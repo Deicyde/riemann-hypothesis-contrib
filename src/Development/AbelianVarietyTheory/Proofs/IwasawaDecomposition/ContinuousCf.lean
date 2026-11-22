@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsOrthono
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
+open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
 open scoped InnerProductSpace Topology
 
 noncomputable section
@@ -18,29 +19,33 @@ def allWords {α : Type} {k : ℕ} (E : Fin k → α) (m : ℕ) : List (List α)
 
 theorem allWords_zero {α : Type} {k : ℕ} (E : Fin k → α) : allWords E 0 = [[]] := rfl
 
-theorem allWords_succ {α : Type} {k : ℕ} (E : Fin k → α) (m : ℕ) :
-    allWords E (m + 1) = [] :: (allWords E m).flatMap fun l => (List.ofFn E).map fun X => X :: l := rfl
+theorem allWords_succ {α : Type} {k : ℕ} (E : Fin k → α) (m : ℕ)
+    : allWords E (m + 1)
+      = [] :: (allWords E m).flatMap fun l => (List.ofFn E).map fun X => X :: l :=
+  rfl
 
-theorem mem_allWords {α : Type} {k : ℕ} (E : Fin k → α) :
-    ∀ (m : ℕ) (l : List α), l ∈ allWords E m ↔ l.length ≤ m ∧ ∀ X ∈ l, ∃ i, E i = X
-  | 0, l => by
-    cases l <;> simp [allWords_zero]
+theorem mem_allWords {α : Type} {k : ℕ} (E : Fin k → α)
+    : ∀ (m : ℕ) (l : List α), l ∈ allWords E m ↔ l.length ≤ m ∧ ∀ X ∈ l, ∃ i, E i = X
+  | 0, l => by cases l <;> simp [allWords_zero]
   | m + 1, [] => by simp [allWords_succ]
   | m + 1, X :: l => by
-    simp only [allWords_succ, List.mem_cons, List.mem_flatMap, List.mem_map, List.mem_ofFn, List.length_cons,
-      reduceCtorEq, false_or, List.cons.injEq, forall_eq_or_imp, Nat.add_le_add_iff_right]
+    simp only [allWords_succ, List.mem_cons, List.mem_flatMap, List.mem_map, List.mem_ofFn,
+      List.length_cons, reduceCtorEq, false_or, List.cons.injEq, forall_eq_or_imp,
+      Nat.add_le_add_iff_right]
     constructor
     · rintro ⟨l', h1, Y, h2, rfl, rfl⟩
       exact ⟨((mem_allWords E m _).1 h1).1, h2, ((mem_allWords E m _).1 h1).2⟩
     · rintro ⟨h1, h2, h3⟩
       exact ⟨l, (mem_allWords E m _).2 ⟨h1, h3⟩, X, h2, rfl, rfl⟩
 
-variable {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {ε : Fin n → Bool} {σ : Mx n → (H →L[ℂ] H)} {k : ℕ}
 
 def cf (E : Fin k → Mx n) (X : Mx n) : ℝ := ∑ i, |((X * (E i)ᴴ).trace).re|
 
-theorem cf_nonneg (E : Fin k → Mx n) (X : Mx n) : 0 ≤ cf E X := Finset.sum_nonneg fun _ _ => abs_nonneg _
+theorem cf_nonneg (E : Fin k → Mx n) (X : Mx n) : 0 ≤ cf E X :=
+  Finset.sum_nonneg fun _ _ => abs_nonneg _
 
 theorem continuous_cf (E : Fin k → Mx n) : Continuous (cf E) := by
   unfold cf
@@ -48,18 +53,28 @@ theorem continuous_cf (E : Fin k → Mx n) : Continuous (cf E) := by
   exact (Complex.continuous_re.comp ((continuous_id.matrix_mul continuous_const).matrix_trace)).abs
 
 omit [CompleteSpace H] in
-theorem Dw_sum (hσ : IsURepOn (UJset ε) σ) {l : List (Mx n)} (hl : ∀ X ∈ l, X ∈ lieSet ε) (c : Fin k → ℂ)
-    {x : Fin k → H} (hx : ∀ i, Sm ε σ (x i)) : Dw σ l (∑ i, c i • x i) = ∑ i, c i • Dw σ l (x i) := by
+theorem Dw_sum
+    (hσ : IsURepOn (UJset ε) σ)
+    {l : List (Mx n)} (hl : ∀ X ∈ l, X ∈ lieSet ε)
+    (c : Fin k → ℂ)
+    {x : Fin k → H} (hx : ∀ i, Sm ε σ (x i))
+    : Dw σ l (∑ i, c i • x i) = ∑ i, c i • Dw σ l (x i) := by
   obtain ⟨L, hL⟩ := exists_word (isUnit_Jm ε) hσ l hl
-  have := congrArg Subtype.val (map_sum L (fun i => c i • (⟨x i, hx i⟩ : smooth (Jm ε) σ)) Finset.univ)
+  have :=
+    congrArg Subtype.val (map_sum L (fun i => c i • (⟨x i, hx i⟩ : smooth (Jm ε) σ)) Finset.univ)
   simp only [map_smul, Submodule.coe_sum, Submodule.coe_smul, hL] at this
   exact this
 
-theorem key (h : Std ε σ) {E : Fin k → Mx n} (hE : ∀ i, E i ∈ lieSet ε)
-    (hx : ∀ X ∈ lieSet ε, X = ∑ i, ((X * (E i)ᴴ).trace).re • E i) (m : ℕ) {w : H} (hw : Sm ε σ w)
-    (l : List (Mx n)) (hl : ∀ X ∈ l, X ∈ lieSet ε) :
-    ∀ p : List (Mx n), (∀ X ∈ p, ∃ i, E i = X) → p.length + l.length ≤ m →
-      ‖Dw σ (p ++ l) w‖ ≤ (l.map (cf E)).prod * sobNorm σ (allWords E m) w := by
+theorem key
+    (h : Std ε σ)
+    {E : Fin k → Mx n}
+    (hE : ∀ i, E i ∈ lieSet ε) (hx : ∀ X ∈ lieSet ε, X = ∑ i, ((X * (E i)ᴴ).trace).re • E i)
+    (m : ℕ)
+    {w : H} (hw : Sm ε σ w)
+    (l : List (Mx n)) (hl : ∀ X ∈ l, X ∈ lieSet ε)
+    : ∀ p : List (Mx n),
+      (∀ X ∈ p, ∃ i, E i = X) → p.length + l.length ≤ m
+        → ‖Dw σ (p ++ l) w‖ ≤ (l.map (cf E)).prod * sobNorm σ (allWords E m) w := by
   induction l with
   | nil =>
     intro p hp hm
@@ -72,8 +87,9 @@ theorem key (h : Std ε σ) {E : Fin k → Mx n} (hE : ∀ i, E i ∈ lieSet ε)
       obtain ⟨i, rfl⟩ := hp Y hY
       exact hE i
     have hs := hw.word h.1 hl'
-    have e1 : Dw σ (p ++ X :: l) w =
-        ∑ i, ((((X * (E i)ᴴ).trace).re : ℝ) : ℂ) • Dw σ ((p ++ [E i]) ++ l) w := by
+    have e1
+        : Dw σ (p ++ X :: l) w
+          = ∑ i, ((((X * (E i)ᴴ).trace).re : ℝ) : ℂ) • Dw σ ((p ++ [E i]) ++ l) w := by
       rw [Dw_append]
       show Dw σ p (dRep σ X (Dw σ l w)) = _
       conv_lhs => rw [hx X hX]
@@ -92,16 +108,28 @@ theorem key (h : Std ε σ) {E : Fin k → Mx n} (hE : ∀ i, E i ∈ lieSet ε)
     · simp only [List.length_append, List.length_cons, List.length_nil] at hm ⊢
       omega
 
-theorem sob_le (h : Std ε σ) {E : Fin k → Mx n} (hE : ∀ i, E i ∈ lieSet ε)
-    (hx : ∀ X ∈ lieSet ε, X = ∑ i, ((X * (E i)ᴴ).trace).re • E i) (m : ℕ) {w : H} (hw : Sm ε σ w)
-    (S : List (List (Mx n))) (hS : Words (lieSet ε) S) (hm : ∀ l ∈ S, l.length ≤ m) :
-    sobNorm σ S w ≤ (S.map fun l => (l.map (cf E)).prod).sum * sobNorm σ (allWords E m) w := by
+theorem sob_le
+    (h : Std ε σ)
+    {E : Fin k → Mx n}
+    (hE : ∀ i, E i ∈ lieSet ε) (hx : ∀ X ∈ lieSet ε, X = ∑ i, ((X * (E i)ᴴ).trace).re • E i)
+    (m : ℕ)
+    {w : H} (hw : Sm ε σ w)
+    (S : List (List (Mx n))) (hS : Words (lieSet ε) S) (hm : ∀ l ∈ S, l.length ≤ m)
+    : sobNorm σ S w ≤ (S.map fun l => (l.map (cf E)).prod).sum * sobNorm σ (allWords E m) w := by
   rw [← List.sum_map_mul_right]
   conv_lhs => unfold sobNorm
   refine List.sum_le_sum fun l hl => ?_
   simpa using key h hE hx m hw l (hS l hl) [] (by simp) (by simpa using hm l hl)
 
-theorem exists_ctrl : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Mx n → (H →L[ℂ] H)), Std ε σ → ∀ S₀ : List (List (Mx n)), Words (lieSet ε) S₀ → ∃ S : List (List (Mx n)), Words (lieSet ε) S ∧ [] ∈ S ∧ Ctrl (lieSet ε) (UJset ε) σ S ∧ ∃ A : ℝ, 0 ≤ A ∧ ∀ w, Sm ε σ w → sobNorm σ S₀ w ≤ A * sobNorm σ S w := by
+theorem exists_ctrl
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        [CompleteSpace H] (σ : Mx n → (H →L[ℂ] H)),
+      Std ε σ
+        → ∀ S₀ : List (List (Mx n)),
+          Words (lieSet ε) S₀
+            → ∃ S : List (List (Mx n)),
+              Words (lieSet ε) S ∧ [] ∈ S ∧ Ctrl (lieSet ε) (UJset ε) σ S
+                ∧ ∃ A : ℝ, 0 ≤ A ∧ ∀ w, Sm ε σ w → sobNorm σ S₀ w ≤ A * sobNorm σ S w := by
   intro n ε H _ _ _ σ h S₀ hS₀
   obtain ⟨E, hE, -, hx⟩ := GlobalTheory.LieONB.exists_orthonormal_basis n ε
   have hE' : ∀ i, E i ∈ lieSet ε := fun i => (hE i).1
@@ -111,12 +139,24 @@ theorem exists_ctrl : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddC
   have hW : Words (lieSet ε) (allWords E m) := fun l hl X hX => by
     obtain ⟨i, rfl⟩ := ((mem_allWords E m l).1 hl).2 X hX
     exact hE' i
-  refine ⟨allWords E m, hW, (mem_allWords E m _).2 (by simp), ?_,
-    (S₀.map fun l => (l.map (cf E)).prod).sum, ?_, fun w hw => sob_le h hE' hx' m hw S₀ hS₀ fun l hl => ?_⟩
-  · refine ⟨fun g => ((allWords E m).map fun l => (l.map fun X => cf E (Jm ε * gᴴ * Jm ε * X * g)).prod).sum, ?_,
-      fun g hg w hw => ?_⟩
+  refine ⟨
+    allWords E m,
+    hW,
+    (mem_allWords E m _).2 (by simp),
+    ?_,
+    (S₀.map fun l => (l.map (cf E)).prod).sum,
+    ?_,
+    fun w hw => sob_le h hE' hx' m hw S₀ hS₀ fun l hl => ?_
+  ⟩
+  · refine ⟨
+      fun g =>
+        ((allWords E m).map fun l => (l.map fun X => cf E (Jm ε * gᴴ * Jm ε * X * g)).prod).sum,
+      ?_,
+      fun g hg w hw => ?_
+    ⟩
     · refine continuous_list_sum _ fun l _ => continuous_list_prod _ fun X _ => ?_
-      exact (continuous_cf E).comp (f := fun g : Mx n => Jm ε * gᴴ * Jm ε * X * g)
+      exact (continuous_cf E).comp
+        (f := fun g : Mx n => Jm ε * gᴴ * Jm ε * X * g)
         (((((continuous_const.matrix_mul continuous_id.matrix_conjTranspose).matrix_mul
           continuous_const).matrix_mul continuous_const)).matrix_mul continuous_id)
     · rw [sobNorm_translate h.1 hg hw hW]

@@ -9,13 +9,14 @@ open GlobalTheory.PRep GlobalTheory.SmGL ValuativeRel PositivityTheory.Lbc
 
 namespace GlobalTheory.CompanionTheory.TopGroup
 
-theorem inter_conj_isOpen :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (J : Subgroup G),
-      IsOpen (J : Set G) → ∀ g : G,
-        IsOpen ((J ⊓ J.map (MulAut.conj g).toMonoidHom : Subgroup G) : Set G) := by
+theorem inter_conj_isOpen
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (J : Subgroup G),
+      IsOpen (J : Set G)
+        → ∀ g : G, IsOpen ((J ⊓ J.map (MulAut.conj g).toMonoidHom : Subgroup G) : Set G) := by
   intro G _ _ _ J hJ g
-  have hpre : ((J.map (MulAut.conj g).toMonoidHom : Subgroup G) : Set G)
-      = (fun x : G => g⁻¹ * x * g) ⁻¹' (J : Set G) := by
+  have hpre
+      : ((J.map (MulAut.conj g).toMonoidHom : Subgroup G) : Set G)
+        = (fun x : G => g⁻¹ * x * g) ⁻¹' (J : Set G) := by
     ext x
     simp only [Subgroup.coe_map, Set.mem_image, SetLike.mem_coe, Set.mem_preimage]
     constructor

@@ -11,12 +11,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.le_of_detIdeal_le :
-    ∀ (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι] (z : Matrix ι ι P) (m : ι → P),
-      CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m) →
-      ∀ Z : Ideal P, Z.IsPrime → relIdeal z m ≤ Z → (∃ j, m j ∉ Z) →
-      ringKrullDim P ≤ ringKrullDim (P ⧸ Z) + (Fintype.card ι : ℕ) →
-      ∀ Q : Ideal P, Q.IsPrime → detIdeal z m ≤ Q → Z ≤ Q := by
+theorem UpperTheory.V.AlgebraTools.le_of_detIdeal_le
+    : ∀ (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι]
+        (z : Matrix ι ι P) (m : ι → P),
+      CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m)
+        → ∀ Z : Ideal P,
+          Z.IsPrime → relIdeal z m ≤ Z → (∃ j, m j ∉ Z)
+            → ringKrullDim P ≤ ringKrullDim (P ⧸ Z) + (Fintype.card ι : ℕ)
+            → ∀ Q : Ideal P, Q.IsPrime → detIdeal z m ≤ Q → Z ≤ Q := by
   intro P _ _ ι _ _ z m hc Z hZ hrel hm hdim Q hQ hdet
   have hdZ : detIdeal z m ≤ Z := det_mem_of_rel P ι z m Z hZ hrel hm
   by_cases hne : Nonempty ι
@@ -44,10 +46,14 @@ theorem UpperTheory.V.AlgebraTools.le_of_detIdeal_le :
   have h2 : ringKrullDim (P ⧸ K) ≤ ringKrullDim (P ⧸ relIdeal z m) :=
     ringKrullDim_le_of_surjective (Ideal.Quotient.factor hrK) (Ideal.Quotient.factor_surjective hrK)
   have h3 := dim_relIdeal_le P ι z m hc
-  have hfin : ringKrullDim (P ⧸ Z) < ⊤ := lt_of_le_of_lt (ringKrullDim_quotient_le Z) ringKrullDim_lt_top
-  have hbot : ringKrullDim (P ⧸ Z) ≠ ⊥ := ne_bot_of_le_ne_bot (by simp) ringKrullDim_nonneg_of_nontrivial
+  have hfin : ringKrullDim (P ⧸ Z) < ⊤ :=
+    lt_of_le_of_lt (ringKrullDim_quotient_le Z) ringKrullDim_lt_top
+  have hbot : ringKrullDim (P ⧸ Z) ≠ ⊥ :=
+    ne_bot_of_le_ne_bot (by simp) ringKrullDim_nonneg_of_nontrivial
   have h12 := h1.trans h2
-  have key : ringKrullDim (P ⧸ Z) + 1 + (Fintype.card ι : ℕ) ≤ ringKrullDim (P ⧸ Z) + (Fintype.card ι : ℕ) := by
+  have key
+      : ringKrullDim (P ⧸ Z) + 1 + (Fintype.card ι : ℕ)
+        ≤ ringKrullDim (P ⧸ Z) + (Fintype.card ι : ℕ) := by
     refine le_trans ?_ (h3.trans hdim)
     gcongr
   generalize ringKrullDim (P ⧸ Z) = d at key hfin hbot

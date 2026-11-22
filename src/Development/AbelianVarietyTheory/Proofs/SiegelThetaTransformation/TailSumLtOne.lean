@@ -6,9 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem tail_sum_lt_one {ι : Type*} (idx : ι → ℕ) (ρ n : ℕ) (hn : 4 * ρ + 4 ≤ n) (h2 : ∀ i, 2 ≤ idx i)
-    (hc : ∀ m, {i | idx i = m}.Finite ∧ {i | idx i = m}.ncard ≤ m ^ (2 * ρ)) (c : ι → ℂ) (hcb : ∀ i, ‖c i‖ ≤ (idx i : ℝ) ^ (-(n : ℝ) / 2)) :
-    Summable (fun i => ‖c i‖) ∧ ∑' i, ‖c i‖ ≤ 0.65 := by
+theorem tail_sum_lt_one
+    {ι : Type*} (idx : ι → ℕ)
+    (ρ n : ℕ) (hn : 4 * ρ + 4 ≤ n)
+    (h2 : ∀ i, 2 ≤ idx i) (hc : ∀ m, {i | idx i = m}.Finite ∧ {i | idx i = m}.ncard ≤ m ^ (2 * ρ))
+    (c : ι → ℂ) (hcb : ∀ i, ‖c i‖ ≤ (idx i : ℝ) ^ (-(n : ℝ) / 2))
+    : Summable (fun i => ‖c i‖) ∧ ∑' i, ‖c i‖ ≤ 0.65 := by
   classical
   have hterm : ∀ i, ‖c i‖ ≤ 1 / ((idx i : ℝ) ^ (2 * ρ) * (idx i : ℝ) ^ 2) := by
     intro i
@@ -34,16 +37,17 @@ theorem tail_sum_lt_one {ι : Type*} (idx : ι → ℕ) (ρ n : ℕ) (hn : 4 * �
           intro i hi
           simpa using (Finset.mem_filter.1 (Finset.mem_coe.1 hi)).2
         exact_mod_cast h3.trans (hc _).2
-      calc ∑ i ∈ s with idx i = idx j, ‖c i‖
-          ≤ (s.filter (fun i => idx i = idx j)).card •
-              (1 / ((idx j : ℝ) ^ (2 * ρ) * (idx j : ℝ) ^ 2)) := by
-            refine Finset.sum_le_card_nsmul _ _ _ ?_
-            intro i hi
-            have := hterm i
-            rwa [(Finset.mem_filter.1 hi).2] at this
+      calc
+        ∑ i ∈ s with idx i = idx j, ‖c i‖
+            ≤ (s.filter (fun i => idx i = idx j)).card
+              • (1 / ((idx j : ℝ) ^ (2 * ρ) * (idx j : ℝ) ^ 2)) := by
+          refine Finset.sum_le_card_nsmul _ _ _ ?_
+          intro i hi
+          have := hterm i
+          rwa [(Finset.mem_filter.1 hi).2] at this
         _ ≤ (idx j : ℝ) ^ (2 * ρ) * (1 / ((idx j : ℝ) ^ (2 * ρ) * (idx j : ℝ) ^ 2)) := by
-            rw [nsmul_eq_mul]
-            exact mul_le_mul_of_nonneg_right hcard (by positivity)
+          rw [nsmul_eq_mul]
+          exact mul_le_mul_of_nonneg_right hcard (by positivity)
         _ = 1 / (idx j : ℝ) ^ 2 := by field_simp
     refine (Finset.sum_le_sum hfib).trans ?_
     have h1 : 1 ∉ s.image idx := by

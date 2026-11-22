@@ -18,13 +18,18 @@ namespace GlobalTheory.MemLoc
 set_option allowUnsafeReducibility true in
 attribute [local irreducible] Per.Acris
 
-theorem crisP_ker_dvd (l : ℕ) [Fact l.Prime] (j : Per.Acris l →+* Per.BdRp l) (hj : IsCrisP j)
-    (x : Per.Acris l) (hx : j x = 0) : ∃ y : Per.Acris l, j y = 0 ∧ x = (l : Per.Acris l) * y := by
+theorem crisP_ker_dvd
+    (l : ℕ) [Fact l.Prime]
+    (j : Per.Acris l →+* Per.BdRp l) (hj : IsCrisP j)
+    (x : Per.Acris l) (hx : j x = 0)
+    : ∃ y : Per.Acris l, j y = 0 ∧ x = (l : Per.Acris l) * y := by
   obtain ⟨-, -, hd, hdv⟩ := acris_basic l
   obtain ⟨s, z, hs⟩ := hd x 1
   have h1 : (l : Per.Acris0 l) ∣ s := by
     refine GlobalTheory.T.acris_divisible_of_kernel_powers l s fun n => ?_
-    obtain ⟨u, z', hu, e⟩ := GlobalTheory.T.acris_filtration_approx_by_envelope_kernel_power l j hj n x (by rw [hx]; exact zero_mem _)
+    obtain ⟨u, z', hu, e⟩ :=
+      GlobalTheory.T.acris_filtration_approx_by_envelope_kernel_power l j hj n x
+        (by rw [hx]; exact zero_mem _)
     obtain ⟨w, hw⟩ := (hdv (s - u) 1).1 ⟨z' - z, by rw [map_sub]; linear_combination e - hs⟩
     exact ⟨u, w, by linear_combination hw, hu⟩
   obtain ⟨w, hw⟩ := h1
@@ -38,9 +43,12 @@ theorem crisP_ker_dvd (l : ℕ) [Fact l.Prime] (j : Per.Acris l →+* Per.BdRp l
   rw [e, map_mul, map_natCast] at hx
   exact hu.mul_right_eq_zero.1 hx
 
-theorem crisP_injective : ∀ (l : ℕ) [Fact l.Prime], ∀ j : Per.Acris l →+* Per.BdRp l, IsCrisP j → Function.Injective j := by
+theorem crisP_injective
+    : ∀ (l : ℕ) [Fact l.Prime], ∀ j : Per.Acris l →+* Per.BdRp l,
+      IsCrisP j → Function.Injective j := by
   intro l _ j hj
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   have h : ∀ n : ℕ, ∃ y : Per.Acris l, j y = 0 ∧ x = (l : Per.Acris l) ^ n * y := by
     intro n

@@ -98,17 +98,26 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SplitCa
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 namespace UpperTheory.N
 
+open Classical in
+def withDc
+    {D : D7} (X : KillingConditions.HubData D) (i : D.nd.Loc)
+    (dc : TruncatedSeriesCountingIdentities.Decl D i)
+    : KillingConditions.HubData D := {
+  X with
+  dc := Function.update X.dc i dc
+}
 
 open Classical in
-def withDc {D : D7} (X : KillingConditions.HubData D) (i : D.nd.Loc) (dc : TruncatedSeriesCountingIdentities.Decl D i) : KillingConditions.HubData D :=
-  { X with dc := Function.update X.dc i dc }
-
-open Classical in
-theorem withDc_dc {D : D7} (X : KillingConditions.HubData D) (i : D.nd.Loc) (dc : TruncatedSeriesCountingIdentities.Decl D i) : (withDc X i dc).dc i = dc := by
+theorem withDc_dc
+    {D : D7} (X : KillingConditions.HubData D) (i : D.nd.Loc)
+    (dc : TruncatedSeriesCountingIdentities.Decl D i)
+    : (withDc X i dc).dc i = dc := by
   simp only [withDc, Function.update_self]
 
 end UpperTheory.N

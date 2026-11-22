@@ -10,8 +10,8 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.BI
 
-theorem ind_mul_classFun_eq_ind_mul_restrict :
-    ∀ (G : Type) [Group G] [Finite G] (H : Subgroup G) (ψ : H → ℂ) (φ : G → ℂ),
+theorem ind_mul_classFun_eq_ind_mul_restrict
+    : ∀ (G : Type) [Group G] [Finite G] (H : Subgroup G) (ψ : H → ℂ) (φ : G → ℂ),
       (∀ g x : G, φ (x⁻¹ * g * x) = φ g) → ind H ψ * φ = ind H (fun h => ψ h * φ h) := by
   intro G _ _ H ψ φ hφ
   funext g

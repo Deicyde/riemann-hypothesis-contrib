@@ -6,18 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory.FinprodProdMulIte
 
-
 open Classical in
-theorem finprod_eq_prod_mul_finprod_ite {ι : Type} (S₁ : Finset ι) (f g : ι → ℂ)
-    (hf : (Function.mulSupport f).Finite) (hfg : ∀ p, p ∉ S₁ → f p = g p) :
-    ∏ᶠ p, f p = (∏ p ∈ S₁, f p) * ∏ᶠ p, (if p ∈ S₁ then (1 : ℂ) else g p) := by
+theorem finprod_eq_prod_mul_finprod_ite
+    {ι : Type} (S₁ : Finset ι) (f g : ι → ℂ) (hf : (Function.mulSupport f).Finite)
+    (hfg : ∀ p, p ∉ S₁ → f p = g p)
+    : ∏ᶠ p, f p = (∏ p ∈ S₁, f p) * ∏ᶠ p, (if p ∈ S₁ then (1 : ℂ) else g p) := by
   have hsub₁ : Function.mulSupport (fun p => if p ∈ S₁ then f p else (1 : ℂ)) ⊆ (S₁ : Set ι) := by
     intro p hp
     by_contra h
     have h' : p ∉ S₁ := h
     exact hp (by simp [h'])
-  have hsub₂ : Function.mulSupport (fun p => if p ∈ S₁ then (1 : ℂ) else g p)
-      ⊆ Function.mulSupport f := by
+  have hsub₂
+      : Function.mulSupport (fun p => if p ∈ S₁ then (1 : ℂ) else g p) ⊆ Function.mulSupport f := by
     intro p hp
     by_cases h : p ∈ S₁
     · exact absurd (by simp [h]) hp

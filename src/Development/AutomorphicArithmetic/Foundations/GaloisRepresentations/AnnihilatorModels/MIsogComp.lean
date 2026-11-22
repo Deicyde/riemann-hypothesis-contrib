@@ -6,15 +6,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-private theorem comp_pow' {C : Type*} [Category C] [CartesianMonoidalCategory C] {X Y Z : C} [MonObj Z]
-    (f : X ⟶ Y) (g : Y ⟶ Z) (n : ℕ) : f ≫ (g ^ n) = (f ≫ g) ^ n := by
+private theorem comp_pow'
+    {C : Type*} [Category C] [CartesianMonoidalCategory C]
+    {X Y Z : C} [MonObj Z]
+    (f : X ⟶ Y) (g : Y ⟶ Z) (n : ℕ)
+    : f ≫ (g ^ n) = (f ≫ g) ^ n := by
   induction n with
   | zero =>
     simp only [pow_zero, Hom.one_def]
@@ -22,12 +28,16 @@ private theorem comp_pow' {C : Type*} [Category C] [CartesianMonoidalCategory C]
   | succ n ih =>
     rw [pow_succ, pow_succ, ← ih, Hom.mul_def, Hom.mul_def, ← Category.assoc, comp_lift]
 
-private theorem pow_comp' {C : Type*} [Category C] [CartesianMonoidalCategory C] {X Y Z : C} [MonObj Y] [MonObj Z]
-    (f : X ⟶ Y) (g : Y ⟶ Z) [IsMonHom g] (n : ℕ) : (f ^ n) ≫ g = (f ≫ g) ^ n := by
+private theorem pow_comp'
+    {C : Type*} [Category C] [CartesianMonoidalCategory C]
+    {X Y Z : C} [MonObj Y] [MonObj Z]
+    (f : X ⟶ Y)
+    (g : Y ⟶ Z) [IsMonHom g]
+    (n : ℕ)
+    : (f ^ n) ≫ g = (f ≫ g) ^ n := by
   exact map_pow (IsMonHom.monoidHom g X) f n
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.isogComp_of :
-    PairCalc → IsogComp := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.isogComp_of : PairCalc → IsogComp := by
   intro hP p _ D R _ b N S s c c' o o₁ o₂ ψ χ h1 h2
   obtain ⟨⟨k, rfl⟩, hψ, ha, he, hL, ψ', hψ', hψ1, hψ2⟩ := h1
   obtain ⟨⟨k', rfl⟩, hχ, ha', he', hL', χ', hχ', hχ1, hχ2⟩ := h2
@@ -35,7 +45,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.isogComp_of :
   haveI := hχ
   haveI := hψ'
   haveI := hχ'
-  refine ⟨⟨k + k', (pow_add p k k').symm⟩, inferInstance, ?_, ?_, ?_, ⟨χ' ≫ ψ', inferInstance, ?_, ?_⟩⟩
+  refine
+    ⟨⟨k + k', (pow_add p k k').symm⟩, inferInstance, ?_, ?_, ?_, ⟨χ' ≫ ψ', inferInstance, ?_, ?_⟩⟩
   · intro a
     rw [← Category.assoc, ha, Category.assoc, ha', Category.assoc]
   · intro x

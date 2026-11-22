@@ -16,7 +16,9 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ContDiffMatri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Matrix
 open Formalism.REAL GlobalTheory.SmoothGlob GlobalTheory.TypeSum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -24,8 +26,8 @@ open GlobalTheory.KFourier MeasureTheory
 
 namespace GlobalTheory.HsLe
 
-theorem hs_toMK_sub_one_le {n : ℕ} (ε : Fin n → Bool) (k : KG ε) :
-    Formalism.REAL.hs (toMK k - 1) ≤ 4 * (n : ℝ) := by
+theorem hs_toMK_sub_one_le {n : ℕ} (ε : Fin n → Bool) (k : KG ε)
+    : Formalism.REAL.hs (toMK k - 1) ≤ 4 * (n : ℝ) := by
   have hu : toMK k ∈ unitary (Matrix (Fin n) (Fin n) ℂ) := k.2.1
   have hcol : ∀ j : Fin n, ∑ i, ‖toMK k i j‖ ^ 2 = 1 := by
     intro j
@@ -46,20 +48,22 @@ theorem hs_toMK_sub_one_le {n : ℕ} (ε : Fin n → Bool) (k : KG ε) :
     have : ∀ i j : Fin n, ‖(1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ^ 2 = if i = j then 1 else 0 := by
       intro i j
       by_cases h : i = j <;> simp [Matrix.one_apply, h]
-    simp only [this, Finset.sum_ite_eq, Finset.mem_univ, if_true, Finset.sum_const, Finset.card_univ,
-      Fintype.card_fin, nsmul_eq_mul, mul_one]
+    simp only [this, Finset.sum_ite_eq, Finset.mem_univ, if_true, Finset.sum_const,
+      Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
   have key : ∀ a b : ℂ, ‖a - b‖ ^ 2 ≤ 2 * ‖a‖ ^ 2 + 2 * ‖b‖ ^ 2 := by
     intro a b
     have h := norm_sub_le a b
     nlinarith [norm_nonneg (a - b), norm_nonneg a, norm_nonneg b, sq_nonneg (‖a‖ - ‖b‖)]
   unfold Formalism.REAL.hs
-  calc ∑ i, ∑ j, ‖(toMK k - 1) i j‖ ^ 2
-      ≤ ∑ i, ∑ j, (2 * ‖toMK k i j‖ ^ 2 + 2 * ‖(1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ^ 2) := by
-        refine Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => ?_
-        rw [Matrix.sub_apply]
-        exact key _ _
-    _ = 2 * ∑ i, ∑ j, ‖toMK k i j‖ ^ 2 + 2 * ∑ i : Fin n, ∑ j : Fin n, ‖(1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ^ 2 := by
-        simp only [Finset.sum_add_distrib, Finset.mul_sum]
+  calc
+    ∑ i, ∑ j, ‖(toMK k - 1) i j‖ ^ 2
+        ≤ ∑ i, ∑ j, (2 * ‖toMK k i j‖ ^ 2 + 2 * ‖(1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ^ 2) := by
+      refine Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => ?_
+      rw [Matrix.sub_apply]
+      exact key _ _
+    _ = 2 * ∑ i, ∑ j, ‖toMK k i j‖ ^ 2
+        + 2 * ∑ i : Fin n, ∑ j : Fin n, ‖(1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ^ 2 := by
+      simp only [Finset.sum_add_distrib, Finset.mul_sum]
     _ = 4 * (n : ℝ) := by rw [hsum, hone]; ring
 
 end GlobalTheory.HsLe

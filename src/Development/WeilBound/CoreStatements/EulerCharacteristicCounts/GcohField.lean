@@ -18,19 +18,20 @@ theorem integer_padic_eq (p : ℕ) [Fact p.Prime] : 𝒪[ℚ_[p]] = PadicInt.sub
     Valuation.Compatible.vle_iff_le (v := Padic.mulValuation),
     GroundTheory.LocalField.Padic.mulValuation_le_iff_norm_le, norm_one]
 
-theorem card_quotient_padic (p : ℕ) [Fact p.Prime] (m : ℕ) :
-    Nat.card (𝒪[ℚ_[p]] ⧸ Ideal.span {((p ^ m : ℕ) : 𝒪[ℚ_[p]])}) = p ^ m := by
+theorem card_quotient_padic (p : ℕ) [Fact p.Prime] (m : ℕ)
+    : Nat.card (𝒪[ℚ_[p]] ⧸ Ideal.span {((p ^ m : ℕ) : 𝒪[ℚ_[p]])}) = p ^ m := by
   let e : 𝒪[ℚ_[p]] ≃+* ℤ_[p] := RingEquiv.subringCongr (integer_padic_eq p)
-  have h1 : Ideal.span {((p ^ m : ℕ) : ℤ_[p])} =
-      (Ideal.span {((p ^ m : ℕ) : 𝒪[ℚ_[p]])}).map (e : 𝒪[ℚ_[p]] →+* ℤ_[p]) := by
+  have h1
+      : Ideal.span {((p ^ m : ℕ) : ℤ_[p])}
+        = (Ideal.span {((p ^ m : ℕ) : 𝒪[ℚ_[p]])}).map (e : 𝒪[ℚ_[p]] →+* ℤ_[p]) := by
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
-  rw [Nat.card_congr (Ideal.quotientEquiv _ _ e h1).toEquiv, Nat.cast_pow,
-    ← PadicInt.ker_toZModPow,
-    Nat.card_congr (RingHom.quotientKerEquivOfSurjective
-      (ZMod.ringHom_surjective (PadicInt.toZModPow m))).toEquiv, Nat.card_zmod]
+  rw [Nat.card_congr (Ideal.quotientEquiv _ _ e h1).toEquiv, Nat.cast_pow, ← PadicInt.ker_toZModPow,
+    Nat.card_congr (RingHom.quotientKerEquivOfSurjective (ZMod.ringHom_surjective
+      (PadicInt.toZModPow m))).toEquiv,
+    Nat.card_zmod]
 
-theorem isSepClosure_padic (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) :
-    IsSepClosure ↥K (PadicAlgCl l) :=
+theorem isSepClosure_padic (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l))
+    : IsSepClosure ↥K (PadicAlgCl l) :=
   ⟨inferInstance, Algebra.isSeparable_tower_top_of_isSeparable ℚ_[l] K _⟩
 
 theorem gcField : SgcField := by

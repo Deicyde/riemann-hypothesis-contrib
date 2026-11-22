@@ -5,13 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SumSu
 
 @[expose] public section
 
-open MvPolynomial GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.GoodMetric.ChernSpan GlobalTheory.GoodMetric.PolyRep
+open MvPolynomial GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.GoodMetric.ChernSpan
+  GlobalTheory.GoodMetric.PolyRep
 open scoped Matrix
 
 namespace GlobalTheory.GoodMetric.ChernSpan
 
-theorem trSpan_mul : ∀ {ι : Type} (m : ι → ℕ) (S : Type) [CommRing S] [Algebra ℝ S] (w w' : ℕ)
-    (f g : Mat m S → S), f ∈ TrSpan m w S → g ∈ TrSpan m w' S → f * g ∈ TrSpan m (w + w') S := by
+theorem trSpan_mul
+    : ∀ {ι : Type} (m : ι → ℕ) (S : Type) [CommRing S] [Algebra ℝ S] (w w' : ℕ) (f g : Mat m S → S),
+      f ∈ TrSpan m w S → g ∈ TrSpan m w' S → f * g ∈ TrSpan m (w + w') S := by
   intro ι m S _ _ w w' f g hf hg
   induction hf using Submodule.span_induction with
   | mem x hx =>

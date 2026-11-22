@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.LocalSmoothExtension
 
-theorem UpperTheory.Gal.LocalSmoothExtension.dSumCongr_of :
-    DSumCongr := by
+theorem UpperTheory.Gal.LocalSmoothExtension.dSumCongr_of : DSumCongr := by
   classical
   intro p _ G wt wt' s hw K f r K' φ
   unfold GlobalTheory.LKDef.dSumIrr

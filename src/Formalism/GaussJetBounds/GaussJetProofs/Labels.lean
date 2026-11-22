@@ -12,8 +12,8 @@ namespace Formalism.DworkPowerSeriesWeights
 
 open Formalism.IncomingBounds
 
-theorem bddAbove_norm_coeff {R : Type} [NormedField R] {σ : Type} (Q : MvPolynomial σ R) :
-    BddAbove (Set.range fun n : σ →₀ ℕ => ‖AddMonoidAlgebra.coeff Q n‖) := by
+theorem bddAbove_norm_coeff {R : Type} [NormedField R] {σ : Type} (Q : MvPolynomial σ R)
+    : BddAbove (Set.range fun n : σ →₀ ℕ => ‖AddMonoidAlgebra.coeff Q n‖) := by
   classical
   have hfin : (Set.range fun n : σ →₀ ℕ => ‖AddMonoidAlgebra.coeff Q n‖).Finite := by
     refine Set.Finite.subset
@@ -30,9 +30,11 @@ theorem gauss_sum_powers : GaussPow := by
   classical
   intro F K _ _ φ σ Y h k hk Q n
   let E : (σ →₀ ℕ) → (σ →₀ ℕ) := fun n =>
-    Finsupp.onFinset n.support (fun y => k y * n y) (fun y hy => by
-      rw [Finsupp.mem_support_iff]
-      exact fun h0 => hy (by rw [h0, Nat.mul_zero]))
+    Finsupp.onFinset n.support
+      (fun y => k y * n y)
+      (fun y hy => by
+        rw [Finsupp.mem_support_iff]
+        exact fun h0 => hy (by rw [h0, Nat.mul_zero]))
   have hEa : ∀ n y, E n y = k y * n y := fun n y => rfl
   have hE : Function.Injective E := by
     intro n n' hnn
@@ -40,7 +42,8 @@ theorem gauss_sum_powers : GaussPow := by
     have := congrArg (fun f => f y) hnn
     simp only [hEa] at this
     exact Nat.eq_of_mul_eq_mul_left (Nat.pos_of_ne_zero (hk y)) this
-  let Q' : MvPolynomial σ F := ∑ n ∈ Q.support, MvPolynomial.monomial (E n) (AddMonoidAlgebra.coeff Q n)
+  let Q' : MvPolynomial σ F :=
+    ∑ n ∈ Q.support, MvPolynomial.monomial (E n) (AddMonoidAlgebra.coeff Q n)
   have h1 : MvPolynomial.eval₂ φ Y Q' = MvPolynomial.eval₂ φ (fun y => Y y ^ k y) Q := by
     rw [MvPolynomial.eval₂_sum, MvPolynomial.eval₂_eq]
     refine Finset.sum_congr rfl fun n _ => ?_
@@ -62,12 +65,14 @@ theorem labelsExist_statement : LabelsExist := by
   classical
   intro l d N0 _ hl TT nu1 size a ha hnu hsize hN
   let S : ZMod d → Finset ℤ := fun s =>
-    (Finset.Icc (-(a : ℤ)) a).filter (fun j => Odd j ∧ s - (j : ZMod d) ∈ TT ∧
-      (0 < j → l ^ j.toNat ≤ nu1 (s - (j : ZMod d))) ∧ (j < 0 → l ^ (-j).toNat ≤ size s))
+    (Finset.Icc (-(a : ℤ)) a).filter (fun j =>
+      Odd j ∧ s - (j : ZMod d) ∈ TT ∧ (0 < j → l ^ j.toNat ≤ nu1 (s - (j : ZMod d)))
+        ∧ (j < 0 → l ^ (-j).toNat ≤ size s))
 
-  have hpow : ∀ (s : ZMod d) (j : ℤ), Odd j →
-      (0 < j → l ^ j.toNat ≤ nu1 (s - (j : ZMod d))) → (j < 0 → l ^ (-j).toNat ≤ size s) →
-      l ^ j.natAbs ≤ a := by
+  have hpow
+      : ∀ (s : ZMod d) (j : ℤ),
+        Odd j → (0 < j → l ^ j.toNat ≤ nu1 (s - (j : ZMod d))) → (j < 0 → l ^ (-j).toNat ≤ size s)
+          → l ^ j.natAbs ≤ a := by
     intro s j hj h1 h2
     rcases lt_trichotomy j 0 with h | h | h
     · have : (-j).toNat = j.natAbs := by omega
@@ -91,9 +96,16 @@ theorem labelsExist_statement : LabelsExist := by
       simp only [S, Finset.mem_filter] at hj
       rw [Finset.mem_filter]
       exact ⟨hj.1, hj.2.1, hpow s j hj.2.1 hj.2.2.2.1 hj.2.2.2.2⟩)
-  refine ⟨fun s => (S s).card,
-    fun s i => (s - ((((S s).equivFin.symm i : S s) : ℤ) : ZMod d), (((S s).equivFin.symm i : S s) : ℤ)),
-    a, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    fun s => (S s).card,
+    fun s i =>
+      (s - ((((S s).equivFin.symm i : S s) : ℤ) : ZMod d), (((S s).equivFin.symm i : S s) : ℤ)),
+    a,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro s i i' hii
     have h2 := congrArg Prod.snd hii
     simp only at h2

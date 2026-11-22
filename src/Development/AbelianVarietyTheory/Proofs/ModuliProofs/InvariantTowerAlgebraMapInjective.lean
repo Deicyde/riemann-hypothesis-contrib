@@ -12,20 +12,26 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SubalgebraEqT
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem mem_smul_ker_of_flat_quotient {B T C : Type} [CommRing B] [AddCommGroup T] [Module B T]
-    [AddCommGroup C] [Module B C] [Module.Flat B C] (φ : T →ₗ[B] C) (hφ : Function.Surjective φ)
-    (q : Ideal B) (x : LinearMap.ker φ) (hx : (x : T) ∈ q • (⊤ : Submodule B T)) :
-    x ∈ q • (⊤ : Submodule B (LinearMap.ker φ)) := by
-  have hinj := LinearMap.lTensor_injective_of_exact_of_flat φ hφ (LinearMap.ker φ).subtype
-    (Submodule.injective_subtype _) (LinearMap.exact_subtype_ker_map φ) (B ⧸ q)
-  have h0 : ∀ (M : Type) [AddCommGroup M] [Module B M] (y : M),
-      ((1 : B ⧸ q) ⊗ₜ[B] y = 0 ↔ y ∈ q • (⊤ : Submodule B M)) := by
+theorem mem_smul_ker_of_flat_quotient
+    {B T C : Type}
+    [CommRing B] [AddCommGroup T] [Module B T] [AddCommGroup C] [Module B C] [Module.Flat B C]
+    (φ : T →ₗ[B] C) (hφ : Function.Surjective φ)
+    (q : Ideal B) (x : LinearMap.ker φ) (hx : (x : T) ∈ q • (⊤ : Submodule B T))
+    : x ∈ q • (⊤ : Submodule B (LinearMap.ker φ)) := by
+  have hinj :=
+    LinearMap.lTensor_injective_of_exact_of_flat φ hφ (LinearMap.ker φ).subtype
+      (Submodule.injective_subtype _) (LinearMap.exact_subtype_ker_map φ) (B ⧸ q)
+  have h0
+      : ∀ (M : Type) [AddCommGroup M] [Module B M] (y : M),
+        ((1 : B ⧸ q) ⊗ₜ[B] y = 0 ↔ y ∈ q • (⊤ : Submodule B M)) := by
     intro M _ _ y
     rw [← Submodule.Quotient.mk_eq_zero, ← TensorProduct.quotTensorEquivQuotSMul_symm_mk,
       LinearEquiv.map_eq_zero_iff]
@@ -34,10 +40,11 @@ theorem mem_smul_ker_of_flat_quotient {B T C : Type} [CommRing B] [AddCommGroup 
   rw [LinearMap.lTensor_tmul, map_zero, h0]
   exact hx
 
-theorem ideal_eq_bot_of_forall_prime_smul_mem {B T : Type} [CommRing B] [CommRing T]
-    [Algebra B T] (J : Ideal T) (hJ : J.FG)
-    (h : ∀ q : Ideal B, q.IsPrime → ∀ x ∈ J, ∃ s : B, s ∉ q ∧
-      s • x ∈ q • (J.restrictScalars B)) : J = ⊥ := by
+theorem ideal_eq_bot_of_forall_prime_smul_mem
+    {B T : Type} [CommRing B] [CommRing T] [Algebra B T]
+    (J : Ideal T) (hJ : J.FG)
+    (h : ∀ q : Ideal B, q.IsPrime → ∀ x ∈ J, ∃ s : B, s ∉ q ∧ s • x ∈ q • (J.restrictScalars B))
+    : J = ⊥ := by
   by_cases hJt : Submodule.annihilator J = ⊤
   · exact Submodule.annihilator_eq_top_iff.1 hJt
   obtain ⟨n, hn, hJn⟩ := Ideal.exists_le_maximal _ hJt
@@ -64,14 +71,26 @@ theorem ideal_eq_bot_of_forall_prime_smul_mem {B T : Type} [CommRing B] [CommRin
   have := n.sub_mem hrJ hr
   rwa [sub_sub_cancel] at this
 
-theorem isPushout_of_tame :
-    ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B R C : Type) [CommRing A] [CommRing B] [CommRing R] [CommRing C] [MulSemiringAction Γ B] [MulSemiringAction Γ C] [Algebra A B] [Algebra A R] [Algebra B C] [Algebra R C] [Algebra A C] [IsScalarTower A B C] [IsScalarTower A R C] [SMulCommClass Γ A B] [SMulCommClass Γ R C] [Algebra.IsInvariant A B Γ] [Algebra.IsInvariant R C Γ], Function.Injective (algebraMap A B) → Function.Injective (algebraMap R C) → (∀ (g : Γ) (b : B), g • algebraMap B C b = algebraMap B C (g • b)) → IsNoetherianRing R → Module.Finite A B → Module.Finite R C → Module.Flat B C → (∀ q : Ideal B, q.IsPrime → (Nat.card (q.inertia Γ) : B) ∉ q) → (∀ q : Ideal B, q.IsPrime → ∀ g ∈ q.inertia Γ, ∀ c : C, g • c - c ∈ q.map (algebraMap B C)) → Algebra.IsPushout A B R C := by
+theorem isPushout_of_tame
+    : ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B R C : Type) [CommRing A] [CommRing B] [CommRing R]
+        [CommRing C] [MulSemiringAction Γ B] [MulSemiringAction Γ C] [Algebra A B] [Algebra A R]
+        [Algebra B C] [Algebra R C] [Algebra A C] [IsScalarTower A B C] [IsScalarTower A R C]
+        [SMulCommClass Γ A B] [SMulCommClass Γ R C] [Algebra.IsInvariant A B Γ]
+        [Algebra.IsInvariant R C Γ],
+      Function.Injective (algebraMap A B) → Function.Injective (algebraMap R C)
+        → (∀ (g : Γ) (b : B), g • algebraMap B C b = algebraMap B C (g • b)) → IsNoetherianRing R
+        → Module.Finite A B → Module.Finite R C → Module.Flat B C
+        → (∀ q : Ideal B, q.IsPrime → (Nat.card (q.inertia Γ) : B) ∉ q)
+        → (∀ q : Ideal B,
+          q.IsPrime → ∀ g ∈ q.inertia Γ, ∀ c : C, g • c - c ∈ q.map (algebraMap B C))
+        → Algebra.IsPushout A B R C := by
   intro Γ _ _ A B R C _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hAB hRC heq hnoeth hfAB hfRC hflat hcard hI
   classical
   haveI := Fintype.ofFinite Γ
   haveI : SMulCommClass A Γ B := SMulCommClass.symm _ _ _
-  let φ : B ⊗[A] R →ₐ[B] C := Algebra.TensorProduct.lift (Algebra.ofId B C)
-    (IsScalarTower.toAlgHom A R C) (fun _ _ => Commute.all _ _)
+  let φ : B ⊗[A] R →ₐ[B] C :=
+    Algebra.TensorProduct.lift (Algebra.ofId B C) (IsScalarTower.toAlgHom A R C)
+      (fun _ _ => Commute.all _ _)
   have hφ : ∀ (b : B) (r : R), φ (b ⊗ₜ r) = algebraMap B C b * algebraMap R C r := by
     intro b r
     simp [φ, Algebra.ofId_apply]
@@ -102,11 +121,12 @@ theorem isPushout_of_tame :
     induction x using TensorProduct.induction_on with
     | zero => exact ⟨0, by simp⟩
     | tmul c r =>
-      obtain ⟨a, ha⟩ := Algebra.IsInvariant.isInvariant (A := A) (G := Γ) (∑ g : Γ, g • c) (by
-        intro k
-        rw [Finset.smul_sum]
-        simp only [← mul_smul]
-        exact Equiv.sum_comp (Equiv.mulLeft k) (fun g => g • c))
+      obtain ⟨a, ha⟩ :=
+        Algebra.IsInvariant.isInvariant (A := A) (G := Γ) (∑ g : Γ, g • c) (by
+          intro k
+          rw [Finset.smul_sum]
+          simp only [← mul_smul]
+          exact Equiv.sum_comp (Equiv.mulLeft k) (fun g => g • c))
       refine ⟨a • r, ?_⟩
       simp only [TensorProduct.smul_tmul']
       rw [← TensorProduct.sum_tmul, ← ha, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
@@ -123,8 +143,9 @@ theorem isPushout_of_tame :
     rw [← Finset.sum_smul, hb, one_smul] at hr
     rw [hr, hφ, map_one, _root_.one_mul, map_eq_zero_iff _ hRC] at hx
     rw [hr, hx, TensorProduct.tmul_zero]
-  have hinert : ∀ q : Ideal B, ∀ g ∈ q.inertia Γ, ∀ x : B ⊗[A] R,
-      g • x - x ∈ q • (⊤ : Submodule B (B ⊗[A] R)) := by
+  have hinert
+      : ∀ q : Ideal B, ∀ g ∈ q.inertia Γ, ∀ x : B ⊗[A] R,
+        g • x - x ∈ q • (⊤ : Submodule B (B ⊗[A] R)) := by
     intro q g hg x
     induction x using TensorProduct.induction_on with
     | zero => simp
@@ -149,10 +170,12 @@ theorem isPushout_of_tame :
   have hker : RingHom.ker φ = ⊥ := by
     refine ideal_eq_bot_of_forall_prime_smul_mem (B := B) _ (IsNoetherian.noetherian _) ?_
     intro q hq x hx
-    obtain ⟨s, hs, hsx⟩ := exists_smul_mem_span_invariants_sup Γ B K
-      (fun g b y => Subtype.ext (hsl g b y)) q hq (hcard q hq)
-      (fun g hg y => mem_smul_ker_of_flat_quotient φ.toLinearMap hsurj q _ (hinert q g hg y))
-      ⟨x, hx⟩
+    obtain ⟨s, hs, hsx⟩ :=
+      exists_smul_mem_span_invariants_sup Γ B K
+        (fun g b y => Subtype.ext (hsl g b y))
+        q hq (hcard q hq)
+        (fun g hg y => mem_smul_ker_of_flat_quotient φ.toLinearMap hsurj q _ (hinert q g hg y))
+        ⟨x, hx⟩
     refine ⟨s, hs, ?_⟩
     have hbot : Submodule.span B {y : K | ∀ g : Γ, g • y = y} = ⊥ := by
       rw [Submodule.span_eq_bot]

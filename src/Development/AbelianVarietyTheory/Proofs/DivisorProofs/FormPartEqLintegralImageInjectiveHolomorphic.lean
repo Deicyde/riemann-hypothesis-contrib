@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TopDegreeDen
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry MvPolynomial MeasureTheory Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.L2DbarEstimates (V)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm GlobalTheory.LineForm GlobalTheory.ChernCalc GlobalTheory.FlagCell2
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts
+  GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm
+  GlobalTheory.LineForm GlobalTheory.ChernCalc GlobalTheory.FlagCell2
 open GlobalTheory.FlagFibre (Low)
 open scoped Matrix ContDiff ComplexOrder ENNReal Classical
 
@@ -21,12 +24,27 @@ open Function
 
 namespace GlobalTheory.FlagCell2.ChangeOfVariables
 
-theorem part_eq_lintegral_image : ∀ (M : Type) [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] (n : ℕ) (A : HolAtlas M n) (β : A.Fld), A.IsForm β → ∀ (Ω : Set M) (Φ : M → V n) (γ : V n → Alt n), IsOpen Ω → Set.InjOn Φ Ω → (∀ x : A.Pt, x.pt ∈ Ω → DifferentiableAt ℂ (Φ ∘ x.ch.symm) x.crd ∧ β x = pull (fderiv ℂ (Φ ∘ x.ch.symm) x.crd) (γ (Φ x.pt))) → ∀ (s : ℤˣ) (T : Set M), MeasurableSet T → T ⊆ Ω → A.part β s T = ∫⁻ v in Φ '' T, ENNReal.ofReal (((s : ℤ) : ℝ) * (dens (γ v)).re) := by
+theorem part_eq_lintegral_image
+    : ∀ (M : Type) [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M]
+        [BorelSpace M] (n : ℕ) (A : HolAtlas M n) (β : A.Fld),
+      A.IsForm β
+        → ∀ (Ω : Set M) (Φ : M → V n) (γ : V n → Alt n),
+          IsOpen Ω → Set.InjOn Φ Ω
+            → (∀ x : A.Pt,
+              x.pt ∈ Ω
+                → DifferentiableAt ℂ (Φ ∘ x.ch.symm) x.crd
+                  ∧ β x = pull (fderiv ℂ (Φ ∘ x.ch.symm) x.crd) (γ (Φ x.pt)))
+            → ∀ (s : ℤˣ) (T : Set M),
+              MeasurableSet T → T ⊆ Ω
+                → A.part β s T
+                  = ∫⁻ v in Φ '' T, ENNReal.ofReal (((s : ℤ) : ℝ) * (dens (γ v)).re) := by
   intro M _ _ _ _ _ n A β hβ Ω Φ γ hΩ hinj hloc s T hT hTΩ
   set ρ : A.ι → M → ℝ≥0∞ := fun k y => ENNReal.ofReal (((s : ℤ) : ℝ) * (dens (A.loc β k (A.e k y))).re) with hρ
   have hp : A.part β s = ChartGlue.glueMeas A.e ρ := rfl
-  have hρc : ∀ k l y, y ∈ (A.e k).source → y ∈ (A.e l).source →
-      ρ k y = ENNReal.ofReal (‖ChartGlue.transDet (A.e k) (A.e l) y‖ ^ 2) * ρ l y := by
+  have hρc
+      : ∀ k l y,
+        y ∈ (A.e k).source → y ∈ (A.e l).source
+          → ρ k y = ENNReal.ofReal (‖ChartGlue.transDet (A.e k) (A.e l) y‖ ^ 2) * ρ l y := by
     intro k l y hk hl
     have h1 := A.loc_crd β (⟨(k, y), hk⟩ : A.Pt)
     have h2 := A.loc_crd β (⟨(l, y), hl⟩ : A.Pt)
@@ -38,33 +56,43 @@ theorem part_eq_lintegral_image : ∀ (M : Type) [TopologicalSpace M] [T2Space M
     simp only [ChartGlue.transDet]
     ring
 
-  have chart : ∀ (i : A.ι) (P : Set M), MeasurableSet P → P ⊆ (A.e i).source → P ⊆ Ω →
-      MeasurableSet (Φ '' P) ∧ A.part β s P =
-        ∫⁻ v in Φ '' P, ENNReal.ofReal (((s : ℤ) : ℝ) * (dens (γ v)).re) := by
+  have chart
+      : ∀ (i : A.ι) (P : Set M),
+        MeasurableSet P → P ⊆ (A.e i).source → P ⊆ Ω
+          → MeasurableSet (Φ '' P)
+            ∧ A.part β s P = ∫⁻ v in Φ '' P, ENNReal.ofReal (((s : ℤ) : ℝ) * (dens (γ v)).re) := by
     intro i P hP hPs hPΩ
     set g : V n → V n := Φ ∘ (A.e i).symm with hg
     have hQ : MeasurableSet (A.e i '' P) := ChartGlue.measurableSet_image (A.e i) hP hPs
-    have hder : ∀ v ∈ A.e i '' P, HasFDerivWithinAt g ((fderiv ℂ g v).restrictScalars ℝ) (A.e i '' P) v := by
+    have hder
+        : ∀ v ∈ A.e i '' P,
+          HasFDerivWithinAt g ((fderiv ℂ g v).restrictScalars ℝ) (A.e i '' P) v := by
       rintro _ ⟨y, hy, rfl⟩
       exact ((hloc ⟨(i, y), hPs hy⟩ (hPΩ hy)).1.hasFDerivAt.restrictScalars ℝ).hasFDerivWithinAt
     have hinjg : Set.InjOn g (A.e i '' P) := by
       rintro _ ⟨y, hy, rfl⟩ _ ⟨z, hz, rfl⟩ hyz
-      simp only [hg, Function.comp_apply, (A.e i).left_inv (hPs hy), (A.e i).left_inv (hPs hz)] at hyz
+      simp only [hg, Function.comp_apply, (A.e i).left_inv (hPs hy), (A.e i).left_inv (hPs hz)]
+        at hyz
       rw [hinj (hPΩ hy) (hPΩ hz) hyz]
     have himg : Φ '' P = g '' (A.e i '' P) := by
       rw [Set.image_image]
-      exact Set.image_congr fun y hy => by simp only [hg, Function.comp_apply, (A.e i).left_inv (hPs hy)]
+      exact Set.image_congr fun y hy => by
+        simp only [hg, Function.comp_apply, (A.e i).left_inv (hPs hy)]
     refine ⟨himg ▸ measurable_image_of_fderivWithin hQ hder hinjg, ?_⟩
-    rw [hp, ChartGlue.glueMeas_apply A.e ρ A.holo hρc i hP hPs, ChartGlue.chartMeas_apply_of_subset _ _ hP hPs, himg,
+    rw [hp, ChartGlue.glueMeas_apply A.e ρ A.holo hρc i hP hPs,
+      ChartGlue.chartMeas_apply_of_subset _ _ hP hPs, himg,
       lintegral_image_eq_lintegral_abs_det_fderiv_mul volume hQ hder hinjg]
     refine setLIntegral_congr_fun hQ ?_
     rintro _ ⟨y, hy, rfl⟩
     have hx := hloc ⟨(i, y), hPs hy⟩ (hPΩ hy)
     have hl := A.loc_crd β (⟨(i, y), hPs hy⟩ : A.Pt)
-    have hdet : ((fderiv ℂ g (A.e i y)).restrictScalars ℝ).det = Algebra.norm ℝ (fderiv ℂ g (A.e i y)).det :=
+    have hdet
+        : ((fderiv ℂ g (A.e i y)).restrictScalars ℝ).det
+          = Algebra.norm ℝ (fderiv ℂ g (A.e i y)).det :=
       LinearMap.det_restrictScalars (f := (fderiv ℂ g (A.e i y) : V n →ₗ[ℂ] V n))
     have hx2 : β ⟨(i, y), hPs hy⟩ = pull (fderiv ℂ g (A.e i y)) (γ (Φ y)) := hx.2
-    have hgy : g (A.e i y) = Φ y := by simp only [hg, Function.comp_apply, (A.e i).left_inv (hPs hy)]
+    have hgy : g (A.e i y) = Φ y := by
+      simp only [hg, Function.comp_apply, (A.e i).left_inv (hPs hy)]
     beta_reduce
     rw [hdet, hgy]
     simp only [hρ, (A.e i).left_inv (hPs hy)]
@@ -76,8 +104,10 @@ theorem part_eq_lintegral_image : ∀ (M : Type) [TopologicalSpace M] [T2Space M
 
   rcases Set.eq_empty_or_nonempty T with rfl | ⟨y₀, -⟩
   · simp
-  obtain ⟨C, hCc, hCU⟩ := TopologicalSpace.isOpen_iUnion_countable (fun j => (A.e j).source)
-    (fun j => (A.e j).open_source)
+  obtain ⟨C, hCc, hCU⟩ :=
+    TopologicalSpace.isOpen_iUnion_countable
+      (fun j => (A.e j).source)
+      (fun j => (A.e j).open_source)
   obtain ⟨f, hf⟩ := (hCc.insert (A.cover y₀).choose).exists_eq_range (Set.insert_nonempty _ _)
   set U : ℕ → Set M := fun k => (A.e (f k)).source with hU
   have hUo : ∀ k, IsOpen (U k) := fun k => (A.e (f k)).open_source
@@ -86,8 +116,8 @@ theorem part_eq_lintegral_image : ∀ (M : Type) [TopologicalSpace M] [T2Space M
     hT.inter (MeasurableSet.disjointed (fun k => (hUo k).measurableSet) k)
   have hPU : ∀ k, P k ⊆ U k := fun k => Set.inter_subset_right.trans (disjointed_subset U k)
   have hPΩ : ∀ k, P k ⊆ Ω := fun k => Set.inter_subset_left.trans hTΩ
-  have hPd : Pairwise (Disjoint on P) := (disjoint_disjointed U).mono fun k l h =>
-    h.mono Set.inter_subset_right Set.inter_subset_right
+  have hPd : Pairwise (Disjoint on P) :=
+    (disjoint_disjointed U).mono fun k l h => h.mono Set.inter_subset_right Set.inter_subset_right
   have hTP : T = ⋃ k, P k := by
     rw [← Set.inter_iUnion, iUnion_disjointed, eq_comm, Set.inter_eq_left]
     intro y _

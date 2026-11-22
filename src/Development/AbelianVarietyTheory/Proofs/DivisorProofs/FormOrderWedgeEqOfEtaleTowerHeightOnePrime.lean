@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KaehlerWedge
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -22,11 +24,22 @@ noncomputable section
 
 namespace GlobalTheory.FieldPair
 
-theorem formOrd_append_of_ord_eq : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (n r : ℕ) (R : Subring K) (T : Subring L)
-    (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T) (x : Fin n → R) (P : Place cL) (P0 : Place cK),
-  IsEtTower cK R cL T ι ψ τ → TrBasis cK (fun i => (x i : K)) → P.IsPrimeOf T → P0.IsPrimeOf R →
-  (∀ g : R, g ≠ 0 → P.ord (ι g : L) = P0.ord (g : K)) →
-  (fun ω => @dite ℤ (∃ a, P.IsFormOrd ω a) (Classical.propDecidable _) (fun h => h.choose) (fun _ => 0)) (dForm cL (Fin.append (fun i => (τ i : L)) (fun i => (ι (x i) : L)))) = (fun ω => @dite ℤ (∃ a, P0.IsFormOrd ω a) (Classical.propDecidable _) (fun h => h.choose) (fun _ => 0)) (dForm cK (fun i => (x i : K))) := by
+theorem formOrd_append_of_ord_eq
+    : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (n r : ℕ) (R : Subring K)
+        (T : Subring L) (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T) (x : Fin n → R) (P : Place cL)
+        (P0 : Place cK),
+      IsEtTower cK R cL T ι ψ τ → TrBasis cK (fun i => (x i : K)) → P.IsPrimeOf T → P0.IsPrimeOf R
+        → (∀ g : R, g ≠ 0 → P.ord (ι g : L) = P0.ord (g : K))
+        → (fun ω =>
+              @dite ℤ (∃ a, P.IsFormOrd ω a) (Classical.propDecidable _)
+                (fun h => h.choose)
+                (fun _ => 0))
+            (dForm cL (Fin.append (fun i => (τ i : L)) (fun i => (ι (x i) : L))))
+          = (fun ω =>
+              @dite ℤ (∃ a, P0.IsFormOrd ω a) (Classical.propDecidable _)
+                (fun h => h.choose)
+                (fun _ => 0))
+            (dForm cK (fun i => (x i : K))) := by
   intro K L _ _ cK cL n r R T ι ψ τ x P P0 hE hx hP hP0 hord
   have hιinj : Function.Injective ι := fun a b h => by
     have := congrArg ψ h
@@ -69,7 +82,9 @@ theorem formOrd_append_of_ord_eq : ∀ {K L : Type} [Field K] [Field L] (cK : �
     have := hj ⟨cK a, hE.base.const_mem a⟩
     rw [hE.const a] at this
     exact this
-  have hFE := GlobalTheory.T.formallyEtale_polynomialPlace_to_place cK cL r R T ι ψ τ P P0 j hE hP hP0 hj hA hτ
+  have hFE :=
+    GlobalTheory.T.formallyEtale_polynomialPlace_to_place cK cL r R T ι ψ τ P P0 j hE hP hP0 hj hA
+      hτ
 
   letI := P0.const.toAlgebra
   letI := cK.toAlgebra
@@ -84,7 +99,8 @@ theorem formOrd_append_of_ord_eq : ∀ {K L : Type} [Field K] [Field L] (cK : �
   obtain rfl : n = m + 1 := by exact_mod_cast h2
   have hω0 : IsFreeGen P0.ring (dForm P0.const z) := isFreeGen_dForm z b hb
   have hF : IsFreeGen P.ring (dForm P.const (Fin.append τ' (fun i => ρ (z i)))) :=
-    GlobalTheory.T.isFreeGen_wedgeForm_of_formallyEtale_mvPolynomial P0.const P.const ρ hc z b hb τ' hFE
+    GlobalTheory.T.isFreeGen_wedgeForm_of_formallyEtale_mvPolynomial P0.const P.const ρ hc z b hb τ'
+      hFE
   haveI : Algebra.FormallyEtale P0.ring K := .of_isLocalization (nonZeroDivisors P0.ring)
   let bK : Module.Basis (Fin (m + 1)) K (Omega cK) :=
     (KaehlerDifferential.isBaseChange_of_formallyEtale ℂ P0.ring K).basis b
@@ -94,8 +110,9 @@ theorem formOrd_append_of_ord_eq : ∀ {K L : Type} [Field K] [Field L] (cK : �
     exact KaehlerDifferential.map_D ℂ ℂ P0.ring K (z i)
   have hrat0 : P0.toRat (m + 1) (dForm P0.const z) = dForm cK (fun i => (z i : K)) :=
     formMap_dForm _ rfl z
-  have hratP : P.toRat (r + (m + 1)) (dForm P.const (Fin.append τ' (fun i => ρ (z i)))) =
-      dForm cL (Fin.append (fun i => (τ i : L)) (fun i => j (z i : K))) := by
+  have hratP
+      : P.toRat (r + (m + 1)) (dForm P.const (Fin.append τ' (fun i => ρ (z i))))
+        = dForm cL (Fin.append (fun i => (τ i : L)) (fun i => j (z i : K))) := by
     refine (formMap_dForm _ rfl _).trans (congrArg _ (funext fun k => ?_))
     refine Fin.addCases (fun i => ?_) (fun i => ?_) k
     · simp only [Fin.append_left]; rfl
@@ -109,16 +126,21 @@ theorem formOrd_append_of_ord_eq : ∀ {K L : Type} [Field K] [Field L] (cK : �
     exact one_ne_zero (hxK.1 (a₁ := 1) (a₂ := 0) (by simp [← hf]))
   have hK : P0.formOrd (dForm cK (fun i => (x i : K))) = P0.ord f := by
     rw [← hf]; exact P0.formOrd_smul_toRat hω0 hf0
-  have key := GlobalTheory.T.kaehlerWedgeForm_map_eq_smul_of_basis cK cL j (RingHom.ext fun a => by
-      change j (cK a) = cL a
-      have := hj ⟨cK a, hE.base.const_mem a⟩
-      rw [hE.const a] at this
-      exact this) (fun i => (x i : K)) (fun i => (z i : K)) bK hbK f
-    (by rw [← hf, hrat0]) (fun i => (τ i : L))
+  have key :=
+    GlobalTheory.T.kaehlerWedgeForm_map_eq_smul_of_basis cK cL j
+      (RingHom.ext fun a => by
+        change j (cK a) = cL a
+        have := hj ⟨cK a, hE.base.const_mem a⟩
+        rw [hE.const a] at this
+        exact this)
+      (fun i => (x i : K))
+      (fun i => (z i : K))
+      bK hbK f (by rw [← hf, hrat0])
+      (fun i => (τ i : L))
   have e1 : (fun i => j (x i : K)) = fun i => (ι (x i) : L) := funext fun i => hj (x i)
   rw [e1, ← hratP] at key
-  change P.formOrd (dForm cL (Fin.append (fun i => (τ i : L)) (fun i => (ι (x i) : L)))) =
-    P0.formOrd (dForm cK (fun i => (x i : K)))
+  change P.formOrd (dForm cL (Fin.append (fun i => (τ i : L)) (fun i => (ι (x i) : L))))
+    = P0.formOrd (dForm cK (fun i => (x i : K)))
   rw [key, P.formOrd_smul_toRat hF ((map_ne_zero j).2 hf0), hordK f hf0, hK]
 
 end GlobalTheory.FieldPair

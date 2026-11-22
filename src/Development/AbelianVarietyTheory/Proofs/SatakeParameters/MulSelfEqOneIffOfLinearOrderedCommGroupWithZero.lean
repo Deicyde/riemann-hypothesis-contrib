@@ -13,7 +13,8 @@ namespace GlobalTheory.Hk3.Inh
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem v_two {ϖ : L} {σ : L →+* L} {q : ℕ} (h : IsUnramInv ϖ σ q) (hq : Odd q) : Valued.v (2 : L) = 1 := by
+theorem v_two {ϖ : L} {σ : L →+* L} {q : ℕ} (h : IsUnramInv ϖ σ q) (hq : Odd q)
+    : Valued.v (2 : L) = 1 := by
   obtain ⟨-, -, -, -, -, h2, hc⟩ := h
   let O := (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring
   have hc' : Nat.card (IsLocalRing.ResidueField O) = q ^ 2 := hc
@@ -35,18 +36,9 @@ theorem v_two {ϖ : L} {σ : L →+* L} {q : ℕ} (h : IsUnramInv ϖ σ q) (hq :
   rw [h2'] at h0
   simp at h0
 
-
-
-
 section Main
 
 variable {ϖ : L} {σ : L →+* L} {q : ℕ} {δ : L} {ψ : AddChar L ℂ}
-
-
-
-
-
-
 
 end Main
 

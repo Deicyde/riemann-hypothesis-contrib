@@ -11,7 +11,8 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.NonemptyParameterMod
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.SplitPrimeNormLemmas
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.SplitPrimeNormLemmas
 open scoped Matrix
 
 namespace Formalism.L2.SG.InstExistsPf
@@ -27,18 +28,18 @@ abbrev crdE : (Fin (VS D).rank → D.host.E) ≃ₗ[D.host.E] (VS D).V := (VS D)
 def Lv : Submodule (𝓞 D.host.E) (Fin (VS D).rank → D.host.E) :=
   (VS D).L0.comap ((crdE D).toLinearMap.restrictScalars (𝓞 D.host.E))
 
-theorem mem_Lv (x : Fin (VS D).rank → D.host.E) :
-    x ∈ Lv D ↔ (∑ i, x i • (VS D).frame i) ∈ (VS D).L0 := by
+theorem mem_Lv (x : Fin (VS D).rank → D.host.E)
+    : x ∈ Lv D ↔ (∑ i, x i • (VS D).frame i) ∈ (VS D).L0 := by
   simp only [Lv, Submodule.mem_comap, LinearMap.restrictScalars_apply, LinearEquiv.coe_coe, crdE,
     Module.Basis.equivFun_symm_apply]
 
-theorem hform_eq (x y : Fin (VS D).rank → D.host.E) :
-    Formalism.UG.hform (starRingEnd D.host.E) (Jv D) x y =
-      (VS D).hT (∑ i, x i • (VS D).frame i) (∑ j, y j • (VS D).frame j) := by
+theorem hform_eq (x y : Fin (VS D).rank → D.host.E)
+    : Formalism.UG.hform (starRingEnd D.host.E) (Jv D) x y
+      = (VS D).hT (∑ i, x i • (VS D).frame i) (∑ j, y j • (VS D).frame j) := by
   unfold Formalism.UG.hform Jv
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, map_smul, smul_eq_mul,
-    Finset.mul_sum, RingHom.id_apply]
+    simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, map_smul,
+      smul_eq_mul, Finset.mul_sum, RingHom.id_apply]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [show (VS D).gram i j = (VS D).hT ((VS D).frame i) ((VS D).frame j) from rfl]
@@ -71,9 +72,11 @@ theorem J_det : (Jv D).det ≠ 0 := by
   funext i
   exact Fintype.linearIndependent_iff.mp (VS D).frame.linearIndependent v h0 i
 
-theorem Lv_eq_map : Lv D = (VS D).L0.map ((crdE D).symm.toLinearMap.restrictScalars (𝓞 D.host.E)) := by
+theorem Lv_eq_map
+    : Lv D = (VS D).L0.map ((crdE D).symm.toLinearMap.restrictScalars (𝓞 D.host.E)) := by
   ext x
-  simp only [Lv, Submodule.mem_comap, Submodule.mem_map, LinearMap.restrictScalars_apply, LinearEquiv.coe_coe]
+  simp only [Lv, Submodule.mem_comap, Submodule.mem_map, LinearMap.restrictScalars_apply,
+    LinearEquiv.coe_coe]
   constructor
   · intro h
     exact ⟨_, h, (crdE D).symm_apply_apply x⟩
@@ -87,15 +90,18 @@ theorem L_fg : (Lv D).FG := by
 theorem L_span : Submodule.span D.host.E ((Lv D : Set (Fin (VS D).rank → D.host.E))) = ⊤ := by
   have hriesz (φ : (VS D).V →ₗ[D.host.E] D.host.E) : ∃ μ : (VS D).V, ∀ v, (VS D).hT μ v = φ v := by
     classical
-    obtain ⟨bs, hbs⟩ := Formalism.HermitianLatticesTheory.dualLattice_dualBasis (VS D).hT (VS D).nondeg (VS D).frame
+    obtain ⟨bs, hbs⟩ :=
+      Formalism.HermitianLatticesTheory.dualLattice_dualBasis (VS D).hT (VS D).nondeg (VS D).frame
     refine ⟨∑ j, star (φ ((VS D).frame j)) • bs j, fun v => ?_⟩
     have key : (VS D).hT (∑ j, star (φ ((VS D).frame j)) • bs j) = φ := by
       apply (VS D).frame.ext
       intro i
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum, LinearMap.sum_apply]
-      have hs : ∀ j, (VS D).hT (star (φ ((VS D).frame j)) • bs j) ((VS D).frame i) =
-          φ ((VS D).frame j) * (if i = j then 1 else 0) := by
+      have hs
+          : ∀ j,
+            (VS D).hT (star (φ ((VS D).frame j)) • bs j) ((VS D).frame i)
+              = φ ((VS D).frame j) * (if i = j then 1 else 0) := by
         intro j
         rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, star_star]
         congr 1
@@ -119,43 +125,49 @@ theorem L_span : Submodule.span D.host.E ((Lv D : Set (Fin (VS D).rank → D.hos
     have hline (a : D.host.E) : a • μ ∈ Λ := by
       rw [← hU]
       change a • μ ∈ Formalism.E.hdual (VS D).hT Λ
-      simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply]
+      simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
+        LinearMap.restrictScalars_apply]
       intro y hy
       have hy₀ := LinearMap.mem_ker.mp (hφ (Submodule.subset_span hy))
       simp [← (VS D).herm.eq (a • μ) y, LinearMap.map_smulₛₗ, hμ, hy₀]
-    obtain ⟨ψ, hψ, -⟩ := Submodule.exists_le_ker_of_notMem
-      (show μ ∉ (⊥ : Submodule D.host.E (VS D).V) by simpa using hμ₀)
+    obtain ⟨ψ, hψ, -⟩ :=
+      Submodule.exists_le_ker_of_notMem (show μ ∉ (⊥ : Submodule D.host.E (VS D).V) by
+        simpa using hμ₀)
     let f := ψ.restrictScalars (𝓞 D.host.E)
     have hmap (x : D.host.E) : x ∈ Λ.map f := by
       refine ⟨(x / ψ μ) • μ, hline _, ?_⟩
       change ψ ((x / ψ μ) • μ) = x
       rw [map_smul, smul_eq_mul, div_mul_cancel₀ _ hψ]
-    obtain ⟨d, hd₀, hd⟩ := FractionalIdeal.isFractional_of_fg
-      (S := nonZeroDivisors (𝓞 D.host.E)) (hL.map f)
+    obtain ⟨d, hd₀, hd⟩ :=
+      FractionalIdeal.isFractional_of_fg (S := nonZeroDivisors (𝓞 D.host.E)) (hL.map f)
     have hinj := IsFractionRing.injective (𝓞 D.host.E) D.host.E
-    have hne {a : 𝓞 D.host.E} (ha : a ≠ 0) : algebraMap (𝓞 D.host.E) D.host.E a ≠ 0 :=
-      fun h => ha (hinj (h.trans (map_zero _).symm))
+    have hne {a : 𝓞 D.host.E} (ha : a ≠ 0) : algebraMap (𝓞 D.host.E) D.host.E a ≠ 0 := fun h =>
+      ha (hinj (h.trans (map_zero _).symm))
     have hinteger (x : D.host.E) : IsLocalization.IsInteger (𝓞 D.host.E) x := by
       have hx := hd _ (hmap ((algebraMap (𝓞 D.host.E) D.host.E d)⁻¹ * x))
       rwa [Algebra.smul_def, ← mul_assoc, mul_inv_cancel₀ (hne (nonZeroDivisors.ne_zero hd₀)),
-        one_mul] at hx
+          one_mul]
+        at hx
     apply RingOfIntegers.not_isField D.host.E
     refine ⟨⟨0, 1, zero_ne_one⟩, mul_comm, ?_⟩
     intro a ha
     obtain ⟨b, hb⟩ := hinteger ((algebraMap (𝓞 D.host.E) D.host.E a)⁻¹)
     refine ⟨b, hinj ?_⟩
     rw [map_mul, hb, map_one, mul_inv_cancel₀ (hne ha)]
-  rw [Lv_eq_map, Submodule.map_coe, LinearMap.coe_restrictScalars, Submodule.span_image,
-    hspan, Submodule.map_top, LinearEquiv.range]
+  rw [Lv_eq_map, Submodule.map_coe, LinearMap.coe_restrictScalars, Submodule.span_image, hspan,
+    Submodule.map_top, LinearEquiv.range]
 
-theorem L_dual (x : Fin (VS D).rank → D.host.E) : x ∈ Lv D ↔
-    ∀ y ∈ Lv D, Formalism.UG.hform (starRingEnd D.host.E) (Jv D) y x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range := by
+theorem L_dual (x : Fin (VS D).rank → D.host.E)
+    : x ∈ Lv D
+      ↔ ∀ y ∈ Lv D,
+        Formalism.UG.hform (starRingEnd D.host.E) (Jv D) y x
+          ∈ (algebraMap (𝓞 D.host.E) D.host.E).range := by
   have hU := (VS D).baseLattice_isUnimodular
   unfold Formalism.HermitianLatticesTheory.IsUnimodular Formalism.HermitianLatticesTheory.dual at hU
   rw [mem_Lv]
   conv_lhs => rw [← hU]
-  simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply,
-    Submodule.mem_one, RingHom.mem_range]
+  simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
+    LinearMap.restrictScalars_apply, Submodule.mem_one, RingHom.mem_range]
   constructor
   · intro h y hy
     rw [mem_Lv] at hy
@@ -183,16 +195,18 @@ theorem rank_eq : (VS D).rank = D.R.r := by
 
 def epsV : Fin (VS D).rank → Bool := fun i => epsS D.R (Fin.cast (rank_eq D) i)
 
-private theorem card_range_filter_lt_or_even_eq (a b : ℕ) :
-    ∑ n ∈ Finset.range (a + 2 * b),
-      (if (if n < a then true else decide ((n - a) % 2 = 0)) = true then 1 else 0 : ℕ) = a + b := by
+private theorem card_range_filter_lt_or_even_eq (a b : ℕ)
+    : ∑ n ∈ Finset.range (a + 2 * b),
+        (if (if n < a then true else decide ((n - a) % 2 = 0)) = true then 1 else 0 : ℕ)
+      = a + b := by
   induction b with
   | zero =>
     simp only [Nat.mul_zero, Nat.add_zero]
     rw [Finset.sum_congr rfl (g := fun _ => (1 : ℕ)) (fun n hn => by simp [Finset.mem_range.mp hn])]
     simp
   | succ b ih =>
-    rw [show a + 2 * (b + 1) = a + 2 * b + 1 + 1 by ring, Finset.sum_range_succ, Finset.sum_range_succ, ih]
+    rw [show a + 2 * (b + 1) = a + 2 * b + 1 + 1 by ring, Finset.sum_range_succ,
+      Finset.sum_range_succ, ih]
     split_ifs <;> simp_all <;> omega
 
 theorem card_epsV : (Finset.univ.filter fun i => epsV D i = true).card = D.R.k + D.R.rS := by
@@ -200,7 +214,8 @@ theorem card_epsV : (Finset.univ.filter fun i => epsV D i = true).card = D.R.k +
   rw [Finset.card_filter]
   simp only [Fin.coe_cast]
   rw [Fin.sum_univ_eq_sum_range
-    (fun n => if (if n < D.R.k - 1 then true else decide ((n - (D.R.k - 1)) % 2 = 0)) = true then 1 else 0)
+    (fun n =>
+      if (if n < D.R.k - 1 then true else decide ((n - (D.R.k - 1)) % 2 = 0)) = true then 1 else 0)
     (VS D).rank]
   have hm := D.R.two_le_m
   have hk := D.R.m_add_three_le_k
@@ -224,8 +239,7 @@ theorem card_not_epsV : Fintype.card {i // ¬ epsV D i = true} = D.R.rS + 1 := b
 
 def eSgn : Fin (VS D).rank ≃ Fin (D.R.k + D.R.rS) ⊕ Fin (D.R.rS + 1) :=
   (Equiv.sumCompl (fun i => epsV D i = true)).symm.trans
-    (Equiv.sumCongr
-      (Fintype.equivFinOfCardEq (by rw [Fintype.card_subtype, card_epsV]))
+    (Equiv.sumCongr (Fintype.equivFinOfCardEq (by rw [Fintype.card_subtype, card_epsV]))
       (Fintype.equivFinOfCardEq (card_not_epsV D)))
 
 theorem eSgn_isLeft (i : Fin (VS D).rank) : (eSgn D i).isLeft = epsV D i := by
@@ -240,8 +254,12 @@ theorem cT_eq {m p : Type} (M : Matrix m p ℂ) : Formalism.UG.cT (starRingEnd �
   ext i j
   simp [Formalism.UG.cT]
 
-theorem Jpq_sub (p q : ℕ) {n : Type} [DecidableEq n] (e : n ≃ Fin p ⊕ Fin q) (ε : n → Bool) (he : ∀ i, (e i).isLeft = ε i) :
-    (Formalism.UG.Jpq p q).submatrix e e = Matrix.diagonal fun a => if ε a then (1 : ℂ) else -1 := by
+theorem Jpq_sub
+    (p q : ℕ)
+    {n : Type} [DecidableEq n]
+    (e : n ≃ Fin p ⊕ Fin q) (ε : n → Bool) (he : ∀ i, (e i).isLeft = ε i)
+    : (Formalism.UG.Jpq p q).submatrix e e
+      = Matrix.diagonal fun a => if ε a then (1 : ℂ) else -1 := by
   ext a b
   simp only [Matrix.submatrix_apply, Formalism.UG.Jpq, Matrix.diagonal_apply]
   by_cases hab : a = b
@@ -252,9 +270,11 @@ theorem Jpq_sub (p q : ℕ) {n : Type} [DecidableEq n] (e : n ≃ Fin p ⊕ Fin 
     have hne : e a ≠ e b := fun h => hab (e.injective h)
     rcases hea : e a with x | x <;> rcases heb : e b with y | y <;> simp_all [Matrix.one_apply]
 
-theorem exists_P (τ : D.what₂.Tau) : ∃ P : Matrix (Fin (VS D).rank) (Fin (VS D).rank) ℂ, IsUnit P ∧
-    Pᴴ * (Jv D).map (embS D τ) * P = Formalism.REAL.Jm (epsV D) := by
-  have hs : Formalism.UG.HasSignature ((VS D).gram.map (embS D τ)) (D.R.k + D.R.rS) (D.R.rS + 1) := by
+theorem exists_P (τ : D.what₂.Tau)
+    : ∃ P : Matrix (Fin (VS D).rank) (Fin (VS D).rank) ℂ,
+      IsUnit P ∧ Pᴴ * (Jv D).map (embS D τ) * P = Formalism.REAL.Jm (epsV D) := by
+  have hs
+      : Formalism.UG.HasSignature ((VS D).gram.map (embS D τ)) (D.R.k + D.R.rS) (D.R.rS + 1) := by
     have h0 := D.sp.Y_sig 0 (embS D τ)
     rw [D.sp.baseSpace_signature_eq] at h0
     exact h0
@@ -266,10 +286,12 @@ theorem exists_P (τ : D.what₂.Tau) : ∃ P : Matrix (Fin (VS D).rank) (Fin (V
         Matrix.submatrix_one_equiv]
     exact (Matrix.isUnit_iff_isUnit_det _).mpr (Matrix.isUnit_det_of_right_inverse h1)
   · rw [show (Jv D).map (embS D τ) = (VS D).gram.map (embS D τ) from rfl]
-    have hGe : (VS D).gram.map (embS D τ) =
-        (Matrix.reindex e e ((VS D).gram.map (embS D τ))).submatrix e e := by
+    have hGe
+        : (VS D).gram.map (embS D τ)
+          = (Matrix.reindex e e ((VS D).gram.map (embS D τ))).submatrix e e := by
       simp [Matrix.reindex_apply, Matrix.submatrix_submatrix]
-    rw [hGe, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv, Matrix.submatrix_mul_equiv, hP]
+    rw [hGe, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv, Matrix.submatrix_mul_equiv,
+      hP]
     exact Jpq_sub _ _ (eSgn D) (epsV D) (eSgn_isLeft D)
 
 end Formalism.L2.SG.InstExistsPf
@@ -278,8 +300,8 @@ namespace Formalism.L2.SG.InstExistsPf
 
 variable (D : D7)
 
-theorem embS_over (τ : D.what₂.Tau) (a : D.host.F) :
-    embS D τ (algebraMap D.host.F D.host.E a) = (Formalism.L2.Host.tauPl D τ).embedding a := by
+theorem embS_over (τ : D.what₂.Tau) (a : D.host.F)
+    : embS D τ (algebraMap D.host.F D.host.E a) = (Formalism.L2.Host.tauPl D τ).embedding a := by
   unfold embS
   change _ = (Formalism.L2.Host.realPl D.host (D.eTau τ)).embedding a
   unfold Formalism.L2.Host.realPl
@@ -290,7 +312,12 @@ theorem embS_over (τ : D.what₂.Tau) (a : D.host.F) :
 
 def instOf : AutInst :=
   let hT := Formalism.MainNotions.S.Inh.aut_HTop_holds D.sp.cm (Jv D) (Lv D) (L_fg D) (L_span D)
-  { F := D.host.F, E := D.host.E, cm := D.sp.cm, n := (VS D).rank, J := Jv D
+  {
+    F := D.host.F
+    E := D.host.E
+    cm := D.sp.cm
+    n := (VS D).rank
+    J := Jv D
     J_herm := J_herm D
     J_det := J_det D
     L := Lv D
@@ -299,15 +326,15 @@ def instOf : AutInst :=
     L_dual := L_dual D
     ε := fun _ => epsV D
     φ := fun v => embS D ((Formalism.L2.Host.tauPl D).symm v)
-    φ_over := fun v a => by
-      rw [embS_over, Equiv.apply_symm_apply]
+    φ_over := fun v a => by rw [embS_over, Equiv.apply_symm_apply]
     P := fun v => (exists_P D ((Formalism.L2.Host.tauPl D).symm v)).choose
     P_unit := fun v => (exists_P D ((Formalism.L2.Host.tauPl D).symm v)).choose_spec.1
     P_spec := fun v => (exists_P D ((Formalism.L2.Host.tauPl D).symm v)).choose_spec.2
     topf := hT.choose
     topf_group := hT.choose_spec.1
     topf_open := hT.choose_spec.2.1
-    topf_basis := hT.choose_spec.2.2 }
+    topf_basis := hT.choose_spec.2.2
+  }
 
 def instanceOfRecord : UnitaryGroupInstance D where
   I := instOf D

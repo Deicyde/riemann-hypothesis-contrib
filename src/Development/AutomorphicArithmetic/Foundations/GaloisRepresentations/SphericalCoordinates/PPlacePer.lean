@@ -5,28 +5,33 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-private theorem exists_extend {M V E : Type} [AddCommGroup M] [AddCommGroup V] [AddCommGroup E] [Module ℚ E]
-    (j : M →+ V) (hj : Function.Injective j) (hd : ∀ w, ∃ (m : ℕ) (u : M), m ≠ 0 ∧ m • w = j u) (P : M →+ E) :
-    ∃ Q : V →+ E, ∀ u, Q (j u) = P u := by
+private theorem exists_extend
+    {M V E : Type} [AddCommGroup M] [AddCommGroup V] [AddCommGroup E] [Module ℚ E]
+    (j : M →+ V) (hj : Function.Injective j) (hd : ∀ w, ∃ (m : ℕ) (u : M), m ≠ 0 ∧ m • w = j u)
+    (P : M →+ E)
+    : ∃ Q : V →+ E, ∀ u, Q (j u) = P u := by
   choose m u hm h using hd
-  have key : ∀ w (n : ℕ) (v : M), n ≠ 0 → n • w = j v →
-      ((m w : ℚ)⁻¹) • P (u w) = ((n : ℚ)⁻¹) • P v := by
+  have key
+      : ∀ w (n : ℕ) (v : M), n ≠ 0 → n • w = j v → ((m w : ℚ)⁻¹) • P (u w) = ((n : ℚ)⁻¹) • P v := by
     intro w n v hn hv
-    have h1 : n • u w = m w • v := hj (by
-      rw [map_nsmul, map_nsmul, ← h w, ← hv, smul_comm])
+    have h1 : n • u w = m w • v := hj (by rw [map_nsmul, map_nsmul, ← h w, ← hv, smul_comm])
     have h2 : n • P (u w) = m w • P v := by rw [← map_nsmul, ← map_nsmul, h1]
     have hn' : (n : ℚ) ≠ 0 := by exact_mod_cast hn
     have hm' : (m w : ℚ) ≠ 0 := by exact_mod_cast hm w
     have h3 : (n : ℚ) • P (u w) = (m w : ℚ) • P v := by
       rw [Nat.cast_smul_eq_nsmul, Nat.cast_smul_eq_nsmul, h2]
-    calc ((m w : ℚ)⁻¹) • P (u w) = ((m w : ℚ)⁻¹ * (n : ℚ)⁻¹) • ((n : ℚ) • P (u w)) := by
-          rw [smul_smul]; congr 1; field_simp
+    calc
+      ((m w : ℚ)⁻¹) • P (u w)
+        = ((m w : ℚ)⁻¹ * (n : ℚ)⁻¹) • ((n : ℚ) • P (u w)) := by rw [smul_smul]; congr 1; field_simp
       _ = ((n : ℚ)⁻¹) • P v := by rw [h3, smul_smul]; congr 1; field_simp
   refine ⟨AddMonoidHom.mk' (fun w => ((m w : ℚ)⁻¹) • P (u w)) ?_, ?_⟩
   · intro a b
@@ -36,24 +41,26 @@ private theorem exists_extend {M V E : Type} [AddCommGroup M] [AddCommGroup V] [
     have hk := key (a + b) (m a * m b) _ (mul_ne_zero (hm a) (hm b)) hab
     have hma : (m a : ℚ) ≠ 0 := by exact_mod_cast hm a
     have hmb : (m b : ℚ) ≠ 0 := by exact_mod_cast hm b
-    rw [hk, map_add (f := _), map_nsmul, map_nsmul, smul_add, ← Nat.cast_smul_eq_nsmul ℚ, ← Nat.cast_smul_eq_nsmul ℚ,
-      smul_smul, smul_smul]
+    rw [hk, map_add (f := _), map_nsmul, map_nsmul, smul_add, ← Nat.cast_smul_eq_nsmul ℚ,
+      ← Nat.cast_smul_eq_nsmul ℚ, smul_smul, smul_smul]
     push_cast
     congr 2 <;> field_simp
   · intro v
     have hk := key (j v) 1 v one_ne_zero (by simp)
     simpa using hk
 
-private theorem finrank_eq_of_place {M V : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M]
-    [AddCommGroup V] [Module ℚ V] (j : M →+ V) (hj : Function.Injective j)
-    (hd : ∀ w, ∃ (m : ℕ) (u : M), m ≠ 0 ∧ m • w = j u) :
-    Module.finrank ℤ M = Module.finrank ℚ V :=
+private theorem finrank_eq_of_place
+    {M V : Type}
+    [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M] [AddCommGroup V] [Module ℚ V]
+    (j : M →+ V) (hj : Function.Injective j) (hd : ∀ w, ∃ (m : ℕ) (u : M), m ≠ 0 ∧ m • w = j u)
+    : Module.finrank ℤ M = Module.finrank ℚ V :=
   _root_.UpperTheory.Reformulated.B.FinrankIntEqFinrankRat.finrank_eq_of_place j hj hd
 
-private theorem period_of_basis {M : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M] {g : ℕ}
-    (P : M →+ (Fin g → ℂ)) (hs : Submodule.span ℝ (Set.range P) = ⊤)
-    (hc : Module.finrank ℤ M = 2 * g) :
-    Function.Injective P ∧ DiscreteTopology P.range := by
+private theorem period_of_basis
+    {M : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M]
+    {g : ℕ} (P : M →+ (Fin g → ℂ)) (hs : Submodule.span ℝ (Set.range P) = ⊤)
+    (hc : Module.finrank ℤ M = 2 * g)
+    : Function.Injective P ∧ DiscreteTopology P.range := by
   let b := Module.finBasis ℤ M
   let v : Fin (Module.finrank ℤ M) → (Fin g → ℂ) := fun i => P (b i)
   have hPx : ∀ x, P x = ∑ i, (b.repr x i) • v i := by
@@ -82,9 +89,9 @@ private theorem period_of_basis {M : Type} [AddCommGroup M] [Module.Free ℤ M] 
     ext i
     simpa using h1 i
   · let bb : Module.Basis (Fin (Module.finrank ℤ M)) ℝ (Fin g → ℂ) := Module.Basis.mk li hsp
-    have hset : (P.range : Set (Fin g → ℂ)) = (Submodule.span ℤ (Set.range bb) : Set (Fin g → ℂ)) := by
-      have hb : Set.range bb = Set.range v := by
-        rw [Module.Basis.coe_mk]
+    have hset
+        : (P.range : Set (Fin g → ℂ)) = (Submodule.span ℤ (Set.range bb) : Set (Fin g → ℂ)) := by
+      have hb : Set.range bb = Set.range v := by rw [Module.Basis.coe_mk]
       rw [hb]
       ext y
       constructor
@@ -104,34 +111,36 @@ private theorem period_of_basis {M : Type} [AddCommGroup M] [Module.Free ℤ M] 
     rw [← hset] at hd'
     exact hd'
 
-private theorem herm_smul_mat {g : ℕ} (r : ℂ) (H : Matrix (Fin g) (Fin g) ℂ) (x y : Fin g → ℂ) :
-    hermForm (r • H) x y = r * hermForm H x y := by
+private theorem herm_smul_mat {g : ℕ} (r : ℂ) (H : Matrix (Fin g) (Fin g) ℂ) (x y : Fin g → ℂ)
+    : hermForm (r • H) x y = r * hermForm H x y := by
   simp [hermForm, Matrix.smul_mulVec, dotProduct_smul]
 
-private theorem herm_nsmul {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (m n : ℕ) (x y : Fin g → ℂ) :
-    hermForm H (m • x) (n • y) = ((m : ℂ) * n) * hermForm H x y := by
+private theorem herm_nsmul {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (m n : ℕ) (x y : Fin g → ℂ)
+    : hermForm H (m • x) (n • y) = ((m : ℂ) * n) * hermForm H x y := by
   simp only [hermForm]
   rw [← Nat.cast_smul_eq_nsmul ℂ m x, ← Nat.cast_smul_eq_nsmul ℂ n y, star_smul, Matrix.mulVec_smul,
     smul_dotProduct, dotProduct_smul]
   simp only [smul_eq_mul, star_natCast]
   ring
 
-private theorem herm_scale {g : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian)
-    (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) {r : ℝ} (hr : 0 < r) :
-    ((r : ℂ) • Hm).IsHermitian ∧ ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm ((r : ℂ) • Hm) z z).re := by
+private theorem herm_scale
+    {g : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ}
+    (hH : Hm.IsHermitian) (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re)
+    {r : ℝ} (hr : 0 < r)
+    : ((r : ℂ) • Hm).IsHermitian
+      ∧ ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm ((r : ℂ) • Hm) z z).re := by
   refine ⟨?_, fun z hz => ?_⟩
   · rw [Matrix.IsHermitian, Matrix.conjTranspose_smul, hH.eq]
     simp
   · rw [herm_smul_mat, Complex.re_ofReal_mul]
     exact mul_pos hr (hpos z hz)
 
-theorem UpperTheory.Gal.W2.placePer_of :
-    UpperTheory.Gal.W2.PlacePer := by
+theorem UpperTheory.Gal.W2.placePer_of : UpperTheory.Gal.W2.PlacePer := by
   intro p _ D G L β ρ D' j hpl
   obtain ⟨hinj, hact, hden, s, hs, hEF⟩ := hpl
   have hsR : (0 : ℝ) < (s : ℝ) := by exact_mod_cast hs
-  have hform : ∀ (m n : ℕ) (u w : VQ D),
-      formB L β (m • u) (n • w) = (m : ℚ) * n * formB L β u w := by
+  have hform
+      : ∀ (m n : ℕ) (u w : VQ D), formB L β (m • u) (n • w) = (m : ℚ) * n * formB L β u w := by
     intro m n u w
     simp only [formB, map_nsmul, LinearMap.smul_apply, nsmul_eq_mul]
     ring
@@ -145,8 +154,7 @@ theorem UpperTheory.Gal.W2.placePer_of :
       show m • Q (actQ D c w) = m • (ρ c *ᵥ Q w)
       have e1 : m • Q (actQ D c w) = P (c • a) := by
         rw [← map_nsmul, ← map_nsmul (actQ D c), h, ← hact, hQ]
-      have e2 : m • (ρ c *ᵥ Q w) = ρ c *ᵥ P a := by
-        rw [← hQ, ← h, map_nsmul, Matrix.mulVec_smul]
+      have e2 : m • (ρ c *ᵥ Q w) = ρ c *ᵥ P a := by rw [← hQ, ← h, map_nsmul, Matrix.mulVec_smul]
       rw [e1, e2, hPa]
     · rw [eq_top_iff, ← hPs]
       apply Submodule.span_mono
@@ -156,13 +164,15 @@ theorem UpperTheory.Gal.W2.placePer_of :
       obtain ⟨n, b, hn, hb⟩ := hden w
       have hmR : (m : ℝ) ≠ 0 := by exact_mod_cast hm
       have hnR : (n : ℝ) ≠ 0 := by exact_mod_cast hn
-      have h1 : hermForm (((((s : ℝ))⁻¹ : ℝ) : ℂ) • Hm) (Q (j a)) (Q (j b)) =
-          (((m : ℝ) * n : ℝ) : ℂ) * hermForm (((((s : ℝ))⁻¹ : ℝ) : ℂ) • Hm) (Q u) (Q w) := by
+      have h1
+          : hermForm (((((s : ℝ))⁻¹ : ℝ) : ℂ) • Hm) (Q (j a)) (Q (j b))
+            = (((m : ℝ) * n : ℝ) : ℂ) * hermForm (((((s : ℝ))⁻¹ : ℝ) : ℂ) • Hm) (Q u) (Q w) := by
         rw [← ha, ← hb, map_nsmul, map_nsmul, herm_nsmul]
         push_cast
         rfl
-      have h2 : (hermForm (((((s : ℝ))⁻¹ : ℝ) : ℂ) • Hm) (Q (j a)) (Q (j b))).im =
-          ((s : ℝ))⁻¹ * (D'.EF a b : ℝ) := by
+      have h2
+          : (hermForm (((((s : ℝ))⁻¹ : ℝ) : ℂ) • Hm) (Q (j a)) (Q (j b))).im
+            = ((s : ℝ))⁻¹ * (D'.EF a b : ℝ) := by
         rw [herm_smul_mat, hQ, hQ, Complex.im_ofReal_mul, hIm]
       have h3 : (D'.EF a b : ℝ) = (s : ℝ) * ((m : ℝ) * n * (formB L β u w : ℚ)) := by
         have h4 := hEF a b
@@ -170,8 +180,9 @@ theorem UpperTheory.Gal.W2.placePer_of :
         exact_mod_cast h4
       rw [h1, Complex.im_ofReal_mul, h3] at h2
       have hs0 : (s : ℝ) ≠ 0 := hsR.ne'
-      have h5 : ((m : ℝ) * n) * (hermForm (((((s : ℝ))⁻¹ : ℝ) : ℂ) • Hm) (Q u) (Q w)).im =
-          ((m : ℝ) * n) * (formB L β u w : ℚ) := by
+      have h5
+          : ((m : ℝ) * n) * (hermForm (((((s : ℝ))⁻¹ : ℝ) : ℂ) • Hm) (Q u) (Q w)).im
+            = ((m : ℝ) * n) * (formB L β u w : ℚ) := by
         rw [h2]
         field_simp
       exact mul_left_cancel₀ (mul_ne_zero hmR hnR) h5

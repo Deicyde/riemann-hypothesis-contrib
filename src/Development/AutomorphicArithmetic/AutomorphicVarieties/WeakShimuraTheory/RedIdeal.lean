@@ -11,7 +11,8 @@ open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolati
 
 namespace UpperTheory.V.Ws
 
-def muOf (l : ℕ) {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (H : Subgroup Γ) : Set Γ :=
+def muOf (l : ℕ) {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (H : Subgroup Γ)
+    : Set Γ :=
   {s | s ∈ H ∧ ∃ a : ℕ, s ^ l ^ a ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure}
 
 structure Fr (O Γ : Type) [CommRing O] [Group Γ] where
@@ -27,7 +28,8 @@ structure Fr (O Γ : Type) [CommRing O] [Group Γ] where
 
 attribute [instance] Fr.fin
 
-@[ext] structure PD (ι Γ R : Type) [Group Γ] [CommRing R] where
+@[ext]
+structure PD (ι Γ R : Type) [Group Γ] [CommRing R] where
   r : Γ →* M4 R
   n : ι → M4 R
 
@@ -41,10 +43,13 @@ def vV : Finset (ℤ × ℤ) := {wBe, -wAl, -wTh}
 
 def qQ : Finset (ℤ × ℤ) := {-wAl, -wPs, -wTh}
 
-def redTypes : List (Finset (ℤ × ℤ)) :=
-  [{wBe, -wBe, -wAl, -wTh, -wPs}, {wBe, -wBe, wAl, wTh, wPs}, {wTh, -wTh, wPs, wBe, -wAl}, {wTh, -wTh, -wPs, -wBe, wAl},
-   {wAl, -wAl, -wTh, -wPs, -wBe}, {wAl, -wAl, wTh, wPs, wBe}, {wPs, -wPs, wBe, -wAl, -wTh}, {wPs, -wPs, -wBe, wAl, wTh},
-   {wBe, -wBe, wTh, -wTh}]
+def redTypes : List (Finset (ℤ × ℤ)) := [
+  {wBe, -wBe, -wAl, -wTh, -wPs}, {wBe, -wBe, wAl, wTh, wPs}, {wTh, -wTh, wPs, wBe, -wAl},
+  {wTh, -wTh, -wPs, -wBe, wAl},
+  {wAl, -wAl, -wTh, -wPs, -wBe}, {wAl, -wAl, wTh, wPs, wBe}, {wPs, -wPs, wBe, -wAl, -wTh},
+  {wPs, -wPs, -wBe, wAl, wTh},
+  {wBe, -wBe, wTh, -wTh}
+]
 
 section Mat
 
@@ -62,14 +67,15 @@ def Supp (S : Finset (ℤ × ℤ)) (r : Γ →* M4 R) : Prop := ∀ g, SuppM S (
 
 def Ent (r : Γ →* M4 R) (w : ℤ × ℤ) : Prop := ∃ g i j, wt i j = w ∧ r g i j ≠ 0
 
-def StarE (r : Γ →* M4 R) : Prop := Ent r wPs ∧ Ent r (-wPs) ∧ (Ent r wBe ∨ Ent r (-wAl) ∨ Ent r (-wTh))
+def StarE (r : Γ →* M4 R) : Prop :=
+  Ent r wPs ∧ Ent r (-wPs) ∧ (Ent r wBe ∨ Ent r (-wAl) ∨ Ent r (-wTh))
 
 def ixB : Fin 2 → Fin 4 := ![1, 3]
 
 def BlockExt (r : Γ →* M4 R) : Prop :=
-  (∀ g i j, lamW j < lamW i → r g i j = 0) ∧
-    Submodule.span R (Set.range fun g => (r g).submatrix ixB ixB) = ⊤ ∧
-    ¬ ∃ Y : M4 R, (∀ i j, ¬ lamW i < lamW j → Y i j = 0) ∧ ∀ g, IsBlock ((1 - Y) * r g * (1 + Y))
+  (∀ g i j, lamW j < lamW i → r g i j = 0)
+    ∧ Submodule.span R (Set.range fun g => (r g).submatrix ixB ixB) = ⊤
+    ∧ ¬ ∃ Y : M4 R, (∀ i j, ¬ lamW i < lamW j → Y i j = 0) ∧ ∀ g, IsBlock ((1 - Y) * r g * (1 + Y))
 
 def Star (r : Γ →* M4 R) : Prop := Irr r ∨ BlockExt r
 
@@ -83,7 +89,8 @@ def map (P : PD ι Γ R) (f : R →+* R') : PD ι Γ R' := ⟨mapRep f P.r, fun 
 
 def ψ (P : PD ι Γ R) (v : ι) (i : Fin 4) (s : Γ) : R := (adj (P.n v) * P.r s * P.n v) i i
 
-def Cont [TopologicalSpace Γ] (P : PD ι Γ R) (I : Ideal R) : Prop := ∀ i j, AdicCont I fun g => P.r g i j
+def Cont [TopologicalSpace Γ] (P : PD ι Γ R) (I : Ideal R) : Prop :=
+  ∀ i j, AdicCont I fun g => P.r g i j
 
 end PD
 
@@ -113,9 +120,9 @@ variable {Φ} in
 def InV (P : PD Φ.ι Γ R) : Prop := Supp vV P.r ∧ ∀ v, SuppM qQ (P.n v) ∧ P.n v 2 0 ≠ 0
 
 def Good (P : PD Φ.ι Γ R) : Prop :=
-  (Ent P.r (-wPs) ∧ (Ent P.r wBe ∨ Ent P.r (-wAl))) ∨ (Ent P.r (-wAl) ∧ Ent P.r (-wBe)) ∨
-    (InV P ∧ Ent P.r (-wAl)) ∨
-    (InV P ∧ Ent P.r wBe ∧ Ent P.r (-wTh) ∧ ∀ v, ∃ s ∈ Φ.Gv v, a (Φ.rt wAl s) ≠ 1)
+  (Ent P.r (-wPs) ∧ (Ent P.r wBe ∨ Ent P.r (-wAl))) ∨ (Ent P.r (-wAl) ∧ Ent P.r (-wBe))
+    ∨ (InV P ∧ Ent P.r (-wAl))
+    ∨ (InV P ∧ Ent P.r wBe ∧ Ent P.r (-wTh) ∧ ∀ v, ∃ s ∈ Φ.Gv v, a (Φ.rt wAl s) ≠ 1)
 
 variable [TopologicalSpace Γ]
 
@@ -141,30 +148,41 @@ def Zloc (H : Subgroup Γ) (w : ℤ × ℤ) : Submodule R (H → R) where
     exact ⟨a1.comp (c • ·), fun g h => by simp only [Pi.smul_apply, a2, smul_eq_mul]; ring⟩
 
 def Zgl (w : ℤ × ℤ) : Submodule R (Γ → R) where
-  carrier := {z | IsLocallyConstant z ∧ (∀ g h, z (g * h) = z g + a (Φ.rt w g) * z h) ∧ (∀ g ∈ Φ.N, z g = 0) ∧
-    (w ≠ 0 → z Φ.g0 = 0)}
+  carrier :=
+    {z | IsLocallyConstant z ∧ (∀ g h, z (g * h) = z g + a (Φ.rt w g) * z h) ∧ (∀ g ∈ Φ.N, z g = 0) ∧
+      (w ≠ 0 → z Φ.g0 = 0)}
   add_mem' := by
     rintro x y ⟨a1, a2, a3, a4⟩ ⟨b1, b2, b3, b4⟩
-    exact ⟨a1.add b1, fun g h => by simp only [Pi.add_apply, a2, b2]; ring, fun g h => by simp [a3 g h, b3 g h],
-      fun h => by simp [a4 h, b4 h]⟩
+    exact ⟨
+      a1.add b1,
+      fun g h => by simp only [Pi.add_apply, a2, b2]; ring,
+      fun g h => by simp [a3 g h, b3 g h],
+      fun h => by simp [a4 h, b4 h]
+    ⟩
   zero_mem' := ⟨IsLocallyConstant.const 0, by simp, by simp, by simp⟩
   smul_mem' := by
     rintro c x ⟨a1, a2, a3, a4⟩
-    exact ⟨a1.comp (c • ·), fun g h => by simp only [Pi.smul_apply, a2, smul_eq_mul]; ring,
-      fun g h => by simp [a3 g h], fun h => by simp [a4 h]⟩
+    exact ⟨
+      a1.comp (c • ·),
+      fun g h => by simp only [Pi.smul_apply, a2, smul_eq_mul]; ring,
+      fun g h => by simp [a3 g h],
+      fun h => by simp [a4 h]
+    ⟩
 
-def LocTriv (w : ℤ × ℤ) (z : Γ → R) (n : Φ.ι → R) : Prop := ∀ v, ∀ s ∈ Φ.Gv v, z s = n v - a (Φ.rt w s) * n v
+def LocTriv (w : ℤ × ℤ) (z : Γ → R) (n : Φ.ι → R) : Prop :=
+  ∀ v, ∀ s ∈ Φ.Gv v, z s = n v - a (Φ.rt w s) * n v
 
 def Str (w : ℤ × ℤ) : Submodule R (Γ → R) :=
-  Φ.Zgl a w ⊓
-    { carrier := {z | ∃ n, Φ.LocTriv a w z n}
-      add_mem' := by
-        rintro x y ⟨n, hn⟩ ⟨m, hm⟩
-        exact ⟨n + m, fun v s hs => by simp only [Pi.add_apply, hn v s hs, hm v s hs]; ring⟩
-      zero_mem' := ⟨0, fun v s _ => by simp⟩
-      smul_mem' := by
-        rintro c x ⟨n, hn⟩
-        exact ⟨c • n, fun v s hs => by simp only [Pi.smul_apply, hn v s hs, smul_eq_mul]; ring⟩ }
+  Φ.Zgl a w ⊓ {
+    carrier := {z | ∃ n, Φ.LocTriv a w z n}
+    add_mem' := by
+      rintro x y ⟨n, hn⟩ ⟨m, hm⟩
+      exact ⟨n + m, fun v s hs => by simp only [Pi.add_apply, hn v s hs, hm v s hs]; ring⟩
+    zero_mem' := ⟨0, fun v s _ => by simp⟩
+    smul_mem' := by
+      rintro c x ⟨n, hn⟩
+      exact ⟨c • n, fun v s hs => by simp only [Pi.smul_apply, hn v s hs, smul_eq_mul]; ring⟩
+  }
 
 structure Bounds (d C : ℕ) : Prop where
   card : Nat.card Φ.ι ≤ C
@@ -190,17 +208,29 @@ end Fr
 
 section Def
 
-variable {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] (Φ : Fr O Γ) {Λ : Type} [CommRing Λ] [IsLocalRing Λ]
+variable
+  {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ]
+  (Φ : Fr O Γ)
+  {Λ : Type} [CommRing Λ] [IsLocalRing Λ]
   (a : O →+* Λ)
 
-structure Fr.Lifts (c : PD Φ.ι Γ (ResidueField Λ)) {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] (P : PD Φ.ι Γ R) : Prop where
+structure Fr.Lifts
+    (c : PD Φ.ι Γ (ResidueField Λ))
+    {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R]
+    (P : PD Φ.ι Γ R)
+    : Prop where
   pair : Φ.IsPair ((algebraMap Λ R).comp a) P
   cont : P.Cont (maximalIdeal R)
   red : P.map (res Λ R : R →+* ResidueField Λ) = c
 
-def Fr.IsDef (c : PD Φ.ι Γ (ResidueField Λ)) {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] (P : PD Φ.ι Γ R) : Prop :=
-  Φ.Lifts a c P ∧ ∀ (R' : Type) [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (P' : PD Φ.ι Γ R'), Φ.Lifts a c P' →
-    ∃! f : R →ₐ[Λ] R', P.map (f : R →+* R') = P'
+def Fr.IsDef
+    (c : PD Φ.ι Γ (ResidueField Λ))
+    {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R]
+    (P : PD Φ.ι Γ R)
+    : Prop :=
+  Φ.Lifts a c P
+    ∧ ∀ (R' : Type) [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (P' : PD Φ.ι Γ R'),
+      Φ.Lifts a c P' → ∃! f : R →ₐ[Λ] R', P.map (f : R →+* R') = P'
 
 structure Space where
   A : Type
@@ -217,8 +247,11 @@ structure Space where
   P : PD Φ.ι Γ A
   pair : Φ.IsPair ((algebraMap Λ A).comp a) P
   cont : P.Cont ((maximalIdeal B).map (algebraMap B A))
-  gen : Algebra.adjoin B ((Set.range fun x : Γ × Fin 4 × Fin 4 => P.r x.1 x.2.1 x.2.2) ∪
-    Set.range fun x : Φ.ι × Fin 4 × Fin 4 => P.n x.1 x.2.1 x.2.2) = ⊤
+  gen
+    : Algebra.adjoin B
+        ((Set.range fun x : Γ × Fin 4 × Fin 4 => P.r x.1 x.2.1 x.2.2)
+          ∪ Set.range fun x : Φ.ι × Fin 4 × Fin 4 => P.n x.1 x.2.1 x.2.2)
+      = ⊤
   cp : Γ → B[X]
   cp_map : ∀ g, (cp g).map (algebraMap B A) = (P.r g).charpoly
   cp_cont : ∀ n, AdicCont (maximalIdeal B) fun g => (cp g).coeff n
@@ -227,13 +260,20 @@ structure Space where
   ψ_map : ∀ v i, ∀ s ∈ Φ.Gv v, algebraMap B A (ψ v i s) = P.ψ v i s
   ψ_cont : ∀ v i, AdicCont (maximalIdeal B) fun s : Φ.Gv v => ψ v i s
   ψ_red : ∀ v i, ∀ s ∈ Φ.Gv v, res Λ B (ψ v i s) = residue Λ (a (Φ.χ i s))
-  genB : ∀ (R : Type) [CommRing R] [Algebra Λ R] [IsCO Λ R] (f f' : B →ₐ[Λ] R),
-    (∀ g n, f ((cp g).coeff n) = f' ((cp g).coeff n)) → (∀ v i, ∀ s ∈ Φ.Gv v, f (ψ v i s) = f' (ψ v i s)) → f = f'
-  univ : ∀ (R : Type) [CommRing R] [Algebra Λ R] [IsCO Λ R] (c : PD Φ.ι Γ (ResidueField Λ)) (Q : PD Φ.ι Γ R),
-    Φ.IsRes ((residue Λ).comp a) c → Φ.Lifts a c Q → ∃ f : A →ₐ[Λ] R, P.map (f : A →+* R) = Q
-  line : ∀ Q : PD Φ.ι Γ (ResidueField Λ)[X], Φ.IsRes (C.comp ((residue Λ).comp a)) Q →
-    ∃ f : A →ₐ[Λ] (ResidueField Λ)[X], P.map (f : A →+* (ResidueField Λ)[X]) = Q ∧
-      ∀ b ∈ maximalIdeal B, f (algebraMap B A b) = 0
+  genB
+    : ∀ (R : Type) [CommRing R] [Algebra Λ R] [IsCO Λ R] (f f' : B →ₐ[Λ] R),
+      (∀ g n, f ((cp g).coeff n) = f' ((cp g).coeff n))
+        → (∀ v i, ∀ s ∈ Φ.Gv v, f (ψ v i s) = f' (ψ v i s))
+        → f = f'
+  univ
+    : ∀ (R : Type) [CommRing R] [Algebra Λ R] [IsCO Λ R] (c : PD Φ.ι Γ (ResidueField Λ))
+        (Q : PD Φ.ι Γ R),
+      Φ.IsRes ((residue Λ).comp a) c → Φ.Lifts a c Q → ∃ f : A →ₐ[Λ] R, P.map (f : A →+* R) = Q
+  line
+    : ∀ Q : PD Φ.ι Γ (ResidueField Λ)[X],
+      Φ.IsRes (C.comp ((residue Λ).comp a)) Q
+        → ∃ f : A →ₐ[Λ] (ResidueField Λ)[X],
+          P.map (f : A →+* (ResidueField Λ)[X]) = Q ∧ ∀ b ∈ maximalIdeal B, f (algebraMap B A b) = 0
 
 attribute [instance] Space.cA Space.aA Space.cB Space.aB Space.coB Space.aBA Space.tower
 
@@ -250,13 +290,21 @@ def Space.LocZero (X : Space Φ a) (J : Ideal X.B) {K : Type} [CommRing K] (y : 
 
 end Def
 
-structure Fr.Std {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (Φ : Fr O Γ) (l : ℕ)
-    {Λ : Type} [CommRing Λ] [IsLocalRing Λ] (a : O →+* Λ) : Prop where
+structure Fr.Std
+    {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+    (Φ : Fr O Γ) (l : ℕ)
+    {Λ : Type} [CommRing Λ] [IsLocalRing Λ]
+    (a : O →+* Λ)
+    : Prop where
   ok : Φ.Ok ((residue Λ).comp a)
   char : CharP (ResidueField Λ) l
   cont : ∀ i, AdicCont (maximalIdeal Λ) fun g => a (Φ.χ i g)
-  phi : ∀ H : Subgroup Γ, IsOpen (H : Set Γ) → Subgroup.normalClosure Φ.N ≤ H → Finite {φ : H →* Multiplicative (ZMod l) //
-    IsOpen (φ.ker : Set H) ∧ ∀ g : H, (g : Γ) ∈ (Subgroup.normalClosure Φ.N).topologicalClosure → φ g = 1}
+  phi
+    : ∀ H : Subgroup Γ,
+      IsOpen (H : Set Γ) → Subgroup.normalClosure Φ.N ≤ H
+        → Finite
+          {φ : H →* Multiplicative (ZMod l) // IsOpen (φ.ker : Set H)
+            ∧ ∀ g : H, (g : Γ) ∈ (Subgroup.normalClosure Φ.N).topologicalClosure → φ g = 1}
   closed : ∀ v, IsClosed (Φ.Gv v : Set Γ)
   phiv : ∀ v, PhiCond (Γ := Φ.Gv v) l
   mu : ∀ v, ∀ s ∈ Φ.Mu v, s ∈ Φ.Gv v ∧ ∀ i, residue Λ (a (Φ.χ i s)) = 1
@@ -273,7 +321,8 @@ def PD.SameAl {ι Γ R : Type} [Group Γ] [CommRing R] (P P' : PD ι Γ R) : Pro
 def PD.In {ι Γ R : Type} [Group Γ] [CommRing R] (S : Finset (ℤ × ℤ)) (P : PD ι Γ R) : Prop :=
   Supp S P.r ∧ ∀ v, SuppM qQ (P.n v)
 
-def Fr.split {O Γ R : Type} [CommRing O] [Group Γ] [CommRing R] (Φ : Fr O Γ) (a : O →+* R) : PD Φ.ι Γ R :=
+def Fr.split {O Γ R : Type} [CommRing O] [Group Γ] [CommRing R] (Φ : Fr O Γ) (a : O →+* R)
+    : PD Φ.ι Γ R :=
   ⟨mapRep a (diagRep Φ.χ), fun _ => 1⟩
 
 end UpperTheory.V.Ws

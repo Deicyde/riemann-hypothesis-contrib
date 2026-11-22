@@ -17,8 +17,8 @@ open PI.UpqRep (rhoC rhoN lowK nsq vNormSq)
 
 variable {n : ℕ}
 
-theorem rho_sum (ε : Fin n → Bool) (a : Fin n) :
-    rhoN ε a + rhoC ε a = ((n : ℝ) - 1) / 2 - ((a : ℕ) : ℝ) := by
+theorem rho_sum (ε : Fin n → Bool) (a : Fin n)
+    : rhoN ε a + rhoC ε a = ((n : ℝ) - 1) / 2 - ((a : ℕ) : ℝ) := by
   unfold rhoN rhoC
   have kgt := Finset.card_filter_add_card_filter_not (s := Ioi a) (fun b => ε b = ε a)
   have e1 : (Ioi a).filter (fun b => ε b = ε a) = univ.filter (fun b => a < b ∧ ε b = ε a) := by
@@ -33,13 +33,20 @@ theorem rho_sum (ε : Fin n → Bool) (a : Fin n) :
     ext b; simp
   rw [e3, e4, Fin.card_Iio] at klt
   have ha := a.isLt
-  have kgt' : (univ.filter (fun b => a < b ∧ ε b = ε a)).card +
-      (univ.filter (fun b => a < b ∧ ε b ≠ ε a)).card + (a : ℕ) + 1 = n := by omega
-  have rgt : ((univ.filter (fun b => a < b ∧ ε b = ε a)).card : ℝ) +
-      ((univ.filter (fun b => a < b ∧ ε b ≠ ε a)).card : ℝ) + ((a : ℕ) : ℝ) + 1 = n := by
+  have kgt'
+      : (univ.filter (fun b => a < b ∧ ε b = ε a)).card
+          + (univ.filter (fun b => a < b ∧ ε b ≠ ε a)).card + (a : ℕ) + 1
+        = n := by
+    omega
+  have rgt
+      : ((univ.filter (fun b => a < b ∧ ε b = ε a)).card : ℝ)
+          + ((univ.filter (fun b => a < b ∧ ε b ≠ ε a)).card : ℝ) + ((a : ℕ) : ℝ) + 1
+        = n := by
     exact_mod_cast kgt'
-  have rlt : ((univ.filter (fun b => b < a ∧ ε b = ε a)).card : ℝ) +
-      ((univ.filter (fun b => b < a ∧ ε b ≠ ε a)).card : ℝ) = ((a : ℕ) : ℝ) := by
+  have rlt
+      : ((univ.filter (fun b => b < a ∧ ε b = ε a)).card : ℝ)
+          + ((univ.filter (fun b => b < a ∧ ε b ≠ ε a)).card : ℝ)
+        = ((a : ℕ) : ℝ) := by
     exact_mod_cast klt
   linarith
 
@@ -59,30 +66,40 @@ theorem abs_rhoC_le (ε : Fin n → Bool) (a : Fin n) : |rhoC ε a| ≤ n := by
   rw [abs_le]
   constructor <;> linarith
 
-theorem two_rhoC_int (ε : Fin n → Bool) (a : Fin n) : ∃ m : ℤ, 2 * rhoC ε a = m :=
-  ⟨((univ.filter fun b => a < b ∧ ε b = ε a).card : ℤ) - ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℤ), by
-    unfold rhoC; push_cast; ring⟩
+theorem two_rhoC_int (ε : Fin n → Bool) (a : Fin n) : ∃ m : ℤ, 2 * rhoC ε a = m := ⟨
+  ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℤ)
+    - ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℤ),
+  by unfold rhoC; push_cast; ring
+⟩
 
-theorem rhoC_lt (ε : Fin n → Bool) {a b : Fin n} (hab : a < b) (he : ε a = ε b) : rhoC ε b < rhoC ε a := by
+theorem rhoC_lt (ε : Fin n → Bool) {a b : Fin n} (hab : a < b) (he : ε a = ε b)
+    : rhoC ε b < rhoC ε a := by
   unfold rhoC
-  have h1 : (univ.filter fun c => b < c ∧ ε c = ε b).card < (univ.filter fun c => a < c ∧ ε c = ε a).card := by
+  have h1
+      : (univ.filter fun c => b < c ∧ ε c = ε b).card
+        < (univ.filter fun c => a < c ∧ ε c = ε a).card := by
     apply card_lt_card
     rw [ssubset_iff_of_subset]
     · exact ⟨b, by simp [hab, he], by simp⟩
     · intro c hc
       simp only [mem_filter, mem_univ, true_and] at hc ⊢
       exact ⟨hab.trans hc.1, hc.2.trans he.symm⟩
-  have h2 : (univ.filter fun c => c < a ∧ ε c = ε a).card ≤ (univ.filter fun c => c < b ∧ ε c = ε b).card := by
+  have h2
+      : (univ.filter fun c => c < a ∧ ε c = ε a).card
+        ≤ (univ.filter fun c => c < b ∧ ε c = ε b).card := by
     apply card_le_card
     intro c hc
     simp only [mem_filter, mem_univ, true_and] at hc ⊢
     exact ⟨hc.1.trans hab, hc.2.trans he⟩
-  have h1' : ((univ.filter fun c => b < c ∧ ε c = ε b).card : ℝ) <
-      ((univ.filter fun c => a < c ∧ ε c = ε a).card : ℝ) := by exact_mod_cast h1
-  have h2' : ((univ.filter fun c => c < a ∧ ε c = ε a).card : ℝ) ≤
-      ((univ.filter fun c => c < b ∧ ε c = ε b).card : ℝ) := by exact_mod_cast h2
+  have h1'
+      : ((univ.filter fun c => b < c ∧ ε c = ε b).card : ℝ)
+        < ((univ.filter fun c => a < c ∧ ε c = ε a).card : ℝ) := by
+    exact_mod_cast h1
+  have h2'
+      : ((univ.filter fun c => c < a ∧ ε c = ε a).card : ℝ)
+        ≤ ((univ.filter fun c => c < b ∧ ε c = ε b).card : ℝ) := by
+    exact_mod_cast h2
   linarith
-
 
 open Classical in
 def levS (y : ℕ → ℝ) (L : ℝ) (m : ℕ) : ℕ := ((range m).filter fun i => L ≤ y i - y (i + 1)).card
@@ -92,8 +109,8 @@ theorem levS_mono (y : ℕ → ℝ) (L : ℝ) : Monotone (levS y L) := by
   intro a b hab
   exact card_le_card (filter_subset_filter _ (range_mono hab))
 
-theorem levS_gap {y : ℕ → ℝ} (hy : Antitone y) {L : ℝ} {a b : ℕ} (h : levS y L a < levS y L b) :
-    L ≤ y a - y b := by
+theorem levS_gap {y : ℕ → ℝ} (hy : Antitone y) {L : ℝ} {a b : ℕ} (h : levS y L a < levS y L b)
+    : L ≤ y a - y b := by
   classical
   obtain ⟨i, hi, hi'⟩ := Finset.exists_mem_notMem_of_card_lt_card h
   simp only [mem_filter, mem_range, not_and] at hi hi'
@@ -104,8 +121,8 @@ theorem levS_gap {y : ℕ → ℝ} (hy : Antitone y) {L : ℝ} {a b : ℕ} (h : 
   have h2 : y b ≤ y (i + 1) := hy (by omega)
   linarith [hi.2]
 
-theorem levS_flat (y : ℕ → ℝ) (L : ℝ) (a m : ℕ) (h : levS y L a = levS y L (a + m)) :
-    y a - y (a + m) ≤ m * L := by
+theorem levS_flat (y : ℕ → ℝ) (L : ℝ) (a m : ℕ) (h : levS y L a = levS y L (a + m))
+    : y a - y (a + m) ≤ m * L := by
   classical
   induction m with
   | zero => simp
@@ -129,9 +146,10 @@ theorem levS_flat (y : ℕ → ℝ) (L : ℝ) (a m : ℕ) (h : levS y L a = levS
     push_cast
     linarith
 
-theorem exists_lev (x : Fin n → ℝ) (hx : Antitone x) {L : ℝ} (hL : 0 ≤ L) :
-    ∃ lev : Fin n → ℕ, Monotone lev ∧ (∀ a b, lev a < lev b → L ≤ x a - x b) ∧
-      ∀ a b, lev a = lev b → |x a - x b| ≤ n * L := by
+theorem exists_lev (x : Fin n → ℝ) (hx : Antitone x) {L : ℝ} (hL : 0 ≤ L)
+    : ∃ lev : Fin n → ℕ,
+      Monotone lev ∧ (∀ a b, lev a < lev b → L ≤ x a - x b)
+        ∧ ∀ a b, lev a = lev b → |x a - x b| ≤ n * L := by
   cases n with
   | zero => exact ⟨fun a => a.elim0, fun a => a.elim0, fun a => a.elim0, fun a => a.elim0⟩
   | succ m =>
@@ -149,7 +167,9 @@ theorem exists_lev (x : Fin n → ℝ) (hx : Antitone x) {L : ℝ} (hL : 0 ≤ L
       apply Fin.ext
       simp only
       omega
-    have key : ∀ a b : Fin (m + 1), a ≤ b → levS y L a = levS y L b → x a - x b ≤ ((m + 1 : ℕ) : ℝ) * L := by
+    have key
+        : ∀ a b : Fin (m + 1),
+          a ≤ b → levS y L a = levS y L b → x a - x b ≤ ((m + 1 : ℕ) : ℝ) * L := by
       intro a b hab h
       have hab' : (a : ℕ) ≤ b := hab
       obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le hab'
@@ -171,7 +191,8 @@ theorem exists_lev (x : Fin n → ℝ) (hx : Antitone x) {L : ℝ} (hL : 0 ≤ L
         rw [abs_sub_comm, abs_of_nonneg h0]
         exact key b a hab h.symm
 
-theorem farReg_of_lkt_unitIneq_farNum : LKTExists → Renumber → UnitIneq → COBlock → FarNum → FarReg := by
+theorem farReg_of_lkt_unitIneq_farNum
+    : LKTExists → Renumber → UnitIneq → COBlock → FarNum → FarReg := by
   intro hLK hRn hUI hCO hFN n C δ hδ
   obtain ⟨K2, hK2⟩ := hUI n
   obtain ⟨K1, hK1⟩ := hCO n
@@ -219,10 +240,12 @@ theorem farReg_of_lkt_unitIneq_farNum : LKTExists → Renumber → UnitIneq → 
     have h2 : Formalism.REAL.sgn (ε ∘ s) a b = 1 := if_pos he
     rw [h2] at h1
     simpa using h1
-  obtain ⟨σ, hσ⟩ := hK1 (ε ∘ s) (γ ∘ s) lev V (fun a b => E (s a) (s b)) hE' χ hG hKU hLF2 hMin2 hSC2 ⟨u, hu, hKH2⟩
+  obtain ⟨σ, hσ⟩ :=
+    hK1 (ε ∘ s) (γ ∘ s) lev V (fun a b => E (s a) (s b)) hE' χ hG hKU hLF2 hMin2 hSC2 ⟨u, hu, hKH2⟩
   have hcas := hK2 (ε ∘ s) V (fun a b => E (s a) (s b)) hE' χ (γ ∘ s) u hUn2 hSC2 hu hKH2
   have hinj : Function.Injective lev := by
-    refine hN χ (xv (ε ∘ s) (γ ∘ s)) (rhoC (ε ∘ s)) lev σ N hanti hmono (abs_rhoC_le _) hspread ?_ ?_ hsep hbd hN₀
+    refine hN χ (xv (ε ∘ s) (γ ∘ s)) (rhoC (ε ∘ s)) lev σ N hanti hmono (abs_rhoC_le _) hspread ?_
+      ?_ hsep hbd hN₀
     · exact fun c => (hσ c).trans (le_max_left _ _)
     · have e : nsq (γ ∘ s + rhoC (ε ∘ s)) = ∑ a, (xv (ε ∘ s) (γ ∘ s) a - rhoC (ε ∘ s) a) ^ 2 := by
         unfold PI.UpqRep.nsq PI.UpqRep.dot
@@ -239,12 +262,15 @@ theorem farReg_of_lkt_unitIneq_farNum : LKTExists → Renumber → UnitIneq → 
     unfold Lc
     have h0 : (0 : ℝ) ≤ n := Nat.cast_nonneg _
     nlinarith [mul_nonneg h0 h0, mul_nonneg (mul_nonneg h0 h0) h0]
-  have hlow : lowK (ε ∘ s) (xv (ε ∘ s) (γ ∘ s) - Formalism.QuantumDeterminants.rhoStd n) = γ ∘ s := by
+  have hlow
+      : lowK (ε ∘ s) (xv (ε ∘ s) (γ ∘ s) - Formalism.QuantumDeterminants.rhoStd n) = γ ∘ s := by
     funext a
     have h1 := rho_sum (ε ∘ s) a
-    simp only [lowK, xv, Formalism.QuantumDeterminants.rhoStd, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
+    simp only [lowK, xv, Formalism.QuantumDeterminants.rhoStd, Pi.add_apply, Pi.sub_apply,
+      Pi.smul_apply, smul_eq_mul]
     linarith
-  refine ⟨s, xv (ε ∘ s) (γ ∘ s) - Formalism.QuantumDeterminants.rhoStd n, ⟨?_, ?_⟩, hord, ?_, u, hu, ?_⟩
+  refine
+    ⟨s, xv (ε ∘ s) (γ ∘ s) - Formalism.QuantumDeterminants.rhoStd n, ⟨?_, ?_⟩, hord, ?_, u, hu, ?_⟩
   · intro a b hab
     have h1 := hstep a b hab
     have h2 : ((b : ℕ) : ℝ) < n := by exact_mod_cast b.isLt
@@ -255,7 +281,8 @@ theorem farReg_of_lkt_unitIneq_farNum : LKTExists → Renumber → UnitIneq → 
     obtain ⟨m, hm⟩ := hγint (s a)
     obtain ⟨k, hk⟩ := two_rhoC_int (ε ∘ s) a
     refine ⟨m + k - (n : ℤ) + 1 + (a : ℕ), ?_⟩
-    simp only [xv, Formalism.QuantumDeterminants.rhoStd, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Function.comp_apply]
+    simp only [xv, Formalism.QuantumDeterminants.rhoStd, Pi.add_apply, Pi.sub_apply, Pi.smul_apply,
+      smul_eq_mul, Function.comp_apply]
     push_cast
     rw [hm, hk]
     ring

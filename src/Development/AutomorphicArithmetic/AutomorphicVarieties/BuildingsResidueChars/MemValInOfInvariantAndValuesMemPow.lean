@@ -7,8 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 open IsLocalRing Matrix UpperTheory.V.Hi
 
-theorem UpperTheory.mem_valIn_of_invariant_and_values_mem_pow :
-    ∀ (Γ Ga Gp : Type) [Group Γ] [Group Ga] [Group Gp] (X : Frame Γ Ga Gp) (A : Type) [CommRing A] [IsCNL A] (m : ℕ) (τ : X.Ub →* GL (Fin m) A) (θ : X.I.T →* Aˣ) (U : Subgroup X.Ub) (k c N : ℕ) (x : Fin N → Ga × Gp), (∀ g, ∃ γ i, ∃ u ∈ U, ∃ b ∈ X.I.Iw c, g = X.glob γ * x i * ((u : Ga), b)) → ∀ f ∈ X.Sp τ θ U, (∀ y ∈ X.I.Nm c, X.rp A m y f - f ∈ X.valIn A m k) → (∀ i j, f (x i) j ∈ maximalIdeal A ^ k) → f ∈ X.valIn A m k := by
+theorem UpperTheory.mem_valIn_of_invariant_and_values_mem_pow
+    : ∀ (Γ Ga Gp : Type) [Group Γ] [Group Ga] [Group Gp] (X : Frame Γ Ga Gp) (A : Type) [CommRing A]
+        [IsCNL A] (m : ℕ) (τ : X.Ub →* GL (Fin m) A) (θ : X.I.T →* Aˣ) (U : Subgroup X.Ub)
+        (k c N : ℕ) (x : Fin N → Ga × Gp),
+      (∀ g, ∃ γ i, ∃ u ∈ U, ∃ b ∈ X.I.Iw c, g = X.glob γ * x i * ((u : Ga), b))
+        → ∀ f ∈ X.Sp τ θ U,
+          (∀ y ∈ X.I.Nm c, X.rp A m y f - f ∈ X.valIn A m k)
+            → (∀ i j, f (x i) j ∈ maximalIdeal A ^ k)
+            → f ∈ X.valIn A m k := by
   intro Γ Ga Gp _ _ _ X A _ _ m τ θ U k c N x hx f hf hy h0
   have hv : ∀ F : X.Fn A m, F ∈ X.valIn A m k ↔ ∀ g i, F g i ∈ maximalIdeal A ^ k := fun F => by
     simp [Frame.valIn, Submodule.mem_pi]
@@ -22,8 +29,7 @@ theorem UpperTheory.mem_valIn_of_invariant_and_values_mem_pow :
     intro j
     have e := congrFun (h4 u⁻¹ (inv_mem hu)) (x i * ((u : Ga), 1))
     rw [Frame.ra_apply] at e
-    have e2 : x i * ((u : Ga), (1 : Gp)) * (((u⁻¹ : X.Ub) : Ga), (1 : Gp)) = x i := by
-      ext <;> simp
+    have e2 : x i * ((u : Ga), (1 : Gp)) * (((u⁻¹ : X.Ub) : Ga), (1 : Gp)) = x i := by ext <;> simp
     rw [← e, e2]
     simp only [mulVec, dotProduct]
     exact Submodule.sum_mem _ fun l _ => Ideal.mul_mem_left _ _ (h0 _ l)

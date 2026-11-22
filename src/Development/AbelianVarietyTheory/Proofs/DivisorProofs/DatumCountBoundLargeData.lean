@@ -16,8 +16,9 @@ namespace GlobalTheory.SumCount.DataCount
 
 section General
 
-variable {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-  [FiniteDimensional K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V]
 
 theorem finrank_le_dim (M : Submodule (𝓞 K) V) : Module.finrank (𝓞 K) M ≤ Module.finrank K V := by
   have h1 : Module.rank (𝓞 K) M ≤ Module.rank (𝓞 K) V := Submodule.rank_le M
@@ -25,9 +26,10 @@ theorem finrank_le_dim (M : Submodule (𝓞 K) V) : Module.finrank (𝓞 K) M �
   rw [h2, ← Module.finrank_eq_rank K V] at h1
   exact Module.finrank_le_of_rank_le h1
 
-theorem card_quot_le_of_fg (M : Submodule (𝓞 K) V) [Module.Finite (𝓞 K) M] {I : Ideal (𝓞 K)} (hI : I ≠ ⊥) :
-    Finite (M ⧸ (I • ⊤ : Submodule (𝓞 K) M)) ∧
-      Nat.card (M ⧸ (I • ⊤ : Submodule (𝓞 K) M)) ≤ Ideal.absNorm I ^ Module.finrank K V := by
+theorem card_quot_le_of_fg
+    (M : Submodule (𝓞 K) V) [Module.Finite (𝓞 K) M] {I : Ideal (𝓞 K)} (hI : I ≠ ⊥)
+    : Finite (M ⧸ (I • ⊤ : Submodule (𝓞 K) M))
+      ∧ Nat.card (M ⧸ (I • ⊤ : Submodule (𝓞 K) M)) ≤ Ideal.absNorm I ^ Module.finrank K V := by
   haveI : Finite (𝓞 K ⧸ I) := Ideal.finiteQuotientOfFreeOfNeBot I hI
   haveI : Module.Flat (𝓞 K) M := by
     rw [IsDedekindDomain.flat_iff_torsion_eq_bot, eq_bot_iff]
@@ -40,15 +42,16 @@ theorem card_quot_le_of_fg (M : Submodule (𝓞 K) V) [Module.Finite (𝓞 K) M]
       exact_mod_cast this
     exact Subtype.ext ((smul_eq_zero.1 h1).resolve_left h2)
   have e := GlobalTheory.DVRQuotCount.card_quot_smul_top_of_flat' (N := M) I
-  have hN : Nat.card (𝓞 K ⧸ I) = Ideal.absNorm I := by rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
+  have hN : Nat.card (𝓞 K ⧸ I) = Ideal.absNorm I := by
+    rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
   have hpos : 0 < Ideal.absNorm I := Nat.pos_of_ne_zero (Ideal.absNorm_eq_zero_iff.not.2 hI)
   rw [hN] at e
   refine ⟨Nat.finite_of_card_ne_zero (by rw [e]; exact (pow_pos hpos _).ne'), ?_⟩
   rw [e]
   exact Nat.pow_le_pow_right hpos (finrank_le_dim M)
 
-theorem card_quot_le (M : Submodule (𝓞 K) V) {I : Ideal (𝓞 K)} (hI : I ≠ ⊥) :
-    Nat.card (M ⧸ (I • ⊤ : Submodule (𝓞 K) M)) ≤ Ideal.absNorm I ^ Module.finrank K V := by
+theorem card_quot_le (M : Submodule (𝓞 K) V) {I : Ideal (𝓞 K)} (hI : I ≠ ⊥)
+    : Nat.card (M ⧸ (I • ⊤ : Submodule (𝓞 K) M)) ≤ Ideal.absNorm I ^ Module.finrank K V := by
   by_cases hf : Finite (M ⧸ (I • ⊤ : Submodule (𝓞 K) M))
   swap
   · haveI := not_finite_iff_infinite.1 hf
@@ -69,9 +72,10 @@ theorem card_quot_le (M : Submodule (𝓞 K) V) {I : Ideal (𝓞 K)} (hI : I ≠
 
 end General
 
-theorem absNorm_le_sq {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (h2 : Module.finrank F E = 2) (w : HeightOneSpectrum (𝓞 E)) :
-    Ideal.absNorm w.asIdeal ≤ Ideal.absNorm (w.under (𝓞 F)).asIdeal ^ 2 := by
+theorem absNorm_le_sq
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (h2 : Module.finrank F E = 2) (w : HeightOneSpectrum (𝓞 E))
+    : Ideal.absNorm w.asIdeal ≤ Ideal.absNorm (w.under (𝓞 F)).asIdeal ^ 2 := by
   have hr : Module.finrank (𝓞 F) (𝓞 E) = 2 := by
     rw [← h2]
     exact (IsFractionRing.finrank_eq (𝓞 F) F (𝓞 E) E).symm
@@ -82,7 +86,8 @@ theorem absNorm_le_sq {F E : Type} [Field F] [NumberField F] [Field E] [NumberFi
   rw [h1]
   exact pow_pos (Nat.pos_of_ne_zero (Ideal.absNorm_eq_zero_iff.not.2 (w.under (𝓞 F)).ne_bot)) _
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Links GlobalTheory.ChiGrid GlobalTheory.SumSize GlobalTheory.RowTest
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Links
+  GlobalTheory.ChiGrid GlobalTheory.SumSize GlobalTheory.RowTest
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc)
 
@@ -99,9 +104,11 @@ theorem absNorm_modul_le : (Ideal.absNorm G.modul : ℝ) ≤ Real.exp (2 * sig G
   rw [G.pl.under_w hv] at h1
   have hpos : (0 : ℝ) < Ideal.absNorm v.asIdeal := by
     exact_mod_cast Nat.pos_of_ne_zero (Ideal.absNorm_eq_zero_iff.not.2 v.ne_bot)
-  have e : Real.exp (2 * ((G.pl.depth sc v : ℝ) * Real.log (Ideal.absNorm v.asIdeal))) =
-      ((Ideal.absNorm v.asIdeal : ℝ) ^ 2) ^ G.pl.depth sc v := by
-    rw [← pow_mul, ← mul_assoc, ← Nat.cast_ofNat, ← Nat.cast_mul, Real.exp_nat_mul, Real.exp_log hpos]
+  have e
+      : Real.exp (2 * ((G.pl.depth sc v : ℝ) * Real.log (Ideal.absNorm v.asIdeal)))
+        = ((Ideal.absNorm v.asIdeal : ℝ) ^ 2) ^ G.pl.depth sc v := by
+    rw [← pow_mul, ← mul_assoc, ← Nat.cast_ofNat, ← Nat.cast_mul, Real.exp_nat_mul,
+      Real.exp_log hpos]
   rw [e, map_pow, Nat.cast_pow]
   exact pow_le_pow_left₀ (Nat.cast_nonneg _) (by exact_mod_cast h1) _
 
@@ -121,25 +128,34 @@ theorem rank_row_le {i : ℕ} (hi : i ≤ D.R.m) : (G.V (.grid i 0)).rank ≤ bi
   rw [e]
   omega
 
-theorem card_cosAt_le {i : ℕ} (hi : i < D.R.m) :
-    (Nat.card (G.CosAt i) : ℝ) ≤ Real.exp ((bigN D : ℝ) ^ 2 * (2 * sig G)) := by
+theorem card_cosAt_le {i : ℕ} (hi : i < D.R.m)
+    : (Nat.card (G.CosAt i) : ℝ) ≤ Real.exp ((bigN D : ℝ) ^ 2 * (2 * sig G)) := by
   have h1 := card_quot_le (homLat (G.Λ (.grid (i + 1) 0)) (G.Λ (.grid i 0))) (G.pl.modul_ne_bot sc)
   rw [Module.finrank_matrix, Module.finrank_self, mul_one, Fintype.card_fin, Fintype.card_fin] at h1
-  have hpos : 0 < Ideal.absNorm G.modul := Nat.pos_of_ne_zero (Ideal.absNorm_eq_zero_iff.not.2 (G.pl.modul_ne_bot sc))
+  have hpos : 0 < Ideal.absNorm G.modul :=
+    Nat.pos_of_ne_zero (Ideal.absNorm_eq_zero_iff.not.2 (G.pl.modul_ne_bot sc))
   have h2 : (G.V (.grid i 0)).rank * (G.V (.grid (i + 1) 0)).rank ≤ bigN D ^ 2 := by
     rw [sq]; exact Nat.mul_le_mul (rank_row_le G hi.le) (rank_row_le G hi)
-  have h3 : Nat.card (G.CosAt i) ≤ Ideal.absNorm G.modul ^ (bigN D ^ 2) := h1.trans (Nat.pow_le_pow_right hpos h2)
-  calc (Nat.card (G.CosAt i) : ℝ) ≤ (Ideal.absNorm G.modul : ℝ) ^ (bigN D ^ 2) := by exact_mod_cast h3
-    _ ≤ Real.exp (2 * sig G) ^ (bigN D ^ 2) := pow_le_pow_left₀ (Nat.cast_nonneg _) (absNorm_modul_le G) _
+  have h3 : Nat.card (G.CosAt i) ≤ Ideal.absNorm G.modul ^ (bigN D ^ 2) :=
+    h1.trans (Nat.pow_le_pow_right hpos h2)
+  calc
+    (Nat.card (G.CosAt i) : ℝ)
+      ≤ (Ideal.absNorm G.modul : ℝ) ^ (bigN D ^ 2) := by exact_mod_cast h3
+    _ ≤ Real.exp (2 * sig G) ^ (bigN D ^ 2) :=
+      pow_le_pow_left₀ (Nat.cast_nonneg _) (absNorm_modul_le G) _
     _ = _ := by rw [← Real.exp_nat_mul]; push_cast; rfl
 
-theorem card_datum_le : (Nat.card G.Datum : ℝ) ≤ Real.exp (D.R.m * ((bigN D : ℝ) ^ 2 * (2 * sig G))) := by
+theorem card_datum_le
+    : (Nat.card G.Datum : ℝ) ≤ Real.exp (D.R.m * ((bigN D : ℝ) ^ 2 * (2 * sig G))) := by
   rw [Nat.card_pi, Nat.cast_prod, Real.exp_nat_mul]
-  refine (Finset.prod_le_prod₀ (fun _ _ => Nat.cast_nonneg _) fun i _ => card_cosAt_le G i.2).trans (le_of_eq ?_)
+  refine (Finset.prod_le_prod₀ (fun _ _ => Nat.cast_nonneg _) fun i _ => card_cosAt_le G i.2).trans
+    (le_of_eq ?_)
   rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
 
-theorem card_datum_le_aOne {C b : ℝ} (hC : 2 ≤ C) (hb : 1 ≤ b) : (Nat.card G.Datum : ℝ) ≤ Real.exp (D.R.m * aOne G C b) := by
-  refine (card_datum_le G).trans (Real.exp_le_exp.2 (mul_le_mul_of_nonneg_left ?_ (Nat.cast_nonneg _)))
+theorem card_datum_le_aOne {C b : ℝ} (hC : 2 ≤ C) (hb : 1 ≤ b)
+    : (Nat.card G.Datum : ℝ) ≤ Real.exp (D.R.m * aOne G C b) := by
+  refine (card_datum_le G).trans
+    (Real.exp_le_exp.2 (mul_le_mul_of_nonneg_left ?_ (Nat.cast_nonneg _)))
   have hm : (1 : ℝ) ≤ D.R.m := by exact_mod_cast (by have := D.R.two_le_m; omega : 1 ≤ D.R.m)
   have hl := Real.log_nonneg hb
   have hs : 0 ≤ (bigN D : ℝ) ^ 2 * sig G := mul_nonneg (by positivity) (sig_nonneg G)
@@ -153,7 +169,10 @@ theorem card_datum_le_aOne {C b : ℝ} (hC : 2 ≤ C) (hb : 1 ≤ b) : (Nat.card
   nlinarith
 
 theorem dataK : GlobalTheory.SumCount.DataK := by
-  refine ⟨0, fun CF _ => ⟨2, fun ε C hC => ⟨0, fun D large₂ _ _ Γ _ _ Pl0 T A Ks _ _ _ R F _ ch _ _ _ => ?_⟩⟩⟩
+  refine ⟨
+    0,
+    fun CF _ => ⟨2, fun ε C hC => ⟨0, fun D large₂ _ _ Γ _ _ Pl0 T A Ks _ _ _ R F _ ch _ _ _ => ?_⟩⟩
+  ⟩
   have hL : (1 : ℝ) ≤ large₂.sc.L := Real.one_le_rpow large₂.sc.one_lt_alt.le large₂.sc.eps_pos.le
   exact card_datum_le_aOne ch.G hC (Real.one_le_exp (by linarith))
 

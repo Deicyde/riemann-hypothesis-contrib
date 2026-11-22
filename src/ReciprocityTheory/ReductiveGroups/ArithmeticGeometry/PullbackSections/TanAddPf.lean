@@ -9,12 +9,14 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
 theorem tanAdd_holds (Xo : Moduli Dw l) : TanAddSt Xo := by
   intro S _ x w hw a b u₁ u₂ h₁ h₂

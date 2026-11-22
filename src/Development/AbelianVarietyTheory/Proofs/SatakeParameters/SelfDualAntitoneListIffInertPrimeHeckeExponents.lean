@@ -7,17 +7,22 @@ public import Formalism.SatakeDualWeyl.KpqSubgroupCompact
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Polynomial
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Hk3
 
-private theorem sorted_list_sign_split (d : List ℤ) (h : d.Pairwise (fun a b => b ≤ a)) :
-    d = d.filter (fun x => decide (0 < x)) ++ d.filter (fun x => decide (x = 0)) ++ d.filter (fun x => decide (x < 0)) := by
+private theorem sorted_list_sign_split (d : List ℤ) (h : d.Pairwise (fun a b => b ≤ a))
+    : d
+      = d.filter (fun x => decide (0 < x)) ++ d.filter (fun x => decide (x = 0))
+        ++ d.filter (fun x => decide (x < 0)) := by
   induction d with
   | nil => rfl
   | cons x t ih =>
@@ -45,21 +50,27 @@ private theorem sorted_list_sign_split (d : List ℤ) (h : d.Pairwise (fun a b =
       rw [List.filter_cons_of_neg (by simp [h1]), List.filter_cons_of_neg (by simp [h2]),
         List.filter_cons_of_pos (by simp [hneg]), e1, e2, List.nil_append, List.nil_append, ← ih]
 
-private theorem flatMap_singleton_natCast (l : List ℕ) : List.flatMap (fun a : ℕ => [(a : ℤ)]) l = l.map (fun a : ℕ => (a : ℤ)) := by
+private theorem flatMap_singleton_natCast (l : List ℕ)
+    : List.flatMap (fun a : ℕ => [(a : ℤ)]) l = l.map (fun a : ℕ => (a : ℤ)) := by
   induction l with
   | nil => rfl
   | cons a l ih => rw [List.flatMap_cons, List.map_cons, ih]; rfl
 
-private theorem label_list_eq_signed (n : ℕ) (s : List ℕ) : labIn n s =
-    s.map (fun a : ℕ => (a : ℤ)) ++ List.replicate (n - 2 * s.length) 0 ++ (s.reverse.map fun a : ℕ => -(a : ℤ)) := by
+private theorem label_list_eq_signed (n : ℕ) (s : List ℕ)
+    : labIn n s
+      = s.map (fun a : ℕ => (a : ℤ)) ++ List.replicate (n - 2 * s.length) 0
+        ++ (s.reverse.map fun a : ℕ => -(a : ℤ)) := by
   unfold labIn
   show List.map _ (List.flatMap (fun a : ℕ => [(a : ℤ)]) s) ++ _ ++
       List.map _ (List.flatMap (fun a : ℕ => [(a : ℤ)]) s.reverse) = _
   rw [flatMap_singleton_natCast, flatMap_singleton_natCast]
   simp [List.map_map, Function.comp_def]
 
-theorem labIn_selfDual_iff : ∀ (n : ℕ) (d : List ℤ), (d.length = n ∧ d.Pairwise (fun a b => b ≤ a) ∧ dualLab d = d) ↔
-    ∃ s : List ℕ, 2 * s.length ≤ n ∧ s.Pairwise (fun a b => b ≤ a) ∧ (∀ a ∈ s, 0 < a) ∧ d = labIn n s := by
+theorem labIn_selfDual_iff
+    : ∀ (n : ℕ) (d : List ℤ),
+      (d.length = n ∧ d.Pairwise (fun a b => b ≤ a) ∧ dualLab d = d)
+        ↔ ∃ s : List ℕ,
+          2 * s.length ≤ n ∧ s.Pairwise (fun a b => b ≤ a) ∧ (∀ a ∈ s, 0 < a) ∧ d = labIn n s := by
   intro n d
   constructor
   · rintro ⟨hlen, hsort, hdual⟩
@@ -128,7 +139,8 @@ theorem labIn_selfDual_iff : ∀ (n : ℕ) (d : List ℤ), (d.length = n ∧ d.P
       · rw [List.pairwise_map]
         exact hsort.imp (fun h => by exact_mod_cast h)
       · rw [List.pairwise_replicate]
-        right; exact le_refl _
+        right
+        exact le_refl _
       · intro a ha b hb
         obtain ⟨x, hx, rfl⟩ := List.mem_map.mp ha
         rw [List.eq_of_mem_replicate hb]

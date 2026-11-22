@@ -6,21 +6,22 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP.ZarPrincipal
 
-theorem form_mul_comm {A : Type} [CommRing A] (I : Ideal A) (f : Module.Dual A ↥I)
-    (y x : ↥I) : f y * (x : A) = f x * (y : A) := by
-  have h : (x : A) • y = (y : A) • x := by
-    ext; simp [mul_comm]
+theorem form_mul_comm {A : Type} [CommRing A] (I : Ideal A) (f : Module.Dual A ↥I) (y x : ↥I)
+    : f y * (x : A) = f x * (y : A) := by
+  have h : (x : A) • y = (y : A) • x := by ext; simp [mul_comm]
   have := congrArg f h
   simp only [map_smul, smul_eq_mul] at this
   rw [mul_comm, this, mul_comm]
 
-theorem one_mem_span_values {A : Type} [CommRing A] (I : Ideal A) [Module.Invertible A ↥I] :
-    (1 : A) ∈ Ideal.span {a | ∃ (f : Module.Dual A ↥I) (y : ↥I), f y = a} := by
+theorem one_mem_span_values {A : Type} [CommRing A] (I : Ideal A) [Module.Invertible A ↥I]
+    : (1 : A) ∈ Ideal.span {a | ∃ (f : Module.Dual A ↥I) (y : ↥I), f y = a} := by
   obtain ⟨t, ht⟩ := (Module.Invertible.bijective (R := A) (M := ↥I)).2 1
   rw [← ht]
   clear ht
@@ -30,11 +31,12 @@ theorem one_mem_span_values {A : Type} [CommRing A] (I : Ideal A) [Module.Invert
 
 end GlobalTheory.BSP.ZarPrincipal
 
-
 open GlobalTheory.BSP.ZarPrincipal in
-theorem GlobalTheory.BSP.invertible_ideal_principal_on_cover :
-    ∀ (A : Type) [CommRing A] (I : Ideal A), Module.Invertible A ↥I → ∃ (n : ℕ) (s t : Fin n → A),
-      Ideal.span (Set.range s) = ⊤ ∧ ∀ i, t i ∈ I ∧ ∀ x ∈ I, ∃ c, s i * x = c * t i := by
+theorem GlobalTheory.BSP.invertible_ideal_principal_on_cover
+    : ∀ (A : Type) [CommRing A] (I : Ideal A),
+      Module.Invertible A ↥I
+        → ∃ (n : ℕ) (s t : Fin n → A),
+          Ideal.span (Set.range s) = ⊤ ∧ ∀ i, t i ∈ I ∧ ∀ x ∈ I, ∃ c, s i * x = c * t i := by
   intro A _ I hI
   set S : Set A := {a | ∃ (f : Module.Dual A ↥I) (y : ↥I), f y = a} with hS
   have h1 : (1 : A) ∈ Ideal.span S := one_mem_span_values I

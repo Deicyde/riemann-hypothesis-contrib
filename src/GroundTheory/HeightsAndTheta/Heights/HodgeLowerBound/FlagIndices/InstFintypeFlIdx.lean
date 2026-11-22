@@ -18,7 +18,6 @@ section FS
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-
 variable (ι) in
 def fsHerm (a : K → ℤ) : HermLine ι where
   a := a
@@ -54,19 +53,24 @@ def PFl : Ideal (MRing (FlIdx Ψ N)) := mCoordIdeal (yFl Ψ N)
 def dimFl : ℕ := Fintype.card Ψ * (N * (N - 1) / 2)
 
 def xDeg (p : Ψ × Fin N) : FlBlock Ψ N → ℤ := fun q =>
-  if q.1 = p.1 then (if (q.2 : ℕ) = p.2 then 1 else 0) - (if (q.2 : ℕ) + 1 = p.2 then 1 else 0) else 0
+  if q.1 = p.1 then
+    (if (q.2 : ℕ) = p.2 then 1 else 0) - (if (q.2 : ℕ) + 1 = p.2 then 1 else 0)
+  else
+    0
 
 def xLine (p : Ψ × Fin N) : HermLine (FlIdx Ψ N) := fsHerm (FlIdx Ψ N) (xDeg Ψ N p)
 
 def monoLines (m : (Ψ × Fin N) →₀ ℕ) (d : ℕ) : Fin d → HermLine (FlIdx Ψ N) := fun k =>
   if h : (k : ℕ) < (Finsupp.toMultiset m).toList.length then
     xLine Ψ N ((Finsupp.toMultiset m).toList.get ⟨k, h⟩)
-  else fsHerm (FlIdx Ψ N) 0
+  else
+    fsHerm (FlIdx Ψ N) 0
 
 def hFlMono (II : IntersectionSystem) (m : (Ψ × Fin N) →₀ ℕ) : ℝ :=
   if m.degree = dimFl Ψ N + 1 then
     II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (dimFl Ψ N + 1) (monoLines Ψ N m (dimFl Ψ N + 1))
-  else 0
+  else
+    0
 
 def hFl (II : IntersectionSystem) (F : RootPoly Ψ N) : ℝ :=
   ∑ m ∈ F.support, ((AddMonoidAlgebra.coeff F m : ℚ) : ℝ) * hFlMono Ψ N II m

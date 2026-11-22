@@ -15,24 +15,26 @@ open GlobalTheory.IndefiniteRowSideFullHecke.ContractionTensorModels
 
 section Hilbert
 
-variable {H₁ H₂ FF : Type}
-  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
-  [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
-  [NormedAddCommGroup FF] [InnerProductSpace ℂ FF]
+variable
+  {H₁ H₂ FF : Type} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [NormedAddCommGroup H₂]
+  [InnerProductSpace ℂ H₂] [NormedAddCommGroup FF] [InnerProductSpace ℂ FF]
 
-theorem norm_of_isIsoBilin {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) (x : H₁) (y : H₂) :
-    ‖Tm x y‖ = ‖x‖ * ‖y‖ := by
+theorem norm_of_isIsoBilin {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) (x : H₁) (y : H₂)
+    : ‖Tm x y‖ = ‖x‖ * ‖y‖ := by
   have h := hI x x y y
-  rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, ← mul_pow] at h
+  rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, ← mul_pow]
+    at h
   have h2 : ‖Tm x y‖ ^ 2 = (‖x‖ * ‖y‖) ^ 2 := by exact_mod_cast h
   exact (pow_left_inj₀ (norm_nonneg _) (by positivity) two_ne_zero).1 h2
 
-theorem exists_riesz [CompleteSpace H₁] {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) (φ : FF) (y : H₂) :
-    ∃ w : H₁, ∀ x, ⟪x, w⟫_ℂ = ⟪Tm x y, φ⟫_ℂ := by
-  let ℓ : H₁ →L[ℂ] ℂ := ((innerₛₗ ℂ φ) ∘ₗ Tm.flip y).mkContinuous (‖φ‖ * ‖y‖) fun x => by
-    have := norm_inner_le_norm (𝕜 := ℂ) φ (Tm x y)
-    rw [norm_of_isIsoBilin hI] at this
-    simpa [mul_assoc, mul_comm, mul_left_comm] using this
+theorem exists_riesz
+    [CompleteSpace H₁] {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) (φ : FF) (y : H₂)
+    : ∃ w : H₁, ∀ x, ⟪x, w⟫_ℂ = ⟪Tm x y, φ⟫_ℂ := by
+  let ℓ : H₁ →L[ℂ] ℂ :=
+    ((innerₛₗ ℂ φ) ∘ₗ Tm.flip y).mkContinuous (‖φ‖ * ‖y‖) fun x => by
+      have := norm_inner_le_norm (𝕜 := ℂ) φ (Tm x y)
+      rw [norm_of_isIsoBilin hI] at this
+      simpa [mul_assoc, mul_comm, mul_left_comm] using this
   obtain ⟨w, hw⟩ := (InnerProductSpace.toDual ℂ H₁).surjective ℓ
   refine ⟨w, fun x => ?_⟩
   have h : ⟪w, x⟫_ℂ = ⟪φ, Tm x y⟫_ℂ := by
@@ -40,8 +42,8 @@ theorem exists_riesz [CompleteSpace H₁] {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ
     simpa [ℓ] using this
   rw [← inner_conj_symm, h, inner_conj_symm]
 
-theorem existsUnique_isContr [CompleteSpace H₁] {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) :
-    ∃! It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁, IsContr Tm It := by
+theorem existsUnique_isContr [CompleteSpace H₁] {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm)
+    : ∃! It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁, IsContr Tm It := by
   choose w hw using exists_riesz hI
   refine ⟨LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) w ?_ ?_ ?_ ?_, fun φ y x => hw φ y x, ?_⟩
   · intro a b y
@@ -75,8 +77,8 @@ theorem emb_injective (i : ι) : Function.Injective fun s : σ i => e ⟨i, s⟩
 def res (α : Var →₀ ℕ) (i : ι) : σ i →₀ ℕ :=
   Finsupp.comapDomain (fun s : σ i => e ⟨i, s⟩) α (emb_injective e i).injOn
 
-theorem res_sum (a : ∀ i, σ i →₀ ℕ) :
-    res e (∑ i, Finsupp.mapDomain (fun s : σ i => e ⟨i, s⟩) (a i)) = a := by
+theorem res_sum (a : ∀ i, σ i →₀ ℕ)
+    : res e (∑ i, Finsupp.mapDomain (fun s : σ i => e ⟨i, s⟩) (a i)) = a := by
   classical
   funext j
   ext s
@@ -89,29 +91,34 @@ theorem res_sum (a : ∀ i, σ i →₀ ℕ) :
     exact hi (congrArg Sigma.fst (e.injective ht))
   · simp
 
-variable {A B : ι → Type} [∀ i, AddCommGroup (A i)] [∀ i, Module ℂ (A i)]
-  [∀ i, AddCommGroup (B i)] [∀ i, Module ℂ (B i)]
+variable
+  {A B : ι → Type}
+  [∀ i, AddCommGroup (A i)] [∀ i, Module ℂ (A i)] [∀ i, AddCommGroup (B i)] [∀ i, Module ℂ (B i)]
 
-def tens (I : ∀ i, MvPolynomial (σ i) ℂ →ₗ[ℂ] A i →ₗ[ℂ] B i) :
-    MvPolynomial Var ℂ →ₗ[ℂ] (⨂[ℂ] i, A i) →ₗ[ℂ] ⨂[ℂ] i, B i :=
+def tens (I : ∀ i, MvPolynomial (σ i) ℂ →ₗ[ℂ] A i →ₗ[ℂ] B i)
+    : MvPolynomial Var ℂ →ₗ[ℂ] (⨂[ℂ] i, A i) →ₗ[ℂ] ⨂[ℂ] i, B i :=
   (basisMonomials Var ℂ).constr ℂ fun α => PiTensorProduct.map fun i => I i (monomial (res e α i) 1)
 
-theorem tens_prod (I : ∀ i, MvPolynomial (σ i) ℂ →ₗ[ℂ] A i →ₗ[ℂ] B i) (P : ∀ i, MvPolynomial (σ i) ℂ) :
-    tens e I (∏ i, rename (fun s : σ i => e ⟨i, s⟩) (P i)) = PiTensorProduct.map fun i => I i (P i) := by
+theorem tens_prod
+    (I : ∀ i, MvPolynomial (σ i) ℂ →ₗ[ℂ] A i →ₗ[ℂ] B i) (P : ∀ i, MvPolynomial (σ i) ℂ)
+    : tens e I (∏ i, rename (fun s : σ i => e ⟨i, s⟩) (P i))
+      = PiTensorProduct.map fun i => I i (P i) := by
   classical
   let pr : MultilinearMap (RingHom.id ℂ) (fun i : ι => MvPolynomial (σ i) ℂ) (MvPolynomial Var ℂ) :=
-    (MultilinearMap.mkPiAlgebra ℂ ι (MvPolynomial Var ℂ)).compLinearMap
-      fun i => (rename (fun s : σ i => e ⟨i, s⟩) : MvPolynomial (σ i) ℂ →ₐ[ℂ] _).toLinearMap
+    (MultilinearMap.mkPiAlgebra ℂ ι (MvPolynomial Var ℂ)).compLinearMap fun i =>
+      (rename (fun s : σ i => e ⟨i, s⟩) : MvPolynomial (σ i) ℂ →ₐ[ℂ] _).toLinearMap
   have hpr : ∀ P, pr P = ∏ i, rename (fun s : σ i => e ⟨i, s⟩) (P i) := fun P => by simp [pr]
-  have key : (tens e I).compMultilinearMap pr
-      = (PiTensorProduct.mapMultilinear ℂ A B).compLinearMap I := by
+  have key
+      : (tens e I).compMultilinearMap pr
+        = (PiTensorProduct.mapMultilinear ℂ A B).compLinearMap I := by
     refine Module.Basis.ext_multilinear (fun i => basisMonomials (σ i) ℂ) fun a => ?_
     simp only [LinearMap.compMultilinearMap_apply, hpr, coe_basisMonomials,
       MultilinearMap.compLinearMap_apply, PiTensorProduct.mapMultilinear_apply, rename_monomial]
     rw [← monomial_sum_one]
-    have := (basisMonomials Var ℂ).constr_basis ℂ
-      (fun α => PiTensorProduct.map fun i => I i (monomial (res e α i) 1))
-      (∑ i, Finsupp.mapDomain (fun s : σ i => e ⟨i, s⟩) (a i))
+    have :=
+      (basisMonomials Var ℂ).constr_basis ℂ
+        (fun α => PiTensorProduct.map fun i => I i (monomial (res e α i) 1))
+        (∑ i, Finsupp.mapDomain (fun s : σ i => e ⟨i, s⟩) (a i))
     rw [res_sum, coe_basisMonomials] at this
     exact this
   have := congrArg (fun f => f P) key
@@ -128,8 +135,7 @@ end Tensor
 
 theorem contrTensor : ContrTensor := by
   intro ι _ σ Var e A B _ _ _ _ I
-  have h : IsTensorIt e I (tens e I) := fun P v => by
-    rw [tens_prod, PiTensorProduct.map_tprod]
+  have h : IsTensorIt e I (tens e I) := fun P v => by rw [tens_prod, PiTensorProduct.map_tprod]
   refine ⟨tens e I, h, fun hI h0 => ?_⟩
   have hex : ∀ i, ∃ P v, I i P v ≠ 0 := by
     intro i
@@ -141,7 +147,8 @@ theorem contrTensor : ContrTensor := by
   rw [h0] at h1
   exact tprod_ne_zero _ hPv h1.symm
 
-theorem contraction : GlobalTheory.IndefiniteRowSideFullHecke.ContractionTensorModels.Contraction := ⟨contrHilbert, contrTensor⟩
+theorem contraction : GlobalTheory.IndefiniteRowSideFullHecke.ContractionTensorModels.Contraction :=
+  ⟨contrHilbert, contrTensor⟩
 
 end GlobalTheory.ContrObj
 

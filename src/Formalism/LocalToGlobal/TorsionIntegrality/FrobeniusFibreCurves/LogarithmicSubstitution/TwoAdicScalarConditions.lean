@@ -21,17 +21,18 @@ theorem Th0Vanish_of (hC : CubeE) (hN : PhENorm) : ThetaZeroVanishing := by
   intro K _ _ _ g2 g3 s2 c0 a1 a3 xT yT al albar S P l linv i ep F ι _ xQ wp wm hP hL hI hlp hCu
     hCu3 hT hQ hFib hN1 hS hEnd hcl h0 hne h1 hb1 hb2
   have hl0 : PowerSeries.constantCoeff l = 0 := hL.2.2.1
-  obtain ⟨hc0, hth⟩ :=
-    phEDef K s2 (xT + c0) (3 * (xT + c0) ^ 2 - g2 / 4) (wOf (xT + c0) P) l hl0
+  obtain ⟨hc0, hth⟩ := phEDef K s2 (xT + c0) (3 * (xT + c0) ^ 2 - g2 / 4) (wOf (xT + c0) P) l hl0
   obtain ⟨-, -, hd1, -⟩ := hC K g2 g3 s2 c0 a1 a3 xT yT P l i ep F hP hL hI hCu hCu3 hT
-  obtain ⟨-, hFG, hF1⟩ := Formalism.L2.Th1.C.first_level_from_universal_law K F l linv _ hlp hL hc0 hd1
-  have hPN := hN K g2 g3 s2 c0 xT al albar S P l linv i ep F ι xQ wp wm hP hT.2.1 hlp hCu
-    hT.2.2.1 hQ hFib hN1 hS
+  obtain ⟨-, hFG, hF1⟩ :=
+    Formalism.L2.Th1.C.first_level_from_universal_law K F l linv _ hlp hL hc0 hd1
+  have hPN :=
+    hN K g2 g3 s2 c0 xT al albar S P l linv i ep F ι xQ wp wm hP hT.2.1 hlp hCu hT.2.2.1 hQ hFib hN1
+      hS
   have hLG : LG (unitBall K) (phTw g2 s2 c0 xT P l) :=
-    Split.split_vanishing_at_two K (unitBall K) (Formalism.L2.Th1.C.unitBallClosed K) l linv _ al albar
-      ⟨hlp, hFG, hc0⟩ hF1 hEnd hcl hPN h0 hne h1 hb1 hb2
-  have hth' : PowerSeries.subst l (thTw g2 s2 c0 xT P) = fExp (-phTw g2 s2 c0 xT P l) := hth
-  have hneg : LG (unitBall K) (-phTw g2 s2 c0 xT P l) :=
+    Split.split_vanishing_at_two K (unitBall K) (Formalism.L2.Th1.C.unitBallClosed K) l linv _ al
+      albar ⟨hlp, hFG, hc0⟩ hF1 hEnd hcl hPN h0 hne h1 hb1 hb2
+  have hth' : PowerSeries.subst l (thTw g2 s2 c0 xT P) = fExp (- phTw g2 s2 c0 xT P l) := hth
+  have hneg : LG (unitBall K) (- phTw g2 s2 c0 xT P l) :=
     (Formalism.L2.Th1.C.lGSubgroup K (unitBall K) Unit).2.2 _ hLG
   refine ⟨?_, ?_, ?_⟩
   · refine (Formalism.L2.Th1.C.simeqIffCong K Unit _ _).2 ?_
@@ -59,10 +60,12 @@ theorem phi_mem_closure (x : ℤ_[2]) : phi K x ∈ closure (Set.range (fun n : 
   rintro _ ⟨n, rfl⟩
   exact ⟨n, by rw [map_intCast]⟩
 
-theorem phi_mem_of_closed {s : Set K} (hs : IsClosed s) (hn : ∀ n : ℤ, (n : K) ∈ s) (x : ℤ_[2]) :
-    phi K x ∈ s := closure_minimal (Set.range_subset_iff.mpr hn) hs (phi_mem_closure x)
+theorem phi_mem_of_closed {s : Set K} (hs : IsClosed s) (hn : ∀ n : ℤ, (n : K) ∈ s) (x : ℤ_[2])
+    : phi K x ∈ s :=
+  closure_minimal (Set.range_subset_iff.mpr hn) hs (phi_mem_closure x)
 
-theorem phi_injective : Function.Injective (phi K) := (algebraMap ℚ_[2] K).injective.comp Subtype.val_injective
+theorem phi_injective : Function.Injective (phi K) :=
+  (algebraMap ℚ_[2] K).injective.comp Subtype.val_injective
 
 theorem phi_inv {x : ℤ_[2]} (hx : ‖x‖ = 1) : ∃ y : ℤ_[2], (phi K x)⁻¹ = phi K y := by
   obtain ⟨u, rfl⟩ := PadicInt.isUnit_iff.mpr hx
@@ -85,8 +88,12 @@ theorem norm_sub_eq_one {b b' : ℤ_[2]} (hb : ‖b‖ = 1) (hb' : ‖b'‖ < 1)
     rw [max_eq_left h] at h2
     linarith
 
-theorem endInt_int {K : Type} [Field K] (R : Subring K) {l linv : PowerSeries K}
-    (h : IsLogPair l linv) (hF : FGInt R l linv) (n : ℤ) : EndInt R l linv (n : K) := by
+theorem endInt_int
+    {K : Type} [Field K]
+    (R : Subring K)
+    {l linv : PowerSeries K} (h : IsLogPair l linv) (hF : FGInt R l linv)
+    (n : ℤ)
+    : EndInt R l linv (n : K) := by
   obtain ⟨-, -, h0, h1, hm, hadd, -⟩ := Formalism.L2.Th1.C.ptClosure K R l linv h hF
   induction n using Int.induction_on with
   | zero => simpa using h0
@@ -129,13 +136,11 @@ theorem two_adic_scalar_conditions : TwoAdicScalars := by
     have := phi_injective h
     rw [this, norm_one] at hb'
     exact lt_irrefl _ hb'
-  · have e : al * (al - albar) = phi K (b * (b - b')) := by
-      rw [hal, halb, map_mul, map_sub]
+  · have e : al * (al - albar) = phi K (b * (b - b')) := by rw [hal, halb, map_mul, map_sub]
     obtain ⟨y, hy⟩ := phi_inv (K := K) (x := b * (b - b')) (by rw [norm_mul, hb, hbb', one_mul])
     rw [e, hy]
     exact hbin y
-  · have e : al * (1 - albar) = phi K (b * (1 - b')) := by
-      rw [hal, halb, map_mul, map_sub, map_one]
+  · have e : al * (1 - albar) = phi K (b * (1 - b')) := by rw [hal, halb, map_mul, map_sub, map_one]
     obtain ⟨y, hy⟩ := phi_inv (K := K) (x := b * (1 - b')) (by rw [norm_mul, hb, h1b', one_mul])
     rw [e, hy]
     exact hbin y

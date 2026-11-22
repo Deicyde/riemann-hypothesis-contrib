@@ -14,10 +14,13 @@ open MvPolynomial ComplexSets
 
 variable {n : ℕ}
 
-theorem isLocalRing_curveLocalRing (I : Ideal (MvPolynomial (Fin n) ℂ)) (q : Fin n → ℂ)
-    [Nontrivial (curveLocalRing I q)] : IsLocalRing (curveLocalRing I q) :=
-  IsLocalRing.of_surjective' (Ideal.Quotient.mk (I.map (algebraMap (MvPolynomial (Fin n) ℂ)
-    (Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)))))) Ideal.Quotient.mk_surjective
+theorem isLocalRing_curveLocalRing
+    (I : Ideal (MvPolynomial (Fin n) ℂ)) (q : Fin n → ℂ) [Nontrivial (curveLocalRing I q)]
+    : IsLocalRing (curveLocalRing I q) :=
+  IsLocalRing.of_surjective'
+    (Ideal.Quotient.mk (I.map (algebraMap (MvPolynomial (Fin n) ℂ)
+      (Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ))))))
+    Ideal.Quotient.mk_surjective
 
 theorem OrdFiniteNonZeroDivisor.proof : OrdFiniteNonZeroDivisor.Statement := by
   intro n I q f hrad hdim hord
@@ -40,7 +43,7 @@ theorem OrdFiniteNonZeroDivisor.proof : OrdFiniteNonZeroDivisor.Statement := by
   have hpP : p.IsPrime := hp.1.1
   have hxp := (hpP.mem_or_mem (hyx ▸ p.zero_mem)).resolve_left hyp
 
-  have hpmax : ¬ p.IsMaximal := by
+  have hpmax : ¬p.IsMaximal := by
     intro hm
     have h1 := IsLocalRing.maximalIdeal_height_eq_ringKrullDim (R := curveLocalRing I q)
     rw [← IsLocalRing.eq_maximalIdeal hm, Ideal.height_eq_zero_iff.mpr hp, hdim] at h1
@@ -49,9 +52,11 @@ theorem OrdFiniteNonZeroDivisor.proof : OrdFiniteNonZeroDivisor.Statement := by
   have : Algebra.IsIntegral (curveLocalRing I q) (curveNormalisation I q) :=
     inferInstanceAs (Algebra.IsIntegral (curveLocalRing I q)
       (integralClosure (curveLocalRing I q) (FractionRing (curveLocalRing I q))))
-  obtain ⟨Q, -, hQ, hQp⟩ := Ideal.exists_ideal_over_prime_of_isIntegral p (⊥ : Ideal (curveNormalisation I q))
-    (by rw [Ideal.under_def, ← RingHom.ker_eq_comap_bot, (RingHom.injective_iff_ker_eq_bot _).1
-      (algebraMap_curveNormalisation_injective I q)]; exact bot_le)
+  obtain ⟨Q, -, hQ, hQp⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral p (⊥ : Ideal (curveNormalisation I q)) (by
+      rw [Ideal.under_def, ← RingHom.ker_eq_comap_bot,
+        (RingHom.injective_iff_ker_eq_bot _).1 (algebraMap_curveNormalisation_injective I q)]
+      exact bot_le)
   obtain ⟨P, hPm, hQP⟩ := Ideal.exists_le_maximal Q hQ.ne_top
   apply hord ⟨P, hPm⟩
   have : P.IsPrime := hPm.isPrime
@@ -60,9 +65,11 @@ theorem OrdFiniteNonZeroDivisor.proof : OrdFiniteNonZeroDivisor.Statement := by
   set Q' := Q.map (algebraMap (curveNormalisation I q) (Localization.AtPrime P)) with hQ'def
   have : Q'.IsPrime := IsLocalization.isPrime_of_isPrime_disjoint P.primeCompl _ Q hQ hd
   have hQ'u : Q'.under _ = Q := IsLocalization.under_map_of_isPrime_disjoint P.primeCompl _ hQ hd
-  have hle : Ideal.span {(algebraMap (curveNormalisation I q) (Localization.AtPrime P)
-      (algebraMap (curveLocalRing I q) (curveNormalisation I q)
-        (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) f)))} ≤ Q' := by
+  have hle
+      : Ideal.span {(algebraMap (curveNormalisation I q) (Localization.AtPrime P)
+          (algebraMap (curveLocalRing I q) (curveNormalisation I q)
+            (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) f)))}
+        ≤ Q' := by
     rw [Ideal.span_singleton_le_iff_mem]
     refine Ideal.mem_map_of_mem _ ?_
     rw [← hQp] at hxp
@@ -74,7 +81,8 @@ theorem OrdFiniteNonZeroDivisor.proof : OrdFiniteNonZeroDivisor.Statement := by
   obtain ⟨-, hart⟩ := hne
   have : IsArtinian (Localization.AtPrime P) (Localization.AtPrime P ⧸ Q') :=
     isArtinian_of_surjective _ (Submodule.factor hle) (Submodule.factor_surjective hle)
-  have : IsArtinianRing (Localization.AtPrime P ⧸ Q') := isArtinian_of_tower (Localization.AtPrime P) this
+  have : IsArtinianRing (Localization.AtPrime P ⧸ Q') :=
+    isArtinian_of_tower (Localization.AtPrime P) this
   have hQ'max : Q'.IsMaximal :=
     Ideal.Quotient.maximal_of_isField _ (IsArtinianRing.isField_of_isDomain _)
   have hQeq : Q = P := by

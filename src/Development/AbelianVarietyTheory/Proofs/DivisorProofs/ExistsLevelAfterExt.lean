@@ -11,9 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Unifo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH GlobalTheory.SiegelOfPolarised GlobalTheory.PrimNorm
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH GlobalTheory.SiegelOfPolarised GlobalTheory.PrimNorm
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -21,41 +24,56 @@ noncomputable section
 
 namespace GlobalTheory.LevelAfterExt
 
-theorem weilIs_of_ext {O C : Type} [Field O] [Field C] (β : O →+* C) {Q : PolAV (Sp O)}
-    {Q' : PolAV (Sp C)} {ψ : Q'.A.left ⟶ Q.A.left} (hQ : IsPolFibre β Q Q' ψ)
+theorem weilIs_of_ext
+    {O C : Type} [Field O] [Field C]
+    (β : O →+* C)
+    {Q : PolAV (Sp O)} {Q' : PolAV (Sp C)} {ψ : Q'.A.left ⟶ Q.A.left} (hQ : IsPolFibre β Q Q' ψ)
     (n : ℕ) (x y : 𝟙_ (Over (Sp O)) ⟶ Q.A) (u : Oˣ) (hx : x ^ n = 1) (hy : y ^ n = 1)
     (hw : WeilIs Q'.A Q'.L n (ObjPull.secPull hQ.2.1 x) (ObjPull.secPull hQ.2.1 y)
-      (unitOn (Units.map β.toMonoidHom u))) : WeilIs Q.A Q.L n x y (unitOn u) := by
+      (unitOn (Units.map β.toMonoidHom u)))
+    : WeilIs Q.A Q.L n x y (unitOn u) := by
   have H := hQ.2.1
   have := Q.isAb.comm
   have hG : GlobalFnsSt := GlobalTheory.laws_without_cohomology.1
   let e : Over.mk (spMap β) ⟶ 𝟙_ (Over (Sp O)) := Over.homMk (spMap β) (Category.comp_id _)
   obtain ⟨c, hc, -⟩ := LevelCompare.weil_existsUnique Q n x y hx hy
   have h₁ := CommPairing.weilIs_pull hG Q.isAb Q.isLB e hc
-  have h₂ := (weilIs_grpPullback_of_comm _ _ Q.A Q'.A _ ψ Q.L Q'.L Q.isLB Q'.isLB H hQ.2.2.symm _ n _ _
-    (pushPt H.1.w _) (pushPt H.1.w _) _ rfl rfl).1 hw
+  have h₂ :=
+    (weilIs_grpPullback_of_comm _ _ Q.A Q'.A _ ψ Q.L Q'.L Q.isLB Q'.isLB H hQ.2.2.symm _ n _ _
+      (pushPt H.1.w _) (pushPt H.1.w _) _ rfl rfl).1 hw
   have h₃ : WeilIs Q.A Q.L n (e ≫ x) (e ≫ y) (unitOn (Units.map β.toMonoidHom u)) :=
-    UnifPoint.weilIs_congr (Category.id_comp _) (ObjPull.secPull_left H x) (ObjPull.secPull_left H y) h₂
+    UnifPoint.weilIs_congr (Category.id_comp _) (ObjPull.secPull_left H x)
+      (ObjPull.secPull_left H y) h₂
   have h₄ := CommutatorPairing.weilIs_unique hG Q.isAb Q.isLB h₁ h₃
-  obtain ⟨w, rfl⟩ : ∃ w : Oˣ, unitOn w = c :=
-    ⟨Units.map (Scheme.ΓSpecIso (CommRingCat.of O)).hom.hom.toMonoidHom c,
-      Units.ext (CommRingCat.inv_hom_apply (Scheme.ΓSpecIso (CommRingCat.of O)) c.val)⟩
-  have e' : Units.map e.left.appTop.hom.toMonoidHom (unitOn w) = unitOn (Units.map β.toMonoidHom w) :=
-    Units.ext (congrArg (fun q => q.hom w.val) (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom β))).symm
+  obtain ⟨w, rfl⟩ : ∃ w : Oˣ, unitOn w = c := ⟨
+    Units.map (Scheme.ΓSpecIso (CommRingCat.of O)).hom.hom.toMonoidHom c,
+    Units.ext (CommRingCat.inv_hom_apply (Scheme.ΓSpecIso (CommRingCat.of O)) c.val)
+  ⟩
+  have e'
+      : Units.map e.left.appTop.hom.toMonoidHom (unitOn w) = unitOn (Units.map β.toMonoidHom w) :=
+    Units.ext
+      (congrArg (fun q => q.hom w.val) (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom β))).symm
   have inj : Function.Injective (unitOn (R := C)) :=
-    Units.map_injective (Scheme.ΓSpecIso (CommRingCat.of C)).symm.commRingCatIsoToRingEquiv.injective
+    Units.map_injective (Scheme.ΓSpecIso (CommRingCat.of
+      C)).symm.commRingCatIsoToRingEquiv.injective
   have h₅ := congrArg Units.val (inj (e'.symm.trans h₄))
   obtain rfl : w = u := Units.ext (β.injective h₅)
   exact hc
 
-theorem exists_ext_torsion (K : Type) [Field K] (P₀ : PolAV (Sp K)) (N : ℕ) (hN : 1 ≤ N) :
-    ∃ (K' : Type) (_ : Field K') (_ : Algebra K K'), Module.Finite K K' ∧
-      ∀ (K'' Ω : Type) [Field K''] [Field Ω] (i : K' →+* K'') (f : K →+* K''), i.comp (algebraMap K K') = f →
-      ∀ (P : PolAV (Sp K'')) (ψ : P.A.left ⟶ P₀.A.left), IsPolFibre f P₀ P ψ →
-      ∀ (σ : K'' →+* Ω) (Q : PolAV (Sp Ω)) (ψσ : Q.A.left ⟶ P.A.left) (hQ : IsPolFibre σ P Q ψσ),
-        ∀ y, y ^ N = 1 → ∃ x, ObjPull.secPull hQ.2.1 x = y := by
-  obtain ⟨K', _, _, hfin, H⟩ := TorsRational.exists_ext_points K (torsion P₀.A N)
-    (AbTorsionAnyBase.isFinite_and_flat_torsion (Sp K) P₀.A P₀.isAb N hN).1
+theorem exists_ext_torsion (K : Type) [Field K] (P₀ : PolAV (Sp K)) (N : ℕ) (hN : 1 ≤ N)
+    : ∃ (K' : Type) (_ : Field K') (_ : Algebra K K'),
+      Module.Finite K K'
+        ∧ ∀ (K'' Ω : Type) [Field K''] [Field Ω] (i : K' →+* K'') (f : K →+* K''),
+          i.comp (algebraMap K K') = f
+            → ∀ (P : PolAV (Sp K'')) (ψ : P.A.left ⟶ P₀.A.left),
+              IsPolFibre f P₀ P ψ
+                → ∀ (σ : K'' →+* Ω) (Q : PolAV (Sp Ω)) (ψσ : Q.A.left ⟶ P.A.left)
+                    (hQ : IsPolFibre σ P Q ψσ),
+                  ∀ y,
+                    y ^ N = 1 → ∃ x, ObjPull.secPull hQ.2.1 x = y := by
+  obtain ⟨K', _, _, hfin, H⟩ :=
+    TorsRational.exists_ext_points K (torsion P₀.A N)
+      (AbTorsionAnyBase.isFinite_and_flat_torsion (Sp K) P₀.A P₀.isAb N hN).1
   refine ⟨K', inferInstance, inferInstance, hfin, ?_⟩
   intro K'' Ω _ _ i f hf P ψ hP σ Q ψσ hQ y hy
   letI : Algebra K' K'' := i.toAlgebra
@@ -101,21 +119,30 @@ theorem exists_ext_torsion (K : Type) [Field K] (P₀ : PolAV (Sp K)) (N : ℕ) 
       exact (Category.comp_id _).trans (Category.id_comp _).symm
   · rw [Over.w, Over.w]
 
-theorem exists_ext_level (K : Type) [Field K] [CharZero K] (P₀ : PolAV (Sp K)) (N : ℕ) (hN : 1 ≤ N) :
-    ∃ (K' : Type) (_ : Field K') (_ : Algebra K K'), Module.Finite K K' ∧
-      ∀ (K'' : Type) [Field K''] (i : K' →+* K'') (f : K →+* K''), i.comp (algebraMap K K') = f →
-      ∀ (P : PolAV (Sp K'')) (ψ : P.A.left ⟶ P₀.A.left), IsPolFibre f P₀ P ψ →
-      ∀ (g : ℕ), P.g = g → ∀ ze : K''ˣ, IsPrimitiveRoot (ze : K'') N →
-      ∃ lev : (Fin g ⊕ Fin g → ℤ) → (𝟙_ (Over (Sp K'')) ⟶ P.A), (∀ x y, lev (x + y) = lev x * lev y) ∧
-        (∀ x, lev x ^ N = 1) ∧ ∀ x y, WeilIs P.A P.L N (lev x) (lev y) (unitOn (ze ^ omegaStd x y)) := by
+theorem exists_ext_level (K : Type) [Field K] [CharZero K] (P₀ : PolAV (Sp K)) (N : ℕ) (hN : 1 ≤ N)
+    : ∃ (K' : Type) (_ : Field K') (_ : Algebra K K'),
+      Module.Finite K K'
+        ∧ ∀ (K'' : Type) [Field K''] (i : K' →+* K'') (f : K →+* K''),
+          i.comp (algebraMap K K') = f
+            → ∀ (P : PolAV (Sp K'')) (ψ : P.A.left ⟶ P₀.A.left),
+              IsPolFibre f P₀ P ψ
+                → ∀ (g : ℕ),
+                  P.g = g
+                    → ∀ ze : K''ˣ,
+                      IsPrimitiveRoot (ze : K'') N
+                        → ∃ lev : (Fin g ⊕ Fin g → ℤ) → (𝟙_ (Over (Sp K'')) ⟶ P.A),
+                          (∀ x y, lev (x + y) = lev x * lev y) ∧ (∀ x, lev x ^ N = 1)
+                            ∧ ∀ x y,
+                              WeilIs P.A P.L N (lev x) (lev y) (unitOn (ze ^ omegaStd x y)) := by
   obtain ⟨K', _, _, hfin, H⟩ := exists_ext_torsion K P₀ N hN
   refine ⟨K', inferInstance, inferInstance, hfin, fun K'' _ i f hf P ψ hP g hg ze hze => ?_⟩
   let Ω := AlgebraicClosure K''
   let σ : K'' →+* Ω := algebraMap K'' Ω
   haveI : CharZero Ω := (σ.comp f).charZero_iff (σ.comp f).injective |>.1 inferInstance
   obtain ⟨Q, φ, hQ⟩ := exists_isPolFibre GlobalTheory.laws_without_cohomology.2.2.1 σ P
-  obtain ⟨l, h₁, h₂, h₃⟩ := SiegPt.exists_level (O := Ω) (C := Ω) Q g N (Units.map σ.toMonoidHom ze) (hQ.1.trans hg)
-    (IsUnit.mk0 _ (Nat.cast_ne_zero.2 (by omega))) (hze.map_of_injective σ.injective)
+  obtain ⟨l, h₁, h₂, h₃⟩ :=
+    SiegPt.exists_level (O := Ω) (C := Ω) Q g N (Units.map σ.toMonoidHom ze) (hQ.1.trans hg)
+      (IsUnit.mk0 _ (Nat.cast_ne_zero.2 (by omega))) (hze.map_of_injective σ.injective)
   haveI : Epi (spMap σ) := by
     letI := σ.toAlgebra
     haveI : Flat (spMap σ) := by
@@ -124,14 +151,13 @@ theorem exists_ext_level (K : Type) [Field K] [CharZero K] (P₀ : PolAV (Sp K))
     haveI : Surjective (spMap σ) := ⟨fun p => ⟨IsLocalRing.closedPoint Ω, Subsingleton.elim _ _⟩⟩
     exact Flat.epi_of_flat_of_surjective _
   have hinj : Function.Injective (ObjPull.secPull hQ.2.1) := fun a b h =>
-    Over.OverMorphism.ext ((cancel_epi (spMap σ)).1 (by
-      rw [← ObjPull.secPull_left hQ.2.1, ← ObjPull.secPull_left hQ.2.1, h]))
+    Over.OverMorphism.ext ((cancel_epi (spMap σ)).1
+      (by rw [← ObjPull.secPull_left hQ.2.1, ← ObjPull.secPull_left hQ.2.1, h]))
   choose t ht using fun a => H K'' Ω i f hf P ψ hP σ Q φ hQ (l a) (h₂ a)
   have tors : ∀ a, t a ^ N = 1 := fun a => hinj (by rw [map_pow, ht, map_one, h₂])
   refine ⟨t, fun a b => hinj ?_, tors, fun a b => weilIs_of_ext σ hQ N _ _ _ (tors a) (tors b) ?_⟩
   · rw [map_mul, ht, ht, ht, h₁]
   · rw [ht, ht, map_zpow]
     exact h₃ a b
-
 
 end GlobalTheory.LevelAfterExt

@@ -16,8 +16,9 @@ namespace PositivityTheory.RgUd.T.Nil.Four.Phi2
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
-  (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
 
 def qL : Matrix (Fin n) (Fin n) k →ₗ[k] (Fin (Module.finrank k Z) → k) where
   toFun := qZ Z
@@ -60,8 +61,7 @@ theorem E_smul (c : k) (u : Fin (d Z) → k) : E Z (c • u) = c • E Z u := by
   simp only [E, map_smul, Submodule.coe_smul]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem E_neg (u : Fin (d Z) → k) : E Z (-u) = -E Z u := by
-  simp [E]
+theorem E_neg (u : Fin (d Z) → k) : E Z (-u) = - E Z u := by simp [E]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
 theorem E_injective : Function.Injective (E Z) := fun u u' h =>
@@ -72,14 +72,16 @@ theorem exists_E {w : Matrix (Fin n) (Fin n) k} (hw : w ∈ B0 Z) : ∃ u, E Z u
   ⟨(bas Z).equivFun ⟨w, hw⟩, by simp [E]⟩
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem dot_D (u : Fin (d Z) → k) (x : Matrix (Fin n) (Fin n) k) : u ⬝ᵥ D Z x = trace (E Z u * x) := by
+theorem dot_D (u : Fin (d Z) → k) (x : Matrix (Fin n) (Fin n) k)
+    : u ⬝ᵥ D Z x = trace (E Z u * x) := by
   rw [E_apply, Finset.sum_mul, trace_sum]
   simp [dotProduct, D, smul_mul_assoc, trace_smul]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
 theorem D_E (u : Fin (d Z) → k) : D Z (E Z u) = G Z *ᵥ u := by
   funext i
-  simp [D, G, E_apply, mulVec, dotProduct, Finset.mul_sum, trace_sum, mul_smul_comm, trace_smul, mul_comm]
+  simp [D, G, E_apply, mulVec, dotProduct, Finset.mul_sum, trace_sum, mul_smul_comm, trace_smul,
+    mul_comm]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
 theorem D_add (x y : Matrix (Fin n) (Fin n) k) : D Z (x + y) = D Z x + D Z y := by
@@ -99,12 +101,13 @@ theorem G_symm : (G Z)ᵀ = G Z := by
   simp only [G, transpose_apply, of_apply]
   exact trace_mul_comm _ _
 
-
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
 theorem orth {z w : Matrix (Fin n) (Fin n) k} (hz : z ∈ Z) (hw : w ∈ B0 Z) : trace (z * w) = 0 := by
   obtain ⟨-, hwq⟩ := Submodule.mem_inf.mp hw
   have hq : qZ Z w = 0 := LinearMap.mem_ker.mp hwq
-  have hz' : (∑ i, (Module.finBasis k Z).repr ⟨z, hz⟩ i • ((Module.finBasis k Z i : Z) : Matrix (Fin n) (Fin n) k)) = z := by
+  have hz'
+      : (∑ i, (Module.finBasis k Z).repr ⟨z, hz⟩ i • ((Module.finBasis k Z i : Z) : Matrix (Fin n) (Fin n) k))
+        = z := by
     have := congrArg Subtype.val ((Module.finBasis k Z).sum_repr ⟨z, hz⟩)
     simpa only [AddSubmonoidClass.coe_finsetSum, SetLike.val_smul] using this
   rw [← hz', Finset.sum_mul, trace_sum]
@@ -122,8 +125,8 @@ theorem D_Z {z : Matrix (Fin n) (Fin n) k} (hz : z ∈ Z) : D Z z = 0 := by
   exact orth Z hz (bas Z j).2
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem Z_le_Bz (hZ : CR Z) {z : Matrix (Fin n) (Fin n) k} (hz : z ∈ Z) : z ∈ Bz Z :=
-  fun a ha => hZ.1 a ha z hz
+theorem Z_le_Bz (hZ : CR Z) {z : Matrix (Fin n) (Fin n) k} (hz : z ∈ Z) : z ∈ Bz Z := fun a ha =>
+  hZ.1 a ha z hz
 
 structure Hyp : Prop where
   pi_mem : ∀ x, piZ Z x ∈ Z
@@ -134,7 +137,8 @@ structure Hyp : Prop where
 variable {Z}
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem sub_pi_mem (hZ : CR Z) (h : Hyp Z) {b : Matrix (Fin n) (Fin n) k} (hb : b ∈ Bz Z) : b - piZ Z b ∈ B0 Z := by
+theorem sub_pi_mem (hZ : CR Z) (h : Hyp Z) {b : Matrix (Fin n) (Fin n) k} (hb : b ∈ Bz Z)
+    : b - piZ Z b ∈ B0 Z := by
   refine ⟨(BzL Z).sub_mem hb (Z_le_Bz Z hZ (h.pi_mem b)), ?_⟩
   show qL Z (b - piZ Z b) = 0
   rw [map_sub]
@@ -150,8 +154,7 @@ theorem G_inj (hZ : CR Z) (h : Hyp Z) {u : Fin (d Z) → k} (hu : G Z *ᵥ u = 0
     apply h.trB _ hwB
     intro b hb
     obtain ⟨v, hv⟩ := exists_E Z (sub_pi_mem hZ h hb)
-    have h1 : trace ((b - piZ Z b) * E Z u) = 0 := by
-      rw [← hv, ← dot_D, hD, dotProduct_zero]
+    have h1 : trace ((b - piZ Z b) * E Z u) = 0 := by rw [← hv, ← dot_D, hD, dotProduct_zero]
     have h2 : trace (piZ Z b * E Z u) = 0 := orth Z (h.pi_mem b) hw
     have h3 : trace (b * E Z u) = trace ((b - piZ Z b) * E Z u) + trace (piZ Z b * E Z u) := by
       rw [← trace_add, ← add_mul, sub_add_cancel]
@@ -193,16 +196,18 @@ theorem Pr_smul (c : k) (x : Matrix (Fin n) (Fin n) k) : Pr Z (c • x) = c • 
   simp [Pr, D_smul, mulVec_smul, E_smul]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem Pr_of_D (hZ : CR Z) (h : Hyp Z) {x : Matrix (Fin n) (Fin n) k} (hx : D Z x = 0) : Pr Z x = 0 := by
+theorem Pr_of_D (hZ : CR Z) (h : Hyp Z) {x : Matrix (Fin n) (Fin n) k} (hx : D Z x = 0)
+    : Pr Z x = 0 := by
   simp [Pr, hx, E]
 
-
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem piZ_eq_sub (hZ : CR Z) (h : Hyp Z) {x : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z) :
-    piZ Z x = x - Pr Z x := by
+theorem piZ_eq_sub (hZ : CR Z) (h : Hyp Z) {x : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z)
+    : piZ Z x = x - Pr Z x := by
   obtain ⟨v, hv⟩ := exists_E Z (sub_pi_mem hZ h hx)
   have hP : Pr Z x = x - piZ Z x := by
-    calc Pr Z x = Pr Z ((x - piZ Z x) + piZ Z x) := by rw [sub_add_cancel]
+    calc
+      Pr Z x
+        = Pr Z ((x - piZ Z x) + piZ Z x) := by rw [sub_add_cancel]
       _ = Pr Z (x - piZ Z x) + Pr Z (piZ Z x) := Pr_add _ _
       _ = x - piZ Z x := by rw [← hv, Pr_E hZ h, Pr_of_D hZ h (D_Z Z (h.pi_mem x)), add_zero]
   rw [hP, sub_sub_cancel]

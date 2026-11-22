@@ -12,8 +12,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctEx :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.CtEx :=
-  UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.rCtEx UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.exAct UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctLin
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctUnit UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctT UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctMul
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.satSum UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.muTw UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.hintSph
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctEx
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.CtEx :=
+  UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.rCtEx
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.exAct
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctLin
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctUnit
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctT
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctMul
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.satSum
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.muTw
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.hintSph

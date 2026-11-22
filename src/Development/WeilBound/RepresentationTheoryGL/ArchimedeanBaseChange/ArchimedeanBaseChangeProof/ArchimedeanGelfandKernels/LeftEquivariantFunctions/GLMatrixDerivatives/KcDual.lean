@@ -17,19 +17,22 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-theorem trace_hOf_mul (hH : HbFacts) (u u' : Fin n × Fin n → ℝ) :
-    (hOf u * hOf u').trace = ∑ p, ((u p * u' p : ℝ) : ℂ) := by
+theorem trace_hOf_mul (hH : HbFacts) (u u' : Fin n × Fin n → ℝ)
+    : (hOf u * hOf u').trace = ∑ p, ((u p * u' p : ℝ) : ℂ) := by
   obtain ⟨-, horth, -⟩ := hH n
-  simp only [hOf, Finset.sum_mul, Finset.mul_sum, Matrix.smul_mul, Matrix.mul_smul, Matrix.trace_sum,
-    Matrix.trace_smul, horth, smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  simp only [hOf, Finset.sum_mul, Finset.mul_sum, Matrix.smul_mul, Matrix.mul_smul,
+    Matrix.trace_sum, Matrix.trace_smul, horth, smul_eq_mul, mul_ite, mul_one, mul_zero,
+    Finset.sum_ite_eq, Finset.mem_univ, if_true]
   refine Finset.sum_congr rfl fun p _ => ?_
   rw [Finset.sum_ite_eq']
   simp only [Finset.mem_univ, if_true]
   push_cast
   ring
 
-theorem map_hOf {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] (α : Mat n →ₗ[ℝ] (V →L[ℂ] V))
-    (u : Fin n × Fin n → ℝ) : α (hOf u) = ∑ p, ((u p : ℝ) : ℂ) • α (hb p) := by
+theorem map_hOf
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (α : Mat n →ₗ[ℝ] (V →L[ℂ] V)) (u : Fin n × Fin n → ℝ)
+    : α (hOf u) = ∑ p, ((u p : ℝ) : ℂ) • α (hb p) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [hOf, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
@@ -57,28 +60,29 @@ theorem dualSum (hH : HbFacts) : DualSum := by
     rw [hre]
     split_ifs <;> simp
   have h2 : a'ᵀ * a = 1 := mul_eq_one_comm.mp h1
-  calc ∑ i, α (A i) * β (A' i)
-      = ∑ i, ∑ p, ∑ q, ((a i p * a' i q : ℝ) : ℂ) • (α (hb p) * β (hb q)) := by
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [eA i, eA' i, map_hOf α, map_hOf β, Finset.sum_mul_sum]
-        refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
-        rw [smul_mul_smul_comm]
-        push_cast
-        rfl
+  calc
+    ∑ i, α (A i) * β (A' i)
+        = ∑ i, ∑ p, ∑ q, ((a i p * a' i q : ℝ) : ℂ) • (α (hb p) * β (hb q)) := by
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [eA i, eA' i, map_hOf α, map_hOf β, Finset.sum_mul_sum]
+      refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
+      rw [smul_mul_smul_comm]
+      push_cast
+      rfl
     _ = ∑ p, ∑ q, ((a'ᵀ * a) q p : ℂ) • (α (hb p) * β (hb q)) := by
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun p _ => ?_
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun q _ => ?_
-        rw [← Finset.sum_smul]
-        congr 1
-        simp only [Matrix.mul_apply, Matrix.transpose_apply]
-        push_cast
-        refine Finset.sum_congr rfl fun i _ => ?_
-        ring
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun p _ => ?_
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun q _ => ?_
+      rw [← Finset.sum_smul]
+      congr 1
+      simp only [Matrix.mul_apply, Matrix.transpose_apply]
+      push_cast
+      refine Finset.sum_congr rfl fun i _ => ?_
+      ring
     _ = ∑ p, α (hb p) * β (hb p) := by
-        rw [h2]
-        refine Finset.sum_congr rfl fun p _ => ?_
-        simp [Matrix.one_apply]
+      rw [h2]
+      refine Finset.sum_congr rfl fun p _ => ?_
+      simp [Matrix.one_apply]
 
 end PositivityTheory.RgBcC.LfSt.Kchain.KcDual

@@ -10,16 +10,17 @@ open TensorProduct
 
 namespace GlobalTheory.LocalCoord
 
-theorem exists_frobenius (k A : Type) [Field k] [Finite k] [CommRing A] [Algebra k A]
-    [Algebra.FiniteType k A] (m : Ideal A) (hm : m.IsMaximal) :
-    ∃ F : A →ₐ[k] A, (∀ a, a - F a ∈ m) ∧ ∀ a, ∃ c, F a = a * a * c := by
+theorem exists_frobenius
+    (k A : Type) [Field k] [Finite k] [CommRing A] [Algebra k A] [Algebra.FiniteType k A]
+    (m : Ideal A) (hm : m.IsMaximal)
+    : ∃ F : A →ₐ[k] A, (∀ a, a - F a ∈ m) ∧ ∀ a, ∃ c, F a = a * a * c := by
   letI := Fintype.ofFinite k
   letI := Ideal.Quotient.field m
   haveI : Module.Finite k (A ⧸ m) := finite_of_finite_type_of_isJacobsonRing k (A ⧸ m)
   haveI : Finite (A ⧸ m) := Module.finite_of_finite k
   letI := Fintype.ofFinite (A ⧸ m)
-  have hpow : ∀ (n : ℕ) (a : A),
-      (FiniteField.frobeniusAlgHom k A ^ n) a = a ^ (Fintype.card k ^ n) := by
+  have hpow
+      : ∀ (n : ℕ) (a : A), (FiniteField.frobeniusAlgHom k A ^ n) a = a ^ (Fintype.card k ^ n) := by
     intro n
     induction n with
     | zero => intro a; simp
@@ -34,17 +35,19 @@ theorem exists_frobenius (k A : Type) [Field k] [Finite k] [CommRing A] [Algebra
   · obtain ⟨d, hd⟩ := Nat.exists_eq_add_of_le (Fintype.one_lt_card (α := A ⧸ m))
     exact ⟨a ^ d, by rw [hpow, ← hc, hd]; ring⟩
 
-theorem span_of_derivation {k A K B W : Type} [Field k] [PerfectField k] [CommRing A]
-    [Algebra k A] [Field K] [Algebra k K] [CommRing B] [Algebra K B] [AddCommGroup W]
-    [Module K W] [Module k W] [IsScalarTower k K W]
-    (φ : K ⊗[k] A →ₐ[K] B) (χ : B →ₐ[K] K) {g : ℕ}
+theorem span_of_derivation
+    {k A K B W : Type} [Field k] [PerfectField k] [CommRing A] [Algebra k A] [Field K] [Algebra k K]
+    [CommRing B] [Algebra K B] [AddCommGroup W] [Module K W] [Module k W] [IsScalarTower k K W]
+    (φ : K ⊗[k] A →ₐ[K] B)
+    (χ : B →ₐ[K] K)
+    {g : ℕ}
     (hφ : Function.Surjective φ) (hker : RingHom.ker φ ≤ nilradical _)
-    (t : Fin g → B) (s : B) (hs : χ s ≠ 0) (ht : ∀ i, χ (t i) = 0)
-    (hb : ∀ b, χ b = 0 → s * b ∈ Ideal.span (Set.range t))
-    (D : A →ₗ[k] W)
-    (hD : ∀ a b, D (a * b) = χ (φ (1 ⊗ₜ a)) • D b + χ (φ (1 ⊗ₜ b)) • D a)
-    (hN : ∀ a ∈ nilradical A, D a = 0) :
-    ∃ w : Fin g → W, ∀ a, χ (φ (1 ⊗ₜ a)) = 0 → D a ∈ Submodule.span K (Set.range w) := by
+    (t : Fin g → B)
+    (s : B) (hs : χ s ≠ 0)
+    (ht : ∀ i, χ (t i) = 0) (hb : ∀ b, χ b = 0 → s * b ∈ Ideal.span (Set.range t))
+    (D : A →ₗ[k] W) (hD : ∀ a b, D (a * b) = χ (φ (1 ⊗ₜ a)) • D b + χ (φ (1 ⊗ₜ b)) • D a)
+    (hN : ∀ a ∈ nilradical A, D a = 0)
+    : ∃ w : Fin g → W, ∀ a, χ (φ (1 ⊗ₜ a)) = 0 → D a ∈ Submodule.span K (Set.range w) := by
   classical
   let E : K ⊗[k] A →ₗ[K] W := D.liftBaseChange K
   have hψ : ∀ (c : K) (a : A), χ (φ (c ⊗ₜ a)) = c * χ (φ (1 ⊗ₜ a)) := by
@@ -94,11 +97,19 @@ theorem span_of_derivation {k A K B W : Type} [Field k] [PerfectField k] [CommRi
   have h2 : E (1 ⊗ₜ a) = D a := by simp [E]
   rw [h2] at h1
   rw [← Submodule.smul_mem_iff _ hs, h1]
-  exact Submodule.sum_mem _ fun i _ =>
-    Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+  exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem exists_local_coordinates :
-    ∀ (k A K B : Type) [Field k] [Finite k] [CommRing A] [Algebra k A] [Algebra.FiniteType k A] [Field K] [Algebra k K] [CommRing B] [Algebra K B] (φ : TensorProduct k K A →ₐ[K] B) (χ : B →ₐ[K] K) (g : ℕ) (m : Ideal A), Function.Surjective φ → RingHom.ker φ ≤ nilradical _ → (∀ a : A, a ∈ m ↔ χ (φ (1 ⊗ₜ a)) = 0) → m.IsMaximal → (∃ (t : Fin g → B) (s : B), χ s ≠ 0 ∧ (∀ i, χ (t i) = 0) ∧ ∀ b, χ b = 0 → s * b ∈ Ideal.span (Set.range t)) → IsReduced B → ∃ (u : Fin g → A) (s : A), s ∉ m ∧ (∀ i, u i ∈ m) ∧ ∀ a ∈ m, s * a ∈ Ideal.span (Set.range u) ⊔ nilradical A := by
+theorem exists_local_coordinates
+    : ∀ (k A K B : Type) [Field k] [Finite k] [CommRing A] [Algebra k A] [Algebra.FiniteType k A]
+        [Field K] [Algebra k K] [CommRing B] [Algebra K B] (φ : TensorProduct k K A →ₐ[K] B)
+        (χ : B →ₐ[K] K) (g : ℕ) (m : Ideal A),
+      Function.Surjective φ → RingHom.ker φ ≤ nilradical _ → (∀ a : A, a ∈ m ↔ χ (φ (1 ⊗ₜ a)) = 0)
+        → m.IsMaximal
+        → (∃ (t : Fin g → B) (s : B),
+          χ s ≠ 0 ∧ (∀ i, χ (t i) = 0) ∧ ∀ b, χ b = 0 → s * b ∈ Ideal.span (Set.range t))
+        → IsReduced B
+        → ∃ (u : Fin g → A) (s : A),
+          s ∉ m ∧ (∀ i, u i ∈ m) ∧ ∀ a ∈ m, s * a ∈ Ideal.span (Set.range u) ⊔ nilradical A := by
   intro k A K B _ _ _ _ _ _ _ _ _ φ χ g m hφ hker hm hmax ⟨t, s, hs, ht, hb⟩ _
   classical
   letI := Ideal.Quotient.field m
@@ -126,36 +137,44 @@ theorem exists_local_coordinates :
     ext j
     simp only [L, hpsmul, map_smul, Finsupp.smul_apply, Pi.smul_apply, smul_eq_mul, map_mul]
     rfl
-  let D : A →ₗ[k] Fin r → K :=
-    { toFun := fun a => L ⟨a - F a, hF a⟩
-      map_add' := fun a a' => by
-        rw [← hLadd]; congr 1; ext; simp only [map_add (f := _), Submodule.coe_add]; ring
-      map_smul' := fun c a => by
-        rw [RingHom.id_apply, ← algebraMap_smul K c (L _), ← ι.commutes, ← hLsmul]
-        congr 1; ext
-        change c • a - F (c • a) = algebraMap k A c * (a - F a)
-        rw [map_smul, ← Algebra.smul_def, smul_sub] }
+  let D : A →ₗ[k] Fin r → K := {
+    toFun := fun a => L ⟨a - F a, hF a⟩
+    map_add' := fun a a' => by
+      rw [← hLadd]; congr 1; ext; simp only [map_add (f := _), Submodule.coe_add]; ring
+    map_smul' := fun c a => by
+      rw [RingHom.id_apply, ← algebraMap_smul K c (L _), ← ι.commutes, ← hLsmul]
+      congr 1
+      ext
+      change c • a - F (c • a) = algebraMap k A c * (a - F a)
+      rw [map_smul, ← Algebra.smul_def, smul_sub]
+  }
   have hιF : ∀ a, ι (F a) = ι a := fun a => by
     have := (hm _).mp (hF a)
     rw [← hι, map_sub, sub_eq_zero] at this
     exact this.symm
-  obtain ⟨w, hw⟩ := span_of_derivation φ χ hφ hker t s hs ht hb D (fun a a' => by
-      change L _ = ι a • L _ + ι a' • L _
-      rw [← hιF a', ← hLsmul, ← hLsmul, ← hLadd]
-      congr 1; ext
-      simp only [map_mul, Submodule.coe_add, SetLike.val_smul, smul_eq_mul]
-      ring) (fun a ha => by
-      have : p ⟨a - F a, hF a⟩ = 0 := by
-        refine (Submodule.Quotient.mk_eq_zero _).mpr (Submodule.subset_span ⟨_, ?_, rfl⟩)
-        exact sub_mem ha ((mem_nilradical.mp ha).map F)
-      change L _ = 0
-      ext j
-      simp [L, this])
+  obtain ⟨w, hw⟩ :=
+    span_of_derivation φ χ hφ hker t s hs ht hb D
+      (fun a a' => by
+        change L _ = ι a • L _ + ι a' • L _
+        rw [← hιF a', ← hLsmul, ← hLsmul, ← hLadd]
+        congr 1
+        ext
+        simp only [map_mul, Submodule.coe_add, SetLike.val_smul, smul_eq_mul]
+        ring)
+      (fun a ha => by
+        have : p ⟨a - F a, hF a⟩ = 0 := by
+          refine (Submodule.Quotient.mk_eq_zero _).mpr (Submodule.subset_span ⟨_, ?_, rfl⟩)
+          exact sub_mem ha ((mem_nilradical.mp ha).map F)
+        change L _ = 0
+        ext j
+        simp [L, this])
   choose v hv using hpsurj
   have hDL : ∀ x : m, D x = L x := fun x => by
     obtain ⟨c, hc⟩ := hF2 x
     have h1 : L x = L ⟨x - F x, hF x⟩ + L ((x * c : A) • x) := by
-      rw [← hLadd]; congr 1; ext
+      rw [← hLadd]
+      congr 1
+      ext
       simp only [hc, Submodule.coe_add, SetLike.val_smul, smul_eq_mul]
       ring
     rw [h1, hLsmul, map_mul, hι, (hm _).mp x.2, zero_mul, zero_smul, add_zero]
@@ -209,7 +228,8 @@ theorem exists_local_coordinates :
       | mem y h =>
         obtain ⟨j, rfl⟩ := h
         exact ⟨v (b j), Ideal.mem_sup_left (Ideal.mem_sup_left (hu j)), hv _⟩
-      | zero => exact ⟨0, zero_mem _, by simp [p]⟩
+      | zero =>
+        exact ⟨0, zero_mem _, by simp [p]⟩
       | add y y' _ _ h h' =>
         obtain ⟨z, hz, rfl⟩ := h
         obtain ⟨z', hz', rfl⟩ := h'
@@ -224,8 +244,8 @@ theorem exists_local_coordinates :
     have : a = (a - z) + z := by ring
     rw [this]
     exact add_mem h3 hz
-  obtain ⟨c, hc, hcle⟩ := Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup
-    (IsNoetherian.noetherian m) le_rfl hle
+  obtain ⟨c, hc, hcle⟩ :=
+    Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup (IsNoetherian.noetherian m) le_rfl hle
   refine ⟨u, c, fun h => hmax.ne_top ?_, fun i => ?_, fun a ha => ?_⟩
   · rw [Ideal.eq_top_iff_one]
     have := sub_mem h hc

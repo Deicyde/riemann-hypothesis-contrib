@@ -138,26 +138,35 @@ theorem theorem_n_five_delta_sum : WachTwistTheoremDeltaSum := by
     have h : Finset.Ioo 0 (t + 1 + 1) = insert (t + 1) (Finset.Ioo 0 (t + 1)) := by
       ext i; simp only [Finset.mem_Ioo, Finset.mem_insert]; omega
     rw [h, Finset.sum_insert (by simp), ih, Nat.factorial_succ,
-      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (Nat.succ_ne_zero t) (Nat.factorial_ne_zero t)]
+      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        (Nat.succ_ne_zero t) (Nat.factorial_ne_zero t)]
     ring
 
 theorem theorem_n_five_delta_clause : WachTwistTheoremDeltaClause := by
   intro O _ _ _ ℓ hℓ hℓu s₀ hs hs2 x y u₁ hx t δO eO
   have he : eO = addVal O (ℓ : O) := IdempotentNormalFormsLenFacts.length_quot_span _
-  have hfac : ∀ i ∈ Finset.Ioo 0 t, addVal O ((u₁ : O) - (u₁ : O) * ((x⁻¹ ^ i : Oˣ) : O)) =
-      eO * ((s₀ + padicValNat ℓ i : ℕ) : ℕ∞) := by
+  have hfac
+      : ∀ i ∈ Finset.Ioo 0 t,
+        addVal O ((u₁ : O) - (u₁ : O) * ((x⁻¹ ^ i : Oˣ) : O))
+          = eO * ((s₀ + padicValNat ℓ i : ℕ) : ℕ∞) := by
     intro i hi
     have hi0 : i ≠ 0 := by rw [Finset.mem_Ioo] at hi; omega
     have h1 : ((x⁻¹ ^ i : Oˣ) : O) * (x : O) ^ i = 1 := by
       rw [← Units.val_pow_eq_pow_val, ← Units.val_mul, inv_pow, inv_mul_cancel, Units.val_one]
-    have h2 : (u₁ : O) - (u₁ : O) * ((x⁻¹ ^ i : Oˣ) : O) =
-        ((u₁ * x⁻¹ ^ i : Oˣ) : O) * ((x : O) ^ i - 1) := by
+    have h2
+        : (u₁ : O) - (u₁ : O) * ((x⁻¹ ^ i : Oˣ) : O)
+          = ((u₁ * x⁻¹ ^ i : Oˣ) : O) * ((x : O) ^ i - 1) := by
       rw [Units.val_mul, mul_sub, mul_assoc, h1]; ring
     rw [h2, addVal_mul, addVal_eq_zero_of_unit, zero_add,
       powSubOneO O ℓ hℓ hℓu s₀ hs hs2 x y hx i hi0, he]
   have hval : addVal O δO = eO * ((∑ i ∈ Finset.Ioo 0 t, (s₀ + padicValNat ℓ i) : ℕ) : ℕ∞) := by
     show addVal O (∏ i ∈ Finset.Ioo 0 t, ((u₁ : O) - (u₁ : O) * ((x⁻¹ ^ i : Oˣ) : O))) = _
-    rw [IdempotentNormalFormsLenFacts.addVal_prod, Finset.sum_congr rfl hfac, ← Finset.mul_sum, Nat.cast_sum]
+    rw [IdempotentNormalFormsLenFacts.addVal_prod, Finset.sum_congr rfl hfac, ← Finset.mul_sum,
+      Nat.cast_sum]
   refine ⟨hval, ?_⟩
   rw [hval]
   have hle : ∑ i ∈ Finset.Ioo 0 t, (s₀ + padicValNat ℓ i) ≤ t * s₀ + padicValNat ℓ t.factorial := by
@@ -166,19 +175,23 @@ theorem theorem_n_five_delta_clause : WachTwistTheoremDeltaClause := by
     | zero => simp
     | succ t =>
       rw [theorem_n_five_delta_sum ℓ hℓ s₀ t, Nat.factorial_succ,
-        (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (Nat.succ_ne_zero t) (Nat.factorial_ne_zero t)]
+        (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+              a ≠ 0 → b ≠ 0
+                → _root_.padicValNat p (a * b)
+                  = _root_.padicValNat p a + _root_.padicValNat p b from by
+            simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+          (Nat.succ_ne_zero t) (Nat.factorial_ne_zero t)]
       exact add_le_add (Nat.mul_le_mul_right _ (Nat.le_succ t)) (Nat.le_add_left _ _)
   gcongr
 
 theorem inputs_from_selmer_inj : SelmerInjConditions := by
-  intro O _ _ _ A T' G _ _ _ _ _ M _ _ _ _ r χ E e₁ δ ι _ _ colIdx D j e' Kc k0 ℓ what₂ s
-    L _ _ _ _ tens v₁ κ V _ _ _ _ _ _ iL qV Ff κz HcG Hc F Vo Io ε T₁ T₂ _ _ _ _ ρ₁ ρ₂ inc π γ lam
-    Cs _ _ cls pr Fs Im h
+  intro O _ _ _ A T' G _ _ _ _ _ M _ _ _ _ r χ E e₁ δ ι _ _ colIdx D j e' Kc k0 ℓ what₂ s L _ _ _ _
+    tens v₁ κ V _ _ _ _ _ _ iL qV Ff κz HcG Hc F Vo Io ε T₁ T₂ _ _ _ _ ρ₁ ρ₂ inc π γ lam Cs _ _ cls
+    pr Fs Im h
   obtain ⟨h1, h2, h3, h4, ⟨a1, a2, a3, a4, a5, a6, a7, a8⟩, h6⟩ := h
   refine ⟨h1, h2, h3, h4, fun l => ?_, h6⟩
   obtain ⟨b1, b2, b3, b4, b5⟩ := a8 l
-  exact selmer_inj_column_place O A T' G M L V r χ (D (colIdx l)) iL qV tens a1 a2 a3 a4 a5 a6 a7 (Ff l)
-    (j (colIdx l)) (κ l) (κz l) b1 b2 b3 b4 b5
-
+  exact selmer_inj_column_place O A T' G M L V r χ (D (colIdx l)) iL qV tens a1 a2 a3 a4 a5 a6 a7
+    (Ff l) (j (colIdx l)) (κ l) (κz l) b1 b2 b3 b4 b5
 
 end Formalism.RepresentationBoundsCohomology.BR

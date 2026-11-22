@@ -18,16 +18,18 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-private theorem mem_specMap_asIdeal {A B : CommRingCat.{u}} (ψ : A ⟶ B)
-    (q : PrimeSpectrum B) (a : A) :
-    a ∈ ((Spec.map ψ) q).asIdeal ↔ (ConcreteCategory.hom ψ) a ∈ q.asIdeal := Iff.rfl
+private theorem mem_specMap_asIdeal
+    {A B : CommRingCat.{u}} (ψ : A ⟶ B) (q : PrimeSpectrum B) (a : A)
+    : a ∈ ((Spec.map ψ) q).asIdeal ↔ (ConcreteCategory.hom ψ) a ∈ q.asIdeal :=
+  Iff.rfl
 
-private theorem vanishingIdeal_preimage_specMap {A B : CommRingCat.{u}} (φ : A ⟶ B) [IsIso φ]
-    (W : Set (PrimeSpectrum A)) :
-    PrimeSpectrum.vanishingIdeal (⇑(Spec.map φ) ⁻¹' W)
+private theorem vanishingIdeal_preimage_specMap
+    {A B : CommRingCat.{u}} (φ : A ⟶ B) [IsIso φ] (W : Set (PrimeSpectrum A))
+    : PrimeSpectrum.vanishingIdeal (⇑(Spec.map φ) ⁻¹' W)
       = Ideal.map (ConcreteCategory.hom φ) (PrimeSpectrum.vanishingIdeal W) := by
-  have hinv : ∀ p : PrimeSpectrum (A : Type u),
-      ((Spec.map φ) ((Spec.map (inv φ)) p) : PrimeSpectrum (A : Type u)) = p := by
+  have hinv
+      : ∀ p : PrimeSpectrum (A : Type u),
+        ((Spec.map φ) ((Spec.map (inv φ)) p) : PrimeSpectrum (A : Type u)) = p := by
     intro p
     apply PrimeSpectrum.ext
     apply Ideal.ext
@@ -62,11 +64,13 @@ private theorem vanishingIdeal_preimage_specMap {A B : CommRingCat.{u}} (φ : A 
     intro q hq
     exact (mem_specMap_asIdeal φ q a).mp (ha _ hq)
 
-private theorem vanishingIdeal_preimage_fromSpec_of_isIso {Y Y' : Scheme.{u}} (ψ : Y' ⟶ Y) [IsIso ψ]
-    (T : Set Y) (U : Y.affineOpens) (hV : IsAffineOpen (ψ ⁻¹ᵁ (U : Y.Opens))) :
-    PrimeSpectrum.vanishingIdeal (⇑hV.fromSpec ⁻¹' (⇑ψ ⁻¹' T))
+private theorem vanishingIdeal_preimage_fromSpec_of_isIso
+    {Y Y' : Scheme.{u}} (ψ : Y' ⟶ Y) [IsIso ψ]
+    (T : Set Y)
+    (U : Y.affineOpens) (hV : IsAffineOpen (ψ ⁻¹ᵁ (U : Y.Opens)))
+    : PrimeSpectrum.vanishingIdeal (⇑hV.fromSpec ⁻¹' (⇑ψ ⁻¹' T))
       = Ideal.map (ConcreteCategory.hom (ψ.app (U : Y.Opens)))
-          (PrimeSpectrum.vanishingIdeal (⇑U.2.fromSpec ⁻¹' T)) := by
+        (PrimeSpectrum.vanishingIdeal (⇑U.2.fromSpec ⁻¹' T)) := by
   have : IsIso (ψ.app (U : Y.Opens)) := inferInstance
   have hU : IsAffineOpen (U : Y.Opens) := U.2
   have happ : ψ.appLE (U : Y.Opens) (ψ ⁻¹ᵁ (U : Y.Opens)) le_rfl = ψ.app (U : Y.Opens) := by
@@ -76,25 +80,27 @@ private theorem vanishingIdeal_preimage_fromSpec_of_isIso {Y Y' : Scheme.{u}} (�
     exact AlgebraicGeometry.IsAffineOpen.SpecMap_appLE_fromSpec ψ hU hV le_rfl
   have hpt : ∀ z, ψ (hV.fromSpec z) = hU.fromSpec ((Spec.map (ψ.app (U : Y.Opens))) z) := by
     intro z
-    have h := congrArg
-      (fun m : Spec Γ(Y', ψ ⁻¹ᵁ (U : Y.Opens)) ⟶ Y => ⇑m z) hsq
+    have h := congrArg (fun m : Spec Γ(Y', ψ ⁻¹ᵁ (U : Y.Opens)) ⟶ Y => ⇑m z) hsq
     simpa using h.symm
   refine Eq.trans ?_ (vanishingIdeal_preimage_specMap (ψ.app (U : Y.Opens)) (⇑hU.fromSpec ⁻¹' T))
   exact congrArg PrimeSpectrum.vanishingIdeal
     (Set.ext fun z => iff_of_eq (congrArg (fun y => y ∈ T) (hpt z)))
 
-private theorem map_mem_maximalIdeal_ringEquiv {R S : Type u} [CommRing R] [CommRing S]
-    [IsLocalRing R] [IsLocalRing S] (e : R ≃+* S) {a : R}
-    (h : a ∈ IsLocalRing.maximalIdeal R) : e a ∈ IsLocalRing.maximalIdeal S := by
+private theorem map_mem_maximalIdeal_ringEquiv
+    {R S : Type u} [CommRing R] [CommRing S] [IsLocalRing R] [IsLocalRing S]
+    (e : R ≃+* S)
+    {a : R} (h : a ∈ IsLocalRing.maximalIdeal R)
+    : e a ∈ IsLocalRing.maximalIdeal S := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff] at h
   intro hu
   exact h (by simpa using hu.map (e.symm : S →+* R))
 
-private theorem isRegularParameterSystem_ringEquiv {R S : Type u} [CommRing R] [CommRing S]
-    [IsLocalRing R] [IsLocalRing S] (e : R ≃+* S) (n : ℕ) (x : Fin n → R)
-    (h : IsRegularParameterSystem R n x) :
-    IsRegularParameterSystem S n (fun i => e (x i)) := by
+private theorem isRegularParameterSystem_ringEquiv
+    {R S : Type u} [CommRing R] [CommRing S] [IsLocalRing R] [IsLocalRing S]
+    (e : R ≃+* S)
+    (n : ℕ) (x : Fin n → R) (h : IsRegularParameterSystem R n x)
+    : IsRegularParameterSystem S n (fun i => e (x i)) := by
   obtain ⟨hspan, hdim⟩ := h
   have hle : Ideal.span (Set.range fun i => e (x i)) ≤ IsLocalRing.maximalIdeal S := by
     rw [Ideal.span_le]
@@ -105,8 +111,9 @@ private theorem isRegularParameterSystem_ringEquiv {R S : Type u} [CommRing R] [
     exact Ideal.subset_span ⟨i, rfl⟩
   have hge : IsLocalRing.maximalIdeal S ≤ Ideal.span (Set.range fun i => e (x i)) := by
     intro y hy
-    have h1 : Ideal.span (Set.range x)
-        ≤ Ideal.comap (e : R →+* S) (Ideal.span (Set.range fun i => e (x i))) := by
+    have h1
+        : Ideal.span (Set.range x)
+          ≤ Ideal.comap (e : R →+* S) (Ideal.span (Set.range fun i => e (x i))) := by
       rw [Ideal.span_le]
       rintro z ⟨i, rfl⟩
       simp only [SetLike.mem_coe, Ideal.mem_comap, RingHom.coe_coe]
@@ -118,29 +125,35 @@ private theorem isRegularParameterSystem_ringEquiv {R S : Type u} [CommRing R] [
     simpa using h4
   exact ⟨le_antisymm hle hge, hdim.trans (ringKrullDim_eq_of_ringEquiv e)⟩
 
-private theorem isRegularParameterSystem_congr {R : Type u} [CommRing R] [IsLocalRing R]
-    (n : ℕ) {x y : Fin n → R} (h : ∀ i, x i = y i) (hy : IsRegularParameterSystem R n y) :
-    IsRegularParameterSystem R n x := by
+private theorem isRegularParameterSystem_congr
+    {R : Type u} [CommRing R] [IsLocalRing R]
+    (n : ℕ)
+    {x y : Fin n → R} (h : ∀ i, x i = y i) (hy : IsRegularParameterSystem R n y)
+    : IsRegularParameterSystem R n x := by
   have hxy : x = y := funext h
   rw [hxy]
   exact hy
 
-private theorem iso_inv_comp_eq_comp_inv {W Y Z T : Scheme.{u}} (a : W ≅ Y) (b : Z ≅ T)
-    (p : W ⟶ Z) (q : Y ⟶ T) (hw : a.hom ≫ q = p ≫ b.hom) :
-    a.inv ≫ p = q ≫ b.inv := by
+private theorem iso_inv_comp_eq_comp_inv
+    {W Y Z T : Scheme.{u}}
+    (a : W ≅ Y) (b : Z ≅ T) (p : W ⟶ Z) (q : Y ⟶ T) (hw : a.hom ≫ q = p ≫ b.hom)
+    : a.inv ≫ p = q ≫ b.inv := by
   rw [Iso.inv_comp_eq, ← Category.assoc, hw, Category.assoc, Iso.hom_inv_id, Category.comp_id]
 
-private theorem eqToIso_hom_comp_projectionToBase_of_eq {X : Scheme.{u}} (s : SequenceOfBlowups X) {i j : ℕ}
-    (hij : i = j) : (eqToIso (congrArg s.schemeAt hij)).hom ≫ s.projectionToBase j = s.projectionToBase i := by
+private theorem eqToIso_hom_comp_projectionToBase_of_eq
+    {X : Scheme.{u}} (s : SequenceOfBlowups X) {i j : ℕ} (hij : i = j)
+    : (eqToIso (congrArg s.schemeAt hij)).hom ≫ s.projectionToBase j = s.projectionToBase i := by
   subst hij
   simp
 
-private theorem iso_hom_comp_projectionToBase_of_commute_blowupMorphism {X : Scheme.{u}} {B B' : SequenceOfBlowups X}
+private theorem iso_hom_comp_projectionToBase_of_commute_blowupMorphism
+    {X : Scheme.{u}} {B B' : SequenceOfBlowups X}
     (e : ∀ i : ℕ, i ≤ B.length → (B.schemeAt i ≅ B'.schemeAt i))
     (h0 : (e 0 (Nat.zero_le _)).hom ≫ B'.isoZero.hom = B.isoZero.hom)
     (hstep : ∀ i : ℕ, ∀ hi : i < B.length,
-        (e (i + 1) hi).hom ≫ B'.transitionMapSucc i = B.transitionMapSucc i ≫ (e i hi.le).hom) :
-    ∀ (i : ℕ) (hi : i ≤ B.length), (e i hi).hom ≫ B'.projectionToBase i = B.projectionToBase i := by
+      (e (i + 1) hi).hom ≫ B'.transitionMapSucc i = B.transitionMapSucc i ≫ (e i hi.le).hom)
+    : ∀ (i : ℕ) (hi : i ≤ B.length),
+      (e i hi).hom ≫ B'.projectionToBase i = B.projectionToBase i := by
   intro i
   induction i with
   | zero =>
@@ -155,121 +168,145 @@ private theorem iso_hom_comp_projectionToBase_of_commute_blowupMorphism {X : Sch
       = B.transitionMapSucc n ≫ B.projectionToBase n
     rw [hstep n hn, Category.assoc, ih hn.le]
 
-private theorem mem_support_of_mem_support_comap {Y Z : Scheme.{u}} (g : Y ⟶ Z)
-    (I : Z.IdealSheafData) {x : Y} (hx : x ∈ (I.comap g).support) : g x ∈ I.support := by
+private theorem mem_support_of_mem_support_comap
+    {Y Z : Scheme.{u}} (g : Y ⟶ Z) (I : Z.IdealSheafData) {x : Y} (hx : x ∈ (I.comap g).support)
+    : g x ∈ I.support := by
   have h := Scheme.IdealSheafData.support_comap I g
   rw [h] at hx
   exact hx
 
-private theorem inv_mem_support_comap_of_iso {Y Z : Scheme.{u}} (g : Y ≅ Z) (I : Z.IdealSheafData)
-    {x : Z} (hx : x ∈ I.support) : g.inv x ∈ (I.comap g.hom).support := by
+private theorem inv_mem_support_comap_of_iso
+    {Y Z : Scheme.{u}} (g : Y ≅ Z) (I : Z.IdealSheafData) {x : Z} (hx : x ∈ I.support)
+    : g.inv x ∈ (I.comap g.hom).support := by
   have hI : (I.comap g.hom).comap g.inv = I := by
     rw [← Scheme.IdealSheafData.comap_comp, Iso.inv_hom_id, Scheme.IdealSheafData.comap_id]
   have hx' : x ∈ ((I.comap g.hom).comap g.inv).support := by rw [hI]; exact hx
   exact mem_support_of_mem_support_comap g.inv (I.comap g.hom) hx'
 
-private theorem isIso_restrict_of_eq {Y Z : Scheme.{u}} {f₁ f₂ : Y ⟶ Z} (hf : f₁ = f₂)
-    (U : Z.Opens) (h : IsIso (f₁ ∣_ U)) : IsIso (f₂ ∣_ U) := by
+private theorem isIso_restrict_of_eq
+    {Y Z : Scheme.{u}} {f₁ f₂ : Y ⟶ Z} (hf : f₁ = f₂) (U : Z.Opens) (h : IsIso (f₁ ∣_ U))
+    : IsIso (f₂ ∣_ U) := by
   subst hf
   exact h
 
 private theorem isOpenMap_iso_hom {Y Z : Scheme.{u}} (g : Y ≅ Z) : IsOpenMap (⇑g.hom) :=
   (Scheme.homeoOfIso g).isOpenMap
 
-private theorem isStrictNormalCrossingsDivisor_reducedInverseImage_iso_inv_comp {Y Y' X : Scheme.{u}} (g : Y ≅ Y') (p : Y ⟶ X)
-    (S : TopologicalSpace.Closeds X) (hS : IsStrictNormalCrossingsDivisor (reducedInverseImage p S)) :
-    IsStrictNormalCrossingsDivisor (reducedInverseImage (g.inv ≫ p) S) := by
+private theorem isStrictNormalCrossingsDivisor_reducedInverseImage_iso_inv_comp
+    {Y Y' X : Scheme.{u}} (g : Y ≅ Y') (p : Y ⟶ X) (S : TopologicalSpace.Closeds X)
+    (hS : IsStrictNormalCrossingsDivisor (reducedInverseImage p S))
+    : IsStrictNormalCrossingsDivisor (reducedInverseImage (g.inv ≫ p) S) := by
   intro y'
   obtain ⟨hreg, U, hy, n, fs, J, hrsp, hideal⟩ := hS (g.inv.base y')
   have hsi : IsIso (g.inv.stalkMap y') := inferInstance
   have hV : IsAffineOpen (g.inv ⁻¹ᵁ (U : Y.Opens)) := U.2.preimage_of_isIso g.inv
-  have he : ∀ t, (asIso (g.inv.stalkMap y')).commRingCatIsoToRingEquiv t
-      = (ConcreteCategory.hom (g.inv.stalkMap y')) t := fun _ => rfl
-  have hnat : ∀ s : Γ(Y, (U : Y.Opens)),
-      (ConcreteCategory.hom (Y'.presheaf.germ (g.inv ⁻¹ᵁ (U : Y.Opens)) y' hy))
-          ((ConcreteCategory.hom (g.inv.app (U : Y.Opens))) s)
-        = (asIso (g.inv.stalkMap y')).commRingCatIsoToRingEquiv
+  have he
+      : ∀ t,
+        (asIso (g.inv.stalkMap y')).commRingCatIsoToRingEquiv t
+          = (ConcreteCategory.hom (g.inv.stalkMap y')) t := fun _ =>
+    rfl
+  have hnat
+      : ∀ s : Γ(Y, (U : Y.Opens)),
+        (ConcreteCategory.hom (Y'.presheaf.germ (g.inv ⁻¹ᵁ (U : Y.Opens)) y' hy))
+            ((ConcreteCategory.hom (g.inv.app (U : Y.Opens))) s)
+          = (asIso (g.inv.stalkMap y')).commRingCatIsoToRingEquiv
             ((ConcreteCategory.hom (Y.presheaf.germ (U : Y.Opens) (g.inv.base y') hy)) s) := by
     intro s
     rw [he]
     simp
-  refine ⟨?_, ⟨g.inv ⁻¹ᵁ (U : Y.Opens), hV⟩, hy, n,
-    fun i => (ConcreteCategory.hom (g.inv.app (U : Y.Opens))) (fs i), J, ?_, ?_⟩
+  refine ⟨
+    ?_,
+    ⟨g.inv ⁻¹ᵁ (U : Y.Opens), hV⟩,
+    hy,
+    n,
+    fun i => (ConcreteCategory.hom (g.inv.app (U : Y.Opens))) (fs i),
+    J,
+    ?_,
+    ?_
+  ⟩
   · have := hreg
     exact IsRegularLocalRing.of_ringEquiv (asIso (g.inv.stalkMap y')).commRingCatIsoToRingEquiv
   · refine isRegularParameterSystem_congr n (fun i => hnat (fs i)) ?_
-    exact isRegularParameterSystem_ringEquiv
-      (asIso (g.inv.stalkMap y')).commRingCatIsoToRingEquiv n
-      (fun i => (ConcreteCategory.hom
-        (Y.presheaf.germ (U : Y.Opens) (g.inv.base y') hy)) (fs i)) hrsp
-  · have h1 : (reducedInverseImage (g.inv ≫ p) S).ideal ⟨g.inv ⁻¹ᵁ (U : Y.Opens), hV⟩
-        = PrimeSpectrum.vanishingIdeal
-            (⇑hV.fromSpec ⁻¹' (⇑(g.inv ≫ p) ⁻¹' (S : Set X))) := by
+    exact isRegularParameterSystem_ringEquiv (asIso (g.inv.stalkMap y')).commRingCatIsoToRingEquiv n
+      (fun i => (ConcreteCategory.hom (Y.presheaf.germ (U : Y.Opens) (g.inv.base y') hy)) (fs i))
+      hrsp
+  · have h1
+        : (reducedInverseImage (g.inv ≫ p) S).ideal ⟨g.inv ⁻¹ᵁ (U : Y.Opens), hV⟩
+          = PrimeSpectrum.vanishingIdeal (⇑hV.fromSpec ⁻¹' (⇑(g.inv ≫ p) ⁻¹' (S : Set X))) := by
       simp [reducedInverseImage, Scheme.IdealSheafData.vanishingIdeal_ideal]
-    have h2 : (reducedInverseImage p S).ideal U
-        = PrimeSpectrum.vanishingIdeal (⇑U.2.fromSpec ⁻¹' (⇑p ⁻¹' (S : Set X))) := by
+    have h2
+        : (reducedInverseImage p S).ideal U
+          = PrimeSpectrum.vanishingIdeal (⇑U.2.fromSpec ⁻¹' (⇑p ⁻¹' (S : Set X))) := by
       simp [reducedInverseImage, Scheme.IdealSheafData.vanishingIdeal_ideal]
     have hcomp : (⇑(g.inv ≫ p) ⁻¹' (S : Set X)) = ⇑g.inv ⁻¹' (⇑p ⁻¹' (S : Set X)) := by
       ext z
       simp
-    rw [h1, hcomp, vanishingIdeal_preimage_fromSpec_of_isIso g.inv (⇑p ⁻¹' (S : Set X)) U hV, ← h2, hideal,
-      Ideal.map_span]
+    rw [h1, hcomp, vanishingIdeal_preimage_fromSpec_of_isIso g.inv (⇑p ⁻¹' (S : Set X)) U hV, ← h2,
+      hideal, Ideal.map_span]
     simp [map_prod]
 
-theorem SequenceOfBlowups.Isomorphic.symm {X : Scheme.{u}} {B B' : SequenceOfBlowups X}
-    (h : B.Isomorphic B') : B'.Isomorphic B := by
+theorem SequenceOfBlowups.Isomorphic.symm
+    {X : Scheme.{u}} {B B' : SequenceOfBlowups X} (h : B.Isomorphic B')
+    : B'.Isomorphic B := by
   obtain ⟨hL, e, h0, hstep, hcen⟩ := h
   have p1 : (e 0 (Nat.zero_le _)).inv ≫ B.isoZero.hom = B'.isoZero.hom := by
     rw [Iso.inv_comp_eq]
     exact h0.symm
-  have p2 : ∀ (i : ℕ) (hi : i < B'.length),
-      (e (i + 1) (by omega)).inv ≫ B.transitionMapSucc i
-        = B'.transitionMapSucc i ≫ (e i (by omega)).inv := by
+  have p2
+      : ∀ (i : ℕ) (hi : i < B'.length),
+        (e (i + 1) (by omega)).inv ≫ B.transitionMapSucc i
+          = B'.transitionMapSucc i ≫ (e i (by omega)).inv := by
     intro i hi
     have hi' : i < B.length := by omega
     exact iso_inv_comp_eq_comp_inv (e (i + 1) hi') (e i hi'.le) (B.transitionMapSucc i)
       (B'.transitionMapSucc i) (hstep i hi')
-  have p3 : ∀ (i : ℕ) (hi : i < B'.length),
-      (B.center i).comap (e i (by omega)).inv = B'.center i := by
+  have p3
+      : ∀ (i : ℕ) (hi : i < B'.length), (B.center i).comap (e i (by omega)).inv = B'.center i := by
     intro i hi
     have hi' : i < B.length := by omega
     rw [← hcen i hi', ← Scheme.IdealSheafData.comap_comp, Iso.inv_hom_id,
       Scheme.IdealSheafData.comap_id]
   exact ⟨hL.symm, fun i hi => (e i (by omega)).symm, p1, p2, p3⟩
 
-theorem SequenceOfBlowups.Isomorphic.trans {X : Scheme.{u}} {B B' B'' : SequenceOfBlowups X}
-    (h : B.Isomorphic B') (h' : B'.Isomorphic B'') : B.Isomorphic B'' := by
+theorem SequenceOfBlowups.Isomorphic.trans
+    {X : Scheme.{u}} {B B' B'' : SequenceOfBlowups X} (h : B.Isomorphic B') (h' : B'.Isomorphic B'')
+    : B.Isomorphic B'' := by
   obtain ⟨hL, e, h0, hstep, hcen⟩ := h
   obtain ⟨hL', g, g0, gstep, gcen⟩ := h'
-  have p1 : ((e 0 (Nat.zero_le _)).hom ≫ (g 0 (Nat.zero_le _)).hom) ≫ B''.isoZero.hom
-      = B.isoZero.hom := by
+  have p1
+      : ((e 0 (Nat.zero_le _)).hom ≫ (g 0 (Nat.zero_le _)).hom) ≫ B''.isoZero.hom
+        = B.isoZero.hom := by
     rw [Category.assoc, g0, h0]
-  have p2 : ∀ (i : ℕ) (hi : i < B.length),
-      ((e (i + 1) hi).hom ≫ (g (i + 1) (by omega)).hom) ≫ B''.transitionMapSucc i
-        = B.transitionMapSucc i ≫ ((e i hi.le).hom ≫ (g i (by omega)).hom) := by
+  have p2
+      : ∀ (i : ℕ) (hi : i < B.length),
+        ((e (i + 1) hi).hom ≫ (g (i + 1) (by omega)).hom) ≫ B''.transitionMapSucc i
+          = B.transitionMapSucc i ≫ ((e i hi.le).hom ≫ (g i (by omega)).hom) := by
     intro i hi
     have hi' : i < B'.length := by omega
     rw [Category.assoc, gstep i hi', ← Category.assoc, hstep i hi, Category.assoc]
-  have p3 : ∀ (i : ℕ) (hi : i < B.length),
-      (B''.center i).comap ((e i hi.le).hom ≫ (g i (by omega)).hom) = B.center i := by
+  have p3
+      : ∀ (i : ℕ) (hi : i < B.length),
+        (B''.center i).comap ((e i hi.le).hom ≫ (g i (by omega)).hom) = B.center i := by
     intro i hi
     have hi' : i < B'.length := by omega
     rw [Scheme.IdealSheafData.comap_comp, gcen i hi', hcen i hi]
   exact ⟨hL.trans hL', fun i hi => (e i hi) ≪≫ (g i (by omega)), p1, p2, p3⟩
 
-theorem SequenceOfBlowups.Isomorphic.exists_lastObjIso {X : Scheme.{u}} {B B' : SequenceOfBlowups X}
-    (h : B.Isomorphic B') :
-    ∃ e : B.lastObj ≅ B'.lastObj, e.hom ≫ B'.lastStructMap = B.lastStructMap := by
+theorem SequenceOfBlowups.Isomorphic.exists_lastObjIso
+    {X : Scheme.{u}} {B B' : SequenceOfBlowups X} (h : B.Isomorphic B')
+    : ∃ e : B.lastObj ≅ B'.lastObj, e.hom ≫ B'.lastStructMap = B.lastStructMap := by
   obtain ⟨hL, e, h0, hstep, _⟩ := h
   refine ⟨e B.length le_rfl ≪≫ eqToIso (congrArg B'.schemeAt hL), ?_⟩
-  rw [SequenceOfBlowups.lastStructMap_eq_projectionToBase, SequenceOfBlowups.lastStructMap_eq_projectionToBase, Iso.trans_hom,
-    Category.assoc, eqToIso_hom_comp_projectionToBase_of_eq B' hL]
+  rw [SequenceOfBlowups.lastStructMap_eq_projectionToBase,
+    SequenceOfBlowups.lastStructMap_eq_projectionToBase, Iso.trans_hom, Category.assoc,
+    eqToIso_hom_comp_projectionToBase_of_eq B' hL]
   exact iso_hom_comp_projectionToBase_of_commute_blowupMorphism e h0 hstep B.length le_rfl
 
-theorem IsStrongResolution.of_isomorphic (k : Type u) [Field k] (X : Scheme.{u})
-    (f : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType f]
-    {B B' : SequenceOfBlowups X} (h : B.Isomorphic B') (hB : IsStrongResolution k X f B) :
-    IsStrongResolution k X f B' := by
+theorem IsStrongResolution.of_isomorphic
+    (k : Type u) [Field k]
+    (X : Scheme.{u}) (f : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType f]
+    {B B' : SequenceOfBlowups X} (h : B.Isomorphic B') (hB : IsStrongResolution k X f B)
+    : IsStrongResolution k X f B' := by
   obtain ⟨ε, hε⟩ := h.exists_lastObjIso
   obtain ⟨hs, hp, hiso, hd, hc, hsnc⟩ := hB
   have hmap : B'.lastStructMap = ε.inv ≫ B.lastStructMap := by
@@ -282,10 +319,11 @@ theorem IsStrongResolution.of_isomorphic (k : Type u) [Field k] (X : Scheme.{u})
     have := hp
     rw [hmap]
     infer_instance
-  have q3 : CategoryTheory.IsIso
-      (AlgebraicGeometry.morphismRestrict B'.lastStructMap f.smoothLocus) := by
+  have q3 : CategoryTheory.IsIso (AlgebraicGeometry.morphismRestrict B'.lastStructMap
+      f.smoothLocus) := by
     have hres : IsIso (ε.hom ∣_ (B'.lastStructMap ⁻¹ᵁ f.smoothLocus)) := inferInstance
-    have hA : IsIso (ε.hom ∣_ (B'.lastStructMap ⁻¹ᵁ f.smoothLocus) ≫ B'.lastStructMap ∣_ f.smoothLocus) := by
+    have hA : IsIso
+        (ε.hom ∣_ (B'.lastStructMap ⁻¹ᵁ f.smoothLocus) ≫ B'.lastStructMap ∣_ f.smoothLocus) := by
       have h0 : IsIso ((ε.hom ≫ B'.lastStructMap) ∣_ f.smoothLocus) :=
         isIso_restrict_of_eq hε.symm f.smoothLocus hiso
       rw [AlgebraicGeometry.morphismRestrict_comp] at h0
@@ -293,8 +331,9 @@ theorem IsStrongResolution.of_isomorphic (k : Type u) [Field k] (X : Scheme.{u})
     exact IsIso.of_isIso_comp_left (ε.hom ∣_ (B'.lastStructMap ⁻¹ᵁ f.smoothLocus))
       (B'.lastStructMap ∣_ f.smoothLocus)
   have q4 : Dense (⇑B'.lastStructMap ⁻¹' (f.smoothLocus : Set X)) := by
-    have hpre : ⇑B'.lastStructMap ⁻¹' (f.smoothLocus : Set X)
-        = ⇑ε.inv ⁻¹' (⇑B.lastStructMap ⁻¹' (f.smoothLocus : Set X)) := by
+    have hpre
+        : ⇑B'.lastStructMap ⁻¹' (f.smoothLocus : Set X)
+          = ⇑ε.inv ⁻¹' (⇑B.lastStructMap ⁻¹' (f.smoothLocus : Set X)) := by
       rw [hmap]
       ext x
       simp
@@ -316,9 +355,11 @@ theorem IsStrongResolution.of_isomorphic (k : Type u) [Field k] (X : Scheme.{u})
       simp
     rw [hval]
     exact hpt
-  have q6 : IsStrictNormalCrossingsDivisor (reducedInverseImage B'.lastStructMap (smoothLocusComplement f)) := by
+  have q6 : IsStrictNormalCrossingsDivisor (reducedInverseImage B'.lastStructMap
+      (smoothLocusComplement f)) := by
     rw [hmap]
-    exact isStrictNormalCrossingsDivisor_reducedInverseImage_iso_inv_comp ε B.lastStructMap (smoothLocusComplement f) hsnc
+    exact isStrictNormalCrossingsDivisor_reducedInverseImage_iso_inv_comp ε B.lastStructMap
+      (smoothLocusComplement f) hsnc
   exact ⟨q1, q2, q3, q4, q5, q6⟩
 
 end FunctorialResolution.EmbeddedResolution

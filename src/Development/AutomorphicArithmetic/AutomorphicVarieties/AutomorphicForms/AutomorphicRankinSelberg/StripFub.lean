@@ -44,29 +44,37 @@ private lemma vol_strip (hV : VolMap) :
 end UpperTheory.V.Af.Rs
 
 open UpperTheory.V.Af.Rs in
-theorem UpperTheory.V.Af.Rs.stripFub :
-    UpperTheory.V.Af.Rs.VolMap → UpperTheory.V.Af.Rs.StripFub := by
+theorem UpperTheory.V.Af.Rs.stripFub
+    : UpperTheory.V.Af.Rs.VolMap → UpperTheory.V.Af.Rs.StripFub := by
   intro hV H hH
   have hf : Measurable fun p : ℝ × ℝ => pt p.1 p.2 := hV.1
   have hg : Measurable fun p : ℝ × ℝ => ENNReal.ofReal (1 / p.2 ^ 2) := by fun_prop
-  have hlt : ∀ᵐ p ∂(((volume : Measure ℝ).restrict (Ico 0 1)).prod (volume.restrict (Ioi 0))),
-      ENNReal.ofReal (1 / p.2 ^ 2) < ⊤ := Filter.Eventually.of_forall fun _ => ENNReal.ofReal_lt_top
+  have hlt
+      : ∀ᵐ p ∂(((volume : Measure ℝ).restrict (Ico 0 1)).prod (volume.restrict (Ioi 0))),
+        ENNReal.ofReal (1 / p.2 ^ 2) < ⊤ :=
+    Filter.Eventually.of_forall fun _ => ENNReal.ofReal_lt_top
   have hμ := vol_strip hV
   have hI : Integrable H ((volume : Measure ℍ).restrict strip) := hH
   rw [hμ] at hI
   have hHm := hI.1
   rw [integrable_map_measure hHm hf.aemeasurable,
-    integrable_withDensity_iff_integrable_smul' hg hlt] at hI
-  have hpt : ∀ p : ℝ × ℝ, (ENNReal.ofReal (1 / p.2 ^ 2)).toReal • (H ∘ fun p : ℝ × ℝ => pt p.1 p.2) p
-      = ((1 / p.2 ^ 2 : ℝ) : ℂ) * H (pt p.1 p.2) := by
+      integrable_withDensity_iff_integrable_smul' hg hlt]
+    at hI
+  have hpt
+      : ∀ p : ℝ × ℝ,
+        (ENNReal.ofReal (1 / p.2 ^ 2)).toReal • (H ∘ fun p : ℝ × ℝ => pt p.1 p.2) p
+          = ((1 / p.2 ^ 2 : ℝ) : ℂ) * H (pt p.1 p.2) := by
     intro p
     rw [ENNReal.toReal_ofReal (by positivity), Complex.real_smul]
     rfl
-  have hF : Integrable (fun p : ℝ × ℝ => ((1 / p.2 ^ 2 : ℝ) : ℂ) * H (pt p.1 p.2))
+  have hF : Integrable
+      (fun p : ℝ × ℝ => ((1 / p.2 ^ 2 : ℝ) : ℂ) * H (pt p.1 p.2))
       (((volume : Measure ℝ).restrict (Ico 0 1)).prod (volume.restrict (Ioi 0))) :=
     hI.congr (Filter.Eventually.of_forall hpt)
-  have hinner : ∀ y : ℝ, ∫ x, ((1 / y ^ 2 : ℝ) : ℂ) * H (pt x y) ∂(volume.restrict (Ico (0:ℝ) 1))
-      = (∫ x in (0:ℝ)..1, H (pt x y)) / ((y ^ 2 : ℝ) : ℂ) := by
+  have hinner
+      : ∀ y : ℝ,
+        ∫ x, ((1 / y ^ 2 : ℝ) : ℂ) * H (pt x y) ∂(volume.restrict (Ico (0:ℝ) 1))
+          = (∫ x in (0:ℝ)..1, H (pt x y)) / ((y ^ 2 : ℝ) : ℂ) := by
     intro y
     rw [integral_const_mul, intervalIntegral.integral_of_le zero_le_one,
       integral_Ico_eq_integral_Ioc, one_div, Complex.ofReal_inv, div_eq_inv_mul]
@@ -74,14 +82,15 @@ theorem UpperTheory.V.Af.Rs.stripFub :
   · have := hF.integral_prod_right
     simp only [hinner] at this
     exact this
-  · calc ∫ z in strip, H z
-        = ∫ p, H (pt p.1 p.2) ∂((((volume : Measure ℝ).restrict (Ico 0 1)).prod
-            (volume.restrict (Ioi 0))).withDensity fun p => ENNReal.ofReal (1 / p.2 ^ 2)) := by
-          rw [hμ, integral_map hf.aemeasurable hHm]
+  · calc
+      ∫ z in strip, H z
+          = ∫ p, H (pt p.1 p.2) ∂((((volume : Measure ℝ).restrict (Ico 0 1)).prod
+              (volume.restrict (Ioi 0))).withDensity fun p => ENNReal.ofReal (1 / p.2 ^ 2)) := by
+        rw [hμ, integral_map hf.aemeasurable hHm]
       _ = ∫ p, ((1 / p.2 ^ 2 : ℝ) : ℂ) * H (pt p.1 p.2) ∂(((volume : Measure ℝ).restrict (Ico 0 1)).prod
             (volume.restrict (Ioi 0))) := by
-          rw [integral_withDensity_eq_integral_toReal_smul hg hlt]
-          exact integral_congr_ae (Filter.Eventually.of_forall hpt)
+        rw [integral_withDensity_eq_integral_toReal_smul hg hlt]
+        exact integral_congr_ae (Filter.Eventually.of_forall hpt)
       _ = ∫ y in Ioi 0, ∫ x, ((1 / y ^ 2 : ℝ) : ℂ) * H (pt x y) ∂(volume.restrict (Ico (0:ℝ) 1)) :=
-          integral_prod_symm _ hF
+        integral_prod_symm _ hF
       _ = _ := by simp only [hinner]

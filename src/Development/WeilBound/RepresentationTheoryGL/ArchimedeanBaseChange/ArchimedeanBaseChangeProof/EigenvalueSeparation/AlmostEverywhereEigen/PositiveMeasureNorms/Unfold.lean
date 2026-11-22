@@ -9,9 +9,11 @@ open MeasureTheory
 
 namespace PositivityTheory.Rg.BcB.E2.P.Unfold
 
-theorem unfolded (hk : KerBasic) (X : Ctx) (φ u : X.G → ℂ) (hφ : Tst φ) (hu : Continuous u)
-    (hinv : ∀ γ ∈ X.Γ, ∀ x, u (γ * x) = u x) (x : X.G) :
-    ∫ y, ker X.Γ φ x y * u y ∂X.ν = ∫ y, φ y * u (x * y) ∂X.μ := by
+theorem unfolded
+    (hk : KerBasic)
+    (X : Ctx) (φ u : X.G → ℂ)
+    (hφ : Tst φ) (hu : Continuous u) (hinv : ∀ γ ∈ X.Γ, ∀ x, u (γ * x) = u x) (x : X.G)
+    : ∫ y, ker X.Γ φ x y * u y ∂X.ν = ∫ y, φ y * u (x * y) ∂X.μ := by
   have : MeasurableConstSMul X.Γ X.G := ⟨fun γ => measurable_const_mul (γ : X.G)⟩
   have : SMulInvariantMeasure X.Γ X.G X.μ := ⟨fun γ s _ => measure_preimage_mul _ γ.1 s⟩
   set g : X.G → ℂ := fun z => φ (x⁻¹ * z) * u z with hg

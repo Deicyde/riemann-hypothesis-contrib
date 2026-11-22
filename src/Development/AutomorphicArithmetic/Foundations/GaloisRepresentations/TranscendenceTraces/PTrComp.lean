@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.trComp_of :
-    TrChar → FamComp → WtComp → RpBasic → RpOp → TrComp := by
+theorem UpperTheory.Gal.TranscendenceTraces.trComp_of
+    : TrChar → FamComp → WtComp → RpBasic → RpOp → TrComp := by
   intro hChar hFam hWc hRp hOp q _ n i W Z S r p _ _ w' w hr hp hq x
   have hrp : IsWt (r ≫ p) (Wt.mul r w' w) := hWc r p w' w hr hp
   have hqZ : IsUnit ((q : ℕ) : Γ(Z, ⊤)) := by

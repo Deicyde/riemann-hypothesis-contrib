@@ -100,10 +100,12 @@ private theorem le_sqrt_of_sq_le' {x y : ℝ} (h : x ^ 2 ≤ y) : x ≤ Real.sqr
   refine (le_abs_self x).trans ?_
   exact Real.abs_le_sqrt h
 
-private theorem sum_norm_mul_le_hsNorm_mul (A B : Matrix m n ℂ) :
-    ∑ i, ∑ j, ‖A i j‖ * ‖B i j‖ ≤ hsNorm A * hsNorm B := by
-  have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (m × n))
-    (fun p => ‖A p.1 p.2‖) (fun p => ‖B p.1 p.2‖)
+private theorem sum_norm_mul_le_hsNorm_mul (A B : Matrix m n ℂ)
+    : ∑ i, ∑ j, ‖A i j‖ * ‖B i j‖ ≤ hsNorm A * hsNorm B := by
+  have h :=
+    Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset (m × n))
+      (fun p => ‖A p.1 p.2‖)
+      (fun p => ‖B p.1 p.2‖)
   simp only [Fintype.sum_prod_type] at h
   unfold hsNorm
   rw [← Real.sqrt_mul (hsSq_nonneg A)]
@@ -131,8 +133,7 @@ lemma hsSq_one (n : ℕ) : hsSq (1 : Matrix (Fin n) (Fin n) ℂ) = n := by
 
 end CS
 
-private theorem re_le_norm' (z : ℂ) : z.re ≤ ‖z‖ := by
-  exact Complex.re_le_norm z
+private theorem re_le_norm' (z : ℂ) : z.re ≤ ‖z‖ := by exact Complex.re_le_norm z
 
 private theorem neg_re_le_norm' (z : ℂ) : -z.re ≤ ‖z‖ := by
   have h := re_le_norm' (-z)
@@ -404,11 +405,11 @@ section RamMain
 
 variable {ι : Type} [Fintype ι] {D : ℕ} {d r : ι → ℕ}
 
-private theorem sum_sqrt_mul_sqrt_le_sqrt_sum_mul' {κ : Type} [Fintype κ] (a b : κ → ℝ) (ha : ∀ u, 0 ≤ a u)
-    (hb : ∀ u, 0 ≤ b u) :
-    ∑ u, Real.sqrt (a u) * Real.sqrt (b u) ≤ Real.sqrt (∑ u, a u) * Real.sqrt (∑ u, b u) := by
-  have h := Finset.sum_mul_sq_le_sq_mul_sq Finset.univ (fun u => Real.sqrt (a u))
-    (fun u => Real.sqrt (b u))
+private theorem sum_sqrt_mul_sqrt_le_sqrt_sum_mul'
+    {κ : Type} [Fintype κ] (a b : κ → ℝ) (ha : ∀ u, 0 ≤ a u) (hb : ∀ u, 0 ≤ b u)
+    : ∑ u, Real.sqrt (a u) * Real.sqrt (b u) ≤ Real.sqrt (∑ u, a u) * Real.sqrt (∑ u, b u) := by
+  have h :=
+    Finset.sum_mul_sq_le_sq_mul_sq Finset.univ (fun u => Real.sqrt (a u)) (fun u => Real.sqrt (b u))
   have ea : ∀ u, Real.sqrt (a u) ^ 2 = a u := fun u => Real.sq_sqrt (ha u)
   have eb : ∀ u, Real.sqrt (b u) ^ 2 = b u := fun u => Real.sq_sqrt (hb u)
   simp only [ea, eb] at h
@@ -418,37 +419,38 @@ private theorem sum_sqrt_mul_sqrt_le_sqrt_sum_mul' {κ : Type} [Fintype κ] (a b
 theorem compressTraceLowerBound : RamTrace := by
   intro ι _ D d r B V ga de e0 hV hga hde he hK hsum
   have hV' : ∀ u, (V u)ᴴ * V u = 1 := hV
-  have hu : ∀ u, (Kd B ga u).trace.re - (Kd (Bram B V) ga u).trace.re
-      ≤ ((d u : ℝ) - r u) + Real.sqrt ((d u : ℝ) - r u) * (Real.sqrt e0 * Real.sqrt (d u)) := by
+  have hu
+      : ∀ u,
+        (Kd B ga u).trace.re - (Kd (Bram B V) ga u).trace.re
+          ≤ ((d u : ℝ) - r u) + Real.sqrt ((d u : ℝ) - r u) * (Real.sqrt e0 * Real.sqrt (d u)) := by
     intro u
-    have e : Kd (Bram B V) ga u = (V u)ᴴ * Kd B ga u * V u :=
-      Kp_ram B V ga u u
+    have e : Kd (Bram B V) ga u = (V u)ᴴ * Kd B ga u * V u := Kp_ram B V ga u u
     rw [e]
-    exact (ram_gap (d u) (r u) (Kd B ga u) (V u) (hV' u) he
-      (hK u)).2
+    exact (ram_gap (d u) (r u) (Kd B ga u) (V u) (hV' u) he (hK u)).2
   have hnn : ∀ u, 0 ≤ (d u : ℝ) - r u := fun u =>
     (ram_gap (d u) (r u) (Kd B ga u) (V u) (hV' u) he (hK u)).1
-  have hCS : ∑ u, Real.sqrt ((d u : ℝ) - r u) * Real.sqrt (d u)
-      ≤ Real.sqrt (∑ u, ((d u : ℝ) - r u)) * Real.sqrt (Rs d) :=
+  have hCS
+      : ∑ u, Real.sqrt ((d u : ℝ) - r u) * Real.sqrt (d u)
+        ≤ Real.sqrt (∑ u, ((d u : ℝ) - r u)) * Real.sqrt (Rs d) :=
     sum_sqrt_mul_sqrt_le_sqrt_sum_mul' _ _ hnn (fun u => Nat.cast_nonneg _)
   have h3 : Real.sqrt (∑ u, ((d u : ℝ) - r u)) ≤ Real.sqrt de * Real.sqrt (Rs d) := by
     rw [← Real.sqrt_mul hde]
     exact Real.sqrt_le_sqrt hsum
-  have hT : Real.sqrt (Rs d) * Real.sqrt (Rs d) = Rs d :=
-    Real.mul_self_sqrt (Rs_nonneg d)
+  have hT : Real.sqrt (Rs d) * Real.sqrt (Rs d) = Rs d := Real.mul_self_sqrt (Rs_nonneg d)
   have h4 : ∑ u, Real.sqrt ((d u : ℝ) - r u) * Real.sqrt (d u) ≤ Real.sqrt de * Rs d := by
     have h := mul_le_mul_of_nonneg_right h3 (Real.sqrt_nonneg (Rs d))
     rw [mul_assoc, hT] at h
     linarith
   have h5 := mul_le_mul_of_nonneg_left h4 (Real.sqrt_nonneg e0)
-  have h2 : ∑ u, Real.sqrt ((d u : ℝ) - r u) * (Real.sqrt e0 * Real.sqrt (d u))
-      = Real.sqrt e0 * ∑ u, Real.sqrt ((d u : ℝ) - r u) * Real.sqrt (d u) := by
+  have h2
+      : ∑ u, Real.sqrt ((d u : ℝ) - r u) * (Real.sqrt e0 * Real.sqrt (d u))
+        = Real.sqrt e0 * ∑ u, Real.sqrt ((d u : ℝ) - r u) * Real.sqrt (d u) := by
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun u _ => by ring
   have hsumu := Finset.sum_le_sum fun u (_ : u ∈ Finset.univ) => hu u
   rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, h2] at hsumu
-  rw [trace_Qm B ga hga, trace_Qm (Bram B V) ga hga, Complex.re_sum,
-    Complex.re_sum, Real.sqrt_mul hde e0]
+  rw [trace_Qm B ga hga, trace_Qm (Bram B V) ga hga, Complex.re_sum, Complex.re_sum,
+    Real.sqrt_mul hde e0]
   linarith
 
 theorem compressDiagDefectBound : CompressDiagDefectBound := by
@@ -466,20 +468,19 @@ theorem compressDiagDefectBound : CompressDiagDefectBound := by
     rw [Kd_ram_sub B V ga hV u]
     exact (hsSq_compress (V u) (hV' u) (V u) (hV' u) _).trans (hK u)
   have hTd := Rs_nonneg d
-  have h2 : Rs d ≤ 2 * Rs r := by
-    nlinarith [mul_nonneg (sub_nonneg.2 hde) hTd]
+  have h2 : Rs d ≤ 2 * Rs r := by nlinarith [mul_nonneg (sub_nonneg.2 hde) hTd]
   unfold F2
-  calc ∑ u, hsSq (Kd (Bram B V) ga u - 1)
+  calc
+    ∑ u, hsSq (Kd (Bram B V) ga u - 1)
       ≤ ∑ u, e0 * (d u : ℝ) := Finset.sum_le_sum fun u _ => hb u
     _ = e0 * Rs d := by
-        unfold Rs
-        rw [Finset.mul_sum]
+      unfold Rs
+      rw [Finset.mul_sum]
     _ ≤ 2 * e0 * Rs r := by nlinarith [mul_le_mul_of_nonneg_left h2 he]
 
 end RamMain
 
 section Num
-
 
 set_option maxHeartbeats 800000 in
 lemma num_main {s η0 η1 a : ℝ} (hs0 : 0 < s) (hs : s ≤ 1 / 4) (hη0 : -1 ≤ η0) (hη0' : η0 ≤ s / 2)
@@ -504,7 +505,6 @@ lemma num_main {s η0 η1 a : ℝ} (hs0 : 0 < s) (hs : s ≤ 1 / 4) (hη0 : -1 �
   have s4 : (1 + 5 * s) * (1 - s / 2) ^ 2 ≤ (1 + 5 * s) * (1 - a) ^ 2 :=
     mul_le_mul_of_nonneg_left hsq2 (by linarith)
   linarith
-
 
 set_option maxHeartbeats 800000 in
 lemma num_ram {s a t : ℝ} (hs0 : 0 < s) (hs : s ≤ 1 / 20) (ha : 0 ≤ a) (ha' : a ≤ s / 2)
@@ -590,20 +590,17 @@ lemma cor_common (B : ∀ u, Matrix (Fin D) (Fin (d u)) ℂ) (ga : ι → ℝ) (
   rw [he2]
   linarith
 
-
 set_option maxHeartbeats 800000 in
 theorem compressTraceSquareBound : CompressTraceSquareBound := by
-  intro ι _ D d r B V ga Dstar sg η0 η1 e0 de hV hga hD hs0 hs hR hη0 hη0' hη1' he ha' hde0 hde hsum hS
+  intro ι _ D d r B V ga Dstar sg η0 η1 e0 de hV hga hD hs0 hs hR hη0 hη0' hη1' he ha' hde0 hde hsum
+    hS
   have hV' : ∀ u, (V u)ᴴ * V u = 1 := hV
   have hS' := hS
   obtain ⟨hP, hK, hDD⟩ := hS'
-  obtain ⟨hDpos, hL, hT, hF2, hF1⟩ :=
-    cor_common B ga hga hD hs0 (by linarith) hR hη0 he ha' hS
+  obtain ⟨hDpos, hL, hT, hF2, hF1⟩ := cor_common B ga hga hD hs0 (by linarith) hR hη0 he ha' hS
   have hlow := compressTraceLowerBound ι D d r B V ga de e0 hV hga hde0 he hK hsum
-  have hT2c : (Qm (Bram B V) ga * Qm (Bram B V) ga).trace.re
-      ≤ (Qm B ga * Qm B ga).trace.re := by
-    rw [trace_Qm_sq (Bram B V) ga hga, trace_Qm_sq B ga hga,
-      Complex.ofReal_re, Complex.ofReal_re]
+  have hT2c : (Qm (Bram B V) ga * Qm (Bram B V) ga).trace.re ≤ (Qm B ga * Qm B ga).trace.re := by
+    rw [trace_Qm_sq (Bram B V) ga hga, trace_Qm_sq B ga hga, Complex.ofReal_re, Complex.ofReal_re]
     refine Finset.sum_le_sum fun u _ => Finset.sum_le_sum fun u' _ => ?_
     rw [Kp_ram B V ga u u']
     exact hsSq_compress (V u) (hV' u) (V u') (hV' u') _
@@ -612,8 +609,9 @@ theorem compressTraceSquareBound : CompressTraceSquareBound := by
   have hsq : Real.sqrt de ^ 2 = de := Real.sq_sqrt hde0
   have ht1 : Real.sqrt de ≤ 1 / 2 := by nlinarith
   have hmul : Real.sqrt (de * e0) = Real.sqrt de * Real.sqrt e0 := Real.sqrt_mul hde0 e0
-  have hT1' : (1 - Real.sqrt e0 - Real.sqrt de ^ 2 - Real.sqrt de * Real.sqrt e0) * Rs d
-      ≤ (Qm (Bram B V) ga).trace.re := by
+  have hT1'
+      : (1 - Real.sqrt e0 - Real.sqrt de ^ 2 - Real.sqrt de * Real.sqrt e0) * Rs d
+        ≤ (Qm (Bram B V) ga).trace.re := by
     rw [hmul] at hlow
     rw [hsq]
     linarith
@@ -625,8 +623,7 @@ theorem compressTraceSquareBound : CompressTraceSquareBound := by
   have hc1 := num_main hs0 (by linarith : sg ≤ 1 / 4) hη0 hη0' hη1' hL ha0 ha'
   have hc2 := num_ram hs0 hs ha0 ha' ht0 ht1
   unfold F1
-  exact num_step hDpos hD hDD hX0 (hT2c.trans hF2) hb0 hT1' (by linarith [hc1, hc2])
-    (by linarith)
+  exact num_step hDpos hD hDD hX0 (hT2c.trans hF2) hb0 hT1' (by linarith [hc1, hc2]) (by linarith)
 
 end Final
 

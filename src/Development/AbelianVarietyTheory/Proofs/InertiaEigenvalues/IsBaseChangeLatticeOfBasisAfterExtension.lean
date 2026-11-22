@@ -8,9 +8,24 @@ open TensorProduct
 
 namespace GlobalTheory
 
-theorem isBaseChange_subtype_of_basis_after_extension : ∀ (S A EE O W RW D Y : Type) [CommRing S] [CommRing A] [CommRing EE] [CommRing O] [CommRing W] [CommRing RW] [Algebra O A] [Algebra A EE] [Algebra O EE] [IsScalarTower O A EE] [Algebra O RW] [AddCommGroup D] [Module EE D] [Module A D] [IsScalarTower A EE D] [AddCommGroup Y] [Module RW Y] (a : S →+* A) (ι : EE →ₐ[O] RW) (c : W →+* RW) (jD : D →+ Y), Function.Injective ι → (∀ e, IsUnit (ι e) → IsUnit e) → (∀ (e : EE) (x : D), jD (e • x) = ι e • jD x) → (∀ s, ι (algebraMap A EE (a s)) ∈ Set.range c) → ∀ (d r : ℕ) (o : Fin d → O), (∀ e : EE, ∃ e' : Fin d → EE, (∀ j, ι (e' j) ∈ Set.range c) ∧ e = ∑ j, o j • e' j) → Nonempty (Module.Basis (Fin r) EE D) → ∀ (q : ℕ) (x : Fin q → D), q = d * r → (∀ y : Y, ∃! w : Fin q → W, y = ∑ i, c (w i) • jD (x i)) → ∀ N : Submodule A D, (∀ y, y ∈ N ↔ ∃ s : Fin q → S, y = ∑ i, a (s i) • x i) → IsBaseChange EE N.subtype := by
-  intro S A EE O W RW D Y _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a ι c jD hinj hunit hjD ha d r o ho
-    ⟨b⟩ q x hq huniq N hN
+theorem isBaseChange_subtype_of_basis_after_extension
+    : ∀ (S A EE O W RW D Y : Type) [CommRing S] [CommRing A] [CommRing EE] [CommRing O] [CommRing W]
+        [CommRing RW] [Algebra O A] [Algebra A EE] [Algebra O EE] [IsScalarTower O A EE]
+        [Algebra O RW] [AddCommGroup D] [Module EE D] [Module A D] [IsScalarTower A EE D]
+        [AddCommGroup Y] [Module RW Y] (a : S →+* A) (ι : EE →ₐ[O] RW) (c : W →+* RW) (jD : D →+ Y),
+      Function.Injective ι → (∀ e, IsUnit (ι e) → IsUnit e)
+        → (∀ (e : EE) (x : D), jD (e • x) = ι e • jD x)
+        → (∀ s, ι (algebraMap A EE (a s)) ∈ Set.range c)
+        → ∀ (d r : ℕ) (o : Fin d → O),
+          (∀ e : EE, ∃ e' : Fin d → EE, (∀ j, ι (e' j) ∈ Set.range c) ∧ e = ∑ j, o j • e' j)
+            → Nonempty (Module.Basis (Fin r) EE D)
+            → ∀ (q : ℕ) (x : Fin q → D),
+              q = d * r → (∀ y : Y, ∃! w : Fin q → W, y = ∑ i, c (w i) • jD (x i))
+                → ∀ N : Submodule A D,
+                  (∀ y, y ∈ N ↔ ∃ s : Fin q → S, y = ∑ i, a (s i) • x i)
+                    → IsBaseChange EE N.subtype := by
+  intro S A EE O W RW D Y _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a ι c jD hinj hunit hjD ha d r o ho ⟨b⟩
+    q x hq huniq N hN
   classical
   subst hq
   have hxN : ∀ i, x i ∈ N := by
@@ -21,8 +36,9 @@ theorem isBaseChange_subtype_of_basis_after_extension : ∀ (S A EE O W RW D Y :
     · intro j _ hj
       simp [Pi.single_eq_of_ne hj]
     · simp
-  have hjsum : ∀ e : Fin (d * r) → EE, ∀ v : Fin (d * r) → D,
-      jD (∑ i, e i • v i) = ∑ i, ι (e i) • jD (v i) := by
+  have hjsum
+      : ∀ e : Fin (d * r) → EE, ∀ v : Fin (d * r) → D,
+        jD (∑ i, e i • v i) = ∑ i, ι (e i) • jD (v i) := by
     intro e v
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
@@ -94,8 +110,7 @@ theorem isBaseChange_subtype_of_basis_after_extension : ∀ (S A EE O W RW D Y :
           simp [Matrix.one_apply_ne hj.symm]
         · simp
       rw [h1]
-      exact Submodule.sum_mem _ fun i _ =>
-        Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+      exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
     have hb : ∀ k, b k ∈ Submodule.span EE (Set.range x) := by
       intro k
       have h1 : b k = ∑ j, e' 1 j • u (finProdFinEquiv (j, k)) := by
@@ -109,18 +124,21 @@ theorem isBaseChange_subtype_of_basis_after_extension : ∀ (S A EE O W RW D Y :
     rw [← b.sum_repr y]
     exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (hb k)
 
-  have hnf : ∀ t : EE ⊗[A] N, ∃ e : Fin (d * r) → EE, (∀ i, ι (e i) ∈ c.range) ∧
-      t = ∑ i, e i ⊗ₜ[A] (⟨x i, hxN i⟩ : N) := by
-    let P : AddSubmonoid (EE ⊗[A] N) :=
-      { carrier := {t | ∃ e : Fin (d * r) → EE, (∀ i, ι (e i) ∈ c.range) ∧
+  have hnf
+      : ∀ t : EE ⊗[A] N, ∃ e : Fin (d * r) → EE,
+        (∀ i, ι (e i) ∈ c.range) ∧ t = ∑ i, e i ⊗ₜ[A] (⟨x i, hxN i⟩ : N) := by
+    let P : AddSubmonoid (EE ⊗[A] N) := {
+      carrier :=
+        {t | ∃ e : Fin (d * r) → EE, (∀ i, ι (e i) ∈ c.range) ∧
           t = ∑ i, e i ⊗ₜ[A] (⟨x i, hxN i⟩ : N)}
-        zero_mem' := ⟨0, fun i => by simp, by simp⟩
-        add_mem' := by
-          rintro _ _ ⟨e₁, h₁, rfl⟩ ⟨e₂, h₂, rfl⟩
-          refine ⟨e₁ + e₂, fun i => ?_, ?_⟩
-          · rw [Pi.add_apply, map_add (f := _)]
-            exact add_mem (h₁ i) (h₂ i)
-          · simp [TensorProduct.add_tmul, Finset.sum_add_distrib] }
+      zero_mem' := ⟨0, fun i => by simp, by simp⟩
+      add_mem' := by
+        rintro _ _ ⟨e₁, h₁, rfl⟩ ⟨e₂, h₂, rfl⟩
+        refine ⟨e₁ + e₂, fun i => ?_, ?_⟩
+        · rw [Pi.add_apply, map_add (f := _)]
+          exact add_mem (h₁ i) (h₂ i)
+        · simp [TensorProduct.add_tmul, Finset.sum_add_distrib]
+    }
     have hP : ∀ (e : EE) (n : N), ι e ∈ c.range → e ⊗ₜ[A] n ∈ P := by
       intro e n he
       obtain ⟨s, hs⟩ := (hN n).1 n.2
@@ -154,7 +172,7 @@ theorem isBaseChange_subtype_of_basis_after_extension : ∀ (S A EE O W RW D Y :
       choose w hw using he
       have h1 : ∑ i, e i • x i = 0 := by
         set_option synthInstance.maxHeartbeats 100000 in
-          simpa [map_sum, LinearMap.liftBaseChange_tmul] using ht
+        simpa [map_sum, LinearMap.liftBaseChange_tmul] using ht
       have h2 : (0 : Y) = ∑ i, c (w i) • jD (x i) := by
         simp only [hw]
         rw [← hjsum, h1, map_zero]

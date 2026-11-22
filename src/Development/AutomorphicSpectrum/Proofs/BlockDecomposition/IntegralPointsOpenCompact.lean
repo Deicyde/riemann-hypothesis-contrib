@@ -11,47 +11,63 @@ open NumberField IsDedekindDomain Matrix
 
 namespace GlobalTheory.CompanionTheory.IntegralPoints
 
-theorem isOpen_isCompact_intGL {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [T2Space R]
-    (O : Subring R) (ho : IsOpen (O : Set R)) (hc : IsCompact (O : Set R)) (n : ℕ) :
-    IsOpen {g : GL (Fin n) R | (∀ i j, (g : Matrix (Fin n) (Fin n) R) i j ∈ O) ∧
-        ∀ i j, ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j ∈ O} ∧
-    IsCompact {g : GL (Fin n) R | (∀ i j, (g : Matrix (Fin n) (Fin n) R) i j ∈ O) ∧
-        ∀ i j, ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j ∈ O} := by
+theorem isOpen_isCompact_intGL
+    {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [T2Space R]
+    (O : Subring R) (ho : IsOpen (O : Set R)) (hc : IsCompact (O : Set R))
+    (n : ℕ)
+    : IsOpen
+        {g : GL (Fin n) R | (∀ i j, (g : Matrix (Fin n) (Fin n) R) i j ∈ O) ∧
+          ∀ i j, ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j ∈ O}
+      ∧ IsCompact
+        {g : GL (Fin n) R | (∀ i j, (g : Matrix (Fin n) (Fin n) R) i j ∈ O) ∧
+          ∀ i j, ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j ∈ O} := by
   constructor
-  · have e : {g : GL (Fin n) R | (∀ i j, (g : Matrix (Fin n) (Fin n) R) i j ∈ O) ∧
-        ∀ i j, ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j ∈ O} =
-        (⋂ i, ⋂ j, (fun g : GL (Fin n) R => (g : Matrix (Fin n) (Fin n) R) i j) ⁻¹' (O : Set R)) ∩
-        (⋂ i, ⋂ j, (fun g : GL (Fin n) R => ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j) ⁻¹' (O : Set R)) := by
-      ext g
-      simp [Set.mem_iInter]
+  · have e
+        : {g : GL (Fin n) R | (∀ i j, (g : Matrix (Fin n) (Fin n) R) i j ∈ O) ∧
+            ∀ i j, ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j ∈ O}
+          = (⋂ i, ⋂ j, (fun g : GL (Fin n) R => (g : Matrix (Fin n) (Fin n) R) i j) ⁻¹' (O : Set R))
+            ∩ (⋂ i, ⋂ j, (fun g : GL (Fin n) R => ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j) ⁻¹' (O : Set R)) :=
+      by
+        ext g
+        simp [Set.mem_iInter]
     rw [e]
     refine IsOpen.inter ?_ ?_
-    · exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-        ho.preimage (Units.continuous_val.matrix_elem i j)
-    · exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-        ho.preimage (Units.continuous_coe_inv.matrix_elem i j)
+    · exact isOpen_iInter_of_finite fun i =>
+        isOpen_iInter_of_finite fun j => ho.preimage (Units.continuous_val.matrix_elem i j)
+    · exact isOpen_iInter_of_finite fun i =>
+        isOpen_iInter_of_finite fun j => ho.preimage (Units.continuous_coe_inv.matrix_elem i j)
   · have hM : IsCompact {A : Matrix (Fin n) (Fin n) R | ∀ i j, A i j ∈ O} := by
       have := isCompact_univ_pi fun _ : Fin n => isCompact_univ_pi fun _ : Fin n => hc
-      have e : {A : Matrix (Fin n) (Fin n) R | ∀ i j, A i j ∈ O} =
-          Set.univ.pi fun _ : Fin n => Set.univ.pi fun _ : Fin n => (O : Set R) :=
+      have e
+          : {A : Matrix (Fin n) (Fin n) R | ∀ i j, A i j ∈ O}
+            = Set.univ.pi fun _ : Fin n => Set.univ.pi fun _ : Fin n => (O : Set R) :=
         Set.ext fun A => ⟨fun h i _ j _ => h i j, fun h i j => h i trivial j trivial⟩
       exact e ▸ this
-    have := (Units.isClosedEmbedding_embedProduct (α := Matrix (Fin n) (Fin n) R)).isCompact_preimage
-      (hM.prod (hM.image MulOpposite.continuous_op))
+    have :=
+      (Units.isClosedEmbedding_embedProduct (α := Matrix (Fin n) (Fin n) R)).isCompact_preimage
+        (hM.prod (hM.image MulOpposite.continuous_op))
     convert this using 1
     ext g
-    exact ⟨fun h => ⟨h.1, _, h.2, rfl⟩, fun ⟨h1, A, hA, e⟩ => ⟨h1, fun i j => by
-      have : A = ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) := MulOpposite.op_injective e
-      exact this ▸ hA i j⟩⟩
+    exact ⟨
+      fun h => ⟨h.1, _, h.2, rfl⟩,
+      fun ⟨h1, A, hA, e⟩ => ⟨
+        h1,
+        fun i j => by
+          have : A = ((g⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) := MulOpposite.op_injective e
+          exact this ▸ hA i j
+      ⟩
+    ⟩
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem coe_Kf (n : ℕ) : (PositivityTheory.Rg.BcB.G8.Kf E n : Set (GL (Fin n) (FiniteAdeleRing (𝓞 E) E))) =
-    {g : GL (Fin n) (FiniteAdeleRing (𝓞 E) E) | (∀ i j, (g : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j ∈ Formalism.UG.intAd E) ∧
-      ∀ i j, ((g⁻¹ : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j ∈
-        Formalism.UG.intAd E} := by
+theorem coe_Kf (n : ℕ)
+    : (PositivityTheory.Rg.BcB.G8.Kf E n : Set (GL (Fin n) (FiniteAdeleRing (𝓞 E) E)))
+      = {g : GL (Fin n) (FiniteAdeleRing (𝓞 E) E) | (∀ i j, (g : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j ∈ Formalism.UG.intAd E) ∧
+          ∀ i j, ((g⁻¹ : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j ∈
+            Formalism.UG.intAd E} := by
   ext g
-  simp only [SetLike.mem_coe, PositivityTheory.Rg.BcB.G8.Kf, Subgroup.mem_iInf, Subgroup.mem_comap, Set.mem_setOf_eq]
+  simp only [SetLike.mem_coe, PositivityTheory.Rg.BcB.G8.Kf, Subgroup.mem_iInf, Subgroup.mem_comap,
+    Set.mem_setOf_eq]
   constructor
   · intro h
     refine ⟨fun i j w => ?_, fun i j w => ?_⟩

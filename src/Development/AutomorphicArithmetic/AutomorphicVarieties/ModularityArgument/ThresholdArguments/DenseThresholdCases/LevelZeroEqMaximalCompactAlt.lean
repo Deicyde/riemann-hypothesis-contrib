@@ -4,4 +4,5 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-noncomputable abbrev UpperTheory.V.Z.Win.WitAQ.weak_admissible_iso := @UpperTheory.GalN.V.WitQ.weak_admissible_iso
+noncomputable abbrev UpperTheory.V.Z.Win.WitAQ.weak_admissible_iso :=
+  @UpperTheory.GalN.V.WitQ.weak_admissible_iso

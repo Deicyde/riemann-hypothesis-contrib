@@ -10,21 +10,24 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ContCor
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.FundDel
 
 section General
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    (ρ : Representation LL G V)
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+  (ρ : Representation LL G V)
 
 lemma actVB_tmul' (g : G) (v : V) (b : B) :
     actVB PD ρ g (v ⊗ₜ[Qp] b) = ρ g v ⊗ₜ[Qp] PD.actB g b := rfl
@@ -118,7 +121,18 @@ lemma cocycle_of_tmul_one (x : V ⊗[Qp] B) (c : G → V)
 
 end General
 
-theorem connecting_cocycle : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI → ∀ (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ A : GRep ↥(GK K) ℚ_[l] LL O, ∀ d₁ ∈ Dcris (P.PD K) A.ρ, ∀ d₂ ∈ DdR (P.PD K) A.ρ, ∃ (x : A.V ⊗[ℚ_[l]] P.R.B) (y : A.V ⊗[ℚ_[l]] P.R.BdR) (c : ↥(GK K) → A.V), y ∈ FilV (P.PD K) (LL := LL) (V := A.V) 0 ∧ x - φVB (P.PD K) (LL := LL) (V := A.V) x = d₁ ∧ ιV (P.PD K) (LL := LL) (V := A.V) x - y = d₂ ∧ c ∈ finiteCocycles (P.PD K) A.ρ ∧ ∀ g, c g ⊗ₜ[ℚ_[l]] (1 : P.R.B) = actVB (P.PD K) A.ρ g x - x := by
+theorem connecting_cocycle
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → ∀ (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+            (O : Type) [CommRing O] [Algebra O LL],
+          GoodO (Qp := ℚ_[l]) LL O
+            → ∀ A : GRep ↥(GK K) ℚ_[l] LL O, ∀ d₁ ∈ Dcris (P.PD K) A.ρ, ∀ d₂ ∈ DdR (P.PD K) A.ρ,
+              ∃ (x : A.V ⊗[ℚ_[l]] P.R.B) (y : A.V ⊗[ℚ_[l]] P.R.BdR) (c : ↥(GK K) → A.V),
+                y ∈ FilV (P.PD K) (LL := LL) (V := A.V) 0
+                  ∧ x - φVB (P.PD K) (LL := LL) (V := A.V) x = d₁
+                  ∧ ιV (P.PD K) (LL := LL) (V := A.V) x - y = d₂ ∧ c ∈ finiteCocycles (P.PD K) A.ρ
+                  ∧ ∀ g, c g ⊗ₜ[ℚ_[l]] (1 : P.R.B) = actVB (P.PD K) A.ρ g x - x := by
   intro l _ P AI T K LL _ _ _ O _ _ hO A d₁ h₁ d₂ h₂
   obtain ⟨hsurj, hker⟩ := GlobalTheory.FundSeq.tensor_fundamental_sequence l P AI T K LL A.V
   obtain ⟨x, y, hy, hx, hxy⟩ := hsurj d₁ d₂
@@ -128,9 +142,10 @@ theorem connecting_cocycle : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI :
   choose c hc using key
   have hc' : ∀ g, c g ⊗ₜ[ℚ_[l]] (1 : P.R.B) = actVB (P.PD K) A.ρ g x - x := fun g => (hc g).symm
   have hcont : Continuous c :=
-    GlobalTheory.FundCont.contCore_tied l P AI T K LL O hO A 0 Fin.elim0 Fin.elim0 (fun i => i.elim0) x c
+    GlobalTheory.FundCont.contCore_tied l P AI T K LL O hO A 0 Fin.elim0 Fin.elim0
+      (fun i => i.elim0)
+      x c
       (fun g => by rw [Finset.univ_eq_empty, Finset.sum_empty, zero_add]; exact hc' g)
-  exact ⟨x, y, c, hy, hx, hxy,
-    ⟨⟨hcont, cocycle_of_tmul_one (P.PD K) A.ρ x c hc'⟩, x, hc'⟩, hc'⟩
+  exact ⟨x, y, c, hy, hx, hxy, ⟨⟨hcont, cocycle_of_tmul_one (P.PD K) A.ρ x c hc'⟩, x, hc'⟩, hc'⟩
 
 end GlobalTheory.FundDel

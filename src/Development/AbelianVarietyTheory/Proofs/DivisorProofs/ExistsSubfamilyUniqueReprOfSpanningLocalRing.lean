@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Tor
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -19,10 +22,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory
 
 theorem exists_subfamily_unique_repr_of_spanning_localRing
-    (R : Type) [CommRing R] [IsLocalRing R] (M : Type) [AddCommGroup M] [Module R M] (d g : ℕ) :
-    Nonempty (Module.Basis (Fin d) R M) → ∀ w : Fin g → M,
-      (∀ u : M, ∃ cf : Fin g → R, u = ∑ a, cf a • w a) →
-      ∃ e : Fin d → Fin g, ∀ u : M, ∃! cf : Fin d → R, u = ∑ a, cf a • w (e a) := by
+    (R : Type) [CommRing R] [IsLocalRing R] (M : Type) [AddCommGroup M] [Module R M] (d g : ℕ)
+    : Nonempty (Module.Basis (Fin d) R M)
+      → ∀ w : Fin g → M,
+        (∀ u : M, ∃ cf : Fin g → R, u = ∑ a, cf a • w a)
+          → ∃ e : Fin d → Fin g, ∀ u : M, ∃! cf : Fin d → R, u = ∑ a, cf a • w (e a) := by
   rintro ⟨b⟩ w hw
   haveI : Module.Finite R M := Module.Finite.of_basis b
   let V := IsLocalRing.ResidueField R ⊗[R] M
@@ -45,15 +49,14 @@ theorem exists_subfamily_unique_repr_of_spanning_localRing
       exact Submodule.smul_of_tower_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
     | add x y hx hy => exact Submodule.add_mem _ hx hy
   obtain ⟨κ, a, ha, hspa, hli⟩ := exists_linearIndependent' (IsLocalRing.ResidueField R) v
-  let bk : Module.Basis κ (IsLocalRing.ResidueField R) V :=
-    Module.Basis.mk hli (by rw [hspa, hsp])
+  let bk : Module.Basis κ (IsLocalRing.ResidueField R) V := Module.Basis.mk hli (by rw [hspa, hsp])
   let bV : Module.Basis (Fin d) (IsLocalRing.ResidueField R) V :=
     Algebra.TensorProduct.basis (IsLocalRing.ResidueField R) b
   let eq : Fin d ≃ κ := bV.indexEquiv bk
   refine ⟨a ∘ eq, ?_⟩
   have hspR : Submodule.span R (Set.range (w ∘ a ∘ eq)) = ⊤ :=
-    IsLocalRing.span_eq_top_of_tmul_eq_basis (w ∘ a ∘ eq) (bk.reindex eq.symm) (fun i => by
-      simp [bk, v])
+    IsLocalRing.span_eq_top_of_tmul_eq_basis (w ∘ a ∘ eq) (bk.reindex eq.symm)
+      (fun i => by simp [bk, v])
   let f : (Fin d → R) →ₗ[R] M := Fintype.linearCombination R (w ∘ a ∘ eq)
   have hf : Function.Surjective f := by
     rw [← LinearMap.range_eq_top, Fintype.range_linearCombination]
@@ -67,6 +70,7 @@ theorem exists_subfamily_unique_repr_of_spanning_localRing
   · rw [← hcf]; simp [f, Fintype.linearCombination_apply]
   · intro cf' hcf'
     apply hfi
-    rw [hcf]; simp [f, Fintype.linearCombination_apply, hcf']
+    rw [hcf]
+    simp [f, Fintype.linearCombination_apply, hcf']
 
 end GlobalTheory

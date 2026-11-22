@@ -7,17 +7,22 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsGLExi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.TwBridge
+open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.BasicNotions
+  Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.SplitWeil
+  GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.TwBridge
 
 namespace GlobalTheory.TwBridge
 
-theorem isGL_int_of_bdd {X : Fields} {Pr : Primes X} {R : Ranks} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ι : X.E →+* k) (ϖ : kˣ) (P : HeightOneSpectrum (𝓞 X.E)) (hP : P ∉ Pr.vGs)
-    (hc : GlobalTheory.SymBridge.IsCompl P (qOf P) ι ϖ) (j c : ℕ) (a : AutY X R j) (g : GL (XIx (Fin R.k) (Fin R.t) j ⊕ Fin c) k)
-    (hg : IsGL ι a g)
-    (hb : ∀ x ∈ lamYat (Pr := Pr) (R := R) j P, a⁻¹ x ∈ lamYat (Pr := Pr) (R := R) j P ∧
-      ((qOf P : X.E) ^ j) • a x ∈ lamYat (Pr := Pr) (R := R) j P) :
-    IntM (g⁻¹ : GL _ k).val ∧ IntM ((ϖ : k) ^ j • g.val) := by
+theorem isGL_int_of_bdd
+    {X : Fields} {Pr : Primes X} {R : Ranks} {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ι : X.E →+* k) (ϖ : kˣ) (P : HeightOneSpectrum (𝓞 X.E))
+    (hP : P ∉ Pr.vGs) (hc : GlobalTheory.SymBridge.IsCompl P (qOf P) ι ϖ)
+    (j c : ℕ) (a : AutY X R j) (g : GL (XIx (Fin R.k) (Fin R.t) j ⊕ Fin c) k) (hg : IsGL ι a g)
+    (hb : ∀ x ∈ lamYat (Pr := Pr) (R := R) j P,
+      a⁻¹ x ∈ lamYat (Pr := Pr) (R := R) j P
+        ∧ ((qOf P : X.E) ^ j) • a x ∈ lamYat (Pr := Pr) (R := R) j P)
+    : IntM (g⁻¹ : GL _ k).val ∧ IntM ((ϖ : k) ^ j • g.val) := by
   obtain ⟨e, -, he⟩ := hg
   have hb' : TwBdd (Pr := Pr) j P a := hb
   have hi : (g⁻¹ : GL _ k).val = GlobalTheory.SymBridge.toLoc ι e e a.symm.toLinearMap := by

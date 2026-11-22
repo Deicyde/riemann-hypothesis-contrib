@@ -8,18 +8,23 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
 
 noncomputable section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Per
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Per
 open scoped Formalism.Per
 
 namespace GlobalTheory.Per
 
-theorem exists_factorial_mul_eq_pow (l : ℕ) [Fact l.Prime] (n : ℕ) :
-    ∃ c : ℤ_[l], ((n.factorial : ℕ) : ℤ_[l]) * c = ((l : ℕ) : ℤ_[l]) ^ n := by
+theorem exists_factorial_mul_eq_pow (l : ℕ) [Fact l.Prime] (n : ℕ)
+    : ∃ c : ℤ_[l], ((n.factorial : ℕ) : ℤ_[l]) * c = ((l : ℕ) : ℤ_[l]) ^ n := by
   have hp : l.Prime := Fact.out
   obtain ⟨k, m, hm, h⟩ := Nat.exists_eq_pow_mul_and_not_dvd (Nat.factorial_ne_zero n) l hp.ne_one
   have hk : k ≤ n := by
     have h1 : k ≤ padicValNat l n.factorial :=
-      ((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat} (ha : a ≠ 0), p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a) (Nat.factorial_ne_zero n)).1 ⟨m, h⟩
+      ((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le
+          : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat}
+              (ha : a ≠ 0),
+            p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a)
+        (Nat.factorial_ne_zero n)).1 ⟨m, h⟩
     have h2 : (l - 1) * padicValNat l n.factorial = n - (l.digits n).sum := by
       simpa only [Nat.padicValNat_def] using hp.sub_one_mul_multiplicity_factorial (n := n)
     have h3 : 1 ≤ l - 1 := by have := hp.two_le; omega
@@ -36,8 +41,8 @@ theorem exists_factorial_mul_eq_pow (l : ℕ) [Fact l.Prime] (n : ℕ) :
   push_cast
   linear_combination ((l : ℤ_[l]) ^ (k + j)) * hu
 
-theorem exists_factorial_mul_eq_pow_ainf (l : ℕ) [Fact l.Prime] (n : ℕ) :
-    ∃ c : Ainf l, ((n.factorial : ℕ) : Ainf l) * c = ((l : ℕ) : Ainf l) ^ n := by
+theorem exists_factorial_mul_eq_pow_ainf (l : ℕ) [Fact l.Prime] (n : ℕ)
+    : ∃ c : Ainf l, ((n.factorial : ℕ) : Ainf l) * c = ((l : ℕ) : Ainf l) ^ n := by
   obtain ⟨c, hc⟩ := exists_factorial_mul_eq_pow l n
   refine ⟨algebraMap ℤ_[l] (Ainf l) c, ?_⟩
   simpa only [map_mul, map_pow, map_natCast] using congrArg (algebraMap ℤ_[l] (Ainf l)) hc

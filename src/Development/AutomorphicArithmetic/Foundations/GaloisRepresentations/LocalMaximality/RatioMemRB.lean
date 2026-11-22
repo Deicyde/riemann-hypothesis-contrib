@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KahlerFormsO
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma omB_smul_mem {K : Type} [Field K] [Algebra ℂ K] (B : Subalgebra ℂ K) (q : ℕ) {b : K} (hb : b ∈ B)
@@ -55,8 +56,8 @@ private lemma pair_prod {F : Type} [Field F] {d : ℕ} (x : Fin (d + 1) → Fˣ)
     simp
   · rw [Finset.prod_pair h, div_self (x i).ne_zero, one_mul]
 
-private theorem key_lemma' {K : Type} [Field K] [Algebra ℂ K] (s t : K) (y z : DR ℂ K) :
-    actZ K (s ⊗ₜ[ℂ] t) (y ⊗ₜ[ℂ] z) = (s • y) ⊗ₜ[ℂ] (t • z) := by
+private theorem key_lemma' {K : Type} [Field K] [Algebra ℂ K] (s t : K) (y z : DR ℂ K)
+    : actZ K (s ⊗ₜ[ℂ] t) (y ⊗ₜ[ℂ] z) = (s • y) ⊗ₜ[ℂ] (t • z) := by
   simp [actZ, Module.endTensorEndAlgHom, Module.endTensorEndAlgHom_apply]
 
 private lemma key {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
@@ -109,17 +110,19 @@ private lemma key {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ 
       rw [map_smul]
       exact Submodule.smul_mem _ c (h N hN)⟩
 
-theorem UpperTheory.Gal.productCup_of_system.idIJ_of :
-    IdJ → ActsLin → GoodZ → IdIJ := by
+theorem UpperTheory.Gal.productCup_of_system.idIJ_of : IdJ → ActsLin → GoodZ → IdIJ := by
   intro hJ hL hG F K _ _ _ _ _ _ d x hc τ hτ a ha i j
   obtain ⟨m, hm, hact⟩ := hJ F K d x hc τ hτ a ha j
-  have hmono : ∀ (q : ℕ) (s t : Finset (Fin (d + 1))), s.Nonempty → s ⊆ t →
-      omB ℂ K (rB ℂ K (xv x) s) q ≤ omB ℂ K (rB ℂ K (xv x) t) q :=
-    fun q => (hG F K d x hc q).2.2
+  have hmono
+      : ∀ (q : ℕ) (s t : Finset (Fin (d + 1))),
+        s.Nonempty → s ⊆ t → omB ℂ K (rB ℂ K (xv x) s) q ≤ omB ℂ K (rB ℂ K (xv x) t) q := fun q =>
+    (hG F K d x hc q).2.2
   obtain ⟨N0, hN0⟩ := key x hc hmono a i j m hm
   refine ⟨_, hN0 N0 le_rfl, ?_⟩
-  have h2 := (hL F K d x hc τ hτ a).2.1 m _
-    ((algebraMap F K ((x j : F) / x i) ^ (N0 + d + 1)) ⊗ₜ[ℂ] (algebraMap F K ((x i : F) / x j) ^ N0)) hact
-  rw [Algebra.TensorProduct.lmul'_apply_tmul, ← map_pow, ← map_pow, ← map_mul, ← map_mul,
-    omG_ratio] at h2
+  have h2 :=
+    (hL F K d x hc τ hτ a).2.1 m _
+      ((algebraMap F K ((x j : F) / x i) ^ (N0 + d + 1)) ⊗ₜ[ℂ] (algebraMap F K ((x i : F) / x j) ^ N0))
+      hact
+  rw [Algebra.TensorProduct.lmul'_apply_tmul, ← map_pow, ← map_pow, ← map_mul, ← map_mul, omG_ratio]
+    at h2
   simpa only [map_pow] using h2

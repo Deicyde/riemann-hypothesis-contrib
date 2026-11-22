@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qj6.ex_lift :
-    ∀ {M Ω C : Type} [inst : Field M] [NumberField M] [inst_2 : Field Ω]
-    [CharZero Ω] [IsAlgClosed Ω] [inst_5 : Field C] [CharZero C] (j : Ω →+* C) (f : M →+* C),
-    ∃ (g : M →+* Ω), ∀ (x : M), (j : Ω → C) ((g : M → Ω) x) = (f : M → C) x := by
+theorem UpperTheory.Reformulated.B.Qj6.ex_lift
+    : ∀ {M Ω C : Type} [inst : Field M] [NumberField M] [inst_2 : Field Ω] [CharZero Ω]
+        [IsAlgClosed Ω] [inst_5 : Field C] [CharZero C] (j : Ω →+* C) (f : M →+* C),
+      ∃ (g : M →+* Ω), ∀ (x : M),
+        (j : Ω → C) ((g : M → Ω) x) = (f : M → C) x := by
   intro M Ω C _ _ _ _ _ _ _ j f
   have key : ∀ x : M, f x ∈ j.fieldRange := by
     intro x

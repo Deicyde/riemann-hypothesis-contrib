@@ -13,20 +13,27 @@ namespace PositivityTheory.jumpWindows
 
 namespace ExistsLogarithmLinear
 
-theorem exists_log_lin {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (χ : AddChar V ℂ) (hχ : Continuous χ)
-    (h0 : ∀ z, χ z ≠ 0) : ∃ L : V →L[ℝ] ℂ, ∀ z, χ z = Complex.exp (L z) := by
+theorem exists_log_lin
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    (χ : AddChar V ℂ) (hχ : Continuous χ) (h0 : ∀ z, χ z ≠ 0)
+    : ∃ L : V →L[ℝ] ℂ, ∀ z, χ z = Complex.exp (L z) := by
   let f : C(V, {z : ℂ // z ≠ 0}) := ⟨fun z => ⟨χ z, h0 z⟩, hχ.subtype_mk _⟩
-  obtain ⟨F, ⟨hF0, hF⟩, -⟩ := Complex.isCoveringMap_exp.existsUnique_continuousMap_lifts f 0 0
-    (Subtype.ext (by simp [f]))
+  obtain ⟨F, ⟨hF0, hF⟩, -⟩ :=
+    Complex.isCoveringMap_exp.existsUnique_continuousMap_lifts f 0 0 (Subtype.ext (by simp [f]))
   have hF' : ∀ z, Complex.exp (F z) = χ z := fun z => congrArg Subtype.val (congrFun hF z)
   have hadd : ∀ x y, F (x + y) = F x + F y := by
     intro x y
     have hc : Continuous fun y => F (x + y) - F y := by fun_prop
-    have := Complex.isCoveringMap_exp.const_of_comp hc (fun y y' => Subtype.ext (by
-      simp only [Complex.exp_sub, hF', AddChar.map_add_eq_mul]
-      rw [mul_div_assoc, mul_div_assoc, div_self (h0 _), div_self (h0 _)])) y 0
+    have :=
+      Complex.isCoveringMap_exp.const_of_comp hc
+        (fun y y' =>
+          Subtype.ext (by
+            simp only [Complex.exp_sub, hF', AddChar.map_add_eq_mul]
+            rw [mul_div_assoc, mul_div_assoc, div_self (h0 _), div_self (h0 _)]))
+        y 0
     simp only [add_zero, hF0, sub_zero] at this
-    rw [← this]; ring
+    rw [← this]
+    ring
   exact ⟨(AddMonoidHom.mk' F hadd).toRealLinearMap F.continuous, fun z => (hF' z).symm⟩
 
 end ExistsLogarithmLinear

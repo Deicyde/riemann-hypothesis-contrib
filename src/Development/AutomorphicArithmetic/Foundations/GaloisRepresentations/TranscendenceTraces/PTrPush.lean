@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.trPush_of :
-    TrChar → FamPush → WtPush → RpBasic → RpOp → TrPush := by
+theorem UpperTheory.Gal.TranscendenceTraces.trPush_of
+    : TrChar → FamPush → WtPush → RpBasic → RpOp → TrPush := by
   intro hTr hFam hWt hRp hOp q _ n i Z Z' S h p _ _ w hw hq x
   obtain ⟨σ, hσ, hσd⟩ := hFam q i h p w (trFam (h ≫ p) w q i) (hTr q i (h ≫ p) w hw hq).2.1
   have hw' := hWt h p w hw
@@ -18,6 +19,7 @@ theorem UpperTheory.Gal.TranscendenceTraces.trPush_of :
   rw [e2]
   obtain ⟨a, ha⟩ := (hRp (ZMod q) (res (ZMod q) (tw q i)) Z' n).1 x
   have h1 := hOp (ZMod q) (ZMod q) σ n x a ha
-  have h2 := hOp (ZMod q) (ZMod q) (trFam (h ≫ p) w q i) n _ _
-    ((hRp (ZMod q) (res (ZMod q) (tw q i)) Z' n).2.2.2.1 Z h x a ha)
+  have h2 :=
+    hOp (ZMod q) (ZMod q) (trFam (h ≫ p) w q i) n _ _
+      ((hRp (ZMod q) (res (ZMod q) (tw q i)) Z' n).2.2.2.1 Z h x a ha)
   exact ((hRp (ZMod q) (res (ZMod q) (tw q i)) S n).2.2.1 _ _ _ _ h2 h1).2.1 (hσd n a).symm

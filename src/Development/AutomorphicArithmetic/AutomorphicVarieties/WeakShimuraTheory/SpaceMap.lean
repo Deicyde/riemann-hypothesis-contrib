@@ -4,14 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
 namespace UpperTheory.V.Ws
 
 section
 variable {ι Γ R R' R'' : Type} [Group Γ] [CommRing R] [CommRing R'] [CommRing R'']
 
-theorem PD.map_map (P : PD ι Γ R) (f : R →+* R') (g : R' →+* R'') : (P.map f).map g = P.map (g.comp f) := rfl
+theorem PD.map_map (P : PD ι Γ R) (f : R →+* R') (g : R' →+* R'')
+    : (P.map f).map g = P.map (g.comp f) :=
+  rfl
 
 theorem adj_map (f : R →+* R') (X : M4 R) : adj (X.map f) = (adj X).map f := by
   ext i j
@@ -29,28 +32,36 @@ theorem PD.map_r (P : PD ι Γ R) (f : R →+* R') (g : Γ) : (P.map f).r g = (P
 
 theorem PD.map_n (P : PD ι Γ R) (f : R →+* R') (v : ι) : (P.map f).n v = (P.n v).map f := rfl
 
-theorem PD.map_flag (P : PD ι Γ R) (f : R →+* R') (v : ι) (s : Γ) :
-    adj ((P.map f).n v) * (P.map f).r s * (P.map f).n v = (adj (P.n v) * P.r s * P.n v).map f := by
+theorem PD.map_flag (P : PD ι Γ R) (f : R →+* R') (v : ι) (s : Γ)
+    : adj ((P.map f).n v) * (P.map f).r s * (P.map f).n v
+      = (adj (P.n v) * P.r s * P.n v).map f := by
   rw [PD.map_r, PD.map_n, adj_map, ← Matrix.map_mul, ← Matrix.map_mul]
 
-theorem PD.map_ψ (P : PD ι Γ R) (f : R →+* R') (v : ι) (i : Fin 4) (s : Γ) : (P.map f).ψ v i s = f (P.ψ v i s) := by
+theorem PD.map_ψ (P : PD ι Γ R) (f : R →+* R') (v : ι) (i : Fin 4) (s : Γ)
+    : (P.map f).ψ v i s = f (P.ψ v i s) := by
   unfold PD.ψ
   rw [PD.map_flag]
   rfl
 
-theorem PD.Cont.map [TopologicalSpace Γ] {P : PD ι Γ R} {I : Ideal R} (h : P.Cont I) (f : R →+* R') {J : Ideal R'}
-    (hf : I ≤ J.comap f) : (P.map f).Cont J := by
+theorem PD.Cont.map
+    [TopologicalSpace Γ]
+    {P : PD ι Γ R} {I : Ideal R} (h : P.Cont I)
+    (f : R →+* R')
+    {J : Ideal R'} (hf : I ≤ J.comap f)
+    : (P.map f).Cont J := by
   intro i j N
-  have hle : I ^ N ≤ (J ^ N).comap f :=
-    (Ideal.pow_right_mono hf N).trans (Ideal.le_comap_pow f N)
+  have hle : I ^ N ≤ (J ^ N).comap f := (Ideal.pow_right_mono hf N).trans (Ideal.le_comap_pow f N)
   have := (h i j N).comp (Ideal.quotientMap (J ^ N) f hle)
   convert this using 1
   rfl
 
 end
 
-theorem Fr.IsPair.map {O Γ R R' : Type} [CommRing O] [Group Γ] [CommRing R] [CommRing R'] {Φ : Fr O Γ} {a : O →+* R}
-    {P : PD Φ.ι Γ R} (h : Φ.IsPair a P) (f : R →+* R') : Φ.IsPair (f.comp a) (P.map f) := by
+theorem Fr.IsPair.map
+    {O Γ R R' : Type} [CommRing O] [Group Γ] [CommRing R] [CommRing R']
+    {Φ : Fr O Γ} {a : O →+* R} {P : PD Φ.ι Γ R} (h : Φ.IsPair a P)
+    (f : R →+* R')
+    : Φ.IsPair (f.comp a) (P.map f) := by
   refine ⟨fun g => isGSp_map f (h.mult g), ?_, h.nrm.map f.map_zero, ?_, ?_, ?_⟩
   · intro g hg
     rw [PD.map_r, h.kill g hg]
@@ -68,29 +79,33 @@ theorem Fr.IsPair.map {O Γ R R' : Type} [CommRing O] [Group Γ] [CommRing R] [C
     rw [PD.map_ψ, h.mu v s hs i, map_one]
 
 section
-variable {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type} [CommRing Λ] [IsLocalRing Λ]
+variable
+  {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ]
+  {Φ : Fr O Γ} {Λ : Type} [CommRing Λ] [IsLocalRing Λ]
   {a : O →+* Λ} (X : Space Φ a)
 
 theorem Space.noeth : IsNoetherianRing X.A :=
   haveI := X.ft
   Algebra.FiniteType.isNoetherianRing X.B X.A
 
-theorem Space.pair_map {R : Type} [CommRing R] [Algebra Λ R] (f : X.A →ₐ[Λ] R) :
-    Φ.IsPair ((algebraMap Λ R).comp a) (X.P.map (f : X.A →+* R)) := by
+theorem Space.pair_map {R : Type} [CommRing R] [Algebra Λ R] (f : X.A →ₐ[Λ] R)
+    : Φ.IsPair ((algebraMap Λ R).comp a) (X.P.map (f : X.A →+* R)) := by
   have := X.pair.map (f : X.A →+* R)
   convert this using 1
   ext x
   simp
 
-theorem Space.cont_map {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] (f : X.A →ₐ[Λ] R) :
-    (X.P.map (f : X.A →+* R)).Cont (maximalIdeal R) := by
+theorem Space.cont_map {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] (f : X.A →ₐ[Λ] R)
+    : (X.P.map (f : X.A →+* R)).Cont (maximalIdeal R) := by
   refine X.cont.map _ (Ideal.map_le_iff_le_comap.2 fun b hb => ?_)
   show (f.comp (IsScalarTower.toAlgHom Λ X.B X.A)) b ∈ maximalIdeal R
   rw [← res_eq_zero_iff Λ, res_map (O := Λ) (R := X.B), res_eq_zero_iff]
   exact hb
 
-theorem Space.hom_ext {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] (f f' : X.A →ₐ[Λ] R)
-    (h : X.P.map (f : X.A →+* R) = X.P.map (f' : X.A →+* R)) : f = f' := by
+theorem Space.hom_ext
+    {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R]
+    (f f' : X.A →ₐ[Λ] R) (h : X.P.map (f : X.A →+* R) = X.P.map (f' : X.A →+* R))
+    : f = f' := by
   have hr : ∀ g i j, f (X.P.r g i j) = f' (X.P.r g i j) := by
     intro g i j
     have := congrArg (fun Q => Q.r g i j) h
@@ -99,13 +114,16 @@ theorem Space.hom_ext {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] (f f' :
     intro v i j
     have := congrArg (fun Q => Q.n v i j) h
     exact this
-  have hB : f.comp (IsScalarTower.toAlgHom Λ X.B X.A) = f'.comp (IsScalarTower.toAlgHom Λ X.B X.A) := by
+  have hB
+      : f.comp (IsScalarTower.toAlgHom Λ X.B X.A) = f'.comp (IsScalarTower.toAlgHom Λ X.B X.A) := by
     apply X.genB R
     · intro g n
       simp only [AlgHom.comp_apply, IsScalarTower.coe_toAlgHom']
       rw [← Polynomial.coeff_map, X.cp_map]
-      have e : ∀ φ : X.A →ₐ[Λ] R, φ ((X.P.r g).charpoly.coeff n) =
-          (((X.P.r g).map (φ : X.A →+* R)).charpoly).coeff n := by
+      have e
+          : ∀ φ : X.A →ₐ[Λ] R,
+            φ ((X.P.r g).charpoly.coeff n)
+              = (((X.P.r g).map (φ : X.A →+* R)).charpoly).coeff n := by
         intro φ
         rw [Matrix.charpoly_map, Polynomial.coeff_map]
         rfl
@@ -118,17 +136,17 @@ theorem Space.hom_ext {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] (f f' :
       simp only [PD.map_ψ] at this
       exact this
   ext x
-  have hx : x ∈ Algebra.adjoin X.B
-      ((Set.range fun x : Γ × Fin 4 × Fin 4 => X.P.r x.1 x.2.1 x.2.2) ∪
-        Set.range fun x : Φ.ι × Fin 4 × Fin 4 => X.P.n x.1 x.2.1 x.2.2) := by
+  have hx
+      : x ∈ Algebra.adjoin X.B
+        ((Set.range fun x : Γ × Fin 4 × Fin 4 => X.P.r x.1 x.2.1 x.2.2)
+          ∪ Set.range fun x : Φ.ι × Fin 4 × Fin 4 => X.P.n x.1 x.2.1 x.2.2) := by
     rw [X.gen]; trivial
   induction hx using Algebra.adjoin_induction with
   | mem y hy =>
     rcases hy with ⟨⟨g, i, j⟩, rfl⟩ | ⟨⟨v, i, j⟩, rfl⟩
     · exact hr g i j
     · exact hn v i j
-  | algebraMap b =>
-    exact DFunLike.congr_fun hB b
+  | algebraMap b => exact DFunLike.congr_fun hB b
   | add y z _ _ hy hz => rw [map_add (f := _), map_add (f := _), hy, hz]
   | mul y z _ _ hy hz => rw [map_mul, map_mul, hy, hz]
 

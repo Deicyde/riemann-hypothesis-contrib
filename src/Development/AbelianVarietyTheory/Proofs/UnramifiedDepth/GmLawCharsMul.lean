@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEi
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -70,7 +73,9 @@ private def gmLaw (R : Type) [CommRing R] (r : ℕ) : FGLaw R r where
     simp only [pt, gmF]
     ring
   assoc i := by
-    have h : ∀ (j k : Fin 3) (l : Fin r), constantCoeff (ev (n := 3) ![pt R r j, pt R r k] (gmF R r l)) = 0 := by
+    have h
+        : ∀ (j k : Fin 3) (l : Fin r),
+          constantCoeff (ev (n := 3) ![pt R r j, pt R r k] (gmF R r l)) = 0 := by
       intro j k l
       rw [ev_gm _ _ (pt_const _) (pt_const _)]
       simp [pt]
@@ -89,7 +94,14 @@ private lemma mulF_gm (R : Type) [CommRing R] (r : ℕ) (N : ℕ) :
     simp only [pt]
     ring
 
-theorem gmLaw_chars_mul : ∀ (R : Type) [CommRing R] (r : ℕ), (∃ Gl : FGLaw R r, Gl.F = gmF R r) ∧ (∀ i : Fin r, IsCh (gmF R r) (1 + MvPowerSeries.X ((0 : Fin 1), i)) ∧ dl (1 + MvPowerSeries.X ((0 : Fin 1), i) : PS R 1 r) = Pi.single i 1) ∧ ∀ (N : ℕ) (i : Fin r), mulF (gmF R r) N i = (1 + MvPowerSeries.X ((0 : Fin 1), i)) ^ N - 1 := by
+theorem gmLaw_chars_mul
+    : ∀ (R : Type) [CommRing R] (r : ℕ),
+      (∃ Gl : FGLaw R r, Gl.F = gmF R r)
+        ∧ (∀ i : Fin r,
+          IsCh (gmF R r) (1 + MvPowerSeries.X ((0 : Fin 1), i))
+            ∧ dl (1 + MvPowerSeries.X ((0 : Fin 1), i) : PS R 1 r) = Pi.single i 1)
+        ∧ ∀ (N : ℕ) (i : Fin r),
+          mulF (gmF R r) N i = (1 + MvPowerSeries.X ((0 : Fin 1), i)) ^ N - 1 := by
   intro R _ r
   refine ⟨⟨gmLaw R r, rfl⟩, fun i => ⟨⟨by simp, ?_⟩, ?_⟩, mulF_gm R r⟩
   · have hA : addOf (gmF R r) (pt R (n := 2) r 0) (pt R (n := 2) r 1) = gmF R r := by
@@ -102,7 +114,8 @@ theorem gmLaw_chars_mul : ∀ (R : Type) [CommRing R] (r : ℕ), (∃ Gl : FGLaw
     ring
   · classical
     funext j
-    simp only [dl, map_add (f := _), coeff_one, coeff_X, Finsupp.single_eq_zero, one_ne_zero, if_false, zero_add,
-      Finsupp.single_left_inj (one_ne_zero : (1 : ℕ) ≠ 0), Prod.mk.injEq, true_and, Pi.single_apply]
+    simp only [dl, map_add (f := _), coeff_one, coeff_X, Finsupp.single_eq_zero, one_ne_zero,
+      if_false, zero_add, Finsupp.single_left_inj (one_ne_zero : (1 : ℕ) ≠ 0), Prod.mk.injEq,
+      true_and, Pi.single_apply]
 
 end GlobalTheory.ChF

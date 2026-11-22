@@ -9,15 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.NormLeOne
 
 noncomputable section
 
-attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
+attribute [-instance]
+  UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Alg
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Alg
 open UpperTheory.V.W UpperTheory.V.Pr
 
 namespace UpperTheory.V.J
 
-private theorem norm_lt_of_mem {l : ℕ} [Fact l.Prime] (c : Coef l) (x : c.O) (hx : x ∈ maximalIdeal c.O) :
-    ‖(x : Qbar l)‖ < 1 := by
+private theorem norm_lt_of_mem
+    {l : ℕ} [Fact l.Prime] (c : Coef l) (x : c.O) (hx : x ∈ maximalIdeal c.O)
+    : ‖(x : Qbar l)‖ < 1 := by
   haveI := c.dvr
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible c.O
   by_cases hx0 : x = 0
@@ -47,20 +51,25 @@ private theorem norm_lt_of_mem {l : ℕ} [Fact l.Prime] (c : Coef l) (x : c.O) (
   have key : x ^ e = ((l : ℕ) : c.O) * (↑u⁻¹ * ↑v ^ e * ϖ ^ (a' * e)) := by
     rw [hxa, hle]
     linear_combination (-(↑v ^ e * ϖ ^ e * ϖ ^ (a' * e))) * u.mul_inv
-  have h2 : ‖(x : Qbar l)‖ ^ e
-      = ‖(((l : ℕ) : c.O) : Qbar l)‖ * ‖((↑u⁻¹ * ↑v ^ e * ϖ ^ (a' * e) : c.O) : Qbar l)‖ := by
+  have h2
+      : ‖(x : Qbar l)‖ ^ e
+        = ‖(((l : ℕ) : c.O) : Qbar l)‖ * ‖((↑u⁻¹ * ↑v ^ e * ϖ ^ (a' * e) : c.O) : Qbar l)‖ := by
     rw [← norm_pow, ← norm_mul, ← SubmonoidClass.coe_pow, ← MulMemClass.coe_mul, key]
   have h3 := GlobalTheory.CoefCoord.norm_le_one c (↑u⁻¹ * ↑v ^ e * ϖ ^ (a' * e))
   have h4 : ‖(x : Qbar l)‖ ^ e < 1 := by
     rw [h2, hcast]
-    calc _ ≤ ‖((l : ℕ) : Qbar l)‖ * 1 := by gcongr
+    calc
+      _ ≤ ‖((l : ℕ) : Qbar l)‖ * 1 := by gcongr
       _ < 1 := by simpa using hlt
   by_contra hge
   push_neg at hge
   exact absurd h4 (not_lt.mpr (one_le_pow₀ hge))
 
-private theorem map_mem_max {O R : Type} [CommRing O] [IsLocalRing O] [CommRing R] [IsLocalRing R] [Algebra O R]
-    (ξ : R →ₐ[O] O) (x : R) (hx : x ∈ maximalIdeal R) : ξ x ∈ maximalIdeal O := by
+private theorem map_mem_max
+    {O R : Type} [CommRing O] [IsLocalRing O] [CommRing R] [IsLocalRing R] [Algebra O R]
+    (ξ : R →ₐ[O] O)
+    (x : R) (hx : x ∈ maximalIdeal R)
+    : ξ x ∈ maximalIdeal O := by
   by_contra h
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, not_not] at h
   obtain ⟨u, hu⟩ := h
@@ -78,8 +87,10 @@ private theorem map_mem_max {O R : Type} [CommRing O] [IsLocalRing O] [CommRing 
     simpa using h4
   exact (IsLocalRing.maximalIdeal.isMaximal R).ne_top ((Ideal.eq_top_iff_one _).mpr h1)
 
-private theorem not_irr_of_line {Γ k : Type} [Group Γ] [Field k] (r : Γ →* GL (Fin 3) k) (j : Fin 3)
-    (h : ∀ s i, i ≠ j → (r s).val i j = 0) : ¬ IsIrr r := by
+private theorem not_irr_of_line
+    {Γ k : Type} [Group Γ] [Field k]
+    (r : Γ →* GL (Fin 3) k) (j : Fin 3) (h : ∀ s i, i ≠ j → (r s).val i j = 0)
+    : ¬ IsIrr r := by
   intro hI
   obtain ⟨-, -, hmin⟩ := hI
   have hinv : Formalism.MainNotions.N.IsInv r (Submodule.span k {Pi.single j (1 : k)}) := by
@@ -99,15 +110,20 @@ private theorem not_irr_of_line {Γ k : Type} [Group Γ] [Field k] (r : Γ →* 
     have := congrFun hs j
     simp at this
   · have hj : j + 1 ≠ j := by fin_cases j <;> decide
-    have hmem : (Pi.single (j + 1) (1 : k) : Fin 3 → k) ∈ Submodule.span k {Pi.single j (1 : k)} := by
+    have hmem
+        : (Pi.single (j + 1) (1 : k) : Fin 3 → k) ∈ Submodule.span k {Pi.single j (1 : k)} := by
       rw [htop]
       exact Submodule.mem_top
     obtain ⟨a, ha⟩ := Submodule.mem_span_singleton.mp hmem
     have := congrFun ha (j + 1)
     simp [Pi.single_apply, hj] at this
 
-private theorem ti_of {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Fr.Frame l k} {K : Type} [CommRing K]
-    (ρ : Fr.NRep F 3 K) (p : Ideal K) (H : ∀ j : Fin 3, ¬ ∀ g i, i ≠ j → ρ.r g i j ∈ p) : ρ.TI p := by
+private theorem ti_of
+    {l : ℕ} [Fact l.Prime]
+    {k : Type} [Field k]
+    {F : Fr.Frame l k} {K : Type} [CommRing K]
+    (ρ : Fr.NRep F 3 K) (p : Ideal K) (H : ∀ j : Fin 3, ¬ ∀ g i, i ≠ j → ρ.r g i j ∈ p)
+    : ρ.TI p := by
   refine ⟨⟨fun hle => H 0 ?_, fun hle => H 2 ?_⟩, fun _ hle => H 1 ?_⟩
   · intro g i hi
     exact hle (Ideal.subset_span ⟨g, i, 0, by revert hi; fin_cases i <;> decide, rfl⟩)
@@ -120,16 +136,21 @@ private theorem ti_of {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Fr.Fram
 
 end UpperTheory.V.J
 
-theorem UpperTheory.V.J.xiTI :
-    UpperTheory.V.J.XiTI := by
+theorem UpperTheory.V.J.xiTI : UpperTheory.V.J.XiTI := by
   intro Ω _ _ _ l _ ι c _ N _ e ψ η σ g₁ B M H L _ _ _ _ _ Φ k c₁ _ f R ξ r hr hi
   have hcol : ∀ j : Fin 3, ¬ ∀ g i, i ≠ j → ξ (R.S.ρ.r g i j) = 0 := by
     intro j h
     refine not_irr_of_line r j (fun s i hij => ?_) hi
     rw [hr s]
     exact congrArg Subtype.val (h (k.p0 s) i hij)
-  refine ⟨ti_of _ _ fun j h => hcol j fun g i hij => h g i hij, ⟨fun a => GlobalTheory.CoefCoord.norm_le_one c₁ _,
-    fun b hb => norm_lt_of_mem c₁ _ (map_mem_max ξ b.1 hb)⟩, ti_of _ _ fun j h => hcol j fun g i hij => ?_⟩
+  refine ⟨
+    ti_of _ _ fun j h => hcol j fun g i hij => h g i hij,
+    ⟨
+      fun a => GlobalTheory.CoefCoord.norm_le_one c₁ _,
+      fun b hb => norm_lt_of_mem c₁ _ (map_mem_max ξ b.1 hb)
+    ⟩,
+    ti_of _ _ fun j h => hcol j fun g i hij => ?_
+  ⟩
   have h0 : ptA R ξ (R.S.u.r g i j) = 0 := h g i hij
   exact Subtype.ext h0
 

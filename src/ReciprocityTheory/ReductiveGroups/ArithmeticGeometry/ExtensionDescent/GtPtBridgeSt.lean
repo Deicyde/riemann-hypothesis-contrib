@@ -45,9 +45,12 @@ structure GtPtF where
   s : ∀ χ : D.X, LB.Gen (LB.LinComb D.P.L (DegPre.gtφ D F b χ) DegPre.gtε)
   isGen : ∀ χ, (s χ).IsGen
   s_zero : LB.Gen.Corr D.P.L _ _ _ _ (s 0) (LB.oneGen D.P.L)
-  mult : ∀ χ χ' : D.X, LB.Gen.Corr D.P.L _ _ _ _
-    (LB.mulGen D.P.L _ _ _ _ (s (χ + χ')) (DegPre.cubAt D F (DegPre.cF D F χ) (DegPre.cF D F χ') b))
-    (LB.mulGen D.P.L _ _ _ _ (s χ) (s χ'))
+  mult
+    : ∀ χ χ' : D.X,
+      LB.Gen.Corr D.P.L _ _ _ _
+        (LB.mulGen D.P.L _ _ _ _ (s (χ + χ'))
+          (DegPre.cubAt D F (DegPre.cF D F χ) (DegPre.cF D F χ') b))
+        (LB.mulGen D.P.L _ _ _ _ (s χ) (s χ'))
 
 namespace GtPtF
 
@@ -57,17 +60,19 @@ def IsZero (g : GtPtF D F) : Prop :=
   g.b = DegPre.zeroF D F ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g.s χ) (LB.oneGen D.P.L)
 
 def IsAdd (g g' g'' : GtPtF D F) : Prop :=
-  g''.b = padd D.P.A g.b g'.b ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _
-    (LB.mulGen D.P.L _ _ _ _ (g''.s χ) (DegPre.cubAt D F (DegPre.cF D F χ) g.b g'.b))
-    (LB.mulGen D.P.L _ _ _ _ (g.s χ) (g'.s χ))
+  g''.b = padd D.P.A g.b g'.b
+    ∧ ∀ χ,
+      LB.Gen.Corr D.P.L _ _ _ _
+        (LB.mulGen D.P.L _ _ _ _ (g''.s χ) (DegPre.cubAt D F (DegPre.cF D F χ) g.b g'.b))
+        (LB.mulGen D.P.L _ _ _ _ (g.s χ) (g'.s χ))
 
 def IsNsmul (k : ℕ) (g h : GtPtF D F) : Prop :=
-  ∃ gs : Fin (k + 1) → GtPtF D F, (gs 0).IsZero ∧
-    (∀ i : Fin k, IsAdd (gs i.castSucc) g (gs i.succ)) ∧ gs (Fin.last k) = h
+  ∃ gs : Fin (k + 1) → GtPtF D F,
+    (gs 0).IsZero ∧ (∀ i : Fin k, IsAdd (gs i.castSucc) g (gs i.succ)) ∧ gs (Fin.last k) = h
 
 def IsIota (y : D.X) (g : GtPtF D F) : Prop :=
-  g.b = DegPre.cF D F y ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g.s χ)
-    (LB.pullGen D.P.L _ _ (D.io y χ) (jFK (R := R) F))
+  g.b = DegPre.cF D F y
+    ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g.s χ) (LB.pullGen D.P.L _ _ (D.io y χ) (jFK (R := R) F))
 
 end GtPtF
 
@@ -105,28 +110,29 @@ def constBF (ζ : F) (W : (BF D F).left.Opens) : Γ((BF D F).left, W) :=
 
 end DegPre
 
-def PhiRel (k : ℕ) (p : QkPt D F k)
-    (w : LB.Gen (LB.LinComb D.P.L (DegPre.lineφ D F p.g.b) (DegPre.lineε k)))
-    (s s' : Fam D F k) : Prop :=
+def PhiRel
+    (k : ℕ) (p : QkPt D F k)
+    (w : LB.Gen (LB.LinComb D.P.L (DegPre.lineφ D F p.g.b) (DegPre.lineε k))) (s s' : Fam D F k)
+    : Prop :=
   ∀ (α : D.X) (u : LB.Gen (LB.LinComb D.P.L (DegPre.phiφ D F p.y α p.g.b) (DegPre.deltaε k))),
-    u.IsGen →
-    LB.Gen.Corr D.P.L _ _ _ _ (LB.pullGen D.P.L _ _ u (DegPre.zF D F).left)
-      (LB.mulGen D.P.L _ _ _ _ (p.g.s α) w) →
-    GeneratorPullback.SecRel D.P.L (DegPre.famφ D F (α + p.y)) (DegPre.famε k) (s'.s (α + p.y))
-      (DegPre.famφ D F α) (DegPre.famε k) (s.s α) (DegPre.trPt D F p.g.b).left
-      (DegPre.phiφ D F p.y α p.g.b) (DegPre.deltaε k) u
+    u.IsGen
+      → LB.Gen.Corr D.P.L _ _ _ _ (LB.pullGen D.P.L _ _ u (DegPre.zF D F).left)
+        (LB.mulGen D.P.L _ _ _ _ (p.g.s α) w)
+      → GeneratorPullback.SecRel D.P.L (DegPre.famφ D F (α + p.y)) (DegPre.famε k) (s'.s (α + p.y))
+        (DegPre.famφ D F α) (DegPre.famε k) (s.s α) (DegPre.trPt D F p.g.b).left
+        (DegPre.phiφ D F p.y α p.g.b) (DegPre.deltaε k) u
 
 def Fam.IsSmul {k : ℕ} (ζ : F) (s s' : Fam D F k) : Prop :=
   ∀ (α : D.X) (j : Fin 4 → D.P.L.ι), (s'.s α).f j = DegPre.constBF D F ζ _ * (s.s α).f j
 
 def WeilQkIs (k : ℕ) (p p' : QkPt D F k) (ζ : F) : Prop :=
   ∀ (w : LB.Gen (LB.LinComb D.P.L (DegPre.lineφ D F p.g.b) (DegPre.lineε k)))
-    (w' : LB.Gen (LB.LinComb D.P.L (DegPre.lineφ D F p'.g.b) (DegPre.lineε k))),
-    w.IsGen → w'.IsGen →
-    ∀ s s₁ s₂ s₃ s₄ : Fam D F k,
-      PhiRel D F k p' w' s s₁ → PhiRel D F k p w s₁ s₂ →
-      PhiRel D F k p w s s₃ → PhiRel D F k p' w' s₃ s₄ →
-      Fam.IsSmul D F ζ s₄ s₂
+      (w' : LB.Gen (LB.LinComb D.P.L (DegPre.lineφ D F p'.g.b) (DegPre.lineε k))),
+    w.IsGen → w'.IsGen
+      → ∀ s s₁ s₂ s₃ s₄ : Fam D F k,
+        PhiRel D F k p' w' s s₁ → PhiRel D F k p w s₁ s₂ → PhiRel D F k p w s s₃
+          → PhiRel D F k p' w' s₃ s₄
+          → Fam.IsSmul D F ζ s₄ s₂
 
 end Phi
 
@@ -137,14 +143,18 @@ variable (F : Type) [Field F] [Algebra (FractionRing R) F]
 
 abbrev TFK : Over (TK R).left := Over.mk (jFK (R := R) F)
 
-def QkToAk (P' : PolAV (TK R).left) (k : ℕ)
-    (E : LB.Sec (LPow P'.A P'.L (k : ℤ) (TFK (R := R) F)) → Fam D F k → Prop)
-    (p : QkPt D F k) (x : TFK (R := R) F ⟶ P'.A) : Prop :=
-  x ^ k = 1 ∧
-    ∀ θ : ThetaGrp P'.A P'.L (k : ℤ) (TFK (R := R) F), θ.pt = x →
-      ∃ w : LB.Gen (LB.LinComb D.P.L (DegPre.lineφ D F p.g.b) (DegPre.lineε k)), w.IsGen ∧
-        ∀ (t t' : LB.Sec (LPow P'.A P'.L (k : ℤ) (TFK (R := R) F))) (s s' : Fam D F k),
-          E t s → E t' s' → IsActOf P'.A P'.L (k : ℤ) θ t t' → PhiRel D F k p w s s'
+def QkToAk
+    (P' : PolAV (TK R).left) (k : ℕ)
+    (E : LB.Sec (LPow P'.A P'.L (k : ℤ) (TFK (R := R) F)) → Fam D F k → Prop) (p : QkPt D F k)
+    (x : TFK (R := R) F ⟶ P'.A)
+    : Prop :=
+  x ^ k = 1
+    ∧ ∀ θ : ThetaGrp P'.A P'.L (k : ℤ) (TFK (R := R) F),
+      θ.pt = x
+        → ∃ w : LB.Gen (LB.LinComb D.P.L (DegPre.lineφ D F p.g.b) (DegPre.lineε k)),
+          w.IsGen
+            ∧ ∀ (t t' : LB.Sec (LPow P'.A P'.L (k : ℤ) (TFK (R := R) F))) (s s' : Fam D F k),
+              E t s → E t' s' → IsActOf P'.A P'.L (k : ℤ) θ t t' → PhiRel D F k p w s s'
 
 end QkToAk
 

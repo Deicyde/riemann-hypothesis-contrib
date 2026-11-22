@@ -13,16 +13,26 @@ section
 noncomputable section
 open scoped TensorProduct NNReal Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.RgEis GlobalTheory.CompanionTheory.SiegelFrame
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.RgEis GlobalTheory.CompanionTheory.SiegelFrame
 namespace PositivityTheory.SiegelWeilFormula.Aeis
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n : ℕ} {Y : Spc F E n}
-theorem siegelMult_w_k {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B) (hn : 1 ≤ n) (χ : Chr F E) (hχ : IsHecke F E χ) (c : ℕ)
-    (hres : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ c) {b : GL (Fin n ⊕ Fin n) E}
-    {K : Subgroup (G2 σ Y)} {a : G2 σ Y → ℝ} (hb : IsFrame2 σ Y b) (hK : IsStdK (σ := σ) (Y := Y) B b K) (ha : IsHgt K a)
-    (s₁ : ℂ) (f : G2 σ Y → ℂ) (hf : IsSec K χ s₁ f) :
-    ∃ (A : ℂ → ℂ) (H : ℂ → modFun σ Y) (t : ℝ), Differentiable ℂ A ∧ (∃ z, A z ≠ 0) ∧
-      (∀ μ, IsGrowForm μ → Differentiable ℂ (fun s => μ (H s))) ∧
-      ∀ s : ℂ, t < s.re → ∀ x, HasSum (fun q => A s * eisTerm (flat a f s₁ s) x q) ((H s).1 x) := by
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {n : ℕ} {Y : Spc F E n}
+theorem siegelMult_w_k
+    {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B)
+    (hn : 1 ≤ n)
+    (χ : Chr F E) (hχ : IsHecke F E χ)
+    (c : ℕ) (hres : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ c)
+    {b : GL (Fin n ⊕ Fin n) E} {K : Subgroup (G2 σ Y)} {a : G2 σ Y → ℝ}
+    (hb : IsFrame2 σ Y b) (hK : IsStdK (σ := σ) (Y := Y) B b K) (ha : IsHgt K a)
+    (s₁ : ℂ) (f : G2 σ Y → ℂ) (hf : IsSec K χ s₁ f)
+    : ∃ (A : ℂ → ℂ) (H : ℂ → modFun σ Y) (t : ℝ),
+      Differentiable ℂ A ∧ (∃ z, A z ≠ 0)
+        ∧ (∀ μ, IsGrowForm μ → Differentiable ℂ (fun s => μ (H s)))
+        ∧ ∀ s : ℂ,
+          t < s.re → ∀ x, HasSum (fun q => A s * eisTerm (flat a f s₁ s) x q) ((H s).1 x) := by
   have hSec : SecLaw := Hd.secLaw
   have hWL : WallLaw := Hd.wallLaw_of Hd.secLaw
   have hD : Dict := Hd.dict
@@ -40,8 +50,10 @@ theorem siegelMult_w_k {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B) 
   obtain ⟨-, -, -, ht2', hlc', hsc', hKc⟩ := hGT E (AE F E) (adCM σ χ) hgood (Fin n) ε
   let Φ := frameEquiv (Y := Y) χ ε b hε
   have hΓ : ∀ x, x ∈ rat2 σ Y ↔ Φ x ∈ (adCM σ χ).uΓ ε (Fin n) := rat_iff χ ε b hε
-  have hKK : ∀ x, x ∈ K ↔ Φ x ∈ (adCM σ χ).uK ε (Fin n) := fun x => GlobalTheory.T.standard_compact_frame_equiv F E σ n Y hD hDI hcm χ ε b hε B K hK x
-  have hIP : ∀ x, (∃ t, IsPar x t) ↔ Φ x ∈ (adCM σ χ).uQ ε (Set.univ : Set (Fin n)) := GlobalTheory.T.parabolic_iff_frame_parabolic F E σ n Y χ ε b hε t₀ ht₀
+  have hKK : ∀ x, x ∈ K ↔ Φ x ∈ (adCM σ χ).uK ε (Fin n) := fun x =>
+    GlobalTheory.T.standard_compact_frame_equiv F E σ n Y hD hDI hcm χ ε b hε B K hK x
+  have hIP : ∀ x, (∃ t, IsPar x t) ↔ Φ x ∈ (adCM σ χ).uQ ε (Set.univ : Set (Fin n)) :=
+    GlobalTheory.T.parabolic_iff_frame_parabolic F E σ n Y χ ε b hε t₀ ht₀
   have hPP : ∀ x, x ∈ par2 σ Y ↔ Φ x ∈ (adCM σ χ).uQ ε (Set.univ : Set (Fin n)) := by
     intro x
     constructor

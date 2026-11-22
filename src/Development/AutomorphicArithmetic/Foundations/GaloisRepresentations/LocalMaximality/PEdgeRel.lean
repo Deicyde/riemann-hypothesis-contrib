@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section
@@ -28,8 +29,8 @@ private theorem tS_sq (S : Finset ι) (k : ι) : tS S k * tS S k = 1 := by
   intro x _
   split_ifs <;> norm_num
 
-private theorem tS_union {S T : Finset ι} (h : Disjoint S T) (k : ι) :
-    tS (S ∪ T) k = tS S k * tS T k := by
+private theorem tS_union {S T : Finset ι} (h : Disjoint S T) (k : ι)
+    : tS (S ∪ T) k = tS S k * tS T k := by
   unfold tS
   rw [Finset.prod_union h]
 
@@ -49,8 +50,8 @@ private theorem tS_mul_uS {S : Finset ι} {k : ι} (h : k ∉ S) : tS S k * uS S
     · simp [hl, not_lt.2 hl.le]
   · simp
 
-private theorem sg_left {I : Finset ι} (J : Finset ι) {k : ι} (h : k ∈ I) :
-    shS I J = tS J k * shS (I.erase k) J := by
+private theorem sg_left {I : Finset ι} (J : Finset ι) {k : ι} (h : k ∈ I)
+    : shS I J = tS J k * shS (I.erase k) J := by
   unfold shS
   exact (Finset.mul_prod_erase I (fun i => tS J i) h).symm
 
@@ -58,21 +59,24 @@ private theorem sg_eq_u (I J : Finset ι) : shS I J = ∏ j ∈ J, uS I j := by
   unfold shS tS uS
   exact Finset.prod_comm
 
-private theorem sg_right (I : Finset ι) {J : Finset ι} {k : ι} (h : k ∈ J) :
-    shS I J = uS I k * shS I (J.erase k) := by
+private theorem sg_right (I : Finset ι) {J : Finset ι} {k : ι} (h : k ∈ J)
+    : shS I J = uS I k * shS I (J.erase k) := by
   rw [sg_eq_u, sg_eq_u]
   exact (Finset.mul_prod_erase J (fun j => uS I j) h).symm
 
 private def ah (α : Finset ι → E) (I J : Finset ι) : E :=
   if Disjoint I J then shS I J • α (I ∪ J) else 0
 
-private theorem ah_cocycle (α : Finset ι → E)
-    (h : ∀ s : Finset ι, ∑ k ∈ s, GlobalTheory.cubeSign s k • α (s.erase k) = 0) (I J : Finset ι) :
-    ∑ i ∈ I, GlobalTheory.cubeSign I i • ah α (I.erase i) J +
-      ((-1 : ℤ) ^ I.card) • ∑ j ∈ J, GlobalTheory.cubeSign J j • ah α I (J.erase j) = 0 := by
+private theorem ah_cocycle
+    (α : Finset ι → E) (h : ∀ s : Finset ι, ∑ k ∈ s, GlobalTheory.cubeSign s k • α (s.erase k) = 0)
+    (I J : Finset ι)
+    : ∑ i ∈ I, GlobalTheory.cubeSign I i • ah α (I.erase i) J
+        + ((-1 : ℤ) ^ I.card) • ∑ j ∈ J, GlobalTheory.cubeSign J j • ah α I (J.erase j)
+      = 0 := by
   by_cases hd : Disjoint I J
-  · have e1 : ∑ i ∈ I, GlobalTheory.cubeSign I i • ah α (I.erase i) J =
-        ∑ i ∈ I, shS I J • (GlobalTheory.cubeSign (I ∪ J) i • α ((I ∪ J).erase i)) := by
+  · have e1
+        : ∑ i ∈ I, GlobalTheory.cubeSign I i • ah α (I.erase i) J
+          = ∑ i ∈ I, shS I J • (GlobalTheory.cubeSign (I ∪ J) i • α ((I ∪ J).erase i)) := by
       refine Finset.sum_congr rfl fun i hi => ?_
       have hiJ : i ∉ J := Finset.disjoint_left.1 hd hi
       have hdi : Disjoint (I.erase i) J :=
@@ -85,8 +89,9 @@ private theorem ah_cocycle (α : Finset ι → E)
       congr 1
       rw [cs_eq, cs_eq, tS_union hd, sg_left J hi]
       linear_combination (-(tS I i * shS (I.erase i) J)) * tS_sq J i
-    have e2 : ∑ j ∈ J, ((-1 : ℤ) ^ I.card) • (GlobalTheory.cubeSign J j • ah α I (J.erase j)) =
-        ∑ j ∈ J, shS I J • (GlobalTheory.cubeSign (I ∪ J) j • α ((I ∪ J).erase j)) := by
+    have e2
+        : ∑ j ∈ J, ((-1 : ℤ) ^ I.card) • (GlobalTheory.cubeSign J j • ah α I (J.erase j))
+          = ∑ j ∈ J, shS I J • (GlobalTheory.cubeSign (I ∪ J) j • α ((I ∪ J).erase j)) := by
       refine Finset.sum_congr rfl fun j hj => ?_
       have hjI : j ∉ I := Finset.disjoint_right.1 hd hj
       have hdj : Disjoint I (J.erase j) :=
@@ -109,15 +114,17 @@ private theorem ah_cocycle (α : Finset ι → E)
         exact h' (Finset.mem_of_mem_erase hy) (Finset.mem_erase.2 ⟨Finset.ne_of_mem_erase hy, hyJ⟩)
       · intro h' y hyI hy
         exact h' (Finset.mem_erase.2 ⟨Finset.ne_of_mem_erase hy, hyI⟩) (Finset.mem_of_mem_erase hy)
-    have e1 : ∑ i ∈ I, GlobalTheory.cubeSign I i • ah α (I.erase i) J =
-        GlobalTheory.cubeSign I x • ah α (I.erase x) J := by
+    have e1
+        : ∑ i ∈ I, GlobalTheory.cubeSign I i • ah α (I.erase i) J
+          = GlobalTheory.cubeSign I x • ah α (I.erase x) J := by
       refine Finset.sum_eq_single_of_mem x hxI fun i _ hne => ?_
       unfold ah
       rw [if_neg, smul_zero]
       intro hdi
       exact Finset.disjoint_left.1 hdi (Finset.mem_erase.2 ⟨hne.symm, hxI⟩) hxJ
-    have e2 : ∑ j ∈ J, GlobalTheory.cubeSign J j • ah α I (J.erase j) =
-        GlobalTheory.cubeSign J x • ah α I (J.erase x) := by
+    have e2
+        : ∑ j ∈ J, GlobalTheory.cubeSign J j • ah α I (J.erase j)
+          = GlobalTheory.cubeSign J x • ah α I (J.erase x) := by
       refine Finset.sum_eq_single_of_mem x hxJ fun j _ hne => ?_
       unfold ah
       rw [if_neg, smul_zero]
@@ -142,8 +149,10 @@ private theorem ah_cocycle (α : Finset ι → E)
       have h1 := tS_mul_uS hnot
       rw [hcard] at h1
       have h2 := tS_sq J x
-      have hz : GlobalTheory.cubeSign I x * shS (I.erase x) J +
-          (-1 : ℤ) ^ I.card * GlobalTheory.cubeSign J x * shS I (J.erase x) = 0 := by
+      have hz
+          : GlobalTheory.cubeSign I x * shS (I.erase x) J
+              + (-1 : ℤ) ^ I.card * GlobalTheory.cubeSign J x * shS I (J.erase x)
+            = 0 := by
         rw [cs_eq, cs_eq, sg_right (I.erase x) hxJ, sg_left (J.erase x) hxI, tS_erase,
           ← tS_erase I x, hn]
         linear_combination (shS (I.erase x) (J.erase x)) * h1 +
@@ -153,8 +162,9 @@ private theorem ah_cocycle (α : Finset ι → E)
       rw [if_neg hd2, if_neg (fun h' => hd2 (hsym.1 h'))]
       simp
 
-private theorem sum_single (I : Finset ι) (x : E) :
-    ∑ i ∈ I, GlobalTheory.cubeSign I i • (if I.erase i = ∅ then x else 0) = if I.card = 1 then x else 0 := by
+private theorem sum_single (I : Finset ι) (x : E)
+    : ∑ i ∈ I, GlobalTheory.cubeSign I i • (if I.erase i = ∅ then x else 0)
+      = if I.card = 1 then x else 0 := by
   split_ifs with h
   · obtain ⟨a, rfl⟩ := Finset.card_eq_one.1 h
     simp [GlobalTheory.cubeSign_singleton]
@@ -168,13 +178,12 @@ private theorem sum_single (I : Finset ι) (x : E) :
     have h4 := Finset.card_pos.2 ⟨i, hi⟩
     omega
 
-private theorem wd_ap [Module ℂ E] (w : ι → Module.End ℂ E) (c : Finset ι → E) (t : Finset ι) :
-    wd w c t = ∑ i ∈ t, GlobalTheory.cubeSign t i • w i (c (t.erase i)) := by
+private theorem wd_ap [Module ℂ E] (w : ι → Module.End ℂ E) (c : Finset ι → E) (t : Finset ι)
+    : wd w c t = ∑ i ∈ t, GlobalTheory.cubeSign t i • w i (c (t.erase i)) := by
   simp [wd, LinearMap.pi_apply, LinearMap.sum_apply, LinearMap.smul_apply]
 end
 
-theorem UpperTheory.Gal.productCup_of_system.edgeRel_of :
-    WdUni → EdgeRel := by
+theorem UpperTheory.Gal.productCup_of_system.edgeRel_of : WdUni → EdgeRel := by
   intro hU
   unfold EdgeRel
   intro ι E _ _ _ _ G p _ α hα
@@ -200,8 +209,9 @@ theorem UpperTheory.Gal.productCup_of_system.edgeRel_of :
       rw [if_neg hI] at h0
       have h1 : α I = 0 := by simpa using h0
       simp [h1]
-  obtain ⟨c, hc⟩ : ∃ c : Finset (ι ⊕ₗ ι) → E, ∀ s, c s =
-      if (lft s).Nonempty ∧ (rgt s).Nonempty then -ah α (lft s) (rgt s) else 0 :=
+  obtain ⟨c, hc⟩
+      : ∃ c : Finset (ι ⊕ₗ ι) → E, ∀ s,
+        c s = if (lft s).Nonempty ∧ (rgt s).Nonempty then - ah α (lft s) (rgt s) else 0 :=
     ⟨_, fun s => rfl⟩
   unfold acx Cx.B
   refine Submodule.mem_map.2 ⟨c, ?_, ?_⟩
@@ -250,20 +260,24 @@ theorem UpperTheory.Gal.productCup_of_system.edgeRel_of :
     · rw [Finset.not_nonempty_iff_eq_empty] at hI
       subst hI
       simp [hα0]
-    have t1 : ∀ i ∈ I, GlobalTheory.cubeSign I i •
-        (if (I.erase i).Nonempty ∧ J.Nonempty then -ah α (I.erase i) J else 0) =
-        -(GlobalTheory.cubeSign I i • ah α (I.erase i) J) +
-          GlobalTheory.cubeSign I i • (if I.erase i = ∅ then α J else 0) := by
+    have t1
+        : ∀ i ∈ I,
+          GlobalTheory.cubeSign I i
+              • (if (I.erase i).Nonempty ∧ J.Nonempty then - ah α (I.erase i) J else 0)
+            = -(GlobalTheory.cubeSign I i • ah α (I.erase i) J)
+              + GlobalTheory.cubeSign I i • (if I.erase i = ∅ then α J else 0) := by
       intro i _
       by_cases he : I.erase i = ∅
       · rw [he]
         simp [ah, shS]
       · have hne : (I.erase i).Nonempty := Finset.nonempty_iff_ne_empty.2 he
         rw [if_pos ⟨hne, hJ⟩, if_neg he, smul_zero, add_zero, smul_neg]
-    have t2 : ∀ j ∈ J, GlobalTheory.cubeSign J j •
-        (if I.Nonempty ∧ (J.erase j).Nonempty then -ah α I (J.erase j) else 0) =
-        -(GlobalTheory.cubeSign J j • ah α I (J.erase j)) +
-          GlobalTheory.cubeSign J j • (if J.erase j = ∅ then α I else 0) := by
+    have t2
+        : ∀ j ∈ J,
+          GlobalTheory.cubeSign J j
+              • (if I.Nonempty ∧ (J.erase j).Nonempty then - ah α I (J.erase j) else 0)
+            = -(GlobalTheory.cubeSign J j • ah α I (J.erase j))
+              + GlobalTheory.cubeSign J j • (if J.erase j = ∅ then α I else 0) := by
       intro j _
       by_cases he : J.erase j = ∅
       · rw [he]

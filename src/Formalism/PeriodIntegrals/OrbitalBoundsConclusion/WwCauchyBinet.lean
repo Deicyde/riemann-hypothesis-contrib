@@ -6,4 +6,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CauchyBinet.WwCa
 
 @[expose] public section
 
-theorem cauchy_binet_minors : PI.WwCauchyBinet.WwCauchyBinet := PI.WwCauchyBinetWork.wwCauchyBinet_main
+theorem cauchy_binet_minors : PI.WwCauchyBinet.WwCauchyBinet :=
+  PI.WwCauchyBinetWork.wwCauchyBinet_main

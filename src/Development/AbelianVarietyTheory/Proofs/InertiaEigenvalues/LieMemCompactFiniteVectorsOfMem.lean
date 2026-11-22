@@ -11,8 +11,10 @@ open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.
 
 namespace GlobalTheory.LieFin
 
-theorem lie_mem_finVec : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {N : ℕ} (X : Lie E N) (φ : Sm E N),
-    φ ∈ finVec (cptRep E N) → lie E N X φ ∈ finVec (cptRep E N) := by
+theorem lie_mem_finVec
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {N : ℕ}
+        (X : Lie E N) (φ : Sm E N),
+      φ ∈ finVec (cptRep E N) → lie E N X φ ∈ finVec (cptRep E N) := by
   intro E _ _ _ N X φ hφ
   let S : Submodule ℂ (Sm E N) := Submodule.span ℂ (Set.range fun k => cptRep E N k φ)
   haveI : FiniteDimensional ℂ S := hφ
@@ -34,7 +36,10 @@ theorem lie_mem_finVec : ∀ (E : Type) [Field E] [NumberField E] [_root_.Number
   show FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun k => cptRep E N k (lie E N X φ)))
   refine Submodule.finiteDimensional_of_le (S₂ := T) (Submodule.span_le.2 ?_)
   rintro _ ⟨k, rfl⟩
-  have e := congrArg (fun f : Module.End ℂ (Sm E N) => f φ) (GlobalTheory.CapAdInv.rt_lie (Unitary.toUnits k) (Matrix.of X))
+  have e :=
+    congrArg
+      (fun f : Module.End ℂ (Sm E N) => f φ)
+      (GlobalTheory.CapAdInv.rt_lie (Unitary.toUnits k) (Matrix.of X))
   simp only [Module.End.mul_apply] at e
   change rt E N (infGL E N (Unitary.toUnits k)) (lie E N X φ) ∈ T
   have eX : toL (Matrix.of X) = X := rfl

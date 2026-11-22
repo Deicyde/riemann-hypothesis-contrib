@@ -8,13 +8,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Matrix UpperTheory.V.Weyl
 
-theorem UpperTheory.V.Weyl.topPol :
-    ∀ (n : ℕ) (ν : Fin n → ℕ), Antitone ν → ∀ H : ℕ, (∀ k, ν k ≤ H) → ∃ f : Pol n, f ≠ 0 ∧ f.totalDegree ≤ n * H ∧
-      ∀ b : Matrix (Fin n) (Fin n) ℂ, (∀ i j, j < i → b i j = 0) → rtr b f = (∏ k, b k k ^ ν k) • f := by
+theorem UpperTheory.V.Weyl.topPol
+    : ∀ (n : ℕ) (ν : Fin n → ℕ),
+      Antitone ν
+        → ∀ H : ℕ,
+          (∀ k, ν k ≤ H)
+            → ∃ f : Pol n,
+              f ≠ 0 ∧ f.totalDegree ≤ n * H
+                ∧ ∀ b : Matrix (Fin n) (Fin n) ℂ,
+                  (∀ i j, j < i → b i j = 0) → rtr b f = (∏ k, b k k ^ ν k) • f := by
   intro n ν hν H hH
   classical
-  have hmem : ∀ (h : ℕ) (hs : (Finset.univ.filter (fun i : Fin n => h < ν i)).Nonempty) (i : Fin n),
-      i ∈ Finset.univ.filter (fun i : Fin n => h < ν i) ↔ i ≤ (Finset.univ.filter (fun i : Fin n => h < ν i)).max' hs := by
+  have hmem
+      : ∀ (h : ℕ) (hs : (Finset.univ.filter (fun i : Fin n => h < ν i)).Nonempty) (i : Fin n),
+        i ∈ Finset.univ.filter (fun i : Fin n => h < ν i)
+          ↔ i ≤ (Finset.univ.filter (fun i : Fin n => h < ν i)).max' hs := by
     intro h hs i
     constructor
     · intro hi
@@ -23,11 +31,24 @@ theorem UpperTheory.V.Weyl.topPol :
       have hm := Finset.max'_mem _ hs
       rw [Finset.mem_filter] at hm ⊢
       exact ⟨Finset.mem_univ _, lt_of_lt_of_le hm.2 (hν hi)⟩
-  obtain ⟨g, hg1, hg2, hg3⟩ : ∃ g : ℕ → Pol n, (∀ h, g h ≠ 0) ∧ (∀ h, (g h).totalDegree ≤ n) ∧
-      ∀ b : Matrix (Fin n) (Fin n) ℂ, (∀ i j, j < i → b i j = 0) → ∀ h,
-        rtr b (g h) = (∏ i ∈ Finset.univ.filter (fun i : Fin n => h < ν i), b i i) • g h := by
-    refine ⟨fun h => if hs : (Finset.univ.filter (fun i : Fin n => h < ν i)).Nonempty then
-      minor ((Finset.univ.filter (fun i : Fin n => h < ν i)).max' hs) else 1, ?_, ?_, ?_⟩
+  obtain ⟨g, hg1, hg2, hg3⟩
+      : ∃ g : ℕ → Pol n,
+        (∀ h, g h ≠ 0) ∧ (∀ h, (g h).totalDegree ≤ n)
+          ∧ ∀ b : Matrix (Fin n) (Fin n) ℂ,
+            (∀ i j, j < i → b i j = 0)
+              → ∀ h,
+                rtr b (g h)
+                  = (∏ i ∈ Finset.univ.filter (fun i : Fin n => h < ν i), b i i) • g h := by
+    refine ⟨
+      fun h =>
+        if hs : (Finset.univ.filter (fun i : Fin n => h < ν i)).Nonempty then
+          minor ((Finset.univ.filter (fun i : Fin n => h < ν i)).max' hs)
+        else
+          1,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · intro h
       by_cases hs : (Finset.univ.filter (fun i : Fin n => h < ν i)).Nonempty
       · simp only [dite_eq_left hs]
@@ -56,28 +77,30 @@ theorem UpperTheory.V.Weyl.topPol :
         simp
   refine ⟨∏ h ∈ Finset.range H, g h, ?_, ?_, ?_⟩
   · exact Finset.prod_ne_zero_iff.mpr (fun h _ => hg1 h)
-  · calc (∏ h ∈ Finset.range H, g h).totalDegree ≤ ∑ h ∈ Finset.range H, (g h).totalDegree :=
-          MvPolynomial.totalDegree_finsetProd _ _
+  · calc
+      (∏ h ∈ Finset.range H, g h).totalDegree
+        ≤ ∑ h ∈ Finset.range H, (g h).totalDegree := MvPolynomial.totalDegree_finsetProd _ _
       _ ≤ ∑ h ∈ Finset.range H, n := Finset.sum_le_sum (fun h _ => hg2 h)
-      _ = n * H := by
-        rw [Finset.sum_const, Finset.card_range, smul_eq_mul, mul_comm]
+      _ = n * H := by rw [Finset.sum_const, Finset.card_range, smul_eq_mul, mul_comm]
   · intro b hb
-    have key : ∏ h ∈ Finset.range H, ∏ i ∈ Finset.univ.filter (fun i : Fin n => h < ν i), b i i =
-        ∏ k, b k k ^ ν k := by
-      calc ∏ h ∈ Finset.range H, ∏ i ∈ Finset.univ.filter (fun i : Fin n => h < ν i), b i i
-          = ∏ h ∈ Finset.range H, ∏ i, (if h < ν i then b i i else 1) := by
-            refine Finset.prod_congr rfl (fun h _ => ?_)
-            rw [Finset.prod_filter]
+    have key
+        : ∏ h ∈ Finset.range H, ∏ i ∈ Finset.univ.filter (fun i : Fin n => h < ν i), b i i
+          = ∏ k, b k k ^ ν k := by
+      calc
+        ∏ h ∈ Finset.range H, ∏ i ∈ Finset.univ.filter (fun i : Fin n => h < ν i), b i i
+            = ∏ h ∈ Finset.range H, ∏ i, (if h < ν i then b i i else 1) := by
+          refine Finset.prod_congr rfl (fun h _ => ?_)
+          rw [Finset.prod_filter]
         _ = ∏ i, ∏ h ∈ Finset.range H, (if h < ν i then b i i else 1) := Finset.prod_comm
         _ = ∏ k, b k k ^ ν k := by
-            refine Finset.prod_congr rfl (fun i _ => ?_)
-            rw [Finset.prod_ite, Finset.prod_const_one, mul_one, Finset.prod_const]
-            congr 1
-            have hf : (Finset.range H).filter (fun h => h < ν i) = Finset.range (ν i) := by
-              ext h
-              simp only [Finset.mem_filter, Finset.mem_range]
-              have := hH i
-              omega
-            rw [hf, Finset.card_range]
+          refine Finset.prod_congr rfl (fun i _ => ?_)
+          rw [Finset.prod_ite, Finset.prod_const_one, mul_one, Finset.prod_const]
+          congr 1
+          have hf : (Finset.range H).filter (fun h => h < ν i) = Finset.range (ν i) := by
+            ext h
+            simp only [Finset.mem_filter, Finset.mem_range]
+            have := hH i
+            omega
+          rw [hf, Finset.card_range]
     rw [map_prod, Finset.prod_congr rfl (fun h _ => hg3 b hb h), ← key]
     simp only [Algebra.smul_def, map_prod, Finset.prod_mul_distrib]

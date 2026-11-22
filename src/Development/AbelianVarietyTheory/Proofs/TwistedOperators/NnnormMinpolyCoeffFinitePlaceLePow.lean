@@ -13,9 +13,13 @@ namespace GlobalTheory.CoefHeight
 
 open Polynomial
 
-theorem val_coeff_prod_X_sub_C_le {K : Type} [Field K] (w : Valuation K ℝ≥0) {M : ℝ≥0} (hM : 1 ≤ M)
-    (s : Multiset K) (hs : ∀ z ∈ s, w z ≤ M) (j : ℕ) :
-    w ((s.map fun a => X - C a).prod.coeff j) ≤ M ^ Multiset.card s := by
+theorem val_coeff_prod_X_sub_C_le
+    {K : Type} [Field K]
+    (w : Valuation K ℝ≥0)
+    {M : ℝ≥0} (hM : 1 ≤ M)
+    (s : Multiset K) (hs : ∀ z ∈ s, w z ≤ M)
+    (j : ℕ)
+    : w ((s.map fun a => X - C a).prod.coeff j) ≤ M ^ Multiset.card s := by
   induction s using Multiset.induction_on generalizing j with
   | empty =>
     simp only [Multiset.map_zero, Multiset.prod_zero, Multiset.card_zero, pow_zero, coeff_one]
@@ -31,10 +35,11 @@ theorem val_coeff_prod_X_sub_C_le {K : Type} [Field K] (w : Valuation K ℝ≥0)
     · rw [map_mul, pow_succ']
       exact mul_le_mul' ha (ih hs' j)
 
-theorem nnnorm_coeff_minpoly_le (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (x : E) (v : HeightOneSpectrum (𝓞 F)) (j : ℕ) :
-    ‖algebraMap F (v.adicCompletion F) ((minpoly F x).coeff j)‖₊ ≤
-      max 1 (absFin F v ((1 : v.adicCompletion F) ⊗ₜ[F] x)) ^ Module.finrank F E := by
+theorem nnnorm_coeff_minpoly_le
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (x : E) (v : HeightOneSpectrum (𝓞 F)) (j : ℕ)
+    : ‖algebraMap F (v.adicCompletion F) ((minpoly F x).coeff j)‖₊
+      ≤ max 1 (absFin F v ((1 : v.adicCompletion F) ⊗ₜ[F] x)) ^ Module.finrank F E := by
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   set M := max 1 (absFin F v ((1 : v.adicCompletion F) ⊗ₜ[F] x)) with hMdef
   have hM : 1 ≤ M := le_max_left _ _
@@ -49,18 +54,23 @@ theorem nnnorm_coeff_minpoly_le (F E : Type) [Field F] [NumberField F] [Field E]
     have hq0 : q ≠ 0 := hmon.ne_zero
     have hz' : aeval z p = 0 := by
       rw [mem_roots hq0, IsRoot, hqdef, eval_map_algebraMap] at hz; exact hz
-    obtain ⟨τ, hτ⟩ := IntermediateField.exists_algHom_of_splits_of_aeval
-      (fun s => ⟨Algebra.IsIntegral.isIntegral s, IsAlgClosed.splits _⟩) hz'
-    have h1 : finEmb F v τ ((1 : v.adicCompletion F) ⊗ₜ[F] x) = z := by rw [finEmb_tmul, map_one, one_mul, hτ]
+    obtain ⟨τ, hτ⟩ :=
+      IntermediateField.exists_algHom_of_splits_of_aeval
+        (fun s => ⟨Algebra.IsIntegral.isIntegral s, IsAlgClosed.splits _⟩)
+        hz'
+    have h1 : finEmb F v τ ((1 : v.adicCompletion F) ⊗ₜ[F] x) = z := by
+      rw [finEmb_tmul, map_one, one_mul, hτ]
     show absBar F v z ≤ M
-    rw [← h1]; exact (le_absFin F v τ _).trans (le_max_right _ _)
+    rw [← h1]
+    exact (le_absFin F v τ _).trans (le_max_right _ _)
   have hcard : Multiset.card q.roots ≤ Module.finrank F E := by
     rw [IsAlgClosed.card_roots_eq_natDegree, hqdef, natDegree_map]; exact minpoly.natDegree_le x
   have key := val_coeff_prod_X_sub_C_le (valBar F v) hM q.roots hroots j
   rw [← hq] at key
   have hc : valBar F v (q.coeff j) = ‖algebraMap F (v.adicCompletion F) (p.coeff j)‖₊ := by
     show absBar F v _ = _
-    rw [hqdef, coeff_map, IsScalarTower.algebraMap_apply F (v.adicCompletion F) (FvBar F v), absBar_algebraMap]
+    rw [hqdef, coeff_map, IsScalarTower.algebraMap_apply F (v.adicCompletion F) (FvBar F v),
+      absBar_algebraMap]
   rw [← hc]
   exact key.trans (pow_le_pow_right₀ hM hcard)
 

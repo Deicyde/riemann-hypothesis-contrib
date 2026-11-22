@@ -4,25 +4,34 @@ public import Mathlib
 
 @[expose] public section
 
-theorem GlobalTheory.away_congr_of_isCoprime : ∀ (A C : Type) [CommRing A] [CommRing C] [Algebra A C] (f g : A), IsCoprime f g → (∀ c : C, ∃ a : A, c - algebraMap A C a ∈ Ideal.span {algebraMap A C g}) → ∀ c' : Localization.Away (algebraMap A C f), ∃ b : Localization.Away f, c' - Localization.awayMap (algebraMap A C) f b ∈ Ideal.span {Localization.awayMap (algebraMap A C) f (algebraMap A (Localization.Away f) g)} := by
+theorem GlobalTheory.away_congr_of_isCoprime
+    : ∀ (A C : Type) [CommRing A] [CommRing C] [Algebra A C] (f g : A),
+      IsCoprime f g → (∀ c : C, ∃ a : A, c - algebraMap A C a ∈ Ideal.span {algebraMap A C g})
+        → ∀ c' : Localization.Away (algebraMap A C f), ∃ b : Localization.Away f,
+          c' - Localization.awayMap (algebraMap A C) f b ∈ Ideal.span
+            {Localization.awayMap (algebraMap A C) f (algebraMap A (Localization.Away f) g)} := by
   intro A C _ _ _ f g hfg hC c'
   obtain ⟨u, v, huv⟩ := hfg
   obtain ⟨⟨c, s⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers (algebraMap A C f)) c'
   obtain ⟨k, hk⟩ := s.2
   obtain ⟨a, ha⟩ := hC c
   refine ⟨algebraMap A (Localization.Away f) (a * u ^ k), ?_⟩
-  have hmap : ∀ x : A, Localization.awayMap (algebraMap A C) f (algebraMap A (Localization.Away f) x)
-      = algebraMap C (Localization.Away (algebraMap A C f)) (algebraMap A C x) :=
-    fun x => IsLocalization.map_eq _ _
+  have hmap
+      : ∀ x : A,
+        Localization.awayMap (algebraMap A C) f (algebraMap A (Localization.Away f) x)
+          = algebraMap C (Localization.Away (algebraMap A C f)) (algebraMap A C x) := fun x =>
+    IsLocalization.map_eq _ _
   rw [hmap, hmap]
   rw [Ideal.mem_span_singleton] at ha ⊢
   have hunit : IsUnit (algebraMap C (Localization.Away (algebraMap A C f)) (s : C)) :=
     IsLocalization.map_units _ s
   rw [← hunit.dvd_mul_right]
-  have key : (IsLocalization.mk' (Localization.Away (algebraMap A C f)) c s
-      - algebraMap C (Localization.Away (algebraMap A C f)) (algebraMap A C (a * u ^ k)))
-      * algebraMap C (Localization.Away (algebraMap A C f)) (s : C)
-      = algebraMap C (Localization.Away (algebraMap A C f)) (c - algebraMap A C (a * (u * f) ^ k)) := by
+  have key
+      : (IsLocalization.mk' (Localization.Away (algebraMap A C f)) c s
+            - algebraMap C (Localization.Away (algebraMap A C f)) (algebraMap A C (a * u ^ k)))
+          * algebraMap C (Localization.Away (algebraMap A C f)) (s : C)
+        = algebraMap C (Localization.Away (algebraMap A C f))
+          (c - algebraMap A C (a * (u * f) ^ k)) := by
     rw [sub_mul, IsLocalization.mk'_spec, ← hk]
     simp only [map_sub, map_mul, map_pow]
     ring
@@ -34,7 +43,8 @@ theorem GlobalTheory.away_congr_of_isCoprime : ∀ (A C : Type) [CommRing A] [Co
     rw [one_pow] at h3
     exact Dvd.dvd.mul_left (h2.trans h3) a
   have h4 := map_dvd (algebraMap A C) h1
-  have : c - algebraMap A C (a * (u * f) ^ k) = (c - algebraMap A C a) + algebraMap A C (a * (1 - (u * f) ^ k)) := by
+  have : c - algebraMap A C (a * (u * f) ^ k)
+      = (c - algebraMap A C a) + algebraMap A C (a * (1 - (u * f) ^ k)) := by
     simp only [map_sub, map_mul, map_pow, map_one]; ring
   rw [this]
   exact dvd_add ha h4

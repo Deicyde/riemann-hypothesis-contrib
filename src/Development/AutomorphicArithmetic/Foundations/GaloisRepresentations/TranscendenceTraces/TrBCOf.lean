@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.trBC_of :
-    TrChar → FamBC → WtBC → RpBasic → RpOp → TrBC := by
+theorem UpperTheory.Gal.TranscendenceTraces.trBC_of
+    : TrChar → FamBC → WtBC → RpBasic → RpOp → TrBC := by
   intro hChar hFam hWbc hRp hOp q _ n i Z' S' Z S v p' p g _ w hpb hw hq x
   haveI : IsFinite p' := MorphismProperty.of_isPullback (P := @IsFinite) hpb inferInstance
   have hw' : IsWt p' (Wt.comap v w) := hWbc v p' p g w hpb hw

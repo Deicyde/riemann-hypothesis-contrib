@@ -348,10 +348,17 @@ lemma near (L : ℝ) {c T : ℝ} (hc : 0 < c) (hT : 0 < T) :
         linarith
     _ = Real.pi + 2 * (T * |L|) := by ring
 
-theorem truncated_perron_kernel : ∃ C : ℝ, 0 < C ∧ ∀ y c T : ℝ, 0 < y → y ≠ 1 → 0 < c → 1 ≤ T → ‖(1 / (2 * Real.pi) : ℂ) * (∫ t in (-T)..T, (y : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)) - (if 1 < y then 1 else 0)‖ ≤ C * y ^ c * min 1 (1 / (T * |Real.log y|)) := by
+theorem truncated_perron_kernel
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ y c T : ℝ,
+          0 < y → y ≠ 1 → 0 < c → 1 ≤ T
+            → ‖(1 / (2 * Real.pi) : ℂ) * (∫ t in (-T)..T, (y : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)) - (if 1 < y then 1 else 0)‖
+              ≤ C * y ^ c * min 1 (1 / (T * |Real.log y|)) := by
   refine ⟨3, by norm_num, fun y c T hy hy1 hc hT => ?_⟩
-  have hint : (∫ t in (-T)..T, (y : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I))
-      = ∫ t in (-T)..T, cexp ((Real.log y : ℝ) * ((c : ℂ) + t * I)) / ((c : ℂ) + t * I) := by
+  have hint
+      : (∫ t in (-T)..T, (y : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I))
+        = ∫ t in (-T)..T, cexp ((Real.log y : ℝ) * ((c : ℂ) + t * I)) / ((c : ℂ) + t * I) := by
     refine intervalIntegral.integral_congr fun t _ => ?_
     rw [Complex.cpow_def_of_ne_zero (by exact_mod_cast hy.ne'), Complex.ofReal_log hy.le]
   rw [hint, Real.rpow_def_of_pos hy]
@@ -366,8 +373,9 @@ theorem truncated_perron_kernel : ∃ C : ℝ, 0 < C ∧ ∀ y c T : ℝ, 0 < y 
   have hn : ‖(1 / (2 * Real.pi) : ℂ)‖ = 1 / (2 * Real.pi) := by
     rw [show (1 / (2 * Real.pi) : ℂ) = ((1 / (2 * Real.pi) : ℝ) : ℂ) by push_cast; rfl,
       Complex.norm_real, Real.norm_eq_abs, abs_of_pos (by positivity)]
-  have hfar : ‖(1 / (2 * Real.pi) : ℂ) * V - (if 1 < y then 1 else 0)‖
-      ≤ 1 / (2 * Real.pi) * (2 * Real.exp (L * c) / (T * |L|)) := by
+  have hfar
+      : ‖(1 / (2 * Real.pi) : ℂ) * V - (if 1 < y then 1 else 0)‖
+        ≤ 1 / (2 * Real.pi) * (2 * Real.exp (L * c) / (T * |L|)) := by
     split_ifs with h1
     · have hLp : 0 < L := Real.log_pos h1
       have e : (1 / (2 * Real.pi) : ℂ) * V - 1 = (1 / (2 * Real.pi) : ℂ) * (V - 2 * Real.pi) := by
@@ -384,23 +392,27 @@ theorem truncated_perron_kernel : ∃ C : ℝ, 0 < C ∧ ∀ y c T : ℝ, 0 < y 
       exact Real.one_le_exp (mul_nonneg (Real.log_pos h1).le hc.le)
     · rw [norm_zero]
       exact hE.le
-  have hnr : ‖(1 / (2 * Real.pi) : ℂ) * V - (if 1 < y then 1 else 0)‖
-      ≤ 1 / (2 * Real.pi) * (Real.exp (L * c) * (Real.pi + 2 * (T * |L|))) + Real.exp (L * c) := by
+  have hnr
+      : ‖(1 / (2 * Real.pi) : ℂ) * V - (if 1 < y then 1 else 0)‖
+        ≤ 1 / (2 * Real.pi) * (Real.exp (L * c) * (Real.pi + 2 * (T * |L|)))
+          + Real.exp (L * c) := by
     refine (norm_sub_le _ _).trans ?_
     rw [norm_mul, hn]
     exact add_le_add (mul_le_mul_of_nonneg_left (near L hc hT0) (by positivity)) hind
   rcases le_or_gt (T * |L|) 1 with hs | hs
   · rw [min_eq_left (by rw [le_div_iff₀ hTL]; linarith)]
     refine hnr.trans ?_
-    have h2 : 1 / (2 * Real.pi) * (Real.exp (L * c) * (Real.pi + 2 * (T * |L|)))
-        ≤ Real.exp (L * c) * 2 := by
+    have h2
+        : 1 / (2 * Real.pi) * (Real.exp (L * c) * (Real.pi + 2 * (T * |L|)))
+          ≤ Real.exp (L * c) * 2 := by
       rw [div_mul_eq_mul_div, one_mul, div_le_iff₀ (by positivity)]
       nlinarith [mul_le_mul_of_nonneg_left hs hE.le, Real.pi_gt_three]
     linarith
   · rw [min_eq_right (by rw [div_le_iff₀ hTL]; linarith)]
     refine hfar.trans ?_
     rw [show 1 / (2 * Real.pi) * (2 * Real.exp (L * c) / (T * |L|))
-        = 1 / Real.pi * (Real.exp (L * c) / (T * |L|)) by field_simp,
+          = 1 / Real.pi * (Real.exp (L * c) / (T * |L|)) by
+        field_simp,
       show 3 * Real.exp (L * c) * (1 / (T * |L|)) = 3 * (Real.exp (L * c) / (T * |L|)) by ring]
     apply mul_le_mul_of_nonneg_right _ (by positivity)
     rw [div_le_iff₀ hpi]

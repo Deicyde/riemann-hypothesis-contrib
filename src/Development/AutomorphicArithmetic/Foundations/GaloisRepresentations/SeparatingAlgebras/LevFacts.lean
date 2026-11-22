@@ -5,14 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
 open MeasureTheory GroundTheory.Automorphic.Spherical UpperTheory.Gal.Gen
 
 open GlobalTheory.Cong.LevelExt in
-theorem UpperTheory.Gal.Gen.levFacts_pf :
-    UpperTheory.Gal.Gen.LevFacts := by
+theorem UpperTheory.Gal.Gen.levFacts_pf : UpperTheory.Gal.Gen.LevFacts := by
   intro E _ _ _ a w₀ hw K hK J hJo hJc
   obtain ⟨e, he⟩ := GlobalTheory.locU_equiv_GL E a w₀ hw
   let s : GL (Fin a) (w₀.adicCompletion E) → UA E a := fun h => ((e.symm h : locU a w₀) : UA E a)
@@ -29,22 +30,35 @@ theorem UpperTheory.Gal.Gen.levFacts_pf :
   have hnap : ¬ Apart w₀ w₀ := not_apart_self w₀
   have hloc : ∀ k ∈ K, ∀ x, cLoc w₀ (k * x) = cLoc w₀ x := fun k hk x => by
     rw [map_mul, hK.one k hk w₀ hnap, one_mul]
-  have hnorm : ∀ J' : Subgroup (GL (Fin a) (w₀.adicCompletion E)),
-      K ≤ Subgroup.normalizer ((locU a w₀ ⊓ J'.comap (cLoc w₀) : Subgroup (UA E a)) : Set (UA E a)) := by
+  have hnorm
+      : ∀ J' : Subgroup (GL (Fin a) (w₀.adicCompletion E)),
+        K ≤ Subgroup.normalizer
+          ((locU a w₀ ⊓ J'.comap (cLoc w₀) : Subgroup (UA E a)) : Set (UA E a)) := by
     intro J'
-    have hKL : ∀ k ∈ K, ∀ l ∈ locU a w₀ ⊓ J'.comap (cLoc w₀), k * l * k⁻¹ ∈ locU a w₀ ⊓ J'.comap (cLoc w₀) := by
+    have hKL
+        : ∀ k ∈ K, ∀ l ∈ locU a w₀ ⊓ J'.comap (cLoc w₀),
+          k * l * k⁻¹ ∈ locU a w₀ ⊓ J'.comap (cLoc w₀) := by
       rintro k hk l ⟨hl1, hl2⟩
       have hl1' := (mem_locU_iff l).1 hl1
-      refine ⟨(mem_locU_iff _).2 ⟨mul_mem (mul_mem (hK.fin hk) hl1'.1) (inv_mem (hK.fin hk)), fun u hu => ?_⟩, ?_⟩
+      refine ⟨
+        (mem_locU_iff _).2
+          ⟨mul_mem (mul_mem (hK.fin hk) hl1'.1) (inv_mem (hK.fin hk)), fun u hu => ?_⟩,
+        ?_
+      ⟩
       · simp only [map_mul, map_inv, hl1'.2 u hu, mul_one, mul_inv_cancel]
       · show cLoc w₀ (k * l * k⁻¹) ∈ J'
         simp only [map_mul, map_inv, hK.one k hk w₀ hnap, one_mul, inv_one, mul_one]
         exact hl2
-    exact fun k hk => Subgroup.mem_normalizer_iff.2 fun l => ⟨fun hl => hKL k hk l hl, fun hl => by
-      have := hKL k⁻¹ (inv_mem hk) _ hl
-      simpa [mul_assoc] using this⟩
-  have hmem : ∀ (J' : Subgroup (GL (Fin a) (w₀.adicCompletion E))) (c : UA E a),
-      c ∈ lev K w₀ J' ↔ ∃ k ∈ K, ∃ x ∈ locU a w₀, cLoc w₀ x ∈ J' ∧ c = k * x := by
+    exact fun k hk =>
+      Subgroup.mem_normalizer_iff.2 fun l => ⟨
+        fun hl => hKL k hk l hl,
+        fun hl => by
+          have := hKL k⁻¹ (inv_mem hk) _ hl
+          simpa [mul_assoc] using this
+      ⟩
+  have hmem
+      : ∀ (J' : Subgroup (GL (Fin a) (w₀.adicCompletion E))) (c : UA E a),
+        c ∈ lev K w₀ J' ↔ ∃ k ∈ K, ∃ x ∈ locU a w₀, cLoc w₀ x ∈ J' ∧ c = k * x := by
     intro J' c
     show c ∈ K ⊔ (locU a w₀ ⊓ J'.comap (cLoc w₀)) ↔ _
     rw [← SetLike.mem_coe, Subgroup.coe_mul_of_left_le_normalizer_right K _ (hnorm J'), Set.mem_mul]
@@ -58,7 +72,8 @@ theorem UpperTheory.Gal.Gen.levFacts_pf :
     obtain ⟨k, hk, x, -, hxJ, rfl⟩ := (hmem J c).1 hc
     rwa [hloc k hk]
   have hLc : IsCompact ((locU a w₀ ⊓ J.comap (cLoc w₀) : Subgroup (UA E a)) : Set (UA E a)) := by
-    have : ((locU a w₀ ⊓ J.comap (cLoc w₀) : Subgroup (UA E a)) : Set (UA E a)) = s '' (J : Set _) := by
+    have : ((locU a w₀ ⊓ J.comap (cLoc w₀) : Subgroup (UA E a)) : Set (UA E a))
+        = s '' (J : Set _) := by
       ext x
       constructor
       · rintro ⟨hx1, hx2⟩
@@ -70,8 +85,14 @@ theorem UpperTheory.Gal.Gen.levFacts_pf :
         exact hh
     rw [this]
     exact hJc.image hs_cont
-  refine ⟨⟨sup_le hK.fin (fun x hx => ((mem_locU_iff x).1 (Subgroup.mem_inf.1 hx).1).1), ?_, ?_⟩, hmem J, hJmem,
-    ?_, fun y => ⟨s y, hs_mem y, hs_loc y⟩, ?_⟩
+  refine ⟨
+    ⟨sup_le hK.fin (fun x hx => ((mem_locU_iff x).1 (Subgroup.mem_inf.1 hx).1).1), ?_, ?_⟩,
+    hmem J,
+    hJmem,
+    ?_,
+    fun y => ⟨s y, hs_mem y, hs_loc y⟩,
+    ?_
+  ⟩
   · show IsCompact ((K ⊔ (locU a w₀ ⊓ J.comap (cLoc w₀)) : Subgroup (UA E a)) : Set (UA E a))
     rw [Subgroup.coe_mul_of_left_le_normalizer_right K _ (hnorm J)]
     exact hK.compact.mul hLc
@@ -81,7 +102,12 @@ theorem UpperTheory.Gal.Gen.levFacts_pf :
     have hs1 : s 1 = 1 := by
       have := hs_eq 1 (one_mem _)
       rwa [map_one] at this
-    refine ⟨k ⁻¹' N₀ ∩ cLoc w₀ ⁻¹' (J : Set _), (hN₀o.preimage hkc).inter (hJo.preimage hcont), ⟨?_, ?_⟩, ?_⟩
+    refine ⟨
+      k ⁻¹' N₀ ∩ cLoc w₀ ⁻¹' (J : Set _),
+      (hN₀o.preimage hkc).inter (hJo.preimage hcont),
+      ⟨?_, ?_⟩,
+      ?_
+    ⟩
     · show k 1 ∈ N₀
       have : k 1 = 1 := by simp [k, hs1]
       rw [this]

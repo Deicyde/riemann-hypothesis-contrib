@@ -12,7 +12,8 @@ noncomputable section
 
 namespace PI.UnitaryCorollaryDerivatives
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.U Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -21,8 +22,9 @@ section pb
 variable {k r : ℕ}
 
 def PG (e : ℝ) (f : B.Mat k r → ℂ) : Prop :=
-  ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) f ∧ ∀ n : ℕ, ∃ C : ℝ, ∀ w : List (Bool × B.Mat k r),
-    (∀ x ∈ w, B.unitLie k r x.2) → w.length ≤ n → ∀ g ∈ B.GV k r, ‖Dw w f g‖ ≤ C * B.gN g ^ e
+  ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) f
+    ∧ ∀ n : ℕ, ∃ C : ℝ, ∀ w : List (Bool × B.Mat k r),
+      (∀ x ∈ w, B.unitLie k r x.2) → w.length ≤ n → ∀ g ∈ B.GV k r, ‖Dw w f g‖ ≤ C * B.gN g ^ e
 
 lemma pb_ck {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {f : B.Mat k r → E} (hf : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) f) (m : ℕ∞) :
     B.CkOn m (B.GV k r) f := by
@@ -44,8 +46,8 @@ lemma pb_mono {e e' : ℝ} {f : B.Mat k r → ℂ} (h : PG e f) (he : e ≤ e') 
   exact ⟨C, fun w hw hl g hg => (hC w hw hl g hg).trans
     (mul_le_mul_of_nonneg_left (Real.rpow_le_rpow_of_exponent_le (gN_ge_one hg) he) hC0)⟩
 
-private theorem Dw_const_zero (w : List (Bool × B.Mat k r)) :
-    Dw w (fun _ : B.Mat k r => (0 : ℂ)) = fun _ => 0 := by
+private theorem Dw_const_zero (w : List (Bool × B.Mat k r))
+    : Dw w (fun _ : B.Mat k r => (0 : ℂ)) = fun _ => 0 := by
   induction w with
   | nil => rfl
   | cons x w ih =>

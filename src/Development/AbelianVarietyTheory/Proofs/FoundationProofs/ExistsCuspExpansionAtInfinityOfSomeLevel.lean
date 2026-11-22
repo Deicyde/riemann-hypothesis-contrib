@@ -18,8 +18,9 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem exists_isExp : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (f : ℍ → ℂ), InR ε.range f →
-    ∃ h : HahnSeries ℚ Ω, IsExp ε f h := by
+theorem exists_isExp
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (f : ℍ → ℂ),
+      InR ε.range f → ∃ h : HahnSeries ℚ Ω, IsExp ε f h := by
   intro Ω _ ε f hf
   obtain ⟨N, w, hN, -, hq⟩ := hf
   obtain ⟨a, ha, hmem⟩ := hq 1
@@ -30,7 +31,8 @@ theorem exists_isExp : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (f : ℍ �
     simp only [one_smul] at this
     simpa only [hb] using this
   obtain ⟨hg', hexg, -, -⟩ := GlobalTheory.T.exists_hahnSeries_isExp_of_hasQ Ω ε N _ b hN hg
-  obtain ⟨hD, hexD, hD0, -, -⟩ := GlobalTheory.T.exists_cuspExpansion_discriminant_integer_leading_one Ω ε
+  obtain ⟨hD, hexD, hD0, -, -⟩ :=
+    GlobalTheory.T.exists_cuspExpansion_discriminant_integer_leading_one Ω ε
   obtain ⟨hring, -, hconst, -, hinv⟩ := GlobalTheory.T.isCuspExpansionAtInfinity_properties Ω ε
   have hDi := hinv DD hD hD0 hexD
   have hpow : ∀ k : ℕ, IsExp ε (DD⁻¹ ^ k) (hD⁻¹ ^ k) := by
@@ -41,8 +43,7 @@ theorem exists_isExp : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (f : ℍ �
       simp only [map_one, HahnSeries.C_one] at this
       rw [pow_zero, pow_zero]
       exact this
-    | succ k ih =>
-      simpa [pow_succ] using (hring _ _ _ _ ih hDi).2.2
+    | succ k ih => simpa [pow_succ] using (hring _ _ _ _ ih hDi).2.2
   have hprod := (hring _ _ _ _ hexg (hpow w)).2.2
   refine ⟨hg' * hD⁻¹ ^ w, ?_⟩
   convert hprod using 1

@@ -10,7 +10,13 @@ open PowerSeries GlobalTheory.BK
 
 namespace GlobalTheory.BK
 
-theorem phi_mem_MMl_of_mem_Y : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H), ∀ y ∈ D.Y, D.phi y ∈ D.MMl := by
+theorem phi_mem_MMl_of_mem_Y
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
+        [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime]
+        [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (η H : ℕ)
+        (D : BKDat O K l e a ι η H),
+      ∀ y ∈ D.Y,
+        D.phi y ∈ D.MMl := by
   intro O K _ _ _ _ _ l e a ι _ _ _ _ _ _ _ η H D y hy
   have hl : (l : K) ≠ 0 := by
     rw [← map_natCast (algebraMap ℚ_[l] K)]
@@ -24,7 +30,8 @@ theorem phi_mem_MMl_of_mem_Y : ∀ (O K : Type) [CommRing O] [NormedField K] [Is
     have : ((l : S O K e) : K⟦X⟧) ^ η * C ((l : K)⁻¹ ^ η) = 1 := by
       rw [show ((l : S O K e) : K⟦X⟧) = C (l : K) by simp, ← map_pow, ← map_mul, ← mul_pow,
         mul_inv_cancel₀ hl, one_pow, map_one]
-    rw [this]; exact one_mem _
+    rw [this]
+    exact one_mem _
   have h2 := D.MMl.smul_mem ⟨_, hc⟩ h1
   convert h2 using 1
   rw [Subalgebra.smul_def]

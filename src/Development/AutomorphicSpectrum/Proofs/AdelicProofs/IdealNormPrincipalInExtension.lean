@@ -11,14 +11,18 @@ open scoped nonZeroDivisors
 
 namespace GlobalTheory.CompanionTheory.Lines
 
-theorem ideal_eq_of_pow_eq {R : Type} [CommRing R] [IsDedekindDomain R] {a b : Ideal R} {h : ℕ}
-    (hh : h ≠ 0) (ha : a ≠ ⊥) (hb : b ≠ ⊥) (hab : a ^ h = b ^ h) : a = b := by
+theorem ideal_eq_of_pow_eq
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    {a b : Ideal R} {h : ℕ} (hh : h ≠ 0) (ha : a ≠ ⊥) (hb : b ≠ ⊥) (hab : a ^ h = b ^ h)
+    : a = b := by
   classical
   have h1 := congrArg UniqueFactorizationMonoid.normalizedFactors hab
   rw [UniqueFactorizationMonoid.normalizedFactors_pow,
-    UniqueFactorizationMonoid.normalizedFactors_pow] at h1
-  have h2 : UniqueFactorizationMonoid.normalizedFactors a
-      = UniqueFactorizationMonoid.normalizedFactors b := by
+      UniqueFactorizationMonoid.normalizedFactors_pow]
+    at h1
+  have h2
+      : UniqueFactorizationMonoid.normalizedFactors a
+        = UniqueFactorizationMonoid.normalizedFactors b := by
     ext p
     have h3 := congrArg (Multiset.count p) h1
     rw [Multiset.count_nsmul, Multiset.count_nsmul] at h3
@@ -26,11 +30,15 @@ theorem ideal_eq_of_pow_eq {R : Type} [CommRing R] [IsDedekindDomain R] {a b : I
   exact associated_iff_eq.mp
     ((UniqueFactorizationMonoid.associated_iff_normalizedFactors_eq_normalizedFactors ha hb).mpr h2)
 
-theorem principal_of_root (K K' : Type) [Field K] [NumberField K] [Field K'] [NumberField K']
-    [Algebra K K'] (I : Ideal (𝓞 K)) (hI : I ≠ ⊥) (h : ℕ) (hh : h ≠ 0) (c : 𝓞 K)
-    (hc : I ^ h = Ideal.span {c}) (z : K') (hz : z ^ h = algebraMap K K' (c : K)) :
-    ∃ y : 𝓞 K', y ≠ 0 ∧ y ∈ I.map (algebraMap (𝓞 K) (𝓞 K')) ∧
-      |((Algebra.norm ℚ (y : K') : ℚ) : ℝ)| = (I.absNorm : ℝ) ^ Module.finrank K K' := by
+theorem principal_of_root
+    (K K' : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] [Algebra K K']
+    (I : Ideal (𝓞 K)) (hI : I ≠ ⊥)
+    (h : ℕ) (hh : h ≠ 0)
+    (c : 𝓞 K) (hc : I ^ h = Ideal.span {c})
+    (z : K') (hz : z ^ h = algebraMap K K' (c : K))
+    : ∃ y : 𝓞 K',
+      y ≠ 0 ∧ y ∈ I.map (algebraMap (𝓞 K) (𝓞 K'))
+        ∧ |((Algebra.norm ℚ (y : K') : ℚ) : ℝ)| = (I.absNorm : ℝ) ^ Module.finrank K K' := by
   have hc0 : c ≠ 0 := by
     rintro rfl
     rw [Ideal.span_singleton_zero] at hc
@@ -68,16 +76,17 @@ theorem principal_of_root (K K' : Type) [Field K] [NumberField K] [Field K'] [Nu
     simp
   have hN : Algebra.norm ℚ (z ^ h) = (Algebra.norm ℚ (c : K)) ^ Module.finrank K K' := by
     rw [hz, ← Algebra.norm_norm (R := ℚ) (S := K) (A := K'), Algebra.norm_algebraMap, map_pow]
-  have hpow : |((Algebra.norm ℚ z : ℚ) : ℝ)| ^ h
-      = ((I.absNorm : ℝ) ^ Module.finrank K K') ^ h := by
+  have hpow : |((Algebra.norm ℚ z : ℚ) : ℝ)| ^ h = ((I.absNorm : ℝ) ^ Module.finrank K K') ^ h := by
     rw [← abs_pow, ← Rat.cast_pow, ← map_pow, hN, Rat.cast_pow, abs_pow, hnc, ← pow_mul, ← pow_mul,
       mul_comm]
   exact (pow_left_inj₀ (abs_nonneg _) (by positivity) hh).mp hpow
 
-theorem exists_principal_extension : ∀ (K : Type) [Field K] [NumberField K] (I : Ideal (𝓞 K)),
-    I ≠ ⊥ → ∃ (K' : Type) (_ : Field K') (_ : NumberField K') (_ : Algebra K K') (y : 𝓞 K'),
-      y ≠ 0 ∧ y ∈ I.map (algebraMap (𝓞 K) (𝓞 K')) ∧
-        |((Algebra.norm ℚ (y : K') : ℚ) : ℝ)| = (I.absNorm : ℝ) ^ Module.finrank K K' := by
+theorem exists_principal_extension
+    : ∀ (K : Type) [Field K] [NumberField K] (I : Ideal (𝓞 K)),
+      I ≠ ⊥
+        → ∃ (K' : Type) (_ : Field K') (_ : NumberField K') (_ : Algebra K K') (y : 𝓞 K'),
+          y ≠ 0 ∧ y ∈ I.map (algebraMap (𝓞 K) (𝓞 K'))
+            ∧ |((Algebra.norm ℚ (y : K') : ℚ) : ℝ)| = (I.absNorm : ℝ) ^ Module.finrank K K' := by
   intro K _ _ I hI
   obtain ⟨h, c, hh, hc⟩ := GlobalTheory.UnRep.exists_pow_eq_span_singleton K I hI
   let p : Polynomial K := Polynomial.X ^ h - Polynomial.C (c : K)
@@ -86,10 +95,9 @@ theorem exists_principal_extension : ∀ (K : Type) [Field K] [NumberField K] (I
     exact_mod_cast hh
   haveI : FiniteDimensional ℚ p.SplittingField := FiniteDimensional.trans ℚ K p.SplittingField
   haveI : NumberField p.SplittingField := NumberField.mk
-  obtain ⟨z, hz⟩ := (Polynomial.SplittingField.splits p).exists_eval_eq_zero
-    (by rwa [Polynomial.degree_map])
-  have hz' : z ^ h = algebraMap K p.SplittingField (c : K) := by
-    simpa [p, sub_eq_zero] using hz
+  obtain ⟨z, hz⟩ :=
+    (Polynomial.SplittingField.splits p).exists_eval_eq_zero (by rwa [Polynomial.degree_map])
+  have hz' : z ^ h = algebraMap K p.SplittingField (c : K) := by simpa [p, sub_eq_zero] using hz
   obtain ⟨y, h1, h2, h3⟩ := principal_of_root K p.SplittingField I hI h hh c hc z hz'
   exact ⟨p.SplittingField, inferInstance, inferInstance, inferInstance, y, h1, h2, h3⟩
 

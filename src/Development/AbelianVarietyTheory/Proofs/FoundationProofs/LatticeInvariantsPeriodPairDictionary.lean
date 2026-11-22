@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.Lattice
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 noncomputable section
@@ -192,15 +194,29 @@ lemma exists_periodPair_of_invariants {a b : ℂ} (h : a ^ 3 - 27 * b ^ 2 ≠ 0)
   · rw [H.g₂_eq, h2, show c ^ 4 = (c ^ 2) ^ 2 by ring, hc]; simp
   · rw [H.g₃_eq, h3, show c ^ 6 = (c ^ 2) ^ 3 by ring, hc]; simp
 
-theorem invariants_dictionary : ∀ (L : PeriodPair) (Λ : AddSubgroup ℂ), (∀ z, z ∈ Λ ↔ z ∈ L.lattice) → g2 Λ = L.g₂ ∧ g3 Λ = L.g₃ ∧ TaylorLogMetric.discr Λ ≠ 0 ∧ area Λ = |(L.ω₁ * starRingEnd ℂ L.ω₂).im| ∧ (∀ z, z ∉ Λ → wpF Λ z = L.weierstrassP z ∧ wpD Λ z = L.derivWeierstrassP z) ∧ (∀ (Λ' : AddSubgroup ℂ), g2 Λ' = g2 Λ → g3 Λ' = g3 Λ → Λ' = Λ) ∧ ∀ a b : ℂ, a ^ 3 - 27 * b ^ 2 ≠ 0 → ∃ (L' : PeriodPair), L'.g₂ = a ∧ L'.g₃ = b := by
+theorem invariants_dictionary
+    : ∀ (L : PeriodPair) (Λ : AddSubgroup ℂ),
+      (∀ z, z ∈ Λ ↔ z ∈ L.lattice)
+        → g2 Λ = L.g₂ ∧ g3 Λ = L.g₃ ∧ TaylorLogMetric.discr Λ ≠ 0
+          ∧ area Λ = |(L.ω₁ * starRingEnd ℂ L.ω₂).im|
+          ∧ (∀ z, z ∉ Λ → wpF Λ z = L.weierstrassP z ∧ wpD Λ z = L.derivWeierstrassP z)
+          ∧ (∀ (Λ' : AddSubgroup ℂ), g2 Λ' = g2 Λ → g3 Λ' = g3 Λ → Λ' = Λ)
+          ∧ ∀ a b : ℂ, a ^ 3 - 27 * b ^ 2 ≠ 0 → ∃ (L' : PeriodPair), L'.g₂ = a ∧ L'.g₃ = b := by
   intro L Λ h
   have hΔ : TaylorLogMetric.discr Λ ≠ 0 := by
     rw [TaylorLogMetric.discr, g2_eq h, lattice_invariant_g3_eq h]
     exact g₂_cube_sub_g₃_sq_ne_zero L
-  refine ⟨g2_eq h, lattice_invariant_g3_eq h, hΔ, area_eq h, fun z _ ↦ ⟨wpF_eq h z, wpD_eq h z⟩,
-    fun Λ' h2 h3 ↦ ?_, fun a b ↦ exists_periodPair_of_invariants⟩
-  obtain ⟨L', h'⟩ := exists_periodPair_of_discr_ne_zero (Λ := Λ')
-    (by rwa [TaylorLogMetric.discr, h2, h3])
+  refine ⟨
+    g2_eq h,
+    lattice_invariant_g3_eq h,
+    hΔ,
+    area_eq h,
+    fun z _ ↦ ⟨wpF_eq h z, wpD_eq h z⟩,
+    fun Λ' h2 h3 ↦ ?_,
+    fun a b ↦ exists_periodPair_of_invariants
+  ⟩
+  obtain ⟨L', h'⟩ :=
+    exists_periodPair_of_discr_ne_zero (Λ := Λ') (by rwa [TaylorLogMetric.discr, h2, h3])
   rw [g2_eq h, g2_eq h'] at h2
   rw [lattice_invariant_g3_eq h, lattice_invariant_g3_eq h'] at h3
   ext z

@@ -12,14 +12,15 @@ noncomputable section
 namespace Formalism.REAL
 
 section KT2Gen
-variable {V : Type*} [AddCommGroup V] [Module ℂ V] {n : ℕ} {ε : Fin n → Bool}
-  {F : Fin n → Fin n → Module.End ℂ V}
+variable
+  {V : Type*} [AddCommGroup V] [Module ℂ V]
+  {n : ℕ} {ε : Fin n → Bool} {F : Fin n → Fin n → Module.End ℂ V}
 
-theorem mem_compactSpan (x : V) : x ∈ kSpan ε F x := by
-  exact Submodule.mem_sInf.2 fun S hS => hS.1
+theorem mem_compactSpan (x : V) : x ∈ kSpan ε F x := by exact Submodule.mem_sInf.2 fun S hS => hS.1
 
-theorem compactSpan_le {x : V} {S : Submodule ℂ V} (hx : x ∈ S) (hS : KStable ε F S) :
-    kSpan ε F x ≤ S := sInf_le ⟨hx, hS⟩
+theorem compactSpan_le {x : V} {S : Submodule ℂ V} (hx : x ∈ S) (hS : KStable ε F S)
+    : kSpan ε F x ≤ S :=
+  sInf_le ⟨hx, hS⟩
 
 theorem isCompactInvariant_compactSpan (x : V) : KStable ε F (kSpan ε F x) := by
   intro a b hab y hy
@@ -27,9 +28,9 @@ theorem isCompactInvariant_compactSpan (x : V) : KStable ε F (kSpan ε F x) := 
   intro S hS
   exact hS.2 a b hab y (hy S hS)
 
-theorem isWeightVector_apply (hrel : KRel ε F) {ν : Fin n → ℝ} {v : V}
-    (hv : IsWeight F ν v) (a b : Fin n) (hab : ε a = ε b) :
-    IsWeight F (ν + root a b) (F a b v) := by
+theorem isWeightVector_apply
+    (hrel : KRel ε F) {ν : Fin n → ℝ} {v : V} (hv : IsWeight F ν v) (a b : Fin n) (hab : ε a = ε b)
+    : IsWeight F (ν + root a b) (F a b v) := by
   intro c
   have h := congrArg (fun T : Module.End ℂ V => T v) (hrel c c a b rfl hab)
   have e1 : (if c = a then F c b else 0) v = (if c = a then (1 : ℂ) else 0) • F a b v := by
@@ -51,9 +52,13 @@ theorem isWeightVector_apply (hrel : KRel ε F) {ν : Fin n → ℝ} {v : V}
 
 end KT2Gen
 
-theorem eigenvalue_real {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n : ℕ}
-    {ε : Fin n → Bool} {F : Fin n → Fin n → Module.End ℂ V} (hunit : KUnit ε F)
-    {v : V} (hv : v ≠ 0) (a : Fin n) {c : ℂ} (hc : F a a v = c • v) : ((c.re : ℝ) : ℂ) = c := by
+theorem eigenvalue_real
+    {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n : ℕ} {ε : Fin n → Bool} {F : Fin n → Fin n → Module.End ℂ V} (hunit : KUnit ε F)
+    {v : V} (hv : v ≠ 0)
+    (a : Fin n)
+    {c : ℂ} (hc : F a a v = c • v)
+    : ((c.re : ℝ) : ℂ) = c := by
   have h := hunit a a rfl v v
   rw [hc, inner_smul_left, inner_smul_right] at h
   have hvv : ⟪v, v⟫_ℂ ≠ 0 := inner_self_ne_zero.2 hv
@@ -89,9 +94,9 @@ theorem kIrr_of (he : KHiExist) (hu : KHiUniq) : KIrr := by
       rwa [hc, smul_smul, inv_mul_cancel₀ hc0, one_smul] at h1
     exact le_antisymm hS (compactSpan_le hxS hSst)
 
-theorem weighted_sum_rootVector_shift {n : ℕ} (ν : Fin n → ℝ) (a b : Fin n) :
-    (∑ i : Fin n, -((i : ℕ) : ℝ) * (ν + root a b) i) =
-      (∑ i : Fin n, -((i : ℕ) : ℝ) * ν i) + (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) := by
+theorem weighted_sum_rootVector_shift {n : ℕ} (ν : Fin n → ℝ) (a b : Fin n)
+    : (∑ i : Fin n, -((i : ℕ) : ℝ) * (ν + root a b) i)
+      = (∑ i : Fin n, -((i : ℕ) : ℝ) * ν i) + (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) := by
   simp only [root, Pi.add_apply, Pi.sub_apply, mul_add, mul_sub, Finset.sum_add_distrib,
     Finset.sum_sub_distrib, Pi.single_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
     Finset.mem_univ, if_true]
@@ -107,8 +112,10 @@ theorem highestWeightExists_holds : KHiExist := by
     · subst hab
       rfl
     · simpa [hab, Ne.symm hab, sub_eq_zero] using h
-  have main : ∀ s : Finset (Fin n), ∃ W : Submodule ℂ V, W ≤ S ∧ W ≠ ⊥ ∧
-      (∀ a, ∀ w ∈ W, F a a w ∈ W) ∧ ∃ lam : Fin n → ℂ, ∀ a ∈ s, ∀ w ∈ W, F a a w = lam a • w := by
+  have main
+      : ∀ s : Finset (Fin n), ∃ W : Submodule ℂ V,
+        W ≤ S ∧ W ≠ ⊥ ∧ (∀ a, ∀ w ∈ W, F a a w ∈ W)
+          ∧ ∃ lam : Fin n → ℂ, ∀ a ∈ s, ∀ w ∈ W, F a a w = lam a • w := by
     intro s
     induction s using Finset.induction_on with
     | empty => exact ⟨S, le_rfl, hne, fun a w hw => hst a a rfl w hw, 0, by simp⟩
@@ -120,12 +127,19 @@ theorem highestWeightExists_holds : KHiExist := by
       obtain ⟨⟨v, hvW⟩, hv⟩ := hc.exists_hasEigenvector
       have hker : ∀ y, y ∈ LinearMap.ker (F a a - c • 1) ↔ F a a y = c • y := by
         intro y
-        simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
-          sub_eq_zero]
+        simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply,
+          Module.End.one_apply, sub_eq_zero]
       have hvker : F a a v = c • v := by
         have h1 := congrArg Subtype.val hv.apply_eq_smul
         simpa using h1
-      refine ⟨W ⊓ LinearMap.ker (F a a - c • 1), inf_le_left.trans hWS, ?_, ?_, Function.update lam a c, ?_⟩
+      refine ⟨
+        W ⊓ LinearMap.ker (F a a - c • 1),
+        inf_le_left.trans hWS,
+        ?_,
+        ?_,
+        Function.update lam a c,
+        ?_
+      ⟩
       · intro h
         have hvmem : v ∈ W ⊓ LinearMap.ker (F a a - c • 1) := ⟨hvW, (hker v).2 hvker⟩
         rw [h] at hvmem
@@ -149,9 +163,11 @@ theorem highestWeightExists_holds : KHiExist := by
     exact hlam a (Finset.mem_univ a) v0 hv0W
   have hstab : ∀ a, ∀ y ∈ S, F a a y ∈ S := fun a => hst a a rfl
   have hfinW : {ν : Fin n → ℝ | ∃ v ∈ S, v ≠ 0 ∧ IsWeight F ν v}.Finite := by
-    refine (Set.Finite.pi (t := fun a => {r : ℝ | Module.End.HasEigenvalue ((F a a).restrict (hstab a)) (r : ℂ)})
+    refine (Set.Finite.pi
+      (t := fun a => {r : ℝ | Module.End.HasEigenvalue ((F a a).restrict (hstab a)) (r : ℂ)})
       (fun a => ?_)).subset ?_
-    · exact (Module.End.finite_hasEigenvalue _).preimage (fun _ _ _ _ h => Complex.ofReal_injective h)
+    · exact (Module.End.finite_hasEigenvalue _).preimage
+        (fun _ _ _ _ h => Complex.ofReal_injective h)
     · rintro ν ⟨v, hvS, hv0, hvw⟩
       simp only [Set.mem_pi, Set.mem_univ, true_implies, Set.mem_setOf_eq]
       intro a
@@ -163,8 +179,10 @@ theorem highestWeightExists_holds : KHiExist := by
       · intro h
         apply hv0
         simpa using congrArg Subtype.val h
-  obtain ⟨ν, ⟨v, hvS, hv0, hvw⟩, hmax⟩ := Set.exists_max_image _
-    (fun ν : Fin n → ℝ => ∑ i : Fin n, -((i : ℕ) : ℝ) * ν i) hfinW ⟨_, v0, hWS hv0W, hv00, hw0⟩
+  obtain ⟨ν, ⟨v, hvS, hv0, hvw⟩, hmax⟩ :=
+    Set.exists_max_image _
+      (fun ν : Fin n → ℝ => ∑ i : Fin n, -((i : ℕ) : ℝ) * ν i)
+      hfinW ⟨_, v0, hWS hv0W, hv00, hw0⟩
   refine ⟨v, hvS, hv0, ν, hvw, fun a b hab hεab => ?_⟩
   by_contra hne'
   have hmem : ν + root a b ∈ {ν : Fin n → ℝ | ∃ v ∈ S, v ≠ 0 ∧ IsWeight F ν v} :=

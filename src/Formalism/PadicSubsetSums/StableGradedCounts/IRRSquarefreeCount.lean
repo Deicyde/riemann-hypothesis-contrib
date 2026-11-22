@@ -9,25 +9,25 @@ open scoped Classical
 
 namespace Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
 
-
 open Classical in
-theorem card_mult_le {K : Type} [Field K] [Fintype K] (N j : ℕ) (P : K[X]) (hP : P.Monic)
-    (hj : P.natDegree = j) :
-    ((Finset.univ : Finset (Fin N → K)).filter (fun c => P * P ∣ monicOf c)).card
+theorem card_mult_le
+    {K : Type} [Field K] [Fintype K] (N j : ℕ) (P : K[X]) (hP : P.Monic) (hj : P.natDegree = j)
+    : ((Finset.univ : Finset (Fin N → K)).filter (fun c => P * P ∣ monicOf c)).card
       ≤ Fintype.card K ^ (N - 2 * j) := by
   have hPP : (P * P).Monic := hP.mul hP
   have hcard : Fintype.card (Fin (N - 2 * j) → K) = Fintype.card K ^ (N - 2 * j) := by simp
   rw [← hcard, ← Finset.card_univ]
-  apply Finset.card_le_card_of_injOn
-    (fun c => fun i : Fin (N - 2 * j) => ((monicOf c) /ₘ (P * P)).coeff i)
+  apply Finset.card_le_card_of_injOn (fun c => fun i : Fin (N - 2 * j) =>
+    ((monicOf c) /ₘ (P * P)).coeff i)
   · intro c _; exact Finset.mem_coe.mpr (Finset.mem_univ _)
-  · have key : ∀ c : Fin N → K, P * P ∣ monicOf c →
-        ((monicOf c) /ₘ (P * P)).Monic ∧ ((monicOf c) /ₘ (P * P)).natDegree = N - 2 * j ∧
-        monicOf c = P * P * ((monicOf c) /ₘ (P * P)) := by
+  · have key
+        : ∀ c : Fin N → K,
+          P * P ∣ monicOf c
+            → ((monicOf c) /ₘ (P * P)).Monic ∧ ((monicOf c) /ₘ (P * P)).natDegree = N - 2 * j
+              ∧ monicOf c = P * P * ((monicOf c) /ₘ (P * P)) := by
       intro c hc
       obtain ⟨g, hg⟩ := hc
-      have hdiv : (monicOf c) /ₘ (P * P) = g := by
-        rw [hg]; exact mul_divByMonic_cancel_left g hPP
+      have hdiv : (monicOf c) /ₘ (P * P) = g := by rw [hg]; exact mul_divByMonic_cancel_left g hPP
       have hgm : g.Monic := hPP.of_mul_monic_left (hg ▸ monicOf_monic c)
       have hdeg : (monicOf c).natDegree = (P * P).natDegree + g.natDegree := by
         rw [hg]; exact hPP.natDegree_mul hgm
@@ -41,10 +41,12 @@ theorem card_mult_le {K : Type} [Field K] [Fintype K] (N j : ℕ) (P : K[X]) (hP
     rw [h3, h3', ← monicOf_coeffs h1 h2, ← monicOf_coeffs h1' h2']
     exact congrArg (fun v => P * P * monicOf v) h
 
-theorem geom_tail (q N m : ℕ) (hq : 2 ≤ q) (hN : 2 ≤ N) (hm : m ≤ N) :
-    ∑ j ∈ Finset.Icc 2 m, q ^ (N - j) ≤ 2 * q ^ (N - 2) := by
-  have key : ∀ m, 1 ≤ m → m ≤ N →
-      (∑ j ∈ Finset.Icc 2 m, q ^ (N - j)) * (q - 1) + q ^ (N - m) = q ^ (N - 1) := by
+theorem geom_tail (q N m : ℕ) (hq : 2 ≤ q) (hN : 2 ≤ N) (hm : m ≤ N)
+    : ∑ j ∈ Finset.Icc 2 m, q ^ (N - j) ≤ 2 * q ^ (N - 2) := by
+  have key
+      : ∀ m,
+        1 ≤ m → m ≤ N
+          → (∑ j ∈ Finset.Icc 2 m, q ^ (N - j)) * (q - 1) + q ^ (N - m) = q ^ (N - 1) := by
     intro m
     induction m with
     | zero => intro h; omega
@@ -62,8 +64,7 @@ theorem geom_tail (q N m : ℕ) (hq : 2 ≤ q) (hN : 2 ≤ N) (hm : m ≤ N) :
         exact ih hm (by omega)
   by_cases hm1 : 1 ≤ m
   · have h := key m hm1 hm
-    have hN1 : q ^ (N - 1) = q ^ (N - 2) * q := by
-      rw [← pow_succ]; congr 1; omega
+    have hN1 : q ^ (N - 1) = q ^ (N - 2) * q := by rw [← pow_succ]; congr 1; omega
     obtain ⟨p, hp⟩ : ∃ p, q = p + 2 := ⟨q - 2, by omega⟩
     subst hp
     have hq1 : p + 2 - 1 = p + 1 := by omega
@@ -116,10 +117,12 @@ theorem squarefree_count : SquarefreeCount := by
   set I : ℕ → ℕ := fun j => ((Finset.univ : Finset (Fin j → K)).filter
       (fun p => Irreducible (monicOf p) ∧ (monicOf p).coeff 0 ≠ 0)).card with hI
   have hBS : BadS.card ≤ ∑ j ∈ Finset.Icc 1 (N / 2), I j * q ^ (N - 2 * j) := by
-    have hsub : BadS ⊆ (Finset.Icc 1 (N / 2)).biUnion (fun j =>
-        ((Finset.univ : Finset (Fin j → K)).filter
-          (fun p => Irreducible (monicOf p) ∧ (monicOf p).coeff 0 ≠ 0)).biUnion (fun p =>
-            Ω.filter (fun c => monicOf p * monicOf p ∣ monicOf c))) := by
+    have hsub
+        : BadS
+          ⊆ (Finset.Icc 1 (N / 2)).biUnion (fun j =>
+            ((Finset.univ : Finset (Fin j → K)).filter
+                (fun p => Irreducible (monicOf p) ∧ (monicOf p).coeff 0 ≠ 0)).biUnion
+              (fun p => Ω.filter (fun c => monicOf p * monicOf p ∣ monicOf c))) := by
       intro c hc
       obtain ⟨_, hns, h0⟩ := Finset.mem_filter.mp hc
       have hne : monicOf c ≠ 0 := (monicOf_monic c).ne_zero
@@ -130,8 +133,7 @@ theorem squarefree_count : SquarefreeCount := by
       have hass : Associated P' P := normalize_associated P
       have hP'irr : Irreducible P' := hass.symm.irreducible hPirr
       have hP'mon : P'.Monic := monic_normalize hPirr.ne_zero
-      have hP'dvd : P' * P' ∣ monicOf c :=
-        (mul_dvd_mul hass.dvd hass.dvd).trans hPdvd
+      have hP'dvd : P' * P' ∣ monicOf c := (mul_dvd_mul hass.dvd hass.dvd).trans hPdvd
       obtain ⟨g, hg⟩ := hP'dvd
       have hgm : g.Monic := (hP'mon.mul hP'mon).of_mul_monic_left (hg ▸ monicOf_monic c)
       have hdeg : (monicOf c).natDegree = (P' * P').natDegree + g.natDegree := by
@@ -160,9 +162,10 @@ theorem squarefree_count : SquarefreeCount := by
     intro p _
     exact card_mult_le N j (monicOf p) (monicOf_monic p) (monicOf_natDegree p)
   have hI1 : I 1 ≤ q - 1 := by
-    have hsub : ((Finset.univ : Finset (Fin 1 → K)).filter
-        (fun p => Irreducible (monicOf p) ∧ (monicOf p).coeff 0 ≠ 0)) ⊆
-        (Finset.univ : Finset (Fin 1 → K)).erase 0 := by
+    have hsub
+        : ((Finset.univ : Finset (Fin 1 → K)).filter
+            (fun p => Irreducible (monicOf p) ∧ (monicOf p).coeff 0 ≠ 0))
+          ⊆ (Finset.univ : Finset (Fin 1 → K)).erase 0 := by
       intro p hp
       refine Finset.mem_erase.mpr ⟨?_, Finset.mem_univ _⟩
       rintro rfl
@@ -176,18 +179,23 @@ theorem squarefree_count : SquarefreeCount := by
   have hI2 : ∀ j, 2 ≤ j → 2 * I j ≤ q ^ j := by
     intro j hj
     have h1 := irreducible_count_upper K j (by omega)
-    have h2 : I j ≤ ((Finset.univ : Finset (Fin j → K)).filter
-        (fun c => Irreducible (monicOf c))).card := by
+    have h2
+        : I j
+          ≤ ((Finset.univ : Finset (Fin j → K)).filter
+            (fun c => Irreducible (monicOf c))).card := by
       apply Finset.card_le_card
       intro p hp
       exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, (Finset.mem_filter.mp hp).2.1⟩
-    calc 2 * I j ≤ j * I j := Nat.mul_le_mul_right _ hj
+    calc
+      2 * I j
+        ≤ j * I j := Nat.mul_le_mul_right _ hj
       _ ≤ j * _ := Nat.mul_le_mul_left _ h2
       _ ≤ q ^ j := h1
   have hsum : ∑ j ∈ Finset.Icc 1 (N / 2), I j * q ^ (N - 2 * j) ≤ q ^ (N - 1) := by
     rcases Nat.lt_or_ge N 2 with hlt | hge
     · have : N / 2 = 0 := by omega
-      rw [this]; simp
+      rw [this]
+      simp
     · have hm1 : 1 ≤ N / 2 := by omega
       rw [← Finset.add_sum_Ioc_eq_sum_Icc hm1]
       have hIoc : Finset.Ioc 1 (N / 2) = Finset.Icc 2 (N / 2) := by
@@ -195,10 +203,12 @@ theorem squarefree_count : SquarefreeCount := by
       rw [hIoc]
       have h2 : 2 * ∑ j ∈ Finset.Icc 2 (N / 2), I j * q ^ (N - 2 * j) ≤ 2 * q ^ (N - 2) := by
         rw [Finset.mul_sum]
-        refine le_trans (Finset.sum_le_sum (fun j hj => ?_)) (geom_tail q N (N / 2) hq2 hge
-          (Nat.div_le_self _ _))
+        refine le_trans (Finset.sum_le_sum (fun j hj => ?_))
+          (geom_tail q N (N / 2) hq2 hge (Nat.div_le_self _ _))
         obtain ⟨hj2, hjm⟩ := Finset.mem_Icc.mp hj
-        calc 2 * (I j * q ^ (N - 2 * j)) = (2 * I j) * q ^ (N - 2 * j) := by ring
+        calc
+          2 * (I j * q ^ (N - 2 * j))
+            = (2 * I j) * q ^ (N - 2 * j) := by ring
           _ ≤ q ^ j * q ^ (N - 2 * j) := Nat.mul_le_mul_right _ (hI2 j hj2)
           _ = q ^ (N - j) := by rw [← pow_add]; congr 1; omega
       have h3 : I 1 * q ^ (N - 2 * 1) ≤ (q - 1) * q ^ (N - 2) := Nat.mul_le_mul_right _ hI1

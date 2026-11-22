@@ -6,11 +6,22 @@ public import Development.AutomorphicArithmetic.TwistedTraces.FixedProjectionInv
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.C.Sf
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.C.Sf
 
-theorem UpperTheory.inf_fixed_le_spanFix_of_dense_spanAll :
-    ∀ (G H S : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] [AddCommGroup S] [Module ℂ S] (τ : Representation ℂ G S) (_ : GroundTheory.Automorphic.IsSmooth τ) (π : UnitaryRep G H) (U : Subgroup G) (_ : IsCompact (U : Set G)) (_ : IsOpen (U : Set G)) (V D : Submodule ℂ H), IsClosed (D : Set H) → π.IsInvariant D → D ≤ V → V ≤ (spanAll τ π V).topologicalClosure → FiniteDimensional ℂ ↥(D ⊓ fixU π U) → D ⊓ fixU π U ≤ spanFix τ π D U := by
+theorem UpperTheory.inf_fixed_le_spanFix_of_dense_spanAll
+    : ∀ (G H S : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [TotallyDisconnectedSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        [CompleteSpace H] [AddCommGroup S] [Module ℂ S] (τ : Representation ℂ G S)
+        (_ : GroundTheory.Automorphic.IsSmooth τ) (π : UnitaryRep G H) (U : Subgroup G)
+        (_ : IsCompact (U : Set G)) (_ : IsOpen (U : Set G)) (V D : Submodule ℂ H),
+      IsClosed (D : Set H) → π.IsInvariant D → D ≤ V → V ≤ (spanAll τ π V).topologicalClosure
+        → FiniteDimensional ℂ ↥(D ⊓ fixU π U)
+        → D ⊓ fixU π U ≤ spanFix τ π D U := by
   intro G H S _ _ _ _ _ _ _ _ _ _ _ τ hτ π U hUc hUo V D hD hinv hDV hV hfin y hy
   have hQX : spanFix τ π D U ≤ D ⊓ fixU π U := by
     refine Submodule.span_le.2 ?_
@@ -24,7 +35,8 @@ theorem UpperTheory.inf_fixed_le_spanFix_of_dense_spanAll :
     rwa [hc] at h
   have hpc : ∀ g v, π g (prj D v) = prj D (π g v) := fun g v => by
     have hi : π.IsInvariant D.topologicalClosure := by rw [hc]; exact hinv
-    exact congrArg (fun T : H →L[ℂ] H => T v)
+    exact congrArg
+      (fun T : H →L[ℂ] H => T v)
       ((UnitaryRep.isInvariant_iff_commute_starProjection D.topologicalClosure).1 hi g).eq
   let Φ : H →L[ℂ] H := prj (fixU π U) ∘L prj D
   have hspan : spanAll τ π V ≤ (spanFix τ π D U).comap (Φ : H →ₗ[ℂ] H) := by
@@ -45,7 +57,8 @@ theorem UpperTheory.inf_fixed_le_spanFix_of_dense_spanAll :
     Submodule.topologicalClosure_minimal _ hspan (hQc.preimage Φ.continuous)
   have hy' : Φ y ∈ spanFix τ π D U := hcl (hV (hDV hy.1))
   have hp : prj D y = y := Submodule.starProjection_eq_self_iff.2 (D.le_topologicalClosure hy.1)
-  have he : prj (fixU π U) y = y := (UpperTheory.fixedProjection_invariant_and_commuting_reps G G H π π U U).2.1 y hy.2
+  have he : prj (fixU π U) y = y :=
+    (UpperTheory.fixedProjection_invariant_and_commuting_reps G G H π π U U).2.1 y hy.2
   have hΦ : Φ y = y := by
     show prj (fixU π U) (prj D y) = y
     rw [hp, he]

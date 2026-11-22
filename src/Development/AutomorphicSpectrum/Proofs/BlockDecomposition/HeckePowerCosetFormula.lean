@@ -9,7 +9,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.SphericalProduct GlobalTheory.CompanionTheory.SatPow
+open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.SphericalProduct
+  GlobalTheory.CompanionTheory.SatPow
 
 noncomputable section
 
@@ -17,25 +18,32 @@ namespace GlobalTheory.CompanionTheory.SatPow.HeckeTrace
 
 variable {G : Type} [Group G]
 
-theorem aOp_rightInvariant {I : Subgroup G} {t : G} {R : Finset G} (hR : ∀ r ∈ R, r ∈ I)
-    (hu : ∀ i ∈ I, ∃! r, r ∈ R ∧ t⁻¹ * (r⁻¹ * i) * t ∈ I) {φ : G → ℂ}
-    (hφ : ∀ g, ∀ i ∈ I, φ (g * i) = φ g) : ∀ g, ∀ i ∈ I, aOp R t φ (g * i) = aOp R t φ g :=
+theorem aOp_rightInvariant
+    {I : Subgroup G} {t : G} {R : Finset G}
+    (hR : ∀ r ∈ R, r ∈ I) (hu : ∀ i ∈ I, ∃! r, r ∈ R ∧ t⁻¹ * (r⁻¹ * i) * t ∈ I)
+    {φ : G → ℂ} (hφ : ∀ g, ∀ i ∈ I, φ (g * i) = φ g)
+    : ∀ g, ∀ i ∈ I, aOp R t φ (g * i) = aOp R t φ g :=
   _root_.UpperTheory.Reformulated.B.Qf37.aOp_rightInvariant hR hu hφ
 
-theorem aOp_iterate_rightInvariant {I : Subgroup G} {t : G} {R : Finset G} (hR : ∀ r ∈ R, r ∈ I)
-    (hu : ∀ i ∈ I, ∃! r, r ∈ R ∧ t⁻¹ * (r⁻¹ * i) * t ∈ I) {φ : G → ℂ}
-    (hφ : ∀ g, ∀ i ∈ I, φ (g * i) = φ g) (j : ℕ) :
-    ∀ g, ∀ i ∈ I, (aOp R t)^[j] φ (g * i) = (aOp R t)^[j] φ g := by
+theorem aOp_iterate_rightInvariant
+    {I : Subgroup G} {t : G} {R : Finset G}
+    (hR : ∀ r ∈ R, r ∈ I) (hu : ∀ i ∈ I, ∃! r, r ∈ R ∧ t⁻¹ * (r⁻¹ * i) * t ∈ I)
+    {φ : G → ℂ} (hφ : ∀ g, ∀ i ∈ I, φ (g * i) = φ g)
+    (j : ℕ)
+    : ∀ g, ∀ i ∈ I, (aOp R t)^[j] φ (g * i) = (aOp R t)^[j] φ g := by
   induction j with
   | zero => simpa using hφ
   | succ j ih =>
     rw [Function.iterate_succ_apply']
     exact aOp_rightInvariant hR hu ih
 
-theorem exists_words (K : Subgroup G) (t : G) (R : Finset G) (h1 : (1 : G) ∈ R)
-    (hc : ∀ r ∈ R, ∀ k : ℕ, t ^ k * r * (t ^ k)⁻¹ ∈ K) (j : ℕ) :
-    ∃ W : Multiset G, W ≠ 0 ∧ (∀ w ∈ W, ∃ k ∈ K, w = k * t ^ j) ∧
-      ∀ (ψ : G → ℂ) (g : G), (aOp R t)^[j] ψ g = (W.map fun w => ψ (g * w)).sum := by
+theorem exists_words
+    (K : Subgroup G) (t : G) (R : Finset G)
+    (h1 : (1 : G) ∈ R) (hc : ∀ r ∈ R, ∀ k : ℕ, t ^ k * r * (t ^ k)⁻¹ ∈ K)
+    (j : ℕ)
+    : ∃ W : Multiset G,
+      W ≠ 0 ∧ (∀ w ∈ W, ∃ k ∈ K, w = k * t ^ j)
+        ∧ ∀ (ψ : G → ℂ) (g : G), (aOp R t)^[j] ψ g = (W.map fun w => ψ (g * w)).sum := by
   induction j with
   | zero =>
     refine ⟨{1}, by simp, ?_, fun ψ g => by simp⟩
@@ -66,14 +74,19 @@ theorem exists_words (K : Subgroup G) (t : G) (R : Finset G) (h1 : (1 : G) ∈ R
       simp only [Function.comp, mul_assoc]
       rfl
 
-theorem finsum_left_mul {K I : Subgroup G} (hIK : I ≤ K) {φ : G → ℂ} (hφ : ∀ g, ∀ i ∈ I, φ (g * i) = φ g)
-    {k : G} (hk : k ∈ K) :
-    ∑ᶠ c : K ⧸ I.subgroupOf K, φ (k * ((c.out : K) : G)) = ∑ᶠ c : K ⧸ I.subgroupOf K, φ ((c.out : K) : G) := by
+theorem finsum_left_mul
+    {K I : Subgroup G} (hIK : I ≤ K)
+    {φ : G → ℂ} (hφ : ∀ g, ∀ i ∈ I, φ (g * i) = φ g)
+    {k : G} (hk : k ∈ K)
+    : ∑ᶠ c : K ⧸ I.subgroupOf K, φ (k * ((c.out : K) : G))
+      = ∑ᶠ c : K ⧸ I.subgroupOf K, φ ((c.out : K) : G) := by
   let kk : K := ⟨k, hk⟩
   rw [← finsum_comp_equiv (MulAction.toPerm kk : Equiv.Perm (K ⧸ I.subgroupOf K))
     (f := fun c : K ⧸ I.subgroupOf K => φ ((c.out : K) : G))]
   refine finsum_congr fun c => ?_
-  have e : (MulAction.toPerm kk : Equiv.Perm (K ⧸ I.subgroupOf K)) c = ((kk * c.out : K) : K ⧸ I.subgroupOf K) := by
+  have e
+      : (MulAction.toPerm kk : Equiv.Perm (K ⧸ I.subgroupOf K)) c
+        = ((kk * c.out : K) : K ⧸ I.subgroupOf K) := by
     show kk • c = _
     conv_lhs => rw [← QuotientGroup.out_eq' c]
     rfl
@@ -84,21 +97,27 @@ theorem finsum_left_mul {K I : Subgroup G} (hIK : I ≤ K) {φ : G → ℂ} (hφ
   show _ = φ (k * ((c.out : K) : G) * ((h : K) : G))
   rw [hφ _ _ hi]
 
-theorem multiset_sum_eq_hAct (K : Subgroup G) (s : G) (M : Multiset G) (hM0 : M ≠ 0)
-    (hMs : ∀ x ∈ M, x ∈ DoubleCoset.doubleCoset s (K : Set G) (K : Set G))
-    (hinv : ∀ ψ : G → ℂ, (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) → ∀ k ∈ K,
-      (M.map fun x => ψ (k * x)).sum = (M.map ψ).sum) :
-    ∃ m : ℕ, 0 < m ∧ ∀ ψ : G → ℂ, (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) →
-      (M.map ψ).sum = (m : ℂ) * hAct K (dosetInd ℂ K s) ψ 1 := by
+theorem multiset_sum_eq_hAct
+    (K : Subgroup G) (s : G) (M : Multiset G)
+    (hM0 : M ≠ 0) (hMs : ∀ x ∈ M, x ∈ DoubleCoset.doubleCoset s (K : Set G) (K : Set G))
+    (hinv : ∀ ψ : G → ℂ,
+      (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) → ∀ k ∈ K, (M.map fun x => ψ (k * x)).sum = (M.map ψ).sum)
+    : ∃ m : ℕ,
+      0 < m
+        ∧ ∀ ψ : G → ℂ,
+          (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g)
+            → (M.map ψ).sum = (m : ℂ) * hAct K (dosetInd ℂ K s) ψ 1 := by
   classical
   set M' : Multiset (G ⧸ K) := M.map (QuotientGroup.mk : G → G ⧸ K) with hM'
-  have hout : ∀ (ψ : G → ℂ), (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) → ∀ x : G,
-      ψ ((x : G ⧸ K).out) = ψ x := by
+  have hout
+      : ∀ (ψ : G → ℂ), (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) → ∀ x : G, ψ ((x : G ⧸ K).out) = ψ x := by
     intro ψ hψ x
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul K x
     rw [hh, hψ _ _ h.2]
-  have key1 : ∀ ψ : G → ℂ, (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) →
-      (M.map ψ).sum = ∑ y ∈ M'.toFinset, (M'.count y : ℂ) * ψ y.out := by
+  have key1
+      : ∀ ψ : G → ℂ,
+        (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g)
+          → (M.map ψ).sum = ∑ y ∈ M'.toFinset, (M'.count y : ℂ) * ψ y.out := by
     intro ψ hψ
     have e : M.map ψ = M'.map fun y : G ⧸ K => ψ y.out := by
       rw [hM', Multiset.map_map]
@@ -138,10 +157,12 @@ theorem multiset_sum_eq_hAct (K : Subgroup G) (s : G) (M : Multiset G) (hM0 : M 
     rw [h2, key2, key2] at h1
     exact_mod_cast h1.symm
   obtain ⟨x0, hx0⟩ := Multiset.exists_mem_of_ne_zero hM0
-  have hconst : ∀ g ∈ DoubleCoset.doubleCoset s (K : Set G) (K : Set G),
-      M'.count (g : G ⧸ K) = M'.count (x0 : G ⧸ K) := by
-    have hred : ∀ g ∈ DoubleCoset.doubleCoset s (K : Set G) (K : Set G),
-        M'.count (g : G ⧸ K) = M'.count (s : G ⧸ K) := by
+  have hconst
+      : ∀ g ∈ DoubleCoset.doubleCoset s (K : Set G) (K : Set G),
+        M'.count (g : G ⧸ K) = M'.count (x0 : G ⧸ K) := by
+    have hred
+        : ∀ g ∈ DoubleCoset.doubleCoset s (K : Set G) (K : Set G),
+          M'.count (g : G ⧸ K) = M'.count (s : G ⧸ K) := by
       intro g hg
       obtain ⟨a, ha, b, hb, rfl⟩ := DoubleCoset.mem_doubleCoset.1 hg
       have : ((a * s * b : G) : G ⧸ K) = ((a * s : G) : G ⧸ K) := by
@@ -150,10 +171,11 @@ theorem multiset_sum_eq_hAct (K : Subgroup G) (s : G) (M : Multiset G) (hM0 : M 
       rw [this, key3 a ha]
     intro g hg
     rw [hred g hg, hred x0 (hMs x0 hx0)]
-  have hpos : 0 < M'.count (x0 : G ⧸ K) :=
-    Multiset.count_pos.2 (Multiset.mem_map_of_mem _ hx0)
+  have hpos : 0 < M'.count (x0 : G ⧸ K) := Multiset.count_pos.2 (Multiset.mem_map_of_mem _ hx0)
   refine ⟨M'.count (x0 : G ⧸ K), hpos, fun ψ hψ => ?_⟩
-  have hmem : ∀ y : G ⧸ K, y ∈ M'.toFinset ↔ y.out ∈ DoubleCoset.doubleCoset s (K : Set G) (K : Set G) := by
+  have hmem
+      : ∀ y : G ⧸ K,
+        y ∈ M'.toFinset ↔ y.out ∈ DoubleCoset.doubleCoset s (K : Set G) (K : Set G) := by
     intro y
     constructor
     · intro hy
@@ -177,7 +199,8 @@ theorem multiset_sum_eq_hAct (K : Subgroup G) (s : G) (M : Multiset G) (hM0 : M 
       simp [dosetInd, Set.indicator_of_mem h]
     · intro y hy
       by_contra hn
-      have h : y.out ∉ DoubleCoset.doubleCoset s (K : Set G) (K : Set G) := fun h => hn ((hmem y).2 h)
+      have h : y.out ∉ DoubleCoset.doubleCoset s (K : Set G) (K : Set G) := fun h =>
+        hn ((hmem y).2 h)
       apply hy
       simp [dosetInd, Set.indicator_of_notMem h]
   rw [hact, key1 ψ hψ, Finset.mul_sum]
@@ -186,27 +209,44 @@ theorem multiset_sum_eq_hAct (K : Subgroup G) (s : G) (M : Multiset G) (hM0 : M 
   rw [QuotientGroup.out_eq'] at h
   rw [h]
 
-theorem heckeTrace : ∀ (G : Type) [Group G] (K I : Subgroup G), I ≤ K → Finite (K ⧸ I.subgroupOf K) → ∀ (t : G) (R : Finset G), (1 : G) ∈ R → (∀ r ∈ R, r ∈ I) → (∀ r ∈ R, ∀ k : ℕ, t ^ k * r * (t ^ k)⁻¹ ∈ K) → (∀ i ∈ I, ∃! r, r ∈ R ∧ t⁻¹ * (r⁻¹ * i) * t ∈ I) → ∀ j : ℕ, ∃ m : ℕ, 0 < m ∧ ∀ ψ : G → ℂ, (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) → ∑ᶠ c : K ⧸ I.subgroupOf K, ((aOp R t)^[j] ψ) ((c.out : K) : G) = (m : ℂ) * hAct K (dosetInd ℂ K (t ^ j)) ψ 1 := by
+theorem heckeTrace
+    : ∀ (G : Type) [Group G] (K I : Subgroup G),
+      I ≤ K → Finite (K ⧸ I.subgroupOf K)
+        → ∀ (t : G) (R : Finset G),
+          (1 : G) ∈ R → (∀ r ∈ R, r ∈ I) → (∀ r ∈ R, ∀ k : ℕ, t ^ k * r * (t ^ k)⁻¹ ∈ K)
+            → (∀ i ∈ I, ∃! r, r ∈ R ∧ t⁻¹ * (r⁻¹ * i) * t ∈ I)
+            → ∀ j : ℕ, ∃ m : ℕ,
+              0 < m
+                ∧ ∀ ψ : G → ℂ,
+                  (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g)
+                    → ∑ᶠ c : K ⧸ I.subgroupOf K, ((aOp R t)^[j] ψ) ((c.out : K) : G)
+                      = (m : ℂ) * hAct K (dosetInd ℂ K (t ^ j)) ψ 1 := by
   intro G _ K I hIK hfin t R h1 hR hc hu j
   classical
   haveI := Fintype.ofFinite (K ⧸ I.subgroupOf K)
   obtain ⟨W, hW0, hWK, hWf⟩ := exists_words K t R h1 hc j
   set M : Multiset G := (Finset.univ : Finset (K ⧸ I.subgroupOf K)).val.bind
     fun c => W.map fun w => ((c.out : K) : G) * w with hMdef
-  have hM : ∀ φ : G → ℂ, (M.map φ).sum =
-      ∑ c : K ⧸ I.subgroupOf K, (W.map fun w => φ (((c.out : K) : G) * w)).sum := by
+  have hM
+      : ∀ φ : G → ℂ,
+        (M.map φ).sum
+          = ∑ c : K ⧸ I.subgroupOf K, (W.map fun w => φ (((c.out : K) : G) * w)).sum := by
     intro φ
     rw [hMdef, Multiset.map_bind, Multiset.sum_bind]
     simp only [Multiset.map_map, Function.comp_def]
     rfl
-  have hL : ∀ ψ : G → ℂ, ∑ᶠ c : K ⧸ I.subgroupOf K, ((aOp R t)^[j] ψ) ((c.out : K) : G) = (M.map ψ).sum := by
+  have hL
+      : ∀ ψ : G → ℂ,
+        ∑ᶠ c : K ⧸ I.subgroupOf K, ((aOp R t)^[j] ψ) ((c.out : K) : G) = (M.map ψ).sum := by
     intro ψ
     rw [finsum_eq_sum_of_fintype, hM]
     exact Finset.sum_congr rfl fun c _ => hWf ψ _
   have hIinv : ∀ ψ : G → ℂ, (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) → ∀ g, ∀ i ∈ I, ψ (g * i) = ψ g :=
     fun ψ hψ g i hi => hψ g i (hIK hi)
-  have hinv : ∀ ψ : G → ℂ, (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g) → ∀ k ∈ K,
-      (M.map fun x => ψ (k * x)).sum = (M.map ψ).sum := by
+  have hinv
+      : ∀ ψ : G → ℂ,
+        (∀ g, ∀ k ∈ K, ψ (g * k) = ψ g)
+          → ∀ k ∈ K, (M.map fun x => ψ (k * x)).sum = (M.map ψ).sum := by
     intro ψ hψ k hk
     rw [← hL ψ, ← finsum_left_mul hIK (aOp_iterate_rightInvariant hR hu (hIinv ψ hψ) j) hk,
       finsum_eq_sum_of_fintype, hM]

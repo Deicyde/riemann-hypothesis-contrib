@@ -20,7 +20,7 @@ namespace PI.SqPairLocal
 theorem modelEx : ModelEx := modelEx_of fixedDVR realUnif
 
 theorem sqPairLocal_of (h : PI.SqPair.LocCartanPair) : PI.SqPair.PLocalAll :=
-  sqPairLocal_of_steps h locGlob intMul (glue_of powLoc) (splitPlace_of powLoc) inertAsm modelEx dict locMat
-    powLoc
+  sqPairLocal_of_steps h locGlob intMul (glue_of powLoc) (splitPlace_of powLoc) inertAsm modelEx
+    dict locMat powLoc
 
 end PI.SqPairLocal

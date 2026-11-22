@@ -13,7 +13,12 @@ public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PHFlProdLinea
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.G.AI.I1
+  ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+  GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 
 noncomputable section
 
@@ -25,11 +30,12 @@ section Block
 
 variable {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N : ℕ}
 
-def omitV (q₀ : FlBlock Ψ N) : (Σ q : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N q.1) → Σ q, FlIdx Ψ N q :=
-  fun p => ⟨p.1.1, p.2⟩
+def omitV (q₀ : FlBlock Ψ N)
+    : (Σ q : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N q.1) → Σ q, FlIdx Ψ N q := fun p =>
+  ⟨p.1.1, p.2⟩
 
-theorem isBlockMap_omitV (q₀ : FlBlock Ψ N) :
-    IsBlockMap (Subtype.val : {q : FlBlock Ψ N // q ≠ q₀} → FlBlock Ψ N) (omitV q₀) := by
+theorem isBlockMap_omitV (q₀ : FlBlock Ψ N)
+    : IsBlockMap (Subtype.val : {q : FlBlock Ψ N // q ≠ q₀} → FlBlock Ψ N) (omitV q₀) := by
   refine ⟨Subtype.val_injective, ?_, fun _ => rfl, ?_⟩
   · rintro ⟨⟨q, hq⟩, i⟩ ⟨⟨q', hq'⟩, i'⟩ h
     simp only [omitV, Sigma.mk.inj_iff] at h
@@ -39,8 +45,8 @@ theorem isBlockMap_omitV (q₀ : FlBlock Ψ N) :
   · rintro ⟨q, i⟩ ⟨y, rfl⟩
     exact ⟨⟨y, i⟩, rfl⟩
 
-theorem isPullHerm_fs (q₀ : FlBlock Ψ N) (a : FlBlock Ψ N → ℤ) (ha : a q₀ = 0) :
-    IsPullHerm (Subtype.val : {q : FlBlock Ψ N // q ≠ q₀} → FlBlock Ψ N) (omitV q₀)
+theorem isPullHerm_fs (q₀ : FlBlock Ψ N) (a : FlBlock Ψ N → ℤ) (ha : a q₀ = 0)
+    : IsPullHerm (Subtype.val : {q : FlBlock Ψ N // q ≠ q₀} → FlBlock Ψ N) (omitV q₀)
       (fsHerm (fun q : {q : FlBlock Ψ N // q ≠ q₀} => FlIdx Ψ N q.1) fun k => a k.1)
       (fsHerm (FlIdx Ψ N) a) := by
   refine ⟨?_, ?_⟩
@@ -52,7 +58,9 @@ theorem isPullHerm_fs (q₀ : FlBlock Ψ N) (a : FlBlock Ψ N → ℤ) (ha : a q
       · simpa using ha
       · rintro ⟨k, hk⟩
         exact k.2 hk
-    · exact (Subtype.val_injective.extend_apply (fun k : {q : FlBlock Ψ N // q ≠ q₀} => a k.1) 0 ⟨q, hq⟩).symm
+    · exact (Subtype.val_injective.extend_apply
+        (fun k : {q : FlBlock Ψ N // q ≠ q₀} => a k.1)
+        0 ⟨q, hq⟩).symm
   · intro z
     simp only [fsHerm, refNorm]
     rw [← Finset.prod_erase _ (a := q₀)]
@@ -85,10 +93,11 @@ end FlZero
 
 open FlZero FlLines
 
-private theorem imageZ_mCoordIdeal' {K : Type} {ι : K → Type} {K' : Type} {ι' : K' → Type} {Ω : Type}
-    [Field Ω] (κ : K → K') (v : (Σ k, ι k) → Σ k', ι' k') (hκ : Function.Injective κ)
-    (hv : ∀ p, (v p).1 = κ p.1) (y : (Σ k', ι' k') → Ω) :
-    imageZ v (mCoordIdeal y) = mCoordIdeal (y ∘ v) := by
+private theorem imageZ_mCoordIdeal'
+    {K : Type} {ι : K → Type} {K' : Type} {ι' : K' → Type} {Ω : Type} [Field Ω]
+    (κ : K → K') (v : (Σ k, ι k) → Σ k', ι' k')
+    (hκ : Function.Injective κ) (hv : ∀ p, (v p).1 = κ p.1) (y : (Σ k', ι' k') → Ω)
+    : imageZ v (mCoordIdeal y) = mCoordIdeal (y ∘ v) := by
   ext g
   simp only [imageZ, mCoordIdeal, Ideal.mem_comap, RingHom.mem_ker]
   have h : (mConeMap y) (rename v g) = rename κ (mConeMap (y ∘ v) g) := by
@@ -106,14 +115,15 @@ private theorem imageZ_mCoordIdeal' {K : Type} {ι : K → Type} {K' : Type} {ι
   · intro h'
     rw [h', map_zero]
 
-private theorem II_fsHerm_yDeg_eq_zero_of_ne (II : IntersectionSystem) (hII : IsFullIntersectionSystem II)
-    (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] [Nonempty Ψ] (N : ℕ) (hN : 2 ≤ N)
-    (p : Ψ × Fin N) (hp : (p.2 : ℕ) + 1 < N)
-    (w : Fin (antisymDegree Ψ N + 1) → Ψ × Fin N) (hw : ∀ j, w j ≠ p) :
-    II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (antisymDegree Ψ N + 1)
-      (fun r => fsHerm (FlIdx Ψ N) (yDeg Ψ N (w r))) = 0 := by
-  have hdim : dimFl Ψ N = antisymDegree Ψ N := by
-    simp [dimFl, antisymDegree, Nat.choose_two_right]
+private theorem II_fsHerm_yDeg_eq_zero_of_ne
+    (II : IntersectionSystem) (hII : IsFullIntersectionSystem II)
+    (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] [Nonempty Ψ]
+    (N : ℕ) (hN : 2 ≤ N) (p : Ψ × Fin N) (hp : (p.2 : ℕ) + 1 < N)
+    (w : Fin (antisymDegree Ψ N + 1) → Ψ × Fin N) (hw : ∀ j, w j ≠ p)
+    : II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (antisymDegree Ψ N + 1)
+        (fun r => fsHerm (FlIdx Ψ N) (yDeg Ψ N (w r)))
+      = 0 := by
+  have hdim : dimFl Ψ N = antisymDegree Ψ N := by simp [dimFl, antisymDegree, Nat.choose_two_right]
   have hP : IsArithVar (PFl Ψ N) (antisymDegree Ψ N + 1) := by
     rw [← hdim]
     exact FlagArithVar.proof Ψ N hN
@@ -134,45 +144,59 @@ private theorem II_fsHerm_yDeg_eq_zero_of_ne (II : IntersectionSystem) (hII : Is
         IsFractionRing.to_map_eq_zero_iff.mp h
       rw [h2, map_zero, map_zero] at h1
       exact zero_ne_one h1
-    have hfinL : ∃ D : ℕ, Algebra.trdeg ℤ
-        (Subfield.closure (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N))) = D := by
+    have hfinL
+        : ∃ D : ℕ,
+          Algebra.trdeg ℤ (Subfield.closure (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N)))
+            = D := by
       have hs : (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N)).Finite := Set.finite_range _
       haveI : Algebra.EssFiniteType ℚ
           (IntermediateField.adjoin ℚ (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N))) :=
         IntermediateField.essFiniteType_iff.mpr (IntermediateField.fg_adjoin_of_finite hs)
-      have hlt := _root_.trdeg_lt_aleph0 ℚ
-        (IntermediateField.adjoin ℚ (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N)))
+      have hlt :=
+        _root_.trdeg_lt_aleph0 ℚ
+          (IntermediateField.adjoin ℚ (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N)))
       rw [← FlagArithVar.trdeg_int_eq_rat, FlagArithVar.trdeg_int_adjoin] at hlt
       exact Cardinal.lt_aleph0.mp hlt
     obtain ⟨D, hD⟩ := hfinL
-    have hA := PositivityTheory.Xgp.fl_arith.arith_of_trdeg hNe (yFl Ψ N) (FlagArithVar.leadIdx Ψ N) hnz D hD
+    have hA :=
+      PositivityTheory.Xgp.fl_arith.arith_of_trdeg hNe (yFl Ψ N) (FlagArithVar.leadIdx Ψ N) hnz D hD
     have hDn : D = antisymDegree Ψ N := by
       have h := hA.2.2.2.symm.trans hP.2.2.2
-      have h' : D + 1 + Fintype.card (FlBlock Ψ N) =
-          antisymDegree Ψ N + 1 + Fintype.card (FlBlock Ψ N) := by exact_mod_cast h
+      have h'
+          : D + 1 + Fintype.card (FlBlock Ψ N)
+            = antisymDegree Ψ N + 1 + Fintype.card (FlBlock Ψ N) := by
+        exact_mod_cast h
       omega
-    have hle : Subfield.closure (coneRatios
-          (fun p : (Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1) => yFl Ψ N (omitV q₀ p))
-          (fun k => FlagArithVar.leadIdx Ψ N k.1)) ≤
-        Subfield.closure (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N)) := by
+    have hle
+        : Subfield.closure (coneRatios
+            (fun p : (Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1) => yFl Ψ N (omitV q₀ p))
+            (fun k => FlagArithVar.leadIdx Ψ N k.1))
+          ≤ Subfield.closure (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N)) := by
       apply Subfield.closure_mono
       rintro _ ⟨p, rfl⟩
       exact ⟨⟨p.1.1, p.2⟩, rfl⟩
-    have hfix1 : ∀ (c : ℚ) (p : Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1),
-        PositivityTheory.Xgp.fl_arith.subF q₀ c (yFl Ψ N (omitV q₀ p)) = yFl Ψ N (omitV q₀ p) := by
+    have hfix1
+        : ∀ (c : ℚ) (p : Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1),
+          PositivityTheory.Xgp.fl_arith.subF q₀ c (yFl Ψ N (omitV q₀ p))
+            = yFl Ψ N (omitV q₀ p) := by
       intro c p
       show PositivityTheory.Xgp.fl_arith.subF q₀ c (algebraMap _ (ΩFl Ψ N) (PositivityTheory.Xgp.fl_arith.yP ⟨p.1.1, p.2⟩)) =
         algebraMap _ (ΩFl Ψ N) (PositivityTheory.Xgp.fl_arith.yP ⟨p.1.1, p.2⟩)
       rw [PositivityTheory.Xgp.fl_arith.subF_alg, PositivityTheory.Xgp.fl_arith.sub_yP _ _ _ p.1.2]
-    have hfix : ∀ (m : ℕ), ∀ x ∈ Subfield.closure (coneRatios
-          (fun p : (Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1) => yFl Ψ N (omitV q₀ p))
-          (fun k => FlagArithVar.leadIdx Ψ N k.1)),
-        PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ) x = x := by
+    have hfix
+        : ∀ (m : ℕ),
+          ∀ x
+              ∈ Subfield.closure (coneRatios
+                (fun p : (Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1) => yFl Ψ N (omitV q₀ p))
+                (fun k => FlagArithVar.leadIdx Ψ N k.1)),
+            PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ) x = x := by
       intro m x hx
-      have hsub : Subfield.closure (coneRatios
-            (fun p : (Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1) => yFl Ψ N (omitV q₀ p))
-            (fun k => FlagArithVar.leadIdx Ψ N k.1)) ≤
-          RingHom.eqLocusField (PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ)) (RingHom.id _) := by
+      have hsub
+          : Subfield.closure (coneRatios
+              (fun p : (Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1) => yFl Ψ N (omitV q₀ p))
+              (fun k => FlagArithVar.leadIdx Ψ N k.1))
+            ≤ RingHom.eqLocusField (PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ))
+              (RingHom.id _) := by
         rw [Subfield.closure_le]
         rintro _ ⟨p, rfl⟩
         show PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ) (yFl Ψ N (omitV q₀ p) /
@@ -180,22 +204,37 @@ private theorem II_fsHerm_yDeg_eq_zero_of_ne (II : IntersectionSystem) (hII : Is
           yFl Ψ N (omitV q₀ p) / yFl Ψ N (omitV q₀ ⟨p.1, FlagArithVar.leadIdx Ψ N p.1.1⟩)
         rw [map_div₀, hfix1, hfix1]
       exact hsub hx
-    have ht : yFl Ψ N ⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩ / yFl Ψ N ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩ ∈
-        Subfield.closure (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N)) :=
+    have ht
+        : yFl Ψ N ⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩
+            / yFl Ψ N ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩
+          ∈ Subfield.closure (coneRatios (yFl Ψ N) (FlagArithVar.leadIdx Ψ N)) :=
       Subfield.subset_closure ⟨⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩, rfl⟩
-    have hinj : Function.Injective fun m : ℕ => PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ)
-        (yFl Ψ N ⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩ / yFl Ψ N ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩) := by
-      have key : ∀ c : ℚ, PositivityTheory.Xgp.fl_arith.subF q₀ c
-          (yFl Ψ N ⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩ / yFl Ψ N ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩) =
-          algebraMap _ (ΩFl Ψ N) (PositivityTheory.Xgp.fl_arith.sub q₀ c
-            (PositivityTheory.Xgp.fl_arith.yP ⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩)) /
-          algebraMap _ (ΩFl Ψ N) (PositivityTheory.Xgp.fl_arith.sub q₀ c
-            (PositivityTheory.Xgp.fl_arith.yP ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩)) := by
+    have hinj : Function.Injective fun m : ℕ =>
+        PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ)
+          (yFl Ψ N ⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩
+            / yFl Ψ N ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩) := by
+      have key
+          : ∀ c : ℚ,
+            PositivityTheory.Xgp.fl_arith.subF q₀ c
+                (yFl Ψ N ⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩
+                  / yFl Ψ N ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩)
+              = algebraMap _ (ΩFl Ψ N)
+                  (PositivityTheory.Xgp.fl_arith.sub q₀ c
+                    (PositivityTheory.Xgp.fl_arith.yP
+                      ⟨q₀, PositivityTheory.Xgp.fl_arith.nextIdx q₀⟩))
+                / algebraMap _ (ΩFl Ψ N)
+                  (PositivityTheory.Xgp.fl_arith.sub q₀ c
+                    (PositivityTheory.Xgp.fl_arith.yP ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩)) := by
         intro c
         rw [map_div₀]
-        exact congrArg₂ (· / ·) (PositivityTheory.Xgp.fl_arith.subF_alg q₀ c _) (PositivityTheory.Xgp.fl_arith.subF_alg q₀ c _)
-      have hB : ∀ c : ℚ, algebraMap _ (ΩFl Ψ N) (PositivityTheory.Xgp.fl_arith.sub q₀ c
-          (PositivityTheory.Xgp.fl_arith.yP ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩)) ≠ 0 := by
+        exact congrArg₂ (· / ·) (PositivityTheory.Xgp.fl_arith.subF_alg q₀ c _)
+          (PositivityTheory.Xgp.fl_arith.subF_alg q₀ c _)
+      have hB
+          : ∀ c : ℚ,
+            algebraMap _ (ΩFl Ψ N)
+                (PositivityTheory.Xgp.fl_arith.sub q₀ c
+                  (PositivityTheory.Xgp.fl_arith.yP ⟨q₀, FlagArithVar.leadIdx Ψ N q₀⟩))
+              ≠ 0 := by
         intro c h
         have h0 := PositivityTheory.Xgp.fl_arith.ev_lead q₀ c
         rw [IsFractionRing.to_map_eq_zero_iff.mp h, map_zero] at h0
@@ -203,24 +242,39 @@ private theorem II_fsHerm_yDeg_eq_zero_of_ne (II : IntersectionSystem) (hII : Is
       intro a b hab
       simp only at hab
       rw [key, key, div_eq_div_iff (hB _) (hB _), ← map_mul, ← map_mul] at hab
-      have h2 := congrArg PositivityTheory.Xgp.fl_arith.ev1 (IsFractionRing.injective _ (ΩFl Ψ N) hab)
-      simp only [map_mul, PositivityTheory.Xgp.fl_arith.ev_next, PositivityTheory.Xgp.fl_arith.ev_lead, mul_one] at h2
+      have h2 :=
+        congrArg PositivityTheory.Xgp.fl_arith.ev1 (IsFractionRing.injective _ (ΩFl Ψ N) hab)
+      simp only [map_mul, PositivityTheory.Xgp.fl_arith.ev_next,
+          PositivityTheory.Xgp.fl_arith.ev_lead, mul_one]
+        at h2
       exact_mod_cast h2
-    obtain ⟨d, hd, hdL⟩ := PositivityTheory.Xgp.fl_arith.trdeg_lt _ _ hle _ ht
-      (fun m => PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ)) hfix hinj D hD
-    have hA' := PositivityTheory.Xgp.fl_arith.arith_of_trdeg hK
-      (fun p : (Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1) => yFl Ψ N (omitV q₀ p))
-      (fun k => FlagArithVar.leadIdx Ψ N k.1) (fun k => hnz k.1) d hdL
+    obtain ⟨d, hd, hdL⟩ :=
+      PositivityTheory.Xgp.fl_arith.trdeg_lt _ _ hle _ ht
+        (fun m => PositivityTheory.Xgp.fl_arith.subF q₀ (m : ℚ))
+        hfix hinj D hD
+    have hA' :=
+      PositivityTheory.Xgp.fl_arith.arith_of_trdeg hK
+        (fun p : (Σ k : {q : FlBlock Ψ N // q ≠ q₀}, FlIdx Ψ N k.1) => yFl Ψ N (omitV q₀ p))
+        (fun k => FlagArithVar.leadIdx Ψ N k.1)
+        (fun k => hnz k.1)
+        d hdL
     have himg : IsArithVar (imageZ (omitV q₀) (PFl Ψ N)) (d + 1) := by
       have hb := isBlockMap_omitV (Ψ := Ψ) (N := N) q₀
       rw [show PFl Ψ N = mCoordIdeal (yFl Ψ N) from rfl, imageZ_mCoordIdeal' _ _ hb.1 hb.2.2.1]
       exact hA'
-    have hc := hII.2.2.2 {q : FlBlock Ψ N // q ≠ q₀} (fun q => FlIdx Ψ N q.1) (FlBlock Ψ N) (FlIdx Ψ N)
-      Subtype.val (omitV q₀) (PFl Ψ N) (d + 1) (antisymDegree Ψ N + 1) 0
-      (fun r => fsHerm (fun q : {q : FlBlock Ψ N // q ≠ q₀} => FlIdx Ψ N q.1) (fun k => yDeg Ψ N (w r) k.1))
-      (fun r => fsHerm (FlIdx Ψ N) (yDeg Ψ N (w r))) Fin.elim0 (isBlockMap_omitV q₀) hP himg (by omega)
-      (fun _ => FlagHeightMultilinear.isSmoothHerm_fsHerm _) (fun r => isPullHerm_fs q₀ _ (hz r))
-      (fun j => j.elim0)
+    have hc :=
+      hII.2.2.2 {q : FlBlock Ψ N // q ≠ q₀}
+        (fun q => FlIdx Ψ N q.1)
+        (FlBlock Ψ N) (FlIdx Ψ N) Subtype.val (omitV q₀) (PFl Ψ N) (d + 1) (antisymDegree Ψ N + 1) 0
+        (fun r =>
+          fsHerm
+            (fun q : {q : FlBlock Ψ N // q ≠ q₀} => FlIdx Ψ N q.1)
+            (fun k => yDeg Ψ N (w r) k.1))
+        (fun r => fsHerm (FlIdx Ψ N) (yDeg Ψ N (w r)))
+        Fin.elim0 (isBlockMap_omitV q₀) hP himg (by omega)
+        (fun _ => FlagHeightMultilinear.isSmoothHerm_fsHerm _)
+        (fun r => isPullHerm_fs q₀ _ (hz r))
+        (fun j => j.elim0)
     rw [Fin.append_elim0] at hc
     exact hc
   · have hall : ∀ q : FlBlock Ψ N, q = q₀ := fun q => by_contra fun h => hK ⟨⟨q, h⟩⟩
@@ -231,28 +285,41 @@ private theorem II_fsHerm_yDeg_eq_zero_of_ne (II : IntersectionSystem) (hII : Is
       rw [hall q]
       exact hz r
     rw [hL]
-    have hu : Function.update (fun _ : Fin (antisymDegree Ψ N + 1) => fsHerm (FlIdx Ψ N) (0 : FlBlock Ψ N → ℤ)) 0
-        (fsHerm (FlIdx Ψ N) 0) = fun _ => fsHerm (FlIdx Ψ N) 0 := by
+    have hu
+        : Function.update
+            (fun _ : Fin (antisymDegree Ψ N + 1) => fsHerm (FlIdx Ψ N) (0 : FlBlock Ψ N → ℤ))
+            0 (fsHerm (FlIdx Ψ N) 0)
+          = fun _ => fsHerm (FlIdx Ψ N) 0 := by
       funext i
       simp [Function.update_apply]
-    have hm := hII.2.1 (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (antisymDegree Ψ N + 1)
-      (fun _ => fsHerm (FlIdx Ψ N) 0) 0 (fsHerm (FlIdx Ψ N) 0) (fsHerm (FlIdx Ψ N) 0) hP
-      (fun _ => FlagHeightMultilinear.isSmoothHerm_fsHerm _) (FlagHeightMultilinear.isSmoothHerm_fsHerm _)
-      (FlagHeightMultilinear.isSmoothHerm_fsHerm _)
+    have hm :=
+      hII.2.1 (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (antisymDegree Ψ N + 1)
+        (fun _ => fsHerm (FlIdx Ψ N) 0)
+        0 (fsHerm (FlIdx Ψ N) 0) (fsHerm (FlIdx Ψ N) 0) hP
+        (fun _ => FlagHeightMultilinear.isSmoothHerm_fsHerm _)
+        (FlagHeightMultilinear.isSmoothHerm_fsHerm _) (FlagHeightMultilinear.isSmoothHerm_fsHerm _)
     rw [fs_zero_tensor, hu] at hm
     linarith
 
-theorem flZero_main : Inputs → ∀ (II : IntersectionSystem), IsFullIntersectionSystem II → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] [Nonempty Ψ] (N : ℕ), 2 ≤ N → ∀ (lam : Ψ × Fin N → ℝ) (p : Ψ × Fin N), (p.2 : ℕ) + 1 < N → gap lam p = 0 → eval lam (hFlPoly Ψ N II) = 0 := by
+theorem flZero_main
+    : Inputs
+      → ∀ (II : IntersectionSystem),
+        IsFullIntersectionSystem II
+          → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] [Nonempty Ψ] (N : ℕ),
+            2 ≤ N
+              → ∀ (lam : Ψ × Fin N → ℝ) (p : Ψ × Fin N),
+                (p.2 : ℕ) + 1 < N → gap lam p = 0 → eval lam (hFlPoly Ψ N II) = 0 := by
   intro _ II hII Ψ _ _ _ N hN lam p hp hgap
-  have hdim : dimFl Ψ N = antisymDegree Ψ N := by
-    simp [dimFl, antisymDegree, Nat.choose_two_right]
+  have hdim : dimFl Ψ N = antisymDegree Ψ N := by simp [dimFl, antisymDegree, Nat.choose_two_right]
   have hP : IsArithVar (PFl Ψ N) (antisymDegree Ψ N + 1) := by
     rw [← hdim]
     exact FlagArithVar.proof Ψ N hN
   have hfam := hII.1 (FlBlock Ψ N) (FlIdx Ψ N)
-  have hpoly : hFlPoly Ψ N II = toWt (formPoly (antisymDegree Ψ N + 1) fun w =>
-      II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (antisymDegree Ψ N + 1)
-        fun r => fsHerm (FlIdx Ψ N) (yDeg Ψ N (w r))) := by
+  have hpoly
+      : hFlPoly Ψ N II
+        = toWt (formPoly (antisymDegree Ψ N + 1) fun w =>
+          II (FlBlock Ψ N) (FlIdx Ψ N) (PFl Ψ N) (antisymDegree Ψ N + 1) fun r =>
+            fsHerm (FlIdx Ψ N) (yDeg Ψ N (w r))) := by
     apply FlLines.formPoly_eq_toWt
     intro μ
     have h1 := FlagHeightMultilinear.I_fsHerm_sum hfam hP (fun _ => μ) (xDeg Ψ N)

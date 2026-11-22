@@ -7,12 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Hypercohomol
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
-theorem GlobalTheory.EtC.cone_kinj_and_bijective_iff : ∀ (R : Type) [CommRing R] {D C : Cx R} (f : D ⟶ C) (m : ℤ),
-    D.IsStrictlyGE m → C.IsStrictlyGE m → (∀ n, CategoryTheory.Injective (D.X n)) →
-    (∀ n, CategoryTheory.Injective (C.X n)) → (mappingCone f).IsKInjective ∧ ∀ K : Cx R,
-      ((∀ n, Function.Bijective (cpush K f n)) ↔ ∀ n, Subsingleton (CohomologyClass K (mappingCone f) n)) := by
+theorem GlobalTheory.EtC.cone_kinj_and_bijective_iff
+    : ∀ (R : Type) [CommRing R] {D C : Cx R} (f : D ⟶ C) (m : ℤ),
+      D.IsStrictlyGE m → C.IsStrictlyGE m → (∀ n, CategoryTheory.Injective (D.X n))
+        → (∀ n, CategoryTheory.Injective (C.X n))
+        → (mappingCone f).IsKInjective
+          ∧ ∀ K : Cx R,
+            ((∀ n, Function.Bijective (cpush K f n))
+              ↔ ∀ n, Subsingleton (CohomologyClass K (mappingCone f) n)) := by
   intro R _ D C f m hD hC iD iC
   refine ⟨?_, ?_⟩
   · haveI : ∀ n, Injective ((mappingCone f).X n) := fun n =>

@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor FunctorialResolution.Blowup
+open CategoryTheory Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  FunctorialResolution.Blowup
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace MvPolynomial
 
 attribute [local instance] MvPolynomial.gradedAlgebra
@@ -24,8 +25,8 @@ private lemma homOfLE_appTop_topIso {W : Scheme.{0}} {U U' : W.Opens} (e : U' �
     ← CommRingCat.comp_apply, ← CommRingCat.comp_apply, ← Functor.map_comp, ← Functor.map_comp]
   exact congrArg (fun t => (W.presheaf.map t) x) (Subsingleton.elim _ _)
 
-private noncomputable def rho {R : Type} [CommRing R] {W : Scheme.{0}} (s : W ⟶ Sp R) :
-    R →+* Γ(W, ⊤) :=
+private noncomputable def rho {R : Type} [CommRing R] {W : Scheme.{0}} (s : W ⟶ Sp R)
+    : R →+* Γ(W, ⊤) :=
   ((Scheme.ΓSpecIso (.of R)).inv ≫ s.appTop).hom
 
 private lemma toSpecΓ_rho {R : Type} [CommRing R] {W : Scheme.{0}} (s : W ⟶ Sp R) :
@@ -39,8 +40,8 @@ private lemma toSpecΓ_rho {R : Type} [CommRing R] {W : Scheme.{0}} (s : W ⟶ S
 section
 variable {R : Type} [CommRing R] {W : Scheme.{0}} (s : W ⟶ Sp R) {M : ℕ}
 
-private noncomputable def phi (U : W.Opens) (x : Fin (M + 1) → Γ(W, U)) :
-    MvPolynomial (Fin (M + 1)) R →+* Γ(U, ⊤) :=
+private noncomputable def phi (U : W.Opens) (x : Fin (M + 1) → Γ(W, U))
+    : MvPolynomial (Fin (M + 1)) R →+* Γ(U, ⊤) :=
   eval₂Hom (U.ι.appTop.hom.comp (rho s)) fun l => U.topIso.inv (x l)
 
 private lemma phi_X (U : W.Opens) (x : Fin (M + 1) → Γ(W, U)) (l : Fin (M + 1)) :
@@ -55,8 +56,9 @@ private lemma phi_irr (U : W.Opens) (x : Fin (M + 1) → Γ(W, U)) (m : Fin (M +
     (HomogeneousIdeal.irrelevant (grading R M)).toIdeal.map (phi s U x) = ⊤ :=
   map_irrelevant_eq_top _ m (by rw [phi_X, hx, map_one]; exact isUnit_one)
 
-private noncomputable def loc (U : W.Opens) (x : Fin (M + 1) → Γ(W, U)) (m : Fin (M + 1))
-    (hx : x m = 1) : U.toScheme ⟶ PSpace R M :=
+private noncomputable def loc
+    (U : W.Opens) (x : Fin (M + 1) → Γ(W, U)) (m : Fin (M + 1)) (hx : x m = 1)
+    : U.toScheme ⟶ PSpace R M :=
   Proj.fromOfGlobalSections (grading R M) (phi s U x) (phi_irr s U x m hx)
 
 private lemma loc_agree {U U' : W.Opens} (x : Fin (M + 1) → Γ(W, U)) (x' : Fin (M + 1) → Γ(W, U'))
@@ -168,22 +170,28 @@ private lemma appLE_ι {Y : Scheme.{0}} (f : W ⟶ Y) (O : Y.Opens) (U : W.Opens
   exact congrArg (fun t => (W.presheaf.map t) (f.appLE O U h y)) (Subsingleton.elim _ _)
 end
 
-theorem UpperTheory.cech_cocycle_line_bundle :
-    ∀ {R : Type} [CommRing R] {W : Scheme.{0}} (s : W ⟶ Sp R) (M : ℕ) {ι : Type}
-        (V : ι → W.Opens), iSup V = ⊤ → ∀ (μ : ι → Fin (M + 1)) (c : ∀ i, Fin (M + 1) → Γ(W, V i)),
-        (∀ i, c i (μ i) = 1) →
-        (∀ i j l k, W.presheaf.map (homOfLE (inf_le_left : V i ⊓ V j ≤ V i)).op (c i l) *
-            W.presheaf.map (homOfLE (inf_le_right : V i ⊓ V j ≤ V j)).op (c j k) =
-          W.presheaf.map (homOfLE (inf_le_left : V i ⊓ V j ≤ V i)).op (c i k) *
-            W.presheaf.map (homOfLE (inf_le_right : V i ⊓ V j ≤ V j)).op (c j l)) →
-        ∃ f : W ⟶ PSpace R M, f ≫ PSpace.str R M = s ∧ ∀ i,
-          ∃ h : V i ≤ f ⁻¹ᵁ Proj.basicOpen (grading R M) (X (μ i)), ∀ l,
-            f.appLE _ (V i) h (chartHom (μ i) (X l)) = c i l := by
+theorem UpperTheory.cech_cocycle_line_bundle
+    : ∀ {R : Type} [CommRing R] {W : Scheme.{0}} (s : W ⟶ Sp R) (M : ℕ) {ι : Type}
+        (V : ι → W.Opens),
+      iSup V = ⊤
+        → ∀ (μ : ι → Fin (M + 1)) (c : ∀ i, Fin (M + 1) → Γ(W, V i)),
+          (∀ i, c i (μ i) = 1)
+            → (∀ i j l k,
+              W.presheaf.map (homOfLE (inf_le_left : V i ⊓ V j ≤ V i)).op (c i l)
+                  * W.presheaf.map (homOfLE (inf_le_right : V i ⊓ V j ≤ V j)).op (c j k)
+                = W.presheaf.map (homOfLE (inf_le_left : V i ⊓ V j ≤ V i)).op (c i k)
+                  * W.presheaf.map (homOfLE (inf_le_right : V i ⊓ V j ≤ V j)).op (c j l))
+            → ∃ f : W ⟶ PSpace R M,
+              f ≫ PSpace.str R M = s
+                ∧ ∀ i, ∃ h : V i ≤ f ⁻¹ᵁ Proj.basicOpen (grading R M) (X (μ i)), ∀ l,
+                  f.appLE _ (V i) h (chartHom (μ i) (X l)) = c i l := by
   intro R _ W s M ι V hV μ c h1 h2
   let cov := W.openCoverOfIsOpenCover V hV
   let fi : ∀ i, (V i).toScheme ⟶ PSpace R M := fun i => loc s (V i) (c i) (μ i) (h1 i)
-  have hag : ∀ i j : ι, pullback.fst (cov.f i) (cov.f j) ≫ fi i =
-      pullback.snd (cov.f i) (cov.f j) ≫ fi j := fun i j => by
+  have hag
+      : ∀ i j : ι,
+        pullback.fst (cov.f i) (cov.f j) ≫ fi i
+          = pullback.snd (cov.f i) (cov.f j) ≫ fi j := fun i j => by
     have H := isPullback_opens_inf (V i) (V j)
     change pullback.fst (V i).ι (V j).ι ≫ fi i = pullback.snd (V i).ι (V j).ι ≫ fi j
     rw [← H.isoPullback_inv_fst, ← H.isoPullback_inv_snd, Category.assoc, Category.assoc,
@@ -200,8 +208,9 @@ theorem UpperTheory.cech_cocycle_line_bundle :
       rw [hι i]
       exact loc_preimage s (V i) (c i) (μ i) (h1 i)
     have hle : V i ≤ f ⁻¹ᵁ Proj.basicOpen (grading R M) (X (μ i)) := fun x hx => by
-      have hx' : (⟨x, hx⟩ : (V i).toScheme) ∈
-          ((V i).ι ≫ f) ⁻¹ᵁ Proj.basicOpen (grading R M) (X (μ i)) := by
+      have hx'
+          : (⟨x, hx⟩ : (V i).toScheme)
+            ∈ ((V i).ι ≫ f) ⁻¹ᵁ Proj.basicOpen (grading R M) (X (μ i)) := by
         rw [hpre]
         trivial
       exact hx'

@@ -16,16 +16,17 @@ namespace RightCosetSpace
 
 section Unimodular
 
-variable {H : Type*} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
+variable
+  {H : Type*} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
   [T2Space H] [SecondCountableTopology H] [MeasurableSpace H] [BorelSpace H]
 
-
 omit [LocallyCompactSpace H] [T2Space H] in
-theorem isFundamentalDomain_preimage_mul_right (L : Subgroup H) [DiscreteTopology L]
-    (ν : Measure H) (g : H) :
-    IsFundamentalDomain L ((· * g) ⁻¹' fundamentalDomain L) ν := by
-  refine IsFundamentalDomain.mk' ((measurableSet_fundamentalDomain L).preimage
-    (measurable_mul_const g)).nullMeasurableSet fun h => ?_
+theorem isFundamentalDomain_preimage_mul_right
+    (L : Subgroup H) [DiscreteTopology L] (ν : Measure H) (g : H)
+    : IsFundamentalDomain L ((· * g) ⁻¹' fundamentalDomain L) ν := by
+  refine IsFundamentalDomain.mk'
+    ((measurableSet_fundamentalDomain L).preimage (measurable_mul_const g)).nullMeasurableSet
+    fun h => ?_
   obtain ⟨l, hl, hlu⟩ := existsUnique_smul_mem_fundamentalDomain L (h * g)
   refine ⟨l, ?_, fun l' hl' => hlu l' ?_⟩
   · show (l • h) * g ∈ fundamentalDomain L
@@ -35,9 +36,10 @@ theorem isFundamentalDomain_preimage_mul_right (L : Subgroup H) [DiscreteTopolog
     rw [smul_mul_assoc] at hl''
     exact hl''
 
-theorem isMulRightInvariant_of_compactSpace (L : Subgroup H) [DiscreteTopology L]
-    [CompactSpace (RightCosetSpace L)] (ν : Measure H) [ν.IsHaarMeasure] :
-    ν.IsMulRightInvariant := by
+theorem isMulRightInvariant_of_compactSpace
+    (L : Subgroup H) [DiscreteTopology L] [CompactSpace (RightCosetSpace L)]
+    (ν : Measure H) [ν.IsHaarMeasure]
+    : ν.IsMulRightInvariant := by
   constructor
   intro g
   have hD := isFundamentalDomain_fundamentalDomain L ν
@@ -52,15 +54,13 @@ theorem isMulRightInvariant_of_compactSpace (L : Subgroup H) [DiscreteTopology L
     exact (isFundamentalDomain_preimage_mul_right L ν g).measure_eq hD
   have hc1 : c = 1 := by
     rw [hc, Measure.smul_apply, ENNReal.smul_def, smul_eq_mul] at h2
-    have : (c : ℝ≥0∞) * ν (fundamentalDomain L) = 1 * ν (fundamentalDomain L) := by
-      rw [h2, one_mul]
+    have : (c : ℝ≥0∞) * ν (fundamentalDomain L) = 1 * ν (fundamentalDomain L) := by rw [h2, one_mul]
     rwa [ENNReal.mul_left_inj h0 htop, ENNReal.coe_eq_one] at this
   rw [hc, hc1, one_smul]
 
-
 omit [T2Space H] in
-theorem inv_eq_self_of_isMulRightInvariant (ν : Measure H) [ν.IsHaarMeasure]
-    [ν.IsMulRightInvariant] : ν.inv = ν := by
+theorem inv_eq_self_of_isMulRightInvariant (ν : Measure H) [ν.IsHaarMeasure] [ν.IsMulRightInvariant]
+    : ν.inv = ν := by
   set c : ℝ≥0 := Measure.haarScalarFactor ν.inv ν
   have hc : ν.inv = c • ν := Measure.isMulLeftInvariant_eq_smul _ _
   have h2 : Measure.map Inv.inv (Measure.map Inv.inv ν) = (c ^ 2 : ℝ≥0) • ν := by
@@ -74,8 +74,9 @@ theorem inv_eq_self_of_isMulRightInvariant (ν : Measure H) [ν.IsHaarMeasure]
     conv_rhs => rw [hν]
     simp
   have h4 : ((c ^ 2 : ℝ≥0) : ℝ≥0∞) = 1 :=
-    (ENNReal.mul_left_inj ((isOpen_interior.measure_pos ν K.interior_nonempty).trans_le
-      (measure_mono interior_subset)).ne'
+    (ENNReal.mul_left_inj
+      ((isOpen_interior.measure_pos ν K.interior_nonempty).trans_le
+        (measure_mono interior_subset)).ne'
       K.isCompact.measure_lt_top.ne).1 h3
   have h5 : c = 1 := by
     rw [ENNReal.coe_eq_one] at h4
@@ -86,7 +87,8 @@ end Unimodular
 
 section Weil
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
   (Γ : Subgroup G) [DiscreteTopology Γ] [CompactSpace (RightCosetSpace Γ)]
 

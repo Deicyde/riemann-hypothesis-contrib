@@ -6,9 +6,11 @@ public import Mathlib
 
 open MeasureTheory FourierTransform
 
-theorem UpperTheory.eq_zero_at_one_of_fourierIntegral_eq_zero :
-    ∀ (G : ℝ → ℂ), MeasureTheory.Integrable G → ContinuousAt G 1 →
-        (∀ u : ℝ, ∫ y : ℝ, G y * Complex.exp (2 * Real.pi * Complex.I * ((y * u : ℝ) : ℂ)) = 0) → G 1 = 0 := by
+theorem UpperTheory.eq_zero_at_one_of_fourierIntegral_eq_zero
+    : ∀ (G : ℝ → ℂ),
+      MeasureTheory.Integrable G → ContinuousAt G 1
+        → (∀ u : ℝ, ∫ y : ℝ, G y * Complex.exp (2 * Real.pi * Complex.I * ((y * u : ℝ) : ℂ)) = 0)
+        → G 1 = 0 := by
   intro G hG hc h
   have hF : 𝓕 G = 0 := by
     funext w

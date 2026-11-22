@@ -9,6 +9,7 @@ public import Formalism.PolynomialDimension.EdgeSumGoodRank
 
 namespace Formalism.CountingSumsFrames.Top
 
-theorem shareProd : Formalism.CountingSumsFrames.ShareProd := Formalism.CountingSumsFrames.share_product_bound
+theorem shareProd : Formalism.CountingSumsFrames.ShareProd :=
+  Formalism.CountingSumsFrames.share_product_bound
 
 end Formalism.CountingSumsFrames.Top

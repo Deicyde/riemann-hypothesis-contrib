@@ -4,10 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.ipEq :
-    ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (V0 : s.Lev) (O : Type) [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] (n : ℕ) (r : Resid V0.frame O n), (∀ u, (residOf r).Ip u = r.Ip u ∧ (residOf r).Ip u = (globOf r V0).frame.Iu u) ∧ ∀ [IsNoetherianRing O] (B : UniversalOrdinaryDeterminantRing r), augmentationIdealKernel (pairOf B.u) = {z | z ∈ B.GroupAlgebraKernelIdeal} := by
+theorem UpperTheory.V.Pa.ipEq
+    : ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω]
+        [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (V0 : s.Lev) (O : Type)
+        [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] (n : ℕ) (r : Resid V0.frame O n),
+      (∀ u, (residOf r).Ip u = r.Ip u ∧ (residOf r).Ip u = (globOf r V0).frame.Iu u)
+        ∧ ∀ [IsNoetherianRing O] (B : UniversalOrdinaryDeterminantRing r),
+          augmentationIdealKernel (pairOf B.u) = {z | z ∈ B.GroupAlgebraKernelIdeal} := by
   intro l _ L Ω _ _ _ _ _ _ s V0 O _ _ _ n r
   have h1 : ∀ u, (residOf r).Ip u = r.Ip u := by
     intro u

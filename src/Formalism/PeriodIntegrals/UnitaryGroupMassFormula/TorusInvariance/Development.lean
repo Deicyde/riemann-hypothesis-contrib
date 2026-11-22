@@ -19,38 +19,44 @@ def blk {k r : ℕ} (i : Fin (r + 1)) (g : Mx k r) : Matrix (Fin (mdim k r i)) (
   fun a b => g (posL k r i a) (posL k r i b)
 
 def StepS : Prop :=
-  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)), inWb k r z →
-    (1 : Mx k r) ∈ Slev k r z i ∧ ∀ s ∈ Slev k r z i, s ∈ Glev k r i ∧ s *ᵥ fvec k r z i = fvec k r z i
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)),
+    inWb k r z
+      → (1 : Mx k r) ∈ Slev k r z i
+        ∧ ∀ s ∈ Slev k r z i, s ∈ Glev k r i ∧ s *ᵥ fvec k r z i = fvec k r z i
 
 def StepGrp : Prop :=
   ∀ (k r : ℕ) (i : Fin (r + 1)), ∀ g ∈ Glev k r i, ∀ h ∈ Glev k r i, g * h ∈ Glev k r i
 
 def StepVec : Prop :=
-  ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)), inWb k r z → inWb k r z' →
-    (∀ s ∈ Slev k r z i, ∀ g : Mx k r, yv k r z i (s * g) = yv k r z i g ∧ ybv k r z i (s * g) = ybv k r z i g) ∧
-    ∀ s' ∈ Slev k r z' i,
-      blk i s' * blk i s'⁻¹ = 1 ∧ blk i s'⁻¹ * blk i s' = 1 ∧
-      blk i s' *ᵥ xv k r z' i = xv k r z' i ∧ xbv k r z' i ᵥ* blk i s'⁻¹ = xbv k r z' i ∧
-      ∀ g ∈ Glev k r i, yv k r z i g = blk i s' *ᵥ yv k r z i (g * s') ∧
-        ybv k r z i g = ybv k r z i (g * s') ᵥ* blk i s'⁻¹
+  ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)),
+    inWb k r z → inWb k r z'
+      → (∀ s ∈ Slev k r z i, ∀ g : Mx k r,
+          yv k r z i (s * g) = yv k r z i g ∧ ybv k r z i (s * g) = ybv k r z i g)
+        ∧ ∀ s' ∈ Slev k r z' i,
+          blk i s' * blk i s'⁻¹ = 1 ∧ blk i s'⁻¹ * blk i s' = 1
+            ∧ blk i s' *ᵥ xv k r z' i = xv k r z' i ∧ xbv k r z' i ᵥ* blk i s'⁻¹ = xbv k r z' i
+            ∧ ∀ g ∈ Glev k r i,
+              yv k r z i g = blk i s' *ᵥ yv k r z i (g * s')
+                ∧ ybv k r z i g = ybv k r z i (g * s') ᵥ* blk i s'⁻¹
 
 def StepCongr : Prop :=
-  ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r))
-    (a b : Fin (mdim k r i)) (f f' : Mx k r → E) (g : Mx k r), IsOpen D → g ∈ Glev k r i ∩ D →
-    (∀ x ∈ Glev k r i ∩ D, f x = f' x) →
-    EH k r (posL k r i a) (posL k r i b) f g = EH k r (posL k r i a) (posL k r i b) f' g
+  ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (k r : ℕ) (i : Fin (r + 1))
+      (D : Set (Mx k r)) (a b : Fin (mdim k r i)) (f f' : Mx k r → E) (g : Mx k r),
+    IsOpen D → g ∈ Glev k r i ∩ D → (∀ x ∈ Glev k r i ∩ D, f x = f' x)
+      → EH k r (posL k r i a) (posL k r i b) f g = EH k r (posL k r i a) (posL k r i b) f' g
 
 def StepRight : Prop :=
-  ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r))
-    (a b : Fin (mdim k r i)) (f : Mx k r → E) (s' g : Mx k r), IsOpen D → SmoothLev k r i D f →
-    s' ∈ Glev k r i → g ∈ Glev k r i → g * s' ∈ D →
-    EH k r (posL k r i a) (posL k r i b) (fun x => f (x * s')) g =
-      ∑ c, ∑ d, (blk i s'⁻¹ c a * blk i s' b d) • EH k r (posL k r i c) (posL k r i d) f (g * s')
+  ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (k r : ℕ) (i : Fin (r + 1))
+      (D : Set (Mx k r)) (a b : Fin (mdim k r i)) (f : Mx k r → E) (s' g : Mx k r),
+    IsOpen D → SmoothLev k r i D f → s' ∈ Glev k r i → g ∈ Glev k r i → g * s' ∈ D
+      → EH k r (posL k r i a) (posL k r i b) (fun x => f (x * s')) g
+        = ∑ c, ∑ d, (blk i s'⁻¹ c a * blk i s' b d) • EH k r (posL k r i c) (posL k r i d) f (g * s')
 
 def StepRSm : Prop :=
-  ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r))
-    (f : Mx k r → E) (s' : Mx k r), s' ∈ Glev k r i → (∀ g ∈ Glev k r i ∩ D, g * s' ∈ D) →
-    SmoothLev k r i D f → SmoothLev k r i D (fun x => f (x * s'))
+  ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (k r : ℕ) (i : Fin (r + 1))
+      (D : Set (Mx k r)) (f : Mx k r → E) (s' : Mx k r),
+    s' ∈ Glev k r i → (∀ g ∈ Glev k r i ∩ D, g * s' ∈ D) → SmoothLev k r i D f
+      → SmoothLev k r i D (fun x => f (x * s'))
 
 section Alg
 
@@ -105,14 +111,15 @@ end Alg
 
 section Model
 
-variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {k r : ℕ} {i : Fin (r + 1)} {D : Set (Mx k r)}
+variable
+  {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {k r : ℕ} {i : Fin (r + 1)} {D : Set (Mx k r)}
 
-abbrev Pt (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r)) : Type := {g : Mx k r // g ∈ Glev k r i ∩ D}
-
+abbrev Pt (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r)) : Type :=
+  {g : Mx k r // g ∈ Glev k r i ∩ D}
 
 open Classical in
-def ext (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r)) (φ : Pt k r i D → E) : Mx k r → E :=
-  fun g => if h : g ∈ Glev k r i ∩ D then φ ⟨g, h⟩ else 0
+def ext (k r : ℕ) (i : Fin (r + 1)) (D : Set (Mx k r)) (φ : Pt k r i D → E) : Mx k r → E := fun g =>
+  if h : g ∈ Glev k r i ∩ D then φ ⟨g, h⟩ else 0
 
 lemma ext_at {φ : Pt k r i D → E} {g : Mx k r} (hg : g ∈ Glev k r i ∩ D) : ext k r i D φ g = φ ⟨g, hg⟩ := by
   unfold ext
@@ -145,7 +152,6 @@ lemma lev_smul {f : Mx k r → E} (c : ℂ) (hf : SmoothLev k r i D f) :
   show c • f g = c • F g
   rw [hfF g hg hgG]
 
-
 variable (E k r i D) in
 def Sm : Submodule ℂ (Pt k r i D → E) where
   carrier := {φ | SmoothLev k r i D (ext k r i D φ)}
@@ -153,17 +159,20 @@ def Sm : Submodule ℂ (Pt k r i D → E) where
     have e : ext k r i D (φ + ψ) = fun g => ext k r i D φ g + ext k r i D ψ g := by
       funext g; unfold ext; split_ifs <;> simp
     show SmoothLev k r i D (ext k r i D (φ + ψ))
-    rw [e]; exact lev_add hφ hψ
+    rw [e]
+    exact lev_add hφ hψ
   zero_mem' := by
     have e : ext k r i D (0 : Pt k r i D → E) = fun _ => 0 := by
       funext g; unfold ext; split_ifs <;> simp
     show SmoothLev k r i D (ext k r i D (0 : Pt k r i D → E))
-    rw [e]; exact lev_zero
+    rw [e]
+    exact lev_zero
   smul_mem' c φ hφ := by
     have e : ext k r i D (c • φ) = fun g => c • ext k r i D φ g := by
       funext g; unfold ext; split_ifs <;> simp
     show SmoothLev k r i D (ext k r i D (c • φ))
-    rw [e]; exact lev_smul c hφ
+    rw [e]
+    exact lev_smul c hφ
 
 def Rep (F : Mx k r → E) (φ : Pt k r i D → E) : Prop :=
   ∀ g (hg : g ∈ Glev k r i ∩ D), F g = φ ⟨g, hg⟩
@@ -176,8 +185,8 @@ lemma posL_inj {a b : Fin (mdim k r i)} (h : posL k r i a = posL k r i b) : a = 
   simp only at h2
   exact Fin.ext (by omega)
 
-def Tf (a b : Fin (mdim k r i)) (φ : Pt k r i D → E) : Pt k r i D → E :=
-  fun p => EH k r (posL k r i a) (posL k r i b) (ext k r i D φ) p.1
+def Tf (a b : Fin (mdim k r i)) (φ : Pt k r i D → E) : Pt k r i D → E := fun p =>
+  EH k r (posL k r i a) (posL k r i b) (ext k r i D φ) p.1
 
 lemma eh_zero (a b : Fin (2 * r + k + 1)) (g : Mx k r) :
     EH k r a b (fun _ : Mx k r => (0 : E)) g = 0 := by
@@ -404,9 +413,10 @@ lemma left_step (hL : QMinorLeftH) {E : Type} [NormedAddCommGroup E] [NormedSpac
     rw [tl11, tl11]
     simp only [Pi.neg_apply, chat2L, hq, hy, hyb]
 
-theorem tInvariant_of_contractions (hCC : ContractionsCovariant) (hP : EabPres) (hG : EabGlLev) (hL : QMinorLeftH)
-    (hS : StepS) (hGr : StepGrp) (hV : StepVec) (hC : StepCongr) (hRt : StepRight) (hRS : StepRSm) :
-    TInvariant := by
+theorem tInvariant_of_contractions
+    (hCC : ContractionsCovariant) (hP : EabPres) (hG : EabGlLev) (hL : QMinorLeftH) (hS : StepS)
+    (hGr : StepGrp) (hV : StepVec) (hC : StepCongr) (hRt : StepRight) (hRS : StepRSm)
+    : TInvariant := by
   intro E _ _ k r z z' i D f Y p q hz hz' hDom hf s hs s' hs' g hg
   have hDo : IsOpen D := hDom.1
   obtain ⟨hVl, hVr⟩ := hV k r z z' i hz hz'
@@ -426,17 +436,22 @@ theorem tInvariant_of_contractions (hCC : ContractionsCovariant) (hP : EabPres) 
   let x0 : Sm E k r i D := ⟨fun p => f p.1, hf'⟩
   have hrep : Rep f x0.1 := fun _ _ => rfl
   have hrep' : Rep (fun x => f (x * s')) (RL (E := E) hP hC hDo hR hRS hs'G x0).1 := fun _ _ => rfl
-  have hint : ∀ a b, Ealg (E := E) (i := i) hP hC hDo a b * RL (E := E) hP hC hDo hR hRS hs'G =
-      RL (E := E) hP hC hDo hR hRS hs'G * Econj (Ealg (E := E) (i := i) hP hC hDo) (blk i s'⁻¹) (blk i s') a b :=
-    fun a b => RL_inter hP hC hDo hR hRS hs'G hRt a b
+  have hint
+      : ∀ a b,
+        Ealg (E := E) (i := i) hP hC hDo a b * RL (E := E) hP hC hDo hR hRS hs'G
+          = RL (E := E) hP hC hDo hR hRS hs'G
+            * Econj (Ealg (E := E) (i := i) hP hC hDo) (blk i s'⁻¹) (blk i s') a b := fun a b =>
+    RL_inter hP hC hDo hR hRS hs'G hRt a b
   have hGl : GlRel (Ealg (E := E) (i := i) hP hC hDo) := Ealg_gl hP hC hDo hG
-  have cov := hCC (Module.End ℂ (Sm E k r i D)) (mdim k r i) (Ealg (E := E) (i := i) hP hC hDo)
-    (blk i s'⁻¹) (blk i s') hGl hQP hPQ
+  have cov :=
+    hCC (Module.End ℂ (Sm E k r i D)) (mdim k r i) (Ealg (E := E) (i := i) hP hC hDo) (blk i s'⁻¹)
+      (blk i s') hGl hQP hPQ
   obtain ⟨hyvy, hybvy⟩ := hyv (s * g) hh.1
   have hy' := hR (s * g) hh
   match p, q with
   | 0, 0 =>
-    rw [tl00, tl00, qdet_rep hP hC hDo _ hrep' (s * g) hh, qdet_rep hP hC hDo _ hrep (s * g * s') hy',
+    rw [tl00, tl00, qdet_rep hP hC hDo _ hrep' (s * g) hh,
+      qdet_rep hP hC hDo _ hrep (s * g * s') hy',
       RL_apply hP hC hDo hR hRS hs'G _ _ (qdet_inter _ _ _ hint _) x0 (s * g) hh,
       (cov (uC k r i Y) 0 0 0 0).1]
   | 0, 1 =>
@@ -452,11 +467,15 @@ theorem tInvariant_of_contractions (hCC : ContractionsCovariant) (hP : EabPres) 
       chat_rep hP hC hDo _ _ _ hrep (s * g * s') hy',
       RL_apply hP hC hDo hR hRS hs'G _ _ (chatA_inter _ _ _ hint _ _ _) x0 (s * g) hh, e]
   | 1, 1 =>
-    have e := (cov (uC k r i Y - 1) (yv k r z i (s * g * s')) (xv k r z' i) (ybv k r z i (s * g * s'))
-      (xbv k r z' i)).2.2
+    have e :=
+      (cov (uC k r i Y - 1) (yv k r z i (s * g * s')) (xv k r z' i) (ybv k r z i (s * g * s'))
+        (xbv k r z' i)).2.2
     rw [← hyvy, hxv, ← hybvy, hxbv] at e
-    rw [tl11, tl11, Pi.neg_apply, Pi.neg_apply, second_capelli_minor_represents hP hC hDo _ _ _ _ _ hrep' (s * g) hh,
+    rw [tl11, tl11, Pi.neg_apply, Pi.neg_apply,
+      second_capelli_minor_represents hP hC hDo _ _ _ _ _ hrep' (s * g) hh,
       second_capelli_minor_represents hP hC hDo _ _ _ _ _ hrep (s * g * s') hy',
-      RL_apply hP hC hDo hR hRS hs'G _ _ (second_capelli_minor_intertwines _ _ _ hint _ _ _ _ _) x0 (s * g) hh, e]
+      RL_apply hP hC hDo hR hRS hs'G _ _ (second_capelli_minor_intertwines _ _ _ hint _ _ _ _ _) x0
+        (s * g) hh,
+      e]
 
 end Formalism.FourierDecayAlt.Q.TInvW

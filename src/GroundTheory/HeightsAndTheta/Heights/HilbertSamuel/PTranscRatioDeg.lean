@@ -22,8 +22,9 @@ theorem TranscRatioDeg.proof : TranscRatioDeg.Statement := by
   have hwk : ∀ k, w k = w 0 * (u (e k) / u (e 0)) := fun k => by
     rw [mul_div_assoc', ← hw k, mul_div_cancel_right₀ _ (he 0)]
 
-  have hfn : ∀ {κ : Type} (v : κ → E) (K : Subfield E), (∀ i j, v i / v j ∈ K) →
-      ∀ x ∈ fnField v, x ∈ K := by
+  have hfn
+      : ∀ {κ : Type} (v : κ → E) (K : Subfield E),
+        (∀ i j, v i / v j ∈ K) → ∀ x ∈ fnField v, x ∈ K := by
     intro κ v K hK x hx
     have : (fnField v).toSubfield ≤ K := by
       unfold fnField
@@ -71,13 +72,15 @@ theorem TranscRatioDeg.proof : TranscRatioDeg.Statement := by
     · intro hx
       exact ⟨⟨x, (hL x).2 hx⟩, rfl⟩
 
-  have hQ : ∀ x ∈ fnField u, x ∈ Subfield.closure (Set.range u) := hfn u _ fun i j =>
-    div_mem (Subfield.subset_closure ⟨i, rfl⟩) (Subfield.subset_closure ⟨j, rfl⟩)
+  have hQ : ∀ x ∈ fnField u, x ∈ Subfield.closure (Set.range u) :=
+    hfn u _ fun i j => div_mem (Subfield.subset_closure ⟨i, rfl⟩) (Subfield.subset_closure ⟨j, rfl⟩)
   have htA : Transcendental A (w 0) :=
-    TranscRatioDeg.transcendental_of_subfield (Subfield.closure (Set.range u)) (fun x => hQ _ x.2)
+    TranscRatioDeg.transcendental_of_subfield (Subfield.closure (Set.range u))
+      (fun x => hQ _ x.2)
       (algebraMap A E).injective (TranscRatioDeg.transcendental_subfieldClosure u (w 0) ht)
   have key := TranscRatioDeg.finrank_adjoin_eq_of_transcendental A htA
-  have hproj : projDeg u e = Module.finrank F₀ A := IntermediateField.relfinrank_eq_finrank_of_le hle
+  have hproj : projDeg u e = Module.finrank F₀ A :=
+    IntermediateField.relfinrank_eq_finrank_of_le hle
   rw [hproj, ← key]
   apply TranscRatioDeg.finrank_adjoin_congr
   · rw [hΦ]
@@ -93,8 +96,7 @@ theorem TranscRatioDeg.proof : TranscRatioDeg.Statement := by
       rintro x (h | h)
       · exact Subfield.subset_closure (Or.inl h)
       · refine hfn u _ (fun i j => ?_) x h
-        have : u i / u j = (u i / u i₀) / (u j / u i₀) := by
-          rw [div_div_div_cancel_right₀ hi₀]
+        have : u i / u j = (u i / u i₀) / (u j / u i₀) := by rw [div_div_div_cancel_right₀ hi₀]
         rw [this]
         exact div_mem (Subfield.subset_closure (Or.inr ⟨i, rfl⟩))
           (Subfield.subset_closure (Or.inr ⟨j, rfl⟩))

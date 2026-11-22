@@ -11,47 +11,56 @@ noncomputable section
 
 namespace GlobalTheory.WeylDuality
 
-theorem intQ_apply {r n : ℕ} (F : MvPolynomial (Fin r × Fin n) ℤ) :
-    intQ r n F = map (Int.castRingHom ℚ) F := rfl
+theorem intQ_apply {r n : ℕ} (F : MvPolynomial (Fin r × Fin n) ℤ)
+    : intQ r n F = map (Int.castRingHom ℚ) F :=
+  rfl
 
-theorem applyWord_mem_dualWeyl (R : Type) [CommRing R] {r n : ℕ} (ν : Fin n → ℕ)
-    (w : List (Fin r × Fin r × ℕ)) {F : MvPolynomial (Fin r × Fin n) R} (hF : F ∈ dualWeyl R r n ν) :
-    applyWord R w F ∈ dualWeyl R r n ν := by
+theorem applyWord_mem_dualWeyl
+    (R : Type) [CommRing R]
+    {r n : ℕ} (ν : Fin n → ℕ) (w : List (Fin r × Fin r × ℕ))
+    {F : MvPolynomial (Fin r × Fin n) R} (hF : F ∈ dualWeyl R r n ν)
+    : applyWord R w F ∈ dualWeyl R r n ν := by
   induction w with
   | nil => simpa [applyWord] using hF
   | cons x w ih =>
     simp only [applyWord, List.foldr_cons] at ih ⊢
     exact rowDivStable R r n ν x.1 x.2.1 x.2.2 _ ih
 
-private theorem rowGen_map_intCast {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {r n : ℕ}
-    (a b : Fin r) (f : MvPolynomial (Fin r × Fin n) R) :
-    Polynomial.map (MvPolynomial.map φ) (rowGen R a b f) = rowGen S a b (map φ f) := by
+private theorem rowGen_map_intCast
+    {R S : Type} [CommRing R] [CommRing S]
+    (φ : R →+* S)
+    {r n : ℕ} (a b : Fin r) (f : MvPolynomial (Fin r × Fin n) R)
+    : Polynomial.map (MvPolynomial.map φ) (rowGen R a b f) = rowGen S a b (map φ f) := by
   induction f using MvPolynomial.induction_on with
   | C c => simp [rowGen]
-  | add p q hp hq => rw [map_add (f := _), map_add (f := _), Polynomial.map_add (f := _), hp, hq, map_add (f := _)]
+  | add p q hp hq =>
+    rw [map_add (f := _), map_add (f := _), Polynomial.map_add (f := _), hp, hq, map_add (f := _)]
   | mul_X p v hp =>
     rw [map_mul, Polynomial.map_mul, hp, map_mul, map_mul, map_X]
     congr 1
     simp only [rowGen, aeval_X]
     split_ifs <;> simp
 
-private theorem rowDiv_map_intCast {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {r n : ℕ}
-    (a b : Fin r) (k : ℕ) (f : MvPolynomial (Fin r × Fin n) R) :
-    map φ (rowDiv R a b k f) = rowDiv S a b k (map φ f) := by
+private theorem rowDiv_map_intCast
+    {R S : Type} [CommRing R] [CommRing S]
+    (φ : R →+* S)
+    {r n : ℕ} (a b : Fin r)
+    (k : ℕ) (f : MvPolynomial (Fin r × Fin n) R)
+    : map φ (rowDiv R a b k f) = rowDiv S a b k (map φ f) := by
   unfold rowDiv
   rw [← rowGen_map_intCast, Polynomial.coeff_map]
 
-private theorem map_intCast_applyWord {r n : ℕ} (w : List (Fin r × Fin r × ℕ))
-    (f : MvPolynomial (Fin r × Fin n) ℤ) :
-    map (Int.castRingHom ℚ) (applyWord ℤ w f) = applyWord ℚ w (map (Int.castRingHom ℚ) f) := by
+private theorem map_intCast_applyWord
+    {r n : ℕ} (w : List (Fin r × Fin r × ℕ)) (f : MvPolynomial (Fin r × Fin n) ℤ)
+    : map (Int.castRingHom ℚ) (applyWord ℤ w f) = applyWord ℚ w (map (Int.castRingHom ℚ) f) := by
   induction w with
   | nil => simp [applyWord]
   | cons x w ih =>
     simp only [applyWord, List.foldr_cons] at ih ⊢
     rw [rowDiv_map_intCast, ih]
 
-private theorem map_intCast_hw {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
-    map (Int.castRingHom ℚ) (hw ℤ hn ν) = hw ℚ hn ν := by
+private theorem map_intCast_hw {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    : map (Int.castRingHom ℚ) (hw ℤ hn ν) = hw ℚ hn ν := by
   unfold hw lpMinor
   rw [map_prod]
   refine Finset.prod_congr rfl fun s _ => ?_
@@ -60,12 +69,12 @@ private theorem map_intCast_hw {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
   ext p q
   simp
 
-theorem intQ_word {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (w : List (Fin r × Fin r × ℕ)) :
-    intQ r n (applyWord ℤ w (hw ℤ hn ν)) = applyWord ℚ w (hw ℚ hn ν) := by
+theorem intQ_word {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (w : List (Fin r × Fin r × ℕ))
+    : intQ r n (applyWord ℤ w (hw ℤ hn ν)) = applyWord ℚ w (hw ℚ hn ν) := by
   rw [intQ_apply, map_intCast_applyWord, map_intCast_hw]
 
-theorem eval_idFrame_int {r n : ℕ} (F : MvPolynomial (Fin r × Fin n) ℤ) :
-    eval (idFrame ℚ r n) (map (Int.castRingHom ℚ) F) = ((eval (idFrame ℤ r n) F : ℤ) : ℚ) := by
+theorem eval_idFrame_int {r n : ℕ} (F : MvPolynomial (Fin r × Fin n) ℤ)
+    : eval (idFrame ℚ r n) (map (Int.castRingHom ℚ) F) = ((eval (idFrame ℤ r n) F : ℤ) : ℚ) := by
   induction F using MvPolynomial.induction_on with
   | C c => simp
   | add p q hp hq => simp only [map_add (f := _), hp, hq, Int.cast_add]
@@ -78,37 +87,41 @@ theorem eval_idFrame_int {r n : ℕ} (F : MvPolynomial (Fin r × Fin n) ℤ) :
 theorem fockQ_symm {σ : Type} (f g : MvPolynomial σ ℚ) : fockQ f g = fockQ g f := by
   exact (fockQPos σ f g).1
 
-theorem fockQ_hw_pos {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) : 0 < fockQ (hw ℚ hn ν) (hw ℚ hn ν) := by
+theorem fockQ_hw_pos {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    : 0 < fockQ (hw ℚ hn ν) (hw ℚ hn ν) := by
   exact (fockQPos _ (hw ℚ hn ν) (hw ℚ hn ν)).2 (hwNe ℚ r n hn ν)
 
 def fockB (σ : Type) : LinearMap.BilinForm ℚ (MvPolynomial σ ℚ) :=
-  LinearMap.mk₂ ℚ fockQ (fun f f' g => (fockQBilin σ f f' g 1).1)
+  LinearMap.mk₂ ℚ fockQ
+    (fun f f' g => (fockQBilin σ f f' g 1).1)
     (fun c f g => (fockQBilin σ f 0 g c).2)
     (fun f g g' => by rw [fockQ_symm, (fockQBilin σ g g' f 1).1, fockQ_symm g, fockQ_symm g'])
     (fun c f g => by rw [fockQ_symm, (fockQBilin σ g 0 f c).2, fockQ_symm g]; rfl)
 
 theorem fockB_apply {σ : Type} (f g : MvPolynomial σ ℚ) : fockB σ f g = fockQ f g := rfl
 
-theorem mem_bDual {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (M : Submodule ℤ (MvPolynomial (Fin r × Fin n) ℚ))
-    (P : MvPolynomial (Fin r × Fin n) ℚ) :
-    P ∈ bDual r n hn ν M ↔
-      P ∈ dualWeyl ℚ r n ν ∧ ∀ Q ∈ M, ∃ z : ℤ, fockQ P Q = z * fockQ (hw ℚ hn ν) (hw ℚ hn ν) := by
+theorem mem_bDual
+    {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (M : Submodule ℤ (MvPolynomial (Fin r × Fin n) ℚ))
+    (P : MvPolynomial (Fin r × Fin n) ℚ)
+    : P ∈ bDual r n hn ν M
+      ↔ P ∈ dualWeyl ℚ r n ν ∧ ∀ Q ∈ M, ∃ z : ℤ, fockQ P Q = z * fockQ (hw ℚ hn ν) (hw ℚ hn ν) := by
   exact Iff.rfl
 
 private theorem fockQ_zero_right {σ : Type} (f : MvPolynomial σ ℚ) : fockQ f 0 = 0 := by
   rw [← fockB_apply, map_zero]
 
-private theorem fockQ_add_right {σ : Type} (f g g' : MvPolynomial σ ℚ) :
-    fockQ f (g + g') = fockQ f g + fockQ f g' := by
+private theorem fockQ_add_right {σ : Type} (f g g' : MvPolynomial σ ℚ)
+    : fockQ f (g + g') = fockQ f g + fockQ f g' := by
   rw [← fockB_apply, map_add (f := _), fockB_apply, fockB_apply]
 
-private theorem fockQ_smul_right' {σ : Type} (f g : MvPolynomial σ ℚ) (c : ℚ) :
-    fockQ f (c • g) = c * fockQ f g := by
+private theorem fockQ_smul_right' {σ : Type} (f g : MvPolynomial σ ℚ) (c : ℚ)
+    : fockQ f (c • g) = c * fockQ f g := by
   rw [← fockB_apply, map_smul, fockB_apply, smul_eq_mul]
 
-private theorem weight_colW_apply' {r n : ℕ} (e : Fin r × Fin n →₀ ℕ) (s : Fin n) :
-    Finsupp.weight (colW r n) e s = ∑ a : Fin r, e (a, s) := by
-  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply, Fintype.sum_prod_type]
+private theorem weight_colW_apply' {r n : ℕ} (e : Fin r × Fin n →₀ ℕ) (s : Fin n)
+    : Finsupp.weight (colW r n) e s = ∑ a : Fin r, e (a, s) := by
+  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply,
+    Fintype.sum_prod_type]
   simp [colW, Pi.single_apply]
 
 theorem nablaEqDualWeylOf : NablaEqDualWeylOf := by
@@ -155,8 +168,9 @@ theorem nablaEqDualWeylOf : NablaEqDualWeylOf := by
     have hhom : IsWeightedHomogeneous (colW r n) P ν := by
       unfold dualWeyl at hP
       exact (mem_weightedHomogeneousSubmodule _ _ _ _).mp (Submodule.mem_inf.mp hP).1
-    have hint : ∀ w : List (Fin r × Fin r × ℕ),
-        ∃ z : ℤ, fockQ (hw ℚ hn ν) (applyWord ℚ w P) = z * fockQ (hw ℚ hn ν) (hw ℚ hn ν) := by
+    have hint
+        : ∀ w : List (Fin r × Fin r × ℕ), ∃ z : ℤ,
+          fockQ (hw ℚ hn ν) (applyWord ℚ w P) = z * fockQ (hw ℚ hn ν) (hw ℚ hn ν) := by
       intro w
       have hmem : applyWord ℚ (transposeWord w) (hw ℚ hn ν) ∈ (weyl ℤ r n hn ν).map (intQ r n) := by
         refine ⟨applyWord ℤ (transposeWord w) (hw ℤ hn ν), ?_, intQ_word hn ν _⟩
@@ -164,7 +178,8 @@ theorem nablaEqDualWeylOf : NablaEqDualWeylOf := by
         exact Submodule.subset_span ⟨_, rfl⟩
       obtain ⟨z, hz⟩ := hPQ _ hmem
       exact ⟨z, by rw [fockQ_symm, hAdj, hz]⟩
-    have hcoef : ∀ e : Fin r × Fin n →₀ ℕ, LowerTri e → ∃ z : ℤ, AddMonoidAlgebra.coeff P e = z := by
+    have hcoef
+        : ∀ e : Fin r × Fin n →₀ ℕ, LowerTri e → ∃ z : ℤ, AddMonoidAlgebra.coeff P e = z := by
       intro e he
       by_cases hs : ∀ s : Fin n, ∑ a : Fin r, e (a, s) = ν s
       · obtain ⟨z, hz⟩ := hint (wordOf e)
@@ -183,9 +198,11 @@ theorem nablaEqDualWeylOf : NablaEqDualWeylOf := by
     rw [← intQ_apply, ← hQ']
     exact hP
 
-theorem dual_dual_of_isLattice {V : Type} [AddCommGroup V] [Module ℚ V] (B : LinearMap.BilinForm ℚ V)
-    (hB : B.Nondegenerate) (hB' : B.IsSymm) (M : Submodule ℤ V) [M.IsFullLattice ℚ] :
-    B.dualSubmodule (B.dualSubmodule M) = M := by
+theorem dual_dual_of_isLattice
+    {V : Type} [AddCommGroup V] [Module ℚ V]
+    (B : LinearMap.BilinForm ℚ V) (hB : B.Nondegenerate) (hB' : B.IsSymm)
+    (M : Submodule ℤ V) [M.IsFullLattice ℚ]
+    : B.dualSubmodule (B.dualSubmodule M) = M := by
   have := Submodule.IsLattice.finite ℚ M
   have := Submodule.IsLattice.free ℚ M
   classical
@@ -204,8 +221,9 @@ theorem dual_dual_of_isLattice {V : Type} [AddCommGroup V] [Module ℚ V] (B : L
 def normB {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) : LinearMap.BilinForm ℚ (dualWeyl ℚ r n ν) :=
   (fockQ (hw ℚ hn ν) (hw ℚ hn ν))⁻¹ • (fockB _).restrict (dualWeyl ℚ r n ν)
 
-theorem normB_apply {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (x y : dualWeyl ℚ r n ν) :
-    normB hn ν x y = (fockQ (hw ℚ hn ν) (hw ℚ hn ν))⁻¹ * fockQ x.1 y.1 := rfl
+theorem normB_apply {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (x y : dualWeyl ℚ r n ν)
+    : normB hn ν x y = (fockQ (hw ℚ hn ν) (hw ℚ hn ν))⁻¹ * fockQ x.1 y.1 :=
+  rfl
 
 theorem normB_symm {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) : (normB hn ν).IsSymm := by
   exact ⟨fun x y => by rw [normB_apply, normB_apply, fockQ_symm x.1]⟩
@@ -222,17 +240,20 @@ theorem normB_nondeg {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) : (normB hn
       exact ((fockQPos _ x.1 x.1).2 hx0).ne' h
   exact ⟨fun x hx => key x (hx x), fun y hy => key y (hy y)⟩
 
-def inV {r n : ℕ} (ν : Fin n → ℕ) (M : Submodule ℤ (MvPolynomial (Fin r × Fin n) ℚ)) :
-    Submodule ℤ (dualWeyl ℚ r n ν) :=
+def inV {r n : ℕ} (ν : Fin n → ℕ) (M : Submodule ℤ (MvPolynomial (Fin r × Fin n) ℚ))
+    : Submodule ℤ (dualWeyl ℚ r n ν) :=
   M.comap ((dualWeyl ℚ r n ν).subtype.restrictScalars ℤ)
 
-theorem mem_inV {r n : ℕ} (ν : Fin n → ℕ) (M : Submodule ℤ (MvPolynomial (Fin r × Fin n) ℚ))
-    (x : dualWeyl ℚ r n ν) : x ∈ inV ν M ↔ x.1 ∈ M := by
+theorem mem_inV
+    {r n : ℕ}
+    (ν : Fin n → ℕ) (M : Submodule ℤ (MvPolynomial (Fin r × Fin n) ℚ)) (x : dualWeyl ℚ r n ν)
+    : x ∈ inV ν M ↔ x.1 ∈ M := by
   exact Iff.rfl
 
-theorem inV_bDual {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (M : Submodule ℤ (MvPolynomial (Fin r × Fin n) ℚ))
-    (hM : ∀ Q ∈ M, Q ∈ dualWeyl ℚ r n ν) :
-    inV ν (bDual r n hn ν M) = (normB hn ν).dualSubmodule (inV ν M) := by
+theorem inV_bDual
+    {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (M : Submodule ℤ (MvPolynomial (Fin r × Fin n) ℚ))
+    (hM : ∀ Q ∈ M, Q ∈ dualWeyl ℚ r n ν)
+    : inV ν (bDual r n hn ν M) = (normB hn ν).dualSubmodule (inV ν M) := by
   have hc := fockQ_hw_pos hn ν
   ext x
   rw [mem_inV, mem_bDual, LinearMap.BilinForm.mem_dualSubmodule]
@@ -258,14 +279,15 @@ theorem dualWeyl_int_fg (r n : ℕ) (ν : Fin n → ℕ) : (dualWeyl ℤ r n ν)
   rw [← hspan]
   exact Submodule.fg_span (Set.finite_range b)
 
-private theorem mem_dualWeyl_rat_of_mem_map_weyl {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν) :
-    ∀ P ∈ (weyl ℤ r n hn ν).map (intQ r n), P ∈ dualWeyl ℚ r n ν := by
+private theorem mem_dualWeyl_rat_of_mem_map_weyl
+    {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν)
+    : ∀ P ∈ (weyl ℤ r n hn ν).map (intQ r n), P ∈ dualWeyl ℚ r n ν := by
   rintro P ⟨G, hG, rfl⟩
   rw [intQ_apply]
   exact dualWeylMap ℤ ℚ (Int.castRingHom ℚ) r n ν G (weylLeDual ℤ r n hn ν hν hG)
 
-theorem weyl_isLattice {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν) :
-    (inV ν ((weyl ℤ r n hn ν).map (intQ r n))).IsFullLattice ℚ := by
+theorem weyl_isLattice {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν)
+    : (inV ν ((weyl ℤ r n hn ν).map (intQ r n))).IsFullLattice ℚ := by
   refine { toIsLattice := ?_, span_eq_top := ?_ }
   · apply Submodule.IsLattice.of_fg ℚ
     have hW : (weyl ℤ r n hn ν).FG := by
@@ -274,8 +296,10 @@ theorem weyl_isLattice {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : An
     have hsub := mem_dualWeyl_rat_of_mem_map_weyl hn ν hν
     refine Submodule.fg_of_fg_map_injective ((dualWeyl ℚ r n ν).subtype.restrictScalars ℤ)
       Subtype.val_injective ?_
-    have heq : (inV ν ((weyl ℤ r n hn ν).map (intQ r n))).map
-        ((dualWeyl ℚ r n ν).subtype.restrictScalars ℤ) = (weyl ℤ r n hn ν).map (intQ r n) := by
+    have heq
+        : (inV ν ((weyl ℤ r n hn ν).map (intQ r n))).map
+            ((dualWeyl ℚ r n ν).subtype.restrictScalars ℤ)
+          = (weyl ℤ r n hn ν).map (intQ r n) := by
       apply le_antisymm
       · exact Submodule.map_comap_le _ _
       · intro P hP
@@ -283,7 +307,8 @@ theorem weyl_isLattice {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : An
     rw [heq]
     exact hW.map _
   · have hsub := mem_dualWeyl_rat_of_mem_map_weyl hn ν hν
-    apply Submodule.map_injective_of_injective (f := (dualWeyl ℚ r n ν).subtype) Subtype.val_injective
+    apply Submodule.map_injective_of_injective (f := (dualWeyl ℚ r n ν).subtype)
+      Subtype.val_injective
     rw [Submodule.map_span, Submodule.map_top, Submodule.range_subtype]
     apply le_antisymm
     · rw [Submodule.span_le]
@@ -298,8 +323,8 @@ theorem weyl_isLattice {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : An
         exact Submodule.subset_span ⟨_, rfl⟩
       exact ⟨⟨_, hsub _ hmem⟩, (mem_inV _ _ _).mpr hmem, rfl⟩
 
-private theorem mem_dualWeyl_rat_of_mem_map_intQ {r n : ℕ} (ν : Fin n → ℕ) :
-    ∀ P ∈ (dualWeyl ℤ r n ν).map (intQ r n), P ∈ dualWeyl ℚ r n ν := by
+private theorem mem_dualWeyl_rat_of_mem_map_intQ {r n : ℕ} (ν : Fin n → ℕ)
+    : ∀ P ∈ (dualWeyl ℤ r n ν).map (intQ r n), P ∈ dualWeyl ℚ r n ν := by
   rintro P ⟨G, hG, rfl⟩
   rw [intQ_apply]
   exact dualWeylMap ℤ ℚ (Int.castRingHom ℚ) r n ν G hG
@@ -309,8 +334,9 @@ theorem weylEqDualNablaOf : WeylEqDualNablaOf := by
   have := weyl_isLattice hn ν hν
   have hW := mem_dualWeyl_rat_of_mem_map_weyl hn ν hν
   have hD := mem_dualWeyl_rat_of_mem_map_intQ (r := r) ν
-  have key : inV ν (bDual r n hn ν ((dualWeyl ℤ r n ν).map (intQ r n))) =
-      inV ν ((weyl ℤ r n hn ν).map (intQ r n)) := by
+  have key
+      : inV ν (bDual r n hn ν ((dualWeyl ℤ r n ν).map (intQ r n)))
+        = inV ν ((weyl ℤ r n hn ν).map (intQ r n)) := by
     rw [inV_bDual hn ν _ hD, hN r n hn ν hν, inV_bDual hn ν _ hW]
     exact dual_dual_of_isLattice _ (normB_nondeg hn ν) (normB_symm hn ν) _
   ext P
@@ -321,8 +347,10 @@ theorem weylEqDualNablaOf : WeylEqDualNablaOf := by
     rw [← key, mem_inV] at h1
     exact h1
   · intro hP
-    have h1 : (⟨P, ((mem_bDual hn ν _ P).mp hP).1⟩ : dualWeyl ℚ r n ν) ∈
-        inV ν (bDual r n hn ν ((dualWeyl ℤ r n ν).map (intQ r n))) := (mem_inV _ _ _).mpr hP
+    have h1
+        : (⟨P, ((mem_bDual hn ν _ P).mp hP).1⟩ : dualWeyl ℚ r n ν)
+          ∈ inV ν (bDual r n hn ν ((dualWeyl ℤ r n ν).map (intQ r n))) :=
+      (mem_inV _ _ _).mpr hP
     rw [key, mem_inV] at h1
     exact h1
 

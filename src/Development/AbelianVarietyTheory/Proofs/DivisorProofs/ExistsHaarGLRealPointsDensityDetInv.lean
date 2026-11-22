@@ -23,7 +23,8 @@ theorem lmul_lmul (y x : Lie E a) : lmul (lmul y x) = (lmul y).comp (lmul x) := 
   simp only [ContinuousLinearMap.comp_apply, lmul_apply]
   simp [Matrix.mul_assoc]
 
-theorem lmul_one : lmul (toL (1 : Matrix (Fin a) (Fin a) (Cinf E))) = ContinuousLinearMap.id ℝ _ := by
+theorem lmul_one
+    : lmul (toL (1 : Matrix (Fin a) (Fin a) (Cinf E))) = ContinuousLinearMap.id ℝ _ := by
   ext z : 1
   simp [lmul_apply]
 
@@ -48,7 +49,8 @@ def lmulL : Lie E a →ₗ[ℝ] (Lie E a →L[ℝ] Lie E a) where
   map_smul' := lmul_smul
 
 theorem continuous_dL : Continuous (dL (E := E) (a := a)) :=
-  ContinuousLinearMap.continuous_det.comp (LinearMap.continuous_of_finiteDimensional (lmulL (E := E) (a := a)))
+  ContinuousLinearMap.continuous_det.comp (LinearMap.continuous_of_finiteDimensional (lmulL (E := E)
+    (a := a)))
 
 open scoped ENNReal NNReal
 
@@ -61,7 +63,9 @@ theorem jG_mul (g y : glG E a) : jG (g * y) = lmul (jG g) (jG y) := rfl
 theorem jG_one : jG (1 : glG E a) = toL 1 := rfl
 
 theorem isOpenEmbedding_jG : Topology.IsOpenEmbedding (jG (E := E) (a := a)) := by
-  have hO : IsOpen ((glG E a : Subgroup (Matrix (Fin a) (Fin a) (Cinf E))ˣ) : Set (Matrix (Fin a) (Fin a) (Cinf E))ˣ) := by
+  have hO : IsOpen
+      ((glG E a : Subgroup (Matrix (Fin a) (Fin a) (Cinf E))ˣ)
+        : Set (Matrix (Fin a) (Fin a) (Cinf E))ˣ) := by
     change IsOpen (Set.univ : Set (Matrix (Fin a) (Fin a) (Cinf E))ˣ)
     exact isOpen_univ
   exact GlobalTheory.CuspQuot.isOpenEmbedding_val.comp hO.isOpenEmbedding_subtypeVal
@@ -103,32 +107,37 @@ def rho (x : Lie E a) : ℝ≥0∞ := ENNReal.ofReal (|dL x|⁻¹)
 theorem measurable_rho : Measurable (rho (E := E) (a := a)) :=
   ENNReal.measurable_ofReal.comp (continuous_dL.abs.measurable.inv)
 
-theorem ofReal_mul_rho (y x : Lie E a) (hy : dL y ≠ 0) :
-    ENNReal.ofReal |dL y| * rho (lmul y x) = rho x := by
+theorem ofReal_mul_rho (y x : Lie E a) (hy : dL y ≠ 0)
+    : ENNReal.ofReal |dL y| * rho (lmul y x) = rho x := by
   unfold rho
   rw [← ENNReal.ofReal_mul (abs_nonneg _), dL_mul, abs_mul, mul_inv, ← mul_assoc,
     mul_inv_cancel₀ (abs_ne_zero.2 hy), one_mul]
 
-def muG [MeasurableSpace (glG E a)] (ν : MeasureTheory.Measure (Lie E a)) : MeasureTheory.Measure (glG E a) :=
+def muG [MeasurableSpace (glG E a)] (ν : MeasureTheory.Measure (Lie E a))
+    : MeasureTheory.Measure (glG E a) :=
   (ν.withDensity rho).comap jG
 
 section Haar
 
-variable [MeasurableSpace (glG E a)] [BorelSpace (glG E a)] (ν : Measure (Lie E a)) [hν : ν.IsAddHaarMeasure]
+variable
+  [MeasurableSpace (glG E a)] [BorelSpace (glG E a)]
+  (ν : Measure (Lie E a)) [hν : ν.IsAddHaarMeasure]
 
 theorem mE : MeasurableEmbedding (jG (E := E) (a := a)) := isOpenEmbedding_jG.measurableEmbedding
 
-theorem withDensity_preimage (g : glG E a) {A : Set (Lie E a)} (hA : MeasurableSet A) :
-    ν.withDensity rho (lmul (jG g) ⁻¹' A) = ν.withDensity rho A := by
+theorem withDensity_preimage (g : glG E a) {A : Set (Lie E a)} (hA : MeasurableSet A)
+    : ν.withDensity rho (lmul (jG g) ⁻¹' A) = ν.withDensity rho A := by
   set L := lmul (jG g)
-  have hsurj : L '' (L ⁻¹' A) = A := Set.image_preimage_eq A (fun x => ⟨lmul (jG g⁻¹) x, lmul_jG_inv g x⟩)
+  have hsurj : L '' (L ⁻¹' A) = A :=
+    Set.image_preimage_eq A (fun x => ⟨lmul (jG g⁻¹) x, lmul_jG_inv g x⟩)
   have hinj : Function.Injective L := fun x y h => by
     rw [← lmul_inv_jG g x, ← lmul_inv_jG g y]
     exact congrArg _ h
   have hS : MeasurableSet (L ⁻¹' A) := hA.preimage L.continuous.measurable
   rw [withDensity_apply _ hA, withDensity_apply _ hS]
   conv_rhs => rw [← hsurj]
-  rw [lintegral_image_eq_lintegral_abs_det_fderiv_mul ν hS (fun x _ => L.hasFDerivAt.hasFDerivWithinAt)
+  rw [lintegral_image_eq_lintegral_abs_det_fderiv_mul ν hS
+    (fun x _ => L.hasFDerivAt.hasFDerivWithinAt)
     hinj.injOn]
   refine setLIntegral_congr_fun hS (fun x _ => ?_)
   exact (ofReal_mul_rho (jG g) x (dL_jG_ne g)).symm
@@ -136,7 +145,8 @@ theorem withDensity_preimage (g : glG E a) {A : Set (Lie E a)} (hA : MeasurableS
 theorem muG_leftInv : (muG ν : Measure (glG E a)).IsMulLeftInvariant := by
   refine ⟨fun g => ?_⟩
   ext s hs
-  have hm : Measurable (g * · : glG E a → glG E a) := (continuous_const.mul continuous_id).measurable
+  have hm : Measurable (g * · : glG E a → glG E a) :=
+    (continuous_const.mul continuous_id).measurable
   rw [Measure.map_apply hm hs, muG, mE.comap_apply, mE.comap_apply]
   have himg : jG '' ((g * ·) ⁻¹' s) = (lmul (jG g)) ⁻¹' (jG '' s) := by
     ext x
@@ -180,24 +190,38 @@ theorem muG_haar : (muG ν : Measure (glG E a)).IsHaarMeasure :=
   haveI := muG_leftInv ν
   haveI := muG_finite ν
   haveI := muG_pos ν
-  { }
+  {}
 
-theorem integral_muG (Φ : Lie E a → ℂ) (hΦ : ∀ x ∉ invSet E a, Φ x = 0) :
-    ∫ y, Φ (toL y.1.val) ∂(muG ν : Measure (glG E a)) =
-      ∫ x, ((|LinearMap.det ((lmul x : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a)|⁻¹ : ℝ) : ℂ) * Φ x ∂ν := by
-  change ∫ y, Φ (jG y) ∂(muG ν) = _
-  rw [← mE.integral_map, muG, mE.map_comap, range_jG, setIntegral_eq_integral_of_forall_compl_eq_zero hΦ]
-  have hf : Measurable fun x : Lie E a => (|dL x|⁻¹).toNNReal := continuous_dL.abs.measurable.inv.real_toNNReal
-  change ∫ x, Φ x ∂(ν.withDensity fun x => (((|dL x|⁻¹).toNNReal : ℝ≥0) : ℝ≥0∞)) = _
-  rw [integral_withDensity_eq_integral_smul hf]
-  refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
-  simp only [NNReal.smul_def, Real.coe_toNNReal _ (inv_nonneg.2 (abs_nonneg _)), Complex.real_smul]
-  rfl
+theorem integral_muG (Φ : Lie E a → ℂ) (hΦ : ∀ x ∉ invSet E a, Φ x = 0)
+    : ∫ y, Φ (toL y.1.val) ∂(muG ν : Measure (glG E a))
+      = ∫ x, ((|LinearMap.det ((lmul x : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a)|⁻¹ : ℝ) : ℂ) * Φ x ∂ν :=
+  by
+    change ∫ y, Φ (jG y) ∂(muG ν) = _
+    rw [← mE.integral_map, muG, mE.map_comap, range_jG,
+      setIntegral_eq_integral_of_forall_compl_eq_zero hΦ]
+    have hf : Measurable fun x : Lie E a => (|dL x|⁻¹).toNNReal :=
+      continuous_dL.abs.measurable.inv.real_toNNReal
+    change ∫ x, Φ x ∂(ν.withDensity fun x => (((|dL x|⁻¹).toNNReal : ℝ≥0) : ℝ≥0∞)) = _
+    rw [integral_withDensity_eq_integral_smul hf]
+    refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
+    simp only [NNReal.smul_def, Real.coe_toNNReal _ (inv_nonneg.2 (abs_nonneg _)),
+      Complex.real_smul]
+    rfl
 
 end Haar
 
-theorem glHaar : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ), ∀ (ν : Measure (Lie E a)), ν.IsAddHaarMeasure → ∀ [MeasurableSpace (glG E a)] [BorelSpace (glG E a)], ∃ μ : Measure (glG E a), μ.IsHaarMeasure ∧ ∀ (Φ : Lie E a → ℂ), ContinuousOn Φ (invSet E a) → (∀ x ∉ invSet E a, Φ x = 0) → ∫ y, Φ (toL y.1.val) ∂μ = ∫ x, ((|LinearMap.det ((lmul x : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a)|⁻¹ : ℝ) : ℂ) * Φ x ∂ν := by
-  intro E _ _ _ a ν hν _ _
-  exact ⟨muG ν, muG_haar ν, fun Φ _ hΦ => integral_muG ν Φ hΦ⟩
+theorem glHaar
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
+      ∀ (ν : Measure (Lie E a)),
+        ν.IsAddHaarMeasure
+          → ∀ [MeasurableSpace (glG E a)] [BorelSpace (glG E a)], ∃ μ : Measure (glG E a),
+            μ.IsHaarMeasure
+              ∧ ∀ (Φ : Lie E a → ℂ),
+                ContinuousOn Φ (invSet E a) → (∀ x ∉ invSet E a, Φ x = 0)
+                  → ∫ y, Φ (toL y.1.val) ∂μ
+                    = ∫ x, ((|LinearMap.det ((lmul x : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a)|⁻¹ : ℝ) : ℂ) * Φ x ∂ν :=
+  by
+    intro E _ _ _ a ν hν _ _
+    exact ⟨muG ν, muG_haar ν, fun Φ _ hΦ => integral_muG ν Φ hΦ⟩
 
 end GlobalTheory.GLHaar

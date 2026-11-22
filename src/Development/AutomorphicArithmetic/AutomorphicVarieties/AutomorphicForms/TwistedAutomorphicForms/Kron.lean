@@ -5,8 +5,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open NumberField IsDedekindDomain in
-theorem UpperTheory.V.Af.Tw.kron :
-    UpperTheory.V.Af.Tw.Kron := by
+theorem UpperTheory.V.Af.Tw.kron : UpperTheory.V.Af.Tw.Kron := by
   intro K _ _
   refine ⟨NumberField.Units.torsionOrder K, ?_, ?_⟩
   · intro l hl hno
@@ -21,11 +20,15 @@ theorem UpperTheory.V.Af.Tw.kron :
     have h3 := h2.map_of_injective (f := algebraMap (𝓞 K) K) (FaithfulSMul.algebraMap_injective _ _)
     exact hno ⟨_, h3⟩
   · intro y hy hnorm
-    have hy' : ∀ v : HeightOneSpectrum (𝓞 K),
-        Valued.v (((Neutral.B1.diagUnits K y : Neutral.B1.Ideles K) : AdeleRing (𝓞 K) K).2 v) = 1 := hy
-    obtain ⟨r, hr⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one K (y : K) (fun v => by
-      rw [← GlobalTheory.UpIdeleMod.valued_algebraMap (R := 𝓞 K) v]
-      exact le_of_eq (hy' v))
+    have hy'
+        : ∀ v : HeightOneSpectrum (𝓞 K),
+          Valued.v (((Neutral.B1.diagUnits K y : Neutral.B1.Ideles K) : AdeleRing (𝓞 K) K).2 v)
+            = 1 :=
+      hy
+    obtain ⟨r, hr⟩ :=
+      HeightOneSpectrum.mem_integers_of_valuation_le_one K (y : K) (fun v => by
+        rw [← GlobalTheory.UpIdeleMod.valued_algebraMap (R := 𝓞 K) v]
+        exact le_of_eq (hy' v))
     have hI : IsIntegral ℤ (y : K) := by
       have := NumberField.RingOfIntegers.isIntegral_coe r
       rwa [hr] at this

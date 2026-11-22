@@ -9,12 +9,16 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.Avac
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 open GlobalTheory.Doubling (absE)
 
@@ -25,7 +29,18 @@ theorem iwaQ_of' (hT : TAll) : IwaQ := by
   obtain ⟨g, hq⟩ := q_split' L ε hd hL p lam hp
   set q := p * (L.j g)⁻¹ with hqdef
   obtain ⟨c, hc⟩ := parabolic_theta_scalar hT L.i₀ hq
-  refine ⟨q, g, k, (absE F E lam : ℝ), c, hk, by simp [hqdef, mul_assoc], absE_pos lam, fun g' => ?_, fun Φ hΦ g' X hX => ?_⟩
+  refine ⟨
+    q,
+    g,
+    k,
+    (absE F E lam : ℝ),
+    c,
+    hk,
+    by simp [hqdef, mul_assoc],
+    absE_pos lam,
+    fun g' => ?_,
+    fun Φ hΦ g' X hX => ?_
+  ⟩
   · have e : L.j g' * (p * k) = (L.j g' * q * (L.j g')⁻¹) * L.j (g' * g) * k := by
       simp only [hqdef, map_mul, mul_assoc, inv_mul_cancel_left]
     rw [e, KWhit.a_mul_K d _ k hk, q_ht' L (q_conj' L hq g') (g' * g)]
@@ -43,7 +58,8 @@ theorem iwaQ_of' (hT : TAll) : IwaQ := by
       rw [hΨ, map_sub, map_smul]
     have e2 := congrFun ((Tl d).map_sub (d.om (L.j g') (d.om q Φ)) (c • d.om (L.j g') Φ)) X
     have e3 := congrFun ((Tl d).map_smul c (d.om (L.j g') Φ)) X
-    simp only [Tl, LinearMap.coe_mk, AddHom.coe_mk, Pi.sub_apply, Pi.smul_apply, smul_eq_mul] at e2 e3
+    simp only [Tl, LinearMap.coe_mk, AddHom.coe_mk, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
+      at e2 e3
     rw [map_mul, Module.End.mul_apply]
     have : d.T (d.om (L.j g') Ψ) X = 0 := key.symm
     rw [e1, e2, e3] at this

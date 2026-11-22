@@ -193,17 +193,23 @@ private lemma term_bd (n : ℕ) (κ Bu α T d ν a b t L M : ℝ) (hd : 1 ≤ d)
   field_simp
   ring
 
-theorem UpperTheory.summable_tsum_inv_one_add_height_pow_le :
-    ∀ (n d : ℕ) (κ Bu : ℝ), 0 < d → 0 < κ → κ ≤ 1 → 1 ≤ Bu → ∃ B : ℝ, 0 ≤ B ∧
-        ∀ (R : Set {r : Fin 2 → ℚ // r ≠ 0}) (β α T t : ℝ), 0 ≤ t → Bu⁻¹ ≤ α → α ≤ T → 1 ≤ T →
-          (∀ ξ ∈ R, ∃ l : ℤ, (d : ℚ) * ξ.1 0 = l) →
-          (∀ ξ ∈ R, ξ.1 0 = 0 → ∃ l : ℤ, (d : ℚ) * ξ.1 1 = l) →
-          (∀ ξ ∈ R, ∀ ξ' ∈ R, ξ.1 0 = ξ'.1 0 → ∃ l : ℤ, (d : ℚ) * (ξ.1 1 - ξ'.1 1) = l) →
-          Summable (R.indicator fun ξ : {r : Fin 2 → ℚ // r ≠ 0} =>
-            ((1 + κ * Real.exp t * (|((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α)) ^ (n + 4))⁻¹) ∧
-          ∑' ξ : {r : Fin 2 → ℚ // r ≠ 0}, R.indicator (fun ξ : {r : Fin 2 → ℚ // r ≠ 0} =>
-            ((1 + κ * Real.exp t * (|((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α)) ^ (n + 4))⁻¹) ξ
-            ≤ B * Real.exp (-((n : ℝ) * t)) * T ^ (n + 2) := by
+theorem UpperTheory.summable_tsum_inv_one_add_height_pow_le
+    : ∀ (n d : ℕ) (κ Bu : ℝ),
+      0 < d → 0 < κ → κ ≤ 1 → 1 ≤ Bu
+        → ∃ B : ℝ,
+          0 ≤ B
+            ∧ ∀ (R : Set {r : Fin 2 → ℚ // r ≠ 0}) (β α T t : ℝ),
+              0 ≤ t → Bu⁻¹ ≤ α → α ≤ T → 1 ≤ T → (∀ ξ ∈ R, ∃ l : ℤ, (d : ℚ) * ξ.1 0 = l)
+                → (∀ ξ ∈ R, ξ.1 0 = 0 → ∃ l : ℤ, (d : ℚ) * ξ.1 1 = l)
+                → (∀ ξ ∈ R, ∀ ξ' ∈ R, ξ.1 0 = ξ'.1 0 → ∃ l : ℤ, (d : ℚ) * (ξ.1 1 - ξ'.1 1) = l)
+                → Summable (R.indicator fun ξ : {r : Fin 2 → ℚ // r ≠ 0} =>
+                    ((1 + κ * Real.exp t
+                        * (|((ξ.1 0 : ℚ) : ℝ)| * α
+                          + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α))
+                      ^ (n + 4))⁻¹)
+                  ∧ ∑' ξ : {r : Fin 2 → ℚ // r ≠ 0}, R.indicator (fun ξ : {r : Fin 2 → ℚ // r ≠ 0} =>
+                      ((1 + κ * Real.exp t * (|((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α)) ^ (n + 4))⁻¹) ξ
+                    ≤ B * Real.exp (-((n : ℝ) * t)) * T ^ (n + 2) := by
   intro n d κ Bu hd hκ hκ1 hBu
   have hd1 : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
   have hd0 : (0 : ℝ) < (d : ℝ) := by linarith
@@ -234,8 +240,9 @@ theorem UpperTheory.summable_tsum_inv_one_add_height_pow_le :
       exact mul_left_cancel₀ (by exact_mod_cast hd.ne') this
     obtain ⟨j, hj⟩ := h3 ξ hξ ξ' hξ' h0
     have hjR : (d : ℝ) * (((ξ.1 1 : ℚ) : ℝ) - ((ξ'.1 1 : ℚ) : ℝ)) = (j : ℝ) := by exact_mod_cast hj
-    have e : (d : ℝ) * (((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ))
-        = (d : ℝ) * (((ξ'.1 0 : ℚ) : ℝ) * β + ((ξ'.1 1 : ℚ) : ℝ)) + (j : ℝ) := by
+    have e
+        : (d : ℝ) * (((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ))
+          = (d : ℝ) * (((ξ'.1 0 : ℚ) : ℝ) * β + ((ξ'.1 1 : ℚ) : ℝ)) + (j : ℝ) := by
       rw [← hjR, h0]; ring
     rw [e, round_add_intCast] at he2
     have hj0 : j = 0 := by linarith
@@ -250,10 +257,16 @@ theorem UpperTheory.summable_tsum_inv_one_add_height_pow_le :
     fin_cases i
     · exact h0
     · exact h1'
-  have hb : ∀ ξ ∈ R, ((1 + κ * Real.exp t * (|((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α)) ^ (n + 4))⁻¹
-      ≤ (C * Real.exp (-((n : ℝ) * t)) * T ^ (n + 2)) * w (τ ξ) := by
+  have hb
+      : ∀ ξ ∈ R,
+        ((1 + κ * Real.exp t
+              * (|((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α))
+            ^ (n + 4))⁻¹
+          ≤ (C * Real.exp (-((n : ℝ) * t)) * T ^ (n + 2)) * w (τ ξ) := by
     intro ξ hξ
-    have hν1 : 1 / ((d : ℝ) * Bu * T) ≤ |((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α := by
+    have hν1
+        : 1 / ((d : ℝ) * Bu * T)
+          ≤ |((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α := by
       by_cases hz : ξ.1 0 = 0
       · obtain ⟨l, hl⟩ := h2 ξ hξ hz
         have hlR : (d : ℝ) * ((ξ.1 1 : ℚ) : ℝ) = (l : ℝ) := by exact_mod_cast hl
@@ -277,9 +290,10 @@ theorem UpperTheory.summable_tsum_inv_one_add_height_pow_le :
         apply lower_bound_second_case _ _ _ _ _ _ hd1 hBu hα hαT hT (abs_nonneg _) (abs_nonneg _)
         have hz' : ((ξ.1 0 : ℚ) : ℝ) = 0 := by rw [hz]; simp
         rw [hz', zero_mul, zero_add]
-        calc (1 : ℝ) ≤ |(l : ℝ)| := hl1
-          _ = (d : ℝ) * |((ξ.1 1 : ℚ) : ℝ)| := by
-            rw [← hlR, abs_mul, abs_of_pos hd0]
+        calc
+          (1 : ℝ)
+            ≤ |(l : ℝ)| := hl1
+          _ = (d : ℝ) * |((ξ.1 1 : ℚ) : ℝ)| := by rw [← hlR, abs_mul, abs_of_pos hd0]
       · obtain ⟨l, hl⟩ := h1 ξ hξ
         have hlR : (d : ℝ) * ((ξ.1 0 : ℚ) : ℝ) = (l : ℝ) := by exact_mod_cast hl
         have hl0 : l ≠ 0 := by
@@ -293,18 +307,24 @@ theorem UpperTheory.summable_tsum_inv_one_add_height_pow_le :
           have : (1 : ℤ) ≤ |l| := Int.one_le_abs hl0
           exact_mod_cast this
         apply lower_bound_first_case _ _ _ _ _ _ hd1 hBu hα hT (abs_nonneg _) (abs_nonneg _)
-        calc (1 : ℝ) ≤ |(l : ℝ)| := hl1
-          _ = (d : ℝ) * |((ξ.1 0 : ℚ) : ℝ)| := by
-            rw [← hlR, abs_mul, abs_of_pos hd0]
+        calc
+          (1 : ℝ)
+            ≤ |(l : ℝ)| := hl1
+          _ = (d : ℝ) * |((ξ.1 0 : ℚ) : ℝ)| := by rw [← hlR, abs_mul, abs_of_pos hd0]
     have hL := round_bd ((d : ℝ) * ((ξ.1 0 : ℚ) : ℝ))
     have hM := round_bd ((d : ℝ) * (((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)))
     rw [abs_mul, abs_of_pos hd0] at hL hM
     exact term_bd n κ Bu α T (d : ℝ) _ _ _ t _ _ hd1 hκ hκ1 hBu hα hαT hT (abs_nonneg _)
       (abs_nonneg _) ht rfl hν1 (abs_nonneg _) (abs_nonneg _) hL hM
-  have hf : ∀ ξ : {r : Fin 2 → ℚ // r ≠ 0}, 0 ≤ ((1 + κ * Real.exp t * (|((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α)) ^ (n + 4))⁻¹ := by
+  have hf
+      : ∀ ξ : {r : Fin 2 → ℚ // r ≠ 0},
+        0 ≤ ((1
+            + κ * Real.exp t
+              * (|((ξ.1 0 : ℚ) : ℝ)| * α + |((ξ.1 0 : ℚ) : ℝ) * β + ((ξ.1 1 : ℚ) : ℝ)| / α))
+          ^ (n + 4))⁻¹ := by
     intro ξ
     positivity
-  obtain ⟨hs, hle⟩ := gen R _ hf τ hinj w wsum hw0 (C * Real.exp (-((n : ℝ) * t)) * T ^ (n + 2))
-    (by positivity) hb
+  obtain ⟨hs, hle⟩ :=
+    gen R _ hf τ hinj w wsum hw0 (C * Real.exp (-((n : ℝ) * t)) * T ^ (n + 2)) (by positivity) hb
   refine ⟨hs, hle.trans (le_of_eq ?_)⟩
   ring

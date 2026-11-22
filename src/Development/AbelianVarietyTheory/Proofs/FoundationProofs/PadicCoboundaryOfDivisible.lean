@@ -5,17 +5,18 @@ public import Formalism.GaloisCohomology.LocalTateDualityK
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology
 
 namespace GlobalTheory.PadicH2Separated
 
-theorem toZModPow_eq_iff {l : ℕ} [Fact l.Prime] (r : ℕ) (x y : ℤ_[l]) :
-    PadicInt.toZModPow r x = PadicInt.toZModPow r y ↔ ‖x - y‖ ≤ (l : ℝ) ^ (-(r : ℤ)) := by
+theorem toZModPow_eq_iff {l : ℕ} [Fact l.Prime] (r : ℕ) (x y : ℤ_[l])
+    : PadicInt.toZModPow r x = PadicInt.toZModPow r y ↔ ‖x - y‖ ≤ (l : ℝ) ^ (-(r : ℤ)) := by
   rw [PadicInt.norm_le_pow_iff_mem_span_pow, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub,
     sub_eq_zero]
 
-theorem continuous_reduction {l : ℕ} [Fact l.Prime] (r : ℕ) :
-    Continuous (PadicInt.toZModPow r : ℤ_[l] → ZMod (l ^ r)) := by
+theorem continuous_reduction {l : ℕ} [Fact l.Prime] (r : ℕ)
+    : Continuous (PadicInt.toZModPow r : ℤ_[l] → ZMod (l ^ r)) := by
   refine (IsLocallyConstant.iff_eventually_eq _).2 (fun x => ?_) |>.continuous
   have hl : (0 : ℝ) < (l : ℝ) ^ (-(r : ℤ)) :=
     zpow_pos (by exact_mod_cast (Fact.out : l.Prime).pos) _
@@ -23,9 +24,11 @@ theorem continuous_reduction {l : ℕ} [Fact l.Prime] (r : ℕ) :
   rw [toZModPow_eq_iff]
   simpa [dist_eq_norm] using hy
 
-theorem continuous_of_reductions {l : ℕ} [Fact l.Prime] {X : Type} [TopologicalSpace X]
-    (b : X → ℤ_[l]) (hb : ∀ s : ℕ, Continuous fun x => PadicInt.toZModPow (s + 1) (b x)) :
-    Continuous b := by
+theorem continuous_of_reductions
+    {l : ℕ} [Fact l.Prime]
+    {X : Type} [TopologicalSpace X]
+    (b : X → ℤ_[l]) (hb : ∀ s : ℕ, Continuous fun x => PadicInt.toZModPow (s + 1) (b x))
+    : Continuous b := by
   rw [continuous_iff_continuousAt]
   intro x
   rw [Metric.continuousAt_iff']
@@ -40,24 +43,30 @@ theorem continuous_of_reductions {l : ℕ} [Fact l.Prime] {X : Type} [Topologica
   rw [dist_eq_norm]
   exact lt_of_le_of_lt (hy.trans hk') hk
 
-theorem finite_cocycles_compact_ultrametric_rep {R G M : Type} [CommRing R] [Group G] [TopologicalSpace G] [AddCommGroup M]
-    [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M]
-    [Finite M] (rho : Representation R G M) [Finite (H1 rho)] : Finite (Z1 rho) := by
-  have hB : Finite (B1 rho) :=
-    Finite.of_surjective _ (LinearMap.surjective_rangeRestrict (d0 rho))
+theorem finite_cocycles_compact_ultrametric_rep
+    {R G M : Type} [CommRing R] [Group G] [TopologicalSpace G] [AddCommGroup M] [Module R M]
+    [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [Finite M]
+    (rho : Representation R G M) [Finite (H1 rho)]
+    : Finite (Z1 rho) := by
+  have hB : Finite (B1 rho) := Finite.of_surjective _ (LinearMap.surjective_rangeRestrict (d0 rho))
   have hB' : Finite ((B1 rho).comap (Z1 rho).subtype) :=
-    Finite.of_injective (fun x => (⟨x.1.1, x.2⟩ : B1 rho)) (fun x y h => by
-      apply Subtype.ext; apply Subtype.ext
-      exact congrArg (fun t : B1 rho => (t : G → M)) h)
+    Finite.of_injective
+      (fun x => (⟨x.1.1, x.2⟩ : B1 rho))
+      (fun x y h => by
+        apply Subtype.ext
+        apply Subtype.ext
+        exact congrArg (fun t : B1 rho => (t : G → M)) h)
   have h1 : Finite ((B1 rho).comap (Z1 rho).subtype).toAddSubgroup := hB'
   have h2 : Finite (Z1 rho ⧸ ((B1 rho).comap (Z1 rho).subtype).toAddSubgroup) :=
     inferInstanceAs (Finite (H1 rho))
   exact Finite.of_addSubgroup_quotient ((B1 rho).comap (Z1 rho).subtype).toAddSubgroup
 
-theorem finite_primitives {R G M : Type} [CommRing R] [Group G] [TopologicalSpace G]
-    [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
-    [ContinuousConstSMul R M] [Finite M] (rho : Representation R G M) [Finite (H1 rho)]
-    (z : G × G → M) : {β : G → M | Continuous β ∧ d1 rho β = z}.Finite := by
+theorem finite_primitives
+    {R G M : Type} [CommRing R] [Group G] [TopologicalSpace G] [AddCommGroup M] [Module R M]
+    [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [Finite M]
+    (rho : Representation R G M) [Finite (H1 rho)]
+    (z : G × G → M)
+    : {β : G → M | Continuous β ∧ d1 rho β = z}.Finite := by
   rcases Set.eq_empty_or_nonempty {β : G → M | Continuous β ∧ d1 rho β = z} with h | ⟨c, hc⟩
   · rw [h]; exact Set.finite_empty
   have hZ : (Z1 rho : Set (G → M)).Finite := finite_cocycles_compact_ultrametric_rep rho
@@ -69,10 +78,18 @@ theorem finite_primitives {R G M : Type} [CommRing R] [Group G] [TopologicalSpac
   have : (β - c) g + rho g ((β - c) h) - (β - c) (g * h) = 0 := by rw [← e]; abel
   exact (sub_eq_zero.1 this).symm
 
-theorem mem_coboundaries_of_forall_pow : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] (ρ : Representation ℤ_[l] Γ ℤ_[l]) (ρr : ∀ r : ℕ, Representation (ZMod (l ^ r)) Γ (ZMod (l ^ r))), (∀ r g x, PadicInt.toZModPow r (ρ g x) = ρr r g (PadicInt.toZModPow r x)) → (∀ r, 0 < r → Finite (H1 (ρr r))) → ∀ z ∈ Z2 ρ, (∀ r : ℕ, ∃ w ∈ Z2 ρ, z - (l : ℤ_[l]) ^ r • w ∈ B2 ρ) → z ∈ B2 ρ := by
+theorem mem_coboundaries_of_forall_pow
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ]
+        (ρ : Representation ℤ_[l] Γ ℤ_[l])
+        (ρr : ∀ r : ℕ, Representation (ZMod (l ^ r)) Γ (ZMod (l ^ r))),
+      (∀ r g x, PadicInt.toZModPow r (ρ g x) = ρr r g (PadicInt.toZModPow r x))
+        → (∀ r, 0 < r → Finite (H1 (ρr r)))
+        → ∀ z ∈ Z2 ρ, (∀ r : ℕ, ∃ w ∈ Z2 ρ, z - (l : ℤ_[l]) ^ r • w ∈ B2 ρ) → z ∈ B2 ρ := by
   intro l _ Γ _ _ ρ ρr hρ hfin z _ hz
-  have hd : ∀ (s : ℕ) (b : Γ → ℤ_[l]), d1 (ρr s) (fun g => PadicInt.toZModPow s (b g)) =
-      fun p => PadicInt.toZModPow s (d1 ρ b p) := by
+  have hd
+      : ∀ (s : ℕ) (b : Γ → ℤ_[l]),
+        d1 (ρr s) (fun g => PadicInt.toZModPow s (b g))
+          = fun p => PadicInt.toZModPow s (d1 ρ b p) := by
     intro s b
     funext ⟨g, h⟩
     simp only [d1_apply, map_add (f := _), map_sub, hρ]
@@ -86,8 +103,10 @@ theorem mem_coboundaries_of_forall_pow : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type
   let T : ℕ → Set (Γ → ℤ_[l]) := fun r =>
     ⋂ s, ⋂ (_ : s ≤ r), (fun (b : Γ → ℤ_[l]) g => PadicInt.toZModPow (s + 1) (b g)) ⁻¹' α (s + 1)
   have hcl : ∀ r, IsClosed (T r) := fun r =>
-    isClosed_iInter fun s => isClosed_iInter fun _ => (hα s).isClosed.preimage
-      (continuous_pi fun g => (continuous_reduction _).comp (continuous_apply g))
+    isClosed_iInter fun s =>
+      isClosed_iInter fun _ =>
+        (hα s).isClosed.preimage
+          (continuous_pi fun g => (continuous_reduction _).comp (continuous_apply g))
   have hne : ∀ r, (T r).Nonempty := by
     intro r
     obtain ⟨w, -, c, hc, hcd⟩ := hz (r + 1)
@@ -100,8 +119,9 @@ theorem mem_coboundaries_of_forall_pow : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type
     simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, map_sub, map_mul, h0, zero_mul, sub_zero]
   have hdec : ∀ r, T (r + 1) ⊆ T r := fun r b hb =>
     Set.mem_iInter₂.2 fun s hs => Set.mem_iInter₂.1 hb s (hs.trans (Nat.le_succ r))
-  obtain ⟨b, hb⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed T hdec hne
-    (hcl 0).isCompact hcl
+  obtain ⟨b, hb⟩ :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed T hdec hne (hcl 0).isCompact
+      hcl
   have hb' : ∀ s, (fun g => PadicInt.toZModPow (s + 1) (b g)) ∈ α (s + 1) := fun s =>
     Set.mem_iInter₂.1 (Set.mem_iInter.1 hb s) s le_rfl
   refine ⟨b, continuous_of_reductions b fun s => (hb' s).1, ?_⟩

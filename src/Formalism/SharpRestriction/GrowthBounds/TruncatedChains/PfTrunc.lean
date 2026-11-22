@@ -10,7 +10,8 @@ open Finset
 
 namespace Formalism.MainNotions.G.ExtremalProjector
 
-open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees Formalism.MainNotions.G.GLWeightTheory
+open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
+  Formalism.MainNotions.G.GLWeightTheory
 
 theorem restNil : RestNil := by
   intro K V _ _ _ _ _ n E hE a b hab k hk
@@ -45,9 +46,11 @@ theorem restNil : RestNil := by
     exact LinearMap.ker_zero
   exact LinearMap.ker_eq_top.1 h2
 
-theorem pf_trunc {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] {n : ℕ}
-    (E : GLOps n K V) (hE : IsGLRep E) (a b : Fin n) (hab : a ≠ b) (c T T' : ℕ)
-    (hT : Module.finrank K V ≤ T) (hT' : Module.finrank K V ≤ T') : pf E a b c T = pf E a b c T' := by
+theorem pf_trunc
+    {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    {n : ℕ} (E : GLOps n K V) (hE : IsGLRep E) (a b : Fin n) (hab : a ≠ b)
+    (c T T' : ℕ) (hT : Module.finrank K V ≤ T) (hT' : Module.finrank K V ≤ T')
+    : pf E a b c T = pf E a b c T' := by
   have hz : ∀ k, Module.finrank K V ≤ k → divPowE E a b k = 0 := by
     intro k hk
     unfold divPowE
@@ -56,10 +59,13 @@ theorem pf_trunc {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K 
     intro S hS
     obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hS
     unfold pf
-    rw [show Module.finrank K V + m + 1 = (Module.finrank K V + 1) + m by ring, Finset.sum_range_add]
-    have h0 : ∑ x ∈ Finset.range m, ((-1 : K) ^ (Module.finrank K V + 1 + x) /
-        ((Nat.choose (c + (Module.finrank K V + 1 + x)) (Module.finrank K V + 1 + x) : ℕ) : K)) •
-        (divPowE E b a (Module.finrank K V + 1 + x) * divPowE E a b (Module.finrank K V + 1 + x)) = 0 :=
+    rw [show Module.finrank K V + m + 1 = (Module.finrank K V + 1) + m by ring,
+      Finset.sum_range_add]
+    have h0
+        : ∑ x ∈ Finset.range m, ((-1 : K) ^ (Module.finrank K V + 1 + x) /
+            ((Nat.choose (c + (Module.finrank K V + 1 + x)) (Module.finrank K V + 1 + x) : ℕ) : K)) •
+            (divPowE E b a (Module.finrank K V + 1 + x) * divPowE E a b (Module.finrank K V + 1 + x))
+          = 0 :=
       Finset.sum_eq_zero (fun x _ => by rw [hz _ (by omega), mul_zero, smul_zero])
     rw [h0, add_zero]
   rw [hsum T hT, hsum T' hT']

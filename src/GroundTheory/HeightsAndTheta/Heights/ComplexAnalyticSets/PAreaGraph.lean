@@ -17,32 +17,33 @@ open scoped ENNReal NNReal
 theorem AreaGraph.proof (h : AreaGraphBound.Statement) : AreaGraph.Statement := by
   intro k m U F hU hF A hAU hA
 
-  change μH[(k : ℝ)] (realGraphPt F '' A) =
-    ∫⁻ x in A, ENNReal.ofReal (graphJac (fderiv ℝ F x :
-      EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))) ∂(μH[(k : ℝ)])
+  change μH[(k : ℝ)] (realGraphPt F '' A)
+    = ∫⁻ x in A, ENNReal.ofReal (graphJac (fderiv ℝ F x :
+        EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))) ∂(μH[(k : ℝ)])
   set S := μH[(k : ℝ)] (realGraphPt F '' A)
   set I := ∫⁻ x in A, ENNReal.ofReal (graphJac (fderiv ℝ F x :
       EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))) ∂(μH[(k : ℝ)])
 
-  have hplus : ∀ j : ℕ,
-      Tendsto (fun δ : ℝ≥0 => ((1 + δ : ℝ≥0) : ℝ≥0∞) ^ j) (𝓝[>] 0) (𝓝 1) := by
+  have hplus : ∀ j : ℕ, Tendsto (fun δ : ℝ≥0 => ((1 + δ : ℝ≥0) : ℝ≥0∞) ^ j) (𝓝[>] 0) (𝓝 1) := by
     intro j
     have hcont : Continuous (fun δ : ℝ≥0 => ((1 + δ : ℝ≥0) : ℝ≥0∞) ^ j) :=
-      (ENNReal.continuous_pow j).comp (ENNReal.continuous_coe.comp (continuous_const.add continuous_id))
+      (ENNReal.continuous_pow j).comp
+        (ENNReal.continuous_coe.comp (continuous_const.add continuous_id))
     simpa using (hcont.tendsto 0).mono_left nhdsWithin_le_nhds
-  have hminus : ∀ j : ℕ,
-      Tendsto (fun δ : ℝ≥0 => ((1 - δ : ℝ≥0) : ℝ≥0∞) ^ j) (𝓝[>] 0) (𝓝 1) := by
+  have hminus : ∀ j : ℕ, Tendsto (fun δ : ℝ≥0 => ((1 - δ : ℝ≥0) : ℝ≥0∞) ^ j) (𝓝[>] 0) (𝓝 1) := by
     intro j
     have hcont : Continuous (fun δ : ℝ≥0 => ((1 - δ : ℝ≥0) : ℝ≥0∞) ^ j) :=
-      (ENNReal.continuous_pow j).comp (ENNReal.continuous_coe.comp (continuous_const.sub continuous_id))
+      (ENNReal.continuous_pow j).comp
+        (ENNReal.continuous_coe.comp (continuous_const.sub continuous_id))
     simpa using (hcont.tendsto 0).mono_left nhdsWithin_le_nhds
 
   have hev : ∀ᶠ δ in 𝓝[>] (0 : ℝ≥0), 0 < δ ∧ δ < 1 := by
     filter_upwards [Ioo_mem_nhdsGT (show (0 : ℝ≥0) < 1 from one_pos)] with δ hδ
     exact hδ
-  have hb : ∀ᶠ δ in 𝓝[>] (0 : ℝ≥0),
-      S ≤ ((1 + δ : ℝ≥0) : ℝ≥0∞) ^ (k + 1) * I ∧
-        ((1 - δ : ℝ≥0) : ℝ≥0∞) ^ k * I ≤ ((1 + δ : ℝ≥0) : ℝ≥0∞) * S := by
+  have hb
+      : ∀ᶠ δ in 𝓝[>] (0 : ℝ≥0),
+        S ≤ ((1 + δ : ℝ≥0) : ℝ≥0∞) ^ (k + 1) * I ∧
+          ((1 - δ : ℝ≥0) : ℝ≥0∞) ^ k * I ≤ ((1 + δ : ℝ≥0) : ℝ≥0∞) * S := by
     filter_upwards [hev] with δ hδ
     exact h k m U F hU hF A hAU hA δ hδ.1 hδ.2
   apply le_antisymm

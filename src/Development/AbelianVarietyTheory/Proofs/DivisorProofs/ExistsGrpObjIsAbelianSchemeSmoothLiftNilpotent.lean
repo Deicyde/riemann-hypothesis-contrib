@@ -9,24 +9,38 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cry
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj DividedPowers
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.Published GlobalTheory.Published.GrothendieckMessing
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  DividedPowers
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.SqLift
+  GlobalTheory.Published GlobalTheory.Published.GrothendieckMessing
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.LiftGroupLaw
 
-theorem exists_grpObj_isAbelianScheme : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (π : R →+* R₀), Function.Surjective π → IsNilpotent (RingHom.ker π) →
-    ∀ (A₀ : Over (Sp R₀)) [GrpObj A₀], IsAbelianScheme A₀ →
-    ∀ (X : Over (Sp R)) (i : A₀.left ⟶ X.left), IsPullback i A₀.hom X.hom (spMap π) → Smooth X.hom →
-    ∀ (e : Sp R ⟶ X.left), e ≫ X.hom = 𝟙 _ → (1 : Over.mk (𝟙 (Sp R₀)) ⟶ A₀).left ≫ i = spMap π ≫ e →
-    ∀ (l : (A₀ ⊗ A₀).left ⟶ (X ⊗ X).left), l ≫ (fst X X).left = (fst A₀ A₀).left ≫ i → l ≫ (snd X X).left = (snd A₀ A₀).left ≫ i →
-    ∀ (m : X ⊗ X ⟶ X), l ≫ m.left = (μ[A₀]).left ≫ i →
-    ∃ _ : GrpObj X, IsGrpPullback A₀ X (spMap π) i ∧ IsAbelianScheme X := by
+theorem exists_grpObj_isAbelianScheme
+    : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (π : R →+* R₀),
+      Function.Surjective π → IsNilpotent (RingHom.ker π)
+        → ∀ (A₀ : Over (Sp R₀)) [GrpObj A₀],
+          IsAbelianScheme A₀
+            → ∀ (X : Over (Sp R)) (i : A₀.left ⟶ X.left),
+              IsPullback i A₀.hom X.hom (spMap π) → Smooth X.hom
+                → ∀ (e : Sp R ⟶ X.left),
+                  e ≫ X.hom = 𝟙 _ → (1 : Over.mk (𝟙 (Sp R₀)) ⟶ A₀).left ≫ i = spMap π ≫ e
+                    → ∀ (l : (A₀ ⊗ A₀).left ⟶ (X ⊗ X).left),
+                      l ≫ (fst X X).left = (fst A₀ A₀).left ≫ i
+                        → l ≫ (snd X X).left = (snd A₀ A₀).left ≫ i
+                        → ∀ (m : X ⊗ X ⟶ X),
+                          l ≫ m.left = (μ[A₀]).left ≫ i
+                            → ∃ _ : GrpObj X,
+                              IsGrpPullback A₀ X (spMap π) i ∧ IsAbelianScheme X := by
   intro R R₀ _ _ π hπ hN A₀ _ hA X i hi hsm e he he1 l hl1 hl2 m hm
   haveI : Smooth X.hom := hsm
   haveI : IsCommMonObj A₀ := hA.comm
-  obtain ⟨hpX, hgX⟩ := GlobalTheory.T.isProper_geometricallyConnected_smooth_nilpotent_lift R R₀ π hπ hN X A₀ i hi hsm hA.proper hA.geomConnected
+  obtain ⟨hpX, hgX⟩ :=
+    GlobalTheory.T.isProper_geometricallyConnected_smooth_nilpotent_lift R R₀ π hπ hN X A₀ i hi hsm
+      hA.proper hA.geomConnected
   haveI := hpX
   haveI := hgX
   have s2 : Smooth (X ⊗ X).hom := by rw [Over.tensorObj_hom]; infer_instance
@@ -43,31 +57,43 @@ theorem exists_grpObj_isAbelianScheme : ∀ (R R₀ : Type) [CommRing R] [CommRi
 
   obtain ⟨jA, hjl⟩ : ∃ jA : (Over.map (spMap π)).obj A₀ ⟶ X, jA.left = i := ⟨Over.homMk i hi.w, rfl⟩
   obtain ⟨E, hEl⟩ : ∃ E : 𝟙_ (Over (Sp R)) ⟶ X, E.left = e := ⟨Over.homMk e he, rfl⟩
-  obtain ⟨L, hLd⟩ : ∃ L : (Over.map (spMap π)).obj (A₀ ⊗ A₀) ⟶ X ⊗ X,
-      L = lift ((Over.map (spMap π)).map (fst A₀ A₀) ≫ jA) ((Over.map (spMap π)).map (snd A₀ A₀) ≫ jA) := ⟨_, rfl⟩
+  obtain ⟨L, hLd⟩
+      : ∃ L : (Over.map (spMap π)).obj (A₀ ⊗ A₀) ⟶ X ⊗ X,
+        L = lift ((Over.map (spMap π)).map (fst A₀ A₀) ≫ jA)
+          ((Over.map (spMap π)).map (snd A₀ A₀) ≫ jA) :=
+    ⟨_, rfl⟩
   have hL : L.left = l := by
     have p : IsPullback (fst X X).left (snd X X).left X.hom X.hom := IsPullback.of_hasPullback _ _
     refine p.hom_ext ?_ ?_
     · rw [← Over.comp_left, hLd, lift_fst, hl1, Over.comp_left, Over.map_map_left, hjl]
     · rw [← Over.comp_left, hLd, lift_snd, hl2, Over.comp_left, Over.map_map_left, hjl]
-  have pt : ∀ (T : Over (Sp R₀)) (x y : T ⟶ A₀),
-      lift ((Over.map (spMap π)).map x ≫ jA) ((Over.map (spMap π)).map y ≫ jA) = (Over.map (spMap π)).map (lift x y) ≫ L := by
+  have pt
+      : ∀ (T : Over (Sp R₀)) (x y : T ⟶ A₀),
+        lift ((Over.map (spMap π)).map x ≫ jA) ((Over.map (spMap π)).map y ≫ jA)
+          = (Over.map (spMap π)).map (lift x y) ≫ L := by
     intro T x y
-    rw [hLd, comp_lift, ← CategoryTheory.Functor.map_comp_assoc, ← CategoryTheory.Functor.map_comp_assoc, lift_fst, lift_snd]
+    rw [hLd, comp_lift, ← CategoryTheory.Functor.map_comp_assoc,
+      ← CategoryTheory.Functor.map_comp_assoc, lift_fst, lift_snd]
   have hLm : L ≫ m = (Over.map (spMap π)).map μ[A₀] ≫ jA := by
     ext1; rw [Over.comp_left, hL, hm, Over.comp_left, Over.map_map_left, hjl]
-  have ptm : ∀ (T : Over (Sp R₀)) (x y : T ⟶ A₀),
-      lift ((Over.map (spMap π)).map x ≫ jA) ((Over.map (spMap π)).map y ≫ jA) ≫ m = (Over.map (spMap π)).map (x * y) ≫ jA := by
+  have ptm
+      : ∀ (T : Over (Sp R₀)) (x y : T ⟶ A₀),
+        lift ((Over.map (spMap π)).map x ≫ jA) ((Over.map (spMap π)).map y ≫ jA) ≫ m
+          = (Over.map (spMap π)).map (x * y) ≫ jA := by
     intro T x y
     rw [pt, Category.assoc, hLm, ← CategoryTheory.Functor.map_comp_assoc, Hom.mul_def]
   have hE : ∀ T : Over (Sp R₀), (Over.map (spMap π)).map (1 : T ⟶ A₀) ≫ jA = toUnit _ ≫ E := by
     intro T
-    have h1 : (1 : T ⟶ A₀) = (Over.homMk T.hom (Category.comp_id T.hom) : T ⟶ Over.mk (𝟙 (Sp R₀))) ≫ 1 := (comp_one _).symm
+    have h1
+        : (1 : T ⟶ A₀)
+          = (Over.homMk T.hom (Category.comp_id T.hom) : T ⟶ Over.mk (𝟙 (Sp R₀))) ≫ 1 :=
+      (comp_one _).symm
     ext1
-    rw [Over.comp_left, Over.comp_left, Over.map_map_left, h1, Over.comp_left, Category.assoc, hjl, he1,
-      Over.toUnit_left, Over.map_obj_hom, hEl]
+    rw [Over.comp_left, Over.comp_left, Over.map_map_left, h1, Over.comp_left, Category.assoc, hjl,
+      he1, Over.toUnit_left, Over.map_obj_hom, hEl]
     rfl
-  have hj : (Over.map (spMap π)).map (𝟙 A₀) ≫ jA = jA := by rw [CategoryTheory.Functor.map_id, Category.id_comp]
+  have hj : (Over.map (spMap π)).map (𝟙 A₀) ≫ jA = jA := by
+    rw [CategoryTheory.Functor.map_id, Category.id_comp]
   have hjE : jA ≫ toUnit X ≫ E = (Over.map (spMap π)).map (1 : A₀ ⟶ A₀) ≫ jA := by
     rw [hE, comp_toUnit_assoc]
 
@@ -78,7 +104,8 @@ theorem exists_grpObj_isAbelianScheme : ∀ (R R₀ : Type) [CommRing R] [CommRi
     rw [hj, _root_.one_mul, hj] at h
     exact h
   have τiso : IsIso τ := by
-    refine GlobalTheory.T.isIso_of_flat_pullback_reduction R R₀ π hπ hN X X A₀ A₀ i i hi hi inferInstance τ (𝟙 A₀) ?_ inferInstance
+    refine GlobalTheory.T.isIso_of_flat_pullback_reduction R R₀ π hπ hN X X A₀ A₀ i i hi hi
+      inferInstance τ (𝟙 A₀) ?_ inferInstance
     have h := congrArg (fun g => g.left) hτ
     simp only [Over.comp_left, hjl] at h
     rw [h, Over.id_left, Category.id_comp]
@@ -86,8 +113,10 @@ theorem exists_grpObj_isAbelianScheme : ∀ (R R₀ : Type) [CommRing R] [CommRi
   have hjτ : jA ≫ inv τ = jA := by
     conv_lhs => rw [← hτ]
     rw [Category.assoc, IsIso.hom_inv_id, Category.comp_id]
-  have ptm₁ : ∀ (T : Over (Sp R₀)) (x y : T ⟶ A₀),
-      lift ((Over.map (spMap π)).map x ≫ jA) ((Over.map (spMap π)).map y ≫ jA) ≫ m₁ = (Over.map (spMap π)).map (x * y) ≫ jA := by
+  have ptm₁
+      : ∀ (T : Over (Sp R₀)) (x y : T ⟶ A₀),
+        lift ((Over.map (spMap π)).map x ≫ jA) ((Over.map (spMap π)).map y ≫ jA) ≫ m₁
+          = (Over.map (spMap π)).map (x * y) ≫ jA := by
     intro T x y
     rw [hm₁d, ← Category.assoc, ptm, Category.assoc, hjτ]
   have hLm₁ : L ≫ m₁ = (Over.map (spMap π)).map μ[A₀] ≫ jA := by
@@ -108,23 +137,30 @@ theorem exists_grpObj_isAbelianScheme : ∀ (R R₀ : Type) [CommRing R] [CommRi
     refine ⟨⟨lift (fst A₀ A₀) ((fst A₀ A₀)⁻¹ * snd A₀ A₀), ?_, ?_⟩⟩
     · apply CartesianMonoidalCategory.hom_ext
       · simp
-      · rw [Category.assoc, lift_snd, comp_mul, GrpObj.comp_inv, lift_fst, lift_snd, hμ, inv_mul_cancel_left,
-          Category.id_comp]
+      · rw [Category.assoc, lift_snd, comp_mul, GrpObj.comp_inv, lift_fst, lift_snd, hμ,
+          inv_mul_cancel_left, Category.id_comp]
     · apply CartesianMonoidalCategory.hom_ext
       · simp
-      · rw [Category.assoc, lift_snd, hμ, comp_mul, lift_fst, lift_snd, mul_inv_cancel_left, Category.id_comp]
-  have hl₂ : IsPullback l (A₀ ⊗ A₀).hom (X ⊗ X).hom (spMap π) := GlobalTheory.AbDual.isPullback_prod hi hi hl1 hl2
+      · rw [Category.assoc, lift_snd, hμ, comp_mul, lift_fst, lift_snd, mul_inv_cancel_left,
+          Category.id_comp]
+  have hl₂ : IsPullback l (A₀ ⊗ A₀).hom (X ⊗ X).hom (spMap π) :=
+    GlobalTheory.AbDual.isPullback_prod hi hi hl1 hl2
   have hLfst : L ≫ fst X X = (Over.map (spMap π)).map (fst A₀ A₀) ≫ jA := by rw [hLd, lift_fst]
   have hLσ : L ≫ lift (fst X X) m₁ = (Over.map (spMap π)).map (lift (fst A₀ A₀) μ[A₀]) ≫ L := by
     rw [comp_lift, hLm₁, hLfst, ← pt]
   have σiso : IsIso (lift (fst X X) m₁) := by
-    refine GlobalTheory.T.isIso_of_flat_pullback_reduction R R₀ π hπ hN (X ⊗ X) (X ⊗ X) (A₀ ⊗ A₀) (A₀ ⊗ A₀) l l hl₂ hl₂ inferInstance _ _ ?_ σ₀iso
+    refine GlobalTheory.T.isIso_of_flat_pullback_reduction R R₀ π hπ hN (X ⊗ X) (X ⊗ X) (A₀ ⊗ A₀)
+      (A₀ ⊗ A₀) l l hl₂ hl₂ inferInstance _ _ ?_ σ₀iso
     have h := congrArg (fun g => g.left) hLσ
     simp only [Over.comp_left, Over.map_map_left, hL] at h
     exact h
-  have toLeft : ∀ {P Q : Over (Sp R)} (a : Q ⟶ P) (f f' : P ⟶ X), a ≫ f = a ≫ f' → a.left ≫ f.left = a.left ≫ f'.left :=
-    fun a f f' h => by simpa only [Over.comp_left] using congrArg (fun g => g.left) h
-  have EXT := GlobalTheory.T.eq_of_shear_automorphism_lift_nilpotent R R₀ π hπ hN A₀ X i hi l hl1 hl2 m₁ hm₁ σiso
+  have toLeft
+      : ∀ {P Q : Over (Sp R)} (a : Q ⟶ P) (f f' : P ⟶ X),
+        a ≫ f = a ≫ f' → a.left ≫ f.left = a.left ≫ f'.left := fun a f f' h => by
+    simpa only [Over.comp_left] using congrArg (fun g => g.left) h
+  have EXT :=
+    GlobalTheory.T.eq_of_shear_automorphism_lift_nilpotent R R₀ π hπ hN A₀ X i hi l hl1 hl2 m₁ hm₁
+      σiso
   have hEu : toUnit (𝟙_ (Over (Sp R))) = 𝟙 _ := toUnit_unique _ _
 
   have mul_one₁ : lift (𝟙 X) (toUnit X ≫ E) ≫ m₁ = 𝟙 X := by
@@ -140,16 +176,21 @@ theorem exists_grpObj_isAbelianScheme : ∀ (R R₀ : Type) [CommRing R] [CommRi
       simp only [comp_lift_assoc, Category.comp_id, comp_toUnit_assoc, hEu, Category.id_comp, hEE]
 
   have comm₁ : (β_ X X).hom ≫ m₁ = m₁ := by
-    refine EXT (X ⊗ X) (A₀ ⊗ A₀) l hl₂ s2 p2 g2 (lift E E).left (by simpa using Over.w (lift E E)) _ _ ?_ ?_
+    refine EXT (X ⊗ X) (A₀ ⊗ A₀) l hl₂ s2 p2 g2 (lift E E).left (by simpa using Over.w (lift E E)) _
+      _ ?_ ?_
     · rw [← hL]
       apply toLeft
       rw [hLd, lift_braiding_hom_assoc, ptm₁, ptm₁, _root_.mul_comm]
     · apply toLeft
       rw [lift_braiding_hom_assoc]
 
-  obtain ⟨L₃, hL₃d⟩ : ∃ L₃ : (Over.map (spMap π)).obj ((A₀ ⊗ A₀) ⊗ A₀) ⟶ (X ⊗ X) ⊗ X,
-      L₃ = lift (lift ((Over.map (spMap π)).map (fst (A₀ ⊗ A₀) A₀ ≫ fst A₀ A₀) ≫ jA)
-        ((Over.map (spMap π)).map (fst (A₀ ⊗ A₀) A₀ ≫ snd A₀ A₀) ≫ jA)) ((Over.map (spMap π)).map (snd (A₀ ⊗ A₀) A₀) ≫ jA) :=
+  obtain ⟨L₃, hL₃d⟩
+      : ∃ L₃ : (Over.map (spMap π)).obj ((A₀ ⊗ A₀) ⊗ A₀) ⟶ (X ⊗ X) ⊗ X,
+        L₃
+          = lift
+            (lift ((Over.map (spMap π)).map (fst (A₀ ⊗ A₀) A₀ ≫ fst A₀ A₀) ≫ jA)
+              ((Over.map (spMap π)).map (fst (A₀ ⊗ A₀) A₀ ≫ snd A₀ A₀) ≫ jA))
+            ((Over.map (spMap π)).map (snd (A₀ ⊗ A₀) A₀) ≫ jA) :=
     ⟨_, rfl⟩
   have hL₃1 : L₃ ≫ fst (X ⊗ X) X = (Over.map (spMap π)).map (fst (A₀ ⊗ A₀) A₀) ≫ L := by
     rw [hL₃d, lift_fst, pt, ← comp_lift, lift_fst_snd, Category.comp_id]
@@ -164,14 +205,20 @@ theorem exists_grpObj_isAbelianScheme : ∀ (R R₀ : Type) [CommRing R] [CommRi
       (by simpa using Over.w (lift (lift E E) E)) _ _ ?_ ?_
     · apply toLeft
       rw [hL₃d]
-      simp only [lift_whiskerRight_assoc, lift_lift_associator_hom_assoc, lift_whiskerLeft_assoc, ptm₁]
+      simp only [lift_whiskerRight_assoc, lift_lift_associator_hom_assoc, lift_whiskerLeft_assoc,
+        ptm₁]
       rw [_root_.mul_assoc]
     · apply toLeft
-      simp only [lift_whiskerRight_assoc, lift_lift_associator_hom_assoc, lift_whiskerLeft_assoc, hEE]
+      simp only [lift_whiskerRight_assoc, lift_lift_associator_hom_assoc, lift_whiskerLeft_assoc,
+        hEE]
 
-  obtain ⟨iX, hiXd⟩ : ∃ iX : X ⟶ X, iX = lift (𝟙 X) (toUnit X ≫ E) ≫ inv (lift (fst X X) m₁) ≫ snd X X := ⟨_, rfl⟩
+  obtain ⟨iX, hiXd⟩
+      : ∃ iX : X ⟶ X, iX = lift (𝟙 X) (toUnit X ≫ E) ≫ inv (lift (fst X X) m₁) ≫ snd X X :=
+    ⟨_, rfl⟩
   have right_inv₁ : lift (𝟙 X) iX ≫ m₁ = toUnit X ≫ E := by
-    have hp : (lift (𝟙 X) (toUnit X ≫ E) ≫ inv (lift (fst X X) m₁)) ≫ lift (fst X X) m₁ = lift (𝟙 X) (toUnit X ≫ E) := by
+    have hp
+        : (lift (𝟙 X) (toUnit X ≫ E) ≫ inv (lift (fst X X) m₁)) ≫ lift (fst X X) m₁
+          = lift (𝟙 X) (toUnit X ≫ E) := by
       rw [Category.assoc, IsIso.inv_hom_id, Category.comp_id]
     have h1 : (lift (𝟙 X) (toUnit X ≫ E) ≫ inv (lift (fst X X) m₁)) ≫ fst X X = 𝟙 X := by
       have h := congrArg (· ≫ fst X X) hp
@@ -204,8 +251,9 @@ theorem exists_grpObj_isAbelianScheme : ∀ (R R₀ : Type) [CommRing R] [CommRi
       left_inv := left_inv₁
       right_inv := right_inv₁ }
   refine ⟨G, ⟨hi, fun T x y x₀ y₀ hx hy => ?_⟩, ⟨⟨comm₁⟩, hsm, hpX, hgX⟩⟩
-  have ex : ∀ (z : T ⟶ A₀) (z₀ : Over.mk (T.hom ≫ spMap π) ⟶ X), z₀.left = z.left ≫ i →
-      z₀ = (Over.map (spMap π)).map z ≫ jA := fun z z₀ h => by
+  have ex
+      : ∀ (z : T ⟶ A₀) (z₀ : Over.mk (T.hom ≫ spMap π) ⟶ X),
+        z₀.left = z.left ≫ i → z₀ = (Over.map (spMap π)).map z ≫ jA := fun z z₀ h => by
     ext1
     rw [h, Over.comp_left, Over.map_map_left, hjl]
   rw [ex x x₀ hx, ex y y₀ hy, Hom.mul_def]

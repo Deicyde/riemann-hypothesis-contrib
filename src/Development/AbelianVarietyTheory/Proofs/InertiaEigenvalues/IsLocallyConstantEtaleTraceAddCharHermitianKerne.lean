@@ -10,8 +10,9 @@ noncomputable section
 
 namespace GlobalTheory.JR.Hyp
 
-theorem isLocallyConstant_of_isStdChar {F : Type} [NontriviallyNormedField F] (ψ : AddChar F ℂ)
-    (hψ : IsStdChar ψ) : IsLocallyConstant (fun t : F => ψ t) := by
+theorem isLocallyConstant_of_isStdChar
+    {F : Type} [NontriviallyNormedField F] (ψ : AddChar F ℂ) (hψ : IsStdChar ψ)
+    : IsLocallyConstant (fun t : F => ψ t) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   filter_upwards [Metric.closedBall_mem_nhds x one_pos] with y hy
@@ -19,8 +20,11 @@ theorem isLocallyConstant_of_isStdChar {F : Type} [NontriviallyNormedField F] (�
   have : y = x + (y - x) := by abel
   rw [this, AddChar.map_add_eq_mul, hψ.1 _ hs, mul_one]
 
-def kerLinF {F E : Type} [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
-    (A : Et F E) (x : A.K) (y' : A.L) : A.L →ₗ[F] F where
+def kerLinF
+    {F E : Type}
+    [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
+    (A : Et F E) (x : A.K) (y' : A.L)
+    : A.L →ₗ[F] F where
   toFun y := Algebra.trace F A.K (x * Algebra.trace A.K A.L (star y * y'))
   map_add' a b := by simp [star_add, add_mul, mul_add, map_add (f := _)]
   map_smul' c a := by
@@ -31,9 +35,13 @@ def kerLinF {F E : Type} [NontriviallyNormedField F] [NontriviallyNormedField E]
     rw [h1, map_smul, smul_eq_mul, ← mul_assoc, mul_comm x, mul_assoc, ← Algebra.smul_def, map_smul]
     rfl
 
-theorem isLocallyConstant_psiK_kerL (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
-    [Unram F E] (A : Et F E) (ψ : AddChar F ℂ) (hψ : IsStdChar ψ) :
-    IsLocallyConstant (A.psiK ψ) ∧ ∀ (x : A.K) (y' : A.L), IsLocallyConstant (fun y => A.kerL ψ x y y') := by
+theorem isLocallyConstant_psiK_kerL
+    (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+    [StarRing E] [Unram F E]
+    (A : Et F E)
+    (ψ : AddChar F ℂ) (hψ : IsStdChar ψ)
+    : IsLocallyConstant (A.psiK ψ)
+      ∧ ∀ (x : A.K) (y' : A.L), IsLocallyConstant (fun y => A.kerL ψ x y y') := by
   have hl := isLocallyConstant_of_isStdChar ψ hψ
   refine ⟨?_, fun x y' => ?_⟩
   · have hc : Continuous (Algebra.trace F A.K) :=

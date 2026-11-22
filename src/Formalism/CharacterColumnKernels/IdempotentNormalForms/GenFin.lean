@@ -40,26 +40,32 @@ theorem genericFin : StatGenericFin := by
   let r : ∀ w, d w → d w → R := fun w a b => Function.surjInv (hρ w) (Matrix.single a b 1)
   let c : (Σ w : s, g × m × d w × d w) → Matrix g m R := fun j =>
     Matrix.single j.2.1 j.2.2.1 (r j.1 j.2.2.2.1 j.2.2.2.2)
-  let L : ∀ w, Matrix (g × d w) (m × d w) (MvPolynomial (Σ w : s, g × m × d w × d w)
-      (IsLocalRing.ResidueField O)) := fun w p q =>
+  let L
+      : ∀ w,
+        Matrix (g × d w) (m × d w)
+          (MvPolynomial (Σ w : s, g × m × d w × d w) (IsLocalRing.ResidueField O)) := fun w p q =>
     ∑ j, MvPolynomial.X j * MvPolynomial.C (res (ρ w (c j p.1 q.1) p.2 q.2))
   let Q : s → MvPolynomial (Σ w : s, g × m × d w × d w) (IsLocalRing.ResidueField O) := fun w =>
     (Matrix.of fun p q => ∑ l, L w (e w p) l * MvPolynomial.C (res (U w l (f w q)))).det
-  have hevalQ : ∀ w (t : (Σ w : s, g × m × d w × d w) → O),
-      MvPolynomial.eval (fun j => res (t j)) (Q w) =
-        res (Matrix.of fun p q => (bigRect (ρ w) (∑ j, t j • c j) * U w) (e w p) (f w q)).det := by
+  have hevalQ
+      : ∀ w (t : (Σ w : s, g × m × d w × d w) → O),
+        MvPolynomial.eval (fun j => res (t j)) (Q w)
+          = res (Matrix.of fun p q =>
+            (bigRect (ρ w) (∑ j, t j • c j) * U w) (e w p) (f w q)).det := by
     intro w t
     simp only [Q]
     rw [RingHom.map_det, RingHom.map_det]
     congr 1
     ext p q
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [L, Matrix.mul_apply, bigRect, Matrix.sum_apply, map_sum]
+    simp [L, Matrix.mul_apply, bigRect, Matrix.sum_apply, map_sum]
 
-  have hsum : ∀ w (φ : g × m × d w × d w → O),
-      bigRect (ρ w) (∑ j : (Σ w : s, g × m × d w × d w),
-        (Pi.single (M := fun w => g × m × d w × d w → O) w φ j.1 j.2) • c j) =
-        fun p q => φ (p.1, q.1, p.2, q.2) := by
+  have hsum
+      : ∀ w (φ : g × m × d w × d w → O),
+        bigRect (ρ w)
+            (∑ j : (Σ w : s, g × m × d w × d w),
+              (Pi.single (M := fun w => g × m × d w × d w → O) w φ j.1 j.2) • c j)
+          = fun p q => φ (p.1, q.1, p.2, q.2) := by
     intro w φ
     funext p q
     set_option synthInstance.maxHeartbeats 100000 in
@@ -84,22 +90,23 @@ theorem genericFin : StatGenericFin := by
         (fun x => C0 w (x.1, x.2.2.1) (x.2.1, x.2.2.2)) j.1 j.2 with ht0
     have h1 := hevalQ w t0
     rw [hQ, map_zero] at h1
-    have h2 : bigRect (ρ w) (∑ j, t0 j • c j) = C0 w := by
-      rw [ht0, hsum]
+    have h2 : bigRect (ρ w) (∑ j, t0 j • c j) = C0 w := by rw [ht0, hsum]
     rw [h2] at h1
     exact (IsLocalRing.residue_ne_zero_iff_isUnit _).2 (hC0 w) h1.symm
   have hprod : (∏ w, Q w) ≠ 0 := Finset.prod_ne_zero_iff.2 (fun w _ => hQne w)
 
   have hL : ∀ w p q, (L w p q).totalDegree ≤ 1 := fun w p q =>
-    MvPolynomial.totalDegree_finsetSum_le fun j _ => (MvPolynomial.totalDegree_mul _ _).trans
-      (by rw [MvPolynomial.totalDegree_X, MvPolynomial.totalDegree_C])
+    MvPolynomial.totalDegree_finsetSum_le fun j _ =>
+      (MvPolynomial.totalDegree_mul _ _).trans
+        (by rw [MvPolynomial.totalDegree_X, MvPolynomial.totalDegree_C])
   have hQdeg : ∀ w, (Q w).totalDegree ≤ Fintype.card g * Fintype.card (d w) := by
     intro w
     simp only [Q]
     refine (genfin_det_totalDegree _ fun p q => ?_).trans ?_
     · rw [Matrix.of_apply]
-      exact MvPolynomial.totalDegree_finsetSum_le fun l _ => (MvPolynomial.totalDegree_mul _ _).trans
-        (by rw [MvPolynomial.totalDegree_C, add_zero]; exact hL _ _ _)
+      exact MvPolynomial.totalDegree_finsetSum_le fun l _ =>
+        (MvPolynomial.totalDegree_mul _ _).trans
+          (by rw [MvPolynomial.totalDegree_C, add_zero]; exact hL _ _ _)
     · rw [Fintype.card_fin, ← Fintype.card_prod]
       have he := Fintype.card_le_of_embedding (e w)
       rwa [Fintype.card_fin] at he
@@ -122,7 +129,8 @@ theorem genericFin : StatGenericFin := by
   obtain ⟨x, hx⟩ : ∃ x, MvPolynomial.eval x (∏ w, Q w) ≠ 0 := by
     by_contra hcon
     simp only [not_exists, not_not] at hcon
-    exact hprod (MvPolynomial.eq_zero_of_eval_zero_at_prod_finset _ (fun _ => S)
+    exact hprod (MvPolynomial.eq_zero_of_eval_zero_at_prod_finset _
+      (fun _ => S)
       (fun i => lt_of_le_of_lt ((MvPolynomial.degreeOf_le_totalDegree _ i).trans hdeg) hS)
       (fun x _ => hcon x))
   rw [map_prod] at hx
@@ -141,13 +149,16 @@ theorem genericFin : StatGenericFin := by
 
 section KerHomRectAux
 
-variable {R : Type*} [Ring R] {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {R : Type*} [Ring R]
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   {m g d : Type} [Fintype m] [Fintype g] [DecidableEq g] [Fintype d] [DecidableEq d]
   (ρ : R →+* Matrix d d O) [SMulCommClass R O (LatQ O d ρ)]
 
-theorem genfin_uncurry_relMap (P : Matrix m g R) (v : g → LatQ O d ρ) :
-    uncurryEquiv (g := m) ρ (relMap O (LatQ O d ρ) P v) =
-      relMap O (KO O) (fun (p : m × d) (q : g × d) => ρ (P p.1 q.1) p.2 q.2)
+theorem genfin_uncurry_relMap (P : Matrix m g R) (v : g → LatQ O d ρ)
+    : uncurryEquiv (g := m) ρ (relMap O (LatQ O d ρ) P v)
+      = relMap O (KO O)
+        (fun (p : m × d) (q : g × d) => ρ (P p.1 q.1) p.2 q.2)
         (uncurryEquiv ρ v) := by
   funext p
   obtain ⟨i, a⟩ := p
@@ -158,9 +169,9 @@ theorem genfin_uncurry_relMap (P : Matrix m g R) (v : g → LatQ O d ρ) :
   rw [hsum]
   rfl
 
-theorem genfin_ker_map_uncurry (P : Matrix m g R) :
-    (LinearMap.ker (relMap O (LatQ O d ρ) P)).map (uncurryEquiv (g := g) ρ).toLinearMap =
-      LinearMap.ker (relMap O (KO O) (fun (p : m × d) (q : g × d) => ρ (P p.1 q.1) p.2 q.2)) := by
+theorem genfin_ker_map_uncurry (P : Matrix m g R)
+    : (LinearMap.ker (relMap O (LatQ O d ρ) P)).map (uncurryEquiv (g := g) ρ).toLinearMap
+      = LinearMap.ker (relMap O (KO O) (fun (p : m × d) (q : g × d) => ρ (P p.1 q.1) p.2 q.2)) := by
   ext w
   rw [Submodule.mem_map_equiv, LinearMap.mem_ker, LinearMap.mem_ker]
   constructor
@@ -178,6 +189,7 @@ end KerHomRectAux
 theorem kerHomRect : StatKerHomRect := by
   intro R O _ _ _ _ m g d _ _ _ _ _ ρ _ P
   rw [(homEquiv (O := O) (M := LatQ O d ρ) P).length_eq]
-  exact ((LinearEquiv.ofSubmodules (uncurryEquiv ρ) _ _ (genfin_ker_map_uncurry ρ P)).length_eq).symm
+  exact ((LinearEquiv.ofSubmodules (uncurryEquiv ρ) _ _
+    (genfin_ker_map_uncurry ρ P)).length_eq).symm
 
 end Formalism.NG

@@ -115,14 +115,19 @@ private lemma extP_comap_eq_inf_conjIdeal_of_isMaximal (hK : Formalism.Hermitian
     exact Ideal.add_mem _ (Ideal.sub_mem _ (Ideal.mul_mem_left _ _ (hmem _ ha𝔭))
       (Ideal.mul_mem_left _ _ (hmem _ hb𝔭))) (Ideal.mul_mem_right _ _ (hmem _ hi))
 
-theorem map_comap_eq_of_inert (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {P : Ideal (𝓞 K)}
-    (hP : P.IsMaximal) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P = P) :
-    extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) = P := by
+theorem map_comap_eq_of_inert
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {P : Ideal (𝓞 K)}
+    (hP : P.IsMaximal) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P = P)
+    : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) = P := by
   rw [extP_comap_eq_inf_conjIdeal_of_isMaximal hK hF hP, hc, inf_idem]
 
-theorem extP_split (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {P : Ideal (𝓞 K)}
-    (hP : P.IsMaximal) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≠ P) :
-    extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) = P * Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
+theorem extP_split
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {P : Ideal (𝓞 K)}
+    (hP : P.IsMaximal) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≠ P)
+    : extP K (P.comap (algebraMap (𝓞 F) (𝓞 K)))
+      = P * Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
   have hle : ¬ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≤ P := by
     intro h
     apply hc
@@ -148,8 +153,8 @@ theorem one_lt_q {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : (1 : ℝ) < 
   have : 1 < Ideal.absNorm 𝔭 := by omega
   exact_mod_cast this
 
-theorem beta_pos {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {M : ℕ} (hM : 1 ≤ M) :
-    0 < 1 - etaF K F 𝔭 ^ M * (Ideal.absNorm 𝔭 : ℝ) ^ (-(M : ℤ)) := by
+theorem beta_pos {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {M : ℕ} (hM : 1 ≤ M)
+    : 0 < 1 - etaF K F 𝔭 ^ M * (Ideal.absNorm 𝔭 : ℝ) ^ (-(M : ℤ)) := by
   have hq := one_lt_q h𝔭
   have hlt : (Ideal.absNorm 𝔭 : ℝ) ^ (-(M : ℤ)) < 1 := by
     rw [zpow_neg, zpow_natCast]
@@ -159,16 +164,21 @@ theorem beta_pos {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {M : ℕ} (hM 
   · rw [one_pow, one_mul]; linarith
   · rcases neg_one_pow_eq_or ℝ M with h' | h' <;> rw [h'] <;> linarith
 
-theorem cnt_unit (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) {M k : ℕ} (hM : 1 ≤ M) (hk : 1 ≤ k) {n : 𝓞 F} (hn : n ∉ 𝔭) :
-    (cnt hF 𝔭 k M (ι n) : ℝ) = (Ideal.absNorm 𝔭 : ℝ) ^ ((2 * M - 1) * k) *
-      (1 - etaF K F 𝔭 ^ M * (Ideal.absNorm 𝔭 : ℝ) ^ (-(M : ℤ))) := by
+theorem cnt_unit
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {M k : ℕ} (hM : 1 ≤ M) (hk : 1 ≤ k)
+    {n : 𝓞 F} (hn : n ∉ 𝔭)
+    : (cnt hF 𝔭 k M (ι n) : ℝ)
+      = (Ideal.absNorm 𝔭 : ℝ) ^ ((2 * M - 1) * k)
+        * (1 - etaF K F 𝔭 ^ M * (Ideal.absNorm 𝔭 : ℝ) ^ (-(M : ℤ))) := by
   classical
   have hinj : RingHom.ker (algebraMap (𝓞 F) (𝓞 K)) ≤ 𝔭 := by
     intro x hx
     rw [RingHom.mem_ker] at hx
     have h2 : algebraMap F K (algebraMap (𝓞 F) F x) = 0 := by
-      rw [← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K, hx, map_zero]
+      rw [← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K, hx,
+        map_zero]
     rw [map_eq_zero_iff _ (algebraMap F K).injective] at h2
     have : x = 0 := RingOfIntegers.ext (h2.trans (map_zero (algebraMap (𝓞 F) F)).symm)
     rw [this]
@@ -199,28 +209,35 @@ theorem cnt_unit (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFi
   · have hsplit := extP_split hK hF hP hc
     rw [hsplit, normRepCount_eq_eulerFac_split hK hP hc M k hM hk _ hfix hnP]
     have hN := absNorm_comap_split hK hF hP hc
-    have hcc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P) = P := by
+    have hcc
+        : Formalism.HermitianLatticesTheory.conjIdeal (K := K)
+            (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P)
+          = P := by
       ext r
       rw [mem_conjIdeal_iff', mem_conjIdeal_iff', conjO_conjO_unimodular_class_representatives]
-    have hc2 : Formalism.HermitianLatticesTheory.conjIdeal (K := K) (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P) ≠
-        Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
+    have hc2
+        : Formalism.HermitianLatticesTheory.conjIdeal (K := K)
+            (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P)
+          ≠ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
       rw [hcc]
       exact Ne.symm hc
     have hNc := absNorm_conjIdeal hK P
-    have hpr : ¬ ((P.comap ι).map ι).IsPrime := by
+    have hpr : ¬((P.comap ι).map ι).IsPrime := by
       intro hpr
       have h3 := hsplit
       unfold extP at h3
       rw [h3] at hpr
       rcases (hpr.mul_le).mp le_rfl with h | h
-      · have h1 : P ≤ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := h.trans Ideal.mul_le_right
+      · have h1 : P ≤ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P :=
+          h.trans Ideal.mul_le_right
         apply hc
         refine le_antisymm ?_ h1
         intro r hr
         rw [mem_conjIdeal_iff'] at hr
         have h4 := h1 hr
         rwa [mem_conjIdeal_iff', conjO_conjO_unimodular_class_representatives] at h4
-      · have h1 : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≤ P := h.trans Ideal.mul_le_left
+      · have h1 : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≤ P :=
+          h.trans Ideal.mul_le_left
         apply hc
         refine le_antisymm h1 ?_
         intro r hr
@@ -241,9 +258,12 @@ theorem cnt_unit (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFi
     rw [if_neg hc, if_neg hc2, hNc, ← hN, heta, ← Real.rpow_add hx, hh, Real.rpow_neg_one, inv_inv,
       one_pow, one_mul]
 
-theorem exists_norm (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) {k : ℕ} (hk : 1 ≤ k) {u : 𝓞 F} (hu : u ∉ 𝔭) :
-    ∃ c : 𝓞 K, conjO K c * c - ι u ∈ extP K 𝔭 ^ k := by
+theorem exists_norm
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {k : ℕ} (hk : 1 ≤ k)
+    {u : 𝓞 F} (hu : u ∉ 𝔭)
+    : ∃ c : 𝓞 K, conjO K c * c - ι u ∈ extP K 𝔭 ^ k := by
   have hq := one_lt_q h𝔭
   have h1 := cnt_unit hK hF h𝔭 (M := 1) le_rfl hk hu
   have h2 := beta_pos (K := K) h𝔭 (M := 1) le_rfl
@@ -259,22 +279,28 @@ theorem exists_norm (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : I
   rw [Fin.sum_univ_one] at hsum
   exact Ideal.Quotient.eq.mp hsum
 
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem exists_frame (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) (hv : vd h L 𝔭 = 0) {k : ℕ} (hk : 1 ≤ k) :
-    ∃ (z : Fin (finrank K V) → ↥L) (g : Fin (finrank K V) → 𝓞 K),
-      (∀ i j, i ≠ j → h (z i : V) (z j : V) = 0) ∧
-      (∀ i, h (z i : V) (z i : V) = algebraMap (𝓞 K) K (g i)) ∧ ∀ i, g i - 1 ∈ extP K 𝔭 ^ k := by
+theorem exists_frame
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (hv : vd h L 𝔭 = 0)
+    {k : ℕ} (hk : 1 ≤ k)
+    : ∃ (z : Fin (finrank K V) → ↥L) (g : Fin (finrank K V) → 𝓞 K),
+      (∀ i j, i ≠ j → h (z i : V) (z j : V) = 0)
+        ∧ (∀ i, h (z i : V) (z i : V) = algebraMap (𝓞 K) K (g i))
+        ∧ ∀ i, g i - 1 ∈ extP K 𝔭 ^ k := by
   obtain ⟨P, hP, rfl⟩ := exists_maximal_over hK hF h𝔭
   have hPp := hP.isPrime
   have hda := LocF.aniso_of_totPosDef hd
   have hu := (isUnimodularAt_iff_vd hK hF hs hd hL hLi hP).2 hv
-  obtain ⟨x, hxM, hxo, hxu⟩ := LocF.exists_orth_unit_frame (WA.isHermSemilocal_locRing hK hP)
-    (LocF.locRing_local hPp) hs hda (WA.isSelfDualMod_loc hL hPp hu)
+  obtain ⟨x, hxM, hxo, hxu⟩ :=
+    LocF.exists_orth_unit_frame (WA.isHermSemilocal_locRing hK hP) (LocF.locRing_local hPp) hs hda
+      (WA.isSelfDualMod_loc hL hPp hu)
   choose s hs' hsx using fun i => Formalism.HermitianLatticesTheory.locBasic_mem_locS.mp
     (show x i ∈ Formalism.HermitianLatticesTheory.locS (Formalism.HermitianLatticesTheory.hcompl (K := K) P) L from hxM i)
   choose u hu' using fun i => MeanB.exists_val hF hs hLi ⟨s i • x i, hsx i⟩
@@ -283,7 +309,8 @@ theorem exists_frame (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : 
     have h1 : WA.IsUnitIn (WA.locRing P) (algebraMap (𝓞 K) K (ι (u i))) := by
       rw [MeanB.algebraMap_comp, ← hu' i]
       show WA.IsUnitIn (WA.locRing P) (h (s i • x i) (s i • x i))
-      rw [Formalism.HermitianLatticesTheory.locDual_h_smul_left, Formalism.HermitianLatticesTheory.locDual_h_smul_right]
+      rw [Formalism.HermitianLatticesTheory.locDual_h_smul_left,
+        Formalism.HermitianLatticesTheory.locDual_h_smul_right]
       refine LocF.isUnitIn_mul ?_ (LocF.isUnitIn_mul ?_ (hxu i))
       · rw [← WA.algebraMap_conjO, LocF.isUnitIn_algebraMap_iff hPp]
         exact WA.conjO_mem_hcompl (hs' i)
@@ -298,23 +325,32 @@ theorem exists_frame (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : 
     rw [sub_sub_cancel] at h2
     exact h𝔭.ne_top ((Ideal.eq_top_iff_one _).2 h2)
   choose c hc using fun i => exists_norm hK hF h𝔭 hk (hunit' i)
-  refine ⟨fun i => ⟨c i • s i • x i, L.smul_mem _ (hsx i)⟩, fun i => conjO K (c i) * c i * ι (u i),
-    ?_, ?_, ?_⟩
+  refine ⟨
+    fun i => ⟨c i • s i • x i, L.smul_mem _ (hsx i)⟩,
+    fun i => conjO K (c i) * c i * ι (u i),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro i j hij
     show h (c i • s i • x i) (c j • s j • x j) = 0
-    simp only [Formalism.HermitianLatticesTheory.locDual_h_smul_left, Formalism.HermitianLatticesTheory.locDual_h_smul_right, hxo i j hij, mul_zero]
+    simp only [Formalism.HermitianLatticesTheory.locDual_h_smul_left,
+      Formalism.HermitianLatticesTheory.locDual_h_smul_right, hxo i j hij, mul_zero]
   · intro i
     show h (c i • s i • x i) (c i • s i • x i) = _
     have := hu' i
     simp only at this
-    rw [Formalism.HermitianLatticesTheory.locDual_h_smul_left, Formalism.HermitianLatticesTheory.locDual_h_smul_right, this, map_mul, map_mul,
+    rw [Formalism.HermitianLatticesTheory.locDual_h_smul_left,
+      Formalism.HermitianLatticesTheory.locDual_h_smul_right, this, map_mul, map_mul,
       WA.algebraMap_conjO, MeanB.algebraMap_comp]
     ring
   · intro i
-    have e : conjO K (c i) * c i * ι (u i) - 1 =
-        (conjO K (c i) * c i - ι (u' i)) * ι (u i) + ι (u' i * u i - 1) := by
+    have e
+        : conjO K (c i) * c i * ι (u i) - 1
+          = (conjO K (c i) * c i - ι (u' i)) * ι (u i) + ι (u' i * u i - 1) := by
       rw [map_sub, map_mul, map_one]; ring
     rw [e]
-    exact add_mem (Ideal.mul_mem_right _ _ (hc i)) ((idealPowerSpanBounds.mem_pow_iff _ _ _).2 (hu'' i))
+    exact add_mem (Ideal.mul_mem_right _ _ (hc i))
+      ((idealPowerSpanBounds.mem_pow_iff _ _ _).2 (hu'' i))
 
 end Formalism.HermitianLattices.Ext.L3.unitaryAbsoluteValueBounds

@@ -10,22 +10,30 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SameDiv
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.LogPair
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem spMap_base_mem_basicOpen {R T : Type} [CommRing R] [CommRing T] (χ : R →+* T) (a : R)
-    (ha : IsUnit (χ a)) (t : Sp T) : (spMap χ).base t ∈ (PrimeSpectrum.basicOpen a : (Sp R).Opens) := by
+theorem spMap_base_mem_basicOpen
+    {R T : Type} [CommRing R] [CommRing T] (χ : R →+* T) (a : R) (ha : IsUnit (χ a)) (t : Sp T)
+    : (spMap χ).base t ∈ (PrimeSpectrum.basicOpen a : (Sp R).Opens) := by
   change a ∉ (PrimeSpectrum.comap χ t).asIdeal
   intro h
   exact t.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ h ha)
 
-theorem tube_of_universallyClosed : ∀ (R k : Type) [CommRing R] [Field k] (φ : R →+* k) (X X' : Scheme.{0})
-    (f : X ⟶ Sp R) (f' : X' ⟶ Sp k) (π : X' ⟶ X) [UniversallyClosed f] (W : X.Opens),
-    IsPullback π f' f (spMap φ) → π ⁻¹ᵁ W = ⊤ → ∃ a : R, φ a ≠ 0 ∧ ∀ (T : Type) [CommRing T] (χ : R →+* T),
-    IsUnit (χ a) → ∀ (Z : Scheme.{0}) (g : Z ⟶ Sp T) (ρ : Z ⟶ X), IsPullback ρ g f (spMap χ) → ρ ⁻¹ᵁ W = ⊤ := by
+theorem tube_of_universallyClosed
+    : ∀ (R k : Type) [CommRing R] [Field k] (φ : R →+* k) (X X' : Scheme.{0}) (f : X ⟶ Sp R)
+        (f' : X' ⟶ Sp k) (π : X' ⟶ X) [UniversallyClosed f] (W : X.Opens),
+      IsPullback π f' f (spMap φ) → π ⁻¹ᵁ W = ⊤
+        → ∃ a : R,
+          φ a ≠ 0
+            ∧ ∀ (T : Type) [CommRing T] (χ : R →+* T),
+              IsUnit (χ a)
+                → ∀ (Z : Scheme.{0}) (g : Z ⟶ Sp T) (ρ : Z ⟶ X),
+                  IsPullback ρ g f (spMap χ) → ρ ⁻¹ᵁ W = ⊤ := by
   intro R k _ _ φ X X' f f' π _ W H hW
   have hc : IsClosed (f.base '' (W : Set X)ᶜ) := f.isClosedMap _ W.isOpen.isClosed_compl
   let t : Sp k := ⟨⊥, Ideal.isPrime_bot⟩

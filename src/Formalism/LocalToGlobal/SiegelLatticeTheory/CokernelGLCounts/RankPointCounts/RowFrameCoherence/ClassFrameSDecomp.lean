@@ -18,24 +18,27 @@ namespace LocalFrameDecomposition
 
 variable {D : Formalism.BasicNotions.D7} (X : HidaSetting D)
 
-theorem frameLoc (w : D.what₂.Word) (v : NumberField.InfinitePlace X.B.I.F) :
-    PI.SchurPlaces.LeviLA.Frame (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
+theorem frameLoc (w : D.what₂.Word) (v : NumberField.InfinitePlace X.B.I.F)
+    : PI.SchurPlaces.LeviLA.Frame (X.B.I.ε v)
+      (fun a => rv X.B.I v (X.eR a))
+      (fun a => rv X.B.I v (X.fR a))
       (rv X.B.I v (X.zR w)) (X.wfr w v) := by
   let fr := Formalism.L2.SG.RealObj.InfCut.PtRepPf.frU X w v
-  exact
-    { ee := fr.ee
-      ef := fr.ef
-      ff := fr.ff
-      ez := fr.ez
-      fz := fr.fz
-      ew := fr.ew
-      fw := fr.fw
-      zw := fr.zw
-      ww := fr.ww
-      zz := fun h0 => fr.T_ne (neg_eq_zero.1 (fr.zz.symm.trans h0))
-      card := by
-        have h := fr.card
-        omega }
+  exact {
+    ee := fr.ee
+    ef := fr.ef
+    ff := fr.ff
+    ez := fr.ez
+    fz := fr.fz
+    ew := fr.ew
+    fw := fr.fw
+    zw := fr.zw
+    ww := fr.ww
+    zz := fun h0 => fr.T_ne (neg_eq_zero.1 (fr.zz.symm.trans h0))
+    card := by
+      have h := fr.card
+      omega
+  }
 
 end LocalFrameDecomposition
 
@@ -60,9 +63,12 @@ theorem sDecompC_holds (w : D.what₂.Word) : SDecompC X w := by
       subst hp
       exact hVz v
   have hN : s0⁻¹ * g⁻¹ ∈ X.NinfU w := fun v => by
-    have e : uMat ((s0⁻¹ * g⁻¹) v) =
-        (((V v)⁻¹ : (Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ)ˣ) : Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ) *
-          uMat (g⁻¹ v) := rfl
+    have e
+        : uMat ((s0⁻¹ * g⁻¹) v)
+          = (((V v)⁻¹ : (Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ)ˣ)
+              : Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ)
+            * uMat (g⁻¹ v) :=
+      rfl
     rw [e]
     exact hVN v
   have hN' := Formalism.L2.SG.RealObj.SpanPreservation.ninfU_inv X w hN

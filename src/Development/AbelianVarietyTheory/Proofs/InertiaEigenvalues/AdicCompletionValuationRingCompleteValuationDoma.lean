@@ -11,32 +11,33 @@ namespace GlobalTheory.ValCompletion
 section General
 variable {R : Type} [CommRing R] {I : Ideal R} {a : R}
 
-theorem evalₐ_eq_zero_iff (h : I = Ideal.span {a}) (n : ℕ) (y : AdicCompletion I R) :
-    AdicCompletion.evalₐ I n y = 0 ↔ algebraMap R (AdicCompletion I R) a ^ n ∣ y := by
+theorem evalₐ_eq_zero_iff (h : I = Ideal.span {a}) (n : ℕ) (y : AdicCompletion I R)
+    : AdicCompletion.evalₐ I n y = 0 ↔ algebraMap R (AdicCompletion I R) a ^ n ∣ y := by
   have hfg : I.FG := ⟨{a}, by simp [h]⟩
-  have e : (I ^ n).map (algebraMap R (AdicCompletion I R)) =
-      Ideal.span {algebraMap R (AdicCompletion I R) a ^ n} := by
+  have e
+      : (I ^ n).map (algebraMap R (AdicCompletion I R))
+        = Ideal.span {algebraMap R (AdicCompletion I R) a ^ n} := by
     have : I ^ n = Ideal.span {a ^ n} := by rw [h, Ideal.span_singleton_pow]
     rw [this, Ideal.map_span, Set.image_singleton, map_pow]
-  rw [← Ideal.mem_span_singleton, ← e, ← Submodule.restrictScalars_mem R,
-    ← Ideal.smul_top_eq_map, AdicCompletion.pow_smul_top_eq_ker_eval hfg, LinearMap.mem_ker]
+  rw [← Ideal.mem_span_singleton, ← e, ← Submodule.restrictScalars_mem R, ← Ideal.smul_top_eq_map,
+    AdicCompletion.pow_smul_top_eq_ker_eval hfg, LinearMap.mem_ker]
   have h' : (I ^ n • ⊤ : Ideal R) = I ^ n := by ext x; simp
   exact map_eq_zero_iff _ (Ideal.quotientEquivAlgOfEq R h').injective
 
-theorem evalₐ_algebraMap (n : ℕ) (r : R) :
-    AdicCompletion.evalₐ I n (algebraMap R (AdicCompletion I R) r) = Ideal.Quotient.mk _ r := by
+theorem evalₐ_algebraMap (n : ℕ) (r : R)
+    : AdicCompletion.evalₐ I n (algebraMap R (AdicCompletion I R) r) = Ideal.Quotient.mk _ r := by
   rw [AlgHom.commutes]; rfl
 
-theorem factorPow_evalₐ {m n : ℕ} (h : m ≤ n) (y : AdicCompletion I R) :
-    Ideal.Quotient.factorPow I h (AdicCompletion.evalₐ I n y) = AdicCompletion.evalₐ I m y := by
+theorem factorPow_evalₐ {m n : ℕ} (h : m ≤ n) (y : AdicCompletion I R)
+    : Ideal.Quotient.factorPow I h (AdicCompletion.evalₐ I n y) = AdicCompletion.evalₐ I m y := by
   induction y using AdicCompletion.induction_on with
   | _ x =>
     simp only [AdicCompletion.evalₐ_mk]
     rw [← AdicCompletion.Ideal.mk_eq_mk I h x]
     rfl
 
-theorem isUnit_evalₐ (y : AdicCompletion I R) (hy : IsUnit (AdicCompletion.evalₐ I 1 y)) (n : ℕ) :
-    IsUnit (AdicCompletion.evalₐ I n y) := by
+theorem isUnit_evalₐ (y : AdicCompletion I R) (hy : IsUnit (AdicCompletion.evalₐ I 1 y)) (n : ℕ)
+    : IsUnit (AdicCompletion.evalₐ I n y) := by
   have key : IsUnit (AdicCompletion.evalₐ I (n + 1) y) := by
     obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (AdicCompletion.evalₐ I (n + 1) y)
     rw [← factorPow_evalₐ (show 1 ≤ n + 1 by omega), ← ha] at hy
@@ -55,8 +56,8 @@ theorem isUnit_evalₐ (y : AdicCompletion I R) (hy : IsUnit (AdicCompletion.eva
   rw [← factorPow_evalₐ (Nat.le_succ n)]
   exact key.map _
 
-theorem isUnit_of_evalₐ (y : AdicCompletion I R) (hy : IsUnit (AdicCompletion.evalₐ I 1 y)) :
-    IsUnit y := by
+theorem isUnit_of_evalₐ (y : AdicCompletion I R) (hy : IsUnit (AdicCompletion.evalₐ I 1 y))
+    : IsUnit y := by
   let f : (n : ℕ) → Localization.Away y →+* R ⧸ I ^ n := fun n =>
     IsLocalization.Away.lift (g := (AdicCompletion.evalₐ I n).toRingHom) y (isUnit_evalₐ y hy n)
   have hf0 : ∀ n x, f n (algebraMap _ _ x) = AdicCompletion.evalₐ I n x := fun n x =>
@@ -81,15 +82,21 @@ theorem not_pow_succ_dvd_pow (hx0 : x ≠ 0) (hxu : ¬ IsUnit x) (m : ℕ) : ¬ 
   have h : x ^ m * 1 = x ^ m * (x * c) := by rw [mul_one]; nth_rewrite 1 [hc]; ring
   exact IsUnit.of_mul_eq_one c (mul_left_cancel₀ (pow_ne_zero m hx0) h).symm
 
-theorem algebraMap_pow_ne_zero (hx0 : x ≠ 0) (hxu : ¬ IsUnit x) (m : ℕ) : (algebraMap V (AdicCompletion (Ideal.span {x}) V) x) ^ m ≠ 0 := by
+theorem algebraMap_pow_ne_zero (hx0 : x ≠ 0) (hxu : ¬ IsUnit x) (m : ℕ)
+    : (algebraMap V (AdicCompletion (Ideal.span {x}) V) x) ^ m ≠ 0 := by
   intro h
   have h2 := congrArg (AdicCompletion.evalₐ (Ideal.span {x}) (m + 1)) h
   rw [← map_pow, evalₐ_algebraMap, map_zero, Ideal.Quotient.eq_zero_iff_mem,
-    Ideal.span_singleton_pow, Ideal.mem_span_singleton] at h2
+      Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+    at h2
   exact not_pow_succ_dvd_pow hx0 hxu m h2
 
-theorem exists_eq_mul_unit (hx0 : x ≠ 0) (hxu : ¬ IsUnit x) (y : AdicCompletion (Ideal.span {x}) V) (hy : y ≠ 0) :
-    ∃ (a : V) (n : ℕ), a ∣ x ^ n ∧ ∃ u : (AdicCompletion (Ideal.span {x}) V)ˣ, y = algebraMap V (AdicCompletion (Ideal.span {x}) V) a * u := by
+theorem exists_eq_mul_unit
+    (hx0 : x ≠ 0) (hxu : ¬ IsUnit x) (y : AdicCompletion (Ideal.span {x}) V) (hy : y ≠ 0)
+    : ∃ (a : V) (n : ℕ),
+      a ∣ x ^ n
+        ∧ ∃ u : (AdicCompletion (Ideal.span {x}) V)ˣ,
+          y = algebraMap V (AdicCompletion (Ideal.span {x}) V) a * u := by
   obtain ⟨n, hn⟩ : ∃ n, AdicCompletion.evalₐ (Ideal.span {x}) n y ≠ 0 := by
     by_contra hc
     push_neg at hc
@@ -105,9 +112,14 @@ theorem exists_eq_mul_unit (hx0 : x ≠ 0) (hxu : ¬ IsUnit x) (y : AdicCompleti
     obtain ⟨c, hc | hc⟩ := PreValuationRing.cond a (x ^ n)
     · exact ⟨c, hc.symm⟩
     · exact absurd ⟨c, hc.symm⟩ hna
-  obtain ⟨z, hz⟩ : algebraMap V (AdicCompletion (Ideal.span {x}) V) x ^ (n + 1) ∣ y - algebraMap V (AdicCompletion (Ideal.span {x}) V) a := by
+  obtain ⟨z, hz⟩
+      : algebraMap V (AdicCompletion (Ideal.span {x}) V) x ^ (n + 1)
+        ∣ y - algebraMap V (AdicCompletion (Ideal.span {x}) V) a := by
     rw [← evalₐ_eq_zero_iff rfl, map_sub, evalₐ_algebraMap, ← ha, sub_self]
-  have hunit : IsUnit (1 + algebraMap V (AdicCompletion (Ideal.span {x}) V) b * algebraMap V (AdicCompletion (Ideal.span {x}) V) x * z) := by
+  have hunit : IsUnit
+      (1
+        + algebraMap V (AdicCompletion (Ideal.span {x}) V) b
+          * algebraMap V (AdicCompletion (Ideal.span {x}) V) x * z) := by
     apply isUnit_of_evalₐ
     have hx1 : Ideal.Quotient.mk (Ideal.span {x} ^ 1) x = 0 := by
       rw [Ideal.Quotient.eq_zero_iff_mem, pow_one]; exact Ideal.mem_span_singleton_self x
@@ -116,7 +128,10 @@ theorem exists_eq_mul_unit (hx0 : x ≠ 0) (hxu : ¬ IsUnit x) (y : AdicCompleti
     exact isUnit_one
   refine ⟨a, n, ⟨b, hb⟩, hunit.unit, ?_⟩
   rw [IsUnit.unit_spec, mul_add, mul_one]
-  have : y = algebraMap V (AdicCompletion (Ideal.span {x}) V) a + algebraMap V (AdicCompletion (Ideal.span {x}) V) x ^ (n + 1) * z := by rw [← hz]; ring
+  have : y
+      = algebraMap V (AdicCompletion (Ideal.span {x}) V) a
+        + algebraMap V (AdicCompletion (Ideal.span {x}) V) x ^ (n + 1) * z := by
+    rw [← hz]; ring
   rw [this, pow_succ, ← map_pow, hb, map_mul]
   ring
 
@@ -124,9 +139,16 @@ end Val
 
 end GlobalTheory.ValCompletion
 
-
 open GlobalTheory.ValCompletion in
-theorem GlobalTheory.adicCompletion_valuationRing_props : ∀ (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] (x : V), x ≠ 0 → ¬ IsUnit x → IsDomain (AdicCompletion (Ideal.span {x}) V) ∧ PreValuationRing (AdicCompletion (Ideal.span {x}) V) ∧ algebraMap V (AdicCompletion (Ideal.span {x}) V) x ≠ 0 ∧ ¬ IsUnit (algebraMap V (AdicCompletion (Ideal.span {x}) V) x) ∧ IsAdicComplete (Ideal.span {algebraMap V (AdicCompletion (Ideal.span {x}) V) x}) (AdicCompletion (Ideal.span {x}) V) := by
+theorem GlobalTheory.adicCompletion_valuationRing_props
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] (x : V),
+      x ≠ 0 → ¬ IsUnit x
+        → IsDomain (AdicCompletion (Ideal.span {x}) V)
+          ∧ PreValuationRing (AdicCompletion (Ideal.span {x}) V)
+          ∧ algebraMap V (AdicCompletion (Ideal.span {x}) V) x ≠ 0
+          ∧ ¬ IsUnit (algebraMap V (AdicCompletion (Ideal.span {x}) V) x)
+          ∧ IsAdicComplete (Ideal.span {algebraMap V (AdicCompletion (Ideal.span {x}) V) x})
+            (AdicCompletion (Ideal.span {x}) V) := by
   intro V _ _ _ x hx0 hxu
   have hne : algebraMap V (AdicCompletion (Ideal.span {x}) V) x ≠ 0 := by
     simpa using algebraMap_pow_ne_zero hx0 hxu 1
@@ -138,13 +160,25 @@ theorem GlobalTheory.adicCompletion_valuationRing_props : ∀ (V : Type) [CommRi
     obtain ⟨a, n, ⟨c, hc1⟩, u, rfl⟩ := exists_eq_mul_unit hx0 hxu y hc.1
     obtain ⟨b, m, ⟨d, hd1⟩, w, rfl⟩ := exists_eq_mul_unit hx0 hxu z hc.2
     apply algebraMap_pow_ne_zero hx0 hxu (n + m)
-    have h1 : algebraMap V (AdicCompletion (Ideal.span {x}) V) a * algebraMap V (AdicCompletion (Ideal.span {x}) V) b = 0 := by
-      have h2 : algebraMap V (AdicCompletion (Ideal.span {x}) V) a * algebraMap V (AdicCompletion (Ideal.span {x}) V) b * ((u : AdicCompletion (Ideal.span {x}) V) * w) = 0 := by
+    have h1
+        : algebraMap V (AdicCompletion (Ideal.span {x}) V) a
+            * algebraMap V (AdicCompletion (Ideal.span {x}) V) b
+          = 0 := by
+      have h2
+          : algebraMap V (AdicCompletion (Ideal.span {x}) V) a
+              * algebraMap V (AdicCompletion (Ideal.span {x}) V) b
+              * ((u : AdicCompletion (Ideal.span {x}) V) * w)
+            = 0 := by
         rw [← hyz]; ring
       exact (Units.mul_left_eq_zero (u * w)).1 (by rw [Units.val_mul]; exact h2)
     rw [pow_add, ← map_pow, ← map_pow, hc1, hd1]
     simp only [map_mul]
-    calc _ = (algebraMap V (AdicCompletion (Ideal.span {x}) V) a * algebraMap V (AdicCompletion (Ideal.span {x}) V) b) * (algebraMap V (AdicCompletion (Ideal.span {x}) V) c * algebraMap V (AdicCompletion (Ideal.span {x}) V) d) := by ring
+    calc
+      _ = (algebraMap V (AdicCompletion (Ideal.span {x}) V) a
+            * algebraMap V (AdicCompletion (Ideal.span {x}) V) b)
+          * (algebraMap V (AdicCompletion (Ideal.span {x}) V) c
+            * algebraMap V (AdicCompletion (Ideal.span {x}) V) d) := by
+        ring
       _ = 0 := by rw [h1, zero_mul]
   refine ⟨hdom, ⟨fun y z => ?_⟩, hne, ?_, ?_⟩
   · by_cases hy : y = 0
@@ -154,24 +188,49 @@ theorem GlobalTheory.adicCompletion_valuationRing_props : ∀ (V : Type) [CommRi
     obtain ⟨a, n, -, u, rfl⟩ := exists_eq_mul_unit hx0 hxu y hy
     obtain ⟨b, m, -, w, rfl⟩ := exists_eq_mul_unit hx0 hxu z hz
     obtain ⟨c, hc | hc⟩ := PreValuationRing.cond a b
-    · refine ⟨algebraMap V (AdicCompletion (Ideal.span {x}) V) c * ((u⁻¹ : (AdicCompletion (Ideal.span {x}) V)ˣ) : AdicCompletion (Ideal.span {x}) V) * w, Or.inl ?_⟩
+    · refine ⟨
+        algebraMap V (AdicCompletion (Ideal.span {x}) V) c
+          * ((u⁻¹ : (AdicCompletion (Ideal.span {x}) V)ˣ) : AdicCompletion (Ideal.span {x}) V) * w,
+        Or.inl ?_
+      ⟩
       rw [← hc, map_mul]
-      calc _ = algebraMap V (AdicCompletion (Ideal.span {x}) V) a * algebraMap V (AdicCompletion (Ideal.span {x}) V) c * w * ((u : AdicCompletion (Ideal.span {x}) V) * ((u⁻¹ : (AdicCompletion (Ideal.span {x}) V)ˣ) : AdicCompletion (Ideal.span {x}) V)) := by ring
+      calc
+        _ = algebraMap V (AdicCompletion (Ideal.span {x}) V) a
+            * algebraMap V (AdicCompletion (Ideal.span {x}) V) c * w
+            * ((u : AdicCompletion (Ideal.span {x}) V)
+              * ((u⁻¹ : (AdicCompletion (Ideal.span {x}) V)ˣ)
+                : AdicCompletion (Ideal.span {x}) V)) := by
+          ring
         _ = _ := by rw [Units.mul_inv, mul_one]
-    · refine ⟨algebraMap V (AdicCompletion (Ideal.span {x}) V) c * ((w⁻¹ : (AdicCompletion (Ideal.span {x}) V)ˣ) : AdicCompletion (Ideal.span {x}) V) * u, Or.inr ?_⟩
+    · refine ⟨
+        algebraMap V (AdicCompletion (Ideal.span {x}) V) c
+          * ((w⁻¹ : (AdicCompletion (Ideal.span {x}) V)ˣ) : AdicCompletion (Ideal.span {x}) V) * u,
+        Or.inr ?_
+      ⟩
       rw [← hc, map_mul]
-      calc _ = algebraMap V (AdicCompletion (Ideal.span {x}) V) b * algebraMap V (AdicCompletion (Ideal.span {x}) V) c * u * ((w : AdicCompletion (Ideal.span {x}) V) * ((w⁻¹ : (AdicCompletion (Ideal.span {x}) V)ˣ) : AdicCompletion (Ideal.span {x}) V)) := by ring
+      calc
+        _ = algebraMap V (AdicCompletion (Ideal.span {x}) V) b
+            * algebraMap V (AdicCompletion (Ideal.span {x}) V) c * u
+            * ((w : AdicCompletion (Ideal.span {x}) V)
+              * ((w⁻¹ : (AdicCompletion (Ideal.span {x}) V)ˣ)
+                : AdicCompletion (Ideal.span {x}) V)) := by
+          ring
         _ = _ := by rw [Units.mul_inv, mul_one]
   · rintro ⟨v, hv⟩
     apply hxu
-    obtain ⟨e, he⟩ := isUnit_iff_exists_inv.1 (⟨v, hv⟩ : IsUnit (algebraMap V (AdicCompletion (Ideal.span {x}) V) x))
+    obtain ⟨e, he⟩ :=
+      isUnit_iff_exists_inv.1
+        (⟨v, hv⟩ : IsUnit (algebraMap V (AdicCompletion (Ideal.span {x}) V) x))
     have h2 := congrArg (AdicCompletion.evalₐ (Ideal.span {x}) 1) he
     have hx1 : Ideal.Quotient.mk (Ideal.span {x} ^ 1) x = 0 := by
       rw [Ideal.Quotient.eq_zero_iff_mem, pow_one]; exact Ideal.mem_span_singleton_self x
     rw [map_mul, evalₐ_algebraMap, hx1, zero_mul, map_one, eq_comm, ← map_one (Ideal.Quotient.mk _),
-      Ideal.Quotient.eq_zero_iff_mem, pow_one, Ideal.mem_span_singleton] at h2
+        Ideal.Quotient.eq_zero_iff_mem, pow_one, Ideal.mem_span_singleton]
+      at h2
     exact isUnit_of_dvd_one h2
-  · have e : (Ideal.span {x}).map (algebraMap V (AdicCompletion (Ideal.span {x}) V)) = Ideal.span {algebraMap V (AdicCompletion (Ideal.span {x}) V) x} := by
+  · have e
+        : (Ideal.span {x}).map (algebraMap V (AdicCompletion (Ideal.span {x}) V))
+          = Ideal.span {algebraMap V (AdicCompletion (Ideal.span {x}) V) x} := by
       rw [Ideal.map_span, Set.image_singleton]
     rw [← e, IsAdicComplete.map_algebraMap_iff]
     exact AdicCompletion.isAdicComplete (Submodule.fg_span_singleton x)

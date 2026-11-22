@@ -69,11 +69,10 @@ lemma coeff_initPart (v : σ) (e : ℕ) (f : MvPolynomial σ ℚ_[p]) (m : σ �
     have h0 : f.coeff m = 0 := by simpa [MvPolynomial.mem_support_iff] using hm
     by_cases h : m v = e <;> simp [h, h0]
 
-noncomputable def initL (p : ℕ) [Fact p.Prime] (v : σ) (e : ℕ) :
-    MvPolynomial σ ℚ_[p] →ₗ[ℤ_[p]] MvPolynomial σ ℚ_[p] where
+noncomputable def initL (p : ℕ) [Fact p.Prime] (v : σ) (e : ℕ)
+    : MvPolynomial σ ℚ_[p] →ₗ[ℤ_[p]] MvPolynomial σ ℚ_[p] where
   toFun := initPart v e
-  map_add' x y := by
-    ext m; simp only [coeff_initPart, MvPolynomial.coeff_add]; split_ifs <;> simp
+  map_add' x y := by ext m; simp only [coeff_initPart, MvPolynomial.coeff_add]; split_ifs <;> simp
   map_smul' a x := by
     ext m
     simp only [coeff_initPart, RingHom.id_apply]
@@ -284,16 +283,21 @@ namespace Formalism.GM.MeanGammaLemmas
 open Polynomial Finset Formalism.GM.M
 
 noncomputable def betaT (p : ℕ) [Fact p.Prime] (m z o S e : ℕ) : ℚ_[p] :=
-  (p : ℚ_[p]) ^ m * ((e.factorial * (z + e).choose e : ℕ) : ℚ_[p]) / ((o.factorial * S.factorial : ℕ) : ℚ_[p])
+  (p : ℚ_[p]) ^ m * ((e.factorial * (z + e).choose e : ℕ) : ℚ_[p])
+    / ((o.factorial * S.factorial : ℕ) : ℚ_[p])
 
-noncomputable def gramT (p : ℕ) [Fact p.Prime] {K r n : ℕ} (LLw : Letters (K + 1)) (ρ : Fin r)
-    (f : Fin n → MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) (ord : Fin n → ℕ) : Matrix (Fin n) (Fin n) ℚ_[p] :=
-  Matrix.of fun x y => fock p (initPart (Fin.last K, ρ) (ord x) (f x)) (initPart (Fin.last K, ρ) (ord x) (f y)) /
-    ∏ i, ((LLw.deg i).factorial : ℚ_[p])
+noncomputable def gramT
+    (p : ℕ) [Fact p.Prime]
+    {K r n : ℕ} (LLw : Letters (K + 1)) (ρ : Fin r)
+    (f : Fin n → MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) (ord : Fin n → ℕ)
+    : Matrix (Fin n) (Fin n) ℚ_[p] :=
+  Matrix.of fun x y =>
+    fock p (initPart (Fin.last K, ρ) (ord x) (f x)) (initPart (Fin.last K, ρ) (ord x) (f y))
+      / ∏ i, ((LLw.deg i).factorial : ℚ_[p])
 
-noncomputable def coefT (p : ℕ) [Fact p.Prime] {n : ℕ} (D0 m : ℕ) (cc : Fin n → Fin n → ℕ → ℤ_[p]) :
-    Fin n → Fin n → ℕ → ℚ_[p] :=
-  fun x y k => if k ≤ D0 then (p : ℚ_[p]) ^ m * (cc x y k : ℚ_[p]) else 0
+noncomputable def coefT (p : ℕ) [Fact p.Prime] {n : ℕ} (D0 m : ℕ) (cc : Fin n → Fin n → ℕ → ℤ_[p])
+    : Fin n → Fin n → ℕ → ℚ_[p] := fun x y k =>
+  if k ≤ D0 then (p : ℚ_[p]) ^ m * (cc x y k : ℚ_[p]) else 0
 
 lemma betaT_ne_zero (p : ℕ) [hp : Fact p.Prime] (m z o S e : ℕ) : betaT p m z o S e ≠ 0 := by
   have hp0 : (p : ℚ_[p]) ≠ 0 := Nat.cast_ne_zero.mpr hp.out.ne_zero

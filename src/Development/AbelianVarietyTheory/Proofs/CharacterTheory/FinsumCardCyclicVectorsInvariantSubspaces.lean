@@ -9,32 +9,39 @@ open Polynomial GlobalTheory.CuspGL
 
 namespace GlobalTheory.CuspGL
 
-theorem finsum_card_cyclic_eq (F : Type) [Field F] [Finite F] (V : Type) [AddCommGroup V]
-    [Module F V] [FiniteDimensional F V] (g : Module.End F V) :
-    ∑ᶠ W : {W : Submodule F V // ∀ x ∈ W, g x ∈ W},
-      (Nat.card {v : W.1 // ∀ U : Submodule F (W.1),
-        (∀ x ∈ U, (g.restrict W.2) x ∈ U) → v ∈ U → U = ⊤} : ℂ)
+theorem finsum_card_cyclic_eq
+    (F : Type) [Field F] [Finite F]
+    (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (g : Module.End F V)
+    : ∑ᶠ W : {W : Submodule F V // ∀ x ∈ W, g x ∈ W},
+        (Nat.card {v : W.1 // ∀ U : Submodule F (W.1),
+          (∀ x ∈ U, (g.restrict W.2) x ∈ U) → v ∈ U → U = ⊤} : ℂ)
       = (Nat.card F : ℂ) ^ Module.finrank F V := by
   classical
   haveI : Finite V := Module.finite_of_finite F
   haveI : Finite (Submodule F V) :=
     Finite.of_injective (fun W : Submodule F V => (W : Set V)) SetLike.coe_injective
   haveI : Fintype {W : Submodule F V // ∀ x ∈ W, g x ∈ W} := Fintype.ofFinite _
-  have key : ∀ (W W' : {W : Submodule F V // ∀ x ∈ W, g x ∈ W}) (v : W.1),
-      (∀ U : Submodule F (W.1), (∀ x ∈ U, (g.restrict W.2) x ∈ U) → v ∈ U → U = ⊤) →
-      (v : V) ∈ W'.1 → W.1 ≤ W'.1 := by
+  have key
+      : ∀ (W W' : {W : Submodule F V // ∀ x ∈ W, g x ∈ W}) (v : W.1),
+        (∀ U : Submodule F (W.1), (∀ x ∈ U, (g.restrict W.2) x ∈ U) → v ∈ U → U = ⊤)
+          → (v : V) ∈ W'.1
+          → W.1 ≤ W'.1 := by
     intro W W' v hv hv' x hx
     have h := hv (W'.1.comap W.1.subtype) (fun y hy => W'.2 _ hy) hv'
     have : (⟨x, hx⟩ : W.1) ∈ W'.1.comap W.1.subtype := h ▸ Submodule.mem_top
     exact this
-  let f : (Σ W : {W : Submodule F V // ∀ x ∈ W, g x ∈ W}, {v : W.1 // ∀ U : Submodule F (W.1),
-        (∀ x ∈ U, (g.restrict W.2) x ∈ U) → v ∈ U → U = ⊤}) → V := fun p => (p.2.1 : V)
+  let f
+      : (Σ W : {W : Submodule F V // ∀ x ∈ W, g x ∈ W},
+          {v : W.1 // ∀ U : Submodule F (W.1), (∀ x ∈ U, (g.restrict W.2) x ∈ U) → v ∈ U → U = ⊤})
+        → V := fun p =>
+    (p.2.1 : V)
   have hf : Function.Bijective f := by
     constructor
     · rintro ⟨W, v, hv⟩ ⟨W', v', hv'⟩ h
       have h' : (v : V) = v' := h
-      have hW : W = W' := Subtype.ext (le_antisymm (key W W' v hv (h' ▸ v'.2))
-        (key W' W v' hv' (h' ▸ v.2)))
+      have hW : W = W' :=
+        Subtype.ext (le_antisymm (key W W' v hv (h' ▸ v'.2)) (key W' W v' hv' (h' ▸ v.2)))
       subst hW
       have : v = v' := Subtype.ext h'
       subst this

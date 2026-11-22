@@ -20,18 +20,21 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 theorem irrAdm' : GlobalTheory.Published.IrreducibleAdmissibleGL := fun k _ _ _ _ n V _ _ π hs hi =>
   (GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness k).1 (Fin n) V π hs hi
 
-theorem conj_chi (n : ℕ) (s : ℝ) (g : GL (Fin n) k) :
-    starRingEnd ℂ ((detChar (Fin n) (absPow k (s : ℂ)) g : ℂˣ) : ℂ) =
-      ((detChar (Fin n) (absPow k (s : ℂ)) g : ℂˣ) : ℂ) := by
-  have h : ((detChar (Fin n) (absPow k (s : ℂ)) g : ℂˣ) : ℂ) =
-      ((nabs k (Matrix.GeneralLinearGroup.det g) : ℝ) : ℂ) ^ (s : ℂ) := rfl
+theorem conj_chi (n : ℕ) (s : ℝ) (g : GL (Fin n) k)
+    : starRingEnd ℂ ((detChar (Fin n) (absPow k (s : ℂ)) g : ℂˣ) : ℂ)
+      = ((detChar (Fin n) (absPow k (s : ℂ)) g : ℂˣ) : ℂ) := by
+  have h
+      : ((detChar (Fin n) (absPow k (s : ℂ)) g : ℂˣ) : ℂ)
+        = ((nabs k (Matrix.GeneralLinearGroup.det g) : ℝ) : ℂ) ^ (s : ℂ) :=
+    rfl
   rw [h, ← Complex.ofReal_cpow (by unfold nabs; positivity), Complex.conj_ofReal]
 
 end ConjDual
 
 open ConjDual in
-theorem conjDual (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    ConjDual k := by
+theorem conjDual
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : ConjDual k := by
   intro n V _ _ ρ hs hi hu s
   obtain ⟨B, hsym, hpos, hinv⟩ := hu
 
@@ -42,32 +45,34 @@ theorem conjDual (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsN
 
   have hsm : ∀ v : V, (B.flip v : Module.Dual ℂ V) ∈ smoothPart ρ.dual := by
     intro v
-    let H₁ : Subgroup (GL (Fin n) k) :=
-      { carrier := {g | ρ g v = v}
-        mul_mem' := by
-          intro a b ha hb
-          simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
-          rw [hb, ha]
-        one_mem' := by simp
-        inv_mem' := by
-          intro a ha
-          simp only [Set.mem_setOf_eq] at *
-          conv_lhs => rw [← ha]
-          rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
-    let H₂ : Subgroup (GL (Fin n) k) :=
-      { carrier := {g | ρ.dual g (B.flip v) = B.flip v}
-        mul_mem' := by
-          intro a b ha hb
-          simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
-          rw [hb, ha]
-        one_mem' := by
-          show ρ.dual 1 (B.flip v) = B.flip v
-          rw [map_one, Module.End.one_apply]
-        inv_mem' := by
-          intro a ha
-          simp only [Set.mem_setOf_eq] at *
-          conv_lhs => rw [← ha]
-          rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
+    let H₁ : Subgroup (GL (Fin n) k) := {
+      carrier := {g | ρ g v = v}
+      mul_mem' := by
+        intro a b ha hb
+        simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
+        rw [hb, ha]
+      one_mem' := by simp
+      inv_mem' := by
+        intro a ha
+        simp only [Set.mem_setOf_eq] at *
+        conv_lhs => rw [← ha]
+        rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+    }
+    let H₂ : Subgroup (GL (Fin n) k) := {
+      carrier := {g | ρ.dual g (B.flip v) = B.flip v}
+      mul_mem' := by
+        intro a b ha hb
+        simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
+        rw [hb, ha]
+      one_mem' := by
+        show ρ.dual 1 (B.flip v) = B.flip v
+        rw [map_one, Module.End.one_apply]
+      inv_mem' := by
+        intro a ha
+        simp only [Set.mem_setOf_eq] at *
+        conv_lhs => rw [← ha]
+        rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+    }
     have hle : H₁ ≤ H₂ := by
       intro g hg
       show ρ.dual g (B.flip v) = B.flip v
@@ -85,7 +90,8 @@ theorem conjDual (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsN
     ext x
     rw [hφ, contra_apply, hφ, key]
   have hinj : Function.Injective φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v hv
     by_contra hne
     have h1 := hpos v hne
@@ -95,12 +101,14 @@ theorem conjDual (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsN
     rw [h2] at h1
     simp at h1
   have hsurj : Function.Surjective φ := by
-    have hci : (contra ρ).IsIrreducible := GlobalTheory.CompanionTheory.ZcDual.isIrreducible_contra irrAdm' ρ hs hi
-    let U : Subrepresentation (contra ρ) :=
-      { toSubmodule := LinearMap.range φ
-        apply_mem_toSubmodule := by
-          rintro g _ ⟨v, rfl⟩
-          exact ⟨ρ g v, heq g v⟩ }
+    have hci : (contra ρ).IsIrreducible :=
+      GlobalTheory.CompanionTheory.ZcDual.isIrreducible_contra irrAdm' ρ hs hi
+    let U : Subrepresentation (contra ρ) := {
+      toSubmodule := LinearMap.range φ
+      apply_mem_toSubmodule := by
+        rintro g _ ⟨v, rfl⟩
+        exact ⟨ρ g v, heq g v⟩
+    }
     have : Nontrivial V := by
       by_contra hV
       rw [not_nontrivial_iff_subsingleton] at hV

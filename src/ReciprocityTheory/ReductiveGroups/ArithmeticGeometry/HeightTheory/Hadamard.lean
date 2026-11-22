@@ -9,8 +9,9 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 open scoped BigOperators ComplexOrder
 open Finset Matrix
 
-theorem psd_det_re_le_one_of_diag (N : ℕ) (H : Matrix (Fin N) (Fin N) ℂ) (hH : H.PosSemidef)
-    (hd : ∀ c, H c c = 1) : H.det.re ≤ 1 := by
+theorem psd_det_re_le_one_of_diag
+    (N : ℕ) (H : Matrix (Fin N) (Fin N) ℂ) (hH : H.PosSemidef) (hd : ∀ c, H c c = 1)
+    : H.det.re ≤ 1 := by
   have hHerm := hH.isHermitian
   have htr : ∑ i, hHerm.eigenvalues i = N := by
     have h := hHerm.trace_eq_sum_eigenvalues
@@ -22,18 +23,18 @@ theorem psd_det_re_le_one_of_diag (N : ℕ) (H : Matrix (Fin N) (Fin N) ℂ) (hH
     linarith
   have hre : H.det.re = ∏ i, hHerm.eigenvalues i := by
     rw [hHerm.det_eq_prod_eigenvalues]
-    first
-      | (norm_cast)
-      | simp [← Complex.ofReal_prod]
+    first | (norm_cast) | simp [← Complex.ofReal_prod]
   rw [hre]
-  calc ∏ i, hHerm.eigenvalues i ≤ ∏ i, Real.exp (hHerm.eigenvalues i - 1) :=
-        Finset.prod_le_prod₀ (fun i _ => hH.eigenvalues_nonneg i)
-          (fun i _ => by linarith [Real.add_one_le_exp (hHerm.eigenvalues i - 1)])
+  calc
+    ∏ i, hHerm.eigenvalues i ≤ ∏ i, Real.exp (hHerm.eigenvalues i - 1) :=
+      Finset.prod_le_prod₀
+        (fun i _ => hH.eigenvalues_nonneg i)
+        (fun i _ => by linarith [Real.add_one_le_exp (hHerm.eigenvalues i - 1)])
     _ = Real.exp (∑ i, (hHerm.eigenvalues i - 1)) := (Real.exp_sum _ _).symm
     _ = 1 := by simp [Finset.sum_sub_distrib, htr]
 
-theorem psd_det_re_le_prod_diag (N : ℕ) (G : Matrix (Fin N) (Fin N) ℂ) (hG : G.PosSemidef) :
-    G.det.re ≤ ∏ c, (G c c).re := by
+theorem psd_det_re_le_prod_diag (N : ℕ) (G : Matrix (Fin N) (Fin N) ℂ) (hG : G.PosSemidef)
+    : G.det.re ≤ ∏ c, (G c c).re := by
   classical
   have hdiag : ∀ c, G c c = ((G c c).re : ℂ) := fun c =>
     (Complex.conj_eq_iff_re.mp (by
@@ -90,8 +91,8 @@ theorem psd_det_re_le_prod_diag (N : ℕ) (G : Matrix (Fin N) (Fin N) ℂ) (hG :
     have := mul_lt_mul_of_pos_left hlt hp
     linarith
 
-theorem hadamard_det_le {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) :
-    ‖A.det‖ ≤ ∏ i, Real.sqrt (∑ j, ‖A i j‖ ^ 2) := by
+theorem hadamard_det_le {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ)
+    : ‖A.det‖ ≤ ∏ i, Real.sqrt (∑ j, ‖A i j‖ ^ 2) := by
   have hdet : (A * Aᴴ).det.re = ‖A.det‖ ^ 2 := by
     rw [Matrix.det_mul, Matrix.det_conjTranspose]
     rw [show star A.det = (starRingEnd ℂ) A.det from rfl, Complex.mul_conj, Complex.ofReal_re,
@@ -105,15 +106,17 @@ theorem hadamard_det_le {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) :
   rw [hdet] at key
   simp only [hdiag] at key
   have hs : ∀ i, 0 ≤ ∑ j, ‖A i j‖ ^ 2 := fun i => Finset.sum_nonneg fun j _ => by positivity
-  calc ‖A.det‖ = Real.sqrt (‖A.det‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
+  calc
+    ‖A.det‖
+      = Real.sqrt (‖A.det‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
     _ ≤ Real.sqrt ((∏ i, Real.sqrt (∑ j, ‖A i j‖ ^ 2)) ^ 2) := by
-        apply Real.sqrt_le_sqrt
-        rw [← Finset.prod_pow]
-        have h : ∏ i, Real.sqrt (∑ j, ‖A i j‖ ^ 2) ^ 2 = ∏ i, ∑ j, ‖A i j‖ ^ 2 :=
-          Finset.prod_congr rfl fun i _ => Real.sq_sqrt (hs i)
-        rw [h]
-        exact key
+      apply Real.sqrt_le_sqrt
+      rw [← Finset.prod_pow]
+      have h : ∏ i, Real.sqrt (∑ j, ‖A i j‖ ^ 2) ^ 2 = ∏ i, ∑ j, ‖A i j‖ ^ 2 :=
+        Finset.prod_congr rfl fun i _ => Real.sq_sqrt (hs i)
+      rw [h]
+      exact key
     _ = ∏ i, Real.sqrt (∑ j, ‖A i j‖ ^ 2) :=
-        Real.sqrt_sq (Finset.prod_nonneg fun i _ => Real.sqrt_nonneg _)
+      Real.sqrt_sq (Finset.prod_nonneg fun i _ => Real.sqrt_nonneg _)
 
 end ReciprocityTheory.ChartRestriction.G.T0

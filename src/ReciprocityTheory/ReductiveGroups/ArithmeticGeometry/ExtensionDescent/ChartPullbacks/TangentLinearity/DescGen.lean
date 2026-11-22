@@ -12,18 +12,18 @@ open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
 
 namespace ReciprocityTheory.ChartRestriction.G.Out.TLinPf
 
-theorem descend_gen {X Y : Scheme.{0}} (Q : X ⟶ Y) [Flat Q] [Surjective Q] [IsAffineHom Q]
+theorem descend_gen
+    {X Y : Scheme.{0}} (Q : X ⟶ Y) [Flat Q] [Surjective Q] [IsAffineHom Q]
     (ρ : Γ(X, ⊤))
-    (hρ : ∀ {Z : Scheme.{0}} (y1 y2 : Z ⟶ X), y1 ≫ Q = y2 ≫ Q → y1.appTop.hom ρ = y2.appTop.hom ρ) :
-    ∃ v : Γ(Y, ⊤), Q.appTop.hom v = ρ := by
-
-  have hE : EffectiveEpi Q := by
-    exact inferInstance
+    (hρ : ∀ {Z : Scheme.{0}} (y1 y2 : Z ⟶ X), y1 ≫ Q = y2 ≫ Q → y1.appTop.hom ρ = y2.appTop.hom ρ)
+    : ∃ v : Γ(Y, ⊤), Q.appTop.hom v = ρ := by
+  have hE : EffectiveEpi Q := by exact inferInstance
 
   obtain ⟨e, he⟩ : ∃ e, ∀ i : Fin 1, AffineSpace.toSpecMvPolyIntEquiv (Fin 1) e i = ρ :=
     ⟨(AffineSpace.toSpecMvPolyIntEquiv (Fin 1)).symm fun _ => ρ, fun i => by simp⟩
-  have hcomp : ∀ {Z : Scheme.{0}} (g : Z ⟶ X) (i : Fin 1),
-      AffineSpace.toSpecMvPolyIntEquiv (Fin 1) (g ≫ e) i = g.appTop.hom ρ := by
+  have hcomp
+      : ∀ {Z : Scheme.{0}} (g : Z ⟶ X) (i : Fin 1),
+        AffineSpace.toSpecMvPolyIntEquiv (Fin 1) (g ≫ e) i = g.appTop.hom ρ := by
     intro Z g i
     rw [AffineSpace.toSpecMvPolyIntEquiv_comp, he]
   have hdesc : ∀ {Z : Scheme.{0}} (g₁ g₂ : Z ⟶ X), g₁ ≫ Q = g₂ ≫ Q → g₁ ≫ e = g₂ ≫ e := by

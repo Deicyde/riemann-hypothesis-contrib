@@ -23,8 +23,12 @@ theorem expChart_of (hS : ShearStep) (hC : ConstStep) : ExpChart := by
   unfold Formalism.MainNotions.S.haarLie
   rw [one_smul, hvol, Measure.map_smul, Measure.map_map hE.measurable hΛm, ← hσ.map_eq]
   congr 1
-  have e : ((fun x : Formalism.MainNotions.S.lieE (Nset k r) => fun i j =>
-      NormedSpace.exp (Formalism.MainNotions.S.unrealify (x : EuclideanSpace ℝ _)) i j) ∘ Λ : (J k r → ℝ) → Mt k r) = Φ ∘ σ := by
+  have e
+      : ((fun x : Formalism.MainNotions.S.lieE (Nset k r) => fun i j =>
+              NormedSpace.exp (Formalism.MainNotions.S.unrealify (x : EuclideanSpace ℝ _)) i j)
+            ∘ Λ
+          : (J k r → ℝ) → Mt k r)
+        = Φ ∘ σ := by
     funext y
     simp only [Function.comp, Φ]
     rw [hσe y, hΛ y, Formalism.MainNotions.BridgeCSB.unrealify_RL]
@@ -36,6 +40,7 @@ end Formalism.L2.SG.Pf.NcReal.JX.EC
 
 namespace Formalism.L2.SG.Pf.NcReal.JX
 
-theorem exponential_chart_haar : ExpChart := EC.expChart_of EC.shear_change_holds EC.constant_change_holds
+theorem exponential_chart_haar : ExpChart :=
+  EC.expChart_of EC.shear_change_holds EC.constant_change_holds
 
 end Formalism.L2.SG.Pf.NcReal.JX

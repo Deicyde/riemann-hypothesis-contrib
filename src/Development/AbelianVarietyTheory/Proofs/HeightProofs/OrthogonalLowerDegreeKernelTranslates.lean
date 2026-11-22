@@ -16,7 +16,9 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ContDiffMatri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Matrix
 open Formalism.REAL GlobalTheory.SmoothGlob GlobalTheory.TypeSum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -24,9 +26,11 @@ open GlobalTheory.KFourier MeasureTheory
 
 namespace GlobalTheory.KFourier
 
-theorem orth_translate_lowV {n : ℕ} (ε : Fin n → Bool) (i : ℕ) (p κ : KG ε → ℂ) (hκ : κ ∈ lowV ε i)
-    (h : ∀ q ∈ lowV ε i, ∫ k, q k * p k ∂(muK ε) = 0) (k : KG ε) :
-    ∫ x, star (p x) * κ (x⁻¹ * k) ∂(muK ε) = 0 := by
+theorem orth_translate_lowV
+    {n : ℕ} (ε : Fin n → Bool)
+    (i : ℕ) (p κ : KG ε → ℂ) (hκ : κ ∈ lowV ε i) (h : ∀ q ∈ lowV ε i, ∫ k, q k * p k ∂(muK ε) = 0)
+    (k : KG ε)
+    : ∫ x, star (p x) * κ (x⁻¹ * k) ∂(muK ε) = 0 := by
   cases i with
   | zero =>
     have h0 : κ = 0 := by simpa [lowV] using hκ

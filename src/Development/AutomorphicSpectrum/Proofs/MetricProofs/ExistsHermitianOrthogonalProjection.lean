@@ -9,28 +9,32 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.QuotientLattic
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 
 namespace GlobalTheory.CompanionTheory.Ar.PosFormProjection
 
-theorem exists_orthogonal_coefficients :
-    ∀ (g k : ℕ) (Hm : Matrix (Fin g) (Fin g) ℂ),
-      (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm *ᵥ star z).re) →
-      ∀ u : Fin k → Fin g → ℂ, LinearIndependent ℂ u →
-      ∀ z : Fin g → ℂ, ∃ c : Fin k → ℂ,
-        ∀ j, (z - ∑ i, c i • u i) ⬝ᵥ Hm *ᵥ star (u j) = 0 := by
+theorem exists_orthogonal_coefficients
+    : ∀ (g k : ℕ) (Hm : Matrix (Fin g) (Fin g) ℂ),
+      (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm *ᵥ star z).re)
+        → ∀ u : Fin k → Fin g → ℂ,
+          LinearIndependent ℂ u
+            → ∀ z : Fin g → ℂ, ∃ c : Fin k → ℂ, ∀ j,
+              (z - ∑ i, c i • u i) ⬝ᵥ Hm *ᵥ star (u j) = 0 := by
   intro g k Hm hpos u hli z
-  let A : (Fin k → ℂ) →ₗ[ℂ] (Fin k → ℂ) :=
-    { toFun := fun c j => (∑ i, c i • u i) ⬝ᵥ Hm *ᵥ star (u j)
-      map_add' := by
-        intro a b
-        funext j
-        simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib, add_dotProduct]
-      map_smul' := by
-        intro a b
-        funext j
-        simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, mul_smul, ← Finset.smul_sum,
-          smul_dotProduct] }
+  let A : (Fin k → ℂ) →ₗ[ℂ] (Fin k → ℂ) := {
+    toFun := fun c j => (∑ i, c i • u i) ⬝ᵥ Hm *ᵥ star (u j)
+    map_add' := by
+      intro a b
+      funext j
+      simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib, add_dotProduct]
+    map_smul' := by
+      intro a b
+      funext j
+      simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, mul_smul, ← Finset.smul_sum,
+        smul_dotProduct]
+  }
   have hinj : Function.Injective A := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro c hc

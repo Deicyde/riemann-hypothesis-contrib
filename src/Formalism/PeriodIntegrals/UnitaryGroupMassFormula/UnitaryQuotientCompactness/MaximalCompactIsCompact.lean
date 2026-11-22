@@ -152,8 +152,12 @@ private lemma one_mem_dualWeyl_complex (k r : ℕ) :
 theorem unitary_hermitian_group : UHGroup := by
   intro k r
   unfold IsMatGroup
-  exact ⟨isClosed_UH' k r, one_mem_dualWeyl_complex k r, fun a ha b hb => uh_mul ha hb,
-    fun a ha => ⟨uh_inv ha, Matrix.mul_nonsing_inv _ (uh_det ha)⟩⟩
+  exact ⟨
+    isClosed_UH' k r,
+    one_mem_dualWeyl_complex k r,
+    fun a ha b hb => uh_mul ha hb,
+    fun a ha => ⟨uh_inv ha, Matrix.mul_nonsing_inv _ (uh_det ha)⟩
+  ⟩
 
 theorem siegel_set_subset : SsetSub := by
   intro k r z s hsx
@@ -170,15 +174,17 @@ theorem maximal_compact_isCompact : KCompact := by
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall 0 1
   have c2 : IsClosed {u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ | uᴴ * u = 1} :=
     isClosed_eq (continuous_id.matrix_conjTranspose.matrix_mul continuous_id) continuous_const
-  have hC : IsClosed {u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ |
-      u ∈ UH (Hpk k r) ∧ uᴴ * u = 1} := (isClosed_UH' k r).inter c2
+  have hC : IsClosed
+      {u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ |
+        u ∈ UH (Hpk k r) ∧ uᴴ * u = 1} :=
+    (isClosed_UH' k r).inter c2
   refine hK.of_isClosed_subset hC
     (fun (u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) hu => ?_)
   have hu' : u ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ := by
     rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose]
     exact hu.2
-  exact Set.mem_pi.2 fun i _ => Set.mem_pi.2 fun j _ =>
-    mem_closedBall_zero_iff.2 (entry_norm_bound_of_unitary hu' i j)
+  exact Set.mem_pi.2 fun i _ =>
+    Set.mem_pi.2 fun j _ => mem_closedBall_zero_iff.2 (entry_norm_bound_of_unitary hu' i j)
 
 lemma pow_bdd_le_one {x M : ℝ} (hx : 0 < x) (h : ∀ n : ℕ, x ^ n ≤ M) : x ≤ 1 := by
   by_contra hlt
@@ -214,8 +220,9 @@ theorem trivG_of (hPol : PolarUH) (hK : KCompact) : TrivG := by
         obtain ⟨h1, h2, h3⟩ := ih
         refine ⟨by rw [pow_succ]; exact uh_mul h1 hv, ?_, ?_⟩
         · rw [pow_succ, Matrix.conjTranspose_mul]
-          calc vᴴ * (v ^ n)ᴴ * (v ^ n * v) = vᴴ * ((v ^ n)ᴴ * v ^ n) * v := by
-                simp only [Matrix.mul_assoc]
+          calc
+            vᴴ * (v ^ n)ᴴ * (v ^ n * v)
+              = vᴴ * ((v ^ n)ᴴ * v ^ n) * v := by simp only [Matrix.mul_assoc]
             _ = 1 := by rw [h2, Matrix.mul_one, hvu]
         · rw [pow_succ v n, hmul _ h1 _ hv, h3, pow_succ (D v) n]
     refine pow_bdd_le_one (M := M) (hpos v hv) (fun n => ?_)
@@ -226,23 +233,26 @@ theorem trivG_of (hPol : PolarUH) (hK : KCompact) : TrivG := by
     have hui : u⁻¹ = uᴴ := Matrix.inv_eq_left_inv huu
     have hdu : IsUnit u.det := Matrix.isUnit_det_of_left_inverse huu
     have a1 := powle u hu huu
-    have a2 := powle u⁻¹ (uh_inv hu) (by
-      rw [hui, Matrix.conjTranspose_conjTranspose, ← hui]
-      exact Matrix.mul_nonsing_inv u hdu)
+    have a2 :=
+      powle u⁻¹ (uh_inv hu) (by
+        rw [hui, Matrix.conjTranspose_conjTranspose, ← hui]
+        exact Matrix.mul_nonsing_inv u hdu)
     have a3 := inv_D u hu
     have a4 := hpos u hu
     have a5 := hpos u⁻¹ (uh_inv hu)
     nlinarith
   have hHunit : IsUnit (Hpk k r) := (Matrix.isUnit_iff_isUnit_det _).2 (uh_det hH)
-  have hnorm : ∀ x : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
-      Hpk k r * x * (Hpk k r)⁻¹ ∈ UH (Hpk k r) ↔ x ∈ UH (Hpk k r) := by
+  have hnorm
+      : ∀ x : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
+        Hpk k r * x * (Hpk k r)⁻¹ ∈ UH (Hpk k r) ↔ x ∈ UH (Hpk k r) := by
     intro x
     rw [hpk_inv]
     constructor
     · intro hx
       have h4 := uh_mul (uh_mul hH hx) hH
       have e : Hpk k r * (Hpk k r * x * Hpk k r) * Hpk k r = x := by
-        calc Hpk k r * (Hpk k r * x * Hpk k r) * Hpk k r
+        calc
+          Hpk k r * (Hpk k r * x * Hpk k r) * Hpk k r
             = (Hpk k r * Hpk k r) * x * (Hpk k r * Hpk k r) := by simp only [Matrix.mul_assoc]
           _ = x := by rw [hpk_mul_self, Matrix.one_mul, Matrix.mul_one]
       rwa [e] at h4
@@ -254,8 +264,9 @@ theorem trivG_of (hPol : PolarUH) (hK : KCompact) : TrivG := by
       rwa [hph] at h0
     have hpinv : p⁻¹ = Hpk k r * p * Hpk k r := by
       apply Matrix.inv_eq_left_inv
-      calc Hpk k r * p * Hpk k r * p = Hpk k r * (p * Hpk k r * p) := by
-            simp only [Matrix.mul_assoc]
+      calc
+        Hpk k r * p * Hpk k r * p
+          = Hpk k r * (p * Hpk k r * p) := by simp only [Matrix.mul_assoc]
         _ = 1 := by rw [hpH, hpk_mul_self]
     have e1 := hconj (Hpk k r) hHunit hnorm p hp
     rw [hpk_inv, ← hpinv] at e1

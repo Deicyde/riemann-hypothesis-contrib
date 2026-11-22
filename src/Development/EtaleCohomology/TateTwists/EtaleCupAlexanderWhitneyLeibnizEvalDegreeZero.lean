@@ -6,11 +6,13 @@ public import Development.EtaleCohomology.TateTwists.EtaleCochainDifferentialEva
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations
 
-theorem etale_cup_alexanderWhitney_leibniz_eval_degree_zero : EtaleCochainDifferentialEvaluationDegreeZero := by
+theorem etale_cup_alexanderWhitney_leibniz_eval_degree_zero
+    : EtaleCochainDifferentialEvaluationDegreeZero := by
   intro R _ E I n m hm α U x w w' h h'
   subst h h'
   have hz : IsZero (((chains R).obj E).X (-((0 : ℕ) : ℤ) + 1)) :=
@@ -19,12 +21,16 @@ theorem etale_cup_alexanderWhitney_leibniz_eval_degree_zero : EtaleCochainDiffer
       omega)
   have hd0 : ((chains R).obj E).d (-((0 : ℕ) : ℤ)) (-((0 : ℕ) : ℤ) + 1) = 0 := hz.eq_of_tgt _ _
   unfold ev
-  rw [δ_v n m hm α (-((0 : ℕ) : ℤ)) (-((0 : ℕ) : ℤ) + m) rfl (-((0 : ℕ) : ℤ) + n) (-((0 : ℕ) : ℤ) + 1)
-    (by omega) rfl, hd0, zero_comp, smul_zero, add_zero, ← Category.assoc]
+  rw [δ_v n m hm α (-((0 : ℕ) : ℤ)) (-((0 : ℕ) : ℤ) + m) rfl (-((0 : ℕ) : ℤ) + n)
+      (-((0 : ℕ) : ℤ) + 1) (by omega) rfl,
+    hd0, zero_comp, smul_zero, add_zero, ← Category.assoc]
   rfl
 
-theorem etale_cup_alexanderWhitney_leibniz_of_ext_and_succ (h0 : EtaleSimplicialCochainEqOfEvaluationsAgree) (hs : EtaleAlexanderWhitneyLeibnizPositiveSimplexDegree) :
-    EtaleAlexanderWhitneyCupLeibnizRule :=
-  etale_alexander_whitney_leibniz_of_ext_degree_zero_succ h0 etale_cup_alexanderWhitney_leibniz_eval_degree_zero hs
+theorem etale_cup_alexanderWhitney_leibniz_of_ext_and_succ
+    (h0 : EtaleSimplicialCochainEqOfEvaluationsAgree)
+    (hs : EtaleAlexanderWhitneyLeibnizPositiveSimplexDegree)
+    : EtaleAlexanderWhitneyCupLeibnizRule :=
+  etale_alexander_whitney_leibniz_of_ext_degree_zero_succ h0
+    etale_cup_alexanderWhitney_leibniz_eval_degree_zero hs
 
 end LateralTheory.EtaleFoundations

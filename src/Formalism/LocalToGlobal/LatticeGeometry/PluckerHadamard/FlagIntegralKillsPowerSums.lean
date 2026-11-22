@@ -41,7 +41,8 @@ def blockVandermondePolynomial (τ : Ψ) (S : Finset (Fin N)) : Pol Ψ N :=
   ∏ a ∈ S, ∏ b ∈ S.filter (fun b => a < b), (X (τ, a) - X (τ, b))
 
 def fibreVandermondeProduct (j : ℕ) (cf : ℝ) : Pol Ψ N :=
-  C cf * ∏ τ : Ψ, (blockVandermondePolynomial τ (Formalism.ShimuraLimitIdentity.top N j) * blockVandermondePolynomial τ (smallBlock N j))
+  C cf
+    * ∏ τ : Ψ, (blockVandermondePolynomial τ (Formalism.ShimuraLimitIdentity.top N j) * blockVandermondePolynomial τ (smallBlock N j))
 
 def a0n (Ψ : Type) [Fintype Ψ] (N j : ℕ) : ℕ := Fintype.card Ψ * (j * (N - j))
 
@@ -60,33 +61,23 @@ section Geo
 
 open Formalism.ShimuraLimitIdentity (Pol Sh Tot psumAt Kills)
 
-variable {D : D7} {G : DV.Geo D.what₂.LL} {Lev : Type}
+variable
+  {D : D7} {G : DV.Geo D.what₂.LL} {Lev : Type}
   {jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)} {ng : NgPkg} {w : Dat D Lev}
 
 structure ExtensionData (U : ShimU D G jC ng w) where
-
   Xb : U.Comp → G.Var
-
   PtX : U.Comp → Type
-
   bdX : ∀ c, PtX c → Prop
-
   htX : ∀ c, G.Adl (Xb c) → PtX c → ℝ
-
   degX : ∀ c, G.Adl (Xb c) → ℝ
-
   semiposX : ∀ c, G.Adl (Xb c) → Prop
   nefFibX : ∀ c, G.Adl (Xb c) → Prop
   ampleX : ∀ c, G.Adl (Xb c) → Prop
-
   muC : ℝ → ℝ → ℝ → ∀ c, G.Adl (Xb c)
-
   arLim : ℝ → U.Comp → ℝ
-
   degMu : U.Comp → ℝ
-
   meanU : U.Comp → ℝ
-
   fdeg : ℝ
 
 section Props
@@ -98,7 +89,6 @@ end Props
 section Assembly
 
 variable (U : ShimU D G jC ng w)
-
 
 end Assembly
 

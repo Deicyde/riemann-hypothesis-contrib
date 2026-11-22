@@ -11,15 +11,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem spCo_desc {R L : Type} [CommRing R] [CommRing L] [Algebra R L] {q n : ℕ}
-    (P : Fin q → Polynomial R) (ut : Fin q → Fin n → R) (a : Fin q → Fin n → L)
+private theorem spCo_desc
+    {R L : Type} [CommRing R] [CommRing L] [Algebra R L]
+    {q n : ℕ} (P : Fin q → Polynomial R) (ut : Fin q → Fin n → R) (a : Fin q → Fin n → L)
     (ha : ∀ j, ∏ i, (Polynomial.X - Polynomial.C (a j i)) = (P j).map (algebraMap R L))
     (F : MvPowerSeries (Fin q × Fin n) R →ₐ[R] L)
-    (hX : ∀ p, F (MvPowerSeries.X p) = a p.1 p.2 - algebraMap R L (ut p.1 p.2)) :
-    ∃ F' : Sp P ut →ₐ[R] L, ∀ z, F' (Sp.mk P ut z) = F z := by
+    (hX : ∀ p, F (MvPowerSeries.X p) = a p.1 p.2 - algebraMap R L (ut p.1 p.2))
+    : ∃ F' : Sp P ut →ₐ[R] L, ∀ z, F' (Sp.mk P ut z) = F z := by
   classical
   have hC : ∀ r : R, F (MvPowerSeries.C r) = algebraMap R L r := by
     intro r
@@ -38,26 +40,31 @@ private theorem spCo_desc {R L : Type} [CommRing R] [CommRing L] [Algebra R L] {
       RingHom.ext hC
     rw [← RingHom.coe_coe F, ← Polynomial.coeff_map]
     rw [Polynomial.map_sub, Polynomial.map_prod, Polynomial.map_map, h2, ← ha j]
-    simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C, RingHom.coe_coe, h1, sub_self,
-      Polynomial.coeff_zero]
+    simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C, RingHom.coe_coe, h1,
+      sub_self, Polynomial.coeff_zero]
   exact ⟨Ideal.Quotient.liftₐ _ F fun z hz => hle hz, fun z => rfl⟩
 
-private theorem splitting_algebra_nontrivial_free_generated (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    [IsAdicComplete (maximalIdeal R) R] (q n : ℕ) (P : Fin q → Polynomial R) (ut : Fin q → Fin n → R)
-    (h : ∀ j, (P j).Monic ∧ (P j).natDegree = n ∧
-      (P j).map (residue R) = ∏ i, (Polynomial.X - Polynomial.C (residue R (ut j i)))) :
-    Nontrivial (Sp P ut) ∧ Module.Free R (Sp P ut) ∧
-      Algebra.adjoin R (Set.range fun p : Fin q × Fin n => Sp.u P ut p.1 p.2) = ⊤ := by
+private theorem splitting_algebra_nontrivial_free_generated
+    (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R]
+    (q n : ℕ) (P : Fin q → Polynomial R) (ut : Fin q → Fin n → R)
+    (h : ∀ j,
+      (P j).Monic ∧ (P j).natDegree = n
+        ∧ (P j).map (residue R) = ∏ i, (Polynomial.X - Polynomial.C (residue R (ut j i))))
+    : Nontrivial (Sp P ut) ∧ Module.Free R (Sp P ut)
+      ∧ Algebra.adjoin R (Set.range fun p : Fin q × Fin n => Sp.u P ut p.1 p.2) = ⊤ := by
   classical
   obtain ⟨bas, -⟩ := mSplitAlg_basis (Fin q) n R P (fun j => (h j).1) (fun j => (h j).2.1)
   haveI : Module.Free R (MSplitAlg P n) := Module.Free.of_basis bas
   haveI : Module.Finite R (MSplitAlg P n) := Module.Finite.of_basis bas
-  have hχ : ∀ j, ∏ i, (Polynomial.X - Polynomial.C (residue R (ut j i))) =
-      (P j).map (algebraMap R (ResidueField R)) := by
+  have hχ
+      : ∀ j,
+        ∏ i, (Polynomial.X - Polynomial.C (residue R (ut j i)))
+          = (P j).map (algebraMap R (ResidueField R)) := by
     intro j
     rw [ResidueField.algebraMap_eq, (h j).2.2]
-  obtain ⟨χ, hχr⟩ : ∃ χ : (MSplitAlg P n) →ₐ[R] ResidueField R,
-      ∀ j i, χ (MSplitAlg.root P n j i) = residue R (ut j i) :=
+  obtain ⟨χ, hχr⟩
+      : ∃ χ : (MSplitAlg P n) →ₐ[R] ResidueField R, ∀ j i,
+        χ (MSplitAlg.root P n j i) = residue R (ut j i) :=
     ⟨MSplitAlg.lift P n _ hχ, MSplitAlg.lift_root P n _ hχ⟩
   have hχalg : ∀ r : R, χ (algebraMap R (MSplitAlg P n) r) = residue R r := by
     intro r
@@ -74,7 +81,10 @@ private theorem splitting_algebra_nontrivial_free_generated (R : Type) [CommRing
   haveI : Module.Free R (Localization.AtPrime n0) := hBfree inferInstance
   haveI : IsNoetherianRing (Localization.AtPrime n0) := isNoetherian_of_tower R (inferInstance : IsNoetherian R (Localization.AtPrime n0))
   have hmem0 : ∀ y, y ∈ n0 ↔ χ y = 0 := fun y => by rw [hn0, RingHom.mem_ker]
-  have hinB : ∀ y ∈ n0, algebraMap (MSplitAlg P n) (Localization.AtPrime n0) y ∈ maximalIdeal (Localization.AtPrime n0) := fun y hy =>
+  have hinB
+      : ∀ y ∈ n0,
+        algebraMap (MSplitAlg P n) (Localization.AtPrime n0) y
+          ∈ maximalIdeal (Localization.AtPrime n0) := fun y hy =>
     (IsLocalization.AtPrime.to_map_mem_maximal_iff (Localization.AtPrime n0) n0 y).2 hy
   have hroot : ∀ j i, MSplitAlg.root P n j i - algebraMap R (MSplitAlg P n) (ut j i) ∈ n0 := by
     intro j i
@@ -88,44 +98,72 @@ private theorem splitting_algebra_nontrivial_free_generated (R : Type) [CommRing
     rw [IsScalarTower.algebraMap_apply R (MSplitAlg P n) (Localization.AtPrime n0), ← (algebraMap (MSplitAlg P n) (Localization.AtPrime n0)).map_sub y (algebraMap R (MSplitAlg P n) r)]
     apply hinB
     rw [hmem0, map_sub, hχalg, hr, sub_self])
-  have hmemB : ∀ p : Fin q × Fin n, algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n p.1 p.2) -
-      algebraMap R (Localization.AtPrime n0) (ut p.1 p.2) ∈ maximalIdeal (Localization.AtPrime n0) := by
+  have hmemB
+      : ∀ p : Fin q × Fin n,
+        algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n p.1 p.2)
+            - algebraMap R (Localization.AtPrime n0) (ut p.1 p.2)
+          ∈ maximalIdeal (Localization.AtPrime n0) := by
     intro p
-    rw [IsScalarTower.algebraMap_apply R (MSplitAlg P n) (Localization.AtPrime n0), ← (algebraMap (MSplitAlg P n) (Localization.AtPrime n0)).map_sub (MSplitAlg.root P n p.1 p.2) (algebraMap R (MSplitAlg P n) (ut p.1 p.2))]
+    rw [IsScalarTower.algebraMap_apply R (MSplitAlg P n) (Localization.AtPrime n0),
+      ← (algebraMap (MSplitAlg P n) (Localization.AtPrime n0)).map_sub (MSplitAlg.root P n p.1 p.2)
+        (algebraMap R (MSplitAlg P n) (ut p.1 p.2))]
     exact hinB _ (hroot p.1 p.2)
-  obtain ⟨F, ⟨hFC, hFX⟩, -⟩ := co_ev R R (Localization.AtPrime n0) (Fin q × Fin n) (Algebra.ofId R (Localization.AtPrime n0))
-    (fun p => algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n p.1 p.2) - algebraMap R (Localization.AtPrime n0) (ut p.1 p.2)) hmemB
-  have hFX' : ∀ p : Fin q × Fin n, F (MvPowerSeries.X p) =
-      algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n p.1 p.2) - algebraMap R (Localization.AtPrime n0) (ut p.1 p.2) := hFX
-  have hFC' : ∀ x : R, F (MvPowerSeries.C x) = algebraMap R (Localization.AtPrime n0) x := fun x => hFC x
-  have hrootB : ∀ j, ∏ i, (Polynomial.X - Polynomial.C (algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n j i))) =
-      (P j).map (algebraMap R (Localization.AtPrime n0)) := by
+  obtain ⟨F, ⟨hFC, hFX⟩, -⟩ :=
+    co_ev R R (Localization.AtPrime n0) (Fin q × Fin n) (Algebra.ofId R (Localization.AtPrime n0))
+      (fun p =>
+        algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n p.1 p.2)
+          - algebraMap R (Localization.AtPrime n0) (ut p.1 p.2))
+      hmemB
+  have hFX'
+      : ∀ p : Fin q × Fin n,
+        F (MvPowerSeries.X p)
+          = algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n p.1 p.2)
+            - algebraMap R (Localization.AtPrime n0) (ut p.1 p.2) :=
+    hFX
+  have hFC' : ∀ x : R, F (MvPowerSeries.C x) = algebraMap R (Localization.AtPrime n0) x := fun x =>
+    hFC x
+  have hrootB
+      : ∀ j,
+        ∏ i, (Polynomial.X - Polynomial.C (algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n j i)))
+          = (P j).map (algebraMap R (Localization.AtPrime n0)) := by
     intro j
-    have := congrArg (Polynomial.map (algebraMap (MSplitAlg P n) (Localization.AtPrime n0))) (MSplitAlg.prod_root P n j)
+    have :=
+      congrArg (Polynomial.map (algebraMap (MSplitAlg P n) (Localization.AtPrime n0)))
+        (MSplitAlg.prod_root P n j)
     rw [Polynomial.map_map, ← IsScalarTower.algebraMap_eq] at this
     rw [← this, Polynomial.map_prod]
     simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C]
-  obtain ⟨Φ, hΦ⟩ := spCo_desc P ut (fun j i => algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n j i)) hrootB F hFX
+  obtain ⟨Φ, hΦ⟩ :=
+    spCo_desc P ut
+      (fun j i => algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n j i))
+      hrootB F hFX
   haveI : Nontrivial (Sp P ut) := Φ.toRingHom.domain_nontrivial
   haveI : IsLocalRing (Sp P ut) := IsLocalRing.of_surjective' (Sp.mk P ut).toRingHom
     (fun z => Ideal.Quotient.mk_surjective z)
-  obtain ⟨Ψ, hΨ⟩ : ∃ Ψ : (MSplitAlg P n) →ₐ[R] Sp P ut, ∀ j i, Ψ (MSplitAlg.root P n j i) = Sp.u P ut j i :=
+  obtain ⟨Ψ, hΨ⟩
+      : ∃ Ψ : (MSplitAlg P n) →ₐ[R] Sp P ut, ∀ j i, Ψ (MSplitAlg.root P n j i) = Sp.u P ut j i :=
     ⟨MSplitAlg.lift P n _ (fun j => (spRoots R q n P ut j).1), MSplitAlg.lift_root P n _ _⟩
-  obtain ⟨F0, hF0X, hF0C⟩ : ∃ F0 : MvPowerSeries (Fin q × Fin n) R →ₐ[R] ResidueField R,
-      (∀ p, F0 (MvPowerSeries.X p) = 0) ∧ ∀ r, F0 (MvPowerSeries.C r) = residue R r :=
-    ⟨{ toRingHom := (residue R).comp MvPowerSeries.constantCoeff
-       commutes' := fun r => by
-         show residue R (MvPowerSeries.constantCoeff (algebraMap R (MvPowerSeries (Fin q × Fin n) R) r)) = _
-         rw [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply,
-           MvPowerSeries.constantCoeff_C, ResidueField.algebraMap_eq] },
-     fun p => by
-       show residue R (MvPowerSeries.constantCoeff (MvPowerSeries.X p)) = 0
-       rw [MvPowerSeries.constantCoeff_X, map_zero],
-     fun r => by
-       show residue R (MvPowerSeries.constantCoeff (MvPowerSeries.C r)) = _
-       rw [MvPowerSeries.constantCoeff_C]⟩
-  have hF0X' : ∀ p : Fin q × Fin n, F0 (MvPowerSeries.X p) =
-      residue R (ut p.1 p.2) - algebraMap R (ResidueField R) (ut p.1 p.2) := by
+  obtain ⟨F0, hF0X, hF0C⟩
+      : ∃ F0 : MvPowerSeries (Fin q × Fin n) R →ₐ[R] ResidueField R,
+        (∀ p, F0 (MvPowerSeries.X p) = 0) ∧ ∀ r, F0 (MvPowerSeries.C r) = residue R r := ⟨
+    {
+      toRingHom := (residue R).comp MvPowerSeries.constantCoeff
+      commutes' := fun r => by
+        show residue R (MvPowerSeries.constantCoeff (algebraMap R (MvPowerSeries (Fin q × Fin n) R) r)) = _
+        rw [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply,
+          MvPowerSeries.constantCoeff_C, ResidueField.algebraMap_eq]
+    },
+    fun p => by
+      show residue R (MvPowerSeries.constantCoeff (MvPowerSeries.X p)) = 0
+      rw [MvPowerSeries.constantCoeff_X, map_zero],
+    fun r => by
+      show residue R (MvPowerSeries.constantCoeff (MvPowerSeries.C r)) = _
+      rw [MvPowerSeries.constantCoeff_C]
+  ⟩
+  have hF0X'
+      : ∀ p : Fin q × Fin n,
+        F0 (MvPowerSeries.X p)
+          = residue R (ut p.1 p.2) - algebraMap R (ResidueField R) (ut p.1 p.2) := by
     intro p
     rw [hF0X, ResidueField.algebraMap_eq, sub_self]
   obtain ⟨χ', hχ'⟩ := spCo_desc P ut (fun j i => residue R (ut j i)) hχ F0 hF0X'
@@ -150,19 +188,32 @@ private theorem splitting_algebra_nontrivial_free_generated (R : Type) [CommRing
     show χ' (Ψ y) = 0 ↔ χ y = 0
     rw [← AlgHom.comp_apply, hχΨ]
   obtain ⟨g0, hg0⟩ := hBuniv (Sp P ut) Ψ.toRingHom hcomap
-  have hg0' : ∀ y, g0 (algebraMap (MSplitAlg P n) (Localization.AtPrime n0) y) = Ψ y := fun y => RingHom.congr_fun hg0 y
-  obtain ⟨g, hg⟩ : ∃ g : (Localization.AtPrime n0) →ₐ[R] Sp P ut, ∀ y, g (algebraMap (MSplitAlg P n) (Localization.AtPrime n0) y) = Ψ y :=
-    ⟨{ g0 with
-        commutes' := fun r => by
-          show g0 (algebraMap R (Localization.AtPrime n0) r) = _
-          rw [IsScalarTower.algebraMap_apply R (MSplitAlg P n) (Localization.AtPrime n0), hg0', Ψ.commutes] }, hg0'⟩
-  have hΦu : ∀ j i, Φ (Sp.u P ut j i) = algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n j i) := by
+  have hg0' : ∀ y, g0 (algebraMap (MSplitAlg P n) (Localization.AtPrime n0) y) = Ψ y := fun y =>
+    RingHom.congr_fun hg0 y
+  obtain ⟨g, hg⟩
+      : ∃ g : (Localization.AtPrime n0) →ₐ[R] Sp P ut, ∀ y,
+        g (algebraMap (MSplitAlg P n) (Localization.AtPrime n0) y) = Ψ y := ⟨
+    {
+      g0 with
+      commutes' := fun r => by
+        show g0 (algebraMap R (Localization.AtPrime n0) r) = _
+        rw [IsScalarTower.algebraMap_apply R (MSplitAlg P n) (Localization.AtPrime n0), hg0',
+          Ψ.commutes]
+    },
+    hg0'
+  ⟩
+  have hΦu
+      : ∀ j i,
+        Φ (Sp.u P ut j i)
+          = algebraMap (MSplitAlg P n) (Localization.AtPrime n0) (MSplitAlg.root P n j i) := by
     intro j i
     show Φ (Sp.mk P ut _) = _
     rw [hΦ, map_add (f := _), hFC', hFX']
     exact add_sub_cancel _ _
   have hΦg : Φ.comp g = AlgHom.id R (Localization.AtPrime n0) := by
-    have h1 : (Φ.comp g).comp (IsScalarTower.toAlgHom R (MSplitAlg P n) (Localization.AtPrime n0)) = IsScalarTower.toAlgHom R (MSplitAlg P n) (Localization.AtPrime n0) := by
+    have h1
+        : (Φ.comp g).comp (IsScalarTower.toAlgHom R (MSplitAlg P n) (Localization.AtPrime n0))
+          = IsScalarTower.toAlgHom R (MSplitAlg P n) (Localization.AtPrime n0) := by
       apply MSplitAlg.hom_ext
       intro j i
       rw [AlgHom.comp_apply, AlgHom.comp_apply, IsScalarTower.coe_toAlgHom', hg, hΨ, hΦu]
@@ -175,16 +226,20 @@ private theorem splitting_algebra_nontrivial_free_generated (R : Type) [CommRing
   have hmemSp : ∀ p : Fin q × Fin n, Sp.mk P ut (MvPowerSeries.X p) ∈ maximalIdeal (Sp P ut) := by
     intro p
     rw [← hkerχ', RingHom.mem_ker, hχ', hF0X]
-  obtain ⟨F1, -, huniq⟩ := co_ev R R (Sp P ut) (Fin q × Fin n) (Algebra.ofId R (Sp P ut))
-    (fun p => Sp.mk P ut (MvPowerSeries.X p)) hmemSp
-  have hCalg : ∀ (f : MvPowerSeries (Fin q × Fin n) R →ₐ[R] Sp P ut) (x : R),
-      f (MvPowerSeries.C x) = Algebra.ofId R (Sp P ut) x := by
+  obtain ⟨F1, -, huniq⟩ :=
+    co_ev R R (Sp P ut) (Fin q × Fin n) (Algebra.ofId R (Sp P ut))
+      (fun p => Sp.mk P ut (MvPowerSeries.X p))
+      hmemSp
+  have hCalg
+      : ∀ (f : MvPowerSeries (Fin q × Fin n) R →ₐ[R] Sp P ut) (x : R),
+        f (MvPowerSeries.C x) = Algebra.ofId R (Sp P ut) x := by
     intro f x
     have : (MvPowerSeries.C x : MvPowerSeries (Fin q × Fin n) R) = algebraMap R _ x := by
       rw [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
     rw [this, f.commutes, Algebra.ofId_apply]
-  have hX1 : ∀ p : Fin q × Fin n, ((g.comp Φ).comp (Sp.mk P ut)) (MvPowerSeries.X p) =
-      Sp.mk P ut (MvPowerSeries.X p) := by
+  have hX1
+      : ∀ p : Fin q × Fin n,
+        ((g.comp Φ).comp (Sp.mk P ut)) (MvPowerSeries.X p) = Sp.mk P ut (MvPowerSeries.X p) := by
     intro p
     rw [AlgHom.comp_apply, AlgHom.comp_apply, hΦ, hFX', map_sub, AlgHom.commutes, hg, hΨ]
     exact (spRoots R q n P ut p.1).2 p.2
@@ -215,8 +270,14 @@ private theorem splitting_algebra_nontrivial_free_generated (R : Type) [CommRing
     refine mul_mem hp (Algebra.subset_adjoin ⟨s, ?_⟩)
     exact (hΨ s.1 s.2).symm
 
-theorem UpperTheory.V.Pa.Core.spCo :
-    ∀ (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R] (q n : ℕ) (P : Fin q → Polynomial R) (ut : Fin q → Fin n → R), (∀ j, (P j).Monic ∧ (P j).natDegree = n ∧ (P j).map (residue R) = ∏ i, (Polynomial.X - Polynomial.C (residue R (ut j i)))) → IsCO O (Sp P ut) ∧ Module.Free R (Sp P ut) ∧ Module.Finite R (Sp P ut) ∧ Algebra.adjoin R (Set.range fun p : Fin q × Fin n => Sp.u P ut p.1 p.2) = ⊤ := by
+theorem UpperTheory.V.Pa.Core.spCo
+    : ∀ (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R] (q n : ℕ)
+        (P : Fin q → Polynomial R) (ut : Fin q → Fin n → R),
+      (∀ j,
+          (P j).Monic ∧ (P j).natDegree = n
+            ∧ (P j).map (residue R) = ∏ i, (Polynomial.X - Polynomial.C (residue R (ut j i))))
+        → IsCO O (Sp P ut) ∧ Module.Free R (Sp P ut) ∧ Module.Finite R (Sp P ut)
+          ∧ Algebra.adjoin R (Set.range fun p : Fin q × Fin n => Sp.u P ut p.1 p.2) = ⊤ := by
   intro O R _ _ _ _ _ q n P ut h
   haveI : IsNoetherianRing R := IsCO.toIsNoetherian (O := O)
   haveI : IsAdicComplete (maximalIdeal R) R := IsCO.complete (O := O)

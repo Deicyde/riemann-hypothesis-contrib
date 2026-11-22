@@ -10,13 +10,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteMonicR
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.LKMid.Northcott
 
-theorem isIntegral_eig {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : IsIntegral ℤ M) {w : ℂ}
-    {x : Fin n → ℂ} (hx : x ≠ 0) (hMx : M *ᵥ x = w • x) : IsIntegral ℤ w := by
+theorem isIntegral_eig
+    {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : IsIntegral ℤ M)
+    {w : ℂ} {x : Fin n → ℂ} (hx : x ≠ 0) (hMx : M *ᵥ x = w • x)
+    : IsIntegral ℤ w := by
   obtain ⟨q, hq, hqM⟩ := hM
   refine ⟨q, hq, ?_⟩
   have hv : Module.End.HasEigenvector (Matrix.toLin' M) w x :=
@@ -24,8 +27,9 @@ theorem isIntegral_eig {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : IsIntegr
   have h1 := Module.End.aeval_apply_of_hasEigenvector (p := q.map (algebraMap ℤ ℂ)) hv
   have h2 : Polynomial.aeval (Matrix.toLin' M) (q.map (algebraMap ℤ ℂ)) = 0 := by
     rw [Polynomial.aeval_map_algebraMap]
-    have e := Polynomial.aeval_algHom_apply
-      ((Matrix.toLinAlgEquiv' : Matrix (Fin n) (Fin n) ℂ ≃ₐ[ℂ] _).toAlgHom.restrictScalars ℤ) M q
+    have e :=
+      Polynomial.aeval_algHom_apply
+        ((Matrix.toLinAlgEquiv' : Matrix (Fin n) (Fin n) ℂ ≃ₐ[ℂ] _).toAlgHom.restrictScalars ℤ) M q
     have e2 : Polynomial.aeval M q = 0 := hqM
     rw [e2, map_zero] at e
     exact e
@@ -33,8 +37,11 @@ theorem isIntegral_eig {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : IsIntegr
   have h3 := (smul_eq_zero.1 h1.symm).resolve_right hx
   rwa [Polynomial.eval_map] at h3
 
-theorem norm_le_of_isIntegral_inv (w : ℂ) (c : ℚ) (N : ℕ) (hN : 0 < N) (hw : ‖w‖ ^ 2 = (c : ℝ))
-    (hc : (c : ℝ) ≠ 0) (hI : IsIntegral ℤ ((N : ℂ) * w⁻¹)) : ‖w‖ ≤ N := by
+theorem norm_le_of_isIntegral_inv
+    (w : ℂ) (c : ℚ)
+    (N : ℕ) (hN : 0 < N)
+    (hw : ‖w‖ ^ 2 = (c : ℝ)) (hc : (c : ℝ) ≠ 0) (hI : IsIntegral ℤ ((N : ℂ) * w⁻¹))
+    : ‖w‖ ≤ N := by
   have hcpos : (0 : ℝ) < c := lt_of_le_of_ne (hw ▸ sq_nonneg _) (Ne.symm hc)
   have hconj : IsIntegral ℤ (starRingEnd ℂ ((N : ℂ) * w⁻¹)) := hI.map (starRingEnd ℂ).toIntAlgHom
   have hprod := hI.mul hconj

@@ -8,18 +8,19 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem exists_rational_orthogonal_projection_of_finrank_le (K : Type) [Field K] (σ : K →+* ℂ) (W : Type)
-    [NormedAddCommGroup W] [InnerProductSpace ℂ W] (n : ℕ) (j : (Fin n → K) →ₛₗ[σ] W)
-    (hj : ∀ x y, ⟪j x, j y⟫_ℂ ∈ Set.range σ) :
-    ∀ (d : ℕ) (N : Submodule K (Fin n → K)), Module.finrank K N ≤ d → ∀ (x : Fin n → K),
-      ∃ y ∈ N, ∀ m ∈ N, ⟪j m, j x - j y⟫_ℂ = 0 := by
+theorem exists_rational_orthogonal_projection_of_finrank_le
+    (K : Type) [Field K]
+    (σ : K →+* ℂ)
+    (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+    (n : ℕ) (j : (Fin n → K) →ₛₗ[σ] W) (hj : ∀ x y, ⟪j x, j y⟫_ℂ ∈ Set.range σ)
+    : ∀ (d : ℕ) (N : Submodule K (Fin n → K)),
+      Module.finrank K N ≤ d → ∀ (x : Fin n → K), ∃ y ∈ N, ∀ m ∈ N, ⟪j m, j x - j y⟫_ℂ = 0 := by
   intro d
   induction d with
   | zero =>
     intro N hN x
     refine ⟨0, N.zero_mem, ?_⟩
-    have hb : N = ⊥ := by
-      rw [← Submodule.finrank_eq_zero]; omega
+    have hb : N = ⊥ := by rw [← Submodule.finrank_eq_zero]; omega
     intro m hm
     subst hb
     rw [Submodule.mem_bot] at hm
@@ -55,8 +56,8 @@ theorem exists_rational_orthogonal_projection_of_finrank_le (K : Type) [Field K]
         have : f y' = 0 := hy'N.2
         rwa [hf] at this
       have hv0 : ⟪j v, j (x - (b / a) • v) - j y'⟫_ℂ = 0 := by
-        rw [inner_sub_right, map_sub, inner_sub_right, hy'k, map_smulₛₗ, inner_smul_right, ← ha, ← hb,
-          map_div₀, div_mul_cancel₀ _ hsa]
+        rw [inner_sub_right, map_sub, inner_sub_right, hy'k, map_smulₛₗ, inner_smul_right, ← ha,
+          ← hb, map_div₀, div_mul_cancel₀ _ hsa]
         ring
       intro m hm
       obtain ⟨e, he⟩ := hj v m
@@ -65,8 +66,7 @@ theorem exists_rational_orthogonal_projection_of_finrank_le (K : Type) [Field K]
         show f (m - (e / a) • v) = 0
         rw [hf, map_sub, inner_sub_right, map_smulₛₗ, inner_smul_right, ← ha, ← he, map_div₀,
           div_mul_cancel₀ _ hsa, sub_self]
-      have hsplit : j m = σ (e / a) • j v + j (m - (e / a) • v) := by
-        rw [map_sub, map_smulₛₗ]; abel
+      have hsplit : j m = σ (e / a) • j v + j (m - (e / a) • v) := by rw [map_sub, map_smulₛₗ]; abel
       rw [hsplit, inner_add_left, inner_smul_left, hv0, mul_zero, zero_add]
       exact hy' _ hm'
     · push_neg at h
@@ -74,9 +74,15 @@ theorem exists_rational_orthogonal_projection_of_finrank_le (K : Type) [Field K]
       intro m hm
       rw [h m hm, inner_zero_left]
 
-theorem exists_mem_sub_mem_orthogonal_span_of_inner_mem_range : ∀ (K : Type) [Field K] (σ : K →+* ℂ) (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W] (n : ℕ) (j : (Fin n → K) →ₛₗ[σ] W), (∀ x y, ⟪j x, j y⟫_ℂ ∈ Set.range σ) → ∀ (N : Submodule K (Fin n → K)) (x : Fin n → K), ∃ y ∈ N, j x - j y ∈ (Submodule.span ℂ (j '' (N : Set (Fin n → K))))ᗮ := by
+theorem exists_mem_sub_mem_orthogonal_span_of_inner_mem_range
+    : ∀ (K : Type) [Field K] (σ : K →+* ℂ) (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+        [FiniteDimensional ℂ W] (n : ℕ) (j : (Fin n → K) →ₛₗ[σ] W),
+      (∀ x y, ⟪j x, j y⟫_ℂ ∈ Set.range σ)
+        → ∀ (N : Submodule K (Fin n → K)) (x : Fin n → K), ∃ y ∈ N,
+          j x - j y ∈ (Submodule.span ℂ (j '' (N : Set (Fin n → K))))ᗮ := by
   intro K _ σ W _ _ _ n j hj N x
-  obtain ⟨y, hyN, hy⟩ := exists_rational_orthogonal_projection_of_finrank_le K σ W n j hj _ N le_rfl x
+  obtain ⟨y, hyN, hy⟩ :=
+    exists_rational_orthogonal_projection_of_finrank_le K σ W n j hj _ N le_rfl x
   refine ⟨y, hyN, ?_⟩
   rw [Submodule.mem_orthogonal]
   intro u hu

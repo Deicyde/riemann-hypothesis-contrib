@@ -5,7 +5,8 @@ public import Development.EtaleCohomology.EtaleSheaves.LCBijPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.t_E1Cut LateralTheory.E.LocallyConstantH0
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.t_E1Cut
+  LateralTheory.E.LocallyConstantH0
 
 namespace LateralTheory.E.TwGenNZACPf
 
@@ -18,7 +19,6 @@ theorem prim_isPrimitiveRoot (z : Prim q L) : IsPrimitiveRoot z.1 q := by
   rw [Polynomial.aeval_def, Polynomial.eval₂_eq_eval_map, Polynomial.map_cyclotomic] at h
   exact Polynomial.isRoot_cyclotomic_iff.1 h
 
-
 open Classical in
 def lg (q : ℕ) (z x : L) : ZMod q := if h : ∃ n : ℕ, z ^ n = x then (h.choose : ZMod q) else 0
 
@@ -30,13 +30,13 @@ theorem lg_pow {z : L} (hz : IsPrimitiveRoot z q) (n : ℕ) : lg q z (z ^ n) = n
   have h3 := ((hz.isOfFinOrder (NeZero.ne q)).pow_eq_pow_iff_modEq).1 h2
   rwa [← hz.eq_orderOf] at h3
 
-
 open Classical in
 def fv (q : ℕ) (i : ℤ) (z x : L) : ZMod q :=
   if h : IsUnit (lg q z x) then ((h.unit ^ i : (ZMod q)ˣ) : ZMod q) else 0
 
-theorem fv_rel (i : ℤ) (z : Prim q L) (ζ ξ : Prim q L) (a : (ZMod q)ˣ) (h : ξ.1 = ζ.1 ^ (a : ZMod q).val) :
-    fv q i z.1 ξ.1 = ((a ^ i : (ZMod q)ˣ) : ZMod q) * fv q i z.1 ζ.1 := by
+theorem fv_rel
+    (i : ℤ) (z : Prim q L) (ζ ξ : Prim q L) (a : (ZMod q)ˣ) (h : ξ.1 = ζ.1 ^ (a : ZMod q).val)
+    : fv q i z.1 ξ.1 = ((a ^ i : (ZMod q)ˣ) : ZMod q) * fv q i z.1 ζ.1 := by
   have hz := prim_isPrimitiveRoot z
   obtain ⟨m, -, hm⟩ := hz.eq_pow_of_pow_eq_one (prim_isPrimitiveRoot ζ).pow_eq_one
   have hl : lg q z.1 ξ.1 = lg q z.1 ζ.1 * a := by
@@ -64,7 +64,8 @@ theorem fv_self (i : ℤ) (z : Prim q L) : fv q i z.1 z.1 = 1 := by
   have : hu.unit = 1 := Units.ext (by simp [hl])
   rw [this, one_zpow, Units.val_one]
 
-def lin (i : ℤ) (z : L) : (Prim q L →₀ ULift.{1} (ZMod q)) →ₗ[ULift.{1} (ZMod q)] ULift.{1} (ZMod q) :=
+def lin (i : ℤ) (z : L)
+    : (Prim q L →₀ ULift.{1} (ZMod q)) →ₗ[ULift.{1} (ZMod q)] ULift.{1} (ZMod q) :=
   Finsupp.linearCombination _ (fun ξ : Prim q L => ULift.up (fv q i z ξ.1))
 
 theorem lin_rel (i : ℤ) (z : Prim q L) : twRel q i L ≤ LinearMap.ker (lin i z.1) := by
@@ -75,11 +76,16 @@ theorem lin_rel (i : ℤ) (z : Prim q L) : twRel q i L ≤ LinearMap.ker (lin i 
   apply ULift.ext
   simp [fv_rel i z ζ ξ a h]
 
-theorem field_nz (i : ℤ) (z : Prim q L) (c : ZMod q)
-    (h : c.val • (Submodule.Quotient.mk (Finsupp.single z 1) : (Prim q L →₀ ULift.{1} (ZMod q)) ⧸ twRel q i L) = 0) :
-    c = 0 := by
+theorem field_nz
+    (i : ℤ) (z : Prim q L) (c : ZMod q)
+    (h : c.val
+        • (Submodule.Quotient.mk (Finsupp.single z 1)
+          : (Prim q L →₀ ULift.{1} (ZMod q)) ⧸ twRel q i L)
+      = 0)
+    : c = 0 := by
   have h2 := congrArg ((twRel q i L).liftQ (lin i z.1) (lin_rel i z)) h
-  rw [map_nsmul, Submodule.liftQ_apply, map_zero, lin, Finsupp.linearCombination_single, fv_self] at h2
+  rw [map_nsmul, Submodule.liftQ_apply, map_zero, lin, Finsupp.linearCombination_single, fv_self]
+    at h2
   rw [one_smul] at h2
   have h3 := congrArg AddEquiv.ulift h2
   rw [map_nsmul, map_zero] at h3
@@ -88,15 +94,28 @@ theorem field_nz (i : ℤ) (z : Prim q L) (c : ZMod q)
 
 end Field
 
-theorem ring_nz {q : ℕ} [NeZero q] (i : ℤ) {A : Type} [CommRing A] [Nontrivial A] (ζ : Prim q A) (c : ZMod q)
-    (h : c.val • (Submodule.Quotient.mk (Finsupp.single ζ 1) : (Prim q A →₀ ULift.{1} (ZMod q)) ⧸ twRel q i A) = 0) :
-    c = 0 := by
+theorem ring_nz
+    {q : ℕ} [NeZero q]
+    (i : ℤ)
+    {A : Type} [CommRing A] [Nontrivial A]
+    (ζ : Prim q A) (c : ZMod q)
+    (h : c.val
+        • (Submodule.Quotient.mk (Finsupp.single ζ 1)
+          : (Prim q A →₀ ULift.{1} (ZMod q)) ⧸ twRel q i A)
+      = 0)
+    : c = 0 := by
   obtain ⟨M, hM⟩ := Ideal.exists_maximal A
   let _ := Ideal.Quotient.field M
   apply field_nz i (ζ.map (Ideal.Quotient.mk M)) c
-  have h2 := congrArg (Submodule.mapQ _ _ (Finsupp.lmapDomain (ULift.{1} (ZMod q)) (ULift.{1} (ZMod q))
-    (Prim.map (Ideal.Quotient.mk M))) (twRel_le q i (Ideal.Quotient.mk M))) h
-  rw [map_nsmul, map_zero, Submodule.mapQ_apply, Finsupp.lmapDomain_apply, Finsupp.mapDomain_single] at h2
+  have h2 :=
+    congrArg
+      (Submodule.mapQ _ _
+        (Finsupp.lmapDomain (ULift.{1} (ZMod q)) (ULift.{1} (ZMod q))
+          (Prim.map (Ideal.Quotient.mk M)))
+        (twRel_le q i (Ideal.Quotient.mk M)))
+      h
+  rw [map_nsmul, map_zero, Submodule.mapQ_apply, Finsupp.lmapDomain_apply, Finsupp.mapDomain_single]
+    at h2
   exact h2
 
 theorem gamma_nontrivial (V : Scheme.{0}) [Nonempty V] : Nontrivial Γ(V, ⊤) := by
@@ -108,11 +127,14 @@ theorem TwGenNZAC_of : LateralTheory.E.LCBijPf.TwGenNZAC := by
   let P : Scheme.{0}ᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} (ZMod q)) := Scheme.Γ ⋙ twF q i
   let U : Scheme.{0} := Spec (CommRingCat.of K)
   let m : P.obj (op U) := Submodule.Quotient.mk (Finsupp.single (gam ζ) 1)
-  have h1 : ((toSheafify Scheme.etaleTopology P).app (op U)).hom (c.val • m) =
-      ((toSheafify Scheme.etaleTopology P).app (op U)).hom 0 := by
+  have h1
+      : ((toSheafify Scheme.etaleTopology P).app (op U)).hom (c.val • m)
+        = ((toSheafify Scheme.etaleTopology P).app (op U)).hom 0 := by
     rw [map_nsmul, map_zero]
     exact h
-  have hS := Presheaf.equalizerSieve_mem Scheme.etaleTopology (toSheafify Scheme.etaleTopology P) (c.val • m) 0 h1
+  have hS :=
+    Presheaf.equalizerSieve_mem Scheme.etaleTopology (toSheafify Scheme.etaleTopology P) (c.val • m)
+      0 h1
   obtain ⟨𝒰, hle⟩ := Scheme.exists_cover_of_mem_grothendieckTopology hS
   obtain ⟨p⟩ : Nonempty U := inferInstance
   obtain ⟨j, y, -⟩ := ((Scheme.presieve₀_mem_precoverage_iff _).1 𝒰.mem₀).1 p
@@ -123,7 +145,9 @@ theorem TwGenNZAC_of : LateralTheory.E.LCBijPf.TwGenNZAC := by
   change (P.map (𝒰.f j).op).hom (c.val • m) = (P.map (𝒰.f j).op).hom 0 at hj
   rw [map_nsmul, map_zero] at hj
   change c.val • Submodule.Quotient.mk (Finsupp.mapDomain (Prim.map (Scheme.Γ.map (𝒰.f j).op).hom)
-    (Finsupp.single (gam ζ) 1)) = _ at hj
+        (Finsupp.single (gam ζ) 1))
+      = _
+    at hj
   erw [Finsupp.mapDomain_single] at hj
   exact hj
 

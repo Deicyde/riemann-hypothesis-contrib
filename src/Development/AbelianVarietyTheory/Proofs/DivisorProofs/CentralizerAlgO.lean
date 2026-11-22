@@ -14,7 +14,8 @@ def Datum.algO : Subalgebra ℚ (Module.End ℚ D.VQ) := Algebra.adjoin ℚ (Set
 
 theorem Datum.actQ_mem_algO (b : D.O) : D.actQ b ∈ D.algO := Algebra.subset_adjoin ⟨b, rfl⟩
 
-theorem Datum.centralizer_algO : Subalgebra.centralizer ℚ (D.algO : Set (Module.End ℚ D.VQ)) = D.endO := by
+theorem Datum.centralizer_algO
+    : Subalgebra.centralizer ℚ (D.algO : Set (Module.End ℚ D.VQ)) = D.endO := by
   apply le_antisymm
   · exact Subalgebra.centralizer_le ℚ _ _ (Algebra.subset_adjoin)
   · intro g hg
@@ -30,7 +31,8 @@ theorem Datum.centralizer_algO : Subalgebra.centralizer ℚ (D.algO : Set (Modul
 
 instance Datum.nontrivialVQ : Nontrivial D.VQ := by
   apply Module.nontrivial_of_finrank_pos (R := ℚ)
-  haveI := D.freeLa; haveI := D.finLa
+  haveI := D.freeLa
+  haveI := D.finLa
   rw [Module.finrank_baseChange, D.rankLa]
   exact Nat.mul_pos (Nat.mul_pos D.m_pos D.n_pos) Module.finrank_pos
 

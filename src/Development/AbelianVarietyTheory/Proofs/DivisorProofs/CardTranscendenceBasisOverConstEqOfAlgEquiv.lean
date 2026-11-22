@@ -9,13 +9,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLocalizati
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
-theorem GlobalTheory.trBasis_card_eq_of_algEquiv : ∀ {K κ : Type} [Field K] [Field κ] [Algebra ℂ K] [Algebra ℂ κ] (e : K ≃ₐ[ℂ] κ)
-  (n k : ℕ) (x : Fin n → K) (z : Fin k → κ),
-  TrBasis (algebraMap ℂ K) x → TrBasis (algebraMap ℂ κ) z → n = k := by
+theorem GlobalTheory.trBasis_card_eq_of_algEquiv
+    : ∀ {K κ : Type} [Field K] [Field κ] [Algebra ℂ K] [Algebra ℂ κ] (e : K ≃ₐ[ℂ] κ) (n k : ℕ)
+        (x : Fin n → K) (z : Fin k → κ),
+      TrBasis (algebraMap ℂ K) x → TrBasis (algebraMap ℂ κ) z → n = k := by
   intro K κ _ _ _ _ e n k x z hx hz
   have eK : (algebraMap ℂ K).toAlgebra = (inferInstance : Algebra ℂ K) :=
     Algebra.algebra_ext _ _ fun _ => rfl

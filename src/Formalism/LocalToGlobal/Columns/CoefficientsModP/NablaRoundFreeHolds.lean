@@ -24,9 +24,11 @@ section Tensor
 
 variable {K : Type} [Field K] {ι : Type} [Fintype ι] {n : ℕ}
 
-theorem rd_rowAct_one (f : MvPolynomial (Fin n × Fin n) K) :
-    Formalism.GradedWeylDivisibility.rowAct K (1 : Matrix (Fin n) (Fin n) K) f = f := by
-  have h : Formalism.GradedWeylDivisibility.rowAct K (n := n) (1 : Matrix (Fin n) (Fin n) K) = AlgHom.id K _ := by
+theorem rd_rowAct_one (f : MvPolynomial (Fin n × Fin n) K)
+    : Formalism.GradedWeylDivisibility.rowAct K (1 : Matrix (Fin n) (Fin n) K) f = f := by
+  have h
+      : Formalism.GradedWeylDivisibility.rowAct K (n := n) (1 : Matrix (Fin n) (Fin n) K)
+        = AlgHom.id K _ := by
     apply MvPolynomial.algHom_ext
     intro v
     simp only [Formalism.GradedWeylDivisibility.rowAct, aeval_X, Matrix.one_apply, AlgHom.id_apply]
@@ -35,7 +37,8 @@ theorem rd_rowAct_one (f : MvPolynomial (Fin n × Fin n) K) :
     · intro b _ hb
       simp [Ne.symm hb]
     · simp
-  rw [h]; rfl
+  rw [h]
+  rfl
 
 end Tensor
 

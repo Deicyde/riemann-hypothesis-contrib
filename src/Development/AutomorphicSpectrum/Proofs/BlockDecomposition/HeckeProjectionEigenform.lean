@@ -8,8 +8,10 @@ public import GroundTheory.AutomorphicForms.GL2.ExistsEqPowMulOfValuationLe
 
 noncomputable section
 open NumberField IsDedekindDomain MeasureTheory Matrix Filter Topology
-open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.GodementSection (localChar adeleAt glAt restrictedTensor2 godementSection archSection partialLFunction modPow)
+open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.GodementSection
+  (localChar adeleAt glAt restrictedTensor2 godementSection archSection partialLFunction modPow)
 open GroundTheory.Automorphic.GL2Classical (realEmb realPart Gamma0Level archLift)
 open GroundTheory.Automorphic.Reduction (finAt infAt maxCompact)
 open GroundTheory.Automorphic.GLnLocal (integralGL)
@@ -18,19 +20,23 @@ open Ad3 Ad3.R
 
 namespace GlobalTheory.CompanionTheory.RankinSelbergHeckeProjection
 
-theorem core {G : Type*} [Group G] (P : G → G → ℂ) (cd : G → ℂ) (K : Subgroup G) (h : G)
+theorem core
+    {G : Type*} [Group G]
+    (P : G → G → ℂ)
+    (cd : G → ℂ)
+    (K : Subgroup G)
+    (h : G)
     (hI : ∀ t u u', cd t * P (t * u) (t * u') = P u u')
-    (hR1 : ∀ κ ∈ K, ∀ u u', P (u * κ) u' = P u u')
-    (hR2 : ∀ κ ∈ K, ∀ u u', P u (u' * κ) = P u u')
-    (hcd : ∀ κ ∈ K, cd κ = 1)
-    (hcomm : ∀ κ ∈ K, κ * h = h * κ)
-    {ι : Type*} (B : Finset ι) (t : ι → G) (t₀ t' w : G) (κ : ι → G)
-    (hκ : ∀ b ∈ B, κ b ∈ K) (ht : ∀ b ∈ B, t b = κ b * t₀) (hw : w ∈ K) (ht' : t' = w * t₀ * w⁻¹)
-    (lam lam' e : ℂ)
-    (hs1 : ∑ b ∈ B, P (t b) h + P t' h = lam * P 1 h)
+    (hR1 : ∀ κ ∈ K, ∀ u u', P (u * κ) u' = P u u') (hR2 : ∀ κ ∈ K, ∀ u u', P u (u' * κ) = P u u')
+    (hcd : ∀ κ ∈ K, cd κ = 1) (hcomm : ∀ κ ∈ K, κ * h = h * κ)
+    {ι : Type*} (B : Finset ι) (t : ι → G)
+    (t₀ t' w : G) (κ : ι → G) (hκ : ∀ b ∈ B, κ b ∈ K) (ht : ∀ b ∈ B, t b = κ b * t₀)
+    (hw : w ∈ K) (ht' : t' = w * t₀ * w⁻¹)
+    (lam lam' e : ℂ) (hs1 : ∑ b ∈ B, P (t b) h + P t' h = lam * P 1 h)
     (hs2 : ∑ b ∈ B, P 1 (h * t b) + P 1 (h * t') = lam' * P 1 h)
     (hz : P 1 (t₀⁻¹ * h) = e * P 1 (h * t'))
-    (h0 : P 1 h ≠ 0) : lam = cd t₀⁻¹ * e * lam' := by
+    (h0 : P 1 h ≠ 0)
+    : lam = cd t₀⁻¹ * e * lam' := by
   have hm : ∀ k ∈ K, P (k * t₀) h = P t₀ h := fun k hk => by
     have := hI k t₀ h
     rwa [hcd k hk, one_mul, hcomm k hk, hR2 k hk] at this
@@ -59,8 +65,7 @@ theorem core {G : Type*} [Group G] (P : G → G → ℂ) (cd : G → ℂ) (K : S
 theorem cdet_mul (c : HeckeCharacter ℚ) (g h : G2) : cdet c (g * h) = cdet c g * cdet c h := by
   simp [cdet, map_mul]
 
-theorem norm_cdet (c : HeckeCharacter ℚ) (g : G2) : ‖cdet c g‖ = 1 := by
-  exact Circle.norm_coe _
+theorem norm_cdet (c : HeckeCharacter ℚ) (g : G2) : ‖cdet c g‖ = 1 := by exact Circle.norm_coe _
 
 theorem continuous_cdet (c : HeckeCharacter ℚ) : Continuous (cdet c) :=
   continuous_induced_dom.comp (c.continuous_toIdele.comp GeneralLinearGroup.continuous_det)
@@ -75,39 +80,43 @@ theorem det_diagonal_two (z : Jd) : GeneralLinearGroup.det (dg2 z z : G2) = z * 
   ext1
   simp [dg2, Matrix.det_fin_two]
 
-theorem cdet_scal (c : HeckeCharacter ℚ) (z : Jd) : cdet c (dg2 z z) = (c.toIdele z : ℂ) * c.toIdele z := by
+theorem cdet_scal (c : HeckeCharacter ℚ) (z : Jd)
+    : cdet c (dg2 z z) = (c.toIdele z : ℂ) * c.toIdele z := by
   simp [cdet, det_diagonal_two, map_mul]
 
 theorem central_diagonal_commute (z : Jd) (g : G2) : dg2 z z * g = g * dg2 z z := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [dg2, Matrix.mul_apply, Fin.sum_univ_two, mul_comm]
 
-def Fn (φ : G2 → ℂ) (c : HeckeCharacter ℚ) (u u' g : G2) : ℂ := φ (g * u) * conj (φ (g * u')) * cdet c g
+def Fn (φ : G2 → ℂ) (c : HeckeCharacter ℚ) (u u' g : G2) : ℂ :=
+  φ (g * u) * conj (φ (g * u')) * cdet c g
 
 def Pr (μ : Measure G2) (𝓕 : Set G2) (φ : G2 → ℂ) (c : HeckeCharacter ℚ) (u u' : G2) : ℂ :=
   ∫ g in 𝓕 ∩ band, Fn φ c u u' g ∂μ
 
-theorem continuous_Fn {φ : G2 → ℂ} (hc : Continuous φ) (c : HeckeCharacter ℚ) (u u' : G2) :
-    Continuous (Fn φ c u u') := by
+theorem continuous_Fn {φ : G2 → ℂ} (hc : Continuous φ) (c : HeckeCharacter ℚ) (u u' : G2)
+    : Continuous (Fn φ c u u') := by
   unfold Fn
   exact ((hc.comp (continuous_mul_const u)).mul
     (Complex.continuous_conj.comp (hc.comp (continuous_mul_const u')))).mul (continuous_cdet c)
 
-theorem norm_Fn_le {φ : G2 → ℂ} {C : ℝ} (hb : ∀ g, ‖φ g‖ ≤ C) (c : HeckeCharacter ℚ) (u u' g : G2) :
-    ‖Fn φ c u u' g‖ ≤ C * C := by
+theorem norm_Fn_le {φ : G2 → ℂ} {C : ℝ} (hb : ∀ g, ‖φ g‖ ≤ C) (c : HeckeCharacter ℚ) (u u' g : G2)
+    : ‖Fn φ c u u' g‖ ≤ C * C := by
   have h0 : 0 ≤ C := (norm_nonneg _).trans (hb 1)
   unfold Fn
   rw [norm_mul, norm_mul, norm_cdet, mul_one, RCLike.norm_conj]
   exact mul_le_mul (hb _) (hb _) (norm_nonneg _) h0
 
-theorem integrable_Fn {φ : G2 → ℂ} {C : ℝ} (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C)
-    {μ : Measure G2} {s : Set G2} (hs : μ s < ∞) (c : HeckeCharacter ℚ) (u u' : G2) :
-    IntegrableOn (Fn φ c u u') s μ :=
+theorem integrable_Fn
+    {φ : G2 → ℂ} {C : ℝ} (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C)
+    {μ : Measure G2} {s : Set G2} (hs : μ s < ∞)
+    (c : HeckeCharacter ℚ) (u u' : G2)
+    : IntegrableOn (Fn φ c u u') s μ :=
   Measure.integrableOn_of_bounded hs.ne (continuous_Fn hc c u u').aestronglyMeasurable
     (Eventually.of_forall (norm_Fn_le hb c u u'))
 
-theorem Fn_translate (φ : G2 → ℂ) (c : HeckeCharacter ℚ) (t u u' g : G2) :
-    Fn φ c u u' (g * t) = cdet c t * Fn φ c (t * u) (t * u') g := by
+theorem Fn_translate (φ : G2 → ℂ) (c : HeckeCharacter ℚ) (t u u' g : G2)
+    : Fn φ c u u' (g * t) = cdet c t * Fn φ c (t * u) (t * u') g := by
   simp only [Fn, cdet_mul, mul_assoc]
   ring
 
@@ -126,53 +135,67 @@ theorem toIdele_sq (hc2 : c * c = 1) (z : Jd) : (c.toIdele z : ℂ) * c.toIdele 
 theorem Fn_left (hl : LInv φ) (u u' : G2) : LInv (Fn φ c u u') := fun γ g => by
   simp only [Fn, cdet_mul, cdet_dia, one_mul, mul_assoc (dia2 γ), hl γ]
 
-theorem Fn_scal (hcen : ∀ (z : Jd) g, φ (dg2 z z * g) = (ω.toIdele z : ℂ) * φ g) (u u' : G2) (z : Jd) (g : G2) :
-    Fn φ c u u' (dg2 z z * g) = (c.toIdele z : ℂ) * c.toIdele z * Fn φ c u u' g := by
+theorem Fn_scal
+    (hcen : ∀ (z : Jd) g, φ (dg2 z z * g) = (ω.toIdele z : ℂ) * φ g) (u u' : G2) (z : Jd) (g : G2)
+    : Fn φ c u u' (dg2 z z * g) = (c.toIdele z : ℂ) * c.toIdele z * Fn φ c u u' g := by
   simp only [Fn, cdet_mul, cdet_scal, mul_assoc (dg2 z z), hcen, map_mul]
   have := circle_mul_conj (ω.toIdele z)
   linear_combination (φ (g * u) * conj (φ (g * u')) * ((c.toIdele z : ℂ) * c.toIdele z) * cdet c g) * this
 
-theorem Fn_cinv (hcen : ∀ (z : Jd) g, φ (dg2 z z * g) = (ω.toIdele z : ℂ) * φ g) (hc2 : c * c = 1) (u u' : G2) :
-    CInv (Fn φ c u u') := fun z g => by
+theorem Fn_cinv
+    (hcen : ∀ (z : Jd) g, φ (dg2 z z * g) = (ω.toIdele z : ℂ) * φ g) (hc2 : c * c = 1) (u u' : G2)
+    : CInv (Fn φ c u u') := fun z g => by
   rw [Fn_scal hcen, toIdele_sq hc2, one_mul]
 
 variable {μ : Measure G2} {𝓕 : Set G2}
 
-theorem Pr_right1 {κ : G2} (hκ : ∀ g, φ (g * κ) = φ g) (u u' : G2) : Pr μ 𝓕 φ c (u * κ) u' = Pr μ 𝓕 φ c u u' := by
+theorem Pr_right1 {κ : G2} (hκ : ∀ g, φ (g * κ) = φ g) (u u' : G2)
+    : Pr μ 𝓕 φ c (u * κ) u' = Pr μ 𝓕 φ c u u' := by
   simp only [Pr, Fn, ← mul_assoc, hκ]
 
-theorem Pr_right2 {κ : G2} (hκ : ∀ g, φ (g * κ) = φ g) (u u' : G2) : Pr μ 𝓕 φ c u (u' * κ) = Pr μ 𝓕 φ c u u' := by
+theorem Pr_right2 {κ : G2} (hκ : ∀ g, φ (g * κ) = φ g) (u u' : G2)
+    : Pr μ 𝓕 φ c u (u' * κ) = Pr μ 𝓕 φ c u u' := by
   simp only [Pr, Fn, ← mul_assoc, hκ]
 
-theorem Pr_scal (hcen : ∀ (z : Jd) g, φ (dg2 z z * g) = (ω.toIdele z : ℂ) * φ g) (z : Jd) (u u' : G2) :
-    Pr μ 𝓕 φ c u (dg2 z z * u') = conj (ω.toIdele z : ℂ) * Pr μ 𝓕 φ c u u' := by
+theorem Pr_scal
+    (hcen : ∀ (z : Jd) g, φ (dg2 z z * g) = (ω.toIdele z : ℂ) * φ g) (z : Jd) (u u' : G2)
+    : Pr μ 𝓕 φ c u (dg2 z z * u') = conj (ω.toIdele z : ℂ) * Pr μ 𝓕 φ c u u' := by
   unfold Pr
   rw [← integral_const_mul]
   refine integral_congr_ae (Eventually.of_forall fun g => ?_)
   simp only [Fn]
-  have e : g * (dg2 z z * u') = dg2 z z * (g * u') := by rw [← mul_assoc, ← central_diagonal_commute, mul_assoc]
+  have e : g * (dg2 z z * u') = dg2 z z * (g * u') := by
+    rw [← mul_assoc, ← central_diagonal_commute, mul_assoc]
   rw [e, hcen, map_mul]
   ring
 
-theorem hecke_projection_sum_left {C : ℝ} (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C) (hs : μ (𝓕 ∩ band) < ∞)
-    {ι : Type*} (B : Finset ι) (t : ι → G2) (t' : G2) (lam : ℂ)
-    (hT : ∀ y, ∑ b ∈ B, φ (y * t b) + φ (y * t') = lam * φ y) (u u' : G2) :
-    ∑ b ∈ B, Pr μ 𝓕 φ c (u * t b) u' + Pr μ 𝓕 φ c (u * t') u' = lam * Pr μ 𝓕 φ c u u' := by
+theorem hecke_projection_sum_left
+    {C : ℝ}
+    (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C) (hs : μ (𝓕 ∩ band) < ∞)
+    {ι : Type*} (B : Finset ι) (t : ι → G2)
+    (t' : G2) (lam : ℂ) (hT : ∀ y, ∑ b ∈ B, φ (y * t b) + φ (y * t') = lam * φ y)
+    (u u' : G2)
+    : ∑ b ∈ B, Pr μ 𝓕 φ c (u * t b) u' + Pr μ 𝓕 φ c (u * t') u' = lam * Pr μ 𝓕 φ c u u' := by
   unfold Pr
   rw [← integral_finsetSum _ (fun b _ => integrable_Fn hc hb hs c _ _),
-    ← integral_add (integrable_finsetSum _ fun b _ => integrable_Fn hc hb hs c _ _) (integrable_Fn hc hb hs c _ _),
+    ← integral_add (integrable_finsetSum _ fun b _ => integrable_Fn hc hb hs c _ _)
+      (integrable_Fn hc hb hs c _ _),
     ← integral_const_mul]
   refine integral_congr_ae (Eventually.of_forall fun g => ?_)
   simp only [Fn, ← mul_assoc]
   rw [← Finset.sum_mul, ← Finset.sum_mul, ← add_mul, ← add_mul, hT]
 
-theorem hecke_projection_sum_right {C : ℝ} (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C) (hs : μ (𝓕 ∩ band) < ∞)
-    {ι : Type*} (B : Finset ι) (t : ι → G2) (t' : G2) (lam : ℂ)
-    (hT : ∀ y, ∑ b ∈ B, φ (y * t b) + φ (y * t') = lam * φ y) (u u' : G2) :
-    ∑ b ∈ B, Pr μ 𝓕 φ c u (u' * t b) + Pr μ 𝓕 φ c u (u' * t') = conj lam * Pr μ 𝓕 φ c u u' := by
+theorem hecke_projection_sum_right
+    {C : ℝ}
+    (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C) (hs : μ (𝓕 ∩ band) < ∞)
+    {ι : Type*} (B : Finset ι) (t : ι → G2)
+    (t' : G2) (lam : ℂ) (hT : ∀ y, ∑ b ∈ B, φ (y * t b) + φ (y * t') = lam * φ y)
+    (u u' : G2)
+    : ∑ b ∈ B, Pr μ 𝓕 φ c u (u' * t b) + Pr μ 𝓕 φ c u (u' * t') = conj lam * Pr μ 𝓕 φ c u u' := by
   unfold Pr
   rw [← integral_finsetSum _ (fun b _ => integrable_Fn hc hb hs c _ _),
-    ← integral_add (integrable_finsetSum _ fun b _ => integrable_Fn hc hb hs c _ _) (integrable_Fn hc hb hs c _ _),
+    ← integral_add (integrable_finsetSum _ fun b _ => integrable_Fn hc hb hs c _ _)
+      (integrable_Fn hc hb hs c _ _),
     ← integral_const_mul]
   refine integral_congr_ae (Eventually.of_forall fun g => ?_)
   simp only [Fn, ← mul_assoc]
@@ -182,12 +205,18 @@ theorem hecke_projection_sum_right {C : ℝ} (hc : Continuous φ) (hb : ∀ g, �
   rw [← Finset.sum_mul, ← Finset.mul_sum, ← add_mul, ← mul_add, h2]
   ring
 
-theorem Pr_translate {C : ℝ} (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C) (hl : LInv φ)
+theorem Pr_translate
+    {C : ℝ}
+    (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C) (hl : LInv φ)
     (hcen : ∀ (z : Jd) g, φ (dg2 z z * g) = (ω.toIdele z : ℂ) * φ g) (hc2 : c * c = 1)
-    (hG : ∀ F : G2 → ℂ, Continuous F → (∃ C, ∀ g, ‖F g‖ ≤ C) → LInv F → CInv F →
-      ∀ h, ∫ g in 𝓕 ∩ band, F (g * h) ∂μ = ∫ g in 𝓕 ∩ band, F g ∂μ) (t u u' : G2) :
-    cdet c t * Pr μ 𝓕 φ c (t * u) (t * u') = Pr μ 𝓕 φ c u u' := by
-  have := hG (Fn φ c u u') (continuous_Fn hc c u u') ⟨_, norm_Fn_le hb c u u'⟩ (Fn_left hl u u') (Fn_cinv hcen hc2 u u') t
+    (hG : ∀ F : G2 → ℂ,
+      Continuous F → (∃ C, ∀ g, ‖F g‖ ≤ C) → LInv F → CInv F
+        → ∀ h, ∫ g in 𝓕 ∩ band, F (g * h) ∂μ = ∫ g in 𝓕 ∩ band, F g ∂μ)
+    (t u u' : G2)
+    : cdet c t * Pr μ 𝓕 φ c (t * u) (t * u') = Pr μ 𝓕 φ c u u' := by
+  have :=
+    hG (Fn φ c u u') (continuous_Fn hc c u u') ⟨_, norm_Fn_le hb c u u'⟩ (Fn_left hl u u')
+      (Fn_cinv hcen hc2 u u') t
   simp only [Fn_translate] at this
   rw [integral_const_mul] at this
   exact this
@@ -197,40 +226,51 @@ end Pair
 section Local
 
 open GroundTheory.Automorphic.Reduction in
-theorem isLoc2_mul {v : Pl} {x y : GL (Fin 2) (Qv v)} {h h' : G2} (hx : IsLoc2 v x h) (hy : IsLoc2 v y h') :
-    IsLoc2 v (x * y) (h * h') :=
-  ⟨by rw [finAt_mul, hx.1, hy.1], fun v' hv' => by rw [finAt_mul, hx.2.1 v' hv', hy.2.1 v' hv', one_mul],
-    fun w => by rw [infAt_mul, hx.2.2 w, hy.2.2 w, one_mul]⟩
+theorem isLoc2_mul
+    {v : Pl} {x y : GL (Fin 2) (Qv v)} {h h' : G2} (hx : IsLoc2 v x h) (hy : IsLoc2 v y h')
+    : IsLoc2 v (x * y) (h * h') := ⟨
+  by rw [finAt_mul, hx.1, hy.1],
+  fun v' hv' => by rw [finAt_mul, hx.2.1 v' hv', hy.2.1 v' hv', one_mul],
+  fun w => by rw [infAt_mul, hx.2.2 w, hy.2.2 w, one_mul]
+⟩
 
-theorem isLoc2_unique {v : Pl} {x : GL (Fin 2) (Qv v)} {h h' : G2}
+theorem isLoc2_unique
+    {v : Pl} {x : GL (Fin 2) (Qv v)} {h h' : G2}
     (hext : ∀ g g' : G2, (∀ v, finAt v g = finAt v g') → (∀ w, infAt w g = infAt w g') → g = g')
-    (hx : IsLoc2 v x h) (hy : IsLoc2 v x h') : h = h' := by
+    (hx : IsLoc2 v x h) (hy : IsLoc2 v x h')
+    : h = h' := by
   refine hext _ _ (fun v' => ?_) (fun w => by rw [hx.2.2 w, hy.2.2 w])
   by_cases e : v' = v
   · subst e; rw [hx.1, hy.1]
   · rw [hx.2.1 v' e, hy.2.1 v' e]
 
 open GroundTheory.Automorphic.Reduction in
-theorem isLoc2_comm {v : Pl} {x : GL (Fin 2) (Qv v)} {k h : G2}
+theorem isLoc2_comm
+    {v : Pl} {x : GL (Fin 2) (Qv v)} {k h : G2}
     (hext : ∀ g g' : G2, (∀ v, finAt v g = finAt v g') → (∀ w, infAt w g = infAt w g') → g = g')
-    (hx : IsLoc2 v x k) (hv : finAt v h = 1) : k * h = h * k := by
+    (hx : IsLoc2 v x k) (hv : finAt v h = 1)
+    : k * h = h * k := by
   refine hext _ _ (fun v' => ?_) (fun w => by simp [infAt_mul, hx.2.2 w])
   rw [finAt_mul, finAt_mul]
   by_cases e : v' = v
   · subst e; rw [hv, mul_one, one_mul]
   · rw [hx.2.1 v' e, one_mul, mul_one]
 
-
 open GroundTheory.Automorphic.Reduction in
-theorem det_eq_of_comps {h h' : G2}
+theorem det_eq_of_comps
+    {h h' : G2}
     (hf : ∀ v : Pl, GeneralLinearGroup.det (finAt v h) = GeneralLinearGroup.det (finAt v h'))
-    (hi : ∀ w, GeneralLinearGroup.det (infAt w h) = GeneralLinearGroup.det (infAt w h')) :
-    GeneralLinearGroup.det h = GeneralLinearGroup.det h' := by
-  have e1 : ∀ (v : Pl) (g : G2), ((GeneralLinearGroup.det g : (𝔸[ℚ])ˣ) : 𝔸[ℚ]).2 v =
-      ((GeneralLinearGroup.det (finAt v g) : (Qv v)ˣ) : Qv v) := fun v g =>
+    (hi : ∀ w, GeneralLinearGroup.det (infAt w h) = GeneralLinearGroup.det (infAt w h'))
+    : GeneralLinearGroup.det h = GeneralLinearGroup.det h' := by
+  have e1
+      : ∀ (v : Pl) (g : G2),
+        ((GeneralLinearGroup.det g : (𝔸[ℚ])ˣ) : 𝔸[ℚ]).2 v
+          = ((GeneralLinearGroup.det (finAt v g) : (Qv v)ˣ) : Qv v) := fun v g =>
     RingHom.map_det (finEval v) (g : Matrix (Fin 2) (Fin 2) 𝔸[ℚ])
-  have e2 : ∀ (w : InfinitePlace ℚ) (g : G2), ((GeneralLinearGroup.det g : (𝔸[ℚ])ˣ) : 𝔸[ℚ]).1 w =
-      ((GeneralLinearGroup.det (infAt w g) : (w.Completion)ˣ) : w.Completion) := fun w g =>
+  have e2
+      : ∀ (w : InfinitePlace ℚ) (g : G2),
+        ((GeneralLinearGroup.det g : (𝔸[ℚ])ˣ) : 𝔸[ℚ]).1 w
+          = ((GeneralLinearGroup.det (infAt w g) : (w.Completion)ˣ) : w.Completion) := fun w g =>
     RingHom.map_det (infEval w) (g : Matrix (Fin 2) (Fin 2) 𝔸[ℚ])
   apply Units.ext
   refine Prod.ext (funext fun w => ?_) (Subtype.ext (funext fun v => ?_))
@@ -241,12 +281,13 @@ end Local
 
 section Key
 
-theorem det_diag_adelic_GL2 {R : Type*} [CommRing R] (a d : Rˣ) : GeneralLinearGroup.det (dg2 a d) = a * d := by
+theorem det_diag_adelic_GL2 {R : Type*} [CommRing R] (a d : Rˣ)
+    : GeneralLinearGroup.det (dg2 a d) = a * d := by
   ext1
   simp [dg2, Matrix.det_fin_two]
 
-theorem diagonal_mul_diagonal_alt {R : Type*} [CommRing R] (a b c d : Rˣ) :
-    (dg2 a b * dg2 c d : GL (Fin 2) R) = dg2 (a * c) (b * d) := by
+theorem diagonal_mul_diagonal_alt {R : Type*} [CommRing R] (a b c d : Rˣ)
+    : (dg2 a b * dg2 c d : GL (Fin 2) R) = dg2 (a * c) (b * d) := by
   apply Units.ext
   ext i j
   fin_cases i <;> fin_cases j <;> simp [dg2, Matrix.mul_apply, Fin.sum_univ_two]
@@ -256,8 +297,8 @@ theorem scalar_diagonal_one_one {R : Type*} [CommRing R] : (dg2 1 1 : GL (Fin 2)
   ext i j
   fin_cases i <;> fin_cases j <;> simp [dg2]
 
-theorem antidiagonal_torus_weyl_conjugate {R : Type*} [CommRing R] (a : Rˣ) :
-    (dg2 1 a : GL (Fin 2) R) = w0 * dg2 a 1 * w0⁻¹ := by
+theorem antidiagonal_torus_weyl_conjugate {R : Type*} [CommRing R] (a : Rˣ)
+    : (dg2 1 a : GL (Fin 2) R) = w0 * dg2 a 1 * w0⁻¹ := by
   rw [eq_mul_inv_iff_mul_eq]
   apply Units.ext
   ext i j
@@ -268,46 +309,51 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchim
 theorem unipotent_integral_mem_compact {y : F} (hy : y ∈ 𝒪[F]) : uni2 y ∈ integralGL F 2 := by
   rw [GLnLocal.mem_integralGL_iff]
   have hn : -y ∈ 𝒪[F] := neg_mem hy
-  constructor <;> intro i j <;> fin_cases i <;> fin_cases j <;>
-    simp [uni2, hy, hn, zero_mem, one_mem]
+  constructor <;> intro i j <;> fin_cases i <;> fin_cases j
+    <;> simp [uni2, hy, hn, zero_mem, one_mem]
 
 theorem cmHalfIntegralGenerator_mem_algebraicClosure : (w0 : GL (Fin 2) F) ∈ integralGL F 2 := by
   rw [GLnLocal.mem_integralGL_iff]
   have hn : (-1 : F) ∈ 𝒪[F] := neg_mem (one_mem _)
-  constructor <;> intro i j <;> fin_cases i <;> fin_cases j <;>
-    simp [w0, hn, zero_mem, one_mem]
+  constructor <;> intro i j <;> fin_cases i <;> fin_cases j <;> simp [w0, hn, zero_mem, one_mem]
 
-theorem ord_det_of_mem {x : GL (Fin 2) F} (hx : x ∈ integralGL F 2) :
-    ord ((GeneralLinearGroup.det x : Fˣ) : F) = 0 :=
+theorem ord_det_of_mem {x : GL (Fin 2) F} (hx : x ∈ integralGL F 2)
+    : ord ((GeneralLinearGroup.det x : Fˣ) : F) = 0 :=
   GroundTheory.Automorphic.GodementJacquet.ordDet_of_mem_integralGL hx
 
 end Key
 
-
 open GroundTheory.Automorphic.Reduction in
-theorem eig_relation {φ : G2 → ℂ} {ω c : HeckeCharacter ℚ} {μ : Measure G2} {𝓕 : Set G2} {C : ℝ}
+theorem eig_relation
+    {φ : G2 → ℂ} {ω c : HeckeCharacter ℚ} {μ : Measure G2} {𝓕 : Set G2} {C : ℝ}
     (hc : Continuous φ) (hb : ∀ g, ‖φ g‖ ≤ C) (hl : LInv φ)
     (hcen : ∀ (z : Jd) g, φ (dg2 z z * g) = (ω.toIdele z : ℂ) * φ g) (hc2 : c * c = 1)
-    (hG : ∀ F : G2 → ℂ, Continuous F → (∃ C, ∀ g, ‖F g‖ ≤ C) → LInv F → CInv F →
-      ∀ h, ∫ g in 𝓕 ∩ band, F (g * h) ∂μ = ∫ g in 𝓕 ∩ band, F g ∂μ)
-    (hs : μ (𝓕 ∩ band) < ∞) {v : Pl} (hloc : ∀ x, ∃ h, IsLoc2 v x h)
+    (hG : ∀ F : G2 → ℂ,
+      Continuous F → (∃ C, ∀ g, ‖F g‖ ≤ C) → LInv F → CInv F
+        → ∀ h, ∫ g in 𝓕 ∩ band, F (g * h) ∂μ = ∫ g in 𝓕 ∩ band, F g ∂μ)
+    (hs : μ (𝓕 ∩ band) < ∞)
+    {v : Pl} (hloc : ∀ x, ∃ h, IsLoc2 v x h)
     (hext : ∀ g g' : G2, (∀ v, finAt v g = finAt v g') → (∀ w, infAt w g = infAt w g') → g = g')
-    (hlast : ∀ (x : Qv v) (a d : (Qv v)ˣ), ∃ (x' : 𝔸[ℚ]) (a' d' : Jd), IsLoc2 v (uni2 x) (uni2 x') ∧
-      IsLoc2 v (dg2 a d) (dg2 a' d') ∧ adelicChar ℚ x' = localAdelicChar ℚ v x ∧ (a = d → a' = d') ∧
-      ∀ c : HeckeCharacter ℚ, (c.toIdele a' : ℂ) = localChar c v a ∧ (c.toIdele d' : ℂ) = localChar c v d)
-    (hcu : IsUnramifiedChar (localChar c v)) {lam : ℂ} (hT : ∀ g W, LocFn v φ g W → TypeT lam W)
-    {ϖ : (Qv v)ˣ} {B : Finset (Qv v)} (hR : Reps ϖ B) {h : G2} (hv : finAt v h = 1)
-    (h0 : Pr μ 𝓕 φ c 1 h ≠ 0) :
-    lam = ((localChar c v ϖ⁻¹ : ℂˣ) : ℂ) * ((localChar ω v ϖ : ℂˣ) : ℂ) * conj lam := by
+    (hlast : ∀ (x : Qv v) (a d : (Qv v)ˣ), ∃ (x' : 𝔸[ℚ]) (a' d' : Jd),
+      IsLoc2 v (uni2 x) (uni2 x') ∧ IsLoc2 v (dg2 a d) (dg2 a' d')
+        ∧ adelicChar ℚ x' = localAdelicChar ℚ v x ∧ (a = d → a' = d')
+        ∧ ∀ c : HeckeCharacter ℚ,
+          (c.toIdele a' : ℂ) = localChar c v a ∧ (c.toIdele d' : ℂ) = localChar c v d)
+    (hcu : IsUnramifiedChar (localChar c v))
+    {lam : ℂ} (hT : ∀ g W, LocFn v φ g W → TypeT lam W)
+    {ϖ : (Qv v)ˣ} {B : Finset (Qv v)} (hR : Reps ϖ B)
+    {h : G2} (hv : finAt v h = 1) (h0 : Pr μ 𝓕 φ c 1 h ≠ 0)
+    : lam = ((localChar c v ϖ⁻¹ : ℂˣ) : ℂ) * ((localChar ω v ϖ : ℂˣ) : ℂ) * conj lam := by
   choose L hL using hloc
   have hLm : ∀ x y, L (x * y) = L x * L y := fun x y =>
     isLoc2_unique hext (hL _) (isLoc2_mul (hL x) (hL y))
-  have hL1 : L 1 = 1 := isLoc2_unique hext (hL 1) ⟨finAt_one v, fun v' _ => finAt_one v', fun w => infAt_one w⟩
+  have hL1 : L 1 = 1 :=
+    isLoc2_unique hext (hL 1) ⟨finAt_one v, fun v' _ => finAt_one v', fun w => infAt_one w⟩
   let Lh : GL (Fin 2) (Qv v) →* G2 := { toFun := L, map_one' := hL1, map_mul' := hLm }
   have hLh : ∀ x, Lh x = L x := fun _ => rfl
   have hLinv : ∀ x, L x⁻¹ = (L x)⁻¹ := fun x => map_inv Lh x
-  have hTT : ∀ g, TypeT lam (fun x => φ (g * L x)) := fun g => hT g _ fun x h' hx => by
-    rw [isLoc2_unique hext hx (hL x)]
+  have hTT : ∀ g, TypeT lam (fun x => φ (g * L x)) := fun g =>
+    hT g _ fun x h' hx => by rw [isLoc2_unique hext hx (hL x)]
   have hsph : ∀ x ∈ integralGL (Qv v) 2, ∀ g, φ (g * L x) = φ g := fun x hx g => by
     have := (hTT g).1 x hx 1
     simpa [hL1] using this
@@ -330,40 +376,51 @@ theorem eig_relation {φ : G2 → ℂ} {ω c : HeckeCharacter ℚ} {μ : Measure
     rintro _ ⟨x, hx, rfl⟩ g
     exact hsph x hx g
   have hI := fun t u u' => Pr_translate (μ := μ) (𝓕 := 𝓕) hc hb hl hcen hc2 hG t u u'
-  have hmain := core (Pr μ 𝓕 φ c) (cdet c) K h hI (fun κ hκ u u' => Pr_right1 (hKs κ hκ) u u')
-    (fun κ hκ u u' => Pr_right2 (hKs κ hκ) u u')
-    (by
-      rintro _ ⟨x, hx, rfl⟩
-      rw [hLh, hcL, isUnramifiedChar_iff.1 hcu _ (ord_det_of_mem hx), Units.val_one])
-    (by
-      rintro _ ⟨x, hx, rfl⟩
-      exact isLoc2_comm hext (hL x) hv)
-    B (fun b => L (upm ϖ b)) (L (dg2 ϖ 1)) (L (dg2 1 ϖ)) (L w0) (fun b => L (uni2 b))
-    (fun b hb => ⟨uni2 b, unipotent_integral_mem_compact (hR.2.1 b hb), rfl⟩)
-    (fun b _ => by rw [upm, hLm])
-    ⟨w0, cmHalfIntegralGenerator_mem_algebraicClosure, rfl⟩
-    (by rw [antidiagonal_torus_weyl_conjugate, hLm, hLm, hLinv])
-    lam (conj lam) (conj (((localChar ω v ϖ⁻¹ : ℂˣ) : ℂ)))
-    (by
-      have := hecke_projection_sum_left (c := c) (μ := μ) (𝓕 := 𝓕) hc hb hs B (fun b => L (upm ϖ b)) (L (dg2 1 ϖ)) lam hTs 1 h
-      simpa using this)
-    (hecke_projection_sum_right (c := c) (μ := μ) (𝓕 := 𝓕) hc hb hs B (fun b => L (upm ϖ b)) (L (dg2 1 ϖ)) lam hTs 1 h)
-    (by
-      obtain ⟨_, z, z', -, hd, -, hzz, hch⟩ := hlast 0 ϖ⁻¹ ϖ⁻¹
-      obtain rfl := hzz rfl
-      have e1 : dg2 ϖ⁻¹ ϖ⁻¹ * dg2 1 ϖ = (dg2 ϖ 1)⁻¹ := by
-        rw [eq_inv_iff_mul_eq_one]
-        simp only [diagonal_mul_diagonal_alt, mul_one, inv_mul_cancel, scalar_diagonal_one_one]
-      have e2 : (L (dg2 ϖ 1))⁻¹ * h = dg2 z z * (h * L (dg2 1 ϖ)) := by
-        rw [← hLinv, ← e1, hLm, isLoc2_unique hext (hL _) hd, mul_assoc,
-          isLoc2_comm hext (hL _) hv]
-      rw [e2, Pr_scal hcen, (hch ω).1])
-    h0
+  have hmain :=
+    core (Pr μ 𝓕 φ c) (cdet c) K h hI
+      (fun κ hκ u u' => Pr_right1 (hKs κ hκ) u u')
+      (fun κ hκ u u' => Pr_right2 (hKs κ hκ) u u')
+      (by
+        rintro _ ⟨x, hx, rfl⟩
+        rw [hLh, hcL, isUnramifiedChar_iff.1 hcu _ (ord_det_of_mem hx), Units.val_one])
+      (by
+        rintro _ ⟨x, hx, rfl⟩
+        exact isLoc2_comm hext (hL x) hv)
+      B
+      (fun b => L (upm ϖ b))
+      (L (dg2 ϖ 1)) (L (dg2 1 ϖ)) (L w0)
+      (fun b => L (uni2 b))
+      (fun b hb => ⟨uni2 b, unipotent_integral_mem_compact (hR.2.1 b hb), rfl⟩)
+      (fun b _ => by rw [upm, hLm])
+      ⟨w0, cmHalfIntegralGenerator_mem_algebraicClosure, rfl⟩
+      (by rw [antidiagonal_torus_weyl_conjugate, hLm, hLm, hLinv]) lam (conj lam)
+      (conj (((localChar ω v ϖ⁻¹ : ℂˣ) : ℂ)))
+      (by
+        have :=
+          hecke_projection_sum_left (c := c) (μ := μ) (𝓕 := 𝓕) hc hb hs B
+            (fun b => L (upm ϖ b))
+            (L (dg2 1 ϖ)) lam hTs 1 h
+        simpa using this)
+      (hecke_projection_sum_right (c := c) (μ := μ) (𝓕 := 𝓕) hc hb hs B
+        (fun b => L (upm ϖ b))
+        (L (dg2 1 ϖ)) lam hTs 1 h)
+      (by
+        obtain ⟨_, z, z', -, hd, -, hzz, hch⟩ := hlast 0 ϖ⁻¹ ϖ⁻¹
+        obtain rfl := hzz rfl
+        have e1 : dg2 ϖ⁻¹ ϖ⁻¹ * dg2 1 ϖ = (dg2 ϖ 1)⁻¹ := by
+          rw [eq_inv_iff_mul_eq_one]
+          simp only [diagonal_mul_diagonal_alt, mul_one, inv_mul_cancel, scalar_diagonal_one_one]
+        have e2 : (L (dg2 ϖ 1))⁻¹ * h = dg2 z z * (h * L (dg2 1 ϖ)) := by
+          rw [← hLinv, ← e1, hLm, isLoc2_unique hext (hL _) hd, mul_assoc,
+            isLoc2_comm hext (hL _) hv]
+        rw [e2, Pr_scal hcen, (hch ω).1])
+      h0
   have e3 : cdet c (L (dg2 ϖ 1))⁻¹ = ((localChar c v ϖ⁻¹ : ℂˣ) : ℂ) := by
     rw [← hLinv, hcL, map_inv, det_diag_adelic_GL2, mul_one, map_inv]
   have e4 : conj ((localChar ω v ϖ⁻¹ : ℂˣ) : ℂ) = ((localChar ω v ϖ : ℂˣ) : ℂ) := by
-    rw [GroundTheory.Automorphic.GodementSection.coe_localChar, GroundTheory.Automorphic.GodementSection.coe_localChar, map_inv,
-      Circle.coe_inv_eq_conj, Complex.conj_conj]
+    rw [GroundTheory.Automorphic.GodementSection.coe_localChar,
+      GroundTheory.Automorphic.GodementSection.coe_localChar, map_inv, Circle.coe_inv_eq_conj,
+      Complex.conj_conj]
   rw [e3, e4] at hmain
   exact hmain
 

@@ -25,16 +25,20 @@ noncomputable section
 
 namespace VarietyTangentGraphDense
 
-def frameProjCLM {n : ℕ} (b : OrthonormalBasis (Fin n) ℂ (EuclideanSpace ℂ (Fin n))) (I : Finset (Fin n)) :
-    EuclideanSpace ℂ (Fin n) →L[ℂ] (I → ℂ) :=
+def frameProjCLM
+    {n : ℕ} (b : OrthonormalBasis (Fin n) ℂ (EuclideanSpace ℂ (Fin n))) (I : Finset (Fin n))
+    : EuclideanSpace ℂ (Fin n) →L[ℂ] (I → ℂ) :=
   ContinuousLinearMap.pi fun i : I => innerSL ℂ (b i)
 
-theorem frameProjCLM_apply {n : ℕ} (b : OrthonormalBasis (Fin n) ℂ (EuclideanSpace ℂ (Fin n)))
-    (I : Finset (Fin n)) (z : EuclideanSpace ℂ (Fin n)) : frameProjCLM b I z = frameProj b I z := by
+theorem frameProjCLM_apply
+    {n : ℕ} (b : OrthonormalBasis (Fin n) ℂ (EuclideanSpace ℂ (Fin n))) (I : Finset (Fin n))
+    (z : EuclideanSpace ℂ (Fin n))
+    : frameProjCLM b I z = frameProj b I z := by
   funext i
   simp [frameProjCLM, frameProj]
 
-theorem isClosed_zeroSetEuc {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) : IsClosed (zeroSetEuc J) := by
+theorem isClosed_zeroSetEuc {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ))
+    : IsClosed (zeroSetEuc J) := by
   have h : zeroSetEuc J = ⋂ q ∈ J, {z : EuclideanSpace ℂ (Fin n) | eval (fun i => z i) q = 0} := by
     ext z
     simp [zeroSetEuc]
@@ -42,12 +46,14 @@ theorem isClosed_zeroSetEuc {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) : I
   refine isClosed_biInter fun q _ => isClosed_eq ?_ continuous_const
   exact (MvPolynomial.continuous_eval q).comp (PiLp.continuous_ofLp 2 _)
 
-theorem exists_near_off {n d : ℕ} {J J' : Ideal (MvPolynomial (Fin n) ℂ)}
+theorem exists_near_off
+    {n d : ℕ} {J J' : Ideal (MvPolynomial (Fin n) ℂ)}
     (hO : IndefiniteRowSideFullHecke.ComplexSets.ZeroSetOpenMass.Statement) (hJ : J.IsPrime)
     (hd : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d)
-    (hJ' : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J') < d) {z : EuclideanSpace ℂ (Fin n)}
-    (hz : z ∈ zeroSetEuc J) {ε : ℝ} (hε : 0 < ε) :
-    ∃ z₁ ∈ zeroSetEuc J \ zeroSetEuc J', dist z₁ z < ε := by
+    (hJ' : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J') < d)
+    {z : EuclideanSpace ℂ (Fin n)} (hz : z ∈ zeroSetEuc J)
+    {ε : ℝ} (hε : 0 < ε)
+    : ∃ z₁ ∈ zeroSetEuc J \ zeroSetEuc J', dist z₁ z < ε := by
   by_contra hcon
   push Not at hcon
   set O : Set (Fin n → ℂ) := WithLp.toLp 2 ⁻¹' Metric.ball z ε with hOdef
@@ -65,33 +71,42 @@ theorem exists_near_off {n d : ℕ} {J J' : Ideal (MvPolynomial (Fin n) ℂ)}
     linarith
   have hnull : μH[((2 * d : ℕ) : ℝ)] (zeroSetEuc J') = 0 := NullSmaller.proof n d J' hJ'
   have himg : μH[((2 * d : ℕ) : ℝ)] (WithLp.ofLp '' zeroSetEuc J' : Set (Fin n → ℂ)) = 0 := by
-    have := ((PiLp.lipschitzWith_ofLp 2 (fun _ : Fin n => ℂ)).lipschitzOnWith
-      (s := zeroSetEuc J')).hausdorffMeasure_image_le (d := ((2 * d : ℕ) : ℝ)) (by positivity)
+    have :=
+      ((PiLp.lipschitzWith_ofLp 2 (fun _ : Fin n => ℂ)).lipschitzOnWith
+        (s := zeroSetEuc J')).hausdorffMeasure_image_le (d := ((2 * d : ℕ) : ℝ)) (by positivity)
     rw [hnull, mul_zero] at this
     exact nonpos_iff_eq_zero.1 this
   have := (MeasureTheory.measure_mono hsub).trans_eq himg
   exact hpos.ne' (nonpos_iff_eq_zero.1 this)
 
-theorem analyticAt_of_differentiableOn {σ : Type} [Fintype σ] {m : ℕ} {U : Set (σ → ℂ)}
-    {G : (σ → ℂ) → EuclideanSpace ℂ (Fin m)} (hU : IsOpen U) (hG : DifferentiableOn ℂ G U) {w : σ → ℂ}
-    (hw : w ∈ U) : AnalyticAt ℂ G w := by
+theorem analyticAt_of_differentiableOn
+    {σ : Type} [Fintype σ]
+    {m : ℕ} {U : Set (σ → ℂ)} {G : (σ → ℂ) → EuclideanSpace ℂ (Fin m)}
+    (hU : IsOpen U) (hG : DifferentiableOn ℂ G U)
+    {w : σ → ℂ} (hw : w ∈ U)
+    : AnalyticAt ℂ G w := by
   classical
   let e : σ ≃ Fin (Fintype.card σ) := Fintype.equivFin σ
   let E : (Fin (Fintype.card σ) → ℂ) ≃L[ℂ] (σ → ℂ) :=
     ContinuousLinearEquiv.piCongrLeft ℂ (fun _ : σ => ℂ) e.symm
-  let P : EuclideanSpace ℂ (Fin m) ≃L[ℂ] (Fin m → ℂ) := PiLp.continuousLinearEquiv 2 ℂ (fun _ : Fin m => ℂ)
+  let P : EuclideanSpace ℂ (Fin m) ≃L[ℂ] (Fin m → ℂ) :=
+    PiLp.continuousLinearEquiv 2 ℂ (fun _ : Fin m => ℂ)
   let H : (Fin (Fintype.card σ) → ℂ) → Fin m → ℂ := fun y => P (G (E y))
   have hV : IsOpen (E ⁻¹' U) := hU.preimage E.continuous
   have hH : DifferentiableOn ℂ H (E ⁻¹' U) :=
-    P.differentiable.comp_differentiableOn
-      (hG.comp E.differentiable.differentiableOn (Set.mapsTo_preimage _ _))
+    P.differentiable.comp_differentiableOn (hG.comp E.differentiable.differentiableOn
+      (Set.mapsTo_preimage _ _))
   have hHa : AnalyticOnNhd ℂ H (E ⁻¹' U) := by
     intro y hy
     refine AnalyticAt.pi fun s => ?_
     have hs : DifferentiableOn ℂ (fun x => H x s) (E ⁻¹' U) :=
-      (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin m => ℂ) s).differentiable.comp_differentiableOn hH
-    refine IndefiniteRowSideFullHecke.ComplexSets.analyticOnNhd_of_continuousOn_of_separately hV hs.continuousOn
-      (fun x hx i => ?_) y hy
+      (ContinuousLinearMap.proj (R := ℂ)
+        (φ := fun _ : Fin m => ℂ)
+        s).differentiable.comp_differentiableOn hH
+    refine IndefiniteRowSideFullHecke.ComplexSets.analyticOnNhd_of_continuousOn_of_separately hV
+      hs.continuousOn
+      (fun x hx i => ?_)
+      y hy
     have h1 : DifferentiableAt ℂ (fun x => H x s) (Function.update x i (x i)) := by
       rw [Function.update_eq_self]
       exact hs.differentiableAt (hV.mem_nhds hx)
@@ -107,11 +122,12 @@ theorem analyticAt_of_differentiableOn {σ : Type} [Fintype σ] {m : ℕ} {U : S
   rw [hGe]
   exact (hPa.comp (hHa _ hy)).comp hEa
 
-theorem exists_tangent_frame {n : ℕ} (I₀ : Finset (Fin n))
-    (L : (I₀ → ℂ) →L[ℂ] EuclideanSpace ℂ (Fin n)) (hL : Function.Injective L) :
-    ∃ b : OrthonormalBasis (Fin n) ℂ (EuclideanSpace ℂ (Fin n)),
-      (∀ j ∉ I₀, ∀ v, inner ℂ (b j) (L v) = 0) ∧
-      Function.Injective fun v => frameProjCLM b I₀ (L v) := by
+theorem exists_tangent_frame
+    {n : ℕ}
+    (I₀ : Finset (Fin n)) (L : (I₀ → ℂ) →L[ℂ] EuclideanSpace ℂ (Fin n)) (hL : Function.Injective L)
+    : ∃ b : OrthonormalBasis (Fin n) ℂ (EuclideanSpace ℂ (Fin n)),
+      (∀ j ∉ I₀, ∀ v, inner ℂ (b j) (L v) = 0)
+        ∧ Function.Injective fun v => frameProjCLM b I₀ (L v) := by
   classical
   set T : Submodule ℂ (EuclideanSpace ℂ (Fin n)) := LinearMap.range (L : (I₀ → ℂ) →ₗ[ℂ] _) with hT
   have hfin : Module.finrank ℂ T = Fintype.card I₀ := by
@@ -122,20 +138,24 @@ theorem exists_tangent_frame {n : ℕ} (I₀ : Finset (Fin n))
     (stdOrthonormalBasis ℂ T).reindex (Fintype.equivFinOfCardEq hfin.symm).symm
   let v : Fin n → EuclideanSpace ℂ (Fin n) := fun i =>
     if h : i ∈ I₀ then (u ⟨i, h⟩ : EuclideanSpace ℂ (Fin n)) else 0
-  obtain ⟨b, hb⟩ := Orthonormal.exists_orthonormalBasis_extension_of_card_eq (𝕜 := ℂ)
-    (E := EuclideanSpace ℂ (Fin n)) (ι := Fin n) (by rw [finrank_euclideanSpace]) (v := v)
-    (s := (I₀ : Set (Fin n))) (by
-      rw [orthonormal_iff_ite]
-      rintro ⟨i, hi⟩ ⟨j, hj⟩
-      have hi' : i ∈ I₀ := hi
-      have hj' : j ∈ I₀ := hj
-      have h := orthonormal_iff_ite.1 u.orthonormal ⟨i, hi'⟩ ⟨j, hj'⟩
-      simpa [v, hi', hj', Subtype.ext_iff] using h)
+  obtain ⟨b, hb⟩ :=
+    Orthonormal.exists_orthonormalBasis_extension_of_card_eq (𝕜 := ℂ)
+      (E := EuclideanSpace ℂ (Fin n)) (ι := Fin n) (by rw [finrank_euclideanSpace]) (v := v)
+      (s := (I₀ : Set (Fin n)))
+      (by
+        rw [orthonormal_iff_ite]
+        rintro ⟨i, hi⟩ ⟨j, hj⟩
+        have hi' : i ∈ I₀ := hi
+        have hj' : j ∈ I₀ := hj
+        have h := orthonormal_iff_ite.1 u.orthonormal ⟨i, hi'⟩ ⟨j, hj'⟩
+        simpa [v, hi', hj', Subtype.ext_iff] using h)
   have hbu : ∀ i : I₀, b i = (u i : EuclideanSpace ℂ (Fin n)) := fun i => by
     rw [hb i i.2]
     simp [v, i.2]
-  have hTsum : ∀ x : T, (x : EuclideanSpace ℂ (Fin n)) =
-      ∑ k : I₀, inner ℂ (b k) (x : EuclideanSpace ℂ (Fin n)) • b k := by
+  have hTsum
+      : ∀ x : T,
+        (x : EuclideanSpace ℂ (Fin n))
+          = ∑ k : I₀, inner ℂ (b k) (x : EuclideanSpace ℂ (Fin n)) • b k := by
     intro x
     conv_lhs => rw [← u.sum_repr' x]
     simp [hbu, Submodule.coe_inner]
@@ -160,8 +180,10 @@ theorem exists_tangent_frame {n : ℕ} (I₀ : Finset (Fin n))
 
 end VarietyTangentGraphDense
 
-theorem VarietyTangentGraphDense.proof_of_framePlaneGraph (hP : FramePlaneGraph.Statement)
-    (hO : IndefiniteRowSideFullHecke.ComplexSets.ZeroSetOpenMass.Statement) : VarietyTangentGraphDense.Statement := by
+theorem VarietyTangentGraphDense.proof_of_framePlaneGraph
+    (hP : FramePlaneGraph.Statement)
+    (hO : IndefiniteRowSideFullHecke.ComplexSets.ZeroSetOpenMass.Statement)
+    : VarietyTangentGraphDense.Statement := by
   classical
   open VarietyTangentGraphDense in
   intro n d J hJ hd z hz ε hε
@@ -191,7 +213,8 @@ theorem VarietyTangentGraphDense.proof_of_framePlaneGraph (hP : FramePlaneGraph.
   set P := frameProjCLM b I₀ with hPdef
   set φ : (I₀ → ℂ) → (I₀ → ℂ) := fun w => P (g w) with hφdef
   let M₀ : (I₀ → ℂ) ≃ₗ[ℂ] (I₀ → ℂ) :=
-    LinearEquiv.ofInjectiveEndo ((P.comp L : (I₀ → ℂ) →L[ℂ] (I₀ → ℂ)) : (I₀ → ℂ) →ₗ[ℂ] (I₀ → ℂ)) hbinj
+    LinearEquiv.ofInjectiveEndo ((P.comp L : (I₀ → ℂ) →L[ℂ] (I₀ → ℂ)) : (I₀ → ℂ) →ₗ[ℂ] (I₀ → ℂ))
+      hbinj
   let M : (I₀ → ℂ) ≃L[ℂ] (I₀ → ℂ) := M₀.toContinuousLinearEquiv
   have hMc : (M : (I₀ → ℂ) →L[ℂ] (I₀ → ℂ)) = P.comp L := ContinuousLinearMap.ext fun v => rfl
   have hφd : HasFDerivAt φ (M : (I₀ → ℂ) →L[ℂ] (I₀ → ℂ)) w₁ := by
@@ -261,7 +284,8 @@ theorem VarietyTangentGraphDense.proof_of_framePlaneGraph (hP : FramePlaneGraph.
       rw [e.right_inv hyt]
       exact hy
   · intro j hj
-    have hψd : HasFDerivAt ψ (fderiv ℂ ψ (φ w₁)) (φ w₁) := (hψc.differentiableAt one_ne_zero).hasFDerivAt
+    have hψd : HasFDerivAt ψ (fderiv ℂ ψ (φ w₁)) (φ w₁) :=
+      (hψc.differentiableAt one_ne_zero).hasFDerivAt
     have hgd' : HasFDerivAt g L (ψ (φ w₁)) := by
       rw [hψy₁]
       exact hgd w₁ hw₁
@@ -278,12 +302,14 @@ theorem VarietyTangentGraphDense.proof_of_framePlaneGraph (hP : FramePlaneGraph.
     rw [hψy₁]
     exact hz₁z
 
-theorem VarietyTangentGraphDense.proof (hO : IndefiniteRowSideFullHecke.ComplexSets.ZeroSetOpenMass.Statement) :
-    VarietyTangentGraphDense.Statement :=
+theorem VarietyTangentGraphDense.proof
+    (hO : IndefiniteRowSideFullHecke.ComplexSets.ZeroSetOpenMass.Statement)
+    : VarietyTangentGraphDense.Statement :=
   VarietyTangentGraphDense.proof_of_framePlaneGraph
     (FramePlaneGraph.proof (FrameGraphGeneric.proof
       (FrameJacobianGeneric.proof JacobianRankGeneric.proof ConormalGenerationGeneric.proof)
-      FrameImplicitGraph.proof)) hO
+      FrameImplicitGraph.proof))
+    hO
 
 end
 

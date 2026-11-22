@@ -10,7 +10,9 @@ set_option autoImplicit false
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo (KS Lv Integ)
 
 namespace UpperTheory.Gal.FixZ
@@ -37,7 +39,8 @@ private lemma lofp_cancel {A B S : Scheme.{0}} (f : A ⟶ B) (g : B ⟶ S) [Loca
   rw [← CommRingCat.hom_comp, Scheme.Hom.appLE_comp_appLE]
   exact (f ≫ g).finitePresentation_appLE hW hV _
 
-variable {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} {L : Link D G} {gb : GBase D.toG ℂ} {k : ℕ}
+variable
+  {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} {L : Link D G} {gb : GBase D.toG ℂ} {k : ℕ}
 
 private lemma q_props (hP : G3.PowSm) (T : KS L gb k) (N : Lv p) :
     Smooth (T.X.q (T.lev N)) ∧ IsSeparated (T.X.q (T.lev N)) := by
@@ -85,7 +88,8 @@ theorem trFEt_of : G3.PowSm → ScalEx → TrScal → EtCancel → DescEt → De
   obtain ⟨M, rfl⟩ := T.lev.surjective m
   obtain ⟨M', rfl⟩ := T.lev.surjective m'
   have b1 : ∀ u ∈ T.X.K (T.lev M), 1 * u * 1⁻¹ ∈ T.X.K (T.lev N) := hm (T.lev N, 1) (by simp)
-  have b2 : ∀ u ∈ T.X.K (T.lev M), z * h⁻¹ * u * (z * h⁻¹)⁻¹ ∈ T.X.K (T.lev N') := hm (T.lev N', z * h⁻¹) (by simp)
+  have b2 : ∀ u ∈ T.X.K (T.lev M), z * h⁻¹ * u * (z * h⁻¹)⁻¹ ∈ T.X.K (T.lev N') :=
+    hm (T.lev N', z * h⁻¹) (by simp)
   have b3 : ∀ u ∈ T.X.K (T.lev M'), h * u * h⁻¹ ∈ T.X.K (T.lev M) := hm' (T.lev M, h) (by simp)
   have b4 : ∀ u ∈ T.X.K (T.lev M'), 1 * u * 1⁻¹ ∈ T.X.K (T.lev N') := hm' (T.lev N', 1) (by simp)
   have b5 : ∀ u ∈ T.X.K (T.lev M), z * u * z⁻¹ ∈ T.X.K (T.lev N) := fun u hu => by
@@ -110,7 +114,8 @@ theorem trFEt_of : G3.PowSm → ScalEx → TrScal → EtCancel → DescEt → De
   rw [← c2] at f3 f4
   obtain ⟨-, s1⟩ := tr_props hP T M N' (z * h⁻¹) h'Δ b2
   have t1 : LocallyOfFiniteType (T.X.tr _ _ (z * h⁻¹) h'Δ b2) := inferInstance
-  obtain ⟨f5, f6⟩ := hEC _ _ _ _ (T.X.tr _ _ h a b3) (T.X.tr _ _ (z * h⁻¹) h'Δ b2) (T.X.tr _ _ h a b) t1 f3 f4 f1 f2
+  obtain ⟨f5, f6⟩ :=
+    hEC _ _ _ _ (T.X.tr _ _ h a b3) (T.X.tr _ _ (z * h⁻¹) h'Δ b2) (T.X.tr _ _ h a b) t1 f3 f4 f1 f2
 
   have c3 : T.X.tr _ _ 1 oΔ b4 ≫ T.X.tr _ _ h a b = T.X.tr _ _ h a b9 :=
     tr_comp T.X oΔ b4 a b (mul_one h) a b9
@@ -118,10 +123,8 @@ theorem trFEt_of : G3.PowSm → ScalEx → TrScal → EtCancel → DescEt → De
     tr_comp T.X a b3 oΔ b1 (one_mul h) a b9
   have g1 := T.X.fin _ _ oΔ b1
   have g2 := T.X.etale _ _ oΔ b1
-  have g3 : IsFinite (T.X.tr _ _ 1 oΔ b4 ≫ T.X.tr _ _ h a b) := by
-    rw [c3, ← c4]; infer_instance
-  have g4 : Etale (T.X.tr _ _ 1 oΔ b4 ≫ T.X.tr _ _ h a b) := by
-    rw [c3, ← c4]; infer_instance
+  have g3 : IsFinite (T.X.tr _ _ 1 oΔ b4 ≫ T.X.tr _ _ h a b) := by rw [c3, ← c4]; infer_instance
+  have g4 : Etale (T.X.tr _ _ 1 oΔ b4 ≫ T.X.tr _ _ h a b) := by rw [c3, ← c4]; infer_instance
   obtain ⟨s2, s3⟩ := tr_props hP T N' N h a b
   have g5 := hDE _ _ _ _ _ (T.X.etale _ _ oΔ b4) (T.X.onto _ _ oΔ b4) s3 g4
   exact ⟨hDF _ _ _ _ _ (T.X.onto _ _ oΔ b4) s2 g5 g3, g5⟩

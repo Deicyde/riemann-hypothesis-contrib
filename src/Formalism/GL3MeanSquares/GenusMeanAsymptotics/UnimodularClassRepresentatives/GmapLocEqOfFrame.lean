@@ -14,12 +14,15 @@ noncomputable section
 
 namespace Formalism.HermitianLattices.Ext.L3.WA
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
 
-theorem smul_mem_loc {L : Submodule (𝓞 K) V} {p : Ideal (𝓞 K)} (hp : p.IsPrime) {a : K}
-    (ha : a ∈ Formalism.HermitianLatticesTheory.locR (K := K) p) {m : V} (hm : m ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L) :
-    a • m ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L := by
+theorem smul_mem_loc
+    {L : Submodule (𝓞 K) V} {p : Ideal (𝓞 K)} (hp : p.IsPrime)
+    {a : K} (ha : a ∈ Formalism.HermitianLatticesTheory.locR (K := K) p)
+    {m : V} (hm : m ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L)
+    : a • m ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L := by
   obtain ⟨r, s, hs, rfl⟩ := (mem_locR_iff hp a).mp ha
   obtain ⟨t, ht, htm⟩ := Formalism.HermitianLatticesTheory.locBasic_mem_locS.mp hm
   refine Formalism.HermitianLatticesTheory.locBasic_mem_locS.mpr ⟨s * t, mul_mem hs ht, ?_⟩
@@ -32,12 +35,16 @@ theorem smul_mem_loc {L : Submodule (𝓞 K) V} {p : Ideal (𝓞 K)} (hp : p.IsP
   rw [this]
   exact L.smul_mem r htm
 
-theorem isSelfDualMod_loc {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) {p : Ideal (𝓞 K)} (hp : p.IsPrime)
-    (hu : Formalism.HermitianLatticesTheory.IsUnimodularAt h p L) :
-    IsSelfDualMod (locRing p) h (Formalism.HermitianLatticesTheory.loc (K := K) p L).toAddSubgroup := by
-  have hu' : ∀ x, x ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L ↔
-      ∀ y ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L, h y x ∈ Formalism.HermitianLatticesTheory.locR (K := K) p := by
+theorem isSelfDualMod_loc
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L)
+    {p : Ideal (𝓞 K)} (hp : p.IsPrime) (hu : Formalism.HermitianLatticesTheory.IsUnimodularAt h p L)
+    : IsSelfDualMod (locRing p) h
+      (Formalism.HermitianLatticesTheory.loc (K := K) p L).toAddSubgroup := by
+  have hu'
+      : ∀ x,
+        x ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L
+          ↔ ∀ y ∈ Formalism.HermitianLatticesTheory.loc (K := K) p L,
+            h y x ∈ Formalism.HermitianLatticesTheory.locR (K := K) p := by
     intro x
     rw [← Formalism.HermitianLatticesTheory.locDual_mem_dualAt]
     unfold Formalism.HermitianLatticesTheory.IsUnimodularAt at hu

@@ -39,12 +39,14 @@ private theorem Bd.nsmul (h : Bd a M) (m : ℕ) : Bd a (m • M) := by
   | zero => intro i j; simp
   | succ m ih => rw [succ_nsmul]; exact ih.add h
 
-private theorem Bd.pow (h : Bd a M) (ha : a ≤ 1) (m : ℕ) : Bd (a * a) ((1 + M) ^ m - 1 - m • M) := by
+private theorem Bd.pow (h : Bd a M) (ha : a ≤ 1) (m : ℕ)
+    : Bd (a * a) ((1 + M) ^ m - 1 - m • M) := by
   induction m with
   | zero => intro i j; simp
   | succ m ih =>
-    have e : (1 + M) ^ (m + 1) - 1 - (m + 1) • M =
-        ((1 + M) ^ m - 1 - m • M) + ((1 + M) ^ m - 1 - m • M) * M + (m • M) * M := by
+    have e
+        : (1 + M) ^ (m + 1) - 1 - (m + 1) • M
+          = ((1 + M) ^ m - 1 - m • M) + ((1 + M) ^ m - 1 - m • M) * M + (m • M) * M := by
       rw [pow_succ, succ_nsmul]
       generalize m • M = D
       noncomm_ring
@@ -76,9 +78,11 @@ theorem valuation_natCast_le_one (q : ℕ) : valuation E (q : E) ≤ 1 := by
 
 end Bound
 
-variable {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] {n : ℕ}
+variable
+  {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] {n : ℕ}
 
-theorem ball_mono {r s : ValueGroupWithZero E} (h : r ≤ s) : ball n r ⊆ ball n s := fun _ hg i j => (hg i j).trans h
+theorem ball_mono {r s : ValueGroupWithZero E} (h : r ≤ s) : ball n r ⊆ ball n s := fun _ hg i j =>
+  (hg i j).trans h
 
 def ballSub (n : ℕ) (r : ValueGroupWithZero E) (hr : r < 1) : Subgroup (GL (Fin n) E) where
   carrier := ball n r
@@ -87,8 +91,9 @@ def ballSub (n : ℕ) (r : ValueGroupWithZero E) (hr : r < 1) : Subgroup (GL (Fi
     intro x y hx hy
     have hx' : Bd r ((x : Matrix (Fin n) (Fin n) E) - 1) := hx
     have hy' : Bd r ((y : Matrix (Fin n) (Fin n) E) - 1) := hy
-    have e : ((x * y : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) - 1 =
-        (x - 1) + (y - 1) + ((x : Matrix (Fin n) (Fin n) E) - 1) * (y - 1) := by
+    have e
+        : ((x * y : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) - 1
+          = (x - 1) + (y - 1) + ((x : Matrix (Fin n) (Fin n) E) - 1) * (y - 1) := by
       rw [Units.val_mul]; noncomm_ring
     have := (hx'.add hy').add ((hx'.mul hy').mono (mul_le_of_le_one_right' hr.le))
     rw [← e] at this
@@ -108,18 +113,23 @@ theorem isOpen_ball {r : ValueGroupWithZero E} (hr : r ≠ 0) : IsOpen (ball n r
     refine ⟨Units.mk0 r hr, ?_⟩
     rintro _ ⟨z, hz, rfl⟩
     exact Valuation.map_add_le _ hx (le_of_lt (show valuation E z < r from hz))
-  have e : ball n r = ⋂ i, ⋂ j, (fun g : GL (Fin n) E =>
-      (g : Matrix (Fin n) (Fin n) E) i j - (1 : Matrix (Fin n) (Fin n) E) i j) ⁻¹' {x : E | valuation E x ≤ r} := by
-    ext g
-    simp only [Set.mem_iInter, Set.mem_preimage]
-    rfl
+  have e
+      : ball n r
+        = ⋂ i, ⋂ j, (fun g : GL (Fin n) E =>
+          (g : Matrix (Fin n) (Fin n) E) i j - (1 : Matrix (Fin n) (Fin n) E) i j) ⁻¹' {x : E | valuation E x ≤ r} :=
+    by
+      ext g
+      simp only [Set.mem_iInter, Set.mem_preimage]
+      rfl
   rw [e]
-  exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-    hO.preimage ((Units.continuous_val.matrix_elem i j).sub continuous_const)
+  exact isOpen_iInter_of_finite fun i =>
+    isOpen_iInter_of_finite fun j =>
+      hO.preimage ((Units.continuous_val.matrix_elem i j).sub continuous_const)
 
 theorem isCompact_ball {r : ValueGroupWithZero E} (hr : r < 1) : IsCompact (ball n r) := by
   have h0 : IsCompact {M : Matrix (Fin n) (Fin n) E | Bd r M} :=
-    isCompact_pi_infinite (s := fun _ : Fin n => {x : Fin n → E | ∀ j, x j ∈ {y | valuation E y ≤ r}})
+    isCompact_pi_infinite
+      (s := fun _ : Fin n => {x : Fin n → E | ∀ j, x j ∈ {y | valuation E y ≤ r}})
       fun _ => isCompact_pi_infinite fun _ => IsNonarchimedeanLocalField.isCompact_closedBall E r
   have h1 : IsCompact {M : Matrix (Fin n) (Fin n) E | Bd r (M - 1)} :=
     (Homeomorph.subRight (1 : Matrix (Fin n) (Fin n) E)).isCompact_preimage.mpr h0
@@ -128,8 +138,10 @@ theorem isCompact_ball {r : ValueGroupWithZero E} (hr : r < 1) : IsCompact (ball
   ext g
   exact ⟨fun hg => ⟨hg, (ballSub n r hr).inv_mem hg⟩, fun hg => hg.1⟩
 
-theorem pow_mem_ball {q : ℕ} {r : ValueGroupWithZero E} (hr : r < valuation E (q : E)) {u : GL (Fin n) E}
-    (hu : u ∈ ball n r) : u ^ q ∈ ball n (r * valuation E (q : E)) := by
+theorem pow_mem_ball
+    {q : ℕ} {r : ValueGroupWithZero E} (hr : r < valuation E (q : E))
+    {u : GL (Fin n) E} (hu : u ∈ ball n r)
+    : u ^ q ∈ ball n (r * valuation E (q : E)) := by
   have hu' : Bd r ((u : Matrix (Fin n) (Fin n) E) - 1) := hu
   have h1 := (hu'.pow (hr.le.trans (valuation_natCast_le_one q)) q).mono (mul_le_mul' le_rfl hr.le)
   have h2 : Bd (r * valuation E (q : E)) (q • ((u : Matrix (Fin n) (Fin n) E) - 1)) := fun i j => by
@@ -139,24 +151,29 @@ theorem pow_mem_ball {q : ℕ} {r : ValueGroupWithZero E} (hr : r < valuation E 
   rw [sub_add_cancel, add_sub_cancel, ← Units.val_pow_eq_pow_val] at h3
   exact h3
 
-theorem sg_mem_ball_iff {σ : E ≃+* E} (hσ : Isom σ) {r : ValueGroupWithZero E} {u : GL (Fin n) E} :
-    sg σ u ∈ ball n r ↔ u ∈ ball n r := by
+theorem sg_mem_ball_iff {σ : E ≃+* E} (hσ : Isom σ) {r : ValueGroupWithZero E} {u : GL (Fin n) E}
+    : sg σ u ∈ ball n r ↔ u ∈ ball n r := by
   refine forall₂_congr fun i j => ?_
-  have e : ((sg σ u : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j - (1 : Matrix (Fin n) (Fin n) E) i j =
-      σ ((u : Matrix (Fin n) (Fin n) E) i j - (1 : Matrix (Fin n) (Fin n) E) i j) := by
+  have e
+      : ((sg σ u : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j
+          - (1 : Matrix (Fin n) (Fin n) E) i j
+        = σ ((u : Matrix (Fin n) (Fin n) E) i j - (1 : Matrix (Fin n) (Fin n) E) i j) := by
     rw [map_sub]
     congr 1
     rw [Matrix.one_apply]
     split_ifs <;> simp
   rw [e, hσ]
 
-theorem exists_fixed_root {σ : E ≃+* E} (hσ : Isom σ) {q : ℕ} {r : ValueGroupWithZero E} (hr : r < valuation E (q : E))
-    {g : GL (Fin n) E} (hg : g ∈ ball n (r * valuation E (q : E))) (hf : sg σ g = g) :
-    ∃ u ∈ ball n r, sg σ u = u ∧ u ^ q = g := by
+theorem exists_fixed_root
+    {σ : E ≃+* E} (hσ : Isom σ)
+    {q : ℕ} {r : ValueGroupWithZero E} (hr : r < valuation E (q : E))
+    {g : GL (Fin n) E} (hg : g ∈ ball n (r * valuation E (q : E))) (hf : sg σ g = g)
+    : ∃ u ∈ ball n r, sg σ u = u ∧ u ^ q = g := by
   obtain ⟨u, ⟨hu, huq⟩, huu⟩ := rootEx E n q r hr g hg
   exact ⟨u, hu, huu _ ⟨(sg_mem_ball_iff hσ).mpr hu, by rw [← map_pow, huq, hf]⟩, huq⟩
 
-theorem exists_radius {w : ValueGroupWithZero E} (hw : w ≠ 0) : ∃ r : ValueGroupWithZero E, 0 < r ∧ r < w := by
+theorem exists_radius {w : ValueGroupWithZero E} (hw : w ≠ 0)
+    : ∃ r : ValueGroupWithZero E, 0 < r ∧ r < w := by
   obtain ⟨c, hc0, hc1⟩ := ValuativeRel.IsNontrivial.exists_lt_one (R := E)
   exact ⟨c * w, mul_pos hc0 (zero_lt_iff.mpr hw), mul_lt_of_lt_one_left (zero_lt_iff.mpr hw) hc1⟩
 

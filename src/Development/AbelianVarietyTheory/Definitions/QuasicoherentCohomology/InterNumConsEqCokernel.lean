@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Opposite Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.InterModel
 
@@ -26,9 +27,11 @@ theorem radical_ker (f : Z ⟶ X) [QuasiCompact f] [IsReduced Z] : f.ker.radical
   rw [map_pow] at hn
   exact IsNilpotent.eq_zero ⟨n, hn⟩
 
-theorem interNumRed_eq_interNumOn (f : Z ⟶ X) [IsClosedImmersion f] [IsReduced Z]
-    (C : Closeds X) (h : Set.range f = C) (L : ι → LB X) :
-    interNumRed k C L = interNumOn k f L := by
+theorem interNumRed_eq_interNumOn
+    (f : Z ⟶ X) [IsClosedImmersion f] [IsReduced Z]
+    (C : Closeds X) (h : Set.range f = C)
+    (L : ι → LB X)
+    : interNumRed k C L = interNumOn k f L := by
   rw [interNumOn_eq_interNumSub, interNumRed_def, ← radical_ker f,
     ← Scheme.IdealSheafData.vanishingIdeal_support]
   congr 2

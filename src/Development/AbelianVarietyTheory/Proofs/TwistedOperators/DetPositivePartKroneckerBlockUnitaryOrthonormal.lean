@@ -15,8 +15,8 @@ open GlobalTheory.CompactFockAction GlobalTheory.IndefiniteRowSideFullHecke.Rais
 
 def sgnP {k : ℕ} (p : ℕ) : Fin k → Bool := fun a => decide (a.val < p)
 
-theorem onb_facts {k : ℕ} {G s B : Matrix (Fin k) (Fin k) ℂ} {p : ℕ} (h : IsONBasis G s B p) :
-    B * B⁻¹ = 1 ∧ B⁻¹ * B = 1 ∧ s = B * Formalism.REAL.Jm (sgnP p) * B⁻¹ := by
+theorem onb_facts {k : ℕ} {G s B : Matrix (Fin k) (Fin k) ℂ} {p : ℕ} (h : IsONBasis G s B p)
+    : B * B⁻¹ = 1 ∧ B⁻¹ * B = 1 ∧ s = B * Formalism.REAL.Jm (sgnP p) * B⁻¹ := by
   obtain ⟨ε, hε, hG, hs⟩ := h
   have hd : Matrix.diagonal (fun a => (ε a : ℂ)) = Formalism.REAL.Jm (sgnP (k := k) p) := by
     unfold Formalism.REAL.Jm sgnP
@@ -46,7 +46,8 @@ theorem onb_facts {k : ℕ} {G s B : Matrix (Fin k) (Fin k) ℂ} {p : ℕ} (h : 
   refine ⟨h1, h2, ?_⟩
   rw [← hd, ← hs, Matrix.mul_assoc, h1, Matrix.mul_one]
 
-theorem isBlock_of_isKMat {k p : ℕ} {κ : Matrix (Fin k) (Fin k) ℂ} (h : IsKMat p κ) : IsBlock (sgnP p) κ := by
+theorem isBlock_of_isKMat {k p : ℕ} {κ : Matrix (Fin k) (Fin k) ℂ} (h : IsKMat p κ)
+    : IsBlock (sgnP p) κ := by
   intro i j hij
   apply h.2 i j
   intro hiff
@@ -54,12 +55,13 @@ theorem isBlock_of_isKMat {k p : ℕ} {κ : Matrix (Fin k) (Fin k) ℂ} (h : IsK
   unfold sgnP
   exact decide_eq_decide.2 hiff
 
-theorem card_sgnP {k p : ℕ} (hp : p ≤ k) (e : Bool) :
-    (Finset.univ.filter fun i : Fin k => sgnP p i = e).card = if e then p else k - p := by
+theorem card_sgnP {k p : ℕ} (hp : p ≤ k) (e : Bool)
+    : (Finset.univ.filter fun i : Fin k => sgnP p i = e).card = if e then p else k - p := by
   have h1 : (Finset.univ.filter fun i : Fin k => i.val < p).card = p := by
     rw [Fin.card_filter_val_lt]; omega
-  have h2 := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin k)))
-    (p := fun i : Fin k => i.val < p)
+  have h2 :=
+    Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin k)))
+      (p := fun i : Fin k => i.val < p)
   rw [Finset.card_univ, Fintype.card_fin] at h2
   cases e
   · simp only [sgnP, decide_eq_false_iff_not, Bool.false_eq_true, if_false]
@@ -67,28 +69,36 @@ theorem card_sgnP {k p : ℕ} (hp : p ≤ k) (e : Bool) :
   · simp only [sgnP, decide_eq_true_eq, if_true]
     exact h1
 
-theorem signBlockDeterminant_positive_eq {k p : ℕ} (κ : Matrix (Fin k) (Fin k) ℂ) : signBlockDeterminant (sgnP p) true κ = detPos p κ := by
+theorem signBlockDeterminant_positive_eq {k p : ℕ} (κ : Matrix (Fin k) (Fin k) ℂ)
+    : signBlockDeterminant (sgnP p) true κ = detPos p κ := by
   unfold signBlockDeterminant detPos
-  rw [← Matrix.det_submatrix_equiv_self (Equiv.subtypeEquivRight (fun a : Fin k => (by simp [sgnP] : sgnP p a = true ↔ a.val < p)))]
+  rw [← Matrix.det_submatrix_equiv_self (Equiv.subtypeEquivRight (fun a : Fin k =>
+    (by simp [sgnP] : sgnP p a = true ↔ a.val < p)))]
   rfl
 
-theorem signBlockDeterminant_negative_eq {k p : ℕ} (κ : Matrix (Fin k) (Fin k) ℂ) : signBlockDeterminant (sgnP p) false κ = detNeg p κ := by
+theorem signBlockDeterminant_negative_eq {k p : ℕ} (κ : Matrix (Fin k) (Fin k) ℂ)
+    : signBlockDeterminant (sgnP p) false κ = detNeg p κ := by
   unfold signBlockDeterminant detNeg
-  rw [← Matrix.det_submatrix_equiv_self (Equiv.subtypeEquivRight (fun a : Fin k => (by simp [sgnP] : sgnP p a = false ↔ ¬ a.val < p)))]
+  rw [← Matrix.det_submatrix_equiv_self (Equiv.subtypeEquivRight (fun a : Fin k =>
+    (by simp [sgnP] : sgnP p a = false ↔ ¬ a.val < p)))]
   rfl
 
-theorem detPlus_onb : ∀ {n m : ℕ} (GS sS BS κS : Matrix (Fin n) (Fin n) ℂ) (GT sT BT κT : Matrix (Fin m) (Fin m) ℂ)
-    (pS pT : ℕ), pS ≤ n → pT ≤ m → IsONBasis GS sS BS pS → IsONBasis GT sT BT pT → IsKMat pS κS → IsKMat pT κT →
-    GlobalTheory.WeilParts.detPlus sS sT (BS * κS * BS⁻¹)⁻¹ (BT * κT * BT⁻¹) =
-      detPos pT κT ^ pS * detNeg pT κT ^ (n - pS) * (detPos pS κS ^ pT)⁻¹ * (detNeg pS κS ^ (m - pT))⁻¹ := by
+theorem detPlus_onb
+    : ∀ {n m : ℕ} (GS sS BS κS : Matrix (Fin n) (Fin n) ℂ) (GT sT BT κT : Matrix (Fin m) (Fin m) ℂ)
+        (pS pT : ℕ),
+      pS ≤ n → pT ≤ m → IsONBasis GS sS BS pS → IsONBasis GT sT BT pT → IsKMat pS κS → IsKMat pT κT
+        → GlobalTheory.WeilParts.detPlus sS sT (BS * κS * BS⁻¹)⁻¹ (BT * κT * BT⁻¹)
+          = detPos pT κT ^ pS * detNeg pT κT ^ (n - pS) * (detPos pS κS ^ pT)⁻¹
+            * (detNeg pS κS ^ (m - pT))⁻¹ := by
   intro n m GS sS BS κS GT sT BT κT pS pT hpS hpT hBS hBT hκS hκT
   obtain ⟨h1S, h2S, hsS⟩ := onb_facts hBS
   obtain ⟨h1T, h2T, hsT⟩ := onb_facts hBT
   have hu : κS * κSᴴ = 1 := Matrix.mem_unitaryGroup_iff.1 hκS.1
   have hinv : (BS * κS * BS⁻¹)⁻¹ = BS * κSᴴ * BS⁻¹ := by
     refine Matrix.inv_eq_right_inv ?_
-    calc BS * κS * BS⁻¹ * (BS * κSᴴ * BS⁻¹) = BS * (κS * (BS⁻¹ * BS) * κSᴴ) * BS⁻¹ := by
-          simp only [Matrix.mul_assoc]
+    calc
+      BS * κS * BS⁻¹ * (BS * κSᴴ * BS⁻¹)
+        = BS * (κS * (BS⁻¹ * BS) * κSᴴ) * BS⁻¹ := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [h2S, Matrix.mul_one, hu, Matrix.mul_one, h1S]
   rw [hinv, hsS, hsT, detPlus_conj h2S h2T]
   have bS := isBlock_of_isKMat hκS
@@ -96,10 +106,12 @@ theorem detPlus_onb : ∀ {n m : ℕ} (GS sS BS κS : Matrix (Fin n) (Fin n) ℂ
   have bS' : IsBlock (sgnP pS) κSᴴ := fun i j e => by
     rw [Matrix.conjTranspose_apply, bS j i (Ne.symm e), star_zero]
   rw [detPlus_block bS' bT, prod_bool _ fun e => signBlockDeterminant (sgnP pS) e κSᴴ,
-    prod_bool _ fun e => signBlockDeterminant (sgnP pT) e κT, card_sgnP hpT, card_sgnP hpT, card_sgnP hpS, card_sgnP hpS]
+    prod_bool _ fun e => signBlockDeterminant (sgnP pT) e κT, card_sgnP hpT, card_sgnP hpT,
+    card_sgnP hpS, card_sgnP hpS]
   have ih := fun e => signBlockDeterminant_mul_eq_one_of_mul_eq_one e bS hu
   rw [eq_inv_of_mul_eq_one_right (ih true), eq_inv_of_mul_eq_one_right (ih false)]
-  simp only [if_true, Bool.false_eq_true, if_false, signBlockDeterminant_positive_eq, signBlockDeterminant_negative_eq, inv_pow]
+  simp only [if_true, Bool.false_eq_true, if_false, signBlockDeterminant_positive_eq,
+    signBlockDeterminant_negative_eq, inv_pow]
   ring
 
 end GlobalTheory.PlusDetONB

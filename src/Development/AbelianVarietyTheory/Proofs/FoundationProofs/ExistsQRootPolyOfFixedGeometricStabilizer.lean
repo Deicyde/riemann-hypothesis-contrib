@@ -19,9 +19,8 @@ variable {p Ω}
 theorem algebraMap_mem_baseField (a : O0 p) : algebraMap (O0 p) Ω a ∈ baseField p Ω :=
   Subfield.subset_closure (Or.inl ⟨a, rfl⟩)
 
-theorem ggeo_fix_baseField {g : Gal p Ω} (hg : g ∈ Ggeo (p := p) Ω) {x : Ω}
-    (hx : x ∈ baseField p Ω) :
-    g x = x := by
+theorem ggeo_fix_baseField {g : Gal p Ω} (hg : g ∈ Ggeo (p := p) Ω) {x : Ω} (hx : x ∈ baseField p Ω)
+    : g x = x := by
   have hle : baseField p Ω ≤ RingHom.eqLocusField (g : Ω →+* Ω) (RingHom.id Ω) := by
     refine Subfield.closure_le.2 ?_
     rintro z (⟨a, rfl⟩ | hz)
@@ -46,18 +45,21 @@ theorem isAlgebraic_baseField (h : IsClo p Ω) : Algebra.IsAlgebraic (baseField 
   have hφ : Function.Injective φ := fun a b hab => h.inj (congrArg Subtype.val hab)
   refine ⟨P.map φ, (Polynomial.map_ne_zero_iff hφ).2 hP0, ?_⟩
   rw [aeval_def, eval₂_map]
-  have : (algebraMap (baseField p Ω) Ω).comp φ = algebraMap (O0 p) Ω := by
-    ext a; rfl
+  have : (algebraMap (baseField p Ω) Ω).comp φ = algebraMap (O0 p) Ω := by ext a; rfl
   rw [this, ← aeval_def, hPx]
 
 end GlobalTheory.K5.Span
 
 open GlobalTheory.K5.Span in
 open GlobalTheory.K5 GlobalTheory.K5.Span in
-theorem GlobalTheory.K5.span_fixed_ggeo_stab : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
-  ∀ (T : Tower p Ω) (N : ℕ) (y : Ω), (∀ g ∈ Ggeo (p := p) Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g y = y) →
-  ∃ c : ℕ → Ω, (∀ j, ∀ g ∈ Ggeo (p := p) Ω, g (c j) = c j) ∧
-    y = ∑ j ∈ Finset.range (p ^ N), c j * T.qq N ^ j := by
+theorem GlobalTheory.K5.span_fixed_ggeo_stab
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      IsClo p Ω
+        → ∀ (T : Tower p Ω) (N : ℕ) (y : Ω),
+          (∀ g ∈ Ggeo (p := p) Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g y = y)
+            → ∃ c : ℕ → Ω,
+              (∀ j, ∀ g ∈ Ggeo (p := p) Ω, g (c j) = c j)
+                ∧ y = ∑ j ∈ Finset.range (p ^ N), c j * T.qq N ^ j := by
   intro p _ Ω _ _ h T N y hy
   haveI : CharZero Ω := Basic.charZero_of_isClo h
   haveI := h.clo
@@ -85,8 +87,7 @@ theorem GlobalTheory.K5.span_fixed_ggeo_stab : ∀ (p : ℕ) [Fact p.Prime] (Ω 
   have hpN : p ^ N ≠ 0 := pow_ne_zero _ (Fact.out : p.Prime).ne_zero
   have hQm : Q.Monic := monic_X_pow_sub_C _ hpN
   have hQd : Q.natDegree = p ^ N := natDegree_X_pow_sub_C _
-  have hQ1 : Q ≠ 1 := by
-    intro e; rw [e, natDegree_one] at hQd; exact hpN hQd.symm
+  have hQ1 : Q ≠ 1 := by intro e; rw [e, natDegree_one] at hQd; exact hpN hQd.symm
   have hQq : aeval (T.qq N) Q = 0 := by
     simp only [Q, map_sub, map_pow, aeval_X, aeval_C, Basic.qq_pow]
     exact sub_self _
@@ -95,7 +96,8 @@ theorem GlobalTheory.K5.span_fixed_ggeo_stab : ∀ (p : ℕ) [Fact p.Prime] (Ω 
   have hR : aeval (T.qq N) R = y := by
     have e := congrArg (aeval (T.qq N)) (modByMonic_add_div P Q)
     rw [map_add (f := _), map_mul, hQq, zero_mul, add_zero] at e
-    rw [e]; exact hP
+    rw [e]
+    exact hP
   refine ⟨fun j => ((R.coeff j : L) : Ω), fun j g hg => ggeo_fix_baseField hg (R.coeff j).2, ?_⟩
   rw [← hR, aeval_eq_sum_range' hRd]
   refine Finset.sum_congr rfl fun j _ => ?_

@@ -13,22 +13,27 @@ open Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds GlobalTheory.MainT
 
 namespace GlobalTheory
 
-theorem exists_isUnit_det_mul_eq_neg_of_linearIndependent_residue {R : Type} [CommRing R]
-    [IsLocalRing R] (n n0 : ℕ) (Φ : Fin n → Fin n0 → R)
+theorem exists_isUnit_det_mul_eq_neg_of_linearIndependent_residue
+    {R : Type} [CommRing R] [IsLocalRing R]
+    (n n0 : ℕ) (Φ : Fin n → Fin n0 → R)
     (h : LinearIndependent (IsLocalRing.ResidueField R)
-      (fun (c : Fin n0) (b : Fin n) => IsLocalRing.residue R (Φ b c))) :
-    n0 ≤ n ∧ ∃ Y : Matrix (Fin n) (Fin n) R, IsUnit Y.det ∧
-      ∀ (b : Fin n) (c : Fin n0), ∑ b', Y b b' * Φ b' c = if b.val = c.val then -1 else 0 := by
+      (fun (c : Fin n0) (b : Fin n) => IsLocalRing.residue R (Φ b c)))
+    : n0 ≤ n
+      ∧ ∃ Y : Matrix (Fin n) (Fin n) R,
+        IsUnit Y.det
+          ∧ ∀ (b : Fin n) (c : Fin n0),
+            ∑ b', Y b b' * Φ b' c = if b.val = c.val then -1 else 0 := by
   have hle : n0 ≤ n := by simpa using h.fintype_card_le_finrank
   refine ⟨hle, ?_⟩
   obtain ⟨n', rfl⟩ := Nat.exists_eq_add_of_le hle
   obtain ⟨w, hw⟩ := exists_linearIndependent_sumElim_of_finrank_eq (n' := n') (by simp) _ h
   choose s hs using IsLocalRing.residue_surjective (R := R)
-  let M : Matrix (Fin (n0 + n')) (Fin (n0 + n')) R := Matrix.of fun i j =>
-    Sum.elim (Φ i) (fun j' => s (w j' i)) (finSumFinEquiv.symm j)
-  have hcol : (M.map (IsLocalRing.residue R)).col =
-      Sum.elim (fun (c : Fin n0) (b : Fin (n0 + n')) => IsLocalRing.residue R (Φ b c)) w ∘
-        finSumFinEquiv.symm := by
+  let M : Matrix (Fin (n0 + n')) (Fin (n0 + n')) R :=
+    Matrix.of fun i j => Sum.elim (Φ i) (fun j' => s (w j' i)) (finSumFinEquiv.symm j)
+  have hcol
+      : (M.map (IsLocalRing.residue R)).col
+        = Sum.elim (fun (c : Fin n0) (b : Fin (n0 + n')) => IsLocalRing.residue R (Φ b c)) w
+          ∘ finSumFinEquiv.symm := by
     funext j i
     obtain ⟨j, rfl⟩ := finSumFinEquiv.surjective j
     rcases j with j | j
@@ -56,7 +61,14 @@ theorem exists_isUnit_det_mul_eq_neg_of_linearIndependent_residue {R : Type} [Co
     · rw [if_pos hbc, if_pos (Fin.ext hbc)]
     · rw [if_neg hbc, if_neg (fun e => hbc (by rw [e]; rfl)), neg_zero]
 
-theorem exists_unimodular_mul_eq_neg_of_indepMod : ∀ (C : Type) [Field C] (V : VF C) (n n0 : ℕ) (Φ : Fin n → Fin n0 → C), (∀ b c, V.Ge 0 (Φ b c)) → IndepMod V (fun c b => Φ b c) → n0 ≤ n ∧ ∃ Y : Matrix (Fin n) (Fin n) C, (∀ b b', V.Ge 0 (Y b b')) ∧ V.v Y.det = 0 ∧ ∀ (b : Fin n) (c : Fin n0), b.val < n0 → ∑ b', Y b b' * Φ b' c = if b.val = c.val then -1 else 0 := by
+theorem exists_unimodular_mul_eq_neg_of_indepMod
+    : ∀ (C : Type) [Field C] (V : VF C) (n n0 : ℕ) (Φ : Fin n → Fin n0 → C),
+      (∀ b c, V.Ge 0 (Φ b c)) → IndepMod V (fun c b => Φ b c)
+        → n0 ≤ n
+          ∧ ∃ Y : Matrix (Fin n) (Fin n) C,
+            (∀ b b', V.Ge 0 (Y b b')) ∧ V.v Y.det = 0
+              ∧ ∀ (b : Fin n) (c : Fin n0),
+                b.val < n0 → ∑ b', Y b b' * Φ b' c = if b.val = c.val then -1 else 0 := by
   intro C _ V n n0 Φ hΦ hind
   let O : ValuationSubring C := (AddValuation.toValuation V.v).valuationSubring
   have hmem : ∀ x : C, x ∈ O ↔ 0 ≤ V.v x := fun _ => Iff.rfl
@@ -71,10 +83,14 @@ theorem exists_unimodular_mul_eq_neg_of_indepMod : ∀ (C : Type) [Field C] (V :
         exact congrArg (fun z : O => V.v (z : C)) hy
       have h2 := (hmem _).1 x.2
       have h3 := (hmem _).1 y.2
-      exact le_antisymm (by
-        calc V.v (x : C) = V.v (x : C) + 0 := (add_zero _).symm
-          _ ≤ V.v (x : C) + V.v (y : C) := by gcongr
-          _ = 0 := h1) h2
+      exact le_antisymm
+        (by
+          calc
+            V.v (x : C)
+              = V.v (x : C) + 0 := (add_zero _).symm
+            _ ≤ V.v (x : C) + V.v (y : C) := by gcongr
+            _ = 0 := h1)
+        h2
     · intro hx
       have hx0 : (x : C) ≠ 0 := by
         intro h0
@@ -97,7 +113,8 @@ theorem exists_unimodular_mul_eq_neg_of_indepMod : ∀ (C : Type) [Field C] (V :
     intro g hg ν
     choose s hs using IsLocalRing.residue_surjective (R := O)
     rw [← hs (g ν), hres]
-    refine hind (fun ν => (s (g ν) : C)) (fun ν => (hge _).2 ((hmem _).1 (s (g ν)).2)) (fun x => ?_) ν
+    refine
+      hind (fun ν => (s (g ν) : C)) (fun ν => (hge _).2 ((hmem _).1 (s (g ν)).2)) (fun x => ?_) ν
     have h1 : IsLocalRing.residue O (∑ ν, s (g ν) * Ψ x ν) = 0 := by
       have := congrFun hg x
       simpa [hs, Finset.sum_apply] using this

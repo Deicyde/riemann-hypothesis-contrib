@@ -12,4 +12,7 @@ public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.Admiss
 open CompanionTheory.Bmu
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.AdaptedBasisExistsAlt : AdaptExists := by
-  first | exact @GlobalTheory.CompanionTheory.BmuAdapt.adaptExists | exact GlobalTheory.CompanionTheory.BmuAdapt.adaptExists | (intros; apply GlobalTheory.CompanionTheory.BmuAdapt.adaptExists <;> assumption)
+  first
+  | exact @GlobalTheory.CompanionTheory.BmuAdapt.adaptExists
+  | exact GlobalTheory.CompanionTheory.BmuAdapt.adaptExists
+  | (intros; apply GlobalTheory.CompanionTheory.BmuAdapt.adaptExists <;> assumption)

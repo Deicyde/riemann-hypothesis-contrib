@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PreimageRegS
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
@@ -21,8 +24,9 @@ namespace GlobalTheory.Desc.GaussPt
 
 section Top
 
-theorem coheight_le_one_of_flat {H S : Scheme.{0}} (p : H ⟶ S) [Flat p] (x : H)
-    (hx : Order.coheight x ≤ 1) : Order.coheight (p x) ≤ 1 := by
+theorem coheight_le_one_of_flat
+    {H S : Scheme.{0}} (p : H ⟶ S) [Flat p] (x : H) (hx : Order.coheight x ≤ 1)
+    : Order.coheight (p x) ≤ 1 := by
   have hp := Flat.generalizingMap p
   have hx' := (Order.coheight_le_coe_iff (n := 1)).1 hx
   refine (Order.coheight_le_coe_iff (n := 1)).2 fun y hy ↦ ?_
@@ -34,13 +38,13 @@ theorem coheight_le_one_of_flat {H S : Scheme.{0}} (p : H ⟶ S) [Flat p] (x : H
     exact Specializes.map (hm (show x' ≤ x'' from h₂)) p.continuous
   simpa using this
 
-theorem coheight_le_one_iff {X : Scheme.{0}} (x : X) :
-    Order.coheight x ≤ 1 ↔ ringKrullDim (X.presheaf.stalk x) ≤ 1 := by
+theorem coheight_le_one_iff {X : Scheme.{0}} (x : X)
+    : Order.coheight x ≤ 1 ↔ ringKrullDim (X.presheaf.stalk x) ≤ 1 := by
   rw [ringKrullDim_stalk_eq_coheight]
   exact_mod_cast Iff.rfl
 
-theorem height_le_one {R : Type} [CommRing R] (q : Sp R) (h : Order.coheight q ≤ 1) :
-    q.asIdeal.height ≤ 1 := by
+theorem height_le_one {R : Type} [CommRing R] (q : Sp R) (h : Order.coheight q ≤ 1)
+    : q.asIdeal.height ≤ 1 := by
   rw [coheight_le_one_iff] at h
   have : q.asIdeal.IsPrime := q.2
   letI : Algebra R ((Sp R).presheaf.stalk q) := StructureSheaf.stalkAlgebra R q
@@ -64,8 +68,9 @@ theorem cst_injective (p : X ⟶ Sp R) [Flat p] : Function.Injective (GlobalTheo
   refine ((unitAt_cst_iff p (genericPoint X) r).2 ?_).ne_zero hr
   rwa [asIdeal_genericPoint]
 
-theorem ringKrullDim_eq_one (p : X ⟶ Sp R) [Flat p] {x : X} (h : (p x).asIdeal ≠ ⊥)
-    (hx : Order.coheight x ≤ 1) : ringKrullDim (X.presheaf.stalk x) = 1 := by
+theorem ringKrullDim_eq_one
+    (p : X ⟶ Sp R) [Flat p] {x : X} (h : (p x).asIdeal ≠ ⊥) (hx : Order.coheight x ≤ 1)
+    : ringKrullDim (X.presheaf.stalk x) = 1 := by
   rw [ringKrullDim_stalk_eq_coheight]
   have h0 : Order.coheight x ≠ 0 := fun h0 => by
     rw [Order.coheight_eq_zero] at h0
@@ -73,11 +78,14 @@ theorem ringKrullDim_eq_one (p : X ⟶ Sp R) [Flat p] {x : X} (h : (p x).asIdeal
     obtain rfl : x = genericPoint X := (h₁.antisymm (genericPoint_specializes x)).eq
     exact h (asIdeal_genericPoint p)
   have : Order.coheight x = 1 := le_antisymm hx (Order.one_le_iff_ne_zero.2 h0)
-  rw [this]; rfl
+  rw [this]
+  rfl
 
-theorem eq_of_coheight_le_one (p : X ⟶ Sp R) [Smooth p] [GeometricallyConnected p] {x x' : X}
-    (e : p x = p x') (h : (p x).asIdeal ≠ ⊥) (hx : Order.coheight x ≤ 1) (hx' : Order.coheight x' ≤ 1) :
-    x = x' := by
+theorem eq_of_coheight_le_one
+    (p : X ⟶ Sp R) [Smooth p] [GeometricallyConnected p]
+    {x x' : X} (e : p x = p x') (h : (p x).asIdeal ≠ ⊥) (hx : Order.coheight x ≤ 1)
+    (hx' : Order.coheight x' ≤ 1)
+    : x = x' := by
   have := isIntegral_fiber_of_smooth p (p x)
   let ξ := p.fiberι (p x) (genericPoint _)
   have hξ : p ξ = p x := (p.range_fiberι (p x)).le ⟨_, rfl⟩
@@ -99,40 +107,54 @@ end Top
 
 section Ring
 
-theorem exists_common_field {R A B : Type} [CommRing R] [CommRing A] [CommRing B] (ρ : R →+* A)
-    (ρ' : R →+* B) (q : Sp A) (q' : Sp B) (h : spMap ρ q = spMap ρ' q') :
-    ∃ (Ω : Type) (_ : Field Ω) (u : A →+* Ω) (u' : B →+* Ω), RingHom.ker u = q.asIdeal ∧
-      RingHom.ker u' = q'.asIdeal ∧ u.comp ρ = u'.comp ρ' := by
-  obtain ⟨w, h₁, h₂⟩ := Scheme.Pullback.exists_preimage_pullback (f := spMap ρ) (g := spMap ρ') q q' h
+theorem exists_common_field
+    {R A B : Type} [CommRing R] [CommRing A] [CommRing B]
+    (ρ : R →+* A) (ρ' : R →+* B) (q : Sp A) (q' : Sp B) (h : spMap ρ q = spMap ρ' q')
+    : ∃ (Ω : Type) (_ : Field Ω) (u : A →+* Ω) (u' : B →+* Ω),
+      RingHom.ker u = q.asIdeal ∧ RingHom.ker u' = q'.asIdeal ∧ u.comp ρ = u'.comp ρ' := by
+  obtain ⟨w, h₁, h₂⟩ :=
+    Scheme.Pullback.exists_preimage_pullback (f := spMap ρ) (g := spMap ρ') q q' h
   let k := (pullback (spMap ρ) (spMap ρ')).fromSpecResidueField w
-  have hk : ∀ {C : Type} [CommRing C] (g : pullback (spMap ρ) (spMap ρ') ⟶ Sp C),
-      RingHom.ker (Spec.preimage (k ≫ g)).hom = (g w).asIdeal := by
+  have hk
+      : ∀ {C : Type} [CommRing C] (g : pullback (spMap ρ) (spMap ρ') ⟶ Sp C),
+        RingHom.ker (Spec.preimage (k ≫ g)).hom = (g w).asIdeal := by
     intro C _ g
     let o : Spec ((pullback (spMap ρ) (spMap ρ')).residueField w) := (⊥ : PrimeSpectrum _)
     have e := congrArg (fun m => m o) (Spec.map_preimage (k ≫ g))
-    have e' : (k ≫ g) o = g w := by
-      rw [Scheme.Hom.comp_apply, Scheme.fromSpecResidueField_apply]
+    have e' : (k ≫ g) o = g w := by rw [Scheme.Hom.comp_apply, Scheme.fromSpecResidueField_apply]
     rw [← e', ← e]
     rfl
-  refine ⟨_, inferInstance, (Spec.preimage (k ≫ pullback.fst _ _)).hom,
-    (Spec.preimage (k ≫ pullback.snd _ _)).hom, (hk _).trans (by rw [h₁]), (hk _).trans (by rw [h₂]), ?_⟩
-  have : CommRingCat.ofHom ρ ≫ Spec.preimage (k ≫ pullback.fst _ _) =
-      CommRingCat.ofHom ρ' ≫ Spec.preimage (k ≫ pullback.snd _ _) := by
+  refine ⟨
+    _,
+    inferInstance,
+    (Spec.preimage (k ≫ pullback.fst _ _)).hom,
+    (Spec.preimage (k ≫ pullback.snd _ _)).hom,
+    (hk _).trans (by rw [h₁]),
+    (hk _).trans (by rw [h₂]),
+    ?_
+  ⟩
+  have : CommRingCat.ofHom ρ ≫ Spec.preimage (k ≫ pullback.fst _ _)
+      = CommRingCat.ofHom ρ' ≫ Spec.preimage (k ≫ pullback.snd _ _) := by
     apply Spec.map_injective
     rw [Spec.map_comp, Spec.map_comp, Spec.map_preimage, Spec.map_preimage, Category.assoc,
       Category.assoc, pullback.condition]
   exact congrArg CommRingCat.Hom.hom this
 
-theorem dvr_of_height {E : Type} [CommRing E] [IsRegularLocalRing E] [IsDomain E]
-    (h : (maximalIdeal E).height ≤ 1) (h0 : maximalIdeal E ≠ ⊥) : IsDiscreteValuationRing E := by
+theorem dvr_of_height
+    {E : Type} [CommRing E] [IsRegularLocalRing E] [IsDomain E]
+    (h : (maximalIdeal E).height ≤ 1) (h0 : maximalIdeal E ≠ ⊥)
+    : IsDiscreteValuationRing E := by
   have : IsPrincipalIdealRing E :=
     GroundTheory.Arith.SchemeCoh.IsRegularLocalRing.isPrincipalIdealRing_of_ringKrullDim_le_one (by
       rw [← IsLocalRing.maximalIdeal_height_eq_ringKrullDim]; exact_mod_cast h)
   exact ⟨h0⟩
 
-theorem height_le_of_map {A E : Type} [CommRing A] [IsNoetherianRing A] [CommRing E] [IsLocalRing E]
-    [IsNoetherianRing E] (a : A →+* E) (q : Ideal A) [q.IsPrime] (hq : q.height ≤ 1)
-    (h₁ : (maximalIdeal E).comap a = q) (h₂ : q.map a = maximalIdeal E) : (maximalIdeal E).height ≤ 1 := by
+theorem height_le_of_map
+    {A E : Type} [CommRing A] [IsNoetherianRing A] [CommRing E] [IsLocalRing E] [IsNoetherianRing E]
+    (a : A →+* E)
+    (q : Ideal A) [q.IsPrime]
+    (hq : q.height ≤ 1) (h₁ : (maximalIdeal E).comap a = q) (h₂ : q.map a = maximalIdeal E)
+    : (maximalIdeal E).height ≤ 1 := by
   letI := a.toAlgebra
   have : (maximalIdeal E).LiesOver q := ⟨h₁.symm⟩
   refine (Ideal.height_le_height_add_of_liesOver q (maximalIdeal E)).trans ?_
@@ -144,14 +166,18 @@ theorem height_le_of_map {A E : Type} [CommRing A] [IsNoetherianRing A] [CommRin
   rw [h₄, Ideal.height_bot, add_zero]
   exact hq
 
-theorem injective_of_flat {A E : Type} [CommRing A] [IsDomain A] [CommRing E] [Nontrivial E]
-    {a : A →+* E} (h : a.Flat) : Function.Injective a := by
+theorem injective_of_flat
+    {A E : Type} [CommRing A] [IsDomain A] [CommRing E] [Nontrivial E] {a : A →+* E} (h : a.Flat)
+    : Function.Injective a := by
   letI := a.toAlgebra
   have : Module.Flat A E := h
   exact FaithfulSMul.algebraMap_injective A E
 
-theorem dvd_pow_of_dim {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O] (h : ringKrullDim O ≤ 1)
-    {g t : O} (hg : g ≠ 0) (ht : ¬ IsUnit t) : ∃ n : ℕ, g ∣ t ^ n := by
+theorem dvd_pow_of_dim
+    {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O]
+    (h : ringKrullDim O ≤ 1)
+    {g t : O} (hg : g ≠ 0) (ht : ¬ IsUnit t)
+    : ∃ n : ℕ, g ∣ t ^ n := by
   have : Ring.KrullDimLE 1 O := Ring.krullDimLE_iff.2 h
   have : t ∈ (Ideal.span {g}).radical := by
     rw [Ideal.radical_eq_sInf, Ideal.mem_sInf]
@@ -168,8 +194,8 @@ section Span
 
 variable {R₁ F₁ : Type} [CommRing R₁] [CommRing F₁] (c : R₁ →+* F₁)
 
-theorem mem_spanBy_iff (T : Set F₁) (v : F₁) :
-    v ∈ spanBy c T ↔ letI := c.toAlgebra; v ∈ Submodule.span R₁ T := by
+theorem mem_spanBy_iff (T : Set F₁) (v : F₁)
+    : v ∈ spanBy c T ↔ letI := c.toAlgebra; v ∈ Submodule.span R₁ T := by
   letI := c.toAlgebra
   rw [Submodule.mem_span_set']
   constructor
@@ -180,20 +206,21 @@ theorem mem_spanBy_iff (T : Set F₁) (v : F₁) :
 
 variable {c}
 
-theorem spanBy_zero (T : Set F₁) : (0 : F₁) ∈ spanBy c T :=
-  (mem_spanBy_iff c T _).2 (zero_mem _)
+theorem spanBy_zero (T : Set F₁) : (0 : F₁) ∈ spanBy c T := (mem_spanBy_iff c T _).2 (zero_mem _)
 
-theorem spanBy_add {T : Set F₁} {u v : F₁} (hu : u ∈ spanBy c T) (hv : v ∈ spanBy c T) :
-    u + v ∈ spanBy c T :=
+theorem spanBy_add {T : Set F₁} {u v : F₁} (hu : u ∈ spanBy c T) (hv : v ∈ spanBy c T)
+    : u + v ∈ spanBy c T :=
   (mem_spanBy_iff c T _).2 (add_mem ((mem_spanBy_iff c T _).1 hu) ((mem_spanBy_iff c T _).1 hv))
 
 theorem spanBy_smul {T : Set F₁} (r : R₁) {u : F₁} (hu : u ∈ spanBy c T) : c r * u ∈ spanBy c T :=
   letI := c.toAlgebra
   (mem_spanBy_iff c T _).2 (Submodule.smul_mem _ r ((mem_spanBy_iff c T _).1 hu))
 
-theorem spanBy_induction {T : Set F₁} {P : F₁ → Prop} (h₀ : P 0) (h₁ : ∀ t ∈ T, P t)
-    (h₂ : ∀ u v, P u → P v → P (u + v)) (h₃ : ∀ r u, P u → P (c r * u)) {v : F₁}
-    (hv : v ∈ spanBy c T) : P v := by
+theorem spanBy_induction
+    {T : Set F₁} {P : F₁ → Prop} (h₀ : P 0) (h₁ : ∀ t ∈ T, P t) (h₂ : ∀ u v, P u → P v → P (u + v))
+    (h₃ : ∀ r u, P u → P (c r * u))
+    {v : F₁} (hv : v ∈ spanBy c T)
+    : P v := by
   letI := c.toAlgebra
   rw [mem_spanBy_iff] at hv
   induction hv using Submodule.span_induction with

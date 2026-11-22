@@ -14,16 +14,21 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AbsNormPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.Published GlobalTheory.AboveL
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.Published
+  GlobalTheory.AboveL
 
 namespace GlobalTheory.DenseInvFrob
 
-theorem isSplitAt_of_inertiaDeg_eq_one {E : Type} [Field E] [NumberField E] [IsCMField E]
-    (w : HeightOneSpectrum (𝓞 E)) (hf : w.asIdeal.inertiaDeg ℤ = 1)
-    (he : w.asIdeal.ramificationIdx ℤ = 1) : IsSplitAt w := by
+theorem isSplitAt_of_inertiaDeg_eq_one
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (w : HeightOneSpectrum (𝓞 E))
+    (hf : w.asIdeal.inertiaDeg ℤ = 1) (he : w.asIdeal.ramificationIdx ℤ = 1)
+    : IsSplitAt w := by
   classical
   set v := w.under (𝓞 (maximalRealSubfield E)) with hv
   set p : Ideal (𝓞 (maximalRealSubfield E)) := v.asIdeal with hp
@@ -36,7 +41,8 @@ theorem isSplitAt_of_inertiaDeg_eq_one {E : Type} [Field E] [NumberField E] [IsC
   have hsum := Ideal.sum_ramification_inertia_eq_finrank p (𝓞 E)
   have hrank : Module.finrank (𝓞 (maximalRealSubfield E)) (𝓞 E) = 2 := by
     rw [← Algebra.IsQuadraticExtension.finrank_eq_two (maximalRealSubfield E) E]
-    exact (IsFractionRing.finrank_eq (𝓞 (maximalRealSubfield E)) (maximalRealSubfield E) (𝓞 E) E).symm
+    exact (IsFractionRing.finrank_eq (𝓞 (maximalRealSubfield E)) (maximalRealSubfield E) (𝓞 E)
+      E).symm
   rw [hrank] at hsum
   have hf1 : w.asIdeal.inertiaDeg (𝓞 (maximalRealSubfield E)) = 1 := by
     have := Ideal.inertiaDeg_tower (R := ℤ) p w.asIdeal
@@ -59,8 +65,10 @@ theorem isSplitAt_of_inertiaDeg_eq_one {E : Type} [Field E] [NumberField E] [IsC
     ext1
     simp only [HeightOneSpectrum.under_asIdeal]
     exact hql.over.symm
-  rw [Finset.sum_eq_single ⟨w.asIdeal, hPmem⟩ (fun b _ hb => absurd (huniq b) hb)
-    (fun h => absurd (Finset.mem_univ _) h)] at hsum
+  rw [Finset.sum_eq_single ⟨w.asIdeal, hPmem⟩
+      (fun b _ hb => absurd (huniq b) hb)
+      (fun h => absurd (Finset.mem_univ _) h)]
+    at hsum
   simp only [he1, hf1, mul_one] at hsum
   omega
 

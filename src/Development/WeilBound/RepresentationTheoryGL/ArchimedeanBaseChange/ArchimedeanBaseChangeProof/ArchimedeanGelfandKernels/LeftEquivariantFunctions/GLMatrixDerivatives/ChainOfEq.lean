@@ -18,11 +18,14 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
-theorem rd_equiv (A : V ≃L[ℂ] V) (X : Mat n) (f : Mat n → V) : Rd X (fun x => A (f x)) = fun x => A (Rd X f x) := by
+theorem rd_equiv (A : V ≃L[ℂ] V) (X : Mat n) (f : Mat n → V)
+    : Rd X (fun x => A (f x)) = fun x => A (Rd X f x) := by
   funext g
   show fderiv ℝ (fun x => A (f x)) g (g * X) = A (fderiv ℝ f g (g * X))
   by_cases hf : DifferentiableAt ℝ f g
-  · have h : HasFDerivAt (fun x => A (f x)) ((A.restrictScalars ℝ : V →L[ℝ] V).comp (fderiv ℝ f g)) g :=
+  · have h : HasFDerivAt
+        (fun x => A (f x))
+        ((A.restrictScalars ℝ : V →L[ℝ] V).comp (fderiv ℝ f g)) g :=
       (A.restrictScalars ℝ : V →L[ℝ] V).hasFDerivAt.comp g hf.hasFDerivAt
     rw [h.fderiv]
     rfl
@@ -35,15 +38,16 @@ theorem rd_equiv (A : V ≃L[ℂ] V) (X : Mat n) (f : Mat n → V) : Rd X (fun x
     rw [fderiv_zero_of_not_differentiableAt hn, fderiv_zero_of_not_differentiableAt hf]
     simp
 
-theorem eu_equiv (A : V ≃L[ℂ] V) (s : Bool) (a b : Fin n) (f : Mat n → V) :
-    Eu s a b (fun x => A (f x)) = fun x => A (Eu s a b f x) := by
+theorem eu_equiv (A : V ≃L[ℂ] V) (s : Bool) (a b : Fin n) (f : Mat n → V)
+    : Eu s a b (fun x => A (f x)) = fun x => A (Eu s a b f x) := by
   unfold Eu
   rw [rd_equiv, rd_equiv]
   funext x
   by_cases hs : s = true <;> simp [hs, map_add (f := _), map_smul]
 
-theorem epow_equiv (A : V ≃L[ℂ] V) (s : Bool) (m : ℕ) : ∀ (a b : Fin n) (f : Mat n → V),
-    Epow s m a b (fun x => A (f x)) = fun x => A (Epow s m a b f x) := by
+theorem epow_equiv (A : V ≃L[ℂ] V) (s : Bool) (m : ℕ)
+    : ∀ (a b : Fin n) (f : Mat n → V),
+      Epow s m a b (fun x => A (f x)) = fun x => A (Epow s m a b f x) := by
   induction m with
   | zero =>
     intro a b f
@@ -56,15 +60,15 @@ theorem epow_equiv (A : V ≃L[ℂ] V) (s : Bool) (m : ℕ) : ∀ (a b : Fin n) 
     simp only [ih, eu_equiv]
     funext x
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Finset.sum_apply, map_sum]
+    simp [Finset.sum_apply, map_sum]
 
-theorem gel_equiv (A : V ≃L[ℂ] V) (s : Bool) (m : ℕ) (f : Mat n → V) :
-    gel s m (fun x => A (f x)) = fun x => A (gel s m f x) := by
+theorem gel_equiv (A : V ≃L[ℂ] V) (s : Bool) (m : ℕ) (f : Mat n → V)
+    : gel s m (fun x => A (f x)) = fun x => A (gel s m f x) := by
   unfold gel
   simp only [epow_equiv]
   funext x
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [Finset.sum_apply, map_sum]
+  simp [Finset.sum_apply, map_sum]
 
 theorem om_equiv (A : V ≃L[ℂ] V) (f : Mat n → V) : Om (fun x => A (f x)) = fun x => A (Om f x) := by
   unfold Om
@@ -72,8 +76,9 @@ theorem om_equiv (A : V ≃L[ℂ] V) (f : Mat n → V) : Om (fun x => A (f x)) =
   funext x
   simp [map_add (f := _), map_nsmul]
 
-theorem zop_equiv (A : V ≃L[ℂ] V) : ∀ (w : List (Bool × ℕ)) (f : Mat n → V),
-    zOp w (fun x => A (f x)) = fun x => A (zOp w f x) := by
+theorem zop_equiv (A : V ≃L[ℂ] V)
+    : ∀ (w : List (Bool × ℕ)) (f : Mat n → V),
+      zOp w (fun x => A (f x)) = fun x => A (zOp w f x) := by
   intro w
   induction w with
   | nil =>

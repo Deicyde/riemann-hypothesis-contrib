@@ -17,7 +17,12 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Unita
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.RecTie Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3 ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.RecTie Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3
+  ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -28,14 +33,20 @@ namespace GlobalTheory.RowLocalRows
 
 open Formalism.IndefR.principalLevelFrame
 
-theorem fixed_fd_of_isotIn {D : D7} {n : ℕ} {A : Type} [AddCommGroup A] [Module ℂ A]
+theorem fixed_fd_of_isotIn
+    {D : D7} {n : ℕ} {A : Type} [AddCommGroup A] [Module ℂ A]
     (ρ : GAf D.host.E n →* Module.End ℂ A) (C : Submodule ℂ A)
-    (hadm : ∀ N : ℕ, 0 < N →
-      FiniteDimensional ℂ ↥(Submodule.span ℂ {x | x ∈ C ∧ ∀ κ, NG.Cong D.host.E n N κ → ρ κ x = x}))
-    (π : NG.FinTyp D.host.E n) (hne : isotIn (D := D) ρ C π ≠ ⊥) (N : ℕ) (hN : 0 < N) :
-    FiniteDimensional ℂ ↥(Submodule.span ℂ {f | f ∈ π.S ∧ ∀ κ, NG.Cong D.host.E n N κ → NG.rt D.host.E n κ f = f}) := by
-  obtain ⟨Φ, ⟨hΦe, hΦC⟩, hΦne⟩ : ∃ Φ : π.S →ₗ[ℂ] A,
-      (IsEqvA ρ π Φ ∧ LinearMap.range Φ ≤ C) ∧ LinearMap.range Φ ≠ ⊥ := by
+    (hadm : ∀ N : ℕ,
+      0 < N
+        → FiniteDimensional ℂ
+          ↥(Submodule.span ℂ {x | x ∈ C ∧ ∀ κ, NG.Cong D.host.E n N κ → ρ κ x = x}))
+    (π : NG.FinTyp D.host.E n) (hne : isotIn (D := D) ρ C π ≠ ⊥)
+    (N : ℕ) (hN : 0 < N)
+    : FiniteDimensional ℂ
+      ↥(Submodule.span ℂ
+        {f | f ∈ π.S ∧ ∀ κ, NG.Cong D.host.E n N κ → NG.rt D.host.E n κ f = f}) := by
+  obtain ⟨Φ, ⟨hΦe, hΦC⟩, hΦne⟩
+      : ∃ Φ : π.S →ₗ[ℂ] A, (IsEqvA ρ π Φ ∧ LinearMap.range Φ ≤ C) ∧ LinearMap.range Φ ≠ ⊥ := by
     by_contra hcon
     push_neg at hcon
     apply hne
@@ -93,7 +104,8 @@ theorem fixed_fd_of_isotIn {D : D7} {n : ℕ} {A : Type} [AddCommGroup A] [Modul
   let g : F →ₗ[ℂ] T := LinearMap.codRestrict T (Φ ∘ₗ Submodule.inclusion hFS) (fun f => hFT f f.2)
   have hg : Function.Injective g := by
     intro a b hab
-    have h1 : Φ (Submodule.inclusion hFS a) = Φ (Submodule.inclusion hFS b) := congrArg Subtype.val hab
+    have h1 : Φ (Submodule.inclusion hFS a) = Φ (Submodule.inclusion hFS b) :=
+      congrArg Subtype.val hab
     exact Submodule.inclusion_injective hFS (hinj h1)
   exact Module.Finite.of_injective g hg
 
@@ -101,10 +113,12 @@ section Conj
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-theorem fixed_fd_of_conjT (π : NG.FinTyp L n) (N : ℕ)
-    (h : FiniteDimensional ℂ ↥(Submodule.span ℂ
-      {f | f ∈ (FinTyp.conjT π).S ∧ ∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f})) :
-    FiniteDimensional ℂ ↥(Submodule.span ℂ {f | f ∈ π.S ∧ ∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f}) := by
+theorem fixed_fd_of_conjT
+    (π : NG.FinTyp L n) (N : ℕ)
+    (h : FiniteDimensional ℂ
+      ↥(Submodule.span ℂ {f | f ∈ (FinTyp.conjT π).S ∧ ∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f}))
+    : FiniteDimensional ℂ
+      ↥(Submodule.span ℂ {f | f ∈ π.S ∧ ∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f}) := by
   set S1 := Submodule.span ℂ {f | f ∈ π.S ∧ ∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f} with hS1
   set S2 := Submodule.span ℂ {f | f ∈ (FinTyp.conjT π).S ∧ ∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f} with hS2
   have hmap : ∀ f ∈ S1, (fun g => star (f g)) ∈ S2 := by
@@ -133,10 +147,11 @@ theorem fixed_fd_of_conjT (π : NG.FinTyp L n) (N : ℕ)
         simp [mul_comm]
       rw [this]
       exact S2.smul_mem _ hx
-  let c : S1 →ₗ[ℝ] S2 :=
-    { toFun := fun f => ⟨fun g => star ((f : GAf L n → ℂ) g), hmap f f.2⟩
-      map_add' := fun a b => Subtype.ext (funext fun g => by simp)
-      map_smul' := fun r a => Subtype.ext (funext fun g => by simp) }
+  let c : S1 →ₗ[ℝ] S2 := {
+    toFun := fun f => ⟨fun g => star ((f : GAf L n → ℂ) g), hmap f f.2⟩
+    map_add' := fun a b => Subtype.ext (funext fun g => by simp)
+    map_smul' := fun r a => Subtype.ext (funext fun g => by simp)
+  }
   have hc : Function.Injective c := by
     intro a b hab
     apply Subtype.ext
@@ -147,19 +162,24 @@ theorem fixed_fd_of_conjT (π : NG.FinTyp L n) (N : ℕ)
   haveI : FiniteDimensional ℝ S1 := Module.Finite.of_injective c hc
   exact Module.Finite.of_restrictScalars_finite ℝ ℂ S1
 
-theorem form_of_conjT (π : NG.FinTyp L n) (B' : (FinTyp.conjT π).S → (FinTyp.conjT π).S → ℂ)
+theorem form_of_conjT
+    (π : NG.FinTyp L n) (B' : (FinTyp.conjT π).S → (FinTyp.conjT π).S → ℂ)
     (hlin : ∀ x y z (c : ℂ), B' x (y + c • z) = B' x y + c * B' x z)
-    (hherm : ∀ x y, B' x y = starRingEnd ℂ (B' y x))
-    (hpos : ∀ x, x ≠ 0 → 0 < (B' x x).re)
-    (hinv : ∀ h (x y x' y' : (FinTyp.conjT π).S), (x' : GAf L n → ℂ) = NG.rt L n h x →
-      (y' : GAf L n → ℂ) = NG.rt L n h y → B' x' y' = B' x y) :
-    ∃ B : π.S → π.S → ℂ, (∀ x y z (c : ℂ), B x (y + c • z) = B x y + c * B x z) ∧
-      (∀ x y, B x y = starRingEnd ℂ (B y x)) ∧ (∀ x, x ≠ 0 → 0 < (B x x).re) ∧
-      ∀ h (x y x' y' : π.S), (x' : GAf L n → ℂ) = NG.rt L n h x →
-        (y' : GAf L n → ℂ) = NG.rt L n h y → B x' y' = B x y := by
+    (hherm : ∀ x y, B' x y = starRingEnd ℂ (B' y x)) (hpos : ∀ x, x ≠ 0 → 0 < (B' x x).re)
+    (hinv : ∀ h (x y x' y' : (FinTyp.conjT π).S),
+      (x' : GAf L n → ℂ) = NG.rt L n h x → (y' : GAf L n → ℂ) = NG.rt L n h y → B' x' y' = B' x y)
+    : ∃ B : π.S → π.S → ℂ,
+      (∀ x y z (c : ℂ), B x (y + c • z) = B x y + c * B x z)
+        ∧ (∀ x y, B x y = starRingEnd ℂ (B y x)) ∧ (∀ x, x ≠ 0 → 0 < (B x x).re)
+        ∧ ∀ h (x y x' y' : π.S),
+          (x' : GAf L n → ℂ) = NG.rt L n h x → (y' : GAf L n → ℂ) = NG.rt L n h y
+            → B x' y' = B x y := by
   let c : π.S → (FinTyp.conjT π).S := fun f =>
     ⟨fun g => star ((f : GAf L n → ℂ) g), by rw [conjT_S, mem_conjSub]; simpa using f.2⟩
-  have hc : ∀ f : π.S, ((c f : (FinTyp.conjT π).S) : GAf L n → ℂ) = fun g => star ((f : GAf L n → ℂ) g) := fun _ => rfl
+  have hc
+      : ∀ f : π.S,
+        ((c f : (FinTyp.conjT π).S) : GAf L n → ℂ) = fun g => star ((f : GAf L n → ℂ) g) := fun _ =>
+    rfl
   refine ⟨fun x y => starRingEnd ℂ (B' (c x) (c y)), ?_, ?_, ?_, ?_⟩
   · intro x y z a
     have e : c (y + a • z) = c y + (starRingEnd ℂ a) • c z := by
@@ -198,7 +218,6 @@ end GlobalTheory.RowLocalRows
 namespace GlobalTheory.RowLocalRows
 
 open Formalism.IndefR.principalLevelFrame Formalism.IndefR.Mult
-
 
 end GlobalTheory.RowLocalRows
 

@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.AppellH
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
@@ -33,14 +35,18 @@ theorem ex_div_pow {n : ℕ} (hn : 0 < n) (a : u.Λ) : u.ex ((n : ℂ)⁻¹ • 
   rw [← ex_natSmul, smul_inv_smul₀ (Nat.cast_ne_zero.2 hn.ne')]
   exact (u.ker _).2 a.2
 
-theorem exists_eq_ex_div {n : ℕ} (hn : 0 < n) (x : 𝟙_ (Over (Sp ℂ)) ⟶ A) (hx : x ^ n = 1) :
-    ∃ a : u.Λ, x = u.ex ((n : ℂ)⁻¹ • (a : Fin g → ℂ)) := by
+theorem exists_eq_ex_div {n : ℕ} (hn : 0 < n) (x : 𝟙_ (Over (Sp ℂ)) ⟶ A) (hx : x ^ n = 1)
+    : ∃ a : u.Λ, x = u.ex ((n : ℂ)⁻¹ • (a : Fin g → ℂ)) := by
   obtain ⟨z, rfl⟩ := u.ex_onto x
   refine ⟨⟨(n : ℂ) • z, (u.ker _).1 (by rw [ex_natSmul, hx])⟩, ?_⟩
   rw [inv_smul_smul₀ (Nat.cast_ne_zero.2 hn.ne')]
 
-theorem map_mem {B : Over (Sp ℂ)} [GrpObj B] {M : LB B.left} {g' : ℕ} (v : HolUnif B M g') {f : A ⟶ B}
-    {F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)} (hF : ∀ z, v.ex (F z) = u.ex z ≫ f) (a : u.Λ) : F a ∈ v.Λ := by
+theorem map_mem
+    {B : Over (Sp ℂ)} [GrpObj B]
+    {M : LB B.left} {g' : ℕ} (v : HolUnif B M g')
+    {f : A ⟶ B} {F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)} (hF : ∀ z, v.ex (F z) = u.ex z ≫ f)
+    (a : u.Λ)
+    : F a ∈ v.Λ := by
   rw [← v.ker, hF, (u.ker _).2 a.2, ← ex_zero u, ← hF, map_zero, ex_zero]
 
 end Unif
@@ -62,16 +68,20 @@ theorem eq_of_rootVal {m m' : ℤ} (h : ∀ n : ℕ, 0 < n → rootVal m n = roo
       field_simp at hk
       linear_combination (2 * Real.pi * Complex.I) * hk
     exact_mod_cast this
-  have := Int.eq_zero_of_dvd_of_natAbs_lt_natAbs (key ((m' - m).natAbs + 1) (Nat.succ_pos _))
-    (by rw [Int.natAbs_natCast]; omega)
+  have :=
+    Int.eq_zero_of_dvd_of_natAbs_lt_natAbs (key ((m' - m).natAbs + 1) (Nat.succ_pos _))
+      (by rw [Int.natAbs_natCast]; omega)
   omega
 
-theorem hermForm_eq_of_im {p q a b : ℕ} (HA : Matrix (Fin a) (Fin a) ℂ) (HB : Matrix (Fin b) (Fin b) ℂ)
+theorem hermForm_eq_of_im
+    {p q a b : ℕ} (HA : Matrix (Fin a) (Fin a) ℂ) (HB : Matrix (Fin b) (Fin b) ℂ)
     (F₁ : (Fin p → ℂ) →ₗ[ℂ] (Fin a → ℂ)) (F₂ : (Fin q → ℂ) →ₗ[ℂ] (Fin a → ℂ))
     (G₁ : (Fin p → ℂ) →ₗ[ℂ] (Fin b → ℂ)) (G₂ : (Fin q → ℂ) →ₗ[ℂ] (Fin b → ℂ))
-    {S : Set (Fin p → ℂ)} {T : Set (Fin q → ℂ)} (hS : Submodule.span ℝ S = ⊤) (hT : Submodule.span ℝ T = ⊤)
-    (h : ∀ z ∈ S, ∀ w ∈ T, (hermForm HA (F₁ z) (F₂ w)).im = (hermForm HB (G₁ z) (G₂ w)).im) (z w) :
-    hermForm HA (F₁ z) (F₂ w) = hermForm HB (G₁ z) (G₂ w) := by
+    {S : Set (Fin p → ℂ)} {T : Set (Fin q → ℂ)}
+    (hS : Submodule.span ℝ S = ⊤) (hT : Submodule.span ℝ T = ⊤)
+    (h : ∀ z ∈ S, ∀ w ∈ T, (hermForm HA (F₁ z) (F₂ w)).im = (hermForm HB (G₁ z) (G₂ w)).im)
+    (z w)
+    : hermForm HA (F₁ z) (F₂ w) = hermForm HB (G₁ z) (G₂ w) := by
   have him : ∀ z w, (hermForm HA (F₁ z) (F₂ w)).im = (hermForm HB (G₁ z) (G₂ w)).im := by
     intro z w
     have hz : z ∈ Submodule.span ℝ S := hS ▸ Submodule.mem_top
@@ -82,14 +92,18 @@ theorem hermForm_eq_of_im {p q a b : ℕ} (HA : Matrix (Fin a) (Fin a) ℂ) (HB 
       | mem w hw => exact h z hz w hw
       | zero => simp [hermForm]
       | add x y _ _ hx hy =>
-        simp only [hermForm, map_add (f := _), star_add, Matrix.mulVec_add, dotProduct_add, Complex.add_im] at hx hy ⊢
+        simp only [hermForm, map_add (f := _), star_add, Matrix.mulVec_add, dotProduct_add,
+            Complex.add_im]
+          at hx hy ⊢
         rw [hx, hy]
       | smul r x _ hx =>
         rw [← Complex.coe_smul]
         simp only [hermForm, map_smul, star_smul, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul,
-          Complex.star_def, Complex.conj_ofReal, Complex.im_ofReal_mul] at hx ⊢
+            Complex.star_def, Complex.conj_ofReal, Complex.im_ofReal_mul]
+          at hx ⊢
         rw [hx]
-    | zero => simp [hermForm]
+    | zero =>
+      simp [hermForm]
     | add x y _ _ hx hy =>
       simp only [hermForm, map_add (f := _), add_dotProduct, Complex.add_im] at hx hy ⊢
       rw [hx, hy]
@@ -101,31 +115,53 @@ theorem hermForm_eq_of_im {p q a b : ℕ} (HA : Matrix (Fin a) (Fin a) ℂ) (HB 
   have e := him (Complex.I • z) w
   simpa only [hermForm, map_smul, smul_dotProduct, smul_eq_mul, Complex.I_mul_im] using e
 
-theorem weilIs_iff (hU : ThetaUnifAV) (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g)
-    {Hm : Matrix (Fin P.g) (Fin P.g) ℂ} {χ : u.Λ → ℂ} (h : u.IsAH Hm χ) (a b : u.Λ) :
-    ∃ m : ℤ, (m : ℝ) = (hermForm Hm a b).im ∧ ∀ (n : ℕ) (c : ℂˣ), 0 < n →
-      (Out.WeilIs P.A P.L n (u.ex ((n : ℂ)⁻¹ • (a : Fin P.g → ℂ))) (u.ex ((n : ℂ)⁻¹ • (b : Fin P.g → ℂ))) (unitOn c) ↔
-        c = rootVal m n) := by
+theorem weilIs_iff
+    (hU : ThetaUnifAV)
+    (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g)
+    {Hm : Matrix (Fin P.g) (Fin P.g) ℂ} {χ : u.Λ → ℂ} (h : u.IsAH Hm χ)
+    (a b : u.Λ)
+    : ∃ m : ℤ,
+      (m : ℝ) = (hermForm Hm a b).im
+        ∧ ∀ (n : ℕ) (c : ℂˣ),
+          0 < n
+            → (Out.WeilIs P.A P.L n (u.ex ((n : ℂ)⁻¹ • (a : Fin P.g → ℂ)))
+                (u.ex ((n : ℂ)⁻¹ • (b : Fin P.g → ℂ))) (unitOn c)
+              ↔ c = rootVal m n) := by
   obtain ⟨Ef, hE, -, -, -, -, hW⟩ := GlobalTheory.AHWeil.tangent_and_weil_of_isAH hU P P.g u Hm χ h
   refine ⟨Ef a b, hE a b, fun n c hn => ⟨fun hc => ?_, fun hc => hW n a b c hn (by rw [hc]; rfl)⟩⟩
-  exact weilIs_unique_fieldPoint (Sp ℂ) P.A P.L P.isLB ℂ (𝟙 _) n _ _ c _ hc (hW n a b (rootVal (Ef a b) n) hn rfl)
+  exact weilIs_unique_fieldPoint (Sp ℂ) P.A P.L P.isLB ℂ (𝟙 _) n _ _ c _ hc
+    (hW n a b (rootVal (Ef a b) n) hn rfl)
 
 end GlobalTheory.CM.HermWeil
 
 namespace GlobalTheory.CM
 open HermWeil
 
-theorem weilEq_iff_hermForm_eq : ThetaUnifAV → Out.Laws → ∀ (X Y A B : Out.PolAV (Sp ℂ)) (uX : HolUnif X.A X.L X.g) (uY : HolUnif Y.A Y.L Y.g) (uA : HolUnif A.A A.L A.g) (uB : HolUnif B.A B.L B.g) (HA : Matrix (Fin A.g) (Fin A.g) ℂ) (HB : Matrix (Fin B.g) (Fin B.g) ℂ) (χA : uA.Λ → ℂ) (χB : uB.Λ → ℂ), uA.IsAH HA χA → uB.IsAH HB χB →
-  ∀ (f₁ : X.A ⟶ A.A) (f₂ : Y.A ⟶ A.A) (g₁ : X.A ⟶ B.A) (g₂ : Y.A ⟶ B.A) (F₁ : (Fin X.g → ℂ) →ₗ[ℂ] (Fin A.g → ℂ)) (F₂ : (Fin Y.g → ℂ) →ₗ[ℂ] (Fin A.g → ℂ)) (G₁ : (Fin X.g → ℂ) →ₗ[ℂ] (Fin B.g → ℂ)) (G₂ : (Fin Y.g → ℂ) →ₗ[ℂ] (Fin B.g → ℂ)),
-  (∀ z, uA.ex (F₁ z) = uX.ex z ≫ f₁) → (∀ z, uA.ex (F₂ z) = uY.ex z ≫ f₂) → (∀ z, uB.ex (G₁ z) = uX.ex z ≫ g₁) → (∀ z, uB.ex (G₂ z) = uY.ex z ≫ g₂) →
-  (WeilEq A.L f₁ f₂ B.L g₁ g₂ (𝟙 (Sp ℂ)) ↔ ∀ z w, hermForm HA (F₁ z) (F₂ w) = hermForm HB (G₁ z) (G₂ w)) := by
+theorem weilEq_iff_hermForm_eq
+    : ThetaUnifAV → Out.Laws
+      → ∀ (X Y A B : Out.PolAV (Sp ℂ)) (uX : HolUnif X.A X.L X.g) (uY : HolUnif Y.A Y.L Y.g)
+          (uA : HolUnif A.A A.L A.g) (uB : HolUnif B.A B.L B.g) (HA : Matrix (Fin A.g) (Fin A.g) ℂ)
+          (HB : Matrix (Fin B.g) (Fin B.g) ℂ) (χA : uA.Λ → ℂ) (χB : uB.Λ → ℂ),
+        uA.IsAH HA χA → uB.IsAH HB χB
+          → ∀ (f₁ : X.A ⟶ A.A) (f₂ : Y.A ⟶ A.A) (g₁ : X.A ⟶ B.A) (g₂ : Y.A ⟶ B.A)
+              (F₁ : (Fin X.g → ℂ) →ₗ[ℂ] (Fin A.g → ℂ)) (F₂ : (Fin Y.g → ℂ) →ₗ[ℂ] (Fin A.g → ℂ))
+              (G₁ : (Fin X.g → ℂ) →ₗ[ℂ] (Fin B.g → ℂ)) (G₂ : (Fin Y.g → ℂ) →ₗ[ℂ] (Fin B.g → ℂ)),
+            (∀ z, uA.ex (F₁ z) = uX.ex z ≫ f₁) → (∀ z, uA.ex (F₂ z) = uY.ex z ≫ f₂)
+              → (∀ z, uB.ex (G₁ z) = uX.ex z ≫ g₁) → (∀ z, uB.ex (G₂ z) = uY.ex z ≫ g₂)
+              → (WeilEq A.L f₁ f₂ B.L g₁ g₂ (𝟙 (Sp ℂ))
+                ↔ ∀ z w, hermForm HA (F₁ z) (F₂ w) = hermForm HB (G₁ z) (G₂ w)) := by
   intro hU _ X Y A B uX uY uA uB HA HB χA χB hA hB f₁ f₂ g₁ g₂ F₁ F₂ G₁ G₂ h₁ h₂ h₃ h₄
-  have key : ∀ (a : uX.Λ) (b : uY.Λ), ∃ m m' : ℤ, (m : ℝ) = (hermForm HA (F₁ a) (F₂ b)).im ∧
-      (m' : ℝ) = (hermForm HB (G₁ a) (G₂ b)).im ∧ ∀ (n : ℕ) (c : ℂˣ), 0 < n →
-      (Out.WeilIs A.A A.L n (uX.ex ((n : ℂ)⁻¹ • (a : Fin X.g → ℂ)) ≫ f₁)
-        (uY.ex ((n : ℂ)⁻¹ • (b : Fin Y.g → ℂ)) ≫ f₂) (unitOn c) ↔ c = rootVal m n) ∧
-      (Out.WeilIs B.A B.L n (uX.ex ((n : ℂ)⁻¹ • (a : Fin X.g → ℂ)) ≫ g₁)
-        (uY.ex ((n : ℂ)⁻¹ • (b : Fin Y.g → ℂ)) ≫ g₂) (unitOn c) ↔ c = rootVal m' n) := by
+  have key
+      : ∀ (a : uX.Λ) (b : uY.Λ), ∃ m m' : ℤ,
+        (m : ℝ) = (hermForm HA (F₁ a) (F₂ b)).im ∧ (m' : ℝ) = (hermForm HB (G₁ a) (G₂ b)).im
+          ∧ ∀ (n : ℕ) (c : ℂˣ),
+            0 < n
+              → (Out.WeilIs A.A A.L n (uX.ex ((n : ℂ)⁻¹ • (a : Fin X.g → ℂ)) ≫ f₁)
+                    (uY.ex ((n : ℂ)⁻¹ • (b : Fin Y.g → ℂ)) ≫ f₂) (unitOn c)
+                  ↔ c = rootVal m n)
+                ∧ (Out.WeilIs B.A B.L n (uX.ex ((n : ℂ)⁻¹ • (a : Fin X.g → ℂ)) ≫ g₁)
+                    (uY.ex ((n : ℂ)⁻¹ • (b : Fin Y.g → ℂ)) ≫ g₂) (unitOn c)
+                  ↔ c = rootVal m' n) := by
     intro a b
     obtain ⟨m, hm, hw⟩ := weilIs_iff hU A uA hA ⟨_, map_mem uX uA h₁ a⟩ ⟨_, map_mem uY uA h₂ b⟩
     obtain ⟨m', hm', hw'⟩ := weilIs_iff hU B uB hB ⟨_, map_mem uX uB h₃ a⟩ ⟨_, map_mem uY uB h₄ b⟩

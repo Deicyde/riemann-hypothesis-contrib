@@ -12,17 +12,18 @@ namespace PI.LocCartanPair
 
 variable {R : Type} [CommRing R] [StarRing R]
 
-theorem splPlane_entry {ι m n : Type} [Fintype ι] (A : Matrix ι ι R) (M : Matrix ι m R)
-    (N : Matrix ι n R) (r : m) (s : n) :
-    (Mᴴ * A * N) r s = star (fun i => M i r) ⬝ᵥ (A *ᵥ fun i => N i s) := by
+theorem splPlane_entry
+    {ι m n : Type} [Fintype ι]
+    (A : Matrix ι ι R) (M : Matrix ι m R) (N : Matrix ι n R) (r : m) (s : n)
+    : (Mᴴ * A * N) r s = star (fun i => M i r) ⬝ᵥ (A *ᵥ fun i => N i s) := by
   rw [Matrix.mul_assoc]; rfl
 
-theorem splPlane_herm {ι : Type} [Fintype ι] (A : Matrix ι ι R) (hA : Aᴴ = A) (a b : ι → R) :
-    star (star a ⬝ᵥ (A *ᵥ b)) = star b ⬝ᵥ (A *ᵥ a) := by
+theorem splPlane_herm {ι : Type} [Fintype ι] (A : Matrix ι ι R) (hA : Aᴴ = A) (a b : ι → R)
+    : star (star a ⬝ᵥ (A *ᵥ b)) = star b ⬝ᵥ (A *ᵥ a) := by
   rw [star_dotProduct, star_star, star_mulVec, ← dotProduct_mulVec, hA]
 
-theorem splPlane_unitEntry [IsLocalRing R] {ι : Type} [Fintype ι] (w z : ι → R)
-    (h : w ⬝ᵥ z = 1) : ∃ i, IsUnit (z i) := by
+theorem splPlane_unitEntry [IsLocalRing R] {ι : Type} [Fintype ι] (w z : ι → R) (h : w ⬝ᵥ z = 1)
+    : ∃ i, IsUnit (z i) := by
   by_contra hn
   push Not at hn
   have hm : w ⬝ᵥ z ∈ IsLocalRing.maximalIdeal R :=
@@ -32,21 +33,24 @@ theorem splPlane_unitEntry [IsLocalRing R] {ι : Type} [Fintype ι] (w z : ι �
 
 variable {ι κ : Type} [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
 
-def splBasis (E : Fin 2 ⊕ κ ≃ ι) (x y : ι → R) : Matrix ι (Fin 2 ⊕ κ) R :=
-  fun i c => Sum.elim (fun a => ![x, y] a i) (fun j => (1 : Matrix ι ι R) i (E (.inr j))) c
+def splBasis (E : Fin 2 ⊕ κ ≃ ι) (x y : ι → R) : Matrix ι (Fin 2 ⊕ κ) R := fun i c =>
+  Sum.elim (fun a => ![x, y] a i) (fun j => (1 : Matrix ι ι R) i (E (.inr j))) c
 
-def splCorr (E : Fin 2 ⊕ κ ≃ ι) (A : Matrix ι ι R) (x y : ι → R) : Matrix (Fin 2) κ R :=
-  fun a j => ![-(star y ⬝ᵥ (A *ᵥ fun i => (1 : Matrix ι ι R) i (E (.inr j)))),
-    -(star x ⬝ᵥ (A *ᵥ fun i => (1 : Matrix ι ι R) i (E (.inr j))))] a
+def splCorr (E : Fin 2 ⊕ κ ≃ ι) (A : Matrix ι ι R) (x y : ι → R) : Matrix (Fin 2) κ R := fun a j =>
+  ![-(star y ⬝ᵥ (A *ᵥ fun i => (1 : Matrix ι ι R) i (E (.inr j)))),
+      -(star x ⬝ᵥ (A *ᵥ fun i => (1 : Matrix ι ι R) i (E (.inr j))))]
+    a
 
-theorem splPlane_core (E : Fin 2 ⊕ κ ≃ ι) (A : Matrix ι ι R) (hA : Aᴴ = A) (x y : ι → R)
-    (hxx : star x ⬝ᵥ (A *ᵥ x) = 0) (hyy : star y ⬝ᵥ (A *ᵥ y) = 0)
-    (hxy : star x ⬝ᵥ (A *ᵥ y) = 1)
-    (hdet : IsUnit (x (E (.inl 0)) * y (E (.inl 1)) - y (E (.inl 0)) * x (E (.inl 1)))) :
-    ∃ (u : Matrix ι (Fin 2 ⊕ κ) R) (v : Matrix (Fin 2 ⊕ κ) ι R) (A₁ : Matrix κ κ R),
-      u * v = 1 ∧ v * u = 1 ∧ (∀ i, u i (.inl 0) = x i) ∧ (∀ i, u i (.inl 1) = y i) ∧
-      uᴴ * A * u = fromBlocks !![0, 1; 1, 0] 0 0 A₁ ∧ A₁ᴴ = A₁ ∧
-      (IsUnit A.det → IsUnit A₁.det) := by
+theorem splPlane_core
+    (E : Fin 2 ⊕ κ ≃ ι)
+    (A : Matrix ι ι R) (hA : Aᴴ = A)
+    (x y : ι → R)
+    (hxx : star x ⬝ᵥ (A *ᵥ x) = 0) (hyy : star y ⬝ᵥ (A *ᵥ y) = 0) (hxy : star x ⬝ᵥ (A *ᵥ y) = 1)
+    (hdet : IsUnit (x (E (.inl 0)) * y (E (.inl 1)) - y (E (.inl 0)) * x (E (.inl 1))))
+    : ∃ (u : Matrix ι (Fin 2 ⊕ κ) R) (v : Matrix (Fin 2 ⊕ κ) ι R) (A₁ : Matrix κ κ R),
+      u * v = 1 ∧ v * u = 1 ∧ (∀ i, u i (.inl 0) = x i) ∧ (∀ i, u i (.inl 1) = y i)
+        ∧ uᴴ * A * u = fromBlocks !![0, 1; 1, 0] 0 0 A₁ ∧ A₁ᴴ = A₁
+        ∧ (IsUnit A.det → IsUnit A₁.det) := by
   have hyx : star y ⬝ᵥ (A *ᵥ x) = 1 := by rw [← splPlane_herm A hA x y, hxy, star_one]
   set u₀ := splBasis E x y with hu₀def
   set B := splCorr E A x y with hBdef
@@ -77,20 +81,23 @@ theorem splPlane_core (E : Fin 2 ⊕ κ ≃ ι) (A : Matrix ι ι R) (hA : Aᴴ 
   have hvu : v * u = 1 := by
     rw [hudef, hvdef, Matrix.mul_assoc, ← Matrix.mul_assoc v₀, hvu₀, Matrix.one_mul, hT'T]
   have hc0 : (fun i => u i (.inl 0)) = x := by
-    funext i; simp [hudef, hTdef, hu₀def, splBasis, Matrix.mul_apply, Fintype.sum_sum_type,
-      Fin.sum_univ_two]
+    funext i
+    simp [hudef, hTdef, hu₀def, splBasis, Matrix.mul_apply, Fintype.sum_sum_type, Fin.sum_univ_two]
   have hc1 : (fun i => u i (.inl 1)) = y := by
-    funext i; simp [hudef, hTdef, hu₀def, splBasis, Matrix.mul_apply, Fintype.sum_sum_type,
-      Fin.sum_univ_two]
-  have hcj : ∀ j, (fun i => u i (.inr j)) = (fun i => (1 : Matrix ι ι R) i (E (.inr j)))
-      + B 0 j • x + B 1 j • y := by
-    intro j; funext i
-    simp [hudef, hTdef, hu₀def, splBasis, Matrix.mul_apply, Fintype.sum_sum_type,
-      Fin.sum_univ_two, Matrix.one_apply, mul_ite]
+    funext i
+    simp [hudef, hTdef, hu₀def, splBasis, Matrix.mul_apply, Fintype.sum_sum_type, Fin.sum_univ_two]
+  have hcj
+      : ∀ j,
+        (fun i => u i (.inr j))
+          = (fun i => (1 : Matrix ι ι R) i (E (.inr j))) + B 0 j • x + B 1 j • y := by
+    intro j
+    funext i
+    simp [hudef, hTdef, hu₀def, splBasis, Matrix.mul_apply, Fintype.sum_sum_type, Fin.sum_univ_two,
+      Matrix.one_apply, mul_ite]
     ring
   set G := uᴴ * A * u with hGdef
-  have hG : ∀ r s, G r s = star (fun i => u i r) ⬝ᵥ (A *ᵥ fun i => u i s) :=
-    fun r s => splPlane_entry A u u r s
+  have hG : ∀ r s, G r s = star (fun i => u i r) ⬝ᵥ (A *ᵥ fun i => u i s) := fun r s =>
+    splPlane_entry A u u r s
   have h12 : G.toBlocks₁₂ = 0 := by
     ext a j
     simp only [toBlocks₁₂, of_apply, hG, hcj, Matrix.zero_apply]
@@ -108,25 +115,22 @@ theorem splPlane_core (E : Fin 2 ⊕ κ ≃ ι) (A : Matrix ι ι R) (hA : Aᴴ 
     rw [hG, ← splPlane_herm A hA, ← hG, this, star_zero]
   have h11 : G.toBlocks₁₁ = !![0, 1; 1, 0] := by
     ext a b
-    fin_cases a <;> fin_cases b <;>
-      simp [toBlocks₁₁, hG, hc0, hc1, hxx, hyy, hxy, hyx]
+    fin_cases a <;> fin_cases b <;> simp [toBlocks₁₁, hG, hc0, hc1, hxx, hyy, hxy, hyx]
   have hGe : G = fromBlocks !![0, 1; 1, 0] 0 0 G.toBlocks₂₂ := by
     conv_lhs => rw [← fromBlocks_toBlocks G]
     rw [h11, h12, h21]
-  refine ⟨u, v, G.toBlocks₂₂, huv, hvu, fun i => congrFun hc0 i, fun i => congrFun hc1 i,
-    hGe, ?_, ?_⟩
+  refine
+    ⟨u, v, G.toBlocks₂₂, huv, hvu, fun i => congrFun hc0 i, fun i => congrFun hc1 i, hGe, ?_, ?_⟩
   · ext i j
     simp only [conjTranspose_apply, toBlocks₂₂, of_apply]
     rw [hG, hG, splPlane_herm A hA]
   · intro hAdet
     set U : Matrix (Fin 2 ⊕ κ) (Fin 2 ⊕ κ) R := u.submatrix E id with hUdef
     have hUv : U * v.submatrix id E = 1 := by
-      rw [hUdef, ← Matrix.submatrix_mul _ _ _ _ _ Function.bijective_id, huv,
-        submatrix_one_equiv]
+      rw [hUdef, ← Matrix.submatrix_mul _ _ _ _ _ Function.bijective_id, huv, submatrix_one_equiv]
     have hU : IsUnit U.det := isUnit_det_of_right_inverse hUv
     have hGU : G = Uᴴ * A.submatrix E E * U := by
-      rw [hUdef, conjTranspose_submatrix, submatrix_mul_equiv, submatrix_mul_equiv,
-        submatrix_id_id]
+      rw [hUdef, conjTranspose_submatrix, submatrix_mul_equiv, submatrix_mul_equiv, submatrix_id_id]
     have hGdet : IsUnit G.det := by
       rw [hGU, det_mul, det_mul, det_conjTranspose, det_submatrix_equiv_self]
       exact (hU.star.mul hAdet).mul hU
@@ -137,10 +141,12 @@ section Local
 
 variable {R : Type} [CommRing R] [StarRing R]
 
-theorem splPlane_pair [IsLocalRing R] {ι : Type} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι R)
-    (hA : Aᴴ = A) (x y : ι → R) (hxx : star x ⬝ᵥ (A *ᵥ x) = 0)
-    (hxy : star x ⬝ᵥ (A *ᵥ y) = 1) :
-    ∃ i₀ j₀, i₀ ≠ j₀ ∧ IsUnit (x i₀ * y j₀ - y i₀ * x j₀) := by
+theorem splPlane_pair
+    [IsLocalRing R]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι R) (hA : Aᴴ = A)
+    (x y : ι → R) (hxx : star x ⬝ᵥ (A *ᵥ x) = 0) (hxy : star x ⬝ᵥ (A *ᵥ y) = 1)
+    : ∃ i₀ j₀, i₀ ≠ j₀ ∧ IsUnit (x i₀ * y j₀ - y i₀ * x j₀) := by
   have hyx : star y ⬝ᵥ (A *ᵥ x) = 1 := by rw [← splPlane_herm A hA x y, hxy, star_one]
   rw [dotProduct_mulVec] at hyx
   obtain ⟨i₀, hi₀⟩ := splPlane_unitEntry _ _ hyx
@@ -153,18 +159,24 @@ theorem splPlane_pair [IsLocalRing R] {ι : Type} [Fintype ι] [DecidableEq ι] 
     rw [← dotProduct_mulVec, hy', mulVec_sub, mulVec_smul, dotProduct_sub, dotProduct_smul, hxx,
       hxy, smul_eq_mul, mul_zero, sub_zero]
   obtain ⟨j₀, hj₀⟩ := splPlane_unitEntry _ _ hxy'
-  have hne : i₀ ≠ j₀ := by
-    rintro rfl; rw [hy'i] at hj₀; exact not_isUnit_zero hj₀
+  have hne : i₀ ≠ j₀ := by rintro rfl; rw [hy'i] at hj₀; exact not_isUnit_zero hj₀
   refine ⟨i₀, j₀, hne, ?_⟩
   have e : x i₀ * y j₀ - y i₀ * x j₀ = x i₀ * y' j₀ := by
     simp only [hy', Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
     linear_combination (y i₀ * x j₀) * hxi
-  rw [e]; exact hi₀.mul hj₀
+  rw [e]
+  exact hi₀.mul hj₀
 
-def splEquiv {ι : Type} [DecidableEq ι] (i₀ j₀ : ι) (hne : i₀ ≠ j₀) :
-    Fin 2 ⊕ {j // j ≠ i₀ ∧ j ≠ j₀} ≃ ι where
+def splEquiv {ι : Type} [DecidableEq ι] (i₀ j₀ : ι) (hne : i₀ ≠ j₀)
+    : Fin 2 ⊕ {j // j ≠ i₀ ∧ j ≠ j₀} ≃ ι where
   toFun := Sum.elim ![i₀, j₀] Subtype.val
-  invFun j := if h0 : j = i₀ then .inl 0 else if h1 : j = j₀ then .inl 1 else .inr ⟨j, h0, h1⟩
+  invFun j :=
+    if h0 : j = i₀ then
+      .inl 0
+    else if h1 : j = j₀ then
+      .inl 1
+    else
+      .inr ⟨j, h0, h1⟩
   left_inv := by
     rintro (a | ⟨j, h0, h1⟩)
     · fin_cases a
@@ -179,14 +191,17 @@ def splEquiv {ι : Type} [DecidableEq ι] (i₀ j₀ : ι) (hne : i₀ ≠ j₀)
       · subst h1; simp [h0]
       · simp [h0, h1]
 
-theorem splPlane [IsLocalRing R] {ι κ : Type} [Fintype ι] [DecidableEq ι] [Fintype κ]
-    [DecidableEq κ] (hc : Fintype.card κ + 2 = Fintype.card ι) (A : Matrix ι ι R) (hA : Aᴴ = A)
-    (x y : ι → R) (hxx : star x ⬝ᵥ (A *ᵥ x) = 0) (hyy : star y ⬝ᵥ (A *ᵥ y) = 0)
-    (hxy : star x ⬝ᵥ (A *ᵥ y) = 1) :
-    ∃ (u : Matrix ι (Fin 2 ⊕ κ) R) (v : Matrix (Fin 2 ⊕ κ) ι R) (A₁ : Matrix κ κ R),
-      u * v = 1 ∧ v * u = 1 ∧ (∀ i, u i (.inl 0) = x i) ∧ (∀ i, u i (.inl 1) = y i) ∧
-      uᴴ * A * u = fromBlocks !![0, 1; 1, 0] 0 0 A₁ ∧ A₁ᴴ = A₁ ∧
-      (IsUnit A.det → IsUnit A₁.det) := by
+theorem splPlane
+    [IsLocalRing R]
+    {ι κ : Type} [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (hc : Fintype.card κ + 2 = Fintype.card ι)
+    (A : Matrix ι ι R) (hA : Aᴴ = A)
+    (x y : ι → R)
+    (hxx : star x ⬝ᵥ (A *ᵥ x) = 0) (hyy : star y ⬝ᵥ (A *ᵥ y) = 0) (hxy : star x ⬝ᵥ (A *ᵥ y) = 1)
+    : ∃ (u : Matrix ι (Fin 2 ⊕ κ) R) (v : Matrix (Fin 2 ⊕ κ) ι R) (A₁ : Matrix κ κ R),
+      u * v = 1 ∧ v * u = 1 ∧ (∀ i, u i (.inl 0) = x i) ∧ (∀ i, u i (.inl 1) = y i)
+        ∧ uᴴ * A * u = fromBlocks !![0, 1; 1, 0] 0 0 A₁ ∧ A₁ᴴ = A₁
+        ∧ (IsUnit A.det → IsUnit A₁.det) := by
   obtain ⟨i₀, j₀, hne, hu⟩ := splPlane_pair A hA x y hxx hxy
   have hc₀ : Fintype.card {j // j ≠ i₀ ∧ j ≠ j₀} = Fintype.card κ := by
     have := Fintype.card_congr (splEquiv i₀ j₀ hne)

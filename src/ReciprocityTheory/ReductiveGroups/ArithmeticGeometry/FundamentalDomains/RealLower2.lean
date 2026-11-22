@@ -58,16 +58,21 @@ private lemma sqrt_nsq_mulVec_le_opN_mul {m n : ℕ} (A : Matrix (Fin m) (Fin n)
   rw [← Real.sqrt_sq (opN_nonneg A), ← Real.sqrt_mul (sq_nonneg _)]
   exact Real.sqrt_le_sqrt (nsq_mulVec_le_opN A v)
 
-
 set_option maxHeartbeats 800000 in
-theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : ℝ} (hρ0 : 0 < ρ)
-    (hρ : ρ ≤ 1 / 10) {Z : X.Coord} (hZ : X.zN Z ≤ ρ) (hy : X.xZ x Z ∈ X.dom) (τ : X.Ψ)
-    (v : Fin r → ℂ) :
-    (1 - ρ) / (1 + ρ) * X.maj x τ v ≤ X.maj (X.xZ x Z) τ v ∧
-      X.maj (X.xZ x Z) τ v ≤ (1 + ρ) / (1 - ρ) * X.maj x τ v := by
-  obtain ⟨w, rfl⟩ : ∃ w, v = mat x τ *ᵥ w := ⟨(mat x τ)⁻¹ *ᵥ v, by
-    rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _
-      (isUnit_iff_ne_zero.mpr ((X.mem_dom_iff x).1 hx τ).1), Matrix.one_mulVec]⟩
+theorem mj_bounds
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x)
+    {ρ : ℝ} (hρ0 : 0 < ρ) (hρ : ρ ≤ 1 / 10)
+    {Z : X.Coord} (hZ : X.zN Z ≤ ρ) (hy : X.xZ x Z ∈ X.dom)
+    (τ : X.Ψ) (v : Fin r → ℂ)
+    : (1 - ρ) / (1 + ρ) * X.maj x τ v ≤ X.maj (X.xZ x Z) τ v
+      ∧ X.maj (X.xZ x Z) τ v ≤ (1 + ρ) / (1 - ρ) * X.maj x τ v := by
+  obtain ⟨w, rfl⟩ : ∃ w, v = mat x τ *ᵥ w := ⟨
+    (mat x τ)⁻¹ *ᵥ v,
+    by
+      rw [Matrix.mulVec_mulVec,
+        Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr ((X.mem_dom_iff x).1 hx τ).1),
+        Matrix.one_mulVec]
+  ⟩
   have hx0 : X.xZ x 0 ∈ X.dom := by rw [mj_xZ_zero]; exact hx
   obtain ⟨γ0, h0maj, h0id⟩ := mj_coord X ho 0 hx0 τ w
   rw [mj_xZ_zero] at h0maj
@@ -86,10 +91,12 @@ theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ :
   have hkρ : Data.opN (Matrix.of (Z τ)) ≤ ρ := (opN_le_zN X Z τ).trans hZ
   have hs2 : nsq (Matrix.of (Z τ) *ᵥ γ) ≤ Data.opN (Matrix.of (Z τ)) ^ 2 * nsq γ :=
     nsq_mulVec_le_opN _ _
-  have hS : Real.sqrt (nsq (Matrix.of (Z τ) *ᵥ γ)) ≤ Data.opN (Matrix.of (Z τ)) * Real.sqrt (nsq γ) :=
+  have hS
+      : Real.sqrt (nsq (Matrix.of (Z τ) *ᵥ γ)) ≤ Data.opN (Matrix.of (Z τ)) * Real.sqrt (nsq γ) :=
     sqrt_nsq_mulVec_le_opN_mul _ _
-  have hdid : ∀ δ, mjip (mjpa X w - γ) δ =
-      mjip (mjpb X w - Matrix.of (Z τ) *ᵥ γ) (Matrix.of (Z τ) *ᵥ δ) := by
+  have hdid
+      : ∀ δ,
+        mjip (mjpa X w - γ) δ = mjip (mjpb X w - Matrix.of (Z τ) *ᵥ γ) (Matrix.of (Z τ) *ᵥ δ) := by
     intro δ
     rw [mjip_sub_left, mjip_sub_left]
     linear_combination hid δ
@@ -108,7 +115,9 @@ theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ :
     have h2 := re_mjip_le_sqrt_nsq_mul t (Zm *ᵥ d)
     have h4 : Real.sqrt (nsq (Zm *ᵥ d)) ≤ k * Real.sqrt (nsq d) := sqrt_nsq_mulVec_le_opN_mul Zm d
     have h5 : Real.sqrt (nsq d) ^ 2 ≤ Real.sqrt (nsq t) * (k * Real.sqrt (nsq d)) := by
-      calc Real.sqrt (nsq d) ^ 2 = nsq d := hD2
+      calc
+        Real.sqrt (nsq d) ^ 2
+          = nsq d := hD2
         _ = (mjip t (Zm *ᵥ d)).re := h1
         _ ≤ _ := h2.trans (mul_le_mul_of_nonneg_left h4 hT0)
     rcases eq_or_lt_of_le hD0 with h | h
@@ -116,7 +125,9 @@ theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ :
       positivity
     · nlinarith
   have hdd : nsq d ≤ k ^ 2 * nsq t := by
-    calc nsq d = Real.sqrt (nsq d) ^ 2 := hD2.symm
+    calc
+      nsq d
+        = Real.sqrt (nsq d) ^ 2 := hD2.symm
       _ ≤ (k * Real.sqrt (nsq t)) ^ 2 := pow_le_pow_left₀ hD0 hDs 2
       _ = k ^ 2 * nsq t := by rw [mul_pow, hT2]
   have hAe : nsq (mjpa X w) = nsq γ + 2 * (mjip γ d).re + nsq d := by
@@ -129,8 +140,9 @@ theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ :
   have hS' : Real.sqrt (nsq (Zm *ᵥ γ)) ≤ k * Real.sqrt (nsq γ) := hS
   have hk1 : k < 1 := by linarith
   refine ⟨?_, ?_⟩
-  · have hlow : (1 - k ^ 2) * (nsq γ + nsq t) ≤
-        2 * (nsq γ - nsq (Zm *ᵥ γ)) - (nsq (mjpa X w) - nsq (mjpb X w)) := by
+  · have hlow
+        : (1 - k ^ 2) * (nsq γ + nsq t)
+          ≤ 2 * (nsq γ - nsq (Zm *ᵥ γ)) - (nsq (mjpa X w) - nsq (mjpb X w)) := by
       rw [hAe, hBe, hcross]
       nlinarith [hs2', hdd]
     have r1 : (mjip γ d).re ≤ Real.sqrt (nsq γ) * (k * Real.sqrt (nsq t)) :=
@@ -144,15 +156,18 @@ theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ :
       rw [div_le_div_iff₀ (by linarith) (by linarith)]
       nlinarith
     have hAB0 : 0 ≤ nsq (mjpa X w) + nsq (mjpb X w) := add_nonneg (nsq_nonneg _) (nsq_nonneg _)
-    calc (1 - ρ) / (1 + ρ) * (nsq (mjpa X w) + nsq (mjpb X w))
-        ≤ (1 - k) / (1 + k) * (nsq (mjpa X w) + nsq (mjpb X w)) := mul_le_mul_of_nonneg_right hc hAB0
+    calc
+      (1 - ρ) / (1 + ρ) * (nsq (mjpa X w) + nsq (mjpb X w))
+          ≤ (1 - k) / (1 + k) * (nsq (mjpa X w) + nsq (mjpb X w)) :=
+        mul_le_mul_of_nonneg_right hc hAB0
       _ ≤ (1 - k) / (1 + k) * ((1 + k) ^ 2 * (nsq γ + nsq t)) :=
-          mul_le_mul_of_nonneg_left hAB (div_nonneg (by linarith) (by linarith))
+        mul_le_mul_of_nonneg_left hAB (div_nonneg (by linarith) (by linarith))
       _ = (1 - k ^ 2) * (nsq γ + nsq t) := by
-          field_simp
-          ring
+        field_simp
+        ring
       _ ≤ _ := hlow
-  · have hQid : nsq γ - nsq (Zm *ᵥ γ) = (mjip (mjpa X w) γ).re - (mjip (mjpb X w) (Zm *ᵥ γ)).re := by
+  · have hQid
+        : nsq γ - nsq (Zm *ᵥ γ) = (mjip (mjpa X w) γ).re - (mjip (mjpb X w) (Zm *ᵥ γ)).re := by
       have := congrArg Complex.re (hid γ)
       simp only [Complex.sub_re, mjip_self, Complex.ofReal_re] at this
       linarith
@@ -160,11 +175,13 @@ theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ :
     have r4 := neg_re_mjip_le_sqrt_nsq_mul (mjpb X w) (Zm *ᵥ γ)
     have hβ0 := Real.sqrt_nonneg (nsq (mjpb X w))
     have hα0 := Real.sqrt_nonneg (nsq (mjpa X w))
-    have r5 : Real.sqrt (nsq (mjpb X w)) * Real.sqrt (nsq (Zm *ᵥ γ)) ≤
-        Real.sqrt (nsq (mjpb X w)) * (ρ * Real.sqrt (nsq γ)) :=
+    have r5
+        : Real.sqrt (nsq (mjpb X w)) * Real.sqrt (nsq (Zm *ᵥ γ))
+          ≤ Real.sqrt (nsq (mjpb X w)) * (ρ * Real.sqrt (nsq γ)) :=
       mul_le_mul_of_nonneg_left (hS'.trans (mul_le_mul_of_nonneg_right hkρ hG0)) hβ0
-    have hQle : nsq γ - nsq (Zm *ᵥ γ) ≤
-        (Real.sqrt (nsq (mjpa X w)) + ρ * Real.sqrt (nsq (mjpb X w))) * Real.sqrt (nsq γ) := by
+    have hQle
+        : nsq γ - nsq (Zm *ᵥ γ)
+          ≤ (Real.sqrt (nsq (mjpa X w)) + ρ * Real.sqrt (nsq (mjpb X w))) * Real.sqrt (nsq γ) := by
       rw [hQid]
       linarith [r3, r4, r5]
     have hkk : k ^ 2 ≤ ρ ^ 2 := pow_le_pow_left₀ hk0 hkρ 2
@@ -176,8 +193,9 @@ theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ :
         exact mul_le_of_le_one_left hρ0.le (by linarith)
       linarith
     have hQ0 : 0 ≤ nsq γ - nsq (Zm *ᵥ γ) := le_trans (mul_nonneg hρ2 (nsq_nonneg γ)) hQge
-    have hup : (nsq γ - nsq (Zm *ᵥ γ)) * (1 - ρ ^ 2) ≤
-        (Real.sqrt (nsq (mjpa X w)) + ρ * Real.sqrt (nsq (mjpb X w))) ^ 2 := by
+    have hup
+        : (nsq γ - nsq (Zm *ᵥ γ)) * (1 - ρ ^ 2)
+          ≤ (Real.sqrt (nsq (mjpa X w)) + ρ * Real.sqrt (nsq (mjpb X w))) ^ 2 := by
       set s := Real.sqrt (nsq (mjpa X w)) + ρ * Real.sqrt (nsq (mjpb X w)) with hs
       set Q := nsq γ - nsq (Zm *ᵥ γ) with hQ
       rcases eq_or_lt_of_le hQ0 with hq | hq
@@ -186,8 +204,9 @@ theorem mj_bounds {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ :
       · have hsq : Q ^ 2 ≤ (s * Real.sqrt (nsq γ)) ^ 2 := pow_le_pow_left₀ hQ0 hQle 2
         rw [mul_pow, hG2] at hsq
         nlinarith [mul_le_mul_of_nonneg_left hQge (sq_nonneg s), mul_le_mul_of_nonneg_right hsq hρ2]
-    have := real_upper (ρ := ρ) (α := Real.sqrt (nsq (mjpa X w))) (β := Real.sqrt (nsq (mjpb X w)))
-      (Q := nsq γ - nsq (Zm *ᵥ γ)) (by linarith) hρ0.le hup
+    have :=
+      real_upper (ρ := ρ) (α := Real.sqrt (nsq (mjpa X w))) (β := Real.sqrt (nsq (mjpb X w)))
+        (Q := nsq γ - nsq (Zm *ᵥ γ)) (by linarith) hρ0.le hup
     rwa [Real.sq_sqrt (nsq_nonneg _), Real.sq_sqrt (nsq_nonneg _)] at this
 
 end

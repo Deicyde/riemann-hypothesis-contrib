@@ -13,16 +13,19 @@ namespace GlobalTheory.CompanionTheory.BZPhiPhi
 
 variable (k : Type) [Field k]
 
-def rowQ (n : ℕ) (g : Mir k (n + 1)) : Fin (n + 1) → k :=
-  fun j => ((g : GL (Fin (n + 2)) k) : Matrix (Fin (n + 2)) (Fin (n + 2)) k) (Fin.castSucc (Fin.last n)) (Fin.castSucc j)
+def rowQ (n : ℕ) (g : Mir k (n + 1)) : Fin (n + 1) → k := fun j =>
+  ((g : GL (Fin (n + 2)) k) : Matrix (Fin (n + 2)) (Fin (n + 2)) k) (Fin.castSucc (Fin.last n))
+    (Fin.castSucc j)
 
 def unipM (n : ℕ) : Multiplicative (Fin (n + 1) → k) →* Mir k (n + 1) :=
   (unip k (n + 1)).codRestrict (Mir k (n + 1)) (fun v => MirU_le_Mir k (n + 1) ⟨v, rfl⟩)
 
-theorem unipM_val (n : ℕ) (v : Multiplicative (Fin (n + 1) → k)) :
-    ((unipM k n v : Mir k (n + 1)) : GL (Fin (n + 2)) k) = unip k (n + 1) v := rfl
+theorem unipM_val (n : ℕ) (v : Multiplicative (Fin (n + 1) → k))
+    : ((unipM k n v : Mir k (n + 1)) : GL (Fin (n + 2)) k) = unip k (n + 1) v :=
+  rfl
 
-theorem unipM_mem_MirUin (n : ℕ) (v : Multiplicative (Fin (n + 1) → k)) : unipM k n v ∈ MirUin k (n + 1) := by
+theorem unipM_mem_MirUin (n : ℕ) (v : Multiplicative (Fin (n + 1) → k))
+    : unipM k n v ∈ MirUin k (n + 1) := by
   rw [GlobalTheory.BZMir.MirUin, Subgroup.mem_subgroupOf, GlobalTheory.BZMir.MirU]
   exact ⟨v, rfl⟩
 
@@ -37,7 +40,8 @@ theorem rowQ_one (n : ℕ) : rowQ k n 1 = Pi.single (Fin.last n) 1 := by
   by_cases h : j = Fin.last n
   · subst h
     simp [GlobalTheory.CompanionTheory.BZPhiPhi.rowQ]
-  · simp [GlobalTheory.CompanionTheory.BZPhiPhi.rowQ, Matrix.one_apply, Pi.single_apply, h, Ne.symm h]
+  · simp [GlobalTheory.CompanionTheory.BZPhiPhi.rowQ, Matrix.one_apply, Pi.single_apply, h,
+      Ne.symm h]
 
 end GlobalTheory.CompanionTheory.BZPhiPhi
 
@@ -47,15 +51,16 @@ section Top
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem continuous_matMir (n : ℕ) :
-    Continuous fun g : Mir k (n + 1) => ((g : GL (Fin (n + 2)) k) : Matrix (Fin (n + 2)) (Fin (n + 2)) k) :=
+theorem continuous_matMir (n : ℕ)
+    : Continuous fun g : Mir k (n + 1) =>
+      ((g : GL (Fin (n + 2)) k) : Matrix (Fin (n + 2)) (Fin (n + 2)) k) :=
   Units.continuous_val.comp continuous_subtype_val
 
 theorem continuous_rowQ (n : ℕ) : Continuous (rowQ k n) :=
   continuous_pi fun j => (continuous_apply _).comp ((continuous_apply _).comp (continuous_matMir n))
 
-theorem continuous_unipM (n : ℕ) :
-    Continuous fun v : Fin (n + 1) → k => unipM k n (Multiplicative.ofAdd v) := by
+theorem continuous_unipM (n : ℕ)
+    : Continuous fun v : Fin (n + 1) → k => unipM k n (Multiplicative.ofAdd v) := by
   have hcol : Continuous fun v : Fin (n + 1) → k => GlobalTheory.BZMir.colMat k (n + 1) v := by
     refine continuous_matrix fun i j => ?_
     unfold GlobalTheory.BZMir.colMat

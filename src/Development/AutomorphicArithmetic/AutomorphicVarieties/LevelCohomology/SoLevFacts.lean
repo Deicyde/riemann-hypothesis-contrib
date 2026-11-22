@@ -6,18 +6,27 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
 
-private theorem finite_quot {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Finite (ResidueField O)] (b : O) (hb : b ≠ 0) : Finite (O ⧸ Ideal.span {b}) := by
+private theorem finite_quot
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Finite (ResidueField O)]
+    (b : O) (hb : b ≠ 0)
+    : Finite (O ⧸ Ideal.span {b}) := by
   have hfl := isFiniteLength_quotient_span_singleton O (mem_nonZeroDivisors_of_ne_zero hb)
   haveI : IsArtinianRing (O ⧸ Ideal.span {b}) :=
     isArtinian_of_tower O (isFiniteLength_iff_isNoetherian_isArtinian.mp hfl).2
   exact IsLocalRing.finite_quotient_iff.mpr
     (IsLocalRing.exists_maximalIdeal_pow_le_of_isArtinianRing_quotient _)
 
-theorem UpperTheory.V.X.So.levFacts :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (a : O), a ≠ 0 → ∀ (M : Type) [AddCommGroup M] [Module O M], Nonempty (M ≃ₗ[O] (O ⧸ Ideal.span {a})) → Finite M ∧ (∃ r : ℕ, 0 < r ∧ ∀ m : M, (l ^ r) • m = 0) ∧ ∀ d : O, d ≠ 0 → Nat.card {m : M // d • m = 0} ≤ Nat.card (O ⧸ Ideal.span {d}) := by
+theorem UpperTheory.V.X.So.levFacts
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (a : O),
+      a ≠ 0
+        → ∀ (M : Type) [AddCommGroup M] [Module O M],
+          Nonempty (M ≃ₗ[O] (O ⧸ Ideal.span {a}))
+            → Finite M ∧ (∃ r : ℕ, 0 < r ∧ ∀ m : M, (l ^ r) • m = 0)
+              ∧ ∀ d : O, d ≠ 0 → Nat.card {m : M // d • m = 0} ≤ Nat.card (O ⧸ Ideal.span {d}) := by
   intro l _ O _ _ _ _ _ a ha M _ _ hne
   obtain ⟨e⟩ := hne
   haveI : CharZero O := charZero_of_injective_algebraMap (UpperTheory.V.Base.dvrFacts l O).1
@@ -34,8 +43,8 @@ theorem UpperTheory.V.X.So.levFacts :
     intro m
     obtain ⟨y, hy⟩ := Ideal.Quotient.mk_surjective (e m)
     refine ⟨y, e.injective ?_⟩
-    rw [map_smul, LinearEquiv.apply_symm_apply, ← hy, Algebra.smul_def, Ideal.Quotient.algebraMap_eq,
-      ← map_mul, mul_one]
+    rw [map_smul, LinearEquiv.apply_symm_apply, ← hy, Algebra.smul_def,
+      Ideal.Quotient.algebraMap_eq, ← map_mul, mul_one]
   refine ⟨inferInstance, ?_, ?_⟩
   · obtain ⟨n, hn⟩ := (IsLocalRing.finite_quotient_iff (R := O)).mp hQa
     refine ⟨n + 1, Nat.succ_pos n, fun m => ?_⟩
@@ -49,8 +58,10 @@ theorem UpperTheory.V.X.So.levFacts :
     let φ : M →ₗ[O] M := LinearMap.lsmul O M d
     have hker : Nat.card {m : M // d • m = 0} = Nat.card (LinearMap.ker φ) :=
       Nat.card_congr (Equiv.subtypeEquivRight (fun m => by simp [φ]))
-    have h1 := AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup (LinearMap.ker φ).toAddSubgroup
-    have h2 := AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup (LinearMap.range φ).toAddSubgroup
+    have h1 :=
+      AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup (LinearMap.ker φ).toAddSubgroup
+    have h2 :=
+      AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup (LinearMap.range φ).toAddSubgroup
     change Nat.card M = Nat.card (M ⧸ LinearMap.ker φ) * Nat.card (LinearMap.ker φ) at h1
     change Nat.card M = Nat.card (M ⧸ LinearMap.range φ) * Nat.card (LinearMap.range φ) at h2
     rw [Nat.card_congr φ.quotKerEquivRange.toEquiv] at h1

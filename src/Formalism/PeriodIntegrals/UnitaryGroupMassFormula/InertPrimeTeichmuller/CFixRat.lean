@@ -29,8 +29,9 @@ theorem c_invol (hK : Module.finrank ℚ K = 2) (c : K →+* K) (x : K) : c (c x
   rw [pow_two, AlgEquiv.mul_apply, AlgEquiv.one_apply] at this
   exact this
 
-theorem c_fix_rat (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x ≠ x) {y : K}
-    (hy : c y = y) : ∃ r : ℚ, (r : K) = y := by
+theorem c_fix_rat
+    (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x ≠ x) {y : K} (hy : c y = y)
+    : ∃ r : ℚ, (r : K) = y := by
   let D : K →ₗ[ℚ] K := c.toRatAlgHom.toLinearMap - LinearMap.id
   have hD : ∀ z, D z = c z - z := fun z => rfl
   have hS : LinearMap.ker D ≠ ⊤ := by
@@ -39,8 +40,7 @@ theorem c_fix_rat (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c
     have hm : x ∈ LinearMap.ker D := h ▸ Submodule.mem_top
     rw [LinearMap.mem_ker, hD, sub_eq_zero] at hm
     exact hx hm
-  have hlt : Module.finrank ℚ (LinearMap.ker D) < 2 :=
-    hK ▸ Submodule.finrank_lt hS
+  have hlt : Module.finrank ℚ (LinearMap.ker D) < 2 := hK ▸ Submodule.finrank_lt hS
   have hle : (ℚ ∙ (1 : K)) ≤ LinearMap.ker D := by
     rw [Submodule.span_singleton_le_iff_mem, LinearMap.mem_ker, hD, map_one, sub_self]
   have heq : (ℚ ∙ (1 : K)) = LinearMap.ker D :=
@@ -50,16 +50,15 @@ theorem c_fix_rat (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c
   obtain ⟨r, hr⟩ := hyS
   exact ⟨r, by rw [← hr, Rat.smul_def, mul_one]⟩
 
-theorem add_c_int (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x ≠ x) (a : 𝓞 K) :
-    ∃ n : ℤ, a + RingOfIntegers.mapRingHom c a = (n : 𝓞 K) := by
+theorem add_c_int (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x ≠ x) (a : 𝓞 K)
+    : ∃ n : ℤ, a + RingOfIntegers.mapRingHom c a = (n : 𝓞 K) := by
   have hfix : c ((a : K) + c a) = (a : K) + c a := by rw [map_add (f := _), c_invol hK c, add_comm]
   obtain ⟨r, hr⟩ := c_fix_rat hK c hc hfix
   have hint : IsIntegral ℤ (algebraMap ℚ K r) := by
     rw [eq_ratCast, hr]
     have := (a + RingOfIntegers.mapRingHom c a).isIntegral_coe
     simpa [RingOfIntegers.mapRingHom_apply] using this
-  rw [isIntegral_algebraMap_iff ,
-    IsIntegrallyClosed.isIntegral_iff] at hint
+  rw [isIntegral_algebraMap_iff, IsIntegrallyClosed.isIntegral_iff] at hint
   obtain ⟨n, hn⟩ := hint
   refine ⟨n, RingOfIntegers.ext ?_⟩
   have h2 : ((a + RingOfIntegers.mapRingHom c a : 𝓞 K) : K) = (a : K) + c a := by

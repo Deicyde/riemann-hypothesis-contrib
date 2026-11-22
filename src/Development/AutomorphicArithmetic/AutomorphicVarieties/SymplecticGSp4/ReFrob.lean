@@ -7,10 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem re_two {Γ M : Type} [Group Γ] [Monoid M] (a b : Γ →* M) :
-    ∃ g, (∃ x, a x ≠ 1) → (∃ y, b y ≠ 1) → a g ≠ 1 ∧ b g ≠ 1 := by
+private theorem re_two {Γ M : Type} [Group Γ] [Monoid M] (a b : Γ →* M)
+    : ∃ g, (∃ x, a x ≠ 1) → (∃ y, b y ≠ 1) → a g ≠ 1 ∧ b g ≠ 1 := by
   by_cases h : (∃ x, a x ≠ 1) ∧ ∃ y, b y ≠ 1
   · obtain ⟨⟨x, hx⟩, y, hy⟩ := h
     by_cases h1 : b x = 1
@@ -40,21 +42,25 @@ variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
 
 private theorem re_cc : ∃ σ : G ℚ Ω, IsCC σ := by
   obtain ⟨σ, h⟩ := exists_isConjOm (E := ℚ) (Ω := Ω)
-  refine ⟨AlgEquiv.ofRingEquiv (f := σ) fun x => by rw [eq_ratCast (algebraMap ℚ Ω), map_ratCast], ?_⟩
+  refine
+    ⟨AlgEquiv.ofRingEquiv (f := σ) fun x => by rw [eq_ratCast (algebraMap ℚ Ω), map_ratCast], ?_⟩
   exact h
 
-private theorem re_mul {A : ValuationSubring Ω} {q : ℕ} {t g : G ℚ Ω} (ht : t ∈ Ine (F := ℚ) A)
-    (hg : IsFrob (F := ℚ) A q g) : IsFrob (F := ℚ) A q (t * g) := by
+private theorem re_mul
+    {A : ValuationSubring Ω} {q : ℕ} {t g : G ℚ Ω}
+    (ht : t ∈ Ine (F := ℚ) A) (hg : IsFrob (F := ℚ) A q g)
+    : IsFrob (F := ℚ) A q (t * g) := by
   refine ⟨mul_mem ht.1 hg.1, fun x hx => ?_⟩
   have hy : A.valuation (g x) ≤ 1 :=
-    (A.valuation_le_one_iff _).2 ((apply_mem_iff_of_mem_Dec hg.1 x).2 ((A.valuation_le_one_iff _).1 hx))
+    (A.valuation_le_one_iff _).2
+      ((apply_mem_iff_of_mem_Dec hg.1 x).2 ((A.valuation_le_one_iff _).1 hx))
   have h3 := Valuation.map_add_lt A.valuation (ht.2 _ hy) (hg.2 x hx)
   rw [sub_add_sub_cancel] at h3
   exact h3
 
-private theorem re_frob (l : ℕ) [hl : Fact l.Prime] (v : ℕ) :
-    ∃ (A : ValuationSubring Ω) (σ : G ℚ Ω), v.Prime → A.valuation (v : Ω) < 1 ∧ IsFrob (F := ℚ) A v σ ∧
-      (v = l → cycZ ℚ Ω l σ = 1) := by
+private theorem re_frob (l : ℕ) [hl : Fact l.Prime] (v : ℕ)
+    : ∃ (A : ValuationSubring Ω) (σ : G ℚ Ω),
+      v.Prime → A.valuation (v : Ω) < 1 ∧ IsFrob (F := ℚ) A v σ ∧ (v = l → cycZ ℚ Ω l σ = 1) := by
   by_cases hv : v.Prime
   · obtain ⟨A, hA⟩ := (ML.placeBasic Ω).1 v hv
     obtain ⟨g, hg⟩ := (ML.placeBasic Ω).2.1 A v hv hA
@@ -67,8 +73,21 @@ private theorem re_frob (l : ℕ) [hl : Fact l.Prime] (v : ℕ) :
 
 end
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.rawEx :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}, l ≠ 2 → ∀ (S : Finset ℕ) (e : ℕ) (ψ ξ : G ℚ Ω →* c.Oˣ), IsOpen (ψ.ker : Set (G ℚ Ω)) → ∃ D : Raw Ω c, D.S = S ∧ D.e = e ∧ D.ψ = ψ ∧ D.ξ = ξ ∧ (∀ p : ℕ, p.Prime → (D.pl p).valuation (p : Ω) < 1) ∧ IsCC D.cc ∧ D.om ^ (l - 1) = 1 ∧ (∀ g, Raw.bar D.om g = Raw.bar (chiO ℚ Ω l c.O) g) ∧ (∀ v : ℕ, v.Prime → IsFrob (D.pl v) v (D.sg v)) ∧ cycZ ℚ Ω l (D.sg l) = 1 ∧ Filter.Tendsto (fun n : ℕ => D.sg l ^ l ^ n.factorial) Filter.atTop (nhds D.ph) ∧ ((∃ g, Raw.bar D.al g ≠ 1) → (∃ g, Raw.bar D.Psi g ≠ 1) → Raw.bar D.al D.g0 ≠ 1 ∧ Raw.bar D.Psi D.g0 ≠ 1) ∧ (D.s0 : G ℚ Ω) ∈ D.Ip l ⊓ D.ψ.ker ⊓ D.om.ker ∧ ¬ IsOfFinOrder (cycZ ℚ Ω l D.s0) := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.rawEx
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l},
+      l ≠ 2
+        → ∀ (S : Finset ℕ) (e : ℕ) (ψ ξ : G ℚ Ω →* c.Oˣ),
+          IsOpen (ψ.ker : Set (G ℚ Ω))
+            → ∃ D : Raw Ω c,
+              D.S = S ∧ D.e = e ∧ D.ψ = ψ ∧ D.ξ = ξ
+                ∧ (∀ p : ℕ, p.Prime → (D.pl p).valuation (p : Ω) < 1) ∧ IsCC D.cc
+                ∧ D.om ^ (l - 1) = 1 ∧ (∀ g, Raw.bar D.om g = Raw.bar (chiO ℚ Ω l c.O) g)
+                ∧ (∀ v : ℕ, v.Prime → IsFrob (D.pl v) v (D.sg v)) ∧ cycZ ℚ Ω l (D.sg l) = 1
+                ∧ Filter.Tendsto (fun n : ℕ => D.sg l ^ l ^ n.factorial) Filter.atTop (nhds D.ph)
+                ∧ ((∃ g, Raw.bar D.al g ≠ 1) → (∃ g, Raw.bar D.Psi g ≠ 1)
+                  → Raw.bar D.al D.g0 ≠ 1 ∧ Raw.bar D.Psi D.g0 ≠ 1)
+                ∧ (D.s0 : G ℚ Ω) ∈ D.Ip l ⊓ D.ψ.ker ⊓ D.om.ker
+                ∧ ¬ IsOfFinOrder (cycZ ℚ Ω l D.s0) := by
   intro Ω _ _ _ l hl c _ S e ψ ξ hψ
   have : IsGalois ℚ Ω := IsAlgClosure.isGalois ℚ Ω
   have hl2 : 2 ≤ l := hl.out.two_le
@@ -83,8 +102,23 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.rawEx :
   have : Finite (G ℚ Ω ⧸ ψ.ker) := Subgroup.quotient_finite_of_isOpen _ hψ
   have hi : ψ.ker.index ≠ 0 := Subgroup.index_ne_zero_of_finite
   have hI : s ^ (ψ.ker.index * (l - 1)) ∈ Ine (F := ℚ) (pl l) := pow_mem hs _
-  refine ⟨⟨S, e, ψ, ξ, om, cc, pl, sg, ph, g0, ⟨_, hI.1⟩⟩, rfl, rfl, rfl, rfl, fun p hp => (h p hp).1, hcc, hom.1,
-    fun g => Ideal.Quotient.eq.2 (hom.2 g), fun v hv => (h v hv).2.1, (h l hl.out).2.2 rfl, hph, hg0, ⟨⟨hI, ?_⟩, ?_⟩, ?_⟩
+  refine ⟨
+    ⟨S, e, ψ, ξ, om, cc, pl, sg, ph, g0, ⟨_, hI.1⟩⟩,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    fun p hp => (h p hp).1,
+    hcc,
+    hom.1,
+    fun g => Ideal.Quotient.eq.2 (hom.2 g),
+    fun v hv => (h v hv).2.1,
+    (h l hl.out).2.2 rfl,
+    hph,
+    hg0,
+    ⟨⟨hI, ?_⟩, ?_⟩,
+    ?_
+  ⟩
   · show s ^ (ψ.ker.index * (l - 1)) ∈ ψ.ker
     rw [pow_mul]
     exact pow_mem (Subgroup.pow_index_mem _ s) _

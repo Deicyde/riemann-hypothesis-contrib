@@ -10,12 +10,13 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.LocalLatticeBases
 
-open Formalism.BasicNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.LocB NumberField Classical
+open Formalism.BasicNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.LocB NumberField Classical
 
 variable (D : D7) (u : D.what₂.Word)
 
-theorem bwB_clsCrd_lat (i : ℕ) (hi : i ≤ D.R.m) (c : (D.mem u).C.cls i) :
-    Submodule.IsLattice D.host.E (clsCrd D u i hi c) := by
+theorem bwB_clsCrd_lat (i : ℕ) (hi : i ≤ D.R.m) (c : (D.mem u).C.cls i)
+    : Submodule.IsLattice D.host.E (clsCrd D u i hi c) := by
   unfold clsCrd
   exact Submodule.IsLattice.of_fg D.host.E ((D.clsLat_lat u i c).fg.map _)
 
@@ -28,8 +29,10 @@ theorem bwB_gramN_det (i : ℕ) (hi : i ≤ D.R.m) : IsUnit (gramN D i hi).det :
   have hfa : ∀ a, (D.sp.X i).hT ((D.sp.X i).frame a) (∑ b, v b • (D.sp.X i).frame b) = 0 := by
     intro a
     have h := congrFun hv a
-    have e : Matrix.mulVec (D.sp.X i).gram v a =
-        ∑ b, (D.sp.X i).hT ((D.sp.X i).frame a) ((D.sp.X i).frame b) * v b := rfl
+    have e
+        : Matrix.mulVec (D.sp.X i).gram v a
+          = ∑ b, (D.sp.X i).hT ((D.sp.X i).frame a) ((D.sp.X i).frame b) * v b :=
+      rfl
     rw [e] at h
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_smul, smul_eq_mul]

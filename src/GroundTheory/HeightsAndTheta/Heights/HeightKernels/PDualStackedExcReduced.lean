@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4 MvPolynomial NumberField
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4
+  MvPolynomial NumberField
 
 noncomputable section
 
@@ -19,8 +20,9 @@ namespace StackedExceptionalReduced
 
 variable {K : Type} [Field K] [NumberField K] {i : ℕ} {F' : HermLattice K i} {T : Type} [Fintype T]
 
-theorem mul_mem_of_mem_base [DecidableEq T] (b' : Module.Basis T ℤ (dualLattice F')) (a : T → ℤ) (u : T) :
-    ∀ x ∈ stackedBase b' a,
+theorem mul_mem_of_mem_base
+    [DecidableEq T] (b' : Module.Basis T ℤ (dualLattice F')) (a : T → ℤ) (u : T)
+    : ∀ x ∈ stackedBase b' a,
       graphSecond u * x ∈ stackedGraph b' a ⊔ Ideal.span {C (a u) * graphFirst u} := by
   intro x hx
   obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
@@ -36,26 +38,32 @@ theorem mul_mem_of_mem_base [DecidableEq T] (b' : Module.Basis T ℤ (dualLattic
   | add x y _ _ hx hy => rw [mul_add]; exact Ideal.add_mem _ hx hy
   | smul r x _ hx => rw [smul_eq_mul, mul_left_comm]; exact Ideal.mul_mem_left _ r hx
 
-theorem graphFirst_not_mem {k : Type} [Field k] {n : ℕ} {α : T → k} {M : T → Fin n → k} {t : T}
-    (h : α t ≠ 0) : graphFirst t ∉ linPrime α M := by
+theorem graphFirst_not_mem
+    {k : Type} [Field k] {n : ℕ} {α : T → k} {M : T → Fin n → k} {t : T} (h : α t ≠ 0)
+    : graphFirst t ∉ linPrime α M := by
   rw [linPrime, RingHom.mem_ker, LinPrimeExample.linPointMap_first]
   exact mul_ne_zero (by rwa [Ne, C_eq_zero]) (X_ne_zero _)
 
-theorem graphSecond_not_mem {k : Type} [Field k] {m : ℕ} {α : T → k} {M : T → Fin (m + 1) → k} {t : T}
-    (h : M t 0 ≠ 0) : graphSecond t ∉ linPrime α M := by
+theorem graphSecond_not_mem
+    {k : Type} [Field k] {m : ℕ} {α : T → k} {M : T → Fin (m + 1) → k} {t : T} (h : M t 0 ≠ 0)
+    : graphSecond t ∉ linPrime α M := by
   rw [linPrime, RingHom.mem_ker, LinPrimeExample.linPointMap_second]
   intro h0
   apply h
-  have h1 := congrArg (MvPolynomial.eval fun o : Option (Fin (m + 1)) =>
-    o.elim (0 : k) fun j => if j = 0 then 1 else 0) h0
+  have h1 :=
+    congrArg
+      (MvPolynomial.eval fun o : Option (Fin (m + 1)) =>
+        o.elim (0 : k) fun j => if j = 0 then 1 else 0)
+      h0
   simpa [Finset.sum_ite_eq'] using h1
 
 end StackedExceptionalReduced
 
-
 open StackedExceptionalCycle StackedGraphHorizontal StackedExceptionalReduced in
-theorem DualStackedExcReduced.proof (hC : DualStackedExcCoords.Statement) (hB : DualStackedExcBase.Statement)
-    (hX : DualStackedExcChart.Statement) : DualStackedExcReduced.Statement := by
+theorem DualStackedExcReduced.proof
+    (hC : DualStackedExcCoords.Statement) (hB : DualStackedExcBase.Statement)
+    (hX : DualStackedExcChart.Statement)
+    : DualStackedExcReduced.Statement := by
   intro K _ _ i F F' T _ _ b b' a hi hlt hcov hab
   obtain ⟨k, _, ρ, π, y₀, m, g, α, M, hd⟩ := hC K i F F' T b b' a hi hlt hcov hab
   have hbase := hB K i F F' T b b' a hi hlt hcov hab k ρ π y₀ m g α M hd
@@ -71,8 +79,9 @@ theorem DualStackedExcReduced.proof (hC : DualStackedExcCoords.Statement) (hB : 
   have hsub : ∀ w : T, stackedGraph b' a ⊔ Ideal.span {C (a w) * graphFirst w} ≤ stackedBase b' a :=
     fun w => sup_le le_sup_left ((Ideal.span_singleton_le_iff_mem _).mpr (first_mem_base b' a w))
 
-  have hkey : ∀ W : Ideal (MRing (stackedBlocks T)), W.IsPrime → IsRelevant W → stackedBase b' a ≤ W →
-      linPrime α M ≤ W := by
+  have hkey
+      : ∀ W : Ideal (MRing (stackedBlocks T)),
+        W.IsPrime → IsRelevant W → stackedBase b' a ≤ W → linPrime α M ≤ W := by
     intro W hW hWr hBW e he
     obtain ⟨v', hv'⟩ : ∃ v' : T, graphFirst v' ∉ W := hWr (Sum.inl ())
     obtain ⟨u', hu'⟩ : ∃ u' : T, graphSecond u' ∉ W := hWr (Sum.inr ())

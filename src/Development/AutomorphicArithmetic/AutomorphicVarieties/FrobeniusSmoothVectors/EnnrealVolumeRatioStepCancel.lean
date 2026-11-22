@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem ennreal_volume_ratio_step_cancel (a h : ℕ) (x : WithBot ℕ∞) (H : ((a + h : ℕ) : WithBot ℕ∞) ≤ x + h) :
-    (a : WithBot ℕ∞) ≤ x := by
+private theorem ennreal_volume_ratio_step_cancel
+    (a h : ℕ) (x : WithBot ℕ∞) (H : ((a + h : ℕ) : WithBot ℕ∞) ≤ x + h)
+    : (a : WithBot ℕ∞) ≤ x := by
   induction x using WithBot.recBotCoe with
   | bot =>
     exfalso
@@ -19,14 +20,20 @@ private theorem ennreal_volume_ratio_step_cancel (a h : ℕ) (x : WithBot ℕ∞
     induction y using ENat.recTopCoe with
     | top => exact le_top
     | coe n =>
-      have h2 : ((a + h : ℕ) : WithBot ℕ∞) ≤ ((n + h : ℕ) : WithBot ℕ∞) := by
-        simpa using H
+      have h2 : ((a + h : ℕ) : WithBot ℕ∞) ≤ ((n + h : ℕ) : WithBot ℕ∞) := by simpa using H
       have h3 : a + h ≤ n + h := by exact_mod_cast h2
       have h4 : a ≤ n := by omega
       exact_mod_cast h4
 
-theorem UpperTheory.V.Fr.c1ch :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R] (h D : ℕ) (f : Fin h → R), (nilradical R).IsPrime → (∃ (O : Type) (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O) (_ : IsAdicComplete (maximalIdeal O) O) (_ : Algebra O R), IsCO O R) → (∀ i, f i ∈ maximalIdeal R) → ((D + 1 + h : ℕ) : WithBot ℕ∞) ≤ ringKrullDim R → Chained (Ideal.span (Set.range f)) D := by
+theorem UpperTheory.V.Fr.c1ch
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+        [IsAdicComplete (maximalIdeal R) R] (h D : ℕ) (f : Fin h → R),
+      (nilradical R).IsPrime
+        → (∃ (O : Type) (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O)
+            (_ : IsAdicComplete (maximalIdeal O) O) (_ : Algebra O R),
+          IsCO O R)
+        → (∀ i, f i ∈ maximalIdeal R) → ((D + 1 + h : ℕ) : WithBot ℕ∞) ≤ ringKrullDim R
+        → Chained (Ideal.span (Set.range f)) D := by
   intro R _ _ _ _ h D f hnil hO hf hdim
   obtain ⟨O, _, _, _, _, _, hCO⟩ := hO
   haveI : IrreducibleSpace (PrimeSpectrum R) :=

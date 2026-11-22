@@ -10,9 +10,10 @@ namespace MassDataIdxEmb
 
 open Metric
 
-theorem quad_root {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    (c0 c1 : K) (h1 : ‖c1‖ = 1) (h0 : ‖c0‖ < 1) :
-    ∃ x : K, x * x + c1 * x + c0 = 0 := by
+theorem quad_root
+    {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+    (c0 c1 : K) (h1 : ‖c1‖ = 1) (h0 : ‖c0‖ < 1)
+    : ∃ x : K, x * x + c1 * x + c0 = 0 := by
   have hnorm : ∀ x : K, ‖x‖ ≤ ‖c0‖ → ‖c1 + x‖ = 1 := by
     intro x hx
     have hne : ‖c1‖ ≠ ‖x‖ := by rw [h1]; exact (lt_of_le_of_lt hx h0).ne'
@@ -31,8 +32,10 @@ theorem quad_root {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteSpa
   haveI : CompleteSpace (closedBall (0 : K) ‖c0‖) := IsClosed.completeSpace_coe
   haveI : Nonempty (closedBall (0 : K) ‖c0‖) := ⟨⟨0, mem_closedBall_self (norm_nonneg _)⟩⟩
   have hcon : ContractingWith ⟨‖c0‖, norm_nonneg _⟩ (hmaps.restrict f _ _) := by
-    refine ⟨NNReal.coe_lt_coe.1 (by rw [NNReal.coe_one]; exact h0),
-      LipschitzWith.of_dist_le_mul fun a b => ?_⟩
+    refine ⟨
+      NNReal.coe_lt_coe.1 (by rw [NNReal.coe_one]; exact h0),
+      LipschitzWith.of_dist_le_mul fun a b => ?_
+    ⟩
     have ha := mem_closedBall_zero_iff.1 a.2
     have hb := mem_closedBall_zero_iff.1 b.2
     rw [Subtype.dist_eq, Subtype.dist_eq, dist_eq_norm, dist_eq_norm]

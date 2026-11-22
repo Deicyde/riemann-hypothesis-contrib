@@ -8,10 +8,35 @@ namespace GlobalTheory
 
 open Polynomial
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.isIntegral_mul_of_bounded_at_points :
-    ∀ (O O' : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing O'] [IsDomain O'] [IsDiscreteValuationRing O'] [IsAdicComplete (IsLocalRing.maximalIdeal O') O'] [CharZero O'] [Algebra O O'] [IsLocalHom (algebraMap O O')], Function.Injective (algebraMap O O') → (∀ (B : Type) [CommRing B] [IsDomain B] [Algebra O B] [Algebra.FiniteType O B], Function.Injective (algebraMap O B) → ∀ I : Ideal B, I ≠ ⊤ → Ideal.map (algebraMap O B) (IsLocalRing.maximalIdeal O) ≤ I → ∀ e : B, e ≠ 0 → ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V) (_ : Algebra O' V) (_ : Module.Finite O' V) (φ : B →+* V), φ.comp (algebraMap O B) = (algebraMap O' V).comp (algebraMap O O') ∧ φ e ≠ 0 ∧ ∀ x ∈ I, φ x ∈ IsLocalRing.maximalIdeal V) → ∀ (A Ω : Type) [CommRing A] [IsDomain A] [Algebra O A] [Algebra.FiniteType O A] [Field Ω] [Algebra A Ω] [IsFractionRing A Ω], Function.Injective (algebraMap O A) → ∀ (e : A), e ≠ 0 → ∀ f : Ω, (∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Algebra O' V] [Module.Finite O' V] (φ : A →+* V), φ.comp (algebraMap O A) = (algebraMap O' V).comp (algebraMap O O') → φ e ≠ 0 → ∀ a b : A, f * algebraMap A Ω b = algebraMap A Ω a → φ b ≠ 0 → φ b ∣ φ a) → ∃ s : A, s - 1 ∈ Ideal.map (algebraMap O A) (IsLocalRing.maximalIdeal O) ∧ IsIntegral A (algebraMap A Ω s * f) := by
+theorem _root_.GlobalTheory.isIntegral_mul_of_bounded_at_points
+    : ∀ (O O' : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing O']
+        [IsDomain O'] [IsDiscreteValuationRing O'] [IsAdicComplete (IsLocalRing.maximalIdeal O') O']
+        [CharZero O'] [Algebra O O'] [IsLocalHom (algebraMap O O')],
+      Function.Injective (algebraMap O O')
+        → (∀ (B : Type) [CommRing B] [IsDomain B] [Algebra O B] [Algebra.FiniteType O B],
+          Function.Injective (algebraMap O B)
+            → ∀ I : Ideal B,
+              I ≠ ⊤ → Ideal.map (algebraMap O B) (IsLocalRing.maximalIdeal O) ≤ I
+                → ∀ e : B,
+                  e ≠ 0
+                    → ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V)
+                        (_ : Algebra O' V) (_ : Module.Finite O' V) (φ : B →+* V),
+                      φ.comp (algebraMap O B) = (algebraMap O' V).comp (algebraMap O O') ∧ φ e ≠ 0
+                        ∧ ∀ x ∈ I, φ x ∈ IsLocalRing.maximalIdeal V)
+        → ∀ (A Ω : Type) [CommRing A] [IsDomain A] [Algebra O A] [Algebra.FiniteType O A] [Field Ω]
+            [Algebra A Ω] [IsFractionRing A Ω],
+          Function.Injective (algebraMap O A)
+            → ∀ (e : A),
+              e ≠ 0
+                → ∀ f : Ω,
+                  (∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Algebra O' V]
+                        [Module.Finite O' V] (φ : A →+* V),
+                      φ.comp (algebraMap O A) = (algebraMap O' V).comp (algebraMap O O') → φ e ≠ 0
+                        → ∀ a b : A, f * algebraMap A Ω b = algebraMap A Ω a → φ b ≠ 0 → φ b ∣ φ a)
+                    → ∃ s : A,
+                      s - 1 ∈ Ideal.map (algebraMap O A) (IsLocalRing.maximalIdeal O)
+                        ∧ IsIntegral A (algebraMap A Ω s * f) := by
   intro O O' _ _ _ _ _ _ _ _ _ _ _ hpts A Ω _ _ _ _ _ _ _ hOA e he f hf
   by_cases hf0 : f = 0
   · exact ⟨1, by simp, by simp [hf0, isIntegral_zero]⟩
@@ -22,8 +47,7 @@ theorem _root_.GlobalTheory.isIntegral_mul_of_bounded_at_points :
   have hfc : f * algebraMap A Ω c = algebraMap A Ω d := by rw [← hdc, div_mul_cancel₀ _ hcΩ]
   set g : Ω := f⁻¹ with hg
   have hgf : g * f = 1 := inv_mul_cancel₀ hf0
-  have hgd : g * algebraMap A Ω d = algebraMap A Ω c := by
-    rw [← hfc, ← mul_assoc, hgf, one_mul]
+  have hgd : g * algebraMap A Ω d = algebraMap A Ω c := by rw [← hfc, ← mul_assoc, hgf, one_mul]
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hπm : π ∈ IsLocalRing.maximalIdeal O := (IsLocalRing.mem_maximalIdeal _).2 hπ.not_isUnit
   let B := Algebra.adjoin A ({g} : Set Ω)
@@ -49,8 +73,7 @@ theorem _root_.GlobalTheory.isIntegral_mul_of_bounded_at_points :
     obtain ⟨V, _, _, _, _, _, φ, hφ, hφe, hφI⟩ := hpts B hOB I hI hmI _ hec
     let ψ : A →+* V := φ.comp (algebraMap A B)
     have hψ : ψ.comp (algebraMap O A) = (algebraMap O' V).comp (algebraMap O O') := hφ
-    have hψec : ψ e * ψ c ≠ 0 := by
-      simpa [ψ, map_mul] using hφe
+    have hψec : ψ e * ψ c ≠ 0 := by simpa [ψ, map_mul] using hφe
     have hψc : ψ c ≠ 0 := right_ne_zero_of_mul hψec
     obtain ⟨t, ht⟩ := hf V ψ hψ (left_ne_zero_of_mul hψec) d c hfc hψc
     have hmem : φ gB ∈ IsLocalRing.maximalIdeal V := hφI gB (Ideal.subset_span (by simp))

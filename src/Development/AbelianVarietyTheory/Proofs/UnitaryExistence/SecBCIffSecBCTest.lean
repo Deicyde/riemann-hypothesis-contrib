@@ -19,28 +19,41 @@ noncomputable section
 
 namespace GlobalTheory.SecFieldCompare
 
-open Formalism.L2.Pj NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.CoefChangeCompare (Natural FromT ValueWD HasBC map_trans evR_spec evR_not evR_test evR_of_map
-  map_cancel hasBC_of exists_testRing_ext)
+open Formalism.L2.Pj NumberField ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.CoefChangeCompare
+  (Natural FromT ValueWD HasBC map_trans evR_spec evR_not evR_test evR_of_map map_cancel hasBC_of
+    exists_testRing_ext)
 open GlobalTheory.IndefiniteRowSideFullHecke.SectionBaseChangeTests (IsBCTest SecBCTest SecBCAll)
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable {Xo : Moduli Dw l} {c c' : Coeff l} (hle : c.F ≤ c'.F)
 
-def homRes {S T : Type} [CommRing S] [Algebra c.F S] [Algebra c'.F S] [CommRing T] [Algebra c.F T]
-    [Algebra c'.F T] (hS : AlgOver c c' hle S) (hT : AlgOver c c' hle T) (ψ : S →ₐ[c'.F] T) : S →ₐ[c.F] T :=
-  { ψ.toRingHom with
-    commutes' := fun a => by
-      show ψ (algebraMap c.F S a) = algebraMap c.F T a
-      rw [← hS a, ψ.commutes, hT a] }
+def homRes
+    {S T : Type}
+    [CommRing S] [Algebra c.F S] [Algebra c'.F S] [CommRing T] [Algebra c.F T] [Algebra c'.F T]
+    (hS : AlgOver c c' hle S) (hT : AlgOver c c' hle T) (ψ : S →ₐ[c'.F] T)
+    : S →ₐ[c.F] T := {
+  ψ.toRingHom with
+  commutes' := fun a => by
+    show ψ (algebraMap c.F S a) = algebraMap c.F T a
+    rw [← hS a, ψ.commutes, hT a]
+}
 
-theorem frMap_res_iff {S T : Type} [CommRing S] [Algebra c.F S] [Algebra c'.F S] [CommRing T] [Algebra c.F T]
-    [Algebra c'.F T] (hS : AlgOver c c' hle S) (hT : AlgOver c c' hle T) (ψ : S →ₐ[c'.F] T)
-    (y : FrPt Xo c' S) (z : FrPt Xo c' T) :
-    FrMap (homRes hle hS hT ψ) (y.res hle hS) (z.res hle hT) ↔ FrMap ψ y z := Iff.rfl
+theorem frMap_res_iff
+    {S T : Type}
+    [CommRing S] [Algebra c.F S] [Algebra c'.F S] [CommRing T] [Algebra c.F T] [Algebra c'.F T]
+    (hS : AlgOver c c' hle S) (hT : AlgOver c c' hle T) (ψ : S →ₐ[c'.F] T) (y : FrPt Xo c' S)
+    (z : FrPt Xo c' T)
+    : FrMap (homRes hle hS hT ψ) (y.res hle hS) (z.res hle hT) ↔ FrMap ψ y z :=
+  Iff.rfl
 
-theorem fromT_of_res (hBC : HasBC Xo c) {S : Type} [CommRing S] [Algebra c.F S] [Algebra c'.F S]
-    (h : AlgOver c c' hle S) (y : FrPt Xo c' S) (hy : FromT (y.res hle h)) : FromT y := by
+theorem fromT_of_res
+    (hBC : HasBC Xo c)
+    {S : Type} [CommRing S] [Algebra c.F S] [Algebra c'.F S]
+    (h : AlgOver c c' hle S) (y : FrPt Xo c' S) (hy : FromT (y.res hle h))
+    : FromT y := by
   obtain ⟨p, φ, y₀, hy₀⟩ := hy
   let : Algebra c.F c'.F := (incF c c' hle).toAlgebra
   obtain ⟨q, α, hα, hlift, -⟩ := exists_testRing_ext (K' := c'.F) p

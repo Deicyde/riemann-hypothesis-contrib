@@ -5,15 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffOf
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
 open scoped Formalism.Per
 
 namespace GlobalTheory
 
-theorem coeff_coeff_pow_eq_of_box :
-    ∀ (R : Type) [CommRing R] (m i n : ℕ) (G H : R⟦X⟧⟦X⟧),
-      (∀ i' ≤ i, ∀ n' ≤ n, coeff n' (coeff i' G) = coeff n' (coeff i' H)) →
-      coeff n (coeff i (G ^ m)) = coeff n (coeff i (H ^ m)) := by
+theorem coeff_coeff_pow_eq_of_box
+    : ∀ (R : Type) [CommRing R] (m i n : ℕ) (G H : R⟦X⟧⟦X⟧),
+      (∀ i' ≤ i, ∀ n' ≤ n, coeff n' (coeff i' G) = coeff n' (coeff i' H))
+        → coeff n (coeff i (G ^ m)) = coeff n (coeff i (H ^ m)) := by
   intro R _ m i n G H h
   induction m generalizing i n with
   | zero => simp

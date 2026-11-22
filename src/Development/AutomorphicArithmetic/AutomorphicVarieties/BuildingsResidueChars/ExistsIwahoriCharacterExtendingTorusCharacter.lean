@@ -7,16 +7,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 open IsLocalRing Matrix UpperTheory.V.Hi
 
-theorem UpperTheory.exists_iwahori_character_extending_torus_character :
-    ∀ (G : Type) [Group G] (I : Iwa G) (B : Type) [CommGroup B] (c : ℕ) (φ : I.T →* B), (∀ t : I.T, (t : G) ∈ I.Tc c → φ t = 1) → ∃ ψ : I.Iw c →* B, ∀ b : I.Iw c, ((b : G) ∈ I.N → ψ b = 1) ∧ ((b : G) ∈ I.Nm c → ψ b = 1) ∧ ∀ hb : (b : G) ∈ I.T, ψ b = φ ⟨b, hb⟩ := by
+theorem UpperTheory.exists_iwahori_character_extending_torus_character
+    : ∀ (G : Type) [Group G] (I : Iwa G) (B : Type) [CommGroup B] (c : ℕ) (φ : I.T →* B),
+      (∀ t : I.T, (t : G) ∈ I.Tc c → φ t = 1)
+        → ∃ ψ : I.Iw c →* B, ∀ b : I.Iw c,
+          ((b : G) ∈ I.N → ψ b = 1) ∧ ((b : G) ∈ I.Nm c → ψ b = 1)
+            ∧ ∀ hb : (b : G) ∈ I.T, ψ b = φ ⟨b, hb⟩ := by
   intro G _ I B _ c φ hφ
   obtain ⟨tt, h1, htt⟩ := UpperTheory.exists_iwahori_torus_projection G I
   have hle : ∀ b ∈ I.Iw c, b ∈ I.Iw 0 := by
     intro b hb
     obtain ⟨x, hx, t, ht, y, hy, h⟩ := (UpperTheory.V.Hi.iwMem G I c b).1.1 hb
     exact (UpperTheory.V.Hi.iwMem G I 0 b).1.2 ⟨x, hx, t, ht, y, I.Nm_anti (Nat.zero_le c) hy, h⟩
-  have key : ∀ b ∈ I.Iw 0, ∀ x ∈ I.N, ∀ t : I.T, ∀ y ∈ I.Nm c,
-      φ (tt (b * (x * t * y))) = φ (tt b) * φ t := by
+  have key
+      : ∀ b ∈ I.Iw 0, ∀ x ∈ I.N, ∀ t : I.T, ∀ y ∈ I.Nm c,
+        φ (tt (b * (x * t * y))) = φ (tt b) * φ t := by
     intro b hb x hx t y hy
     have hx0 : x ∈ I.Iw 0 :=
       (UpperTheory.V.Hi.iwMem G I 0 x).1.2 ⟨x, hx, 1, one_mem _, 1, one_mem _, by simp⟩

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MuDvdOfDvdIt
 
 @[expose] public section
 
-open CategoryTheory Opposite Matrix GlobalTheory GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open CategoryTheory Opposite Matrix GlobalTheory GlobalTheory.PDivGroup GlobalTheory.Sandwich
+  GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
 
 noncomputable section
 
@@ -14,8 +15,9 @@ namespace GlobalTheory.GhostKer
 
 section SlopeTestRemainingChoices
 
-variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (Ideal.span {(p : O)}) O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
 
 theorem phiInv_frobenius (b : Ainf p O) : phiInv p O (WittVector.frobenius b) = b := by
   rw [WittVector.frobenius_eq_map_frobenius]
@@ -24,15 +26,14 @@ theorem phiInv_frobenius (b : Ainf p O) : phiInv p O (WittVector.frobenius b) = 
   simp only [WittVector.map_coeff]
   exact (_root_.frobeniusEquiv (PreTilt O p) p).symm_apply_apply _
 
-theorem frobenius_iterate_teichmuller (k : ℕ) (x : PreTilt O p) :
-    (WittVector.frobenius : Ainf p O →+* Ainf p O)^[k] (WittVector.teichmuller p x) =
-      WittVector.teichmuller p (x ^ p ^ k) := by
+theorem frobenius_iterate_teichmuller (k : ℕ) (x : PreTilt O p)
+    : (WittVector.frobenius : Ainf p O →+* Ainf p O)^[k] (WittVector.teichmuller p x)
+      = WittVector.teichmuller p (x ^ p ^ k) := by
   induction k with
   | zero => simp
   | succ k ih =>
     rw [Function.iterate_succ_apply', ih, WittVector.frobenius_eq_map_frobenius,
       WittVector.map_teichmuller, frobenius_def, ← pow_mul, ← pow_succ]
-
 
 variable (p O) in
 def ghostHom (n : ℕ) : Ainf p O →+* O where
@@ -42,8 +43,8 @@ def ghostHom (n : ℕ) : Ainf p O →+* O where
   map_zero' := ghost_zero n
   map_add' := ghost_add n
 
-theorem ghost_succ_xi {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) (k : ℕ) :
-    ghost p O (k + 1) (xi ε) = p := by
+theorem ghost_succ_xi {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) (k : ℕ)
+    : ghost p O (k + 1) (xi ε) = p := by
   have h : ghost p O (k + 1) (WittVector.teichmuller p (root ε)) = 1 := by
     rw [ghost, frobenius_iterate_teichmuller, WittVector.fontaineTheta_teichmuller, pow_succ',
       pow_mul, root, frobeniusEquiv_symm_pow_p, map_pow]
@@ -62,7 +63,13 @@ theorem nu_eq_mu_root (x : PreTilt O p) : nu x = mu (root x) := rfl
 
 end SlopeTestRemainingChoices
 
-theorem mu_dvd_of_ghost : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ a : Ainf p O, (∀ n, ghost p O n a = 0) → Sandwich.mu ε ∣ a := by
+theorem mu_dvd_of_ghost
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ a : Ainf p O,
+          (∀ n, ghost p O n a = 0) → Sandwich.mu ε ∣ a := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε a ha
   have h1 : IsPrimitiveRoot (root ε).untilt p := by simpa [zeta] using hε 1
   have hp0 : (p : O) ≠ 0 := by

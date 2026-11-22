@@ -27,11 +27,9 @@ def segreIncl : MRing ι R →ₐ[R] MRing (segreIdx ι) R :=
 
 variable {ι R}
 
-def segreY (c : ∀ k, ι k) : MRing (segreIdx ι) R :=
-  X (⟨Sum.inl (), c⟩ : Σ k, segreIdx ι k)
+def segreY (c : ∀ k, ι k) : MRing (segreIdx ι) R := X (⟨Sum.inl (), c⟩ : Σ k, segreIdx ι k)
 
-def segreMon (c : ∀ k, ι k) : MRing (segreIdx ι) R :=
-  ∏ k, X (⟨Sum.inr k, c k⟩ : Σ k, segreIdx ι k)
+def segreMon (c : ∀ k, ι k) : MRing (segreIdx ι) R := ∏ k, X (⟨Sum.inr k, c k⟩ : Σ k, segreIdx ι k)
 
 variable (ι R)
 
@@ -42,8 +40,7 @@ def segreLiftVal (W : Ideal (MRing ι R)) : (Σ k, segreIdx ι k) → Polynomial
   | ⟨Sum.inl _, c⟩ => Polynomial.X * Polynomial.C (Ideal.Quotient.mk W (∏ k, X ⟨k, c k⟩))
   | ⟨Sum.inr k, i⟩ => Polynomial.C (Ideal.Quotient.mk W (X ⟨k, i⟩))
 
-def segreLiftMap (W : Ideal (MRing ι R)) :
-    MRing (segreIdx ι) R →ₐ[R] Polynomial (MRing ι R ⧸ W) :=
+def segreLiftMap (W : Ideal (MRing ι R)) : MRing (segreIdx ι) R →ₐ[R] Polynomial (MRing ι R ⧸ W) :=
   aeval (segreLiftVal ι R W)
 
 def segreLift (W : Ideal (MRing ι R)) : Ideal (MRing (segreIdx ι) R) :=

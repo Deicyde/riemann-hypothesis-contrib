@@ -17,9 +17,11 @@ open Formalism.GradedWeylDivisibility
 
 namespace GlobalTheory.HighWt
 
-theorem map_bidet {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {r n K : ℕ} (sz : Fin K → ℕ)
-    (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin r) :
-    MvPolynomial.map φ (bideterminant R sz hsz I) = bideterminant S sz hsz I := by
+theorem map_bidet
+    {R S : Type} [CommRing R] [CommRing S]
+    (φ : R →+* S)
+    {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin r)
+    : MvPolynomial.map φ (bideterminant R sz hsz I) = bideterminant S sz hsz I := by
   unfold bideterminant initMinor
   rw [map_prod]
   refine Finset.prod_congr rfl fun k _ => ?_
@@ -44,7 +46,8 @@ theorem baseChange_holds : BaseChange := by
       refine ⟨bideterminant O sz hsz I, ?_, map_bidet _ sz hsz I⟩
       rw [← hsh]
       exact bidetMem O N N K sz hsz I
-    | zero => exact ⟨0, Submodule.zero_mem _, by simp⟩
+    | zero =>
+      exact ⟨0, Submodule.zero_mem _, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, ha, rfl⟩ := hx
       obtain ⟨b, hb, rfl⟩ := hy
@@ -57,7 +60,8 @@ theorem baseChange_holds : BaseChange := by
   · intro g hg h0
     have hk : g ∈ RingHom.ker (MvPolynomial.map (Ideal.Quotient.mk (Ideal.span {ϖ}))) := h0
     rw [MvPolynomial.ker_map, Ideal.mk_ker, Ideal.map_span, Set.image_singleton,
-      Ideal.mem_span_singleton'] at hk
+        Ideal.mem_span_singleton']
+      at hk
     obtain ⟨h, hh⟩ := hk
     have hgh : g = ϖ • h := by rw [smul_eq_C_mul, ← hh, mul_comm]
     refine ⟨h, ?_, hgh⟩

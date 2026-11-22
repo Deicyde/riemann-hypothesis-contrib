@@ -9,13 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteClosed
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory AlgebraicGeometry NumberField MonoidalCategory CartesianMonoidalCategory MonObj
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory CategoryTheory.Hom.group
 
 namespace GlobalTheory.OStableClosed
 open GlobalTheory.RationalPoint
 
-theorem finite_of_isClosed_of_no_torsion : ∀ (E : Type) [Field E] [NumberField E] (k : Type) [Field k] [IsAlgClosed k] [CharZero k] (G : Over (Sp k)) [GrpObj G] (act : OAct (𝓞 E) G) (π : 𝓞 E), IsSemiAbelian G → π ≠ 0 → ¬ IsUnit π → ∀ (C : Subgroup (𝟙_ (Over (Sp k)) ⟶ G)) (Z : Set G.left), IsClosed Z → (∀ x, x ∈ C ↔ Set.range x.left ⊆ Z) → (∀ (a : 𝓞 E), ∀ x ∈ C, x ≫ act.act a ∈ C) → (∀ x ∈ C, x ≫ act.act π = 1 → x = 1) → Finite C := by
+theorem finite_of_isClosed_of_no_torsion
+    : ∀ (E : Type) [Field E] [NumberField E] (k : Type) [Field k] [IsAlgClosed k] [CharZero k]
+        (G : Over (Sp k)) [GrpObj G] (act : OAct (𝓞 E) G) (π : 𝓞 E),
+      IsSemiAbelian G → π ≠ 0 → ¬ IsUnit π
+        → ∀ (C : Subgroup (𝟙_ (Over (Sp k)) ⟶ G)) (Z : Set G.left),
+          IsClosed Z → (∀ x, x ∈ C ↔ Set.range x.left ⊆ Z)
+            → (∀ (a : 𝓞 E), ∀ x ∈ C, x ≫ act.act a ∈ C) → (∀ x ∈ C, x ≫ act.act π = 1 → x = 1)
+            → Finite C := by
   intro E _ _ k _ _ _ G _ act π hG hπ hπu C Z hZ hC hstab htor
   have := hG.comm
   have := hG.smooth
@@ -30,20 +38,23 @@ theorem finite_of_isClosed_of_no_torsion : ∀ (E : Type) [Field E] [NumberField
   haveI := T.isAbelian.proper
   haveI := T.isAbelian.smooth
   haveI := act.hom π
-  obtain ⟨actB, actT, hB, hT⟩ := GlobalTheory.T.exists_ringAction_torus_and_abelian_quotient (𝓞 E) k G act hG T
+  obtain ⟨actB, actT, hB, hT⟩ :=
+    GlobalTheory.T.exists_ringAction_torus_and_abelian_quotient (𝓞 E) k G act hG T
   let φ : (𝟙_ (Over (Sp k)) ⟶ G) →* (𝟙_ (Over (Sp k)) ⟶ T.B) :=
     MonoidHom.mk' (fun x => x ≫ T.q) fun x y => MonObj.mul_comp x y T.q
   let j : (𝟙_ (Over (Sp k)) ⟶ splitTorus (Sp k) T.X) →* (𝟙_ (Over (Sp k)) ⟶ G) :=
     MonoidHom.mk' (fun x => x ≫ T.i) fun x y => MonObj.mul_comp x y T.i
   let m : (𝟙_ (Over (Sp k)) ⟶ G) →* (𝟙_ (Over (Sp k)) ⟶ G) :=
     MonoidHom.mk' (fun x => x ≫ act.act π) fun x y => MonObj.mul_comp x y _
-  have hj : Function.Injective j := fun x y hxy =>
-    T.isKernel.hom_ext hxy (toUnit_unique _ _)
+  have hj : Function.Injective j := fun x y hxy => T.isKernel.hom_ext hxy (toUnit_unique _ _)
   have hker : ∀ x, φ x = 1 → ∃ t, j t = x := fun x hx =>
     ⟨T.isKernel.lift x (toUnit _) hx, T.isKernel.lift_fst _ _ _⟩
   have hTf : Finite (C.comap j) := by
-    refine GlobalTheory.T.finite_closed_torus_subgroup_without_pi_torsion E k T.X actT π hπ hπu _ (T.i.left ⁻¹' Z)
-      (hZ.preimage T.i.left.continuous) (fun x => ?_) (fun a x hx => ?_) (fun x hx h1 => ?_)
+    refine GlobalTheory.T.finite_closed_torus_subgroup_without_pi_torsion E k T.X actT π hπ hπu _
+      (T.i.left ⁻¹' Z) (hZ.preimage T.i.left.continuous)
+      (fun x => ?_)
+      (fun a x hx => ?_)
+      (fun x hx h1 => ?_)
     · rw [Subgroup.mem_comap, hC, range_left_subset_iff, range_left_subset_iff]
       rfl
     · rw [Subgroup.mem_comap] at hx ⊢
@@ -64,10 +75,15 @@ theorem finite_of_isClosed_of_no_torsion : ∀ (E : Type) [Field E] [NumberField
     have := congrArg (fun t : C.comap j => j t.1) hxy
     simp only [hs] at this
     exact Subtype.ext (Subtype.ext this)
-  obtain ⟨Z', hZ', h'⟩ := exists_isClosed_image_of_isClosed_subgroup k G T.B T.q inferInstance
-    inferInstance inferInstance inferInstance inferInstance C Z hZ hC
+  obtain ⟨Z', hZ', h'⟩ :=
+    exists_isClosed_image_of_isClosed_subgroup k G T.B T.q inferInstance inferInstance inferInstance
+      inferInstance inferInstance C Z hZ hC
   have hR : Finite ψ.range := by
-    refine GlobalTheory.T.finite_closed_ringStable_subgroup_abelian_no_torsion E k T.B actB π T.isAbelian hπ hπu _ Z' hZ' (fun y => ?_) (fun a y hy => ?_) ?_
+    refine GlobalTheory.T.finite_closed_ringStable_subgroup_abelian_no_torsion E k T.B actB π
+      T.isAbelian hπ hπu _ Z' hZ'
+      (fun y => ?_)
+      (fun a y hy => ?_)
+      ?_
     · rw [← h']
       exact ⟨fun ⟨x, hx⟩ => ⟨x.1, x.2, hx⟩, fun ⟨x, hx, hy⟩ => ⟨⟨x, hx⟩, hy⟩⟩
     · obtain ⟨x, rfl⟩ := hy
@@ -86,9 +102,10 @@ theorem finite_of_isClosed_of_no_torsion : ∀ (E : Type) [Field E] [NumberField
       let f : ψ.ker → ψ.ker := fun z => ⟨⟨m z.1.1, hmC z.1⟩, hmK z⟩
       have hf : Function.Injective f := fun z₁ z₂ h => by
         have h1 : m z₁.1.1 = m z₂.1.1 := congrArg (fun z : ψ.ker => z.1.1) h
-        have h2 : z₁.1.1 / z₂.1.1 = 1 := htor _ (C.div_mem z₁.1.2 z₂.1.2) (by
-          change m (z₁.1.1 / z₂.1.1) = 1
-          rw [map_div, h1, div_self'])
+        have h2 : z₁.1.1 / z₂.1.1 = 1 :=
+          htor _ (C.div_mem z₁.1.2 z₂.1.2) (by
+            change m (z₁.1.1 / z₂.1.1) = 1
+            rw [map_div, h1, div_self'])
         exact Subtype.ext (Subtype.ext (div_eq_one.1 h2))
       have hw : ψ ⟨m y.1, hmC y⟩ = 1 := by
         change (y.1 ≫ act.act π) ≫ T.q = 1
@@ -96,9 +113,10 @@ theorem finite_of_isClosed_of_no_torsion : ∀ (E : Type) [Field E] [NumberField
         exact hy
       obtain ⟨z, hz⟩ := (Finite.injective_iff_surjective.1 hf) ⟨⟨m y.1, hmC y⟩, hw⟩
       have h1 : m z.1.1 = m y.1 := congrArg (fun z : ψ.ker => z.1.1) hz
-      have h2 : y.1 / z.1.1 = 1 := htor _ (C.div_mem y.2 z.1.2) (by
-        change m (y.1 / z.1.1) = 1
-        rw [map_div, h1, div_self'])
+      have h2 : y.1 / z.1.1 = 1 :=
+        htor _ (C.div_mem y.2 z.1.2) (by
+          change m (y.1 / z.1.1) = 1
+          rw [map_div, h1, div_self'])
       have h3 : y = z.1 := Subtype.ext (div_eq_one.1 h2)
       rw [h3]
       exact z.2

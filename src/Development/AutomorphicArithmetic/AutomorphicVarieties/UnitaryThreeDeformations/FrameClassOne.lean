@@ -10,11 +10,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PartsConj
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
 open NumberField NumberField.InfinitePlace Real in
-private theorem pid4 (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {2 ^ 2} ℚ K] :
-    IsPrincipalIdealRing (𝓞 K) := by
+private theorem pid4 (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {2 ^ 2} ℚ K]
+    : IsPrincipalIdealRing (𝓞 K) := by
   apply RingOfIntegers.isPrincipalIdealRing_of_abs_discr_lt
   rw [IsCyclotomicExtension.Rat.discr_prime_pow 2 2 K, IsCyclotomicExtension.Rat.finrank (2 ^ 2) K,
     IsCyclotomicExtension.Rat.nrComplexPlaces_eq_totient_div_two (2 ^ 2) K]
@@ -24,12 +25,16 @@ private theorem pid4 (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension
   nlinarith [Real.pi_gt_three]
 
 open NumberField Formalism.ConjugateSelfDual UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum in
-private theorem char_triv (K Ω : Type) [Field K] [NumberField K] [IsCyclotomicExtension {2 ^ 2} ℚ K] [Field Ω]
-    [Algebra K Ω] [IsAlgClosure K Ω] (C : Type) [CommGroup C] (χ : G K Ω →* C) (h : IsLocallyConstant χ)
-    (hI : ∀ A : ValuationSubring Ω, Ine (F := K) A ≤ χ.ker) (g : G K Ω) : χ g = 1 := by
+private theorem char_triv
+    (K Ω : Type) [Field K] [NumberField K] [IsCyclotomicExtension {2 ^ 2} ℚ K] [Field Ω]
+    [Algebra K Ω] [IsAlgClosure K Ω]
+    (C : Type) [CommGroup C]
+    (χ : G K Ω →* C)
+    (h : IsLocallyConstant χ) (hI : ∀ A : ValuationSubring Ω, Ine (F := K) A ≤ χ.ker)
+    (g : G K Ω)
+    : χ g = 1 := by
   haveI : IsPrincipalIdealRing (𝓞 K) := pid4 K
-  have hc : Fintype.card (ClassGroup (𝓞 K)) = 1 := by
-    convert card_classGroup_eq_one (R := 𝓞 K)
+  have hc : Fintype.card (ClassGroup (𝓞 K)) = 1 := by convert card_classGroup_eq_one (R := 𝓞 K)
   have hsub : Subsingleton (ClassGroup (𝓞 K)) :=
     Fintype.card_le_one_iff_subsingleton.mp (le_of_eq hc)
   have hopen : IsOpen (χ.ker : Set (G K Ω)) := by
@@ -67,8 +72,7 @@ private theorem char_triv (K Ω : Type) [Field K] [NumberField K] [IsCyclotomicE
     have hw := hj z
     have hcz : c.toRingEquiv z = z := hfix
     rw [hcz] at hw
-    have hw2 : (j z) ^ 2 = -1 := by
-      rw [← map_pow, hsq, map_neg, map_one]
+    have hw2 : (j z) ^ 2 = -1 := by rw [← map_pow, hsq, map_neg, map_one]
     have him : (j z).im = 0 := by
       have := congrArg Complex.im hw
       simp at this
@@ -82,9 +86,13 @@ private theorem char_triv (K Ω : Type) [Field K] [NumberField K] [IsCyclotomicE
     exact Subsingleton.elim _ _
   exact hk hg
 
-open NumberField Formalism.ConjugateSelfDual UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum IntermediateField in
-private theorem mem_iff (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (ζ : Ω) (hζ : IsPrimitiveRoot ζ 4)
-    (σ : G ℚ Ω) : σ ∈ galOf ℚ ℚ⟮ζ⟯ Ω ↔ eta4 Ω σ = 1 := by
+open NumberField Formalism.ConjugateSelfDual UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum
+  IntermediateField in
+private theorem mem_iff
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (ζ : Ω) (hζ : IsPrimitiveRoot ζ 4)
+    (σ : G ℚ Ω)
+    : σ ∈ galOf ℚ ℚ⟮ζ⟯ Ω ↔ eta4 Ω σ = 1 := by
   have hz : ζ ≠ 0 := hζ.ne_zero (by norm_num)
   have h1 : ζ ≠ 1 := hζ.ne_one (by norm_num)
   have h2 : ζ ^ 2 ≠ 1 := by
@@ -94,7 +102,8 @@ private theorem mem_iff (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ �
   have hcls : ∀ τ : Formalism.ConjugateSelfDual.G ℚ Ω, τ ζ = ζ ↔ eta4 Ω τ = 1 := by
     intro τ
     have hs := UpperTheory.V.Chr.cls_spec (k := ℚ) 4 τ ζ hζ.pow_eq_one
-    have he : eta4 Ω τ = 1 ↔ ZMod.χ₄ ((UpperTheory.V.Chr.cls ℚ Ω 4 τ : (ZMod 4)ˣ) : ZMod 4) = 1 := by
+    have he
+        : eta4 Ω τ = 1 ↔ ZMod.χ₄ ((UpperTheory.V.Chr.cls ℚ Ω 4 τ : (ZMod 4)ˣ) : ZMod 4) = 1 := by
       rw [Units.ext_iff]
       rfl
     rw [he]
@@ -143,16 +152,21 @@ private theorem mem_iff (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ �
       rw [IntermediateField.adjoin_simple_le_iff, IntermediateField.mem_fixedField_iff]
       intro τ hτ
       have hst : σ ∈ MulAction.stabilizer (Formalism.ConjugateSelfDual.G ℚ Ω) ζ := hs
-      have := (Subgroup.zpowers_le (H := MulAction.stabilizer (Formalism.ConjugateSelfDual.G ℚ Ω) ζ)).2 hst hτ
+      have :=
+        (Subgroup.zpowers_le (H := MulAction.stabilizer (Formalism.ConjugateSelfDual.G ℚ Ω) ζ)).2
+          hst hτ
       exact this
     have hx := (IntermediateField.mem_fixedField_iff _ _).1 (hle x.2) σ (Subgroup.mem_zpowers σ)
     exact hx
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual UpperTheory.V in
 open scoped Pointwise in
-private theorem conj_ine {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω]
-    {A B : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 k)} (hA : IsPlaceOver A v) (hB : IsPlaceOver B v)
-    {τ : G k Ω} (hτ : τ ∈ Ine (F := k) B) : ∃ g : G k Ω, g⁻¹ * τ * g ∈ Ine (F := k) A := by
+private theorem conj_ine
+    {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω]
+    {A B : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 k)}
+    (hA : IsPlaceOver A v) (hB : IsPlaceOver B v)
+    {τ : G k Ω} (hτ : τ ∈ Ine (F := k) B)
+    : ∃ g : G k Ω, g⁻¹ * τ * g ∈ Ine (F := k) A := by
   obtain ⟨σ, hσ⟩ := exists_smul_eq_of_isPlaceOver hA hB
   have hl : UpperTheory.V.IsLift (RingEquiv.refl k) σ.toRingEquiv := fun x => σ.commutes x
   have hm : ∀ x : Ω, σ.toRingEquiv x ∈ B ↔ x ∈ A := by
@@ -166,17 +180,22 @@ private theorem conj_ine {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Alg
     rfl
   rwa [he] at key
 
-open NumberField Formalism.ConjugateSelfDual UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum IntermediateField in
-theorem UpperTheory.V.UnitaryThreeInertia.frame_class_one :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (c : Coef l) {N : ℕ} [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) (o₁ : ℕ), HostData l e ψ o₁ →
-    ∀ (S : Finset Pl) (A : S → ValuationSubring Ω) (F : Frame c.O (Formalism.ConjugateSelfDual.G ℚ Ω) (Gam Ω S) S), IsHostFrame Ω c e ψ S A F →
-    F.Cl1 := by
+open NumberField Formalism.ConjugateSelfDual UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum
+  IntermediateField in
+theorem UpperTheory.V.UnitaryThreeInertia.frame_class_one
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (c : Coef l)
+        {N : ℕ} [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) (o₁ : ℕ),
+      HostData l e ψ o₁
+        → ∀ (S : Finset Pl) (A : S → ValuationSubring Ω)
+            (F : Frame c.O (Formalism.ConjugateSelfDual.G ℚ Ω) (Gam Ω S) S),
+          IsHostFrame Ω c e ψ S A F → F.Cl1 := by
   intro Ω _ _ _ l _ c N _ e ψ o₁ hD S A F hF
   intro Ab _ χ hloc hχ
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   obtain ⟨ζ, hζ⟩ : ∃ ζ : Ω, IsPrimitiveRoot ζ 4 := by
-    obtain ⟨z, hz⟩ := IsAlgClosed.exists_root (Polynomial.cyclotomic 4 Ω)
-      (Polynomial.degree_cyclotomic_pos 4 Ω (by norm_num)).ne.symm
+    obtain ⟨z, hz⟩ :=
+      IsAlgClosed.exists_root (Polynomial.cyclotomic 4 Ω)
+        (Polynomial.degree_cyclotomic_pos 4 Ω (by norm_num)).ne.symm
     exact ⟨z, (Polynomial.isRoot_cyclotomic_iff).1 hz⟩
   haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
   have hint : IsIntegral ℚ ζ := Algebra.IsIntegral.isIntegral ζ
@@ -189,7 +208,8 @@ theorem UpperTheory.V.UnitaryThreeInertia.frame_class_one :
   haveI : IsAlgClosure ℚ⟮ζ⟯ Ω := ⟨inferInstance, Algebra.IsAlgebraic.tower_top (K := ℚ) ℚ⟮ζ⟯⟩
   obtain ⟨hDec, hIne, hcont, hhom⟩ := UpperTheory.V.Kum.toGalDict ℚ Ω ℚ⟮ζ⟯ (galOf ℚ ℚ⟮ζ⟯ Ω) le_rfl
   obtain ⟨hh, _⟩ := hhom le_rfl
-  let eq := MulEquiv.ofBijective (UpperTheory.V.Kum.toGal ℚ⟮ζ⟯ (le_refl (galOf ℚ ℚ⟮ζ⟯ Ω))) hh.bijective
+  let eq :=
+    MulEquiv.ofBijective (UpperTheory.V.Kum.toGal ℚ⟮ζ⟯ (le_refl (galOf ℚ ℚ⟮ζ⟯ Ω))) hh.bijective
   have hker : ∀ u : galOf ℚ ℚ⟮ζ⟯ Ω, F.π u ∈ F.η.ker := by
     intro u
     rw [MonoidHom.mem_ker]
@@ -209,7 +229,9 @@ theorem UpperTheory.V.UnitaryThreeInertia.frame_class_one :
     apply eq.injective
     rw [MulEquiv.apply_symm_apply]
     exact ((hh.homeomorph _).apply_symm_apply x).symm
-  have key : ∀ (B : ValuationSubring Ω) (u : galOf ℚ ℚ⟮ζ⟯ Ω), (u : Formalism.ConjugateSelfDual.G ℚ Ω) ∈ Ine (F := ℚ) B → χ (ρ u) = 1 := by
+  have key
+      : ∀ (B : ValuationSubring Ω) (u : galOf ℚ ℚ⟮ζ⟯ Ω),
+        (u : Formalism.ConjugateSelfDual.G ℚ Ω) ∈ Ine (F := ℚ) B → χ (ρ u) = 1 := by
     intro B u hu
     by_cases hB : B = ⊤
     · have h0 := ((UpperTheory.V.Base.places ℚ Ω l B).2.1 hB).1
@@ -226,7 +248,8 @@ theorem UpperTheory.V.UnitaryThreeInertia.frame_class_one :
           rw [Subgroup.mem_subgroupOf, hF.I]
           exact hg
         have heq : F.π g * (F.loc ⟨v, hvS⟩) ⟨_, hgD⟩ * (F.π g)⁻¹ = F.π u := by
-          simp only [UpperTheory.V.UnitaryThreeInertia.Frame.loc, MonoidHom.comp_apply, Subgroup.coe_subtype, map_mul, map_inv]
+          simp only [UpperTheory.V.UnitaryThreeInertia.Frame.loc, MonoidHom.comp_apply,
+            Subgroup.coe_subtype, map_mul, map_inv]
           group
         have hmem : F.π g * (F.loc ⟨v, hvS⟩) ⟨_, hgD⟩ * (F.π g)⁻¹ ∈ F.η.ker := by
           rw [heq]
@@ -246,16 +269,18 @@ theorem UpperTheory.V.UnitaryThreeInertia.frame_class_one :
           rw [hF.π]
           exact (QuotientGroup.eq_one_iff _).2 hN
         rw [this, map_one]
-  have htriv := char_triv ℚ⟮ζ⟯ Ω Ab ((χ.comp ρ).comp eq.symm.toMonoidHom)
-    ((hloc.comp_continuous (hρc.comp hec)))
-    (by
-      intro B τ hτ
-      rw [MonoidHom.mem_ker, MonoidHom.comp_apply, MonoidHom.comp_apply]
-      apply key B
-      rw [← hIne B]
-      have : UpperTheory.V.Kum.toGal ℚ⟮ζ⟯ (le_refl (galOf ℚ ℚ⟮ζ⟯ Ω)) (eq.symm τ) = τ := eq.apply_symm_apply τ
-      rw [MulEquiv.coe_toMonoidHom, this]
-      exact hτ)
+  have htriv :=
+    char_triv ℚ⟮ζ⟯ Ω Ab ((χ.comp ρ).comp eq.symm.toMonoidHom)
+      ((hloc.comp_continuous (hρc.comp hec)))
+      (by
+        intro B τ hτ
+        rw [MonoidHom.mem_ker, MonoidHom.comp_apply, MonoidHom.comp_apply]
+        apply key B
+        rw [← hIne B]
+        have : UpperTheory.V.Kum.toGal ℚ⟮ζ⟯ (le_refl (galOf ℚ ℚ⟮ζ⟯ Ω)) (eq.symm τ) = τ :=
+          eq.apply_symm_apply τ
+        rw [MulEquiv.coe_toMonoidHom, this]
+        exact hτ)
   ext ⟨γ, hγ⟩
   obtain ⟨u, rfl⟩ : ∃ u : Formalism.ConjugateSelfDual.G ℚ Ω, F.π u = γ := by
     rw [hF.π]

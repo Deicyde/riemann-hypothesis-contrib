@@ -71,8 +71,9 @@ theorem realCharConj : RealConj := by
     have := (hL (starRingEnd ℂ z)).conj_conj
     rw [Complex.conj_conj] at this
     exact this
-  have heq : (fun z => starRingEnd ℂ (DirichletCharacter.LFunction χ (starRingEnd ℂ z))) =
-      DirichletCharacter.LFunction χ := by
+  have heq
+      : (fun z => starRingEnd ℂ (DirichletCharacter.LFunction χ (starRingEnd ℂ z)))
+        = DirichletCharacter.LFunction χ := by
     refine AnalyticOnNhd.eq_of_eventuallyEq (z₀ := 2) (analyticOnNhd_univ_iff_differentiable.2 hG)
       (analyticOnNhd_univ_iff_differentiable.2 hL) ?_
     have hopen : IsOpen {z : ℂ | 1 < z.re} := isOpen_lt continuous_const Complex.continuous_re

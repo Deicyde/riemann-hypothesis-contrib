@@ -16,8 +16,10 @@ namespace GroundTheory.Heights₂.Heights.Vertical
 
 private theorem coneDim₃ : GroundTheory.Heights₂.Heights.ConeDimOfChowForm.Statement :=
   GroundTheory.Heights₂.Heights.ConeDimOfChowForm.proof
-    (GroundTheory.Heights₂.Heights.IncIdealDim.proof GroundTheory.Heights₂.Heights.IncidenceGeneric.full
-      GroundTheory.Heights₂.Heights.GenericLinearTrdeg.full GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof)
+    (GroundTheory.Heights₂.Heights.IncIdealDim.proof
+      GroundTheory.Heights₂.Heights.IncidenceGeneric.full
+      GroundTheory.Heights₂.Heights.GenericLinearTrdeg.full
+      GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof)
     GroundTheory.Heights₂.Heights.IncIdealPrime.full
 
 theorem ChartPointTrdeg.full : ChartPointTrdeg.Statement :=
@@ -26,17 +28,17 @@ theorem SpecChart.full : SpecChart.Statement := SpecChart.proof
 theorem GenericFormsKer.full : GenericFormsKer.Statement := GenericFormsKer.proof
 theorem DerivSpanTrdeg.full : DerivSpanTrdeg.Statement := DerivSpanTrdeg.proof
 
-theorem SecPointSeparable.of_freeParAlgIndep (h : FreeParAlgIndep.Statement) :
-    SecPointSeparable.Statement :=
+theorem SecPointSeparable.of_freeParAlgIndep (h : FreeParAlgIndep.Statement)
+    : SecPointSeparable.Statement :=
   SecPointSeparable.proof GenericFormsKer.full DerivSpanTrdeg.full h
 
-theorem GenSecSeparable.of_freeParAlgIndep (h : FreeParAlgIndep.Statement) :
-    GenSecSeparable.Statement :=
+theorem GenSecSeparable.of_freeParAlgIndep (h : FreeParAlgIndep.Statement)
+    : GenSecSeparable.Statement :=
   GenSecSeparable.proof SecAlgFinite.full GenSecDomain.full ChartPointTrdeg.full
     (SecPointSeparable.of_freeParAlgIndep h)
 
-theorem ChowFormSectionVertical.of_freeParAlgIndep (h : FreeParAlgIndep.Statement) :
-    ChowFormSectionVertical.Statement :=
+theorem ChowFormSectionVertical.of_freeParAlgIndep (h : FreeParAlgIndep.Statement)
+    : ChowFormSectionVertical.Statement :=
   ChowFormSectionVertical.of_chartPoint_secPoint_specChart ChartPointTrdeg.full
     (SecPointSeparable.of_freeParAlgIndep h) SpecChart.full
 

@@ -10,8 +10,8 @@ namespace LateralTheory.DivDb.FinPolyPf
 variable {K : Type} [Field K] [IsAlgClosed K] {n : ℕ}
 
 omit [IsAlgClosed K] in
-theorem root_sub (x : Matrix (Fin n) (Fin n) K) (P : K[X]) (hP : P ≠ 0) (hx : aeval x P = 0) :
-    x.charpoly.roots ⊆ P.roots := by
+theorem root_sub (x : Matrix (Fin n) (Fin n) K) (P : K[X]) (hP : P ≠ 0) (hx : aeval x P = 0)
+    : x.charpoly.roots ⊆ P.roots := by
   intro a ha
   rw [Polynomial.mem_roots (Matrix.charpoly_monic x).ne_zero] at ha
   rw [Polynomial.mem_roots hP]
@@ -29,8 +29,9 @@ theorem card_roots_eq (P : K[X]) : Multiset.card P.roots = P.natDegree :=
 theorem cp_card (x : Matrix (Fin n) (Fin n) K) : Multiset.card x.charpoly.roots = n := by
   rw [card_roots_eq, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
 
-theorem eq_of_roots (x : Matrix (Fin n) (Fin n) K) (P : K[X]) (hm : P.Monic)
-    (h : x.charpoly.roots = P.roots) : x.charpoly = P := by
+theorem eq_of_roots
+    (x : Matrix (Fin n) (Fin n) K) (P : K[X]) (hm : P.Monic) (h : x.charpoly.roots = P.roots)
+    : x.charpoly = P := by
   rw [← prod_multiset_X_sub_C_of_monic_of_roots_card_eq (Matrix.charpoly_monic x) (card_roots_eq _),
     ← prod_multiset_X_sub_C_of_monic_of_roots_card_eq hm (card_roots_eq _), h]
 

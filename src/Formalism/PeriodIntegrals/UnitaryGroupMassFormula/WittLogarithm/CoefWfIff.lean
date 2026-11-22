@@ -11,16 +11,13 @@ namespace PI.WfLogWork
 
 open PI.ExpIntWProof
 
-theorem coefWf_iff {p : ℕ} [Fact p.Prime] (f : PowerSeries ℂ_[p]) :
-    CoefWf (f : MvPowerSeries Unit ℂ_[p]) ↔ ∀ n, PowerSeries.coeff n f ∈ Wf p := by
+theorem coefWf_iff {p : ℕ} [Fact p.Prime] (f : PowerSeries ℂ_[p])
+    : CoefWf (f : MvPowerSeries Unit ℂ_[p]) ↔ ∀ n, PowerSeries.coeff n f ∈ Wf p := by
   constructor
   · intro h n
     exact h (Finsupp.single () n)
   · intro h n
-    have hn : n = Finsupp.single () (n ()) := by
-      first
-        | exact Finsupp.unique_single n
-        | (ext; simp)
+    have hn : n = Finsupp.single () (n ()) := by first | exact Finsupp.unique_single n | (ext; simp)
     rw [hn]
     exact h (n ())
 

@@ -12,12 +12,15 @@ open IsLocalRing Polynomial
 open scoped TensorProduct
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.closure_finite_over_base : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [IsDomain R] [IsNoetherianRing R]
-    [IsIntegrallyClosed R] [Algebra A R], Function.Injective (algebraMap A R) →
-    ∀ (D : Type) [CommRing D] [Algebra (GlobalTheory.LocAcyc.GenFib A R) D]
-    [Module.Finite (GlobalTheory.LocAcyc.GenFib A R) D] [Algebra.Etale (GlobalTheory.LocAcyc.GenFib A R) D],
-    letI := GlobalTheory.KeyOriginNoeth.closureAlg A R D;
-    Module.Finite R (GlobalTheory.KeyOriginNoeth.closure A R D) := by
+theorem _root_.GlobalTheory.T.closure_finite_over_base
+    : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [IsDomain R] [IsNoetherianRing R]
+        [IsIntegrallyClosed R] [Algebra A R],
+      Function.Injective (algebraMap A R)
+        → ∀ (D : Type) [CommRing D] [Algebra (GlobalTheory.LocAcyc.GenFib A R) D]
+            [Module.Finite (GlobalTheory.LocAcyc.GenFib A R) D]
+            [Algebra.Etale (GlobalTheory.LocAcyc.GenFib A R) D],
+          letI := GlobalTheory.KeyOriginNoeth.closureAlg A R D
+          Module.Finite R (GlobalTheory.KeyOriginNoeth.closure A R D) := by
   intro A R _ _ _ _ _ _ _ hinj D _ _ _ _
   classical
   let GF := GlobalTheory.LocAcyc.GenFib A R
@@ -35,7 +38,8 @@ theorem _root_.GlobalTheory.T.closure_finite_over_base : ∀ (A R : Type) [CommR
   have : IsScalarTower R GF K' :=
     IsScalarTower.of_algebraMap_eq (fun r => (IsLocalization.lift_eq (M := S) hS r).symm)
   have hg : Function.Injective (algebraMap GF K') := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     obtain ⟨⟨r, s⟩, rfl⟩ := IsLocalization.mk'_surjective S x
     change g (IsLocalization.mk' GF r s) = 0 at hx
@@ -53,34 +57,40 @@ theorem _root_.GlobalTheory.T.closure_finite_over_base : ∀ (A R : Type) [CommR
     intro x y hxy
     apply (TensorProduct.lid GF D).symm.injective
     apply h1
-    simp only [TensorProduct.lid_symm_apply, LinearMap.rTensor_tmul, Algebra.linearMap_apply, map_one]
+    simp only [TensorProduct.lid_symm_apply, LinearMap.rTensor_tmul, Algebra.linearMap_apply,
+      map_one]
     exact hxy
   have key : (ι : D →+* L').comp (GlobalTheory.KeyOriginNoeth.baseHom A R D) = algebraMap R L' := by
     ext r
     show ι (algebraMap GF D (algebraMap R GF r)) = algebraMap R L' r
-    rw [AlgHom.commutes, IsScalarTower.algebraMap_apply GF K' L', IsScalarTower.algebraMap_apply R K' L',
-      ← IsScalarTower.algebraMap_apply R GF K']
+    rw [AlgHom.commutes, IsScalarTower.algebraMap_apply GF K' L',
+      IsScalarTower.algebraMap_apply R K' L', ← IsScalarTower.algebraMap_apply R GF K']
   let : Algebra R (GlobalTheory.KeyOriginNoeth.closure A R D) :=
     GlobalTheory.KeyOriginNoeth.closureAlg A R D
-  let Φ : GlobalTheory.KeyOriginNoeth.closure A R D →ₗ[R] integralClosure R L' :=
-    { toFun := fun c => ⟨ι c.1, by
+  let Φ : GlobalTheory.KeyOriginNoeth.closure A R D →ₗ[R] integralClosure R L' := {
+    toFun := fun c => ⟨
+      ι c.1,
+      by
         have hc : (GlobalTheory.KeyOriginNoeth.baseHom A R D).IsIntegralElem c.1 := c.2
         obtain ⟨p, hp, he⟩ := hc
         refine ⟨p, hp, ?_⟩
-        have h2 := Polynomial.hom_eval₂ p (GlobalTheory.KeyOriginNoeth.baseHom A R D) (ι : D →+* L') c.1
+        have h2 :=
+          Polynomial.hom_eval₂ p (GlobalTheory.KeyOriginNoeth.baseHom A R D) (ι : D →+* L') c.1
         rw [he, map_zero] at h2
         rw [← key]
-        exact h2.symm⟩
-      map_add' := fun x y => by
-        apply Subtype.ext
-        show ι (x.1 + y.1) = ι x.1 + ι y.1
-        exact map_add ι _ _
-      map_smul' := fun r c => by
-        apply Subtype.ext
-        show ι (GlobalTheory.KeyOriginNoeth.baseHom A R D r * c.1) = r • ι c.1
-        rw [map_mul, Algebra.smul_def]
-        congr 1
-        exact RingHom.congr_fun key r }
+        exact h2.symm
+    ⟩
+    map_add' := fun x y => by
+      apply Subtype.ext
+      show ι (x.1 + y.1) = ι x.1 + ι y.1
+      exact map_add ι _ _
+    map_smul' := fun r c => by
+      apply Subtype.ext
+      show ι (GlobalTheory.KeyOriginNoeth.baseHom A R D r * c.1) = r • ι c.1
+      rw [map_mul, Algebra.smul_def]
+      congr 1
+      exact RingHom.congr_fun key r
+  }
   have hΦ : Function.Injective Φ := by
     intro x y hxy
     apply Subtype.ext

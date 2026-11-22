@@ -7,10 +7,9 @@ public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClas
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Rc9.conj_sqrt :
-    ∀ {R : Formalism.BasicNotions.Ranks} (H : Formalism.BasicNotions.Host R),
-    (H.conj : H.E → H.E) H.sqd =
-      -H.sqd := by
+theorem UpperTheory.Reformulated.B.Rc9.conj_sqrt
+    : ∀ {R : Formalism.BasicNotions.Ranks} (H : Formalism.BasicNotions.Host R),
+      (H.conj : H.E → H.E) H.sqd = -H.sqd := by
   intro R H
   have h := H.gal_sqd H.conj
   have hc : H.gal H.conj = R.toFrame.cc := H.gal.apply_symm_apply _

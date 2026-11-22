@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExponentH
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso)
@@ -19,10 +22,11 @@ open UpperTheory.Gal.Int.Div
 
 open GlobalTheory.CuspRep.InfType GlobalTheory.CuspRep.AlgExpo
 
-private theorem chi_fixed {E : Type} [Field E] [NumberField E] [IsCMField E] (χ : HChar E)
-    (hfix : ∀ z, cj E z = z → χ.1 z = 1) (τ : E →+* ℂ) (z : ℂ)
-    (hs : expU (atEmb τ (starRingEnd ℂ z)) = expU (atEmb τ z)) :
-    Complex.exp (expo χ τ * z + expo χ (ComplexEmbedding.conjugate τ) * starRingEnd ℂ z) = 1 := by
+private theorem chi_fixed
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (χ : HChar E) (hfix : ∀ z, cj E z = z → χ.1 z = 1)
+    (τ : E →+* ℂ) (z : ℂ) (hs : expU (atEmb τ (starRingEnd ℂ z)) = expU (atEmb τ z))
+    : Complex.exp (expo χ τ * z + expo χ (ComplexEmbedding.conjugate τ) * starRingEnd ℂ z) = 1 := by
   rw [← chiInf_expU_atEmb]
   have h1 : cj E (infId E (expU (atEmb τ z))) = infId E (expU (atEmb τ z)) := by
     refine (GlobalTheory.NormExpo.conjAd_infId E _).trans ?_
@@ -31,25 +35,31 @@ private theorem chi_fixed {E : Type} [Field E] [NumberField E] [IsCMField E] (χ
   rw [h2]
   rfl
 
-private theorem expU_neg_pi {E : Type} [Field E] [NumberField E] [IsCMField E] (τ : E →+* ℂ) :
-    expU (atEmb τ (starRingEnd ℂ ((Real.pi : ℂ) * Complex.I))) = expU (atEmb τ ((Real.pi : ℂ) * Complex.I)) := by
+private theorem expU_neg_pi {E : Type} [Field E] [NumberField E] [IsCMField E] (τ : E →+* ℂ)
+    : expU (atEmb τ (starRingEnd ℂ ((Real.pi : ℂ) * Complex.I)))
+      = expU (atEmb τ ((Real.pi : ℂ) * Complex.I)) := by
   classical
   refine Units.ext (funext fun w => ?_)
-  change Complex.exp (atEmb τ (starRingEnd ℂ ((Real.pi : ℂ) * Complex.I)) w) =
-    Complex.exp (atEmb τ ((Real.pi : ℂ) * Complex.I) w)
+  change Complex.exp (atEmb τ (starRingEnd ℂ ((Real.pi : ℂ) * Complex.I)) w)
+    = Complex.exp (atEmb τ ((Real.pi : ℂ) * Complex.I) w)
   unfold atEmb
   by_cases hw : w = InfinitePlace.mk τ
   · subst hw
     split_ifs <;> simp [Complex.exp_neg, Complex.exp_pi_mul_I]
   · simp [Pi.single_eq_of_ne hw]
 
-private theorem add_eq_zero_of {p q : ℂ} (h : ∀ t : ℝ, Complex.exp (p * t + q * starRingEnd ℂ (t : ℂ)) = 1) : p + q = 0 := by
+private theorem add_eq_zero_of
+    {p q : ℂ} (h : ∀ t : ℝ, Complex.exp (p * t + q * starRingEnd ℂ (t : ℂ)) = 1)
+    : p + q = 0 := by
   have hf : (fun t : ℝ => Complex.exp ((p + q) * t)) = fun _ => 1 := by
     funext t
     have := h t
     rw [Complex.conj_ofReal] at this
-    rw [add_mul]; exact this
-  have hd : HasDerivAt (fun t : ℝ => Complex.exp ((p + q) * t)) (Complex.exp ((p + q) * ((0 : ℝ) : ℂ)) * ((p + q) * 1)) 0 := by
+    rw [add_mul]
+    exact this
+  have hd : HasDerivAt
+      (fun t : ℝ => Complex.exp ((p + q) * t))
+      (Complex.exp ((p + q) * ((0 : ℝ) : ℂ)) * ((p + q) * 1)) 0 := by
     have h0 : HasDerivAt (fun t : ℝ => (p + q) * (t : ℂ)) ((p + q) * 1) 0 :=
       (Complex.ofRealCLM.hasDerivAt (x := (0 : ℝ))).const_mul (p + q)
     exact h0.cexp
@@ -57,8 +67,7 @@ private theorem add_eq_zero_of {p q : ℂ} (h : ∀ t : ℝ, Complex.exp (p * t 
   have := hd.unique (hasDerivAt_const (0 : ℝ) (1 : ℂ))
   simpa using this
 
-theorem UpperTheory.Gal.Int.Div.algOfFix_of :
-    AlgOfFix := by
+theorem UpperTheory.Gal.Int.Div.algOfFix_of : AlgOfFix := by
   intro E _ _ _ χ hfix
   have key : ∀ τ : E →+* ℂ, ∃ n : ℤ, expo χ τ = n := by
     intro τ

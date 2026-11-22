@@ -5,9 +5,9 @@ public import Formalism.PeriodIntegrals.PhNormLimit
 
 @[expose] public section
 
-private theorem coeff_pow_eq_zero_of_lt_of_constantCoeff_eq_zero {K : Type*} [CommRing K] (a : MvPowerSeries Unit K)
-    (ha : MvPowerSeries.constantCoeff a = 0) :
-    ∀ (d : ℕ) (e : Unit →₀ ℕ), e () < d → MvPowerSeries.coeff e (a ^ d) = 0 := by
+private theorem coeff_pow_eq_zero_of_lt_of_constantCoeff_eq_zero
+    {K : Type*} [CommRing K] (a : MvPowerSeries Unit K) (ha : MvPowerSeries.constantCoeff a = 0)
+    : ∀ (d : ℕ) (e : Unit →₀ ℕ), e () < d → MvPowerSeries.coeff e (a ^ d) = 0 := by
   intro d
   induction d with
   | zero => intro e he; exact absurd he (Nat.not_lt_zero _)
@@ -25,10 +25,13 @@ private theorem coeff_pow_eq_zero_of_lt_of_constantCoeff_eq_zero {K : Type*} [Co
       rw [hx2, MvPowerSeries.coeff_zero_eq_constantCoeff_apply, ha, mul_zero]
     · rw [ih x.1 (by omega), zero_mul]
 
-private theorem coeff_subst_eq_sum_range_coeff_mul_coeff_pow {K : Type*} [CommRing K] (f : PowerSeries K)
-    (a : MvPowerSeries Unit K) (ha : MvPowerSeries.constantCoeff a = 0) (e : Unit →₀ ℕ) :
-    MvPowerSeries.coeff e (PowerSeries.subst a f) =
-      ∑ d ∈ Finset.range (e () + 1), PowerSeries.coeff d f • MvPowerSeries.coeff e (a ^ d) := by
+private theorem coeff_subst_eq_sum_range_coeff_mul_coeff_pow
+    {K : Type*} [CommRing K]
+    (f : PowerSeries K)
+    (a : MvPowerSeries Unit K) (ha : MvPowerSeries.constantCoeff a = 0)
+    (e : Unit →₀ ℕ)
+    : MvPowerSeries.coeff e (PowerSeries.subst a f)
+      = ∑ d ∈ Finset.range (e () + 1), PowerSeries.coeff d f • MvPowerSeries.coeff e (a ^ d) := by
   rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero ha)]
   apply finsum_eq_sum_of_support_subset
   intro d hd
@@ -37,15 +40,19 @@ private theorem coeff_subst_eq_sum_range_coeff_mul_coeff_pow {K : Type*} [CommRi
   by_contra hn
   exact hd (by rw [coeff_pow_eq_zero_of_lt_of_constantCoeff_eq_zero a ha d e (by omega), smul_zero])
 
-private theorem constantCoeff_subst_of_constantCoeff_eq_zero_orbital_bounds_conclusion {K : Type*} [CommRing K] (f : PowerSeries K)
-    (a : MvPowerSeries Unit K) (ha : MvPowerSeries.constantCoeff a = 0) :
-    MvPowerSeries.constantCoeff (PowerSeries.subst a f) = PowerSeries.constantCoeff f := by
-  rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, coeff_subst_eq_sum_range_coeff_mul_coeff_pow f a ha 0]
+private theorem constantCoeff_subst_of_constantCoeff_eq_zero_orbital_bounds_conclusion
+    {K : Type*} [CommRing K]
+    (f : PowerSeries K)
+    (a : MvPowerSeries Unit K) (ha : MvPowerSeries.constantCoeff a = 0)
+    : MvPowerSeries.constantCoeff (PowerSeries.subst a f) = PowerSeries.constantCoeff f := by
+  rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply,
+    coeff_subst_eq_sum_range_coeff_mul_coeff_pow f a ha 0]
   simp
 
-private theorem continuous_coeff_pow_of_continuous_coeff {K Y : Type*} [NormedField K] [TopologicalSpace Y]
-    (F : Y → MvPowerSeries Unit K) (hF : ∀ e, Continuous fun y => MvPowerSeries.coeff e (F y)) :
-    ∀ (n : ℕ) (e : Unit →₀ ℕ), Continuous fun y => MvPowerSeries.coeff e (F y ^ n) := by
+private theorem continuous_coeff_pow_of_continuous_coeff
+    {K Y : Type*} [NormedField K] [TopologicalSpace Y]
+    (F : Y → MvPowerSeries Unit K) (hF : ∀ e, Continuous fun y => MvPowerSeries.coeff e (F y))
+    : ∀ (n : ℕ) (e : Unit →₀ ℕ), Continuous fun y => MvPowerSeries.coeff e (F y ^ n) := by
   intro n
   induction n with
   | zero =>
@@ -57,31 +64,41 @@ private theorem continuous_coeff_pow_of_continuous_coeff {K Y : Type*} [NormedFi
     simp only [pow_succ, MvPowerSeries.coeff_mul]
     exact continuous_finsetSum _ fun x _ => (ih x.1).mul (hF x.2)
 
-private theorem continuous_coeff_subst_of_continuous_coeff {K Y : Type*} [NormedField K] [TopologicalSpace Y]
-    (f : PowerSeries K) (a : Y → MvPowerSeries Unit K)
-    (ha : ∀ y, MvPowerSeries.constantCoeff (a y) = 0)
-    (hc : ∀ e, Continuous fun y => MvPowerSeries.coeff e (a y)) :
-    ∀ e, Continuous fun y => MvPowerSeries.coeff e (PowerSeries.subst (a y) f) := by
+private theorem continuous_coeff_subst_of_continuous_coeff
+    {K Y : Type*} [NormedField K] [TopologicalSpace Y]
+    (f : PowerSeries K)
+    (a : Y → MvPowerSeries Unit K) (ha : ∀ y, MvPowerSeries.constantCoeff (a y) = 0)
+    (hc : ∀ e, Continuous fun y => MvPowerSeries.coeff e (a y))
+    : ∀ e, Continuous fun y => MvPowerSeries.coeff e (PowerSeries.subst (a y) f) := by
   intro e
-  have h : (fun y => MvPowerSeries.coeff e (PowerSeries.subst (a y) f)) =
-      fun y => ∑ d ∈ Finset.range (e () + 1),
-        PowerSeries.coeff d f • MvPowerSeries.coeff e (a y ^ d) :=
+  have h
+      : (fun y => MvPowerSeries.coeff e (PowerSeries.subst (a y) f))
+        = fun y =>
+          ∑ d ∈ Finset.range (e () + 1),
+            PowerSeries.coeff d f • MvPowerSeries.coeff e (a y ^ d) :=
     funext fun y => coeff_subst_eq_sum_range_coeff_mul_coeff_pow f (a y) (ha y) e
   rw [h]
   exact continuous_finsetSum _ fun d _ =>
-    Continuous.smul (f := fun _ => PowerSeries.coeff d f) continuous_const (continuous_coeff_pow_of_continuous_coeff a hc d e)
+    Continuous.smul
+      (f := fun _ => PowerSeries.coeff d f)
+      continuous_const (continuous_coeff_pow_of_continuous_coeff a hc d e)
 
-private theorem forall_mem_closure_of_isClosed_setOf {Y : Type*} [TopologicalSpace Y] (T : Set Y) (P : Y → Prop)
-    (hc : IsClosed {y | P y}) (h : ∀ y ∈ T, P y) : ∀ y ∈ closure T, P y :=
-  fun _ hy => closure_minimal h hc hy
+private theorem forall_mem_closure_of_isClosed_setOf
+    {Y : Type*} [TopologicalSpace Y]
+    (T : Set Y) (P : Y → Prop) (hc : IsClosed {y | P y}) (h : ∀ y ∈ T, P y)
+    : ∀ y ∈ closure T, P y := fun _ hy =>
+  closure_minimal h hc hy
 
-private theorem isClosed_setOf_coeff_exp_norm_le_one {K Y : Type*} [NormedField K] [TopologicalSpace Y]
+private theorem isClosed_setOf_coeff_exp_norm_le_one
+    {K Y : Type*} [NormedField K] [TopologicalSpace Y]
     (F G : Y → MvPowerSeries Unit K) (hF : ∀ e, Continuous fun y => MvPowerSeries.coeff e (F y))
-    (hG : ∀ (n : Unit →₀ ℕ) (y : Y), MvPowerSeries.coeff n (G y) =
-      ∑ k ∈ Finset.range ((n.sum fun _ k => k) + 1),
-        MvPowerSeries.coeff n (F y ^ k) / (k.factorial : K)) :
-    IsClosed {y | MvPowerSeries.constantCoeff (F y) = 0 ∧
-      ∀ n : Unit →₀ ℕ, ‖MvPowerSeries.coeff n (G y)‖ ≤ 1} := by
+    (hG : ∀ (n : Unit →₀ ℕ) (y : Y),
+      MvPowerSeries.coeff n (G y)
+        = ∑ k ∈ Finset.range ((n.sum fun _ k => k) + 1),
+            MvPowerSeries.coeff n (F y ^ k) / (k.factorial : K))
+    : IsClosed
+      {y | MvPowerSeries.constantCoeff (F y) = 0 ∧
+        ∀ n : Unit →₀ ℕ, ‖MvPowerSeries.coeff n (G y)‖ ≤ 1} := by
   have h1 : IsClosed {y | MvPowerSeries.constantCoeff (F y) = 0} := by
     refine isClosed_eq ?_ continuous_const
     simpa only [MvPowerSeries.coeff_zero_eq_constantCoeff_apply] using hF 0
@@ -89,24 +106,43 @@ private theorem isClosed_setOf_coeff_exp_norm_le_one {K Y : Type*} [NormedField 
     simp only [Set.setOf_forall]
     refine isClosed_iInter fun n => isClosed_le ?_ continuous_const
     simp only [hG]
-    exact (continuous_finsetSum _ fun k _ => (continuous_coeff_pow_of_continuous_coeff F hF k n).div_const _).norm
+    exact (continuous_finsetSum _ fun k _ =>
+      (continuous_coeff_pow_of_continuous_coeff F hF k n).div_const _).norm
   simpa only [Set.setOf_and] using h1.inter h2
 
-private theorem continuous_coeff_subst_subst_C_mul_subst {K Y : Type*} [NormedField K] [TopologicalSpace Y]
-    (l ex ph : PowerSeries K) (hl : PowerSeries.constantCoeff l = 0)
-    (hex : PowerSeries.constantCoeff ex = 0) (c : Y → K) (hc : Continuous c) :
-    ∀ e, Continuous fun y => MvPowerSeries.coeff e (PowerSeries.subst (PowerSeries.subst
-        (MvPowerSeries.C (c y) * PowerSeries.subst (MvPowerSeries.X () : MvPowerSeries Unit K) l)
-        ex) ph) := by
-  have hin : ∀ y, MvPowerSeries.constantCoeff
-      (MvPowerSeries.C (c y) * PowerSeries.subst (MvPowerSeries.X () : MvPowerSeries Unit K) l) = 0 := by
+private theorem continuous_coeff_subst_subst_C_mul_subst
+    {K Y : Type*} [NormedField K] [TopologicalSpace Y]
+    (l ex ph : PowerSeries K)
+    (hl : PowerSeries.constantCoeff l = 0) (hex : PowerSeries.constantCoeff ex = 0)
+    (c : Y → K) (hc : Continuous c)
+    : ∀ e,
+      Continuous fun y =>
+        MvPowerSeries.coeff e
+          (PowerSeries.subst
+            (PowerSeries.subst
+              (MvPowerSeries.C (c y)
+                * PowerSeries.subst (MvPowerSeries.X () : MvPowerSeries Unit K) l)
+              ex)
+            ph) := by
+  have hin
+      : ∀ y,
+        MvPowerSeries.constantCoeff
+            (MvPowerSeries.C (c y)
+              * PowerSeries.subst (MvPowerSeries.X () : MvPowerSeries Unit K) l)
+          = 0 := by
     intro y
     rw [map_mul, MvPowerSeries.constantCoeff_C,
-      constantCoeff_subst_of_constantCoeff_eq_zero_orbital_bounds_conclusion l _ (MvPowerSeries.constantCoeff_X ()), hl, mul_zero]
-  have hmid : ∀ y, MvPowerSeries.constantCoeff (PowerSeries.subst
-      (MvPowerSeries.C (c y) * PowerSeries.subst (MvPowerSeries.X () : MvPowerSeries Unit K) l)
-      ex) = 0 :=
-    fun y => (constantCoeff_subst_of_constantCoeff_eq_zero_orbital_bounds_conclusion ex _ (hin y)).trans hex
+      constantCoeff_subst_of_constantCoeff_eq_zero_orbital_bounds_conclusion l _
+        (MvPowerSeries.constantCoeff_X ()),
+      hl, mul_zero]
+  have hmid
+      : ∀ y,
+        MvPowerSeries.constantCoeff (PowerSeries.subst
+            (MvPowerSeries.C (c y)
+              * PowerSeries.subst (MvPowerSeries.X () : MvPowerSeries Unit K) l)
+            ex)
+          = 0 := fun y =>
+    (constantCoeff_subst_of_constantCoeff_eq_zero_orbital_bounds_conclusion ex _ (hin y)).trans hex
   refine continuous_coeff_subst_of_continuous_coeff ph _ hmid ?_
   refine continuous_coeff_subst_of_continuous_coeff ex _ hin ?_
   intro e

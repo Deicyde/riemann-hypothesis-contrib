@@ -88,8 +88,8 @@ lemma quad_lower {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) :
       simp
     · exact absurd ⟨_, hnorm v hv⟩ hS
 
-theorem posDef_nhd {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) :
-    ∃ δ > 0, ∀ H : Matrix (Fin n) (Fin n) ℂ, H.IsHermitian → ‖H‖ < δ → (x + H).PosDef := by
+theorem posDef_nhd {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef)
+    : ∃ δ > 0, ∀ H : Matrix (Fin n) (Fin n) ℂ, H.IsHermitian → ‖H‖ < δ → (x + H).PosDef := by
   obtain ⟨c, hc, hq⟩ := quad_lower hx
   refine ⟨c / ((n : ℝ) * n + 1), by positivity, fun H hH hHn => ?_⟩
   rw [posDef_iff_dotProduct_mulVec]
@@ -102,7 +102,7 @@ theorem posDef_nhd {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) :
   · rw [e, Complex.add_re, Complex.zero_re]
     have h1 := hq v
     have h2 := quad_norm_le H v
-    have h3 : -‖star v ⬝ᵥ (H *ᵥ v)‖ ≤ (star v ⬝ᵥ (H *ᵥ v)).re := by
+    have h3 : - ‖star v ⬝ᵥ (H *ᵥ v)‖ ≤ (star v ⬝ᵥ (H *ᵥ v)).re := by
       have := Complex.abs_re_le_norm (star v ⬝ᵥ (H *ᵥ v))
       linarith [neg_abs_le (star v ⬝ᵥ (H *ᵥ v)).re]
     have hv2 : 0 < ‖v‖ ^ 2 := by have := norm_pos_iff.mpr hv; positivity
@@ -116,9 +116,10 @@ theorem posDef_nhd {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) :
   · rw [Complex.zero_im]
     simpa using him.symm
 
-theorem line_zero {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F] [CompleteSpace F] (g : ℂ → F)
-    (hg : ∀ s : ℂ, ‖s‖ < 2 → DifferentiableAt ℂ g s) (hr : ∀ t : ℝ, |t| < 2 → g t = 0) :
-    g Complex.I = 0 := by
+theorem line_zero
+    {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F] [CompleteSpace F]
+    (g : ℂ → F) (hg : ∀ s : ℂ, ‖s‖ < 2 → DifferentiableAt ℂ g s) (hr : ∀ t : ℝ, |t| < 2 → g t = 0)
+    : g Complex.I = 0 := by
   have hDO : DifferentiableOn ℂ g (Metric.ball 0 2) := fun s hs =>
     (hg s (by simpa using hs)).differentiableWithinAt
   have han := hDO.analyticOnNhd Metric.isOpen_ball
@@ -132,8 +133,9 @@ theorem line_zero {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F] [Comple
       simpa [Real.dist_eq] using ht
     exact (Filter.Eventually.filter_mono nhdsWithin_le_nhds h2).mono fun t h => hr t h
   have hfreq : ∃ᶠ s in nhdsWithin (0 : ℂ) {0}ᶜ, g s = 0 := ht.frequently hev.frequently
-  have hz := han.eqOn_zero_of_preconnected_of_frequently_eq_zero (convex_ball (0 : ℂ) 2).isPreconnected
-    (Metric.mem_ball_self two_pos) hfreq
+  have hz :=
+    han.eqOn_zero_of_preconnected_of_frequently_eq_zero (convex_ball (0 : ℂ) 2).isPreconnected
+      (Metric.mem_ball_self two_pos) hfreq
   have hI : Complex.I ∈ Metric.ball (0 : ℂ) 2 := by
     rw [Metric.mem_ball, dist_zero_right, Complex.norm_I]
     norm_num

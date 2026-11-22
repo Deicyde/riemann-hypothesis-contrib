@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSE
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -28,7 +29,8 @@ theorem spectral_pairing_zero_right : RDSPZeroR := by
     exact smul_right_injective _ hw e
   have hD : ∀ y ∈ JF.Om k r D.z D.z', y ∈ Q.Glev k r 0 ∩ JF.Om k r D.z D.z' := fun y hy =>
     ⟨Formalism.FourierDecayAlt.P.OrbitalIntegralIdentities.glev0 hy.1, hy⟩
-  have hNl : ∀ n ∈ Formalism.QuantumDeterminants.Nset k r, n ∈ Q.Nlev k r 0 := fun n hn => ⟨hn, Formalism.FourierDecayAlt.P.OrbitalIntegralIdentities.glev0 hn.1⟩
+  have hNl : ∀ n ∈ Formalism.QuantumDeterminants.Nset k r, n ∈ Q.Nlev k r 0 := fun n hn =>
+    ⟨hn, Formalism.FourierDecayAlt.P.OrbitalIntegralIdentities.glev0 hn.1⟩
   rw [hge]
   exact Formalism.FourierDecayAlt.P.CutMP.JA.LT.agree_sgs D X Y
     (fun y hy n hn => hX.2.1 y (hD y hy) n (hNl n hn))

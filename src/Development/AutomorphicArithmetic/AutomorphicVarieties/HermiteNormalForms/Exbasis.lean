@@ -7,13 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.exbasis :
-    ∀ (L : Type) [Field L] [NumberField L] (N : ℕ) (M : Set (Lat L N)), Spans M →
-    ∃ A : Matrix (Fin N) (Fin N) (𝓞 L), A.det ≠ 0 ∧ ∀ a, (fun i => A i a) ∈ M := by
+theorem UpperTheory.V.KT.exbasis
+    : ∀ (L : Type) [Field L] [NumberField L] (N : ℕ) (M : Set (Lat L N)),
+      Spans M → ∃ A : Matrix (Fin N) (Fin N) (𝓞 L), A.det ≠ 0 ∧ ∀ a, (fun i => A i a) ∈ M := by
   intro L _ _ N M hM
   classical
   obtain ⟨s, hs, hspan, hli⟩ := exists_linearIndependent L (toL '' M)
-  have htop : (⊤ : Submodule L (Fin N → L)) ≤ Submodule.span L (Set.range ((↑) : s → Fin N → L)) := by
+  have htop
+      : (⊤ : Submodule L (Fin N → L)) ≤ Submodule.span L (Set.range ((↑) : s → Fin N → L)) := by
     rw [Subtype.range_coe, hspan]
     exact hM.ge
   let B := Module.Basis.mk hli htop

@@ -23,9 +23,12 @@ theorem haarUnique_holds : Formalism.L2.SG.Pf.LsNc5.HaarUnique := by
   obtain ⟨hσ', h0', hc', hi'⟩ := hν
   haveI := hσ
   haveI := hσ'
-  have hco : (ProductExactness.NinfG X u : Set X.B.I.Ginf) = X.NinfU u := ProductExactness.NinfG_coe X u
+  have hco : (ProductExactness.NinfG X u : Set X.B.I.Ginf) = X.NinfU u :=
+    ProductExactness.NinfG_coe X u
   rw [← hco] at hc hi hc' hi'
-  obtain ⟨κ, -, -, hκ⟩ := ProductExactness.PiM.uniq_on_closed (ProductExactness.NinfG X u) (ProductExactness.NinfG_closed X u) μ ν hc hc' hi hi' h0 h0'
+  obtain ⟨κ, -, -, hκ⟩ :=
+    ProductExactness.PiM.uniq_on_closed (ProductExactness.NinfG X u)
+      (ProductExactness.NinfG_closed X u) μ ν hc hc' hi hi' h0 h0'
   exact ⟨κ, hκ⟩
 
 end Formalism.L2.SG.Pf.NcReal.JX

@@ -15,8 +15,12 @@ def ordPart (U : Module.End R M) : Submodule R M := ⨅ n : ℕ, LinearMap.range
 theorem mem_ordPart {U : Module.End R M} {x : M} : x ∈ ordPart U ↔ ∀ n : ℕ, ∃ y, (U ^ n) y = x := by
   simp [ordPart, Submodule.mem_iInf]
 
-theorem map_mem_smul_top {N : Type*} [AddCommGroup N] [Module R N] (f : M →ₗ[R] N) (J : Ideal R)
-    {x : M} (hx : x ∈ (J • ⊤ : Submodule R M)) : f x ∈ (J • ⊤ : Submodule R N) := by
+theorem map_mem_smul_top
+    {N : Type*} [AddCommGroup N] [Module R N]
+    (f : M →ₗ[R] N)
+    (J : Ideal R)
+    {x : M} (hx : x ∈ (J • ⊤ : Submodule R M))
+    : f x ∈ (J • ⊤ : Submodule R N) := by
   have h1 := Submodule.mem_map_of_mem (f := f) hx
   rw [Submodule.map_smul''] at h1
   exact Submodule.smul_mono le_rfl le_top h1
@@ -47,19 +51,16 @@ structure IsOrdProj (I : Ideal R) (U e : Module.End R M) : Prop where
 def IsFactLim (I : Ideal R) (U e : Module.End R M) : Prop :=
   ∀ k : ℕ, ∃ N : ℕ, ∀ j, N ≤ j → ∀ x, (U ^ j.factorial) x - e x ∈ (I ^ k • ⊤ : Submodule R M)
 
-
 open Classical in
-noncomputable def ordProj (I : Ideal R) (U : Module.End R M) : Module.End R M :=
-  by
-    classical
-    exact if h : ∃ e, IsOrdProj I U e then h.choose else 0
+noncomputable def ordProj (I : Ideal R) (U : Module.End R M) : Module.End R M := by
+  classical
+  exact if h : ∃ e, IsOrdProj I U e then h.choose else 0
 
-theorem isOrdProj_ordProj {I : Ideal R} {U : Module.End R M} (h : ∃ e, IsOrdProj I U e) :
-    IsOrdProj I U (ordProj I U) := by
+theorem isOrdProj_ordProj {I : Ideal R} {U : Module.End R M} (h : ∃ e, IsOrdProj I U e)
+    : IsOrdProj I U (ordProj I U) := by
   unfold ordProj
   rw [dite_eq_left h]
   exact h.choose_spec
-
 
 variable (M) in
 structure OrdAdm (I : Ideal R) : Prop where
@@ -70,12 +71,15 @@ end Ord
 
 section Map
 
-variable {A A' : Type*} [CommRing A] [CommRing A'] [Algebra A A']
+variable
+  {A A' : Type*} [CommRing A] [CommRing A'] [Algebra A A']
   {M : Type*} [AddCommGroup M] [Module A M]
   {M' : Type*} [AddCommGroup M'] [Module A M'] [Module A' M'] [IsScalarTower A A' M']
 
-theorem pow_intertwine {U : Module.End A M} {U' : Module.End A' M'} {f : M →ₗ[A] M'}
-    (h : ∀ x, f (U x) = U' (f x)) (n : ℕ) (x : M) : f ((U ^ n) x) = (U' ^ n) (f x) := by
+theorem pow_intertwine
+    {U : Module.End A M} {U' : Module.End A' M'} {f : M →ₗ[A] M'} (h : ∀ x, f (U x) = U' (f x))
+    (n : ℕ) (x : M)
+    : f ((U ^ n) x) = (U' ^ n) (f x) := by
   induction n with
   | zero => simp
   | succ n ih => simp only [pow_succ', Module.End.mul_apply, h, ih]
@@ -84,7 +88,9 @@ end Map
 
 section Lim
 
-variable {R : Type*} [CommRing R] {P : ℕ → Type*} [∀ b, AddCommGroup (P b)] [∀ b, Module R (P b)]
+variable
+  {R : Type*} [CommRing R]
+  {P : ℕ → Type*} [∀ b, AddCommGroup (P b)] [∀ b, Module R (P b)]
   {Q : ℕ → Type*} [∀ b, AddCommGroup (Q b)] [∀ b, Module R (Q b)]
 
 end Lim

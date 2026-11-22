@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.JGenS
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSAmp
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSAmp
 
 set_option autoImplicit false
 
@@ -22,19 +24,30 @@ namespace GlobalTheory.HSAmp
 
 open GlobalTheory.TrueGeo.SmallSec
 
-theorem pair_pull : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (Y : Scheme.{0})
-    [IsIntegral Y] (q : Y ⟶ Sp k) (π : Y ⟶ X) (hπ : π ≫ p = q), π (genericPoint Y) = genericPoint X →
-    ∀ P : Pair p, ∃ (Q : Pair q) (e : X.functionField →+* Y.functionField), Q.L = P.L.pull π hπ ∧
-      Q.A = P.A.pull π hπ ∧ ∀ (a b : ℤ), ∀ f ∈ P.H a b, e f ∈ Q.H a b ∧ ∀ (σ : k →+* ℂ) (y : CxPts q σ),
-        Q.nu a b σ y (e f) = P.nu a b σ (Points.PtsOver.map π hπ _ y) f := by
+theorem pair_pull
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (Y : Scheme.{0})
+        [IsIntegral Y] (q : Y ⟶ Sp k) (π : Y ⟶ X) (hπ : π ≫ p = q),
+      π (genericPoint Y) = genericPoint X
+        → ∀ P : Pair p, ∃ (Q : Pair q) (e : X.functionField →+* Y.functionField),
+          Q.L = P.L.pull π hπ ∧ Q.A = P.A.pull π hπ
+            ∧ ∀ (a b : ℤ), ∀ f ∈ P.H a b,
+              e f ∈ Q.H a b
+                ∧ ∀ (σ : k →+* ℂ) (y : CxPts q σ),
+                  Q.nu a b σ y (e f) = P.nu a b σ (Points.PtsOver.map π hπ _ y) f := by
   intro k _ X _ p Y _ q π hπ hgen P
   subst hπ
   have hη : π (genericPoint Y) ⤳ genericPoint X := hgen ▸ specializes_rfl
-  let Q : Pair (π ≫ p) :=
-    ⟨P.L.pull π rfl, P.A.pull π rfl, _, _, MultPull.isRatSec_pull_map π hη P.hr,
-      MultPull.isRatSec_pull_map π hη P.hr'⟩
-  have hloc : ∀ (a b : ℤ) (f : X.functionField) (i : Q.L.B.ι) (j : Q.A.B.ι),
-      Q.loc a b (fnMap π hη f) i j = fnMap π hη (P.loc a b f (i PUnit.unit) (j PUnit.unit)) := by
+  let Q : Pair (π ≫ p) := ⟨
+    P.L.pull π rfl,
+    P.A.pull π rfl,
+    _,
+    _,
+    MultPull.isRatSec_pull_map π hη P.hr,
+    MultPull.isRatSec_pull_map π hη P.hr'
+  ⟩
+  have hloc
+      : ∀ (a b : ℤ) (f : X.functionField) (i : Q.L.B.ι) (j : Q.A.B.ι),
+        Q.loc a b (fnMap π hη f) i j = fnMap π hη (P.loc a b f (i PUnit.unit) (j PUnit.unit)) := by
     intro a b f i j
     simp only [Pair.loc, map_mul, map_zpow₀]
     rfl
@@ -42,7 +55,8 @@ theorem pair_pull : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] 
     intro a b f hf x i j hi hj
     rw [hloc]
     exact FrameGlue.Pull.regAt_fnMap π hη
-      (hf (π x) (i PUnit.unit) (j PUnit.unit) (Set.mem_iInter.1 hi PUnit.unit) (Set.mem_iInter.1 hj PUnit.unit))
+      (hf (π x) (i PUnit.unit) (j PUnit.unit) (Set.mem_iInter.1 hi PUnit.unit)
+        (Set.mem_iInter.1 hj PUnit.unit))
   refine ⟨Q, fnMap π hη, rfl, rfl, fun a b f hf => ⟨hmem a b f hf, fun σ y => ?_⟩⟩
   let z := Points.PtsOver.map π (rfl : π ≫ p = π ≫ p) (spMap σ) y
   set i0 := pick (P.L.φ σ).isLB z

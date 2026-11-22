@@ -8,12 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IsClas
 
 namespace GlobalTheory.ColNorms
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds GlobalTheory.ColNorms
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds
+  GlobalTheory.ColNorms
 open scoped ComplexOrder
 
-theorem pairVr_one_eq {E K : Type} [Field E] [Field K] [StarRing K] {ι : Type} [Fintype ι] (emb : ι → E →+* K) {n : ℕ}
-    (lam : ι → DomWeight n) :
-    pairVr emb lam (1 : Matrix (Fin n) (Fin n) E) = pairK lam (fun _ => (1 : Matrix (Fin n) (Fin n) K)) := by
+theorem pairVr_one_eq
+    {E K : Type} [Field E] [Field K] [StarRing K]
+    {ι : Type} [Fintype ι]
+    (emb : ι → E →+* K)
+    {n : ℕ} (lam : ι → DomWeight n)
+    : pairVr emb lam (1 : Matrix (Fin n) (Fin n) E)
+      = pairK lam (fun _ => (1 : Matrix (Fin n) (Fin n) K)) := by
   have e : gramKd emb (1 : Matrix (Fin n) (Fin n) E) = fun _ => 1 := by
     funext τ
     rw [gramKd, Matrix.map_one _ (map_zero _) (map_one _), inv_one, Matrix.transpose_one]

@@ -8,20 +8,21 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem padicAlgCl_norm_ratCast (q : ℕ) [Fact q.Prime] (c : ℚ) :
-    ‖(c : PadicAlgCl q)‖ = ‖((c : ℚ) : ℚ_[q])‖ := by
+theorem padicAlgCl_norm_ratCast (q : ℕ) [Fact q.Prime] (c : ℚ)
+    : ‖(c : PadicAlgCl q)‖ = ‖((c : ℚ) : ℚ_[q])‖ := by
   rw [← PadicAlgCl.norm_extends q (c : ℚ_[q]), map_ratCast]
 
-theorem norm_conj_le_one_of_bounded_coords :
-    ∀ (M : Type) [CommRing M] [Algebra ℚ M] (q : ℕ) [Fact q.Prime] (ι : Type) [Fintype ι]
-      (f : M →ₗ[ℚ] (ι → ℚ)), Function.Injective f → ∀ (a : M) (B : ℝ),
-      (∀ (k : ℕ) (i : ι), ‖((f (a ^ k) i : ℚ) : ℚ_[q])‖ ≤ B) →
-      ∀ τ : M →+* PadicAlgCl q, ‖τ a‖ ≤ 1 := by
+theorem norm_conj_le_one_of_bounded_coords
+    : ∀ (M : Type) [CommRing M] [Algebra ℚ M] (q : ℕ) [Fact q.Prime] (ι : Type) [Fintype ι]
+        (f : M →ₗ[ℚ] (ι → ℚ)),
+      Function.Injective f
+        → ∀ (a : M) (B : ℝ),
+          (∀ (k : ℕ) (i : ι), ‖((f (a ^ k) i : ℚ) : ℚ_[q])‖ ≤ B)
+            → ∀ τ : M →+* PadicAlgCl q, ‖τ a‖ ≤ 1 := by
   intro M _ _ q _ ι _ f hf a B hB τ
   classical
   obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective f (LinearMap.ker_eq_bot.mpr hf)
-  have hgf : ∀ m, g (f m) = m := fun m => by
-    simpa using LinearMap.congr_fun hg m
+  have hgf : ∀ m, g (f m) = m := fun m => by simpa using LinearMap.congr_fun hg m
   have hsmul : ∀ (c : ℚ) (m : M), τ (c • m) = (c : PadicAlgCl q) * τ m := by
     intro c m
     rw [Algebra.smul_def, map_mul]

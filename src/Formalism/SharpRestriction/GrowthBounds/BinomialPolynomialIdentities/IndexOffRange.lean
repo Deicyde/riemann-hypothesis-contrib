@@ -13,8 +13,9 @@ namespace Formalism.MainNotions.G.ColumnFamilies
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-theorem hstrip_iff {n : ℕ} (nu mu : Fin n → ℤ) (b : ℕ) :
-    Formalism.InvariantFactorPaths.GelfandTsetlinBases.HStrip mu nu b ↔ Formalism.MainNotions.G.HStrip nu mu b := by
+theorem hstrip_iff {n : ℕ} (nu mu : Fin n → ℤ) (b : ℕ)
+    : Formalism.InvariantFactorPaths.GelfandTsetlinBases.HStrip mu nu b
+      ↔ Formalism.MainNotions.G.HStrip nu mu b := by
   unfold Formalism.InvariantFactorPaths.GelfandTsetlinBases.HStrip Formalism.MainNotions.G.HStrip
   refine and_congr Iff.rfl (and_congr ?_ ?_)
   · constructor
@@ -23,13 +24,16 @@ theorem hstrip_iff {n : ℕ} (nu mu : Fin n → ℤ) (b : ℕ) :
     · intro h m m' hm
       have hlt : m.1 + 1 < n := by rw [hm]; exact m'.2
       have : m' = ⟨m.1 + 1, hlt⟩ := Fin.ext hm.symm
-      rw [this]; exact h m hlt
+      rw [this]
+      exact h m hlt
   · rw [Finset.sum_sub_distrib]
 
-theorem ext_of_lt {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) {i : ℕ} (h : i < N + 1) : ext mu i = mu ⟨i, h⟩ := by
+theorem ext_of_lt {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) {i : ℕ} (h : i < N + 1)
+    : ext mu i = mu ⟨i, h⟩ := by
   unfold ext; rw [dite_eq_left h]
 
-theorem isV_of_lt {N : ℕ} (LL : Letters (Fin N)) {i : ℕ} (h : i < N) : isV LL i = LL.vec ⟨i, h⟩ := by
+theorem isV_of_lt {N : ℕ} (LL : Letters (Fin N)) {i : ℕ} (h : i < N)
+    : isV LL i = LL.vec ⟨i, h⟩ := by
   unfold isV; rw [dite_eq_left h]
 
 theorem Bn_of_lt {N : ℕ} (B : Fin N → ℕ) {i : ℕ} (h : i < N) : Bn B i = B ⟨i, h⟩ := by
@@ -40,7 +44,8 @@ theorem restPathTo : RestPathTo := by
   refine ⟨?_, ?_, ?_⟩
   · rw [ext_of_lt _ (Nat.succ_pos N)]; exact P.zero
   · intro i hi
-    rw [ext_of_lt _ (Nat.lt_succ_of_le hi)]; exact P.dom _
+    rw [ext_of_lt _ (Nat.lt_succ_of_le hi)]
+    exact P.dom _
   · intro i hi
     have hs := P.step ⟨i, hi⟩
     rw [isV_of_lt LL hi, Bn_of_lt B hi, ext_of_lt P.mu (show i < N + 1 by omega),
@@ -71,22 +76,26 @@ theorem restPathFrom : RestPathFrom := by
     · exact (hstrip_iff _ _ _).1 h
     · exact (hstrip_iff _ _ _).1 h
 
-theorem tabCol_eq {n : ℕ} (I : ℤ → Finset (Fin n)) (c : ℤ) : tabCol I c = Formalism.InvariantFactorPaths.GelfandTsetlinBases.hatIdx I c := by
+theorem tabCol_eq {n : ℕ} (I : ℤ → Finset (Fin n)) (c : ℤ)
+    : tabCol I c = Formalism.InvariantFactorPaths.GelfandTsetlinBases.hatIdx I c := by
   unfold tabCol Formalism.InvariantFactorPaths.GelfandTsetlinBases.hatIdx
   split_ifs
   · rfl
   · exact (Finset.compl_eq_univ_sdiff _).symm
 
-theorem cnt_succ {n : ℕ} (A : Finset (Fin n)) (t : Fin n) :
-    Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt A (t.val + 1) = (A.filter (· ≤ t)).card := by
+theorem cnt_succ {n : ℕ} (A : Finset (Fin n)) (t : Fin n)
+    : Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt A (t.val + 1)
+      = (A.filter (· ≤ t)).card := by
   unfold Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt
   congr 1
 
-theorem dom_iff_le {n : ℕ} (A B : Finset (Fin n)) :
-    Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.Dom A B ↔ ∀ t : Fin n, (B.filter (· ≤ t)).card ≤ (A.filter (· ≤ t)).card := by
+theorem dom_iff_le {n : ℕ} (A B : Finset (Fin n))
+    : Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.Dom A B
+      ↔ ∀ t : Fin n, (B.filter (· ≤ t)).card ≤ (A.filter (· ≤ t)).card := by
   constructor
   · intro h t
-    rw [← cnt_succ, ← cnt_succ]; exact h _
+    rw [← cnt_succ, ← cnt_succ]
+    exact h _
   · intro h x
     rcases x with _ | y
     · simp [Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt]
@@ -95,23 +104,31 @@ theorem dom_iff_le {n : ℕ} (A B : Finset (Fin n)) :
         rw [← cnt_succ, ← cnt_succ] at this
         exact this
       · have hn : n ≤ y + 1 := by omega
-        rw [Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt_of_le A hn, Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt_of_le B hn]
+        rw [Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt_of_le A hn,
+          Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt_of_le B hn]
         rcases Nat.eq_zero_or_pos n with h0 | hpos
         · subst h0
           have : B = ∅ := by ext a; exact a.elim0
-          rw [this]; simp
+          rw [this]
+          simp
         · have := h ⟨n - 1, by omega⟩
           rw [← cnt_succ, ← cnt_succ] at this
           have e : n - 1 + 1 = n := by omega
           simp only [e] at this
-          rwa [Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt_of_le A le_rfl, Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt_of_le B le_rfl] at this
+          rwa [Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt_of_le A le_rfl,
+              Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.cnt_of_le B le_rfl]
+            at this
 
-theorem index_off_range {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) (I : ℤ → Finset (Fin n))
-    (h : ∀ c, (I c).card = if 1 ≤ c then colH (pEnd mu) c else n - colH (pEnd mu) c) (c : ℤ)
-    (hc : c ∉ colRange mu) : I c = ∅ := by
+theorem index_off_range
+    {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) (I : ℤ → Finset (Fin n))
+    (h : ∀ c, (I c).card = if 1 ≤ c then colH (pEnd mu) c else n - colH (pEnd mu) c)
+    (c : ℤ) (hc : c ∉ colRange mu)
+    : I c = ∅ := by
   rw [← Finset.card_eq_zero, h c]
-  have hT : ∀ m, |pEnd mu m| ≤ ∑ i, ∑ m, |mu i m| := fun m => Formalism.MainNotions.LemmaBAlt.abs_entry_le_total mu (Fin.last N) m
-  have hT0 : (0 : ℤ) ≤ ∑ i, ∑ m, |mu i m| := Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _
+  have hT : ∀ m, |pEnd mu m| ≤ ∑ i, ∑ m, |mu i m| := fun m =>
+    Formalism.MainNotions.LemmaBAlt.abs_entry_le_total mu (Fin.last N) m
+  have hT0 : (0 : ℤ) ≤ ∑ i, ∑ m, |mu i m| :=
+    Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _
   simp only [colRange, Finset.mem_Icc, not_and_or, not_le] at hc
   rcases hc with hc | hc
   · rw [if_neg (by omega)]
@@ -144,7 +161,9 @@ theorem restStd : RestStd := by
     exact h3 c t
   · rintro ⟨h2, h3⟩
     refine ⟨index_off_range mu I h2, h2, fun c t => ?_⟩
-    have := (dom_iff_le _ _).1 ((Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.dom_iff _ _).1 (h3 c)) t
+    have :=
+      (dom_iff_le _ _).1
+        ((Formalism.InvariantFactorPaths.GelfandTsetlinBases.Branch.dom_iff _ _).1 (h3 c)) t
     rw [← tabCol_eq, ← tabCol_eq] at this
     exact this
 

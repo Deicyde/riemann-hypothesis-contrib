@@ -15,10 +15,14 @@ open Formalism.REAL (GlRel IsUnitary KHighest IsWeight)
 open PI.UpqRep (IsKFin IsKTypeOf IsKStableOn)
 open CompanionTheory.D.DSIC
 
-theorem kHighest_iff {n : ℕ} (ε : Fin n → Bool) {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-    [Module ℂ W] (ι : V →ₗ[ℂ] W) (hι : Function.Injective ι) (E' : Fin n → Fin n → Module.End ℂ V)
-    (E : Fin n → Fin n → Module.End ℂ W) (h : ∀ a b v, ι (E' a b v) = E a b (ι v)) (μ : Fin n → ℝ) (v : V) :
-    KHighest ε E' μ v ↔ KHighest ε E μ (ι v) := by
+theorem kHighest_iff
+    {n : ℕ} (ε : Fin n → Bool)
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (ι : V →ₗ[ℂ] W) (hι : Function.Injective ι)
+    (E' : Fin n → Fin n → Module.End ℂ V) (E : Fin n → Fin n → Module.End ℂ W)
+    (h : ∀ a b v, ι (E' a b v) = E a b (ι v))
+    (μ : Fin n → ℝ) (v : V)
+    : KHighest ε E' μ v ↔ KHighest ε E μ (ι v) := by
   constructor
   · rintro ⟨h1, h2⟩
     refine ⟨fun a => ?_, fun a b hab he => ?_⟩
@@ -29,10 +33,12 @@ theorem kHighest_iff {n : ℕ} (ε : Fin n → Bool) {V W : Type} [AddCommGroup 
     · rw [h, h1 a, map_smul]
     · rw [h, h2 a b hab he, map_zero]
 
-theorem glRel_of_inj {n : ℕ} {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-    [Module ℂ W] (ι : V →ₗ[ℂ] W) (hι : Function.Injective ι) (E' : Fin n → Fin n → Module.End ℂ V)
-    (E : Fin n → Fin n → Module.End ℂ W) (h : ∀ a b v, ι (E' a b v) = E a b (ι v)) (hE : GlRel E) :
-    GlRel E' := by
+theorem glRel_of_inj
+    {n : ℕ} {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (ι : V →ₗ[ℂ] W) (hι : Function.Injective ι)
+    (E' : Fin n → Fin n → Module.End ℂ V) (E : Fin n → Fin n → Module.End ℂ W)
+    (h : ∀ a b v, ι (E' a b v) = E a b (ι v)) (hE : GlRel E)
+    : GlRel E' := by
   intro a b c d
   ext v
   apply hι
@@ -42,8 +48,9 @@ theorem glRel_of_inj {n : ℕ} {V W : Type} [AddCommGroup V] [Module ℂ V] [Add
   rw [this]
   split_ifs <;> simp [h]
 
-theorem kModExists (h1 : SmMod) (h2 : KFinSm) (h3 : KFinStab) (h4 : StabLink) (h5 : HWofType) (h6 : TypeOfHW) :
-    CompanionTheory.D.LK.KModExists := by
+theorem kModExists
+    (h1 : SmMod) (h2 : KFinSm) (h3 : KFinStab) (h4 : StabLink) (h5 : HWofType) (h6 : TypeOfHW)
+    : CompanionTheory.D.LK.KModExists := by
   intro n ε H _ _ _ σ hσ hirr
   obtain ⟨S, E, hS⟩ := h1 n ε H σ hσ
   obtain ⟨V₀, hV, hst⟩ := h3 n ε H σ S E hσ hS
@@ -61,12 +68,22 @@ theorem kModExists (h1 : SmMod) (h2 : KFinSm) (h3 : KFinStab) (h4 : StabLink) (h
   have hι : Function.Injective ι := Submodule.inclusion_injective hDS
   have hin : ∀ a b (v : D), (S.subtype ∘ₗ E a b ∘ₗ ι) v ∈ D := fun a b v =>
     ⟨E a b (ι v), hst a b _ ((hV _).2 ((hmem _).1 v.2)), rfl⟩
-  let E' : Fin n → Fin n → Module.End ℂ D := fun a b => LinearMap.codRestrict D (S.subtype ∘ₗ E a b ∘ₗ ι) (hin a b)
+  let E' : Fin n → Fin n → Module.End ℂ D := fun a b =>
+    LinearMap.codRestrict D (S.subtype ∘ₗ E a b ∘ₗ ι) (hin a b)
   have hE' : ∀ a b v, ι (E' a b v) = E a b (ι v) := fun a b v => Subtype.ext rfl
   have hT : ∀ T : Submodule ℂ H, FiniteDimensional ℂ T → IsKStableOn ε σ T → T ≤ D :=
     fun T hf hs v hv => (hmem v).2 ⟨T, hf, hv, hs⟩
-  refine ⟨D, E', hmem, fun X hX v => hS.real X hX (ι v), glRel_of_inj ι hι E' E hE' hS.gl,
-    fun a b x y => hS.unit a b (ι x) (ι y), ?_, ?_, ?_⟩
+  refine ⟨
+    D,
+    E',
+    hmem,
+    fun X hX v => hS.real X hX (ι v),
+    glRel_of_inj ι hι E' E hE' hS.gl,
+    fun a b x y => hS.unit a b (ι x) (ι y),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro x
     obtain ⟨T, hf, hx, hs⟩ := (hmem _).1 x.2
     have hTD := hT T hf hs
@@ -85,7 +102,8 @@ theorem kModExists (h1 : SmMod) (h2 : KFinSm) (h3 : KFinStab) (h4 : StabLink) (h
     refine ⟨⟨v, hTD hvT⟩, fun h => hv0 (Subtype.ext (congrArg (fun z : D => (z : H)) h)), hvT, ?_⟩
     exact (kHighest_iff ε ι hι E' E hE' μ _).2 hv
   · intro μ x hx0 hx
-    exact h6 n ε H σ S E hσ hS μ (ι x) (fun h => hx0 (hι (h.trans (map_zero ι).symm))) ((hmem _).1 x.2)
-      ((kHighest_iff ε ι hι E' E hE' μ _).1 hx)
+    exact h6 n ε H σ S E hσ hS μ (ι x)
+      (fun h => hx0 (hι (h.trans (map_zero ι).symm)))
+      ((hmem _).1 x.2) ((kHighest_iff ε ι hι E' E hE' μ _).1 hx)
 
 end GlobalTheory.CompanionTheory.KModExists

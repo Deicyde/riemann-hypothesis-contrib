@@ -15,8 +15,8 @@ theorem ChowFormCycleAdd.proof (h1 : ChowFormAssoc.Statement) : ChowFormCycleAdd
   classical
   intro F _ n k Z₁ Z₂ f₁ f₂ ⟨c₁, hc₁, g₁, hg₁, hf₁⟩ ⟨c₂, hc₂, g₂, hg₂, hf₂⟩
   subst hf₁ hf₂
-  let g : Ideal (MvPolynomial (Fin n) F) → MvPolynomial (Fin k × Fin n) F :=
-    fun W => if W ∈ Z₁.support then g₁ W else g₂ W
+  let g : Ideal (MvPolynomial (Fin n) F) → MvPolynomial (Fin k × Fin n) F := fun W =>
+    if W ∈ Z₁.support then g₁ W else g₂ W
   have hd : ∀ W, ∃ d : F, d ≠ 0 ∧ (W ∈ Z₂.support → g₂ W = C d * g W) := by
     intro W
     by_cases hW1 : W ∈ Z₁.support
@@ -38,15 +38,15 @@ theorem ChowFormCycleAdd.proof (h1 : ChowFormAssoc.Statement) : ChowFormCycleAdd
     by_cases hW1 : W ∈ Z₁.support
     · simpa only [g, if_pos hW1] using hg₁ W hW1
     · simpa only [g, if_neg hW1] using hg₂ W (hW.resolve_left hW1)
-  · have e1 : ∏ W ∈ Z₁.support, g₁ W ^ Z₁ W =
-        ∏ W ∈ Z₁.support ∪ Z₂.support, g W ^ Z₁ W := by
+  · have e1 : ∏ W ∈ Z₁.support, g₁ W ^ Z₁ W = ∏ W ∈ Z₁.support ∪ Z₂.support, g W ^ Z₁ W := by
       rw [← Finset.prod_subset Finset.subset_union_left (f := fun W => g W ^ Z₁ W)]
       · exact Finset.prod_congr rfl fun W hW => by simp only [g, if_pos hW]
       · intro W _ hW
         rw [Finsupp.mem_support_iff, not_not] at hW
         simp [hW]
-    have e2 : ∏ W ∈ Z₂.support, g₂ W ^ Z₂ W =
-        C (∏ W ∈ Z₂.support, d W ^ Z₂ W) * ∏ W ∈ Z₁.support ∪ Z₂.support, g W ^ Z₂ W := by
+    have e2
+        : ∏ W ∈ Z₂.support, g₂ W ^ Z₂ W
+          = C (∏ W ∈ Z₂.support, d W ^ Z₂ W) * ∏ W ∈ Z₁.support ∪ Z₂.support, g W ^ Z₂ W := by
       rw [← Finset.prod_subset Finset.subset_union_right (f := fun W => g W ^ Z₂ W)]
       · rw [map_prod, ← Finset.prod_mul_distrib]
         exact Finset.prod_congr rfl fun W hW => by rw [hdg W hW, mul_pow, map_pow]

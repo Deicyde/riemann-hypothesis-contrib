@@ -22,7 +22,9 @@ theorem pDlogCmp : SDlogCmp := by
   let J : Ideal (PowerSeries R) := Ideal.span {(p : PowerSeries R) ^ k, cyc R p (j + 1)}
   have hpow : ∀ i, k ≤ i → ∀ y : PowerSeries R, (p : PowerSeries R) ^ i * y ∈ J := by
     intro i hi y
-    have e : (p : PowerSeries R) ^ i * y = (p : PowerSeries R) ^ k * ((p : PowerSeries R) ^ (i - k) * y) := by
+    have e
+        : (p : PowerSeries R) ^ i * y
+          = (p : PowerSeries R) ^ k * ((p : PowerSeries R) ^ (i - k) * y) := by
       rw [← mul_assoc, ← pow_add, Nat.add_sub_cancel' hi]
     rw [e]
     exact J.mul_mem_right _ (Ideal.subset_span (by simp))
@@ -44,8 +46,8 @@ theorem pDlogCmp : SDlogCmp := by
         rw [h0]
         exact Ideal.zero_mem _
     exact hle hx
-  obtain ⟨a, b, hab⟩ : ∃ a b : PowerSeries R,
-      F - g * W = (p : PowerSeries R) ^ N * a + cyc R p (j + 1) * b := by
+  obtain ⟨a, b, hab⟩
+      : ∃ a b : PowerSeries R, F - g * W = (p : PowerSeries R) ^ N * a + cyc R p (j + 1) * b := by
     unfold LC at hL
     rw [← map_sub] at hL
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp hL
@@ -70,8 +72,9 @@ theorem pDlogCmp : SDlogCmp := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hc, map_sum]
     refine Ideal.sum_mem _ fun i _ => ?_
-    rw [Derivation.leibniz_pow, map_add (f := _), Derivation.map_one_eq_zero, PowerSeries.derivative_X,
-      zero_add, smul_eq_mul, mul_one, nsmul_eq_mul, Nat.cast_mul, Nat.cast_pow, mul_assoc]
+    rw [Derivation.leibniz_pow, map_add (f := _), Derivation.map_one_eq_zero,
+      PowerSeries.derivative_X, zero_add, smul_eq_mul, mul_one, nsmul_eq_mul, Nat.cast_mul,
+      Nat.cast_pow, mul_assoc]
     exact hpow j hkj _
   have hDE : D (F - g * W) ∈ J := by
     rw [hab, map_add (f := _), Derivation.leibniz, Derivation.leibniz, Derivation.leibniz_pow,
@@ -87,8 +90,9 @@ theorem pDlogCmp : SDlogCmp := by
     rfl
   have hFi := Ring.mul_inverse_cancel F hF
   have hgi := Ring.mul_inverse_cancel g hg
-  have key : dl F - dl g =
-      Ring.inverse F * Ring.inverse g * ((1 + PowerSeries.X) * (D F * g - D g * F)) := by
+  have key
+      : dl F - dl g
+        = Ring.inverse F * Ring.inverse g * ((1 + PowerSeries.X) * (D F * g - D g * F)) := by
     unfold dl
     rw [hdd F, hdd g]
     linear_combination (-(1 + PowerSeries.X) * D F * Ring.inverse F) * hgi +

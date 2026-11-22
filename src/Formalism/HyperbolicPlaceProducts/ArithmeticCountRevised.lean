@@ -7,6 +7,7 @@ public import Formalism.HyperbolicPlaceProducts.SubgroupIndexCounts.DetIndexProd
 
 namespace Formalism.SLP.GlobalBoundRefinements.Final
 
-theorem autCount : Formalism.SLP.GlobalBoundRefinements.AutCount := Formalism.SLP.GlobalBoundRefinements.P.card_linearEquiv_le
+theorem autCount : Formalism.SLP.GlobalBoundRefinements.AutCount :=
+  Formalism.SLP.GlobalBoundRefinements.P.card_linearEquiv_le
 
 end Formalism.SLP.GlobalBoundRefinements.Final

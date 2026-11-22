@@ -158,9 +158,18 @@ lemma symbol_lower {n m : ℕ} (p : Fin m → Fin n → ℂ)
 
 end TorusElliptic
 
-
 open TorusElliptic in
-theorem torus_elliptic_system_solvable : ∀ (n m : ℕ) (p : Fin m → Fin n → ℂ), (∀ ξ : Fin n → ℝ, (∀ a, ∑ k, p a k * (ξ k : ℂ) = 0) → ξ = 0) → ∀ w : Fin m → (Fin n → ℝ) → ℂ, (∀ a, ContDiff ℝ ∞ (w a) ∧ (∀ (ν : Fin n → ℤ) x, w a (x + fun k => (ν k : ℝ)) = w a x)) → (∀ a b x, ∑ k, p a k * fderiv ℝ (w b) x (Pi.single k 1) = ∑ k, p b k * fderiv ℝ (w a) x (Pi.single k 1)) → ∃ (t : Fin m → ℂ) (f : (Fin n → ℝ) → ℂ), ContDiff ℝ ∞ f ∧ (∀ (ν : Fin n → ℤ) x, f (x + fun k => (ν k : ℝ)) = f x) ∧ ∀ a x, ∑ k, p a k * fderiv ℝ f x (Pi.single k 1) = w a x - t a := by
+theorem torus_elliptic_system_solvable
+    : ∀ (n m : ℕ) (p : Fin m → Fin n → ℂ),
+      (∀ ξ : Fin n → ℝ, (∀ a, ∑ k, p a k * (ξ k : ℂ) = 0) → ξ = 0)
+        → ∀ w : Fin m → (Fin n → ℝ) → ℂ,
+          (∀ a, ContDiff ℝ ∞ (w a) ∧ (∀ (ν : Fin n → ℤ) x, w a (x + fun k => (ν k : ℝ)) = w a x))
+            → (∀ a b x,
+              ∑ k, p a k * fderiv ℝ (w b) x (Pi.single k 1)
+                = ∑ k, p b k * fderiv ℝ (w a) x (Pi.single k 1))
+            → ∃ (t : Fin m → ℂ) (f : (Fin n → ℝ) → ℂ),
+              ContDiff ℝ ∞ f ∧ (∀ (ν : Fin n → ℤ) x, f (x + fun k => (ν k : ℝ)) = f x)
+                ∧ ∀ a x, ∑ k, p a k * fderiv ℝ f x (Pi.single k 1) = w a x - t a := by
   classical
   intro n m p hp w hw hcomp
   choose c hc hwc using fun a => GlobalTheory.exists_rapid_fourierSeries_of_int_periodic n (w a) (hw a).1 (hw a).2
@@ -171,15 +180,20 @@ theorem torus_elliptic_system_solvable : ∀ (n m : ℕ) (p : Fin m → Fin n �
     intro a b ν
     have hs1 := summable_symb (hc' b) (p a)
     have hs2 := summable_symb (hc' a) (p b)
-    have := GlobalTheory.fourier_coeff_eq_zero_of_tsum_eq_zero_fin n (fun ν => 2 * π * I * (∑ k, p a k * (ν k : ℂ)) * c b ν
-      - 2 * π * I * (∑ k, p b k * (ν k : ℂ)) * c a ν)
-      (summable_norm_iff.2 (hs1.of_norm.sub hs2.of_norm)) (fun x => by
-        have h := hcomp a b x
-        rw [hwf a, hwf b, sum_fderiv (hc' b), sum_fderiv (hc' a)] at h
-        have h' := (summable_ch hs1 x).tsum_sub (summable_ch hs2 x)
-        rw [h, sub_self] at h'
-        rw [← h']
-        exact tsum_congr fun ν => by unfold ch; ring) ν
+    have :=
+      GlobalTheory.fourier_coeff_eq_zero_of_tsum_eq_zero_fin n
+        (fun ν =>
+          2 * π * I * (∑ k, p a k * (ν k : ℂ)) * c b ν
+            - 2 * π * I * (∑ k, p b k * (ν k : ℂ)) * c a ν)
+        (summable_norm_iff.2 (hs1.of_norm.sub hs2.of_norm))
+        (fun x => by
+          have h := hcomp a b x
+          rw [hwf a, hwf b, sum_fderiv (hc' b), sum_fderiv (hc' a)] at h
+          have h' := (summable_ch hs1 x).tsum_sub (summable_ch hs2 x)
+          rw [h, sub_self] at h'
+          rw [← h']
+          exact tsum_congr fun ν => by unfold ch; ring)
+        ν
     apply mul_left_cancel₀ h2pi
     linear_combination this
   obtain ⟨ε, hε, hlow⟩ := symbol_lower p hp
@@ -203,7 +217,13 @@ theorem torus_elliptic_system_solvable : ∀ (n m : ℕ) (p : Fin m → Fin n �
       have h3 := hC (α ν h) ν
       gcongr
       linarith
-  refine ⟨fun a => c a 0, fun x => ∑' ν, d ν * ch ν x, (GlobalTheory.contDiff_and_fderiv_tsum_fourier_of_rapid n d hd).1, ?_, ?_⟩
+  refine ⟨
+    fun a => c a 0,
+    fun x => ∑' ν, d ν * ch ν x,
+    (GlobalTheory.contDiff_and_fderiv_tsum_fourier_of_rapid n d hd).1,
+    ?_,
+    ?_
+  ⟩
   · intro μ x
     simp only [ch_periodic]
   · intro a x

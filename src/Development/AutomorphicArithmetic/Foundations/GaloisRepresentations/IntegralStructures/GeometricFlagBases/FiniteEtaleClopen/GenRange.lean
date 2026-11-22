@@ -8,8 +8,7 @@ open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain
 open GlobalTheory.GalV (HTower)
 open UpperTheory.Gal.Int.Geo UpperTheory.Gal.Int.Geo.Cut
 
-theorem UpperTheory.Gal.Int.Geo.Cut.genRange :
-    UpperTheory.Gal.Int.Geo.Cut.GenRange := by
+theorem UpperTheory.Gal.Int.Geo.Cut.genRange : UpperTheory.Gal.Int.Geo.Cut.GenRange := by
   intro O k _ _ _ _ _ Y p
   haveI : IsPreimmersion (gen O k) := IsPreimmersion.of_isLocalization (nonZeroDivisors O)
   have hker : RingHom.ker (algebraMap O k) = ⊥ :=

@@ -7,19 +7,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 noncomputable section
 
-open NumberField Matrix UpperTheory.V.KT UpperTheory.V.KL PositivityTheory.KB PositivityTheory.KB.SmoothPartitionUnityBasic.DerivationBounds Filter Topology
+open NumberField Matrix UpperTheory.V.KT UpperTheory.V.KL PositivityTheory.KB
+  PositivityTheory.KB.SmoothPartitionUnityBasic.DerivationBounds Filter Topology
 
 namespace PositivityTheory.KB.SmoothPartitionUnityBasic
 
-private theorem d_rel {L : Type} [Field L] [NumberField L] {N : ℕ} (g : Gp L N) (h : HS L N)
-    (z : VR L N) (w : InfinitePlace L) :
-    star (z w) ⬝ᵥ (mat (actL g h) w *ᵥ z w) =
-      star ((((g w)⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ) *ᵥ z w) ⬝ᵥ
-        (mat h w *ᵥ ((((g w)⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ) *ᵥ z w)) := by
+private theorem d_rel
+    {L : Type} [Field L] [NumberField L]
+    {N : ℕ} (g : Gp L N) (h : HS L N) (z : VR L N)
+    (w : InfinitePlace L)
+    : star (z w) ⬝ᵥ (mat (actL g h) w *ᵥ z w)
+      = star ((((g w)⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ) *ᵥ z w)
+        ⬝ᵥ (mat h w *ᵥ ((((g w)⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ) *ᵥ z w)) := by
   rw [mat_actL, star_mulVec, ← mulVec_mulVec, ← mulVec_mulVec, dotProduct_mulVec]
 
-private theorem d_key {L : Type} [Field L] [NumberField L] {N : ℕ} (x : Gp L N) (v : HS L N) (z : VR L N) :
-    |qR (actL x v) z| ≤ N * ‖v‖ * qR (actL x (one L N).1) z := by
+private theorem d_key
+    {L : Type} [Field L] [NumberField L] {N : ℕ} (x : Gp L N) (v : HS L N) (z : VR L N)
+    : |qR (actL x v) z| ≤ N * ‖v‖ * qR (actL x (one L N).1) z := by
   unfold qR
   rw [Finset.mul_sum]
   refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun w _ => ?_)
@@ -39,8 +43,7 @@ theorem pf_DerB : DerB := by
   have hline : HasDerivAt (fun t : ℝ => φ (p + t • u)) ((fderiv ℝ φ p) u) 0 := by
     have h1 : HasDerivAt (fun t : ℝ => p + t • u) u 0 := by
       simpa using ((hasDerivAt_id (0 : ℝ)).smul_const u).const_add p
-    have hD : HasFDerivAt φ (fderiv ℝ φ p) (p + (0 : ℝ) • u) := by
-      simpa using hd.hasFDerivAt
+    have hD : HasFDerivAt φ (fderiv ℝ φ p) (p + (0 : ℝ) • u) := by simpa using hd.hasFDerivAt
     exact hD.comp_hasDerivAt (0 : ℝ) h1
   have hlim := hline.tendsto_slope_zero_right.norm
   set K : ℝ := N * ‖v‖ with hK

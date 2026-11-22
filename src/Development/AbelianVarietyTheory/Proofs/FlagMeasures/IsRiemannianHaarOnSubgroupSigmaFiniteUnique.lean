@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.InvSubOneMem
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.GaugeSubHaar
 
@@ -14,7 +15,8 @@ open Topology
 
 open MeasureTheory NumberField Matrix Finset in
 open Topology in
-private theorem uMat_one_flag_measures {n : ℕ} {ε : Fin n → Bool} : _root_.Formalism.MainNotions.S.uMat (1 : _root_.Formalism.REAL.UJ ε) = 1 := by
+private theorem uMat_one_flag_measures {n : ℕ} {ε : Fin n → Bool}
+    : _root_.Formalism.MainNotions.S.uMat (1 : _root_.Formalism.REAL.UJ ε) = 1 := by
   have h1 := _root_.GlobalTheory.GaugeSubLoc.uMat_mul (1 : _root_.Formalism.REAL.UJ ε) 1
   have h2 := _root_.GlobalTheory.GaugeSubLoc.uMat_mul_inv (1 : _root_.Formalism.REAL.UJ ε)
   rw [mul_one] at h1
@@ -23,13 +25,15 @@ private theorem uMat_one_flag_measures {n : ℕ} {ε : Fin n → Bool} : _root_.
 
 open MeasureTheory NumberField Matrix Finset in
 open Topology in
-private theorem comap_subtype_val_haar_properties {n : ℕ} {ε : Fin n → Bool}
-    (S : Subgroup (_root_.Formalism.REAL.UJ ε)) (hS : IsClosed (S : Set (_root_.Formalism.REAL.UJ ε))) (d : ℕ)
-    (μ : Measure (_root_.Formalism.REAL.UJ ε)) (h : _root_.GlobalTheory.FlagMeas.IsGaugeSub (S : Set (_root_.Formalism.REAL.UJ ε)) d μ) :
-    Measure.map (Subtype.val : S → _root_.Formalism.REAL.UJ ε) (μ.comap Subtype.val) = μ ∧
-      (μ.comap (Subtype.val : S → _root_.Formalism.REAL.UJ ε)).IsMulLeftInvariant ∧
-      IsFiniteMeasureOnCompacts (μ.comap (Subtype.val : S → _root_.Formalism.REAL.UJ ε)) ∧
-      μ.comap (Subtype.val : S → _root_.Formalism.REAL.UJ ε) ≠ 0 := by
+private theorem comap_subtype_val_haar_properties
+    {n : ℕ} {ε : Fin n → Bool} (S : Subgroup (_root_.Formalism.REAL.UJ ε))
+    (hS : IsClosed (S : Set (_root_.Formalism.REAL.UJ ε)))
+    (d : ℕ) (μ : Measure (_root_.Formalism.REAL.UJ ε))
+    (h : _root_.GlobalTheory.FlagMeas.IsGaugeSub (S : Set (_root_.Formalism.REAL.UJ ε)) d μ)
+    : Measure.map (Subtype.val : S → _root_.Formalism.REAL.UJ ε) (μ.comap Subtype.val) = μ
+      ∧ (μ.comap (Subtype.val : S → _root_.Formalism.REAL.UJ ε)).IsMulLeftInvariant
+      ∧ IsFiniteMeasureOnCompacts (μ.comap (Subtype.val : S → _root_.Formalism.REAL.UJ ε))
+      ∧ μ.comap (Subtype.val : S → _root_.Formalism.REAL.UJ ε) ≠ 0 := by
   obtain ⟨h1, h2, h3⟩ := h
   have hme : MeasurableEmbedding (Subtype.val : S → _root_.Formalism.REAL.UJ ε) :=
     MeasurableEmbedding.subtype_coe hS.measurableSet
@@ -41,8 +45,10 @@ private theorem comap_subtype_val_haar_properties {n : ℕ} {ε : Fin n → Bool
     refine ⟨fun s => ?_⟩
     have key : Measure.map Subtype.val (Measure.map (s * ·) ν) = Measure.map Subtype.val ν := by
       rw [Measure.map_map hme.measurable (measurable_const_mul s)]
-      have hcomp : (Subtype.val ∘ (s * ·)) =
-          (fun g : _root_.Formalism.REAL.UJ ε => (s : _root_.Formalism.REAL.UJ ε) * g) ∘ Subtype.val := by
+      have hcomp
+          : (Subtype.val ∘ (s * ·))
+            = (fun g : _root_.Formalism.REAL.UJ ε => (s : _root_.Formalism.REAL.UJ ε) * g)
+              ∘ Subtype.val := by
         funext x; rfl
       rw [hcomp, ← Measure.map_map (measurable_const_mul _) hme.measurable, hmap]
       exact h2 s s.2
@@ -60,8 +66,9 @@ private theorem comap_subtype_val_haar_properties {n : ℕ} {ε : Fin n → Bool
   have hL0 : volume (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1) ≠ 0 :=
     (Metric.measure_ball_pos volume _ one_pos).ne'
   have hLtop : volume (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1) ≠ ⊤ := measure_ball_lt_top.ne
-  have hev := (h3.eventually (isOpen_Ioo.mem_nhds ⟨pos_iff_ne_zero.2 hL0, lt_top_iff_ne_top.2 hLtop⟩)).and
-    (self_mem_nhdsWithin : Set.Ioi (0 : ℝ) ∈ 𝓝[>] 0)
+  have hev :=
+    (h3.eventually (isOpen_Ioo.mem_nhds ⟨pos_iff_ne_zero.2 hL0, lt_top_iff_ne_top.2 hLtop⟩)).and
+      (self_mem_nhdsWithin : Set.Ioi (0 : ℝ) ∈ 𝓝[>] 0)
   obtain ⟨r, ⟨hpos, htop⟩, hr⟩ := hev.exists
   set B := {g | f g ≤ r} with hBdef
   have hB0 : μ B ≠ 0 := by
@@ -82,26 +89,36 @@ private theorem comap_subtype_val_haar_properties {n : ℕ} {ε : Fin n → Bool
     have hUne : (Subtype.val ⁻¹' {g | f g < r} : Set S).Nonempty :=
       ⟨1, by simp only [Set.mem_preimage, Set.mem_setOf_eq, OneMemClass.coe_one, hf1]; exact hr⟩
     have hUtop : ν (Subtype.val ⁻¹' {g | f g < r}) ≠ ⊤ := by
-      refine ne_top_of_le_ne_top ?_ (measure_mono (Set.preimage_mono
-        (show {g | f g < r} ⊆ B from fun g (hg : f g < r) => (le_of_lt hg : f g ≤ r))))
-      rw [hνB]; exact hBtop
+      refine ne_top_of_le_ne_top ?_
+        (measure_mono (Set.preimage_mono (show {g | f g < r} ⊆ B from fun g (hg : f g < r) =>
+          (le_of_lt hg : f g ≤ r))))
+      rw [hνB]
+      exact hBtop
     exact measure_lt_top_of_isCompact_of_isMulLeftInvariant _ hUo hUne hUtop hK
   · intro h0
     apply hB0
     rw [← hνB, h0, Measure.coe_zero, Pi.zero_apply]
 
-
 open MeasureTheory NumberField Matrix Finset in
 open Topology in
-theorem _root_.GlobalTheory.GaugeSubHaar.isGaugeSub_haar : ∀ (n : ℕ) (ε : Fin n → Bool) (S : Subgroup (_root_.Formalism.REAL.UJ ε)), IsClosed (S : Set (_root_.Formalism.REAL.UJ ε)) → ∀ (d : ℕ) (μ : Measure (_root_.Formalism.REAL.UJ ε)), _root_.GlobalTheory.FlagMeas.IsGaugeSub (S : Set (_root_.Formalism.REAL.UJ ε)) d μ → SigmaFinite μ ∧ IsFiniteMeasureOnCompacts μ ∧ ∀ μ', _root_.GlobalTheory.FlagMeas.IsGaugeSub (S : Set (_root_.Formalism.REAL.UJ ε)) d μ' → μ' = μ := by
+theorem _root_.GlobalTheory.GaugeSubHaar.isGaugeSub_haar
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (S : Subgroup (_root_.Formalism.REAL.UJ ε)),
+      IsClosed (S : Set (_root_.Formalism.REAL.UJ ε))
+        → ∀ (d : ℕ) (μ : Measure (_root_.Formalism.REAL.UJ ε)),
+          _root_.GlobalTheory.FlagMeas.IsGaugeSub (S : Set (_root_.Formalism.REAL.UJ ε)) d μ
+            → SigmaFinite μ ∧ IsFiniteMeasureOnCompacts μ
+              ∧ ∀ μ',
+                _root_.GlobalTheory.FlagMeas.IsGaugeSub (S : Set (_root_.Formalism.REAL.UJ ε)) d μ'
+                  → μ' = μ := by
   intro n ε S hS d μ hμ
   have hme : MeasurableEmbedding (Subtype.val : S → _root_.Formalism.REAL.UJ ε) :=
     MeasurableEmbedding.subtype_coe hS.measurableSet
   obtain ⟨hmap, hinv, hfin, hne⟩ := comap_subtype_val_haar_properties S hS d μ hμ
   set ν := μ.comap (Subtype.val : S → _root_.Formalism.REAL.UJ ε) with hν
-  have hfinμ : IsFiniteMeasureOnCompacts μ := ⟨fun K hK => by
-    rw [← hmap, hme.map_apply]
-    exact (hS.isClosedEmbedding_subtypeVal.isCompact_preimage hK).measure_lt_top⟩
+  have hfinμ : IsFiniteMeasureOnCompacts μ :=
+    ⟨fun K hK => by
+      rw [← hmap, hme.map_apply]
+      exact (hS.isClosedEmbedding_subtypeVal.isCompact_preimage hK).measure_lt_top⟩
   haveI : LocallyCompactSpace S := hS.isClosedEmbedding_subtypeVal.locallyCompactSpace
   haveI : SecondCountableTopology (_root_.Formalism.REAL.UJ ε) := inferInstance
   haveI : SecondCountableTopology S := TopologicalSpace.Subtype.secondCountableTopology _
@@ -126,8 +143,9 @@ theorem _root_.GlobalTheory.GaugeSubHaar.isGaugeSub_haar : ∀ (n : ℕ) (ε : F
   obtain ⟨-, -, h3'⟩ := hμ'
   rw [hμc] at h3'
   revert h3 h3'
-  change Filter.Tendsto _ _ (nhds (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1))) →
-    Filter.Tendsto _ _ (nhds (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1))) → _
+  change Filter.Tendsto _ _ (nhds (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1)))
+    → Filter.Tendsto _ _ (nhds (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1)))
+    → _
   intro h3 h3'
   have hL0 : volume (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1) ≠ 0 :=
     (Metric.measure_ball_pos volume _ one_pos).ne'

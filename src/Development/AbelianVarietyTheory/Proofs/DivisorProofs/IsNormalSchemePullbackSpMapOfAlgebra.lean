@@ -9,15 +9,19 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 theorem GlobalTheory.isNormalScheme_pullback_spMap_of_algebra
-    (halg : ∀ (F K A : Type) [Field F] [CharZero F] [Field K] [Algebra F K] [CommRing A]
-      [Algebra F A], (∀ (P : Ideal A) [P.IsPrime], IsDomain (Localization.AtPrime P) ∧
-        IsIntegrallyClosed (Localization.AtPrime P)) →
-      ∀ (Q : Ideal (TensorProduct F A K)) [Q.IsPrime], IsDomain (Localization.AtPrime Q) ∧
-        IsIntegrallyClosed (Localization.AtPrime Q))
-    (F K : Type) [Field F] [CharZero F] [Field K] (c : F →+* K) (Y : Scheme.{0})
-    (g : Y ⟶ Sp F) (hY : GlobalTheory.IsNormalScheme Y) : GlobalTheory.IsNormalScheme (pullback g (spMap c)) := by
+    (halg
+      : ∀ (F K A : Type) [Field F] [CharZero F] [Field K] [Algebra F K] [CommRing A] [Algebra F A],
+        (∀ (P : Ideal A) [P.IsPrime],
+            IsDomain (Localization.AtPrime P) ∧ IsIntegrallyClosed (Localization.AtPrime P))
+          → ∀ (Q : Ideal (TensorProduct F A K)) [Q.IsPrime],
+            IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q))
+    (F K : Type) [Field F] [CharZero F] [Field K]
+    (c : F →+* K)
+    (Y : Scheme.{0}) (g : Y ⟶ Sp F) (hY : GlobalTheory.IsNormalScheme Y)
+    : GlobalTheory.IsNormalScheme (pullback g (spMap c)) := by
   let 𝒰 := Y.affineOpenCover.openCover
-  refine (GlobalTheory.IsNormalScheme.iff_of_openCover (Scheme.Pullback.openCoverOfLeft 𝒰 g (spMap c))).mpr ?_
+  refine (GlobalTheory.IsNormalScheme.iff_of_openCover (Scheme.Pullback.openCoverOfLeft 𝒰 g
+    (spMap c))).mpr ?_
   intro i
   change GlobalTheory.IsNormalScheme (pullback (𝒰.f i ≫ g) (spMap c))
   let R := Y.affineOpenCover.X i

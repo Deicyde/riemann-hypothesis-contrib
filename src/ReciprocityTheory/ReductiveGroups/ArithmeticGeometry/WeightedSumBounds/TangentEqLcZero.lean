@@ -15,28 +15,29 @@ variable {C : Type} [Field C]
 
 def intRing (v : AddValuation C (WithTop ℝ)) : Subring C where
   carrier := {x | 0 ≤ v x}
-  mul_mem' {x y} hx hy := by
-    show 0 ≤ v (x * y); rw [v.map_mul]; exact add_nonneg hx hy
+  mul_mem' {x y} hx hy := by show 0 ≤ v (x * y); rw [v.map_mul]; exact add_nonneg hx hy
   one_mem' := by show 0 ≤ v 1; rw [v.map_one]
   add_mem' {x y} hx hy := le_trans (le_min hx hy) (v.map_add x y)
   zero_mem' := by show 0 ≤ v 0; rw [v.map_zero]; exact le_top
   neg_mem' {x} hx := by show 0 ≤ v (-x); rw [v.map_neg]; exact hx
 
-theorem mem_intRing {v : AddValuation C (WithTop ℝ)} {x : C} :
-    x ∈ intRing v ↔ IsIntV v x := Iff.rfl
+theorem mem_intRing {v : AddValuation C (WithTop ℝ)} {x : C} : x ∈ intRing v ↔ IsIntV v x := Iff.rfl
 
-private theorem hs_lemma_2 {σ τ : Type} [Finite σ] {a : σ → MvPowerSeries τ C}
-    (ha0 : ∀ s, constantCoeff (a s) = 0) : HasSubst a := by
+private theorem hs_lemma_2
+    {σ τ : Type} [Finite σ] {a : σ → MvPowerSeries τ C} (ha0 : ∀ s, constantCoeff (a s) = 0)
+    : HasSubst a := by
   first
   | exact hasSubst_of_constantCoeff_zero ha0
   | exact HasSubst.of_constantCoeff_zero' ha0
   | exact hasSubst_of_constantCoeff_nilpotent (fun s => by rw [ha0 s]; exact IsNilpotent.zero)
   | exact HasSubst.of_constantCoeff_nilpotent (fun s => by rw [ha0 s]; exact IsNilpotent.zero)
 
-theorem mvIsInt_subst {σ τ : Type} [Finite σ] (v : AddValuation C (WithTop ℝ))
-    {f : MvPowerSeries σ C} (hf : MvIsInt v f) {a : σ → MvPowerSeries τ C}
-    (ha : ∀ s, MvIsInt v (a s)) (ha0 : ∀ s, constantCoeff (a s) = 0) :
-    MvIsInt v (subst a f) := by
+theorem mvIsInt_subst
+    {σ τ : Type} [Finite σ]
+    (v : AddValuation C (WithTop ℝ))
+    {f : MvPowerSeries σ C} (hf : MvIsInt v f)
+    {a : σ → MvPowerSeries τ C} (ha : ∀ s, MvIsInt v (a s)) (ha0 : ∀ s, constantCoeff (a s) = 0)
+    : MvIsInt v (subst a f) := by
   classical
   have hS : HasSubst a := hs_lemma_2 ha0
   have hmul : ∀ p q : MvPowerSeries τ C, MvIsInt v p → MvIsInt v q → MvIsInt v (p * q) := by
@@ -62,16 +63,19 @@ theorem mvIsInt_subst {σ τ : Type} [Finite σ] (v : AddValuation C (WithTop �
   intro e
   rw [coeff_subst hS]
   apply mem_intRing.mp
-  refine finsum_induction (fun x => x ∈ intRing v) (Subring.zero_mem _)
-    (fun x y hx hy => Subring.add_mem _ hx hy) (fun d => ?_)
+  refine finsum_induction
+    (fun x => x ∈ intRing v)
+    (Subring.zero_mem _)
+    (fun x y hx hy => Subring.add_mem _ hx hy)
+    (fun d => ?_)
   rw [smul_eq_mul]
   exact Subring.mul_mem _ (mem_intRing.mpr (hf d)) (mem_intRing.mpr (hprod d e))
 
 theorem unit_finsupp (e : Unit →₀ ℕ) : e = Finsupp.single () (e ()) := by
   exact Finsupp.ext fun u => by cases u; simp
 
-theorem psIsInt_iff {v : AddValuation C (WithTop ℝ)} {f : PowerSeries C} :
-    PsIsInt v f ↔ MvIsInt v (σ := Unit) f := by
+theorem psIsInt_iff {v : AddValuation C (WithTop ℝ)} {f : PowerSeries C}
+    : PsIsInt v f ↔ MvIsInt v (σ := Unit) f := by
   constructor
   · intro h α
     rw [unit_finsupp α]
@@ -88,9 +92,11 @@ theorem isCurve_zero : IsCurve v (0 : Fin d → PowerSeries C) := by
   refine ⟨by simp, fun n => ?_⟩
   simp [IsIntV]
 
-private theorem cc_lemma_3 {σ τ : Type} [Finite σ] {f : MvPowerSeries σ C}
-    (hf : constantCoeff f = 0) {a : σ → MvPowerSeries τ C}
-    (ha0 : ∀ s, constantCoeff (a s) = 0) : constantCoeff (subst a f) = 0 := by
+private theorem cc_lemma_3
+    {σ τ : Type} [Finite σ]
+    {f : MvPowerSeries σ C} (hf : constantCoeff f = 0)
+    {a : σ → MvPowerSeries τ C} (ha0 : ∀ s, constantCoeff (a s) = 0)
+    : constantCoeff (subst a f) = 0 := by
   classical
   rw [← coeff_zero_eq_constantCoeff_apply, coeff_subst (hs_lemma_2 ha0)]
   apply finsum_eq_zero_of_forall_eq_zero
@@ -103,11 +109,13 @@ private theorem cc_lemma_3 {σ τ : Type} [Finite σ] {f : MvPowerSeries σ C}
       exact he (Finsupp.ext fun s => by simpa using h s)
     have hp : constantCoeff (e.prod fun s n => a s ^ n) = 0 := by
       rw [Finsupp.prod, map_prod]
-      exact Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hs) (by rw [map_pow, ha0 s, zero_pow hs])
+      exact Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hs)
+        (by rw [map_pow, ha0 s, zero_pow hs])
     rw [coeff_zero_eq_constantCoeff_apply, hp, smul_zero]
 
-theorem isCurve_add (G : LogFGL v d) {ga gb : Fin d → PowerSeries C}
-    (ha : IsCurve v ga) (hb : IsCurve v gb) : IsCurve v (G.add ga gb) := by
+theorem isCurve_add
+    (G : LogFGL v d) {ga gb : Fin d → PowerSeries C} (ha : IsCurve v ga) (hb : IsCurve v gb)
+    : IsCurve v (G.add ga gb) := by
   intro a
   have hs0 : ∀ s, constantCoeff (Sum.elim ga gb s) = 0 := by
     rintro (s | s)
@@ -119,10 +127,12 @@ theorem isCurve_add (G : LogFGL v d) {ga gb : Fin d → PowerSeries C}
     · exact psIsInt_iff.mp (hb s).2
   exact ⟨cc_lemma_3 (G.F_const a) hs0, psIsInt_iff.mpr (mvIsInt_subst v (G.F_int a) hsI hs0)⟩
 
-theorem lgCurve_add (G : LogFGL v d) {ga gb : Fin d → PowerSeries C}
-    (ha : ∀ b, PowerSeries.constantCoeff (ga b) = 0)
-    (hb : ∀ b, PowerSeries.constantCoeff (gb b) = 0) (a : Fin d) :
-    G.lgCurve (G.add ga gb) a = G.lgCurve ga a + G.lgCurve gb a := by
+theorem lgCurve_add
+    (G : LogFGL v d)
+    {ga gb : Fin d → PowerSeries C} (ha : ∀ b, PowerSeries.constantCoeff (ga b) = 0)
+    (hb : ∀ b, PowerSeries.constantCoeff (gb b) = 0)
+    (a : Fin d)
+    : G.lgCurve (G.add ga gb) a = G.lgCurve ga a + G.lgCurve gb a := by
   have hE0 : ∀ s, constantCoeff (Sum.elim ga gb s) = 0 := by
     rintro (s | s)
     · exact ha s
@@ -154,73 +164,79 @@ theorem lgCurve_zero (G : LogFGL v d) (a : Fin d) : G.lgCurve 0 a = 0 := by
       exact hn (Finsupp.ext fun s => by simpa using h s)
     have hp : (n.prod fun s k => (0 : Fin d → PowerSeries C) s ^ k) = 0 := by
       rw [Finsupp.prod]
-      exact Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hs) (by rw [Pi.zero_apply, zero_pow hs])
+      exact Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hs)
+        (by rw [Pi.zero_apply, zero_pow hs])
     rw [hp, map_zero, smul_zero]
 
-theorem isCurve_sumList (G : LogFGL v d) :
-    ∀ l : List (Fin d → PowerSeries C), (∀ g ∈ l, IsCurve v g) → IsCurve v (G.sumList l)
+theorem isCurve_sumList (G : LogFGL v d)
+    : ∀ l : List (Fin d → PowerSeries C), (∀ g ∈ l, IsCurve v g) → IsCurve v (G.sumList l)
   | [], _ => isCurve_zero
-  | g :: l, h => isCurve_add G (h g (by simp))
-      (isCurve_sumList G l fun g' hg' => h g' (by simp [hg']))
+  | g :: l, h =>
+    isCurve_add G (h g (by simp)) (isCurve_sumList G l fun g' hg' => h g' (by simp [hg']))
 
-theorem lgCurve_sumList (G : LogFGL v d) :
-    ∀ l : List (Fin d → PowerSeries C), (∀ g ∈ l, IsCurve v g) → ∀ a,
-      G.lgCurve (G.sumList l) a = (l.map fun g => G.lgCurve g a).sum := by
+theorem lgCurve_sumList (G : LogFGL v d)
+    : ∀ l : List (Fin d → PowerSeries C),
+      (∀ g ∈ l, IsCurve v g)
+        → ∀ a, G.lgCurve (G.sumList l) a = (l.map fun g => G.lgCurve g a).sum := by
   intro l
   induction l with
   | nil =>
-      intro _ a
-      simp [LogFGL.sumList, lgCurve_zero]
+    intro _ a
+    simp [LogFGL.sumList, lgCurve_zero]
   | cons g l ih =>
-      intro h a
-      have hl : ∀ g' ∈ l, IsCurve v g' := fun g' hg' => h g' (by simp [hg'])
-      change G.lgCurve (G.add g (G.sumList l)) a = _
-      rw [lgCurve_add G (fun b => (h g (by simp) b).1)
-        (fun b => (isCurve_sumList G l hl b).1), ih hl a, List.map_cons, List.sum_cons]
+    intro h a
+    have hl : ∀ g' ∈ l, IsCurve v g' := fun g' hg' => h g' (by simp [hg'])
+    change G.lgCurve (G.add g (G.sumList l)) a = _
+    rw [lgCurve_add G (fun b => (h g (by simp) b).1) (fun b => (isCurve_sumList G l hl b).1),
+      ih hl a, List.map_cons, List.sum_cons]
 
-theorem isCurve_sumF (G : LogFGL v d) {m : ℕ} (g : Fin m → Fin d → PowerSeries C)
-    (h : ∀ u, IsCurve v (g u)) : IsCurve v (G.sumF g) :=
+theorem isCurve_sumF
+    (G : LogFGL v d) {m : ℕ} (g : Fin m → Fin d → PowerSeries C) (h : ∀ u, IsCurve v (g u))
+    : IsCurve v (G.sumF g) :=
   isCurve_sumList G (List.ofFn g) (fun g' hg' => by
     obtain ⟨u, rfl⟩ := List.mem_ofFn.mp hg'
     exact h u)
 
-theorem lgCurve_sumF (G : LogFGL v d) {m : ℕ} (g : Fin m → Fin d → PowerSeries C)
-    (h : ∀ u, IsCurve v (g u)) (a : Fin d) :
-    G.lgCurve (G.sumF g) a = ∑ u, G.lgCurve (g u) a := by
+theorem lgCurve_sumF
+    (G : LogFGL v d)
+    {m : ℕ} (g : Fin m → Fin d → PowerSeries C) (h : ∀ u, IsCurve v (g u))
+    (a : Fin d)
+    : G.lgCurve (G.sumF g) a = ∑ u, G.lgCurve (g u) a := by
   rw [show G.sumF g = G.sumList (List.ofFn g) from rfl,
-    lgCurve_sumList G _ (fun g' hg' => by
-      obtain ⟨u, rfl⟩ := List.mem_ofFn.mp hg'
-      exact h u) a]
+    lgCurve_sumList G _
+      (fun g' hg' => by
+        obtain ⟨u, rfl⟩ := List.mem_ofFn.mp hg'
+        exact h u)
+      a]
   simp [List.map_ofFn, List.sum_ofFn]
 
-theorem isCurve_rescale {x : C} (hx : IsIntV v x) {ga : Fin d → PowerSeries C}
-    (h : IsCurve v ga) : IsCurve v (rescaleCurve x ga) := by
+theorem isCurve_rescale {x : C} (hx : IsIntV v x) {ga : Fin d → PowerSeries C} (h : IsCurve v ga)
+    : IsCurve v (rescaleCurve x ga) := by
   intro a
   refine ⟨?_, fun n => ?_⟩
   · show PowerSeries.constantCoeff (PowerSeries.rescale x (ga a)) = 0
-    rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_rescale, pow_zero, one_mul,
-      PowerSeries.coeff_zero_eq_constantCoeff_apply, (h a).1]
+    rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_rescale, pow_zero,
+      one_mul, PowerSeries.coeff_zero_eq_constantCoeff_apply, (h a).1]
   · show IsIntV v (PowerSeries.coeff n (PowerSeries.rescale x (ga a)))
     rw [PowerSeries.coeff_rescale]
     exact mem_intRing.mp (Subring.mul_mem _ (Subring.pow_mem _ (mem_intRing.mpr hx) n)
       (mem_intRing.mpr ((h a).2 n)))
 
-theorem lgCurve_rescale (G : LogFGL v d) (x : C) {ga : Fin d → PowerSeries C}
-    (h0 : ∀ b, PowerSeries.constantCoeff (ga b) = 0) (a : Fin d) :
-    G.lgCurve (rescaleCurve x ga) a = PowerSeries.rescale x (G.lgCurve ga a) := by
+theorem lgCurve_rescale
+    (G : LogFGL v d) (x : C)
+    {ga : Fin d → PowerSeries C} (h0 : ∀ b, PowerSeries.constantCoeff (ga b) = 0)
+    (a : Fin d)
+    : G.lgCurve (rescaleCurve x ga) a = PowerSeries.rescale x (G.lgCurve ga a) := by
   have hX : HasSubst (fun _ : Unit => (x • PowerSeries.X : PowerSeries C)) :=
     (PowerSeries.HasSubst.smul_X' x).const
   show subst (fun b => PowerSeries.rescale x (ga b)) (G.lg a) = PowerSeries.rescale x (subst ga (G.lg a))
   simp only [PowerSeries.rescale_eq_subst, PowerSeries.subst_def]
   rw [subst_comp_subst_apply (hasSubst_of_constantCoeff_zero h0) hX]
 
-theorem degree_eq_one {σ : Type} {e : σ →₀ ℕ} (he : e.degree = 1) :
-    ∃ b, e = Finsupp.single b 1 := by
+theorem degree_eq_one {σ : Type} {e : σ →₀ ℕ} (he : e.degree = 1)
+    : ∃ b, e = Finsupp.single b 1 := by
   classical
-  have hd : ∑ i ∈ e.support, e i = 1 := by
-    first
-    | exact he
-    | simpa [Finsupp.degree] using he
+  have hd : ∑ i ∈ e.support, e i = 1 := by first | exact he | simpa [Finsupp.degree] using he
   have hne : e.support.Nonempty := by
     rw [Finset.nonempty_iff_ne_empty]
     intro h
@@ -249,9 +265,7 @@ theorem order_lg_sub_X (G : LogFGL v d) (a : Fin d) : ((2 : ℕ) : ℕ∞) ≤ (
   rw [map_sub]
   rcases (show e.degree = 0 ∨ e.degree = 1 by omega) with h0 | h1
   · have hz : e = 0 := by
-      first
-      | exact Finsupp.degree_eq_zero_iff.mp h0
-      | exact (Finsupp.degree_eq_zero_iff e).mp h0
+      first | exact Finsupp.degree_eq_zero_iff.mp h0 | exact (Finsupp.degree_eq_zero_iff e).mp h0
     rw [hz, coeff_zero_eq_constantCoeff_apply, coeff_zero_eq_constantCoeff_apply, G.lg_const,
       constantCoeff_X, sub_zero]
   · obtain ⟨b, rfl⟩ := degree_eq_one h1
@@ -261,19 +275,25 @@ theorem order_lg_sub_X (G : LogFGL v d) (a : Fin d) : ((2 : ℕ) : ℕ∞) ≤ (
     · rw [if_neg hab, if_neg (fun h => hab ((Finsupp.single_left_injective one_ne_zero h).symm)),
         sub_zero]
 
-theorem coeff_lgCurve_low (G : LogFGL v d) {ga : Fin d → PowerSeries C} {k : ℕ} (hk1 : 1 ≤ k)
-    (hk : ∀ b, ∀ i < k, PowerSeries.coeff i (ga b) = 0) (a : Fin d) {j : ℕ} (hj : j < 2 * k) :
-    PowerSeries.coeff j (G.lgCurve ga a) = PowerSeries.coeff j (ga a) := by
+theorem coeff_lgCurve_low
+    (G : LogFGL v d)
+    {ga : Fin d → PowerSeries C} {k : ℕ}
+    (hk1 : 1 ≤ k) (hk : ∀ b, ∀ i < k, PowerSeries.coeff i (ga b) = 0)
+    (a : Fin d)
+    {j : ℕ} (hj : j < 2 * k)
+    : PowerSeries.coeff j (G.lgCurve ga a) = PowerSeries.coeff j (ga a) := by
   have h0 : ∀ b, constantCoeff (ga b) = 0 := fun b => by
     have := hk b 0 hk1
     rwa [PowerSeries.coeff_zero_eq_constantCoeff_apply] at this
   have hs : HasSubst ga := hasSubst_of_constantCoeff_zero h0
   have hsplit : G.lgCurve ga a = ga a + subst ga (G.lg a - X a) := by
     rw [LogFGL.lgCurve, subst_sub hs, subst_X hs]; ring
-  have hord : ((k : ℕ∞)) ≤ ⨅ b, MvPowerSeries.order (ga b) := le_iInf fun b => nat_le_order fun e he => by
-    rw [unit_finsupp e] at he ⊢
-    rw [Finsupp.degree_single] at he
-    exact hk b _ he
+  have hord : ((k : ℕ∞)) ≤ ⨅ b, MvPowerSeries.order (ga b) :=
+    le_iInf fun b =>
+      nat_le_order fun e he => by
+        rw [unit_finsupp e] at he ⊢
+        rw [Finsupp.degree_single] at he
+        exact hk b _ he
   have hR := le_order_subst hs (G.lg a - X a)
   have hlt : ((Finsupp.single () j).degree : ℕ∞) < (subst ga (G.lg a - X a)).order := by
     rw [Finsupp.degree_single]
@@ -284,14 +304,17 @@ theorem coeff_lgCurve_low (G : LogFGL v d) {ga : Fin d → PowerSeries C} {k : �
   change _ + coeff (Finsupp.single () j) _ = _
   rw [this, add_zero]
 
-theorem tangent_eq_lc_zero (G : LogFGL v d) (p : ℕ) {ga : Fin d → PowerSeries C}
-    (h0 : ∀ b, PowerSeries.constantCoeff (ga b) = 0) : tangent ga = G.lc p ga 0 := by
+theorem tangent_eq_lc_zero
+    (G : LogFGL v d) (p : ℕ)
+    {ga : Fin d → PowerSeries C} (h0 : ∀ b, PowerSeries.constantCoeff (ga b) = 0)
+    : tangent ga = G.lc p ga 0 := by
   funext a
   show PowerSeries.coeff 1 (ga a) = PowerSeries.coeff (p ^ 0) (G.lgCurve ga a)
   rw [pow_zero]
-  exact (coeff_lgCurve_low G le_rfl (fun b i hi => by
-    rw [Nat.lt_one_iff.mp hi, PowerSeries.coeff_zero_eq_constantCoeff_apply, h0 b]) a
-    (by norm_num)).symm
+  exact (coeff_lgCurve_low G le_rfl
+    (fun b i hi => by
+      rw [Nat.lt_one_iff.mp hi, PowerSeries.coeff_zero_eq_constantCoeff_apply, h0 b])
+    a (by norm_num)).symm
 
 end
 

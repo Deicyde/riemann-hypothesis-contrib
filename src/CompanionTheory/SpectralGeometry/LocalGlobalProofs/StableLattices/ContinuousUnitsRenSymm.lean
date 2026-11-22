@@ -16,7 +16,8 @@ namespace GlobalTheory.CompanionTheory.RenumDS
 
 variable {n : ℕ}
 
-abbrev ren (r : Equiv.Perm (Fin n)) (g : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ := g.submatrix r r
+abbrev ren (r : Equiv.Perm (Fin n)) (g : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
+  g.submatrix r r
 
 lemma ren_mul (r : Equiv.Perm (Fin n)) (g h : Matrix (Fin n) (Fin n) ℂ) : ren r (g * h) = ren r g * ren r h :=
   (Matrix.submatrix_mul_equiv g h r r r).symm
@@ -85,7 +86,8 @@ lemma Ord.symm {ε ε₁ : Fin n → Bool} {r : Equiv.Perm (Fin n)} (hε : ε₁
 
 section Rep
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {ε ε₁ : Fin n → Bool} {r : Equiv.Perm (Fin n)} {τ τ' : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
 lemma hε_symm (hε : ε₁ = ε ∘ r) : ε = ε₁ ∘ r.symm := by subst hε; ext a; simp
@@ -230,7 +232,8 @@ open MeasureTheory
 
 variable {n : ℕ}
 
-def unitsRen (r : Equiv.Perm (Fin n)) : (Matrix (Fin n) (Fin n) ℂ)ˣ ≃* (Matrix (Fin n) (Fin n) ℂ)ˣ :=
+def unitsRen (r : Equiv.Perm (Fin n))
+    : (Matrix (Fin n) (Fin n) ℂ)ˣ ≃* (Matrix (Fin n) (Fin n) ℂ)ˣ :=
   Units.mapEquiv (Matrix.reindexAlgEquiv ℂ ℂ r.symm).toMulEquiv
 
 lemma unitsRen_val (r : Equiv.Perm (Fin n)) (g : (Matrix (Fin n) (Fin n) ℂ)ˣ) :
@@ -250,18 +253,25 @@ lemma continuous_unitsRen_symm (r : Equiv.Perm (Fin n)) : Continuous (unitsRen r
   rw [this]
   exact continuous_unitsRen r.symm
 
-def ujRen (ε : Fin n → Bool) (r : Equiv.Perm (Fin n)) : Formalism.REAL.UJ ε ≃* Formalism.REAL.UJ (ε ∘ r) where
-  toFun g := ⟨unitsRen r g, by
-    show Formalism.REAL.inUJ _ _
-    rw [unitsRen_val]
-    exact mem_UJ r (show _ ∈ PI.UpqRep.UJset ε from g.2)⟩
-  invFun g := ⟨(unitsRen r).symm g, by
-    show Formalism.REAL.inUJ _ _
-    rw [unitsRen_symm_val]
-    have h := mem_UJ r.symm (show _ ∈ PI.UpqRep.UJset (ε ∘ r) from g.2)
-    have e : (ε ∘ r) ∘ r.symm = ε := by ext a; simp
-    rw [e] at h
-    exact h⟩
+def ujRen (ε : Fin n → Bool) (r : Equiv.Perm (Fin n))
+    : Formalism.REAL.UJ ε ≃* Formalism.REAL.UJ (ε ∘ r) where
+  toFun g := ⟨
+    unitsRen r g,
+    by
+      show Formalism.REAL.inUJ _ _
+      rw [unitsRen_val]
+      exact mem_UJ r (show _ ∈ PI.UpqRep.UJset ε from g.2)
+  ⟩
+  invFun g := ⟨
+    (unitsRen r).symm g,
+    by
+      show Formalism.REAL.inUJ _ _
+      rw [unitsRen_symm_val]
+      have h := mem_UJ r.symm (show _ ∈ PI.UpqRep.UJset (ε ∘ r) from g.2)
+      have e : (ε ∘ r) ∘ r.symm = ε := by ext a; simp
+      rw [e] at h
+      exact h
+  ⟩
   left_inv g := by simp
   right_inv g := by simp
   map_mul' g h := by ext1; simp
@@ -287,7 +297,8 @@ lemma memLp_ren (ε : Fin n → Bool) (r : Equiv.Perm (Fin n)) {f : Formalism.RE
 
 section Rep
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {ε ε₁ : Fin n → Bool} {r : Equiv.Perm (Fin n)} {τ τ' : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
 lemma sqIrr_ren (hε : ε₁ = ε ∘ r) (hτ : ∀ g, τ' g = τ (ren r g)) (h : GlobalTheory.Dec.IsSqIntIrr ε₁ τ) :
@@ -334,8 +345,11 @@ theorem dsOfArr : CompanionTheory.RgExh.Fin.DSOfArr := by
   · have hε' : ε = (ε ∘ s) ∘ s.symm := by ext a; simp
     have ho : Ord ε s.symm := Ord.symm (ε₁ := ε ∘ s) (r := s) rfl hord
     have hK' : IsKMod (ε ∘ s) σ0 D (fun a b => E (s a) (s b)) :=
-      kMod_ren (ε₁ := ε) (ε := ε ∘ s) (r := s.symm) (τ := fun g => σ0 (ren s g)) (τ' := σ0) hε' ho
-        (fun g => by show σ0 g = σ0 (ren s (ren s.symm g)); rw [ren_ren_symm]) hK
+      kMod_ren (ε₁ := ε) (ε := ε ∘ s) (r := s.symm)
+        (τ := fun g => σ0 (ren s g))
+        (τ' := σ0) hε' ho
+        (fun g => by show σ0 g = σ0 (ren s (ren s.symm g)); rw [ren_ren_symm])
+        hK
     refine ⟨⟨hl, hord, fun μ x hx hh => ?_, ?_⟩, fun ν x hx hh => ?_⟩
     · obtain ⟨T, hT⟩ := hK'.ty μ x hx hh
       exact hds.2.2.2.2.2.2 μ T hT

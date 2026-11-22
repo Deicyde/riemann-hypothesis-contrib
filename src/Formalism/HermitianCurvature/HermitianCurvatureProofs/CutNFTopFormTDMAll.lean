@@ -9,6 +9,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutNFTopForm
 namespace Formalism.FourierDecayAlt.P.CutBP.TDM
 
 theorem topDMeasCpt_of_typeNormMeas (h : TypeNormMeas) : TopDMeasCpt :=
-  topDMeasCpt_of_parts h vector_positive_cone diff_operator_in_class_CC scalar_point_measurability_holds empty_list_measurability_holds
+  topDMeasCpt_of_parts h vector_positive_cone diff_operator_in_class_CC
+    scalar_point_measurability_holds empty_list_measurability_holds
 
 end Formalism.FourierDecayAlt.P.CutBP.TDM

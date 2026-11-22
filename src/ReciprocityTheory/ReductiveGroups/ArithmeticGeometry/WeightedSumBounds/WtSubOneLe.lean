@@ -19,16 +19,19 @@ theorem pt6' : TypicalCurveRebasing := by
   dsimp only
   have hcr : ∀ u, IsCurve v (rescaleCurve (x u) (γ u)) := fun u => isCurve_rescale (hx u) (hc u)
   have hγ' : IsCurve v (G.sumF fun u => rescaleCurve (x u) (γ u)) := isCurve_sumF G _ hcr
-  have hlc : ∀ (k : ℕ) (a : Fin d),
-      PowerSeries.coeff k (G.lgCurve (G.sumF fun u => rescaleCurve (x u) (γ u)) a) =
-        ∑ u, x u ^ k * PowerSeries.coeff k (G.lgCurve (γ u) a) := by
+  have hlc
+      : ∀ (k : ℕ) (a : Fin d),
+        PowerSeries.coeff k (G.lgCurve (G.sumF fun u => rescaleCurve (x u) (γ u)) a)
+          = ∑ u, x u ^ k * PowerSeries.coeff k (G.lgCurve (γ u) a) := by
     intro k a
     set_option synthInstance.maxHeartbeats 100000 in
       rw [lgCurve_sumF G _ hcr a, map_sum]
     refine Finset.sum_congr rfl fun u _ => ?_
     rw [lgCurve_rescale G (x u) (fun b => (hc u b).1) a, PowerSeries.coeff_rescale]
-  have hL : ∀ n : ℕ, G.lc p (G.sumF fun u => rescaleCurve (x u) (γ u)) n =
-      ∑ u, x u ^ p ^ n • G.lc p (γ u) n := by
+  have hL
+      : ∀ n : ℕ,
+        G.lc p (G.sumF fun u => rescaleCurve (x u) (γ u)) n
+          = ∑ u, x u ^ p ^ n • G.lc p (γ u) n := by
     intro n
     funext a
     rw [Finset.sum_apply]
@@ -68,9 +71,12 @@ theorem pt5' : TypicalCurveStructureConstants := by
     · rw [hlcδ]
       simp only [Pi.smul_apply, smul_eq_mul]
       rw [(hγty a).2 (n + 1) c (by intro e; apply hc; rw [e]; push_cast; ring), mul_zero]
-  refine ⟨fun s b a => ptx G p γ (δ a) s b,
+  refine ⟨
+    fun s b a => ptx G p γ (δ a) s b,
     fun s b a => ptx_int G hp hγ (fun b => (hγty b).1) hdet' (δ a) (hδc a) (hδt a).1 s b,
-    fun s b a hne => ?_, fun a n => ?_⟩
+    fun s b a hne => ?_,
+    fun a n => ?_
+  ⟩
   · rw [ptx_type ty G hp hγ hdet' hγty (δ a) _ (hδt a) s b hne]
     ring
   · rw [← hlcδ a n, ptx_rel G p hγ hdet' (δ a) n]
@@ -80,26 +86,29 @@ theorem pt5' : TypicalCurveStructureConstants := by
     dsimp only
     rw [show n + 1 - 1 - m = n - m by omega, Nat.sub_sub_self hmn]
 
-theorem wt_sub_one_le {r : ℝ} {y : WithTop ℝ} (h : (r : WithTop ℝ) ≤ 1 + y) :
-    ((r - 1 : ℝ) : WithTop ℝ) ≤ y := by
+theorem wt_sub_one_le {r : ℝ} {y : WithTop ℝ} (h : (r : WithTop ℝ) ≤ 1 + y)
+    : ((r - 1 : ℝ) : WithTop ℝ) ≤ y := by
   induction y using WithTop.recTopCoe with
   | top => exact le_top
   | coe a =>
-    have h1 : ((1 : WithTop ℝ) + (a : WithTop ℝ)) = ((1 + a : ℝ) : WithTop ℝ) := by
-      norm_cast
+    have h1 : ((1 : WithTop ℝ) + (a : WithTop ℝ)) = ((1 + a : ℝ) : WithTop ℝ) := by norm_cast
     rw [h1, WithTop.coe_le_coe] at h
     exact WithTop.coe_le_coe.mpr (by linarith)
 
-private theorem le_valuation_finset_sum {C : Type} [Field C] (v : AddValuation C (WithTop ℝ))
-    {ι : Type} (s : Finset ι) (f : ι → C) (g : WithTop ℝ) (h : ∀ i ∈ s, g ≤ v (f i)) :
-    g ≤ v (∑ i ∈ s, f i) := by
+private theorem le_valuation_finset_sum
+    {C : Type} [Field C]
+    (v : AddValuation C (WithTop ℝ))
+    {ι : Type} (s : Finset ι) (f : ι → C)
+    (g : WithTop ℝ) (h : ∀ i ∈ s, g ≤ v (f i))
+    : g ≤ v (∑ i ∈ s, f i) := by
   classical
   revert h
   refine Finset.induction_on s (fun _ => by simp) ?_
   intro i s hi ih h
   rw [Finset.sum_insert hi]
-  exact le_trans (le_min (h i (Finset.mem_insert_self i s))
-    (ih fun j hj => h j (Finset.mem_insert_of_mem hj))) (AddValuation.map_add v _ _)
+  exact le_trans
+    (le_min (h i (Finset.mem_insert_self i s)) (ih fun j hj => h j (Finset.mem_insert_of_mem hj)))
+    (AddValuation.map_add v _ _)
 
 theorem pt5v' : TypicalCurveValuationBounds := by
   unfold TypicalCurveValuationBounds
@@ -132,7 +141,9 @@ theorem pt5v' : TypicalCurveValuationBounds := by
           apply WithTop.coe_le_coe.mpr
           have : (m : ℝ) ≤ n := by exact_mod_cast Nat.lt_succ_iff.mp hm'
           linarith
-        calc (((-(n : ℝ)) : ℝ) : WithTop ℝ) = 0 + (((-(n : ℝ)) : ℝ) : WithTop ℝ) := (zero_add _).symm
+        calc
+          (((-(n : ℝ)) : ℝ) : WithTop ℝ)
+            = 0 + (((-(n : ℝ)) : ℝ) : WithTop ℝ) := (zero_add _).symm
           _ ≤ (p ^ m) • v (sc (n - m) e b) + v (G.lc p (γ e) m c) := add_le_add h1 (h3.trans h2)
       rw [AddValuation.map_mul, hv] at hge
       have := wt_sub_one_le hge
@@ -182,10 +193,14 @@ theorem pt5v' : TypicalCurveValuationBounds := by
           apply WithTop.coe_le_coe.mpr
           have : (m : ℝ) ≤ k := by exact_mod_cast Nat.lt_succ_iff.mp hlt
           linarith
-        calc (((-(k : ℝ)) : ℝ) : WithTop ℝ) = 0 + (((-(k : ℝ)) : ℝ) : WithTop ℝ) := (zero_add _).symm
-          _ ≤ (p ^ m) • v (sc (k + 1 - m) e a) + v (G.lc p (γ e) m c) := add_le_add h1' (h3.trans h2)
+        calc
+          (((-(k : ℝ)) : ℝ) : WithTop ℝ)
+            = 0 + (((-(k : ℝ)) : ℝ) : WithTop ℝ) := (zero_add _).symm
+          _ ≤ (p ^ m) • v (sc (k + 1 - m) e a) + v (G.lc p (γ e) m c) :=
+            add_le_add h1' (h3.trans h2)
       · subst heq
-        rw [Nat.sub_self, hs0 e, zero_pow (pow_ne_zero _ hp.ne_zero), zero_mul, AddValuation.map_zero]
+        rw [Nat.sub_self, hs0 e, zero_pow (pow_ne_zero _ hp.ne_zero), zero_mul,
+          AddValuation.map_zero]
         exact le_top
     rw [AddValuation.map_mul, hv] at hge
     have := wt_sub_one_le hge

@@ -4,13 +4,17 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.PrimeSetTwoBoun
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-private theorem conductor_le_of_quadratic_squares {N M : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive)
-    (h2 : χ ^ 2 = 1) (hM : M ∣ N) (hM0 : M ≠ 0)
-    (hsq : ∀ t : ℤ, ∃ v : ZMod N, v ^ 2 = 1 + (M : ZMod N) * (t : ZMod N)) : N ≤ M := by
+private theorem conductor_le_of_quadratic_squares
+    {N M : ℕ} [NeZero N]
+    (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive) (h2 : χ ^ 2 = 1)
+    (hM : M ∣ N) (hM0 : M ≠ 0)
+    (hsq : ∀ t : ℤ, ∃ v : ZMod N, v ^ 2 = 1 + (M : ZMod N) * (t : ZMod N))
+    : N ≤ M := by
   haveI : NeZero M := ⟨hM0⟩
   have hf : χ.FactorsThrough M := by
     rw [DirichletCharacter.factorsThrough_iff_ker_unitsMap hM]
@@ -26,8 +30,7 @@ private theorem conductor_le_of_quadratic_squares {N M : ℕ} [NeZero N] (χ : D
     obtain ⟨t, ht⟩ := h1
     obtain ⟨v, hv⟩ := hsq (-t)
     have ha' : a = 1 + (M : ℤ) * (-t) := by linarith
-    have huv : (u : ZMod N) = v ^ 2 := by
-      rw [hv, ← ha, ha']; push_cast; ring
+    have huv : (u : ZMod N) = v ^ 2 := by rw [hv, ← ha, ha']; push_cast; ring
     have hvu : IsUnit v := by
       have : IsUnit (v ^ 2) := huv ▸ u.isUnit
       exact (isUnit_pow_iff two_ne_zero).mp this
@@ -38,14 +41,18 @@ private theorem conductor_le_of_quadratic_squares {N M : ℕ} [NeZero N] (χ : D
   rw [DirichletCharacter.isPrimitive_def] at hp
   omega
 
-private theorem real_cond_odd {N p : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive)
-    (h2 : χ ^ 2 = 1) (hpp : p.Prime) (hodd : p ≠ 2) : ¬ p ^ 2 ∣ N := by
+private theorem real_cond_odd
+    {N p : ℕ} [NeZero N]
+    (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive) (h2 : χ ^ 2 = 1)
+    (hpp : p.Prime) (hodd : p ≠ 2)
+    : ¬ p ^ 2 ∣ N := by
   rintro ⟨k, hk⟩
   have hN : N ≠ 0 := NeZero.ne N
   have hk0 : k ≠ 0 := by rintro rfl; simp at hk; exact hN hk
   obtain ⟨r, hr⟩ := hpp.odd_of_ne_two hodd
   have hle : N ≤ p * k := by
-    refine conductor_le_of_quadratic_squares χ hp h2 ⟨p, by rw [hk]; ring⟩ (mul_ne_zero hpp.ne_zero hk0) fun t => ?_
+    refine conductor_le_of_quadratic_squares χ hp h2 ⟨p, by rw [hk]; ring⟩
+      (mul_ne_zero hpp.ne_zero hk0) fun t => ?_
     refine ⟨1 + (p : ZMod N) * k * t * (r + 1), ?_⟩
     have h0 : (p : ZMod N) ^ 2 * k = 0 := by
       have h := congrArg (Nat.cast : ℕ → ZMod N) hk
@@ -59,13 +66,15 @@ private theorem real_cond_odd {N p : ℕ} [NeZero N] (χ : DirichletCharacter �
   have : 0 < p * k := Nat.pos_of_ne_zero (mul_ne_zero hpp.ne_zero hk0)
   nlinarith
 
-private theorem real_cond_two {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive)
-    (h2 : χ ^ 2 = 1) : ¬ 2 ^ 4 ∣ N := by
+private theorem real_cond_two
+    {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive) (h2 : χ ^ 2 = 1)
+    : ¬ 2 ^ 4 ∣ N := by
   rintro ⟨k, hk⟩
   have hN : N ≠ 0 := NeZero.ne N
   have hk0 : k ≠ 0 := by rintro rfl; simp at hk; exact hN hk
   have hle : N ≤ 8 * k := by
-    refine conductor_le_of_quadratic_squares χ hp h2 ⟨2, by rw [hk]; ring⟩ (mul_ne_zero (by norm_num) hk0) fun t => ?_
+    refine conductor_le_of_quadratic_squares χ hp h2 ⟨2, by rw [hk]; ring⟩
+      (mul_ne_zero (by norm_num) hk0) fun t => ?_
     refine ⟨1 + 4 * (k : ZMod N) * t, ?_⟩
     have h0 : (16 : ZMod N) * k = 0 := by
       have h := congrArg (Nat.cast : ℕ → ZMod N) hk
@@ -76,9 +85,11 @@ private theorem real_cond_two {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ 
     linear_combination (k * t ^ 2) * h0
   omega
 
-theorem real_cond :
-    ∀ (N₀ q d : ℕ) (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), χ.IsPrimitive → χ ^ 2 = 1 → 8 ∣ N₀ → q.Prime → d.Prime →
-      (∀ p : ℕ, p.Prime → p ∣ N → p ∣ N₀ ∨ p = q ∨ p = d) → N ∣ N₀ * q * d := by
+theorem real_cond
+    : ∀ (N₀ q d : ℕ) (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+      χ.IsPrimitive → χ ^ 2 = 1 → 8 ∣ N₀ → q.Prime → d.Prime
+        → (∀ p : ℕ, p.Prime → p ∣ N → p ∣ N₀ ∨ p = q ∨ p = d)
+        → N ∣ N₀ * q * d := by
   intro N₀ q d N _ χ hp h2 h8 hq hd hall
   rw [Nat.dvd_iff_prime_pow_dvd_dvd]
   intro p k hpp hk

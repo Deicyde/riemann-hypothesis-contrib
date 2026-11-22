@@ -160,20 +160,24 @@ theorem splitRules : SplitRules := by
   have hS : IsAffineOpen (T.p ⁻¹ᵁ U) := hU.preimage T.p
   letI := T.alg U
   letI : Algebra Γ(Y, U) B := ((y.appLE U ⊤ hy ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom).hom).toAlgebra
-  let ζ : Fin T.d → (Γ(T.Z, T.p ⁻¹ᵁ U) →ₐ[Γ(Y, U)] B) := fun i =>
-    { ((z i).appLE (T.p ⁻¹ᵁ U) ⊤ (hz i) ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom).hom with
-      commutes' := fun a => by
-        have e := app_comp_appLE (z i) T.p y (hzy i) U ⊤ hy (hz i)
-        have e' := congr($(e) ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom)
-        exact congr($(e').hom a) }
+  let ζ : Fin T.d → (Γ(T.Z, T.p ⁻¹ᵁ U) →ₐ[Γ(Y, U)] B) := fun i => {
+    ((z i).appLE (T.p ⁻¹ᵁ U) ⊤ (hz i) ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom).hom with
+    commutes' := fun a => by
+      have e := app_comp_appLE (z i) T.p y (hzy i) U ⊤ hy (hz i)
+      have e' := congr($(e) ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom)
+      exact congr($(e').hom a)
+  }
   refine ⟨ζ, ?_, fun i a => rfl⟩
   let C := Localization.Away (l : B)
   have e1 : awayPt l B ≫ y = Spec.map (CommRingCat.ofHom (algebraMap Γ(Y, U) C)) ≫ hU.fromSpec := by
     conv_lhs => rw [spec_fac y hU hy]
     rw [← Spec.map_comp_assoc]
     congr 2
-  have e2 : ∀ i, awayPt l B ≫ z i = Spec.map (CommRingCat.ofHom
-      ((IsScalarTower.toAlgHom Γ(Y, U) B C).comp (ζ i)).toRingHom) ≫ hS.fromSpec := by
+  have e2
+      : ∀ i,
+        awayPt l B ≫ z i
+          = Spec.map (CommRingCat.ofHom ((IsScalarTower.toAlgHom Γ(Y, U) B C).comp (ζ i)).toRingHom)
+            ≫ hS.fromSpec := by
     intro i
     conv_lhs => rw [spec_fac (z i) hS (hz i)]
     rw [← Spec.map_comp_assoc]

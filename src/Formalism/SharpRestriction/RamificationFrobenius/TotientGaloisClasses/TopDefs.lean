@@ -20,7 +20,8 @@ def EFamC (Λ : Level) {eps : ℝ} (Fm : FamCore eps) : Prop :=
 
 section
 
-variable {Fam : ℝ → Type 1} (core : ∀ {eps : ℝ}, Fam eps → FamCore eps)
+variable
+  {Fam : ℝ → Type 1} (core : ∀ {eps : ℝ}, Fam eps → FamCore eps)
   (Tied : ∀ {eps : ℝ}, Fam eps → (eD eL K cHH eK CL x : ℝ) → Prop)
 
 variable {core Tied}

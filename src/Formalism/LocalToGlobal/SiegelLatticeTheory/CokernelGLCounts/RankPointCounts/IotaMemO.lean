@@ -12,7 +12,8 @@ open scoped Classical
 
 namespace Formalism.L2.SG.Pf.FibQ
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups PI.PairValDefs PI.NRCW IsDedekindDomain
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups PI.PairValDefs PI.NRCW IsDedekindDomain
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -30,10 +31,11 @@ def condI (y : D.host.E) : Ideal (𝓞 D.host.E) where
     rintro c a ⟨o, h⟩
     exact ⟨c * o, by rw [smul_eq_mul]; push_cast; rw [mul_assoc, h]⟩
 
-theorem iota_mem_O (p : PlF D) (y : D.host.E)
+theorem iota_mem_O
+    (p : PlF D) (y : D.host.E)
     (h : ∀ P : HeightOneSpectrum (𝓞 D.host.E),
-      P.asIdeal.comap (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) = p.asIdeal → IntP P y) :
-    (D.s.atP p).ιE y ∈ (D.s.atP p).O := by
+      P.asIdeal.comap (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) = p.asIdeal → IntP P y)
+    : (D.s.atP p).ιE y ∈ (D.s.atP p).O := by
   rw [Formalism.L2.SG.Pf.LocalDenominators.iE_mem_O_iff_D]
   have := p.isPrime
   by_contra hno
@@ -43,8 +45,9 @@ theorem iota_mem_O (p : PlF D) (y : D.host.E)
     by_contra hsp
     obtain ⟨o, ho⟩ := hs
     apply hno s hsp
-    have e : algebraMap D.host.F D.host.E (s : D.host.F) =
-        ((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) s : 𝓞 D.host.E) : D.host.E) := by
+    have e
+        : algebraMap D.host.F D.host.E (s : D.host.F)
+          = ((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) s : 𝓞 D.host.E) : D.host.E) := by
       rw [← IsScalarTower.algebraMap_apply (𝓞 D.host.F) D.host.F D.host.E,
         IsScalarTower.algebraMap_apply (𝓞 D.host.F) (𝓞 D.host.E) D.host.E]
     rw [e, ho]

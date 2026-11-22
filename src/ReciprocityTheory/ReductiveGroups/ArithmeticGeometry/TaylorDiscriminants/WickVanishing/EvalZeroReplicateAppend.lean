@@ -18,8 +18,8 @@ def ev1 (g : ι → k) : List ι → k
 
 def word (Ls : List ι) (m : ι →₀ ℕ) : List ι := Ls.flatMap (fun l => List.replicate (m l) l)
 
-theorem word_cons (l : ι) (Ls : List ι) (m : ι →₀ ℕ) :
-    word (l :: Ls) m = List.replicate (m l) l ++ word Ls m := by
+theorem word_cons (l : ι) (Ls : List ι) (m : ι →₀ ℕ)
+    : word (l :: Ls) m = List.replicate (m l) l ++ word Ls m := by
   simp only [word, List.flatMap_cons]
 
 end ReciprocityTheory.ChartRestriction.G.TB.G2

@@ -244,9 +244,9 @@ private lemma exists_bruhat_function_of_positive_on_cosets {G : Type*} [Group G]
     rw [integral_div]
     exact div_self (hFpos x).ne'
 
-
 open MeasureTheory Pointwise in
-theorem _root_.GlobalTheory.bruhatFunctionExists_closedSubgroup : _root_.HeckeCharacterZeroLocus.BruhatFunctionExistsVariant.{u} := by
+theorem _root_.GlobalTheory.bruhatFunctionExists_closedSubgroup
+    : _root_.HeckeCharacterZeroLocus.BruhatFunctionExistsVariant.{u} := by
   unfold _root_.HeckeCharacterZeroLocus.BruhatFunctionExistsVariant
   intro G _ _ _ _ _ _ _ H hH μ _
   obtain ⟨f, hf, hf0, hfK, hpos⟩ := exists_nonneg_continuous_ne_zero_on_cosets H hH

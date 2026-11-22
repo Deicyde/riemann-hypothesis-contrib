@@ -21,12 +21,13 @@ open Semi
 
 section Adj
 
-theorem homEquiv_mul {S S' : Scheme.{0}} (φ : S' ⟶ S) (X : Over S') (A : Over S) [GrpObj A]
-    (a b : (Over.map φ).obj X ⟶ A) :
-    (Over.mapPullbackAdj φ).homEquiv X A (a * b) =
-      (Over.mapPullbackAdj φ).homEquiv X A a * (Over.mapPullbackAdj φ).homEquiv X A b := by
-  rw [Adjunction.homEquiv_unit, Adjunction.homEquiv_unit, Adjunction.homEquiv_unit,
-    Functor.map_mul, MonObj.comp_mul]
+theorem homEquiv_mul
+    {S S' : Scheme.{0}} (φ : S' ⟶ S) (X : Over S') (A : Over S) [GrpObj A]
+    (a b : (Over.map φ).obj X ⟶ A)
+    : (Over.mapPullbackAdj φ).homEquiv X A (a * b)
+      = (Over.mapPullbackAdj φ).homEquiv X A a * (Over.mapPullbackAdj φ).homEquiv X A b := by
+  rw [Adjunction.homEquiv_unit, Adjunction.homEquiv_unit, Adjunction.homEquiv_unit, Functor.map_mul,
+    MonObj.comp_mul]
 
 end Adj
 

@@ -6,18 +6,19 @@ public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory
 
-theorem norm_sq_integral_inner_smul_le (Ω V : Type) [MeasurableSpace Ω] [NormedAddCommGroup V]
-    [InnerProductSpace ℂ V] (ν : Measure Ω) (f g : Ω → V) (ph : Ω → ℂ)
-    (hf : AEStronglyMeasurable f ν) (hg : AEStronglyMeasurable g ν)
-    (hp : AEStronglyMeasurable ph ν) :
-    ENNReal.ofReal (‖∫ x, ⟪f x, ph x • g x⟫_ℂ ∂ν‖ ^ 2) ≤
-      (∫⁻ x, ENNReal.ofReal (‖ph x‖ ^ 2 * ‖f x‖ ^ 2) ∂ν) *
-        ∫⁻ x, ENNReal.ofReal (‖g x‖ ^ 2) ∂ν := by
+theorem norm_sq_integral_inner_smul_le
+    (Ω V : Type) [MeasurableSpace Ω] [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (ν : Measure Ω) (f g : Ω → V) (ph : Ω → ℂ)
+    (hf : AEStronglyMeasurable f ν) (hg : AEStronglyMeasurable g ν) (hp : AEStronglyMeasurable ph ν)
+    : ENNReal.ofReal (‖∫ x, ⟪f x, ph x • g x⟫_ℂ ∂ν‖ ^ 2)
+      ≤ (∫⁻ x, ENNReal.ofReal (‖ph x‖ ^ 2 * ‖f x‖ ^ 2) ∂ν)
+        * ∫⁻ x, ENNReal.ofReal (‖g x‖ ^ 2) ∂ν := by
   set F : Ω → ℝ≥0∞ := fun x => ‖ph x‖ₑ * ‖f x‖ₑ with hF
   set G : Ω → ℝ≥0∞ := fun x => ‖g x‖ₑ with hG
   have hFm : AEMeasurable F ν := hp.enorm.mul hf.enorm
@@ -26,11 +27,12 @@ theorem norm_sq_integral_inner_smul_le (Ω V : Type) [MeasurableSpace Ω] [Norme
     refine (enorm_integral_le_lintegral_enorm _).trans (lintegral_mono fun x => ?_)
     have h : ‖⟪f x, ph x • g x⟫_ℂ‖ ≤ ‖ph x‖ * ‖f x‖ * ‖g x‖ := by
       refine (norm_inner_le_norm _ _).trans (le_of_eq ?_)
-      rw [norm_smul]; ring
+      rw [norm_smul]
+      ring
     have := ENNReal.ofReal_le_ofReal h
     rw [ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_mul (by positivity),
-      ofReal_norm_eq_enorm, ofReal_norm_eq_enorm, ofReal_norm_eq_enorm,
-      ofReal_norm_eq_enorm] at this
+        ofReal_norm_eq_enorm, ofReal_norm_eq_enorm, ofReal_norm_eq_enorm, ofReal_norm_eq_enorm]
+      at this
     exact this
   have h2 := ENNReal.lintegral_mul_le_Lp_mul_Lq ν Real.HolderConjugate.two_two hFm hGm
   have e1 : (∫⁻ x, ENNReal.ofReal (‖ph x‖ ^ 2 * ‖f x‖ ^ 2) ∂ν) = ∫⁻ x, F x ^ (2 : ℝ) ∂ν := by

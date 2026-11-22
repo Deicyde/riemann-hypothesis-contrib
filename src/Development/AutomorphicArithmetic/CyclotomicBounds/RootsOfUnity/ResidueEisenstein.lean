@@ -10,10 +10,14 @@ namespace UpperTheory.Mu
 
 variable {L : Type} [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L))
 
-theorem tame_ext_prime {p : ℕ} (hp : p.Prime) (hw : Units.torsionOrder L + 1 < p) (hv : (p : 𝓞 L) ∈ v.asIdeal)
-    (ε : (𝓞 L)ˣ →* ℂˣ) :
-    ∃ θ : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ, θ ≠ 1 ∧ ∀ ζ : (𝓞 L)ˣ, (∃ m : ℕ, 0 < m ∧ ((ζ : 𝓞 L) : L) ^ m = 1) →
-      θ (Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom ζ) = ε ζ := by
+theorem tame_ext_prime
+    {p : ℕ} (hp : p.Prime) (hw : Units.torsionOrder L + 1 < p) (hv : (p : 𝓞 L) ∈ v.asIdeal)
+    (ε : (𝓞 L)ˣ →* ℂˣ)
+    : ∃ θ : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ,
+      θ ≠ 1
+        ∧ ∀ ζ : (𝓞 L)ˣ,
+          (∃ m : ℕ, 0 < m ∧ ((ζ : 𝓞 L) : L) ^ m = 1)
+            → θ (Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom ζ) = ε ζ := by
   have hv' : v.asIdeal ≠ ⊤ := v.isPrime.ne_top
   have hpos := Units.torsionOrder_pos L
   have hn : ((Units.torsionOrder L : ℕ) : 𝓞 L) ∉ v.asIdeal := by
@@ -24,7 +28,9 @@ theorem tame_ext_prime {p : ℕ} (hp : p.Prime) (hw : Units.torsionOrder L + 1 <
       have := Nat.le_of_dvd hpos hd
       omega
     obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.2 hcop
-    have h1 : (1 : 𝓞 L) = (a : 𝓞 L) * ((Units.torsionOrder L : ℕ) : 𝓞 L) + (b : 𝓞 L) * ((p : ℕ) : 𝓞 L) := by
+    have h1
+        : (1 : 𝓞 L)
+          = (a : 𝓞 L) * ((Units.torsionOrder L : ℕ) : 𝓞 L) + (b : 𝓞 L) * ((p : ℕ) : 𝓞 L) := by
       have := congrArg (Int.cast : ℤ → 𝓞 L) hab
       push_cast at this
       exact this.symm
@@ -35,7 +41,8 @@ theorem tame_ext_prime {p : ℕ} (hp : p.Prime) (hw : Units.torsionOrder L + 1 <
     have hd : Ideal.absNorm v.asIdeal ∣ p ^ Module.finrank ℤ (𝓞 L) := by
       have h1 := Ideal.absNorm_dvd_absNorm_of_le ((Ideal.span_singleton_le_iff_mem _).mpr hv)
       rwa [Ideal.absNorm_span_singleton, show ((p : ℕ) : 𝓞 L) = algebraMap ℤ (𝓞 L) (p : ℤ) by simp,
-        Algebra.norm_algebraMap, Int.natAbs_pow, Int.natAbs_natCast] at h1
+          Algebra.norm_algebraMap, Int.natAbs_pow, Int.natAbs_natCast]
+        at h1
     obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow hp).1 hd
     have hk0 : k ≠ 0 := by
       rintro rfl
@@ -53,10 +60,17 @@ theorem tame_ext_prime {p : ℕ} (hp : p.Prime) (hw : Units.torsionOrder L + 1 <
     simpa using hζm
   exact hθε ⟨ζ, hmem⟩
 
-theorem tame_par {p : ℕ} (hp : p.Prime) (hw : Units.torsionOrder L + 1 < p) (hv : (p : 𝓞 L) ∈ v.asIdeal)
-    {I : Type} [Fintype I] (φ : I → L →+* ℂ) (e : I → ℤ) :
-    ∃ θ : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ, θ ≠ 1 ∧ ∀ ζ : (𝓞 L)ˣ, (∃ m : ℕ, 0 < m ∧ ((ζ : 𝓞 L) : L) ^ m = 1) →
-      (∏ i, φ i ((ζ : 𝓞 L) : L) ^ e i) * ((θ (Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom ζ) : ℂˣ) : ℂ) = 1 := by
+theorem tame_par
+    {p : ℕ} (hp : p.Prime) (hw : Units.torsionOrder L + 1 < p) (hv : (p : 𝓞 L) ∈ v.asIdeal)
+    {I : Type} [Fintype I]
+    (φ : I → L →+* ℂ) (e : I → ℤ)
+    : ∃ θ : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ,
+      θ ≠ 1
+        ∧ ∀ ζ : (𝓞 L)ˣ,
+          (∃ m : ℕ, 0 < m ∧ ((ζ : 𝓞 L) : L) ^ m = 1)
+            → (∏ i, φ i ((ζ : 𝓞 L) : L) ^ e i)
+                * ((θ (Units.map (Ideal.Quotient.mk v.asIdeal).toMonoidHom ζ) : ℂˣ) : ℂ)
+              = 1 := by
   classical
   let f : I → (𝓞 L)ˣ →* ℂˣ := fun i =>
     (zpowGroupHom (e i)).comp (Units.map ((φ i).toMonoidHom.comp (algebraMap (𝓞 L) L).toMonoidHom))
@@ -69,7 +83,8 @@ theorem tame_par {p : ℕ} (hp : p.Prime) (hw : Units.torsionOrder L + 1 < p) (h
   rw [hθε ζ hζ, MonoidHom.inv_apply, MonoidHom.finsetProd_apply, ← hf]
   exact Units.mul_inv _
 
-theorem exists_unit_of_root {z : L} (hz : ∃ m : ℕ, 0 < m ∧ z ^ m = 1) : ∃ ζ : (𝓞 L)ˣ, ((ζ : 𝓞 L) : L) = z := by
+theorem exists_unit_of_root {z : L} (hz : ∃ m : ℕ, 0 < m ∧ z ^ m = 1)
+    : ∃ ζ : (𝓞 L)ˣ, ((ζ : 𝓞 L) : L) = z := by
   obtain ⟨m, hm, hzm⟩ := hz
   have hint : IsIntegral ℤ z := by
     refine IsIntegral.of_pow hm ?_

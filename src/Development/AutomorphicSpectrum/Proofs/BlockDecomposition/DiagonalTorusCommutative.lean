@@ -13,8 +13,8 @@ namespace GlobalTheory.CompanionTheory.LbElem.TorComm
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem stdBlocks_ones_eq (N : ℕ) (a : Fin N) (i : Fin (ones N a)) :
-    stdBlocks (ones N) (sum_ones N) ⟨a, i⟩ = a := by
+theorem stdBlocks_ones_eq (N : ℕ) (a : Fin N) (i : Fin (ones N a))
+    : stdBlocks (ones N) (sum_ones N) ⟨a, i⟩ = a := by
   have hi : (i : ℕ) = 0 := by
     have := i.isLt
     simp only [ones] at this
@@ -23,8 +23,8 @@ theorem stdBlocks_ones_eq (N : ℕ) (a : Fin N) (i : Fin (ones N a)) :
   rw [stdBlocks_val]
   simp [ones, hi]
 
-theorem offDiag_of_mem {N : ℕ} {x : GL (Fin N) k} (hx : x ∈ Tor k N) {i j : Fin N} (hij : i ≠ j) :
-    (x : Matrix (Fin N) (Fin N) k) i j = 0 := by
+theorem offDiag_of_mem {N : ℕ} {x : GL (Fin N) k} (hx : x ∈ Tor k N) {i j : Fin N} (hij : i ≠ j)
+    : (x : Matrix (Fin N) (Fin N) k) i j = 0 := by
   rw [Tor, MonoidHom.mem_range] at hx
   obtain ⟨s, rfl⟩ := hx
   obtain ⟨⟨a, p⟩, rfl⟩ := (stdBlocks (ones N) (sum_ones N)).surjective i
@@ -44,11 +44,13 @@ theorem offDiag_of_mem {N : ℕ} {x : GL (Fin N) k} (hx : x ∈ Tor k N) {i j : 
     rw [hpq]
   simp [leviEmb, Matrix.blockDiagonal'_apply, hab]
 
-theorem diag_ne_zero {N : ℕ} (x : GL (Fin N) k)
-    (h : ∀ i j : Fin N, i ≠ j → (x : Matrix (Fin N) (Fin N) k) i j = 0) (i : Fin N) :
-    (x : Matrix (Fin N) (Fin N) k) i i ≠ 0 := by
-  have hM : (x : Matrix (Fin N) (Fin N) k) =
-      Matrix.diagonal fun l => (x : Matrix (Fin N) (Fin N) k) l l := by
+theorem diag_ne_zero
+    {N : ℕ} (x : GL (Fin N) k) (h : ∀ i j : Fin N, i ≠ j → (x : Matrix (Fin N) (Fin N) k) i j = 0)
+    (i : Fin N)
+    : (x : Matrix (Fin N) (Fin N) k) i i ≠ 0 := by
+  have hM
+      : (x : Matrix (Fin N) (Fin N) k)
+        = Matrix.diagonal fun l => (x : Matrix (Fin N) (Fin N) k) l l := by
     ext a b
     by_cases hab : a = b
     · subst hab
@@ -59,11 +61,17 @@ theorem diag_ne_zero {N : ℕ} (x : GL (Fin N) k)
   rw [hM, Matrix.det_diagonal] at hdet
   exact Finset.prod_ne_zero_iff.mp hdet i (Finset.mem_univ i)
 
-theorem mem_of_offDiag {N : ℕ} (x : GL (Fin N) k)
-    (h : ∀ i j : Fin N, i ≠ j → (x : Matrix (Fin N) (Fin N) k) i j = 0) : x ∈ Tor k N := by
+theorem mem_of_offDiag
+    {N : ℕ} (x : GL (Fin N) k) (h : ∀ i j : Fin N, i ≠ j → (x : Matrix (Fin N) (Fin N) k) i j = 0)
+    : x ∈ Tor k N := by
   rw [Tor, MonoidHom.mem_range]
-  refine ⟨(fun a => Matrix.GeneralLinearGroup.scalar _
-    (Units.mk0 ((x : Matrix (Fin N) (Fin N) k) a a) (diag_ne_zero x h a)) : Levi k (Bl (ones N))), ?_⟩
+  refine ⟨
+    (fun a =>
+        Matrix.GeneralLinearGroup.scalar _
+          (Units.mk0 ((x : Matrix (Fin N) (Fin N) k) a a) (diag_ne_zero x h a))
+      : Levi k (Bl (ones N))),
+    ?_
+  ⟩
   apply Units.ext
   ext i j
   obtain ⟨⟨a, p⟩, rfl⟩ := (stdBlocks (ones N) (sum_ones N)).surjective i
@@ -78,15 +86,17 @@ theorem mem_of_offDiag {N : ℕ} (x : GL (Fin N) k)
       omega
     subst hpq
     have hs : ((stdBlocks (ones N) (sum_ones N)).symm a).fst = a := by
-      have hh := stdBlocks_ones_eq N ((stdBlocks (ones N) (sum_ones N)).symm a).fst
-        ((stdBlocks (ones N) (sum_ones N)).symm a).snd
+      have hh :=
+        stdBlocks_ones_eq N ((stdBlocks (ones N) (sum_ones N)).symm a).fst
+          ((stdBlocks (ones N) (sum_ones N)).symm a).snd
       simpa using hh.symm
     simp [leviEmb, stdBlocks_ones_eq, Matrix.GeneralLinearGroup.scalar, hs]
-  · rw [h _ _ (fun heq => hab (congrArg Sigma.fst ((stdBlocks (ones N) (sum_ones N)).injective heq)))]
+  · rw [h _ _
+      (fun heq => hab (congrArg Sigma.fst ((stdBlocks (ones N) (sum_ones N)).injective heq)))]
     simp [leviEmb, Matrix.blockDiagonal'_apply, hab]
 
-theorem eq_diagonal {N : ℕ} (M : Matrix (Fin N) (Fin N) k)
-    (h : ∀ i j : Fin N, i ≠ j → M i j = 0) : M = Matrix.diagonal fun i => M i i := by
+theorem eq_diagonal {N : ℕ} (M : Matrix (Fin N) (Fin N) k) (h : ∀ i j : Fin N, i ≠ j → M i j = 0)
+    : M = Matrix.diagonal fun i => M i i := by
   ext a b
   by_cases hab : a = b
   · subst hab
@@ -94,8 +104,8 @@ theorem eq_diagonal {N : ℕ} (M : Matrix (Fin N) (Fin N) k)
   · rw [Matrix.diagonal_apply_ne _ hab]
     exact h a b hab
 
-theorem mul_comm_of_mem {N : ℕ} {a b : GL (Fin N) k} (ha : a ∈ Tor k N) (hb : b ∈ Tor k N) :
-    a * b = b * a := by
+theorem mul_comm_of_mem {N : ℕ} {a b : GL (Fin N) k} (ha : a ∈ Tor k N) (hb : b ∈ Tor k N)
+    : a * b = b * a := by
   apply Units.ext
   rw [Units.val_mul, Units.val_mul,
     eq_diagonal (a : Matrix (Fin N) (Fin N) k) (fun i j hij => offDiag_of_mem ha hij),
@@ -105,14 +115,18 @@ theorem mul_comm_of_mem {N : ℕ} {a b : GL (Fin N) k} (ha : a ∈ Tor k N) (hb 
   funext i
   exact mul_comm _ _
 
-theorem tor_comm_and_mem_iff : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k], ∀ (N : ℕ),
-    (∀ a ∈ PositivityTheory.Lbc.Tor k N, ∀ b ∈ PositivityTheory.Lbc.Tor k N, a * b = b * a) ∧
-      ∀ x : GL (Fin N) k, x ∈ PositivityTheory.Lbc.Tor k N ↔
-        ∀ i j : Fin N, i ≠ j → (x : Matrix (Fin N) (Fin N) k) i j = 0 := by
+theorem tor_comm_and_mem_iff
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      ∀ (N : ℕ),
+        (∀ a ∈ PositivityTheory.Lbc.Tor k N, ∀ b ∈ PositivityTheory.Lbc.Tor k N, a * b = b * a)
+          ∧ ∀ x : GL (Fin N) k,
+            x ∈ PositivityTheory.Lbc.Tor k N
+              ↔ ∀ i j : Fin N, i ≠ j → (x : Matrix (Fin N) (Fin N) k) i j = 0 := by
   intro k _ _ _ _ N
-  exact ⟨fun a ha b hb => mul_comm_of_mem ha hb,
-    fun x => ⟨fun hx i j hij => offDiag_of_mem hx hij, mem_of_offDiag x⟩⟩
+  exact ⟨
+    fun a ha b hb => mul_comm_of_mem ha hb,
+    fun x => ⟨fun hx i j hij => offDiag_of_mem hx hij, mem_of_offDiag x⟩
+  ⟩
 
 end GlobalTheory.CompanionTheory.LbElem.TorComm
 

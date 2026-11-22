@@ -6,11 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Quadratic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published UpperTheory.V.Af.Bc
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+  UpperTheory.V.Af.Bc
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normRam :
-    NormRam := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normRam : NormRam := by
   intro K M Ω _ _ _ _ _ _ _ _ _ _ _ hp η hη A v hA hτ hunr
   obtain ⟨τ, hτI, hτM⟩ := hτ
   obtain ⟨hη1, hηp, hηev⟩ := hη
@@ -27,15 +28,17 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normRam :
     obtain ⟨artM, hartM⟩ := GlobalTheory.globalArtinReciprocity_holds M Ω
     have hφc : Continuous (r.comp (UpperTheory.V.Af.Bc.res K Ω M)) :=
       hrc.comp (UpperTheory.V.Af.continuous_restrictScalarsHom K M Ω)
-    have hbad : {w : HeightOneSpectrum (𝓞 M) | ¬ (η.UnrAt (HeightOneSpectrum.under (𝓞 K) w) ∧
-        ∀ f : ℕ, normV w = normV (HeightOneSpectrum.under (𝓞 K) w) ^ f →
-          η.val (HeightOneSpectrum.under (𝓞 K) w) ^ f = 1)}.Finite := by
+    have hbad
+        : {w : HeightOneSpectrum (𝓞 M) | ¬ (η.UnrAt (HeightOneSpectrum.under (𝓞 K) w) ∧
+          ∀ f : ℕ, normV w = normV (HeightOneSpectrum.under (𝓞 K) w) ^ f →
+            η.val (HeightOneSpectrum.under (𝓞 K) w) ^ f = 1)}.Finite := by
       have h1 := GlobalTheory.QuadNormChar.tendsto_under (K := K) (K' := M)
       have h2 : ∀ᶠ w in Filter.cofinite, η.UnrAt (HeightOneSpectrum.under (𝓞 K) w) :=
         h1.eventually (Filter.eventually_cofinite.2 (GlobalTheory.Mem.UnrAe.finite_ramified η))
       exact Filter.eventually_cofinite.1 (h2.and hηev)
-    have hone := GlobalTheory.FrobDense.eq_one_of_frob M Ω artM hartM (Qbar 2)ˣ (r.comp (UpperTheory.V.Af.Bc.res K Ω M)) hφc
-      hbad.toFinset ?_
+    have hone :=
+      GlobalTheory.FrobDense.eq_one_of_frob M Ω artM hartM (Qbar 2)ˣ
+        (r.comp (UpperTheory.V.Af.Bc.res K Ω M)) hφc hbad.toFinset ?_
     · intro g
       exact DFunLike.congr_fun hone g
     · intro w hw A' hA' σ hσ
@@ -49,12 +52,14 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normRam :
         have h3 := hr.frob_unr hart (Or.inr rfl) hwu hB hσ'
         rw [map_inv, Units.val_inv_eq_inv_val, h3, inv_inv]
         simp
-      obtain ⟨-, hfr⟩ := UpperTheory.frobenius_power_compatibility K M Ω 2 ι w (w.asIdeal.inertiaDeg (𝓞 K))
-        (GlobalTheory.QuadNormChar.normV_under w)
+      obtain ⟨-, hfr⟩ :=
+        UpperTheory.frobenius_power_compatibility K M Ω 2 ι w (w.asIdeal.inertiaDeg (𝓞 K))
+          (GlobalTheory.QuadNormChar.normV_under w)
       obtain ⟨-, hval⟩ := hfr r _ hce A' hA'
       have h6 := hval σ hσ
-      have h7 : ((η.val (HeightOneSpectrum.under (𝓞 K) w) : ℂˣ) : ℂ) ^
-          (w.asIdeal.inertiaDeg (𝓞 K)) = 1 := by
+      have h7
+          : ((η.val (HeightOneSpectrum.under (𝓞 K) w) : ℂˣ) : ℂ) ^ (w.asIdeal.inertiaDeg (𝓞 K))
+            = 1 := by
         rw [← Units.val_pow_eq_pow_val, hwn _ (GlobalTheory.QuadNormChar.normV_under w)]
         rfl
       rw [h7] at h6
@@ -69,11 +74,12 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normRam :
     let ρ : G K Ω →* (M ≃ₐ[K] M) := AlgEquiv.restrictNormalHom M
     have hfix : ∀ g : G K Ω, ρ g = 1 → r g = 1 := by
       intro g hg
-      let g' : Ω ≃ₐ[M] Ω := AlgEquiv.ofRingEquiv (f := g.toRingEquiv) (fun x => by
-        have h1 := AlgEquiv.restrictNormal_commutes g M x
-        have h2 : g.restrictNormal M = 1 := hg
-        rw [h2] at h1
-        simpa using h1.symm)
+      let g' : Ω ≃ₐ[M] Ω :=
+        AlgEquiv.ofRingEquiv (f := g.toRingEquiv) (fun x => by
+          have h1 := AlgEquiv.restrictNormal_commutes g M x
+          have h2 : g.restrictNormal M = 1 := hg
+          rw [h2] at h1
+          simpa using h1.symm)
       have hg' : UpperTheory.V.Af.Bc.res K Ω M g' = g := by
         ext x
         rfl
@@ -88,14 +94,12 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normRam :
       rw [h2] at h3
       simpa using h3.symm
     have hgen : Subgroup.zpowers (ρ τ) = ⊤ :=
-      zpowers_eq_top_of_prime_card (p := Module.finrank K M)
-        (IsGalois.card_aut_eq_finrank K M) hρτ
+      zpowers_eq_top_of_prime_card (p := Module.finrank K M) (IsGalois.card_aut_eq_finrank K M) hρτ
     intro g
     have hg : ρ g ∈ Subgroup.zpowers (ρ τ) := hgen ▸ Subgroup.mem_top _
     obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.1 hg
     have hτ1 : r τ = 1 := hrI τ hτI
-    have h4 : ρ ((τ ^ k)⁻¹ * g) = 1 := by
-      rw [map_mul, map_inv, map_zpow, hk, inv_mul_cancel]
+    have h4 : ρ ((τ ^ k)⁻¹ * g) = 1 := by rw [map_mul, map_inv, map_zpow, hk, inv_mul_cancel]
     have h5 := hfix _ h4
     rw [map_mul, map_inv, map_zpow, hτ1, one_zpow, inv_one, one_mul] at h5
     exact h5

@@ -6,15 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-private theorem norm_index_count_bound (M a c : ℕ) :
-    (((a + c) / M : ℕ) : ℤ) = ((a / M : ℕ) : ℤ) +
-      ∑ j ∈ Finset.range c, if (j : ZMod M) = ((a + c : ℕ) : ZMod M) then 1 else 0 := by
+private theorem norm_index_count_bound (M a c : ℕ)
+    : (((a + c) / M : ℕ) : ℤ)
+      = ((a / M : ℕ) : ℤ)
+        + ∑ j ∈ Finset.range c, if (j : ZMod M) = ((a + c : ℕ) : ZMod M) then 1 else 0 := by
   induction c with
   | zero => simp
   | succ c ih =>
     have e : a + (c + 1) = (a + c) + 1 := by omega
-    have h1 : ∀ j : ℕ, (((j + 1 : ℕ) : ZMod M) = (((a + c + 1 : ℕ)) : ZMod M)) ↔
-        ((j : ZMod M) = ((a + c : ℕ) : ZMod M)) := by
+    have h1
+        : ∀ j : ℕ,
+          (((j + 1 : ℕ) : ZMod M) = (((a + c + 1 : ℕ)) : ZMod M))
+            ↔ ((j : ZMod M) = ((a + c : ℕ) : ZMod M)) := by
       intro j
       push_cast
       exact add_left_inj 1
@@ -26,20 +29,22 @@ private theorem norm_index_count_bound (M a c : ℕ) :
     rw [Nat.cast_add, ih]
     split_ifs <;> push_cast <;> ring
 
-theorem UpperTheory.V.FW.gcDiff :
-    ∀ (M c : ℕ) [NeZero M] (s : ZMod M), c.Coprime M → gc M c s - gc M c (s - c) = (∑ j ∈ Finset.range c, if (j : ZMod M) = s then 1 else 0) - if s = 0 then (c : ℤ) else 0 := by
+theorem UpperTheory.V.FW.gcDiff
+    : ∀ (M c : ℕ) [NeZero M] (s : ZMod M),
+      c.Coprime M
+        → gc M c s - gc M c (s - c)
+          = (∑ j ∈ Finset.range c, if (j : ZMod M) = s then 1 else 0)
+            - if s = 0 then (c : ℤ) else 0 := by
   intro M c _ s hc
   have hM : 0 < M := Nat.pos_of_ne_zero (NeZero.ne M)
   have hinv : (c : ZMod M)⁻¹ * (c : ZMod M) = 1 := by
     rw [mul_comm]
     exact ZMod.coe_mul_inv_eq_one c hc
-  have hts : (c : ZMod M)⁻¹ * (s - c) = (c : ZMod M)⁻¹ * s - 1 := by
-    rw [mul_sub, hinv]
+  have hts : (c : ZMod M)⁻¹ * (s - c) = (c : ZMod M)⁻¹ * s - 1 := by rw [mul_sub, hinv]
   unfold UpperTheory.V.FW.gc
   rw [hts]
   set t : ZMod M := (c : ZMod M)⁻¹ * s with ht
-  have hs : s = (c : ZMod M) * t := by
-    rw [ht, ← mul_assoc, ZMod.coe_mul_inv_eq_one c hc, one_mul]
+  have hs : s = (c : ZMod M) * t := by rw [ht, ← mul_assoc, ZMod.coe_mul_inv_eq_one c hc, one_mul]
   set w := (t - 1).val with hw
   have htw : t = ((w + 1 : ℕ) : ZMod M) := by
     rw [Nat.cast_add, Nat.cast_one, hw, ZMod.natCast_zmod_val]
@@ -51,8 +56,7 @@ theorem UpperTheory.V.FW.gcDiff :
     ring
   rw [hcast] at key
   rcases Nat.lt_or_ge (w + 1) M with h | h
-  · have hvt : t.val = w + 1 := by
-      rw [htw, ZMod.val_natCast, Nat.mod_eq_of_lt h]
+  · have hvt : t.val = w + 1 := by rw [htw, ZMod.val_natCast, Nat.mod_eq_of_lt h]
     have hs0 : s ≠ 0 := by
       intro h0
       have t0 : t = 0 := by rw [ht, h0, mul_zero]

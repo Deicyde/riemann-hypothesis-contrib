@@ -10,10 +10,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.RgGuCore
 
-theorem not_inf_le_of_rank_quotient_le_one {V : Type} [AddCommGroup V] [Module ℂ V]
-    (T A C : Submodule ℂ V) (hT : Module.rank ℂ (V ⧸ T) ≤ 1)
-    (hmod : (A ⊔ C) ⊓ T ≤ A ⊓ T ⊔ C ⊓ T) (hA : ¬ A ≤ T) (hC : ¬ C ≤ T) :
-    ¬ A ⊓ C ≤ T := by
+theorem not_inf_le_of_rank_quotient_le_one
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (T A C : Submodule ℂ V) (hT : Module.rank ℂ (V ⧸ T) ≤ 1) (hmod : (A ⊔ C) ⊓ T ≤ A ⊓ T ⊔ C ⊓ T)
+    (hA : ¬ A ≤ T) (hC : ¬ C ≤ T)
+    : ¬ A ⊓ C ≤ T := by
   obtain ⟨a, haA, haT⟩ := SetLike.not_le_iff_exists.mp hA
   obtain ⟨c, hcC, hcT⟩ := SetLike.not_le_iff_exists.mp hC
   obtain ⟨v₀, hv₀⟩ := rank_le_one_iff.mp hT
@@ -32,7 +33,9 @@ theorem not_inf_le_of_rank_quotient_le_one {V : Type} [AddCommGroup V] [Module �
   obtain ⟨x, hx, y, hy, hxy⟩ := Submodule.mem_sup.mp (hmod (Submodule.mem_inf.mpr ⟨hsum, hdiff⟩))
   rw [Submodule.mem_inf] at hx hy
   have hw : c - y = (t * s⁻¹) • a + x := by
-    calc c - y = (c - (t * s⁻¹) • a - (x + y)) + (t * s⁻¹) • a + x := by abel
+    calc
+      c - y
+        = (c - (t * s⁻¹) • a - (x + y)) + (t * s⁻¹) • a + x := by abel
       _ = (t * s⁻¹) • a + x := by rw [hxy, sub_self, zero_add]
   have hwA : c - y ∈ A := hw ▸ Submodule.add_mem _ (Submodule.smul_mem _ _ haA) hx.1
   have hwC : c - y ∈ C := Submodule.sub_mem _ hcC hy.1
@@ -41,14 +44,17 @@ theorem not_inf_le_of_rank_quotient_le_one {V : Type} [AddCommGroup V] [Module �
   have hwT : c - y ∈ T := h (Submodule.mem_inf.mpr ⟨hwA, hwC⟩)
   simpa using Submodule.add_mem _ hwT hy.2
 
-theorem gen_core_meet {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (T : Submodule ℂ V) (hT : Module.rank ℂ (V ⧸ T) ≤ 1)
+theorem gen_core_meet
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    (T : Submodule ℂ V) (hT : Module.rank ℂ (V ⧸ T) ≤ 1)
     (A C : Subrepresentation ρ)
     (hmod : (A ⊔ C).toSubmodule ⊓ T ≤ A.toSubmodule ⊓ T ⊔ C.toSubmodule ⊓ T)
-    (hA : ¬ A.toSubmodule ≤ T) (hC : ¬ C.toSubmodule ≤ T) :
-    ¬ (A ⊓ C).toSubmodule ≤ T := by
+    (hA : ¬ A.toSubmodule ≤ T) (hC : ¬ C.toSubmodule ≤ T)
+    : ¬ (A ⊓ C).toSubmodule ≤ T := by
   rw [Subrepresentation.toSubmodule_sup] at hmod
   rw [Subrepresentation.toSubmodule_inf]
-  exact GlobalTheory.CompanionTheory.RgGuCore.not_inf_le_of_rank_quotient_le_one T A.toSubmodule C.toSubmodule hT hmod hA hC
+  exact GlobalTheory.CompanionTheory.RgGuCore.not_inf_le_of_rank_quotient_le_one T A.toSubmodule
+    C.toSubmodule hT hmod hA hC
 
 end GlobalTheory.CompanionTheory.RgGuCore

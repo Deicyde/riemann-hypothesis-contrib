@@ -10,7 +10,8 @@ public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.Statements
 
 @[expose] public section
 
-open GlobalTheory.CompanionTheory.Ar.HS NumberField MeasureTheory Matrix GroundTheory.Heights₂.Heights
+open GlobalTheory.CompanionTheory.Ar.HS NumberField MeasureTheory Matrix
+  GroundTheory.Heights₂.Heights
 
 noncomputable section
 
@@ -21,16 +22,18 @@ open scoped ENNReal Pointwise
 
 section Cone
 
-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-  [MeasurableSpace E] [BorelSpace E] [Nontrivial E]
-
+variable
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+  [BorelSpace E] [Nontrivial E]
 
 open Classical in
-def radial (p : sphere (0 : E) 1) (z : E) : sphere (0 : E) 1 :=
-  ⟨if z = 0 then (p : E) else ‖z‖⁻¹ • z, by
+def radial (p : sphere (0 : E) 1) (z : E) : sphere (0 : E) 1 := ⟨
+  if z = 0 then (p : E) else ‖z‖⁻¹ • z,
+  by
     split_ifs with h
     · exact p.2
-    · simp [norm_smul, h]⟩
+    · simp [norm_smul, h]
+⟩
 
 lemma radial_coe_of_ne (p : sphere (0 : E) 1) {z : E} (h : z ≠ 0) :
     (radial p z : E) = ‖z‖⁻¹ • z := by
@@ -134,8 +137,8 @@ lemma sum_norm_sq_mulVec {U : Matrix (Fin N) (Fin N) ℂ} (hU : Uᴴ * U = 1) (x
     rw [Complex.star_def, Complex.conj_mul']
   exact_mod_cast (hsq (U *ᵥ x)).trans (key.trans (hsq x).symm)
 
-def phi (B C : Matrix (Fin N) (Fin N) ℂ) (h1 : C * B = 1) (h2 : B * C = 1) :
-    (Fin k → EuclideanSpace ℂ (Fin N)) ≃ₗ[ℂ] (Fin k × Fin N → ℂ) where
+def phi (B C : Matrix (Fin N) (Fin N) ℂ) (h1 : C * B = 1) (h2 : B * C = 1)
+    : (Fin k → EuclideanSpace ℂ (Fin N)) ≃ₗ[ℂ] (Fin k × Fin N → ℂ) where
   toFun z p := (B *ᵥ fun a => z p.1 a) p.2
   invFun u i := WithLp.toLp 2 (C *ᵥ fun a => u (i, a))
   map_add' x y := by
@@ -173,12 +176,15 @@ lemma exists_map_eq_smul {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℂ X
 
 end Lin
 
-theorem sphere_mean_eq_mahler : ∀ (N k : ℕ) (h : HermNorm N) (B : Matrix (Fin N) (Fin N) ℂ)
-    (f : MvPolynomial (Fin k × Fin N) ℂ), 1 ≤ N → f ≠ 0 → (h.mat * B)ᴴ * (h.mat * B) = 1 →
-    ∫ t : Fin k → Metric.sphere (0 : EuclideanSpace ℂ (Fin N)) 1,
-      Real.log ‖MvPolynomial.eval (fun p : Fin k × Fin N =>
-        (B *ᵥ fun a => (t p.1 : EuclideanSpace ℂ (Fin N)) a) p.2) f‖
-      ∂(Measure.pi fun _ => Tuple.sphP N) = mahler h k f := by
+theorem sphere_mean_eq_mahler
+    : ∀ (N k : ℕ) (h : HermNorm N) (B : Matrix (Fin N) (Fin N) ℂ)
+        (f : MvPolynomial (Fin k × Fin N) ℂ),
+      1 ≤ N → f ≠ 0 → (h.mat * B)ᴴ * (h.mat * B) = 1
+        → ∫ t : Fin k → Metric.sphere (0 : EuclideanSpace ℂ (Fin N)) 1,
+            Real.log ‖MvPolynomial.eval (fun p : Fin k × Fin N =>
+              (B *ᵥ fun a => (t p.1 : EuclideanSpace ℂ (Fin N)) a) p.2) f‖
+            ∂(Measure.pi fun _ => Tuple.sphP N)
+          = mahler h k f := by
   intro N k h B f hN hf hU
   have hdet : (h.mat * B).det ≠ 0 := by
     intro h0
@@ -195,10 +201,12 @@ theorem sphere_mean_eq_mahler : ∀ (N k : ℕ) (h : HermNorm N) (B : Matrix (Fi
   obtain ⟨p0, hp0⟩ :=
     (NormedSpace.sphere_nonempty (x := (0 : EuclideanSpace ℂ (Fin N))) (r := 1)).2 zero_le_one
   let p : sphere (0 : EuclideanSpace ℂ (Fin N)) 1 := ⟨p0, hp0⟩
-  have hsph : Tuple.sphP N = (ballP (volume : Measure (EuclideanSpace ℂ (Fin N)))).map (radial p) := by
+  have hsph
+      : Tuple.sphP N = (ballP (volume : Measure (EuclideanSpace ℂ (Fin N)))).map (radial p) := by
     rw [map_radial]
     rfl
-  have hmeas : Measurable (fun (z : Fin k → EuclideanSpace ℂ (Fin N)) (i : Fin k) => radial p (z i)) :=
+  have hmeas
+      : Measurable (fun (z : Fin k → EuclideanSpace ℂ (Fin N)) (i : Fin k) => radial p (z i)) :=
     Measurable.of_eval (fun i => (measurable_radial p).comp (measurable_pi_apply i))
   have hΦ : Continuous (fun t : Fin k → Metric.sphere (0 : EuclideanSpace ℂ (Fin N)) 1 =>
       fun q : Fin k × Fin N => (B *ᵥ fun a => (t q.1 : EuclideanSpace ℂ (Fin N)) a) q.2) := by
@@ -207,11 +215,13 @@ theorem sphere_mean_eq_mahler : ∀ (N k : ℕ) (h : HermNorm N) (B : Matrix (Fi
     refine continuous_finsetSum _ (fun a _ => continuous_const.mul ?_)
     fun_prop
   have hF : Measurable (fun t : Fin k → Metric.sphere (0 : EuclideanSpace ℂ (Fin N)) 1 =>
-      Real.log ‖MvPolynomial.eval (fun q : Fin k × Fin N =>
-        (B *ᵥ fun a => (t q.1 : EuclideanSpace ℂ (Fin N)) a) q.2) f‖) :=
-    Real.measurable_log.comp (continuous_norm.comp ((MvPolynomial.continuous_eval f).comp hΦ)).measurable
-  rw [show (Measure.pi fun _ : Fin k => Tuple.sphP N) =
-      (Measure.pi fun _ : Fin k => ballP (volume : Measure (EuclideanSpace ℂ (Fin N)))).map
+      Real.log
+        ‖MvPolynomial.eval (fun q : Fin k × Fin N =>
+          (B *ᵥ fun a => (t q.1 : EuclideanSpace ℂ (Fin N)) a) q.2) f‖) :=
+    Real.measurable_log.comp (continuous_norm.comp ((MvPolynomial.continuous_eval f).comp
+      hΦ)).measurable
+  rw [show (Measure.pi fun _ : Fin k => Tuple.sphP N)
+      = (Measure.pi fun _ : Fin k => ballP (volume : Measure (EuclideanSpace ℂ (Fin N)))).map
         (fun z i => radial p (z i)) by
     rw [Measure.pi_map_pi (fun _ => (measurable_radial p).aemeasurable), hsph]]
   rw [integral_map hmeas.aemeasurable hF.aestronglyMeasurable, pi_ballP]
@@ -220,38 +230,46 @@ theorem sphere_mean_eq_mahler : ∀ (N k : ℕ) (h : HermNorm N) (B : Matrix (Fi
   let L := (phi (k := k) B B⁻¹ h1 h2).toContinuousLinearEquiv
   have hemb : MeasurableEmbedding (phi (k := k) B B⁻¹ h1 h2) := L.toHomeomorph.measurableEmbedding
   haveI := Measure.pi.isAddHaarMeasure (fun _ : Fin k => (volume : Measure (EuclideanSpace ℂ (Fin N))))
-  obtain ⟨a, ha0, ha1, hmap⟩ := exists_map_eq_smul L
-    (Measure.pi fun _ : Fin k => (volume : Measure (EuclideanSpace ℂ (Fin N))))
-    (volume : Measure (Fin k × Fin N → ℂ))
-  have hmap' : (Measure.pi fun _ : Fin k => (volume : Measure (EuclideanSpace ℂ (Fin N)))).map
-      (phi (k := k) B B⁻¹ h1 h2) = a • (volume : Measure (Fin k × Fin N → ℂ)) := hmap
+  obtain ⟨a, ha0, ha1, hmap⟩ :=
+    exists_map_eq_smul L (Measure.pi fun _ : Fin k => (volume : Measure (EuclideanSpace ℂ (Fin N))))
+      (volume : Measure (Fin k × Fin N → ℂ))
+  have hmap'
+      : (Measure.pi fun _ : Fin k => (volume : Measure (EuclideanSpace ℂ (Fin N)))).map
+          (phi (k := k) B B⁻¹ h1 h2)
+        = a • (volume : Measure (Fin k × Fin N → ℂ)) :=
+    hmap
   rw [← map_normalised hemb ha0 ha1 hmap', hemb.integral_map]
-  have hpre : (phi (k := k) B B⁻¹ h1 h2) ⁻¹' {u | ∀ i, (h.norm fun j => u (i, j)) < 1} =
-      Set.pi univ (fun _ => ball (0 : EuclideanSpace ℂ (Fin N)) 1) := by
+  have hpre
+      : (phi (k := k) B B⁻¹ h1 h2) ⁻¹' {u | ∀ i, (h.norm fun j => u (i, j)) < 1}
+        = Set.pi univ (fun _ => ball (0 : EuclideanSpace ℂ (Fin N)) 1) := by
     ext z
     simp only [Set.mem_preimage, Set.mem_setOf_eq, Set.mem_pi, Set.mem_univ, true_implies,
       mem_ball_zero_iff]
     exact forall_congr' (fun i => by rw [norm_phi h h1 h2 hU z i])
   rw [hpre]
   refine integral_congr_ae ?_
-  have hae : ∀ᵐ z ∂(Measure.pi fun _ : Fin k => (volume : Measure (EuclideanSpace ℂ (Fin N)))),
-      ∀ i, z i ≠ 0 := by
+  have hae
+      : ∀ᵐ z ∂(Measure.pi fun _ : Fin k => (volume : Measure (EuclideanSpace ℂ (Fin N)))),
+        ∀ i, z i ≠ 0 := by
     rw [ae_all_iff]
     intro i
-    exact measure_eq_zero_iff_ae_notMem.1
-      (Measure.pi_eval_preimage_null (fun _ => (volume : Measure (EuclideanSpace ℂ (Fin N))))
-        (i := i) (measure_singleton 0))
+    exact measure_eq_zero_iff_ae_notMem.1 (Measure.pi_eval_preimage_null
+      (fun _ => (volume : Measure (EuclideanSpace ℂ (Fin N))))
+      (i := i) (measure_singleton 0))
   filter_upwards [Measure.ae_smul_measure (ae_restrict_of_ae hae) _] with z hz
-  have harg : (fun q : Fin k × Fin N =>
-      (B *ᵥ fun a => ((radial p (z q.1) : EuclideanSpace ℂ (Fin N)) a)) q.2) =
-      (fun ij => ((h.norm fun j => phi (k := k) B B⁻¹ h1 h2 z (ij.1, j) : ℝ) : ℂ)⁻¹ *
-        phi (k := k) B B⁻¹ h1 h2 z ij) := by
+  have harg
+      : (fun q : Fin k × Fin N =>
+          (B *ᵥ fun a => ((radial p (z q.1) : EuclideanSpace ℂ (Fin N)) a)) q.2)
+        = (fun ij =>
+          ((h.norm fun j => phi (k := k) B B⁻¹ h1 h2 z (ij.1, j) : ℝ) : ℂ)⁻¹
+            * phi (k := k) B B⁻¹ h1 h2 z ij) := by
     funext q
     rw [norm_phi h h1 h2 hU z q.1, radial_coe_of_ne p (hz q.1)]
     show (B *ᵥ fun a => ((‖z q.1‖⁻¹ • z q.1 : EuclideanSpace ℂ (Fin N)) a)) q.2 =
       ((‖z q.1‖ : ℝ) : ℂ)⁻¹ * (B *ᵥ fun a => z q.1 a) q.2
-    have e : (fun a => ((‖z q.1‖⁻¹ • z q.1 : EuclideanSpace ℂ (Fin N)) a)) =
-        (((‖z q.1‖ : ℝ) : ℂ)⁻¹) • (fun a => z q.1 a) := by
+    have e
+        : (fun a => ((‖z q.1‖⁻¹ • z q.1 : EuclideanSpace ℂ (Fin N)) a))
+          = (((‖z q.1‖ : ℝ) : ℂ)⁻¹) • (fun a => z q.1 a) := by
       funext a
       rw [Pi.smul_apply, smul_eq_mul, ← Complex.ofReal_inv, ← Complex.real_smul]
       rfl

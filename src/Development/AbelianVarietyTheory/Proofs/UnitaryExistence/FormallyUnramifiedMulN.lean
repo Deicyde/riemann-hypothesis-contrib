@@ -11,8 +11,10 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
 
 namespace GlobalTheory.MulUnramified
 
-def affineComb {A R : Type} [CommRing A] [CommRing R] (a b c : A →+* R)
-    (h : ∀ s t, (a s - c s) * (b t - c t) = 0) : A →+* R where
+def affineComb
+    {A R : Type} [CommRing A] [CommRing R]
+    (a b c : A →+* R) (h : ∀ s t, (a s - c s) * (b t - c t) = 0)
+    : A →+* R where
   toFun s := a s + b s - c s
   map_one' := by simp
   map_zero' := by simp
@@ -206,13 +208,12 @@ end GlobalTheory.MulUnramified
 
 namespace GlobalTheory
 
-
 open MulUnramified in
-theorem formallyUnramified_mulN (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (n : ℕ)
-    (hn : IsUnit (n : Γ(S, ⊤))) : FormallyUnramified (mulN G n).left := by
+theorem formallyUnramified_mulN
+    (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (n : ℕ) (hn : IsUnit (n : Γ(S, ⊤)))
+    : FormallyUnramified (mulN G n).left := by
   refine FormallyUnramified.of_hom_ext _ fun R R₀ φ hφ hsq g₁ g₂ hi hg ↦ ?_
-  have hS : g₂ ≫ G.hom = g₁ ≫ G.hom := by
-    rw [← Over.w (mulN G n), reassoc_of% hg]
+  have hS : g₂ ≫ G.hom = g₁ ≫ G.hom := by rw [← Over.w (mulN G n), reassoc_of% hg]
   let T : Over S := Over.mk (g₁ ≫ G.hom)
   let T₀ : Over S := Over.mk (Spec.map φ ≫ g₁ ≫ G.hom)
   let j : T₀ ⟶ T := Over.homMk (Spec.map φ) rfl
@@ -232,8 +233,9 @@ theorem formallyUnramified_mulN (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsComm
     rw [hsq, Ideal.mem_bot] at this
     rw [this]
     exact zero_mem _
-  have := eq_one_of_pow_eq_one G j hsurj (mul_eq_zero_of_ker_sq φ hsq) n hn (x / y)
-    (by rw [GrpObj.comp_div, hj, div_self']) (by rw [div_pow, hxy, div_self'])
+  have :=
+    eq_one_of_pow_eq_one G j hsurj (mul_eq_zero_of_ker_sq φ hsq) n hn (x / y)
+      (by rw [GrpObj.comp_div, hj, div_self']) (by rw [div_pow, hxy, div_self'])
   exact congrArg (·.left) (div_eq_one.mp this)
 
 end GlobalTheory

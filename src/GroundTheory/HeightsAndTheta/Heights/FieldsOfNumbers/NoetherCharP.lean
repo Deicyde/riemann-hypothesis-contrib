@@ -14,15 +14,16 @@ namespace GroundTheory.Heights₂.Heights.FieldNumbers
 
 universe u
 
-
 set_option maxHeartbeats 800000 in
 set_option synthInstance.maxHeartbeats 200000 in
-theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p : ℕ) [Fact p.Prime]
-    [CharP k p] (s : ℕ) (L : Type u) [Field L] [Algebra (FractionRing (MvPolynomial (Fin s) k)) L]
+theorem finite_integralClosure_mvPolynomial_of_charP
+    (k : Type u) [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (s : ℕ) (L : Type u) [Field L] [Algebra (FractionRing (MvPolynomial (Fin s) k)) L]
     [FiniteDimensional (FractionRing (MvPolynomial (Fin s) k)) L]
     [Algebra (MvPolynomial (Fin s) k) L]
-    [IsScalarTower (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L] :
-    Module.Finite (MvPolynomial (Fin s) k) (integralClosure (MvPolynomial (Fin s) k) L) := by
+    [IsScalarTower (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L]
+    : Module.Finite (MvPolynomial (Fin s) k) (integralClosure (MvPolynomial (Fin s) k) L) := by
   classical
   set B := MvPolynomial (Fin s) k
   set F := FractionRing B
@@ -30,8 +31,9 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
   have hinjBL : Function.Injective (algebraMap B L) := by
     rw [IsScalarTower.algebraMap_eq B F L]
     exact (algebraMap F L).injective.comp (IsFractionRing.injective B F)
-  have : CharP L p := charP_of_injective_ringHom (f := (algebraMap B L).comp MvPolynomial.C)
-    (hinjBL.comp (MvPolynomial.C_injective (Fin s) k)) p
+  have : CharP L p :=
+    charP_of_injective_ringHom (f := (algebraMap B L).comp MvPolynomial.C)
+      (hinjBL.comp (MvPolynomial.C_injective (Fin s) k)) p
 
   have : ExpChar (separableClosure F L) p := ExpChar.prime hp
   have : IsPurelyInseparable (separableClosure F L) L := separableClosure.isPurelyInseparable F L
@@ -41,8 +43,8 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
   have hsepq : ∀ y : L, IsSeparable F (y ^ q) := by
     intro y
     rw [← IsPurelyInseparable.algebraMap_iterateFrobenius (separableClosure F L) p (le_refl e) y]
-    exact mem_separableClosure_iff.mp
-      (IsPurelyInseparable.iterateFrobenius (separableClosure F L) L p (le_refl e) y).2
+    exact mem_separableClosure_iff.mp (IsPurelyInseparable.iterateFrobenius (separableClosure F L) L
+      p (le_refl e) y).2
 
   let : Algebra k L := ((algebraMap B L).comp (algebraMap k B)).toAlgebra
   have : IsScalarTower k B L := IsScalarTower.of_algebraMap_eq' rfl
@@ -54,9 +56,11 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
   let b := Module.finBasis F L
   let g : Fin (Module.finrank F L) → F[X] := fun j => minpoly F (b j ^ q)
   choose num den hden hnd using fun c : F => IsFractionRing.div_surjective (A := B) c
-  let Tk : Finset k := Finset.univ.biUnion fun j => (Finset.range ((g j).natDegree + 1)).biUnion
-    fun i => (num ((g j).coeff i)).support.image (num ((g j).coeff i)).coeff ∪
-      (den ((g j).coeff i)).support.image (den ((g j).coeff i)).coeff
+  let Tk : Finset k :=
+    Finset.univ.biUnion fun j =>
+      (Finset.range ((g j).natDegree + 1)).biUnion fun i =>
+        (num ((g j).coeff i)).support.image (num ((g j).coeff i)).coeff
+          ∪ (den ((g j).coeff i)).support.image (den ((g j).coeff i)).coeff
 
   choose r hr using fun a : k => IsAlgClosed.exists_pow_nat_eq (algebraMap k Ω a) hq
   choose t ht using fun i : Fin s =>
@@ -77,8 +81,8 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
 
   set B' := MvPolynomial (Fin s) k'
   let θ : B →ₐ[k] B' := (MvPolynomial.mapAlgHom (Algebra.ofId k k')).comp (MvPolynomial.expand q)
-  have hθ : ∀ N : B, θ N = MvPolynomial.map (algebraMap k k') (MvPolynomial.expand q N) :=
-    fun N => rfl
+  have hθ : ∀ N : B, θ N = MvPolynomial.map (algebraMap k k') (MvPolynomial.expand q N) := fun N =>
+    rfl
   let : Algebra B B' := θ.toRingHom.toAlgebra
   have : Module.Finite B B' := finite_mapExpand k k' (Fin s) q hq
   have : Algebra.IsIntegral B B' := Algebra.IsIntegral.of_finite B B'
@@ -87,8 +91,8 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
     have h : (ψ.restrictScalars k).comp θ = IsScalarTower.toAlgHom k B Ω := by
       apply MvPolynomial.algHom_ext
       intro i
-      simp only [AlgHom.comp_apply, AlgHom.restrictScalars_apply, θ, ψ, MvPolynomial.mapAlgHom_apply,
-        MvPolynomial.expand_X, map_pow, MvPolynomial.map_X]
+      simp only [AlgHom.comp_apply, AlgHom.restrictScalars_apply, θ, ψ,
+        MvPolynomial.mapAlgHom_apply, MvPolynomial.expand_X, map_pow, MvPolynomial.map_X]
       erw [MvPolynomial.aeval_X]
       rw [ht]
       rfl
@@ -113,14 +117,15 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
     rw [hψθ, hψθ]
     conv_rhs => rw [← hnd c]
     rw [map_div₀, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
-  have hrootB : ∀ N : B, (∀ m ∈ N.support, N.coeff m ∈ Tk) →
-      ∃ N' : B', ψ N' ^ q = algebraMap B Ω N := by
+  have hrootB
+      : ∀ N : B, (∀ m ∈ N.support, N.coeff m ∈ Tk) → ∃ N' : B', ψ N' ^ q = algebraMap B Ω N := by
     intro N hN
-    obtain ⟨N', hN'⟩ := exists_pow_eq_map_expand (k' := k') p e N fun m => by
-      by_cases hm : m ∈ N.support
-      · exact hk'root _ (hN m hm)
-      · rw [MvPolynomial.notMem_support_iff.mp hm, map_zero]
-        exact ⟨0, zero_pow hq.ne'⟩
+    obtain ⟨N', hN'⟩ :=
+      exists_pow_eq_map_expand (k' := k') p e N fun m => by
+        by_cases hm : m ∈ N.support
+        · exact hk'root _ (hN m hm)
+        · rw [MvPolynomial.notMem_support_iff.mp hm, map_zero]
+          exact ⟨0, zero_pow hq.ne'⟩
     refine ⟨N', ?_⟩
     rw [← map_pow, hN', ← hθ, hψθ]
   have hcoeff : ∀ j i, ∃ d : F', algebraMap F' Ω d ^ q = algebraMap F Ω ((g j).coeff i) := by
@@ -130,10 +135,20 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
     have hi : i ∈ Finset.range ((g j).natDegree + 1) :=
       Finset.mem_range.mpr (Nat.lt_succ_of_le (le_natDegree_of_ne_zero hc))
     set c := (g j).coeff i
-    obtain ⟨N', hN'⟩ := hrootB (num c) fun m hm => Finset.mem_biUnion.mpr ⟨j, Finset.mem_univ _,
-      Finset.mem_biUnion.mpr ⟨i, hi, Finset.mem_union_left _ (Finset.mem_image_of_mem _ hm)⟩⟩
-    obtain ⟨D', hD'⟩ := hrootB (den c) fun m hm => Finset.mem_biUnion.mpr ⟨j, Finset.mem_univ _,
-      Finset.mem_biUnion.mpr ⟨i, hi, Finset.mem_union_right _ (Finset.mem_image_of_mem _ hm)⟩⟩
+    obtain ⟨N', hN'⟩ :=
+      hrootB (num c) fun m hm =>
+        Finset.mem_biUnion.mpr ⟨
+          j,
+          Finset.mem_univ _,
+          Finset.mem_biUnion.mpr ⟨i, hi, Finset.mem_union_left _ (Finset.mem_image_of_mem _ hm)⟩
+        ⟩
+    obtain ⟨D', hD'⟩ :=
+      hrootB (den c) fun m hm =>
+        Finset.mem_biUnion.mpr ⟨
+          j,
+          Finset.mem_univ _,
+          Finset.mem_biUnion.mpr ⟨i, hi, Finset.mem_union_right _ (Finset.mem_image_of_mem _ hm)⟩
+        ⟩
     refine ⟨algebraMap B' F' N' / algebraMap B' F' D', ?_⟩
     rw [map_div₀, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply, div_pow]
     change ψ N' ^ q / ψ D' ^ q = _
@@ -151,7 +166,8 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
     have : Finite (Set.range ω) := Set.finite_range ω
     exact IntermediateField.finiteDimensional_adjoin fun x ⟨j, hj⟩ => hj ▸ (hωsep j).isIntegral
   have : Algebra.IsSeparable F' E :=
-    (IntermediateField.isSeparable_adjoin_iff_isSeparable (F := F') (E := Ω)).mpr fun x ⟨j, hj⟩ => hj ▸ hωsep j
+    (IntermediateField.isSeparable_adjoin_iff_isSeparable (F := F') (E := Ω)).mpr fun x ⟨j, hj⟩ =>
+      hj ▸ hωsep j
   have hLE : ∀ y : L, algebraMap L Ω y ∈ E := by
     intro y
     set_option synthInstance.maxHeartbeats 100000 in
@@ -173,18 +189,18 @@ theorem finite_integralClosure_mvPolynomial_of_charP (k : Type u) [Field k] (p :
     (integralClosure B' E).toSubmodule.map (IsScalarTower.toAlgHom B' E Ω).toLinearMap
   have hSfg : S.FG := (Module.Finite.iff_fg.mp hC').map _
   have : Module.Finite B (S.restrictScalars B) := Module.Finite.iff_fg.mpr hSfg.restrictScalars
-  have : IsNoetherian B (S.restrictScalars B) := isNoetherian_of_isNoetherianRing_of_finite B (S.restrictScalars B)
+  have : IsNoetherian B (S.restrictScalars B) :=
+    isNoetherian_of_isNoetherianRing_of_finite B (S.restrictScalars B)
   let φ : L →ₗ[B] Ω := (IsScalarTower.toAlgHom B L Ω).toLinearMap
   have hle : (integralClosure B L).toSubmodule.map φ ≤ S.restrictScalars B := by
     rintro _ ⟨y, hy, rfl⟩
     have hint : IsIntegral B' (algebraMap L Ω y) :=
       ((hy : IsIntegral B y).map (IsScalarTower.toAlgHom B L Ω)).tower_top
     refine ⟨⟨algebraMap L Ω y, hLE y⟩, ?_, rfl⟩
-    exact (isIntegral_algHom_iff (IsScalarTower.toAlgHom B' E Ω)
-      (algebraMap E Ω).injective).mp hint
+    exact (isIntegral_algHom_iff (IsScalarTower.toAlgHom B' E Ω) (algebraMap E Ω).injective).mp hint
   have : IsNoetherian B ((integralClosure B L).toSubmodule.map φ) := isNoetherian_of_le hle
-  have hfg : ((integralClosure B L).toSubmodule.map φ).FG := Module.Finite.iff_fg.mp (Module.IsNoetherian.finite B _)
-  exact Module.Finite.iff_fg.mpr
-    (Submodule.fg_of_fg_map_injective φ (algebraMap L Ω).injective hfg)
+  have hfg : ((integralClosure B L).toSubmodule.map φ).FG :=
+    Module.Finite.iff_fg.mp (Module.IsNoetherian.finite B _)
+  exact Module.Finite.iff_fg.mpr (Submodule.fg_of_fg_map_injective φ (algebraMap L Ω).injective hfg)
 
 end GroundTheory.Heights₂.Heights.FieldNumbers

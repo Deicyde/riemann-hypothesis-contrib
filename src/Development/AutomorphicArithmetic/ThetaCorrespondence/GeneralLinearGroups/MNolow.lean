@@ -17,14 +17,16 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.GeneralLinea
 
 @[expose] public section
 
-open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult UpperTheory.Lit.Cas
+open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult UpperTheory.Lit.Cas
 
 section SlopeTestRemainingChoices
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 variable (k) in
-private theorem exists_small : ∃ z : kˣ, Tendsto (fun i : ℕ => (z : k) ^ i) atTop (𝓝 0) ∧ nabs k z < 1 := by
+private theorem exists_small
+    : ∃ z : kˣ, Tendsto (fun i : ℕ => (z : k) ^ i) atTop (𝓝 0) ∧ nabs k z < 1 := by
   obtain ⟨z, h1, h2⟩ := GlobalTheory.CentralExponent.exists_nabs_lt_one k
   refine ⟨z, ?_, h2⟩
   have h3 : ValuativeRel.valuation k (z : k) < 1 :=
@@ -38,16 +40,20 @@ private theorem exists_small : ∃ z : kˣ, Tendsto (fun i : ℕ => (z : k) ^ i)
   rw [map_pow]
   exact lt_of_le_of_lt (pow_le_pow_right_of_le_one' h1 hi) hn
 
-private theorem scalarBy_ofChar (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) (z : kˣ) :
-    ScalarBy (IrrGL.ofChar χ hχ) z (χ z : ℂ) := by
-  have key : ∀ w : ℂ, (IrrRep.det (Fin 1) χ hχ).ρ (Matrix.GeneralLinearGroup.scalar (Fin 1) z) w =
-      (χ z : ℂ) • w := by
+private theorem scalarBy_ofChar (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) (z : kˣ)
+    : ScalarBy (IrrGL.ofChar χ hχ) z (χ z : ℂ) := by
+  have key
+      : ∀ w : ℂ,
+        (IrrRep.det (Fin 1) χ hχ).ρ (Matrix.GeneralLinearGroup.scalar (Fin 1) z) w
+          = (χ z : ℂ) • w := by
     intro w
     have hd : Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.scalar (Fin 1) z) = z := by
       ext
       simp
-    change ((χ (Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.scalar (Fin 1) z)) : ℂ) •
-      (LinearMap.id : ℂ →ₗ[ℂ] ℂ)) w = _
+    change ((χ (Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.scalar (Fin 1) z)) : ℂ)
+          • (LinearMap.id : ℂ →ₗ[ℂ] ℂ))
+        w
+      = _
     rw [hd]
     rfl
   intro v
@@ -55,15 +61,17 @@ private theorem scalarBy_ofChar (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) (z
   obtain ⟨w, rfl⟩ : ∃ w, φ.toLinearEquiv w = v :=
     ⟨φ.toLinearEquiv.symm v, φ.toLinearEquiv.apply_symm_apply v⟩
   have h := φ.toIntertwiningMap.isIntertwining _ _ (Matrix.GeneralLinearGroup.scalar (Fin 1) z) w
-  have h2 : φ.toIntertwiningMap ((IrrRep.det (Fin 1) χ hχ).ρ (Matrix.GeneralLinearGroup.scalar (Fin 1) z) w) =
-      (χ z : ℂ) • φ.toIntertwiningMap w := by
+  have h2
+      : φ.toIntertwiningMap ((IrrRep.det (Fin 1) χ hχ).ρ
+          (Matrix.GeneralLinearGroup.scalar (Fin 1) z) w)
+        = (χ z : ℂ) • φ.toIntertwiningMap w := by
     rw [← map_smul]
     congr 1
     exact key w
   exact h.symm.trans h2
 
-private theorem scalarBy_nu (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) (z : kˣ) (s : ℝ) :
-    ScalarBy ((IrrGL.ofChar χ hχ).nu s) z ((χ z : ℂ) * ((nabs k z ^ s : ℝ) : ℂ)) := by
+private theorem scalarBy_nu (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) (z : kˣ) (s : ℝ)
+    : ScalarBy ((IrrGL.ofChar χ hχ).nu s) z ((χ z : ℂ) * ((nabs k z ^ s : ℝ) : ℂ)) := by
   unfold IrrGL.nu
   rw [IrrGL.tw_ofChar]
   have e : (χ z : ℂ) * ((nabs k z ^ s : ℝ) : ℂ) = ((χ * absPow k (s : ℂ)) z : ℂ) := by
@@ -73,8 +81,14 @@ private theorem scalarBy_nu (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) (z : k
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.Lit.Mix.nolow :
-    GlobalTheory.Published.GeometricLemma → GlobalTheory.Published.BernsteinZelevinskyFiniteness → GlobalTheory.Published.ZelevinskyPolynomialRing → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (r t : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (σ : Representation ℂ (GL (Fin r) k) V) (A : Multiset (IrrGL (k := k))) (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ), r < t → HasSupport σ A → IsUnitarisable σ → IsUnitaryChar χ → (IrrGL.ofChar χ hχ).nu (-((t : ℂ) - 1) / 2) ∉ A := by
+theorem UpperTheory.Lit.Mix.nolow
+    : GlobalTheory.Published.GeometricLemma → GlobalTheory.Published.BernsteinZelevinskyFiniteness
+      → GlobalTheory.Published.ZelevinskyPolynomialRing
+      → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+          (r t : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (σ : Representation ℂ (GL (Fin r) k) V)
+          (A : Multiset (IrrGL (k := k))) (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ),
+        r < t → HasSupport σ A → IsUnitarisable σ → IsUnitaryChar χ
+          → (IrrGL.ofChar χ hχ).nu (-((t : ℂ) - 1) / 2) ∉ A := by
   intro hG hBZ hZ k _ _ _ _ r t V _ _ σ A χ hχ hrt hA hU hχu hmem
   classical
   set c0 : ℝ := -((t : ℝ) - 1) / 2 with hc0
@@ -114,7 +128,9 @@ theorem UpperTheory.Lit.Mix.nolow :
   have hS1 : ∀ a ∈ S, (x a).1 = 1 := fun a ha => by rw [hg a (hSL ha)]; rfl
   have hScard : S.card ≤ r := by
     rw [← hr]
-    calc S.card = ∑ a ∈ S, (x a).1 := by rw [Finset.sum_congr rfl hS1]; simp
+    calc
+      S.card
+        = ∑ a ∈ S, (x a).1 := by rw [Finset.sum_congr rfl hS1]; simp
       _ ≤ ∑ a, (x a).1 := Finset.sum_le_sum_of_subset (Finset.subset_univ S)
   obtain ⟨n, rfl⟩ : ∃ n, r = S.card + n := ⟨r - S.card, by omega⟩
   have e0 : Finset.univ.val.filter (· ∈ S) = S.val := by
@@ -203,10 +219,12 @@ theorem UpperTheory.Lit.Mix.nolow :
   have hscal := scalarFull k h₀ S.card u hu z c hsc
   have hadm : IsAdmissible σ := (hBZ k).1 _ V σ hA.isSmooth hA.isIrreducible
   have hnt : Nontrivial V := Model.nontrivial_of_isIrreducible hA.isIrreducible
-  have hb := UpperTheory.Lit.Mix.bound k S.card n V _ _ σ (prodIrr u hu) (prodIrr w hw) hadm hnt hU
-    ⟨f, hf⟩ z hzt (∏ a, c a) hscal
-  have hnorm : ‖(∏ a, c a) * ((absPow k (((S.card * n : ℕ) : ℂ) / 2)) z : ℂ)‖ =
-      nabs k z ^ (∑ a, E (u a) + (S.card * n : ℝ) / 2) := by
+  have hb :=
+    UpperTheory.Lit.Mix.bound k S.card n V _ _ σ (prodIrr u hu) (prodIrr w hw) hadm hnt hU ⟨f, hf⟩ z
+      hzt (∏ a, c a) hscal
+  have hnorm
+      : ‖(∏ a, c a) * ((absPow k (((S.card * n : ℕ) : ℂ) / 2)) z : ℂ)‖
+        = nabs k z ^ (∑ a, E (u a) + (S.card * n : ℝ) / 2) := by
     have e2 : (((S.card * n : ℕ) : ℂ) / 2) = ((((S.card * n : ℝ) / 2 : ℝ)) : ℂ) := by
       push_cast
       ring

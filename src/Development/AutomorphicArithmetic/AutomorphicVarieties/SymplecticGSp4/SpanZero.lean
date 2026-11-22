@@ -6,10 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem list_neg {α : Type} (d : α → ℤ × ℤ) (L : List α) (h : ((L.map d).sum).2 < 0) :
-    ∃ a ∈ L, (d a).2 < 0 := by
+private theorem list_neg {α : Type} (d : α → ℤ × ℤ) (L : List α) (h : ((L.map d).sum).2 < 0)
+    : ∃ a ∈ L, (d a).2 < 0 := by
   induction L with
   | nil => simp at h
   | cons b L ih =>
@@ -19,8 +21,8 @@ private theorem list_neg {α : Type} (d : α → ℤ × ℤ) (L : List α) (h : 
     · obtain ⟨a, ha, h'⟩ := ih (by omega)
       exact ⟨a, List.mem_cons_of_mem _ ha, h'⟩
 
-private theorem list_pos {α : Type} (d : α → ℤ × ℤ) (L : List α) (h : 0 < ((L.map d).sum).2) :
-    ∃ a ∈ L, 0 < (d a).2 := by
+private theorem list_pos {α : Type} (d : α → ℤ × ℤ) (L : List α) (h : 0 < ((L.map d).sum).2)
+    : ∃ a ∈ L, 0 < (d a).2 := by
   induction L with
   | nil => simp at h
   | cons b L ih =>
@@ -30,9 +32,12 @@ private theorem list_pos {α : Type} (d : α → ℤ × ℤ) (L : List α) (h : 
     · obtain ⟨a, ha, h'⟩ := ih (by omega)
       exact ⟨a, List.mem_cons_of_mem _ ha, h'⟩
 
-private theorem span_zero {O S K : Type} [CommRing O] [CommRing S] [Algebra O S] [CommRing K] [Algebra O K]
-    (B : Subalgebra O S) (ξ : B →ₐ[O] K) (T : Set S) (hT : ∀ y ∈ T, ∃ h : y ∈ B, ξ ⟨y, h⟩ = 0)
-    (x : B) (hx : x.1 ∈ Submodule.span O T) : ξ x = 0 := by
+private theorem span_zero
+    {O S K : Type} [CommRing O] [CommRing S] [Algebra O S] [CommRing K] [Algebra O K]
+    (B : Subalgebra O S) (ξ : B →ₐ[O] K)
+    (T : Set S) (hT : ∀ y ∈ T, ∃ h : y ∈ B, ξ ⟨y, h⟩ = 0)
+    (x : B) (hx : x.1 ∈ Submodule.span O T)
+    : ξ x = 0 := by
   obtain ⟨x, hxB⟩ := x
   have hx' : x ∈ Submodule.span O T := hx
   clear hx
@@ -55,9 +60,11 @@ private theorem span_zero {O S K : Type} [CommRing O] [CommRing S] [Algebra O S]
     have e : (⟨a • y, B.smul_mem hy1 a⟩ : B) = a • ⟨y, hy1⟩ := rfl
     rw [e, map_smul, hy2, smul_zero]
 
-private theorem prod_zero {O S K α : Type} [CommRing O] [CommRing S] [Algebra O S] [CommRing K] [Algebra O K]
-    (B : Subalgebra O S) (ξ : B →ₐ[O] K) (e : α → B) (L : List α) (a : α) (ha : a ∈ L) (h0 : ξ (e a) = 0) :
-    ∃ h : (L.map fun a => (e a).1).prod ∈ B, ξ ⟨_, h⟩ = 0 := by
+private theorem prod_zero
+    {O S K α : Type} [CommRing O] [CommRing S] [Algebra O S] [CommRing K] [Algebra O K]
+    (B : Subalgebra O S) (ξ : B →ₐ[O] K) (e : α → B)
+    (L : List α) (a : α) (ha : a ∈ L) (h0 : ξ (e a) = 0)
+    : ∃ h : (L.map fun a => (e a).1).prod ∈ B, ξ ⟨_, h⟩ = 0 := by
   have hp : (((L.map e).prod : B) : S) = (L.map fun a => (e a).1).prod := by
     simpa [List.map_map, Function.comp_def] using map_list_prod B.val (L.map e)
   have hm : (L.map fun a => (e a).1).prod ∈ B := by
@@ -70,14 +77,31 @@ private theorem prod_zero {O S K α : Type} [CommRing O] [CommRing S] [Algebra O
   simp only [List.mem_map, Function.comp_apply]
   exact ⟨a, ha, h0⟩
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.signs :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ M : Model D, ∀ [GradedAlgebra M.gr], D.Fin0 → ∀ ξ : M.SS →ₐ[c.O] PadicAlgCl l, ((∀ i j, (wt i j).2 < 0 → ¬ Ge (M.rep ξ) i j) → NegZero M.gr (ξ.comp M.toSS)) ∧ ((∀ i j, 0 < (wt i j).2 → ¬ Ge (M.rep ξ) i j) → PosZero M.gr (ξ.comp M.toSS)) ∧ (PosZero M.gr (ξ.comp M.toSS) → ¬ Ge (M.rep ξ) 0 2) ∧ (NegZero M.gr (ξ.comp M.toSS) → ¬ Ge (M.rep ξ) 2 0) ∧ ∀ ξ' : M.SS →ₐ[c.O] PadicAlgCl l, Same0 M.gr (ξ.comp M.toSS) (ξ'.comp M.toSS) → (∀ g i, M.rep ξ g i i = M.rep ξ' g i i) ∧ (DiagType (M.rep ξ) → DiagType (M.rep ξ')) := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.signs
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ M : Model D, ∀ [GradedAlgebra M.gr],
+          D.Fin0
+            → ∀ ξ : M.SS →ₐ[c.O] PadicAlgCl l,
+              ((∀ i j, (wt i j).2 < 0 → ¬ Ge (M.rep ξ) i j) → NegZero M.gr (ξ.comp M.toSS))
+                ∧ ((∀ i j, 0 < (wt i j).2 → ¬ Ge (M.rep ξ) i j) → PosZero M.gr (ξ.comp M.toSS))
+                ∧ (PosZero M.gr (ξ.comp M.toSS) → ¬ Ge (M.rep ξ) 0 2)
+                ∧ (NegZero M.gr (ξ.comp M.toSS) → ¬ Ge (M.rep ξ) 2 0)
+                ∧ ∀ ξ' : M.SS →ₐ[c.O] PadicAlgCl l,
+                  Same0 M.gr (ξ.comp M.toSS) (ξ'.comp M.toSS)
+                    → (∀ g i, M.rep ξ g i i = M.rep ξ' g i i)
+                      ∧ (DiagType (M.rep ξ) → DiagType (M.rep ξ')) := by
   intro Ω _ _ _ l _ c D hD M _ h0 ξ
-  have hv : ∀ (ζ : M.SS →ₐ[c.O] PadicAlgCl l) g i j, M.rep ζ g i j = ζ (M.ent g i j) := fun _ _ _ _ => rfl
+  have hv : ∀ (ζ : M.SS →ₐ[c.O] PadicAlgCl l) g i j, M.rep ζ g i j = ζ (M.ent g i j) :=
+    fun _ _ _ _ => rfl
   have hwt : ∀ i j : Fin 4, (wt i j).1 = 0 → True := fun _ _ _ => trivial
-  have zero_of : ∀ n : ℤ, ∀ f ∈ M.gr n,
-      (∀ L : List (G ℚ Ω × Fin 4 × Fin 4), (L.map fun a => wt a.2.1 a.2.2).sum = ((0 : ℤ), n) →
-        ∃ a ∈ L, ξ (M.ent a.1 a.2.1 a.2.2) = 0) → ξ (M.toSS f) = 0 := by
+  have zero_of
+      : ∀ n : ℤ, ∀ f ∈ M.gr n,
+        (∀ L : List (G ℚ Ω × Fin 4 × Fin 4),
+            (L.map fun a => wt a.2.1 a.2.2).sum = ((0 : ℤ), n)
+              → ∃ a ∈ L, ξ (M.ent a.1 a.2.1 a.2.2) = 0)
+          → ξ (M.toSS f) = 0 := by
     intro n f hf hL
     have hx := (kerA D hD M).2.2 n f hf
     rw [spanMono D hD M h0] at hx
@@ -85,7 +109,8 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.signs :
     rintro y ⟨L, hsum, rfl⟩
     obtain ⟨a, ha, hz⟩ := hL L hsum
     exact prod_zero M.SS ξ (fun a => M.ent a.1 a.2.1 a.2.2) L a ha hz
-  have from_part : ∀ n : ℤ, ∀ g i j, wt i j = ((0 : ℤ), n) → ∃ f ∈ M.gr n, M.toSS f = M.ent g i j := by
+  have from_part
+      : ∀ n : ℤ, ∀ g i j, wt i j = ((0 : ℤ), n) → ∃ f ∈ M.gr n, M.toSS f = M.ent g i j := by
     intro n g i j he
     apply (kerA D hD M).2.1 n (M.ent g i j)
     have := M.entry_mem g i j

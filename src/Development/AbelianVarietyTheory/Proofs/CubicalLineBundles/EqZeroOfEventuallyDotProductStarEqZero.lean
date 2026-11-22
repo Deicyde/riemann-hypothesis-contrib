@@ -19,8 +19,9 @@ private lemma dotProduct_mulVec_star_add_smul_expand (C : Matrix (Fin r) (Fin r)
     smul_dotProduct, dotProduct_smul, smul_eq_mul]
   ring
 
-theorem eq_zero_of_forall_dotProduct_star_eq_zero {C : Matrix (Fin r) (Fin r) ℂ}
-    (h : ∀ u : Fin r → ℂ, u ⬝ᵥ C *ᵥ star u = 0) : C = 0 := by
+theorem eq_zero_of_forall_dotProduct_star_eq_zero
+    {C : Matrix (Fin r) (Fin r) ℂ} (h : ∀ u : Fin r → ℂ, u ⬝ᵥ C *ᵥ star u = 0)
+    : C = 0 := by
   have hS : ∀ x y : Fin r → ℂ, x ⬝ᵥ C *ᵥ star y = 0 := by
     intro x y
     have h1 := h ((1 : ℂ) • x + (1 : ℂ) • y)
@@ -35,20 +36,23 @@ theorem eq_zero_of_forall_dotProduct_star_eq_zero {C : Matrix (Fin r) (Fin r) �
   have := hS (Pi.single i 1) (Pi.single j 1)
   simpa using this
 
-theorem eq_zero_of_eventually_dotProduct_star_eq_zero {C : Matrix (Fin r) (Fin r) ℂ}
-    {v : Fin r → ℂ} (h : ∀ᶠ w in 𝓝 v, w ⬝ᵥ C *ᵥ star w = 0) : C = 0 := by
+theorem eq_zero_of_eventually_dotProduct_star_eq_zero
+    {C : Matrix (Fin r) (Fin r) ℂ} {v : Fin r → ℂ} (h : ∀ᶠ w in 𝓝 v, w ⬝ᵥ C *ᵥ star w = 0)
+    : C = 0 := by
   apply eq_zero_of_forall_dotProduct_star_eq_zero
   intro u
   have hv : v ⬝ᵥ C *ᵥ star v = 0 := h.self_of_nhds
   have hc : ∀ s : ℝ, Continuous fun t : ℝ => (1 : ℂ) • v + ((s * t : ℝ) : ℂ) • u := fun s =>
     continuous_const.add ((Complex.continuous_ofReal.comp (continuous_const.mul continuous_id)).smul
       continuous_const)
-  have e : ∀ s : ℝ, ∀ᶠ t : ℝ in 𝓝 0,
-      ((1 : ℂ) • v + ((s * t : ℝ) : ℂ) • u) ⬝ᵥ C *ᵥ star ((1 : ℂ) • v + ((s * t : ℝ) : ℂ) • u) = 0 :=
+  have e
+      : ∀ s : ℝ,
+        ∀ᶠ t : ℝ in 𝓝 0,
+          ((1 : ℂ) • v + ((s * t : ℝ) : ℂ) • u) ⬝ᵥ C *ᵥ star ((1 : ℂ) • v + ((s * t : ℝ) : ℂ) • u) = 0 :=
     fun s => ((hc s).tendsto' 0 v (by simp)).eventually h
   obtain ⟨t, ⟨h1, h2⟩, ht⟩ :=
-    (((e 1).and (e (-1))).filter_mono nhdsWithin_le_nhds |>.and
-      (self_mem_nhdsWithin : ({0}ᶜ : Set ℝ) ∈ 𝓝[≠] (0 : ℝ))).exists
+    (((e 1).and (e (-1))).filter_mono nhdsWithin_le_nhds
+      |>.and (self_mem_nhdsWithin : ({0}ᶜ : Set ℝ) ∈ 𝓝[≠] (0 : ℝ))).exists
   rw [dotProduct_mulVec_star_add_smul_expand, hv] at h1 h2
   simp only [star_one, Complex.star_def, Complex.conj_ofReal] at h1 h2
   have ht0 : (t : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr ht
@@ -57,8 +61,8 @@ theorem eq_zero_of_eventually_dotProduct_star_eq_zero {C : Matrix (Fin r) (Fin r
     linear_combination (h1 + h2) / 2
   exact (mul_eq_zero.mp key).resolve_left (pow_ne_zero 2 ht0)
 
-theorem dotProduct_star_eq_re {A : Matrix (Fin r) (Fin r) ℂ} (hA : A.IsHermitian)
-    (w : Fin r → ℂ) : w ⬝ᵥ A *ᵥ star w = ((w ⬝ᵥ A *ᵥ star w).re : ℂ) := by
+theorem dotProduct_star_eq_re {A : Matrix (Fin r) (Fin r) ℂ} (hA : A.IsHermitian) (w : Fin r → ℂ)
+    : w ⬝ᵥ A *ᵥ star w = ((w ⬝ᵥ A *ᵥ star w).re : ℂ) := by
   have hc : star (w ⬝ᵥ A *ᵥ star w) = w ⬝ᵥ A *ᵥ star w := by
     simp only [dotProduct, mulVec, Finset.mul_sum, star_sum, star_mul', star_star, Pi.star_apply]
     rw [Finset.sum_comm]
@@ -86,26 +90,31 @@ private lemma mul_of_col_eq_of_mulVec (g : Matrix (Fin r) (Fin r) ℂ) (x : Fin 
   ext i j
   simp [Matrix.mul_apply, mulVec, dotProduct]
 
-theorem exists_unitary_mulVec_eq {B : Matrix (Fin r) (Fin r) ℂ} (hB : B.IsHermitian)
-    (hdet : B.det ≠ 0) {v w : Fin r → ℂ} (hv : v ≠ 0) (hw : w ≠ 0)
-    (h : w ⬝ᵥ B *ᵥ star w = v ⬝ᵥ B *ᵥ star v) :
-    ∃ g : Matrix (Fin r) (Fin r) ℂ, gᵀ * B * g.map (starRingEnd ℂ) = B ∧ g *ᵥ v = w := by
+theorem exists_unitary_mulVec_eq
+    {B : Matrix (Fin r) (Fin r) ℂ} (hB : B.IsHermitian) (hdet : B.det ≠ 0)
+    {v w : Fin r → ℂ} (hv : v ≠ 0) (hw : w ≠ 0) (h : w ⬝ᵥ B *ᵥ star w = v ⬝ᵥ B *ᵥ star v)
+    : ∃ g : Matrix (Fin r) (Fin r) ℂ, gᵀ * B * g.map (starRingEnd ℂ) = B ∧ g *ᵥ v = w := by
   have hG : ∀ a b, starRingEnd ℂ (B a b) = B b a := fun a b => by
     rw [starRingEnd_apply]
     exact hB.apply b a
-  have h0 : ∀ a : Fin 1 → ℂ, (Matrix.of fun k (_ : Fin 1) => v k) *ᵥ a = 0 ↔
-      (Matrix.of fun k (_ : Fin 1) => w k) *ᵥ a = 0 := by
+  have h0
+      : ∀ a : Fin 1 → ℂ,
+        (Matrix.of fun k (_ : Fin 1) => v k) *ᵥ a = 0
+          ↔ (Matrix.of fun k (_ : Fin 1) => w k) *ᵥ a = 0 := by
     intro a
     rw [of_col_mulVec_eq_smul, of_col_mulVec_eq_smul, smul_eq_zero, smul_eq_zero]
     simp [hv, hw]
-  have hXY : (Matrix.of fun k (_ : Fin 1) => w k)ᵀ * B *
-        (Matrix.of fun k (_ : Fin 1) => w k).map (starRingEnd ℂ) =
-      (Matrix.of fun k (_ : Fin 1) => v k)ᵀ * B *
-        (Matrix.of fun k (_ : Fin 1) => v k).map (starRingEnd ℂ) := by
+  have hXY
+      : (Matrix.of fun k (_ : Fin 1) => w k)ᵀ * B
+          * (Matrix.of fun k (_ : Fin 1) => w k).map (starRingEnd ℂ)
+        = (Matrix.of fun k (_ : Fin 1) => v k)ᵀ * B
+          * (Matrix.of fun k (_ : Fin 1) => v k).map (starRingEnd ℂ) := by
     ext i j
     rw [transpose_col_mul_mul_map_conj_apply, transpose_col_mul_mul_map_conj_apply, h]
-  obtain ⟨γ, hγ, hγX⟩ := GlobalTheory.HermWitt.exists_gl_isometry_mul_eq two_ne_zero
-    (fun t => Complex.conj_conj t) hG hdet h0 hXY
+  obtain ⟨γ, hγ, hγX⟩ :=
+    GlobalTheory.HermWitt.exists_gl_isometry_mul_eq two_ne_zero
+      (fun t => Complex.conj_conj t)
+      hG hdet h0 hXY
   refine ⟨γ, hγ, ?_⟩
   rw [mul_of_col_eq_of_mulVec] at hγX
   funext i
@@ -118,13 +127,16 @@ private lemma dotProduct_mulVec_star_real_smul (C : Matrix (Fin r) (Fin r) ℂ) 
   push_cast
   ring
 
-theorem eq_smul_of_norm_eq_one_on_orbit :
-    ∀ (r : ℕ) (A B : Matrix (Fin r) (Fin r) ℂ) (v : Fin r → ℂ), A.IsHermitian → B.IsHermitian →
-      B.det ≠ 0 → (∀ h : Matrix (Fin r) (Fin r) ℂ, hᵀ * B * h.map (starRingEnd ℂ) = B →
-        ‖(h *ᵥ v) ⬝ᵥ (A *ᵥ star (h *ᵥ v))‖ = 1) → ∃ t : ℝ, t ≠ 0 ∧ A = (t : ℂ) • B := by
+theorem eq_smul_of_norm_eq_one_on_orbit
+    : ∀ (r : ℕ) (A B : Matrix (Fin r) (Fin r) ℂ) (v : Fin r → ℂ),
+      A.IsHermitian → B.IsHermitian → B.det ≠ 0
+        → (∀ h : Matrix (Fin r) (Fin r) ℂ,
+          hᵀ * B * h.map (starRingEnd ℂ) = B → ‖(h *ᵥ v) ⬝ᵥ (A *ᵥ star (h *ᵥ v))‖ = 1)
+        → ∃ t : ℝ, t ≠ 0 ∧ A = (t : ℂ) • B := by
   intro r A B v hA hB hdet hh
-  have hid : (1 : Matrix (Fin r) (Fin r) ℂ)ᵀ * B * (1 : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) =
-      B := by
+  have hid
+      : (1 : Matrix (Fin r) (Fin r) ℂ)ᵀ * B * (1 : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)
+        = B := by
     simp
   have hv : v ≠ 0 := by
     rintro rfl
@@ -133,11 +145,11 @@ theorem eq_smul_of_norm_eq_one_on_orbit :
   have hAre := dotProduct_star_eq_re hA
   have hBre := dotProduct_star_eq_re hB
 
-  have horb : ∀ w : Fin r → ℂ, w ≠ 0 → (w ⬝ᵥ B *ᵥ star w).re = (v ⬝ᵥ B *ᵥ star v).re →
-      |(w ⬝ᵥ A *ᵥ star w).re| = 1 := by
+  have horb
+      : ∀ w : Fin r → ℂ,
+        w ≠ 0 → (w ⬝ᵥ B *ᵥ star w).re = (v ⬝ᵥ B *ᵥ star v).re → |(w ⬝ᵥ A *ᵥ star w).re| = 1 := by
     intro w hw hwv
-    have hQ : w ⬝ᵥ B *ᵥ star w = v ⬝ᵥ B *ᵥ star v := by
-      rw [hBre w, hBre v, hwv]
+    have hQ : w ⬝ᵥ B *ᵥ star w = v ⬝ᵥ B *ᵥ star v := by rw [hBre w, hBre v, hwv]
     obtain ⟨g, hg, rfl⟩ := exists_unitary_mulVec_eq hB hdet hv hw hQ
     have := hh g hg
     rwa [hAre (g *ᵥ v), Complex.norm_real, Real.norm_eq_abs] at this
@@ -145,31 +157,38 @@ theorem eq_smul_of_norm_eq_one_on_orbit :
 
   have hcr : (v ⬝ᵥ B *ᵥ star v).re ≠ 0 := by
     intro h0
-    have e := horb (((2 : ℝ) : ℂ) • v) (smul_ne_zero (by norm_num) hv)
-      (by rw [dotProduct_mulVec_star_real_smul, Complex.re_ofReal_mul, h0, mul_zero])
+    have e :=
+      horb (((2 : ℝ) : ℂ) • v) (smul_ne_zero (by norm_num) hv)
+        (by rw [dotProduct_mulVec_star_real_smul, Complex.re_ofReal_mul, h0, mul_zero])
     rw [dotProduct_mulVec_star_real_smul, Complex.re_ofReal_mul, abs_mul, hsr] at e
     norm_num at e
   set cr := (v ⬝ᵥ B *ᵥ star v).re with hcr_def
   set sr := (v ⬝ᵥ A *ᵥ star v).re with hsr_def
-  have hcont : ∀ M : Matrix (Fin r) (Fin r) ℂ,
-      Continuous fun w : Fin r → ℂ => (w ⬝ᵥ M *ᵥ star w).re := fun M =>
-    Complex.continuous_re.comp
-      (continuous_id.dotProduct (continuous_const.matrix_mulVec continuous_star))
+  have hcont
+      : ∀ M : Matrix (Fin r) (Fin r) ℂ,
+        Continuous fun w : Fin r → ℂ => (w ⬝ᵥ M *ᵥ star w).re := fun M =>
+    Complex.continuous_re.comp (continuous_id.dotProduct (continuous_const.matrix_mulVec
+      continuous_star))
 
-  have hφ : Filter.Tendsto (fun w : Fin r → ℂ =>
-      (w ⬝ᵥ A *ᵥ star w).re * cr / (w ⬝ᵥ B *ᵥ star w).re) (𝓝 v) (𝓝 sr) := by
-    have h : ContinuousAt (fun w : Fin r → ℂ =>
-        (w ⬝ᵥ A *ᵥ star w).re * cr / (w ⬝ᵥ B *ᵥ star w).re) v :=
+  have hφ : Filter.Tendsto
+      (fun w : Fin r → ℂ => (w ⬝ᵥ A *ᵥ star w).re * cr / (w ⬝ᵥ B *ᵥ star w).re)
+      (𝓝 v) (𝓝 sr) := by
+    have h : ContinuousAt
+        (fun w : Fin r → ℂ => (w ⬝ᵥ A *ᵥ star w).re * cr / (w ⬝ᵥ B *ᵥ star w).re)
+        v :=
       ((hcont A).continuousAt.mul (continuousAt_const (y := cr))).div (hcont B).continuousAt hcr
-    have h2 : Filter.Tendsto (fun w : Fin r → ℂ =>
-        (w ⬝ᵥ A *ᵥ star w).re * cr / (w ⬝ᵥ B *ᵥ star w).re) (𝓝 v) (𝓝 (sr * cr / cr)) := h.tendsto
+    have h2 : Filter.Tendsto
+        (fun w : Fin r → ℂ => (w ⬝ᵥ A *ᵥ star w).re * cr / (w ⬝ᵥ B *ᵥ star w).re)
+        (𝓝 v) (𝓝 (sr * cr / cr)) :=
+      h.tendsto
     have hval : sr * cr / cr = sr := by field_simp
     rwa [hval] at h2
   have E1 : ∀ᶠ w in 𝓝 v, w ≠ 0 := eventually_ne_nhds hv
   have E2 : ∀ᶠ w in 𝓝 v, 0 < (w ⬝ᵥ B *ᵥ star w).re * cr :=
     continuousAt_const.eventually_lt ((hcont B).continuousAt.mul continuousAt_const)
       (mul_self_pos.mpr hcr)
-  have E3 := hφ.eventually (Ioo_mem_nhds (show sr - 1 < sr by linarith) (show sr < sr + 1 by linarith))
+  have E3 :=
+    hφ.eventually (Ioo_mem_nhds (show sr - 1 < sr by linarith) (show sr < sr + 1 by linarith))
   have key : ∀ᶠ w in 𝓝 v, w ⬝ᵥ (A - ((sr / cr : ℝ) : ℂ) • B) *ᵥ star w = 0 := by
     filter_upwards [E1, E2, E3] with w hw hpos hI
     obtain ⟨hI1, hI2⟩ := hI
@@ -185,17 +204,18 @@ theorem eq_smul_of_norm_eq_one_on_orbit :
       Real.sq_sqrt hq.le
     have ha : Real.sqrt (cr / (w ⬝ᵥ B *ᵥ star w).re) ≠ 0 := (Real.sqrt_pos.mpr hq).ne'
 
-    have e := horb ((Real.sqrt (cr / (w ⬝ᵥ B *ᵥ star w).re) : ℂ) • w)
-      (smul_ne_zero (Complex.ofReal_ne_zero.mpr ha) hw)
-      (by rw [dotProduct_mulVec_star_real_smul, Complex.re_ofReal_mul, ha2]; field_simp)
+    have e :=
+      horb ((Real.sqrt (cr / (w ⬝ᵥ B *ᵥ star w).re) : ℂ) • w)
+        (smul_ne_zero (Complex.ofReal_ne_zero.mpr ha) hw)
+        (by rw [dotProduct_mulVec_star_real_smul, Complex.re_ofReal_mul, ha2]; field_simp)
     rw [dotProduct_mulVec_star_real_smul, Complex.re_ofReal_mul, ha2] at e
     have e' : |(w ⬝ᵥ A *ᵥ star w).re * cr / (w ⬝ᵥ B *ᵥ star w).re| = 1 := by
       rw [← e]
       congr 1
       ring
     have hφw : (w ⬝ᵥ A *ᵥ star w).re * cr / (w ⬝ᵥ B *ᵥ star w).re = sr := by
-      rcases (abs_eq zero_le_one).mp e' with h1 | h1 <;>
-        rcases (abs_eq zero_le_one).mp hsr with h2 | h2 <;> linarith [hI1, hI2]
+      rcases (abs_eq zero_le_one).mp e' with h1 | h1
+        <;> rcases (abs_eq zero_le_one).mp hsr with h2 | h2 <;> linarith [hI1, hI2]
     have hreal : (w ⬝ᵥ A *ᵥ star w).re - sr / cr * (w ⬝ᵥ B *ᵥ star w).re = 0 := by
       have h := hφw
       field_simp at h ⊢

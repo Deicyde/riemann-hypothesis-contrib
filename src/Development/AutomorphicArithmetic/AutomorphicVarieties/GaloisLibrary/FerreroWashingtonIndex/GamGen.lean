@@ -6,9 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-private theorem padic_val_one_add_mul_pow_pow_sub_one (l : ℕ) (hl : l.Prime) (f : ℕ) (hf : f.Coprime l) (j : ℕ) :
-    (l : ℤ) ^ (ee l + j) ∣ (1 + (f : ℤ) * (l : ℤ) ^ ee l) ^ l ^ j - 1 ∧
-      ¬ (l : ℤ) ^ (ee l + j + 1) ∣ (1 + (f : ℤ) * (l : ℤ) ^ ee l) ^ l ^ j - 1 := by
+private theorem padic_val_one_add_mul_pow_pow_sub_one
+    (l : ℕ) (hl : l.Prime) (f : ℕ) (hf : f.Coprime l) (j : ℕ)
+    : (l : ℤ) ^ (ee l + j) ∣ (1 + (f : ℤ) * (l : ℤ) ^ ee l) ^ l ^ j - 1
+      ∧ ¬ (l : ℤ) ^ (ee l + j + 1) ∣ (1 + (f : ℤ) * (l : ℤ) ^ ee l) ^ l ^ j - 1 := by
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl
   have hfl : ¬ (l : ℤ) ∣ (f : ℤ) := by
     intro hd
@@ -20,31 +21,32 @@ private theorem padic_val_one_add_mul_pow_pow_sub_one (l : ℕ) (hl : l.Prime) (
   have hx : ¬ (l : ℤ) ∣ 1 + (f : ℤ) * (l : ℤ) ^ ee l := by
     intro hd
     have he : 1 ≤ ee l := by unfold ee; split_ifs <;> norm_num
-    have h2 : (l : ℤ) ∣ (f : ℤ) * (l : ℤ) ^ ee l :=
-      Dvd.dvd.mul_left (dvd_pow_self _ (by omega)) _
+    have h2 : (l : ℤ) ∣ (f : ℤ) * (l : ℤ) ^ ee l := Dvd.dvd.mul_left (dvd_pow_self _ (by omega)) _
     have h3 : (l : ℤ) ∣ 1 := by
       have := dvd_sub hd h2
       simpa using this
     have h4 : l ∣ 1 := by exact_mod_cast h3
     exact hl.one_lt.ne' (Nat.dvd_one.mp h4)
-  have key : emultiplicity (l : ℤ) ((1 + (f : ℤ) * (l : ℤ) ^ ee l) ^ l ^ j - 1)
-      = ((ee l + j : ℕ) : ℕ∞) := by
+  have key
+      : emultiplicity (l : ℤ) ((1 + (f : ℤ) * (l : ℤ) ^ ee l) ^ l ^ j - 1)
+        = ((ee l + j : ℕ) : ℕ∞) := by
     by_cases h2 : l = 2
     · subst h2
       have e2 : ee 2 = 2 := by simp [ee]
       have h4 : (4 : ℤ) ∣ (1 + (f : ℤ) * ((2 : ℕ) : ℤ) ^ ee 2) - 1 := by
         rw [e2]
         exact ⟨f, by push_cast; ring⟩
-      have hx2 : ¬ (2 : ℤ) ∣ 1 + (f : ℤ) * ((2 : ℕ) : ℤ) ^ ee 2 := by
-        simpa using hx
-      have := Int.two_pow_two_pow_sub_pow_two_pow (x := 1 + (f : ℤ) * ((2 : ℕ) : ℤ) ^ ee 2)
-        (y := 1) j h4 hx2
+      have hx2 : ¬ (2 : ℤ) ∣ 1 + (f : ℤ) * ((2 : ℕ) : ℤ) ^ ee 2 := by simpa using hx
+      have :=
+        Int.two_pow_two_pow_sub_pow_two_pow (x := 1 + (f : ℤ) * ((2 : ℕ) : ℤ) ^ ee 2) (y := 1) j h4
+          hx2
       rw [one_pow, add_sub_cancel_left] at this
       have hq2 : emultiplicity (2 : ℤ) ((f : ℤ) * ((2 : ℕ) : ℤ) ^ ee 2) = (ee 2 : ℕ∞) := by
         simpa using hq
       rw [hq2] at this
       have : emultiplicity ((2 : ℕ) : ℤ) ((1 + (f : ℤ) * ((2 : ℕ) : ℤ) ^ ee 2) ^ 2 ^ j - 1)
-          = (ee 2 : ℕ∞) + j := by simpa using this
+          = (ee 2 : ℕ∞) + j := by
+        simpa using this
       rw [this]
       push_cast
       rfl
@@ -54,8 +56,8 @@ private theorem padic_val_one_add_mul_pow_pow_sub_one (l : ℕ) (hl : l.Prime) (
         rw [add_sub_cancel_left]
         exact Dvd.dvd.mul_left (dvd_pow_self _ (by omega)) _
       have := Int.emultiplicity_pow_sub_pow hl hodd hxy hx (l ^ j)
-      rw [one_pow, add_sub_cancel_left, hq,
-        emultiplicity_pow_self_of_prime (Nat.prime_iff.mp hl) j] at this
+      rw [one_pow, add_sub_cancel_left, hq, emultiplicity_pow_self_of_prime (Nat.prime_iff.mp hl) j]
+        at this
       rw [this]
       push_cast
       rfl
@@ -66,8 +68,10 @@ private theorem padic_val_one_add_mul_pow_pow_sub_one (l : ℕ) (hl : l.Prime) (
     omega
 
 set_option maxHeartbeats 400000 in
-theorem UpperTheory.V.FW.gamGen :
-    ∀ (l : ℕ) [Fact l.Prime] (f n : ℕ) (h : f * l ^ ee l ∣ f * l ^ n) (γ : (ZMod (f * l ^ n))ˣ), f.Coprime l → ee l ≤ n → (γ : ZMod (f * l ^ n)) = 1 + f * l ^ ee l → (ZMod.unitsMap h).ker = Subgroup.zpowers γ ∧ γ ^ l ^ n = 1 := by
+theorem UpperTheory.V.FW.gamGen
+    : ∀ (l : ℕ) [Fact l.Prime] (f n : ℕ) (h : f * l ^ ee l ∣ f * l ^ n) (γ : (ZMod (f * l ^ n))ˣ),
+      f.Coprime l → ee l ≤ n → (γ : ZMod (f * l ^ n)) = 1 + f * l ^ ee l
+        → (ZMod.unitsMap h).ker = Subgroup.zpowers γ ∧ γ ^ l ^ n = 1 := by
   intro l _ f n h γ hf hen hγ
   have hl : l.Prime := Fact.out
   obtain ⟨d, rfl⟩ : ∃ d, n = ee l + d := ⟨n - ee l, by omega⟩
@@ -94,8 +98,8 @@ theorem UpperTheory.V.FW.gamGen :
       refine dvd_trans ?_ h1
       rw [hxdef, add_sub_cancel_left]
       exact dvd_mul_right _ _
-    rw [Units.ext_iff, Units.val_pow_eq_pow_val, Units.val_one, hγx, ← Int.cast_pow,
-      ← sub_eq_zero, ← Int.cast_one, ← Int.cast_sub, ZMod.intCast_zmod_eq_zero_iff_dvd]
+    rw [Units.ext_iff, Units.val_pow_eq_pow_val, Units.val_one, hγx, ← Int.cast_pow, ← sub_eq_zero,
+      ← Int.cast_one, ← Int.cast_sub, ZMod.intCast_zmod_eq_zero_iff_dvd]
     push_cast
     constructor
     · intro hd
@@ -122,9 +126,10 @@ theorem UpperTheory.V.FW.gamGen :
   have hcardK : Nat.card K = l ^ d := by
     have a := Subgroup.card_mul_index K
     rw [hK, Subgroup.index_ker, MonoidHom.range_eq_top.mpr (ZMod.unitsMap_surjective h),
-      Subgroup.card_top, c1, c2,
-      Nat.totient_mul (Nat.Coprime.pow_right _ hf), Nat.totient_mul (Nat.Coprime.pow_right _ hf),
-      Nat.totient_prime_pow hl (by omega), Nat.totient_prime_pow hl (by omega)] at a
+        Subgroup.card_top, c1, c2, Nat.totient_mul (Nat.Coprime.pow_right _ hf),
+        Nat.totient_mul (Nat.Coprime.pow_right _ hf), Nat.totient_prime_pow hl (by omega),
+        Nat.totient_prime_pow hl (by omega)]
+      at a
     have hpos : 0 < f.totient * (l ^ (ee l - 1) * (l - 1)) := by
       have h1 := hl.one_lt
       have h2 := Nat.totient_pos.mpr (Nat.pos_of_ne_zero hf0)

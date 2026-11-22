@@ -20,8 +20,7 @@ theorem dsLin : DsLin := by
   obtain ⟨U, F, hUo, h1U, hF, hfF⟩ := hu 1 h1
   refine ⟨fderiv ℝ F 1, fun X hX => ?_⟩
   have hmem : ∀ t : ℝ, ex X t ∈ Formalism.QuantumDeterminants.UH Hm := fun t => ex_mem_of_lie hX t
-  have hd : HasDerivAt (fun t : ℝ => ex X t) X 0 := by
-    simpa using hasDerivAt_mul_ex (1 : Mat n) X
+  have hd : HasDerivAt (fun t : ℝ => ex X t) X 0 := by simpa using hasDerivAt_mul_ex (1 : Mat n) X
   have hl := hasDerivAt_local (f := fun g => σ g u) hmem (ex_zero X) hd hUo h1U hF hfF
   exact hl.deriv
 

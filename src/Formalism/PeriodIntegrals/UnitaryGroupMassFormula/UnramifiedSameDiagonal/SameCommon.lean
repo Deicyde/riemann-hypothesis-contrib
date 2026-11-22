@@ -9,20 +9,27 @@ noncomputable section
 
 namespace SameDiaZero
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms Formalism.L2.GlobalTheoryTheory Formalism.L2.GlobalTheoryTheory.LocalLatticeBases Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0 Formalism.UG
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.product_first_zeroth_parts
+  Formalism.L2.Forms Formalism.L2.GlobalTheoryTheory
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0 Formalism.UG
 open NumberField IsDedekindDomain Matrix CrossDiaZero
 
-theorem smul_comm_OE {E : Type} [Field E] [NumberField E] {n : ℕ} (t : E) (m : 𝓞 E) (w : Fin n → E) :
-    t • (m • w) = m • (t • w) := by
+theorem smul_comm_OE {E : Type} [Field E] [NumberField E] {n : ℕ} (t : E) (m : 𝓞 E) (w : Fin n → E)
+    : t • (m • w) = m • (t • w) := by
   exact smul_comm t m w
 
-theorem localization_LshKer_eq_localization_sup {R W : Type} [CommRing R] [AddCommGroup W] [Module R W] (P : Ideal R) [P.IsPrime]
-    (L : Submodule R W) (y : W) (s : R) (hs : s ∉ P) :
-    Formalism.HermitianLatticesTheory.localization₂ P (L ⊔ Submodule.span R {s • y}) = Formalism.HermitianLatticesTheory.localization₂ P (L ⊔ Submodule.span R {y}) := by
+theorem localization_LshKer_eq_localization_sup
+    {R W : Type} [CommRing R] [AddCommGroup W] [Module R W]
+    (P : Ideal R) [P.IsPrime]
+    (L : Submodule R W) (y : W)
+    (s : R) (hs : s ∉ P)
+    : Formalism.HermitianLatticesTheory.localization₂ P (L ⊔ Submodule.span R {s • y})
+      = Formalism.HermitianLatticesTheory.localization₂ P (L ⊔ Submodule.span R {y}) := by
   have hS : s ∈ P.primeCompl := hs
   ext x
-  change (∃ t ∈ P.primeCompl, t • x ∈ L ⊔ Submodule.span R {s • y}) ↔
-    ∃ t ∈ P.primeCompl, t • x ∈ L ⊔ Submodule.span R {y}
+  change (∃ t ∈ P.primeCompl, t • x ∈ L ⊔ Submodule.span R {s • y})
+    ↔ ∃ t ∈ P.primeCompl, t • x ∈ L ⊔ Submodule.span R {y}
   constructor
   · rintro ⟨t, ht, hx⟩
     refine ⟨t, ht, (sup_le_sup_left ?_ L) hx⟩

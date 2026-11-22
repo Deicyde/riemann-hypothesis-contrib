@@ -9,15 +9,16 @@ open scoped InnerProductSpace BigOperators Matrix
 
 namespace GlobalTheory
 
-theorem exists_det_add_mul_one_sub_mul_ne_zero {k : Type*} [Field k] {n : ℕ}
-    (A B : Matrix (Fin n) (Fin n) k) :
-    ∃ T : Matrix (Fin n) (Fin n) k, (A + T * (1 - B * A)).det ≠ 0 := by
+theorem exists_det_add_mul_one_sub_mul_ne_zero
+    {k : Type*} [Field k] {n : ℕ} (A B : Matrix (Fin n) (Fin n) k)
+    : ∃ T : Matrix (Fin n) (Fin n) k, (A + T * (1 - B * A)).det ≠ 0 := by
   classical
   set LA := Matrix.toLin' A with hLA
   set K := LinearMap.ker LA
   obtain ⟨U, hU⟩ := Submodule.exists_isCompl (LinearMap.range LA)
   obtain ⟨K', hK'⟩ := Submodule.exists_isCompl K
-  have h1 : Module.finrank k (LinearMap.range LA) + Module.finrank k K = Module.finrank k (Fin n → k) :=
+  have h1
+      : Module.finrank k (LinearMap.range LA) + Module.finrank k K = Module.finrank k (Fin n → k) :=
     LinearMap.finrank_range_add_finrank_ker LA
   have h2 := Submodule.finrank_add_eq_of_isCompl hU
   have hdim : Module.finrank k K = Module.finrank k U := by omega
@@ -40,7 +41,8 @@ theorem exists_det_add_mul_one_sub_mul_ne_zero {k : Type*} [Field k] {n : ℕ}
       exact U.neg_mem (hfU _)
     exact (Submodule.disjoint_def.mp hU.disjoint) _ hr hu
   rw [hAv, zero_add, Matrix.sub_mulVec, Matrix.one_mulVec, ← Matrix.mulVec_mulVec, hAv,
-    Matrix.mulVec_zero, sub_zero] at hv
+      Matrix.mulVec_zero, sub_zero]
+    at hv
   have hvK : v ∈ K := by
     show LA v = 0
     rw [hLA, Matrix.toLin'_apply, hAv]
@@ -51,15 +53,15 @@ theorem exists_det_add_mul_one_sub_mul_ne_zero {k : Type*} [Field k] {n : ℕ}
     have : f v = 0 := hv
     change U.subtype ((e : K →ₗ[k] U) ⟨v, hvK⟩) = 0
     simpa only [f, LinearMap.comp_apply, hp] using this
-  have he' : e ⟨v, hvK⟩ = e 0 := by
-    exact he.trans (map_zero (e : K →ₗ[k] U)).symm
+  have he' : e ⟨v, hvK⟩ = e 0 := by exact he.trans (map_zero (e : K →ₗ[k] U)).symm
   have : (⟨v, hvK⟩ : K) = 0 := e.injective he'
   simpa using congrArg Subtype.val this
 
-theorem exists_GL_of_span_range_eq : ∀ (O M : Type) [CommRing O] [IsLocalRing O] [AddCommGroup M]
-    [Module O M] (n : ℕ) (x y : Fin n → M),
-    Submodule.span O (Set.range x) = Submodule.span O (Set.range y) →
-    ∃ h : GL (Fin n) O, ∀ i, y i = ∑ j, (h : Matrix (Fin n) (Fin n) O) i j • x j := by
+theorem exists_GL_of_span_range_eq
+    : ∀ (O M : Type) [CommRing O] [IsLocalRing O] [AddCommGroup M] [Module O M] (n : ℕ)
+        (x y : Fin n → M),
+      Submodule.span O (Set.range x) = Submodule.span O (Set.range y)
+        → ∃ h : GL (Fin n) O, ∀ i, y i = ∑ j, (h : Matrix (Fin n) (Fin n) O) i j • x j := by
   intro O M _ _ _ _ n x y hspan
   classical
   have hA : ∀ i, ∃ c : Fin n → O, ∑ j, c j • x j = y i := fun i =>
@@ -70,8 +72,9 @@ theorem exists_GL_of_span_range_eq : ∀ (O M : Type) [CommRing O] [IsLocalRing 
     ⟨fun i => (hA i).choose, fun i => (hA i).choose_spec⟩
   obtain ⟨B, hB⟩ : ∃ B : Matrix (Fin n) (Fin n) O, ∀ i, ∑ j, B i j • y j = x i :=
     ⟨fun i => (hB i).choose, fun i => (hB i).choose_spec⟩
-  have hmul : ∀ (P Q : Matrix (Fin n) (Fin n) O) (z : Fin n → M) i,
-      ∑ j, (P * Q) i j • z j = ∑ l, P i l • ∑ j, Q l j • z j := by
+  have hmul
+      : ∀ (P Q : Matrix (Fin n) (Fin n) O) (z : Fin n → M) i,
+        ∑ j, (P * Q) i j • z j = ∑ l, P i l • ∑ j, Q l j • z j := by
     intro P Q z i
     simp only [Matrix.mul_apply, Finset.sum_smul, Finset.smul_sum, mul_smul]
     exact Finset.sum_comm

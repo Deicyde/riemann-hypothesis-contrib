@@ -6,16 +6,18 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalJacobianTyp
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology Filter PositivityTheory.Rg.Base1 GroundTheory.Global GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology Filter PositivityTheory.Rg.Base1 GroundTheory.Global
+  GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
 open scoped TensorProduct ENNReal NNReal Matrix Classical
 open scoped Pointwise
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Haar
 
-theorem nnnorm_eq_distribHaarChar (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) (n : (Fv F v)ˣ) :
-    ‖(n : Fv F v)‖₊ = distribHaarChar (Fv F v) n := by
+theorem nnnorm_eq_distribHaarChar
+    (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (n : (Fv F v)ˣ)
+    : ‖(n : Fv F v)‖₊ = distribHaarChar (Fv F v) n := by
   have hn : (n : Fv F v) ≠ 0 := n.ne_zero
   have hva : Valued.v (n : Fv F v) ≠ 0 := (Valuation.ne_zero_iff _).2 hn
   have h := PI.UnitaryGroupMassFormula.LocJacTyp.BM.modF_Fv v (n : Fv F v) hn
@@ -24,16 +26,20 @@ theorem nnnorm_eq_distribHaarChar (F : Type) [Field F] [NumberField F]
   rw [hu] at h
   have habs : PI.LocJacTyp.absV v (n : Fv F v) = ‖(n : Fv F v)‖ := by
     unfold PI.LocJacTyp.absV
-    rw [dite_eq_right hva, NumberField.FinitePlace.norm_def, WithZeroMulInt.toNNReal_neg_apply _ hva]
+    rw [dite_eq_right hva, NumberField.FinitePlace.norm_def,
+      WithZeroMulInt.toNNReal_neg_apply _ hva]
     push_cast
     rw [WithZero.toAdd_unzero_eq_log]
   rw [habs, ← coe_nnnorm, ENNReal.ofReal_coe_nnreal] at h
   exact (ENNReal.coe_injective h).symm
 
-theorem map_mul_left (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
-    (lam : Measure (Fv F v)) (hl : lam.IsAddHaarMeasure) (n : (Fv F v)ˣ) :
-    lam.map (fun t => (n : Fv F v) * t) = (‖(n : Fv F v)‖₊)⁻¹ • lam := by
-  have : SecondCountableTopology (Fv F v) := PI.UnitaryGroupMassFormula.LocJacTyp.BM.secondCountable_Fv v
+theorem map_mul_left
+    (F : Type) [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v))
+    (hl : lam.IsAddHaarMeasure) (n : (Fv F v)ˣ)
+    : lam.map (fun t => (n : Fv F v) * t) = (‖(n : Fv F v)‖₊)⁻¹ • lam := by
+  have : SecondCountableTopology (Fv F v) :=
+    PI.UnitaryGroupMassFormula.LocJacTyp.BM.secondCountable_Fv v
   have : lam.Regular := inferInstance
   have hc : Continuous fun t : Fv F v => (n : Fv F v) * t := continuous_const.mul continuous_id
   ext S hS

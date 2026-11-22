@@ -19,14 +19,15 @@ theorem invariant_factors_submodule : InvariantFactorsSubmodule := by
   classical
   obtain ⟨C, hCM, hCg, hC⟩ := h
 
-  let f : (C → R) →ₗ[R] X ⧸ P :=
-    { toFun := fun a => ∑ c : C, a c • P.mkQ (c : X)
-      map_add' := by
-        intro a b
-        simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
-      map_smul' := by
-        intro r a
-        simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.smul_sum, mul_smul] }
+  let f : (C → R) →ₗ[R] X ⧸ P := {
+    toFun := fun a => ∑ c : C, a c • P.mkQ (c : X)
+    map_add' := by
+      intro a b
+      simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
+    map_smul' := by
+      intro r a
+      simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.smul_sum, mul_smul]
+  }
   let W : Submodule R (X ⧸ P) := M'.map (P.mkQ ∘ₗ ((π ^ E) • LinearMap.id))
   let U : Submodule R (C → R) := W.comap f
 
@@ -55,8 +56,8 @@ theorem invariant_factors_submodule : InvariantFactorsSubmodule := by
     have hfa : f (fun c => coef c) = P.mkQ (π ^ E • x) := by
       show ∑ c : C, coef c • P.mkQ (c : X) = _
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hpz, map_add (f := _), Submodule.mkQ_apply, (Submodule.Quotient.mk_eq_zero P).mpr hp, zero_add,
-        ← hcoef, map_sum, ← Finset.sum_coe_sort C]
+        rw [← hpz, map_add (f := _), Submodule.mkQ_apply, (Submodule.Quotient.mk_eq_zero P).mpr hp,
+          zero_add, ← hcoef, map_sum, ← Finset.sum_coe_sort C]
       refine Finset.sum_congr rfl fun c _ => ?_
       rw [map_smul]
     have ha : (fun c : C => coef (c : X)) ∈ U := by
@@ -73,10 +74,12 @@ theorem invariant_factors_submodule : InvariantFactorsSubmodule := by
       rw [map_smul, map_smul, hmf i]
     have hmem : π ^ E • x - ∑ i, r i • π ^ E • mm i ∈ P := by
       rw [← Submodule.ker_mkQ P, LinearMap.mem_ker, map_sub, hq, sub_self]
-    have hspan : ∑ i, r i • π ^ E • mm i ∈
-        Submodule.span R (↑(Finset.univ.image mm) : Set X) :=
-      Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.smul_mem _ _
-        (Submodule.subset_span (Finset.mem_coe.mpr (Finset.mem_image_of_mem mm (Finset.mem_univ i)))))
+    have hspan : ∑ i, r i • π ^ E • mm i ∈ Submodule.span R (↑(Finset.univ.image mm) : Set X) :=
+      Submodule.sum_mem _ fun i _ =>
+        Submodule.smul_mem _ _
+          (Submodule.smul_mem _ _
+            (Submodule.subset_span (Finset.mem_coe.mpr (Finset.mem_image_of_mem mm
+              (Finset.mem_univ i)))))
     exact Submodule.mem_sup.mpr ⟨_, hmem, _, hspan, sub_add_cancel _ _⟩
 
 theorem inverse_shift : InvShift := by
@@ -89,14 +92,14 @@ theorem inverse_shift : InvShift := by
     obtain ⟨c, hc, rfl⟩ := Finset.mem_image.mp (Finset.mem_coe.mp hz)
     obtain ⟨b, hb, k, hk, hbk⟩ := Submodule.mem_sup.mp (hC hc)
     rw [← hbk, smul_add]
-    exact B.add_mem (B.smul_mem _ hb)
-      (hNBB (hNANB (Submodule.smul_mem_pointwise_smul k _ _ hk)))
+    exact B.add_mem (B.smul_mem _ hb) (hNBB (hNANB (Submodule.smul_mem_pointwise_smul k _ _ hk)))
   · intro x hx
     obtain ⟨p, hp, z, hz, hpz⟩ := Submodule.mem_sup.mp (hCx x (le_sup_left (a := B) hx))
     rw [pow_add, mul_comm, mul_smul, ← hpz, smul_add]
     have hz' : π ^ e • z ∈ Submodule.span R (↑(C.image (fun c => π ^ e • c)) : Set X) := by
-      refine Submodule.span_induction (p := fun z _ => π ^ e • z ∈
-        Submodule.span R (↑(C.image (fun c => π ^ e • c)) : Set X)) ?_ ?_ ?_ ?_ hz
+      refine Submodule.span_induction
+        (p := fun z _ => π ^ e • z ∈ Submodule.span R (↑(C.image (fun c => π ^ e • c)) : Set X))
+        ?_ ?_ ?_ ?_ hz
       · intro c hc
         exact Submodule.subset_span (Finset.mem_coe.mpr (Finset.mem_image_of_mem _ hc))
       · simp

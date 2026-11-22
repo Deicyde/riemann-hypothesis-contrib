@@ -18,19 +18,30 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.weilDeligne_charpoly_twist_special : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (x : WD h), (x.lpTw 0).lpChar (WD.lpSp (h := h) 1) = x ∧ ∀ (l : ℕ) (σ : Weil h), ((x.lpTw (((l : ℝ) - 1) / 2)).lpChar (WD.lpSp (h := h) l)).charPol σ = ((Multiset.range l).map fun j : ℕ => (x.lpTw j).charPol σ).prod := by
+theorem _root_.GlobalTheory.T.weilDeligne_charpoly_twist_special
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (x : WD h),
+      (x.lpTw 0).lpChar (WD.lpSp (h := h) 1) = x
+        ∧ ∀ (l : ℕ) (σ : Weil h),
+          ((x.lpTw (((l : ℝ) - 1) / 2)).lpChar (WD.lpSp (h := h) l)).charPol σ
+            = ((Multiset.range l).map fun j : ℕ => (x.lpTw j).charPol σ).prod := by
   intro E Ω _ _ _ _ _ A w h x
   have hOne : (x.lpTw 0).lpChar (WD.lpSp (h := h) 1) = x := by
     rw [WD.lpTw_zero]
     induction x using WD.ind with
     | hP n a =>
       rw [WD.lpSp, WD.lpChar_mk]
-      refine WD.sound (WDRep.Iso.symm ⟨(TensorProduct.rid ℂ (Fin n → ℂ)).symm ≪≫ₗ
-        TensorProduct.congr (LinearEquiv.refl ℂ _) (LinearEquiv.funUnique (Fin 1) ℂ ℂ).symm,
-        fun σ v => ?_, fun v => ?_⟩)
+      refine WD.sound (WDRep.Iso.symm ⟨
+        (TensorProduct.rid ℂ (Fin n → ℂ)).symm
+          ≪≫ₗ TensorProduct.congr (LinearEquiv.refl ℂ _) (LinearEquiv.funUnique (Fin 1) ℂ ℂ).symm,
+        fun σ v => ?_,
+        fun v => ?_
+      ⟩)
       · have : (WDRep.sp (h := h) 1).ρ σ = 1 := by
           refine LinearMap.ext fun v => funext fun i => ?_
           simp [WDRep.spEig]

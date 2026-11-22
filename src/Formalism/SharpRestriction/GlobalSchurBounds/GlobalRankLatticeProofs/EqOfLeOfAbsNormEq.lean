@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.UnusedSlot33.HK
 
-open NumberField Polynomial Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.TwoAdicCyclotomicDecomposition
+open NumberField Polynomial Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.TwoAdicCyclotomicDecomposition
 open scoped Pointwise
 
 variable {R : Ranks} (H : Host R)
@@ -22,42 +23,42 @@ theorem conjugation_mul_self : c0 * c0 = 1 := by
 theorem cc_mul_cc (φ : Formalism.HC.Frame) : φ.cc * φ.cc = 1 := by
   exact Prod.ext Formalism.MainNotions.UnusedSlot33.HK.conjugation_mul_self (mul_one _)
 
-theorem galE_sigmaOf (g : R.GG) :
-    H.galE (H.sigmaOf g) = g := by
-  exact H.gal.apply_symm_apply g
+theorem galE_sigmaOf (g : R.GG) : H.galE (H.sigmaOf g) = g := by exact H.gal.apply_symm_apply g
 
-theorem sigmaOf_galE (σ : H.E ≃ₐ[ℚ] H.E) :
-    H.sigmaOf (H.galE σ) = σ := by
+theorem sigmaOf_galE (σ : H.E ≃ₐ[ℚ] H.E) : H.sigmaOf (H.galE σ) = σ := by
   exact H.gal.symm_apply_apply σ
 
-private theorem algEquiv_eqOn_K_of_eq_sqd (H : Host R) (σ τ : H.E ≃ₐ[ℚ] H.E) (h : σ H.sqd = τ H.sqd)
-    (x : H.E) (hx : x ∈ H.K) : σ x = τ x := by
+private theorem algEquiv_eqOn_K_of_eq_sqd
+    (H : Host R) (σ τ : H.E ≃ₐ[ℚ] H.E) (h : σ H.sqd = τ H.sqd) (x : H.E) (hx : x ∈ H.K)
+    : σ x = τ x := by
   have hρ : τ⁻¹ * σ ∈ MulAction.stabilizer (H.E ≃ₐ[ℚ] H.E) H.sqd := by
-    rw [MulAction.mem_stabilizer_iff, AlgEquiv.smul_def, AlgEquiv.mul_apply, h,
-      AlgEquiv.aut_inv, AlgEquiv.symm_apply_apply]
+    rw [MulAction.mem_stabilizer_iff, AlgEquiv.smul_def, AlgEquiv.mul_apply, h, AlgEquiv.aut_inv,
+      AlgEquiv.symm_apply_apply]
   have hle : H.K ≤ IntermediateField.fixedField (MulAction.stabilizer (H.E ≃ₐ[ℚ] H.E) H.sqd) := by
     show IntermediateField.adjoin ℚ {H.sqd} ≤ _
     rw [IntermediateField.adjoin_simple_le_iff]
     exact (IntermediateField.mem_fixedField_iff _ _).2 fun f hf => hf
   have h1 := (IntermediateField.mem_fixedField_iff _ _).1 (hle hx) _ hρ
   rw [AlgEquiv.mul_apply, AlgEquiv.aut_inv] at h1
-  calc σ x = τ (τ.symm (σ x)) := (τ.apply_symm_apply _).symm
+  calc
+    σ x
+      = τ (τ.symm (σ x)) := (τ.apply_symm_apply _).symm
     _ = τ x := by rw [h1]
 
-private theorem algEquiv_fix_K_of_gal_eq_one (H : Host R) (σ : H.E ≃ₐ[ℚ] H.E) (h : (H.gal σ).1.2 = 1)
-    (x : H.E) (hx : x ∈ H.K) : σ x = x := by
+private theorem algEquiv_fix_K_of_gal_eq_one
+    (H : Host R) (σ : H.E ≃ₐ[ℚ] H.E) (h : (H.gal σ).1.2 = 1) (x : H.E) (hx : x ∈ H.K)
+    : σ x = x := by
   have h1 := algEquiv_eqOn_K_of_eq_sqd H σ 1 (by rw [H.gal_sqd, h, AlgEquiv.one_apply]; simp) x hx
   rwa [AlgEquiv.one_apply] at h1
 
-theorem sigmaOf_fix_K (g : R.GG) (hg : g ∈ R.Psi) (x : H.E) (hx : x ∈ H.K) :
-    H.sigmaOf g x = x := by
+theorem sigmaOf_fix_K (g : R.GG) (hg : g ∈ R.Psi) (x : H.E) (hx : x ∈ H.K) : H.sigmaOf g x = x := by
   have hk : R.toFrame.chD g = 1 := MonoidHom.mem_ker.1 (show g ∈ R.toFrame.chD.ker from hg)
   have hg' : g.1.2 = 1 := by simpa [Formalism.HC.Frame.chD] using hk
   refine algEquiv_fix_K_of_gal_eq_one H (H.sigmaOf g) ?_ x hx
   rw [show H.gal (H.sigmaOf g) = g from H.gal.apply_symm_apply g]
   exact hg'
 
-theorem conj_b : H.conj H.sqrtMinusD = - H.sqrtMinusD := by
+theorem conj_b : H.conj H.sqrtMinusD = -H.sqrtMinusD := by
   show H.conj H.sqd = - H.sqd
   rw [H.gal_sqd, show H.gal H.conj = R.cc from H.gal.apply_symm_apply _]
   simp [Formalism.HC.Frame.cc, c0]
@@ -79,17 +80,22 @@ theorem conj_conj (x : H.E) : H.conj (H.conj x) = x := by
   rw [← AlgEquiv.mul_apply, h, AlgEquiv.one_apply]
 
 def DiffKH (H : Host R) : Prop :=
-  ∃ β : 𝓞 H.E, (β : H.E) = H.sqrtMinusD ∧
-    (differentIdeal ℤ (𝓞 H.K)).map (algebraMap (𝓞 H.K) (𝓞 H.E)) = Ideal.span {β}
+  ∃ β : 𝓞 H.E,
+    (β : H.E) = H.sqrtMinusD
+      ∧ (differentIdeal ℤ (𝓞 H.K)).map (algebraMap (𝓞 H.K) (𝓞 H.E)) = Ideal.span {β}
 
 def NormKH (H : Host R) : Prop :=
-  ∀ cc : Ideal (𝓞 H.K), cc ≠ ⊥ →
-    Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc *
-      (H.conj • Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc) =
-    Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)}
+  ∀ cc : Ideal (𝓞 H.K),
+    cc ≠ ⊥
+      → Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc
+          * (H.conj • Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc)
+        = Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)}
 
-theorem eq_of_le_of_absNorm_eq {K : Type*} [Field K] [NumberField K] {I J : Ideal (𝓞 K)}
-    (hle : I ≤ J) (hI : Ideal.absNorm I ≠ 0) (h : Ideal.absNorm I = Ideal.absNorm J) : I = J := by
+theorem eq_of_le_of_absNorm_eq
+    {K : Type*} [Field K] [NumberField K]
+    {I J : Ideal (𝓞 K)}
+    (hle : I ≤ J) (hI : Ideal.absNorm I ≠ 0) (h : Ideal.absNorm I = Ideal.absNorm J)
+    : I = J := by
   obtain ⟨M, hM⟩ := Ideal.dvd_iff_le.mpr hle
   have h1 : Ideal.absNorm M = 1 := by
     have h2 := congrArg Ideal.absNorm hM
@@ -98,10 +104,12 @@ theorem eq_of_le_of_absNorm_eq {K : Type*} [Field K] [NumberField K] {I J : Idea
   rw [Ideal.absNorm_eq_one_iff] at h1
   rw [hM, h1, Ideal.mul_top]
 
-theorem different_quad (K : Type) [Field K] [NumberField K] (a : ℤ) (x : K)
-    (hx : x ^ 2 = (a : K)) (hadj : IntermediateField.adjoin ℚ {x} = ⊤) (hsf : Squarefree a)
-    (h4 : a % 4 = 1) (h1 : a ≠ 1) (x' : 𝓞 K) (hx' : (x' : K) = x) :
-    differentIdeal ℤ (𝓞 K) = Ideal.span {x'} := by
+theorem different_quad
+    (K : Type) [Field K] [NumberField K]
+    (a : ℤ) (x : K) (hx : x ^ 2 = (a : K)) (hadj : IntermediateField.adjoin ℚ {x} = ⊤)
+    (hsf : Squarefree a) (h4 : a % 4 = 1) (h1 : a ≠ 1)
+    (x' : 𝓞 K) (hx' : (x' : K) = x)
+    : differentIdeal ℤ (𝓞 K) = Ideal.span {x'} := by
   have hdisc : discr K = a := Formalism.HF.quadDiscr K a x hx hadj hsf h4
   have ha0 : a ≠ 0 := hsf.ne_zero
   have hirr : Irreducible (X ^ 2 - C (a : ℚ)) :=
@@ -152,8 +160,9 @@ theorem different_quad (K : Type) [Field K] [NumberField K] (a : ℤ) (x : K)
     · rw [degree_eq_natDegree hPmon.ne_zero, degree_eq_natDegree (minpoly.ne_zero hint'), hPdeg,
         hdegZ]
   have hAdj : Algebra.adjoin ℚ {algebraMap (𝓞 K) K ω'} = ⊤ := by
-    have := IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (F := ℚ) (α := ω)
-      (Algebra.IsAlgebraic.isAlgebraic ω)
+    have :=
+      IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (F := ℚ) (α := ω)
+        (Algebra.IsAlgebraic.isAlgebraic ω)
     rw [hadjω, IntermediateField.top_toSubalgebra] at this
     rw [hω']
     exact this.symm
@@ -171,8 +180,7 @@ theorem different_quad (K : Type) [Field K] [NumberField K] (a : ℤ) (x : K)
     rw [hder, hx'', map_sub, map_mul, aeval_C, aeval_X, map_one]
     simp
   rw [hval] at hmem
-  have hle : Ideal.span {x'} ≤ differentIdeal ℤ (𝓞 K) :=
-    (Ideal.span_singleton_le_iff_mem _).2 hmem
+  have hle : Ideal.span {x'} ≤ differentIdeal ℤ (𝓞 K) := (Ideal.span_singleton_le_iff_mem _).2 hmem
   have hn : (Algebra.norm ℤ x') ^ 2 = a ^ 2 := by
     have : ((Algebra.norm ℤ x' : ℤ) : ℚ) ^ 2 = (a : ℚ) ^ 2 := by
       rw [Algebra.coe_norm_int, hx', ← map_pow, hx, show ((a : ℤ) : K) = algebraMap ℚ K a by simp,
@@ -186,13 +194,11 @@ theorem different_quad (K : Type) [Field K] [NumberField K] (a : ℤ) (x : K)
   exact (eq_of_le_of_absNorm_eq hle (by rw [hN1]; exact Int.natAbs_ne_zero.2 ha0)
     (hN1.trans hN2.symm)).symm
 
-theorem gen_top (H : Host R) (x : H.K) (hx : (x : H.E) = H.sqd) :
-    IntermediateField.adjoin ℚ {x} = ⊤ := by
+theorem gen_top (H : Host R) (x : H.K) (hx : (x : H.E) = H.sqd)
+    : IntermediateField.adjoin ℚ {x} = ⊤ := by
   apply IntermediateField.map_injective (IsScalarTower.toAlgHom ℚ H.K H.E)
   rw [IntermediateField.adjoin_map, Set.image_singleton]
-  first
-  | rw [IntermediateField.map_top]
-  | rw [← AlgHom.fieldRange_eq_map]
+  first | rw [IntermediateField.map_top] | rw [← AlgHom.fieldRange_eq_map]
   ext z
   rw [AlgHom.mem_fieldRange]
   have h1 : IsScalarTower.toAlgHom ℚ H.K H.E x = H.sqd := hx
@@ -210,25 +216,26 @@ theorem diffK_holds (H : Host R) : DiffKH H := by
     apply Subtype.ext
     simp [H.sqd_sq]
   have hint : IsIntegral ℤ (⟨H.sqd, hmem⟩ : H.K) := by
-    refine ⟨Polynomial.X ^ 2 + Polynomial.C (H.d : ℤ), Polynomial.monic_X_pow_add_C _ two_ne_zero, ?_⟩
+    refine
+      ⟨Polynomial.X ^ 2 + Polynomial.C (H.d : ℤ), Polynomial.monic_X_pow_add_C _ two_ne_zero, ?_⟩
     rw [Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_C, hx2]
     simp
   have hint' : (⟨H.sqd, hmem⟩ : H.K) ∈ integralClosure ℤ H.K := (mem_integralClosure_iff ℤ _).2 hint
-  have hdiff := Formalism.MainNotions.UnusedSlot33.HK.different_quad H.K (-(H.d : ℤ)) ⟨H.sqd, hmem⟩ (by rw [hx2]; simp)
-    (Formalism.MainNotions.UnusedSlot33.HK.gen_top H _ rfl)
-    (Int.squarefree_natAbs.1 (by simpa using Irreducible.squarefree hd)) (by omega) (by omega)
-    ⟨⟨H.sqd, hmem⟩, hint'⟩ rfl
+  have hdiff :=
+    Formalism.MainNotions.UnusedSlot33.HK.different_quad H.K (-(H.d : ℤ)) ⟨H.sqd, hmem⟩
+      (by rw [hx2]; simp) (Formalism.MainNotions.UnusedSlot33.HK.gen_top H _ rfl)
+      (Int.squarefree_natAbs.1 (by simpa using Irreducible.squarefree hd)) (by omega) (by omega)
+      ⟨⟨H.sqd, hmem⟩, hint'⟩ rfl
   refine ⟨algebraMap (𝓞 H.K) (𝓞 H.E) ⟨⟨H.sqd, hmem⟩, hint'⟩, rfl, ?_⟩
   rw [hdiff, Ideal.map_span]
   exact congrArg Ideal.span Set.image_singleton
 
-theorem cases_K (σ : H.E ≃ₐ[ℚ] H.E) :
-    (∀ x ∈ H.K, σ x = x) ∨ (∀ x ∈ H.K, σ x = H.conj x) := by
+theorem cases_K (σ : H.E ≃ₐ[ℚ] H.E) : (∀ x ∈ H.K, σ x = x) ∨ (∀ x ∈ H.K, σ x = H.conj x) := by
   rcases Int.units_eq_one_or (H.gal σ).1.2 with h | h
   · exact Or.inl (fun x hx => algEquiv_fix_K_of_gal_eq_one H σ h x hx)
   · refine Or.inr (fun x hx => algEquiv_eqOn_K_of_eq_sqd H σ H.conj ?_ x hx)
     have hc := Formalism.MainNotions.UnusedSlot33.HK.conj_b H
-    change H.conj H.sqd = - H.sqd at hc
+    change H.conj H.sqd = -H.sqd at hc
     rw [H.gal_sqd, h, hc]
     simp
 
@@ -247,8 +254,7 @@ theorem isGalK : IsGalois ℚ H.K := by
   rw [IsGalois.fixedField_fixingSubgroup] at h1
   exact h1
 
-theorem norm_K (x : H.K) :
-    algebraMap ℚ H.E (Algebra.norm ℚ x) = (x : H.E) * H.conj (x : H.E) := by
+theorem norm_K (x : H.K) : algebraMap ℚ H.E (Algebra.norm ℚ x) = (x : H.E) * H.conj (x : H.E) := by
   classical
   have hG := isGalK H
   have hE := H.hostE_isGalois
@@ -262,7 +268,7 @@ theorem norm_K (x : H.K) :
     have h2 := hcK' ⟨_, bE_mem H⟩
     rw [← h1] at h2
     change H.sqd = _ at h2
-    rw [show H.conj (H.sqd) = - H.sqd from conj_b H] at h2
+    rw [show H.conj (H.sqd) = -H.sqd from conj_b H] at h2
     have h3 : (2 : H.E) * H.sqd = 0 := by linear_combination h2
     rcases mul_eq_zero.1 h3 with h4 | h4
     · exact two_ne_zero h4
@@ -292,25 +298,26 @@ theorem norm_K (x : H.K) :
   rw [← hcK' x]
   exact h2
 
-theorem norm_int (x : 𝓞 H.K) :
-    ((Algebra.intNorm ℤ (𝓞 H.K) x : ℤ) : H.E) =
-      ((x : H.K) : H.E) * H.conj ((x : H.K) : H.E) := by
+theorem norm_int (x : 𝓞 H.K)
+    : ((Algebra.intNorm ℤ (𝓞 H.K) x : ℤ) : H.E) = ((x : H.K) : H.E) * H.conj ((x : H.K) : H.E) := by
   rw [← norm_K H (x : H.K), ← Algebra.coe_norm_int, Algebra.intNorm_eq_norm, map_intCast]
 
-theorem span_le (cc : Ideal (𝓞 H.K)) :
-    Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)} ≤
-      Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc *
-        (H.conj • Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc) := by
+theorem span_le (cc : Ideal (𝓞 H.K))
+    : Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)}
+      ≤ Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc
+        * (H.conj • Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc) := by
   rw [Ideal.span_singleton_le_iff_mem]
-  have h1 : Ideal.relNorm ℤ cc ≤ Ideal.comap (algebraMap ℤ (𝓞 H.E))
-      (Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc *
-        (H.conj • Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc)) := by
+  have h1
+      : Ideal.relNorm ℤ cc
+        ≤ Ideal.comap (algebraMap ℤ (𝓞 H.E))
+          (Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc
+            * (H.conj • Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc)) := by
     rw [Ideal.relNorm_apply, Ideal.span_le]
     rintro _ ⟨x, hx, rfl⟩
     refine Ideal.mem_comap.2 ?_
-    have h2 : algebraMap ℤ (𝓞 H.E) (Algebra.intNorm ℤ (𝓞 H.K) x) =
-        algebraMap (𝓞 H.K) (𝓞 H.E) x *
-          (H.conj • algebraMap (𝓞 H.K) (𝓞 H.E) x) := by
+    have h2
+        : algebraMap ℤ (𝓞 H.E) (Algebra.intNorm ℤ (𝓞 H.K) x)
+          = algebraMap (𝓞 H.K) (𝓞 H.E) x * (H.conj • algebraMap (𝓞 H.K) (𝓞 H.E) x) := by
       apply RingOfIntegers.coe_injective
       have h3 := norm_int H x
       rw [eq_intCast]
@@ -326,8 +333,7 @@ theorem span_le (cc : Ideal (𝓞 H.K)) :
   rw [Ideal.mem_comap] at h4
   simpa using h4
 
-theorem absNorm_smul (I : Ideal (𝓞 H.E)) :
-    Ideal.absNorm (H.conj • I) = Ideal.absNorm I := by
+theorem absNorm_smul (I : Ideal (𝓞 H.E)) : Ideal.absNorm (H.conj • I) = Ideal.absNorm I := by
   rw [Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply, Submodule.cardQuot_apply]
   exact Nat.card_congr (Ideal.quotientEquiv I (H.conj • I)
     (MulSemiringAction.toRingEquiv _ (𝓞 H.E) H.conj) rfl).toEquiv.symm
@@ -351,12 +357,14 @@ theorem normK_holds (H : Host R) : NormKH H := by
   have hN : Ideal.absNorm cc ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff]
     exact hcc
-  have e1 : Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)} =
-      Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E))
-        (Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.K)}) := by
+  have e1
+      : Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)}
+        = Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E))
+          (Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.K)}) := by
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
-  have e2 : Ideal.absNorm (Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)}) =
-      (Ideal.absNorm cc ^ 2) ^ Module.finrank (𝓞 H.K) (𝓞 H.E) := by
+  have e2
+      : Ideal.absNorm (Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)})
+        = (Ideal.absNorm cc ^ 2) ^ Module.finrank (𝓞 H.K) (𝓞 H.E) := by
     rw [e1, Ideal.absNorm_algebraMap, absNorm_natK]
   symm
   apply eq_of_le_of_absNorm_eq (span_le H cc)

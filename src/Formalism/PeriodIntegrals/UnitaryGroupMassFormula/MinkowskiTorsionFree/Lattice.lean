@@ -25,8 +25,8 @@ theorem single_mem (i : Fin N) : (Pi.single i 1 : Fin N → ℚ) ∈ lat G := by
     Pi.single i 1
   exact Matrix.one_mulVec _
 
-theorem mulVec_mem (g : G) {v : Fin N → ℚ} (hv : v ∈ lat G) :
-    ((g : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec v ∈ lat G := by
+theorem mulVec_mem (g : G) {v : Fin N → ℚ} (hv : v ∈ lat G)
+    : ((g : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec v ∈ lat G := by
   have hv' : v ∈ Submodule.span ℤ (orbitSet G) := hv
   clear hv
   induction hv' using Submodule.span_induction with
@@ -39,7 +39,8 @@ theorem mulVec_mem (g : G) {v : Fin N → ℚ} (hv : v ∈ lat G) :
         (((h : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ) *ᵥ Pi.single i 1)
     rw [Matrix.mulVec_mulVec]
     rfl
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     rw [Matrix.mulVec_add]
     exact Submodule.add_mem _ hx hy
@@ -48,8 +49,9 @@ theorem mulVec_mem (g : G) {v : Fin N → ℚ} (hv : v ∈ lat G) :
     exact Submodule.smul_mem _ a hx
 
 noncomputable def rho : G →* Module.End ℤ (lat G) where
-  toFun g := ((((g : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVecLin).restrictScalars
-    ℤ).restrict (fun v hv => mulVec_mem G g hv)
+  toFun g :=
+    ((((g : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVecLin).restrictScalars
+      ℤ).restrict (fun v hv => mulVec_mem G g hv)
   map_one' := by ext v i; simp
   map_mul' g g' := by
     ext v : 1
@@ -58,9 +60,10 @@ noncomputable def rho : G →* Module.End ℤ (lat G) where
       (((g' : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec (v : Fin N → ℚ))
     simp [Matrix.mulVec_mulVec]
 
-theorem rho_apply_coe (g : G) (v : lat G) :
-    ((rho G g v : lat G) : Fin N → ℚ) =
-      ((g : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec v := rfl
+theorem rho_apply_coe (g : G) (v : lat G)
+    : ((rho G g v : lat G) : Fin N → ℚ)
+      = ((g : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec v :=
+  rfl
 
 section finite
 
@@ -88,7 +91,8 @@ theorem card_basis : Fintype.card (Module.Free.ChooseBasisIndex ℤ (lat G)) = N
   · have h3 : LinearIndependent ℚ (fun i : Fin N => (Pi.single i 1 : Fin N → ℚ)) := by
       have h7 := (Pi.basisFun ℚ (Fin N)).linearIndependent
       rwa [show ⇑(Pi.basisFun ℚ (Fin N)) = fun i : Fin N => (Pi.single i 1 : Fin N → ℚ) from
-        funext fun i => by simp] at h7
+          funext fun i => by simp]
+        at h7
     have h4 : LinearIndependent ℤ (fun i : Fin N => (Pi.single i 1 : Fin N → ℚ)) :=
       (LinearIndependent.iff_fractionRing (R := ℤ) (K := ℚ)).2 h3
     have h5 : LinearIndependent ℤ (fun i : Fin N => (⟨Pi.single i 1, single_mem G i⟩ : lat G)) :=
@@ -108,14 +112,20 @@ theorem phi_injective : Function.Injective (phi G) := by
   intro g g' h
   have h1 : rho G g = rho G g' := by
     have h0 := congrArg (fun u : GeneralLinearGroup (Fin N) ℤ => (u : Matrix (Fin N) (Fin N) ℤ)) h
-    change (LinearMap.toMatrixAlgEquiv (basisFin G)) (rho G g) =
-      (LinearMap.toMatrixAlgEquiv (basisFin G)) (rho G g') at h0
+    change (LinearMap.toMatrixAlgEquiv (basisFin G)) (rho G g)
+        = (LinearMap.toMatrixAlgEquiv (basisFin G)) (rho G g')
+      at h0
     exact (LinearMap.toMatrixAlgEquiv (basisFin G)).injective h0
-  have h2 : ∀ i, ((g : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec (Pi.single i 1) =
-      ((g' : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec (Pi.single i 1) := by
+  have h2
+      : ∀ i,
+        ((g : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec (Pi.single i 1)
+          = ((g' : GeneralLinearGroup (Fin N) ℚ) : Matrix (Fin N) (Fin N) ℚ).mulVec
+            (Pi.single i 1) := by
     intro i
-    have h0 := congrArg
-      (fun f : Module.End ℤ (lat G) => ((f ⟨Pi.single i 1, single_mem G i⟩ : lat G) : Fin N → ℚ)) h1
+    have h0 :=
+      congrArg
+        (fun f : Module.End ℤ (lat G) => ((f ⟨Pi.single i 1, single_mem G i⟩ : lat G) : Fin N → ℚ))
+        h1
     simpa [rho_apply_coe] using h0
   apply Subtype.ext
   apply Units.ext

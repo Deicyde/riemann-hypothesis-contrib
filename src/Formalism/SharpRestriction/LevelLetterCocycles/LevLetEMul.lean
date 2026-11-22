@@ -11,16 +11,20 @@ open Classical
 
 namespace Formalism.MainNotions.UnusedSlot80.DivLevR
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.WachCoordinates Formalism.MainNotions.WachCoordinates.Br Formalism.MainNotions.ArcLiftingSetup PowerSeries
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.WachCoordinates Formalism.MainNotions.WachCoordinates.Br
+  Formalism.MainNotions.ArcLiftingSetup PowerSeries
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR}
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {W : LocWach PD LL O v n}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {W : LocWach PD LL O v n}
 
 theorem letE_mem (a : ZMod n) : (letE a : LetA O n) ∈ W.AΔ := by
   intro δ _
@@ -39,12 +43,12 @@ theorem lev_letE' (a : ZMod n) (ζ : LL) : W.lev a ζ (letE a : LetA O n) = 1 :=
   rw [map_sub, map_one, sub_eq_zero] at h
   exact h.symm
 
-theorem lev_letE_mul (a : ZMod n) (ζ : LL) (g : LetA O n) :
-    W.lev a ζ ((letE a : LetA O n) * g) = W.lev a ζ g := by
+theorem lev_letE_mul (a : ZMod n) (ζ : LL) (g : LetA O n)
+    : W.lev a ζ ((letE a : LetA O n) * g) = W.lev a ζ g := by
   rw [map_mul, lev_letE', one_mul]
 
-theorem lev_q_X (a : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p) :
-    ∃ R : PowerSeries LL, constantCoeff R ≠ 0 ∧ W.lev a ζ W.q = X * R := by
+theorem lev_q_X (a : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
+    : ∃ R : PowerSeries LL, constantCoeff R ≠ 0 ∧ W.lev a ζ W.q = X * R := by
   have hζ1 : IsPrimitiveRoot ζ (PD.p ^ 1) := by rwa [pow_one]
   obtain ⟨E, hE0, hED, hE⟩ := W.lev_π a ζ ⟨1, hζ1⟩
   have hq : (letπ : LetA O n) * W.q = (1 + letπ) ^ PD.p - 1 := by
@@ -66,8 +70,9 @@ theorem lev_q_X (a : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p) :
   have hsub : ζ - 1 ≠ 0 := sub_ne_zero.mpr hζne
 
   have h0 := congrArg constantCoeff hL
-  rw [map_mul, map_sub, map_pow, map_one, hF, map_mul, constantCoeff_C, hE0, mul_one, hζp,
-    sub_self, hP0] at h0
+  rw [map_mul, map_sub, map_pow, map_one, hF, map_mul, constantCoeff_C, hE0, mul_one, hζp, sub_self,
+      hP0]
+    at h0
   have hLq0 : constantCoeff Lq = 0 := by
     rcases mul_eq_zero.mp h0 with h | h
     · exact absurd h hsub
@@ -103,8 +108,8 @@ section Div
 
 variable [IsDomain O]
 
-theorem lev_qP_X (hR : ToolsR.RingP W) (a : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p) :
-    ∃ S : PowerSeries LL, constantCoeff S ≠ 0 ∧ W.lev a ζ (qP W) = X * S := by
+theorem lev_qP_X (hR : ToolsR.RingP W) (a : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
+    : ∃ S : PowerSeries LL, constantCoeff S ≠ 0 ∧ W.lev a ζ (qP W) = X * S := by
   obtain ⟨w, hw⟩ := hR.2.2.2.2.1
   rw [ToolsR.eat_qP] at hw
   obtain ⟨R, hR0, hRq⟩ := lev_q_X (W := W) a ζ hζ
@@ -127,14 +132,17 @@ theorem lev_qP_X (hR : ToolsR.RingP W) (a : ZMod n) (ζ : LL) (hζ : IsPrimitive
 
 variable [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
 
-theorem step (hR : ToolsR.RingP W) (hpu : ¬ IsUnit ((PD.p : ℕ) : O))
-    (hinj : Function.Injective (algebraMap O LL)) (a : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
-    (g : LetA O n) (hg : g ∈ W.AΔ) (h0 : coeff 0 (W.lev a ζ g) = 0) :
-    ∃ h ∈ W.AΔ, (letE a : LetA O n) * g = qP W * h := by
+theorem step
+    (hR : ToolsR.RingP W) (hpu : ¬ IsUnit ((PD.p : ℕ) : O))
+    (hinj : Function.Injective (algebraMap O LL))
+    (a : ZMod n)
+    (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
+    (g : LetA O n) (hg : g ∈ W.AΔ) (h0 : coeff 0 (W.lev a ζ g) = 0)
+    : ∃ h ∈ W.AΔ, (letE a : LetA O n) * g = qP W * h := by
   obtain ⟨f, hf, -⟩ := hR.2.1 g hg
   set I : Ideal O := Ideal.span {((PD.p : ℕ) : O)} with hIdef
-  have : Nontrivial (O ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr (by
-    rw [Ne, hIdef, Ideal.span_singleton_eq_top]; exact hpu)
+  have : Nontrivial (O ⧸ I) :=
+    Ideal.Quotient.nontrivial_iff.mpr (by rw [Ne, hIdef, Ideal.span_singleton_eq_top]; exact hpu)
   have hpI : Ideal.Quotient.mk I ((PD.p : ℕ) : O) = 0 :=
     Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self _)
   set D : PowerSeries O := X + C ((PD.p : ℕ) : O) with hD
@@ -154,19 +162,20 @@ theorem step (hR : ToolsR.RingP W) (hpu : ¬ IsUnit ((PD.p : ℕ) : O))
     exact_mod_cast this
   have heq : f a = D * H + (r : PowerSeries O) := HD.eq_mul_add
   have hr : (r : PowerSeries O) = r.coeff 0 • (1 : PowerSeries O) := by
-    have hle : r.degree ≤ 0 := by
-      exact Nat.WithBot.lt_one_iff_le_zero.mp hdeg
+    have hle : r.degree ≤ 0 := by exact Nat.WithBot.lt_one_iff_le_zero.mp hdeg
     conv_lhs => rw [Polynomial.eq_C_of_degree_le_zero hle]
     rw [Polynomial.coe_C, smul_eq_C_mul, mul_one]
   have hDn : D = X + ((PD.p : ℕ) : PowerSeries O) := by rw [hD, map_natCast]
   have ha0 : constantCoeff W.π₀₁ = 0 := ToolsR.π₀₁_cc hR
   have hs0 := HasSubst.of_constantCoeff_zero' ha0
-  have hga : g a = (W.π₀₁ + ((PD.p : ℕ) : PowerSeries O)) * subst W.π₀₁ H +
-      r.coeff 0 • (1 : PowerSeries O) := by
+  have hga
+      : g a
+        = (W.π₀₁ + ((PD.p : ℕ) : PowerSeries O)) * subst W.π₀₁ H
+          + r.coeff 0 • (1 : PowerSeries O) := by
     rw [hf a]
     change subst W.π₀₁ (f a) = _
-    rw [heq, hr, hDn, ← coe_substAlgHom hs0, map_add (f := _), map_mul, map_add (f := _), substAlgHom_X, map_natCast,
-      map_smul, map_one]
+    rw [heq, hr, hDn, ← coe_substAlgHom hs0, map_add (f := _), map_mul, map_add (f := _),
+      substAlgHom_X, map_natCast, map_smul, map_one]
   set h : LetA O n := Pi.single a (subst W.π₀₁ H) with hh
   have key : (letE a : LetA O n) * g = qP W * h + r.coeff 0 • (letE a : LetA O n) := by
     funext i
@@ -178,26 +187,31 @@ theorem step (hR : ToolsR.RingP W) (hpu : ¬ IsUnit ((PD.p : ℕ) : O))
   obtain ⟨S, -, hS⟩ := lev_qP_X hR a ζ hζ
   have hL := congrArg (fun x => coeff 0 (W.lev a ζ x)) key
   simp only [map_add (f := _), map_mul, map_smul, lev_letE', hS, one_mul] at hL
-  rw [h0, mul_assoc, coeff_zero_X_mul, zero_add, coeff_smul, coeff_zero_eq_constantCoeff,
-    map_one, Algebra.smul_def, mul_one] at hL
+  rw [h0, mul_assoc, coeff_zero_X_mul, zero_add, coeff_smul, coeff_zero_eq_constantCoeff, map_one,
+      Algebra.smul_def, mul_one]
+    at hL
   have hc : r.coeff 0 = 0 := hinj (by rw [← hL, map_zero])
   rw [hc, zero_smul, add_zero] at key
   refine ⟨h, ?_, key⟩
-  refine ToolsR.cancel_AΔ (ToolsR.qP_AΔ hR) (fun i hq => by
-    have := congrArg constantCoeff hq
-    simp only [qP, Pi.add_apply, LocWach.π₀, Pi.natCast_apply, map_add (f := _), ToolsR.π₀₁_cc hR, map_natCast,
-      zero_add, map_zero] at this
-    have h1 : ((PD.p : ℕ) : LL) = 0 := by
-      rw [← map_natCast (algebraMap O LL), this, map_zero]
-    have h2 := W.v_l
-    rw [h1, AddValuation.map_zero] at h2
-    exact absurd h2 (by simp)) ?_
+  refine ToolsR.cancel_AΔ (ToolsR.qP_AΔ hR)
+    (fun i hq => by
+      have := congrArg constantCoeff hq
+      simp only [qP, Pi.add_apply, LocWach.π₀, Pi.natCast_apply, map_add (f := _), ToolsR.π₀₁_cc hR,
+          map_natCast, zero_add, map_zero]
+        at this
+      have h1 : ((PD.p : ℕ) : LL) = 0 := by rw [← map_natCast (algebraMap O LL), this, map_zero]
+      have h2 := W.v_l
+      rw [h1, AddValuation.map_zero] at h2
+      exact absurd h2 (by simp))
+    ?_
   rw [← key]
   exact W.AΔ.mul_mem (letE_mem a) hg
 
-theorem divLev_of (hR : ToolsR.RingP W) (hpu : ¬ IsUnit ((PD.p : ℕ) : O))
-    (hinj : Function.Injective (algebraMap O LL)) (a : ZMod n) (ζ : LL)
-    (hζ : IsPrimitiveRoot ζ PD.p) : LevC.DivLev (W := W) a ζ := by
+theorem divLev_of
+    (hR : ToolsR.RingP W) (hpu : ¬ IsUnit ((PD.p : ℕ) : O))
+    (hinj : Function.Injective (algebraMap O LL)) (a : ZMod n)
+    (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
+    : LevC.DivLev (W := W) a ζ := by
   intro g hg k
   induction k generalizing g with
   | zero =>

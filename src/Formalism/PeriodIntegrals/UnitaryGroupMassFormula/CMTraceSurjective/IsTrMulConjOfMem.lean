@@ -42,8 +42,7 @@ theorem isTr_mul_fixed {b s : 𝓞 K} (hb : conj b = b) (hs : IsTr s) : IsTr (b 
 
 def trIdeal (K : Type*) [Field K] [StarRing K] : Ideal (𝓞 K) := Ideal.span {s | IsTr s}
 
-private theorem isTr_mul_conj_add_conj_mul (u v : 𝓞 K) :
-    IsTr (u * conj v + conj u * v) :=
+private theorem isTr_mul_conj_add_conj_mul (u v : 𝓞 K) : IsTr (u * conj v + conj u * v) :=
   ⟨u * conj v, by rw [map_mul, conj_conj]⟩
 
 theorem isTr_mul_conj_of_mem {u : 𝓞 K} (hu : u ∈ trIdeal K) : IsTr (u * conj u) := by
@@ -63,17 +62,16 @@ theorem isTr_mul_conj_of_mem {u : 𝓞 K} (hu : u ∈ trIdeal K) : IsTr (u * con
     convert h using 1
     ring
   | smul a x _ hx =>
-    have hb : conj (a * conj a) = a * conj a := by
-      rw [map_mul, conj_conj, mul_comm]
+    have hb : conj (a * conj a) = a * conj a := by rw [map_mul, conj_conj, mul_comm]
     have h := isTr_mul_fixed hb hx
     rw [smul_eq_mul, map_mul]
     convert h using 1
     ring
 
 theorem trIdeal_eq_top
-    (hP : ∀ P : Ideal (𝓞 K), P.IsMaximal →
-      ∃ θ t : 𝓞 K, algebraMap (𝓞 K) K t = star (algebraMap (𝓞 K) K θ) ∧ θ - t ∉ P) :
-    trIdeal K = ⊤ := by
+    (hP : ∀ P : Ideal (𝓞 K),
+      P.IsMaximal → ∃ θ t : 𝓞 K, algebraMap (𝓞 K) K t = star (algebraMap (𝓞 K) K θ) ∧ θ - t ∉ P)
+    : trIdeal K = ⊤ := by
   by_contra hne
   obtain ⟨P, hPmax, hle⟩ := Ideal.exists_le_maximal _ hne
   obtain ⟨θ, t, ht, hnot⟩ := hP P hPmax
@@ -82,14 +80,12 @@ theorem trIdeal_eq_top
     rw [coe_conj]
     exact ht
   rw [htc] at hnot
-  have h1 : θ + conj θ ∈ P :=
-    hle (Ideal.subset_span (isTr_self θ))
-  have h2 : θ * conj θ + conj (θ * conj θ) ∈ P :=
-    hle (Ideal.subset_span (isTr_self _))
+  have h1 : θ + conj θ ∈ P := hle (Ideal.subset_span (isTr_self θ))
+  have h2 : θ * conj θ + conj (θ * conj θ) ∈ P := hle (Ideal.subset_span (isTr_self _))
   have h3 : (θ - conj θ) ^ 2 ∈ P := by
-    have e : (θ - conj θ) ^ 2 =
-        (θ + conj θ) * (θ + conj θ) -
-          2 * (θ * conj θ + conj (θ * conj θ)) := by
+    have e
+        : (θ - conj θ) ^ 2
+          = (θ + conj θ) * (θ + conj θ) - 2 * (θ * conj θ + conj (θ * conj θ)) := by
       rw [map_mul, conj_conj]
       ring
     rw [e]
@@ -97,9 +93,9 @@ theorem trIdeal_eq_top
   exact hnot (hPmax.isPrime.mem_of_pow_mem 2 h3)
 
 theorem isTr_one
-    (hP : ∀ P : Ideal (𝓞 K), P.IsMaximal →
-      ∃ θ t : 𝓞 K, algebraMap (𝓞 K) K t = star (algebraMap (𝓞 K) K θ) ∧ θ - t ∉ P) :
-    IsTr (1 : 𝓞 K) := by
+    (hP : ∀ P : Ideal (𝓞 K),
+      P.IsMaximal → ∃ θ t : 𝓞 K, algebraMap (𝓞 K) K t = star (algebraMap (𝓞 K) K θ) ∧ θ - t ∉ P)
+    : IsTr (1 : 𝓞 K) := by
   have h1 : (1 : 𝓞 K) ∈ trIdeal K := by
     rw [trIdeal_eq_top hP]
     exact Submodule.mem_top

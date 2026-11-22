@@ -20,9 +20,14 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsSmoothA
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open scoped TensorProduct
 open Classical
 
@@ -30,8 +35,9 @@ noncomputable section
 
 namespace GlobalTheory.GKGenKFin
 
-variable {D : D7} (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) {V : HSp D} {S : D.what₂.Tau → SPar}
-  (M : Formalism.IndefR.Mult.DSModel V S)
+variable
+  {D : D7} (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ))
+  {V : HSp D} {S : D.what₂.Tau → SPar} (M : Formalism.IndefR.Mult.DSModel V S)
 
 def kGrp : Subgroup (GA D V) :=
   Subgroup.closure {k | ∃ τ g, GlobalTheory.CuspGK.InK M τ g ∧ k = atTau θ V τ g}
@@ -47,10 +53,18 @@ theorem rTr_inv_rTr (x : GA D V) (f : GA D V → ℂ) : rTr V x⁻¹ (rTr V x f)
   funext g
   simp only [rTr, inv_mul_cancel_right]
 
-theorem rTr_mem_of_kStable {W : Submodule ℂ (GA D V → ℂ)} (hW : FiniteDimensional ℂ W)
-    (hK : GlobalTheory.KTypeProj.KStable θ M W) {k : GA D V} (hk : k ∈ kGrp θ M) : ∀ f ∈ W, rTr V k f ∈ W := by
-  refine Subgroup.closure_induction (p := fun k _ => ∀ f ∈ W, rTr V k f ∈ W) (fun x hx => ?_) ?_
-    (fun x y _ _ hx hy => ?_) (fun x _ hx => ?_) hk
+theorem rTr_mem_of_kStable
+    {W : Submodule ℂ (GA D V → ℂ)}
+    (hW : FiniteDimensional ℂ W) (hK : GlobalTheory.KTypeProj.KStable θ M W)
+    {k : GA D V} (hk : k ∈ kGrp θ M)
+    : ∀ f ∈ W, rTr V k f ∈ W := by
+  refine Subgroup.closure_induction
+    (p := fun k _ => ∀ f ∈ W, rTr V k f ∈ W)
+    (fun x hx => ?_)
+    ?_
+    (fun x y _ _ hx hy => ?_)
+    (fun x _ hx => ?_)
+    hk
   · obtain ⟨τ, g, hg, rfl⟩ := hx
     exact hK τ g hg
   · intro f hf
@@ -60,7 +74,8 @@ theorem rTr_mem_of_kStable {W : Submodule ℂ (GA D V → ℂ)} (hW : FiniteDime
   · intro f hf
     rw [rTr_mul]
     exact hx _ (hy f hf)
-  · let T : W →ₗ[ℂ] W := ((GlobalTheory.KTypeProj.rTrL x).restrict (p := W) (q := W) fun f hf => hx f hf)
+  · let T : W →ₗ[ℂ] W :=
+      ((GlobalTheory.KTypeProj.rTrL x).restrict (p := W) (q := W) fun f hf => hx f hf)
     have hinj : Function.Injective T := by
       intro a b hab
       apply Subtype.ext
@@ -74,11 +89,11 @@ theorem rTr_mem_of_kStable {W : Submodule ℂ (GA D V → ℂ)} (hW : FiniteDime
     rw [← e, rTr_inv_rTr]
     exact h.2
 
-theorem isKFinite_smul {Φ : GA D V → ℂ} {K : Subgroup (GA D V)} (h : GlobalTheory.Doubling.IsKFinite K Φ) (c : ℂ) :
-    GlobalTheory.Doubling.IsKFinite K (c • Φ) := by
+theorem isKFinite_smul
+    {Φ : GA D V → ℂ} {K : Subgroup (GA D V)} (h : GlobalTheory.Doubling.IsKFinite K Φ) (c : ℂ)
+    : GlobalTheory.Doubling.IsKFinite K (c • Φ) := by
   obtain ⟨W, hW, hm⟩ := GlobalTheory.Doubling.isKFinite_iff.1 h
-  exact GlobalTheory.Doubling.isKFinite_iff.2 ⟨W, hW, fun k hk => by
-    exact W.smul_mem c (hm k hk)⟩
+  exact GlobalTheory.Doubling.isKFinite_iff.2 ⟨W, hW, fun k hk => by exact W.smul_mem c (hm k hk)⟩
 
 def kfinSm (hθ : IsInfFam θ) : Submodule ℂ (GA D V → ℂ) where
   carrier := {x | IsAutFunSm θ V x ∧ GlobalTheory.Doubling.IsKFinite (kGrp θ M) x}
@@ -86,13 +101,21 @@ def kfinSm (hθ : IsInfFam θ) : Submodule ℂ (GA D V → ℂ) where
   add_mem' := fun h h' => ⟨GlobalTheory.Mem.AutSpace.isAutFunSm_add h.1 h'.1, h.2.add h'.2⟩
   smul_mem' := fun c _ h => ⟨GlobalTheory.Mem.AutSpace.isAutFunSm_smul c h.1, isKFinite_smul h.2 c⟩
 
-theorem exists_kStable {x : GA D V → ℂ} (h : GlobalTheory.Doubling.IsKFinite (kGrp θ M) x) :
-    ∃ Y : Submodule ℂ (GA D V → ℂ), FiniteDimensional ℂ Y ∧ x ∈ Y ∧ GlobalTheory.KTypeProj.KStable θ M Y := by
-  refine ⟨GlobalTheory.Doubling.kSpan (kGrp θ M) x, h, Submodule.subset_span ⟨1, one_mem _, funext fun g => by simp⟩, ?_⟩
+theorem exists_kStable {x : GA D V → ℂ} (h : GlobalTheory.Doubling.IsKFinite (kGrp θ M) x)
+    : ∃ Y : Submodule ℂ (GA D V → ℂ),
+      FiniteDimensional ℂ Y ∧ x ∈ Y ∧ GlobalTheory.KTypeProj.KStable θ M Y := by
+  refine ⟨
+    GlobalTheory.Doubling.kSpan (kGrp θ M) x,
+    h,
+    Submodule.subset_span ⟨1, one_mem _, funext fun g => by simp⟩,
+    ?_
+  ⟩
   intro τ g hg f hf
   have ha : atTau θ V τ g ∈ kGrp θ M := Subgroup.subset_closure ⟨τ, g, hg, rfl⟩
-  have hle : GlobalTheory.Doubling.kSpan (kGrp θ M) x ≤
-      (GlobalTheory.Doubling.kSpan (kGrp θ M) x).comap (GlobalTheory.KTypeProj.rTrL (atTau θ V τ g)) := by
+  have hle
+      : GlobalTheory.Doubling.kSpan (kGrp θ M) x
+        ≤ (GlobalTheory.Doubling.kSpan (kGrp θ M) x).comap
+          (GlobalTheory.KTypeProj.rTrL (atTau θ V τ g)) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨k, hk, rfl⟩
     refine Submodule.subset_span ⟨atTau θ V τ g * k, mul_mem ha hk, ?_⟩
@@ -103,21 +126,31 @@ theorem exists_kStable {x : GA D V → ℂ} (h : GlobalTheory.Doubling.IsKFinite
 theorem isGKSub_kfinSm (hθ : IsInfFam θ) : GlobalTheory.CuspGK.IsGKSub θ M (kfinSm θ M hθ) := by
   constructor
   · intro τ g hg f hf
-    exact ⟨GlobalTheory.Mem.RealTranslate.isAutFunSm_rTr_atTau D θ hθ V f hf.1 τ g hg.1,
-      hf.2.translate (Subgroup.subset_closure ⟨τ, g, hg, rfl⟩)⟩
+    exact ⟨
+      GlobalTheory.Mem.RealTranslate.isAutFunSm_rTr_atTau D θ hθ V f hf.1 τ g hg.1,
+      hf.2.translate (Subgroup.subset_closure ⟨τ, g, hg, rfl⟩)
+    ⟩
   · intro τ X hX f hf
-    exact ⟨GlobalTheory.CuspLie.isAutFunSm_Rder hθ hX hf.1,
-      GlobalTheory.CuspLie.isKFinite_Rder hθ hX (kGrp_le θ M) hf.1.smooth hf.2⟩
+    exact ⟨
+      GlobalTheory.CuspLie.isAutFunSm_Rder hθ hX hf.1,
+      GlobalTheory.CuspLie.isKFinite_Rder hθ hX (kGrp_le θ M) hf.1.smooth hf.2
+    ⟩
 
-theorem kFinite_of_mem_gkGen : ∀ {D : D7} (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) {V : HSp D}
-    {S : D.what₂.Tau → SPar} (M : Formalism.IndefR.Mult.DSModel V S), IsInfFam (D := D) θ → ∀ ψ : GA D V → ℂ,
-    IsAutFunSm θ V ψ →
-    (∃ W : Submodule ℂ (GA D V → ℂ), FiniteDimensional ℂ W ∧ ψ ∈ W ∧ GlobalTheory.KTypeProj.KStable θ M W) →
-    ∀ x ∈ GlobalTheory.CuspGK.gkGen θ M ψ, ∃ Y : Submodule ℂ (GA D V → ℂ), FiniteDimensional ℂ Y ∧ x ∈ Y ∧
-      GlobalTheory.KTypeProj.KStable θ M Y := by
+theorem kFinite_of_mem_gkGen
+    : ∀ {D : D7} (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) {V : HSp D}
+        {S : D.what₂.Tau → SPar} (M : Formalism.IndefR.Mult.DSModel V S),
+      IsInfFam (D := D) θ
+        → ∀ ψ : GA D V → ℂ,
+          IsAutFunSm θ V ψ
+            → (∃ W : Submodule ℂ (GA D V → ℂ),
+              FiniteDimensional ℂ W ∧ ψ ∈ W ∧ GlobalTheory.KTypeProj.KStable θ M W)
+            → ∀ x ∈ GlobalTheory.CuspGK.gkGen θ M ψ, ∃ Y : Submodule ℂ (GA D V → ℂ),
+              FiniteDimensional ℂ Y ∧ x ∈ Y ∧ GlobalTheory.KTypeProj.KStable θ M Y := by
   intro D θ V S M hθ ψ hψ ⟨W, hW, hψW, hK⟩ x hx
-  have hm : ψ ∈ kfinSm θ M hθ :=
-    ⟨hψ, GlobalTheory.Doubling.isKFinite_iff.2 ⟨W, hW, fun k hk => rTr_mem_of_kStable θ M hW hK hk ψ hψW⟩⟩
+  have hm : ψ ∈ kfinSm θ M hθ := ⟨
+    hψ,
+    GlobalTheory.Doubling.isKFinite_iff.2 ⟨W, hW, fun k hk => rTr_mem_of_kStable θ M hW hK hk ψ hψW⟩
+  ⟩
   exact exists_kStable θ M (GlobalTheory.CuspGK.gkGen_le θ M hm (isGKSub_kfinSm θ M hθ) hx).2
 
 end GlobalTheory.GKGenKFin

@@ -9,11 +9,12 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace GlobalTheory.CommonDenominatorExistence
 
-theorem exists_common_denominator {E : Type} [Field E] [NumberField E] {r : ℕ}
-    {L : GlobalTheory.SW.Lt E r} (hL : Submodule.FG L) :
-    ∃ (d : NumberField.RingOfIntegers E), d ≠ (0 : NumberField.RingOfIntegers E) ∧
-      ∀ v ∈ L, ∀ (a : Fin r), ∃ (c : NumberField.RingOfIntegers E),
-        (↑c : E) = (↑d : E) * v a := by
+theorem exists_common_denominator
+    {E : Type} [Field E] [NumberField E] {r : ℕ} {L : GlobalTheory.SW.Lt E r} (hL : Submodule.FG L)
+    : ∃ (d : NumberField.RingOfIntegers E),
+      d ≠ (0 : NumberField.RingOfIntegers E)
+        ∧ ∀ v ∈ L, ∀ (a : Fin r), ∃ (c : NumberField.RingOfIntegers E),
+          (↑c : E) = (↑d : E) * v a := by
   obtain ⟨s, rfl⟩ := hL
   choose z hz using fun p : (Fin r → E) × Fin r =>
     IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) (p.1 p.2)
@@ -23,9 +24,11 @@ theorem exists_common_denominator {E : Type} [Field E] [NumberField E] {r : ℕ}
   induction hv using Submodule.span_induction with
   | mem g hg =>
     intro a
-    obtain ⟨e, he⟩ := Finset.dvd_prod_of_mem (fun p => ((z p).2 : NumberField.RingOfIntegers E))
-      (show (g, a) ∈ s ×ˢ (Finset.univ : Finset (Fin r)) from
-        Finset.mem_product.mpr ⟨hg, Finset.mem_univ a⟩)
+    obtain ⟨e, he⟩ :=
+      Finset.dvd_prod_of_mem
+        (fun p => ((z p).2 : NumberField.RingOfIntegers E))
+        (show (g, a) ∈ s ×ˢ (Finset.univ : Finset (Fin r)) from
+          Finset.mem_product.mpr ⟨hg, Finset.mem_univ a⟩)
     refine ⟨e * (z (g, a)).1, ?_⟩
     have h := hz (g, a)
     simp only [← NumberField.RingOfIntegers.coe_eq_algebraMap] at h

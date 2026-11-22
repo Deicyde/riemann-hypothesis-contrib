@@ -19,7 +19,14 @@ namespace GlobalTheory.KummerTwistLemmas
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem twist_places_under_split_coprime_conductor : ∀ {D : Formalism.BasicNotions.D7} {T : Type} {L : Formalism.IndefR.Links.LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} (G : GlobalTheory.ChiGrid.GridData L sc) {μ₀ : T}, L.Is μ₀ → ∀ (t : T), GlobalTheory.CMVal.IsFinSetSplitPlacesCoprimeConductor (GlobalTheory.FunObj.SqNum.condF G.pl) ((GlobalTheory.SqTop.twPl G t).image fun P => P.under (𝓞 D.host.F)) := by
+theorem twist_places_under_split_coprime_conductor
+    : ∀ {D : Formalism.BasicNotions.D7} {T : Type} {L : Formalism.IndefR.Links.LevCh D T}
+        {sc : GlobalTheory.ChiGrid.Consts} (G : GlobalTheory.ChiGrid.GridData L sc) {μ₀ : T},
+      L.Is μ₀
+        → ∀ (t : T),
+          GlobalTheory.CMVal.IsFinSetSplitPlacesCoprimeConductor
+            (GlobalTheory.FunObj.SqNum.condF G.pl)
+            ((GlobalTheory.SqTop.twPl G t).image fun P => P.under (𝓞 D.host.F)) := by
   intro D T L sc G μ₀ hL t q hq
   obtain ⟨P, hP, rfl⟩ := Finset.mem_image.1 hq
   have hP' : P ∈ L.Q t ∧ P ∉ G.pl.W0 := by
@@ -31,7 +38,8 @@ theorem twist_places_under_split_coprime_conductor : ∀ {D : Formalism.BasicNot
   · apply (hL.Q_pl t P hP'.1).2 P hP'.1
     intro c hc
     refine ⟨Formalism.DivisionValues.cO _ c, ?_, rfl⟩
-    have h : Formalism.DivisionValues.cO _ c ∈ (Formalism.DivisionValues.conjPl P).asIdeal := Ideal.mem_map_of_mem _ hc
+    have h : Formalism.DivisionValues.cO _ c ∈ (Formalism.DivisionValues.conjPl P).asIdeal :=
+      Ideal.mem_map_of_mem _ hc
     rwa [← e] at h
   · exact congrArg HeightOneSpectrum.asIdeal (GlobalTheory.TwistTypePlaces.under_conjPl P)
   · have hS : P.under (𝓞 D.host.F) ∉ G.pl.S0 := by
@@ -45,6 +53,8 @@ theorem twist_places_under_split_coprime_conductor : ∀ {D : Formalism.BasicNot
     rw [if_neg hS] at h0
     have hne : GlobalTheory.FunObj.SqNum.condF G.pl ≠ 0 :=
       Finset.prod_ne_zero_iff.2 fun u _ => pow_ne_zero _ u.ne_bot
-    exact (multiplicity_eq_zero (FiniteMultiplicity.of_prime_left (P.under (𝓞 D.host.F)).prime hne)).1 h0
+    exact
+      (multiplicity_eq_zero (FiniteMultiplicity.of_prime_left (P.under (𝓞 D.host.F)).prime hne)).1
+        h0
 
 end GlobalTheory.KummerTwistLemmas

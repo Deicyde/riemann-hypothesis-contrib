@@ -8,8 +8,10 @@ set_option autoImplicit false
 
 namespace CrystallineSemistableComparison.Pb.EtaleIntegralityFacts
 
-theorem irreducibleSpace_of_connected_of_locally {α : Type*} [TopologicalSpace α] [ConnectedSpace α]
-    (h : ∀ x : α, ∃ U : Set α, IsOpen U ∧ x ∈ U ∧ IsIrreducible U) : IrreducibleSpace α := by
+theorem irreducibleSpace_of_connected_of_locally
+    {α : Type*} [TopologicalSpace α] [ConnectedSpace α]
+    (h : ∀ x : α, ∃ U : Set α, IsOpen U ∧ x ∈ U ∧ IsIrreducible U)
+    : IrreducibleSpace α := by
   obtain ⟨x₀⟩ := (inferInstance : Nonempty α)
   have hopen : IsOpen (irreducibleComponent x₀) := by
     rw [isOpen_iff_forall_mem_open]

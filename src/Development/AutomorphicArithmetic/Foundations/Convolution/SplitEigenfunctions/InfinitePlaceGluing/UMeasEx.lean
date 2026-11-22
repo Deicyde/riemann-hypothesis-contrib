@@ -49,7 +49,8 @@ private lemma measurableSet_UU : MeasurableSet (UU : Set (IdeleGroup ℚ)) := by
   exact (isClosed_eq (IdeleGroup.continuous_toInfinite ℚ) continuous_const).measurableSet.inter
     ((isOpen_finiteIntegralUnits ℚ).preimage (IdeleGroup.continuous_toFinite ℚ)).measurableSet
 
-private noncomputable def ef (x : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) : IdeleGroup ℚ := (IdeleGroup.prodEquiv ℚ).symm (1, x)
+private noncomputable def ef (x : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) : IdeleGroup ℚ :=
+  (IdeleGroup.prodEquiv ℚ).symm (1, x)
 
 private lemma measurable_ef : Measurable ef :=
   ((map_continuous (IdeleGroup.prodEquiv ℚ).symm).comp (continuous_const.prodMk continuous_id)).measurable
@@ -70,13 +71,13 @@ private lemma mul_ef {t : IdeleGroup ℚ} (h : IdeleGroup.toInfinite ℚ t = 1) 
   · change IdeleGroup.toFinite ℚ t * IdeleGroup.toFinite ℚ (ef x) = IdeleGroup.toFinite ℚ (ef _)
     rw [toFinite_ef, toFinite_ef]
 
-theorem uMeasEx_of :
-    UMeasEx := by
+theorem uMeasEx_of : UMeasEx := by
   have hU : MeasurableSet (finiteIntegralUnits ℚ : Set (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) :=
     (isOpen_finiteIntegralUnits ℚ).measurableSet
   refine ⟨⟨((finiteIdeleMeasure ℚ).restrict (finiteIntegralUnits ℚ)).map ef, ⟨?_⟩, ?_, ?_⟩⟩
   · rw [Measure.map_apply measurable_ef MeasurableSet.univ, Set.preimage_univ,
-      Measure.restrict_apply MeasurableSet.univ, Set.univ_inter, finiteIdeleMeasure_finiteIntegralUnits]
+      Measure.restrict_apply MeasurableSet.univ, Set.univ_inter,
+      finiteIdeleMeasure_finiteIntegralUnits]
   · rw [Measure.map_apply measurable_ef measurableSet_UU.compl,
       Measure.restrict_apply (measurable_ef measurableSet_UU.compl)]
     convert measure_empty (μ := finiteIdeleMeasure ℚ)
@@ -87,16 +88,22 @@ theorem uMeasEx_of :
     exact hx ((mem_UU_iff _).2 ⟨toInfinite_ef x, by rwa [toFinite_ef]⟩)
   · intro t ht
     obtain ⟨h1, h2⟩ := (mem_UU_iff t).1 ht
-    have hg := (measurePreserving_mul_left (finiteIdeleMeasure ℚ) (IdeleGroup.toFinite ℚ t)).restrict_preimage hU
-    have hpre : (fun x => IdeleGroup.toFinite ℚ t * x) ⁻¹'
-        (finiteIntegralUnits ℚ : Set (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) = finiteIntegralUnits ℚ := by
+    have hg :=
+      (measurePreserving_mul_left (finiteIdeleMeasure ℚ)
+        (IdeleGroup.toFinite ℚ t)).restrict_preimage hU
+    have hpre
+        : (fun x => IdeleGroup.toFinite ℚ t * x)
+            ⁻¹' (finiteIntegralUnits ℚ : Set (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ)
+          = finiteIntegralUnits ℚ := by
       ext x
       exact (finiteIntegralUnits ℚ).mul_mem_cancel_left h2
     rw [hpre] at hg
     have hf : Measurable fun x : IdeleGroup ℚ => (t * x : (A ℚ)ˣ) :=
       (continuous_const.mul continuous_id).measurable
     rw [Measure.map_map hf measurable_ef]
-    have hc : (fun x : IdeleGroup ℚ => (t * x : (A ℚ)ˣ)) ∘ ef = ef ∘ fun x => IdeleGroup.toFinite ℚ t * x := by
+    have hc
+        : (fun x : IdeleGroup ℚ => (t * x : (A ℚ)ˣ)) ∘ ef
+          = ef ∘ fun x => IdeleGroup.toFinite ℚ t * x := by
       funext x
       exact mul_ef h1 x
     rw [hc, ← Measure.map_map measurable_ef hg.measurable, hg.map_eq]

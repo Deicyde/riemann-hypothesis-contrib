@@ -8,7 +8,9 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProo
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 noncomputable section
@@ -17,18 +19,23 @@ namespace GlobalTheory.InducedType
 
 open Formalism.FrobeniusOrbits Formalism.MainNotions.UnusedSlot33.HK
 
-theorem sigmaOf_mul {R : Ranks} (H : Host R) (g g' : R.GG) :
-    H.sigmaOf (g * g') = H.sigmaOf g * H.sigmaOf g' := map_mul (H.gal).symm g g'
+theorem sigmaOf_mul {R : Ranks} (H : Host R) (g g' : R.GG)
+    : H.sigmaOf (g * g') = H.sigmaOf g * H.sigmaOf g' :=
+  map_mul (H.gal).symm g g'
 
 theorem sigmaOf_one {R : Ranks} (H : Host R) : H.sigmaOf 1 = 1 := map_one (H.gal).symm
 
-theorem emb_apply {R : Ranks} (H : Host R) (g : R.GG) (x : H.E) : H.emb g x = H.φ₀ (H.sigmaOf g x) := rfl
+theorem emb_apply {R : Ranks} (H : Host R) (g : R.GG) (x : H.E)
+    : H.emb g x = H.φ₀ (H.sigmaOf g x) :=
+  rfl
 
-def galK {R : Ranks} (H : Host R) (g : R.Psi) : H.E ≃ₐ[H.K] H.E :=
-  { (H.sigmaOf g : H.E ≃+* H.E) with
-    commutes' := fun a => sigmaOf_fix_K H g g.2 a a.2 }
+def galK {R : Ranks} (H : Host R) (g : R.Psi) : H.E ≃ₐ[H.K] H.E := {
+  (H.sigmaOf g : H.E ≃+* H.E) with
+  commutes' := fun a => sigmaOf_fix_K H g g.2 a a.2
+}
 
-theorem galK_apply {R : Ranks} (H : Host R) (g : R.Psi) (x : H.E) : galK H g x = H.sigmaOf g x := rfl
+theorem galK_apply {R : Ranks} (H : Host R) (g : R.Psi) (x : H.E) : galK H g x = H.sigmaOf g x :=
+  rfl
 
 theorem galK_bijective {R : Ranks} (H : Host R) : Function.Bijective (galK H) := by
   constructor
@@ -54,8 +61,8 @@ theorem sum_eq_trace (D : D7) : TraceMapNormalisation D := fun y => by
   change _ = D.host.φ₀ (algebraMap D.host.K D.host.E _)
   set_option synthInstance.maxHeartbeats 100000 in
     rw [h, map_sum]
-  exact Fintype.sum_bijective (galK D.host ∘ D.eTau) ((galK_bijective D.host).comp D.eTau.bijective) _ _
-    (fun τ => rfl)
+  exact Fintype.sum_bijective (galK D.host ∘ D.eTau) ((galK_bijective D.host).comp D.eTau.bijective)
+    _ _ (fun τ => rfl)
 
 theorem permutes (D : D7) : EmbeddingPermutesTypes D := fun M ρ hK hM => by
   have h0 : ∀ x, D.host.φ₀ x ∈ M := fun x => by
@@ -76,7 +83,7 @@ theorem permutes (D : D7) : EmbeddingPermutesTypes D := fun M ρ hK hM => by
     Equiv.coe_mulLeft, Subgroup.coe_mul, emb_apply, emb_apply, sigmaOf_mul]
   rfl
 
-theorem induced_type : ∀ D : D7, admG1 D ∧ EmbeddingPermutesTypes D :=
-  fun D => ⟨⟨restrict_K D, sum_eq_trace D⟩, permutes D⟩
+theorem induced_type : ∀ D : D7, admG1 D ∧ EmbeddingPermutesTypes D := fun D =>
+  ⟨⟨restrict_K D, sum_eq_trace D⟩, permutes D⟩
 
 end GlobalTheory.InducedType

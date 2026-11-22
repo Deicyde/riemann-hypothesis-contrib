@@ -16,72 +16,87 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 open MvPolynomial
 open ReciprocityTheory.ChartRestriction.G.Geo (ChartBundle chartRing div_mem_chartRing)
-open IndefiniteRowSideFullHecke.NumbersDVR.Bundles (mseg joinCoord restrictChart chartMon IsGradedFrame IsUnitOn FlagPair IsPull
-  IsVertDiv mcIdeal assocDeg assocVar joinCoord_assocVar)
+open IndefiniteRowSideFullHecke.NumbersDVR.Bundles
+  (mseg joinCoord restrictChart chartMon IsGradedFrame IsUnitOn FlagPair IsPull IsVertDiv mcIdeal
+    assocDeg assocVar joinCoord_assocVar)
 
 namespace FlagPairJoinLeft
 
 section Charts
 
-variable {Ω : Type*} [Field Ω] {K K' K₂ : Type} [Fintype K] [Fintype K'] [Fintype K₂]
+variable
+  {Ω : Type*} [Field Ω]
+  {K K' K₂ : Type} [Fintype K] [Fintype K'] [Fintype K₂]
   {ι : K → Type} {ι' : K' → Type} {ι₂ : K₂ → Type}
 
-def lowChart (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k) : ∀ k : K ⊕ K', Sum.elim ι ι' k
+def lowChart (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k)
+    : ∀ k : K ⊕ K', Sum.elim ι ι' k
   | .inl k => s (.inl k)
   | .inr k => s (.inr (.inl k))
 
-def wChart (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k) : ∀ k, ι₂ k :=
-  fun k => s (.inr (.inr k))
+def wChart (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k) : ∀ k, ι₂ k := fun k =>
+  s (.inr (.inr k))
 
-def combChart (t : ∀ k : K ⊕ K', Sum.elim ι ι' k) (u : ∀ k, ι₂ k) :
-    ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k
+def combChart (t : ∀ k : K ⊕ K', Sum.elim ι ι' k) (u : ∀ k, ι₂ k)
+    : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k
   | .inl k => t (.inl k)
   | .inr (.inl k) => t (.inr k)
   | .inr (.inr k) => u k
 
-theorem lowChart_combChart (t : ∀ k : K ⊕ K', Sum.elim ι ι' k) (u : ∀ k, ι₂ k) :
-    lowChart (combChart t u) = t := by
+theorem lowChart_combChart (t : ∀ k : K ⊕ K', Sum.elim ι ι' k) (u : ∀ k, ι₂ k)
+    : lowChart (combChart t u) = t := by
   funext k
   rcases k with k | k <;> rfl
 
-theorem wChart_combChart (t : ∀ k : K ⊕ K', Sum.elim ι ι' k) (u : ∀ k, ι₂ k) :
-    wChart (combChart t u) = u :=
+theorem wChart_combChart (t : ∀ k : K ⊕ K', Sum.elim ι ι' k) (u : ∀ k, ι₂ k)
+    : wChart (combChart t u) = u :=
   rfl
 
-theorem mseg_assoc (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
-    (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k) :
-    mseg (joinCoord x (joinCoord z w)) s = mseg (joinCoord x z) (lowChart s) * mseg w (wChart s) := by
+theorem mseg_assoc
+    (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
+    (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k)
+    : mseg (joinCoord x (joinCoord z w)) s
+      = mseg (joinCoord x z) (lowChart s) * mseg w (wChart s) := by
   simp only [mseg, Fintype.prod_sum_type, mul_assoc]
   rfl
 
-theorem mseg_low_ne (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
-    {s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k} (hs : mseg (joinCoord x (joinCoord z w)) s ≠ 0) :
-    mseg (joinCoord x z) (lowChart s) ≠ 0 := by
+theorem mseg_low_ne
+    (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
+    {s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k}
+    (hs : mseg (joinCoord x (joinCoord z w)) s ≠ 0)
+    : mseg (joinCoord x z) (lowChart s) ≠ 0 := by
   rw [mseg_assoc] at hs
   exact left_ne_zero_of_mul hs
 
-theorem chartMon_assoc (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
-    (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k) (a : K ⊕ K' → ℤ) :
-    chartMon (joinCoord x (joinCoord z w)) s (assocDeg (K₂ := K₂) a) = chartMon (joinCoord x z) (lowChart s) a := by
-  simp only [chartMon, Fintype.prod_sum_type, assocDeg, Sum.elim_inl, Sum.elim_inr, Pi.zero_apply, zpow_zero,
-    Finset.prod_const_one, mul_one]
+theorem chartMon_assoc
+    (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
+    (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k) (a : K ⊕ K' → ℤ)
+    : chartMon (joinCoord x (joinCoord z w)) s (assocDeg (K₂ := K₂) a)
+      = chartMon (joinCoord x z) (lowChart s) a := by
+  simp only [chartMon, Fintype.prod_sum_type, assocDeg, Sum.elim_inl, Sum.elim_inr, Pi.zero_apply,
+    zpow_zero, Finset.prod_const_one, mul_one]
   rfl
 
 variable (O : Type*) [CommRing O] [Algebra O Ω]
 
-theorem chartRing_le (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
-    (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k) (hs : mseg (joinCoord x (joinCoord z w)) s ≠ 0) :
-    chartRing O (mseg (joinCoord x z)) (lowChart s) ≤ chartRing O (mseg (joinCoord x (joinCoord z w))) s := by
+theorem chartRing_le
+    (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
+    (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k)
+    (hs : mseg (joinCoord x (joinCoord z w)) s ≠ 0)
+    : chartRing O (mseg (joinCoord x z)) (lowChart s)
+      ≤ chartRing O (mseg (joinCoord x (joinCoord z w))) s := by
   have hw : mseg w (wChart s) ≠ 0 := by
     rw [mseg_assoc] at hs
     exact right_ne_zero_of_mul hs
   unfold chartRing
   apply Algebra.adjoin_le
   rintro _ ⟨t, rfl⟩
-  have h : mseg (joinCoord x z) t / mseg (joinCoord x z) (lowChart s) =
-      mseg (joinCoord x (joinCoord z w)) (combChart t (wChart s)) / mseg (joinCoord x (joinCoord z w)) s := by
-    rw [mseg_assoc x z w (combChart t (wChart s)), mseg_assoc x z w s, lowChart_combChart, wChart_combChart,
-      mul_div_mul_right _ _ hw]
+  have h
+      : mseg (joinCoord x z) t / mseg (joinCoord x z) (lowChart s)
+        = mseg (joinCoord x (joinCoord z w)) (combChart t (wChart s))
+          / mseg (joinCoord x (joinCoord z w)) s := by
+    rw [mseg_assoc x z w (combChart t (wChart s)), mseg_assoc x z w s, lowChart_combChart,
+      wChart_combChart, mul_div_mul_right _ _ hw]
   simp only
   rw [h]
   exact div_mem_chartRing (o := O) _ _ _
@@ -93,8 +108,9 @@ section Lattices
 variable (O : Type*) [CommRing O] {Ω : Type*} [Field Ω] [Algebra O Ω]
 variable {V : Type*} [AddCommGroup V] [Module Ω V]
 
-def satLat (R : Subalgebra O Ω) (L : AddSubgroup V) (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) (f : Ω) (hf : f ∈ R) :
-    AddSubgroup V where
+def satLat
+    (R : Subalgebra O Ω) (L : AddSubgroup V) (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) (f : Ω) (hf : f ∈ R)
+    : AddSubgroup V where
   carrier := {e | ∃ n : ℕ, f ^ n • e ∈ L}
   zero_mem' := ⟨0, by simp⟩
   add_mem' := by
@@ -132,28 +148,39 @@ end Lattices
 
 section Bundles
 
-variable (O : Type*) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {Ω : Type*} [Field Ω] [Algebra O Ω]
-variable {K K' K₂ : Type} [Fintype K] [Fintype K'] [Fintype K₂] {ι : K → Type} {ι' : K' → Type} {ι₂ : K₂ → Type}
+variable
+  (O : Type*) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {Ω : Type*} [Field Ω] [Algebra O Ω]
+variable
+  {K K' K₂ : Type} [Fintype K] [Fintype K'] [Fintype K₂]
+  {ι : K → Type} {ι' : K' → Type} {ι₂ : K₂ → Type}
   [∀ k, Fintype (ι k)] [∀ k, Fintype (ι' k)] [∀ k, Fintype (ι₂ k)]
 variable {N : ℕ} {V : Type*} [AddCommGroup V] [Module Ω V]
 
-theorem lat_le (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω) {E : ChartBundle O (mseg x) N V}
-    {EF : ChartBundle O (mseg (joinCoord x z)) N V} {EB : ChartBundle O (mseg (joinCoord x (joinCoord z w))) N V}
+theorem lat_le
+    (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
+    {E : ChartBundle O (mseg x) N V} {EF : ChartBundle O (mseg (joinCoord x z)) N V}
+    {EB : ChartBundle O (mseg (joinCoord x (joinCoord z w))) N V}
     (hF : IsPull O x z E EF) (hB : IsPull O x (joinCoord z w) E EB)
-    (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k) (hs : mseg (joinCoord x (joinCoord z w)) s ≠ 0) :
-    EF.lat (lowChart s) ≤ EB.lat s := by
+    (s : ∀ k : K ⊕ (K' ⊕ K₂), Sum.elim ι (Sum.elim ι' ι₂) k)
+    (hs : mseg (joinCoord x (joinCoord z w)) s ≠ 0)
+    : EF.lat (lowChart s) ≤ EB.lat s := by
   rw [hF _ (mseg_low_ne x z w hs), hB s hs]
   apply AddSubgroup.closure_mono
   rintro _ ⟨a, ha, e, he, rfl⟩
   exact ⟨a, chartRing_le O x z w s hs ha, e, he, rfl⟩
 
-theorem isGradedFrame_assoc (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
+theorem isGradedFrame_assoc
+    (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω)
+    (w : (Σ k, ι₂ k) → Ω)
     {E : ChartBundle O (mseg x) N V} {EF : ChartBundle O (mseg (joinCoord x z)) N V}
     {EB : ChartBundle O (mseg (joinCoord x (joinCoord z w))) N V}
     (hF : IsPull O x z E EF) (hB : IsPull O x (joinCoord z w) E EB)
     {Vs : Fin (N + 1) → Submodule Ω V} {m : Fin N → K ⊕ K' → ℤ} {gen : Fin N → V}
-    (h : IsGradedFrame O (joinCoord x z) EF Vs m gen) :
-    IsGradedFrame O (joinCoord x (joinCoord z w)) EB Vs (fun i => assocDeg (K₂ := K₂) (m i)) gen := by
+    (h : IsGradedFrame O (joinCoord x z) EF Vs m gen)
+    : IsGradedFrame O (joinCoord x (joinCoord z w)) EB Vs
+      (fun i => assocDeg (K₂ := K₂) (m i))
+      gen := by
   intro s hs
   have hle := chartRing_le O x z w s hs
   have hlat := lat_le O x z w hF hB s hs
@@ -161,7 +188,10 @@ theorem isGradedFrame_assoc (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω)
   refine ⟨k, f, c, fun l => hle (hf l), fun l => hle (hc l), hsum, fun l => ?_⟩
   obtain ⟨b, hli, hspan, hiff, hwl⟩ := hl l
   refine ⟨b, hli, hspan, fun e => ?_, fun i => ?_⟩
-  · have hgen : EB.lat s ≤ coordLat O (chartRing O (mseg (joinCoord x (joinCoord z w))) s) (f l) (hle (hf l)) b := by
+  · have hgen
+        : EB.lat s
+          ≤ coordLat O (chartRing O (mseg (joinCoord x (joinCoord z w))) s) (f l) (hle (hf l))
+            b := by
       rw [hB s hs, AddSubgroup.closure_le]
       rintro _ ⟨a, ha, e', he', rfl⟩
       have he'F : e' ∈ EF.lat (lowChart s) := by
@@ -190,17 +220,22 @@ theorem isGradedFrame_assoc (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω)
             field_simp
           rw [h']
           exact hn'
-        · calc e = (f l ^ n)⁻¹ • (f l ^ n • e) := by rw [smul_smul, inv_mul_cancel₀ hfn, one_smul]
+        · calc
+            e = (f l ^ n)⁻¹ • (f l ^ n • e) := by rw [smul_smul, inv_mul_cancel₀ hfn, one_smul]
             _ = ∑ q, (a q / f l ^ n) • b q := by
               rw [he, Finset.smul_sum]
               simp_rw [smul_smul, div_eq_inv_mul]
     · rintro ⟨a, ha, rfl⟩
-      have hS : ∀ q, a q • b q ∈ satLat O (chartRing O (mseg (joinCoord x (joinCoord z w))) s) (EB.lat s)
-          (EB.stable s) (f l) (hle (hf l)) := by
+      have hS
+          : ∀ q,
+            a q • b q ∈ satLat O (chartRing O (mseg (joinCoord x (joinCoord z w))) s) (EB.lat s)
+              (EB.stable s) (f l) (hle (hf l)) := by
         intro q
         obtain ⟨n, hn⟩ := ha q
-        have hsingle : ∀ q', ∃ n : ℕ, f l ^ n * (Pi.single q (1 : Ω) : Fin N → Ω) q' ∈
-            chartRing O (mseg (joinCoord x z)) (lowChart s) := by
+        have hsingle
+            : ∀ q', ∃ n : ℕ,
+              f l ^ n * (Pi.single q (1 : Ω) : Fin N → Ω) q'
+                ∈ chartRing O (mseg (joinCoord x z)) (lowChart s) := by
           intro q'
           refine ⟨0, ?_⟩
           rw [pow_zero, one_mul]
@@ -208,7 +243,8 @@ theorem isGradedFrame_assoc (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω)
           · subst hq
             simp
           · simp [hq]
-        obtain ⟨m', hm'⟩ := (hiff (b q)).2 ⟨Pi.single q 1, hsingle, by simp [Pi.single_apply, ite_smul]⟩
+        obtain ⟨m', hm'⟩ :=
+          (hiff (b q)).2 ⟨Pi.single q 1, hsingle, by simp [Pi.single_apply, ite_smul]⟩
         refine ⟨n + m', ?_⟩
         have h' : f l ^ (n + m') • (a q • b q) = (f l ^ n * a q) • (f l ^ m' • b q) := by
           rw [smul_smul, smul_smul]
@@ -229,14 +265,16 @@ section Forms
 variable {O : Type*} [CommRing O] {Ω : Type*} [Field Ω] [Algebra O Ω]
 variable {K K' K₂ : Type} {ι : K → Type} {ι' : K' → Type} {ι₂ : K₂ → Type}
 
-theorem aeval_assoc (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
-    (f : MvPolynomial (Σ k : K ⊕ K', Sum.elim ι ι' k) O) :
-    aeval (joinCoord x (joinCoord z w)) (rename (assocVar ι₂) f) = aeval (joinCoord x z) f := by
-  have h : joinCoord x (joinCoord z w) ∘ assocVar ι₂ = joinCoord x z := funext (joinCoord_assocVar x z w)
+theorem aeval_assoc
+    (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
+    (f : MvPolynomial (Σ k : K ⊕ K', Sum.elim ι ι' k) O)
+    : aeval (joinCoord x (joinCoord z w)) (rename (assocVar ι₂) f) = aeval (joinCoord x z) f := by
+  have h : joinCoord x (joinCoord z w) ∘ assocVar ι₂ = joinCoord x z :=
+    funext (joinCoord_assocVar x z w)
   rw [aeval_rename, h]
 
-theorem assocDeg_sub (a b : K ⊕ K' → ℤ) :
-    assocDeg (K₂ := K₂) (a - b) = assocDeg (K₂ := K₂) a - assocDeg (K₂ := K₂) b := by
+theorem assocDeg_sub (a b : K ⊕ K' → ℤ)
+    : assocDeg (K₂ := K₂) (a - b) = assocDeg (K₂ := K₂) a - assocDeg (K₂ := K₂) b := by
   funext k
   rcases k with k | k | k <;> simp [assocDeg]
 
@@ -244,20 +282,26 @@ end Forms
 
 section Pairs
 
-variable (O : Type*) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {Ω : Type*} [Field Ω] [Algebra O Ω]
-variable {K K' K₂ : Type} [Fintype K] [Fintype K'] [Fintype K₂] {ι : K → Type} {ι' : K' → Type} {ι₂ : K₂ → Type}
+variable
+  (O : Type*) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {Ω : Type*} [Field Ω] [Algebra O Ω]
+variable
+  {K K' K₂ : Type} [Fintype K] [Fintype K'] [Fintype K₂]
+  {ι : K → Type} {ι' : K' → Type} {ι₂ : K₂ → Type}
   [∀ k, Fintype (ι k)] [∀ k, Fintype (ι' k)] [∀ k, Fintype (ι₂ k)]
 variable {N : ℕ} {V : Type*} [AddCommGroup V] [Module Ω V]
 
-def assocFlagPair (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
+def assocFlagPair
+    (x : (Σ k, ι k) → Ω) (z : (Σ k, ι' k) → Ω) (w : (Σ k, ι₂ k) → Ω)
     {E E' : ChartBundle O (mseg x) N V} {EF E'F : ChartBundle O (mseg (joinCoord x z)) N V}
     {EB E'B : ChartBundle O (mseg (joinCoord x (joinCoord z w))) N V}
-    (hF : IsPull O x z E EF) (hF' : IsPull O x z E' E'F)
-    (hB : IsPull O x (joinCoord z w) E EB) (hB' : IsPull O x (joinCoord z w) E' E'B)
-    (φ : FlagPair O (joinCoord x z) EF E'F)
-    (hvert : ∀ i, IsVertDiv O (mcIdeal O (joinCoord x (joinCoord z w)))
-      (assocDeg (K₂ := K₂) (φ.deg i - φ.deg' i)) (rename (assocVar ι₂) (φ.f i)) (rename (assocVar ι₂) (φ.g i))) :
-    FlagPair O (joinCoord x (joinCoord z w)) EB E'B where
+    (hF : IsPull O x z E EF) (hF' : IsPull O x z E' E'F) (hB : IsPull O x (joinCoord z w) E EB)
+    (hB' : IsPull O x (joinCoord z w) E' E'B) (φ : FlagPair O (joinCoord x z) EF E'F)
+    (hvert : ∀ i,
+      IsVertDiv O (mcIdeal O (joinCoord x (joinCoord z w)))
+        (assocDeg (K₂ := K₂) (φ.deg i - φ.deg' i)) (rename (assocVar ι₂) (φ.f i))
+        (rename (assocVar ι₂) (φ.g i)))
+    : FlagPair O (joinCoord x (joinCoord z w)) EB E'B where
   Vs := φ.Vs
   mono := φ.mono
   dim := φ.dim
@@ -283,11 +327,19 @@ end Pairs
 
 end FlagPairJoinLeft
 
-
 open FlagPairJoinLeft in
-theorem FlagPairJoinLeft.proof (hVert : JoinVerticalDivisorLeft.Statement) : FlagPairJoinLeft.Statement := by
+theorem FlagPairJoinLeft.proof (hVert : JoinVerticalDivisorLeft.Statement)
+    : FlagPairJoinLeft.Statement := by
   intro O _ _ _ Ω _ _ K _ ι _ x K' _ ι' _ z K₂ _ ι₂ _ w N V _ _ E E' EF E'F hF hF' φ EB E'B hB hB'
-  exact ⟨assocFlagPair O x z w hF hF' hB hB' φ fun i => hVert O Ω K ι x K' ι' z K₂ ι₂ w _ _ _ (φ.vert i),
-    rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+  exact ⟨
+    assocFlagPair O x z w hF hF' hB hB' φ fun i => hVert O Ω K ι x K' ι' z K₂ ι₂ w _ _ _ (φ.vert i),
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl
+  ⟩
 
 end GroundTheory.Heights₂.Heights.NumbersDVR

@@ -11,11 +11,19 @@ namespace GlobalTheory.ShuffleCount
 
 open MvPolynomial
 
-private theorem aeval_killCompl {S B : Type*} [CommRing B] [Algebra ℚ B] (U : Set S)
-    (φ : S → B) (h0 : ∀ Δ ∉ U, φ Δ = 0) (P : MvPolynomial S ℚ) :
-    aeval (fun Δ : U => φ Δ) (killCompl (R := ℚ) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)) P) = aeval φ P := by
+private theorem aeval_killCompl
+    {S B : Type*} [CommRing B] [Algebra ℚ B]
+    (U : Set S) (φ : S → B) (h0 : ∀ Δ ∉ U, φ Δ = 0)
+    (P : MvPolynomial S ℚ)
+    : aeval
+        (fun Δ : U => φ Δ)
+        (killCompl (R := ℚ) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)) P)
+      = aeval φ P := by
   classical
-  have key : (aeval (fun Δ : U => φ Δ)).comp (killCompl (R := ℚ) (Subtype.val_injective : Function.Injective (Subtype.val : U → S))) = aeval φ := by
+  have key
+      : (aeval (fun Δ : U => φ Δ)).comp
+          (killCompl (R := ℚ) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)))
+        = aeval φ := by
     apply MvPolynomial.algHom_ext
     intro Δ
     by_cases hΔ : Δ ∈ U
@@ -23,23 +31,33 @@ private theorem aeval_killCompl {S B : Type*} [CommRing B] [Algebra ℚ B] (U : 
       rw [AlgHom.comp_apply]
       conv_lhs => rw [hX]
       rw [killCompl_rename_app, aeval_X, aeval_X]
-    · rw [AlgHom.comp_apply, aeval_X, h0 Δ hΔ, X, killCompl_monomial_eq_zero_of_not_subset, map_zero]
+    · rw [AlgHom.comp_apply, aeval_X, h0 Δ hΔ, X, killCompl_monomial_eq_zero_of_not_subset,
+        map_zero]
       intro h
       obtain ⟨⟨_, hmem⟩, rfl⟩ := h (by simp : Δ ∈ (↑(Finsupp.single Δ 1).support : Set S))
       exact hΔ hmem
   exact AlgHom.congr_fun key P
 
-private theorem coeff_killCompl_comapDomain {S : Type*} (U : Set S) (P : MvPolynomial S ℚ) (m : S →₀ ℕ)
-    (hm : ↑m.support ⊆ Set.range (Subtype.val : U → S)) :
-    AddMonoidAlgebra.coeff (killCompl (R := ℚ) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)) P)
-      (m.comapDomain (Subtype.val : U → S) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)).injOn) = AddMonoidAlgebra.coeff P m := by
+private theorem coeff_killCompl_comapDomain
+    {S : Type*} (U : Set S) (P : MvPolynomial S ℚ) (m : S →₀ ℕ)
+    (hm : ↑m.support ⊆ Set.range (Subtype.val : U → S))
+    : AddMonoidAlgebra.coeff
+        (killCompl (R := ℚ) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)) P)
+        (m.comapDomain (Subtype.val : U → S)
+          (Subtype.val_injective : Function.Injective (Subtype.val : U → S)).injOn)
+      = AddMonoidAlgebra.coeff P m := by
   classical
   induction P using MvPolynomial.induction_on' with
   | monomial n r =>
     by_cases hn : ↑n.support ⊆ Set.range (Subtype.val : U → S)
-    · rw [killCompl_monomial_eq_monomial_comapDomain_of_subset _ _ hn, coeff_monomial, coeff_monomial]
-      have hiff : n.comapDomain (Subtype.val : U → S) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)).injOn =
-          m.comapDomain (Subtype.val : U → S) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)).injOn ↔ n = m := by
+    · rw [killCompl_monomial_eq_monomial_comapDomain_of_subset _ _ hn, coeff_monomial,
+        coeff_monomial]
+      have hiff
+          : n.comapDomain (Subtype.val : U → S)
+                (Subtype.val_injective : Function.Injective (Subtype.val : U → S)).injOn
+              = m.comapDomain (Subtype.val : U → S)
+                (Subtype.val_injective : Function.Injective (Subtype.val : U → S)).injOn
+            ↔ n = m := by
         constructor
         · intro h
           rw [← Finsupp.mapDomain_comapDomain _ Subtype.val_injective n hn,
@@ -55,21 +73,41 @@ private theorem coeff_killCompl_comapDomain {S : Type*} (U : Set S) (P : MvPolyn
       · rfl
   | add P Q hP hQ => rw [map_add (f := _), MvPolynomial.coeff_add, MvPolynomial.coeff_add, hP, hQ]
 
-theorem coeff_eq_zero_of_aeval_eq_zero {S B : Type*} [CommRing B] [Algebra ℚ B] (U : Set S)
-    (φ : S → B) (hind : AlgebraicIndependent ℚ (fun Δ : U => φ Δ)) (h0 : ∀ Δ ∉ U, φ Δ = 0)
-    (P : MvPolynomial S ℚ) (hP : aeval φ P = 0) (m : S →₀ ℕ) (hm : ∀ Δ ∈ m.support, Δ ∈ U) :
-    AddMonoidAlgebra.coeff P m = 0 := by
+theorem coeff_eq_zero_of_aeval_eq_zero
+    {S B : Type*} [CommRing B] [Algebra ℚ B]
+    (U : Set S) (φ : S → B)
+    (hind : AlgebraicIndependent ℚ (fun Δ : U => φ Δ)) (h0 : ∀ Δ ∉ U, φ Δ = 0)
+    (P : MvPolynomial S ℚ) (hP : aeval φ P = 0)
+    (m : S →₀ ℕ) (hm : ∀ Δ ∈ m.support, Δ ∈ U)
+    : AddMonoidAlgebra.coeff P m = 0 := by
   classical
   have hm' : ↑m.support ⊆ Set.range (Subtype.val : U → S) := fun Δ hΔ =>
     ⟨⟨Δ, hm Δ (Finset.mem_coe.1 hΔ)⟩, rfl⟩
   rw [← coeff_killCompl_comapDomain U P m hm']
-  have hQ : killCompl (R := ℚ) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)) P = 0 := by
+  have hQ
+      : killCompl (R := ℚ) (Subtype.val_injective : Function.Injective (Subtype.val : U → S)) P
+        = 0 := by
     apply algebraicIndependent_iff_injective_aeval.1 hind
     rw [map_zero, aeval_killCompl U φ h0 P, hP]
   rw [hQ]
   simp
 
-theorem separates_of_shuffle_count : ∀ (I S : Type 1) (A : Type) [DecidableEq A] [LinearOrder A] (Ψ : (I →₀ ℤ) ≃+ MvPolynomial S ℤ) (M : I → List A → ℕ∞) (U : Set S) (ℓ : S → List A) (φ : S → ShuffleAlgebra ℚ A), Set.InjOn ℓ U → (∀ Δ ∈ U, IsLyndon (ℓ Δ) ∧ φ Δ = ShuffleAlgebra.word ℚ (ℓ Δ)) → (∀ Δ ∉ U, φ Δ = 0) → (∀ m : S →₀ ℕ, 0 ≤ Ψ.symm (MvPolynomial.monomial m 1) ∧ ∃ s : Multiset (List A), (∀ w, ((Ψ.symm (MvPolynomial.monomial m 1)).sum fun x a => (a.toNat : ℕ∞) * M x w) = (s.count w : ℕ∞)) ∧ (s.map (ShuffleAlgebra.word ℚ)).sum = m.prod fun Δ e => φ Δ ^ e) → ∀ (n : ℕ) (p : Fin n → I) (c : Fin n → ℂ), Function.Injective p → (∀ i, ∃ w, M (p i) w ≠ 0) → (∀ w, ∑ i, c i * ((M (p i) w).toNat : ℂ) = 0) → ∀ i, c i = 0 := by
+theorem separates_of_shuffle_count
+    : ∀ (I S : Type 1) (A : Type) [DecidableEq A] [LinearOrder A] (Ψ : (I →₀ ℤ) ≃+ MvPolynomial S ℤ)
+        (M : I → List A → ℕ∞) (U : Set S) (ℓ : S → List A) (φ : S → ShuffleAlgebra ℚ A),
+      Set.InjOn ℓ U → (∀ Δ ∈ U, IsLyndon (ℓ Δ) ∧ φ Δ = ShuffleAlgebra.word ℚ (ℓ Δ))
+        → (∀ Δ ∉ U, φ Δ = 0)
+        → (∀ m : S →₀ ℕ,
+          0 ≤ Ψ.symm (MvPolynomial.monomial m 1)
+            ∧ ∃ s : Multiset (List A),
+              (∀ w,
+                  ((Ψ.symm (MvPolynomial.monomial m 1)).sum fun x a => (a.toNat : ℕ∞) * M x w)
+                    = (s.count w : ℕ∞))
+                ∧ (s.map (ShuffleAlgebra.word ℚ)).sum = m.prod fun Δ e => φ Δ ^ e)
+        → ∀ (n : ℕ) (p : Fin n → I) (c : Fin n → ℂ),
+          Function.Injective p → (∀ i, ∃ w, M (p i) w ≠ 0)
+            → (∀ w, ∑ i, c i * ((M (p i) w).toNat : ℂ) = 0)
+            → ∀ i, c i = 0 := by
   intro I S A _ _ Ψ M U ℓ φ hinj hU hφ0 hcnt n p c hp hne hc
   classical
   let Rh : List A → (I →₀ ℤ) →+ ℤ := fun w =>
@@ -78,8 +116,9 @@ theorem separates_of_shuffle_count : ∀ (I S : Type 1) (A : Type) [DecidableEq 
     simp [Rh]
   have hRsum : ∀ w (y : I →₀ ℤ), Rh w y = y.sum fun x a => a * ((M x w).toNat : ℤ) := fun w y => by
     simp [Rh, Finsupp.liftAddHom_apply]
-  have K0 : ∀ (y : I →₀ ℤ) (w : List A) (N : ℕ), 0 ≤ y →
-      (y.sum fun x a => (a.toNat : ℕ∞) * M x w) = (N : ℕ∞) → Rh w y = N := by
+  have K0
+      : ∀ (y : I →₀ ℤ) (w : List A) (N : ℕ),
+        0 ≤ y → (y.sum fun x a => (a.toNat : ℕ∞) * M x w) = (N : ℕ∞) → Rh w y = N := by
     intro y w N hy hN
     rw [Finsupp.sum] at hN
     have hfin : ∀ x ∈ y.support, ((y x).toNat : ℕ∞) * M x w ≠ ⊤ := by
@@ -94,28 +133,32 @@ theorem separates_of_shuffle_count : ∀ (I S : Type 1) (A : Type) [DecidableEq 
     rw [hRsum, Finsupp.sum, ← h1, Nat.cast_sum]
     refine Finset.sum_congr rfl fun x _ => ?_
     rw [Nat.cast_mul, Int.toNat_of_nonneg (Finsupp.le_def.1 hy x)]
-  have K1 : ∀ (w : List A) (P : MvPolynomial S ℤ),
-      (ShuffleAlgebra.wordBasis ℚ A).repr (aeval φ (MvPolynomial.map (Int.castRingHom ℚ) P)) w =
-        ((Rh w (Ψ.symm P) : ℤ) : ℚ) := by
+  have K1
+      : ∀ (w : List A) (P : MvPolynomial S ℤ),
+        (ShuffleAlgebra.wordBasis ℚ A).repr (aeval φ (MvPolynomial.map (Int.castRingHom ℚ) P)) w
+          = ((Rh w (Ψ.symm P) : ℤ) : ℚ) := by
     intro w P
     induction P using MvPolynomial.induction_on' with
     | monomial m r =>
       obtain ⟨hpos, s, hs1, hs2⟩ := hcnt m
-      have hmr : (MvPolynomial.monomial m r : MvPolynomial S ℤ) = r • MvPolynomial.monomial m 1 := by
+      have hmr
+          : (MvPolynomial.monomial m r : MvPolynomial S ℤ) = r • MvPolynomial.monomial m 1 := by
         rw [MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
-      rw [MvPolynomial.map_monomial, MvPolynomial.aeval_monomial, ← hs2, ← Algebra.smul_def, map_smul,
-        Finsupp.smul_apply, Lyndon.repr_sum_word, hmr, map_zsmul, map_zsmul, K0 _ w _ hpos (hs1 w),
-        smul_eq_mul, smul_eq_mul]
+      rw [MvPolynomial.map_monomial, MvPolynomial.aeval_monomial, ← hs2, ← Algebra.smul_def,
+        map_smul, Finsupp.smul_apply, Lyndon.repr_sum_word, hmr, map_zsmul, map_zsmul,
+        K0 _ w _ hpos (hs1 w), smul_eq_mul, smul_eq_mul]
       simp only [eq_intCast, Int.cast_mul, Int.cast_natCast]
       congr
-    | add P Q hP hQ =>
-      simp only [map_add (f := _), Finsupp.add_apply, hP, hQ, Int.cast_add]
-  have K2 : ∀ m : S →₀ ℕ, (∃ Δ ∈ m.support, Δ ∉ U) →
-      ∀ x, Ψ.symm (MvPolynomial.monomial m 1) x ≠ 0 → ∀ w, M x w = 0 := by
+    | add P Q hP hQ => simp only [map_add (f := _), Finsupp.add_apply, hP, hQ, Int.cast_add]
+  have K2
+      : ∀ m : S →₀ ℕ,
+        (∃ Δ ∈ m.support, Δ ∉ U)
+          → ∀ x, Ψ.symm (MvPolynomial.monomial m 1) x ≠ 0 → ∀ w, M x w = 0 := by
     rintro m ⟨Δ, hΔ, hΔU⟩ x hx w
     obtain ⟨hpos, s, hs1, hs2⟩ := hcnt m
     have hprod : (m.prod fun Δ e => φ Δ ^ e) = 0 :=
-      Finset.prod_eq_zero hΔ (by show φ Δ ^ m Δ = 0; rw [hφ0 Δ hΔU, zero_pow (Finsupp.mem_support_iff.1 hΔ)])
+      Finset.prod_eq_zero hΔ
+        (by show φ Δ ^ m Δ = 0; rw [hφ0 Δ hΔU, zero_pow (Finsupp.mem_support_iff.1 hΔ)])
     have hcount : s.count w = 0 := by
       have h := Lyndon.repr_sum_word ℚ s w
       rw [hs2, hprod, map_zero, Finsupp.zero_apply] at h
@@ -133,14 +176,15 @@ theorem separates_of_shuffle_count : ∀ (I S : Type 1) (A : Type) [DecidableEq 
     · exact h
   have hind : AlgebraicIndependent ℚ (fun Δ : U => φ Δ) := by
     have hR := Published.radfordShufflePolynomial_holds.algebraicIndependent ℚ A
-    have he : Function.Injective
-        (fun Δ : U => (⟨ℓ Δ, (hU Δ Δ.2).1⟩ : {w : List A // IsLyndon w})) := by
+    have he
+        : Function.Injective (fun Δ : U => (⟨ℓ Δ, (hU Δ Δ.2).1⟩ : {w : List A // IsLyndon w})) := by
       intro a b hab
       exact Subtype.ext (hinj a.2 b.2 (congrArg Subtype.val hab))
     have hcomp := hR.comp _ he
-    have heq : (fun Δ : U => φ Δ) =
-        (fun l : {w : List A // IsLyndon w} => ShuffleAlgebra.word ℚ l.1) ∘
-          (fun Δ : U => (⟨ℓ Δ, (hU Δ Δ.2).1⟩ : {w : List A // IsLyndon w})) := by
+    have heq
+        : (fun Δ : U => φ Δ)
+          = (fun l : {w : List A // IsLyndon w} => ShuffleAlgebra.word ℚ l.1)
+            ∘ (fun Δ : U => (⟨ℓ Δ, (hU Δ Δ.2).1⟩ : {w : List A // IsLyndon w})) := by
       funext Δ
       exact (hU Δ Δ.2).2
     rw [heq]
@@ -196,8 +240,8 @@ theorem separates_of_shuffle_count : ∀ (I S : Type 1) (A : Type) [DecidableEq 
     exact hw (K2 m hout (p i) hx0 w)
   have KQ : ∀ q : Fin n → ℚ, (∀ w, ∑ j, q j * ((M (p j) w).toNat : ℚ) = 0) → ∀ i, q i = 0 := by
     intro q hq i
-    obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors ℤ)
-      (Finset.univ : Finset (Fin n)) q
+    obtain ⟨b, hb⟩ :=
+      IsLocalization.exist_integer_multiples (nonZeroDivisors ℤ) (Finset.univ : Finset (Fin n)) q
     choose k hk using fun j => RingHom.mem_rangeS.1 (hb j (Finset.mem_univ j))
     have hk' : ∀ j, (k j : ℚ) = ((b : ℤ) : ℚ) * q j := fun j => by
       simpa [Algebra.smul_def] using hk j

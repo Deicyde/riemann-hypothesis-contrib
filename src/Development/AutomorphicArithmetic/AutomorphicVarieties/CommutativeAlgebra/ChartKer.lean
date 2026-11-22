@@ -84,12 +84,18 @@ private lemma homog_ker {O K σ τ X : Type} [CommRing O] [CommRing K] [Algebra 
   · intro i _ hi
     exact hg i _ (wcomp_mem O w i f) n (fun h => hi (h.symm.trans hn))
 
-theorem UpperTheory.V.Alg.chart_ker :
-    ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R] [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) (τ : Type) [Fintype τ] (wt : τ → X) (φ : R →ₐ[O] MvPowerSeries τ (FractionRing O)), IsChart W.part (W.origin h) wt φ →
-      (RingHom.ker φ).IsPrime ∧ IsHomog O W.wt (RingHom.ker (φ.comp W.π)) ∧ RingHom.ker φ ≤ RingHom.ker (W.origin h) ∧
-      (∀ D ∈ PtDer (W.origin h) O, ∀ f, φ f = 0 → D f = 0) ∧
-      ∀ (R' : Type) [CommRing R'] [Algebra O R'] (p : R →ₐ[O] R') (x' : R' →ₐ[O] O) (φ' : R' →ₐ[O] MvPowerSeries τ (FractionRing O)), Function.Surjective p → x'.comp p = W.origin h → φ'.comp p = φ →
-        IsChart (fun j => (W.part j).map p.toLinearMap) x' wt φ' := by
+theorem UpperTheory.V.Alg.chart_ker
+    : ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R]
+        [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) (τ : Type) [Fintype τ] (wt : τ → X)
+        (φ : R →ₐ[O] MvPowerSeries τ (FractionRing O)),
+      IsChart W.part (W.origin h) wt φ
+        → (RingHom.ker φ).IsPrime ∧ IsHomog O W.wt (RingHom.ker (φ.comp W.π))
+          ∧ RingHom.ker φ ≤ RingHom.ker (W.origin h)
+          ∧ (∀ D ∈ PtDer (W.origin h) O, ∀ f, φ f = 0 → D f = 0)
+          ∧ ∀ (R' : Type) [CommRing R'] [Algebra O R'] (p : R →ₐ[O] R') (x' : R' →ₐ[O] O)
+              (φ' : R' →ₐ[O] MvPowerSeries τ (FractionRing O)),
+            Function.Surjective p → x'.comp p = W.origin h → φ'.comp p = φ
+              → IsChart (fun j => (W.part j).map p.toLinearMap) x' wt φ' := by
   intro O X R _ _ _ _ _ _ W h τ _ wt φ H
   have hle : ∀ f, φ f = 0 → W.origin h f = 0 := fun f hf => by
     have := H.const f

@@ -22,37 +22,44 @@ noncomputable section
 
 namespace GlobalTheory.Pdv.UnStd
 
-open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.KerJ
+open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
+  Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host
+  GlobalTheory.KerJ
 open GlobalTheory.Mem.Chr (finPartI finPartI_eq_self unitIdl)
 
-theorem mtType_of_frame_mul {D : D7} {C : CharFrame D} (Dt : DtTied D C) (ξ : HChar D.host.E) {n : ℕ} (hn : 0 < n)
-    (hord : ξ.OrderDvd n) (mt : ℕ → D.Dt →* ℂˣ)
-    (h : ∀ (j : Fin D.R.m) a, IsFinIdele a → mt (j.1 + 1) (Dt.eDt a) = (C.mu0 j * ξ).1 a) (u : D.what₂.Word) :
-    MtType u mt := by
+theorem mtType_of_frame_mul
+    {D : D7} {C : CharFrame D} (Dt : DtTied D C) (ξ : HChar D.host.E)
+    {n : ℕ} (hn : 0 < n) (hord : ξ.OrderDvd n)
+    (mt : ℕ → D.Dt →* ℂˣ)
+    (h : ∀ (j : Fin D.R.m) a, IsFinIdele a → mt (j.1 + 1) (Dt.eDt a) = (C.mu0 j * ξ).1 a)
+    (u : D.what₂.Word)
+    : MtType u mt := by
   letI := D.host.cmStar
   have hcm : IsCMField D.host.E := D.host.isCMField_hostE
   intro i hi
   have hun : (C.mu0 ⟨i, hi⟩ * ξ).IsUnitary := fun x => by
     have e : (C.mu0 ⟨i, hi⟩ * ξ).1 x = (C.mu0 ⟨i, hi⟩).1 x * ξ.1 x := rfl
-    rw [e, Units.val_mul, norm_mul, (C.isMu0 ⟨i, hi⟩).unitary x, CharModel.isUnitary_of_orderDvd hn hord x, one_mul]
+    rw [e, Units.val_mul, norm_mul, (C.isMu0 ⟨i, hi⟩).unitary x,
+      CharModel.isUnitary_of_orderDvd hn hord x, one_mul]
   refine ⟨fun k hk => ?_, ?_⟩
   · obtain ⟨a, ha, rfl⟩ := (Dt.UO_eq k).1 hk
     obtain ⟨m, hm, hu⟩ := GlobalTheory.UnUnitCmp.Val.finUnit_pow _ hun
     refine ⟨m, hm, Units.ext ?_⟩
-    rw [← CharModel.eDt_finPart Dt a, h ⟨i, hi⟩ _ (CharModel.isFin_finPart a), Units.val_pow_eq_pow_val]
+    rw [← CharModel.eDt_finPart Dt a, h ⟨i, hi⟩ _ (CharModel.isFin_finPart a),
+      Units.val_pow_eq_pow_val]
     exact hu _ (CharModel.isFin_finPart a) ha
   · choose e he using fun τ => (D.hcW u τ).e_int ⟨i, hi⟩
     refine ⟨e, fun τ => (he τ).symm, fun z => ?_⟩
     obtain ⟨k, hk⟩ := GlobalTheory.Mem.Col2.exists_eq_div_conj D.host z
     obtain ⟨m, hm, hinf⟩ := (C.isMu0 ⟨i, hi⟩).inf
-    rw [← Dt.rat k z hk, ← CharModel.eDt_finPart Dt, h ⟨i, hi⟩ _ (CharModel.isFin_finPart _), GlobalTheory.Mem.Chr.DetGroupModel.fin_diag,
-      HChar.inf_mul, GlobalTheory.TypeValues.inf_eq_one _ hn hord, mul_one, Units.val_inv_eq_inv_val, hinf k,
+    rw [← Dt.rat k z hk, ← CharModel.eDt_finPart Dt, h ⟨i, hi⟩ _ (CharModel.isFin_finPart _),
+      GlobalTheory.Mem.Chr.DetGroupModel.fin_diag, HChar.inf_mul,
+      GlobalTheory.TypeValues.inf_eq_one _ hn hord, mul_one, Units.val_inv_eq_inv_val, hinf k,
       ← Finset.prod_inv_distrib, ← D.eTau.prod_comp]
     refine Finset.prod_congr rfl fun τ _ => ?_
-    have hme : m (D.eTau τ) = 2 * -e τ := by
+    have hme : m (D.eTau τ) = 2 * - e τ := by
       have h1 := hm (D.eTau τ)
-      have h2 : eExp D ⟨i, hi⟩ (D.eTau τ) = e τ := by
-        rw [← he τ, D.hcW_e]; simp [eExp]
+      have h2 : eExp D ⟨i, hi⟩ (D.eTau τ) = e τ := by rw [← he τ, D.hcW_e]; simp [eExp]
       simp only [h2] at h1
       exact_mod_cast h1
     have h1 := congrArg (embPsi D.host (D.eTau τ)) hk
@@ -71,25 +78,37 @@ theorem mtType_of_frame_mul {D : D7} {C : CharFrame D} (Dt : DtTied D C) (ξ : H
 
 end GlobalTheory.Pdv.UnStd
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Pdv.UnStd
 
-open Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.KerJ
+open Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host
+  GlobalTheory.KerJ
 
-theorem mtType_stdO {B : Base} {X : PreX B.toPre} (I : TC B X) (hok : I.Ok) (hp : TC.Pins B X) (l : I.Laws)
-    (Z : TC.Later B (I.cols l)) {Qp : I.ι → Finset ℕ} {O : ∀ u a, GL3Theta.LiftObj (I.rec7 l Z) ((I.rec7 l Z).chTw u a)}
-    (hO : I.StdO l Z Qp O) (u : (I.rec7 l Z).what₂.Word) (a : (I.rec7 l Z).what₂.Tup) : MtType u (O u a).mt := by
+theorem mtType_stdO
+    {B : Base} {X : PreX B.toPre}
+    (I : TC B X) (hok : I.Ok) (hp : TC.Pins B X) (l : I.Laws) (Z : TC.Later B (I.cols l))
+    {Qp : I.ι → Finset ℕ} {O : ∀ u a, GL3Theta.LiftObj (I.rec7 l Z) ((I.rec7 l Z).chTw u a)}
+    (hO : I.StdO l Z Qp O)
+    (u : (I.rec7 l Z).what₂.Word) (a : (I.rec7 l Z).what₂.Tup)
+    : MtType u (O u a).mt := by
   obtain ⟨T, hT⟩ := TC.dtTied_true I hok hp l Z
   have ht : IsOfFinOrder (I.tup a : Chr B.fields.F B.fields.E B.fields.K) :=
-    (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 (I.tup a).2).1).1).1).2
+    (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 (I.tup
+      a).2).1).1).1).2
   obtain ⟨n, hn, hpow⟩ := isOfFinOrder_iff_pow_eq_one.1 ht
   have hk : KDq B.host I.SQ ≤ ((I.xi a).1.comp (finPartI B.host.E)).ker :=
-    (KDq_anti B.host (I.Q_subset_SQ a)).trans ((GlobalTheory.Mem.LevTwist.levOk_twists B X I hok).2.2 a).1
+    (KDq_anti B.host (I.Q_subset_SQ a)).trans
+      ((GlobalTheory.Mem.LevTwist.levOk_twists B X I hok).2.2 a).1
   refine mtType_of_frame_mul T (I.xi a) hn ((hok.xi_reads a).orderDvd hpow) _ (fun j x hx => ?_) u
   have hm : 1 ≤ j.1 + 1 ∧ j.1 + 1 ≤ B.R.m := ⟨by omega, j.2⟩
-  have e1 : (O u a).mt (j.1 + 1) = (I.rec7 l Z).muTil (j.1 + 1) * (show (I.rec7 l Z).Dt →* ℂˣ from tildeQ B.host I.SQ (I.xi a)) := by
+  have e1
+      : (O u a).mt (j.1 + 1)
+        = (I.rec7 l Z).muTil (j.1 + 1)
+          * (show (I.rec7 l Z).Dt →* ℂˣ from tildeQ B.host I.SQ (I.xi a)) := by
     rw [hO.mt u a]
     exact if_pos hm
   rw [e1, MonoidHom.mul_apply, T.muTil_eq j x hx, hT x]
@@ -99,10 +118,17 @@ theorem mtType_stdO {B : Base} {X : PreX B.toPre} (I : TC B X) (hok : I.Ok) (hp 
 
 end GlobalTheory.Pdv.UnStd
 
-
 open GlobalTheory.Pdv.UnStd in
-theorem GlobalTheory.Pdv.unUnit_stdKer : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)), ∀ (L : SizeData₂ (I.rec7 l Z)) (hT : GatTies (I.rec7 l Z)) (Gi : G.Inst (I.rec7 l Z) L) (Gl : G.LatInst (I.rec7 l Z)) (K : G.Consts) (Y : DivX (I.rec7 l Z)) (cX : ExtraC) (ex : Extra (I.rec7 l Z) L hT Gi Gl K Y cX) (t : KerEntTied ex), I.StdKer l Z t → t.ent.UnUnit := by
+theorem GlobalTheory.Pdv.unUnit_stdKer
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok → TC.Pins B X
+        → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)),
+          ∀ (L : SizeData₂ (I.rec7 l Z)) (hT : GatTies (I.rec7 l Z)) (Gi : G.Inst (I.rec7 l Z) L)
+              (Gl : G.LatInst (I.rec7 l Z)) (K : G.Consts) (Y : DivX (I.rec7 l Z)) (cX : ExtraC)
+              (ex : Extra (I.rec7 l Z) L hT Gi Gl K Y cX) (t : KerEntTied ex),
+            I.StdKer l Z t → t.ent.UnUnit := by
   intro B X I hok hp l Z L hT Gi Gl K Y cX ex t hs
-  exact GlobalTheory.KerJ.unUnit_of_mtType _ L hT Gi Gl K Y cX ex t (fun u μ => mtType_stdO I hok hp l Z hs.O u μ)
+  exact GlobalTheory.KerJ.unUnit_of_mtType _ L hT Gi Gl K Y cX ex t
+    (fun u μ => mtType_stdO I hok hp l Z hs.O u μ)
 
 end

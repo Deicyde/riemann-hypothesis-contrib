@@ -88,7 +88,8 @@ theorem liftHc_holds : LiftHc := GlobalTheory.T.shintaniLift_harishChandraInduct
 
 theorem killsHc_holds : KillsHc := GlobalTheory.T.twistedHarishChandra_isotypic_part
 
-theorem jAppend_holds : JAppend := fun F _ _ θ => (GlobalTheory.T.harishChandraProductCuspidalGL_list_properties F θ).2.1
+theorem jAppend_holds : JAppend := fun F _ _ θ =>
+  (GlobalTheory.T.harishChandraProductCuspidalGL_list_properties F θ).2.1
 
 theorem normEx_holds : NormEx := by
   intro F F' _ _ _ _ s hs t δ
@@ -113,35 +114,52 @@ theorem jdChar_holds : JDChar := jdChar hcChar
 theorem typeOfLbl_holds : TypeOfLbl := typeOfLbl meetsIff frobL_holds jdEq
 
 theorem lblOf_holds : LblOf :=
-  lblOf meetsIff frobL_holds jdEq cuspChar tensTr cuspIrr tensFix (subqMap finSec UpperTheory.Gal.TypesAndIwahori.paraFactor) suppStd
+  lblOf meetsIff frobL_holds jdEq cuspChar tensTr cuspIrr tensFix
+    (subqMap finSec UpperTheory.Gal.TypesAndIwahori.paraFactor) suppStd
 
 theorem killsTrue_holds : KillsOn fun _ => True :=
-  killsTrue (killsNil killsAll_holds) liftHc_holds killsHc_holds normEx_holds liftOk jdEq jdChar_holds liftDet
+  killsTrue (killsNil killsAll_holds) liftHc_holds killsHc_holds normEx_holds liftOk jdEq
+    jdChar_holds liftDet
 
-theorem lblOn_of (hT : FinTrace) (P₀ : Lbl → Prop) (h₁ : ∀ a l, P₀ a → P₀ (a.lift l)) (h₂ : KillsOn P₀) : LblOn P₀ :=
+theorem lblOn_of
+    (hT : FinTrace) (P₀ : Lbl → Prop) (h₁ : ∀ a l, P₀ a → P₀ (a.lift l)) (h₂ : KillsOn P₀)
+    : LblOn P₀ :=
   lblOn (baseCase resEmbCompat lblIso_holds) liftsFix placeEx resEmbEx unrOfIne P₀ h₁
     (stepSplit stableOf resEmbCompat lblIso_holds P₀)
     (stepInert hT stableOf resEmbCompat (resDeg cardRes) liftOk jdEq P₀ h₂)
 
-theorem lblTrue_of (hT : FinTrace) : LblOn fun _ => True := lblOn_of hT _ (fun _ _ _ => trivial) killsTrue_holds
+theorem lblTrue_of (hT : FinTrace) : LblOn fun _ => True :=
+  lblOn_of hT _ (fun _ _ _ => trivial) killsTrue_holds
 
 theorem suppAny_of (hT : FinTrace) : SuppAny :=
-  suppAny (lblOn_of hT _ (fun a l h => by simp only [Lbl.lift, h, List.map_nil]) (killsNil killsAll_holds)) lblOf_holds
-    typeOfLbl_holds UpperTheory.Gal.TypesAndIwahori.suppOfType_holds UpperTheory.Gal.TypesAndIwahori.blockCount tameChars leTop_holds polTop polBot resEmbEx
-    (unifTower liftsFix placeEx unrOfIne) baseQ_holds cardRes artRead (cuspIne tameRead typeChar nameOf baseQ_holds) suppIne
+  suppAny
+    (lblOn_of hT _
+      (fun a l h => by simp only [Lbl.lift, h, List.map_nil])
+      (killsNil killsAll_holds))
+    lblOf_holds typeOfLbl_holds UpperTheory.Gal.TypesAndIwahori.suppOfType_holds
+    UpperTheory.Gal.TypesAndIwahori.blockCount tameChars leTop_holds polTop polBot resEmbEx
+    (unifTower liftsFix placeEx unrOfIne) baseQ_holds cardRes artRead
+    (cuspIne tameRead typeChar nameOf baseQ_holds) suppIne
 
 theorem lblMixed_holds : LblMixed :=
   lblMixed lblOf_holds group1 cuspFrob (inertOf typeChar baseQ_holds) unlFull
-    (jdPair jAppend_holds hcOne (hcPair hcChar hcOne) (detPair frobL_holds jdEq) jdChar_holds) jdChar_holds
-    (lblFull meetsIff frobL_holds jdEq tensTr avgMap (indMap UpperTheory.Gal.TypesAndIwahori.indSupp UpperTheory.Gal.TypesAndIwahori.paraFactor) tensInc)
+    (jdPair jAppend_holds hcOne (hcPair hcChar hcOne) (detPair frobL_holds jdEq) jdChar_holds)
+    jdChar_holds
+    (lblFull meetsIff frobL_holds jdEq tensTr avgMap
+      (indMap UpperTheory.Gal.TypesAndIwahori.indSupp UpperTheory.Gal.TypesAndIwahori.paraFactor)
+      tensInc)
 
 theorem mixType_of (hT : FinTrace) : MixType :=
-  mixType (lblTrue_of hT) lblMixed_holds sepOf leTop_holds polTop typeOfLbl_holds resEmbEx baseQ_holds cardRes
+  mixType (lblTrue_of hT) lblMixed_holds sepOf leTop_holds polTop typeOfLbl_holds resEmbEx
+    baseQ_holds cardRes
 
-theorem suppAny_holds (h : GlobalTheory.DZA.InflMatching) : SuppAny := suppAny_of (L.finTrace_of_matching h)
+theorem suppAny_holds (h : GlobalTheory.DZA.InflMatching) : SuppAny :=
+  suppAny_of (L.finTrace_of_matching h)
 
-theorem mixType_holds (h : GlobalTheory.DZA.InflMatching) : MixType := mixType_of (L.finTrace_of_matching h)
+theorem mixType_holds (h : GlobalTheory.DZA.InflMatching) : MixType :=
+  mixType_of (L.finTrace_of_matching h)
 
-theorem suppBC_holds (h : GlobalTheory.DZA.InflMatching) : SuppBC := suppBC_of_mix (suppAny_holds h) (mixUnlinked (mixType_holds h))
+theorem suppBC_holds (h : GlobalTheory.DZA.InflMatching) : SuppBC :=
+  suppBC_of_mix (suppAny_holds h) (mixUnlinked (mixType_holds h))
 
 end UpperTheory.Gal.InertialTypesAlt

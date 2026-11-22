@@ -20,14 +20,17 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RowsRawMassAn
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.BridgeLemma GlobalTheory.Core.Deg
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.BridgeLemma GlobalTheory.Core.Deg
 
 namespace GlobalTheory.Core.Deg
 
-theorem cntOn_singleton : Formalism.HermitianLatticesTheory.SiegelMassRatio → ∀ c : ℝ, CntOn {c} := by
+theorem cntOn_singleton
+    : Formalism.HermitianLatticesTheory.SiegelMassRatio → ∀ c : ℝ, CntOn {c} := by
   intro hM c Cg cb Cu cT CT
   obtain ⟨C1a, hC1⟩ := GlobalTheory.Mass.PrimMeanRow.main 1 one_pos
-  obtain ⟨c3, hC3⟩ := GlobalTheory.LoopC.PairMean.main Cg cb Cu cT CT c 1 3 (max C1a 0) (le_max_right _ _)
+  obtain ⟨c3, hC3⟩ :=
+    GlobalTheory.LoopC.PairMean.main Cg cb Cu cT CT c 1 3 (max C1a 0) (le_max_right _ _)
   obtain ⟨cH, -, hHH⟩ := GlobalTheory.GramHeight.height_bounds Cg cb Cu cT CT c 1
   obtain ⟨cS, hSW⟩ := GlobalTheory.LoopC.GenericMean.main Cg cb Cu cT CT c 1
   obtain ⟨c4, hC4⟩ := GlobalTheory.LoopC.Partner.partners_le Cg cb Cu cT CT c 1
@@ -39,7 +42,8 @@ theorem cntOn_singleton : Formalism.HermitianLatticesTheory.SiegelMassRatio → 
       (hC1 _ (le_max_left _ _) _ _ u u _ _ Cg cb Cu cT CT C0 1 hl)
   · exact hHH _ _ u u _ _ hl
   · exact hSW _ _ u u _ _ hl
-      (GlobalTheory.Mass.PrimMeanCorankOne.main _ _ u u _ _ Cg cb Cu cT CT C0 1 (Formalism.MainNotions.BridgeLemma.mass_ratio_of_siegel_cm_unramified hM _))
+      (GlobalTheory.Mass.PrimMeanCorankOne.main _ _ u u _ _ Cg cb Cu cT CT C0 1
+        (Formalism.MainNotions.BridgeLemma.mass_ratio_of_siegel_cm_unramified hM _))
   · exact hC4 _ _ u u _ _ hl
 
 end GlobalTheory.Core.Deg

@@ -18,16 +18,15 @@ section SlopeTestRemainingChoices
 
 variable {K : Type} [CommRing K] (R : Subring K) {n : ℕ}
 
-def liftR (M : Matrix (Fin n) (Fin n) K) (hM : IsInt R M) : Matrix (Fin n) (Fin n) R :=
-  fun i j => ⟨M i j, hM i j⟩
+def liftR (M : Matrix (Fin n) (Fin n) K) (hM : IsInt R M) : Matrix (Fin n) (Fin n) R := fun i j =>
+  ⟨M i j, hM i j⟩
 
-theorem liftR_map (M : Matrix (Fin n) (Fin n) K) (hM : IsInt R M) :
-    (liftR R M hM).map R.subtype = M := by
+theorem liftR_map (M : Matrix (Fin n) (Fin n) K) (hM : IsInt R M)
+    : (liftR R M hM).map R.subtype = M := by
   ext i j
   rfl
 
-theorem coeLin_apply (v : Fin n → R) (j : Fin n) : coeLin R v j = (v j : K) := by
-  rfl
+theorem coeLin_apply (v : Fin n → R) (j : Fin n) : coeLin R v j = (v j : K) := by rfl
 
 theorem coeLin_injective : Function.Injective (coeLin R : (Fin n → R) →ₗ[R] (Fin n → K)) := by
   intro v w h
@@ -36,24 +35,24 @@ theorem coeLin_injective : Function.Injective (coeLin R : (Fin n → R) →ₗ[R
   rw [coeLin_apply, coeLin_apply] at hj
   exact Subtype.ext hj
 
-theorem coeLin_mulVec (M : Matrix (Fin n) (Fin n) R) (v : Fin n → R) :
-    coeLin R (M *ᵥ v) = M.map R.subtype *ᵥ coeLin R v := by
+theorem coeLin_mulVec (M : Matrix (Fin n) (Fin n) R) (v : Fin n → R)
+    : coeLin R (M *ᵥ v) = M.map R.subtype *ᵥ coeLin R v := by
   funext i
   simp [Matrix.mulVec, dotProduct, coeLin_apply]
 
-theorem mem_latZ (Z : Matrix (Fin n) (Fin n) K) (x : Fin n → R) :
-    x ∈ latZ R Z ↔ ∃ y, Z *ᵥ coeLin R y = coeLin R x := by
+theorem mem_latZ (Z : Matrix (Fin n) (Fin n) K) (x : Fin n → R)
+    : x ∈ latZ R Z ↔ ∃ y, Z *ᵥ coeLin R y = coeLin R x := by
   exact Iff.rfl
 
-theorem det_lift_eq_one (M : Matrix (Fin n) (Fin n) R) (h : (M.map R.subtype).det = 1) :
-    M.det = 1 := by
+theorem det_lift_eq_one (M : Matrix (Fin n) (Fin n) R) (h : (M.map R.subtype).det = 1)
+    : M.det = 1 := by
   have h2 : R.subtype M.det = R.subtype 1 := by
     rw [RingHom.map_det, map_one]
     exact h
   exact Subtype.ext h2
 
-theorem lowUni_mulVec_eLast {M : Matrix (Fin n) (Fin n) K} (h : IsLowUni M) :
-    M *ᵥ coeLin R (eLast R) = coeLin R (eLast R) := by
+theorem lowUni_mulVec_eLast {M : Matrix (Fin n) (Fin n) K} (h : IsLowUni M)
+    : M *ᵥ coeLin R (eLast R) = coeLin R (eLast R) := by
   have hw : ∀ j : Fin n, coeLin R (eLast R) j = if j.val + 1 = n then 1 else 0 := by
     intro j
     rw [coeLin_apply]
@@ -79,15 +78,15 @@ theorem lowUni_mulVec_eLast {M : Matrix (Fin n) (Fin n) K} (h : IsLowUni M) :
       exact h.1 hij
     · rfl
 
-theorem lastCoord_apply (w : Fin n → K) :
-    lastCoord R w = ∑ j : Fin n, if j.val + 1 = n then w j else 0 := by
+theorem lastCoord_apply (w : Fin n → K)
+    : lastCoord R w = ∑ j : Fin n, if j.val + 1 = n then w j else 0 := by
   unfold lastCoord
   rw [LinearMap.sum_apply]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   split_ifs <;> rfl
 
-theorem lastCoord_upUni {M : Matrix (Fin n) (Fin n) K} (h : IsUpUni M) (w : Fin n → K) :
-    lastCoord R (M *ᵥ w) = lastCoord R w := by
+theorem lastCoord_upUni {M : Matrix (Fin n) (Fin n) K} (h : IsUpUni M) (w : Fin n → K)
+    : lastCoord R (M *ᵥ w) = lastCoord R w := by
   rw [lastCoord_apply, lastCoord_apply]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   split_ifs with hj
@@ -102,8 +101,9 @@ theorem lastCoord_upUni {M : Matrix (Fin n) (Fin n) K} (h : IsUpUni M) (w : Fin 
       exact absurd (Finset.mem_univ j) hj'
   · rfl
 
-theorem lamLin_apply (Z : Matrix (Fin n) (Fin n) K) (v : Fin n → R) :
-    lamLin R Z v = Submodule.mkQ _ (lastCoord R (Z⁻¹ *ᵥ coeLin R v)) := rfl
+theorem lamLin_apply (Z : Matrix (Fin n) (Fin n) K) (v : Fin n → R)
+    : lamLin R Z v = Submodule.mkQ _ (lastCoord R (Z⁻¹ *ᵥ coeLin R v)) :=
+  rfl
 
 end SlopeTestRemainingChoices
 
@@ -111,20 +111,23 @@ section Inv
 
 variable {K : Type} [CommRing K] (R : Subring K) {n : ℕ}
 
-def eqvA (A : Matrix (Fin n) (Fin n) R) (hA : (A.map R.subtype).det = 1) :
-    (Fin n → R) ≃ₗ[R] (Fin n → R) :=
+def eqvA (A : Matrix (Fin n) (Fin n) R) (hA : (A.map R.subtype).det = 1)
+    : (Fin n → R) ≃ₗ[R] (Fin n → R) :=
   LinearEquiv.ofLinear A.mulVecLin A⁻¹.mulVecLin
     (by
-      apply LinearMap.ext; intro v
+      apply LinearMap.ext
+      intro v
       simp [mulVec_mulVec, Matrix.mul_nonsing_inv A (by simp [det_lift_eq_one R A hA])])
     (by
-      apply LinearMap.ext; intro v
+      apply LinearMap.ext
+      intro v
       simp [mulVec_mulVec, Matrix.nonsing_inv_mul A (by simp [det_lift_eq_one R A hA])])
 
-theorem map_latZ (A B : Matrix (Fin n) (Fin n) R) (Z : Matrix (Fin n) (Fin n) K)
-    (hA : (A.map R.subtype).det = 1) (hB : (B.map R.subtype).det = 1) :
-    (latZ R Z).map (eqvA R A hA : (Fin n → R) →ₗ[R] (Fin n → R)) =
-      latZ R (A.map R.subtype * Z * B.map R.subtype) := by
+theorem map_latZ
+    (A B : Matrix (Fin n) (Fin n) R)
+    (Z : Matrix (Fin n) (Fin n) K) (hA : (A.map R.subtype).det = 1) (hB : (B.map R.subtype).det = 1)
+    : (latZ R Z).map (eqvA R A hA : (Fin n → R) →ₗ[R] (Fin n → R))
+      = latZ R (A.map R.subtype * Z * B.map R.subtype) := by
   have hAd := det_lift_eq_one R A hA
   have hBd := det_lift_eq_one R B hB
   have hAA : A * A⁻¹ = 1 := Matrix.mul_nonsing_inv A (by rw [hAd]; exact isUnit_one)
@@ -153,27 +156,34 @@ theorem map_latZ (A B : Matrix (Fin n) (Fin n) R) (Z : Matrix (Fin n) (Fin n) K)
     · show A *ᵥ (A⁻¹ *ᵥ x) = x
       rw [Matrix.mulVec_mulVec, hAA, Matrix.one_mulVec]
 
-def cokEquiv (A B : Matrix (Fin n) (Fin n) R) (Z : Matrix (Fin n) (Fin n) K)
-    (hA : (A.map R.subtype).det = 1) (hB : (B.map R.subtype).det = 1) :
-    coker R Z ≃ₗ[R] coker R (A.map R.subtype * Z * B.map R.subtype) :=
+def cokEquiv
+    (A B : Matrix (Fin n) (Fin n) R)
+    (Z : Matrix (Fin n) (Fin n) K) (hA : (A.map R.subtype).det = 1) (hB : (B.map R.subtype).det = 1)
+    : coker R Z ≃ₗ[R] coker R (A.map R.subtype * Z * B.map R.subtype) :=
   Submodule.Quotient.equiv _ _ (eqvA R A hA) (map_latZ R A B Z hA hB)
 
-theorem cokEquiv_mk (A B : Matrix (Fin n) (Fin n) R) (Z : Matrix (Fin n) (Fin n) K)
-    (hA : (A.map R.subtype).det = 1) (hB : (B.map R.subtype).det = 1) (v : Fin n → R) :
-    cokEquiv R A B Z hA hB (Submodule.Quotient.mk v) = Submodule.Quotient.mk (A *ᵥ v) := rfl
+theorem cokEquiv_mk
+    (A B : Matrix (Fin n) (Fin n) R)
+    (Z : Matrix (Fin n) (Fin n) K) (hA : (A.map R.subtype).det = 1) (hB : (B.map R.subtype).det = 1)
+    (v : Fin n → R)
+    : cokEquiv R A B Z hA hB (Submodule.Quotient.mk v) = Submodule.Quotient.mk (A *ᵥ v) :=
+  rfl
 
-theorem cokEquiv_eZ (A B : Matrix (Fin n) (Fin n) R) (Z : Matrix (Fin n) (Fin n) K)
-    (hA : (A.map R.subtype).det = 1) (hB : (B.map R.subtype).det = 1)
-    (hlow : IsLowUni (A.map R.subtype)) :
-    cokEquiv R A B Z hA hB (eZ R Z) = eZ R (A.map R.subtype * Z * B.map R.subtype) := by
+theorem cokEquiv_eZ
+    (A B : Matrix (Fin n) (Fin n) R)
+    (Z : Matrix (Fin n) (Fin n) K) (hA : (A.map R.subtype).det = 1) (hB : (B.map R.subtype).det = 1)
+    (hlow : IsLowUni (A.map R.subtype))
+    : cokEquiv R A B Z hA hB (eZ R Z) = eZ R (A.map R.subtype * Z * B.map R.subtype) := by
   show cokEquiv R A B Z hA hB (Submodule.Quotient.mk (eLast R)) = Submodule.Quotient.mk (eLast R)
   rw [cokEquiv_mk]
   exact congrArg Submodule.Quotient.mk
     (coeLin_injective R (by rw [coeLin_mulVec]; exact lowUni_mulVec_eLast R hlow))
 
-theorem lamLin_mul (A B : Matrix (Fin n) (Fin n) R) (Z : Matrix (Fin n) (Fin n) K)
-    (hA : (A.map R.subtype).det = 1) (hup : IsUpUni (B.map R.subtype)) (v : Fin n → R) :
-    lamLin R (A.map R.subtype * Z * B.map R.subtype) (A *ᵥ v) = lamLin R Z v := by
+theorem lamLin_mul
+    (A B : Matrix (Fin n) (Fin n) R)
+    (Z : Matrix (Fin n) (Fin n) K) (hA : (A.map R.subtype).det = 1)
+    (hup : IsUpUni (B.map R.subtype)) (v : Fin n → R)
+    : lamLin R (A.map R.subtype * Z * B.map R.subtype) (A *ᵥ v) = lamLin R Z v := by
   have hAinv : (A.map R.subtype)⁻¹ * A.map R.subtype = 1 :=
     Matrix.nonsing_inv_mul _ (by rw [hA]; exact isUnit_one)
   have hBd : (B.map R.subtype).det = 1 := by
@@ -206,14 +216,17 @@ theorem isoInv : IsoInv := by
   have hAA : A * A⁻¹ = 1 :=
     Matrix.mul_nonsing_inv A (by rw [det_lift_eq_one R A hA]; exact isUnit_one)
   refine Nat.card_congr (Equiv.subtypeEquiv
-    { toFun := fun φ => (cokEquiv R A B Z hA hB).trans φ
+    {
+      toFun := fun φ => (cokEquiv R A B Z hA hB).trans φ
       invFun := fun ψ => (cokEquiv R A B Z hA hB).symm.trans ψ
       left_inv := fun φ => by
         ext x
         rw [LinearEquiv.trans_apply, LinearEquiv.trans_apply, LinearEquiv.apply_symm_apply]
       right_inv := fun ψ => by
         ext x
-        rw [LinearEquiv.trans_apply, LinearEquiv.trans_apply, LinearEquiv.symm_apply_apply] } ?_)
+        rw [LinearEquiv.trans_apply, LinearEquiv.trans_apply, LinearEquiv.symm_apply_apply]
+    }
+    ?_)
   intro φ
   simp only [isoSet, Set.mem_setOf_eq, Equiv.coe_fn_mk]
   constructor
@@ -231,8 +244,7 @@ theorem isoInv : IsoInv := by
     · have h3 := h2 (A⁻¹ *ᵥ v)
       change lam (φ (cokEquiv R A B Z hA hB (Submodule.Quotient.mk (A⁻¹ *ᵥ v)))) = _ at h3
       rw [cokEquiv_mk, Matrix.mulVec_mulVec, hAA, Matrix.one_mulVec] at h3
-      rw [h3, ← lamLin_mul R A B Z hA hb (A⁻¹ *ᵥ v), Matrix.mulVec_mulVec, hAA,
-        Matrix.one_mulVec]
+      rw [h3, ← lamLin_mul R A B Z hA hb (A⁻¹ *ᵥ v), Matrix.mulVec_mulVec, hAA, Matrix.one_mulVec]
 
 theorem isoFinite : IsoFinite := by
   intro K _ R hfin n Z hZ hdet
@@ -243,19 +255,20 @@ theorem isoFinite : IsoFinite := by
   have hmem : ∀ x : Fin n → R, Zr.det • x ∈ latZ R (Zr.map R.subtype) := by
     intro x
     refine (mem_latZ R _ _).2 ⟨Zr.adjugate *ᵥ x, ?_⟩
-    rw [coeLin_mulVec, Matrix.mulVec_mulVec, ← Matrix.map_mul, Matrix.mul_adjugate,
-      ← coeLin_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec]
+    rw [coeLin_mulVec, Matrix.mulVec_mulVec, ← Matrix.map_mul, Matrix.mul_adjugate, ← coeLin_mulVec,
+      Matrix.smul_mulVec, Matrix.one_mulVec]
   have hs := Ideal.Quotient.mk_surjective (I := Ideal.span {Zr.det})
   have hcok : Finite (coker R (Zr.map R.subtype)) := by
-    let g : (Fin n → R ⧸ Ideal.span {Zr.det}) → coker R (Zr.map R.subtype) :=
-      fun w => Submodule.Quotient.mk (fun j => Function.surjInv hs (w j))
+    let g : (Fin n → R ⧸ Ideal.span {Zr.det}) → coker R (Zr.map R.subtype) := fun w =>
+      Submodule.Quotient.mk (fun j => Function.surjInv hs (w j))
     have hg : Function.Surjective g := by
       intro q
       obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ q
       refine ⟨fun j => Ideal.Quotient.mk _ (x j), ?_⟩
-      have hc : ∀ j, ∃ c : R,
-          Function.surjInv hs (Ideal.Quotient.mk (Ideal.span {Zr.det}) (x j)) - x j
-            = Zr.det * c := by
+      have hc
+          : ∀ j, ∃ c : R,
+            Function.surjInv hs (Ideal.Quotient.mk (Ideal.span {Zr.det}) (x j)) - x j
+              = Zr.det * c := by
         intro j
         have h1 := Function.surjInv_eq hs (Ideal.Quotient.mk (Ideal.span {Zr.det}) (x j))
         rw [Ideal.Quotient.eq, Ideal.mem_span_singleton] at h1
@@ -263,8 +276,9 @@ theorem isoFinite : IsoFinite := by
       choose c hc using hc
       show Submodule.Quotient.mk _ = Submodule.Quotient.mk x
       rw [Submodule.Quotient.eq]
-      have hsub : (fun j => Function.surjInv hs (Ideal.Quotient.mk (Ideal.span {Zr.det}) (x j)))
-          - x = Zr.det • c := by
+      have hsub
+          : (fun j => Function.surjInv hs (Ideal.Quotient.mk (Ideal.span {Zr.det}) (x j))) - x
+            = Zr.det • c := by
         funext j
         simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
         exact hc j

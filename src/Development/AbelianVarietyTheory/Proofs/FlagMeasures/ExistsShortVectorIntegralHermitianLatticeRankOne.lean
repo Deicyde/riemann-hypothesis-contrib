@@ -15,16 +15,17 @@ namespace GlobalTheory.Mass.ShortVector
 
 open GlobalTheory.Mass.DiscOrder
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
 
 omit [StarRing K] [Module K V] [IsScalarTower (𝓞 K) K V] in
-theorem idxN_span (x : V) (S : Submodule (𝓞 K) V) :
-    idxN (Submodule.span (𝓞 K) {x}) S =
-      Ideal.absNorm (S.comap (LinearMap.toSpanSingleton (𝓞 K) V x) : Ideal (𝓞 K)) := by
-  have hr : (Submodule.span (𝓞 K) {x}).toAddSubgroup =
-      (⊤ : AddSubgroup (𝓞 K)).map (LinearMap.toSpanSingleton (𝓞 K) V x).toAddMonoidHom := by
+theorem idxN_span (x : V) (S : Submodule (𝓞 K) V)
+    : idxN (Submodule.span (𝓞 K) {x}) S
+      = Ideal.absNorm (S.comap (LinearMap.toSpanSingleton (𝓞 K) V x) : Ideal (𝓞 K)) := by
+  have hr
+      : (Submodule.span (𝓞 K) {x}).toAddSubgroup
+        = (⊤ : AddSubgroup (𝓞 K)).map (LinearMap.toSpanSingleton (𝓞 K) V x).toAddMonoidHom := by
     ext y
     simp [Submodule.mem_span_singleton]
   unfold idxN
@@ -46,17 +47,20 @@ theorem nondeg (h : V →ₗ⋆[K] V →ₗ[K] K) (hp : PD h) : h.Nondegenerate 
     exact lt_irrefl _ hpos
 
 omit [StarRing K] in
-theorem span_isLattice (h1 : Module.finrank K V = 1) {x : V} (hx : x ≠ 0) :
-    Submodule.IsFullLattice K (Submodule.span (𝓞 K) {x}) := by
+theorem span_isLattice (h1 : Module.finrank K V = 1) {x : V} (hx : x ≠ 0)
+    : Submodule.IsFullLattice K (Submodule.span (𝓞 K) {x}) := by
   have : Submodule.IsLattice K (Submodule.span (𝓞 K) {x}) :=
     Submodule.IsLattice.of_fg K (Submodule.fg_span_singleton x)
   refine { span_eq_top := ?_ }
   rw [Submodule.span_span_of_tower]
   exact (finrank_eq_one_iff_of_ne_zero x hx).mp h1
 
-private theorem apply_self_ne_zero_and_span_of_finrank_one [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K)
-    (hn : h.Nondegenerate) (h1 : Module.finrank K V = 1) {m : V} (hm : m ≠ 0) :
-    h m m ≠ 0 ∧ ∀ y : V, ∃ c : K, c • m = y := by
+private theorem apply_self_ne_zero_and_span_of_finrank_one
+    [FiniteDimensional K V]
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hn : h.Nondegenerate)
+    (h1 : Module.finrank K V = 1)
+    {m : V} (hm : m ≠ 0)
+    : h m m ≠ 0 ∧ ∀ y : V, ∃ c : K, c • m = y := by
   have hsp : Submodule.span K {m} = ⊤ := (finrank_eq_one_iff_of_ne_zero m hm).mp h1
   have hy : ∀ y : V, ∃ c : K, c • m = y := fun y =>
     Submodule.mem_span_singleton.mp (hsp ▸ Submodule.mem_top)
@@ -64,14 +68,18 @@ private theorem apply_self_ne_zero_and_span_of_finrank_one [FiniteDimensional K 
   obtain ⟨c, rfl⟩ := hy y
   rw [LinearMap.map_smul, h0, smul_zero]
 
-private theorem exists_integer_eq_conj (s : 𝓞 K) :
-    ∃ t : 𝓞 K, algebraMap (𝓞 K) K t = starRingEnd K (algebraMap (𝓞 K) K s) :=
-  ⟨⟨starRingEnd K (algebraMap (𝓞 K) K s),
-    (RingOfIntegers.isIntegral_coe s).map (starRingEnd K).toIntAlgHom⟩, rfl⟩
+private theorem exists_integer_eq_conj (s : 𝓞 K)
+    : ∃ t : 𝓞 K, algebraMap (𝓞 K) K t = starRingEnd K (algebraMap (𝓞 K) K s) := ⟨
+  ⟨
+    starRingEnd K (algebraMap (𝓞 K) K s),
+    (RingOfIntegers.isIntegral_coe s).map (starRingEnd K).toIntAlgHom
+  ⟩,
+  rfl
+⟩
 
-private theorem smul_mem_dual_span_of_mul_apply_self_integral (h : V →ₗ⋆[K] V →ₗ[K] K) (x : V) (c : K) (t : 𝓞 K)
-    (ht : algebraMap (𝓞 K) K t = c * h x x) :
-    c • x ∈ dual h (Submodule.span (𝓞 K) {x}) := by
+private theorem smul_mem_dual_span_of_mul_apply_self_integral
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (x : V) (c : K) (t : 𝓞 K) (ht : algebraMap (𝓞 K) K t = c * h x x)
+    : c • x ∈ dual h (Submodule.span (𝓞 K) {x}) := by
   rw [dualBasic_mem_dual]
   intro y hy
   obtain ⟨s, rfl⟩ := Submodule.mem_span_singleton.mp hy
@@ -80,10 +88,14 @@ private theorem smul_mem_dual_span_of_mul_apply_self_integral (h : V →ₗ⋆[K
   refine Submodule.mem_one.mpr ⟨s' * t, ?_⟩
   rw [map_mul, ht, hs']
 
-theorem exists_gen [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (hn : h.Nondegenerate)
-    (h1 : Module.finrank K V = 1) (M : Submodule (𝓞 K) V) (hM : IsIntLat h M) :
-    ∃ (x : V) (b : 𝓞 K) (I : Ideal (𝓞 K)), x ≠ 0 ∧ (b : K) * h x x = 1 ∧ I ≠ ⊥ ∧ (∀ r ∈ I, r • x ∈ M) ∧
-      Ideal.absNorm I ^ 2 = Ideal.absNorm (Ideal.span {b}) * discN h M := by
+theorem exists_gen
+    [FiniteDimensional K V]
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (hn : h.Nondegenerate)
+    (h1 : Module.finrank K V = 1)
+    (M : Submodule (𝓞 K) V) (hM : IsIntLat h M)
+    : ∃ (x : V) (b : 𝓞 K) (I : Ideal (𝓞 K)),
+      x ≠ 0 ∧ (b : K) * h x x = 1 ∧ I ≠ ⊥ ∧ (∀ r ∈ I, r • x ∈ M)
+        ∧ Ideal.absNorm I ^ 2 = Ideal.absNorm (Ideal.span {b}) * discN h M := by
   have : Nontrivial V := Module.nontrivial_of_finrank_eq_succ h1
   have hMne : M ≠ ⊥ := by
     intro hbot
@@ -96,8 +108,7 @@ theorem exists_gen [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (h
   have hx0 : x₀ ≠ 0 := smul_ne_zero (inv_ne_zero hmm) hm0
   obtain ⟨hxx, -⟩ := apply_self_ne_zero_and_span_of_finrank_one h hn h1 hx0
   set L : Submodule (𝓞 K) V := Submodule.span (𝓞 K) {x₀} with hL
-  have hMd : M ≤ dual h M := fun y hy =>
-    (dualBasic_mem_dual h M y).mpr fun z hz => hM.2 z hz y hy
+  have hMd : M ≤ dual h M := fun y hy => (dualBasic_mem_dual h M y).mpr fun z hz => hM.2 z hz y hy
   have hdL : dual h M ≤ L := by
     intro y hy
     obtain ⟨c, rfl⟩ := hspan y
@@ -109,25 +120,27 @@ theorem exists_gen [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (h
   have hLd : dual h L ≤ dual h M := fun y hy =>
     (dualBasic_mem_dual h M y).mpr fun z hz => (dualBasic_mem_dual h L y).mp hy z (hML hz)
   obtain ⟨b, hb⟩ : ∃ b : 𝓞 K, b • x₀ = (h x₀ x₀)⁻¹ • x₀ :=
-    Submodule.mem_span_singleton.mp
-      (hdL (hLd (smul_mem_dual_span_of_mul_apply_self_integral h x₀ _ 1 (by rw [map_one, inv_mul_cancel₀ hxx]))))
+    Submodule.mem_span_singleton.mp (hdL (hLd (smul_mem_dual_span_of_mul_apply_self_integral h x₀ _
+      1 (by rw [map_one, inv_mul_cancel₀ hxx]))))
   have hbK : algebraMap (𝓞 K) K b = (h x₀ x₀)⁻¹ := by
     rw [← algebraMap_smul K b x₀] at hb
     exact smul_left_injective K hx0 hb
-  have hcomap : Submodule.comap (LinearMap.toSpanSingleton (𝓞 K) V x₀) (dual h L) =
-      Ideal.span {b} := by
+  have hcomap
+      : Submodule.comap (LinearMap.toSpanSingleton (𝓞 K) V x₀) (dual h L) = Ideal.span {b} := by
     ext r
     simp only [Submodule.mem_comap, LinearMap.toSpanSingleton_apply, Ideal.mem_span_singleton']
     constructor
     · intro hr
-      obtain ⟨u, hu⟩ := Submodule.mem_one.mp
-        ((dualBasic_mem_dual h L _).mp hr x₀ (Submodule.mem_span_singleton_self x₀))
+      obtain ⟨u, hu⟩ :=
+        Submodule.mem_one.mp ((dualBasic_mem_dual h L _).mp hr x₀
+          (Submodule.mem_span_singleton_self x₀))
       refine ⟨u, FaithfulSMul.algebraMap_injective (𝓞 K) K ?_⟩
       rw [map_mul, hu, ← algebraMap_smul K r x₀, LinearMap.map_smul, smul_eq_mul, hbK, mul_assoc,
         mul_inv_cancel₀ hxx, mul_one]
     · rintro ⟨u, rfl⟩
       rw [← algebraMap_smul K (u * b) x₀]
-      exact smul_mem_dual_span_of_mul_apply_self_integral h x₀ _ u (by rw [map_mul, hbK, mul_assoc, inv_mul_cancel₀ hxx, mul_one])
+      exact smul_mem_dual_span_of_mul_apply_self_integral h x₀ _ u
+        (by rw [map_mul, hbK, mul_assoc, inv_mul_cancel₀ hxx, mul_one])
   have hLlat : Submodule.IsFullLattice K L := span_isLattice h1 hx0
   have e1 := idxN_mul hMd hdL
   have e2 := idxN_mul hLd hdL
@@ -152,7 +165,16 @@ theorem exists_gen [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (h
   · rw [← e4, ← e5, discN, ← e2, e3, ← e1]
     ring
 
-theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K), IsCMUnram K → h.IsSymm → PD h → Module.finrank K V = 1 → ∀ M : Submodule (𝓞 K) V, IsIntLat h M → ∃ x ∈ M, x ≠ 0 ∧ ∀ τ : K →+* ℂ, (τ (h x x)).re ≤ (2 * vInv K) * (discN h M : ℝ) ^ ((1 : ℝ) / (2 * fDeg K)) := by
+theorem main
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
+      IsCMUnram K → h.IsSymm → PD h → Module.finrank K V = 1
+        → ∀ M : Submodule (𝓞 K) V,
+          IsIntLat h M
+            → ∃ x ∈ M,
+              x ≠ 0
+                ∧ ∀ τ : K →+* ℂ,
+                  (τ (h x x)).re ≤ (2 * vInv K) * (discN h M : ℝ) ^ ((1 : ℝ) / (2 * fDeg K)) := by
   intro K V _ _ _ _ _ _ _ _ h hK hs hp h1 M hM
   have hn := nondeg h hp
   obtain ⟨x₀, b, I, hx0, hb, hI, hIM, hnorm⟩ := exists_gen h hs hn h1 M hM
@@ -170,8 +192,9 @@ theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommG
   have hNb : (0 : ℝ) < Ideal.absNorm (Ideal.span {b}) := by
     exact_mod_cast Nat.pos_of_ne_zero (Ideal.absNorm_eq_zero_iff.not.mpr
       (Ideal.span_singleton_eq_bot.not.mpr hb0))
-  have hnormR : ((Ideal.absNorm I : ℕ) : ℝ) ^ 2 =
-      (Ideal.absNorm (Ideal.span {b}) : ℝ) * (discN h M : ℝ) := by
+  have hnormR
+      : ((Ideal.absNorm I : ℕ) : ℝ) ^ 2
+        = (Ideal.absNorm (Ideal.span {b}) : ℝ) * (discN h M : ℝ) := by
     exact_mod_cast hnorm
   have hD : (0 : ℝ) < discN h M := by
     by_contra hD
@@ -189,13 +212,15 @@ theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommG
   have hT : 0 < 2 * vInv K * (discN h M : ℝ) ^ ((1 : ℝ) / (2 * fDeg K)) := by
     rw [hv]
     exact mul_pos (Real.rpow_pos_of_pos hdK _) (Real.rpow_pos_of_pos hD _)
-  have hlogT : (fDeg K : ℝ) * Real.log (2 * vInv K * (discN h M : ℝ) ^ ((1 : ℝ) / (2 * fDeg K))) =
-      (Real.log |(discr K : ℝ)| + Real.log (discN h M : ℝ)) / 2 := by
+  have hlogT
+      : (fDeg K : ℝ) * Real.log (2 * vInv K * (discN h M : ℝ) ^ ((1 : ℝ) / (2 * fDeg K)))
+        = (Real.log |(discr K : ℝ)| + Real.log (discN h M : ℝ)) / 2 := by
     rw [hv, Real.log_mul (Real.rpow_pos_of_pos hdK _).ne' (Real.rpow_pos_of_pos hD _).ne',
       Real.log_rpow hdK, Real.log_rpow hD]
     field_simp
-  have hI2 : 2 * Real.log (Ideal.absNorm I : ℝ) =
-      Real.log (Ideal.absNorm (Ideal.span {b}) : ℝ) + Real.log (discN h M : ℝ) := by
+  have hI2
+      : 2 * Real.log (Ideal.absNorm I : ℝ)
+        = Real.log (Ideal.absNorm (Ideal.span {b}) : ℝ) + Real.log (discN h M : ℝ) := by
     rw [← Real.log_mul hNb.ne' hD.ne', ← hnormR, Real.log_pow]
     norm_num
   set T : ℝ := 2 * vInv K * (discN h M : ℝ) ^ ((1 : ℝ) / (2 * fDeg K)) with hTdef
@@ -203,10 +228,13 @@ theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommG
     intro w
     simp [InfinitePlace.mult, InfinitePlace.not_isReal_iff_isComplex.mpr (hTC.isComplex w)]
   have hsum := GlobalTheory.RegulatorClassBound.sum_mult_log K b hb0
-  have hc : ∑ w : InfinitePlace K, (w.mult : ℝ) * ((Real.log T + Real.log (w (b : K))) / 2) =
-      Real.log ((Ideal.absNorm I : ℝ) * Real.sqrt |(discr K : ℝ)|) := by
-    have e : ∀ w : InfinitePlace K, (w.mult : ℝ) * ((Real.log T + Real.log (w (b : K))) / 2) =
-        Real.log T + (w.mult : ℝ) * Real.log (w (b : K)) / 2 := by
+  have hc
+      : ∑ w : InfinitePlace K, (w.mult : ℝ) * ((Real.log T + Real.log (w (b : K))) / 2)
+        = Real.log ((Ideal.absNorm I : ℝ) * Real.sqrt |(discr K : ℝ)|) := by
+    have e
+        : ∀ w : InfinitePlace K,
+          (w.mult : ℝ) * ((Real.log T + Real.log (w (b : K))) / 2)
+            = Real.log T + (w.mult : ℝ) * Real.log (w (b : K)) / 2 := by
       intro w
       rw [hmult w]
       ring
@@ -216,8 +244,10 @@ theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommG
     have hfc : ((Fintype.card (InfinitePlace K) : ℕ) : ℝ) = (fDeg K : ℝ) := rfl
     rw [hfc]
     linarith [hlogT, hI2]
-  obtain ⟨a, haI, ha0, hab⟩ := GlobalTheory.RegulatorClassBound.exists_mem_box K I hI
-    (fun w => (Real.log T + Real.log (w (b : K))) / 2) hc
+  obtain ⟨a, haI, ha0, hab⟩ :=
+    GlobalTheory.RegulatorClassBound.exists_mem_box K I hI
+      (fun w => (Real.log T + Real.log (w (b : K))) / 2)
+      hc
   have haK : algebraMap (𝓞 K) K a ≠ 0 :=
     (map_ne_zero_iff _ (FaithfulSMul.algebraMap_injective (𝓞 K) K)).mpr ha0
   refine ⟨a • x₀, hIM a haI, ?_, fun τ => ?_⟩
@@ -249,8 +279,9 @@ theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommG
         ← Complex.normSq_eq_conj_mul_self, ← Complex.ofReal_mul, Complex.ofReal_re,
         Complex.normSq_eq_norm_sq, sq]
     rw [hvx]
-    calc ‖τ (a : K)‖ * ‖τ (a : K)‖ * r ≤ T * ‖τ (b : K)‖ * r :=
-          mul_le_mul_of_nonneg_right hsq.le hr.le
+    calc
+      ‖τ (a : K)‖ * ‖τ (a : K)‖ * r
+        ≤ T * ‖τ (b : K)‖ * r := mul_le_mul_of_nonneg_right hsq.le hr.le
       _ = T := by rw [mul_assoc, hbr, mul_one]
 
 end GlobalTheory.Mass.ShortVector

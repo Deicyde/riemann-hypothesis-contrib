@@ -18,7 +18,6 @@ section Objects
 
 variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
 
-
 variable (ι) in
 abbrev Family := Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ
 
@@ -26,19 +25,18 @@ def AllSmooth {n : ℕ} (L : Fin n → HermLine ι) : Prop := ∀ j, IsSmoothHer
 
 def degs {n : ℕ} (L : Fin n → HermLine ι) : Fin n → K → ℤ := fun j => (L j).a
 
-def pots {n : ℕ} (L : Fin n → HermLine ι) : Fin n → ((Σ k, ι k) → ℂ) → ℝ :=
-  fun j z => Real.log ((L j).h z)
-
-
+def pots {n : ℕ} (L : Fin n → HermLine ι) : Fin n → ((Σ k, ι k) → ℂ) → ℝ := fun j z =>
+  Real.log ((L j).h z)
 
 end Objects
 
 def Conservation.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (n : ℕ)
-    (L : Fin n → HermLine ι) (p : ℕ), IsArithVar P (n + 1) → AllSmooth L → p.Prime →
-    ∑ V ∈ (divSupp_finite P (C (p : ℤ))).toFinset,
-        (multAt (P ⊔ Ideal.span {C (p : ℤ)}) V : ℝ) * (geoNum n V (degs L) : ℝ) =
-      ptsIntegral P (pots L) (fun _ => 1)
+      (L : Fin n → HermLine ι) (p : ℕ),
+    IsArithVar P (n + 1) → AllSmooth L → p.Prime
+      → ∑ V ∈ (divSupp_finite P (C (p : ℤ))).toFinset,
+            (multAt (P ⊔ Ideal.span {C (p : ℤ)}) V : ℝ) * (geoNum n V (degs L) : ℝ)
+        = ptsIntegral P (pots L) (fun _ => 1)
 
 section Inhabitants
 

@@ -26,15 +26,17 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.ForSecondHalf
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
 open GroundTheory.Heights₂.Heights.HilbertSamuel
 
-theorem SiuZB.proof (hK : KodairaGeneric.Statement) (hZ : SectionsDimZero.Statement) : KH.SiuZStatement := by
+theorem SiuZB.proof (hK : KodairaGeneric.Statement) (hZ : SectionsDimZero.Statement)
+    : KH.SiuZStatement := by
   intro K _ ι _ Ω _ _ y D α I hI hV hB hNef hPos
   classical
-
-  have hagree : ∀ (V : Ideal (MRingOver ℚ ι)) (n : ℕ) (L : Fin n → K → ℤ), IsProjVarF V n →
-      I V n L = NumbersDVR.intNum ℚ V L := by
+  have hagree
+      : ∀ (V : Ideal (MRingOver ℚ ι)) (n : ℕ) (L : Fin n → K → ℤ),
+        IsProjVarF V n → I V n L = NumbersDVR.intNum ℚ V L := by
     obtain ⟨I₀, -, h₀⟩ := Targets.ExistsUnique.full ℚ ι
     intro V n L hVn
     rw [h₀ I hI V n L hVn, h₀ _ (NumbersDVR.IntNumIsFieldIntersection.full ℚ K ι) V n L hVn]
@@ -44,8 +46,8 @@ theorem SiuZB.proof (hK : KodairaGeneric.Statement) (hZ : SectionsDimZero.Statem
     rw [h] at hPos
     exact hPos
 
-  obtain ⟨k, e, hk, he, hmem⟩ :
-      ∃ (k : ℕ) (e : Ω), 1 ≤ k ∧ e ≠ 0 ∧ e ∈ chartLatQ y ((k : ℤ) • α - 1) 1 := by
+  obtain ⟨k, e, hk, he, hmem⟩
+      : ∃ (k : ℕ) (e : Ω), 1 ≤ k ∧ e ≠ 0 ∧ e ∈ chartLatQ y ((k : ℤ) • α - 1) 1 := by
     rcases Nat.eq_zero_or_pos D with rfl | hD
     · have hr := hZ K ι Ω y ((1 : ℕ) • α - 1) 1 hV
       have hg : genDeg (mCoordIdeal y) 0 ((1 : ℕ) • α - 1) = genDeg (mCoordIdeal y) 0 α := by
@@ -55,7 +57,8 @@ theorem SiuZB.proof (hK : KodairaGeneric.Statement) (hZ : SectionsDimZero.Statem
         exact j.elim0
       rw [hg] at hr
       have hpos : 0 < Module.finrank ℚ (chartLatQ y ((1 : ℕ) • α - 1) 1) := by
-        have : (0 : ℤ) < Module.finrank ℚ (chartLatQ y ((1 : ℕ) • α - 1) 1) := by rw [hr]; exact hdeg
+        have : (0 : ℤ) < Module.finrank ℚ (chartLatQ y ((1 : ℕ) • α - 1) 1) := by
+          rw [hr]; exact hdeg
         exact_mod_cast this
       have := Module.nontrivial_of_finrank_pos hpos
       obtain ⟨⟨e, he⟩, hne⟩ := exists_ne (0 : chartLatQ y ((1 : ℕ) • α - 1) 1)

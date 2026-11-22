@@ -5,15 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open scoped Matrix in
-theorem UpperTheory.cohomology_to_coinvariants_surjective :
-    UpperTheory.V.Af.CohB.ToCoSurj := by
+theorem UpperTheory.cohomology_to_coinvariants_surjective : UpperTheory.V.Af.CohB.ToCoSurj := by
   intro Γ X Y _ _ _ p hp y h d ξ F
   choose c hc using h
   have hm : ∀ x, c x • x ∈ UpperTheory.V.Af.CohB.fib p hp y := fun x => by
     change p (c x • x) = y
     rw [hp, hc]
-  have key : ∀ (g g' : Γ) (z z' : ↥(UpperTheory.V.Af.CohB.fib p hp y)), g⁻¹ • z.1 = g'⁻¹ • z'.1 →
-      ξ g *ᵥ (ξ g'⁻¹ *ᵥ F.1 g' z') = F.1 g z := by
+  have key
+      : ∀ (g g' : Γ) (z z' : ↥(UpperTheory.V.Af.CohB.fib p hp y)),
+        g⁻¹ • z.1 = g'⁻¹ • z'.1 → ξ g *ᵥ (ξ g'⁻¹ *ᵥ F.1 g' z') = F.1 g z := by
     intro g g' z z' hz
     have hz' : z.1 = (g * g'⁻¹) • z'.1 := by rw [mul_smul, ← hz, smul_inv_smul]
     have hs : g * g'⁻¹ ∈ MulAction.stabilizer Γ y := by
@@ -26,7 +26,9 @@ theorem UpperTheory.cohomology_to_coinvariants_surjective :
       apply Subtype.ext
       change (g * g'⁻¹)⁻¹ • z.1 = z'.1
       rw [hz', inv_smul_smul]
-    change F.1 (g * g'⁻¹ * g') z = ξ (g * g'⁻¹) *ᵥ F.1 g' ((⟨_, hs⟩ : ↥(MulAction.stabilizer Γ y))⁻¹ • z) at h3
+    change F.1 (g * g'⁻¹ * g') z
+        = ξ (g * g'⁻¹) *ᵥ F.1 g' ((⟨_, hs⟩ : ↥(MulAction.stabilizer Γ y))⁻¹ • z)
+      at h3
     rw [h4, inv_mul_cancel_right] at h3
     rw [h3, map_mul, Matrix.mulVec_mulVec]
   refine ⟨fun x => ξ (c x)⁻¹ *ᵥ F.1 (c x) ⟨c x • x, hm x⟩, ?_⟩

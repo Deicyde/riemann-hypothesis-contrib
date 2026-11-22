@@ -11,9 +11,11 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Loc
 
 namespace Zz
 
-def CentredSegSqInt (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : Prop :=
-  ∀ (Δ : Segment k) (y : IrrGL (k := k)), IsLSeg Δ y.rep → (∀ (t : kˣ) (c : ℂ), Zl.ScalarBy y t c → ‖c‖ = 1) →
-    IsSqIntCoeff y.rep
+def CentredSegSqInt
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : Prop :=
+  ∀ (Δ : Segment k) (y : IrrGL (k := k)),
+    IsLSeg Δ y.rep → (∀ (t : kˣ) (c : ℂ), Zl.ScalarBy y t c → ‖c‖ = 1) → IsSqIntCoeff y.rep
 
 end Zz
 

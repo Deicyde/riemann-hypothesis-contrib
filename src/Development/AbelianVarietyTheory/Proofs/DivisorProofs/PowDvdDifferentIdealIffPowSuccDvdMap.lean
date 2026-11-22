@@ -9,13 +9,14 @@ open GlobalTheory.PD GlobalTheory.CechDR KaehlerDifferential
 
 namespace GlobalTheory.TameDifferent
 
-private theorem trace_add_of_short_exact {k A M C : Type*} [Field k]
-    [AddCommGroup A] [Module k A] [AddCommGroup M] [Module k M] [AddCommGroup C] [Module k C]
-    [Module.Finite k M] (f : A →ₗ[k] M) (g : M →ₗ[k] C) (hf : Function.Injective f)
-    (hg : Function.Surjective g) (hfg : ∀ a, g (f a) = 0) (hex : ∀ m, g m = 0 → ∃ a, f a = m)
+private theorem trace_add_of_short_exact
+    {k A M C : Type*} [Field k] [AddCommGroup A] [Module k A] [AddCommGroup M] [Module k M]
+    [AddCommGroup C] [Module k C] [Module.Finite k M]
+    (f : A →ₗ[k] M) (g : M →ₗ[k] C) (hf : Function.Injective f) (hg : Function.Surjective g)
+    (hfg : ∀ a, g (f a) = 0) (hex : ∀ m, g m = 0 → ∃ a, f a = m)
     (α : A →ₗ[k] A) (φ : M →ₗ[k] M) (γ : C →ₗ[k] C)
-    (h1 : ∀ a, φ (f a) = f (α a)) (h2 : ∀ m, g (φ m) = γ (g m)) :
-    LinearMap.trace k M φ = LinearMap.trace k A α + LinearMap.trace k C γ := by
+    (h1 : ∀ a, φ (f a) = f (α a)) (h2 : ∀ m, g (φ m) = γ (g m))
+    : LinearMap.trace k M φ = LinearMap.trace k A α + LinearMap.trace k C γ := by
   have : Module.Finite k A := Module.Finite.of_injective f hf
   have : Module.Finite k C := Module.Finite.of_surjective g hg
   obtain ⟨s, hs⟩ := g.exists_rightInverse_of_surjective (LinearMap.range_eq_top.2 hg)
@@ -43,36 +44,44 @@ private theorem trace_add_of_short_exact {k A M C : Type*} [Field k]
   have e2 : g ∘ₗ (φ ∘ₗ s) = γ := by
     ext c
     simp only [LinearMap.comp_apply, h2, hs']
-  calc LinearMap.trace k M φ
-      = LinearMap.trace k M ((φ ∘ₗ f) ∘ₗ r) + LinearMap.trace k M ((φ ∘ₗ s) ∘ₗ g) := by
-        rw [← map_add (f := _), ← hφ]
+  calc
+    LinearMap.trace k M φ
+        = LinearMap.trace k M ((φ ∘ₗ f) ∘ₗ r) + LinearMap.trace k M ((φ ∘ₗ s) ∘ₗ g) := by
+      rw [← map_add (f := _), ← hφ]
     _ = _ := by
-        rw [LinearMap.trace_comp_comm' r (φ ∘ₗ f), LinearMap.trace_comp_comm' g (φ ∘ₗ s), e1, e2]
+      rw [LinearMap.trace_comp_comm' r (φ ∘ₗ f), LinearMap.trace_comp_comm' g (φ ∘ₗ s), e1, e2]
 
-theorem trace_quotient_pow {k B : Type*} [Field k] [CommRing B] [IsDedekindDomain B]
-    (P : Ideal B) [P.IsMaximal] (hP : P ≠ ⊥) (e : ℕ)
-    [Algebra k (B ⧸ P ^ (e + 1))] [Algebra k (B ⧸ P)] [Module.Finite k (B ⧸ P ^ (e + 1))]
-    (h : ∀ c : k, Ideal.Quotient.factor (Ideal.pow_le_self (Nat.succ_ne_zero e))
-      (algebraMap k (B ⧸ P ^ (e + 1)) c) = algebraMap k (B ⧸ P) c) (x : B) :
-    Algebra.trace k (B ⧸ P ^ (e + 1)) (Ideal.Quotient.mk _ x) =
-      (e + 1 : k) * Algebra.trace k (B ⧸ P) (Ideal.Quotient.mk _ x) := by
+theorem trace_quotient_pow
+    {k B : Type*} [Field k] [CommRing B] [IsDedekindDomain B]
+    (P : Ideal B) [P.IsMaximal]
+    (hP : P ≠ ⊥)
+    (e : ℕ) [Algebra k (B ⧸ P ^ (e + 1))] [Algebra k (B ⧸ P)] [Module.Finite k (B ⧸ P ^ (e + 1))]
+    (h : ∀ c : k,
+      Ideal.Quotient.factor (Ideal.pow_le_self (Nat.succ_ne_zero e))
+          (algebraMap k (B ⧸ P ^ (e + 1)) c)
+        = algebraMap k (B ⧸ P) c)
+    (x : B)
+    : Algebra.trace k (B ⧸ P ^ (e + 1)) (Ideal.Quotient.mk _ x)
+      = (e + 1 : k) * Algebra.trace k (B ⧸ P) (Ideal.Quotient.mk _ x) := by
   rename_i hmax instA instP instF
   revert h instF instA
   induction e with
   | zero =>
     intro instA instF h
-    have hbij : Function.Bijective
-        (Ideal.Quotient.factor (Ideal.pow_le_self (I := P) (Nat.succ_ne_zero 0))) := by
+    have hbij : Function.Bijective (Ideal.Quotient.factor (Ideal.pow_le_self (I := P)
+        (Nat.succ_ne_zero 0))) := by
       refine ⟨?_, Ideal.Quotient.factor_surjective _⟩
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro y hy
       obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
       rw [Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem] at hy
       rw [Ideal.Quotient.eq_zero_iff_mem]
       simpa using hy
-    let g : (B ⧸ P ^ (0 + 1)) →ₐ[k] B ⧸ P :=
-      { toRingHom := Ideal.Quotient.factor (Ideal.pow_le_self (Nat.succ_ne_zero 0))
-        commutes' := h }
+    let g : (B ⧸ P ^ (0 + 1)) →ₐ[k] B ⧸ P := {
+      toRingHom := Ideal.Quotient.factor (Ideal.pow_le_self (Nat.succ_ne_zero 0))
+      commutes' := h
+    }
     have := Algebra.trace_eq_of_algEquiv (AlgEquiv.ofBijective g hbij) (Ideal.Quotient.mk _ x)
     rw [← this]
     simp [g]
@@ -81,19 +90,21 @@ theorem trace_quotient_pow {k B : Type*} [Field k] [CommRing B] [IsDedekindDomai
     have hle : P ^ (e + 1 + 1) ≤ P ^ (e + 1) := Ideal.pow_le_pow_right (Nat.le_succ _)
     let instB : Algebra k (B ⧸ P ^ (e + 1)) :=
       ((Ideal.Quotient.factor hle).comp (algebraMap k (B ⧸ P ^ (e + 1 + 1)))).toAlgebra
-    let g : (B ⧸ P ^ (e + 1 + 1)) →ₐ[k] B ⧸ P ^ (e + 1) :=
-      { toRingHom := Ideal.Quotient.factor hle
-        commutes' := fun _ => rfl }
+    let g : (B ⧸ P ^ (e + 1 + 1)) →ₐ[k] B ⧸ P ^ (e + 1) := {
+      toRingHom := Ideal.Quotient.factor hle
+      commutes' := fun _ => rfl
+    }
     have hgmk : ∀ y : B, g (Ideal.Quotient.mk _ y) = Ideal.Quotient.mk _ y := fun _ => rfl
     have hg : Function.Surjective g := Ideal.Quotient.factor_surjective hle
     have instG : Module.Finite k (B ⧸ P ^ (e + 1)) := Module.Finite.of_surjective g.toLinearMap hg
-    have ih' := @ih instB instG (by
-      intro c
-      rw [← h c]
-      change Ideal.Quotient.factor _ (Ideal.Quotient.factor hle (algebraMap k _ c)) = _
-      obtain ⟨z, hz⟩ := Ideal.Quotient.mk_surjective (algebraMap k (B ⧸ P ^ (e + 1 + 1)) c)
-      rw [← hz]
-      rfl)
+    have ih' :=
+      @ih instB instG (by
+        intro c
+        rw [← h c]
+        change Ideal.Quotient.factor _ (Ideal.Quotient.factor hle (algebraMap k _ c)) = _
+        obtain ⟨z, hz⟩ := Ideal.Quotient.mk_surjective (algebraMap k (B ⧸ P ^ (e + 1 + 1)) c)
+        rw [← hz]
+        rfl)
     obtain ⟨a, ha, ha'⟩ := Ideal.exists_mem_pow_notMem_pow_succ P hP hmax.ne_top (e + 1)
     let f0 : (B ⧸ P) →ₗ[B] B ⧸ P ^ (e + 1 + 1) :=
       Submodule.mapQ P (P ^ (e + 1 + 1) : Ideal B) (LinearMap.mul B B a) (by
@@ -102,26 +113,29 @@ theorem trace_quotient_pow {k B : Type*} [Field k] [CommRing B] [IsDedekindDomai
         rw [pow_succ P (e + 1)]
         exact Ideal.mul_mem_mul ha hy)
     have hf0 : ∀ y : B, f0 (Ideal.Quotient.mk _ y) = Ideal.Quotient.mk _ (a * y) := fun _ => rfl
-    let f : (B ⧸ P) →ₗ[k] B ⧸ P ^ (e + 1 + 1) :=
-      { toFun := f0
-        map_add' := f0.map_add
-        map_smul' := by
-          intro c y
-          obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
-          obtain ⟨z, hz⟩ := Ideal.Quotient.mk_surjective (algebraMap k (B ⧸ P ^ (e + 1 + 1)) c)
-          rw [RingHom.id_apply, Algebra.smul_def, Algebra.smul_def, ← h c, ← hz,
-            Ideal.Quotient.factor_mk, ← map_mul, hf0, hf0, ← map_mul]
-          congr 1
-          ring }
+    let f : (B ⧸ P) →ₗ[k] B ⧸ P ^ (e + 1 + 1) := {
+      toFun := f0
+      map_add' := f0.map_add
+      map_smul' := by
+        intro c y
+        obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
+        obtain ⟨z, hz⟩ := Ideal.Quotient.mk_surjective (algebraMap k (B ⧸ P ^ (e + 1 + 1)) c)
+        rw [RingHom.id_apply, Algebra.smul_def, Algebra.smul_def, ← h c, ← hz,
+          Ideal.Quotient.factor_mk, ← map_mul, hf0, hf0, ← map_mul]
+        congr 1
+        ring
+    }
     have hf : ∀ y : B, f (Ideal.Quotient.mk _ y) = Ideal.Quotient.mk _ (a * y) := fun _ => rfl
-    have key := trace_add_of_short_exact f g.toLinearMap ?_ hg ?_ ?_
-      (Algebra.lmul k _ (Ideal.Quotient.mk _ x)) (Algebra.lmul k _ (Ideal.Quotient.mk _ x))
-      (Algebra.lmul k _ (Ideal.Quotient.mk _ x)) ?_ ?_
+    have key :=
+      trace_add_of_short_exact f g.toLinearMap ?_ hg ?_ ?_
+        (Algebra.lmul k _ (Ideal.Quotient.mk _ x)) (Algebra.lmul k _ (Ideal.Quotient.mk _ x))
+        (Algebra.lmul k _ (Ideal.Quotient.mk _ x)) ?_ ?_
     · rw [← Algebra.trace_apply, ← Algebra.trace_apply, ← Algebra.trace_apply] at key
       rw [key, ih']
       push_cast
       ring
-    · set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    · set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro y hy
       obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
       rw [hf, Ideal.Quotient.eq_zero_iff_mem] at hy
@@ -147,8 +161,8 @@ theorem trace_quotient_pow {k B : Type*} [Field k] [CommRing B] [IsDedekindDomai
       rw [hf, map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.2 hu, zero_add, mul_comm]
     · intro y
       obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
-      change Ideal.Quotient.mk _ x * f (Ideal.Quotient.mk _ y) =
-        f (Ideal.Quotient.mk _ x * Ideal.Quotient.mk _ y)
+      change Ideal.Quotient.mk _ x * f (Ideal.Quotient.mk _ y)
+        = f (Ideal.Quotient.mk _ x * Ideal.Quotient.mk _ y)
       rw [← map_mul, hf, hf, ← map_mul]
       congr 1
       ring
@@ -164,35 +178,38 @@ open nonZeroDivisors Module
 
 attribute [local instance] FractionRing.liftAlgebra FractionRing.isScalarTower_liftAlgebra
 
-variable {A B : Type} [CommRing A] [CommRing B] [Algebra A B]
-  [IsDedekindDomain A] [IsDedekindDomain B] [Module.IsTorsionFree A B] [Module.Finite A B]
+variable
+  {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [IsDedekindDomain A] [IsDedekindDomain B]
+  [Module.IsTorsionFree A B] [Module.Finite A B]
 
 theorem intTrace_mk_eq
-    {p : Ideal A} [p.IsMaximal] (P Q : Ideal B) [P.IsMaximal] [P.LiesOver p] (hP0 : P ≠ ⊥)
-    (n : ℕ) (hPQ : IsCoprime P Q) (hP : P ^ (n + 1) * Q = Ideal.map (algebraMap A B) p)
-    (x : B) (hx : x ∈ Q) :
-    Ideal.Quotient.mk p (Algebra.intTrace A B x) =
-      ((n + 1 : ℕ) : A ⧸ p) * Algebra.trace (A ⧸ p) (B ⧸ P) (Ideal.Quotient.mk _ x) := by
-  let : Algebra (A ⧸ p) (B ⧸ Q) := Ideal.Quotient.algebraQuotientOfLEComap (by
+    {p : Ideal A} [p.IsMaximal]
+    (P Q : Ideal B) [P.IsMaximal] [P.LiesOver p]
+    (hP0 : P ≠ ⊥)
+    (n : ℕ)
+    (hPQ : IsCoprime P Q) (hP : P ^ (n + 1) * Q = Ideal.map (algebraMap A B) p)
+    (x : B) (hx : x ∈ Q)
+    : Ideal.Quotient.mk p (Algebra.intTrace A B x)
+      = ((n + 1 : ℕ) : A ⧸ p) * Algebra.trace (A ⧸ p) (B ⧸ P) (Ideal.Quotient.mk _ x) := by
+  let : Algebra (A ⧸ p) (B ⧸ Q) :=
+    Ideal.Quotient.algebraQuotientOfLEComap (by
       rw [← Ideal.map_le_iff_le_comap, ← hP]
       exact Ideal.mul_le_right)
   have : IsScalarTower A (A ⧸ p) (B ⧸ Q) := .of_algebraMap_eq' rfl
-  have : Module.Finite (A ⧸ p) (B ⧸ Q) :=
-    Module.Finite.of_restrictScalars_finite A (A ⧸ p) (B ⧸ Q)
-  let : Algebra (A ⧸ p) (B ⧸ P ^ (n + 1)) := Ideal.Quotient.algebraQuotientOfLEComap (by
+  have : Module.Finite (A ⧸ p) (B ⧸ Q) := Module.Finite.of_restrictScalars_finite A (A ⧸ p) (B ⧸ Q)
+  let : Algebra (A ⧸ p) (B ⧸ P ^ (n + 1)) :=
+    Ideal.Quotient.algebraQuotientOfLEComap (by
       rw [← Ideal.map_le_iff_le_comap, ← hP]
       exact Ideal.mul_le_left)
   have : IsScalarTower A (A ⧸ p) (B ⧸ P ^ (n + 1)) := .of_algebraMap_eq' rfl
   have : Module.Finite (A ⧸ p) (B ⧸ P ^ (n + 1)) :=
     Module.Finite.of_restrictScalars_finite A (A ⧸ p) (B ⧸ P ^ (n + 1))
-  let e : (B ⧸ p.map (algebraMap A B)) ≃ₐ[A ⧸ p] ((B ⧸ P ^ (n + 1)) × B ⧸ Q) :=
-    { __ := (Ideal.quotEquivOfEq hP.symm).trans
-        (Ideal.quotientMulEquivQuotientProd _ Q hPQ.pow_left),
-      commutes' := Quotient.ind fun _ ↦ rfl }
-  have hx' : (e (Ideal.Quotient.mk _ x)).2 = 0 := by
-    simpa [e, Ideal.Quotient.eq_zero_iff_mem]
-  have hx'' : (e (Ideal.Quotient.mk _ x)).1 = Ideal.Quotient.mk _ x := by
-    simp [e]
+  let e : (B ⧸ p.map (algebraMap A B)) ≃ₐ[A ⧸ p] ((B ⧸ P ^ (n + 1)) × B ⧸ Q) := {
+    __ := (Ideal.quotEquivOfEq hP.symm).trans (Ideal.quotientMulEquivQuotientProd _ Q hPQ.pow_left)
+    commutes' := Quotient.ind fun _ ↦ rfl
+  }
+  have hx' : (e (Ideal.Quotient.mk _ x)).2 = 0 := by simpa [e, Ideal.Quotient.eq_zero_iff_mem]
+  have hx'' : (e (Ideal.Quotient.mk _ x)).1 = Ideal.Quotient.mk _ x := by simp [e]
   let := Ideal.Quotient.field p
   rw [← Algebra.trace_quotient_eq_of_isDedekindDomain, ← Algebra.trace_eq_of_algEquiv e,
     Algebra.trace_prod_apply, hx', hx'', map_zero, add_zero, Nat.cast_add, Nat.cast_one]
@@ -201,20 +218,22 @@ theorem intTrace_mk_eq
   obtain ⟨c, rfl⟩ := Ideal.Quotient.mk_surjective c
   rfl
 
-theorem not_pow_dvd_differentIdeal [Algebra.IsSeparable (FractionRing A) (FractionRing B)]
-    {p : Ideal A} [p.IsMaximal] (P Q : Ideal B) [P.IsMaximal] [P.LiesOver p]
-    [Algebra.IsSeparable (A ⧸ p) (B ⧸ P)] (hP0 : P ≠ ⊥)
-    (n : ℕ) (hPQ : IsCoprime P Q) (hP : P ^ (n + 1) * Q = Ideal.map (algebraMap A B) p)
-    (hn : ((n + 1 : ℕ) : A ⧸ p) ≠ 0) :
-    ¬ P ^ (n + 1) ∣ differentIdeal A B := by
+theorem not_pow_dvd_differentIdeal
+    [Algebra.IsSeparable (FractionRing A) (FractionRing B)]
+    {p : Ideal A} [p.IsMaximal]
+    (P Q : Ideal B) [P.IsMaximal] [P.LiesOver p] [Algebra.IsSeparable (A ⧸ p) (B ⧸ P)]
+    (hP0 : P ≠ ⊥)
+    (n : ℕ)
+    (hPQ : IsCoprime P Q) (hP : P ^ (n + 1) * Q = Ideal.map (algebraMap A B) p)
+    (hn : ((n + 1 : ℕ) : A ⧸ p) ≠ 0)
+    : ¬ P ^ (n + 1) ∣ differentIdeal A B := by
   intro h
   let := Ideal.Quotient.field p
   let := Ideal.Quotient.field P
   obtain ⟨x, hx⟩ : ∃ x, Algebra.trace (A ⧸ p) (B ⧸ P) x ≠ 0 := by
     simpa [LinearMap.ext_iff] using Algebra.trace_ne_zero (A ⧸ p) (B ⧸ P)
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
-  have h1 : x ∈ P ⊔ Q := by
-    rw [Ideal.isCoprime_iff_sup_eq.mp hPQ]; trivial
+  have h1 : x ∈ P ⊔ Q := by rw [Ideal.isCoprime_iff_sup_eq.mp hPQ]; trivial
   obtain ⟨u, hu, y, hy, rfl⟩ := Submodule.mem_sup.mp h1
   rw [map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.mpr hu, zero_add] at hx
   refine not_dvd_differentIdeal_of_intTrace_not_mem A _ Q hP y hy ?_ h
@@ -229,11 +248,13 @@ open nonZeroDivisors
 
 attribute [local instance] FractionRing.liftAlgebra FractionRing.isScalarTower_liftAlgebra
 
-theorem pow_dvd_differentIdeal_iff_pow_succ_dvd_map : ∀ (A B : Type) [CommRing A] [IsDomain A]
-    [IsDiscreteValuationRing A] [CommRing B] [IsDedekindDomain B] [Algebra A B] [Module.Finite A B]
-    [Module.IsTorsionFree A B] [CharZero (IsLocalRing.ResidueField A)] (Q : Ideal B) [Q.IsMaximal]
-    [Q.LiesOver (IsLocalRing.maximalIdeal A)] (n : ℕ),
-    Q ^ n ∣ differentIdeal A B ↔ Q ^ (n + 1) ∣ (IsLocalRing.maximalIdeal A).map (algebraMap A B) := by
+theorem pow_dvd_differentIdeal_iff_pow_succ_dvd_map
+    : ∀ (A B : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [CommRing B]
+        [IsDedekindDomain B] [Algebra A B] [Module.Finite A B] [Module.IsTorsionFree A B]
+        [CharZero (IsLocalRing.ResidueField A)] (Q : Ideal B) [Q.IsMaximal]
+        [Q.LiesOver (IsLocalRing.maximalIdeal A)] (n : ℕ),
+      Q ^ n ∣ differentIdeal A B
+        ↔ Q ^ (n + 1) ∣ (IsLocalRing.maximalIdeal A).map (algebraMap A B) := by
   intro A B _ _ _ _ _ _ _ _ _ Q _ _ n
   have hm : IsLocalRing.maximalIdeal A ≠ ⊥ := IsDiscreteValuationRing.not_a_field A
   have hm' : (IsLocalRing.maximalIdeal A).map (algebraMap A B) ≠ ⊥ :=
@@ -282,7 +303,8 @@ theorem pow_dvd_differentIdeal_iff_pow_succ_dvd_map : ∀ (A B : Type) [CommRing
     pow_sub_one_dvd_differentIdeal A Q e hm ((hk e).mpr le_rfl)
   have hD2 : ¬ Q ^ e ∣ differentIdeal A B := by
     rw [hke]
-    refine not_pow_dvd_differentIdeal (p := IsLocalRing.maximalIdeal A) Q R hQ0 k (Ideal.isCoprime_iff_sup_eq.mpr h₁) ?_ ?_
+    refine not_pow_dvd_differentIdeal (p := IsLocalRing.maximalIdeal A) Q R hQ0 k
+      (Ideal.isCoprime_iff_sup_eq.mpr h₁) ?_ ?_
     · rw [h₂, hke]
     · exact Nat.cast_ne_zero.mpr (Nat.succ_ne_zero k)
   rw [hk (n + 1)]

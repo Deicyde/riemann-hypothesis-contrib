@@ -6,7 +6,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.ScalarOnPartsFull
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory Matrix IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory Matrix IsDedekindDomain NumberField
 open Formalism.L2.Theta
 open scoped TensorProduct ContDiff InnerProductSpace
 
@@ -16,20 +18,21 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (V : HSp D)
 
-theorem rder_zero (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin V.rank) ℂ) :
-    Rder θ V τ X (0 : GA D V → ℂ) = 0 := by
+theorem rder_zero (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin V.rank) ℂ)
+    : Rder θ V τ X (0 : GA D V → ℂ) = 0 := by
   funext g
   simp [Rder]
 
-theorem rderC_zero (τ : D.what₂.Tau) (Z : Matrix (Fin V.rank) (Fin V.rank) ℂ) :
-    RderC θ V τ Z (0 : GA D V → ℂ) = 0 := by
+theorem rderC_zero (τ : D.what₂.Tau) (Z : Matrix (Fin V.rank) (Fin V.rank) ℂ)
+    : RderC θ V τ Z (0 : GA D V → ℂ) = 0 := by
   simp [RderC, rder_zero]
 
 theorem gelf_zero (τ : D.what₂.Tau) (k : ℕ) : gelf θ V τ k (0 : GA D V → ℂ) = 0 := by
   unfold gelf
   refine Finset.sum_eq_zero fun idx _ => ?_
-  have h : ∀ l : List ((GA D V → ℂ) → GA D V → ℂ), (∀ f ∈ l, f 0 = 0) →
-      l.foldr (fun f acc => f acc) 0 = 0 := by
+  have h
+      : ∀ l : List ((GA D V → ℂ) → GA D V → ℂ),
+        (∀ f ∈ l, f 0 = 0) → l.foldr (fun f acc => f acc) 0 = 0 := by
     intro l hl
     induction l with
     | nil => rfl
@@ -42,8 +45,8 @@ theorem gelf_zero (τ : D.what₂.Tau) (k : ℕ) : gelf θ V τ k (0 : GA D V �
   obtain ⟨a, rfl⟩ := hf
   exact rderC_zero θ V τ _
 
-theorem foldr_rder_zero (l : List (D.what₂.Tau × Matrix (Fin V.rank) (Fin V.rank) ℂ)) :
-    l.foldr (fun p f => Rder θ V p.1 p.2 f) (0 : GA D V → ℂ) = 0 := by
+theorem foldr_rder_zero (l : List (D.what₂.Tau × Matrix (Fin V.rank) (Fin V.rank) ℂ))
+    : l.foldr (fun p f => Rder θ V p.1 p.2 f) (0 : GA D V → ℂ) = 0 := by
   induction l with
   | nil => rfl
   | cons p l ih =>
@@ -66,7 +69,8 @@ theorem isAutFunSm_zero : IsAutFunSm θ V (fun _ => 0) := {
     have h := foldr_rder_zero θ V l
     change ‖(l.foldr (fun p f => Rder θ V p.1 p.2 f) (0 : GA D V → ℂ)) (x * g)‖ ≤ _
     rw [h]
-    simp }
+    simp
+}
 
 theorem isCuspFun_zero : IsCuspFun V (fun _ => 0) := by
   intro r C _ μ 𝓕 _ _ g
@@ -74,7 +78,8 @@ theorem isCuspFun_zero : IsCuspFun V (fun _ => 0) := by
 
 variable {V} {S : D.what₂.Tau → SPar}
 
-theorem isMultMap_zero (M : DSModel V S) (J : Set (GA D V)) (χ : GA D V → ℂ) : IsMultMap θ M J χ 0 := {
+theorem isMultMap_zero (M : DSModel V S) (J : Set (GA D V)) (χ : GA D V → ℂ)
+    : IsMultMap θ M J χ 0 := {
   aut v := by
     show IsAutFunSm θ V (fun _ => 0)
     exact isAutFunSm_zero θ V
@@ -85,31 +90,31 @@ theorem isMultMap_zero (M : DSModel V S) (J : Set (GA D V)) (χ : GA D V → ℂ
   equiv τ g _ v w _ := by
     funext x
     simp [rTr]
-  cont τ v x := by
-    refine ⟨0, ⟨[], 0, by simp, fun w _ => by simp⟩, fun w => by simp⟩ }
-
+  cont τ v x := by refine ⟨0, ⟨[], 0, by simp, fun w _ => by simp⟩, fun w => by simp⟩
+}
 
 variable (V) in
-theorem rder_smul (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin V.rank) ℂ) (c : ℂ) (φ : GA D V → ℂ) :
-    Rder θ V τ X (c • φ) = c • Rder θ V τ X φ := by
+theorem rder_smul
+    (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin V.rank) ℂ) (c : ℂ) (φ : GA D V → ℂ)
+    : Rder θ V τ X (c • φ) = c • Rder θ V τ X φ := by
   funext g
   simp only [Rder, Pi.smul_apply, smul_eq_mul]
-  first
-    | exact deriv_const_mul_field c
-    | simp
+  first | exact deriv_const_mul_field c | simp
 
 variable (V) in
-theorem foldr_rder_smul (l : List (D.what₂.Tau × Matrix (Fin V.rank) (Fin V.rank) ℂ)) (c : ℂ) (φ : GA D V → ℂ) :
-    l.foldr (fun p f => Rder θ V p.1 p.2 f) (c • φ) = c • l.foldr (fun p f => Rder θ V p.1 p.2 f) φ := by
+theorem foldr_rder_smul
+    (l : List (D.what₂.Tau × Matrix (Fin V.rank) (Fin V.rank) ℂ)) (c : ℂ) (φ : GA D V → ℂ)
+    : l.foldr (fun p f => Rder θ V p.1 p.2 f) (c • φ)
+      = c • l.foldr (fun p f => Rder θ V p.1 p.2 f) φ := by
   induction l with
   | nil => rfl
   | cons p l ih =>
     rw [List.foldr_cons, List.foldr_cons, ih]
     exact rder_smul θ V p.1 p.2 c _
 
-
 variable (V) in
-theorem isAutFunSm_smul {φ : GA D V → ℂ} (h : IsAutFunSm θ V φ) (c : ℂ) : IsAutFunSm θ V (c • φ) := {
+theorem isAutFunSm_smul {φ : GA D V → ℂ} (h : IsAutFunSm θ V φ) (c : ℂ)
+    : IsAutFunSm θ V (c • φ) := {
   left γ hγ g := by simp only [Pi.smul_apply, h.left γ hγ g]
   level := by
     obtain ⟨U, hU, hk⟩ := h.level
@@ -125,8 +130,8 @@ theorem isAutFunSm_smul {φ : GA D V → ℂ} (h : IsAutFunSm θ V φ) (c : ℂ)
     obtain ⟨C, hC⟩ := hN l hl x
     refine ⟨‖c‖ * C, fun g hg => ?_⟩
     rw [foldr_rder_smul, Pi.smul_apply, norm_smul, mul_assoc]
-    exact mul_le_mul_of_nonneg_left (hC g hg) (norm_nonneg c) }
-
+    exact mul_le_mul_of_nonneg_left (hC g hg) (norm_nonneg c)
+}
 
 variable (V) in
 theorem isCuspFun_smul {φ : GA D V → ℂ} (h : IsCuspFun V φ) (c : ℂ) : IsCuspFun V (c • φ) := by
@@ -134,8 +139,10 @@ theorem isCuspFun_smul {φ : GA D V → ℂ} (h : IsCuspFun V φ) (c : ℂ) : Is
   simp only [Pi.smul_apply]
   rw [MeasureTheory.integral_smul, h r C hC μ 𝓕 hμ h𝓕 g, smul_zero]
 
-theorem isMultMap_smul {M : DSModel V S} {J : Set (GA D V)} {χ : GA D V → ℂ} {T : MMap M}
-    (hT : IsMultMap θ M J χ T) (c : ℂ) : IsMultMap θ M J χ (c • T) := {
+theorem isMultMap_smul
+    {M : DSModel V S} {J : Set (GA D V)} {χ : GA D V → ℂ} {T : MMap M} (hT : IsMultMap θ M J χ T)
+    (c : ℂ)
+    : IsMultMap θ M J χ (c • T) := {
   aut v := by
     show IsAutFunSm θ V (c • T v)
     exact isAutFunSm_smul θ V (hT.aut v) c
@@ -153,7 +160,8 @@ theorem isMultMap_smul {M : DSModel V S} {J : Set (GA D V)} {χ : GA D V → ℂ
     refine ⟨c • ℓ, ⟨L, ‖c‖ * C, hL, fun w hw => ?_⟩, fun w => ?_⟩
     · rw [LinearMap.smul_apply, norm_smul, mul_assoc]
       exact mul_le_mul_of_nonneg_left (hC w hw) (norm_nonneg c)
-    · simp only [LinearMap.smul_apply, _root_.smul_apply, Pi.smul_apply, hℓ w] }
+    · simp only [LinearMap.smul_apply, _root_.smul_apply, Pi.smul_apply, hℓ w]
+}
 
 end Formalism.IndefR.Mult
 

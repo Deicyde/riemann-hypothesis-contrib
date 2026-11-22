@@ -11,14 +11,17 @@ namespace ReciprocityTheory.L2DbarEstimates.C
 open MeasureTheory Metric Set Filter Topology Complex
 open scoped ENNReal
 
-theorem reg_ball {n : ℕ} {Ω : Set (V n)} {u : V n → ℂ} (hΩ : IsOpen Ω) (hu : Integrable u)
-    (hw : WeakHolo Ω u) (c : V n) (r : ℝ) (hr : closedBall c (3 * r) ⊆ Ω) :
-    ∃ U : V n → ℂ, DifferentiableOn ℂ U (ball c r) ∧ u =ᵐ[volume.restrict (ball c r)] U := by
+theorem reg_ball
+    {n : ℕ} {Ω : Set (V n)} {u : V n → ℂ}
+    (hΩ : IsOpen Ω) (hu : Integrable u) (hw : WeakHolo Ω u) (c : V n)
+    (r : ℝ) (hr : closedBall c (3 * r) ⊆ Ω)
+    : ∃ U : V n → ℂ, DifferentiableOn ℂ U (ball c r) ∧ u =ᵐ[volume.restrict (ball c r)] U := by
   by_cases hr0 : 0 < r
   · refine ⟨mollify n r u, fun x hx => ?_, ?_⟩
     · have hx' : closedBall x r ⊆ Ω := by
         refine (Metric.closedBall_subset_closedBall' ?_).trans hr
-        rw [Metric.mem_ball] at hx; linarith
+        rw [Metric.mem_ball] at hx
+        linarith
       exact (mollify_differentiableAt hΩ hu hw hr0 hx').differentiableWithinAt
     · rw [Filter.EventuallyEq, ae_restrict_iff' measurableSet_ball]
       filter_upwards [mollify_tendsto_ae hu] with x hx hxb
@@ -56,8 +59,7 @@ theorem reg : RegStatement := by
     refine ⟨hu'.locallyIntegrable.locallyIntegrableOn _, fun g hg v => ?_⟩
     have hzero : ∀ z, z ∉ tsupport g → dbarDir g z v = 0 := by
       intro z hz
-      have h0 : fderiv ℝ g z = 0 := by
-        rw [(notMem_tsupport_iff_eventuallyEq.mp hz).fderiv_eq]; simp
+      have h0 : fderiv ℝ g z = 0 := by rw [(notMem_tsupport_iff_eventuallyEq.mp hz).fderiv_eq]; simp
       simp [dbarDir, h0]
     have hts : tsupport g ⊆ ball x (4 * (ε / 8)) := hg.2.2
     have hpt : ∀ z, u' z * dbarDir g z v = u z * dbarDir g z v := by
@@ -66,14 +68,16 @@ theorem reg : RegStatement := by
       · rw [hu'def, Set.indicator_of_mem (h4 (hts hz))]
       · simp [hzero z hz]
     have h1 := hw.2 g ⟨hg.1, hg.2.1, hts.trans h4Ω⟩ v
-    rw [setIntegral_eq_integral_of_forall_compl_eq_zero
-      (fun z hz => by simp [hzero z (fun h => hz (hts.trans h4Ω h))])] at h1
-    rw [setIntegral_eq_integral_of_forall_compl_eq_zero
-      (fun z hz => by simp [hzero z (fun h => hz (hts h))])]
+    rw [setIntegral_eq_integral_of_forall_compl_eq_zero (fun z hz => by
+        simp [hzero z (fun h => hz (hts.trans h4Ω h))])]
+      at h1
+    rw [setIntegral_eq_integral_of_forall_compl_eq_zero (fun z hz => by
+      simp [hzero z (fun h => hz (hts h))])]
     simp_rw [hpt]
     exact h1
-  obtain ⟨U, hU, hae⟩ := reg_ball (Ω := ball x (4 * (ε / 8))) Metric.isOpen_ball hu' hw' x (ε / 8)
-    (Metric.closedBall_subset_ball (by linarith))
+  obtain ⟨U, hU, hae⟩ :=
+    reg_ball (Ω := ball x (4 * (ε / 8))) Metric.isOpen_ball hu' hw' x (ε / 8)
+      (Metric.closedBall_subset_ball (by linarith))
   refine ⟨ε / 8, hr0, (Metric.ball_subset_ball (by linarith)).trans h4Ω, U, hU, ?_⟩
   refine Filter.EventuallyEq.trans ?_ hae
   refine ae_restrict_of_forall_mem measurableSet_ball (fun z hz => ?_)

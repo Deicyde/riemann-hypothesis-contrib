@@ -10,9 +10,10 @@ open TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_embeddings_agree_on_subfield_ne (L Ω : Type) [Field L] [Field Ω] [Algebra L Ω]
-    [CharZero L] (a : Ω) (ha : a ∉ Set.range (algebraMap L Ω)) :
-    ∃ (F : Type) (_ : Field F) (i₁ i₂ : Ω →+* F),
+theorem exists_embeddings_agree_on_subfield_ne
+    (L Ω : Type) [Field L] [Field Ω] [Algebra L Ω] [CharZero L]
+    (a : Ω) (ha : a ∉ Set.range (algebraMap L Ω))
+    : ∃ (F : Type) (_ : Field F) (i₁ i₂ : Ω →+* F),
       i₁.comp (algebraMap L Ω) = i₂.comp (algebraMap L Ω) ∧ i₁ a ≠ i₂ a := by
   haveI hred : IsReduced (Ω ⊗[L] Ω) := GlobalTheory.ReducedAlg.isReduced_tensor (k := L) Ω Ω
   have he : (a ⊗ₜ[L] (1 : Ω) - (1 : Ω) ⊗ₜ[L] a : Ω ⊗[L] Ω) ≠ 0 := by
@@ -27,17 +28,21 @@ theorem exists_embeddings_agree_on_subfield_ne (L Ω : Type) [Field L] [Field Ω
     apply ha
     refine ⟨(φ 1)⁻¹ * φ a, ?_⟩
     rw [Algebra.algebraMap_eq_smul_one, mul_smul, ← h2, smul_smul, inv_mul_cancel₀ hφ, one_smul]
-  have hn : ¬ IsNilpotent (a ⊗ₜ[L] (1 : Ω) - (1 : Ω) ⊗ₜ[L] a : Ω ⊗[L] Ω) :=
-    fun h => he h.eq_zero
+  have hn : ¬ IsNilpotent (a ⊗ₜ[L] (1 : Ω) - (1 : Ω) ⊗ₜ[L] a : Ω ⊗[L] Ω) := fun h => he h.eq_zero
   rw [nilpotent_iff_mem_prime] at hn
   push_neg at hn
   obtain ⟨J, hJ, heJ⟩ := hn
   haveI := hJ
   let g : (Ω ⊗[L] Ω) →+* FractionRing ((Ω ⊗[L] Ω) ⧸ J) :=
     (algebraMap ((Ω ⊗[L] Ω) ⧸ J) (FractionRing ((Ω ⊗[L] Ω) ⧸ J))).comp (Ideal.Quotient.mk J)
-  refine ⟨FractionRing ((Ω ⊗[L] Ω) ⧸ J), inferInstance,
+  refine ⟨
+    FractionRing ((Ω ⊗[L] Ω) ⧸ J),
+    inferInstance,
     g.comp (Algebra.TensorProduct.includeLeftRingHom),
-    g.comp (Algebra.TensorProduct.includeRight (R := L) (A := Ω) (B := Ω)).toRingHom, ?_, ?_⟩
+    g.comp (Algebra.TensorProduct.includeRight (R := L) (A := Ω) (B := Ω)).toRingHom,
+    ?_,
+    ?_
+  ⟩
   · ext l
     simp only [RingHom.comp_apply]
     congr 1

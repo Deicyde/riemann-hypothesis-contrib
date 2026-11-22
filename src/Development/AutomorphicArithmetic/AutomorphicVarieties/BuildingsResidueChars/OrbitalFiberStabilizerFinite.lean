@@ -26,15 +26,17 @@ theorem orbitalFiber_stabilizer_finite : UpperTheory.V.Z.Sym.Glob.Fib.StabFin :=
       simp [hψ]
     exact this.to_subtype
   have hA' : Finite ((U.comap ψ).subgroupOf (U'.comap ψ)) :=
-    Finite.of_injective (fun a => (⟨a.1.1, a.2⟩ : U.comap ψ)) (fun a b hab => by
-      apply Subtype.ext
-      apply Subtype.ext
-      exact congrArg (fun z : U.comap ψ => (z : H)) hab)
+    Finite.of_injective
+      (fun a => (⟨a.1.1, a.2⟩ : U.comap ψ))
+      (fun a b hab => by
+        apply Subtype.ext
+        apply Subtype.ext
+        exact congrArg (fun z : U.comap ψ => (z : H)) hab)
   have hq : Finite ((U'.comap ψ) ⧸ (U.comap ψ).subgroupOf (U'.comap ψ)) :=
     Nat.finite_of_card_ne_zero h1
   have hfB : Finite (U'.comap ψ) :=
-    Finite.of_equiv _ (Subgroup.groupEquivQuotientProdSubgroup
-      (s := (U.comap ψ).subgroupOf (U'.comap ψ))).symm
+    Finite.of_equiv _
+      (Subgroup.groupEquivQuotientProdSubgroup (s := (U.comap ψ).subgroupOf (U'.comap ψ))).symm
   have : ((U'.comap ψ : Subgroup H) : Set H).Finite := Set.toFinite _
   convert this using 1
   ext h

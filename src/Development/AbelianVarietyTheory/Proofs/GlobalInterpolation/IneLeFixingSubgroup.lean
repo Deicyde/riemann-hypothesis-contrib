@@ -9,20 +9,20 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.UnramDiscr
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.UnramDiscr.mem_of_isIntegral {Ω : Type*} [Field Ω] (A : ValuationSubring Ω)
-    {x : Ω} (hx : IsIntegral ℤ x) : x ∈ A := by
+theorem _root_.GlobalTheory.UnramDiscr.mem_of_isIntegral
+    {Ω : Type*} [Field Ω] (A : ValuationSubring Ω) {x : Ω} (hx : IsIntegral ℤ x)
+    : x ∈ A := by
   have h : IsIntegral A x := hx.tower_top
   obtain ⟨y, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.mp h
   exact y.2
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.UnramDiscr.embedding_eq {K Ω : Type*} [Field K] [NumberField K]
-    [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (A : ValuationSubring Ω)
-    (hd : ¬ A.valuation ((discr K : ℤ) : Ω) < 1)
-    (f g : K →+* Ω) (h : ∀ x : 𝓞 K, A.valuation (f x - g x) < 1) : f = g := by
+theorem _root_.GlobalTheory.UnramDiscr.embedding_eq
+    {K Ω : Type*} [Field K] [NumberField K] [Field Ω] [CharZero Ω] [IsAlgClosed Ω]
+    (A : ValuationSubring Ω) (hd : ¬ A.valuation ((discr K : ℤ) : Ω) < 1)
+    (f g : K →+* Ω) (h : ∀ x : 𝓞 K, A.valuation (f x - g x) < 1)
+    : f = g := by
   classical
   by_contra hfg
   set ι := Module.Free.ChooseBasisIndex ℤ (𝓞 K)
@@ -33,8 +33,8 @@ theorem _root_.GlobalTheory.UnramDiscr.embedding_eq {K Ω : Type*} [Field K] [Nu
   have hint : ∀ (φ : K →+* Ω) (x : 𝓞 K), φ x ∈ A := fun φ x =>
     _root_.GlobalTheory.UnramDiscr.mem_of_isIntegral A
       ((RingOfIntegers.isIntegral_coe x).map φ.toIntAlgHom)
-  let N : Matrix ι ι A := Matrix.of fun i j => ⟨e j (b i), by
-    rw [integralBasis_apply]; exact hint (e j).toRingHom _⟩
+  let N : Matrix ι ι A :=
+    Matrix.of fun i j => ⟨e j (b i), by rw [integralBasis_apply]; exact hint (e j).toRingHom _⟩
   have hM : ((discr K : ℤ) : Ω) = ((N.det ^ 2 : A) : Ω) := by
     have hdet := Algebra.discr_eq_det_embeddingsMatrixReindex_pow_two ℚ Ω b e
     rw [← coe_discr] at hdet

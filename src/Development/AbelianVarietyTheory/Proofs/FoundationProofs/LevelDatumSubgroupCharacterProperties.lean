@@ -28,9 +28,12 @@ theorem isUp_mul {u v : GG g N} (hu : IsUp g N u) (hv : IsUp g N v) : IsUp g N (
     · rw [hu.2 a b h', zero_mul]
     · rw [hv.2 b c (lt_of_lt_of_le h h'), mul_zero]
 
-theorem mul_entry {u v : GG g N} (hu : IsUp g N u) (hv : IsUp g N v) {a c : Fin N} (hac : a < c)
-    (h : ∀ b, a < b → b < c → u.val a b * v.val b c = 0) : (u * v).val a c = u.val a c + v.val a c := by
-  rw [Units.val_mul, Matrix.mul_apply, Finset.sum_eq_add_of_mem a c (Finset.mem_univ _) (Finset.mem_univ _) hac.ne]
+theorem mul_entry
+    {u v : GG g N} (hu : IsUp g N u) (hv : IsUp g N v)
+    {a c : Fin N} (hac : a < c) (h : ∀ b, a < b → b < c → u.val a b * v.val b c = 0)
+    : (u * v).val a c = u.val a c + v.val a c := by
+  rw [Units.val_mul, Matrix.mul_apply,
+    Finset.sum_eq_add_of_mem a c (Finset.mem_univ _) (Finset.mem_univ _) hac.ne]
   · rw [hu.1, hv.1, one_mul, mul_one, add_comm]
   · rintro b _ ⟨h1, h2⟩
     rcases lt_or_gt_of_ne h1 with h1 | h1
@@ -61,13 +64,15 @@ theorem mem_one (L : Lev g N) : L.Mem 1 := by
 
 theorem mem_mul (L : Lev g N) {u v : GG g N} (hu : L.Mem u) (hv : L.Mem v) : L.Mem (u * v) := by
   refine ⟨isUp_mul hu.1 hv.1, fun hs a c h1 h2 h3 => ?_⟩
-  rw [mul_entry hu.1 hv.1 (by rw [Fin.lt_def]; omega), hu.2 hs a c h1 h2 h3, hv.2 hs a c h1 h2 h3, add_zero]
+  rw [mul_entry hu.1 hv.1 (by rw [Fin.lt_def]; omega), hu.2 hs a c h1 h2 h3, hv.2 hs a c h1 h2 h3,
+    add_zero]
   intro b hb hc
   rw [Fin.lt_def] at hb hc
   rw [hv.2 hs b c (by omega) (by omega) h3, mul_zero]
 
-theorem edge_mul (L : Lev g N) {u v : GG g N} (hu : L.Mem u) (hv : L.Mem v) {a c : Fin N} (h : L.Edge a c) :
-    (u * v).val a c = u.val a c + v.val a c := by
+theorem edge_mul
+    (L : Lev g N) {u v : GG g N} (hu : L.Mem u) (hv : L.Mem v) {a c : Fin N} (h : L.Edge a c)
+    : (u * v).val a c = u.val a c + v.val a c := by
   refine mul_entry hu.1 hv.1 (edge_lt L h) fun b hb hc => ?_
   rw [Fin.lt_def] at hb hc
   unfold Lev.Edge at h
@@ -85,7 +90,8 @@ theorem chi_one (L : Lev g N) : L.chi 1 = 1 := by
   · simp [Matrix.one_apply_ne (edge_lt L h).ne]
   · rfl
 
-theorem chi_mul (L : Lev g N) {u v : GG g N} (hu : L.Mem u) (hv : L.Mem v) : L.chi (u * v) = L.chi u * L.chi v := by
+theorem chi_mul (L : Lev g N) {u v : GG g N} (hu : L.Mem u) (hv : L.Mem v)
+    : L.chi (u * v) = L.chi u * L.chi v := by
   unfold Lev.chi
   rw [← AddChar.map_add_eq_mul, ← Finset.sum_add_distrib]
   congr 1
@@ -96,7 +102,16 @@ theorem chi_mul (L : Lev g N) {u v : GG g N} (hu : L.Mem u) (hv : L.Mem v) : L.c
   · rw [edge_mul L hu hv h, mul_add]
   · simp
 
-theorem lev_group : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ), ∀ L : Lev g N, L.Mem 1 ∧ (∀ u v, L.Mem u → L.Mem v → L.Mem (u * v)) ∧ L.chi 1 = 1 ∧ (∀ u v, L.Mem u → L.Mem v → L.chi (u * v) = L.chi u * L.chi v) ∧ ∀ u, L.Mem u → IsNilpotent (u.val - 1) :=
-  fun _ _ _ L => ⟨mem_one L, fun _ _ => mem_mul L, chi_one L, fun _ _ => chi_mul L, fun _ hu => isNilpotent_of_isUp hu.1⟩
+theorem lev_group
+    : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ), ∀ L : Lev g N,
+      L.Mem 1 ∧ (∀ u v, L.Mem u → L.Mem v → L.Mem (u * v)) ∧ L.chi 1 = 1
+        ∧ (∀ u v, L.Mem u → L.Mem v → L.chi (u * v) = L.chi u * L.chi v)
+        ∧ ∀ u, L.Mem u → IsNilpotent (u.val - 1) := fun _ _ _ L => ⟨
+  mem_one L,
+  fun _ _ => mem_mul L,
+  chi_one L,
+  fun _ _ => chi_mul L,
+  fun _ hu => isNilpotent_of_isUp hu.1
+⟩
 
 end GlobalTheory.BadShare.LevGroup

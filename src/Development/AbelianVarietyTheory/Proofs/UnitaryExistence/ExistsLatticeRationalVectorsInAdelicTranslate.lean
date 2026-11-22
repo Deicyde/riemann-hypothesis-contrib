@@ -59,16 +59,18 @@ lemma hat_smul_ring (L : Submodule (𝓞 E) (Fin n → E)) (b : 𝓞 E) {z : Fin
   | add x y _ _ hx hy => rw [smul_add]; exact add_mem hx hy
   | neg x _ hx => rw [smul_neg]; exact neg_mem hx
 
-def pre (M : Matrix (Fin n) (Fin n) (RA F E)) (L : Submodule (𝓞 E) (Fin n → E)) :
-    Submodule (𝓞 E) (Fin n → E) where
+def pre (M : Matrix (Fin n) (Fin n) (RA F E)) (L : Submodule (𝓞 E) (Fin n → E))
+    : Submodule (𝓞 E) (Fin n → E) where
   carrier := {v | M.mulVec (fv F v) ∈ hat F (L : Set (Fin n → E))}
   add_mem' := by
     intro x y hx hy
     simp only [Set.mem_ofPred_eq] at *
-    rw [fv_add, Matrix.mulVec_add]; exact add_mem hx hy
+    rw [fv_add, Matrix.mulVec_add]
+    exact add_mem hx hy
   zero_mem' := by
     simp only [Set.mem_ofPred_eq]
-    rw [fv_zero, Matrix.mulVec_zero]; exact zero_mem _
+    rw [fv_zero, Matrix.mulVec_zero]
+    exact zero_mem _
   smul_mem' := by
     intro b x hx
     simp only [Set.mem_ofPred_eq] at *
@@ -128,9 +130,16 @@ lemma nsmul_cancel {d : ℕ} (hd : 0 < d) {x y : Fin n → RA F E} (h : d • x 
 
 end GlobalTheory.AdLat.Translate
 
-
 open GlobalTheory.AdLat.Translate in
-theorem GlobalTheory.AdLat.exists_lattice_latOf : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)) (g : GL (Fin n) (RA F E)), L.FG → Submodule.span E (L : Set (Fin n → E)) = ⊤ → ∃ Λ : Submodule (𝓞 E) (Fin n → E), (Λ : Set (Fin n → E)) = latOf F (g : Matrix (Fin n) (Fin n) (RA F E)) L ∧ Λ.FG ∧ Submodule.span E (Λ : Set (Fin n → E)) = ⊤ ∧ (hat F (Λ : Set (Fin n → E)) : Set (Fin n → RA F E)) = (g : Matrix (Fin n) (Fin n) (RA F E)).mulVec '' (hat F (L : Set (Fin n → E))) := by
+theorem GlobalTheory.AdLat.exists_lattice_latOf
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ)
+        (L : Submodule (𝓞 E) (Fin n → E)) (g : GL (Fin n) (RA F E)),
+      L.FG → Submodule.span E (L : Set (Fin n → E)) = ⊤
+        → ∃ Λ : Submodule (𝓞 E) (Fin n → E),
+          (Λ : Set (Fin n → E)) = latOf F (g : Matrix (Fin n) (Fin n) (RA F E)) L ∧ Λ.FG
+            ∧ Submodule.span E (Λ : Set (Fin n → E)) = ⊤
+            ∧ (hat F (Λ : Set (Fin n → E)) : Set (Fin n → RA F E))
+              = (g : Matrix (Fin n) (Fin n) (RA F E)).mulVec '' (hat F (L : Set (Fin n → E))) := by
   intro F E _ _ _ _ _ n L g hL hspan
   obtain ⟨h1, h2, -, h4⟩ := GlobalTheory.AdLat.hat_rational_points_and_approx F E n L hL hspan
   set G : Matrix (Fin n) (Fin n) (RA F E) := (g : Matrix (Fin n) (Fin n) (RA F E)) with hG
@@ -140,8 +149,10 @@ theorem GlobalTheory.AdLat.exists_lattice_latOf : ∀ (F E : Type) [Field F] [Nu
     intro z; rw [Matrix.mulVec_mulVec, hG, hH, Units.mul_inv, Matrix.one_mulVec]
   have hHG : ∀ z, H.mulVec (G.mulVec z) = z := by
     intro z; rw [Matrix.mulVec_mulVec, hG, hH, Units.inv_mul, Matrix.one_mulVec]
-  have him : ∀ z, z ∈ G.mulVec '' (hat F (L : Set (Fin n → E)) : Set (Fin n → RA F E)) ↔
-      H.mulVec z ∈ hat F (L : Set (Fin n → E)) := by
+  have him
+      : ∀ z,
+        z ∈ G.mulVec '' (hat F (L : Set (Fin n → E)) : Set (Fin n → RA F E))
+          ↔ H.mulVec z ∈ hat F (L : Set (Fin n → E)) := by
     intro z
     constructor
     · rintro ⟨u, hu, rfl⟩; rw [hHG]; exact hu
@@ -184,8 +195,7 @@ theorem GlobalTheory.AdLat.exists_lattice_latOf : ∀ (F E : Type) [Field F] [Nu
     · intro hz
       exact mulVec_mem_hat subset_rfl hz
     · intro hz
-      have hdz : d • z ∈ hat F (L : Set (Fin n → E)) := by
-        rw [← hGH z]; exact hdG _ hz
+      have hdz : d • z ∈ hat F (L : Set (Fin n → E)) := by rw [← hGH z]; exact hdG _ hz
       obtain ⟨x, -, w, hw, hxw⟩ := h2 (d * e) (Nat.mul_pos hd he) _ hdz
       have hx' : x = d • ((d : E)⁻¹ • x) := by
         rw [← Nat.cast_smul_eq_nsmul E, smul_smul, mul_inv_cancel₀ hd', one_smul]

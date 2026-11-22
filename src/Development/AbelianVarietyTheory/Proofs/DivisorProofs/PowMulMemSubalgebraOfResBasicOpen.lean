@@ -16,12 +16,14 @@ variable {X : Scheme.{0}} (F : X.Opensᵒᵖ ⥤ CommRingCat) (α : X.presheaf �
 
 theorem res_pow_mul_mem_gen
     (hα : ((Scheme.AffineZariskiSite.toOpensFunctor X).op.whiskerLeft α).Coequifibered)
-    {D W V : X.Opens} (hD : IsAffineOpen D) (hDW : D ≤ W) (hDV : D ≤ V)
-    (T : Set (F.obj (op V))) (f : Γ(X, W)) (a : F.obj (op W))
-    (ha : ∀ (W' : X.Opens), IsAffineOpen W' → ∀ (h1 : W' ≤ X.basicOpen f) (h2 : W' ≤ V),
-      (F.map (homOfLE h1).op).hom ((F.map (homOfLE (X.basicOpen_le f)).op).hom a) ∈
-        gen F α h2 T) :
-    ∃ m : ℕ, (F.map (homOfLE hDW).op).hom ((α.app (op W)).hom f ^ m * a) ∈ gen F α hDV T := by
+    {D W V : X.Opens} (hD : IsAffineOpen D) (hDW : D ≤ W) (hDV : D ≤ V) (T : Set (F.obj (op V)))
+    (f : Γ(X, W)) (a : F.obj (op W))
+    (ha : ∀ (W' : X.Opens),
+      IsAffineOpen W'
+        → ∀ (h1 : W' ≤ X.basicOpen f) (h2 : W' ≤ V),
+          (F.map (homOfLE h1).op).hom ((F.map (homOfLE (X.basicOpen_le f)).op).hom a)
+            ∈ gen F α h2 T)
+    : ∃ m : ℕ, (F.map (homOfLE hDW).op).hom ((α.app (op W)).hom f ^ m * a) ∈ gen F α hDV T := by
   set fD : Γ(X, D) := (X.presheaf.map (homOfLE hDW).op).hom f with hfD
   have hbo : X.basicOpen fD = D ⊓ X.basicOpen f := Scheme.basicOpen_res X f (homOfLE hDW).op
   have hD'D : X.basicOpen fD ≤ D := X.basicOpen_le fD
@@ -47,24 +49,30 @@ theorem res_pow_mul_mem_gen
   haveI : IsLocalization.Away fD Γ(X, X.basicOpen fD) := hD.isLocalization_basicOpen fD
   haveI : IsLocalization.Away (algebraMap Γ(X, D) (F.obj (op D)) fD)
       (F.obj (op (X.basicOpen fD))) := isLocalizationAway F α hα hD fD
-  have hres : ∀ {U₁ U₂ U₃ : X.Opens} (h₁ : U₂ ≤ U₁) (h₂ : U₃ ≤ U₂) (y : F.obj (op U₁)),
-      (F.map (homOfLE h₂).op).hom ((F.map (homOfLE h₁).op).hom y) =
-        (F.map (homOfLE (h₂.trans h₁)).op).hom y := by
+  have hres
+      : ∀ {U₁ U₂ U₃ : X.Opens} (h₁ : U₂ ≤ U₁) (h₂ : U₃ ≤ U₂) (y : F.obj (op U₁)),
+        (F.map (homOfLE h₂).op).hom ((F.map (homOfLE h₁).op).hom y)
+          = (F.map (homOfLE (h₂.trans h₁)).op).hom y := by
     intro U₁ U₂ U₃ h₁ h₂ y
     rw [← CommRingCat.comp_apply, ← F.map_comp]
     rfl
-  obtain ⟨m, hm⟩ := GlobalTheory.T.exists_pow_mul_mem_adjoin_of_localizationAway (R := Γ(X, D)) (A := F.obj (op D))
-    (R' := Γ(X, X.basicOpen fD)) (A' := F.obj (op (X.basicOpen fD))) fD
-    ((F.map (homOfLE hDV).op).hom '' T) ((F.map (homOfLE hDW).op).hom a) (by
-      have h0 := ha _ hD' hD'f hD'V
-      rw [hres, gen_eq_adjoin] at h0
-      change (F.map (homOfLE hD'D).op).hom ((F.map (homOfLE hDW).op).hom a) ∈ _
-      rw [hres, Set.image_image]
-      have hfun : (fun x => (algebraMap (F.obj (op D)) (F.obj (op (X.basicOpen fD))))
-          ((F.map (homOfLE hDV).op).hom x)) = ⇑(F.map (homOfLE hD'V).op).hom :=
-        funext fun x => hres _ _ x
-      rw [hfun]
-      exact h0)
+  obtain ⟨m, hm⟩ :=
+    GlobalTheory.T.exists_pow_mul_mem_adjoin_of_localizationAway (R := Γ(X, D)) (A := F.obj (op D))
+      (R' := Γ(X, X.basicOpen fD)) (A' := F.obj (op (X.basicOpen fD))) fD
+      ((F.map (homOfLE hDV).op).hom '' T) ((F.map (homOfLE hDW).op).hom a)
+      (by
+        have h0 := ha _ hD' hD'f hD'V
+        rw [hres, gen_eq_adjoin] at h0
+        change (F.map (homOfLE hD'D).op).hom ((F.map (homOfLE hDW).op).hom a) ∈ _
+        rw [hres, Set.image_image]
+        have hfun
+            : (fun x =>
+                (algebraMap (F.obj (op D)) (F.obj (op (X.basicOpen fD))))
+                  ((F.map (homOfLE hDV).op).hom x))
+              = ⇑(F.map (homOfLE hD'V).op).hom :=
+          funext fun x => hres _ _ x
+        rw [hfun]
+        exact h0)
   refine ⟨m, ?_⟩
   have hnat : (F.map (homOfLE hDW).op).hom ((α.app (op W)).hom f) = (α.app (op D)).hom fD := by
     have := congr($(α.naturality (homOfLE hDW).op).hom f)
@@ -75,7 +83,18 @@ theorem res_pow_mul_mem_gen
 
 end GlobalTheory.QcSub.PowerMultiple
 
-theorem GlobalTheory.QcSub.pow_mul_mem_sub_of_res_basicOpen : ∀ (X : Scheme.{0}), IsNoetherian X → ∀ (F : X.Opensᵒᵖ ⥤ CommRingCat) (α : X.presheaf ⟶ F), ((Scheme.AffineZariskiSite.toOpensFunctor X).op.whiskerLeft α).Coequifibered → ∀ {ι : Type} [Finite ι] (V : ι → X.Opens), (∀ j, IsAffineOpen (V j)) → ∀ (T : ∀ j, Set (F.obj (op (V j)))) (W : X.Opens), IsAffineOpen W → ∀ (f : Γ(X, W)) (a : F.obj (op W)), (F.map (homOfLE (X.basicOpen_le f)).op).hom a ∈ sub F α V T (X.basicOpen f) → ∃ m : ℕ, (α.app (op W)).hom f ^ m * a ∈ sub F α V T W := by
+theorem GlobalTheory.QcSub.pow_mul_mem_sub_of_res_basicOpen
+    : ∀ (X : Scheme.{0}),
+      IsNoetherian X
+        → ∀ (F : X.Opensᵒᵖ ⥤ CommRingCat) (α : X.presheaf ⟶ F),
+          ((Scheme.AffineZariskiSite.toOpensFunctor X).op.whiskerLeft α).Coequifibered
+            → ∀ {ι : Type} [Finite ι] (V : ι → X.Opens),
+              (∀ j, IsAffineOpen (V j))
+                → ∀ (T : ∀ j, Set (F.obj (op (V j)))) (W : X.Opens),
+                  IsAffineOpen W
+                    → ∀ (f : Γ(X, W)) (a : F.obj (op W)),
+                      (F.map (homOfLE (X.basicOpen_le f)).op).hom a ∈ sub F α V T (X.basicOpen f)
+                        → ∃ m : ℕ, (α.app (op W)).hom f ^ m * a ∈ sub F α V T W := by
   intro X hX F α hα ι _ V hV T W hW f a ha
   classical
   haveI := Fintype.ofFinite ι
@@ -92,16 +111,22 @@ theorem GlobalTheory.QcSub.pow_mul_mem_sub_of_res_basicOpen : ∀ (X : Scheme.{0
   refine ⟨∑ j, ∑ h : s j, m j h, ?_⟩
   rw [mem_sub]
   intro j W' hW' hWW' hWV
-  refine GlobalTheory.T.mem_adjoin_restricted_sections_of_local X F α hα (V j) W (T j) _ ?_ W' hW' hWW' hWV
+  refine GlobalTheory.T.mem_adjoin_restricted_sections_of_local X F α hα (V j) W (T j) _ ?_ W' hW'
+    hWW' hWV
   intro x hx
   have hx' := hs2 j hx
   simp only [Set.mem_iUnion, SetLike.mem_coe] at hx'
   obtain ⟨h, hh, hxh⟩ := hx'
   refine ⟨X.basicOpen h, hW.basicOpen h, hxh, X.basicOpen_le h, hle j h hh, ?_⟩
   have hmle : m j ⟨h, hh⟩ ≤ ∑ j, ∑ h : s j, m j h :=
-    le_trans (Finset.single_le_sum (f := fun h' => m j h') (fun _ _ => Nat.zero_le _)
-      (Finset.mem_univ (⟨h, hh⟩ : s j)))
-      (Finset.single_le_sum (f := fun j' => ∑ h' : s j', m j' h') (fun _ _ => Nat.zero_le _)
+    le_trans
+      (Finset.single_le_sum
+        (f := fun h' => m j h')
+        (fun _ _ => Nat.zero_le _)
+        (Finset.mem_univ (⟨h, hh⟩ : s j)))
+      (Finset.single_le_sum
+        (f := fun j' => ∑ h' : s j', m j' h')
+        (fun _ _ => Nat.zero_le _)
         (Finset.mem_univ j))
   rw [show ∑ j, ∑ h : s j, m j h = (∑ j, ∑ h : s j, m j h - m j ⟨h, hh⟩) + m j ⟨h, hh⟩ by omega,
     pow_add, mul_assoc, map_mul]

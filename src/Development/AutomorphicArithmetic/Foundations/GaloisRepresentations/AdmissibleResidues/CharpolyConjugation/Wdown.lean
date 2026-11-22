@@ -28,37 +28,48 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial GlobalTheory GlobalTheory.WeilDeligne GlobalTheory.CuspRep UpperTheory.V.Af UpperTheory.GalN.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial GlobalTheory GlobalTheory.WeilDeligne
+  GlobalTheory.CuspRep UpperTheory.V.Af UpperTheory.GalN.V
 
-private theorem val_le_one {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
-    (A : ValuationSubring Ω) (x : 𝓞 K) : A.valuation (algebraMap K Ω (x : K)) ≤ 1 := by
-  have hi : IsIntegral ℤ (algebraMap K Ω (x : K)) := (x.2 : IsIntegral ℤ (x : K)).map (IsScalarTower.toAlgHom ℤ K Ω)
+private theorem val_le_one
+    {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
+    (A : ValuationSubring Ω) (x : 𝓞 K)
+    : A.valuation (algebraMap K Ω (x : K)) ≤ 1 := by
+  have hi : IsIntegral ℤ (algebraMap K Ω (x : K)) :=
+    (x.2 : IsIntegral ℤ (x : K)).map (IsScalarTower.toAlgHom ℤ K Ω)
   have hA : IsIntegral A (algebraMap K Ω (x : K)) := hi.tower_top
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.1 hA
   rw [A.valuation_le_one_iff, ← hy]
   exact y.2
 
-private theorem exists_place {F K Ω : Type} [Field F] [NumberField F] [Field K] [NumberField K] [Field Ω]
-    [Algebra F Ω] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω]
-    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A w) :
-    ∃ v : HeightOneSpectrum (𝓞 K), IsPlaceOver A v := by
-  let I : Ideal (𝓞 K) :=
-    { carrier := {x | A.valuation (algebraMap K Ω (x : K)) < 1}
-      zero_mem' := by simp
-      add_mem' := by
-        intro a b ha hb
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
-        have e : algebraMap K Ω ((a + b : 𝓞 K) : K) = algebraMap K Ω (a : K) + algebraMap K Ω (b : K) := by
-          simp
-        rw [e]
-        exact Valuation.map_add_lt _ ha hb
-      smul_mem' := by
-        intro c a ha
-        simp only [Set.mem_setOf_eq] at ha ⊢
-        have e : algebraMap K Ω ((c • a : 𝓞 K) : K) = algebraMap K Ω (c : K) * algebraMap K Ω (a : K) := by
-          simp
-        rw [e, map_mul]
-        exact lt_of_le_of_lt (mul_le_of_le_one_left' (val_le_one A c)) ha }
+private theorem exists_place
+    {F K Ω : Type} [Field F] [NumberField F] [Field K] [NumberField K] [Field Ω] [Algebra F Ω]
+    [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω]
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A w)
+    : ∃ v : HeightOneSpectrum (𝓞 K), IsPlaceOver A v := by
+  let I : Ideal (𝓞 K) := {
+    carrier := {x | A.valuation (algebraMap K Ω (x : K)) < 1}
+    zero_mem' := by simp
+    add_mem' := by
+      intro a b ha hb
+      simp only [Set.mem_setOf_eq] at ha hb ⊢
+      have e
+          : algebraMap K Ω ((a + b : 𝓞 K) : K)
+            = algebraMap K Ω (a : K) + algebraMap K Ω (b : K) := by
+        simp
+      rw [e]
+      exact Valuation.map_add_lt _ ha hb
+    smul_mem' := by
+      intro c a ha
+      simp only [Set.mem_setOf_eq] at ha ⊢
+      have e
+          : algebraMap K Ω ((c • a : 𝓞 K) : K)
+            = algebraMap K Ω (c : K) * algebraMap K Ω (a : K) := by
+        simp
+      rw [e, map_mul]
+      exact lt_of_le_of_lt (mul_le_of_le_one_left' (val_le_one A c)) ha
+  }
   have hmem : ∀ x : 𝓞 K, x ∈ I ↔ A.valuation (algebraMap K Ω (x : K)) < 1 := fun _ => Iff.rfl
   have hprime : I.IsPrime := by
     refine ⟨fun h => ?_, fun {a b} hab => ?_⟩
@@ -71,7 +82,9 @@ private theorem exists_place {F K Ω : Type} [Field F] [NumberField F] [Field K]
       rw [hmem, not_lt] at h1 h2
       have e1 := le_antisymm (val_le_one A a) h1
       have e2 := le_antisymm (val_le_one A b) h2
-      have e : algebraMap K Ω ((a * b : 𝓞 K) : K) = algebraMap K Ω (a : K) * algebraMap K Ω (b : K) := by
+      have e
+          : algebraMap K Ω ((a * b : 𝓞 K) : K)
+            = algebraMap K Ω (a : K) * algebraMap K Ω (b : K) := by
         simp
       rw [e, map_mul, e1, e2] at hab
       simp at hab

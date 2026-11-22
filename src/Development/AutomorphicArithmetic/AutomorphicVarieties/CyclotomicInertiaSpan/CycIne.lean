@@ -8,10 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.B1
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.B1
 
-private theorem cycIne_red_surj (l : ℕ) [Fact l.Prime] (n : ℕ) (b : (ZMod (l ^ n))ˣ) :
-    ∃ u : ℤ_[l]ˣ, KStar.TotallyRealRoots.redPow l n u = b := by
+private theorem cycIne_red_surj (l : ℕ) [Fact l.Prime] (n : ℕ) (b : (ZMod (l ^ n))ˣ)
+    : ∃ u : ℤ_[l]ˣ, KStar.TotallyRealRoots.redPow l n u = b := by
   have hl : l.Prime := Fact.out
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · refine ⟨1, Units.ext ?_⟩
@@ -35,14 +37,15 @@ private theorem cycIne_red_surj (l : ℕ) [Fact l.Prime] (n : ℕ) (b : (ZMod (l
       exact le_antisymm (PadicInt.norm_le_one _)
         (not_lt.mp fun h => hk ((PadicInt.norm_int_lt_one_iff_dvd _).mp h))
     refine ⟨hu.unit, Units.ext ?_⟩
-    simp only [KStar.TotallyRealRoots.redPow, Units.coe_map, IsUnit.unit_spec, MonoidHom.coe_coe, map_intCast,
-      Int.cast_natCast]
+    simp only [KStar.TotallyRealRoots.redPow, Units.coe_map, IsUnit.unit_spec, MonoidHom.coe_coe,
+      map_intCast, Int.cast_natCast]
     rw [hkdef]
     exact (map_natCast (PadicInt.toZModPow n) _).trans (ZMod.natCast_zmod_val _)
 
-theorem UpperTheory.V.B1.cycIne :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (p : ℕ) [Fact p.Prime] (B : ValuationSubring Ω), B.valuation (p : Ω) < 1 →
-    (Ine (F := ℚ) B).map (cycN ℚ Ω N) = B3.pPart N p := by
+theorem UpperTheory.V.B1.cycIne
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (p : ℕ)
+        [Fact p.Prime] (B : ValuationSubring Ω),
+      B.valuation (p : Ω) < 1 → (Ine (F := ℚ) B).map (cycN ℚ Ω N) = B3.pPart N p := by
   intro Ω _ _ _ N _ p _ B hB
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
@@ -79,7 +82,8 @@ theorem UpperTheory.V.B1.cycIne :
     obtain ⟨σ, hσ, hσu⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω p B hB u
     refine Subgroup.mem_map.mpr ⟨σ, hσ, ?_⟩
     rw [cycN_eq_iff]
-    refine (UpperTheory.V.LDataCardLeFinrank.classIff Ω p N (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) h).mpr ⟨?_, ?_⟩
+    refine (UpperTheory.V.LDataCardLeFinrank.classIff Ω p N
+      (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) h).mpr ⟨?_, ?_⟩
     · intro ζ hζ
       rw [hh', Units.val_one, ZMod.val_one_eq_one_mod]
       show σ ζ = _

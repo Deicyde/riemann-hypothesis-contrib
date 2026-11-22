@@ -8,9 +8,10 @@ open NumberField Module
 
 namespace GlobalTheory
 
-theorem exists_basis_closure_eq_of_fg_of_nsmul_mem {Γ : Type} [AddCommGroup Γ] [Module ℚ Γ]
-    (A : AddSubgroup Γ) (hA : A.FG) (hN : ∀ x : Γ, ∃ N : ℕ, 0 < N ∧ N • x ∈ A) :
-    ∃ (n : ℕ) (b : Basis (Fin n) ℚ Γ), A = AddSubgroup.closure (Set.range b) := by
+theorem exists_basis_closure_eq_of_fg_of_nsmul_mem
+    {Γ : Type} [AddCommGroup Γ] [Module ℚ Γ]
+    (A : AddSubgroup Γ) (hA : A.FG) (hN : ∀ x : Γ, ∃ N : ℕ, 0 < N ∧ N • x ∈ A)
+    : ∃ (n : ℕ) (b : Basis (Fin n) ℚ Γ), A = AddSubgroup.closure (Set.range b) := by
   classical
   have : HasUniqueDiv Γ := .of_module_rat Γ
   have : Module.Finite ℤ A :=
@@ -49,19 +50,25 @@ theorem exists_basis_closure_eq_of_fg_of_nsmul_mem {Γ : Type} [AddCommGroup Γ]
   rw [Basis.coe_mk]
   exact hcl
 
-theorem relIndex_map_nsmul_comap_eq_abs_norm_det :
-    ∀ (E Γ : Type) [Field E] [NumberField E] [AddCommGroup Γ] [Module E Γ] [FiniteDimensional E Γ] (A : AddSubgroup Γ), A.FG → (∀ x : Γ, ∃ N : ℕ, 0 < N ∧ N • x ∈ A) → ∀ (m : Module.End E Γ) (N : ℕ), N ≠ 0 → LinearMap.det m ≠ 0 → (∀ x ∈ A, N • m x ∈ A) → (((A.map (N • AddMonoidHom.id Γ)).relIndex (A.comap m.toAddMonoidHom) : ℕ) : ℚ) = |Algebra.norm ℚ ((N : E) ^ Module.finrank E Γ * LinearMap.det m)| := by
+theorem relIndex_map_nsmul_comap_eq_abs_norm_det
+    : ∀ (E Γ : Type) [Field E] [NumberField E] [AddCommGroup Γ] [Module E Γ] [FiniteDimensional E Γ]
+        (A : AddSubgroup Γ),
+      A.FG → (∀ x : Γ, ∃ N : ℕ, 0 < N ∧ N • x ∈ A)
+        → ∀ (m : Module.End E Γ) (N : ℕ),
+          N ≠ 0 → LinearMap.det m ≠ 0 → (∀ x ∈ A, N • m x ∈ A)
+            → (((A.map (N • AddMonoidHom.id Γ)).relIndex (A.comap m.toAddMonoidHom) : ℕ) : ℚ)
+              = |Algebra.norm ℚ ((N : E) ^ Module.finrank E Γ * LinearMap.det m)| := by
   intro E Γ _ _ _ _ _ A hA hAN m N hN0 hdet hmA
   classical
   letI : Module ℚ Γ := Module.compHom Γ (algebraMap ℚ E)
-  have : IsScalarTower ℚ E Γ := ⟨fun q c x => by
-    show (q • c) • x = algebraMap ℚ E q • (c • x)
-    rw [Algebra.smul_def, mul_smul]⟩
+  have : IsScalarTower ℚ E Γ :=
+    ⟨fun q c x => by
+      show (q • c) • x = algebraMap ℚ E q • (c • x)
+      rw [Algebra.smul_def, mul_smul]⟩
   obtain ⟨n, b, hb⟩ := exists_basis_closure_eq_of_fg_of_nsmul_mem A hA hAN
   have : FiniteDimensional ℚ Γ := Module.Finite.of_basis b
   let mQ : Γ →ₗ[ℚ] Γ := m.restrictScalars ℚ
-  have hdetQ : LinearMap.det mQ = Algebra.norm ℚ (LinearMap.det m) :=
-    LinearMap.det_restrictScalars
+  have hdetQ : LinearMap.det mQ = Algebra.norm ℚ (LinearMap.det m) := LinearMap.det_restrictScalars
   have hdetQ0 : LinearMap.det mQ ≠ 0 := by
     rw [hdetQ]
     exact Algebra.norm_ne_zero_iff.mpr hdet
@@ -71,8 +78,7 @@ theorem relIndex_map_nsmul_comap_eq_abs_norm_det :
   have hN' : (N : ℚ) ≠ 0 := by exact_mod_cast hN0
   let b₁ : Basis (Fin n) ℚ Γ := b.map (LinearEquiv.smulOfNeZero ℚ Γ (N : ℚ) hN')
   let b₂ : Basis (Fin n) ℚ Γ := b.map e.symm
-  have hb₁ : ∀ i, b₁ i = N • b i := fun i => by
-    simp [b₁, Nat.cast_smul_eq_nsmul]
+  have hb₁ : ∀ i, b₁ i = N • b i := fun i => by simp [b₁, Nat.cast_smul_eq_nsmul]
   have h₁ : A.map (N • AddMonoidHom.id Γ) = AddSubgroup.closure (Set.range b₁) := by
     rw [hb, AddMonoidHom.map_closure, ← Set.range_comp]
     congr 1

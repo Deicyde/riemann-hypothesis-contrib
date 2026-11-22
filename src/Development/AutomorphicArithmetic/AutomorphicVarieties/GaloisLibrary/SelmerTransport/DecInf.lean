@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
 
 private theorem exists_unit (l : ℕ) [hl : Fact l.Prime] : ∃ u : ℤ_[l]ˣ, ¬ IsOfFinOrder u := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl.out.one_lt
@@ -24,9 +25,12 @@ private theorem exists_unit (l : ℕ) [hl : Fact l.Prime] : ∃ u : ℤ_[l]ˣ, �
   rw [← Nat.cast_pow, Nat.cast_eq_one, Nat.pow_eq_one] at h
   omega
 
-theorem UpperTheory.V.Base.decInf :
-    ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (l : ℕ) [Fact l.Prime] (U : Subgroup (G k Ω)), IsOpen (U : Set (G k Ω)) → ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 →
-      ∃ g ∈ U ⊓ Dec (F := k) A, ¬ IsOfFinOrder (cycZ k Ω l g) := by
+theorem UpperTheory.V.Base.decInf
+    : ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (l : ℕ)
+        [Fact l.Prime] (U : Subgroup (G k Ω)),
+      IsOpen (U : Set (G k Ω))
+        → ∀ A : ValuationSubring Ω,
+          A.valuation (l : Ω) < 1 → ∃ g ∈ U ⊓ Dec (F := k) A, ¬ IsOfFinOrder (cycZ k Ω l g) := by
   intro k Ω _ _ _ _ _ l _ U hU A hlt
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap k Ω).injective
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed k
@@ -41,10 +45,13 @@ theorem UpperTheory.V.Base.decInf :
   have : Finite ((Ω ≃ₐ[ℚ] Ω) ⧸ K.fixingSubgroup) :=
     Subgroup.quotient_finite_of_isOpen _ K.fixingSubgroup_isOpen
   have : K.fixingSubgroup.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
-  obtain ⟨n, hn, -, hmem⟩ := Subgroup.exists_pow_mem_of_index_ne_zero
-    (Subgroup.FiniteIndex.index_ne_zero (H := K.fixingSubgroup)) σ
-  let g : G k Ω := { (σ ^ n).toRingEquiv with
-    commutes' := fun x => (IntermediateField.mem_fixingSubgroup_iff _ _).1 hmem _ ⟨x, rfl⟩ }
+  obtain ⟨n, hn, -, hmem⟩ :=
+    Subgroup.exists_pow_mem_of_index_ne_zero
+      (Subgroup.FiniteIndex.index_ne_zero (H := K.fixingSubgroup)) σ
+  let g : G k Ω := {
+    (σ ^ n).toRingEquiv with
+    commutes' := fun x => (IntermediateField.mem_fixingSubgroup_iff _ _).1 hmem _ ⟨x, rfl⟩
+  }
   have hg : g ∈ Dec (F := k) A := (Dec (F := ℚ) A).pow_mem (Ine_le_Dec A hσ) n
   have hgu : cycZ k Ω l g = u ^ n := by
     change cycZ ℚ Ω l (σ ^ n) = u ^ n

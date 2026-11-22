@@ -6,11 +6,16 @@ public import GroundTheory.GlobalFields.CyclotomicCharacters.PadicUnitsLog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Two
 open scoped Classical
 
-private theorem addClosed_index (l : ℕ) [Fact l.Prime] (A : AddSubgroup ℤ_[l])
-    (hA : IsClosed (A : Set ℤ_[l])) (a : ℤ_[l]) (ha : a ∈ A) (h0 : a ≠ 0) : A.index ≠ 0 := by
+private theorem addClosed_index
+    (l : ℕ) [Fact l.Prime]
+    (A : AddSubgroup ℤ_[l]) (hA : IsClosed (A : Set ℤ_[l]))
+    (a : ℤ_[l]) (ha : a ∈ A) (h0 : a ≠ 0)
+    : A.index ≠ 0 := by
   have key : ∀ x : ℤ_[l], a * x ∈ A := by
     intro x
     refine PadicInt.denseRange_intCast.induction_on x ?_ ?_
@@ -43,12 +48,14 @@ private theorem addClosed_index (l : ℕ) [Fact l.Prime] (A : AddSubgroup ℤ_[l
   exact Nat.eq_zero_of_zero_dvd (hA0 ▸ AddSubgroup.index_dvd_of_le hle)
 
 open GroundTheory.Global.Cyclotomic in
-theorem UpperTheory.V.Ws.index_ne_zero_of_isClosed_of_not_isOfFinOrder :
-    ∀ (l : ℕ) [Fact l.Prime] (H : Subgroup ℤ_[l]ˣ), IsClosed (H : Set ℤ_[l]ˣ) → (∃ u ∈ H, ¬ IsOfFinOrder u) → H.index ≠ 0 := by
+theorem UpperTheory.V.Ws.index_ne_zero_of_isClosed_of_not_isOfFinOrder
+    : ∀ (l : ℕ) [Fact l.Prime] (H : Subgroup ℤ_[l]ˣ),
+      IsClosed (H : Set ℤ_[l]ˣ) → (∃ u ∈ H, ¬ IsOfFinOrder u) → H.index ≠ 0 := by
   intro l _ H hH hu
   obtain ⟨u, huH, hu⟩ := hu
   set L := padicUnitsLog l with hL
-  have hB : IsClosed ((H.map L : Subgroup (Multiplicative ℤ_[l])) : Set (Multiplicative ℤ_[l])) := by
+  have hB
+      : IsClosed ((H.map L : Subgroup (Multiplicative ℤ_[l])) : Set (Multiplicative ℤ_[l])) := by
     rw [Subgroup.coe_map]
     exact ((hH.isCompact).image (continuous_padicUnitsLog l)).isClosed
   let A : AddSubgroup ℤ_[l] := Subgroup.toAddSubgroup' (H.map L)

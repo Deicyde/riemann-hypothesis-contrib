@@ -9,19 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Admissi
 
 noncomputable section
 
-open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Polynomial
+open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Polynomial
 open Formalism.MainNotions.N (GRep)
 
 namespace GlobalTheory.FullCharpoly
 
 section Lat
-variable {G LL O V W : Type} [Group G] [Field LL] [CommRing O] [Algebra O LL]
-  [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
-  [AddCommGroup W] [Module LL W] [Module O W] [IsScalarTower O LL W]
+variable
+  {G LL O V W : Type}
+  [Group G] [Field LL] [CommRing O] [Algebra O LL] [AddCommGroup V] [Module LL V] [Module O V]
+  [IsScalarTower O LL V] [AddCommGroup W] [Module LL W] [Module O W] [IsScalarTower O LL W]
   {ρ : Representation LL G V} {σ : Representation LL G W}
 
-def mapLat (e : V ≃ₗ[LL] W) (he : ∀ g x, e (ρ g x) = σ g (e x)) (L : Lattice (O := O) ρ) :
-    Lattice (O := O) σ where
+def mapLat (e : V ≃ₗ[LL] W) (he : ∀ g x, e (ρ g x) = σ g (e x)) (L : Lattice (O := O) ρ)
+    : Lattice (O := O) σ where
   T := L.T.map ((e.restrictScalars O : V ≃ₗ[O] W) : V →ₗ[O] W)
   stable := by
     rintro g _ ⟨x, hx, rfl⟩
@@ -31,19 +33,26 @@ def mapLat (e : V ≃ₗ[LL] W) (he : ∀ g x, e (ρ g x) = σ g (e x)) (L : Lat
     have := L.free
     exact Module.Free.of_equiv ((e.restrictScalars O).submoduleMap L.T)
   span := by
-    have h : ((L.T.map ((e.restrictScalars O : V ≃ₗ[O] W) : V →ₗ[O] W) : Submodule O W) : Set W) =
-        (e : V →ₗ[LL] W) '' (L.T : Set V) := rfl
+    have h
+        : ((L.T.map ((e.restrictScalars O : V ≃ₗ[O] W) : V →ₗ[O] W) : Submodule O W) : Set W)
+          = (e : V →ₗ[LL] W) '' (L.T : Set V) :=
+      rfl
     rw [h, Submodule.span_image, L.span, Submodule.map_top, LinearEquiv.range]
 
 variable {E M : Type} [AddCommGroup E] [Module O E] [AddCommGroup M] [Module O M]
 
-theorem quot_equiv_iff (L₁ L₂ : Lattice (O := O) ρ) (act : G → E → E) (π : Representation O G M)
-    (p : E →ₗ[O] M) (hp : Function.Surjective p) (hact : ∀ g x, p (act g x) = π g (p x)) :
-    (∃ e : (E ⧸ LinearMap.ker p) ≃ₗ[O] (↥L₁.T ⧸ L₂.T.comap L₁.T.subtype),
-      ∀ (g : G) (x : E) (y : ↥L₁.T), e (Submodule.Quotient.mk x) = Submodule.Quotient.mk y →
-        e (Submodule.Quotient.mk (act g x)) = Submodule.Quotient.mk ⟨ρ g y, L₁.stable g y y.2⟩) ↔
-    ∃ q : ↥L₁.T →ₗ[O] M, Function.Surjective q ∧ (∀ g x, q (latRep L₁ g x) = π g (q x)) ∧
-      ∀ x, q x = 0 ↔ (x : V) ∈ L₂.T := by
+theorem quot_equiv_iff
+    (L₁ L₂ : Lattice (O := O) ρ)
+    (act : G → E → E) (π : Representation O G M) (p : E →ₗ[O] M)
+    (hp : Function.Surjective p) (hact : ∀ g x, p (act g x) = π g (p x))
+    : (∃ e : (E ⧸ LinearMap.ker p) ≃ₗ[O] (↥L₁.T ⧸ L₂.T.comap L₁.T.subtype),
+        ∀ (g : G) (x : E) (y : ↥L₁.T),
+          e (Submodule.Quotient.mk x) = Submodule.Quotient.mk y
+            → e (Submodule.Quotient.mk (act g x))
+              = Submodule.Quotient.mk ⟨ρ g y, L₁.stable g y y.2⟩)
+      ↔ ∃ q : ↥L₁.T →ₗ[O] M,
+        Function.Surjective q ∧ (∀ g x, q (latRep L₁ g x) = π g (q x))
+          ∧ ∀ x, q x = 0 ↔ (x : V) ∈ L₂.T := by
   constructor
   · rintro ⟨e, he⟩
     let Φ := p.quotKerEquivOfSurjective hp
@@ -84,15 +93,17 @@ theorem quot_equiv_iff (L₁ L₂ : Lattice (O := O) ρ) (act : G → E → E) (
 end Lat
 
 section Sum
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR}
-    {LL : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [IsTopologicalRing LL]
-    {O : Type} [CommRing O] [Algebra O LL] {n : ℕ}
-    {emb : ZMod n → (K₀ →ₐ[Qp] LL)} {lam : O} {jT : ZMod n → ℤ → ℤ} {cT : G → Polynomial LL}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [IsTopologicalRing LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {n : ℕ} {emb : ZMod n → (K₀ →ₐ[Qp] LL)} {lam : O} {jT : ZMod n → ℤ → ℤ} {cT : G → Polynomial LL}
 
 def ofFull (F : tableLineDegreeTwo.FullRep PD emb lam jT cT) : GRep G Qp LL O where
   V := F.V
@@ -108,21 +119,24 @@ def sumFull {m : ℕ} (F : Fin m → tableLineDegreeTwo.FullRep PD emb lam jT cT
   ρ := tableLineDegreeTwo.piRep F
   cont := fun x => continuous_pi fun j => (F j).full.1 (x j)
 
-def toFull (A : GRep G Qp LL O) (h : tableLineDegreeTwo.IsFull PD emb lam jT cT A.ρ) : tableLineDegreeTwo.FullRep PD emb lam jT cT where
+def toFull (A : GRep G Qp LL O) (h : tableLineDegreeTwo.IsFull PD emb lam jT cT A.ρ)
+    : tableLineDegreeTwo.FullRep PD emb lam jT cT where
   V := A.V
   ρ := A.ρ
   full := h
 
-private theorem mapLattice_quotient_of_equivariant_equiv {G LL O V W M : Type} [Group G] [Field LL] [CommRing O] [Algebra O LL]
-    [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
-    [AddCommGroup W] [Module LL W] [Module O W] [IsScalarTower O LL W]
+private theorem mapLattice_quotient_of_equivariant_equiv
+    {G LL O V W M : Type}
+    [Group G] [Field LL] [CommRing O] [Algebra O LL] [AddCommGroup V] [Module LL V] [Module O V]
+    [IsScalarTower O LL V] [AddCommGroup W] [Module LL W] [Module O W] [IsScalarTower O LL W]
     {ρ : Representation LL G V} {σ : Representation LL G W} [AddCommGroup M] [Module O M]
-    (π : Representation O G M) (e : V ≃ₗ[LL] W) (he : ∀ g x, e (ρ g x) = σ g (e x))
+    (π : Representation O G M)
+    (e : V ≃ₗ[LL] W) (he : ∀ g x, e (ρ g x) = σ g (e x))
     (L₁ L₂ : Lattice (O := O) ρ) (q : ↥L₁.T →ₗ[O] M) (hq : Function.Surjective q)
-    (hqe : ∀ g x, q (latRep L₁ g x) = π g (q x)) (hqk : ∀ x, q x = 0 ↔ (x : V) ∈ L₂.T) :
-    ∃ q' : ↥(mapLat e he L₁).T →ₗ[O] M, Function.Surjective q' ∧
-      (∀ g x, q' (latRep (mapLat e he L₁) g x) = π g (q' x)) ∧
-      ∀ x, q' x = 0 ↔ (x : W) ∈ (mapLat e he L₂).T := by
+    (hqe : ∀ g x, q (latRep L₁ g x) = π g (q x)) (hqk : ∀ x, q x = 0 ↔ (x : V) ∈ L₂.T)
+    : ∃ q' : ↥(mapLat e he L₁).T →ₗ[O] M,
+      Function.Surjective q' ∧ (∀ g x, q' (latRep (mapLat e he L₁) g x) = π g (q' x))
+        ∧ ∀ x, q' x = 0 ↔ (x : W) ∈ (mapLat e he L₂).T := by
   let s : ↥L₁.T ≃ₗ[O] ↥(mapLat e he L₁).T := (e.restrictScalars O).submoduleMap L₁.T
   have hsx : ∀ x, (s x : W) = e x := fun x => rfl
   refine ⟨q.comp s.symm.toLinearMap, hq.comp s.symm.surjective, ?_, ?_⟩
@@ -145,35 +159,58 @@ private theorem mapLattice_quotient_of_equivariant_equiv {G LL O V W M : Type} [
       have hzx : z = (x : V) := e.injective hze
       rwa [← hzx]
 
-
 omit [IsTopologicalRing LL] in
-theorem admissible_quotient_ker_iff_full_lattices {E M : Type} [AddCommGroup E] [Module O E] [AddCommGroup M] [Module O M]
-    (act : G → E → E) (π : Representation O G M)
-    (p : E →ₗ[O] M) (hp : Function.Surjective p) (hact : ∀ g x, p (act g x) = π g (p x)) :
-    tableLineDegreeTwo.AdmQ PD emb lam jT cT act (LinearMap.ker p) ↔
-      ∃ (μ : ℕ) (F : Fin μ → GRep G Qp LL O) (A : GRep G Qp LL O)
-      (e : A.V ≃ₗ[LL] (∀ j, (F j).V)) (L₁ L₂ : Lattice (O := O) A.ρ) (q : ↥L₁.T →ₗ[O] M),
-      (∀ j, tableLineDegreeTwo.IsFull PD emb lam jT cT (F j).ρ) ∧ (∀ g x j, e (A.ρ g x) j = (F j).ρ g (e x j)) ∧ L₂.T ≤ L₁.T ∧
-      Function.Surjective q ∧ (∀ g x, q (latRep L₁ g x) = π g (q x)) ∧ ∀ x, q x = 0 ↔ (x : A.V) ∈ L₂.T := by
+theorem admissible_quotient_ker_iff_full_lattices
+    {E M : Type} [AddCommGroup E] [Module O E] [AddCommGroup M] [Module O M]
+    (act : G → E → E) (π : Representation O G M) (p : E →ₗ[O] M)
+    (hp : Function.Surjective p) (hact : ∀ g x, p (act g x) = π g (p x))
+    : tableLineDegreeTwo.AdmQ PD emb lam jT cT act (LinearMap.ker p)
+      ↔ ∃ (μ : ℕ) (F : Fin μ → GRep G Qp LL O) (A : GRep G Qp LL O) (e : A.V ≃ₗ[LL] (∀ j, (F j).V))
+          (L₁ L₂ : Lattice (O := O) A.ρ) (q : ↥L₁.T →ₗ[O] M),
+        (∀ j, tableLineDegreeTwo.IsFull PD emb lam jT cT (F j).ρ)
+          ∧ (∀ g x j, e (A.ρ g x) j = (F j).ρ g (e x j)) ∧ L₂.T ≤ L₁.T ∧ Function.Surjective q
+          ∧ (∀ g x, q (latRep L₁ g x) = π g (q x)) ∧ ∀ x, q x = 0 ↔ (x : A.V) ∈ L₂.T := by
   constructor
   · rintro ⟨m, F, L₁, L₂, hle, e, he⟩
     obtain ⟨q, hq, hqe, hqk⟩ := (quot_equiv_iff L₁ L₂ act π p hp hact).1 ⟨e, he⟩
-    exact ⟨m, fun j => ofFull (F j), sumFull F, LinearEquiv.refl LL _, L₁, L₂, q,
-      fun j => (F j).full, fun g x j => rfl, hle, hq, hqe, hqk⟩
+    exact ⟨
+      m,
+      fun j => ofFull (F j),
+      sumFull F,
+      LinearEquiv.refl LL _,
+      L₁,
+      L₂,
+      q,
+      fun j => (F j).full,
+      fun g x j => rfl,
+      hle,
+      hq,
+      hqe,
+      hqk
+    ⟩
   · rintro ⟨μ, F, A, e, L₁, L₂, q, hF, he, hle, hq, hqe, hqk⟩
     let F' : Fin μ → tableLineDegreeTwo.FullRep PD emb lam jT cT := fun j => toFull (F j) (hF j)
     let e' : A.V ≃ₗ[LL] (∀ j, (F' j).V) := e
-    have he' : ∀ g x, e' (A.ρ g x) = tableLineDegreeTwo.piRep F' g (e' x) := fun g x => funext fun j => he g x j
-    obtain ⟨q', hq', hqe', hqk'⟩ := mapLattice_quotient_of_equivariant_equiv π e' he' L₁ L₂ q hq hqe hqk
-    exact ⟨μ, F', mapLat e' he' L₁, mapLat e' he' L₂, Submodule.map_mono hle,
-      (quot_equiv_iff _ _ act π p hp hact).2 ⟨q', hq', hqe', hqk'⟩⟩
-
+    have he' : ∀ g x, e' (A.ρ g x) = tableLineDegreeTwo.piRep F' g (e' x) := fun g x =>
+      funext fun j => he g x j
+    obtain ⟨q', hq', hqe', hqk'⟩ :=
+      mapLattice_quotient_of_equivariant_equiv π e' he' L₁ L₂ q hq hqe hqk
+    exact ⟨
+      μ,
+      F',
+      mapLat e' he' L₁,
+      mapLat e' he' L₂,
+      Submodule.map_mono hle,
+      (quot_equiv_iff _ _ act π p hp hact).2 ⟨q', hq', hqe', hqk'⟩
+    ⟩
 
 omit [TopologicalSpace G] [TopologicalSpace LL] [IsTopologicalRing LL] in
-theorem resPoly_eq {V : Type} [AddCommGroup V] [Module LL V] [FiniteDimensional LL V]
-    (ρ : Representation LL G V) (χ : ℕ → G →* Oˣ) (t : ℕ) :
-    tableLineDegreeTwo.resPoly ρ χ t = fun g => LinearMap.charpoly (ρ g) *
-      ∏ c : Fin t, (X - C (algebraMap O LL (χ (c.val + 1) g))) := by
+theorem resPoly_eq
+    {V : Type} [AddCommGroup V] [Module LL V] [FiniteDimensional LL V]
+    (ρ : Representation LL G V) (χ : ℕ → G →* Oˣ) (t : ℕ)
+    : tableLineDegreeTwo.resPoly ρ χ t
+      = fun g =>
+        LinearMap.charpoly (ρ g) * ∏ c : Fin t, (X - C (algebraMap O LL (χ (c.val + 1) g))) := by
   funext g
   simp only [tableLineDegreeTwo.resPoly]
   congr 1
@@ -194,16 +231,28 @@ end Sum
 
 variable {l : ℕ} [Fact l.Prime] {P : LocPrime l} (S : TopSit P)
 
-theorem isFull_iff_polyFull (jT : ZMod S.n → ℤ → ℤ) (A : GRep S.G ℚ_[l] ↥S.LL.1 S.O) :
-    tableLineDegreeTwo.IsFull (P.PD S.K) S.emb S.Γ.lam jT (tableLineDegreeTwo.resPoly S.Γ.T₀.ρ S.Γ.chi S.D.t) A.ρ ↔ PolyFull S jT A := by
+theorem isFull_iff_polyFull (jT : ZMod S.n → ℤ → ℤ) (A : GRep S.G ℚ_[l] ↥S.LL.1 S.O)
+    : tableLineDegreeTwo.IsFull (P.PD S.K) S.emb S.Γ.lam jT
+        (tableLineDegreeTwo.resPoly S.Γ.T₀.ρ S.Γ.chi S.D.t) A.ρ
+      ↔ PolyFull S jT A := by
   unfold tableLineDegreeTwo.IsFull PolyFull
   rw [resPoly_eq]
-  simp only [tableLineDegreeTwo.Over, AlgHom.ext_iff, AlgHom.comp_apply, IsScalarTower.coe_toAlgHom']
+  simp only [tableLineDegreeTwo.Over, AlgHom.ext_iff, AlgHom.comp_apply,
+    IsScalarTower.coe_toAlgHom']
   exact ⟨fun h => ⟨h.2.1, h.2.2.1, h.2.2.2⟩, fun h => ⟨A.cont, h.1, h.2.1, h.2.2⟩⟩
 
-theorem admissibleQuotient_iff_admissible_module : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (S : TopSit P) (jT : ZMod S.n → ℤ → ℤ), (∀ i a, ((S.D.Ut i).count a : ℤ) = jT i a) → ∀ (E M : Type) [AddCommGroup E] [Module S.O E] [AddCommGroup M] [Module S.O M] (act : S.G → E → E) (π : Representation S.O S.G M) (p : E →ₗ[S.O] M), Function.Surjective p → (∀ g x, p (act g x) = π g (p x)) → (tableLineDegreeTwo.AdmQ (P.PD S.K) S.emb S.Γ.lam jT (tableLineDegreeTwo.resPoly S.Γ.T₀.ρ S.Γ.chi S.D.t) act (LinearMap.ker p) ↔ S.admitted π) := by
+theorem admissibleQuotient_iff_admissible_module
+    : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (S : TopSit P) (jT : ZMod S.n → ℤ → ℤ),
+      (∀ i a, ((S.D.Ut i).count a : ℤ) = jT i a)
+        → ∀ (E M : Type) [AddCommGroup E] [Module S.O E] [AddCommGroup M] [Module S.O M]
+            (act : S.G → E → E) (π : Representation S.O S.G M) (p : E →ₗ[S.O] M),
+          Function.Surjective p → (∀ g x, p (act g x) = π g (p x))
+            → (tableLineDegreeTwo.AdmQ (P.PD S.K) S.emb S.Γ.lam jT
+                (tableLineDegreeTwo.resPoly S.Γ.T₀.ρ S.Γ.chi S.D.t) act (LinearMap.ker p)
+              ↔ S.admitted π) := by
   intro l _ P S jT hj E M _ _ _ _ act π p hp hact
-  refine (admissible_quotient_ker_iff_full_lattices act π p hp hact).trans (Iff.trans ?_ (admissibleModule_iff_lattice_quotients S hj π).symm)
+  refine (admissible_quotient_ker_iff_full_lattices act π p hp hact).trans
+    (Iff.trans ?_ (admissibleModule_iff_lattice_quotients S hj π).symm)
   constructor
   · rintro ⟨μ, F, A, e, L₁, L₂, q, hF, h⟩
     exact ⟨μ, F, A, e, L₁, L₂, q, fun j => (isFull_iff_polyFull S jT (F j)).1 (hF j), h⟩

@@ -4,8 +4,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Endomorp
 
 @[expose] public section
 
-theorem UpperTheory.Zero.ConvolutionTheory.EB.powNorm :
-    UpperTheory.Zero.ConvolutionTheory.EB.PowNorm := by
+theorem UpperTheory.Zero.ConvolutionTheory.EB.powNorm
+    : UpperTheory.Zero.ConvolutionTheory.EB.PowNorm := by
   intro H _ _ Q U ρ hQ hU k
   have hρ : 0 ≤ ρ := (norm_nonneg _).trans hU
   have hb : ∀ f ∈ Q, ‖U f‖ ≤ ρ * ‖f‖ := by

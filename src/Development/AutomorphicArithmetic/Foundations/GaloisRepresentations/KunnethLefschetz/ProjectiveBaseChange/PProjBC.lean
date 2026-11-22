@@ -7,11 +7,13 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProperCohomology.
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace CrystallineSemistableComparison ReciprocityTheory.ChartRestriction.G.Geo.Tor UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  CrystallineSemistableComparison ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 
-theorem UpperTheory.Gal.KunnethLefschetz.projBC_holds :
-    UpperTheory.Gal.KunnethLefschetz.ProjBC := by
+theorem UpperTheory.Gal.KunnethLefschetz.projBC_holds
+    : UpperTheory.Gal.KunnethLefschetz.ProjBC := by
   unfold UpperTheory.Gal.KunnethLefschetz.ProjBC
   refine ⟨?_, ?_⟩
   · intro R R' _ _ φ X p hp
@@ -22,10 +24,12 @@ theorem UpperTheory.Gal.KunnethLefschetz.projBC_holds :
     let b := GroundTheory.Arith.SchemeCoh.ProjSpace.toSpecBase R N
     have H := GroundTheory.Arith.SchemeCoh.ProjSpace.isPullback_baseChange R R' N
     let ι : pullback (i ≫ b) s ⟶ GroundTheory.Arith.SchemeCoh.projectiveSpace R' N :=
-      H.lift (pullback.fst (i ≫ b) s ≫ i) (pullback.snd (i ≫ b) s) (by rw [Category.assoc]; exact pullback.condition)
+      H.lift (pullback.fst (i ≫ b) s ≫ i) (pullback.snd (i ≫ b) s)
+        (by rw [Category.assoc]; exact pullback.condition)
     have hι₁ : ι ≫ _ = pullback.fst (i ≫ b) s ≫ i := H.lift_fst _ _ _
     have hι₂ : ι ≫ _ = pullback.snd (i ≫ b) s := H.lift_snd _ _ _
-    have hsq : IsPullback ι (pullback.fst (i ≫ b) s) (GroundTheory.Arith.SchemeCoh.ProjSpace.baseChangeMap R R' N) i := by
+    have hsq : IsPullback ι (pullback.fst (i ≫ b) s)
+        (GroundTheory.Arith.SchemeCoh.ProjSpace.baseChangeMap R R' N) i := by
       refine IsPullback.of_right (h₂₂ := b) (v₁₃ := s) ?_ hι₁ H.flip
       rw [hι₂]
       exact (IsPullback.of_hasPullback (i ≫ b) s).flip

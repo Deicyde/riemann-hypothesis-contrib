@@ -10,27 +10,30 @@ noncomputable section
 
 namespace GlobalTheory.GaugeEx.PairLat
 
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
 open scoped TensorProduct NNReal ENNReal
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
   {d : ℕ} (b : Module.Basis (Fin d) F E)
 
-theorem ev_incl (e : E) : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
-    inclR (Fv F v) e ∈ intV b v := by
+theorem ev_incl (e : E)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
+      inclR (Fv F v) e ∈ intV b v := by
   filter_upwards [IntBasis.ev_int_coord b e] with v hv
   exact IntBasis.tmul_mem b v (one_mem _) hv
 
-theorem ev_map {m n : ℕ} (A : Matrix (Fin m) (Fin n) E) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
-      ∀ i j, A.map (inclR (Fv F v)) i j ∈ intV b v :=
+theorem ev_map {m n : ℕ} (A : Matrix (Fin m) (Fin n) E)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
+        ∀ i j, A.map (inclR (Fv F v)) i j ∈ intV b v :=
   Filter.eventually_all.2 fun i => Filter.eventually_all.2 fun j => ev_incl b (A i j)
 
-theorem mulVec_mem (v : HeightOneSpectrum (𝓞 F))
-    (hm : ∀ y ∈ intV b v, ∀ z ∈ intV b v, y * z ∈ intV b v) {m n : ℕ}
-    (A : Matrix (Fin m) (Fin n) (Fv F v ⊗[F] E)) (hA : ∀ i j, A i j ∈ intV b v)
-    (w : Fin n → Fv F v ⊗[F] E) (hw : ∀ j, w j ∈ intV b v) (i : Fin m) :
-    A.mulVec w i ∈ intV b v := by
+theorem mulVec_mem
+    (v : HeightOneSpectrum (𝓞 F)) (hm : ∀ y ∈ intV b v, ∀ z ∈ intV b v, y * z ∈ intV b v)
+    {m n : ℕ} (A : Matrix (Fin m) (Fin n) (Fv F v ⊗[F] E)) (hA : ∀ i j, A i j ∈ intV b v)
+    (w : Fin n → Fv F v ⊗[F] E) (hw : ∀ j, w j ∈ intV b v) (i : Fin m)
+    : A.mulVec w i ∈ intV b v := by
   have h : A.mulVec w i = ∑ j, A i j * w j := rfl
   rw [h]
   exact IntBasis.sum_mem' b v Finset.univ (fun j => A i j * w j) fun j _ => hm _ (hA i j) _ (hw j)

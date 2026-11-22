@@ -13,8 +13,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem prp_coe {K : Type} [CommRing K] (j : ZMod 2) (X : adp K j) :
-    prp K j (X : Matrix (Fin 3) (Fin 3) K) = X := by
+private theorem prp_coe {K : Type} [CommRing K] (j : ZMod 2) (X : adp K j)
+    : prp K j (X : Matrix (Fin 3) (Fin 3) K) = X := by
   apply Subtype.ext
   ext a b
   simp only [prp, LinearMap.coe_mk, AddHom.coe_mk, Matrix.of_apply]
@@ -30,8 +30,26 @@ private theorem lieT_mem (K : Type) [CommRing K] : lieT K 3 ∈ adp K 0 := by
     exact absurd (by simp [pw]) h
   · exact Matrix.diagonal_apply_ne _ hab
 
-theorem UpperTheory.V.Fr.ep_tan :
-    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ}, F.Ok C₀ → ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O], IsUnit (2 : O) → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R), (∀ y, σ (σ y) = y) → ∀ (ρ : NRep F 3 R) (B : Box F 3 R) (π : F.V → Fin 3 → ZMod 2), ρ.Univ O → B.Of ρ → B.Cont (maximalIdeal R) → (ρ.bar O).Good → B.Gr σ π → ∀ h : (B.bar O).Ev π, lieT (ResidueField O) 3 ≠ 0 → thetaLie (lieT (ResidueField O) 3) = lieT (ResidueField O) 3 → (∀ j, Module.finrank (ResidueField O) (H1C F.loc (h.ad j) ((B.bar O).bp j)) ≤ Module.finrank (ResidueField O) (derp O σ j)) ∧ Module.finrank (ResidueField O) (H1C F.loc (h.ad 0) ((B.bar O).bp 0)) + 1 ≤ Module.finrank (ResidueField O) (derp O σ 0) + Module.finrank (ResidueField O) (coneH0 (h.ad 0) ((B.bar O).bp 0)) := by
+theorem UpperTheory.V.Fr.ep_tan
+    : ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ},
+      F.Ok C₀
+        → ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+            [IsAdicComplete (maximalIdeal O) O],
+          IsUnit (2 : O)
+            → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R),
+              (∀ y, σ (σ y) = y)
+                → ∀ (ρ : NRep F 3 R) (B : Box F 3 R) (π : F.V → Fin 3 → ZMod 2),
+                  ρ.Univ O → B.Of ρ → B.Cont (maximalIdeal R) → (ρ.bar O).Good → B.Gr σ π
+                    → ∀ h : (B.bar O).Ev π,
+                      lieT (ResidueField O) 3 ≠ 0
+                        → thetaLie (lieT (ResidueField O) 3) = lieT (ResidueField O) 3
+                        → (∀ j,
+                            Module.finrank (ResidueField O) (H1C F.loc (h.ad j) ((B.bar O).bp j))
+                              ≤ Module.finrank (ResidueField O) (derp O σ j))
+                          ∧ Module.finrank (ResidueField O) (H1C F.loc (h.ad 0) ((B.bar O).bp 0))
+                              + 1
+                            ≤ Module.finrank (ResidueField O) (derp O σ 0) + Module.finrank
+                              (ResidueField O) (coneH0 (h.ad 0) ((B.bar O).bp 0)) := by
   intro l _ k _ _ F C₀ hOk O _ _ _ _ h2 R _ _ _ σ hσ ρ B π hU hOf hCont hGood hGr h hT0 hθ
   have h2K : (2 : ResidueField O) ≠ 0 := hGood.two
   have hP := (ep_prp (K := ResidueField O) h2K (B.bar O) π h).1
@@ -41,8 +59,9 @@ theorem UpperTheory.V.Fr.ep_tan :
       (Submodule.inclusion_injective _)
   let φ : ∀ j, derp O σ j →ₗ[ResidueField O] F.Γ → adp (ResidueField O) j := fun j =>
     (LinearMap.compLeft (prp (ResidueField O) j) F.Γ) ∘ₗ (Box.tanCo O B) ∘ₗ (derp O σ j).subtype
-  have hbrig : ∀ j (v : F.V) (Y : adp (ResidueField O) j),
-      (∀ s, (h.ad j (F.loc v s)) Y - Y ∈ (B.bar O).bp j v) → Y ∈ (B.bar O).bp j v := by
+  have hbrig
+      : ∀ j (v : F.V) (Y : adp (ResidueField O) j),
+        (∀ s, (h.ad j (F.loc v s)) Y - Y ∈ (B.bar O).bp j v) → Y ∈ (B.bar O).bp j v := by
     intro j v Y hY
     have hbar : (B.bar O).Of (ρ.bar O) := by
       let f : R →+* ResidueField O := res O R
@@ -55,22 +74,31 @@ theorem UpperTheory.V.Fr.ep_tan :
         rw [hOf.res]
         rfl
       · intro v i s
-        have e : (((B.map f).g v : GL (Fin 3) (ResidueField O)) : Matrix (Fin 3) (Fin 3) (ResidueField O)) * (ρ.map f).r (F.loc0 v s) *
-            ((((B.map f).g v)⁻¹ : GL (Fin 3) (ResidueField O)) : Matrix (Fin 3) (Fin 3) (ResidueField O)) =
-            f.mapMatrix ((B.g v : Matrix (Fin 3) (Fin 3) R) * ρ.r (F.loc0 v s) *
-              (((B.g v)⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R)) := by
+        have e
+            : (((B.map f).g v : GL (Fin 3) (ResidueField O))
+                  : Matrix (Fin 3) (Fin 3) (ResidueField O))
+                * (ρ.map f).r (F.loc0 v s)
+                * ((((B.map f).g v)⁻¹ : GL (Fin 3) (ResidueField O))
+                  : Matrix (Fin 3) (Fin 3) (ResidueField O))
+              = f.mapMatrix
+                ((B.g v : Matrix (Fin 3) (Fin 3) R) * ρ.r (F.loc0 v s)
+                  * (((B.g v)⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R)) := by
           rw [map_mul, map_mul]
           rfl
         rw [e]
         exact congrArg f (hOf.psi v i s)
     exact pr_brig (ResidueField O) (ρ.bar O) (B.bar O) hbar hGood v Y hY
-  have hsurj : ∀ j, ∀ x ∈ Z1C F.loc (h.ad j) ((B.bar O).bp j),
-      ∃ D : derp O σ j, ∃ X, ∀ s, φ j D s = x.1 s + ((h.ad j s) X - X) := by
+  have hsurj
+      : ∀ j, ∀ x ∈ Z1C F.loc (h.ad j) ((B.bar O).bp j), ∃ D : derp O σ j, ∃ X, ∀ s,
+        φ j D s = x.1 s + ((h.ad j s) X - X) := by
     intro j x hx
     obtain ⟨hlc, hco, hloc⟩ := hx
-    have hy : ((fun s => (x.1 s : Matrix (Fin 3) (Fin 3) (ResidueField O))),
-        (fun v => (x.2 v : Matrix (Fin 3) (Fin 3) (ResidueField O)))) ∈
-        Z1C F.loc (B.bar O).ad (B.bar O).b := by
+    have hy
+        : (
+            (fun s => (x.1 s : Matrix (Fin 3) (Fin 3) (ResidueField O))),
+            (fun v => (x.2 v : Matrix (Fin 3) (Fin 3) (ResidueField O)))
+          )
+          ∈ Z1C F.loc (B.bar O).ad (B.bar O).b := by
       refine ⟨?_, ?_, ?_⟩
       · show IsLocallyConstant (fun s => (x.1 s : Matrix (Fin 3) (Fin 3) (ResidueField O)))
         exact hlc.comp Subtype.val
@@ -90,7 +118,8 @@ theorem UpperTheory.V.Fr.ep_tan :
   have hc := (pr_count F.loc (h.ad 0) ((B.bar O).bp 0) (φ 0) (hbrig 0) (hsurj 0)).2
   obtain ⟨D, hD, hDe⟩ := pr_tor hOk O R ρ B hU hOf hCont hGood hθ
   obtain ⟨D', hD', hD'e⟩ := ep_dproj O h2 R σ hσ B π hGr 0 D hD
-  have e0 : prp (ResidueField O) 0 (lieT (ResidueField O) 3) = ⟨lieT (ResidueField O) 3, lieT_mem _⟩ :=
+  have e0
+      : prp (ResidueField O) 0 (lieT (ResidueField O) 3) = ⟨lieT (ResidueField O) 3, lieT_mem _⟩ :=
     prp_coe 0 ⟨_, lieT_mem _⟩
   refine hc ⟨lieT _ 3, lieT_mem _⟩ ⟨D', hD'⟩ ?_ ?_
   · intro h0

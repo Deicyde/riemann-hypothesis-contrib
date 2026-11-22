@@ -22,27 +22,46 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem conj_trans {H R : Type} [Group H] [CommRing R] {r r' r'' : H →* M4 R} (h : IsConj4 r r') (h' : IsConj4 r' r'') :
-    IsConj4 r r'' := by
+private theorem conj_trans
+    {H R : Type} [Group H] [CommRing R]
+    {r r' r'' : H →* M4 R} (h : IsConj4 r r') (h' : IsConj4 r' r'')
+    : IsConj4 r r'' := by
   obtain ⟨u, hu⟩ := h
   obtain ⟨v, hv⟩ := h'
-  exact ⟨v * u, fun g => by rw [hv, hu, mul_inv_rev, Units.val_mul, Units.val_mul]; simp only [mul_assoc]⟩
+  exact ⟨
+    v * u,
+    fun g => by rw [hv, hu, mul_inv_rev, Units.val_mul, Units.val_mul]; simp only [mul_assoc]
+  ⟩
 
-private theorem res_self (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] :
-    (res O O : O →+* ResidueField O) = residue O := RingHom.ext fun x => (res O O).commutes x
+private theorem res_self
+    (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O]
+    : (res O O : O →+* ResidueField O) = residue O :=
+  RingHom.ext fun x => (res O O).commutes x
 
-private theorem last_step (hC : CohomologyHyp) (hPM : PMEx) {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime]
-    {c : Coef l} {D : Raw Ω c} (T : Tower D) (hF : T.Fit) (hD : T.Deep) (ι : PadicAlgCl l ≃+* ℂ) (𝔞 : Amb l) (C : ℕ)
-    (hB : ∀ (k : Type) [Field k] (a : c.O →+* k), (∀ x ∈ maximalIdeal c.O, a x = 0) → (T.fr ∅).Bounds a T.d C)
-    (hd : 30 * (C + 1) * (C + 1) ≤ T.d) {c₁ : Coef l} {h₁ : c.O ≤ c₁.O} {Q : PD T.ι (G T.F Ω) c₁.O} (hQ : T.SeedPair ι h₁ Q)
+private theorem last_step
+    (hC : CohomologyHyp) (hPM : PMEx)
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    {c : Coef l} {D : Raw Ω c} (T : Tower D) (hF : T.Fit) (hD : T.Deep)
+    (ι : PadicAlgCl l ≃+* ℂ)
+    (𝔞 : Amb l)
+    (C : ℕ)
+    (hB : ∀ (k : Type) [Field k] (a : c.O →+* k),
+      (∀ x ∈ maximalIdeal c.O, a x = 0) → (T.fr ∅).Bounds a T.d C)
+    (hd : 30 * (C + 1) * (C + 1) ≤ T.d)
+    {c₁ : Coef l} {h₁ : c.O ≤ c₁.O} {Q : PD T.ι (G T.F Ω) c₁.O} (hQ : T.SeedPair ι h₁ Q)
     {P : PD T.ι (G T.F Ω) 𝔞.V} (hs : 𝔞.Small P) (hp : (T.fr ∅).IsPair (𝔞.a c) P)
     (hr : (T.fr ∅).IsRes (𝔞.red c) (P.map (residue 𝔞.V)))
-    (hch : (T.fr ∅).Chain (𝔞.red c) (P.map (residue 𝔞.V)) (Q.map (𝔞.red c₁))) :
-    ∃ (c' : Coef l) (h : c.O ≤ c'.O) (X : Space (T.fr ∅) (inc h)) (J : Ideal X.B) (y : X.A →+* 𝔞.V), T.PM ι X J ∧
-      y.comp (algebraMap c'.O X.A) = 𝔞.a c' ∧ (∀ b ∈ maximalIdeal X.B, y (algebraMap X.B X.A b) ∈ maximalIdeal 𝔞.V) ∧
-      (∀ b ∈ J, y (algebraMap X.B X.A b) = 0) ∧ X.P.map y = P := by
+    (hch : (T.fr ∅).Chain (𝔞.red c) (P.map (residue 𝔞.V)) (Q.map (𝔞.red c₁)))
+    : ∃ (c' : Coef l) (h : c.O ≤ c'.O) (X : Space (T.fr ∅) (inc h)) (J : Ideal X.B)
+        (y : X.A →+* 𝔞.V),
+      T.PM ι X J ∧ y.comp (algebraMap c'.O X.A) = 𝔞.a c'
+        ∧ (∀ b ∈ maximalIdeal X.B, y (algebraMap X.B X.A b) ∈ maximalIdeal 𝔞.V)
+        ∧ (∀ b ∈ J, y (algebraMap X.B X.A b) = 0) ∧ X.P.map y = P := by
   obtain ⟨c₂, k₂⟩ := chainDesc 𝔞 c (T.fr ∅) _ _ hr hch
   obtain ⟨c₃, k₃⟩ := smallCo 𝔞 P hs
   obtain ⟨c₄, k₄⟩ := hPM Ω l c D T hF hD ι
@@ -61,7 +80,9 @@ private theorem last_step (hC : CohomologyHyp) (hPM : PMEx) {Ω : Type} [Field �
   obtain ⟨s, t, es, et, rs, cst⟩ := k₂ c' h (a₂.trans b₁)
   obtain ⟨R, _, _, _, f, QR, fi, fa, fr, qc, rfl⟩ := k₃ c' (a₃.trans b₂)
   have inj := (chainMap (T.fr ∅) ((residue c'.O).comp (inc h)) (𝔞.j c') s).2.2
-  have loc : ∀ {d : Coef l} (e : d.O ≤ c'.O), maximalIdeal d.O ≤ (maximalIdeal c'.O).comap (inc e) := fun {d} e x hx hu => by
+  have loc
+      : ∀ {d : Coef l} (e : d.O ≤ c'.O),
+        maximalIdeal d.O ≤ (maximalIdeal c'.O).comap (inc e) := fun {d} e x hx hu => by
     have h2 : IsUnit (𝔞.a d x) := 𝔞.compat d c' e x ▸ hu.map (𝔞.a c')
     exact hx (IsLocalHom.map_nonunit x h2)
 
@@ -73,19 +94,27 @@ private theorem last_step (hC : CohomologyHyp) (hPM : PMEx) {Ω : Type} [Field �
     rw [et, res_self, PD.map_map, PD.map_map, ← jc]
     rfl
   obtain ⟨f₁, hf₁⟩ := X.univ c'.O t _ (Asm.chain_end rs cst).1 lQ
-  have sd := hJ.seed ((Algebra.ofId c'.O (PadicAlgCl l)).comp f₁) (by
-    have e : X.P.map (((Algebra.ofId c'.O (PadicAlgCl l)).comp f₁ : X.A →ₐ[c'.O] PadicAlgCl l) : X.A →+* PadicAlgCl l) =
-        Q.map (algebraMap c₁.O (PadicAlgCl l)) := by
-      show (X.P.map (f₁ : X.A →+* c'.O)).map (algebraMap c'.O (PadicAlgCl l)) = _
-      rw [hf₁]
-      rfl
-    rw [e]
-    exact hQ.seed)
-  have s₁ : X.SomeIn J (RingHom.ker ((res c'.O c'.O).comp f₁)) := Asm.someIn_of_locZero X J _ sd fun z hz => by
-    have h0 : f₁ z = 0 := Subtype.ext hz
-    show res c'.O c'.O (f₁ z) = 0
-    rw [h0, map_zero]
-  have e₁' : X.P.map (((res c'.O c'.O).comp f₁ : X.A →ₐ[c'.O] ResidueField c'.O) : X.A →+* ResidueField c'.O) = t := by
+  have sd :=
+    hJ.seed ((Algebra.ofId c'.O (PadicAlgCl l)).comp f₁) (by
+      have e
+          : X.P.map
+              (((Algebra.ofId c'.O (PadicAlgCl l)).comp f₁ : X.A →ₐ[c'.O] PadicAlgCl l)
+                : X.A →+* PadicAlgCl l)
+            = Q.map (algebraMap c₁.O (PadicAlgCl l)) := by
+        show (X.P.map (f₁ : X.A →+* c'.O)).map (algebraMap c'.O (PadicAlgCl l)) = _
+        rw [hf₁]
+        rfl
+      rw [e]
+      exact hQ.seed)
+  have s₁ : X.SomeIn J (RingHom.ker ((res c'.O c'.O).comp f₁)) :=
+    Asm.someIn_of_locZero X J _ sd fun z hz => by
+      have h0 : f₁ z = 0 := Subtype.ext hz
+      show res c'.O c'.O (f₁ z) = 0
+      rw [h0, map_zero]
+  have e₁'
+      : X.P.map
+          (((res c'.O c'.O).comp f₁ : X.A →ₐ[c'.O] ResidueField c'.O) : X.A →+* ResidueField c'.O)
+        = t := by
     show (X.P.map (f₁ : X.A →+* c'.O)).map (res c'.O c'.O : c'.O →+* ResidueField c'.O) = t
     rw [hf₁]
     exact lQ.red
@@ -99,14 +128,29 @@ private theorem last_step (hC : CohomologyHyp) (hPM : PMEx) {Ω : Type} [Field �
     · show (QR.map _).map _ = s.map _
       rw [es, PD.map_map, PD.map_map, fr]
   obtain ⟨f₀, hf₀⟩ := X.univ R s _ rs lR
-  have e₀ : X.P.map (((res c'.O R).comp f₀ : X.A →ₐ[c'.O] ResidueField c'.O) : X.A →+* ResidueField c'.O) = s := by
+  have e₀
+      : X.P.map
+          (((res c'.O R).comp f₀ : X.A →ₐ[c'.O] ResidueField c'.O) : X.A →+* ResidueField c'.O)
+        = s := by
     show (X.P.map (f₀ : X.A →+* R)).map (res c'.O R : R →+* ResidueField c'.O) = s
     rw [hf₀]
     exact lR.red
-  have all := Asm.allIn_of_chain hS X J
-    (ch hC D T hF hD ι c' h X J hJ C (hB _ _ fun x hx => (residue_eq_zero_iff _).2 (loc h hx)) hd)
-    ((res c'.O R).comp f₀) ((res c'.O c'.O).comp f₁) (e₀ ▸ rs) (e₀ ▸ e₁' ▸ cst) s₁
-  refine ⟨c', h, X, J, f.comp (f₀ : X.A →+* R), hJ, ?_, fun b hb => ?_, Asm.zero_of_allIn X J _ all fun z hz => ?_, ?_⟩
+  have all :=
+    Asm.allIn_of_chain hS X J
+      (ch hC D T hF hD ι c' h X J hJ C (hB _ _ fun x hx => (residue_eq_zero_iff _).2 (loc h hx)) hd)
+      ((res c'.O R).comp f₀) ((res c'.O c'.O).comp f₁) (e₀ ▸ rs) (e₀ ▸ e₁' ▸ cst) s₁
+  refine ⟨
+    c',
+    h,
+    X,
+    J,
+    f.comp (f₀ : X.A →+* R),
+    hJ,
+    ?_,
+    fun b hb => ?_,
+    Asm.zero_of_allIn X J _ all fun z hz => ?_,
+    ?_
+  ⟩
   · rw [RingHom.comp_assoc, AlgHom.comp_algebraMap, fa]
   · have h0 : res c'.O R ((f₀.comp (IsScalarTower.toAlgHom c'.O X.B X.A)) b) = 0 := by
       rw [res_map, res_eq_zero_iff]

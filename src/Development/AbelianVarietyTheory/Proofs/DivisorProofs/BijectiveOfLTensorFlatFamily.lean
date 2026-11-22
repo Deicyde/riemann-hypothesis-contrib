@@ -8,11 +8,14 @@ open TensorProduct
 
 namespace GlobalTheory
 
-theorem subsingleton_of_lTensor_flat_family (R : Type) [CommRing R] (J : Type) (B : J → Type)
-    [∀ i, CommRing (B i)] [∀ i, Algebra R (B i)] (hflat : ∀ i, Module.Flat R (B i))
+theorem subsingleton_of_lTensor_flat_family
+    (R : Type) [CommRing R]
+    (J : Type) (B : J → Type) [∀ i, CommRing (B i)] [∀ i, Algebra R (B i)]
+    (hflat : ∀ i, Module.Flat R (B i))
     (hmax : ∀ m : Ideal R, m.IsMaximal → ∃ i, Ideal.map (algebraMap R (B i)) m ≠ ⊤)
-    (M : Type) [AddCommGroup M] [Module R M] (h : ∀ i, Subsingleton (B i ⊗[R] M)) :
-    Subsingleton M := by
+    (M : Type) [AddCommGroup M] [Module R M]
+    (h : ∀ i, Subsingleton (B i ⊗[R] M))
+    : Subsingleton M := by
   by_contra hM
   rw [not_subsingleton_iff_nontrivial] at hM
   obtain ⟨x, hx⟩ := exists_ne (0 : M)
@@ -41,11 +44,14 @@ theorem subsingleton_of_lTensor_flat_family (R : Type) [CommRing R] (J : Type) (
   rw [Ideal.smul_top_eq_map, Submodule.restrictScalars_eq_top_iff] at htop
   exact hi (top_le_iff.mp (htop ▸ Ideal.map_mono hIm))
 
-theorem bijective_of_lTensor_flat_family : ∀ (R : Type) [CommRing R] (N N' : Type) [AddCommGroup N]
-    [Module R N] [AddCommGroup N'] [Module R N'] (f : N →ₗ[R] N') (J : Type) (B : J → Type)
-    [∀ i, CommRing (B i)] [∀ i, Algebra R (B i)], (∀ i, Module.Flat R (B i)) →
-    (∀ m : Ideal R, m.IsMaximal → ∃ i, Ideal.map (algebraMap R (B i)) m ≠ ⊤) →
-    (∀ i, Function.Bijective (LinearMap.lTensor (B i) f)) → Function.Bijective f := by
+theorem bijective_of_lTensor_flat_family
+    : ∀ (R : Type) [CommRing R] (N N' : Type) [AddCommGroup N] [Module R N] [AddCommGroup N']
+        [Module R N'] (f : N →ₗ[R] N') (J : Type) (B : J → Type) [∀ i, CommRing (B i)]
+        [∀ i, Algebra R (B i)],
+      (∀ i, Module.Flat R (B i))
+        → (∀ m : Ideal R, m.IsMaximal → ∃ i, Ideal.map (algebraMap R (B i)) m ≠ ⊤)
+        → (∀ i, Function.Bijective (LinearMap.lTensor (B i) f))
+        → Function.Bijective f := by
   intro R _ N N' _ _ _ _ f J B _ _ hflat hmax hbij
   constructor
   · set K := LinearMap.ker f

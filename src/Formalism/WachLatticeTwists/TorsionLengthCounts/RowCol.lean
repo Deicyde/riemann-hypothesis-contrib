@@ -10,10 +10,14 @@ namespace Formalism.RepresentationBoundsCohomology.RowCol
 
 open Module
 
-theorem length_le_of_killed {O : Type*} [CommRing O] (b : O) {X : Type*} [AddCommGroup X]
-    [Module O X] {ι : Type*} [Fintype ι] (g : (ι → O) →ₗ[O] X) (hg : Function.Surjective g)
-    (hb : ∀ x : X, b • x = 0) :
-    Module.length O X ≤ (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {b}) := by
+theorem length_le_of_killed
+    {O : Type*} [CommRing O]
+    (b : O)
+    {X : Type*} [AddCommGroup X] [Module O X]
+    {ι : Type*} [Fintype ι]
+    (g : (ι → O) →ₗ[O] X) (hg : Function.Surjective g)
+    (hb : ∀ x : X, b • x = 0)
+    : Module.length O X ≤ (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {b}) := by
   classical
   let gi : ι → (O →ₗ[O] X) := fun i =>
     LinearMap.toSpanSingleton O X (g (fun j => if i = j then 1 else 0))
@@ -33,32 +37,36 @@ theorem length_le_of_killed {O : Type*} [CommRing O] (b : O) {X : Type*} [AddCom
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp only [map_smul]
-  calc Module.length O X ≤ Module.length O (ι → O ⧸ Ideal.span {b}) :=
-        Module.length_le_of_surjective h hs
+  calc
+    Module.length O X
+      ≤ Module.length O (ι → O ⧸ Ideal.span {b}) := Module.length_le_of_surjective h hs
     _ = _ := by rw [Module.length_pi, ENat.card_eq_coe_fintype_card]
 
-theorem length_le_of_killed_pow {O : Type*} [CommRing O] (b : O) : ∀ (e : ℕ) {X : Type*}
-    [AddCommGroup X] [Module O X] {ι : Type*} [Fintype ι] (g : (ι → O) →ₗ[O] X),
-    Function.Surjective g → (∀ x : X, b ^ e • x = 0) →
-    Module.length O X ≤
-      (e : ℕ∞) * ((Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {b})) := by
+theorem length_le_of_killed_pow {O : Type*} [CommRing O] (b : O)
+    : ∀ (e : ℕ) {X : Type*} [AddCommGroup X] [Module O X] {ι : Type*} [Fintype ι]
+        (g : (ι → O) →ₗ[O] X),
+      Function.Surjective g → (∀ x : X, b ^ e • x = 0)
+        → Module.length O X
+          ≤ (e : ℕ∞) * ((Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {b})) := by
   intro e
   induction e with
   | zero =>
     intro X _ _ ι _ g _ hb
-    have : Subsingleton X := ⟨fun x y => by
-      have hx := hb x
-      have hy := hb y
-      simp only [pow_zero, one_smul] at hx hy
-      rw [hx, hy]⟩
+    have : Subsingleton X :=
+      ⟨fun x y => by
+        have hx := hb x
+        have hy := hb y
+        simp only [pow_zero, one_smul] at hx hy
+        rw [hx, hy]⟩
     rw [Module.length_eq_zero_iff.mpr this]
     exact zero_le
   | succ e ih =>
     intro X _ _ ι _ g hg hb
     let φ : X →ₗ[O] X := b • LinearMap.id
     let Y : Submodule O X := LinearMap.range φ
-    have hlen := Module.length_eq_add_of_exact Y.subtype Y.mkQ Y.injective_subtype Y.mkQ_surjective
-      (LinearMap.exact_subtype_mkQ Y)
+    have hlen :=
+      Module.length_eq_add_of_exact Y.subtype Y.mkQ Y.injective_subtype Y.mkQ_surjective
+        (LinearMap.exact_subtype_mkQ Y)
     let gY : (ι → O) →ₗ[O] Y := φ.rangeRestrict.comp g
     have hgY : Function.Surjective gY := (LinearMap.surjective_rangeRestrict φ).comp hg
     have hbY : ∀ y : Y, b ^ e • y = 0 := by
@@ -78,14 +86,17 @@ theorem length_le_of_killed_pow {O : Type*} [CommRing O] (b : O) : ∀ (e : ℕ)
       exact LinearMap.mem_range.mpr ⟨x, rfl⟩
     have hQ := length_le_of_killed b (Y.mkQ.comp g) (Y.mkQ_surjective.comp hg) hbQ
     rw [hlen]
-    calc _ ≤ (e : ℕ∞) * ((Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {b})) +
-          (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {b}) := add_le_add hY hQ
+    calc
+      _ ≤ (e : ℕ∞) * ((Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {b}))
+          + (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {b}) :=
+        add_le_add hY hQ
       _ = _ := by push_cast; ring
 
 end Formalism.RepresentationBoundsCohomology.RowCol
 
 open Module in
-theorem Formalism.RepresentationBoundsCohomology.rowColength : Formalism.RepresentationBoundsCohomology.StatRowColength := by
+theorem Formalism.RepresentationBoundsCohomology.rowColength
+    : Formalism.RepresentationBoundsCohomology.StatRowColength := by
   intro O _ _ _ M _ _ _ I ℓ e hI
   classical
   set T := Submodule.torsion O M with hT
@@ -132,18 +143,26 @@ theorem Formalism.RepresentationBoundsCohomology.rowColength : Formalism.Represe
       rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
       exact hI x
     rw [← map_smul, ← map_smul, h0, map_zero]
-  have hP := Formalism.RepresentationBoundsCohomology.RowCol.length_le_of_killed_pow ((ℓ : O)) e G hGs hGk
-  have hlen := Module.length_eq_add_of_exact N.subtype N.mkQ N.injective_subtype N.mkQ_surjective
-    (LinearMap.exact_subtype_mkQ N)
+  have hP :=
+    Formalism.RepresentationBoundsCohomology.RowCol.length_le_of_killed_pow ((ℓ : O)) e G hGs hGk
+  have hlen :=
+    Module.length_eq_add_of_exact N.subtype N.mkQ N.injective_subtype N.mkQ_surjective
+      (LinearMap.exact_subtype_mkQ N)
   have hN : Module.length O N ≤ Module.length O T :=
     Module.length_le_of_surjective (I.mkQ.comp T.subtype).rangeRestrict
       (LinearMap.surjective_rangeRestrict _)
   rw [hlen, add_comm]
   refine add_le_add ?_ hN
-  have hcard' : ((Fintype.card (Module.Free.ChooseBasisIndex O (M ⧸ T)) : ℕ) : ℕ∞) ≤
-      (Module.finrank O M : ℕ∞) := by exact_mod_cast hcard
-  calc _ ≤ (e : ℕ∞) * ((Fintype.card (Module.Free.ChooseBasisIndex O (M ⧸ T)) : ℕ∞) *
-        Module.length O (O ⧸ Ideal.span {(ℓ : O)})) := hP
-    _ = (Fintype.card (Module.Free.ChooseBasisIndex O (M ⧸ T)) : ℕ∞) *
-        ((e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)})) := mul_left_comm _ _ _
+  have hcard'
+      : ((Fintype.card (Module.Free.ChooseBasisIndex O (M ⧸ T)) : ℕ) : ℕ∞)
+        ≤ (Module.finrank O M : ℕ∞) := by
+    exact_mod_cast hcard
+  calc
+    _ ≤ (e : ℕ∞)
+        * ((Fintype.card (Module.Free.ChooseBasisIndex O (M ⧸ T)) : ℕ∞)
+          * Module.length O (O ⧸ Ideal.span {(ℓ : O)})) :=
+      hP
+    _ = (Fintype.card (Module.Free.ChooseBasisIndex O (M ⧸ T)) : ℕ∞)
+        * ((e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)})) :=
+      mul_left_comm _ _ _
     _ ≤ _ := mul_le_mul' hcard' le_rfl

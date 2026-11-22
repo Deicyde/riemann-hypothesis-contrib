@@ -15,8 +15,6 @@ open scoped BigOperators
 
 variable {D : D7} {L : SizeData₂ D}
 
-
-
 theorem delta1_pos (s : Scale) : 0 < s.delta1 := by
   unfold Scale.delta1
   exact Real.rpow_pos_of_pos (by linarith [s.one_lt_alt]) _

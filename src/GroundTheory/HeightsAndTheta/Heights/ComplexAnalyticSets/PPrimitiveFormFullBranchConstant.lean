@@ -11,26 +11,33 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Filter Topology
 
-theorem monic_root_branch_eventuallyEq {d N : ℕ} (a : Fin N → (Fin d → ℂ) → ℂ) (s : Fin d → ℂ)
-    (u v : (Fin d → ℂ) → ℂ) (ha : ∀ j, ContinuousAt (a j) s) (hu : ContinuousAt u s)
-    (hv : ContinuousAt v s) (huv : u s = v s)
-    (hsep : (Polynomial.X ^ N + ∑ j, Polynomial.C (a j s) * Polynomial.X ^ (j : ℕ) : Polynomial ℂ).Separable)
+theorem monic_root_branch_eventuallyEq
+    {d N : ℕ} (a : Fin N → (Fin d → ℂ) → ℂ) (s : Fin d → ℂ) (u v : (Fin d → ℂ) → ℂ)
+    (ha : ∀ j, ContinuousAt (a j) s) (hu : ContinuousAt u s) (hv : ContinuousAt v s)
+    (huv : u s = v s)
+    (hsep : (Polynomial.X ^ N + ∑ j, Polynomial.C (a j s) * Polynomial.X ^ (j : ℕ)
+      : Polynomial ℂ).Separable)
     (hru : ∀ᶠ t in 𝓝 s, u t ^ N + ∑ j, a j t * u t ^ (j : ℕ) = 0)
-    (hrv : ∀ᶠ t in 𝓝 s, v t ^ N + ∑ j, a j t * v t ^ (j : ℕ) = 0) : u =ᶠ[𝓝 s] v := by
+    (hrv : ∀ᶠ t in 𝓝 s, v t ^ N + ∑ j, a j t * v t ^ (j : ℕ) = 0)
+    : u =ᶠ[𝓝 s] v := by
   set Q : (Fin d → ℂ) → ℂ → ℂ → ℂ := fun t x y =>
     ∑ i ∈ Finset.range N, x ^ i * y ^ (N - 1 - i) +
       ∑ j : Fin N, a j t * ∑ i ∈ Finset.range j, x ^ i * y ^ ((j : ℕ) - 1 - i) with hQdef
-  have hQ : ∀ t x y, (x ^ N + ∑ j, a j t * x ^ (j : ℕ)) - (y ^ N + ∑ j, a j t * y ^ (j : ℕ)) =
-      Q t x y * (x - y) := by
+  have hQ
+      : ∀ t x y,
+        (x ^ N + ∑ j, a j t * x ^ (j : ℕ)) - (y ^ N + ∑ j, a j t * y ^ (j : ℕ))
+          = Q t x y * (x - y) := by
     intro t x y
     rw [hQdef, add_mul, geom_sum₂_mul, Finset.sum_mul]
     simp_rw [mul_assoc, geom_sum₂_mul, mul_sub, Finset.sum_sub_distrib]
     ring
   have hQs : Q s (u s) (u s) ≠ 0 := by
-    have h := hsep.eval₂_derivative_ne_zero (RingHom.id ℂ) (x := u s)
-      (by simpa [Polynomial.eval₂_id, Polynomial.eval_finsetSum] using hru.self_of_nhds)
+    have h :=
+      hsep.eval₂_derivative_ne_zero (RingHom.id ℂ) (x := u s)
+        (by simpa [Polynomial.eval₂_id, Polynomial.eval_finsetSum] using hru.self_of_nhds)
     convert h using 1
-    simp [hQdef, Polynomial.eval₂_id, Polynomial.eval_finsetSum, geom_sum₂_self, Polynomial.derivative_X_pow]
+    simp [hQdef, Polynomial.eval₂_id, Polynomial.eval_finsetSum, geom_sum₂_self,
+      Polynomial.derivative_X_pow]
   have hc : ContinuousAt (fun t => Q t (u t) (v t)) s := by
     simp only [hQdef]
     fun_prop
@@ -41,12 +48,14 @@ theorem monic_root_branch_eventuallyEq {d N : ℕ} (a : Fin N → (Fin d → ℂ
   exact sub_eq_zero.1 ((mul_eq_zero.1 h.symm).resolve_left h3)
 
 theorem PrimitiveFormFullBranchConstant.proof : PrimitiveFormFullBranchConstant.Statement := by
-  intro σ _ X W N' k f d A ℓ N a δ q B O r hW hN' hWN' hf hXN' hXW hP hB ha hδ hq hO hOc hOB hδO hsep hr hrO
+  intro σ _ X W N' k f d A ℓ N a δ q B O r hW hN' hWN' hf hXN' hXW hP hB ha hδ hq hO hOc hOB hδO
+    hsep hr hrO
   set G : (Fin d → ℂ) → σ → ℂ := fun s i => (∑ j, q i j s * r s ^ (j : ℕ)) / δ s with hGdef
   set P : (Fin d → ℂ) → Prop := fun u => G u ∈ X ∩ W ∧ A (G u) = u ∧ ℓ (G u) = r u with hPdef
-  have hG : AnalyticOnNhd ℂ G O := fun u hu => analyticAt_pi_iff.2 fun i =>
-    (Finset.analyticAt_fun_sum _ fun j _ => (hq i j u (hOB hu)).mul ((hr u hu).pow _)).div
-      (hδ u (hOB hu)) (hδO u hu)
+  have hG : AnalyticOnNhd ℂ G O := fun u hu =>
+    analyticAt_pi_iff.2 fun i =>
+      (Finset.analyticAt_fun_sum _ fun j _ => (hq i j u (hOB hu)).mul ((hr u hu).pow _)).div
+        (hδ u (hOB hu)) (hδO u hu)
 
   have hfull : ∀ s ∈ O, (PrimitiveFormRootFull X W A ℓ δ q s (r s) ↔ ∀ᶠ u in 𝓝 s, P u) := by
     intro s hs
@@ -57,26 +66,37 @@ theorem PrimitiveFormFullBranchConstant.proof : PrimitiveFormFullBranchConstant.
         obtain ⟨hX, hA, hℓ⟩ := hw u hu
         have h := hP _ hX
         rwa [hA, hℓ] at h
-      have heq : r' =ᶠ[𝓝 s] r := monic_root_branch_eventuallyEq a s r' r
-        (fun j => (ha j s (hOB hs)).continuousAt) (hr' s hsO').continuousAt (hr s hs).continuousAt hrs
-        (hsep s hs) hroot' (Filter.mem_of_superset (hO.mem_nhds hs) hrO)
+      have heq : r' =ᶠ[𝓝 s] r :=
+        monic_root_branch_eventuallyEq a s r' r
+          (fun j => (ha j s (hOB hs)).continuousAt)
+          (hr' s hsO').continuousAt (hr s hs).continuousAt hrs (hsep s hs) hroot'
+          (Filter.mem_of_superset (hO.mem_nhds hs) hrO)
       filter_upwards [hO'.mem_nhds hsO', heq] with u hu hru
       have h := hw u hu
       simp only [hru] at h
       exact h
     · intro hev
       obtain ⟨U, hUs, hUo, hsU⟩ := mem_nhds_iff.1 hev
-      exact ⟨U ∩ O, r, hUo.inter hO, ⟨hsU, hs⟩, hr.mono Set.inter_subset_right, rfl, fun u hu => hUs hu.1⟩
+      exact ⟨
+        U ∩ O,
+        r,
+        hUo.inter hO,
+        ⟨hsU, hs⟩,
+        hr.mono Set.inter_subset_right,
+        rfl,
+        fun u hu => hUs hu.1
+      ⟩
 
   set S : Set (Fin d → ℂ) := {s | ∀ᶠ u in 𝓝 s, P u} with hSdef
   have hSo : IsOpen S := isOpen_setOfPred_eventually_nhds
   have hSc : closure S ∩ O ⊆ S := by
     rintro s ⟨hsc, hs⟩
     have hGs : ContinuousAt G s := (hG s hs).continuousAt
-    have hGW : G s ∈ closure W := closure_mono (by rintro _ ⟨u, hu, rfl⟩; exact hu.self_of_nhds.1.2)
-      (mem_closure_image hGs hsc)
-    obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.1
-      (Filter.inter_mem (hO.mem_nhds hs) (hGs.preimage_mem_nhds (hN'.mem_nhds (hWN' hGW))))
+    have hGW : G s ∈ closure W :=
+      closure_mono (by rintro _ ⟨u, hu, rfl⟩; exact hu.self_of_nhds.1.2) (mem_closure_image hGs hsc)
+    obtain ⟨ε, hε, hball⟩ :=
+      Metric.mem_nhds_iff.1 (Filter.inter_mem (hO.mem_nhds hs)
+        (hGs.preimage_mem_nhds (hN'.mem_nhds (hWN' hGW))))
 
     set Φ : (Fin d → ℂ) → (Fin k → ℂ) × (Fin d → ℂ) × ℂ :=
       fun u => (fun i => f i (G u), A (G u) - u, ℓ (G u) - r u) with hΦdef
@@ -108,8 +128,10 @@ theorem PrimitiveFormFullBranchConstant.proof : PrimitiveFormFullBranchConstant.
     obtain ⟨h1, h2, h3⟩ := hU u hu
     exact ⟨⟨h1, hu'⟩, h2, h3⟩
 
-  have key : ∀ s ∈ O, ∀ s' ∈ O, PrimitiveFormRootFull X W A ℓ δ q s (r s) →
-      PrimitiveFormRootFull X W A ℓ δ q s' (r s') := by
+  have key
+      : ∀ s ∈ O, ∀ s' ∈ O,
+        PrimitiveFormRootFull X W A ℓ δ q s (r s)
+          → PrimitiveFormRootFull X W A ℓ δ q s' (r s') := by
     intro s hs s' hs' h
     have hsub : O ⊆ S := hOc.subset_of_closure_inter_subset hSo ⟨s, hs, (hfull s hs).1 h⟩ hSc
     exact (hfull s' hs').2 (hsub hs')

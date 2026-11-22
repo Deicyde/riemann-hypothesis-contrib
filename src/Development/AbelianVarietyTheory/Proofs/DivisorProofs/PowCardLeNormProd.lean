@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory.RootNormLowerBound
 
-theorem pow_card_le_norm_prod {ε : ℝ} (hε : 0 < ε) (s : Multiset ℂ)
-    (h : ∀ t ∈ s, ε ≤ ‖t‖) : ε ^ Multiset.card s ≤ ‖(s.map (fun a => -a)).prod‖ := by
+theorem pow_card_le_norm_prod {ε : ℝ} (hε : 0 < ε) (s : Multiset ℂ) (h : ∀ t ∈ s, ε ≤ ‖t‖)
+    : ε ^ Multiset.card s ≤ ‖(s.map (fun a => -a)).prod‖ := by
   induction s using Multiset.induction_on with
   | empty => simp
   | cons a s ih =>
@@ -17,9 +17,10 @@ theorem pow_card_le_norm_prod {ε : ℝ} (hε : 0 < ε) (s : Multiset ℂ)
       mul_comm (ε ^ Multiset.card s)]
     exact mul_le_mul ha ih' (by positivity) (norm_nonneg _)
 
-theorem exists_root_norm_lt {F : Polynomial ℂ} (hF : Polynomial.Monic F) {ε : ℝ}
-    (hε : (0 : ℝ) < ε) (h0 : ‖F.coeff (0 : ℕ)‖ < ε ^ Polynomial.natDegree F) :
-    ∃ (t : ℂ), Polynomial.IsRoot F t ∧ ‖t‖ < ε := by
+theorem exists_root_norm_lt
+    {F : Polynomial ℂ} (hF : Polynomial.Monic F)
+    {ε : ℝ} (hε : (0 : ℝ) < ε) (h0 : ‖F.coeff (0 : ℕ)‖ < ε ^ Polynomial.natDegree F)
+    : ∃ (t : ℂ), Polynomial.IsRoot F t ∧ ‖t‖ < ε := by
   by_contra hcon
   have hall : ∀ t ∈ F.roots, ε ≤ ‖t‖ := fun t ht =>
     le_of_not_gt fun hlt => hcon ⟨t, (Polynomial.mem_roots hF.ne_zero).1 ht, hlt⟩

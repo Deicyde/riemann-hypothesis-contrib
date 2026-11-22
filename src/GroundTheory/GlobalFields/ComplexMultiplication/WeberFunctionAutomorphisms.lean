@@ -13,33 +13,39 @@ open WeierstrassCurve OnePoint ShortWeierstrass
 
 variable {F : Type*} [Field F]
 
-
 open scoped Classical in
 noncomputable def automorphismOrder (W : WeierstrassCurve F) : ℕ := by
   classical
-  exact if W.a₆ = 0 then 4 else if W.a₄ = 0 then 6 else 2
+  exact
+    if W.a₆ = 0 then
+      4
+    else if W.a₄ = 0 then
+      6
+    else
+      2
 
-def automorphismScale (W : WeierstrassCurve F) :
-    MulAction.stabilizer (VariableChange F) W →* Fˣ where
+def automorphismScale (W : WeierstrassCurve F)
+    : MulAction.stabilizer (VariableChange F) W →* Fˣ where
   toFun ξ := ξ.1.u
   map_one' := rfl
   map_mul' _ _ := rfl
 
-def automorphismPoint {W : WeierstrassCurve F} (ξ : MulAction.stabilizer (VariableChange F) W) :
-    W.toAffine.Point → W.toAffine.Point :=
+def automorphismPoint {W : WeierstrassCurve F} (ξ : MulAction.stabilizer (VariableChange F) W)
+    : W.toAffine.Point → W.toAffine.Point :=
   variableChangePoint ξ.1 (MulAction.mem_stabilizer_iff.mp ξ.2)
 
 section CharZero
 
 variable [CharZero F] {W : WeierstrassCurve F}
 
-theorem automorphism_rst_eq_zero (hW : IsShortForm W)
-    (ξ : MulAction.stabilizer (VariableChange F) W) : ξ.1.r = 0 ∧ ξ.1.s = 0 ∧ ξ.1.t = 0 :=
+theorem automorphism_rst_eq_zero
+    (hW : IsShortForm W) (ξ : MulAction.stabilizer (VariableChange F) W)
+    : ξ.1.r = 0 ∧ ξ.1.s = 0 ∧ ξ.1.t = 0 :=
   variableChange_rst_eq_zero hW ((MulAction.mem_stabilizer_iff.mp ξ.2).symm ▸ hW)
 
-theorem mem_range_automorphismScale (hW : IsShortForm W) (u : Fˣ) :
-    u ∈ (automorphismScale W).range ↔
-      (↑u⁻¹ : F) ^ 4 * W.a₄ = W.a₄ ∧ (↑u⁻¹ : F) ^ 6 * W.a₆ = W.a₆ := by
+theorem mem_range_automorphismScale (hW : IsShortForm W) (u : Fˣ)
+    : u ∈ (automorphismScale W).range
+      ↔ (↑u⁻¹ : F) ^ 4 * W.a₄ = W.a₄ ∧ (↑u⁻¹ : F) ^ 6 * W.a₆ = W.a₆ := by
   constructor
   · rintro ⟨ξ, rfl⟩
     have hξ : ξ.1 • W = W := MulAction.mem_stabilizer_iff.mp ξ.2
@@ -60,10 +66,9 @@ theorem mem_range_automorphismScale (hW : IsShortForm W) (u : Fˣ) :
 
 variable [W.IsElliptic]
 
-
 omit [CharZero F] in
-theorem scale_conditions_iff (hW : IsShortForm W) (w : F) :
-    (w⁻¹ ^ 4 * W.a₄ = W.a₄ ∧ w⁻¹ ^ 6 * W.a₆ = W.a₆) ↔ w ^ automorphismOrder W = 1 := by
+theorem scale_conditions_iff (hW : IsShortForm W) (w : F)
+    : (w⁻¹ ^ 4 * W.a₄ = W.a₄ ∧ w⁻¹ ^ 6 * W.a₆ = W.a₆) ↔ w ^ automorphismOrder W = 1 := by
   have key : ∀ (k : ℕ) (c : F), c ≠ 0 → (w⁻¹ ^ k * c = c ↔ w ^ k = 1) := by
     intro k c hc
     rw [inv_pow]
@@ -94,9 +99,9 @@ theorem scale_conditions_iff (hW : IsShortForm W) (w : F) :
       · rw [show w ^ 4 = (w ^ 2) ^ 2 by ring, h, one_pow]
       · rw [show w ^ 6 = (w ^ 2) ^ 3 by ring, h, one_pow]
 
-theorem weberFunction_automorphismPoint (hW : IsShortForm W)
-    (ξ : MulAction.stabilizer (VariableChange F) W) (P : W.toAffine.Point) :
-    weberFunction W (automorphismPoint ξ P) = weberFunction W P :=
+theorem weberFunction_automorphismPoint
+    (hW : IsShortForm W) (ξ : MulAction.stabilizer (VariableChange F) W) (P : W.toAffine.Point)
+    : weberFunction W (automorphismPoint ξ P) = weberFunction W P :=
   weberFunction_variableChangePoint ξ.1 _ hW hW P
 
 end CharZero
@@ -105,17 +110,16 @@ section Fibres
 
 variable [CharZero F] {W : WeierstrassCurve F} [W.IsElliptic]
 
-
 omit [CharZero F] [W.IsElliptic] in
-theorem IsShortForm.sq_eq (hW : IsShortForm W) {x y : F} (h : W.toAffine.Nonsingular x y) :
-    y ^ 2 = x ^ 3 + W.a₄ * x + W.a₆ := by
+theorem IsShortForm.sq_eq (hW : IsShortForm W) {x y : F} (h : W.toAffine.Nonsingular x y)
+    : y ^ 2 = x ^ 3 + W.a₄ * x + W.a₆ := by
   have := h.1
   rw [Affine.equation_iff] at this
   simpa [hW.a₁_eq, hW.a₂_eq, hW.a₃_eq] using this
 
-theorem exists_scale_of_weberValue_eq [IsAlgClosed F] (hW : IsShortForm W) {x₁ x₂ : F}
-    (hx : weberValue W x₁ = weberValue W x₂) :
-    ∃ v : F, v ≠ 0 ∧ v ^ 4 * W.a₄ = W.a₄ ∧ v ^ 6 * W.a₆ = W.a₆ ∧ v ^ 2 * x₁ = x₂ := by
+theorem exists_scale_of_weberValue_eq
+    [IsAlgClosed F] (hW : IsShortForm W) {x₁ x₂ : F} (hx : weberValue W x₁ = weberValue W x₂)
+    : ∃ v : F, v ≠ 0 ∧ v ^ 4 * W.a₄ = W.a₄ ∧ v ^ 6 * W.a₆ = W.a₆ ∧ v ^ 2 * x₁ = x₂ := by
   have hΔ : W.Δ ≠ 0 := W.isUnit_Δ.ne_zero
   by_cases h6 : W.a₆ = 0
   · have h4 : W.a₄ ≠ 0 := by
@@ -143,8 +147,7 @@ theorem exists_scale_of_weberValue_eq [IsAlgClosed F] (hW : IsShortForm W) {x₁
         exact pow_eq_zero_iff (n := 3) (by norm_num) |>.mp hcube.symm
       exact ⟨1, one_ne_zero, by simp, by simp, by simp [hx1, hx2]⟩
     · obtain ⟨w, hw⟩ : ∃ w, w = x₂ / x₁ := ⟨_, rfl⟩
-      have hw3 : w ^ 3 = 1 := by
-        rw [hw, div_pow, ← hcube, div_self (pow_ne_zero 3 hx1)]
+      have hw3 : w ^ 3 = 1 := by rw [hw, div_pow, ← hcube, div_self (pow_ne_zero 3 hx1)]
       have hw0 : w ≠ 0 := by
         rintro rfl
         simp at hw3
@@ -156,16 +159,16 @@ theorem exists_scale_of_weberValue_eq [IsAlgClosed F] (hW : IsShortForm W) {x₁
     have h : x₁ = x₂ := mul_left_cancel₀ hc hx
     exact ⟨1, one_ne_zero, by simp, by simp, by simp [h]⟩
 
-
 omit [W.IsElliptic] in
-theorem exists_automorphismPoint_of_scale (hW : IsShortForm W) {v x₁ y₁ x₂ y₂ : F} (hv : v ≠ 0)
-    (h4 : v ^ 4 * W.a₄ = W.a₄) (h6 : v ^ 6 * W.a₆ = W.a₆) (hx : v ^ 2 * x₁ = x₂)
-    (hy : v ^ 3 * y₁ = y₂) (h₁ : W.toAffine.Nonsingular x₁ y₁)
-    (h₂ : W.toAffine.Nonsingular x₂ y₂) :
-    ∃ ξ : MulAction.stabilizer (VariableChange F) W,
+theorem exists_automorphismPoint_of_scale
+    (hW : IsShortForm W)
+    {v x₁ y₁ x₂ y₂ : F}
+    (hv : v ≠ 0) (h4 : v ^ 4 * W.a₄ = W.a₄) (h6 : v ^ 6 * W.a₆ = W.a₆) (hx : v ^ 2 * x₁ = x₂)
+    (hy : v ^ 3 * y₁ = y₂) (h₁ : W.toAffine.Nonsingular x₁ y₁) (h₂ : W.toAffine.Nonsingular x₂ y₂)
+    : ∃ ξ : MulAction.stabilizer (VariableChange F) W,
       automorphismPoint ξ (.some x₁ y₁ h₁) = .some x₂ y₂ h₂ := by
-  obtain ⟨ξ, hξ⟩ := (mem_range_automorphismScale hW ((Units.mk0 v hv)⁻¹)).mpr
-    ⟨by simpa using h4, by simpa using h6⟩
+  obtain ⟨ξ, hξ⟩ :=
+    (mem_range_automorphismScale hW ((Units.mk0 v hv)⁻¹)).mpr ⟨by simpa using h4, by simpa using h6⟩
   refine ⟨ξ, ?_⟩
   obtain ⟨hr, hs, ht⟩ := automorphism_rst_eq_zero hW ξ
   have hu : (↑ξ.1.u⁻¹ : F) = v := by
@@ -175,9 +178,9 @@ theorem exists_automorphismPoint_of_scale (hW : IsShortForm W) {v x₁ y₁ x₂
     Affine.Point.some.injEq]
   exact ⟨hx, hy⟩
 
-theorem weberFunction_eq_iff [IsAlgClosed F] (hW : IsShortForm W) (P Q : W.toAffine.Point) :
-    weberFunction W P = weberFunction W Q ↔
-      ∃ ξ : MulAction.stabilizer (VariableChange F) W, automorphismPoint ξ P = Q := by
+theorem weberFunction_eq_iff [IsAlgClosed F] (hW : IsShortForm W) (P Q : W.toAffine.Point)
+    : weberFunction W P = weberFunction W Q
+      ↔ ∃ ξ : MulAction.stabilizer (VariableChange F) W, automorphismPoint ξ P = Q := by
   constructor
   · intro hPQ
     cases P with
@@ -197,8 +200,8 @@ theorem weberFunction_eq_iff [IsAlgClosed F] (hW : IsShortForm W) (P Q : W.toAff
           linear_combination (-(v ^ 6)) * hW.sq_eq h₁ - v ^ 2 * x₁ * h4 - h6
         rcases sq_eq_sq_iff_eq_or_eq_neg.mp hy with hy | hy
         · exact exists_automorphismPoint_of_scale hW hv h4 h6 hx2 hy.symm h₁ h₂
-        · refine exists_automorphismPoint_of_scale (v := -v) hW (neg_ne_zero.mpr hv) ?_ ?_ ?_ ?_
-            h₁ h₂
+        · refine exists_automorphismPoint_of_scale (v := -v) hW (neg_ne_zero.mpr hv) ?_ ?_ ?_ ?_ h₁
+            h₂
           · rw [show (-v) ^ 4 = v ^ 4 by ring, h4]
           · rw [show (-v) ^ 6 = v ^ 6 by ring, h6]
           · rw [show (-v) ^ 2 = v ^ 2 by ring, hx2]

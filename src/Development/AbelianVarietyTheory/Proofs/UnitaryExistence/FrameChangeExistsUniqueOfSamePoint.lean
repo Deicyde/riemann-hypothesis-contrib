@@ -9,25 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsTan
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Frames
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Frames
 
 namespace GlobalTheory.Frames.ChgOf
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l}
 
-theorem scal_mul' {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (a b : S) (i : (PPx x).ι) :
-    scal x (a * b) i = scal x a i * scal x b i := by
+theorem scal_mul' {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (a b : S) (i : (PPx x).ι)
+    : scal x (a * b) i = scal x a i * scal x b i := by
   simp [scal, ReciprocityTheory.ChartRestriction.G.Out.liftFun, map_mul]
 
 theorem scal_one' {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (i : (PPx x).ι) : scal x 1 i = 1 := by
   simp [scal, ReciprocityTheory.ChartRestriction.G.Out.liftFun, map_one]
 
-theorem gen_unit' {S : Type} [CommRing S] {x : Sp S ⟶ Xo.X} (s s' : LB.Sec (PPx x))
+theorem gen_unit'
+    {S : Type} [CommRing S]
+    {x : Sp S ⟶ Xo.X} (s s' : LB.Sec (PPx x))
     (hs : ∀ s'' : LB.Sec (PPx x), ∃! a : S, ∀ i, s''.f i = scal x a i * s.f i)
-    (hs' : ∀ s'' : LB.Sec (PPx x), ∃! a : S, ∀ i, s''.f i = scal x a i * s'.f i) :
-    ∃ u : Sˣ, ∀ i, s'.f i = scal x (u : S) i * s.f i := by
+    (hs' : ∀ s'' : LB.Sec (PPx x), ∃! a : S, ∀ i, s''.f i = scal x a i * s'.f i)
+    : ∃ u : Sˣ, ∀ i, s'.f i = scal x (u : S) i * s.f i := by
   obtain ⟨a, ha, -⟩ := hs s'
   obtain ⟨b, hb, -⟩ := hs' s
   obtain ⟨c1, -, hc1⟩ := hs s
@@ -38,8 +43,8 @@ theorem gen_unit' {S : Type} [CommRing S] {x : Sp S ⟶ Xo.X} (s s' : LB.Sec (PP
     exact (hc1 _ e1).trans (hc1 _ e2).symm
   exact ⟨⟨a, b, by rw [mul_comm]; exact h1, h1⟩, ha⟩
 
-theorem appLE_id' {X : Scheme.{0}} (U : X.Opens) (h : U ≤ (𝟙 X : X ⟶ X) ⁻¹ᵁ U) (f : Γ(X, U)) :
-    ((𝟙 X : X ⟶ X).appLE U U h).hom f = f := by
+theorem appLE_id' {X : Scheme.{0}} (U : X.Opens) (h : U ≤ (𝟙 X : X ⟶ X) ⁻¹ᵁ U) (f : Γ(X, U))
+    : ((𝟙 X : X ⟶ X).appLE U U h).hom f = f := by
   simp only [Scheme.Hom.appLE]
   have e : (homOfLE h).op = 𝟙 _ := Subsingleton.elim _ _
   rw [e]
@@ -50,8 +55,8 @@ theorem spMap_id' (S : Type) [CommRing S] : spMap (RingHom.id S) = 𝟙 (Sp S) :
   unfold spMap
   exact Spec.map_id _
 
-theorem secBC_id_iff {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (a : S) (s t : LB.Sec (PPx x)) :
-    SecBC (RingHom.id S) a x x s t ↔ ∀ i, t.f i = scal x a i * s.f i := by
+theorem secBC_id_iff {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (a : S) (s t : LB.Sec (PPx x))
+    : SecBC (RingHom.id S) a x x s t ↔ ∀ i, t.f i = scal x a i * s.f i := by
   constructor
   · rintro ⟨pm, h1, h2, h3⟩ i
     have hp : pm = 𝟙 _ := by
@@ -70,20 +75,35 @@ theorem secBC_id_iff {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (a : S) (s t : 
 
 end GlobalTheory.Frames.ChgOf
 
-
 open GlobalTheory.Frames.ChgOf in
-theorem GlobalTheory.Frames.frChg_exists_unique : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (S : Type) [CommRing S] [Algebra c.F S] (y y' : FrPt Xo c S), (y'.x = y.x → ∃ (g : (∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) S)) (a : Sˣ), (∀ τ, IsUnit (g τ).det) ∧ FrChg g (a : S) y y') ∧ ∀ (g g' : (∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) S)) (a a' : S), FrChg g a y y' → FrChg g' a' y y' → g = g' ∧ a = a' := by
+theorem GlobalTheory.Frames.frChg_exists_unique
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (S : Type) [CommRing S] [Algebra c.F S]
+        (y y' : FrPt Xo c S),
+      (y'.x = y.x
+          → ∃ (g : (∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) S)) (a : Sˣ),
+            (∀ τ, IsUnit (g τ).det) ∧ FrChg g (a : S) y y')
+        ∧ ∀ (g g' : (∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) S)) (a a' : S),
+          FrChg g a y y' → FrChg g' a' y y' → g = g' ∧ a = a' := by
   intro E _ _ _ H Dw l Xo c S _ _ y y'
   obtain ⟨x', hover', u', tan', eig', basis', s', gen'⟩ := y'
   constructor
   · intro hx
     simp only at hx
     subst hx
-    obtain ⟨N, _, _, v, ρ, hv, htan, hcomb, -, -⟩ := GlobalTheory.T.exists_tangent_module_universal_group E H Dw l Xo S y.x
+    obtain ⟨N, _, _, v, ρ, hv, htan, hcomb, -, -⟩ :=
+      GlobalTheory.T.exists_tangent_module_universal_group E H Dw l Xo S y.x
     choose g hg using fun τ i => (y.basis τ (u' τ i) (tan' τ i) (eig' τ i)).exists
     choose h hh using fun τ i => (basis' τ (y.u τ i) (y.tan τ i) (y.eig τ i)).exists
     obtain ⟨a, ha⟩ := gen_unit' y.s s' y.gen gen'
-    refine ⟨fun τ => Matrix.of (g τ), a, fun τ => ?_, rfl, fun τ i => hg τ i, (secBC_id_iff _ _ _ _).2 ha⟩
+    refine ⟨
+      fun τ => Matrix.of (g τ),
+      a,
+      fun τ => ?_,
+      rfl,
+      fun τ i => hg τ i,
+      (secBC_id_iff _ _ _ _).2 ha
+    ⟩
     choose b hb using fun i => (htan _).1 (y.tan τ i)
     choose b' hb' using fun i => (htan _).1 (tan' τ i)
     have eb : y.u τ = fun i => v (b i) := funext fun i => (hb i).symm
@@ -102,7 +122,8 @@ theorem GlobalTheory.Frames.frChg_exists_unique : ∀ (E : Type) [Field E] [Numb
       · rw [← hb i, eb, hcomb]
         congr 1
         rw [h2 i]
-        simp only [h1, Finset.smul_sum, smul_smul, Matrix.mul_apply, Matrix.of_apply, Finset.sum_smul]
+        simp only [h1, Finset.smul_sum, smul_smul, Matrix.mul_apply, Matrix.of_apply,
+          Finset.sum_smul]
         exact Finset.sum_comm
       · rw [← hb i, eb, hcomb]
         congr 1

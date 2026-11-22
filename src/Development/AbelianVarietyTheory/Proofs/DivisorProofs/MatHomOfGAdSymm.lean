@@ -11,7 +11,9 @@ noncomputable section
 namespace GlobalTheory.IwLine
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.UG GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.AdelicU
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.UG GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+  GlobalTheory.AdelicU
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
@@ -21,13 +23,15 @@ theorem cA_eq_sigR (σ : E →ₐ[F] E) (z : AE F E) : cA σ z = sigR (AF F) σ 
   | tmul a b => rfl
   | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
 
-theorem UG_eq_HR (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) :
-    GlobalTheory.WeilM.UG (cA σ) (incM F J) = HR (AF F) σ Jᵀ := by
-  have hc : ∀ M : Matrix (Fin n) (Fin n) (AE F E), M.map (cA σ) = M.map (sigR (AF F) σ) := fun M => by
+theorem UG_eq_HR (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    : GlobalTheory.WeilM.UG (cA σ) (incM F J) = HR (AF F) σ Jᵀ := by
+  have hc
+      : ∀ M : Matrix (Fin n) (Fin n) (AE F E), M.map (cA σ) = M.map (sigR (AF F) σ) := fun M => by
     ext i j; exact cA_eq_sigR σ _
   have hJ : JR (AF F) Jᵀ = (incM F J)ᵀ := rfl
   ext g
-  change (g.1)ᵀ * incM F J * (g.1).map (cA σ) = incM F J ↔ cT (sigR (AF F) σ) g.1 * JR (AF F) Jᵀ * g.1 = JR (AF F) Jᵀ
+  change (g.1)ᵀ * incM F J * (g.1).map (cA σ) = incM F J
+    ↔ cT (sigR (AF F) σ) g.1 * JR (AF F) Jᵀ * g.1 = JR (AF F) Jᵀ
   rw [hc, hJ, cT]
   constructor
   · intro h
@@ -57,11 +61,14 @@ def lineStab (x : Fin n → E) : Subgroup (UA σ J) where
     have e : mat g⁻¹ *ᵥ (mat g *ᵥ incV F x) = incV F x := by
       rw [Matrix.mulVec_mulVec, GlobalTheory.StabHaar.mat_inv_mul, Matrix.one_mulVec]
     rw [ha, Matrix.mulVec_smul] at e
-    calc mat g⁻¹ *ᵥ incV F x = ((a⁻¹ : (AE F E)ˣ) : AE F E) • ((a : AE F E) • mat g⁻¹ *ᵥ incV F x) := by
-          rw [smul_smul, Units.inv_mul, one_smul]
+    calc
+      mat g⁻¹ *ᵥ incV F x
+          = ((a⁻¹ : (AE F E)ˣ) : AE F E) • ((a : AE F E) • mat g⁻¹ *ᵥ incV F x) := by
+        rw [smul_smul, Units.inv_mul, one_smul]
       _ = _ := by rw [e]
 
-theorem mem_lineStab {x : Fin n → E} {g : UA σ J} :
-    g ∈ lineStab σ J x ↔ ∃ a : (AE F E)ˣ, mat g *ᵥ incV F x = (a : AE F E) • incV F x := Iff.rfl
+theorem mem_lineStab {x : Fin n → E} {g : UA σ J}
+    : g ∈ lineStab σ J x ↔ ∃ a : (AE F E)ˣ, mat g *ᵥ incV F x = (a : AE F E) • incV F x :=
+  Iff.rfl
 
 end GlobalTheory.IwLine

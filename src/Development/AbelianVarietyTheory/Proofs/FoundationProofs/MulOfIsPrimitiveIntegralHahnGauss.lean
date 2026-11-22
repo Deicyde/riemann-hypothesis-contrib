@@ -11,29 +11,31 @@ open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisens
 
 namespace GlobalTheory.Glue
 
-theorem Prim.mul {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (P Q : HahnSeries ℚ Ω) :
-    Prim A P → Prim A Q → Prim A (P * Q) := by
+theorem Prim.mul {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (P Q : HahnSeries ℚ Ω)
+    : Prim A P → Prim A Q → Prim A (P * Q) := by
   classical
   rintro ⟨hPA, rP, hrP0, hrPi⟩ ⟨hQA, rQ, hrQ0, hrQi⟩
-  let lift : ∀ φ : HahnSeries ℚ Ω, (∀ r, φ.coeff r ∈ A) → HahnSeries ℚ A := fun φ h =>
-    { coeff := fun r => ⟨φ.coeff r, h r⟩
-      isPWO_support' := φ.isPWO_support.mono (fun r hr h' => hr (Subtype.ext (by simpa using h'))) }
+  let lift : ∀ φ : HahnSeries ℚ Ω, (∀ r, φ.coeff r ∈ A) → HahnSeries ℚ A := fun φ h => {
+    coeff := fun r => ⟨φ.coeff r, h r⟩
+    isPWO_support' := φ.isPWO_support.mono (fun r hr h' => hr (Subtype.ext (by simpa using h')))
+  }
   let P' := lift P hPA
   let Q' := lift Q hQA
   let ι : A →ₙ+* Ω := (A.subtype : A →+* Ω)
   have hPm : P'.map ι = P := by ext r; rfl
   have hQm : Q'.map ι = Q := by ext r; rfl
   have hmul : (P' * Q').map ι = P * Q := by rw [HahnSeries.map_mul, hPm, hQm]
-  have hcoeff : ∀ r, (P * Q).coeff r = (((P' * Q').coeff r : A) : Ω) := by
-    intro r; rw [← hmul]; rfl
+  have hcoeff : ∀ r, (P * Q).coeff r = (((P' * Q').coeff r : A) : Ω) := by intro r; rw [← hmul]; rfl
 
   have hunit : ∀ (x : Ω) (hx : x ∈ A), x ≠ 0 → x⁻¹ ∈ A → IsUnit (⟨x, hx⟩ : A) := by
     intro x hx h0 hi
     have h : (⟨x, hx⟩ : A) * ⟨x⁻¹, hi⟩ = 1 := Subtype.ext (by simp [mul_inv_cancel₀ h0])
     exact (Units.mkOfMulEqOne _ _ h).isUnit
-  let π : A →ₙ+* IsLocalRing.ResidueField A := (IsLocalRing.residue A : A →+* IsLocalRing.ResidueField A)
-  have hred : ∀ (φ : HahnSeries ℚ Ω) (h : ∀ r, φ.coeff r ∈ A) (r : ℚ), φ.coeff r ≠ 0 → (φ.coeff r)⁻¹ ∈ A →
-      (lift φ h).map π ≠ 0 := by
+  let π : A →ₙ+* IsLocalRing.ResidueField A :=
+    (IsLocalRing.residue A : A →+* IsLocalRing.ResidueField A)
+  have hred
+      : ∀ (φ : HahnSeries ℚ Ω) (h : ∀ r, φ.coeff r ∈ A) (r : ℚ),
+        φ.coeff r ≠ 0 → (φ.coeff r)⁻¹ ∈ A → (lift φ h).map π ≠ 0 := by
     intro φ h r h0 hi hz
     have := congrArg (fun ψ : HahnSeries ℚ (IsLocalRing.ResidueField A) => ψ.coeff r) hz
     simp only [HahnSeries.coeff_zero] at this
@@ -49,7 +51,8 @@ theorem Prim.mul {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (P Q : HahnSer
     push_neg at h
     exact hne (HahnSeries.ext (funext h))
   have hr' : IsLocalRing.residue A ((P' * Q').coeff r) ≠ 0 := hr
-  rw [Ne, IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, not_not] at hr'
+  rw [Ne, IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, not_not]
+    at hr'
   obtain ⟨u, hu⟩ := hr'
   have h1 : (((P' * Q').coeff r : A) : Ω) * (((u⁻¹ : Aˣ) : A) : Ω) = 1 := by
     rw [← hu]

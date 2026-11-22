@@ -47,7 +47,8 @@ theorem norm_sq_sum_pN (ξ : Vsp dim) : ‖ξ‖ ^ 2 = ∑ σ, pN ξ σ := by
   rw [EuclideanSpace.norm_sq_eq, Fintype.sum_sigma]
   rfl
 
-theorem nS_le [_root_.NumberField.IsTotallyComplex E] (ξ : Vsp dim) (σ : E →+* ℂ) : nS ξ σ ≤ ‖ξ‖ ^ 2 := by
+theorem nS_le [_root_.NumberField.IsTotallyComplex E] (ξ : Vsp dim) (σ : E →+* ℂ)
+    : nS ξ σ ≤ ‖ξ‖ ^ 2 := by
   classical
   rw [norm_sq_sum_pN, nS]
   have hne : ComplexEmbedding.conjugate σ ≠ σ := conjugate_ne σ
@@ -56,50 +57,68 @@ theorem nS_le [_root_.NumberField.IsTotallyComplex E] (ξ : Vsp dim) (σ : E →
 
 def hA (x ξ : Vsp dim) (σ : E →+* ℂ) : ℂ := ∑ a : Fin (dim σ), x ⟨σ, a⟩ * (starRingEnd ℂ) (ξ ⟨σ, a⟩)
 
-theorem im_Hf_act (x ξ : Vsp dim) (β : 𝓞 E) :
-    ((Hf x (act β ξ)).im : ℂ) =
-      ∑ σ, σ (β : E) * ((hA x ξ (ComplexEmbedding.conjugate σ) - (starRingEnd ℂ) (hA x ξ σ)) / (2 * I)) := by
-  have hZ : Hf x (act β ξ) = ∑ σ, (starRingEnd ℂ) (σ (β : E)) * hA x ξ σ := by
-    simp only [Hf, act, hA, Fintype.sum_sigma, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun σ _ => Finset.sum_congr rfl fun a _ => ?_
-    simp only [PiLp.toLp_apply, map_mul]
-    ring
-  have hre : ∑ σ, σ (β : E) * hA x ξ (ComplexEmbedding.conjugate σ) =
-      ∑ σ, (starRingEnd ℂ) (σ (β : E)) * hA x ξ σ := by
-    refine Fintype.sum_equiv (ComplexEmbedding.involutive_conjugate (K := E)).toPerm _ _ (fun σ => ?_)
-    simp only [Function.Involutive.coe_toPerm, ComplexEmbedding.involutive_conjugate (K := E) σ,
-      ComplexEmbedding.conjugate_coe_eq, Complex.conj_conj]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hZ, Complex.im_eq_sub_conj, map_sum]
-  simp only [map_mul, Complex.conj_conj, mul_sub, mul_div_assoc', Finset.sum_div, Finset.sum_sub_distrib]
-  rw [← hre]
-  simp only [← Finset.sum_sub_distrib, ← Finset.sum_div]
+theorem im_Hf_act (x ξ : Vsp dim) (β : 𝓞 E)
+    : ((Hf x (act β ξ)).im : ℂ)
+      = ∑ σ, σ (β : E) * ((hA x ξ (ComplexEmbedding.conjugate σ) - (starRingEnd ℂ) (hA x ξ σ)) / (2 * I)) :=
+  by
+    have hZ : Hf x (act β ξ) = ∑ σ, (starRingEnd ℂ) (σ (β : E)) * hA x ξ σ := by
+      simp only [Hf, act, hA, Fintype.sum_sigma, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun σ _ => Finset.sum_congr rfl fun a _ => ?_
+      simp only [PiLp.toLp_apply, map_mul]
+      ring
+    have hre
+        : ∑ σ, σ (β : E) * hA x ξ (ComplexEmbedding.conjugate σ)
+          = ∑ σ, (starRingEnd ℂ) (σ (β : E)) * hA x ξ σ := by
+      refine Fintype.sum_equiv (ComplexEmbedding.involutive_conjugate (K := E)).toPerm _ _
+        (fun σ => ?_)
+      simp only [Function.Involutive.coe_toPerm, ComplexEmbedding.involutive_conjugate (K := E) σ,
+        ComplexEmbedding.conjugate_coe_eq, Complex.conj_conj]
+    set_option synthInstance.maxHeartbeats 100000 in
+      rw [hZ, Complex.im_eq_sub_conj, map_sum]
+    simp only [map_mul, Complex.conj_conj, mul_sub, mul_div_assoc', Finset.sum_div,
+      Finset.sum_sub_distrib]
+    rw [← hre]
+    simp only [← Finset.sum_sub_distrib, ← Finset.sum_div]
 
-theorem emb_dual (x ξ : Vsp dim) (y : E)
-    (hy : ∀ β : 𝓞 E, ((Algebra.trace ℚ E ((β : E) * y) : ℚ) : ℝ) = (Hf x (act β ξ)).im) (σ : E →+* ℂ) :
-    σ y = (hA x ξ (ComplexEmbedding.conjugate σ) - (starRingEnd ℂ) (hA x ξ σ)) / (2 * I) := by
-  have h := emb_indep (fun σ => σ y -
-      (hA x ξ (ComplexEmbedding.conjugate σ) - (starRingEnd ℂ) (hA x ξ σ)) / (2 * I)) (fun β => by
-    have h1 := congrArg (fun r : ℝ => (r : ℂ)) (hy β)
-    simp only [Complex.ofReal_ratCast] at h1
-    rw [trace_sum_emb, im_Hf_act] at h1
-    simp only [map_mul] at h1
-    simp only [mul_sub, Finset.sum_sub_distrib, h1, sub_self])
+theorem emb_dual
+    (x ξ : Vsp dim) (y : E)
+    (hy : ∀ β : 𝓞 E, ((Algebra.trace ℚ E ((β : E) * y) : ℚ) : ℝ) = (Hf x (act β ξ)).im)
+    (σ : E →+* ℂ)
+    : σ y = (hA x ξ (ComplexEmbedding.conjugate σ) - (starRingEnd ℂ) (hA x ξ σ)) / (2 * I) := by
+  have h :=
+    emb_indep
+      (fun σ =>
+        σ y - (hA x ξ (ComplexEmbedding.conjugate σ) - (starRingEnd ℂ) (hA x ξ σ)) / (2 * I))
+      (fun β => by
+        have h1 := congrArg (fun r : ℝ => (r : ℂ)) (hy β)
+        simp only [Complex.ofReal_ratCast] at h1
+        rw [trace_sum_emb, im_Hf_act] at h1
+        simp only [map_mul] at h1
+        simp only [mul_sub, Finset.sum_sub_distrib, h1, sub_self])
   have := congrFun h σ
   simpa [sub_eq_zero] using this
 
-theorem emb_dual_zero (x ξ : Vsp dim) (y : E)
-    (hy : ∀ β : 𝓞 E, ((Algebra.trace ℚ E ((β : E) * y) : ℚ) : ℝ) = (Hf x (act β ξ)).im) (σ : E →+* ℂ)
-    (hn : nS ξ σ = 0) : σ y = 0 := by
+theorem emb_dual_zero
+    (x ξ : Vsp dim) (y : E)
+    (hy : ∀ β : 𝓞 E, ((Algebra.trace ℚ E ((β : E) * y) : ℚ) : ℝ) = (Hf x (act β ξ)).im)
+    (σ : E →+* ℂ) (hn : nS ξ σ = 0)
+    : σ y = 0 := by
   have h1 : pN ξ σ = 0 := by
-    have := pN_nonneg ξ σ; have := pN_nonneg ξ (ComplexEmbedding.conjugate σ); rw [nS] at hn; linarith
+    have := pN_nonneg ξ σ
+    have := pN_nonneg ξ (ComplexEmbedding.conjugate σ)
+    rw [nS] at hn
+    linarith
   have h2 : pN ξ (ComplexEmbedding.conjugate σ) = 0 := by
-    have := pN_nonneg ξ σ; have := pN_nonneg ξ (ComplexEmbedding.conjugate σ); rw [nS] at hn; linarith
+    have := pN_nonneg ξ σ
+    have := pN_nonneg ξ (ComplexEmbedding.conjugate σ)
+    rw [nS] at hn
+    linarith
   have hz : ∀ τ, pN ξ τ = 0 → hA x ξ τ = 0 := by
     intro τ hτ
     have : ∀ a, ξ ⟨τ, a⟩ = 0 := by
       intro a
-      have h := (Finset.sum_eq_zero_iff_of_nonneg (fun a _ => by positivity)).1 hτ a (Finset.mem_univ a)
+      have h :=
+        (Finset.sum_eq_zero_iff_of_nonneg (fun a _ => by positivity)).1 hτ a (Finset.mem_univ a)
       simpa using h
     simp [hA, this]
   rw [emb_dual x ξ y hy σ, hz _ h2, hz _ h1]
@@ -109,13 +128,13 @@ def actT (t : (E →+* ℂ) → ℂ) (v : Vsp dim) : Vsp dim := WithLp.toLp 2 fu
 
 theorem act_eq_actT (β : 𝓞 E) (v : Vsp dim) : act β v = actT (canonicalEmbedding E (β : E)) v := rfl
 
-theorem actT_sum {ι : Type} (s : Finset ι) (c : ι → ℝ) (t : ι → (E →+* ℂ) → ℂ) (v : Vsp dim) :
-    actT (∑ k ∈ s, c k • t k) v = ∑ k ∈ s, c k • actT (t k) v := by
+theorem actT_sum {ι : Type} (s : Finset ι) (c : ι → ℝ) (t : ι → (E →+* ℂ) → ℂ) (v : Vsp dim)
+    : actT (∑ k ∈ s, c k • t k) v = ∑ k ∈ s, c k • actT (t k) v := by
   ext i
   simp [actT, Finset.sum_mul, Complex.real_smul, mul_assoc]
 
-theorem norm_actT_sq (t : (E →+* ℂ) → ℂ) (v : Vsp dim) :
-    ‖actT t v‖ ^ 2 = ∑ σ, ‖t σ‖ ^ 2 * pN v σ := by
+theorem norm_actT_sq (t : (E →+* ℂ) → ℂ) (v : Vsp dim)
+    : ‖actT t v‖ ^ 2 = ∑ σ, ‖t σ‖ ^ 2 * pN v σ := by
   rw [EuclideanSpace.norm_sq_eq, Fintype.sum_sigma]
   refine Finset.sum_congr rfl fun σ _ => ?_
   simp only [pN, Finset.mul_sum]
@@ -127,11 +146,13 @@ end Coord
 section CS
 variable {dim : (E →+* ℂ) → ℕ}
 
-theorem cs_bound [IsCMField E] (I : Submodule ℤ (Vsp dim))
-    (hst : ∀ (α : 𝓞 E) x, x ∈ I → act α x ∈ I) {ξ : Vsp dim} (hξ : ξ ∈ I) (x u : Vsp dim)
-    (hu : IsU I x u) (y : E)
-    (hy : ∀ β : 𝓞 E, ((Algebra.trace ℚ E ((β : E) * y) : ℚ) : ℝ) = (Hf x (act β ξ)).im) :
-    2 * ∑ σ : E →+* ℂ, ‖σ y‖ ^ 2 ≤ ‖ξ‖ ^ 2 * ‖u‖ ^ 2 := by
+theorem cs_bound
+    [IsCMField E]
+    (I : Submodule ℤ (Vsp dim)) (hst : ∀ (α : 𝓞 E) x, x ∈ I → act α x ∈ I)
+    {ξ : Vsp dim} (hξ : ξ ∈ I)
+    (x u : Vsp dim) (hu : IsU I x u)
+    (y : E) (hy : ∀ β : 𝓞 E, ((Algebra.trace ℚ E ((β : E) * y) : ℚ) : ℝ) = (Hf x (act β ξ)).im)
+    : 2 * ∑ σ : E →+* ℂ, ‖σ y‖ ^ 2 ≤ ‖ξ‖ ^ 2 * ‖u‖ ^ 2 := by
   classical
   set t : (E →+* ℂ) → ℂ := fun σ =>
     if nS ξ σ = 0 then 0 else (starRingEnd ℂ) (σ y) / (nS ξ σ : ℂ) with htdef
@@ -143,8 +164,11 @@ theorem cs_bound [IsCMField E] (I : Submodule ℤ (Vsp dim))
     · rw [map_div₀, Complex.conj_ofReal]
   obtain ⟨c, hc⟩ := real_span t ht
   set β : Free.ChooseBasisIndex ℤ (𝓞 E) → 𝓞 E := fun k => RingOfIntegers.basis E k
-  have hβ : ∀ k, canonicalEmbedding E (integralBasis E k) = canonicalEmbedding E ((β k : 𝓞 E) : E) :=
-    fun k => by rw [integralBasis_apply]
+  have hβ
+      : ∀ k,
+        canonicalEmbedding E (integralBasis E k)
+          = canonicalEmbedding E ((β k : 𝓞 E) : E) := fun k => by
+    rw [integralBasis_apply]
   set b := actT t ξ with hbdef
   have hb : b = ∑ k, c k • act (β k) ξ := by
     rw [hbdef, hc, actT_sum]
@@ -152,11 +176,15 @@ theorem cs_bound [IsCMField E] (I : Submodule ℤ (Vsp dim))
     rw [hβ, ← act_eq_actT]
   have hactI : ∀ k, act (β k) ξ ∈ IR I := fun k => Submodule.subset_span (hst _ _ hξ)
   set S : ℝ := ∑ σ, if nS ξ σ = 0 then 0 else ‖σ y‖ ^ 2 / nS ξ σ with hSdef
-  have hS0 : 0 ≤ S := Finset.sum_nonneg fun σ _ => by
-    split_ifs with h
-    · exact le_refl _
-    · exact div_nonneg (by positivity) (by
-        have := pN_nonneg ξ σ; have := pN_nonneg ξ (ComplexEmbedding.conjugate σ); rw [nS]; linarith)
+  have hS0 : 0 ≤ S :=
+    Finset.sum_nonneg fun σ _ => by
+      split_ifs with h
+      · exact le_refl _
+      · exact div_nonneg (by positivity) (by
+          have := pN_nonneg ξ σ
+          have := pN_nonneg ξ (ComplexEmbedding.conjugate σ)
+          rw [nS]
+          linarith)
   have hub : inner ℝ u b = S := by
     have e1 : inner ℝ u b = ∑ k, c k * ((Algebra.trace ℚ E ((β k : E) * y) : ℚ) : ℝ) := by
       rw [hb, inner_sum]
@@ -196,7 +224,8 @@ theorem cs_bound [IsCMField E] (I : Submodule ℤ (Vsp dim))
         congr 1
         rw [Complex.norm_real, Real.norm_eq_abs, sq_abs]
     have hsym : ∑ σ, ‖t σ‖ ^ 2 * pN ξ σ = ∑ σ, ‖t σ‖ ^ 2 * pN ξ (ComplexEmbedding.conjugate σ) := by
-      refine Fintype.sum_equiv (ComplexEmbedding.involutive_conjugate (K := E)).toPerm _ _ (fun σ => ?_)
+      refine Fintype.sum_equiv (ComplexEmbedding.involutive_conjugate (K := E)).toPerm _ _
+        (fun σ => ?_)
       simp only [Function.Involutive.coe_toPerm, ComplexEmbedding.involutive_conjugate (K := E) σ]
       rw [hF, hF, nS_conj, ComplexEmbedding.conjugate_coe_eq, Complex.norm_conj]
     have h2 : 2 * ∑ σ, ‖t σ‖ ^ 2 * pN ξ σ = S := by
@@ -228,7 +257,10 @@ theorem cs_bound [IsCMField E] (I : Submodule ℤ (Vsp dim))
       have h1 := nS_le ξ σ
       rw [hξ0] at h1
       have h2 : 0 ≤ nS ξ σ := by
-        have := pN_nonneg ξ σ; have := pN_nonneg ξ (ComplexEmbedding.conjugate σ); unfold nS; linarith
+        have := pN_nonneg ξ σ
+        have := pN_nonneg ξ (ComplexEmbedding.conjugate σ)
+        unfold nS
+        linarith
       have h3 : nS ξ σ ≤ 0 := by simpa using h1
       exact le_antisymm h3 h2
     simp [hz]
@@ -240,9 +272,14 @@ theorem cs_bound [IsCMField E] (I : Submodule ℤ (Vsp dim))
       split_ifs with h
       · rw [emb_dual_zero x ξ y hy σ h]
         simp
-      · have hn : 0 < nS ξ σ := lt_of_le_of_ne (by
-          have := pN_nonneg ξ σ; have := pN_nonneg ξ (ComplexEmbedding.conjugate σ); rw [nS]; linarith)
-          (Ne.symm h)
+      · have hn : 0 < nS ξ σ :=
+          lt_of_le_of_ne
+            (by
+              have := pN_nonneg ξ σ
+              have := pN_nonneg ξ (ComplexEmbedding.conjugate σ)
+              rw [nS]
+              linarith)
+            (Ne.symm h)
         exact div_le_div_of_nonneg_left (by positivity) hn (nS_le ξ σ)
     rw [← Finset.sum_div] at hlow
     have := (div_le_iff₀ hpos).1 hlow

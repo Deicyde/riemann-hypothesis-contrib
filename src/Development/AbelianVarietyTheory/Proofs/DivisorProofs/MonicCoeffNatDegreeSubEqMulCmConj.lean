@@ -8,9 +8,9 @@ open NumberField Polynomial
 
 namespace GlobalTheory
 
-theorem coeff_natDegree_sub_eq_of_roots_norm_one (Q : ℂ[X]) (hQ : Q.Monic)
-    (hroots : ∀ z ∈ Q.roots, ‖z‖ = 1) :
-    ∀ i ≤ Q.natDegree, Q.coeff (Q.natDegree - i) = Q.coeff 0 * starRingEnd ℂ (Q.coeff i) := by
+theorem coeff_natDegree_sub_eq_of_roots_norm_one
+    (Q : ℂ[X]) (hQ : Q.Monic) (hroots : ∀ z ∈ Q.roots, ‖z‖ = 1)
+    : ∀ i ≤ Q.natDegree, Q.coeff (Q.natDegree - i) = Q.coeff 0 * starRingEnd ℂ (Q.coeff i) := by
   intro i hi
   set s := Q.roots with hs
   have hprod : (s.map fun z => X - C z).prod = Q := by
@@ -20,14 +20,17 @@ theorem coeff_natDegree_sub_eq_of_roots_norm_one (Q : ℂ[X]) (hQ : Q.Monic)
     intro z hz
     have hz1 : z * starRingEnd ℂ z = 1 := by
       rw [Complex.mul_conj, Complex.normSq_eq_norm_sq, hroots z hz]; simp
-    rw [sub_eq_add_neg, ← C_neg, reverse_add_C, natDegree_X, ← one_mul (X : ℂ[X]), reverse_mul_X, ← C_1, reverse_C]
+    rw [sub_eq_add_neg, ← C_neg, reverse_add_C, natDegree_X, ← one_mul (X : ℂ[X]), reverse_mul_X,
+      ← C_1, reverse_C]
     rw [mul_sub, ← C_mul, neg_mul, hz1]
     simp only [C_1, C_neg, one_mul, pow_one]
     ring
   have hrev : Q.reverse = C (Q.coeff 0) * Q.map (starRingEnd ℂ) := by
-    have key : ∀ t : Multiset ℂ, (∀ z ∈ t, (X - C z : ℂ[X]).reverse = C (-z) * (X - C (starRingEnd ℂ z))) →
-        (t.map fun z => X - C z).prod.reverse
-          = (t.map fun z => C (-z) * (X - C (starRingEnd ℂ z))).prod := by
+    have key
+        : ∀ t : Multiset ℂ,
+          (∀ z ∈ t, (X - C z : ℂ[X]).reverse = C (-z) * (X - C (starRingEnd ℂ z)))
+            → (t.map fun z => X - C z).prod.reverse
+              = (t.map fun z => C (-z) * (X - C (starRingEnd ℂ z))).prod := by
       intro t
       induction t using Multiset.induction_on with
       | empty => intro _; simpa using reverse_C (1 : ℂ)
@@ -54,17 +57,18 @@ theorem coeff_natDegree_sub_eq_of_roots_norm_one (Q : ℂ[X]) (hQ : Q.Monic)
   simp only [coeff_reverse, coeff_C_mul, coeff_map] at h1
   rwa [revAt_le hi] at h1
 
-theorem monic_coeff_natDegree_sub_eq_mul_complexConj :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (P : Polynomial E),
-    P.Monic → P.natDegree = n → (∀ (τ : E →+* ℂ), ∀ z ∈ (P.map τ).roots, ‖z‖ = 1) →
-    ∀ i ≤ n, P.coeff (n - i) = P.coeff 0 * IsCMField.complexConj E (P.coeff i) := by
+theorem monic_coeff_natDegree_sub_eq_mul_complexConj
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (P : Polynomial E),
+      P.Monic → P.natDegree = n → (∀ (τ : E →+* ℂ), ∀ z ∈ (P.map τ).roots, ‖z‖ = 1)
+        → ∀ i ≤ n, P.coeff (n - i) = P.coeff 0 * IsCMField.complexConj E (P.coeff i) := by
   intro E _ _ _ n P hP hn hroots i hi
   let τ : E →+* ℂ := (IsAlgClosed.lift (R := ℚ) (M := ℂ) (S := E)).toRingHom
   have hQ : (P.map τ).Monic := hP.map τ
   have hdeg : (P.map τ).natDegree = n := by rw [hP.natDegree_map, hn]
   have h := coeff_natDegree_sub_eq_of_roots_norm_one (P.map τ) hQ (hroots τ) i (hdeg ▸ hi)
   rw [hdeg, coeff_map, coeff_map, coeff_map, ← IsCMField.complexEmbedding_complexConj E τ,
-    ← map_mul] at h
+      ← map_mul]
+    at h
   exact τ.injective h
 
 end GlobalTheory

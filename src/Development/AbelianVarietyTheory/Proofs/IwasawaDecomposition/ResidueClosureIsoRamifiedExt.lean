@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocDict
+open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocDict
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -17,19 +20,21 @@ namespace GlobalTheory.LocIntegral
 open Polynomial
 open scoped WithZero
 
-variable {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
+variable
+  {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
   {v : HeightOneSpectrum (𝓞 K)} {v' : HeightOneSpectrum (𝓞 L)}
 
 theorem exists_valued_eq (γ : ℤᵐ⁰) : ∃ c : v.adicCompletion K, Valued.v c = γ := by
   obtain ⟨x, hx⟩ := v.valuation_surjective K γ
   exact ⟨algebraMap K _ x, (HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x).trans hx⟩
 
-theorem valued_coeff_minpoly_le_one (e : ℕ) (he : 0 < e)
-    (f : v.adicCompletion K →+* v'.adicCompletion L)
-    (hfv : ∀ y, Valued.v (f y) = Valued.v y ^ e) :
-    letI := f.toAlgebra; FiniteDimensional (v.adicCompletion K) (v'.adicCompletion L) →
-    ∀ x : v'.adicCompletion L, Valued.v x ≤ 1 →
-      ∀ n, Valued.v ((minpoly (v.adicCompletion K) x).coeff n) ≤ 1 := by
+theorem valued_coeff_minpoly_le_one
+    (e : ℕ) (he : 0 < e)
+    (f : v.adicCompletion K →+* v'.adicCompletion L) (hfv : ∀ y, Valued.v (f y) = Valued.v y ^ e)
+    : letI := f.toAlgebra
+      FiniteDimensional (v.adicCompletion K) (v'.adicCompletion L)
+        → ∀ x : v'.adicCompletion L,
+          Valued.v x ≤ 1 → ∀ n, Valued.v ((minpoly (v.adicCompletion K) x).coeff n) ≤ 1 := by
   letI := f.toAlgebra
   intro hfd x hx n
   letI : NontriviallyNormedField (v.adicCompletion K) := Valued.toNontriviallyNormedField _ ℤᵐ⁰
@@ -38,10 +43,10 @@ theorem valued_coeff_minpoly_le_one (e : ℕ) (he : 0 < e)
       (Valued.toNormedField (v.adicCompletion K) ℤᵐ⁰).toDist)
   haveI : CompleteSpace (v.adicCompletion K) := inferInstance
   choose c hc using (exists_valued_eq (v := v) : ∀ γ : ℤᵐ⁰, ∃ c : v.adicCompletion K, Valued.v c = γ)
-  have hmono : ∀ a b : v.adicCompletion K, Valued.v a ≤ Valued.v b → ‖a‖ ≤ ‖b‖ :=
-    fun a b h => Valued.toNormedField.norm_le_iff.2 h
-  have hnorm : ∀ a b : v.adicCompletion K, Valued.v a = Valued.v b → ‖a‖ = ‖b‖ :=
-    fun a b h => le_antisymm (hmono a b h.le) (hmono b a h.ge)
+  have hmono : ∀ a b : v.adicCompletion K, Valued.v a ≤ Valued.v b → ‖a‖ ≤ ‖b‖ := fun a b h =>
+    Valued.toNormedField.norm_le_iff.2 h
+  have hnorm : ∀ a b : v.adicCompletion K, Valued.v a = Valued.v b → ‖a‖ = ‖b‖ := fun a b h =>
+    le_antisymm (hmono a b h.le) (hmono b a h.ge)
   have he' : (e : ℝ)⁻¹ ≠ 0 := inv_ne_zero (by exact_mod_cast he.ne')
   let ρ : v'.adicCompletion L → ℝ := fun z => ‖c (Valued.v z)‖ ^ ((e : ℝ)⁻¹)
   have ρ_nonneg : ∀ z, 0 ≤ ρ z := fun z => Real.rpow_nonneg (norm_nonneg _) _
@@ -76,20 +81,20 @@ theorem valued_coeff_minpoly_le_one (e : ℕ) (he : 0 < e)
   have ρ_one : ρ 1 = 1 := by
     have := ρ_f 1
     rwa [map_one, norm_one] at this
-  let N : AlgebraNorm (v.adicCompletion K) (v'.adicCompletion L) :=
-    { toFun := ρ
-      map_zero' := ρ_zero
-      add_le' := fun a b => by
-        rcases le_total (Valued.v a) (Valued.v b) with h | h
-        · have := ρ_le (a + b) b ((Valuation.map_add _ a b).trans (max_le h le_rfl))
-          linarith [ρ_nonneg a]
-        · have := ρ_le (a + b) a ((Valuation.map_add _ a b).trans (max_le le_rfl h))
-          linarith [ρ_nonneg b]
-      neg' := fun a => by simp only [ρ, Valuation.map_neg]
-      mul_le' := fun a b => (ρ_mul a b).le
-      eq_zero_of_map_eq_zero' := ρ_eq_zero
-      smul' := fun a z => by
-        rw [Algebra.smul_def, RingHom.algebraMap_toAlgebra, ρ_mul, ρ_f] }
+  let N : AlgebraNorm (v.adicCompletion K) (v'.adicCompletion L) := {
+    toFun := ρ
+    map_zero' := ρ_zero
+    add_le' := fun a b => by
+      rcases le_total (Valued.v a) (Valued.v b) with h | h
+      · have := ρ_le (a + b) b ((Valuation.map_add _ a b).trans (max_le h le_rfl))
+        linarith [ρ_nonneg a]
+      · have := ρ_le (a + b) a ((Valuation.map_add _ a b).trans (max_le le_rfl h))
+        linarith [ρ_nonneg b]
+    neg' := fun a => by simp only [ρ, Valuation.map_neg]
+    mul_le' := fun a b => (ρ_mul a b).le
+    eq_zero_of_map_eq_zero' := ρ_eq_zero
+    smul' := fun a z => by rw [Algebra.smul_def, RingHom.algebraMap_toAlgebra, ρ_mul, ρ_f]
+  }
   have hN : ∀ z, N z = ρ z := fun _ => rfl
   have hpm : IsPowMul N := by
     intro a k hk
@@ -112,16 +117,20 @@ namespace GlobalTheory.LocIntegral
 
 open Polynomial
 
-theorem isIntegral_iff_isIntegral_map : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L]
-    (v : HeightOneSpectrum (𝓞 K)) (v' : HeightOneSpectrum (𝓞 L)) (e : ℕ)
-    (f : v.adicCompletion K →+* v'.adicCompletion L), 0 < e →
-    (∀ y, Valued.v (f y) = Valued.v y ^ e) →
-    letI := f.toAlgebra; FiniteDimensional (v.adicCompletion K) (v'.adicCompletion L) →
-    ∀ b₀ : Kbar v ≃+* Kbar v',
-      (∀ x, b₀ (algebraMap (v.adicCompletion K) (Kbar v) x) =
-        algebraMap (v'.adicCompletion L) (Kbar v') (f x)) →
-      ∀ y : Kbar v, IsIntegral (v.adicCompletionIntegers K) y ↔
-        IsIntegral (v'.adicCompletionIntegers L) (b₀ y) := by
+theorem isIntegral_iff_isIntegral_map
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L]
+        (v : HeightOneSpectrum (𝓞 K)) (v' : HeightOneSpectrum (𝓞 L)) (e : ℕ)
+        (f : v.adicCompletion K →+* v'.adicCompletion L),
+      0 < e → (∀ y, Valued.v (f y) = Valued.v y ^ e)
+        → letI := f.toAlgebra
+          FiniteDimensional (v.adicCompletion K) (v'.adicCompletion L)
+            → ∀ b₀ : Kbar v ≃+* Kbar v',
+              (∀ x,
+                  b₀ (algebraMap (v.adicCompletion K) (Kbar v) x)
+                    = algebraMap (v'.adicCompletion L) (Kbar v') (f x))
+                → ∀ y : Kbar v,
+                  IsIntegral (v.adicCompletionIntegers K) y
+                    ↔ IsIntegral (v'.adicCompletionIntegers L) (b₀ y) := by
   intro K L _ _ _ _ v v' e f he hfv
   letI := f.toAlgebra
   intro hfd b₀ hb y
@@ -133,8 +142,9 @@ theorem isIntegral_iff_isIntegral_map : ∀ (K L : Type) [Field K] [NumberField 
   let g : v.adicCompletionIntegers K →+* v'.adicCompletionIntegers L :=
     f.restrict (v.adicCompletionIntegers K) (v'.adicCompletionIntegers L) hle
   have hg : ∀ a, ((g a : v'.adicCompletionIntegers L) : v'.adicCompletion L) = f a := fun _ => rfl
-  have hcomp : (algebraMap (v'.adicCompletionIntegers L) (Kbar v')).comp g =
-      b₀.toRingHom.comp (algebraMap (v.adicCompletionIntegers K) (Kbar v)) := by
+  have hcomp
+      : (algebraMap (v'.adicCompletionIntegers L) (Kbar v')).comp g
+        = b₀.toRingHom.comp (algebraMap (v.adicCompletionIntegers K) (Kbar v)) := by
     ext a
     simp only [RingHom.coe_comp, Function.comp_apply, RingEquiv.toRingHom_eq_coe,
       RingEquiv.coe_toRingHom]
@@ -182,8 +192,9 @@ theorem isIntegral_iff_isIntegral_map : ∀ (K L : Type) [Field K] [NumberField 
       rw [e2, ← Polynomial.eval₂_map, hq] at e1
       exact e1.trans (minpoly.aeval (v.adicCompletion K) (a : v'.adicCompletion L))
     have h1 : IsIntegral (v'.adicCompletionIntegers L) y := by
-      have := IsIntegral.map_of_comp_eq (RingHom.id (v'.adicCompletionIntegers L)) b₀.symm.toRingHom
-        (by ext; rfl) hy
+      have :=
+        IsIntegral.map_of_comp_eq (RingHom.id (v'.adicCompletionIntegers L)) b₀.symm.toRingHom
+          (by ext; rfl) hy
       simpa using this
     exact isIntegral_trans y h1
 

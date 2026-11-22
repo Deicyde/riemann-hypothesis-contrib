@@ -7,9 +7,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.cotInd_of_span :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (κ : Type) [Fintype κ] (x : κ → R),
-      Ideal.span (Set.range x) = maximalIdeal R → Fintype.card κ ≤ (maximalIdeal R).spanFinrank → CotInd R x := by
+theorem UpperTheory.V.AlgebraTools.cotInd_of_span
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (κ : Type) [Fintype κ]
+        (x : κ → R),
+      Ideal.span (Set.range x) = maximalIdeal R → Fintype.card κ ≤ (maximalIdeal R).spanFinrank
+        → CotInd R x := by
   intro R _ _ _ κ _ x hx hcard
   have hm : ∀ k, x k ∈ maximalIdeal R := fun k => hx ▸ Ideal.subset_span ⟨k, rfl⟩
   refine (cotInd_iff R x).mpr ⟨hm, ?_⟩

@@ -9,7 +9,8 @@ set_option autoImplicit false
 noncomputable section
 
 open MvPowerSeries
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
 
 namespace ReciprocityTheory.ChartRestriction.G.Pdiv.TL
 
@@ -17,12 +18,14 @@ section Jets
 
 variable {T : Type} [CommRing T]
 
-theorem limJ_mk_eq_iff {σ : Type} (k : ℕ) (P Q : MvPolynomial σ T) :
-    (Ideal.Quotient.mk _ P : JetR T σ k) = Ideal.Quotient.mk _ Q ↔
-      ∀ x : σ →₀ ℕ, x.degree < k + 1 → P.coeff x = Q.coeff x := by
+theorem limJ_mk_eq_iff {σ : Type} (k : ℕ) (P Q : MvPolynomial σ T)
+    : (Ideal.Quotient.mk _ P : JetR T σ k) = Ideal.Quotient.mk _ Q
+      ↔ ∀ x : σ →₀ ℕ, x.degree < k + 1 → P.coeff x = Q.coeff x := by
   rw [Ideal.Quotient.eq]
-  have hI : (Ideal.span (Set.range (MvPolynomial.X : σ → MvPolynomial σ T))) =
-      MvPolynomial.idealOfVars σ T := rfl
+  have hI
+      : (Ideal.span (Set.range (MvPolynomial.X : σ → MvPolynomial σ T)))
+        = MvPolynomial.idealOfVars σ T :=
+    rfl
   rw [hI, MvPolynomial.mem_pow_idealOfVars_iff]
   constructor
   · intro h x hx
@@ -38,9 +41,9 @@ theorem limJ_mk_eq_iff {σ : Type} (k : ℕ) (P Q : MvPolynomial σ T) :
     rw [MvPolynomial.mem_support_iff, MvPolynomial.coeff_sub, h x hlt, sub_self] at hx
     exact hx rfl
 
-theorem limJ_tt_eq_iff {σ : Type} [Finite σ] (k : ℕ) (f g : MvPowerSeries σ T) :
-    truncTotalAlgHom σ T (k + 1) f = truncTotalAlgHom σ T (k + 1) g ↔
-      ∀ x : σ →₀ ℕ, x.degree < k + 1 → coeff x f = coeff x g := by
+theorem limJ_tt_eq_iff {σ : Type} [Finite σ] (k : ℕ) (f g : MvPowerSeries σ T)
+    : truncTotalAlgHom σ T (k + 1) f = truncTotalAlgHom σ T (k + 1) g
+      ↔ ∀ x : σ →₀ ℕ, x.degree < k + 1 → coeff x f = coeff x g := by
   rw [MvPowerSeries.truncTotalAlgHom_apply, MvPowerSeries.truncTotalAlgHom_apply]
   refine (limJ_mk_eq_iff k (truncTotal (k + 1) f) (truncTotal (k + 1) g)).trans ?_
   refine forall_congr' fun x => imp_congr_right fun hx => ?_

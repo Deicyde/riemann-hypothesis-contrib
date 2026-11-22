@@ -20,18 +20,21 @@ section Infinity
 
 variable {W : WeierstrassCurve F}
 
-theorem eq_valuationInfty_pow_of_genX (w : Valuation W.toAffine.FunctionField ℤᵐ⁰)
-    (hF : ∀ c : F, c ≠ 0 → w (algebraMap F W.toAffine.FunctionField c) = 1) {a : ℕ} (ha : 0 < a)
-    (hx : w (genX W) = exp (2 * (a : ℤ))) (f : W.toAffine.FunctionField) :
-    w f = valuationInfty W f ^ a := by
+theorem eq_valuationInfty_pow_of_genX
+    (w : Valuation W.toAffine.FunctionField ℤᵐ⁰)
+    (hF : ∀ c : F, c ≠ 0 → w (algebraMap F W.toAffine.FunctionField c) = 1)
+    {a : ℕ} (ha : 0 < a) (hx : w (genX W) = exp (2 * (a : ℤ)))
+    (f : W.toAffine.FunctionField)
+    : w f = valuationInfty W f ^ a := by
   have hk : (0 : ℤ) < 2 * a := by positivity
   obtain ⟨m, hm, hm3⟩ := valuation_genY_of_one_lt w hF hk hx
   have hm' : m = 3 * a := by linarith
   subst hm'
   have ha' : (a : ℤ) ≠ 0 := by exact_mod_cast ha.ne'
-  have hA : ∀ c : W.toAffine.CoordinateRing,
-      w (algebraMap _ W.toAffine.FunctionField c) =
-        valuationInfty W (algebraMap _ W.toAffine.FunctionField c) ^ a := by
+  have hA
+      : ∀ c : W.toAffine.CoordinateRing,
+        w (algebraMap _ W.toAffine.FunctionField c)
+          = valuationInfty W (algebraMap _ W.toAffine.FunctionField c) ^ a := by
     intro c
     rcases eq_or_ne c 0 with rfl | hc
     · simp [zero_pow ha.ne']
@@ -42,14 +45,20 @@ theorem eq_valuationInfty_pow_of_genX (w : Valuation W.toAffine.FunctionField �
     · have hp : p ≠ 0 := by rintro rfl; simp at hc
       rw [natDegree_norm_smul_basis_of_q_eq_zero, map_zero, zero_mul, add_zero,
         valuation_poly_of_one_lt w hF hk hx hp]
-      congr 1; push_cast; ring
-    · have hwQy : w (algebraMap F[X] W.toAffine.FunctionField q * genY W) =
-          exp (2 * a * (q.natDegree : ℤ) + 3 * a) := by
+      congr 1
+      push_cast
+      ring
+    · have hwQy
+          : w (algebraMap F[X] W.toAffine.FunctionField q * genY W)
+            = exp (2 * a * (q.natDegree : ℤ) + 3 * a) := by
         rw [Valuation.map_mul, valuation_poly_of_one_lt w hF hk hx hq, hm, ← exp_add]
-        congr 1; ring
+        congr 1
+        ring
       rcases eq_or_ne p 0 with rfl | hp
       · rw [natDegree_norm_smul_basis_of_p_eq_zero hq, map_zero, zero_add, hwQy]
-        congr 1; push_cast; ring
+        congr 1
+        push_cast
+        ring
       · rw [natDegree_norm_smul_basis_of_ne_zero hp hq]
         have hwP := valuation_poly_of_one_lt w hF hk hx hp
         have hapos : (0 : ℤ) < a := by exact_mod_cast ha
@@ -57,10 +66,14 @@ theorem eq_valuationInfty_pow_of_genX (w : Valuation W.toAffine.FunctionField �
           hlt | hlt
         · rw [Valuation.map_add_eq_of_lt_right _ (by rw [hwP, hwQy, exp_lt_exp]; nlinarith), hwQy,
             max_eq_right (by omega)]
-          congr 1; push_cast; ring
+          congr 1
+          push_cast
+          ring
         · rw [Valuation.map_add_eq_of_lt_left _ (by rw [hwP, hwQy, exp_lt_exp]; nlinarith), hwP,
             max_eq_left (by omega)]
-          congr 1; push_cast; ring
+          congr 1
+          push_cast
+          ring
   obtain ⟨⟨c, s⟩, rfl⟩ := IsLocalization.mk'_surjective W.toAffine.CoordinateRing⁰ f
   dsimp only
   have hs : (s : W.toAffine.CoordinateRing) ≠ 0 := nonZeroDivisors.ne_zero s.2
@@ -69,9 +82,11 @@ theorem eq_valuationInfty_pow_of_genX (w : Valuation W.toAffine.FunctionField �
   have h2 := congrArg (fun g => valuationInfty W g ^ a) hspec
   rw [Valuation.map_mul, hA, hA] at h1
   rw [Valuation.map_mul, mul_pow] at h2
-  have hvs : valuationInfty W (algebraMap _ W.toAffine.FunctionField
-      (s : W.toAffine.CoordinateRing)) ^ a ≠ 0 :=
-    pow_ne_zero _ ((Valuation.ne_zero_iff _).mpr ((map_ne_zero_iff _ (IsFractionRing.injective _ _)).mpr hs))
+  have hvs
+      : valuationInfty W (algebraMap _ W.toAffine.FunctionField (s : W.toAffine.CoordinateRing)) ^ a
+        ≠ 0 :=
+    pow_ne_zero _
+      ((Valuation.ne_zero_iff _).mpr ((map_ne_zero_iff _ (IsFractionRing.injective _ _)).mpr hs))
   exact mul_right_cancel₀ hvs (h1.trans h2.symm)
 
 omit [Field F] in
@@ -81,14 +96,14 @@ theorem genX_ne_zero' [Field F] (W : WeierstrassCurve F) : genX W ≠ 0 := by
   rw [h]
   exact isAlgebraic_zero
 
-theorem exists_eq_valuationInfty_pow (w : Valuation W.toAffine.FunctionField ℤᵐ⁰)
-    (hF : ∀ c : F, c ≠ 0 → w (algebraMap F W.toAffine.FunctionField c) = 1)
-    (hx : 1 < w (genX W)) : ∃ e : ℕ, 0 < e ∧ ∀ f, w f = valuationInfty W f ^ e := by
+theorem exists_eq_valuationInfty_pow
+    (w : Valuation W.toAffine.FunctionField ℤᵐ⁰)
+    (hF : ∀ c : F, c ≠ 0 → w (algebraMap F W.toAffine.FunctionField c) = 1) (hx : 1 < w (genX W))
+    : ∃ e : ℕ, 0 < e ∧ ∀ f, w f = valuationInfty W f ^ e := by
   have hx0 : w (genX W) ≠ 0 := (Valuation.ne_zero_iff _).mpr (genX_ne_zero' W)
   set k := log (w (genX W))
   have hxk : w (genX W) = exp k := (exp_log hx0).symm
-  have hk : 0 < k := by
-    rw [hxk, ← exp_zero, exp_lt_exp] at hx; exact hx
+  have hk : 0 < k := by rw [hxk, ← exp_zero, exp_lt_exp] at hx; exact hx
   obtain ⟨m, -, hm3⟩ := valuation_genY_of_one_lt w hF hk hxk
   refine ⟨(m - k).toNat, by omega, eq_valuationInfty_pow_of_genX w hF (by omega) ?_⟩
   rw [hxk]
@@ -101,8 +116,9 @@ section Classify
 
 variable {W : WeierstrassCurve F} [IsAlgClosed F] [W.IsElliptic]
 
-theorem valuationPoint_pointOfIdeal [DecidableEq F] (v : HeightOneSpectrum W.toAffine.CoordinateRing) :
-    valuationPoint W (pointOfIdeal W v) = v.valuation W.toAffine.FunctionField := by
+theorem valuationPoint_pointOfIdeal
+    [DecidableEq F] (v : HeightOneSpectrum W.toAffine.CoordinateRing)
+    : valuationPoint W (pointOfIdeal W v) = v.valuation W.toAffine.FunctionField := by
   obtain ⟨h, e⟩ : ∃ h : W.toAffine.Nonsingular _ _, pointOfIdeal W v = .some _ _ h := ⟨_, rfl⟩
   have hv : heightOneOfNonsingular h = v := by
     apply pointOfIdeal_injective W
@@ -111,18 +127,20 @@ theorem valuationPoint_pointOfIdeal [DecidableEq F] (v : HeightOneSpectrum W.toA
   show (heightOneOfNonsingular h).valuation _ = _
   rw [hv]
 
-theorem exists_valuationPoint_pow [DecidableEq F] (w : Valuation W.toAffine.FunctionField ℤᵐ⁰)
+theorem exists_valuationPoint_pow
+    [DecidableEq F]
+    (w : Valuation W.toAffine.FunctionField ℤᵐ⁰)
     (hF : ∀ c : F, c ≠ 0 → w (algebraMap F W.toAffine.FunctionField c) = 1)
-    (hnt : ∃ f, f ≠ 0 ∧ w f ≠ 1) :
-    ∃ (P : W.toAffine.Point) (e : ℕ), 0 < e ∧ ∀ f, w f = valuationPoint W P f ^ e := by
+    (hnt : ∃ f, f ≠ 0 ∧ w f ≠ 1)
+    : ∃ (P : W.toAffine.Point) (e : ℕ), 0 < e ∧ ∀ f, w f = valuationPoint W P f ^ e := by
   by_cases hx : 1 < w (genX W)
   · obtain ⟨e, he, h⟩ := exists_eq_valuationInfty_pow w hF hx
     exact ⟨0, e, he, h⟩
   · obtain ⟨v, -, e, he, h⟩ := exists_eq_pow_valuation_of_le_one w hF (not_lt.mp hx) hnt
     exact ⟨pointOfIdeal W v, e, he, fun f => by rw [valuationPoint_pointOfIdeal, h]⟩
 
-theorem valuationPoint_genX_le_one {P : W.toAffine.Point} (hP : P ≠ 0) :
-    valuationPoint W P (genX W) ≤ 1 := by
+theorem valuationPoint_genX_le_one {P : W.toAffine.Point} (hP : P ≠ 0)
+    : valuationPoint W P (genX W) ≤ 1 := by
   cases P with
   | zero => exact absurd rfl hP
   | some x y h =>
@@ -131,13 +149,17 @@ theorem valuationPoint_genX_le_one {P : W.toAffine.Point} (hP : P ≠ 0) :
 
 theorem valuationPoint_zero_genX : valuationPoint W 0 (genX W) = exp 2 := valuationInfty_genX W
 
-theorem eq_zero_of_one_lt_valuationPoint_genX {P : W.toAffine.Point}
-    (h : 1 < valuationPoint W P (genX W)) : P = 0 := by
+theorem eq_zero_of_one_lt_valuationPoint_genX
+    {P : W.toAffine.Point} (h : 1 < valuationPoint W P (genX W))
+    : P = 0 := by
   by_contra hP
   exact absurd (valuationPoint_genX_le_one hP) (not_le.mpr h)
 
-theorem eq_of_valuationPoint_pow_eq [DecidableEq F] {P Q : W.toAffine.Point} {e e' : ℕ} (he : 0 < e)
-    (h : ∀ f, valuationPoint W P f ^ e = valuationPoint W Q f ^ e') : P = Q := by
+theorem eq_of_valuationPoint_pow_eq
+    [DecidableEq F]
+    {P Q : W.toAffine.Point} {e e' : ℕ}
+    (he : 0 < e) (h : ∀ f, valuationPoint W P f ^ e = valuationPoint W Q f ^ e')
+    : P = Q := by
   have he' : e' ≠ 0 := by
     rintro rfl
     have := h 0
@@ -147,7 +169,8 @@ theorem eq_of_valuationPoint_pow_eq [DecidableEq F] {P Q : W.toAffine.Point} {e 
   have h' : ∀ f, valuationPoint W 0 f ^ e = valuationPoint W (Q - P) f ^ e' := by
     intro f
     have := h (translate W (-P) f)
-    rwa [valuationPoint_translate, valuationPoint_translate, add_neg_cancel, ← sub_eq_add_neg] at this
+    rwa [valuationPoint_translate, valuationPoint_translate, add_neg_cancel, ← sub_eq_add_neg] at
+      this
   have hx := h' (genX W)
   rw [valuationPoint_zero_genX, ← exp_nsmul] at hx
   have hgt : 1 < valuationPoint W (Q - P) (genX W) := by
@@ -162,8 +185,10 @@ theorem eq_of_valuationPoint_pow_eq [DecidableEq F] {P Q : W.toAffine.Point} {e 
   rw [sub_eq_zero] at this
   exact this.symm
 
-theorem eq_of_valuationPoint_pow_eq_pow (P : W.toAffine.Point) {e e' : ℕ}
-    (h : ∀ f, valuationPoint W P f ^ e = valuationPoint W P f ^ e') : e = e' := by
+theorem eq_of_valuationPoint_pow_eq_pow
+    (P : W.toAffine.Point)
+    {e e' : ℕ} (h : ∀ f, valuationPoint W P f ^ e = valuationPoint W P f ^ e')
+    : e = e' := by
   obtain ⟨t, ht⟩ := exists_valuationPoint_eq_exp_neg_one W P
   have := h t
   rw [ht, ← exp_nsmul, ← exp_nsmul, exp_inj] at this
@@ -174,14 +199,16 @@ end Classify
 
 section Isogeny
 
-variable [IsAlgClosed F] [DecidableEq F] {E E' E'' : WeierstrassCurve F} [E.IsElliptic]
-  [E'.IsElliptic] [E''.IsElliptic]
-
+variable
+  [IsAlgClosed F] [DecidableEq F]
+  {E E' E'' : WeierstrassCurve F} [E.IsElliptic] [E'.IsElliptic] [E''.IsElliptic]
 
 omit [IsAlgClosed F] [DecidableEq F] in
-theorem valuation_le_one_of_isIntegral {K : Type*} [Field K] [Algebra F K]
-    (M : IntermediateField F K) (v : Valuation K ℤᵐ⁰) (hM : ∀ m : M, v (m : K) ≤ 1) {z : K}
-    (hz : IsIntegral M z) : v z ≤ 1 := by
+theorem valuation_le_one_of_isIntegral
+    {K : Type*} [Field K] [Algebra F K]
+    (M : IntermediateField F K) (v : Valuation K ℤᵐ⁰) (hM : ∀ m : M, v (m : K) ≤ 1)
+    {z : K} (hz : IsIntegral M z)
+    : v z ≤ 1 := by
   by_contra hgt
   push_neg at hgt
   have hz0 : z ≠ 0 := by rintro rfl; simp at hgt
@@ -195,32 +222,34 @@ theorem valuation_le_one_of_isIntegral {K : Type*} [Field K] [Algebra F K]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_add (f := _), map_pow, aeval_X, map_sum, map_mul, aeval_C] at h0
   set n := (minpoly M z).natDegree
-  have hpow : ∀ i : ℕ, v z ^ i = exp (i * k) := fun i => by
-    rw [hk, ← exp_nsmul, nsmul_eq_mul]
-  have hsum : v (∑ i ∈ Finset.range n, algebraMap M K ((minpoly M z).coeff i) * z ^ i) <
-      v (z ^ n) := by
+  have hpow : ∀ i : ℕ, v z ^ i = exp (i * k) := fun i => by rw [hk, ← exp_nsmul, nsmul_eq_mul]
+  have hsum
+      : v (∑ i ∈ Finset.range n, algebraMap M K ((minpoly M z).coeff i) * z ^ i) < v (z ^ n) := by
     rw [Valuation.map_pow, hpow]
     apply Valuation.map_sum_lt _ exp_ne_zero
     intro i hi
     rw [Valuation.map_mul, Valuation.map_pow, hpow]
-    calc v (algebraMap M K ((minpoly M z).coeff i)) * exp (i * k) ≤ 1 * exp (i * k) :=
-          mul_le_mul_left (hM _) _
+    calc
+      v (algebraMap M K ((minpoly M z).coeff i)) * exp (i * k)
+        ≤ 1 * exp (i * k) := mul_le_mul_left (hM _) _
       _ < exp (n * k) := by
-          rw [one_mul, exp_lt_exp]
-          have : (i : ℤ) < n := by exact_mod_cast Finset.mem_range.mp hi
-          nlinarith
+        rw [one_mul, exp_lt_exp]
+        have : (i : ℤ) < n := by exact_mod_cast Finset.mem_range.mp hi
+        nlinarith
   have := Valuation.map_add_eq_of_lt_left v hsum
   rw [h0, map_zero, Valuation.map_pow, hpow] at this
   exact exp_ne_zero this.symm
 
-theorem valuationPoint_zero_eq (f : E.toAffine.FunctionField) :
-    valuationPoint E 0 f = valuationInfty E f := rfl
+theorem valuationPoint_zero_eq (f : E.toAffine.FunctionField)
+    : valuationPoint E 0 f = valuationInfty E f :=
+  rfl
 
 namespace Isogeny
 
-theorem exists_point_valuation_comap (φ : Isogeny E E') :
-    ∃ (Q : E'.toAffine.Point) (e : ℕ), 0 < e ∧ ∀ R f,
-      valuationPoint E R (φ.comap f) = valuationPoint E' (Q + φ.pointMap R) f ^ e := by
+theorem exists_point_valuation_comap (φ : Isogeny E E')
+    : ∃ (Q : E'.toAffine.Point) (e : ℕ),
+      0 < e
+        ∧ ∀ R f, valuationPoint E R (φ.comap f) = valuationPoint E' (Q + φ.pointMap R) f ^ e := by
   let w : Valuation E'.toAffine.FunctionField ℤᵐ⁰ := (valuationPoint E 0).comap φ.comap.toRingHom
   have hw : ∀ f, w f = valuationPoint E 0 (φ.comap f) := fun f => rfl
   have hF : ∀ c : F, c ≠ 0 → w (algebraMap F E'.toAffine.FunctionField c) = 1 := by
@@ -248,8 +277,8 @@ theorem exists_point_valuation_comap (φ : Isogeny E E') :
 
 end Isogeny
 
-theorem one_lt_valuationPoint_mulIsogeny_x {n : ℤ} (hn : n ≠ 0) :
-    1 < valuationPoint E 0 ((mulIsogeny E n hn).comap (genX E)) := by
+theorem one_lt_valuationPoint_mulIsogeny_x {n : ℤ} (hn : n ≠ 0)
+    : 1 < valuationPoint E 0 ((mulIsogeny E n hn).comap (genX E)) := by
   have hvF : ∀ c : F, c ≠ 0 → valuationInfty E (algebraMap F E.toAffine.FunctionField c) = 1 :=
     fun c hc => valuationInfty_algebraMap_const_eq_one E hc
   have hΦ0 : E.Φ n ≠ 0 := by
@@ -274,8 +303,8 @@ theorem one_lt_valuationPoint_mulIsogeny_x {n : ℤ} (hn : n ≠ 0) :
 
 namespace Isogeny
 
-theorem comp_mulIsogeny_two (φ : Isogeny E E') :
-    φ.comp (mulIsogeny E 2 two_ne_zero) = (mulIsogeny E' 2 two_ne_zero).comp φ := by
+theorem comp_mulIsogeny_two (φ : Isogeny E E')
+    : φ.comp (mulIsogeny E 2 two_ne_zero) = (mulIsogeny E' 2 two_ne_zero).comp φ := by
   apply ext'
   have h2 : (mulIsogeny E 2 two_ne_zero).1 = genericPoint E + genericPoint E := by
     rw [mulIsogeny_val, two_zsmul]
@@ -286,13 +315,17 @@ theorem comp_mulIsogeny_two (φ : Isogeny E E') :
       app_genericPoint']
   rw [e1, comp_val, mulIsogeny_val, map_zsmul, map_comap_genericPoint, two_zsmul]
 
-theorem comap_comp_mulIsogeny_two (φ : Isogeny E E') :
-    (mulIsogeny E 2 two_ne_zero).comap.comp φ.comap = φ.comap.comp (mulIsogeny E' 2 two_ne_zero).comap := by
+theorem comap_comp_mulIsogeny_two (φ : Isogeny E E')
+    : (mulIsogeny E 2 two_ne_zero).comap.comp φ.comap
+      = φ.comap.comp (mulIsogeny E' 2 two_ne_zero).comap := by
   rw [← comap_comp, ← comap_comp, comp_mulIsogeny_two]
 
-theorem mulIsogeny_two_valuation (E : WeierstrassCurve F) [E.IsElliptic] :
-    ∃ e : ℕ, 0 < e ∧ ∀ R f, valuationPoint E R ((mulIsogeny E 2 two_ne_zero).comap f) =
-      valuationPoint E ((2 : ℤ) • R) f ^ e := by
+theorem mulIsogeny_two_valuation (E : WeierstrassCurve F) [E.IsElliptic]
+    : ∃ e : ℕ,
+      0 < e
+        ∧ ∀ R f,
+          valuationPoint E R ((mulIsogeny E 2 two_ne_zero).comap f)
+            = valuationPoint E ((2 : ℤ) • R) f ^ e := by
   obtain ⟨Q, e, he, hQ⟩ := (mulIsogeny E 2 two_ne_zero).exists_point_valuation_comap
   have hQ0 : Q = 0 := by
     have h := hQ 0 (genX E)
@@ -305,8 +338,9 @@ theorem mulIsogeny_two_valuation (E : WeierstrassCurve F) [E.IsElliptic] :
   refine ⟨e, he, fun R f => ?_⟩
   rw [hQ, hQ0, zero_add, pointMap_mulIsogeny]
 
-theorem exists_ramIdx (φ : Isogeny E E') : ∃ e : ℕ, 0 < e ∧ ∀ R f,
-    valuationPoint E R (φ.comap f) = valuationPoint E' (φ.pointMap R) f ^ e := by
+theorem exists_ramIdx (φ : Isogeny E E')
+    : ∃ e : ℕ,
+      0 < e ∧ ∀ R f, valuationPoint E R (φ.comap f) = valuationPoint E' (φ.pointMap R) f ^ e := by
   obtain ⟨Q, e, he, hQ⟩ := φ.exists_point_valuation_comap
   suffices hQ0 : Q = 0 by
     refine ⟨e, he, fun R f => ?_⟩
@@ -314,8 +348,8 @@ theorem exists_ramIdx (φ : Isogeny E E') : ∃ e : ℕ, 0 < e ∧ ∀ R f,
   obtain ⟨e₂, he₂, h₂⟩ := mulIsogeny_two_valuation E
   obtain ⟨e₂', he₂', h₂'⟩ := mulIsogeny_two_valuation E'
   have hφ0 : φ.pointMap 0 = 0 := map_zero φ.pointHom
-  have key : ∀ f, valuationPoint E' Q f ^ (e * e₂) =
-      valuationPoint E' ((2 : ℤ) • Q) f ^ (e₂' * e) := by
+  have key
+      : ∀ f, valuationPoint E' Q f ^ (e * e₂) = valuationPoint E' ((2 : ℤ) • Q) f ^ (e₂' * e) := by
     intro f
     have h1 := h₂ 0 (φ.comap f)
     rw [smul_zero, hQ, hφ0, add_zero, ← pow_mul] at h1
@@ -330,27 +364,30 @@ noncomputable def ramIdx (φ : Isogeny E E') : ℕ := φ.exists_ramIdx.choose
 
 theorem ramIdx_pos (φ : Isogeny E E') : 0 < φ.ramIdx := φ.exists_ramIdx.choose_spec.1
 
-theorem valuationPoint_comap (φ : Isogeny E E') (R : E.toAffine.Point)
-    (f : E'.toAffine.FunctionField) :
-    valuationPoint E R (φ.comap f) = valuationPoint E' (φ.pointMap R) f ^ φ.ramIdx :=
+theorem valuationPoint_comap
+    (φ : Isogeny E E') (R : E.toAffine.Point) (f : E'.toAffine.FunctionField)
+    : valuationPoint E R (φ.comap f) = valuationPoint E' (φ.pointMap R) f ^ φ.ramIdx :=
   φ.exists_ramIdx.choose_spec.2 R f
 
-theorem ordPoint_comap (φ : Isogeny E E') (R : E.toAffine.Point) {f : E'.toAffine.FunctionField}
-    (hf : f ≠ 0) :
-    ordPoint E R (φ.comap f) = φ.ramIdx * ordPoint E' (φ.pointMap R) f := by
+theorem ordPoint_comap
+    (φ : Isogeny E E') (R : E.toAffine.Point) {f : E'.toAffine.FunctionField} (hf : f ≠ 0)
+    : ordPoint E R (φ.comap f) = φ.ramIdx * ordPoint E' (φ.pointMap R) f := by
   have hf' : φ.comap f ≠ 0 := (map_ne_zero_iff _ φ.comap.toRingHom.injective).mpr hf
   have h := φ.valuationPoint_comap R f
   rw [valuationPoint_eq_exp E R hf', valuationPoint_eq_exp E' _ hf, ← exp_nsmul, exp_inj,
-    nsmul_eq_mul] at h
+      nsmul_eq_mul]
+    at h
   linarith
 
-theorem ramIdx_eq_of (φ : Isogeny E E') {e : ℕ} (R : E.toAffine.Point)
-    (h : ∀ f, valuationPoint E R (φ.comap f) = valuationPoint E' (φ.pointMap R) f ^ e) :
-    φ.ramIdx = e :=
+theorem ramIdx_eq_of
+    (φ : Isogeny E E')
+    {e : ℕ} (R : E.toAffine.Point)
+    (h : ∀ f, valuationPoint E R (φ.comap f) = valuationPoint E' (φ.pointMap R) f ^ e)
+    : φ.ramIdx = e :=
   eq_of_valuationPoint_pow_eq_pow (φ.pointMap R) fun f => by rw [← h, valuationPoint_comap]
 
-theorem ramIdx_comp (ψ : Isogeny E' E'') (φ : Isogeny E E') :
-    (ψ.comp φ).ramIdx = ψ.ramIdx * φ.ramIdx := by
+theorem ramIdx_comp (ψ : Isogeny E' E'') (φ : Isogeny E E')
+    : (ψ.comp φ).ramIdx = ψ.ramIdx * φ.ramIdx := by
   apply ramIdx_eq_of _ 0
   intro f
   rw [comap_comp, AlgHom.comp_apply, valuationPoint_comap, valuationPoint_comap, pointMap_comp,

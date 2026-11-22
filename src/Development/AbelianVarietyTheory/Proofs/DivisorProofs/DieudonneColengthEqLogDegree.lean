@@ -14,13 +14,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DieudonneFun
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 namespace GlobalTheory.Dieu
 
-theorem length_quot_range_map_eq_of_hasLogDeg : ∀ (p : ℕ) [Fact p.Prime] (T : Theory p) (k : Type) [Field k]
-    [CharP k p] [PerfectRing k p] (G H : PDivGroup p k) (q : G ⟶ H) (e : ℕ), IsIsog q → HasLogDeg q e →
-    Module.length (WittVector p k) (T.M G ⧸ LinearMap.range (T.map q)) = e := by
+theorem length_quot_range_map_eq_of_hasLogDeg
+    : ∀ (p : ℕ) [Fact p.Prime] (T : Theory p) (k : Type) [Field k] [CharP k p] [PerfectRing k p]
+        (G H : PDivGroup p k) (q : G ⟶ H) (e : ℕ),
+      IsIsog q → HasLogDeg q e
+        → Module.length (WittVector p k) (T.M G ⧸ LinearMap.range (T.map q)) = e := by
   intro p _ T k _ _ _ G H q e hq he
   obtain ⟨n, g, hqg, hgq⟩ := hq
   have hq' : IsIsog q := ⟨n, g, hqg, hgq⟩
@@ -28,16 +31,22 @@ theorem length_quot_range_map_eq_of_hasLogDeg : ∀ (p : ℕ) [Fact p.Prime] (T 
   obtain ⟨e', he', -⟩ := GlobalTheory.T.existsUnique_kernelOrder_pPowerDegree_isogeny p k H G g hg
   have hpG := ((GlobalTheory.T.pDivisibleGroup_isogeny_basic_properties p k G).1 n).2
   rw [← hqg] at hpG
-  have hle : n * G.height ≤ e + e' := GlobalTheory.T.hasKernelOrderPPowerDegree_comp_le_add p k G H G q g e e' _ he he' hpG
+  have hle : n * G.height ≤ e + e' :=
+    GlobalTheory.T.hasKernelOrderPPowerDegree_comp_le_add p k G H G q g e e' _ he he' hpG
   have h1 := GlobalTheory.T.kernelDegree_le_dieudonneColength p T k G H q e hq' he
   have h2 := GlobalTheory.T.kernelDegree_le_dieudonneColength p T k H G g e' hg he'
   obtain ⟨hinj, hfin1, -⟩ := GlobalTheory.T.isogenous_pDivGroup_finrank_omega_dual p T k G H q hq'
   obtain ⟨-, hfin2, -⟩ := GlobalTheory.T.isogenous_pDivGroup_finrank_omega_dual p T k H G g hg
   obtain ⟨hid, hcomp, -, -, -, -, -, hrank, -⟩ :=
-    GlobalTheory.T.dieudonneFunctorBase_functor_properties p (fun _ _ _ => True) T.base k G H G trivial trivial trivial
+    GlobalTheory.T.dieudonneFunctorBase_functor_properties p
+      (fun _ _ _ => True)
+      T.base k G H G trivial trivial trivial
   obtain ⟨-, -, -, -, hsmulG, -⟩ :=
-    GlobalTheory.T.dieudonneFunctorBase_functor_properties p (fun _ _ _ => True) T.base k G G G trivial trivial trivial
-  obtain ⟨hadd, hpow, -⟩ := GlobalTheory.T.witt_module_length_composition p k (T.M G) (T.M H) (T.M G)
+    GlobalTheory.T.dieudonneFunctorBase_functor_properties p
+      (fun _ _ _ => True)
+      T.base k G G G trivial trivial trivial
+  obtain ⟨hadd, hpow, -⟩ :=
+    GlobalTheory.T.witt_module_length_composition p k (T.M G) (T.M H) (T.M G)
   have hsum := hadd (T.map q) (T.map g) hinj
   have hcomp' : T.map q ∘ₗ T.map g = T.map (q ≫ g) := (hcomp q g).symm
   have hmul : ∀ a : T.M G, (T.map q ∘ₗ T.map g) a = p ^ n • a := by

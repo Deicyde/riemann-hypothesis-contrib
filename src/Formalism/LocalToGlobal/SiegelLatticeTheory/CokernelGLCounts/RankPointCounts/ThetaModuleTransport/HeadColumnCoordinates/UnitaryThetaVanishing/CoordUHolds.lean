@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.ThetaMbeU
 
@@ -17,10 +18,14 @@ variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableS
 variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V)
 variable {r : ℕ}
 
-theorem mmInt_U {t : Term V M r} (hg : GoodU H t) (hT : t.T ∈ 𝒪[F]) (hT' : t.T' ∈ 𝒪[F])
-    (hint : ∀ a b, H.Zhat t.f t.f' a b ∈ M.L.O) : MMInt H t := by
-  have hTO : algebraMap F E t.T ∈ M.L.O := Formalism.MainNotions.LocalModelPeriodLattices.algebraMap_mem_O M.L ⟨t.T, hT⟩
-  have hTO' : algebraMap F E t.T' ∈ M.L.O := Formalism.MainNotions.LocalModelPeriodLattices.algebraMap_mem_O M.L ⟨t.T', hT'⟩
+theorem mmInt_U
+    {t : Term V M r} (hg : GoodU H t) (hT : t.T ∈ 𝒪[F]) (hT' : t.T' ∈ 𝒪[F])
+    (hint : ∀ a b, H.Zhat t.f t.f' a b ∈ M.L.O)
+    : MMInt H t := by
+  have hTO : algebraMap F E t.T ∈ M.L.O :=
+    Formalism.MainNotions.LocalModelPeriodLattices.algebraMap_mem_O M.L ⟨t.T, hT⟩
+  have hTO' : algebraMap F E t.T' ∈ M.L.O :=
+    Formalism.MainNotions.LocalModelPeriodLattices.algebraMap_mem_O M.L ⟨t.T', hT'⟩
   have hgen : ∀ i j, H.h (H.MMfam t i) (H.MMfam t j) ∈ M.L.O := by
     intro i j
     have e := congrFun (congrFun (gramH_eqU H hg) i) j
@@ -65,20 +70,22 @@ theorem mmInt_U {t : Term V M r} (hg : GoodU H t) (hT : t.T ∈ 𝒪[F]) (hT' : 
   | add x y _ _ hx hy => rw [H.h_add_left]; exact add_mem hx hy
   | smul c x _ hx => rw [Subring.smul_def, H.h_smul_left]; exact mul_mem c.2 hx
 
-theorem PsiU_symm_mk {t : Term V M r} (hg : GoodU H t) (Y : Ix r → M.L.O) :
-    (PsiU H hg).symm (Submodule.Quotient.mk Y) =
-      ddMk H t ((sharpEquiv H t (unit_gramHU H hg)).symm Y) := by
+theorem PsiU_symm_mk {t : Term V M r} (hg : GoodU H t) (Y : Ix r → M.L.O)
+    : (PsiU H hg).symm (Submodule.Quotient.mk Y)
+      = ddMk H t ((sharpEquiv H t (unit_gramHU H hg)).symm Y) := by
   rw [LinearEquiv.symm_apply_eq, PsiU_mk, LinearEquiv.apply_symm_apply]
 
-theorem isomD_iffU {t₁ t₂ : Term V M r} (hg₁ : GoodU H t₁) (hg₂ : GoodU H t₂)
-    (θ : DDt H t₁ ≃ₗ[M.L.O] DDt H t₂) :
-    IsomD H t₁ t₂ θ ↔ ∀ Y W Y₂ W₂ : Ix r → M.L.O,
-      PsiU H hg₂ (θ ((PsiU H hg₁).symm (Submodule.Quotient.mk Y))) = Submodule.Quotient.mk Y₂ →
-      PsiU H hg₂ (θ ((PsiU H hg₁).symm (Submodule.Quotient.mk W))) = Submodule.Quotient.mk W₂ →
-      formC M.L.O (M.L.cj : E →+* E) (H.Zhat t₂.f t₂.f') (algebraMap F E t₂.T) (algebraMap F E t₂.T')
-          Y₂ W₂ -
-        formC M.L.O (M.L.cj : E →+* E) (H.Zhat t₁.f t₁.f') (algebraMap F E t₁.T)
-          (algebraMap F E t₁.T') Y W ∈ M.L.O := by
+theorem isomD_iffU
+    {t₁ t₂ : Term V M r} (hg₁ : GoodU H t₁) (hg₂ : GoodU H t₂) (θ : DDt H t₁ ≃ₗ[M.L.O] DDt H t₂)
+    : IsomD H t₁ t₂ θ
+      ↔ ∀ Y W Y₂ W₂ : Ix r → M.L.O,
+        PsiU H hg₂ (θ ((PsiU H hg₁).symm (Submodule.Quotient.mk Y))) = Submodule.Quotient.mk Y₂
+          → PsiU H hg₂ (θ ((PsiU H hg₁).symm (Submodule.Quotient.mk W))) = Submodule.Quotient.mk W₂
+          → formC M.L.O (M.L.cj : E →+* E) (H.Zhat t₂.f t₂.f') (algebraMap F E t₂.T)
+                (algebraMap F E t₂.T') Y₂ W₂
+              - formC M.L.O (M.L.cj : E →+* E) (H.Zhat t₁.f t₁.f') (algebraMap F E t₁.T)
+                (algebraMap F E t₁.T') Y W
+            ∈ M.L.O := by
   unfold IsomD
   constructor
   · intro h Y W Y₂ W₂ hY hW
@@ -87,21 +94,24 @@ theorem isomD_iffU {t₁ t₂ : Term V M r} (hg₁ : GoodU H t₁) (hg₂ : Good
     rw [h_eq_formCU H hg₂, h_eq_formCU H hg₁] at key
     simpa only [LinearEquiv.apply_symm_apply] using key
   · intro h x y x₂ y₂ hx hy
-    have hx' : PsiU H hg₂ (θ ((PsiU H hg₁).symm
-        (Submodule.Quotient.mk (sharpEquiv H t₁ (unit_gramHU H hg₁) x)))) =
-        Submodule.Quotient.mk (sharpEquiv H t₂ (unit_gramHU H hg₂) x₂) := by
+    have hx'
+        : PsiU H hg₂
+            (θ ((PsiU H hg₁).symm (Submodule.Quotient.mk (sharpEquiv H t₁ (unit_gramHU H hg₁) x))))
+          = Submodule.Quotient.mk (sharpEquiv H t₂ (unit_gramHU H hg₂) x₂) := by
       rw [PsiU_symm_mk H hg₁, LinearEquiv.symm_apply_apply, hx, PsiU_mk]
-    have hy' : PsiU H hg₂ (θ ((PsiU H hg₁).symm
-        (Submodule.Quotient.mk (sharpEquiv H t₁ (unit_gramHU H hg₁) y)))) =
-        Submodule.Quotient.mk (sharpEquiv H t₂ (unit_gramHU H hg₂) y₂) := by
+    have hy'
+        : PsiU H hg₂
+            (θ ((PsiU H hg₁).symm (Submodule.Quotient.mk (sharpEquiv H t₁ (unit_gramHU H hg₁) y))))
+          = Submodule.Quotient.mk (sharpEquiv H t₂ (unit_gramHU H hg₂) y₂) := by
       rw [PsiU_symm_mk H hg₁, LinearEquiv.symm_apply_apply, hy, PsiU_mk]
     rw [h_eq_formCU H hg₂, h_eq_formCU H hg₁]
     exact h _ _ _ _ hx' hy'
 
-theorem kap_eq (f₁ f₁' f₂ f₂' : Fin (r + 1) → V) (hD₁ : IsUnit (H.Dl f₁ f₁' (r + 1)))
-    (hD₂ : IsUnit (H.Dl f₂ f₂' (r + 1)))
-    (hrel : H.Dl f₁ f₁' r * H.Dl f₂ f₂' (r + 1) = H.Dl f₂ f₂' r * H.Dl f₁ f₁' (r + 1)) :
-    kapU H f₂ f₂' = kapU H f₁ f₁' := by
+theorem kap_eq
+    (f₁ f₁' f₂ f₂' : Fin (r + 1) → V)
+    (hD₁ : IsUnit (H.Dl f₁ f₁' (r + 1))) (hD₂ : IsUnit (H.Dl f₂ f₂' (r + 1)))
+    (hrel : H.Dl f₁ f₁' r * H.Dl f₂ f₂' (r + 1) = H.Dl f₂ f₂' r * H.Dl f₁ f₁' (r + 1))
+    : kapU H f₂ f₂' = kapU H f₁ f₁' := by
   obtain ⟨u₁, hu₁⟩ := hD₁
   obtain ⟨u₂, hu₂⟩ := hD₂
   simp only [kapU]
@@ -110,8 +120,8 @@ theorem kap_eq (f₁ f₁' f₂ f₂' : Fin (r + 1) → V) (hD₁ : IsUnit (H.Dl
     Units.eq_inv_mul_iff_mul_eq]
   linear_combination -hrel
 
-private theorem Dl_swap_eq_cj_Dl (f f' : Fin (r + 1) → V) (l : ℕ) :
-    H.Dl f' f l = M.L.cj (H.Dl f f' l) := by
+private theorem Dl_swap_eq_cj_Dl (f f' : Fin (r + 1) → V) (l : ℕ)
+    : H.Dl f' f l = M.L.cj (H.Dl f f' l) := by
   unfold HermSp.Dl
   split_ifs with hl
   · rw [AlgEquiv.map_det, ← Matrix.det_transpose]
@@ -122,22 +132,23 @@ private theorem Dl_swap_eq_cj_Dl (f f' : Fin (r + 1) → V) (l : ℕ) :
     exact H.h_herm _ _
   · simp
 
-theorem rel_swap (f₁ f₁' f₂ f₂' : Fin (r + 1) → V)
-    (hrel : H.Dl f₁ f₁' r * H.Dl f₂ f₂' (r + 1) = H.Dl f₂ f₂' r * H.Dl f₁ f₁' (r + 1)) :
-    H.Dl f₁' f₁ r * H.Dl f₂' f₂ (r + 1) = H.Dl f₂' f₂ r * H.Dl f₁' f₁ (r + 1) := by
-  rw [Dl_swap_eq_cj_Dl H f₁, Dl_swap_eq_cj_Dl H f₂, Dl_swap_eq_cj_Dl H f₂, Dl_swap_eq_cj_Dl H f₁, ← map_mul, ← map_mul,
-    hrel]
+theorem rel_swap
+    (f₁ f₁' f₂ f₂' : Fin (r + 1) → V)
+    (hrel : H.Dl f₁ f₁' r * H.Dl f₂ f₂' (r + 1) = H.Dl f₂ f₂' r * H.Dl f₁ f₁' (r + 1))
+    : H.Dl f₁' f₁ r * H.Dl f₂' f₂ (r + 1) = H.Dl f₂' f₂ r * H.Dl f₁' f₁ (r + 1) := by
+  rw [Dl_swap_eq_cj_Dl H f₁, Dl_swap_eq_cj_Dl H f₂, Dl_swap_eq_cj_Dl H f₂, Dl_swap_eq_cj_Dl H f₁,
+    ← map_mul, ← map_mul, hrel]
 
 end Parts
 
-private theorem image_prod_map_eq_iff_image_transport_eq {A₁ A₂ B₁ B₂ C₁ C₂ D : Type*} (G₁ : Set (A₁ × B₁)) (G₂ : Set (A₂ × B₂))
-    (Ψ₁ : A₁ → C₁) (Ψ₁' : C₁ → A₁) (hΨ₁ : ∀ a, Ψ₁' (Ψ₁ a) = a) (Ψ₂ : A₂ → C₂)
-    (hΨ₂ : Function.Injective Ψ₂) (P₁ : B₁ → D) (P₂ : B₂ → D) (θ : A₁ → A₂) (φ : B₁ → B₂)
-    (hP : ∀ b, P₂ (φ b) = P₁ b)
-    (sep : ∀ p ∈ G₁, ∀ q ∈ G₂, P₂ q.2 = P₁ p.2 → q.2 = φ p.2) :
-    (fun p : A₁ × B₁ => (θ p.1, φ p.2)) '' G₁ = G₂ ↔
-      (fun p : C₁ × D => (Ψ₂ (θ (Ψ₁' p.1)), p.2)) '' ((fun p : A₁ × B₁ => (Ψ₁ p.1, P₁ p.2)) '' G₁) =
-        (fun p : A₂ × B₂ => (Ψ₂ p.1, P₂ p.2)) '' G₂ := by
+private theorem image_prod_map_eq_iff_image_transport_eq
+    {A₁ A₂ B₁ B₂ C₁ C₂ D : Type*} (G₁ : Set (A₁ × B₁)) (G₂ : Set (A₂ × B₂)) (Ψ₁ : A₁ → C₁)
+    (Ψ₁' : C₁ → A₁) (hΨ₁ : ∀ a, Ψ₁' (Ψ₁ a) = a) (Ψ₂ : A₂ → C₂) (hΨ₂ : Function.Injective Ψ₂)
+    (P₁ : B₁ → D) (P₂ : B₂ → D) (θ : A₁ → A₂) (φ : B₁ → B₂) (hP : ∀ b, P₂ (φ b) = P₁ b)
+    (sep : ∀ p ∈ G₁, ∀ q ∈ G₂, P₂ q.2 = P₁ p.2 → q.2 = φ p.2)
+    : (fun p : A₁ × B₁ => (θ p.1, φ p.2)) '' G₁ = G₂
+      ↔ (fun p : C₁ × D => (Ψ₂ (θ (Ψ₁' p.1)), p.2)) '' ((fun p : A₁ × B₁ => (Ψ₁ p.1, P₁ p.2)) '' G₁)
+        = (fun p : A₂ × B₂ => (Ψ₂ p.1, P₂ p.2)) '' G₂ := by
   rw [Set.image_image]
   simp only [hΨ₁]
   constructor
@@ -206,9 +217,10 @@ theorem coordU_holds : CoordU := by
     unfold nuU
     rw [h_omP_omPU H f₂' f₂ t₁.T hK₂, h_omP_omPU H t₁.f' t₁.f t₁.T hK₁,
       kap_eq H t₁.f' t₁.f f₂' f₂ hD₁s hD₂s (rel_swap H _ _ _ _ hrel)]
-  have sends1 : ∀ {g₁ g₂ : Fin (r + 1) → V} (ψ : H.Wb g₁ →ₗ[E] H.Wb g₂) (v₁ v₂ : V)
-      (h₁ : v₁ ∈ H.perp (H.X g₁)) (h₂ : v₂ ∈ H.perp (H.X g₂)), H.SendsTo ψ 1 1 v₁ v₂ →
-      ψ (H.mkW g₁ ⟨v₁, h₁⟩) = H.mkW g₂ ⟨v₂, h₂⟩ := by
+  have sends1
+      : ∀ {g₁ g₂ : Fin (r + 1) → V} (ψ : H.Wb g₁ →ₗ[E] H.Wb g₂) (v₁ v₂ : V)
+          (h₁ : v₁ ∈ H.perp (H.X g₁)) (h₂ : v₂ ∈ H.perp (H.X g₂)),
+        H.SendsTo ψ 1 1 v₁ v₂ → ψ (H.mkW g₁ ⟨v₁, h₁⟩) = H.mkW g₂ ⟨v₂, h₂⟩ := by
     intro g₁ g₂ ψ v₁ v₂ h₁ h₂ hs
     simpa only [one_smul] using hs ⟨v₁, h₁⟩ ⟨v₂, h₂⟩ rfl rfl
   have hc : ∀ w, PcU H hg₂ (φ w) = PcU H hg₁ w := by
@@ -225,27 +237,32 @@ theorem coordU_holds : CoordU := by
     · exact sends1 _ _ _ _ _ hS'
   have sep := gam_sepU H hg₁ hg₂ rfl hnu φ (sends1 _ _ _ _ _ hS) (sends_omP H φ hD₁ hD₂ hom')
   have sep' := gam_sepU' H hg₁ hg₂ rfl hnu' φ' (sends1 _ _ _ _ _ hS') (sends_omP' H φ' hD₁ hD₂ hom)
-  let eqv : (DDt H t₁ ≃ₗ[M.L.O] DDt H t₂) ≃
-      (DDc M.L.O (M.L.cj : E →+* E) (H.Zhat t₁.f t₁.f') (algebraMap F E t₁.T) (algebraMap F E t₁.T') ≃ₗ[M.L.O]
-        DDc M.L.O (M.L.cj : E →+* E) (H.Zhat f₂ f₂') (algebraMap F E t₁.T) (algebraMap F E t₁.T')) :=
-    { toFun := fun θ => ((PsiU H hg₁).symm.trans θ).trans (PsiU H hg₂)
+  let eqv
+      : (DDt H t₁ ≃ₗ[M.L.O] DDt H t₂)
+        ≃ (DDc M.L.O (M.L.cj : E →+* E) (H.Zhat t₁.f t₁.f') (algebraMap F E t₁.T) (algebraMap F E t₁.T') ≃ₗ[M.L.O]
+            DDc M.L.O (M.L.cj : E →+* E) (H.Zhat f₂ f₂') (algebraMap F E t₁.T) (algebraMap F E t₁.T')) :=
+    {
+      toFun := fun θ => ((PsiU H hg₁).symm.trans θ).trans (PsiU H hg₂)
       invFun := fun ψ => ((PsiU H hg₁).trans ψ).trans (PsiU H hg₂).symm
       left_inv := fun θ => by
         ext x
         simp
       right_inv := fun ψ => by
         ext x
-        simp }
+        simp
+    }
   refine Nat.card_congr (Equiv.subtypeEquiv eqv ?_)
   intro θ
   simp only [Theta, ThetaC, Set.mem_setOf_eq]
   rw [isomD_iffU H hg₁ hg₂ θ]
-  have key := image_prod_map_eq_iff_image_transport_eq (Gam H t₁) (Gam H t₂) (PsiU H hg₁) (PsiU H hg₁).symm
-    (PsiU H hg₁).symm_apply_apply (PsiU H hg₂) (PsiU H hg₂).injective (PcU H hg₁) (PcU H hg₂) θ φ
-    hc sep
-  have key' := image_prod_map_eq_iff_image_transport_eq (Gam' H t₁) (Gam' H t₂) (PsiU H hg₁) (PsiU H hg₁).symm
-    (PsiU H hg₁).symm_apply_apply (PsiU H hg₂) (PsiU H hg₂).injective (PcU' H hg₁) (PcU' H hg₂) θ φ'
-    hc' sep'
+  have key :=
+    image_prod_map_eq_iff_image_transport_eq (Gam H t₁) (Gam H t₂) (PsiU H hg₁) (PsiU H hg₁).symm
+      (PsiU H hg₁).symm_apply_apply (PsiU H hg₂) (PsiU H hg₂).injective (PcU H hg₁) (PcU H hg₂) θ φ
+      hc sep
+  have key' :=
+    image_prod_map_eq_iff_image_transport_eq (Gam' H t₁) (Gam' H t₂) (PsiU H hg₁) (PsiU H hg₁).symm
+      (PsiU H hg₁).symm_apply_apply (PsiU H hg₂) (PsiU H hg₂).injective (PcU' H hg₁) (PcU' H hg₂) θ
+      φ' hc' sep'
   constructor
   · rintro ⟨_, _, hI, hGm, _⟩
     obtain ⟨hA, hB⟩ := hGm hsplit

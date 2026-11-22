@@ -16,8 +16,11 @@ abbrev Place (p : ℕ) [Fact p.Prime] : Type := Qbar →+* ℂ_[p]
 
 abbrev incl (p : ℕ) [Fact p.Prime] : 𝓞_ℂ_[p] →+* ℂ_[p] := algebraMap 𝓞_ℂ_[p] ℂ_[p]
 
-def IsModel {p : ℕ} [Fact p.Prime] (E : WeierstrassCurve ℂ_[p]) (W : WeierstrassCurve 𝓞_ℂ_[p])
-    (C : WeierstrassCurve.VariableChange ℂ_[p]) : Prop :=
+def IsModel
+    {p : ℕ} [Fact p.Prime]
+    (E : WeierstrassCurve ℂ_[p]) (W : WeierstrassCurve 𝓞_ℂ_[p])
+    (C : WeierstrassCurve.VariableChange ℂ_[p])
+    : Prop :=
   C • E = W.map (incl p) ∧ IsUnit W.Δ
 
 section Expansion
@@ -97,12 +100,15 @@ private lemma vSer_isFixedPt :
 
 open PowerSeries in
 variable {A : Type} [CommRing A] (W : WeierstrassCurve A) in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer_eq :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W = X ^ 3 + C W.a₁ * X * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W
-      + C W.a₂ * X ^ 2 * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W
-      + C W.a₃ * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W ^ 2
-      + C W.a₄ * X * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W ^ 2
-      + C W.a₆ * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W ^ 3 := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer_eq
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W
+      = X ^ 3
+        + C W.a₁ * X * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W
+        + C W.a₂ * X ^ 2 * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W
+        + C W.a₃ * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W ^ 2
+        + C W.a₄ * X * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W ^ 2
+        + C W.a₆
+          * _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer W ^ 3 := by
   have hv := vSer_isFixedPt W
   simp only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.wSer]
   conv_lhs => rw [hv, _root_.GlobalTheory.IndefiniteRowSideFullHecke.NodalSeriesPeriods.step]

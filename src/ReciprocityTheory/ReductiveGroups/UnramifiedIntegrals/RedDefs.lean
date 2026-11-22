@@ -15,9 +15,9 @@ namespace ReciprocityTheory.ChartRestriction.L1
 def redSqD (d : ℕ) : ℂ := 2 * omegaK d - 1
 
 def IsHalfReps (L : PeriodPair) (α : ℂ) (T : Finset ℂ) : Prop :=
-  (∀ P ∈ T, α * P ∈ L.lattice ∧ 2 * P ∉ L.lattice) ∧
-  (∀ P ∈ T, ∀ Q ∈ T, (P - Q ∈ L.lattice ∨ P + Q ∈ L.lattice) → P = Q) ∧
-  (∀ z, α * z ∈ L.lattice → z ∉ L.lattice → ∃ P ∈ T, z - P ∈ L.lattice ∨ z + P ∈ L.lattice)
+  (∀ P ∈ T, α * P ∈ L.lattice ∧ 2 * P ∉ L.lattice)
+    ∧ (∀ P ∈ T, ∀ Q ∈ T, (P - Q ∈ L.lattice ∨ P + Q ∈ L.lattice) → P = Q)
+    ∧ (∀ z, α * z ∈ L.lattice → z ∉ L.lattice → ∃ P ∈ T, z - P ∈ L.lattice ∨ z + P ∈ L.lattice)
 
 def xsOf (L : PeriodPair) (T : Finset ℂ) : Finset ℂ := T.image L.weierstrassP
 
@@ -44,8 +44,8 @@ def homS (U : PowerSeries K) (m : ℕ) (Q : K[X]) : PowerSeries K :=
 end Alg
 
 def KerProdAt (d : ℕ) (L : PeriodPair) (l e : ℕ) : Prop :=
-  ∃ (N : ℕ) (T : Finset ℂ), ¬ l ∣ N ∧ ¬ e ∣ N ∧ ¬ e ∣ T.card ∧
-    (∀ z ∈ T, z ∉ L.lattice ∧ (N : ℂ) * z ∈ L.lattice) ∧
-    ∀ k : Subfield ℂ, L.g₂ ∈ k → L.g₃ ∈ k → omegaK d ∈ k → ∏ z ∈ T, L.weierstrassP z ∈ k
+  ∃ (N : ℕ) (T : Finset ℂ),
+    ¬ l ∣ N ∧ ¬ e ∣ N ∧ ¬ e ∣ T.card ∧ (∀ z ∈ T, z ∉ L.lattice ∧ (N : ℂ) * z ∈ L.lattice)
+      ∧ ∀ k : Subfield ℂ, L.g₂ ∈ k → L.g₃ ∈ k → omegaK d ∈ k → ∏ z ∈ T, L.weierstrassP z ∈ k
 
 end ReciprocityTheory.ChartRestriction.L1

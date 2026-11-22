@@ -11,6 +11,8 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 namespace PositivityTheory.KCo
-theorem dictX_proof_k : _root_.PositivityTheory.KCo.DictX_k := _root_.PositivityTheory.KCo.dictX_of_k model_existence cyclicity adjoint_statement section_statement action_uniqueness
+theorem dictX_proof_k : _root_.PositivityTheory.KCo.DictX_k :=
+  _root_.PositivityTheory.KCo.dictX_of_k model_existence cyclicity adjoint_statement
+    section_statement action_uniqueness
 end PositivityTheory.KCo
 end

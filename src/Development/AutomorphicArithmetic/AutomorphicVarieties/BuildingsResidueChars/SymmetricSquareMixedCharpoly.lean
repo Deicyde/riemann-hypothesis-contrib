@@ -67,8 +67,7 @@ private lemma cp_ant (A B : Matrix (Fin 2) (Fin 2) k) : (ant A B).charpoly = (A 
 end UpperTheory.V.Sd.S2.symmetric_square_mixed_charpoly
 
 open UpperTheory.V.Sd.S2 UpperTheory.V.Sd.S2.symmetric_square_mixed_charpoly in
-theorem UpperTheory.symmetric_square_mixed_charpoly :
-    UpperTheory.V.Sd.S2.MixCp := by
+theorem UpperTheory.symmetric_square_mixed_charpoly : UpperTheory.V.Sd.S2.MixCp := by
   intro k Γ₀ Γ _ _ _ j t α β ρ R H s hs
   have hN : j.range.Normal := Subgroup.normal_of_index_eq_two H.index
   have hc : ∀ h : Γ₀, ∃ h', j h' = t⁻¹ * j h * t := fun h => by
@@ -80,18 +79,21 @@ theorem UpperTheory.symmetric_square_mixed_charpoly :
   refine ⟨fun g g' hg => ?_, fun g hg => ?_⟩
   · obtain ⟨h, hh⟩ := hm _ _ ht' hs
     obtain ⟨g'', hg''⟩ := hc g
-    have e : g' = h⁻¹ * g'' * h := H.inj (by
-      rw [map_mul, map_mul, map_inv, hh, hg'', hg]; group)
+    have e : g' = h⁻¹ * g'' * h := H.inj (by rw [map_mul, map_mul, map_inv, hh, hg'', hg]; group)
     rw [H.on g g'' hg'', cp_conj H.two α.ne_zero β.ne_zero _ _ (P_mix H.two α β _ _), cp_blk, e]
     congr 1
-    rw [map_mul, Units.val_mul, Matrix.charpoly_mul_comm, ← Units.val_mul, ← map_mul, mul_inv_cancel_left]
+    rw [map_mul, Units.val_mul, Matrix.charpoly_mul_comm, ← Units.val_mul, ← map_mul,
+      mul_inv_cancel_left]
   · obtain ⟨h, hh⟩ := hm _ _ hs ht'
     obtain ⟨h', hh'⟩ := hc h
     obtain ⟨u, hu⟩ := hm _ _ H.nmem H.nmem
-    have e : g = h * u * h' := H.inj (by
-      rw [map_mul, map_mul, hh', hu, hh, hg]; group)
+    have e : g = h * u * h' := H.inj (by rw [map_mul, map_mul, hh', hu, hh, hg]; group)
     have es : s = j h * t := by rw [hh]; group
-    have key : Pm (α : k) β * (R s : Matrix (Fin 4) (Fin 4) k) =
-        ant ((ρ h : Matrix (Fin 2) (Fin 2) k) * Matrix.diagonal ![(α : k) ^ 2, (β : k) ^ 2]) (ρ h') * Pm (α : k) β := by
+    have key
+        : Pm (α : k) β * (R s : Matrix (Fin 4) (Fin 4) k)
+          = ant ((ρ h : Matrix (Fin 2) (Fin 2) k) * Matrix.diagonal ![(α : k) ^ 2, (β : k) ^ 2])
+              (ρ h')
+            * Pm (α : k) β := by
       rw [es, map_mul, Units.val_mul, H.on h h' hh', H.off, ← Matrix.mul_assoc, P_mix H.two, blk_P]
-    rw [cp_conj H.two α.ne_zero β.ne_zero _ _ key, cp_ant, e, map_mul, map_mul, Units.val_mul, Units.val_mul, H.sq u hu]
+    rw [cp_conj H.two α.ne_zero β.ne_zero _ _ key, cp_ant, e, map_mul, map_mul, Units.val_mul,
+      Units.val_mul, H.sq u hu]

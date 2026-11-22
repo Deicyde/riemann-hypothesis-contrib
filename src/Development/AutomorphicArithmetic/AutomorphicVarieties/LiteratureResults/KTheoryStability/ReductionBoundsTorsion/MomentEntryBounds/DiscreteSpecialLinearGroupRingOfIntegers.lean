@@ -10,8 +10,9 @@ open NumberField NumberField.InfinitePlace Matrix MeasureTheory UpperTheory.V.KT
 
 namespace PositivityTheory.KB.MomentRationality.Disc
 
-theorem eq_zero_of_lt_one {L : Type} [Field L] [NumberField L] (a : 𝓞 L)
-    (h : ∀ w : InfinitePlace L, w (a : L) < 1) : a = 0 := by
+theorem eq_zero_of_lt_one
+    {L : Type} [Field L] [NumberField L] (a : 𝓞 L) (h : ∀ w : InfinitePlace L, w (a : L) < 1)
+    : a = 0 := by
   classical
   by_contra ha
   have hn : Algebra.norm ℤ a ≠ 0 := Algebra.norm_ne_zero_iff.2 ha
@@ -24,25 +25,31 @@ theorem eq_zero_of_lt_one {L : Type} [Field L] [NumberField L] (a : 𝓞 L)
     obtain ⟨w0⟩ := (inferInstance : Nonempty (InfinitePlace L))
     rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ w0)]
     have hp : ∏ w ∈ Finset.univ.erase w0, w (a : L) ^ w.mult ≤ 1 :=
-      Finset.prod_le_one₀ (fun w _ => pow_nonneg (apply_nonneg _ _) _)
+      Finset.prod_le_one₀
+        (fun w _ => pow_nonneg (apply_nonneg _ _) _)
         (fun w _ => pow_le_one₀ (apply_nonneg _ _) (h w).le)
     have hw0 : w0 (a : L) ^ w0.mult < 1 :=
       pow_lt_one₀ (apply_nonneg _ _) (h w0) InfinitePlace.mult_pos.ne'
-    calc _ ≤ w0 (a : L) ^ w0.mult * 1 :=
-          mul_le_mul_of_nonneg_left hp (pow_nonneg (apply_nonneg _ _) _)
+    calc
+      _ ≤ w0 (a : L) ^ w0.mult * 1 := mul_le_mul_of_nonneg_left hp (pow_nonneg (apply_nonneg _ _) _)
       _ < 1 := by rw [mul_one]; exact hw0
   rw [h2] at h3
   push_cast at h3
   linarith
 
-theorem continuous_entry {L : Type} [Field L] [NumberField L] {N : ℕ} (w : InfinitePlace L) (i j : Fin N) :
-    Continuous fun x : Sp L N => mt x w i j := by
+theorem continuous_entry
+    {L : Type} [Field L] [NumberField L] {N : ℕ} (w : InfinitePlace L) (i j : Fin N)
+    : Continuous fun x : Sp L N => mt x w i j := by
   fun_prop
 
-theorem mt_latS {L : Type} [Field L] [NumberField L] {N : ℕ} (σ : SpecialLinearGroup (Fin N) (𝓞 L))
-    (w : InfinitePlace L) (i j : Fin N) :
-    mt ((MonoidHom.pi fun w : InfinitePlace L => SpecialLinearGroup.map (n := Fin N) (embO w)) σ) w i j =
-      w.embedding (((σ : Matrix (Fin N) (Fin N) (𝓞 L)) i j : 𝓞 L) : L) := rfl
+theorem mt_latS
+    {L : Type} [Field L] [NumberField L]
+    {N : ℕ} (σ : SpecialLinearGroup (Fin N) (𝓞 L))
+    (w : InfinitePlace L) (i j : Fin N)
+    : mt ((MonoidHom.pi fun w : InfinitePlace L => SpecialLinearGroup.map (n := Fin N) (embO w)) σ)
+        w i j
+      = w.embedding (((σ : Matrix (Fin N) (Fin N) (𝓞 L)) i j : 𝓞 L) : L) :=
+  rfl
 
 theorem countable_O (L : Type) [Field L] [NumberField L] : Countable (𝓞 L) :=
   (RingOfIntegers.basis L).equivFun.injective.countable
@@ -57,13 +64,13 @@ theorem discrete_specialLinearGroup_ringOfIntegers : SDisc := by
   intro L _ _ N
   refine ⟨?_, ?_⟩
   · rw [discreteTopology_iff_isOpen_singleton_one]
-    let U : Set (Sp L N) :=
-      {x | ∀ w i j, ‖mt x w i j - (1 : Matrix (Fin N) (Fin N) ℂ) i j‖ < 1}
+    let U : Set (Sp L N) := {x | ∀ w i j, ‖mt x w i j - (1 : Matrix (Fin N) (Fin N) ℂ) i j‖ < 1}
     have hU : IsOpen U := by
       simp only [U, Set.setOf_forall]
-      exact isOpen_iInter_of_finite fun w => isOpen_iInter_of_finite fun i =>
-        isOpen_iInter_of_finite fun j =>
-          isOpen_lt ((continuous_entry w i j).sub continuous_const).norm continuous_const
+      exact isOpen_iInter_of_finite fun w =>
+        isOpen_iInter_of_finite fun i =>
+          isOpen_iInter_of_finite fun j =>
+            isOpen_lt ((continuous_entry w i j).sub continuous_const).norm continuous_const
     refine isOpen_induced_iff.2 ⟨U, hU, ?_⟩
     ext ⟨γ, hγ⟩
     simp only [Set.mem_preimage, Set.mem_singleton_iff]
@@ -72,8 +79,10 @@ theorem discrete_specialLinearGroup_ringOfIntegers : SDisc := by
       obtain ⟨σ, rfl⟩ := hγ
       have hσ : σ = 1 := by
         refine Matrix.SpecialLinearGroup.ext _ _ fun i j => ?_
-        have h0 := eq_zero_of_lt_one
-          (((σ : Matrix (Fin N) (Fin N) (𝓞 L)) i j) - (1 : Matrix (Fin N) (Fin N) (𝓞 L)) i j) (fun w => ?_)
+        have h0 :=
+          eq_zero_of_lt_one
+            (((σ : Matrix (Fin N) (Fin N) (𝓞 L)) i j) - (1 : Matrix (Fin N) (Fin N) (𝓞 L)) i j)
+            (fun w => ?_)
         · simpa using sub_eq_zero.1 h0
         · have h1 := hγU w i j
           rw [mt_latS] at h1
@@ -98,8 +107,8 @@ theorem discrete_specialLinearGroup_ringOfIntegers : SDisc := by
       inferInstanceAs (Countable (Fin N → Fin N → 𝓞 L))
     haveI : Countable (SpecialLinearGroup (Fin N) (𝓞 L)) :=
       inferInstanceAs (Countable {A : Matrix (Fin N) (Fin N) (𝓞 L) // A.det = 1})
-    exact (MonoidHom.rangeRestrict_surjective
-      (MonoidHom.pi fun w : InfinitePlace L => SpecialLinearGroup.map (n := Fin N) (embO w))).countable
+    exact (MonoidHom.rangeRestrict_surjective (MonoidHom.pi fun w : InfinitePlace L =>
+      SpecialLinearGroup.map (n := Fin N) (embO w))).countable
 
 end PositivityTheory.KB
 

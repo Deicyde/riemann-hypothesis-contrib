@@ -5,7 +5,8 @@ public import ReciprocityTheory.DualLattices.EvCotStatement
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory.CotPoints
 
@@ -33,8 +34,11 @@ private lemma coords_nsmul {R M N : Type} [CommRing R] [AddCommGroup M] [Module 
 
 section
 
-variable {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
-  {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe]
+variable
+  {R₀ : Type} [CommRing R₀]
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)]
+  {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe]
   {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp)
 
 private lemma ptMap_spec (t : Nb p g) :
@@ -50,12 +54,20 @@ private lemma ptOf_zero : ptOf B D.L.τ (0 : Nb p g) = 0 := by
 
 end
 
-theorem points_eq_tangent :
-  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), ∀ (S : LAlg R₀) (s : LHom Tw.O S) (π : LHom S Tw.O) (hπ : π.SqZero), π.comp s = LHom.id Tw.O →
-    (∀ m : Fin g → π.ker, (∀ k, p • m k = 0) → ∃! φ : LHom (D.fin.AAx (D.ptIdx 0)) S, φ.comp (D.fin.sO (D.ptIdx 0)) = s ∧ π.comp φ = (D.ptMap 0) ∧
-      B.map φ (D.fin.y (D.ptIdx 0)) = B.tg π hπ (∑ k, D.ch.gb k ⊗ₜ[R₀] m k)) ∧
-    (∀ φ : LHom (D.fin.AAx (D.ptIdx 0)) S, φ.comp (D.fin.sO (D.ptIdx 0)) = s → π.comp φ = (D.ptMap 0) → ∃! m : Fin g → π.ker, (∀ k, p • m k = 0) ∧
-      B.map φ (D.fin.y (D.ptIdx 0)) = B.tg π hπ (∑ k, D.ch.gb k ⊗ₜ[R₀] m k))) := by
+theorem points_eq_tangent
+    : (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
+        {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
+        [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp),
+      ∀ (S : LAlg R₀) (s : LHom Tw.O S) (π : LHom S Tw.O) (hπ : π.SqZero),
+        π.comp s = LHom.id Tw.O
+          → (∀ m : Fin g → π.ker,
+              (∀ k, p • m k = 0)
+                → ∃! φ : LHom (D.fin.AAx (D.ptIdx 0)) S, φ.comp (D.fin.sO (D.ptIdx 0)) = s ∧ π.comp φ = (D.ptMap 0) ∧
+                  B.map φ (D.fin.y (D.ptIdx 0)) = B.tg π hπ (∑ k, D.ch.gb k ⊗ₜ[R₀] m k))
+            ∧ (∀ φ : LHom (D.fin.AAx (D.ptIdx 0)) S,
+              φ.comp (D.fin.sO (D.ptIdx 0)) = s → π.comp φ = (D.ptMap 0)
+                → ∃! m : Fin g → π.ker, (∀ k, p • m k = 0) ∧
+                  B.map φ (D.fin.y (D.ptIdx 0)) = B.tg π hπ (∑ k, D.ch.gb k ⊗ₜ[R₀] m k))) := by
   intro R₀ _ p _ g B Tw Dt _ Oe _ _ σ cp D S s π hπ hs
   obtain ⟨-, h2, h3⟩ := ptMap_spec D 0
   rw [ptOf_zero D] at h2 h3
@@ -64,14 +76,14 @@ theorem points_eq_tangent :
       rw [← map_nsmul, coords_nsmul]
       simp [hm]
     obtain ⟨i, φ, e1, e2, e3⟩ := D.fin.univ S s _ hz
-    have h4 := h3 i (π.comp φ) (by rw [comp_assoc', e1, hs])
-      (by rw [B.map_comp, e2]; exact (B.tg_ker π hπ _).2 ⟨_, rfl⟩)
+    have h4 :=
+      h3 i (π.comp φ) (by rw [comp_assoc', e1, hs])
+        (by rw [B.map_comp, e2]; exact (B.tg_ker π hπ _).2 ⟨_, rfl⟩)
     obtain ⟨hi, hφ⟩ := h4
     subst hi
     refine ⟨φ, ⟨e1, eq_of_heq hφ, e2⟩, fun φ' h' => ?_⟩
     exact eq_of_heq (e3 _ φ' h'.1 h'.2.2).2
-  · have h0 : B.map π (B.map φ (D.fin.y (D.ptIdx 0))) = 0 := by
-      rw [← B.map_comp, hπφ, h2]
+  · have h0 : B.map π (B.map φ (D.fin.y (D.ptIdx 0))) = 0 := by rw [← B.map_comp, hπφ, h2]
     obtain ⟨v, hv⟩ := (B.tg_ker π hπ _).1 h0
     have hb := coords_bijective (N := π.ker) D.ch.gb
     obtain ⟨m, hm⟩ := hb.2 v

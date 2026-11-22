@@ -19,7 +19,8 @@ public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.Formally
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB
 
 namespace GlobalTheory
 
@@ -29,8 +30,8 @@ theorem canonGauge_of_log : LogSt → CanonGaugeSt := fun hlog =>
   canonGauge_of_steps exists_formalBiext_map exists_regauge
     (GaugeFirstLaw.exists_gauge_first_law hcob huniq)
     (SecondLawGauge.exists_gauge_second_law hcob huniq)
-    (ActionGauge.exists_action_gauge
-      (derivation_inner_of_reduced_order SepIdem.exists_separability_element))
+    (ActionGauge.exists_action_gauge (derivation_inner_of_reduced_order
+      SepIdem.exists_separability_element))
     SymGauge.exists_gauge_of_symmetry
 
 end GlobalTheory

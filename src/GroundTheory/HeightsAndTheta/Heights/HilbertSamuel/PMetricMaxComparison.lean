@@ -24,10 +24,13 @@ theorem MetricMaxComparison.proof : MetricMaxComparison.Statement := by
     · have hS : S = ⋂ k, (fun z => ‖blk k z‖) ⁻¹' {1} := by ext z; simp [S]
       rw [hS]
       exact isClosed_iInter fun k => isClosed_singleton.preimage (hblkc k).norm
-    · refine (Metric.isBounded_closedBall (x := (0 : (Σ k, ι k) → ℂ)) (r := 1)).subset fun z hz => ?_
+    · refine (Metric.isBounded_closedBall (x := (0 : (Σ k, ι k) → ℂ)) (r := 1)).subset fun z hz =>
+        ?_
       rw [Metric.mem_closedBall, dist_zero_right, pi_norm_le_iff_of_nonneg zero_le_one]
       intro p
-      calc ‖z p‖ = ‖blk p.1 z p.2‖ := rfl
+      calc
+        ‖z p‖
+          = ‖blk p.1 z p.2‖ := rfl
         _ ≤ ‖blk p.1 z‖ := norm_le_pi_norm _ _
         _ = 1 := hz p.1
   have hSU : S ⊆ {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
@@ -53,7 +56,10 @@ theorem MetricMaxComparison.proof : MetricMaxComparison.Statement := by
   have hwS : (fun p : Σ k, ι k => c p.1 * z p) ∈ S := fun k => by
     have h1 : blk k (fun p : Σ k, ι k => c p.1 * z p) = c k • blk k z := rfl
     rw [h1, norm_smul, hcn, inv_mul_cancel₀ (hn k).ne']
-  have hmax : (HermLine.ofMetrics (fun k => maxMetric (C := ℂ) (ι := ι k)) A.a).h z = ∏ k, ‖blk k z‖ ^ A.a k := rfl
+  have hmax
+      : (HermLine.ofMetrics (fun k => maxMetric (C := ℂ) (ι := ι k)) A.a).h z
+        = ∏ k, ‖blk k z‖ ^ A.a k :=
+    rfl
   have hprod : (∏ k, ‖blk k z‖ ^ A.a k) * (∏ k, ‖c k‖ ^ A.a k) = 1 := by
     rw [← Finset.prod_mul_distrib]
     refine Finset.prod_eq_one fun k _ => ?_

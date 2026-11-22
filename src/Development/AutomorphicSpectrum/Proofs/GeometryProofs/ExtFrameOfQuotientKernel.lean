@@ -6,21 +6,20 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Ggeo
 
-theorem ext_frame_of_quotient_kernel (Ω M V : Type) [Field Ω] [AddCommGroup M] [Module Ω M]
-    [AddCommGroup V] [Module Ω V] (R : Subring Ω) (H : Submodule R M) (π : M →ₗ[Ω] V) (p q : ℕ)
-    (u : Fin (p + q) → M) (v : Fin p → V) (P : Matrix (Fin p) (Fin p) Ω)
-    (C : Matrix (Fin q) (Fin q) Ω)
-    (hu : LinearIndependent Ω u) (hv : LinearIndependent Ω v)
-    (hHu : ∀ y ∈ H, y ∈ Submodule.span Ω (Set.range u))
-    (hπ1 : ∀ i, π (u (Fin.castAdd q i)) = v i) (hπ2 : ∀ j, π (u (Fin.natAdd p j)) = 0)
-    (hP : P.det ≠ 0) (hC : C.det ≠ 0)
+theorem ext_frame_of_quotient_kernel
+    (Ω M V : Type) [Field Ω] [AddCommGroup M] [Module Ω M] [AddCommGroup V] [Module Ω V]
+    (R : Subring Ω) (H : Submodule R M)
+    (π : M →ₗ[Ω] V) (p q : ℕ) (u : Fin (p + q) → M) (v : Fin p → V) (P : Matrix (Fin p) (Fin p) Ω)
+    (C : Matrix (Fin q) (Fin q) Ω) (hu : LinearIndependent Ω u) (hv : LinearIndependent Ω v)
+    (hHu : ∀ y ∈ H, y ∈ Submodule.span Ω (Set.range u)) (hπ1 : ∀ i, π (u (Fin.castAdd q i)) = v i)
+    (hπ2 : ∀ j, π (u (Fin.natAdd p j)) = 0) (hP : P.det ≠ 0) (hC : C.det ≠ 0)
     (hmap : H.map (π.restrictScalars R) = Submodule.span R (Set.range fun i => ∑ j, P i j • v j))
     (hCH : ∀ j, ∑ k, C j k • u (Fin.natAdd p k) ∈ H)
-    (hker : ∀ y ∈ H, π y = 0 →
-      y ∈ Submodule.span R (Set.range fun j => ∑ k, C j k • u (Fin.natAdd p k))) :
-    ∃ A : Matrix (Fin (p + q)) (Fin (p + q)) Ω, A.det = P.det * C.det ∧
-      LinearIndependent Ω (fun i => ∑ j, A i j • u j) ∧
-      H = Submodule.span R (Set.range fun i => ∑ j, A i j • u j) := by
+    (hker : ∀ y ∈ H,
+      π y = 0 → y ∈ Submodule.span R (Set.range fun j => ∑ k, C j k • u (Fin.natAdd p k)))
+    : ∃ A : Matrix (Fin (p + q)) (Fin (p + q)) Ω,
+      A.det = P.det * C.det ∧ LinearIndependent Ω (fun i => ∑ j, A i j • u j)
+        ∧ H = Submodule.span R (Set.range fun i => ∑ j, A i j • u j) := by
   classical
   have hlift : ∀ i, ∃ y ∈ H, π y = ∑ j, P i j • v j := by
     intro i
@@ -86,14 +85,14 @@ theorem ext_frame_of_quotient_kernel (Ω M V : Type) [Field Ω] [AddCommGroup M]
         rw [← hmap]; exact ⟨y, hy, rfl⟩
       obtain ⟨r, hr⟩ := (Submodule.mem_span_range_iff_exists_fun R).1 hmem
       set S := Submodule.span R (Set.range fun i => ∑ j, A i j • u j) with hS
-      have hhS : ∀ i, h i ∈ S := fun i => by
-        rw [← hw1 i]; exact Submodule.subset_span ⟨_, rfl⟩
+      have hhS : ∀ i, h i ∈ S := fun i => by rw [← hw1 i]; exact Submodule.subset_span ⟨_, rfl⟩
       have hCS : Submodule.span R (Set.range fun j => ∑ k, C j k • u (Fin.natAdd p k)) ≤ S := by
         rw [Submodule.span_le]
         rintro _ ⟨j, rfl⟩
         have := hw2 j
         simp only at this ⊢
-        rw [← this]; exact Submodule.subset_span ⟨_, rfl⟩
+        rw [← this]
+        exact Submodule.subset_span ⟨_, rfl⟩
       have hsumH : ∑ i, r i • h i ∈ H := Submodule.sum_mem _ fun i _ => H.smul_mem _ (hH i)
       have hsumS : ∑ i, r i • h i ∈ S := Submodule.sum_mem _ fun i _ => S.smul_mem _ (hhS i)
       have hdiff : y - ∑ i, r i • h i ∈ H := H.sub_mem hy hsumH

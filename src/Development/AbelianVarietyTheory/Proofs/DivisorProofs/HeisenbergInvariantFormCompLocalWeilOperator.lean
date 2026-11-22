@@ -9,17 +9,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LatAtVAtStab
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
 namespace GlobalTheory.InertVacEquiv
 
-theorem acts_schr_of_ref {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (v : Pl (F := F)) (ψ : AddChar (AF F) ℂ)
+theorem acts_schr_of_ref
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} [Fintype κ]
+    (v : Pl (F := F))
+    (ψ : AddChar (AF F) ℂ)
     (w : (κ → AF F) × (κ → AF F)) (h₁ : At (evFin F v) w.1) (h₂ : At (evFin F v) w.2)
     (R : (κ → AF F) → ℂ) (hR0 : R 0 ≠ 0) (hR : ∀ x z, At (evFin F v) z → R (x + z) = R x)
-    (φ φ₁ : (κ → Fv F v) → ℂ) (h : schr ψ w (tens (evFin F v) φ R) = tens (evFin F v) φ₁ R) :
-    Acts (evFin F v) (schr ψ w) φ φ₁ := by
+    (φ φ₁ : (κ → Fv F v) → ℂ) (h : schr ψ w (tens (evFin F v) φ R) = tens (evFin F v) φ₁ R)
+    : Acts (evFin F v) (schr ψ w) φ φ₁ := by
   intro r hr
   funext x
   set y : κ → AF F := fun i => GlobalTheory.LatVac.liftV v (evFin F v (x i)) with hyD
@@ -48,32 +54,41 @@ theorem acts_schr_of_ref {F : Type} [Field F] [NumberField F] {κ : Type} [Finty
   simp only [schr, tens] at key ⊢
   rw [hRyw, hRy] at key
   rw [hdot, hrx, hφ₁]
-  have hcanc : ψ (y ⬝ᵥ w.2 + ⅟(2 : AF F) * (w.1 ⬝ᵥ w.2)) * φ (fun i => evFin F v ((x + w.1) i)) =
-      φ₁ (fun i => evFin F v (y i)) := by
+  have hcanc
+      : ψ (y ⬝ᵥ w.2 + ⅟(2 : AF F) * (w.1 ⬝ᵥ w.2)) * φ (fun i => evFin F v ((x + w.1) i))
+        = φ₁ (fun i => evFin F v (y i)) := by
     apply mul_right_cancel₀ hR0
     rw [hφ, ← key, mul_assoc]
   rw [← mul_assoc, hcanc]
 
-theorem heisInv_comp : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E)
-    (a a' : ℕ) (G : Geo σ a a') (X : Chars F E) (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W), IsTriple B G X om om' →
-    ∀ (v : Pl (F := F)) (m : ℕ) (C : Matrix (Fin (a + a')) (Fin m) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))),
-    ∀ l : ((Fin a' × Fin (a + a') → Fv F v) → ℂ) →ₗ[ℂ] ℂ, GlobalTheory.InertVacLag.HeisInv G.M' B.ψ v C l →
-    ∀ g ∈ UAt σ G.V' (evFin F v),
-    ∀ S : ((Fin a' × Fin (a + a') → Fv F v) → ℂ) →ₗ[ℂ] ((Fin a' × Fin (a + a') → Fv F v) → ℂ),
-      (∀ φ ∈ SB (Fin a' × Fin (a + a') → Fv F v), S φ ∈ SB (Fin a' × Fin (a + a') → Fv F v) ∧
-        Acts (evFin F v) (om' (g, 1)) φ (S φ)) →
-      GlobalTheory.InertVacLag.HeisInv G.M' B.ψ v C (l ∘ₗ S) := by
+theorem heisInv_comp
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) (a a' : ℕ) (G : Geo σ a a') (X : Chars F E)
+        (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W),
+      IsTriple B G X om om'
+        → ∀ (v : Pl (F := F)) (m : ℕ)
+            (C : Matrix (Fin (a + a')) (Fin m)
+              (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+                (E := E))),
+          ∀ l : ((Fin a' × Fin (a + a') → Fv F v) → ℂ) →ₗ[ℂ] ℂ,
+            GlobalTheory.InertVacLag.HeisInv G.M' B.ψ v C l
+              → ∀ g ∈ UAt σ G.V' (evFin F v),
+                ∀ S : ((Fin a' × Fin (a + a') → Fv F v) → ℂ) →ₗ[ℂ] ((Fin a' × Fin (a + a') → Fv F v) → ℂ),
+                  (∀ φ ∈ SB (Fin a' × Fin (a + a') → Fv F v),
+                      S φ ∈ SB (Fin a' × Fin (a + a') → Fv F v)
+                        ∧ Acts (evFin F v) (om' (g, 1)) φ (S φ))
+                    → GlobalTheory.InertVacLag.HeisInv G.M' B.ψ v C (l ∘ₗ S) := by
   intro F E _ _ _ _ _ σ B a a' G X om om' hT v m C l hl g _ S hS u hu φ hφ φ₁ hφ₁ hA
   obtain ⟨R, hR0, hRest⟩ := GlobalTheory.RestWitness.exists_rest (Fin a' × Fin (a + a')) v
   have hsp := GlobalTheory.WeilM.IsUWeilPair.isUSplitting hT.weil'
   set u' := GlobalTheory.WeilM.actAB (cA σ) ((g, 1) : UA σ G.V'.J × UA σ G.W.J) u with hu'D
-  have hu'eq : u' = mat g * u := by
-    simp [hu'D, GlobalTheory.WeilM.actAB, mat]
+  have hu'eq : u' = mat g * u := by simp [hu'D, GlobalTheory.WeilM.actAB, mat]
   obtain ⟨huAt, z, hz⟩ := hu
   have hAt' : At (evFin F v) u' := by
     intro c hc
     rw [hu'eq, ← Matrix.mul_smul, huAt c hc, Matrix.mul_zero]
-  have hlag : u' ∈ GlobalTheory.InertVacLag.lagAt v C := ⟨hAt', mat g * z, by rw [hu'eq, hz, Matrix.mul_assoc]⟩
+  have hlag : u' ∈ GlobalTheory.InertVacLag.lagAt v C :=
+    ⟨hAt', mat g * z, by rw [hu'eq, hz, Matrix.mul_assoc]⟩
   have hco1 : At (evFin F v) (G.M'.co.e u').1 := by
     intro c hc
     rw [← Prod.smul_fst, ← map_smul, hAt' c hc, map_zero, Prod.fst_zero]

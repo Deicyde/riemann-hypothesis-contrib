@@ -20,8 +20,12 @@ open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData
 
 theorem inputs_holds : Inputs := by
   have hDecay := CompanionTheory.FamilyDerivativeExpansion.DecS.decay_infinite_range
-  exact ⟨Formalism.L2.SG.BesselDiscreteSeries.decLow, hDecay,
-    CompanionTheory.D.gk.admitted.k_finite_smooth, trivial⟩
+  exact ⟨
+    Formalism.L2.SG.BesselDiscreteSeries.decLow,
+    hDecay,
+    CompanionTheory.D.gk.admitted.k_finite_smooth,
+    trivial
+  ⟩
 
 end CompanionTheory.D.Upq.BesselFunctionalConstruction
 

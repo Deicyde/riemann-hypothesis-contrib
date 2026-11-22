@@ -18,46 +18,57 @@ open scoped TensorProduct
 
 variable {M₁ M₂ : Type*} [Monoid M₁] [Monoid M₂] {V : Type*} [AddCommGroup V] [Module ℂ V]
 
-def prodRep (ρ₁ : Representation ℂ M₁ V) (ρ₂ : Representation ℂ M₂ V)
-    (hcomm : ∀ a b, ρ₁ a * ρ₂ b = ρ₂ b * ρ₁ a) : Representation ℂ (M₁ × M₂) V where
+def prodRep
+    (ρ₁ : Representation ℂ M₁ V) (ρ₂ : Representation ℂ M₂ V)
+    (hcomm : ∀ a b, ρ₁ a * ρ₂ b = ρ₂ b * ρ₁ a)
+    : Representation ℂ (M₁ × M₂) V where
   toFun p := ρ₁ p.1 * ρ₂ p.2
   map_one' := by simp
   map_mul' p q := by
     simp only [Prod.fst_mul, Prod.snd_mul, map_mul]
-    calc ρ₁ p.1 * ρ₁ q.1 * (ρ₂ p.2 * ρ₂ q.2) = ρ₁ p.1 * (ρ₁ q.1 * ρ₂ p.2) * ρ₂ q.2 := by
-          simp only [mul_assoc]
+    calc
+      ρ₁ p.1 * ρ₁ q.1 * (ρ₂ p.2 * ρ₂ q.2)
+        = ρ₁ p.1 * (ρ₁ q.1 * ρ₂ p.2) * ρ₂ q.2 := by simp only [mul_assoc]
       _ = ρ₁ p.1 * (ρ₂ p.2 * ρ₁ q.1) * ρ₂ q.2 := by rw [hcomm]
       _ = ρ₁ p.1 * ρ₂ p.2 * (ρ₁ q.1 * ρ₂ q.2) := by simp only [mul_assoc]
 
-theorem prodRep_apply (ρ₁ : Representation ℂ M₁ V) (ρ₂ : Representation ℂ M₂ V) (hcomm)
-    (p : M₁ × M₂) (v : V) : prodRep ρ₁ ρ₂ hcomm p v = ρ₁ p.1 (ρ₂ p.2 v) :=
+theorem prodRep_apply
+    (ρ₁ : Representation ℂ M₁ V) (ρ₂ : Representation ℂ M₂ V) (hcomm) (p : M₁ × M₂) (v : V)
+    : prodRep ρ₁ ρ₂ hcomm p v = ρ₁ p.1 (ρ₂ p.2 v) :=
   rfl
 
 section Existence
 
-variable {ρ₁ : Representation ℂ M₁ V} {ρ₂ : Representation ℂ M₂ V}
+variable
+  {ρ₁ : Representation ℂ M₁ V} {ρ₂ : Representation ℂ M₂ V}
   {hcomm : ∀ a b, ρ₁ a * ρ₂ b = ρ₂ b * ρ₁ a} {e₁ e₂ : End ℂ V}
 
-def tensorForm {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂] [Module ℂ V₂]
-    (φ : Dual ℂ V₁) (ψ : Dual ℂ V₂) : Dual ℂ (V₁ ⊗[ℂ] V₂) :=
+def tensorForm
+    {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂] [Module ℂ V₂]
+    (φ : Dual ℂ V₁) (ψ : Dual ℂ V₂)
+    : Dual ℂ (V₁ ⊗[ℂ] V₂) :=
   TensorProduct.lid ℂ ℂ ∘ₗ TensorProduct.map φ ψ
 
-theorem tensorForm_tmul {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂]
-    [Module ℂ V₂] (φ : Dual ℂ V₁) (ψ : Dual ℂ V₂) (x : V₁) (y : V₂) :
-    tensorForm φ ψ (x ⊗ₜ y) = φ x * ψ y := by
+theorem tensorForm_tmul
+    {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂] [Module ℂ V₂]
+    (φ : Dual ℂ V₁) (ψ : Dual ℂ V₂) (x : V₁) (y : V₂)
+    : tensorForm φ ψ (x ⊗ₜ y) = φ x * ψ y := by
   simp [tensorForm]
 
-theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducible)
-    (he₁ : IsWinProj ρ₁ e₁) (he₂ : IsWinProj ρ₂ e₂) (he₁₂ : ∀ b, e₁ * ρ₂ b = ρ₂ b * e₁)
-    (he₂₁ : ∀ a, e₂ * ρ₁ a = ρ₁ a * e₂) (hee : e₁ * e₂ = e₂ * e₁)
-    [FiniteDimensional ℂ (LinearMap.range (e₁ * e₂))] (hne : LinearMap.range (e₁ * e₂) ≠ ⊥) :
-    ∃ (N₁ N₂ : Submodule ℂ V), N₁ ≤ LinearMap.range (e₁ * e₂) ∧ N₂ ≤ LinearMap.range (e₁ * e₂) ∧
-      N₁ ≠ ⊥ ∧ N₂ ≠ ⊥ ∧ (∀ a, ∀ n ∈ N₁, e₁ (ρ₁ a n) ∈ N₁) ∧ (∀ b, ∀ n ∈ N₂, e₂ (ρ₂ b n) ∈ N₂) ∧
-      (mGenQuotRep ρ₁ e₁ N₁).IsIrreducible ∧ (mGenQuotRep ρ₂ e₂ N₂).IsIrreducible ∧
-      ((∀ T : End ℂ ((mGenSubrep ρ₂ N₂).toSubmodule ⧸ mGenKernel ρ₂ e₂ N₂),
-          (∀ b, T * mGenQuotRep ρ₂ e₂ N₂ b = mGenQuotRep ρ₂ e₂ N₂ b * T) → ∃ c : ℂ, T = c • 1) →
-        Nonempty ((prodRep ρ₁ ρ₂ hcomm).Equiv
-          (outerTensor (mGenQuotRep ρ₁ e₁ N₁) (mGenQuotRep ρ₂ e₂ N₂)))) := by
+theorem exists_equiv_outerTensor
+    (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducible) (he₁ : IsWinProj ρ₁ e₁) (he₂ : IsWinProj ρ₂ e₂)
+    (he₁₂ : ∀ b, e₁ * ρ₂ b = ρ₂ b * e₁) (he₂₁ : ∀ a, e₂ * ρ₁ a = ρ₁ a * e₂)
+    (hee : e₁ * e₂ = e₂ * e₁)
+    [FiniteDimensional ℂ (LinearMap.range (e₁ * e₂))]
+    (hne : LinearMap.range (e₁ * e₂) ≠ ⊥)
+    : ∃ (N₁ N₂ : Submodule ℂ V),
+      N₁ ≤ LinearMap.range (e₁ * e₂) ∧ N₂ ≤ LinearMap.range (e₁ * e₂) ∧ N₁ ≠ ⊥ ∧ N₂ ≠ ⊥
+        ∧ (∀ a, ∀ n ∈ N₁, e₁ (ρ₁ a n) ∈ N₁) ∧ (∀ b, ∀ n ∈ N₂, e₂ (ρ₂ b n) ∈ N₂)
+        ∧ (mGenQuotRep ρ₁ e₁ N₁).IsIrreducible ∧ (mGenQuotRep ρ₂ e₂ N₂).IsIrreducible
+        ∧ ((∀ T : End ℂ ((mGenSubrep ρ₂ N₂).toSubmodule ⧸ mGenKernel ρ₂ e₂ N₂),
+            (∀ b, T * mGenQuotRep ρ₂ e₂ N₂ b = mGenQuotRep ρ₂ e₂ N₂ b * T) → ∃ c : ℂ, T = c • 1)
+          → Nonempty ((prodRep ρ₁ ρ₂ hcomm).Equiv
+            (outerTensor (mGenQuotRep ρ₁ e₁ N₁) (mGenQuotRep ρ₂ e₂ N₂)))) := by
   classical
   haveI := hirr
   set P := prodRep ρ₁ ρ₂ hcomm
@@ -75,14 +86,18 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
     rw [hE2 w hw, hE1 w hw]
   have hEidem : ∀ v, (e₁ * e₂) ((e₁ * e₂) v) = (e₁ * e₂) v := fun v => hEw _ ⟨v, rfl⟩
 
-  let sub₁ : Subrepresentation P → Subrepresentation ρ₁ := fun Y =>
-    ⟨Y.toSubmodule, fun a y hy => by
+  let sub₁ : Subrepresentation P → Subrepresentation ρ₁ := fun Y => ⟨
+    Y.toSubmodule,
+    fun a y hy => by
       have := Y.apply_mem_toSubmodule (a, 1) hy
-      simpa [P, prodRep_apply] using this⟩
-  let sub₂ : Subrepresentation P → Subrepresentation ρ₂ := fun Y =>
-    ⟨Y.toSubmodule, fun b y hy => by
+      simpa [P, prodRep_apply] using this
+  ⟩
+  let sub₂ : Subrepresentation P → Subrepresentation ρ₂ := fun Y => ⟨
+    Y.toSubmodule,
+    fun b y hy => by
       have := Y.apply_mem_toSubmodule (1, b) hy
-      simpa [P, prodRep_apply] using this⟩
+      simpa [P, prodRep_apply] using this
+  ⟩
   have hE : IsWinProj P (e₁ * e₂) :=
     ⟨hEidem, fun Y y hy => he₁.mem (sub₁ Y) _ (he₂.mem (sub₂ Y) _ hy)⟩
 
@@ -130,30 +145,33 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
       · exact mem_iUnion.2 ⟨true, by simp [Tp]⟩
       · exact mem_iUnion.2 ⟨false, by simp [Tp]⟩
     exact IsStable.adjoin hp _ hmem
-  have hvanish := fun i (N : Submodule ℂ W) (hN : N ≠ ⊥) (hNs : IsStable (Tp i) N)
-      (a : End ℂ W) (ha : a ∈ Algebra.adjoin ℂ (Tp i)) (h0 : ∀ x ∈ N, a x = 0) =>
-    eq_zero_of_place hsimple hcommTp i hN hNs ha h0
+  have hvanish :=
+    fun i (N : Submodule ℂ W) (hN : N ≠ ⊥) (hNs : IsStable (Tp i) N) (a : End ℂ W)
+        (ha : a ∈ Algebra.adjoin ℂ (Tp i)) (h0 : ∀ x ∈ N, a x = 0) =>
+      eq_zero_of_place hsimple hcommTp i hN hNs ha h0
   have : Nontrivial W := Submodule.nontrivial_iff_ne_bot.2 hne
   have hdata := fun i => exists_rankOne_simple (Tp i)
   choose N hNst hN0 hNsimple p hp n hnN hn0 hpn hpN using hdata
   have hpp : ∀ i, p i * p i = p i := by
     intro i
     rw [← sub_eq_zero]
-    refine hvanish i (N i) (hN0 i) (hNst i) _ (Subalgebra.sub_mem _
-      (Subalgebra.mul_mem _ (hp i) (hp i)) (hp i)) fun x hx => ?_
+    refine hvanish i (N i) (hN0 i) (hNst i) _
+      (Subalgebra.sub_mem _ (Subalgebra.mul_mem _ (hp i) (hp i)) (hp i)) fun x hx => ?_
     obtain ⟨d, hd⟩ := hpN i x hx
     rw [LinearMap.sub_apply, Module.End.mul_apply, hd, map_smul, hpn i, sub_self]
-  have hcex : ∀ i, ∀ t ∈ Tp i, ∃ c : ℂ, p i (t (n i)) = c • n i :=
-    fun i t ht => hpN i _ (hNst i t ht (n i) (hnN i))
+  have hcex : ∀ i, ∀ t ∈ Tp i, ∃ c : ℂ, p i (t (n i)) = c • n i := fun i t ht =>
+    hpN i _ (hNst i t ht (n i) (hnN i))
   have hTpT : ∀ i, ∀ t ∈ Tp i, ∀ c : ℂ, p i (t (n i)) = c • n i → p i * t * p i = c • p i := by
     intro i t ht c hc
     rw [← sub_eq_zero]
-    refine hvanish i (N i) (hN0 i) (hNst i) _ (Subalgebra.sub_mem _ (Subalgebra.mul_mem _
-      (Subalgebra.mul_mem _ (hp i) (Algebra.subset_adjoin ht)) (hp i))
-      (Subalgebra.smul_mem _ (hp i) _)) fun y hy => ?_
+    refine hvanish i (N i) (hN0 i) (hNst i) _
+      (Subalgebra.sub_mem _
+        (Subalgebra.mul_mem _ (Subalgebra.mul_mem _ (hp i) (Algebra.subset_adjoin ht)) (hp i))
+        (Subalgebra.smul_mem _ (hp i) _))
+      fun y hy => ?_
     obtain ⟨d, hd⟩ := hpN i y hy
-    rw [LinearMap.sub_apply, Module.End.mul_apply, Module.End.mul_apply, hd, map_smul, map_smul,
-      hc, LinearMap.smul_apply, hd, smul_comm, sub_self]
+    rw [LinearMap.sub_apply, Module.End.mul_apply, Module.End.mul_apply, hd, map_smul, map_smul, hc,
+      LinearMap.smul_apply, hd, smul_comm, sub_self]
   have hcommp : Commute (p true) (p false) :=
     commute_adjoin hcommTp (by decide) (hp true) (hp false)
   have hT₁mem : ∀ a, T₁ a ∈ Tp true := fun a => by simp [Tp]
@@ -186,8 +204,11 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
   obtain ⟨x₁, hx₁⟩ : ∃ y ∈ (⊤ : Submodule ℂ W), p true y ≠ 0 := by
     by_contra hcon
     push Not at hcon
-    have := hvanish true ⊤ top_ne_bot (fun _ _ _ _ => trivial) (p true) (hp true)
-      fun x _ => hcon x trivial
+    have :=
+      hvanish true ⊤ top_ne_bot
+        (fun _ _ _ _ => trivial)
+        (p true) (hp true)
+        fun x _ => hcon x trivial
     apply hn0 true
     rw [← hpn true, this, LinearMap.zero_apply]
   set y₁ := p true x₁
@@ -197,9 +218,10 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
   let Y : Submodule ℂ W := LinearMap.ker (p true - 1)
   have hY : y₁ ∈ Y := by
     rw [LinearMap.mem_ker, LinearMap.sub_apply, hy₁, Module.End.one_apply, sub_self]
-  have hY0 : Y ≠ ⊥ := fun h => hx₁.2 (by
-    have : y₁ ∈ (⊥ : Submodule ℂ W) := h ▸ hY
-    simpa using this)
+  have hY0 : Y ≠ ⊥ := fun h =>
+    hx₁.2 (by
+      have : y₁ ∈ (⊥ : Submodule ℂ W) := h ▸ hY
+      simpa using this)
   have hYs : IsStable (Tp false) Y := by
     intro t ht y hy
     rw [LinearMap.mem_ker, LinearMap.sub_apply, Module.End.one_apply, sub_eq_zero] at hy ⊢
@@ -227,8 +249,7 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
     push Not at hcon
     exact hxs0 ((Module.forall_dual_apply_eq_zero_iff ℂ xs).1 hcon)
   set φ : Dual ℂ W := (φ₀ xs)⁻¹ • (φ₀ ∘ₗ p true ∘ₗ p false)
-  have hφ1 : φ xs = 1 := by
-    simp [φ, hxs2, hxs1, hφ₀]
+  have hφ1 : φ xs = 1 := by simp [φ, hxs2, hxs1, hφ₀]
   have hφp1 : ∀ w, φ (p true w) = φ w := fun w => by
     simp only [φ, LinearMap.smul_apply, LinearMap.comp_apply]
     rw [← Module.End.mul_apply (p false), ← hcommp.eq, Module.End.mul_apply,
@@ -270,16 +291,20 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
   have hN₂st : ∀ b, ∀ x ∈ N₂, e₂ (ρ₂ b x) ∈ N₂ := by
     rintro b _ ⟨w, hw, rfl⟩
     exact ⟨T₂ b w, hNst false _ (hT₂mem b) w hw, hT₂ b w⟩
-  have hN₁0 : N₁ ≠ ⊥ := fun h => hn0 true (by
-    have : ((n true : W) : V) ∈ N₁ := ⟨n true, hnN true, rfl⟩
-    rw [h, Submodule.mem_bot] at this
-    exact Subtype.ext this)
-  have hN₂0 : N₂ ≠ ⊥ := fun h => hn0 false (by
-    have : ((n false : W) : V) ∈ N₂ := ⟨n false, hnN false, rfl⟩
-    rw [h, Submodule.mem_bot] at this
-    exact Subtype.ext this)
-  have hmin : ∀ i (M' : Submodule ℂ V), (∀ t ∈ Tp i, ∀ w : W, (w : V) ∈ M' → (t w : V) ∈ M') →
-      M' ≤ (N i).map W.subtype → M' ≠ ⊥ → M' = (N i).map W.subtype := by
+  have hN₁0 : N₁ ≠ ⊥ := fun h =>
+    hn0 true (by
+      have : ((n true : W) : V) ∈ N₁ := ⟨n true, hnN true, rfl⟩
+      rw [h, Submodule.mem_bot] at this
+      exact Subtype.ext this)
+  have hN₂0 : N₂ ≠ ⊥ := fun h =>
+    hn0 false (by
+      have : ((n false : W) : V) ∈ N₂ := ⟨n false, hnN false, rfl⟩
+      rw [h, Submodule.mem_bot] at this
+      exact Subtype.ext this)
+  have hmin
+      : ∀ i (M' : Submodule ℂ V),
+        (∀ t ∈ Tp i, ∀ w : W, (w : V) ∈ M' → (t w : V) ∈ M') → M' ≤ (N i).map W.subtype → M' ≠ ⊥
+          → M' = (N i).map W.subtype := by
     intro i M' hst hle hne'
     set q : Submodule ℂ (N i) := (M'.comap W.subtype).comap (N i).subtype
     have hq : IsStable (restrictSet (Tp i) (N i) (hNst i)) q := by
@@ -298,18 +323,26 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
     rintro _ ⟨m, hm, rfl⟩
     have : (⟨m, hm⟩ : N i) ∈ q := hqt ▸ Submodule.mem_top
     exact this
-  have hN₁min : ∀ N' : Submodule ℂ V, N' ≤ N₁ → N' ≠ ⊥ → (∀ a, ∀ x ∈ N', e₁ (ρ₁ a x) ∈ N') →
-      N' = N₁ := fun N' hle hne' hst => hmin true N' (fun t ht w hw => by
+  have hN₁min
+      : ∀ N' : Submodule ℂ V,
+        N' ≤ N₁ → N' ≠ ⊥ → (∀ a, ∀ x ∈ N', e₁ (ρ₁ a x) ∈ N') → N' = N₁ := fun N' hle hne' hst =>
+    hmin true N'
+      (fun t ht w hw => by
         simp only [Tp, if_true] at ht
         obtain ⟨a, rfl⟩ := ht
         rw [hT₁]
-        exact hst a w hw) hle hne'
-  have hN₂min : ∀ N' : Submodule ℂ V, N' ≤ N₂ → N' ≠ ⊥ → (∀ b, ∀ x ∈ N', e₂ (ρ₂ b x) ∈ N') →
-      N' = N₂ := fun N' hle hne' hst => hmin false N' (fun t ht w hw => by
+        exact hst a w hw)
+      hle hne'
+  have hN₂min
+      : ∀ N' : Submodule ℂ V,
+        N' ≤ N₂ → N' ≠ ⊥ → (∀ b, ∀ x ∈ N', e₂ (ρ₂ b x) ∈ N') → N' = N₂ := fun N' hle hne' hst =>
+    hmin false N'
+      (fun t ht w hw => by
         simp only [Tp, if_false, Bool.false_eq_true] at ht
         obtain ⟨b, rfl⟩ := ht
         rw [hT₂]
-        exact hst b w hw) hle hne'
+        exact hst b w hw)
+      hle hne'
   have hπ₁ := isIrreducible_mGenQuotRep he₁ hN₁e hN₁st hN₁0 hN₁min
   have hπ₂ := isIrreducible_mGenQuotRep he₂ hN₂e hN₂st hN₂0 hN₂min
   refine ⟨N₁, N₂, hN₁W, hN₂W, hN₁0, hN₂0, hN₁st, hN₂st, hπ₁, hπ₂, fun hschur => ?_⟩
@@ -335,8 +368,8 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
   set l₂ : Dual ℂ V := ψ₂ ∘ₗ p false ∘ₗ E'
   let n₁ : N₁ := ⟨(n true : V), ⟨n true, hnN true, rfl⟩⟩
   let n₂ : N₂ := ⟨(n false : V), ⟨n false, hnN false, rfl⟩⟩
-  have hloc₁ : ∀ a, mGenQuotForm ρ₁ e₁ N₁ l₁ (mGenQuotRep ρ₁ e₁ N₁ a (mGenQuotMk ρ₁ e₁ N₁ n₁)) =
-      c₁ a := by
+  have hloc₁
+      : ∀ a, mGenQuotForm ρ₁ e₁ N₁ l₁ (mGenQuotRep ρ₁ e₁ N₁ a (mGenQuotMk ρ₁ e₁ N₁ n₁)) = c₁ a := by
     intro a
     rw [mGenQuotForm_apply]
     have : E' (e₁ (ρ₁ a n₁)) = T₁ a (n true) := by
@@ -344,8 +377,8 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
       exact hE' (T₁ a (n true))
     simp only [l₁, LinearMap.comp_apply]
     rw [this, hc₁, map_smul, hψ₁, smul_eq_mul, mul_one]
-  have hloc₂ : ∀ b, mGenQuotForm ρ₂ e₂ N₂ l₂ (mGenQuotRep ρ₂ e₂ N₂ b (mGenQuotMk ρ₂ e₂ N₂ n₂)) =
-      c₂ b := by
+  have hloc₂
+      : ∀ b, mGenQuotForm ρ₂ e₂ N₂ l₂ (mGenQuotRep ρ₂ e₂ N₂ b (mGenQuotMk ρ₂ e₂ N₂ n₂)) = c₂ b := by
     intro b
     rw [mGenQuotForm_apply]
     have : E' (e₂ (ρ₂ b n₂)) = T₂ b (n false) := by
@@ -356,7 +389,8 @@ theorem exists_equiv_outerTensor (hirr : (prodRep ρ₁ ρ₂ hcomm).IsIrreducib
   refine nonempty_equiv_of_matrixCoeff_eq' (v := (xs : V)) (l := φ ∘ₗ E')
     (w := mGenQuotMk ρ₁ e₁ N₁ n₁ ⊗ₜ mGenQuotMk ρ₂ e₂ N₂ n₂)
     (m := tensorForm (mGenQuotForm ρ₁ e₁ N₁ l₁) (mGenQuotForm ρ₂ e₂ N₂ l₂))
-    (fun ⟨a, b⟩ => ?_) ⟨1, ?_⟩
+    (fun ⟨a, b⟩ => ?_)
+    ⟨1, ?_⟩
   · rw [outerTensor_tmul, tensorForm_tmul, hloc₁, hloc₂, LinearMap.comp_apply]
     rw [← hcoefV a b]
     rfl

@@ -15,7 +15,8 @@ public import Development.AbelianVarietyTheory.Statements.FundamentalDomains.Exi
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
 open MonoidalCategory CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -24,14 +25,20 @@ noncomputable section
 
 namespace GlobalTheory.FibreAbDim
 
-theorem exists_isLieBasis_of_frame {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {X : Scheme.{0}}
-    (t : SAB H X) {R : Type} [CommRing R] (x : Sp R ⟶ X) {G' : Over (Sp R)} [GrpObj G'] {φ : G'.left ⟶ t.G.left}
-    (h : IsGrpPullback G' t.G x φ) {n : ℕ} (v : Fin n → (Sp (DualNumber R) ⟶ t.G.left))
-    (hv : ∀ a, IsTanAtG t x (v a))
-    (hb : ∀ w, IsTanAtG t x w → ∃! cf : Fin n → R, IsCombAtG t x v cf w) :
-    ∃ v' : Fin n → (epsR R ⟶ G'), IsLieBasis v' := by
-  obtain ⟨ρ, hρ⟩ := GlobalTheory.HeckePoint.exists_ptsEquiv h (epsR R) (spMap (algebraMap R (DualNumber R)) ≫ x) rfl
-  obtain ⟨σ, hσ⟩ := GlobalTheory.HeckePoint.exists_ptsEquiv h (𝟙_ (Over (Sp R))) x (Category.id_comp _)
+theorem exists_isLieBasis_of_frame
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} {X : Scheme.{0}} (t : SAB H X)
+    {R : Type} [CommRing R]
+    (x : Sp R ⟶ X)
+    {G' : Over (Sp R)} [GrpObj G']
+    {φ : G'.left ⟶ t.G.left} (h : IsGrpPullback G' t.G x φ)
+    {n : ℕ} (v : Fin n → (Sp (DualNumber R) ⟶ t.G.left)) (hv : ∀ a, IsTanAtG t x (v a))
+    (hb : ∀ w, IsTanAtG t x w → ∃! cf : Fin n → R, IsCombAtG t x v cf w)
+    : ∃ v' : Fin n → (epsR R ⟶ G'), IsLieBasis v' := by
+  obtain ⟨ρ, hρ⟩ :=
+    GlobalTheory.HeckePoint.exists_ptsEquiv h (epsR R) (spMap (algebraMap R (DualNumber R)) ≫ x) rfl
+  obtain ⟨σ, hσ⟩ :=
+    GlobalTheory.HeckePoint.exists_ptsEquiv h (𝟙_ (Over (Sp R))) x (Category.id_comp _)
   have h1 : η[G'].left ≫ φ = (1 : Over.mk x ⟶ t.G).left := by
     have := hσ 1
     rw [map_one] at this
@@ -55,7 +62,8 @@ theorem exists_isLieBasis_of_frame {E : Type} [Field E] [NumberField E] [IsCMFie
   have hv' : ∀ a, (v' a).left ≫ φ = v a := fun a => by
     rw [← hρ]
     simp [v']
-  have comb : ∀ (c : Fin n → R) (w : epsR R ⟶ G'), IsLieComb c v' w ↔ IsCombAtG t x v c (ρ w).left := by
+  have comb
+      : ∀ (c : Fin n → R) (w : epsR R ⟶ G'), IsLieComb c v' w ↔ IsCombAtG t x v c (ρ w).left := by
     intro c w
     constructor
     · rintro ⟨u, hu, rfl⟩
@@ -87,12 +95,25 @@ theorem exists_isLieBasis_of_frame {E : Type} [Field E] [NumberField E] [IsCMFie
     exact hv a
   · simpa only [comb] using hb _ ((tan w).1 hw)
 
-theorem isAbelianScheme_and_relDim : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X : Scheme.{0}) (t : SAB H X), IsProper t.G.hom → ∀ (U : X.affineOpens) (n : ℕ) (v : Fin n → (Sp (DualNumber Γ(X, U.1)) ⟶ t.G.left)), (∀ a, IsTanAtG t (chart U) (v a)) → (∀ w, IsTanAtG t (chart U) w → ∃! cf : Fin n → Γ(X, U.1), IsCombAtG t (chart U) v cf w) → ∀ (m : Ideal Γ(X, U.1)), m.IsMaximal → ∀ (A : Over (Sp (Γ(X, U.1) ⧸ m))) [GrpObj A] (j : A.left ⟶ t.G.left), IsGrpPullback A t.G (spMap (Ideal.Quotient.mk m) ≫ chart U) j → IsAbelianScheme A ∧ SmoothOfRelativeDimension n A.hom := by
+theorem isAbelianScheme_and_relDim
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X : Scheme.{0})
+        (t : SAB H X),
+      IsProper t.G.hom
+        → ∀ (U : X.affineOpens) (n : ℕ) (v : Fin n → (Sp (DualNumber Γ(X, U.1)) ⟶ t.G.left)),
+          (∀ a, IsTanAtG t (chart U) (v a))
+            → (∀ w,
+              IsTanAtG t (chart U) w → ∃! cf : Fin n → Γ(X, U.1), IsCombAtG t (chart U) v cf w)
+            → ∀ (m : Ideal Γ(X, U.1)),
+              m.IsMaximal
+                → ∀ (A : Over (Sp (Γ(X, U.1) ⧸ m))) [GrpObj A] (j : A.left ⟶ t.G.left),
+                  IsGrpPullback A t.G (spMap (Ideal.Quotient.mk m) ≫ chart U) j
+                    → IsAbelianScheme A ∧ SmoothOfRelativeDimension n A.hom := by
   intro E _ _ _ H X t hp U n v hv hb m hm A _ j hj
   have hG := GlobalTheory.HeckePoint.isAbelianScheme_of_proper t hp
-  have pullAb : ∀ {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} {G' : Over S'}
-      [GrpObj G] [GrpObj G'] {φ : G'.left ⟶ G.left},
-      IsAbelianScheme G → IsGrpPullback G' G f φ → IsAbelianScheme G' := by
+  have pullAb
+      : ∀ {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+          {φ : G'.left ⟶ G.left},
+        IsAbelianScheme G → IsGrpPullback G' G f φ → IsAbelianScheme G' := by
     intro S S' f G G' _ _ φ hG h
     have := hG.comm
     have hc : IsCommMonObj G' := by
@@ -101,9 +122,12 @@ theorem isAbelianScheme_and_relDim : ∀ (E : Type) [Field E] [NumberField E] [I
       refine ⟨⟨fun x y => Over.OverMorphism.ext (h.1.hom_ext ?_ (by rw [Over.w, Over.w]))⟩⟩
       rw [← h.2 T x y (pushPt h.1.w x) (pushPt h.1.w y) rfl rfl,
         ← h.2 T y x (pushPt h.1.w y) (pushPt h.1.w x) rfl rfl, _root_.mul_comm]
-    exact ⟨hc, MorphismProperty.of_isPullback (P := @Smooth) h.1 hG.smooth,
+    exact ⟨
+      hc,
+      MorphismProperty.of_isPullback (P := @Smooth) h.1 hG.smooth,
       MorphismProperty.of_isPullback (P := @IsProper) h.1 hG.proper,
-      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hG.geomConnected⟩
+      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hG.geomConnected
+    ⟩
   have hA := pullAb hG hj
   refine ⟨hA, ?_⟩
   have h₀ := isGrpPullback_pullback t.G (chart U)
@@ -115,7 +139,8 @@ theorem isAbelianScheme_and_relDim : ∀ (E : Type) [Field E] [NumberField E] [I
   have := hG'.comm
   have := hA.comm
   have := hG.comm
-  obtain ⟨v₁, hv₁, -⟩ := GlobalTheory.exists_isLieBasis_baseChange _ _ _ _ A _ h₁ hG'.smooth n v' hv'
+  obtain ⟨v₁, hv₁, -⟩ :=
+    GlobalTheory.exists_isLieBasis_baseChange _ _ _ _ A _ h₁ hG'.smooth n v' hv'
   have : IsLocalRing (Γ(X, U.1) ⧸ m) := by
     letI := Ideal.Quotient.field m
     infer_instance

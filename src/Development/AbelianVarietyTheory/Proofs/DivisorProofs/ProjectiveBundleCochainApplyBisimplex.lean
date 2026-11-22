@@ -5,16 +5,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CrossTZeroRi
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC GlobalTheory.EtC.CupSpec GlobalTheory.EZ GlobalTheory.PBFc
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC GlobalTheory.EtC.CupSpec GlobalTheory.EZ GlobalTheory.PBFc
 
 noncomputable section
 
 namespace GlobalTheory.PBFc
 
-theorem evT_finsetSum {R : Type} [CommRing R] {X : SimplicialObject Spc} {L : Cx R} {t : ℤ} {ι : Type} (S : Finset ι)
-    (γ : ι → Cochain (totChains R X) L t) (a b : ℕ) (s : ℤ)
-    (h : -((a + b : ℕ) : ℤ) + t = s) (U : Scheme.{0}) (y : BSx X a b U) :
-    evT (∑ j ∈ S, γ j) a b s h U y = ∑ j ∈ S, evT (γ j) a b s h U y := by
+theorem evT_finsetSum
+    {R : Type} [CommRing R]
+    {X : SimplicialObject Spc} {L : Cx R} {t : ℤ} {ι : Type}
+    (S : Finset ι) (γ : ι → Cochain (totChains R X) L t)
+    (a b : ℕ) (s : ℤ) (h : -((a + b : ℕ) : ℤ) + t = s)
+    (U : Scheme.{0}) (y : BSx X a b U)
+    : evT (∑ j ∈ S, γ j) a b s h U y = ∑ j ∈ S, evT (γ j) a b s h U y := by
   classical
   induction S using Finset.induction_on with
   | empty => rw [Finset.sum_empty, Finset.sum_empty, evT_zero]

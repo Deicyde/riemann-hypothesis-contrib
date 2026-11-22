@@ -9,8 +9,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.DivLC
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Filter
-  Asymptotics ReciprocityTheory.ChartRestriction.G.AR.Up
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology Filter Asymptotics ReciprocityTheory.ChartRestriction.G.AR.Up
 open scoped ContDiff ENNReal Matrix
 
 noncomputable section
@@ -47,15 +48,16 @@ theorem lact_one' (y : Frame X.Ψ r) : lact (1 : GL (Fin r) E) y = y := by
   rw [Matrix.map_one _ (map_zero _) (map_one _), one_mul]
   rfl
 
-theorem s_xs_zero {Xa : ArchInM X} (Fl : FlatM X Xa) (j : Fin Fl.δ) (k : Fin (nd X)) :
-    Fl.s k (Fl.xs j) = 0 := by
+theorem s_xs_zero {Xa : ArchInM X} (Fl : FlatM X Xa) (j : Fin Fl.δ) (k : Fin (nd X))
+    : Fl.s k (Fl.xs j) = 0 := by
   have he : Fl.xs j = lact (1 : GL (Fin r) E) (rmul (Fl.xs j) (nmat X 0)) := by
     rw [lact_one']
     exact (cpt_zero' X (Fl.xs j)).symm
   exact (Fl.S_eq (Fl.xs j) (Fl.xs_mem j)).mpr ⟨j, 1, X.Γ.one_mem, nmat X 0, nmat_zero_mem X, he⟩ k
 
-theorem anal_loc {P : Frame X.Ψ r → ℂ} (hP : DifferentiableOn ℂ P X.dom) {x : Frame X.Ψ r}
-    (hx : x ∈ X.dom) : AnalyticAt ℂ (fun z => P (cpt X x z)) 0 := by
+theorem anal_loc
+    {P : Frame X.Ψ r → ℂ} (hP : DifferentiableOn ℂ P X.dom) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    : AnalyticAt ℂ (fun z => P (cpt X x z)) 0 := by
   have hc := OntoB.cd_cpt X x
   have hU : IsOpen {z : V (nd X) | cpt X x z ∈ X.dom} :=
     (FourierCoefficientDomain.isOpen_dom X).preimage hc.continuous

@@ -21,8 +21,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LinearUniform
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 open GlobalTheory.FlatTors GlobalTheory.IndefiniteRowSideFullHecke.FlatIsoUnitGenerator
 open scoped TensorProduct
@@ -33,7 +35,8 @@ noncomputable section
 
 namespace GlobalTheory.TorsRepMap
 
-open ReciprocityTheory.ChartRestriction.G.DVR GlobalTheory.TorsionFormCompare GlobalTheory.TorusModel GlobalTheory.FieldRestrictionTest
+open ReciprocityTheory.ChartRestriction.G.DVR GlobalTheory.TorsionFormCompare
+  GlobalTheory.TorusModel GlobalTheory.FieldRestrictionTest
 
 section Points
 
@@ -43,7 +46,9 @@ variable {Gt : Over (Sp R)} [GrpObj Gt] {Φ : ∀ T, (T ⟶ Gt) ≃ GtPt D T}
 
 end Points
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
-  {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {t : SAB H (Sp R)}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {t : SAB H (Sp R)}
 
 end GlobalTheory.TorsRepMap

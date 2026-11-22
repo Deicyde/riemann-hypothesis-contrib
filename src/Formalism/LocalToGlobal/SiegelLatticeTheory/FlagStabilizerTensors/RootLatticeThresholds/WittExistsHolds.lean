@@ -20,8 +20,9 @@ section Flag
 
 variable {D : D7} {T : D.host.E}
 
-theorem flag_span_orth (F : FlagG (VS D) D.R.rS T) {x : (VS D).V}
-    (hx : x ∈ Submodule.span D.host.E (Set.range F.e)) : (VS D).hT x F.z = 0 := by
+theorem flag_span_orth
+    (F : FlagG (VS D) D.R.rS T) {x : (VS D).V} (hx : x ∈ Submodule.span D.host.E (Set.range F.e))
+    : (VS D).hT x F.z = 0 := by
   induction hx using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨a, rfl⟩ := hy
@@ -30,7 +31,8 @@ theorem flag_span_orth (F : FlagG (VS D) D.R.rS T) {x : (VS D).V}
   | add y w _ _ hy hw => simp [hy, hw]
   | smul c y _ hy => simp [hy]
 
-theorem flag_fvec_indep (hT : T ≠ 0) (F : FlagG (VS D) D.R.rS T) : LinearIndependent D.host.E F.fvec := by
+theorem flag_fvec_indep (hT : T ≠ 0) (F : FlagG (VS D) D.R.rS T)
+    : LinearIndependent D.host.E F.fvec := by
   unfold FlagG.fvec
   rw [linearIndependent_finSnoc]
   refine ⟨F.e_indep, fun hz => hT ?_⟩
@@ -38,9 +40,10 @@ theorem flag_fvec_indep (hT : T ≠ 0) (F : FlagG (VS D) D.R.rS T) : LinearIndep
   rw [F.z_norm] at h1
   exact neg_eq_zero.1 h1
 
-theorem flag_gram {T' : D.host.E} (hTT : T = T') (F : FlagG (VS D) D.R.rS T) (F' : FlagG (VS D) D.R.rS T')
-    (i j : Fin (D.R.rS + 1)) :
-    (VS D).hT (F.fvec i) (F.fvec j) = (VS D).hT (F'.fvec i) (F'.fvec j) := by
+theorem flag_gram
+    {T' : D.host.E} (hTT : T = T')
+    (F : FlagG (VS D) D.R.rS T) (F' : FlagG (VS D) D.R.rS T') (i j : Fin (D.R.rS + 1))
+    : (VS D).hT (F.fvec i) (F.fvec j) = (VS D).hT (F'.fvec i) (F'.fvec j) := by
   subst hTT
   have hze : ∀ (G : FlagG (VS D) D.R.rS T) (a : Fin D.R.rS), (VS D).hT G.z (G.e a) = 0 := by
     intro G a
@@ -55,16 +58,19 @@ theorem flag_gram {T' : D.host.E} (hTT : T = T') (F : FlagG (VS D) D.R.rS T) (F'
     | last => simp only [FlagG.fvec, Fin.snoc_last, Fin.snoc_castSucc, F.z_orth, F'.z_orth]
     | cast b => simp only [FlagG.fvec, Fin.snoc_castSucc, F.e_iso, F'.e_iso]
 
-theorem flag_witt {T' : D.host.E} (hT : T ≠ 0) (hTT : T = T') (F : FlagG (VS D) D.R.rS T)
-    (F' : FlagG (VS D) D.R.rS T') :
-    ∃ δ : (VS D).V ≃ₗ[D.host.E] (VS D).V, δ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT ∧ (∀ a, δ (F.e a) = F'.e a) ∧
-      δ F.z = F'.z := by
+theorem flag_witt
+    {T' : D.host.E}
+    (hT : T ≠ 0) (hTT : T = T') (F : FlagG (VS D) D.R.rS T) (F' : FlagG (VS D) D.R.rS T')
+    : ∃ δ : (VS D).V ≃ₗ[D.host.E] (VS D).V,
+      δ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT ∧ (∀ a, δ (F.e a) = F'.e a)
+        ∧ δ F.z = F'.z := by
   have hind := flag_fvec_indep hT F
   have hind' := flag_fvec_indep (hTT ▸ hT) F'
   set U := Submodule.span D.host.E (Set.range F.fvec) with hU
   let b : Module.Basis (Fin (D.R.rS + 1)) D.host.E U := Module.Basis.span hind
   let f : U →ₗ[D.host.E] (VS D).V :=
-    Finsupp.linearCombination D.host.E F'.fvec ∘ₗ (b.repr : U →ₗ[D.host.E] (Fin (D.R.rS + 1) →₀ D.host.E))
+    Finsupp.linearCombination D.host.E F'.fvec
+      ∘ₗ (b.repr : U →ₗ[D.host.E] (Fin (D.R.rS + 1) →₀ D.host.E))
   have hfb : ∀ i, f (b i) = F'.fvec i := by
     intro i
     simp [f, Module.Basis.repr_self, Finsupp.linearCombination_single]
@@ -82,8 +88,11 @@ theorem flag_witt {T' : D.host.E} (hT : T ≠ 0) (hTT : T = T') (F : FlagG (VS D
     intro x y
     have h := congrArg (fun B => B x y) hB
     simpa only [LinearMap.compl₂_apply, LinearMap.comp_apply, Submodule.subtype_apply] using h
-  obtain ⟨g, hg, hgf⟩ := _root_.witt_extension_theorem D.host.E (VS D).V (VS D).hT
-    (fun x y => (VS D).herm.eq x y) (fun x hx => (VS D).nondeg.1 x hx) U f hinj hiso
+  obtain ⟨g, hg, hgf⟩ :=
+    _root_.witt_extension_theorem D.host.E (VS D).V (VS D).hT
+      (fun x y => (VS D).herm.eq x y)
+      (fun x hx => (VS D).nondeg.1 x hx)
+      U f hinj hiso
   have hgi : ∀ i, g (F.fvec i) = F'.fvec i := by
     intro i
     have h := hgf (b i)

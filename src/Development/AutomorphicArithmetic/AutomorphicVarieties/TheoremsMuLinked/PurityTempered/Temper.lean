@@ -5,13 +5,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Th
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Th
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.V.Th.temper :
-    Af.Hypotheses₂ → ∀ (F Ω : Type) [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (n : ℕ), 1 ≤ n → ∀ (π : CuspSub F n), (CG.mk π).IsRegAlg → (∃ χ, GlobalTheory.ContraPair.PolarizedPair π χ) → ∀ (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (k := w.adicCompletion F) → WD h), IsRec h rc → ∀ σ, π.IsLocComp w σ → ∃ t : ℝ, ((rc (algNorm σ)).lpTw t).tempered := by
+theorem UpperTheory.V.Th.temper
+    : Af.Hypotheses₂
+      → ∀ (F Ω : Type) [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω]
+          [IsAlgClosure F Ω] (n : ℕ),
+        1 ≤ n
+          → ∀ (π : CuspSub F n),
+            (CG.mk π).IsRegAlg → (∃ χ, GlobalTheory.ContraPair.PolarizedPair π χ)
+              → ∀ (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w)
+                  (rc : IrrGL (k := w.adicCompletion F) → WD h),
+                IsRec h rc
+                  → ∀ σ, π.IsLocComp w σ → ∃ t : ℝ, ((rc (algNorm σ)).lpTw t).tempered := by
   intro hP F Ω _ _ _ _ _ _ n hn π hreg ⟨χ, hpol⟩ w A h rc hrc σ hσ
   obtain ⟨l, hlp, hl⟩ : ∃ l : ℕ, l.Prime ∧ ((l : ℕ) : 𝓞 F) ∉ w.asIdeal := by
     by_cases h2 : ((2 : ℕ) : 𝓞 F) ∈ w.asIdeal

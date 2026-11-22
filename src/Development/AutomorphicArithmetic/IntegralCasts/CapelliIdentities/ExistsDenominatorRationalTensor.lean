@@ -5,12 +5,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOf
 
 @[expose] public section
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.Qh61.VQ :
-    {p : ℕ} → [inst : Fact (Nat.Prime p)] → GlobalTheory.UPel.HT.Datum p → Type :=
-    fun {p : ℕ} [Fact (Nat.Prime p)] (D : GlobalTheory.UPel.HT.Datum p) ↦ TensorProduct ℤ ℚ D.La
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.Qh61.VQ
+    : {p : ℕ} → [inst : Fact (Nat.Prime p)] → GlobalTheory.UPel.HT.Datum p → Type :=
+  fun {p : ℕ} [Fact (Nat.Prime p)] (D : GlobalTheory.UPel.HT.Datum p) ↦ TensorProduct ℤ ℚ D.La
 
-private theorem UpperTheory.Reformulated.B.Qh61.exists_den {M : Type} [AddCommGroup M] (x : TensorProduct ℤ ℚ M) :
-    ∃ k : ℕ, 0 < k ∧ ∃ a : M, k • x = (1 : ℚ) ⊗ₜ[ℤ] a := by
+private theorem UpperTheory.Reformulated.B.Qh61.exists_den
+    {M : Type} [AddCommGroup M] (x : TensorProduct ℤ ℚ M)
+    : ∃ k : ℕ, 0 < k ∧ ∃ a : M, k • x = (1 : ℚ) ⊗ₜ[ℤ] a := by
   induction x using TensorProduct.induction_on with
   | zero => exact ⟨1, one_pos, 0, by simp⟩
   | tmul q m =>
@@ -26,9 +28,9 @@ private theorem UpperTheory.Reformulated.B.Qh61.exists_den {M : Type} [AddCommGr
       map_nsmul (TensorProduct.mk ℤ ℚ M 1) n c
     rw [TensorProduct.tmul_add, e, e, ← ha, ← hb, smul_add, smul_smul, smul_smul, mul_comm l k]
 
-private theorem UpperTheory.Reformulated.B.Qh61.exists_denominator_rational_tensor {M : Type} [AddCommGroup M]
-    (s : Finset (TensorProduct ℤ ℚ M)) :
-    ∃ k : ℕ, 0 < k ∧ ∀ x ∈ s, ∃ a : M, k • x = (1 : ℚ) ⊗ₜ[ℤ] a := by
+private theorem UpperTheory.Reformulated.B.Qh61.exists_denominator_rational_tensor
+    {M : Type} [AddCommGroup M] (s : Finset (TensorProduct ℤ ℚ M))
+    : ∃ k : ℕ, 0 < k ∧ ∀ x ∈ s, ∃ a : M, k • x = (1 : ℚ) ⊗ₜ[ℤ] a := by
   classical
   choose d hd a ha using fun x : TensorProduct ℤ ℚ M => UpperTheory.Reformulated.B.Qh61.exists_den x
   refine ⟨∏ x ∈ s, d x, Finset.prod_pos fun x _ => hd x, fun x hx => ?_⟩
@@ -37,8 +39,10 @@ private theorem UpperTheory.Reformulated.B.Qh61.exists_denominator_rational_tens
   rw [hc, mul_comm, mul_smul, ha]
   exact (map_nsmul (TensorProduct.mk ℤ ℚ M 1) c (a x)).symm
 
-theorem UpperTheory.Reformulated.B.Qh61.exists_den_finset :
-    ∀ {p : ℕ} [inst : Fact (Nat.Prime p)] (D : GlobalTheory.UPel.HT.Datum p) (s : Finset (UpperTheory.Reformulated.B.Qh61.VQ D)),
-      ∃ (k : ℕ), (0 : ℕ) < k ∧ ∀ x ∈ s, ∃ (a : D.La), k • x = (1 : ℚ) ⊗ₜ[ℤ] a := by
+theorem UpperTheory.Reformulated.B.Qh61.exists_den_finset
+    : ∀ {p : ℕ} [inst : Fact (Nat.Prime p)] (D : GlobalTheory.UPel.HT.Datum p)
+        (s : Finset (UpperTheory.Reformulated.B.Qh61.VQ D)),
+      ∃ (k : ℕ),
+        (0 : ℕ) < k ∧ ∀ x ∈ s, ∃ (a : D.La), k • x = (1 : ℚ) ⊗ₜ[ℤ] a := by
   intro p _ D s
   exact UpperTheory.Reformulated.B.Qh61.exists_denominator_rational_tensor s

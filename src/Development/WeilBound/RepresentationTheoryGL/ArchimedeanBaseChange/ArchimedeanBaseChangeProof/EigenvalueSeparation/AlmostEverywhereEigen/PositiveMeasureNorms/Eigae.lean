@@ -14,11 +14,19 @@ theorem eigae : WeakAE → EigAE := by
   intro hW X ι S _ _ ν _ F f Φ σ A hFc hrep hΦ hσ hσA hE
   have hfm : ∀ j, Measurable (Function.uncurry (f j)) := fun j => (hrep j).1
   have hfx : ∀ j x, Measurable (f j x) := fun j x => (hfm j).comp measurable_prodMk_left
-  have key : ∀ i x, ∀ᵐ s ∂ν, ∑ j, ∫ y, Φ i j y * conj (f j (x * y) s) ∂X.μ = σ s * conj (f i x s) := by
+  have key
+      : ∀ i x, ∀ᵐ s ∂ν, ∑ j, ∫ y, Φ i j y * conj (f j (x * y) s) ∂X.μ = σ s * conj (f i x s) := by
     intro i x
-    refine hW X.G S ι X.μ ν (fun j y => F j (x * y)) (fun j y => f j (x * y)) (fun j => Φ i j)
-      (fun s => σ s * conj (f i x s)) (fun j => ⟨?_, fun y => (hrep j).2 (x * y)⟩)
-      (fun j => (hΦ i j).1.aestronglyMeasurable) (fun j => ?_) ?_ (fun h => ?_)
+    refine hW X.G S ι X.μ ν
+      (fun j y => F j (x * y))
+      (fun j y => f j (x * y))
+      (fun j => Φ i j)
+      (fun s => σ s * conj (f i x s))
+      (fun j => ⟨?_, fun y => (hrep j).2 (x * y)⟩)
+      (fun j => (hΦ i j).1.aestronglyMeasurable)
+      (fun j => ?_)
+      ?_
+      (fun h => ?_)
     · exact (hfm j).comp ((measurable_const_mul x).prodMap measurable_id)
     · have hc : Continuous fun y => Φ i j y • F j (x * y) :=
         (hΦ i j).1.smul ((hFc j).comp (continuous_const.mul continuous_id))
@@ -36,13 +44,16 @@ theorem eigae : WeakAE → EigAE := by
       filter_upwards [(hrep i).2 x] with s hs
       simp [hs]
   refine ae_all_iff.2 fun i => ?_
-  have hmeas : MeasurableSet {p : X.G × S |
-      ∑ j, ∫ y, Φ i j y * conj (f j (p.1 * y) p.2) ∂X.μ = σ p.2 * conj (f i p.1 p.2)} := by
+  have hmeas : MeasurableSet
+      {p : X.G × S |
+        ∑ j, ∫ y, Φ i j y * conj (f j (p.1 * y) p.2) ∂X.μ = σ p.2 * conj (f i p.1 p.2)} := by
     refine measurableSet_eq_fun ?_ ?_
     · refine Finset.measurable_sum _ fun j _ => ?_
-      have : StronglyMeasurable fun q : (X.G × S) × X.G => Φ i j q.2 * conj (f j (q.1.1 * q.2) q.1.2) := by
+      have : StronglyMeasurable fun q : (X.G × S) × X.G =>
+          Φ i j q.2 * conj (f j (q.1.1 * q.2) q.1.2) := by
         refine Measurable.stronglyMeasurable ?_
-        refine ((hΦ i j).1.measurable.comp measurable_snd).mul (Complex.continuous_conj.measurable.comp ?_)
+        refine ((hΦ i j).1.measurable.comp measurable_snd).mul
+          (Complex.continuous_conj.measurable.comp ?_)
         exact (hfm j).comp ((measurable_fst.fst.mul measurable_snd).prodMk measurable_fst.snd)
       exact (this.integral_prod_right' (ν := X.μ)).measurable
     · exact (hσ.comp measurable_snd).mul (Complex.continuous_conj.measurable.comp (hfm i))

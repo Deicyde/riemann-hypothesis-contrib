@@ -8,9 +8,10 @@ universe u_1
 
 namespace GlobalTheory.NatCastUnitNorm
 
-theorem norm_natCast_eq_one_of_not_dvd {K : Type u_1} [inst : NormedField K] [IsUltrametricDist K]
-    {l m : ℕ} (hl : Nat.Prime l) (hlt : ‖(l : K)‖ < (1 : ℝ)) (hm : ¬ l ∣ m) :
-    ‖(m : K)‖ = (1 : ℝ) := by
+theorem norm_natCast_eq_one_of_not_dvd
+    {K : Type u_1} [inst : NormedField K] [IsUltrametricDist K]
+    {l m : ℕ} (hl : Nat.Prime l) (hlt : ‖(l : K)‖ < (1 : ℝ)) (hm : ¬ l ∣ m)
+    : ‖(m : K)‖ = (1 : ℝ) := by
   have hle : ‖(m : K)‖ ≤ 1 := IsUltrametricDist.norm_natCast_le_one K m
   by_contra hne
   have hmlt : ‖(m : K)‖ < 1 := lt_of_le_of_ne hle hne
@@ -23,7 +24,9 @@ theorem norm_natCast_eq_one_of_not_dvd {K : Type u_1} [inst : NormedField K] [Is
     intro c x hx
     rw [norm_mul]
     have hc : ‖(c : K)‖ ≤ 1 := IsUltrametricDist.norm_intCast_le_one K c
-    calc ‖(c : K)‖ * ‖x‖ ≤ 1 * ‖x‖ := mul_le_mul_of_nonneg_right hc (norm_nonneg x)
+    calc
+      ‖(c : K)‖ * ‖x‖
+        ≤ 1 * ‖x‖ := mul_le_mul_of_nonneg_right hc (norm_nonneg x)
       _ = ‖x‖ := one_mul _
       _ < 1 := hx
   have h1 := IsUltrametricDist.norm_add_le_max ((a : K) * (l : K)) ((b : K) * (m : K))

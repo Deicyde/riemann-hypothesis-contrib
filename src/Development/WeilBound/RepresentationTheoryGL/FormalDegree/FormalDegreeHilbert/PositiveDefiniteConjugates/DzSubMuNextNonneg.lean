@@ -18,17 +18,21 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem inP_entry_zero {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) {a b : Fin n}
-    (h : ε a = ε b) : X a b = 0 := by
-  have h1 : (Matrix.diagonal (fun c => if ε c = true then (1 : ℂ) else -1) * X *
-      Matrix.diagonal (fun c => if ε c = true then (1 : ℂ) else -1)) a b = (-X) a b :=
+theorem inP_entry_zero
+    {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) {a b : Fin n} (h : ε a = ε b)
+    : X a b = 0 := by
+  have h1
+      : (Matrix.diagonal (fun c => if ε c = true then (1 : ℂ) else -1) * X
+            * Matrix.diagonal (fun c => if ε c = true then (1 : ℂ) else -1))
+          a b
+        = (-X) a b :=
     congrFun (congrFun (ReciprocityTheory.ChartRestriction.DS.S7.inP_JXJ hX) a) b
   simp only [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.neg_apply] at h1
   rw [h] at h1
   split_ifs at h1 <;> linear_combination h1 / 2
 
-theorem exists_pmat {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) :
-    ∃ z : PCoord ε → ℂ, pmat z = X := by
+theorem exists_pmat {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X)
+    : ∃ z : PCoord ε → ℂ, pmat z = X := by
   refine ⟨fun ab => X ab.1.1 ab.1.2, ?_⟩
   have hH := ReciprocityTheory.ChartRestriction.DS.S7.isHermitian_of_mem_noncompactPart' hX
   ext a b
@@ -45,13 +49,16 @@ theorem exists_pmat {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX :
     · exact hne (by rw [heq])
     · exact h1 ⟨hgt, hne⟩
 
-theorem one_le_lead_exp {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) (i : ℕ) (hi : i ≤ n) :
-    1 ≤ (lead i (NormedSpace.exp X)).re := by
+theorem one_le_lead_exp
+    {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) (i : ℕ) (hi : i ≤ n)
+    : 1 ≤ (lead i (NormedSpace.exp X)).re := by
   obtain ⟨z, hz⟩ := exists_pmat hX
   have h0 := ReciprocityTheory.ChartRestriction.DS.fi_nonneg z i
   rw [hz] at h0
   have hpos : 0 < (lead i (NormedSpace.exp X)).re := by
-    have hsub := (ReciprocityTheory.ChartRestriction.DS.S7.exp_noncompactPart_posDef hX).submatrix (Fin.castLE_injective hi)
+    have hsub :=
+      (ReciprocityTheory.ChartRestriction.DS.S7.exp_noncompactPart_posDef hX).submatrix
+        (Fin.castLE_injective hi)
     show 0 < (if h : i ≤ n then ((NormedSpace.exp X).submatrix (Fin.castLE h) (Fin.castLE h)).det else 0).re
     rw [dite_eq_left hi]
     exact (Complex.pos_iff.1 hsub.det_pos).1
@@ -74,11 +81,19 @@ theorem phiLe : PhiLe := by
   rw [inv_inv] at hc
   obtain ⟨hY, hexp⟩ := hc
   rw [← hexp]
-  generalize ReciprocityTheory.ChartRestriction.DS.S7.toMK k⁻¹ * X * ReciprocityTheory.ChartRestriction.DS.S7.toMK k = Y at hY ⊢
-  have hreal : ∀ j : ℕ, j ≤ n → ReciprocityTheory.ChartRestriction.DS.S7.lead j (NormedSpace.exp Y) =
-      ((ReciprocityTheory.ChartRestriction.DS.S7.lead j (NormedSpace.exp Y)).re : ℂ) := by
+  generalize ReciprocityTheory.ChartRestriction.DS.S7.toMK k⁻¹ * X
+        * ReciprocityTheory.ChartRestriction.DS.S7.toMK k
+      = Y
+    at hY ⊢
+  have hreal
+      : ∀ j : ℕ,
+        j ≤ n
+          → ReciprocityTheory.ChartRestriction.DS.S7.lead j (NormedSpace.exp Y)
+            = ((ReciprocityTheory.ChartRestriction.DS.S7.lead j (NormedSpace.exp Y)).re : ℂ) := by
     intro j hj
-    have hPD := (ReciprocityTheory.ChartRestriction.DS.S7.exp_noncompactPart_posDef hY).submatrix (Fin.castLE_injective hj)
+    have hPD :=
+      (ReciprocityTheory.ChartRestriction.DS.S7.exp_noncompactPart_posDef hY).submatrix
+        (Fin.castLE_injective hj)
     have hp := Complex.pos_iff.1 hPD.det_pos
     show (if h : j ≤ n then ((NormedSpace.exp Y).submatrix (Fin.castLE h) (Fin.castLE h)).det else 0) =
       (((if h : j ≤ n then ((NormedSpace.exp Y).submatrix (Fin.castLE h) (Fin.castLE h)).det else 0).re : ℝ) : ℂ)
@@ -86,11 +101,16 @@ theorem phiLe : PhiLe := by
     apply Complex.ext
     · simp
     · simp [← hp.2]
-  have hge1 : ∀ i : Fin n, 1 ≤ (ReciprocityTheory.ChartRestriction.DS.S7.lead (↑i + 1) (NormedSpace.exp Y)).re :=
+  have hge1
+      : ∀ i : Fin n,
+        1 ≤ (ReciprocityTheory.ChartRestriction.DS.S7.lead (↑i + 1) (NormedSpace.exp Y)).re :=
     fun i => one_le_lead_exp hY (↑i + 1) i.isLt
-  have hprod : ReciprocityTheory.ChartRestriction.DS.S7.PhiM (Dz n) (NormedSpace.exp Y) =
-      ((∏ i : Fin n, ((ReciprocityTheory.ChartRestriction.DS.S7.lead (↑i + 1) (NormedSpace.exp Y)).re) ^
-        (-(Dz n i - ReciprocityTheory.ChartRestriction.DS.S7.muNext (Dz n) i)) : ℝ) : ℂ) := by
+  have hprod
+      : ReciprocityTheory.ChartRestriction.DS.S7.PhiM (Dz n) (NormedSpace.exp Y)
+        = ((∏ i : Fin n, ((ReciprocityTheory.ChartRestriction.DS.S7.lead (↑i + 1) (NormedSpace.exp Y)).re) ^
+            (-(Dz n i - ReciprocityTheory.ChartRestriction.DS.S7.muNext (Dz n) i))
+            : ℝ)
+          : ℂ) := by
     show (∏ i : Fin n, ReciprocityTheory.ChartRestriction.DS.S7.lead (↑i + 1) (NormedSpace.exp Y) ^
       (-(Dz n i - ReciprocityTheory.ChartRestriction.DS.S7.muNext (Dz n) i))) = _
     rw [Complex.ofReal_prod]

@@ -8,14 +8,19 @@ noncomputable section
 
 namespace GlobalTheory.UPel.HT
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 variable {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [CommRing R] {S : Scheme.{0}}
 
-def Obj.toSieg {b : Base D R} {N : ℕ} {t : S ⟶ Sp R} (o : Obj b N t) {h M : ℕ} {B : Type} [CommRing B] {ζ : B}
-    {t₁ : S ⟶ Sp B} {lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ o.A)} (hl : IsSympLev o.P h M ζ t₁ lev) :
-    SiegPre h M ζ t₁ where
+def Obj.toSieg
+    {b : Base D R} {N : ℕ} {t : S ⟶ Sp R} (o : Obj b N t)
+    {h M : ℕ} {B : Type} [CommRing B]
+    {ζ : B} {t₁ : S ⟶ Sp B} {lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ o.A)}
+    (hl : IsSympLev o.P h M ζ t₁ lev)
+    : SiegPre h M ζ t₁ where
   A := o.A
   ab := o.ab
   P := o.P
@@ -28,8 +33,12 @@ def Obj.toSieg {b : Base D R} {N : ℕ} {t : S ⟶ Sp R} (o : Obj b N t) {h M : 
   lev_tors := hl.2.1
   geom := hl.2.2
 
-theorem Obj.toSieg_ample {b : Base D R} {N : ℕ} {t : S ⟶ Sp R} (o : Obj b N t) {h M : ℕ} {B : Type} [CommRing B]
-    {ζ : B} {t₁ : S ⟶ Sp B} {lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ o.A)} (hl : IsSympLev o.P h M ζ t₁ lev) :
-    Out.RelAmple (o.toSieg hl).A (o.toSieg hl).diag := o.ample
+theorem Obj.toSieg_ample
+    {b : Base D R} {N : ℕ} {t : S ⟶ Sp R} (o : Obj b N t)
+    {h M : ℕ} {B : Type} [CommRing B]
+    {ζ : B} {t₁ : S ⟶ Sp B} {lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ o.A)}
+    (hl : IsSympLev o.P h M ζ t₁ lev)
+    : Out.RelAmple (o.toSieg hl).A (o.toSieg hl).diag :=
+  o.ample
 
 end GlobalTheory.UPel.HT

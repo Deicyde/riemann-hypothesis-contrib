@@ -168,8 +168,8 @@ theorem logRatioLowerBound_of_logVandermondeGap (hV : VandPlace) : LogRatioLower
   refine ⟨30 + (2 + 2 * C₀) / ε, ?_⟩
   intro x hx
   dsimp only
-  intro f m k vE Δ g₁ g₂ u v b w Dstar dstar massk massr Isig Ipi Lval hf hm hk hkx hπ hvE hΔ
-    hg₁ hg₂ hP hmk hmr hIs hIp hLv hmass hidx hD hd
+  intro f m k vE Δ g₁ g₂ u v b w Dstar dstar massk massr Isig Ipi Lval hf hm hk hkx hπ hvE hΔ hg₁
+    hg₂ hP hmk hmr hIs hIp hLv hmass hidx hD hd
   have hpl : ∀ ρ, ρ < f → _ := fun ρ hρ =>
     place_bound hV ε x C₀ hε hx hC₀ k m Δ (u ρ) (v ρ) (b ρ) (w ρ) hk hm hΔ hkx (hP ρ hρ)
   set L := x ^ ε with hLdef
@@ -191,27 +191,33 @@ theorem logRatioLowerBound_of_logVandermondeGap (hV : VandPlace) : LogRatioLower
     have : 0 ≤ Real.log Real.pi := Real.log_nonneg (by linarith [Real.pi_gt_three])
     linarith
   have hlog2 : Real.log 2 ≤ 1 := by
-    have := Real.log_le_sub_one_of_pos (by norm_num : (0:ℝ) < 2); linarith
-  have hl2vE : Real.log (2 * vE) ≤ 1 + L := by
-    rw [Real.log_mul (by norm_num) hvE0.ne']; linarith
+    have := Real.log_le_sub_one_of_pos (by norm_num : (0 : ℝ) < 2); linarith
+  have hl2vE : Real.log (2 * vE) ≤ 1 + L := by rw [Real.log_mul (by norm_num) hvE0.ne']; linarith
   have hl23 : -(1 / 2 : ℝ) ≤ Real.log (2 / 3) := by
-    have := Real.one_sub_inv_le_log_of_pos (by norm_num : (0:ℝ) < 2 / 3); norm_num at this ⊢; linarith
+    have := Real.one_sub_inv_le_log_of_pos (by norm_num : (0 : ℝ) < 2 / 3)
+    norm_num at this ⊢
+    linarith
 
   have hwpos : ∀ ρ, ρ < f → ∀ j, j < m → 0 < w ρ j := fun ρ hρ => (hpl ρ hρ).2.2.1
-  have hsum : (k : ℝ) * ∑ ρ ∈ range f, ∑ j ∈ range m, Real.log (w ρ j) ≤
-      ∑ ρ ∈ range f, (Real.log (vandN (rowPar k (v ρ) (b ρ)) (k - 1 + m)) - Real.log (vandN (u ρ) k))
-        + f * (k * L * (20 + K) + 2 * m * L) := by
+  have hsum
+      : (k : ℝ) * ∑ ρ ∈ range f, ∑ j ∈ range m, Real.log (w ρ j)
+        ≤ ∑ ρ ∈ range f, (Real.log (vandN (rowPar k (v ρ) (b ρ)) (k - 1 + m)) - Real.log (vandN (u ρ) k))
+          + f * (k * L * (20 + K) + 2 * m * L) := by
     have h := Finset.sum_le_sum (fun ρ hρ => (hpl ρ (Finset.mem_range.mp hρ)).2.2.2)
     rw [Finset.sum_add_distrib, Finset.sum_add_distrib] at h
     simp only [Finset.sum_const, Finset.card_range, nsmul_eq_mul] at h
     rw [Finset.mul_sum]
     linarith
 
-  have hterm : ∀ M ∈ Ico (k + 1) (k - 1 + m + 1),
-      0 < ((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f / Real.sqrt ((2 * vE) ^ f) * Lval M ∧
-      Real.log (((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f / Real.sqrt ((2 * vE) ^ f)
-        * Lval M) = f * Real.log (((M - 1).factorial : ℕ) : ℝ)
-          + (f * M * lv - f / 2 * Real.log (2 * vE) + Real.log (Lval M)) := by
+  have hterm
+      : ∀ M ∈ Ico (k + 1) (k - 1 + m + 1),
+        0 < ((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f / Real.sqrt ((2 * vE) ^ f)
+            * Lval M
+          ∧ Real.log
+              (((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f / Real.sqrt ((2 * vE) ^ f)
+                * Lval M)
+            = f * Real.log (((M - 1).factorial : ℕ) : ℝ)
+              + (f * M * lv - f / 2 * Real.log (2 * vE) + Real.log (Lval M)) := by
     intro M hM
     have hLM := (hLv M hM).1
     have hfac : (0 : ℝ) < (((M - 1).factorial : ℕ) : ℝ) := by positivity
@@ -220,15 +226,17 @@ theorem logRatioLowerBound_of_logVandermondeGap (hV : VandPlace) : LogRatioLower
     have hAf : 0 < ((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f := pow_pos hA f
     have h2v : 0 < (2 * vE) ^ f := pow_pos (by linarith) f
     have hS : 0 < Real.sqrt ((2 * vE) ^ f) := Real.sqrt_pos.mpr h2v
-    have hQ : 0 < ((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f / Real.sqrt ((2 * vE) ^ f) :=
+    have hQ
+        : 0 < ((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f / Real.sqrt ((2 * vE) ^ f) :=
       div_pos hAf hS
     refine ⟨mul_pos hQ hLM, ?_⟩
     rw [Real.log_mul hQ.ne' hLM.ne', Real.log_div hAf.ne' hS.ne', Real.log_pow,
       Real.log_sqrt h2v.le, Real.log_pow, Real.log_mul hfac.ne' hpw.ne', Real.log_pow]
     ring
-  have hrestM : ∀ M ∈ Ico (k + 1) (k - 1 + m + 1),
-      (f : ℝ) * k * lv - f / 2 * (1 + L) - f
-        ≤ f * M * lv - f / 2 * Real.log (2 * vE) + Real.log (Lval M) := by
+  have hrestM
+      : ∀ M ∈ Ico (k + 1) (k - 1 + m + 1),
+        (f : ℝ) * k * lv - f / 2 * (1 + L) - f
+          ≤ f * M * lv - f / 2 * Real.log (2 * vE) + Real.log (Lval M) := by
     intro M hM
     have hM' := Finset.mem_Ico.mp hM
     have hMk : (k : ℝ) ≤ M := by exact_mod_cast (by omega : k ≤ M)
@@ -244,31 +252,43 @@ theorem logRatioLowerBound_of_logVandermondeGap (hV : VandPlace) : LogRatioLower
       have := neg_abs_le (Real.log (Lval M))
       linarith
     linarith
-  have hrest : ((m : ℝ) - 1) * ((f : ℝ) * k * lv - f / 2 * (1 + L) - f)
-      ≤ ∑ M ∈ Ico (k + 1) (k - 1 + m + 1), (f * M * lv - f / 2 * Real.log (2 * vE) + Real.log (Lval M)) := by
-    have h := Finset.sum_le_sum hrestM
-    rw [Finset.sum_const, Nat.card_Ico, nsmul_eq_mul] at h
-    have hc : ((k - 1 + m + 1 - (k + 1) : ℕ) : ℝ) = (m : ℝ) - 1 := by
-      rw [show k - 1 + m + 1 - (k + 1) = m - 1 by omega, Nat.cast_sub hm, Nat.cast_one]
-    rw [hc] at h
-    exact h
-  have hprodM : 0 < ∏ M ∈ Ico (k + 1) (k - 1 + m + 1),
-      ((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f / Real.sqrt ((2 * vE) ^ f) * Lval M :=
+  have hrest
+      : ((m : ℝ) - 1) * ((f : ℝ) * k * lv - f / 2 * (1 + L) - f)
+        ≤ ∑ M ∈ Ico (k + 1) (k - 1 + m + 1), (f * M * lv - f / 2 * Real.log (2 * vE) + Real.log (Lval M)) :=
+    by
+      have h := Finset.sum_le_sum hrestM
+      rw [Finset.sum_const, Nat.card_Ico, nsmul_eq_mul] at h
+      have hc : ((k - 1 + m + 1 - (k + 1) : ℕ) : ℝ) = (m : ℝ) - 1 := by
+        rw [show k - 1 + m + 1 - (k + 1) = m - 1 by omega, Nat.cast_sub hm, Nat.cast_one]
+      rw [hc] at h
+      exact h
+  have hprodM
+      : 0
+        < ∏ M ∈ Ico (k + 1) (k - 1 + m + 1),
+          ((((M - 1).factorial : ℕ) : ℝ) * (vE / Real.pi) ^ M) ^ f / Real.sqrt ((2 * vE) ^ f) * Lval M :=
     prod_pos (fun M hM => (hterm M hM).1)
-  have hlogmass : Real.log massr = Real.log massk
-      + (f * ∑ M ∈ Ico (k + 1) (k - 1 + m + 1), Real.log (((M - 1).factorial : ℕ) : ℝ)
-        + ∑ M ∈ Ico (k + 1) (k - 1 + m + 1), (f * M * lv - f / 2 * Real.log (2 * vE) + Real.log (Lval M))) := by
-    rw [hmass, Real.log_mul hmk.ne' hprodM.ne', Real.log_prod (fun M hM => (hterm M hM).1.ne'),
-      Finset.sum_congr rfl (fun M hM => (hterm M hM).2), Finset.sum_add_distrib, Finset.mul_sum]
+  have hlogmass
+      : Real.log massr
+        = Real.log massk
+          + (f * ∑ M ∈ Ico (k + 1) (k - 1 + m + 1), Real.log (((M - 1).factorial : ℕ) : ℝ)
+            + ∑ M ∈ Ico (k + 1) (k - 1 + m + 1), (f * M * lv - f / 2 * Real.log (2 * vE) + Real.log (Lval M))) :=
+    by
+      rw [hmass, Real.log_mul hmk.ne' hprodM.ne', Real.log_prod (fun M hM => (hterm M hM).1.ne'),
+        Finset.sum_congr rfl (fun M hM => (hterm M hM).2), Finset.sum_add_distrib, Finset.mul_sum]
   have hfact := sum_log_factorial k (k - 1 + m) (by omega)
 
-  have hdimR : ∀ ρ ∈ range f, 0 < dimVN (rowPar k (v ρ) (b ρ)) (k - 1 + m) ∧
-      Real.log (dimVN (rowPar k (v ρ) (b ρ)) (k - 1 + m)) = Real.log (vandN (rowPar k (v ρ) (b ρ)) (k - 1 + m))
-        - ∑ i ∈ range (k - 1 + m), Real.log ((i.factorial : ℕ) : ℝ) :=
-    fun ρ hρ => log_dimVN _ _ (hpl ρ (Finset.mem_range.mp hρ)).2.1
-  have hdimu : ∀ ρ ∈ range f, 0 < dimVN (u ρ) k ∧
-      Real.log (dimVN (u ρ) k) = Real.log (vandN (u ρ) k)
-        - ∑ i ∈ range k, Real.log ((i.factorial : ℕ) : ℝ) :=
+  have hdimR
+      : ∀ ρ ∈ range f,
+        0 < dimVN (rowPar k (v ρ) (b ρ)) (k - 1 + m)
+          ∧ Real.log (dimVN (rowPar k (v ρ) (b ρ)) (k - 1 + m))
+            = Real.log (vandN (rowPar k (v ρ) (b ρ)) (k - 1 + m))
+              - ∑ i ∈ range (k - 1 + m), Real.log ((i.factorial : ℕ) : ℝ) := fun ρ hρ =>
+    log_dimVN _ _ (hpl ρ (Finset.mem_range.mp hρ)).2.1
+  have hdimu
+      : ∀ ρ ∈ range f,
+        0 < dimVN (u ρ) k
+          ∧ Real.log (dimVN (u ρ) k)
+            = Real.log (vandN (u ρ) k) - ∑ i ∈ range k, Real.log ((i.factorial : ℕ) : ℝ) :=
     fun ρ hρ => log_dimVN _ _ (hpl ρ (Finset.mem_range.mp hρ)).1
   have hPR : 0 < ∏ ρ ∈ range f, dimVN (rowPar k (v ρ) (b ρ)) (k - 1 + m) :=
     prod_pos (fun ρ hρ => (hdimR ρ hρ).1)
@@ -276,69 +296,92 @@ theorem logRatioLowerBound_of_logVandermondeGap (hV : VandPlace) : LogRatioLower
   have h23 : (0 : ℝ) < (2 / 3 : ℝ) ^ f := by positivity
   have hA1 : 0 < (2 / 3 : ℝ) ^ f * massr := mul_pos h23 hmr
   have hA2 : 0 < (2 / 3 : ℝ) ^ f * massr * Isig := mul_pos hA1 hIs
-  have hLD : 0 < (2 / 3 : ℝ) ^ f * massr * Isig * ∏ ρ ∈ range f, dimVN (rowPar k (v ρ) (b ρ)) (k - 1 + m) :=
+  have hLD
+      : 0
+        < (2 / 3 : ℝ) ^ f * massr * Isig
+          * ∏ ρ ∈ range f, dimVN (rowPar k (v ρ) (b ρ)) (k - 1 + m) :=
     mul_pos hA2 hPR
   have hmI : 0 < massk * Ipi := mul_pos hmk hIp
   have hd0 : 0 < dstar := by rw [hd]; exact mul_pos hmI hPu
   have hD0 : 0 < Dstar := lt_of_lt_of_le hLD hD
   have hlD := Real.log_le_log hLD hD
   rw [Real.log_mul hA2.ne' hPR.ne', Real.log_mul hA1.ne' hIs.ne', Real.log_mul h23.ne' hmr.ne',
-    Real.log_pow, Real.log_prod (fun ρ hρ => (hdimR ρ hρ).1.ne'),
-    Finset.sum_congr rfl (fun ρ hρ => (hdimR ρ hρ).2), Finset.sum_sub_distrib, Finset.sum_const,
-    Finset.card_range, nsmul_eq_mul] at hlD
-  have hld : Real.log dstar = Real.log massk + Real.log Ipi
-      + (∑ ρ ∈ range f, Real.log (vandN (u ρ) k) - f * ∑ i ∈ range k, Real.log ((i.factorial : ℕ) : ℝ)) := by
+      Real.log_pow, Real.log_prod (fun ρ hρ => (hdimR ρ hρ).1.ne'),
+      Finset.sum_congr rfl (fun ρ hρ => (hdimR ρ hρ).2), Finset.sum_sub_distrib, Finset.sum_const,
+      Finset.card_range, nsmul_eq_mul]
+    at hlD
+  have hld
+      : Real.log dstar
+        = Real.log massk + Real.log Ipi
+          + (∑ ρ ∈ range f, Real.log (vandN (u ρ) k)
+            - f * ∑ i ∈ range k, Real.log ((i.factorial : ℕ) : ℝ)) := by
     rw [hd, Real.log_mul hmI.ne' hPu.ne', Real.log_mul hmk.ne' hIp.ne',
       Real.log_prod (fun ρ hρ => (hdimu ρ hρ).1.ne'),
       Finset.sum_congr rfl (fun ρ hρ => (hdimu ρ hρ).2), Finset.sum_sub_distrib, Finset.sum_const,
       Finset.card_range, nsmul_eq_mul]
-  have hDd : Real.log (Dstar / dstar) = Real.log Dstar - Real.log dstar := Real.log_div hD0.ne' hd0.ne'
-  have hVd : ∑ ρ ∈ range f, (Real.log (vandN (rowPar k (v ρ) (b ρ)) (k - 1 + m)) - Real.log (vandN (u ρ) k))
-      = ∑ ρ ∈ range f, Real.log (vandN (rowPar k (v ρ) (b ρ)) (k - 1 + m))
-        - ∑ ρ ∈ range f, Real.log (vandN (u ρ) k) := by rw [Finset.sum_sub_distrib]
-  have hfact' : (f : ℝ) * ∑ M ∈ Ico (k + 1) (k - 1 + m + 1), Real.log (((M - 1).factorial : ℕ) : ℝ)
-      + f * ∑ i ∈ range k, Real.log ((i.factorial : ℕ) : ℝ)
-      = f * ∑ i ∈ range (k - 1 + m), Real.log ((i.factorial : ℕ) : ℝ) := by
+  have hDd : Real.log (Dstar / dstar) = Real.log Dstar - Real.log dstar :=
+    Real.log_div hD0.ne' hd0.ne'
+  have hVd
+      : ∑ ρ ∈ range f, (Real.log (vandN (rowPar k (v ρ) (b ρ)) (k - 1 + m)) - Real.log (vandN (u ρ) k))
+        = ∑ ρ ∈ range f, Real.log (vandN (rowPar k (v ρ) (b ρ)) (k - 1 + m))
+          - ∑ ρ ∈ range f, Real.log (vandN (u ρ) k) := by
+    rw [Finset.sum_sub_distrib]
+  have hfact'
+      : (f : ℝ) * ∑ M ∈ Ico (k + 1) (k - 1 + m + 1), Real.log (((M - 1).factorial : ℕ) : ℝ)
+          + f * ∑ i ∈ range k, Real.log ((i.factorial : ℕ) : ℝ)
+        = f * ∑ i ∈ range (k - 1 + m), Real.log ((i.factorial : ℕ) : ℝ) := by
     rw [← mul_add, hfact]
 
   have hG0 : 0 ≤ Real.log g₁ + Real.log g₂ := by
     have := Real.log_nonneg hg₁; have := Real.log_nonneg hg₂; linarith
   have hg0 : 0 < g₁ * g₂ := by positivity
-  have hI : -(2 * f * Real.log 2) + f * k * m * (Real.log g₁ + Real.log g₂)
-      ≤ Real.log Isig - Real.log Ipi := by
+  have hI
+      : -(2 * f * Real.log 2) + f * k * m * (Real.log g₁ + Real.log g₂)
+        ≤ Real.log Isig - Real.log Ipi := by
     have hi1 : (0 : ℝ) < ((2 : ℝ) ^ (2 * f))⁻¹ := by positivity
     have hi2 : 0 < (g₁ * g₂) ^ ((f : ℝ) * m * (2 * k + m - 1) / 2) := Real.rpow_pos_of_pos hg0 _
     have h1 := Real.log_le_log (mul_pos hi1 hi2) hidx
     rw [Real.log_div hIs.ne' hIp.ne', Real.log_mul hi1.ne' hi2.ne', Real.log_inv, Real.log_pow,
-      Real.log_rpow hg0, Real.log_mul (by positivity) (by positivity)] at h1
+        Real.log_rpow hg0, Real.log_mul (by positivity) (by positivity)]
+      at h1
     push_cast at h1
     have hm0 : 0 ≤ (m : ℝ) - 1 := by linarith
     have hx1 : 0 ≤ (f : ℝ) * m * ((m : ℝ) - 1) * (Real.log g₁ + Real.log g₂) := by positivity
-    have he : (f : ℝ) * m * (2 * k + m - 1) / 2 * (Real.log g₁ + Real.log g₂)
-        = f * k * m * (Real.log g₁ + Real.log g₂) + (f : ℝ) * m * ((m : ℝ) - 1) * (Real.log g₁ + Real.log g₂) / 2 := by
+    have he
+        : (f : ℝ) * m * (2 * k + m - 1) / 2 * (Real.log g₁ + Real.log g₂)
+          = f * k * m * (Real.log g₁ + Real.log g₂)
+            + (f : ℝ) * m * ((m : ℝ) - 1) * (Real.log g₁ + Real.log g₂) / 2 := by
       ring
     linarith
 
-  have hwl : ∀ ρ ∈ range f, ∀ j ∈ range m,
-      Real.log (w ρ j * vE / Real.pi) = Real.log (w ρ j) + lv := by
+  have hwl
+      : ∀ ρ ∈ range f, ∀ j ∈ range m, Real.log (w ρ j * vE / Real.pi) = Real.log (w ρ j) + lv := by
     intro ρ hρ j hj
-    rw [mul_div_assoc, Real.log_mul (hwpos ρ (Finset.mem_range.mp hρ) j (Finset.mem_range.mp hj)).ne' hvp.ne']
-  have hLHS : ∑ j ∈ range m, (1 / (f : ℝ)) * ∑ ρ ∈ range f, Real.log (w ρ j * vE / Real.pi)
-      = (1 / (f : ℝ)) * ∑ ρ ∈ range f, ∑ j ∈ range m, Real.log (w ρ j) + m * lv := by
-    have e : ∀ j ∈ range m, (1 / (f : ℝ)) * ∑ ρ ∈ range f, Real.log (w ρ j * vE / Real.pi)
-        = (1 / (f : ℝ)) * ∑ ρ ∈ range f, Real.log (w ρ j) + lv := by
+    rw [mul_div_assoc,
+      Real.log_mul (hwpos ρ (Finset.mem_range.mp hρ) j (Finset.mem_range.mp hj)).ne' hvp.ne']
+  have hLHS
+      : ∑ j ∈ range m, (1 / (f : ℝ)) * ∑ ρ ∈ range f, Real.log (w ρ j * vE / Real.pi)
+        = (1 / (f : ℝ)) * ∑ ρ ∈ range f, ∑ j ∈ range m, Real.log (w ρ j) + m * lv := by
+    have e
+        : ∀ j ∈ range m,
+          (1 / (f : ℝ)) * ∑ ρ ∈ range f, Real.log (w ρ j * vE / Real.pi)
+            = (1 / (f : ℝ)) * ∑ ρ ∈ range f, Real.log (w ρ j) + lv := by
       intro j hj
-      rw [Finset.sum_congr rfl (fun ρ hρ => hwl ρ hρ j hj), Finset.sum_add_distrib, Finset.sum_const,
-        Finset.card_range, nsmul_eq_mul, mul_add, ← mul_assoc, one_div_mul_cancel hf0.ne', one_mul]
+      rw [Finset.sum_congr rfl (fun ρ hρ => hwl ρ hρ j hj), Finset.sum_add_distrib,
+        Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_add, ← mul_assoc,
+        one_div_mul_cancel hf0.ne', one_mul]
     rw [Finset.sum_congr rfl e, Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_comm,
       Finset.sum_const, Finset.card_range, nsmul_eq_mul]
   rw [hLHS]
   set T := ∑ ρ ∈ range f, ∑ j ∈ range m, Real.log (w ρ j) with hT
   set G := Real.log g₁ + Real.log g₂ with hGdef
-  rw [show (1 : ℝ) / (f * k) * Real.log (Dstar / dstar) = Real.log (Dstar / dstar) / (f * k) by ring,
+  rw [show (1 : ℝ) / (f * k) * Real.log (Dstar / dstar) = Real.log (Dstar / dstar) / (f * k) by
+      ring,
     le_div_iff₀ (by positivity)]
-  have hexp : (1 / (f : ℝ) * T + m * lv + m * G - (30 + K) * (L + (m : ℝ) ^ 2 * L / k)) * (f * k)
-      = k * T + f * k * m * lv + f * k * m * G - (30 + K) * (f * k * L + f * (m : ℝ) ^ 2 * L) := by
+  have hexp
+      : (1 / (f : ℝ) * T + m * lv + m * G - (30 + K) * (L + (m : ℝ) ^ 2 * L / k)) * (f * k)
+        = k * T + f * k * m * lv + f * k * m * G
+          - (30 + K) * (f * k * L + f * (m : ℝ) ^ 2 * L) := by
     field_simp
   rw [hexp]
 

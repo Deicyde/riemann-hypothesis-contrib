@@ -19,14 +19,18 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory
 
-theorem fn_hahnSeries_inv_converges : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C : ℝ) (φ : ℂ → ℂ) (h : HahnSeries ℚ Ω), Den h → h ≠ 0 → HS ε C φ h → Den h⁻¹ ∧ ∃ C' : ℝ, HS ε C' φ⁻¹ h⁻¹ := by
+theorem fn_hahnSeries_inv_converges
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C : ℝ) (φ : ℂ → ℂ) (h : HahnSeries ℚ Ω),
+      Den h → h ≠ 0 → HS ε C φ h → Den h⁻¹ ∧ ∃ C' : ℝ, HS ε C' φ⁻¹ h⁻¹ := by
   intro Ω _ ε C φ h hD hne hS
-  obtain ⟨N, n₀, a, hN, ha0, hcoef, hzero⟩ := GlobalTheory.T.hahnSeries_commonDenominator_eq_monomial_mul_powerSeries Ω h hD hne
+  obtain ⟨N, n₀, a, hN, ha0, hcoef, hzero⟩ :=
+    GlobalTheory.T.hahnSeries_commonDenominator_eq_monomial_mul_powerSeries Ω h hD hne
   obtain ⟨Φ, hΦ1, hΦ0⟩ := GlobalTheory.T.powerSeries_as_rat_hahnSeries_fractional_q Ω N hN
   set p : PowerSeries Ω := PowerSeries.mk a with hpdef
   have hp0 : PowerSeries.constantCoeff p ≠ 0 := by simpa [p] using ha0
   set q : PowerSeries Ω := p⁻¹ with hqdef
-  have hdiv : ∀ (r : ℚ) (m : ℤ) (k : ℕ), r - (m : ℚ) / N = (k : ℚ) / N ↔ r = ((m + k : ℤ) : ℚ) / N := by
+  have hdiv
+      : ∀ (r : ℚ) (m : ℤ) (k : ℕ), r - (m : ℚ) / N = (k : ℚ) / N ↔ r = ((m + k : ℤ) : ℚ) / N := by
     intro r m k
     rw [sub_eq_iff_eq_add]
     push_cast
@@ -68,7 +72,9 @@ theorem fn_hahnSeries_inv_converges : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* 
 
   set A : ℕ → ℂ := fun k => ε (a k) with hAdef
   have hA0 : A 0 ≠ 0 := (map_ne_zero ε).2 ha0
-  have hnorm : ∀ z : ℂ, ‖Complex.exp (2 * Real.pi * Complex.I * z / N)‖ = Real.exp (-(2 * Real.pi * z.im / N)) := by
+  have hnorm
+      : ∀ z : ℂ,
+        ‖Complex.exp (2 * Real.pi * Complex.I * z / N)‖ = Real.exp (-(2 * Real.pi * z.im / N)) := by
     intro z
     rw [Complex.norm_exp]
     congr 1
@@ -76,7 +82,12 @@ theorem fn_hahnSeries_inv_converges : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* 
     rw [hNc, Complex.div_ofReal_re]
     simp
     ring
-  have hred : ∀ z : ℂ, C < z.im → HasSum (fun k : ℕ => A k * Complex.exp (2 * Real.pi * Complex.I * z / N) ^ k) (φ z * Complex.exp (-(2 * Real.pi * Complex.I * n₀ * z / N))) := by
+  have hred
+      : ∀ z : ℂ,
+        C < z.im
+          → HasSum
+            (fun k : ℕ => A k * Complex.exp (2 * Real.pi * Complex.I * z / N) ^ k)
+            (φ z * Complex.exp (-(2 * Real.pi * Complex.I * n₀ * z / N))) := by
     intro z hz
     exact (GlobalTheory.fn_hasSum_reindex_nat Ω ε h N n₀ a z (φ z) hN hcoef hzero).1 (hS z hz)
   set t0 : ℝ := max C 0 + 1 with ht0
@@ -90,7 +101,8 @@ theorem fn_hahnSeries_inv_converges : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* 
   have hsum0 := hred z0 hz0im
   have hconv : ∀ x : ℂ, ‖x‖ < ‖x0‖ → Summable fun n => A n * x ^ n := fun x hx =>
     summable_powerSeries_of_norm_lt hsum0.tendsto_sum_nat.cauchySeq hx
-  obtain ⟨ρ', hρ', hmain⟩ := GlobalTheory.T.hasSum_powerSeries_inv_of_convergent A ‖x0‖ hx0pos hA0 hconv
+  obtain ⟨ρ', hρ', hmain⟩ :=
+    GlobalTheory.T.hasSum_powerSeries_inv_of_convergent A ‖x0‖ hx0pos hA0 hconv
   have hmk : PowerSeries.mk A = PowerSeries.map ε p := by
     ext k
     simp [p, A]
@@ -108,8 +120,7 @@ theorem fn_hahnSeries_inv_converges : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* 
     have hpi : 0 < 2 * Real.pi := by positivity
     have hNr : (0 : ℝ) < N := by exact_mod_cast hN
     rw [div_lt_iff₀ hpi] at hzL
-    have h1 : |Real.log ρ'| < 2 * Real.pi * z.im / N := by
-      rw [lt_div_iff₀ hNr]; linarith
+    have h1 : |Real.log ρ'| < 2 * Real.pi * z.im / N := by rw [lt_div_iff₀ hNr]; linarith
     have h2 := neg_abs_le (Real.log ρ')
     have h3 : -(2 * Real.pi * z.im / N) = -(2 * Real.pi * z.im / N) := rfl
     linarith
@@ -117,7 +128,9 @@ theorem fn_hahnSeries_inv_converges : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* 
   have htsum : (∑' n, A n * x ^ n) = φ z * Complex.exp (-(2 * Real.pi * Complex.I * n₀ * z / N)) :=
     (hred z hzC).tsum_eq
   rw [hg]
-  apply (GlobalTheory.fn_hasSum_reindex_nat Ω ε g N (-n₀) (fun k => PowerSeries.coeff k q) z (φ⁻¹ z) hN hgc hgz).2
+  apply (GlobalTheory.fn_hasSum_reindex_nat Ω ε g N (-n₀)
+    (fun k => PowerSeries.coeff k q)
+    z (φ⁻¹ z) hN hgc hgz).2
   convert (preTransparency := .reducible) hinv using 1
   · funext k
     rw [← hmapinv, PowerSeries.coeff_map]

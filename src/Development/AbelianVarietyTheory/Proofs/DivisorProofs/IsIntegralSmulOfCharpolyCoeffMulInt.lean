@@ -5,15 +5,16 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsRootSe
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 namespace GlobalTheory
 
 theorem isIntegral_smul_of_charpoly_coeff_mul_int
-    (A : Type) [Ring A] [Algebra ℚ A] [FiniteDimensional ℚ A] (x : A) (M : ℕ)
-    (h : ∀ i, ∃ a : ℤ, (M : ℚ) * (LinearMap.mulLeft ℚ x).charpoly.coeff i = a) :
-    IsIntegral ℤ ((M : ℤ) • x) := by
+    (A : Type) [Ring A] [Algebra ℚ A] [FiniteDimensional ℚ A]
+    (x : A) (M : ℕ) (h : ∀ i, ∃ a : ℤ, (M : ℚ) * (LinearMap.mulLeft ℚ x).charpoly.coeff i = a)
+    : IsIntegral ℤ ((M : ℤ) • x) := by
   set χ := (LinearMap.mulLeft ℚ x).charpoly with hχ
   have hmon : χ.Monic := LinearMap.charpoly_monic _
 

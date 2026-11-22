@@ -5,16 +5,21 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.SdChange
 
-theorem selfDual_twist : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-    [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
-    (μ : Measure V) (χ : V → V → ℂ), SelfDual μ χ → ∀ (B : V ≃ₜ+ V),
-    (∀ x y, χ x (B y) = χ (B x) y) → ∀ c : ℝ≥0, μ.map B = c • μ →
-    SelfDual ((NNReal.sqrt c)⁻¹ • μ) (fun x y => χ x (B y)) := by
+theorem selfDual_twist
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+        [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] [MeasurableSpace V]
+        [BorelSpace V] (μ : Measure V) (χ : V → V → ℂ),
+      SelfDual μ χ
+        → ∀ (B : V ≃ₜ+ V),
+          (∀ x y, χ x (B y) = χ (B x) y)
+            → ∀ c : ℝ≥0,
+              μ.map B = c • μ → SelfDual ((NNReal.sqrt c)⁻¹ • μ) (fun x y => χ x (B y)) := by
   intro V _ _ _ _ _ _ _ _ μ χ hsd B hsym c hc
   obtain ⟨hHaar, hinv⟩ := hsd
   have hemb : MeasurableEmbedding B := (B.toHomeomorph).measurableEmbedding
@@ -29,8 +34,8 @@ theorem selfDual_twist : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [I
   refine ⟨Measure.IsAddHaarMeasure.nnreal_smul μ (inv_ne_zero hs0), ?_⟩
   intro Φ _ _ hint z
   let H : V → ℂ := fun y => ∫ x, Φ x * χ x y ∂μ
-  have h1 : ∀ y, ∫ x, Φ x * χ x (B y) ∂(s⁻¹ • μ) = s⁻¹ • H (B y) :=
-    fun y => integral_smul_nnreal_measure _ _
+  have h1 : ∀ y, ∫ x, Φ x * χ x (B y) ∂(s⁻¹ • μ) = s⁻¹ • H (B y) := fun y =>
+    integral_smul_nnreal_measure _ _
   simp only [h1] at hint ⊢
   have hsE : ((s⁻¹ : ℝ≥0) : ℝ≥0∞) ≠ 0 := by simpa using hs0
   have hint2 : Integrable (fun y => H (B y)) μ := by
@@ -53,8 +58,7 @@ theorem selfDual_twist : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [I
   have hI := hinv Φ ‹_› ‹_› hintH z
   have h7 : ∫ w, H w * χ w z ∂(μ.map B) = c • ∫ w, H w * χ w z ∂μ := by
     rw [hc]; exact integral_smul_nnreal_measure _ _
-  have h8 : ∫ w, H w * χ w z ∂(μ.map B) = ∫ y, H (B y) * χ (B y) z ∂μ :=
-    hemb.integral_map _
+  have h8 : ∫ w, H w * χ w z ∂(μ.map B) = ∫ y, H (B y) * χ (B y) z ∂μ := hemb.integral_map _
   rw [integral_smul_nnreal_measure]
   have h9 : ∀ y, (s⁻¹ • H (B y)) * χ y (B z) = s⁻¹ • (H (B y) * χ (B y) z) := by
     intro y; rw [hsym, smul_mul_assoc]

@@ -17,7 +17,8 @@ theorem expSat : PositivityTheory.SphericalProduct.ExpSat := by
   have hsm : ∀ a, IsSmoothChar (ξ a) := fun a => isSmoothChar_of_isUnram (hξ a)
   have hdeg : ∑ a, (IrrGL.ofChar (ξ a) (hsm a)).1 = n :=
     (Finset.sum_congr rfl fun _ _ => rfl).trans hd
-  obtain ⟨f, hf⟩ := GlobalTheory.CompanionTheory.GlFrob.embedding_of_exponent k n hd V π hs ha hirr ξ hsm hdeg hv
+  obtain ⟨f, hf⟩ :=
+    GlobalTheory.CompanionTheory.GlFrob.embedding_of_exponent k n hd V π hs ha hirr ξ hsm hdeg hv
   obtain ⟨⟨x, hx1, hxL⟩, hsoc⟩ := GlobalTheory.CompanionTheory.LocGL.socleOne k n ξ hξ hanti hdeg
   subst hx1
   have hS := hsoc _ x.rep hxL

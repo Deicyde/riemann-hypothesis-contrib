@@ -15,24 +15,28 @@ namespace Formalism.HN
 
 universe u v w w₂
 
-theorem shiftInv_zl_mono {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V]
-    [NormedAddCommGroup E] [InnerProductSpace ℝ E] (ρ : V →+ E) {A B : Submodule R V}
-    (h : A ≤ B) : zl ρ A ≤ zl ρ B := by
+theorem shiftInv_zl_mono
+    {R V E : Type*}
+    [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    (ρ : V →+ E)
+    {A B : Submodule R V} (h : A ≤ B)
+    : zl ρ A ≤ zl ρ B := by
   exact satBasic_zl_mono ρ h
 
-theorem shiftInv_isSat_iff {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V]
-    [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] (ρ : V →+ E)
-    {L : Submodule R V} (hL : IsLat ρ L) (N : Submodule R V) :
-    IsSat ρ L N ↔
-      N ≤ L ∧ ∀ N' : Submodule R V, N ≤ N' → N' ≤ L → rk ρ N' = rk ρ N → N' = N := by
+theorem shiftInv_isSat_iff
+    {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E]
+    [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (ρ : V →+ E)
+    {L : Submodule R V} (hL : IsLat ρ L)
+    (N : Submodule R V)
+    : IsSat ρ L N ↔ N ≤ L ∧ ∀ N' : Submodule R V, N ≤ N' → N' ≤ L → rk ρ N' = rk ρ N → N' = N := by
   have hB := saturation_basic_properties R V E ρ L hL
   constructor
   · intro hN
     exact ⟨hN.1, fun N' h₁ h₂ h₃ => hB.2.2.1 N N' hN h₁ h₂ h₃⟩
   · rintro ⟨hNL, hmax⟩
     obtain ⟨N', hNN', hN'L, himg⟩ := real_saturation_property R V E ρ L N hL hNL
-    have hsat := Formalism.F.saturProps E (zl ρ L) (zl ρ N) hL.2
-      (shiftInv_zl_mono ρ hNL)
+    have hsat := Formalism.F.saturProps E (zl ρ L) (zl ρ N) hL.2 (shiftInv_zl_mono ρ hNL)
     have hrk : rk ρ N' = rk ρ N := by
       show Formalism.F.rk (zl ρ N') = Formalism.F.rk (zl ρ N)
       rw [himg]
@@ -42,14 +46,15 @@ theorem shiftInv_isSat_iff {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V
     rw [← heq, himg]
     exact hsat.1
 
-theorem shiftInv_mu {R : Type u} {V : Type v} {E : Type w} {E₂ : Type w₂} [Ring R]
-    [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] [NormedAddCommGroup E₂] [InnerProductSpace ℝ E₂]
-    [FiniteDimensional ℝ E₂] (h1 : MuChar.{u, v, w}) (h1' : MuChar.{u, v, w₂})
-    (ρ : V →+ E) (ρ₂ : V →+ E₂) (L : Submodule R V) (c : ℝ) (hL : IsLat ρ L)
-    (hL₂ : IsLat ρ₂ L)
+theorem shiftInv_mu
+    {R : Type u} {V : Type v} {E : Type w} {E₂ : Type w₂} [Ring R] [AddCommGroup V] [Module R V]
+    [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [NormedAddCommGroup E₂]
+    [InnerProductSpace ℝ E₂] [FiniteDimensional ℝ E₂]
+    (h1 : MuChar.{u, v, w}) (h1' : MuChar.{u, v, w₂})
+    (ρ : V →+ E) (ρ₂ : V →+ E₂) (L : Submodule R V) (c : ℝ) (hL : IsLat ρ L) (hL₂ : IsLat ρ₂ L)
     (hsh : ∀ N : Submodule R V, N ≤ L → rk ρ₂ N = rk ρ N ∧ deg ρ₂ N = deg ρ N + c * rk ρ N)
-    (hL0 : L ≠ ⊥) : muMax ρ₂ L = muMax ρ L + c ∧ muMin ρ₂ L = muMin ρ L + c := by
+    (hL0 : L ≠ ⊥)
+    : muMax ρ₂ L = muMax ρ L + c ∧ muMin ρ₂ L = muMin ρ L + c := by
   obtain ⟨hmax, hmin, -, -, -⟩ := h1 R V E ρ L hL hL0
   obtain ⟨hmax₂, hmin₂, -, -, -⟩ := h1' R V E₂ ρ₂ L hL₂ hL0
   have hrL := (hsh L le_rfl).1
@@ -82,8 +87,8 @@ theorem shiftInv_mu {R : Type u} {V : Type v} {E : Type w} {E₂ : Type w₂} [R
       have := (hmin (muMin ρ L)).1 le_rfl N hN
       linarith
 
-theorem shiftInv_count (c : ℝ) (k m : ℕ) :
-    (∑ i ∈ Finset.range m, if i < k then c else 0) = c * ((min k m : ℕ) : ℝ) := by
+theorem shiftInv_count (c : ℝ) (k m : ℕ)
+    : (∑ i ∈ Finset.range m, if i < k then c else 0) = c * ((min k m : ℕ) : ℝ) := by
   induction m with
   | zero => simp
   | succ m ih =>
@@ -97,14 +102,16 @@ theorem shiftInv_count (c : ℝ) (k m : ℕ) :
       rw [min_eq_left h, min_eq_left (show k ≤ m + 1 by omega)]
       ring
 
-private theorem sum_fin_ite_lt_const_eq_mul_min (c : ℝ) (k n : ℕ) :
-    (∑ j : Fin n, if (j : ℕ) < k then c else 0) = c * ((min k n : ℕ) : ℝ) :=
+private theorem sum_fin_ite_lt_const_eq_mul_min (c : ℝ) (k n : ℕ)
+    : (∑ j : Fin n, if (j : ℕ) < k then c else 0) = c * ((min k n : ℕ) : ℝ) :=
   (Fin.sum_univ_eq_sum_range (fun i => if i < k then c else 0) n).trans (shiftInv_count c k n)
 
-theorem shiftInv_sum {n m : ℕ} (h : m = n) (f : Fin n → ℝ) (g : Fin m → ℝ) (c : ℝ) (k : ℕ)
-    (hfg : ∀ (j : ℕ) (h1 : j < m) (h2 : j < n), g ⟨j, h1⟩ = f ⟨j, h2⟩ + c) :
-    (∑ j : Fin m, if (j : ℕ) < k then g j else 0) =
-      (∑ j : Fin n, if (j : ℕ) < k then f j else 0) + c * ((min k n : ℕ) : ℝ) := by
+theorem shiftInv_sum
+    {n m : ℕ} (h : m = n) (f : Fin n → ℝ) (g : Fin m → ℝ)
+    (c : ℝ)
+    (k : ℕ) (hfg : ∀ (j : ℕ) (h1 : j < m) (h2 : j < n), g ⟨j, h1⟩ = f ⟨j, h2⟩ + c)
+    : (∑ j : Fin m, if (j : ℕ) < k then g j else 0)
+      = (∑ j : Fin n, if (j : ℕ) < k then f j else 0) + c * ((min k n : ℕ) : ℝ) := by
   subst h
   rw [← sum_fin_ite_lt_const_eq_mul_min c k, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -112,8 +119,9 @@ theorem shiftInv_sum {n m : ℕ} (h : m = n) (f : Fin n → ℝ) (g : Fin m → 
   · exact hfg j.1 j.2 j.2
   · simp
 
-private theorem lt_card_filter_le_iff_of_antitone {n : ℕ} {s : Fin n → ℝ} (hs : Antitone s) (j : Fin n) (θ : ℝ) :
-    (j : ℕ) < (Finset.univ.filter (fun i => θ ≤ s i)).card ↔ θ ≤ s j := by
+private theorem lt_card_filter_le_iff_of_antitone
+    {n : ℕ} {s : Fin n → ℝ} (hs : Antitone s) (j : Fin n) (θ : ℝ)
+    : (j : ℕ) < (Finset.univ.filter (fun i => θ ≤ s i)).card ↔ θ ≤ s j := by
   constructor
   · intro h
     by_contra hlt
@@ -139,8 +147,9 @@ private theorem lt_card_filter_le_iff_of_antitone {n : ℕ} {s : Fin n → ℝ} 
     rw [Fin.card_Iic] at c1
     omega
 
-theorem shiftInvariance_of (h1 : MuChar.{u, v, w}) (h1' : MuChar.{u, v, w₂})
-    (h4 : HNSlopes.{u, v, w}) : ShiftInvariance.{u, v, w, w₂} := by
+theorem shiftInvariance_of
+    (h1 : MuChar.{u, v, w}) (h1' : MuChar.{u, v, w₂}) (h4 : HNSlopes.{u, v, w})
+    : ShiftInvariance.{u, v, w, w₂} := by
   intro R V E E₂ _ _ _ _ _ _ _ _ _ ρ ρ₂ L c hL hL₂ hsh
   have hBL := saturation_basic_properties R V E ρ L hL
   have hBL₂ := saturation_basic_properties R V E₂ ρ₂ L hL₂
@@ -152,17 +161,22 @@ theorem shiftInvariance_of (h1 : MuChar.{u, v, w}) (h1' : MuChar.{u, v, w₂})
     simp only [Set.mem_ofPred_eq]
     constructor
     · rintro ⟨hNL, hN0, hθ⟩
-      have hm := (shiftInv_mu h1 h1' ρ ρ₂ N c (hBL.1 N hNL) (hBL₂.1 N hNL)
-        (fun N' hN' => hsh N' (hN'.trans hNL)) hN0).2
+      have hm :=
+        (shiftInv_mu h1 h1' ρ ρ₂ N c (hBL.1 N hNL) (hBL₂.1 N hNL)
+          (fun N' hN' => hsh N' (hN'.trans hNL))
+          hN0).2
       exact ⟨hNL, hN0, by linarith⟩
     · rintro ⟨hNL, hN0, hθ⟩
-      have hm := (shiftInv_mu h1 h1' ρ ρ₂ N c (hBL.1 N hNL) (hBL₂.1 N hNL)
-        (fun N' hN' => hsh N' (hN'.trans hNL)) hN0).2
+      have hm :=
+        (shiftInv_mu h1 h1' ρ ρ₂ N c (hBL.1 N hNL) (hBL₂.1 N hNL)
+          (fun N' hN' => hsh N' (hN'.trans hNL))
+          hN0).2
       exact ⟨hNL, hN0, by linarith⟩
   have hfiltle : ∀ θ : ℝ, hnStep ρ L θ ≤ L := fun θ => sSup_le fun N hN => hN.1
   have hS := h4 R V E ρ L hL
-  have hslope : ∀ (j : ℕ) (hj₂ : j < rk ρ₂ L) (hj : j < rk ρ L),
-      slopeList ρ₂ L ⟨j, hj₂⟩ = slopeList ρ L ⟨j, hj⟩ + c := by
+  have hslope
+      : ∀ (j : ℕ) (hj₂ : j < rk ρ₂ L) (hj : j < rk ρ L),
+        slopeList ρ₂ L ⟨j, hj₂⟩ = slopeList ρ L ⟨j, hj⟩ + c := by
     intro j hj₂ hj
     have hset : {θ : ℝ | j < rk ρ₂ (hnStep ρ₂ L θ)} = Set.Iic (slopeList ρ L ⟨j, hj⟩ + c) := by
       ext θ
@@ -175,8 +189,7 @@ theorem shiftInvariance_of (h1 : MuChar.{u, v, w}) (h1' : MuChar.{u, v, w₂})
       constructor <;> intro h <;> linarith
     show sSup {θ : ℝ | j < rk ρ₂ (hnStep ρ₂ L θ)} = slopeList ρ L ⟨j, hj⟩ + c
     rw [hset, csSup_Iic]
-  refine ⟨fun N => ?_, fun hL0 => shiftInv_mu h1 h1' ρ ρ₂ L c hL hL₂ hsh hL0,
-    hfilt, fun k => ?_⟩
+  refine ⟨fun N => ?_, fun hL0 => shiftInv_mu h1 h1' ρ ρ₂ L c hL hL₂ hsh hL0, hfilt, fun k => ?_⟩
   · rw [shiftInv_isSat_iff ρ₂ hL₂, shiftInv_isSat_iff ρ hL]
     constructor
     · rintro ⟨hNL, hm⟩

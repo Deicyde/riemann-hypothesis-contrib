@@ -45,7 +45,12 @@ private lemma nabs_inv_twisted_operators (k : Type) [Field k] [ValuativeRel k] [
   show ((distribHaarChar k x⁻¹ : NNReal) : ℝ) = ((distribHaarChar k x : NNReal) : ℝ)⁻¹
   rw [map_inv, NNReal.coe_inv]
 
-theorem ip_om_om : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (a b : Type) [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] (ν : Measure k) [ν.IsAddHaarMeasure] (μ : kˣ →* ℂˣ) (_ : ∀ x, ‖(μ x : ℂ)‖ = 1) (g : GL a k) (h : GL b k) (Φ Ψ : Matrix b a k → ℂ), ip ν (om μ g h Φ) (om μ g h Ψ) = ip ν Φ Ψ := by
+theorem ip_om_om
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (a b : Type) [Fintype a] [DecidableEq a] [Fintype b]
+        [DecidableEq b] (ν : Measure k) [ν.IsAddHaarMeasure] (μ : kˣ →* ℂˣ)
+        (_ : ∀ x, ‖(μ x : ℂ)‖ = 1) (g : GL a k) (h : GL b k) (Φ Ψ : Matrix b a k → ℂ),
+      ip ν (om μ g h Φ) (om μ g h Ψ) = ip ν Φ Ψ := by
   intro k _ _ _ _ _ _ a b _ _ _ _ ν _ μ hμ g h Φ Ψ
   set F : Matrix b a k → ℂ := fun y => Φ y * (starRingEnd ℂ) (Ψ y) with hF
   have hinv : ‖(((μ (Matrix.GeneralLinearGroup.det h))⁻¹ : ℂˣ) : ℂ)‖ = 1 := by
@@ -54,24 +59,31 @@ theorem ip_om_om : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k
   set nh := nabs k (Matrix.GeneralLinearGroup.det h) with hnh
   set c : ℝ := ng ^ ((Fintype.card b : ℝ) / 2) * nh ^ (-(Fintype.card a : ℝ) / 2) *
     (ng ^ ((Fintype.card b : ℝ) / 2) * nh ^ (-(Fintype.card a : ℝ) / 2)) with hc
-  have hpt : ∀ x, om μ g h Φ x * (starRingEnd ℂ) (om μ g h Ψ x) =
-      (c : ℂ) * F ((h⁻¹ : GL b k).val * x * g.val) := fun x =>
+  have hpt
+      : ∀ x,
+        om μ g h Φ x * (starRingEnd ℂ) (om μ g h Ψ x)
+          = (c : ℂ) * F ((h⁻¹ : GL b k).val * x * g.val) := fun x =>
     unit_mul_real_mul_conj_eq_real_sq_mul _ _ (hμ _) hinv _ _ _ _
   have hT := (GlobalTheory.T.linear_change_of_variables_localField_matrix k a b ν).2 g h⁻¹ F
   have hdet : nabs k (Matrix.GeneralLinearGroup.det h⁻¹) = nh⁻¹ := by
     rw [map_inv, nabs_inv_twisted_operators]
-  have hkey : c * (nabs k (Matrix.GeneralLinearGroup.det h⁻¹) ^ (-(Fintype.card a : ℝ)) *
-      ng ^ (-(Fintype.card b : ℝ))) = 1 := by
+  have hkey
+      : c * (nabs k (Matrix.GeneralLinearGroup.det h⁻¹) ^ (-(Fintype.card a : ℝ))
+          * ng ^ (-(Fintype.card b : ℝ)))
+        = 1 := by
     rw [hdet]
-    exact rpow_half_mul_rpow_inv_eq_one ng nh (nabs_pos_twisted_operators k _) (nabs_pos_twisted_operators k _) _ _
+    exact rpow_half_mul_rpow_inv_eq_one ng nh (nabs_pos_twisted_operators k _)
+      (nabs_pos_twisted_operators k _) _ _
   unfold ip
-  calc ∫ x, om μ g h Φ x * (starRingEnd ℂ) (om μ g h Ψ x) ∂(volM ν b a)
-      = ∫ x, (c : ℂ) * F ((h⁻¹ : GL b k).val * x * g.val) ∂(volM ν b a) := by
-        congr 1
-        funext x
-        exact hpt x
+  calc
+    ∫ x, om μ g h Φ x * (starRingEnd ℂ) (om μ g h Ψ x) ∂(volM ν b a)
+        = ∫ x, (c : ℂ) * F ((h⁻¹ : GL b k).val * x * g.val) ∂(volM ν b a) := by
+      congr 1
+      funext x
+      exact hpt x
     _ = (c : ℂ) * ∫ x, F ((h⁻¹ : GL b k).val * x * g.val) ∂(volM ν b a) := integral_const_mul _ _
     _ = ∫ x, F x ∂(volM ν b a) := by
-        rw [hT, Complex.real_smul, ← mul_assoc, ← Complex.ofReal_mul, hkey, Complex.ofReal_one, one_mul]
+      rw [hT, Complex.real_smul, ← mul_assoc, ← Complex.ofReal_mul, hkey, Complex.ofReal_one,
+        one_mul]
 
 end GlobalTheory.SplitWeil

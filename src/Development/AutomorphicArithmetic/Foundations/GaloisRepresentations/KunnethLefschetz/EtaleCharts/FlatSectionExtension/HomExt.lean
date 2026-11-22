@@ -5,10 +5,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.homExt :
-    ∀ {V X : Scheme.{0}} (a b : V ⟶ X), (∀ x : V, ∃ U : V.Opens, x ∈ U ∧ U.ι ≫ a = U.ι ≫ b) → a = b := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.homExt
+    : ∀ {V X : Scheme.{0}} (a b : V ⟶ X),
+      (∀ x : V, ∃ U : V.Opens, x ∈ U ∧ U.ι ≫ a = U.ι ≫ b) → a = b := by
   intro V X a b h
   choose W hxW hW using h
   have hcov : TopologicalSpace.IsOpenCover W := by

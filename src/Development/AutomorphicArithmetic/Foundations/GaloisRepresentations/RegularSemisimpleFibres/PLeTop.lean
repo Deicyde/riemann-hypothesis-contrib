@@ -4,14 +4,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem label_le_preserves_splitting (h₁ : LiftOk) (h₂ : LiftBlocks) {a b : Lbl} (ha : a.Ok) (hab : a.Le b) :
-    b.Ok ∧ b.rk = a.rk ∧ ∀ Q, b.Splits Q → a.Splits Q ∧ b.blocks Q = a.blocks Q := by
+private theorem label_le_preserves_splitting
+    (h₁ : LiftOk) (h₂ : LiftBlocks) {a b : Lbl} (ha : a.Ok) (hab : a.Le b)
+    : b.Ok ∧ b.rk = a.rk ∧ ∀ Q, b.Splits Q → a.Splits Q ∧ b.blocks Q = a.blocks Q := by
   induction hab with
   | refl => exact ⟨ha, rfl, fun Q hQ => ⟨hQ, rfl⟩⟩
   | @tail m c _ hstep ih =>
@@ -23,8 +27,7 @@ private theorem label_le_preserves_splitting (h₁ : LiftOk) (h₂ : LiftBlocks)
     obtain ⟨haQ, hblk'⟩ := hS Q hbQ
     exact ⟨haQ, hblk.trans hblk'⟩
 
-theorem UpperTheory.Gal.InertialTypesAlt.leTop :
-    LiftOk → LiftBlocks → LeRank → LeTop := by
+theorem UpperTheory.Gal.InertialTypesAlt.leTop : LiftOk → LiftBlocks → LeRank → LeTop := by
   intro h₁ h₂ h₃ a b ha hab hs
   obtain ⟨hb, hrk, hS⟩ := label_le_preserves_splitting h₁ h₂ ha hab
   obtain ⟨f, hf, hq, hd⟩ := hs

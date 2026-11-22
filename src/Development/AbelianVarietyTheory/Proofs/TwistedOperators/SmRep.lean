@@ -12,11 +12,9 @@ open GlobalTheory.PRep GlobalTheory.SmGL
 namespace GlobalTheory.SmGL
 
 structure SmRep (G : Type) [Group G] [TopologicalSpace G] : Type 1 where
-
   V : Type
   [acg : AddCommGroup V]
   [mod : Module ℂ V]
-
   ρ : Representation ℂ G V
   smooth : IsSmooth ρ
 

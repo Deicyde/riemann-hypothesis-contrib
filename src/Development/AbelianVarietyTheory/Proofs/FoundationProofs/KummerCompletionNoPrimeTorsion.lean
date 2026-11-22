@@ -11,8 +11,12 @@ open Matrix GlobalTheory.KZ GlobalTheory.KZ.BettiB
 
 namespace GlobalTheory.KZ.BettiB
 
-theorem rootOfUnity_eq_pow {Ω K : Type} [Field Ω] [CharZero Ω] [IsAlgClosed Ω] [Field K] [Algebra Ω K]
-    (l : ℕ) (hl : 0 < l) (ζ : Kˣ) (hζ : ζ ^ l = 1) (m : ℕ) (hm : 0 < m) : ∃ η : Kˣ, ζ = η ^ m := by
+theorem rootOfUnity_eq_pow
+    {Ω K : Type} [Field Ω] [CharZero Ω] [IsAlgClosed Ω] [Field K] [Algebra Ω K]
+    (l : ℕ) (hl : 0 < l)
+    (ζ : Kˣ) (hζ : ζ ^ l = 1)
+    (m : ℕ) (hm : 0 < m)
+    : ∃ η : Kˣ, ζ = η ^ m := by
   have : NeZero l := ⟨hl.ne'⟩
   obtain ⟨ω, hω⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω l
   have hω' : IsPrimitiveRoot (algebraMap Ω K ω) l := hω.map_of_injective (algebraMap Ω K).injective
@@ -26,8 +30,10 @@ theorem rootOfUnity_eq_pow {Ω K : Type} [Field Ω] [CharZero Ω] [IsAlgClosed �
   refine ⟨Units.mk0 _ hz0, Units.ext ?_⟩
   rw [Units.val_pow_eq_pow_val, Units.val_mk0, ← map_pow, hz, map_pow, hi]
 
-theorem khat_no_l_torsion : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε)
-    (l : ℕ) [Fact l.Prime] (x : X.Khat l), (l : ℤ_[l]) • x = 0 → x = 0 := by
+theorem khat_no_l_torsion
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) (l : ℕ)
+        [Fact l.Prime] (x : X.Khat l),
+      (l : ℤ_[l]) • x = 0 → x = 0 := by
   intro Ω _ _ _ ε X l _ x hx
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hl : 0 < l := (Fact.out : l.Prime).pos
@@ -49,8 +55,7 @@ theorem khat_no_l_torsion : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgCl
   obtain ⟨g, hg⟩ := (hker _ _).1 h1
   rw [one_mul] at hg
   set ζ : X.Kˣ := f * (g ^ (l ^ n))⁻¹ with hζdef
-  have hζ : ζ ^ l = 1 := by
-    rw [hζdef, mul_pow, hg, inv_pow, ← pow_mul, ← pow_succ, mul_inv_cancel]
+  have hζ : ζ ^ l = 1 := by rw [hζdef, mul_pow, hg, inv_pow, ← pow_mul, ← pow_succ, mul_inv_cancel]
   have : CharZero Ω := algebraRat.charZero Ω
   obtain ⟨η, hη⟩ := rootOfUnity_eq_pow (Ω := Ω) l hl ζ hζ (l ^ n) (pow_pos hl n)
   have hf' : f = 1 * (η * g) ^ (l ^ n) := by

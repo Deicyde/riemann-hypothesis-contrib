@@ -4,10 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial GlobalTheory.GalOfCusp UpperTheory.V.Af
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+  GlobalTheory.GalOfCusp UpperTheory.V.Af
 
-theorem UpperTheory.map_trace_eq_sum_roots_of_charpoly_map :
-    ∀ (k : Type) [Field k] (φ : k →+* ℂ) (B : Multiset ℂ), (∀ M : Matrix (Fin 3) (Fin 3) k, M.charpoly.map φ = (B.map fun b => X - C b).prod → φ M.trace = B.sum) ∧ ∀ M : Matrix (Fin 2) (Fin 2) k, M.charpoly.map φ = (B.map fun b => X - C b).prod → ∀ h : ℕ, φ (M ^ h).trace = (B.map (· ^ h)).sum := by
+theorem UpperTheory.map_trace_eq_sum_roots_of_charpoly_map
+    : ∀ (k : Type) [Field k] (φ : k →+* ℂ) (B : Multiset ℂ),
+      (∀ M : Matrix (Fin 3) (Fin 3) k,
+          M.charpoly.map φ = (B.map fun b => X - C b).prod → φ M.trace = B.sum)
+        ∧ ∀ M : Matrix (Fin 2) (Fin 2) k,
+          M.charpoly.map φ = (B.map fun b => X - C b).prod
+            → ∀ h : ℕ, φ (M ^ h).trace = (B.map (· ^ h)).sum := by
   intro k _ φ B
   refine ⟨fun M hM => ?_, fun M hM => ?_⟩
   · rw [AddMonoidHom.map_trace, Matrix.trace_eq_sum_roots_charpoly, Matrix.charpoly_map, hM,
@@ -22,8 +29,10 @@ theorem UpperTheory.map_trace_eq_sum_roots_of_charpoly_map :
     obtain ⟨b1, b2, rfl⟩ := Multiset.card_eq_two.mp hc
     have h0 := Matrix.aeval_self_charpoly (M.map φ)
     rw [hN] at h0
-    simp only [Multiset.insert_eq_cons, Multiset.map_cons, Multiset.map_singleton, Multiset.prod_cons,
-      Multiset.prod_singleton, map_mul, map_sub, aeval_X, aeval_C, Algebra.algebraMap_eq_smul_one] at h0
+    simp only [Multiset.insert_eq_cons, Multiset.map_cons, Multiset.map_singleton,
+        Multiset.prod_cons, Multiset.prod_singleton, map_mul, map_sub, aeval_X, aeval_C,
+        Algebra.algebraMap_eq_smul_one]
+      at h0
     set N := M.map φ with hNdef
     have hCH : N * N = (b1 + b2) • N - (b1 * b2) • (1 : Matrix (Fin 2) (Fin 2) ℂ) := by
       have e : N * N - ((b1 + b2) • N - (b1 * b2) • (1 : Matrix (Fin 2) (Fin 2) ℂ)) = 0 := by
@@ -31,8 +40,9 @@ theorem UpperTheory.map_trace_eq_sum_roots_of_charpoly_map :
         simp only [sub_mul, mul_sub, smul_mul_assoc, mul_smul_comm, one_mul, mul_one, smul_smul]
         module
       exact sub_eq_zero.mp e
-    have key : ∀ h : ℕ, (N ^ h).trace = b1 ^ h + b2 ^ h ∧
-        (N ^ (h + 1)).trace = b1 ^ (h + 1) + b2 ^ (h + 1) := by
+    have key
+        : ∀ h : ℕ,
+          (N ^ h).trace = b1 ^ h + b2 ^ h ∧ (N ^ (h + 1)).trace = b1 ^ (h + 1) + b2 ^ (h + 1) := by
       intro h
       induction h with
       | zero =>

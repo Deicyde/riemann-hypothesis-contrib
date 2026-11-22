@@ -5,7 +5,8 @@ public import CompanionTheory.AutomorphicTheory.PadicCyclotomicFields.GcohTateA
 
 @[expose] public section
 
-open CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal ValuativeRel Formalism.GaloisCohomology
+open CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal ValuativeRel
+  Formalism.GaloisCohomology
 
 namespace CompanionTheory.LocalTateOrthogonality.Gcoh
 

@@ -20,34 +20,41 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.NineStatements
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GroundTheory.Heights₂.Heights.LowerBoundFree
-open ReciprocityTheory.AnForm (levi levi_congr levi_comp levi_add_smul levi_re_analytic continuousOn_levi)
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GroundTheory.Heights₂.Heights.LowerBoundFree
+open ReciprocityTheory.AnForm
+  (levi levi_congr levi_comp levi_add_smul levi_re_analytic continuousOn_levi)
 
 namespace APrimeLeviCharts
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-
 
 omit [∀ k, Fintype (ι k)] in
 theorem isOpen_blocks : IsOpen {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
   have h : {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} = ⋂ k, ⋃ i, {z | z ⟨k, i⟩ ≠ 0} := by
     ext z; simp
   rw [h]
-  exact isOpen_iInter_of_finite fun k => isOpen_iUnion fun i =>
-    isOpen_ne_fun (continuous_apply _) continuous_const
+  exact isOpen_iInter_of_finite fun k =>
+    isOpen_iUnion fun i => isOpen_ne_fun (continuous_apply _) continuous_const
 
-theorem contDiffAt_log_h {A : HermLine ι} (hA : IsSmoothHerm A) {z : (Σ k, ι k) → ℂ}
-    (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) : ContDiffAt ℝ 2 (fun y => Real.log (A.h y)) z := by
+theorem contDiffAt_log_h
+    {A : HermLine ι} (hA : IsSmoothHerm A) {z : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+    : ContDiffAt ℝ 2 (fun y => Real.log (A.h y)) z := by
   have h1 : ContDiffAt ℝ 2 A.h z :=
     (hA.contDiffAt (isOpen_blocks.mem_nhds hz)).of_le (WithTop.coe_le_coe.mpr le_top)
   exact h1.log (A.pos z hz).ne'
 
-theorem levi_log_h_torus {J : Type} [Fintype J] {A : HermLine ι} (hA : IsSmoothHerm A)
-    {τ₁ τ₂ : (J → ℂ) → (Σ k, ι k) → ℂ} {u₀ : J → ℂ} (h₁ : AnalyticAt ℂ τ₁ u₀) (h₂ : AnalyticAt ℂ τ₂ u₀)
-    (hrel : ∀ᶠ u in 𝓝 u₀, (∀ k, ∃ i, τ₂ u ⟨k, i⟩ ≠ 0) ∧
-      ∃ c : K → ℂ, (∀ k, c k ≠ 0) ∧ τ₁ u = torusSmul c (τ₂ u))
-    (e : J → ℂ) :
-    levi ((fun y => Real.log (A.h y)) ∘ τ₁) u₀ e = levi ((fun y => Real.log (A.h y)) ∘ τ₂) u₀ e := by
+theorem levi_log_h_torus
+    {J : Type} [Fintype J]
+    {A : HermLine ι} (hA : IsSmoothHerm A)
+    {τ₁ τ₂ : (J → ℂ) → (Σ k, ι k) → ℂ} {u₀ : J → ℂ}
+    (h₁ : AnalyticAt ℂ τ₁ u₀) (h₂ : AnalyticAt ℂ τ₂ u₀)
+    (hrel
+      : ∀ᶠ u in 𝓝 u₀, (∀ k, ∃ i, τ₂ u ⟨k, i⟩ ≠ 0) ∧
+        ∃ c : K → ℂ, (∀ k, c k ≠ 0) ∧ τ₁ u = torusSmul c (τ₂ u))
+    (e : J → ℂ)
+    : levi ((fun y => Real.log (A.h y)) ∘ τ₁) u₀ e
+      = levi ((fun y => Real.log (A.h y)) ∘ τ₂) u₀ e := by
   classical
   have hb := hrel.self_of_nhds.1
   choose i hi using hb
@@ -59,8 +66,9 @@ theorem levi_log_h_torus {J : Type} [Fintype J] {A : HermLine ι} (hA : IsSmooth
     rw [eventually_all]
     intro k
     exact ((analyticAt_pi_iff.1 h₂) ⟨k, i k⟩).continuousAt.eventually_ne (hi k)
-  have hrel' : ∀ᶠ u in 𝓝 u₀, (∀ k, ∃ i, τ₂ u ⟨k, i⟩ ≠ 0) ∧ (∀ k, c k u ≠ 0) ∧
-      τ₁ u = torusSmul (fun k => c k u) (τ₂ u) := by
+  have hrel'
+      : ∀ᶠ u in 𝓝 u₀, (∀ k, ∃ i, τ₂ u ⟨k, i⟩ ≠ 0) ∧ (∀ k, c k u ≠ 0) ∧
+        τ₁ u = torusSmul (fun k => c k u) (τ₂ u) := by
     filter_upwards [hrel, hne] with u hu hn
     obtain ⟨hbl, c', hc'0, hc'⟩ := hu
     have hcc : ∀ k, c k u = c' k := by
@@ -78,8 +86,11 @@ theorem levi_log_h_torus {J : Type} [Fintype J] {A : HermLine ι} (hA : IsSmooth
   set H : (J → ℂ) → ℂ := fun u =>
     ∑ k, ((A.a k : ℝ) : ℂ) * (Complex.log (c k u / c k u₀) + Complex.log (c k u₀)) with hHdef
   have hH : AnalyticAt ℂ H u₀ := by
-    have hk : ∀ k ∈ Finset.univ, AnalyticAt ℂ
-        (fun u => ((A.a k : ℝ) : ℂ) * (Complex.log (c k u / c k u₀) + Complex.log (c k u₀))) u₀ := by
+    have hk
+        : ∀ k ∈ Finset.univ,
+          AnalyticAt ℂ
+            (fun u => ((A.a k : ℝ) : ℂ) * (Complex.log (c k u / c k u₀) + Complex.log (c k u₀)))
+            u₀ := by
       intro k _
       refine analyticAt_const.mul (AnalyticAt.add ?_ analyticAt_const)
       refine ((hcan k).div analyticAt_const (hc0 k)).clog ?_
@@ -92,12 +103,14 @@ theorem levi_log_h_torus {J : Type} [Fintype J] {A : HermLine ι} (hA : IsSmooth
     simp only [hHdef, Finset.sum_apply]
   have hHre : ∀ u, (∀ k, c k u ≠ 0) → (H u).re = ∑ k, (A.a k : ℝ) * Real.log ‖c k u‖ := by
     intro u hu
-    simp only [hHdef, Complex.re_sum, Complex.re_ofReal_mul, Complex.add_re, Complex.log_re, norm_div]
+    simp only [hHdef, Complex.re_sum, Complex.re_ofReal_mul, Complex.add_re, Complex.log_re,
+      norm_div]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Real.log_div (norm_ne_zero_iff.2 (hu k)) (norm_ne_zero_iff.2 (hc0 k))]
     ring
-  have heq : ((fun y => Real.log (A.h y)) ∘ τ₁) =ᶠ[𝓝 u₀]
-      fun u => ((fun y => Real.log (A.h y)) ∘ τ₂) u + 1 * (H u).re := by
+  have heq
+      : ((fun y => Real.log (A.h y)) ∘ τ₁) =ᶠ[𝓝 u₀]
+        fun u => ((fun y => Real.log (A.h y)) ∘ τ₂) u + 1 * (H u).re := by
     filter_upwards [hrel'] with u hu
     obtain ⟨hbl, hcu, hτ⟩ := hu
     have hs := A.smul (fun k => c k u) (τ₂ u) hcu
@@ -120,19 +133,23 @@ section Charts
 
 variable {P : Ideal (MRing ι)} {d : ℕ}
 
-theorem analyticAt_sec (M : CxModel P d) {e : OpenPartialHomeomorph M.Xc (Fin d → ℂ)}
-    (he : ReciprocityTheory.AnForm.M.IsCompatChart M.atlas e) {U : Set M.Xc} (hU : IsOpen U)
+theorem analyticAt_sec
+    (M : CxModel P d)
+    {e : OpenPartialHomeomorph M.Xc (Fin d → ℂ)}
+    (he : ReciprocityTheory.AnForm.M.IsCompatChart M.atlas e)
+    {U : Set M.Xc} (hU : IsOpen U)
     {s : M.Xc → (Σ k, ι k) → ℂ} (hs : ∀ p, M.atlas.HoloOn U fun y => s y p)
-    {u : Fin d → ℂ} (hu : u ∈ e.target) (huU : e.symm u ∈ U) :
-    AnalyticAt ℂ (fun u => s (e.symm u)) u := by
+    {u : Fin d → ℂ} (hu : u ∈ e.target) (huU : e.symm u ∈ U)
+    : AnalyticAt ℂ (fun u => s (e.symm u)) u := by
   obtain ⟨j, hj⟩ := M.atlas.cover (e.symm u)
   set V : Set (Fin d → ℂ) := e.target ∩ e.symm ⁻¹' (U ∩ (M.atlas.chart j).source) with hV
-  have hVo : IsOpen V := e.continuousOn_symm.isOpen_inter_preimage e.open_target
-    (hU.inter (M.atlas.chart j).open_source)
+  have hVo : IsOpen V :=
+    e.continuousOn_symm.isOpen_inter_preimage e.open_target (hU.inter (M.atlas.chart j).open_source)
   have huV : u ∈ V := ⟨hu, huU, hj⟩
   refine analyticAt_pi_iff.2 fun p => ?_
   have h1 : AnalyticAt ℂ (M.atlas.chart j ∘ e.symm) u := (he j).2 u ⟨hu, hj⟩
-  have h2 : AnalyticAt ℂ ((fun y' => s y' p) ∘ (M.atlas.chart j).symm) ((M.atlas.chart j ∘ e.symm) u) := by
+  have h2 : AnalyticAt ℂ ((fun y' => s y' p) ∘ (M.atlas.chart j).symm)
+      ((M.atlas.chart j ∘ e.symm) u) := by
     refine hs p j _ ⟨(M.atlas.chart j).map_source hj, ?_⟩
     show (M.atlas.chart j).symm ((M.atlas.chart j) (e.symm u)) ∈ U
     rw [(M.atlas.chart j).left_inv hj]

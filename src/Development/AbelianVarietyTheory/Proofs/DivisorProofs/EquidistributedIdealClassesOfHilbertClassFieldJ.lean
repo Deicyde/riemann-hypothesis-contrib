@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.LatVal GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport
+open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.LatVal
+  GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport
 open GlobalTheory.ToricTransport (coordIn)
 open scoped nonZeroDivisors
 open GlobalTheory.Published
@@ -16,46 +17,73 @@ noncomputable section
 
 namespace GlobalTheory.EquidistJ
 
-theorem card_ext_mul_finrank (L M : IntermediateField ℚ ℂ) (hML : M ≤ L) [FiniteDimensional ℚ L] (σ : ℂ ≃+* ℂ) :
-    Nat.card {τ : L →+* ℂ // ∀ x : L, (x : ℂ) ∈ M → τ x = σ x} * Module.finrank ℚ M = Module.finrank ℚ L := by
+theorem card_ext_mul_finrank
+    (L M : IntermediateField ℚ ℂ) (hML : M ≤ L) [FiniteDimensional ℚ L] (σ : ℂ ≃+* ℂ)
+    : Nat.card {τ : L →+* ℂ // ∀ x : L, (x : ℂ) ∈ M → τ x = σ x} * Module.finrank ℚ M
+      = Module.finrank ℚ L := by
   let E := IntermediateField.extendScalars hML
   have hEL : Module.finrank ℚ E = Module.finrank ℚ L := rfl
   have hEpos : 0 < Module.finrank ℚ E := by rw [hEL]; exact Module.finrank_pos
   haveI : FiniteDimensional ℚ E := Module.finite_of_finrank_pos hEpos
   haveI : FiniteDimensional M E := FiniteDimensional.right ℚ M E
-  let ι : L →+* E :=
-    { toFun := fun x => ⟨x.1, x.2⟩, map_one' := rfl, map_mul' := fun _ _ => rfl, map_zero' := rfl,
-      map_add' := fun _ _ => rfl }
-  let ι' : E →+* L :=
-    { toFun := fun x => ⟨x.1, x.2⟩, map_one' := rfl, map_mul' := fun _ _ => rfl, map_zero' := rfl,
-      map_add' := fun _ _ => rfl }
-  let e : {τ : L →+* ℂ // ∀ x : L, (x : ℂ) ∈ M → τ x = σ x} ≃ (E →ₐ[M] ℂ) :=
-    { toFun := fun τ =>
-        { toRingHom := σ.symm.toRingHom.comp (τ.1.comp ι')
-          commutes' := fun m => by
-            change σ.symm (τ.1 ⟨m.1, hML m.2⟩) = m.1
-            rw [τ.2 ⟨m.1, hML m.2⟩ m.2]
-            exact σ.symm_apply_apply _ }
-      invFun := fun f => ⟨σ.toRingHom.comp (f.toRingHom.comp ι), fun x hx => by
-          change σ (f ⟨x.1, x.2⟩) = σ x.1
-          congr 1
-          exact f.commutes ⟨x.1, hx⟩⟩
-      left_inv := fun τ => Subtype.ext (RingHom.ext fun x => by
-          change σ (σ.symm (τ.1 ⟨x.1, x.2⟩)) = τ.1 x
-          rw [σ.apply_symm_apply])
-      right_inv := fun f => AlgHom.ext fun x => by
-          change σ.symm (σ (f ⟨x.1, x.2⟩)) = f x
-          rw [σ.symm_apply_apply] }
+  let ι : L →+* E := {
+    toFun := fun x => ⟨x.1, x.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
+  let ι' : E →+* L := {
+    toFun := fun x => ⟨x.1, x.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
+  let e : {τ : L →+* ℂ // ∀ x : L, (x : ℂ) ∈ M → τ x = σ x} ≃ (E →ₐ[M] ℂ) := {
+    toFun := fun τ => {
+      toRingHom := σ.symm.toRingHom.comp (τ.1.comp ι')
+      commutes' := fun m => by
+        change σ.symm (τ.1 ⟨m.1, hML m.2⟩) = m.1
+        rw [τ.2 ⟨m.1, hML m.2⟩ m.2]
+        exact σ.symm_apply_apply _
+    }
+    invFun := fun f => ⟨
+      σ.toRingHom.comp (f.toRingHom.comp ι),
+      fun x hx => by
+        change σ (f ⟨x.1, x.2⟩) = σ x.1
+        congr 1
+        exact f.commutes ⟨x.1, hx⟩
+    ⟩
+    left_inv := fun τ =>
+      Subtype.ext (RingHom.ext fun x => by
+        change σ (σ.symm (τ.1 ⟨x.1, x.2⟩)) = τ.1 x
+        rw [σ.apply_symm_apply])
+    right_inv := fun f =>
+      AlgHom.ext fun x => by
+        change σ.symm (σ (f ⟨x.1, x.2⟩)) = f x
+        rw [σ.symm_apply_apply]
+  }
   set_option synthInstance.maxHeartbeats 200000 in
-    rw [Nat.card_congr e, Nat.card_eq_fintype_card, AlgHom.card M E ℂ, mul_comm,
-      Module.finrank_mul_finrank ℚ M E, hEL]
+  rw [Nat.card_congr e, Nat.card_eq_fintype_card, AlgHom.card M E ℂ, mul_comm,
+    Module.finrank_mul_finrank ℚ M E, hEL]
 
-theorem equidistributed_of_hilbertClassFieldJ : ∀ (hH : GlobalTheory.Published.HilbertClassFieldJ) {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finrank ℚ K = 2) (φK : K →+* ℂ) (ΛK : PeriodPair) (hΛ : IsLatOf φK 1 ΛK) (𝔞 : (ℂ ≃+* ℂ) → (FractionalIdeal (𝓞 K)⁰ K)ˣ) (h𝔞 : ∀ σ : ℂ ≃+* ℂ, Fixes φK σ → ∃ Λ : PeriodPair, IsLatOf φK (𝔞 σ : FractionalIdeal (𝓞 K)⁰ K) Λ ∧ jLat Λ = σ (jLat ΛK)), Equidistributed φK (jLat ΛK) 𝔞 := by
+theorem equidistributed_of_hilbertClassFieldJ
+    : ∀ (hH : GlobalTheory.Published.HilbertClassFieldJ) {K : Type} [Field K] [NumberField K]
+        [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finrank ℚ K = 2) (φK : K →+* ℂ)
+        (ΛK : PeriodPair) (hΛ : IsLatOf φK 1 ΛK) (𝔞 : (ℂ ≃+* ℂ) → (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+        (h𝔞 : ∀ σ : ℂ ≃+* ℂ,
+          Fixes φK σ
+            → ∃ Λ : PeriodPair,
+              IsLatOf φK (𝔞 σ : FractionalIdeal (𝓞 K)⁰ K) Λ ∧ jLat Λ = σ (jLat ΛK)),
+      Equidistributed φK (jLat ΛK) 𝔞 := by
   intro hH K _ _ _ h2 φK ΛK hΛ 𝔞 h𝔞
   letI : Algebra K ℂ := φK.toAlgebra
   have hj : ∀ Λ : PeriodPair, jLat Λ = (latticeCurve Λ).j := fun Λ => by rw [latticeCurve_j_eq]; rfl
-  have hlat : ∀ (𝔟 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (Λ : PeriodPair),
-      IsLatOf φK (𝔟 : FractionalIdeal (𝓞 K)⁰ K) Λ → IsIdealLattice 𝔟 Λ := fun _ _ h => h
+  have hlat
+      : ∀ (𝔟 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (Λ : PeriodPair),
+        IsLatOf φK (𝔟 : FractionalIdeal (𝓞 K)⁰ K) Λ → IsIdealLattice 𝔟 Λ := fun _ _ h =>
+    h
   obtain ⟨-, hfin, hcl, -, hrange⟩ := hH K h2 ΛK (hlat 1 ΛK hΛ)
   set H : IntermediateField K ℂ := K⟮(latticeCurve ΛK).j⟯ with hHdef
   have hpos : 0 < Module.finrank K H := hfin ▸ Fintype.card_pos
@@ -64,10 +92,12 @@ theorem equidistributed_of_hilbertClassFieldJ : ∀ (hH : GlobalTheory.Published
   have hj0' : jLat ΛK ∈ H := by rw [hj]; exact hj0
   have halg : IsAlgebraic ℚ (jLat ΛK) := by
     rw [hj]
-    exact (IntermediateField.isAlgebraic_iff.1
-      (Algebra.IsAlgebraic.isAlgebraic (⟨_, hj0⟩ : H))).restrictScalars ℚ
-  have hclass : ∀ σ σ' : ℂ ≃+* ℂ, Fixes φK σ → Fixes φK σ' →
-      (ClassGroup.mk K (𝔞 σ) = ClassGroup.mk K (𝔞 σ') ↔ σ (jLat ΛK) = σ' (jLat ΛK)) := by
+    exact (IntermediateField.isAlgebraic_iff.1 (Algebra.IsAlgebraic.isAlgebraic
+      (⟨_, hj0⟩ : H))).restrictScalars ℚ
+  have hclass
+      : ∀ σ σ' : ℂ ≃+* ℂ,
+        Fixes φK σ → Fixes φK σ'
+          → (ClassGroup.mk K (𝔞 σ) = ClassGroup.mk K (𝔞 σ') ↔ σ (jLat ΛK) = σ' (jLat ΛK)) := by
     intro σ σ' hσ hσ'
     obtain ⟨Λ, hl, hjl⟩ := h𝔞 σ hσ
     obtain ⟨Λ', hl', hjl'⟩ := h𝔞 σ' hσ'
@@ -82,8 +112,9 @@ theorem equidistributed_of_hilbertClassFieldJ : ∀ (hH : GlobalTheory.Published
   obtain ⟨g, hg⟩ := hinv
   haveI : NumberField H := NumberField.of_module_finite K H
   haveI : Countable H := (Module.finBasis ℚ H).equivFun.injective.countable
-  obtain ⟨σC, hσC⟩ := GlobalTheory.GaloisDescent.exists_complex_ringEquiv_comp_eq H.val.toRingHom
-    (H.val.toRingHom.comp g.toAlgHom.toRingHom)
+  obtain ⟨σC, hσC⟩ :=
+    GlobalTheory.GaloisDescent.exists_complex_ringEquiv_comp_eq H.val.toRingHom
+      (H.val.toRingHom.comp g.toAlgHom.toRingHom)
   have hfixC : Fixes φK σC := fun x => by
     have := hσC (algebraMap K H x)
     exact (by simpa using this : σC (algebraMap K ℂ x) = algebraMap K ℂ x)
@@ -105,8 +136,11 @@ theorem equidistributed_of_hilbertClassFieldJ : ∀ (hH : GlobalTheory.Published
     rw [Module.finrank_mul_finrank ℚ K H]
     rfl
   rw [hM, h2, hfin] at hcount
-  have hiff : ∀ τ : L →+* ℂ, (∃ σ : ℂ ≃+* ℂ, Fixes φK σ ∧ (∀ x : L, σ (x : ℂ) = τ x) ∧
-      ClassGroup.mk K (𝔞 σ) = ClassGroup.mk0 I) ↔ ∀ x : L, (x : ℂ) ∈ H.restrictScalars ℚ → τ x = σC x := by
+  have hiff
+      : ∀ τ : L →+* ℂ,
+        (∃ σ : ℂ ≃+* ℂ,
+            Fixes φK σ ∧ (∀ x : L, σ (x : ℂ) = τ x) ∧ ClassGroup.mk K (𝔞 σ) = ClassGroup.mk0 I)
+          ↔ ∀ x : L, (x : ℂ) ∈ H.restrictScalars ℚ → τ x = σC x := by
     intro τ
     constructor
     · rintro ⟨σ, hσ, hστ, hcσ⟩ x hx
@@ -121,7 +155,8 @@ theorem equidistributed_of_hilbertClassFieldJ : ∀ (hH : GlobalTheory.Published
       rw [← hστ x]
       exact DFunLike.congr_fun hab ⟨x, hx⟩
     · intro hτ
-      obtain ⟨σ, hσ⟩ := GlobalTheory.GaloisDescent.exists_complex_ringEquiv_comp_eq L.val.toRingHom τ
+      obtain ⟨σ, hσ⟩ :=
+        GlobalTheory.GaloisDescent.exists_complex_ringEquiv_comp_eq L.val.toRingHom τ
       have hσf : Fixes φK σ := fun x => by
         have h1 := hσ ⟨φK x, hKL x⟩
         have h2 := hτ ⟨φK x, hKL x⟩ (H.algebraMap_mem x)

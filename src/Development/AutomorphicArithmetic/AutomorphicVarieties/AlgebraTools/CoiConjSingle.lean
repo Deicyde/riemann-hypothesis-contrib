@@ -6,9 +6,11 @@ public import Mathlib
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-private theorem UpperTheory.V.AlgebraTools.exists_unit_entry {R : Type} [CommRing R] [IsLocalRing R] {ι : Type}
-    [Fintype ι] [DecidableEq ι] (e : Matrix ι ι R) (he : IsIdempotentElem e) (h0 : e ≠ 0) :
-    ∃ a b, IsUnit (e a b) := by
+private theorem UpperTheory.V.AlgebraTools.exists_unit_entry
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (e : Matrix ι ι R) (he : IsIdempotentElem e) (h0 : e ≠ 0)
+    : ∃ a b, IsUnit (e a b) := by
   classical
   by_contra h
   push_neg at h
@@ -28,8 +30,12 @@ private theorem UpperTheory.V.AlgebraTools.exists_unit_entry {R : Type} [CommRin
   have h2 : (1 - e) * e = 0 := by rw [sub_mul, one_mul, he.eq, sub_self]
   exact hu.mul_right_eq_zero.1 h2
 
-theorem UpperTheory.V.AlgebraTools.coi_conj_single :
-    ∀ {R : Type} [CommRing R] [IsLocalRing R] {ι : Type} [Fintype ι] [DecidableEq ι] (f : ι → Matrix ι ι R), CompleteOrthogonalIdempotents f → (∀ i, f i ≠ 0) → ∃ g : GL ι R, ∀ i, (g : Matrix ι ι R) * f i * ((g⁻¹ : GL ι R) : Matrix ι ι R) = single i i 1 := by
+theorem UpperTheory.V.AlgebraTools.coi_conj_single
+    : ∀ {R : Type} [CommRing R] [IsLocalRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
+        (f : ι → Matrix ι ι R),
+      CompleteOrthogonalIdempotents f → (∀ i, f i ≠ 0)
+        → ∃ g : GL ι R, ∀ i,
+          (g : Matrix ι ι R) * f i * ((g⁻¹ : GL ι R) : Matrix ι ι R) = single i i 1 := by
   intro R _ _ ι _ _ f hf h0
   classical
   have hc : ∀ i, ∃ a b, IsUnit (f i a b) := fun i =>
@@ -37,8 +43,9 @@ theorem UpperTheory.V.AlgebraTools.coi_conj_single :
   choose a b hu using hc
   set P : Matrix ι ι R := Matrix.of fun k j => f j k (b j) with hP
   set Q : Matrix ι ι R := Matrix.of fun i k => ((hu i).unit⁻¹ : Rˣ) * f i (a i) k with hQ
-  have hent : ∀ (M : Matrix ι ι R) (j k : ι),
-      (Q * M * P) j k = ((hu j).unit⁻¹ : Rˣ) * (f j * M * f k) (a j) (b k) := by
+  have hent
+      : ∀ (M : Matrix ι ι R) (j k : ι),
+        (Q * M * P) j k = ((hu j).unit⁻¹ : Rˣ) * (f j * M * f k) (a j) (b k) := by
     intro M j k
     simp only [hP, hQ, Matrix.mul_apply, Matrix.of_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
   have hidem : ∀ i, f i * f i = f i := fun i => (hf.idem i).eq

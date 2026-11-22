@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsThetaOf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 
 set_option autoImplicit false
@@ -23,9 +25,12 @@ open GlobalTheory.AbDual
 
 variable {k : Type} [Field k]
 
-theorem fil_isotropic_of_isCorrForm (A : Over (Sp k)) [GrpObj A] (hA : IsAbelianScheme A) (P : LB (A ⊗ A).left)
-    (hP : P.IsLB) (φ : HdR A →ₗ[k] HdR A →ₗ[k] k) (hφ : IsCorrForm (dp0 k) (𝟙 _) A A P φ) :
-    ∀ x ∈ Fil A, ∀ y ∈ Fil A, φ x y = 0 := by
+theorem fil_isotropic_of_isCorrForm
+    (A : Over (Sp k)) [GrpObj A]
+    (hA : IsAbelianScheme A)
+    (P : LB (A ⊗ A).left) (hP : P.IsLB)
+    (φ : HdR A →ₗ[k] HdR A →ₗ[k] k) (hφ : IsCorrForm (dp0 k) (𝟙 _) A A P φ)
+    : ∀ x ∈ Fil A, ∀ y ∈ Fil A, φ x y = 0 := by
   have H := GlobalTheory.abelianDeRham
   obtain ⟨g, hg⟩ := GlobalTheory.AbVarRelDim.exists_relDim k A hA
   have hAB := AbelianSchemeGerms.isAbelianScheme_tensor A A hA hA
@@ -51,87 +56,141 @@ variable {d : ℕ}
 def proj (j : Fin d) : TrivSqZeroExt k (Fin d → k) →+* TrivSqZeroExt k k :=
   (TrivSqZeroExt.map (LinearMap.proj (R := k) (φ := fun _ : Fin d => k) j)).toRingHom
 
-@[simp] theorem fst_proj (j : Fin d) (a : TrivSqZeroExt k (Fin d → k)) : (proj j a).fst = a.fst := by
+@[simp]
+theorem fst_proj (j : Fin d) (a : TrivSqZeroExt k (Fin d → k)) : (proj j a).fst = a.fst := by
   simp [proj]
 
-@[simp] theorem snd_proj (j : Fin d) (a : TrivSqZeroExt k (Fin d → k)) : (proj j a).snd = a.snd j := by
+@[simp]
+theorem snd_proj (j : Fin d) (a : TrivSqZeroExt k (Fin d → k)) : (proj j a).snd = a.snd j := by
   simp [proj]
 
-theorem projMor (A₀ : Over (Sp k)) [GrpObj A₀] (j : Fin d) :
-    GrpMor (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀
-      (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀ (proj j) (𝟙 _)
-      (Over.Hom.left (𝟙 A₀)) :=
-  GrpMor.of_hom (isDPMorphism_sqDP _ _ _ fun a ha => by
+theorem projMor (A₀ : Over (Sp k)) [GrpObj A₀] (j : Fin d)
+    : GrpMor (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k)))
+      (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀
+      (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀
+      (proj j) (𝟙 _) (Over.Hom.left (𝟙 A₀)) :=
+  GrpMor.of_hom
+    (isDPMorphism_sqDP _ _ _ fun a ha => by
       rw [RingHom.mem_ker] at ha ⊢
       change (proj j a).fst = 0
-      rw [fst_proj]; exact ha)
+      rw [fst_proj]
+      exact ha)
     (by
       rw [← GlobalTheory.Cris.spMap_comp]
       congr 1
-      ext a <;> simp) (𝟙 A₀)
+      ext a <;> simp)
+    (𝟙 A₀)
 
-theorem eq_of_liftSemi_surj' {K C C' : Type} [Field K] [CommRing C] [CommRing C'] [Algebra K C] {M M' M'' : Type*}
+theorem eq_of_liftSemi_surj'
+    {K C C' : Type} [Field K] [CommRing C] [CommRing C'] [Algebra K C]
+    {M M' M'' : Type*}
     [AddCommGroup M] [Module K M] [AddCommGroup M'] [Module C M'] [AddCommGroup M''] [Module C' M'']
-    (P : M →ₛₗ[algebraMap K C] M') (hP : Function.Surjective (liftSemi P)) (σ : C →+* C')
-    (Q : M' →ₛₗ[σ] M'') (P' : M → M'') (hQ : ∀ c, Q (P c) = P' c) (x : M' →ₗ[C] C) (x' : M'' →ₗ[C'] C')
-    (h : ∀ c, x' (P' c) = σ (x (P c))) (c : M') : x' (Q c) = σ (x c) := by
+    (P : M →ₛₗ[algebraMap K C] M') (hP : Function.Surjective (liftSemi P))
+    (σ : C →+* C') (Q : M' →ₛₗ[σ] M'')
+    (P' : M → M'') (hQ : ∀ c, Q (P c) = P' c)
+    (x : M' →ₗ[C] C) (x' : M'' →ₗ[C'] C') (h : ∀ c, x' (P' c) = σ (x (P c)))
+    (c : M')
+    : x' (Q c) = σ (x c) := by
   obtain ⟨u, rfl⟩ := hP c
   induction u using TensorProduct.induction_on with
   | zero => simp
-  | add u v hu hv => rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), hu, hv]
+  | add u v hu hv =>
+    rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _),
+      hu, hv]
   | tmul r c =>
-    rw [liftSemi_tmul, LinearMap.map_smulₛₗ, map_smul, map_smul, hQ, h, smul_eq_mul, smul_eq_mul, map_mul]
+    rw [liftSemi_tmul, LinearMap.map_smulₛₗ, map_smul, map_smul, hQ, h, smul_eq_mul, smul_eq_mul,
+      map_mul]
 
-theorem projMor_corr (A₀ : Over (Sp k)) [GrpObj A₀] (hA : IsAbelianScheme A₀) (j : Fin d)
-    (x : Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀)
-    (x' : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀)
-    (h : ∀ c, x' ((GlobalTheory.FODef.constMorV k k A₀).pull c) = proj j (x ((GlobalTheory.FODef.constMorV k (Fin d → k) A₀).pull c))) :
-    (projMor A₀ j).Corr x x' :=
-  eq_of_liftSemi_surj' _ (GlobalTheory.SqZeroCrys.isBC_trivSqZeroExt k (Fin d → k) A₀ hA (GlobalTheory.FODef.sqZero k (Fin d → k))
-    (GlobalTheory.FODef.constMorV k (Fin d → k) A₀)).2 (proj j) (projMor A₀ j).pull _
-    (fun c => GrpMor.pull_pull (GlobalTheory.FODef.constMorV k (Fin d → k) A₀) (projMor A₀ j) (GlobalTheory.FODef.constMorV k k A₀)
-      (fun r => by ext <;> simp [TrivSqZeroExt.algebraMap_eq_inl]) (by simp) c) x x' h
+theorem projMor_corr
+    (A₀ : Over (Sp k)) [GrpObj A₀]
+    (hA : IsAbelianScheme A₀)
+    (j : Fin d)
+    (x : Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k)))
+      (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀)
+    (x' : Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+      (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀)
+    (h : ∀ c,
+      x' ((GlobalTheory.FODef.constMorV k k A₀).pull c)
+        = proj j (x ((GlobalTheory.FODef.constMorV k (Fin d → k) A₀).pull c)))
+    : (projMor A₀ j).Corr x x' :=
+  eq_of_liftSemi_surj' _
+    (GlobalTheory.SqZeroCrys.isBC_trivSqZeroExt k (Fin d → k) A₀ hA
+      (GlobalTheory.FODef.sqZero k (Fin d → k)) (GlobalTheory.FODef.constMorV k (Fin d → k) A₀)).2
+    (proj j) (projMor A₀ j).pull _
+    (fun c =>
+      GrpMor.pull_pull (GlobalTheory.FODef.constMorV k (Fin d → k) A₀) (projMor A₀ j)
+        (GlobalTheory.FODef.constMorV k k A₀)
+        (fun r => by ext <;> simp [TrivSqZeroExt.algebraMap_eq_inl])
+        (by simp) c)
+    x x' h
 
-theorem exists_red_form (A₀ : Over (Sp k)) [GrpObj A₀] (P : LB (A₀ ⊗ A₀).left) (hP : P.IsLB)
-    (φ : Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ →ₗ[TrivSqZeroExt k (Fin d → k)]
-      Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ →ₗ[TrivSqZeroExt k (Fin d → k)]
-        TrivSqZeroExt k (Fin d → k))
-    (hφ : IsCorrForm (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom)
-      A₀ A₀ P φ) :
-    ∃ φ₀ : HdR A₀ →ₗ[k] HdR A₀ →ₗ[k] k, IsCorrForm (dp0 k) (𝟙 _) A₀ A₀ P φ₀ ∧
-      ∀ x x' y y', (GlobalTheory.Published.GrothendieckMessing.crysRedMor (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) rfl A₀).Corr x x' →
-        (GlobalTheory.Published.GrothendieckMessing.crysRedMor (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) rfl A₀).Corr y y' →
-        φ₀ x' y' = (φ x y).fst :=
-  hφ.pull hP (GlobalTheory.Published.GrothendieckMessing.crysRedMor (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) rfl A₀)
-    (GlobalTheory.Published.GrothendieckMessing.crysRedMor (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) rfl A₀)
+theorem exists_red_form
+    (A₀ : Over (Sp k)) [GrpObj A₀]
+    (P : LB (A₀ ⊗ A₀).left) (hP : P.IsLB)
+    (φ
+      : Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ →ₗ[TrivSqZeroExt k (Fin d → k)]
+        Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ →ₗ[TrivSqZeroExt k (Fin d → k)]
+          TrivSqZeroExt k (Fin d → k))
+    (hφ : IsCorrForm (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k)))
+      (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ A₀ P φ)
+    : ∃ φ₀ : HdR A₀ →ₗ[k] HdR A₀ →ₗ[k] k,
+      IsCorrForm (dp0 k) (𝟙 _) A₀ A₀ P φ₀
+        ∧ ∀ x x' y y',
+          (GlobalTheory.Published.GrothendieckMessing.crysRedMor
+              (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) rfl A₀).Corr x x'
+            → (GlobalTheory.Published.GrothendieckMessing.crysRedMor
+              (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) rfl A₀).Corr y y'
+            → φ₀ x' y' = (φ x y).fst :=
+  hφ.pull hP
+    (GlobalTheory.Published.GrothendieckMessing.crysRedMor
+      (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) rfl A₀)
+    (GlobalTheory.Published.GrothendieckMessing.crysRedMor
+      (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) rfl A₀)
     (h := 𝟙 _) ((Category.id_comp _).trans (Category.comp_id _).symm)
     ((Category.id_comp _).trans (Category.comp_id _).symm) hP (GlobalTheory.lbIso_pull_id hP)
 
-theorem exists_proj_form (A₀ : Over (Sp k)) [GrpObj A₀] (P : LB (A₀ ⊗ A₀).left) (hP : P.IsLB) (j : Fin d)
-    (φ : Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ →ₗ[TrivSqZeroExt k (Fin d → k)]
-      Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ →ₗ[TrivSqZeroExt k (Fin d → k)]
-        TrivSqZeroExt k (Fin d → k))
-    (hφ : IsCorrForm (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom)
-      A₀ A₀ P φ) :
-    ∃ φ' : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀ →ₗ[TrivSqZeroExt k k]
-        Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀ →ₗ[TrivSqZeroExt k k]
-          TrivSqZeroExt k k,
-      IsCorrForm (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀ A₀ P φ' ∧
-      ∀ x x' y y', (projMor A₀ j).Corr x x' → (projMor A₀ j).Corr y y' → φ' x' y' = proj j (φ x y) :=
-  hφ.pull hP (projMor A₀ j) (projMor A₀ j) (h := 𝟙 _) ((Category.id_comp _).trans (Category.comp_id _).symm)
+theorem exists_proj_form
+    (A₀ : Over (Sp k)) [GrpObj A₀]
+    (P : LB (A₀ ⊗ A₀).left) (hP : P.IsLB)
+    (j : Fin d)
+    (φ
+      : Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ →ₗ[TrivSqZeroExt k (Fin d → k)]
+        Crys (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k))) (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ →ₗ[TrivSqZeroExt k (Fin d → k)]
+          TrivSqZeroExt k (Fin d → k))
+    (hφ : IsCorrForm (divided₂ (GlobalTheory.FODef.sqZero k (Fin d → k)))
+      (spMap (TrivSqZeroExt.fstHom k k (Fin d → k)).toRingHom) A₀ A₀ P φ)
+    : ∃ φ'
+        : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀ →ₗ[TrivSqZeroExt k k]
+          Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀ →ₗ[TrivSqZeroExt k k]
+            TrivSqZeroExt k k,
+      IsCorrForm (divided₂ (GlobalTheory.FODef.sqZero k k))
+          (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀ A₀ P φ'
+        ∧ ∀ x x' y y',
+          (projMor A₀ j).Corr x x' → (projMor A₀ j).Corr y y' → φ' x' y' = proj j (φ x y) :=
+  hφ.pull hP (projMor A₀ j) (projMor A₀ j) (h := 𝟙 _)
+    ((Category.id_comp _).trans (Category.comp_id _).symm)
     ((Category.id_comp _).trans (Category.comp_id _).symm) hP (GlobalTheory.lbIso_pull_id hP)
 
-theorem exists_mem_of_fil (A₀ : Over (Sp k)) [GrpObj A₀] (g : HdR A₀ →ₗ[k] HdR A₀)
+theorem exists_mem_of_fil
+    (A₀ : Over (Sp k)) [GrpObj A₀]
+    (g : HdR A₀ →ₗ[k] HdR A₀)
     (E : Submodule (TrivSqZeroExt k k)
-      (Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀))
-    (hE : ∀ x ∈ Fil A₀, ∃ e ∈ E, ∀ c, e ((GlobalTheory.FODef.constMorV k k A₀).pull c) =
-      TrivSqZeroExt.inl (x c) + TrivSqZeroExt.inr (g x c))
-    {x z : HdR A₀} (hx : x ∈ Fil A₀) (hz : z ∈ Fil A₀) :
-    ∃ e ∈ E, ∀ c, e ((GlobalTheory.FODef.constMorV k k A₀).pull c) =
-      TrivSqZeroExt.inl (x c) + TrivSqZeroExt.inr ((g x + z) c) := by
+      (Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+        (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀))
+    (hE : ∀ x ∈ Fil A₀, ∃ e ∈ E, ∀ c,
+      e ((GlobalTheory.FODef.constMorV k k A₀).pull c)
+        = TrivSqZeroExt.inl (x c) + TrivSqZeroExt.inr (g x c))
+    {x z : HdR A₀} (hx : x ∈ Fil A₀) (hz : z ∈ Fil A₀)
+    : ∃ e ∈ E, ∀ c,
+      e ((GlobalTheory.FODef.constMorV k k A₀).pull c)
+        = TrivSqZeroExt.inl (x c) + TrivSqZeroExt.inr ((g x + z) c) := by
   obtain ⟨e₁, h₁, he₁⟩ := hE x hx
   obtain ⟨e₂, h₂, he₂⟩ := hE z hz
-  refine ⟨e₁ + (TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) • e₂, add_mem h₁ (E.smul_mem _ h₂), fun c => ?_⟩
+  refine ⟨
+    e₁ + (TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) • e₂,
+    add_mem h₁ (E.smul_mem _ h₂),
+    fun c => ?_
+  ⟩
   rw [LinearMap.add_apply, LinearMap.smul_apply, he₁, he₂, smul_eq_mul]
   ext <;> simp
 

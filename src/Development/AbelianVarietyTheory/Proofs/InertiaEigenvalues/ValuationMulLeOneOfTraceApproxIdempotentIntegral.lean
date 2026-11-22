@@ -9,12 +9,12 @@ open Classical
 
 namespace GlobalTheory.InvDiffLocal
 
-
 open IsDedekindDomain.HeightOneSpectrum in
-theorem exists_not_mem_mul_mem {R : Type} [CommRing R] [IsDedekindDomain R] {K : Type} [Field K]
-    [Algebra R K] [IsFractionRing R K] (v : HeightOneSpectrum R) (t : K)
-    (ht : v.valuation K t ≤ 1) :
-    ∃ s : R, s ∉ v.asIdeal ∧ ∃ r : R, algebraMap R K s * t = algebraMap R K r := by
+theorem exists_not_mem_mul_mem
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    {K : Type} [Field K] [Algebra R K] [IsFractionRing R K]
+    (v : HeightOneSpectrum R) (t : K) (ht : v.valuation K t ≤ 1)
+    : ∃ s : R, s ∉ v.asIdeal ∧ ∃ r : R, algebraMap R K s * t = algebraMap R K r := by
   obtain ⟨⟨a, ⟨b, hb⟩⟩, rfl⟩ := IsLocalization.mk'_surjective (nonZeroDivisors R) t
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   rw [valuation_of_mk'] at ht
@@ -44,8 +44,7 @@ theorem exists_not_mem_mul_mem {R : Type} [CommRing R] [IsDedekindDomain R] {K :
     exact this (Ideal.mem_span_singleton_self b)
   obtain ⟨s, hsB, hsp⟩ := Set.not_subset.1 hB'p
   refine ⟨s, hsp, ?_⟩
-  have hmem : a * s ∈ Ideal.span {b} := by
-    rw [hB']; exact Ideal.mul_mem_mul haI hsB
+  have hmem : a * s ∈ Ideal.span {b} := by rw [hB']; exact Ideal.mul_mem_mul haI hsB
   obtain ⟨r, hr⟩ := Ideal.mem_span_singleton'.1 hmem
   refine ⟨r, ?_⟩
   show algebraMap R K s * IsLocalization.mk' K a ⟨b, hb⟩ = algebraMap R K r
@@ -58,10 +57,10 @@ end GlobalTheory.InvDiffLocal
 
 namespace GlobalTheory.InvDiffLocal
 
-theorem mul_mem_of_trace_mem {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
-    [Algebra K L] (x : L)
-    (hx : ∀ b : 𝓞 L, Algebra.trace K L ((b : L) * x) ∈ (algebraMap (𝓞 K) K).range) :
-    ∀ d ∈ differentIdeal (𝓞 K) (𝓞 L), ∃ c : 𝓞 L, (c : L) = x * (d : L) := by
+theorem mul_mem_of_trace_mem
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    (x : L) (hx : ∀ b : 𝓞 L, Algebra.trace K L ((b : L) * x) ∈ (algebraMap (𝓞 K) K).range)
+    : ∀ d ∈ differentIdeal (𝓞 K) (𝓞 L), ∃ c : 𝓞 L, (c : L) = x * (d : L) := by
   intro d hd
   have hxd : x ∈ FractionalIdeal.dual (𝓞 K) K (1 : FractionalIdeal (nonZeroDivisors (𝓞 L)) L) := by
     rw [FractionalIdeal.mem_dual (by simp)]
@@ -69,7 +68,10 @@ theorem mul_mem_of_trace_mem {K L : Type} [Field K] [NumberField K] [Field L] [N
     obtain ⟨b, rfl⟩ := (FractionalIdeal.mem_one_iff _).1 ha
     rw [Algebra.traceForm_apply, mul_comm]
     exact hx b
-  have hdd : (d : L) ∈ ((differentIdeal (𝓞 K) (𝓞 L) : Ideal (𝓞 L)) : FractionalIdeal (nonZeroDivisors (𝓞 L)) L) :=
+  have hdd
+      : (d : L)
+        ∈ ((differentIdeal (𝓞 K) (𝓞 L) : Ideal (𝓞 L))
+          : FractionalIdeal (nonZeroDivisors (𝓞 L)) L) :=
     (FractionalIdeal.mem_coeIdeal _).2 ⟨d, hd, rfl⟩
   rw [coeIdeal_differentIdeal (𝓞 K) K] at hdd
   have hm := FractionalIdeal.mul_mem_mul hxd hdd
@@ -81,12 +83,14 @@ end GlobalTheory.InvDiffLocal
 
 namespace GlobalTheory.InvDiffLocal
 
-
 open IsDedekindDomain.HeightOneSpectrum in
-theorem exists_approx_idempotent {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
-    [Algebra K L] (la : HeightOneSpectrum (𝓞 L)) (p : HeightOneSpectrum (𝓞 K)) (N : ℕ) :
-    ∃ z : 𝓞 L, z ∉ la.asIdeal ∧ ∀ la' : HeightOneSpectrum (𝓞 L), la' ≠ la →
-      la'.asIdeal.under (𝓞 K) = p.asIdeal → z ∈ la'.asIdeal ^ N := by
+theorem exists_approx_idempotent
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    (la : HeightOneSpectrum (𝓞 L)) (p : HeightOneSpectrum (𝓞 K)) (N : ℕ)
+    : ∃ z : 𝓞 L,
+      z ∉ la.asIdeal
+        ∧ ∀ la' : HeightOneSpectrum (𝓞 L),
+          la' ≠ la → la'.asIdeal.under (𝓞 K) = p.asIdeal → z ∈ la'.asIdeal ^ N := by
   set S : Set (HeightOneSpectrum (𝓞 L)) := {la' | la' ≠ la ∧ la'.asIdeal.under (𝓞 K) = p.asIdeal}
   haveI := p.isMaximal
   have hfin : S.Finite := by
@@ -117,14 +121,17 @@ end GlobalTheory.InvDiffLocal
 
 namespace GlobalTheory.InvDiffLocal
 
-
 open IsDedekindDomain.HeightOneSpectrum in
-theorem valuation_mul_different_le_one : ∀ (K L : Type) [Field K] [NumberField K] [Field L]
-    [NumberField L] [Algebra K L] (la : HeightOneSpectrum (𝓞 L)) (p : HeightOneSpectrum (𝓞 K)),
-    la.asIdeal.under (𝓞 K) = p.asIdeal → ∀ y : L, (∃ N : ℕ, ∀ b : 𝓞 L,
-      (∀ la' : HeightOneSpectrum (𝓞 L), la' ≠ la → la'.asIdeal.under (𝓞 K) = p.asIdeal →
-        b ∈ la'.asIdeal ^ N) → p.valuation K (Algebra.trace K L ((b : L) * y)) ≤ 1) →
-    ∀ d ∈ differentIdeal (𝓞 K) (𝓞 L), la.valuation L (y * (d : L)) ≤ 1 := by
+theorem valuation_mul_different_le_one
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+        (la : HeightOneSpectrum (𝓞 L)) (p : HeightOneSpectrum (𝓞 K)),
+      la.asIdeal.under (𝓞 K) = p.asIdeal
+        → ∀ y : L,
+          (∃ N : ℕ, ∀ b : 𝓞 L,
+              (∀ la' : HeightOneSpectrum (𝓞 L),
+                  la' ≠ la → la'.asIdeal.under (𝓞 K) = p.asIdeal → b ∈ la'.asIdeal ^ N)
+                → p.valuation K (Algebra.trace K L ((b : L) * y)) ≤ 1)
+            → ∀ d ∈ differentIdeal (𝓞 K) (𝓞 L), la.valuation L (y * (d : L)) ≤ 1 := by
   intro K L _ _ _ _ _ la p hp y ⟨N, hN⟩ d hd
   obtain ⟨z, hzla, hzN⟩ := exists_approx_idempotent (K := K) la p N
   set x : L := (z : L) * y with hxdef
@@ -134,8 +141,11 @@ theorem valuation_mul_different_le_one : ∀ (K L : Type) [Field K] [NumberField
     rw [hxdef, ← mul_assoc]
     simpa using h
   set bs := RingOfIntegers.basis L
-  have hloc : ∀ i, ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ ∃ r : 𝓞 K,
-      algebraMap (𝓞 K) K s * Algebra.trace K L ((bs i : L) * x) = algebraMap (𝓞 K) K r :=
+  have hloc
+      : ∀ i, ∃ s : 𝓞 K,
+        s ∉ p.asIdeal
+          ∧ ∃ r : 𝓞 K,
+            algebraMap (𝓞 K) K s * Algebra.trace K L ((bs i : L) * x) = algebraMap (𝓞 K) K r :=
     fun i => exists_not_mem_mul_mem p _ (hx (bs i))
   choose s hsp r hr using hloc
   set s0 : 𝓞 K := ∏ i, s i with hs0
@@ -144,24 +154,25 @@ theorem valuation_mul_different_le_one : ∀ (K L : Type) [Field K] [NumberField
     rw [hs0, Ideal.IsPrime.prod_mem_iff]
     rintro ⟨i, _, hi⟩
     exact hsp i hi
-  have hgen : ∀ b : 𝓞 L,
-      algebraMap (𝓞 K) K s0 * Algebra.trace K L ((b : L) * x) ∈ (algebraMap (𝓞 K) K).range := by
+  have hgen
+      : ∀ b : 𝓞 L,
+        algebraMap (𝓞 K) K s0 * Algebra.trace K L ((b : L) * x) ∈ (algebraMap (𝓞 K) K).range := by
     intro b
     have hb : b ∈ Submodule.span ℤ (Set.range bs) := by rw [bs.span_eq]; trivial
     induction hb using Submodule.span_induction with
     | mem b hb =>
       obtain ⟨i, rfl⟩ := hb
-      rw [hs0, ← Finset.mul_prod_erase _ _ (Finset.mem_univ i), map_mul, mul_comm (algebraMap _ _ (s i)),
-        mul_assoc, hr i, ← map_mul]
+      rw [hs0, ← Finset.mul_prod_erase _ _ (Finset.mem_univ i), map_mul,
+        mul_comm (algebraMap _ _ (s i)), mul_assoc, hr i, ← map_mul]
       exact ⟨_, rfl⟩
-    | zero => simp
+    | zero =>
+      simp
     | add b c _ _ hb hc =>
       have : ((b + c : 𝓞 L) : L) * x = (b : L) * x + (c : L) * x := by push_cast; ring
       rw [this, map_add (f := _), mul_add]
       exact add_mem hb hc
     | smul n b _ hb =>
-      have : ((n • b : 𝓞 L) : L) * x = n • ((b : L) * x) := by
-        rw [← smul_mul_assoc]; congr 1
+      have : ((n • b : 𝓞 L) : L) * x = n • ((b : L) * x) := by rw [← smul_mul_assoc]; congr 1
       rw [this, map_zsmul, mul_smul_comm]
       exact zsmul_mem hb n
   set x' : L := algebraMap (𝓞 K) L s0 * x with hx'def

@@ -11,17 +11,21 @@ noncomputable section
 
 namespace Formalism.HN
 
-theorem imageLattice_mono {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V]
-    [NormedAddCommGroup E] [InnerProductSpace ℝ E] (ρ : V →+ E) {A B : Submodule R V}
-    (h : A ≤ B) : zl ρ A ≤ zl ρ B := by
+theorem imageLattice_mono
+    {R V E : Type*}
+    [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    (ρ : V →+ E)
+    {A B : Submodule R V} (h : A ≤ B)
+    : zl ρ A ≤ zl ρ B := by
   intro x hx
   obtain ⟨y, hy, rfl⟩ := AddSubgroup.mem_map.mp hx
   exact AddSubgroup.mem_map.mpr ⟨y, h hy, rfl⟩
 
 universe u v w in
-theorem hnStep_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : RatioMax.{u, v, w})
-    (h4 : FinSup.{u, v, w}) (h5 : SatR.{u, v, w}) (h6 : SatBasic.{u, v, w}) :
-    HNStep.{u, v, w} := by
+theorem hnStep_of
+    (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : RatioMax.{u, v, w})
+    (h4 : FinSup.{u, v, w}) (h5 : SatR.{u, v, w}) (h6 : SatBasic.{u, v, w})
+    : HNStep.{u, v, w} := by
   intro R V E _ _ _ _ _ _ ρ L hL θ
   obtain ⟨hsub, hmono, hsat_eq, -, -, hbot, -, -⟩ := h6 R V E ρ L hL
   obtain ⟨g, hg⟩ : ∃ g : Submodule R V → ℝ, ∀ N, g N = deg ρ N - θ * (rk ρ N : ℝ) :=
@@ -29,36 +33,34 @@ theorem hnStep_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : Rat
   have sm : ∀ A B : Submodule R V, A ≤ L → B ≤ L → g A + g B ≤ g (A ⊔ B) + g (A ⊓ B) := by
     intro A B hA hB
     obtain ⟨hr, hd⟩ := h1 R V E ρ L A B hL hA hB
-    have hr' : (rk ρ (A ⊔ B) : ℝ) + rk ρ (A ⊓ B) = rk ρ A + rk ρ B := by
-      exact_mod_cast hr
+    have hr' : (rk ρ (A ⊔ B) : ℝ) + rk ρ (A ⊓ B) = rk ρ A + rk ρ B := by exact_mod_cast hr
     have hθ : θ * (rk ρ (A ⊔ B) : ℝ) + θ * rk ρ (A ⊓ B) = θ * rk ρ A + θ * rk ρ B := by
       rw [← mul_add, ← mul_add, hr']
     simp only [hg]
     linarith
-  have charP : ∀ M : Submodule R V, M ≤ L → M ≠ ⊥ →
-      (θ ≤ muMin ρ M ↔ ∀ N ≤ M, g N ≤ g M) := by
+  have charP : ∀ M : Submodule R V, M ≤ L → M ≠ ⊥ → (θ ≤ muMin ρ M ↔ ∀ N ≤ M, g N ≤ g M) := by
     intro M hM hM0
     rw [(h2 R V E ρ M (hsub M hM) hM0).2.1 θ]
     refine forall_congr' fun N => imp_congr_right fun _ => ?_
     simp only [hg, mul_sub]
     constructor <;> intro h <;> linarith
-  have supP : ∀ A B : Submodule R V, A ≤ L → B ≤ L → (∀ N ≤ A, g N ≤ g A) →
-      (∀ N ≤ B, g N ≤ g B) → ∀ N ≤ A ⊔ B, g N ≤ g (A ⊔ B) := by
+  have supP
+      : ∀ A B : Submodule R V,
+        A ≤ L → B ≤ L → (∀ N ≤ A, g N ≤ g A) → (∀ N ≤ B, g N ≤ g B)
+          → ∀ N ≤ A ⊔ B, g N ≤ g (A ⊔ B) := by
     intro A B hA hB pA pB N hN
     have hNL : N ≤ L := hN.trans (sup_le hA hB)
     have e1 := sm N A hNL hA
     have e2 := pA (N ⊓ A) inf_le_right
     have e3 := sm (N ⊔ A) B (sup_le hNL hA) hB
     have e4 := pB ((N ⊔ A) ⊓ B) inf_le_right
-    have e5 : N ⊔ A ⊔ B = A ⊔ B := by
-      rw [sup_assoc]; exact sup_eq_right.mpr hN
+    have e5 : N ⊔ A ⊔ B = A ⊔ B := by rw [sup_assoc]; exact sup_eq_right.mpr hN
     rw [e5] at e3
     linarith
-  obtain ⟨t, htS, htF⟩ := h4 R V E ρ L {N | N ≤ L ∧ N ≠ ⊥ ∧ θ ≤ muMin ρ N} hL
-    (fun N hN => hN.1)
+  obtain ⟨t, htS, htF⟩ := h4 R V E ρ L {N | N ≤ L ∧ N ≠ ⊥ ∧ θ ≤ muMin ρ N} hL (fun N hN => hN.1)
   have hFdef : hnStep ρ L θ = t.sup id := htF
-  have memS : ∀ N : Submodule R V, N ≤ L → N ≠ ⊥ → θ ≤ muMin ρ N →
-      N ≤ hnStep ρ L θ := fun N a b c =>
+  have memS
+      : ∀ N : Submodule R V, N ≤ L → N ≠ ⊥ → θ ≤ muMin ρ N → N ≤ hnStep ρ L θ := fun N a b c =>
     le_sSup (s := {N | N ≤ L ∧ N ≠ ⊥ ∧ θ ≤ muMin ρ N})
       (show N ≤ L ∧ N ≠ ⊥ ∧ θ ≤ muMin ρ N from ⟨a, b, c⟩)
   have PF : t.sup id ≤ L ∧ ∀ N ≤ t.sup id, g N ≤ g (t.sup id) := by
@@ -75,16 +77,15 @@ theorem hnStep_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : Rat
   clear hFdef htF htS
   set F := hnStep ρ L θ with hFset
   clear_value F
-  have rkpos_of : IsSat ρ L F → ∀ X : Submodule R V, F < X → X ≤ L →
-      rk ρ F < rk ρ X := by
+  have rkpos_of : IsSat ρ L F → ∀ X : Submodule R V, F < X → X ≤ L → rk ρ F < rk ρ X := by
     intro hs X hX hXL
     rcases (hmono F X hX.le hXL).1.lt_or_eq with h | h
     · exact h
     · exact absurd (hsat_eq F X hs hX.le hXL h.symm) hX.ne'
   have Fsat : IsSat ρ L F := by
     obtain ⟨F', hFF', hF'L, himg⟩ := h5 R V E ρ L F hL FL
-    obtain ⟨hsatimg, -, hrkimg⟩ := Formalism.F.saturProps E (zl ρ L)
-      (zl ρ F) hL.2 (imageLattice_mono ρ FL)
+    obtain ⟨hsatimg, -, hrkimg⟩ :=
+      Formalism.F.saturProps E (zl ρ L) (zl ρ F) hL.2 (imageLattice_mono ρ FL)
     have hF'sat : IsSat ρ L F' := by
       unfold IsSat
       rw [himg]
@@ -141,12 +142,10 @@ theorem hnStep_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : Rat
     have hX : M ⊔ F ≤ N₀ := sup_le hM hFN₀.le
     have hXN₀ : g (M ⊔ F) ≤ g N₀ := by
       rcases (le_sup_right : F ≤ M ⊔ F).lt_or_eq with hlt | heq
-      · have hrX₀ : (rk ρ (M ⊔ F) : ℝ) ≤ rk ρ N₀ := by
-          exact_mod_cast (hmono _ _ hX hN₀L).1
+      · have hrX₀ : (rk ρ (M ⊔ F) : ℝ) ≤ rk ρ N₀ := by exact_mod_cast (hmono _ _ hX hN₀L).1
         have k2 := hmax (M ⊔ F) hlt (hX.trans hN₀L)
         have hpos : 0 < (rk ρ N₀ : ℝ) - rk ρ F := sub_pos.mpr hr₀
-        have hm : ((rk ρ N₀ : ℝ) - rk ρ F) * g (M ⊔ F) ≤
-            ((rk ρ N₀ : ℝ) - rk ρ F) * g N₀ := by
+        have hm : ((rk ρ N₀ : ℝ) - rk ρ F) * g (M ⊔ F) ≤ ((rk ρ N₀ : ℝ) - rk ρ F) * g N₀ := by
           simp only [hg]
           nlinarith [mul_nonneg (sub_nonneg.mpr hμ) (sub_nonneg.mpr hrX₀)]
         exact le_of_mul_le_mul_left hm hpos

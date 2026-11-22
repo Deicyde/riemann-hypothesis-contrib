@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.ModuliIntegralCharts.H1
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
@@ -21,8 +22,8 @@ def ltEquiv (Dw : Datum H) (n : ℕ) : LtN Dw n ≃ (Σ τ : E →+* ℂ, Fin (D
   left_inv _ := rfl
   right_inv _ := rfl
 
-def encP {Dw : Datum H} {n : ℕ} {K : Type} [CommRing K] (P : MvPolynomial (LtN Dw n) K) :
-    MvPolynomial ((Σ τ : E →+* ℂ, Fin (Dw.mult τ)) × Fin n) K :=
+def encP {Dw : Datum H} {n : ℕ} {K : Type} [CommRing K] (P : MvPolynomial (LtN Dw n) K)
+    : MvPolynomial ((Σ τ : E →+* ℂ, Fin (Dw.mult τ)) × Fin n) K :=
   MvPolynomial.rename (ltEquiv Dw n) P
 
 def PsiCoverSt (H : Host E) : Prop :=

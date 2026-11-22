@@ -139,8 +139,9 @@ theorem latExt : LatExt := by
   intro v₁ v₂ hpos G h₁ h₂ ω hω z
   have hne : ((starRingEnd ℂ) v₁ * v₂).im ≠ 0 := hpos.ne'
   have hA : ((((starRingEnd ℂ) v₁ * v₂).im : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hne
-  have hI : (starRingEnd ℂ) v₁ * v₂ - v₁ * (starRingEnd ℂ) v₂ =
-      2 * I * ((((starRingEnd ℂ) v₁ * v₂).im : ℝ) : ℂ) := by
+  have hI
+      : (starRingEnd ℂ) v₁ * v₂ - v₁ * (starRingEnd ℂ) v₂
+        = 2 * I * ((((starRingEnd ℂ) v₁ * v₂).im : ℝ) : ℂ) := by
     apply Complex.ext <;> simp [Complex.mul_re, Complex.mul_im] <;> ring
   set A : ℂ := ((((starRingEnd ℂ) v₁ * v₂).im : ℝ) : ℂ) with hAdef
   have r10 : Rel G A v₁ v₂ 1 0 := by

@@ -6,11 +6,20 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.PlaceBelow
 @[expose] public section
 
 open scoped BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj NumberField
 
 namespace GlobalTheory
 
-theorem eigenvector_mem_span_block_of_basis : ∀ (K C : Type) [Field K] [Field C] (ι : K →+* C) (O A : Type) [Fintype A] (n : A → ℕ) (d : ℕ) (M : O → Matrix (Fin d) (Fin d) C) (em : A → O → C) (u : (Σ a : A, Fin (n a)) → Fin d → K), Function.Injective em → (∀ x q, (M x).mulVec (fun s => ι (u q s)) = em q.1 x • fun s => ι (u q s)) → (∀ z : Fin d → K, ∃! b : (Σ a : A, Fin (n a)) → K, ∀ s, ∑ q, b q * u q s = z s) → ∀ (a : A) (z : Fin d → C), (∀ x, (M x).mulVec z = em a x • z) → ∃ b : Fin (n a) → C, z = ∑ i, b i • fun s => ι (u ⟨a, i⟩ s) := by
+theorem eigenvector_mem_span_block_of_basis
+    : ∀ (K C : Type) [Field K] [Field C] (ι : K →+* C) (O A : Type) [Fintype A] (n : A → ℕ) (d : ℕ)
+        (M : O → Matrix (Fin d) (Fin d) C) (em : A → O → C) (u : (Σ a : A, Fin (n a)) → Fin d → K),
+      Function.Injective em
+        → (∀ x q, (M x).mulVec (fun s => ι (u q s)) = em q.1 x • fun s => ι (u q s))
+        → (∀ z : Fin d → K, ∃! b : (Σ a : A, Fin (n a)) → K, ∀ s, ∑ q, b q * u q s = z s)
+        → ∀ (a : A) (z : Fin d → C),
+          (∀ x, (M x).mulVec z = em a x • z)
+            → ∃ b : Fin (n a) → C, z = ∑ i, b i • fun s => ι (u ⟨a, i⟩ s) := by
   intro K C _ _ ι O A _ n d M em u hem hM hb a z hz
   classical
   let U : Matrix (Σ a : A, Fin (n a)) (Fin d) K := Matrix.of u
@@ -27,28 +36,29 @@ theorem eigenvector_mem_span_block_of_basis : ∀ (K C : Type) [Field K] [Field 
     have h1 : U * W * U = U := by rw [Matrix.mul_assoc, hWU, Matrix.mul_one]
     have h2 : (1 : Matrix (Σ a : A, Fin (n a)) (Σ a : A, Fin (n a)) K) * U = U := Matrix.one_mul _
     ext q q'
-    have := (hb (u q)).unique (y₁ := (U * W) q)
-      (y₂ := (1 : Matrix (Σ a : A, Fin (n a)) (Σ a : A, Fin (n a)) K) q)
-      (fun s => by
-        have := congrFun (congrFun h1 q) s
-        rw [Matrix.mul_apply] at this
-        exact this)
-      (fun s => by
-        have := congrFun (congrFun h2 q) s
-        rw [Matrix.mul_apply] at this
-        exact this)
+    have :=
+      (hb (u q)).unique (y₁ := (U * W) q)
+        (y₂ := (1 : Matrix (Σ a : A, Fin (n a)) (Σ a : A, Fin (n a)) K) q)
+        (fun s => by
+          have := congrFun (congrFun h1 q) s
+          rw [Matrix.mul_apply] at this
+          exact this)
+        (fun s => by
+          have := congrFun (congrFun h2 q) s
+          rw [Matrix.mul_apply] at this
+          exact this)
     exact congrFun this q'
   have hWU' : W.map ι * U.map ι = 1 := by
     rw [← Matrix.map_mul, hWU, Matrix.map_one _ (map_zero ι) (map_one ι)]
   have hUW' : U.map ι * W.map ι = 1 := by
     rw [← Matrix.map_mul, hUW, Matrix.map_one _ (map_zero ι) (map_one ι)]
-  have hvm : ∀ c : (Σ a : A, Fin (n a)) → C,
-      Matrix.vecMul c (U.map ι) = ∑ q, c q • fun s => ι (u q s) := by
+  have hvm
+      : ∀ c : (Σ a : A, Fin (n a)) → C,
+        Matrix.vecMul c (U.map ι) = ∑ q, c q • fun s => ι (u q s) := by
     intro c
     funext s
     simp [Matrix.vecMul, dotProduct, U, Finset.sum_apply]
-  have hind : ∀ c : (Σ a : A, Fin (n a)) → C,
-      (∑ q, c q • fun s => ι (u q s)) = 0 → c = 0 := by
+  have hind : ∀ c : (Σ a : A, Fin (n a)) → C, (∑ q, c q • fun s => ι (u q s)) = 0 → c = 0 := by
     intro c hc
     rw [← hvm] at hc
     have : Matrix.vecMul (Matrix.vecMul c (U.map ι)) (W.map ι) = c := by
@@ -64,14 +74,14 @@ theorem eigenvector_mem_span_block_of_basis : ∀ (K C : Type) [Field K] [Field 
     apply hem
     funext x
     have h := hz x
-    have h3 : (∑ q : (Σ a : A, Fin (n a)), ((em q.1 x - em a x) * c q) • fun s => ι (u q s)) = 0 := by
-      have e1 : (M x).mulVec z
-          = ∑ q : (Σ a : A, Fin (n a)), (em q.1 x * c q) • fun s => ι (u q s) := by
+    have h3
+        : (∑ q : (Σ a : A, Fin (n a)), ((em q.1 x - em a x) * c q) • fun s => ι (u q s)) = 0 := by
+      have e1
+          : (M x).mulVec z = ∑ q : (Σ a : A, Fin (n a)), (em q.1 x * c q) • fun s => ι (u q s) := by
         rw [hc, Matrix.mulVec_sum]
         refine Finset.sum_congr rfl fun q _ => ?_
         rw [Matrix.mulVec_smul, hM, smul_smul, mul_comm]
-      have e2 : em a x • z
-          = ∑ q : (Σ a : A, Fin (n a)), (em a x * c q) • fun s => ι (u q s) := by
+      have e2 : em a x • z = ∑ q : (Σ a : A, Fin (n a)), (em a x * c q) • fun s => ι (u q s) := by
         rw [hc, Finset.smul_sum]
         refine Finset.sum_congr rfl fun q _ => ?_
         rw [smul_smul]

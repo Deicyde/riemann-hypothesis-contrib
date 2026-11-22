@@ -13,9 +13,11 @@ open MvPolynomial Formalism.BasicNotions.TH
 
 namespace GlobalTheory.LowIrr
 
-def zR (P Q R S : ℕ) : Fin R × Fin (P + Q) → Ln P Q R S := fun w => (finSumFinEquiv.symm w.2, .inl w.1)
+def zR (P Q R S : ℕ) : Fin R × Fin (P + Q) → Ln P Q R S := fun w =>
+  (finSumFinEquiv.symm w.2, .inl w.1)
 
-def yS (P Q R S : ℕ) : Fin S × Fin (P + Q) → Ln P Q R S := fun w => (finSumFinEquiv.symm w.2, .inr w.1)
+def yS (P Q R S : ℕ) : Fin S × Fin (P + Q) → Ln P Q R S := fun w =>
+  (finSumFinEquiv.symm w.2, .inr w.1)
 
 def kap (P Q k k' : ℕ) : Fin (P + Q) → ℂ := fun i => if (i : ℕ) < P then (k : ℂ) else -(k' : ℂ)
 
@@ -29,19 +31,20 @@ theorem yS_inj (P Q R S : ℕ) : Function.Injective (yS P Q R S) := by
   simp only [yS, Prod.mk.injEq, Sum.inr.injEq, EmbeddingLike.apply_eq_iff_eq] at e
   rw [e.1, e.2]
 
-theorem zR_ne_yS (P Q R S : ℕ) (u w) : zR P Q R S u ≠ yS P Q R S w := by
-  simp [zR, yS]
+theorem zR_ne_yS (P Q R S : ℕ) (u w) : zR P Q R S u ≠ yS P Q R S w := by simp [zR, yS]
 
-theorem zR_or_yS (P Q R S : ℕ) (s : Ln P Q R S) :
-    (∃ u, zR P Q R S u = s) ∨ ∃ w, yS P Q R S w = s := by
+theorem zR_or_yS (P Q R S : ℕ) (s : Ln P Q R S)
+    : (∃ u, zR P Q R S u = s) ∨ ∃ w, yS P Q R S w = s := by
   obtain ⟨a, c | d⟩ := s
   · exact Or.inl ⟨(c, finSumFinEquiv a), by simp [zR]⟩
   · exact Or.inr ⟨(d, finSumFinEquiv a), by simp [yS]⟩
 
-theorem fockF_rowOp {σ I J : Type} [DecidableEq σ] [Fintype J] (z : I × J → σ) (c d : I)
-    (f g : MvPolynomial σ ℂ) :
-    Formalism.REAL.fockF (GlobalTheory.Capelli.rowOp ℂ z c d f) g = Formalism.REAL.fockF f (GlobalTheory.Capelli.rowOp ℂ z d c g) := by
-  rw [GlobalTheory.Capelli.rowOp_apply, GlobalTheory.Capelli.rowOp_apply, Formalism.REAL.fischerInner_sum_left, Formalism.REAL.fischerInner_sum_right]
+theorem fockF_rowOp
+    {σ I J : Type} [DecidableEq σ] [Fintype J] (z : I × J → σ) (c d : I) (f g : MvPolynomial σ ℂ)
+    : Formalism.REAL.fockF (GlobalTheory.Capelli.rowOp ℂ z c d f) g
+      = Formalism.REAL.fockF f (GlobalTheory.Capelli.rowOp ℂ z d c g) := by
+  rw [GlobalTheory.Capelli.rowOp_apply, GlobalTheory.Capelli.rowOp_apply,
+    Formalism.REAL.fischerInner_sum_left, Formalism.REAL.fischerInner_sum_right]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Formalism.REAL.fischerInner_X_mul_left, Formalism.REAL.fischerInner_pderiv_left]
 

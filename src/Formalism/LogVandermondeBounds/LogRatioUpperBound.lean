@@ -14,7 +14,8 @@ def nBetween (k a b : ℕ) : ℕ := ((Ioo a b).filter (fun c => plusSign k c ≠
 
 noncomputable def dTau (k m : ℕ) (lam : ℕ → ℝ) : ℝ :=
   (∏ a ∈ range (k - 1 + m), ∏ b ∈ (Ico (a + 1) (k - 1 + m)).filter (fun b => plusSign k b = plusSign k a),
-      (lam a - lam b + nBetween k a b)) /
-    ((∏ i ∈ range (k - 1 + m / 2), ((i.factorial : ℕ) : ℝ)) * ∏ i ∈ range (m / 2), ((i.factorial : ℕ) : ℝ))
+      (lam a - lam b + nBetween k a b))
+    / ((∏ i ∈ range (k - 1 + m / 2), ((i.factorial : ℕ) : ℝ))
+      * ∏ i ∈ range (m / 2), ((i.factorial : ℕ) : ℝ))
 
 end Formalism.LogVandermondeBounds.StandardLattice

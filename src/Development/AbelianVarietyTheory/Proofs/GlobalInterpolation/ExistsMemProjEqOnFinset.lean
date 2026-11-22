@@ -7,16 +7,20 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions Formalism.MainNotions.StandardLattice
+open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions
+  Formalism.MainNotions.StandardLattice
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_mem_proj_eq_on_finset {G ι : Type} [Group G] {Gv : ι → Type}
-    [∀ v, Group (Gv v)] (π : ∀ v, G →* Gv v) (H : Subgroup G) (Kv : ∀ v, Subgroup (Gv v))
+theorem exists_mem_proj_eq_on_finset
+    {G ι : Type} [Group G]
+    {Gv : ι → Type} [∀ v, Group (Gv v)]
+    (π : ∀ v, G →* Gv v) (H : Subgroup G) (Kv : ∀ v, Subgroup (Gv v))
     (hH : ∀ v, ∀ h ∈ Kv v, ∃ g ∈ H, π v g = h ∧ ∀ w, w ≠ v → π w g = 1)
-    (h : ∀ v, Gv v) (hh : ∀ v, h v ∈ Kv v) (T : Finset ι) :
-    ∃ g ∈ H, (∀ v ∈ T, π v g = h v) ∧ ∀ v, v ∉ T → π v g = 1 := by
+    (h : ∀ v, Gv v) (hh : ∀ v, h v ∈ Kv v)
+    (T : Finset ι)
+    : ∃ g ∈ H, (∀ v ∈ T, π v g = h v) ∧ ∀ v, v ∉ T → π v g = 1 := by
   classical
   induction T using Finset.induction_on with
   | empty => exact ⟨1, H.one_mem, by simp, by simp⟩
@@ -33,35 +37,34 @@ theorem exists_mem_proj_eq_on_finset {G ι : Type} [Group G] {Gv : ι → Type}
       rw [Finset.mem_insert, not_or] at hv
       rw [map_mul, h4 v hv.1, h2 v hv.2, one_mul]
 
-theorem index_pi_univ_dep {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)]
-    (H : ∀ i, Subgroup (G i)) :
-    (Subgroup.pi Set.univ H).index = ∏ i, (H i).index := by
+theorem index_pi_univ_dep
+    {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)] (H : ∀ i, Subgroup (G i))
+    : (Subgroup.pi Set.univ H).index = ∏ i, (H i).index := by
   simp_rw [Subgroup.index, ← Nat.card_pi]
-  refine Nat.card_congr
-    ((Quotient.congrRight (fun x y ↦ ?_)).trans (Setoid.piQuotientEquiv _).symm)
+  refine Nat.card_congr ((Quotient.congrRight (fun x y ↦ ?_)).trans (Setoid.piQuotientEquiv _).symm)
   rw [QuotientGroup.leftRel_pi]
 
-theorem relIndex_eq_prod_local :
-    ∀ (G ι : Type) [Group G] (Gv : ι → Type) [∀ v, Group (Gv v)] (π : ∀ v, G →* Gv v)
-      (H K U : Subgroup G) (Kv Uv : ∀ v, Subgroup (Gv v)) (S : Finset ι),
-      (∀ v, ∀ h ∈ Kv v, ∃ g ∈ H, π v g = h ∧ ∀ w, w ≠ v → π w g = 1) →
-      (∀ g, g ∈ K ↔ g ∈ H ∧ ∀ v, π v g ∈ Kv v) →
-      (∀ g, g ∈ U ↔ g ∈ H ∧ ∀ v, π v g ∈ Uv v) →
-      (∀ v, v ∉ S → Kv v ≤ Uv v) →
-      U.relIndex K = ∏ v ∈ S, (Uv v).relIndex (Kv v) := by
+theorem relIndex_eq_prod_local
+    : ∀ (G ι : Type) [Group G] (Gv : ι → Type) [∀ v, Group (Gv v)] (π : ∀ v, G →* Gv v)
+        (H K U : Subgroup G) (Kv Uv : ∀ v, Subgroup (Gv v)) (S : Finset ι),
+      (∀ v, ∀ h ∈ Kv v, ∃ g ∈ H, π v g = h ∧ ∀ w, w ≠ v → π w g = 1)
+        → (∀ g, g ∈ K ↔ g ∈ H ∧ ∀ v, π v g ∈ Kv v) → (∀ g, g ∈ U ↔ g ∈ H ∧ ∀ v, π v g ∈ Uv v)
+        → (∀ v, v ∉ S → Kv v ≤ Uv v)
+        → U.relIndex K = ∏ v ∈ S, (Uv v).relIndex (Kv v) := by
   intro G ι _ Gv _ π H K U Kv Uv S hH hK hU hS
   classical
-  let f : K →* (∀ v : S, Kv v) :=
-    { toFun := fun g v => ⟨π v g, ((hK g).1 g.2).2 v⟩
-      map_one' := by
-        funext v
-        apply Subtype.ext
-        simp
-      map_mul' := by
-        intro a b
-        funext v
-        apply Subtype.ext
-        simp }
+  let f : K →* (∀ v : S, Kv v) := {
+    toFun := fun g v => ⟨π v g, ((hK g).1 g.2).2 v⟩
+    map_one' := by
+      funext v
+      apply Subtype.ext
+      simp
+    map_mul' := by
+      intro a b
+      funext v
+      apply Subtype.ext
+      simp
+  }
   have hf : Function.Surjective f := by
     intro x
     let h : ∀ v, Gv v := fun v => if hv : v ∈ S then (x ⟨v, hv⟩ : Gv v) else 1
@@ -82,8 +85,8 @@ theorem relIndex_eq_prod_local :
     change π v g = _
     rw [h1 v v.2]
     simp only [h, dif_pos v.2]
-  have hc : U.subgroupOf K =
-      (Subgroup.pi Set.univ fun v : S => (Uv v).subgroupOf (Kv v)).comap f := by
+  have hc
+      : U.subgroupOf K = (Subgroup.pi Set.univ fun v : S => (Uv v).subgroupOf (Kv v)).comap f := by
     ext g
     rw [Subgroup.mem_subgroupOf, Subgroup.mem_comap, Subgroup.mem_pi, hU]
     constructor

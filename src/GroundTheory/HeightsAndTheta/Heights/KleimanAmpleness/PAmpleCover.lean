@@ -15,11 +15,11 @@ noncomputable section
 
 universe u w
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω}
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
-theorem AmpleCover.sub_twist (F Q : SubSystem S x Ω) (I : Chart x) :
-    (F.twist Q).sub I = F.sub I * Q.sub I := by
+theorem AmpleCover.sub_twist (F Q : SubSystem S x Ω) (I : Chart x)
+    : (F.twist Q).sub I = F.sub I * Q.sub I := by
   rw [Submodule.mul_eq_span_mul_set]
   change Submodule.span _ _ = _
   congr 1
@@ -29,8 +29,8 @@ theorem AmpleCover.sub_twist (F Q : SubSystem S x Ω) (I : Chart x) :
   · rintro ⟨q, hq, y, hy, rfl⟩; exact ⟨y, hy, q, hq, mul_comm _ _⟩
   · rintro ⟨y, hy, q, hq, rfl⟩; exact ⟨q, hq, y, hy, mul_comm _ _⟩
 
-theorem AmpleCover.sub_pow (Q : SubSystem S x Ω) (n : ℕ) (I : Chart x) :
-    (Q.pow n).sub I = Q.sub I ^ n := by
+theorem AmpleCover.sub_pow (Q : SubSystem S x Ω) (n : ℕ) (I : Chart x)
+    : (Q.pow n).sub I = Q.sub I ^ n := by
   induction n with
   | zero =>
     obtain ⟨i, hi⟩ := I.2.1
@@ -61,13 +61,13 @@ theorem AmpleCover.proof : AmpleCover.Statement.{u, w} := by
       intro j
       have h1 : A.h j * w ∈ (1 : Submodule R Ω) := by
         rw [← hone A.m, ← hpow]
-        exact Submodule.mul_mem_mul (by rw [← A.generates I]; exact Submodule.subset_span ⟨j, rfl⟩) hw
+        exact Submodule.mul_mem_mul (by rw [← A.generates I]; exact Submodule.subset_span ⟨j, rfl⟩)
+          hw
       obtain ⟨a, ha⟩ := Submodule.mem_one.mp h1
       obtain ⟨e, he⟩ := hF j I y hy
       refine ⟨a, ⟨e, ?_⟩, ha⟩
       change a ^ e • y ∈ G
-      have hw' : w ^ e ∈ Q' ^ (A.m * e) := by
-        rw [pow_mul]; exact Submodule.pow_mem_pow _ hw e
+      have hw' : w ^ e ∈ Q' ^ (A.m * e) := by rw [pow_mul]; exact Submodule.pow_mem_pow _ hw e
       have h2 : (y * A.h j ^ e) * w ^ e ∈ G * P ^ (A.m * e) * Q' ^ (A.m * e) :=
         Submodule.mul_mem_mul (by rw [← hpow]; exact he) hw'
       rw [mul_assoc, hone, mul_one] at h2

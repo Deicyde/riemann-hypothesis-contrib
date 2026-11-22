@@ -5,11 +5,22 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PowIdeal
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE TensorProduct
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE TensorProduct
 
 namespace GlobalTheory.CompanionTheory.GE
 
-theorem krull_noeth_chart : ∀ {X : Scheme.{0}} (J : X.IdealSheafData) {Z : Scheme.{0}} (ψ : Z ⟶ J.subscheme), IsProper ψ → ∀ (V : X.Opens), IsAffineOpen V → ∀ (U : Z.Opens), IsAffineOpen U → ∀ h : U ≤ (ψ ≫ J.subschemeι) ⁻¹ᵁ V, letI : Algebra Γ(X, V) Γ(Z, U) := ((ψ ≫ J.subschemeι).appLE V U h).hom.toAlgebra; ∀ (R : Type) [CommRing R] [IsNoetherianRing R] [Algebra Γ(X, V) R], IsNoetherianRing (R ⊗[Γ(X, V)] Γ(Z, U)) := by
+theorem krull_noeth_chart
+    : ∀ {X : Scheme.{0}} (J : X.IdealSheafData) {Z : Scheme.{0}} (ψ : Z ⟶ J.subscheme),
+      IsProper ψ
+        → ∀ (V : X.Opens),
+          IsAffineOpen V
+            → ∀ (U : Z.Opens),
+              IsAffineOpen U
+                → ∀ h : U ≤ (ψ ≫ J.subschemeι) ⁻¹ᵁ V,
+                  letI : Algebra Γ(X, V) Γ(Z, U) := ((ψ ≫ J.subschemeι).appLE V U h).hom.toAlgebra
+                  ∀ (R : Type) [CommRing R] [IsNoetherianRing R] [Algebra Γ(X, V) R],
+                    IsNoetherianRing (R ⊗[Γ(X, V)] Γ(Z, U)) := by
   intro X J Z ψ hψ V hV U hU h
   have hft : ((ψ ≫ J.subschemeι).appLE V U h).hom.FiniteType := by
     haveI : LocallyOfFiniteType ψ := inferInstance

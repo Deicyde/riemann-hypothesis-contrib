@@ -18,36 +18,45 @@ def InvAt (i : G.comp) (L0 : G.P.Tup) (ξ : G.P.Xsp) : Prop :=
   ∀ γ : (G.lev i).Γ, (G.lev i).smul γ L0 = L0 → ((G.lev i).χ γ : G.O) • (G.lev i).actX γ ξ = ξ
 
 def HRatInv : Prop :=
-  ∀ (i : G.comp) (L0 : G.P.Tup), G.P.IsLatTup L0 →
-    {ξ | ξ ∈ G.P.HtupW L0 ∧ InvAt G i L0 ξ} ⊆
-      Submodule.span G.O {ξ | ξ ∈ G.P.HtupW L0 ∧ InvAt G i L0 ξ ∧ RatX G e ξ}
+  ∀ (i : G.comp) (L0 : G.P.Tup),
+    G.P.IsLatTup L0
+      → {ξ | ξ ∈ G.P.HtupW L0 ∧ InvAt G i L0 ξ}
+        ⊆ Submodule.span G.O {ξ | ξ ∈ G.P.HtupW L0 ∧ InvAt G i L0 ξ ∧ RatX G e ξ}
 
-theorem chiAct_mul (i : G.comp) (a b : (G.lev i).Γ) (ξ : G.P.Xsp) :
-    ((G.lev i).χ (a * b) : G.O) • (G.lev i).actX (a * b) ξ =
-      ((G.lev i).χ a : G.O) • (G.lev i).actX a (((G.lev i).χ b : G.O) • (G.lev i).actX b ξ) := by
-  rw [map_mul, Units.val_mul, Formalism.MainNotions.G.LatticeSystems.jd_actX_mul, LinearMap.comp_apply, LinearMap.map_smul_of_tower, smul_smul]
+theorem chiAct_mul (i : G.comp) (a b : (G.lev i).Γ) (ξ : G.P.Xsp)
+    : ((G.lev i).χ (a * b) : G.O) • (G.lev i).actX (a * b) ξ
+      = ((G.lev i).χ a : G.O) • (G.lev i).actX a (((G.lev i).χ b : G.O) • (G.lev i).actX b ξ) := by
+  rw [map_mul, Units.val_mul, Formalism.MainNotions.G.LatticeSystems.jd_actX_mul,
+    LinearMap.comp_apply, LinearMap.map_smul_of_tower, smul_smul]
 
-theorem jdI_apply (i : G.comp) (L0 : G.P.Tup) (γ : (G.lev i).Γ) (ξ : G.P.Xsp) (hξ : InvAt G i L0 ξ) :
-    delta G i L0 ξ i ((G.lev i).smul γ L0) = ((G.lev i).χ γ : G.O) • (G.lev i).actX γ ξ := by
+theorem jdI_apply (i : G.comp) (L0 : G.P.Tup) (γ : (G.lev i).Γ) (ξ : G.P.Xsp) (hξ : InvAt G i L0 ξ)
+    : delta G i L0 ξ i ((G.lev i).smul γ L0) = ((G.lev i).χ γ : G.O) • (G.lev i).actX γ ξ := by
   classical
   unfold Formalism.MainNotions.G.LatticeSystems.delta
   have hex : ∃ γ' : (G.lev i).Γ, (G.lev i).smul γ L0 = (G.lev i).smul γ' L0 := ⟨γ, rfl⟩
   rw [dite_eq_left hex, if_pos rfl]
   have hspec : (G.lev i).smul γ L0 = (G.lev i).smul hex.choose L0 := hex.choose_spec
   have hstab : (G.lev i).smul (γ⁻¹ * hex.choose) L0 = L0 := by
-    rw [Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, ← hspec, ← Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, inv_mul_cancel,
+    rw [Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, ← hspec,
+      ← Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, inv_mul_cancel,
       Formalism.MainNotions.G.LatticeSystems.jd_smul_one]
   have h1 := hξ (γ⁻¹ * hex.choose) hstab
-  calc ((G.lev i).χ hex.choose : G.O) • (G.lev i).actX hex.choose ξ
-      = ((G.lev i).χ (γ * (γ⁻¹ * hex.choose)) : G.O) • (G.lev i).actX (γ * (γ⁻¹ * hex.choose)) ξ := by
-        rw [mul_inv_cancel_left]
-    _ = ((G.lev i).χ γ : G.O) • (G.lev i).actX γ (((G.lev i).χ (γ⁻¹ * hex.choose) : G.O) •
-          (G.lev i).actX (γ⁻¹ * hex.choose) ξ) := chiAct_mul G i _ _ ξ
+  calc
+    ((G.lev i).χ hex.choose : G.O) • (G.lev i).actX hex.choose ξ
+        = ((G.lev i).χ (γ * (γ⁻¹ * hex.choose)) : G.O)
+          • (G.lev i).actX (γ * (γ⁻¹ * hex.choose)) ξ := by
+      rw [mul_inv_cancel_left]
+    _ = ((G.lev i).χ γ : G.O) • (G.lev i).actX γ
+        (((G.lev i).χ (γ⁻¹ * hex.choose) : G.O) • (G.lev i).actX (γ⁻¹ * hex.choose) ξ) :=
+      chiAct_mul G i _ _ ξ
     _ = ((G.lev i).χ γ : G.O) • (G.lev i).actX γ ξ := by rw [h1]
 
-theorem jdI_mem (Hv : G.P.Tup → Submodule G.O G.P.Xsp) (hE : EquivSys G Hv)
-    (i : G.comp) (L0 : G.P.Tup) (hL0 : G.P.IsLatTup L0) (ξ : G.P.Xsp) (hξ : ξ ∈ Hv L0) (hI : InvAt G i L0 ξ) :
-    delta G i L0 ξ ∈ G.funMod Hv := by
+theorem jdI_mem
+    (Hv : G.P.Tup → Submodule G.O G.P.Xsp) (hE : EquivSys G Hv)
+    (i : G.comp)
+    (L0 : G.P.Tup) (hL0 : G.P.IsLatTup L0)
+    (ξ : G.P.Xsp) (hξ : ξ ∈ Hv L0) (hI : InvAt G i L0 ξ)
+    : delta G i L0 ξ ∈ G.funMod Hv := by
   classical
   rw [Formalism.MainNotions.G.GAtP.funMod, Submodule.mem_pi]
   intro i' _
@@ -84,20 +93,26 @@ theorem jdI_mem (Hv : G.P.Tup → Submodule G.O G.P.Xsp) (hE : EquivSys G Hv)
     · subst hi
       by_cases hL : ∃ h : (G.lev i').Γ, L = (G.lev i').smul h L0
       · obtain ⟨h, rfl⟩ := hL
-        rw [← Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, jdI_apply G i' L0 _ ξ hI, jdI_apply G i' L0 h ξ hI, chiAct_mul]
+        rw [← Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, jdI_apply G i' L0 _ ξ hI,
+          jdI_apply G i' L0 h ξ hI, chiAct_mul]
       · have hL' : ¬ ∃ h : (G.lev i').Γ, (G.lev i').smul γ L = (G.lev i').smul h L0 := by
           rintro ⟨h, hh⟩
           apply hL
           refine ⟨γ⁻¹ * h, ?_⟩
-          rw [Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, ← hh, ← Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, inv_mul_cancel,
+          rw [Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, ← hh,
+            ← Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, inv_mul_cancel,
             Formalism.MainNotions.G.LatticeSystems.jd_smul_one]
         rw [Formalism.MainNotions.G.LatticeSystems.jd_zero G i' L0 ξ i' _ (Or.inr hL'),
-          Formalism.MainNotions.G.LatticeSystems.jd_zero G i' L0 ξ i' _ (Or.inr hL), map_zero, smul_zero]
-    · rw [Formalism.MainNotions.G.LatticeSystems.jd_zero G i L0 ξ i' _ (Or.inl hi), Formalism.MainNotions.G.LatticeSystems.jd_zero G i L0 ξ i' _ (Or.inl hi),
-        map_zero, smul_zero]
+          Formalism.MainNotions.G.LatticeSystems.jd_zero G i' L0 ξ i' _ (Or.inr hL), map_zero,
+          smul_zero]
+    · rw [Formalism.MainNotions.G.LatticeSystems.jd_zero G i L0 ξ i' _ (Or.inl hi),
+        Formalism.MainNotions.G.LatticeSystems.jd_zero G i L0 ξ i' _ (Or.inl hi), map_zero,
+        smul_zero]
 
-theorem inv_of_mem (Hv : G.P.Tup → Submodule G.O G.P.Xsp) (F : G.Fn) (hF : F ∈ G.funMod Hv) (i : G.comp)
-    (L0 : G.P.Tup) : InvAt G i L0 (F i L0) := by
+theorem inv_of_mem
+    (Hv : G.P.Tup → Submodule G.O G.P.Xsp) (F : G.Fn) (hF : F ∈ G.funMod Hv)
+    (i : G.comp) (L0 : G.P.Tup)
+    : InvAt G i L0 (F i L0) := by
   intro γ hγ
   have hFi : F i ∈ (G.lev i).funMod Hv := (Submodule.mem_pi.mp hF) i (Set.mem_univ i)
   unfold Formalism.MainNotions.G.Level.funMod at hFi
@@ -109,17 +124,21 @@ theorem inv_of_mem (Hv : G.P.Tup → Submodule G.O G.P.Xsp) (F : G.Fn) (hF : F �
   have h5 := h4 L0
   rw [LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero] at h5
   simp only [LinearMap.proj_apply, LinearMap.comp_apply, LinearMap.smul_apply,
-    LinearMap.restrictScalars_apply] at h5
+      LinearMap.restrictScalars_apply]
+    at h5
   rw [hγ] at h5
   exact h5.symm
 
-theorem jdI_decomp (reps : Finset (G.comp × G.P.Tup)) (hR : IsReps G reps)
-    (Hv : G.P.Tup → Submodule G.O G.P.Xsp) (F : G.Fn) (hF : F ∈ G.funMod Hv) :
-    F = ∑ r ∈ reps, delta G r.1 r.2 (F r.1 r.2) := by
+theorem jdI_decomp
+    (reps : Finset (G.comp × G.P.Tup)) (hR : IsReps G reps)
+    (Hv : G.P.Tup → Submodule G.O G.P.Xsp) (F : G.Fn) (hF : F ∈ G.funMod Hv)
+    : F = ∑ r ∈ reps, delta G r.1 r.2 (F r.1 r.2) := by
   classical
-  have hcomp : ∀ i, F i ∈ (G.lev i).funMod Hv := fun i => (Submodule.mem_pi.mp hF) i (Set.mem_univ i)
-  have heqv : ∀ (i : G.comp) (γ : (G.lev i).Γ) (L : G.P.Tup),
-      F i ((G.lev i).smul γ L) = ((G.lev i).χ γ : G.O) • (G.lev i).actX γ (F i L) := by
+  have hcomp : ∀ i, F i ∈ (G.lev i).funMod Hv := fun i =>
+    (Submodule.mem_pi.mp hF) i (Set.mem_univ i)
+  have heqv
+      : ∀ (i : G.comp) (γ : (G.lev i).Γ) (L : G.P.Tup),
+        F i ((G.lev i).smul γ L) = ((G.lev i).χ γ : G.O) • (G.lev i).actX γ (F i L) := by
     intro i γ L
     have hFi := hcomp i
     unfold Formalism.MainNotions.G.Level.funMod at hFi
@@ -131,7 +150,8 @@ theorem jdI_decomp (reps : Finset (G.comp × G.P.Tup)) (hR : IsReps G reps)
     have h5 := h4 L
     rw [LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero] at h5
     simpa only [LinearMap.proj_apply, LinearMap.comp_apply, LinearMap.smul_apply,
-      LinearMap.restrictScalars_apply] using h5
+        LinearMap.restrictScalars_apply]
+      using h5
   have hzero : ∀ (i : G.comp) (L : G.P.Tup), ¬ G.P.IsLatTup L → F i L = 0 := by
     intro i L hL
     have hFi := hcomp i
@@ -160,7 +180,8 @@ theorem jdI_decomp (reps : Finset (G.comp × G.P.Tup)) (hR : IsReps G reps)
         rintro ⟨g, hg⟩
         refine hne (hR.2.1 ⟨i0, L0⟩ hr0 ⟨i0, L1⟩ hr1 rfl ⟨g⁻¹ * γ, ?_⟩).symm
         dsimp only
-        rw [Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, ← hγ, hg, ← Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, inv_mul_cancel,
+        rw [Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, ← hγ, hg,
+          ← Formalism.MainNotions.G.LatticeSystems.jd_smul_mul, inv_mul_cancel,
           Formalism.MainNotions.G.LatticeSystems.jd_smul_one]
       · left
         exact fun h => h1 (by simpa using h)
@@ -175,8 +196,8 @@ theorem jdI_decomp (reps : Finset (G.comp × G.P.Tup)) (hR : IsReps G reps)
     rintro ⟨g, rfl⟩
     exact hL (Formalism.MainNotions.G.LatticeSystems.jd_lat _ g L1 (hR.1 _ hr1))
 
-theorem deltaI_rat (hA : RatActG G e) (i : G.comp) (L0 : G.P.Tup) (ξ : G.P.Xsp) (hξ : RatX G e ξ) :
-    RatFn G e (delta G i L0 ξ) := by
+theorem deltaI_rat (hA : RatActG G e) (i : G.comp) (L0 : G.P.Tup) (ξ : G.P.Xsp) (hξ : RatX G e ξ)
+    : RatFn G e (delta G i L0 ξ) := by
   intro i' L
   classical
   unfold Formalism.MainNotions.G.LatticeSystems.delta
@@ -185,8 +206,9 @@ theorem deltaI_rat (hA : RatActG G e) (i : G.comp) (L0 : G.P.Tup) (ξ : G.P.Xsp)
   · exact ⟨0, by simp⟩
   · exact ⟨0, by simp⟩
 
-theorem mRatSpan_inv (h2 : G.FinClasses) (hE : EquivSys G G.P.HtupW) (hA : RatActG G e) (hH : HRatInv G e) :
-    MRatSpan G.P G.comp e G.M := by
+theorem mRatSpan_inv
+    (h2 : G.FinClasses) (hE : EquivSys G G.P.HtupW) (hA : RatActG G e) (hH : HRatInv G e)
+    : MRatSpan G.P G.comp e G.M := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
@@ -197,7 +219,8 @@ theorem mRatSpan_inv (h2 : G.FinClasses) (hE : EquivSys G G.P.HtupW) (hA : RatAc
     refine Submodule.sum_mem _ fun r hr => ?_
     have hlat : G.P.IsLatTup r.2 := hR.1 r hr
     have hval : F r.1 r.2 ∈ G.P.HtupW r.2 := ((jd_fmem G G.P.HtupW F).1 hF r.1).1 r.2 hlat
-    have hsp : F r.1 r.2 ∈ Submodule.span G.O {ξ | ξ ∈ G.P.HtupW r.2 ∧ InvAt G r.1 r.2 ξ ∧ RatX G e ξ} :=
+    have hsp
+        : F r.1 r.2 ∈ Submodule.span G.O {ξ | ξ ∈ G.P.HtupW r.2 ∧ InvAt G r.1 r.2 ξ ∧ RatX G e ξ} :=
       hH r.1 r.2 hlat ⟨hval, inv_of_mem G G.P.HtupW F hF r.1 r.2⟩
     generalize F r.1 r.2 = x at hsp
     induction hsp using Submodule.span_induction with
@@ -209,7 +232,8 @@ theorem mRatSpan_inv (h2 : G.FinClasses) (hE : EquivSys G G.P.HtupW) (hA : RatAc
       have : delta G r.1 r.2 (0 : G.P.Xsp) = 0 := by
         have := jd_smul G r.1 r.2 0 0
         simpa using this
-      rw [this]; exact Submodule.zero_mem _
+      rw [this]
+      exact Submodule.zero_mem _
     | add y z _ _ h1' h2' => rw [jd_add]; exact Submodule.add_mem _ h1' h2'
     | smul a y _ h1' => rw [jd_smul]; exact Submodule.smul_mem _ _ h1'
 

@@ -6,8 +6,15 @@ public import Mathlib
 
 open Module Topology
 
-theorem UpperTheory.finite_zp_module_torsion_free_splitting :
-    ∀ (l : ℕ) [Fact l.Prime] (N : Type) [AddCommGroup N] [Module ℤ_[l] N] [TopologicalSpace N] [IsTopologicalAddGroup N] [ContinuousSMul ℤ_[l] N] [T2Space N] [Module.Finite ℤ_[l] N], Finite ↥(Submodule.torsion ℤ_[l] N) ∧ ∃ (p : N →ₗ[ℤ_[l]] (Fin (Module.finrank ℤ_[l] N) → ℤ_[l])) (t : N →ₗ[ℤ_[l]] ↥(Submodule.torsion ℤ_[l] N)), Continuous p ∧ IsOpen (LinearMap.ker t : Set N) ∧ (∀ y : ↥(Submodule.torsion ℤ_[l] N), p y = 0 ∧ t y = y) ∧ Function.Bijective (fun y => (p y, t y)) := by
+theorem UpperTheory.finite_zp_module_torsion_free_splitting
+    : ∀ (l : ℕ) [Fact l.Prime] (N : Type) [AddCommGroup N] [Module ℤ_[l] N] [TopologicalSpace N]
+        [IsTopologicalAddGroup N] [ContinuousSMul ℤ_[l] N] [T2Space N] [Module.Finite ℤ_[l] N],
+      Finite ↥(Submodule.torsion ℤ_[l] N)
+        ∧ ∃ (p : N →ₗ[ℤ_[l]] (Fin (Module.finrank ℤ_[l] N) → ℤ_[l]))
+            (t : N →ₗ[ℤ_[l]] ↥(Submodule.torsion ℤ_[l] N)),
+          Continuous p ∧ IsOpen (LinearMap.ker t : Set N)
+            ∧ (∀ y : ↥(Submodule.torsion ℤ_[l] N), p y = 0 ∧ t y = y)
+            ∧ Function.Bijective (fun y => (p y, t y)) := by
   intro l _ N _ _ _ _ _ _ _
   obtain ⟨m, g, hg⟩ := Module.Finite.exists_fin' ℤ_[l] N
   have hgc : Continuous g := LinearMap.continuous_on_pi g
@@ -16,8 +23,9 @@ theorem UpperTheory.finite_zp_module_torsion_free_splitting :
     intro f
     rw [hq.continuous_iff]
     exact LinearMap.continuous_on_pi (f ∘ₗ g)
-  obtain ⟨a, ha, ha0⟩ := Submodule.annihilator_top_inter_nonZeroDivisors
-    (R := ℤ_[l]) (M := Submodule.torsion ℤ_[l] N) Submodule.torsion_isTorsion
+  obtain ⟨a, ha, ha0⟩ :=
+    Submodule.annihilator_top_inter_nonZeroDivisors (R := ℤ_[l]) (M := Submodule.torsion ℤ_[l] N)
+      Submodule.torsion_isTorsion
   have ha0' : a ≠ 0 := nonZeroDivisors.ne_zero ha0
   have hkill : ∀ y : Submodule.torsion ℤ_[l] N, ((l : ℤ_[l]) ^ a.valuation) • y = 0 := by
     intro y
@@ -63,7 +71,8 @@ theorem UpperTheory.finite_zp_module_torsion_free_splitting :
     rw [this, map_smul, map_smul, hkill]
   refine ⟨?_, p, t, hlin p, ?_, fun y => ⟨?_, ?_⟩, ?_, ?_⟩
   · haveI : NeZero (l ^ K) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
-    refine Finite.of_surjective (fun d : Fin m → ZMod (l ^ K) => t (g (fun i => ((d i).val : ℤ_[l])))) ?_
+    refine
+      Finite.of_surjective (fun d : Fin m → ZMod (l ^ K) => t (g (fun i => ((d i).val : ℤ_[l])))) ?_
     intro y
     obtain ⟨c, hc⟩ := hg (y : N)
     refine ⟨fun i => PadicInt.toZModPow K (c i), ?_⟩
@@ -77,7 +86,8 @@ theorem UpperTheory.finite_zp_module_torsion_free_splitting :
     simp [map_sub, ZMod.natCast_zmod_val]
   · refine hq.isCoinducing.isOpen_preimage.mp ?_
     show IsOpen ((LinearMap.ker (t ∘ₗ g) : Submodule ℤ_[l] (Fin m → ℤ_[l])) : Set (Fin m → ℤ_[l]))
-    refine Submodule.isOpen_mono (U := Submodule.pi Set.univ (fun _ => Ideal.span {(l : ℤ_[l]) ^ K})) ?_ ?_
+    refine Submodule.isOpen_mono
+      (U := Submodule.pi Set.univ (fun _ => Ideal.span {(l : ℤ_[l]) ^ K})) ?_ ?_
     · intro c hc
       exact LinearMap.mem_ker.mpr (hker c (fun i => hc i (Set.mem_univ i)))
     · rw [Submodule.coe_pi]

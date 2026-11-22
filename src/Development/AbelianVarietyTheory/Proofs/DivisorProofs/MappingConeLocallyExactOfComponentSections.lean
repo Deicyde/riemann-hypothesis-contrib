@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Subsingleton
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 noncomputable section
 
@@ -52,14 +53,27 @@ lemma sres_add {F : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) (x y : Sec F U) :
 
 end GlobalTheory.EtC.ConeSec
 
-
 open GlobalTheory.EtC.ConeSec in
-theorem GlobalTheory.EtC.cone_sec_exact : ∀ (R : Type) [CommRing R] {I J : Cx R} (f : I ⟶ J) (U : Scheme.{0}) (n : ℤ), (∀ (b₁ : Sec (I.X (n + 1)) U) (b₂ : Sec (J.X n) U), Sec.map (I.d (n + 1) (n + 2)) b₁ = 0 → Sec.map (f.f (n + 1)) b₁ + Sec.map (J.d n (n + 1)) b₂ = 0 → Loc U fun V g => ∃ (a₁ : Sec (I.X n) V) (a₂ : Sec (J.X (n - 1)) V), Sec.map (I.d n (n + 1)) a₁ = -Sec.res g b₁ ∧ Sec.map (f.f n) a₁ + Sec.map (J.d (n - 1) n) a₂ = Sec.res g b₂) → ∀ b : Sec ((mappingCone f).X n) U, Sec.map ((mappingCone f).d n (n + 1)) b = 0 → Loc U fun V g => ∃ a : Sec ((mappingCone f).X (n - 1)) V, Sec.map ((mappingCone f).d (n - 1) n) a = Sec.res g b := by
+theorem GlobalTheory.EtC.cone_sec_exact
+    : ∀ (R : Type) [CommRing R] {I J : Cx R} (f : I ⟶ J) (U : Scheme.{0}) (n : ℤ),
+      (∀ (b₁ : Sec (I.X (n + 1)) U) (b₂ : Sec (J.X n) U),
+          Sec.map (I.d (n + 1) (n + 2)) b₁ = 0
+            → Sec.map (f.f (n + 1)) b₁ + Sec.map (J.d n (n + 1)) b₂ = 0
+            → Loc U fun V g =>
+              ∃ (a₁ : Sec (I.X n) V) (a₂ : Sec (J.X (n - 1)) V),
+                Sec.map (I.d n (n + 1)) a₁ = - Sec.res g b₁
+                  ∧ Sec.map (f.f n) a₁ + Sec.map (J.d (n - 1) n) a₂ = Sec.res g b₂)
+        → ∀ b : Sec ((mappingCone f).X n) U,
+          Sec.map ((mappingCone f).d n (n + 1)) b = 0
+            → Loc U fun V g =>
+              ∃ a : Sec ((mappingCone f).X (n - 1)) V,
+                Sec.map ((mappingCone f).d (n - 1) n) a = Sec.res g b := by
   intro R _ I J f U n hyp b hb
   obtain ⟨b₁, hb₁⟩ : ∃ x, Sec.map ((mappingCone.fst f).1.v n (n + 1) rfl) b = x := ⟨_, rfl⟩
   obtain ⟨b₂, hb₂⟩ : ∃ x, Sec.map ((mappingCone.snd f).v n n (add_zero n)) b = x := ⟨_, rfl⟩
   have h1 : Sec.map (I.d (n + 1) (n + 2)) b₁ = 0 := by
-    have e := congrArg (fun φ => Sec.map φ b) (mappingCone.d_fst_v f n (n + 1) (n + 2) rfl (by ring))
+    have e :=
+      congrArg (fun φ => Sec.map φ b) (mappingCone.d_fst_v f n (n + 1) (n + 2) rfl (by ring))
     simp only [smap_comp, smap_neg, hb, smap_zero, hb₁] at e
     exact neg_eq_zero.mp e.symm
   have h2 : Sec.map (f.f (n + 1)) b₁ + Sec.map (J.d n (n + 1)) b₂ = 0 := by
@@ -71,16 +85,26 @@ theorem GlobalTheory.EtC.cone_sec_exact : ∀ (R : Type) [CommRing R] {I J : Cx 
   obtain ⟨S, hS, h⟩ := hyp b₁ b₂ h1 h2
   refine ⟨S, hS, fun V g hg => ?_⟩
   obtain ⟨a₁, a₂, e1, e2⟩ := h V g hg
-  refine ⟨Sec.map ((mappingCone.inl f).v n (n - 1) (by ring)) a₁ + Sec.map ((mappingCone.inr f).f (n - 1)) a₂, ?_⟩
-  have k1 : Sec.map ((mappingCone f).d (n - 1) n) (Sec.map ((mappingCone.inl f).v n (n - 1) (by ring)) a₁) =
-      Sec.map ((mappingCone.inr f).f n) (Sec.map (f.f n) a₁) -
-        Sec.map ((mappingCone.inl f).v (n + 1) n (by ring)) (Sec.map (I.d n (n + 1)) a₁) := by
-    rw [← smap_comp, mappingCone.inl_v_d f n (n - 1) (n + 1) (by ring) (by ring), smap_sub, smap_comp, smap_comp]
-  have k2 : Sec.map ((mappingCone f).d (n - 1) n) (Sec.map ((mappingCone.inr f).f (n - 1)) a₂) =
-      Sec.map ((mappingCone.inr f).f n) (Sec.map (J.d (n - 1) n) a₂) := by
+  refine ⟨
+    Sec.map ((mappingCone.inl f).v n (n - 1) (by ring)) a₁
+      + Sec.map ((mappingCone.inr f).f (n - 1)) a₂,
+    ?_
+  ⟩
+  have k1
+      : Sec.map ((mappingCone f).d (n - 1) n)
+          (Sec.map ((mappingCone.inl f).v n (n - 1) (by ring)) a₁)
+        = Sec.map ((mappingCone.inr f).f n) (Sec.map (f.f n) a₁)
+          - Sec.map ((mappingCone.inl f).v (n + 1) n (by ring)) (Sec.map (I.d n (n + 1)) a₁) := by
+    rw [← smap_comp, mappingCone.inl_v_d f n (n - 1) (n + 1) (by ring) (by ring), smap_sub,
+      smap_comp, smap_comp]
+  have k2
+      : Sec.map ((mappingCone f).d (n - 1) n) (Sec.map ((mappingCone.inr f).f (n - 1)) a₂)
+        = Sec.map ((mappingCone.inr f).f n) (Sec.map (J.d (n - 1) n) a₂) := by
     rw [← smap_comp, mappingCone.inr_f_d, smap_comp]
-  have k3 : Sec.res g b = Sec.map ((mappingCone.inl f).v (n + 1) n (by ring)) (Sec.res g b₁) +
-      Sec.map ((mappingCone.inr f).f n) (Sec.res g b₂) := by
+  have k3
+      : Sec.res g b
+        = Sec.map ((mappingCone.inl f).v (n + 1) n (by ring)) (Sec.res g b₁)
+          + Sec.map ((mappingCone.inr f).f n) (Sec.res g b₂) := by
     rw [← hid, sres_add, sres_map, sres_map]
   rw [smap_add', k1, k2, e1, k3, ← e2, smap_add', smap_neg']
   abel

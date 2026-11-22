@@ -15,24 +15,27 @@ private lemma rk (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) [h : DiscreteTop
     rw [Module.finrank_pi_fintype]; simp [mul_comm]
   omega
 
-theorem UpperTheory.exists_injective_lattice_hom_ringOfIntegers_of_finrank_ge :
-    ∀ (E : Type) [Field E] [NumberField E] (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ))
-        (α : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)), 2 * g ≤ Module.finrank ℚ E → DiscreteTopology Λ →
-        ∀ (hs : ∀ s, ∀ z ∈ Λ, α s z ∈ Λ),
-        ∃ ι : Λ →+ 𝓞 E, Function.Injective ι ∧ ∀ (s : 𝓞 E) (x : Λ), ι ⟨α s x, hs s x x.2⟩ = s * ι x := by
+theorem UpperTheory.exists_injective_lattice_hom_ringOfIntegers_of_finrank_ge
+    : ∀ (E : Type) [Field E] [NumberField E] (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ))
+        (α : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)),
+      2 * g ≤ Module.finrank ℚ E → DiscreteTopology Λ
+        → ∀ (hs : ∀ s, ∀ z ∈ Λ, α s z ∈ Λ), ∃ ι : Λ →+ 𝓞 E,
+          Function.Injective ι ∧ ∀ (s : 𝓞 E) (x : Λ), ι ⟨α s x, hs s x x.2⟩ = s * ι x := by
   intro E _ _ g Λ α hg hd hs
   by_cases h0 : ∀ x : Λ, x = 0
   · refine ⟨0, fun a b _ => by rw [h0 a, h0 b], fun s x => by simp⟩
   push Not at h0
   obtain ⟨x0, hx0⟩ := h0
-  let ψ' : 𝓞 E →+ Λ :=
-    { toFun := fun s => ⟨α s x0, hs s x0 x0.2⟩
-      map_zero' := by ext1; simp
-      map_add' := fun a b => by ext1; simp }
+  let ψ' : 𝓞 E →+ Λ := {
+    toFun := fun s => ⟨α s x0, hs s x0 x0.2⟩
+    map_zero' := by ext1; simp
+    map_add' := fun a b => by ext1; simp
+  }
   let ψ : 𝓞 E →ₗ[ℤ] Λ := ψ'.toIntLinearMap
   have hψ : ∀ s, (ψ s : Fin g → ℂ) = α s x0 := fun s => rfl
   have hinj : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro s hs0
     by_contra hne
     have hz : α s x0 = 0 := by rw [← hψ, hs0]; rfl
@@ -54,8 +57,7 @@ theorem UpperTheory.exists_injective_lattice_hom_ringOfIntegers_of_finrank_ge :
   have hd0 : d ≠ 0 := Nat.card_pos.ne'
   have hmem : ∀ x : Λ, ∃ t, ψ t = d • x := by
     intro x
-    have : (LinearMap.range ψ).mkQ (d • x) = 0 := by
-      rw [map_nsmul]; exact card_nsmul_eq_zero'
+    have : (LinearMap.range ψ).mkQ (d • x) = 0 := by rw [map_nsmul]; exact card_nsmul_eq_zero'
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at this
     exact this
   choose f hf using hmem

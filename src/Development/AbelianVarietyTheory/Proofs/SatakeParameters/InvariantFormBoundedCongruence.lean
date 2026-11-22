@@ -13,7 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DefiniteL
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -22,19 +25,28 @@ namespace GlobalTheory.VFormCls
 
 open Formalism.IndefR.Bridge
 
-theorem reps_inj {G Γ' : Type} [Group G] [Group Γ'] {ι : Γ' →* G} {J : Subgroup G} {I : Type} {y : I → G}
-    (hy : IsReps ι J y) : Function.Injective y := by
+theorem reps_inj
+    {G Γ' : Type} [Group G] [Group Γ']
+    {ι : Γ' →* G} {J : Subgroup G} {I : Type} {y : I → G} (hy : IsReps ι J y)
+    : Function.Injective y := by
   intro i i' h
   exact (hy (y i)).unique ⟨1, 1, by simp⟩ ⟨1, 1, by simp [h]⟩
 
-theorem transport {G G' Γ' : Type} [Group G] [Group G'] [Group Γ'] (Γ : Subgroup G) (ι : Γ' →* G')
-    (hι : Function.Injective ι) (φ : G →* G') (hφ : Function.Bijective φ) (a : G)
-    (hrat : ∀ h, h ∈ Γ ↔ ∃ γ, ι γ = φ (a⁻¹ * h * a)) (J' : Subgroup G') {I : Type} [Fintype I]
-    (y : I → G') (hy : IsReps ι J' y) :
-    ∃ T : Finset G, (∀ g : G, ∃! t, t ∈ T ∧ ∃ (γ : Γ) (κ : G), κ ∈ J'.comap φ ∧ g = (γ : G) * t * κ) ∧
-      ∀ {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W] (F F' : G' → W),
-        adInner ι J' y F F' = ∑ t ∈ T, ((Nat.card {γ : Γ // t⁻¹ * (γ : G) * t ∈ J'.comap φ} : ℕ) : ℂ)⁻¹ *
-          inner ℂ (F (φ (a⁻¹ * t))) (F' (φ (a⁻¹ * t))) := by
+theorem transport
+    {G G' Γ' : Type} [Group G] [Group G'] [Group Γ']
+    (Γ : Subgroup G)
+    (ι : Γ' →* G') (hι : Function.Injective ι)
+    (φ : G →* G') (hφ : Function.Bijective φ)
+    (a : G) (hrat : ∀ h, h ∈ Γ ↔ ∃ γ, ι γ = φ (a⁻¹ * h * a))
+    (J' : Subgroup G')
+    {I : Type} [Fintype I]
+    (y : I → G') (hy : IsReps ι J' y)
+    : ∃ T : Finset G,
+      (∀ g : G, ∃! t, t ∈ T ∧ ∃ (γ : Γ) (κ : G), κ ∈ J'.comap φ ∧ g = (γ : G) * t * κ)
+        ∧ ∀ {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W] (F F' : G' → W),
+          adInner ι J' y F F'
+            = ∑ t ∈ T, ((Nat.card {γ : Γ // t⁻¹ * (γ : G) * t ∈ J'.comap φ} : ℕ) : ℂ)⁻¹ *
+              inner ℂ (F (φ (a⁻¹ * t))) (F' (φ (a⁻¹ * t))) := by
   classical
   let e : G ≃* G' := MulEquiv.ofBijective φ hφ
   have he : ∀ x, φ (e.symm x) = x := fun x => e.apply_symm_apply x
@@ -48,8 +60,10 @@ theorem transport {G G' Γ' : Type} [Group G] [Group G'] [Group Γ'] (Γ : Subgr
 
   have hrat' : ∀ γ : Γ, ∃ γ', ι γ' = φ (a⁻¹ * γ * a) := fun γ => (hrat γ).1 γ.2
 
-  have key : ∀ (g : G) (i : I), (∃ (γ : Γ) (κ : G), κ ∈ J'.comap φ ∧ g = (γ : G) * t i * κ) ↔
-      ∃ (γ' : Γ') (k : J'), φ (a⁻¹ * g) = ι γ' * y i * k := by
+  have key
+      : ∀ (g : G) (i : I),
+        (∃ (γ : Γ) (κ : G), κ ∈ J'.comap φ ∧ g = (γ : G) * t i * κ)
+          ↔ ∃ (γ' : Γ') (k : J'), φ (a⁻¹ * g) = ι γ' * y i * k := by
     intro g i
     constructor
     · rintro ⟨γ, κ, hκ, rfl⟩
@@ -59,12 +73,10 @@ theorem transport {G G' Γ' : Type} [Group G] [Group G'] [Group Γ'] (Γ : Subgr
       simp only [t, map_mul, map_inv, he]
       group
     · rintro ⟨γ', k, h⟩
-      have hγ : a * e.symm (ι γ') * a⁻¹ ∈ Γ := by
-        rw [hrat]; exact ⟨γ', by simp [he, mul_assoc]⟩
+      have hγ : a * e.symm (ι γ') * a⁻¹ ∈ Γ := by rw [hrat]; exact ⟨γ', by simp [he, mul_assoc]⟩
       refine ⟨⟨_, hγ⟩, e.symm k, by simp [he], ?_⟩
       apply hφ.1
-      have h2 : φ g = φ a * (ι γ' * y i * k) := by
-        rw [← h, map_mul, map_inv]; group
+      have h2 : φ g = φ a * (ι γ' * y i * k) := by rw [← h, map_mul, map_inv]; group
       rw [h2]
       simp only [t, map_mul, map_inv, he]
       group
@@ -83,23 +95,28 @@ theorem transport {G G' Γ' : Type} [Group G] [Group G'] [Group Γ'] (Γ : Subgr
     rw [hty i]
     congr 2
     refine congrArg (fun n : ℕ => (n : ℂ)) (Nat.card_congr (Equiv.symm ?_))
-    refine
-      { toFun := fun γ => ⟨c γ.1, ?_⟩
-        invFun := fun γ' => ⟨⟨a * e.symm (ι γ'.1) * a⁻¹, (hrat _).2 ⟨γ'.1, by simp [he, mul_assoc]⟩⟩, ?_⟩
-        left_inv := ?_
-        right_inv := ?_ }
+    refine {
+      toFun := fun γ => ⟨c γ.1, ?_⟩
+      invFun := fun γ' =>
+        ⟨⟨a * e.symm (ι γ'.1) * a⁻¹, (hrat _).2 ⟨γ'.1, by simp [he, mul_assoc]⟩⟩, ?_⟩
+      left_inv := ?_
+      right_inv := ?_
+    }
     · rw [mem_stab, hc γ.1, ← hty i]
       have := γ.2
       rw [Subgroup.mem_comap] at this
       convert this using 1
-      simp only [map_mul, map_inv]; group
+      simp only [map_mul, map_inv]
+      group
     · have := γ'.2
       rw [mem_stab] at this
       rw [Subgroup.mem_comap]
       convert this using 1
-      simp only [t, map_mul, map_inv, he]; group
+      simp only [t, map_mul, map_inv, he]
+      group
     · intro γ
-      apply Subtype.ext; apply Subtype.ext
+      apply Subtype.ext
+      apply Subtype.ext
       apply hφ.1
       simp only [map_mul, map_inv, he]
       rw [hc]
@@ -115,9 +132,13 @@ end GlobalTheory.VFormCls
 
 namespace GlobalTheory.VFormCls
 
-theorem adForms_right {G Γ W : Type} [Group G] [Group Γ] {ι : Γ →* G} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+theorem adForms_right
+    {G Γ W : Type} [Group G] [Group Γ]
+    {ι : Γ →* G} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
     {ρ : Γ →* Module.End ℂ W} {J : Subgroup G} {χ : J →* ℂˣ} {F : G → W}
-    (hF : F ∈ Formalism.IndefR.Bridge.AdForms ι ρ J χ) (g : G) (k : J) : F (g * k) = (χ k : ℂ) • F g := by
+    (hF : F ∈ Formalism.IndefR.Bridge.AdForms ι ρ J χ)
+    (g : G) (k : J)
+    : F (g * k) = (χ k : ℂ) • F g := by
   have h0 := hF 1 g k
   simpa using h0
 
@@ -125,31 +146,40 @@ end GlobalTheory.VFormCls
 
 namespace GlobalTheory.VFormCls
 
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.RecTie Formalism.IndefR.principalLevelFrame Formalism.L2.Theta
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.RecTie
+  Formalism.IndefR.principalLevelFrame Formalism.L2.Theta
 
-theorem ipA_eq {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
-    {A : Formalism.L2.DIV.FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
-    (R : RealDat D A Ks) (F : Face D A) (tupT : D.what₂.Tup → T) (hm : 0 < D.R.m) (hTop : TopMultH R)
-    (hinj : ∀ i t, Function.Injective (R.extV i t)) (μ : D.what₂.Tup) (i : Fin D.R.m)
-    (x y : GA D (Vc D i) → (R.cV i).W) :
-    (toLiftReal R F tupT hm hTop hinj).ipA μ i x y = (((RealDat.nP F false)⁻¹ : ℝ) : ℂ) * ipVia (R.extV i (tupT μ)) x y :=
+theorem ipA_eq
+    {D : D7} {G : Type} [Group G] [Fintype G]
+    {Pl0 T : Type} {A : Formalism.L2.DIV.FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+    [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+    (R : RealDat D A Ks)
+    (F : Face D A) (tupT : D.what₂.Tup → T) (hm : 0 < D.R.m) (hTop : TopMultH R)
+    (hinj : ∀ i t, Function.Injective (R.extV i t)) (μ : D.what₂.Tup)
+    (i : Fin D.R.m) (x y : GA D (Vc D i) → (R.cV i).W)
+    : (toLiftReal R F tupT hm hTop hinj).ipA μ i x y
+      = (((RealDat.nP F false)⁻¹ : ℝ) : ℂ) * ipVia (R.extV i (tupT μ)) x y :=
   rfl
 
-
 set_option maxHeartbeats 1000000 in
-theorem inner_eq {D : D7} {cf : CharFrame D} {nch : NChoice D} {tp : TupTied D cf nch} (X : GlobalTheory.NJoin.RealAt D cf nch tp)
-    (μ : D.what₂.Tup) (hμ : Used0 D μ) (j : Fin D.R.m) :
-    ∃ Fx : D.what₂.Mt μ (j.1 + 1) → (Bridge.Gf (Vc D j) → (X.R.cV j).W),
-      (∀ x, Fx x ∈ Bridge.AdForms (Bridge.ratF (Vc D j)) (X.R.cV j).coef.ρ
-        (levEnv (Vc D j) (X.R.βV j) (X.R.datVt j (X.tupT μ))).J (levEnv (Vc D j) (X.R.βV j) (X.R.datVt j (X.tupT μ))).χ) ∧
-      (∀ x, (X.R.cV j).ext (Fx x) = X.fn hμ j x) ∧
-      ∀ x y, inner ℂ x y = (((RealDat.nP X.F false)⁻¹ : ℝ) : ℂ) *
-        Bridge.adInner (Bridge.ratF (Vc D j)) (levEnv (Vc D j) (X.R.βV j) (X.R.datVt j (X.tupT μ))).J
-          (X.R.B.L j (X.tupT μ)).pres.y (Fx x) (Fx y) := by
+theorem inner_eq
+    {D : D7} {cf : CharFrame D} {nch : NChoice D} {tp : TupTied D cf nch}
+    (X : GlobalTheory.NJoin.RealAt D cf nch tp) (μ : D.what₂.Tup) (hμ : Used0 D μ) (j : Fin D.R.m)
+    : ∃ Fx : D.what₂.Mt μ (j.1 + 1) → (Bridge.Gf (Vc D j) → (X.R.cV j).W),
+      (∀ x,
+          Fx x ∈ Bridge.AdForms (Bridge.ratF (Vc D j)) (X.R.cV j).coef.ρ
+            (levEnv (Vc D j) (X.R.βV j) (X.R.datVt j (X.tupT μ))).J
+            (levEnv (Vc D j) (X.R.βV j) (X.R.datVt j (X.tupT μ))).χ)
+        ∧ (∀ x, (X.R.cV j).ext (Fx x) = X.fn hμ j x)
+        ∧ ∀ x y,
+          inner ℂ x y
+            = (((RealDat.nP X.F false)⁻¹ : ℝ) : ℂ) * Bridge.adInner (Bridge.ratF (Vc D j))
+              (levEnv (Vc D j) (X.R.βV j) (X.R.datVt j (X.tupT μ))).J (X.R.B.L j (X.tupT μ)).pres.y
+              (Fx x) (Fx y) := by
   have hC := X.given.core
   have hHV := hC.models.HV j (X.tupT μ)
-  have hex : ∀ x : D.what₂.Mt μ (j.1 + 1), ∃ h, X.R.extV j (X.tupT μ) h = X.fn hμ j x :=
-    fun x => (X.IL.jMt μ hμ j x).2.1
+  have hex : ∀ x : D.what₂.Mt μ (j.1 + 1), ∃ h, X.R.extV j (X.tupT μ) h = X.fn hμ j x := fun x =>
+    (X.IL.jMt μ hμ j x).2.1
   choose hx hhx using hex
   refine ⟨fun x => (X.R.HV j (X.tupT μ)).e (hx x), fun x => ?_, fun x => hhx x, fun x y => ?_⟩
   · have h := LinearMap.mem_range_self (X.R.HV j (X.tupT μ)).e (hx x)
@@ -174,10 +204,9 @@ namespace GlobalTheory.VFormCls
 
 open Formalism.IndefR Formalism.L2.Theta
 
-
 set_option maxHeartbeats 4000000 in
-theorem frame_bij {D : D7} {V : TH.HSp D} {n : ℕ} (P : principalLevelFrame.RowPsi V n) :
-    Function.Bijective ((finHom V).rangeRestrict.comp P.ψ) := by
+theorem frame_bij {D : D7} {V : TH.HSp D} {n : ℕ} (P : principalLevelFrame.RowPsi V n)
+    : Function.Bijective ((finHom V).rangeRestrict.comp P.ψ) := by
   obtain ⟨hsplit, -, hinter, -⟩ := GlobalTheory.UnitarySplit.real_finite_split D V
   constructor
   · intro x y h
@@ -209,7 +238,6 @@ end GlobalTheory.VFormCls
 namespace GlobalTheory.VFormCls
 
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.RecTie Formalism.L2.Theta
-
 
 end GlobalTheory.VFormCls
 

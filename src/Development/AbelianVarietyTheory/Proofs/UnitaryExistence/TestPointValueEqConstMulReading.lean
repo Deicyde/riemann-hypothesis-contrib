@@ -15,16 +15,29 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFra
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Frames GlobalTheory.FrameUnif
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory.FrameUnif
 
-theorem test_value_eq_const_mul_reading : Out.SecBaseChangeSt → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r), IsUnf U → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (p : TRing c.F) (y : FrPt Xo c p.R) (ψ : p.R →ₐ[c.F] CAt σ), ∃ (k : U.Comp) (x : (U.X k).dom) (u : ℂ), ∀ f ∈ sec Xo c a n, toC (ψ (f p y)) = u * rdU U f k x.1 := by
+theorem test_value_eq_const_mul_reading
+    : Out.SecBaseChangeSt
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+          (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+          (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r),
+        IsUnf U
+          → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (p : TRing c.F) (y : FrPt Xo c p.R)
+              (ψ : p.R →ₐ[c.F] CAt σ),
+            ∃ (k : U.Comp) (x : (U.X k).dom) (u : ℂ), ∀ f ∈ sec Xo c a n,
+              toC (ψ (f p y)) = u * rdU U f k x.1 := by
   intro hSB E _ _ _ H Dw l Xo c σ r U hU a n p y ψ
-  obtain ⟨-, -, hWD, -, -, -, hBor⟩ := GlobalTheory.T.framedModuli_algebraicLaws_chart_weight_integrality hSB E H Dw l Xo c
-  obtain ⟨z, hz⟩ := GlobalTheory.Frames.FramedBaseChange.exists_frMap hSB E H Dw l Xo c p.R (CAt σ) ψ y
+  obtain ⟨-, -, hWD, -, -, -, hBor⟩ :=
+    GlobalTheory.T.framedModuli_algebraicLaws_chart_weight_integrality hSB E H Dw l Xo c
+  obtain ⟨z, hz⟩ :=
+    GlobalTheory.Frames.FramedBaseChange.exists_frMap hSB E H Dw l Xo c p.R (CAt σ) ψ y
   obtain ⟨-, -, hcov, -⟩ := hU
   obtain ⟨k, x, t, ht⟩ := hcov z
   have hred : _root_.IsReduced (CAt σ) := by
@@ -36,7 +49,8 @@ theorem test_value_eq_const_mul_reading : Out.SecBaseChangeSt → ∀ (E : Type)
   unfold sec secW at hf'
   obtain ⟨hN, -⟩ := hf'
   have h1 : evR Xo c f z = ψ (f p y) := by
-    have hT : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) z := ⟨p, ψ, y, hz⟩
+    have hT : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) z :=
+      ⟨p, ψ, y, hz⟩
     unfold evR evalAt
     rw [dif_pos hT]
     exact hWD f hN _ _ _ _ _ _ _ _ hT.choose_spec.choose_spec.choose_spec hz

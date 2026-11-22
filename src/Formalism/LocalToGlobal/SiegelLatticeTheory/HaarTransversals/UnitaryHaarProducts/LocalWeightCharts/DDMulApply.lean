@@ -23,13 +23,13 @@ def pos (k r : ℕ) : Ix k r → Fin (2 * r + k + 1)
 
 theorem pos_inj : Function.Injective (pos k r) := by
   intro p q h
-  rcases p with a | j | a <;> rcases q with b | j' | b <;>
-    simp only [pos, eI, wI, esI, Fin.ext_iff] at h <;>
-    first
-    | (congr 1; exact Fin.ext (by omega))
-    | (congr 2; exact Fin.ext (by omega))
-    | (exfalso; omega)
-    | skip
+  rcases p with a | j | a <;> rcases q with b | j' | b
+    <;> simp only [pos, eI, wI, esI, Fin.ext_iff] at h
+    <;> first
+      | (congr 1; exact Fin.ext (by omega))
+      | (congr 2; exact Fin.ext (by omega))
+      | (exfalso; omega)
+      | skip
   all_goals (first | (exfalso; have := a.isLt; have := b.isLt; omega) | skip)
 
 theorem pos_bij : Function.Bijective (pos k r) := by
@@ -42,8 +42,8 @@ def posE (k r : ℕ) : Ix k r ≃ Fin (2 * r + k + 1) := Equiv.ofBijective _ pos
 
 theorem posE_apply (p : Ix k r) : posE k r p = pos k r p := rfl
 
-theorem sum_split {β : Type*} [AddCommMonoid β] (f : Fin (2 * r + k + 1) → β) :
-    ∑ l, f l = ∑ a, f (eI k r a) + ∑ j, f (wI k r j) + ∑ a, f (esI k r a) := by
+theorem sum_split {β : Type*} [AddCommMonoid β] (f : Fin (2 * r + k + 1) → β)
+    : ∑ l, f l = ∑ a, f (eI k r a) + ∑ j, f (wI k r j) + ∑ a, f (esI k r a) := by
   rw [← Equiv.sum_comp (posE k r) f, Fintype.sum_sum_type, Fintype.sum_sum_type]
   exact (add_assoc _ _ _).symm
 
@@ -71,18 +71,17 @@ theorem sgn_wI (j : Fin (k + 1)) : UnitaryGroupBasics.sgn k r (wI k r j) = dD k 
   split_ifs <;> first | rfl | omega
 
 theorem eI_inj {a b : Fin r} : eI k r a = eI k r b ↔ a = b :=
-  ⟨fun h => by simpa using @pos_inj k r (Sum.inl a) (Sum.inl b) h,
-    fun h => h ▸ rfl⟩
+  ⟨fun h => by simpa using @pos_inj k r (Sum.inl a) (Sum.inl b) h, fun h => h ▸ rfl⟩
 
-theorem esI_inj {a b : Fin r} : esI k r a = esI k r b ↔ a = b :=
-  ⟨fun h => by
-    simpa using @pos_inj k r (Sum.inr (Sum.inr a)) (Sum.inr (Sum.inr b)) h,
-    fun h => h ▸ rfl⟩
+theorem esI_inj {a b : Fin r} : esI k r a = esI k r b ↔ a = b := ⟨
+  fun h => by simpa using @pos_inj k r (Sum.inr (Sum.inr a)) (Sum.inr (Sum.inr b)) h,
+  fun h => h ▸ rfl
+⟩
 
-theorem wI_inj {a b : Fin (k + 1)} : wI k r a = wI k r b ↔ a = b :=
-  ⟨fun h => by
-    simpa using @pos_inj k r (Sum.inr (Sum.inl a)) (Sum.inr (Sum.inl b)) h,
-    fun h => h ▸ rfl⟩
+theorem wI_inj {a b : Fin (k + 1)} : wI k r a = wI k r b ↔ a = b := ⟨
+  fun h => by simpa using @pos_inj k r (Sum.inr (Sum.inl a)) (Sum.inr (Sum.inl b)) h,
+  fun h => h ▸ rfl
+⟩
 
 theorem eI_ne_esI (a b : Fin r) : eI k r a ≠ esI k r b := fun h => by
   have := @pos_inj k r (Sum.inl a) (Sum.inr (Sum.inr b)) h; simp at this
@@ -94,17 +93,16 @@ theorem wI_ne_esI (j : Fin (k + 1)) (a : Fin r) : wI k r j ≠ esI k r a := fun 
   have := @pos_inj k r (Sum.inr (Sum.inl j)) (Sum.inr (Sum.inr a)) h
   simp at this
 
-theorem form_apply (g : Mx k r) (i j : Fin (2 * r + k + 1)) :
-    (gᴴ * Hpk k r * g) i j =
-      ∑ a, star (g (eI k r a) i) * g (esI k r a) j +
-      ∑ c, star (g (wI k r c) i) * dD k c c * g (wI k r c) j +
-      ∑ a, star (g (esI k r a) i) * g (eI k r a) j := by
+theorem form_apply (g : Mx k r) (i j : Fin (2 * r + k + 1))
+    : (gᴴ * Hpk k r * g) i j
+      = ∑ a, star (g (eI k r a) i) * g (esI k r a) j
+        + ∑ c, star (g (wI k r c) i) * dD k c c * g (wI k r c) j
+        + ∑ a, star (g (esI k r a) i) * g (eI k r a) j := by
   rw [Matrix.mul_assoc, Matrix.mul_apply, sum_split]
   simp only [UnitaryGroupBasics.hpk_mul_apply, tau_eI, tau_esI, tau_wI, sgn_eI, sgn_esI, sgn_wI,
     conjTranspose_apply, one_mul, mul_assoc]
 
-theorem hpk_esI_eI (a b : Fin r) :
-    Hpk k r (esI k r a) (eI k r b) = if a = b then 1 else 0 := by
+theorem hpk_esI_eI (a b : Fin r) : Hpk k r (esI k r a) (eI k r b) = if a = b then 1 else 0 := by
   rw [UnitaryGroupBasics.hpk_row, tau_esI, sgn_esI]
   by_cases h : a = b
   · subst h; simp
@@ -164,8 +162,8 @@ theorem rel_F {g : Mx k r} (hc : ColB g) (hu : g ∈ UH (Hpk k r)) : (bF g)ᴴ *
   rw [Matrix.mul_apply, Matrix.one_apply]
   simpa [bF, bA, conjTranspose_apply] using e
 
-theorem dD_mul_apply {m : Type*} (X : Matrix (Fin (k + 1)) m ℂ) (j : Fin (k + 1)) (b : m) :
-    (dD k * X) j b = dD k j j * X j b := by
+theorem dD_mul_apply {m : Type*} (X : Matrix (Fin (k + 1)) m ℂ) (j : Fin (k + 1)) (b : m)
+    : (dD k * X) j b = dD k j j * X j b := by
   simp only [dD, Matrix.diagonal_mul, Matrix.diagonal_apply_eq]
 
 theorem bA_mul {g h : Mx k r} (hh : ColB h) : bA (g * h) = bA g * bA h := by
@@ -194,13 +192,14 @@ theorem bC_mul (g h : Mx k r) : bC (g * h) = bA g * bC h + bB g * bE h + bC g * 
 theorem colB_of_mem {g : Mx k r} (hg : g ∈ Nset k r) : ColB g :=
   colB_of ((UnitaryGroupBasics.nset_iff g).1 hg).2
 
-theorem bF_lowId {g : Mx k r} (hc : ColB g) (hu : g ∈ UH (Hpk k r)) :
-    ∀ a b : Fin r, a ≤ b → bF g a b = if a = b then 1 else 0 := by
+theorem bF_lowId {g : Mx k r} (hc : ColB g) (hu : g ∈ UH (Hpk k r))
+    : ∀ a b : Fin r, a ≤ b → bF g a b = if a = b then 1 else 0 := by
   have hFA := rel_F hc hu
   letI : Invertible (bA g).det := by rw [bA_det hc]; exact invertibleOne
   letI : Invertible (bA g) := Matrix.invertibleOfDetInvertible (bA g)
   have hinv : (bA g)⁻¹ = (bF g)ᴴ := Matrix.inv_eq_left_inv hFA
-  have hT : ((bF g)ᴴ).BlockTriangular id := hinv ▸ blockTriangular_inv_of_blockTriangular (bA_upper hc)
+  have hT : ((bF g)ᴴ).BlockTriangular id :=
+    hinv ▸ blockTriangular_inv_of_blockTriangular (bA_upper hc)
   intro a b hab
   rcases lt_or_eq_of_le hab with h | rfl
   · rw [if_neg (ne_of_lt h)]
@@ -210,38 +209,44 @@ theorem bF_lowId {g : Mx k r} (hc : ColB g) (hu : g ∈ UH (Hpk k r)) :
   · rw [if_pos rfl]
     have e := congrFun (congrFun hFA a) a
     rw [Matrix.mul_apply, Finset.sum_eq_single a, Matrix.one_apply_eq] at e
-    · have h1 : bA g a a = 1 := by
-        show g _ _ = 1; rw [hc.aa a a le_rfl, if_pos rfl]
+    · have h1 : bA g a a = 1 := by show g _ _ = 1; rw [hc.aa a a le_rfl, if_pos rfl]
       rw [h1, mul_one, conjTranspose_apply] at e
       have := congrArg star e
       rwa [star_star, star_one] at this
     · intro c _ hca
       rcases lt_or_gt_of_ne hca with h | h
       · rw [hT (show id c < id a from h), zero_mul]
-      · have : bA g c a = 0 := by
-          show g _ _ = 0; rw [hc.aa c a (le_of_lt h), if_neg (ne_of_gt h)]
+      · have : bA g c a = 0 := by show g _ _ = 0; rw [hc.aa c a (le_of_lt h), if_neg (ne_of_gt h)]
         rw [this, mul_zero]
     · simp
 
 def wt (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℤ :=
-  if i.val < r then (r : ℤ) - i.val else if i.val ≤ r + k then 0 else (r + k : ℤ) - i.val
+  if i.val < r then
+    (r : ℤ) - i.val
+  else if i.val ≤ r + k then
+    0
+  else
+    (r + k : ℤ) - i.val
 
-theorem nset_upper {g : Mx k r} (hg : g ∈ Nset k r) (i j : Fin (2 * r + k + 1))
-    (h : ¬ wt k r j < wt k r i) : (g - 1) i j = 0 := by
+theorem nset_upper
+    {g : Mx k r} (hg : g ∈ Nset k r) (i j : Fin (2 * r + k + 1)) (h : ¬ wt k r j < wt k r i)
+    : (g - 1) i j = 0 := by
   have hc := colB_of_mem hg
   have hu : g ∈ UH (Hpk k r) := hg.1
   rw [Matrix.sub_apply, Matrix.one_apply, sub_eq_zero]
   obtain ⟨p, rfl⟩ := (posE k r).surjective i
   obtain ⟨q, rfl⟩ := (posE k r).surjective j
   simp only [(posE k r).injective.eq_iff]
-  rcases p with a | c | a <;> rcases q with b | c' | b <;>
-    simp only [posE_apply, pos, wt, eI, wI, esI, Sum.inl.injEq, Sum.inr.injEq, reduceCtorEq,
-      if_false] at h ⊢
+  rcases p with a | c | a <;> rcases q with b | c' | b
+    <;> simp only [posE_apply, pos, wt, eI, wI, esI, Sum.inl.injEq, Sum.inr.injEq, reduceCtorEq,
+        if_false]
+      at h ⊢
   · have hb := b.isLt
     have ha := a.isLt
     have hba : (b : ℕ) ≤ a := by split_ifs at h <;> omega
     exact hc.aa a b (Fin.le_iff_val_le_val.2 hba)
-  all_goals first
+  all_goals
+    first
     | (exfalso; have := a.isLt; have := b.isLt; split_ifs at h <;> omega)
     | (exfalso; have := a.isLt; split_ifs at h <;> omega)
     | (exfalso; have := b.isLt; split_ifs at h <;> omega)

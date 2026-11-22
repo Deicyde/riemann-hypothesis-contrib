@@ -9,25 +9,30 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets PositivityTheory.Rg.Tf.Loc UpperTheory.ConvolutionTheory.Loc
+open MeasureTheory ValuativeRel GlobalTheory.PRep GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets PositivityTheory.Rg.Tf.Loc
+  UpperTheory.ConvolutionTheory.Loc
 open GlobalTheory.SmGL hiding iwahori
 
-private theorem map_diag {E F : Type} [Field E] [Field F] {n : ℕ} (f : E →+* F) (u : Fin n → Eˣ) :
-    Matrix.GeneralLinearGroup.map f (diagT E (Fin n) u) = diagT F (Fin n) fun i => Units.map (f : E →* F) (u i) := by
+private theorem map_diag {E F : Type} [Field E] [Field F] {n : ℕ} (f : E →+* F) (u : Fin n → Eˣ)
+    : Matrix.GeneralLinearGroup.map f (diagT E (Fin n) u)
+      = diagT F (Fin n) fun i => Units.map (f : E →* F) (u i) := by
   ext i j
   by_cases hij : i = j
   · subst hij
     simp [val_diagT]
   · simp [val_diagT, Matrix.diagonal_apply, hij]
 
-private theorem diag_comm {E : Type} [Field E] {n : ℕ} (u v : Fin n → Eˣ) :
-    diagT E (Fin n) u * diagT E (Fin n) v = diagT E (Fin n) v * diagT E (Fin n) u := by
+private theorem diag_comm {E : Type} [Field E] {n : ℕ} (u v : Fin n → Eˣ)
+    : diagT E (Fin n) u * diagT E (Fin n) v = diagT E (Fin n) v * diagT E (Fin n) u := by
   rw [← map_mul, ← map_mul, mul_comm]
 
-private theorem strict_map {k E : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
-    [Algebra k E] [ValuativeExtension k E] {n : ℕ} {t : Fin n → kˣ} (ht : Strict t) :
-    Strict fun i => Units.map (algebraMap k E : k →* E) (t i) := by
+private theorem strict_map
+    {k E : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] [Algebra k E]
+    [ValuativeExtension k E]
+    {n : ℕ} {t : Fin n → kˣ} (ht : Strict t)
+    : Strict fun i => Units.map (algebraMap k E : k →* E) (t i) := by
   intro i j hij
   have h := ht i j hij
   rw [← (valuation k).vlt_iff_lt] at h
@@ -36,8 +41,7 @@ private theorem strict_map {k E : Type} [Field k] [ValuativeRel k] [TopologicalS
   intro hle
   exact h (ValuativeExtension.vle_iff_vle.mp hle)
 
-theorem UpperTheory.Gal.InertialTypesAlt.L.align :
-    UpperTheory.Gal.InertialTypesAlt.L.Align := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.align : UpperTheory.Gal.InertialTypesAlt.L.Align := by
   intro k E _ _ _ _ _ _ _ _ _ _ _ _ _ σ hσ n δ h y γ d hd hnorm hy
   obtain ⟨hcyc, -, hb⟩ := bridge k E σ
   obtain ⟨hsg, hnrm, -, -, -⟩ := hb n
@@ -62,13 +66,16 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.align :
   have huc : u * T = T * u := by
     have hz' : T = z⁻¹ * γ * z := by rw [hz]; group
     rw [hz', hu]
-    calc z⁻¹ * t * z * (z⁻¹ * γ * z) = z⁻¹ * (t * γ) * z := by group
+    calc
+      z⁻¹ * t * z * (z⁻¹ * γ * z)
+        = z⁻¹ * (t * γ) * z := by group
       _ = z⁻¹ * (γ * t) * z := by rw [hct]
       _ = z⁻¹ * γ * z * (z⁻¹ * t * z) := by group
-  obtain ⟨s2, hs2⟩ := strictNormal E n (RingEquiv.refl E) 1 hrefl m m hms hms (incl u) (by
-    rw [hsgr, ← hT, ← map_inv, ← map_mul, ← map_mul, mul_assoc, ← huc]
-    congr 1
-    group)
+  obtain ⟨s2, hs2⟩ :=
+    strictNormal E n (RingEquiv.refl E) 1 hrefl m m hms hms (incl u) (by
+      rw [hsgr, ← hT, ← map_inv, ← map_mul, ← map_mul, mul_assoc, ← huc]
+      congr 1
+      group)
   set w := y⁻¹ * h * incl z with hw
   have hg : (incl γ : GL (Fin n) E) = incl z * incl T * (incl z)⁻¹ := by
     rw [hz]
@@ -81,7 +88,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.align :
     rw [← hT]
     conv_lhs => rw [hwc0]
     group
-  obtain ⟨s1, hs1⟩ := strictNormal E n (RingEquiv.refl E) 1 hrefl m m hms hms w (by rw [hsgr]; exact hwc)
+  obtain ⟨s1, hs1⟩ :=
+    strictNormal E n (RingEquiv.refl E) 1 hrefl m m hms hms w (by rw [hsgr]; exact hwc)
   have ht' : (incl t : GL (Fin n) E) = incl z * incl u * (incl z)⁻¹ := by
     rw [hu]
     simp only [map_mul, map_inv]

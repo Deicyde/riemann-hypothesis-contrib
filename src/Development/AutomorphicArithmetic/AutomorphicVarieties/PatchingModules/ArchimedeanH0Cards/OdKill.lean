@@ -6,8 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix Filter ReciprocityTheory.Gal UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.Pa.B2
 
-private theorem UpperTheory.V.Pa.B2.odKill_char (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Finite K] [Algebra ℤ_[l] K] :
-    (l : K) = 0 := by
+private theorem UpperTheory.V.Pa.B2.odKill_char
+    (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Finite K] [Algebra ℤ_[l] K]
+    : (l : K) = 0 := by
   obtain ⟨q, hq⟩ := CharP.exists K
   haveI := hq
   have hx : (q : ℤ_[l]) ≠ 0 := Nat.cast_ne_zero.mpr (CharP.char_ne_zero_of_finite K q)
@@ -17,8 +18,12 @@ private theorem UpperTheory.V.Pa.B2.odKill_char (l : ℕ) [Fact l.Prime] (K : Ty
     ((PadicInt.unitCoeff hx).isUnit.map (algebraMap ℤ_[l] K)).ne_zero
   exact pow_eq_zero_iff'.mp ((mul_eq_zero.mp h1.symm).resolve_left hu) |>.1
 
-theorem UpperTheory.V.Pa.B2.odKill :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ) (x : NP G0.frame n) (X : Type) [CommRing X] [Algebra x.A X] (D : Dat x.A (plOf G)), IsOd h x X D → (∀ m : D.M.X, l • m = 0) ∧ (∀ w, ∀ m : (D.Q w).X, l • m = 0) ∧ ∀ u, ∀ g ∈ L.Ju u, ∀ m : (D.Q (inU G u)).X, (D.Q (inU G u)).ρ g m = m := by
+theorem UpperTheory.V.Pa.B2.odKill
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ)
+        (x : NP G0.frame n) (X : Type) [CommRing X] [Algebra x.A X] (D : Dat x.A (plOf G)),
+      IsOd h x X D
+        → (∀ m : D.M.X, l • m = 0) ∧ (∀ w, ∀ m : (D.Q w).X, l • m = 0)
+          ∧ ∀ u, ∀ g ∈ L.Ju u, ∀ m : (D.Q (inU G u)).X, (D.Q (inU G u)).ρ g m = m := by
   intro l _ L G G0 h n x X _ _ D hD
   have hlA : (l : x.A) = 0 := by
     show (l : PowerSeries x.K) = 0

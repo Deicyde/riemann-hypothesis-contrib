@@ -34,9 +34,14 @@ lemma pullAlong_le {K : Type} [Fintype K] (F : X' ⟶ X) (h : Y' ⟶ Y) (φ : K 
   rw [← hψ k]
   exact h2
 
-def pullAlong {K : Type} [Fintype K] (F : X' ⟶ X) (h : Y' ⟶ Y) (φ : K → (Y ⟶ X)) (ε : K → ℤ)
-    (ψ : K → (Y' ⟶ X')) (hψ : ∀ k, ψ k ≫ F = h ≫ φ k) (t : LB.Gen (LB.LinComb L φ ε)) :
-    LB.Gen (LB.LinComb (L.pull F) ψ ε) where
+def pullAlong
+    {K : Type} [Fintype K]
+    (F : X' ⟶ X) (h : Y' ⟶ Y)
+    (φ : K → (Y ⟶ X))
+    (ε : K → ℤ)
+    (ψ : K → (Y' ⟶ X')) (hψ : ∀ k, ψ k ≫ F = h ≫ φ k)
+    (t : LB.Gen (LB.LinComb L φ ε))
+    : LB.Gen (LB.LinComb (L.pull F) ψ ε) where
   s := fun jj => res (pullAlong_le L F h φ ψ hψ jj) (pullU h _ (t.s (fun k => jj k ⟨⟩)))
 
 lemma box_le {J K : Type} [Fintype J] [Fintype K] (F : J → (X' ⟶ X)) (φ : K → (Y ⟶ X'))
@@ -50,9 +55,11 @@ lemma box_le {J K : Type} [Fintype J] [Fintype K] (F : J → (X' ⟶ X)) (φ : K
   show (φ k).base y ∈ (⋂ _u : PUnit, (F i).base ⁻¹' (L.U (jj k i) : Set X))
   exact Set.mem_iInter.2 fun _ => h2
 
-def boxGen {J K : Type} [Fintype J] [Fintype K] (F : J → (X' ⟶ X)) (φ : K → (Y ⟶ X'))
-    (ε : K → ℤ) (t : ∀ i, LB.Gen (LB.LinComb (L.pull (F i)) φ ε)) :
-    LB.Gen (LB.LinComb (LB.LinComb L F (fun _ => 1)) φ ε) where
+def boxGen
+    {J K : Type} [Fintype J] [Fintype K]
+    (F : J → (X' ⟶ X)) (φ : K → (Y ⟶ X')) (ε : K → ℤ)
+    (t : ∀ i, LB.Gen (LB.LinComb (L.pull (F i)) φ ε))
+    : LB.Gen (LB.LinComb (LB.LinComb L F (fun _ => 1)) φ ε) where
   s := fun jj => ∏ i, res (box_le L F φ jj i) ((t i).s (fun k _ => jj k i))
 
 end GeneratorPullback
@@ -121,29 +128,37 @@ abbrev boxLB {G' G : Over S} {j : ℕ} (L : LB G.left) (pr : Fin j → (G' ⟶ G
 
 variable {G' G : Over S} [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G] {j : ℕ}
 
-def boxRig (p : IsPowGrp G' G j) (L : LB G.left) (r : LB.Gen (L.pull (eSec G))) :
-    LB.Gen ((boxLB L p.pr).pull (eSec G')) :=
-  GeneratorPullback.boxGen L (fun i => (p.pr i).left) (fun _ => eSec G') (fun _ => 1)
+def boxRig (p : IsPowGrp G' G j) (L : LB G.left) (r : LB.Gen (L.pull (eSec G)))
+    : LB.Gen ((boxLB L p.pr).pull (eSec G')) :=
+  GeneratorPullback.boxGen L
+    (fun i => (p.pr i).left)
+    (fun _ => eSec G')
+    (fun _ => 1)
     (fun i => letI := p.hom i; (CubeMap.ofHom (p.pr i)).rigPull L r)
 
-def boxCub (p : IsPowGrp G' G j) (L : LB G.left) (t : LB.Gen (Theta G L)) :
-    LB.Gen (Theta G' (boxLB L p.pr)) :=
-  GeneratorPullback.boxGen L (fun i => (p.pr i).left) (thφ G' (x3 G')) thε
+def boxCub (p : IsPowGrp G' G j) (L : LB G.left) (t : LB.Gen (Theta G L))
+    : LB.Gen (Theta G' (boxLB L p.pr)) :=
+  GeneratorPullback.boxGen L
+    (fun i => (p.pr i).left)
+    (thφ G' (x3 G')) thε
     (fun i => letI := p.hom i; (CubeMap.ofHom (p.pr i)).thetaPull L t)
 
-theorem inv_pr (p : IsPowGrp G' G j) (i : Fin j) (k : Fin 2) :
-    (![(ι[G']).left, 𝟙 G'.left] : Fin 2 → (G'.left ⟶ G'.left)) k ≫ (p.pr i).left =
-      (p.pr i).left ≫ (![(ι[G]).left, 𝟙 G.left] : Fin 2 → (G.left ⟶ G.left)) k := by
+theorem inv_pr (p : IsPowGrp G' G j) (i : Fin j) (k : Fin 2)
+    : (![(ι[G']).left, 𝟙 G'.left] : Fin 2 → (G'.left ⟶ G'.left)) k ≫ (p.pr i).left
+      = (p.pr i).left ≫ (![(ι[G]).left, 𝟙 G.left] : Fin 2 → (G.left ⟶ G.left)) k := by
   have := p.hom i
   fin_cases k
   · simp only [Fin.zero_eta, Fin.isValue, Matrix.cons_val_zero]
     rw [← Over.comp_left, ← Over.comp_left, GrpObj.inv_hom]
   · simp
 
-def boxSym (p : IsPowGrp G' G j) (L : LB G.left)
-    (sy : LB.Gen (LB.LinComb L (K := Fin 2) ![(ι[G]).left, 𝟙 G.left] ![1, -1])) :
-    LB.Gen (LB.LinComb (boxLB L p.pr) (K := Fin 2) ![(ι[G']).left, 𝟙 G'.left] ![1, -1]) :=
-  GeneratorPullback.boxGen L (fun i => (p.pr i).left) _ _
+def boxSym
+    (p : IsPowGrp G' G j)
+    (L : LB G.left) (sy : LB.Gen (LB.LinComb L (K := Fin 2) ![(ι[G]).left, 𝟙 G.left] ![1, -1]))
+    : LB.Gen (LB.LinComb (boxLB L p.pr) (K := Fin 2) ![(ι[G']).left, 𝟙 G'.left] ![1, -1]) :=
+  GeneratorPullback.boxGen L
+    (fun i => (p.pr i).left)
+    _ _
     (fun i => GeneratorPullback.pullAlong L (p.pr i).left (p.pr i).left _ _ _ (inv_pr p i) sy)
 
 def BoxIsLBSt : Prop :=
@@ -152,24 +167,23 @@ def BoxIsLBSt : Prop :=
 
 def BoxRigIsGenSt : Prop :=
   ∀ (G' G : Over S) [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G] (j : ℕ)
-    (p : IsPowGrp G' G j) (L : LB G.left) (r : LB.Gen (L.pull (eSec G))),
+      (p : IsPowGrp G' G j) (L : LB G.left) (r : LB.Gen (L.pull (eSec G))),
     L.IsLB → r.IsGen → (boxRig p L r).IsGen
 
 def BoxCubicalSt : Prop :=
   ∀ (G' G : Over S) [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G] (j : ℕ)
-    (p : IsPowGrp G' G j) (L : RigLB G) (c : CubicalStr G L) (hL : (boxLB L.L p.pr).IsLB)
-    (hr : (boxRig p L.L L.rig).IsGen),
-    ∃ c' : CubicalStr G' ⟨boxLB L.L p.pr, boxRig p L.L L.rig, hL, hr⟩, c'.t = boxCub p L.L c.t
+      (p : IsPowGrp G' G j) (L : RigLB G) (c : CubicalStr G L) (hL : (boxLB L.L p.pr).IsLB)
+      (hr : (boxRig p L.L L.rig).IsGen),
+    ∃ c' : CubicalStr G' ⟨boxLB L.L p.pr, boxRig p L.L L.rig, hL, hr⟩,
+      c'.t = boxCub p L.L c.t
 
 def BoxSymSt : Prop :=
   ∀ (G' G : Over S) [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G] (j : ℕ)
-    (p : IsPowGrp G' G j) (L : LB G.left)
-    (sy : LB.Gen (LB.LinComb L (K := Fin 2) ![(ι[G]).left, 𝟙 G.left] ![1, -1])),
-    L.IsLB → sy.IsGen →
-    LB.Gen.Corr L _ _ _ _ (LB.pullGen L _ _ sy (eSec G)) (LB.oneGen L) →
-    (boxSym p L sy).IsGen ∧
-      LB.Gen.Corr (boxLB L p.pr) _ _ _ _ (LB.pullGen (boxLB L p.pr) _ _ (boxSym p L sy) (eSec G'))
-        (LB.oneGen (boxLB L p.pr))
+      (p : IsPowGrp G' G j) (L : LB G.left)
+      (sy : LB.Gen (LB.LinComb L (K := Fin 2) ![(ι[G]).left, 𝟙 G.left] ![1, -1])),
+    L.IsLB → sy.IsGen → LB.Gen.Corr L _ _ _ _ (LB.pullGen L _ _ sy (eSec G)) (LB.oneGen L)
+      → (boxSym p L sy).IsGen ∧ LB.Gen.Corr (boxLB L p.pr) _ _ _ _
+        (LB.pullGen (boxLB L p.pr) _ _ (boxSym p L sy) (eSec G')) (LB.oneGen (boxLB L p.pr))
 
 end Pow
 

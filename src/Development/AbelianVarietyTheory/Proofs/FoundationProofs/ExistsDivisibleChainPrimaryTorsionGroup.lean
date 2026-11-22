@@ -4,7 +4,9 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.FinalTheo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2.DivChain
@@ -83,13 +85,15 @@ lemma exists_start {l : ℕ} (htors : ∀ x : X, ∃ n : ℕ, l ^ n • x = 0)
 
 end
 
-theorem exists_divisible_chain : ∀ (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X],
-    (∀ x : X, ∃ n : ℕ, l ^ n • x = 0) → Finite {x : X // l • x = 0} →
-    (∀ m : ℕ, ∃ x : X, l ^ m • x ≠ 0) → ∃ x : ℕ → X, x 0 ≠ 0 ∧ ∀ n, l • x (n + 1) = x n := by
+theorem exists_divisible_chain
+    : ∀ (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X],
+      (∀ x : X, ∃ n : ℕ, l ^ n • x = 0) → Finite {x : X // l • x = 0}
+        → (∀ m : ℕ, ∃ x : X, l ^ m • x ≠ 0)
+        → ∃ x : ℕ → X, x 0 ≠ 0 ∧ ∀ n, l • x (n + 1) = x n := by
   intro l _ X _ htors hfin hunb
   obtain ⟨y0, hy0, -, hdiv⟩ := exists_start htors hfin hunb
-  have H : ∀ y : {y : X // DivAll l y}, ∃ z : X, l • z = y.1 ∧ DivAll l z :=
-    fun y => exists_preimage hfin y.2
+  have H : ∀ y : {y : X // DivAll l y}, ∃ z : X, l • z = y.1 ∧ DivAll l z := fun y =>
+    exists_preimage hfin y.2
   choose g hg hgd using H
   let s : ℕ → {y : X // DivAll l y} := fun n => Nat.rec ⟨y0, hdiv⟩ (fun _ y => ⟨g y, hgd y⟩) n
   exact ⟨fun n => (s n).1, hy0, fun n => hg (s n)⟩

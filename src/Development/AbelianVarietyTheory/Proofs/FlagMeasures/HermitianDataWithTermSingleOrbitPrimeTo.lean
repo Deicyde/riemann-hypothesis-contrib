@@ -10,17 +10,20 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FramePairCoor
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver GlobalTheory.HL
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver GlobalTheory.HL
 open scoped Pointwise Classical
 
 namespace GlobalTheory.HL.PrimeToOrbit
 
-theorem coord_one_orbit {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-    [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E) (r k : ℕ)
-    (S : GlobalTheory.HL.Frames L r k) (hgg : S.gg = false) (hvG : vE L S.ϖ S.G = 0)
-    (hDu : ∀ l, S.D l ≠ 0 → S.D l ∈ L.O ∧ ∃ y ∈ L.O, S.D l * y = 1)
-    {δ δ' : S.Datum} {Λ Λ' : Submodule L.O S.V} (hT : S.IsTerm δ Λ) (hT' : S.IsTerm δ' Λ') :
-    ∃ h ∈ S.H0, h • δ = δ' := by
+theorem coord_one_orbit
+    {F : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
+    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : LocE F E) (r k : ℕ) (S : GlobalTheory.HL.Frames L r k) (hgg : S.gg = false)
+    (hvG : vE L S.ϖ S.G = 0) (hDu : ∀ l, S.D l ≠ 0 → S.D l ∈ L.O ∧ ∃ y ∈ L.O, S.D l * y = 1)
+    {δ δ' : S.Datum} {Λ Λ' : Submodule L.O S.V} (hT : S.IsTerm δ Λ) (hT' : S.IsTerm δ' Λ')
+    : ∃ h ∈ S.H0, h • δ = δ' := by
   have ha : S.a = 0 := by simp [GlobalTheory.HL.Frames.a, GlobalTheory.HL.Frames.vth, hgg, hvG]
   obtain ⟨-, -, hall⟩ := GlobalTheory.HL.GoodClass.one_class L r k S hgg hDu
   have hint : ∀ d Λ, S.IsTerm d Λ → S.IsIntCls (S.Fr d Λ) := fun d Λ h =>
@@ -49,7 +52,15 @@ theorem coord_one_orbit {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace 
   have h5 : h • δ' = δ := hdd _ _ _ h1.1 h4
   rw [← h5, smul_smul, inv_mul_cancel, one_smul]
 
-theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ), ∀ (k : ℕ) (P : FPair H r), Module.finrank E V = k + 2 * r + 1 → P.RelG (theta M) → P.PrimeTo → ∀ (d d' : Datum P) (t t' : Term V M r), IsTermOver P d t → IsTermOver P d' t' → Datum.Rel d d' := by
+theorem main
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ),
+          ∀ (k : ℕ) (P : FPair H r),
+            Module.finrank E V = k + 2 * r + 1 → P.RelG (theta M) → P.PrimeTo
+              → ∀ (d d' : Datum P) (t t' : Term V M r),
+                IsTermOver P d t → IsTermOver P d' t' → Datum.Rel d d' := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P hdim hrel hpt d d' t t' ht ht'
   have := hM.loc
   have := hM.char0

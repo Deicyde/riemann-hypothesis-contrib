@@ -8,13 +8,16 @@ open CategoryTheory Limits TensorProduct
 
 namespace GlobalTheory
 
-theorem projective_baseChange_presentation_matrix : ∀ (R B M : Type) [CommRing R] [CommRing B] [Algebra R B] [AddCommGroup M]
-    [Module R M] (n m : ℕ) (π : (Fin n → R) →ₗ[R] M), Function.Surjective π →
-    ∀ (r : Fin m → Fin n → R), Submodule.span R (Set.range r) = LinearMap.ker π →
-    Module.Projective B (B ⊗[R] M) →
-    ∃ (v : Fin n → Fin n → B) (w : Fin n → Fin m → B),
-    (∀ b l, ∑ a, algebraMap R B (r b a) * v a l = 0) ∧
-    (∀ a l, v a l = (if a = l then 1 else 0) + ∑ b, w a b * algebraMap R B (r b l)) := by
+theorem projective_baseChange_presentation_matrix
+    : ∀ (R B M : Type) [CommRing R] [CommRing B] [Algebra R B] [AddCommGroup M] [Module R M]
+        (n m : ℕ) (π : (Fin n → R) →ₗ[R] M),
+      Function.Surjective π
+        → ∀ (r : Fin m → Fin n → R),
+          Submodule.span R (Set.range r) = LinearMap.ker π → Module.Projective B (B ⊗[R] M)
+            → ∃ (v : Fin n → Fin n → B) (w : Fin n → Fin m → B),
+              (∀ b l, ∑ a, algebraMap R B (r b a) * v a l = 0)
+                ∧ (∀ a l,
+                  v a l = (if a = l then 1 else 0) + ∑ b, w a b * algebraMap R B (r b l)) := by
   intro R B M _ _ _ _ _ n m π hπ r hr hP
   let e := TensorProduct.piScalarRight R B B (Fin n)
   let πB : (Fin n → B) →ₗ[B] B ⊗[R] M := (π.baseChange B) ∘ₗ e.symm.toLinearMap
@@ -22,8 +25,7 @@ theorem projective_baseChange_presentation_matrix : ∀ (R B M : Type) [CommRing
   obtain ⟨i, hi⟩ := Module.projective_lifting_property πB LinearMap.id hπB
   let v : Fin n → Fin n → B := fun a => i ((1 : B) ⊗ₜ[R] π (Pi.single a 1))
   let f : (Fin m → R) →ₗ[R] (Fin n → R) := Fintype.linearCombination R r
-  have hex : Function.Exact f π := by
-    rw [LinearMap.exact_iff, Fintype.range_linearCombination, hr]
+  have hex : Function.Exact f π := by rw [LinearMap.exact_iff, Fintype.range_linearCombination, hr]
   have hexB := lTensor_exact B hex hπ
   let N : Submodule B (Fin n → B) := Submodule.span B (Set.range fun b l => algebraMap R B (r b l))
   have hker : ∀ y, πB y = 0 → y ∈ N := by
@@ -39,12 +41,13 @@ theorem projective_baseChange_presentation_matrix : ∀ (R B M : Type) [CommRing
     induction z using TensorProduct.induction_on with
     | zero => simp
     | tmul x c =>
-        have : e ((f.lTensor B) (x ⊗ₜ c)) = ∑ b, (x * algebraMap R B (c b)) • (fun l => algebraMap R B (r b l)) := by
-          ext l
-          simp [e, f, Fintype.linearCombination_apply, Finset.sum_apply, Algebra.smul_def, Finset.mul_sum,
-            Finset.sum_mul, mul_comm, mul_left_comm]
-        rw [this]
-        exact Submodule.sum_mem _ fun b _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, rfl⟩)
+      have : e ((f.lTensor B) (x ⊗ₜ c))
+          = ∑ b, (x * algebraMap R B (c b)) • (fun l => algebraMap R B (r b l)) := by
+        ext l
+        simp [e, f, Fintype.linearCombination_apply, Finset.sum_apply, Algebra.smul_def,
+          Finset.mul_sum, Finset.sum_mul, mul_comm, mul_left_comm]
+      rw [this]
+      exact Submodule.sum_mem _ fun b _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, rfl⟩)
     | add a b ha hb => rw [map_add (f := _), map_add (f := _)]; exact N.add_mem ha hb
   have hπv : ∀ a, πB (v a - Pi.single a 1) = 0 := by
     intro a
@@ -60,7 +63,9 @@ theorem projective_baseChange_presentation_matrix : ∀ (R B M : Type) [CommRing
   · have hrb : π (r b) = 0 := by
       have : r b ∈ LinearMap.ker π := hr ▸ Submodule.subset_span ⟨b, rfl⟩
       exact this
-    have hsum : (1 : B) ⊗ₜ[R] π (r b) = ∑ a, algebraMap R B (r b a) • ((1 : B) ⊗ₜ[R] π (Pi.single a 1)) := by
+    have hsum
+        : (1 : B) ⊗ₜ[R] π (r b)
+          = ∑ a, algebraMap R B (r b a) • ((1 : B) ⊗ₜ[R] π (Pi.single a 1)) := by
       conv_lhs => rw [← Finset.univ_sum_single (r b)]
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [map_sum, TensorProduct.tmul_sum, algebraMap_smul]
@@ -71,7 +76,7 @@ theorem projective_baseChange_presentation_matrix : ∀ (R B M : Type) [CommRing
       simp [Pi.single_apply]
     have h1 : ∑ a, algebraMap R B (r b a) • v a = 0 := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [v, ← map_smul, ← map_sum, ← hsum, hrb, TensorProduct.tmul_zero, map_zero]
+      simp only [v, ← map_smul, ← map_sum, ← hsum, hrb, TensorProduct.tmul_zero, map_zero]
     have := congrFun h1 l
     simpa [Finset.sum_apply, Algebra.smul_def] using this
   · have := congrFun (hw a) l

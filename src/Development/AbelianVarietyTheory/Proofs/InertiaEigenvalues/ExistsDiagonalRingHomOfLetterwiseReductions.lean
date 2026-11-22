@@ -5,13 +5,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CardLeO
 
 @[expose] public section
 
-open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps GlobalTheory.Present GlobalTheory.RedFun Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps
+  GlobalTheory.Present GlobalTheory.RedFun Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc
 open scoped LaurentSeries PowerSeries TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_diagonal_ringHom_of_letterwise_reductions :
-    ∀ (I E F R : Type) [Fintype I] [CommRing E] [CommRing F] [CommRing R] (e : I → E), (∀ i, e i * e i = e i) → (∀ i j, i ≠ j → e i * e j = 0) → ∑ i, e i = 1 → ∀ (p : I → (E →+* F)) (r : E →+* R), (∀ i, Function.Surjective (p i)) → (∀ i x, p i x = 0 → r (e i) * r x = 0) → ∃ κ : F →+* R, ∀ i x, r (e i) * κ (p i x) = r (e i) * r x := by
+theorem exists_diagonal_ringHom_of_letterwise_reductions
+    : ∀ (I E F R : Type) [Fintype I] [CommRing E] [CommRing F] [CommRing R] (e : I → E),
+      (∀ i, e i * e i = e i) → (∀ i j, i ≠ j → e i * e j = 0) → ∑ i, e i = 1
+        → ∀ (p : I → (E →+* F)) (r : E →+* R),
+          (∀ i, Function.Surjective (p i)) → (∀ i x, p i x = 0 → r (e i) * r x = 0)
+            → ∃ κ : F →+* R, ∀ i x, r (e i) * κ (p i x) = r (e i) * r x := by
   intro I E F R _ _ _ _ e hid hort hsum p r hsurj hker
   classical
   choose s hs using hsurj
@@ -23,7 +29,8 @@ theorem exists_diagonal_ringHom_of_letterwise_reductions :
   have hext : ∀ a b : R, (∀ i, r (e i) * a = r (e i) * b) → a = b := by
     intro a b h
     have h1 : ∑ i, r (e i) = 1 := by rw [← map_sum, hsum, map_one]
-    calc a = (∑ i, r (e i)) * a := by rw [h1, one_mul]
+    calc
+      a = (∑ i, r (e i)) * a := by rw [h1, one_mul]
       _ = (∑ i, r (e i)) * b := by
         rw [Finset.sum_mul, Finset.sum_mul]
         exact Finset.sum_congr rfl fun i _ => h i

@@ -10,7 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4 NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4 NumberField
+  IsDedekindDomain
 
 noncomputable section
 
@@ -23,11 +24,13 @@ theorem exists_chart (hy : IsArithVar (mCoordIdeal y) 1) : ∃ t : T, y ⟨(), t
   refine ⟨t, fun h0 => ht ?_⟩
   simp [mCoordIdeal, RingHom.mem_ker, mConeMap, h0]
 
-
 omit [Fintype T] in
-theorem mem_integer_of_mem_chartRingZ [NumberField K'] (v : HeightOneSpectrum (𝓞 K')) (t : T)
-    (ht : ∀ u, v.valuation K' (y ⟨(), u⟩) ≤ v.valuation K' (y ⟨(), t⟩)) {b : K'}
-    (hb : b ∈ chartRingZ y (fun _ => t)) : b ∈ (v.valuation K').integer := by
+theorem mem_integer_of_mem_chartRingZ
+    [NumberField K']
+    (v : HeightOneSpectrum (𝓞 K')) (t : T)
+    (ht : ∀ u, v.valuation K' (y ⟨(), u⟩) ≤ v.valuation K' (y ⟨(), t⟩))
+    {b : K'} (hb : b ∈ chartRingZ y (fun _ => t))
+    : b ∈ (v.valuation K').integer := by
   induction hb using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨⟨⟨⟩, u⟩, rfl⟩ := hx
@@ -39,34 +42,42 @@ theorem mem_integer_of_mem_chartRingZ [NumberField K'] (v : HeightOneSpectrum (�
   | add x z _ _ hx hz => exact add_mem hx hz
   | mul x z _ _ hx hz => exact mul_mem hx hz
 
-theorem mem_integralClosure_of_mem_curveRing [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1)
-    {b : K'} (hb : b ∈ curveRing y) : b ∈ integralClosure ℤ K' := by
+theorem mem_integralClosure_of_mem_curveRing
+    [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1) {b : K'} (hb : b ∈ curveRing y)
+    : b ∈ integralClosure ℤ K' := by
   obtain ⟨t0, ht0⟩ := exists_chart y hy
   suffices hv : ∀ v : HeightOneSpectrum (𝓞 K'), v.valuation K' b ≤ 1 by
     obtain ⟨r, hr⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 K') K' b hv
     rw [← hr]
     exact r.2
   intro v
-  obtain ⟨t, -, ht⟩ := Finset.exists_max_image Finset.univ (fun u => v.valuation K' (y ⟨(), u⟩))
-    ⟨t0, Finset.mem_univ _⟩
+  obtain ⟨t, -, ht⟩ :=
+    Finset.exists_max_image Finset.univ
+      (fun u => v.valuation K' (y ⟨(), u⟩))
+      ⟨t0, Finset.mem_univ _⟩
   have hyt : y ⟨(), t⟩ ≠ 0 := by
     intro h0
     have h1 := ht t0 (Finset.mem_univ _)
     rw [h0, map_zero] at h1
     exact ht0 ((Valuation.zero_iff _).mp (le_antisymm h1 zero_le))
-  exact mem_integer_of_mem_chartRingZ y v t (fun u => ht u (Finset.mem_univ _))
+  exact mem_integer_of_mem_chartRingZ y v t
+    (fun u => ht u (Finset.mem_univ _))
     (mem_curveRing.mp hb (fun _ => t) (fun _ => hyt))
 
-theorem finite [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1) : Module.Finite ℤ (curveRing y) := by
+theorem finite [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1)
+    : Module.Finite ℤ (curveRing y) := by
   have : Module.Finite ℤ (integralClosure ℤ K') := inferInstanceAs (Module.Finite ℤ (𝓞 K'))
-  let f : curveRing y →ₗ[ℤ] integralClosure ℤ K' :=
-    { toFun := fun b => ⟨b, mem_integralClosure_of_mem_curveRing y hy b.2⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
-  exact Module.Finite.of_injective f fun a b h => Subtype.ext (congrArg (fun z : integralClosure ℤ K' => (z : K')) h)
+  let f : curveRing y →ₗ[ℤ] integralClosure ℤ K' := {
+    toFun := fun b => ⟨b, mem_integralClosure_of_mem_curveRing y hy b.2⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
+  exact Module.Finite.of_injective f fun a b h =>
+    Subtype.ext (congrArg (fun z : integralClosure ℤ K' => (z : K')) h)
 
-theorem mem_blockFnField_of_mem_curveRing [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1)
-    {b : K'} (hb : b ∈ curveRing y) : b ∈ blockFnField y := by
+theorem mem_blockFnField_of_mem_curveRing
+    [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1) {b : K'} (hb : b ∈ curveRing y)
+    : b ∈ blockFnField y := by
   obtain ⟨t, ht⟩ := exists_chart y hy
   have hbt := mem_curveRing.mp hb (fun _ => t) (fun _ => ht)
   clear hb
@@ -78,8 +89,8 @@ theorem mem_blockFnField_of_mem_curveRing [NumberField K'] (hy : IsArithVar (mCo
   | add x z _ _ hx hz => exact add_mem hx hz
   | mul x z _ _ hx hz => exact mul_mem hx hz
 
-theorem exists_nat_mul_mem_adjoin [CharZero K'] {S : Set K'} {x : K'} (hx : x ∈ Algebra.adjoin ℚ S) :
-    ∃ n : ℕ, n ≠ 0 ∧ (n : K') * x ∈ Algebra.adjoin ℤ S := by
+theorem exists_nat_mul_mem_adjoin [CharZero K'] {S : Set K'} {x : K'} (hx : x ∈ Algebra.adjoin ℚ S)
+    : ∃ n : ℕ, n ≠ 0 ∧ (n : K') * x ∈ Algebra.adjoin ℤ S := by
   induction hx using Algebra.adjoin_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using Algebra.subset_adjoin hx⟩
   | algebraMap q =>
@@ -93,7 +104,8 @@ theorem exists_nat_mul_mem_adjoin [CharZero K'] {S : Set K'} {x : K'} (hx : x �
     obtain ⟨n, hn, hnx⟩ := hx
     obtain ⟨m, hm, hmz⟩ := hz
     refine ⟨n * m, mul_ne_zero hn hm, ?_⟩
-    have e : ((n * m : ℕ) : K') * (x + z) = (m : K') * ((n : K') * x) + (n : K') * ((m : K') * z) := by
+    have e
+        : ((n * m : ℕ) : K') * (x + z) = (m : K') * ((n : K') * x) + (n : K') * ((m : K') * z) := by
       push_cast; ring
     rw [e]
     exact add_mem (mul_mem (natCast_mem _ m) hnx) (mul_mem (natCast_mem _ n) hmz)
@@ -101,36 +113,38 @@ theorem exists_nat_mul_mem_adjoin [CharZero K'] {S : Set K'} {x : K'} (hx : x �
     obtain ⟨n, hn, hnx⟩ := hx
     obtain ⟨m, hm, hmz⟩ := hz
     refine ⟨n * m, mul_ne_zero hn hm, ?_⟩
-    have e : ((n * m : ℕ) : K') * (x * z) = ((n : K') * x) * ((m : K') * z) := by
-      push_cast; ring
+    have e : ((n * m : ℕ) : K') * (x * z) = ((n : K') * x) * ((m : K') * z) := by push_cast; ring
     rw [e]
     exact mul_mem hnx hmz
 
-
 omit [Fintype T] in
-theorem mem_adjoin_of_mem_blockFnField [NumberField K'] (t : T) (ht : y ⟨(), t⟩ ≠ 0) {x : K'}
-    (hx : x ∈ blockFnField y) :
-    x ∈ Algebra.adjoin ℚ (Set.range fun p : Σ _ : Unit, T => y p / y ⟨p.1, t⟩) := by
-  rw [← IntermediateField.adjoin_toSubalgebra_of_isAlgebraic
-    (fun x _ => Algebra.IsAlgebraic.isAlgebraic x)]
-  have hle : blockFnField y ≤
-      IntermediateField.adjoin ℚ (Set.range fun p : Σ _ : Unit, T => y p / y ⟨p.1, t⟩) := by
+theorem mem_adjoin_of_mem_blockFnField
+    [NumberField K'] (t : T) (ht : y ⟨(), t⟩ ≠ 0) {x : K'} (hx : x ∈ blockFnField y)
+    : x ∈ Algebra.adjoin ℚ (Set.range fun p : Σ _ : Unit, T => y p / y ⟨p.1, t⟩) := by
+  rw [← IntermediateField.adjoin_toSubalgebra_of_isAlgebraic (fun x _ =>
+    Algebra.IsAlgebraic.isAlgebraic x)]
+  have hle
+      : blockFnField y
+        ≤ IntermediateField.adjoin ℚ (Set.range fun p : Σ _ : Unit, T => y p / y ⟨p.1, t⟩) := by
     refine IntermediateField.adjoin_le_iff.mpr ?_
     rintro _ ⟨p, q, -, rfl⟩
-    have hp : y p / y ⟨(), t⟩ ∈
-        IntermediateField.adjoin ℚ (Set.range fun p : Σ _ : Unit, T => y p / y ⟨p.1, t⟩) :=
+    have hp
+        : y p / y ⟨(), t⟩
+          ∈ IntermediateField.adjoin ℚ (Set.range fun p : Σ _ : Unit, T => y p / y ⟨p.1, t⟩) :=
       IntermediateField.subset_adjoin _ _ ⟨p, rfl⟩
-    have hq : y q / y ⟨(), t⟩ ∈
-        IntermediateField.adjoin ℚ (Set.range fun p : Σ _ : Unit, T => y p / y ⟨p.1, t⟩) :=
+    have hq
+        : y q / y ⟨(), t⟩
+          ∈ IntermediateField.adjoin ℚ (Set.range fun p : Σ _ : Unit, T => y p / y ⟨p.1, t⟩) :=
       IntermediateField.subset_adjoin _ _ ⟨q, rfl⟩
     rw [← div_div_div_cancel_right₀ ht]
     exact div_mem hp hq
   exact hle hx
 
-theorem exists_nat_mul_mem_curveRing [NumberField K'] {x : K'} (hx : x ∈ blockFnField y) :
-    ∃ n : ℕ, n ≠ 0 ∧ (n : K') * x ∈ curveRing y := by
+theorem exists_nat_mul_mem_curveRing [NumberField K'] {x : K'} (hx : x ∈ blockFnField y)
+    : ∃ n : ℕ, n ≠ 0 ∧ (n : K') * x ∈ curveRing y := by
   classical
-  have key : ∀ t : T, ∃ n : ℕ, n ≠ 0 ∧ (y ⟨(), t⟩ ≠ 0 → (n : K') * x ∈ chartRingZ y (fun _ => t)) := by
+  have key
+      : ∀ t : T, ∃ n : ℕ, n ≠ 0 ∧ (y ⟨(), t⟩ ≠ 0 → (n : K') * x ∈ chartRingZ y (fun _ => t)) := by
     intro t
     by_cases ht : y ⟨(), t⟩ = 0
     · exact ⟨1, one_ne_zero, fun h => (h ht).elim⟩
@@ -143,23 +157,26 @@ theorem exists_nat_mul_mem_curveRing [NumberField K'] {x : K'} (hx : x ∈ block
   have hc' : c = fun _ => c () := funext fun u => by cases u; rfl
   have h1 := hN (c ()) (hc ())
   rw [← hc'] at h1
-  have e : ((∏ t, N t : ℕ) : K') * x =
-      ((∏ t ∈ Finset.univ.erase (c ()), N t : ℕ) : K') * ((N (c ()) : K') * x) := by
+  have e
+      : ((∏ t, N t : ℕ) : K') * x
+        = ((∏ t ∈ Finset.univ.erase (c ()), N t : ℕ) : K') * ((N (c ()) : K') * x) := by
     rw [← Finset.mul_prod_erase Finset.univ N (Finset.mem_univ (c ()))]
-    push_cast; ring
+    push_cast
+    ring
   rw [e]
   exact mul_mem (natCast_mem _ _) h1
 
-theorem finrank_eq [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1) :
-    Module.finrank ℤ (curveRing y) = Module.finrank ℚ (blockFnField y) := by
+theorem finrank_eq [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1)
+    : Module.finrank ℤ (curveRing y) = Module.finrank ℚ (blockFnField y) := by
   have := finite y hy
   let b := Module.finBasis ℤ (curveRing y)
   let ι : curveRing y →ₗ[ℤ] K' := (curveRing y).subtype.toAddMonoidHom.toIntLinearMap
   have hliZ : LinearIndependent ℤ (ι ∘ b) :=
     b.linearIndependent.map' ι (LinearMap.ker_eq_bot.mpr Subtype.val_injective)
   have hliQ : LinearIndependent ℚ (ι ∘ b) := (LinearIndependent.iff_fractionRing ℤ ℚ).mp hliZ
-  have hspan : Submodule.span ℚ (Set.range (ι ∘ b)) =
-      Subalgebra.toSubmodule (blockFnField y).toSubalgebra := by
+  have hspan
+      : Submodule.span ℚ (Set.range (ι ∘ b))
+        = Subalgebra.toSubmodule (blockFnField y).toSubalgebra := by
     apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
@@ -183,9 +200,9 @@ theorem finrank_eq [NumberField K'] (hy : IsArithVar (mCoordIdeal y) 1) :
 
 end CurveAffineCharts
 
-theorem CurveCharts.proof (hc : ClosedPointChart.Statement) : CurveCharts.Statement :=
-  fun T _ K' _ _ y hy =>
-    ⟨CurveAffineCharts.finite y hy, CurveAffineCharts.finrank_eq y hy, hc T K' y hy⟩
+theorem CurveCharts.proof (hc : ClosedPointChart.Statement)
+    : CurveCharts.Statement := fun T _ K' _ _ y hy =>
+  ⟨CurveAffineCharts.finite y hy, CurveAffineCharts.finrank_eq y hy, hc T K' y hy⟩
 
 end
 

@@ -42,20 +42,25 @@ theorem supertrace_carriedBy_diracKernel : StrKer := by
   let Dl : TSub Y →ₗ[ℂ] TSub Y := (((dD ε E).restrict hY : Y →ₗ[ℂ] Y) : TSub Y →ₗ[ℂ] TSub Y)
   let Γy : TSub Y →ₗ[ℂ] TSub Y := ((gradT.restrict hG : Y →ₗ[ℂ] Y) : TSub Y →ₗ[ℂ] TSub Y)
   let B : TSub Y →ₗ[ℂ] TSub Y := (((wK hD hk).restrict (hK k hk) : Y →ₗ[ℂ] Y) : TSub Y →ₗ[ℂ] TSub Y)
-  obtain ⟨hker, htr⟩ := str_eq_str_ker Dl Γy B
-    (fun x y => by rw [tsub_inner, tsub_inner]; exact tform_D hU _ _)
-    (fun x => Subtype.ext (gradT_D E _)) (fun x => Subtype.ext (wK_D hσ hD hk _))
-  have h1 : LinearMap.trace ℂ Y ((gradT ∘ₗ wK hD hk).restrict (fun y hy => hG _ (hK k hk y hy))) =
-      LinearMap.trace ℂ (TSub Y) (Γy ∘ₗ B) := rfl
+  obtain ⟨hker, htr⟩ :=
+    str_eq_str_ker Dl Γy B
+      (fun x y => by rw [tsub_inner, tsub_inner]; exact tform_D hU _ _)
+      (fun x => Subtype.ext (gradT_D E _))
+      (fun x => Subtype.ext (wK_D hσ hD hk _))
+  have h1
+      : LinearMap.trace ℂ Y ((gradT ∘ₗ wK hD hk).restrict (fun y hy => hG _ (hK k hk y hy)))
+        = LinearMap.trace ℂ (TSub Y) (Γy ∘ₗ B) :=
+    rfl
   rw [h1, htr]
   have hmemZ : ∀ x : LinearMap.ker Dl, tsubVal Y (x : TSub Y) ∈ Z := by
     intro x
     have hx : Dl (x : TSub Y) = 0 := x.2
     exact ⟨tsubVal_mem (x : TSub Y), congrArg (tsubVal Y) hx⟩
-  let f : LinearMap.ker Dl →ₗ[ℂ] TSub Z :=
-    { toFun := fun x => ((⟨tsubVal Y (x : TSub Y), hmemZ x⟩ : Z) : TSub Z)
-      map_add' := fun x y => rfl
-      map_smul' := fun c x => rfl }
+  let f : LinearMap.ker Dl →ₗ[ℂ] TSub Z := {
+    toFun := fun x => ((⟨tsubVal Y (x : TSub Y), hmemZ x⟩ : Z) : TSub Z)
+    map_add' := fun x y => rfl
+    map_smul' := fun c x => rfl
+  }
   have hf : Function.Bijective f := by
     constructor
     · intro x y hxy

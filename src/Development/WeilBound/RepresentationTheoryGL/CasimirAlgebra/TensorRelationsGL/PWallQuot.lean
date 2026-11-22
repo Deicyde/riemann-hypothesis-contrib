@@ -16,8 +16,8 @@ section Alg
 
 variable {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B]
 
-theorem qdet_map (f : A →ₐ[ℂ] B) {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) :
-    f (qdet E u) = qdet (fun a b => f (E a b)) u := by
+theorem qdet_map (f : A →ₐ[ℂ] B) {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ)
+    : f (qdet E u) = qdet (fun a b => f (E a b)) u := by
   unfold qdet qminor
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -27,19 +27,22 @@ theorem qdet_map (f : A →ₐ[ℂ] B) {n : ℕ} (E : Fin n → Fin n → A) (u 
   refine congrArg List.prod (congrArg List.ofFn (funext fun k => ?_))
   simp only [Function.comp, Tm, map_add (f := _), apply_ite f, map_zero, AlgHom.commutes]
 
-theorem glRel_map (f : A →ₐ[ℂ] B) {n : ℕ} {E : Fin n → Fin n → A} (h : GlRel E) : GlRel fun a b => f (E a b) := by
+theorem glRel_map (f : A →ₐ[ℂ] B) {n : ℕ} {E : Fin n → Fin n → A} (h : GlRel E)
+    : GlRel fun a b => f (E a b) := by
   intro a b c d
   have := congrArg f (h a b c d)
   simpa [map_sub, map_mul, apply_ite f] using this
 
-theorem glRel_of_inj (f : A →ₐ[ℂ] B) (hf : Function.Injective f) {n : ℕ} {E : Fin n → Fin n → A}
-    (h : GlRel fun a b => f (E a b)) : GlRel E := by
+theorem glRel_of_inj
+    (f : A →ₐ[ℂ] B) (hf : Function.Injective f)
+    {n : ℕ} {E : Fin n → Fin n → A} (h : GlRel fun a b => f (E a b))
+    : GlRel E := by
   intro a b c d
   apply hf
   simpa [map_sub, map_mul, apply_ite f] using h a b c d
 
-theorem comm_qdet {n : ℕ} (E : Fin n → Fin n → A) (x : A) (h : ∀ a b, Commute x (E a b)) (u : ℂ) :
-    Commute x (qdet E u) := by
+theorem comm_qdet {n : ℕ} (E : Fin n → Fin n → A) (x : A) (h : ∀ a b, Commute x (E a b)) (u : ℂ)
+    : Commute x (qdet E u) := by
   unfold qdet qminor
   refine Commute.sum_right _ _ _ fun σ _ => ?_
   refine Commute.mul_right (Int.cast_commute _ _).symm ?_
@@ -79,15 +82,16 @@ open WQ
 
 theorem wallQuot_of (hQ : QdetFacts) : WallQuot := by
   intro n M _ _ ι E hgl hcomm l φ hφ
-  let N : Submodule ℂ M :=
-    { carrier := {y | ∀ w ∈ envAlg E, φ (w y) = 0}
-      add_mem' := fun {x y} hx hy w hw => by
-        show φ (w (x + y)) = 0
-        rw [map_add (f := _), map_add (f := _), hx w hw, hy w hw, add_zero]
-      zero_mem' := fun w _ => by simp
-      smul_mem' := fun c y hy w hw => by
-        show φ (w (c • y)) = 0
-        rw [map_smul, map_smul, hy w hw, smul_zero] }
+  let N : Submodule ℂ M := {
+    carrier := {y | ∀ w ∈ envAlg E, φ (w y) = 0}
+    add_mem' := fun {x y} hx hy w hw => by
+      show φ (w (x + y)) = 0
+      rw [map_add (f := _), map_add (f := _), hx w hw, hy w hw, add_zero]
+    zero_mem' := fun w _ => by simp
+    smul_mem' := fun c y hy w hw => by
+      show φ (w (c • y)) = 0
+      rw [map_smul, map_smul, hy w hw, smul_zero]
+  }
   have hgen : ∀ τ a b, E τ a b ∈ envAlg E := fun τ a b => Algebra.subset_adjoin ⟨τ, a, b, rfl⟩
   have hstab : ∀ τ a b, E τ a b ∈ stab N := fun τ a b y hy w hw =>
     hy (w * E τ a b) (Subalgebra.mul_mem _ hw (hgen τ a b))
@@ -111,12 +115,20 @@ theorem wallQuot_of (hQ : QdetFacts) : WallQuot := by
     rw [show qdet (F τ) u = qmap N (qdet (E' τ) u) from (qdet_map _ _ _).symm,
       show qdet (E τ) u = (stab N).val (qdet (E' τ) u) from (qdet_map (stab N).val (E' τ) u).symm]
     rfl
-  refine ⟨N, F, fun τ => glRel_map (qmap N) (hgl' τ), fun τ τ' h a b c d => ?_, fun τ u => ?_,
-    fun τ a b => LinearMap.ext fun y => rfl, fun y => Iff.rfl⟩
-  · exact (show Commute (E' τ a b) (E' τ' c d) from Subtype.ext (hcomm τ τ' h a b c d).eq).map (qmap N)
+  refine ⟨
+    N,
+    F,
+    fun τ => glRel_map (qmap N) (hgl' τ),
+    fun τ τ' h a b c d => ?_,
+    fun τ u => ?_,
+    fun τ a b => LinearMap.ext fun y => rfl,
+    fun y => Iff.rfl
+  ⟩
+  · exact (show Commute (E' τ a b) (E' τ' c d) from Subtype.ext (hcomm τ τ' h a b c d).eq).map
+      (qmap N)
   · refine Submodule.linearMap_qext _ (LinearMap.ext fun y => ?_)
-    rw [LinearMap.comp_apply, LinearMap.comp_apply, hq, Module.algebraMap_end_apply, ← N.mkQ.map_smul,
-      Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
+    rw [LinearMap.comp_apply, LinearMap.comp_apply, hq, Module.algebraMap_end_apply,
+      ← N.mkQ.map_smul, Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
     intro w hw
     show φ (w (qdet (E τ) u y - (∏ k, (u + l τ k)) • y)) = 0
     have hc := congrArg (fun T : Module.End ℂ M => φ (T y)) (hcent τ u w hw).eq

@@ -11,7 +11,8 @@ open Filter Topology PositivityTheory.RgEis
 
 namespace GlobalTheory.CompanionTheory.RgEisScale
 
-variable {G : Type} [Group G] [TopologicalSpace G] {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
 
 lemma ht_rep {Γ K P : Subgroup G} {l : G → ℝ} (hl : IsHt Γ K ⊤ l) (q : Cos P Γ) (g : G) :
     l (rep q * g) = l g := by
@@ -32,18 +33,23 @@ lemma conv_twist {Γ K P : Subgroup G} {l : G → ℝ} (hl : IsHt Γ K ⊤ l) {f
   refine ((hc g).mul_right (Real.exp (t * l g))).congr fun q => ?_
   rw [h, ht_rep hl, Real.exp_add]
 
-theorem wall_scale [IsTopologicalGroup G] {K Γ P P' : Subgroup G} {ρ : K →* (W →L[ℂ] W)} {c : G → ℂ}
-    {η η' β l : G → ℝ} {s : ℝ} (hs : 0 < s) (hl : IsHt Γ K ⊤ l) {R : ℝ} {D : ℂ → ℂ}
-    {Op : ℂ → (secSp K P c ρ →L[ℂ] secSp K P' c ρ)} {H : ℂ → G → (secSp K P c ρ →L[ℂ] W)}
-    (hw : Wall Γ K P P' c η η' β ρ (secSp K P c ρ) R D Op H) :
-    Wall Γ K P P' c (fun g => s * (η g + l g)) (fun g => s * (η' g - l g)) β ρ (secSp K P c ρ) (R / s)
-      (fun z => D (s * z)) (fun z => Op (s * z))
+theorem wall_scale
+    [IsTopologicalGroup G]
+    {K Γ P P' : Subgroup G} {ρ : K →* (W →L[ℂ] W)} {c : G → ℂ} {η η' β l : G → ℝ} {s : ℝ}
+    (hs : 0 < s) (hl : IsHt Γ K ⊤ l)
+    {R : ℝ} {D : ℂ → ℂ} {Op : ℂ → (secSp K P c ρ →L[ℂ] secSp K P' c ρ)}
+    {H : ℂ → G → (secSp K P c ρ →L[ℂ] W)} (hw : Wall Γ K P P' c η η' β ρ (secSp K P c ρ) R D Op H)
+    : Wall Γ K P P' c
+      (fun g => s * (η g + l g))
+      (fun g => s * (η' g - l g))
+      β ρ (secSp K P c ρ) (R / s)
+      (fun z => D (s * z))
+      (fun z => Op (s * z))
       (fun z g => Complex.exp (s * z * l g) • H (s * z) g) := by
   have hsC : (s : ℂ) ≠ 0 := by exact_mod_cast hs.ne'
   have hre : ∀ z : ℂ, ((s : ℂ) * z).re = s * z.re := fun z => by simp
   have hσ : Differentiable ℂ (fun z : ℂ => (s : ℂ) * z) := by fun_prop
-  have hgtx : ∀ x : ℝ, R / s < x → R < s * x := fun x hx => by
-    rwa [div_lt_iff₀' hs] at hx
+  have hgtx : ∀ x : ℝ, R / s < x → R < s * x := fun x hx => by rwa [div_lt_iff₀' hs] at hx
   have hltx : ∀ x : ℝ, x < -(R / s) → s * x < -R := fun x hx => by
     have h1 := mul_lt_mul_of_pos_left hx hs
     have h2 : s * -(R / s) = -R := by field_simp
@@ -53,19 +59,20 @@ theorem wall_scale [IsTopologicalGroup G] {K Γ P P' : Subgroup G} {ρ : K →* 
   have hlec' : ∀ {y : ℝ} {z : ℂ}, z.re ≤ y → ((s : ℂ) * z).re ≤ s * y := fun h => by
     rw [hre]; exact mul_le_mul_of_nonneg_left h hs.le
   have hlc : Continuous fun g => (l g : ℂ) := Complex.continuous_ofReal.comp hl.cont
-  refine
-    { le := hw.le
-      pos := div_nonneg hw.pos hs.le
-      convR := fun x hx => ?_
-      convL := fun x hx => ?_
-      dEnt := ⟨hw.dEnt.1.comp hσ, fun b a => ?_⟩
-      dNe := ?_
-      op := ⟨?_, fun b a ha => ?_⟩
-      hol := fun g => ?_
-      cont := ?_
-      bdd := fun b a g => ?_
-      eqR := fun z hz g w => ?_
-      eqL := fun z hz g w => ?_ }
+  refine {
+    le := hw.le
+    pos := div_nonneg hw.pos hs.le
+    convR := fun x hx => ?_
+    convL := fun x hx => ?_
+    dEnt := ⟨hw.dEnt.1.comp hσ, fun b a => ?_⟩
+    dNe := ?_
+    op := ⟨?_, fun b a ha => ?_⟩
+    hol := fun g => ?_
+    cont := ?_
+    bdd := fun b a g => ?_
+    eqR := fun z hz g w => ?_
+    eqL := fun z hz g w => ?_
+  }
   · exact conv_twist hl (s * x) (fun y => by ring) (hw.convR (s * x) (hgtx x hx))
   · exact conv_twist hl (s * x) (fun y => by ring) (hw.convL (s * x) (hltx x hx))
   · obtain ⟨M, hM⟩ := hw.dEnt.2 (s * b) (s * a)
@@ -77,7 +84,8 @@ theorem wall_scale [IsTopologicalGroup G] {K Γ P P' : Subgroup G} {ρ : K →* 
   · refine hw.op.1.comp hσ.differentiableOn fun z hz => ?_
     have hz' : z.re < -(R / s) := hz
     show ((s : ℂ) * z).re < -R
-    rw [hre]; exact hltx _ hz'
+    rw [hre]
+    exact hltx _ hz'
   · obtain ⟨M, hM⟩ := hw.op.2 (s * b) (s * a) (hltx a ha)
     exact ⟨M, fun z h1 h2 => hM _ (hlec h1) (hlec' h2)⟩
   · have h1 : Differentiable ℂ fun z : ℂ => Complex.exp (s * z * l g) := by fun_prop
@@ -90,15 +98,21 @@ theorem wall_scale [IsTopologicalGroup G] {K Γ P P' : Subgroup G} {ρ : K →* 
   · obtain ⟨U, hU, M, hM⟩ := hw.bdd (s * b) (s * a) g
     have hV : {g' | |l g'| < |l g| + 1} ∈ 𝓝 g :=
       (isOpen_lt (continuous_abs.comp hl.cont) continuous_const).mem_nhds (by simp)
-    refine ⟨U ∩ {g' | |l g'| < |l g| + 1}, inter_mem hU hV,
-      Real.exp (s * max |b| |a| * (|l g| + 1)) * M, fun z h1 h2 g' hg' => ?_⟩
+    refine ⟨
+      U ∩ {g' | |l g'| < |l g| + 1},
+      inter_mem hU hV,
+      Real.exp (s * max |b| |a| * (|l g| + 1)) * M,
+      fun z h1 h2 g' hg' => ?_
+    ⟩
     have hH := hM _ (hlec h1) (hlec' h2) g' hg'.1
     have hg2 : |l g'| < |l g| + 1 := hg'.2
     have hz : |z.re| ≤ max |b| |a| := abs_le_max_abs_abs h1 h2
     have hE : ‖Complex.exp (s * z * l g')‖ ≤ Real.exp (s * max |b| |a| * (|l g| + 1)) := by
       rw [Complex.norm_exp, Complex.re_mul_ofReal, hre]
       apply Real.exp_le_exp.mpr
-      calc s * z.re * l g' ≤ |s * z.re * l g'| := le_abs_self _
+      calc
+        s * z.re * l g'
+          ≤ |s * z.re * l g'| := le_abs_self _
         _ = s * |z.re| * |l g'| := by rw [abs_mul, abs_mul, abs_of_pos hs]
         _ ≤ s * max |b| |a| * (|l g| + 1) := by gcongr
     rw [norm_smul]

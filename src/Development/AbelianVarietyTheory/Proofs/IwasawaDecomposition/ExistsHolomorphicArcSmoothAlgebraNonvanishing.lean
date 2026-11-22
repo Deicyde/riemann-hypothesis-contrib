@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.ExistsHolo
 
 namespace GlobalTheory.HolArc
 
-theorem isAlgebraic_of_etale (S R : Type) [CommRing S] [IsDomain S] [CommRing R] [IsDomain R]
-    [Algebra S R] [Algebra.Etale S R] [FaithfulSMul S R] : Algebra.IsAlgebraic S R := by
+theorem isAlgebraic_of_etale
+    (S R : Type) [CommRing S] [IsDomain S] [CommRing R] [IsDomain R] [Algebra S R]
+    [Algebra.Etale S R] [FaithfulSMul S R]
+    : Algebra.IsAlgebraic S R := by
   let K := FractionRing S
   let L := FractionRing R
   letI : Algebra K L := FractionRing.liftAlgebra S L
@@ -26,8 +28,9 @@ theorem isAlgebraic_of_etale (S R : Type) [CommRing S] [IsDomain S] [CommRing R]
   exact Algebra.IsAlgebraic.of_injective (IsScalarTower.toAlgHom S R L)
     (IsFractionRing.injective R L)
 
-theorem faithfulSMul_of_flat (S R : Type) [CommRing S] [IsDomain S] [CommRing R] [IsDomain R]
-    [Algebra S R] [Module.Flat S R] : FaithfulSMul S R := by
+theorem faithfulSMul_of_flat
+    (S R : Type) [CommRing S] [IsDomain S] [CommRing R] [IsDomain R] [Algebra S R] [Module.Flat S R]
+    : FaithfulSMul S R := by
   rw [faithfulSMul_iff_algebraMap_injective, injective_iff_map_eq_zero]
   intro a ha
   by_contra h
@@ -36,26 +39,28 @@ theorem faithfulSMul_of_flat (S R : Type) [CommRing S] [IsDomain S] [CommRing R]
   have : a • (1 : R) = a • (0 : R) := by simp [Algebra.smul_def, ha]
   exact one_ne_zero (hreg this)
 
-theorem exists_line (m : ℕ) (q : MvPolynomial (Fin m) ℂ) (hq : q ≠ 0) (b₀ : Fin m → ℂ) :
-    ∃ (v : Fin m → ℂ) (ρ : ℝ), 0 < ρ ∧
-      ∀ u ∈ Metric.ball (0 : ℂ) ρ, u ≠ 0 → MvPolynomial.eval (b₀ + u • v) q ≠ 0 := by
+theorem exists_line (m : ℕ) (q : MvPolynomial (Fin m) ℂ) (hq : q ≠ 0) (b₀ : Fin m → ℂ)
+    : ∃ (v : Fin m → ℂ) (ρ : ℝ),
+      0 < ρ ∧ ∀ u ∈ Metric.ball (0 : ℂ) ρ, u ≠ 0 → MvPolynomial.eval (b₀ + u • v) q ≠ 0 := by
   obtain ⟨w, hw⟩ : ∃ w, MvPolynomial.eval w q ≠ 0 := by
     by_contra h
     push_neg at h
     exact hq (MvPolynomial.funext fun x => by simpa using h x)
   let v := w - b₀
-  let Q : Polynomial ℂ := MvPolynomial.aeval
-    (fun i => Polynomial.C (b₀ i) + Polynomial.X * Polynomial.C (v i)) q
+  let Q : Polynomial ℂ :=
+    MvPolynomial.aeval (fun i => Polynomial.C (b₀ i) + Polynomial.X * Polynomial.C (v i)) q
   have hQ : ∀ u, Q.eval u = MvPolynomial.eval (b₀ + u • v) q := fun u => by
     have : (Polynomial.evalRingHom u).comp
-        (MvPolynomial.aeval (R := ℂ) (fun i => Polynomial.C (b₀ i) + Polynomial.X * Polynomial.C (v i)) :
-          MvPolynomial (Fin m) ℂ →ₐ[ℂ] Polynomial ℂ).toRingHom =
-        MvPolynomial.eval (b₀ + u • v) := by
+          (MvPolynomial.aeval (R := ℂ)
+              (fun i => Polynomial.C (b₀ i) + Polynomial.X * Polynomial.C (v i))
+            : MvPolynomial (Fin m) ℂ →ₐ[ℂ] Polynomial ℂ).toRingHom
+        = MvPolynomial.eval (b₀ + u • v) := by
       refine MvPolynomial.ringHom_ext (fun a => ?_) fun i => ?_ <;> simp <;> ring
     exact congrArg (fun f : MvPolynomial (Fin m) ℂ →+* ℂ => f q) this
-  have hQ0 : Q ≠ 0 := fun h => hw (by
-    have := hQ 1
-    simpa [h, v] using this.symm)
+  have hQ0 : Q ≠ 0 := fun h =>
+    hw (by
+      have := hQ 1
+      simpa [h, v] using this.symm)
   have hfin : (((Q.roots.toFinset.erase 0 : Finset ℂ) : Set ℂ))ᶜ ∈ nhds (0 : ℂ) :=
     (Finset.finite_toSet _).isClosed.isOpen_compl.mem_nhds (by simp)
   obtain ⟨ρ, hρ, hb⟩ := Metric.mem_nhds_iff.1 hfin
@@ -66,12 +71,24 @@ theorem exists_line (m : ℕ) (q : MvPolynomial (Fin m) ℂ) (hq : q ≠ 0) (b�
 
 end GlobalTheory.HolArc
 
-open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.BdArc Filter Topology
+open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj
+  GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.BdArc Filter
+  Topology
 open ReciprocityTheory.ChartRestriction.G.FD (Data Frame Bor rmul lact mat col dmin Wt)
 
 namespace GlobalTheory.HolArc
 
-theorem exists_holPts_ne_zero : ∀ (F A : Type) [Field F] [CommRing A] [IsDomain A] [Algebra F A], Algebra.Smooth F A → ∀ (ψ₀ : A →+* ℂ) (p : A), p ≠ 0 → ∃ (ψ : ℂ → (A →+* ℂ)) (r : ℝ), IsHolPts ψ r ∧ ψ 0 = ψ₀ ∧ (∀ u ∈ Metric.ball (0 : ℂ) r, (ψ u).comp (algebraMap F A) = ψ₀.comp (algebraMap F A)) ∧ ∀ u ∈ Metric.ball (0 : ℂ) r, u ≠ 0 → ψ u p ≠ 0 := by
+theorem exists_holPts_ne_zero
+    : ∀ (F A : Type) [Field F] [CommRing A] [IsDomain A] [Algebra F A],
+      Algebra.Smooth F A
+        → ∀ (ψ₀ : A →+* ℂ) (p : A),
+          p ≠ 0
+            → ∃ (ψ : ℂ → (A →+* ℂ)) (r : ℝ),
+              IsHolPts ψ r ∧ ψ 0 = ψ₀
+                ∧ (∀ u ∈ Metric.ball (0 : ℂ) r,
+                  (ψ u).comp (algebraMap F A) = ψ₀.comp (algebraMap F A))
+                ∧ ∀ u ∈ Metric.ball (0 : ℂ) r, u ≠ 0 → ψ u p ≠ 0 := by
   intro F A _ _ _ _ hS ψ₀ p hp
   haveI := hS
   haveI : (RingHom.ker ψ₀).IsPrime := RingHom.ker_isPrime ψ₀
@@ -102,8 +119,11 @@ theorem exists_holPts_ne_zero : ∀ (F A : Type) [Field F] [CommRing A] [IsDomai
     exact (Algebra.IsAlgebraic.isAlgebraic (ι p)).exists_nonzero_dvd
       (mem_nonZeroDivisors_of_ne_zero ((map_ne_zero_iff ι hι).2 hp))
   obtain ⟨N, τ, n, f, O, hN, hO, hO₀, hd, hτ, hrec⟩ :=
-    GlobalTheory.EtaleFamily.exists_holomorphic_sections 0 m F R P Set.univ (fun _ => σ) 0 e het
-      isOpen_univ trivial (fun a => differentiableOn_const _) heC
+    GlobalTheory.EtaleFamily.exists_holomorphic_sections 0 m F R P Set.univ
+      (fun _ => σ)
+      0 e het isOpen_univ trivial
+      (fun a => differentiableOn_const _)
+      heC
   obtain ⟨h3, h4⟩ := hrec 0 e heC hO₀
   simp only [hPX, he] at h3 h4
   let b₀ : Fin m → ℂ := fun i => ψ₀ (s i)
@@ -119,8 +139,14 @@ theorem exists_holPts_ne_zero : ∀ (F A : Type) [Field F] [CommRing A] [IsDomai
   obtain ⟨ρ', hρ', hb⟩ := Metric.mem_nhds_iff.1 hNo
   have hsub : ∀ u ∈ Metric.ball (0 : ℂ) (min ρ ρ'), ℓ u ∈ N := fun u hu =>
     hb (Metric.ball_subset_ball (min_le_right _ _) hu)
-  refine ⟨fun u => (τ (ℓ u)).comp ι, min ρ ρ', ⟨lt_min hρ hρ', fun a => ?_⟩, ?_, fun u hu => ?_,
-    fun u hu hu0 h => ?_⟩
+  refine ⟨
+    fun u => (τ (ℓ u)).comp ι,
+    min ρ ρ',
+    ⟨lt_min hρ hρ', fun a => ?_⟩,
+    ?_,
+    fun u hu => ?_,
+    fun u hu hu0 h => ?_
+  ⟩
   · exact (hd (ι a)).comp hℓd.differentiableOn hsub
   · refine RingHom.ext fun a => ?_
     simp only [RingHom.comp_apply, hℓ0]

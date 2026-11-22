@@ -18,32 +18,39 @@ section JacInvSec
 variable {N : ℕ}
 
 def lmulP (Z : Matrix (Fin n) (Fin n) ℂ) : MP n →L[ℝ] MP n :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun X => Matrix.of.symm (Z * Matrix.of X)
-      map_add' := fun X Y => by
-        funext i j
-        simp [Matrix.mul_apply, Finset.sum_add_distrib, mul_add]
-      map_smul' := fun c X => by
-        funext i j
-        simp [Matrix.mul_apply, Finset.smul_sum, mul_left_comm] }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun X => Matrix.of.symm (Z * Matrix.of X)
+    map_add' := fun X Y => by
+      funext i j
+      simp [Matrix.mul_apply, Finset.sum_add_distrib, mul_add]
+    map_smul' := fun c X => by
+      funext i j
+      simp [Matrix.mul_apply, Finset.smul_sum, mul_left_comm]
+  }
 
-theorem lmulP_apply (Z : Matrix (Fin n) (Fin n) ℂ) (X : MP n) : lmulP Z X = Matrix.of.symm (Z * Matrix.of X) := rfl
+theorem lmulP_apply (Z : Matrix (Fin n) (Fin n) ℂ) (X : MP n)
+    : lmulP Z X = Matrix.of.symm (Z * Matrix.of X) :=
+  rfl
 
-theorem of_sum_smul (c : Fin N → ℝ) (X : Fin N → MP n) :
-    Matrix.of (∑ k, c k • X k) = ∑ k, c k • Matrix.of (X k) := by
+theorem of_sum_smul (c : Fin N → ℝ) (X : Fin N → MP n)
+    : Matrix.of (∑ k, c k • X k) = ∑ k, c k • Matrix.of (X k) := by
   ext i j
   simp [Matrix.sum_apply, Finset.sum_apply]
 
-theorem sum_single (v : EuclideanSpace ℝ (Fin N)) : v = ∑ k, v k • EuclideanSpace.single k (1 : ℝ) := by
+theorem sum_single (v : EuclideanSpace ℝ (Fin N))
+    : v = ∑ k, v k • EuclideanSpace.single k (1 : ℝ) := by
   conv_lhs => rw [← (EuclideanSpace.basisFun (Fin N) ℝ).sum_repr v]
   simp [EuclideanSpace.basisFun_apply]
 
-theorem mul_dPart {Θ : EuclideanSpace ℝ (Fin N) → MP n} {U : Set (EuclideanSpace ℝ (Fin N))}
+theorem mul_dPart
+    {Θ : EuclideanSpace ℝ (Fin N) → MP n} {U : Set (EuclideanSpace ℝ (Fin N))}
     {φ : EuclideanSpace ℝ (Fin N) → EuclideanSpace ℝ (Fin N)} {Z : Matrix (Fin n) (Fin n) ℂ}
     (hΘ : Differentiable ℝ Θ) (hU : IsOpen U) (hφ : DifferentiableOn ℝ φ U)
-    (h : ∀ t ∈ U, Matrix.of (Θ (φ t)) = Z * Matrix.of (Θ t)) {t : EuclideanSpace ℝ (Fin N)} (ht : t ∈ U) (i : Fin N) :
-    Z * Matrix.of (dPart Θ t i) =
-      ∑ k, (fderiv ℝ φ t (EuclideanSpace.single i 1) k) • Matrix.of (dPart Θ (φ t) k) := by
+    (h : ∀ t ∈ U, Matrix.of (Θ (φ t)) = Z * Matrix.of (Θ t))
+    {t : EuclideanSpace ℝ (Fin N)} (ht : t ∈ U)
+    (i : Fin N)
+    : Z * Matrix.of (dPart Θ t i)
+      = ∑ k, (fderiv ℝ φ t (EuclideanSpace.single i 1) k) • Matrix.of (dPart Θ (φ t) k) := by
   have hφt : DifferentiableAt ℝ φ t := hφ.differentiableAt (hU.mem_nhds ht)
   have heq : (Θ ∘ φ) =ᶠ[𝓝 t] (lmulP Z ∘ Θ) := by
     filter_upwards [hU.mem_nhds ht] with s hs
@@ -63,11 +70,13 @@ theorem mul_dPart {Θ : EuclideanSpace ℝ (Fin N) → MP n} {U : Set (Euclidean
   simp only [dPart]
   exact h5.symm.trans (of_sum_smul _ _)
 
-theorem chartJac_mul_det {Θ : EuclideanSpace ℝ (Fin N) → MP n} {U : Set (EuclideanSpace ℝ (Fin N))}
+theorem chartJac_mul_det
+    {Θ : EuclideanSpace ℝ (Fin N) → MP n} {U : Set (EuclideanSpace ℝ (Fin N))}
     {φ : EuclideanSpace ℝ (Fin N) → EuclideanSpace ℝ (Fin N)} {Z : Matrix (Fin n) (Fin n) ℂ}
-    (hΘ : Differentiable ℝ Θ) (hinv : ∀ s, IsUnit (Matrix.of (Θ s)).det) (hU : IsOpen U) (hφ : DifferentiableOn ℝ φ U)
-    (h : ∀ t ∈ U, Matrix.of (Θ (φ t)) = Z * Matrix.of (Θ t)) {t : EuclideanSpace ℝ (Fin N)} (ht : t ∈ U) :
-    chartJac Θ (φ t) * |(fderiv ℝ φ t).det| = chartJac Θ t := by
+    (hΘ : Differentiable ℝ Θ) (hinv : ∀ s, IsUnit (Matrix.of (Θ s)).det) (hU : IsOpen U)
+    (hφ : DifferentiableOn ℝ φ U) (h : ∀ t ∈ U, Matrix.of (Θ (φ t)) = Z * Matrix.of (Θ t))
+    {t : EuclideanSpace ℝ (Fin N)} (ht : t ∈ U)
+    : chartJac Θ (φ t) * |(fderiv ℝ φ t).det| = chartJac Θ t := by
   set D : Matrix (Fin N) (Fin N) ℝ := Matrix.of fun k i => fderiv ℝ φ t (EuclideanSpace.single i 1) k with hDdef
   set M := Matrix.of (Θ t)
   set M' := Matrix.of (Θ (φ t))
@@ -94,8 +103,10 @@ theorem chartJac_mul_det {Θ : EuclideanSpace ℝ (Fin N) → MP n} {U : Set (Eu
       rw [map_sum]
     simp only [map_smul]
     rfl
-  have hG : (Matrix.of fun i j : Fin N => @inner ℝ _ _ (w t i) (w t j)) =
-      D.transpose * (Matrix.of fun k l : Fin N => @inner ℝ _ _ (w (φ t) k) (w (φ t) l)) * D := by
+  have hG
+      : (Matrix.of fun i j : Fin N => @inner ℝ _ _ (w t i) (w t j))
+        = D.transpose * (Matrix.of fun k l : Fin N => @inner ℝ _ _ (w (φ t) k) (w (φ t) l))
+          * D := by
     ext i j
     rw [Matrix.of_apply, hw i, hw j]
     simp only [sum_inner, inner_sum, real_inner_smul_left, real_inner_smul_right, Matrix.mul_apply,
@@ -103,14 +114,24 @@ theorem chartJac_mul_det {Θ : EuclideanSpace ℝ (Fin N) → MP n} {U : Set (Eu
     refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
     ring
   have hdet : (fderiv ℝ φ t).det = D.det := by
-    rw [ContinuousLinearMap.det, ← LinearMap.det_toMatrix (EuclideanSpace.basisFun (Fin N) ℝ).toBasis]
+    rw [ContinuousLinearMap.det,
+      ← LinearMap.det_toMatrix (EuclideanSpace.basisFun (Fin N) ℝ).toBasis]
     congr 1
-  have hJ : chartJac Θ t = Real.sqrt (Matrix.det (Matrix.of fun i j : Fin N => @inner ℝ _ _ (w t i) (w t j))) := rfl
-  have hJ' : chartJac Θ (φ t) =
-      Real.sqrt (Matrix.det (Matrix.of fun i j : Fin N => @inner ℝ _ _ (w (φ t) i) (w (φ t) j))) := rfl
+  have hJ
+      : chartJac Θ t
+        = Real.sqrt (Matrix.det (Matrix.of fun i j : Fin N => @inner ℝ _ _ (w t i) (w t j))) :=
+    rfl
+  have hJ'
+      : chartJac Θ (φ t)
+        = Real.sqrt (Matrix.det (Matrix.of fun i j : Fin N =>
+          @inner ℝ _ _ (w (φ t) i) (w (φ t) j))) :=
+    rfl
   rw [hJ, hJ', hG, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, hdet,
-    show D.det * Matrix.det (Matrix.of fun k l : Fin N => @inner ℝ _ _ (w (φ t) k) (w (φ t) l)) * D.det =
-      (D.det * D.det) * Matrix.det (Matrix.of fun k l : Fin N => @inner ℝ _ _ (w (φ t) k) (w (φ t) l)) by ring,
+    show D.det * Matrix.det (Matrix.of fun k l : Fin N => @inner ℝ _ _ (w (φ t) k) (w (φ t) l))
+          * D.det
+        = (D.det * D.det)
+          * Matrix.det (Matrix.of fun k l : Fin N => @inner ℝ _ _ (w (φ t) k) (w (φ t) l)) by
+      ring,
     Real.sqrt_mul (mul_self_nonneg _), Real.sqrt_mul_self_eq_abs, mul_comm]
 
 end JacInvSec

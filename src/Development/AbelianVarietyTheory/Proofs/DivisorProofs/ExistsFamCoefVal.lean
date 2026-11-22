@@ -14,8 +14,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsDegene
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT GlobalTheory.TorsionAnyChar
@@ -57,9 +60,11 @@ namespace GlobalTheory.UT.MixedConv
 open GlobalTheory.FieldBaseChange
 
 section Core
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] {U : UnifPre I D A G} (E : EndU U)
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+  {U : UnifPre I D A G} (E : EndU U)
   {F : Type} [Field F] [IsAlgClosed F] [Algebra (FractionRing R) F]
 
 end Core
@@ -68,7 +73,14 @@ end GlobalTheory.UT.MixedConv
 
 namespace GlobalTheory.UT
 
-theorem _root_.GlobalTheory.PeriodsAnyChar.weilQkIs_iff_weilIs : LL → AnyUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ => ∀ (k : ℕ), 1 ≤ k → ∀ (p p' : QkPt D.toPre F k) x x', QkToAkU U.toUnifPre F k p x → QkToAkU U.toUnifPre F k p' x' → ∀ ζ : Fˣ, WeilQkIs D.toPre F k p p' ζ ↔ WeilIs A.A A.L k x x' (unitOn ζ) := by
+theorem _root_.GlobalTheory.PeriodsAnyChar.weilQkIs_iff_weilIs
+    : LL
+      → AnyUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ =>
+        ∀ (k : ℕ),
+          1 ≤ k
+            → ∀ (p p' : QkPt D.toPre F k) x x',
+              QkToAkU U.toUnifPre F k p x → QkToAkU U.toUnifPre F k p' x'
+                → ∀ ζ : Fˣ, WeilQkIs D.toPre F k p p' ζ ↔ WeilIs A.A A.L k x x' (unitOn ζ) := by
   intro hL R _ _ I _ D A G _ _ _ U F _ _ _ k hk p p' x x' hx hx' ζ
   have hG := hL.1.globalFns
   obtain ⟨w₀, hw₀⟩ := U.ext
@@ -79,8 +91,10 @@ theorem _root_.GlobalTheory.PeriodsAnyChar.weilQkIs_iff_weilIs : LL → AnyUF fu
   obtain ⟨e, he⟩ := exists_linearEquiv_expandsF hG U F hk w₀ hw₀
   obtain ⟨ρ, hρ, hcomm, -⟩ := thetaGrp_acts_linearly hG _ A (k : ℤ) (TFK (R := R) F)
   obtain ⟨c, hc⟩ := CommutatorPairing.exists_commIsOf hG A.isAb A.isLB θ θ'
-  obtain ⟨z, rfl⟩ : ∃ z : Fˣ, unitOn z = c :=
-    ⟨Units.map (Scheme.ΓSpecIso (CommRingCat.of F)).hom.hom.toMonoidHom c, Units.ext (by simp [unitOn])⟩
+  obtain ⟨z, rfl⟩ : ∃ z : Fˣ, unitOn z = c := ⟨
+    Units.map (Scheme.ΓSpecIso (CommRingCat.of F)).hom.hom.toMonoidHom c,
+    Units.ext (by simp [unitOn])
+  ⟩
   let E : SecM A.A A.L (k : ℤ) (TFK (R := R) F) → Fam D.toPre F k := fun v => e (SecM.toSec A.A v)
   have hE : ∀ s, ∃ v, E v = s := fun s => ⟨SecM.ofSec A.A (e.symm s), e.apply_symm_apply s⟩
   have a : ∀ v, PhiRel D.toPre F k p w (E v) (E (ρ θ v)) := fun v =>
@@ -91,22 +105,26 @@ theorem _root_.GlobalTheory.PeriodsAnyChar.weilQkIs_iff_weilIs : LL → AnyUF fu
     phi_unique p w ((phiRel_iff hG p w hw _ _).1 H) ((phiRel_iff hG p w hw _ _).1 (a v))
   have b' : ∀ v t, PhiRel D.toPre F k p' w' (E v) t → t = E (ρ θ' v) := fun v t H =>
     phi_unique p' w' ((phiRel_iff hG p' w' hw' _ _).1 H) ((phiRel_iff hG p' w' hw' _ _).1 (a' v))
-  have key := weilQkIs_iff_of_comm hG D p p' w w' hw hw' (z : F) (fun s s₁ s₂ s₃ s₄ h₁ h₂ h₃ h₄ => by
-    obtain ⟨v, rfl⟩ := hE s
-    obtain rfl := b' _ _ h₁
-    obtain rfl := b _ _ h₂
-    obtain rfl := b _ _ h₃
-    obtain rfl := b' _ _ h₄
-    rw [hcomm θ θ' _ hc v]
-    exact e.map_smul (z : F) (SecM.toSec A.A (ρ θ' (ρ θ v)))) (by
-    obtain ⟨B, hB, -⟩ := BoxSpan.exists_basis hL.1.secBaseChange A k hk F (jFK (R := R) F)
-    have : Nontrivial Γ((TFK (R := R) F).left, ⊤) :=
-      (Scheme.ΓSpecIso (CommRingCat.of F)).commRingCatIsoToRingEquiv.toEquiv.nontrivial
-    have hne := hB.ne_zero ⟨0, pow_pos hk _⟩
-    refine ⟨_, _, _, a (B ⟨0, pow_pos hk _⟩), a' _, fun h0 => hne ?_⟩
-    have h1 : SecM.toSec A.A (ρ θ' (ρ θ (B ⟨0, pow_pos hk _⟩))) = _ := e.map_eq_zero_iff.1 h0
-    have h2 : ρ θ' (ρ θ (B ⟨0, pow_pos hk _⟩)) = 0 := congrArg (SecM.ofSec A.A) h1
-    exact (ρ θ).map_eq_zero_iff.1 ((ρ θ').map_eq_zero_iff.1 h2)) hk (ζ : F)
+  have key :=
+    weilQkIs_iff_of_comm hG D p p' w w' hw hw' (z : F)
+      (fun s s₁ s₂ s₃ s₄ h₁ h₂ h₃ h₄ => by
+        obtain ⟨v, rfl⟩ := hE s
+        obtain rfl := b' _ _ h₁
+        obtain rfl := b _ _ h₂
+        obtain rfl := b _ _ h₃
+        obtain rfl := b' _ _ h₄
+        rw [hcomm θ θ' _ hc v]
+        exact e.map_smul (z : F) (SecM.toSec A.A (ρ θ' (ρ θ v))))
+      (by
+        obtain ⟨B, hB, -⟩ := BoxSpan.exists_basis hL.1.secBaseChange A k hk F (jFK (R := R) F)
+        have : Nontrivial Γ((TFK (R := R) F).left, ⊤) :=
+          (Scheme.ΓSpecIso (CommRingCat.of F)).commRingCatIsoToRingEquiv.toEquiv.nontrivial
+        have hne := hB.ne_zero ⟨0, pow_pos hk _⟩
+        refine ⟨_, _, _, a (B ⟨0, pow_pos hk _⟩), a' _, fun h0 => hne ?_⟩
+        have h1 : SecM.toSec A.A (ρ θ' (ρ θ (B ⟨0, pow_pos hk _⟩))) = _ := e.map_eq_zero_iff.1 h0
+        have h2 : ρ θ' (ρ θ (B ⟨0, pow_pos hk _⟩)) = 0 := congrArg (SecM.ofSec A.A) h1
+        exact (ρ θ).map_eq_zero_iff.1 ((ρ θ').map_eq_zero_iff.1 h2))
+      hk (ζ : F)
   have hz := GlobalLift.weilIs_of_commIsOf hG A.isAb A.isLB hc
   rw [key]
   constructor
@@ -114,13 +132,25 @@ theorem _root_.GlobalTheory.PeriodsAnyChar.weilQkIs_iff_weilIs : LL → AnyUF fu
     obtain rfl : ζ = z := Units.ext H
     exact hz
   · intro H
-    exact congrArg Units.val (H1.unitOn_injective (CommutatorPairing.weilIs_unique hG A.isAb A.isLB H hz))
+    exact congrArg Units.val
+      (H1.unitOn_injective (CommutatorPairing.weilIs_unique hG A.isAb A.isLB H hz))
 
 end GlobalTheory.UT
 
 namespace GlobalTheory.TorsionIso
 
-theorem _root_.GlobalTheory.PeriodsAnyChar.torsion_map : LL → AnyUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ => ∀ (k : ℕ), 1 ≤ k → ∃ f : QkPt D.toPre F k → (TFK (R := R) F ⟶ A.A), (∀ p x, QkToAkU U.toUnifPre F k p x ↔ x = f p) ∧ ((k : F) ≠ 0 → ∀ x, x ^ k = 1 → ∃ p, f p = x) ∧ (∀ p p', f p = f p' ↔ QkPt.Equiv D.toPre F p p') ∧ (∀ p p' p'', QkAdd p p' p'' → f p'' = f p * f p') ∧ ∀ p p' (z : Fˣ), WeilQkIs D.toPre F k p p' z ↔ WeilIs A.A A.L k (f p) (f p') (unitOn z) := by
+theorem _root_.GlobalTheory.PeriodsAnyChar.torsion_map
+    : LL
+      → AnyUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ =>
+        ∀ (k : ℕ),
+          1 ≤ k
+            → ∃ f : QkPt D.toPre F k → (TFK (R := R) F ⟶ A.A),
+              (∀ p x, QkToAkU U.toUnifPre F k p x ↔ x = f p)
+                ∧ ((k : F) ≠ 0 → ∀ x, x ^ k = 1 → ∃ p, f p = x)
+                ∧ (∀ p p', f p = f p' ↔ QkPt.Equiv D.toPre F p p')
+                ∧ (∀ p p' p'', QkAdd p p' p'' → f p'' = f p * f p')
+                ∧ ∀ p p' (z : Fˣ),
+                  WeilQkIs D.toPre F k p p' z ↔ WeilIs A.A A.L k (f p) (f p') (unitOn z) := by
   intro hL R _ _ I hI D A G _ _ hG U F _ _ _ k hk
   have hqk := indAtTransl_any hL R I hI D A G hG U F k hk
   have hcomp := indAtComp_any hL R I hI D A G hG U F k hk
@@ -135,9 +165,16 @@ theorem _root_.GlobalTheory.PeriodsAnyChar.torsion_map : LL → AnyUF fun {R} _ 
   have hpow : ∀ p, f p ^ k = 1 := fun p => by
     obtain ⟨w, hw⟩ := U.ext
     exact (hf p w hw).1
-  refine ⟨f, fun p x => ⟨fun h => huniq p _ _ h (hf p), fun h => h ▸ hf p⟩, ?_,
-    fun p p' => ⟨fun h => hinj p p' (f p) (hf p) (h ▸ hf p'), hwd p p'⟩, ?_,
-    fun p p' z => GlobalTheory.PeriodsAnyChar.weilQkIs_iff_weilIs hL R I hI D A G hG U F k hk p p' _ _ (hf p) (hf p') z⟩
+  refine ⟨
+    f,
+    fun p x => ⟨fun h => huniq p _ _ h (hf p), fun h => h ▸ hf p⟩,
+    ?_,
+    fun p p' => ⟨fun h => hinj p p' (f p) (hf p) (h ▸ hf p'), hwd p p'⟩,
+    ?_,
+    fun p p' z =>
+      GlobalTheory.PeriodsAnyChar.weilQkIs_iff_weilIs hL R I hI D A G hG U F k hk p p' _ _ (hf p)
+        (hf p') z
+  ⟩
   · intro hkF x hx
     obtain ⟨p, hp⟩ := exists_qkToAkU R I hI D A G hG U F k hkF x hx
     exact ⟨p, huniq p _ _ (hf p) hp⟩
@@ -152,16 +189,29 @@ namespace GlobalTheory.LevelCompat
 open GlobalTheory.TorusExt
 attribute [local instance] gtGroup
 
-theorem _root_.GlobalTheory.PeriodsAnyChar.qkToAkU_level : LL → AnyUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ => ∀ (k n N : ℕ), 1 ≤ k → 1 ≤ n → N = k * n → ∀ (p : QkPt D.toPre F k) (q : QkPt D.toPre F N) x, (q.y = n • p.y → q.g = p.g → (QkToAkU U.toUnifPre F k p x ↔ QkToAkU U.toUnifPre F N q x)) ∧ (p.y = q.y → GtPtF.IsNsmul n q.g p.g → QkToAkU U.toUnifPre F N q x → QkToAkU U.toUnifPre F k p (x ^ n)) := by
+theorem _root_.GlobalTheory.PeriodsAnyChar.qkToAkU_level
+    : LL
+      → AnyUF fun {R} _ _ {I} {D} {A} {G} _ _ U F _ _ =>
+        ∀ (k n N : ℕ),
+          1 ≤ k → 1 ≤ n → N = k * n
+            → ∀ (p : QkPt D.toPre F k) (q : QkPt D.toPre F N) x,
+              (q.y = n • p.y → q.g = p.g
+                  → (QkToAkU U.toUnifPre F k p x ↔ QkToAkU U.toUnifPre F N q x))
+                ∧ (p.y = q.y → GtPtF.IsNsmul n q.g p.g → QkToAkU U.toUnifPre F N q x
+                  → QkToAkU U.toUnifPre F k p (x ^ n)) := by
   intro hL R _ _ I hI D A G _ _ hG U F _ _ _ k n N hk hn hN
   have hN1 : 1 ≤ N := hN ▸ Nat.mul_pos hk hn
   obtain ⟨f, hf, -⟩ := GlobalTheory.PeriodsAnyChar.torsion_map hL R I hI D A G hG U F k hk
-  obtain ⟨f', hf', -, -, hadd, -⟩ := GlobalTheory.PeriodsAnyChar.torsion_map hL R I hI D A G hG U F N hN1
-  have key : ∀ (p : QkPt D.toPre F k) (q : QkPt D.toPre F N), q.y = n • p.y → q.g = p.g → f p = f' q := by
+  obtain ⟨f', hf', -, -, hadd, -⟩ :=
+    GlobalTheory.PeriodsAnyChar.torsion_map hL R I hI D A G hG U F N hN1
+  have key
+      : ∀ (p : QkPt D.toPre F k) (q : QkPt D.toPre F N),
+        q.y = n • p.y → q.g = p.g → f p = f' q := by
     intro p q hy hg
     obtain ⟨x₀, h₀⟩ := existsTransl_any hL R I hI D A G hG U F k hk p
-    have a := (indAtTransl_any hL R I hI D A G hG U F k hk p x₀).1
-      (h₀ 1 k le_rfl (Nat.mul_one k).symm p (one_nsmul _).symm rfl)
+    have a :=
+      (indAtTransl_any hL R I hI D A G hG U F k hk p x₀).1
+        (h₀ 1 k le_rfl (Nat.mul_one k).symm p (one_nsmul _).symm rfl)
     have b := (indAtTransl_any hL R I hI D A G hG U F N hN1 q x₀).1 (h₀ n N hn hN q hy hg)
     exact ((hf p x₀).1 a).symm.trans ((hf' q x₀).1 b)
   intro p q x

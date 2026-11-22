@@ -18,8 +18,8 @@ def ex (Dw : Datum H) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) : Ix Dw → �
   | none => n
   | some x => a (x.1, x.2)
 
-theorem ex_add (Dw : Datum H) (a a' : (E →+* ℂ) × ℕ → ℕ) (n n' : ℕ) :
-    ex Dw (a + a') (n + n') = ex Dw a n + ex Dw a' n' := by
+theorem ex_add (Dw : Datum H) (a a' : (E →+* ℂ) × ℕ → ℕ) (n n' : ℕ)
+    : ex Dw (a + a') (n + n') = ex Dw a n + ex Dw a' n' := by
   funext i; cases i <;> rfl
 
 def Dom (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) : Prop := (∀ τ, Antitone fun i => a (τ, i)) ∧ Even n

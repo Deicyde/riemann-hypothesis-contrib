@@ -13,23 +13,28 @@ namespace Formalism.HermitianLattices.Ext.L3.ExtendedPrimeIdeals
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
-theorem map_mem_extP {𝔭 : Ideal (𝓞 F)} {k : ℕ} {s : 𝓞 F} (hs : s ∈ 𝔭 ^ k) :
-    algebraMap (𝓞 F) (𝓞 K) s ∈ extP K 𝔭 ^ k := by
+theorem map_mem_extP {𝔭 : Ideal (𝓞 F)} {k : ℕ} {s : 𝓞 F} (hs : s ∈ 𝔭 ^ k)
+    : algebraMap (𝓞 F) (𝓞 K) s ∈ extP K 𝔭 ^ k := by
   rw [← Ideal.mem_comap, MeanB.comap_extP_pow]
   exact hs
 
-theorem mem_extP_of_mul {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {t : 𝓞 F} (ht : t ∉ 𝔭) {k : ℕ}
-    {z : 𝓞 K} (hz : algebraMap (𝓞 F) (𝓞 K) t * z ∈ extP K 𝔭 ^ k) : z ∈ extP K 𝔭 ^ k := by
+theorem mem_extP_of_mul
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {t : 𝓞 F} (ht : t ∉ 𝔭)
+    {k : ℕ} {z : 𝓞 K} (hz : algebraMap (𝓞 F) (𝓞 K) t * z ∈ extP K 𝔭 ^ k)
+    : z ∈ extP K 𝔭 ^ k := by
   obtain ⟨u, hu⟩ := MeanA.exists_mul_sub_one_mem_pow h𝔭 ht k
-  have e : z = algebraMap (𝓞 F) (𝓞 K) u * (algebraMap (𝓞 F) (𝓞 K) t * z) -
-      algebraMap (𝓞 F) (𝓞 K) (u * t - 1) * z := by
+  have e
+      : z
+        = algebraMap (𝓞 F) (𝓞 K) u * (algebraMap (𝓞 F) (𝓞 K) t * z)
+          - algebraMap (𝓞 F) (𝓞 K) (u * t - 1) * z := by
     rw [map_sub, map_mul, map_one]
     ring
   rw [e]
   exact sub_mem (Ideal.mul_mem_left _ _ hz) (Ideal.mul_mem_right _ _ (map_mem_extP hu))
 
-theorem conjO_mem_extP (hF : IsFixF K F) (𝔭 : Ideal (𝓞 F)) (k : ℕ) {z : 𝓞 K}
-    (hz : z ∈ extP K 𝔭 ^ k) : conjO K z ∈ extP K 𝔭 ^ k := by
+theorem conjO_mem_extP (hF : IsFixF K F) (𝔭 : Ideal (𝓞 F)) (k : ℕ) {z : 𝓞 K} (hz : z ∈ extP K 𝔭 ^ k)
+    : conjO K z ∈ extP K 𝔭 ^ k := by
   obtain ⟨z', hz', e⟩ := MeanB.star_mem_extP hF 𝔭 k hz
   have : conjO K z = z' := RingOfIntegers.ext e.symm
   rw [this]
@@ -38,14 +43,18 @@ theorem conjO_mem_extP (hF : IsFixF K F) (𝔭 : Ideal (𝓞 F)) (k : ℕ) {z : 
 theorem ne_bot_of_isMaximal {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : 𝔭 ≠ ⊥ :=
   Ring.ne_bot_of_isMaximal_of_not_isField h𝔭 (RingOfIntegers.not_isField F)
 
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 def IsGen (L : Submodule (𝓞 K) V) (𝔭 : Ideal (𝓞 F)) (e : V) : Prop :=
   e ∈ L ∧ e ≠ 0 ∧ ∀ x ∈ L, ∃ t : 𝓞 F, t ∉ 𝔭 ∧ ∃ a : 𝓞 K, algebraMap (𝓞 F) (𝓞 K) t • x = a • e
 
-theorem exists_isGen {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L)
-    (h1 : finrank K V = 1) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : ∃ e, IsGen L 𝔭 e := by
+theorem exists_isGen
+    {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L)
+    (h1 : finrank K V = 1)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ e, IsGen L 𝔭 e := by
   obtain ⟨b, hb, hloc⟩ := LocalSpans.exists_basis_locF hL h𝔭
   have hsub : Subsingleton (Fin (finrank K V)) := by
     rw [h1]
@@ -68,10 +77,15 @@ theorem exists_isGen {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K 
   obtain ⟨a, ha⟩ := hm
   exact ⟨t, ht, a, ha.symm⟩
 
-theorem discrIdeal_le_iff (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
-    (h1 : finrank K V = 1) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {e : V} (he : IsGen L 𝔭 e)
-    {n : 𝓞 F} (hn : h e e = algebraMap F K (n : F)) (j : ℕ) :
-    discrIdeal h L ≤ extP K 𝔭 ^ j ↔ n ∈ 𝔭 ^ j := by
+theorem discrIdeal_le_iff
+    (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
+    (h1 : finrank K V = 1)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {e : V} (he : IsGen L 𝔭 e)
+    {n : 𝓞 F} (hn : h e e = algebraMap F K (n : F))
+    (j : ℕ)
+    : discrIdeal h L ≤ extP K 𝔭 ^ j ↔ n ∈ 𝔭 ^ j := by
   have hsub : Subsingleton (Fin (finrank K V)) := by
     rw [h1]
     infer_instance
@@ -91,14 +105,19 @@ theorem discrIdeal_le_iff (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} {
     obtain ⟨t, ht, a, ha⟩ := he.2.2 (x i0) (hx i0)
     apply mem_extP_of_mul h𝔭 ht
     apply mem_extP_of_mul h𝔭 ht
-    have : algebraMap (𝓞 F) (𝓞 K) t * (algebraMap (𝓞 F) (𝓞 K) t * z) =
-        conjO K a * a * algebraMap (𝓞 F) (𝓞 K) n := by
+    have : algebraMap (𝓞 F) (𝓞 K) t * (algebraMap (𝓞 F) (𝓞 K) t * z)
+        = conjO K a * a * algebraMap (𝓞 F) (𝓞 K) n := by
       apply RingOfIntegers.coe_injective
-      have e1 : h (algebraMap (𝓞 F) (𝓞 K) t • x i0) (algebraMap (𝓞 F) (𝓞 K) t • x i0) =
-          h (a • e) (a • e) := by rw [ha]
-      rw [Formalism.HermitianLatticesTheory.locDual_h_smul_left, Formalism.HermitianLatticesTheory.locDual_h_smul_right,
-        Formalism.HermitianLatticesTheory.locDual_h_smul_left, Formalism.HermitianLatticesTheory.locDual_h_smul_right, hn, ← hz,
-        MeanB.algebraMap_comp, MeanB.star_algebraMap hF] at e1
+      have e1
+          : h (algebraMap (𝓞 F) (𝓞 K) t • x i0) (algebraMap (𝓞 F) (𝓞 K) t • x i0)
+            = h (a • e) (a • e) := by
+        rw [ha]
+      rw [Formalism.HermitianLatticesTheory.locDual_h_smul_left,
+          Formalism.HermitianLatticesTheory.locDual_h_smul_right,
+          Formalism.HermitianLatticesTheory.locDual_h_smul_left,
+          Formalism.HermitianLatticesTheory.locDual_h_smul_right, hn, ← hz, MeanB.algebraMap_comp,
+          MeanB.star_algebraMap hF]
+        at e1
       simp only [map_mul]
       rw [MeanB.algebraMap_comp, MeanB.algebraMap_comp]
       change _ = star (algebraMap (𝓞 K) K a) * _ * _
@@ -107,10 +126,15 @@ theorem discrIdeal_le_iff (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} {
     rw [this]
     exact Ideal.mul_mem_left _ _ (map_mem_extP hnj)
 
-theorem vd_spec (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} (hd : IsTotPosDef h)
-    {L : Submodule (𝓞 K) V} (h1 : finrank K V = 1) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {e : V}
-    (he : IsGen L 𝔭 e) {n : 𝓞 F} (hn : h e e = algebraMap F K (n : F)) :
-    n ∈ 𝔭 ^ vd h L 𝔭 ∧ n ∉ 𝔭 ^ (vd h L 𝔭 + 1) := by
+theorem vd_spec
+    (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (h1 : finrank K V = 1)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {e : V} (he : IsGen L 𝔭 e)
+    {n : 𝓞 F} (hn : h e e = algebraMap F K (n : F))
+    : n ∈ 𝔭 ^ vd h L 𝔭 ∧ n ∉ 𝔭 ^ (vd h L 𝔭 + 1) := by
   have hn0 : n ≠ 0 := by
     rintro rfl
     apply he.2.1

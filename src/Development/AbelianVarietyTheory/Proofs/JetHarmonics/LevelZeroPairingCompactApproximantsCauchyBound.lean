@@ -9,22 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.CapelliProduc
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Filter Topology MeasureTheory
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Filter Topology
+  MeasureTheory
 
 namespace GlobalTheory.LevelZeroApprox
 
-theorem ccle_sub {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {A : ℝ} {m : ℕ}
-    {F F' : B.Mat k r → E} {c c' : ℝ} (h : B.CCle A m F c) (h' : B.CCle A m F' c') :
-    B.CCle A m (F - F') (c + c') := by
-  have h1 := Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_add h (Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_smul (-1 : ℂ) h')
+theorem ccle_sub
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {A : ℝ} {m : ℕ} {F F' : B.Mat k r → E} {c c' : ℝ} (h : B.CCle A m F c) (h' : B.CCle A m F' c')
+    : B.CCle A m (F - F') (c + c') := by
+  have h1 :=
+    Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_add h
+      (Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_smul (-1 : ℂ) h')
   have e : (fun g => F g + (fun g => (-1 : ℂ) • F' g) g) = F - F' := by
     funext g; simp [sub_eq_add_neg]
   rw [e] at h1
   simpa using h1
 
-theorem ckOn_sub {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {m : ℕ∞} {U : Set (B.Mat k r)}
-    {F F' : B.Mat k r → E} (h : B.CkOn m U F) (h' : B.CkOn m U F') : B.CkOn m U (F - F') := by
-  have h1 := Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_add h (Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_smul (-1 : ℂ) h')
+theorem ckOn_sub
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {m : ℕ∞} {U : Set (B.Mat k r)} {F F' : B.Mat k r → E} (h : B.CkOn m U F) (h' : B.CkOn m U F')
+    : B.CkOn m U (F - F') := by
+  have h1 :=
+    Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_add h
+      (Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_smul (-1 : ℂ) h')
   have e : (fun g => F g + (fun g => (-1 : ℂ) • F' g) g) = F - F' := by
     funext g; simp [sub_eq_add_neg]
   rwa [e] at h1
@@ -32,11 +40,23 @@ theorem ckOn_sub {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ 
 section
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem ckOn_bump_smul {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    {H : B.Mat k r → E} (h : B.CkOn ⊤ (B.GV k r) H) (n : ℕ) :
-    B.CkOn ⊤ (B.GV k r) (fun g : B.Mat k r => ((Real.smoothTransition ((4 - ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • g) i j)) / 3) : ℝ) : ℂ) • H g) := by
-  have hcs : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun g : B.Mat k r => ((Real.smoothTransition ((4 - ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • g) i j)) / 3) : ℝ) : ℂ)) := by
-    have e : (fun g : B.Mat k r => ((Real.smoothTransition ((4 - ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • g) i j)) / 3) : ℝ) : ℂ)) = fun g => 1 - Formalism.FourierDecayAlt.P.JCx2.pdPsi ((n : ℝ) + 1) g := by
+theorem ckOn_bump_smul
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {H : B.Mat k r → E} (h : B.CkOn ⊤ (B.GV k r) H)
+    (n : ℕ)
+    : B.CkOn ⊤ (B.GV k r) (fun g : B.Mat k r =>
+      ((Real.smoothTransition ((4 - ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • g) i j)) / 3) : ℝ)
+          : ℂ)
+        • H g) := by
+  have hcs : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun g : B.Mat k r =>
+      ((Real.smoothTransition ((4 - ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • g) i j)) / 3) : ℝ)
+        : ℂ)) := by
+    have e
+        : (fun g : B.Mat k r =>
+            ((Real.smoothTransition ((4 - ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • g) i j)) / 3)
+                : ℝ)
+              : ℂ))
+          = fun g => 1 - Formalism.FourierDecayAlt.P.JCx2.pdPsi ((n : ℝ) + 1) g := by
       funext g
       rw [Formalism.FourierDecayAlt.P.JCx2.pdPsi, sub_sub_cancel]
       rfl
@@ -45,9 +65,10 @@ theorem ckOn_bump_smul {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpac
   exact Formalism.FourierDecayAlt.P.JCx2.pd_smooth_smul hcs h
 end
 
-theorem threshold (k r N l : ℕ) (hl : l ≤ N) :
-    B.AB k r + 1 + 2 * ((r : ℝ) + 1) * ((5 + l * (2 * r + k + 1) : ℕ) : ℝ) ≤
-      20 * ((r : ℝ) + 1) ^ 4 * ((N : ℝ) * (2 * (r : ℝ) + k + 1) ^ 2 + (2 * (r : ℝ) + k + 1) ^ 3) := by
+theorem threshold (k r N l : ℕ) (hl : l ≤ N)
+    : B.AB k r + 1 + 2 * ((r : ℝ) + 1) * ((5 + l * (2 * r + k + 1) : ℕ) : ℝ)
+      ≤ 20 * ((r : ℝ) + 1) ^ 4
+        * ((N : ℝ) * (2 * (r : ℝ) + k + 1) ^ 2 + (2 * (r : ℝ) + k + 1) ^ 3) := by
   unfold B.AB
   push_cast
   have hr : (0 : ℝ) ≤ r := Nat.cast_nonneg r

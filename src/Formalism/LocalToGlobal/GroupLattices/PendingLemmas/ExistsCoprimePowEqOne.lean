@@ -22,7 +22,9 @@ theorem norm_wToC_unit (u : (WW p)ˣ) : ‖wToC p (u : WW p)‖ = 1 := by
     rw [← map_mul, Units.mul_inv, map_one]
   have h2 := congrArg norm h1
   rw [norm_mul, norm_one] at h2
-  calc (1 : ℝ) = ‖wToC p (u : WW p)‖ * ‖wToC p ((u⁻¹ : (WW p)ˣ) : WW p)‖ := h2.symm
+  calc
+    (1 : ℝ)
+      = ‖wToC p (u : WW p)‖ * ‖wToC p ((u⁻¹ : (WW p)ˣ) : WW p)‖ := h2.symm
     _ ≤ ‖wToC p (u : WW p)‖ * 1 := mul_le_mul_of_nonneg_left (norm_wToC_le p _) (norm_nonneg _)
     _ = _ := mul_one _
 
@@ -30,52 +32,65 @@ theorem r_pos : 0 < ((p : ℝ)⁻¹) := by
   have : (0 : ℝ) < p := by exact_mod_cast hp.out.pos
   positivity
 
-theorem dvd_of_norm_le {x : WW p} {N : ℕ} (h : ‖wToC p x‖ ≤ ((p : ℝ)⁻¹) ^ N) : (p : WW p) ^ N ∣ x := by
+theorem dvd_of_norm_le {x : WW p} {N : ℕ} (h : ‖wToC p x‖ ≤ ((p : ℝ)⁻¹) ^ N)
+    : (p : WW p) ^ N ∣ x := by
   by_cases hx : x = 0
   · rw [hx]; exact dvd_zero _
-  obtain ⟨k, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hx (WittVector.irreducible p (k := kb p))
+  obtain ⟨k, u, hu⟩ :=
+    IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hx (WittVector.irreducible p (k := kb p))
   rw [hu, map_mul, map_pow, map_natCast, norm_mul, norm_wToC_unit, one_mul, norm_pow, norm_p_C] at h
   have hNk : N ≤ k := (pow_le_pow_iff_right_of_lt_one₀ (r_pos p) (r_lt_one p)).1 h
   rw [hu]
   exact Dvd.dvd.mul_left (pow_dvd_pow _ hNk) _
 
-theorem mem_range_of_closure {y : ℂ_[p]} (hy : y ∈ closure (Set.range (wToC p))) : y ∈ Set.range (wToC p) := by
+theorem mem_range_of_closure {y : ℂ_[p]} (hy : y ∈ closure (Set.range (wToC p)))
+    : y ∈ Set.range (wToC p) := by
   have h1 : ∀ N : ℕ, ∃ x : WW p, ‖y - wToC p x‖ ≤ ((p : ℝ)⁻¹) ^ N := by
     intro N
     obtain ⟨_, ⟨x, rfl⟩, hx⟩ := Metric.mem_closure_iff.1 hy _ (pow_pos (r_pos p) N)
     exact ⟨x, by rw [← dist_eq_norm]; exact hx.le⟩
   choose xs hxs using h1
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := Ideal.span {(p : WW p)}) xs (by
-    intro m n hmn
-    rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-    apply dvd_of_norm_le
-    rw [map_sub]
-    have : wToC p (xs m) - wToC p (xs n) = (y - wToC p (xs n)) - (y - wToC p (xs m)) := by ring
-    rw [this]
-    exact nsub p ((hxs n).trans (pow_le_pow_of_le_one (r_nonneg p) (r_lt_one p).le hmn)) (hxs m))
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec' (I := Ideal.span {(p : WW p)}) xs (by
+      intro m n hmn
+      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+        Ideal.mem_span_singleton]
+      apply dvd_of_norm_le
+      rw [map_sub]
+      have : wToC p (xs m) - wToC p (xs n) = (y - wToC p (xs n)) - (y - wToC p (xs m)) := by ring
+      rw [this]
+      exact nsub p ((hxs n).trans (pow_le_pow_of_le_one (r_nonneg p) (r_lt_one p).le hmn)) (hxs m))
   refine ⟨L, (eq_of_close p fun N => ?_).symm⟩
   have h2 := hL N
-  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton] at h2
+  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+      Ideal.mem_span_singleton]
+    at h2
   obtain ⟨c, hc⟩ := h2
   have : y - wToC p L = (y - wToC p (xs N)) + wToC p (xs N - L) := by rw [map_sub]; ring
   rw [this, hc]
   exact nadd p (hxs N) (norm_wToC_pow_mul p N c)
 
-theorem exists_coprime_pow_eq_one {y : kb p} (hy : y ≠ 0) : ∃ m : ℕ, 0 < m ∧ Nat.Coprime m p ∧ y ^ m = 1 := by
+theorem exists_coprime_pow_eq_one {y : kb p} (hy : y ≠ 0)
+    : ∃ m : ℕ, 0 < m ∧ Nat.Coprime m p ∧ y ^ m = 1 := by
   obtain ⟨q, hq, hyq⟩ := exists_pow_eq p y
   have h1 : y ^ (q - 1) = 1 := by
     have : y ^ (q - 1) * y = 1 * y := by rw [← pow_succ, Nat.sub_add_cancel hq.le, hyq, one_mul]
     exact mul_right_cancel₀ hy this
   obtain ⟨a, m, hm, hn⟩ := Nat.exists_eq_pow_mul_and_not_dvd (n := q - 1) (by omega) p hp.out.ne_one
-  refine ⟨m, Nat.pos_of_ne_zero (by rintro rfl; exact hm (dvd_zero _)),
-    ((Nat.Prime.coprime_iff_not_dvd hp.out).2 hm).symm, ?_⟩
+  refine ⟨
+    m,
+    Nat.pos_of_ne_zero (by rintro rfl; exact hm (dvd_zero _)),
+    ((Nat.Prime.coprime_iff_not_dvd hp.out).2 hm).symm,
+    ?_
+  ⟩
   rw [hn, mul_comm, pow_mul] at h1
   apply iterateFrobenius_inj (kb p) p a
   rw [iterateFrobenius_def, iterateFrobenius_def, h1, one_pow]
 
 abbrev muP : Set ℂ_[p] := {ζ : ℂ_[p] | ∃ n : ℕ, 0 < n ∧ Nat.Coprime n p ∧ ζ ^ n = 1}
 
-theorem wToC_teich_mem (y : kb p) : wToC p (WittVector.teichmuller p y) ∈ Subring.closure (muP p) := by
+theorem wToC_teich_mem (y : kb p)
+    : wToC p (WittVector.teichmuller p y) ∈ Subring.closure (muP p) := by
   by_cases hy : y = 0
   · rw [hy, WittVector.teichmuller_zero, map_zero]
     exact Subring.zero_mem _
@@ -87,16 +102,19 @@ theorem teich_injective : Function.Injective (WittVector.teichmuller p : kb p �
   have := congrArg (fun x : WW p => x.coeff 0) h
   simpa [WittVector.teichmuller_coeff_zero] using this
 
-theorem root_mem_range {ζ : ℂ_[p]} {n : ℕ} (hn : 0 < n) (hc : Nat.Coprime n p) (hζ : ζ ^ n = 1) :
-    ζ ∈ Set.range (wToC p) := by
-  have : NeZero ((n : ℕ) : kb p) := ⟨by
-    intro h0
-    rw [CharP.cast_eq_zero_iff (kb p) p] at h0
-    exact hp.out.ne_one (hc.symm.eq_one_of_dvd h0)⟩
+theorem root_mem_range {ζ : ℂ_[p]} {n : ℕ} (hn : 0 < n) (hc : Nat.Coprime n p) (hζ : ζ ^ n = 1)
+    : ζ ∈ Set.range (wToC p) := by
+  have : NeZero ((n : ℕ) : kb p) :=
+    ⟨by
+      intro h0
+      rw [CharP.cast_eq_zero_iff (kb p) p] at h0
+      exact hp.out.ne_one (hc.symm.eq_one_of_dvd h0)⟩
   have : NeZero n := ⟨hn.ne'⟩
   obtain ⟨η, hη⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (kb p) n
-  have h1 : IsPrimitiveRoot (WittVector.teichmuller p η) n := hη.map_of_injective (teich_injective p)
-  have h2 : IsPrimitiveRoot (wToC p (WittVector.teichmuller p η)) n := h1.map_of_injective (wToC_injective p)
+  have h1 : IsPrimitiveRoot (WittVector.teichmuller p η) n :=
+    hη.map_of_injective (teich_injective p)
+  have h2 : IsPrimitiveRoot (wToC p (WittVector.teichmuller p η)) n :=
+    h1.map_of_injective (wToC_injective p)
   obtain ⟨i, _, hi⟩ := h2.eq_pow_of_pow_eq_one hζ
   exact ⟨WittVector.teichmuller p η ^ i, by rw [map_pow, hi]⟩
 
@@ -106,13 +124,18 @@ theorem wToC_mem_Wp (x : WW p) : wToC p x ∈ Formalism.MainNotions.GL3Theta.Wp 
   intro ε hε
   obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one hε (r_lt_one p)
   obtain ⟨c, hc⟩ := WittVector.dvd_sub_sum_teichmuller_iterateFrobeniusEquiv_coeff x N
-  refine ⟨wToC p (∑ i ∈ Finset.Iic N, (WittVector.teichmuller p
-        (((_root_.frobeniusEquiv (kb p) p).symm ^ i) (x.coeff i)) * (p : WW p) ^ i)), ?_, ?_⟩
+  refine ⟨
+    wToC p
+      (∑ i ∈ Finset.Iic N, (WittVector.teichmuller p
+        (((_root_.frobeniusEquiv (kb p) p).symm ^ i) (x.coeff i)) * (p : WW p) ^ i)),
+    ?_,
+    ?_
+  ⟩
   · set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-      refine Subring.sum_mem _ fun i _ => ?_
-      rw [map_mul, map_pow, map_natCast]
-      exact Subring.mul_mem _ (wToC_teich_mem p _) (Subring.pow_mem _ (natCast_mem _ p) i)
+    rw [map_sum]
+    refine Subring.sum_mem _ fun i _ => ?_
+    rw [map_mul, map_pow, map_natCast]
+    exact Subring.mul_mem _ (wToC_teich_mem p _) (Subring.pow_mem _ (natCast_mem _ p) i)
   · rw [dist_eq_norm, ← map_sub, hc]
     refine lt_of_le_of_lt (norm_wToC_pow_mul p (N + 1) c) (lt_of_le_of_lt ?_ hN)
     exact pow_le_pow_of_le_one (r_nonneg p) (r_lt_one p).le (Nat.le_succ N)
@@ -133,13 +156,15 @@ theorem range_wToC : Set.range (wToC p) = (Formalism.MainNotions.GL3Theta.Wp p :
   · intro hy
     exact Wp_le_range p hy
 
-theorem mem_Wp_iff (y : ℂ_[p]) : y ∈ Formalism.MainNotions.GL3Theta.Wp p ↔ ∃ x : WW p, wToC p x = y := by
+theorem mem_Wp_iff (y : ℂ_[p])
+    : y ∈ Formalism.MainNotions.GL3Theta.Wp p ↔ ∃ x : WW p, wToC p x = y := by
   have := Set.ext_iff.1 (range_wToC p) y
   exact this.symm
 
 section Rat
 
-open MvPowerSeries Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta Formalism.MainNotions.J
+open MvPowerSeries Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta
+  Formalism.MainNotions.J
 
 variable {p}
 
@@ -150,21 +175,24 @@ theorem inWf_iff (x : ℂ_[p]) : InWf x ↔ ∃ z : K0 p, k0ToC p z = x := by
   · rintro ⟨k, hk⟩
     obtain ⟨w, hw⟩ := (mem_Wp_iff p _).1 hk
     refine ⟨algebraMap (WW p) (K0 p) w / (p : K0 p) ^ k, ?_⟩
-    rw [map_div₀, witt_fraction_to_Cp_algebraMap, hw, map_pow, map_natCast, mul_div_cancel_left₀ _ (pow_ne_zero _ pC_ne)]
+    rw [map_div₀, witt_fraction_to_Cp_algebraMap, hw, map_pow, map_natCast,
+      mul_div_cancel_left₀ _ (pow_ne_zero _ pC_ne)]
   · rintro ⟨z, rfl⟩
     obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := WW p) z
     have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
-    obtain ⟨k, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hb0 (WittVector.irreducible p (k := kb p))
+    obtain ⟨k, u, hu⟩ :=
+      IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hb0 (WittVector.irreducible p (k := kb p))
     refine ⟨k, (mem_Wp_iff p _).2 ⟨a * ((u⁻¹ : (WW p)ˣ) : WW p), ?_⟩⟩
     have hu1 : wToC p (u : WW p) * wToC p ((u⁻¹ : (WW p)ˣ) : WW p) = 1 := by
       rw [← map_mul, Units.mul_inv, map_one]
     have hu0 : wToC p (u : WW p) ≠ 0 := left_ne_zero_of_mul_eq_one hu1
-    rw [map_div₀, witt_fraction_to_Cp_algebraMap, witt_fraction_to_Cp_algebraMap, hu, map_mul, map_mul, map_pow, map_natCast, eq_inv_of_mul_eq_one_right hu1]
+    rw [map_div₀, witt_fraction_to_Cp_algebraMap, witt_fraction_to_Cp_algebraMap, hu, map_mul,
+      map_mul, map_pow, map_natCast, eq_inv_of_mul_eq_one_right hu1]
     have := pow_ne_zero k (pC_ne (p := p))
     field_simp
 
-theorem coefWf_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) :
-    CoefWf F ↔ ∃ b : MvPowerSeries σ (K0 p), map (k0ToC p) b = F := by
+theorem coefWf_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p])
+    : CoefWf F ↔ ∃ b : MvPowerSeries σ (K0 p), map (k0ToC p) b = F := by
   constructor
   · intro h
     choose b hb using fun n => (inWf_iff _).1 (h n)
@@ -173,8 +201,8 @@ theorem coefWf_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) :
     rw [coeff_map]
     exact (inWf_iff _).2 ⟨_, rfl⟩
 
-theorem integralW_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) :
-    IntegralW F ↔ ∃ b : MvPowerSeries σ (WW p), map (wToC p) b = F := by
+theorem integralW_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p])
+    : IntegralW F ↔ ∃ b : MvPowerSeries σ (WW p), map (wToC p) b = F := by
   constructor
   · intro h
     choose b hb using fun n => (mem_Wp_iff p _).1 (h n)
@@ -183,9 +211,12 @@ theorem integralW_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) :
     rw [coeff_map]
     exact (mem_Wp_iff p _).2 ⟨_, rfl⟩
 
-theorem beRat_of (g : G1 p) (hex : PowerSeries.constantCoeff g.ex = 0)
+theorem beRat_of
+    (g : G1 p) (hex : PowerSeries.constantCoeff g.ex = 0)
     (hB : CoefWf (g.be (X 0) (X 1) : MvPowerSeries (Fin 2) ℂ_[p]))
-    (hE : CoefWf (g.ex : MvPowerSeries Unit ℂ_[p])) (e : K0 p) : BeRat g (k0ToC p e) := by
+    (hE : CoefWf (g.ex : MvPowerSeries Unit ℂ_[p]))
+    (e : K0 p)
+    : BeRat g (k0ToC p e) := by
   obtain ⟨B0, hB0⟩ := (coefWf_iff _).1 hB
   obtain ⟨E0, hE0⟩ := (coefWf_iff _).1 hE
   have hE00 : PowerSeries.constantCoeff (E0 : PowerSeries (K0 p)) = 0 := by
@@ -195,19 +226,24 @@ theorem beRat_of (g : G1 p) (hex : PowerSeries.constantCoeff g.ex = 0)
   have h0 : ∀ i : Fin 2, constantCoeff (C e⁻¹ * X i : MvPowerSeries (Fin 2) (K0 p)) = 0 := by
     intro i
     rw [map_mul, constantCoeff_X, mul_zero]
-  have h0' : ∀ i : Fin 2, constantCoeff (C (k0ToC p e)⁻¹ * X i : MvPowerSeries (Fin 2) ℂ_[p]) = 0 := by
+  have h0'
+      : ∀ i : Fin 2, constantCoeff (C (k0ToC p e)⁻¹ * X i : MvPowerSeries (Fin 2) ℂ_[p]) = 0 := by
     intro i
     rw [map_mul, constantCoeff_X, mul_zero]
-  let a : Fin 2 → MvPowerSeries (Fin 2) (K0 p) := fun i => PowerSeries.subst (C e⁻¹ * X i) (E0 : PowerSeries (K0 p))
-  have ha0 : ∀ i, constantCoeff (a i) = 0 := fun i => PowerSeries.constantCoeff_subst_eq_zero (h0 i) _ hE00
+  let a : Fin 2 → MvPowerSeries (Fin 2) (K0 p) := fun i =>
+    PowerSeries.subst (C e⁻¹ * X i) (E0 : PowerSeries (K0 p))
+  have ha0 : ∀ i, constantCoeff (a i) = 0 := fun i =>
+    PowerSeries.constantCoeff_subst_eq_zero (h0 i) _ hE00
   have ha : HasSubst a := hasSubst_of_constantCoeff_zero ha0
   have hai : ∀ i, map (k0ToC p) (a i) = g.pt (C (k0ToC p e)⁻¹ * X i) := by
     intro i
     show map (k0ToC p) (PowerSeries.subst _ _) = _
-    rw [PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero (h0 i)), map_mul, map_C, map_X, map_inv₀]
+    rw [PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero (h0 i)), map_mul, map_C,
+      map_X, map_inv₀]
     unfold G1.pt
     congr 1
-  have hT : HasSubst (fun i : Fin 2 => g.pt (C (k0ToC p e)⁻¹ * X i : MvPowerSeries (Fin 2) ℂ_[p])) :=
+  have hT
+      : HasSubst (fun i : Fin 2 => g.pt (C (k0ToC p e)⁻¹ * X i : MvPowerSeries (Fin 2) ℂ_[p])) :=
     hasSubst_of_constantCoeff_zero fun i => cc_pt g hex (h0' i)
   refine ⟨subst a B0, ?_⟩
   rw [map_subst ha, hB0]
@@ -233,7 +269,9 @@ theorem isUnit_of_norm_eq_one {x : WW p} (h : ‖wToC p x‖ = 1) : IsUnit x := 
   rw [pow_one, pow_one, h] at this
   exact absurd this (not_le.2 (r_lt_one p))
 
-theorem logF_map : PowerSeries.map (k0ToC p) (Formalism.MainNotions.FormalGroupSystem.logF p) = Formalism.MainNotions.GL3Theta.logF p := by
+theorem logF_map
+    : PowerSeries.map (k0ToC p) (Formalism.MainNotions.FormalGroupSystem.logF p)
+      = Formalism.MainNotions.GL3Theta.logF p := by
   ext n
   rw [PowerSeries.coeff_map]
   unfold Formalism.MainNotions.FormalGroupSystem.logF Formalism.MainNotions.GL3Theta.logF
@@ -250,29 +288,44 @@ theorem cc_logF : PowerSeries.constantCoeff (Formalism.MainNotions.GL3Theta.logF
   rw [if_neg]
   exact (pow_pos hp.out.pos _).ne
 
-theorem lg_pt (g : G1 p) (hex : PowerSeries.constantCoeff g.ex = 0) (hinv : PowerSeries.subst g.ex g.l = PowerSeries.X)
-    {a : PowerSeries ℂ_[p]} (ha : PowerSeries.constantCoeff a = 0) :
-    PowerSeries.subst (PowerSeries.subst a g.ex) g.l = a := by
+theorem lg_pt
+    (g : G1 p)
+    (hex : PowerSeries.constantCoeff g.ex = 0) (hinv : PowerSeries.subst g.ex g.l = PowerSeries.X)
+    {a : PowerSeries ℂ_[p]} (ha : PowerSeries.constantCoeff a = 0)
+    : PowerSeries.subst (PowerSeries.subst a g.ex) g.l = a := by
   rw [← PowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.of_constantCoeff_zero' hex)
-    (PowerSeries.HasSubst.of_constantCoeff_zero' ha), hinv,
-    PowerSeries.subst_X (PowerSeries.HasSubst.of_constantCoeff_zero' ha)]
+      (PowerSeries.HasSubst.of_constantCoeff_zero' ha),
+    hinv, PowerSeries.subst_X (PowerSeries.HasSubst.of_constantCoeff_zero' ha)]
 
-theorem ltIso_of (g : G1 p) (hOk : g.Ok) {c : ℂ_[p]} (hc : c ∈ Wp p) (hc1 : ‖c‖ = 1)
-    (hΘ : IntegralW (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : MvPowerSeries Unit ℂ_[p]))
-    (hΘ1 : ‖PowerSeries.coeff 1 (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : PowerSeries ℂ_[p])‖ = 1) :
-    LTIso g := by
+theorem ltIso_of
+    (g : G1 p) (hOk : g.Ok)
+    {c : ℂ_[p]} (hc : c ∈ Wp p) (hc1 : ‖c‖ = 1)
+    (hΘ : IntegralW
+      (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : MvPowerSeries Unit ℂ_[p]))
+    (hΘ1
+      : ‖PowerSeries.coeff 1 (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : PowerSeries ℂ_[p])‖
+        = 1)
+    : LTIso g := by
   have hex := hOk.2.2.1
   have hinv := hOk.2.2.2
   have hA0 : PowerSeries.constantCoeff (c • Formalism.MainNotions.GL3Theta.logF p) = 0 := by
     rw [PowerSeries.smul_eq_C_mul, map_mul, cc_logF, mul_zero]
-  have hAe : (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p : MvPowerSeries Unit ℂ_[p]) = c • Formalism.MainNotions.GL3Theta.logF p :=
+  have hAe
+      : (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p : MvPowerSeries Unit ℂ_[p])
+        = c • Formalism.MainNotions.GL3Theta.logF p :=
     (MvPowerSeries.smul_eq_C_mul _ _).symm
   rw [hAe] at hΘ hΘ1
   obtain ⟨c0, hc0⟩ := (mem_Wp_iff p c).1 hc
   have hu0 : IsUnit c0 := isUnit_of_norm_eq_one (by rw [hc0]; exact hc1)
-  obtain ⟨Θ0, hΘ0'⟩ : ∃ Θ0 : PowerSeries (WW p),
-      PowerSeries.map (wToC p) Θ0 = PowerSeries.subst (c • Formalism.MainNotions.GL3Theta.logF p) g.ex := (integralW_iff _).1 hΘ
-  have hcc : PowerSeries.constantCoeff (PowerSeries.subst (c • Formalism.MainNotions.GL3Theta.logF p) g.ex : PowerSeries ℂ_[p]) = 0 :=
+  obtain ⟨Θ0, hΘ0'⟩
+      : ∃ Θ0 : PowerSeries (WW p),
+        PowerSeries.map (wToC p) Θ0
+          = PowerSeries.subst (c • Formalism.MainNotions.GL3Theta.logF p) g.ex :=
+    (integralW_iff _).1 hΘ
+  have hcc
+      : PowerSeries.constantCoeff
+          (PowerSeries.subst (c • Formalism.MainNotions.GL3Theta.logF p) g.ex : PowerSeries ℂ_[p])
+        = 0 :=
     PowerSeries.constantCoeff_subst_eq_zero hA0 _ hex
   have hΘ00 : PowerSeries.constantCoeff Θ0 = 0 := by
     apply wToC_injective p
@@ -282,8 +335,8 @@ theorem ltIso_of (g : G1 p) (hOk : g.Ok) {c : ℂ_[p]} (hc : c ∈ Wp p) (hc1 : 
     apply isUnit_of_norm_eq_one
     rw [← PowerSeries.coeff_map, hΘ0']
     exact hΘ1
-  refine ⟨hu0.unit⁻¹, Θ0.substInvOfIsUnit hΘ01,
-    PowerSeries.constantCoeff_substInvOfIsUnit _ _, ?_, ?_⟩
+  refine
+    ⟨hu0.unit⁻¹, Θ0.substInvOfIsUnit hΘ01, PowerSeries.constantCoeff_substInvOfIsUnit _ _, ?_, ?_⟩
   · rw [PowerSeries.coeff_one_substInvOfIsUnit]
     exact Units.isUnit _
   · set th := Θ0.substInvOfIsUnit hΘ01 with hth
@@ -291,15 +344,19 @@ theorem ltIso_of (g : G1 p) (hOk : g.Ok) {c : ℂ_[p]} (hc : c ∈ Wp p) (hc1 : 
     have hT0 : PowerSeries.constantCoeff (PowerSeries.map (wToC p) th) = 0 := by
       rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_map,
         PowerSeries.coeff_zero_eq_constantCoeff_apply, hth0, map_zero]
-    have hT : PowerSeries.HasSubst (PowerSeries.map (wToC p) th) := PowerSeries.HasSubst.of_constantCoeff_zero' hT0
+    have hT : PowerSeries.HasSubst (PowerSeries.map (wToC p) th) :=
+      PowerSeries.HasSubst.of_constantCoeff_zero' hT0
 
-    have h1 : PowerSeries.subst (PowerSeries.map (wToC p) th)
-        (PowerSeries.subst (c • Formalism.MainNotions.GL3Theta.logF p) g.ex : PowerSeries ℂ_[p]) = PowerSeries.X := by
+    have h1
+        : PowerSeries.subst (PowerSeries.map (wToC p) th)
+            (PowerSeries.subst (c • Formalism.MainNotions.GL3Theta.logF p) g.ex : PowerSeries ℂ_[p])
+          = PowerSeries.X := by
       have h2 : PowerSeries.subst th Θ0 = PowerSeries.X :=
         PowerSeries.subst_substInvOfIsUnit_right _ hΘ00 hΘ01
       have h3 := congrArg (PowerSeries.map (wToC p)) h2
-      have h3' : PowerSeries.map (wToC p) (PowerSeries.subst th Θ0) =
-          PowerSeries.subst (PowerSeries.map (wToC p) th) (PowerSeries.map (wToC p) Θ0) :=
+      have h3'
+          : PowerSeries.map (wToC p) (PowerSeries.subst th Θ0)
+            = PowerSeries.subst (PowerSeries.map (wToC p) th) (PowerSeries.map (wToC p) Θ0) :=
         PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero' hth0) Θ0
       rw [h3', hΘ0', PowerSeries.map_X] at h3
       exact h3
@@ -307,7 +364,8 @@ theorem ltIso_of (g : G1 p) (hOk : g.Ok) {c : ℂ_[p]} (hc : c ∈ Wp p) (hc1 : 
     have h4 := lg_pt g hex hinv hA0
     have h5 := congrArg (PowerSeries.subst (PowerSeries.map (wToC p) th)) h4
     rw [PowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.of_constantCoeff_zero' hcc) hT, h1,
-      PowerSeries.X_subst, PowerSeries.subst_smul hT] at h5
+        PowerSeries.X_subst, PowerSeries.subst_smul hT]
+      at h5
     rw [logF_map]
     have hcne : c ≠ 0 := by
       intro h0
@@ -328,9 +386,12 @@ open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta Formal
 
 variable {p}
 
-theorem coeff_one_subst {R : Type*} [CommRing R] (a f : PowerSeries R) (ha : PowerSeries.constantCoeff a = 0) :
-    PowerSeries.coeff 1 (PowerSeries.subst a f) = PowerSeries.coeff 1 f * PowerSeries.coeff 1 a := by
-  rw [PowerSeries.coeff_subst' (PowerSeries.HasSubst.of_constantCoeff_zero' ha), finsum_eq_single _ 1, pow_one, smul_eq_mul]
+theorem coeff_one_subst
+    {R : Type*} [CommRing R] (a f : PowerSeries R) (ha : PowerSeries.constantCoeff a = 0)
+    : PowerSeries.coeff 1 (PowerSeries.subst a f)
+      = PowerSeries.coeff 1 f * PowerSeries.coeff 1 a := by
+  rw [PowerSeries.coeff_subst' (PowerSeries.HasSubst.of_constantCoeff_zero' ha),
+    finsum_eq_single _ 1, pow_one, smul_eq_mul]
   intro d hd
   obtain ⟨a', ha'⟩ := PowerSeries.X_dvd_iff.2 ha
   rcases Nat.lt_or_gt_of_ne hd with h | h
@@ -356,30 +417,43 @@ theorem coeff_one_l (g : G1 p) (hW : IsWq g.W g.wq) : PowerSeries.coeff 1 g.l = 
     have := congrArg PowerSeries.constantCoeff hW
     simpa using this
   unfold G1.l flog
-  rw [PowerSeries.coeff_mk, if_neg one_ne_zero, Nat.sub_self, PowerSeries.coeff_zero_eq_constantCoeff_apply]
+  rw [PowerSeries.coeff_mk, if_neg one_ne_zero, Nat.sub_self,
+    PowerSeries.coeff_zero_eq_constantCoeff_apply]
   unfold omegaW
-  simp only [map_mul, map_sub, map_add (f := _), map_neg, map_pow, PowerSeries.constantCoeff_inv, PowerSeries.constantCoeff_X, h0]
+  simp only [map_mul, map_sub, map_add (f := _), map_neg, map_pow, PowerSeries.constantCoeff_inv,
+    PowerSeries.constantCoeff_X, h0]
   simp
   rw [show PowerSeries.constantCoeff (2 : PowerSeries ℂ_[p]) = 2 from map_ofNat _ 2]
   exact mul_inv_cancel₀ two_ne_zero
 
-theorem coeff_one_theta (g : G1 p) (hOk : g.Ok) (c : ℂ_[p]) :
-    PowerSeries.coeff 1 (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : PowerSeries ℂ_[p]) = c := by
+theorem coeff_one_theta (g : G1 p) (hOk : g.Ok) (c : ℂ_[p])
+    : PowerSeries.coeff 1
+        (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : PowerSeries ℂ_[p])
+      = c := by
   have hA0 : PowerSeries.constantCoeff (c • Formalism.MainNotions.GL3Theta.logF p) = 0 := by
     rw [PowerSeries.smul_eq_C_mul, map_mul, cc_logF, mul_zero]
-  have hAe : (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p : MvPowerSeries Unit ℂ_[p]) = c • Formalism.MainNotions.GL3Theta.logF p :=
+  have hAe
+      : (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p : MvPowerSeries Unit ℂ_[p])
+        = c • Formalism.MainNotions.GL3Theta.logF p :=
     (MvPowerSeries.smul_eq_C_mul _ _).symm
   rw [hAe]
   have h4 := congrArg (PowerSeries.coeff 1) (lg_pt g hOk.2.2.1 hOk.2.2.2 hA0)
-  rw [coeff_one_subst _ _ (PowerSeries.constantCoeff_subst_eq_zero hA0 _ hOk.2.2.1), coeff_one_l g hOk.2.1, one_mul,
-    PowerSeries.coeff_smul, coeff_one_logF, smul_eq_mul, mul_one] at h4
+  rw [coeff_one_subst _ _ (PowerSeries.constantCoeff_subst_eq_zero hA0 _ hOk.2.2.1),
+      coeff_one_l g hOk.2.1, one_mul, PowerSeries.coeff_smul, coeff_one_logF, smul_eq_mul, mul_one]
+    at h4
   exact h4
 
-theorem ltIso_of' (g : G1 p) (hOk : g.Ok) {c : ℂ_[p]} (hc1 : ‖c‖ = 1)
-    (hΘ : IntegralW (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : MvPowerSeries Unit ℂ_[p])) : LTIso g := by
+theorem ltIso_of'
+    (g : G1 p) (hOk : g.Ok)
+    {c : ℂ_[p]} (hc1 : ‖c‖ = 1)
+    (hΘ : IntegralW
+      (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : MvPowerSeries Unit ℂ_[p]))
+    : LTIso g := by
   have h1 := coeff_one_theta g hOk c
   have hc : c ∈ Wp p := by
-    have : PowerSeries.coeff 1 (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : PowerSeries ℂ_[p]) ∈ Wp p :=
+    have : PowerSeries.coeff 1
+          (g.pt (MvPowerSeries.C c * Formalism.MainNotions.GL3Theta.logF p) : PowerSeries ℂ_[p])
+        ∈ Wp p :=
       hΘ (Finsupp.single () 1)
     rwa [h1] at this
   exact ltIso_of g hOk hc hc1 hΘ (by rw [h1]; exact hc1)
@@ -396,7 +470,8 @@ def ratSub : Subring (PowerSeries ℂ_[p]) := (PowerSeries.map (k0ToC p)).range
 
 variable {p}
 
-theorem mem_ratSub {f : PowerSeries ℂ_[p]} : f ∈ ratSub p ↔ ∀ n, ∃ z : K0 p, k0ToC p z = PowerSeries.coeff n f := by
+theorem mem_ratSub {f : PowerSeries ℂ_[p]}
+    : f ∈ ratSub p ↔ ∀ n, ∃ z : K0 p, k0ToC p z = PowerSeries.coeff n f := by
   constructor
   · rintro ⟨b, rfl⟩ n
     exact ⟨PowerSeries.coeff n b, (PowerSeries.coeff_map _ _ _).symm⟩
@@ -404,19 +479,26 @@ theorem mem_ratSub {f : PowerSeries ℂ_[p]} : f ∈ ratSub p ↔ ∀ n, ∃ z :
     choose b hb using h
     exact ⟨PowerSeries.mk b, by ext n; rw [PowerSeries.coeff_map, PowerSeries.coeff_mk]; exact hb n⟩
 
-theorem C_mem_ratSub {a : ℂ_[p]} (ha : a ∈ Wp p) : algebraMap ℂ_[p] (PowerSeries ℂ_[p]) a ∈ ratSub p := by
+theorem C_mem_ratSub {a : ℂ_[p]} (ha : a ∈ Wp p)
+    : algebraMap ℂ_[p] (PowerSeries ℂ_[p]) a ∈ ratSub p := by
   obtain ⟨x, rfl⟩ := (mem_Wp_iff p a).1 ha
-  exact ⟨PowerSeries.C (algebraMap (WW p) (K0 p) x), by rw [PowerSeries.map_C, witt_fraction_to_Cp_algebraMap]; rfl⟩
+  exact ⟨
+    PowerSeries.C (algebraMap (WW p) (K0 p) x),
+    by rw [PowerSeries.map_C, witt_fraction_to_Cp_algebraMap]; rfl
+  ⟩
 
-theorem X_mem_ratSub : (PowerSeries.X : PowerSeries ℂ_[p]) ∈ ratSub p := ⟨PowerSeries.X, PowerSeries.map_X _⟩
+theorem X_mem_ratSub : (PowerSeries.X : PowerSeries ℂ_[p]) ∈ ratSub p :=
+  ⟨PowerSeries.X, PowerSeries.map_X _⟩
 
 theorem two_mem_ratSub : (2 : PowerSeries ℂ_[p]) ∈ ratSub p := by
   have := Subring.add_mem _ (Subring.one_mem (ratSub p)) (Subring.one_mem _)
   rwa [one_add_one_eq_two] at this
 
-theorem cc_map (b : PowerSeries (K0 p)) :
-    PowerSeries.constantCoeff (PowerSeries.map (k0ToC p) b) = k0ToC p (PowerSeries.constantCoeff b) := by
-  rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_map, PowerSeries.coeff_zero_eq_constantCoeff_apply]
+theorem cc_map (b : PowerSeries (K0 p))
+    : PowerSeries.constantCoeff (PowerSeries.map (k0ToC p) b)
+      = k0ToC p (PowerSeries.constantCoeff b) := by
+  rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_map,
+    PowerSeries.coeff_zero_eq_constantCoeff_apply]
 
 theorem inv_mem_ratSub {f : PowerSeries ℂ_[p]} (hf : f ∈ ratSub p) : f⁻¹ ∈ ratSub p := by
   obtain ⟨b, rfl⟩ := hf
@@ -434,22 +516,27 @@ theorem dX_mem_ratSub {f : PowerSeries ℂ_[p]} (hf : f ∈ ratSub p) : dX f ∈
   rw [mem_ratSub] at hf ⊢
   intro n
   obtain ⟨z, hz⟩ := hf (n + 1)
-  exact ⟨((n : K0 p) + 1) * z, by unfold dX; rw [PowerSeries.coeff_mk, map_mul, map_add (f := _), map_natCast, map_one, hz]⟩
+  exact ⟨
+    ((n : K0 p) + 1) * z,
+    by unfold dX; rw [PowerSeries.coeff_mk, map_mul, map_add (f := _), map_natCast, map_one, hz]
+  ⟩
 
-theorem wq_mem_ratSub {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} (hW : IsWq W wq)
-    (h1 : W.a₁ ∈ Wp p) (h2 : W.a₂ ∈ Wp p) (h3 : W.a₃ ∈ Wp p) (h4 : W.a₄ ∈ Wp p) (h6 : W.a₆ ∈ Wp p) :
-    wq ∈ ratSub p := by
+theorem wq_mem_ratSub
+    {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} (hW : IsWq W wq) (h1 : W.a₁ ∈ Wp p)
+    (h2 : W.a₂ ∈ Wp p) (h3 : W.a₃ ∈ Wp p) (h4 : W.a₄ ∈ Wp p) (h6 : W.a₆ ∈ Wp p)
+    : wq ∈ ratSub p := by
   rw [mem_ratSub]
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     choose! b hb using ih
     set wn : PowerSeries ℂ_[p] := PowerSeries.mk fun m => if m < n then PowerSeries.coeff m wq else 0 with hwn_def
-    have hwn : wn ∈ ratSub p := mem_ratSub.2 fun m => by
-      rw [hwn_def, PowerSeries.coeff_mk]
-      split_ifs with h
-      · exact ⟨b m, hb m h⟩
-      · exact ⟨0, map_zero _⟩
+    have hwn : wn ∈ ratSub p :=
+      mem_ratSub.2 fun m => by
+        rw [hwn_def, PowerSeries.coeff_mk]
+        split_ifs with h
+        · exact ⟨b m, hb m h⟩
+        · exact ⟨0, map_zero _⟩
     have hd : (PowerSeries.X : PowerSeries ℂ_[p]) ^ n ∣ wq - wn := by
       rw [PowerSeries.X_pow_dvd_iff]
       intro m hm
@@ -457,17 +544,22 @@ theorem wq_mem_ratSub {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} 
     obtain ⟨r, hr⟩ := hd
     let c := algebraMap ℂ_[p] (PowerSeries ℂ_[p])
     let Φ : PowerSeries ℂ_[p] → PowerSeries ℂ_[p] := fun w =>
-      1 + c W.a₁ * PowerSeries.X * w + c W.a₂ * PowerSeries.X ^ 2 * w + c W.a₃ * PowerSeries.X ^ 3 * w ^ 2 +
-        c W.a₄ * PowerSeries.X ^ 4 * w ^ 2 + c W.a₆ * PowerSeries.X ^ 6 * w ^ 3
+      1 + c W.a₁ * PowerSeries.X * w + c W.a₂ * PowerSeries.X ^ 2 * w
+        + c W.a₃ * PowerSeries.X ^ 3 * w ^ 2 + c W.a₄ * PowerSeries.X ^ 4 * w ^ 2
+        + c W.a₆ * PowerSeries.X ^ 6 * w ^ 3
     have hΦ : wq = Φ wq := hW
-    have e1 : Φ wq - Φ wn = PowerSeries.X * (wq - wn) * (c W.a₁ + c W.a₂ * PowerSeries.X +
-        c W.a₃ * PowerSeries.X ^ 2 * (wq + wn) + c W.a₄ * PowerSeries.X ^ 3 * (wq + wn) +
-        c W.a₆ * PowerSeries.X ^ 5 * (wq ^ 2 + wq * wn + wn ^ 2)) := by
+    have e1
+        : Φ wq - Φ wn
+          = PowerSeries.X * (wq - wn)
+            * (c W.a₁ + c W.a₂ * PowerSeries.X + c W.a₃ * PowerSeries.X ^ 2 * (wq + wn)
+              + c W.a₄ * PowerSeries.X ^ 3 * (wq + wn)
+              + c W.a₆ * PowerSeries.X ^ 5 * (wq ^ 2 + wq * wn + wn ^ 2)) := by
       simp only [Φ]
       ring
     have e2 : PowerSeries.coeff n (Φ wq - Φ wn) = 0 := by
       rw [e1, hr]
-      have : ∀ Q : PowerSeries ℂ_[p], PowerSeries.X * (PowerSeries.X ^ n * r) * Q = PowerSeries.X ^ (n + 1) * (r * Q) := by
+      have : ∀ Q : PowerSeries ℂ_[p],
+          PowerSeries.X * (PowerSeries.X ^ n * r) * Q = PowerSeries.X ^ (n + 1) * (r * Q) := by
         intro Q
         ring
       rw [this, PowerSeries.coeff_X_pow_mul', if_neg (by omega)]
@@ -477,27 +569,42 @@ theorem wq_mem_ratSub {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} 
     have hmem : Φ wn ∈ ratSub p := by
       have hX := X_mem_ratSub (p := p)
       simp only [Φ]
-      exact Subring.add_mem _ (Subring.add_mem _ (Subring.add_mem _ (Subring.add_mem _ (Subring.add_mem _ (Subring.one_mem _)
-        (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h1) hX) hwn))
-        (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h2) (Subring.pow_mem _ hX 2)) hwn))
-        (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h3) (Subring.pow_mem _ hX 3)) (Subring.pow_mem _ hwn 2)))
-        (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h4) (Subring.pow_mem _ hX 4)) (Subring.pow_mem _ hwn 2)))
-        (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h6) (Subring.pow_mem _ hX 6)) (Subring.pow_mem _ hwn 3))
+      exact Subring.add_mem _
+        (Subring.add_mem _
+          (Subring.add_mem _
+            (Subring.add_mem _
+              (Subring.add_mem _ (Subring.one_mem _)
+                (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h1) hX) hwn))
+              (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h2) (Subring.pow_mem _ hX 2))
+                hwn))
+            (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h3) (Subring.pow_mem _ hX 3))
+              (Subring.pow_mem _ hwn 2)))
+          (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h4) (Subring.pow_mem _ hX 4))
+            (Subring.pow_mem _ hwn 2)))
+        (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h6) (Subring.pow_mem _ hX 6))
+          (Subring.pow_mem _ hwn 3))
     rw [e3]
     exact mem_ratSub.1 hmem n
 
-theorem omega_mem_ratSub {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} (hwq : wq ∈ ratSub p)
-    (h1 : W.a₁ ∈ Wp p) (h3 : W.a₃ ∈ Wp p) : omegaW W wq ∈ ratSub p := by
+theorem omega_mem_ratSub
+    {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]}
+    (hwq : wq ∈ ratSub p) (h1 : W.a₁ ∈ Wp p) (h3 : W.a₃ ∈ Wp p)
+    : omegaW W wq ∈ ratSub p := by
   have hX := X_mem_ratSub (p := p)
   show (-(2 : PowerSeries ℂ_[p]) * wq - PowerSeries.X * dX wq) *
     (wq * (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) W.a₁ * PowerSeries.X +
       algebraMap ℂ_[p] (PowerSeries ℂ_[p]) W.a₃ * PowerSeries.X ^ 3 * wq - 2))⁻¹ ∈ ratSub p
   exact Subring.mul_mem _
-    (Subring.sub_mem _ (Subring.mul_mem _ (Subring.neg_mem _ two_mem_ratSub) hwq) (Subring.mul_mem _ hX (dX_mem_ratSub hwq)))
-    (inv_mem_ratSub (Subring.mul_mem _ hwq (Subring.sub_mem _ (Subring.add_mem _ (Subring.mul_mem _ (C_mem_ratSub h1) hX)
-      (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h3) (Subring.pow_mem _ hX 3)) hwq)) two_mem_ratSub)))
+    (Subring.sub_mem _ (Subring.mul_mem _ (Subring.neg_mem _ two_mem_ratSub) hwq)
+      (Subring.mul_mem _ hX (dX_mem_ratSub hwq)))
+    (inv_mem_ratSub (Subring.mul_mem _ hwq
+      (Subring.sub_mem _
+        (Subring.add_mem _ (Subring.mul_mem _ (C_mem_ratSub h1) hX)
+          (Subring.mul_mem _ (Subring.mul_mem _ (C_mem_ratSub h3) (Subring.pow_mem _ hX 3)) hwq))
+        two_mem_ratSub)))
 
-theorem l_mem_ratSub (g : G1 p) (hW : IsWq g.W g.wq) (hM : ModelOverW g.lam g.abelian₂ g.C) : g.l ∈ ratSub p := by
+theorem l_mem_ratSub (g : G1 p) (hW : IsWq g.W g.wq) (hM : ModelOverW g.lam g.abelian₂ g.C)
+    : g.l ∈ ratSub p := by
   have hω : omegaW g.W g.wq ∈ ratSub p :=
     omega_mem_ratSub (wq_mem_ratSub hW hM.1 hM.2.1 hM.2.2.1 hM.2.2.2.1 hM.2.2.2.2) hM.1 hM.2.2.1
   rw [mem_ratSub] at hω ⊢
@@ -521,33 +628,44 @@ theorem exRat_of (g : G1 p) (hOk : g.Ok) (hM : ModelOverW g.lam g.abelian₂ g.C
     apply IsUnit.mk0
     intro h0
     have h1 := coeff_one_l g hOk.2.1
-    have h2 : PowerSeries.coeff 1 (PowerSeries.map (k0ToC p) l0) = PowerSeries.coeff 1 g.l := congrArg _ hl0
+    have h2 : PowerSeries.coeff 1 (PowerSeries.map (k0ToC p) l0) = PowerSeries.coeff 1 g.l :=
+      congrArg _ hl0
     rw [PowerSeries.coeff_map, h0, map_zero, h1] at h2
     exact zero_ne_one h2
-  have he00 : PowerSeries.constantCoeff (l0.substInvOfIsUnit hl01) = 0 := PowerSeries.constantCoeff_substInvOfIsUnit _ _
-  have hE0 : PowerSeries.constantCoeff (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) = 0 := by
+  have he00 : PowerSeries.constantCoeff (l0.substInvOfIsUnit hl01) = 0 :=
+    PowerSeries.constantCoeff_substInvOfIsUnit _ _
+  have hE0
+      : PowerSeries.constantCoeff (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) = 0 := by
     rw [cc_map, he00, map_zero]
   have hE1 : PowerSeries.HasSubst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) :=
     PowerSeries.HasSubst.of_constantCoeff_zero' hE0
   have hL : PowerSeries.HasSubst g.l := PowerSeries.HasSubst.of_constantCoeff_zero' (cc_l g)
-  have h3 : PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) g.l = PowerSeries.X := by
+  have h3
+      : PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) g.l
+        = PowerSeries.X := by
     have h2 : PowerSeries.subst (l0.substInvOfIsUnit hl01) l0 = PowerSeries.X :=
       PowerSeries.subst_substInvOfIsUnit_right _ hl00 hl01
     have h4 := congrArg (PowerSeries.map (k0ToC p)) h2
-    have h4' : PowerSeries.map (k0ToC p) (PowerSeries.subst (l0.substInvOfIsUnit hl01) l0) =
-        PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) (PowerSeries.map (k0ToC p) l0) :=
+    have h4'
+        : PowerSeries.map (k0ToC p) (PowerSeries.subst (l0.substInvOfIsUnit hl01) l0)
+          = PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01))
+            (PowerSeries.map (k0ToC p) l0) :=
       PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero' he00) l0
     rw [h4', PowerSeries.map_X] at h4
     rw [← h4]
     exact congrArg _ hl0.symm
   have h5 : PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01) = g.ex := by
-    calc PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)
-        = PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) (PowerSeries.X : PowerSeries ℂ_[p]) :=
-          (PowerSeries.subst_X hE1).symm
-      _ = PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) (PowerSeries.subst g.l g.ex) := by
-          rw [ex_l g hex hinv]
-      _ = PowerSeries.subst (PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) g.l) g.ex :=
-          PowerSeries.subst_comp_subst_apply hL hE1 _
+    calc
+      PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)
+          = PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01))
+            (PowerSeries.X : PowerSeries ℂ_[p]) :=
+        (PowerSeries.subst_X hE1).symm
+      _ = PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01))
+          (PowerSeries.subst g.l g.ex) := by
+        rw [ex_l g hex hinv]
+      _ = PowerSeries.subst
+          (PowerSeries.subst (PowerSeries.map (k0ToC p) (l0.substInvOfIsUnit hl01)) g.l) g.ex :=
+        PowerSeries.subst_comp_subst_apply hL hE1 _
       _ = PowerSeries.subst (PowerSeries.X : PowerSeries ℂ_[p]) g.ex := by rw [h3]
       _ = g.ex := PowerSeries.X_subst _
   exact (coefWf_iff _).2 ⟨l0.substInvOfIsUnit hl01, h5⟩

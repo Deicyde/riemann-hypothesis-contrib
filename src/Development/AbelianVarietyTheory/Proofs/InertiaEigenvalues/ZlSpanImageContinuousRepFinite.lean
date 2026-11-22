@@ -12,11 +12,24 @@ open Formalism.MainNotions.N GlobalTheory.Cong GlobalTheory.PsChar
 
 namespace GlobalTheory
 
-theorem zl_span_image_finite : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] (a : ℕ) (r : Γ →* GL (Fin a) (PadicAlgCl l)), Continuous r → ∃ t : Finset Γ, ∀ f : Γ →₀ ℤ_[l], ∃ f' : Γ →₀ ℤ_[l], f'.support ⊆ t ∧ (f.sum fun h c => ((algebraMap ℚ_[l] (PadicAlgCl l)) (c : ℚ_[l])) • ((r h : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l))) = (f'.sum fun h c => ((algebraMap ℚ_[l] (PadicAlgCl l)) (c : ℚ_[l])) • ((r h : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l))) := by
+theorem zl_span_image_finite
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] (a : ℕ) (r : Γ →* GL (Fin a) (PadicAlgCl l)),
+      Continuous r
+        → ∃ t : Finset Γ, ∀ f : Γ →₀ ℤ_[l], ∃ f' : Γ →₀ ℤ_[l],
+          f'.support ⊆ t
+            ∧ (f.sum fun h c =>
+                ((algebraMap ℚ_[l] (PadicAlgCl l)) (c : ℚ_[l]))
+                  • ((r h : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l)))
+              = (f'.sum fun h c =>
+                ((algebraMap ℚ_[l] (PadicAlgCl l)) (c : ℚ_[l]))
+                  • ((r h : GL (Fin a) (PadicAlgCl l))
+                    : Matrix (Fin a) (Fin a) (PadicAlgCl l))) := by
   intro l _ Γ _ _ _ _ a r hr
   classical
   obtain ⟨L, hLfin, hL⟩ := GlobalTheory.T.exists_finiteExtension_entries_of_compact_rep l Γ a r hr
-  let ρ : Γ → Matrix (Fin a) (Fin a) (PadicAlgCl l) := fun g => ((r g : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l))
+  let ρ : Γ → Matrix (Fin a) (Fin a) (PadicAlgCl l) := fun g =>
+    ((r g : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l))
   have hρ : Continuous ρ := Units.continuous_val.comp hr
   let e : Matrix (Fin a) (Fin a) L →ₗ[ℚ_[l]] Matrix (Fin a) (Fin a) (PadicAlgCl l) :=
     LinearMap.mapMatrix L.val.toLinearMap
@@ -42,8 +55,9 @@ theorem zl_span_image_finite : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group �
     linarith
   let ψ : Γ → (Fin (Module.finrank ℚ_[l] V) → ℤ_[l]) := fun g i => ⟨c⁻¹ * φ (ρV g) i, hbd g i⟩
   obtain ⟨G, hG⟩ : (Submodule.span ℤ_[l] (Set.range ψ)).FG := IsNoetherian.noetherian _
-  have hGT : ∀ x ∈ G, ∃ T : Finset (Fin (Module.finrank ℚ_[l] V) → ℤ_[l]),
-      ↑T ⊆ Set.range ψ ∧ x ∈ Submodule.span ℤ_[l] (T : Set _) := fun x hx =>
+  have hGT
+      : ∀ x ∈ G, ∃ T : Finset (Fin (Module.finrank ℚ_[l] V) → ℤ_[l]),
+        ↑T ⊆ Set.range ψ ∧ x ∈ Submodule.span ℤ_[l] (T : Set _) := fun x hx =>
     Submodule.mem_span_finite_of_mem_span (hG ▸ Submodule.subset_span hx)
   choose T hT1 hT2 using hGT
   let U := G.attach.biUnion (fun x => T x.1 x.2)
@@ -65,14 +79,21 @@ theorem zl_span_image_finite : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group �
     exact ⟨y, hyU, by rw [dite_eq_left hex]⟩
 
   let A : (Γ →₀ ℤ_[l]) → V := fun f => f.sum fun h c' => ((c' : ℚ_[l])) • ρV h
-  have hSM : ∀ f : Γ →₀ ℤ_[l], (f.sum fun h c' => ((algebraMap ℚ_[l] (PadicAlgCl l)) (c' : ℚ_[l])) • ρ h) = ((A f : V) : Matrix (Fin a) (Fin a) (PadicAlgCl l)) := by
+  have hSM
+      : ∀ f : Γ →₀ ℤ_[l],
+        (f.sum fun h c' => ((algebraMap ℚ_[l] (PadicAlgCl l)) (c' : ℚ_[l])) • ρ h)
+          = ((A f : V) : Matrix (Fin a) (Fin a) (PadicAlgCl l)) := by
     intro f
     simp only [A, Finsupp.sum, Submodule.coe_sum, Submodule.coe_smul, algebraMap_smul]
     rfl
-  have hLC : ∀ f : Γ →₀ ℤ_[l], ∀ i, ((Finsupp.linearCombination ℤ_[l] ψ f i : ℤ_[l]) : ℚ_[l]) = c⁻¹ * φ (A f) i := by
+  have hLC
+      : ∀ f : Γ →₀ ℤ_[l], ∀ i,
+        ((Finsupp.linearCombination ℤ_[l] ψ f i : ℤ_[l]) : ℚ_[l]) = c⁻¹ * φ (A f) i := by
     intro f i
-    have hcs : ∀ F : Γ → ℤ_[l], ((∑ x ∈ f.support, F x : ℤ_[l]) : ℚ_[l]) = ∑ x ∈ f.support, (F x : ℚ_[l]) :=
-      fun F => map_sum PadicInt.Coe.ringHom F f.support
+    have hcs
+        : ∀ F : Γ → ℤ_[l],
+          ((∑ x ∈ f.support, F x : ℤ_[l]) : ℚ_[l]) = ∑ x ∈ f.support, (F x : ℚ_[l]) := fun F =>
+      map_sum PadicInt.Coe.ringHom F f.support
     rw [Finsupp.linearCombination_apply]
     unfold Finsupp.sum
     simp only [A]

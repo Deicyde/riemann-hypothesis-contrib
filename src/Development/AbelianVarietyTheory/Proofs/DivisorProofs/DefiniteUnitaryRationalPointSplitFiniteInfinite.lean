@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalCompone
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.BCT.TrKer
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.BCT.TrKer
 open scoped Classical TensorProduct Topology
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -14,9 +16,10 @@ noncomputable section
 
 namespace GlobalTheory.BCT.RatSplit
 
-theorem ratU_split : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ), ∀ γ ∈ ratU E n,
-    ∃ γ₀ : UE E n, splitFin E n γ = finPt γ₀ ∧
-      ∀ v : InfinitePlace E, cEmb v.embedding γ = GeneralLinearGroup.map v.embedding γ₀.1 := by
+theorem ratU_split
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ), ∀ γ ∈ ratU E n, ∃ γ₀ : UE E n,
+      splitFin E n γ = finPt γ₀
+        ∧ ∀ v : InfinitePlace E, cEmb v.embedding γ = GeneralLinearGroup.map v.embedding γ₀.1 := by
   intro E _ _ _ n γ hγ
   obtain ⟨g0, hg0⟩ := (Subgroup.mem_subgroupOf.1 hγ : γ.1 ∈ (ratGL E n).range)
   have hval : γ.1.val = g0.val.map (algebraMap E (Ad E)) := by rw [← hg0]; rfl
@@ -35,16 +38,14 @@ theorem ratU_split : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n :
       Matrix.map_one _ (map_zero _) (map_one _), ← hval, h2]
   refine ⟨⟨g0, hU⟩, ?_, ?_⟩
   · set a : finU (E := E) (n := n) := finPt ⟨g0, hU⟩ with ha
-    have haval : ((a : UA E n) : GA E n) = finGL E n (ratF E n g0) := by
-      rw [ha, FinPtLoc.finPt_eq]
+    have haval : ((a : UA E n) : GA E n) = finGL E n (ratF E n g0) := by rw [ha, FinPtLoc.finPt_eq]
     have hb : (a : UA E n)⁻¹ * γ ∈ infU E n := by
       show GeneralLinearGroup.map (pFin E) (((a : UA E n)⁻¹ * γ : UA E n) : GA E n) = 1
       rw [Subgroup.coe_mul, Subgroup.coe_inv, map_mul, map_inv, haval, pFin_finGL, ← hg0]
       have : GeneralLinearGroup.map (pFin E) (ratGL E n g0) = ratF E n g0 := by
         apply Units.ext; ext i j; rfl
       rw [this, inv_mul_cancel]
-    have hγs : γ = (a : UA E n) * ((⟨_, hb⟩ : infU E n) : UA E n) := by
-      simp
+    have hγs : γ = (a : UA E n) * ((⟨_, hb⟩ : infU E n) : UA E n) := by simp
     rw [hγs, splitFin_mul]
   · intro v
     apply Units.ext

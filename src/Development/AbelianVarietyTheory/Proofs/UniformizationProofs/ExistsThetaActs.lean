@@ -9,14 +9,26 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Spa
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TorsionTheta
 
-theorem exists_theta_acts : KerPowSt → ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (P : PolAV S) (F : Type) [Field F] (t : Spec (CommRingCat.of F) ⟶ S) (n : ℕ), 1 ≤ n → ∀ x : Over.mk t ⟶ P.A, x ^ n = 1 → ∃ θ : ThetaGrp P.A P.L (n : ℤ) (Over.mk t), θ.pt = x ∧ ∀ s : LB.Sec (LPow P.A P.L (n : ℤ) (Over.mk t)), ∃ s', IsActOf P.A P.L (n : ℤ) θ s s' := by
+theorem exists_theta_acts
+    : KerPowSt
+      → ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (P : PolAV S) (F : Type) [Field F]
+          (t : Spec (CommRingCat.of F) ⟶ S) (n : ℕ),
+        1 ≤ n
+          → ∀ x : Over.mk t ⟶ P.A,
+            x ^ n = 1
+              → ∃ θ : ThetaGrp P.A P.L (n : ℤ) (Over.mk t),
+                θ.pt = x
+                  ∧ ∀ s : LB.Sec (LPow P.A P.L (n : ℤ) (Over.mk t)), ∃ s',
+                    IsActOf P.A P.L (n : ℤ) θ s s' := by
   intro hK S _ P F _ t n hn x hx
 
   have : Unique (Over.mk t).left := inferInstanceAs (Unique (PrimeSpectrum F))

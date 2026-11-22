@@ -15,9 +15,10 @@ theorem good_range : PlaceGood k K (LocalSubring.range (algebraMap k K)) := by
   rintro a ⟨c, rfl⟩
   exact ⟨c, Or.inl rfl⟩
 
-theorem ub (s : Set (LocalSubring K)) (hs : s ⊆ {A | PlaceGood k K A}) (H : IsChain (· ≤ ·) s)
-    (y : LocalSubring K) (hys : y ∈ s) :
-    ∃ U ∈ {A | PlaceGood k K A}, ∀ z ∈ s, z ≤ U := by
+theorem ub
+    (s : Set (LocalSubring K)) (hs : s ⊆ {A | PlaceGood k K A}) (H : IsChain (· ≤ ·) s)
+    (y : LocalSubring K) (hys : y ∈ s)
+    : ∃ U ∈ {A | PlaceGood k K A}, ∀ z ∈ s, z ≤ U := by
   have inst : Nonempty s := ⟨⟨y, hys⟩⟩
   have hdir := H.directed.mono_comp _ LocalSubring.toSubring_mono
   refine ⟨@LocalSubring.mk _ _ (⨆ i : s, i.1.toSubring) ⟨?_⟩, ?_, ?_⟩
@@ -34,7 +35,8 @@ theorem ub (s : Set (LocalSubring K)) (hs : s ⊆ {A | PlaceGood k K A}) (H : Is
       obtain ⟨A, haA : a ∈ A.1.toSubring⟩ := (Subring.mem_iSup_of_directed hdir).mp ha
       obtain ⟨c, hc⟩ := (hs A.2).2 a haA
       refine ⟨c, hc.imp_right fun hn hinv => hn ?_⟩
-      obtain ⟨B, hbB : (a - algebraMap k K c)⁻¹ ∈ B.1.toSubring⟩ := (Subring.mem_iSup_of_directed hdir).mp hinv
+      obtain ⟨B, hbB : (a - algebraMap k K c)⁻¹ ∈ B.1.toSubring⟩ :=
+        (Subring.mem_iSup_of_directed hdir).mp hinv
       obtain ⟨C, hCA, hCB⟩ := H.directed A B
       have hd : a - algebraMap k K c ∈ A.1.toSubring := sub_mem haA ((hs A.2).1 c)
       have hne : a - algebraMap k K c ≠ 0 := by
@@ -48,7 +50,8 @@ theorem ub (s : Set (LocalSubring K)) (hs : s ⊆ {A | PlaceGood k K A}) (H : Is
       obtain ⟨w, hw⟩ := isUnit_iff_exists_inv.mp hu'
       have : (a - algebraMap k K c)⁻¹ = (w : K) :=
         inv_eq_of_mul_eq_one_right (by simpa using congrArg Subtype.val hw)
-      rw [this]; exact w.2
+      rw [this]
+      exact w.2
   · intro A hA
     refine ⟨le_iSup (fun i : s ↦ i.1.toSubring) ⟨A, hA⟩, ⟨?_⟩⟩
     rintro ⟨a, haA⟩ h
@@ -62,9 +65,12 @@ end LateralTheory.KummerTheory.PlaceZornPf
 
 theorem LateralTheory.KummerTheory.PlaceZorn_of : LateralTheory.KummerTheory.PlaceZorn := by
   intro k K _ _ _ _
-  obtain ⟨m, -, hm⟩ := zorn_le_nonempty₀ {A : LocalSubring K | LateralTheory.KummerTheory.PlaceGood k K A}
-    (fun s hs H y hy => LateralTheory.KummerTheory.PlaceZornPf.ub s hs H y hy) _ LateralTheory.KummerTheory.PlaceZornPf.good_range
+  obtain ⟨m, -, hm⟩ :=
+    zorn_le_nonempty₀ {A : LocalSubring K | LateralTheory.KummerTheory.PlaceGood k K A}
+      (fun s hs H y hy => LateralTheory.KummerTheory.PlaceZornPf.ub s hs H y hy)
+      _ LateralTheory.KummerTheory.PlaceZornPf.good_range
   exact ⟨m, hm.1, fun B hB hgB => hm.2 hgB hB⟩
 
-theorem LateralTheory.KummerTheory.PlaceEx_of_step (h : LateralTheory.KummerTheory.PlaceStep) : LateralTheory.KummerTheory.PlaceEx :=
+theorem LateralTheory.KummerTheory.PlaceEx_of_step (h : LateralTheory.KummerTheory.PlaceStep)
+    : LateralTheory.KummerTheory.PlaceEx :=
   LateralTheory.KummerTheory.PlaceEx_of LateralTheory.KummerTheory.PlaceZorn_of h

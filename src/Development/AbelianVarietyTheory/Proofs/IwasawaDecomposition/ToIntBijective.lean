@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Coeff
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.L2.Host Formalism.L2.Rows Formalism.L2.Geo GlobalTheory.GeoGraft NumberField
+open Formalism.BasicNotions Formalism.L2.Host Formalism.L2.Rows Formalism.L2.Geo
+  GlobalTheory.GeoGraft NumberField
 
 namespace GlobalTheory.GeoModel
 
@@ -24,17 +25,22 @@ theorem otoLL_mem (y : D.what₂.O) : D.what₂.OtoLL y ∈ fracO D :=
 variable {D} {T : HostTied D} {C : CharFrame D}
 
 def toInt (h : OTied D T C) : D.what₂.O →+* 𝓞 (fracO D) where
-  toFun y := ⟨⟨D.what₂.OtoLL y, otoLL_mem D y⟩, by
-    have hq : IsIntegral ℤ (T.jLL (D.what₂.OtoLL y)) := ((h.range _).1 ⟨y, rfl⟩).2
-    let f : (fracO D) →ₐ[ℤ] Qb := (T.jLL.comp (fracO D).val.toRingHom).toIntAlgHom
-    have hf : Function.Injective f := (T.jLL.comp (fracO D).val.toRingHom).injective
-    exact (isIntegral_algHom_iff f hf).1 hq⟩
+  toFun y := ⟨
+    ⟨D.what₂.OtoLL y, otoLL_mem D y⟩,
+    by
+      have hq : IsIntegral ℤ (T.jLL (D.what₂.OtoLL y)) := ((h.range _).1 ⟨y, rfl⟩).2
+      let f : (fracO D) →ₐ[ℤ] Qb := (T.jLL.comp (fracO D).val.toRingHom).toIntAlgHom
+      have hf : Function.Injective f := (T.jLL.comp (fracO D).val.toRingHom).injective
+      exact (isIntegral_algHom_iff f hf).1 hq
+  ⟩
   map_one' := by ext; simp
   map_mul' a b := by ext; exact map_mul D.what₂.OtoLL a b
   map_zero' := by ext; simp
   map_add' a b := by ext; exact map_add D.what₂.OtoLL a b
 
-theorem toInt_val (h : OTied D T C) (y : D.what₂.O) : ((toInt h y : fracO D) : D.what₂.LL) = D.what₂.OtoLL y := rfl
+theorem toInt_val (h : OTied D T C) (y : D.what₂.O)
+    : ((toInt h y : fracO D) : D.what₂.LL) = D.what₂.OtoLL y :=
+  rfl
 
 theorem toInt_bijective (h : OTied D T C) : Function.Bijective (toInt h) := by
   refine ⟨fun a b hab => h.inj ?_, fun z => ?_⟩
@@ -57,6 +63,7 @@ theorem toInt_bijective (h : OTied D T C) : Function.Bijective (toInt h) := by
     ext
     exact T.jLL.injective hy
 
-def eO (h : OTied D T C) : 𝓞 (fracO D) ≃+* D.what₂.O := (RingEquiv.ofBijective _ (toInt_bijective h)).symm
+def eO (h : OTied D T C) : 𝓞 (fracO D) ≃+* D.what₂.O :=
+  (RingEquiv.ofBijective _ (toInt_bijective h)).symm
 
 end GlobalTheory.GeoModel

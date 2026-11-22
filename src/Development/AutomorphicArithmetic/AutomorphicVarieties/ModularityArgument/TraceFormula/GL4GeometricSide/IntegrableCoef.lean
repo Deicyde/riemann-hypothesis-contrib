@@ -13,26 +13,31 @@ namespace UpperTheory.V.Z.GSp4Splitting
 
 variable {n : ℕ}
 
-private theorem cont_tr (E : PositivityTheory.RgBcC.KMod n) (T : E.V →L[ℂ] E.V) :
-    Continuous fun κ : Un n =>
+private theorem cont_tr (E : PositivityTheory.RgBcC.KMod n) (T : E.V →L[ℂ] E.V)
+    : Continuous fun κ : Un n =>
       LinearMap.trace ℂ E.V ((E.ρ κ * T : E.V →L[ℂ] E.V) : E.V →ₗ[ℂ] E.V) := by
-  let L : (E.V →L[ℂ] E.V) →ₗ[ℂ] ℂ :=
-    (LinearMap.trace ℂ E.V).comp (ContinuousLinearMap.coeLM ℂ)
+  let L : (E.V →L[ℂ] E.V) →ₗ[ℂ] ℂ := (LinearMap.trace ℂ E.V).comp (ContinuousLinearMap.coeLM ℂ)
   have hL : Continuous L := L.continuous_of_finiteDimensional
   exact hL.comp (E.cont.mul continuous_const)
 
 variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
-private theorem integrable_coef [CompactSpace (Un n)] [MeasurableSpace (Un n)] [BorelSpace (Un n)]
-    (ν : Measure (Un n)) [IsFiniteMeasure ν] (σ : Un n →* (V →ₗ[ℂ] V)) (hσ : IsK σ)
-    {f : Un n → ℂ} (hf : Continuous f) (v w : V) :
-    Integrable (fun κ => f κ * ⟪w, σ κ v⟫_ℂ) ν :=
+private theorem integrable_coef
+    [CompactSpace (Un n)] [MeasurableSpace (Un n)] [BorelSpace (Un n)]
+    (ν : Measure (Un n)) [IsFiniteMeasure ν]
+    (σ : Un n →* (V →ₗ[ℂ] V)) (hσ : IsK σ)
+    {f : Un n → ℂ} (hf : Continuous f)
+    (v w : V)
+    : Integrable (fun κ => f κ * ⟪w, σ κ v⟫_ℂ) ν :=
   (hf.mul (hσ.cont v w)).integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)
 
-private theorem exists_avg [CompactSpace (Un n)] [MeasurableSpace (Un n)] [BorelSpace (Un n)]
-    (ν : Measure (Un n)) [IsFiniteMeasure ν] (σ : Un n →* (V →ₗ[ℂ] V)) (hσ : IsK σ)
-    {f : Un n → ℂ} (hf : Continuous f) (v : V) :
-    ∃ p : V, ∀ w : V, ⟪w, p⟫_ℂ = ∫ κ, f κ * ⟪w, σ κ v⟫_ℂ ∂ν := by
+private theorem exists_avg
+    [CompactSpace (Un n)] [MeasurableSpace (Un n)] [BorelSpace (Un n)]
+    (ν : Measure (Un n)) [IsFiniteMeasure ν]
+    (σ : Un n →* (V →ₗ[ℂ] V)) (hσ : IsK σ)
+    {f : Un n → ℂ} (hf : Continuous f)
+    (v : V)
+    : ∃ p : V, ∀ w : V, ⟪w, p⟫_ℂ = ∫ κ, f κ * ⟪w, σ κ v⟫_ℂ ∂ν := by
   obtain ⟨S, hfd, hv, hS⟩ := hσ.fin v
   have hmem : ∀ κ, σ κ v ∈ S := fun κ => hS κ v hv
   let b := stdOrthonormalBasis ℂ S
@@ -42,8 +47,9 @@ private theorem exists_avg [CompactSpace (Un n)] [MeasurableSpace (Un n)] [Borel
     have h' := congrArg (Subtype.val) h
     simpa [Submodule.coe_sum, Submodule.coe_inner] using h'.symm
   refine ⟨∑ i, (∫ κ, f κ * ⟪((b i : S) : V), σ κ v⟫_ℂ ∂ν) • ((b i : S) : V), fun w => ?_⟩
-  have hint : ∀ κ, f κ * ⟪w, σ κ v⟫_ℂ =
-      ∑ i, (f κ * ⟪((b i : S) : V), σ κ v⟫_ℂ) * ⟪w, ((b i : S) : V)⟫_ℂ := by
+  have hint
+      : ∀ κ,
+        f κ * ⟪w, σ κ v⟫_ℂ = ∑ i, (f κ * ⟪((b i : S) : V), σ κ v⟫_ℂ) * ⟪w, ((b i : S) : V)⟫_ℂ := by
     intro κ
     conv_lhs => rw [hexp κ]
     rw [inner_sum, Finset.mul_sum]

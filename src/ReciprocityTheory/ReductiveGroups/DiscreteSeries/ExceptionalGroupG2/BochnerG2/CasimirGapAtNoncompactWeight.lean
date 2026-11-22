@@ -21,35 +21,45 @@ variable {n : ℕ}
 
 section Unitary
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {lam : Fin n → ℝ} {V : Submodule ℂ M}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {lam : Fin n → ℝ} {V : Submodule ℂ M}
 
-theorem k_highest_weight_layer_decomp (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : 2 * (n : ℝ) < h) {μ : Fin n → ℝ} {w : M}
-    (hw : w ∈ genSub E V) (hμ : IsKHWVec ε E μ w) :
-    ∃ w₀ ∈ V, IsKHWVec ε E μ w₀ ∧ ∃ m, ∃ ws : Fin m → M, w = w₀ + ∑ j, ws j ∧
-      ∀ j : Fin m, ws j ∈ layer ε E V ((j : ℕ) + 1) ∧ (ws j ≠ 0 →
-        IsNCSum ε ((j : ℕ) + 1) (μ - lowK ε lam) ∧ 0 < h - n + 1 ∧
-        casValK ε (lowK ε lam) + 2 * (((j : ℕ) : ℝ) + 1) * (h - n + 1) ≤ casValK ε μ) := by
+theorem k_highest_weight_layer_decomp
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v) (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : 2 * (n : ℝ) < h)
+    {μ : Fin n → ℝ} {w : M} (hw : w ∈ genSub E V) (hμ : IsKHWVec ε E μ w)
+    : ∃ w₀ ∈ V,
+      IsKHWVec ε E μ w₀
+        ∧ ∃ m, ∃ ws : Fin m → M,
+          w = w₀ + ∑ j, ws j
+            ∧ ∀ j : Fin m,
+              ws j ∈ layer ε E V ((j : ℕ) + 1)
+                ∧ (ws j ≠ 0
+                  → IsNCSum ε ((j : ℕ) + 1) (μ - lowK ε lam) ∧ 0 < h - n + 1
+                    ∧ casValK ε (lowK ε lam) + 2 * (((j : ℕ) : ℝ) + 1) * (h - n + 1)
+                      ≤ casValK ε μ) := by
   obtain ⟨m, hm⟩ := exists_layer_of_mem_genSub hE hV.2.1 hw
   obtain ⟨w₀, hw₀, hw₀μ, ws, hsum, hws⟩ := layer_khw_decomp hE hU hV.1 hV.2.1 hm hμ
   refine ⟨w₀, hw₀, hw₀μ, m, ws, hsum, fun j => ⟨(hws j).1, fun h0 => ?_⟩⟩
-  obtain ⟨h1, h2⟩ := khw_layer_succ_bound hE hU hV hc hmono hh hbig (j : ℕ) (hws j).1
-    (hws j).2.1 h0 (hws j).2.2
+  obtain ⟨h1, h2⟩ :=
+    khw_layer_succ_bound hE hU hV hc hmono hh hbig (j : ℕ) (hws j).1 (hws j).2.1 h0 (hws j).2.2
   obtain ⟨a, b, hab⟩ := isNCSum_succ_exists h1
   have := (gap_gt hab hbig).2
   exact ⟨h1, by linarith, h2⟩
 
-theorem casimir_gap_at_noncompact_weight (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : 2 * (n : ℝ) < h) {μ : Fin n → ℝ} {w : M}
-    (hw : w ∈ genSub E V) (hw0 : w ≠ 0) (hμ : IsKHWVec ε E μ w) (hne : μ ≠ lowK ε lam) :
-    ∃ j : ℕ, IsNCSum ε (j + 1) (μ - lowK ε lam) ∧ 0 < h - n + 1 ∧
-      casValK ε (lowK ε lam) + 2 * ((j : ℝ) + 1) * (h - n + 1) ≤ casValK ε μ := by
-  obtain ⟨w₀, hw₀, -, m, ws, hwsum, hws⟩ := k_highest_weight_layer_decomp hE hU hV hc hmono hh hbig hw hμ
+theorem casimir_gap_at_noncompact_weight
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v) (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : 2 * (n : ℝ) < h)
+    {μ : Fin n → ℝ} {w : M}
+    (hw : w ∈ genSub E V) (hw0 : w ≠ 0) (hμ : IsKHWVec ε E μ w) (hne : μ ≠ lowK ε lam)
+    : ∃ j : ℕ,
+      IsNCSum ε (j + 1) (μ - lowK ε lam) ∧ 0 < h - n + 1
+        ∧ casValK ε (lowK ε lam) + 2 * ((j : ℝ) + 1) * (h - n + 1) ≤ casValK ε μ := by
+  obtain ⟨w₀, hw₀, -, m, ws, hwsum, hws⟩ :=
+    k_highest_weight_layer_decomp hE hU hV hc hmono hh hbig hw hμ
   by_cases hall : ∀ j, ws j = 0
   · exfalso
     have hweq : w = w₀ := by
@@ -64,12 +74,14 @@ theorem casimir_gap_at_noncompact_weight (hE : IsGlRep E) (hU : IsInfUnitary ε 
     obtain ⟨h1, h2, h3⟩ := (hws j).2 hj
     exact ⟨(j : ℕ), h1, h2, h3⟩
 
-theorem khw_lowK_mem (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hgap : StdGap ε lam) {w : M} (hw : w ∈ genSub E V) (hμ : IsKHWVec ε E (lowK ε lam) w) :
-    w ∈ V := by
+theorem khw_lowK_mem
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v) (hgap : StdGap ε lam)
+    {w : M} (hw : w ∈ genSub E V) (hμ : IsKHWVec ε E (lowK ε lam) w)
+    : w ∈ V := by
   obtain ⟨hmono, h, hh, hbig⟩ := hgap
-  obtain ⟨w₀, hw₀, -, m, ws, rfl, hws⟩ := k_highest_weight_layer_decomp hE hU hV hc hmono hh hbig hw hμ
+  obtain ⟨w₀, hw₀, -, m, ws, rfl, hws⟩ :=
+    k_highest_weight_layer_decomp hE hU hV hc hmono hh hbig hw hμ
 
   have hzero : ∀ j, ws j = 0 := by
     intro j
@@ -80,18 +92,20 @@ theorem khw_lowK_mem (hE : IsGlRep E) (hU : IsInfUnitary ε E)
     linarith
   simpa [hzero] using hw₀
 
-theorem vogan_min (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hgap : StdGap ε lam) {μ : Fin n → ℝ} {w : M} (hw : w ∈ genSub E V) (hw0 : w ≠ 0)
-    (hμ : IsKHWVec ε E μ w) :
-    nsq (lowK ε lam + (2 : ℝ) • rhoC ε) ≤ nsq (μ + (2 : ℝ) • rhoC ε) := by
+theorem vogan_min
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v) (hgap : StdGap ε lam)
+    {μ : Fin n → ℝ} {w : M} (hw : w ∈ genSub E V) (hw0 : w ≠ 0) (hμ : IsKHWVec ε E μ w)
+    : nsq (lowK ε lam + (2 : ℝ) • rhoC ε) ≤ nsq (μ + (2 : ℝ) • rhoC ε) := by
   by_cases hne : μ = lowK ε lam
   · subst hne
     exact le_refl _
   obtain ⟨hmono, h, hh, hbig⟩ := hgap
-  obtain ⟨j, ⟨γ, -, hsum⟩, -, hle⟩ := casimir_gap_at_noncompact_weight hE hU hV hc hmono hh hbig hw hw0 hμ hne
-  have hexp : ∀ x : Fin n → ℝ, nsq (x + (2 : ℝ) • rhoC ε) =
-      nsq (x + rhoC ε) + 2 * dot x (rhoC ε) + 3 * nsq (rhoC ε) := by
+  obtain ⟨j, ⟨γ, -, hsum⟩, -, hle⟩ :=
+    casimir_gap_at_noncompact_weight hE hU hV hc hmono hh hbig hw hw0 hμ hne
+  have hexp
+      : ∀ x : Fin n → ℝ,
+        nsq (x + (2 : ℝ) • rhoC ε) = nsq (x + rhoC ε) + 2 * dot x (rhoC ε) + 3 * nsq (rhoC ε) := by
     intro x
     simp only [nsq, dot, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum,
       ← Finset.sum_add_distrib]
@@ -108,8 +122,10 @@ theorem vogan_min (hE : IsGlRep E) (hU : IsInfUnitary ε E)
     exact Finset.sum_congr rfl fun i _ => hroot _ _
 
   have hρ : ∀ a, -((n : ℝ) / 2) ≤ rhoC ε a ∧ rhoC ε a ≤ (n : ℝ) / 2 := by
-    have key : ∀ s t : Finset (Fin n),
-        -((n : ℝ) / 2) ≤ ((s.card : ℝ) - t.card) / 2 ∧ ((s.card : ℝ) - t.card) / 2 ≤ (n : ℝ) / 2 := by
+    have key
+        : ∀ s t : Finset (Fin n),
+          -((n : ℝ) / 2) ≤ ((s.card : ℝ) - t.card) / 2
+            ∧ ((s.card : ℝ) - t.card) / 2 ≤ (n : ℝ) / 2 := by
       intro s t
       have hs : (s.card : ℝ) ≤ n := by exact_mod_cast (card_le_univ s).trans (by simp)
       have ht : (t.card : ℝ) ≤ n := by exact_mod_cast (card_le_univ t).trans (by simp)
@@ -139,10 +155,10 @@ theorem vogan_min (hE : IsGlRep E) (hU : IsInfUnitary ε E)
   have e2 := hexp (lowK ε lam)
   linarith
 
-theorem khw_mem_layer (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hgap : StdGap ε lam) (μ : Fin n → ℝ) :
-    ∃ k : ℕ, ∀ w ∈ genSub E V, IsKHWVec ε E μ w → w ∈ layer ε E V k := by
+theorem khw_mem_layer
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v) (hgap : StdGap ε lam) (μ : Fin n → ℝ)
+    : ∃ k : ℕ, ∀ w ∈ genSub E V, IsKHWVec ε E μ w → w ∈ layer ε E V k := by
   obtain ⟨hmono, h, hh, hbig⟩ := hgap
   have hn : (0 : ℝ) < h - n + 1 := by
     have : (0 : ℝ) ≤ n := Nat.cast_nonneg n
@@ -152,7 +168,8 @@ theorem khw_mem_layer (hE : IsGlRep E) (hU : IsInfUnitary ε E)
     simp only [layer]
     exact le_sup_left
   refine ⟨⌈(casValK ε μ - casValK ε (lowK ε lam)) / (2 * (h - n + 1))⌉₊, fun w hw hμ => ?_⟩
-  obtain ⟨w₀, hw₀, -, m, ws, rfl, hws⟩ := k_highest_weight_layer_decomp hE hU hV hc hmono hh hbig hw hμ
+  obtain ⟨w₀, hw₀, -, m, ws, rfl, hws⟩ :=
+    k_highest_weight_layer_decomp hE hU hV hc hmono hh hbig hw hμ
   refine add_mem (hmon (Nat.zero_le _) (show w₀ ∈ layer ε E V 0 from hw₀))
     (_root_.sum_mem fun j _ => ?_)
   by_cases hj : ws j = 0

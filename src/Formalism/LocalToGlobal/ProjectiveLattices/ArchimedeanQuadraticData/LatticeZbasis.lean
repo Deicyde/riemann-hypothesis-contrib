@@ -12,10 +12,13 @@ namespace Formalism.L2.Pj.FundamentalDomainD5
 
 open NumberField Matrix
 
-theorem lattice_zbasis {K : Type} [Field K] [NumberField K] {r : ℕ} (L : Submodule (𝓞 K) (Fin r → K))
-    (hfg : L.FG) (hspan : Submodule.span K (L : Set (Fin r → K)) = ⊤) :
-    ∃ e : Fin (Module.finrank ℚ K * r) → (Fin r → K), (∀ j, e j ∈ L) ∧ LinearIndependent ℚ e ∧
-      ∀ v ∈ L, ∃ n : Fin (Module.finrank ℚ K * r) → ℤ, v = ∑ j, (n j : ℚ) • e j := by
+theorem lattice_zbasis
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ} (L : Submodule (𝓞 K) (Fin r → K)) (hfg : L.FG)
+    (hspan : Submodule.span K (L : Set (Fin r → K)) = ⊤)
+    : ∃ e : Fin (Module.finrank ℚ K * r) → (Fin r → K),
+      (∀ j, e j ∈ L) ∧ LinearIndependent ℚ e
+        ∧ ∀ v ∈ L, ∃ n : Fin (Module.finrank ℚ K * r) → ℤ, v = ∑ j, (n j : ℚ) • e j := by
   classical
   haveI : Module.Finite (𝓞 K) L := Module.Finite.iff_fg.mpr hfg
   haveI : Module.Finite ℤ L := Module.Finite.trans (𝓞 K) L
@@ -23,7 +26,8 @@ theorem lattice_zbasis {K : Type} [Field K] [NumberField K] {r : ℕ} (L : Submo
   set b := Module.Free.chooseBasis ℤ L
   set f : Module.Free.ChooseBasisIndex ℤ L → (Fin r → K) := fun j => (b j : Fin r → K) with hf
   have hfZ : LinearIndependent ℤ f :=
-    b.linearIndependent.map' (L.subtype.restrictScalars ℤ) (LinearMap.ker_eq_bot.mpr Subtype.val_injective)
+    b.linearIndependent.map' (L.subtype.restrictScalars ℤ)
+      (LinearMap.ker_eq_bot.mpr Subtype.val_injective)
   have hfQ : LinearIndependent ℚ f := (LinearIndependent.iff_fractionRing ℤ ℚ).mp hfZ
   have hrep : ∀ v ∈ L, ∃ c : Module.Free.ChooseBasisIndex ℤ L → ℤ, v = ∑ j, (c j : ℚ) • f j := by
     intro v hv
@@ -45,7 +49,8 @@ theorem lattice_zbasis {K : Type} [Field K] [NumberField K] {r : ℕ} (L : Submo
     have hmem : ((⟨y • k, hyi⟩ : 𝓞 K)) • v ∈ L := L.smul_mem _ hv
     have hyK : (y : K) ≠ 0 := by exact_mod_cast hy0
     have heq : k • v = ((y : ℚ)⁻¹) • ((⟨y • k, hyi⟩ : 𝓞 K) • v) := by
-      rw [algebra_compatible_smul K ((y : ℚ)⁻¹), algebra_compatible_smul K (⟨y • k, hyi⟩ : 𝓞 K), smul_smul]
+      rw [algebra_compatible_smul K ((y : ℚ)⁻¹), algebra_compatible_smul K (⟨y • k, hyi⟩ : 𝓞 K),
+        smul_smul]
       congr 1
       simp only [map_inv₀, map_intCast, zsmul_eq_mul]
       show k = (y : K)⁻¹ * ((y : K) * k)
@@ -55,7 +60,9 @@ theorem lattice_zbasis {K : Type} [Field K] [NumberField K] {r : ℕ} (L : Submo
   have htop : ⊤ ≤ Submodule.span ℚ (Set.range f) := by
     intro x _
     have hx : x ∈ Submodule.span K (L : Set (Fin r → K)) := hspan ▸ Submodule.mem_top
-    have key : ∀ z ∈ Submodule.span K (L : Set (Fin r → K)), ∀ k : K, k • z ∈ Submodule.span ℚ (Set.range f) := by
+    have key
+        : ∀ z ∈ Submodule.span K (L : Set (Fin r → K)), ∀ k : K,
+          k • z ∈ Submodule.span ℚ (Set.range f) := by
       intro z hz
       induction hz using Submodule.span_induction with
       | mem v hv => exact hKL v hv

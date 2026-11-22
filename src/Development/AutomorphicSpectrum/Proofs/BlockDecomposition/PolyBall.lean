@@ -23,7 +23,9 @@ def polyBall (n : ℕ) (s : kˣ) : Subgroup (Multiplicative (Fin n → k)) where
     have h := hx i
     simpa [cball, Valuation.map_neg] using h
 
-def resChr (ψ : AddChar k Circle) {n : ℕ} (a : Fin n → k) (L : Subgroup (Multiplicative (Fin n → k))) : L →* ℂˣ :=
+def resChr
+    (ψ : AddChar k Circle) {n : ℕ} (a : Fin n → k) (L : Subgroup (Multiplicative (Fin n → k)))
+    : L →* ℂˣ :=
   (chrA k ψ a).comp L.subtype
 
 def unipIn (k : Type) [Field k] (n : ℕ) : Multiplicative (Fin n → k) →* Mir k n :=

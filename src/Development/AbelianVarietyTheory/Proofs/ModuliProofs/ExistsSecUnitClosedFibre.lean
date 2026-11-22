@@ -15,25 +15,31 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsReduce
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.ThetaDvr
 
-theorem app_eq_zero_of_not_mem {V : Type} [CommRing V] [IsDomain V] [IsLocalRing V] (G : Over (Sp V)) [Smooth G.hom]
-    {U : G.left.Opens} (a : Γ(G.left, U))
-    (h : ∀ x ∈ G.left.basicOpen a, G.hom x ≠ IsLocalRing.closedPoint V) :
-    ((fstG (IsLocalRing.maximalIdeal V) 0 G).left.app _).hom a = 0 := by
-
+theorem app_eq_zero_of_not_mem
+    {V : Type} [CommRing V] [IsDomain V] [IsLocalRing V]
+    (G : Over (Sp V)) [Smooth G.hom]
+    {U : G.left.Opens}
+    (a : Γ(G.left, U)) (h : ∀ x ∈ G.left.basicOpen a, G.hom x ≠ IsLocalRing.closedPoint V)
+    : ((fstG (IsLocalRing.maximalIdeal V) 0 G).left.app _).hom a = 0 := by
   have hk : _root_.IsReduced (V ⧸ IsLocalRing.maximalIdeal V ^ (0 + 1)) := by
     rw [zero_add, pow_one]
     infer_instance
   have : IsReduced (pullback G.hom (thick V (IsLocalRing.maximalIdeal V) 0)) :=
-    GlobalTheory.isReduced_of_smooth_of_isReduced (pullback.snd G.hom (thick V (IsLocalRing.maximalIdeal V) 0))
+    GlobalTheory.isReduced_of_smooth_of_isReduced (pullback.snd G.hom
+      (thick V (IsLocalRing.maximalIdeal V) 0))
 
-  have hpt : ∀ y : ↥(pullback G.hom (thick V (IsLocalRing.maximalIdeal V) 0)),
-      G.hom (pullback.fst G.hom (thick V (IsLocalRing.maximalIdeal V) 0) y) = IsLocalRing.closedPoint V := by
+  have hpt
+      : ∀ y : ↥(pullback G.hom (thick V (IsLocalRing.maximalIdeal V) 0)),
+        G.hom (pullback.fst G.hom (thick V (IsLocalRing.maximalIdeal V) 0) y)
+          = IsLocalRing.closedPoint V := by
     intro y
     rw [← Scheme.Hom.comp_apply, pullback.condition, Scheme.Hom.comp_apply]
     apply PrimeSpectrum.ext
@@ -42,8 +48,8 @@ theorem app_eq_zero_of_not_mem {V : Type} [CommRing V] [IsDomain V] [IsLocalRing
     · intro r hr
       have h0 : Ideal.Quotient.mk (IsLocalRing.maximalIdeal V ^ (0 + 1)) r = 0 :=
         Ideal.Quotient.eq_zero_iff_mem.mpr (by rw [zero_add, pow_one]; exact hr)
-      change Ideal.Quotient.mk (IsLocalRing.maximalIdeal V ^ (0 + 1)) r ∈
-        ((pullback.snd G.hom (thick V (IsLocalRing.maximalIdeal V) 0)) y).asIdeal
+      change Ideal.Quotient.mk (IsLocalRing.maximalIdeal V ^ (0 + 1)) r
+        ∈ ((pullback.snd G.hom (thick V (IsLocalRing.maximalIdeal V) 0)) y).asIdeal
       rw [h0]
       exact Ideal.zero_mem _
 
@@ -66,20 +72,26 @@ private lemma gs_id_eq_germ_moduli {X : Scheme.{0}} (U : X.Opens) (a : Γ(X, U))
   rw [dite_eq_left (show (𝟙 X) z ∈ U from hz)]
   rfl
 
-theorem exists_sec_unit_closed_fibre (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (G : Over (Sp V))
-    [GrpObj G] [Smooth G.hom] [IsSeparated G.hom] [QuasiCompact G.hom] [GeometricallyConnected G.hom] (N : LB G.left)
-    (hN : N.IsLB) (s : LB.Sec (N.pull (pullback.fst G.hom (jK V)))) (j) (hj : s.f j ≠ 0) :
-    ∃ (θ : LB.Sec N) (k : N.ι), ∃ x ∈ G.left.basicOpen (θ.f k), G.hom x = IsLocalRing.closedPoint V := by
+theorem exists_sec_unit_closed_fibre
+    (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    (G : Over (Sp V)) [GrpObj G] [Smooth G.hom] [IsSeparated G.hom] [QuasiCompact G.hom]
+    [GeometricallyConnected G.hom]
+    (N : LB G.left) (hN : N.IsLB) (s : LB.Sec (N.pull (pullback.fst G.hom (jK V))))
+    (j) (hj : s.f j ≠ 0)
+    : ∃ (θ : LB.Sec N) (k : N.ι), ∃ x ∈ G.left.basicOpen (θ.f k),
+      G.hom x = IsLocalRing.closedPoint V := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible V
   have hflat : (algebraMap V (FractionRing V)).Flat := by
     exact RingHom.flat_algebraMap_iff.mpr (IsLocalization.flat (FractionRing V) (nonZeroDivisors V))
   have : CompactSpace G.left := QuasiCompact.compactSpace_of_compactSpace G.hom
   have : QuasiSeparatedSpace G.left := quasiSeparatedSpace_of_quasiSeparated G.hom
   have hpb : IsPullback (pullback.fst G.hom (jK V)) (pullback.snd G.hom (jK V)) G.hom
-      (Spec.map (CommRingCat.ofHom (algebraMap V (FractionRing V)))) := IsPullback.of_hasPullback _ _
+      (Spec.map (CommRingCat.ofHom (algebraMap V (FractionRing V)))) :=
+    IsPullback.of_hasPullback _ _
 
-  obtain ⟨n, c, u, hu⟩ := GlobalTheory.FlatSec.exists_comb_of_flat V (FractionRing V) _ hflat G.left G.hom _
-    (pullback.fst G.hom (jK V)) _ hpb N hN s
+  obtain ⟨n, c, u, hu⟩ :=
+    GlobalTheory.FlatSec.exists_comb_of_flat V (FractionRing V) _ hflat G.left G.hom _
+      (pullback.fst G.hom (jK V)) _ hpb N hN s
   have hne : ∃ i k, (u i).f k ≠ 0 := by
     by_contra hcon
     push Not at hcon
@@ -109,9 +121,10 @@ theorem exists_sec_unit_closed_fibre (V : Type) [CommRing V] [IsDomain V] [IsDis
     push Not at hcon
     exact hk₀ ((GlobalTheory.sec_eq_zero_and_hom_eq_of_thickenings V _ hjac G).1 N hN θ₀ hcon k₀)
   classical
-
-  have hunit : ∀ (θ : LB.Sec N) (k : N.ι), ((fstG (IsLocalRing.maximalIdeal V) 0 G).left.app _).hom (θ.f k) ≠ 0 →
-      ∃ x ∈ G.left.basicOpen (θ.f k), G.hom x = IsLocalRing.closedPoint V := by
+  have hunit
+      : ∀ (θ : LB.Sec N) (k : N.ι),
+        ((fstG (IsLocalRing.maximalIdeal V) 0 G).left.app _).hom (θ.f k) ≠ 0
+          → ∃ x ∈ G.left.basicOpen (θ.f k), G.hom x = IsLocalRing.closedPoint V := by
     intro θ k hθ
     by_contra hcon
     push Not at hcon
@@ -139,7 +152,11 @@ theorem exists_sec_unit_closed_fibre (V : Type) [CommRing V] [IsDomain V] [IsDis
     obtain ⟨x, hx, hxc⟩ := hunit τ k hk
     exact ⟨τ, k, x, hx, hxc⟩
 
-theorem thetaNZ_of_polAt : Laws → Laws2 → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (t : SAB H (Sp V)), GlobalTheory.LN.PolAt t (jK V) → GlobalTheory.LN.ThetaNZ t.G t.PP.L := by
+theorem thetaNZ_of_polAt
+    : Laws → Laws2
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (V : Type) [CommRing V]
+          [IsDomain V] [IsDiscreteValuationRing V] (t : SAB H (Sp V)),
+        GlobalTheory.LN.PolAt t (jK V) → GlobalTheory.LN.ThetaNZ t.G t.PP.L := by
   intro hL hL2 E _ _ _ H V _ _ _ t ht
   obtain ⟨A, oA, gen, -, hiso, -⟩ := GlobalTheory.LN.exists_polAV_of_polAt hL hL2 E H V t ht
   have hsa := t.4
@@ -157,7 +174,8 @@ theorem thetaNZ_of_polAt : Laws → Laws2 → ∀ (E : Type) [Field E] [NumberFi
     intro y _
     change A.A.hom (gen.hom.left y) ∈ W
     rwa [Subsingleton.elim (A.A.hom (gen.hom.left y)) (IsLocalRing.closedPoint (FractionRing V))]
-  obtain ⟨θ', hθ'⟩ := GlobalTheory.ThetaLocal.exists_sec_pull A.isLB (LB.isLB_pull hLt _) gen.hom.left w hw hO θ hθ
+  obtain ⟨θ', hθ'⟩ :=
+    GlobalTheory.ThetaLocal.exists_sec_pull A.isLB (LB.isLB_pull hLt _) gen.hom.left w hw hO θ hθ
   have hgy : gen.hom.left (gen.inv.left g) = g := by
     rw [← Scheme.Hom.comp_apply, ← Over.comp_left, gen.inv_hom_id, Over.id_left]
     rfl

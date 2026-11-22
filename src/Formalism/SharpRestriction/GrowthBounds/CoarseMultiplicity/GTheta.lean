@@ -8,11 +8,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.ColumnSystems.Pf
 
-open Formalism.MainNotions.G MvPolynomial Formalism.MainNotions.G.GLWeightTheory Formalism.MainNotions.CovariantDegrees
+open Formalism.MainNotions.G MvPolynomial Formalism.MainNotions.G.GLWeightTheory
+  Formalism.MainNotions.CovariantDegrees
 
-theorem op_single_add {K σ : Type} [Field K] (a : σ) (b : ℕ) (f : σ →₀ ℕ) (ha : a ∉ f.support) (u : MvPolynomial σ K) :
-    monomial (Finsupp.single a b + f) (1 : K) * divDer (Finsupp.single a b + f) u =
-      cth a b (monomial f (1 : K) * divDer f u) := by
+theorem op_single_add
+    {K σ : Type} [Field K] (a : σ) (b : ℕ) (f : σ →₀ ℕ) (ha : a ∉ f.support) (u : MvPolynomial σ K)
+    : monomial (Finsupp.single a b + f) (1 : K) * divDer (Finsupp.single a b + f) u
+      = cth a b (monomial f (1 : K) * divDer f u) := by
   classical
   ext μ
   rw [eig_one, coeff_cth, eig_one]
@@ -26,12 +28,16 @@ theorem op_single_add {K σ : Type} [Field K] (a : σ) (b : ℕ) (f : σ →₀ 
 
 section GlobalTheory
 
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero (KK O)] {N r : ℕ} [NeZero r]
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero (KK O)]
+  {N r : ℕ} [NeZero r]
 
-theorem op_SSt (D7 : Formalism.BasicNotions.D7) {D : BlockData N} (hT : TieOK D) (ν : BVar N r D.T.t →₀ ℕ) :
-    (∀ v ∈ ν.support, OddV D v) → ∀ (thr thr' : Fin D.T.q → WithTop ℤ),
-    (∀ k, thr k + (((ν.sum fun _ n => n : ℕ) : ℤ) : WithTop ℤ) ≤ thr' k) →
-    ∀ u ∈ SSt O r D thr, monomial ν (1 : KK O) * divDer ν u ∈ SSt O r D thr' := by
+theorem op_SSt
+    (D7 : Formalism.BasicNotions.D7) {D : BlockData N} (hT : TieOK D) (ν : BVar N r D.T.t →₀ ℕ)
+    : (∀ v ∈ ν.support, OddV D v)
+      → ∀ (thr thr' : Fin D.T.q → WithTop ℤ),
+        (∀ k, thr k + (((ν.sum fun _ n => n : ℕ) : ℤ) : WithTop ℤ) ≤ thr' k)
+          → ∀ u ∈ SSt O r D thr, monomial ν (1 : KK O) * divDer ν u ∈ SSt O r D thr' := by
   classical
   induction ν using Finsupp.induction with
   | zero =>
@@ -50,9 +56,15 @@ theorem op_SSt (D7 : Formalism.BasicNotions.D7) {D : BlockData N} (hT : TieOK D)
       · rfl
       · rw [Finsupp.support_single _ hb, Finset.disjoint_singleton_left]
         exact ha
-    have h1 := ih (fun v hvf => hv v (by rw [hsupp]; exact Finset.mem_insert_of_mem hvf)) thr
-      (fun k => thr k + (((f.sum fun _ n => n : ℕ) : ℤ) : WithTop ℤ)) (fun _ => le_rfl) u hu
-    refine cth_SSt D7 hT b (fun k => ?_) a (hv a (by rw [hsupp]; exact Finset.mem_insert_self _ _)) h1
+    have h1 :=
+      ih
+        (fun v hvf => hv v (by rw [hsupp]; exact Finset.mem_insert_of_mem hvf))
+        thr
+        (fun k => thr k + (((f.sum fun _ n => n : ℕ) : ℤ) : WithTop ℤ))
+        (fun _ => le_rfl)
+        u hu
+    refine
+      cth_SSt D7 hT b (fun k => ?_) a (hv a (by rw [hsupp]; exact Finset.mem_insert_self _ _)) h1
     refine le_trans (le_of_eq ?_) (hthr k)
     rw [hsum, add_assoc]
     push_cast
@@ -60,8 +72,9 @@ theorem op_SSt (D7 : Formalism.BasicNotions.D7) {D : BlockData N} (hT : TieOK D)
 
 end GlobalTheory
 
-theorem tieOK_blockBase (p : ℕ) {r s : ℕ} (S : SegData s) (aTop : Fin s → ℕ) (aPlus : ℕ) (b : SegBlock s r) :
-    TieOK (blockBase p S aTop aPlus b) := by
+theorem tieOK_blockBase
+    (p : ℕ) {r s : ℕ} (S : SegData s) (aTop : Fin s → ℕ) (aPlus : ℕ) (b : SegBlock s r)
+    : TieOK (blockBase p S aTop aPlus b) := by
   refine { lt := ?_, inj := ?_, sep := ?_, uW := ?_, vecE := ?_ }
   · intro i
     have := (uTop S i).2
@@ -85,8 +98,9 @@ theorem tieOK_blockBase (p : ℕ) {r s : ℕ} (S : SegData s) (aTop : Fin s → 
     show decide ((2 * ((uTop S i : Fin s) : ℕ) + 1) % 2 = 0) = false
     simp
 
-theorem thr_shift (x : WithTop ℤ) (mm : ℝ) (n c4 : ℕ) (h : n ≤ c4) :
-    x.map (fun y : ℤ => ⌊(y : ℝ) - mm⌋) + ((n : ℤ) : WithTop ℤ) ≤ x.map (fun y : ℤ => ⌊(y : ℝ) - (mm - (c4 : ℝ))⌋) := by
+theorem thr_shift (x : WithTop ℤ) (mm : ℝ) (n c4 : ℕ) (h : n ≤ c4)
+    : x.map (fun y : ℤ => ⌊(y : ℝ) - mm⌋) + ((n : ℤ) : WithTop ℤ)
+      ≤ x.map (fun y : ℤ => ⌊(y : ℝ) - (mm - (c4 : ℝ))⌋) := by
   cases x with
   | top => simp
   | coe y =>
@@ -100,10 +114,15 @@ theorem gThetaAt (D7 : Formalism.BasicNotions.D7) : GThetaAt := by
   intro C0 CE1 CE2 X _ O _ _ _ _ j b _ c T q hT mm u hu
   unfold gOp
   refine Submodule.sum_mem _ fun ν hν => Submodule.smul_mem _ _ ?_
-  have hTie := tieOK_blockBase X.p (r := X.m) (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j) b
+  have hTie :=
+    tieOK_blockBase X.p (r := X.m) (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j)
+      b
   refine op_SSt (O := O) (r := X.m) D7 hTie ν ?_
     (fun k => (segmentCapacities X.p (X.seg C0 CE1 CE2 j) b k).map (fun y : ℤ => ⌊(y : ℝ) - mm⌋))
-    (fun k => (segmentCapacities X.p (X.seg C0 CE1 CE2 j) b k).map (fun y : ℤ => ⌊(y : ℝ) - (mm - 4 * (c : ℝ))⌋)) ?_ u hu
+    (fun k =>
+      (segmentCapacities X.p (X.seg C0 CE1 CE2 j) b k).map
+        (fun y : ℤ => ⌊(y : ℝ) - (mm - 4 * (c : ℝ))⌋))
+    ?_ u hu
   · intro v hv
     have h := (hT ν hν).2 v hv
     rcases v with ⟨a, c'⟩ | ⟨l, s⟩
@@ -112,8 +131,12 @@ theorem gThetaAt (D7 : Formalism.BasicNotions.D7) : GThetaAt := by
       · intro e
         have := congrArg Fin.val e
         simp only [Fin.val_castSucc] at this
-        have h2 : ((blockBase X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j) b).uPos : ℕ) =
-          2 * segS X.TT j := rfl
+        have h2
+            : ((blockBase X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j)
+                  b).uPos
+                : ℕ)
+              = 2 * segS X.TT j :=
+          rfl
         omega
       · intro e
         have := congrArg Fin.val e
@@ -122,11 +145,18 @@ theorem gThetaAt (D7 : Formalism.BasicNotions.D7) : GThetaAt := by
     · have h' : (l : ℕ) < (X.seg C0 CE1 CE2 j).t := h
       intro e
       have := congrArg Fin.val e
-      have h2 : ((Fin.last (blockBase X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j) b).T.t :
-        Fin _) : ℕ) = (X.seg C0 CE1 CE2 j).t := rfl
+      have h2
+          : ((Fin.last (blockBase X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j)
+                  (segAPlus X.TT X.aT j) b).T.t
+                : Fin _)
+              : ℕ)
+            = (X.seg C0 CE1 CE2 j).t :=
+        rfl
       omega
   · intro k
-    have := thr_shift (segmentCapacities X.p (X.seg C0 CE1 CE2 j) b k) mm (ν.sum fun _ n => n) (4 * c) (hT ν hν).1
+    have :=
+      thr_shift (segmentCapacities X.p (X.seg C0 CE1 CE2 j) b k) mm (ν.sum fun _ n => n) (4 * c)
+        (hT ν hν).1
     have e : (((4 * c : ℕ) : ℕ) : ℝ) = 4 * (c : ℝ) := by push_cast; ring
     rw [e] at this
     exact this

@@ -13,38 +13,51 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC
 
 namespace UpperTheory.Gal.Int.Geo
 
-private theorem red_pow_add_apply_eq (hA : A11) (l : ℕ) [Fact (Nat.Prime l)] (E : Spc) (n i : ℤ)
-    (x : Hl l E n i) (m a : ℕ) :
-    red (l ^ (m + a)) (l ^ m) E n i ((x : (j : ℕ) → HtL l j E n i) (m + a)) =
-      (x : (j : ℕ) → HtL l j E n i) m := by
+private theorem red_pow_add_apply_eq
+    (hA : A11) (l : ℕ) [Fact (Nat.Prime l)] (E : Spc) (n i : ℤ) (x : Hl l E n i) (m a : ℕ)
+    : red (l ^ (m + a)) (l ^ m) E n i ((x : (j : ℕ) → HtL l j E n i) (m + a))
+      = (x : (j : ℕ) → HtL l j E n i) m := by
   have hl : l ≠ 0 := (Fact.out : l.Prime).ne_zero
-  have hx : ∀ k : ℕ, red (l ^ (k + 1)) (l ^ k) E n i ((x : (j : ℕ) → HtL l j E n i) (k + 1)) =
-      (x : (j : ℕ) → HtL l j E n i) k := x.2
+  have hx
+      : ∀ k : ℕ,
+        red (l ^ (k + 1)) (l ^ k) E n i ((x : (j : ℕ) → HtL l j E n i) (k + 1))
+          = (x : (j : ℕ) → HtL l j E n i) k :=
+    x.2
   induction a with
   | zero =>
     haveI : NeZero (l ^ m) := ⟨pow_ne_zero _ hl⟩
     exact (hA (l ^ m) (l ^ m) dvd_rfl E).2.2.1 n i _
   | succ a ih =>
     haveI : NeZero (l ^ (m + (a + 1))) := ⟨pow_ne_zero _ hl⟩
-    have h4 := (hA (l ^ (m + (a + 1))) (l ^ (m + a)) (pow_dvd_pow l (by omega)) E).2.2.2 (l ^ m)
-      (pow_dvd_pow l (by omega)) n i ((x : (j : ℕ) → HtL l j E n i) (m + (a + 1)))
+    have h4 :=
+      (hA (l ^ (m + (a + 1))) (l ^ (m + a)) (pow_dvd_pow l (by omega)) E).2.2.2 (l ^ m)
+        (pow_dvd_pow l (by omega)) n i ((x : (j : ℕ) → HtL l j E n i) (m + (a + 1)))
     rw [← h4]
     exact (congrArg (red (l ^ (m + a)) (l ^ m) E n i) (hx (m + a))).trans ih
 
-private theorem red_pow_apply_eq_of_le (hA : A11) (l : ℕ) [Fact (Nat.Prime l)] (E : Spc) (n i : ℤ)
-    (x : Hl l E n i) (m M : ℕ) (h : m ≤ M) :
-    red (l ^ M) (l ^ m) E n i ((x : (j : ℕ) → HtL l j E n i) M) = (x : (j : ℕ) → HtL l j E n i) m := by
+private theorem red_pow_apply_eq_of_le
+    (hA : A11)
+    (l : ℕ) [Fact (Nat.Prime l)]
+    (E : Spc) (n i : ℤ) (x : Hl l E n i)
+    (m M : ℕ) (h : m ≤ M)
+    : red (l ^ M) (l ^ m) E n i ((x : (j : ℕ) → HtL l j E n i) M)
+      = (x : (j : ℕ) → HtL l j E n i) m := by
   obtain ⟨a, rfl⟩ := Nat.exists_eq_add_of_le h
   exact red_pow_add_apply_eq hA l E n i x m a
 
-private theorem exists_eq_pow_smul_of_lev_eq_zero (hA : A11) (l : ℕ) [Fact (Nat.Prime l)] (E : Spc) (n i : ℤ)
-    (hf : ∀ m : ℕ, Finite (Ht (l ^ m) E n i)) (hB : ∀ b : ℕ, LateralTheory.KummerTheory.BockData l b E i) (b : ℕ)
-    (x : Hl l E n i) (hx : LateralTheory.KummerTheory.lev l x b = 0) : ∃ y : Hl l E n i, x = (l : ℤ_[l]) ^ b • y := by
+private theorem exists_eq_pow_smul_of_lev_eq_zero
+    (hA : A11)
+    (l : ℕ) [Fact (Nat.Prime l)]
+    (E : Spc) (n i : ℤ) (hf : ∀ m : ℕ, Finite (Ht (l ^ m) E n i))
+    (hB : ∀ b : ℕ, LateralTheory.KummerTheory.BockData l b E i)
+    (b : ℕ) (x : Hl l E n i) (hx : LateralTheory.KummerTheory.lev l x b = 0)
+    : ∃ y : Hl l E n i, x = (l : ℤ_[l]) ^ b • y := by
   obtain ⟨u, d, hud⟩ := hB b
   let xs : (j : ℕ) → HtL l j E n i := x
   have hmem : ∀ k : ℕ, red (l ^ (k + 1)) (l ^ k) E n i (xs (k + 1)) = xs k := x.2
   let S : ℕ → Type 1 := fun a => {z : Ht (l ^ a) E n i // u a n z = xs (b + a)}
-  have hS : ∀ (a : ℕ) (z : S (a + 1)), u a n (red (l ^ (a + 1)) (l ^ a) E n i z.1) = xs (b + a) := by
+  have hS
+      : ∀ (a : ℕ) (z : S (a + 1)), u a n (red (l ^ (a + 1)) (l ^ a) E n i z.1) = xs (b + a) := by
     intro a z
     rw [← (hud a n).2.2.2.2.2 z.1, z.2]
     exact hmem (b + a)
@@ -96,9 +109,12 @@ theorem vFin_of (h : KunnethLefschetz.In) : GlobalTheory.GalV.VFin := by
     haveI : NeZero (l ^ m) := ⟨pow_ne_zero _ hl0⟩
     exact h.e4 (l ^ m) k (by push_cast; exact hl.pow m) p n i
   have hM : Module.Finite ℤ_[l] (Hl l (sch.obj X) n i) :=
-    LateralTheory.EWeil.AdicFinPf.AdicFin_of l (sch.obj X) n i hfin
-      (fun b x hx => exists_eq_pow_smul_of_lev_eq_zero h.a11 l (sch.obj X) n i hfin
-        (fun b' => LateralTheory.Fin.Bock.etale_bockstein_sequence_adic_finiteness h.a7 h.a8 h.a10 h.a11 l b' (sch.obj X) i hInv) b x hx)
+    LateralTheory.EWeil.AdicFinPf.AdicFin_of l (sch.obj X) n i hfin (fun b x hx =>
+      exists_eq_pow_smul_of_lev_eq_zero h.a11 l (sch.obj X) n i hfin
+        (fun b' =>
+          LateralTheory.Fin.Bock.etale_bockstein_sequence_adic_finiteness h.a7 h.a8 h.a10 h.a11 l b'
+            (sch.obj X) i hInv)
+        b x hx)
   exact ⟨hM, Module.Finite.base_change ℤ_[l] ℚ_[l] _⟩
 
 end UpperTheory.Gal.Int.Geo

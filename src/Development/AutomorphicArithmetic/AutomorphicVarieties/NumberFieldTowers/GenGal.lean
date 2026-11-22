@@ -8,11 +8,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.NumberField
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Tower
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Tower
 
-theorem UpperTheory.V.Tower.genGal :
-    ∀ (k L Ω : Type) [Field k] [NumberField k] [Field L] [NumberField L] [Field Ω] [Algebra k L] [Algebra k Ω] [Algebra L Ω] [IsScalarTower k L Ω] [IsAlgClosure k Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime], IsClosed (galOf k L Ω : Set (G k Ω)) ∧ (Procyc L Ω l ↔ l ≠ 2 ∨ galOf k L Ω ≤ gamU l ⊤) ∧
-        (Procyc L Ω l → ∃ γ, IsGen l (galOf k L Ω) γ) := by
+theorem UpperTheory.V.Tower.genGal
+    : ∀ (k L Ω : Type) [Field k] [NumberField k] [Field L] [NumberField L] [Field Ω] [Algebra k L]
+        [Algebra k Ω] [Algebra L Ω] [IsScalarTower k L Ω] [IsAlgClosure k Ω] [IsAlgClosure L Ω]
+        (l : ℕ) [Fact l.Prime],
+      IsClosed (galOf k L Ω : Set (G k Ω)) ∧ (Procyc L Ω l ↔ l ≠ 2 ∨ galOf k L Ω ≤ gamU l ⊤)
+        ∧ (Procyc L Ω l → ∃ γ, IsGen l (galOf k L Ω) γ) := by
   intro k L Ω _ _ _ _ _ _ _ _ _ _ _ l _
   have hcl : IsClosed (galOf k L Ω : Set (G k Ω)) :=
     Subgroup.isClosed_of_isOpen _ (galEmbTop k L Ω).2.1

@@ -13,8 +13,9 @@ namespace GroundTheory.Heights₂.Heights.Kleiman.TranslateEq
 
 open MvPolynomial
 
-theorem SerreVanish.equiv (hC : GradedCech.Statement) :
-    Kleiman.SerreVanish.Statement.{0, 0} ↔ IndefiniteRowSideFullHecke.Kleiman.SerreVanish.Statement := by
+theorem SerreVanish.equiv (hC : GradedCech.Statement)
+    : Kleiman.SerreVanish.Statement.{0, 0}
+      ↔ IndefiniteRowSideFullHecke.Kleiman.SerreVanish.Statement := by
   constructor
   · intro hA S _ _ N M _ _ _ _ G hfin
     obtain ⟨c₀, hc₀⟩ := hA S N M (gradedEquiv S N M G) hfin

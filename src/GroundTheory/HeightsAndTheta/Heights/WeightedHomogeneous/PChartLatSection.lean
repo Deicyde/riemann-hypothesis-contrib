@@ -20,10 +20,7 @@ namespace ChartLatSection
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι] {n : ι → ℕ} {Ω : Type} [Field Ω]
 
-
-
 end ChartLatSection
-
 
 end
 

@@ -17,8 +17,7 @@ open Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep in
 theorem gauge_left_line_holds : GLLeft := by
   intro Wp Wq _ _ _ _ _ _ P Bs hpl hk ζ hζ Fr hFr
   obtain ⟨-, hz, hz', hTz, hTz', -, -⟩ := hpl
-  have hζ' : Tz P.k P.r Bs.z * Tz P.k P.r Bs.z' < Complex.normSq ζ := by
-    rw [hTz, hTz']; exact hζ
+  have hζ' : Tz P.k P.r Bs.z * Tz P.k P.r Bs.z' < Complex.normSq ζ := by rw [hTz, hTz']; exact hζ
   set μ := NF.muZ P.k P.r Bs.μsec ζ with hμ
   have hm := NFRadRedA.muZ_uwb Bs.sec hζ'
   have hG := NFRadRedA.uwb_glev hm
@@ -37,21 +36,27 @@ theorem gauge_left_line_holds : GLLeft := by
     rw [sub_pos, lt_div_iff₀ hT]; linarith
   set p := SSn.prWv P.k P.r Bs.z y with hpdef
   have hpp := DU.prWv_norm hT hy hyy hyz
-  have hre : (herm (Hpk P.k P.r) p p).re = Complex.normSq ζ / Tz P.k P.r Bs.z - Tz P.k P.r Bs.z' := by
+  have hre
+      : (herm (Hpk P.k P.r) p p).re = Complex.normSq ζ / Tz P.k P.r Bs.z - Tz P.k P.r Bs.z' := by
     rw [hpp]; simp
-  have hν : SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ =
-      (((Real.sqrt (Complex.normSq ζ / Tz P.k P.r Bs.z - Tz P.k P.r Bs.z'))⁻¹ : ℝ) : ℂ) • p := by
+  have hν
+      : SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ
+        = (((Real.sqrt (Complex.normSq ζ / Tz P.k P.r Bs.z - Tz P.k P.r Bs.z'))⁻¹ : ℝ) : ℂ)
+          • p := by
     show SSn.unitH P.k P.r p = _
     unfold SSn.unitH
     rw [hre]
-  have hsne : (((Real.sqrt (Complex.normSq ζ / Tz P.k P.r Bs.z - Tz P.k P.r Bs.z'))⁻¹ : ℝ) : ℂ) ≠ 0 := by
-    have : 0 < Real.sqrt (Complex.normSq ζ / Tz P.k P.r Bs.z - Tz P.k P.r Bs.z') := Real.sqrt_pos.2 hpos
+  have hsne
+      : (((Real.sqrt (Complex.normSq ζ / Tz P.k P.r Bs.z - Tz P.k P.r Bs.z'))⁻¹ : ℝ) : ℂ) ≠ 0 := by
+    have : 0 < Real.sqrt (Complex.normSq ζ / Tz P.k P.r Bs.z - Tz P.k P.r Bs.z') :=
+      Real.sqrt_pos.2 hpos
     exact_mod_cast (inv_pos.2 this).ne'
 
   have hFz : ∀ a, herm (Hpk P.k P.r) (Fr a) Bs.z = 0 := fun a => hFr.2.2 a Bs.z (by simp)
   have hFy : ∀ a, herm (Hpk P.k P.r) (Fr a) y = 0 := by
     intro a
-    have h1 : herm (Hpk P.k P.r) (Fr a) (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ) = 0 := hFr.2.2 a _ (by simp)
+    have h1 : herm (Hpk P.k P.r) (Fr a) (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ) = 0 :=
+      hFr.2.2 a _ (by simp)
     rw [hν, DU.hsmul_r] at h1
     have h2 : herm (Hpk P.k P.r) (Fr a) p = 0 := by
       rcases mul_eq_zero.1 h1 with h | h
@@ -61,8 +66,7 @@ theorem gauge_left_line_holds : GLLeft := by
     exact h2
   have hmi : μ⁻¹ * μ = 1 := Gauge.GC.KLAM.inv_mul_uh hU
   have hmm : μ * μ⁻¹ = 1 := Gauge.GC.KLAM.mul_inv_uh hU
-  have hz'e : Bs.z' = μ⁻¹ *ᵥ y := by
-    rw [hydef, Matrix.mulVec_mulVec, hmi, Matrix.one_mulVec]
+  have hz'e : Bs.z' = μ⁻¹ *ᵥ y := by rw [hydef, Matrix.mulVec_mulVec, hmi, Matrix.one_mulVec]
   have hF' : Q.IsFrameOf P.k P.r [μ⁻¹ *ᵥ Bs.z, Bs.z'] (fun a => μ⁻¹ *ᵥ Fr a) := by
     refine ⟨fun a => Qx8.inWb_mulVec hGi (hFr.1 a), fun a b => ?_, fun a w hw => ?_⟩
     · rw [Qx2.herm_uh hUi]; exact hFr.2.1 a b
@@ -71,10 +75,12 @@ theorem gauge_left_line_holds : GLLeft := by
       · rw [Qx2.herm_uh hUi]; exact hFz a
       · rw [hz'e, Qx2.herm_uh hUi]; exact hFy a
   refine ⟨hF', fun X hX w v => ?_⟩
-  have hXF : X ∈ Gauge.GC.FibAt P.k P.r Bs.z Bs.z' Bs.π Bs.π' μ :=
-    fun h hh h' hh' he => hX (h, h') ⟨hh, hh', he⟩
-  have hint := Qx8.capRep_intertwine hF' Bs.π'_rep Bs.π'_cont hU X
-    (fun h' hh' hy' u => Gauge.GC.KLAM.fib_intertwine Bs.π_rep hG hXF hh' hy' u) w v
+  have hXF : X ∈ Gauge.GC.FibAt P.k P.r Bs.z Bs.z' Bs.π Bs.π' μ := fun h hh h' hh' he =>
+    hX (h, h') ⟨hh, hh', he⟩
+  have hint :=
+    Qx8.capRep_intertwine hF' Bs.π'_rep Bs.π'_cont hU X
+      (fun h' hh' hy' u => Gauge.GC.KLAM.fib_intertwine Bs.π_rep hG hXF hh' hy' u)
+      w v
   have hback : (fun a => μ *ᵥ (μ⁻¹ *ᵥ Fr a)) = Fr := by
     funext a
     rw [Matrix.mulVec_mulVec, hmm, Matrix.one_mulVec]

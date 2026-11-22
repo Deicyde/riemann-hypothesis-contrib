@@ -7,17 +7,21 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Che
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry MvPolynomial MeasureTheory Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.L2DbarEstimates (V)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm GlobalTheory.LineForm GlobalTheory.ChernCalc
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts
+  GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm
+  GlobalTheory.LineForm GlobalTheory.ChernCalc
 open scoped Matrix ContDiff ComplexOrder
 
 namespace GlobalTheory.ChernCalc
 
-theorem conn_lowerTriangular {n s : ℕ} {T : V n → Matrix (Fin s) (Fin s) ℂ} {x : V n}
-    (h0 : ∀ᶠ y in 𝓝 x, ∀ i j, i < j → T y i j = 0) (hd : ∀ i, T x i i ≠ 0) (ξ : V n) :
-    (∀ i j, j < i → conn T x ξ i j = 0) ∧
-      ∀ i, conn T x ξ i i = (T x i i)⁻¹ * del (fun y => T y i i) x ξ := by
+theorem conn_lowerTriangular
+    {n s : ℕ} {T : V n → Matrix (Fin s) (Fin s) ℂ} {x : V n}
+    (h0 : ∀ᶠ y in 𝓝 x, ∀ i j, i < j → T y i j = 0) (hd : ∀ i, T x i i ≠ 0) (ξ : V n)
+    : (∀ i j, j < i → conn T x ξ i j = 0)
+      ∧ ∀ i, conn T x ξ i i = (T x i i)⁻¹ * del (fun y => T y i i) x ξ := by
   have hT : (T x)ᵀ.BlockTriangular id := fun i j hij => h0.self_of_nhds j i hij
   have hu' : IsUnit (T x)ᵀ.det := by
     rw [Matrix.det_of_isUpperTriangular hT]
@@ -33,7 +37,8 @@ theorem conn_lowerTriangular {n s : ℕ} {T : V n → Matrix (Fin s) (Fin s) ℂ
   refine ⟨fun i j hij => hc hij, fun i => ?_⟩
   have h := congrFun (congrFun (transpose_mul_conn hu ξ) i) i
   rw [Matrix.mul_apply, Finset.sum_eq_single i, Matrix.transpose_apply, Matrix.transpose_apply,
-    mdel_apply] at h
+      mdel_apply]
+    at h
   · rw [← h, inv_mul_cancel_left₀ (hd i)]
   · intro k _ hk
     rcases lt_or_gt_of_ne hk with hk | hk
@@ -41,15 +46,21 @@ theorem conn_lowerTriangular {n s : ℕ} {T : V n → Matrix (Fin s) (Fin s) ℂ
     · rw [hc (show id i < id k from hk), mul_zero]
   · simp
 
-theorem curv_lowerTriangular : ∀ (n s : ℕ) (T : V n → Matrix (Fin s) (Fin s) ℂ) (d : Fin s → V n → ℝ) (v : V n), MContDiffAt ∞ T v → (∀ i, 0 < d i v) → (∀ᶠ x in 𝓝 v, (∀ i j, i < j → T x i j = 0) ∧ ∀ i, T x i i = d i x) → ∀ ξ η, (∀ i j, j < i → curv T v ξ η i j = 0) ∧ ∀ i, curv T v ξ η i i = -leviForm (fun x => Real.log (d i x)) v ξ η := by
+theorem curv_lowerTriangular
+    : ∀ (n s : ℕ) (T : V n → Matrix (Fin s) (Fin s) ℂ) (d : Fin s → V n → ℝ) (v : V n),
+      MContDiffAt ∞ T v → (∀ i, 0 < d i v)
+        → (∀ᶠ x in 𝓝 v, (∀ i j, i < j → T x i j = 0) ∧ ∀ i, T x i i = d i x)
+        → ∀ ξ η,
+          (∀ i j, j < i → curv T v ξ η i j = 0)
+            ∧ ∀ i, curv T v ξ η i i = - leviForm (fun x => Real.log (d i x)) v ξ η := by
   intro n s T d v hT hd he ξ η
   have h0 : ∀ᶠ y in 𝓝 v, ∀ i j, i < j → T y i j = 0 := he.mono fun _ h => h.1
-  have hv : ∀ i, T v i i ≠ 0 := fun i => by
-    rw [he.self_of_nhds.2 i]; exact_mod_cast (hd i).ne'
+  have hv : ∀ i, T v i i ≠ 0 := fun i => by rw [he.self_of_nhds.2 i]; exact_mod_cast (hd i).ne'
   have hne : ∀ᶠ y in 𝓝 v, ∀ i, T y i i ≠ 0 :=
     eventually_all.2 fun i => (hT i i).continuousAt.eventually_ne (hv i)
-  have hc : ∀ᶠ x in 𝓝 v, (∀ i j, j < i → conn T x ξ i j = 0) ∧
-      ∀ i, conn T x ξ i i = (T x i i)⁻¹ * del (fun y => T y i i) x ξ := by
+  have hc
+      : ∀ᶠ x in 𝓝 v, (∀ i j, j < i → conn T x ξ i j = 0) ∧
+        ∀ i, conn T x ξ i i = (T x i i)⁻¹ * del (fun y => T y i i) x ξ := by
     filter_upwards [h0.eventually_nhds, hne] with x h1 h2
     exact conn_lowerTriangular h1 h2 ξ
   refine ⟨fun i j hij => ?_, fun i => ?_⟩
@@ -59,9 +70,11 @@ theorem curv_lowerTriangular : ∀ (n s : ℕ) (T : V n → Matrix (Fin s) (Fin 
   · let H : V n → Matrix (Fin 1) (Fin 1) ℂ := fun x => Matrix.of fun _ _ => T x i i
     have hH : ∀ᶠ x in 𝓝 v, conn T x ξ i i = conn H x ξ 0 0 := by
       filter_upwards [hc, hne] with x h1 h2
-      rw [h1.2 i, (conn_lowerTriangular (T := H)
-        (Eventually.of_forall fun _ a b hab => absurd (Subsingleton.elim a b) hab.ne)
-        (fun _ => h2 i) ξ).2 0]
+      rw [h1.2 i,
+        (conn_lowerTriangular (T := H)
+          (Eventually.of_forall fun _ a b hab => absurd (Subsingleton.elim a b) hab.ne)
+          (fun _ => h2 i)
+          ξ).2 0]
       rfl
     have hs : ContDiffAt ℝ 2 (d i) v := by
       have h1 : ContDiffAt ℝ 2 (fun x => (T x i i).re) v :=

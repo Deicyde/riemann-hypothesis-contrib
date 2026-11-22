@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.AppellH
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 
@@ -206,11 +208,11 @@ lemma neg_eq (hv : ValueRules) (hL : L.IsLB) (hs : Out.Sym A L)
 
 end SymmetricSemicharacter
 
-
 open SymmetricSemicharacter in
-theorem semicharacter_sq_eq_one_of_symmetric :
-    ∀ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ)
-      (χ : u.Λ → ℂ), u.IsAH Hm χ → ∀ l, χ l ^ 2 = 1 := by
+theorem semicharacter_sq_eq_one_of_symmetric
+    : ∀ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ)
+        (χ : u.Λ → ℂ),
+      u.IsAH Hm χ → ∀ l, χ l ^ 2 = 1 := by
   intro P u Hm χ h l
   have h1 := mul_neg_eq_one u valueRules P.isLB h l
   rwa [neg_eq u valueRules P.isLB P.sym h l, ← sq] at h1

@@ -11,6 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConstantCycl
 namespace GlobalTheory.GaussManinTop
 
 theorem main : GlobalTheory.Published.GaussManinPeriods :=
-  GlobalTheory.T.gaussManinPeriods_of_span_and_taylor_clauses GlobalTheory.T.periods_span_deRhamHomology_rank_two_g GlobalTheory.T.constantCycleExtension_taylorPeriod_of_thickeningComparison
+  GlobalTheory.T.gaussManinPeriods_of_span_and_taylor_clauses
+    GlobalTheory.T.periods_span_deRhamHomology_rank_two_g
+    GlobalTheory.T.constantCycleExtension_taylorPeriod_of_thickeningComparison
 
 end GlobalTheory.GaussManinTop

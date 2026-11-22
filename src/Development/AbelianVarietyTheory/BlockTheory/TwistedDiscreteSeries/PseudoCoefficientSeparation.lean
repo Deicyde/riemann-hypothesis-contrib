@@ -22,19 +22,27 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.PseudoCoefficientSeparation
 def HasWideGaps {r : ℕ} (lam : Fin r → ℤ) : Prop :=
   StrictAnti lam ∧ ∀ i j : Fin r, (j : ℕ) = i + 1 → (r : ℤ) ≤ lam i - lam j
 
-def IsDiscreteWithInfChar {r : ℕ} (ε : Fin r → Bool) (lam : Fin r → ℤ) {X : Type} [NormedAddCommGroup X]
-    [InnerProductSpace ℂ X] (D : Matrix (Fin r) (Fin r) ℂ → (X →L[ℂ] X)) : Prop :=
+def IsDiscreteWithInfChar
+    {r : ℕ} (ε : Fin r → Bool) (lam : Fin r → ℤ)
+    {X : Type} [NormedAddCommGroup X] [InnerProductSpace ℂ X]
+    (D : Matrix (Fin r) (Fin r) ℂ → (X →L[ℂ] X))
+    : Prop :=
   IsSqIntIrr ε D ∧ HasInfChar ε (fun a => (lam a : ℂ)) D
 
 def PseudoCoeffSeparation : Prop :=
-  ∀ (r : ℕ), Odd r → ∀ (ε : Fin r → Bool) (lam : Fin r → ℤ), HasWideGaps lam →
-    ∀ (X : Type) [NormedAddCommGroup X] [InnerProductSpace ℂ X] [CompleteSpace X]
-      (D : Matrix (Fin r) (Fin r) ℂ → (X →L[ℂ] X)) (hD : IsDiscreteWithInfChar ε lam D)
-      (μ : Measure (UJ ε)) [μ.IsHaarMeasure] (f : UJ ε → ℂ), IsPseudoCoeff (ujMat ε) μ (ujRep hD.1.2.2.1) f →
-    ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V]
-      (π : Matrix (Fin r) (Fin r) ℂ → (V →L[ℂ] V)) (hπ : IsIrrAdm ε π) (c : ℂ),
-      HasTrace (repOp (groupRep ε hπ.2.1.1) μ f) c → c ≠ 0 →
-        HasInfChar ε (fun a => (lam a : ℂ)) π ∧ (IsURepOn (UJset ε) π → UEquiv ε π D ∧ c = 1)
+  ∀ (r : ℕ),
+    Odd r
+      → ∀ (ε : Fin r → Bool) (lam : Fin r → ℤ),
+        HasWideGaps lam
+          → ∀ (X : Type) [NormedAddCommGroup X] [InnerProductSpace ℂ X] [CompleteSpace X]
+              (D : Matrix (Fin r) (Fin r) ℂ → (X →L[ℂ] X)) (hD : IsDiscreteWithInfChar ε lam D)
+              (μ : Measure (UJ ε)) [μ.IsHaarMeasure] (f : UJ ε → ℂ),
+            IsPseudoCoeff (ujMat ε) μ (ujRep hD.1.2.2.1) f
+              → ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V]
+                  (π : Matrix (Fin r) (Fin r) ℂ → (V →L[ℂ] V)) (hπ : IsIrrAdm ε π) (c : ℂ),
+                HasTrace (repOp (groupRep ε hπ.2.1.1) μ f) c → c ≠ 0
+                  → HasInfChar ε (fun a => (lam a : ℂ)) π
+                    ∧ (IsURepOn (UJset ε) π → UEquiv ε π D ∧ c = 1)
 
 end GlobalTheory.IndefiniteRowSideFullHecke.PseudoCoefficientSeparation
 

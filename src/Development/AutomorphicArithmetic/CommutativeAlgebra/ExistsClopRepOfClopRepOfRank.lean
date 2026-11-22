@@ -50,8 +50,8 @@ private lemma opens_ext {ι : Type} {T G : Over S} {A : ι → Over S} (j : ∀ 
   have := congrArg (fun W => z ∈ W) (h i)
   simpa using this
 
-private instance whisker_open {T T' G : Over S} (y : T' ⟶ T) [IsOpenImmersion y.left] :
-    IsOpenImmersion (y ▷ G).left :=
+private instance whisker_open {T T' G : Over S} (y : T' ⟶ T) [IsOpenImmersion y.left]
+    : IsOpenImmersion (y ▷ G).left :=
   MorphismProperty.of_isPullback (P := @IsOpenImmersion) (sq y).flip ‹_›
 
 private noncomputable def sumObj (Y : ℕ → Over S) : Over S :=
@@ -72,8 +72,8 @@ private lemma sumι_disj (Y : ℕ → Over S) {r s : ℕ} {a : (Y r).left} {b : 
     (h : (sumι Y r).left a = (sumι Y s).left b) : r = s := by
   exact congrArg Sigma.fst ((sigmaι_eq_iff (fun r => (Y r).left) r s a b).mp h)
 
-private noncomputable def sumU (G : Over S) (Y : ℕ → Over S)
-    (U : ∀ r, (Y r ⊗ G).left.Opens) : (sumObj Y ⊗ G).left.Opens :=
+private noncomputable def sumU (G : Over S) (Y : ℕ → Over S) (U : ∀ r, (Y r ⊗ G).left.Opens)
+    : (sumObj Y ⊗ G).left.Opens :=
   ⨆ r, (sumι Y r ▷ G).left ''ᵁ U r
 
 private lemma fst_whisker {T T' G : Over S} (y : T' ⟶ T) (z : (T' ⊗ G).left) :
@@ -122,8 +122,7 @@ private lemma isClosed_sumU (G : Over S) (Y : ℕ → Over S) (U : ∀ r, (Y r �
   exact isOpen_iUnion fun r =>
     (sumι Y r ▷ G).left.isOpenEmbedding.isOpenMap _ (hU r).isOpen_compl
 
-private noncomputable def piece (T : Over S) (W : T.left.Opens) : Over S :=
-  Over.mk (W.ι ≫ T.hom)
+private noncomputable def piece (T : Over S) (W : T.left.Opens) : Over S := Over.mk (W.ι ≫ T.hom)
 
 private noncomputable def pieceι (T : Over S) (W : T.left.Opens) : piece T W ⟶ T :=
   Over.homMk W.ι rfl
@@ -183,8 +182,13 @@ private lemma piece_glue {T Z : Over S} (W : ℕ → T.left.Opens) (hc : ∀ t, 
 end UpperTheory.SumInclusionOpen
 
 open UpperTheory.SumInclusionOpen in
-theorem UpperTheory.exists_clopRep_of_clopRepOfRank :
-    ∀ {S : Scheme.{0}} (G : Over S), IsFinite G.hom → Etale G.hom → ∀ (Y : ℕ → Over S) (U : ∀ r, (Y r ⊗ G).left.Opens), (∀ r, UpperTheory.RepresentationRank.RepOfRank r G (Y r) (U r)) → ∃ (Y' : Over S) (U' : (Y' ⊗ G).left.Opens), UpperTheory.RepresentationRank.Rep G Y' U' := by
+theorem UpperTheory.exists_clopRep_of_clopRepOfRank
+    : ∀ {S : Scheme.{0}} (G : Over S),
+      IsFinite G.hom → Etale G.hom
+        → ∀ (Y : ℕ → Over S) (U : ∀ r, (Y r ⊗ G).left.Opens),
+          (∀ r, UpperTheory.RepresentationRank.RepOfRank r G (Y r) (U r))
+            → ∃ (Y' : Over S) (U' : (Y' ⊗ G).left.Opens),
+              UpperTheory.RepresentationRank.Rep G Y' U' := by
   intro S G hfin het Y U hY
   have hsumc := isClosed_sumU G Y U (fun r => (hY r).1)
   refine ⟨sumObj Y, sumU G Y U, hsumc, ?_⟩
@@ -202,23 +206,33 @@ theorem UpperTheory.exists_clopRep_of_clopRepOfRank :
       rw [← SetLike.mem_coe, ← Scheme.Opens.range_ι]
       exact ⟨x, rfl⟩
     exact this
-  have hrank_sum : ∀ s (a : (Y s).left),
-      Scheme.Hom.finrank (UpperTheory.RepresentationRank.proj (sumU G Y U)) ((sumι Y s).left a) = s := by
+  have hrank_sum
+      : ∀ s (a : (Y s).left),
+        Scheme.Hom.finrank (UpperTheory.RepresentationRank.proj (sumU G Y U)) ((sumι Y s).left a)
+          = s := by
     intro s a
-    rw [← UpperTheory.clopProj_finrank_pullback (sumι Y s) (sumU G Y U) hfin het hsumc a, preim_sumU]
+    rw [← UpperTheory.clopProj_finrank_pullback (sumι Y s) (sumU G Y U) hfin het hsumc a,
+      preim_sumU]
     exact (hY s).2.1 a
-  have hVr_closed : ∀ r, IsClosed
-      (((pieceι T (W r) ▷ G).left ⁻¹ᵁ V : (piece T (W r) ⊗ G).left.Opens) :
-        Set (piece T (W r) ⊗ G).left) :=
-    fun r => IsClosed.preimage (Scheme.Hom.continuous (pieceι T (W r) ▷ G).left) hV
-  have hVr_rank : ∀ r (t : (piece T (W r)).left),
-      Scheme.Hom.finrank (UpperTheory.RepresentationRank.proj ((pieceι T (W r) ▷ G).left ⁻¹ᵁ V)) t = r := by
+  have hVr_closed
+      : ∀ r,
+        IsClosed
+          (((pieceι T (W r) ▷ G).left ⁻¹ᵁ V : (piece T (W r) ⊗ G).left.Opens)
+            : Set (piece T (W r) ⊗ G).left) := fun r =>
+    IsClosed.preimage (Scheme.Hom.continuous (pieceι T (W r) ▷ G).left) hV
+  have hVr_rank
+      : ∀ r (t : (piece T (W r)).left),
+        Scheme.Hom.finrank (UpperTheory.RepresentationRank.proj ((pieceι T (W r) ▷ G).left ⁻¹ᵁ V)) t
+          = r := by
     intro r t
     rw [UpperTheory.clopProj_finrank_pullback (pieceι T (W r)) V hfin het hV t]
     exact hmem r t
-  have hex : ∀ r, ∃ z : piece T (W r) ⟶ Y r, (z ▷ G).left ⁻¹ᵁ U r = (pieceι T (W r) ▷ G).left ⁻¹ᵁ V ∧
-      ∀ z' : piece T (W r) ⟶ Y r, (z' ▷ G).left ⁻¹ᵁ U r = (pieceι T (W r) ▷ G).left ⁻¹ᵁ V → z' = z :=
-    fun r => (hY r).2.2 _ _ (hVr_closed r) (hVr_rank r)
+  have hex
+      : ∀ r, ∃ z : piece T (W r) ⟶ Y r,
+        (z ▷ G).left ⁻¹ᵁ U r = (pieceι T (W r) ▷ G).left ⁻¹ᵁ V
+          ∧ ∀ z' : piece T (W r) ⟶ Y r,
+            (z' ▷ G).left ⁻¹ᵁ U r = (pieceι T (W r) ▷ G).left ⁻¹ᵁ V → z' = z := fun r =>
+    (hY r).2.2 _ _ (hVr_closed r) (hVr_rank r)
   choose z hz hzu using hex
   obtain ⟨y, hy⟩ := piece_glue W hc hd (fun r => z r ≫ sumι Y r)
   have hjs : ∀ t : T.left, ∃ r, ∃ a, (pieceι T (W r)).left a = t := by
@@ -227,9 +241,11 @@ theorem UpperTheory.exists_clopRep_of_clopRepOfRank :
     have : t ∈ Set.range (W r).ι := by rw [Scheme.Opens.range_ι]; exact hr
     obtain ⟨a, ha⟩ := this
     exact ⟨r, a, ha⟩
-  have key : ∀ (y₀ : T ⟶ sumObj Y) r (z₀ : piece T (W r) ⟶ Y r),
-      pieceι T (W r) ≫ y₀ = z₀ ≫ sumι Y r →
-      (pieceι T (W r) ▷ G).left ⁻¹ᵁ ((y₀ ▷ G).left ⁻¹ᵁ sumU G Y U) = (z₀ ▷ G).left ⁻¹ᵁ U r := by
+  have key
+      : ∀ (y₀ : T ⟶ sumObj Y) r (z₀ : piece T (W r) ⟶ Y r),
+        pieceι T (W r) ≫ y₀ = z₀ ≫ sumι Y r
+          → (pieceι T (W r) ▷ G).left ⁻¹ᵁ ((y₀ ▷ G).left ⁻¹ᵁ sumU G Y U)
+            = (z₀ ▷ G).left ⁻¹ᵁ U r := by
     intro y₀ r z₀ h
     rw [← preim_comp, h, preim_comp, preim_sumU]
   refine ⟨y, ?_, ?_⟩

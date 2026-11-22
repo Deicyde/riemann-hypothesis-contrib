@@ -10,15 +10,19 @@ open scoped TensorProduct Matrix
 
 namespace GlobalTheory.UnRep.ReflLaws
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E) {n : ℕ}
-  (G : Matrix (Fin n) (Fin n) E)
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (c : E ≃ₐ[F] E)
+  {n : ℕ} (G : Matrix (Fin n) (Fin n) E)
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix in
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E) {n : ℕ}
-  (G : Matrix (Fin n) (Fin n) E) in
-theorem _root_.GlobalTheory.UnRep.ReflLaws.hermE_eq_dot (v x : Fin n → E) :
-    _root_.GlobalTheory.UnRep.hermE c G v x = (G *ᵥ fun b => c (x b)) ⬝ᵥ v := by
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (c : E ≃ₐ[F] E)
+  {n : ℕ} (G : Matrix (Fin n) (Fin n) E) in
+theorem _root_.GlobalTheory.UnRep.ReflLaws.hermE_eq_dot (v x : Fin n → E)
+    : _root_.GlobalTheory.UnRep.hermE c G v x = (G *ᵥ fun b => c (x b)) ⬝ᵥ v := by
   unfold _root_.GlobalTheory.UnRep.hermE
   simp only [dotProduct, Matrix.mulVec, Finset.sum_mul]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
@@ -26,12 +30,16 @@ theorem _root_.GlobalTheory.UnRep.ReflLaws.hermE_eq_dot (v x : Fin n → E) :
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix in
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E) {n : ℕ}
-  (G : Matrix (Fin n) (Fin n) E) in
-theorem _root_.GlobalTheory.UnRep.ReflLaws.refl_mulVec (x : Fin n → E) (u : E) (v : Fin n → E) :
-    _root_.GlobalTheory.UnRep.refl c G x u *ᵥ v =
-      v + ((u - 1) * _root_.GlobalTheory.UnRep.hermE c G v x /
-        _root_.GlobalTheory.UnRep.hermE c G x x) • x := by
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (c : E ≃ₐ[F] E)
+  {n : ℕ} (G : Matrix (Fin n) (Fin n) E) in
+theorem _root_.GlobalTheory.UnRep.ReflLaws.refl_mulVec (x : Fin n → E) (u : E) (v : Fin n → E)
+    : _root_.GlobalTheory.UnRep.refl c G x u *ᵥ v
+      = v
+        + ((u - 1) * _root_.GlobalTheory.UnRep.hermE c G v x
+            / _root_.GlobalTheory.UnRep.hermE c G x x)
+          • x := by
   unfold _root_.GlobalTheory.UnRep.refl
   rw [Matrix.add_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec, Matrix.vecMulVec_mulVec,
     _root_.GlobalTheory.UnRep.ReflLaws.hermE_eq_dot]
@@ -43,21 +51,25 @@ theorem _root_.GlobalTheory.UnRep.ReflLaws.refl_mulVec (x : Fin n → E) (u : E)
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix in
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E) {n : ℕ}
-  (G : Matrix (Fin n) (Fin n) E) in
-private theorem hermE_add_smul_left' (v x y : Fin n → E) (t : E) :
-    _root_.GlobalTheory.UnRep.hermE c G (v + t • x) y =
-      _root_.GlobalTheory.UnRep.hermE c G v y + t * _root_.GlobalTheory.UnRep.hermE c G x y := by
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (c : E ≃ₐ[F] E)
+  {n : ℕ} (G : Matrix (Fin n) (Fin n) E) in
+private theorem hermE_add_smul_left' (v x y : Fin n → E) (t : E)
+    : _root_.GlobalTheory.UnRep.hermE c G (v + t • x) y
+      = _root_.GlobalTheory.UnRep.hermE c G v y + t * _root_.GlobalTheory.UnRep.hermE c G x y := by
   simp only [_root_.GlobalTheory.UnRep.ReflLaws.hermE_eq_dot, dotProduct_add, dotProduct_smul,
     smul_eq_mul]
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix in
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E) {n : ℕ}
-  (G : Matrix (Fin n) (Fin n) E) in
-private theorem hermE_conj_eq_swap_of_involutive_of_conj_symm (hinv : ∀ z : E, c (c z) = z) (hG : ∀ a b, c (G a b) = G b a)
-    (a b : Fin n → E) :
-    c (_root_.GlobalTheory.UnRep.hermE c G a b) = _root_.GlobalTheory.UnRep.hermE c G b a := by
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (c : E ≃ₐ[F] E)
+  {n : ℕ} (G : Matrix (Fin n) (Fin n) E) in
+private theorem hermE_conj_eq_swap_of_involutive_of_conj_symm
+    (hinv : ∀ z : E, c (c z) = z) (hG : ∀ a b, c (G a b) = G b a) (a b : Fin n → E)
+    : c (_root_.GlobalTheory.UnRep.hermE c G a b) = _root_.GlobalTheory.UnRep.hermE c G b a := by
   unfold _root_.GlobalTheory.UnRep.hermE
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_mul, hinv, hG]
@@ -67,11 +79,14 @@ private theorem hermE_conj_eq_swap_of_involutive_of_conj_symm (hinv : ∀ z : E,
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix in
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E) {n : ℕ}
-  (G : Matrix (Fin n) (Fin n) E) in
-private theorem hermE_add_smul_right' (v x y : Fin n → E) (t : E) :
-    _root_.GlobalTheory.UnRep.hermE c G v (y + t • x) =
-      _root_.GlobalTheory.UnRep.hermE c G v y + c t * _root_.GlobalTheory.UnRep.hermE c G v x := by
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (c : E ≃ₐ[F] E)
+  {n : ℕ} (G : Matrix (Fin n) (Fin n) E) in
+private theorem hermE_add_smul_right' (v x y : Fin n → E) (t : E)
+    : _root_.GlobalTheory.UnRep.hermE c G v (y + t • x)
+      = _root_.GlobalTheory.UnRep.hermE c G v y
+        + c t * _root_.GlobalTheory.UnRep.hermE c G v x := by
   have hfun : (fun b => c ((y + t • x) b)) = (fun b => c (y b)) + c t • fun b => c (x b) := by
     funext b
     simp [map_add (f := _), map_mul]
@@ -80,19 +95,30 @@ private theorem hermE_add_smul_right' (v x y : Fin n → E) (t : E) :
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix in
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E) {n : ℕ}
-  (G : Matrix (Fin n) (Fin n) E) in
-theorem _root_.GlobalTheory.UnRep.ReflLaws.refl_laws : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] (c : E ≃ₐ[F] E) (n : ℕ) (G : Matrix (Fin n) (Fin n) E),
-    _root_.GlobalTheory.UnRep.IsHermForm c G → ∀ x : Fin n → E,
-    _root_.GlobalTheory.UnRep.hermE c G x x ≠ 0 →
-    (∀ u v, _root_.GlobalTheory.UnRep.refl c G x u *ᵥ v =
-      v + ((u - 1) * _root_.GlobalTheory.UnRep.hermE c G v x /
-        _root_.GlobalTheory.UnRep.hermE c G x x) • x) ∧
-    _root_.GlobalTheory.UnRep.refl c G x 1 = 1 ∧
-    (∀ u u', _root_.GlobalTheory.UnRep.refl c G x u * _root_.GlobalTheory.UnRep.refl c G x u' =
-      _root_.GlobalTheory.UnRep.refl c G x (u * u')) ∧
-    ∀ u, u * c u = 1 → _root_.GlobalTheory.UnRep.IsUnE c G (_root_.GlobalTheory.UnRep.refl c G x u) := by
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (c : E ≃ₐ[F] E)
+  {n : ℕ} (G : Matrix (Fin n) (Fin n) E) in
+theorem _root_.GlobalTheory.UnRep.ReflLaws.refl_laws
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (c : E ≃ₐ[F] E) (n : ℕ) (G : Matrix (Fin n) (Fin n) E),
+      _root_.GlobalTheory.UnRep.IsHermForm c G
+        → ∀ x : Fin n → E,
+          _root_.GlobalTheory.UnRep.hermE c G x x ≠ 0
+            → (∀ u v,
+                _root_.GlobalTheory.UnRep.refl c G x u *ᵥ v
+                  = v
+                    + ((u - 1) * _root_.GlobalTheory.UnRep.hermE c G v x
+                        / _root_.GlobalTheory.UnRep.hermE c G x x)
+                      • x)
+              ∧ _root_.GlobalTheory.UnRep.refl c G x 1 = 1
+              ∧ (∀ u u',
+                _root_.GlobalTheory.UnRep.refl c G x u * _root_.GlobalTheory.UnRep.refl c G x u'
+                  = _root_.GlobalTheory.UnRep.refl c G x (u * u'))
+              ∧ ∀ u,
+                u * c u = 1
+                  → _root_.GlobalTheory.UnRep.IsUnE c G
+                    (_root_.GlobalTheory.UnRep.refl c G x u) := by
   intro F E _ _ _ _ _ c n G hG x hx
   obtain ⟨hinv, -, hsym, -⟩ := hG
   refine ⟨_root_.GlobalTheory.UnRep.ReflLaws.refl_mulVec c G x, ?_, ?_, ?_⟩
@@ -100,8 +126,8 @@ theorem _root_.GlobalTheory.UnRep.ReflLaws.refl_laws : ∀ (F E : Type) [Field F
     simp
   · intro u u'
     refine Matrix.toLin'.injective (LinearMap.ext fun v => ?_)
-    simp only [Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, _root_.GlobalTheory.UnRep.ReflLaws.refl_mulVec,
-      hermE_add_smul_left']
+    simp only [Matrix.toLin'_apply, ← Matrix.mulVec_mulVec,
+      _root_.GlobalTheory.UnRep.ReflLaws.refl_mulVec, hermE_add_smul_left']
     rw [add_assoc, ← add_smul]
     congr 2
     field_simp
@@ -109,12 +135,14 @@ theorem _root_.GlobalTheory.UnRep.ReflLaws.refl_laws : ∀ (F E : Type) [Field F
   · intro u hu
     unfold _root_.GlobalTheory.UnRep.IsUnE
     intro v y
-    have hxx : c (_root_.GlobalTheory.UnRep.hermE c G x x) = _root_.GlobalTheory.UnRep.hermE c G x x :=
+    have hxx
+        : c (_root_.GlobalTheory.UnRep.hermE c G x x) = _root_.GlobalTheory.UnRep.hermE c G x x :=
       hermE_conj_eq_swap_of_involutive_of_conj_symm c G hinv hsym x x
-    have hyx : c (_root_.GlobalTheory.UnRep.hermE c G y x) = _root_.GlobalTheory.UnRep.hermE c G x y :=
+    have hyx
+        : c (_root_.GlobalTheory.UnRep.hermE c G y x) = _root_.GlobalTheory.UnRep.hermE c G x y :=
       hermE_conj_eq_swap_of_involutive_of_conj_symm c G hinv hsym y x
-    simp only [_root_.GlobalTheory.UnRep.ReflLaws.refl_mulVec, hermE_add_smul_left', hermE_add_smul_right',
-      map_div₀, map_mul, map_sub, map_one, hxx, hyx]
+    simp only [_root_.GlobalTheory.UnRep.ReflLaws.refl_mulVec, hermE_add_smul_left',
+      hermE_add_smul_right', map_div₀, map_mul, map_sub, map_one, hxx, hyx]
     field_simp
     linear_combination (_root_.GlobalTheory.UnRep.hermE c G v x * _root_.GlobalTheory.UnRep.hermE c G x y *
       1) * hu

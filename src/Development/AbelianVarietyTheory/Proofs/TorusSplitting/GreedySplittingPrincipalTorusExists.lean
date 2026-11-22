@@ -20,8 +20,8 @@ theorem greedy_splitting_exists : SplitStatement := by
   intro E _ _ _ X DF P
   by_cases h : X.la1 < P.th
   · exact greedy_splitting_thin exists_short_integers_span
-      (exists_short_independent_isU transference_discrete_lattice principalTorus_im_perfect)
-      E X DF P h
+      (exists_short_independent_isU transference_discrete_lattice principalTorus_im_perfect) E X DF
+      P h
   · exact ⟨⊥, thickSplit_bot E X DF P h⟩
 
 end GlobalTheory

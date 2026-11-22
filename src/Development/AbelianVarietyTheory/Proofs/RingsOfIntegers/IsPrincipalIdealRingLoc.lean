@@ -12,22 +12,28 @@ namespace GlobalTheory.PlaceInt.LocBasis
 open NumberField Module
 open scoped nonZeroDivisors
 
-theorem exists_basis_up_to {O A E : Type} [CommRing O] [CommRing A] [IsDomain A] [Field E] [Algebra O A] [Algebra A E]
-    [Algebra O E] [IsScalarTower O A E] (S : Submonoid O) [IsLocalization S A] [IsFractionRing A E]
-    [IsPrincipalIdealRing A] {n : ℕ} (L : Submodule O (Fin n → E)) (hfg : L.FG)
-    (hsp : Submodule.span E (L : Set (Fin n → E)) = ⊤) :
-    ∃ (s : S) (b : Fin n → Fin n → E), LinearIndependent E b ∧ (∀ i, b i ∈ L) ∧
-      ∀ w ∈ L, (s : O) • w ∈ Submodule.span O (Set.range b) := by
+theorem exists_basis_up_to
+    {O A E : Type} [CommRing O] [CommRing A] [IsDomain A] [Field E] [Algebra O A] [Algebra A E]
+    [Algebra O E] [IsScalarTower O A E]
+    (S : Submonoid O) [IsLocalization S A] [IsFractionRing A E] [IsPrincipalIdealRing A]
+    {n : ℕ}
+    (L : Submodule O (Fin n → E)) (hfg : L.FG) (hsp : Submodule.span E (L : Set (Fin n → E)) = ⊤)
+    : ∃ (s : S) (b : Fin n → Fin n → E),
+      LinearIndependent E b ∧ (∀ i, b i ∈ L)
+        ∧ ∀ w ∈ L, (s : O) • w ∈ Submodule.span O (Set.range b) := by
   classical
   set M : Submodule A (Fin n → E) := Submodule.span A (L : Set (Fin n → E)) with hM
-  have : Submodule.IsFullLattice E M :=
-    { toIsLattice := Submodule.IsLattice.of_fg E <| by
+  have : Submodule.IsFullLattice E M := {
+    toIsLattice :=
+      Submodule.IsLattice.of_fg E <| by
         obtain ⟨s, hs⟩ := hfg
         refine ⟨s, ?_⟩
         rw [hM, ← hs, Submodule.span_span_of_tower]
-      span_eq_top := by rw [hM, Submodule.span_span_of_tower, hsp] }
+    span_eq_top := by rw [hM, Submodule.span_span_of_tower, hsp]
+  }
   have hrk : Module.finrank A M = n := by
-    simpa using ((Submodule.IsFullLattice.finrank_eq E M).trans (Module.finrank_fintype_fun_eq_card E))
+    simpa using
+      ((Submodule.IsFullLattice.finrank_eq E M).trans (Module.finrank_fintype_fun_eq_card E))
   haveI : Module.Finite A M := Submodule.IsLattice.finite E M
   let c : Basis (Fin n) A M := Module.finBasisOfFinrankEq A M hrk
   have hc : ∀ i, ∃ t : S, (t : O) • (c i : Fin n → E) ∈ L := fun i => by
@@ -46,12 +52,12 @@ theorem exists_basis_up_to {O A E : Type} [CommRing O] [CommRing A] [IsDomain A]
     rw [h]
     exact (c'.extendOfIsFullLattice E).linearIndependent
   have hspanA : Submodule.span A (Set.range b) = M := by
-    have : Set.range b = M.subtype '' Set.range c' := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range b = M.subtype '' Set.range c' := by rw [← Set.range_comp]; rfl
     rw [this, Submodule.span_image, c'.span_eq, Submodule.map_top, Submodule.range_subtype]
   have hw : ∀ w ∈ L, ∃ r : S, (r : O) • w ∈ Submodule.span O (Set.range b) := fun w hw => by
-    obtain ⟨r, hr⟩ := multiple_mem_span_of_mem_localization_span S A (Set.range b) w
-      (hspanA ▸ Submodule.subset_span hw)
+    obtain ⟨r, hr⟩ :=
+      multiple_mem_span_of_mem_localization_span S A (Set.range b) w
+        (hspanA ▸ Submodule.subset_span hw)
     exact ⟨r, hr⟩
   obtain ⟨G, hG⟩ := hfg
   choose! r hr using hw
@@ -73,8 +79,9 @@ def primeTo (R : Type) [CommRing R] (m : ℕ) : Submonoid R where
     rintro _ _ ⟨a, ha0, ha, rfl⟩ ⟨b, hb0, hb, rfl⟩
     exact ⟨a * b, mul_ne_zero ha0 hb0, Nat.Coprime.mul_left ha hb, by simp⟩
 
-theorem exists_prime_mem {R : Type} [CommRing R] (Q : Ideal R) (hQ : Q.IsPrime) (a : ℕ) (ha : a ≠ 0)
-    (h : (a : R) ∈ Q) : ∃ p : ℕ, p.Prime ∧ (p : R) ∈ Q := by
+theorem exists_prime_mem
+    {R : Type} [CommRing R] (Q : Ideal R) (hQ : Q.IsPrime) (a : ℕ) (ha : a ≠ 0) (h : (a : R) ∈ Q)
+    : ∃ p : ℕ, p.Prime ∧ (p : R) ∈ Q := by
   induction a using induction_on_primes with
   | zero => exact absurd rfl ha
   | one => exact absurd ((Ideal.eq_top_iff_one Q).2 (by simpa using h)) hQ.ne_top
@@ -84,9 +91,11 @@ theorem exists_prime_mem {R : Type} [CommRing R] (Q : Ideal R) (hQ : Q.IsPrime) 
     · exact ⟨p, hp, h⟩
     · exact ih (by rintro rfl; simp at ha) h
 
-theorem isPrincipalIdealRing_loc (E : Type) [Field E] [NumberField E] (m : ℕ) (hm : 0 < m)
-    (hS : primeTo (𝓞 E) m ≤ (𝓞 E)⁰) (A : Type) [CommRing A] [IsDomain A] [Algebra (𝓞 E) A]
-    [IsLocalization (primeTo (𝓞 E) m) A] : IsPrincipalIdealRing A := by
+theorem isPrincipalIdealRing_loc
+    (E : Type) [Field E] [NumberField E]
+    (m : ℕ) (hm : 0 < m) (hS : primeTo (𝓞 E) m ≤ (𝓞 E)⁰)
+    (A : Type) [CommRing A] [IsDomain A] [Algebra (𝓞 E) A] [IsLocalization (primeTo (𝓞 E) m) A]
+    : IsPrincipalIdealRing A := by
   have : IsDedekindDomain A := IsLocalization.isDedekindDomain (𝓞 E) hS A
   have hinj : Function.Injective (algebraMap (𝓞 E) A) := IsLocalization.injective A hS
   have hm0 : (m : A) ≠ 0 := by
@@ -114,8 +123,9 @@ theorem isPrincipalIdealRing_loc (E : Type) [Field E] [NumberField E] (m : ℕ) 
   obtain ⟨p, hp, hpP⟩ := exists_prime_mem P hP' _ (by rwa [Ne, Ideal.absNorm_eq_zero_iff]) h1
   have hpm : p ∣ m := by
     by_contra hn
-    have hu := IsLocalization.map_units A (⟨(p : 𝓞 E), p, hp.ne_zero, (Nat.Prime.coprime_iff_not_dvd hp).2 hn,
-      rfl⟩ : primeTo (𝓞 E) m)
+    have hu :=
+      IsLocalization.map_units A
+        (⟨(p : 𝓞 E), p, hp.ne_zero, (Nat.Prime.coprime_iff_not_dvd hp).2 hn, rfl⟩ : primeTo (𝓞 E) m)
     simp only [map_natCast] at hu
     exact hP'.ne_top (Ideal.eq_top_of_isUnit_mem _ hpP hu)
   obtain ⟨c, rfl⟩ := hpm
@@ -124,18 +134,32 @@ theorem isPrincipalIdealRing_loc (E : Type) [Field E] [NumberField E] (m : ℕ) 
 
 end GlobalTheory.PlaceInt.LocBasis
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
 namespace GlobalTheory.PlaceInt.LocBasis
 
-theorem exists_matrix_primeTo : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)) (N : ℕ), 0 < N → L ≤ stdLat E n → Ideal.span {(N : 𝓞 E)} • stdLat E n ≤ L → ∀ m : ℕ, 0 < m → ∃ (k₁ : ℕ) (g : Matrix (Fin n) (Fin n) (𝓞 E)), Nat.Coprime k₁ m ∧ g.det ≠ 0 ∧ (∀ v ∈ stdLat E n, (g.map (algebraMap (𝓞 E) E)).mulVec v ∈ L) ∧ ∀ w ∈ L, ∃ v ∈ stdLat E n, (k₁ : E) • w = (g.map (algebraMap (𝓞 E) E)).mulVec v := by
+theorem exists_matrix_primeTo
+    : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)) (N : ℕ),
+      0 < N → L ≤ stdLat E n → Ideal.span {(N : 𝓞 E)} • stdLat E n ≤ L
+        → ∀ m : ℕ,
+          0 < m
+            → ∃ (k₁ : ℕ) (g : Matrix (Fin n) (Fin n) (𝓞 E)),
+              Nat.Coprime k₁ m ∧ g.det ≠ 0
+                ∧ (∀ v ∈ stdLat E n, (g.map (algebraMap (𝓞 E) E)).mulVec v ∈ L)
+                ∧ ∀ w ∈ L, ∃ v ∈ stdLat E n,
+                  (k₁ : E) • w = (g.map (algebraMap (𝓞 E) E)).mulVec v := by
   intro E _ _ n L N hN hle hNL m hm
   classical
-  have hmem : ∀ v : Fin n → E, v ∈ stdLat E n ↔ ∃ u : Fin n → 𝓞 E, v = fun i => algebraMap (𝓞 E) E (u i) := fun v => by
+  have hmem
+      : ∀ v : Fin n → E,
+        v ∈ stdLat E n ↔ ∃ u : Fin n → 𝓞 E, v = fun i => algebraMap (𝓞 E) E (u i) := fun v => by
     simp only [stdLat, Submodule.mem_pi, Set.mem_univ, forall_true_left, Submodule.mem_one]
     constructor
     · intro h
@@ -148,31 +172,39 @@ theorem exists_matrix_primeTo : ∀ (E : Type) [Field E] [NumberField E] (n : �
     exact mem_nonZeroDivisors_of_ne_zero (by exact_mod_cast hk)
   let A := Localization.subalgebra E (primeTo (𝓞 E) m) hS
   have : IsPrincipalIdealRing A := isPrincipalIdealRing_loc E m hm hS A
-  have hstd : (stdLat E n).FG := Submodule.fg_pi fun _ => by
-    rw [Submodule.one_eq_span]; exact Submodule.fg_span_singleton _
+  have hstd : (stdLat E n).FG :=
+    Submodule.fg_pi fun _ => by rw [Submodule.one_eq_span]; exact Submodule.fg_span_singleton _
   have hfg : L.FG := hstd.of_le hle
   have hN0 : (N : E) ≠ 0 := by exact_mod_cast hN.ne'
   have hsp : Submodule.span E (L : Set (Fin n → E)) = ⊤ := by
     rw [eq_top_iff, ← (Pi.basisFun E (Fin n)).span_eq, Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     have h1 : (Pi.basisFun E (Fin n) i) ∈ stdLat E n :=
-      (hmem _).2 ⟨Pi.single i 1, funext fun j => by by_cases h : j = i <;> simp [h, Pi.single_apply]⟩
+      (hmem _).2
+        ⟨Pi.single i 1, funext fun j => by by_cases h : j = i <;> simp [h, Pi.single_apply]⟩
     have h2 := hNL (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self (N : 𝓞 E)) h1)
-    have h3 := Submodule.smul_mem (Submodule.span E (L : Set (Fin n → E))) (N : E)⁻¹ (Submodule.subset_span h2)
+    have h3 :=
+      Submodule.smul_mem (Submodule.span E (L : Set (Fin n → E))) (N : E)⁻¹
+        (Submodule.subset_span h2)
     rwa [← algebraMap_smul E (N : 𝓞 E), smul_smul, map_natCast, inv_mul_cancel₀ hN0, one_smul] at h3
-  obtain ⟨⟨_, k, hk0, hk, rfl⟩, b, hli, hb, hw⟩ := exists_basis_up_to (A := A) (primeTo (𝓞 E) m) L hfg hsp
+  obtain ⟨⟨_, k, hk0, hk, rfl⟩, b, hli, hb, hw⟩ :=
+    exists_basis_up_to (A := A) (primeTo (𝓞 E) m) L hfg hsp
   choose u hu using fun j => (hmem (b j)).1 (hle (hb j))
   let g : Matrix (Fin n) (Fin n) (𝓞 E) := Matrix.of fun i j => u j i
-  have hg : ∀ a : Fin n → 𝓞 E, (g.map (algebraMap (𝓞 E) E)).mulVec (fun i => algebraMap (𝓞 E) E (a i)) =
-      ∑ j, a j • b j := fun a => by
+  have hg
+      : ∀ a : Fin n → 𝓞 E,
+        (g.map (algebraMap (𝓞 E) E)).mulVec (fun i => algebraMap (𝓞 E) E (a i))
+          = ∑ j, a j • b j := fun a => by
     funext i
-    simp only [Matrix.mulVec, dotProduct, g, Matrix.map_apply, Matrix.of_apply, Finset.sum_apply, Pi.smul_apply]
+    simp only [Matrix.mulVec, dotProduct, g, Matrix.map_apply, Matrix.of_apply, Finset.sum_apply,
+      Pi.smul_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [hu j, Algebra.smul_def, mul_comm]
   refine ⟨k, g, hk, ?_, ?_, ?_⟩
   · have hcol : (g.map (algebraMap (𝓞 E) E)).col = b := by
       funext j i
-      rw [hu j]; rfl
+      rw [hu j]
+      rfl
     have hunit : IsUnit (g.map (algebraMap (𝓞 E) E)) :=
       Matrix.linearIndependent_cols_iff_isUnit.1 (hcol ▸ hli)
     intro h0

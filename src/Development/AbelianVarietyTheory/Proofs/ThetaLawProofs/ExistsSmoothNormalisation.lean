@@ -8,21 +8,23 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.SmoothOfI
 
 namespace GlobalTheory.CurveNorm
 
-theorem exists_lift_of_isIntegral {k E E' : Type} [Field k] [IsAlgClosed k] [CommRing E]
-    [CommRing E'] [Algebra k E] [Algebra k E'] [Algebra E E'] [IsScalarTower k E E']
-    [Algebra.IsIntegral E E'] (hinj : Function.Injective (algebraMap E E')) (e : E →ₐ[k] k) :
-    ∃ e' : E' →ₐ[k] k, e'.comp (IsScalarTower.toAlgHom k E E') = e := by
+theorem exists_lift_of_isIntegral
+    {k E E' : Type} [Field k] [IsAlgClosed k] [CommRing E] [CommRing E'] [Algebra k E]
+    [Algebra k E'] [Algebra E E'] [IsScalarTower k E E'] [Algebra.IsIntegral E E']
+    (hinj : Function.Injective (algebraMap E E')) (e : E →ₐ[k] k)
+    : ∃ e' : E' →ₐ[k] k, e'.comp (IsScalarTower.toAlgHom k E E') = e := by
   have hsurj : Function.Surjective e := fun c => ⟨algebraMap k E c, by simp⟩
   haveI hp : (RingHom.ker e).IsPrime := RingHom.ker_isPrime e
-  obtain ⟨Q, -, hQ, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := E')
-    (RingHom.ker e) ⊥ (by
+  obtain ⟨Q, -, hQ, hQc⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (S := E') (RingHom.ker e) ⊥ (by
       intro x hx
       have : x = 0 := hinj (by simpa using hx)
       simp [this])
   have key : ∀ x : E, algebraMap k (E' ⧸ Q) (e x) = Ideal.Quotient.mk Q (algebraMap E E' x) := by
     intro x
     have h1 : algebraMap k E (e x) - x ∈ RingHom.ker e := by simp [RingHom.mem_ker]
-    rw [← hQc, Ideal.mem_comap, map_sub, ← Ideal.Quotient.eq, ← IsScalarTower.algebraMap_apply] at h1
+    rw [← hQc, Ideal.mem_comap, map_sub, ← Ideal.Quotient.eq, ← IsScalarTower.algebraMap_apply]
+      at h1
     exact h1
   haveI : Algebra.IsIntegral k (E' ⧸ Q) := by
     constructor
@@ -42,10 +44,13 @@ theorem exists_lift_of_isIntegral {k E E' : Type} [Field k] [IsAlgClosed k] [Com
   apply φ.injective
   exact (φ.apply_symm_apply _).trans (key x).symm
 
-theorem exists_smooth_normalisation (E : Type) [CommRing E] [IsDomain E] [Algebra ℂ E]
-    [Algebra.FiniteType ℂ E] [Ring.DimensionLEOne E] (e : E →ₐ[ℂ] ℂ) :
-    ∃ (E' : Type) (_ : CommRing E') (_ : IsDomain E') (_ : Algebra ℂ E') (ρ : E →ₐ[ℂ] E')
-      (e' : E' →ₐ[ℂ] ℂ), Algebra.Smooth ℂ E' ∧ Function.Injective ρ ∧ e'.comp ρ = e := by
+theorem exists_smooth_normalisation
+    (E : Type)
+    [CommRing E] [IsDomain E] [Algebra ℂ E] [Algebra.FiniteType ℂ E] [Ring.DimensionLEOne E]
+    (e : E →ₐ[ℂ] ℂ)
+    : ∃ (E' : Type) (_ : CommRing E') (_ : IsDomain E') (_ : Algebra ℂ E') (ρ : E →ₐ[ℂ] E')
+        (e' : E' →ₐ[ℂ] ℂ),
+      Algebra.Smooth ℂ E' ∧ Function.Injective ρ ∧ e'.comp ρ = e := by
   let F := FractionRing E
   let E' : Type := integralClosure E F
   haveI : Module.Finite E E' := GlobalTheory.NormFin.finite_integralClosure_of_isAlgClosed ℂ E F
@@ -62,7 +67,16 @@ theorem exists_smooth_normalisation (E : Type) [CommRing E] [IsDomain E] [Algebr
     apply IsFractionRing.injective E F
     exact congrArg Subtype.val h
   obtain ⟨e', he'⟩ := exists_lift_of_isIntegral hinj e
-  exact ⟨E', inferInstance, inferInstance, inferInstance, IsScalarTower.toAlgHom ℂ E E', e',
-    GlobalTheory.DedekindSmooth.smooth_of_isDedekindDomain ℂ E', hinj, he'⟩
+  exact ⟨
+    E',
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    IsScalarTower.toAlgHom ℂ E E',
+    e',
+    GlobalTheory.DedekindSmooth.smooth_of_isDedekindDomain ℂ E',
+    hinj,
+    he'
+  ⟩
 
 end GlobalTheory.CurveNorm

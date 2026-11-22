@@ -11,9 +11,11 @@ namespace FunctorialResolution.EmbeddedResolution
 
 namespace MonomialCenter
 
-private theorem sort_image_of_strictMono {α β : Type*} [LinearOrder α] [LinearOrder β]
-    [DecidableEq β] (f : α → β) (hf : StrictMono f) (s : Finset α) :
-    (s.image f).sort (· ≤ ·) = (s.sort (· ≤ ·)).map f := by
+private theorem sort_image_of_strictMono
+    {α β : Type*} [LinearOrder α] [LinearOrder β] [DecidableEq β]
+    (f : α → β) (hf : StrictMono f)
+    (s : Finset α)
+    : (s.image f).sort (· ≤ ·) = (s.sort (· ≤ ·)).map f := by
   have hlt' : List.Pairwise (· < ·) ((s.image f).sort (· ≤ ·)) :=
     (Finset.sortedLT_sort (s.image f)).pairwise
   have hmap : List.Pairwise (· < ·) ((s.sort (· ≤ ·)).map f) :=
@@ -22,15 +24,15 @@ private theorem sort_image_of_strictMono {α β : Type*} [LinearOrder α] [Linea
   intro b
   simp [Finset.mem_sort]
 
-theorem sortedIndices_image_of_strictMono {n n' : ℕ} [DecidableEq (Fin n')]
-    (φ : Fin n → Fin n') (hφ : StrictMono φ) (J : Finset (Fin n)) :
-    sortedIndices (J.image φ) = (J.sort (· ≤ ·)).map (fun j => ((φ j : Fin n') : ℕ)) := by
+theorem sortedIndices_image_of_strictMono
+    {n n' : ℕ} [DecidableEq (Fin n')] (φ : Fin n → Fin n') (hφ : StrictMono φ) (J : Finset (Fin n))
+    : sortedIndices (J.image φ) = (J.sort (· ≤ ·)).map (fun j => ((φ j : Fin n') : ℕ)) := by
   rw [sortedIndices_eq_map_sort, sort_image_of_strictMono φ hφ J, List.map_map]
   rfl
 
-theorem lex_map_iff_of_strictMono {α β : Type*} [LinearOrder α] [LinearOrder β]
-    (f : α → β) (hf : StrictMono f) (l l' : List α) :
-    List.Lex (· < ·) (l.map f) (l'.map f) ↔ List.Lex (· < ·) l l' := by
+theorem lex_map_iff_of_strictMono
+    {α β : Type*} [LinearOrder α] [LinearOrder β] (f : α → β) (hf : StrictMono f) (l l' : List α)
+    : List.Lex (· < ·) (l.map f) (l'.map f) ↔ List.Lex (· < ·) l l' := by
   induction l generalizing l' with
   | nil =>
     cases l' with
@@ -55,23 +57,26 @@ theorem lex_map_iff_of_strictMono {α β : Type*} [LinearOrder α] [LinearOrder 
         · exact Or.inl (hf h)
         · exact Or.inr ⟨rfl, (ih t).mpr h2⟩
 
-theorem lex_sortedIndices_image_iff {n n' : ℕ} [DecidableEq (Fin n')]
-    (φ : Fin n → Fin n') (hφ : StrictMono φ) (J J' : Finset (Fin n)) :
-    List.Lex (· < ·) (sortedIndices (J.image φ)) (sortedIndices (J'.image φ)) ↔
-      List.Lex (· < ·) (sortedIndices J) (sortedIndices J') := by
-  have hg : StrictMono (fun j : Fin n => ((φ j : Fin n') : ℕ)) :=
-    fun a b h => Fin.val_strictMono (hφ h)
+theorem lex_sortedIndices_image_iff
+    {n n' : ℕ} [DecidableEq (Fin n')]
+    (φ : Fin n → Fin n') (hφ : StrictMono φ)
+    (J J' : Finset (Fin n))
+    : List.Lex (· < ·) (sortedIndices (J.image φ)) (sortedIndices (J'.image φ))
+      ↔ List.Lex (· < ·) (sortedIndices J) (sortedIndices J') := by
+  have hg : StrictMono (fun j : Fin n => ((φ j : Fin n') : ℕ)) := fun a b h =>
+    Fin.val_strictMono (hφ h)
   have h1 := lex_map_iff_of_strictMono _ hg (J.sort (· ≤ ·)) (J'.sort (· ≤ ·))
-  have h2 := lex_map_iff_of_strictMono (Fin.val : Fin n → ℕ) Fin.val_strictMono
-    (J.sort (· ≤ ·)) (J'.sort (· ≤ ·))
+  have h2 :=
+    lex_map_iff_of_strictMono (Fin.val : Fin n → ℕ) Fin.val_strictMono (J.sort (· ≤ ·))
+      (J'.sort (· ≤ ·))
   rw [sortedIndices_image_of_strictMono φ hφ J, sortedIndices_image_of_strictMono φ hφ J',
     sortedIndices_eq_map_sort, sortedIndices_eq_map_sort]
   exact h1.trans h2.symm
 
 def reversedIndex (n : ℕ) (j : Fin n) : ℕ := n - 1 - (j : ℕ)
 
-theorem reversedIndex_lt_reversedIndex_iff {n : ℕ} (j j' : Fin n) :
-    reversedIndex n j < reversedIndex n j' ↔ j' < j := by
+theorem reversedIndex_lt_reversedIndex_iff {n : ℕ} (j j' : Fin n)
+    : reversedIndex n j < reversedIndex n j' ↔ j' < j := by
   have hj := j.isLt
   have hj' := j'.isLt
   simp only [reversedIndex, Fin.lt_def]
@@ -84,16 +89,18 @@ theorem reversedIndex_injective {n : ℕ} : Function.Injective (reversedIndex n)
   have h' : n - 1 - (a : ℕ) = n - 1 - (b : ℕ) := h
   exact Fin.val_injective (by omega)
 
-theorem binaryEncode_eq_sum_image {n : ℕ} (J : Finset (Fin n)) :
-    _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J = ∑ e ∈ J.image (reversedIndex n), 2 ^ e := by
-  have hinj : ∀ a ∈ J, ∀ b ∈ J, reversedIndex n a = reversedIndex n b → a = b :=
-    fun a _ b _ h => reversedIndex_injective h
+theorem binaryEncode_eq_sum_image {n : ℕ} (J : Finset (Fin n))
+    : _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J
+      = ∑ e ∈ J.image (reversedIndex n), 2 ^ e := by
+  have hinj : ∀ a ∈ J, ∀ b ∈ J, reversedIndex n a = reversedIndex n b → a = b := fun a _ b _ h =>
+    reversedIndex_injective h
   rw [Finset.sum_image hinj]
   rfl
 
-theorem binaryEncode_lt_iff {n : ℕ} (J J' : Finset (Fin n)) :
-    _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J' < _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J ↔
-      (∃ a ∈ J, a ∉ J' ∧ ∀ b ∈ J', b ∉ J → a < b) := by
+theorem binaryEncode_lt_iff {n : ℕ} (J J' : Finset (Fin n))
+    : _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J'
+        < _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J
+      ↔ (∃ a ∈ J, a ∉ J' ∧ ∀ b ∈ J', b ∉ J → a < b) := by
   simp only [binaryEncode_eq_sum_image]
   rw [(Finset.geomSum_lt_geomSum_iff_toColex_lt_toColex (le_refl 2)).trans
     Finset.Colex.toColex_lt_toColex_iff_exists_forall_lt]
@@ -126,10 +133,10 @@ theorem binaryEncode_lt_iff {n : ℕ} (J J' : Finset (Fin n)) :
         exact hfnot (Finset.mem_image_of_mem _ hbJ)
       exact (reversedIndex_lt_reversedIndex_iff b a).mpr (hmin b hb hbJ)
 
-private theorem lex_iff_exists_min_mem {α : Type*} [LinearOrder α] :
-    ∀ (L L' : List α), L.length = L'.length → List.Pairwise (· < ·) L →
-      List.Pairwise (· < ·) L' →
-      (List.Lex (· < ·) L L' ↔ ∃ a ∈ L, a ∉ L' ∧ ∀ b ∈ L', b ∉ L → a < b) := by
+private theorem lex_iff_exists_min_mem {α : Type*} [LinearOrder α]
+    : ∀ (L L' : List α),
+      L.length = L'.length → List.Pairwise (· < ·) L → List.Pairwise (· < ·) L'
+        → (List.Lex (· < ·) L L' ↔ ∃ a ∈ L, a ∉ L' ∧ ∀ b ∈ L', b ∉ L → a < b) := by
   intro L
   induction L with
   | nil =>
@@ -221,29 +228,35 @@ private theorem lex_iff_exists_min_mem {α : Type*} [LinearOrder α] :
             · exact le_of_lt (hs.1 x h)
           exact absurd hxb (not_lt.mpr (le_trans hab.le hax))
 
-theorem binaryEncode_lt_iff_lex_of_card_eq {n : ℕ} (J J' : Finset (Fin n)) (hcard : J.card = J'.card) :
-    _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J' < _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J ↔
-      List.Lex (· < ·) (sortedIndices J) (sortedIndices J') := by
+theorem binaryEncode_lt_iff_lex_of_card_eq
+    {n : ℕ} (J J' : Finset (Fin n)) (hcard : J.card = J'.card)
+    : _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J'
+        < _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J
+      ↔ List.Lex (· < ·) (sortedIndices J) (sortedIndices J') := by
   have hlen : (J.sort (· ≤ ·)).length = (J'.sort (· ≤ ·)).length := by
     rw [Finset.length_sort, Finset.length_sort, hcard]
   have hsJ : List.Pairwise (· < ·) (J.sort (· ≤ ·)) := (Finset.sortedLT_sort J).pairwise
   have hsJ' : List.Pairwise (· < ·) (J'.sort (· ≤ ·)) := (Finset.sortedLT_sort J').pairwise
-  have hmap := lex_map_iff_of_strictMono (Fin.val : Fin n → ℕ) Fin.val_strictMono
-    (J.sort (· ≤ ·)) (J'.sort (· ≤ ·))
+  have hmap :=
+    lex_map_iff_of_strictMono (Fin.val : Fin n → ℕ) Fin.val_strictMono (J.sort (· ≤ ·))
+      (J'.sort (· ≤ ·))
   have hA := lex_iff_exists_min_mem (J.sort (· ≤ ·)) (J'.sort (· ≤ ·)) hlen hsJ hsJ'
-  have hfin : (∃ a ∈ J.sort (· ≤ ·), a ∉ J'.sort (· ≤ ·) ∧
-      ∀ b ∈ J'.sort (· ≤ ·), b ∉ J.sort (· ≤ ·) → a < b) ↔
-      (∃ a ∈ J, a ∉ J' ∧ ∀ b ∈ J', b ∉ J → a < b) := by
+  have hfin
+      : (∃ a ∈ J.sort (· ≤ ·),
+          a ∉ J'.sort (· ≤ ·) ∧ ∀ b ∈ J'.sort (· ≤ ·), b ∉ J.sort (· ≤ ·) → a < b)
+        ↔ (∃ a ∈ J, a ∉ J' ∧ ∀ b ∈ J', b ∉ J → a < b) := by
     simp only [Finset.mem_sort]
   rw [sortedIndices_eq_map_sort, sortedIndices_eq_map_sort]
   exact (binaryEncode_lt_iff J J').trans (hfin.symm.trans (hA.symm.trans hmap.symm))
 
-theorem binaryEncode_injective {n : ℕ} :
-    Function.Injective (fun J : Finset (Fin n) => _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J) := by
+theorem binaryEncode_injective {n : ℕ}
+    : Function.Injective (fun J : Finset (Fin n) =>
+      _root_.FunctorialResolution.EmbeddedResolution.binaryEncode J) := by
   intro J J' h
   have hJ := binaryEncode_eq_sum_image J
   have hJ' := binaryEncode_eq_sum_image J'
-  have h1 : (∑ e ∈ J.image (reversedIndex n), 2 ^ e) = (∑ e ∈ J'.image (reversedIndex n), 2 ^ e) := by
+  have h1
+      : (∑ e ∈ J.image (reversedIndex n), 2 ^ e) = (∑ e ∈ J'.image (reversedIndex n), 2 ^ e) := by
     rw [← hJ, ← hJ']
     exact h
   exact Finset.image_injective reversedIndex_injective (Finset.geomSum_injective (le_refl 2) h1)

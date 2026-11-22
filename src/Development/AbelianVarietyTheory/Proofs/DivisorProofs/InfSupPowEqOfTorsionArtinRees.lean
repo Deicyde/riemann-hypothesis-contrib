@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem inf_sup_pow_eq_of_torsion : ∀ (B : Type) [CommRing B] [IsNoetherianRing B]
-    (K τ τ' : Ideal B), τ ≤ τ' → (∀ b ∈ τ', ∀ f ∈ K, ∃ m : ℕ, f ^ m * b ∈ τ) →
-    ∃ k₀ : ℕ, ∀ k, k₀ ≤ k → τ' ⊓ (τ ⊔ K ^ k) = τ := by
+theorem inf_sup_pow_eq_of_torsion
+    : ∀ (B : Type) [CommRing B] [IsNoetherianRing B] (K τ τ' : Ideal B),
+      τ ≤ τ' → (∀ b ∈ τ', ∀ f ∈ K, ∃ m : ℕ, f ^ m * b ∈ τ)
+        → ∃ k₀ : ℕ, ∀ k, k₀ ≤ k → τ' ⊓ (τ ⊔ K ^ k) = τ := by
   intro B _ _ K τ τ' hle htor
   classical
   obtain ⟨s, hs⟩ := (IsNoetherian.noetherian τ' : τ'.FG)
@@ -41,7 +42,9 @@ theorem inf_sup_pow_eq_of_torsion : ∀ (B : Type) [CommRing B] [IsNoetherianRin
     have h := hc k (by omega)
     simp only [smul_eq_mul, Ideal.mul_top] at h
     rw [h]
-    calc K ^ (k - c) * (K ^ c ⊓ τ') ≤ K ^ (k - c) * τ' := Ideal.mul_mono_right inf_le_right
+    calc
+      K ^ (k - c) * (K ^ c ⊓ τ')
+        ≤ K ^ (k - c) * τ' := Ideal.mul_mono_right inf_le_right
       _ ≤ K ^ m * τ' := Ideal.mul_mono_left (Ideal.pow_le_pow_right (by omega))
       _ ≤ τ := hKm
   apply le_antisymm

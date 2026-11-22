@@ -5,16 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Conduct
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.MainNotions Formalism.FrobeniusOrbits Formalism.L2.Host GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.LamTie
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.BasicNotions Formalism.MainNotions Formalism.FrobeniusOrbits Formalism.L2.Host
+  GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.LamTie
 
 namespace GlobalTheory.LamTie
 
-theorem basecond_exists_above {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (OF E)) :
-    ∃ P : HeightOneSpectrum (𝓞 E), below P = v := by
+theorem basecond_exists_above {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (OF E))
+    : ∃ P : HeightOneSpectrum (𝓞 E), below P = v := by
   have hinj : Function.Injective (algebraMap (OF E) (𝓞 E)) :=
     FaithfulSMul.algebraMap_injective (OF E) (𝓞 E)
-  obtain ⟨Q, -, hQ, hQv⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := 𝓞 E) v.asIdeal ⊥
-    (by
+  obtain ⟨Q, -, hQ, hQv⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (S := 𝓞 E) v.asIdeal ⊥ (by
       intro x hx
       rw [Ideal.mem_comap, Ideal.mem_bot, ← map_zero (algebraMap (OF E) (𝓞 E))] at hx
       rw [hinj hx]
@@ -28,24 +30,28 @@ theorem basecond_exists_above {E : Type} [Field E] [NumberField E] (v : HeightOn
   ext x
   simp [below, Ideal.under, ← hQv]
 
-theorem basecond_natCast_mem_below {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) (n : ℕ) :
-    (n : OF E) ∈ (below P).asIdeal ↔ (n : 𝓞 E) ∈ P.asIdeal := by
+theorem basecond_natCast_mem_below
+    {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) (n : ℕ)
+    : (n : OF E) ∈ (below P).asIdeal ↔ (n : 𝓞 E) ∈ P.asIdeal := by
   simp [below, Ideal.under, Ideal.mem_comap, map_natCast]
 
-theorem isBaseCond_cond0 : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (q0 : ℕ) (w0 : HeightOneSpectrum (𝓞 H.E)), (∀ p ∈ [H.g 0, H.g 1, H.pde, H.pde', q0], ∀ P : HeightOneSpectrum (𝓞 H.E), (p : 𝓞 H.E) ∈ P.asIdeal → Splits (below P)) → PlacesOk H q0 w0 → IsBaseCond (cond0 H w0) := by
+theorem isBaseCond_cond0
+    : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (q0 : ℕ) (w0 : HeightOneSpectrum (𝓞 H.E)),
+      (∀ p ∈ [H.g 0, H.g 1, H.pde, H.pde', q0], ∀ P : HeightOneSpectrum (𝓞 H.E),
+          (p : 𝓞 H.E) ∈ P.asIdeal → Splits (below P))
+        → PlacesOk H q0 w0
+        → IsBaseCond (cond0 H w0) := by
   intro R H q0 w0 hspl hok
   have hprime : ∀ p ∈ [H.g 0, H.g 1, H.pde, H.pde', q0], p.Prime := fun p hp => (hok.splits p hp).1
 
   have hN0 : ((H.g 0 * H.g 1 * H.pde * H.pde' : ℕ) : OF H.E) ≠ 0 := by
     have h : H.g 0 * H.g 1 * H.pde * H.pde' ≠ 0 := by
-      refine mul_ne_zero (mul_ne_zero (mul_ne_zero ?_ ?_) ?_) ?_ <;>
-        exact (hprime _ (by simp)).ne_zero
+      refine mul_ne_zero (mul_ne_zero (mul_ne_zero ?_ ?_) ?_) ?_
+        <;> exact (hprime _ (by simp)).ne_zero
     exact_mod_cast h
   have hle : cond0 H w0 ≤ (below w0).asIdeal := by
     unfold cond0
-    first
-    | exact Ideal.mul_le_right
-    | exact Ideal.mul_le_left
+    first | exact Ideal.mul_le_right | exact Ideal.mul_le_left
   refine ⟨?_, ?_, ?_⟩
   · intro h
     rcases Ideal.mul_eq_bot.mp h with h1 | h1
@@ -58,7 +64,8 @@ theorem isBaseCond_cond0 : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (
     exact (below w0).isPrime.ne_top (top_le_iff.mp (h ▸ hle))
   · intro v hv
 
-    obtain ⟨p, hp, hpv⟩ : ∃ p ∈ [H.g 0, H.g 1, H.pde, H.pde', q0], ((p : ℕ) : OF H.E) ∈ v.asIdeal := by
+    obtain ⟨p, hp, hpv⟩
+        : ∃ p ∈ [H.g 0, H.g 1, H.pde, H.pde', q0], ((p : ℕ) : OF H.E) ∈ v.asIdeal := by
       have hvp : Prime v.asIdeal := Ideal.prime_of_isPrime v.ne_bot v.isPrime
       rcases hvp.dvd_or_dvd hv with h | h
       · have h1 : ((H.g 0 * H.g 1 * H.pde * H.pde' : ℕ) : OF H.E) ∈ v.asIdeal :=

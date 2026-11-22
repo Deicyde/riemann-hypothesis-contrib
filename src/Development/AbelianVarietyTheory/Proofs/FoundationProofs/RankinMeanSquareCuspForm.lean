@@ -8,29 +8,36 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HasSumPar
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
 
 namespace GlobalTheory.MeanSquareEstimates
 
-theorem key (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ) (hc : CF k L χ h) (C : ℝ)
-    (hC : ∀ τ : ℍ, ‖qs h τ‖ ^ 2 * τ.im ^ k ≤ C) (y : ℝ) (hy : 0 < y) :
-    Summable (fun n : ℕ => ‖h n‖ ^ 2 * Real.exp (-4 * π * n * y)) ∧
-      ∑' n : ℕ, ‖h n‖ ^ 2 * Real.exp (-4 * π * n * y) ≤ C / y ^ k := by
+theorem key
+    (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ) (hc : CF k L χ h)
+    (C : ℝ) (hC : ∀ τ : ℍ, ‖qs h τ‖ ^ 2 * τ.im ^ k ≤ C)
+    (y : ℝ) (hy : 0 < y)
+    : Summable (fun n : ℕ => ‖h n‖ ^ 2 * Real.exp (-4 * π * n * y))
+      ∧ ∑' n : ℕ, ‖h n‖ ^ 2 * Real.exp (-4 * π * n * y) ≤ C / y ^ k := by
   have hp := GlobalTheory.T.hasSum_parseval_qExpansion_horizontal_line h h y hc.1.1 hc.1.1 hy
   set I := ∫ x in (0 : ℝ)..1, conj (qs h (ofComplex (x + y * Complex.I))) * qs h (ofComplex (x + y * Complex.I))
   have hr := Complex.hasSum_re hp
-  have e : (fun n : ℕ => (conj (h n) * h n * ((Real.exp (-4 * π * n * y) : ℝ) : ℂ)).re) =
-      fun n : ℕ => ‖h n‖ ^ 2 * Real.exp (-4 * π * n * y) := by
+  have e
+      : (fun n : ℕ => (conj (h n) * h n * ((Real.exp (-4 * π * n * y) : ℝ) : ℂ)).re)
+        = fun n : ℕ => ‖h n‖ ^ 2 * Real.exp (-4 * π * n * y) := by
     funext n
     rw [Complex.conj_mul']
     norm_cast
   rw [e] at hr
   refine ⟨hr.summable, ?_⟩
   rw [hr.tsum_eq]
-  have hb : ∀ x ∈ Set.uIoc (0 : ℝ) 1, ‖conj (qs h (ofComplex (x + y * Complex.I))) * qs h (ofComplex (x + y * Complex.I))‖ ≤ C / y ^ k := by
+  have hb
+      : ∀ x ∈ Set.uIoc (0 : ℝ) 1,
+        ‖conj (qs h (ofComplex (x + y * Complex.I))) * qs h (ofComplex (x + y * Complex.I))‖
+          ≤ C / y ^ k := by
     intro x _
     have him : 0 < ((x : ℂ) + y * Complex.I).im := by simpa using hy
     rw [ofComplex_apply_of_im_pos him, Complex.conj_mul']
@@ -40,13 +47,18 @@ theorem key (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ) (hc : CF k L χ h) 
     rw [le_div_iff₀ (by positivity)]
     simpa using h1
   have := intervalIntegral.norm_integral_le_of_norm_le_const hb
-  calc I.re ≤ ‖I‖ := Complex.re_le_norm I
+  calc
+    I.re
+      ≤ ‖I‖ := Complex.re_le_norm I
     _ ≤ C / y ^ k * |1 - 0| := this
     _ = C / y ^ k := by simp
 
-theorem key2 (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ) (hc : CF k L χ h) (C : ℝ)
-    (hC : ∀ τ : ℍ, ‖qs h τ‖ ^ 2 * τ.im ^ k ≤ C) (t : ℝ) (ht : 0 < t) (N : ℕ) :
-    ∑ n ∈ Finset.range N, ‖h n‖ ^ 2 * Real.exp (-(n : ℝ) * t) ≤ C * (4 * π) ^ k / t ^ k := by
+theorem key2
+    (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ) (hc : CF k L χ h)
+    (C : ℝ) (hC : ∀ τ : ℍ, ‖qs h τ‖ ^ 2 * τ.im ^ k ≤ C)
+    (t : ℝ) (ht : 0 < t)
+    (N : ℕ)
+    : ∑ n ∈ Finset.range N, ‖h n‖ ^ 2 * Real.exp (-(n : ℝ) * t) ≤ C * (4 * π) ^ k / t ^ k := by
   have hy : 0 < t / (4 * π) := by positivity
   obtain ⟨hs, hb⟩ := key k L χ h hc C hC _ hy
   have e : ∀ n : ℕ, -4 * π * n * (t / (4 * π)) = -(n : ℝ) * t := fun n => by field_simp
@@ -55,10 +67,14 @@ theorem key2 (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ) (hc : CF k L χ h)
   rw [e2] at hb
   exact (hs.sum_le_tsum _ (fun n _ => by positivity)).trans hb
 
-theorem blk (a : ℕ → ℝ) (ha : ∀ n, 0 ≤ a n) (a0 : a 0 = 0) (k : ℕ) (D : ℝ)
+theorem blk
+    (a : ℕ → ℝ) (ha : ∀ n, 0 ≤ a n) (a0 : a 0 = 0)
+    (k : ℕ) (D : ℝ)
     (hD : ∀ t : ℝ, 0 < t → ∀ N : ℕ, ∑ n ∈ Finset.range N, a n * Real.exp (-(n : ℝ) * t) ≤ D / t ^ k)
-    (s : ℝ) (hs : 0 < s) (N : ℕ) :
-    ∑ n ∈ Finset.range N, a n / (n : ℝ) ^ ((k : ℝ) + s) ≤ Real.exp 2 * D / (1 - (2 : ℝ) ^ (-s)) := by
+    (s : ℝ) (hs : 0 < s)
+    (N : ℕ)
+    : ∑ n ∈ Finset.range N, a n / (n : ℝ) ^ ((k : ℝ) + s)
+      ≤ Real.exp 2 * D / (1 - (2 : ℝ) ^ (-s)) := by
   set x : ℝ := (2 : ℝ) ^ (-s) with hxdef
   have hx0 : 0 ≤ x := by positivity
   have hx1 : x < 1 := Real.rpow_lt_one_of_one_lt_of_neg (by norm_num) (by linarith)
@@ -83,40 +99,52 @@ theorem blk (a : ℕ → ℝ) (ha : ∀ n, 0 ≤ a n) (a0 : a 0 = 0) (k : ℕ) (
     have h2j : ((2 : ℝ) ^ j) ≤ n := by exact_mod_cast hj1
     have h2j' : (n : ℝ) ≤ 2 * (2 : ℝ) ^ j := by
       have : (n : ℝ) < ((2 ^ (j + 1) : ℕ) : ℝ) := by exact_mod_cast hj2
-      push_cast at this; rw [pow_succ] at this; linarith
+      push_cast at this
+      rw [pow_succ] at this
+      linarith
     have P : ((2 : ℝ) ^ j) ^ k * ((2 : ℝ) ^ j) ^ s ≤ (n : ℝ) ^ k * (n : ℝ) ^ s := by gcongr
     have E : 1 ≤ Real.exp 2 * Real.exp (-(n : ℝ) * ((2 : ℝ) ^ j)⁻¹) := by
-      rw [← Real.exp_add]; apply Real.one_le_exp
+      rw [← Real.exp_add]
+      apply Real.one_le_exp
       have : (n : ℝ) * ((2 : ℝ) ^ j)⁻¹ ≤ 2 := by
         rw [← div_eq_mul_inv, div_le_iff₀ (by positivity)]; linarith
       linarith
     have hxj : x ^ j = (((2 : ℝ) ^ j) ^ s)⁻¹ := by
-      rw [hxdef, Real.rpow_neg (by norm_num), inv_pow, ← Real.rpow_natCast, ← Real.rpow_natCast, ← Real.rpow_mul (by norm_num), ← Real.rpow_mul (by norm_num), mul_comm]
+      rw [hxdef, Real.rpow_neg (by norm_num), inv_pow, ← Real.rpow_natCast, ← Real.rpow_natCast,
+        ← Real.rpow_mul (by norm_num), ← Real.rpow_mul (by norm_num), mul_comm]
     have L : (n : ℝ) ^ ((k : ℝ) + s) = (n : ℝ) ^ k * (n : ℝ) ^ s := by
       rw [Real.rpow_add npos, Real.rpow_natCast]
-    have R : G j n = a n * (Real.exp 2 * Real.exp (-(n : ℝ) * ((2 : ℝ) ^ j)⁻¹)) / (((2 : ℝ) ^ j) ^ k * ((2 : ℝ) ^ j) ^ s) := by
+    have R
+        : G j n
+          = a n * (Real.exp 2 * Real.exp (-(n : ℝ) * ((2 : ℝ) ^ j)⁻¹))
+            / (((2 : ℝ) ^ j) ^ k * ((2 : ℝ) ^ j) ^ s) := by
       rw [hG]; dsimp only; rw [hxj]; field_simp
     rw [L, R]
     have an := ha n
-    calc a n / ((n : ℝ) ^ k * (n : ℝ) ^ s) ≤ a n / (((2 : ℝ) ^ j) ^ k * ((2 : ℝ) ^ j) ^ s) := by
-          gcongr
+    calc
+      a n / ((n : ℝ) ^ k * (n : ℝ) ^ s)
+        ≤ a n / (((2 : ℝ) ^ j) ^ k * ((2 : ℝ) ^ j) ^ s) := by gcongr
       _ ≤ _ := by gcongr; exact le_mul_of_one_le_right an E
-  calc ∑ n ∈ Finset.range N, a n / (n : ℝ) ^ ((k : ℝ) + s) ≤ ∑ n ∈ Finset.range N, ∑ j ∈ Finset.range N, G j n :=
-        Finset.sum_le_sum pt
+  calc
+    ∑ n ∈ Finset.range N, a n / (n : ℝ) ^ ((k : ℝ) + s)
+      ≤ ∑ n ∈ Finset.range N, ∑ j ∈ Finset.range N, G j n := Finset.sum_le_sum pt
     _ = ∑ j ∈ Finset.range N, ∑ n ∈ Finset.range N, G j n := Finset.sum_comm
     _ = ∑ j ∈ Finset.range N, Real.exp 2 * (x ^ j / ((2 : ℝ) ^ j) ^ k) *
           ∑ n ∈ Finset.range N, a n * Real.exp (-(n : ℝ) * ((2 : ℝ) ^ j)⁻¹) := by
-        simp only [hG, Finset.mul_sum]
-    _ ≤ ∑ j ∈ Finset.range N, Real.exp 2 * (x ^ j / ((2 : ℝ) ^ j) ^ k) * (D / (((2 : ℝ) ^ j)⁻¹) ^ k) := by
+      simp only [hG, Finset.mul_sum]
+    _ ≤ ∑ j ∈ Finset.range N, Real.exp 2 * (x ^ j / ((2 : ℝ) ^ j) ^ k) * (D / (((2 : ℝ) ^ j)⁻¹) ^ k) :=
+      by
         gcongr with j _
         exact hD _ (by positivity) N
     _ = ∑ j ∈ Finset.range N, Real.exp 2 * D * x ^ j := by
-        refine Finset.sum_congr rfl fun j _ => ?_
-        rw [inv_pow]; field_simp
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [inv_pow]
+      field_simp
     _ = Real.exp 2 * D * ∑ j ∈ Finset.range N, x ^ j := by rw [Finset.mul_sum]
     _ ≤ Real.exp 2 * D * (x ^ 0 / (1 - x)) := by
-        gcongr
-        rw [Finset.range_eq_Ico]; exact geom_sum_Ico_le_of_lt_one hx0 hx1
+      gcongr
+      rw [Finset.range_eq_Ico]
+      exact geom_sum_Ico_le_of_lt_one hx0 hx1
     _ = Real.exp 2 * D / (1 - x) := by rw [pow_zero]; ring
 
 theorem geo (s : ℝ) (hs : 0 < s) (hs1 : s ≤ 1) : s / 3 ≤ 1 - (2 : ℝ) ^ (-s) := by
@@ -138,9 +166,14 @@ end GlobalTheory.MeanSquareEstimates
 
 namespace GlobalTheory
 
-
 open GlobalTheory.MeanSquareEstimates in
-theorem rankin_mean_square : ∀ (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ), 1 ≤ k → CF k L χ h → h 0 = 0 ∧ (∃ C : ℝ, ∀ n : ℕ, ‖h n‖ ^ 2 ≤ C * (n : ℝ) ^ k) ∧ (∀ s : ℝ, 0 < s → Summable fun n : ℕ => ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s)) ∧ ∃ C : ℝ, ∀ s : ℝ, 0 < s → s ≤ 1 → s * ∑' n : ℕ, ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s) ≤ C := by
+theorem rankin_mean_square
+    : ∀ (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ),
+      1 ≤ k → CF k L χ h
+        → h 0 = 0 ∧ (∃ C : ℝ, ∀ n : ℕ, ‖h n‖ ^ 2 ≤ C * (n : ℝ) ^ k)
+          ∧ (∀ s : ℝ, 0 < s → Summable fun n : ℕ => ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s))
+          ∧ ∃ C : ℝ, ∀ s : ℝ,
+            0 < s → s ≤ 1 → s * ∑' n : ℕ, ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s) ≤ C := by
   intro k L χ h hk hc
   obtain ⟨C, hC⟩ := hc.2
   have C0 : 0 ≤ C := le_trans (by positivity) (hC UpperHalfPlane.I)
@@ -150,7 +183,9 @@ theorem rankin_mean_square : ∀ (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ
   have K1 : ∀ t : ℝ, 0 < t → ∀ n : ℕ, ‖h n‖ ^ 2 * Real.exp (-(n : ℝ) * t) ≤ D / t ^ k := by
     intro t ht n
     refine le_trans ?_ (K t ht (n + 1))
-    exact Finset.single_le_sum (f := fun m : ℕ => ‖h m‖ ^ 2 * Real.exp (-(m : ℝ) * t)) (fun m _ => by positivity)
+    exact Finset.single_le_sum
+      (f := fun m : ℕ => ‖h m‖ ^ 2 * Real.exp (-(m : ℝ) * t))
+      (fun m _ => by positivity)
       (Finset.mem_range.mpr (Nat.lt_succ_self n))
   have h0 : h 0 = 0 := by
     have lim : Tendsto (fun t : ℝ => D / t ^ k) atTop (𝓝 0) :=
@@ -161,10 +196,20 @@ theorem rankin_mean_square : ∀ (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ
       simpa using K1 t ht 0
     have : ‖h 0‖ = 0 := by nlinarith [norm_nonneg (h 0)]
     exact norm_eq_zero.mp this
-  have B : ∀ s : ℝ, 0 < s → ∀ N : ℕ, ∑ n ∈ Finset.range N, ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s) ≤ Real.exp 2 * D / (1 - (2 : ℝ) ^ (-s)) :=
-    fun s hs N => blk (fun n => ‖h n‖ ^ 2) (fun n => by positivity) (by simp [h0]) k D K s hs N
+  have B
+      : ∀ s : ℝ,
+        0 < s
+          → ∀ N : ℕ,
+            ∑ n ∈ Finset.range N, ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s)
+              ≤ Real.exp 2 * D / (1 - (2 : ℝ) ^ (-s)) := fun s hs N =>
+    blk (fun n => ‖h n‖ ^ 2) (fun n => by positivity) (by simp [h0]) k D K s hs N
   have nn : ∀ s : ℝ, ∀ n : ℕ, 0 ≤ ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s) := fun s n => by positivity
-  refine ⟨h0, ⟨D * Real.exp 1, fun n => ?_⟩, fun s hs => summable_of_sum_range_le (nn s) (B s hs), ⟨3 * (Real.exp 2 * D), fun s hs hs1 => ?_⟩⟩
+  refine ⟨
+    h0,
+    ⟨D * Real.exp 1, fun n => ?_⟩,
+    fun s hs => summable_of_sum_range_le (nn s) (B s hs),
+    ⟨3 * (Real.exp 2 * D), fun s hs hs1 => ?_⟩
+  ⟩
   · rcases Nat.eq_zero_or_pos n with rfl | hn
     · simp [h0, zero_pow (by omega : k ≠ 0)]
     have npos : (0 : ℝ) < n := by exact_mod_cast hn
@@ -173,12 +218,16 @@ theorem rankin_mean_square : ∀ (k L : ℕ) (χ : ℤ → ℂ) (h : ℕ → ℂ
     have e : ‖h n‖ ^ 2 = ‖h n‖ ^ 2 * Real.exp (-1) * Real.exp 1 := by
       rw [mul_assoc, ← Real.exp_add]; simp
     rw [e]
-    calc ‖h n‖ ^ 2 * Real.exp (-1) * Real.exp 1 ≤ D * (n : ℝ) ^ k * Real.exp 1 := by gcongr
+    calc
+      ‖h n‖ ^ 2 * Real.exp (-1) * Real.exp 1
+        ≤ D * (n : ℝ) ^ k * Real.exp 1 := by gcongr
       _ = D * Real.exp 1 * (n : ℝ) ^ k := by ring
   · have T := Real.tsum_le_of_sum_range_le (nn s) (B s hs)
     have g := geo s hs hs1
     have pos : 0 < 1 - (2 : ℝ) ^ (-s) := by linarith
-    calc s * ∑' n : ℕ, ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s) ≤ s * (Real.exp 2 * D / (1 - (2 : ℝ) ^ (-s))) := by gcongr
+    calc
+      s * ∑' n : ℕ, ‖h n‖ ^ 2 / (n : ℝ) ^ ((k : ℝ) + s)
+        ≤ s * (Real.exp 2 * D / (1 - (2 : ℝ) ^ (-s))) := by gcongr
       _ ≤ 3 * (Real.exp 2 * D) := by
         rw [mul_div_assoc', div_le_iff₀ pos]
         have : 0 ≤ Real.exp 2 * D := by positivity

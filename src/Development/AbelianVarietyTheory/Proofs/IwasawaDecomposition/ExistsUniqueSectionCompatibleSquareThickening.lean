@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LinCo
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -26,8 +28,9 @@ section Flat
 
 variable {X Y Z : Scheme.{0}} {L : LB X}
 
-theorem good_sq_iff (z : Z) (J' : (Z ⟶ X) → L.ι) :
-    Good (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => 2)) z (fun ψ _ => J' ψ) ↔ Good L z J' := by
+theorem good_sq_iff (z : Z) (J' : (Z ⟶ X) → L.ι)
+    : Good (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => 2)) z (fun ψ _ => J' ψ)
+      ↔ Good L z J' := by
   constructor
   · intro h ψ
     have := GlobalTheory.Algebraise.mem_wc.1 (h ψ)
@@ -38,13 +41,16 @@ theorem good_sq_iff (z : Z) (J' : (Z ⟶ X) → L.ι) :
 theorem eq_const_of_fin_one {α β : Type} (J : α → (Fin 1 → β)) : J = fun ψ _ => J ψ 0 :=
   funext fun ψ => funext fun κ => congrArg (J ψ) (Subsingleton.elim _ _)
 
-theorem sval_flat {a n m : ℤ} {g : Y ⟶ X} {t : LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => g) (fun _ => m))}
-    {s : LB.Sec (LB.LinComb (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => a)) (K := Fin 1) (fun _ => g)
+theorem sval_flat
+    {a n m : ℤ} {g : Y ⟶ X} {t : LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => g) (fun _ => m))}
+    {s : LB.Sec (LB.LinComb (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => a)) (K := Fin 1)
+      (fun _ => g)
       (fun _ => n))}
-    (h : ∀ (Z : Scheme.{0}) (r : Z ⟶ Y) (z : Z) (j : L.ι), g (r z) ∈ L.U j →
-      gs r z _ (t.f fun _ => j) = gs r z _ (s.f fun _ => fun _ => j))
-    (r : Z ⟶ Y) (z : Z) (J' : (Z ⟶ X) → L.ι) (hJ : Good L z J') :
-    sval t r z J' = sval s r z (fun ψ _ => J' ψ) :=
+    (h : ∀ (Z : Scheme.{0}) (r : Z ⟶ Y) (z : Z) (j : L.ι),
+      g (r z) ∈ L.U j → gs r z _ (t.f fun _ => j) = gs r z _ (s.f fun _ => fun _ => j))
+    (r : Z ⟶ Y)
+    (z : Z) (J' : (Z ⟶ X) → L.ι) (hJ : Good L z J')
+    : sval t r z J' = sval s r z (fun ψ _ => J' ψ) :=
   h Z r z (J' (r ≫ g)) (by simpa using hJ (r ≫ g))
 
 end Flat

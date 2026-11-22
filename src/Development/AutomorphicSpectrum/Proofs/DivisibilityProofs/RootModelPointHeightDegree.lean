@@ -11,13 +11,22 @@ public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PZhangLowerX
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 namespace GlobalTheory.CompanionTheory.Ar.Top
 
-theorem ht_combLine_integral_multiple : ∀ II : IntersectionSystem, IsFullIntersectionSystem II → ∀ (Ψ : Type) [Fintype Ψ] (N : ℕ) (M : RootModel Ψ N) (t : ℝ) (lam : Wt Ψ N) (s : ℝ) (q : ℕ) (n : Option (Ψ × Fin N) → ℤ) (W : Ideal (MRing M.ι)), (∀ j, (n j : ℝ) = q * M.coef lam s j) → M.IsPt W → 0 < degC W ∧ II M.K M.ι W 1 ![combLine (M.line t) n] = q * M.ht II t lam s W * degC W := by
+theorem ht_combLine_integral_multiple
+    : ∀ II : IntersectionSystem,
+      IsFullIntersectionSystem II
+        → ∀ (Ψ : Type) [Fintype Ψ] (N : ℕ) (M : RootModel Ψ N) (t : ℝ) (lam : Wt Ψ N) (s : ℝ)
+            (q : ℕ) (n : Option (Ψ × Fin N) → ℤ) (W : Ideal (MRing M.ι)),
+          (∀ j, (n j : ℝ) = q * M.coef lam s j) → M.IsPt W
+            → 0 < degC W
+              ∧ II M.K M.ι W 1 ![combLine (M.line t) n] = q * M.ht II t lam s W * degC W := by
   intro II hII Ψ _ N M t lam s q n W hn hW
-  have hpos : 0 < degC W := GroundTheory.Heights₂.Heights.LowerBoundFree.degC_pos_of_isArithVar_one hW.1
+  have hpos : 0 < degC W :=
+    GroundTheory.Heights₂.Heights.LowerBoundFree.degC_pos_of_isArithVar_one hW.1
   refine ⟨hpos, ?_⟩
   have hl : ∀ j, IsSmoothHerm (M.line t j) := by
     intro j
@@ -33,7 +42,9 @@ theorem ht_combLine_integral_multiple : ∀ II : IntersectionSystem, IsFullInter
     intro i
     obtain rfl : i = 0 := Subsingleton.elim _ _
     exact M.A_smooth
-  have h := GlobalTheory.T.arith_intersection_multilinear II hII M.K M.ι W 1 ![M.A] 0 (Option (Ψ × Fin N)) (M.line t) n hW.1 hL hl
+  have h :=
+    GlobalTheory.T.arith_intersection_multilinear II hII M.K M.ι W 1 ![M.A] 0 (Option (Ψ × Fin N))
+      (M.line t) n hW.1 hL hl
   simp only [hupd] at h
   have hd : (degC W : ℝ) ≠ 0 := by exact_mod_cast hpos.ne'
   rw [h, RootModel.ht, mul_assoc, div_mul_cancel₀ _ hd, Finset.mul_sum]

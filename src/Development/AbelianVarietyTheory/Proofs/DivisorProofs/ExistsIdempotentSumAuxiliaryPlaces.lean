@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EvalVAlge
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links GlobalTheory.ChiGrid
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links GlobalTheory.ChiGrid
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct nonZeroDivisors Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -18,21 +20,25 @@ open GlobalTheory.IdemModTwo
 
 variable {D : D7}
 
-theorem splitAt_under {e : Formalism.L2.Theta.AE D} {Q : HeightOneSpectrum (𝓞 D.host.E)}
-    (h : Formalism.L2.NTheta.IsIdemAt e Q) : SplitAt D (Q.under (𝓞 D.host.F)) e := by
+theorem splitAt_under
+    {e : Formalism.L2.Theta.AE D} {Q : HeightOneSpectrum (𝓞 D.host.E)}
+    (h : Formalism.L2.NTheta.IsIdemAt e Q)
+    : SplitAt D (Q.under (𝓞 D.host.F)) e := by
   obtain ⟨v, he⟩ := (isSplitIdem_iff e).1 h.1
   obtain ⟨Q', hQ, hQv⟩ := GlobalTheory.IdemPrime.exists_isIdemAt D v e he
-  obtain rfl : Q = Q' := HeightOneSpectrum.ext (Ideal.ext fun x => by
-    by_cases hx : x = 0
-    · rw [hx]; exact iff_of_true (zero_mem _) (zero_mem _)
-    · rw [h.2 x hx, hQ.2 x hx])
+  obtain rfl : Q = Q' :=
+    HeightOneSpectrum.ext (Ideal.ext fun x => by
+      by_cases hx : x = 0
+      · rw [hx]; exact iff_of_true (zero_mem _) (zero_mem _)
+      · rw [h.2 x hx, hQ.2 x hx])
   have : Q.under (𝓞 D.host.F) = v := HeightOneSpectrum.ext hQv
   rwa [this]
 
-theorem exists_isIdemSum (S : Finset (HeightOneSpectrum (𝓞 D.host.E)))
+theorem exists_isIdemSum
+    (S : Finset (HeightOneSpectrum (𝓞 D.host.E)))
     (h : ∀ Q ∈ S, ∃ e : Formalism.L2.Theta.AE D, Formalism.L2.NTheta.IsIdemAt e Q)
-    (hinj : ∀ Q ∈ S, ∀ Q' ∈ S, Q.under (𝓞 D.host.F) = Q'.under (𝓞 D.host.F) → Q = Q') :
-    ∃ e : Formalism.L2.Theta.AE D, IsIdemSum e S := by
+    (hinj : ∀ Q ∈ S, ∀ Q' ∈ S, Q.under (𝓞 D.host.F) = Q'.under (𝓞 D.host.F) → Q = Q')
+    : ∃ e : Formalism.L2.Theta.AE D, IsIdemSum e S := by
   choose! es hes using h
   refine ⟨∑ Q ∈ S, es Q, ⟨es, hes, rfl⟩, ?_⟩
   set_option synthInstance.maxHeartbeats 100000 in
@@ -41,9 +47,12 @@ theorem exists_isIdemSum (S : Finset (HeightOneSpectrum (𝓞 D.host.E)))
   by_cases hq : Q = Q'
   · subst hq
     exact (hes Q hQ).1.2.1
-  · exact (splitAt_under (hes Q hQ)).orth (splitAt_under (hes Q' hQ')).conj fun h => hq (hinj Q hQ Q' hQ' h)
+  · exact (splitAt_under (hes Q hQ)).orth (splitAt_under (hes Q' hQ')).conj fun h =>
+      hq (hinj Q hQ Q' hQ' h)
 
-theorem exists_idempotentSum_auxiliaryPlaces : ∀ (D : D7) (T : Type) (L : LevCh D T) (P : Places L), ∃ e : Formalism.L2.Theta.AE D, IsIdemSum e P.W0 := by
+theorem exists_idempotentSum_auxiliaryPlaces
+    : ∀ (D : D7) (T : Type) (L : LevCh D T) (P : Places L), ∃ e : Formalism.L2.Theta.AE D,
+      IsIdemSum e P.W0 := by
   classical
   intro D T L P
   have hm : ∀ Q ∈ P.W0, ∃ v ∈ P.S0, P.w v = Q := fun Q hQ => by

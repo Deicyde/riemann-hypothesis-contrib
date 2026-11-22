@@ -8,23 +8,29 @@ namespace Formalism.FourierDecayAlt.P.Dual
 
 open NumberField FractionalIdeal
 
-theorem alg {E : Type} [Field E] [NumberField E] (dd : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
-    (hdd : dd ≠ 0) (ν g : ℤ) (hg : g ≠ 0) :
-    spanSingleton _ (g : E) * (dd⁻¹ * (dd ^ ν * spanSingleton _ ((g : E) ^ 2))⁻¹) =
-      dd ^ (-(ν + 1)) * spanSingleton _ ((g : E)⁻¹) := by
+theorem alg
+    {E : Type} [Field E] [NumberField E]
+    (dd : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hdd : dd ≠ 0)
+    (ν g : ℤ) (hg : g ≠ 0)
+    : spanSingleton _ (g : E) * (dd⁻¹ * (dd ^ ν * spanSingleton _ ((g : E) ^ 2))⁻¹)
+      = dd ^ (-(ν + 1)) * spanSingleton _ ((g : E)⁻¹) := by
   have hgE : (g : E) ≠ 0 := by exact_mod_cast hg
   rw [mul_inv (dd ^ ν), spanSingleton_inv]
-  have h1 : spanSingleton (nonZeroDivisors (𝓞 E)) (g : E) * spanSingleton _ (((g : E) ^ 2)⁻¹) =
-      spanSingleton _ ((g : E)⁻¹) := by
+  have h1
+      : spanSingleton (nonZeroDivisors (𝓞 E)) (g : E) * spanSingleton _ (((g : E) ^ 2)⁻¹)
+        = spanSingleton _ ((g : E)⁻¹) := by
     rw [spanSingleton_mul_spanSingleton]; congr 1; field_simp
   rw [show dd ^ (-(ν + 1)) = dd⁻¹ * (dd ^ ν)⁻¹ by
     rw [neg_add, zpow_add₀ hdd, _root_.zpow_neg, zpow_neg_one, mul_comm]]
-  rw [← h1]; ring
+  rw [← h1]
+  ring
 
 theorem dual_third_group_integral : Formalism.FourierDecayAlt.L.DualLatticeInclusion := by
   intro E _ _ dd h1 ν g hg La hLa x hx
   have hdd : dd ≠ 0 := by
-    intro h0; rw [h0, _root_.inv_zero] at h1; exact dual_ne_zero ℤ ℚ (one_ne_zero (α := FractionalIdeal (nonZeroDivisors (𝓞 E)) E)) h1
+    intro h0
+    rw [h0, _root_.inv_zero] at h1
+    exact dual_ne_zero ℤ ℚ (one_ne_zero (α := FractionalIdeal (nonZeroDivisors (𝓞 E)) E)) h1
   have hgE : (g : E) ≠ 0 := by exact_mod_cast hg
   have hJ : dd ^ ν * spanSingleton (nonZeroDivisors (𝓞 E)) ((g : E) ^ 2) ≠ 0 :=
     mul_ne_zero (zpow_ne_zero _ hdd) (by simp [spanSingleton_eq_zero_iff, hgE])
@@ -43,4 +49,6 @@ theorem dual_third_group_integral : Formalism.FourierDecayAlt.L.DualLatticeInclu
 
 end Formalism.FourierDecayAlt.P.Dual
 
-theorem Formalism.FourierDecayAlt.P.dual_third_group_holds : Formalism.FourierDecayAlt.L.DualLatticeInclusion := Formalism.FourierDecayAlt.P.Dual.dual_third_group_integral
+theorem Formalism.FourierDecayAlt.P.dual_third_group_holds
+    : Formalism.FourierDecayAlt.L.DualLatticeInclusion :=
+  Formalism.FourierDecayAlt.P.Dual.dual_third_group_integral

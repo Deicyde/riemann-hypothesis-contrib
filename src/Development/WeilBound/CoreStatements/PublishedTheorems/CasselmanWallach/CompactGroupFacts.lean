@@ -21,8 +21,10 @@ theorem second_derivative_holds : B3 := by
   obtain ⟨u, hu, hsub⟩ := mem_nhdsGT_iff_exists_Ioo_subset.mp (e1.and e2)
   have hu0 : (0 : ℝ) < u := hu
   have hb : u / 2 ∈ Set.Ioo (0 : ℝ) u := ⟨by linarith, by linarith⟩
-  obtain ⟨c, hc, hcslope⟩ := exists_hasDerivAt_eq_slope ψ ψ' (half_pos hu0)
-    (fun t _ => (hψ t).continuousAt.continuousWithinAt) (fun t _ => hψ t)
+  obtain ⟨c, hc, hcslope⟩ :=
+    exists_hasDerivAt_eq_slope ψ ψ' (half_pos hu0)
+      (fun t _ => (hψ t).continuousAt.continuousWithinAt)
+      (fun t _ => hψ t)
   have hcu : c ∈ Set.Ioo (0 : ℝ) u := ⟨hc.1, hc.2.trans (by linarith)⟩
   obtain ⟨-, hc'⟩ := hsub hcu
   obtain ⟨hbmax, -⟩ := hsub hb

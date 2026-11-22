@@ -11,9 +11,11 @@ open Formalism.REAL (UJ KG toM toMK muK expG inG Jm Kset)
 
 namespace GlobalTheory
 
-theorem expG_continuous_inv : ∀ (n : ℕ) (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ), inG ε Z →
-    Continuous (fun t : ℝ => expG ε Z t) ∧
-      ∀ t : ℝ, toM (expG ε Z t)⁻¹ = NormedSpace.exp (-((t : ℂ) • Z)) := by
+theorem expG_continuous_inv
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ),
+      inG ε Z
+        → Continuous (fun t : ℝ => expG ε Z t)
+          ∧ ∀ t : ℝ, toM (expG ε Z t)⁻¹ = NormedSpace.exp (-((t : ℂ) • Z)) := by
   intro n ε Z hZ
   refine ⟨(Formalism.REAL.group_exponential_facts n ε Z hZ).2.2.1, fun t => ?_⟩
   have hmul : toM (expG ε Z t) * NormedSpace.exp (-((t : ℂ) • Z)) = 1 := by

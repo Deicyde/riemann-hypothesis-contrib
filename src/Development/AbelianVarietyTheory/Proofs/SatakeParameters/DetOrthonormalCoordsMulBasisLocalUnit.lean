@@ -9,20 +9,27 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsUnitNat
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.MainNotions.G.KAat Formalism.MainNotions.G.CmpJ Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelInstances Formalism.L2.KerInert.SecondKernelSeries Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwU GlobalTheory.TwV GlobalTheory.TwV.DelB TensorProduct
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.MainNotions.G.KAat
+  Formalism.MainNotions.G.CmpJ Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelInstances
+  Formalism.L2.KerInert.SecondKernelSeries Formalism.L2.KerInert.QuadraticBaseChangeGL3
+  Formalism.L2.KerInert.SecondKernelDifference Formalism.L2.KerInert.SecondKernelHermitian
+  GlobalTheory.TwU GlobalTheory.TwV GlobalTheory.TwV.DelB TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped Matrix
 
 namespace GlobalTheory.TwV.LatDet
 
-theorem det_isUnit_of_colSpan {W Qq : Type} [CommRing W] [Field Qq] [Algebra W Qq]
-    (hinj : Function.Injective (algebraMap W Qq)) {N : ℕ} (M : Matrix (Fin N) (Fin N) Qq)
-    (h1 : ∀ i c, M i c ∈ (algebraMap W Qq).range) (h2 : ∀ i, Pi.single i (1 : Qq) ∈ colSpan W M) :
-    ∃ y : Wˣ, M.det = algebraMap W Qq y := by
+theorem det_isUnit_of_colSpan
+    {W Qq : Type} [CommRing W] [Field Qq] [Algebra W Qq]
+    (hinj : Function.Injective (algebraMap W Qq))
+    {N : ℕ} (M : Matrix (Fin N) (Fin N) Qq) (h1 : ∀ i c, M i c ∈ (algebraMap W Qq).range)
+    (h2 : ∀ i, Pi.single i (1 : Qq) ∈ colSpan W M)
+    : ∃ y : Wˣ, M.det = algebraMap W Qq y := by
   choose M0' hM0 using h1
   let M0 : Matrix (Fin N) (Fin N) W := fun i c => M0' i c
-  have hM : M = M0.map (algebraMap W Qq) := by
-    ext i c; rw [Matrix.map_apply]; exact (hM0 i c).symm
+  have hM : M = M0.map (algebraMap W Qq) := by ext i c; rw [Matrix.map_apply]; exact (hM0 i c).symm
   have h2' : ∀ i, ∃ c : Fin N → W, ∑ k, c k • (fun r => M r k) = Pi.single i (1 : Qq) := fun i =>
     (Submodule.mem_span_range_iff_exists_fun W).1 (h2 i)
   choose C hC using h2'
@@ -33,11 +40,13 @@ theorem det_isUnit_of_colSpan {W Qq : Type} [CommRing W] [Field Qq] [Algebra W Q
     simp only [Finset.sum_apply, Pi.smul_apply] at this
     simp only [Algebra.smul_def] at this
     rw [Matrix.mul_apply, Matrix.one_apply]
-    have h3 : ∑ k, M r k * (C0.map (algebraMap W Qq)) k i = ∑ k, algebraMap W Qq (C i k) * M r k := by
+    have h3
+        : ∑ k, M r k * (C0.map (algebraMap W Qq)) k i = ∑ k, algebraMap W Qq (C i k) * M r k := by
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [Matrix.map_apply, mul_comm]
     rw [h3, this, Pi.single_apply]
-  have h4 : (M0 * C0).map (algebraMap W Qq) = (1 : Matrix (Fin N) (Fin N) W).map (algebraMap W Qq) := by
+  have h4
+      : (M0 * C0).map (algebraMap W Qq) = (1 : Matrix (Fin N) (Fin N) W).map (algebraMap W Qq) := by
     rw [Matrix.map_mul, ← hM, hMC, Matrix.map_one _ (map_zero _) (map_one _)]
   have h5 : M0 * C0 = 1 := by
     ext i c
@@ -49,17 +58,23 @@ theorem det_isUnit_of_colSpan {W Qq : Type} [CommRing W] [Field Qq] [Algebra W Q
   rw [hM]
   exact (RingHom.map_det (algebraMap W Qq) M0).symm
 
-theorem rho_int_mem {E W Qq : Type} [Field E] [NumberField E] [CommRing W] [IsDomain W] [Field Qq] [Algebra W Qq]
-    [IsFractionRing W Qq] [IsIntegrallyClosed W] (ρ : E →+* Qq) (x : 𝓞 E) : ρ x ∈ (algebraMap W Qq).range := by
+theorem rho_int_mem
+    {E W Qq : Type} [Field E] [NumberField E] [CommRing W] [IsDomain W] [Field Qq] [Algebra W Qq]
+    [IsFractionRing W Qq] [IsIntegrallyClosed W]
+    (ρ : E →+* Qq) (x : 𝓞 E)
+    : ρ x ∈ (algebraMap W Qq).range := by
   have hx : IsIntegral ℤ (x : E) := NumberField.RingOfIntegers.isIntegral_coe x
   have h1 : IsIntegral ℤ (ρ x) := hx.map ρ.toIntAlgHom
   have h2 : IsIntegral W (ρ x) := h1.tower_top
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.mp h2
   exact ⟨y, hy⟩
 
-theorem mulVec_mem_locSp_mvL {E W Qq : Type} [Field E] [NumberField E] [StarRing E] [CommRing W] [Field Qq] [Algebra W Qq]
-    (ρ : E →+* Qq) {N : ℕ} (g : GL (Fin N) E) (L : Submodule (𝓞 E) (Fin N → E)) {z : Fin N → Qq}
-    (hz : z ∈ locSp W ρ L) : (g.1.map ρ) *ᵥ z ∈ locSp W ρ (mvL g L) := by
+theorem mulVec_mem_locSp_mvL
+    {E W Qq : Type} [Field E] [NumberField E] [StarRing E] [CommRing W] [Field Qq] [Algebra W Qq]
+    (ρ : E →+* Qq)
+    {N : ℕ} (g : GL (Fin N) E) (L : Submodule (𝓞 E) (Fin N → E))
+    {z : Fin N → Qq} (hz : z ∈ locSp W ρ L)
+    : (g.1.map ρ) *ᵥ z ∈ locSp W ρ (mvL g L) := by
   let f : (Fin N → Qq) →ₗ[W] (Fin N → Qq) := ((g.1.map ρ).mulVecLin).restrictScalars W
   have hle : locSp W ρ L ≤ (locSp W ρ (mvL g L)).comap f := by
     unfold locSp
@@ -79,11 +94,16 @@ end GlobalTheory.TwV.LatDet
 
 namespace GlobalTheory.TwV.LatDet
 
-theorem locSp_std_int {E W Qq : Type} [Field E] [NumberField E] [CommRing W] [IsDomain W] [Field Qq] [Algebra W Qq]
-    [IsFractionRing W Qq] [IsIntegrallyClosed W] (ρ : E →+* Qq) {N : ℕ} {z : Fin N → Qq}
-    (hz : z ∈ locSp W ρ (Submodule.pi Set.univ (fun _ : Fin N => (1 : Submodule (𝓞 E) E)))) (i : Fin N) :
-    z i ∈ (algebraMap W Qq).range := by
-  let P : Submodule W (Fin N → Qq) := Submodule.pi Set.univ (fun _ => LinearMap.range (Algebra.linearMap W Qq))
+theorem locSp_std_int
+    {E W Qq : Type} [Field E] [NumberField E] [CommRing W] [IsDomain W] [Field Qq] [Algebra W Qq]
+    [IsFractionRing W Qq] [IsIntegrallyClosed W]
+    (ρ : E →+* Qq)
+    {N : ℕ} {z : Fin N → Qq}
+    (hz : z ∈ locSp W ρ (Submodule.pi Set.univ (fun _ : Fin N => (1 : Submodule (𝓞 E) E))))
+    (i : Fin N)
+    : z i ∈ (algebraMap W Qq).range := by
+  let P : Submodule W (Fin N → Qq) :=
+    Submodule.pi Set.univ (fun _ => LinearMap.range (Algebra.linearMap W Qq))
   have hle : locSp W ρ (Submodule.pi Set.univ (fun _ : Fin N => (1 : Submodule (𝓞 E) E))) ≤ P := by
     unfold locSp
     rw [Submodule.span_le]
@@ -98,14 +118,23 @@ theorem locSp_std_int {E W Qq : Type} [Field E] [NumberField E] [CommRing W] [Is
   obtain ⟨w', hw⟩ := hle hz i trivial
   exact ⟨w', hw⟩
 
-theorem det_unit_of_base {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
-    (sp : Spaces R F E) {W Qq : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq] [Algebra W Qq]
-    [IsFractionRing W Qq] (ρ : E →+* Qq) {N : ℕ} (J : Matrix (Fin N) (Fin N) E) (a : 𝓞 E) (T : ℕ)
-    (Lb : Submodule (𝓞 E) (Fin N → E)) (hT : IsUnit (T : W))
-    (hdual : ∀ z ∈ dualSet (sp.cm.sig : E →+* E) J Lb, (T : E) • z ∈ Lb) (crd B : GL (Fin N) E)
-    (hbase : mvL crd (compan (sp := sp) J a Lb) = Submodule.pi Set.univ (fun _ : Fin N => (1 : Submodule (𝓞 E) E)))
-    (hB : locSp W ρ Lb = colSpan W (B.1.map ρ)) :
-    ∃ y : Wˣ, ρ (crd.1.det * B.1.det) = algebraMap W Qq y := by
+theorem det_unit_of_base
+    {R : Ranks} {F E : Type}
+    [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+    (sp : Spaces R F E)
+    {W Qq : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq] [Algebra W Qq]
+    [IsFractionRing W Qq]
+    (ρ : E →+* Qq)
+    {N : ℕ} (J : Matrix (Fin N) (Fin N) E)
+    (a : 𝓞 E)
+    (T : ℕ)
+    (Lb : Submodule (𝓞 E) (Fin N → E))
+    (hT : IsUnit (T : W)) (hdual : ∀ z ∈ dualSet (sp.cm.sig : E →+* E) J Lb, (T : E) • z ∈ Lb)
+    (crd B : GL (Fin N) E)
+    (hbase : mvL crd (compan (sp := sp) J a Lb)
+      = Submodule.pi Set.univ (fun _ : Fin N => (1 : Submodule (𝓞 E) E)))
+    (hB : locSp W ρ Lb = colSpan W (B.1.map ρ))
+    : ∃ y : Wˣ, ρ (crd.1.det * B.1.det) = algebraMap W Qq y := by
   have hc := CompSp.locSp_compan_eq sp W Qq ρ J a T Lb hT hdual
   rw [hB] at hc
   let M : Matrix (Fin N) (Fin N) Qq := crd.1.map ρ * B.1.map ρ
@@ -124,7 +153,9 @@ theorem det_unit_of_base {R : Ranks} {F E : Type} [Field F] [NumberField F] [Fie
     rw [hbase, hcolM] at h1
     exact locSp_std_int ρ h1 i
   · intro i
-    have hei : Pi.single i (1 : E) ∈ Submodule.pi Set.univ (fun _ : Fin N => (1 : Submodule (𝓞 E) E)) := by
+    have hei
+        : Pi.single i (1 : E)
+          ∈ Submodule.pi Set.univ (fun _ : Fin N => (1 : Submodule (𝓞 E) E)) := by
       intro k _
       rw [Pi.single_apply]
       split_ifs
@@ -158,9 +189,10 @@ end GlobalTheory.TwV.LatDet
 
 namespace GlobalTheory.TwV.LatDet
 
-theorem latAd_one_eq {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {N : ℕ}
-    (Lb : Submodule (𝓞 E) (Fin N → E)) (hfin : Module.Finite (𝓞 E) Lb) :
-    latAd (1 : GL (Fin N) (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Lb = Lb := by
+theorem latAd_one_eq
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {N : ℕ} (Lb : Submodule (𝓞 E) (Fin N → E)) (hfin : Module.Finite (𝓞 E) Lb)
+    : latAd (1 : GL (Fin N) (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Lb = Lb := by
   apply le_antisymm
   · rw [latAd, Submodule.span_le]
     intro x hx
@@ -171,10 +203,19 @@ theorem latAd_one_eq {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
     apply Submodule.subset_span
     show _ ∈ {x | _}
     simp only [Set.mem_setOf_eq, inv_one, Units.val_one, Matrix.one_mulVec]
-    exact (Submodule.subset_span ⟨x, hx, rfl⟩ : (fun i => inclE (FiniteAdeleRing (𝓞 F) F) (x i)) ∈
-      latS (F := F) (FiniteAdeleRing (𝓞 F) F) (tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)) Lb)
+    exact (Submodule.subset_span ⟨x, hx, rfl⟩
+      : (fun i => inclE (FiniteAdeleRing (𝓞 F) F) (x i)) ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F)
+        (tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)) Lb)
 
-theorem crd_mul_det_unit : AllSites (fun {D L hT Gi Gl Kc Dx cX ex u μ w hg Lv I H X} [Fact (D.what₂.places.resChar w).Prime] {std t J} S => ∀ j (hj : j ≤ D.R.m) (β : (J.St j hj).Ch) (B : GL (Fin (D.R.N j)) D.host.E), ∀ v, locSp ((sysS H X std).G.P.W v) (J.rho std v) ((J.St j hj).K β).lev.Lb = colSpan ((sysS H X std).G.P.W v) (B.1.map (J.rho std v)) → ∃ y : ((sysS H X std).G.P.W v)ˣ, J.rho std v ((J.A.crd j hj).1.det * B.1.det) = algebraMap _ _ (y : (sysS H X std).G.P.W v)) := by
+theorem crd_mul_det_unit
+    : AllSites (fun {D L hT Gi Gl Kc Dx cX ex u μ w hg Lv I H X}
+        [Fact (D.what₂.places.resChar w).Prime] {std t J} S =>
+      ∀ j (hj : j ≤ D.R.m) (β : (J.St j hj).Ch) (B : GL (Fin (D.R.N j)) D.host.E), ∀ v,
+        locSp ((sysS H X std).G.P.W v) (J.rho std v) ((J.St j hj).K β).lev.Lb
+            = colSpan ((sysS H X std).G.P.W v) (B.1.map (J.rho std v))
+          → ∃ y : ((sysS H X std).G.P.W v)ˣ,
+            J.rho std v ((J.A.crd j hj).1.det * B.1.det)
+              = algebraMap _ _ (y : (sysS H X std).G.P.W v)) := by
   intro D L hT Gi Gl Kc Dx cX ex u μ w hg Lv I H X _ std t J S j hj β B v hB
   have hbase := J.base j hj β
   unfold latCo at hbase
@@ -185,8 +226,10 @@ theorem crd_mul_det_unit : AllSites (fun {D L hT Gi Gl Kc Dx cX ex u μ w hg Lv 
   haveI := hset.frac_alt
   have hcop : Nat.Coprime (D.mem u).A.T (D.what₂.places.resChar w) :=
     (Nat.coprime_comm).1 ((Nat.Prime.coprime_iff_not_dvd hg.1).2 hg.2.2.2.2.2)
-  have hTu : IsUnit (((D.mem u).A.T : ℕ) : (sysS H X std).G.P.W v) := natCast_isUnit_localRing (sysS H X std) v _ hcop
+  have hTu : IsUnit (((D.mem u).A.T : ℕ) : (sysS H X std).G.P.W v) :=
+    natCast_isUnit_localRing (sysS H X std) v _ hcop
   rw [← hTe] at hTu
-  exact det_unit_of_base D.sp (J.rho std v) (gramN D j hj) J.a (J.St j hj).T _ hTu hdual (J.A.crd j hj) B hbase hB
+  exact det_unit_of_base D.sp (J.rho std v) (gramN D j hj) J.a (J.St j hj).T _ hTu hdual
+    (J.A.crd j hj) B hbase hB
 
 end GlobalTheory.TwV.LatDet

@@ -11,8 +11,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem specFirstVar_isWeightedHomogeneous {k n : ℕ} (u : Fin n → ℂ) (ij : Fin (k + 1) × Fin n) :
-    IsWeightedHomogeneous (groupWeight k n) (specFirstVar u ij)
+theorem specFirstVar_isWeightedHomogeneous {k n : ℕ} (u : Fin n → ℂ) (ij : Fin (k + 1) × Fin n)
+    : IsWeightedHomogeneous (groupWeight k n) (specFirstVar u ij)
       (fun i : Fin k => groupWeight (k + 1) n ij i.succ) := by
   obtain ⟨i, j⟩ := ij
   induction i using Fin.cases with
@@ -23,7 +23,9 @@ theorem specFirstVar_isWeightedHomogeneous {k n : ℕ} (u : Fin n → ℂ) (ij :
     rw [h0]
     simpa [specFirstVar] using isWeightedHomogeneous_C (groupWeight k n) (u j)
   | succ i' =>
-    have h1 : (fun i : Fin k => groupWeight (k + 1) n (i'.succ, j) i.succ) = groupWeight k n (i', j) := by
+    have h1
+        : (fun i : Fin k => groupWeight (k + 1) n (i'.succ, j) i.succ)
+          = groupWeight k n (i', j) := by
       funext i
       simp [groupWeight, Pi.single_apply]
     rw [h1]
@@ -36,8 +38,9 @@ theorem SpecFirstHomog.proof : SpecFirstHomog.Statement := by
     rw [f.as_sum, map_sum]
   refine IsWeightedHomogeneous.sum _ _ _ fun d hd => ?_
   rw [bind₁_monomial]
-  have hdeg : (fun _ : Fin k => δ) =
-      ∑ ij ∈ d.support, d ij • (fun i : Fin k => groupWeight (k + 1) n ij i.succ) := by
+  have hdeg
+      : (fun _ : Fin k => δ)
+        = ∑ ij ∈ d.support, d ij • (fun i : Fin k => groupWeight (k + 1) n ij i.succ) := by
     have hw := hf (mem_support_iff.mp hd)
     funext i
     have := congrFun hw i.succ

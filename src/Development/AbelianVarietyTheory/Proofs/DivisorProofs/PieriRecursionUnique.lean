@@ -8,13 +8,19 @@ open scoped Classical
 
 namespace GlobalTheory
 
-theorem pieri_recursion_zero (n : ℕ) (c : ℕ → ℂ) (D : (Fin n → ℕ) → ℂ)
-    (hD : ∀ l, ¬ Antitone l → D l = 0)
-    (hr : ∀ l, Antitone l → ∀ j ≤ n, ∑ J ∈ (Finset.univ : Finset (Finset (Fin n))).filter
-      (fun J => J.card = j), D (l + (fun i => if i ∈ J then 1 else 0)) = c j * D l)
-    (h0 : D 0 = 0) : ∀ μ, D μ = 0 := by
-  have main : ∀ s k (μ : Fin n → ℕ), ∑ i, μ i = s →
-      n - (Finset.univ.filter (fun i => μ i ≠ 0)).card = k → D μ = 0 := by
+theorem pieri_recursion_zero
+    (n : ℕ) (c : ℕ → ℂ) (D : (Fin n → ℕ) → ℂ) (hD : ∀ l, ¬ Antitone l → D l = 0)
+    (hr : ∀ l,
+      Antitone l
+        → ∀ j ≤ n,
+          ∑ J ∈ (Finset.univ : Finset (Finset (Fin n))).filter
+              (fun J => J.card = j), D (l + (fun i => if i ∈ J then 1 else 0))
+            = c j * D l)
+    (h0 : D 0 = 0)
+    : ∀ μ, D μ = 0 := by
+  have main
+      : ∀ s k (μ : Fin n → ℕ),
+        ∑ i, μ i = s → n - (Finset.univ.filter (fun i => μ i ≠ 0)).card = k → D μ = 0 := by
     intro s
     refine Nat.strong_induction_on s ?_
     intro s ihs k
@@ -33,8 +39,9 @@ theorem pieri_recursion_zero (n : ℕ) (c : ℕ → ℂ) (D : (Fin n → ℕ) �
       funext i
       simp only [Pi.add_apply, hl, hJ0, Finset.mem_filter, Finset.mem_univ, true_and]
       split_ifs with h <;> omega
-    have hsum : ∀ J : Finset (Fin n),
-        ∑ i, ((l + (fun i => if i ∈ J then 1 else 0) : Fin n → ℕ)) i = ∑ i, l i + J.card := by
+    have hsum
+        : ∀ J : Finset (Fin n),
+          ∑ i, ((l + (fun i => if i ∈ J then 1 else 0) : Fin n → ℕ)) i = ∑ i, l i + J.card := by
       intro J
       simp [Finset.sum_add_distrib, Finset.sum_boole]
     have hDl : D l = 0 := by
@@ -44,11 +51,14 @@ theorem pieri_recursion_zero (n : ℕ) (c : ℕ → ℂ) (D : (Fin n → ℕ) �
           by_contra h
           push_neg at h
           exact hz (funext h)
-        exact Finset.sum_lt_sum (fun i _ => Nat.sub_le _ _)
+        exact Finset.sum_lt_sum
+          (fun i _ => Nat.sub_le _ _)
           ⟨i, Finset.mem_univ _, by simp only [hl]; omega⟩
       exact ihs _ hlt _ l rfl rfl
-    have hsingle : ∑ J ∈ (Finset.univ : Finset (Finset (Fin n))).filter (fun J => J.card = J0.card),
-        D (l + (fun i => if i ∈ J then 1 else 0)) = D (l + (fun i => if i ∈ J0 then 1 else 0)) := by
+    have hsingle
+        : ∑ J ∈ (Finset.univ : Finset (Finset (Fin n))).filter (fun J => J.card = J0.card),
+            D (l + (fun i => if i ∈ J then 1 else 0))
+          = D (l + (fun i => if i ∈ J0 then 1 else 0)) := by
       refine Finset.sum_eq_single_of_mem J0 (by simp) ?_
       intro J hJ hne
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hJ
@@ -90,19 +100,31 @@ theorem pieri_recursion_zero (n : ℕ) (c : ℕ → ℂ) (D : (Fin n → ℕ) �
   intro μ
   exact main _ _ μ rfl rfl
 
-theorem pieri_recursion_unique : ∀ (n : ℕ) (c : ℕ → ℂ) (V U : (Fin n → ℕ) → ℂ),
-    (∀ l, ¬ Antitone l → V l = 0) → (∀ l, ¬ Antitone l → U l = 0) →
-    (∀ l, Antitone l → ∀ j ≤ n, ∑ J ∈ (Finset.univ : Finset (Finset (Fin n))).filter
-      (fun J => J.card = j), V (l + (fun i => if i ∈ J then 1 else 0)) = c j * V l) →
-    (∀ l, Antitone l → ∀ j ≤ n, ∑ J ∈ (Finset.univ : Finset (Finset (Fin n))).filter
-      (fun J => J.card = j), U (l + (fun i => if i ∈ J then 1 else 0)) = c j * U l) →
-    V 0 = U 0 → V = U := by
+theorem pieri_recursion_unique
+    : ∀ (n : ℕ) (c : ℕ → ℂ) (V U : (Fin n → ℕ) → ℂ),
+      (∀ l, ¬ Antitone l → V l = 0) → (∀ l, ¬ Antitone l → U l = 0)
+        → (∀ l,
+          Antitone l
+            → ∀ j ≤ n,
+              ∑ J ∈ (Finset.univ : Finset (Finset (Fin n))).filter
+                  (fun J => J.card = j), V (l + (fun i => if i ∈ J then 1 else 0))
+                = c j * V l)
+        → (∀ l,
+          Antitone l
+            → ∀ j ≤ n,
+              ∑ J ∈ (Finset.univ : Finset (Finset (Fin n))).filter
+                  (fun J => J.card = j), U (l + (fun i => if i ∈ J then 1 else 0))
+                = c j * U l)
+        → V 0 = U 0
+        → V = U := by
   intro n c V U hV hU hrV hrU h0
-  have h := pieri_recursion_zero n c (fun l => V l - U l)
-    (fun l hl => by simp [hV l hl, hU l hl])
-    (fun l hl j hj => by
-      simp only [Finset.sum_sub_distrib, hrV l hl j hj, hrU l hl j hj, mul_sub])
-    (by simp [h0])
+  have h :=
+    pieri_recursion_zero n c
+      (fun l => V l - U l)
+      (fun l hl => by simp [hV l hl, hU l hl])
+      (fun l hl j hj => by
+        simp only [Finset.sum_sub_distrib, hrV l hl j hj, hrU l hl j hj, mul_sub])
+      (by simp [h0])
   funext μ
   exact sub_eq_zero.mp (h μ)
 

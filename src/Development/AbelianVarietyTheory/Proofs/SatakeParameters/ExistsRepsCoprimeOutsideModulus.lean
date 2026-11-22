@@ -6,9 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-
 open IsDedekindDomain in
-theorem exists_reps_coprime_outside_modulus : ∀ (A : Type) [CommRing A] [IsDedekindDomain A] (m : Ideal A) (a₀ b₀ : A), m ≠ ⊥ → ∃ a b : A, a - a₀ ∈ m ∧ b - b₀ ∈ m ∧ b ≠ 0 ∧ ∀ p : Ideal A, p.IsMaximal → ¬ m ≤ p → ¬ (a ∈ p ∧ b ∈ p) := by
+theorem exists_reps_coprime_outside_modulus
+    : ∀ (A : Type) [CommRing A] [IsDedekindDomain A] (m : Ideal A) (a₀ b₀ : A),
+      m ≠ ⊥
+        → ∃ a b : A,
+          a - a₀ ∈ m ∧ b - b₀ ∈ m ∧ b ≠ 0
+            ∧ ∀ p : Ideal A, p.IsMaximal → ¬ m ≤ p → ¬(a ∈ p ∧ b ∈ p) := by
   classical
   intro A _ _ m a₀ b₀ hm
   obtain ⟨b, hbm, hb0⟩ : ∃ b, b - b₀ ∈ m ∧ b ≠ 0 := by
@@ -36,7 +40,8 @@ theorem exists_reps_coprime_outside_modulus : ∀ (A : Type) [CommRing A] [IsDed
   refine ⟨a₀ * y + x, b, ?_, hbm, hb0, ?_⟩
   · have : a₀ * y + x - a₀ = x - a₀ * x := by
       have hy' : y = 1 - x := by rw [← hxy]; ring
-      rw [hy']; ring
+      rw [hy']
+      ring
     rw [this]
     exact m.sub_mem hx (m.mul_mem_left a₀ hx)
   · rintro p hp hmp ⟨hap, hbp⟩

@@ -11,15 +11,16 @@ noncomputable section
 
 namespace PI.VolStabS.TopoMeas
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField IsDedekindDomain MeasureTheory Filter Topology PI.VolFromSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField IsDedekindDomain
+  MeasureTheory Filter Topology PI.VolFromSW
 open scoped TensorProduct
 
-theorem measurable_finprod {X ι : Type} [MeasurableSpace X] [Countable ι] (f : ι → X → ℂ)
-    (hf : ∀ i, Measurable (f i)) : Measurable (fun x => ∏ᶠ i, f i x) := by
+theorem measurable_finprod
+    {X ι : Type} [MeasurableSpace X] [Countable ι] (f : ι → X → ℂ) (hf : ∀ i, Measurable (f i))
+    : Measurable (fun x => ∏ᶠ i, f i x) := by
   classical
   obtain ⟨e, he⟩ := exists_injective_nat ι
-  have hfin : ∀ n : ℕ, {i | e i < n}.Finite := fun n =>
-    (Set.finite_lt_nat n).preimage he.injOn
+  have hfin : ∀ n : ℕ, {i | e i < n}.Finite := fun n => (Set.finite_lt_nat n).preimage he.injOn
   let s : ℕ → Finset ι := fun n => (hfin n).toFinset
   let A : ℕ → Set X := fun n => ⋂ i, ⋂ (_ : n ≤ e i), f i ⁻¹' {1}
   let h : ℕ → X → ℂ := fun n x => if x ∈ A n then ∏ i ∈ s n, f i x else 1
@@ -60,15 +61,17 @@ theorem measurable_finprod {X ι : Type} [MeasurableSpace X] [Countable ι] (f :
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
 
-theorem continuous_projV {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-    {M a : ℕ} : Continuous (projV (F := F) (E := E) v (M := M) (n := a)) :=
-  continuous_pi fun x => continuous_pi fun i =>
-    (PI.VolStabS.PositiveNearLattice.continuous_map_tens b (evalV F v)
-      (by exact RestrictedProduct.continuous_eval v)).comp
-      ((continuous_apply i).comp (continuous_apply x))
+theorem continuous_projV
+    {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) {M a : ℕ}
+    : Continuous (projV (F := F) (E := E) v (M := M) (n := a)) :=
+  continuous_pi fun x =>
+    continuous_pi fun i =>
+      (PI.VolStabS.PositiveNearLattice.continuous_map_tens b (evalV F v)
+          (by exact RestrictedProduct.continuous_eval v)).comp
+        ((continuous_apply i).comp (continuous_apply x))
 
-theorem measurable_adm {M a : ℕ} (Φ : (Fin a → Fin M → AF F ⊗[F] E) → ℂ) (hΦ : IsAdm F E Φ) :
-    Measurable Φ := by
+theorem measurable_adm {M a : ℕ} (Φ : (Fin a → Fin M → AF F ⊗[F] E) → ℂ) (hΦ : IsAdm F E Φ)
+    : Measurable Φ := by
   obtain ⟨d, b, Φinf, Φf, Φv, hc, -, ⟨hSB, -, hprod⟩, hIF⟩ := hΦ
   have e1 : Φ = fun X => Φinf (projInf X) * Φf (projFin X) := funext hIF
   have e2 : Φf = fun Y => ∏ᶠ v, Φv v (projV v Y) := funext hprod
@@ -84,7 +87,8 @@ end PI.VolStabS.TopoMeas
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField MeasureTheory PI.VolFromSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField MeasureTheory
+  PI.VolFromSW
 
 theorem measOrb_holds : MeasOrb := by
   intro F E _ _ _ _ _ σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet Φ hΦ

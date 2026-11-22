@@ -11,16 +11,18 @@ open Set Filter Topology GlobalTheory.Cont
 
 namespace PositivityTheory.SiegelWeilFormula.Atop
 
-theorem vacData_of {G : Type} [TopologicalSpace G] (h : ℂ → G → ℂ) (s₀ : ℂ) (v : G → ℂ)
-    (U : Set ℂ) (p : Polynomial ℂ) (Ê : ℂ → G → ℂ) (t : ℝ) (hU : IsOpen U) (hR : IsRightDomain U) (hs : s₀ ∈ U)
-    (hp : p ≠ 0) (hd : ∀ g, DifferentiableOn ℂ (Ê · g) U)
+theorem vacData_of
+    {G : Type} [TopologicalSpace G]
+    (h : ℂ → G → ℂ) (s₀ : ℂ) (v : G → ℂ) (U : Set ℂ) (p : Polynomial ℂ) (Ê : ℂ → G → ℂ) (t : ℝ)
+    (hU : IsOpen U) (hR : IsRightDomain U) (hs : s₀ ∈ U) (hp : p ≠ 0)
+    (hd : ∀ g, DifferentiableOn ℂ (Ê · g) U)
     (hc : ContinuousOn (fun y : ℂ × G => Ê y.1 y.2) (U ×ˢ Set.univ))
-    (he : ∀ z : ℂ, t < z.re → ∀ g, Ê z g = p.eval z * h z g) (hv : ∀ g, HolValueAt (h · g) s₀ (v g)) :
-    ∃ (r : ℝ) (F : ℂ → G → ℂ), 0 < r ∧ ContinuousOn (fun y : ℂ × G => F y.1 y.2) (Metric.ball s₀ r ×ˢ Set.univ) ∧
-      (∀ g, DifferentiableOn ℂ (F · g) (Metric.ball s₀ r)) ∧ (∀ g, F s₀ g = v g) ∧
-      ∀ g, ∀ z ∈ Metric.ball s₀ r, HolValueAt (h · g) z (F z g) := by
+    (he : ∀ z : ℂ, t < z.re → ∀ g, Ê z g = p.eval z * h z g) (hv : ∀ g, HolValueAt (h · g) s₀ (v g))
+    : ∃ (r : ℝ) (F : ℂ → G → ℂ),
+      0 < r ∧ ContinuousOn (fun y : ℂ × G => F y.1 y.2) (Metric.ball s₀ r ×ˢ Set.univ)
+        ∧ (∀ g, DifferentiableOn ℂ (F · g) (Metric.ball s₀ r)) ∧ (∀ g, F s₀ g = v g)
+        ∧ ∀ g, ∀ z ∈ Metric.ball s₀ r, HolValueAt (h · g) z (F z g) := by
   classical
-
   set S := p.roots.toFinset with hS
   have hroot : ∀ z, p.eval z = 0 → z ∈ S := fun z hz => by
     rw [hS, Multiset.mem_toFinset, Polynomial.mem_roots hp]; exact hz
@@ -45,15 +47,18 @@ theorem vacData_of {G : Type} [TopologicalSpace G] (h : ℂ → G → ℂ) (s₀
       show Ê z g / p.eval z = h z g
       rw [he z h1 g, mul_div_cancel_left₀ _ h2]
   have hext : ∀ g z, z ∈ U → IsExtAt (h · g) z (Q · g) := fun g z hz => ⟨U, hz, hmer g⟩
-  have htend : ∀ g, Tendsto (Q · g) (𝓝[≠] s₀) (𝓝 (v g)) := fun g => (hext g s₀ hs).holValueAt_iff.1 (hv g)
+  have htend : ∀ g, Tendsto (Q · g) (𝓝[≠] s₀) (𝓝 (v g)) := fun g =>
+    (hext g s₀ hs).holValueAt_iff.1 (hv g)
 
   have hnhds : U ∩ ((((S.erase s₀ : Finset ℂ) : Set ℂ))ᶜ) ∈ 𝓝 s₀ :=
-    Filter.inter_mem (hU.mem_nhds hs) ((Finset.finite_toSet _).isClosed.isOpen_compl.mem_nhds (by simp))
+    Filter.inter_mem (hU.mem_nhds hs)
+      ((Finset.finite_toSet _).isClosed.isOpen_compl.mem_nhds (by simp))
   obtain ⟨r₁, hr₁, hball⟩ := Metric.mem_nhds_iff.1 hnhds
   have hbU : ∀ z ∈ Metric.ball s₀ r₁, z ∈ U := fun z hz => (hball hz).1
   have hbp : ∀ z ∈ Metric.ball s₀ r₁, z ≠ s₀ → p.eval z ≠ 0 := fun z hz hne h0 =>
     (hball hz).2 (Finset.mem_coe.2 (Finset.mem_erase.2 ⟨hne, hroot z h0⟩))
-  have hQd : ∀ g, ∀ z ∈ Metric.ball s₀ r₁, z ≠ s₀ → DifferentiableAt ℂ (Q · g) z := fun g z hz hne =>
+  have hQd
+      : ∀ g, ∀ z ∈ Metric.ball s₀ r₁, z ≠ s₀ → DifferentiableAt ℂ (Q · g) z := fun g z hz hne =>
     ((hd g).differentiableAt (hU.mem_nhds (hbU z hz))).div (p.differentiable z) (hbp z hz hne)
 
   set F : ℂ → G → ℂ := fun z g => Function.update (fun w => Q w g) s₀ (v g) z with hF
@@ -65,7 +70,8 @@ theorem vacData_of {G : Type} [TopologicalSpace G] (h : ℂ → G → ℂ) (s₀
     exact Function.update_self _ _ _
   have hFd : ∀ g, DifferentiableOn ℂ (F · g) (Metric.ball s₀ r₁) := by
     intro g
-    refine (Complex.differentiableOn_compl_singleton_and_continuousAt_iff (Metric.ball_mem_nhds s₀ hr₁)).1 ⟨?_, ?_⟩
+    refine (Complex.differentiableOn_compl_singleton_and_continuousAt_iff (Metric.ball_mem_nhds s₀
+      hr₁)).1 ⟨?_, ?_⟩
     · intro z hz
       have hne : z ≠ s₀ := fun e => hz.2 (Set.mem_singleton_iff.2 e)
       refine ((hQd g z hz.1 hne).congr_of_eventuallyEq ?_).differentiableWithinAt
@@ -78,30 +84,37 @@ theorem vacData_of {G : Type} [TopologicalSpace G] (h : ℂ → G → ℂ) (s₀
     by_cases hne : z = s₀
     · subst hne; rw [hFs]; exact hv g
     · rw [hFQ g z hne]
-      exact (hext g z (hbU z hz)).holValueAt_iff.2
-        ((hQd g z hz hne).continuousAt.tendsto.mono_left nhdsWithin_le_nhds)
+      exact (hext g z (hbU z hz)).holValueAt_iff.2 ((hQd g z hz hne).continuousAt.tendsto.mono_left
+        nhdsWithin_le_nhds)
 
   set ρ : ℝ := 3 * r₁ / 4 with hρ
   have hρ0 : ρ ≠ 0 := by rw [hρ]; positivity
   set K : ℂ × G → ℝ → ℂ := fun y θ => (circleMap 0 ρ θ * Complex.I) •
     ((circleMap s₀ ρ θ - y.1)⁻¹ • (Ê (circleMap s₀ ρ θ) y.2 / p.eval (circleMap s₀ ρ θ))) with hK
   have hcirc : ∀ θ, circleMap s₀ ρ θ ∈ Metric.ball s₀ r₁ := fun θ => by
-    rw [Metric.mem_ball, dist_eq_norm, circleMap_sub_center, norm_circleMap_zero, abs_of_pos (by rw [hρ]; positivity)]
-    rw [hρ]; linarith
-  have hrep : ∀ y ∈ Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G),
-      F y.1 y.2 = (2 * Real.pi * Complex.I : ℂ)⁻¹ • ∫ θ in (0 : ℝ)..2 * Real.pi, K y θ := by
+    rw [Metric.mem_ball, dist_eq_norm, circleMap_sub_center, norm_circleMap_zero,
+      abs_of_pos (by rw [hρ]; positivity)]
+    rw [hρ]
+    linarith
+  have hrep
+      : ∀ y ∈ Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G),
+        F y.1 y.2 = (2 * Real.pi * Complex.I : ℂ)⁻¹ • ∫ θ in (0 : ℝ)..2 * Real.pi, K y θ := by
     rintro ⟨z, g⟩ ⟨hz, -⟩
     have hzρ : z ∈ Metric.ball s₀ ρ := Metric.ball_subset_ball (by rw [hρ]; linarith) hz
-    have hcl : Metric.closedBall s₀ ρ ⊆ Metric.ball s₀ r₁ := Metric.closedBall_subset_ball (by rw [hρ]; linarith)
+    have hcl : Metric.closedBall s₀ ρ ⊆ Metric.ball s₀ r₁ :=
+      Metric.closedBall_subset_ball (by rw [hρ]; linarith)
     rw [← Complex.two_pi_I_inv_smul_circleIntegral_sub_inv_smul_of_differentiable_on_off_countable
       (s := ∅) Set.countable_empty hzρ ((hFd g).continuousOn.mono hcl)
-      (fun x hx => (hFd g).differentiableAt (Metric.isOpen_ball.mem_nhds (hcl (Metric.ball_subset_closedBall hx.1))))]
+      (fun x hx =>
+        (hFd g).differentiableAt
+          (Metric.isOpen_ball.mem_nhds (hcl (Metric.ball_subset_closedBall hx.1))))]
     congr 1
     unfold circleIntegral
     refine intervalIntegral.integral_congr fun θ _ => ?_
     simp only [hK, deriv_circleMap]
     rw [hFQ g _ (circleMap_ne_center hρ0)]
-  have hcont : ContinuousOn (fun y : ℂ × G => (2 * Real.pi * Complex.I : ℂ)⁻¹ • ∫ θ in (0 : ℝ)..2 * Real.pi, K y θ)
+  have hcont : ContinuousOn
+      (fun y : ℂ × G => (2 * Real.pi * Complex.I : ℂ)⁻¹ • ∫ θ in (0 : ℝ)..2 * Real.pi, K y θ)
       (Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) := by
     rw [continuousOn_iff_continuous_restrict]
     show Continuous fun x : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) =>
@@ -111,17 +124,22 @@ theorem vacData_of {G : Type} [TopologicalSpace G] (h : ℂ → G → ℂ) (s₀
       (continuous_const : Continuous fun _ : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) =>
         (2 * Real.pi * Complex.I : ℂ)⁻¹).smul hI
     refine intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'
-      (f := fun (x : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G))) θ => K x.1 θ) ?_ 0 (2 * Real.pi)
+      (f := fun (x : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G))) θ => K x.1 θ)
+      ?_ 0 (2 * Real.pi)
     show Continuous fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ => (circleMap 0 ρ q.2 * Complex.I) •
       ((circleMap s₀ ρ q.2 - q.1.1.1)⁻¹ • (Ê (circleMap s₀ ρ q.2) q.1.1.2 / p.eval (circleMap s₀ ρ q.2)))
-    have hc1 : Continuous fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ => circleMap s₀ ρ q.2 :=
+    have hc1 : Continuous fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ =>
+        circleMap s₀ ρ q.2 :=
       (continuous_circleMap s₀ ρ).comp continuous_snd
     have hE : Continuous fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ =>
         Ê (circleMap s₀ ρ q.2) q.1.1.2 :=
-      hc.comp_continuous (f := fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ =>
-        (circleMap s₀ ρ q.2, q.1.1.2)) (hc1.prodMk (continuous_snd.comp (continuous_subtype_val.comp continuous_fst)))
+      hc.comp_continuous
+        (f := fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ =>
+          (circleMap s₀ ρ q.2, q.1.1.2))
+        (hc1.prodMk (continuous_snd.comp (continuous_subtype_val.comp continuous_fst)))
         (fun q => ⟨hbU _ (hcirc q.2), Set.mem_univ _⟩)
-    have hP : Continuous fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ => p.eval (circleMap s₀ ρ q.2) :=
+    have hP : Continuous fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ =>
+        p.eval (circleMap s₀ ρ q.2) :=
       p.continuous.comp hc1
     have hz : Continuous fun q : ↥(Metric.ball s₀ (r₁ / 2) ×ˢ (Set.univ : Set G)) × ℝ => q.1.1.1 :=
       continuous_fst.comp (continuous_subtype_val.comp continuous_fst)
@@ -130,8 +148,15 @@ theorem vacData_of {G : Type} [TopologicalSpace G] (h : ℂ → G → ℂ) (s₀
     · have hq : q.1.1.1 ∈ Metric.ball s₀ ρ := Metric.ball_subset_ball (by rw [hρ]; linarith) q.1.2.1
       exact sub_ne_zero.2 (circleMap_ne_mem_ball hq q.2)
     · exact hbp _ (hcirc q.2) (circleMap_ne_center hρ0)
-  refine ⟨r₁ / 2, F, by positivity, hcont.congr hrep, fun g => (hFd g).mono (Metric.ball_subset_ball (by linarith)),
-    hFs, fun g z hz => hHol g z (Metric.ball_subset_ball (by linarith) hz)⟩
+  refine ⟨
+    r₁ / 2,
+    F,
+    by positivity,
+    hcont.congr hrep,
+    fun g => (hFd g).mono (Metric.ball_subset_ball (by linarith)),
+    hFs,
+    fun g z hz => hHol g z (Metric.ball_subset_ball (by linarith) hz)
+  ⟩
 
 end PositivityTheory.SiegelWeilFormula.Atop
 

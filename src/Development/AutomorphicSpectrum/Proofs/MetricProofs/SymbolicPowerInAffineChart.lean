@@ -14,33 +14,38 @@ open MvPolynomial ReciprocityTheory.AnForm.R
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem aeval_smul_of_isMultiHomog {L : Type} [CommRing L] [Algebra ℂ L]
-    {f : MvPolynomial (Σ k, ι k) ℂ} {a : K → ℕ} (hf : IsMultiHomog f a) (c : K → L)
-    (y : (Σ k, ι k) → L) :
-    aeval (fun q => c q.1 * y q) f = (∏ k, c k ^ a k) * aeval y f := by
+theorem aeval_smul_of_isMultiHomog
+    {L : Type} [CommRing L] [Algebra ℂ L]
+    {f : MvPolynomial (Σ k, ι k) ℂ} {a : K → ℕ} (hf : IsMultiHomog f a)
+    (c : K → L) (y : (Σ k, ι k) → L)
+    : aeval (fun q => c q.1 * y q) f = (∏ k, c k ^ a k) * aeval y f := by
   rw [aeval_def, aeval_def, eval₂_eq', eval₂_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
-  have h1 : ∏ q : (Σ k, ι k), (c q.1 * y q) ^ m q =
-      (∏ k, c k ^ a k) * ∏ q : (Σ k, ι k), y q ^ m q := by
+  have h1
+      : ∏ q : (Σ k, ι k), (c q.1 * y q) ^ m q = (∏ k, c k ^ a k) * ∏ q : (Σ k, ι k), y q ^ m q := by
     simp_rw [mul_pow, Finset.prod_mul_distrib]
     congr 1
     rw [Fintype.prod_sigma]
     refine Finset.prod_congr rfl fun k _ => ?_
     show ∏ i, c k ^ m ⟨k, i⟩ = _
     rw [Finset.prod_pow_eq_pow_sum, hf m hm k]
-  rw [h1]; ring
+  rw [h1]
+  ring
 
-def chartSub {L : Type} [CommRing L] [Algebra ℂ L] (w : (Σ k, ι k) → L) :
-    MvPolynomial (Fin (Fintype.card (Σ k, ι k))) ℂ →ₐ[ℂ] L :=
+def chartSub {L : Type} [CommRing L] [Algebra ℂ L] (w : (Σ k, ι k) → L)
+    : MvPolynomial (Fin (Fintype.card (Σ k, ι k))) ℂ →ₐ[ℂ] L :=
   aeval fun j => w ((Fintype.equivFin (Σ k, ι k)).symm j)
 
-theorem chartSub_renC {L : Type} [CommRing L] [Algebra ℂ L] (w : (Σ k, ι k) → L)
-    (h : MvPolynomial (Σ k, ι k) ℂ) : chartSub w (renC (Σ k, ι k) h) = aeval w h := by
+theorem chartSub_renC
+    {L : Type} [CommRing L] [Algebra ℂ L] (w : (Σ k, ι k) → L) (h : MvPolynomial (Σ k, ι k) ℂ)
+    : chartSub w (renC (Σ k, ι k) h) = aeval w h := by
   simp [chartSub, renC, renameEquiv_apply, aeval_rename, Function.comp_def]
 
-theorem chartSub_bind {L : Type} [CommRing L] [Algebra ℂ L] (w : (Σ k, ι k) → L)
-    (p : (k : K) → ι k) (h1 : ∀ k, w ⟨k, p k⟩ = 1) (f : MvPolynomial (Σ k, ι k) ℂ) :
-    chartSub w (bind₁ (lift p) f) = aeval w f := by
+theorem chartSub_bind
+    {L : Type} [CommRing L] [Algebra ℂ L]
+    (w : (Σ k, ι k) → L) (p : (k : K) → ι k) (h1 : ∀ k, w ⟨k, p k⟩ = 1)
+    (f : MvPolynomial (Σ k, ι k) ℂ)
+    : chartSub w (bind₁ (lift p) f) = aeval w f := by
   have : (chartSub w).comp (bind₁ (lift p)) = aeval w := by
     refine MvPolynomial.algHom_ext fun q => ?_
     rw [AlgHom.comp_apply, bind₁_X_right, aeval_X]
@@ -53,35 +58,40 @@ theorem chartSub_bind {L : Type} [CommRing L] [Algebra ℂ L] (w : (Σ k, ι k) 
     · simp [chartSub]
   exact DFunLike.congr_fun this f
 
-variable {L : Type} [CommRing L] [Algebra ℂ L] [Algebra (MvPolynomial (Σ k, ι k) ℂ) L]
+variable
+  {L : Type} [CommRing L] [Algebra ℂ L] [Algebra (MvPolynomial (Σ k, ι k) ℂ) L]
   [IsScalarTower ℂ (MvPolynomial (Σ k, ι k) ℂ) L]
 
-theorem aeval_algebraMap_X (g : MvPolynomial (Σ k, ι k) ℂ) :
-    aeval (fun q => algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q)) g =
-      algebraMap (MvPolynomial (Σ k, ι k) ℂ) L g := by
-  have : aeval (fun q => algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q)) =
-      IsScalarTower.toAlgHom ℂ (MvPolynomial (Σ k, ι k) ℂ) L :=
+theorem aeval_algebraMap_X (g : MvPolynomial (Σ k, ι k) ℂ)
+    : aeval (fun q => algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q)) g
+      = algebraMap (MvPolynomial (Σ k, ι k) ℂ) L g := by
+  have : aeval (fun q => algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q))
+      = IsScalarTower.toAlgHom ℂ (MvPolynomial (Σ k, ι k) ℂ) L :=
     MvPolynomial.algHom_ext fun q => by simp
   exact DFunLike.congr_fun this g
 
-theorem map_ideal_le (S : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (hS : IsMultiHomogIdeal S)
+theorem map_ideal_le
+    (S : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (hS : IsMultiHomogIdeal S)
     (p : (k : K) → ι k) (c : K → L)
-    (hc : ∀ k, c k * algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X ⟨k, p k⟩) = 1) :
-    (ideal S p).map (chartSub fun q => c q.1 * algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q)) ≤
-      S.map (algebraMap (MvPolynomial (Σ k, ι k) ℂ) L) := by
+    (hc : ∀ k, c k * algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X ⟨k, p k⟩) = 1)
+    : (ideal S p).map (chartSub fun q => c q.1 * algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q))
+      ≤ S.map (algebraMap (MvPolynomial (Σ k, ι k) ℂ) L) := by
   rw [Ideal.map_le_iff_le_comap]
   unfold ideal
   rw [Ideal.map_le_iff_le_comap]
   intro h hh
   rw [Ideal.mem_comap, Ideal.mem_comap]
-  have key : ∀ h ∈ chartIdeal S p, aeval (fun q => c q.1 * algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q)) h ∈
-      S.map (algebraMap (MvPolynomial (Σ k, ι k) ℂ) L) := by
+  have key
+      : ∀ h ∈ chartIdeal S p,
+        aeval (fun q => c q.1 * algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q)) h
+          ∈ S.map (algebraMap (MvPolynomial (Σ k, ι k) ℂ) L) := by
     obtain ⟨G, hG, rfl⟩ := hS
     intro h hh
-    have hle : chartIdeal (Ideal.span G) p ≤
-        (Ideal.map (algebraMap (MvPolynomial (Σ k, ι k) ℂ) L) (Ideal.span G)).comap
-          (aeval (fun q => c q.1 * algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q)) :
-            MvPolynomial (Σ k, ι k) ℂ →ₐ[ℂ] L) := by
+    have hle
+        : chartIdeal (Ideal.span G) p
+          ≤ (Ideal.map (algebraMap (MvPolynomial (Σ k, ι k) ℂ) L) (Ideal.span G)).comap
+            (aeval (fun q => c q.1 * algebraMap (MvPolynomial (Σ k, ι k) ℂ) L (X q))
+              : MvPolynomial (Σ k, ι k) ℂ →ₐ[ℂ] L) := by
       refine sup_le ?_ ?_
       · rw [Ideal.span_le]
         intro g hg
@@ -103,20 +113,27 @@ namespace GlobalTheory.CompanionTheory.Ar.Cmp.SncRes.Homog
 
 open MvPolynomial ReciprocityTheory.AnForm.R GlobalTheory.CompanionTheory.Ar.Cmp
 
-theorem relation_homogenises (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
+theorem relation_homogenises
+    (K : Type) [Fintype K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
     (P Q : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (p : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ)
     (a : K → ℕ) (n : ℕ) (s' : MvPolynomial (Fin (Fintype.card (Σ k, ι k))) ℂ)
     (hP : IsMultiHomogIdeal P) (hQ : IsMultiHomogIdeal Q) (hQp : Q.IsPrime)
     (hX : ∀ k, (X ⟨k, p k⟩ : MvPolynomial (Σ k, ι k) ℂ) ∉ Q) (hf : IsMultiHomog f a)
     (hs' : s' ∉ SncRes.ideal Q p)
-    (hrel : s' * bind₁ (SncRes.lift p) f ∈ SncRes.ideal Q p ^ n ⊔ SncRes.ideal P p) :
-    ∃ s ∉ Q, s * f ∈ Q ^ n ⊔ P := by
+    (hrel : s' * bind₁ (SncRes.lift p) f ∈ SncRes.ideal Q p ^ n ⊔ SncRes.ideal P p)
+    : ∃ s ∉ Q, s * f ∈ Q ^ n ⊔ P := by
   set x : MvPolynomial (Σ k, ι k) ℂ := ∏ k, X ⟨k, p k⟩ with hx
   let L := Localization.Away x
   let i : MvPolynomial (Σ k, ι k) ℂ →+* L := algebraMap _ L
   have hxu : IsUnit (i x) := IsLocalization.Away.algebraMap_isUnit x
   have hu : ∀ k, IsUnit (i (X ⟨k, p k⟩)) := fun k =>
-    isUnit_of_dvd_unit (map_dvd i (Finset.dvd_prod_of_mem (fun k => (X ⟨k, p k⟩ : MvPolynomial (Σ k, ι k) ℂ)) (Finset.mem_univ k))) hxu
+    isUnit_of_dvd_unit
+      (map_dvd i
+        (Finset.dvd_prod_of_mem
+          (fun k => (X ⟨k, p k⟩ : MvPolynomial (Σ k, ι k) ℂ))
+          (Finset.mem_univ k)))
+      hxu
   have hv : ∀ k, ∃ v, v * i (X ⟨k, p k⟩) = 1 := fun k => (hu k).exists_left_inv
   choose c hc using hv
   let w : (Σ k, ι k) → L := fun q => c q.1 * i (X q)
@@ -139,8 +156,10 @@ theorem relation_homogenises (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fi
   have h3 : ψ s' * i f ∈ (Q ^ n ⊔ P).map i := by
     have := Ideal.mul_mem_left _ (∏ k, i (X ⟨k, p k⟩) ^ a k) h1
     rw [hψf] at this
-    have e : (∏ k, i (X ⟨k, p k⟩) ^ a k) * (ψ s' * ((∏ k, c k ^ a k) * i f)) =
-        ((∏ k, i (X ⟨k, p k⟩) ^ a k) * ∏ k, c k ^ a k) * (ψ s' * i f) := by ring
+    have e
+        : (∏ k, i (X ⟨k, p k⟩) ^ a k) * (ψ s' * ((∏ k, c k ^ a k) * i f))
+          = ((∏ k, i (X ⟨k, p k⟩) ^ a k) * ∏ k, c k ^ a k) * (ψ s' * i f) := by
+      ring
     rwa [e, hinv, one_mul] at this
   obtain ⟨e, s₀, hs₀⟩ := IsLocalization.Away.surj x (ψ s')
   have h4 : i (s₀ * f) ∈ (Q ^ n ⊔ P).map i := by
@@ -150,8 +169,8 @@ theorem relation_homogenises (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fi
     have := Ideal.mul_mem_left _ (i x ^ e) h3
     convert this using 1
     ring
-  obtain ⟨m, hm, hmI⟩ := (IsLocalization.algebraMap_mem_map_algebraMap_iff
-    (Submonoid.powers x) L _ _).1 h4
+  obtain ⟨m, hm, hmI⟩ :=
+    (IsLocalization.algebraMap_mem_map_algebraMap_iff (Submonoid.powers x) L _ _).1 h4
   refine ⟨m * s₀, ?_, by rwa [mul_assoc]⟩
   intro hmem
   have hxQ : x ∉ Q := by
@@ -205,7 +224,6 @@ theorem relation_homogenises (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fi
   have h6 := congrArg Φ hs₀
   rw [map_mul, map_pow, hΦ, hΦ, hgx, one_pow, mul_one, h5] at h6
   rw [h6]
-  exact Ideal.Quotient.eq_zero_iff_mem.2
-    (Ideal.mem_map_of_mem _ (Ideal.mem_sup_left hs₀Q))
+  exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_map_of_mem _ (Ideal.mem_sup_left hs₀Q))
 
 end GlobalTheory.CompanionTheory.Ar.Cmp.SncRes.Homog

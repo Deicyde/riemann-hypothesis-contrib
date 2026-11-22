@@ -10,8 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.WeilPairingP
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 
 namespace PositivityTheory.UnitarySelfGeneration
 
@@ -19,17 +21,21 @@ open PositivityTheory.UnitarySelfGeneration.Isomove
 
 namespace Isomove
 
-variable {X X' : Scheme.{0}} {G : Over X} {G' : Over X'} [GrpObj G] [GrpObj G'] {f : X' ⟶ X} {φ : G'.left ⟶ G.left}
-  {g : X ⟶ X'} {ψ : G.left ⟶ G'.left} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {ξ' : Sp Ω ⟶ X'}
-  {V : Type} [AddCommGroup V] [Module Ω V]
+variable
+  {X X' : Scheme.{0}} {G : Over X} {G' : Over X'} [GrpObj G] [GrpObj G']
+  {f : X' ⟶ X} {φ : G'.left ⟶ G.left} {g : X ⟶ X'} {ψ : G.left ⟶ G'.left} {Ω : Type} [Field Ω]
+  {ξ : Sp Ω ⟶ X} {ξ' : Sp Ω ⟶ X'} {V : Type} [AddCommGroup V] [Module Ω V]
 
-theorem extends_pull (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (hξ : ξ' ≫ f = ξ)
+theorem extends_pull
+    (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (hξ : ξ' ≫ f = ξ)
     {M : LieModel G ξ V} {M' : LieModel G' ξ' V} (hM : ∀ e, (M.pt e).left ≫ ψ = (M'.pt e).left)
     (q' : Cpt ξ') (q : Cpt ξ) (σ : X.presheaf.stalk q.1 →+* X'.presheaf.stalk q'.1)
-    (h1 : spMap σ ≫ X.fromSpecStalk q.1 = X'.fromSpecStalk q'.1 ≫ f) (h2 : (genMap ξ' q').comp σ = genMap ξ q)
-    (e : V) (v) (hv : M.Extends q e v) :
-    ∃ v', M'.Extends q' e v' ∧ v'.left = spMap (dualMap σ) ≫ v.left ≫ ψ := by
-  obtain ⟨v1, hv1, ht1⟩ := mv_bc (G := G) σ (x := X.fromSpecStalk q.1) (x' := X'.fromSpecStalk q'.1 ≫ f) h1 v
+    (h1 : spMap σ ≫ X.fromSpecStalk q.1 = X'.fromSpecStalk q'.1 ≫ f)
+    (h2 : (genMap ξ' q').comp σ = genMap ξ q)
+    (e : V) (v) (hv : M.Extends q e v)
+    : ∃ v', M'.Extends q' e v' ∧ v'.left = spMap (dualMap σ) ≫ v.left ≫ ψ := by
+  obtain ⟨v1, hv1, ht1⟩ :=
+    mv_bc (G := G) σ (x := X.fromSpecStalk q.1) (x' := X'.fromSpecStalk q'.1 ≫ f) h1 v
   have hw : (v1.left ≫ ψ) ≫ G'.hom = (epsAt (X'.fromSpecStalk q'.1)).hom := by
     rw [Category.assoc, hψ.1.w, ← Category.assoc, Over.w v1]
     simp [epsAt, fg]
@@ -47,9 +53,12 @@ theorem extends_pull (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (h�
   · show v1.left ≫ ψ = _
     rw [hv1, Category.assoc]
 
-theorem lat_le (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (hξ : ξ' ≫ f = ξ)
+theorem lat_le
+    (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (hξ : ξ' ≫ f = ξ)
     {M : LieModel G ξ V} {M' : LieModel G' ξ' V} (hM : ∀ e, (M.pt e).left ≫ ψ = (M'.pt e).left)
-    (q' : Cpt ξ') (q : Cpt ξ) (hq : f q'.1 = q.1) (e : V) (he : e ∈ M.lat q) : e ∈ M'.lat q' := by
+    (q' : Cpt ξ') (q : Cpt ξ) (hq : f q'.1 = q.1)
+    (e : V) (he : e ∈ M.lat q)
+    : e ∈ M'.lat q' := by
   obtain ⟨σ, h1, h2, -⟩ := mv_stalk hξ q' q hq
   induction he using Submodule.span_induction with
   | mem e he =>
@@ -60,15 +69,20 @@ theorem lat_le (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (hξ : ξ
   | add a b _ _ ha hb => exact add_mem ha hb
   | smul c a _ ha => exact (M'.lat q').smul_mem ⟨c, mv_regAt_le hξ q' q hq c.2⟩ ha
 
-theorem htAt_push (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (gf : g ≫ f = 𝟙 _)
-    (φψ : φ ≫ ψ = 𝟙 _) (ψφ : ψ ≫ φ = 𝟙 _) (hξ : ξ' ≫ f = ξ)
+theorem htAt_push
+    (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (gf : g ≫ f = 𝟙 _) (φψ : φ ≫ ψ = 𝟙 _)
+    (ψφ : ψ ≫ φ = 𝟙 _) (hξ : ξ' ≫ f = ξ)
     {M : LieModel G ξ V} {M' : LieModel G' ξ' V} (hM : ∀ e, (M.pt e).left ≫ ψ = (M'.pt e).left)
     {L : LB G.left} {L' : LB G'.left} {n : ℕ}
-    (hW : ∀ (k : Type) [Field k] (z' : Sp k ⟶ X') (z : Sp k ⟶ X), z' ≫ f = z →
-      ∀ (a' b' : Over.mk z' ⟶ G') (a b : Over.mk z ⟶ G) (c : kˣ), a'.left ≫ φ = a.left → b'.left ≫ φ = b.left →
-      Out.WeilIs G L n a b (unitOn c) → Out.WeilIs G' L' n a' b' (unitOn c))
-    (q' : Cpt ξ') (q : Cpt ξ) (hq : f q'.1 = q.1) (x' : Over.mk ξ' ⟶ G') (x : Over.mk ξ ⟶ G)
-    (hx : x'.left ≫ φ = x.left) (w : Module.Dual Ω V) (hw : M'.IsHTAt L' n x' q' w) : M.IsHTAt L n x q w := by
+    (hW : ∀ (k : Type) [Field k] (z' : Sp k ⟶ X') (z : Sp k ⟶ X),
+      z' ≫ f = z
+        → ∀ (a' b' : Over.mk z' ⟶ G') (a b : Over.mk z ⟶ G) (c : kˣ),
+          a'.left ≫ φ = a.left → b'.left ≫ φ = b.left → Out.WeilIs G L n a b (unitOn c)
+            → Out.WeilIs G' L' n a' b' (unitOn c))
+    (q' : Cpt ξ') (q : Cpt ξ) (hq : f q'.1 = q.1)
+    (x' : Over.mk ξ' ⟶ G') (x : Over.mk ξ ⟶ G) (hx : x'.left ≫ φ = x.left)
+    (w : Module.Dual Ω V) (hw : M'.IsHTAt L' n x' q' w)
+    : M.IsHTAt L n x q w := by
   have hgq : g q.1 = q'.1 := by
     rw [← hq, ← Scheme.Hom.comp_apply, fg]
     rfl
@@ -84,7 +98,9 @@ theorem htAt_push (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (gf : 
   · intro k _ _ i xk g0 c h hxk hpow hweil
     have hz : (spMap i ≫ ξ) ≫ g = spMap i ≫ ξ' := by rw [Category.assoc, hξg]
     have hz' : (spMap i ≫ ξ') ≫ f = spMap i ≫ ξ := by rw [Category.assoc, hξ]
-    have comm : ∀ a : Over.mk (spMap i ≫ ξ) ⟶ G, (a.left ≫ ψ) ≫ G'.hom = (Over.mk (spMap i ≫ ξ')).hom := by
+    have comm
+        : ∀ a : Over.mk (spMap i ≫ ξ) ⟶ G,
+          (a.left ≫ ψ) ≫ G'.hom = (Over.mk (spMap i ≫ ξ')).hom := by
       intro a
       rw [Category.assoc, hψ.1.w, ← Category.assoc, Over.w a]
       simpa using hz
@@ -119,38 +135,47 @@ theorem htAt_push (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (gf : 
       rw [hvl]
       exact Category.assoc _ _ _
     have e1 := mv_secVal_comp (spMap (dualMap σ) ≫ v.left) ψ v'.left hcomp W' s' hh h'
-    have e2 := mv_secVal_bc (dualMap σ) v.left (spMap (dualMap σ) ≫ v.left) rfl (ψ ⁻¹ᵁ W') (ψ.app W' s') h hh
-    have hs : secVal v'.left W' h' s' = dualMap σ (secVal v.left (ψ ⁻¹ᵁ W') h (ψ.app W' s')) := e1.symm.trans e2
+    have e2 :=
+      mv_secVal_bc (dualMap σ) v.left (spMap (dualMap σ) ≫ v.left) rfl (ψ ⁻¹ᵁ W') (ψ.app W' s') h hh
+    have hs : secVal v'.left W' h' s' = dualMap σ (secVal v.left (ψ ⁻¹ᵁ W') h (ψ.app W' s')) :=
+      e1.symm.trans e2
     rw [hs, ← h2]
     simp [dualMap]
 
-theorem htOm_le (hφ : IsGrpPullback G' G f φ) (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _) (gf : g ≫ f = 𝟙 _)
-    (φψ : φ ≫ ψ = 𝟙 _) (ψφ : ψ ≫ φ = 𝟙 _) (hξ : ξ' ≫ f = ξ)
+theorem htOm_le
+    (hφ : IsGrpPullback G' G f φ) (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _)
+    (gf : g ≫ f = 𝟙 _) (φψ : φ ≫ ψ = 𝟙 _) (ψφ : ψ ≫ φ = 𝟙 _) (hξ : ξ' ≫ f = ξ)
     {M : LieModel G ξ V} {M' : LieModel G' ξ' V} (hM : ∀ e, (M.pt e).left ≫ ψ = (M'.pt e).left)
     {L : LB G.left} {L' : LB G'.left} {n : ℕ}
-    (hW : ∀ (k : Type) [Field k] (z' : Sp k ⟶ X') (z : Sp k ⟶ X), z' ≫ f = z →
-      ∀ (a' b' : Over.mk z' ⟶ G') (a b : Over.mk z ⟶ G) (c : kˣ), a'.left ≫ φ = a.left → b'.left ≫ φ = b.left →
-      Out.WeilIs G L n a b (unitOn c) → Out.WeilIs G' L' n a' b' (unitOn c))
-    (q' : Cpt ξ') (q : Cpt ξ) (hq : f q'.1 = q.1) (w : Module.Dual Ω V) (hw : w ∈ M'.htOm L' n q') :
-    w ∈ M.htOm L n q := by
+    (hW : ∀ (k : Type) [Field k] (z' : Sp k ⟶ X') (z : Sp k ⟶ X),
+      z' ≫ f = z
+        → ∀ (a' b' : Over.mk z' ⟶ G') (a b : Over.mk z ⟶ G) (c : kˣ),
+          a'.left ≫ φ = a.left → b'.left ≫ φ = b.left → Out.WeilIs G L n a b (unitOn c)
+            → Out.WeilIs G' L' n a' b' (unitOn c))
+    (q' : Cpt ξ') (q : Cpt ξ) (hq : f q'.1 = q.1)
+    (w : Module.Dual Ω V) (hw : w ∈ M'.htOm L' n q')
+    : w ∈ M.htOm L n q := by
   have hξ' : ξ ≫ g = ξ' := by rw [← hξ, Category.assoc, fg, Category.comp_id]
   have hq' : g q.1 = q'.1 := by rw [← hq, ← Scheme.Hom.comp_apply, fg]; rfl
   induction hw using Submodule.span_induction with
   | mem w hw =>
     obtain ⟨x', hx', hw⟩ := hw
     obtain ⟨x, hx⟩ := mv_push hφ.1.w hξ x'
-    exact Submodule.subset_span ⟨x, mv_pow hφ hξ hx hx',
-      htAt_push hψ fg gf φψ ψφ hξ hM hW q' q hq x' x hx w hw⟩
+    exact Submodule.subset_span
+      ⟨x, mv_pow hφ hξ hx hx', htAt_push hψ fg gf φψ ψφ hξ hM hW q' q hq x' x hx w hw⟩
   | zero => exact zero_mem _
   | add a b _ _ ha hb => exact add_mem ha hb
   | smul c a _ ha => exact (M.htOm L n q).smul_mem ⟨c, mv_regAt_le hξ' q q' hq' c.2⟩ ha
 
-theorem model (hφ : IsGrpPullback G' G f φ) (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _)
-    (φψ : φ ≫ ψ = 𝟙 _) (hξ : ξ' ≫ f = ξ) (M : LieModel G ξ V) [Mono ψ] :
-    ∃ M' : LieModel G' ξ' V, ∀ e, (M.pt e).left ≫ ψ = (M'.pt e).left := by
+theorem model
+    (hφ : IsGrpPullback G' G f φ) (hψ : IsGrpPullback G G' g ψ) (fg : f ≫ g = 𝟙 _)
+    (φψ : φ ≫ ψ = 𝟙 _) (hξ : ξ' ≫ f = ξ) (M : LieModel G ξ V)
+    [Mono ψ]
+    : ∃ M' : LieModel G' ξ' V, ∀ e, (M.pt e).left ≫ ψ = (M'.pt e).left := by
   have hξg : ξ ≫ g = ξ' := by rw [← hξ, Category.assoc, fg, Category.comp_id]
-  have hy : (Spec.map (CommRingCat.ofHom (algebraMap Ω (DualNumber Ω))) ≫ ξ) ≫ g =
-      Spec.map (CommRingCat.ofHom (algebraMap Ω (DualNumber Ω))) ≫ ξ' := by
+  have hy
+      : (Spec.map (CommRingCat.ofHom (algebraMap Ω (DualNumber Ω))) ≫ ξ) ≫ g
+        = Spec.map (CommRingCat.ofHom (algebraMap Ω (DualNumber Ω))) ≫ ξ' := by
     rw [Category.assoc, hξg]
   have hc : ∀ a : epsAt ξ ⟶ G, (a.left ≫ ψ) ≫ G'.hom = (epsAt ξ').hom := by
     intro a
@@ -187,20 +212,36 @@ theorem model (hφ : IsGrpPullback G' G f φ) (hψ : IsGrpPullback G G' g ψ) (f
 theorem grp_id (G : Over X) [GrpObj G] : IsGrpPullback G G (𝟙 X) (𝟙 G.left) := by
   refine ⟨IsPullback.id_horiz G.hom, ?_⟩
   intro T x y x₀ y₀ hx hy
-  have key : ∀ (t : T.left ⟶ X), t = T.hom → ∀ (a b : Over.mk t ⟶ G),
-      a.left = x.left → b.left = y.left → (a * b).left = (x * y).left := by
+  have key
+      : ∀ (t : T.left ⟶ X),
+        t = T.hom
+          → ∀ (a b : Over.mk t ⟶ G),
+            a.left = x.left → b.left = y.left → (a * b).left = (x * y).left := by
     intro t ht
     subst ht
     intro a b ha hb
     have e1 : a = x := Over.OverMorphism.ext ha
     have e2 : b = y := Over.OverMorphism.ext hb
     rw [e1, e2]
-  exact (key _ (Category.comp_id _) x₀ y₀ (hx.trans (Category.comp_id _)) (hy.trans (Category.comp_id _))).trans
-    (Category.comp_id _).symm
+  exact (key _ (Category.comp_id _) x₀ y₀ (hx.trans (Category.comp_id _))
+    (hy.trans (Category.comp_id _))).trans (Category.comp_id _).symm
 
 end Isomove
 
-theorem lie_model_transport_isomorphism : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X X' : Scheme.{0}) (e : X' ≅ X) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (ξ' : Sp Ω ⟶ X') (t : SAB H X) (t' : SAB H X') (m : SABMap t' t e.hom) (V : Type) [AddCommGroup V] [Module Ω V] (M : LieModel t.G ξ V), ξ' ≫ e.hom = ξ → ∃ M' : LieModel t'.G ξ' V, (∀ v, (M'.pt v).left ≫ m.φ = (M.pt v).left) ∧ (∀ n, FullTorsion t.G ξ n → FullTorsion t'.G ξ' n) ∧ (IsCptGen ξ → IsCptGen ξ') ∧ ∀ (q : Cpt ξ') (h : genPt ξ ⤳ e.hom q.1), regAt ξ' q = regAt ξ ⟨e.hom q.1, h⟩ ∧ (M'.lat q : Set V) = M.lat ⟨e.hom q.1, h⟩ ∧ ∀ n, (M'.htOm t'.PP.L n q : Set (Module.Dual Ω V)) = M.htOm t.PP.L n ⟨e.hom q.1, h⟩ := by
+theorem lie_model_transport_isomorphism
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X X' : Scheme.{0})
+        (e : X' ≅ X) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (ξ' : Sp Ω ⟶ X') (t : SAB H X)
+        (t' : SAB H X') (m : SABMap t' t e.hom) (V : Type) [AddCommGroup V] [Module Ω V]
+        (M : LieModel t.G ξ V),
+      ξ' ≫ e.hom = ξ
+        → ∃ M' : LieModel t'.G ξ' V,
+          (∀ v, (M'.pt v).left ≫ m.φ = (M.pt v).left)
+            ∧ (∀ n, FullTorsion t.G ξ n → FullTorsion t'.G ξ' n) ∧ (IsCptGen ξ → IsCptGen ξ')
+            ∧ ∀ (q : Cpt ξ') (h : genPt ξ ⤳ e.hom q.1),
+              regAt ξ' q = regAt ξ ⟨e.hom q.1, h⟩ ∧ (M'.lat q : Set V) = M.lat ⟨e.hom q.1, h⟩
+                ∧ ∀ n,
+                  (M'.htOm t'.PP.L n q : Set (Module.Dual Ω V))
+                    = M.htOm t.PP.L n ⟨e.hom q.1, h⟩ := by
   intro E _ _ _ H X X' e Ω _ ξ ξ' t t' m V _ _ M hξ
   have hφ : IsGrpPullback t'.G t.G e.hom m.φ := m.cart
   haveI : IsIso m.φ := hφ.1.isIso_fst_of_isIso
@@ -220,23 +261,33 @@ theorem lie_model_transport_isomorphism : ∀ (E : Type) [Field E] [NumberField 
   have hM' : ∀ v, (M'.pt v).left ≫ m.φ = (M.pt v).left := by
     intro v
     rw [← hM v, Category.assoc, ψφ, Category.comp_id]
-  have hW1 : ∀ (n : ℕ) (k : Type) [Field k] (z' : Sp k ⟶ X') (z : Sp k ⟶ X), z' ≫ e.hom = z →
-      ∀ (a' b' : Over.mk z' ⟶ t'.G) (a b : Over.mk z ⟶ t.G) (c : kˣ), a'.left ≫ m.φ = a.left →
-        b'.left ≫ m.φ = b.left → Out.WeilIs t.G t.PP.L (n : ℤ) a b (unitOn c) →
-          Out.WeilIs t'.G t'.PP.L (n : ℤ) a' b' (unitOn c) := by
+  have hW1
+      : ∀ (n : ℕ) (k : Type) [Field k] (z' : Sp k ⟶ X') (z : Sp k ⟶ X),
+        z' ≫ e.hom = z
+          → ∀ (a' b' : Over.mk z' ⟶ t'.G) (a b : Over.mk z ⟶ t.G) (c : kˣ),
+            a'.left ≫ m.φ = a.left → b'.left ≫ m.φ = b.left
+              → Out.WeilIs t.G t.PP.L (n : ℤ) a b (unitOn c)
+              → Out.WeilIs t'.G t'.PP.L (n : ℤ) a' b' (unitOn c) := by
     intro n k _ z' z hz a' b' a b c ha hb hw
     subst hz
-    exact (GlobalTheory.T.weil_pairing_pullback_iff E H X X' t t' e.hom m k z' a' b' a b n c ha hb).mpr hw
-  have hW2 : ∀ (n : ℕ) (k : Type) [Field k] (z' : Sp k ⟶ X) (z : Sp k ⟶ X'), z' ≫ e.inv = z →
-      ∀ (a' b' : Over.mk z' ⟶ t.G) (a b : Over.mk z ⟶ t'.G) (c : kˣ), a'.left ≫ inv m.φ = a.left →
-        b'.left ≫ inv m.φ = b.left → Out.WeilIs t'.G t'.PP.L (n : ℤ) a b (unitOn c) →
-          Out.WeilIs t.G t.PP.L (n : ℤ) a' b' (unitOn c) := by
+    exact
+      (GlobalTheory.T.weil_pairing_pullback_iff E H X X' t t' e.hom m k z' a' b' a b n c ha hb).mpr
+        hw
+  have hW2
+      : ∀ (n : ℕ) (k : Type) [Field k] (z' : Sp k ⟶ X) (z : Sp k ⟶ X'),
+        z' ≫ e.inv = z
+          → ∀ (a' b' : Over.mk z' ⟶ t.G) (a b : Over.mk z ⟶ t'.G) (c : kˣ),
+            a'.left ≫ inv m.φ = a.left → b'.left ≫ inv m.φ = b.left
+              → Out.WeilIs t'.G t'.PP.L (n : ℤ) a b (unitOn c)
+              → Out.WeilIs t.G t.PP.L (n : ℤ) a' b' (unitOn c) := by
     intro n k _ z' z hz a' b' a b c ha hb hw
     have hz2 : z' = z ≫ e.hom := by rw [← hz, Category.assoc, gf, Category.comp_id]
     subst hz2
     have ha' : a.left ≫ m.φ = a'.left := by rw [← ha, Category.assoc, ψφ, Category.comp_id]
     have hb' : b.left ≫ m.φ = b'.left := by rw [← hb, Category.assoc, ψφ, Category.comp_id]
-    exact (GlobalTheory.T.weil_pairing_pullback_iff E H X X' t t' e.hom m k z a b a' b' n c ha' hb').mp hw
+    exact
+      (GlobalTheory.T.weil_pairing_pullback_iff E H X X' t t' e.hom m k z a b a' b' n c ha' hb').mp
+        hw
   refine ⟨M', hM', ?_, ?_, ?_⟩
   · intro n hT k _ i g' hpow
     have hy : (spMap i ≫ ξ') ≫ e.hom = spMap i ≫ ξ := by rw [Category.assoc, hξ]
@@ -244,7 +295,9 @@ theorem lie_model_transport_isomorphism : ∀ (E : Type) [Field E] [NumberField 
     obtain ⟨x, hx⟩ := hT k i a (mv_pow hφ hy ha hpow)
     obtain ⟨x', hx'⟩ := mv_push hψw hξ' x
     refine ⟨x', ?_⟩
-    calc g'.left = (g'.left ≫ m.φ) ≫ inv m.φ := by rw [Category.assoc, φψ, Category.comp_id]
+    calc
+      g'.left
+        = (g'.left ≫ m.φ) ≫ inv m.φ := by rw [Category.assoc, φψ, Category.comp_id]
       _ = (spMap i ≫ x.left) ≫ inv m.φ := by rw [ha, hx]
       _ = spMap i ≫ x'.left := by rw [Category.assoc, hx']
   · intro hc
@@ -257,13 +310,17 @@ theorem lie_model_transport_isomorphism : ∀ (E : Type) [Field E] [NumberField 
       rw [h0]
       exact p.2.map e.hom.continuous
     refine ⟨?_, ?_⟩
-    · have key : ∀ ζ : Sp Ω ⟶ X, ξ' ≫ e.hom = ζ → Function.Bijective (Scheme.stalkClosedPointTo ζ).hom →
-          Function.Bijective (Scheme.stalkClosedPointTo ξ').hom := by
+    · have key
+          : ∀ ζ : Sp Ω ⟶ X,
+            ξ' ≫ e.hom = ζ → Function.Bijective (Scheme.stalkClosedPointTo ζ).hom
+              → Function.Bijective (Scheme.stalkClosedPointTo ξ').hom := by
         intro ζ hζ hb
         subst hζ
         rw [Scheme.stalkClosedPointTo_comp] at hb
-        change Function.Bijective ((Scheme.stalkClosedPointTo ξ').hom ∘ (e.hom.stalkMap _).hom) at hb
-        exact (Function.Bijective.of_comp_iff _ (ConcreteCategory.bijective_of_isIso (e.hom.stalkMap _))).mp hb
+        change Function.Bijective ((Scheme.stalkClosedPointTo ξ').hom ∘ (e.hom.stalkMap _).hom)
+          at hb
+        exact (Function.Bijective.of_comp_iff _
+          (ConcreteCategory.bijective_of_isIso (e.hom.stalkMap _))).mp hb
       exact key ξ hξ hc.bij
     · intro p a b hab
       obtain ⟨σ, -, h2, hbij⟩ := mv_stalk hξ p ⟨e.hom p.1, hsp p⟩ rfl
@@ -277,8 +334,12 @@ theorem lie_model_transport_isomorphism : ∀ (E : Type) [Field E] [NumberField 
     have hq2 : e.inv (e.hom q.1) = q.1 := by
       rw [← Scheme.Hom.comp_apply, e.hom_inv_id]
       rfl
-    refine ⟨le_antisymm (mv_regAt_le (f := e.inv) hξ' ⟨e.hom q.1, h⟩ q hq2)
-      (mv_regAt_le hξ q ⟨e.hom q.1, h⟩ rfl), ?_, ?_⟩
+    refine ⟨
+      le_antisymm (mv_regAt_le (f := e.inv) hξ' ⟨e.hom q.1, h⟩ q hq2)
+        (mv_regAt_le hξ q ⟨e.hom q.1, h⟩ rfl),
+      ?_,
+      ?_
+    ⟩
     · ext v
       constructor
       · intro hv

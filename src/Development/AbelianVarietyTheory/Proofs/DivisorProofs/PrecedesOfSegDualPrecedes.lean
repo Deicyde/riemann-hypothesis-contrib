@@ -11,15 +11,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsL
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.JHMult
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.LocLanglands GlobalTheory.JHMult
 
 namespace GlobalTheory.LocLanglands
 
-theorem precedes_of_segDual_precedes :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
-    ∀ D : IrrGL (k := k) → IrrGL (k := k), (∀ x y, DualCl x y ↔ y = D x) → (∀ x, D (D x) = x) →
-      (∀ (x : IrrGL (k := k)) (s : ℂ), D (x.nu s) = (D x).nu (-s)) → (∀ x, x.IsCusp → (D x).IsCusp) →
-      (∀ x, (D x).1 = x.1) → ∀ Δ Γ Δ' Γ' : Segment k, SegDual Δ Δ' → SegDual Γ Γ' → Γ'.Precedes Δ' → Δ.Precedes Γ := by
+theorem precedes_of_segDual_precedes
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      ∀ D : IrrGL (k := k) → IrrGL (k := k),
+        (∀ x y, DualCl x y ↔ y = D x) → (∀ x, D (D x) = x)
+          → (∀ (x : IrrGL (k := k)) (s : ℂ), D (x.nu s) = (D x).nu (-s))
+          → (∀ x, x.IsCusp → (D x).IsCusp) → (∀ x, (D x).1 = x.1)
+          → ∀ Δ Γ Δ' Γ' : Segment k,
+            SegDual Δ Δ' → SegDual Γ Γ' → Γ'.Precedes Δ' → Δ.Precedes Γ := by
   intro k _ _ _ _ D hD hDD hnu _ _ Δ Γ Δ' Γ' ⟨l1, d1⟩ ⟨l2, d2⟩ H
   obtain ⟨j, h0, h1, h2, e⟩ := Segment.precedes_iff.1 H
   rw [(hD _ _).1 d1, (hD _ _).1 d2] at e

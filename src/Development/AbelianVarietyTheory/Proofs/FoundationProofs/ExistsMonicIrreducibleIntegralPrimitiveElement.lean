@@ -12,31 +12,35 @@ namespace GlobalTheory.FunctionFieldPrimitive
 
 open Polynomial
 
-
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 open Polynomial in
-theorem _root_.GlobalTheory.FunctionFieldPrimitive.exists_integral_primitive {F : Type} [Field F] [CharZero F]
-    {L : Type} [Field L]
-    [Algebra F L] (t : L) (ht : Transcendental F t)
-    (hfin : FiniteDimensional (IntermediateField.adjoin F {t}) L) :
-    ∃ (Φ : Polynomial (Polynomial F)) (ω : L), Φ.Monic ∧ Irreducible Φ ∧
-      Φ.eval₂ (Polynomial.aeval t).toRingHom ω = 0 ∧
-      ∀ x : L, ∃ Q : Polynomial F, Q ≠ 0 ∧ ∃ R : Polynomial (Polynomial F),
-        Polynomial.aeval t Q * x = R.eval₂ (Polynomial.aeval t).toRingHom ω := by
+theorem _root_.GlobalTheory.FunctionFieldPrimitive.exists_integral_primitive
+    {F : Type} [Field F] [CharZero F]
+    {L : Type} [Field L] [Algebra F L]
+    (t : L) (ht : Transcendental F t) (hfin : FiniteDimensional (IntermediateField.adjoin F {t}) L)
+    : ∃ (Φ : Polynomial (Polynomial F)) (ω : L),
+      Φ.Monic ∧ Irreducible Φ ∧ Φ.eval₂ (Polynomial.aeval t).toRingHom ω = 0
+        ∧ ∀ x : L, ∃ Q : Polynomial F,
+          Q ≠ 0
+            ∧ ∃ R : Polynomial (Polynomial F),
+              Polynomial.aeval t Q * x = R.eval₂ (Polynomial.aeval t).toRingHom ω := by
   have htK : t ∈ IntermediateField.adjoin F {t} := IntermediateField.mem_adjoin_simple_self F t
-  have hne : ∀ p : Polynomial F, p ≠ 0 → Polynomial.aeval t p ≠ 0 := fun p hp h =>
-    ht ⟨p, hp, h⟩
-  have hden : ∀ y ∈ IntermediateField.adjoin F {t}, ∃ s : Polynomial F, s ≠ 0 ∧
-      ∃ r : Polynomial F, Polynomial.aeval t s * y = Polynomial.aeval t r := by
+  have hne : ∀ p : Polynomial F, p ≠ 0 → Polynomial.aeval t p ≠ 0 := fun p hp h => ht ⟨p, hp, h⟩
+  have hden
+      : ∀ y ∈ IntermediateField.adjoin F {t}, ∃ s : Polynomial F,
+        s ≠ 0 ∧ ∃ r : Polynomial F, Polynomial.aeval t s * y = Polynomial.aeval t r := by
     intro y hy
     obtain ⟨r, s, rfl⟩ := (IntermediateField.mem_adjoin_simple_iff F y).1 hy
     by_cases hs : s = 0
     · exact ⟨1, one_ne_zero, 0, by simp [hs]⟩
     · exact ⟨s, hs, r, by rw [mul_div_cancel₀ _ (hne s hs)]⟩
-  have hcomm : ∀ p : Polynomial F,
-      ((Polynomial.aeval (⟨t, htK⟩ : IntermediateField.adjoin F {t}) p :
-        IntermediateField.adjoin F {t}) : L) = Polynomial.aeval t p := fun p =>
+  have hcomm
+      : ∀ p : Polynomial F,
+        ((Polynomial.aeval (⟨t, htK⟩ : IntermediateField.adjoin F {t}) p
+              : IntermediateField.adjoin F {t})
+            : L)
+          = Polynomial.aeval t p := fun p =>
     (Polynomial.aeval_algHom_apply (IntermediateField.adjoin F {t}).val
       (⟨t, htK⟩ : IntermediateField.adjoin F {t}) p).symm
   letI algK : Algebra (Polynomial F) (IntermediateField.adjoin F {t}) :=
@@ -74,18 +78,27 @@ theorem _root_.GlobalTheory.FunctionFieldPrimitive.exists_integral_primitive {F 
     rw [eq_top_iff, ← hθ, IntermediateField.adjoin_simple_le_iff]
     have hθeq : θ = (Polynomial.aeval t y)⁻¹ * (y • θ) := by
       rw [hωdef, inv_mul_cancel_left₀ (hne y hy0)]
-    have hmem : (Polynomial.aeval t y)⁻¹ * (y • θ) ∈
-        IntermediateField.adjoin (IntermediateField.adjoin F {t}) {y • θ} :=
-      mul_mem (inv_mem (IntermediateField.algebraMap_mem _
-        (⟨Polynomial.aeval t y, hyK⟩ : IntermediateField.adjoin F {t})))
+    have hmem
+        : (Polynomial.aeval t y)⁻¹ * (y • θ)
+          ∈ IntermediateField.adjoin (IntermediateField.adjoin F {t}) {y • θ} :=
+      mul_mem
+        (inv_mem (IntermediateField.algebraMap_mem _
+          (⟨Polynomial.aeval t y, hyK⟩ : IntermediateField.adjoin F {t})))
         (IntermediateField.mem_adjoin_simple_self _ (y • θ))
     rwa [← hθeq] at hmem
-  refine ⟨minpoly (Polynomial F) (y • θ), y • θ, minpoly.monic hyint,
-    minpoly.irreducible hyint, minpoly.aeval _ _, ?_⟩
+  refine ⟨
+    minpoly (Polynomial F) (y • θ),
+    y • θ,
+    minpoly.monic hyint,
+    minpoly.irreducible hyint,
+    minpoly.aeval _ _,
+    ?_
+  ⟩
   intro x
   have hx : x ∈ Algebra.adjoin (IntermediateField.adjoin F {t}) {y • θ} := by
     rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
-      (Algebra.IsAlgebraic.isAlgebraic (y • θ)), htop]
+        (Algebra.IsAlgebraic.isAlgebraic (y • θ)),
+      htop]
     trivial
   induction hx using Algebra.adjoin_induction with
   | mem z hz =>

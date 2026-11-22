@@ -6,17 +6,20 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsAddFun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN GlobalTheory.SnMass.SkewVol
+open NumberField IsDedekindDomain MeasureTheory Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
+  GlobalTheory.SnMass.VolN GlobalTheory.SnMass.SkewVol
 open scoped TensorProduct ENNReal nonZeroDivisors Classical
 
 namespace GlobalTheory
 
-theorem exists_fundamentalDomain_snd_of_two_smul_mem {ι : Type} [Fintype ι]
-    (Λ : Submodule ℤ ((ι → ℝ) × (ι → ℝ))) [DiscreteTopology Λ] :
-    Submodule.span ℝ (Λ : Set ((ι → ℝ) × (ι → ℝ))) = ⊤ →
-    (∀ a b, (a, b) ∈ Λ → ((0 : ι → ℝ), (2 : ℝ) • b) ∈ Λ) →
-    ∃ D : Set (ι → ℝ), MeasurableSet D ∧
-      ∀ y, ∃! l, l ∈ {b : ι → ℝ | ∃ a, (a, b) ∈ Λ} ∧ y + l ∈ D := by
+theorem exists_fundamentalDomain_snd_of_two_smul_mem
+    {ι : Type} [Fintype ι] (Λ : Submodule ℤ ((ι → ℝ) × (ι → ℝ))) [DiscreteTopology Λ]
+    : Submodule.span ℝ (Λ : Set ((ι → ℝ) × (ι → ℝ))) = ⊤
+      → (∀ a b, (a, b) ∈ Λ → ((0 : ι → ℝ), (2 : ℝ) • b) ∈ Λ)
+      → ∃ D : Set (ι → ℝ),
+        MeasurableSet D ∧ ∀ y, ∃! l, l ∈ {b : ι → ℝ | ∃ a, (a, b) ∈ Λ} ∧ y + l ∈ D := by
   intro hspan h2
   let L₂ : Submodule ℤ (ι → ℝ) := Λ.map (LinearMap.snd ℤ (ι → ℝ) (ι → ℝ))
   have hmem : ∀ b, b ∈ L₂ ↔ ∃ a, (a, b) ∈ Λ := by

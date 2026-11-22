@@ -4,17 +4,19 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.Qf37.aOp :
-    {G : Type} → [Group G] → Finset G → G → (G → ℂ) → G → ℂ :=
-    fun {G : Type} [Group G] (R : Finset G) (t : G) (φ : G → ℂ) (g : G) ↦ ∑ r ∈ R, φ (g * r * t)
+noncomputable def UpperTheory.Reformulated.B.Qf37.aOp
+    : {G : Type} → [Group G] → Finset G → G → (G → ℂ) → G → ℂ :=
+  fun {G : Type} [Group G] (R : Finset G) (t : G) (φ : G → ℂ) (g : G) ↦ ∑ r ∈ R, φ (g * r * t)
 
-theorem UpperTheory.Reformulated.B.Qf37.aOp_rightInvariant :
-    ∀ {G : Type} [inst : Group G] {I : Subgroup G} {t : G} {R : Finset G},
-      (∀ r ∈ R, r ∈ I) →
-        (∀ i ∈ I, ∃! r : G, r ∈ R ∧ t⁻¹ * (r⁻¹ * i) * t ∈ I) →
-          ∀ {φ : G → ℂ},
-            (∀ (g i : G), i ∈ I → φ (g * i) = φ g) →
-              ∀ (g i : G), i ∈ I → UpperTheory.Reformulated.B.Qf37.aOp R t φ (g * i) = UpperTheory.Reformulated.B.Qf37.aOp R t φ g := by
+theorem UpperTheory.Reformulated.B.Qf37.aOp_rightInvariant
+    : ∀ {G : Type} [inst : Group G] {I : Subgroup G} {t : G} {R : Finset G},
+      (∀ r ∈ R, r ∈ I) → (∀ i ∈ I, ∃! r : G, r ∈ R ∧ t⁻¹ * (r⁻¹ * i) * t ∈ I)
+        → ∀ {φ : G → ℂ},
+          (∀ (g i : G), i ∈ I → φ (g * i) = φ g)
+            → ∀ (g i : G),
+              i ∈ I
+                → UpperTheory.Reformulated.B.Qf37.aOp R t φ (g * i)
+                  = UpperTheory.Reformulated.B.Qf37.aOp R t φ g := by
   intro G inst I t R hR hU φ hφ g i hi
   have hex : ∀ r ∈ R, ∃ s, s ∈ R ∧ t⁻¹ * (s⁻¹ * (i * r)) * t ∈ I := fun r hr =>
     (hU (i * r) (I.mul_mem hi (hR r hr))).exists
@@ -28,14 +30,13 @@ theorem UpperTheory.Reformulated.B.Qf37.aOp_rightInvariant :
     have h4 : t⁻¹ * (a⁻¹ * b) * t ∈ I := by
       convert h3 using 1
       group
-    have h5 : t⁻¹ * (b⁻¹ * b) * t ∈ I := by
-      simp
+    have h5 : t⁻¹ * (b⁻¹ * b) * t ∈ I := by simp
     exact (hU b (hR b hb)).unique ⟨ha, h4⟩ ⟨hb, h5⟩
   unfold UpperTheory.Reformulated.B.Qf37.aOp
   refine Finset.sum_bij σ hσR hinj ?_ ?_
   · intro b hb
-    obtain ⟨a, ha, hab⟩ := Finset.surj_on_of_inj_on_of_card_le σ hσR
-      (fun a b ha hb h => hinj a ha b hb h) le_rfl b hb
+    obtain ⟨a, ha, hab⟩ :=
+      Finset.surj_on_of_inj_on_of_card_le σ hσR (fun a b ha hb h => hinj a ha b hb h) le_rfl b hb
     exact ⟨a, ha, hab.symm⟩
   · intro a ha
     rw [← hφ (g * σ a ha * t) _ (hσ a ha)]

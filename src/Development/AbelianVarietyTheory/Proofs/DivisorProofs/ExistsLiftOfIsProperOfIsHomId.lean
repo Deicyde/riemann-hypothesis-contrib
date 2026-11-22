@@ -12,10 +12,10 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 
 namespace GlobalTheory
 
-theorem exists_lift_of_isProper_of_isHom_id :
-    ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (Y M : RatModel o Ω) (q : Y.Z ⟶ M.Z),
-      M.IsHom Y (AlgHom.id o Ω) q → IsProper q → ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z),
-        ∃ y' : Sp (OO p) ⟶ Y.Z, y' ≫ q = y := by
+theorem exists_lift_of_isProper_of_isHom_id
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (Y M : RatModel o Ω) (q : Y.Z ⟶ M.Z),
+      M.IsHom Y (AlgHom.id o Ω) q → IsProper q
+        → ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z), ∃ y' : Sp (OO p) ⟶ Y.Z, y' ≫ q = y := by
   intro o Ω _ _ _ Y M q hq hp p _ y
   have hq' : Y.pt ≫ q = spMap (AlgHom.id o Ω).toRingHom ≫ M.pt := by
     first | exact hq | exact hq.1 | exact hq.2
@@ -29,8 +29,8 @@ theorem exists_lift_of_isProper_of_isHom_id :
       exact h1
     intro z
     exact (genericPoint_specializes z).mem_closed hc hg
-  obtain ⟨K', _, σ, y₁, hσ, hy₁⟩ := exists_finite_ext_point_lift_of_surjective_lft q inferInstance hsurj
-    (PadicAlgCl p) (gPt p ≫ y)
+  obtain ⟨K', _, σ, y₁, hσ, hy₁⟩ :=
+    exists_finite_ext_point_lift_of_surjective_lft q inferInstance hsurj (PadicAlgCl p) (gPt p ≫ y)
   have hbij : Function.Bijective σ := by
     letI := σ.toAlgebra
     haveI : Module.Finite (PadicAlgCl p) K' := hσ
@@ -38,14 +38,15 @@ theorem exists_lift_of_isProper_of_isHom_id :
   let e := RingEquiv.ofBijective σ hbij
   have he : e.symm.toRingHom.comp σ = RingHom.id _ := RingHom.ext fun x => e.symm_apply_apply x
   have h2 : (spMap e.symm.toRingHom ≫ y₁) ≫ q = gPt p ≫ y := by
-    rw [Category.assoc, hy₁, ← Category.assoc, ← ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp, he]
+    rw [Category.assoc, hy₁, ← Category.assoc,
+      ← ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap_comp, he]
     have : spMap (RingHom.id (PadicAlgCl p)) = 𝟙 _ := Spec.map_id _
     rw [this, Category.id_comp]
   have hE : ValuativeCriterion.Existence q :=
-    (UniversallyClosed.eq_valuativeCriterion ▸ (inferInstance : UniversallyClosed q) :
-      (ValuativeCriterion.Existence ⊓ @QuasiCompact) q).1
-  obtain ⟨⟨l⟩⟩ := hE
-    { R := OO p, K := PadicAlgCl p, i₁ := spMap e.symm.toRingHom ≫ y₁, i₂ := y, commSq := ⟨h2⟩ }
+    (UniversallyClosed.eq_valuativeCriterion ▸ (inferInstance : UniversallyClosed q)
+      : (ValuativeCriterion.Existence ⊓ @QuasiCompact) q).1
+  obtain ⟨⟨l⟩⟩ :=
+    hE { R := OO p, K := PadicAlgCl p, i₁ := spMap e.symm.toRingHom ≫ y₁, i₂ := y, commSq := ⟨h2⟩ }
   exact ⟨l.l, l.fac_right⟩
 
 end GlobalTheory

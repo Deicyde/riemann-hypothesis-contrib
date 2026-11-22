@@ -8,18 +8,37 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RankCol
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 noncomputable section
 
 namespace GlobalTheory.FlipTop
 
-theorem prodHalf_topFn_eq_givenFn : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (B : Frames G) {μ₀ : T}, L.Is μ₀ →
-    ∀ (t : T) {e e' : AE D}, IsIdemSum e (locPl G t) → IsIdemSum e' (GlobalTheory.FlipTop.topPl L t) → (∀ w ∈ locPl G t, w ∉ GlobalTheory.FlipTop.topPl L t → ((∀ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) ≤ 1) ∧ ∃ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) = 1)) → ∀ (Φ : G.Datum) (j : ℕ) (hj : j < D.R.m),
-    GlobalTheory.HalfProd.prodHalf e' (e - e') (halfInd (e - e') (latO (G.pS (.mu t 0 j)) (G.pT (.mu t 0 j)) (G.latS (.mu t 0 j) : Set _) (G.latT (.mu t 0 j) : Set _) fun _ => True)) (GlobalTheory.FlipTop.topFn B t e' j (GlobalTheory.FlipTop.rank_col G hj.le) (GlobalTheory.FlipTop.rank_col G hj)) =
-      GlobalTheory.FlipStart.givenFn B t Φ e (.down t 0 j) := by
+theorem prodHalf_topFn_eq_givenFn
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (B : Frames G)
+        {μ₀ : T},
+      L.Is μ₀
+        → ∀ (t : T) {e e' : AE D},
+          IsIdemSum e (locPl G t) → IsIdemSum e' (GlobalTheory.FlipTop.topPl L t)
+            → (∀ w ∈ locPl G t,
+              w ∉ GlobalTheory.FlipTop.topPl L t
+                → ((∀ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) ≤ 1)
+                  ∧ ∃ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) = 1))
+            → ∀ (Φ : G.Datum) (j : ℕ) (hj : j < D.R.m),
+              GlobalTheory.HalfProd.prodHalf e' (e - e')
+                  (halfInd (e - e')
+                    (latO (G.pS (.mu t 0 j)) (G.pT (.mu t 0 j)) (G.latS (.mu t 0 j) : Set _)
+                      (G.latT (.mu t 0 j) : Set _) fun _ => True))
+                  (GlobalTheory.FlipTop.topFn B t e' j (GlobalTheory.FlipTop.rank_col G hj.le)
+                    (GlobalTheory.FlipTop.rank_col G hj))
+                = GlobalTheory.FlipStart.givenFn B t Φ e (.down t 0 j) := by
   intro D T L sc G B μ₀ hL t e e' he he' hAA Φ j hj
   classical
   have hsub : GlobalTheory.FlipTop.topPl L t ⊆ locPl G t := by
@@ -42,36 +61,60 @@ theorem prodHalf_topFn_eq_givenFn : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc 
   · rw [if_neg hx, if_neg hx, mul_zero]
   rw [if_pos hx, if_pos hx, mul_one]
   set N := GlobalTheory.FunObj.Comparison₂.fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D)) with hN
-  have hfr : ∀ a : AE D, GlobalTheory.FunObj.Comparison₂.fr (B.β 0 (j + 1)) (B.β 0 j) ((a • x).map (toEAf D)) = toEAf D a • N := by
+  have hfr
+      : ∀ a : AE D,
+        GlobalTheory.FunObj.Comparison₂.fr (B.β 0 (j + 1)) (B.β 0 j) ((a • x).map (toEAf D))
+          = toEAf D a • N := by
     intro a
     rw [hN, ← GlobalTheory.FunObj.Comparison₂.fr_smul]
     congr 1
     ext p q
     simp [Matrix.map_apply, Matrix.smul_apply, RingHom.map_mul]
-  have hcomp : ∀ (a : AE D) (w : Pl D.host.E), cpt (D := D) w (toEAf D a) = 1 →
-      (GlobalTheory.FunObj.Comparison₂.fr (B.β 0 (j + 1)) (B.β 0 j) ((a • x).map (toEAf D))).map (cpt (D := D) w) = N.map (cpt (D := D) w) := by
+  have hcomp
+      : ∀ (a : AE D) (w : Pl D.host.E),
+        cpt (D := D) w (toEAf D a) = 1
+          → (GlobalTheory.FunObj.Comparison₂.fr (B.β 0 (j + 1)) (B.β 0 j)
+              ((a • x).map (toEAf D))).map (cpt (D := D) w)
+            = N.map (cpt (D := D) w) := by
     intro a w hw
     rw [hfr]
     ext p q
     simp [Matrix.map_apply, Matrix.smul_apply, RingHom.map_mul, hw]
 
-  have hsubm : ∀ w : Pl D.host.E, GlobalTheory.StepData.IntM ((N.map (cpt (D := D) w)).submatrix (GlobalTheory.FunObj.Comparison₂.ixOf G t w hb)
-      (GlobalTheory.FunObj.Comparison₂.ixOf G t w ha)) ↔ GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) := fun w =>
-    ⟨fun h i l => by simpa using h ((GlobalTheory.FunObj.Comparison₂.ixOf G t w hb).symm i) ((GlobalTheory.FunObj.Comparison₂.ixOf G t w ha).symm l),
-      fun h i l => h _ _⟩
-  have hR : ∀ w, givenDatum t w B Φ (edgeOf (.down t 0 j)) (locArg B t w (.down t 0 j) x) =
-      stepFn L t w j ((N.map (cpt (D := D) w)).submatrix (GlobalTheory.FunObj.Comparison₂.ixOf G t w hb) (GlobalTheory.FunObj.Comparison₂.ixOf G t w ha)) := by
+  have hsubm
+      : ∀ w : Pl D.host.E,
+        GlobalTheory.StepData.IntM ((N.map (cpt (D := D) w)).submatrix
+            (GlobalTheory.FunObj.Comparison₂.ixOf G t w hb)
+            (GlobalTheory.FunObj.Comparison₂.ixOf G t w ha))
+          ↔ GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) := fun w => ⟨
+    fun h i l => by
+      simpa using
+        h ((GlobalTheory.FunObj.Comparison₂.ixOf G t w hb).symm i)
+          ((GlobalTheory.FunObj.Comparison₂.ixOf G t w ha).symm l),
+    fun h i l => h _ _
+  ⟩
+  have hR
+      : ∀ w,
+        givenDatum t w B Φ (edgeOf (.down t 0 j)) (locArg B t w (.down t 0 j) x)
+          = stepFn L t w j
+            ((N.map (cpt (D := D) w)).submatrix (GlobalTheory.FunObj.Comparison₂.ixOf G t w hb)
+              (GlobalTheory.FunObj.Comparison₂.ixOf G t w ha)) := by
     intro w
-    have hla : locArg B t w (.down t 0 j) x = B.coord t w (X := (0, j + 1)) (Y := (0, j)) ⟨Nat.zero_le _, hj⟩
-        ⟨Nat.zero_le _, hj.le⟩ ((x.map (toEAf D)).map (cpt (D := D) w)) := by
+    have hla
+        : locArg B t w (.down t 0 j) x
+          = B.coord t w (X := (0, j + 1)) (Y := (0, j)) ⟨Nat.zero_le _, hj⟩ ⟨Nat.zero_le _, hj.le⟩
+            ((x.map (toEAf D)).map (cpt (D := D) w)) := by
       rw [Matrix.map_map]
       exact dif_pos ⟨Nat.zero_le _, hj⟩
     rw [hla]
     exact GlobalTheory.FunObj.Comparison₂.givenDatum_theta_coord B t w Φ hj ha hb (x.map (toEAf D))
   rw [Finset.prod_congr rfl fun w _ => hR w, ← Finset.prod_sdiff hsub]
-  have hout : ∀ w ∈ locPl G t \ GlobalTheory.FlipTop.topPl L t, stepFn L t w j ((N.map (cpt (D := D) w)).submatrix
-      (GlobalTheory.FunObj.Comparison₂.ixOf G t w hb) (GlobalTheory.FunObj.Comparison₂.ixOf G t w ha)) =
-      if GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) then 1 else 0 := by
+  have hout
+      : ∀ w ∈ locPl G t \ GlobalTheory.FlipTop.topPl L t,
+        stepFn L t w j
+            ((N.map (cpt (D := D) w)).submatrix (GlobalTheory.FunObj.Comparison₂.ixOf G t w hb)
+              (GlobalTheory.FunObj.Comparison₂.ixOf G t w ha))
+          = if GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) then 1 else 0 := by
     intro w hw
     obtain ⟨-, hw2⟩ := Finset.mem_sdiff.1 hw
     have hP : w ∉ L.Pg := fun h => hw2 (Finset.mem_union_left _ h)
@@ -84,20 +127,36 @@ theorem prodHalf_topFn_eq_givenFn : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc 
   have hx1 : IsHalf (e - e') ((e - e') • x) := fun p q => by
     simp only [Matrix.smul_apply, smul_eq_mul, ← mul_assoc, h2]
   have hS : IsSelfDualC (G.pS (.mu t 0 j)) (G.latS (.mu t 0 j)) := (colY_isV D T L μ₀ hL j hj.le).sd
-  have hT : IsSelfDualC (G.pT (.mu t 0 j)) (G.latT (.mu t 0 j)) := (colY_isV D T L μ₀ hL (j + 1) hj).sd
-  have hAA' : ∀ w ∈ locPl G t \ GlobalTheory.FlipTop.topPl L t, ((∀ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) ≤ 1) ∧ ∃ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) = 1) := fun w hw =>
+  have hT : IsSelfDualC (G.pT (.mu t 0 j)) (G.latT (.mu t 0 j)) :=
+    (colY_isV D T L μ₀ hL (j + 1) hj).sd
+  have hAA'
+      : ∀ w ∈ locPl G t \ GlobalTheory.FlipTop.topPl L t,
+        ((∀ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) ≤ 1)
+          ∧ ∃ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) = 1) := fun w hw =>
     hAA w (Finset.mem_sdiff.1 hw).1 (Finset.mem_sdiff.1 hw).2
-  have hlat := GlobalTheory.T.mem_completedHomLattice_iff_integral_on_unit_half hS hT (B.isFrame_β hL (Nat.zero_le _) hj.le) (B.isFrame_β hL (Nat.zero_le _) hj) he₁ hAA'
-    ((e - e') • x) hx1
-  have k1 : halfInd (e - e') (latO (G.pS (.mu t 0 j)) (G.pT (.mu t 0 j)) (G.latS (.mu t 0 j) : Set _)
-      (G.latT (.mu t 0 j) : Set _) fun _ => True) ((e - e') • x) =
-      if ∀ w ∈ locPl G t \ GlobalTheory.FlipTop.topPl L t, GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) then 1 else 0 := by
+  have hlat :=
+    GlobalTheory.T.mem_completedHomLattice_iff_integral_on_unit_half hS hT
+      (B.isFrame_β hL (Nat.zero_le _) hj.le) (B.isFrame_β hL (Nat.zero_le _) hj) he₁ hAA'
+      ((e - e') • x) hx1
+  have k1
+      : halfInd (e - e')
+          (latO (G.pS (.mu t 0 j)) (G.pT (.mu t 0 j)) (G.latS (.mu t 0 j) : Set _)
+            (G.latT (.mu t 0 j) : Set _) fun _ => True)
+          ((e - e') • x)
+        = if ∀ w ∈ locPl G t \ GlobalTheory.FlipTop.topPl L t,
+              GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) then
+            1
+          else
+            0 := by
     unfold halfInd
     refine if_congr ?_ rfl rfl
     rw [and_iff_left hx1, hlat]
     exact forall₂_congr fun w hw => by rw [hcomp _ w (d1 w hw)]
 
-  have hint : IsIntM (toEAf D e' • N) ↔ ∀ w ∈ GlobalTheory.FlipTop.topPl L t, GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) := by
+  have hint
+      : IsIntM (toEAf D e' • N)
+        ↔ ∀ w ∈ GlobalTheory.FlipTop.topPl L t,
+          GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) := by
     constructor
     · intro h w hw i l
       have := (mem_OA_iff _).1 (h i l) w
@@ -113,18 +172,22 @@ theorem prodHalf_topFn_eq_givenFn : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc 
         exact zero_mem _
   have hx0 : IsHalf e' (e' • x) := fun p q => by
     simp only [Matrix.smul_apply, smul_eq_mul, ← mul_assoc, h1]
-  have k0 : GlobalTheory.FlipTop.topFn B t e' j ha hb (e' • x) = ∏ w ∈ GlobalTheory.FlipTop.topPl L t, stepFn L t w j
-      ((N.map (cpt (D := D) w)).submatrix (GlobalTheory.FunObj.Comparison₂.ixOf G t w hb) (GlobalTheory.FunObj.Comparison₂.ixOf G t w ha)) := by
-    unfold GlobalTheory.FlipTop.topFn
-    rw [Finset.prod_congr rfl fun w hw => by rw [hcomp e' w (c1 w hw)]]
-    by_cases H : ∀ w ∈ GlobalTheory.FlipTop.topPl L t, GlobalTheory.StepData.IntM (N.map (cpt (D := D) w))
-    · rw [if_pos ⟨hx0, by rw [hfr]; exact hint.2 H⟩]
-    · rw [if_neg fun h => H (by have h' := h.2; rw [hfr] at h'; exact hint.1 h')]
-      push_neg at H
-      obtain ⟨w, hw, hn⟩ := H
-      refine (Finset.prod_eq_zero hw ?_).symm
-      by_contra h0
-      exact hn ((hsubm w).1 (GlobalTheory.FunObj.LocTest.intM_of_stepFn t w j h0))
+  have k0
+      : GlobalTheory.FlipTop.topFn B t e' j ha hb (e' • x)
+        = ∏ w ∈ GlobalTheory.FlipTop.topPl L t, stepFn L t w j
+          ((N.map (cpt (D := D) w)).submatrix (GlobalTheory.FunObj.Comparison₂.ixOf G t w hb) (GlobalTheory.FunObj.Comparison₂.ixOf G t w ha)) :=
+    by
+      unfold GlobalTheory.FlipTop.topFn
+      rw [Finset.prod_congr rfl fun w hw => by rw [hcomp e' w (c1 w hw)]]
+      by_cases H
+        : ∀ w ∈ GlobalTheory.FlipTop.topPl L t, GlobalTheory.StepData.IntM (N.map (cpt (D := D) w))
+      · rw [if_pos ⟨hx0, by rw [hfr]; exact hint.2 H⟩]
+      · rw [if_neg fun h => H (by have h' := h.2; rw [hfr] at h'; exact hint.1 h')]
+        push_neg at H
+        obtain ⟨w, hw, hn⟩ := H
+        refine (Finset.prod_eq_zero hw ?_).symm
+        by_contra h0
+        exact hn ((hsubm w).1 (GlobalTheory.FunObj.LocTest.intM_of_stepFn t w j h0))
   rw [k0, k1, mul_comm]
 
 end GlobalTheory.FlipTop

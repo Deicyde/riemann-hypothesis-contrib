@@ -12,10 +12,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem alg_vring {C K : Type} [CommRing C] [IsLocalRing C] [CommRing K] [Algebra C K]
-    {P : ℤ → Submodule C K} [SetLike.GradedMonoid P] (h : HasVertex P) (hi : Function.Injective (algebraMap C K))
-    (hn : IsNoetherianRing (lauSub P)) : IsVertexRing C (vertex h) := by
-  have hcoeff : ∀ c : C, ((algebraMap C (lauSub P) c : lauSub P) : AddMonoidAlgebra K ℤ).coeff 0 = algebraMap C K c := by
+private theorem alg_vring
+    {C K : Type} [CommRing C] [IsLocalRing C] [CommRing K] [Algebra C K]
+    {P : ℤ → Submodule C K} [SetLike.GradedMonoid P]
+    (h : HasVertex P) (hi : Function.Injective (algebraMap C K)) (hn : IsNoetherianRing (lauSub P))
+    : IsVertexRing C (vertex h) := by
+  have hcoeff
+      : ∀ c : C,
+        ((algebraMap C (lauSub P) c : lauSub P) : AddMonoidAlgebra K ℤ).coeff 0
+          = algebraMap C K c := by
     intro c
     simp
   refine ⟨hn, ?_, alg_sep h hn, ?_, ?_⟩
@@ -36,13 +41,26 @@ private theorem alg_vring {C K : Type} [CommRing C] [IsLocalRing C] [CommRing K]
     refine ⟨0, (maximalIdeal C).zero_mem, ?_⟩
     simp [hc]
 
-private theorem alg_ev (C K : Type) [CommRing C] [CommRing K] [Algebra C K] :
-    ∃ e : AddMonoidAlgebra K ℤ →ₐ[C] K, ∀ j x, e (AddMonoidAlgebra.single j x) = x := by
-  refine ⟨AddMonoidAlgebra.liftNCAlgHom (AlgHom.id C K) 1 (fun _ _ => Commute.one_right _), fun j x => ?_⟩
+private theorem alg_ev (C K : Type) [CommRing C] [CommRing K] [Algebra C K]
+    : ∃ e : AddMonoidAlgebra K ℤ →ₐ[C] K, ∀ j x, e (AddMonoidAlgebra.single j x) = x := by
+  refine ⟨
+    AddMonoidAlgebra.liftNCAlgHom (AlgHom.id C K) 1 (fun _ _ => Commute.one_right _),
+    fun j x => ?_
+  ⟩
   exact (AddMonoidAlgebra.liftNC_single _ _ _ _).trans (by simp)
 
-theorem UpperTheory.V.Fr.alg :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (K : Type) [CommRing K] [Algebra O K] [Algebra C K] [IsScalarTower O C K], Function.Injective (algebraMap C K) → ∀ ρ : NRep F n K, Cone O C ρ → ∃ (ξ : S.A →ₐ[O] K) (β : S.B →ₐ[O] C), S.u.map (ξ : S.A →+* K) = ρ ∧ ∀ b, ξ (S.inc b) = algebraMap C K (β b) := by
+theorem UpperTheory.V.Fr.alg
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ S : Space O F n,
+          ∀ (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (K : Type) [CommRing K] [Algebra O K]
+              [Algebra C K] [IsScalarTower O C K],
+            Function.Injective (algebraMap C K)
+              → ∀ ρ : NRep F n K,
+                Cone O C ρ
+                  → ∃ (ξ : S.A →ₐ[O] K) (β : S.B →ₐ[O] C),
+                    S.u.map (ξ : S.A →+* K) = ρ ∧ ∀ b, ξ (S.inc b) = algebraMap C K (β b) := by
   intro l _ O _ _ _ _ F C₀ n hF hn S C _ _ _ K _ _ _ _ hi ρ hcone
   have hv := alg_vertex C ρ hcone
   haveI := alg_ft C ρ hcone.fg
@@ -71,7 +89,10 @@ theorem UpperTheory.V.Fr.alg :
       have hp := NRep.map_ψ (ξ : S.A →+* lauSub (NRep.part C ρ)) S.u v i g
       rw [hξ] at hp
       show e ((ξ ((S.u.ψ v i g : S.Aˣ) : S.A) : lauSub (NRep.part C ρ)) : AddMonoidAlgebra K ℤ) = _
-      have hp' : ξ ((S.u.ψ v i g : S.Aˣ) : S.A) = ((ρD.ψ v i g : (lauSub (NRep.part C ρ))ˣ) : lauSub (NRep.part C ρ)) := hp.symm
+      have hp'
+          : ξ ((S.u.ψ v i g : S.Aˣ) : S.A)
+            = ((ρD.ψ v i g : (lauSub (NRep.part C ρ))ˣ) : lauSub (NRep.part C ρ)) :=
+        hp.symm
       rw [hp', h2, he]
   · show e ((ξ (S.inc b) : lauSub (NRep.part C ρ)) : AddMonoidAlgebra K ℤ) = _
     rw [hβ b]

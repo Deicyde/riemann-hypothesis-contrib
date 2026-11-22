@@ -9,16 +9,15 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat
 section
 variable {R K : Type} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
 
-private theorem mul_zpow_mul_inv_pow_mul_zpow_lemma {G : Type*} [CommGroup G] (x y g : G) (k j a : ℤ)
-    (M : ℕ) :
-    (x * g ^ k) ^ a * ((y * g ^ j) ^ M)⁻¹ = x ^ a * (y ^ M)⁻¹ * g ^ (k * a - j * M) := by
+private theorem mul_zpow_mul_inv_pow_mul_zpow_lemma
+    {G : Type*} [CommGroup G] (x y g : G) (k j a : ℤ) (M : ℕ)
+    : (x * g ^ k) ^ a * ((y * g ^ j) ^ M)⁻¹ = x ^ a * (y ^ M)⁻¹ * g ^ (k * a - j * M) := by
   rw [mul_zpow, ← zpow_mul, mul_pow, ← zpow_natCast (g ^ j), ← zpow_mul, zpow_sub, mul_inv]
   exact mul_mul_mul_comm _ _ _ _
 
-theorem dvrOrder_exists_eq_unit_mul_zpow_iff {t : R} (ht : Irreducible t) (v : Rˣ) (e : ℤ) :
-    (∃ r : R, algebraMap R K r = algebraMap R K v * algebraMap R K t ^ e) ↔ 0 ≤ e := by
-  have ht0 : algebraMap R K t ≠ 0 :=
-    (map_ne_zero_iff _ (IsFractionRing.injective R K)).2 ht.ne_zero
+theorem dvrOrder_exists_eq_unit_mul_zpow_iff {t : R} (ht : Irreducible t) (v : Rˣ) (e : ℤ)
+    : (∃ r : R, algebraMap R K r = algebraMap R K v * algebraMap R K t ^ e) ↔ 0 ≤ e := by
+  have ht0 : algebraMap R K t ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective R K)).2 ht.ne_zero
   constructor
   · rintro ⟨r, hr⟩
     by_contra he
@@ -35,15 +34,18 @@ theorem dvrOrder_exists_eq_unit_mul_zpow_iff {t : R} (ht : Irreducible t) (v : R
     lift e to ℕ using he
     exact ⟨v * t ^ e, by rw [map_mul, map_pow, zpow_natCast]⟩
 
-theorem dvrOrder_exists_unit_eq_unit_mul_zpow_iff {t : R} (ht : Irreducible t) (v : Rˣ) (e : ℤ) :
-    (∃ r : Rˣ, algebraMap R K r = algebraMap R K v * algebraMap R K t ^ e) ↔ e = 0 := by
+theorem dvrOrder_exists_unit_eq_unit_mul_zpow_iff {t : R} (ht : Irreducible t) (v : Rˣ) (e : ℤ)
+    : (∃ r : Rˣ, algebraMap R K r = algebraMap R K v * algebraMap R K t ^ e) ↔ e = 0 := by
   constructor
   · rintro ⟨r, hr⟩
     have ht0 : algebraMap R K t ≠ 0 :=
       (map_ne_zero_iff _ (IsFractionRing.injective R K)).2 ht.ne_zero
-    have h1 : 0 ≤ e := (GlobalTheory.CompanionTheory.Ar.Flat.dvrOrder_exists_eq_unit_mul_zpow_iff (K := K) ht v e).1 ⟨r, hr⟩
+    have h1 : 0 ≤ e :=
+      (GlobalTheory.CompanionTheory.Ar.Flat.dvrOrder_exists_eq_unit_mul_zpow_iff (K := K) ht v e).1
+        ⟨r, hr⟩
     have h2 : 0 ≤ -e := by
-      refine (GlobalTheory.CompanionTheory.Ar.Flat.dvrOrder_exists_eq_unit_mul_zpow_iff (K := K) ht r (-e)).1 ⟨v, ?_⟩
+      refine (GlobalTheory.CompanionTheory.Ar.Flat.dvrOrder_exists_eq_unit_mul_zpow_iff (K := K) ht
+        r (-e)).1 ⟨v, ?_⟩
       rw [hr, zpow_neg, mul_assoc, mul_inv_cancel₀ (zpow_ne_zero _ ht0), mul_one]
     omega
   · rintro rfl
@@ -51,7 +53,16 @@ theorem dvrOrder_exists_unit_eq_unit_mul_zpow_iff {t : R} (ht : Irreducible t) (
 
 end
 
-theorem dvr_order_integral_unit_iff : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K] [IsFractionRing R K] (ϖ : R) (s : K), ϖ ≠ 0 → ¬ IsUnit ϖ → s ≠ 0 → ∃ (m : ℕ) (n : ℤ), 0 < m ∧ ∀ (M : ℕ) (a : ℤ), ((∃ r : R, algebraMap R K r * s ^ M = algebraMap R K ϖ ^ a) ↔ (M : ℤ) * n ≤ a * m) ∧ ((∃ r : Rˣ, algebraMap R K r * s ^ M = algebraMap R K ϖ ^ a) ↔ (M : ℤ) * n = a * m) := by
+theorem dvr_order_integral_unit_iff
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+        [IsFractionRing R K] (ϖ : R) (s : K),
+      ϖ ≠ 0 → ¬ IsUnit ϖ → s ≠ 0
+        → ∃ (m : ℕ) (n : ℤ),
+          0 < m
+            ∧ ∀ (M : ℕ) (a : ℤ),
+              ((∃ r : R, algebraMap R K r * s ^ M = algebraMap R K ϖ ^ a) ↔ (M : ℤ) * n ≤ a * m)
+                ∧ ((∃ r : Rˣ, algebraMap R K r * s ^ M = algebraMap R K ϖ ^ a)
+                  ↔ (M : ℤ) * n = a * m) := by
   intro R K _ _ _ _ _ _ ϖ s hϖ hϖu hs
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible R
   have hinj : Function.Injective (algebraMap R K) := IsFractionRing.injective R K
@@ -85,22 +96,26 @@ theorem dvr_order_integral_unit_iff : ∀ (R K : Type) [CommRing R] [IsDomain R]
     ring
   refine ⟨k, j, hk, fun M a => ?_⟩
   obtain ⟨v, hv⟩ : ∃ v : Rˣ, v = u ^ a * (w ^ M)⁻¹ := ⟨_, rfl⟩
-  have hU : (φ u * g ^ (k : ℤ)) ^ a * ((φ w * g ^ j) ^ M)⁻¹ =
-      φ v * g ^ ((k : ℤ) * a - j * M) := by
+  have hU : (φ u * g ^ (k : ℤ)) ^ a * ((φ w * g ^ j) ^ M)⁻¹ = φ v * g ^ ((k : ℤ) * a - j * M) := by
     rw [mul_zpow_mul_inv_pow_mul_zpow_lemma, hv, map_mul, map_zpow, map_inv, map_pow]
   have hU' := congrArg (fun z : Kˣ => (z : K)) hU
   simp only [Units.val_mul, Units.val_zpow_eq_zpow_val, Units.val_inv_eq_inv_val,
-    Units.val_pow_eq_pow_val, hφ, hg] at hU'
-  have hX : ∀ r : K, r * s ^ M = algebraMap R K ϖ ^ a ↔
-      r = algebraMap R K v * algebraMap R K π ^ ((k : ℤ) * a - j * M) := by
+      Units.val_pow_eq_pow_val, hφ, hg]
+    at hU'
+  have hX
+      : ∀ r : K,
+        r * s ^ M = algebraMap R K ϖ ^ a
+          ↔ r = algebraMap R K v * algebraMap R K π ^ ((k : ℤ) * a - j * M) := by
     intro r
     rw [← hU', ← hϖK, ← hsK, ← div_eq_mul_inv, eq_div_iff (pow_ne_zero _ hs)]
   constructor
   · rw [exists_congr fun r : R => hX (algebraMap R K r),
-      GlobalTheory.CompanionTheory.Ar.Flat.dvrOrder_exists_eq_unit_mul_zpow_iff (K := K) hπ v ((k : ℤ) * a - j * M)]
+      GlobalTheory.CompanionTheory.Ar.Flat.dvrOrder_exists_eq_unit_mul_zpow_iff (K := K) hπ v
+        ((k : ℤ) * a - j * M)]
     constructor <;> intro h <;> linarith
   · rw [exists_congr fun r : Rˣ => hX (algebraMap R K r),
-      GlobalTheory.CompanionTheory.Ar.Flat.dvrOrder_exists_unit_eq_unit_mul_zpow_iff (K := K) hπ v ((k : ℤ) * a - j * M)]
+      GlobalTheory.CompanionTheory.Ar.Flat.dvrOrder_exists_unit_eq_unit_mul_zpow_iff (K := K) hπ v
+        ((k : ℤ) * a - j * M)]
     constructor <;> intro h <;> linarith
 
 end GlobalTheory.CompanionTheory.Ar.Flat

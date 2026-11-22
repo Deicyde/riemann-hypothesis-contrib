@@ -12,11 +12,14 @@ namespace SheetDecomposition
 open MeasureTheory Filter Topology Matrix GlobalTheory.CompanionTheory.Ar.Cusp
 open scoped ENNReal ComplexOrder
 
-theorem hasSum_sheets {X M : Type*} [AddCommMonoid M] [TopologicalSpace M] [ContinuousAdd M] {np : ℕ}
-    (FF : Fin np → Set X) (pc : ℕ → Fin np) (B : ℕ → Set X) (d : Fin np → ℕ)
-    (hB : ∀ m, B m ⊆ FF (pc m)) (g : Fin np → X → M) (t : X)
-    (ht : ∀ k, t ∈ FF k → {m | pc m = k ∧ t ∈ B m}.encard = d k) :
-    HasSum (fun m => (B m).indicator (g (pc m)) t) (∑ k, d k • (FF k).indicator (g k) t) := by
+theorem hasSum_sheets
+    {X M : Type*} [AddCommMonoid M] [TopologicalSpace M] [ContinuousAdd M]
+    {np : ℕ} (FF : Fin np → Set X) (pc : ℕ → Fin np)
+    (B : ℕ → Set X)
+    (d : Fin np → ℕ)
+    (hB : ∀ m, B m ⊆ FF (pc m)) (g : Fin np → X → M)
+    (t : X) (ht : ∀ k, t ∈ FF k → {m | pc m = k ∧ t ∈ B m}.encard = d k)
+    : HasSum (fun m => (B m).indicator (g (pc m)) t) (∑ k, d k • (FF k).indicator (g k) t) := by
   classical
   have hfin : ∀ k, {m | pc m = k ∧ t ∈ B m}.Finite := by
     intro k
@@ -41,7 +44,8 @@ theorem hasSum_sheets {X M : Type*} [AddCommMonoid M] [TopologicalSpace M] [Cont
     rw [hsum]
     exact hasSum_sum_of_ne_finset_zero hzero
   have h1 : ∑ m ∈ s, (B m).indicator (g (pc m)) t = ∑ m ∈ s, g (pc m) t :=
-    Finset.sum_congr rfl (fun m hm => Set.indicator_of_mem (show t ∈ B m from hS.mem_toFinset.mp hm) _)
+    Finset.sum_congr rfl
+      (fun m hm => Set.indicator_of_mem (show t ∈ B m from hS.mem_toFinset.mp hm) _)
   rw [h1, ← Finset.sum_fiberwise s pc (fun m => g (pc m) t)]
   apply Finset.sum_congr rfl
   intro k _
@@ -60,20 +64,24 @@ theorem hasSum_sheets {X M : Type*} [AddCommMonoid M] [TopologicalSpace M] [Cont
   · rw [Set.indicator_of_notMem hk, smul_zero]
     have he : s.filter (fun m => pc m = k) = ∅ := by
       ext m
-      simp only [Finset.mem_filter, Finset.notMem_empty, iff_false, not_and, s, Set.Finite.mem_toFinset,
-        Set.mem_setOf_eq]
+      simp only [Finset.mem_filter, Finset.notMem_empty, iff_false, not_and, s,
+        Set.Finite.mem_toFinset, Set.mem_setOf_eq]
       intro hm h
       exact hk (h ▸ hB m hm)
     rw [he, Finset.card_empty, zero_smul]
 
-theorem sum_sheets {X : Type*} [MeasurableSpace X] (μ : Measure X) {np : ℕ}
-    (FF : Fin np → Set X) (pc : ℕ → Fin np) (B : ℕ → Set X) (d : Fin np → ℕ)
-    (hF : ∀ k, MeasurableSet (FF k)) (hBm : ∀ m, MeasurableSet (B m))
-    (hB : ∀ m, B m ⊆ FF (pc m)) (f : Fin np → X → ℝ)
+theorem sum_sheets
+    {X : Type*} [MeasurableSpace X]
+    (μ : Measure X)
+    {np : ℕ} (FF : Fin np → Set X) (pc : ℕ → Fin np)
+    (B : ℕ → Set X)
+    (d : Fin np → ℕ)
+    (hF : ∀ k, MeasurableSet (FF k)) (hBm : ∀ m, MeasurableSet (B m)) (hB : ∀ m, B m ⊆ FF (pc m))
+    (f : Fin np → X → ℝ)
     (hc : ∀ k, ∀ᵐ t ∂μ, t ∈ FF k → {m | pc m = k ∧ t ∈ B m}.encard = d k)
-    (hf : ∀ k, IntegrableOn (f k) (FF k) μ) :
-    Summable (fun m => ∫ t in B m, |f (pc m) t| ∂μ) ∧
-      ∑' m, ∫ t in B m, f (pc m) t ∂μ = ∑ k, (d k : ℝ) * ∫ t in FF k, f k t ∂μ := by
+    (hf : ∀ k, IntegrableOn (f k) (FF k) μ)
+    : Summable (fun m => ∫ t in B m, |f (pc m) t| ∂μ)
+      ∧ ∑' m, ∫ t in B m, f (pc m) t ∂μ = ∑ k, (d k : ℝ) * ∫ t in FF k, f k t ∂μ := by
   classical
   set F : ℕ → X → ℝ := fun m => (B m).indicator (f (pc m)) with hFdef
   have hFint : ∀ m, Integrable (F m) μ := fun m =>
@@ -82,19 +90,22 @@ theorem sum_sheets {X : Type*} [MeasurableSpace X] (μ : Measure X) {np : ℕ}
     (integral_indicator (hBm m)).symm
   have hIntAbs : ∀ m, ∫ t in B m, |f (pc m) t| ∂μ = (∫⁻ t, ‖F m t‖ₑ ∂μ).toReal := by
     intro m
-    rw [← integral_norm_eq_lintegral_enorm (hFint m).aestronglyMeasurable, ← integral_indicator (hBm m)]
+    rw [← integral_norm_eq_lintegral_enorm (hFint m).aestronglyMeasurable,
+      ← integral_indicator (hBm m)]
     congr 1
     ext t
     by_cases ht : t ∈ B m <;> simp [F, ht, Real.norm_eq_abs]
   have hae : ∀ᵐ t ∂μ, ∀ k, t ∈ FF k → {m | pc m = k ∧ t ∈ B m}.encard = d k := ae_all_iff.mpr hc
-  have hmeas : ∀ k, AEMeasurable (fun t => (d k : ℝ≥0∞) * (FF k).indicator (fun x => ‖f k x‖ₑ) t) μ := by
+  have hmeas
+      : ∀ k, AEMeasurable (fun t => (d k : ℝ≥0∞) * (FF k).indicator (fun x => ‖f k x‖ₑ) t) μ := by
     intro k
     apply AEMeasurable.const_mul
     exact (aemeasurable_indicator_iff (hF k)).mpr (hf k).aestronglyMeasurable.enorm
   have hlin : ∑' m, ∫⁻ t, ‖F m t‖ₑ ∂μ = ∑ k, (d k : ℝ≥0∞) * ∫⁻ t in FF k, ‖f k t‖ₑ ∂μ := by
     rw [← lintegral_tsum (fun m => (hFint m).aestronglyMeasurable.enorm)]
-    have hae1 : ∀ᵐ t ∂μ, ∑' m, ‖F m t‖ₑ =
-        ∑ k, (d k : ℝ≥0∞) * (FF k).indicator (fun x => ‖f k x‖ₑ) t := by
+    have hae1
+        : ∀ᵐ t ∂μ, ∑' m, ‖F m t‖ₑ =
+          ∑ k, (d k : ℝ≥0∞) * (FF k).indicator (fun x => ‖f k x‖ₑ) t := by
       filter_upwards [hae] with t ht
       have h := hasSum_sheets FF pc B d hB (fun k x => ‖f k x‖ₑ) t ht
       simp only [nsmul_eq_mul] at h
@@ -127,12 +138,15 @@ theorem sum_sheets {X : Type*} [MeasurableSpace X] (μ : Measure X) {np : ℕ}
 
 variable {Ψ : Type} [Fintype Ψ] {j j' n : ℕ}
 
-theorem contDiff_ballDet (q : Ψ × Fin j × Fin j' ≃ Fin n) (τ : Ψ) :
-    ContDiff ℝ 2 fun t => (1 - (ballMat q t τ)ᴴ * ballMat q t τ).det := by
-  have hent : ∀ a b, ContDiff ℝ 2 fun t : Fin n → ℂ =>
-      ((1 - (ballMat q t τ)ᴴ * ballMat q t τ : Matrix (Fin j') (Fin j') ℂ)) a b := by
+theorem contDiff_ballDet (q : Ψ × Fin j × Fin j' ≃ Fin n) (τ : Ψ)
+    : ContDiff ℝ 2 fun t => (1 - (ballMat q t τ)ᴴ * ballMat q t τ).det := by
+  have hent
+      : ∀ a b,
+        ContDiff ℝ 2 fun t : Fin n → ℂ =>
+          ((1 - (ballMat q t τ)ᴴ * ballMat q t τ : Matrix (Fin j') (Fin j') ℂ)) a b := by
     intro a b
-    simp only [Matrix.sub_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, ballMat, Matrix.of_apply]
+    simp only [Matrix.sub_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, ballMat,
+      Matrix.of_apply]
     apply contDiff_const.sub
     apply ContDiff.sum
     intro c _
@@ -147,8 +161,8 @@ theorem contDiff_ballDet (q : Ψ × Fin j × Fin j' ≃ Fin n) (τ : Ψ) :
   intro i _
   exact hent _ _
 
-theorem contDiffAt_ballPot (q : Ψ × Fin j × Fin j' ≃ Fin n) {t : Fin n → ℂ} (ht : t ∈ ballDom q) :
-    ContDiffAt ℝ 2 (fun t' => ballPot q t' / 2) t := by
+theorem contDiffAt_ballPot (q : Ψ × Fin j × Fin j' ≃ Fin n) {t : Fin n → ℂ} (ht : t ∈ ballDom q)
+    : ContDiffAt ℝ 2 (fun t' => ballPot q t' / 2) t := by
   refine ContDiffAt.div_const (ContDiffAt.neg (ContDiffAt.sum fun τ _ => ?_)) _
   refine ContDiffAt.log (Complex.reCLM.contDiff.comp (contDiff_ballDet q τ)).contDiffAt ?_
   exact (Complex.pos_iff.1 (ht τ).det_pos).1.ne'
@@ -163,12 +177,17 @@ theorem ballDens_zero (q : Ψ × Fin j × Fin j' ≃ Fin n) : ballDens q 0 = 1 :
   have : ∀ τ, ballMat q 0 τ = 0 := fun τ => by ext a b; simp [ballMat]
   simp [ballDens, ballPot, this]
 
-theorem ballPot_renumber {Ψ' : Type} [Fintype Ψ'] (e : Ψ ≃ Ψ') (q : Ψ × Fin j × Fin j' ≃ Fin n)
-    (q' : Ψ' × Fin j × Fin j' ≃ Fin n) :
-    ∃ σ : Equiv.Perm (Fin n), ∀ t, ballPot q t = ballPot q' (fun i => t (σ i)) := by
+theorem ballPot_renumber
+    {Ψ' : Type} [Fintype Ψ']
+    (e : Ψ ≃ Ψ') (q : Ψ × Fin j × Fin j' ≃ Fin n) (q' : Ψ' × Fin j × Fin j' ≃ Fin n)
+    : ∃ σ : Equiv.Perm (Fin n), ∀ t, ballPot q t = ballPot q' (fun i => t (σ i)) := by
   refine ⟨q'.symm.trans ((Equiv.prodCongr e.symm (Equiv.refl _)).trans q), fun t => ?_⟩
-  have hB : ∀ τ', ballMat q' (fun i => t ((q'.symm.trans
-      ((Equiv.prodCongr e.symm (Equiv.refl _)).trans q)) i)) τ' = ballMat q t (e.symm τ') := by
+  have hB
+      : ∀ τ',
+        ballMat q'
+            (fun i => t ((q'.symm.trans ((Equiv.prodCongr e.symm (Equiv.refl _)).trans q)) i))
+            τ'
+          = ballMat q t (e.symm τ') := by
     intro τ'
     ext a b
     simp [ballMat]
@@ -177,9 +196,10 @@ theorem ballPot_renumber {Ψ' : Type} [Fintype Ψ'] (e : Ψ ≃ Ψ') (q : Ψ × 
   exact (Equiv.sum_comp e.symm
     (fun τ => Real.log (1 - (ballMat q t τ)ᴴ * ballMat q t τ).det.re)).symm
 
-theorem norm_det_perm (σ : Equiv.Perm (Fin n)) (t : Fin n → ℂ) :
-    ‖LinearMap.det ((fderiv ℂ (fun (t : Fin n → ℂ) i => t (σ i)) t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) :
-      (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))‖ = 1 := by
+theorem norm_det_perm (σ : Equiv.Perm (Fin n)) (t : Fin n → ℂ)
+    : ‖LinearMap.det ((fderiv ℂ (fun (t : Fin n → ℂ) i => t (σ i)) t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) :
+        (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))‖
+      = 1 := by
   set L : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ) :=
     LinearMap.toContinuousLinearMap (Matrix.toLin' (σ.permMatrix ℂ)) with hLdef
   have hL : (fun (t : Fin n → ℂ) i => t (σ i)) = ⇑L := by
@@ -187,7 +207,8 @@ theorem norm_det_perm (σ : Equiv.Perm (Fin n)) (t : Fin n → ℂ) :
     simp [L, Matrix.toLin'_apply, Matrix.permMatrix_mulVec]
     rfl
   rw [hL, L.fderiv]
-  have hdet : LinearMap.det (L : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)) = ((Equiv.Perm.sign σ : ℤ) : ℂ) := by
+  have hdet
+      : LinearMap.det (L : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)) = ((Equiv.Perm.sign σ : ℤ) : ℂ) := by
     simp [L, LinearMap.det_toLin', Matrix.det_permutation]
   rw [hdet]
   rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h <;> simp [h]

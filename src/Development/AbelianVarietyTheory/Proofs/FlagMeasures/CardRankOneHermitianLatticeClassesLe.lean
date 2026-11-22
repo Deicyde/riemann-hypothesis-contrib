@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGau
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.RankOneClasses
 
@@ -21,28 +22,32 @@ theorem ne_bot_of_isLattice {L : Submodule (𝓞 E) E} (h : Submodule.IsFullLatt
   rw [hb] at this
   simp at this
 
-noncomputable def latUnit (L : Submodule (𝓞 E) E) (h : Submodule.IsFullLattice E L) :
-    (FractionalIdeal (𝓞 E)⁰ E)ˣ :=
+noncomputable def latUnit (L : Submodule (𝓞 E) E) (h : Submodule.IsFullLattice E L)
+    : (FractionalIdeal (𝓞 E)⁰ E)ˣ :=
   Units.mk0 (⟨L, FractionalIdeal.isFractional_of_fg h.fg⟩ : FractionalIdeal (𝓞 E)⁰ E) (by
     intro h0
     exact ne_bot_of_isLattice h (FractionalIdeal.coeToSubmodule_eq_bot.mpr h0))
 
 omit [StarRing E] in
-theorem exists_scale {L M : Submodule (𝓞 E) E} (hL : Submodule.IsFullLattice E L)
-    (hM : Submodule.IsFullLattice E M)
-    (h : (QuotientGroup.mk (latUnit L hL) :
-      (FractionalIdeal (𝓞 E)⁰ E)ˣ ⧸ (toPrincipalIdeal (𝓞 E) E).range) =
-      QuotientGroup.mk (latUnit M hM)) :
-    ∃ a : E, a ≠ 0 ∧ ∀ y, a * y ∈ M ↔ y ∈ L := by
+theorem exists_scale
+    {L M : Submodule (𝓞 E) E} (hL : Submodule.IsFullLattice E L) (hM : Submodule.IsFullLattice E M)
+    (h : (QuotientGroup.mk (latUnit L hL)
+        : (FractionalIdeal (𝓞 E)⁰ E)ˣ ⧸ (toPrincipalIdeal (𝓞 E) E).range)
+      = QuotientGroup.mk (latUnit M hM))
+    : ∃ a : E, a ≠ 0 ∧ ∀ y, a * y ∈ M ↔ y ∈ L := by
   obtain ⟨a, ha⟩ := QuotientGroup.eq.mp h
   have h1 : latUnit M hM = toPrincipalIdeal (𝓞 E) E a * latUnit L hL := by
     rw [ha, mul_comm, mul_inv_cancel_left]
-  have h2 : ((latUnit M hM : (FractionalIdeal (𝓞 E)⁰ E)ˣ) : FractionalIdeal (𝓞 E)⁰ E) =
-      FractionalIdeal.spanSingleton (𝓞 E)⁰ (a : E) * (latUnit L hL : (FractionalIdeal (𝓞 E)⁰ E)ˣ) := by
+  have h2
+      : ((latUnit M hM : (FractionalIdeal (𝓞 E)⁰ E)ˣ) : FractionalIdeal (𝓞 E)⁰ E)
+        = FractionalIdeal.spanSingleton (𝓞 E)⁰ (a : E)
+          * (latUnit L hL : (FractionalIdeal (𝓞 E)⁰ E)ˣ) := by
     rw [h1, Units.val_mul, coe_toPrincipalIdeal]
   refine ⟨a, a.ne_zero, fun y => ?_⟩
-  have h3 : (a : E) * y ∈ M ↔ (a : E) * y ∈
-      ((latUnit M hM : (FractionalIdeal (𝓞 E)⁰ E)ˣ) : FractionalIdeal (𝓞 E)⁰ E) := Iff.rfl
+  have h3
+      : (a : E) * y ∈ M
+        ↔ (a : E) * y ∈ ((latUnit M hM : (FractionalIdeal (𝓞 E)⁰ E)ˣ) : FractionalIdeal (𝓞 E)⁰ E) :=
+    Iff.rfl
   rw [h3, h2, FractionalIdeal.mem_singleton_mul]
   constructor
   · rintro ⟨z, hz, he⟩
@@ -54,19 +59,17 @@ theorem exists_scale {L M : Submodule (𝓞 E) E} (hL : Submodule.IsFullLattice 
 def idealOf (β : E) (L : Submodule (𝓞 E) E) : Submodule (𝓞 E) E :=
   Submodule.span (𝓞 E) {t | ∃ x ∈ L, ∃ y ∈ L, t = star x * β * y}
 
-theorem idealOf_fg (β : E) {L : Submodule (𝓞 E) E} (h : Submodule.IsFullLattice E L) :
-    (idealOf β L).FG := by
+theorem idealOf_fg (β : E) {L : Submodule (𝓞 E) E} (h : Submodule.IsFullLattice E L)
+    : (idealOf β L).FG := by
   obtain ⟨d, hd, hdL⟩ : IsFractional (𝓞 E)⁰ L := FractionalIdeal.isFractional_of_fg h.fg
-  have hd0 : (d : E) ≠ 0 := by
-    simpa using nonZeroDivisors.ne_zero hd
+  have hd0 : (d : E) ≠ 0 := by simpa using nonZeroDivisors.ne_zero hd
   have hs0 : star (d : E) ≠ 0 := by simpa using hd0
   have hle : idealOf β L ≤ Submodule.span (𝓞 E) {(star (d : E))⁻¹ * β * (d : E)⁻¹} := by
     refine Submodule.span_le.mpr ?_
     rintro t ⟨x, hx, y, hy, rfl⟩
     obtain ⟨p, hp⟩ := hdL x hx
     obtain ⟨q, hq⟩ := hdL y hy
-    have hi : IsIntegral ℤ (star (p : E)) :=
-      p.isIntegral_coe.map (starRingEnd E).toIntAlgHom
+    have hi : IsIntegral ℤ (star (p : E)) := p.isIntegral_coe.map (starRingEnd E).toIntAlgHom
     let p' : 𝓞 E := ⟨star (p : E), hi⟩
     refine Submodule.mem_span_singleton.mpr ⟨p' * q, ?_⟩
     have hp' : (p : E) = d * x := hp
@@ -76,15 +79,17 @@ theorem idealOf_fg (β : E) {L : Submodule (𝓞 E) E} (h : Submodule.IsFullLatt
     field_simp
   exact Submodule.FG.of_le (Submodule.fg_span_singleton _) hle
 
-theorem idealOf_ne_bot {β : E} (hβ : β ≠ 0) {L : Submodule (𝓞 E) E}
-    (h : Submodule.IsFullLattice E L) : idealOf β L ≠ ⊥ := by
+theorem idealOf_ne_bot
+    {β : E} (hβ : β ≠ 0) {L : Submodule (𝓞 E) E} (h : Submodule.IsFullLattice E L)
+    : idealOf β L ≠ ⊥ := by
   obtain ⟨x, hx, hx0⟩ := (Submodule.ne_bot_iff L).mp (ne_bot_of_isLattice h)
-  refine (Submodule.ne_bot_iff _).mpr ⟨star x * β * x, Submodule.subset_span ⟨x, hx, x, hx, rfl⟩, ?_⟩
+  refine (Submodule.ne_bot_iff _).mpr
+    ⟨star x * β * x, Submodule.subset_span ⟨x, hx, x, hx, rfl⟩, ?_⟩
   simp [hx0, hβ]
 
-theorem mul_mem_idealOf {β γ t a : E} {L M : Submodule (𝓞 E) E}
-    (h : ∀ y ∈ L, a * y ∈ M) (ht : star a * γ * a = t * β) :
-    ∀ z ∈ idealOf β L, t • z ∈ idealOf γ M := by
+theorem mul_mem_idealOf
+    {β γ t a : E} {L M : Submodule (𝓞 E) E} (h : ∀ y ∈ L, a * y ∈ M) (ht : star a * γ * a = t * β)
+    : ∀ z ∈ idealOf β L, t • z ∈ idealOf γ M := by
   intro z hz
   induction hz using Submodule.span_induction with
   | mem z hz =>
@@ -96,25 +101,31 @@ theorem mul_mem_idealOf {β γ t a : E} {L M : Submodule (𝓞 E) E}
   | add x y _ _ hx hy => rw [smul_add]; exact add_mem hx hy
   | smul r x _ hx => rw [smul_comm]; exact Submodule.smul_mem _ r hx
 
-theorem exists_unit {β γ a : E} (hβ : β ≠ 0) (hγ : γ ≠ 0) {L M : Submodule (𝓞 E) E}
-    (hL : Submodule.IsFullLattice E L) (ha : a ≠ 0) (h : ∀ y, a * y ∈ M ↔ y ∈ L)
-    (hN : idealOf β L = idealOf γ M) :
-    ∃ u : (𝓞 E)ˣ, star a * γ * a * ((u : 𝓞 E) : E) = β := by
+theorem exists_unit
+    {β γ a : E} (hβ : β ≠ 0) (hγ : γ ≠ 0)
+    {L M : Submodule (𝓞 E) E} (hL : Submodule.IsFullLattice E L)
+    (ha : a ≠ 0) (h : ∀ y, a * y ∈ M ↔ y ∈ L) (hN : idealOf β L = idealOf γ M)
+    : ∃ u : (𝓞 E)ˣ, star a * γ * a * ((u : 𝓞 E) : E) = β := by
   have hs : star a ≠ 0 := by simpa using ha
   have h1 : ∀ z ∈ idealOf β L, (star a * γ * a / β) • z ∈ idealOf β L := by
     intro z hz
-    have := mul_mem_idealOf (γ := γ) (t := star a * γ * a / β) (fun y hy => (h y).mpr hy)
-      (by field_simp) z hz
+    have :=
+      mul_mem_idealOf (γ := γ) (t := star a * γ * a / β)
+        (fun y hy => (h y).mpr hy)
+        (by field_simp) z hz
     rwa [← hN] at this
   have h2 : ∀ z ∈ idealOf β L, (β / (star a * γ * a)) • z ∈ idealOf β L := by
     intro z hz
     rw [hN] at hz
-    exact mul_mem_idealOf (a := a⁻¹) (fun y hy => (h _).mp (by rwa [mul_inv_cancel_left₀ ha]))
+    exact mul_mem_idealOf (a := a⁻¹)
+      (fun y hy => (h _).mp (by rwa [mul_inv_cancel_left₀ ha]))
       (by rw [star_inv₀]; field_simp) z hz
-  have i1 := isIntegral_trans (R := ℤ) _ (isIntegral_of_smul_mem_submodule _ (idealOf_ne_bot hβ hL)
-    (idealOf_fg β hL) _ h1)
-  have i2 := isIntegral_trans (R := ℤ) _ (isIntegral_of_smul_mem_submodule _ (idealOf_ne_bot hβ hL)
-    (idealOf_fg β hL) _ h2)
+  have i1 :=
+    isIntegral_trans (R := ℤ) _
+      (isIntegral_of_smul_mem_submodule _ (idealOf_ne_bot hβ hL) (idealOf_fg β hL) _ h1)
+  have i2 :=
+    isIntegral_trans (R := ℤ) _
+      (isIntegral_of_smul_mem_submodule _ (idealOf_ne_bot hβ hL) (idealOf_fg β hL) _ h2)
   refine ⟨⟨⟨_, i2⟩, ⟨_, i1⟩, ?_, ?_⟩, ?_⟩
   · apply RingOfIntegers.ext
     change β / (star a * γ * a) * (star a * γ * a / β) = 1
@@ -125,25 +136,30 @@ theorem exists_unit {β γ a : E} (hβ : β ≠ 0) (hγ : γ ≠ 0) {L M : Submo
   · change star a * γ * a * (β / (star a * γ * a)) = β
     field_simp
 
-noncomputable def even_im_hermitian_sub (u : (𝓞 E)ˣ) : Fin (Units.rank E) → ZMod 2 :=
-  fun i => (((Units.basisModTorsion E).repr (Additive.ofMul (u : (𝓞 E)ˣ ⧸ Units.torsion E)) i : ℤ) : ZMod 2)
+noncomputable def even_im_hermitian_sub (u : (𝓞 E)ˣ) : Fin (Units.rank E) → ZMod 2 := fun i =>
+  (((Units.basisModTorsion E).repr (Additive.ofMul (u : (𝓞 E)ˣ ⧸ Units.torsion E)) i : ℤ) : ZMod 2)
 
 omit [StarRing E] in
-theorem exists_sq_of_parity {u w : (𝓞 E)ˣ} (h : even_im_hermitian_sub u = even_im_hermitian_sub w) :
-    ∃ (ζ : (𝓞 E)ˣ) (v : (𝓞 E)ˣ), ζ ∈ Units.torsion E ∧ u = w * ζ * v ^ 2 := by
-  have hd : ∀ i, ∃ k : ℤ,
-      (Units.basisModTorsion E).repr (Additive.ofMul (u : (𝓞 E)ˣ ⧸ Units.torsion E)) i -
-      (Units.basisModTorsion E).repr (Additive.ofMul (w : (𝓞 E)ˣ ⧸ Units.torsion E)) i = 2 * k := by
+theorem exists_sq_of_parity {u w : (𝓞 E)ˣ} (h : even_im_hermitian_sub u = even_im_hermitian_sub w)
+    : ∃ (ζ : (𝓞 E)ˣ) (v : (𝓞 E)ˣ), ζ ∈ Units.torsion E ∧ u = w * ζ * v ^ 2 := by
+  have hd
+      : ∀ i, ∃ k : ℤ,
+        (Units.basisModTorsion E).repr (Additive.ofMul (u : (𝓞 E)ˣ ⧸ Units.torsion E)) i
+            - (Units.basisModTorsion E).repr (Additive.ofMul (w : (𝓞 E)ˣ ⧸ Units.torsion E)) i
+          = 2 * k := by
     intro i
     exact (ZMod.intCast_eq_intCast_iff_dvd_sub _ _ 2).mp (congrFun h i).symm
   choose k hk using hd
-  obtain ⟨v, hv⟩ := QuotientGroup.mk_surjective
-    (Additive.toMul ((Units.basisModTorsion E).equivFun.symm k))
-  have hv' : Additive.ofMul (v : (𝓞 E)ˣ ⧸ Units.torsion E) =
-      (Units.basisModTorsion E).equivFun.symm k := by rw [hv]; rfl
-  have he : Additive.ofMul (u : (𝓞 E)ˣ ⧸ Units.torsion E) =
-      Additive.ofMul (w : (𝓞 E)ˣ ⧸ Units.torsion E) +
-        (2 : ℤ) • Additive.ofMul (v : (𝓞 E)ˣ ⧸ Units.torsion E) := by
+  obtain ⟨v, hv⟩ :=
+    QuotientGroup.mk_surjective (Additive.toMul ((Units.basisModTorsion E).equivFun.symm k))
+  have hv'
+      : Additive.ofMul (v : (𝓞 E)ˣ ⧸ Units.torsion E)
+        = (Units.basisModTorsion E).equivFun.symm k := by
+    rw [hv]; rfl
+  have he
+      : Additive.ofMul (u : (𝓞 E)ˣ ⧸ Units.torsion E)
+        = Additive.ofMul (w : (𝓞 E)ˣ ⧸ Units.torsion E)
+          + (2 : ℤ) • Additive.ofMul (v : (𝓞 E)ˣ ⧸ Units.torsion E) := by
     apply (Units.basisModTorsion E).equivFun.injective
     rw [map_add (f := _), map_smul, hv', LinearEquiv.apply_symm_apply]
     funext i
@@ -155,14 +171,17 @@ theorem exists_sq_of_parity {u w : (𝓞 E)ˣ} (h : even_im_hermitian_sub u = ev
   refine ⟨(w * v ^ 2)⁻¹ * u, v, QuotientGroup.eq.mp he', ?_⟩
   rw [mul_right_comm, mul_inv_cancel_left]
 
-theorem eq_of_norm_eq (φ : E →+* ℂ) (hφ : ∀ a, φ (star a) = starRingEnd ℂ (φ a)) {A B : E}
-    (hA : star A = A) (hB : star B = B) (pA : 0 < (φ A).re) (pB : 0 < (φ B).re)
-    (h : ‖φ A‖ = ‖φ B‖) : A = B := by
+theorem eq_of_norm_eq
+    (φ : E →+* ℂ) (hφ : ∀ a, φ (star a) = starRingEnd ℂ (φ a))
+    {A B : E}
+    (hA : star A = A) (hB : star B = B) (pA : 0 < (φ A).re) (pB : 0 < (φ B).re) (h : ‖φ A‖ = ‖φ B‖)
+    : A = B := by
   apply φ.injective
   have a1 : ((φ A).re : ℂ) = φ A := Complex.conj_eq_iff_re.mp (by rw [← hφ, hA])
   have b1 : ((φ B).re : ℂ) = φ B := Complex.conj_eq_iff_re.mp (by rw [← hφ, hB])
   rw [← a1, ← b1, Complex.norm_real, Complex.norm_real, Real.norm_of_nonneg pA.le,
-    Real.norm_of_nonneg pB.le] at h
+      Real.norm_of_nonneg pB.le]
+    at h
   rw [← a1, ← b1, h]
 
 theorem card_classes_le : ∀ (E : Type) [Field E] [NumberField E] [StarRing E], Formalism.HermitianLatticesTheory.IsCMUnram E → ∀ N : Submodule (𝓞 E) E, ENat.card (Quot (fun X Y : {X : E × Submodule (𝓞 E) E // star X.1 = X.1 ∧ (∀ φ : E →+* ℂ, 0 < (φ X.1).re) ∧ Submodule.IsFullLattice E X.2 ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ X.2, ∃ y ∈ X.2, t = star x * X.1 * y} = N} => ∃ c : E, c ≠ 0 ∧ star c * Y.1.1 * c = X.1.1 ∧ ∀ y, c * y ∈ Y.1.2 ↔ y ∈ X.1.2)) ≤ ((classNumber E * 2 ^ Formalism.HermitianLatticesTheory.fDeg E : ℕ) : ENat) := by

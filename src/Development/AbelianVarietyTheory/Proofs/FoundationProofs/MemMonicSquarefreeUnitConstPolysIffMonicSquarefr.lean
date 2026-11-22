@@ -9,8 +9,8 @@ open Polynomial Classical GlobalTheory.BadShare
 
 namespace GlobalTheory.BadShare
 
-theorem mem_sqSet_iff (g : ℕ) [Fact g.Prime] (N : ℕ) (f : (ZMod g)[X]) :
-    f ∈ sqSet g N ↔ f.Monic ∧ f.natDegree = N ∧ Squarefree f ∧ f.coeff 0 ≠ 0 := by
+theorem mem_sqSet_iff (g : ℕ) [Fact g.Prime] (N : ℕ) (f : (ZMod g)[X])
+    : f ∈ sqSet g N ↔ f.Monic ∧ f.natDegree = N ∧ Squarefree f ∧ f.coeff 0 ≠ 0 := by
   unfold sqSet
   rw [Finset.mem_filter, Finset.mem_image, ← and_assoc (a := f.Monic)]
   refine and_congr_left fun _ => ⟨?_, ?_⟩

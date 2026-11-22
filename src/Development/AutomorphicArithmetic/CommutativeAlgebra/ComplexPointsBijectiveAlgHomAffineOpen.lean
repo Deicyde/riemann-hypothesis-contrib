@@ -7,24 +7,38 @@ public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.I
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.HodgeCoh GlobalTheory.CechDR GlobalTheory.PD KaehlerDifferential GlobalTheory.W1 GlobalTheory.WH
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+  GlobalTheory.HodgeCoh GlobalTheory.CechDR GlobalTheory.PD KaehlerDifferential GlobalTheory.W1
+  GlobalTheory.WH
 
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX) in
-open GlobalTheory.TopForm ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi in
-private theorem germ_algX {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ Sp ℂ) (V : X.Opens) (hg : genericPoint X ∈ V) (a : ℂ) :
-    (X.presheaf.germ V (genericPoint X) hg).hom (algX p V a) = @algebraMap ℂ X.functionField _ _ (ffAlg p) a := by
+open GlobalTheory.TopForm ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi in
+private theorem germ_algX
+    {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ Sp ℂ) (V : X.Opens) (hg : genericPoint X ∈ V) (a : ℂ)
+    : (X.presheaf.germ V (genericPoint X) hg).hom (algX p V a)
+      = @algebraMap ℂ X.functionField _ _ (ffAlg p) a := by
   have h := congrArg (fun φ => φ a) (GlobalTheory.TopForm.resG_comp_algX p (le_top : V ≤ ⊤))
   simp only [RingHom.comp_apply] at h
   rw [← h]
   simp only [ReciprocityTheory.ChartRestriction.G.Geo.Tor.resG, TopCat.Presheaf.germ_res_apply]
-  simp only [algX, GlobalTheory.PD.ffAlg, RingHom.algebraMap_toAlgebra, RingHom.comp_apply, Scheme.Hom.appLE]
+  simp only [algX, GlobalTheory.PD.ffAlg, RingHom.algebraMap_toAlgebra, RingHom.comp_apply,
+    Scheme.Hom.appLE]
   simp only [CommRingCat.comp_apply, TopCat.Presheaf.germ_res_apply]
   rfl
 
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX) in
 open GlobalTheory.Points GlobalTheory.TopForm GlobalTheory.ChartGlue in
-theorem UpperTheory.complexPoints_bijective_algHom_affineOpen :
-    ∀ (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp ℂ) [inst : Algebra ℂ X.functionField], inst = ffAlg p → ∀ (V : X.Opens), IsAffineOpen V → ∀ (hg : genericPoint X ∈ V) (B : Subalgebra ℂ X.functionField), (∀ y, y ∈ B ↔ ∃ f : Γ(X, V), (X.presheaf.germ V (genericPoint X) hg).hom f = y) → (∀ e : B →ₐ[ℂ] ℂ, ∃! y : CxPts p (RingHom.id ℂ), UpperTheory.A.Mt p V hg B e y) ∧ (∀ y ∈ CxPts.ptsIn p (RingHom.id ℂ) V, ∃! e : B →ₐ[ℂ] ℂ, UpperTheory.A.Mt p V hg B e y) := by
+theorem UpperTheory.complexPoints_bijective_algHom_affineOpen
+    : ∀ (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp ℂ) [inst : Algebra ℂ X.functionField],
+      inst = ffAlg p
+        → ∀ (V : X.Opens),
+          IsAffineOpen V
+            → ∀ (hg : genericPoint X ∈ V) (B : Subalgebra ℂ X.functionField),
+              (∀ y, y ∈ B ↔ ∃ f : Γ(X, V), (X.presheaf.germ V (genericPoint X) hg).hom f = y)
+                → (∀ e : B →ₐ[ℂ] ℂ, ∃! y : CxPts p (RingHom.id ℂ), UpperTheory.A.Mt p V hg B e y)
+                  ∧ (∀ y ∈ CxPts.ptsIn p (RingHom.id ℂ) V,
+                    ∃! e : B →ₐ[ℂ] ℂ, UpperTheory.A.Mt p V hg B e y) := by
   intro X _ p inst hinst V hV hg B hB
   subst hinst
   set g := (X.presheaf.germ V (genericPoint X) hg).hom with hgdef

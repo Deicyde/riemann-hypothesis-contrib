@@ -11,9 +11,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Complemen
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
 open MeasureTheory IsDedekindDomain NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker GlobalTheory.AdSpan
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Ker GlobalTheory.AdSpan
 open GlobalTheory.SW hiding Level
 open scoped TensorProduct ComplexConjugate Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -26,70 +30,87 @@ variable {D : D7}
 
 theorem partAt_eq_smul {S T : HSp D} (c : AE D) (w : WO S T) : partAt c w = c • w := rfl
 
-theorem actO_partAt (S T : HSp D) (g : GA D S) (h : GA D T) (c : AE D) (w : WO S T) :
-    actO S T g h (partAt c w) = partAt c (actO S T g h w) := by
+theorem actO_partAt (S T : HSp D) (g : GA D S) (h : GA D T) (c : AE D) (w : WO S T)
+    : actO S T g h (partAt c w) = partAt c (actO S T g h w) := by
   simp only [partAt_eq_smul, actO, Matrix.mul_smul, Matrix.smul_mul]
 
-theorem isHalf_partAt {S T : HSp D} {c : AE D} (hc : c * c = c) (w : WO S T) : IsHalf c (partAt c w) :=
-  fun i j => by simp only [partAt, Matrix.map_apply, ← mul_assoc, hc]
+theorem isHalf_partAt {S T : HSp D} {c : AE D} (hc : c * c = c) (w : WO S T)
+    : IsHalf c (partAt c w) := fun i j => by
+  simp only [partAt, Matrix.map_apply, ← mul_assoc, hc]
 
 theorem partAt_of_isHalf {S T : HSp D} {c : AE D} {w : WO S T} (h : IsHalf c w) : partAt c w = w :=
   Matrix.ext fun i j => h i j
 
-theorem partAt_add_one_sub {S T : HSp D} (c : AE D) (w : WO S T) : partAt c w + partAt (1 - c) w = w :=
+theorem partAt_add_one_sub {S T : HSp D} (c : AE D) (w : WO S T)
+    : partAt c w + partAt (1 - c) w = w :=
   Matrix.ext fun i j => by simp only [partAt, Matrix.add_apply, Matrix.map_apply]; ring
 
-theorem partAt_neg {S T : HSp D} (c : AE D) (w : WO S T) : partAt c (-w) = -partAt c w := by
+theorem partAt_neg {S T : HSp D} (c : AE D) (w : WO S T) : partAt c (-w) = - partAt c w := by
   simp only [partAt_eq_smul, smul_neg]
 
-theorem partAt_sub {S T : HSp D} (c : AE D) (w w' : WO S T) : partAt c (w - w') = partAt c w - partAt c w' := by
+theorem partAt_sub {S T : HSp D} (c : AE D) (w w' : WO S T)
+    : partAt c (w - w') = partAt c w - partAt c w' := by
   simp only [partAt_eq_smul, smul_sub]
 
-theorem finW_add (S T : HSp D) (y y' : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    finW S T (y + y') = finW S T y + finW S T y' :=
+theorem finW_add (S T : HSp D) (y y' : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : finW S T (y + y') = finW S T y + finW S T y' :=
   Matrix.ext fun a k => by simp [finW, TensorProduct.tmul_add]
 
-theorem finW_neg (S T : HSp D) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    finW S T (-y) = -finW S T y :=
+theorem finW_neg (S T : HSp D) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : finW S T (-y) = - finW S T y :=
   Matrix.ext fun a k => by simp [finW, TensorProduct.tmul_neg]
 
-theorem finW_sub (S T : HSp D) (y y' : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    finW S T (y - y') = finW S T y - finW S T y' := by
+theorem finW_sub (S T : HSp D) (y y' : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : finW S T (y - y') = finW S T y - finW S T y' := by
   rw [sub_eq_add_neg, finW_add, finW_neg, ← sub_eq_add_neg]
 
-theorem actO_add (S T : HSp D) (g : GA D S) (h : GA D T) (x y : WO S T) :
-    actO S T g h (x + y) = actO S T g h x + actO S T g h y := by
+theorem actO_add (S T : HSp D) (g : GA D S) (h : GA D T) (x y : WO S T)
+    : actO S T g h (x + y) = actO S T g h x + actO S T g h y := by
   simp only [actO, Matrix.mul_add, Matrix.add_mul]
 
-theorem actO_neg (S T : HSp D) (g : GA D S) (h : GA D T) (x : WO S T) :
-    actO S T g h (-x) = -actO S T g h x := by
+theorem actO_neg (S T : HSp D) (g : GA D S) (h : GA D T) (x : WO S T)
+    : actO S T g h (-x) = - actO S T g h x := by
   simp only [actO, Matrix.mul_neg, Matrix.neg_mul]
 
-theorem actO_sub (S T : HSp D) (g : GA D S) (h : GA D T) (x y : WO S T) :
-    actO S T g h (x - y) = actO S T g h x - actO S T g h y := by
+theorem actO_sub (S T : HSp D) (g : GA D S) (h : GA D T) (x y : WO S T)
+    : actO S T g h (x - y) = actO S T g h x - actO S T g h y := by
   rw [sub_eq_add_neg, actO_add, actO_neg, ← sub_eq_add_neg]
 
-theorem frMapAdj_neg (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)) (βT : GL (Fin T.rank) (EAf D)) (x : WO S T) :
-    frMapAdj S T βS βT (-x) = -frMapAdj S T βS βT x := by
+theorem frMapAdj_neg
+    (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)) (βT : GL (Fin T.rank) (EAf D)) (x : WO S T)
+    : frMapAdj S T βS βT (-x) = - frMapAdj S T βS βT x := by
   unfold frMapAdj
   simp [Matrix.map_neg, Matrix.transpose_neg, Matrix.mul_neg, Matrix.neg_mul]
 
-theorem partAt_mem_hatA (S T : HSp D) (I : Ideal (𝓞 D.host.E)) (L : Lt D.host.E T.rank) (w : AE D)
-    (hw : finPart D w ∈ AddSubgroup.closure {y | ∃ a ∈ intAf D.host.F, ∃ x : 𝓞 D.host.E, x ∈ I ∧
-      y = a ⊗ₜ[D.host.F] (x : D.host.E)})
-    {u : WO S T} (hu : u ∈ hatA S T (tens (stdL D.host.E S.rank) L)) :
-    partAt w u ∈ hatA S T (tens (stdL D.host.E S.rank) (I • L)) := by
-  let Ψ : WO S T →+ WO S T := AddMonoidHom.mk' (fun u => partAt w u)
-    fun x y => Matrix.ext fun i j => mul_add w (x i j) (y i j)
-  have main : hatA S T (tens (stdL D.host.E S.rank) L) ≤
-      (hatA S T (tens (stdL D.host.E S.rank) (I • L))).comap Ψ := by
+theorem partAt_mem_hatA
+    (S T : HSp D)
+    (I : Ideal (𝓞 D.host.E))
+    (L : Lt D.host.E T.rank)
+    (w : AE D)
+    (hw : finPart D w ∈ AddSubgroup.closure
+      {y | ∃ a ∈ intAf D.host.F, ∃ x : 𝓞 D.host.E, x ∈ I ∧
+        y = a ⊗ₜ[D.host.F] (x : D.host.E)})
+    {u : WO S T} (hu : u ∈ hatA S T (tens (stdL D.host.E S.rank) L))
+    : partAt w u ∈ hatA S T (tens (stdL D.host.E S.rank) (I • L)) := by
+  let Ψ : WO S T →+ WO S T :=
+    AddMonoidHom.mk'
+      (fun u => partAt w u)
+      fun x y => Matrix.ext fun i j => mul_add w (x i j) (y i j)
+  have main
+      : hatA S T (tens (stdL D.host.E S.rank) L)
+        ≤ (hatA S T (tens (stdL D.host.E S.rank) (I • L))).comap Ψ := by
     refine (AddSubgroup.closure_le _).2 ?_
     rintro _ ⟨α, hα, y, hy, rfl⟩
-    let Φ : Af D.host.F ⊗[D.host.F] D.host.E →+ WO S T := AddMonoidHom.mk'
-      (fun z => Matrix.of fun a k => GlobalTheory.LatticeStable.liftMul D (α ⊗ₜ[D.host.F] y k a) z)
-      fun z z' => Matrix.ext fun a k => (GlobalTheory.LatticeStable.liftMul D _).map_add z z'
-    have hle : AddSubgroup.closure {y | ∃ a ∈ intAf D.host.F, ∃ x : 𝓞 D.host.E, x ∈ I ∧
-        y = a ⊗ₜ[D.host.F] (x : D.host.E)} ≤ (hatA S T (tens (stdL D.host.E S.rank) (I • L))).comap Φ := by
+    let Φ : Af D.host.F ⊗[D.host.F] D.host.E →+ WO S T :=
+      AddMonoidHom.mk'
+        (fun z =>
+          Matrix.of fun a k => GlobalTheory.LatticeStable.liftMul D (α ⊗ₜ[D.host.F] y k a) z)
+        fun z z' => Matrix.ext fun a k => (GlobalTheory.LatticeStable.liftMul D _).map_add z z'
+    have hle
+        : AddSubgroup.closure
+            {y | ∃ a ∈ intAf D.host.F, ∃ x : 𝓞 D.host.E, x ∈ I ∧
+              y = a ⊗ₜ[D.host.F] (x : D.host.E)}
+          ≤ (hatA S T (tens (stdL D.host.E S.rank) (I • L))).comap Φ := by
       refine (AddSubgroup.closure_le _).2 ?_
       rintro _ ⟨β, hβ, o, ho, rfl⟩
       refine AddSubgroup.subset_closure ⟨β * α, fun v => ?_, (o : D.host.E) • y, ?_, ?_⟩
@@ -99,7 +120,9 @@ theorem partAt_mem_hatA (S T : HSp D) (I : Ideal (𝓞 D.host.E)) (L : Lt D.host
         have := Submodule.smul_mem_smul ho (hy k)
         exact this
       · ext a k
-        change GlobalTheory.LatticeStable.liftFin D ((β ⊗ₜ[D.host.F] (o : D.host.E)) * (α ⊗ₜ[D.host.F] y k a)) = _
+        change GlobalTheory.LatticeStable.liftFin D
+            ((β ⊗ₜ[D.host.F] (o : D.host.E)) * (α ⊗ₜ[D.host.F] y k a))
+          = _
         rw [Algebra.TensorProduct.tmul_mul_tmul, GlobalTheory.LatticeStable.liftFin_tmul]
         simp [Matrix.smul_apply]
     have e : Ψ (Matrix.of fun a k => pairA D.host.F 0 α ⊗ₜ[D.host.F] y k a) = Φ (finPart D w) :=
@@ -116,44 +139,58 @@ namespace GlobalTheory.LiftLevel.DatSum
 
 variable {D : D7}
 
-def tr (S T : HSp D) (e : AE D) (k₀ : GA D S) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) : WO S T :=
+def tr (S T : HSp D) (e : AE D) (k₀ : GA D S) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : WO S T :=
   partAt (cA D e) (actO S T k₀ 1 (finW S T y))
 
-theorem tr_eq (S T : HSp D) (e : AE D) (k₀ : GA D S) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    tr S T e k₀ y = actO S T k₀ 1 (partAt (cA D e) (finW S T y)) := (actO_partAt S T k₀ 1 _ _).symm
+theorem tr_eq (S T : HSp D) (e : AE D) (k₀ : GA D S) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : tr S T e k₀ y = actO S T k₀ 1 (partAt (cA D e) (finW S T y)) :=
+  (actO_partAt S T k₀ 1 _ _).symm
 
-theorem tr_sub (S T : HSp D) (e : AE D) (k₀ : GA D S) (y y' : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    tr S T e k₀ (y - y') = tr S T e k₀ y - tr S T e k₀ y' := by
+theorem tr_sub
+    (S T : HSp D) (e : AE D) (k₀ : GA D S) (y y' : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : tr S T e k₀ (y - y') = tr S T e k₀ y - tr S T e k₀ y' := by
   simp only [tr, finW_sub, actO_sub, partAt_sub]
 
-theorem tr_neg (S T : HSp D) (e : AE D) (k₀ : GA D S) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E) :
-    tr S T e k₀ (-y) = -tr S T e k₀ y := by
+theorem tr_neg
+    (S T : HSp D) (e : AE D) (k₀ : GA D S) (y : Matrix (Fin S.rank) (Fin T.rank) D.host.E)
+    : tr S T e k₀ (-y) = - tr S T e k₀ y := by
   simp only [tr, finW_neg, actO_neg, partAt_neg]
 
-theorem intAE_le_top : intAE D ≤ AddSubgroup.closure {y | ∃ a ∈ intAf D.host.F, ∃ x : 𝓞 D.host.E,
-    x ∈ (⊤ : Ideal (𝓞 D.host.E)) ∧ y = a ⊗ₜ[D.host.F] (x : D.host.E)} :=
+theorem intAE_le_top
+    : intAE D
+      ≤ AddSubgroup.closure
+        {y | ∃ a ∈ intAf D.host.F, ∃ x : 𝓞 D.host.E,
+          x ∈ (⊤ : Ideal (𝓞 D.host.E)) ∧ y = a ⊗ₜ[D.host.F] (x : D.host.E)} :=
   (AddSubgroup.closure_le _).2 (by
     rintro _ ⟨a, ha, x, rfl⟩
     exact AddSubgroup.subset_closure ⟨a, ha, x, Submodule.mem_top, rfl⟩)
 
-theorem tens_inter {n r : ℕ} {I J : Ideal (𝓞 D.host.E)} (h : IsCoprime I J) {L : Lt D.host.E r}
-    {y : Matrix (Fin n) (Fin r) D.host.E} (hI : y ∈ tens (stdL D.host.E n) (I • L))
-    (hJ : y ∈ tens (stdL D.host.E n) (J • L)) : y ∈ tens (stdL D.host.E n) ((I * J) • L) := by
+theorem tens_inter
+    {n r : ℕ} {I J : Ideal (𝓞 D.host.E)} (h : IsCoprime I J)
+    {L : Lt D.host.E r} {y : Matrix (Fin n) (Fin r) D.host.E}
+    (hI : y ∈ tens (stdL D.host.E n) (I • L)) (hJ : y ∈ tens (stdL D.host.E n) (J • L))
+    : y ∈ tens (stdL D.host.E n) ((I * J) • L) := by
   rw [GlobalTheory.SW.TensLat.mem_tens_stdL] at hI hJ ⊢
   intro k
   rw [Ideal.isCoprime_iff_sup_eq] at h
-  obtain ⟨i, hi, j, hj, hij⟩ := Submodule.mem_sup.1 (h ▸ Submodule.mem_top : (1 : 𝓞 D.host.E) ∈ I ⊔ J)
+  obtain ⟨i, hi, j, hj, hij⟩ :=
+    Submodule.mem_sup.1 (h ▸ Submodule.mem_top : (1 : 𝓞 D.host.E) ∈ I ⊔ J)
   have e : y k = i • y k + j • y k := by rw [← add_smul, hij, one_smul]
   rw [e]
   refine add_mem ?_ ?_
   · rw [Submodule.mul_smul]; exact Submodule.smul_mem_smul hi (hJ k)
   · rw [mul_comm, Submodule.mul_smul]; exact Submodule.smul_mem_smul hj (hI k)
 
-theorem nsmul_mem_hatA (S T : HSp D) {𝔪 : Ideal (𝓞 D.host.E)} {N : ℕ} (hN : (N : 𝓞 D.host.E) ∈ 𝔪)
-    (L : Lt D.host.E T.rank) {u : WO S T} (hu : u ∈ hatA S T (tens (stdL D.host.E S.rank) L)) :
-    N • u ∈ hatA S T (tens (stdL D.host.E S.rank) (𝔪 • L)) := by
-  have main : hatA S T (tens (stdL D.host.E S.rank) L) ≤
-      (hatA S T (tens (stdL D.host.E S.rank) (𝔪 • L))).comap (nsmulAddMonoidHom N) := by
+theorem nsmul_mem_hatA
+    (S T : HSp D)
+    {𝔪 : Ideal (𝓞 D.host.E)} {N : ℕ} (hN : (N : 𝓞 D.host.E) ∈ 𝔪)
+    (L : Lt D.host.E T.rank)
+    {u : WO S T} (hu : u ∈ hatA S T (tens (stdL D.host.E S.rank) L))
+    : N • u ∈ hatA S T (tens (stdL D.host.E S.rank) (𝔪 • L)) := by
+  have main
+      : hatA S T (tens (stdL D.host.E S.rank) L)
+        ≤ (hatA S T (tens (stdL D.host.E S.rank) (𝔪 • L))).comap (nsmulAddMonoidHom N) := by
     refine (AddSubgroup.closure_le _).2 ?_
     rintro _ ⟨α, hα, y, hy, rfl⟩
     refine AddSubgroup.subset_closure ⟨α, hα, N • y, ?_, ?_⟩
@@ -162,44 +199,59 @@ theorem nsmul_mem_hatA (S T : HSp D) {𝔪 : Ideal (𝓞 D.host.E)} {N : ℕ} (h
       have := Submodule.smul_mem_smul hN (hy k)
       rwa [Nat.cast_smul_eq_nsmul] at this
     · ext a k
-      change N • (pairA D.host.F 0 α ⊗ₜ[D.host.F] y k a) = pairA D.host.F 0 α ⊗ₜ[D.host.F] (N • y k a)
-      exact (map_nsmul (TensorProduct.mk D.host.F (AF D.host.F) D.host.E (pairA D.host.F 0 α)) N (y k a)).symm
+      change N • (pairA D.host.F 0 α ⊗ₜ[D.host.F] y k a)
+        = pairA D.host.F 0 α ⊗ₜ[D.host.F] (N • y k a)
+      exact (map_nsmul (TensorProduct.mk D.host.F (AF D.host.F) D.host.E (pairA D.host.F 0 α)) N
+        (y k a)).symm
   exact main hu
 
-theorem fullStd (n : ℕ) : (stdL D.host.E n).FG ∧
-    Submodule.span D.host.E (stdL D.host.E n : Set (Fin n → D.host.E)) = ⊤ := by
+theorem fullStd (n : ℕ)
+    : (stdL D.host.E n).FG
+      ∧ Submodule.span D.host.E (stdL D.host.E n : Set (Fin n → D.host.E)) = ⊤ := by
   refine ⟨Submodule.fg_span (Set.finite_range _), ?_⟩
   rw [stdL, Submodule.span_span_of_tower]
   convert (Pi.basisFun D.host.E (Fin n)).span_eq
   simp
 
-theorem fullSmul {r : ℕ} {𝔞 : Ideal (𝓞 D.host.E)} (h : 𝔞 ≠ ⊥) {N : Lt D.host.E r}
-    (hN : N.FG ∧ Submodule.span D.host.E (N : Set (Fin r → D.host.E)) = ⊤) :
-    (𝔞 • N).FG ∧ Submodule.span D.host.E ((𝔞 • N : Lt D.host.E r) : Set (Fin r → D.host.E)) = ⊤ := by
+theorem fullSmul
+    {r : ℕ} {𝔞 : Ideal (𝓞 D.host.E)} (h : 𝔞 ≠ ⊥)
+    {N : Lt D.host.E r} (hN : N.FG ∧ Submodule.span D.host.E (N : Set (Fin r → D.host.E)) = ⊤)
+    : (𝔞 • N).FG
+      ∧ Submodule.span D.host.E ((𝔞 • N : Lt D.host.E r) : Set (Fin r → D.host.E)) = ⊤ := by
   refine ⟨Submodule.FG.of_le hN.1 Submodule.smul_le_right, ?_⟩
   obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot h
   have h0 : (a : D.host.E) ≠ 0 := by simpa using ha0
   rw [eq_top_iff, ← hN.2, Submodule.span_le]
-  exact fun v hv => (Submodule.smul_mem_iff _ h0).1
-    (Submodule.subset_span (Submodule.smul_mem_smul ha hv))
+  exact fun v hv =>
+    (Submodule.smul_mem_iff _ h0).1 (Submodule.subset_span (Submodule.smul_mem_smul ha hv))
 
-theorem omegaK_congr {a b : ℕ} (Pg : Finset (Formalism.L2.DIV.Pl D.host.E))
+theorem omegaK_congr
+    {a b : ℕ}
+    (Pg : Finset (Formalism.L2.DIV.Pl D.host.E))
     {y y' : ∀ PP : Formalism.L2.DIV.Pl D.host.E, Matrix (Fin b) (Fin a) (Formalism.L2.DIV.kP PP)}
-    (h : ∀ PP ∈ Pg, y PP = y' PP) : omegaK Pg y = omegaK Pg y' := by
+    (h : ∀ PP ∈ Pg, y PP = y' PP)
+    : omegaK Pg y = omegaK Pg y' := by
   unfold omegaK
-  have hc : (∀ PP ∈ Pg, LowZero a (y PP) ∧ topL a (y PP) = 1) ↔
-      (∀ PP ∈ Pg, LowZero a (y' PP) ∧ topL a (y' PP) = 1) := forall₂_congr fun PP hP => by rw [h PP hP]
+  have hc
+      : (∀ PP ∈ Pg, LowZero a (y PP) ∧ topL a (y PP) = 1)
+        ↔ (∀ PP ∈ Pg, LowZero a (y' PP) ∧ topL a (y' PP) = 1) :=
+    forall₂_congr fun PP hP => by rw [h PP hP]
   by_cases h1 : ∀ PP ∈ Pg, LowZero a (y PP) ∧ topL a (y PP) = 1
   · rw [if_pos h1, if_pos (hc.1 h1)]
   · rw [if_neg h1, if_neg (fun h2 => h1 (hc.2 h2))]
 
-theorem omegaQ_congr {a b : ℕ} (Q : Finset (Formalism.L2.DIV.Pl D.host.E)) (r : ℕ)
-    (ξ : ∀ PP : Formalism.L2.DIV.Pl D.host.E, (Formalism.L2.DIV.kP PP)ˣ →* ℂˣ) (k : ℤ)
+theorem omegaQ_congr
+    {a b : ℕ}
+    (Q : Finset (Formalism.L2.DIV.Pl D.host.E))
+    (r : ℕ) (ξ : ∀ PP : Formalism.L2.DIV.Pl D.host.E, (Formalism.L2.DIV.kP PP)ˣ →* ℂˣ) (k : ℤ)
     {y y' : ∀ PP : Formalism.L2.DIV.Pl D.host.E, Matrix (Fin b) (Fin a) (Formalism.L2.DIV.kP PP)}
-    (h : ∀ PP ∈ Q, y PP = y' PP) : omegaQ Q r ξ k y = omegaQ Q r ξ k y' := by
+    (h : ∀ PP ∈ Q, y PP = y' PP)
+    : omegaQ Q r ξ k y = omegaQ Q r ξ k y' := by
   unfold omegaQ
-  have hc : (∀ PP ∈ Q, LowZero r (y PP) ∧ IsUnit (topL r (y PP)).det) ↔
-      (∀ PP ∈ Q, LowZero r (y' PP) ∧ IsUnit (topL r (y' PP)).det) := forall₂_congr fun PP hP => by rw [h PP hP]
+  have hc
+      : (∀ PP ∈ Q, LowZero r (y PP) ∧ IsUnit (topL r (y PP)).det)
+        ↔ (∀ PP ∈ Q, LowZero r (y' PP) ∧ IsUnit (topL r (y' PP)).det) :=
+    forall₂_congr fun PP hP => by rw [h PP hP]
   by_cases h1 : ∀ PP ∈ Q, LowZero r (y PP) ∧ IsUnit (topL r (y PP)).det
   · rw [dite_eq_left h1, dite_eq_left (hc.1 h1)]
     refine Finset.prod_congr rfl fun PP _ => ?_

@@ -10,7 +10,8 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.NonemptyParameterMod
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.L2.SG.HidaSetting
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.L2.SG.HidaSetting
   Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf
 
 namespace Formalism.L2.SG.LoopTieOf
@@ -21,12 +22,18 @@ section Gen
 
 variable {D : D7} {X : HidaSetting D} {Y : Full X} {hF : FinX Y}
 
-def FrameEqvInj (T : TermTie D) {u u' : D.what₂.Word} (F0 : FlagG (VS D) D.R.rS (Tu D u : D.host.E)) : Prop :=
-  ∀ t t' : D.s.Term u u', T.abelian₂ t = T.abelian₂ t' →
-    (∃ n ∈ NLam (T.abelian₂ t) (lf D F0), FrameEqv D n (T.fl' t) (T.fl' t')) → t = t'
+def FrameEqvInj (T : TermTie D) {u u' : D.what₂.Word} (F0 : FlagG (VS D) D.R.rS (Tu D u : D.host.E))
+    : Prop :=
+  ∀ t t' : D.s.Term u u',
+    T.abelian₂ t = T.abelian₂ t'
+      → (∃ n ∈ NLam (T.abelian₂ t) (lf D F0), FrameEqv D n (T.fl' t) (T.fl' t'))
+      → t = t'
 
-theorem pair_eq_of_terms (hI : SIso D.s (sOf hF)) {u u' : D.what₂.Word} (p q : D.s.Pair u u') (h1 : D.s.pfst p = D.s.pfst q)
-    (h2 : D.s.psnd p = D.s.psnd q) : p = q := by
+theorem pair_eq_of_terms
+    (hI : SIso D.s (sOf hF))
+    {u u' : D.what₂.Word}
+    (p q : D.s.Pair u u') (h1 : D.s.pfst p = D.s.pfst q) (h2 : D.s.psnd p = D.s.psnd q)
+    : p = q := by
   apply (hI.eP u u').injective
   apply Subtype.ext
   apply Prod.ext
@@ -37,14 +44,20 @@ theorem pair_eq_of_terms (hI : SIso D.s (sOf hF)) {u u' : D.what₂.Word} (p q :
       rw [← hI.psnd, ← hI.psnd, h2]
     exact e
 
-theorem pairInj_of (hI : SIso D.s (sOf hF)) (T : TermTie D) {u u' : D.what₂.Word} (F0 : FlagG (VS D) D.R.rS (Tu D u : D.host.E))
-    (hTI : FrameEqvInj T (u' := u') F0) :
-    ∀ p q : D.s.Pair u u', T.abelian₂ (D.s.pfst p) = T.abelian₂ (D.s.pfst q) →
-      (∃ n' ∈ NLam (T.abelian₂ (D.s.pfst p)) (lf D F0), ∃ n'' ∈ NLam (T.abelian₂ (D.s.pfst p)) (lf D F0),
-        FrameEqv D n' (T.fl' (D.s.pfst p)) (T.fl' (D.s.pfst q)) ∧
-        FrameEqv D n'' (T.fl' (D.s.psnd p)) (T.fl' (D.s.psnd q)) ∧
-        ∀ x ∈ orth (hS D) (Xsp (T.fl' (D.s.pfst q))),
-          T.beta q x - n'' (T.beta p (n'.symm x)) ∈ Xsp (T.fl' (D.s.psnd q))) → p = q := by
+theorem pairInj_of
+    (hI : SIso D.s (sOf hF))
+    (T : TermTie D)
+    {u u' : D.what₂.Word}
+    (F0 : FlagG (VS D) D.R.rS (Tu D u : D.host.E)) (hTI : FrameEqvInj T (u' := u') F0)
+    : ∀ p q : D.s.Pair u u',
+      T.abelian₂ (D.s.pfst p) = T.abelian₂ (D.s.pfst q)
+        → (∃ n' ∈ NLam (T.abelian₂ (D.s.pfst p)) (lf D F0),
+          ∃ n'' ∈ NLam (T.abelian₂ (D.s.pfst p)) (lf D F0),
+            FrameEqv D n' (T.fl' (D.s.pfst p)) (T.fl' (D.s.pfst q))
+              ∧ FrameEqv D n'' (T.fl' (D.s.psnd p)) (T.fl' (D.s.psnd q))
+              ∧ ∀ x ∈ orth (hS D) (Xsp (T.fl' (D.s.pfst q))),
+                T.beta q x - n'' (T.beta p (n'.symm x)) ∈ Xsp (T.fl' (D.s.psnd q)))
+        → p = q := by
   rintro p q hL ⟨n', hn', n'', hn'', h1, h2, -⟩
   have e1 : D.s.pfst p = D.s.pfst q := hTI _ _ hL ⟨n', hn', h1⟩
   have e2 : D.s.psnd p = D.s.psnd q := by
@@ -59,11 +72,15 @@ end Gen
 
 section AtTermTieOf
 
-variable {D : D7} {X : HidaSetting D} {Y : Full X} {hF : FinX Y} (W : WittDat X) (hI : SIso D.s (sOf hF))
+variable
+  {D : D7} {X : HidaSetting D} {Y : Full X} {hF : FinX Y} (W : WittDat X) (hI : SIso D.s (sOf hF))
 
-def loopRowsOf (H : TieHyp W hI) (A : AmpDat X) (hV : PvalForm W hI A) (hRR : RowRepsIso D) (u u' : D.what₂.Word)
-    (hTI : FrameEqvInj (termTieOf W hI H A hV) (u' := u') (FlagOfWord W u)) :
-    LoopRowsDat D (termTieOf W hI H A hV) u u' where
+def loopRowsOf
+    (H : TieHyp W hI)
+    (A : AmpDat X) (hV : PvalForm W hI A)
+    (hRR : RowRepsIso D)
+    (u u' : D.what₂.Word) (hTI : FrameEqvInj (termTieOf W hI H A hV) (u' := u') (FlagOfWord W u))
+    : LoopRowsDat D (termTieOf W hI H A hV) u u' where
   F0 := FlagOfWord W u
   flag_e_eq_hyperbolic := F0rec_e W u
   formsAtZero := F0rec_z_eq_zmOf W u

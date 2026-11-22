@@ -14,8 +14,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-theorem UpperTheory.V.CA.d_quotDet :
-    ∀ {n : ℕ} {A G : Type} [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [Group G] (D : GDet n A G) [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G], D.IsCont (maximalIdeal A) → ∀ Z : Set (MonoidAlgebra A G), (∀ z ∈ Z, D.Kills z) → ∃ DE : Det n A (D.CHQuot Z), DE.IsCH ∧ DE.pull (D.toQuot Z) = D.toDet := by
+theorem UpperTheory.V.CA.d_quotDet
+    : ∀ {n : ℕ} {A G : Type} [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [Group G]
+        (D : GDet n A G) [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+        [TotallyDisconnectedSpace G],
+      D.IsCont (maximalIdeal A)
+        → ∀ Z : Set (MonoidAlgebra A G),
+          (∀ z ∈ Z, D.Kills z)
+            → ∃ DE : Det n A (D.CHQuot Z), DE.IsCH ∧ DE.pull (D.toQuot Z) = D.toDet := by
   intro n A G _ _ _ _ D _ _ _ _ hc Z hZ
   set f := D.toQuot Z
   have hsurj : Function.Surjective f := RingCon.mkₐ_surjective _
@@ -43,11 +49,11 @@ theorem UpperTheory.V.CA.d_quotDet :
       exact TwoSidedIdeal.subset_span (R := MonoidAlgebra A G) hz
     exact (d_toDet D z).2.2.2.1 ((d_ker _ z).1.1 (d_ch_ker _ hz'))
   have hK : ∀ x, f x = 0 → x ∈ D.toDet.ker := fun x hx =>
-    (d_ker _ x).1.2 ((d_toDet D x).2.2.2.2
-      (d_closed D (maximalIdeal A) hc (D.CH ∪ Z)
-        (by
-          rintro z (hz | hz)
-          exacts [hCHk z hz, hZ z hz]) x (hker x hx)))
+    (d_ker _ x).1.2 ((d_toDet D x).2.2.2.2 (d_closed D (maximalIdeal A) hc (D.CH ∪ Z)
+      (by
+        rintro z (hz | hz)
+        exacts [hCHk z hz, hZ z hz])
+      x (hker x hx)))
   obtain ⟨DE, hDE, -⟩ := d_factor D.toDet f hsurj hK
   refine ⟨DE, ?_, hDE⟩
   show DE.CH = ⊥

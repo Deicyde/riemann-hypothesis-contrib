@@ -17,20 +17,24 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanish
 set_option autoImplicit false
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 namespace GlobalTheory.Div.SncBoundary
 
-noncomputable def multHom {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X] (z : X) :
-    CartierDiv X →+ ℤ :=
+noncomputable def multHom {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X] (z : X)
+    : CartierDiv X →+ ℤ :=
   AddMonoidHom.mk' (fun D => D.mult z) fun D E => CartierDiv.mult_add D E z
 
-private theorem regAt_of_ord_eq_zero_of_normal {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X]
+private theorem regAt_of_ord_eq_zero_of_normal
+    {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X]
     (hN : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme X)
-    {z : X} (hz : Order.coheight z = 1) {f : X.functionField} (hf : f ≠ 0)
-    (h0 : Scheme.ord f z = 0) : RegAt z f := by
+    {z : X} (hz : Order.coheight z = 1)
+    {f : X.functionField} (hf : f ≠ 0) (h0 : Scheme.ord f z = 0)
+    : RegAt z f := by
   haveI : Ring.KrullDimLE 1 (X.presheaf.stalk z) := krullDimLE_of_coheight_le hz.le
   obtain ⟨hD, hI⟩ := hN z
   have hnf : ¬ IsField (X.presheaf.stalk z) := by
@@ -41,8 +45,12 @@ private theorem regAt_of_ord_eq_zero_of_normal {X : Scheme.{0}} [IsIntegral X] [
   haveI : Ring.DimensionLEOne (X.presheaf.stalk z) :=
     ⟨fun hne hp => hp.isMaximal_of_ne_bot hne⟩
   have hDD : IsDedekindDomain (X.presheaf.stalk z) :=
-    (isDedekindDomain_iff _ X.functionField).mpr
-      ⟨hD, inferInstance, inferInstance, fun hx => (isIntegrallyClosed_iff X.functionField).mp hI hx⟩
+    (isDedekindDomain_iff _ X.functionField).mpr ⟨
+      hD,
+      inferInstance,
+      inferInstance,
+      fun hx => (isIntegrallyClosed_iff X.functionField).mp hI hx
+    ⟩
   have hTF := IsDiscreteValuationRing.TFAE (X.presheaf.stalk z) hnf
   have hV : ValuationRing (X.presheaf.stalk z) := (hTF.out 3 2).mp hDD
   have hord : Ring.ordFrac (X.presheaf.stalk z) f = 1 := by
@@ -66,19 +74,22 @@ private theorem regAt_of_ord_eq_zero_of_normal {X : Scheme.{0}} [IsIntegral X] [
     have h3 : Ring.ord (X.presheaf.stalk z) r = 0 := by rw [← hn, hn0]; rfl
     have hsub : Subsingleton (X.presheaf.stalk z ⧸ Ideal.span {r}) :=
       Module.length_eq_zero_iff.mp h3
-    have hu : IsUnit r :=
-      Ideal.span_singleton_eq_top.mp (Ideal.Quotient.subsingleton_iff.mp hsub)
+    have hu : IsUnit r := Ideal.span_singleton_eq_top.mp (Ideal.Quotient.subsingleton_iff.mp hsub)
     refine ⟨↑hu.unit⁻¹, ?_⟩
-    have hm : algebraMap (X.presheaf.stalk z) X.functionField (↑hu.unit⁻¹ : X.presheaf.stalk z) *
-        algebraMap (X.presheaf.stalk z) X.functionField r = 1 := by
+    have hm
+        : algebraMap (X.presheaf.stalk z) X.functionField (↑hu.unit⁻¹ : X.presheaf.stalk z)
+            * algebraMap (X.presheaf.stalk z) X.functionField r
+          = 1 := by
       rw [← map_mul]
       simp
     rw [hr] at hm
     exact (mul_inv_eq_one₀ hf).1 hm
 
-private theorem cartierDiv_eff_of_mult_eq_zero {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X]
-    (hN : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme X) (E : CartierDiv X)
-    (h : ∀ z, E.mult z = 0) : E.Eff := by
+private theorem cartierDiv_eff_of_mult_eq_zero
+    {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X]
+    (hN : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme X)
+    (E : CartierDiv X) (h : ∀ z, E.mult z = 0)
+    : E.Eff := by
   haveI : GlobalTheory.IsNormalScheme X := ⟨fun x => (hN x).1, fun x => (hN x).2⟩
   rw [CartierDiv.eff_iff]
   intro x g hg
@@ -90,16 +101,20 @@ private theorem cartierDiv_eff_of_mult_eq_zero {X : Scheme.{0}} [IsIntegral X] [
   rw [← hgz.mult_eq]
   exact h z
 
-private theorem cartierDiv_eq_zero_of_mult_eq_zero {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X]
-    (hN : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme X) (E : CartierDiv X)
-    (h : ∀ z, E.mult z = 0) : E = 0 := by
-  refine CartierDiv.Eff.eq_zero (cartierDiv_eff_of_mult_eq_zero hN E h) (cartierDiv_eff_of_mult_eq_zero hN (-E) fun z => ?_)
+private theorem cartierDiv_eq_zero_of_mult_eq_zero
+    {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X]
+    (hN : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme X)
+    (E : CartierDiv X) (h : ∀ z, E.mult z = 0)
+    : E = 0 := by
+  refine CartierDiv.Eff.eq_zero (cartierDiv_eff_of_mult_eq_zero hN E h)
+    (cartierDiv_eff_of_mult_eq_zero hN (-E) fun z => ?_)
   show multHom z (-E) = 0
   rw [map_neg]
   exact neg_eq_zero.mpr (h z)
 
-private theorem cartierDiv_mult_nonneg_of_eff {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X]
-    {D : CartierDiv X} (hD : D.Eff) (z : X) : 0 ≤ D.mult z := by
+private theorem cartierDiv_mult_nonneg_of_eff
+    {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X] {D : CartierDiv X} (hD : D.Eff) (z : X)
+    : 0 ≤ D.mult z := by
   obtain ⟨g, hg⟩ := D.exists_isEqn z
   rw [hg.mult_eq]
   by_cases hz : Order.coheight z = 1
@@ -114,7 +129,16 @@ private theorem cartierDiv_mult_nonneg_of_eff {X : Scheme.{0}} [IsIntegral X] [I
     simpa [Scheme.ordHom] using this
   · simp [Scheme.ord_eq_zero_of_coheight_neq_one hz]
 
-theorem vanishing_ample_snc_cartier : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (q : Y ⟶ Sp k) (n : ℕ) [SmoothOfRelativeDimension n q], IsProjOver q → ∀ (Kc : CanonLB q n) (Q A : LB Y) (hQ : Q.IsLB) (hA : IsAmpleLB A) (B : Closeds Y) (Γ : CartierDiv Y) (e : ℕ), FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal B) → Γ.Eff → Γ.supp ≤ B → (∀ z, Γ.mult z < e) → e • cls Q hQ = e • cls Kc.bundle Kc.isLB + toPic Γ + cls A hA.isLB → ∀ i, 0 < i → Subsingleton (coh (twist (GlobalTheory.structureModule Y) Q) i) := by
+theorem vanishing_ample_snc_cartier
+    : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y]
+        (q : Y ⟶ Sp k) (n : ℕ) [SmoothOfRelativeDimension n q],
+      IsProjOver q
+        → ∀ (Kc : CanonLB q n) (Q A : LB Y) (hQ : Q.IsLB) (hA : IsAmpleLB A) (B : Closeds Y)
+            (Γ : CartierDiv Y) (e : ℕ),
+          FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal B) → Γ.Eff → Γ.supp ≤ B
+            → (∀ z, Γ.mult z < e)
+            → e • cls Q hQ = e • cls Kc.bundle Kc.isLB + toPic Γ + cls A hA.isLB
+            → ∀ i, 0 < i → Subsingleton (coh (twist (GlobalTheory.structureModule Y) Q) i) := by
   intro k _ _ Y _ _ q n _ hp Kc Q A hQ hA B Γ e hB hΓ hsupp hmult heq i hi
   have hsm : Smooth q := SmoothOfRelativeDimension.smooth (n := n) (f := q)
   obtain ⟨-, hN, -⟩ := isReduced_isNormalScheme_isLocallyNoetherian_of_smooth_over_field k Y q hsm
@@ -142,8 +166,9 @@ theorem vanishing_ample_snc_cartier : ∀ (k : Type) [Field k] [CharZero k] (Y :
     · push_neg at hz
       rw [Finset.sum_eq_zero fun j _ => by rw [(hD j).2 z (hz j), smul_zero], sub_zero]
       by_contra hne
-      obtain ⟨j, hj⟩ := hBw z (CartierDiv.coheight_eq_one_of_mult_ne_zero hne)
-        (hsupp (CartierDiv.mem_supp_of_mult_ne_zero hne))
+      obtain ⟨j, hj⟩ :=
+        hBw z (CartierDiv.coheight_eq_one_of_mult_ne_zero hne)
+          (hsupp (CartierDiv.mem_supp_of_mult_ne_zero hne))
       exact hz j hj
   have he : 0 < e := by
     have h1 := hmult (genericPoint Y)
@@ -158,7 +183,8 @@ theorem vanishing_ample_snc_cartier : ∀ (k : Type) [Field k] [CharZero k] (Y :
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hdec, map_sum] at heq
   simp only [map_nsmul, toPic_apply] at heq
-  exact GlobalTheory.Div.vanishing_ample_snc_charZero k Y q n hp r (fun j => toLB (D j)) σ hrel Kc Q A hQ hA
-    e b he hb heq i hi
+  exact GlobalTheory.Div.vanishing_ample_snc_charZero k Y q n hp r
+    (fun j => toLB (D j))
+    σ hrel Kc Q A hQ hA e b he hb heq i hi
 
 end GlobalTheory.Div.SncBoundary

@@ -12,19 +12,25 @@ open GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
 
 namespace UpperTheory.Gal.W2
 
-private theorem tens_inj (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Module.Free ℤ O] :
-    Function.Injective (fun x : O => x ⊗ₜ[ℤ] (1 : ℤ_[p])) := by
+private theorem tens_inj (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Module.Free ℤ O]
+    : Function.Injective (fun x : O => x ⊗ₜ[ℤ] (1 : ℤ_[p])) := by
   have hinj : Function.Injective (Algebra.linearMap ℤ ℤ_[p]) := by
     intro a b h
     exact RingHom.injective_int (algebraMap ℤ ℤ_[p]) h
-  have h1 := Module.Flat.lTensor_preserves_injective_linearMap (M := O) (Algebra.linearMap ℤ ℤ_[p]) hinj
+  have h1 :=
+    Module.Flat.lTensor_preserves_injective_linearMap (M := O) (Algebra.linearMap ℤ ℤ_[p]) hinj
   intro x y hxy
   have h2 : x ⊗ₜ[ℤ] (1 : ℤ) = y ⊗ₜ[ℤ] (1 : ℤ) := h1 (by simpa using hxy)
   have h3 := congrArg (TensorProduct.rid ℤ O) h2
   simpa using h3
 
-private theorem comm_of_split (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Module.Free ℤ O] {R : Type} [CommRing R]
-    {m : ℕ} (hm : m = 1) (f : (O ⊗[ℤ] ℤ_[p]) ≃+* Matrix (Fin m) (Fin m) R) (x y : O) : x * y = y * x := by
+private theorem comm_of_split
+    (p : ℕ) [Fact p.Prime]
+    {O : Type} [Ring O] [Module.Free ℤ O]
+    {R : Type} [CommRing R]
+    {m : ℕ} (hm : m = 1) (f : (O ⊗[ℤ] ℤ_[p]) ≃+* Matrix (Fin m) (Fin m) R)
+    (x y : O)
+    : x * y = y * x := by
   subst hm
   apply tens_inj p
   have hc : ∀ A B : Matrix (Fin 1) (Fin 1) R, A * B = B * A := by
@@ -38,15 +44,19 @@ private theorem comm_of_split (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Modu
   have h2 := f.injective this
   simpa using h2
 
-private theorem a_inj {F : Type} [Field F] [NumberField F] {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O]
-    [Module.Free ℤ O] : Function.Injective (algebraMap (𝓞 F) O) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+private theorem a_inj
+    {F : Type} [Field F] [NumberField F]
+    {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O] [Module.Free ℤ O]
+    : Function.Injective (algebraMap (𝓞 F) O) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro c hc
   by_contra h0
-  have hI : RingHom.ker (algebraMap (𝓞 F) O) ≠ ⊥ := fun h => h0 (by
-    have h1 : c ∈ RingHom.ker (algebraMap (𝓞 F) O) := hc
-    rw [h] at h1
-    simpa using h1)
+  have hI : RingHom.ker (algebraMap (𝓞 F) O) ≠ ⊥ := fun h =>
+    h0 (by
+      have h1 : c ∈ RingHom.ker (algebraMap (𝓞 F) O) := hc
+      rw [h] at h1
+      simpa using h1)
   have hN := Ideal.absNorm_mem (RingHom.ker (algebraMap (𝓞 F) O))
   have hN0 : Ideal.absNorm (RingHom.ker (algebraMap (𝓞 F) O)) ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff]
@@ -59,18 +69,19 @@ private theorem a_inj {F : Type} [Field F] [NumberField F] {O : Type} [Ring O] [
   · exact hN0 (by exact_mod_cast h)
   · exact one_ne_zero h
 
-private theorem a_onto {F : Type} [Field F] [NumberField F] {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O]
-    [Module.Free ℤ O] [Module.Finite ℤ O] (hcomm : ∀ x y : O, x * y = y * x)
-    (hc : ∀ x : O, ∃ c : 𝓞 F, ∃ e : ℤ, e ≠ 0 ∧ e • x = algebraMap (𝓞 F) O c) :
-    Function.Surjective (algebraMap (𝓞 F) O) := by
+private theorem a_onto
+    {F : Type} [Field F] [NumberField F]
+    {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O] [Module.Free ℤ O] [Module.Finite ℤ O]
+    (hcomm : ∀ x y : O, x * y = y * x)
+    (hc : ∀ x : O, ∃ c : 𝓞 F, ∃ e : ℤ, e ≠ 0 ∧ e • x = algebraMap (𝓞 F) O c)
+    : Function.Surjective (algebraMap (𝓞 F) O) := by
   intro x
   obtain ⟨c, e, he, hx⟩ := hc x
   letI : CommRing O := { (inferInstance : Ring O) with mul_comm := hcomm }
   obtain ⟨P, hP, hPx⟩ : IsIntegral ℤ x := IsIntegral.of_finite ℤ x
   have hQ : Polynomial.eval₂ (algebraMap ℤ O) (algebraMap ℤ O e * x) (P.scaleRoots e) = 0 := by
     rw [Polynomial.scaleRoots_eval₂_mul, hPx, mul_zero]
-  have hex : algebraMap ℤ O e * x = algebraMap (𝓞 F) O c := by
-    rw [← hx]; simp [zsmul_eq_mul]
+  have hex : algebraMap ℤ O e * x = algebraMap (𝓞 F) O c := by rw [← hx]; simp [zsmul_eq_mul]
   have hQ2 : Polynomial.eval₂ (algebraMap ℤ (𝓞 F)) c (P.scaleRoots e) = 0 := by
     apply a_inj (O := O)
     rw [map_zero, Polynomial.hom_eval₂, ← hex, ← hQ]

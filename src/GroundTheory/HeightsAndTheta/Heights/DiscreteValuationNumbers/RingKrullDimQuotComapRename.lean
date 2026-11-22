@@ -25,15 +25,15 @@ set_option linter.unusedSectionVars false
 
 namespace ProjectiveBundleNumbers
 
-theorem sum_choose_succ (n : ℕ) (U : ℕ → ℤ) :
-    ∑ k ∈ Finset.range (n + 2), ((n + 1).choose k : ℤ) * U k =
-      ∑ k ∈ Finset.range (n + 1), (n.choose k : ℤ) * U k +
-        ∑ k ∈ Finset.range (n + 1), (n.choose k : ℤ) * U (k + 1) := by
+theorem sum_choose_succ (n : ℕ) (U : ℕ → ℤ)
+    : ∑ k ∈ Finset.range (n + 2), ((n + 1).choose k : ℤ) * U k
+      = ∑ k ∈ Finset.range (n + 1), (n.choose k : ℤ) * U k
+        + ∑ k ∈ Finset.range (n + 1), (n.choose k : ℤ) * U (k + 1) := by
   rw [Finset.sum_range_succ', Finset.sum_range_succ' (fun k => (n.choose k : ℤ) * U k)]
   simp only [Nat.choose_succ_succ', Nat.cast_add, add_mul, Finset.sum_add_distrib,
     Nat.choose_zero_right]
-  rw [Finset.sum_range_succ (fun k => (n.choose (k + 1) : ℤ) * U (k + 1)),
-    Nat.choose_succ_self, Nat.cast_zero, zero_mul, add_zero]
+  rw [Finset.sum_range_succ (fun k => (n.choose (k + 1) : ℤ) * U (k + 1)), Nat.choose_succ_self,
+    Nat.cast_zero, zero_mul, add_zero]
   ring
 
 section ProjBundle
@@ -46,8 +46,10 @@ end ProjBundle
 
 section Rename
 
-variable {F : Type} [Field F] {S : Type} [Fintype S] [DecidableEq S] {κ ι' : S → Type}
-  [∀ s, Fintype (κ s)] [∀ s, Fintype (ι' s)]
+variable
+  {F : Type} [Field F]
+  {S : Type} [Fintype S] [DecidableEq S]
+  {κ ι' : S → Type} [∀ s, Fintype (κ s)] [∀ s, Fintype (ι' s)]
 
 end Rename
 

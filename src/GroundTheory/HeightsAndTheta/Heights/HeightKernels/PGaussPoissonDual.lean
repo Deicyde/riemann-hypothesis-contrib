@@ -15,21 +15,21 @@ noncomputable section
 
 namespace PGaussPoissonDual
 
-theorem qf_smul {g : ℕ} (c : ℝ) (Y : Matrix (Fin g) (Fin g) ℝ) (w : Fin g → ℝ) :
-    qf (c • Y) w = c * qf Y w := by
+theorem qf_smul {g : ℕ} (c : ℝ) (Y : Matrix (Fin g) (Fin g) ℝ) (w : Fin g → ℝ)
+    : qf (c • Y) w = c * qf Y w := by
   rw [qf, qf, Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul]
 
-theorem dot_mulVec_self {g : ℕ} (B : Matrix (Fin g) (Fin g) ℝ) (w : Fin g → ℝ) :
-    (B *ᵥ w) ⬝ᵥ (B *ᵥ w) = qf (Bᵀ * B) w := by
+theorem dot_mulVec_self {g : ℕ} (B : Matrix (Fin g) (Fin g) ℝ) (w : Fin g → ℝ)
+    : (B *ᵥ w) ⬝ᵥ (B *ᵥ w) = qf (Bᵀ * B) w := by
   rw [qf, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec w Bᵀ, Matrix.vecMul_transpose]
 
 end PGaussPoissonDual
 
-
 open PGaussPoissonDual in
-theorem GaussPoissonDual.proof (hS : GaussSqrt.Statement) (hP : GaussPoissonBound.Statement)
-    (hM : GaussDualMin.Statement) (hD : GaussDetFactor.Statement) :
-    GaussPoissonDual.Statement := by
+theorem GaussPoissonDual.proof
+    (hS : GaussSqrt.Statement) (hP : GaussPoissonBound.Statement) (hM : GaussDualMin.Statement)
+    (hD : GaussDetFactor.Statement)
+    : GaussPoissonDual.Statement := by
   intro g Y ρ hY hρ hmin u
   have hY2 : ((1 / 2 : ℝ) • Y).PosDef := hY.smul (by norm_num)
   obtain ⟨B, hB⟩ := hS g _ hY2
@@ -38,8 +38,10 @@ theorem GaussPoissonDual.proof (hS : GaussSqrt.Statement) (hP : GaussPoissonBoun
     have h1 : (Bᵀ * B).det = 0 := by rw [det_mul, det_transpose, h0, mul_zero]
     rw [hB] at h1
     exact hY2.det_pos.ne' h1
-  have hterm : ∀ k : Fin g → ℤ, Real.exp (-(π / 2) * qf Y (intVec k + u)) =
-      Real.exp (-π * ((B *ᵥ (intVec k + u)) ⬝ᵥ (B *ᵥ (intVec k + u)))) := by
+  have hterm
+      : ∀ k : Fin g → ℤ,
+        Real.exp (-(π / 2) * qf Y (intVec k + u))
+          = Real.exp (-π * ((B *ᵥ (intVec k + u)) ⬝ᵥ (B *ᵥ (intVec k + u)))) := by
     intro k
     rw [dot_mulVec_self, hB, qf_smul]
     ring_nf

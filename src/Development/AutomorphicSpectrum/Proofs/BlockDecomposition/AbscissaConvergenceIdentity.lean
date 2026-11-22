@@ -6,10 +6,14 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SigmaFin
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 open IsDedekindDomain NumberField
 open GlobalTheory.RegSch (ikS projS Lvl)
 open PositivityTheory.Rg.Rsw PositivityTheory.Rg.Rsw.L
@@ -18,8 +22,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.ColumnSplitting.GramAct
 
-theorem ip_mt {D : D7} {a b : ℕ} (V : HSp D) (g : GA D V) (x : Mx D V.rank a) (y : Mx D V.rank b) :
-    ip V (mm (mt V g) x) (mm (mt V g) y) = ip V x y := by
+theorem ip_mt {D : D7} {a b : ℕ} (V : HSp D) (g : GA D V) (x : Mx D V.rank a) (y : Mx D V.rank b)
+    : ip V (mm (mt V g) x) (mm (mt V g) y) = ip V x y := by
   have hu : adj (mt V g) * (gA V * mt V g) = gA V := mt_unitary V g
   unfold ip mm
   rw [adj_mul, Matrix.mul_assoc, ← Matrix.mul_assoc (gA V), ← Matrix.mul_assoc (adj (mt V g)), hu]

@@ -13,20 +13,29 @@ namespace PI.LocGlobInclWork
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem mem_localization_iff {W : Type} [AddCommGroup W] [Module (𝓞 K) W] (p : Ideal (𝓞 K)) [p.IsPrime]
-    (L : Submodule (𝓞 K) W) (x : W) :
-    x ∈ Formalism.HermitianLatticesTheory.localization₂ p L ↔ ∃ s ∈ p.primeCompl, s • x ∈ L := Iff.rfl
+theorem mem_localization_iff
+    {W : Type} [AddCommGroup W] [Module (𝓞 K) W]
+    (p : Ideal (𝓞 K)) [p.IsPrime]
+    (L : Submodule (𝓞 K) W) (x : W)
+    : x ∈ Formalism.HermitianLatticesTheory.localization₂ p L ↔ ∃ s ∈ p.primeCompl, s • x ∈ L :=
+  Iff.rfl
 
-theorem self_le_locP {W : Type} [AddCommGroup W] [Module (𝓞 K) W] (p : Ideal (𝓞 K)) [p.IsPrime]
-    (L : Submodule (𝓞 K) W) : L ≤ Formalism.HermitianLatticesTheory.localization₂ p L :=
-  fun x hx => (mem_localization_iff p L x).mpr ⟨1, p.primeCompl.one_mem, by rw [one_smul]; exact hx⟩
+theorem self_le_locP
+    {W : Type} [AddCommGroup W] [Module (𝓞 K) W]
+    (p : Ideal (𝓞 K)) [p.IsPrime]
+    (L : Submodule (𝓞 K) W)
+    : L ≤ Formalism.HermitianLatticesTheory.localization₂ p L := fun x hx =>
+  (mem_localization_iff p L x).mpr ⟨1, p.primeCompl.one_mem, by rw [one_smul]; exact hx⟩
 
 theorem maximal_ne_bot (m : Ideal (𝓞 K)) (hm : m.IsMaximal) : m ≠ ⊥ := by
   haveI := hm
   exact (Ideal.bot_lt_of_maximal m (NumberField.RingOfIntegers.not_isField K)).ne'
 
-theorem mem_of_local {W : Type} [AddCommGroup W] [Module (𝓞 K) W] (N : Submodule (𝓞 K) W) (x : W)
-    (h : ∀ w : HeightOneSpectrum (𝓞 K), ∃ s : 𝓞 K, s ∉ w.asIdeal ∧ s • x ∈ N) : x ∈ N := by
+theorem mem_of_local
+    {W : Type} [AddCommGroup W] [Module (𝓞 K) W]
+    (N : Submodule (𝓞 K) W) (x : W)
+    (h : ∀ w : HeightOneSpectrum (𝓞 K), ∃ s : 𝓞 K, s ∉ w.asIdeal ∧ s • x ∈ N)
+    : x ∈ N := by
   by_contra hx
   have hI : N.comap (LinearMap.toSpanSingleton (𝓞 K) W x) ≠ ⊤ := by
     intro htop
@@ -42,9 +51,9 @@ theorem mem_of_local {W : Type} [AddCommGroup W] [Module (𝓞 K) W] (N : Submod
   rw [Submodule.mem_comap, LinearMap.toSpanSingleton_apply]
   exact hsx
 
-theorem coe_pow_toNat_le (v : HeightOneSpectrum (𝓞 K)) (k : ℤ) :
-    ((v.asIdeal ^ k.toNat : Ideal (𝓞 K)) : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ≤
-      (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ k := by
+theorem coe_pow_toNat_le (v : HeightOneSpectrum (𝓞 K)) (k : ℤ)
+    : ((v.asIdeal ^ k.toNat : Ideal (𝓞 K)) : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)
+      ≤ (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ k := by
   rw [FractionalIdeal.coeIdeal_pow]
   by_cases hk : 0 ≤ k
   · obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hk
@@ -58,12 +67,15 @@ theorem coe_pow_toNat_le (v : HeightOneSpectrum (𝓞 K)) (k : ℤ) :
       exact FractionalIdeal.coeIdeal_le_one
     have h2 : (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ n ≠ 0 :=
       pow_ne_zero _ (FractionalIdeal.coeIdeal_ne_zero.mpr v.ne_bot)
-    calc (1 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) = 1⁻¹ := inv_one.symm
-      _ ≤ ((v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ n)⁻¹ := FractionalIdeal.inv_anti_mono h2 h1
+    calc
+      (1 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)
+        = 1⁻¹ := inv_one.symm
+      _ ≤ ((v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ n)⁻¹ :=
+        FractionalIdeal.inv_anti_mono h2 h1
 
-theorem coe_prod_le (S : Finset (HeightOneSpectrum (𝓞 K))) (n : HeightOneSpectrum (𝓞 K) → ℤ) :
-    ((∏ v ∈ S, v.asIdeal ^ (n v).toNat : Ideal (𝓞 K)) : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ≤
-      ∏ v ∈ S, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ n v := by
+theorem coe_prod_le (S : Finset (HeightOneSpectrum (𝓞 K))) (n : HeightOneSpectrum (𝓞 K) → ℤ)
+    : ((∏ v ∈ S, v.asIdeal ^ (n v).toNat : Ideal (𝓞 K)) : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)
+      ≤ ∏ v ∈ S, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ n v := by
   classical
   induction S using Finset.induction_on with
   | empty => simp
@@ -73,14 +85,17 @@ theorem coe_prod_le (S : Finset (HeightOneSpectrum (𝓞 K))) (n : HeightOneSpec
     have h1 := FractionalIdeal.coe_le_coe.mpr (coe_pow_toNat_le v (n v))
     have h2 := FractionalIdeal.coe_le_coe.mpr ih
     first
-      | exact mul_le_mul' h1 h2
-      | exact Submodule.mul_le_mul' h1 h2
-      | exact Submodule.mul_le_mul_of_le_of_le h1 h2
+    | exact mul_le_mul' h1 h2
+    | exact Submodule.mul_le_mul' h1 h2
+    | exact Submodule.mul_le_mul_of_le_of_le h1 h2
 
-theorem exists_unit_at (w : HeightOneSpectrum (𝓞 K)) (S : Finset (HeightOneSpectrum (𝓞 K)))
-    (hw : w ∉ S) (n : HeightOneSpectrum (𝓞 K) → ℤ) :
-    ∃ t : 𝓞 K, t ∉ w.asIdeal ∧
-      algebraMap (𝓞 K) K t ∈ ∏ v ∈ S, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ n v := by
+theorem exists_unit_at
+    (w : HeightOneSpectrum (𝓞 K)) (S : Finset (HeightOneSpectrum (𝓞 K))) (hw : w ∉ S)
+    (n : HeightOneSpectrum (𝓞 K) → ℤ)
+    : ∃ t : 𝓞 K,
+      t ∉ w.asIdeal
+        ∧ algebraMap (𝓞 K) K t
+          ∈ ∏ v ∈ S, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ n v := by
   classical
   haveI : w.asIdeal.IsPrime := w.isPrime
   have hP : ¬ (∏ v ∈ S, v.asIdeal ^ (n v).toNat) ≤ w.asIdeal := by
@@ -98,14 +113,16 @@ theorem exists_unit_at (w : HeightOneSpectrum (𝓞 K)) (S : Finset (HeightOneSp
   refine ⟨t, htw, ?_⟩
   exact coe_prod_le S n ((FractionalIdeal.mem_coeIdeal _).mpr ⟨t, htP, rfl⟩)
 
-variable [StarRing K] {W : Type} [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
-  [IsScalarTower (𝓞 K) K W]
+variable
+  [StarRing K] {W : Type} [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
 
-theorem smul_mem_idealSmul (I J : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)
-    (B : Submodule (𝓞 K) W) (t : 𝓞 K) (ht : algebraMap (𝓞 K) K t ∈ J) {y : W}
-    (hy : y ∈ Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) B) :
-    t • y ∈ Formalism.HermitianLatticesTheory.idealSmul ((I * J : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) :
-      Submodule (𝓞 K) K) B := by
+theorem smul_mem_idealSmul
+    (I J : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)
+    (B : Submodule (𝓞 K) W)
+    (t : 𝓞 K) (ht : algebraMap (𝓞 K) K t ∈ J)
+    {y : W} (hy : y ∈ Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) B)
+    : t • y ∈ Formalism.HermitianLatticesTheory.idealSmul
+      ((I * J : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K) B := by
   induction hy using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨c, hc, b, hb, rfl⟩ := hz
@@ -124,27 +141,37 @@ theorem main : PI.LocGlobIncl := by
   intro w
   haveI : w.asIdeal.IsPrime := w.isPrime
   by_cases hw : w ∈ T
-  · obtain ⟨s, hs, hsx⟩ := (mem_localization_iff w.asIdeal _ x).mp (hT w hw ((self_le_locP w.asIdeal M) hx))
+  · obtain ⟨s, hs, hsx⟩ :=
+      (mem_localization_iff w.asIdeal _ x).mp (hT w hw ((self_le_locP w.asIdeal M) hx))
     obtain ⟨t, ht, htJ⟩ := exists_unit_at w (T.erase w) (by simp) (fun v => -(a v))
-    have htJ' : algebraMap (𝓞 K) K t ∈
-        ∏ v ∈ T.erase w, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v)) := htJ
+    have htJ'
+        : algebraMap (𝓞 K) K t
+          ∈ ∏ v ∈ T.erase w, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v)) :=
+      htJ
     refine ⟨t * s, fun hmem => (w.isPrime.mem_or_mem hmem).elim ht hs, ?_⟩
     rw [mul_smul]
-    have e : (w.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a w)) *
-        ∏ v ∈ T.erase w, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v)) =
-        ∏ v ∈ T, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v)) :=
-      Finset.mul_prod_erase T (fun v => (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v))) hw
+    have e
+        : (w.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a w))
+            * ∏ v ∈ T.erase w, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v))
+          = ∏ v ∈ T, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v)) :=
+      Finset.mul_prod_erase T
+        (fun v => (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v)))
+        hw
     have hm := smul_mem_idealSmul _ _ B t htJ' hsx
     rw [e] at hm
     exact hm
-  · obtain ⟨s, hs, hsx⟩ := (mem_localization_iff w.asIdeal _ x).mp (hnT w hw ((self_le_locP w.asIdeal M) hx))
+  · obtain ⟨s, hs, hsx⟩ :=
+      (mem_localization_iff w.asIdeal _ x).mp (hnT w hw ((self_le_locP w.asIdeal M) hx))
     obtain ⟨t, ht, htJ⟩ := exists_unit_at w T hw (fun v => -(a v))
-    have htJ' : algebraMap (𝓞 K) K t ∈
-        ∏ v ∈ T, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v)) := htJ
+    have htJ'
+        : algebraMap (𝓞 K) K t
+          ∈ ∏ v ∈ T, (v.asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ^ (-(a v)) :=
+      htJ
     refine ⟨t * s, fun hmem => (w.isPrime.mem_or_mem hmem).elim ht hs, ?_⟩
     rw [mul_smul]
-    have hB : s • x ∈ Formalism.HermitianLatticesTheory.idealSmul
-        ((1 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K) B := by
+    have hB
+        : s • x ∈ Formalism.HermitianLatticesTheory.idealSmul
+          ((1 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K) B := by
       apply Submodule.subset_span
       refine ⟨1, ?_, s • x, hsx, (one_smul K _).symm⟩
       rw [FractionalIdeal.coe_one]

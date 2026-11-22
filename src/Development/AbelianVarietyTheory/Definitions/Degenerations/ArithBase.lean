@@ -7,12 +7,14 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Induced
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 noncomputable section
 namespace GlobalTheory.ZH
 open Classical
 
-def eStd (g n : ℕ) (a b : Fin g ⊕ Fin g → ZMod n) : ZMod n := ∑ i, (a (.inl i) * b (.inr i) - a (.inr i) * b (.inl i))
+def eStd (g n : ℕ) (a b : Fin g ⊕ Fin g → ZMod n) : ZMod n :=
+  ∑ i, (a (.inl i) * b (.inr i) - a (.inr i) * b (.inl i))
 
 structure ThetaSys (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] where
   g : ℕ
@@ -66,7 +68,8 @@ def perp (H : AddSubgroup S.Gam) : AddSubgroup S.Gam where
     rw [← neg_zero, ← h1, ← Finset.sum_neg_distrib]
     exact Finset.sum_congr rfl fun i _ => by ring
 
-def IsoFree (T : AddSubgroup S.Gam) : Prop := T ≤ S.perp T ∧ ∃ d : ℕ, Nonempty (T ≃+ (Fin d → ZMod (S.r * S.N)))
+def IsoFree (T : AddSubgroup S.Gam) : Prop :=
+  T ≤ S.perp T ∧ ∃ d : ℕ, Nonempty (T ≃+ (Fin d → ZMod (S.r * S.N)))
 
 def ζN : o := S.ζ ^ (S.r ^ 2 * S.N)
 
@@ -87,23 +90,40 @@ structure Test (p : ℕ) [Fact p.Prime] (y : S.R →+* PadicAlgCl p) where
   yy_onto : Function.Surjective yy
   isoFree : S.IsoFree (S.perp yy.ker)
   wt : X →+ (S.perp yy.ker →+ ZMod S.N)
-  wt_eq : ∀ (x : S.Gam) (α : X), yy x = QuotientAddGroup.mk α → ∀ t : S.perp yy.ker,
-    wt α t = ZMod.castHom (dvd_mul_left S.N S.r) (ZMod S.N) (eStd S.g _ t x)
+  wt_eq
+    : ∀ (x : S.Gam) (α : X),
+      yy x = QuotientAddGroup.mk α
+        → ∀ t : S.perp yy.ker,
+          wt α t = ZMod.castHom (dvd_mul_left S.N S.r) (ZMod S.N) (eStd S.g _ t x)
   δ : ℝ
   δ_max : IsGreatest (Set.range fun x => ‖y ⟨S.th x, S.th_mem x⟩‖) δ
   δ_pos : 0 < δ
   supp : AddSubgroup.closure {x | ‖y ⟨S.th x, S.th_mem x⟩‖ = δ} = yy.ker
-  tx : ∀ x, y ⟨S.th x, S.th_mem x⟩ ≠ 0 → ∃ w : X, yy x = QuotientAddGroup.mk w ∧
-    ‖y ⟨S.th x, S.th_mem x⟩‖ ≤ δ * Real.exp (-(q w / ((S.r * S.N : ℕ) : ℝ) ^ 2))
-  le : ∀ (α : X), (∀ v0, q α ≤ q (α + S.N • v0)) → ∀ h ∈ yy.ker, ∀ i,
-    ‖∑ j, y (algebraMap o S.R (S.proj _ (wt α) j i)) * y ⟨S.ev h j, S.ev_mem h j⟩‖ ≤ δ * Real.exp (-(q α / S.N))
-  eq : ∀ (α : X), (∀ v0, q α ≤ q (α + S.N • v0)) → ∃ (k : _) (hk : S.FF _ (wt α) k ∈ S.R),
-    ‖y ⟨S.FF _ (wt α) k, hk⟩‖ = δ * Real.exp (-(q α / S.N))
-  unit0 : ∀ h ∈ yy.ker, ∃ i, ‖∑ j, y (algebraMap o S.R (S.proj _ (wt 0) j i)) * y ⟨S.ev h j, S.ev_mem h j⟩‖ = δ
+  tx
+    : ∀ x,
+      y ⟨S.th x, S.th_mem x⟩ ≠ 0
+        → ∃ w : X,
+          yy x = QuotientAddGroup.mk w
+            ∧ ‖y ⟨S.th x, S.th_mem x⟩‖ ≤ δ * Real.exp (-(q w / ((S.r * S.N : ℕ) : ℝ) ^ 2))
+  le
+    : ∀ (α : X),
+      (∀ v0, q α ≤ q (α + S.N • v0))
+        → ∀ h ∈ yy.ker, ∀ i,
+          ‖∑ j, y (algebraMap o S.R (S.proj _ (wt α) j i)) * y ⟨S.ev h j, S.ev_mem h j⟩‖
+            ≤ δ * Real.exp (-(q α / S.N))
+  eq
+    : ∀ (α : X),
+      (∀ v0, q α ≤ q (α + S.N • v0))
+        → ∃ (k : _) (hk : S.FF _ (wt α) k ∈ S.R),
+          ‖y ⟨S.FF _ (wt α) k, hk⟩‖ = δ * Real.exp (-(q α / S.N))
+  unit0
+    : ∀ h ∈ yy.ker, ∃ i,
+      ‖∑ j, y (algebraMap o S.R (S.proj _ (wt 0) j i)) * y ⟨S.ev h j, S.ev_mem h j⟩‖ = δ
 attribute [instance] Test.add Test.free Test.finite
 
-def HasTests : Prop := ∀ (p : ℕ) [Fact p.Prime] (y : S.R →+* PadicAlgCl p),
-  (∀ a : o, ‖y (algebraMap o S.R a)‖ ≤ 1) → Nonempty (S.Test p y)
+def HasTests : Prop :=
+  ∀ (p : ℕ) [Fact p.Prime] (y : S.R →+* PadicAlgCl p),
+    (∀ a : o, ‖y (algebraMap o S.R a)‖ ≤ 1) → Nonempty (S.Test p y)
 variable (M : RatModel o Ω)
 
 def supI (z : M.Z) : Set S.Gam := {x | M.Div S.th x z}
@@ -127,16 +147,18 @@ def admitted (U₀ : M.Z.Opens) : Prop :=
 def At {p : ℕ} [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z) (y₀ : S.R →+* PadicAlgCl p) : Prop :=
   ∀ a : S.R, y₀ a = M.val (gPt p ≫ y) a
 
-def Test.E {S : ThetaSys o Ω} {p : ℕ} [Fact p.Prime] {y : S.R →+* PadicAlgCl p} (τ : S.Test p y) :
-    Submodule (OO p) (S.J → PadicAlgCl p) :=
-  Submodule.span (OO p) {v | ∃ (α : τ.X) (l : PadicAlgCl p) (i : S.J), (∀ v0, τ.q α ≤ τ.q (α + S.N • v0)) ∧
-    ‖l‖ ≤ Real.exp (τ.q α / S.N) ∧ v = fun j => l * y (algebraMap o S.R (S.proj _ (τ.wt α) j i))}
+def Test.E {S : ThetaSys o Ω} {p : ℕ} [Fact p.Prime] {y : S.R →+* PadicAlgCl p} (τ : S.Test p y)
+    : Submodule (OO p) (S.J → PadicAlgCl p) :=
+  Submodule.span (OO p)
+    {v | ∃ (α : τ.X) (l : PadicAlgCl p) (i : S.J), (∀ v0, τ.q α ≤ τ.q (α + S.N • v0)) ∧
+      ‖l‖ ≤ Real.exp (τ.q α / S.N) ∧ v = fun j => l * y (algebraMap o S.R (S.proj _ (τ.wt α) j i))}
 
 def IsEE (U₀ : M.Z.Opens) (EE : M.Lat S.J) : Prop :=
-  (∀ z ∈ U₀, EE.E z = Submodule.span (M.O z) (Set.range fun i => Pi.single i (1 : Ω))) ∧
-  ∀ (z : M.Z) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z) (y₀ : S.R →+* PadicAlgCl p) (τ : S.Test p y₀),
-    M.Cen U₀ z y → S.At M y y₀ →
-    Submodule.span (OO p) ((fun (v : S.J → Ω) j => M.val (gPt p ≫ y) (v j)) '' (EE.E z)) = τ.E
+  (∀ z ∈ U₀, EE.E z = Submodule.span (M.O z) (Set.range fun i => Pi.single i (1 : Ω)))
+    ∧ ∀ (z : M.Z) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z) (y₀ : S.R →+* PadicAlgCl p)
+        (τ : S.Test p y₀),
+      M.Cen U₀ z y → S.At M y y₀
+        → Submodule.span (OO p) ((fun (v : S.J → Ω) j => M.val (gPt p ≫ y) (v j)) '' (EE.E z)) = τ.E
 end ThetaSys
 
 class ArithBase (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] : Prop where

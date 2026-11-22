@@ -4,10 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.Gys.ccEx :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω], ∃ c : InfinitePlace F → G F Ω, ∀ w, w.IsReal → IsCCAt w (c w) := by
+theorem UpperTheory.V.Ws.Gys.ccEx
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω],
+      ∃ c : InfinitePlace F → G F Ω, ∀ w,
+        w.IsReal → IsCCAt w (c w) := by
   intro F Ω _ _ _ _ _
   classical
   have key : ∀ w : InfinitePlace F, w.IsReal → ∃ c : G F Ω, IsCCAt w c := by
@@ -18,8 +21,7 @@ theorem UpperTheory.V.Ws.Gys.ccEx :
       exact RingHom.congr_fun h a
     letI : Algebra F ℂ := w.embedding.toAlgebra
     let e : Ω ≃ₐ[F] algebraicClosure F ℂ := IsAlgClosure.equiv F Ω (algebraicClosure F ℂ)
-    let κ : ℂ →ₐ[F] ℂ :=
-      { (starRingEnd ℂ) with commutes' := fun a => hφ a }
+    let κ : ℂ →ₐ[F] ℂ := { (starRingEnd ℂ) with commutes' := fun a => hφ a }
     let j : Ω →ₐ[F] ℂ := (algebraicClosure F ℂ).val.comp e.toAlgHom
     have hmem : ∀ x : Ω, (κ.comp j) x ∈ (algebraicClosure F ℂ).toSubalgebra := by
       intro x

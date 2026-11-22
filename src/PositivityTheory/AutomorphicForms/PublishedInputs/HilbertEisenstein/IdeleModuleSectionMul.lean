@@ -10,26 +10,31 @@ public import GroundTheory.GlobalFields.TateThesis.EulerFactorsInfinite
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Base
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af
+  UpperTheory.V.Base
 open scoped Matrix SchwartzMap nonZeroDivisors Classical
-open MeasureTheory GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.V.Sd UpperTheory.V.Published NumberField.mixedEmbedding
+open MeasureTheory GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.V.Sd
+  UpperTheory.V.Published NumberField.mixedEmbedding
 
 namespace UpperTheory.HilbertEisensteinWeightOne.EisensteinIntegrability
 
 variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
 
-theorem pair_sum {α : Type*} [Zero α] {f : α → ℝ} (hf0 : ∀ x, 0 ≤ f x) (hf : Summable f) :
-    Summable (fun ξ : {ξ : Fin 2 → α // ξ ≠ 0} => f (ξ.1 0) * f (ξ.1 1)) ∧
-      ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, f (ξ.1 0) * f (ξ.1 1) ≤
-        2 * (∑' x, f x) * ∑' x, (if x = 0 then 0 else f x) := by
+theorem pair_sum {α : Type*} [Zero α] {f : α → ℝ} (hf0 : ∀ x, 0 ≤ f x) (hf : Summable f)
+    : Summable (fun ξ : {ξ : Fin 2 → α // ξ ≠ 0} => f (ξ.1 0) * f (ξ.1 1))
+      ∧ ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, f (ξ.1 0) * f (ξ.1 1)
+        ≤ 2 * (∑' x, f x) * ∑' x, (if x = 0 then 0 else f x) := by
   set f' : α → ℝ := fun x => if x = 0 then 0 else f x with hf'def
   have hf'0 : ∀ x, 0 ≤ f' x := fun x => by
-    simp only [f']; split_ifs
+    simp only [f']
+    split_ifs
     · exact le_rfl
     · exact hf0 x
   have hf'le : ∀ x, f' x ≤ f x := fun x => by
-    simp only [f']; split_ifs
+    simp only [f']
+    split_ifs
     · exact hf0 x
     · exact le_rfl
   have hf' : Summable f' := hf.of_nonneg_of_le hf'0 hf'le
@@ -64,25 +69,35 @@ theorem pair_sum {α : Type*} [Zero α] {f : α → ℝ} (hf0 : ∀ x, 0 ≤ f x
   have hS : Summable (fun ξ : {ξ : Fin 2 → α // ξ ≠ 0} => f (ξ.1 0) * f (ξ.1 1)) :=
     hQs.of_nonneg_of_le (fun ξ => mul_nonneg (hf0 _) (hf0 _)) hle
   refine ⟨hS, ?_⟩
-  have h1 : ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, f (ξ.1 0) * f (ξ.1 1) ≤
-      ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, g (e ξ.1) := hS.tsum_le_tsum hle hQs
+  have h1
+      : ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, f (ξ.1 0) * f (ξ.1 1)
+        ≤ ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, g (e ξ.1) :=
+    hS.tsum_le_tsum hle hQs
   have h2 : ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, g (e ξ.1) ≤ ∑' ξ : Fin 2 → α, g (e ξ) :=
     hQ.tsum_subtype_le _ {ξ | ξ ≠ 0} hQ0
   have h3 : ∑' ξ : Fin 2 → α, g (e ξ) = ∑' p : α × α, g p := e.tsum_eq g
   have h4 : ∑' p : α × α, g p = (∑' x, f' x) * (∑' x, f x) + (∑' x, f x) * (∑' x, f' x) := by
     rw [hgdef, hP1.tsum_add hP2, hf'.tsum_mul_tsum hf hP1, hf.tsum_mul_tsum hf' hP2]
-  have h5 : (∑' x, f' x) * (∑' x, f x) + (∑' x, f x) * (∑' x, f' x) = 2 * (∑' x, f x) * ∑' x, f' x := by
+  have h5
+      : (∑' x, f' x) * (∑' x, f x) + (∑' x, f x) * (∑' x, f' x) = 2 * (∑' x, f x) * ∑' x, f' x := by
     ring
-  calc ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, f (ξ.1 0) * f (ξ.1 1) ≤ 2 * (∑' x, f x) * ∑' x, f' x := by
-        rw [← h5, ← h4, ← h3]; exact h1.trans h2
+  calc
+    ∑' ξ : {ξ : Fin 2 → α // ξ ≠ 0}, f (ξ.1 0) * f (ξ.1 1)
+      ≤ 2 * (∑' x, f x) * ∑' x, f' x := by rw [← h5, ← h4, ← h3]; exact h1.trans h2
     _ = 2 * (∑' x, f x) * ∑' x, (if x = 0 then 0 else f x) := rfl
 
-theorem decay1D {G : Ad F → ℂ} (hG : G ∈ schwartzBruhat F) {C : Set (IdeleGroup F)} (hC : IsCompact C)
-    (w : InfinitePlace F) :
-    ∃ M : ℝ, 0 ≤ M ∧ ∀ a ∈ C, ∀ T : {r : ℝ // 0 < r}, 1 ≤ (T : ℝ) →
-      Summable (fun x : F => ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖) ∧
-      ∑' x : F, (if x = 0 then 0 else ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖) ≤ ((T : ℝ) ^ 3)⁻¹ * M ∧
-      ∑' x : F, ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖ ≤ ‖G 0‖ + M := by
+theorem decay1D
+    {G : Ad F → ℂ} (hG : G ∈ schwartzBruhat F)
+    {C : Set (IdeleGroup F)} (hC : IsCompact C)
+    (w : InfinitePlace F)
+    : ∃ M : ℝ,
+      0 ≤ M
+        ∧ ∀ a ∈ C, ∀ T : {r : ℝ // 0 < r},
+          1 ≤ (T : ℝ)
+            → Summable (fun x : F => ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖)
+              ∧ ∑' x : F, (if x = 0 then 0 else ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖)
+                ≤ ((T : ℝ) ^ 3)⁻¹ * M
+              ∧ ∑' x : F, ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖ ≤ ‖G 0‖ + M := by
   obtain ⟨u, hu, hFu⟩ := exists_decay_bound w hG hC 3
   refine ⟨∑' ξ, |u ξ|, tsum_nonneg fun _ => abs_nonneg _, fun a ha T hT => ?_⟩
   have hs : Summable (fun x : F => ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖) :=
@@ -92,8 +107,9 @@ theorem decay1D {G : Ad F → ℂ} (hG : G ∈ schwartzBruhat F) {C : Set (Idele
   have hs' : Summable (fun x : F =>
       if x = 0 then (0 : ℝ) else ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖) :=
     hs.of_nonneg_of_le (fun x => by split_ifs <;> positivity) (fun x => by split_ifs <;> simp)
-  have h2 : ∑' x : F, (if x = 0 then 0 else ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖) ≤
-      ((T : ℝ) ^ 3)⁻¹ * ∑' ξ, |u ξ| := by
+  have h2
+      : ∑' x : F, (if x = 0 then 0 else ‖G ((moduleSection w T * a) • algebraMap F (Ad F) x)‖)
+        ≤ ((T : ℝ) ^ 3)⁻¹ * ∑' ξ, |u ξ| := by
     rw [← tsum_mul_left]
     refine hs'.tsum_le_tsum (fun ξ => ?_) (hu.abs.mul_left _)
     split_ifs with h
@@ -106,19 +122,21 @@ theorem decay1D {G : Ad F → ℂ} (hG : G ∈ schwartzBruhat F) {C : Set (Idele
   have h4 := h2.trans h3
   linarith
 
-theorem absD_scalar_mul (z : Ideles F) (g : GA F 2) :
-    absD (Matrix.GeneralLinearGroup.scalar (Fin 2) z * g) = (ideleModule F z : ℝ) ^ 2 * absD g := by
+theorem absD_scalar_mul (z : Ideles F) (g : GA F 2)
+    : absD (Matrix.GeneralLinearGroup.scalar (Fin 2) z * g)
+      = (ideleModule F z : ℝ) ^ 2 * absD g := by
   unfold absD
   rw [map_mul, Matrix.GeneralLinearGroup.det_scalar, Fintype.card_fin, map_mul, map_pow,
     Positive.val_mul, Positive.val_pow]
 
-theorem ideleModule_section_mul (t : {r : ℝ // 0 < r}) (u : normOneSubgroup F) :
-    (ideleModule F (moduleSection (w0 F) t * (u : Ideles F)) : ℝ) = t := by
+theorem ideleModule_section_mul (t : {r : ℝ // 0 < r}) (u : normOneSubgroup F)
+    : (ideleModule F (moduleSection (w0 F) t * (u : Ideles F)) : ℝ) = t := by
   have hu : ideleModule F (u : IdeleGroup F) = 1 := u.2
   change (ideleModule F (moduleSection (w0 F) t * (u : IdeleGroup F)) : ℝ) = t
   rw [map_mul, ideleModule_moduleSection, hu, mul_one]
 
-theorem integrable_bound : Integrable (fun t : {r : ℝ // 0 < r} => (1 + Real.log t ^ 2)⁻¹) posRealMeasure := by
+theorem integrable_bound
+    : Integrable (fun t : {r : ℝ // 0 < r} => (1 + Real.log t ^ 2)⁻¹) posRealMeasure := by
   rw [posRealMeasure_eq_map_expPos]
   change Integrable _ (Measure.map expPosHomeomorph.toMeasurableEquiv volume)
   refine (integrable_map_equiv expPosHomeomorph.toMeasurableEquiv _).2 ?_

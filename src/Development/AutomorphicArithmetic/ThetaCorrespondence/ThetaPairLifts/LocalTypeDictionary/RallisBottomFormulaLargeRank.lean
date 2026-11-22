@@ -14,8 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFinPt
 @[expose] public section
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 open Formalism.DivisionValues (vw)
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
@@ -25,14 +29,33 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.BotFormula
 end GlobalTheory.BotFormula
 set_option maxHeartbeats 4000000 in
-theorem GlobalTheory.BotFormula.rallis_bottom_formula_large_rank : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching →
-    (∀ D, GlobalTheory.NormSum.Inp D) → GlobalTheory.SqTop.BotSmall →
-    GlobalTheory.SqTop.GBig fun {D} T _ _ G _ _ _ _ => ∀ (W : G.Weil), IsStdChar D W.ψ (-1) → ∀ (i j : Fin D.R.m) (A A' WW : HSp D)
-      (X : Tri T A A' WW) (δ t0 : ℂ), IsBottomTri W i j X → X.rW.β = 1 →
-      ∃ Ω : ℂ, Ω ≠ 0 ∧ ∀ (s : T) (Q : ℕ) (P P' : Pair D ⊤ δ t0 Q), IsBottom G s i j (GlobalTheory.SqTop.modT G s) P P' →
-        ∃ u : ℂ, u ≠ 0 ∧ u ∈ Qbar ∧ (∀ (p : ℕ) [Fact p.Prime], ¬ p ∣ GlobalTheory.SqTop.Qn G s → ∀ lam : Qbar →+* ℂ_[p], ‖lamC lam u‖ = 1) ∧
-          ∀ (ea : P.a = A.rank) (ed : P.d = WW.rank) (h : GA D P.d) (g : GA D WW), GlobalTheory.BotFormula.IsFinPt WW g h →
-            ∀ T, starRingEnd ℂ (P.coord h T) = Ω * u * X.I W.ψ W.θ s (GlobalTheory.BotFormula.minorF ea ed T) g := by
+theorem GlobalTheory.BotFormula.rallis_bottom_formula_large_rank
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching
+      → (∀ D, GlobalTheory.NormSum.Inp D) → GlobalTheory.SqTop.BotSmall
+      → GlobalTheory.SqTop.GBig fun {D} T _ _ G _ _ _ _ =>
+        ∀ (W : G.Weil),
+          IsStdChar D W.ψ (-1)
+            → ∀ (i j : Fin D.R.m) (A A' WW : HSp D) (X : Tri T A A' WW) (δ t0 : ℂ),
+              IsBottomTri W i j X → X.rW.β = 1
+                → ∃ Ω : ℂ,
+                  Ω ≠ 0
+                    ∧ ∀ (s : T) (Q : ℕ) (P P' : Pair D ⊤ δ t0 Q),
+                      IsBottom G s i j (GlobalTheory.SqTop.modT G s) P P'
+                        → ∃ u : ℂ,
+                          u ≠ 0 ∧ u ∈ Qbar
+                            ∧ (∀ (p : ℕ) [Fact p.Prime],
+                              ¬ p ∣ GlobalTheory.SqTop.Qn G s
+                                → ∀ lam : Qbar →+* ℂ_[p], ‖lamC lam u‖ = 1)
+                            ∧ ∀ (ea : P.a = A.rank) (ed : P.d = WW.rank) (h : GA D P.d)
+                                (g : GA D WW),
+                              GlobalTheory.BotFormula.IsFinPt WW g h
+                                → ∀ T,
+                                  starRingEnd ℂ (P.coord h T)
+                                    = Ω * u
+                                      * X.I W.ψ W.θ s (GlobalTheory.BotFormula.minorF ea ed T)
+                                        g := by
   intro hPr hK hM hI hB
   obtain ⟨cA, hA⟩ := _root_.GlobalTheory.T.bottomTheta_kernel_finiteDimensional hPr hK hM hI hB
   obtain ⟨cB, hB'⟩ := _root_.GlobalTheory.T.bottom_thetaIntegral_classSum_formula hPr hK hM hI hB
@@ -40,8 +63,12 @@ theorem GlobalTheory.BotFormula.rallis_bottom_formula_large_rank : _root_.Global
   obtain ⟨CA, xA, hA⟩ := hA ε CF (le_trans (le_max_left _ _) hCF)
   obtain ⟨CB, xB, hB'⟩ := hB' ε CF (le_trans (le_max_right _ _) hCF)
   refine ⟨max CA CB, max xA xB, fun C hC0 D large₂ he hx hR T Lc μ₀ hL G => ?_⟩
-  have hA := hA C (le_trans (le_max_left _ _) hC0) D large₂ he (le_trans (le_max_left _ _) hx) hR T Lc μ₀ hL G
-  have hB' := hB' C (le_trans (le_max_right _ _) hC0) D large₂ he (le_trans (le_max_right _ _) hx) hR T Lc μ₀ hL G
+  have hA :=
+    hA C (le_trans (le_max_left _ _) hC0) D large₂ he (le_trans (le_max_left _ _) hx) hR T Lc μ₀ hL
+      G
+  have hB' :=
+    hB' C (le_trans (le_max_right _ _) hC0) D large₂ he (le_trans (le_max_right _ _) hx) hR T Lc μ₀
+      hL G
   intro W hψ i j A A' WW X δ t0 hX hβ
   obtain ⟨Ω₀, hΩ₀, HK⟩ := hA W hψ i j A A' WW X δ t0 hX hβ
   obtain ⟨v, hv, HC⟩ := hB' W hψ i j A A' WW X δ t0 hX
@@ -65,18 +92,27 @@ theorem GlobalTheory.BotFormula.rallis_bottom_formula_large_rank : _root_.Global
   rw [HC s Q P P' hP ea ed g pt hpt T]
   simp_rw [HK ea ed h g _ (pt _) hg (hpt _) T]
   rw [GlobalTheory.NormSum.Pair.coord, GlobalTheory.BotFormula.conj_finsum]
-  have e1 : ∀ x : GlobalTheory.NormSum.Cls D P.a (GlobalTheory.NormSum.intG D P.a),
-      ((GlobalTheory.NormSum.gam D (GlobalTheory.NormSum.intG D P.a) x.out : ℂ))⁻¹ * (Ω₀ * u * starRingEnd ℂ (P.term x.out h T)) =
-      (Ω₀ * u) * starRingEnd ℂ (((GlobalTheory.NormSum.gam D (GlobalTheory.NormSum.intG D P.a) x.out : ℂ))⁻¹ * P.term x.out h T) := by
+  have e1
+      : ∀ x : GlobalTheory.NormSum.Cls D P.a (GlobalTheory.NormSum.intG D P.a),
+        ((GlobalTheory.NormSum.gam D (GlobalTheory.NormSum.intG D P.a) x.out : ℂ))⁻¹
+            * (Ω₀ * u * starRingEnd ℂ (P.term x.out h T))
+          = (Ω₀ * u) * starRingEnd ℂ
+            (((GlobalTheory.NormSum.gam D (GlobalTheory.NormSum.intG D P.a) x.out : ℂ))⁻¹
+              * P.term x.out h T) := by
     intro x
-    rw [map_mul, map_inv₀, map_natCast]; ring
+    rw [map_mul, map_inv₀, map_natCast]
+    ring
   simp_rw [e1, ← mul_finsum]
   field_simp
 end
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 open Formalism.DivisionValues (vw)
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
@@ -84,13 +120,35 @@ open GlobalTheory.NormSum (Pair Tup)
 open Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.theta_bottom_formula_large : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching →
-    (∀ D, GlobalTheory.NormSum.Inp D) → GlobalTheory.SqTop.BotSmall →
-    GlobalTheory.SqTop.GBig fun {D} T _ _ G _ _ _ _ => ∀ (W : G.Weil), IsStdChar D W.ψ (-1) → ∀ (i j : Fin D.R.m) (A A' WW : HSp D)
-      (X : Tri T A A' WW) (δ t0 : ℂ), IsBottomTri W i j X → X.rW.β = 1 →
-      ∃ Ω : ℂ, Ω ≠ 0 ∧ ∀ (s : T) (Q : ℕ) (P P' : Pair D ⊤ δ t0 Q), IsBottom G s i j (GlobalTheory.SqTop.modT G s) P P' →
-        ∃ u : ℂ, u ≠ 0 ∧ u ∈ Qbar ∧ (∀ (p : ℕ) [Fact p.Prime], ¬ p ∣ GlobalTheory.SqTop.Qn G s → ∀ lam : Qbar →+* ℂ_[p], ‖lamC lam u‖ = 1) ∧
-          ∀ (ea : P.a = A.rank) (ed : P.d = WW.rank) (h : GA D P.d) (g : GA D WW), GlobalTheory.BotFormula.IsFinPt WW g h →
-            ∀ T, starRingEnd ℂ (P.coord h T) = Ω * u * X.I W.ψ W.θ s (GlobalTheory.BotFormula.minorF ea ed T) g := by
-  first | exact @_root_.GlobalTheory.BotFormula.rallis_bottom_formula_large_rank | exact _root_.GlobalTheory.BotFormula.rallis_bottom_formula_large_rank | (intros; apply _root_.GlobalTheory.BotFormula.rallis_bottom_formula_large_rank <;> assumption)
+theorem _root_.GlobalTheory.T.theta_bottom_formula_large
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching
+      → (∀ D, GlobalTheory.NormSum.Inp D) → GlobalTheory.SqTop.BotSmall
+      → GlobalTheory.SqTop.GBig fun {D} T _ _ G _ _ _ _ =>
+        ∀ (W : G.Weil),
+          IsStdChar D W.ψ (-1)
+            → ∀ (i j : Fin D.R.m) (A A' WW : HSp D) (X : Tri T A A' WW) (δ t0 : ℂ),
+              IsBottomTri W i j X → X.rW.β = 1
+                → ∃ Ω : ℂ,
+                  Ω ≠ 0
+                    ∧ ∀ (s : T) (Q : ℕ) (P P' : Pair D ⊤ δ t0 Q),
+                      IsBottom G s i j (GlobalTheory.SqTop.modT G s) P P'
+                        → ∃ u : ℂ,
+                          u ≠ 0 ∧ u ∈ Qbar
+                            ∧ (∀ (p : ℕ) [Fact p.Prime],
+                              ¬ p ∣ GlobalTheory.SqTop.Qn G s
+                                → ∀ lam : Qbar →+* ℂ_[p], ‖lamC lam u‖ = 1)
+                            ∧ ∀ (ea : P.a = A.rank) (ed : P.d = WW.rank) (h : GA D P.d)
+                                (g : GA D WW),
+                              GlobalTheory.BotFormula.IsFinPt WW g h
+                                → ∀ T,
+                                  starRingEnd ℂ (P.coord h T)
+                                    = Ω * u
+                                      * X.I W.ψ W.θ s (GlobalTheory.BotFormula.minorF ea ed T)
+                                        g := by
+  first
+  | exact @_root_.GlobalTheory.BotFormula.rallis_bottom_formula_large_rank
+  | exact _root_.GlobalTheory.BotFormula.rallis_bottom_formula_large_rank
+  | (intros; apply _root_.GlobalTheory.BotFormula.rallis_bottom_formula_large_rank <;> assumption)
 end

@@ -9,11 +9,12 @@ open ReciprocityTheory.ChartRestriction.DS (casimirK IsGlRep IsInfUnitary adjSig
 
 namespace PositivityTheory.CW.EigenOrthogonalForm
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {E : Fin n → Fin n → Module.End ℂ V}
 
-theorem cas_symm (hu : IsInfUnitary ε E) (x y : V) :
-    ⟪casimirK ε E x, y⟫_ℂ = ⟪x, casimirK ε E y⟫_ℂ := by
+theorem cas_symm (hu : IsInfUnitary ε E) (x y : V)
+    : ⟪casimirK ε E x, y⟫_ℂ = ⟪x, casimirK ε E y⟫_ℂ := by
   unfold casimirK
   simp only [LinearMap.sum_apply, Module.End.mul_apply, sum_inner, inner_sum]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b hb => ?_
@@ -21,8 +22,11 @@ theorem cas_symm (hu : IsInfUnitary ε E) (x y : V) :
   rw [hu a b, hu b a]
   simp [adjSign, hab]
 
-theorem inner_eq_zero_of_eig (hu : IsInfUnitary ε E) {μ μ' : ℝ} (hne : μ ≠ μ') {v y : V}
-    (hv : casimirK ε E v = (μ : ℂ) • v) (hy : casimirK ε E y = (μ' : ℂ) • y) : ⟪v, y⟫_ℂ = 0 := by
+theorem inner_eq_zero_of_eig
+    (hu : IsInfUnitary ε E)
+    {μ μ' : ℝ} (hne : μ ≠ μ')
+    {v y : V} (hv : casimirK ε E v = (μ : ℂ) • v) (hy : casimirK ε E y = (μ' : ℂ) • y)
+    : ⟪v, y⟫_ℂ = 0 := by
   have h := cas_symm hu v y
   rw [hv, hy, inner_smul_left, inner_smul_right, Complex.conj_ofReal] at h
   have h' : ((μ : ℂ) - μ') * ⟪v, y⟫_ℂ = 0 := by rw [sub_mul, h, sub_self]
@@ -30,13 +34,16 @@ theorem inner_eq_zero_of_eig (hu : IsInfUnitary ε E) {μ μ' : ℝ} (hne : μ �
   · exact absurd (by exact_mod_cast sub_eq_zero.1 h0) hne
   · exact h0
 
-theorem B_eq_zero (B : V →ₗ⋆[ℂ] V →ₗ[ℂ] ℂ) (hB : ∀ v y, B (casimirK ε E v) y = B v (casimirK ε E y))
-    {μ μ' : ℝ} (hne : μ ≠ μ') {v y : V}
-    (hv : casimirK ε E v = (μ : ℂ) • v) (hy : casimirK ε E y = (μ' : ℂ) • y) : B v y = 0 := by
+theorem B_eq_zero
+    (B : V →ₗ⋆[ℂ] V →ₗ[ℂ] ℂ) (hB : ∀ v y, B (casimirK ε E v) y = B v (casimirK ε E y))
+    {μ μ' : ℝ} (hne : μ ≠ μ')
+    {v y : V} (hv : casimirK ε E v = (μ : ℂ) • v) (hy : casimirK ε E y = (μ' : ℂ) • y)
+    : B v y = 0 := by
   have h := hB v y
   rw [hv, hy] at h
   simp only [map_smulₛₗ, LinearMap.smul_apply, map_smul, smul_eq_mul, Complex.conj_ofReal,
-    RingHom.id_apply] at h
+      RingHom.id_apply]
+    at h
   have h2 : ((μ : ℂ) - μ') * B v y = 0 := by rw [sub_mul, h, sub_self]
   rcases mul_eq_zero.1 h2 with h3 | h3
   · exact absurd (by exact_mod_cast sub_eq_zero.1 h3) hne
@@ -49,19 +56,20 @@ namespace PositivityTheory.CW
 open EigenOrthogonalForm in
 theorem e2c : CasimirPairingBound := by
   intro n ε V _ _ E _ _ hM Q hQ η
-  let S : Submodule ℂ V :=
-    { carrier := {a | ∃ C : ℝ, 0 ≤ C ∧ ∀ y, ‖⟪a, y⟫_ℂ‖ ≤ C * Q y}
-      add_mem' := by
-        rintro a b ⟨C₁, h₁, ha⟩ ⟨C₂, h₂, hb⟩
-        refine ⟨C₁ + C₂, add_nonneg h₁ h₂, fun y => ?_⟩
-        rw [inner_add_left, add_mul]
-        exact (norm_add_le _ _).trans (add_le_add (ha y) (hb y))
-      zero_mem' := ⟨0, le_rfl, fun y => by simp⟩
-      smul_mem' := by
-        rintro c a ⟨C, h, ha⟩
-        refine ⟨‖c‖ * C, mul_nonneg (norm_nonneg _) h, fun y => ?_⟩
-        rw [inner_smul_left, norm_mul, RCLike.norm_conj, mul_assoc]
-        exact mul_le_mul_of_nonneg_left (ha y) (norm_nonneg _) }
+  let S : Submodule ℂ V := {
+    carrier := {a | ∃ C : ℝ, 0 ≤ C ∧ ∀ y, ‖⟪a, y⟫_ℂ‖ ≤ C * Q y}
+    add_mem' := by
+      rintro a b ⟨C₁, h₁, ha⟩ ⟨C₂, h₂, hb⟩
+      refine ⟨C₁ + C₂, add_nonneg h₁ h₂, fun y => ?_⟩
+      rw [inner_add_left, add_mul]
+      exact (norm_add_le _ _).trans (add_le_add (ha y) (hb y))
+    zero_mem' := ⟨0, le_rfl, fun y => by simp⟩
+    smul_mem' := by
+      rintro c a ⟨C, h, ha⟩
+      refine ⟨‖c‖ * C, mul_nonneg (norm_nonneg _) h, fun y => ?_⟩
+      rw [inner_smul_left, norm_mul, RCLike.norm_conj, mul_assoc]
+      exact mul_le_mul_of_nonneg_left (ha y) (norm_nonneg _)
+  }
   suffices hS : S = ⊤ by
     have hη : η ∈ S := hS ▸ Submodule.mem_top
     exact hη
@@ -101,7 +109,8 @@ theorem e2c : CasimirPairingBound := by
       have hyW : y ∈ W := (hWmem y).2 hy
       have := LinearMap.congr_fun hfg ⟨y, hyW⟩
       simp only [LinearMap.sum_apply, LinearMap.smul_apply, hgv, LinearMap.comp_apply,
-        Submodule.subtype_apply] at this
+          Submodule.subtype_apply]
+        at this
       rw [← this, LinearMap.sum_apply]
       simp only [LinearMap.smul_apply]
     · have h0 : ⟪w, y⟫_ℂ = 0 := inner_eq_zero_of_eig hM.uni (Ne.symm hμ) hw hy
@@ -110,8 +119,11 @@ theorem e2c : CasimirPairingBound := by
       rw [LinearMap.sum_apply, innerₛₗ_apply_apply, h0]
       simp [h1]
   show ∃ C : ℝ, 0 ≤ C ∧ ∀ y, ‖⟪w, y⟫_ℂ‖ ≤ C * Q y
-  refine ⟨∑ i, ‖f i‖ * Q (v i),
-    Finset.sum_nonneg fun i _ => mul_nonneg (norm_nonneg _) (apply_nonneg Q _), fun y => ?_⟩
+  refine ⟨
+    ∑ i, ‖f i‖ * Q (v i),
+    Finset.sum_nonneg fun i _ => mul_nonneg (norm_nonneg _) (apply_nonneg Q _),
+    fun y => ?_
+  ⟩
   have hwy : ⟪w, y⟫_ℂ = ∑ i, f i * B i (v i) y := by
     have h := LinearMap.congr_fun hid y
     rw [innerₛₗ_apply_apply, LinearMap.sum_apply] at h

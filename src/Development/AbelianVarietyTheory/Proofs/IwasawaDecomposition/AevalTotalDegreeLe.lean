@@ -8,9 +8,10 @@ universe u_1
 namespace GlobalTheory.AevalTotalDegreeBound
 open MvPolynomial
 
-theorem aeval_totalDegree_le {σ : Type u_1} (f : σ → MvPolynomial σ ℂ)
-    (hf : ∀ v, (f v).totalDegree ≤ 1) (P : MvPolynomial σ ℂ) :
-    (aeval f P).totalDegree ≤ P.totalDegree := by
+theorem aeval_totalDegree_le
+    {σ : Type u_1}
+    (f : σ → MvPolynomial σ ℂ) (hf : ∀ v, (f v).totalDegree ≤ 1) (P : MvPolynomial σ ℂ)
+    : (aeval f P).totalDegree ≤ P.totalDegree := by
   classical
   conv_lhs => rw [P.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -28,7 +29,12 @@ theorem aeval_totalDegree_le {σ : Type u_1} (f : σ → MvPolynomial σ ℂ)
   refine (totalDegree_pow _ _).trans ?_
   simpa using Nat.mul_le_mul_left (s i) (hf i)
 
-theorem main : ∀ {σ : Type u_1} (f : σ → MvPolynomial σ ℂ), (∀ (v : σ), MvPolynomial.totalDegree (f v) ≤ (1 : ℕ)) → ∀ (P : MvPolynomial σ ℂ), MvPolynomial.totalDegree ((MvPolynomial.aeval f : MvPolynomial σ ℂ → MvPolynomial σ ℂ) P) ≤ MvPolynomial.totalDegree P :=
-  fun f hf P => aeval_totalDegree_le f hf P
+theorem main
+    : ∀ {σ : Type u_1} (f : σ → MvPolynomial σ ℂ),
+      (∀ (v : σ), MvPolynomial.totalDegree (f v) ≤ (1 : ℕ))
+        → ∀ (P : MvPolynomial σ ℂ),
+          MvPolynomial.totalDegree ((MvPolynomial.aeval f : MvPolynomial σ ℂ → MvPolynomial σ ℂ) P)
+            ≤ MvPolynomial.totalDegree P := fun f hf P =>
+  aeval_totalDegree_le f hf P
 
 end GlobalTheory.AevalTotalDegreeBound

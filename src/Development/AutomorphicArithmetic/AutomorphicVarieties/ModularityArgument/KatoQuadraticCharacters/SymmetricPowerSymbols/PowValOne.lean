@@ -16,8 +16,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-private theorem cyc_one {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) {m M' : ℕ} (hm : 0 < m)
-    (h : m ∣ M') (s : Ω ≃ₐ[ℚ] Ω) (hs : s ∈ fixMu Ω M') : cyc m s = 1 := by
+private theorem cyc_one
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    {ε : Ω →+* ℂ} (X : Tower Ω ε)
+    {m M' : ℕ} (hm : 0 < m) (h : m ∣ M')
+    (s : Ω ≃ₐ[ℚ] Ω) (hs : s ∈ fixMu Ω M')
+    : cyc m s = 1 := by
   have hfix : ∀ z : Ω, z ^ m = 1 → s z = z := by
     intro z hz
     obtain ⟨k, rfl⟩ := h
@@ -31,14 +35,14 @@ private theorem cyc_one {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
     have hζ := isPrimitiveRoot_eOm ε hm.ne'
     have h1 := hy _ hζ.pow_eq_one
     rw [hfix _ hζ.pow_eq_one] at h1
-    have hv : (cyc m s).val = 1 :=
-      hζ.pow_inj (ZMod.val_lt _) hm1 (by rw [pow_one]; exact h1.symm)
+    have hv : (cyc m s).val = 1 := hζ.pow_inj (ZMod.val_lt _) hm1 (by rw [pow_one]; exact h1.symm)
     rw [← ZMod.natCast_zmod_val (cyc m s), hv, Nat.cast_one]
   · have hm2 : m = 1 := by omega
     subst hm2
     exact Subsingleton.elim _ _
 
-private theorem pow_val_one {K : Type} [Field K] {m : ℕ} (hm : 0 < m) (f : Kˣ) : ∃ h : Kˣ, f ^ (1 : ZMod m).val = f * h ^ m := by
+private theorem pow_val_one {K : Type} [Field K] {m : ℕ} (hm : 0 < m) (f : Kˣ)
+    : ∃ h : Kˣ, f ^ (1 : ZMod m).val = f * h ^ m := by
   rcases Nat.lt_or_ge 1 m with h1 | h1
   · refine ⟨1, ?_⟩
     haveI : Fact (1 < m) := ⟨h1⟩
@@ -49,10 +53,16 @@ private theorem pow_val_one {K : Type} [Field K] {m : ℕ} (hm : 0 < m) (f : Kˣ
     rw [show (1 : ZMod 1).val = 0 by decide]
     simp
 
-private theorem key {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) {m : ℕ} (hm : 0 < m)
-    {τ : X.K ≃+* X.K} {s : Ω ≃ₐ[ℚ] Ω} (hτ : admitted X τ s) (hs : cyc m s = 1) {u v : X.K} (hu : τ u = u) (hv : τ v = v) {P Q : Pt X m}
-    (hP : IsPt X m u v P) (hQ : IsPt X m u v Q) {a F F' : X.Kˣ} (ha : Mv X m (RingEquiv.refl _) 1 Q P a)
-    (hF : Mv X m τ s Q Q F) (hF' : Mv X m τ s P P F') : ∃ h : X.Kˣ, F * a = unU X τ a * F' * h ^ m := by
+private theorem key
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    {ε : Ω →+* ℂ} (X : Tower Ω ε)
+    {m : ℕ} (hm : 0 < m)
+    {τ : X.K ≃+* X.K} {s : Ω ≃ₐ[ℚ] Ω} (hτ : admitted X τ s) (hs : cyc m s = 1)
+    {u v : X.K} (hu : τ u = u) (hv : τ v = v)
+    {P Q : Pt X m} (hP : IsPt X m u v P) (hQ : IsPt X m u v Q)
+    {a F F' : X.Kˣ}
+    (ha : Mv X m (RingEquiv.refl _) 1 Q P a) (hF : Mv X m τ s Q Q F) (hF' : Mv X m τ s P P F')
+    : ∃ h : X.Kˣ, F * a = unU X τ a * F' * h ^ m := by
   have hadm1 : admitted X (RingEquiv.refl X.K) 1 := (admB Ω ε X).2.2.1
   have hPτ : IsPt X m (τ u) (τ v) P := by rw [hu, hv]; exact hP
   have hQτ : IsPt X m (τ u) (τ v) Q := by rw [hu, hv]; exact hQ
@@ -72,12 +82,15 @@ private theorem key {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω
   rw [hh1, hh2] at hh
   refine ⟨h2 * h * h1⁻¹, ?_⟩
   rw [mul_pow, mul_pow, inv_pow, ← mul_left_inj (h1 ^ m)]
-  calc F * a * h1 ^ m = F * h1 ^ m * a := by rw [mul_right_comm]
+  calc
+    F * a * h1 ^ m
+      = F * h1 ^ m * a := by rw [mul_right_comm]
     _ = _ := hh
     _ = _ := by rw [mul_right_comm (unU X τ a)]; group
 
-private theorem mem_gamma_of_dvd_of_mem_gamma' {N N' : ℕ} (h : N ∣ N') {γ : SL(2, ℤ)}
-    (hγ : γ ∈ CongruenceSubgroup.Gamma N') : γ ∈ CongruenceSubgroup.Gamma N := by
+private theorem mem_gamma_of_dvd_of_mem_gamma'
+    {N N' : ℕ} (h : N ∣ N') {γ : SL(2, ℤ)} (hγ : γ ∈ CongruenceSubgroup.Gamma N')
+    : γ ∈ CongruenceSubgroup.Gamma N := by
   rw [CongruenceSubgroup.Gamma_mem] at hγ ⊢
   obtain ⟨h1, h2, h3, h4⟩ := hγ
   have hc := fun (z : ℤ) => map_intCast (ZMod.castHom h (ZMod N)) z
@@ -89,7 +102,8 @@ private theorem mem_gamma_of_dvd_of_mem_gamma' {N N' : ℕ} (h : N ∣ N') {γ :
 
 theorem UpperTheory.V.Z.Kato.Sym.pTop : UpperTheory.V.Z.Kato.Sym.PTop := by
   unfold UpperTheory.V.Z.Kato.Sym.PTop
-  intro Ω _ _ _ ε X l n c d k M M' hl hc hd hc6 hd6 hLv hk hM' hkM hlM t w ht hw x y hxy x' y' hx' hy'
+  intro Ω _ _ _ ε X l n c d k M M' hl hc hd hc6 hd6 hLv hk hM' hkM hlM t w ht hw x y hxy x' y' hx'
+    hy'
   have hm : 0 < l ^ n := pow_pos hl.pos n
   obtain ⟨hM, hcM, hdM⟩ := hLv
   have hMM' : M ∣ M' := (Dvd.intro_left k rfl).trans hkM
@@ -106,8 +120,10 @@ theorem UpperTheory.V.Z.Kato.Sym.pTop : UpperTheory.V.Z.Kato.Sym.PTop := by
     rw [cyc_one X hM hMM' s hs, one_mul]
     funext i
     fin_cases i <;> rfl
-  have hmemF : ∀ f : X.K, (∀ γ ∈ CongruenceSubgroup.Gamma M', X.sl (ofSL γ) f = f) →
-      (∀ s ∈ fixMu Ω M', X.gal s f = f) → f ∈ topF X M' := by
+  have hmemF
+      : ∀ f : X.K,
+        (∀ γ ∈ CongruenceSubgroup.Gamma M', X.sl (ofSL γ) f = f) → (∀ s ∈ fixMu Ω M', X.gal s f = f)
+          → f ∈ topF X M' := by
     intro f h1 h2
     refine Subfield.mem_inf.2 ⟨(mem_lev_iff X _ f).2 h1, ?_⟩
     simp only [Subfield.mem_iInf]
@@ -119,22 +135,22 @@ theorem UpperTheory.V.Z.Kato.Sym.pTop : UpperTheory.V.Z.Kato.Sym.PTop := by
   have hgv : ∀ s ∈ fixMu Ω M', X.gal s (X.sl (dg k) (sg X d M y)) = X.sl (dg k) (sg X d M y) := by
     intro s hs
     rw [hgd1 s, hgaly s, hfixU s hs y]
-  have hslu : ∀ γ ∈ CongruenceSubgroup.Gamma M',
-      X.sl (ofSL γ) (X.sl (dg k) (sg X c M x)) = X.sl (dg k) (sg X c M x) := by
+  have hslu
+      : ∀ γ ∈ CongruenceSubgroup.Gamma M',
+        X.sl (ofSL γ) (X.sl (dg k) (sg X c M x)) = X.sl (dg k) (sg X c M x) := by
     intro γ hγ
     obtain ⟨γ', hγ', hcomm⟩ := hgd3 M γ (mem_gamma_of_dvd_of_mem_gamma' hkM hγ)
     rw [hgd2 γ γ' hcomm, hslx, (rowB Ω M hM).2.2.1 γ' x hγ']
-  have hslv : ∀ γ ∈ CongruenceSubgroup.Gamma M',
-      X.sl (ofSL γ) (X.sl (dg k) (sg X d M y)) = X.sl (dg k) (sg X d M y) := by
+  have hslv
+      : ∀ γ ∈ CongruenceSubgroup.Gamma M',
+        X.sl (ofSL γ) (X.sl (dg k) (sg X d M y)) = X.sl (dg k) (sg X d M y) := by
     intro γ hγ
     obtain ⟨γ', hγ', hcomm⟩ := hgd3 M γ (mem_gamma_of_dvd_of_mem_gamma' hkM hγ)
     rw [hgd2 γ γ' hcomm, hsly, (rowB Ω M hM).2.2.1 γ' y hγ']
-  have hIu : IsU X (X.sl (dg k) (sg X c M x)) :=
-    (hadm.2.2.2.2.2.1 _ _ (hadm.1 (dg k))).1 _ hUx
-  have hIv : IsU X (X.sl (dg k) (sg X d M y)) :=
-    (hadm.2.2.2.2.2.1 _ _ (hadm.1 (dg k))).1 _ hUy
-  obtain ⟨P, hP, hPγ, hPs⟩ := ptTop Ω ε X l n M' hl hM' hlM _ _ hIu hIv
-    (hmemF _ hslu hgu) (hmemF _ hslv hgv)
+  have hIu : IsU X (X.sl (dg k) (sg X c M x)) := (hadm.2.2.2.2.2.1 _ _ (hadm.1 (dg k))).1 _ hUx
+  have hIv : IsU X (X.sl (dg k) (sg X d M y)) := (hadm.2.2.2.2.2.1 _ _ (hadm.1 (dg k))).1 _ hUy
+  obtain ⟨P, hP, hPγ, hPs⟩ :=
+    ptTop Ω ε X l n M' hl hM' hlM _ _ hIu hIv (hmemF _ hslu hgu) (hmemF _ hslv hgv)
   obtain ⟨a, haU, ha⟩ :=
     (mvEx Ω ε X (l ^ n) hm (RingEquiv.refl X.K) 1 hadm.2.2.1 _ _ (Q x y) hQxy).1 P hP
   rw [hsix x' hx', hsiy y' hy']
@@ -143,8 +159,9 @@ theorem UpperTheory.V.Z.Kato.Sym.pTop : UpperTheory.V.Z.Kato.Sym.PTop := by
     obtain ⟨γ', hγ', hcomm⟩ := hgd3 M γ (mem_gamma_of_dvd_of_mem_gamma' hkM hγ)
     have hF := hQsl γ γ' hcomm
     rw [(rowB Ω M hM).2.2.1 γ' x hγ', (rowB Ω M hM).2.2.1 γ' y hγ'] at hF
-    obtain ⟨h, hh⟩ := key X hm (hadm.1 (ofSL γ)) ((lgB Ω ε X (l ^ n) hm).2.2.2.2.2.2 1 1).2.1
-      (hslu γ hγ) (hslv γ hγ) hP hQxy ha hF (hPγ γ hγ)
+    obtain ⟨h, hh⟩ :=
+      key X hm (hadm.1 (ofSL γ)) ((lgB Ω ε X (l ^ n) hm).2.2.2.2.2.2 1 1).2.1 (hslu γ hγ)
+        (hslv γ hγ) hP hQxy ha hF (hPγ γ hγ)
     rw [one_mul, mul_one] at hh
     refine ⟨h⁻¹, ?_⟩
     change unU X (slR X (ofSL γ)) a = a * h⁻¹ ^ (l ^ n)
@@ -155,15 +172,17 @@ theorem UpperTheory.V.Z.Kato.Sym.pTop : UpperTheory.V.Z.Kato.Sym.PTop := by
     have hF := hQgal s
     rw [hfixU _ hs' x, hfixU _ hs' y] at hF
     obtain ⟨f, hf, hf'⟩ := hPs s hs
-    obtain ⟨h, hh⟩ := key X hm (hadm.2.1 s) (cyc_one X hm hlM s hs) (hgu s hs) (hgv s hs)
-      hP hQxy ha hF hf'
+    obtain ⟨h, hh⟩ :=
+      key X hm (hadm.2.1 s) (cyc_one X hm hlM s hs) (hgu s hs) (hgv s hs) hP hQxy ha hF hf'
     refine ⟨h, ?_⟩
     have hh' := congrArg (fun z : X.Kˣ => (z : X.K)) hh
     simp only [Units.val_mul, Units.val_pow_eq_pow_val] at hh'
-    change X.sl (dg k) (w s x y : X.K) * (a : X.K) = X.gal s (a : X.K) * (f : X.K) * (h : X.K) ^ (l ^ n) at hh'
-    change X.sl (dg k) (w s x y : X.K) =
-      wGen X M' l n (X.sl (dg k) (sg X c M x)) (X.sl (dg k) (sg X d M y)) s *
-        (X.gal s (a : X.K) / (a : X.K)) * (h : X.K) ^ (l ^ n)
+    change X.sl (dg k) (w s x y : X.K) * (a : X.K)
+        = X.gal s (a : X.K) * (f : X.K) * (h : X.K) ^ (l ^ n)
+      at hh'
+    change X.sl (dg k) (w s x y : X.K)
+      = wGen X M' l n (X.sl (dg k) (sg X c M x)) (X.sl (dg k) (sg X d M y)) s
+        * (X.gal s (a : X.K) / (a : X.K)) * (h : X.K) ^ (l ^ n)
     rw [← hf]
     have ha0 : (a : X.K) ≠ 0 := a.ne_zero
     field_simp

@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
 private lemma order_pow {O A K τ : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing K] [Algebra O K]
     (x : A →ₐ[O] O) (φ : A →ₐ[O] MvPowerSeries τ K)
@@ -81,19 +83,26 @@ private lemma extend {O R K τ : Type} [CommRing O] [CommRing R] [Algebra O R] [
             map_add' := hadd
             commutes' := fun c => (onA (algebraMap O A c)).trans (φ.commutes c) }, spec⟩
 
-theorem UpperTheory.smoothPt_part_of_smoothPt_associatedGraded :
-    ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [Module.Free ℤ X] [Module.Finite ℤ X] [CommRing R] [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) (n : X → ℕ), SmoothPt W.gr (W.originA h) n → SmoothPt W.part (W.origin h) n := by
+theorem UpperTheory.smoothPt_part_of_smoothPt_associatedGraded
+    : ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [Module.Free ℤ X]
+        [Module.Finite ℤ X] [CommRing R] [Algebra O R] (W : WPres O X R) (h : W.HasOrigin)
+        (n : X → ℕ),
+      SmoothPt W.gr (W.originA h) n → SmoothPt W.part (W.origin h) n := by
   rintro O X R _ _ _ _ _ _ _ _ W h n ⟨τ, fτ, wt, φ, H, hn⟩
-  obtain ⟨ψ, spec⟩ := extend W.A (RingHom.ker (W.origin h)) φ
-    (fun k y hy => order_pow (W.originA h) φ H.const k y (by
-      rw [← (ker_pow O R X W h k).1]
-      exact hy))
-    (fun k => (ker_pow O R X W h k).2)
+  obtain ⟨ψ, spec⟩ :=
+    extend W.A (RingHom.ker (W.origin h)) φ
+      (fun k y hy =>
+        order_pow (W.originA h) φ H.const k y (by
+          rw [← (ker_pow O R X W h k).1]
+          exact hy))
+      (fun k => (ker_pow O R X W h k).2)
   have onA : ∀ y : W.A, ψ y = φ y := fun y => by
     ext m
     exact spec (m.degree + 1) y y (by simp) m (Nat.lt_succ_self _)
   obtain ⟨h1, h2⟩ := ker_pow O R X W h 2
-  have hx : ∀ (f : R) (y : W.A), f - y ∈ RingHom.ker (W.origin h) ^ 2 → W.origin h f = W.originA h y := by
+  have hx
+      : ∀ (f : R) (y : W.A),
+        f - y ∈ RingHom.ker (W.origin h) ^ 2 → W.origin h f = W.originA h y := by
     intro f y hy
     have := Ideal.pow_le_self (two_ne_zero) hy
     rw [RingHom.mem_ker, map_sub, sub_eq_zero] at this
@@ -110,9 +119,10 @@ theorem UpperTheory.smoothPt_part_of_smoothPt_associatedGraded :
     rw [← onA] at hf hf'
     exact ⟨f, hf, hf'⟩
   · obtain ⟨y, hy⟩ := h2 f
-    obtain ⟨c, hc, hcy⟩ := H.inj y ((hx f y hy).symm.trans hf) (fun i => by
-      rw [← spec 2 f y hy _ (by rw [Finsupp.degree_single]; norm_num)]
-      exact hl i)
+    obtain ⟨c, hc, hcy⟩ :=
+      H.inj y ((hx f y hy).symm.trans hf) (fun i => by
+        rw [← spec 2 f y hy _ (by rw [Finsupp.degree_single]; norm_num)]
+        exact hl i)
     rw [← h1] at hcy
     have h3 : c • (y : R) ∈ RingHom.ker (W.origin h) ^ 2 := hcy
     refine ⟨c, hc, ?_⟩

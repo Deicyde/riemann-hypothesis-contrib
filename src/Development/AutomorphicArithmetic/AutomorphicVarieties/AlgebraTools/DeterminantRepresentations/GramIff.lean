@@ -6,11 +6,12 @@ public import Mathlib
 
 open Polynomial Matrix
 
-private theorem linearIndependent_iff_det_trace_gram_ne_zero {K ι : Type} [Field K] [Fintype ι] [DecidableEq ι]
-    (v : ι × ι → Matrix ι ι K) :
-    LinearIndependent K v ↔ (Matrix.of fun a b => (v a * v b).trace).det ≠ 0 := by
-  have hrow : ∀ (c : ι × ι → K) a,
-      (v a * ∑ b, c b • v b).trace = ((Matrix.of fun a b => (v a * v b).trace) *ᵥ c) a := by
+private theorem linearIndependent_iff_det_trace_gram_ne_zero
+    {K ι : Type} [Field K] [Fintype ι] [DecidableEq ι] (v : ι × ι → Matrix ι ι K)
+    : LinearIndependent K v ↔ (Matrix.of fun a b => (v a * v b).trace).det ≠ 0 := by
+  have hrow
+      : ∀ (c : ι × ι → K) a,
+        (v a * ∑ b, c b • v b).trace = ((Matrix.of fun a b => (v a * v b).trace) *ᵥ c) a := by
     intro c a
     rw [Finset.mul_sum, Matrix.trace_sum]
     simp [Matrix.mulVec, dotProduct, Matrix.trace_smul, mul_comm]
@@ -48,9 +49,10 @@ private theorem linearIndependent_iff_det_trace_gram_ne_zero {K ι : Type} [Fiel
     rw [← hrow, hc, Matrix.mul_zero, Matrix.trace_zero]
     rfl
 
-theorem UpperTheory.V.AlgebraTools.Det.gramIff :
-    ∀ {K G ι : Type} [Field K] [Monoid G] [Fintype ι] [DecidableEq ι] (ρ : G →* Matrix ι ι K),
-    Submodule.span K (Set.range ρ) = ⊤ ↔ ∃ g : ι × ι → G, (Matrix.of fun a b => (ρ (g a * g b)).trace).det ≠ 0 := by
+theorem UpperTheory.V.AlgebraTools.Det.gramIff
+    : ∀ {K G ι : Type} [Field K] [Monoid G] [Fintype ι] [DecidableEq ι] (ρ : G →* Matrix ι ι K),
+      Submodule.span K (Set.range ρ) = ⊤
+        ↔ ∃ g : ι × ι → G, (Matrix.of fun a b => (ρ (g a * g b)).trace).det ≠ 0 := by
   intro K G ι _ _ _ _ ρ
   have hcard : Fintype.card (ι × ι) = Module.finrank K (Matrix ι ι K) := by
     simp [Module.finrank_matrix, Fintype.card_prod]
@@ -60,7 +62,8 @@ theorem UpperTheory.V.AlgebraTools.Det.gramIff :
     have hs_top : Submodule.span K s = ⊤ := hss.trans hspan
     let bs := Module.Basis.mk hli (by rw [Subtype.range_coe]; exact hs_top.ge)
     haveI : Fintype s := (hli.setFinite).fintype
-    have hcs : Fintype.card (ι × ι) = Fintype.card s := hcard.trans (Module.finrank_eq_card_basis bs)
+    have hcs : Fintype.card (ι × ι) = Fintype.card s :=
+      hcard.trans (Module.finrank_eq_card_basis bs)
     let e : ι × ι ≃ s := Fintype.equivOfCardEq hcs
     have hmem : ∀ a, ∃ y, ρ y = (e a : Matrix ι ι K) := fun a => hsr (e a).2
     refine ⟨fun a => (hmem a).choose, ?_⟩
@@ -72,7 +75,8 @@ theorem UpperTheory.V.AlgebraTools.Det.gramIff :
     simpa only [map_mul] using (linearIndependent_iff_det_trace_gram_ne_zero _).1 hvli
   · rintro ⟨g, hg⟩
     have hvli : LinearIndependent K (fun a => ρ (g a)) :=
-      (linearIndependent_iff_det_trace_gram_ne_zero (fun a => ρ (g a))).2 (by simpa only [map_mul] using hg)
+      (linearIndependent_iff_det_trace_gram_ne_zero (fun a => ρ (g a))).2
+        (by simpa only [map_mul] using hg)
     have htop := hvli.span_eq_top_of_card_eq_finrank' hcard
     rw [eq_top_iff, ← htop]
     exact Submodule.span_mono (Set.range_comp_subset_range g ρ)

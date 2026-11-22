@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MemUni
 
 @[expose] public section
 
-open Formalism.BasicNotions Classical NumberField IsDedekindDomain Matrix GlobalTheory.LvT GlobalTheory.LvT.Inh
+open Formalism.BasicNotions Classical NumberField IsDedekindDomain Matrix GlobalTheory.LvT
+  GlobalTheory.LvT.Inh
 open Formalism.MainNotions.product_first_zeroth_parts (Ow ten blk CSpan IntSpan wSh)
 open Formalism.L2.Col (conjPrime₂ PosStar hStd UF Sp)
 
@@ -13,8 +14,9 @@ namespace GlobalTheory.LvT.LocUnr
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem valuation_eq_exp_neg_one (P : HeightOneSpectrum (𝓞 K)) (r : 𝓞 K) (h1 : r ∈ P.asIdeal)
-    (h2 : r ∉ P.asIdeal ^ 2) : P.valuation K (algebraMap (𝓞 K) K r) = WithZero.exp (-1 : ℤ) := by
+theorem valuation_eq_exp_neg_one
+    (P : HeightOneSpectrum (𝓞 K)) (r : 𝓞 K) (h1 : r ∈ P.asIdeal) (h2 : r ∉ P.asIdeal ^ 2)
+    : P.valuation K (algebraMap (𝓞 K) K r) = WithZero.exp (-1 : ℤ) := by
   have e : P.valuation K (algebraMap (𝓞 K) K r) = P.intValuation r := P.valuation_of_algebraMap r
   rw [e]
   have hr : r ≠ 0 := by rintro rfl; exact h2 (Submodule.zero_mem _)

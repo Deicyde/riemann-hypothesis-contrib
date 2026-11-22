@@ -22,18 +22,25 @@ namespace Formalism.HN
 
 universe u v w
 
-theorem hnExtreme_mem_iff {n : ℕ} (f : Fin n → ℝ) (hf : Antitone f) (θ : ℝ) (j : Fin n) :
-    θ ≤ f j ↔ (j : ℕ) < (Finset.univ.filter (fun i => θ ≤ f i)).card := by
-  first | exact Bl.general_b_fact_left_form.goal1 .. | (apply Bl.general_b_fact_left_form.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_left_form.goal1 <;> assumption) | (apply @Bl.general_b_fact_left_form.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_left_form.goal1 <;> assumption) | (apply @Bl.general_b_fact_left_form.goal1 <;> first | assumption | infer_instance)
+theorem hnExtreme_mem_iff {n : ℕ} (f : Fin n → ℝ) (hf : Antitone f) (θ : ℝ) (j : Fin n)
+    : θ ≤ f j ↔ (j : ℕ) < (Finset.univ.filter (fun i => θ ≤ f i)).card := by
+  first
+  | exact Bl.general_b_fact_left_form.goal1 ..
+  | (apply Bl.general_b_fact_left_form.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_left_form.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_left_form.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_left_form.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_left_form.goal1 <;> first | assumption | infer_instance)
 
-theorem hnExtreme_of (h1 : HNSlopes.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : HNStep.{u, v, w})
-    (h4 : SatBasic.{u, v, w}) : HNExtreme.{u, v, w} := by
+theorem hnExtreme_of
+    (h1 : HNSlopes.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : HNStep.{u, v, w})
+    (h4 : SatBasic.{u, v, w})
+    : HNExtreme.{u, v, w} := by
   intro R V E _ _ _ _ _ _ ρ L hL hL0
   obtain ⟨hanti, hcard, -⟩ := h1 R V E ρ L hL
   obtain ⟨B1, B2, B3, B4, B5, -, -, -⟩ := h4 R V E ρ L hL
   obtain ⟨M1, -, M3, -⟩ := h2 R V E ρ L hL hL0
-  have key : ∀ (θ : ℝ) (j : Fin (rk ρ L)),
-      θ ≤ slopeList ρ L j ↔ (j : ℕ) < rk ρ (hnStep ρ L θ) := by
+  have key : ∀ (θ : ℝ) (j : Fin (rk ρ L)), θ ≤ slopeList ρ L j ↔ (j : ℕ) < rk ρ (hnStep ρ L θ) := by
     intro θ j
     rw [← hcard θ]
     exact hnExtreme_mem_iff _ hanti θ j
@@ -85,8 +92,7 @@ theorem hnExtreme_of (h1 : HNSlopes.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : HNS
         have : rk ρ N ≠ 0 := fun h => hN0 ((B4 N hNL).1 h)
         exact_mod_cast this
       have hsl : slope ρ N = deg ρ N / rk ρ N := rfl
-      have hdegN : deg ρ N = muMax ρ L * rk ρ N := by
-        rw [← hNsl, hsl, div_mul_cancel₀ _ hrkN]
+      have hdegN : deg ρ N = muMax ρ L * rk ρ N := by rw [← hNsl, hsl, div_mul_cancel₀ _ hrkN]
       rw [mul_sub]
       linarith
     obtain ⟨-, -, S3, -⟩ := h3 R V E ρ L hL (muMax ρ L)
@@ -94,8 +100,11 @@ theorem hnExtreme_of (h1 : HNSlopes.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : HNS
     intro h
     rw [h] at hle
     exact hN0 (le_bot_iff.1 hle)
-  refine ⟨fun j => ⟨lowB j, upB j⟩, ⟨⟨0, hrkpos⟩, le_antisymm (upB _) ?_⟩,
-    ⟨⟨rk ρ L - 1, by omega⟩, le_antisymm ?_ (lowB _)⟩⟩
+  refine ⟨
+    fun j => ⟨lowB j, upB j⟩,
+    ⟨⟨0, hrkpos⟩, le_antisymm (upB _) ?_⟩,
+    ⟨⟨rk ρ L - 1, by omega⟩, le_antisymm ?_ (lowB _)⟩
+  ⟩
   · rw [key]
     show 0 < rk ρ (hnStep ρ L (muMax ρ L))
     rcases Nat.eq_zero_or_pos (rk ρ (hnStep ρ L (muMax ρ L))) with h | h
@@ -116,6 +125,9 @@ theorem hnExtreme_of (h1 : HNSlopes.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : HNS
     linarith
 
 theorem polygon_extreme_slopes : HNExtreme :=
-  hnExtreme_of polygon_slopes_characterization slope_characterization (hnStep_of degree_supermodular slope_characterization maximal_slope_ratio finite_supremum_slopes real_saturation_property saturation_basic_properties) saturation_basic_properties
+  hnExtreme_of polygon_slopes_characterization slope_characterization
+    (hnStep_of degree_supermodular slope_characterization maximal_slope_ratio finite_supremum_slopes
+      real_saturation_property saturation_basic_properties)
+    saturation_basic_properties
 
 end Formalism.HN

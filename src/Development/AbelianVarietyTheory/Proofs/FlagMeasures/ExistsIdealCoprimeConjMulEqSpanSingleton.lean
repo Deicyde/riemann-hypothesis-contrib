@@ -11,16 +11,22 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem exists_ideal_coprime_conj_mul_eq_spanSingleton :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E],
-      Formalism.BasicNotions.CMData F E → ∀ (c : FractionalIdeal (nonZeroDivisors (𝓞 E)) E), c ≠ 0 →
-      ∀ N : 𝓞 E, N ≠ 0 → ∃ P : Ideal (𝓞 E), P ≠ ⊥ ∧
-        P ⊔ P.comap (RingOfIntegers.mapRingHom (starRingEnd E)) = ⊤ ∧
-        (∃ t : 𝓞 E, ∃ p ∈ P, t * N + p = 1) ∧
-        ∃ α : E, (P : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) * c =
-          FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 E)) α := by
+theorem exists_ideal_coprime_conj_mul_eq_spanSingleton
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E],
+      Formalism.BasicNotions.CMData F E
+        → ∀ (c : FractionalIdeal (nonZeroDivisors (𝓞 E)) E),
+          c ≠ 0
+            → ∀ N : 𝓞 E,
+              N ≠ 0
+                → ∃ P : Ideal (𝓞 E),
+                  P ≠ ⊥ ∧ P ⊔ P.comap (RingOfIntegers.mapRingHom (starRingEnd E)) = ⊤
+                    ∧ (∃ t : 𝓞 E, ∃ p ∈ P, t * N + p = 1)
+                    ∧ ∃ α : E,
+                      (P : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) * c
+                        = FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 E)) α := by
   intro F E _ _ _ _ _ _ hcm c hc N hN
-  obtain ⟨a, hac, hQ, hp⟩ := GlobalTheory.T.exists_mem_fractionalIdeal_primitive_local_generator' F E hcm.deg2 c hc N hN
+  obtain ⟨a, hac, hQ, hp⟩ :=
+    GlobalTheory.T.exists_mem_fractionalIdeal_primitive_local_generator' F E hcm.deg2 c hc N hN
 
   have ha : a ≠ 0 := by
     rintro rfl
@@ -31,24 +37,28 @@ theorem exists_ideal_coprime_conj_mul_eq_spanSingleton :
     rw [← mul_inv_cancel₀ hc]
     exact mul_le_mul' (FractionalIdeal.spanSingleton_le_iff_mem.mpr hac) le_rfl
   obtain ⟨P, hP⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.mp hle
-  have hPc : (P : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) * c =
-      FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 E)) a := by
+  have hPc
+      : (P : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) * c
+        = FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 E)) a := by
     rw [hP, mul_assoc, inv_mul_cancel₀ hc, mul_one]
 
-  have key : ∀ Q : Ideal (𝓞 E), P ≤ Q → a ∈ (Q : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) * c := by
+  have key
+      : ∀ Q : Ideal (𝓞 E), P ≤ Q → a ∈ (Q : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) * c := by
     intro Q hPQ
     rw [← FractionalIdeal.spanSingleton_le_iff_mem, ← hPc]
     exact mul_le_mul' ((FractionalIdeal.coeIdeal_le_coeIdeal E).mpr hPQ) le_rfl
-  have hσσ : ∀ x : 𝓞 E, RingOfIntegers.mapRingHom (starRingEnd E)
-      (RingOfIntegers.mapRingHom (starRingEnd E) x) = x := by
+  have hσσ
+      : ∀ x : 𝓞 E,
+        RingOfIntegers.mapRingHom (starRingEnd E) (RingOfIntegers.mapRingHom (starRingEnd E) x)
+          = x := by
     intro x
     ext
     simp
   refine ⟨P, ?_, ?_, ?_, a, hPc⟩
   · rintro rfl
     apply ha
-    rw [FractionalIdeal.coeIdeal_bot, zero_mul, eq_comm,
-      FractionalIdeal.spanSingleton_eq_zero_iff] at hPc
+    rw [FractionalIdeal.coeIdeal_bot, zero_mul, eq_comm, FractionalIdeal.spanSingleton_eq_zero_iff]
+      at hPc
     exact hPc
   · by_contra htop
     obtain ⟨Q, hQm, hPQ⟩ := Ideal.exists_le_maximal _ htop

@@ -23,10 +23,14 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 open scoped InnerProductSpace TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField IsDedekindDomain
-open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict Formalism.L2.SG.PoincareInHH.PoincareSetting
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS GlobalTheory.Core.Mi
+open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict
+  Formalism.L2.SG.PoincareInHH.PoincareSetting
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS
+  GlobalTheory.Core.Mi
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.MiTop
 noncomputable section
@@ -35,50 +39,99 @@ open Formalism.IndefR.Links
 section Gen
 variable {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K}
 end Gen
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Yd : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Yd cX}
-theorem dc_heq_alt (W : _root_.GlobalTheory.MiS.RealPackAlt ex) : HEq (W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Dc W.P.Dc :=
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Yd : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Yd cX}
+theorem dc_heq_alt (W : _root_.GlobalTheory.MiS.RealPackAlt ex)
+    : HEq (W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Dc W.P.Dc :=
   (congr_arg_heq W.Dcf W.Q.zs).trans (heq_of_eq W.Q.dc)
-theorem df1_fc_eq_side3 (W : _root_.GlobalTheory.MiS.RealPackAlt ex) : (W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Df1 = W.P.A3.side3 W.P.Ps W.P.ψs W.P.Zs :=
+theorem df1_fc_eq_side3 (W : _root_.GlobalTheory.MiS.RealPackAlt ex)
+    : (W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Df1
+      = W.P.A3.side3 W.P.Ps W.P.ψs W.P.Zs :=
   congrArg (W.P.A3.side3 W.P.Ps W.P.ψs) W.Q.zs
-theorem exists_word_heq_of_mem_dc (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (m : (W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Dc.Mem) : ∃ u, HEq m (W.P.I.wU u) := by
-  obtain ⟨m', hm⟩ := cols_mem (_root_.GlobalTheory.MiTop.AtReal.df1_fc_eq_side3 W) (_root_.GlobalTheory.MiTop.AtReal.dc_heq_alt W) m
+theorem exists_word_heq_of_mem_dc
+    (W : _root_.GlobalTheory.MiS.RealPackAlt ex)
+    (m : (W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Dc.Mem)
+    : ∃ u, HEq m (W.P.I.wU u) := by
+  obtain ⟨m', hm⟩ :=
+    cols_mem (_root_.GlobalTheory.MiTop.AtReal.df1_fc_eq_side3 W)
+      (_root_.GlobalTheory.MiTop.AtReal.dc_heq_alt W) m
   refine ⟨W.Q.wdD m', ?_⟩
-  rw [W.Q.wU_wdD]; exact hm
+  rw [W.Q.wU_wdD]
+  exact hm
 end GlobalTheory.MiTop.AtReal
 namespace GlobalTheory.MiTop.AtReal
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Yd : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Yd cX}
-theorem anchor_word_alt (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (z : GA D (D.sp.Y 0)) (u : D.what₂.Word) (d : _root_.GlobalTheory.MiTop.BottomData W u) (v : (W.Q.Rl.MY 0).Vec)
-    (U : D.what₂.Mu u →ₗ[ℂ] D.what₂.Mu u) (r : ℝ) (c : W.P.T → ℂ) (hR : _root_.GlobalTheory.MiTop.BottomRelation W z d)
-    (hA : (∀ φ, ∃ C, _root_.GlobalTheory.MiTop.IsColumnForm W u C φ) ∧ (∀ T ∈ _root_.GlobalTheory.MiTop.BaseRowSpace W, ∀ C, ∃ b, _root_.GlobalTheory.MiTop.IsPairing' W u (z * (show GA D (D.sp.Y 0) from W.Q.tS)) (T (PiTensorProduct.tprod ℂ v)) C b) ∧ ∃ (φ : D.what₂.Mu u) (C : _) (b : ℂ), ∃ T ∈ _root_.GlobalTheory.MiTop.BaseRowSpace W, _root_.GlobalTheory.MiTop.IsColumnForm W u C φ ∧ _root_.GlobalTheory.MiTop.IsPairing' W u (z * (show GA D (D.sp.Y 0) from W.Q.tS)) (T (PiTensorProduct.tprod ℂ v)) C b ∧ b ≠ 0)
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Yd : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Yd cX}
+theorem anchor_word_alt
+    (W : _root_.GlobalTheory.MiS.RealPackAlt ex)
+    (z : GA D (D.sp.Y 0))
+    (u : D.what₂.Word) (d : _root_.GlobalTheory.MiTop.BottomData W u)
+    (v : (W.Q.Rl.MY 0).Vec) (U : D.what₂.Mu u →ₗ[ℂ] D.what₂.Mu u) (r : ℝ) (c : W.P.T → ℂ)
+    (hR : _root_.GlobalTheory.MiTop.BottomRelation W z d)
+    (hA : (∀ φ, ∃ C, _root_.GlobalTheory.MiTop.IsColumnForm W u C φ)
+      ∧ (∀ T ∈ _root_.GlobalTheory.MiTop.BaseRowSpace W, ∀ C, ∃ b,
+        _root_.GlobalTheory.MiTop.IsPairing' W u (z * (show GA D (D.sp.Y 0) from W.Q.tS))
+          (T (PiTensorProduct.tprod ℂ v)) C b)
+      ∧ ∃ (φ : D.what₂.Mu u) (C : _) (b : ℂ), ∃ T ∈ _root_.GlobalTheory.MiTop.BaseRowSpace W,
+        _root_.GlobalTheory.MiTop.IsColumnForm W u C φ
+          ∧ _root_.GlobalTheory.MiTop.IsPairing' W u (z * (show GA D (D.sp.Y 0) from W.Q.tS))
+            (T (PiTensorProduct.tprod ℂ v)) C b
+          ∧ b ≠ 0)
     (hr : 0 < r) (hU : ∀ φ, ‖U φ‖ = r * ‖φ‖) (hRel : d.Rel U c)
-    (hrow : ∀ t (F : Fin ((W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Df1.nV t) → D.what₂.LL), _root_.GlobalTheory.MiTop.rowFormOfTuple W t F ∈ _root_.GlobalTheory.MiTop.BaseRowSpace W) :
-    ∃ (R : D.what₂.Mu u ≃ₗᵢ[ℂ] D.what₂.Mu u) (p b₀ : ℂ), p ≠ 0 ∧ b₀ ≠ 0 ∧
-      ∀ t (φ : D.what₂.Mu u) (F : Fin ((W.P.A3.side3 W.P.Ps W.P.ψs W.P.Zs).nV t) → D.what₂.LL)
-        (F' : Fin ((W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Df1.nV t) → D.what₂.LL), HEq F F' → ∀ C b, _root_.GlobalTheory.MiTop.IsColumnForm W u C (R (U φ)) →
-        _root_.GlobalTheory.MiTop.IsPairing' W u (z * (show GA D (D.sp.Y 0) from W.Q.tS)) (_root_.GlobalTheory.MiTop.rowFormOfTuple W t F' (PiTensorProduct.tprod ℂ v)) C b →
-        c t * D.what₂.perCol u (W.P.I.tup t) φ (W.P.I.jA t ((rV0 D W.P.A3.A W.P.Ps W.P.ψs t).mulVec F)) * b₀ = p * b := by
+    (hrow : ∀ t
+        (F : Fin ((W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Df1.nV t)
+          → D.what₂.LL),
+      _root_.GlobalTheory.MiTop.rowFormOfTuple W t F ∈ _root_.GlobalTheory.MiTop.BaseRowSpace W)
+    : ∃ (R : D.what₂.Mu u ≃ₗᵢ[ℂ] D.what₂.Mu u) (p b₀ : ℂ),
+      p ≠ 0 ∧ b₀ ≠ 0
+        ∧ ∀ t (φ : D.what₂.Mu u) (F : Fin ((W.P.A3.side3 W.P.Ps W.P.ψs W.P.Zs).nV t) → D.what₂.LL)
+            (F' : Fin ((W.Q.F.fc (_root_.GlobalTheory.MiS.packageCoefficientSpace W).zs).Df1.nV t)
+              → D.what₂.LL),
+          HEq F F'
+            → ∀ C b,
+              _root_.GlobalTheory.MiTop.IsColumnForm W u C (R (U φ))
+                → _root_.GlobalTheory.MiTop.IsPairing' W u (z * (show GA D (D.sp.Y 0) from W.Q.tS))
+                  (_root_.GlobalTheory.MiTop.rowFormOfTuple W t F' (PiTensorProduct.tprod ℂ v)) C b
+                → c t
+                    * D.what₂.perCol u (W.P.I.tup t) φ
+                      (W.P.I.jA t ((rV0 D W.P.A3.A W.P.Ps W.P.ψs t).mulVec F))
+                    * b₀
+                  = p * b := by
   obtain ⟨R, hR⟩ := hR
   obtain ⟨-, -, φ₁, C₀, b₀, T₀, hT₀, hC₀, hP₀, hb₀⟩ := hA
   have hinj : Function.Injective U := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro φ h
     have h1 := hU φ
     rw [h, norm_zero] at h1
     exact norm_eq_zero.1 ((mul_eq_zero.1 h1.symm).resolve_left hr.ne')
   obtain ⟨φ₀, hφ₀⟩ := LinearMap.injective_iff_surjective.1 hinj (R.symm φ₁)
-  have hC₁ : _root_.GlobalTheory.MiTop.IsColumnForm W u C₀ (R (U φ₀)) := by rw [hφ₀, LinearIsometryEquiv.apply_symm_apply]; exact hC₀
+  have hC₁ : _root_.GlobalTheory.MiTop.IsColumnForm W u C₀ (R (U φ₀)) := by
+    rw [hφ₀, LinearIsometryEquiv.apply_symm_apply]; exact hC₀
   obtain ⟨p, hp⟩ := hRel T₀ hT₀
   refine ⟨R, p φ₀, b₀, fun h0 => hb₀ ?_, hb₀, fun t φ F F' hF C b hC hb => ?_⟩
-  · obtain ⟨F, hF⟩ := heq_fin' (α := D.what₂.LL)
-      (congrArg (fun Df => DefSide.nV Df W.P.A3.A.μ0) (_root_.GlobalTheory.MiTop.AtReal.df1_fc_eq_side3 W)).symm (fun _ => 0)
+  · obtain ⟨F, hF⟩ :=
+      heq_fin' (α := D.what₂.LL)
+        (congrArg
+          (fun Df => DefSide.nV Df W.P.A3.A.μ0)
+          (_root_.GlobalTheory.MiTop.AtReal.df1_fc_eq_side3 W)).symm
+        (fun _ => 0)
     have h1 := hp φ₀ φ₀ W.P.A3.A.μ0 F _ hF 1 0 (by rw [h0, mul_zero, zero_mul, add_zero])
-    have h2 := hR (U φ₀) (U φ₀) T₀ hT₀ T₀ hT₀ 1 0
-      (fun y w => by have h3 := h1 y w; rw [zero_mul] at h3 ⊢; exact h3) _ C₀ C₀ b₀ b₀ hC₁ hC₁ hP₀ hP₀
+    have h2 :=
+      hR (U φ₀) (U φ₀) T₀ hT₀ T₀ hT₀ 1 0
+        (fun y w => by have h3 := h1 y w; rw [zero_mul] at h3 ⊢; exact h3)
+        _ C₀ C₀ b₀ b₀ hC₁ hC₁ hP₀ hP₀
     rwa [one_mul, zero_mul, add_zero] at h2
-  · have h1 := hp φ₀ φ t F F' hF
-      (c t * D.what₂.perCol u (W.P.I.tup t) φ (W.P.I.jA t ((rV0 D W.P.A3.A W.P.Ps W.P.ψs t).mulVec F))) (-p φ₀) (by ring)
+  · have h1 :=
+      hp φ₀ φ t F F' hF
+        (c t * D.what₂.perCol u (W.P.I.tup t) φ
+          (W.P.I.jA t ((rV0 D W.P.A3.A W.P.Ps W.P.ψs t).mulVec F)))
+        (- p φ₀) (by ring)
     have h2 := hR (U φ₀) (U φ) T₀ hT₀ _ (hrow t F') _ _ h1 _ C₀ C b₀ b hC₁ hC hP₀ hb
     linear_combination h2
 end GlobalTheory.MiTop.AtReal

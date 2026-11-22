@@ -10,10 +10,11 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem mem_hiUnits_sup_sqs_of_even {K : Type} [Field K] (w : Valuation K ℤᵐ⁰) (p : Kˣ)
-    (hp : w (p : K) = WithZero.exp (-1)) (x : Kˣ) (m : ℤ)
-    (hx : w (x : K) = WithZero.exp (2 * m)) :
-    x ∈ hiUnits w 0 ⊔ sqs (⊤ : Subgroup Kˣ) := by
+theorem mem_hiUnits_sup_sqs_of_even
+    {K : Type} [Field K]
+    (w : Valuation K ℤᵐ⁰) (p : Kˣ) (hp : w (p : K) = WithZero.exp (-1))
+    (x : Kˣ) (m : ℤ) (hx : w (x : K) = WithZero.exp (2 * m))
+    : x ∈ hiUnits w 0 ⊔ sqs (⊤ : Subgroup Kˣ) := by
   have h1 : w ((x * (p ^ m) ^ 2 : Kˣ) : K) = 1 := by
     rw [Units.val_mul, Units.val_pow_eq_pow_val, Units.val_zpow_eq_zpow_val, map_mul, map_pow,
       map_zpow₀, hx, hp, ← WithZero.exp_zsmul, ← WithZero.exp_nsmul, ← WithZero.exp_add,
@@ -31,10 +32,11 @@ theorem mem_hiUnits_sup_sqs_of_even {K : Type} [Field K] (w : Valuation K ℤᵐ
   rw [this]
   exact Subgroup.mul_mem_sup hU hS
 
-theorem index_sqs_top_le : ∀ (K : Type) [Field K] (w : Valuation K ℤᵐ⁰) (π : K),
-    w π = WithZero.exp (-1) → (sqs (hiUnits w 0)).relIndex (hiUnits w 0) ≠ 0 →
-    (sqs (⊤ : Subgroup Kˣ)).index ≠ 0 ∧
-      (sqs (⊤ : Subgroup Kˣ)).index ≤ 2 * (sqs (hiUnits w 0)).relIndex (hiUnits w 0) := by
+theorem index_sqs_top_le
+    : ∀ (K : Type) [Field K] (w : Valuation K ℤᵐ⁰) (π : K),
+      w π = WithZero.exp (-1) → (sqs (hiUnits w 0)).relIndex (hiUnits w 0) ≠ 0
+        → (sqs (⊤ : Subgroup Kˣ)).index ≠ 0
+          ∧ (sqs (⊤ : Subgroup Kˣ)).index ≤ 2 * (sqs (hiUnits w 0)).relIndex (hiUnits w 0) := by
   intro K _ w π hπ h0
   have hπ0 : π ≠ 0 := by
     rintro rfl
@@ -53,8 +55,9 @@ theorem index_sqs_top_le : ∀ (K : Type) [Field K] (w : Valuation K ℤᵐ⁰) 
       rw [Units.val_mul, map_mul, hb', hm, Units.val_mk0, hπ, ← WithZero.exp_add]
       congr 1
       ring
-  have hmul := Subgroup.relIndex_mul_index
-    (le_sup_right : sqs (⊤ : Subgroup Kˣ) ≤ hiUnits w 0 ⊔ sqs (⊤ : Subgroup Kˣ))
+  have hmul :=
+    Subgroup.relIndex_mul_index
+      (le_sup_right : sqs (⊤ : Subgroup Kˣ) ≤ hiUnits w 0 ⊔ sqs (⊤ : Subgroup Kˣ))
   rw [Subgroup.relIndex_sup_right] at hmul
   have hle : sqs (hiUnits w 0) ≤ sqs (⊤ : Subgroup Kˣ) := Subgroup.map_mono le_top
   have hd2 := Subgroup.relIndex_dvd_of_le_left (hiUnits w 0) hle

@@ -14,23 +14,26 @@ namespace CrystallineSemistableComparison.Pb
 
 variable {K : Type} [Field K] {R : Type} [CommRing R] [Algebra K R] {n : ℕ}
 
-def fldF (K : Type) [Field K] {R : Type} [CommRing R] [IsDomain R] [Algebra K R] {d : ℕ} (t : Fin d → Rˣ) :
-    IntermediateField K (FractionRing R) :=
+def fldF
+    (K : Type) [Field K] {R : Type} [CommRing R] [IsDomain R] [Algebra K R] {d : ℕ} (t : Fin d → Rˣ)
+    : IntermediateField K (FractionRing R) :=
   IntermediateField.adjoin K (Set.range fun k => algebraMap R (FractionRing R) (t k : R))
 
-theorem ra_tpow_add {d : ℕ} (t : Fin d → Rˣ) (m m' : Fin d → ℤ) : tpow t (m + m') = tpow t m * tpow t m' := by
+theorem ra_tpow_add {d : ℕ} (t : Fin d → Rˣ) (m m' : Fin d → ℤ)
+    : tpow t (m + m') = tpow t m * tpow t m' := by
   simp only [tpow, Pi.add_apply, zpow_add, Finset.prod_mul_distrib, Units.val_mul]
 
-theorem ra_tpow_zero {d : ℕ} (t : Fin d → Rˣ) : tpow t 0 = 1 := by
-  simp [tpow]
+theorem ra_tpow_zero {d : ℕ} (t : Fin d → Rˣ) : tpow t 0 = 1 := by simp [tpow]
 
-theorem ra_tpow_single {d : ℕ} (t : Fin d → Rˣ) (k : Fin d) (z : ℤ) : tpow t (Pi.single k z) = ((t k ^ z : Rˣ) : R) := by
+theorem ra_tpow_single {d : ℕ} (t : Fin d → Rˣ) (k : Fin d) (z : ℤ)
+    : tpow t (Pi.single k z) = ((t k ^ z : Rˣ) : R) := by
   unfold tpow
   rw [Finset.prod_eq_single k (fun j _ hj => by simp [Pi.single_apply, hj]) (by simp)]
   simp
 
-theorem ra_expS_add {d : ℕ} (S : Finset (Fin (d + 1))) (m m' : Fin d → ℤ) (hm : m ∈ expS S) (hm' : m' ∈ expS S) :
-    m + m' ∈ expS S := by
+theorem ra_expS_add
+    {d : ℕ} (S : Finset (Fin (d + 1))) (m m' : Fin d → ℤ) (hm : m ∈ expS S) (hm' : m' ∈ expS S)
+    : m + m' ∈ expS S := by
   refine ⟨fun k hk => ?_, fun h0 => ?_⟩
   · simpa using add_nonneg (hm.1 k hk) (hm'.1 k hk)
   · simp only [Pi.add_apply, Finset.sum_add_distrib]
@@ -39,19 +42,19 @@ theorem ra_expS_add {d : ℕ} (S : Finset (Fin (d + 1))) (m m' : Fin d → ℤ) 
 theorem ra_zero_mem_expS {d : ℕ} (S : Finset (Fin (d + 1))) : (0 : Fin d → ℤ) ∈ expS S :=
   ⟨fun _ _ => le_rfl, fun _ => by simp⟩
 
-theorem ra_tpow_single_pow {d : ℕ} (t : Fin d → Rˣ) (k : Fin d) (z : ℤ) (N : ℕ) :
-    tpow t (Pi.single k z) ^ N = tpow t (Pi.single k (z * N)) := by
+theorem ra_tpow_single_pow {d : ℕ} (t : Fin d → Rˣ) (k : Fin d) (z : ℤ) (N : ℕ)
+    : tpow t (Pi.single k z) ^ N = tpow t (Pi.single k (z * N)) := by
   rw [ra_tpow_single, ra_tpow_single, ← Units.val_pow_eq_pow_val, ← zpow_natCast, ← zpow_mul]
 
-theorem ra_prod_pow {d : ℕ} (t : Fin d → Rˣ) (e : Fin d → ℕ) :
-    ∏ j, (t j : R) ^ (e j) = tpow t (fun j => (e j : ℤ)) := by
+theorem ra_prod_pow {d : ℕ} (t : Fin d → Rˣ) (e : Fin d → ℕ)
+    : ∏ j, (t j : R) ^ (e j) = tpow t (fun j => (e j : ℤ)) := by
   unfold tpow
   rw [Units.coe_prod]
   refine Finset.prod_congr rfl fun j _ => ?_
   rw [zpow_natCast, Units.val_pow_eq_pow_val]
 
-theorem ra_torusS_le_span (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2))) :
-    ∀ x ∈ torusS K t S, x ∈ Submodule.span K (tpow t '' expS S) := by
+theorem ra_torusS_le_span (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2)))
+    : ∀ x ∈ torusS K t S, x ∈ Submodule.span K (tpow t '' expS S) := by
   intro x hx
   have hx' : x ∈ Subalgebra.toSubmodule (torusS K t S) := hx
   rw [torusS, Algebra.adjoin_eq_span] at hx'
@@ -64,43 +67,52 @@ theorem ra_torusS_le_span (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2))) :
     obtain ⟨m', hm', rfl⟩ := hz
     exact ⟨m + m', ra_expS_add S m m' hm hm', ra_tpow_add t m m'⟩
 
-theorem tpow_mem_torusS (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2))) (m : Fin (n + 1) → ℤ) (hm : m ∈ expS S) :
-    tpow t m ∈ torusS K t S :=
+theorem tpow_mem_torusS
+    (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2))) (m : Fin (n + 1) → ℤ) (hm : m ∈ expS S)
+    : tpow t m ∈ torusS K t S :=
   Algebra.subset_adjoin ⟨m, hm, rfl⟩
 
-theorem t_mem_torusS (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2))) (hS : (0 : Fin (n + 2)) ∈ S) (k : Fin (n + 1)) :
-    (t k : R) ∈ torusS K t S := by
-  have h := tpow_mem_torusS (K := K) t S (Pi.single k 1) ⟨fun j _ => by
-    rw [Pi.single_apply]; split_ifs <;> norm_num, fun h => absurd hS h⟩
+theorem t_mem_torusS
+    (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2))) (hS : (0 : Fin (n + 2)) ∈ S) (k : Fin (n + 1))
+    : (t k : R) ∈ torusS K t S := by
+  have h :=
+    tpow_mem_torusS (K := K) t S (Pi.single k 1)
+      ⟨fun j _ => by rw [Pi.single_apply]; split_ifs <;> norm_num, fun h => absurd hS h⟩
   rwa [ra_tpow_single, zpow_one] at h
 
-theorem torusS_loc (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun k => (t k : R)) (S : Finset (Fin (n + 2)))
-    (hS : (0 : Fin (n + 2)) ∈ S) :
-    Function.Injective (MvPolynomial.aeval (fun k => (⟨t k, t_mem_torusS t S hS k⟩ : torusS K t S)) :
-      MvPolynomial (Fin (n + 1)) K →ₐ[K] torusS K t S) ∧
-    ∀ a : torusS K t S, ∃ f g : MvPolynomial (Fin (n + 1)) K,
-      IsUnit (MvPolynomial.aeval (fun k => (⟨t k, t_mem_torusS t S hS k⟩ : torusS K t S)) g) ∧
-      a * MvPolynomial.aeval (fun k => (⟨t k, t_mem_torusS t S hS k⟩ : torusS K t S)) g =
-        MvPolynomial.aeval (fun k => (⟨t k, t_mem_torusS t S hS k⟩ : torusS K t S)) f := by
+theorem torusS_loc
+    (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun k => (t k : R))
+    (S : Finset (Fin (n + 2))) (hS : (0 : Fin (n + 2)) ∈ S)
+    : Function.Injective
+        (MvPolynomial.aeval (fun k => (⟨t k, t_mem_torusS t S hS k⟩ : torusS K t S))
+          : MvPolynomial (Fin (n + 1)) K →ₐ[K] torusS K t S)
+      ∧ ∀ a : torusS K t S, ∃ f g : MvPolynomial (Fin (n + 1)) K,
+        IsUnit (MvPolynomial.aeval (fun k => (⟨t k, t_mem_torusS t S hS k⟩ : torusS K t S)) g)
+          ∧ a * MvPolynomial.aeval (fun k => (⟨t k, t_mem_torusS t S hS k⟩ : torusS K t S)) g
+            = MvPolynomial.aeval (fun k => (⟨t k, t_mem_torusS t S hS k⟩ : torusS K t S)) f := by
   classical
   set u : Fin (n + 1) → torusS K t S := fun k => ⟨t k, t_mem_torusS t S hS k⟩ with hu
-  have hval : ∀ p : MvPolynomial (Fin (n + 1)) K,
-      ((MvPolynomial.aeval u p : torusS K t S) : R) = MvPolynomial.aeval (fun k => (t k : R)) p := fun p => by
+  have hval
+      : ∀ p : MvPolynomial (Fin (n + 1)) K,
+        ((MvPolynomial.aeval u p : torusS K t S) : R)
+          = MvPolynomial.aeval (fun k => (t k : R)) p := fun p => by
     induction p using MvPolynomial.induction_on with
     | C c => simp
     | add p q hp hq => simp only [map_add (f := _), Subalgebra.coe_add, hp, hq]
     | mul_X p k hp => simp only [map_mul, Subalgebra.coe_mul, hp, MvPolynomial.aeval_X]; rfl
   have hinj := algebraicIndependent_iff_injective_aeval.mp ht
   refine ⟨fun p q h => hinj (by rw [← hval, ← hval, h]), fun a => ?_⟩
-  have key : ∀ x (hx : x ∈ torusS K t S), ∃ f g : MvPolynomial (Fin (n + 1)) K,
-      IsUnit (MvPolynomial.aeval u g) ∧
-        x * MvPolynomial.aeval (fun k => (t k : R)) g = MvPolynomial.aeval (fun k => (t k : R)) f := by
+  have key
+      : ∀ x (hx : x ∈ torusS K t S), ∃ f g : MvPolynomial (Fin (n + 1)) K,
+        IsUnit (MvPolynomial.aeval u g)
+          ∧ x * MvPolynomial.aeval (fun k => (t k : R)) g
+            = MvPolynomial.aeval (fun k => (t k : R)) f := by
     intro x hx
     induction hx using Algebra.adjoin_induction with
     | mem x hx =>
       obtain ⟨m, hm, rfl⟩ := hx
       refine ⟨∏ j, MvPolynomial.X j ^ (m j).toNat, ∏ j, MvPolynomial.X j ^ (-m j).toNat, ?_, ?_⟩
-      · have hmem : (fun j => -((-m j).toNat : ℤ)) ∈ expS S := by
+      · have hmem : (fun j => -((- m j).toNat : ℤ)) ∈ expS S := by
           refine ⟨fun i hi => ?_, fun h0 => ?_⟩
           · have := hm.1 i hi
             simp only [neg_nonneg, Nat.cast_nonpos]
@@ -138,15 +150,23 @@ theorem torusS_loc (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun k 
   obtain ⟨f, g, hg, hfg⟩ := key a a.2
   exact ⟨f, g, hg, Subtype.ext (by rw [Subalgebra.coe_mul, hval, hval]; exact hfg)⟩
 
-theorem torusS_frac [IsDomain R] (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2))) (hS : S.Nonempty) (k : Fin (n + 1)) :
-    ∃ a' ∈ torusS K t S, a' ≠ 0 ∧ (t k : R) * a' ∈ torusS K t S := by
+theorem torusS_frac
+    [IsDomain R]
+    (t : Fin (n + 1) → Rˣ)
+    (S : Finset (Fin (n + 2))) (hS : S.Nonempty)
+    (k : Fin (n + 1))
+    : ∃ a' ∈ torusS K t S, a' ≠ 0 ∧ (t k : R) * a' ∈ torusS K t S := by
   classical
   by_cases h0 : (0 : Fin (n + 2)) ∈ S
   · exact ⟨1, one_mem _, one_ne_zero, by rw [mul_one]; exact t_mem_torusS t S h0 k⟩
   · obtain ⟨s, hs⟩ := hS
     obtain ⟨j, rfl⟩ : ∃ j : Fin (n + 1), j.succ = s := Fin.exists_succ_eq.mpr fun h => h0 (h ▸ hs)
-    refine ⟨tpow t (Pi.single j (-1)), tpow_mem_torusS t S _ ⟨fun i hi => ?_, fun _ => ?_⟩,
-      by unfold tpow; exact Units.ne_zero _, ?_⟩
+    refine ⟨
+      tpow t (Pi.single j (-1)),
+      tpow_mem_torusS t S _ ⟨fun i hi => ?_, fun _ => ?_⟩,
+      by unfold tpow; exact Units.ne_zero _,
+      ?_
+    ⟩
     · rw [Pi.single_apply]
       split_ifs with h
       · subst h; exact absurd hs hi
@@ -161,8 +181,9 @@ theorem torusS_frac [IsDomain R] (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n +
         split_ifs <;> norm_num
       · simp [Finset.sum_add_distrib]
 
-theorem torusS_succ_span (t : Fin (n + 1) → Rˣ) (k : Fin (n + 1)) :
-    ∀ x ∈ torusS K t (Finset.univ.erase k.succ), x ∈ Submodule.span K (tpow t '' {m | m ≠ fun _ => -1}) := by
+theorem torusS_succ_span (t : Fin (n + 1) → Rˣ) (k : Fin (n + 1))
+    : ∀ x ∈ torusS K t (Finset.univ.erase k.succ),
+      x ∈ Submodule.span K (tpow t '' {m | m ≠ fun _ => -1}) := by
   intro x hx
   have hsub : expS (Finset.univ.erase k.succ) ⊆ {m | m ≠ fun _ => -1} := by
     intro m hm h
@@ -171,18 +192,22 @@ theorem torusS_succ_span (t : Fin (n + 1) → Rˣ) (k : Fin (n + 1)) :
     norm_num at this
   exact Submodule.span_mono (Set.image_mono hsub) (ra_torusS_le_span t _ x hx)
 
-theorem torus_scale [IsDomain R] (t : Fin (n + 1) → Rˣ) (i : Fin (n + 2)) :
-    ∃ w ∈ torusS K t (Finset.univ.erase i), w ≠ 0 ∧
-      ∀ x ∈ torusS K t Finset.univ, ∃ N : ℕ, w ^ N * x ∈ torusS K t (Finset.univ.erase i) := by
+theorem torus_scale [IsDomain R] (t : Fin (n + 1) → Rˣ) (i : Fin (n + 2))
+    : ∃ w ∈ torusS K t (Finset.univ.erase i),
+      w ≠ 0
+        ∧ ∀ x ∈ torusS K t Finset.univ, ∃ N : ℕ, w ^ N * x ∈ torusS K t (Finset.univ.erase i) := by
   classical
-  have hscale : ∀ (A : Subalgebra K R) (w : R), w ∈ A → (∀ m, ∃ N : ℕ, w ^ N * tpow t m ∈ A) →
-      ∀ x ∈ torusS K t Finset.univ, ∃ N : ℕ, w ^ N * x ∈ A := by
+  have hscale
+      : ∀ (A : Subalgebra K R) (w : R),
+        w ∈ A → (∀ m, ∃ N : ℕ, w ^ N * tpow t m ∈ A)
+          → ∀ x ∈ torusS K t Finset.univ, ∃ N : ℕ, w ^ N * x ∈ A := by
     intro A w hw hgen x hx
     induction hx using Algebra.adjoin_induction with
     | mem x hx =>
       obtain ⟨m, _, rfl⟩ := hx
       exact hgen m
-    | algebraMap c => exact ⟨0, by simpa using A.algebraMap_mem c⟩
+    | algebraMap c =>
+      exact ⟨0, by simpa using A.algebraMap_mem c⟩
     | add x y _ _ hx hy =>
       obtain ⟨N1, h1⟩ := hx
       obtain ⟨N2, h2⟩ := hy
@@ -197,17 +222,24 @@ theorem torus_scale [IsDomain R] (t : Fin (n + 1) → Rˣ) (i : Fin (n + 2)) :
       have : w ^ (N1 + N2) * (x * y) = (w ^ N1 * x) * (w ^ N2 * y) := by ring
       rw [this]
       exact mul_mem h1 h2
-  have hne : ∀ z : ℤ, ∀ k, tpow t (Pi.single k z) ≠ 0 := fun z k => by unfold tpow; exact Units.ne_zero _
+  have hne : ∀ z : ℤ, ∀ k, tpow t (Pi.single k z) ≠ 0 := fun z k => by
+    unfold tpow; exact Units.ne_zero _
   induction i using Fin.cases with
   | zero =>
     have hS : ∀ i : Fin (n + 1), i.succ ∈ Finset.univ.erase (0 : Fin (n + 2)) := fun i =>
       Finset.mem_erase.mpr ⟨Fin.succ_ne_zero i, Finset.mem_univ _⟩
-    refine ⟨tpow t (Pi.single 0 (-1)), tpow_mem_torusS t _ _ ⟨fun i hi => absurd (hS i) hi, fun _ => by simp⟩,
-      hne _ _, hscale _ _ (tpow_mem_torusS t _ _ ⟨fun i hi => absurd (hS i) hi, fun _ => by simp⟩) fun m => ?_⟩
+    refine ⟨
+      tpow t (Pi.single 0 (-1)),
+      tpow_mem_torusS t _ _ ⟨fun i hi => absurd (hS i) hi, fun _ => by simp⟩,
+      hne _ _,
+      hscale _ _ (tpow_mem_torusS t _ _ ⟨fun i hi => absurd (hS i) hi, fun _ => by simp⟩) fun m =>
+        ?_
+    ⟩
     refine ⟨(∑ k, m k).toNat, ?_⟩
     rw [ra_tpow_single_pow, ← ra_tpow_add]
     refine tpow_mem_torusS t _ _ ⟨fun i hi => absurd (hS i) hi, fun _ => ?_⟩
-    simp only [Pi.add_apply, Finset.sum_add_distrib, Finset.sum_pi_single', Finset.mem_univ, if_true]
+    simp only [Pi.add_apply, Finset.sum_add_distrib, Finset.sum_pi_single', Finset.mem_univ,
+      if_true]
     omega
   | succ k =>
     have h0 : (0 : Fin (n + 2)) ∈ Finset.univ.erase k.succ :=
@@ -218,32 +250,38 @@ theorem torus_scale [IsDomain R] (t : Fin (n + 1) → Rˣ) (i : Fin (n + 2)) :
     have hw : tpow t (Pi.single k 1) ∈ torusS K t (Finset.univ.erase k.succ) := by
       rw [ra_tpow_single, zpow_one]
       exact t_mem_torusS t _ h0 k
-    refine ⟨tpow t (Pi.single k 1), hw, hne _ _, hscale _ _ hw fun m => ⟨(-m k).toNat, ?_⟩⟩
+    refine ⟨tpow t (Pi.single k 1), hw, hne _ _, hscale _ _ hw fun m => ⟨(- m k).toNat, ?_⟩⟩
     rw [ra_tpow_single_pow, ← ra_tpow_add]
     refine tpow_mem_torusS t _ _ ⟨fun i hi => ?_, fun h => absurd h0 h⟩
     obtain rfl := hk i hi
     simp only [Pi.add_apply, Pi.single_eq_same]
     omega
 
-theorem prod_inv_mem (t : Fin (n + 1) → Rˣ) :
-    (((∏ k, t k)⁻¹ : Rˣ) : R) ∈ torusS K t Finset.univ := by
-  have h := tpow_mem_torusS (K := K) t Finset.univ (fun _ => -1) ⟨fun k hk => absurd (Finset.mem_univ _) hk,
-    fun h => absurd (Finset.mem_univ _) h⟩
+theorem prod_inv_mem (t : Fin (n + 1) → Rˣ)
+    : (((∏ k, t k)⁻¹ : Rˣ) : R) ∈ torusS K t Finset.univ := by
+  have h :=
+    tpow_mem_torusS (K := K) t Finset.univ
+      (fun _ => -1)
+      ⟨fun k hk => absurd (Finset.mem_univ _) hk, fun h => absurd (Finset.mem_univ _) h⟩
   rwa [tpow, Finset.prod_congr rfl (fun k _ => zpow_neg_one (t k)), Finset.prod_inv_distrib] at h
 
-theorem torusS_le_univ (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2))) :
-    torusS K t S ≤ torusS K t Finset.univ :=
-  Algebra.adjoin_mono (Set.image_mono fun m _ => ⟨fun k hk => absurd (Finset.mem_univ _) hk,
-    fun h => absurd (Finset.mem_univ _) h⟩)
+theorem torusS_le_univ (t : Fin (n + 1) → Rˣ) (S : Finset (Fin (n + 2)))
+    : torusS K t S ≤ torusS K t Finset.univ :=
+  Algebra.adjoin_mono (Set.image_mono fun m _ =>
+    ⟨fun k hk => absurd (Finset.mem_univ _) hk, fun h => absurd (Finset.mem_univ _) h⟩)
 
-theorem inv_mem_univ (t : Fin (n + 1) → Rˣ) (k : Fin (n + 1)) :
-    (((t k)⁻¹ : Rˣ) : R) ∈ torusS K t Finset.univ := by
-  have h := tpow_mem_torusS (K := K) t Finset.univ (Pi.single k (-1)) ⟨fun k hk => absurd (Finset.mem_univ _) hk,
-    fun h => absurd (Finset.mem_univ _) h⟩
+theorem inv_mem_univ (t : Fin (n + 1) → Rˣ) (k : Fin (n + 1))
+    : (((t k)⁻¹ : Rˣ) : R) ∈ torusS K t Finset.univ := by
+  have h :=
+    tpow_mem_torusS (K := K) t Finset.univ (Pi.single k (-1))
+      ⟨fun k hk => absurd (Finset.mem_univ _) hk, fun h => absurd (Finset.mem_univ _) h⟩
   rwa [ra_tpow_single, zpow_neg_one] at h
 
-theorem jacS_mono {d m : ℕ} (B B' : Subalgebra K R) (hB : B ≤ B') (D : Fin d → Derivation K R R) (κ : Fin m → Fin d) :
-    jacS B D κ ≤ jacS B' D κ :=
+theorem jacS_mono
+    {d m : ℕ}
+    (B B' : Subalgebra K R) (hB : B ≤ B')
+    (D : Fin d → Derivation K R R) (κ : Fin m → Fin d)
+    : jacS B D κ ≤ jacS B' D κ :=
   AddSubgroup.closure_mono fun _ ⟨b, bs, hy⟩ =>
     ⟨Subalgebra.inclusion hB b, fun l => Subalgebra.inclusion hB (bs l), hy⟩
 

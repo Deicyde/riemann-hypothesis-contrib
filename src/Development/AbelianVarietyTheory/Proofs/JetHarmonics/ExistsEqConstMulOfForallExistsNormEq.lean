@@ -9,10 +9,12 @@ namespace GlobalTheory
 
 open Metric Set Filter Topology
 
-theorem exists_eventually_eq_mul_of_norm_eq {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
-    {O : Set V} (hO : IsOpen O) {P Q : V → ℂ} (hP : DifferentiableOn ℂ P O) (hQ : DifferentiableOn ℂ Q O)
-    {x : V} (hx : x ∈ O) (h : ∀ᶠ y in 𝓝 x, ‖P y‖ = ‖Q y‖) :
-    ∃ z ∈ O, ∃ c : ℂ, ∀ᶠ y in 𝓝 z, P y = c * Q y := by
+theorem exists_eventually_eq_mul_of_norm_eq
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {O : Set V} (hO : IsOpen O)
+    {P Q : V → ℂ} (hP : DifferentiableOn ℂ P O) (hQ : DifferentiableOn ℂ Q O)
+    {x : V} (hx : x ∈ O) (h : ∀ᶠ y in 𝓝 x, ‖P y‖ = ‖Q y‖)
+    : ∃ z ∈ O, ∃ c : ℂ, ∀ᶠ y in 𝓝 z, P y = c * Q y := by
   by_cases h0 : ∀ᶠ y in 𝓝 x, Q y = 0
   · refine ⟨x, hx, 0, ?_⟩
     filter_upwards [h, h0] with y hy hy0
@@ -38,18 +40,22 @@ theorem exists_eventually_eq_mul_of_norm_eq {V : Type*} [NormedAddCommGroup V] [
       intro y hy
       show ‖P y / Q y‖ ≤ ‖P z / Q z‖
       rw [hn y hy, hn z (mem_ball_self hε)]
-    have hc := Complex.eqOn_of_isPreconnected_of_isMaxOn_norm (convex_ball z ε).isPreconnected
-      isOpen_ball hd (mem_ball_self hε) hmax
+    have hc :=
+      Complex.eqOn_of_isPreconnected_of_isMaxOn_norm (convex_ball z ε).isPreconnected isOpen_ball hd
+        (mem_ball_self hε) hmax
     refine ⟨z, hzO', P z / Q z, ?_⟩
     filter_upwards [ball_mem_nhds z hε] with y hy
     have e : P y / Q y = P z / Q z := hc hy
     rw [← e, div_mul_cancel₀ _ (hb y hy).2.1]
 
-theorem exists_eq_const_mul_of_forall_exists_norm_eq :
-    ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] (ι : Type) [Countable ι]
-      (O : Set V), IsOpen O → IsPreconnected O → O.Nonempty → ∀ (P : V → ℂ) (Q : ι → V → ℂ),
-      DifferentiableOn ℂ P O → (∀ i, DifferentiableOn ℂ (Q i) O) → (∀ x ∈ O, ∃ i, ‖P x‖ = ‖Q i x‖) →
-      ∃ (i : ι) (c : ℂ), ∀ x ∈ O, P x = c * Q i x := by
+theorem exists_eq_const_mul_of_forall_exists_norm_eq
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] (ι : Type)
+        [Countable ι] (O : Set V),
+      IsOpen O → IsPreconnected O → O.Nonempty
+        → ∀ (P : V → ℂ) (Q : ι → V → ℂ),
+          DifferentiableOn ℂ P O → (∀ i, DifferentiableOn ℂ (Q i) O)
+            → (∀ x ∈ O, ∃ i, ‖P x‖ = ‖Q i x‖)
+            → ∃ (i : ι) (c : ℂ), ∀ x ∈ O, P x = c * Q i x := by
   intro V _ _ _ ι _ O hO hc hne P Q hP hQ h
   haveI : CompleteSpace V := FiniteDimensional.complete ℂ V
   haveI : BaireSpace O := hO.baireSpace
@@ -68,8 +74,9 @@ theorem exists_eq_const_mul_of_forall_exists_norm_eq :
   obtain ⟨z, hz, c, hzc⟩ := exists_eventually_eq_mul_of_norm_eq hO hP (hQ i) x.2 hx2
   refine ⟨i, c, fun y hy => ?_⟩
   have hd : DifferentiableOn ℂ (fun y => P y - c * Q i y) O := hP.sub ((hQ i).const_mul c)
-  have := ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf.eq_zero_of_eventually hO hc hd hz
-    (by filter_upwards [hzc] with y hy; simp [hy]) y hy
+  have :=
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf.eq_zero_of_eventually hO hc hd hz
+      (by filter_upwards [hzc] with y hy; simp [hy]) y hy
   exact sub_eq_zero.mp this
 
 end GlobalTheory

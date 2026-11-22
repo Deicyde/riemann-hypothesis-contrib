@@ -10,8 +10,7 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW
 
-theorem block_map_reflect (R : Ranks) :
-    (block R).map (fun u => (R.t : ℤ) - 1 - u) = block R := by
+theorem block_map_reflect (R : Ranks) : (block R).map (fun u => (R.t : ℤ) - 1 - u) = block R := by
   have hnd : (block R).Nodup := by
     unfold block
     exact (Multiset.nodup_range R.t).map (fun a b h => by exact_mod_cast h)
@@ -34,9 +33,11 @@ theorem block_map_reflect (R : Ranks) :
     · rintro ⟨h0, h1⟩
       exact ⟨(R.t : ℤ) - 1 - x, by rw [hmem]; omega, by ring⟩
 
-theorem jR_symm_card {R : Ranks} (P : HCParam R) (j : Fin R.m) :
-    jR P j false = (jR P j true).map (fun u => (R.t : ℤ) - 1 - u) ∧ ∀ s, (jW P j s).card = R.r ∧
-      (jR P j s).card = R.nV ∧ (jT2 P j s).card = R.r ∧ jT2 P j s ≤ jT1 P j s := by
+theorem jR_symm_card {R : Ranks} (P : HCParam R) (j : Fin R.m)
+    : jR P j false = (jR P j true).map (fun u => (R.t : ℤ) - 1 - u)
+      ∧ ∀ s,
+        (jW P j s).card = R.r ∧ (jR P j s).card = R.nV ∧ (jT2 P j s).card = R.r
+          ∧ jT2 P j s ≤ jT1 P j s := by
   have hk : 1 ≤ R.k := by have := R.m_add_three_le_k; omega
   have hW : ∀ s, (jW P j s).card = R.r := by
     intro s
@@ -48,9 +49,11 @@ theorem jR_symm_card {R : Ranks} (P : HCParam R) (j : Fin R.m) :
     · simp only [jW, Bool.false_eq_true, if_false, Multiset.card_map, h]
     · simp only [jW, if_true, h]
   refine ⟨?_, fun s => ?_⟩
-  · simp only [jR, jW, if_true, Bool.false_eq_true, if_false, Multiset.map_add (f := _), block_map_reflect]
+  · simp only [jR, jW, if_true, Bool.false_eq_true, if_false, Multiset.map_add (f := _),
+      block_map_reflect]
   · have hR : (jR P j s).card = R.nV := by
-      simp only [jR, Multiset.card_add, hW s, block, Multiset.card_map, Multiset.card_range, Ranks.nV]
+      simp only [jR, Multiset.card_add, hW s, block, Multiset.card_map, Multiset.card_range,
+        Ranks.nV]
     refine ⟨hW s, hR, ?_, ?_⟩
     · simp only [jT2, Multiset.card_map, hW s]
     · unfold jT2 jT1 jR

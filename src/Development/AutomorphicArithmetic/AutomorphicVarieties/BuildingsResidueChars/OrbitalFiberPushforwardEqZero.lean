@@ -6,24 +6,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open MulAction
 
-theorem UpperTheory.orbitalFiber_pushforward_eq_zero :
-    UpperTheory.V.Z.Sym.Glob.Fib.PushZero := by
+theorem UpperTheory.orbitalFiber_pushforward_eq_zero : UpperTheory.V.Z.Sym.Glob.Fib.PushZero := by
   intro H Y _ _ H₀ k hidx htriv hk hfin
   classical
-  have hout : ∀ (o : orbitRel.Quotient H Y) (y : Y),
-      (Quotient.mk (orbitRel H Y) y : orbitRel.Quotient H Y) = o ↔ y ∈ orbit H o.out := by
+  have hout
+      : ∀ (o : orbitRel.Quotient H Y) (y : Y),
+        (Quotient.mk (orbitRel H Y) y : orbitRel.Quotient H Y) = o ↔ y ∈ orbit H o.out := by
     intro o y
     rw [← orbitRel_apply, ← Quotient.eq (r := orbitRel H Y), Quotient.out_eq]
   have hkeq : ∀ (x y : Y), y ∈ orbit H x → k y = k x := by
     rintro x y ⟨h, rfl⟩
     exact hk h x
   set S : Finset Y := hfin.toFinset with hS
-  have hmem : ∀ y, y ∈ S ↔ k y ≠ 0 := by
-    intro y; simp [hS]
+  have hmem : ∀ y, y ∈ S ↔ k y ≠ 0 := by intro y; simp [hS]
   let q : Y → orbitRel.Quotient H Y := fun y => Quotient.mk (orbitRel H Y) y
   have h1 : ∑ᶠ y, k y = ∑ y ∈ S, k y := finsum_eq_sum k hfin
-  have h2 : UpperTheory.V.Z.Sym.gq H₀ k =
-      ∑ o ∈ S.image q, k o.out / (H₀.relIndex (stabilizer H o.out) : ℂ) := by
+  have h2
+      : UpperTheory.V.Z.Sym.gq H₀ k
+        = ∑ o ∈ S.image q, k o.out / (H₀.relIndex (stabilizer H o.out) : ℂ) := by
     unfold UpperTheory.V.Z.Sym.gq
     apply finsum_eq_sum_of_support_subset
     intro o ho
@@ -32,8 +32,10 @@ theorem UpperTheory.orbitalFiber_pushforward_eq_zero :
       exact ho (by simp [h0])
     simp only [Finset.coe_image]
     exact ⟨o.out, by simpa [hmem] using hne, Quotient.out_eq o⟩
-  rw [h1, h2, ← Finset.sum_fiberwise_of_maps_to (s := S) (t := S.image q) (g := q)
-    (fun y hy => Finset.mem_image_of_mem q hy), Finset.sum_div]
+  rw [h1, h2,
+    ← Finset.sum_fiberwise_of_maps_to (s := S) (t := S.image q) (g := q)
+      (fun y hy => Finset.mem_image_of_mem q hy),
+    Finset.sum_div]
   refine Finset.sum_congr rfl fun o ho => ?_
   obtain ⟨y₀, hy₀, hy₀o⟩ := Finset.mem_image.mp ho
   have hne : k o.out ≠ 0 := by

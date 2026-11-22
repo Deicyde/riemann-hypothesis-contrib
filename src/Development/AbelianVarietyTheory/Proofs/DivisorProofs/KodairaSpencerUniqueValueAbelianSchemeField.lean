@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpenc
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open AlgebraicGeometry CategoryTheory GlobalTheory.DeRham GlobalTheory.Cris
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,41 +21,52 @@ namespace GlobalTheory.DeRham
 
 open GlobalTheory.Published GlobalTheory.Published.AbelianDeRham
 
-
 set_option maxHeartbeats 1000000 in
-theorem IsKSValue.exists_of_isAbelianScheme (P : AbelianDeRham) {K : Type} [Field K] {A : Over (Sp K)} [GrpObj A]
-    {A' : Over (Sp (DualNumber K))} [GrpObj A'] {i : A.left ⟶ A'.left}
-    (h : IsGrpPullback A A' (epsRed K) i) {g : ℕ} (hA : Semi.IsAbelianScheme A')
-    (hg : SmoothOfRelativeDimension g A'.hom) {f : HdR A} (hf : f ∈ Fil A) : ∃ v, IsKSValue h f v := by
+theorem IsKSValue.exists_of_isAbelianScheme
+    (P : AbelianDeRham)
+    {K : Type} [Field K]
+    {A : Over (Sp K)} [GrpObj A]
+    {A' : Over (Sp (DualNumber K))} [GrpObj A']
+    {i : A.left ⟶ A'.left} (h : IsGrpPullback A A' (epsRed K) i)
+    {g : ℕ}
+    (hA : Semi.IsAbelianScheme A') (hg : SmoothOfRelativeDimension g A'.hom)
+    {f : HdR A} (hf : f ∈ Fil A)
+    : ∃ v, IsKSValue h f v := by
   have a₀ : Semi.IsAbelianScheme A := by
     have := hA.comm
     have hc : IsCommMonObj A := by
-      open CategoryTheory.MonoidalCategory CategoryTheory.CartesianMonoidalCategory CategoryTheory.MonObj in
+      open CategoryTheory.MonoidalCategory CategoryTheory.CartesianMonoidalCategory
+        CategoryTheory.MonObj in
       rw [isCommMonObj_iff_isMulCommutative]
       intro T
       refine ⟨⟨fun x y => Over.OverMorphism.ext (h.1.hom_ext ?_ (by rw [Over.w, Over.w]))⟩⟩
       rw [← h.2 T x y (pushPt h.1.w x) (pushPt h.1.w y) rfl rfl,
         ← h.2 T y x (pushPt h.1.w y) (pushPt h.1.w x) rfl rfl, _root_.mul_comm]
-    exact ⟨hc, MorphismProperty.of_isPullback (P := @Smooth) h.1 hA.smooth,
+    exact ⟨
+      hc,
+      MorphismProperty.of_isPullback (P := @Smooth) h.1 hA.smooth,
       MorphismProperty.of_isPullback (P := @IsProper) h.1 hA.proper,
-      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hA.geomConnected⟩
+      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hA.geomConnected
+    ⟩
   have g₀ := (smoothOfRelativeDimension_isStableUnderBaseChange g).of_isPullback h.1 hg
   have hL := (P.2.1 K A g a₀ g₀).1
   letI : Algebra (DualNumber K) K := (TrivSqZeroExt.fstHom K K K).toRingHom.toAlgebra
   obtain ⟨-, hF⟩ := P.2.2.1 (DualNumber K) A' g hA hg K A i h
   obtain ⟨-, ⟨N, hN⟩, -⟩ := P.2.1 (DualNumber K) A' g hA hg
   obtain ⟨-, hproj, -⟩ := P.1.prim hA hg
-  have su : Function.Surjective (TrivSqZeroExt.fstHom K K K).toRingHom :=
-    fun r => ⟨TrivSqZeroExt.inl r, rfl⟩
+  have su : Function.Surjective (TrivSqZeroExt.fstHom K K K).toRingHom := fun r =>
+    ⟨TrivSqZeroExt.inl r, rfl⟩
   have rA := P.2.2.2.1 _ A' g hA hg _ (epsDP K) (isDPNilpotent_squareZero _) K _ su rfl A i h
   have rB := P.2.2.2.1.crysToDR_bijective hA hg (κ := epsDP K) (isDPNilpotent_squareZero _) su rfl h
-  let φL : primDR A' →ₗ[DualNumber K] K :=
-    { toFun := fun c => f ((bcMor h).pull c)
-      map_add' := fun x y => by simp only [map_add (f := _)]
-      map_smul' := fun r c => by
-        rw [LinearMap.map_smulₛₗ, map_smul, smul_eq_mul, RingHom.id_apply, Algebra.smul_def] }
-  obtain ⟨u, hu⟩ := Module.projective_lifting_property (Algebra.linearMap (DualNumber K) K) φL
-    (fun r => ⟨TrivSqZeroExt.inl r, rfl⟩)
+  let φL : primDR A' →ₗ[DualNumber K] K := {
+    toFun := fun c => f ((bcMor h).pull c)
+    map_add' := fun x y => by simp only [map_add (f := _)]
+    map_smul' := fun r c => by
+      rw [LinearMap.map_smulₛₗ, map_smul, smul_eq_mul, RingHom.id_apply, Algebra.smul_def]
+  }
+  obtain ⟨u, hu⟩ :=
+    Module.projective_lifting_property (Algebra.linearMap (DualNumber K) K) φL
+      (fun r => ⟨TrivSqZeroExt.inl r, rfl⟩)
   let d' : HdR A' := u ∘ₗ N.projection (PrimitiveSubmodule A') hN.symm
   have hd' : d' ∈ Fil A' := by
     rw [Fil, Submodule.mem_dualAnnihilator]
@@ -71,19 +83,20 @@ theorem IsKSValue.exists_of_isAbelianScheme (P : AbelianDeRham) {K : Type} [Fiel
     change (u _).fst = _
     rw [e1, ← add_zero (f ((bcMor h).pull _)), ← e3, ← map_add (f := _), ← map_add (f := _), e2]
   obtain ⟨d, hd⟩ := rB.2 d'
-  let k : HdR A :=
-    { toFun := fun c => (d ((constMor A).pull c)).snd
-      map_add' := fun x y => by simp only [map_add (f := _), TrivSqZeroExt.snd_add]
-      map_smul' := fun r c => by
-        rw [LinearMap.map_smulₛₗ, map_smul, smul_eq_mul, RingHom.id_apply, smul_eq_mul,
-          TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.snd_mul]
-        simp }
+  let k : HdR A := {
+    toFun := fun c => (d ((constMor A).pull c)).snd
+    map_add' := fun x y => by simp only [map_add (f := _), TrivSqZeroExt.snd_add]
+    map_smul' := fun r c => by
+      rw [LinearMap.map_smulₛₗ, map_smul, smul_eq_mul, RingHom.id_apply, smul_eq_mul,
+        TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.snd_mul]
+      simp
+  }
   obtain ⟨v, hv, -⟩ := hL.1 k
   refine ⟨v, k, ⟨d, by rw [liftFil, Submodule.mem_comap, hd]; exact hd', fun c => ?_⟩, hv⟩
   obtain ⟨x, hx⟩ := rA.2 ((constMor A).pull c)
   have red : (bcMor h).pull x = c := by
-    rw [← GrpMor.pull_pull (liftMor (epsDP K) h) (redMor A) (bcMor h) (fun _ => rfl) (by simp) x, hx,
-      redMor_constMor]
+    rw [← GrpMor.pull_pull (liftMor (epsDP K) h) (redMor A) (bcMor h) (fun _ => rfl) (by simp) x,
+      hx, redMor_constMor]
   apply TrivSqZeroExt.ext
   · have e := fd' x
     rw [← hd, crysToDR_apply, hx, red] at e
@@ -92,10 +105,12 @@ theorem IsKSValue.exists_of_isAbelianScheme (P : AbelianDeRham) {K : Type} [Fiel
   · rw [TrivSqZeroExt.snd_add, TrivSqZeroExt.snd_inl, TrivSqZeroExt.snd_inr, zero_add]
     rfl
 
-theorem ksRegular_of_isAbelianScheme : GlobalTheory.Published.AbelianDeRham → ∀ {K : Type} [Field K] {A : Over (Sp K)}
-    [GrpObj A] {A' : Over (Sp (DualNumber K))} [GrpObj A'] {i : A.left ⟶ A'.left}
-    (h : IsGrpPullback A A' (GlobalTheory.DeRham.epsRed K) i) {g : ℕ}, Semi.IsAbelianScheme A' →
-    SmoothOfRelativeDimension g A'.hom → KSRegular h := by
+theorem ksRegular_of_isAbelianScheme
+    : GlobalTheory.Published.AbelianDeRham
+      → ∀ {K : Type} [Field K] {A : Over (Sp K)} [GrpObj A] {A' : Over (Sp (DualNumber K))}
+          [GrpObj A'] {i : A.left ⟶ A'.left}
+          (h : IsGrpPullback A A' (GlobalTheory.DeRham.epsRed K) i) {g : ℕ},
+        Semi.IsAbelianScheme A' → SmoothOfRelativeDimension g A'.hom → KSRegular h := by
   intro P K _ A _ A' _ i h g hA hg f hf
   obtain ⟨v, hv⟩ := IsKSValue.exists_of_isAbelianScheme P h hA hg hf
   exact ⟨v, hv, fun w hw => IsKSValue.unique P hA hg hw hv⟩

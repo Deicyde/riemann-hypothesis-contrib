@@ -9,8 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUn
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -18,10 +21,16 @@ open GlobalTheory.PlaceInt
 
 namespace GlobalTheory.PlaceInt
 
-theorem weilIs_eq_one_of_coprime (hW : WeilSt) {S : Scheme.{0}} [IsLocallyNoetherian S] (P : PolAV S) (k : ℕ)
-    {T : Over S} (hk : IsUnit (k : Γ(T.left, ⊤))) (a b : T ⟶ P.A) (m m' : ℕ) (ha : a ^ k = 1) (hb : b ^ k = 1)
-    (hc : Nat.Coprime m m') (ham : a ^ m = 1) (hbm : b ^ m' = 1) (e : Γ(T.left, ⊤)ˣ)
-    (he : WeilIs P.A P.L k a b e) : e = 1 := by
+theorem weilIs_eq_one_of_coprime
+    (hW : WeilSt)
+    {S : Scheme.{0}} [IsLocallyNoetherian S]
+    (P : PolAV S)
+    (k : ℕ)
+    {T : Over S} (hk : IsUnit (k : Γ(T.left, ⊤))) (a b : T ⟶ P.A)
+    (m m' : ℕ)
+    (ha : a ^ k = 1) (hb : b ^ k = 1) (hc : Nat.Coprime m m') (ham : a ^ m = 1) (hbm : b ^ m' = 1)
+    (e : Γ(T.left, ⊤)ˣ) (he : WeilIs P.A P.L k a b e)
+    : e = 1 := by
   have h₁ : e ^ m = 1 := by
     obtain ⟨hex, hmul, -, -⟩ := hW S P k T
     obtain ⟨c₁, hc₁, hu⟩ := hex 1 b (one_pow k) hb
@@ -42,12 +51,21 @@ theorem weilIs_eq_one_of_coprime (hW : WeilSt) {S : Scheme.{0}} [IsLocallyNoethe
     generalize Nat.gcd k m' = g at hbg hn hn'
     subst hn
     have h := ((hW S P g T).2.2.2 n a b e hk ha hbg).1 (by exact_mod_cast he)
-    have hg := GlobalTheory.UnivPairing.weilIs_pow_eq_one hW P g (a ^ n) b (by rw [← pow_mul, mul_comm]; exact ha) hbg e h
+    have hg :=
+      GlobalTheory.UnivPairing.weilIs_pow_eq_one hW P g (a ^ n) b
+        (by rw [← pow_mul, mul_comm]; exact ha) hbg e h
     rw [hn', pow_mul, hg, one_pow]
   have h := pow_gcd_eq_one.2 ⟨h₁, h₂⟩
   rwa [hc.gcd_eq_one, pow_one] at h
 
-theorem moves_mul_of_coprime : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (S : Type) [CommRing S] (x : Sp S ⟶ Xo.X) (k : ℕ), Odd k → ∀ (a b : (ptO Xo x ⟶ Xo.univ.t.G)) (m m' : ℕ), a ^ k = 1 → b ^ k = 1 → Nat.Coprime m m' → a ^ m = 1 → b ^ m' = 1 → ∀ F F₁ F₂ : SecN Xo x k, Moves Xo b F F₁ → (Moves Xo a F₁ F₂ ↔ Moves Xo (a * b) F F₂) := by
+theorem moves_mul_of_coprime
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (S : Type) [CommRing S] (x : Sp S ⟶ Xo.X) (k : ℕ),
+      Odd k
+        → ∀ (a b : (ptO Xo x ⟶ Xo.univ.t.G)) (m m' : ℕ),
+          a ^ k = 1 → b ^ k = 1 → Nat.Coprime m m' → a ^ m = 1 → b ^ m' = 1
+            → ∀ F F₁ F₂ : SecN Xo x k,
+              Moves Xo b F F₁ → (Moves Xo a F₁ F₂ ↔ Moves Xo (a * b) F F₂) := by
   intro E _ _ _ H Dw l Xo S _ x k hk a b m m' ha hb hc ham hbm F F₁ F₂ h₁
   have hW : WeilSt := GlobalTheory.firstFiveLaws.1.weil
   have := UnivPol.isLocallyNoetherian Xo
@@ -55,7 +73,8 @@ theorem moves_mul_of_coprime : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     have h := (UnivPol.isUnit_natCast Xo k hk.pos).map (ptO Xo x).hom.appTop.hom
     rwa [map_natCast] at h
   obtain ⟨e, he, -⟩ := (hW Xo.X (UnivPol.pol Xo) k (ptO Xo x)).1 a b ha hb
-  have he1 : e = 1 := weilIs_eq_one_of_coprime hW (UnivPol.pol Xo) k hu a b m m' ha hb hc ham hbm e he
+  have he1 : e = 1 :=
+    weilIs_eq_one_of_coprime hW (UnivPol.pol Xo) k hu a b m m' ha hb hc ham hbm e he
   obtain ⟨r, hr2, hrk, hr⟩ := GlobalTheory.PlaceInt.moves_mul E H Dw l Xo S x k hk a b e ha hb he
   have hr1 : toΓ S r = 1 := by
     rw [he1, Units.val_one] at hr2
@@ -65,10 +84,11 @@ theorem moves_mul_of_coprime : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
   have key : ∀ G G' : SecN Xo x k, Moves Xo a F₁ G → Moves Xo (a * b) F G' → G = G' := by
     intro G G' hG hG'
     have h := hr F F₁ G G' h₁ hG hG'
-    have h' : G.f = G'.f := funext fun j => by
-      rw [h j, hr1]
-      unfold liftFun
-      rw [map_one, map_one, _root_.one_mul]
+    have h' : G.f = G'.f :=
+      funext fun j => by
+        rw [h j, hr1]
+        unfold liftFun
+        rw [map_one, map_one, _root_.one_mul]
     cases G
     cases G'
     cases h'

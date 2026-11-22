@@ -10,9 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaMemberD
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -23,8 +26,10 @@ namespace GlobalTheory.GSep.IntLabel
 section
 variable {G X : Type} [AddCommGroup G] [AddCommGroup X] {N : ℕ} {Y : G → X → Prop}
 
-theorem yy_zero (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
-    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu')) : Y 0 0 := by
+theorem yy_zero
+    (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
+    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu'))
+    : Y 0 0 := by
   obtain ⟨mu, hmu⟩ := h1 0
   have h2 := h4 0 0 mu mu hmu hmu
   rw [add_zero] at h2
@@ -34,9 +39,11 @@ theorem yy_zero (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a
   have e : mu = N • w := add_left_cancel (a := mu) (by simpa using hw)
   exact ⟨-w, by simp [e]⟩
 
-theorem yy_neg (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
-    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu')) {a : G} {mu : X} (ha : Y a mu) :
-    Y (-a) (-mu) := by
+theorem yy_neg
+    (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
+    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu'))
+    {a : G} {mu : X} (ha : Y a mu)
+    : Y (-a) (-mu) := by
   obtain ⟨mu', h'⟩ := h1 (-a)
   have h0 := h4 a (-a) mu mu' ha h'
   rw [add_neg_cancel] at h0
@@ -48,25 +55,32 @@ theorem yy_neg (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a 
   rw [smul_neg, ← hw]
   abel
 
-theorem yy_sub (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
-    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu')) {a b : G} {mu nu : X} (ha : Y a mu)
-    (hb : Y b nu) : Y (a - b) (mu - nu) := by
+theorem yy_sub
+    (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
+    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu'))
+    {a b : G} {mu nu : X} (ha : Y a mu) (hb : Y b nu)
+    : Y (a - b) (mu - nu) := by
   rw [sub_eq_add_neg, sub_eq_add_neg]
   exact h4 _ _ _ _ ha (yy_neg h1 h3 h4 hb)
 
-theorem yy_nsmul (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
-    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu')) (k : ℕ) {a : G} {mu : X} (ha : Y a mu) :
-    Y (k • a) (k • mu) := by
+theorem yy_nsmul
+    (h1 : ∀ a, ∃ mu, Y a mu) (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
+    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu')) (k : ℕ)
+    {a : G} {mu : X} (ha : Y a mu)
+    : Y (k • a) (k • mu) := by
   induction k with
   | zero => simpa using yy_zero h1 h3 h4
   | succ k ih => rw [succ_nsmul, succ_nsmul]; exact h4 _ _ _ _ ih ha
 
-theorem mem_closure_iff (p J : ℕ) (hJ : 2 ≤ J) (hN : N = p ^ J) (hG : ∀ a : G, N • a = 0)
-    (htor : ∀ b : G, p • b = 0 → ∃ c, b = p ^ (J - 1) • c) (htf : ∀ x : X, p ^ (J - 1) • x = 0 → x = 0)
-    (h1 : ∀ a, ∃ mu, Y a mu) (h2 : ∀ mu, ∃ a, Y a mu)
+theorem mem_closure_iff
+    (p J : ℕ) (hJ : 2 ≤ J) (hN : N = p ^ J)
+    (hG : ∀ a : G, N • a = 0) (htor : ∀ b : G, p • b = 0 → ∃ c, b = p ^ (J - 1) • c)
+    (htf : ∀ x : X, p ^ (J - 1) • x = 0 → x = 0) (h1 : ∀ a, ∃ mu, Y a mu) (h2 : ∀ mu, ∃ a, Y a mu)
     (h3 : ∀ a mu mu', Y a mu → (Y a mu' ↔ CongMod N mu' mu))
-    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu')) (S : Set G) (hS : ∀ a ∈ S, Y a 0)
-    (hT : ∀ a, Y a 0 → ∃ b, p • b = 0 ∧ a + b ∈ S) (a : G) : a ∈ AddSubgroup.closure S ↔ Y a 0 := by
+    (h4 : ∀ a a' mu mu', Y a mu → Y a' mu' → Y (a + a') (mu + mu'))
+    (S : Set G) (hS : ∀ a ∈ S, Y a 0) (hT : ∀ a, Y a 0 → ∃ b, p • b = 0 ∧ a + b ∈ S)
+    (a : G)
+    : a ∈ AddSubgroup.closure S ↔ Y a 0 := by
   constructor
   · intro ha
     induction ha using AddSubgroup.closure_induction with
@@ -98,15 +112,17 @@ theorem mem_closure_iff (p J : ℕ) (hJ : 2 ≤ J) (hN : N = p ^ J) (hG : ∀ a 
       obtain ⟨e, he⟩ : ∃ e, J - 1 = e + 1 := ⟨J - 2, by omega⟩
       rw [he, pow_succ, mul_smul, hbk, smul_zero]
     have key : p ^ (J - 1) • c = p ^ (J - 1) • ((c - p • c') + bk) := by
-      rw [smul_add, hbk0, add_zero, smul_sub, smul_smul, ← pow_succ, Nat.sub_add_cancel (by omega), ← hN, hG, sub_zero]
+      rw [smul_add, hbk0, add_zero, smul_sub, smul_smul, ← pow_succ, Nat.sub_add_cancel (by omega),
+        ← hN, hG, sub_zero]
     have hbcl : p ^ (J - 1) • c ∈ AddSubgroup.closure S := by
       rw [key]; exact nsmul_mem (AddSubgroup.subset_closure hkS) _
     have e : a = (a + p ^ (J - 1) • c) - p ^ (J - 1) • c := by abel
     rw [e]
     exact sub_mem (AddSubgroup.subset_closure hab) hbcl
 
-theorem zmod_tors {p J M : ℕ} (hp : 0 < p) (hJ : 1 ≤ J) (hM : M = p ^ J) (x : ZMod M) (hx : p • x = 0) :
-    ∃ y : ZMod M, x = p ^ (J - 1) • y := by
+theorem zmod_tors
+    {p J M : ℕ} (hp : 0 < p) (hJ : 1 ≤ J) (hM : M = p ^ J) (x : ZMod M) (hx : p • x = 0)
+    : ∃ y : ZMod M, x = p ^ (J - 1) • y := by
   subst hM
   haveI : NeZero (p ^ J) := ⟨pow_ne_zero _ hp.ne'⟩
   have h1 : p ^ J ∣ p * x.val := by
@@ -130,11 +146,18 @@ end GlobalTheory.GSep.IntLabel
 
 namespace GlobalTheory.GSep
 
-
 open GlobalTheory.GSep.IntLabel in
-theorem mem_HH_iff_yy_zero : ∀ (I : Type) (X₁ : GlobalTheory.GSep.GSet) (z₁ : X₁.M.Z) (act : I → (X₁.ρ.P.A ⟶ X₁.ρ.P.A)) (x₀ : X₁.S.Gam), X₁.M.Div X₁.S.th x₀ z₁ → ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V] (ev : X₁.M.Z.presheaf.stalk z₁ →+* V) (X : Type) [AddCommGroup X] (t : X → V) (δ : I → X → X) (𝔪 : GlobalTheory.GSep.GMem X₁ z₁ act V ev X t δ) (a : X₁.S.Gam), a ∈ X₁.S.HH X₁.M z₁ ↔ 𝔪.YY a 0 := by
+theorem mem_HH_iff_yy_zero
+    : ∀ (I : Type) (X₁ : GlobalTheory.GSep.GSet) (z₁ : X₁.M.Z) (act : I → (X₁.ρ.P.A ⟶ X₁.ρ.P.A))
+        (x₀ : X₁.S.Gam),
+      X₁.M.Div X₁.S.th x₀ z₁
+        → ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V]
+            (ev : X₁.M.Z.presheaf.stalk z₁ →+* V) (X : Type) [AddCommGroup X] (t : X → V)
+            (δ : I → X → X) (𝔪 : GlobalTheory.GSep.GMem X₁ z₁ act V ev X t δ) (a : X₁.S.Gam),
+          a ∈ X₁.S.HH X₁.M z₁ ↔ 𝔪.YY a 0 := by
   intro I X₁ z₁ act x₀ hx₀ V _ _ _ ev X _ t δ 𝔪 a
-  obtain ⟨h1, h2, h3, h4⟩ := GlobalTheory.T.thetaLabels_surjective_hom_lattice_mod_level I X₁ z₁ act V ev X t δ 𝔪
+  obtain ⟨h1, h2, h3, h4⟩ :=
+    GlobalTheory.T.thetaLabels_surjective_hom_lattice_mod_level I X₁ z₁ act V ev X t δ 𝔪
   obtain ⟨j, hj, hr⟩ := X₁.ρ.r_eq
   have hp : 0 < X₁.ρ.n := X₁.ρ.n_prime.pos
   have hk := X₁.ρ.two_le
@@ -143,7 +166,8 @@ theorem mem_HH_iff_yy_zero : ∀ (I : Type) (X₁ : GlobalTheory.GSep.GSet) (z�
   have hG : ∀ b : X₁.S.Gam, (X₁.S.r * X₁.S.N) • b = 0 := fun b => by
     funext v
     simp [nsmul_eq_mul]
-  have htor : ∀ b : X₁.S.Gam, X₁.ρ.n • b = 0 → ∃ c : X₁.S.Gam, b = X₁.ρ.n ^ (j + X₁.ρ.k * 2 - 1) • c := by
+  have htor
+      : ∀ b : X₁.S.Gam, X₁.ρ.n • b = 0 → ∃ c : X₁.S.Gam, b = X₁.ρ.n ^ (j + X₁.ρ.k * 2 - 1) • c := by
     intro b hb
     have hv : ∀ v, ∃ y : ZMod (X₁.S.r * X₁.S.N), b v = X₁.ρ.n ^ (j + X₁.ρ.k * 2 - 1) • y := fun v =>
       zmod_tors hp (by omega) hN (b v) (by simpa using congrFun hb v)
@@ -159,6 +183,9 @@ theorem mem_HH_iff_yy_zero : ∀ (I : Type) (X₁ : GlobalTheory.GSep.GSet) (z�
   rw [ThetaSys.HH]
   exact mem_closure_iff (X₁.ρ.n) (j + X₁.ρ.k * 2) hJ hN hG htor htf h1 h2 h3 h4 _
     (fun b hb => GlobalTheory.T.thetaMember_dividing_label_class_zero I X₁ z₁ act V ev X t δ 𝔪 b hb)
-    (fun b hb => GlobalTheory.T.exists_torsionTranslate_of_classZero_dividing I X₁ z₁ act V ev X t δ 𝔪 x₀ hx₀ b hb) a
+    (fun b hb =>
+      GlobalTheory.T.exists_torsionTranslate_of_classZero_dividing I X₁ z₁ act V ev X t δ 𝔪 x₀ hx₀ b
+        hb)
+    a
 
 end GlobalTheory.GSep

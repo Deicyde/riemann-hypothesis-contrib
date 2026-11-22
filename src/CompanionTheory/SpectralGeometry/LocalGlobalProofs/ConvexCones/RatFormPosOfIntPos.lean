@@ -5,19 +5,20 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.VoronoiMeans.
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-
 open Matrix in
-theorem ratForm_pos_of_int_pos {n : ℕ} (Q : Matrix (Fin n) (Fin n) ℚ)
-    (hQ : ∀ v : Fin n → ℤ, v ≠ 0 → 0 < ∑ i, ∑ j, Q i j * v i * v j)
-    (w : Fin n → ℚ) (hw : w ≠ 0) : 0 < ∑ i, ∑ j, Q i j * w i * w j := by
+theorem ratForm_pos_of_int_pos
+    {n : ℕ} (Q : Matrix (Fin n) (Fin n) ℚ)
+    (hQ : ∀ v : Fin n → ℤ, v ≠ 0 → 0 < ∑ i, ∑ j, Q i j * v i * v j) (w : Fin n → ℚ) (hw : w ≠ 0)
+    : 0 < ∑ i, ∑ j, Q i j * w i * w j := by
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors ℤ) w
   choose v hv using hb
-  have hb0 : ((b : ℤ) : ℚ) ≠ 0 := by
-    exact_mod_cast nonZeroDivisors.ne_zero b.2
+  have hb0 : ((b : ℤ) : ℚ) ≠ 0 := by exact_mod_cast nonZeroDivisors.ne_zero b.2
   have hv' : ∀ i, (v i : ℚ) = (b : ℤ) * w i := by
     intro i
     have := hv i
@@ -32,8 +33,9 @@ theorem ratForm_pos_of_int_pos {n : ℕ} (Q : Matrix (Fin n) (Fin n) ℚ)
     have := (mul_eq_zero.1 h1.symm).resolve_left hb0
     simpa using this
   have h := hQ v hv0
-  have h2 : ∑ i, ∑ j, Q i j * (v i : ℚ) * (v j : ℚ)
-      = ((b : ℤ) : ℚ) ^ 2 * ∑ i, ∑ j, Q i j * w i * w j := by
+  have h2
+      : ∑ i, ∑ j, Q i j * (v i : ℚ) * (v j : ℚ)
+        = ((b : ℤ) : ℚ) ^ 2 * ∑ i, ∑ j, Q i j * w i * w j := by
     simp only [Finset.mul_sum, hv']
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
@@ -41,11 +43,11 @@ theorem ratForm_pos_of_int_pos {n : ℕ} (Q : Matrix (Fin n) (Fin n) ℚ)
   have hb2 : 0 < ((b : ℤ) : ℚ) ^ 2 := by positivity
   exact (pos_iff_pos_of_mul_pos h).1 hb2
 
-
 open Matrix in
-theorem posDef_of_int_pos (n : ℕ) (Q : Matrix (Fin n) (Fin n) ℚ) (hs : Q.IsSymm)
-    (hQ : ∀ v : Fin n → ℤ, v ≠ 0 → 0 < ∑ i, ∑ j, Q i j * v i * v j) :
-    (Q.map (Rat.cast : ℚ → ℝ)).PosDef := by
+theorem posDef_of_int_pos
+    (n : ℕ) (Q : Matrix (Fin n) (Fin n) ℚ)
+    (hs : Q.IsSymm) (hQ : ∀ v : Fin n → ℤ, v ≠ 0 → 0 < ∑ i, ∑ j, Q i j * v i * v j)
+    : (Q.map (Rat.cast : ℚ → ℝ)).PosDef := by
   have hrat := ratForm_pos_of_int_pos Q hQ
   set R : Matrix (Fin n) (Fin n) ℝ := Q.map (Rat.cast : ℚ → ℝ) with hR
   have hRh : R.IsHermitian := by
@@ -56,8 +58,10 @@ theorem posDef_of_int_pos (n : ℕ) (Q : Matrix (Fin n) (Fin n) ℚ) (hs : Q.IsS
     simp only [dotProduct, mulVec, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
-  have hcast : ∀ w : Fin n → ℚ, ((fun i => (w i : ℝ)) ⬝ᵥ (R *ᵥ fun i => (w i : ℝ)))
-      = ((∑ i, ∑ j, Q i j * w i * w j : ℚ) : ℝ) := by
+  have hcast
+      : ∀ w : Fin n → ℚ,
+        ((fun i => (w i : ℝ)) ⬝ᵥ (R *ᵥ fun i => (w i : ℝ)))
+          = ((∑ i, ∑ j, Q i j * w i * w j : ℚ) : ℝ) := by
     intro w
     rw [hform]
     push_cast
@@ -68,8 +72,7 @@ theorem posDef_of_int_pos (n : ℕ) (Q : Matrix (Fin n) (Fin n) ℚ) (hs : Q.IsS
     simp only [hform]
     fun_prop
   have hnonneg : ∀ x : Fin n → ℝ, 0 ≤ x ⬝ᵥ (R *ᵥ x) := by
-    have hcl : IsClosed {x : Fin n → ℝ | 0 ≤ x ⬝ᵥ (R *ᵥ x)} :=
-      isClosed_le continuous_const hcont
+    have hcl : IsClosed {x : Fin n → ℝ | 0 ≤ x ⬝ᵥ (R *ᵥ x)} := isClosed_le continuous_const hcont
     intro x
     refine hdense.induction_on (p := fun x => 0 ≤ x ⬝ᵥ (R *ᵥ x)) x hcl fun w => ?_
     show 0 ≤ (fun i => (w i : ℝ)) ⬝ᵥ (R *ᵥ fun i => (w i : ℝ))

@@ -13,21 +13,22 @@ open Classical
 
 namespace Formalism.L2.FormalSeriesBounds.FunEq
 
-open Formalism.L2.FormalSeriesBounds Formalism.L2.FormalSeriesBounds.PartialDerivEval ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ MvPowerSeries
+open Formalism.L2.FormalSeriesBounds Formalism.L2.FormalSeriesBounds.PartialDerivEval
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ MvPowerSeries
 
 variable {C : Type} [Field C] [CharZero C] {dd : ℕ} {V : VF C}
 
 def ix (i : Fin dd) (L : ℕ) (γ : Fin 2 × Fin dd →₀ ℕ) : Fin 3 × Fin dd →₀ ℕ :=
   Finsupp.single ((0 : Fin 3), i) L + γ.mapDomain (up 2)
 
-theorem index_raise_first (i : Fin dd) (L : ℕ) (γ : Fin 2 × Fin dd →₀ ℕ) (j : Fin dd) :
-    ix i L γ ((0 : Fin 3), j) = if j = i then L else 0 := by
+theorem index_raise_first (i : Fin dd) (L : ℕ) (γ : Fin 2 × Fin dd →₀ ℕ) (j : Fin dd)
+    : ix i L γ ((0 : Fin 3), j) = if j = i then L else 0 := by
   have hn : ((0 : Fin 3), j) ∉ Set.range (up (dd := dd) 2) := by
     rintro ⟨q, hq⟩
     simp only [up, Prod.mk.injEq] at hq
     exact Fin.succ_ne_zero _ hq.1
-  simp only [ix, Finsupp.add_apply, Finsupp.mapDomain_notin_range _ _ hn, add_zero, Finsupp.single_apply,
-    Prod.mk.injEq, true_and]
+  simp only [ix, Finsupp.add_apply, Finsupp.mapDomain_notin_range _ _ hn, add_zero,
+    Finsupp.single_apply, Prod.mk.injEq, true_and]
   by_cases h : j = i
   · subst h; simp
   · simp [h, Ne.symm h]
@@ -35,7 +36,8 @@ theorem index_raise_first (i : Fin dd) (L : ℕ) (γ : Fin 2 × Fin dd →₀ �
 def FrobX (V : VF C) (f : PS C 3 dd) : Prop :=
   ∀ p : Fin 3 × Fin dd →₀ ℕ, (∃ j, ¬ V.l ∣ p ((0 : Fin 3), j)) → V.MM (coeff p f)
 
-def FrobD (V : VF C) (f : PS C 3 dd) : Prop := ∀ j : Fin dd, MaximalIdealCongruence.MMS V (MvPowerSeries.pderiv ((0 : Fin 3), j) f)
+def FrobD (V : VF C) (f : PS C 3 dd) : Prop :=
+  ∀ j : Fin dd, MaximalIdealCongruence.MMS V (MvPowerSeries.pderiv ((0 : Fin 3), j) f)
 
 private theorem v_natCast_nonneg_of_vf (V : VF C) (m : ℕ) : 0 ≤ V.v (m : C) := by
   induction m with
@@ -52,7 +54,8 @@ private theorem v_intCast_nonneg' (V : VF C) (a : ℤ) : 0 ≤ V.v (a : C) := by
   · rw [Int.cast_neg, Int.cast_natCast, AddValuation.map_neg]
     exact v_natCast_nonneg_of_vf V m
 
-private theorem v_natCast_nonpos_of_not_dvd (V : VF C) (n : ℕ) (hn : ¬ V.l ∣ n) : V.v (n : C) ≤ 0 := by
+private theorem v_natCast_nonpos_of_not_dvd (V : VF C) (n : ℕ) (hn : ¬ V.l ∣ n)
+    : V.v (n : C) ≤ 0 := by
   by_contra hlt
   push_neg at hlt
   have hcop : Nat.Coprime n V.l :=
@@ -87,8 +90,10 @@ theorem frobX_of {f : PS C 3 dd} (hi : IntS V f) (hd : FrobD V f) : FrobX V f :=
     rw [Finsupp.single_le_iff]
     exact Nat.one_le_iff_ne_zero.mpr hp0
   rw [MvPowerSeries.coeff_pderiv, tsub_add_cancel_of_le hle] at h
-  have hn : ((((p - Finsupp.single ((0 : Fin 3), j) 1 : Fin 3 × Fin dd →₀ ℕ) ((0 : Fin 3), j)) : ℕ) : C) + 1 =
-      (p ((0 : Fin 3), j) : C) := by
+  have hn
+      : ((((p - Finsupp.single ((0 : Fin 3), j) 1 : Fin 3 × Fin dd →₀ ℕ) ((0 : Fin 3), j)) : ℕ) : C)
+          + 1
+        = (p ((0 : Fin 3), j) : C) := by
     rw [Finsupp.tsub_apply, Finsupp.single_eq_same]
     exact_mod_cast Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr hp0)
   rw [hn] at h
@@ -100,19 +105,23 @@ theorem frobX_of {f : PS C 3 dd} (hi : IntS V f) (hd : FrobD V f) : FrobX V f :=
   rw [add_zero] at this
   exact absurd h (not_lt.mpr this)
 
-private theorem mm_add_of_mm_of_mm {V : VF C} {a b : C} (ha : V.MM a) (hb : V.MM b) : V.MM (a + b) := by
+private theorem mm_add_of_mm_of_mm {V : VF C} {a b : C} (ha : V.MM a) (hb : V.MM b)
+    : V.MM (a + b) := by
   unfold VF.MM at *
   exact lt_of_lt_of_le (lt_min ha hb) (AddValuation.map_add _ _ _)
 
-private theorem mm_finset_sum_of_forall_mm {V : VF C} {ι : Type} (s : Finset ι) (a : ι → C) (h : ∀ i ∈ s, V.MM (a i)) :
-    V.MM (∑ i ∈ s, a i) := by
+private theorem mm_finset_sum_of_forall_mm
+    {V : VF C} {ι : Type} (s : Finset ι) (a : ι → C) (h : ∀ i ∈ s, V.MM (a i))
+    : V.MM (∑ i ∈ s, a i) := by
   refine Finset.sum_induction a (fun x => V.MM x) (fun x y hx hy => mm_add_of_mm_of_mm hx hy) ?_ h
   unfold VF.MM
   rw [AddValuation.map_zero, ← WithTop.coe_zero]
   exact WithTop.coe_lt_top _
 
-private theorem mms_mul_of_intS_of_mms {V : VF C} {σ : Type} {f h : MvPowerSeries σ C} (hf : IntS V f)
-    (hh : MaximalIdealCongruence.MMS V h) : MaximalIdealCongruence.MMS V (f * h) := by
+private theorem mms_mul_of_intS_of_mms
+    {V : VF C} {σ : Type} {f h : MvPowerSeries σ C}
+    (hf : IntS V f) (hh : MaximalIdealCongruence.MMS V h)
+    : MaximalIdealCongruence.MMS V (f * h) := by
   intro μ
   rw [MvPowerSeries.coeff_mul]
   apply mm_finset_sum_of_forall_mm
@@ -125,8 +134,9 @@ private theorem mms_mul_of_intS_of_mms {V : VF C} {σ : Type} {f h : MvPowerSeri
   have h1' : (0 : WithTop ℝ) ≤ V.v (coeff x.1 f) := by simpa using h1
   exact lt_of_lt_of_le h2 (le_add_of_nonneg_left h1')
 
-theorem frobD_mul {f g : PS C 3 dd} (hf : IntS V f) (hg : IntS V g) (hf' : FrobD V f) (hg' : FrobD V g) :
-    FrobD V (f * g) := by
+theorem frobD_mul
+    {f g : PS C 3 dd} (hf : IntS V f) (hg : IntS V g) (hf' : FrobD V f) (hg' : FrobD V g)
+    : FrobD V (f * g) := by
   intro j
   rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul]
   intro μ
@@ -135,8 +145,8 @@ theorem frobD_mul {f g : PS C 3 dd} (hf : IntS V f) (hg : IntS V g) (hf' : FrobD
   · exact mms_mul_of_intS_of_mms hf (hg' j) μ
   · exact mms_mul_of_intS_of_mms hg (hf' j) μ
 
-theorem eq_up_of {p : Fin 3 × Fin dd →₀ ℕ} (hp : ∀ j, p ((0 : Fin 3), j) = 0) :
-    (Finsupp.comapDomain (up 2) p ((up_inj 2).injOn)).mapDomain (up 2) = p := by
+theorem eq_up_of {p : Fin 3 × Fin dd →₀ ℕ} (hp : ∀ j, p ((0 : Fin 3), j) = 0)
+    : (Finsupp.comapDomain (up 2) p ((up_inj 2).injOn)).mapDomain (up 2) = p := by
   ext ⟨k, j⟩
   induction k using Fin.cases with
   | zero =>
@@ -148,32 +158,40 @@ theorem eq_up_of {p : Fin 3 × Fin dd →₀ ℕ} (hp : ∀ j, p ((0 : Fin 3), j
     have e : ((Fin.succ k', j) : Fin 3 × Fin dd) = up 2 (k', j) := rfl
     rw [e, Finsupp.mapDomain_apply_of_injective (up_inj 2), Finsupp.comapDomain_apply]
 
-theorem coeff_free {f : PS C 3 dd} (h1 : ev (rz 2) f = 1) {p : Fin 3 × Fin dd →₀ ℕ}
-    (hp : ∀ j, p ((0 : Fin 3), j) = 0) : coeff p f = if p = 0 then 1 else 0 := by
+theorem coeff_free
+    {f : PS C 3 dd} (h1 : ev (rz 2) f = 1)
+    {p : Fin 3 × Fin dd →₀ ℕ} (hp : ∀ j, p ((0 : Fin 3), j) = 0)
+    : coeff p f = if p = 0 then 1 else 0 := by
   classical
-  have hs : MvPowerSeries.HasSubst (fun q : Fin 3 × Fin dd => rz (C := C) (dd := dd) 2 q.1 q.2) := by
+  have hs
+      : MvPowerSeries.HasSubst (fun q : Fin 3 × Fin dd => rz (C := C) (dd := dd) 2 q.1 q.2) := by
     have hz : ∀ q : Fin 3 × Fin dd, constantCoeff (rz (C := C) (dd := dd) 2 q.1 q.2) = 0 := by
       rintro ⟨k, i⟩
       induction k using Fin.cases <;> simp [rz, pt]
     first
     | exact MvPowerSeries.hasSubst_of_constantCoeff_zero hz
     | exact MvPowerSeries.HasSubst.of_constantCoeff_zero' hz
-    | exact MvPowerSeries.HasSubst.of_constantCoeff_nilpotent (fun q => by rw [hz q]; exact IsNilpotent.zero)
-    | exact MvPowerSeries.hasSubst_of_constantCoeff_nilpotent (fun q => by rw [hz q]; exact IsNilpotent.zero)
-  have hmon : ∀ d' : Fin 2 × Fin dd →₀ ℕ,
-      (d'.prod fun s n => (X s : PS C 2 dd) ^ n) = MvPowerSeries.monomial d' (1 : C) := by
+    | exact MvPowerSeries.HasSubst.of_constantCoeff_nilpotent (fun q => by
+        rw [hz q]; exact IsNilpotent.zero)
+    | exact MvPowerSeries.hasSubst_of_constantCoeff_nilpotent (fun q => by
+        rw [hz q]; exact IsNilpotent.zero)
+  have hmon
+      : ∀ d' : Fin 2 × Fin dd →₀ ℕ,
+        (d'.prod fun s n => (X s : PS C 2 dd) ^ n) = MvPowerSeries.monomial d' (1 : C) := by
     intro d'
     induction d' using Finsupp.induction with
     | zero => rw [Finsupp.prod_zero_index, MvPowerSeries.monomial_zero_one]
     | single_add a b g _ _ ih =>
       rw [Finsupp.prod_add_index' (fun _ => pow_zero _) (fun _ _ _ => pow_add _ _ _), ih,
-        Finsupp.prod_single_index (h := fun x n => (X x : PS C 2 dd) ^ n) (pow_zero _), MvPowerSeries.X_pow_eq, MvPowerSeries.monomial_mul_monomial,
-        one_mul]
+        Finsupp.prod_single_index (h := fun x n => (X x : PS C 2 dd) ^ n) (pow_zero _),
+        MvPowerSeries.X_pow_eq, MvPowerSeries.monomial_mul_monomial, one_mul]
   have inj : Function.Injective (Finsupp.mapDomain (M := ℕ) (up (dd := dd) 2)) :=
     Finsupp.mapDomain_injective (up_inj 2)
-  have hprod : ∀ (d : Fin 3 × Fin dd →₀ ℕ) (e : Fin 2 × Fin dd →₀ ℕ),
-      coeff e (d.prod fun s n => (fun q : Fin 3 × Fin dd => rz (C := C) (dd := dd) 2 q.1 q.2) s ^ n) =
-        if d = e.mapDomain (up 2) then 1 else 0 := by
+  have hprod
+      : ∀ (d : Fin 3 × Fin dd →₀ ℕ) (e : Fin 2 × Fin dd →₀ ℕ),
+        coeff e
+            (d.prod fun s n => (fun q : Fin 3 × Fin dd => rz (C := C) (dd := dd) 2 q.1 q.2) s ^ n)
+          = if d = e.mapDomain (up 2) then 1 else 0 := by
     intro d e
     by_cases hx : ∀ j, d ((0 : Fin 3), j) = 0
     · have hd := (eq_up_of hx).symm
@@ -186,7 +204,9 @@ theorem coeff_free {f : PS C 3 dd} (h1 : ev (rz 2) f = 1) {p : Fin 3 × Fin dd �
       · rw [if_neg he, if_neg (fun h => he (inj h).symm)]
     · push_neg at hx
       obtain ⟨j, hj⟩ := hx
-      have h0 : (d.prod fun s n => (fun q : Fin 3 × Fin dd => rz (C := C) (dd := dd) 2 q.1 q.2) s ^ n) = 0 := by
+      have h0
+          : (d.prod fun s n => (fun q : Fin 3 × Fin dd => rz (C := C) (dd := dd) 2 q.1 q.2) s ^ n)
+            = 0 := by
         apply Finset.prod_eq_zero (i := ((0 : Fin 3), j))
         · exact Finsupp.mem_support_iff.mpr hj
         · show (rz (C := C) (dd := dd) 2 0 j) ^ (d ((0 : Fin 3), j)) = 0
@@ -198,8 +218,9 @@ theorem coeff_free {f : PS C 3 dd} (h1 : ev (rz 2) f = 1) {p : Fin 3 × Fin dd �
       rintro ⟨q, hq⟩
       simp only [up, Prod.mk.injEq] at hq
       exact Fin.succ_ne_zero _ hq.1
-  have key : ∀ e : Fin 2 × Fin dd →₀ ℕ,
-      coeff e (ev (rz (C := C) (dd := dd) 2) f) = coeff (e.mapDomain (up 2)) f := by
+  have key
+      : ∀ e : Fin 2 × Fin dd →₀ ℕ,
+        coeff e (ev (rz (C := C) (dd := dd) 2) f) = coeff (e.mapDomain (up 2)) f := by
     intro e
     show coeff e (MvPowerSeries.subst (fun q : Fin 3 × Fin dd => rz (C := C) (dd := dd) 2 q.1 q.2) f) = _
     rw [MvPowerSeries.coeff_subst hs, finsum_eq_single _ (e.mapDomain (up 2))]
@@ -219,8 +240,12 @@ theorem coeff_free {f : PS C 3 dd} (h1 : ev (rz 2) f = 1) {p : Fin 3 × Fin dd �
     apply hp0
     rw [← eq_up_of hp, h, Finsupp.mapDomain_zero]
 
-theorem x_le (i : Fin dd) (γ : Fin 2 × Fin dd →₀ ℕ) {p : Fin 3 × Fin dd →₀ ℕ} (hp : p ≤ ix i V.l γ)
-    (j : Fin dd) (hj : j ≠ i) : p ((0 : Fin 3), j) = 0 := by
+theorem x_le
+    (i : Fin dd)
+    (γ : Fin 2 × Fin dd →₀ ℕ)
+    {p : Fin 3 × Fin dd →₀ ℕ} (hp : p ≤ ix i V.l γ)
+    (j : Fin dd) (hj : j ≠ i)
+    : p ((0 : Fin 3), j) = 0 := by
   have h := hp ((0 : Fin 3), j)
   rw [index_raise_first, if_neg hj] at h
   exact Nat.le_zero.mp h
@@ -237,9 +262,11 @@ private theorem mm_mul_of_mm_of_ge_zero {a b : C} (ha : V.MM a) (hb : V.Ge 0 b) 
   have hb' : (0 : WithTop ℝ) ≤ V.v b := by simpa using hb
   exact lt_of_lt_of_le ha (le_add_of_nonneg_right hb')
 
-theorem coeff_mul_cong {f g : PS C 3 dd} (hf : IntS V f) (hg : IntS V g) (hfF : FrobX V f) (hgF : FrobX V g)
-    (hf1 : ev (rz 2) f = 1) (hg1 : ev (rz 2) g = 1) (i : Fin dd) (γ : Fin 2 × Fin dd →₀ ℕ) :
-    V.MM (coeff (ix i V.l γ) (f * g) - coeff (ix i V.l γ) f - coeff (ix i V.l γ) g) := by
+theorem coeff_mul_cong
+    {f g : PS C 3 dd} (hf : IntS V f) (hg : IntS V g) (hfF : FrobX V f) (hgF : FrobX V g)
+    (hf1 : ev (rz 2) f = 1) (hg1 : ev (rz 2) g = 1)
+    (i : Fin dd) (γ : Fin 2 × Fin dd →₀ ℕ)
+    : V.MM (coeff (ix i V.l γ) (f * g) - coeff (ix i V.l γ) f - coeff (ix i V.l γ) g) := by
   classical
   unfold FrobX at hfF hgF
   set N := ix i V.l γ with hN
@@ -258,7 +285,8 @@ theorem coeff_mul_cong {f g : PS C 3 dd} (hf : IntS V f) (hg : IntS V g) (hfF : 
   have h1 : ((0 : Fin 3 × Fin dd →₀ ℕ), N) ∈ Finset.HasAntidiagonal.antidiagonal N := by
     rw [Finset.HasAntidiagonal.mem_antidiagonal]
     simp
-  have h2 : (N, (0 : Fin 3 × Fin dd →₀ ℕ)) ∈ (Finset.HasAntidiagonal.antidiagonal N).erase (0, N) := by
+  have h2
+      : (N, (0 : Fin 3 × Fin dd →₀ ℕ)) ∈ (Finset.HasAntidiagonal.antidiagonal N).erase (0, N) := by
     rw [Finset.mem_erase]
     refine ⟨fun h => hN0 (congrArg Prod.fst h), ?_⟩
     rw [Finset.HasAntidiagonal.mem_antidiagonal]

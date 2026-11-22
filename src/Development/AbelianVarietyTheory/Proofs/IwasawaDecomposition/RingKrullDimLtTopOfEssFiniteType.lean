@@ -9,17 +9,19 @@ open IsLocalRing
 namespace GlobalTheory
 
 open IsLocalRing in
-private theorem ringKrullDim_le_of_isLocalization (A D : Type) [CommRing A] [CommRing D]
-    [Algebra A D] (M : Submonoid A) [IsLocalization M D] :
-    ringKrullDim D ≤ ringKrullDim A := by
+private theorem ringKrullDim_le_of_isLocalization
+    (A D : Type) [CommRing A] [CommRing D] [Algebra A D] (M : Submonoid A) [IsLocalization M D]
+    : ringKrullDim D ≤ ringKrullDim A := by
   refine Order.krullDim_le_of_strictMono (PrimeSpectrum.comap (algebraMap A D)) ?_
-  refine Monotone.strictMono_of_injective (fun p q h => ?_)
+  refine Monotone.strictMono_of_injective
+    (fun p q h => ?_)
     (PrimeSpectrum.localization_comap_injective D M)
   exact Ideal.comap_mono h
 
 open IsLocalRing in
-private theorem ringKrullDim_finite_of_finiteType_int (A : Type) [CommRing A]
-    [Algebra.FiniteType ℤ A] : ringKrullDim A < ⊤ := by
+private theorem ringKrullDim_finite_of_finiteType_int
+    (A : Type) [CommRing A] [Algebra.FiniteType ℤ A]
+    : ringKrullDim A < ⊤ := by
   obtain ⟨n, f, hf⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.mp ‹_›
   refine lt_of_le_of_lt (ringKrullDim_le_of_surjective f.toRingHom hf) ?_
   rw [MvPolynomial.ringKrullDim_of_isNoetherianRing,
@@ -29,10 +31,10 @@ private theorem ringKrullDim_finite_of_finiteType_int (A : Type) [CommRing A]
   push_cast [ENat.card_eq_coe_natCard]
   exact h
 
-
 open IsLocalRing in
-theorem _root_.GlobalTheory.ringKrullDim_lt_top_of_essFiniteType (D : Type) [CommRing D] [Algebra.EssFiniteType ℤ D] :
-    ringKrullDim D < ⊤ :=
+theorem _root_.GlobalTheory.ringKrullDim_lt_top_of_essFiniteType
+    (D : Type) [CommRing D] [Algebra.EssFiniteType ℤ D]
+    : ringKrullDim D < ⊤ :=
   lt_of_le_of_lt
     (ringKrullDim_le_of_isLocalization (Algebra.EssFiniteType.subalgebra ℤ D) D
       (Algebra.EssFiniteType.submonoid ℤ D))

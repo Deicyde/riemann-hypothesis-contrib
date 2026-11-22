@@ -7,12 +7,14 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.GrTens
 
-variable {O A Γ : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing Γ] [Algebra O Γ]
+variable
+  {O A Γ : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing Γ] [Algebra O Γ]
   {I : Ideal A} {γ : DividedPowers I} {m : ℕ} (S : GrSplit O γ m)
 
 theorem dividedPowerFiltration_le {r r' : ℕ} (h : r ≤ r') : pdP γ r' ≤ pdP γ r :=
@@ -33,8 +35,8 @@ theorem sumMap_single (i : Fin m) (x : S.N i) : sumMap S (Pi.single i x) = S.ν 
     simp [Pi.single_eq_of_ne hj]
   · simp
 
-theorem sumMap_mem (n : ∀ i, S.N i) (r : ℕ) (h : ∀ i : Fin m, (i : ℕ) < r → n i = 0) :
-    sumMap S n ∈ pdP γ r := by
+theorem sumMap_mem (n : ∀ i, S.N i) (r : ℕ) (h : ∀ i : Fin m, (i : ℕ) < r → n i = 0)
+    : sumMap S n ∈ pdP γ r := by
   rw [sumMap_apply]
   refine Ideal.sum_mem _ fun i _ => ?_
   by_cases hi : (i : ℕ) < r
@@ -42,8 +44,8 @@ theorem sumMap_mem (n : ∀ i, S.N i) (r : ℕ) (h : ∀ i : Fin m, (i : ℕ) < 
     exact zero_mem _
   · exact dividedPowerFiltration_le (not_lt.1 hi) (S.mem i _)
 
-theorem eq_zero_of_mem (n : ∀ i, S.N i) (r : ℕ) :
-    sumMap S n ∈ pdP γ r → ∀ i : Fin m, (i : ℕ) < r → n i = 0 := by
+theorem eq_zero_of_mem (n : ∀ i, S.N i) (r : ℕ)
+    : sumMap S n ∈ pdP γ r → ∀ i : Fin m, (i : ℕ) < r → n i = 0 := by
   induction r with
   | zero => intro _ i hi; omega
   | succ r ih =>
@@ -99,15 +101,16 @@ theorem sumMap_bij : Function.Bijective (sumMap S) := by
 
 def sumEquiv : (∀ i, S.N i) ≃ₗ[O] A := LinearEquiv.ofBijective (sumMap S) (sumMap_bij S)
 
-theorem piLeft_tmul_apply (n : ∀ i, S.N i) (x : Γ) (i : Fin m) :
-    TensorProduct.piLeft O Γ S.N (n ⊗ₜ x) i = n i ⊗ₜ x := by
+theorem piLeft_tmul_apply (n : ∀ i, S.N i) (x : Γ) (i : Fin m)
+    : TensorProduct.piLeft O Γ S.N (n ⊗ₜ x) i = n i ⊗ₜ x := by
   simp [TensorProduct.piLeft, TensorProduct.piRight]
 
 def tensEquiv (Γ : Type) [CommRing Γ] [Algebra O Γ] : (∀ i, S.N i ⊗[O] Γ) ≃ₗ[O] A ⊗[O] Γ :=
   (TensorProduct.piLeft O Γ S.N).symm ≪≫ₗ LinearEquiv.rTensor Γ (sumEquiv S)
 
-theorem piLeft_symm_single (i : Fin m) (n : S.N i) (x : Γ) :
-    (TensorProduct.piLeft O Γ S.N).symm (Pi.single i (n ⊗ₜ x)) = (Pi.single i n : ∀ i, S.N i) ⊗ₜ x := by
+theorem piLeft_symm_single (i : Fin m) (n : S.N i) (x : Γ)
+    : (TensorProduct.piLeft O Γ S.N).symm (Pi.single i (n ⊗ₜ x))
+      = (Pi.single i n : ∀ i, S.N i) ⊗ₜ x := by
   rw [LinearEquiv.symm_apply_eq]
   funext j
   rw [piLeft_tmul_apply]
@@ -116,21 +119,22 @@ theorem piLeft_symm_single (i : Fin m) (n : S.N i) (x : Γ) :
     simp
   · simp [Pi.single_eq_of_ne h]
 
-theorem tensEquiv_single (i : Fin m) (n : S.N i) (x : Γ) :
-    tensEquiv S Γ (Pi.single i (n ⊗ₜ x)) = S.ν i n ⊗ₜ x := by
+theorem tensEquiv_single (i : Fin m) (n : S.N i) (x : Γ)
+    : tensEquiv S Γ (Pi.single i (n ⊗ₜ x)) = S.ν i n ⊗ₜ x := by
   simp only [tensEquiv, LinearEquiv.trans_apply, piLeft_symm_single]
   change sumMap S (Pi.single i n) ⊗ₜ[O] x = _
   rw [sumMap_single]
 
 def coord (i : Fin m) : A →ₗ[O] S.N i := (LinearMap.proj i).comp (sumEquiv S).symm.toLinearMap
 
-theorem coord_eq_zero (i : Fin m) {r : ℕ} (hi : (i : ℕ) < r) {a : A} (ha : a ∈ pdP γ r) : coord S i a = 0 := by
+theorem coord_eq_zero (i : Fin m) {r : ℕ} (hi : (i : ℕ) < r) {a : A} (ha : a ∈ pdP γ r)
+    : coord S i a = 0 := by
   have e : sumMap S ((sumEquiv S).symm a) = a := (sumEquiv S).apply_symm_apply a
   have h : sumMap S ((sumEquiv S).symm a) ∈ pdP γ r := e.symm ▸ ha
   exact eq_zero_of_mem S _ r h i hi
 
-theorem coord_tensEquiv (i : Fin m) (z : ∀ i, S.N i ⊗[O] Γ) :
-    (coord S i).rTensor Γ (tensEquiv S Γ z) = z i := by
+theorem coord_tensEquiv (i : Fin m) (z : ∀ i, S.N i ⊗[O] Γ)
+    : (coord S i).rTensor Γ (tensEquiv S Γ z) = z i := by
   obtain ⟨y, rfl⟩ := (TensorProduct.piLeft O Γ S.N).surjective z
   induction y using TensorProduct.induction_on with
   | zero => simp
@@ -144,20 +148,26 @@ theorem coord_tensEquiv (i : Fin m) (z : ∀ i, S.N i ⊗[O] Γ) :
     rw [e, LinearMap.rTensor_tmul, e', piLeft_tmul_apply]
   | add a b ha hb => simp only [map_add (f := _), Pi.add_apply, ha, hb]
 
-theorem coord_map_eq_zero (i : Fin m) {r : ℕ} (hi : (i : ℕ) < r) {w : A ⊗[O] Γ}
-    (hw : w ∈ (pdP γ r).map (Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ))) :
-    (coord S i).rTensor Γ w = 0 := by
+theorem coord_map_eq_zero
+    (i : Fin m)
+    {r : ℕ} (hi : (i : ℕ) < r)
+    {w : A ⊗[O] Γ}
+    (hw : w ∈ (pdP γ r).map (Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ)))
+    : (coord S i).rTensor Γ w = 0 := by
   have key : ∀ c : A ⊗[O] Γ, (coord S i).rTensor Γ (c * w) = 0 := by
-    refine Submodule.span_induction (p := fun w _ => ∀ c : A ⊗[O] Γ, (coord S i).rTensor Γ (c * w) = 0)
+    refine Submodule.span_induction
+      (p := fun w _ => ∀ c : A ⊗[O] Γ, (coord S i).rTensor Γ (c * w) = 0)
       ?_ ?_ ?_ ?_ hw
     · rintro _ ⟨p, hp, rfl⟩ c
       induction c using TensorProduct.induction_on with
       | zero => simp
       | tmul a x =>
-        have e : (a ⊗ₜ[O] x) * Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ) p
-            = (a * p) ⊗ₜ[O] x := by
+        have e
+            : (a ⊗ₜ[O] x) * Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ) p
+              = (a * p) ⊗ₜ[O] x := by
           simp [Algebra.TensorProduct.tmul_mul_tmul]
-        rw [e, LinearMap.rTensor_tmul, coord_eq_zero S i hi (Ideal.mul_mem_left _ _ hp), TensorProduct.zero_tmul]
+        rw [e, LinearMap.rTensor_tmul, coord_eq_zero S i hi (Ideal.mul_mem_left _ _ hp),
+          TensorProduct.zero_tmul]
       | add a b ha hb => rw [add_mul, map_add (f := _), ha, hb, add_zero]
     · intro c
       simp
@@ -168,25 +178,29 @@ theorem coord_map_eq_zero (i : Fin m) {r : ℕ} (hi : (i : ℕ) < r) {w : A ⊗[
       exact hu _
   simpa using key 1
 
-theorem single_mem_map (i : Fin m) {r : ℕ} (hi : r ≤ (i : ℕ)) (t : S.N i ⊗[O] Γ) :
-    tensEquiv S Γ (Pi.single i t) ∈
-      (pdP γ r).map (Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ)) := by
+theorem single_mem_map (i : Fin m) {r : ℕ} (hi : r ≤ (i : ℕ)) (t : S.N i ⊗[O] Γ)
+    : tensEquiv S Γ (Pi.single i t)
+      ∈ (pdP γ r).map (Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ)) := by
   induction t using TensorProduct.induction_on with
   | zero => simp
   | tmul n x =>
     rw [tensEquiv_single]
-    have e : S.ν i n ⊗ₜ[O] x = Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ) (S.ν i n)
-        * ((1 : A) ⊗ₜ[O] x) := by
+    have e
+        : S.ν i n ⊗ₜ[O] x
+          = Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ) (S.ν i n)
+            * ((1 : A) ⊗ₜ[O] x) := by
       simp [Algebra.TensorProduct.tmul_mul_tmul]
     rw [e]
-    exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ (dividedPowerFiltration_le hi (S.mem i n)))
+    exact Ideal.mul_mem_right _ _
+      (Ideal.mem_map_of_mem _ (dividedPowerFiltration_le hi (S.mem i n)))
   | add a b ha hb =>
     rw [Pi.single_add, map_add (f := _)]
     exact add_mem ha hb
 
-theorem tensEquiv_mem_iff (r : ℕ) (z : ∀ i, S.N i ⊗[O] Γ) :
-    tensEquiv S Γ z ∈ (pdP γ r).map (Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ)) ↔
-      ∀ i : Fin m, (i : ℕ) < r → z i = 0 := by
+theorem tensEquiv_mem_iff (r : ℕ) (z : ∀ i, S.N i ⊗[O] Γ)
+    : tensEquiv S Γ z
+        ∈ (pdP γ r).map (Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ))
+      ↔ ∀ i : Fin m, (i : ℕ) < r → z i = 0 := by
   constructor
   · intro h i hi
     rw [← coord_tensEquiv S i z]
@@ -200,11 +214,15 @@ theorem tensEquiv_mem_iff (r : ℕ) (z : ∀ i, S.N i ⊗[O] Γ) :
       exact zero_mem _
     · exact single_mem_map S i (not_lt.1 hi) _
 
-theorem main : ∀ {O A Γ : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing Γ] [Algebra O Γ] [Module.Flat O Γ]
-    {I : Ideal A} (γ : DividedPowers I) (m : ℕ) (S : GrSplit O γ m),
-    ∃ g : (∀ i, S.N i ⊗[O] Γ) ≃ₗ[O] A ⊗[O] Γ, (∀ i n x, g (Pi.single i (n ⊗ₜ x)) = S.ν i n ⊗ₜ x) ∧
-      ∀ (r : ℕ) (z : ∀ i, S.N i ⊗[O] Γ), g z ∈ (pdP γ r).map (Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ)) ↔
-        ∀ i : Fin m, (i : ℕ) < r → z i = 0 := by
+theorem main
+    : ∀ {O A Γ : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing Γ] [Algebra O Γ]
+        [Module.Flat O Γ] {I : Ideal A} (γ : DividedPowers I) (m : ℕ) (S : GrSplit O γ m),
+      ∃ g : (∀ i, S.N i ⊗[O] Γ) ≃ₗ[O] A ⊗[O] Γ,
+        (∀ i n x, g (Pi.single i (n ⊗ₜ x)) = S.ν i n ⊗ₜ x)
+          ∧ ∀ (r : ℕ) (z : ∀ i, S.N i ⊗[O] Γ),
+            g z ∈ (pdP γ r).map
+                (Algebra.TensorProduct.includeLeftRingHom (R := O) (A := A) (B := Γ))
+              ↔ ∀ i : Fin m, (i : ℕ) < r → z i = 0 := by
   intro O A Γ _ _ _ _ _ _ I γ m S
   exact ⟨tensEquiv S Γ, tensEquiv_single S, tensEquiv_mem_iff S⟩
 

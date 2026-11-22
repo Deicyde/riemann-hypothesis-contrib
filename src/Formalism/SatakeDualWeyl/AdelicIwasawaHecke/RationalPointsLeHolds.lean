@@ -12,9 +12,11 @@ namespace Formalism.UG.P
 
 open Formalism.UG
 
-theorem cT_map {A B : Type} [CommRing A] [CommRing B] (σ : A →+* A) (σ' : B →+* B)
-    (φ : A →+* B) (h : φ.comp σ = σ'.comp φ) {m p : Type} (M : Matrix m p A) :
-    cT σ' (M.map φ) = (cT σ M).map φ := by
+theorem cT_map
+    {A B : Type} [CommRing A] [CommRing B]
+    (σ : A →+* A) (σ' : B →+* B) (φ : A →+* B) (h : φ.comp σ = σ'.comp φ)
+    {m p : Type} (M : Matrix m p A)
+    : cT σ' (M.map φ) = (cT σ M).map φ := by
   ext i j
   simp only [cT, Matrix.transpose_apply, Matrix.map_apply]
   exact (RingHom.congr_fun h (M j i)).symm

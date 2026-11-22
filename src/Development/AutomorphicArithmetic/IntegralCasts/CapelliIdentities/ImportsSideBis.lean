@@ -38,14 +38,13 @@ private lemma key {R : Type} [NormedRing R] [NormedAlgebra ℂ R] {a : R}
 
 end EqOneOfPowersNearOne
 
-theorem UpperTheory.Reformulated.B.Yhd7.main :
-    ∀ {R : Type} [inst : NormedRing R] [NormedAlgebra ℂ R] {a : R},
+theorem UpperTheory.Reformulated.B.Yhd7.main
+    : ∀ {R : Type} [inst : NormedRing R] [NormedAlgebra ℂ R] {a : R},
       (∀ (p : ℕ), ‖a ^ p - (1 : R)‖ < (1 / 2 : ℝ)) → a = (1 : R) := by
   intro R _ _ a h
   by_contra hne
   have hpos : 0 < ‖a - 1‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hne)
   obtain ⟨N, hN⟩ := exists_nat_gt (1 / ‖a - 1‖)
   have hk := EqOneOfPowersNearOne.key h N
-  have h1 : 1 < (N : ℝ) * ‖a - 1‖ := by
-    rw [div_lt_iff₀ hpos] at hN; linarith
+  have h1 : 1 < (N : ℝ) * ‖a - 1‖ := by rw [div_lt_iff₀ hpos] at hN; linarith
   nlinarith

@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.sumNat_of :
-    SumNat := by
+theorem UpperTheory.Gal.TranscendenceTraces.sumNat_of : SumNat := by
   intro R _ F Z S p w A B t a b hB Ω _ _ x
   rw [res_res, hB Ω (x ≫ t.g)]
   symm

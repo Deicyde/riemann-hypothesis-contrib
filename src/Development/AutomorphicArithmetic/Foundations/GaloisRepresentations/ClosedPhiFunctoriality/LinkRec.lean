@@ -13,12 +13,14 @@ theorem linkRec_holds : LinkRec := by
   set s := (lr * (v : R)) ^ N with hs
   set t := (lr * (w : R)) ^ N with ht
   have hvw : u * ((v : R) ^ N * (w : R) ^ (2 * N)) = 1 := by
-    rw [hu_def, ← Units.val_pow_eq_pow_val, ← Units.val_pow_eq_pow_val, ← Units.val_mul, Units.inv_mul]
+    rw [hu_def, ← Units.val_pow_eq_pow_val, ← Units.val_pow_eq_pow_val, ← Units.val_mul,
+      Units.inv_mul]
   have hu : u * (s * (lr * (w : R)) ^ (2 * N)) = lr ^ (3 * N) := by
-    calc u * (s * (lr * (w : R)) ^ (2 * N))
-        = (u * ((v : R) ^ N * (w : R) ^ (2 * N))) * lr ^ (3 * N) := by
-          rw [hs]
-          ring
+    calc
+      u * (s * (lr * (w : R)) ^ (2 * N))
+          = (u * ((v : R) ^ N * (w : R) ^ (2 * N))) * lr ^ (3 * N) := by
+        rw [hs]
+        ring
       _ = lr ^ (3 * N) := by rw [hvw, one_mul]
   refine ⟨(u * t) • α, β₁', ?_⟩
   set D4 := R₁ * α₁ - α * R₁.map φ with hD4def
@@ -26,14 +28,18 @@ theorem linkRec_holds : LinkRec := by
   have hD4 : α * R₁.map φ = R₁ * α₁ - D4 := by rw [hD4def, sub_sub_cancel]
   have hD5 : β * R₀.map φ = R₀ * β₁ - D5 := by rw [hD5def, sub_sub_cancel]
   have e1 : t • (α * R₁.map φ * Q₁.map φ) = s • (R₁ * Q₁ * β₁) - t • (D4 * Q₁.map φ) := by
-    calc t • (α * R₁.map φ * Q₁.map φ) = t • ((R₁ * α₁ - D4) * Q₁.map φ) := by rw [hD4]
+    calc
+      t • (α * R₁.map φ * Q₁.map φ)
+        = t • ((R₁ * α₁ - D4) * Q₁.map φ) := by rw [hD4]
       _ = R₁ * (t • (α₁ * Q₁.map φ)) - t • (D4 * Q₁.map φ) := by
         simp only [Matrix.sub_mul, smul_sub, Matrix.mul_smul, Matrix.mul_assoc]
       _ = R₁ * (s • (Q₁ * β₁)) - t • (D4 * Q₁.map φ) := by rw [h3]
       _ = s • (R₁ * Q₁ * β₁) - t • (D4 * Q₁.map φ) := by
         simp only [Matrix.mul_smul, Matrix.mul_assoc]
   have e2 : t • (α * Q.map φ * R₀.map φ) = s • (Q * R₀ * β₁) - s • (Q * D5) := by
-    calc t • (α * Q.map φ * R₀.map φ) = (t • (α * Q.map φ)) * R₀.map φ := by rw [Matrix.smul_mul]
+    calc
+      t • (α * Q.map φ * R₀.map φ)
+        = (t • (α * Q.map φ)) * R₀.map φ := by rw [Matrix.smul_mul]
       _ = (s • (Q * β)) * R₀.map φ := by rw [h2]
       _ = s • (Q * (β * R₀.map φ)) := by rw [Matrix.smul_mul, Matrix.mul_assoc]
       _ = s • (Q * (R₀ * β₁ - D5)) := by rw [hD5]
@@ -41,11 +47,13 @@ theorem linkRec_holds : LinkRec := by
         simp only [Matrix.mul_sub, smul_sub, Matrix.mul_assoc]
   have hmap : (R₁ * Q₁ - Q * R₀).map φ = R₁.map φ * Q₁.map φ - Q.map φ * R₀.map φ := by
     rw [Matrix.map_sub _ (map_sub φ), Matrix.map_mul, Matrix.map_mul]
-  have e3 : (u * t) • α * (R₁.map φ * Q₁.map φ - Q.map φ * R₀.map φ)
-      = u • (t • (α * R₁.map φ * Q₁.map φ) - t • (α * Q.map φ * R₀.map φ)) := by
+  have e3
+      : (u * t) • α * (R₁.map φ * Q₁.map φ - Q.map φ * R₀.map φ)
+        = u • (t • (α * R₁.map φ * Q₁.map φ) - t • (α * Q.map φ * R₀.map φ)) := by
     simp only [Matrix.smul_mul, Matrix.mul_sub, smul_sub, smul_smul, Matrix.mul_assoc]
-  have key : lr ^ (3 * N) • (R₁ * Q₁ - Q * R₀) - (u * t) • α * (R₁ * Q₁ - Q * R₀).map φ * β₁'
-      = (u * t) • (D4 * (Q₁.map φ * β₁')) - (u * s) • (Q * (D5 * β₁')) := by
+  have key
+      : lr ^ (3 * N) • (R₁ * Q₁ - Q * R₀) - (u * t) • α * (R₁ * Q₁ - Q * R₀).map φ * β₁'
+        = (u * t) • (D4 * (Q₁.map φ * β₁')) - (u * s) • (Q * (D5 * β₁')) := by
     rw [hmap, e3, e1, e2, ← hu]
     simp only [Matrix.sub_mul, Matrix.smul_mul, smul_sub, smul_smul, Matrix.mul_assoc, h1,
       Matrix.mul_smul, Matrix.mul_one, Matrix.mul_sub]

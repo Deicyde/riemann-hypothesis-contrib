@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.Jets.BasicLiftAll
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory GlobalTheory.HatNF
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd
+  Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory
+  GlobalTheory.HatNF
 
 namespace GlobalTheory.RhvPoly
 
@@ -149,31 +151,35 @@ private lemma isPol_eq_zero_of_infinite_zeros {f : ℂ → V} (hf : _root_.Globa
     (hS.mono fun x hx => by simp [← hp, h0 x hx])
   simp [hp, this]
 
-
 open MeasureTheory in
-theorem _root_.GlobalTheory.RhvPoly.rhv_mem_of_infinite : ∀ (P : _root_.Formalism.FourierDecayAlt.M.Par) (A : Type) [Ring A] [StarRing A] [Algebra ℂ A]
-    (d : _root_.Formalism.FourierDecayAlt.Q.NFData P A) (K : Submodule ℂ A) (S : Set ℂ), S.Infinite →
-    (∀ y ∈ S, _root_.GlobalTheory.HatNF.rhv d y ∈ K) → ∀ y : ℂ, _root_.GlobalTheory.HatNF.rhv d y ∈ K := by
+theorem _root_.GlobalTheory.RhvPoly.rhv_mem_of_infinite
+    : ∀ (P : _root_.Formalism.FourierDecayAlt.M.Par) (A : Type) [Ring A] [StarRing A] [Algebra ℂ A]
+        (d : _root_.Formalism.FourierDecayAlt.Q.NFData P A) (K : Submodule ℂ A) (S : Set ℂ),
+      S.Infinite → (∀ y ∈ S, _root_.GlobalTheory.HatNF.rhv d y ∈ K)
+        → ∀ y : ℂ, _root_.GlobalTheory.HatNF.rhv d y ∈ K := by
   intro P A _ _ _ d K S hS hmem y
   classical
   have hx : _root_.GlobalTheory.RhvPoly.IsPol fun y => d.x y := by
-    have := isPol_linearMap_eval d.κ.toLinearMap
-      (fun ρ => ∏ i ∈ Finset.Icc 1 (P.k - 1), (Polynomial.X + Polynomial.C ((_root_.Formalism.FourierDecayAlt.M.rho P ρ i : ℂ))))
+    have :=
+      isPol_linearMap_eval d.κ.toLinearMap (fun ρ =>
+        ∏ i ∈ Finset.Icc 1 (P.k - 1), (Polynomial.X + Polynomial.C ((_root_.Formalism.FourierDecayAlt.M.rho P ρ i : ℂ))))
     convert this using 2 with y
     unfold _root_.Formalism.FourierDecayAlt.Q.NFData.x _root_.Formalism.FourierDecayAlt.M.xC
     simp [Polynomial.eval_prod]
   have hS12 : _root_.GlobalTheory.RhvPoly.IsPol fun y => d.S12 y := by
     unfold _root_.Formalism.FourierDecayAlt.Q.NFData.S12
     refine isPol_finset_sum _ fun l _ => isPol_mul ?_ (.const _)
-    have := isPol_linearMap_eval d.κ.toLinearMap
-      (fun ρ => ∏ i ∈ Finset.Icc 1 (P.k - 1) \ {l}, (Polynomial.X + Polynomial.C ((_root_.Formalism.FourierDecayAlt.M.rho P ρ i : ℂ))))
+    have :=
+      isPol_linearMap_eval d.κ.toLinearMap (fun ρ =>
+        ∏ i ∈ Finset.Icc 1 (P.k - 1) \ {l}, (Polynomial.X + Polynomial.C ((_root_.Formalism.FourierDecayAlt.M.rho P ρ i : ℂ))))
     convert this using 2 with y
     unfold _root_.Formalism.FourierDecayAlt.M.xEx
     simp [Polynomial.eval_prod]
   have hm0 : _root_.GlobalTheory.RhvPoly.IsPol fun y => d.L.m0 y := by
-    have := (_root_.GlobalTheory.RhvPoly.IsPol.const (-d.L.nabs)).add
-      (isPol_linearMap_comp (LinearMap.mulRight ℂ (-(d.L.ζ * d.L.GGi)))
-        (isPol_algebraMap_eval (A := A) (Polynomial.X - Polynomial.C (1 / 2))))
+    have :=
+      (_root_.GlobalTheory.RhvPoly.IsPol.const (-d.L.nabs)).add
+        (isPol_linearMap_comp (LinearMap.mulRight ℂ (-(d.L.ζ * d.L.GGi)))
+          (isPol_algebraMap_eval (A := A) (Polynomial.X - Polynomial.C (1 / 2))))
     convert this using 2 with y
     unfold _root_.Formalism.FourierDecayAlt.R.LevelData.m0
     simp [sub_eq_add_neg]
@@ -181,18 +187,26 @@ theorem _root_.GlobalTheory.RhvPoly.rhv_mem_of_infinite : ∀ (P : _root_.Formal
   have hentry : ∀ i j : Fin 2, _root_.GlobalTheory.RhvPoly.IsPol fun y => d.L.Tvprod y i j :=
     fun i j => isPol_linearMap_comp (Matrix.entryLinearMap ℂ A i j) hTv
   have hpol : _root_.GlobalTheory.RhvPoly.IsPol fun y => _root_.GlobalTheory.HatNF.rhv d y := by
-    have h : (fun y => _root_.GlobalTheory.HatNF.rhv d y) = fun y =>
-        d.L.Dr * ((d.L.GG * d.x y * d.L.m0 y + d.S12 y) * d.L.Tvprod y 0 0 +
-          d.L.GG * d.x y * d.L.Tvprod y 1 0) := by
+    have h
+        : (fun y => _root_.GlobalTheory.HatNF.rhv d y)
+          = fun y =>
+            d.L.Dr
+              * ((d.L.GG * d.x y * d.L.m0 y + d.S12 y) * d.L.Tvprod y 0 0
+                + d.L.GG * d.x y * d.L.Tvprod y 1 0) := by
       funext y
-      unfold _root_.GlobalTheory.HatNF.rhv _root_.Formalism.FourierDecayAlt.Q.NFData.QQ _root_.Formalism.FourierDecayAlt.R.LevelData.Avr _root_.Formalism.FourierDecayAlt.R.LevelData.Bvr
+      unfold _root_.GlobalTheory.HatNF.rhv _root_.Formalism.FourierDecayAlt.Q.NFData.QQ
+        _root_.Formalism.FourierDecayAlt.R.LevelData.Avr
+        _root_.Formalism.FourierDecayAlt.R.LevelData.Bvr
       simp
     rw [h]
-    refine isPol_mul (.const _) (.add (isPol_mul (.add (isPol_mul (isPol_mul (.const _) hx) hm0) hS12)
-      (hentry 0 0)) (isPol_mul (isPol_mul (.const _) hx) (hentry 1 0)))
+    refine isPol_mul (.const _)
+      (.add (isPol_mul (.add (isPol_mul (isPol_mul (.const _) hx) hm0) hS12) (hentry 0 0))
+        (isPol_mul (isPol_mul (.const _) hx) (hentry 1 0)))
   have hq := isPol_linearMap_comp K.mkQ hpol
-  have := isPol_eq_zero_of_infinite_zeros hq hS
-    (fun y hy => (Submodule.Quotient.mk_eq_zero K).2 (hmem y hy)) y
+  have :=
+    isPol_eq_zero_of_infinite_zeros hq hS
+      (fun y hy => (Submodule.Quotient.mk_eq_zero K).2 (hmem y hy))
+      y
   exact (Submodule.Quotient.mk_eq_zero K).1 this
 
 end GlobalTheory.RhvPoly

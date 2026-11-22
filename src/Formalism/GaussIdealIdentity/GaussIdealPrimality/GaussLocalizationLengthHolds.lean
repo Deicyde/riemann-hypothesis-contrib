@@ -23,14 +23,15 @@ variable [(gaussIdeal σ O).IsPrime]
 
 local notation "A" => Localization.AtPrime (gaussIdeal σ O)
 
-theorem maximalIdeal_eq :
-    IsLocalRing.maximalIdeal A = Ideal.map (algebraMap O A) (IsLocalRing.maximalIdeal O) := by
-  rw [← Localization.AtPrime.map_eq_maximalIdeal, IsScalarTower.algebraMap_eq O (MvPolynomial σ O) A,
-    ← Ideal.map_map, MvPolynomial.algebraMap_eq]
+theorem maximalIdeal_eq
+    : IsLocalRing.maximalIdeal A = Ideal.map (algebraMap O A) (IsLocalRing.maximalIdeal O) := by
+  rw [← Localization.AtPrime.map_eq_maximalIdeal,
+    IsScalarTower.algebraMap_eq O (MvPolynomial σ O) A, ← Ideal.map_map, MvPolynomial.algebraMap_eq]
   try rfl
 
 theorem algebraMap_injective : Function.Injective (algebraMap O A) := by
-  rw [IsScalarTower.algebraMap_eq O (MvPolynomial σ O) A, RingHom.coe_comp, MvPolynomial.algebraMap_eq]
+  rw [IsScalarTower.algebraMap_eq O (MvPolynomial σ O) A, RingHom.coe_comp,
+    MvPolynomial.algebraMap_eq]
   exact (IsLocalization.injective (S := A) (M := (gaussIdeal σ O).primeCompl)
     (Ideal.primeCompl_le_nonZeroDivisors (gaussIdeal σ O))).comp (MvPolynomial.C_injective σ O)
 
@@ -60,7 +61,8 @@ instance isLocalHom_A : IsLocalHom (algebraMap O A) := by
   constructor
   intro a ha
   rw [IsScalarTower.algebraMap_eq O (MvPolynomial σ O) A, RingHom.comp_apply,
-    IsLocalization.AtPrime.isUnit_to_map_iff A (gaussIdeal σ O)] at ha
+      IsLocalization.AtPrime.isUnit_to_map_iff A (gaussIdeal σ O)]
+    at ha
   by_contra hna
   apply ha
   have : a ∈ IsLocalRing.maximalIdeal O := hna

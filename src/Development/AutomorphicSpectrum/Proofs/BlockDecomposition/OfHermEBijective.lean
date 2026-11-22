@@ -7,8 +7,12 @@ public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,8 +26,7 @@ theorem rat_mem_hermA (β : HermE D r) : rat β.1 ∈ hermA D r := by
   congr 1
   exact β.2
 
-def ofHermE (β : HermE D r) : ratHerm D r :=
-  ⟨⟨rat β.1, rat_mem_hermA β⟩, ⟨β.1, rfl⟩⟩
+def ofHermE (β : HermE D r) : ratHerm D r := ⟨⟨rat β.1, rat_mem_hermA β⟩, ⟨β.1, rfl⟩⟩
 
 theorem ofHermE_val (β : HermE D r) : (ofHermE β).1.1 = β.1.map (incA D) := rfl
 
@@ -39,9 +42,13 @@ theorem ofHermE_bijective : Function.Bijective (ofHermE (D := D) (r := r)) := by
 
 def hermEquiv : HermE D r ≃ ratHerm D r := Equiv.ofBijective _ ofHermE_bijective
 
-theorem W_eq (ψ : AddChar (AF D.host.F) ℂ) (V : HSp D) (μ : Measure (Mx D V.rank r)) (lam : Measure (hermA D r))
-    (φ : Mx D V.rank r → ℂ) (β : HermE D r) :
-    W ψ V μ lam φ β = ∫ b, Jt ψ V μ φ b *
-      ψ (-halfTr (Matrix.trace (HMul.hMul (ofHermE β).1.1 b.1 : Mx D r r))) ∂lam := rfl
+theorem W_eq
+    (ψ : AddChar (AF D.host.F) ℂ)
+    (V : HSp D) (μ : Measure (Mx D V.rank r))
+    (lam : Measure (hermA D r)) (φ : Mx D V.rank r → ℂ) (β : HermE D r)
+    : W ψ V μ lam φ β
+      = ∫ b, Jt ψ V μ φ b *
+        ψ (-halfTr (Matrix.trace (HMul.hMul (ofHermE β).1.1 b.1 : Mx D r r))) ∂lam :=
+  rfl
 
 end GlobalTheory.CompanionTheory.HermPoisson

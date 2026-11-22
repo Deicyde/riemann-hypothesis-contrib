@@ -16,16 +16,19 @@ namespace GlobalTheory.CompanionTheory.LowestData
 open Formalism.REAL (KHighest)
 open _root_.CompanionTheory.RgExh (GMod AlgDS)
 open _root_.CompanionTheory.RgDs (InCone)
-open GlobalTheory.LowestKTypeDetermines (lt_of_perm_lt rhoC_perm lowK_add strictAnti_add_rho nsq_add_cone eq_zero_of_nsq nsq_comp)
+open GlobalTheory.LowestKTypeDetermines
+  (lt_of_perm_lt rhoC_perm lowK_add strictAnti_add_rho nsq_add_cone eq_zero_of_nsq nsq_comp)
 
 variable {n : ℕ}
 
-theorem kHighest_renumber {V : Type} [AddCommGroup V] [Module ℂ V] (ε : Fin n → Bool)
-    (E : Fin n → Fin n → Module.End ℂ V) {s s' : Equiv.Perm (Fin n)}
-    (hs : ∀ a b, a < b → ε (s a) = ε (s b) → s a < s b)
-    (hs' : ∀ a b, a < b → ε (s' a) = ε (s' b) → s' a < s' b) {Λ : Fin n → ℝ} {v : V}
-    (h : KHighest (ε ∘ s') (fun a b => E (s' a) (s' b)) Λ v) :
-    KHighest (ε ∘ s) (fun a b => E (s a) (s b)) (Λ ∘ s'.symm ∘ s) v := by
+theorem kHighest_renumber
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ε : Fin n → Bool)
+    (E : Fin n → Fin n → Module.End ℂ V)
+    {s s' : Equiv.Perm (Fin n)} (hs : ∀ a b, a < b → ε (s a) = ε (s b) → s a < s b)
+    (hs' : ∀ a b, a < b → ε (s' a) = ε (s' b) → s' a < s' b)
+    {Λ : Fin n → ℝ} {v : V} (h : KHighest (ε ∘ s') (fun a b => E (s' a) (s' b)) Λ v)
+    : KHighest (ε ∘ s) (fun a b => E (s a) (s b)) (Λ ∘ s'.symm ∘ s) v := by
   obtain ⟨h1, h2⟩ := h
   refine ⟨fun a => ?_, fun a b hab he => ?_⟩
   · have := h1 (s'.symm (s a))
@@ -39,17 +42,21 @@ theorem kHighest_renumber {V : Type} [AddCommGroup V] [Module ℂ V] (ε : Fin n
     simpa using this
 
 -- Unfold DataUniq and ConeDS to depend directly on AlgDS and InCone.
-theorem dataUniq (n : ℕ) (ε : Fin n → Bool) (X : GMod n)
-    (s s' : Equiv.Perm (Fin n)) (mu mu' : Fin n → ℝ)
+theorem dataUniq
+    (n : ℕ) (ε : Fin n → Bool) (X : GMod n) (s s' : Equiv.Perm (Fin n)) (mu mu' : Fin n → ℝ)
     (h : AlgDS ε X s mu)
-    (hc : ∀ (ν : Fin n → ℝ) (x : X.V), x ≠ 0 →
-      KHighest (ε ∘ s) (fun a b => X.E (s a) (s b)) ν x →
-      InCone (PI.UpqRep.lowK (ε ∘ s) mu) ν)
-    (h' : AlgDS ε X s' mu') : s = s' ∧ mu = mu' := by
+    (hc : ∀ (ν : Fin n → ℝ) (x : X.V),
+      x ≠ 0 → KHighest (ε ∘ s) (fun a b => X.E (s a) (s b)) ν x
+        → InCone (PI.UpqRep.lowK (ε ∘ s) mu) ν)
+    (h' : AlgDS ε X s' mu')
+    : s = s' ∧ mu = mu' := by
   obtain ⟨hl, hs, -, v, hv0, hv⟩ := h
   obtain ⟨hl', hs', hmin', v', hv0', hv'⟩ := h'
-  have add : ∀ (ε : Fin n → Bool) (lam : Fin n → ℝ),
-      PI.UpqRep.lowK ε lam + (2 : ℝ) • Formalism.REAL.rhoC ε = lam + Formalism.QuantumDeterminants.rhoStd n := fun ε lam => lowK_add ε lam
+  have add
+      : ∀ (ε : Fin n → Bool) (lam : Fin n → ℝ),
+        PI.UpqRep.lowK ε lam + (2 : ℝ) • Formalism.REAL.rhoC ε
+          = lam + Formalism.QuantumDeterminants.rhoStd n := fun ε lam =>
+    lowK_add ε lam
   have k1 := kHighest_renumber ε X.E hs hs' hv'
   have k2 := kHighest_renumber ε X.E hs' hs hv
   obtain ⟨c, hc1, e⟩ := hc _ v' hv0' k1
@@ -60,30 +67,37 @@ theorem dataUniq (n : ℕ) (ε : Fin n → Bool) (X : GMod n)
   have hsx : StrictAnti x := strictAnti_add_rho hl.1
   have hsx' : StrictAnti x' := strictAnti_add_rho hl'.1
   have r1 : x' ∘ s'.symm ∘ s = x + Q := by
-    have e1 : x = PI.UpqRep.lowK (ε ∘ s) mu + (2 : ℝ) • Formalism.REAL.rhoC (ε ∘ s) := (add _ _).symm
-    have e2 : x' = PI.UpqRep.lowK (ε ∘ s') mu' + (2 : ℝ) • Formalism.REAL.rhoC (ε ∘ s') := (add _ _).symm
+    have e1 : x = PI.UpqRep.lowK (ε ∘ s) mu + (2 : ℝ) • Formalism.REAL.rhoC (ε ∘ s) :=
+      (add _ _).symm
+    have e2 : x' = PI.UpqRep.lowK (ε ∘ s') mu' + (2 : ℝ) • Formalism.REAL.rhoC (ε ∘ s') :=
+      (add _ _).symm
     funext a
     have ea := congrFun e a
     rw [e1, e2, rhoC_perm s hs, rhoC_perm s' hs']
     simp only [Function.comp_apply, Pi.add_apply, Pi.smul_apply, Equiv.apply_symm_apply] at ea ⊢
-    rw [ea]; ring
-  have r2 : x ∘ s.symm ∘ s' =
-      PI.UpqRep.lowK (ε ∘ s) mu ∘ s.symm ∘ s' + (2 : ℝ) • Formalism.REAL.rhoC (ε ∘ s') := by
-    have e1 : x = PI.UpqRep.lowK (ε ∘ s) mu + (2 : ℝ) • Formalism.REAL.rhoC (ε ∘ s) := (add _ _).symm
+    rw [ea]
+    ring
+  have r2
+      : x ∘ s.symm ∘ s'
+        = PI.UpqRep.lowK (ε ∘ s) mu ∘ s.symm ∘ s' + (2 : ℝ) • Formalism.REAL.rhoC (ε ∘ s') := by
+    have e1 : x = PI.UpqRep.lowK (ε ∘ s) mu + (2 : ℝ) • Formalism.REAL.rhoC (ε ∘ s) :=
+      (add _ _).symm
     rw [e1, rhoC_perm s hs, rhoC_perm s' hs']
     funext a
     simp
   have m3 : Formalism.REAL.nsq x' ≤ Formalism.REAL.nsq x := by
-    have a1 : Formalism.REAL.nsq x' =
-        PI.UpqRep.vNormSq (ε ∘ s') (PI.UpqRep.lowK (ε ∘ s') mu') := by
+    have a1 : Formalism.REAL.nsq x' = PI.UpqRep.vNormSq (ε ∘ s') (PI.UpqRep.lowK (ε ∘ s') mu') := by
       rw [hx', ← add]; rfl
-    have a2 : Formalism.REAL.nsq x = PI.UpqRep.vNormSq (ε ∘ s')
-        (PI.UpqRep.lowK (ε ∘ s) mu ∘ s.symm ∘ s') := by
+    have a2
+        : Formalism.REAL.nsq x
+          = PI.UpqRep.vNormSq (ε ∘ s') (PI.UpqRep.lowK (ε ∘ s) mu ∘ s.symm ∘ s') := by
       have := nsq_comp (s.symm * s') x
       have e3 : x ∘ ⇑(s.symm * s') = x ∘ s.symm ∘ s' := rfl
       rw [e3, r2] at this
-      rw [← this]; rfl
-    rw [a1, a2]; exact m2
+      rw [← this]
+      rfl
+    rw [a1, a2]
+    exact m2
   have m4 : Formalism.REAL.nsq (x + Q) = Formalism.REAL.nsq x' := by
     rw [← r1]
     exact nsq_comp (s'.symm * s) x'
@@ -103,8 +117,7 @@ theorem dataUniq (n : ℕ) (ε : Fin n → Bool) (X : GMod n)
     simpa using this
   subst h7
   refine ⟨rfl, ?_⟩
-  have h8 : x' = x := by
-    simpa using r1
+  have h8 : x' = x := by simpa using r1
   exact (add_right_cancel h8).symm
 
 end GlobalTheory.CompanionTheory.LowestData

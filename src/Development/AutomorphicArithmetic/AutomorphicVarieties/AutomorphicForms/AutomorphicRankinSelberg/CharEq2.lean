@@ -4,8 +4,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-theorem UpperTheory.V.Af.Rs.charEq2 :
-    UpperTheory.V.Af.Rs.Core → UpperTheory.V.Af.Rs.Deplete → UpperTheory.V.Af.Rs.CharEq2 := by
+theorem UpperTheory.V.Af.Rs.charEq2
+    : UpperTheory.V.Af.Rs.Core → UpperTheory.V.Af.Rs.Deplete → UpperTheory.V.Af.Rs.CharEq2 := by
   intro hCore hDep k N M _ _ hk χ ψ g h hev
   rw [Filter.eventually_cofinite] at hev
   obtain ⟨B, hB⟩ := hev.bddAbove
@@ -18,8 +18,11 @@ theorem UpperTheory.V.Af.Rs.charEq2 :
   have hML : M ∣ L := ⟨N * B.factorial, by rw [hL]; ring⟩
   obtain ⟨χ1, g1, hg1⟩ := hDep k N L hk hNL χ g
   obtain ⟨χ2, h1, hh1⟩ := hDep k M L hk hML ψ h
-  have good : ∀ p, Nat.Prime p → ¬ p ∣ L → (h.a p = g.a p ∧ (starRingEnd ℂ) (g.a p) * χ p = g.a p ∧
-      (starRingEnd ℂ) (h.a p) * ψ p = h.a p) := by
+  have good
+      : ∀ p,
+        Nat.Prime p → ¬ p ∣ L
+          → (h.a p = g.a p ∧ (starRingEnd ℂ) (g.a p) * χ p = g.a p
+            ∧ (starRingEnd ℂ) (h.a p) * ψ p = h.a p) := by
     intro p hp hpL
     by_contra hbad
     have hle : p ≤ B := hB (by simp only [Set.mem_setOf_eq]; exact fun H => hbad (H hp))

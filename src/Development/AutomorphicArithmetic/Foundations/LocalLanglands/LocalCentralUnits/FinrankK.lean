@@ -14,23 +14,29 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Restricts
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne GlobalTheory.LocLanglands DiscreteGroups.sglob.DzType
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands DiscreteGroups.sglob.DzType
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace UpperTheory.Zero.LLC
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-  {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w} {g n : ℕ} [Fact g.Prime]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+  {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w} {g n : ℕ}
+  [Fact g.Prime]
 
-private theorem exists_lift (D : Ext h g n) (hn : 0 < n) (t : Ine (F := E) A) :
-    ∃ t' : Ine (F := D.E') A, (t : G E Ω) = AlgEquiv.restrictScalars E (t' : G D.E' Ω) := by
+private theorem exists_lift (D : Ext h g n) (hn : 0 < n) (t : Ine (F := E) A)
+    : ∃ t' : Ine (F := D.E') A, (t : G E Ω) = AlgEquiv.restrictScalars E (t' : G D.E' Ω) := by
   obtain ⟨s, hs, e⟩ := ine_lift g A w h D.w' D.h' n hn D.unr D.card (t : G E Ω) t.2
   exact ⟨⟨s, hs⟩, e.symm⟩
 
-private theorem lift_unique (D : Ext h g n) {t : Ine (F := E) A} {s s' : Ine (F := D.E') A}
+private theorem lift_unique
+    (D : Ext h g n)
+    {t : Ine (F := E) A} {s s' : Ine (F := D.E') A}
     (e : (t : G E Ω) = AlgEquiv.restrictScalars E (s : G D.E' Ω))
-    (e' : (t : G E Ω) = AlgEquiv.restrictScalars E (s' : G D.E' Ω)) : s = s' :=
+    (e' : (t : G E Ω) = AlgEquiv.restrictScalars E (s' : G D.E' Ω))
+    : s = s' :=
   Subtype.ext (AlgEquiv.restrictScalars_injective E (e.symm.trans e'))
 
 private theorem finrank_K (D : Ext h g n) (hn : 0 < n) : Module.finrank (ZMod g) D.K = n := by
@@ -47,8 +53,7 @@ private theorem finrank_K (D : Ext h g n) (hn : 0 < n) : Module.finrank (ZMod g)
 end UpperTheory.Zero.LLC
 
 open UpperTheory.Zero.LLC in
-theorem UpperTheory.Zero.LLC.resEx :
-    UpperTheory.Zero.LLC.ResEx := by
+theorem UpperTheory.Zero.LLC.resEx : UpperTheory.Zero.LLC.ResEx := by
   intro E Ω _ _ _ _ _ A w h g _ i hi n hn D
   obtain ⟨R0, hR0⟩ := exists_resHom (h' := D.h') D.ha' (K := D.K) (red := D.red) D.ker
   have hlift := exists_lift D hn
@@ -67,43 +72,53 @@ theorem UpperTheory.Zero.LLC.resEx :
       show ((R0 (L t) : D.Kˣ) : D.K) = _
       rw [e1]
       exact hR0 t' x hv
-  ·
-    have hRR : ∀ (t : Ine (F := E) A) (t' : Ine (F := D.E') A),
-        (t : G E Ω) = AlgEquiv.restrictScalars E (t' : G D.E' Ω) → R t = R0 t' := by
+  · have hRR
+        : ∀ (t : Ine (F := E) A) (t' : Ine (F := D.E') A),
+          (t : G E Ω) = AlgEquiv.restrictScalars E (t' : G D.E' Ω) → R t = R0 t' := by
       intro t t' e
       obtain ⟨x, hx⟩ := exists_int_approx_compl D.w' _ (val_artin_ine D.ha' t').le
       have hne := red_ne_zero_of_approx D.ha' D.ker hx
       rw [hR t t' x (Units.mk0 _ hne) e rfl hx]
       exact Units.ext (hR0 t' x hx).symm
-    have hone : ∀ t' : Ine (F := D.E') A,
-        Valued.v ((D.a' (ineIncl D.h' t') : D.w'.adicCompletion D.E') - 1) < 1 → R0 t' = 1 := by
+    have hone
+        : ∀ t' : Ine (F := D.E') A,
+          Valued.v ((D.a' (ineIncl D.h' t') : D.w'.adicCompletion D.E') - 1) < 1 → R0 t' = 1 := by
       intro t' hv
       apply Units.ext
       rw [hR0 t' 1 (by simpa using hv)]
       simp
-    have hwild : ∀ t : Ine (F := E) A, Formalism.MainNotions.BlochKatoReduction.IsWild A (t : G E Ω) → R t = 1 := by
+    have hwild
+        : ∀ t : Ine (F := E) A,
+          Formalism.MainNotions.BlochKatoReduction.IsWild A (t : G E Ω) → R t = 1 := by
       intro t hw
       obtain ⟨t', e⟩ := hlift t
       rw [hRR t t' e]
-      refine hone t' (PositivityTheory.LocalParametersCuspidal.DZC.wild_to_unitsOne D.a' D.ha' (ineIncl D.h' t') ⟨t'.2, fun x hx => ?_⟩)
+      refine hone t'
+        (PositivityTheory.LocalParametersCuspidal.DZC.wild_to_unitsOne D.a' D.ha' (ineIncl D.h' t')
+          ⟨t'.2, fun x hx => ?_⟩)
       have := hw.2 x hx
       rw [e] at this
       exact this
     have hq : normV w = g := normV_eq_of_padic w g i hi
     refine ⟨hn, hq, finrank_K D hn, ?_, ?_, hwild, ?_⟩
     · intro z
-      obtain ⟨t', x, hx, hv⟩ := exists_ine_of_res g A D.w' D.h' n hn D.card D.a' D.ha' D.K D.red D.surj D.ker z
-      exact ⟨⟨AlgEquiv.restrictScalars E (t' : G D.E' Ω), GlobalTheory.AboveL.ResEx.res_mem_Ine t'.2⟩,
-        hR _ t' x z rfl hx hv⟩
-    ·
-      set U : Set (D.w'.adicCompletion D.E')ˣ := {u | Valued.v ((u : D.w'.adicCompletion D.E') - 1) < 1} with hUdef
+      obtain ⟨t', x, hx, hv⟩ :=
+        exists_ine_of_res g A D.w' D.h' n hn D.card D.a' D.ha' D.K D.red D.surj D.ker z
+      exact ⟨
+        ⟨AlgEquiv.restrictScalars E (t' : G D.E' Ω), GlobalTheory.AboveL.ResEx.res_mem_Ine t'.2⟩,
+        hR _ t' x z rfl hx hv
+      ⟩
+    · set U : Set (D.w'.adicCompletion D.E')ˣ := {u | Valued.v ((u : D.w'.adicCompletion D.E') - 1) < 1} with hUdef
       have hU : U ∈ nhds (1 : (D.w'.adicCompletion D.E')ˣ) := by
-        have h0 : {x : D.w'.adicCompletion D.E' | Valued.v (x - 1) < 1} ∈
-            nhds ((1 : (D.w'.adicCompletion D.E')ˣ) : D.w'.adicCompletion D.E') := by
+        have h0
+            : {x : D.w'.adicCompletion D.E' | Valued.v (x - 1) < 1}
+              ∈ nhds ((1 : (D.w'.adicCompletion D.E')ˣ) : D.w'.adicCompletion D.E') := by
           rw [Valued.mem_nhds]
           exact ⟨1, fun y hy => by simpa [Valuation.restrict_lt_one_iff] using hy⟩
         exact Units.continuous_val.continuousAt.preimage_mem_nhds h0
-      have hV : (fun τ : Ine (F := D.E') A => D.a' (ineIncl D.h' τ)) ⁻¹' U ∈ nhds (1 : Ine (F := D.E') A) := by
+      have hV
+          : (fun τ : Ine (F := D.E') A => D.a' (ineIncl D.h' τ)) ⁻¹' U
+            ∈ nhds (1 : Ine (F := D.E') A) := by
         refine D.ha'.cont.continuousAt.preimage_mem_nhds ?_
         simpa using hU
       obtain ⟨O, hO, hOs⟩ := (mem_nhds_induced Subtype.val (1 : Ine (F := D.E') A) _).1 hV

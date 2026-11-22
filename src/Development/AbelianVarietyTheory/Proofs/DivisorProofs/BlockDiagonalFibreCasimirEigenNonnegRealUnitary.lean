@@ -10,10 +10,11 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem cas_diag_unitOn (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool)
-    (F : ι → ι → Module.End ℂ M) (U : Submodule ℂ M) (hU : UnitOn s F U) :
-    (∀ (c : ℂ), ∀ v ∈ U, v ≠ 0 → cas s F v = c • v → c.im = 0 ∧ 0 ≤ c.re) ∧
-      (U ≠ ⊥ → ∃ (ω : ℝ) (v : M), v ∈ U ∧ v ≠ 0 ∧ cas s F v = (ω : ℂ) • v) := by
+theorem cas_diag_unitOn
+    (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M]
+    (s : ι → Bool) (F : ι → ι → Module.End ℂ M) (U : Submodule ℂ M) (hU : UnitOn s F U)
+    : (∀ (c : ℂ), ∀ v ∈ U, v ≠ 0 → cas s F v = c • v → c.im = 0 ∧ 0 ≤ c.re)
+      ∧ (U ≠ ⊥ → ∃ (ω : ℝ) (v : M), v ∈ U ∧ v ≠ 0 ∧ cas s F v = (ω : ℂ) • v) := by
   obtain ⟨hfin, hst, ip, hherm, hpos, hadj⟩ := hU
   have hw : ∀ w ∈ U, (ip w w).im = 0 ∧ 0 ≤ (ip w w).re := by
     intro w hw
@@ -24,7 +25,8 @@ theorem cas_diag_unitOn (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGrou
     · by_cases h0 : w = 0
       · simp [h0]
       · exact le_of_lt (hpos w hw h0)
-  have key : ∀ v ∈ U, ip v (cas s F v) = ∑ a, ∑ b, if s a = s b then ip (F b a v) (F b a v) else 0 := by
+  have key
+      : ∀ v ∈ U, ip v (cas s F v) = ∑ a, ∑ b, if s a = s b then ip (F b a v) (F b a v) else 0 := by
     intro v hv
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [cas, LinearMap.sum_apply, map_sum]

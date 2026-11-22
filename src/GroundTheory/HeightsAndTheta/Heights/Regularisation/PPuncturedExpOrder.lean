@@ -33,14 +33,16 @@ theorem PuncturedExpOrder.proof : PuncturedExpOrder.Statement := by
   have hGF : ∀ x : ℂ, x ≠ 0 → G x = F x := fun x hx => Function.update_of_ne hx _ _
   have hnz : ¬ ∀ᶠ z in 𝓝 (0 : ℂ), G z = 0 := by
     intro h
-    obtain ⟨x, hx, hx0⟩ := ((h.filter_mono nhdsWithin_le_nhds).and
-      (self_mem_nhdsWithin : {(0 : ℂ)}ᶜ ∈ 𝓝[≠] (0 : ℂ))).exists
+    obtain ⟨x, hx, hx0⟩ :=
+      ((h.filter_mono nhdsWithin_le_nhds).and
+        (self_mem_nhdsWithin : {(0 : ℂ)}ᶜ ∈ 𝓝[≠] (0 : ℂ))).exists
     have hx0' : x ≠ 0 := hx0
     rw [hGF x hx0', hFdef] at hx
     exact mul_ne_zero (Complex.exp_ne_zero _) (zpow_ne_zero _ hx0') hx
   obtain ⟨m, u, hua, hu0, hGu⟩ := hGa.exists_eventuallyEq_pow_smul_nonzero_iff.mpr hnz
-  have hev : ∀ᶠ x in 𝓝 (0 : ℂ),
-      AnalyticAt ℂ u x ∧ u x ≠ 0 ∧ G x = x ^ m * u x ∧ x ∈ ball (0 : ℂ) R := by
+  have hev
+      : ∀ᶠ x in 𝓝 (0 : ℂ),
+        AnalyticAt ℂ u x ∧ u x ≠ 0 ∧ G x = x ^ m * u x ∧ x ∈ ball (0 : ℂ) R := by
     filter_upwards [hua.eventually_analyticAt, hua.continuousAt.eventually_ne hu0, hGu,
       ball_mem_nhds (0 : ℂ) hR] with x h1 h2 h3 h4
     exact ⟨h1, h2, by simpa using h3, h4⟩
@@ -52,21 +54,20 @@ theorem PuncturedExpOrder.proof : PuncturedExpOrder.Statement := by
     obtain ⟨-, -, h3, -⟩ := hεs x hx
     rw [hGF x hx0, hFdef] at h3
     have hk : x ^ k ≠ 0 := zpow_ne_zero _ hx0
-    rw [hjdef, zpow_sub₀ hx0, zpow_natCast, div_mul_eq_mul_div, ← h3,
-      mul_div_cancel_right₀ _ hk]
+    rw [hjdef, zpow_sub₀ hx0, zpow_natCast, div_mul_eq_mul_div, ← h3, mul_div_cancel_right₀ _ hk]
   have hSε : IsOpen (ball (0 : ℂ) ε \ {0}) := isOpen_ball.sdiff isClosed_singleton
 
-  have hlog : ∀ x ∈ ball (0 : ℂ) ε, x ≠ 0 →
-      HasDerivAt ψ (deriv ψ x) x ∧ deriv ψ x = (j : ℂ) * (x - 0)⁻¹ + deriv u x / u x := by
+  have hlog
+      : ∀ x ∈ ball (0 : ℂ) ε,
+        x ≠ 0 → HasDerivAt ψ (deriv ψ x) x ∧ deriv ψ x = (j : ℂ) * (x - 0)⁻¹ + deriv u x / u x := by
     intro x hx hx0
     obtain ⟨hux, hu0x, -, hxR⟩ := hεs x hx
     have hψx : HasDerivAt ψ (deriv ψ x) x :=
       ((hψ x ⟨hxR, hx0⟩).differentiableAt (hSo.mem_nhds ⟨hxR, hx0⟩)).hasDerivAt
     refine ⟨hψx, ?_⟩
-    have h1 : HasDerivAt (fun y => Complex.exp (ψ y)) (Complex.exp (ψ x) * deriv ψ x) x :=
-      hψx.cexp
-    have h2 : HasDerivAt (fun y => y ^ j * u y)
-        ((j : ℂ) * x ^ (j - 1) * u x + x ^ j * deriv u x) x :=
+    have h1 : HasDerivAt (fun y => Complex.exp (ψ y)) (Complex.exp (ψ x) * deriv ψ x) x := hψx.cexp
+    have h2
+        : HasDerivAt (fun y => y ^ j * u y) ((j : ℂ) * x ^ (j - 1) * u x + x ^ j * deriv u x) x :=
       (hasDerivAt_zpow j x (Or.inl hx0)).mul hux.differentiableAt.hasDerivAt
     have heq : (fun y => Complex.exp (ψ y)) =ᶠ[𝓝 x] fun y => y ^ j * u y := by
       filter_upwards [hSε.mem_nhds ⟨hx, hx0⟩] with y hy
@@ -74,8 +75,7 @@ theorem PuncturedExpOrder.proof : PuncturedExpOrder.Statement := by
     have h3 := (h1.congr_of_eventuallyEq heq.symm).unique h2
     rw [hkey x hx hx0, zpow_sub_one₀ hx0] at h3
     have hxj : x ^ j ≠ 0 := zpow_ne_zero _ hx0
-    have hd : deriv ψ x =
-        ((j : ℂ) * (x ^ j * x⁻¹) * u x + x ^ j * deriv u x) / (x ^ j * u x) := by
+    have hd : deriv ψ x = ((j : ℂ) * (x ^ j * x⁻¹) * u x + x ^ j * deriv u x) / (x ^ j * u x) := by
       rw [eq_div_iff (mul_ne_zero hxj hu0x)]
       linear_combination h3
     rw [hd, sub_zero]
@@ -99,8 +99,8 @@ theorem PuncturedExpOrder.proof : PuncturedExpOrder.Statement := by
   have hI1 : (∮ z in C(0, r), deriv ψ z) = 0 :=
     circleIntegral.integral_eq_zero_of_hasDerivWithinAt hr.le fun z hz =>
       (hlog z (hsph z hz).1 (hsph z hz).2).1.hasDerivWithinAt
-  have hI2 : (∮ z in C(0, r), deriv ψ z) =
-      ∮ z in C(0, r), ((j : ℂ) * (z - 0)⁻¹ + deriv u z / u z) :=
+  have hI2
+      : (∮ z in C(0, r), deriv ψ z) = ∮ z in C(0, r), ((j : ℂ) * (z - 0)⁻¹ + deriv u z / u z) :=
     circleIntegral.integral_congr hr.le fun z hz => (hlog z (hsph z hz).1 (hsph z hz).2).2
   have hc1 : CircleIntegrable (fun z : ℂ => (j : ℂ) * (z - 0)⁻¹) 0 r := by
     refine ContinuousOn.circleIntegrable hr.le ?_

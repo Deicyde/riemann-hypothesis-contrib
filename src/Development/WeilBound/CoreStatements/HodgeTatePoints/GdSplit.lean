@@ -10,8 +10,9 @@ noncomputable section
 
 namespace PositivityTheory.HtPt.Gd
 
-private theorem isTorsionFree_of_projective {A P : Type*} [CommRing A] [AddCommGroup P] [Module A P]
-    [Module.Projective A P] : Module.IsTorsionFree A P := by
+private theorem isTorsionFree_of_projective
+    {A P : Type*} [CommRing A] [AddCommGroup P] [Module A P] [Module.Projective A P]
+    : Module.IsTorsionFree A P := by
   obtain ⟨s, hs⟩ := Module.projective_def'.mp ‹Module.Projective A P›
   have hinj : Function.Injective s :=
     Function.LeftInverse.injective (g := Finsupp.linearCombination A id)
@@ -25,19 +26,23 @@ private theorem isTorsionFree_of_projective {A P : Type*} [CommRing A] [AddCommG
   simp only [Finsupp.smul_apply, smul_eq_mul] at hx
   exact hr.left hx
 
-theorem inj_mod_of_surj_mod {A : Type} [CommRing A] [IsDomain A] {P : Type} [AddCommGroup P]
-    [Module A P] [Module.Finite A P] [Module.IsTorsionFree A P] {N : ℕ} (a : A)
-    (φ : (Fin N → A) →ₗ[A] P) (hN : (N : Cardinal) ≤ Module.rank A P)
-    (hs : ∀ y, ∃ x y', y = φ x + a • y') (x : Fin N → A) (y : P) (hx : φ x = a • y) :
-    ∃ x', x = a • x' := by
+theorem inj_mod_of_surj_mod
+    {A : Type} [CommRing A] [IsDomain A]
+    {P : Type} [AddCommGroup P] [Module A P] [Module.Finite A P] [Module.IsTorsionFree A P]
+    {N : ℕ}
+    (a : A) (φ : (Fin N → A) →ₗ[A] P)
+    (hN : (N : Cardinal) ≤ Module.rank A P) (hs : ∀ y, ∃ x y', y = φ x + a • y')
+    (x : Fin N → A) (y : P) (hx : φ x = a • y)
+    : ∃ x', x = a • x' := by
   haveI : Module.IsTorsionFree A (Fin N → A) := isTorsionFree_of_projective
-  obtain ⟨r, hr1, hrP⟩ := Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup
-    (I := Ideal.span {a}) (N := LinearMap.range φ) (Module.Finite.fg_top (R := A) (M := P)) le_rfl
-    (by
-      intro z _
-      obtain ⟨x₀, z', rfl⟩ := hs z
-      exact Submodule.add_mem_sup (LinearMap.mem_range_self φ x₀)
-        (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self a) Submodule.mem_top))
+  obtain ⟨r, hr1, hrP⟩ :=
+    Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup (I := Ideal.span {a})
+      (N := LinearMap.range φ) (Module.Finite.fg_top (R := A) (M := P)) le_rfl
+      (by
+        intro z _
+        obtain ⟨x₀, z', rfl⟩ := hs z
+        exact Submodule.add_mem_sup (LinearMap.mem_range_self φ x₀)
+          (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self a) Submodule.mem_top))
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp hr1
   by_cases hr : r = 0
   · refine ⟨-(c • x), ?_⟩
@@ -60,7 +65,8 @@ theorem inj_mod_of_surj_mod {A : Type} [CommRing A] [IsDomain A] {P : Type} [Add
       rw [← hsum]
       exact le_self_add
     rw [le_antisymm hle hrk, add_comm] at hsum
-    exact (Cardinal.add_right_inj_of_lt_aleph0 Cardinal.natCast_lt_aleph0).mp (by rw [hsum, zero_add])
+    exact (Cardinal.add_right_inj_of_lt_aleph0 Cardinal.natCast_lt_aleph0).mp
+      (by rw [hsum, zero_add])
   have hinj : Function.Injective φ := LinearMap.ker_eq_bot.mp (Submodule.rank_eq_zero.mp hker)
   obtain ⟨z, hz⟩ := hrange y
   have hxz : r • x = a • z :=
@@ -69,7 +75,14 @@ theorem inj_mod_of_surj_mod {A : Type} [CommRing A] [IsDomain A] {P : Type} [Add
   rw [smul_sub, ← hxz, smul_smul, ← sub_smul, mul_comm a c, hc]
   simp
 
-theorem split_exact : ∀ (A : Type) [CommRing A] [IsDomain A] (P₁ P₂ : Type) [AddCommGroup P₁] [Module A P₁] [Module.Finite A P₁] [Module.Projective A P₁] [AddCommGroup P₂] [Module A P₂] [Module.Finite A P₂] [Module.Projective A P₂] (N : ℕ) (a : A) (i : P₁ →ₗ[A] (Fin N → A)) (r : (Fin N → A) →ₗ[A] P₁) (q : (Fin N → A) →ₗ[A] P₂), Module.finrank A P₁ + Module.finrank A P₂ = N → (∀ w, ∃ w', r (i w) = w + a • w') → (∀ y, ∃ x y', y = q x + a • y') → (∀ w, ∃ y, q (i w) = a • y) → ∀ x, (∃ y, q x = a • y) → ∃ w x', x = i w + a • x' := by
+theorem split_exact
+    : ∀ (A : Type) [CommRing A] [IsDomain A] (P₁ P₂ : Type) [AddCommGroup P₁] [Module A P₁]
+        [Module.Finite A P₁] [Module.Projective A P₁] [AddCommGroup P₂] [Module A P₂]
+        [Module.Finite A P₂] [Module.Projective A P₂] (N : ℕ) (a : A) (i : P₁ →ₗ[A] (Fin N → A))
+        (r : (Fin N → A) →ₗ[A] P₁) (q : (Fin N → A) →ₗ[A] P₂),
+      Module.finrank A P₁ + Module.finrank A P₂ = N → (∀ w, ∃ w', r (i w) = w + a • w')
+        → (∀ y, ∃ x y', y = q x + a • y') → (∀ w, ∃ y, q (i w) = a • y)
+        → ∀ x, (∃ y, q x = a • y) → ∃ w x', x = i w + a • x' := by
   intro A _ _ P₁ P₂ _ _ _ _ _ _ _ _ N a i r q hrank hri hq hqi x hx
   haveI : Module.IsTorsionFree A (P₁ × P₂) := isTorsionFree_of_projective
   have hN : (N : Cardinal) ≤ Module.rank A (P₁ × P₂) := by

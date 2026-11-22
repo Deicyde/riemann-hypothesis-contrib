@@ -53,8 +53,9 @@ lemma minor_mul_left {n l : ℕ} (hl : l ≤ n) (A U : Matrix (Fin n) (Fin n) �
   rw [e, ← Matrix.conjTranspose_submatrix, Matrix.det_conjTranspose, minor_mul hl _ _ hU,
     ← Matrix.conjTranspose_submatrix, Matrix.det_conjTranspose, star_star]
 
-def flagMat (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) :
-    Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) ℂ := Matrix.of fun i a => fvec k r z a i
+def flagMat (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
+    : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) ℂ :=
+  Matrix.of fun i a => fvec k r z a i
 
 lemma mul_flagMat (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
     (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i) (b) :

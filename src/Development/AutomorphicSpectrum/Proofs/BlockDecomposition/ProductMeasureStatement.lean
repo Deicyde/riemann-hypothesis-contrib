@@ -10,7 +10,9 @@ noncomputable section
 
 open MeasureTheory Measure Set
 open scoped Pointwise
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.CompanionTheory.ThTot
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -19,22 +21,27 @@ namespace GlobalTheory.CompanionTheory.ThTot.ProdMeasPf
 
 section Abstract
 
-variable {X Y Z : Type*} [AddCommGroup X] [AddCommGroup Y] [AddCommGroup Z]
-  [MeasurableSpace X] [MeasurableSpace Y] [MeasurableSpace Z]
+variable
+  {X Y Z : Type*} [AddCommGroup X] [AddCommGroup Y] [AddCommGroup Z] [MeasurableSpace X]
+  [MeasurableSpace Y] [MeasurableSpace Z]
 
-theorem isAddFundamentalDomain_join (J : X × Y ≃ᵐ Z) (hJ : ∀ a b, J (a + b) = J a + J b)
+theorem isAddFundamentalDomain_join
+    (J : X × Y ≃ᵐ Z) (hJ : ∀ a b, J (a + b) = J a + J b)
     (Γ : AddSubgroup X) (Δ : AddSubgroup Y) (Λ : AddSubgroup Z)
     (hΛ : ∀ z, z ∈ Λ ↔ (J.symm z).1 ∈ Γ ∧ (J.symm z).2 ∈ Δ)
-    (μ : Measure X) (ν : Measure Y) [SFinite μ] [SFinite ν] (F : Set X) (G : Set Y)
-    (hF : IsAddFundamentalDomain Γ F μ) (hG : IsAddFundamentalDomain Δ G ν) :
-    IsAddFundamentalDomain Λ (J '' (F ×ˢ G)) ((μ.prod ν).map J) := by
+    (μ : Measure X) (ν : Measure Y) [SFinite μ] [SFinite ν]
+    (F : Set X) (G : Set Y) (hF : IsAddFundamentalDomain Γ F μ) (hG : IsAddFundamentalDomain Δ G ν)
+    : IsAddFundamentalDomain Λ (J '' (F ×ˢ G)) ((μ.prod ν).map J) := by
   have hm : ∀ R : Set (X × Y), (μ.prod ν).map J (J '' R) = μ.prod ν R := fun R => by
     rw [J.map_apply, Set.preimage_image_eq _ J.injective]
   have htr : ∀ (l : Z) (w : X × Y), l + J w = J (J.symm l + w) := fun l w => by
     rw [hJ, J.apply_symm_apply]
-  have himg : ∀ l : Λ, (l +ᵥ (J '' (F ×ˢ G)) : Set Z) =
-      J '' ((((⟨(J.symm l.1).1, ((hΛ _).1 l.2).1⟩ : Γ) +ᵥ F : Set X)) ×ˢ
-        (((⟨(J.symm l.1).2, ((hΛ _).1 l.2).2⟩ : Δ) +ᵥ G : Set Y))) := by
+  have himg
+      : ∀ l : Λ,
+        (l +ᵥ (J '' (F ×ˢ G)) : Set Z)
+          = J
+            '' ((((⟨(J.symm l.1).1, ((hΛ _).1 l.2).1⟩ : Γ) +ᵥ F : Set X))
+              ×ˢ (((⟨(J.symm l.1).2, ((hΛ _).1 l.2).2⟩ : Δ) +ᵥ G : Set Y))) := by
     intro l
     ext z
     constructor
@@ -67,8 +74,9 @@ theorem isAddFundamentalDomain_join (J : X × Y ≃ᵐ Z) (hJ : ∀ a b, J (a + 
   · intro l l' hll
     change (μ.prod ν).map J ((l +ᵥ (J '' (F ×ˢ G)) : Set Z) ∩ (l' +ᵥ (J '' (F ×ˢ G)) : Set Z)) = 0
     rw [himg, himg, ← Set.image_inter J.injective, hm, Set.prod_inter_prod, Measure.prod_prod]
-    have hne : (⟨(J.symm l.1).1, ((hΛ _).1 l.2).1⟩ : Γ) ≠ ⟨(J.symm l'.1).1, ((hΛ _).1 l'.2).1⟩ ∨
-        (⟨(J.symm l.1).2, ((hΛ _).1 l.2).2⟩ : Δ) ≠ ⟨(J.symm l'.1).2, ((hΛ _).1 l'.2).2⟩ := by
+    have hne
+        : (⟨(J.symm l.1).1, ((hΛ _).1 l.2).1⟩ : Γ) ≠ ⟨(J.symm l'.1).1, ((hΛ _).1 l'.2).1⟩
+          ∨ (⟨(J.symm l.1).2, ((hΛ _).1 l.2).2⟩ : Δ) ≠ ⟨(J.symm l'.1).2, ((hΛ _).1 l'.2).2⟩ := by
       by_contra hcon
       push_neg at hcon
       apply hll
@@ -97,7 +105,8 @@ theorem rowJ_rowT_rowB (y : Mx D (r + s) p) : rowJ (rowT y) (rowB y) = y := by
   | left a => simp [rowT, rowJ]
   | right b => simp [rowB, rowJ]
 
-theorem rowJ_add (x x' : Mx D r p) (z z' : Mx D s p) : rowJ (x + x') (z + z') = rowJ x z + rowJ x' z' := by
+theorem rowJ_add (x x' : Mx D r p) (z z' : Mx D s p)
+    : rowJ (x + x') (z + z') = rowJ x z + rowJ x' z' := by
   funext i j
   induction i using Fin.addCases with
   | left a => simp [rowJ]
@@ -112,10 +121,8 @@ theorem continuous_rowB : Continuous (rowB : Mx D (r + s) p → Mx D s p) :=
 theorem continuous_rowJ : Continuous (fun z : Mx D r p × Mx D s p => rowJ z.1 z.2) := by
   refine continuous_matrix fun i j => ?_
   induction i using Fin.addCases with
-  | left a =>
-    simpa [rowJ] using (continuous_fst.matrix_elem a j)
-  | right b =>
-    simpa [rowJ] using (continuous_snd.matrix_elem b j)
+  | left a => simpa [rowJ] using (continuous_fst.matrix_elem a j)
+  | right b => simpa [rowJ] using (continuous_snd.matrix_elem b j)
 
 def rowH : Mx D r p × Mx D s p ≃ₜ Mx D (r + s) p where
   toFun z := rowJ z.1 z.2
@@ -125,27 +132,40 @@ def rowH : Mx D r p × Mx D s p ≃ₜ Mx D (r + s) p where
   continuous_toFun := continuous_rowJ
   continuous_invFun := continuous_rowT.prodMk continuous_rowB
 
-theorem mem_ratMx_iff (y : Mx D (r + s) p) :
-    y ∈ ratMx D (r + s) p ↔ rowT y ∈ ratMx D r p ∧ rowB y ∈ ratMx D s p := by
+theorem mem_ratMx_iff (y : Mx D (r + s) p)
+    : y ∈ ratMx D (r + s) p ↔ rowT y ∈ ratMx D r p ∧ rowB y ∈ ratMx D s p := by
   constructor
   · rintro ⟨γ, rfl⟩
     exact ⟨⟨fun i j => γ (Fin.castAdd s i) j, rfl⟩, ⟨fun i j => γ (Fin.natAdd r i) j, rfl⟩⟩
   · rintro ⟨⟨a, ha⟩, ⟨b, hb⟩⟩
     replace ha : rat a = rowT y := ha
     replace hb : rat b = rowB y := hb
-    refine ⟨fun i j => Fin.addCases (motive := fun _ => D.host.E) (fun u => a u j) (fun v => b v j) i, ?_⟩
+    refine ⟨
+      fun i j => Fin.addCases (motive := fun _ => D.host.E) (fun u => a u j) (fun v => b v j) i,
+      ?_
+    ⟩
     change rat _ = y
     funext i j
     induction i using Fin.addCases with
     | left u =>
       refine Eq.trans ?_ (congrFun (congrFun ha u) j)
-      change incA D (Fin.addCases (motive := fun _ => D.host.E) (fun u => a u j) (fun v => b v j) (Fin.castAdd s u)) =
-        incA D (a u j)
+      change incA D
+          (Fin.addCases
+            (motive := fun _ => D.host.E)
+            (fun u => a u j)
+            (fun v => b v j)
+            (Fin.castAdd s u))
+        = incA D (a u j)
       rw [Fin.addCases_left]
     | right v =>
       refine Eq.trans ?_ (congrFun (congrFun hb v) j)
-      change incA D (Fin.addCases (motive := fun _ => D.host.E) (fun u => a u j) (fun v => b v j) (Fin.natAdd r v)) =
-        incA D (b v j)
+      change incA D
+          (Fin.addCases
+            (motive := fun _ => D.host.E)
+            (fun u => a u j)
+            (fun v => b v j)
+            (Fin.natAdd r v))
+        = incA D (b v j)
       rw [Fin.addCases_right]
 
 theorem prodMeas : ProdMeas := by
@@ -158,18 +178,24 @@ theorem prodMeas : ProdMeas := by
   haveI : BorelSpace (Mx D (r + s) p) := ⟨rfl⟩
   haveI := hr.1
   haveI := hs.1
-  let J : Mx D r p × Mx D s p ≃ᵐ Mx D (r + s) p := (rowH (D := D) (r := r) (s := s) (p := p)).toMeasurableEquiv
+  let J : Mx D r p × Mx D s p ≃ᵐ Mx D (r + s) p :=
+    (rowH (D := D) (r := r) (s := s) (p := p)).toMeasurableEquiv
   have hJ : ∀ a b, J (a + b) = J a + J b := fun a b => rowJ_add a.1 b.1 a.2 b.2
   have hJf : (J : Mx D r p × Mx D s p → Mx D (r + s) p) = fun z => rowJ z.1 z.2 := rfl
-  let e : Mx D r p × Mx D s p ≃+ Mx D (r + s) p :=
-    { (rowH (D := D) (r := r) (s := s) (p := p)).toEquiv with map_add' := hJ }
+  let e : Mx D r p × Mx D s p ≃+ Mx D (r + s) p := {
+    (rowH (D := D) (r := r) (s := s) (p := p)).toEquiv with
+    map_add' := hJ
+  }
   have hH : ((μr.prod μs).map e).IsAddHaarMeasure :=
-    AddEquiv.isAddHaarMeasure_map (μr.prod μs) e continuous_rowJ (continuous_rowT.prodMk continuous_rowB)
+    AddEquiv.isAddHaarMeasure_map (μr.prod μs) e continuous_rowJ
+      (continuous_rowT.prodMk continuous_rowB)
   have hF : IsAddFundamentalDomain (ratMx D (r + s) p) (J '' (𝓕r ×ˢ 𝓕s)) ((μr.prod μs).map J) :=
     isAddFundamentalDomain_join J hJ (ratMx D r p) (ratMx D s p) (ratMx D (r + s) p)
-      (fun z => mem_ratMx_iff z) μr μs 𝓕r 𝓕s hr.2.1 hs.2.1
+      (fun z => mem_ratMx_iff z)
+      μr μs 𝓕r 𝓕s hr.2.1 hs.2.1
   have h1 : (μr.prod μs).map J (J '' (𝓕r ×ˢ 𝓕s)) = 1 := by
-    rw [J.map_apply, Set.preimage_image_eq _ J.injective, Measure.prod_prod, hr.2.2, hs.2.2, one_mul]
+    rw [J.map_apply, Set.preimage_image_eq _ J.injective, Measure.prod_prod, hr.2.2, hs.2.2,
+      one_mul]
   have hcov : IsCovolOne (ratMx D (r + s) p) ((μr.prod μs).map J) (J '' (𝓕r ×ˢ 𝓕s)) := ⟨hH, hF, h1⟩
   exact covolOne_measure_eq hcov h
 

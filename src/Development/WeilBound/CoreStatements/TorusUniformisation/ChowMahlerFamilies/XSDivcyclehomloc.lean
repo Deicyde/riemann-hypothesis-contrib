@@ -22,5 +22,7 @@ theorem homLocRingLocal : HomLocRingLocal.Statement.{0} :=
 
 end PositivityTheory.Xgn.A_s_divcyclehomloc
 
-theorem PositivityTheory.Xgn.t_s_divcyclehomloc : GroundTheory.Heights₂.Heights.NumbersDVR.DivCycleHomLoc.Statement.{0} :=
-  GroundTheory.Heights₂.Heights.NumbersDVR.DivCycleHomLoc.proof PositivityTheory.Xgn.A_s_divcyclehomloc.homLocRingLocal
+theorem PositivityTheory.Xgn.t_s_divcyclehomloc
+    : GroundTheory.Heights₂.Heights.NumbersDVR.DivCycleHomLoc.Statement.{0} :=
+  GroundTheory.Heights₂.Heights.NumbersDVR.DivCycleHomLoc.proof
+    PositivityTheory.Xgn.A_s_divcyclehomloc.homLocRingLocal

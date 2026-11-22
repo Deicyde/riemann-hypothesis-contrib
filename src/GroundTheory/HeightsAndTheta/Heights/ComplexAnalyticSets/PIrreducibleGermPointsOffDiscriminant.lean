@@ -15,15 +15,28 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Metric Filter Set
 
-theorem isRegularPointOf_ball {d : ℕ} (c : Fin d → ℂ) (ε : ℝ) :
-    ∀ y ∈ ball c ε, IsRegularPointOf (ball c ε) y := fun y hy =>
-  ⟨hy, d, ContinuousLinearMap.id ℂ _, ball c ε, ball c ε, id, isOpen_ball, isOpen_ball, hy,
-    analyticOnNhd_id, fun _ _ => rfl, by simp⟩
+theorem isRegularPointOf_ball {d : ℕ} (c : Fin d → ℂ) (ε : ℝ)
+    : ∀ y ∈ ball c ε, IsRegularPointOf (ball c ε) y := fun y hy => ⟨
+  hy,
+  d,
+  ContinuousLinearMap.id ℂ _,
+  ball c ε,
+  ball c ε,
+  id,
+  isOpen_ball,
+  isOpen_ball,
+  hy,
+  analyticOnNhd_id,
+  fun _ _ => rfl,
+  by simp
+⟩
 
-theorem IrreducibleGermPointsOffDiscriminant.proof (hPF : IrreducibleGermPrimitiveForm.Statement)
-    (hSh : PrimitiveFormSheetedOffDiscriminant.Statement) (hNear : PrimitiveFormSheetedPointsNear.Statement)
-    (hConn : ManifoldZerosComplementConnected.Statement) :
-    IrreducibleGermPointsOffDiscriminant.Statement := by
+theorem IrreducibleGermPointsOffDiscriminant.proof
+    (hPF : IrreducibleGermPrimitiveForm.Statement)
+    (hSh : PrimitiveFormSheetedOffDiscriminant.Statement)
+    (hNear : PrimitiveFormSheetedPointsNear.Statement)
+    (hConn : ManifoldZerosComplementConnected.Statement)
+    : IrreducibleGermPointsOffDiscriminant.Statement := by
   intro σ _ X x d A hX hirr hiso hinj
   obtain ⟨ℓ, N, a, δ, q, ha, hδ, hq, hδ0, hp, hsep, hqz⟩ := hPF σ X x d A hX hirr hiso hinj
   obtain ⟨M, hM, hMsh⟩ := hSh σ X x d A hX hirr hiso hinj ℓ N a δ q ha hδ hq hδ0 hp hsep hqz
@@ -31,10 +44,11 @@ theorem IrreducibleGermPointsOffDiscriminant.proof (hPF : IrreducibleGermPrimiti
   refine ⟨δ, hδ, hδ0, fun W hW => ?_⟩
   obtain ⟨W₀, hW₀, hiso'⟩ := hiso
   obtain ⟨Nn, k, f, hNo, hxN, hf, hXN⟩ := hX
-  obtain ⟨r, hr, hrsub⟩ := Metric.mem_nhds_iff.mp
-    (inter_mem (inter_mem hW hM) (inter_mem hW₀ (hNo.mem_nhds hxN)))
+  obtain ⟨r, hr, hrsub⟩ :=
+    Metric.mem_nhds_iff.mp (inter_mem (inter_mem hW hM) (inter_mem hW₀ (hNo.mem_nhds hxN)))
   have hr2 : 0 < r / 2 := half_pos hr
-  have hcb : closedBall x (r / 2) ⊆ (W ∩ M) ∩ (W₀ ∩ Nn) := (closedBall_subset_ball (half_lt_self hr)).trans hrsub
+  have hcb : closedBall x (r / 2) ⊆ (W ∩ M) ∩ (W₀ ∩ Nn) :=
+    (closedBall_subset_ball (half_lt_self hr)).trans hrsub
 
   set K : Set (σ → ℂ) := closedBall x (r / 2) ∩ ⋂ i, (closedBall x (r / 2) ∩ f i ⁻¹' {0}) with hK
   have hKc : IsCompact K := by
@@ -60,7 +74,8 @@ theorem IrreducibleGermPointsOffDiscriminant.proof (hPF : IrreducibleGermPrimiti
     have hzx : z = x := hiso' z ⟨((hKmem z).mp hzK).2, (hcb ((hKmem z).mp hzK).1).2.1⟩ hAz
     rw [hzx, mem_sphere, dist_self] at hzs
     exact hr2.ne hzs
-  obtain ⟨ε₁, hε₁, hε₁S⟩ := Metric.isOpen_iff.mp (hSc.image A.continuous).isClosed.isOpen_compl (A x) hAS
+  obtain ⟨ε₁, hε₁, hε₁S⟩ :=
+    Metric.isOpen_iff.mp (hSc.image A.continuous).isClosed.isOpen_compl (A x) hAS
   obtain ⟨ε₂, hε₂, hε₂a⟩ := hδ.exists_ball_analyticOnNhd
   set D := ball (A x) (min ε₁ ε₂) with hD
   have hε : 0 < min ε₁ ε₂ := lt_min hε₁ hε₂
@@ -70,25 +85,29 @@ theorem IrreducibleGermPointsOffDiscriminant.proof (hPF : IrreducibleGermPrimiti
   have hTo : IsOpen T := hDa.continuousOn.isOpen_inter_preimage isOpen_ball isOpen_compl_singleton
   have hTc : IsPreconnected T := by
     refine hConn (Fin d) D δ (convex_ball _ _).isPreconnected (isRegularPointOf_ball _ _) hDa ?_
-    obtain ⟨y, hy0, hyD⟩ := ((Filter.not_eventually.mp hδ0).and_eventually (ball_mem_nhds _ hε)).exists
+    obtain ⟨y, hy0, hyD⟩ :=
+      ((Filter.not_eventually.mp hδ0).and_eventually (ball_mem_nhds _ hε)).exists
     exact ⟨y, hyD, hy0⟩
 
   set u : Set (Fin d → ℂ) := T ∩ A '' (X ∩ ball x (r / 2)) with hu
   have huo : IsOpen u := by
     refine isOpen_iff_mem_nhds.mpr ?_
     rintro y ⟨hyT, z, ⟨hzX, hzb⟩, rfl⟩
-    obtain ⟨O, V, g, hO, hV, hzV, hg, hAg, hXV⟩ := hMsh z ⟨hzX, (hcb (ball_subset_closedBall hzb)).1.2⟩ hyT.2
+    obtain ⟨O, V, g, hO, hV, hzV, hg, hAg, hXV⟩ :=
+      hMsh z ⟨hzX, (hcb (ball_subset_closedBall hzb)).1.2⟩ hyT.2
     obtain ⟨t₀, ht₀, hgt₀⟩ : z ∈ g '' O := hXV ▸ ⟨hzX, hzV⟩
     have hAz : A z = t₀ := by rw [← hgt₀]; exact hAg t₀ ht₀
     rw [hAz] at hyT ⊢
     have hpre : g ⁻¹' (V ∩ ball x (r / 2)) ∈ 𝓝 t₀ :=
-      (hg t₀ ht₀).continuousAt.preimage_mem_nhds ((hV.inter isOpen_ball).mem_nhds (hgt₀ ▸ ⟨hzV, hzb⟩))
+      (hg t₀ ht₀).continuousAt.preimage_mem_nhds
+        ((hV.inter isOpen_ball).mem_nhds (hgt₀ ▸ ⟨hzV, hzb⟩))
     filter_upwards [hTo.mem_nhds hyT, hO.mem_nhds ht₀, hpre] with t ht htO htg
     have hgX : g t ∈ X ∩ V := hXV ▸ ⟨t, htO, rfl⟩
     exact ⟨ht, g t, ⟨hgX.1, htg.2⟩, hAg t htO⟩
   have hune : (T ∩ u).Nonempty := by
     have hU : ball x (r / 2) ∩ A ⁻¹' D ∈ 𝓝 x :=
-      inter_mem (ball_mem_nhds x hr2) (A.continuous.continuousAt.preimage_mem_nhds (ball_mem_nhds _ hε))
+      inter_mem (ball_mem_nhds x hr2)
+        (A.continuous.continuousAt.preimage_mem_nhds (ball_mem_nhds _ hε))
     obtain ⟨z, ⟨hzX, hzb, hzD⟩, hδz, -⟩ := hnear _ hU
     exact ⟨A z, ⟨hzD, hδz⟩, ⟨hzD, hδz⟩, z, ⟨hzX, hzb⟩, rfl⟩
   have hucl : closure u ∩ T ⊆ u := by

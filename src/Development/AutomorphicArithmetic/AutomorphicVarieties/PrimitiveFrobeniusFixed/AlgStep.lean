@@ -10,12 +10,16 @@ public import GroundTheory.GlobalFields.IdeleGroups.ClassGroup
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-private theorem alg_step {L Γ : Type} [Field L] [LinearOrderedCommGroupWithZero Γ] (w : Valuation L Γ) (A B x z ζ : L)
-    (hA : w A = 1) (hx : w x = 1) (hζ : w ζ = 1) (h1 : w (A - B) < 1) (h2 : w (A / x - ζ * (B / z)) < 1) :
-    w (x - ζ⁻¹ * z) < 1 := by
+private theorem alg_step
+    {L Γ : Type} [Field L] [LinearOrderedCommGroupWithZero Γ]
+    (w : Valuation L Γ) (A B x z ζ : L) (hA : w A = 1) (hx : w x = 1) (hζ : w ζ = 1)
+    (h1 : w (A - B) < 1) (h2 : w (A / x - ζ * (B / z)) < 1)
+    : w (x - ζ⁻¹ * z) < 1 := by
   have hA0 : A ≠ 0 := by
     intro h
     rw [h, map_zero] at hA
@@ -52,9 +56,14 @@ private theorem alg_step {L Γ : Type} [Field L] [LinearOrderedCommGroupWithZero
   · rw [map_mul, map_div₀, map_mul, map_mul, map_inv₀, hx, hz, hζ, hA]
     simpa using h2
 
-private theorem isX_unit (N : ℕ) [NeZero N] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K]
-    (b q : ℕ) (𝔞 : Ideal (𝓞 K)) (X : K) (h0 : 𝔞 ≠ ⊥) (hc : IsCoprime 𝔞 (Ideal.span {(q : 𝓞 K)})) (hX : IsX N K b 𝔞 X)
-    (v : HeightOneSpectrum (𝓞 K)) (hv : (q : 𝓞 K) ∈ v.asIdeal) : v.valuation K X = 1 := by
+private theorem isX_unit
+    (N : ℕ) [NeZero N]
+    (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K]
+    (b q : ℕ)
+    (𝔞 : Ideal (𝓞 K)) (X : K)
+    (h0 : 𝔞 ≠ ⊥) (hc : IsCoprime 𝔞 (Ideal.span {(q : 𝓞 K)})) (hX : IsX N K b 𝔞 X)
+    (v : HeightOneSpectrum (𝓞 K)) (hv : (q : 𝓞 K) ∈ v.asIdeal)
+    : v.valuation K X = 1 := by
   haveI := v.isPrime
   obtain ⟨a, ha, c, hc', hac⟩ := Ideal.isCoprime_iff_exists.mp hc
   obtain ⟨r, rfl⟩ := Ideal.mem_span_singleton'.mp hc'
@@ -81,7 +90,10 @@ private theorem isX_unit (N : ℕ) [NeZero N] (K : Type) [Field K] [NumberField 
       rw [e]
       exact Ideal.add_mem _ ha' hc''
     exact v.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h1)
-  have hcount : ∀ t, FractionalIdeal.count K v ((conjI N K 𝔞 t : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K) = 0 := by
+  have hcount
+      : ∀ t,
+        FractionalIdeal.count K v ((conjI N K 𝔞 t : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K)
+          = 0 := by
     intro t
     rw [FractionalIdeal.count_coe K v (hne t), Nat.cast_eq_zero]
     by_contra hc0
@@ -93,20 +105,37 @@ private theorem isX_unit (N : ℕ) [NeZero N] (K : Type) [Field K] [NumberField 
     rw [h, zero_mul] at h1
     exact zero_ne_one h1
   have hcs := GroundTheory.Global.count_spanSingleton v hX0
-  rw [hX.2, FractionalIdeal.count_prod K v _ _
-    (fun t _ => zpow_ne_zero _ (FractionalIdeal.coeIdeal_ne_zero.mpr (hne t))),
-    Finset.sum_eq_zero (fun t _ => by rw [FractionalIdeal.count_zpow, hcount t, mul_zero])] at hcs
+  rw [hX.2,
+      FractionalIdeal.count_prod K v _ _
+        (fun t _ => zpow_ne_zero _ (FractionalIdeal.coeIdeal_ne_zero.mpr (hne t))),
+      Finset.sum_eq_zero (fun t _ => by rw [FractionalIdeal.count_zpow, hcount t, mul_zero])]
+    at hcs
   have hv0 : v.valuation K X ≠ 0 := (Valuation.ne_zero_iff _).mpr hX0
   have hl : WithZero.log (v.valuation K X) = 0 := by linarith
   rw [← WithZero.exp_log hv0, hl, WithZero.exp_zero]
 
-theorem UpperTheory.V.ML.xCong :
-    ∀ (M q : ℕ) [NeZero M] [NeZero (q * M)] (K K' : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K] [Field K'] [NumberField K'] [IsCyclotomicExtension {q * M} ℚ K'] [Algebra K K'], q.Prime → ∀ u : (ZMod M)ˣ, (u : ZMod M) = q → ∀ (b : ℕ), b < M → b < q → ∀ (𝔞 : Ideal (𝓞 K')) (X' : K') (X : K), IsCoprime 𝔞 (Ideal.span {(q : 𝓞 K')}) →
-    IsX (q * M) K' b 𝔞 X' → IsX M K b (Ideal.relNorm (𝓞 K) 𝔞) X →
-    ∃ ζ : K', ζ ^ (2 * (q * M)) = 1 ∧ ∀ v : HeightOneSpectrum (𝓞 K'), (q : 𝓞 K') ∈ v.asIdeal → v.valuation K' (X' - ζ * algebraMap K K' ((sg M K u)⁻¹ X)) < 1 := by
+theorem UpperTheory.V.ML.xCong
+    : ∀ (M q : ℕ) [NeZero M] [NeZero (q * M)] (K K' : Type) [Field K] [NumberField K]
+        [IsCyclotomicExtension {M} ℚ K] [Field K'] [NumberField K']
+        [IsCyclotomicExtension {q * M} ℚ K'] [Algebra K K'],
+      q.Prime
+        → ∀ u : (ZMod M)ˣ,
+          (u : ZMod M) = q
+            → ∀ (b : ℕ),
+              b < M → b < q
+                → ∀ (𝔞 : Ideal (𝓞 K')) (X' : K') (X : K),
+                  IsCoprime 𝔞 (Ideal.span {(q : 𝓞 K')}) → IsX (q * M) K' b 𝔞 X'
+                    → IsX M K b (Ideal.relNorm (𝓞 K) 𝔞) X
+                    → ∃ ζ : K',
+                      ζ ^ (2 * (q * M)) = 1
+                        ∧ ∀ v : HeightOneSpectrum (𝓞 K'),
+                          (q : 𝓞 K') ∈ v.asIdeal
+                            → v.valuation K' (X' - ζ * algebraMap K K' ((sg M K u)⁻¹ X)) < 1 := by
   intro M q _ _ K K' _ _ _ _ _ _ _ hq u hu b hbM hbq 𝔞 X' X hc hX' hX
-  have key : ∀ I : Ideal (𝓞 K'), IsCoprime I (Ideal.span {(q : 𝓞 K')}) →
-      ∀ v : HeightOneSpectrum (𝓞 K'), (q : 𝓞 K') ∈ v.asIdeal → ¬ I ≤ v.asIdeal := by
+  have key
+      : ∀ I : Ideal (𝓞 K'),
+        IsCoprime I (Ideal.span {(q : 𝓞 K')})
+          → ∀ v : HeightOneSpectrum (𝓞 K'), (q : 𝓞 K') ∈ v.asIdeal → ¬ I ≤ v.asIdeal := by
     intro I hI v hv hle
     rw [Ideal.isCoprime_iff_sup_eq] at hI
     apply v.isPrime.ne_top
@@ -128,8 +157,9 @@ theorem UpperTheory.V.ML.xCong :
   have hPnz : P.asIdeal ∈ (Ideal (𝓞 K'))⁰ := mem_nonZeroDivisors_of_ne_zero P.ne_bot
   have hprin : Submodule.IsPrincipal (P.asIdeal * 𝔞) := by
     rw [← ClassGroup.mk0_eq_one_iff (mul_mem hPnz h𝔞nz)]
-    have hm : ClassGroup.mk0 ⟨P.asIdeal * 𝔞, mul_mem hPnz h𝔞nz⟩ =
-        ClassGroup.mk0 ⟨P.asIdeal, hPnz⟩ * ClassGroup.mk0 ⟨𝔞, h𝔞nz⟩ := by
+    have hm
+        : ClassGroup.mk0 ⟨P.asIdeal * 𝔞, mul_mem hPnz h𝔞nz⟩
+          = ClassGroup.mk0 ⟨P.asIdeal, hPnz⟩ * ClassGroup.mk0 ⟨𝔞, h𝔞nz⟩ := by
       rw [← map_mul]
       rfl
     have hcl : ClassGroup.mk0 ⟨P.asIdeal, hPnz⟩ = (ClassGroup.mk0 ⟨𝔞, h𝔞nz⟩)⁻¹ := hPcl
@@ -160,7 +190,8 @@ theorem UpperTheory.V.ML.xCong :
     exact Ideal.mul_mem_right _ _ ((red K' p P.asIdeal).2 π hπ).2.2.2
   obtain ⟨-, hm2, -, -, hm5⟩ := xMul (q * M) K' b
   obtain ⟨-, hn2, -, -, hn5⟩ := xMul M K b
-  have hA : IsX (q * M) K' b (Ideal.span {y}) (∏ t, ((sg (q * M) K') t)⁻¹ (y : K') ^ th (q * M) b ↑t) :=
+  have hA
+      : IsX (q * M) K' b (Ideal.span {y}) (∏ t, ((sg (q * M) K') t)⁻¹ (y : K') ^ th (q * M) b ↑t) :=
     hm5 y hy0
   have hXP' := hm2 P.asIdeal 𝔞 _ X' P.ne_bot h0 (by rw [hy]; exact hA) hX'
   have hrel : Ideal.relNorm (𝓞 K) (Ideal.span {y}) ≠ ⊥ := by
@@ -179,10 +210,11 @@ theorem UpperTheory.V.ML.xCong :
       Algebra.algebraMap_intNorm y
     rw [hcoe] at h5
     exact h5
-  have hXP := hn2 _ _ _ X (mt Ideal.relNorm_eq_bot_iff.mp P.ne_bot) (mt Ideal.relNorm_eq_bot_iff.mp h0)
-    (by rw [← map_mul, hy]; exact hB) hX
-  obtain ⟨ζ1, hζ1, hjac⟩ := xCongJac M q K K' hq u hu b hbM p π hpcop _ _
-    (by rw [hπ]; exact hXP') (by rw [hπ]; exact hXP)
+  have hXP :=
+    hn2 _ _ _ X (mt Ideal.relNorm_eq_bot_iff.mp P.ne_bot) (mt Ideal.relNorm_eq_bot_iff.mp h0)
+      (by rw [← map_mul, hy]; exact hB) hX
+  obtain ⟨ζ1, hζ1, hjac⟩ :=
+    xCongJac M q K K' hq u hu b hbM p π hpcop _ _ (by rw [hπ]; exact hXP') (by rw [hπ]; exact hXP)
   refine ⟨ζ1⁻¹, by rw [inv_pow, hζ1, inv_one], fun v hv => ?_⟩
   have hyv : ∀ v : HeightOneSpectrum (𝓞 K'), (q : 𝓞 K') ∈ v.asIdeal → y ∉ v.asIdeal := by
     intro v hv hyv
@@ -197,7 +229,8 @@ theorem UpperTheory.V.ML.xCong :
     rw [h, map_zero] at hX'1
     exact zero_ne_one hX'1
   have hAv : v.valuation K' (∏ t, ((sg (q * M) K') t)⁻¹ (y : K') ^ th (q * M) b ↑t) = 1 := by
-    rw [← div_mul_cancel₀ (∏ t, ((sg (q * M) K') t)⁻¹ (y : K') ^ th (q * M) b ↑t) hX'0, map_mul, hP1, hX'1, one_mul]
+    rw [← div_mul_cancel₀ (∏ t, ((sg (q * M) K') t)⁻¹ (y : K') ^ th (q * M) b ↑t) hX'0, map_mul,
+      hP1, hX'1, one_mul]
   have hζv : v.valuation K' ζ1 = 1 := by
     have h := congrArg (v.valuation K') hζ1
     rw [map_pow, map_one] at h

@@ -8,15 +8,30 @@ namespace GlobalTheory
 
 open scoped InnerProductSpace
 
-theorem norm_sq_adjoint_add_ge_of_joint_eigenspaces (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp] (Vm : Type) [NormedAddCommGroup Vm] [InnerProductSpace ℂ Vm] [FiniteDimensional ℂ Vm] (ι : Type) (S : ι → Submodule ℂ V) (A : Vp →L[ℂ] V) (B : Vm →L[ℂ] V) (wp wm : ι → ℝ) (c : ℝ) (hS : (⨆ i, S i) = ⊤)
-    (hw : ∀ i, ∀ v ∈ S i, A (ContinuousLinearMap.adjoint A v) = (wp i : ℂ) • v ∧ B (ContinuousLinearMap.adjoint B v) = (wm i : ℂ) • v)
-    (hc : ∀ i, c ≤ wp i ∨ c ≤ wm i) (v : V) :
-    c * ‖v‖ ^ 2 ≤ ‖ContinuousLinearMap.adjoint A v‖ ^ 2 + ‖ContinuousLinearMap.adjoint B v‖ ^ 2 := by
-  have hA : ∀ x : V, (⟪A (ContinuousLinearMap.adjoint A x), x⟫_ℂ).re = ‖ContinuousLinearMap.adjoint A x‖ ^ 2 := by
+theorem norm_sq_adjoint_add_ge_of_joint_eigenspaces
+    (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+    (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
+    (Vm : Type) [NormedAddCommGroup Vm] [InnerProductSpace ℂ Vm] [FiniteDimensional ℂ Vm]
+    (ι : Type) (S : ι → Submodule ℂ V)
+    (A : Vp →L[ℂ] V) (B : Vm →L[ℂ] V) (wp wm : ι → ℝ) (c : ℝ)
+    (hS : (⨆ i, S i) = ⊤)
+    (hw : ∀ i, ∀ v ∈ S i,
+      A (ContinuousLinearMap.adjoint A v) = (wp i : ℂ) • v
+        ∧ B (ContinuousLinearMap.adjoint B v) = (wm i : ℂ) • v)
+    (hc : ∀ i, c ≤ wp i ∨ c ≤ wm i) (v : V)
+    : c * ‖v‖ ^ 2
+      ≤ ‖ContinuousLinearMap.adjoint A v‖ ^ 2 + ‖ContinuousLinearMap.adjoint B v‖ ^ 2 := by
+  have hA
+      : ∀ x : V,
+        (⟪A (ContinuousLinearMap.adjoint A x), x⟫_ℂ).re
+          = ‖ContinuousLinearMap.adjoint A x‖ ^ 2 := by
     intro x
     rw [← ContinuousLinearMap.adjoint_inner_right]
     exact inner_self_eq_norm_sq (𝕜 := ℂ) _
-  have hB : ∀ x : V, (⟪B (ContinuousLinearMap.adjoint B x), x⟫_ℂ).re = ‖ContinuousLinearMap.adjoint B x‖ ^ 2 := by
+  have hB
+      : ∀ x : V,
+        (⟪B (ContinuousLinearMap.adjoint B x), x⟫_ℂ).re
+          = ‖ContinuousLinearMap.adjoint B x‖ ^ 2 := by
     intro x
     rw [← ContinuousLinearMap.adjoint_inner_right]
     exact inner_self_eq_norm_sq (𝕜 := ℂ) _
@@ -25,8 +40,11 @@ theorem norm_sq_adjoint_add_ge_of_joint_eigenspaces (V : Type) [NormedAddCommGro
     rw [inner_smul_left, Complex.conj_ofReal, Complex.re_ofReal_mul]
     congr 1
     exact inner_self_eq_norm_sq (𝕜 := ℂ) _
-  let X : V →ₗ[ℂ] V := (A ∘L ContinuousLinearMap.adjoint A + B ∘L ContinuousLinearMap.adjoint B : V →L[ℂ] V).toLinearMap
-  have hX : ∀ x, X x = A (ContinuousLinearMap.adjoint A x) + B (ContinuousLinearMap.adjoint B x) := fun x => rfl
+  let X : V →ₗ[ℂ] V :=
+    (A ∘L ContinuousLinearMap.adjoint A + B ∘L ContinuousLinearMap.adjoint B
+      : V →L[ℂ] V).toLinearMap
+  have hX : ∀ x, X x = A (ContinuousLinearMap.adjoint A x) + B (ContinuousLinearMap.adjoint B x) :=
+    fun x => rfl
   have hsym : X.IsSymmetric := by
     intro x y
     rw [hX, hX, inner_add_left, inner_add_right]
@@ -65,7 +83,8 @@ theorem norm_sq_adjoint_add_ge_of_joint_eigenspaces (V : Type) [NormedAddCommGro
       have hne : ((wp i + wm i : ℝ) : ℂ) ≠ (μ : ℂ) := by
         intro h'
         have := Complex.ofReal_injective h'
-        apply hlt; linarith
+        apply hlt
+        linarith
       by_contra h0
       exact hne (mul_right_cancel₀ h0 h)
     rw [hS, Submodule.top_orthogonal_eq_bot] at hmem
@@ -75,7 +94,8 @@ theorem norm_sq_adjoint_add_ge_of_joint_eigenspaces (V : Type) [NormedAddCommGro
   have hμ : ∀ j, c ≤ hsym.eigenvalues hn j := fun j =>
     hev _ (b j) (hsym.apply_eigenvectorBasis hn j) (b.orthonormal.ne_zero j)
   rw [← hA, ← hB, ← Complex.add_re, ← inner_add_left, ← hX]
-  rw [← b.sum_inner_mul_inner (X v) v, Complex.re_sum, ← b.sum_sq_norm_inner_right v, Finset.mul_sum]
+  rw [← b.sum_inner_mul_inner (X v) v, Complex.re_sum, ← b.sum_sq_norm_inner_right v,
+    Finset.mul_sum]
   refine Finset.sum_le_sum fun j _ => ?_
   have h1 : ⟪X v, b j⟫_ℂ = (hsym.eigenvalues hn j : ℂ) * ⟪v, b j⟫_ℂ := by
     rw [hsym v (b j), hb, hsym.apply_eigenvectorBasis hn j, inner_smul_right]; rfl

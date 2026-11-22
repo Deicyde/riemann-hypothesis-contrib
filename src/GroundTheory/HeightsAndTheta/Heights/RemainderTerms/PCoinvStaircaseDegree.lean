@@ -11,8 +11,8 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open MvPolynomial Finset Coinv
 
-theorem Coinv.sum_staircase_exponents (f n : ℕ) :
-    ∑ v : Fin f × Fin n, (v.2 : ℕ) = coinvTop f n := by
+theorem Coinv.sum_staircase_exponents (f n : ℕ)
+    : ∑ v : Fin f × Fin n, (v.2 : ℕ) = coinvTop f n := by
   rw [Fintype.sum_prod_type]
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
   rw [Fin.sum_univ_eq_sum_range (fun i => i) n, Finset.sum_range_id]

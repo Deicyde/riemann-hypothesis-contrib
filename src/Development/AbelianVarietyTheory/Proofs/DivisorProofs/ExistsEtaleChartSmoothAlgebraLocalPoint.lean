@@ -13,9 +13,11 @@ namespace GlobalTheory.DenseSec
 open KaehlerDifferential
 open scoped TensorProduct
 
-theorem formallyEtale_of_bijective_kaehler_mapBaseChange (R P B : Type*) [CommRing R] [CommRing P] [CommRing B]
-    [Algebra R P] [Algebra R B] [Algebra P B] [IsScalarTower R P B] [Algebra.FormallySmooth R B]
-    (h : Function.Bijective (mapBaseChange R P B)) : Algebra.FormallyEtale P B := by
+theorem formallyEtale_of_bijective_kaehler_mapBaseChange
+    (R P B : Type*) [CommRing R] [CommRing P] [CommRing B] [Algebra R P] [Algebra R B] [Algebra P B]
+    [IsScalarTower R P B] [Algebra.FormallySmooth R B]
+    (h : Function.Bijective (mapBaseChange R P B))
+    : Algebra.FormallyEtale P B := by
   have h1 : Subsingleton Ω[B⁄P] := by
     refine subsingleton_of_forall_eq 0 fun x => ?_
     obtain ⟨y, rfl⟩ := map_surjective R P B x
@@ -30,20 +32,22 @@ theorem formallyEtale_of_bijective_kaehler_mapBaseChange (R P B : Type*) [CommRi
     rw [Subsingleton.elim y 0, map_zero]
   exact ⟨h1, h2⟩
 
-theorem exists_etChart : ∀ (R : Type) [CommRing R] [IsLocalRing R] (A : Type) [CommRing A] [Algebra R A]
-    [Algebra.Smooth R A] (ε : A →ₐ[R] R), ∃ (g : ℕ) (t : Fin g → A) (h : A),
-      (∀ i, ε (t i) = 0) ∧ IsUnit (ε h) ∧ GlobalTheory.DenseSec.EtChart R A t h := by
+theorem exists_etChart
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (A : Type) [CommRing A] [Algebra R A]
+        [Algebra.Smooth R A] (ε : A →ₐ[R] R),
+      ∃ (g : ℕ) (t : Fin g → A) (h : A),
+        (∀ i, ε (t i) = 0) ∧ IsUnit (ε h) ∧ GlobalTheory.DenseSec.EtChart R A t h := by
   intro R _ _ A _ _ _ ε
   classical
   let p : Ideal A := (maximalIdeal R).comap ε
   haveI : p.IsPrime := Ideal.comap_isPrime _ _
-  obtain ⟨κ, a, b, hb⟩ := Module.exists_basis_of_span_of_flat _
-    (span_range_map_derivation_of_isLocalization R _ (Localization.AtPrime p) p.primeCompl)
+  obtain ⟨κ, a, b, hb⟩ :=
+    Module.exists_basis_of_span_of_flat _
+      (span_range_map_derivation_of_isLocalization R _ (Localization.AtPrime p) p.primeCompl)
   let t : κ → A := fun i => a i - algebraMap R A (ε (a i))
   have hDt : ∀ i, D R A (t i) = D R A (a i) := by intro i; simp [t]
   have hεt : ∀ i, ε (t i) = 0 := by intro i; simp [t]
-  let e : (κ →₀ A) →ₗ[A] Ω[A⁄R] :=
-    Finsupp.linearCombination A fun i : κ ↦ D R A (t i)
+  let e : (κ →₀ A) →ₗ[A] Ω[A⁄R] := Finsupp.linearCombination A fun i : κ ↦ D R A (t i)
   let l₁ : (κ →₀ A) →ₗ[A] (κ →₀ Localization.AtPrime p) :=
     Finsupp.mapRange.linearMap (Algebra.linearMap A (Localization.AtPrime p))
   let l₂ : Ω[A⁄R] →ₗ[A] Ω[Localization.AtPrime p⁄R] := map R R A (Localization.AtPrime p)
@@ -59,8 +63,7 @@ theorem exists_etChart : ∀ (R : Type) [CommRing R] [IsLocalRing R] (A : Type) 
   obtain ⟨g, hg, h⟩ := Module.FinitePresentation.exists_notMem_bijective e p l₁ l₂ heₚ
   let l₁ₜ : (κ →₀ A) →ₗ[A] (κ →₀ Localization.Away g) :=
     Finsupp.mapRange.linearMap (Algebra.linearMap A _)
-  let l₂ₜ : Ω[A⁄R] →ₗ[A] Ω[Localization.Away g⁄R] :=
-    map R R A (Localization.Away g)
+  let l₂ₜ : Ω[A⁄R] →ₗ[A] Ω[Localization.Away g⁄R] := map R R A (Localization.Away g)
   rw [← IsLocalizedModule.map_bijective_iff_localizedModuleMap_bijective l₁ₜ l₂ₜ] at h
   let eₜ' : (κ →₀ Localization.Away g) →ₗ[Localization.Away g] Ω[Localization.Away g⁄R] :=
     IsLocalizedModule.mapExtendScalars (Submonoid.powers g) l₁ₜ l₂ₜ (Localization.Away g) e
@@ -68,8 +71,7 @@ theorem exists_etChart : ∀ (R : Type) [CommRing R] [IsLocalRing R] (A : Type) 
     .ofRepr (LinearEquiv.ofBijective eₜ' h).symm
   have hbB : ∀ i, bB i = D R _ (algebraMap A (Localization.Away g) (t i)) := by
     intro i
-    have h1 : bB i = eₜ' (Finsupp.single i 1) := by
-      rfl
+    have h1 : bB i = eₜ' (Finsupp.single i 1) := by rfl
     rw [h1]
     trans IsLocalizedModule.map (Submonoid.powers g) l₁ₜ l₂ₜ e <| l₁ₜ <| Finsupp.single i 1
     · simp [eₜ', -IsLocalizedModule.map_apply, l₁ₜ]
@@ -84,22 +86,28 @@ theorem exists_etChart : ∀ (R : Type) [CommRing R] [IsLocalRing R] (A : Type) 
     show Algebra.Etale (MvPolynomial (Fin (Nat.card κ)) R) (Localization.Away g)
     have hsc : IsScalarTower R (MvPolynomial (Fin (Nat.card κ)) R) (Localization.Away g) :=
       IsScalarTower.of_algebraMap_eq fun r => by
-        change algebraMap R (Localization.Away g) r =
-          algebraMap A (Localization.Away g) (MvPolynomial.aeval (t ∘ eκ.symm) (MvPolynomial.C r))
+        change algebraMap R (Localization.Away g) r
+          = algebraMap A (Localization.Away g) (MvPolynomial.aeval (t ∘ eκ.symm) (MvPolynomial.C r))
         rw [MvPolynomial.aeval_C, ← IsScalarTower.algebraMap_apply]
-    have hX : ∀ i, algebraMap (MvPolynomial (Fin (Nat.card κ)) R) (Localization.Away g) (MvPolynomial.X i) =
-        algebraMap A (Localization.Away g) (t (eκ.symm i)) := by
+    have hX
+        : ∀ i,
+          algebraMap (MvPolynomial (Fin (Nat.card κ)) R) (Localization.Away g) (MvPolynomial.X i)
+            = algebraMap A (Localization.Away g) (t (eκ.symm i)) := by
       intro i
-      change algebraMap A (Localization.Away g) (MvPolynomial.aeval (t ∘ eκ.symm) (MvPolynomial.X i)) = _
-      rw [MvPolynomial.aeval_X]; rfl
+      change
+        algebraMap A (Localization.Away g) (MvPolynomial.aeval (t ∘ eκ.symm) (MvPolynomial.X i)) = _
+      rw [MvPolynomial.aeval_X]
+      rfl
     haveI : Algebra.FormallySmooth A (Localization.Away g) := Algebra.FormallySmooth.of_isLocalization (Submonoid.powers g)
     haveI : Algebra.FormallySmooth R (Localization.Away g) := Algebra.FormallySmooth.comp R A (Localization.Away g)
     let P := MvPolynomial (Fin (Nat.card κ)) R
-    let bP : Module.Basis (Fin (Nat.card κ)) (Localization.Away g) ((Localization.Away g) ⊗[P] Ω[P⁄R]) :=
+    let bP : Module.Basis (Fin (Nat.card κ)) (Localization.Away g)
+        ((Localization.Away g) ⊗[P] Ω[P⁄R]) :=
       (mvPolynomialBasis R (Fin (Nat.card κ))).baseChange (Localization.Away g)
     let bB' := bB.reindex eκ
     have hbij : Function.Bijective (mapBaseChange R P (Localization.Away g)) := by
-      have : mapBaseChange R P (Localization.Away g) = (bP.equiv bB' (Equiv.refl _)).toLinearMap := by
+      have : mapBaseChange R P (Localization.Away g)
+          = (bP.equiv bB' (Equiv.refl _)).toLinearMap := by
         refine bP.ext fun i => ?_
         rw [LinearEquiv.coe_coe, Module.Basis.equiv_apply]
         simp [bP, bB', hbB, ← hX, P]

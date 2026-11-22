@@ -17,7 +17,6 @@ variable {C : Type} [Field C] {V : VF C}
 
 end FrobP
 
-
 namespace FrobP
 
 variable {C : Type} [Field C] {V : VF C}
@@ -28,6 +27,5 @@ theorem mm_l : V.MM (V.l : C) := by
   exact zero_lt_one
 
 end FrobP
-
 
 end Formalism.L2.FormalSeriesBounds

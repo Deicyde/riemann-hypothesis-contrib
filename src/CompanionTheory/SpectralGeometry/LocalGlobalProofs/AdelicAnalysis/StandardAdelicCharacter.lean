@@ -97,8 +97,7 @@ lemma charFun_eq (x : A F) (b : F) (h : x - algebraMap F (A F) b ∈ Oh F) :
 
 def stdChar : AddChar (A F) ℂ where
   toFun := charFun F
-  map_zero_eq_one' := by
-    rw [charFun_eq F 0 0 (by simpa using zero_mem_Oh F), fieldChar_zero]
+  map_zero_eq_one' := by rw [charFun_eq F 0 0 (by simpa using zero_mem_Oh F), fieldChar_zero]
   map_add_eq_mul' x y := by
     obtain ⟨a, ha⟩ := exists_rep F x
     obtain ⟨b, hb⟩ := exists_rep F y
@@ -136,16 +135,29 @@ lemma Oh_subset_of_isClosed {S : Set (A F)} (hS : IsClosed S)
   obtain ⟨r, hr⟩ := (hint b).1 hb.2
   exact ⟨algebraMap F (A F) b, hb.1, hr ▸ h r⟩
 
-theorem main : ∀ (F : Type) [Field F] [NumberField F], (∃ ψ : AddChar (A F) ℂ, IsStdChar F ψ) ∧ ∀ ψ : AddChar (A F) ℂ, IsStdChar F ψ → (∀ x, ‖ψ x‖ = 1) ∧ (∀ x ∈ Oh F, ψ x = 1) ∧ ∀ b : F, (∀ x ∈ Oh F, ψ (algebraMap F (A F) b * x) = 1) ↔ ∀ r : 𝓞 F, ∃ n : ℤ, Algebra.trace ℚ F (b * (r : F)) = n := by
+theorem main
+    : ∀ (F : Type) [Field F] [NumberField F],
+      (∃ ψ : AddChar (A F) ℂ, IsStdChar F ψ)
+        ∧ ∀ ψ : AddChar (A F) ℂ,
+          IsStdChar F ψ
+            → (∀ x, ‖ψ x‖ = 1) ∧ (∀ x ∈ Oh F, ψ x = 1)
+              ∧ ∀ b : F,
+                (∀ x ∈ Oh F, ψ (algebraMap F (A F) b * x) = 1)
+                  ↔ ∀ r : 𝓞 F, ∃ n : ℤ, Algebra.trace ℚ F (b * (r : F)) = n := by
   intro F _ _
   obtain ⟨-, -, -, -, -, -, hint, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   have hψ1 : ∀ ψ : AddChar (A F) ℂ, IsStdChar F ψ → ∀ x ∈ Oh F, ψ x = 1 := by
     intro ψ hψ x hx
-    refine Oh_subset_of_isClosed F (S := {y | ψ y = 1}) (isClosed_eq hψ.1 continuous_const) (fun r => ?_) hx
+    refine Oh_subset_of_isClosed F (S := {y | ψ y = 1}) (isClosed_eq hψ.1 continuous_const)
+      (fun r => ?_)
+      hx
     show ψ (algebraMap F (A F) (r : F)) = 1
     rw [hψ.2]
     exact (fieldChar_eq_one_iff F _).2 (trace_integer F r)
-  refine ⟨⟨stdChar F, continuous_stdChar F, fun b => ?_⟩, fun ψ hψ => ⟨fun x => ?_, hψ1 ψ hψ, fun b => ⟨fun h r => ?_, fun h => ?_⟩⟩⟩
+  refine ⟨
+    ⟨stdChar F, continuous_stdChar F, fun b => ?_⟩,
+    fun ψ hψ => ⟨fun x => ?_, hψ1 ψ hψ, fun b => ⟨fun h r => ?_, fun h => ?_⟩⟩
+  ⟩
   · rw [stdChar_apply, charFun_eq F _ b (by simp [zero_mem_Oh F])]
     rfl
   · obtain ⟨b, hb⟩ := exists_rep F x
@@ -157,7 +169,9 @@ theorem main : ∀ (F : Type) [Field F] [NumberField F], (∃ ψ : AddChar (A F)
     exact (fieldChar_eq_one_iff F (b * (r : F))).1 h1
   · intro x hx
     refine Oh_subset_of_isClosed F (S := {y | ψ (algebraMap F (A F) b * y) = 1})
-      (isClosed_eq (hψ.1.comp (continuous_const.mul continuous_id)) continuous_const) (fun r => ?_) hx
+      (isClosed_eq (hψ.1.comp (continuous_const.mul continuous_id)) continuous_const)
+      (fun r => ?_)
+      hx
     show ψ (algebraMap F (A F) b * algebraMap F (A F) (r : F)) = 1
     rw [← map_mul, hψ.2]
     exact (fieldChar_eq_one_iff F _).2 (h r)

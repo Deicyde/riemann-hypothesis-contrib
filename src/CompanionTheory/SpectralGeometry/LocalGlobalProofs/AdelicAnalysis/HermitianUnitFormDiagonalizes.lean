@@ -16,9 +16,8 @@ open HeckeCharacterZeroLocus.SiegelWeilU
 
 variable {A : Type} [CommRing A] {m : ℕ}
 
-def bd (a : A) (M : Matrix (Fin m) (Fin m) A) : Matrix (Fin (m + 1)) (Fin (m + 1)) A :=
-  fun i j => Fin.cases (Fin.cases a (fun _ => 0) j)
-    (fun i' => Fin.cases 0 (fun j' => M i' j') j) i
+def bd (a : A) (M : Matrix (Fin m) (Fin m) A) : Matrix (Fin (m + 1)) (Fin (m + 1)) A := fun i j =>
+  Fin.cases (Fin.cases a (fun _ => 0) j) (fun i' => Fin.cases 0 (fun j' => M i' j') j) i
 
 @[simp] lemma bd_succ_zero (a : A) (M : Matrix (Fin m) (Fin m) A) (i : Fin m) :
     bd a M i.succ 0 = 0 := rfl
@@ -50,9 +49,10 @@ lemma bd_diagonal (a : A) (d : Fin m → A) :
   refine Fin.cases ?_ (fun i' => ?_) i <;> refine Fin.cases ?_ (fun j' => ?_) j <;>
     simp [bd, Matrix.diagonal_apply, h0]
 
-def uni (r : Fin m → A) : Matrix (Fin (m + 1)) (Fin (m + 1)) A :=
-  fun i j => Fin.cases (Fin.cases 1 r j)
-    (fun i' => Fin.cases 0 (fun j' => (1 : Matrix (Fin m) (Fin m) A) i' j') j) i
+def uni (r : Fin m → A) : Matrix (Fin (m + 1)) (Fin (m + 1)) A := fun i j =>
+  Fin.cases (Fin.cases 1 r j)
+    (fun i' => Fin.cases 0 (fun j' => (1 : Matrix (Fin m) (Fin m) A) i' j') j)
+    i
 
 lemma det_uni (r : Fin m → A) : (uni r).det = 1 := by
   rw [Matrix.det_succ_column_zero, Fin.sum_univ_succ]
@@ -138,7 +138,17 @@ lemma unimodular (σ : A →+* A) {n : ℕ} (J : Matrix (Fin n) (Fin n) A) (x : 
   show (b * ∑ i : Fin n, σ (x i) * J i j) * x j = b * ∑ i : Fin n, σ (x i) * J i j * x j
   rw [mul_assoc, Finset.sum_mul]
 
-theorem diagonalise : ∀ (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (σ : A →+* A), (∀ y, σ (σ y) = y) → (∀ (m : ℕ) (J : Matrix (Fin (m + 1)) (Fin (m + 1)) A), (∀ i j, σ (J j i) = J i j) → IsUnit J.det → ∃ x, IsUnit (HeckeCharacterZeroLocus.SiegelWeilU.hform σ J x x)) → ∀ (m : ℕ) (J : Matrix (Fin m) (Fin m) A), (∀ i j, σ (J j i) = J i j) → IsUnit J.det → ∃ (g : Matrix (Fin m) (Fin m) A) (d : Fin m → A), IsUnit g.det ∧ (∀ i, IsUnit (d i) ∧ σ (d i) = d i) ∧ HeckeCharacterZeroLocus.SiegelWeilU.cT σ g * J * g = Matrix.diagonal d := by
+theorem diagonalise
+    : ∀ (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (σ : A →+* A),
+      (∀ y, σ (σ y) = y)
+        → (∀ (m : ℕ) (J : Matrix (Fin (m + 1)) (Fin (m + 1)) A),
+          (∀ i j, σ (J j i) = J i j) → IsUnit J.det
+            → ∃ x, IsUnit (HeckeCharacterZeroLocus.SiegelWeilU.hform σ J x x))
+        → ∀ (m : ℕ) (J : Matrix (Fin m) (Fin m) A),
+          (∀ i j, σ (J j i) = J i j) → IsUnit J.det
+            → ∃ (g : Matrix (Fin m) (Fin m) A) (d : Fin m → A),
+              IsUnit g.det ∧ (∀ i, IsUnit (d i) ∧ σ (d i) = d i)
+                ∧ HeckeCharacterZeroLocus.SiegelWeilU.cT σ g * J * g = Matrix.diagonal d := by
   intro A _ _ σ hσ H m
   induction m with
   | zero =>
@@ -148,7 +158,9 @@ theorem diagonalise : ∀ (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (
     intro J hJ hdet
     obtain ⟨x, hx⟩ := H m J hJ hdet
     obtain ⟨b, hb⟩ := hx.exists_left_inv
-    obtain ⟨g₀, hg₀, hcol⟩ := GlobalTheory.CompanionTheory.SW.SemilocalColumn.exists_invertible_first_column A m x (unimodular σ J x b hb)
+    obtain ⟨g₀, hg₀, hcol⟩ :=
+      GlobalTheory.CompanionTheory.SW.SemilocalColumn.exists_invertible_first_column A m x
+        (unimodular σ J x b hb)
     set K := cT σ g₀ * J * g₀ with hKdef
     have hK : ∀ i j, σ (K j i) = K i j := cT_congr_herm σ hσ J g₀ hJ
     have hcorner : K 0 0 = hform σ J x x := corner σ J g₀ x hcol
@@ -159,7 +171,9 @@ theorem diagonalise : ∀ (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (
       have h1 : σ b * K 0 0 = 1 := by
         have := congrArg σ hbK
         rwa [map_mul, hσβ, map_one] at this
-      calc σ b = σ b * (K 0 0 * b) := by rw [mul_comm (K 0 0), hbK, mul_one]
+      calc
+        σ b
+          = σ b * (K 0 0 * b) := by rw [mul_comm (K 0 0), hbK, mul_one]
         _ = (σ b * K 0 0) * b := by ring
         _ = b := by rw [h1, one_mul]
     set r : Fin m → A := fun j => -(b * K 0 j.succ) with hr
@@ -184,8 +198,9 @@ theorem diagonalise : ∀ (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (
       refine Fin.cases ?_ (fun i' => ?_) i
       · simpa using ⟨hβ, hσβ⟩
       · simpa using hd₁ i'
-    · have e : cT σ (g₀ * uni r * bd 1 g₁) * J * (g₀ * uni r * bd 1 g₁) =
-          cT σ (bd 1 g₁) * (cT σ (uni r) * K * uni r) * bd 1 g₁ := by
+    · have e
+          : cT σ (g₀ * uni r * bd 1 g₁) * J * (g₀ * uni r * bd 1 g₁)
+            = cT σ (bd 1 g₁) * (cT σ (uni r) * K * uni r) * bd 1 g₁ := by
         rw [hKdef, cT_mul, cT_mul]
         simp only [Matrix.mul_assoc]
       rw [e, hstep, cT_bd, bd_mul, bd_mul, hdiag, map_one, one_mul, mul_one, bd_diagonal]

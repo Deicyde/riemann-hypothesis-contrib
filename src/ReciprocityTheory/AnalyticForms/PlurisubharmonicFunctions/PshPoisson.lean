@@ -379,10 +379,12 @@ lemma poissonInt_tendsto {g : ℂ → ℝ} {r : ℝ} (hr : 0 < r) (hg : Continuo
     _ = ε / 2 + K := hfin
     _ < ε := by linarith
 
-theorem poisson_ext {g : ℂ → ℝ} {r : ℝ} (hr : 0 < r) (hg : ContinuousOn g (Metric.sphere 0 r)) :
-    ∃ Φ : ℂ → ℝ, ContinuousOn Φ (Metric.closedBall 0 r) ∧ (∀ ζ ∈ Metric.sphere 0 r, Φ ζ = g ζ) ∧
-      Φ 0 = Real.circleAverage g 0 r ∧
-      ∀ a s, 0 < s → Metric.closedBall a s ⊆ Metric.ball 0 r → Real.circleAverage Φ a s = Φ a := by
+theorem poisson_ext {g : ℂ → ℝ} {r : ℝ} (hr : 0 < r) (hg : ContinuousOn g (Metric.sphere 0 r))
+    : ∃ Φ : ℂ → ℝ,
+      ContinuousOn Φ (Metric.closedBall 0 r) ∧ (∀ ζ ∈ Metric.sphere 0 r, Φ ζ = g ζ)
+        ∧ Φ 0 = Real.circleAverage g 0 r
+        ∧ ∀ a s,
+          0 < s → Metric.closedBall a s ⊆ Metric.ball 0 r → Real.circleAverage Φ a s = Φ a := by
   refine ⟨fun z ↦ if ‖z‖ < r then poissonInt g r z else g z, ?_, ?_, ?_, ?_⟩
   · intro z hz
     rcases lt_or_eq_of_le (mem_closedBall_zero_iff.mp hz) with hlt | heq
@@ -416,8 +418,9 @@ theorem poisson_ext {g : ℂ → ℝ} {r : ℝ} (hr : 0 < r) (hg : ContinuousOn 
     rw [if_pos (by rw [norm_zero]; exact hr)]
     exact poissonInt_zero hr
   · intro a s hs hsub
-    have hev : Set.EqOn (fun z ↦ if ‖z‖ < r then poissonInt g r z else g z) (poissonInt g r)
-        (sphere a |s|) := by
+    have hev : Set.EqOn
+        (fun z ↦ if ‖z‖ < r then poissonInt g r z else g z)
+        (poissonInt g r) (sphere a |s|) := by
       intro y hy
       rw [abs_of_pos hs] at hy
       have hyb : y ∈ ball (0 : ℂ) r := hsub (sphere_subset_closedBall hy)

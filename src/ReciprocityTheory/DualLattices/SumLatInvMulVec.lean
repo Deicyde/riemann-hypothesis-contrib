@@ -14,8 +14,9 @@ open ReciprocityTheory.PGsh.L2
 
 variable {C : Type} [Field C] {v : Valuation C NNReal}
 
-def phiMap {n s h : ℕ} (A : Fin n → Matrix (Fin s) (Fin h) C) (w : Fin n × Fin h → C) :
-    Fin n × Fin s → C := fun y => ∑ l, A y.1 y.2 l * w (y.1, l)
+def phiMap {n s h : ℕ} (A : Fin n → Matrix (Fin s) (Fin h) C) (w : Fin n × Fin h → C)
+    : Fin n × Fin s → C := fun y =>
+  ∑ l, A y.1 y.2 l * w (y.1, l)
 
 lemma sumLat_inv_mulVec {n s : ℕ} (Mτ : Fin n → Lat v (Fin s)) (w : Fin n × Fin s → C)
     (τ : Fin n) (i : Fin s) :
@@ -47,10 +48,11 @@ lemma v_mulVec_le {m k : Type} [Fintype k] (P : Matrix m k C) (x : k → C)
   rw [map_mul]
   exact mul_le_one₀ (hP i j) (zero_le) (hx j)
 
-theorem polyVec_mem {n h : ℕ} {a : Fin n → C} (F : Lat v (Fin n × Fin h))
-    (hF : F.B = freeMat a h) (p : Polynomial C) (hp : ∀ k, v (p.coeff k) ≤ 1)
-    (hdeg : p.natDegree < n) (u : Fin h → C) (hu : ∀ l, v (u l) ≤ 1) :
-    (fun y : Fin n × Fin h => p.eval (a y.1) * u y.2) ∈ F.pts := by
+theorem polyVec_mem
+    {n h : ℕ} {a : Fin n → C} (F : Lat v (Fin n × Fin h)) (hF : F.B = freeMat a h)
+    (p : Polynomial C) (hp : ∀ k, v (p.coeff k) ≤ 1) (hdeg : p.natDegree < n)
+    (u : Fin h → C) (hu : ∀ l, v (u l) ≤ 1)
+    : (fun y : Fin n × Fin h => p.eval (a y.1) * u y.2) ∈ F.pts := by
   classical
   refine ⟨fun y ↦ p.coeff (y.1 : ℕ) * u y.2, ?_, ?_⟩
   · intro j
@@ -58,8 +60,8 @@ theorem polyVec_mem {n h : ℕ} {a : Fin n → C} (F : Lat v (Fin n × Fin h))
     exact mul_le_one₀ (hp _) (zero_le) (hu _)
   · funext y
     rw [hF]
-    simp only [Matrix.mulVec, dotProduct, freeMat, Matrix.of_apply, Fintype.sum_prod_type,
-      ite_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    simp only [Matrix.mulVec, dotProduct, freeMat, Matrix.of_apply, Fintype.sum_prod_type, ite_mul,
+      zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     rw [Polynomial.eval_eq_sum_range' hdeg, Finset.sum_mul, ← Fin.sum_univ_eq_sum_range]
     exact Finset.sum_congr rfl fun k _ ↦ by ring
 

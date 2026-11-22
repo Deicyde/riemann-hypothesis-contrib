@@ -20,25 +20,27 @@ theorem divHom_injective {e : ℕ} (he : 0 < e) : Function.Injective (divHom e) 
   rw [divHom_apply, divHom_apply] at hab
   exact_mod_cast mul_right_cancel₀ (inv_ne_zero he') hab
 
-theorem map_divHom_zmultiples {e : ℕ} (he : 0 < e) :
-    (AddSubgroup.zmultiples (e : ℤ)).map (divHom e) = AddSubgroup.zmultiples (1 : ℝ) := by
+theorem map_divHom_zmultiples {e : ℕ} (he : 0 < e)
+    : (AddSubgroup.zmultiples (e : ℤ)).map (divHom e) = AddSubgroup.zmultiples (1 : ℝ) := by
   have he' : (e : ℝ) ≠ 0 := by positivity
   rw [AddMonoidHom.map_zmultiples, divHom_apply]
   congr 1
   rw [Int.cast_natCast, mul_inv_cancel₀ he']
 
-theorem map_divHom_top (e : ℕ) : (⊤ : AddSubgroup ℤ).map (divHom e) = AddSubgroup.zmultiples ((e : ℝ)⁻¹) := by
+theorem map_divHom_top (e : ℕ)
+    : (⊤ : AddSubgroup ℤ).map (divHom e) = AddSubgroup.zmultiples ((e : ℝ)⁻¹) := by
   rw [← AddMonoidHom.range_eq_map, divHom, AddSubgroup.range_zmultiplesHom]
 
-theorem relIndex_zmultiples_one_inv {n : ℕ} (hn : 0 < n) :
-    (AddSubgroup.zmultiples (1 : ℝ)).relIndex (AddSubgroup.zmultiples ((n : ℝ)⁻¹)) = n := by
+theorem relIndex_zmultiples_one_inv {n : ℕ} (hn : 0 < n)
+    : (AddSubgroup.zmultiples (1 : ℝ)).relIndex (AddSubgroup.zmultiples ((n : ℝ)⁻¹)) = n := by
   rw [← map_divHom_zmultiples hn, ← map_divHom_top,
-    AddSubgroup.relIndex_map_map_of_injective _ _ (divHom_injective hn), AddSubgroup.relIndex_top_right,
-    Int.index_zmultiples, Int.natAbs_natCast]
+    AddSubgroup.relIndex_map_map_of_injective _ _ (divHom_injective hn),
+    AddSubgroup.relIndex_top_right, Int.index_zmultiples, Int.natAbs_natCast]
 
-theorem real_subgroup_eq_zmultiples (V : AddSubgroup ℝ) (h1 : (1 : ℝ) ∈ V) {e : ℕ}
-    (hee : (AddSubgroup.zmultiples (1 : ℝ)).relIndex V = e) (he : 0 < e) :
-    V = AddSubgroup.zmultiples ((e : ℝ)⁻¹) := by
+theorem real_subgroup_eq_zmultiples
+    (V : AddSubgroup ℝ) (h1 : (1 : ℝ) ∈ V)
+    {e : ℕ} (hee : (AddSubgroup.zmultiples (1 : ℝ)).relIndex V = e) (he : 0 < e)
+    : V = AddSubgroup.zmultiples ((e : ℝ)⁻¹) := by
   have he' : (e : ℝ) ≠ 0 := by positivity
   have hV : (V.comap (divHom e)).map (divHom e) = V := by
     rw [AddSubgroup.map_comap_eq, inf_eq_right]
@@ -49,12 +51,14 @@ theorem real_subgroup_eq_zmultiples (V : AddSubgroup ℝ) (h1 : (1 : ℝ) ∈ V)
     refine ⟨k, ?_⟩
     rw [divHom_apply]
     have hk' : (k : ℝ) = e * v := by simpa using hk
-    rw [hk']; field_simp
+    rw [hk']
+    field_simp
   have hle : AddSubgroup.zmultiples (e : ℤ) ≤ V.comap (divHom e) := by
     rw [← AddSubgroup.map_le_iff_le_comap, map_divHom_zmultiples he]
     exact AddSubgroup.zmultiples_le_of_mem h1
   have h3 : (AddSubgroup.zmultiples (e : ℤ)).relIndex (V.comap (divHom e)) = e := by
-    rw [← AddSubgroup.relIndex_map_map_of_injective _ _ (divHom_injective he), map_divHom_zmultiples he, hV, hee]
+    rw [← AddSubgroup.relIndex_map_map_of_injective _ _ (divHom_injective he),
+      map_divHom_zmultiples he, hV, hee]
   have h4 := AddSubgroup.relIndex_mul_index hle
   rw [h3, Int.index_zmultiples, Int.natAbs_natCast] at h4
   have h5 : (V.comap (divHom e)).index = 1 := by
@@ -63,10 +67,13 @@ theorem real_subgroup_eq_zmultiples (V : AddSubgroup ℝ) (h1 : (1 : ℝ) ∈ V)
   rw [AddSubgroup.index_eq_one] at h5
   rw [← hV, h5, map_divHom_top]
 
-theorem relIndex_pos_of_le_zmultiples (V : AddSubgroup ℝ) (h1 : (1 : ℝ) ∈ V) {n : ℕ} (hn : 0 < n)
-    (hV : V ≤ AddSubgroup.zmultiples ((n : ℝ)⁻¹)) : 0 < (AddSubgroup.zmultiples (1 : ℝ)).relIndex V := by
-  have h2 := AddSubgroup.relIndex_mul_relIndex (AddSubgroup.zmultiples (1 : ℝ)) V _
-    (AddSubgroup.zmultiples_le_of_mem h1) hV
+theorem relIndex_pos_of_le_zmultiples
+    (V : AddSubgroup ℝ) (h1 : (1 : ℝ) ∈ V)
+    {n : ℕ} (hn : 0 < n) (hV : V ≤ AddSubgroup.zmultiples ((n : ℝ)⁻¹))
+    : 0 < (AddSubgroup.zmultiples (1 : ℝ)).relIndex V := by
+  have h2 :=
+    AddSubgroup.relIndex_mul_relIndex (AddSubgroup.zmultiples (1 : ℝ)) V _
+      (AddSubgroup.zmultiples_le_of_mem h1) hV
   rw [relIndex_zmultiples_one_inv hn] at h2
   exact Nat.pos_of_ne_zero fun h0 => by rw [h0, zero_mul] at h2; omega
 
@@ -93,14 +100,15 @@ theorem vbar_pUnit : vbar p (pUnit p) = 1 := by
 
 theorem one_mem_valueGroup : (1 : ℝ) ∈ valueGroup p K := ⟨pUnit p, pUnit_mem p K, vbar_pUnit p⟩
 
-theorem valueGroup_eq_zmultiples_of_pos (he : 0 < eK p K) :
-    valueGroup p K = AddSubgroup.zmultiples ((eK p K : ℝ)⁻¹) :=
+theorem valueGroup_eq_zmultiples_of_pos (he : 0 < eK p K)
+    : valueGroup p K = AddSubgroup.zmultiples ((eK p K : ℝ)⁻¹) :=
   real_subgroup_eq_zmultiples _ (one_mem_valueGroup p K) rfl he
 
-theorem valueGroup_le_of_finiteDimensional (hK : FiniteDimensional ℚ_[p] K) :
-    valueGroup p K ≤ AddSubgroup.zmultiples
-      ((Module.finrank (⊥ : IntermediateField ℚ_[p] (PadicAlgCl p))
-        (IntermediateField.extendScalars (bot_le : ⊥ ≤ K)) : ℝ)⁻¹) := by
+theorem valueGroup_le_of_finiteDimensional (hK : FiniteDimensional ℚ_[p] K)
+    : valueGroup p K
+      ≤ AddSubgroup.zmultiples ((Module.finrank (⊥ : IntermediateField ℚ_[p] (PadicAlgCl p))
+          (IntermediateField.extendScalars (bot_le : ⊥ ≤ K))
+        : ℝ)⁻¹) := by
   rintro _ ⟨x, hx, rfl⟩
   have := finDim_extendScalars_of_le p hK (bot_le : ⊥ ≤ K)
   set n := Module.finrank (⊥ : IntermediateField ℚ_[p] (PadicAlgCl p))
@@ -110,8 +118,9 @@ theorem valueGroup_le_of_finiteDimensional (hK : FiniteDimensional ℚ_[p] K) :
   set y : PadicAlgCl p := ((Additive.toMul x : (PadicAlgCl p)ˣ) : PadicAlgCl p) with hy
   have hy0 : y ≠ 0 := Units.ne_zero _
   have h1 := norm_algebraNorm p hK (bot_le : ⊥ ≤ K) ⟨y, hx⟩
-  obtain ⟨a, ha⟩ := IntermediateField.mem_bot.1 (Algebra.norm (⊥ : IntermediateField ℚ_[p] (PadicAlgCl p))
-    (⟨y, hx⟩ : IntermediateField.extendScalars (bot_le : ⊥ ≤ K))).2
+  obtain ⟨a, ha⟩ :=
+    IntermediateField.mem_bot.1 (Algebra.norm (⊥ : IntermediateField ℚ_[p] (PadicAlgCl p))
+      (⟨y, hx⟩ : IntermediateField.extendScalars (bot_le : ⊥ ≤ K))).2
   rw [← ha, PadicAlgCl.norm_extends] at h1
   have ha0 : a ≠ 0 := by
     rintro rfl
@@ -121,7 +130,9 @@ theorem valueGroup_le_of_finiteDimensional (hK : FiniteDimensional ℚ_[p] K) :
   refine AddSubgroup.mem_zmultiples_iff.2 ⟨a.valuation, ?_⟩
   rw [vbar_apply]
   have h2 := congrArg (Real.logb p) h1
-  rw [← Real.rpow_intCast, Real.logb_rpow (by linarith [one_lt_p_real p]) (one_lt_p_real p).ne', Real.logb_pow] at h2
+  rw [← Real.rpow_intCast, Real.logb_rpow (by linarith [one_lt_p_real p]) (one_lt_p_real p).ne',
+      Real.logb_pow]
+    at h2
   change _ = (n : ℝ) * Real.logb p ‖y‖ at h2
   rw [zsmul_eq_mul]
   push_cast at h2
@@ -164,7 +175,8 @@ theorem vK_surjective_of_pos (he : 0 < eK p K) : Function.Surjective (vK p K) :=
 theorem vK_surjective (hK : FiniteDimensional ℚ_[p] K) : Function.Surjective (vK p K) :=
   vK_surjective_of_pos p K (eK_pos p K hK)
 
-theorem exists_vK_eq_one (hK : FiniteDimensional ℚ_[p] K) : ∃ π : Kˣ, vK p K π = 1 := vK_surjective p K hK 1
+theorem exists_vK_eq_one (hK : FiniteDimensional ℚ_[p] K) : ∃ π : Kˣ, vK p K π = 1 :=
+  vK_surjective p K hK 1
 
 end
 

@@ -36,8 +36,11 @@ theorem metrizableSpace : TopologicalSpace.MetrizableSpace F := by
   exact UniformSpace.metrizableSpace
 
 theorem sigmaCompactSpace : SigmaCompactSpace F := by
-  refine ⟨⟨fun k : ℕ => {x | valuation F x ≤ (valuation F (GLnLocal.uniformizer F : F))⁻¹ ^ k},
-    fun k => IsNonarchimedeanLocalField.isCompact_closedBall F _, ?_⟩⟩
+  refine ⟨⟨
+    fun k : ℕ => {x | valuation F x ≤ (valuation F (GLnLocal.uniformizer F : F))⁻¹ ^ k},
+    fun k => IsNonarchimedeanLocalField.isCompact_closedBall F _,
+    ?_
+  ⟩⟩
   refine Set.eq_univ_of_forall fun x => ?_
   simp only [Set.mem_iUnion, Set.mem_ofPred_eq]
   by_cases hx : x = 0
@@ -60,14 +63,15 @@ instance secondCountableTopology : SecondCountableTopology F := by
   let := TopologicalSpace.metrizableSpaceMetric F
   exact EMetric.secondCountable_of_sigmaCompact F
 
-theorem secondCountableTopology_units {M : Type*} [Monoid M] [TopologicalSpace M]
-    [SecondCountableTopology M] : SecondCountableTopology Mˣ :=
+theorem secondCountableTopology_units
+    {M : Type*} [Monoid M] [TopologicalSpace M] [SecondCountableTopology M]
+    : SecondCountableTopology Mˣ :=
   haveI : SecondCountableTopology Mᵐᵒᵖ :=
     MulOpposite.opHomeomorph.symm.isEmbedding.secondCountableTopology
   Units.isEmbedding_embedProduct.secondCountableTopology
 
-instance secondCountableTopology_GL (ι : Type*) [Fintype ι] [DecidableEq ι] :
-    SecondCountableTopology (GL ι F) :=
+instance secondCountableTopology_GL (ι : Type*) [Fintype ι] [DecidableEq ι]
+    : SecondCountableTopology (GL ι F) :=
   haveI : SecondCountableTopology (Matrix ι ι F) :=
     inferInstanceAs (SecondCountableTopology (ι → ι → F))
   secondCountableTopology_units
@@ -78,16 +82,13 @@ section Modulus
 
 variable {F} {ι : Type*} [Fintype ι]
 
-instance continuousConstSMul_linearEquiv :
-    ContinuousConstSMul ((ι → F) ≃ₗ[F] (ι → F)) (ι → F) :=
+instance continuousConstSMul_linearEquiv : ContinuousConstSMul ((ι → F) ≃ₗ[F] (ι → F)) (ι → F) :=
   ⟨fun L => (L.toLinearMap).continuous_on_pi⟩
-
 
 variable (F ι) in
 noncomputable def box : Set (ι → F) := Set.univ.pi fun _ => (𝒪[F] : Set F)
 
-theorem mem_box {x : ι → F} : x ∈ box (F := F) (ι := ι) ↔ ∀ i, x i ∈ 𝒪[F] := by
-  simp [box]
+theorem mem_box {x : ι → F} : x ∈ box (F := F) (ι := ι) ↔ ∀ i, x i ∈ 𝒪[F] := by simp [box]
 
 theorem isOpen_box : IsOpen (box (F := F) (ι := ι)) :=
   isOpen_set_pi Set.finite_univ fun _ _ => Valuation.isOpen_integer
@@ -97,8 +98,9 @@ theorem isCompact_box : IsCompact (box (F := F) (ι := ι)) :=
 
 theorem zero_mem_box : (0 : ι → F) ∈ box (F := F) (ι := ι) := fun _ _ => (𝒪[F]).zero_mem
 
-theorem distribHaarChar_eq_one_of_image_box {L : (ι → F) ≃ₗ[F] (ι → F)}
-    (h : L '' box (F := F) (ι := ι) = box (F := F) (ι := ι)) : distribHaarChar (ι → F) L = 1 := by
+theorem distribHaarChar_eq_one_of_image_box
+    {L : (ι → F) ≃ₗ[F] (ι → F)} (h : L '' box (F := F) (ι := ι) = box (F := F) (ι := ι))
+    : distribHaarChar (ι → F) L = 1 := by
   borelize (ι → F)
   let μ : Measure (ι → F) := Measure.addHaar
   refine distribHaarChar_eq_of_measure_smul_eq_mul (μ := μ) (s := box (F := F) (ι := ι))
@@ -106,9 +108,10 @@ theorem distribHaarChar_eq_one_of_image_box {L : (ι → F) ≃ₗ[F] (ι → F)
   have : L • box (F := F) (ι := ι) = L '' box (F := F) (ι := ι) := rfl
   rw [this, h, ENNReal.coe_one, one_mul]
 
-theorem distribHaarChar_eq_one_of_mapsTo_box {L : (ι → F) ≃ₗ[F] (ι → F)}
-    (h₁ : ∀ x ∈ box (F := F) (ι := ι), L x ∈ box (F := F) (ι := ι)) (h₂ : ∀ x ∈ box (F := F) (ι := ι), L.symm x ∈ box (F := F) (ι := ι)) :
-    distribHaarChar (ι → F) L = 1 := by
+theorem distribHaarChar_eq_one_of_mapsTo_box
+    {L : (ι → F) ≃ₗ[F] (ι → F)} (h₁ : ∀ x ∈ box (F := F) (ι := ι), L x ∈ box (F := F) (ι := ι))
+    (h₂ : ∀ x ∈ box (F := F) (ι := ι), L.symm x ∈ box (F := F) (ι := ι))
+    : distribHaarChar (ι → F) L = 1 := by
   refine distribHaarChar_eq_one_of_image_box (Set.Subset.antisymm ?_ fun x hx => ?_)
   · rintro _ ⟨x, hx, rfl⟩
     exact h₁ x hx
@@ -116,12 +119,15 @@ theorem distribHaarChar_eq_one_of_mapsTo_box {L : (ι → F) ≃ₗ[F] (ι → F
 
 variable [DecidableEq ι]
 
-theorem mulVec_mem_box {A : Matrix ι ι F} (hA : ∀ i j, A i j ∈ 𝒪[F]) {x : ι → F}
-    (hx : x ∈ box (F := F) (ι := ι)) : A.mulVec x ∈ box (F := F) (ι := ι) :=
+theorem mulVec_mem_box
+    {A : Matrix ι ι F} (hA : ∀ i j, A i j ∈ 𝒪[F]) {x : ι → F} (hx : x ∈ box (F := F) (ι := ι))
+    : A.mulVec x ∈ box (F := F) (ι := ι) :=
   mem_box.2 fun i => Subring.sum_mem _ fun j _ => Subring.mul_mem _ (hA i j) (mem_box.1 hx j)
 
 noncomputable def modulus : F →*₀ ℝ≥0 where
-  toFun x := by classical exact if h : x = 0 then 0 else distribHaarChar F (Units.mk0 x h)
+  toFun x := by
+    classical
+    exact if h : x = 0 then 0 else distribHaarChar F (Units.mk0 x h)
   map_zero' := dif_pos rfl
   map_one' := by
     rw [dite_eq_right one_ne_zero]
@@ -149,31 +155,31 @@ theorem modulus_ne_zero {x : F} (hx : x ≠ 0) : modulus x ≠ 0 := by
   exact distribHaarChar_pos.ne'
 
 noncomputable def glEquiv : GL ι F ≃* ((ι → F) ≃ₗ[F] (ι → F)) :=
-  Matrix.GeneralLinearGroup.toLin.trans
-    (LinearMap.GeneralLinearGroup.generalLinearEquiv F (ι → F))
+  Matrix.GeneralLinearGroup.toLin.trans (LinearMap.GeneralLinearGroup.generalLinearEquiv F (ι → F))
 
 theorem glEquiv_apply (g : GL ι F) (x : ι → F) : glEquiv g x = (g : Matrix ι ι F).mulVec x := by
   simp [glEquiv, LinearMap.GeneralLinearGroup.generalLinearEquiv, Matrix.GeneralLinearGroup.toLin]
 
-theorem det_glEquiv (g : GL ι F) :
-    LinearEquiv.det (glEquiv g) = Matrix.GeneralLinearGroup.det g := by
+theorem det_glEquiv (g : GL ι F)
+    : LinearEquiv.det (glEquiv g) = Matrix.GeneralLinearGroup.det g := by
   ext
   rw [LinearEquiv.coe_det]
   show LinearMap.det (Matrix.toLin' (g : Matrix ι ι F)) = _
   rw [LinearMap.det_toLin']
   rfl
 
-theorem distribHaarChar_glEquiv_eq_one {g : GL ι F} (h₁ : ∀ a b, (g : Matrix ι ι F) a b ∈ 𝒪[F])
-    (h₂ : ∀ a b, ((g⁻¹ : GL ι F) : Matrix ι ι F) a b ∈ 𝒪[F]) :
-    distribHaarChar (ι → F) (glEquiv g) = 1 := by
+theorem distribHaarChar_glEquiv_eq_one
+    {g : GL ι F} (h₁ : ∀ a b, (g : Matrix ι ι F) a b ∈ 𝒪[F])
+    (h₂ : ∀ a b, ((g⁻¹ : GL ι F) : Matrix ι ι F) a b ∈ 𝒪[F])
+    : distribHaarChar (ι → F) (glEquiv g) = 1 := by
   refine distribHaarChar_eq_one_of_mapsTo_box (fun x hx => ?_) (fun x hx => ?_)
   · rw [glEquiv_apply]
     exact mulVec_mem_box h₁ hx
   · rw [show (glEquiv g).symm = glEquiv g⁻¹ from (map_inv glEquiv g).symm, glEquiv_apply]
     exact mulVec_mem_box h₂ hx
 
-theorem transvection_mem_integer {i j : ι} {c : F} (hc : c ∈ 𝒪[F]) (a b : ι) :
-    Matrix.transvection i j c a b ∈ 𝒪[F] := by
+theorem transvection_mem_integer {i j : ι} {c : F} (hc : c ∈ 𝒪[F]) (a b : ι)
+    : Matrix.transvection i j c a b ∈ 𝒪[F] := by
   simp only [Matrix.transvection, Matrix.add_apply, Matrix.one_apply, Matrix.single_apply]
   refine Subring.add_mem _ ?_ ?_
   · split_ifs
@@ -183,15 +189,16 @@ theorem transvection_mem_integer {i j : ι} {c : F} (hc : c ∈ 𝒪[F]) (a b : 
     · exact hc
     · exact Subring.zero_mem _
 
-theorem distribHaarChar_glEquiv_diagonal {D : ι → F} (h : (Matrix.diagonal D).det ≠ 0) :
-    distribHaarChar (ι → F) (glEquiv (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h)) =
-      distribHaarChar F (Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h)) := by
+theorem distribHaarChar_glEquiv_diagonal {D : ι → F} (h : (Matrix.diagonal D).det ≠ 0)
+    : distribHaarChar (ι → F) (glEquiv (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h))
+      = distribHaarChar F
+        (Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h)) := by
   have hD : ∀ i, D i ≠ 0 := fun i => by
     rw [Matrix.det_diagonal] at h
     exact Finset.prod_ne_zero_iff.1 h i (Finset.mem_univ i)
   let u : ι → Fˣ := fun i => Units.mk0 (D i) (hD i)
-  have hdet : Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h) =
-      ∏ i, u i := by
+  have hdet
+      : Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h) = ∏ i, u i := by
     ext
     simp [u, Matrix.GeneralLinearGroup.mkOfDetNeZero, Matrix.det_diagonal]
   rw [hdet, map_prod]
@@ -199,8 +206,9 @@ theorem distribHaarChar_glEquiv_diagonal {D : ι → F} (h : (Matrix.diagonal D)
   let ν : Measure F := Measure.addHaar
   let μ : Measure (ι → F) := Measure.pi fun _ => ν
   letI : Regular μ := Measure.Regular.of_sigmaCompactSpace_of_isLocallyFiniteMeasure μ
-  have himage : glEquiv (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h) • box (F := F) (ι := ι) =
-      Set.univ.pi fun i => u i • (𝒪[F] : Set F) := by
+  have himage
+      : glEquiv (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h) • box (F := F) (ι := ι)
+        = Set.univ.pi fun i => u i • (𝒪[F] : Set F) := by
     ext x
     simp only [Set.mem_pi, Set.mem_univ, true_implies]
     constructor
@@ -212,7 +220,8 @@ theorem distribHaarChar_glEquiv_diagonal {D : ι → F} (h : (Matrix.diagonal D)
       choose y hy hyx using hx
       refine ⟨y, mem_box.2 hy, funext fun i => ?_⟩
       simpa [LinearEquiv.smul_def, glEquiv_apply, u, Matrix.GeneralLinearGroup.mkOfDetNeZero,
-        Matrix.mulVec_diagonal, Units.smul_def] using hyx i
+          Matrix.mulVec_diagonal, Units.smul_def]
+        using hyx i
   refine distribHaarChar_eq_of_measure_smul_eq_mul (μ := μ) (s := box (F := F) (ι := ι))
     (isOpen_box.measure_ne_zero μ ⟨0, zero_mem_box⟩) isCompact_box.measure_lt_top.ne ?_
   rw [himage, box, Measure.pi_pi, Measure.pi_pi, ENNReal.ofNNReal_finsetProd,
@@ -220,9 +229,9 @@ theorem distribHaarChar_glEquiv_diagonal {D : ι → F} (h : (Matrix.diagonal D)
   refine Finset.prod_congr rfl fun i _ => ?_
   exact (distribHaarChar_mul ν (u i) _).symm
 
-theorem distribHaarChar_glEquiv_transvection (t : Matrix.TransvectionStruct ι F)
-    (h : t.toMatrix.det ≠ 0) :
-    distribHaarChar (ι → F) (glEquiv (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h)) = 1 := by
+theorem distribHaarChar_glEquiv_transvection
+    (t : Matrix.TransvectionStruct ι F) (h : t.toMatrix.det ≠ 0)
+    : distribHaarChar (ι → F) (glEquiv (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h)) = 1 := by
   classical
   obtain ⟨i, j, hij, c⟩ := t
   have h1 : ∀ d : F, (Matrix.transvection i j d).det ≠ 0 := fun d => by
@@ -231,7 +240,8 @@ theorem distribHaarChar_glEquiv_transvection (t : Matrix.TransvectionStruct ι F
   let T : F → GL ι F := fun d => Matrix.GeneralLinearGroup.mkOfDetNeZero _ (h1 d)
   have hT : ∀ d d', T d * T d' = T (d + d') := fun d d' => by
     ext : 1
-    simp [T, Matrix.GeneralLinearGroup.mkOfDetNeZero, Matrix.transvection_mul_transvection_same (h := hij)]
+    simp [T, Matrix.GeneralLinearGroup.mkOfDetNeZero,
+      Matrix.transvection_mul_transvection_same (h := hij)]
   have hT1 : distribHaarChar (ι → F) (glEquiv (T 1)) = 1 := by
     have hinv : (T 1)⁻¹ = T (-1) := by
       rw [inv_eq_iff_mul_eq_one, hT, add_neg_cancel]
@@ -255,8 +265,9 @@ theorem distribHaarChar_glEquiv_transvection (t : Matrix.TransvectionStruct ι F
     · subst hk; simpa [d] using hc
     · simp [d, hk]
   let Dg : GL ι F := Matrix.GeneralLinearGroup.mkOfDetNeZero _ hd
-  have hM : Matrix.transvection i j c * Matrix.diagonal d =
-      Matrix.diagonal d * Matrix.transvection i j 1 := by
+  have hM
+      : Matrix.transvection i j c * Matrix.diagonal d
+        = Matrix.diagonal d * Matrix.transvection i j 1 := by
     ext a b
     rw [Matrix.mul_diagonal, Matrix.diagonal_mul]
     simp only [Matrix.transvection, Matrix.add_apply, Matrix.one_apply, Matrix.single_apply, d]
@@ -280,42 +291,50 @@ theorem distribHaarChar_glEquiv_transvection (t : Matrix.TransvectionStruct ι F
   rw [mul_comm] at key
   exact (mul_eq_left₀ hpos).1 key
 
-theorem distribHaarChar_glEquiv (g : GL ι F) :
-    distribHaarChar (ι → F) (glEquiv g) = distribHaarChar F (Matrix.GeneralLinearGroup.det g) := by
+theorem distribHaarChar_glEquiv (g : GL ι F)
+    : distribHaarChar (ι → F) (glEquiv g)
+      = distribHaarChar F (Matrix.GeneralLinearGroup.det g) := by
   let φ : GL ι F →* ℝ≥0 := (distribHaarChar (ι → F)).comp glEquiv.toMonoidHom
   let ψ : GL ι F →* ℝ≥0 := (distribHaarChar F).comp Matrix.GeneralLinearGroup.det
-  have key : ∀ (M : Matrix ι ι F) (h : M.det ≠ 0),
-      φ (Matrix.GeneralLinearGroup.mkOfDetNeZero M h) =
-        ψ (Matrix.GeneralLinearGroup.mkOfDetNeZero M h) := by
+  have key
+      : ∀ (M : Matrix ι ι F) (h : M.det ≠ 0),
+        φ (Matrix.GeneralLinearGroup.mkOfDetNeZero M h)
+          = ψ (Matrix.GeneralLinearGroup.mkOfDetNeZero M h) := by
     intro M hM
     refine Matrix.diagonal_transvection_induction_of_det_ne_zero
-      (fun M => ∀ h : M.det ≠ 0, φ (Matrix.GeneralLinearGroup.mkOfDetNeZero M h) =
-        ψ (Matrix.GeneralLinearGroup.mkOfDetNeZero M h)) M hM ?_ ?_ ?_ hM
+      (fun M =>
+        ∀ h : M.det ≠ 0,
+          φ (Matrix.GeneralLinearGroup.mkOfDetNeZero M h)
+            = ψ (Matrix.GeneralLinearGroup.mkOfDetNeZero M h))
+      M hM ?_ ?_ ?_ hM
     · intro D _ h
       exact distribHaarChar_glEquiv_diagonal h
     · intro t h
-      have hdet : Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h) = 1 := by
+      have hdet
+          : Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.mkOfDetNeZero _ h) = 1 := by
         ext
         simp [Matrix.GeneralLinearGroup.mkOfDetNeZero]
       change distribHaarChar (ι → F) (glEquiv _) = distribHaarChar F _
       rw [distribHaarChar_glEquiv_transvection t h, hdet, map_one]
     · intro A B hA hB IHA IHB h
-      have : Matrix.GeneralLinearGroup.mkOfDetNeZero (A * B) h =
-          Matrix.GeneralLinearGroup.mkOfDetNeZero A hA *
-            Matrix.GeneralLinearGroup.mkOfDetNeZero B hB := by
+      have : Matrix.GeneralLinearGroup.mkOfDetNeZero (A * B) h
+          = Matrix.GeneralLinearGroup.mkOfDetNeZero A hA
+            * Matrix.GeneralLinearGroup.mkOfDetNeZero B hB := by
         ext : 1
         rfl
       rw [this, map_mul, map_mul, IHA hA, IHB hB]
-  have hg : Matrix.GeneralLinearGroup.mkOfDetNeZero (g : Matrix ι ι F)
-      (Matrix.det_ne_zero_of_left_inverse (g.inv_mul)) = g := by
+  have hg
+      : Matrix.GeneralLinearGroup.mkOfDetNeZero (g : Matrix ι ι F)
+          (Matrix.det_ne_zero_of_left_inverse (g.inv_mul))
+        = g := by
     ext : 1
     rfl
   have := key _ (Matrix.det_ne_zero_of_left_inverse (g.inv_mul))
   rw [hg] at this
   exact this
 
-theorem distribHaarChar_pi_eq (L : (ι → F) ≃ₗ[F] (ι → F)) :
-    distribHaarChar (ι → F) L = distribHaarChar F (LinearEquiv.det L) := by
+theorem distribHaarChar_pi_eq (L : (ι → F) ≃ₗ[F] (ι → F))
+    : distribHaarChar (ι → F) L = distribHaarChar F (LinearEquiv.det L) := by
   obtain ⟨g, rfl⟩ := glEquiv.surjective L
   rw [distribHaarChar_glEquiv, det_glEquiv]
 

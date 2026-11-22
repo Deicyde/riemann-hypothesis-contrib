@@ -6,30 +6,33 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NotF
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
 namespace GlobalTheory.FlatLocCompl
 
-theorem mem_pow_smul_top_iff {R S : Type} [CommRing R] [CommRing S] [Algebra R S] (r : R) (k : ℕ) (z : S) :
-    z ∈ ((Ideal.span {r}) ^ k • ⊤ : Submodule R S) ↔ z ∈ Ideal.span {(algebraMap R S r) ^ k} := by
-  rw [Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists,
-    Ideal.mem_span_singleton]
+theorem mem_pow_smul_top_iff
+    {R S : Type} [CommRing R] [CommRing S] [Algebra R S] (r : R) (k : ℕ) (z : S)
+    : z ∈ ((Ideal.span {r}) ^ k • ⊤ : Submodule R S) ↔ z ∈ Ideal.span {(algebraMap R S r) ^ k} := by
+  rw [Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul,
+    Submodule.mem_smul_pointwise_iff_exists, Ideal.mem_span_singleton]
   constructor
   · rintro ⟨e, -, rfl⟩
     exact ⟨e, by rw [Algebra.smul_def, map_pow]⟩
   · rintro ⟨e, rfl⟩
     exact ⟨e, Submodule.mem_top, by rw [Algebra.smul_def, map_pow]⟩
 
-theorem mem_pow_smul_top_self_iff {R : Type} [CommRing R] (r : R) (k : ℕ) (z : R) :
-    z ∈ ((Ideal.span {r}) ^ k • ⊤ : Submodule R R) ↔ z ∈ Ideal.span {r ^ k} := by
+theorem mem_pow_smul_top_self_iff {R : Type} [CommRing R] (r : R) (k : ℕ) (z : R)
+    : z ∈ ((Ideal.span {r}) ^ k • ⊤ : Submodule R R) ↔ z ∈ Ideal.span {r ^ k} := by
   rw [mem_pow_smul_top_iff]; rfl
 
-theorem flat_of_levels {B E : Type} [CommRing B] [IsNoetherianRing B] [CommRing E] [Algebra B E] (p : B)
-    (hc : IsAdicComplete (Ideal.span {algebraMap B E p}) E)
-    (hinj : ∀ (b : B) (k : ℕ), algebraMap B E b ∈ Ideal.span {(algebraMap B E p) ^ k} →
-      b ∈ Ideal.span {p ^ k})
-    (hden : ∀ (y : E) (k : ℕ), ∃ b : B, algebraMap B E b - y ∈ Ideal.span {(algebraMap B E p) ^ k}) :
-    Module.Flat B E := by
+theorem flat_of_levels
+    {B E : Type} [CommRing B] [IsNoetherianRing B] [CommRing E] [Algebra B E]
+    (p : B) (hc : IsAdicComplete (Ideal.span {algebraMap B E p}) E)
+    (hinj : ∀ (b : B) (k : ℕ),
+      algebraMap B E b ∈ Ideal.span {(algebraMap B E p) ^ k} → b ∈ Ideal.span {p ^ k})
+    (hden : ∀ (y : E) (k : ℕ), ∃ b : B, algebraMap B E b - y ∈ Ideal.span {(algebraMap B E p) ^ k})
+    : Module.Flat B E := by
   set I : Ideal B := Ideal.span {p} with hI
   haveI : IsAdicComplete I E := by
     rw [← IsAdicComplete.map_algebraMap_iff (S := E)]
@@ -65,7 +68,8 @@ theorem flat_of_levels {B E : Type} [CommRing B] [IsNoetherianRing B] [CommRing 
       have h2 : fk k x = Submodule.Quotient.mk (f b) := by
         simp only [fk, LinearMap.comp_apply, AdicCompletion.eval_apply, ← hb]; rfl
       rw [h2, eq_comm, Submodule.Quotient.mk_eq_zero, mem_pow_smul_top_iff] at h1
-      rw [← hb, AdicCompletion.val_zero_apply, Submodule.Quotient.mk_eq_zero, mem_pow_smul_top_self_iff]
+      rw [← hb, AdicCompletion.val_zero_apply, Submodule.Quotient.mk_eq_zero,
+        mem_pow_smul_top_self_iff]
       exact hinj b k h1
     · intro y
       choose b hb using fun k => hden y k
@@ -73,8 +77,10 @@ theorem flat_of_levels {B E : Type} [CommRing B] [IsNoetherianRing B] [CommRing 
         intro k
         rw [SModEq.sub_mem, mem_pow_smul_top_self_iff]
         apply hinj
-        have h3 : algebraMap B E (b k - b (k + 1)) =
-            (algebraMap B E (b k) - y) - (algebraMap B E (b (k + 1)) - y) := by rw [map_sub]; ring
+        have h3
+            : algebraMap B E (b k - b (k + 1))
+              = (algebraMap B E (b k) - y) - (algebraMap B E (b (k + 1)) - y) := by
+          rw [map_sub]; ring
         rw [h3]
         refine Ideal.sub_mem _ (hb k) ?_
         refine Ideal.span_singleton_le_span_singleton.2 ?_ (hb (k + 1))
@@ -92,18 +98,23 @@ end GlobalTheory.FlatLocCompl
 
 namespace GlobalTheory.FlatLocCompl
 
-theorem flat_letA (O : Type) [CommRing O] [IsNoetherianRing O] (n : ℕ) [NeZero n] (E : Type) [CommRing E]
-    [Algebra (LetA O n) E] (p : ℕ) (hπ : IsUnit (algebraMap (LetA O n) E letπ))
-    (hc : IsAdicComplete (Ideal.span {(p : E)}) E)
-    (hden : ∀ (x : E) (k : ℕ), ∃ (a : LetA O n) (m : ℕ), x * algebraMap (LetA O n) E (letπ ^ m) -
-      algebraMap (LetA O n) E a ∈ Ideal.span {(p : E) ^ k})
-    (hsat : ∀ (a : LetA O n) (k : ℕ), algebraMap (LetA O n) E a ∈ Ideal.span {(p : E) ^ k} →
-      ∃ b : LetA O n, a = (p : LetA O n) ^ k * b) :
-    Module.Flat (LetA O n) E := by
+theorem flat_letA
+    (O : Type) [CommRing O] [IsNoetherianRing O]
+    (n : ℕ) [NeZero n]
+    (E : Type) [CommRing E] [Algebra (LetA O n) E]
+    (p : ℕ)
+    (hπ : IsUnit (algebraMap (LetA O n) E letπ)) (hc : IsAdicComplete (Ideal.span {(p : E)}) E)
+    (hden : ∀ (x : E) (k : ℕ), ∃ (a : LetA O n) (m : ℕ),
+      x * algebraMap (LetA O n) E (letπ ^ m) - algebraMap (LetA O n) E a ∈ Ideal.span {(p : E) ^ k})
+    (hsat : ∀ (a : LetA O n) (k : ℕ),
+      algebraMap (LetA O n) E a ∈ Ideal.span {(p : E) ^ k}
+        → ∃ b : LetA O n, a = (p : LetA O n) ^ k * b)
+    : Module.Flat (LetA O n) E := by
   let B := Localization.Away (letπ : LetA O n)
   let g : B →+* E := IsLocalization.Away.lift (S := B) (letπ : LetA O n) hπ
   letI : Algebra B E := g.toAlgebra
-  have hg : ∀ a : LetA O n, algebraMap B E (algebraMap (LetA O n) B a) = algebraMap (LetA O n) E a :=
+  have hg
+      : ∀ a : LetA O n, algebraMap B E (algebraMap (LetA O n) B a) = algebraMap (LetA O n) E a :=
     fun a => IsLocalization.Away.lift_eq (S := B) (letπ : LetA O n) hπ a
   haveI : IsScalarTower (LetA O n) B E := IsScalarTower.of_algebraMap_eq fun a => (hg a).symm
   have hp : algebraMap B E (p : B) = (p : E) := map_natCast _ _

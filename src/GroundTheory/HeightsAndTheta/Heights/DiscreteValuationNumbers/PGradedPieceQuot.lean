@@ -13,30 +13,33 @@ open MvPolynomial
 
 universe u
 
-theorem finite_blockWeight_eq {K : Type} [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (m : K → ℕ) :
-    {d : (Σ k, ι k) →₀ ℕ | Finsupp.weight (blockWeight ι) d = m}.Finite := by
+theorem finite_blockWeight_eq
+    {K : Type} [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (m : K → ℕ)
+    : {d : (Σ k, ι k) →₀ ℕ | Finsupp.weight (blockWeight ι) d = m}.Finite := by
   classical
   refine (Set.finite_Iic (Finsupp.equivFunOnFinite.symm fun v : (Σ k, ι k) => m v.1)).subset ?_
   intro d hd
   simp only [Set.mem_ofPred_eq] at hd
   simp only [Set.mem_Iic]
   intro v
-  have hcoord : (Finsupp.weight (blockWeight ι) d) v.1 =
-      Finsupp.weight (fun x => blockWeight ι x v.1) d := by
+  have hcoord
+      : (Finsupp.weight (blockWeight ι) d) v.1
+        = Finsupp.weight (fun x => blockWeight ι x v.1) d := by
     simp [Finsupp.weight_apply, Finsupp.sum, Finset.sum_apply]
   have hle : d v ≤ Finsupp.weight (fun x => blockWeight ι x v.1) d :=
     Finsupp.le_weight _ (by simp [blockWeight]) d
   rw [← hcoord, hd] at hle
   simpa using hle
 
-theorem finiteDimensional_weightedHomogeneousSubmodule (F : Type u) [Field F] {K : Type}
-    [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (m : K → ℕ) :
-    FiniteDimensional F (weightedHomogeneousSubmodule F (blockWeight ι) m) := by
+theorem finiteDimensional_weightedHomogeneousSubmodule
+    (F : Type u) [Field F]
+    {K : Type} [Fintype K] [DecidableEq K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (m : K → ℕ)
+    : FiniteDimensional F (weightedHomogeneousSubmodule F (blockWeight ι) m) := by
   rw [weightedHomogeneousSubmodule_eq_finsupp_supported]
   have := (finite_blockWeight_eq ι m).to_subtype
-  exact Module.Finite.of_basis
-    (basisRestrictSupport F {d | Finsupp.weight (blockWeight ι) d = m})
+  exact Module.Finite.of_basis (basisRestrictSupport F {d | Finsupp.weight (blockWeight ι) d = m})
 
 theorem GradedPieceQuot.proof : GradedPieceQuot.Statement.{u} := by
   intro F _ K _ _ ι _ I m

@@ -13,42 +13,47 @@ variable {L : Type} [Field L] [NumberField L] {W : Type} [AddCommGroup W] [Modul
 
 def cond (A B : Submodule (𝓞 L) W) : Ideal (𝓞 L) where
   carrier := {u | ∀ x ∈ A, u • x ∈ B}
-  add_mem' := fun {a b} ha hb x hx => by
-    rw [add_smul]; exact B.add_mem (ha x hx) (hb x hx)
+  add_mem' := fun {a b} ha hb x hx => by rw [add_smul]; exact B.add_mem (ha x hx) (hb x hx)
   zero_mem' := fun x _ => by rw [zero_smul]; exact B.zero_mem
-  smul_mem' := fun c u hu x hx => by
-    rw [smul_eq_mul, mul_smul]; exact B.smul_mem c (hu x hx)
+  smul_mem' := fun c u hu x hx => by rw [smul_eq_mul, mul_smul]; exact B.smul_mem c (hu x hx)
 
-theorem mem_cond {A B : Submodule (𝓞 L) W} {u : 𝓞 L} :
-    u ∈ cond A B ↔ ∀ x ∈ A, u • x ∈ B := Iff.rfl
+theorem mem_cond {A B : Submodule (𝓞 L) W} {u : 𝓞 L} : u ∈ cond A B ↔ ∀ x ∈ A, u • x ∈ B := Iff.rfl
 
-theorem exists_reps {A B : Submodule (𝓞 L) W}
-    (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0) :
-    ∃ S : Finset W, (∀ r ∈ S, r ∈ A) ∧ ∀ x ∈ A, ∃ r ∈ S, x - r ∈ B := by
+theorem exists_reps {A B : Submodule (𝓞 L) W} (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0)
+    : ∃ S : Finset W, (∀ r ∈ S, r ∈ A) ∧ ∀ x ∈ A, ∃ r ∈ S, x - r ∈ B := by
   classical
   have hQ : Finite (A.toAddSubgroup ⧸ B.toAddSubgroup.addSubgroupOf A.toAddSubgroup) :=
     Nat.finite_of_card_ne_zero hfin
   have := Fintype.ofFinite (A.toAddSubgroup ⧸ B.toAddSubgroup.addSubgroupOf A.toAddSubgroup)
-  refine ⟨Finset.univ.image
-    (fun q : A.toAddSubgroup ⧸ B.toAddSubgroup.addSubgroupOf A.toAddSubgroup =>
-      ((Quotient.out q : A.toAddSubgroup) : W)), ?_, ?_⟩
+  refine ⟨
+    Finset.univ.image (fun q : A.toAddSubgroup ⧸ B.toAddSubgroup.addSubgroupOf A.toAddSubgroup =>
+      ((Quotient.out q : A.toAddSubgroup) : W)),
+    ?_,
+    ?_
+  ⟩
   · intro r hr
     obtain ⟨q, -, rfl⟩ := Finset.mem_image.mp hr
     exact (Quotient.out q).2
   · intro x hx
     let q : A.toAddSubgroup ⧸ B.toAddSubgroup.addSubgroupOf A.toAddSubgroup :=
       QuotientAddGroup.mk ⟨x, hx⟩
-    refine ⟨((Quotient.out q : A.toAddSubgroup) : W),
-      Finset.mem_image.mpr ⟨q, Finset.mem_univ _, rfl⟩, ?_⟩
-    have hq : (QuotientAddGroup.mk (Quotient.out q) :
-        A.toAddSubgroup ⧸ B.toAddSubgroup.addSubgroupOf A.toAddSubgroup) = q := Quotient.out_eq q
+    refine ⟨
+      ((Quotient.out q : A.toAddSubgroup) : W),
+      Finset.mem_image.mpr ⟨q, Finset.mem_univ _, rfl⟩,
+      ?_
+    ⟩
+    have hq
+        : (QuotientAddGroup.mk (Quotient.out q)
+            : A.toAddSubgroup ⧸ B.toAddSubgroup.addSubgroupOf A.toAddSubgroup)
+          = q :=
+      Quotient.out_eq q
     have h := QuotientAddGroup.eq.mp hq
     rw [AddSubgroup.mem_addSubgroupOf] at h
     have h' : -((Quotient.out q : A.toAddSubgroup) : W) + x ∈ B := h
     rwa [neg_add_eq_sub] at h'
 
-theorem cond_ne_bot {A B : Submodule (𝓞 L) W}
-    (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0) : cond A B ≠ ⊥ := by
+theorem cond_ne_bot {A B : Submodule (𝓞 L) W} (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0)
+    : cond A B ≠ ⊥ := by
   intro hbot
 
   have hmem : ((B.toAddSubgroup.relIndex A.toAddSubgroup : ℕ) : 𝓞 L) ∈ cond A B := by
@@ -58,10 +63,10 @@ theorem cond_ne_bot {A B : Submodule (𝓞 L) W}
   rw [hbot, Ideal.mem_bot] at hmem
   exact hfin (Nat.cast_eq_zero.mp hmem)
 
-theorem exists_mem_cond_notMem {A B : Submodule (𝓞 L) W} (w : FinitePlace L)
-    (hloc : locAt w A = locAt w B)
-    (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0) :
-    ∃ s ∈ cond A B, s ∉ w.maximalIdeal.asIdeal := by
+theorem exists_mem_cond_notMem
+    {A B : Submodule (𝓞 L) W} (w : FinitePlace L) (hloc : locAt w A = locAt w B)
+    (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0)
+    : ∃ s ∈ cond A B, s ∉ w.maximalIdeal.asIdeal := by
   classical
   obtain ⟨S, hSA, hS⟩ := exists_reps hfin
   have hex : ∀ r ∈ S, ∃ t : 𝓞 L, t ∉ w.maximalIdeal.asIdeal ∧ t • r ∈ B := by
@@ -82,10 +87,13 @@ theorem exists_mem_cond_notMem {A B : Submodule (𝓞 L) W} (w : FinitePlace L)
     rintro ⟨r, hr, hmem⟩
     exact (ht r hr).1 hmem
 
-theorem cond_sup_span_eq_top {A B : Submodule (𝓞 L) W} (v : FinitePlace L)
+theorem cond_sup_span_eq_top
+    {A B : Submodule (𝓞 L) W}
+    (v : FinitePlace L)
     (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0)
     (hloc : ∀ w : FinitePlace L, w ≠ v → locAt w A = locAt w B)
-    {t : 𝓞 L} (ht : t ∉ v.maximalIdeal.asIdeal) : cond A B ⊔ Ideal.span {t} = ⊤ := by
+    {t : 𝓞 L} (ht : t ∉ v.maximalIdeal.asIdeal)
+    : cond A B ⊔ Ideal.span {t} = ⊤ := by
   by_contra hne
   obtain ⟨P, hPmax, hle⟩ := Ideal.exists_le_maximal _ hne
   have hPbot : P ≠ ⊥ := by
@@ -93,8 +101,7 @@ theorem cond_sup_span_eq_top {A B : Submodule (𝓞 L) W} (v : FinitePlace L)
     apply cond_ne_bot hfin
     rw [eq_bot_iff, ← hP]
     exact le_sup_left.trans hle
-  obtain ⟨Q, hQ⟩ : ∃ Q : HeightOneSpectrum (𝓞 L), Q.asIdeal = P :=
-    ⟨⟨P, hPmax.isPrime, hPbot⟩, rfl⟩
+  obtain ⟨Q, hQ⟩ : ∃ Q : HeightOneSpectrum (𝓞 L), Q.asIdeal = P := ⟨⟨P, hPmax.isPrime, hPbot⟩, rfl⟩
   by_cases hw : FinitePlace.mk Q = v
   · apply ht
     rw [← hw, FinitePlace.maximalIdeal_mk, hQ]
@@ -104,23 +111,27 @@ theorem cond_sup_span_eq_top {A B : Submodule (𝓞 L) W} (v : FinitePlace L)
     rw [FinitePlace.maximalIdeal_mk, hQ]
     exact hle (Ideal.mem_sup_left hs)
 
-theorem exists_bezout {A B : Submodule (𝓞 L) W} (v : FinitePlace L)
+theorem exists_bezout
+    {A B : Submodule (𝓞 L) W}
+    (v : FinitePlace L)
     (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0)
     (hloc : ∀ w : FinitePlace L, w ≠ v → locAt w A = locAt w B)
-    {t : 𝓞 L} (ht : t ∉ v.maximalIdeal.asIdeal) :
-    ∃ s u : 𝓞 L, u ∈ cond A B ∧ s * t + u = 1 := by
+    {t : 𝓞 L} (ht : t ∉ v.maximalIdeal.asIdeal)
+    : ∃ s u : 𝓞 L, u ∈ cond A B ∧ s * t + u = 1 := by
   have h1 : (1 : 𝓞 L) ∈ cond A B ⊔ Ideal.span {t} := by
     rw [cond_sup_span_eq_top v hfin hloc ht]; exact Submodule.mem_top
   obtain ⟨u, hu, z, hz, huz⟩ := Submodule.mem_sup.mp h1
   obtain ⟨s, rfl⟩ := Ideal.mem_span_singleton'.mp hz
   exact ⟨s, u, hu, by rw [add_comm]; exact huz⟩
 
-theorem relIndex_locAt (L : Type) [Field L] [NumberField L] (W : Type) [AddCommGroup W]
-    [Module (𝓞 L) W] (v : FinitePlace L) (A B : Submodule (𝓞 L) W) (hBA : B ≤ A)
-    (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0)
-    (hloc : ∀ w : FinitePlace L, w ≠ v → locAt w A = locAt w B) :
-    (locAt v B).toAddSubgroup.relIndex (locAt v A).toAddSubgroup =
-      B.toAddSubgroup.relIndex A.toAddSubgroup := by
+theorem relIndex_locAt
+    (L : Type) [Field L] [NumberField L]
+    (W : Type) [AddCommGroup W] [Module (𝓞 L) W]
+    (v : FinitePlace L) (A B : Submodule (𝓞 L) W)
+    (hBA : B ≤ A) (hfin : B.toAddSubgroup.relIndex A.toAddSubgroup ≠ 0)
+    (hloc : ∀ w : FinitePlace L, w ≠ v → locAt w A = locAt w B)
+    : (locAt v B).toAddSubgroup.relIndex (locAt v A).toAddSubgroup
+      = B.toAddSubgroup.relIndex A.toAddSubgroup := by
   have hle : A.toAddSubgroup ≤ (locAt v A).toAddSubgroup := fun x hx => le_locAt v A hx
 
   have hback : ∀ x ∈ A, x ∈ locAt v B → x ∈ B := by
@@ -131,8 +142,9 @@ theorem relIndex_locAt (L : Type) [Field L] [NumberField L] (W : Type) [AddCommG
     rw [hx']
     exact B.add_mem (B.smul_mem s htx) (mem_cond.mp hu x hxA)
 
-  let f := (QuotientAddGroup.mk' ((locAt v B).toAddSubgroup.addSubgroupOf
-    (locAt v A).toAddSubgroup)).comp (AddSubgroup.inclusion hle)
+  let f :=
+    (QuotientAddGroup.mk' ((locAt v B).toAddSubgroup.addSubgroupOf (locAt v A).toAddSubgroup)).comp
+      (AddSubgroup.inclusion hle)
   have hsurj : Function.Surjective f := by
     intro q
     obtain ⟨⟨y, hy⟩, rfl⟩ := QuotientAddGroup.mk'_surjective _ q

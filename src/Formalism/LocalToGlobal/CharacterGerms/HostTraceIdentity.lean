@@ -14,7 +14,8 @@ open Classical
 namespace Formalism.L2.FormalSeriesBounds
 
 open Formalism.IncomingBounds Formalism.L2.Pj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 def VF.RR {C : Type} [Field C] (V : VF C) : Subring C where
   carrier := {x | V.Ge 0 x}
@@ -24,7 +25,8 @@ def VF.RR {C : Type} [Field C] (V : VF C) : Subring C where
   zero_mem' := VF.Ge.zero 0
   neg_mem' := fun ha => VF.Ge.neg ha
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable {Xo : Moduli Dw l} {c : Coeff l} [StarRing (𝓞 E)]
 variable {C : Type} [Field C] [CharZero C] {V : VF C}
 
@@ -36,14 +38,17 @@ def a3B (C3 : IntChart T io y) : FB T.Fr (chD C3.ch) (𝓞 E) := letI := io.toAl
 
 def a3h (C3 : IntChart T io y) : PS T.Fr 2 (chD C3.ch) := letI := io.toAlgebra; C3.ch.h
 
-def chartUnitVectors (C3 : IntChart T io y) : Lt1 Dw → Fin (chD C3.ch) → T.Fr := letI := io.toAlgebra; C3.ch.uvec
+def chartUnitVectors (C3 : IntChart T io y) : Lt1 Dw → Fin (chD C3.ch) → T.Fr :=
+  letI := io.toAlgebra; C3.ch.uvec
 
 def EmbOK (T : CDVR) (V : VF C) (ι : T.Fr →+* C) : Prop :=
-  ∀ x : T.Fr, x ≠ 0 → V.v (ι x) = (((vV T.V x : ℝ) / (vV T.V ((V.l : ℕ) : T.Fr) : ℝ) : ℝ) : WithTop ℝ)
+  ∀ x : T.Fr,
+    x ≠ 0 → V.v (ι x) = (((vV T.V x : ℝ) / (vV T.V ((V.l : ℕ) : T.Fr) : ℝ) : ℝ) : WithTop ℝ)
 
 def eOf (T : CDVR) (V : VF C) : ℕ := (vV T.V ((V.l : ℕ) : T.Fr)).toNat
 
-structure IsBC (C3 : IntChart T io y) (ι : T.Fr →+* C) (k : ℕ) (Y : FBChart C V (𝓞 E) (chD C3.ch)) : Prop where
+structure IsBC (C3 : IntChart T io y) (ι : T.Fr →+* C) (k : ℕ) (Y : FBChart C V (𝓞 E) (chD C3.ch))
+    : Prop where
   F : ∀ j, Y.B.G.F j = MvPowerSeries.map ι ((a3B C3).G.F j)
   act : ∀ a j, Y.B.A.act a j = MvPowerSeries.map ι ((a3B C3).A.act a j)
   ph1 : Y.B.ph1 = MvPowerSeries.map ι (a3B C3).ph1
@@ -54,7 +59,8 @@ structure IsBC (C3 : IntChart T io y) (ι : T.Fr →+* C) (k : ℕ) (Y : FBChart
   w0 : Y.w0 = H.w0
   k : Y.k = k
 
-def chartLetterSystem (C3 : IntChart T io y) (V : VF C) (ι : T.Fr →+* C) (a : (E →+* ℂ) × ℕ → ℕ) : LetSys C (chD C3.ch) where
+def chartLetterSystem (C3 : IntChart T io y) (V : VF C) (ι : T.Fr →+* C) (a : (E →+* ℂ) × ℕ → ℕ)
+    : LetSys C (chD C3.ch) where
   ι := fun N => LtN Dw N
   fin := fun _ => inferInstance
   cp := fun _ ℓ => ℓ.2.2
@@ -70,41 +76,63 @@ structure Lab (E : Type) [Field E] (Orb : Type) (d : ℕ) where
   j' : ℕ
   big : Orb → Fin 2 → ZMod d → Prop
 
-abbrev Lab.II {Orb : Type} {d : ℕ} (lab : Lab E Orb d) (Dw : Datum H) (o : Orb) (g : Fin 2) : Type :=
+abbrev Lab.II {Orb : Type} {d : ℕ} (lab : Lab E Orb d) (Dw : Datum H) (o : Orb) (g : Fin 2)
+    : Type :=
   Σ a : ZMod d, Fin (Dw.mult (lab.tau o g a))
 
 section Pairs
 
 variable {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} {Orb : Type} {d : ℕ} [NeZero d]
 
-def emA3 (io : c.F →+* T.Fr) (ι : T.Fr →+* C) (τ : E →+* ℂ) : 𝓞 E →+* C := (ι.comp io).comp (embK c τ)
+def emA3 (io : c.F →+* T.Fr) (ι : T.Fr →+* C) (τ : E →+* ℂ) : 𝓞 E →+* C :=
+  (ι.comp io).comp (embK c τ)
 
-def lieBasisVector (C3 : IntChart T io y) (ι : T.Fr →+* C) (lab : Lab E Orb d) (o : Orb) (g : Fin 2) (x : lab.II Dw o g) :
-    Fin (chD C3.ch) → C := fun i => ι (chartUnitVectors C3 ⟨lab.tau o g x.1, x.2⟩ i)
+def lieBasisVector
+    (C3 : IntChart T io y) (ι : T.Fr →+* C)
+    (lab : Lab E Orb d) (o : Orb) (g : Fin 2) (x : lab.II Dw o g)
+    : Fin (chD C3.ch) → C := fun i =>
+  ι (chartUnitVectors C3 ⟨lab.tau o g x.1, x.2⟩ i)
 
 structure LabArith (V : VF C) (io : c.F →+* T.Fr) (ι : T.Fr →+* C) (lab : Lab E Orb d) : Prop where
   inj : Function.Injective fun x : Orb × Fin 2 × ZMod d => lab.tau x.1 x.2.1 x.2.2
   conj : ∀ o a, lab.tau o 1 a = ComplexEmbedding.conjugate (lab.tau o 0 a)
   frob : ∀ o g a x, V.MM (emA3 io ι (lab.tau o g (a + 1)) x - emA3 io ι (lab.tau o g a) x ^ V.l)
-  sep : ∀ x x' : Orb × Fin 2 × ZMod d, x ≠ x' →
-    ∃ a : 𝓞 E, V.v (emA3 io ι (lab.tau x.1 x.2.1 x.2.2) a - emA3 io ι (lab.tau x'.1 x'.2.1 x'.2.2) a) = 0
-  unr : ∀ o g, ∃ ε : 𝓞 E, (∃ y, ε * ε - ε = (V.l : 𝓞 E) * y) ∧ (∀ a, V.MM (emA3 io ι (lab.tau o g a) ε - 1)) ∧
-    ∀ x : 𝓞 E, (∀ a, V.MM (emA3 io ι (lab.tau o g a) x)) → ∃ y, ε * x = (V.l : 𝓞 E) * y
+  sep
+    : ∀ x x' : Orb × Fin 2 × ZMod d,
+      x ≠ x'
+        → ∃ a : 𝓞 E,
+          V.v (emA3 io ι (lab.tau x.1 x.2.1 x.2.2) a - emA3 io ι (lab.tau x'.1 x'.2.1 x'.2.2) a) = 0
+  unr
+    : ∀ o g, ∃ ε : 𝓞 E,
+      (∃ y, ε * ε - ε = (V.l : 𝓞 E) * y) ∧ (∀ a, V.MM (emA3 io ι (lab.tau o g a) ε - 1))
+        ∧ ∀ x : 𝓞 E, (∀ a, V.MM (emA3 io ι (lab.tau o g a) x)) → ∃ y, ε * x = (V.l : 𝓞 E) * y
 
-structure LabGeo (C3 : IntChart T io y) (ι : T.Fr →+* C) (Y : FBChart C V (𝓞 E) (chD C3.ch)) (lab : Lab E Orb d) :
-    Prop where
+structure LabGeo
+    (C3 : IntChart T io y) (ι : T.Fr →+* C) (Y : FBChart C V (𝓞 E) (chD C3.ch)) (lab : Lab E Orb d)
+    : Prop where
   em_int : ∀ o g a x, V.Ge 0 (emA3 io ι (lab.tau o g a) x)
   em_conj : ∀ o a x, emA3 io ι (lab.tau o 1 a) x = emA3 io ι (lab.tau o 0 a) (star x)
   u_int : ∀ o g x i, V.Ge 0 (lieBasisVector C3 ι lab o g x i)
-  u_eig : ∀ o g (x : lab.II Dw o g) a, linAct (Y.B.A.act a) (lieBasisVector C3 ι lab o g x) =
-    emA3 io ι (lab.tau o g x.1) a • lieBasisVector C3 ι lab o g x
-  u_sat : ∀ o g, ∃ w : Fin (chD C3.ch) → lab.II Dw o g → C, (∀ x q, V.Ge 0 (w x q)) ∧
-    ∀ q q' : lab.II Dw o g, ∑ x, lieBasisVector C3 ι lab o g q x * w x q' = if q = q' then 1 else 0
-  u_full : ∀ o g a (v : Fin (chD C3.ch) → C), (∀ x, linAct (Y.B.A.act x) v = emA3 io ι (lab.tau o g a) x • v) →
-    ∃ b : lab.II Dw o g → C, (∀ q, q.1 ≠ a → b q = 0) ∧ v = ∑ q, b q • lieBasisVector C3 ι lab o g q
+  u_eig
+    : ∀ o g (x : lab.II Dw o g) a,
+      linAct (Y.B.A.act a) (lieBasisVector C3 ι lab o g x)
+        = emA3 io ι (lab.tau o g x.1) a • lieBasisVector C3 ι lab o g x
+  u_sat
+    : ∀ o g, ∃ w : Fin (chD C3.ch) → lab.II Dw o g → C,
+      (∀ x q, V.Ge 0 (w x q))
+        ∧ ∀ q q' : lab.II Dw o g,
+          ∑ x, lieBasisVector C3 ι lab o g q x * w x q' = if q = q' then 1 else 0
+  u_full
+    : ∀ o g a (v : Fin (chD C3.ch) → C),
+      (∀ x, linAct (Y.B.A.act x) v = emA3 io ι (lab.tau o g a) x • v)
+        → ∃ b : lab.II Dw o g → C,
+          (∀ q, q.1 ≠ a → b q = 0) ∧ v = ∑ q, b q • lieBasisVector C3 ι lab o g q
 
-def pairOfLab {C3 : IntChart T io y} {ι : T.Fr →+* C} {Y : FBChart C V (𝓞 E) (chD C3.ch)} {lab : Lab E Orb d}
-    (ha : LabArith V io ι lab) (hg : LabGeo C3 ι Y lab) (o : Orb) : PairData Y d (lab.II Dw o) where
+def pairOfLab
+    {C3 : IntChart T io y} {ι : T.Fr →+* C} {Y : FBChart C V (𝓞 E) (chD C3.ch)} {lab : Lab E Orb d}
+    (ha : LabArith V io ι lab) (hg : LabGeo C3 ι Y lab)
+    (o : Orb)
+    : PairData Y d (lab.II Dw o) where
   em := fun g a => emA3 io ι (lab.tau o g a)
   em_int := hg.em_int o
   em_conj := hg.em_conj o
@@ -124,9 +152,11 @@ def pairOfLab {C3 : IntChart T io y} {ι : T.Fr →+* C} {Y : FBChart C V (𝓞 
   j' := lab.j'
   big := lab.big o
 
-theorem pairsSep_ofLab {C3 : IntChart T io y} {ι : T.Fr →+* C} {Y : FBChart C V (𝓞 E) (chD C3.ch)} {lab : Lab E Orb d}
-    (ha : LabArith V io ι lab) (hg : LabGeo C3 ι Y lab) : PairsSep Y (pairOfLab ha hg) :=
-  fun x x' h => ha.sep x x' h
+theorem pairsSep_ofLab
+    {C3 : IntChart T io y} {ι : T.Fr →+* C} {Y : FBChart C V (𝓞 E) (chD C3.ch)} {lab : Lab E Orb d}
+    (ha : LabArith V io ι lab) (hg : LabGeo C3 ι Y lab)
+    : PairsSep Y (pairOfLab ha hg) := fun x x' h =>
+  ha.sep x x' h
 
 end Pairs
 
@@ -135,36 +165,46 @@ section Named
 variable (Xo c)
 
 def BCExSt : Prop :=
-  ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C3 : IntChart T io y)
-    (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι → IsAlgClosed C →
-    (∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n)) → V.l ≠ 2 →
-    H.w0 + star H.w0 = 1 → ∀ k : ℕ, V.v (k : C) = 0 → ∃ Y : FBChart C V (𝓞 E) (chD C3.ch), IsBC C3 ι k Y
+  ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C3 : IntChart T io y) (C : Type) [Field C]
+      [CharZero C] (V : VF C) (ι : T.Fr →+* C),
+    EmbOK T V ι → IsAlgClosed C
+      → (∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
+      → V.l ≠ 2 → H.w0 + star H.w0 = 1
+      → ∀ k : ℕ, V.v (k : C) = 0 → ∃ Y : FBChart C V (𝓞 E) (chD C3.ch), IsBC C3 ι k Y
 
 def HostTraceIdentity (H : Host E) : Prop := (∀ a : 𝓞 E, star a = H.bar a) → H.w0 + star H.w0 = 1
 
 def DescentSt : Prop :=
-  ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C3 : IntChart T io y)
-    (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι →
-    ∀ (k : ℕ) (Y : FBChart C V (𝓞 E) (chD C3.ch)), IsBC C3 ι k Y →
-    ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), nuLocC C3 (eOf T V) k a n ≤ Y.nuPlE (chartLetterSystem C3 V ι a) n
+  ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C3 : IntChart T io y) (C : Type) [Field C]
+      [CharZero C] (V : VF C) (ι : T.Fr →+* C),
+    EmbOK T V ι
+      → ∀ (k : ℕ) (Y : FBChart C V (𝓞 E) (chD C3.ch)),
+        IsBC C3 ι k Y
+          → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ),
+            nuLocC C3 (eOf T V) k a n ≤ Y.nuPlE (chartLetterSystem C3 V ι a) n
 
 def LabGeoSt : Prop :=
-  (∀ a : 𝓞 E, star a = H.bar a) →
-  ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C3 : IntChart T io y)
-    (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι →
-    ∀ (k : ℕ) (Y : FBChart C V (𝓞 E) (chD C3.ch)), IsBC C3 ι k Y →
-    ∀ (Orb : Type) (d : ℕ) [NeZero d] (lab : Lab E Orb d), LabArith V io ι lab → LabGeo C3 ι Y lab
+  (∀ a : 𝓞 E, star a = H.bar a)
+    → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C3 : IntChart T io y) (C : Type)
+        [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C),
+      EmbOK T V ι
+        → ∀ (k : ℕ) (Y : FBChart C V (𝓞 E) (chD C3.ch)),
+          IsBC C3 ι k Y
+            → ∀ (Orb : Type) (d : ℕ) [NeZero d] (lab : Lab E Orb d),
+              LabArith V io ι lab → LabGeo C3 ι Y lab
 
 end Named
 
 def Lab.RankOK {Orb : Type} {d : ℕ} (lab : Lab E Orb d) (Dw : Datum H) : Prop :=
-  ∀ o, (∀ g a, lab.big o (1 - g) a ↔ ¬ lab.big o g a) ∧
-    (∀ g a, lab.big o g a → Dw.mult (lab.tau o g a) = lab.n + lab.j) ∧
-    (∀ g a, ¬ lab.big o g a → Dw.mult (lab.tau o g a) = lab.j')
+  ∀ o,
+    (∀ g a, lab.big o (1 - g) a ↔ ¬ lab.big o g a)
+      ∧ (∀ g a, lab.big o g a → Dw.mult (lab.tau o g a) = lab.n + lab.j)
+      ∧ (∀ g a, ¬ lab.big o g a → Dw.mult (lab.tau o g a) = lab.j')
 
 section Top
 
-variable {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} {Orb : Type} [Fintype Orb] {d : ℕ} [NeZero d]
+variable
+  {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} {Orb : Type} [Fintype Orb] {d : ℕ} [NeZero d]
 
 end Top
 

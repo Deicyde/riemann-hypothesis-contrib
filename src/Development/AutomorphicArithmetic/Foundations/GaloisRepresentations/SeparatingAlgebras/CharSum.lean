@@ -5,13 +5,14 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.PowValAdd
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
 open UpperTheory.Gal.Gen
 
-theorem UpperTheory.Gal.Gen.charSum_pf :
-    UpperTheory.Gal.Gen.CharSum := by
+theorem UpperTheory.Gal.Gen.charSum_pf : UpperTheory.Gal.Gen.CharSum := by
   intro N _
   have hN : N ≠ 0 := NeZero.ne N
   obtain ⟨ζ, hζ⟩ : ∃ ζ : ℂ, IsPrimitiveRoot ζ N := ⟨_, Complex.isPrimitiveRoot_exp N hN⟩
@@ -23,9 +24,11 @@ theorem UpperTheory.Gal.Gen.charSum_pf :
   have hu : ∀ j : ℕ, (u ^ j) ^ N = 1 := by
     intro j
     rw [← pow_mul, mul_comm, pow_mul, huN, one_pow]
-  let χ : Fin N → (Multiplicative (ZMod N) →* ℂˣ) := fun j => GlobalTheory.CongSc.zchar (u ^ (j : ℕ)) (hu j)
-  have hval : ∀ (j : Fin N) (x : Multiplicative (ZMod N)),
-      ((χ j x : ℂˣ) : ℂ) = (ζ ^ (j : ℕ)) ^ (Multiplicative.toAdd x).val := by
+  let χ : Fin N → (Multiplicative (ZMod N) →* ℂˣ) := fun j =>
+    GlobalTheory.CongSc.zchar (u ^ (j : ℕ)) (hu j)
+  have hval
+      : ∀ (j : Fin N) (x : Multiplicative (ZMod N)),
+        ((χ j x : ℂˣ) : ℂ) = (ζ ^ (j : ℕ)) ^ (Multiplicative.toAdd x).val := by
     intro j x
     simp [χ, GlobalTheory.CongSc.zchar_apply, u]
   have hone : ∀ j : Fin N, j ≠ 0 → ((χ j (Multiplicative.ofAdd 1) : ℂˣ) : ℂ) = ζ ^ (j : ℕ) := by

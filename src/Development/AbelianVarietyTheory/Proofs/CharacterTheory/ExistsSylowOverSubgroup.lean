@@ -6,36 +6,37 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_sylow_over_subgroup (G : Type) [Group G] [Finite G] (C : Subgroup G) (p : ℕ)
-    (hp : p.Prime) :
-    ∃ H : Subgroup G, C ≤ H ∧ (∀ h ∈ H, ∀ c ∈ C, h * c * h⁻¹ ∈ C) ∧
-      (∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ C) ∧
-      ∀ N : Subgroup G, (∀ g : G, g ∈ N ↔ ∀ c ∈ C, g * c * g⁻¹ ∈ C) → ¬ p ∣ H.relIndex N := by
+theorem exists_sylow_over_subgroup
+    (G : Type) [Group G] [Finite G] (C : Subgroup G) (p : ℕ) (hp : p.Prime)
+    : ∃ H : Subgroup G,
+      C ≤ H ∧ (∀ h ∈ H, ∀ c ∈ C, h * c * h⁻¹ ∈ C) ∧ (∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ C)
+        ∧ ∀ N : Subgroup G, (∀ g : G, g ∈ N ↔ ∀ c ∈ C, g * c * g⁻¹ ∈ C) → ¬ p ∣ H.relIndex N := by
   classical
   haveI : Fact p.Prime := ⟨hp⟩
-  let N : Subgroup G :=
-    { carrier := {g | ∀ c ∈ C, g * c * g⁻¹ ∈ C}
-      one_mem' := by intro c hc; simpa using hc
-      mul_mem' := by
-        intro a b ha hb c hc
-        have := ha _ (hb c hc)
-        simpa [mul_assoc] using this
-      inv_mem' := by
-        intro a ha c hc
-        have key : ∀ n : ℕ, ∀ c ∈ C, a ^ n * c * (a ^ n)⁻¹ ∈ C := by
-          intro n
-          induction n with
-          | zero => intro c hc; simpa using hc
-          | succ n ih =>
-            intro c hc
-            have := ha _ (ih c hc)
-            simpa [pow_succ', mul_assoc] using this
-        have h1 : a ^ (orderOf a - 1) = a⁻¹ := by
-          have hpos : 0 < orderOf a := orderOf_pos a
-          apply eq_inv_of_mul_eq_one_left
-          rw [← pow_succ, Nat.sub_add_cancel hpos, pow_orderOf_eq_one]
-        have := key (orderOf a - 1) c hc
-        rwa [h1] at this }
+  let N : Subgroup G := {
+    carrier := {g | ∀ c ∈ C, g * c * g⁻¹ ∈ C}
+    one_mem' := by intro c hc; simpa using hc
+    mul_mem' := by
+      intro a b ha hb c hc
+      have := ha _ (hb c hc)
+      simpa [mul_assoc] using this
+    inv_mem' := by
+      intro a ha c hc
+      have key : ∀ n : ℕ, ∀ c ∈ C, a ^ n * c * (a ^ n)⁻¹ ∈ C := by
+        intro n
+        induction n with
+        | zero => intro c hc; simpa using hc
+        | succ n ih =>
+          intro c hc
+          have := ha _ (ih c hc)
+          simpa [pow_succ', mul_assoc] using this
+      have h1 : a ^ (orderOf a - 1) = a⁻¹ := by
+        have hpos : 0 < orderOf a := orderOf_pos a
+        apply eq_inv_of_mul_eq_one_left
+        rw [← pow_succ, Nat.sub_add_cancel hpos, pow_orderOf_eq_one]
+      have := key (orderOf a - 1) c hc
+      rwa [h1] at this
+  }
   have hN : ∀ g : G, g ∈ N ↔ ∀ c ∈ C, g * c * g⁻¹ ∈ C := fun g => Iff.rfl
   let C' : Subgroup N := C.subgroupOf N
   haveI hC' : C'.Normal := ⟨fun n hn g => by

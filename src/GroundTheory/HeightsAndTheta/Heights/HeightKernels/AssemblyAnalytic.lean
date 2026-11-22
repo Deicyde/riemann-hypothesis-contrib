@@ -49,13 +49,12 @@ theorem GaussianSum.full : GaussianSum.Statement :=
     GaussConstant.proof
 
 theorem ThetaMean.full : ThetaMean.Statement :=
-  ThetaMean.proof
-    (ThetaInnerMean.proof ThetaSummandNorm.proof
-      (ThetaCubeParseval.proof ThetaCharIntegral.proof))
+  ThetaMean.proof (ThetaInnerMean.proof ThetaSummandNorm.proof
+    (ThetaCubeParseval.proof ThetaCharIntegral.proof))
 
 theorem ThetaBound.full : ThetaBound.Statement :=
-  ThetaBound.proof GaussianSum.full ThetaMean.full
-    (ThetaNormMajorant.proof ThetaSummandNorm.proof) ThetaFirstCoordSplit.proof ThetaConstants.proof
+  ThetaBound.proof GaussianSum.full ThetaMean.full (ThetaNormMajorant.proof ThetaSummandNorm.proof)
+    ThetaFirstCoordSplit.proof ThetaConstants.proof
 
 theorem PlueckerNormSq.full : PlueckerNormSq.Statement := PlueckerNormSq.proof CauchyBinet.proof
 

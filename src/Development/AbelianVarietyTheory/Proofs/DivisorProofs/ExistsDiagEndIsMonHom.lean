@@ -9,8 +9,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc
 open MonObj GrpObj
@@ -28,17 +31,20 @@ def diagPrecomp {T : Scheme.{0}} {X Y M : Over T} [MonObj M] (f : X ⟶ Y) : (Y 
     change f ≫ lift g h ≫ μ = lift (f ≫ g) (f ≫ h) ≫ μ
     rw [← Category.assoc, comp_lift]
 
-theorem exists_diagEnd_isMonHom (g n : ℕ) (F : SFam g n (zetaAway n)) (W : Matrix (Fin 8) (Fin 8) ℤ) (T : Scheme.{0})
-    (P : PolAV T) (u : T ⟶ F.X) (h : SharpOver F W P u) :
-    ∃ ε : Matrix (Fin 8) (Fin 8) ℤ → (P.A ⟶ P.A), IsDiagEnd F W P u ε ∧ ∀ E, IsMonHom (ε E) := by
+theorem exists_diagEnd_isMonHom
+    (g n : ℕ) (F : SFam g n (zetaAway n))
+    (W : Matrix (Fin 8) (Fin 8) ℤ) (T : Scheme.{0})
+    (P : PolAV T) (u : T ⟶ F.X) (h : SharpOver F W P u)
+    : ∃ ε : Matrix (Fin 8) (Fin 8) ℤ → (P.A ⟶ P.A), IsDiagEnd F W P u ε ∧ ∀ E, IsMonHom (ε E) := by
   obtain ⟨c, hc, pr, hpr, huniq, hL⟩ := h
   choose ε hε _ using fun E : Matrix (Fin 8) (Fin 8) ℤ =>
     huniq P.A (fun a => ((List.finRange 8).map fun b => pr b ^ E a b).prod)
-  have ext : ∀ (T' : Over T) (x x' : T' ⟶ P.A), (∀ a, x ≫ pr a = x' ≫ pr a) → x = x' := fun T' x x' hx =>
-    (huniq T' (fun a => x' ≫ pr a)).unique hx (fun _ => rfl)
+  have ext : ∀ (T' : Over T) (x x' : T' ⟶ P.A), (∀ a, x ≫ pr a = x' ≫ pr a) → x = x' :=
+    fun T' x x' hx => (huniq T' (fun a => x' ≫ pr a)).unique hx (fun _ => rfl)
   refine ⟨ε, ⟨c, hc, pr, hpr, huniq, hL, hε⟩, fun E => ?_⟩
-  have key : ∀ (T' : Over T) (x : T' ⟶ P.A) (a : Fin 8),
-      (x ≫ ε E) ≫ pr a = ((List.finRange 8).map fun b => (x ≫ pr b) ^ E a b).prod := by
+  have key
+      : ∀ (T' : Over T) (x : T' ⟶ P.A) (a : Fin 8),
+        (x ≫ ε E) ≫ pr a = ((List.finRange 8).map fun b => (x ≫ pr b) ^ E a b).prod := by
     intro T' x a
     rw [Category.assoc, hε]
     change diagPrecomp (M := c.A) x _ = _

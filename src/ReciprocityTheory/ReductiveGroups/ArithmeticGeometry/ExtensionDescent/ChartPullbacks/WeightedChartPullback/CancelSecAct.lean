@@ -19,16 +19,19 @@ namespace ReciprocityTheory.ChartRestriction.G.Out.WeightPf
 
 open Semi
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegPre R} {e : ℕ}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (g : GtCoord I D e G)
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegPre R} {e : ℕ} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
+  (g : GtCoord I D e G)
 
-abbrev Te (D : DegPre R) (I : Ideal R) (e : ℕ) := splitTorus (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))) D.X
+abbrev Te (D : DegPre R) (I : Ideal R) (e : ℕ) :=
+  splitTorus (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))) D.X
 
 def act : Te D I e ⊗ thickObj R I e G ⟶ thickObj R I e G :=
   lift (fst (Te D I e) (thickObj R I e G) ≫ g.i) (snd _ _) ≫ μ[thickObj R I e G]
 
-def sec : thickObj R I e G ⟶ Te D I e ⊗ thickObj R I e G :=
-  lift (toUnit _ ≫ η[Te D I e]) (𝟙 _)
+def sec : thickObj R I e G ⟶ Te D I e ⊗ thickObj R I e G := lift (toUnit _ ≫ η[Te D I e]) (𝟙 _)
 
 lemma i_q : g.i ≫ g.q = toUnit _ ≫ η[thickObj R I e D.P.A] := g.isKernel.w
 

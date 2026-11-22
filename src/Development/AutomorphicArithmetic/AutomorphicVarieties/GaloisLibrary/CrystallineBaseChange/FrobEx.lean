@@ -4,7 +4,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
 open UpperTheory.V UpperTheory.V.Af
 open scoped Pointwise
 
@@ -13,21 +14,23 @@ section
 variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
 
 omit [NumberField F] in
-private theorem val_smul_lt (g : G F Ω) (A : ValuationSubring Ω) (y : Ω) :
-    (g • A).valuation (g y) < 1 ↔ A.valuation y < 1 := by
+private theorem val_smul_lt (g : G F Ω) (A : ValuationSubring Ω) (y : Ω)
+    : (g • A).valuation (g y) < 1 ↔ A.valuation y < 1 := by
   have e : ∀ z : Ω, g z ∈ g • A ↔ z ∈ A := fun z => by
-    rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, show g z = g • z from rfl, inv_smul_smul]
+    rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, show g z = g • z from rfl,
+      inv_smul_smul]
   rw [valuation_lt_one_iff', valuation_lt_one_iff', e, ← map_inv₀, e, map_eq_zero]
 
 omit [NumberField F] in
-private theorem val_smul_le (g : G F Ω) (A : ValuationSubring Ω) (y : Ω) :
-    (g • A).valuation (g y) ≤ 1 ↔ A.valuation y ≤ 1 := by
+private theorem val_smul_le (g : G F Ω) (A : ValuationSubring Ω) (y : Ω)
+    : (g • A).valuation (g y) ≤ 1 ↔ A.valuation y ≤ 1 := by
   rw [ValuationSubring.valuation_le_one_iff, ValuationSubring.valuation_le_one_iff,
     ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, show g y = g • y from rfl, inv_smul_smul]
 
 omit [NumberField F] in
-private theorem conj_dec {g τ : G F Ω} {A : ValuationSubring Ω} (h : τ ∈ (g • A).decompositionSubgroup F) :
-    g⁻¹ * τ * g ∈ A.decompositionSubgroup F := by
+private theorem conj_dec
+    {g τ : G F Ω} {A : ValuationSubring Ω} (h : τ ∈ (g • A).decompositionSubgroup F)
+    : g⁻¹ * τ * g ∈ A.decompositionSubgroup F := by
   have h1 : τ • g • A = g • A := h
   show (g⁻¹ * τ * g) • A = A
   rw [mul_smul, mul_smul, h1, inv_smul_smul]
@@ -38,20 +41,24 @@ private theorem conj_apply (g τ : G F Ω) (x : Ω) : g ((g⁻¹ * τ * g) x) = 
   rw [mul_smul, mul_smul, smul_inv_smul]
 
 omit [NumberField F] in
-private theorem conj_frob {g τ : G F Ω} {A : ValuationSubring Ω} {q : ℕ} (h : IsFrob (g • A) q τ) :
-    IsFrob A q (g⁻¹ * τ * g) := by
+private theorem conj_frob {g τ : G F Ω} {A : ValuationSubring Ω} {q : ℕ} (h : IsFrob (g • A) q τ)
+    : IsFrob A q (g⁻¹ * τ * g) := by
   refine ⟨conj_dec h.1, fun x hx => ?_⟩
   have h1 := h.2 (g x) ((val_smul_le g A x).2 hx)
   rwa [← conj_apply, ← map_pow, ← map_sub, val_smul_lt] at h1
 
-private theorem conj_ine {g τ : G F Ω} {A : ValuationSubring Ω} (h : τ ∈ Ine (F := F) (g • A)) :
-    g⁻¹ * τ * g ∈ Ine (F := F) A := by
+private theorem conj_ine {g τ : G F Ω} {A : ValuationSubring Ω} (h : τ ∈ Ine (F := F) (g • A))
+    : g⁻¹ * τ * g ∈ Ine (F := F) A := by
   refine ⟨conj_dec h.1, fun x hx => ?_⟩
   have h1 := h.2 (g x) ((val_smul_le g A x).2 hx)
   rwa [← conj_apply, ← map_sub, val_smul_lt] at h1
 
-private theorem ine_fix {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A w) {M : ℕ}
-    (hM : ((M : ℕ) : 𝓞 F) ∉ w.asIdeal) {s : G F Ω} (hs : s ∈ Ine (F := F) A) (ζ : Ω) (hζ : ζ ^ M = 1) : s ζ = ζ := by
+private theorem ine_fix
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A w)
+    {M : ℕ} (hM : ((M : ℕ) : 𝓞 F) ∉ w.asIdeal)
+    {s : G F Ω} (hs : s ∈ Ine (F := F) A)
+    (ζ : Ω) (hζ : ζ ^ M = 1)
+    : s ζ = ζ := by
   set v := A.valuation with hvdef
   have hM0 : M ≠ 0 := by
     rintro rfl
@@ -102,17 +109,20 @@ private theorem ine_fix {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 F
     rw [← geom_sum_mul u i, map_mul]
     have hs1 : v (∑ j ∈ Finset.range i, u ^ j) ≤ 1 :=
       Valuation.map_sum_le v (fun j _ => by rw [map_pow]; exact pow_le_one' hule j)
-    calc v (∑ j ∈ Finset.range i, u ^ j) * v (u - 1) ≤ 1 * v (u - 1) := by gcongr
+    calc
+      v (∑ j ∈ Finset.range i, u ^ j) * v (u - 1)
+        ≤ 1 * v (u - 1) := by gcongr
       _ = v (u - 1) := one_mul _
       _ < 1 := hu1
-  rw [Finset.sum_sub_distrib, hsum, Finset.sum_const, Finset.card_range, zero_sub, Valuation.map_neg] at hlt
+  rw [Finset.sum_sub_distrib, hsum, Finset.sum_const, Finset.card_range, zero_sub,
+      Valuation.map_neg]
+    at hlt
   apply hvM
   simpa using hlt
 
 end
 
-theorem UpperTheory.V.Br.frobEx :
-    UpperTheory.V.Br.FrobEx := by
+theorem UpperTheory.V.Br.frobEx : UpperTheory.V.Br.FrobEx := by
   intro F Ω _ _ _ _ _ l _ ι n r w
   refine ⟨?_, ?_⟩
   · intro B B' hB hB'
@@ -130,19 +140,25 @@ theorem UpperTheory.V.Br.frobEx :
       have hc : ∀ i, χ i t = 1 := fun i => hχ i t (fun ζ hζ => ine_fix hA0 hM ht ζ hζ)
       simp only [hc, Units.val_one, Matrix.diagonal_one] at hd
       have hq : P * r t * P⁻¹ = 1 := Units.ext hd
-      calc r t = P⁻¹ * (P * r t * P⁻¹) * P := by group
+      calc
+        r t
+          = P⁻¹ * (P * r t * P⁻¹) * P := by group
         _ = 1 := by rw [hq]; group
     obtain ⟨σ0, hσ0⟩ := exists_isFrob hA0
-    refine ⟨(Polynomial.map ι.toRingHom
-      ((r σ0⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)).charpoly).roots, ?_⟩
+    refine ⟨
+      (Polynomial.map ι.toRingHom
+        ((r σ0⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)).charpoly).roots,
+      ?_
+    ⟩
     intro A hA
     obtain ⟨g, hg⟩ := exists_smul_eq_of_isPlaceOver hA0 hA
     subst hg
     refine ⟨fun s hs => ?_, fun σ hσ => ?_⟩
     · have ht := hI0 _ (conj_ine hs)
-      calc r s = r g * r (g⁻¹ * s * g) * r g⁻¹ := by
-            simp only [map_mul, map_inv]
-            group
+      calc
+        r s = r g * r (g⁻¹ * s * g) * r g⁻¹ := by
+          simp only [map_mul, map_inv]
+          group
         _ = 1 := by rw [ht]; simp
     · have hc := inv_mul_mem_Ine_of_isFrob hσ0 (conj_frob hσ)
       have he : r (g⁻¹ * σ * g) = r σ0 := by

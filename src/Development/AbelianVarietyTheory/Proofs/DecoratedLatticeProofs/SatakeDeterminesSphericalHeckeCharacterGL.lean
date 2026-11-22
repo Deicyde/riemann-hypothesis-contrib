@@ -10,12 +10,15 @@ noncomputable section
 
 namespace GlobalTheory.ChainOnto.SatHeckeChar
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.UG GlobalTheory.PRep GlobalTheory.AdelicU GlobalTheory.LFun
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.UG GlobalTheory.PRep GlobalTheory.AdelicU GlobalTheory.LFun
 
-theorem heckeVec_eq_smul_of_isSatVecGL :
-    ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ) (B : Multiset ℂˣ),
-      ∀ φ ∈ Hecke ℂ (KGL w (n := n)), ∃ z : ℂ, ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
-        (ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V) (x : V),
+theorem heckeVec_eq_smul_of_isSatVecGL
+    : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ)
+        (B : Multiset ℂˣ),
+      ∀ φ ∈ Hecke ℂ (KGL w (n := n)), ∃ z : ℂ,
+        ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
+            (ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V) (x : V),
           IsSatVecGL w ρ x B → heckeVec ρ (KGL w (n := n)) φ x = z • x := by
   intro E _ _ w n B φ hφ
   by_cases hB : B.card = n

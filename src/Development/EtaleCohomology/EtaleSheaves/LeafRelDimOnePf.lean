@@ -10,8 +10,8 @@ open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
 
 namespace LateralTheory.E.LeafRelDimOnePf
 
-theorem exists_ne_generic {C : Scheme.{0}} [IsIntegral C] (hd : topologicalKrullDim C = 1) :
-    ∃ x : C, x ≠ genericPoint C := by
+theorem exists_ne_generic {C : Scheme.{0}} [IsIntegral C] (hd : topologicalKrullDim C = 1)
+    : ∃ x : C, x ≠ genericPoint C := by
   by_contra h
   push Not at h
   have : Subsingleton C := ⟨fun a b => (h a).trans (h b).symm⟩
@@ -24,11 +24,15 @@ theorem isField_top (Ω : Type) [Field Ω] : IsField Γ(Sp Ω, ⊤) :=
   MulEquiv.isField (Field.toIsField Ω)
     (Scheme.ΓSpecIso (CommRingCat.of Ω)).commRingCatIsoToRingEquiv.toMulEquiv
 
-theorem chart (Ω : Type) [Field Ω] {C : Scheme.{0}} (c : C ⟶ Sp Ω) [IsIntegral C]
-    (hd : topologicalKrullDim C = 1) (U : (Sp Ω).Opens) (V : C.Opens) (hV : IsAffineOpen V)
-    (x : C) (hx : x ∈ V) (hxη : x ≠ genericPoint C) (e : V ≤ c ⁻¹ᵁ U)
-    (hs : (c.appLE U V e).hom.IsStandardSmooth) :
-    RingHom.IsStandardSmoothOfRelativeDimension 1 (c.appLE U V e).hom := by
+theorem chart
+    (Ω : Type) [Field Ω]
+    {C : Scheme.{0}} (c : C ⟶ Sp Ω) [IsIntegral C]
+    (hd : topologicalKrullDim C = 1)
+    (U : (Sp Ω).Opens)
+    (V : C.Opens) (hV : IsAffineOpen V)
+    (x : C) (hx : x ∈ V) (hxη : x ≠ genericPoint C)
+    (e : V ≤ c ⁻¹ᵁ U) (hs : (c.appLE U V e).hom.IsStandardSmooth)
+    : RingHom.IsStandardSmoothOfRelativeDimension 1 (c.appLE U V e).hom := by
   have hU : U = ⊤ := by
     ext p
     simp only [TopologicalSpace.Opens.coe_top, Set.mem_univ, iff_true]
@@ -42,8 +46,9 @@ theorem chart (Ω : Type) [Field Ω] {C : Scheme.{0}} (c : C ⟶ Sp Ω) [IsInteg
   obtain ⟨ι, σ, _, _, ⟨P⟩⟩ := hs.out
   have : Algebra.IsStandardSmoothOfRelativeDimension P.dimension Γ(Sp Ω, ⊤) Γ(C, V) :=
     P.isStandardSmoothOfRelativeDimension rfl
-  have h1 := GlobalTheory.AffinePoints.ringKrullDim_eq_of_isStandardSmooth (K := Γ(Sp Ω, ⊤)) (A := Γ(C, V))
-    (d := P.dimension)
+  have h1 :=
+    GlobalTheory.AffinePoints.ringKrullDim_eq_of_isStandardSmooth (K := Γ(Sp Ω, ⊤)) (A := Γ(C, V))
+      (d := P.dimension)
   have hle : ringKrullDim Γ(C, V) ≤ 1 := by
     rw [← PrimeSpectrum.topologicalKrullDim_eq_ringKrullDim, ← hd]
     exact hV.fromSpec.isOpenEmbedding.isInducing.topologicalKrullDim_le

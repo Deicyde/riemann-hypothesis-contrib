@@ -9,15 +9,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CardResi
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.CuspRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.CuspRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.CompanionTheory.DlBridgeAt
 
-theorem val_eq_uniformizer_of_ord {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ϖ : kˣ) (h : ord k ϖ = 1) :
-    valuation k (ϖ : k) = uniformizer k := by
+theorem val_eq_uniformizer_of_ord
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ϖ : kˣ) (h : ord k ϖ = 1)
+    : valuation k (ϖ : k) = uniformizer k := by
   obtain ⟨y, hy⟩ := valuation_surjective (uniformizer k)
   have hy0 : y ≠ 0 := by
     rintro rfl
@@ -36,18 +39,19 @@ theorem val_eq_uniformizer_of_ord {k : Type} [Field k] [ValuativeRel k] [Topolog
 
 end GlobalTheory.CompanionTheory.DlBridgeAt
 
-
 open GlobalTheory.CompanionTheory.DlBridgeAt in
-theorem GlobalTheory.CompanionTheory.DlBridgeAt.dlBridge : PositivityTheory.Rg.BcB.F.Tail.PExp.DlBridge := by
+theorem GlobalTheory.CompanionTheory.DlBridgeAt.dlBridge
+    : PositivityTheory.Rg.BcB.F.Tail.PExp.DlBridge := by
   intro E _ _ _ w ϖ hϖ
-  have hord : ord (w.adicCompletion E) ϖ = 1 := (GlobalTheory.CompanionTheory.CtS.NuVal.ord_eq_ordL_unit w ϖ).trans hϖ
+  have hord : ord (w.adicCompletion E) ϖ = 1 :=
+    (GlobalTheory.CompanionTheory.CtS.NuVal.ord_eq_ordL_unit w ϖ).trans hϖ
   refine ⟨val_eq_uniformizer_of_ord ϖ hord, fun N x => ?_⟩
   have hinv := GlobalTheory.CompanionTheory.JacEigAt.deltaHalf_inv N w ϖ hord x
-  have hv := val_deltaHalf (w.adicCompletion E)
-    (leviTorus (w.adicCompletion E) (Fin N) fun i => ϖ ^ x i)
+  have hv :=
+    val_deltaHalf (w.adicCompletion E) (leviTorus (w.adicCompletion E) (Fin N) fun i => ϖ ^ x i)
   have hm := deltaB_eq_modulus (fun i : Fin N => ϖ ^ x i)
-  have hpos := modulus_pos (w.adicCompletion E)
-    (leviTorus (w.adicCompletion E) (Fin N) fun i => ϖ ^ x i)
+  have hpos :=
+    modulus_pos (w.adicCompletion E) (leviTorus (w.adicCompletion E) (Fin N) fun i => ϖ ^ x i)
   rw [Units.val_inv_eq_inv_val, hv] at hinv
   rw [hv, hm]
   change _ = GlobalTheory.BCT.qh w ^ _ at hinv

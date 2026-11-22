@@ -13,23 +13,30 @@ noncomputable section
 
 variable {n : ℕ} {U : Set (V n)}
 
-theorem ext_glue (hU : IsOpen U) (g G : V n → ℂ) (hg : DifferentiableOn ℂ g U)
+theorem ext_glue
+    (hU : IsOpen U)
+    (g G : V n → ℂ) (hg : DifferentiableOn ℂ g U)
     (hgn : ∀ W : Set (V n), IsOpen W → W ⊆ U → W.Nonempty → ∃ y ∈ W, g y ≠ 0)
     (hG : DifferentiableOn ℂ G {y | y ∈ U ∧ g y ≠ 0})
-    (hL : ∀ p ∈ U, ∃ ρ > 0, ball p ρ ⊆ U ∧
-      ∫⁻ y in ball p ρ \ {y | g y = 0}, ENNReal.ofReal (‖G y‖ ^ 2) < ⊤) :
-    ∃ G' : V n → ℂ, DifferentiableOn ℂ G' U ∧ Set.EqOn G' G {y | y ∈ U ∧ g y ≠ 0} := by
+    (hL : ∀ p ∈ U, ∃ ρ > 0,
+      ball p ρ ⊆ U ∧ ∫⁻ y in ball p ρ \ {y | g y = 0}, ENNReal.ofReal (‖G y‖ ^ 2) < ⊤)
+    : ∃ G' : V n → ℂ, DifferentiableOn ℂ G' U ∧ Set.EqOn G' G {y | y ∈ U ∧ g y ≠ 0} := by
   classical
-  have hloc : ∀ p ∈ U, ∃ ρ > 0, ball p ρ ⊆ U ∧ ∃ F : V n → ℂ, DifferentiableOn ℂ F (ball p ρ) ∧
-      Set.EqOn F G (ball p ρ \ {y | g y = 0}) := by
+  have hloc
+      : ∀ p ∈ U, ∃ ρ > 0,
+        ball p ρ ⊆ U
+          ∧ ∃ F : V n → ℂ,
+            DifferentiableOn ℂ F (ball p ρ) ∧ Set.EqOn F G (ball p ρ \ {y | g y = 0}) := by
     intro p hp
     obtain ⟨ρ, hρ, hsub, hint⟩ := hL p hp
-    obtain ⟨F, hF, hFeq⟩ := ReciprocityTheory.L2DbarEstimates.ext n p ρ g G (hg.mono hsub)
-      (hG.mono fun y hy => ⟨hsub hy.1, hy.2⟩) hint
+    obtain ⟨F, hF, hFeq⟩ :=
+      ReciprocityTheory.L2DbarEstimates.ext n p ρ g G (hg.mono hsub)
+        (hG.mono fun y hy => ⟨hsub hy.1, hy.2⟩) hint
     exact ⟨ρ, hρ, hsub, F, hF, hFeq⟩
   choose ρ hρ hsub F hF hFeq using hloc
-  have agree : ∀ y (hy : y ∈ U) z (hz : z ∈ U) x, x ∈ ball y (ρ y hy) → x ∈ ball z (ρ z hz) →
-      F y hy x = F z hz x := by
+  have agree
+      : ∀ y (hy : y ∈ U) z (hz : z ∈ U) x,
+        x ∈ ball y (ρ y hy) → x ∈ ball z (ρ z hz) → F y hy x = F z hz x := by
     intro y hy z hz x hxy hxz
     by_contra hne
     have hcy : ContinuousAt (F y hy) x :=
@@ -38,8 +45,9 @@ theorem ext_glue (hU : IsOpen U) (g G : V n → ℂ) (hg : DifferentiableOn ℂ 
       (hF z hz).continuousOn.continuousAt (isOpen_ball.mem_nhds hxz)
     have hev : ∀ᶠ t in 𝓝 x, F y hy t ≠ F z hz t := by
       first
-        | exact hcy.eventually_ne hcz hne
-        | exact ((hcy.sub hcz).eventually_ne (sub_ne_zero.mpr hne)).mono fun t ht h => ht (sub_eq_zero.mpr h)
+      | exact hcy.eventually_ne hcz hne
+      | exact ((hcy.sub hcz).eventually_ne (sub_ne_zero.mpr hne)).mono fun t ht h =>
+          ht (sub_eq_zero.mpr h)
     have hs : {t | t ∈ ball y (ρ y hy) ∧ t ∈ ball z (ρ z hz) ∧ F y hy t ≠ F z hz t} ∈ 𝓝 x :=
       Filter.inter_mem (isOpen_ball.mem_nhds hxy) (Filter.inter_mem (isOpen_ball.mem_nhds hxz) hev)
     obtain ⟨W, hWs, hWo, hxW⟩ := _root_.mem_nhds_iff.mp hs

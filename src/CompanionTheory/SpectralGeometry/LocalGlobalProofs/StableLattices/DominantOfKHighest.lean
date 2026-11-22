@@ -75,13 +75,15 @@ theorem lktExists : LKTExists := by
     fun μ x hx hh => hint μ x hx hh.1
   obtain ⟨x, hx⟩ := exists_ne (0 : V)
   obtain ⟨S, hfd, hS, hxS⟩ := hfin x
-  obtain ⟨y, -, hy0, ν, hy⟩ := Formalism.REAL.highestWeightExists_holds V n ε E S hfd hF hK hS
-    (fun h => hx (by simpa [h] using hxS))
+  obtain ⟨y, -, hy0, ν, hy⟩ :=
+    Formalism.REAL.highestWeightExists_holds V n ε E S hfd hF hK hS
+      (fun h => hx (by simpa [h] using hxS))
   have hex : ∃ k : ℕ, ∃ (μ : Fin n → ℝ) (w : V), w ≠ 0 ∧ KHighest ε E μ w ∧ vNormSq ε μ = k := by
     obtain ⟨k, hk⟩ := vNormSq_nat ε (hintK ν y hy0 hy)
     exact ⟨k, ν, y, hy0, hy, hk⟩
   obtain ⟨γ, u, hu, hγ, hk⟩ := Nat.find_spec hex
-  refine ⟨γ, u, hu, hγ, ?_, hintK γ u hu hγ, fun a b hab he => dominant_of_kHighest hF hK hu hγ hab he⟩
+  refine
+    ⟨γ, u, hu, hγ, ?_, hintK γ u hu hγ, fun a b hab he => dominant_of_kHighest hF hK hu hγ hab he⟩
   intro μ w hw hμ
   obtain ⟨k, hk'⟩ := vNormSq_nat ε (hintK μ w hw hμ)
   rw [hk, hk']

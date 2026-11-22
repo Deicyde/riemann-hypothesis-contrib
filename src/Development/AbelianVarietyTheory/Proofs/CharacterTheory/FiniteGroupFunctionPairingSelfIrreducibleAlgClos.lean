@@ -8,13 +8,15 @@ public import Development.AbelianVarietyTheory.Definitions.CommutativeAlgebra.Ab
 open GlobalTheory.BI
 namespace GlobalTheory.BI
 
-theorem pair_self_of_isIrrChar_algClosed (L : Type) [Field L] [CharZero L] [IsAlgClosed L] (G : Type) [Group G] [Finite G]
-    (χ : G → L) (h : IsIrrChar L L χ) : pair χ χ = 1 := by
+theorem pair_self_of_isIrrChar_algClosed
+    (L : Type) [Field L] [CharZero L] [IsAlgClosed L]
+    (G : Type) [Group G] [Finite G]
+    (χ : G → L) (h : IsIrrChar L L χ)
+    : pair χ χ = 1 := by
   classical
   obtain ⟨n, ρ, hρ, hχ⟩ := h
   have : Fintype G := Fintype.ofFinite G
-  have : Invertible (Nat.card G : L) :=
-    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have : Invertible (Nat.card G : L) := invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have : ρ.IsIrreducible := hρ
 
   have key := ρ.card_inv_mul_sum_char_mul_char_eq_finrank ρ

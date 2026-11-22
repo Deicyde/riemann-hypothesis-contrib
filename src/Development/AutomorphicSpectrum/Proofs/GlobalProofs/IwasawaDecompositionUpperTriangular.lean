@@ -10,14 +10,17 @@ open scoped ComplexConjugate ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.QL.Iwasawa
 
-theorem map_mem_GLint {F : Type} [Field F] [ValuativeRel F] {n : ℕ}
-    (k : GL (Fin n) (ValuativeRel.valuation F).valuationSubring) :
-    GeneralLinearGroup.map (algebraMap (ValuativeRel.valuation F).valuationSubring F) k ∈
-      GLint 𝒪[F] n := by
-  have key : ∀ (u : GL (Fin n) (ValuativeRel.valuation F).valuationSubring),
-      IsInt 𝒪[F] ((GeneralLinearGroup.map
-        (algebraMap (ValuativeRel.valuation F).valuationSubring F) u : GL (Fin n) F) :
-          Matrix (Fin n) (Fin n) F) := by
+theorem map_mem_GLint
+    {F : Type} [Field F] [ValuativeRel F]
+    {n : ℕ} (k : GL (Fin n) (ValuativeRel.valuation F).valuationSubring)
+    : GeneralLinearGroup.map (algebraMap (ValuativeRel.valuation F).valuationSubring F) k
+      ∈ GLint 𝒪[F] n := by
+  have key
+      : ∀ (u : GL (Fin n) (ValuativeRel.valuation F).valuationSubring),
+        IsInt 𝒪[F]
+          ((GeneralLinearGroup.map (algebraMap (ValuativeRel.valuation F).valuationSubring F) u
+              : GL (Fin n) F)
+            : Matrix (Fin n) (Fin n) F) := by
     intro u i j
     have h := (u.1 i j).2
     exact h
@@ -25,11 +28,12 @@ theorem map_mem_GLint {F : Type} [Field F] [ValuativeRel F] {n : ℕ}
   rw [← map_inv]
   exact key k⁻¹
 
-theorem exists_upper_mul_int {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] {O : Subring F} {ϖ : F} {nrm : AbsoluteValue F ℝ} {q : ℕ}
-    (h : LF O ϖ nrm q) (n : ℕ) (g : GL (Fin n) F) :
-    ∃ b : GL (Fin n) F, (b : Matrix (Fin n) (Fin n) F).BlockTriangular id ∧
-      ∃ k ∈ GLint O n, g = b * k := by
+theorem exists_upper_mul_int
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {O : Subring F} {ϖ : F} {nrm : AbsoluteValue F ℝ} {q : ℕ} (h : LF O ϖ nrm q)
+    (n : ℕ) (g : GL (Fin n) F)
+    : ∃ b : GL (Fin n) F,
+      (b : Matrix (Fin n) (Fin n) F).BlockTriangular id ∧ ∃ k ∈ GLint O n, g = b * k := by
   obtain rfl := h.O_eq
   obtain ⟨k, b, hb, hg⟩ :=
     GlobalTheory.ValIwasawa.iwasawa (ValuativeRel.valuation F).valuationSubring F n g⁻¹

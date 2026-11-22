@@ -90,17 +90,23 @@ private lemma exists_unitary_exp_diagonal_fixing_of_nsq_eq {ι : Type} [Fintype 
   rw [hh] at hnh
   exact _root_.GlobalTheory.ClassFin.act_exp_eq_of_isMinVec ι m d v U δ hv hU hδ (by simpa only [one_mul] using hnh)
 
-
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct MatrixOrder in
-theorem _root_.GlobalTheory.ClassFin.act_conjTranspose_of_isMinVec : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ℕ) (d : Fin m → ℕ)
-    (v : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ), _root_.GlobalTheory.ClassFin.IsMinVec d v → ∀ g : Matrix ι ι ℂ, g.det = 1 →
-      _root_.GlobalTheory.ClassFin.act d v g = v → _root_.GlobalTheory.ClassFin.act d v gᴴ = v := by
+theorem _root_.GlobalTheory.ClassFin.act_conjTranspose_of_isMinVec
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ℕ) (d : Fin m → ℕ)
+        (v : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ),
+      _root_.GlobalTheory.ClassFin.IsMinVec d v
+        → ∀ g : Matrix ι ι ℂ,
+          g.det = 1 → _root_.GlobalTheory.ClassFin.act d v g = v
+            → _root_.GlobalTheory.ClassFin.act d v gᴴ = v := by
   intro ι _ _ m d v hv g hg hgv
-  obtain ⟨U, δ, -, -, hgP, hfix⟩ := exists_unitary_exp_diagonal_fixing_of_nsq_eq d v hv g hg (by rw [hgv])
+  obtain ⟨U, δ, -, -, hgP, hfix⟩ :=
+    exists_unitary_exp_diagonal_fixing_of_nsq_eq d v hv g hg (by rw [hgv])
   obtain ⟨-, hactmul, -⟩ := (_root_.GlobalTheory.ClassFin.tpow_act_algebra ι ℂ).2 m d v
-  calc _root_.GlobalTheory.ClassFin.act d v gᴴ
-      = _root_.GlobalTheory.ClassFin.act d (_root_.GlobalTheory.ClassFin.act d v g) gᴴ := by rw [hgv]
+  calc
+    _root_.GlobalTheory.ClassFin.act d v gᴴ
+        = _root_.GlobalTheory.ClassFin.act d (_root_.GlobalTheory.ClassFin.act d v g) gᴴ := by
+      rw [hgv]
     _ = _root_.GlobalTheory.ClassFin.act d v (g * gᴴ) := (hactmul g gᴴ).symm
     _ = v := by rw [hgP]; exact hfix 2
 

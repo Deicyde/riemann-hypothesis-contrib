@@ -6,7 +6,8 @@ public import Development.WeilBound.CoreStatements.RationalSupMetrics.PullRatios
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Small Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Small
+  Filter Topology
 
 namespace GlobalTheory.CompanionTheory.Ar.Small
 

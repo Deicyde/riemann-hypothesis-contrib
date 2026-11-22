@@ -13,12 +13,18 @@ namespace GroundTheory.Heights₂.Heights.Targets
 
 open ReciprocityTheory.ChartRestriction.G.Geo Filter
 
-theorem chartLat_le_chartLatNm {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
-    (y : (Σ k, ι k) → Ω) (a : K → ℤ) (τ : ℕ) : chartLat y a τ ≤ chartLatNm y a τ := fun _ hs c hc =>
-  (mem_integralClosure_iff _ _).mpr (isIntegral_algebraMap (R := chartRingZ y c) (A := Ω) (x := ⟨_, hs c hc⟩))
+theorem chartLat_le_chartLatNm
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω]
+    (y : (Σ k, ι k) → Ω) (a : K → ℤ) (τ : ℕ)
+    : chartLat y a τ ≤ chartLatNm y a τ := fun _ hs c hc =>
+  (mem_integralClosure_iff _ _).mpr
+    (isIntegral_algebraMap (R := chartRingZ y c) (A := Ω) (x := ⟨_, hs c hc⟩))
 
-theorem MoriwakiBigCurve.proof (hL : CurveCountLower.Statement)
-    (hPk : HilbertSamuel.SmallPacking.Statement) : MoriwakiBigCurve.Statement := by
+theorem MoriwakiBigCurve.proof
+    (hL : CurveCountLower.Statement) (hPk : HilbertSamuel.SmallPacking.Statement)
+    : MoriwakiBigCurve.Statement := by
   intro K _ ι _ Ω _ y A P0 II hII hP hB _ hS hC _ _
   set Q := IsSmallH (mCoordIdeal y) y A
   set La := chartLat y A.a
@@ -26,8 +32,10 @@ theorem MoriwakiBigCurve.proof (hL : CurveCountLower.Statement)
   obtain ⟨C, hC⟩ := hL K ι Ω y A II hII hP hB hS.1 hC
   obtain ⟨C', hC'⟩ := (hPk K ι Ω y 0 A La hP hB hS.1 fun τ => chartLat_le_chartLatNm y A.a τ).2
   have h0 : ∀ τ, 0 ≤ smallSectionCount Q La τ := fun τ => Real.log_natCast_nonneg _
-  have hf : (fun k : ℕ => smallSectionCount Q La (1 * k) / (((1 * k : ℕ) : ℝ) ^ (0 + 1) / ((0 + 1).factorial : ℝ))) =
-      fun k : ℕ => smallSectionCount Q La k / k := by
+  have hf
+      : (fun k : ℕ =>
+          smallSectionCount Q La (1 * k) / (((1 * k : ℕ) : ℝ) ^ (0 + 1) / ((0 + 1).factorial : ℝ)))
+        = fun k : ℕ => smallSectionCount Q La k / k := by
     funext k
     simp
   unfold arVolP

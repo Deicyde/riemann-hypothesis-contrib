@@ -16,8 +16,10 @@ instance sigmaFinite_mu (β : ℂ) : SigmaFinite (mu β) := by unfold mu; infer_
 
 theorem wMat_mul_self (d : ℕ) : wMat d * wMat d = 1 := by
   ext i j
-  have key : ∀ k : Fin d, (if k = i.rev then (1:ℂ) else 0) * (if j = k.rev then (1:ℂ) else 0) =
-      if k = i.rev then (if i = j then 1 else 0) else 0 := by
+  have key
+      : ∀ k : Fin d,
+        (if k = i.rev then (1 : ℂ) else 0) * (if j = k.rev then (1 : ℂ) else 0)
+          = if k = i.rev then (if i = j then 1 else 0) else 0 := by
     intro k
     by_cases hk : k = i.rev
     · simp [hk, eq_comm]
@@ -56,27 +58,27 @@ theorem card_UT (n : ℕ) : Fintype.card (UT n) = ∑ i ∈ Finset.range n, i :=
   simp_rw [this]
   exact Fin.sum_univ_eq_sum_range (fun i => i) n
 
-theorem symm_castSucc {n : ℕ} (i : Fin n) :
-    finSumFinEquiv.symm (i.castSucc : Fin (n + 1)) = Sum.inl i :=
+theorem symm_castSucc {n : ℕ} (i : Fin n)
+    : finSumFinEquiv.symm (i.castSucc : Fin (n + 1)) = Sum.inl i :=
   finSumFinEquiv_symm_apply_castAdd (n := 1) i
 
 theorem symm_last (n : ℕ) : finSumFinEquiv.symm (Fin.last n : Fin (n + 1)) = Sum.inr (0 : Fin 1) :=
   finSumFinEquiv_symm_apply_natAdd (m := n) (0 : Fin 1)
 
-theorem blk_cc {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (i j : Fin n) :
-    blk A b a e i.castSucc j.castSucc = A i j := by
+theorem blk_cc {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (i j : Fin n)
+    : blk A b a e i.castSucc j.castSucc = A i j := by
   simp [blk, symm_castSucc]
 
-theorem blk_cl {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (i : Fin n) :
-    blk A b a e i.castSucc (Fin.last n) = b i := by
+theorem blk_cl {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (i : Fin n)
+    : blk A b a e i.castSucc (Fin.last n) = b i := by
   simp [blk, symm_castSucc, symm_last]
 
-theorem blk_lc {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (j : Fin n) :
-    blk A b a e (Fin.last n) j.castSucc = a j := by
+theorem blk_lc {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) (j : Fin n)
+    : blk A b a e (Fin.last n) j.castSucc = a j := by
   simp [blk, symm_castSucc, symm_last]
 
-theorem blk_ll {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ) :
-    blk A b a e (Fin.last n) (Fin.last n) = e := by
+theorem blk_ll {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (b a : Fin n → ℂ) (e : ℂ)
+    : blk A b a e (Fin.last n) (Fin.last n) = e := by
   simp [blk, symm_last]
 
 theorem continuous_inv_upper (d : ℕ) : Continuous (fun v : UT d → ℂ => (upper v)⁻¹) := by
@@ -86,8 +88,8 @@ theorem continuous_inv_upper (d : ℕ) : Continuous (fun v : UT d → ℂ => (up
   rw [h]
   exact (continuous_upper d).matrix_adjugate
 
-theorem mp_comp_equiv (β : ℂ) {ι ι' : Type} [Fintype ι] [Fintype ι'] (σ : ι ≃ ι') :
-    MeasurePreserving (fun v : ι' → ℂ => v ∘ σ) (muPi β ι') (muPi β ι) := by
+theorem mp_comp_equiv (β : ℂ) {ι ι' : Type} [Fintype ι] [Fintype ι'] (σ : ι ≃ ι')
+    : MeasurePreserving (fun v : ι' → ℂ => v ∘ σ) (muPi β ι') (muPi β ι) := by
   have h := measurePreserving_piCongrLeft (α := fun _ : ι => ℂ) (fun _ : ι => mu β) σ.symm
   have he : (fun v : ι' → ℂ => v ∘ σ) = MeasurableEquiv.piCongrLeft (fun _ : ι => ℂ) σ.symm := by
     funext v i
@@ -97,12 +99,12 @@ theorem mp_comp_equiv (β : ℂ) {ι ι' : Type} [Fintype ι] [Fintype ι'] (σ 
   rw [he]
   exact h
 
-theorem wMat_mul_apply {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
-    (wMat n * A) i j = A i.rev j := by
+theorem wMat_mul_apply {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
+    : (wMat n * A) i j = A i.rev j := by
   simp [wMat, Matrix.mul_apply]
 
-theorem mul_wMat_apply {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
-    (A * wMat n) i j = A i j.rev := by
+theorem mul_wMat_apply {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
+    : (A * wMat n) i j = A i j.rev := by
   have h : ∀ k : Fin n, (j = k.rev) = (k = j.rev) := fun k => by
     rw [eq_iff_iff]
     constructor

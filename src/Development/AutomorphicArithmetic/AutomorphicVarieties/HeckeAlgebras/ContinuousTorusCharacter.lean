@@ -21,31 +21,25 @@ noncomputable def fixd (ρ : Representation A H M) (K : Subgroup H) : Submodule 
 def dc (ρ : Representation A H M) (K K' : Subgroup H) (x : H) : Module.End A M :=
   ∑ᶠ q : MulAction.orbit K (x : H ⧸ K'), ρ (q : H ⧸ K').out
 
-def rtr (A H M : Type) [CommRing A] [Group H] [AddCommGroup M] [Module A M] : Representation A H (H → M) where
+def rtr (A H M : Type) [CommRing A] [Group H] [AddCommGroup M] [Module A M]
+    : Representation A H (H → M) where
   toFun h := LinearMap.funLeft A M (· * h)
   map_one' := by ext f g; simp
   map_mul' h h' := by ext f g; simp [mul_assoc]
 
-@[simp] theorem rtr_apply (h g : H) (f : H → M) : rtr A H M h f g = f (g * h) := rfl
+@[simp]
+theorem rtr_apply (h g : H) (f : H → M) : rtr A H M h f g = f (g * h) := rfl
 
 end Rep
 
 structure Iwa (G : Type) [Group G] where
-
   Nf : Subgroup G
-
   Tf : Subgroup G
-
   N : Subgroup G
-
   T : Subgroup G
-
   Tc : ℕ → Subgroup G
-
   Nm : ℕ → Subgroup G
-
   P : Submonoid G
-
   z : G
   N_le : N ≤ Nf
   T_le : T ≤ Tf
@@ -92,11 +86,19 @@ def Smooth (π : Representation A G M) : Prop :=
   ∀ v, ∃ c : ℕ, v ∈ fixd π (I.Nconj (I.z ^ c)) ∧ v ∈ fixd π (I.Tc c) ∧ v ∈ fixd π (I.Nm c)
 
 def eig (π : Representation A G M) (c : ℕ) (φ : I.T →* Aˣ) : Submodule A M where
-  carrier := {v | v ∈ fixd π I.N ∧ v ∈ fixd π (I.Nm c) ∧ ∀ t : I.T, π t v = (((φ t)⁻¹ : Aˣ) : A) • v}
-  add_mem' ha hb := ⟨add_mem ha.1 hb.1, add_mem ha.2.1 hb.2.1, fun t => by rw [map_add (f := _), ha.2.2, hb.2.2, smul_add]⟩
+  carrier :=
+    {v | v ∈ fixd π I.N ∧ v ∈ fixd π (I.Nm c) ∧ ∀ t : I.T, π t v = (((φ t)⁻¹ : Aˣ) : A) • v}
+  add_mem' ha hb := ⟨
+    add_mem ha.1 hb.1,
+    add_mem ha.2.1 hb.2.1,
+    fun t => by rw [map_add (f := _), ha.2.2, hb.2.2, smul_add]
+  ⟩
   zero_mem' := ⟨zero_mem _, zero_mem _, fun t => by simp⟩
-  smul_mem' c v hv := ⟨Submodule.smul_mem _ c hv.1, Submodule.smul_mem _ c hv.2.1, fun t => by
-    rw [map_smul, hv.2.2, smul_comm]⟩
+  smul_mem' c v hv := ⟨
+    Submodule.smul_mem _ c hv.1,
+    Submodule.smul_mem _ c hv.2.1,
+    fun t => by rw [map_smul, hv.2.2, smul_comm]
+  ⟩
 
 def ContChar [IsLocalRing A] (θ : I.T →* Aˣ) : Prop :=
   ∀ k : ℕ, ∃ c, ∀ t : I.T, (t : G) ∈ I.Tc c → (θ t : A) - 1 ∈ maximalIdeal A ^ k
@@ -125,7 +127,8 @@ variable {Γ Ga Gp : Type} [Group Γ] [Group Ga] [Group Gp] (X : Frame Γ Ga Gp)
 abbrev Fn (_X : Frame Γ Ga Gp) (A : Type) (m : ℕ) : Type := Ga × Gp → Fin m → A
 
 def FinLevel (U : Subgroup X.Ub) : Prop :=
-  ∃ s : Finset (Ga × Gp), ∀ g, ∃ γ, ∃ x ∈ s, ∃ u ∈ U, ∃ b ∈ X.I.Iw 0, g = X.glob γ * x * ((u : Ga), b)
+  ∃ s : Finset (Ga × Gp), ∀ g, ∃ γ, ∃ x ∈ s, ∃ u ∈ U, ∃ b ∈ X.I.Iw 0,
+    g = X.glob γ * x * ((u : Ga), b)
 
 def Neat (U : Subgroup X.Ub) : Prop :=
   ∀ g γ, ∀ u ∈ U, ∀ b ∈ X.I.Iw 0, X.glob γ * g = g * ((u : Ga), b) → u = 1 ∧ b = 1
@@ -135,22 +138,26 @@ section Padic
 variable {A : Type} [CommRing A] {m : ℕ} (τ : X.Ub →* GL (Fin m) A) (θ : X.I.T →* Aˣ)
 
 def Free (U : Subgroup X.Ub) : Prop :=
-  ∀ g γ, ∀ u ∈ U, ∀ b ∈ X.I.Iw 0, X.glob γ * g = g * ((u : Ga), b) →
-    b ∈ Subgroup.center Gp ∧ ∃ hb : b ∈ X.I.T, (θ ⟨b, hb⟩ : A) • (τ u : Matrix (Fin m) (Fin m) A) = 1
+  ∀ g γ, ∀ u ∈ U, ∀ b ∈ X.I.Iw 0,
+    X.glob γ * g = g * ((u : Ga), b)
+      → b ∈ Subgroup.center Gp
+        ∧ ∃ hb : b ∈ X.I.T, (θ ⟨b, hb⟩ : A) • (τ u : Matrix (Fin m) (Fin m) A) = 1
 
 variable (A m) in
 def rp : Representation A Gp (X.Fn A m) := (rtr A (Ga × Gp) (Fin m → A)).comp (MonoidHom.inr Ga Gp)
 
 def ra : Representation A X.Ub (X.Fn A m) where
-  toFun u :=
-    { toFun := fun f g => (τ u : Matrix (Fin m) (Fin m) A) *ᵥ f (g * ((u : Ga), 1))
-      map_add' := fun f f' => by ext g i; simp [mulVec_add]
-      map_smul' := fun c f => by ext g i; simp [mulVec_smul] }
+  toFun u := {
+    toFun := fun f g => (τ u : Matrix (Fin m) (Fin m) A) *ᵥ f (g * ((u : Ga), 1))
+    map_add' := fun f f' => by ext g i; simp [mulVec_add]
+    map_smul' := fun c f => by ext g i; simp [mulVec_smul]
+  }
   map_one' := by ext f g i; simp [← Prod.one_eq_mk]
   map_mul' u u' := by ext f g i; simp [mul_assoc]
 
-theorem ra_apply (u : X.Ub) (f : X.Fn A m) (g : Ga × Gp) :
-    X.ra τ u f g = (τ u : Matrix (Fin m) (Fin m) A) *ᵥ f (g * ((u : Ga), 1)) := rfl
+theorem ra_apply (u : X.Ub) (f : X.Fn A m) (g : Ga × Gp)
+    : X.ra τ u f g = (τ u : Matrix (Fin m) (Fin m) A) *ᵥ f (g * ((u : Ga), 1)) :=
+  rfl
 
 variable (A m) in
 def U (a : Gp) : Module.End A (X.Fn A m) := X.I.uOp (X.rp A m) a
@@ -159,27 +166,38 @@ variable [IsLocalRing A]
 
 variable (m) in
 def Amb : Submodule A (X.Fn A m) where
-  carrier := {f | (∀ γ g, f (X.glob γ * g) = f g) ∧ f ∈ fixd (X.rp A m) X.I.N ∧
-    (∀ t : X.I.T, X.rp A m t f = (((θ t)⁻¹ : Aˣ) : A) • f) ∧
-    ∀ k : ℕ, ∃ c, ∀ y ∈ X.I.Nm c, ∀ g i, f (g * (1, y)) i - f g i ∈ maximalIdeal A ^ k}
-  add_mem' {f f'} h h' := ⟨fun γ g => by simp [h.1, h'.1], add_mem h.2.1 h'.2.1,
-    fun t => by rw [map_add (f := _), h.2.2.1, h'.2.2.1, smul_add], fun k => by
+  carrier :=
+    {f | (∀ γ g, f (X.glob γ * g) = f g) ∧ f ∈ fixd (X.rp A m) X.I.N ∧
+      (∀ t : X.I.T, X.rp A m t f = (((θ t)⁻¹ : Aˣ) : A) • f) ∧
+      ∀ k : ℕ, ∃ c, ∀ y ∈ X.I.Nm c, ∀ g i, f (g * (1, y)) i - f g i ∈ maximalIdeal A ^ k}
+  add_mem' {f f'} h h' := ⟨
+    fun γ g => by simp [h.1, h'.1],
+    add_mem h.2.1 h'.2.1,
+    fun t => by rw [map_add (f := _), h.2.2.1, h'.2.2.1, smul_add],
+    fun k => by
       obtain ⟨c, hc⟩ := h.2.2.2 k
       obtain ⟨c', hc'⟩ := h'.2.2.2 k
       refine ⟨max c c', fun y hy g i => ?_⟩
-      have := add_mem (hc y (X.I.Nm_anti (le_max_left _ _) hy) g i) (hc' y (X.I.Nm_anti (le_max_right _ _) hy) g i)
+      have :=
+        add_mem (hc y (X.I.Nm_anti (le_max_left _ _) hy) g i)
+          (hc' y (X.I.Nm_anti (le_max_right _ _) hy) g i)
       convert this using 1
       simp only [Pi.add_apply]
-      ring⟩
+      ring
+  ⟩
   zero_mem' := ⟨fun _ _ => rfl, zero_mem _, fun t => by simp, fun k => ⟨0, fun _ _ _ _ => by simp⟩⟩
-  smul_mem' a f h := ⟨fun γ g => by simp [h.1], Submodule.smul_mem _ a h.2.1,
-    fun t => by rw [map_smul, h.2.2.1, smul_comm], fun k => by
+  smul_mem' a f h := ⟨
+    fun γ g => by simp [h.1],
+    Submodule.smul_mem _ a h.2.1,
+    fun t => by rw [map_smul, h.2.2.1, smul_comm],
+    fun k => by
       obtain ⟨c, hc⟩ := h.2.2.2 k
       refine ⟨c, fun y hy g i => ?_⟩
       have := Ideal.mul_mem_left _ a (hc y hy g i)
       convert this using 1
       simp only [Pi.smul_apply, smul_eq_mul]
-      ring⟩
+      ring
+  ⟩
 
 def Sp (U : Subgroup X.Ub) : Submodule A (X.Fn A m) := X.Amb m θ ⊓ fixd (X.ra τ) U
 
@@ -192,7 +210,8 @@ def Ord (U : Subgroup X.Ub) : Submodule A (X.Fn A m) :=
 
 end Padic
 
-def mapFn {A B : Type} [CommRing A] [CommRing B] [Algebra A B] {m : ℕ} : X.Fn A m →ₗ[A] X.Fn B m where
+def mapFn {A B : Type} [CommRing A] [CommRing B] [Algebra A B] {m : ℕ}
+    : X.Fn A m →ₗ[A] X.Fn B m where
   toFun f g i := algebraMap A B (f g i)
   map_add' f f' := by ext g i; simp
   map_smul' c f := by ext g i; simp [Algebra.smul_def]
@@ -206,15 +225,13 @@ variable {A M ι : Type} [CommRing A] [IsLocalRing A] [AddCommGroup M] [Module A
 def locPart (Y : Submodule A M) (op : ι → Module.End A M) (a : ι → A) : Submodule A M :=
   Y ⊓ ⨅ (i : ι) (k : ℕ), ⨆ n : ℕ, (maximalIdeal A ^ k • Y).comap ((op i - algebraMap A _ (a i)) ^ n)
 
-
 omit [IsLocalRing A] in
-def Restr {Y : Submodule A M} (t : Module.End A Y) (φ : Module.End A M) : Prop := ∀ y : Y, (t y : M) = φ y
-
+def Restr {Y : Submodule A M} (t : Module.End A Y) (φ : Module.End A M) : Prop :=
+  ∀ y : Y, (t y : M) = φ y
 
 omit [IsLocalRing A] in
 def heckeAlg (Y : Submodule A M) (op : ι → Module.End A M) : Subalgebra A (Module.End A Y) :=
   Algebra.adjoin A {t | ∃ i, Restr t (op i)}
-
 
 omit [IsLocalRing A] in
 def CommOn (Y : Submodule A M) (op : ι → Module.End A M) : Prop :=
@@ -227,7 +244,10 @@ section Classical
 def IsIntUnit (O : Type) {Ω : Type} [CommRing O] [Field Ω] [Algebra O Ω] (x : Ω) : Prop :=
   x ≠ 0 ∧ IsIntegral O x ∧ IsIntegral O x⁻¹
 
-structure WtRep {G : Type} [Group G] (I : Iwa G) (O Ω : Type) [CommRing O] [IsLocalRing O] [Field Ω] [Algebra O Ω] where
+structure WtRep
+    {G : Type} [Group G]
+    (I : Iwa G)
+    (O Ω : Type) [CommRing O] [IsLocalRing O] [Field Ω] [Algebra O Ω] where
   d : ℕ
   ξ : G →* GL (Fin (d + 1)) Ω
   χ : I.Tf →* Ωˣ
@@ -238,18 +258,28 @@ structure WtRep {G : Type} [Group G] (I : Iwa G) (O Ω : Type) [CommRing O] [IsL
   int_P : ∀ a (ha : a ∈ I.P) i j, ((χ ⟨a, I.P_le a ha⟩)⁻¹ : Ωˣ) * ξ a i j ∈ (algebraMap O Ω).range
   row_N : ∀ x ∈ I.Nf, ∀ j, ξ x 0 j = if j = 0 then 1 else 0
   torusAction : ∀ (t : I.Tf) j, ξ t 0 j = if j = 0 then (χ t : Ω) else 0
-  nilpotent_central_action : ∀ i j, j ≠ 0 → ∃ x ∈ maximalIdeal O,
-    ((χ ⟨I.z, I.P_le _ I.z_mem⟩)⁻¹ : Ωˣ) * ξ I.z i j = algebraMap O Ω x
-  cont_Nm : ∀ k : ℕ, ∃ c, ∀ y ∈ I.Nm c, ∀ i j, ∃ x ∈ maximalIdeal O ^ k,
-    ξ y i j = (if i = j then 1 else 0) + algebraMap O Ω x
-  continuous_torusCharacter : ∀ k : ℕ, ∃ c, ∀ t : I.Tf, (t : G) ∈ I.Tc c → ∃ x ∈ maximalIdeal O ^ k, (χ t : Ω) = 1 + algebraMap O Ω x
-  central : ∀ t : I.Tf, (t : G) ∈ Subgroup.center G → ∀ i j, ξ t i j = if i = j then (χ t : Ω) else 0
+  nilpotent_central_action
+    : ∀ i j,
+      j ≠ 0
+        → ∃ x ∈ maximalIdeal O, ((χ ⟨I.z, I.P_le _ I.z_mem⟩)⁻¹ : Ωˣ) * ξ I.z i j = algebraMap O Ω x
+  cont_Nm
+    : ∀ k : ℕ, ∃ c, ∀ y ∈ I.Nm c, ∀ i j, ∃ x ∈ maximalIdeal O ^ k,
+      ξ y i j = (if i = j then 1 else 0) + algebraMap O Ω x
+  continuous_torusCharacter
+    : ∀ k : ℕ, ∃ c, ∀ t : I.Tf,
+      (t : G) ∈ I.Tc c → ∃ x ∈ maximalIdeal O ^ k, (χ t : Ω) = 1 + algebraMap O Ω x
+  central
+    : ∀ t : I.Tf, (t : G) ∈ Subgroup.center G → ∀ i j, ξ t i j = if i = j then (χ t : Ω) else 0
 
 private theorem fin1 (i j : Fin (0 + 1)) : i = j := Subsingleton.elim (α := Fin 1) i j
 
 namespace Frame
 
-variable {Γ Ga Gp : Type} [Group Γ] [Group Ga] [Group Gp] (X : Frame Γ Ga Gp) {Ω : Type} [Field Ω] {d m : ℕ}
+variable
+  {Γ Ga Gp : Type} [Group Γ] [Group Ga] [Group Gp]
+  (X : Frame Γ Ga Gp)
+  {Ω : Type} [Field Ω]
+  {d m : ℕ}
 
 def AF (ξ : Gp →* GL (Fin d) Ω) : Submodule Ω (X.Fn Ω d) where
   carrier := {F | ∀ γ g, F (X.glob γ * g) = (ξ (X.glob γ).2 : Matrix (Fin d) (Fin d) Ω) *ᵥ F g}
@@ -265,10 +295,11 @@ def rpF : Representation Ω Gp (Fin m → X.Fn Ω d) where
 
 variable (d) in
 def raF (τ : X.Ub →* GL (Fin m) Ω) : Representation Ω X.Ub (Fin m → X.Fn Ω d) where
-  toFun u :=
-    { toFun := fun F i g k => X.ra τ u (fun g j => F j g k) g i
-      map_add' := fun F F' => by ext i g k; exact congrFun (congrFun ((X.ra τ u).map_add _ _) g) i
-      map_smul' := fun c F => by ext i g k; exact congrFun (congrFun ((X.ra τ u).map_smul c _) g) i }
+  toFun u := {
+    toFun := fun F i g k => X.ra τ u (fun g j => F j g k) g i
+    map_add' := fun F F' => by ext i g k; exact congrFun (congrFun ((X.ra τ u).map_add _ _) g) i
+    map_smul' := fun c F => by ext i g k; exact congrFun (congrFun ((X.ra τ u).map_smul c _) g) i
+  }
   map_one' := by
     refine LinearMap.ext fun F => ?_
     ext i g k
@@ -278,8 +309,10 @@ def raF (τ : X.Ub →* GL (Fin m) Ω) : Representation Ω X.Ub (Fin m → X.Fn 
     ext i g k
     simp
 
-def Cl (τ : X.Ub →* GL (Fin m) Ω) (ξ : Gp →* GL (Fin d) Ω) (U : Subgroup X.Ub) (c : ℕ) (φ : X.I.T →* Ωˣ) :
-    Submodule Ω (Fin m → X.Fn Ω d) :=
+def Cl
+    (τ : X.Ub →* GL (Fin m) Ω) (ξ : Gp →* GL (Fin d) Ω) (U : Subgroup X.Ub) (c : ℕ)
+    (φ : X.I.T →* Ωˣ)
+    : Submodule Ω (Fin m → X.Fn Ω d) :=
   Submodule.pi Set.univ (fun _ => X.AF ξ) ⊓ fixd (X.raF d τ) U ⊓ X.I.eig (X.rpF Ω d m) c φ
 
 variable {O : Type} [CommRing O] [IsLocalRing O] [Algebra O Ω] (W : WtRep X.I O Ω)
@@ -288,8 +321,8 @@ variable (m) in
 def UF (a : X.I.P) : Module.End Ω (Fin m → X.Fn Ω (W.d + 1)) :=
   (((W.χ ⟨a, X.I.P_le a a.2⟩)⁻¹ : Ωˣ) : Ω) • X.I.uOp (X.rpF Ω (W.d + 1) m) a
 
-def ClOrd (τ : X.Ub →* GL (Fin m) Ω) (U : Subgroup X.Ub) (c : ℕ) (φ : X.I.T →* Ωˣ) :
-    Submodule Ω (Fin m → X.Fn Ω (W.d + 1)) :=
+def ClOrd (τ : X.Ub →* GL (Fin m) Ω) (U : Subgroup X.Ub) (c : ℕ) (φ : X.I.T →* Ωˣ)
+    : Submodule Ω (Fin m → X.Fn Ω (W.d + 1)) :=
   ⨆ μ : {μ : Ω // IsIntUnit O μ}, X.Cl τ W.ξ U c φ ⊓ (X.UF m W ⟨X.I.z, X.I.z_mem⟩).maxGenEigenspace μ.1
 
 variable (m) in

@@ -18,7 +18,9 @@ theorem finOpen : PositivityTheory.PfSWUS.SchInf.FinOpen := by
   push Not at hcon
   have hpos : ν U ≠ 0 := (hU.measure_pos ν hne).ne'
   have h2 := hm
-  unfold GlobalTheory.CompanionTheory.SW.IsGramFib Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily at h2
+  unfold GlobalTheory.CompanionTheory.SW.IsGramFib
+      Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily
+    at h2
   have hfib := h2.2.1 f hf
   have hle : (⊤ : ℝ≥0∞) * ν U ≤ ∫⁻ S, ∫⁻ X, f X ∂(m S) ∂ν := by
     rw [← lintegral_indicator_const hU.measurableSet]

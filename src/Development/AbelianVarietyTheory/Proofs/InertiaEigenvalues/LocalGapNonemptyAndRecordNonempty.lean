@@ -9,8 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsL
 open Formalism Formalism.BasicNotions
 namespace GlobalTheory.MemLoc
 
-theorem localGap_nonempty : ∀ {R : Formalism.BasicNotions.Ranks} (H : Formalism.BasicNotions.Host R),
-    Nonempty (Formalism.BasicNotions.Examples₂.LocalGap H) := by
+theorem localGap_nonempty
+    : ∀ {R : Formalism.BasicNotions.Ranks} (H : Formalism.BasicNotions.Host R),
+      Nonempty (Formalism.BasicNotions.Examples₂.LocalGap H) := by
   intro R H
   obtain ⟨L, A, ⟨T⟩⟩ := exists_locTheory_tied
   exact ⟨⟨L, A, T⟩⟩

@@ -6,12 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Strip
 
-theorem strip_open_real_discs (n : ℕ) (X : Fin n → ℝ) :
-    IsOpen {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4} ∧
-    (∀ t : ℝ, (t : ℂ) ∈ {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4}) ∧
-    ∀ z ∈ {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4}, ∃ (t ρ : ℝ), 0 < ρ ∧
-      z ∈ Metric.ball (t : ℂ) ρ ∧
-      Metric.ball (t : ℂ) ρ ⊆ {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4} := by
+theorem strip_open_real_discs (n : ℕ) (X : Fin n → ℝ)
+    : IsOpen {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4}
+      ∧ (∀ t : ℝ, (t : ℂ) ∈ {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4})
+      ∧ ∀ z ∈ {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4}, ∃ (t ρ : ℝ),
+        0 < ρ ∧ z ∈ Metric.ball (t : ℂ) ρ
+          ∧ Metric.ball (t : ℂ) ρ ⊆ {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4} := by
   set S := {z : ℂ | ∀ j, |z.im * X j| < Real.pi / 4} with hS
   have hpi : 0 < Real.pi / 4 := by positivity
   refine ⟨?_, ?_, ?_⟩
@@ -36,8 +36,7 @@ theorem strip_open_real_discs (n : ℕ) (X : Fin n → ℝ) :
     obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.mp hopen _ hmem
     refine ⟨z.re, |z.im| + ε / 2, by positivity, ?_, ?_⟩
     · rw [Metric.mem_ball, Complex.dist_eq]
-      have h : z - (z.re : ℂ) = (z.im : ℂ) * Complex.I := by
-        apply Complex.ext <;> simp
+      have h : z - (z.re : ℂ) = (z.im : ℂ) * Complex.I := by apply Complex.ext <;> simp
       rw [h, norm_mul, Complex.norm_I, mul_one, Complex.norm_real, Real.norm_eq_abs]
       linarith
     · intro w hw j
@@ -54,8 +53,9 @@ theorem strip_open_real_discs (n : ℕ) (X : Fin n → ℝ) :
         exact hball hin j
       show |w.im * X j| < Real.pi / 4
       rw [abs_mul]
-      calc |w.im| * |X j| ≤ (|z.im| + ε / 2) * |X j| :=
-            mul_le_mul_of_nonneg_right him.le (abs_nonneg _)
+      calc
+        |w.im| * |X j|
+          ≤ (|z.im| + ε / 2) * |X j| := mul_le_mul_of_nonneg_right him.le (abs_nonneg _)
         _ < Real.pi / 4 := hρ
 
 end GlobalTheory.CompanionTheory.Strip

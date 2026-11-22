@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Glo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZM GlobalTheory.SiegLev GlobalTheory.SiegelTor
 open scoped CategoryTheory.Obj
 
@@ -28,11 +29,13 @@ open GlobalTheory.CechPic
 
 section Classes
 
-variable {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A] {P : LB (A ⊗ A).left} (hP : P.IsLB)
+variable
+  {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A] {P : LB (A ⊗ A).left} (hP : P.IsLB)
 
 def pc {T : Over S} (a b : T ⟶ A) : Pic T.left := pull (lift a b).left (cls P hP)
 
-variable (hB : ∀ (T : Over S) (x x' y : T ⟶ A), pc hP (x * x') y = pc hP x y + pc hP x' y)
+variable
+  (hB : ∀ (T : Over S) (x x' y : T ⟶ A), pc hP (x * x') y = pc hP x y + pc hP x' y)
   (hB' : ∀ (T : Over S) (x y y' : T ⟶ A), pc hP x (y * y') = pc hP x y + pc hP x y')
 
 include hB in
@@ -53,10 +56,9 @@ theorem pc_pow_right {T : Over S} (x y : T ⟶ A) (k : ℕ) : pc hP x (y ^ k) = 
   | zero => rw [pow_zero, one, zero_smul]
   | succ k ih => rw [pow_succ, hB', ih, succ_nsmul]
 
-
 include hB hB' in
-theorem exists_theta_diag {k : ℕ} {T : Over S} (x : T ⟶ A) (hx : x ^ k = 1) :
-    ∃ θ : Out.ThetaGrp A (P.pull (lift (𝟙 A) (𝟙 A)).left) k T, θ.pt = x := by
+theorem exists_theta_diag {k : ℕ} {T : Over S} (x : T ⟶ A) (hx : x ^ k = 1)
+    : ∃ θ : Out.ThetaGrp A (P.pull (lift (𝟙 A) (𝟙 A)).left) k T, θ.pt = x := by
   have hD : (P.pull (lift (𝟙 A) (𝟙 A)).left).IsLB := pull_isLB hP _
   have e : ∀ g : T ⊗ A ⟶ A, pull g.left (cls _ hD) = pc hP g g := fun g => by
     rw [cls_pull hP, ← pull_comp, ← Over.comp_left, comp_lift, Category.comp_id]
@@ -89,11 +91,13 @@ section Mul
 
 variable {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A]
 
-
 open WeilMul in
-theorem weilIs_mul_left (hG : Out.GlobalFnsSt) (hA : IsAbelianScheme A) {L : LB A.left} (hL : L.IsLB) {k : ℤ}
-    {T : Over S} {x x' y : T ⟶ A} {c c' : Γ(T.left, ⊤)ˣ} (h : Out.WeilIs A L k x y c)
-    (h' : Out.WeilIs A L k x' y c') : Out.WeilIs A L k (x * x') y (c * c') := by
+theorem weilIs_mul_left
+    (hG : Out.GlobalFnsSt) (hA : IsAbelianScheme A)
+    {L : LB A.left} (hL : L.IsLB)
+    {k : ℤ} {T : Over S} {x x' y : T ⟶ A} {c c' : Γ(T.left, ⊤)ˣ}
+    (h : Out.WeilIs A L k x y c) (h' : Out.WeilIs A L k x' y c')
+    : Out.WeilIs A L k (x * x') y (c * c') := by
   intro p
   obtain ⟨V, hV, a₁, a₂⟩ := h p
   obtain ⟨V', hV', b₁, b₂⟩ := h' p
@@ -112,39 +116,52 @@ namespace GlobalTheory.DiagPairing
 
 open GlobalTheory.CechPic
 
-theorem exists_weilIs_diag_root : ∀ (h n : ℕ) (B : Type) [CommRing B] (ζ : B) (S : Scheme.{0}) (s : S ⟶ Sp B)
-    (c : SiegPre h n ζ s) (N : ℕ) (T : Over S) (x y : T ⟶ c.A), Out.RelAmple c.A c.diag → 0 < N →
-    IsUnit (N : Γ(T.left, ⊤)) → x ^ N = 1 → y ^ N = 1 →
-    ∃ c₀ : Γ(T.left, ⊤)ˣ, c₀ ^ N = 1 ∧ Out.WeilIs c.A c.diag N x y c₀ := by
+theorem exists_weilIs_diag_root
+    : ∀ (h n : ℕ) (B : Type) [CommRing B] (ζ : B) (S : Scheme.{0}) (s : S ⟶ Sp B)
+        (c : SiegPre h n ζ s) (N : ℕ) (T : Over S) (x y : T ⟶ c.A),
+      Out.RelAmple c.A c.diag → 0 < N → IsUnit (N : Γ(T.left, ⊤)) → x ^ N = 1 → y ^ N = 1
+        → ∃ c₀ : Γ(T.left, ⊤)ˣ, c₀ ^ N = 1 ∧ Out.WeilIs c.A c.diag N x y c₀ := by
   intro h n B _ ζ S s c N T x y hamp hN _ hx hy
   have hG : Out.GlobalFnsSt := GlobalTheory.globalFns_holds
   have hD : c.diag.IsLB := pull_isLB c.isLB _
-  have hB : ∀ (T : Over S) (x x' y : T ⟶ c.A), pc c.isLB (x * x') y = pc c.isLB x y + pc c.isLB x' y :=
-    fun T x x' y => by
-      obtain ⟨t, ht⟩ := (GlobalTheory.Biadditive.biadditive_of_triv_axes hG S c.A c.diag c.ab hD hamp c.P c.isLB c.rig₁ c.rig₂
-        T x x' y).1
-      have e := (cls_eq_zero_iff (LB.isLB_linComb c.isLB _ _)).2 ⟨t, ht⟩
-      rw [cls_linComb c.isLB, Fin.sum_univ_three] at e
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons,
-        Matrix.tail_cons, one_smul, neg_smul] at e
-      unfold pc
-      rw [← sub_eq_zero, ← e]
-      abel
-  have hB' : ∀ (T : Over S) (x y y' : T ⟶ c.A), pc c.isLB x (y * y') = pc c.isLB x y + pc c.isLB x y' :=
-    fun T x y y' => by
-      obtain ⟨t, ht⟩ := (GlobalTheory.Biadditive.biadditive_of_triv_axes hG S c.A c.diag c.ab hD hamp c.P c.isLB c.rig₁ c.rig₂
-        T y y' x).2
-      have e := (cls_eq_zero_iff (LB.isLB_linComb c.isLB _ _)).2 ⟨t, ht⟩
-      rw [cls_linComb c.isLB, Fin.sum_univ_three] at e
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons,
-        Matrix.tail_cons, one_smul, neg_smul] at e
-      unfold pc
-      rw [← sub_eq_zero, ← e]
-      abel
-  have lifts : ∀ z : T ⟶ c.A, z ^ N = 1 → ∀ p : T.left, ∃ V : T.left.Opens, p ∈ V ∧
-      ∃ θ : Out.ThetaGrp c.A c.diag N (Out.overRes V), θ.pt = Out.overResι V ≫ z := fun z hz p => by
-    obtain ⟨θ, hθ⟩ := exists_theta_diag c.isLB hB hB' (k := N) (Out.overResι ⊤ ≫ z)
-      (by rw [← MonObj.comp_pow, hz, MonObj.comp_one])
+  have hB
+      : ∀ (T : Over S) (x x' y : T ⟶ c.A),
+        pc c.isLB (x * x') y = pc c.isLB x y + pc c.isLB x' y := fun T x x' y => by
+    obtain ⟨t, ht⟩ :=
+      (GlobalTheory.Biadditive.biadditive_of_triv_axes hG S c.A c.diag c.ab hD hamp c.P c.isLB
+        c.rig₁ c.rig₂ T x x' y).1
+    have e := (cls_eq_zero_iff (LB.isLB_linComb c.isLB _ _)).2 ⟨t, ht⟩
+    rw [cls_linComb c.isLB, Fin.sum_univ_three] at e
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons,
+        Matrix.tail_cons, one_smul, neg_smul]
+      at e
+    unfold pc
+    rw [← sub_eq_zero, ← e]
+    abel
+  have hB'
+      : ∀ (T : Over S) (x y y' : T ⟶ c.A),
+        pc c.isLB x (y * y') = pc c.isLB x y + pc c.isLB x y' := fun T x y y' => by
+    obtain ⟨t, ht⟩ :=
+      (GlobalTheory.Biadditive.biadditive_of_triv_axes hG S c.A c.diag c.ab hD hamp c.P c.isLB
+        c.rig₁ c.rig₂ T y y' x).2
+    have e := (cls_eq_zero_iff (LB.isLB_linComb c.isLB _ _)).2 ⟨t, ht⟩
+    rw [cls_linComb c.isLB, Fin.sum_univ_three] at e
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons,
+        Matrix.tail_cons, one_smul, neg_smul]
+      at e
+    unfold pc
+    rw [← sub_eq_zero, ← e]
+    abel
+  have lifts
+      : ∀ z : T ⟶ c.A,
+        z ^ N = 1
+          → ∀ p : T.left, ∃ V : T.left.Opens,
+            p ∈ V
+              ∧ ∃ θ : Out.ThetaGrp c.A c.diag N (Out.overRes V),
+                θ.pt = Out.overResι V ≫ z := fun z hz p => by
+    obtain ⟨θ, hθ⟩ :=
+      exists_theta_diag c.isLB hB hB' (k := N) (Out.overResι ⊤ ≫ z)
+        (by rw [← MonObj.comp_pow, hz, MonObj.comp_one])
     exact ⟨⊤, trivial, θ, hθ⟩
   obtain ⟨c₀, hc₀⟩ := CommutatorPairing.exists_weilIs hG c.ab hD (lifts x hx) (lifts y hy)
   obtain ⟨c₁, hc₁⟩ := CommutatorPairing.exists_weilIs hG c.ab hD (lifts 1 (one_pow N)) (lifts y hy)

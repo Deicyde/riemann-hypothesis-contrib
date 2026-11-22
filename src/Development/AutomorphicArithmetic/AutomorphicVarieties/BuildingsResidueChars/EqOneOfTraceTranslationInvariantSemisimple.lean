@@ -6,11 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsSSRepTr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.UnitaryBC UpperTheory.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.UnitaryBC UpperTheory.V
 open UpperTheory.V.W (Plc Lp resP)
 
-theorem UpperTheory.eq_one_of_trace_translation_invariant_semisimple :
-    ∀ (Γ k : Type) [Group Γ] [Field k] [CharZero k] (n : ℕ) (ρ : Γ →* GL (Fin n) k), Formalism.MainNotions.N.IsSSRep ρ → ∀ g : Γ, (∀ h : Γ, (ρ (h * g) : Matrix (Fin n) (Fin n) k).trace = (ρ h : Matrix (Fin n) (Fin n) k).trace) → ρ g = 1 := by
+theorem UpperTheory.eq_one_of_trace_translation_invariant_semisimple
+    : ∀ (Γ k : Type) [Group Γ] [Field k] [CharZero k] (n : ℕ) (ρ : Γ →* GL (Fin n) k),
+      Formalism.MainNotions.N.IsSSRep ρ
+        → ∀ g : Γ,
+          (∀ h : Γ,
+              (ρ (h * g) : Matrix (Fin n) (Fin n) k).trace = (ρ h : Matrix (Fin n) (Fin n) k).trace)
+            → ρ g = 1 := by
   intro Γ k _ _ _ n ρ hss g htr
   classical
   let σ : Γ →* Module.End k (Fin n → k) :=
@@ -23,8 +29,9 @@ theorem UpperTheory.eq_one_of_trace_translation_invariant_semisimple :
     have h1 : a ∈ Subalgebra.toSubmodule A := ha
     rw [Algebra.adjoin_eq_span, ← MonoidHom.coe_mrange, Submonoid.closure_eq] at h1
     exact h1
-  have hinv : ∀ W : Submodule k (Fin n → k), Formalism.MainNotions.N.IsInv ρ W →
-      ∀ a ∈ A, ∀ v ∈ W, a v ∈ W := by
+  have hinv
+      : ∀ W : Submodule k (Fin n → k),
+        Formalism.MainNotions.N.IsInv ρ W → ∀ a ∈ A, ∀ v ∈ W, a v ∈ W := by
     intro W hW a ha v hv
     suffices H : ∀ b ∈ Submodule.span k (Set.range σ), b v ∈ W from H a (hspan a ha)
     intro b hb
@@ -44,11 +51,12 @@ theorem UpperTheory.eq_one_of_trace_translation_invariant_semisimple :
       have := W.smul_mem (⟨σ h, hmem⟩ : A) hv
       exact this
     obtain ⟨W', hW'inv, hc⟩ := hss _ hW
-    let W'' : Submodule A (Fin n → k) :=
-      { carrier := W'
-        add_mem' := W'.add_mem
-        zero_mem' := W'.zero_mem
-        smul_mem' := fun a v hv => hinv W' hW'inv a a.2 v hv }
+    let W'' : Submodule A (Fin n → k) := {
+      carrier := W'
+      add_mem' := W'.add_mem
+      zero_mem' := W'.zero_mem
+      smul_mem' := fun a v hv => hinv W' hW'inv a a.2 v hv
+    }
     refine ⟨W'', ?_, ?_⟩
     · rw [Submodule.disjoint_def]
       intro v hv hv'
@@ -58,10 +66,11 @@ theorem UpperTheory.eq_one_of_trace_translation_invariant_semisimple :
       have hv : v ∈ W.restrictScalars k ⊔ W' := by rw [hc.sup_eq_top]; trivial
       obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hv
       exact Submodule.add_mem_sup hy hz
-  let φ : A →ₗ[A] (Fin n → (Fin n → k)) :=
-    { toFun := fun a i => (a : Module.End k (Fin n → k)) (Pi.single i 1)
-      map_add' := fun a b => by ext i j; simp
-      map_smul' := fun a b => by ext i j; rfl }
+  let φ : A →ₗ[A] (Fin n → (Fin n → k)) := {
+    toFun := fun a i => (a : Module.End k (Fin n → k)) (Pi.single i 1)
+    map_add' := fun a b => by ext i j; simp
+    map_smul' := fun a b => by ext i j; rfl
+  }
   have hφ : Function.Injective φ := by
     intro a b hab
     apply Subtype.ext
@@ -74,8 +83,10 @@ theorem UpperTheory.eq_one_of_trace_translation_invariant_semisimple :
   have hxA : σ g - 1 ∈ A := A.sub_mem hgA A.one_mem
   have htrace : ∀ a ∈ A, LinearMap.trace k (Fin n → k) (a * (σ g - 1)) = 0 := by
     intro a ha
-    suffices H : ∀ b ∈ Submodule.span k (Set.range σ),
-        LinearMap.trace k (Fin n → k) (b * (σ g - 1)) = 0 from H a (hspan a ha)
+    suffices H
+        : ∀ b ∈ Submodule.span k (Set.range σ),
+          LinearMap.trace k (Fin n → k) (b * (σ g - 1)) = 0 from
+      H a (hspan a ha)
     intro b hb
     induction hb using Submodule.span_induction with
     | mem b' hb' =>
@@ -111,8 +122,7 @@ theorem UpperTheory.eq_one_of_trace_translation_invariant_semisimple :
     | exact (LinearMap.IsIdempotentElem.trace_eq_zero_iff hI).mp htr_e
     | exact (IsIdempotentElem.trace_eq_zero_iff hI).mp htr_e
   have he0' : e = 0 := Subtype.ext he0
-  have hx0 : x' = 0 := by
-    rw [← key x' (Submodule.mem_span_singleton_self x'), he0', mul_zero]
+  have hx0 : x' = 0 := by rw [← key x' (Submodule.mem_span_singleton_self x'), he0', mul_zero]
   have hx1 : σ g - 1 = 0 := congrArg Subtype.val hx0
   apply Units.ext
   apply Matrix.toLin'.injective

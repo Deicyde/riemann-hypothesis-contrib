@@ -5,15 +5,19 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
-private theorem locOne_nak {L : Type} [Field L] [Algebra ℂ L] (B O : Subalgebra ℂ L)
-    [Algebra.FiniteType ℂ B] (hBO : B ≤ O) (ev : O →ₐ[ℂ] ℂ) (hunit : ∀ u : O, ev u ≠ 0 → IsUnit u)
+private theorem locOne_nak
+    {L : Type} [Field L] [Algebra ℂ L]
+    (B O : Subalgebra ℂ L) [Algebra.FiniteType ℂ B]
+    (hBO : B ≤ O) (ev : O →ₐ[ℂ] ℂ) (hunit : ∀ u : O, ev u ≠ 0 → IsUnit u)
     (hden : ∀ v : O, ∃ b : B, ev ⟨b, hBO b.2⟩ ≠ 0 ∧ (b : L) * v ∈ B)
     {d : ℕ} (t : Fin d → O) (ht : ∀ l, ev (t l) = 0)
-    (hmax : ∀ v : O, ev v = 0 → ∃ a : Fin d → O, v = ∑ l, a l * t l) (v : O) :
-    D ℂ L (v : L) ∈ Submodule.span O (Set.range fun l => D ℂ L (t l : L)) := by
+    (hmax : ∀ v : O, ev v = 0 → ∃ a : Fin d → O, v = ∑ l, a l * t l)
+    (v : O)
+    : D ℂ L (v : L) ∈ Submodule.span O (Set.range fun l => D ℂ L (t l : L)) := by
   classical
   set I : Ideal O := RingHom.ker ev with hI
   set N : Submodule O (Ω[L⁄ℂ]) := Submodule.span O (Set.range fun l => D ℂ L (t l : L)) with hN
@@ -85,8 +89,7 @@ private theorem locOne_nak {L : Type} [Field L] [Algebra ℂ L] (B O : Subalgebr
         exact ht l
       · exact Submodule.subset_span ⟨a l, rfl⟩
 
-theorem UpperTheory.Gal.productCup_of_system.locOne_of :
-    LocMax → ValBasic → LocOne := by
+theorem UpperTheory.Gal.productCup_of_system.locOne_of : LocMax → ValBasic → LocOne := by
   intro hMax hVal F L _ _ _ _ _ _ d x hc hred e v hv
   obtain ⟨hle, ⟨ev, hev⟩, hbv, hinv⟩ := hVal L (rB ℂ L (xv x) {0}) e.1
   haveI := hc.smooth 0
@@ -100,16 +103,17 @@ theorem UpperTheory.Gal.productCup_of_system.locOne_of :
     obtain ⟨h0, h1⟩ := hinv u (ev u) ((hev _ _).2 ⟨u.2, rfl⟩) hu
     exact IsUnit.of_mul_eq_one (⟨_, h1⟩ : loc (rB ℂ L (xv x) {0}) e.1)
       (Subtype.ext (mul_inv_cancel₀ h0))
-  have hden : ∀ v : loc (rB ℂ L (xv x) {0}) e.1, ∃ b : rB ℂ L (xv x) {0},
-      ev ⟨b, hle b.2⟩ ≠ 0 ∧ (b : L) * v ∈ rB ℂ L (xv x) {0} := by
+  have hden
+      : ∀ v : loc (rB ℂ L (xv x) {0}) e.1, ∃ b : rB ℂ L (xv x) {0},
+        ev ⟨b, hle b.2⟩ ≠ 0 ∧ (b : L) * v ∈ rB ℂ L (xv x) {0} := by
     intro v
     obtain ⟨b, hb, hbv'⟩ := v.2
     exact ⟨b, by rw [hevB]; exact hb, hbv'⟩
   let t : Fin d → loc (rB ℂ L (xv x) {0}) e.1 := fun l => ⟨tt L x l, hle (tco_mem ℂ L (xv x) l)⟩
-  have ht : ∀ l, ev (t l) = 0 := fun l =>
-    (hevB ⟨_, tco_mem ℂ L (xv x) l⟩).trans (e.2 l)
-  have hmax : ∀ v : loc (rB ℂ L (xv x) {0}) e.1, ev v = 0 → ∃ a : Fin d → loc (rB ℂ L (xv x) {0}) e.1,
-      v = ∑ l, a l * t l := by
+  have ht : ∀ l, ev (t l) = 0 := fun l => (hevB ⟨_, tco_mem ℂ L (xv x) l⟩).trans (e.2 l)
+  have hmax
+      : ∀ v : loc (rB ℂ L (xv x) {0}) e.1,
+        ev v = 0 → ∃ a : Fin d → loc (rB ℂ L (xv x) {0}) e.1, v = ∑ l, a l * t l := by
     intro v h0
     obtain ⟨a, ha, hv'⟩ := hMax F L d x hc hred e v ((hev _ _).2 ⟨v.2, h0⟩)
     refine ⟨fun l => ⟨a l, ha l⟩, Subtype.ext ?_⟩

@@ -12,6 +12,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SesquilinearRowS
 namespace PI.SRW
 
 theorem splitRow_of_iso (hi : IsoStep) : PI.SplitRow.SplitRow :=
-  splitRow_of (coreStep_of frame_reduction hi assembly_reduction) adjoint_action_reduction trace_reduction
+  splitRow_of (coreStep_of frame_reduction hi assembly_reduction) adjoint_action_reduction
+    trace_reduction
 
 end PI.SRW

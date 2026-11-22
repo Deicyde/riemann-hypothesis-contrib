@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_mul_pow_mem_of_fg {O Ω : Type} [CommRing O] [Field Ω] [Algebra O Ω]
-    (A B : Subalgebra O Ω) (hA : A.FG)
-    (hB : ∀ x : Ω, ∃ a ∈ B, ∃ b ∈ B, b ≠ 0 ∧ x * b = a) :
-    ∃ d ∈ B, d ≠ 0 ∧ ∀ a ∈ A, ∃ n : ℕ, a * d ^ n ∈ B := by
+theorem exists_mul_pow_mem_of_fg
+    {O Ω : Type} [CommRing O] [Field Ω] [Algebra O Ω]
+    (A B : Subalgebra O Ω) (hA : A.FG) (hB : ∀ x : Ω, ∃ a ∈ B, ∃ b ∈ B, b ≠ 0 ∧ x * b = a)
+    : ∃ d ∈ B, d ≠ 0 ∧ ∀ a ∈ A, ∃ n : ℕ, a * d ^ n ∈ B := by
   classical
   obtain ⟨s, hs⟩ := hA
   have hden : ∀ x : Ω, ∃ b ∈ B, b ≠ 0 ∧ x * b ∈ B := by
@@ -23,7 +23,6 @@ theorem exists_mul_pow_mem_of_fg {O Ω : Type} [CommRing O] [Field Ω] [Algebra 
   rw [← hs] at ha
   induction ha using Algebra.adjoin_induction with
   | mem x hx =>
-
     refine ⟨1, ?_⟩
     rw [pow_one, ← Finset.mul_prod_erase s den (Finset.mem_coe.mp hx), ← mul_assoc]
     exact mul_mem (hdenmul x) (Subalgebra.prod_mem B (fun y _ => hdenB y))
@@ -33,17 +32,21 @@ theorem exists_mul_pow_mem_of_fg {O Ω : Type} [CommRing O] [Field Ω] [Algebra 
     obtain ⟨n, hn⟩ := hx
     obtain ⟨m, hm⟩ := hy
     refine ⟨n + m, ?_⟩
-    have e : (x + y) * (∏ z ∈ s, den z) ^ (n + m) =
-        x * (∏ z ∈ s, den z) ^ n * (∏ z ∈ s, den z) ^ m +
-          y * (∏ z ∈ s, den z) ^ m * (∏ z ∈ s, den z) ^ n := by ring
+    have e
+        : (x + y) * (∏ z ∈ s, den z) ^ (n + m)
+          = x * (∏ z ∈ s, den z) ^ n * (∏ z ∈ s, den z) ^ m
+            + y * (∏ z ∈ s, den z) ^ m * (∏ z ∈ s, den z) ^ n := by
+      ring
     rw [e]
     exact add_mem (mul_mem hn (pow_mem hD m)) (mul_mem hm (pow_mem hD n))
   | mul x y _ _ hx hy =>
     obtain ⟨n, hn⟩ := hx
     obtain ⟨m, hm⟩ := hy
     refine ⟨n + m, ?_⟩
-    have e : x * y * (∏ z ∈ s, den z) ^ (n + m) =
-        (x * (∏ z ∈ s, den z) ^ n) * (y * (∏ z ∈ s, den z) ^ m) := by ring
+    have e
+        : x * y * (∏ z ∈ s, den z) ^ (n + m)
+          = (x * (∏ z ∈ s, den z) ^ n) * (y * (∏ z ∈ s, den z) ^ m) := by
+      ring
     rw [e]
     exact mul_mem hn hm
 

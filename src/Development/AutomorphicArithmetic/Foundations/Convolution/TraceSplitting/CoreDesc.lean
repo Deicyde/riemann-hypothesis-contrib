@@ -18,6 +18,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Integrab
 @[expose] public section
 
 open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.T in
-theorem UpperTheory.ConvolutionTheory.T.coreDesc :
-    UpperTheory.ConvolutionTheory.CI → UpperTheory.ConvolutionTheory.GM.GM → UpperTheory.ConvolutionTheory.T.CoreDesc :=
-  coreDesc_of absLast pullBack unitTrace oneTerm sideSum pickS pickInf tyEx termE goodEx places C.occursBasics L1.eigBasic
+theorem UpperTheory.ConvolutionTheory.T.coreDesc
+    : UpperTheory.ConvolutionTheory.CI → UpperTheory.ConvolutionTheory.GM.GM
+      → UpperTheory.ConvolutionTheory.T.CoreDesc :=
+  coreDesc_of absLast pullBack unitTrace oneTerm sideSum pickS pickInf tyEx termE goodEx places
+    C.occursBasics L1.eigBasic

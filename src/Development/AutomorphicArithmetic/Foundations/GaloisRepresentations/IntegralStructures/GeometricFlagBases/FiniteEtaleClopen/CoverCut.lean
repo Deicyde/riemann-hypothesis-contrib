@@ -12,11 +12,13 @@ namespace UpperTheory.Gal.Int.Geo.Cut
 
 open GlobalTheory.GalV (Splits)
 
-private theorem splits_cancel {A B Z : Scheme.{0}} (m : A ⟶ B) [Mono m] (f : Z ⟶ A) {J : Type}
-    (a : J → (Z ⟶ Z)) (h : Splits (f ≫ m) (f ≫ m) a) : Splits f f a := by
+private theorem splits_cancel
+    {A B Z : Scheme.{0}} (m : A ⟶ B) [Mono m]
+    (f : Z ⟶ A)
+    {J : Type} (a : J → (Z ⟶ Z)) (h : Splits (f ≫ m) (f ≫ m) a)
+    : Splits f f a := by
   obtain ⟨h, hi⟩ := h
-  have h' : ∀ j, a j ≫ f = f := fun j =>
-    (cancel_mono m).1 (by rw [Category.assoc]; exact h j)
+  have h' : ∀ j, a j ≫ f = f := fun j => (cancel_mono m).1 (by rw [Category.assoc]; exact h j)
   refine ⟨h', ?_⟩
   let e : pullback f f ⟶ pullback (f ≫ m) (f ≫ m) :=
     pullback.lift (pullback.fst _ _) (pullback.snd _ _) (by rw [pullback.condition_assoc])
@@ -34,9 +36,11 @@ private theorem splits_cancel {A B Z : Scheme.{0}} (m : A ⟶ B) [Mono m] (f : Z
       repeat' rw [pullback.lift_fst]
     · simp only [e, e', Category.assoc, Category.id_comp]
       repeat' rw [pullback.lift_snd]⟩⟩
-  have heq : (Limits.Sigma.desc fun j => pullback.lift (a j) (𝟙 Z) (by simp [h' j]) :
-      (∐ fun _ : J => Z) ⟶ pullback f f) ≫ e =
-      Limits.Sigma.desc fun j => pullback.lift (a j) (𝟙 Z) (by simp [h j]) := by
+  have heq
+      : (Limits.Sigma.desc fun j => pullback.lift (a j) (𝟙 Z) (by simp [h' j])
+            : (∐ fun _ : J => Z) ⟶ pullback f f)
+          ≫ e
+        = Limits.Sigma.desc fun j => pullback.lift (a j) (𝟙 Z) (by simp [h j]) := by
     apply Limits.Sigma.hom_ext
     intro j
     simp only [Limits.colimit.ι_desc_assoc, Limits.colimit.ι_desc, Limits.Cofan.mk_ι_app]
@@ -53,17 +57,15 @@ private theorem splits_cancel {A B Z : Scheme.{0}} (m : A ⟶ B) [Mono m] (f : Z
 
 end UpperTheory.Gal.Int.Geo.Cut
 
-theorem UpperTheory.Gal.Int.Geo.Cut.coverCut :
-    UpperTheory.Gal.Int.Geo.Cut.CoverCut := by
+theorem UpperTheory.Gal.Int.Geo.Cut.coverCut : UpperTheory.Gal.Int.Geo.Cut.CoverCut := by
   intro k L O _ _ _ _ H θ C V hVcl hpre
   have hV : ∀ z, C.π z ∈ V := by
     intro z
-    have hz : pullback.lift C.π H.q C.ov z ∈
-        ⇑(pullback.fst C.p (gen O k)) ⁻¹' (V : Set C.Y) := by
+    have hz : pullback.lift C.π H.q C.ov z ∈ ⇑(pullback.fst C.p (gen O k)) ⁻¹' (V : Set C.Y) := by
       rw [hpre]
       exact ⟨z, rfl⟩
-    simpa only [Set.mem_preimage, ← Scheme.Hom.comp_apply, pullback.lift_fst,
-      SetLike.mem_coe] using hz
+    simpa only [Set.mem_preimage, ← Scheme.Hom.comp_apply, pullback.lift_fst, SetLike.mem_coe] using
+      hz
   have hrange : Set.range ⇑C.π ⊆ Set.range ⇑V.ι := by
     rw [Scheme.Opens.range_ι]
     rintro _ ⟨z, rfl⟩
@@ -76,10 +78,10 @@ theorem UpperTheory.Gal.Int.Geo.Cut.coverCut :
   let m : pullback (V.ι ≫ C.p) (gen O k) ⟶ pullback C.p (gen O k) :=
     pullback.lift (pullback.fst _ _ ≫ V.ι) (pullback.snd _ _)
       (by rw [Category.assoc]; exact pullback.condition)
-  have hsq : IsPullback (pullback.fst (V.ι ≫ C.p) (gen O k)) m V.ι
-      (pullback.fst C.p (gen O k)) := by
-    refine IsPullback.of_bot (v₂₁ := pullback.snd C.p (gen O k)) (v₂₂ := C.p)
-      (h₃₁ := gen O k) ?_ ?_ (IsPullback.of_hasPullback C.p (gen O k))
+  have hsq
+      : IsPullback (pullback.fst (V.ι ≫ C.p) (gen O k)) m V.ι (pullback.fst C.p (gen O k)) := by
+    refine IsPullback.of_bot (v₂₁ := pullback.snd C.p (gen O k)) (v₂₂ := C.p) (h₃₁ := gen O k) ?_ ?_
+      (IsPullback.of_hasPullback C.p (gen O k))
     · rw [pullback.lift_snd]
       exact IsPullback.of_hasPullback (V.ι ≫ C.p) (gen O k)
     · rw [pullback.lift_fst]
@@ -112,8 +114,7 @@ theorem UpperTheory.Gal.Int.Geo.Cut.coverCut :
     exact ⟨N, V.ι ≫ i, inferInstance, by rw [Category.assoc, hic]⟩
   have hdim : ∃ d, SmoothOfRelativeDimension d (V.ι ≫ C.p) := by
     obtain ⟨d, hd⟩ := C.dim
-    exact ⟨d, HasRingHomProperty.comp_of_isOpenImmersion
-      (P := @SmoothOfRelativeDimension d) _ _ hd⟩
+    exact ⟨d, HasRingHomProperty.comp_of_isOpenImmersion (P := @SmoothOfRelativeDimension d) _ _ hd⟩
   have honto : AlgebraicGeometry.Surjective L' := by
     refine ⟨fun w => ?_⟩
     have hw : m w ∈ ⇑(pullback.fst C.p (gen O k)) ⁻¹' (V : Set C.Y) := by
@@ -125,8 +126,13 @@ theorem UpperTheory.Gal.Int.Geo.Cut.coverCut :
     obtain ⟨z, hz⟩ := hw
     refine ⟨z, m.isOpenEmbedding.injective ?_⟩
     rw [← Scheme.Hom.comp_apply, hLm, hz]
-  exact ⟨Cover.mk V.toScheme (V.ι ≫ C.p) inferInstance hproj π' ov' C.Δ (grp := C.grp)
-      (fin := C.fin) C.a (IsFinite.of_comp L' m) (Etale.of_comp L' m) C.one C.mul spl'
-      C.fix hdim,
-    V.ι, ⟨inferInstance, by rw [Scheme.Opens.range_ι]; exact hVcl⟩,
-    Scheme.Opens.range_ι V, rfl, hπ', honto⟩
+  exact ⟨
+    Cover.mk V.toScheme (V.ι ≫ C.p) inferInstance hproj π' ov' C.Δ (grp := C.grp) (fin := C.fin) C.a
+      (IsFinite.of_comp L' m) (Etale.of_comp L' m) C.one C.mul spl' C.fix hdim,
+    V.ι,
+    ⟨inferInstance, by rw [Scheme.Opens.range_ι]; exact hVcl⟩,
+    Scheme.Opens.range_ι V,
+    rfl,
+    hπ',
+    honto
+  ⟩

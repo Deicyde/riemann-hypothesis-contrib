@@ -100,8 +100,7 @@ private lemma isot_tensor {G H W W' X Y : Type} [Group G] [Group H] [AddCommGrou
 
 end UpperTheory.V.Z.J.D
 
-theorem UpperTheory.V.Z.J.D.boxIsot :
-    Step → BoxIsot := by
+theorem UpperTheory.V.Z.J.D.boxIsot : Step → BoxIsot := by
   intro hStep G H W W' _ _ _ _ _ _ ρ τ hρ _ X _ _ κ h1 h2
   obtain ⟨Y, _, _, κ', f, hf⟩ := hStep G H X W κ ρ hρ h1
   haveI : Nontrivial W := by

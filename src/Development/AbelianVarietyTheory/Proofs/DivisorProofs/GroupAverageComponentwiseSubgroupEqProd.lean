@@ -56,9 +56,11 @@ private lemma bijective_quotient_comap_of_surjective {A B : Type} [Group A] [Gro
     rw [← QuotientGroup.out_eq' z, ← ha, QuotientGroup.eq]
     exact h2
 
-theorem avg_comp_surj {A B : Type} [Group A] [Group B] (π : A →* B) (hπ : Function.Surjective π) (v : B → ℂ) :
-    avg (v ∘ π) = avg v := by
-  rw [avg_eq_inv_index_mul_finsum_rStab_quotient, avg_eq_inv_index_mul_finsum_rStab_quotient, rStab_comp_eq_comap_of_surjective π hπ v]
+theorem avg_comp_surj
+    {A B : Type} [Group A] [Group B] (π : A →* B) (hπ : Function.Surjective π) (v : B → ℂ)
+    : avg (v ∘ π) = avg v := by
+  rw [avg_eq_inv_index_mul_finsum_rStab_quotient, avg_eq_inv_index_mul_finsum_rStab_quotient,
+    rStab_comp_eq_comap_of_surjective π hπ v]
   let e := Equiv.ofBijective _ (bijective_quotient_comap_of_surjective π hπ (rStab v))
   have hidx : ((rStab v).comap π).index = (rStab v).index := by
     rw [Subgroup.index_eq_card, Subgroup.index_eq_card]
@@ -89,9 +91,11 @@ private lemma bijective_pi_quotient_to_quotient_pi {J : Type} (M : J → Type) [
     rw [← QuotientGroup.out_eq' (z j), QuotientGroup.eq]
     exact hj
 
-theorem avg_pi {J : Type} [Fintype J] (M : J → Type) [∀ j, Group (M j)] (v : ∀ j, M j → ℂ)
-    (hv : ∀ j, (rStab (v j)).index ≠ 0) :
-    avg (fun x : (∀ j, M j) => ∏ j, v j (x j)) = ∏ j, avg (v j) := by
+theorem avg_pi
+    {J : Type} [Fintype J]
+    (M : J → Type) [∀ j, Group (M j)]
+    (v : ∀ j, M j → ℂ) (hv : ∀ j, (rStab (v j)).index ≠ 0)
+    : avg (fun x : (∀ j, M j) => ∏ j, v j (x j)) = ∏ j, avg (v j) := by
   classical
   haveI : ∀ j, (rStab (v j)).FiniteIndex := fun j => ⟨hv j⟩
   haveI : ∀ j, Fintype (M j ⧸ rStab (v j)) := fun j => Fintype.ofFinite _
@@ -101,20 +105,22 @@ theorem avg_pi {J : Type} [Fintype J] (M : J → Type) [∀ j, Group (M j)] (v :
     rw [mem_rStab_iff_forall_mul_right_invariant]
     intro x
     refine Finset.prod_congr rfl (fun j _ => ?_)
-    exact (mem_rStab_iff_forall_mul_right_invariant (v j) (k j)).mp ((Subgroup.mem_pi _).mp hk j (Set.mem_univ j)) (x j)
+    exact (mem_rStab_iff_forall_mul_right_invariant (v j) (k j)).mp
+      ((Subgroup.mem_pi _).mp hk j (Set.mem_univ j)) (x j)
   let e := Equiv.ofBijective _ (bijective_pi_quotient_to_quotient_pi M (fun j => rStab (v j)))
   have hidx : S.index = ∏ j, (rStab (v j)).index := by
     rw [Subgroup.index_eq_card, Nat.card_congr e, Nat.card_pi]
     simp only [Subgroup.index_eq_card]
-  have hS0 : S.index ≠ 0 := by
-    rw [hidx]; exact Finset.prod_ne_zero_iff.mpr (fun j _ => hv j)
-  have hsum : (∑ᶠ q : (∀ j, M j) ⧸ S, ∏ j, v j (q.out j)) = ∏ j, ∑ᶠ q : M j ⧸ rStab (v j), v j q.out := by
+  have hS0 : S.index ≠ 0 := by rw [hidx]; exact Finset.prod_ne_zero_iff.mpr (fun j _ => hv j)
+  have hsum
+      : (∑ᶠ q : (∀ j, M j) ⧸ S, ∏ j, v j (q.out j)) = ∏ j, ∑ᶠ q : M j ⧸ rStab (v j), v j q.out := by
     have h1 : ∀ q : (∀ j, M j) ⧸ S, ∏ j, v j (q.out j) = ∏ j, v j ((e q j).out) := by
       intro q
       refine Finset.prod_congr rfl (fun j _ => ?_)
       exact (apply_out (v j) (q.out j)).symm
     rw [finsum_congr h1]
-    refine (finsum_comp_equiv e (f := fun z : (∀ j, M j ⧸ rStab (v j)) => ∏ j, v j (z j).out)).trans ?_
+    refine (finsum_comp_equiv e (f := fun z : (∀ j, M j ⧸ rStab (v j)) => ∏ j, v j (z j).out)).trans
+      ?_
     rw [finsum_eq_sum_of_fintype]
     simp only [finsum_eq_sum_of_fintype]
     rw [Finset.prod_univ_sum, Fintype.piFinset_univ]
@@ -122,7 +128,13 @@ theorem avg_pi {J : Type} [Fintype J] (M : J → Type) [∀ j, Group (M j)] (v :
   simp only [avg_eq_inv_index_mul_finsum_rStab_quotient]
   rw [Finset.prod_mul_distrib, Finset.prod_inv_distrib, ← Nat.cast_prod, ← hidx, hsum]
 
-theorem avg_restrProd : ∀ (ι G : Type) [Group G] (H : ι → Type) [∀ i, Group (H i)] (p : ∀ i, G →* H i) (K : Subgroup G) (KH : ∀ i, Subgroup (H i)) (hK : ∀ x : G, x ∈ K ↔ ∀ i, p i x ∈ KH i) (u : ∀ i, KH i → ℂ), (∀ y : ∀ i, H i, (∀ᶠ i in cofinite, y i ∈ KH i) → ∃ x : G, ∀ i, p i x = y i) → (∀ i, (rStab (u i)).index ≠ 0) → (∀ᶠ i in cofinite, ∀ k, u i k = 1) → avg (fun k : K => ∏ᶠ i, u i ⟨p i k, (hK k).1 k.2 i⟩) = ∏ᶠ i, avg (u i) := by
+theorem avg_restrProd
+    : ∀ (ι G : Type) [Group G] (H : ι → Type) [∀ i, Group (H i)] (p : ∀ i, G →* H i)
+        (K : Subgroup G) (KH : ∀ i, Subgroup (H i)) (hK : ∀ x : G, x ∈ K ↔ ∀ i, p i x ∈ KH i)
+        (u : ∀ i, KH i → ℂ),
+      (∀ y : ∀ i, H i, (∀ᶠ i in cofinite, y i ∈ KH i) → ∃ x : G, ∀ i, p i x = y i)
+        → (∀ i, (rStab (u i)).index ≠ 0) → (∀ᶠ i in cofinite, ∀ k, u i k = 1)
+        → avg (fun k : K => ∏ᶠ i, u i ⟨p i k, (hK k).1 k.2 i⟩) = ∏ᶠ i, avg (u i) := by
   intro ι G _ H _ p K KH hK u happ hu h1
   classical
   have hs := Filter.eventually_cofinite.mp h1
@@ -146,8 +158,9 @@ theorem avg_restrProd : ∀ (ι G : Type) [Group G] (H : ι → Type) [∀ i, Gr
     change p (j : ι) x = ((y j : KH (j : ι)) : H (j : ι))
     rw [hx]
     simp [y', j.2]
-  have hfun : (fun k : K => ∏ᶠ i, u i ⟨p i k, (hK k).1 k.2 i⟩) =
-      (fun y : (∀ j : T, KH j) => ∏ j : T, u j (y j)) ∘ π := by
+  have hfun
+      : (fun k : K => ∏ᶠ i, u i ⟨p i k, (hK k).1 k.2 i⟩)
+        = (fun y : (∀ j : T, KH j) => ∏ j : T, u j (y j)) ∘ π := by
     funext k
     rw [Function.comp_apply, finprod_eq_prod_of_mulSupport_subset _ (s := T)]
     · exact (Finset.prod_coe_sort T (fun i => u i ⟨p i k, (hK k).1 k.2 i⟩)).symm

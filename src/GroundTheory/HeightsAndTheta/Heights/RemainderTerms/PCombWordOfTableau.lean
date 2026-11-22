@@ -13,9 +13,10 @@ open MvPolynomial Finset Equiv Comb
 
 noncomputable section
 
-theorem CombWordOfTableau.proof (h1 : CombTableauRowCount.Statement)
-    (h2 : CombTableauRowPrefix.Statement) (h3 : CombTableauRowLattice.Statement)
-    (h4 : CombYoungRowCard.Statement) : CombWordOfTableau.Statement := by
+theorem CombWordOfTableau.proof
+    (h1 : CombTableauRowCount.Statement) (h2 : CombTableauRowPrefix.Statement)
+    (h3 : CombTableauRowLattice.Statement) (h4 : CombYoungRowCard.Statement)
+    : CombWordOfTableau.Statement := by
   intro m lam hlam T hT
   refine ⟨?_, fun t => ?_⟩
   · simp only [latticeWords, mem_filter, mem_univ, true_and]

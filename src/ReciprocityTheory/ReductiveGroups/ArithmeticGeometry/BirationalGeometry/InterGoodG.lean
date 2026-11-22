@@ -43,12 +43,14 @@ private lemma aeval_sumElim_one_eq_aeval_aeval_sumElim_X_one {r : ℕ} {S : Type
     cases i <;> simp
   rw [← AlgHom.comp_apply, comp_aeval, hf]
 
-theorem algebraicIndependent_sumElim (P : Ideal (MRing ι)) (hP : P.IsPrime) (hH : IsHorizontal P)
-    (hhom : IsMultiHomogIdeal P) (k0 : K) (i0 : (k : K) → ι k)
-    (hi0 : ∀ k, (X ⟨k, i0 k⟩ : MRing ι) ∉ P) {r : ℕ} (L : Fin r → ((k : K) → ι k) → ℚ)
-    (hind : AlgebraicIndependent ℚ (forms (segQ P) L)) :
-    AlgebraicIndependent ℚ (Sum.elim (forms (segQ P) L)
-      (fun k' : {k // k ≠ k0} => Ideal.Quotient.mk (qIdeal P) (X ⟨k'.1, i0 k'.1⟩))) := by
+theorem algebraicIndependent_sumElim
+    (P : Ideal (MRing ι)) (hP : P.IsPrime) (hH : IsHorizontal P) (hhom : IsMultiHomogIdeal P)
+    (k0 : K)
+    (i0 : (k : K) → ι k) (hi0 : ∀ k, (X ⟨k, i0 k⟩ : MRing ι) ∉ P)
+    {r : ℕ} (L : Fin r → ((k : K) → ι k) → ℚ) (hind : AlgebraicIndependent ℚ (forms (segQ P) L))
+    : AlgebraicIndependent ℚ
+      (Sum.elim (forms (segQ P) L)
+        (fun k' : {k // k ≠ k0} => Ideal.Quotient.mk (qIdeal P) (X ⟨k'.1, i0 k'.1⟩))) := by
   classical
   have : IsDomain (MvPolynomial (Σ k, ι k) ℚ ⧸ qIdeal P) := isDomain_qQuot P hP hH
   set b : {k // k ≠ k0} → MvPolynomial (Σ k, ι k) ℚ ⧸ qIdeal P :=
@@ -62,8 +64,7 @@ theorem algebraicIndependent_sumElim (P : Ideal (MRing ι)) (hP : P.IsPrime) (hH
     | inr k' => simp [yt, b, Ideal.Quotient.mkₐ_eq_mk]
   have hhomY : ∀ e, IsWeightedHomogeneous (blkWt (ι := ι)) (yt e) (sWt k0 r e) := by
     rintro (j | k')
-    · have hmem : (∑ t, L j t • segMon t) ∈
-          weightedHomogeneousSubmodule ℚ (blkWt (ι := ι)) oneK :=
+    · have hmem : (∑ t, L j t • segMon t) ∈ weightedHomogeneousSubmodule ℚ (blkWt (ι := ι)) oneK :=
         Submodule.sum_mem _ fun t _ => Submodule.smul_mem _ _ (segMon_isWeightedHomogeneous t)
       exact hmem
     · exact isWeightedHomogeneous_X ℚ (blkWt (ι := ι)) ⟨k'.1, i0 k'.1⟩
@@ -71,8 +72,10 @@ theorem algebraicIndependent_sumElim (P : Ideal (MRing ι)) (hP : P.IsPrime) (hH
     intro k' h
     rw [hbdef, Ideal.Quotient.eq_zero_iff_mem] at h
     exact hi0 k'.1 (mem_of_qmap_mem_qIdeal P hP hH (by simpa using h))
-  have hev : ∀ G, aeval (Sum.elim (forms (segQ P) L) b) G =
-      Ideal.Quotient.mk (qIdeal P) (aeval (R := ℚ) yt G) := by
+  have hev
+      : ∀ G,
+        aeval (Sum.elim (forms (segQ P) L) b) G
+          = Ideal.Quotient.mk (qIdeal P) (aeval (R := ℚ) yt G) := by
     intro G
     rw [← hyt, ← comp_aeval, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk]
   rw [algebraicIndependent_iff]
@@ -84,10 +87,13 @@ theorem algebraicIndependent_sumElim (P : Ideal (MRing ι)) (hP : P.IsPrime) (hH
     intro δ
     have hHd : IsWeightedHomogeneous (sWt k0 r) (weightedHomogeneousComponent (sWt k0 r) δ H) δ :=
       weightedHomogeneousComponent_isWeightedHomogeneous _ _
-    have hcomp := weightedHomogeneousComponent_mem_of_mem ℚ (blkWt (ι := ι))
-      (qIdeal_isHomogeneous P hhom) hmem δ
+    have hcomp :=
+      weightedHomogeneousComponent_mem_of_mem ℚ (blkWt (ι := ι)) (qIdeal_isHomogeneous P hhom) hmem
+        δ
     rw [component_aeval (sWt k0 r) yt hhomY H δ] at hcomp
-    have h0 : aeval (Sum.elim (forms (segQ P) L) b) (weightedHomogeneousComponent (sWt k0 r) δ H) = 0 := by
+    have h0
+        : aeval (Sum.elim (forms (segQ P) L) b) (weightedHomogeneousComponent (sWt k0 r) δ H)
+          = 0 := by
       rw [hev, Ideal.Quotient.eq_zero_iff_mem]
       exact hcomp
     by_contra hne
@@ -99,19 +105,22 @@ theorem algebraicIndependent_sumElim (P : Ideal (MRing ι)) (hP : P.IsPrime) (hH
     rw [aeval_sumElim_one_eq_aeval_aeval_sumElim_X_one] at h1
     have h2 := algebraicIndependent_iff.mp hind _ h1
     apply hne
-    rw [← rename_inl_aeval_mul_prod_X_inr_pow_eq_of_support (fun s => n0 (Sum.inr s))
-      (weightedHomogeneousComponent (sWt k0 r) δ H) ?_, h2, map_zero, zero_mul]
+    rw [← rename_inl_aeval_mul_prod_X_inr_pow_eq_of_support
+        (fun s => n0 (Sum.inr s))
+        (weightedHomogeneousComponent (sWt k0 r) δ H) ?_,
+      h2, map_zero, zero_mul]
     intro m hm s
-    exact inr_eq_of_weight_eq k0 ((hHd (mem_support_iff.mp hm)).trans
-      (hHd (mem_support_iff.mp hn0)).symm) s
+    exact inr_eq_of_weight_eq k0
+      ((hHd (mem_support_iff.mp hm)).trans (hHd (mem_support_iff.mp hn0)).symm) s
   ext n
   have := congrArg (AddMonoidAlgebra.coeff · n) (key (Finsupp.weight (sWt k0 r) n))
   rw [coeff_weightedHomogeneousComponent, if_pos rfl] at this
   simpa using this
 
-theorem forms_not_algebraicIndependent (P : Ideal (MRing ι)) (e : ℕ) (hP : IsArithVar P (e + 1))
-    {r : ℕ} (hr : e + 1 < r) (L : Fin r → ((k : K) → ι k) → ℚ) :
-    ¬ AlgebraicIndependent ℚ (forms (segQ P) L) := by
+theorem forms_not_algebraicIndependent
+    (P : Ideal (MRing ι)) (e : ℕ) (hP : IsArithVar P (e + 1))
+    {r : ℕ} (hr : e + 1 < r) (L : Fin r → ((k : K) → ι k) → ℚ)
+    : ¬ AlgebraicIndependent ℚ (forms (segQ P) L) := by
   classical
   intro hind
   obtain ⟨hne, ⟨hprime, hhom, hrel⟩, hH, hdim⟩ := hP

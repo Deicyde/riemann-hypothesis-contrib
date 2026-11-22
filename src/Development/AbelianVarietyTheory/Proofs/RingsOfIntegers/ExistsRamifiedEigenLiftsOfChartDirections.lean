@@ -18,15 +18,21 @@ noncomputable section
 
 namespace GlobalTheory.EigRam
 
-open NumberField IsLocalRing UniqueFactorizationMonoid Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf
+open NumberField IsLocalRing UniqueFactorizationMonoid Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf
 
-theorem exists_pairs_sides {Ty Pl : Type} [Fintype Ty] (pl : Ty → Pl) (cj : Pl → Pl) (hcj : ∀ w, cj (cj w) = w)
-    (hne : ∀ t, cj (pl t) ≠ pl t) :
-    ∃ (c : Ty → Finset Ty) (s : Ty → Bool), ∀ t t', pl t' = cj (pl t) → c t = c t' ∧ s t ≠ s t' := by
+theorem exists_pairs_sides
+    {Ty Pl : Type} [Fintype Ty]
+    (pl : Ty → Pl) (cj : Pl → Pl) (hcj : ∀ w, cj (cj w) = w) (hne : ∀ t, cj (pl t) ≠ pl t)
+    : ∃ (c : Ty → Finset Ty) (s : Ty → Bool), ∀ t t',
+      pl t' = cj (pl t) → c t = c t' ∧ s t ≠ s t' := by
   classical
   letI : LinearOrder Pl := linearOrderOfSTO WellOrderingRel
-  refine ⟨fun t => Finset.univ.filter fun x => pl x = pl t ∨ pl x = cj (pl t),
-    fun t => decide (pl t < cj (pl t)), fun t t' h => ⟨?_, ?_⟩⟩
+  refine ⟨
+    fun t => Finset.univ.filter fun x => pl x = pl t ∨ pl x = cj (pl t),
+    fun t => decide (pl t < cj (pl t)),
+    fun t t' h => ⟨?_, ?_⟩
+  ⟩
   · ext x
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, h, hcj]
     exact or_comm
@@ -35,10 +41,13 @@ theorem exists_pairs_sides {Ty Pl : Type} [Fintype Ty] (pl : Ty → Pl) (cj : Pl
     · simp [h1, h1.not_gt]
     · simp [h1, h1.not_gt]
 
-theorem exists_delta {E : Type} [Field E] [NumberField E] [IsGalois ℚ E] {V : Type} [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] (σ : 𝓞 E →+* V) (p a m : ℕ) (hp : p.Prime) (hpV : ¬ IsUnit (p : V)) (hm : ¬ p ∣ m)
-    (hd : (discr E).natAbs = p ^ a * m) :
-    ∃ δ ∈ differentIdeal ℤ (𝓞 E), σ δ ^ Module.finrank ℚ E ∣ (p : V) ^ a := by
+theorem exists_delta
+    {E : Type} [Field E] [NumberField E] [IsGalois ℚ E]
+    {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    (σ : 𝓞 E →+* V)
+    (p a m : ℕ)
+    (hp : p.Prime) (hpV : ¬ IsUnit (p : V)) (hm : ¬ p ∣ m) (hd : (discr E).natAbs = p ^ a * m)
+    : ∃ δ ∈ differentIdeal ℤ (𝓞 E), σ δ ^ Module.finrank ℚ E ∣ (p : V) ^ a := by
   classical
   set P : Ideal (𝓞 E) := (maximalIdeal V).comap σ with hP
   have hPp : P.IsPrime := Ideal.comap_isPrime σ _
@@ -53,16 +62,18 @@ theorem exists_delta {E : Type} [Field E] [NumberField E] [IsGalois ℚ E] {V : 
   haveI : P.IsMaximal := hPp.isMaximal hP0
   have hexp := diffExp E p a m hp hm hd P hPp hpP
   obtain ⟨Q, hQ, hD⟩ := Ideal.eq_prime_pow_mul_coprime (differentIdeal_ne_bot (A := ℤ) (B := 𝓞 E)) P
-  obtain ⟨Q', -, hI⟩ := Ideal.eq_prime_pow_mul_coprime
-    (I := Ideal.span {(p : 𝓞 E)}) (by rwa [Ne, Ideal.span_singleton_eq_bot]) P
+  obtain ⟨Q', -, hI⟩ :=
+    Ideal.eq_prime_pow_mul_coprime (I := Ideal.span {(p : 𝓞 E)})
+      (by rwa [Ne, Ideal.span_singleton_eq_bot]) P
   have hQm : Q.map σ = ⊤ := by
     by_contra h
     have h1 : Q.map σ ≤ maximalIdeal V := le_maximalIdeal h
     have h2 : Q ≤ P := Ideal.map_le_iff_le_comap.1 h1
     exact hPp.ne_top (by rw [← hQ, sup_eq_left.2 h2])
-  obtain ⟨δ, hδ, hmin⟩ := (wellFounded_lt (α := ℕ∞)).has_min
-    ((fun x => IsDiscreteValuationRing.addVal V (σ x)) '' (differentIdeal ℤ (𝓞 E) : Set (𝓞 E)))
-    ⟨_, 0, zero_mem _, rfl⟩
+  obtain ⟨δ, hδ, hmin⟩ :=
+    (wellFounded_lt (α := ℕ∞)).has_min
+      ((fun x => IsDiscreteValuationRing.addVal V (σ x)) '' (differentIdeal ℤ (𝓞 E) : Set (𝓞 E)))
+      ⟨_, 0, zero_mem _, rfl⟩
   obtain ⟨δ, hδ, rfl⟩ := hδ
   refine ⟨δ, hδ, ?_⟩
   have hle : (differentIdeal ℤ (𝓞 E)).map σ ≤ Ideal.span {σ δ} := by
@@ -76,21 +87,30 @@ theorem exists_delta {E : Type} [Field E] [NumberField E] [IsGalois ℚ E] {V : 
     exact h0 (Ideal.mem_span_singleton_self _)
   have h2 := Ideal.mem_map_of_mem σ (Ideal.pow_mem_pow h1 a)
   rw [← pow_mul, mul_comm, ← hexp, pow_mul, Ideal.map_pow, map_pow, map_natCast] at h2
-  have h3 : (P ^ (normalizedFactors (differentIdeal ℤ (𝓞 E))).count P).map σ = (differentIdeal ℤ (𝓞 E)).map σ := by
+  have h3
+      : (P ^ (normalizedFactors (differentIdeal ℤ (𝓞 E))).count P).map σ
+        = (differentIdeal ℤ (𝓞 E)).map σ := by
     conv_rhs => rw [hD]
     rw [Ideal.map_mul, hQm, Ideal.mul_top]
   rw [h3] at h2
   have h4 := Ideal.pow_right_mono hle _ h2
   rwa [Ideal.span_singleton_pow, Ideal.mem_span_singleton] at h4
 
-theorem vV_pow {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field k] [Algebra V k]
-    [IsFractionRing V k] (x : k) (n : ℕ) : vV V (x ^ n) = n * vV V x := by
+theorem vV_pow
+    {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field k] [Algebra V k]
+    [IsFractionRing V k]
+    (x : k) (n : ℕ)
+    : vV V (x ^ n) = n * vV V x := by
   simp [vV, map_pow, WithZero.log_pow]
 
-theorem bound_of_den {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field k] [Algebra V k]
-    [IsFractionRing V k] (r q : V) (hq : q ≠ 0) (n a : ℕ) (hn : 0 < n) (hdvd : r ^ n ∣ q ^ a) (x : k)
-    (hx : algebraMap V k r * x ∈ (algebraMap V k).range) (e : ℕ) :
-    (((-((vV V (algebraMap V k q) : ℝ) / e * ((a : ℝ) / n))) : ℝ) : EReal) ≤ nval V e x := by
+theorem bound_of_den
+    {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field k] [Algebra V k]
+    [IsFractionRing V k]
+    (r q : V) (hq : q ≠ 0)
+    (n a : ℕ) (hn : 0 < n) (hdvd : r ^ n ∣ q ^ a)
+    (x : k) (hx : algebraMap V k r * x ∈ (algebraMap V k).range)
+    (e : ℕ)
+    : (((-((vV V (algebraMap V k q) : ℝ) / e * ((a : ℝ) / n))) : ℝ) : EReal) ≤ nval V e x := by
   by_cases hx0 : x = 0
   · rw [hx0, nval_zero]; exact le_top
   have hinj : Function.Injective (algebraMap V k) := IsFractionRing.injective V k
@@ -104,9 +124,11 @@ theorem bound_of_den {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuation
     rintro rfl
     exact hqa (by rw [ht, mul_zero])
   have hrk : algebraMap V k r ≠ 0 := (map_ne_zero_iff _ hinj).2 hr0
-  have h1 : (a : ℤ) * vV V (algebraMap V k q) = n * vV V (algebraMap V k r) + vV V (algebraMap V k t) := by
-    rw [← vV_pow, ← vV_pow, ← vV_mul (pow_ne_zero _ hrk) ((map_ne_zero_iff _ hinj).2 ht0), ← map_pow, ← map_pow,
-      ← map_mul, ht]
+  have h1
+      : (a : ℤ) * vV V (algebraMap V k q)
+        = n * vV V (algebraMap V k r) + vV V (algebraMap V k t) := by
+    rw [← vV_pow, ← vV_pow, ← vV_mul (pow_ne_zero _ hrk) ((map_ne_zero_iff _ hinj).2 ht0),
+      ← map_pow, ← map_pow, ← map_mul, ht]
   have h2 := ERam.vV_alg_nonneg (k := k) t
   obtain ⟨v, hv⟩ := hx
   have h3 := ERam.vV_alg_nonneg (k := k) v
@@ -122,9 +144,11 @@ theorem bound_of_den {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuation
   refine le_trans (le_of_eq ?_) h7
   ring
 
-theorem isRQ_of_nonunit {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CharZero V] [Field k]
-    [Algebra V k] [Algebra ℚ k] [IsFractionRing V k] (N : ℕ) (hN0 : N ≠ 0) (hNu : ¬ IsUnit (N : V)) :
-    TB.IsRQ (R := V) k := by
+theorem isRQ_of_nonunit
+    {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CharZero V] [Field k]
+    [Algebra V k] [Algebra ℚ k] [IsFractionRing V k]
+    (N : ℕ) (hN0 : N ≠ 0) (hNu : ¬ IsUnit (N : V))
+    : TB.IsRQ (R := V) k := by
   refine ⟨IsFractionRing.injective V k, fun y => ?_⟩
   have hNV0 : (N : V) ≠ 0 := by exact_mod_cast hN0
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible V
@@ -144,11 +168,14 @@ theorem isRQ_of_nonunit {V k : Type} [CommRing V] [IsDomain V] [IsDiscreteValuat
   rw [h1, map_mul]
   field_simp
 
-theorem isIntegral_mul_dual {E : Type} [Field E] [NumberField E] (δ : 𝓞 E) (hδ : δ ∈ differentIdeal ℤ (𝓞 E))
-    (i : Fin (ERam.nI E)) : IsIntegral ℤ ((δ : E) * ERam.omDF (E := E) i) := by
+theorem isIntegral_mul_dual
+    {E : Type} [Field E] [NumberField E]
+    (δ : 𝓞 E) (hδ : δ ∈ differentIdeal ℤ (𝓞 E))
+    (i : Fin (ERam.nI E))
+    : IsIntegral ℤ ((δ : E) * ERam.omDF (E := E) i) := by
   classical
-  have hbqω : ∀ i, integralBasis E i = algebraMap (𝓞 E) E (RingOfIntegers.basis E i) :=
-    fun i => integralBasis_apply E i
+  have hbqω : ∀ i, integralBasis E i = algebraMap (𝓞 E) E (RingOfIntegers.basis E i) := fun i =>
+    integralBasis_apply E i
   refine _root_.dual_difference E _ (integralBasis E) (fun i => ?_) (fun x => ?_) _ hδ _
   · rw [hbqω]
     exact RingOfIntegers.isIntegral_coe _
@@ -161,8 +188,8 @@ theorem isIntegral_mul_dual {E : Type} [Field E] [NumberField E] (δ : 𝓞 E) (
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hbqω, map_zsmul, Int.cast_smul_eq_zsmul]
 
-theorem sum_embeddings {E : Type} [Field E] [NumberField E] (x : E) :
-    ∑ τ : E →+* ℂ, τ x = ((Algebra.trace ℚ E x : ℚ) : ℂ) := by
+theorem sum_embeddings {E : Type} [Field E] [NumberField E] (x : E)
+    : ∑ τ : E →+* ℂ, τ x = ((Algebra.trace ℚ E x : ℚ) : ℂ) := by
   have h := trace_eq_sum_embeddings (K := ℚ) (L := E) ℂ (x := x)
   rw [eq_ratCast] at h
   rw [h]
@@ -170,16 +197,80 @@ theorem sum_embeddings {E : Type} [Field E] [NumberField E] (x : E) :
 
 end GlobalTheory.EigRam
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
 
-
 open GlobalTheory.EigRam ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf in
-theorem GlobalTheory.PlaceInt.exists_ramified_eigenLifts : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)], (∀ a : 𝓞 E, star a = H.bar a) → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C : IntegralChartA3 Xo c T io y), IsGalois ℚ E → ∀ (p a m : ℕ), p.Prime → ¬ IsUnit (p : T.V) → ¬ p ∣ m → (NumberField.discr E).natAbs = p ^ a * m → (∀ 𝔭 : Ideal (𝓞 E), 𝔭.IsPrime → (p : 𝓞 E) ∈ 𝔭 → ∃ x ∈ 𝔭, H.bar x ∉ 𝔭) → ∀ e : ℕ, 0 < e → letI := io.toAlgebra; ∃ (π : Type) (_ : Fintype π) (_ : DecidableEq π) (cc : (E →+* ℂ) → π) (s : (E →+* ℂ) → Bool), (∀ τ, cc (ComplexEmbedding.conjugate τ) = cc τ ∧ s (ComplexEmbedding.conjugate τ) ≠ s τ) ∧ ∃ (φ : Lt1 Dw → Fin (chD C.ch) → T.V) (ψ : Lt1 Dw → Fin (chD C.ch) → T.Fr), (∀ ℓ i, (((-((vV T.V (p : T.Fr) : ℝ) / e * ((a : ℝ) / Module.finrank ℚ E))) : ℝ) : EReal) ≤ nval T.V e (ψ ℓ i)) ∧ (∀ ℓ ℓ' : Lt1 Dw, ℓ'.1 ≠ ComplexEmbedding.conjugate ℓ.1 → ∑ i, (algebraMap T.V T.Fr (φ ℓ' i) + ψ ℓ' i - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ') i) * C.ch.uvec ℓ i = 0) ∧ TB.OppositePairVanishing T.Fr (fun ℓ : Lt1 Dw => cc ℓ.1) (fun ℓ => s ℓ.1) (fun ℓ => (C.ch.uvec ℓ, fun i => algebraMap T.V T.Fr (φ ℓ i) - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ) i)) (fun ℓ => (C.ch.uvec ℓ, fun i => algebraMap T.V T.Fr (φ ℓ i) - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ) i)) ∧ TB.OppositePairVanishing T.Fr (fun ℓ : Lt1 Dw => cc ℓ.1) (fun ℓ => s ℓ.1) (fun ℓ => (0, ψ ℓ)) (fun ℓ => (C.ch.uvec ℓ, fun i => algebraMap T.V T.Fr (φ ℓ i) - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ) i)) ∧ TB.OppositePairVanishing T.Fr (fun ℓ : Lt1 Dw => cc ℓ.1) (fun ℓ => s ℓ.1) (fun ℓ => (C.ch.uvec ℓ, fun i => algebraMap T.V T.Fr (φ ℓ i) - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ) i)) (fun ℓ => (0, ψ ℓ)) := by
+theorem GlobalTheory.PlaceInt.exists_ramified_eigenLifts
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)],
+      (∀ a : 𝓞 E, star a = H.bar a)
+        → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C : IntegralChartA3 Xo c T io y),
+          IsGalois ℚ E
+            → ∀ (p a m : ℕ),
+              p.Prime → ¬ IsUnit (p : T.V) → ¬ p ∣ m → (NumberField.discr E).natAbs = p ^ a * m
+                → (∀ 𝔭 : Ideal (𝓞 E), 𝔭.IsPrime → (p : 𝓞 E) ∈ 𝔭 → ∃ x ∈ 𝔭, H.bar x ∉ 𝔭)
+                → ∀ e : ℕ,
+                  0 < e
+                    → letI := io.toAlgebra
+                      ∃ (π : Type) (_ : Fintype π) (_ : DecidableEq π) (cc : (E →+* ℂ) → π)
+                          (s : (E →+* ℂ) → Bool),
+                        (∀ τ,
+                            cc (ComplexEmbedding.conjugate τ) = cc τ
+                              ∧ s (ComplexEmbedding.conjugate τ) ≠ s τ)
+                          ∧ ∃ (φ : Lt1 Dw → Fin (chD C.ch) → T.V)
+                              (ψ : Lt1 Dw → Fin (chD C.ch) → T.Fr),
+                            (∀ ℓ i,
+                                (((-((vV T.V (p : T.Fr) : ℝ) / e * ((a : ℝ) / Module.finrank ℚ E)))
+                                      : ℝ)
+                                    : EReal)
+                                  ≤ nval T.V e (ψ ℓ i))
+                              ∧ (∀ ℓ ℓ' : Lt1 Dw,
+                                ℓ'.1 ≠ ComplexEmbedding.conjugate ℓ.1
+                                  → ∑ i, (algebraMap T.V T.Fr (φ ℓ' i) + ψ ℓ' i - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ') i) * C.ch.uvec ℓ i
+                                    = 0)
+                              ∧ TB.OppositePairVanishing T.Fr
+                                (fun ℓ : Lt1 Dw => cc ℓ.1)
+                                (fun ℓ => s ℓ.1)
+                                (fun ℓ => (
+                                  C.ch.uvec ℓ,
+                                  fun i =>
+                                    algebraMap T.V T.Fr (φ ℓ i)
+                                      - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ) i
+                                ))
+                                (fun ℓ => (
+                                  C.ch.uvec ℓ,
+                                  fun i =>
+                                    algebraMap T.V T.Fr (φ ℓ i)
+                                      - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ) i
+                                ))
+                              ∧ TB.OppositePairVanishing T.Fr
+                                (fun ℓ : Lt1 Dw => cc ℓ.1)
+                                (fun ℓ => s ℓ.1)
+                                (fun ℓ => (0, ψ ℓ))
+                                (fun ℓ => (
+                                  C.ch.uvec ℓ,
+                                  fun i =>
+                                    algebraMap T.V T.Fr (φ ℓ i)
+                                      - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ) i
+                                ))
+                              ∧ TB.OppositePairVanishing T.Fr
+                                (fun ℓ : Lt1 Dw => cc ℓ.1)
+                                (fun ℓ => s ℓ.1)
+                                (fun ℓ => (
+                                  C.ch.uvec ℓ,
+                                  fun i =>
+                                    algebraMap T.V T.Fr (φ ℓ i)
+                                      - (TB.sg1 T.Fr C.ch.h).mulVec (C.ch.uvec ℓ) i
+                                ))
+                                (fun ℓ => (0, ψ ℓ)) := by
   classical
   intro E _ _ _ H Dw l Xo c _ hstar T io y C hG p a m hp hpV hm hd hmove e _
   letI := io.toAlgebra
@@ -187,8 +278,8 @@ theorem GlobalTheory.PlaceInt.exists_ramified_eigenLifts : ∀ (E : Type) [Field
   obtain ⟨hc, -, heig0, -⟩ := hall B hB
   have hinj : Function.Injective (algebraMap T.V T.Fr) := IsFractionRing.injective T.V T.Fr
   have hRQ : TB.IsRQ (R := T.V) T.Fr := isRQ_of_nonunit p hp.ne_zero hpV
-  have huv : ∀ ℓ, C.ch.uvec ℓ = fun i => algebraMap T.V T.Fr (C.uvecT ℓ i) :=
-    fun ℓ => funext (C.gen.1.2.2.2.2.2.2 ℓ)
+  have huv : ∀ ℓ, C.ch.uvec ℓ = fun i => algebraMap T.V T.Fr (C.uvecT ℓ i) := fun ℓ =>
+    funext (C.gen.1.2.2.2.2.2.2 ℓ)
   let ψ : (E →+* ℂ) → E →+* T.Fr := fun τ => io.comp (embF c τ)
   let χ : (E →+* ℂ) → 𝓞 E →+* T.Fr := fun τ => (ψ τ).comp (algebraMap (𝓞 E) E)
   choose σ hσ using fun τ => exists_ringOfIntegers_lift E T.V T.Fr (ψ τ)
@@ -262,14 +353,17 @@ theorem GlobalTheory.PlaceInt.exists_ramified_eigenLifts : ∀ (E : Type) [Field
     rw [← hstar] at hx'
     exact hx' hx
   obtain ⟨cc, s, hpair⟩ := exists_pairs_sides pl cjP hcj hne
-  have hplace : ∀ w : Ideal (𝓞 E), ∃ (n : ℕ) (b : Fin n → 𝓞 E) (a : Fin n → T.V), ∀ t,
-      ERam.evD (χ t) b (fun i => algebraMap T.V T.Fr (a i)) = if pl t = w then 1 else 0 := by
+  have hplace
+      : ∀ w : Ideal (𝓞 E), ∃ (n : ℕ) (b : Fin n → 𝓞 E) (a : Fin n → T.V), ∀ t,
+        ERam.evD (χ t) b (fun i => algebraMap T.V T.Fr (a i)) = if pl t = w then 1 else 0 := by
     intro w
     by_cases hw : ∃ t, pl t = w
     · obtain ⟨t0, rfl⟩ := hw
       obtain ⟨n, b, a, h⟩ := placeIdem E T.V T.Fr (pl t0) (hplp t0) (hpl0 t0)
       refine ⟨n, b, a, fun t => (h (ψ t)).trans (if_congr ?_ rfl rfl)⟩
-      have hmem : ∀ x : 𝓞 E, ψ t (x : E) ∈ algebraMap T.V T.Fr '' (maximalIdeal T.V : Set T.V) ↔ x ∈ pl t := by
+      have hmem
+          : ∀ x : 𝓞 E,
+            ψ t (x : E) ∈ algebraMap T.V T.Fr '' (maximalIdeal T.V : Set T.V) ↔ x ∈ pl t := by
         intro x
         rw [← hσ, hinj.mem_set_image]
         rfl
@@ -288,17 +382,28 @@ theorem GlobalTheory.PlaceInt.exists_ramified_eigenLifts : ∀ (E : Type) [Field
     have h2 := hδv τ
     rw [h, zero_pow hn.ne', zero_dvd_iff] at h2
     exact pow_ne_zero _ hp0 h2
-  obtain ⟨φ, ψ', h1, h2, h3, h4, h5⟩ := ERam.eigLiftRam_core hRQ B (gaugeOf C) hc (fun ℓ : Lt1 Dw => ℓ.1) χ
-    ComplexEmbedding.conjugate hχsep hχinj C.uvecT (fun ℓ a => by rw [← huv]; exact heig0 ℓ a)
-    (fun _ => ERam.nI E) (fun _ => ERam.bD _ hNint) (fun t => ERam.cD (ψ t) _) (fun t => ERam.eqv_D _ _ hNint)
-    (ERam.comp_D ψ (fun x => by rw [htr, eq_ratCast]) _ hN0 hNint _)
-    (ERam.comp_D ψ (fun x => by rw [htr, eq_ratCast]) _ hN0 hNint _)
-    pl cjP hpl nP bP aP (fun w t => by convert hP w t)
-    (fun _ => ERam.nI E) (fun t => ERam.bD _ (isIntegral_mul_dual _ (hδ t))) (fun t => ERam.cD (ψ t) (δ t))
-    (fun t => ERam.eqv_D _ _ _) (fun t => ERam.ev_D _ _ _ (hδ0 t)) (fun t => σ t (δ t))
-    (fun t i => ⟨σ t (ERam.omF i), by
-      rw [hσ, hσ, ERam.cD, mul_div_cancel₀ _ (hδ0 t)]⟩) cc s hpair
-  refine ⟨Finset (E →+* ℂ), inferInstance, inferInstance, cc, s, fun τ => ?_, φ, ψ', fun ℓ i => ?_, ?_⟩
+  obtain ⟨φ, ψ', h1, h2, h3, h4, h5⟩ :=
+    ERam.eigLiftRam_core hRQ B (gaugeOf C) hc
+      (fun ℓ : Lt1 Dw => ℓ.1)
+      χ ComplexEmbedding.conjugate hχsep hχinj C.uvecT
+      (fun ℓ a => by rw [← huv]; exact heig0 ℓ a)
+      (fun _ => ERam.nI E)
+      (fun _ => ERam.bD _ hNint)
+      (fun t => ERam.cD (ψ t) _)
+      (fun t => ERam.eqv_D _ _ hNint)
+      (ERam.comp_D ψ (fun x => by rw [htr, eq_ratCast]) _ hN0 hNint _)
+      (ERam.comp_D ψ (fun x => by rw [htr, eq_ratCast]) _ hN0 hNint _) pl cjP hpl nP bP aP
+      (fun w t => by convert hP w t)
+      (fun _ => ERam.nI E)
+      (fun t => ERam.bD _ (isIntegral_mul_dual _ (hδ t)))
+      (fun t => ERam.cD (ψ t) (δ t))
+      (fun t => ERam.eqv_D _ _ _)
+      (fun t => ERam.ev_D _ _ _ (hδ0 t))
+      (fun t => σ t (δ t))
+      (fun t i => ⟨σ t (ERam.omF i), by rw [hσ, hσ, ERam.cD, mul_div_cancel₀ _ (hδ0 t)]⟩)
+      cc s hpair
+  refine
+    ⟨Finset (E →+* ℂ), inferInstance, inferInstance, cc, s, fun τ => ?_, φ, ψ', fun ℓ i => ?_, ?_⟩
   · obtain ⟨e1, e2⟩ := hpair τ _ (hpl τ)
     exact ⟨e1.symm, e2.symm⟩
   · have := bound_of_den (k := T.Fr) _ _ hp0 _ a hn (hδv ℓ.1) _ (h1 ℓ i) e

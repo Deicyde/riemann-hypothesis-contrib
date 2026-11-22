@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 open Classical
 
 namespace GlobalTheory.LtCharCont
@@ -22,13 +23,15 @@ open GlobalTheory.ExpImage Filter Topology Formalism.MainNotions.LocalSituation
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem oB_mem {P : LocPrime l} {AI : LocAinf l P} (T : LocTied l P AI) (w : Om l) :
-    oB P w ∈ FilB P 0 := by
+theorem oB_mem {P : LocPrime l} {AI : LocAinf l P} (T : LocTied l P AI) (w : Om l)
+    : oB P w ∈ FilB P 0 := by
   obtain ⟨y, h1, -⟩ := T.om w
   exact (GlobalTheory.ThetaTie.fil_zero T _).2 ⟨y, h1.symm⟩
 
-theorem norm_th_le_of_mem_Lat {P : LocPrime l} {AI : LocAinf l P} (Θ : ThetaL P AI) {n : ℕ}
-    {y : P.R.BdR} (hy : y ∈ Lat AI 1 n) : ‖Θ.θ y‖ ≤ ‖(l : ℚ_[l])‖ ^ n := by
+theorem norm_th_le_of_mem_Lat
+    {P : LocPrime l} {AI : LocAinf l P} (Θ : ThetaL P AI)
+    {n : ℕ} {y : P.R.BdR} (hy : y ∈ Lat AI 1 n)
+    : ‖Θ.θ y‖ ≤ ‖(l : ℚ_[l])‖ ^ n := by
   obtain ⟨a, ha⟩ := hy
   have hy0 : y ∈ FilB P 0 := Lat_mem_zero AI ⟨a, ha⟩
   have hi0 : io AI (((l : ℕ) : Ainf l) ^ n * a) ∈ FilB P 0 := io_mem AI _
@@ -50,15 +53,19 @@ theorem norm_th_le_of_mem_Lat {P : LocPrime l} {AI : LocAinf l P} (Θ : ThetaL P
   rw [e3]
   have := Θ.θ_int a
   rw [← io_apply AI a] at this
-  calc _ ≤ ‖(l : ℚ_[l])‖ ^ n * 1 := by gcongr
+  calc
+    _ ≤ ‖(l : ℚ_[l])‖ ^ n * 1 := by gcongr
     _ = _ := mul_one _
 
-theorem continuous_char_of_act : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
-    LocTied l P AI → ∀ (K : FinExt l) (x : P.R.B), IsUnit x → P.ιB x ∈ (P.PD K).Fil 1 →
-    P.ιB x ∉ (P.PD K).Fil 2 → ∀ c : ↥(GK K) →* (↥(K0 K))ˣ,
-    (∀ g : ↥(GK K), P.actQ (g : GQ l) x =
-      algebraMap ↥(K0 K) P.R.B ((c g : (↥(K0 K))ˣ) : ↥(K0 K)) * x) →
-    Continuous (fun g : ↥(GK K) => (((c g : (↥(K0 K))ˣ) : ↥(K0 K)) : Om l)) := by
+theorem continuous_char_of_act
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → ∀ (K : FinExt l) (x : P.R.B),
+          IsUnit x → P.ιB x ∈ (P.PD K).Fil 1 → P.ιB x ∉ (P.PD K).Fil 2
+            → ∀ c : ↥(GK K) →* (↥(K0 K))ˣ,
+              (∀ g : ↥(GK K),
+                  P.actQ (g : GQ l) x = algebraMap ↥(K0 K) P.R.B ((c g : (↥(K0 K))ˣ) : ↥(K0 K)) * x)
+                → Continuous (fun g : ↥(GK K) => (((c g : (↥(K0 K))ˣ) : ↥(K0 K)) : Om l)) := by
   intro l _ P AI T K x _hxu hx1 hx2 c hc
   let Θ := GlobalTheory.ThetaTie.thetaL T
   have hF : ∀ (a : ℤ) (y : P.R.BdR), y ∈ (P.PD K).Fil a ↔ y ∈ FilB P a := fun a y =>
@@ -84,7 +91,8 @@ theorem continuous_char_of_act : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
   let χv : ↥(GK K) → Om l := fun g => algebraMap ℚ_[l] (Om l) (P.χQ (g : GQ l) : ℚ_[l])
   let uv : ↥(GK K) → Om l := fun g => cv g * (χv g)⁻¹
   have hK0 : ∀ z : ↥(K0 K), P.ιB (algebraMap ↥(K0 K) P.R.B z) = oB P (z : Om l) := fun z =>
-    GlobalTheory.LocIota.ιB_algebraMap_Kur P (IntermediateField.inclusion (inf_le_right : K0 K ≤ MaximalUnramifiedExtension l) z)
+    GlobalTheory.LocIota.ιB_algebraMap_Kur P
+      (IntermediateField.inclusion (inf_le_right : K0 K ≤ MaximalUnramifiedExtension l) z)
   have hqo : ∀ z : ℚ_[l], qB P z = oB P (algebraMap ℚ_[l] (Om l) z) := fun z =>
     IsScalarTower.algebraMap_apply ℚ_[l] (Om l) P.R.BdR z
   have hact : ∀ g : ↥(GK K), P.actQdR (g : GQ l) (s * P.ιB x) = oB P (uv g) * (s * P.ιB x) := by

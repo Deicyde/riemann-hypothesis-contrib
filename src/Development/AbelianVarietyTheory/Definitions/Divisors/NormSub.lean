@@ -22,12 +22,16 @@ def simT (c : A →ₐ[k] A) : Subgroup Aˣ where
     rintro x ⟨s, hs⟩
     refine ⟨s⁻¹, ?_⟩
     have h1 : ((x⁻¹ : Aˣ) : A) * c ((x⁻¹ : Aˣ) : A) * algebraMap k A s = 1 := by
-      rw [← hs, show ((x⁻¹ : Aˣ) : A) * c ((x⁻¹ : Aˣ) : A) * ((x : A) * c x)
-          = (((x⁻¹ : Aˣ) : A) * x) * c (((x⁻¹ : Aˣ) : A) * x) by rw [map_mul]; ring]
+      rw [← hs,
+        show ((x⁻¹ : Aˣ) : A) * c ((x⁻¹ : Aˣ) : A) * ((x : A) * c x)
+            = (((x⁻¹ : Aˣ) : A) * x) * c (((x⁻¹ : Aˣ) : A) * x) by
+          rw [map_mul]; ring]
       simp
-    calc ((x⁻¹ : Aˣ) : A) * c ((x⁻¹ : Aˣ) : A)
-        = ((x⁻¹ : Aˣ) : A) * c ((x⁻¹ : Aˣ) : A) * (algebraMap k A s * algebraMap k A ((s⁻¹ : kˣ) : k)) := by
-          rw [← map_mul, Units.mul_inv, map_one, mul_one]
+    calc
+      ((x⁻¹ : Aˣ) : A) * c ((x⁻¹ : Aˣ) : A)
+          = ((x⁻¹ : Aˣ) : A) * c ((x⁻¹ : Aˣ) : A)
+            * (algebraMap k A s * algebraMap k A ((s⁻¹ : kˣ) : k)) := by
+        rw [← map_mul, Units.mul_inv, map_one, mul_one]
       _ = algebraMap k A ((s⁻¹ : kˣ) : k) := by rw [← mul_assoc, h1, one_mul]
 
 end GlobalTheory.LKTorus

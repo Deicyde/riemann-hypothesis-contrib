@@ -40,30 +40,36 @@ theorem ConeSlabBound.proof (hV : VarietySlabMeasure.Statement) : ConeSlabBound.
   let K : ℝ≥0 := ‖L‖₊
   refine ⟨(K : ℝ) ^ s * C, α, hα, fun ε hε hε1 => ?_⟩
 
-  have hsub : coneBall h W ∩ {y | ‖∑ j, u j * h.pointOf y j‖ ≤ ε * ‖y‖} ⊆
-      L '' {z | z ∈ zeroSetEuc W ∧ ‖z‖ ≤ ‖F‖ ∧ ‖∑ j, u j * z j‖ ≤ ε} := by
+  have hsub
+      : coneBall h W ∩ {y | ‖∑ j, u j * h.pointOf y j‖ ≤ ε * ‖y‖}
+        ⊆ L '' {z | z ∈ zeroSetEuc W ∧ ‖z‖ ≤ ‖F‖ ∧ ‖∑ j, u j * z j‖ ≤ ε} := by
     rintro y ⟨⟨hy1, hyW⟩, hyu⟩
     refine ⟨F y, ⟨fun q hq => ?_, ?_, ?_⟩, hLF y⟩
     · have : (fun i => F y i) = h.pointOf y := funext (hF y)
       rw [this]
       exact hyW q hq
-    · calc ‖F y‖ ≤ ‖F‖ * ‖y‖ := F.le_opNorm y
+    · calc
+        ‖F y‖
+          ≤ ‖F‖ * ‖y‖ := F.le_opNorm y
         _ ≤ ‖F‖ * 1 := mul_le_mul_of_nonneg_left hy1.le (norm_nonneg _)
         _ = ‖F‖ := mul_one _
     · simp only [hF]
-      calc ‖∑ j, u j * h.pointOf y j‖ ≤ ε * ‖y‖ := hyu
+      calc
+        ‖∑ j, u j * h.pointOf y j‖
+          ≤ ε * ‖y‖ := hyu
         _ ≤ ε * 1 := mul_le_mul_of_nonneg_left hy1.le hε.le
         _ = ε := mul_one _
-  calc μH[s] (coneBall h W ∩ {y | ‖∑ j, u j * h.pointOf y j‖ ≤ ε * ‖y‖})
+  calc
+    μH[s] (coneBall h W ∩ {y | ‖∑ j, u j * h.pointOf y j‖ ≤ ε * ‖y‖})
       ≤ μH[s] (L '' {z | z ∈ zeroSetEuc W ∧ ‖z‖ ≤ ‖F‖ ∧ ‖∑ j, u j * z j‖ ≤ ε}) := measure_mono hsub
     _ ≤ (K : ℝ≥0∞) ^ s * μH[s] {z | z ∈ zeroSetEuc W ∧ ‖z‖ ≤ ‖F‖ ∧ ‖∑ j, u j * z j‖ ≤ ε} :=
-        L.lipschitz.hausdorffMeasure_image_le hs0 _
+      L.lipschitz.hausdorffMeasure_image_le hs0 _
     _ ≤ (K : ℝ≥0∞) ^ s * ENNReal.ofReal (C * ε ^ α) := by
-        gcongr
-        exact hb ε hε hε1
+      gcongr
+      exact hb ε hε hε1
     _ = ENNReal.ofReal ((K : ℝ) ^ s * C * ε ^ α) := by
-        rw [mul_assoc, ENNReal.ofReal_mul (Real.rpow_nonneg K.coe_nonneg _),
-          ← ENNReal.ofReal_rpow_of_nonneg K.coe_nonneg hs0, ENNReal.ofReal_coe_nnreal]
+      rw [mul_assoc, ENNReal.ofReal_mul (Real.rpow_nonneg K.coe_nonneg _),
+        ← ENNReal.ofReal_rpow_of_nonneg K.coe_nonneg hs0, ENNReal.ofReal_coe_nnreal]
 
 end
 

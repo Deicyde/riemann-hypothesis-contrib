@@ -14,8 +14,10 @@ noncomputable section
 
 namespace GlobalTheory.RowModelRoad
 
-open GlobalTheory.TypeLeaf Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
-open GlobalTheory.BlockComplement GlobalTheory.IndefiniteRowSideFullHecke.BlockRepresentationsSemisimple
+open GlobalTheory.TypeLeaf Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+open GlobalTheory.BlockComplement
+  GlobalTheory.IndefiniteRowSideFullHecke.BlockRepresentationsSemisimple
 
 section Twist
 
@@ -25,19 +27,24 @@ end Twist
 
 section Lift
 
-variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N) (i : N.Loc)
+variable
+  {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N) (i : N.Loc)
 
 end Lift
 
 section Eig
 
-variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} {N : NData R H what₂} (A : NAut N) (i : N.Loc)
+variable
+  {R : Ranks} {H : Host R} {what₂ : Rows.Data R} {N : NData R H what₂} (A : NAut N) (i : N.Loc)
 
-theorem frobEig_block (θ : A.CG 1) (t : ℕ) (w : PlE H) (b : ℂ) (hu : A.unr (A.locG θ w))
-    (hb : A.frobEig (A.locG θ w) = {b}) :
-    A.unr (spehLoc N A ⟨1, θ, t⟩ w) ∧ A.frobEig (spehLoc N A ⟨1, θ, t⟩ w) =
-      ((List.range t : List ℕ) : Multiset ℕ).map
-        fun k : ℕ => b * ((normV w : ℕ) : ℂ) ^ (((((t : ℝ) - 1) / 2 - k : ℝ)) : ℂ) := by
+theorem frobEig_block
+    (θ : A.CG 1)
+    (t : ℕ)
+    (w : PlE H) (b : ℂ) (hu : A.unr (A.locG θ w)) (hb : A.frobEig (A.locG θ w) = {b})
+    : A.unr (spehLoc N A ⟨1, θ, t⟩ w)
+      ∧ A.frobEig (spehLoc N A ⟨1, θ, t⟩ w)
+        = ((List.range t : List ℕ) : Multiset ℕ).map fun k : ℕ =>
+          b * ((normV w : ℕ) : ℂ) ^ (((((t : ℝ) - 1) / 2 - k : ℝ)) : ℂ) := by
   unfold spehLoc
   dsimp only
   induction List.range t with

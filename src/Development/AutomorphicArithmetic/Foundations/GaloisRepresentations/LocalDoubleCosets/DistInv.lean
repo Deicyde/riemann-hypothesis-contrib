@@ -5,27 +5,32 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory
+  UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
 
-private theorem comp_mem_Cc {X : Type} [TopologicalSpace X] (s : X → X) (q : ℕ) (hs : Continuous s)
-    (hsp : ∀ x, s^[q + 1] x = x) {f : X → ℂ} (hf : f ∈ Cc X) : f ∘ s ∈ Cc X := by
+private theorem comp_mem_Cc
+    {X : Type} [TopologicalSpace X]
+    (s : X → X) (q : ℕ) (hs : Continuous s) (hsp : ∀ x, s^[q + 1] x = x)
+    {f : X → ℂ} (hf : f ∈ Cc X)
+    : f ∘ s ∈ Cc X := by
   obtain ⟨h1, h2⟩ := hf
-  let e : X ≃ₜ X :=
-    { toFun := s
-      invFun := s^[q]
-      left_inv := fun y => by
-        show s^[q] (s y) = y
-        rw [← Function.iterate_succ_apply s q y, hsp]
-      right_inv := fun y => by
-        show s (s^[q] y) = y
-        rw [← Function.iterate_succ_apply' s q y, hsp]
-      continuous_toFun := hs
-      continuous_invFun := hs.iterate q }
+  let e : X ≃ₜ X := {
+    toFun := s
+    invFun := s^[q]
+    left_inv := fun y => by
+      show s^[q] (s y) = y
+      rw [← Function.iterate_succ_apply s q y, hsp]
+    right_inv := fun y => by
+      show s (s^[q] y) = y
+      rw [← Function.iterate_succ_apply' s q y, hsp]
+    continuous_toFun := hs
+    continuous_invFun := hs.iterate q
+  }
   exact ⟨h1.comp_continuous hs, h2.comp_homeomorph e⟩
 
-theorem UpperTheory.Gal.LocD.distInv :
-    DistZero → DistInv := by
-  intro hZ X H _ _ _ _ _ _ _ _ _ _ _ _ _ s τ p hp hs hτ hsp hτp hsτ χ hχL hχτ k x hxs horb hcl D hD f hf
+theorem UpperTheory.Gal.LocD.distInv : DistZero → DistInv := by
+  intro hZ X H _ _ _ _ _ _ _ _ _ _ _ _ _ s τ p hp hs hτ hsp hτp hsτ χ hχL hχτ k x hxs horb hcl D hD
+    f hf
   have hsp' : ∀ y, s^[p - 1 + 1] y = y := fun y => by rw [Nat.sub_add_cancel hp]; exact hsp y
   have cc : ∀ g ∈ Cc X, g ∘ s ∈ Cc X := fun g hg => comp_mem_Cc s (p - 1) hs hsp' hg
   let D' : (X → ℂ) →ₗ[ℂ] ℂ := D.comp (LinearMap.funLeft ℂ ℂ s) - D
@@ -40,8 +45,9 @@ theorem UpperTheory.Gal.LocD.distInv :
       rw [hh', ← Function.iterate_succ_apply' τ (p - 1) h, Nat.succ_eq_add_one,
         Nat.sub_add_cancel hp, hτp]
     have hχh : χ h' = χ h := by rw [← hχτ h', hτh]
-    have hcomp : GroundTheory.Automorphic.Whittaker.transl h g ∘ s
-        = GroundTheory.Automorphic.Whittaker.transl h' (g ∘ s) := by
+    have hcomp
+        : GroundTheory.Automorphic.Whittaker.transl h g ∘ s
+          = GroundTheory.Automorphic.Whittaker.transl h' (g ∘ s) := by
       ext y
       simp only [Function.comp_apply, GroundTheory.Automorphic.Whittaker.transl_apply]
       rw [hsτ, map_inv, hτh]

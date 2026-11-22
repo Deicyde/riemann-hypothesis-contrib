@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.B2x5
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 section Herm
 
@@ -59,7 +60,8 @@ def i0 (k r' : ℕ) : Fin (2 * (1 + r') + k + 1) := eI k (1 + r') (a0 r')
 
 def iL (k r' : ℕ) : Fin (2 * (1 + r') + k + 1) := esI k (1 + r') (a0 r')
 
-def res (k r' : ℕ) (u : Fin (2 * (1 + r') + k + 1) → ℂ) : Fin (2 * r' + k + 1) → ℂ := fun j => u (levPos k 1 r' j)
+def res (k r' : ℕ) (u : Fin (2 * (1 + r') + k + 1) → ℂ) : Fin (2 * r' + k + 1) → ℂ := fun j =>
+  u (levPos k 1 r' j)
 
 lemma first_index_val (k r' : ℕ) : (i0 k r').val = 0 := rfl
 
@@ -662,7 +664,9 @@ theorem heisHaar : HeisHaar := by
   · intro a ha
     obtain ⟨x, rfl⟩ := Set.mem_range.mp ha
     refine map_μHeis k r' (measurable_lmulM _)
-      (shear k r' (measurePreserving_add_left volume x.1) ((measurable_herm_im_left k r' x.1).const_sub x.2)) ?_
+      (shear k r' (measurePreserving_add_left volume x.1)
+        ((measurable_herm_im_left k r' x.1).const_sub x.2))
+      ?_
     intro y
     show heis0 k r' x * heis0 k r' y = heis0 k r' (x.1 + y.1, y.2 + (x.2 - (herm (Hpk k r') y.1 x.1).im))
     rw [heisMul]
@@ -671,13 +675,16 @@ theorem heisHaar : HeisHaar := by
   · intro a ha
     obtain ⟨x, rfl⟩ := Set.mem_range.mp ha
     refine map_μHeis k r' (measurable_rmulF _)
-      (shear k r' (measurePreserving_add_left volume x.1) ((measurable_herm_im_right k r' x.1).const_sub x.2)) ?_
+      (shear k r' (measurePreserving_add_left volume x.1)
+        ((measurable_herm_im_right k r' x.1).const_sub x.2))
+      ?_
     intro y
     show heis0 k r' y * heis0 k r' x = heis0 k r' (x.1 + y.1, y.2 + (x.2 - (herm (Hpk k r') x.1 y.1).im))
     rw [heisMul]
     congr 2 <;> first | ring | abel
   · intro K hK
-    have hK' : IsCompact (coord k r' '' (K : Set (Mat k (1 + r')))) := hK.image (continuous_coord k r')
+    have hK' : IsCompact (coord k r' '' (K : Set (Mat k (1 + r')))) :=
+      hK.image (continuous_coord k r')
     rw [μHeis_eq, Measure.map_apply (measurable_heisT k r') hK.measurableSet]
     refine lt_of_le_of_lt (measure_mono ?_) hK'.measure_lt_top
     intro x hx
@@ -688,7 +695,8 @@ theorem heisHaar : HeisHaar := by
     first
     | exact NeZero.ne _ h
     | exact (IsOpenPosMeasure.open_pos (μ := (volume : Measure (HPar k r'))) Set.univ isOpen_univ
-        Set.univ_nonempty) (by rw [h]; rfl)
+          Set.univ_nonempty)
+        (by rw [h]; rfl)
 
 lemma normSq_det_GV {k r : ℕ} {g : Mat k r} (hg : g ∈ GV k r) : Complex.normSq g.det = 1 := by
   have hH := isUnit_det_Hpk k r
@@ -740,8 +748,10 @@ theorem heisenberg_subgroup_closed : Formalism.FourierDecayAlt.B2.HeisClosed := 
 
 theorem heisenberg_haar_measure : Formalism.FourierDecayAlt.B2.HeisHaar := B2x5.heisHaar
 
-theorem heisenberg_conjugation_by_levi : Formalism.FourierDecayAlt.B2.HeisConjLev := B2x5.heisConjLev
+theorem heisenberg_conjugation_by_levi : Formalism.FourierDecayAlt.B2.HeisConjLev :=
+  B2x5.heisConjLev
 
-theorem heisenberg_levi_conjugation_measure : Formalism.FourierDecayAlt.B2.HeisConjLevMeas := B2x5.heisConjLevMeas
+theorem heisenberg_levi_conjugation_measure : Formalism.FourierDecayAlt.B2.HeisConjLevMeas :=
+  B2x5.heisConjLevMeas
 
 end Formalism.FourierDecayAlt.P

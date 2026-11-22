@@ -14,19 +14,20 @@ noncomputable section
 
 namespace GlobalTheory.ColClassCompare
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.StandardLattice GlobalTheory.IndefiniteRowSideFullHecke.SplitColumnClasses
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.StandardLattice
+  GlobalTheory.IndefiniteRowSideFullHecke.SplitColumnClasses
 
 section Descent
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {p : ℕ}
 
-theorem unram_card_of_split (hp : p.Prime)
-    (h : (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E)
-    (v : Ideal (𝓞 F)) [hv : v.IsPrime] (hpv : (p : 𝓞 F) ∈ v) :
-    (p : 𝓞 F) ∉ v ^ 2 ∧ Nat.card (𝓞 F ⧸ v) = p := by
+theorem unram_card_of_split
+    (hp : p.Prime) (h : (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E)
+    (v : Ideal (𝓞 F)) [hv : v.IsPrime]
+    (hpv : (p : 𝓞 F) ∈ v)
+    : (p : 𝓞 F) ∉ v ^ 2 ∧ Nat.card (𝓞 F ⧸ v) = p := by
   obtain ⟨P, hP, hPl⟩ := (inferInstance : Nonempty (v.primesOver (𝓞 E)))
-  have hgP : (p : 𝓞 E) ∈ P := by
-    simpa using (Ideal.mem_of_liesOver P v (p : 𝓞 F)).1 hpv
+  have hgP : (p : 𝓞 E) ∈ P := by simpa using (Ideal.mem_of_liesOver P v (p : 𝓞 F)).1 hpv
   obtain ⟨hP2, hP3⟩ := GlobalTheory.LocSplit.split_prime hp h P hgP
   refine ⟨fun h2 => hP2 ?_, ?_⟩
   · have := Ideal.mem_map_of_mem (algebraMap (𝓞 F) (𝓞 E)) h2
@@ -48,28 +49,32 @@ theorem unram_card_of_split (hp : p.Prime)
       simpa using hm
     rw [← Nat.card_eq_of_bijective _ hb, Nat.card_zmod]
 
-theorem ncard_primesOver_of_split (hp : p.Prime)
-    (h : (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E) :
-    (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 F)).ncard = Module.finrank ℚ F := by
+theorem ncard_primesOver_of_split
+    (hp : p.Prime) (h : (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E)
+    : (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 F)).ncard = Module.finrank ℚ F := by
   classical
   have hp' : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
   haveI : (Ideal.span {(p : ℤ)}).IsPrime := (Ideal.span_singleton_prime hp'.ne_zero).mpr hp'
   have hne : (Ideal.span {(p : ℤ)}) ≠ ⊥ := by simpa using hp.ne_zero
   haveI hmax : (Ideal.span {(p : ℤ)}).IsMaximal := Ideal.IsPrime.isMaximal inferInstance hne
   have hs := Ideal.sum_ramification_inertia (𝓞 F) ℚ F (p := Ideal.span {(p : ℤ)}) hne
-  rw [← hs, ← IsDedekindDomain.coe_primesOverFinset hne, Set.ncard_coe_finset, Finset.card_eq_sum_ones]
+  rw [← hs, ← IsDedekindDomain.coe_primesOverFinset hne, Set.ncard_coe_finset,
+    Finset.card_eq_sum_ones]
   refine Finset.sum_congr rfl fun q hq => ?_
   rw [IsDedekindDomain.mem_primesOverFinset_iff hne] at hq
   haveI := hq.1
   haveI := hq.2
   have hpq : (p : 𝓞 F) ∈ q := by
-    simpa using (Ideal.mem_of_liesOver q (Ideal.span {(p : ℤ)}) (p : ℤ)).1 (Ideal.mem_span_singleton_self _)
+    simpa using
+      (Ideal.mem_of_liesOver q (Ideal.span {(p : ℤ)}) (p : ℤ)).1 (Ideal.mem_span_singleton_self _)
   obtain ⟨h2, hc⟩ := unram_card_of_split (E := E) hp h q hpq
   have he : (Ideal.span {(p : ℤ)}).ramificationIdx' q = 1 := by
     by_contra hne1
     refine h2 ?_
-    have := (Ideal.ramificationIdx'_ne_one_iff (by
-      rw [Ideal.map_span, Set.image_singleton, Ideal.span_singleton_le_iff_mem]; simpa using hpq)).1 hne1
+    have :=
+      (Ideal.ramificationIdx'_ne_one_iff (by
+        rw [Ideal.map_span, Set.image_singleton, Ideal.span_singleton_le_iff_mem]
+        simpa using hpq)).1 hne1
     rw [Ideal.map_span, Set.image_singleton, Ideal.span_singleton_le_iff_mem] at this
     simpa using this
   have hf : (Ideal.span {(p : ℤ)}).inertiaDeg' q = 1 := by
@@ -86,7 +91,8 @@ theorem finrank_F (D : D7) : Module.finrank ℚ D.host.F = D.R.f := by
   rw [D.sp.cm.deg2, finrank_host D] at h1
   omega
 
-theorem splitsF_of_splitsCompletely (D : D7) {p : ℕ} (h : SplitsCompletely D.host.E p) : SplitsF D p := by
+theorem splitsF_of_splitsCompletely (D : D7) {p : ℕ} (h : SplitsCompletely D.host.E p)
+    : SplitsF D p := by
   obtain ⟨hp, h⟩ := h
   rw [GlobalTheory.HostSplit.ncard_placesOver _ hp] at h
   refine ⟨?_, fun v hv => ?_⟩
@@ -97,8 +103,8 @@ theorem splitsF_of_splitsCompletely (D : D7) {p : ℕ} (h : SplitsCompletely D.h
   · haveI := v.isPrime
     exact (unram_card_of_split hp h v.asIdeal hv).2
 
-theorem levelPrime_mod (D : D7) (u : D.what₂.Word) :
-    (D.mem u).A.T % (D.host.QS * D.host.q * D.host.d) = 1 := by
+theorem levelPrime_mod (D : D7) (u : D.what₂.Word)
+    : (D.mem u).A.T % (D.host.QS * D.host.q * D.host.d) = 1 := by
   obtain ⟨π, -, hn, hm⟩ := D.T_norm u
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.1 hm
   have hq8 : D.host.q % 8 = 3 := D.host.hyp.2.2.1
@@ -130,7 +136,7 @@ theorem levelPrime_mod (D : D7) (u : D.what₂.Word) :
     have hM0' : (M : D.host.E) ≠ 0 := by exact_mod_cast (by omega : M ≠ 0)
     rw [map_div₀, map_sub, map_one, map_natCast, map_natCast, eq_div_iff hM0', hz]
     linear_combination hn
-  rw [h4, isIntegral_algebraMap_iff ] at hzi
+  rw [h4, isIntegral_algebraMap_iff] at hzi
   obtain ⟨n, hn'⟩ := IsIntegrallyClosed.isIntegral_iff.1 hzi
   have h5 : (((D.mem u).A.T : ℤ) : ℚ) = ((1 + M * n : ℤ) : ℚ) := by
     have : (n : ℚ) = (((D.mem u).A.T : ℚ) - 1) / M := by simpa using hn'
@@ -144,12 +150,14 @@ theorem levelPrime_mod (D : D7) (u : D.what₂.Word) :
     exact Int.emod_eq_of_lt (by norm_num) (by exact_mod_cast hM1)
   exact_mod_cast h7
 
-theorem levelPrime_splitsCompletely_in_cmField (D : D7) (u : D.what₂.Word) : SplitsCompletely D.host.E (D.mem u).A.T :=
-  ⟨(D.mem u).A.T_prime,
-    (GlobalTheory.HostSplit.split_of_one_mod D.R D.host _ (D.mem u).A.T_prime (levelPrime_mod D u)).1⟩
+theorem levelPrime_splitsCompletely_in_cmField (D : D7) (u : D.what₂.Word)
+    : SplitsCompletely D.host.E (D.mem u).A.T := ⟨
+  (D.mem u).A.T_prime,
+  (GlobalTheory.HostSplit.split_of_one_mod D.R D.host _ (D.mem u).A.T_prime (levelPrime_mod D u)).1
+⟩
 
-theorem split_g_iff (D : D7) (i : Fin 2) :
-    SplitsF D (D.host.g i) ↔ SplitsCompletely D.host.E (D.host.g i) :=
+theorem split_g_iff (D : D7) (i : Fin 2)
+    : SplitsF D (D.host.g i) ↔ SplitsCompletely D.host.E (D.host.g i) :=
   ⟨fun _ => splitsCompletely_g D i, splitsF_of_splitsCompletely D⟩
 
 end GlobalTheory.ColClassCompare

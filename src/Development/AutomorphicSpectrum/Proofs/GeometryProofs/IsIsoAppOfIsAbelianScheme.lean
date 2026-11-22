@@ -12,29 +12,35 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianSchem
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace GlobalTheory.CompanionTheory.Ar.Approx
 
-theorem isAbelianScheme_pullback {S S' : Scheme.{0}} (A : Over S) [GrpObj A]
-    (hA : IsAbelianScheme A) (f : S' ⟶ S) : IsAbelianScheme ((Over.pullback f).obj A) :=
-  { comm := by have := hA.comm; infer_instance
-    smooth := by have := hA.smooth; show Smooth (pullback.snd _ _); infer_instance
-    proper := by have := hA.proper; show IsProper (pullback.snd _ _); infer_instance
-    geomConnected := by
-      have := hA.geomConnected; show GeometricallyConnected (pullback.snd _ _); infer_instance }
+theorem isAbelianScheme_pullback
+    {S S' : Scheme.{0}} (A : Over S) [GrpObj A] (hA : IsAbelianScheme A) (f : S' ⟶ S)
+    : IsAbelianScheme ((Over.pullback f).obj A) := {
+  comm := by have := hA.comm; infer_instance
+  smooth := by have := hA.smooth; show Smooth (pullback.snd _ _); infer_instance
+  proper := by have := hA.proper; show IsProper (pullback.snd _ _); infer_instance
+  geomConnected := by
+    have := hA.geomConnected; show GeometricallyConnected (pullback.snd _ _); infer_instance
+}
 
-theorem isIso_appTop_restrict {S : Scheme.{0}} (A : Over S) [GrpObj A]
-    (hA : IsAbelianScheme A) (V : S.Opens) [IsAffine V.toScheme] :
-    IsIso (A.hom ∣_ V).appTop := by
+theorem isIso_appTop_restrict
+    {S : Scheme.{0}} (A : Over S) [GrpObj A]
+    (hA : IsAbelianScheme A)
+    (V : S.Opens) [IsAffine V.toScheme]
+    : IsIso (A.hom ∣_ V).appTop := by
   let R : Type := Γ(V.toScheme, ⊤)
   let e : V.toScheme ≅ Sp R := V.toScheme.isoSpec
   let f : Sp R ⟶ S := e.inv ≫ V.ι
   have hf : e.hom ≫ f = V.ι := by simp [f]
   obtain ⟨S₀, B, _, φ, -, hfin, hB, hpb⟩ :=
-    GlobalTheory.T.abelianScheme_spreads_out_finiteType_subring R ((Over.pullback f).obj A) ∅ (isAbelianScheme_pullback A hA f)
+    GlobalTheory.T.abelianScheme_spreads_out_finiteType_subring R ((Over.pullback f).obj A) ∅
+      (isAbelianScheme_pullback A hA f)
   have : IsNoetherianRing S₀ := Algebra.FiniteType.isNoetherianRing ℤ S₀
   have := hB.smooth
   have := hB.proper
@@ -51,10 +57,13 @@ theorem isIso_appTop_restrict {S : Scheme.{0}} (A : Over S) [GrpObj A]
     exact (isPullback_morphismRestrict A.hom V).flip
   exact GlobalTheory.ProperFunctions.isIso_appTop_baseChange (sq.paste_horiz hpb.1)
 
-theorem isIso_app_of_isAbelianScheme : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A],
-    IsAbelianScheme A → ∀ U : S.Opens, IsIso (A.hom.app U) := fun _ A _ hA U ↦
-  GlobalTheory.ProperFunctions.isIso_app_of_forall_affineOpens A.hom (fun V ↦
-    have : IsAffine V.1.toScheme := V.2
-    isIso_appTop_restrict A hA V.1) U
+theorem isIso_app_of_isAbelianScheme
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A],
+      IsAbelianScheme A → ∀ U : S.Opens, IsIso (A.hom.app U) := fun _ A _ hA U ↦
+  GlobalTheory.ProperFunctions.isIso_app_of_forall_affineOpens A.hom
+    (fun V ↦
+      have : IsAffine V.1.toScheme := V.2
+      isIso_appTop_restrict A hA V.1)
+    U
 
 end GlobalTheory.CompanionTheory.Ar.Approx

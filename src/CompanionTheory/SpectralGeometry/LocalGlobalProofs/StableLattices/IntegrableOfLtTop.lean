@@ -141,11 +141,11 @@ lemma iint_mono {f : ℝ → ℝ} (hf : Continuous f) (h0 : ∀ t, 0 ≤ f t) {S
   intervalIntegral.integral_mono_interval le_rfl hS hST (ae_of_all _ h0)
     (hf.intervalIntegrable _ _)
 
-theorem step_pos (hae : z.re + R = a) (ha : 0 < a) (hu : Continuous u) (hg : Continuous g)
-    (hd : ∀ t, 0 ≤ t → HasDerivAt u (z * u t + g t) t)
-    (iu : IntegrableOn (wt R u) (Ioi 0)) {P : ℝ}
-    (hP : ∀ T, 0 ≤ T → ∫ t in (0 : ℝ)..T, wt R g t ≤ P) :
-    a * ∫ t in Ioi (0 : ℝ), wt R u t ≤ P / a := by
+theorem step_pos
+    (hae : z.re + R = a) (ha : 0 < a) (hu : Continuous u) (hg : Continuous g)
+    (hd : ∀ t, 0 ≤ t → HasDerivAt u (z * u t + g t) t) (iu : IntegrableOn (wt R u) (Ioi 0))
+    {P : ℝ} (hP : ∀ T, 0 ≤ T → ∫ t in (0 : ℝ)..T, wt R g t ≤ P)
+    : a * ∫ t in Ioi (0 : ℝ), wt R u t ≤ P / a := by
   have cu := wt_cont R hu
   have base : ∀ T, 0 ≤ T → a * ∫ t in (0 : ℝ)..T, wt R u t ≤ wt R u T + P / a := by
     intro T hT
@@ -157,39 +157,47 @@ theorem step_pos (hae : z.re + R = a) (ha : 0 < a) (hu : Continuous u) (hg : Con
     have e : 2 * a - a = a := by ring
     rw [e] at h1
     linarith
-  have nth : ∀ n : ℕ, a * ∫ t in (0 : ℝ)..n, wt R u t ≤
-      ((∫ t in (0 : ℝ)..((n : ℝ) + 1), wt R u t) - ∫ t in (0 : ℝ)..n, wt R u t) + P / a := by
+  have nth
+      : ∀ n : ℕ,
+        a * ∫ t in (0 : ℝ)..n, wt R u t
+          ≤ ((∫ t in (0 : ℝ)..((n : ℝ) + 1), wt R u t) - ∫ t in (0 : ℝ)..n, wt R u t) + P / a := by
     intro n
     have hn : (0 : ℝ) ≤ n := n.cast_nonneg
-    have h1 : ∫ _t in (n : ℝ)..((n : ℝ) + 1), (a * ∫ s in (0 : ℝ)..n, wt R u s) ≤
-        ∫ t in (n : ℝ)..((n : ℝ) + 1), (wt R u t + P / a) := by
+    have h1
+        : ∫ _t in (n : ℝ)..((n : ℝ) + 1), (a * ∫ s in (0 : ℝ)..n, wt R u s)
+          ≤ ∫ t in (n : ℝ)..((n : ℝ) + 1), (wt R u t + P / a) := by
       refine intervalIntegral.integral_mono_on (by linarith)
-        (continuous_const.intervalIntegrable _ _)
-        ((cu.add continuous_const).intervalIntegrable _ _) fun t ht => ?_
+        (continuous_const.intervalIntegrable _ _) ((cu.add continuous_const).intervalIntegrable _ _)
+        fun t ht => ?_
       have h2 := iint_mono cu (wt_nonneg R u) hn ht.1
       have h3 := base t (hn.trans ht.1)
       have h4 : a * ∫ s in (0 : ℝ)..n, wt R u s ≤ a * ∫ s in (0 : ℝ)..t, wt R u s := by gcongr
       linarith
     rw [intervalIntegral.integral_add (cu.intervalIntegrable _ _)
-      (continuous_const.intervalIntegrable _ _), intervalIntegral.integral_const,
-      intervalIntegral.integral_const] at h1
-    have h2 : (∫ t in (0 : ℝ)..((n : ℝ) + 1), wt R u t) - ∫ t in (0 : ℝ)..n, wt R u t =
-        ∫ t in (n : ℝ)..((n : ℝ) + 1), wt R u t :=
+          (continuous_const.intervalIntegrable _ _),
+        intervalIntegral.integral_const, intervalIntegral.integral_const]
+      at h1
+    have h2
+        : (∫ t in (0 : ℝ)..((n : ℝ) + 1), wt R u t) - ∫ t in (0 : ℝ)..n, wt R u t
+          = ∫ t in (n : ℝ)..((n : ℝ) + 1), wt R u t :=
       intervalIntegral.integral_interval_sub_left (cu.intervalIntegrable _ _)
         (cu.intervalIntegrable _ _)
     rw [h2]
     simpa using h1
   have t1 := intervalIntegral_tendsto_integral_Ioi 0 iu tendsto_natCast_atTop_atTop
-  have t2 := intervalIntegral_tendsto_integral_Ioi (b := fun n : ℕ => (n : ℝ) + 1) 0 iu
-    (tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop)
+  have t2 :=
+    intervalIntegral_tendsto_integral_Ioi
+      (b := fun n : ℕ => (n : ℝ) + 1)
+      0 iu (tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop)
   have := le_of_tendsto_of_tendsto' (t1.const_mul a) ((t2.sub t1).add_const (P / a)) nth
   simpa using this
 
-theorem step_neg {b : ℝ} (hae : z.re + R = -b) (hb : 0 < b) (hu : Continuous u) (hg : Continuous g)
-    (hd : ∀ t, 0 ≤ t → HasDerivAt u (z * u t + g t) t)
-    (iu : IntegrableOn (wt R u) (Ioi 0)) {P : ℝ}
-    (hP : ∀ T, 0 ≤ T → ∫ t in (0 : ℝ)..T, wt R g t ≤ P) :
-    b * ∫ t in Ioi (0 : ℝ), wt R u t ≤ wt R u 0 + P / b := by
+theorem step_neg
+    {b : ℝ} (hae : z.re + R = -b) (hb : 0 < b)
+    (hu : Continuous u) (hg : Continuous g) (hd : ∀ t, 0 ≤ t → HasDerivAt u (z * u t + g t) t)
+    (iu : IntegrableOn (wt R u) (Ioi 0))
+    {P : ℝ} (hP : ∀ T, 0 ≤ T → ∫ t in (0 : ℝ)..T, wt R g t ≤ P)
+    : b * ∫ t in Ioi (0 : ℝ), wt R u t ≤ wt R u 0 + P / b := by
   have base : ∀ n : ℕ, b * ∫ t in (0 : ℝ)..n, wt R u t ≤ wt R u 0 + P / b := by
     intro n
     have hn : (0 : ℝ) ≤ n := n.cast_nonneg
@@ -204,28 +212,35 @@ theorem step_neg {b : ℝ} (hae : z.re + R = -b) (hb : 0 < b) (hu : Continuous u
   have t1 := intervalIntegral_tendsto_integral_Ioi 0 iu tendsto_natCast_atTop_atTop
   exact le_of_tendsto' (t1.const_mul b) base
 
-theorem init_bound {b : ℝ} (hae : z.re + R = -b) (hb : 0 < b) (hu : Continuous u) (hg : Continuous g)
-    (hd : ∀ t, 0 ≤ t → HasDerivAt u (z * u t + g t) t) {P : ℝ}
-    (hP : ∀ T, 0 ≤ T → ∫ t in (0 : ℝ)..T, wt R g t ≤ P) :
-    wt R u 0 ≤ (2 + 2 * b) * (∫ t in (0 : ℝ)..1, wt R u t) + P := by
+theorem init_bound
+    {b : ℝ} (hae : z.re + R = -b) (hb : 0 < b)
+    (hu : Continuous u) (hg : Continuous g) (hd : ∀ t, 0 ≤ t → HasDerivAt u (z * u t + g t) t)
+    {P : ℝ} (hP : ∀ T, 0 ≤ T → ∫ t in (0 : ℝ)..T, wt R g t ≤ P)
+    : wt R u 0 ≤ (2 + 2 * b) * (∫ t in (0 : ℝ)..1, wt R u t) + P := by
   have cu := wt_cont R hu
-  have key : ∀ t ∈ Icc (0 : ℝ) 1, wt R u 0 ≤
-      wt R u t + ((1 + 2 * b) * (∫ s in (0 : ℝ)..1, wt R u s) + P) := by
+  have key
+      : ∀ t ∈ Icc (0 : ℝ) 1,
+        wt R u 0 ≤ wt R u t + ((1 + 2 * b) * (∫ s in (0 : ℝ)..1, wt R u s) + P) := by
     intro t ht
     have h1 := energy_ge hae hu hg hd ht.1 one_pos
     have h2 := iint_mono cu (wt_nonneg R u) ht.1 ht.2
     have h3 := hP t ht.1
-    have h4 : (1 + 2 * b) * (∫ s in (0 : ℝ)..t, wt R u s) ≤
-        (1 + 2 * b) * ∫ s in (0 : ℝ)..1, wt R u s := by gcongr
+    have h4
+        : (1 + 2 * b) * (∫ s in (0 : ℝ)..t, wt R u s)
+          ≤ (1 + 2 * b) * ∫ s in (0 : ℝ)..1, wt R u s := by
+      gcongr
     rw [div_one] at h1
     linarith
-  have h : ∫ _t in (0 : ℝ)..1, wt R u 0 ≤ ∫ t in (0 : ℝ)..1,
-      (wt R u t + ((1 + 2 * b) * (∫ s in (0 : ℝ)..1, wt R u s) + P)) :=
+  have h
+      : ∫ _t in (0 : ℝ)..1, wt R u 0
+        ≤ ∫ t in (0 : ℝ)..1,
+          (wt R u t + ((1 + 2 * b) * (∫ s in (0 : ℝ)..1, wt R u s) + P)) :=
     intervalIntegral.integral_mono_on zero_le_one (continuous_const.intervalIntegrable _ _)
       ((cu.add continuous_const).intervalIntegrable _ _) key
   rw [intervalIntegral.integral_add (cu.intervalIntegrable _ _)
-    (continuous_const.intervalIntegrable _ _), intervalIntegral.integral_const,
-    intervalIntegral.integral_const] at h
+        (continuous_const.intervalIntegrable _ _),
+      intervalIntegral.integral_const, intervalIntegral.integral_const]
+    at h
   simp only [sub_zero, one_smul] at h
   linarith
 
@@ -251,12 +266,14 @@ lemma unit_le (hu : Continuous u) :
 
 end Energy
 
-theorem step {z : ℂ} {R : ℝ} (ha : z.re + R ≠ 0) : ∃ K : ℝ, 0 < K ∧
-    ∀ u g : ℝ → ℂ, Continuous u → Continuous g →
-      (∀ t, 0 ≤ t → HasDerivAt u (z * u t + g t) t) →
-      IntegrableOn (wt R u) (Ioi 0) → IntegrableOn (wt R g) (Ioi 0) →
-      ∫ t in Ioi (0 : ℝ), wt R u t ≤
-        K * ((∫ t in Ioc (0 : ℝ) 1, ‖u t‖ ^ 2) + ∫ t in Ioi (0 : ℝ), wt R g t) := by
+theorem step {z : ℂ} {R : ℝ} (ha : z.re + R ≠ 0)
+    : ∃ K : ℝ,
+      0 < K
+        ∧ ∀ u g : ℝ → ℂ,
+          Continuous u → Continuous g → (∀ t, 0 ≤ t → HasDerivAt u (z * u t + g t) t)
+            → IntegrableOn (wt R u) (Ioi 0) → IntegrableOn (wt R g) (Ioi 0)
+            → ∫ t in Ioi (0 : ℝ), wt R u t
+              ≤ K * ((∫ t in Ioc (0 : ℝ) 1, ‖u t‖ ^ 2) + ∫ t in Ioi (0 : ℝ), wt R g t) := by
   rcases lt_or_gt_of_ne ha with h | h
   · obtain ⟨b, hae⟩ : ∃ b, z.re + R = -b := ⟨-(z.re + R), by ring⟩
     have hb : 0 < b := by linarith
@@ -276,8 +293,9 @@ theorem step {z : ℂ} {R : ℝ} (ha : z.re + R ≠ 0) : ∃ K : ℝ, 0 < K ∧
     have h4 : (2 + 2 * b) * (∫ t in (0 : ℝ)..1, wt R u t) ≤ (2 + 2 * b) * (E * X) := by gcongr
     have hD : 0 ≤ (2 + 2 * b) * E := by positivity
     have hQ : 0 ≤ 1 + 1 / b := by positivity
-    have e : b * (((2 + 2 * b) * E + (1 + 1 / b)) / b * (X + P)) =
-        ((2 + 2 * b) * E + (1 + 1 / b)) * (X + P) := by
+    have e
+        : b * (((2 + 2 * b) * E + (1 + 1 / b)) / b * (X + P))
+          = ((2 + 2 * b) * E + (1 + 1 / b)) * (X + P) := by
       field_simp
     have e2 : P / b = 1 / b * P := by ring
     refine le_of_mul_le_mul_left ?_ hb
@@ -293,21 +311,23 @@ theorem step {z : ℂ} {R : ℝ} (ha : z.re + R ≠ 0) : ∃ K : ℝ, 0 < K ∧
     generalize (∫ t in Ioc (0 : ℝ) 1, ‖u t‖ ^ 2) = X at *
     generalize (∫ t in Ioi (0 : ℝ), wt R g t) = P at *
     generalize (∫ t in Ioi (0 : ℝ), wt R u t) = W at *
-    have e : a * (1 / (a * a) * (X + P)) = X / a + P / a := by
-      field_simp
+    have e : a * (1 / (a * a) * (X + P)) = X / a + P / a := by field_simp
     refine le_of_mul_le_mul_left ?_ ha'
     rw [e]
     have : 0 ≤ X / a := by positivity
     linarith
 
-theorem chain (m : ℕ) (z : Fin m → ℂ) (R : ℝ) (hz : ∀ k, (z k).re + R ≠ 0) : ∃ C : ℝ, 0 < C ∧
-    ∀ F : Fin (m + 1) → ℝ → ℂ,
-      (∀ (k : Fin m) (t : ℝ), 0 ≤ t →
-        HasDerivAt (F k.succ) (z k * F k.succ t + F k.castSucc t) t) →
-      (∀ k, Continuous (F k)) →
-      (∀ k, IntegrableOn (wt R (F k)) (Ioi 0)) →
-      ∫ t in Ioi (0 : ℝ), wt R (F (Fin.last m)) t ≤
-        C * ((∑ k, ∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2) + ∫ t in Ioi (0 : ℝ), wt R (F 0) t) := by
+theorem chain (m : ℕ) (z : Fin m → ℂ) (R : ℝ) (hz : ∀ k, (z k).re + R ≠ 0)
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ F : Fin (m + 1) → ℝ → ℂ,
+          (∀ (k : Fin m) (t : ℝ),
+              0 ≤ t → HasDerivAt (F k.succ) (z k * F k.succ t + F k.castSucc t) t)
+            → (∀ k, Continuous (F k)) → (∀ k, IntegrableOn (wt R (F k)) (Ioi 0))
+            → ∫ t in Ioi (0 : ℝ), wt R (F (Fin.last m)) t
+              ≤ C
+                * ((∑ k, ∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2)
+                  + ∫ t in Ioi (0 : ℝ), wt R (F 0) t) := by
   induction m with
   | zero =>
     refine ⟨1, one_pos, fun F _ _ _ => ?_⟩
@@ -320,18 +340,22 @@ theorem chain (m : ℕ) (z : Fin m → ℂ) (R : ℝ) (hz : ∀ k, (z k).re + R 
     obtain ⟨C, hC, H⟩ := ih (fun k => z k.castSucc) (fun k => hz k.castSucc)
     obtain ⟨K, hK, S⟩ := step (hz (Fin.last m))
     refine ⟨K * (1 + C), by positivity, fun F hd hc hi => ?_⟩
-    have h1 := H (fun k => F k.castSucc)
-      (fun k t ht => by
-        have := hd k.castSucc t ht
-        rw [Fin.succ_castSucc] at this
-        exact this)
-      (fun k => hc _) (fun k => hi _)
-    have h2 := S (F (Fin.last (m + 1))) (F (Fin.last m).castSucc) (hc _) (hc _)
-      (fun t ht => by
-        have := hd (Fin.last m) t ht
-        rw [Fin.succ_last] at this
-        exact this)
-      (hi _) (hi _)
+    have h1 :=
+      H
+        (fun k => F k.castSucc)
+        (fun k t ht => by
+          have := hd k.castSucc t ht
+          rw [Fin.succ_castSucc] at this
+          exact this)
+        (fun k => hc _)
+        (fun k => hi _)
+    have h2 :=
+      S (F (Fin.last (m + 1))) (F (Fin.last m).castSucc) (hc _) (hc _)
+        (fun t ht => by
+          have := hd (Fin.last m) t ht
+          rw [Fin.succ_last] at this
+          exact this)
+        (hi _) (hi _)
     rw [Fin.sum_univ_castSucc]
     simp only [Fin.castSucc_zero] at h1
     have hS : 0 ≤ ∑ k : Fin (m + 1), ∫ t in Ioc (0 : ℝ) 1, ‖F k.castSucc t‖ ^ 2 :=
@@ -375,16 +399,18 @@ lemma lint_unit {u : ℝ → ℂ} (hu : Continuous u) :
   refine lintegral_congr fun t => ?_
   rw [ENNReal.ofReal_pow (norm_nonneg _), ofReal_norm]
 
-theorem lineChain (m : ℕ) (z : Fin m → ℂ) (R R' : ℝ)
-    (hRR : R ≤ R') (hz : ∀ k, (z k).re ≠ -R) : ∃ C : ℝ, 0 < C ∧
-    ∀ F : Fin (m + 1) → ℝ → ℂ,
-      (∀ (k : Fin m) (t : ℝ), 0 ≤ t →
-        HasDerivAt (F k.succ) (z k * F k.succ t + F k.castSucc t) t) →
-      (∀ k, Continuous (F k)) →
-      (∀ k, ∫⁻ t in Ioi (0 : ℝ), ‖F k t‖ₑ ^ 2 * ENNReal.ofReal (Real.exp (2 * R' * t)) < ⊤) →
-      ∫⁻ t in Ioi (0 : ℝ), ‖F (Fin.last m) t‖ₑ ^ 2 * ENNReal.ofReal (Real.exp (2 * R * t)) ≤
-        ENNReal.ofReal C * (∑ k, ∫⁻ t in Ioc (0 : ℝ) 1, ‖F k t‖ₑ ^ 2 +
-          ∫⁻ t in Ioi (0 : ℝ), ‖F 0 t‖ₑ ^ 2 * ENNReal.ofReal (Real.exp (2 * R * t))) := by
+theorem lineChain (m : ℕ) (z : Fin m → ℂ) (R R' : ℝ) (hRR : R ≤ R') (hz : ∀ k, (z k).re ≠ -R)
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ F : Fin (m + 1) → ℝ → ℂ,
+          (∀ (k : Fin m) (t : ℝ),
+              0 ≤ t → HasDerivAt (F k.succ) (z k * F k.succ t + F k.castSucc t) t)
+            → (∀ k, Continuous (F k))
+            → (∀ k, ∫⁻ t in Ioi (0 : ℝ), ‖F k t‖ₑ ^ 2 * ENNReal.ofReal (Real.exp (2 * R' * t)) < ⊤)
+            → ∫⁻ t in Ioi (0 : ℝ), ‖F (Fin.last m) t‖ₑ ^ 2 * ENNReal.ofReal (Real.exp (2 * R * t))
+              ≤ ENNReal.ofReal C
+                * (∑ k, ∫⁻ t in Ioc (0 : ℝ) 1, ‖F k t‖ₑ ^ 2 +
+                    ∫⁻ t in Ioi (0 : ℝ), ‖F 0 t‖ₑ ^ 2 * ENNReal.ofReal (Real.exp (2 * R * t))) := by
   obtain ⟨C, hC, H⟩ := chain m z R (fun k h => hz k (by linarith))
   refine ⟨C, hC, fun F hd hc hfin => ?_⟩
   have hint : ∀ k, IntegrableOn (wt R (F k)) (Ioi 0) := by
@@ -400,26 +426,32 @@ theorem lineChain (m : ℕ) (z : Fin m → ℂ) (R R' : ℝ)
     gcongr
   have key := H F hd hc hint
   rw [lint_wt (hint (Fin.last m)), lint_wt (hint 0)]
-  have hX : ∀ k, 0 ≤ ∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2 :=
-    fun k => integral_nonneg fun t => by positivity
+  have hX : ∀ k, 0 ≤ ∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2 := fun k =>
+    integral_nonneg fun t => by positivity
   have hW : 0 ≤ ∫ t in Ioi (0 : ℝ), wt R (F 0) t := integral_nonneg (wt_nonneg R _)
   generalize hI : ENNReal.ofReal (∫ t in Ioi (0 : ℝ), wt R (F 0) t) = I
-  have e : ∀ k, ∫⁻ t in Ioc (0 : ℝ) 1, (‖F k t‖ₑ ^ 2 + I) =
-      ENNReal.ofReal (∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2) + I := by
+  have e
+      : ∀ k,
+        ∫⁻ t in Ioc (0 : ℝ) 1, (‖F k t‖ₑ ^ 2 + I)
+          = ENNReal.ofReal (∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2) + I := by
     intro k
     rw [lintegral_add_right _ measurable_const, lintegral_const, ← lint_unit (hc k)]
     simp
   simp_rw [e]
-  calc ENNReal.ofReal (∫ t in Ioi (0 : ℝ), wt R (F (Fin.last m)) t)
-      ≤ ENNReal.ofReal (C * ((∑ k, ∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2) +
-          ∫ t in Ioi (0 : ℝ), wt R (F 0) t)) := ENNReal.ofReal_le_ofReal key
+  calc
+    ENNReal.ofReal (∫ t in Ioi (0 : ℝ), wt R (F (Fin.last m)) t)
+        ≤ ENNReal.ofReal
+          (C * ((∑ k, ∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2) + ∫ t in Ioi (0 : ℝ), wt R (F 0) t)) :=
+      ENNReal.ofReal_le_ofReal key
     _ = ENNReal.ofReal C * ((∑ k, ENNReal.ofReal (∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2)) + I) := by
-        rw [ENNReal.ofReal_mul hC.le, ENNReal.ofReal_add (Finset.sum_nonneg fun k _ => hX k) hW,
-          ENNReal.ofReal_sum_of_nonneg fun k _ => hX k, hI]
+      rw [ENNReal.ofReal_mul hC.le, ENNReal.ofReal_add (Finset.sum_nonneg fun k _ => hX k) hW,
+        ENNReal.ofReal_sum_of_nonneg fun k _ => hX k, hI]
     _ ≤ ENNReal.ofReal C * ∑ k, (ENNReal.ofReal (∫ t in Ioc (0 : ℝ) 1, ‖F k t‖ ^ 2) + I) := by
-        rw [Finset.sum_add_distrib]
-        gcongr
-        exact Finset.single_le_sum (f := fun _ : Fin (m + 1) => I) (fun _ _ => zero_le)
-          (Finset.mem_univ 0)
+      rw [Finset.sum_add_distrib]
+      gcongr
+      exact Finset.single_le_sum
+        (f := fun _ : Fin (m + 1) => I)
+        (fun _ _ => zero_le)
+        (Finset.mem_univ 0)
 
 end GlobalTheory.CompanionTheory.LineChainProof

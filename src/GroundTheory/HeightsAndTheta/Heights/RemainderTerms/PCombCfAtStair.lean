@@ -61,8 +61,9 @@ theorem CombCfAtStair.proof (h1 : CombCfUpdateZero.Statement) : CombCfAtStair.St
         simpa using this
   | succ n ih =>
     intro lam hlam
-    have hsplit : alternantPsum m (List.replicate (n + 1) 1) =
-        alternantPsum m (List.replicate n 1) * psum (Fin m) ℚ 1 := by
+    have hsplit
+        : alternantPsum m (List.replicate (n + 1) 1)
+          = alternantPsum m (List.replicate n 1) * psum (Fin m) ℚ 1 := by
       simp only [alternantPsum, List.replicate_succ', List.map_append, List.prod_append,
         List.map_cons, List.map_nil, List.prod_cons, List.prod_nil, mul_one, mul_assoc]
     rw [hsplit, cf_mul_psum, card_latticeWords_succ n lam hlam, Nat.cast_sum]
@@ -70,8 +71,9 @@ theorem CombCfAtStair.proof (h1 : CombCfUpdateZero.Statement) : CombCfAtStair.St
     rw [Nat.cast_ite, Nat.cast_zero]
     by_cases hgood : 1 ≤ lam i ∧ Antitone (Function.update lam i (lam i - 1))
     · rw [if_pos (by omega), if_pos hgood.1]
-      have hup : Function.update (fun j => lam j + stair m j) i (lam i + stair m i - 1) =
-          fun j => Function.update lam i (lam i - 1) j + stair m j := by
+      have hup
+          : Function.update (fun j => lam j + stair m j) i (lam i + stair m i - 1)
+            = fun j => Function.update lam i (lam i - 1) j + stair m j := by
         funext j
         by_cases hj : j = i
         · subst hj
@@ -80,8 +82,12 @@ theorem CombCfAtStair.proof (h1 : CombCfUpdateZero.Statement) : CombCfAtStair.St
         · simp only [Function.update_of_ne hj]
       rw [hup]
       exact ih _ hgood.2
-    · have hR : (if 1 ≤ lam i then
-          (((latticeWords n (Function.update lam i (lam i - 1))).card : ℕ) : ℚ) else 0) = 0 := by
+    · have hR
+          : (if 1 ≤ lam i then
+               (((latticeWords n (Function.update lam i (lam i - 1))).card : ℕ) : ℚ)
+             else
+               0)
+            = 0 := by
         split_ifs with hi
         · rw [latticeWords_eq_empty_of_not_antitone n _ (fun h => hgood ⟨hi, h⟩)]
           simp

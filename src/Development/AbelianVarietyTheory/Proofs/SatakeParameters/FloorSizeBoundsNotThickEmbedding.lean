@@ -10,7 +10,10 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW
 
-theorem size_not_thick : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (g : D.R.GG) (j : Fin D.R.m), Roomy L C → ¬ Thick D.host g → L.sc.w'' D.R.n ≤ (⌊(hcAt D g).e j⌋ : ℝ) ∧ (⌊(hcAt D g).e j⌋ : ℝ) ≤ 8 / 5 * L.sc.b' := by
+theorem size_not_thick
+    : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (g : D.R.GG) (j : Fin D.R.m),
+      Roomy L C → ¬ Thick D.host g
+        → L.sc.w'' D.R.n ≤ (⌊(hcAt D g).e j⌋ : ℝ) ∧ (⌊(hcAt D g).e j⌋ : ℝ) ≤ 8 / 5 * L.sc.b' := by
   intro D L C g j hR hnt
   obtain ⟨-, hw100, hwη, hwb, hbT, -⟩ := hR
   set ρ := D.eTau.symm ⟨plc g, plc_mem g⟩ with hρ
@@ -25,7 +28,9 @@ theorem size_not_thick : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (g : D.R.GG)
   have hfl : (⌊(hcAt D g).e j⌋ : ℝ) = wj D (j.1 + 1) ρ := by
     rw [hw]
     show (⌊(D.hc ρ).e j⌋ : ℝ) = (((D.hc ρ).e j : ℚ) : ℝ)
-    rw [hz, Int.floor_intCast]; push_cast; rfl
+    rw [hz, Int.floor_intCast]
+    push_cast
+    rfl
   rw [hfl]
   have hx : 0 < L.sc.x := lt_trans one_pos L.sc.one_lt_alt
   have hb' : 0 < L.sc.b' := by linarith

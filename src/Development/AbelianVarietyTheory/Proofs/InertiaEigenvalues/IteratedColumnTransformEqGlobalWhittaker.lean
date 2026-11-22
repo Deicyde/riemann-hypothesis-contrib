@@ -15,16 +15,20 @@ open MeasureTheory GroundTheory.Automorphic.FourierWhittaker
 
 namespace GlobalTheory.CuspGeneric.WhitEq
 
-theorem avg_eq_setIntegral {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+theorem avg_eq_setIntegral
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
     [LocallyCompactSpace G] [SecondCountableTopology G] [m : MeasurableSpace G] [hB : BorelSpace G]
-    (Γ : AddSubgroup G) [Countable Γ] (μ : Measure G) [μ.IsAddHaarMeasure] (D : Set G)
-    (hD : IsAddFundamentalDomain Γ D μ) (h1 : μ D = 1) (Φ : G → ℂ)
-    (hΦ : ∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x) :
-    avg Γ Φ = ∫ x in D, Φ x ∂μ := by
+    (Γ : AddSubgroup G) [Countable Γ]
+    (μ : Measure G) [μ.IsAddHaarMeasure]
+    (D : Set G) (hD : IsAddFundamentalDomain Γ D μ) (h1 : μ D = 1)
+    (Φ : G → ℂ) (hΦ : ∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x)
+    : avg Γ Φ = ∫ x in D, Φ x ∂μ := by
   obtain ⟨rfl⟩ := hB
   letI : MeasurableSpace G := borel G
   haveI : BorelSpace G := ⟨rfl⟩
-  have hex : ∃ p : Measure G × Set G, p.1.IsAddHaarMeasure ∧ IsAddFundamentalDomain Γ p.2 p.1 ∧ p.1 p.2 = 1 :=
+  have hex
+      : ∃ p : Measure G × Set G,
+        p.1.IsAddHaarMeasure ∧ IsAddFundamentalDomain Γ p.2 p.1 ∧ p.1 p.2 = 1 :=
     ⟨(μ, D), inferInstance, hD, h1⟩
   unfold avg
   rw [dite_eq_left hex]
@@ -65,8 +69,9 @@ def colIx {a k : ℕ} (hk : k < a) : UnipotentBlockColumnIndex a k k ≃ Fin k w
       omega
   right_inv i := rfl
 
-theorem blkU_eq_colGL {R : Type} [CommRing R] {a k : ℕ} (hk : k < a) (x : UnipotentBlockColumnIndex a k k → R) :
-    (blkU x : GL (Fin a) R) = colGL (n := a) k (fun i => x ((colIx hk).symm i)) := by
+theorem blkU_eq_colGL
+    {R : Type} [CommRing R] {a k : ℕ} (hk : k < a) (x : UnipotentBlockColumnIndex a k k → R)
+    : (blkU x : GL (Fin a) R) = colGL (n := a) k (fun i => x ((colIx hk).symm i)) := by
   apply Units.ext
   ext i j
   change (1 + posM Subtype.val x : Matrix (Fin a) (Fin a) R) i j = uMat (colX (n := a) k _) i j
@@ -74,8 +79,10 @@ theorem blkU_eq_colGL {R : Type} [CommRing R] {a k : ℕ} (hk : k < a) (x : Unip
   by_cases hij : (i : ℕ) < k ∧ (j : ℕ) = k
   · have hne : i ≠ j := fun h => by rw [h] at hij; omega
     have hlt : i < j := by rw [Fin.lt_def]; omega
-    rw [Finset.sum_eq_single (⟨(i, j), hij.1, hij.2.ge, hij.2.le⟩ : UnipotentBlockColumnIndex a k k)]
-    · rw [if_neg hne, if_neg hne, dite_eq_left hlt, colX_apply, dite_eq_left hij.2, Matrix.single_apply_same, zero_add]
+    rw [Finset.sum_eq_single
+      (⟨(i, j), hij.1, hij.2.ge, hij.2.le⟩ : UnipotentBlockColumnIndex a k k)]
+    · rw [if_neg hne, if_neg hne, dite_eq_left hlt, colX_apply, dite_eq_left hij.2,
+        Matrix.single_apply_same, zero_add]
       congr 1
       apply Subtype.ext
       apply Prod.ext
@@ -106,24 +113,31 @@ theorem blkU_eq_colGL {R : Type} [CommRing R] {a k : ℕ} (hk : k < a) (x : Unip
 
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 
-theorem dot_eLast {k : ℕ} (hk : k < a) (x : UnipotentBlockColumnIndex a k k → Ad E) :
-    dot (eLast a k) x = pair (lastVec k) (fun i => x ((colIx hk).symm i)) := by
+theorem dot_eLast {k : ℕ} (hk : k < a) (x : UnipotentBlockColumnIndex a k k → Ad E)
+    : dot (eLast a k) x = pair (lastVec k) (fun i => x ((colIx hk).symm i)) := by
   unfold dot pair
   refine Fintype.sum_equiv (colIx hk) _ _ fun t => ?_
   dsimp only
   rw [Equiv.symm_apply_apply]
   rfl
 
-theorem colT_eq_stepCoeff {k : ℕ} (hk : k < a) (f : GA E a → ℂ)
-    (hf : ∀ (ξ : Fin k → E) g, f (ratGL E a (colGL k ξ) * g) = f g) (g : GA E a) :
-    colT (Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)) k f g = stepCoeff k f g := by
+theorem colT_eq_stepCoeff
+    {k : ℕ} (hk : k < a)
+    (f : GA E a → ℂ) (hf : ∀ (ξ : Fin k → E) g, f (ratGL E a (colGL k ξ) * g) = f g)
+    (g : GA E a)
+    : colT (Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)) k f g
+      = stepCoeff k f g := by
   set ψ₀ : AddChar (Ad E) ℂ := Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)
   have hψ : ∀ y, ψ₀ y = (GroundTheory.Global.adelicChar E y : ℂ) := fun y => rfl
   set Φ : (UnipotentBlockColumnIndex a k k → Ad E) → ℂ := fun x => ψ₀ (-dot (eLast a k) x) * f (blkU x * g) with hΦdef
   have hΦ : ∀ γ ∈ ratV E (UnipotentBlockColumnIndex a k k), ∀ x, Φ (γ + x) = Φ x := by
     rintro _ ⟨c, rfl⟩ x
-    have e1 : (AddMonoidHom.compLeft (algebraMap E (Ad E)).toAddMonoidHom (UnipotentBlockColumnIndex a k k)) c =
-        fun t => algebraMap E (Ad E) (c t) := rfl
+    have e1
+        : (AddMonoidHom.compLeft (algebraMap E (Ad E)).toAddMonoidHom
+              (UnipotentBlockColumnIndex a k k))
+            c
+          = fun t => algebraMap E (Ad E) (c t) :=
+      rfl
     rw [e1]
     have hU : f (blkU ((fun t => algebraMap E (Ad E) (c t)) + x) * g) = f (blkU x * g) := by
       change f (posU _ _ * g) = _
@@ -131,23 +145,30 @@ theorem colT_eq_stepCoeff {k : ℕ} (hk : k < a) (f : GA E a → ℂ)
       change f (blkU _ * _) = _
       rw [← ratGL_blkU, blkU_eq_colGL hk, hf]
       rfl
-    have hD : dot (eLast a k) ((fun t => algebraMap E (Ad E) (c t)) + x) =
-        algebraMap E (Ad E) (∑ t, eLast a k t * c t) + dot (eLast a k) x := by
+    have hD
+        : dot (eLast a k) ((fun t => algebraMap E (Ad E) (c t)) + x)
+          = algebraMap E (Ad E) (∑ t, eLast a k t * c t) + dot (eLast a k) x := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [dot, Pi.add_apply, mul_add, Finset.sum_add_distrib, map_sum, map_mul]
+      simp only [dot, Pi.add_apply, mul_add, Finset.sum_add_distrib, map_sum, map_mul]
     simp only [Φ]
     rw [hU, hD, neg_add, AddChar.map_add_eq_mul, hψ (-(algebraMap E (Ad E) _)), ← map_neg,
       GroundTheory.Global.adelicChar_algebraMap, Circle.coe_one, one_mul]
   haveI : Countable (ratV E (UnipotentBlockColumnIndex a k k)) := countable_vecLattice
-  have hA : avg (ratV E (UnipotentBlockColumnIndex a k k)) Φ = ∫ x in vecDomain E (UnipotentBlockColumnIndex a k k), Φ x ∂vecMeasure E (UnipotentBlockColumnIndex a k k) :=
-    avg_eq_setIntegral (ratV E (UnipotentBlockColumnIndex a k k)) (vecMeasure E (UnipotentBlockColumnIndex a k k)) (vecDomain E (UnipotentBlockColumnIndex a k k))
-      isAddFundamentalDomain_vecDomain vecMeasure_vecDomain Φ hΦ
+  have hA
+      : avg (ratV E (UnipotentBlockColumnIndex a k k)) Φ
+        = ∫ x in vecDomain E (UnipotentBlockColumnIndex a k k), Φ x ∂vecMeasure E (UnipotentBlockColumnIndex a k k) :=
+    avg_eq_setIntegral (ratV E (UnipotentBlockColumnIndex a k k))
+      (vecMeasure E (UnipotentBlockColumnIndex a k k))
+      (vecDomain E (UnipotentBlockColumnIndex a k k)) isAddFundamentalDomain_vecDomain
+      vecMeasure_vecDomain Φ hΦ
   change avg (ratV E (UnipotentBlockColumnIndex a k k)) Φ = _
   rw [hA]
   let Em := MeasurableEquiv.piCongrLeft (fun _ : Fin k => Ad E) (colIx hk)
-  have hE : MeasurePreserving Em (vecMeasure E (UnipotentBlockColumnIndex a k k)) (vecMeasure E (Fin k)) :=
+  have hE : MeasurePreserving Em (vecMeasure E (UnipotentBlockColumnIndex a k k))
+      (vecMeasure E (Fin k)) :=
     measurePreserving_piCongrLeft (fun _ : Fin k => GroundTheory.Global.adeleMeasure E) (colIx hk)
-  have hEx : ∀ x : UnipotentBlockColumnIndex a k k → Ad E, Em x = fun i => x ((colIx hk).symm i) := by
+  have hEx
+      : ∀ x : UnipotentBlockColumnIndex a k k → Ad E, Em x = fun i => x ((colIx hk).symm i) := by
     intro x
     funext i
     simp [Em, MeasurableEquiv.piCongrLeft, Equiv.piCongrLeft]
@@ -165,9 +186,13 @@ theorem colT_eq_stepCoeff {k : ℕ} (hk : k < a) (f : GA E a → ℂ)
   simp only [Φ, hEx, hψ]
   rw [blkU_eq_colGL hk, dot_eLast hk, mul_comm]
 
-theorem whit_partialCoeff (F : GA E a → ℂ) (hl : ∀ (γ : GL (Fin a) E) (g : GA E a), F (ratGL E a γ * g) = F g) :
-    ∀ m, m + 1 ≤ a → whit (Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)) m (partialCoeff F (m + 1)) =
-      partialCoeff F 1 := by
+theorem whit_partialCoeff
+    (F : GA E a → ℂ) (hl : ∀ (γ : GL (Fin a) E) (g : GA E a), F (ratGL E a γ * g) = F g)
+    : ∀ m,
+      m + 1 ≤ a
+        → whit (Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)) m
+            (partialCoeff F (m + 1))
+          = partialCoeff F 1 := by
   intro m
   induction m with
   | zero => intro _; rfl
@@ -175,17 +200,23 @@ theorem whit_partialCoeff (F : GA E a → ℂ) (hl : ∀ (γ : GL (Fin a) E) (g 
     intro hm
     have hk : m + 1 < a := by omega
     rw [whit_succ]
-    have hcol : colT (Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)) (m + 1) (partialCoeff F (m + 1 + 1)) =
-        partialCoeff F (m + 1) := by
+    have hcol
+        : colT (Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)) (m + 1)
+            (partialCoeff F (m + 1 + 1))
+          = partialCoeff F (m + 1) := by
       funext g
-      rw [colT_eq_stepCoeff hk _ (fun ξ g => partialCoeff_succ_diagonal_colGL (K := E) (n := a) hl hk ξ g),
+      rw [colT_eq_stepCoeff hk _
+          (fun ξ g => partialCoeff_succ_diagonal_colGL (K := E) (n := a) hl hk ξ g),
         partialCoeff_of_lt F hk]
     rw [hcol]
     exact ih (by omega)
 
-theorem whit_eq_whittaker : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (F : GA E a → ℂ), 0 < a → Continuous F →
-    (∀ (γ : GL (Fin a) E) (g : GA E a), F (ratGL E a γ * g) = F g) →
-    GlobalTheory.CuspGeneric.whit (Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)) (a - 1) F = GlobalTheory.JSW.whit F := by
+theorem whit_eq_whittaker
+    : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (F : GA E a → ℂ),
+      0 < a → Continuous F → (∀ (γ : GL (Fin a) E) (g : GA E a), F (ratGL E a γ * g) = F g)
+        → GlobalTheory.CuspGeneric.whit
+            (Circle.coeHom.compAddChar (GroundTheory.Global.adelicChar E)) (a - 1) F
+          = GlobalTheory.JSW.whit F := by
   intro E _ _ a F ha hc hl
   have h := whit_partialCoeff F hl (a - 1) (by omega)
   rw [Nat.sub_add_cancel ha, partialCoeff_self] at h

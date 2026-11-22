@@ -19,10 +19,11 @@ lemma expS_summable {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) :
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 def mvL {n : ℕ} (y : Fin n → ℂ) : Matrix (Fin n) (Fin n) ℂ →L[ℂ] (Fin n → ℂ) :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun M => M *ᵥ y
-      map_add' := fun M N => Matrix.add_mulVec M N y
-      map_smul' := fun c M => Matrix.smul_mulVec c M y }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun M => M *ᵥ y
+    map_add' := fun M N => Matrix.add_mulVec M N y
+    map_smul' := fun c M => Matrix.smul_mulVec c M y
+  }
 
 lemma mvL_apply {n : ℕ} (y : Fin n → ℂ) (M : Matrix (Fin n) (Fin n) ℂ) : mvL y M = M *ᵥ y := rfl
 
@@ -89,8 +90,8 @@ lemma star_hpk_dot (v y : Fin (2 * r + k + 1) → ℂ) : star (Hpk k r *ᵥ v) �
   rw [hpk_symm j i]
   ring
 
-theorem xuv_mulVec (u v y : Fin (2 * r + k + 1) → ℂ) :
-    Xuv k r u v *ᵥ y = herm (Hpk k r) y v • u - herm (Hpk k r) y u • v := by
+theorem xuv_mulVec (u v y : Fin (2 * r + k + 1) → ℂ)
+    : Xuv k r u v *ᵥ y = herm (Hpk k r) y v • u - herm (Hpk k r) y u • v := by
   unfold Xuv
   rw [Matrix.sub_mulVec, vmv_mulVec, vmv_mulVec, star_hpk_dot, star_hpk_dot]
 
@@ -100,8 +101,8 @@ theorem xuv_inLie (u v : Fin (2 * r + k + 1) → ℂ) : B.inLie k r (Xuv k r u v
   have e2 : star (Hpk k r *ᵥ v) = star v ᵥ* Hpk k r := by rw [Matrix.star_mulVec, hH]
   unfold B.inLie Xuv
   rw [Matrix.conjTranspose_sub, Matrix.conjTranspose_vecMulVec, Matrix.conjTranspose_vecMulVec,
-    star_star, star_star, Matrix.sub_mul, Matrix.mul_sub, Matrix.vecMulVec_mul, Matrix.vecMulVec_mul,
-    Matrix.mul_vecMulVec, Matrix.mul_vecMulVec, e1, e2]
+    star_star, star_star, Matrix.sub_mul, Matrix.mul_sub, Matrix.vecMulVec_mul,
+    Matrix.vecMulVec_mul, Matrix.mul_vecMulVec, Matrix.mul_vecMulVec, e1, e2]
   abel
 
 lemma mat_eq_mulVec_bvec {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) : M i j = (M *ᵥ bvec j) i := by
@@ -160,9 +161,10 @@ lemma one_mem_UWset (z : Fin (2 * r + k + 1) → ℂ) : (1 : B.Mat k r) ∈ UWse
   show (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)ᴴ * Hpk k r * 1 = Hpk k r
   simp
 
-theorem xuv_lieN (z : Fin (2 * r + k + 1) → ℂ) (a : Fin r) (v : Fin (2 * r + k + 1) → ℂ)
-    (hv : ∀ b : Fin r, b.val ≤ a.val → v (esI k r b) = 0) :
-    Xuv k r (bvec (eI k r a)) v ∈ lieOf (Sset k r z) := by
+theorem xuv_lieN
+    (z : Fin (2 * r + k + 1) → ℂ)
+    (a : Fin r) (v : Fin (2 * r + k + 1) → ℂ) (hv : ∀ b : Fin r, b.val ≤ a.val → v (esI k r b) = 0)
+    : Xuv k r (bvec (eI k r a)) v ∈ lieOf (Sset k r z) := by
   intro t
   set X := Xuv k r (bvec (eI k r a)) v with hX
   have hXa : X *ᵥ bvec (eI k r a) = 0 := by
@@ -172,36 +174,48 @@ theorem xuv_lieN (z : Fin (2 * r + k + 1) → ℂ) (a : Fin r) (v : Fin (2 * r +
     intro c
     rw [hX, xuv_mulVec, herm_eI_left, herm_bvec_bvec, hpk_eI_eI]
     simp
-  have hXj : ∀ j : Fin (2 * r + k + 1), r ≤ j.val → j.val ≤ r + k →
-      X *ᵥ bvec j = herm (Hpk k r) (bvec j) v • bvec (eI k r a) := by
+  have hXj
+      : ∀ j : Fin (2 * r + k + 1),
+        r ≤ j.val → j.val ≤ r + k → X *ᵥ bvec j = herm (Hpk k r) (bvec j) v • bvec (eI k r a) := by
     intro j hj hj'
     rw [hX, xuv_mulVec, herm_bvec_bvec, hpk_eI_row_block a j hj hj']
     simp
-  refine ⟨1, one_mem_UWset z, NormedSpace.exp ((t : ℂ) • X), ⟨Formalism.FourierDecayAlt.P.B5.exp_mem (xuv_inLie _ _) t, ?_, ?_⟩,
-    (Matrix.one_mul _).symm⟩
+  refine ⟨
+    1,
+    one_mem_UWset z,
+    NormedSpace.exp ((t : ℂ) • X),
+    ⟨Formalism.FourierDecayAlt.P.B5.exp_mem (xuv_inLie _ _) t, ?_, ?_⟩,
+    (Matrix.one_mul _).symm
+  ⟩
   · intro c i hci
-    have e := exp_smul_mulVec_sq X (bvec (eI k r c)) (by rw [hXc, Matrix.mulVec_smul, hXa, smul_zero]) (t : ℂ)
-    rw [show NormedSpace.exp ((t : ℂ) • X) i (eI k r c) = (NormedSpace.exp ((t : ℂ) • X) *ᵥ bvec (eI k r c)) i
-      from mat_eq_mulVec_bvec _ _ _, e, hXc]
+    have e :=
+      exp_smul_mulVec_sq X (bvec (eI k r c)) (by rw [hXc, Matrix.mulVec_smul, hXa, smul_zero])
+        (t : ℂ)
+    rw [show NormedSpace.exp ((t : ℂ) • X) i (eI k r c)
+          = (NormedSpace.exp ((t : ℂ) • X) *ᵥ bvec (eI k r c)) i from
+        mat_eq_mulVec_bvec _ _ _,
+      e, hXc]
     have hz : star (v (esI k r c)) * bvec (eI k r a) i = 0 := by
       by_cases hca : c.val ≤ a.val
       · rw [hv c hca]; simp
-      · have : i ≠ eI k r a := by
-          intro h; rw [h] at hci; simp only [eI] at hci; omega
+      · have : i ≠ eI k r a := by intro h; rw [h] at hci; simp only [eI] at hci; omega
         simp [bvec, Pi.single_apply, this]
     simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, hz, mul_zero, add_zero]
     simp [bvec, Pi.single_apply]
   · intro i j hj hj' hi
-    have e := exp_smul_mulVec_sq X (bvec j) (by rw [hXj j hj hj', Matrix.mulVec_smul, hXa, smul_zero]) (t : ℂ)
-    rw [show NormedSpace.exp ((t : ℂ) • X) i j = (NormedSpace.exp ((t : ℂ) • X) *ᵥ bvec j) i
-      from mat_eq_mulVec_bvec _ _ _, e, hXj j hj hj']
-    have : i ≠ eI k r a := by
-      intro h; rw [h] at hi; simp only [eI] at hi; omega
+    have e :=
+      exp_smul_mulVec_sq X (bvec j) (by rw [hXj j hj hj', Matrix.mulVec_smul, hXa, smul_zero])
+        (t : ℂ)
+    rw [show NormedSpace.exp ((t : ℂ) • X) i j = (NormedSpace.exp ((t : ℂ) • X) *ᵥ bvec j) i from
+        mat_eq_mulVec_bvec _ _ _,
+      e, hXj j hj hj']
+    have : i ≠ eI k r a := by intro h; rw [h] at hi; simp only [eI] at hi; omega
     simp [bvec, Pi.single_apply, this]
 
-theorem xuv_lieW (z u v : Fin (2 * r + k + 1) → ℂ) (hu : inWb k r u) (hv : inWb k r v)
-    (huz : herm (Hpk k r) u z = 0) (hvz : herm (Hpk k r) v z = 0) :
-    Xuv k r u v ∈ lieOf (UWset k r z) := by
+theorem xuv_lieW
+    (z u v : Fin (2 * r + k + 1) → ℂ) (hu : inWb k r u) (hv : inWb k r v)
+    (huz : herm (Hpk k r) u z = 0) (hvz : herm (Hpk k r) v z = 0)
+    : Xuv k r u v ∈ lieOf (UWset k r z) := by
   intro t
   set X := Xuv k r u v with hX
   have hes : ∀ (w : Fin (2 * r + k + 1) → ℂ), inWb k r w → ∀ c : Fin r, w (esI k r c) = 0 := by
@@ -210,11 +224,14 @@ theorem xuv_lieW (z u v : Fin (2 * r + k + 1) → ℂ) (hu : inWb k r u) (hv : i
     intro w hw c; exact hw _ (Or.inl (by simp only [eI]; omega))
   refine ⟨Formalism.FourierDecayAlt.P.B5.exp_mem (xuv_inLie _ _) t, fun c => ⟨?_, ?_⟩, ?_⟩
   · refine exp_smul_mulVec_fix X _ ?_ _
-    rw [hX, xuv_mulVec, herm_eI_left, herm_eI_left, hes v hv, hes u hu]; simp
+    rw [hX, xuv_mulVec, herm_eI_left, herm_eI_left, hes v hv, hes u hu]
+    simp
   · refine exp_smul_mulVec_fix X _ ?_ _
-    rw [hX, xuv_mulVec, herm_esI_left, herm_esI_left, hei v hv, hei u hu]; simp
+    rw [hX, xuv_mulVec, herm_esI_left, herm_esI_left, hei v hv, hei u hu]
+    simp
   · refine exp_smul_mulVec_fix X _ ?_ _
-    rw [hX, xuv_mulVec, herm_conj z v, herm_conj z u, hvz, huz]; simp
+    rw [hX, xuv_mulVec, herm_conj z v, herm_conj z u, hvz, huz]
+    simp
 
 end
 

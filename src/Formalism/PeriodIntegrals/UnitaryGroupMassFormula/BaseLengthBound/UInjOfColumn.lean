@@ -6,7 +6,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.BaseLengthBound.
 
 noncomputable section
 
-open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
+open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField
+  IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
 
 namespace PoleLengthBounds
 
@@ -21,7 +22,8 @@ theorem uInj_of_column (hCol : Column) : UInj := by
     obtain ⟨jj, hjj⟩ := (hCol G la Q S CRm T c hOk hw ζ).2
     have h1 := congrArg (ordV (unifO X la G.N) ζ Q.e Q.c) (hb jj)
     rw [ordV_smul Q.c ζ hU hC.2.2, ord_uC_eq_zero Q hC ζ jj α hjj, zero_add,
-      ordV_zero Q.c ζ hU hC.2.2, ordV, WithTop.add_eq_top] at h1
+        ordV_zero Q.c ζ hU hC.2.2, ordV, WithTop.add_eq_top]
+      at h1
     rcases h1 with h1 | h1
     · exact h1
     · exact absurd h1 WithTop.coe_ne_top

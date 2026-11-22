@@ -10,8 +10,12 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FockTheta.RealPlaceImaginar
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.FinPl
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.SeeSaw GlobalTheory.FinPl
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,75 +25,101 @@ namespace GlobalTheory.SeeSawRhs
 
 variable {D : D7}
 
-theorem latO_mono (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank → D.host.E))
-    {P P' : Pl D → Prop} (h : ∀ p, P p → P' p) : latO S T LS LT P ≤ latO S T LS LT P' := by
+theorem latO_mono
+    (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank → D.host.E))
+    {P P' : Pl D → Prop} (h : ∀ p, P p → P' p)
+    : latO S T LS LT P ≤ latO S T LS LT P' := by
   apply AddSubgroup.closure_mono
   rintro w ⟨α, hα, hv, rest⟩
   exact ⟨α, hα, fun v hv' => hv v (fun hp => hv' (h v hp)), rest⟩
 
-theorem vac_mono {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} {LS : Lat S} {LT : Lat T} {P P' : Pl D → Prop}
-    (h : ∀ p, P p → P' p) {f : WO S T → ℂ} (hf : Vac ψ S T LS LT P' f) : Vac ψ S T LS LT P f :=
-  ⟨hf.1, fun u hu => hf.2.1 u (latO_mono S T _ _ h hu),
-    fun e he u hu hh => hf.2.2 e he u (latO_mono S T _ _ h hu) hh⟩
+theorem vac_mono
+    {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} {LS : Lat S} {LT : Lat T} {P P' : Pl D → Prop}
+    (h : ∀ p, P p → P' p)
+    {f : WO S T → ℂ} (hf : Vac ψ S T LS LT P' f)
+    : Vac ψ S T LS LT P f := ⟨
+  hf.1,
+  fun u hu => hf.2.1 u (latO_mono S T _ _ h hu),
+  fun e he u hu hh => hf.2.2 e he u (latO_mono S T _ _ h hu) hh
+⟩
 
 theorem idAt_mono {P P' : Pl D → Prop} (h : ∀ p, P p → P' p) : idAt D P ≤ idAt D P' := by
   intro x hx
   simp only [idAt, Ideal.mem_inf, Submodule.mem_iInf] at hx ⊢
   exact ⟨hx.1, fun w => hx.2 ⟨w.1, fun hw => w.2 (h _ hw)⟩⟩
 
-theorem combAt_mono {P P' : Pl D → Prop} (h : ∀ p, P p → P' p) {S T : HSp D} {c : WO S T →₀ ℂ}
-    (hc : CombAt P c) : CombAt P' c := fun u hu i j => idAt_mono h (hc u hu i j)
+theorem combAt_mono
+    {P P' : Pl D → Prop} (h : ∀ p, P p → P' p) {S T : HSp D} {c : WO S T →₀ ℂ} (hc : CombAt P c)
+    : CombAt P' c := fun u hu i j =>
+  idAt_mono h (hc u hu i j)
 
-theorem comb_apply (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (c : WO S T →₀ ℂ) (f : WO S T → ℂ) (w : WO S T) :
-    comb ψ S T c f w = ∑ x ∈ c.support, c x * (ψ (symplOH S T w x) * f (w + x)) := by
+theorem comb_apply
+    (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (c : WO S T →₀ ℂ) (f : WO S T → ℂ) (w : WO S T)
+    : comb ψ S T c f w = ∑ x ∈ c.support, c x * (ψ (symplOH S T w x) * f (w + x)) := by
   simp [comb, heisO, Finset.sum_apply]
 
-theorem biComb_smul (ψ : AddChar (AF D.host.F) ℂ) (A S A' : HSp D) (c : WO A S →₀ ℂ) (c' : WO S A' →₀ ℂ) (a : ℂ)
-    (C : WO A S → WO S A' → ℂ) : biComb ψ A S A' c c' (a • C) = a • biComb ψ A S A' c c' C := by
+theorem biComb_smul
+    (ψ : AddChar (AF D.host.F) ℂ)
+    (A S A' : HSp D) (c : WO A S →₀ ℂ) (c' : WO S A' →₀ ℂ)
+    (a : ℂ) (C : WO A S → WO S A' → ℂ)
+    : biComb ψ A S A' c c' (a • C) = a • biComb ψ A S A' c c' C := by
   funext u v
   simp only [biComb, Pi.smul_apply, smul_eq_mul, comb_apply, Finset.mul_sum]
   exact Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => by ring
 
-theorem comb_comm2 (ψ : AddChar (AF D.host.F) ℂ) (A S A' : HSp D) (e : WO A S →₀ ℂ) (d' : WO S A' →₀ ℂ)
-    (G : WO A S → WO S A' → ℂ) (u : WO A S) (v : WO S A') :
-    comb ψ S A' d' (fun v' => comb ψ A S e (fun u'' => G u'' v') u) v =
-      comb ψ A S e (fun u'' => comb ψ S A' d' (G u'') v) u := by
+theorem comb_comm2
+    (ψ : AddChar (AF D.host.F) ℂ)
+    (A S A' : HSp D)
+    (e : WO A S →₀ ℂ) (d' : WO S A' →₀ ℂ) (G : WO A S → WO S A' → ℂ) (u : WO A S) (v : WO S A')
+    : comb ψ S A' d' (fun v' => comb ψ A S e (fun u'' => G u'' v') u) v
+      = comb ψ A S e (fun u'' => comb ψ S A' d' (G u'') v) u := by
   simp only [comb_apply, Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => by ring
 
-theorem biComb_biComb (ψ : AddChar (AF D.host.F) ℂ) (A S A' : HSp D) (d e : WO A S →₀ ℂ) (d' e' : WO S A' →₀ ℂ)
-    (C : WO A S → WO S A' → ℂ) (u : WO A S) (v : WO S A') :
-    biComb ψ A S A' d d' (biComb ψ A S A' e e' C) u v =
-      comb ψ A S d (comb ψ A S e (fun u'' => comb ψ S A' d' (comb ψ S A' e' (C u'')) v)) u := by
+theorem biComb_biComb
+    (ψ : AddChar (AF D.host.F) ℂ)
+    (A S A' : HSp D)
+    (d e : WO A S →₀ ℂ) (d' e' : WO S A' →₀ ℂ) (C : WO A S → WO S A' → ℂ) (u : WO A S) (v : WO S A')
+    : biComb ψ A S A' d d' (biComb ψ A S A' e e' C) u v
+      = comb ψ A S d (comb ψ A S e (fun u'' => comb ψ S A' d' (comb ψ S A' e' (C u'')) v)) u := by
   simp only [biComb]
   congr 1
   funext u'
   exact comb_comm2 ψ A S A' e d' (fun u'' v' => comb ψ S A' e' (C u'') v') u' v
 
-theorem biLift_smul {A S A' : HSp D} (oma : Om A S) (omb : Om S A') (vA : Vol A) (vS : Vol S) (φ : GA D A → ℂ) (a : ℂ)
-    (C : WO A S → WO S A' → ℂ) : biLift oma omb vA vS φ (a • C) = a • biLift oma omb vA vS φ C := by
+theorem biLift_smul
+    {A S A' : HSp D} (oma : Om A S) (omb : Om S A') (vA : Vol A) (vS : Vol S) (φ : GA D A → ℂ)
+    (a : ℂ) (C : WO A S → WO S A' → ℂ)
+    : biLift oma omb vA vS φ (a • C) = a • biLift oma omb vA vS φ C := by
   funext h₂
-  have h1 : ∀ h₀ h₁ v, oma (h₀, h₁) (fun u => a * C u v) 0 = a * oma (h₀, h₁) (fun u => C u v) 0 := by
+  have h1
+      : ∀ h₀ h₁ v, oma (h₀, h₁) (fun u => a * C u v) 0 = a * oma (h₀, h₁) (fun u => C u v) 0 := by
     intro h₀ h₁ v
     rw [show (fun u => a * C u v) = a • (fun u => C u v) from rfl, map_smul]
     rfl
-  have h2 : ∀ h₀ h₁, omb (h₁, h₂) (fun v => oma (h₀, h₁) (fun u => a * C u v) 0) 0 =
-      a * omb (h₁, h₂) (fun v => oma (h₀, h₁) (fun u => C u v) 0) 0 := by
+  have h2
+      : ∀ h₀ h₁,
+        omb (h₁, h₂) (fun v => oma (h₀, h₁) (fun u => a * C u v) 0) 0
+          = a * omb (h₁, h₂) (fun v => oma (h₀, h₁) (fun u => C u v) 0) 0 := by
     intro h₀ h₁
-    have e : (fun v => oma (h₀, h₁) (fun u => a * C u v) 0) = a • (fun v => oma (h₀, h₁) (fun u => C u v) 0) :=
+    have e
+        : (fun v => oma (h₀, h₁) (fun u => a * C u v) 0)
+          = a • (fun v => oma (h₀, h₁) (fun u => C u v) 0) :=
       funext fun v => h1 h₀ h₁ v
     rw [e, map_smul]
     rfl
   simp only [biLift, Pi.smul_apply, smul_eq_mul, h2]
   simp_rw [show ∀ x y : ℂ, x * (a * y) = a * (x * y) from fun x y => mul_left_comm x a y, integral_const_mul]
 
-theorem theta_comb_left {ψ : AddChar (AF D.host.F) ℂ} {A S A' : HSp D} (Y : WO A S → WO S A' → ℂ)
-    (hY : ∀ v, IsThetaFunO ψ A S (fun u => Y u v)) (c : WO S A' →₀ ℂ) (v : WO S A') :
-    IsThetaFunO ψ A S (fun u => comb ψ S A' c (Y u) v) := by
+theorem theta_comb_left
+    {ψ : AddChar (AF D.host.F) ℂ} {A S A' : HSp D} (Y : WO A S → WO S A' → ℂ)
+    (hY : ∀ v, IsThetaFunO ψ A S (fun u => Y u v)) (c : WO S A' →₀ ℂ) (v : WO S A')
+    : IsThetaFunO ψ A S (fun u => comb ψ S A' c (Y u) v) := by
   classical
-  have key : ∀ s : Finset (WO S A'),
-      IsThetaFunO ψ A S (fun u => ∑ x ∈ s, c x * (ψ (symplOH S A' v x) * Y u (v + x))) := by
+  have key
+      : ∀ s : Finset (WO S A'),
+        IsThetaFunO ψ A S (fun u => ∑ x ∈ s, c x * (ψ (symplOH S A' v x) * Y u (v + x))) := by
     intro s
     refine Finset.induction_on s ?_ ?_
     · simp only [Finset.sum_empty]

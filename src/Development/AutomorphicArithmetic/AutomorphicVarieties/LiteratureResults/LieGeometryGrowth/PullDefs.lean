@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 noncomputable section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
 open GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum
 open scoped ContDiff TensorProduct
 
@@ -15,22 +16,27 @@ namespace UpperTheory.V.Lit.Geo
 
 section Abs
 
-variable {V' V F : Type} [NormedAddCommGroup V'] [NormedSpace ℝ V'] [NormedAddCommGroup V] [NormedSpace ℝ V]
-  [NormedAddCommGroup F] [NormedSpace ℝ F]
+variable
+  {V' V F : Type} [NormedAddCommGroup V'] [NormedSpace ℝ V'] [NormedAddCommGroup V]
+  [NormedSpace ℝ V] [NormedAddCommGroup F] [NormedSpace ℝ F]
 
 def pb (H : V' → V) {q : ℕ} (w : V → V [⋀^Fin q]→L[ℝ] F) (p : V') : V' [⋀^Fin q]→L[ℝ] F :=
   (w (H p)).compContinuousLinearMap (fderiv ℝ H p)
 
-theorem pb_apply (H : V' → V) {q : ℕ} (w : V → V [⋀^Fin q]→L[ℝ] F) (p : V') (v : Fin q → V') :
-    pb H w p v = w (H p) fun i => fderiv ℝ H p (v i) := rfl
+theorem pb_apply (H : V' → V) {q : ℕ} (w : V → V [⋀^Fin q]→L[ℝ] F) (p : V') (v : Fin q → V')
+    : pb H w p v = w (H p) fun i => fderiv ℝ H p (v i) :=
+  rfl
 
 def flow (W : V → V) (t : ℝ) (p : V) : V := p + t • W p
 
-def hk (W : V → V) (t : ℝ) {q : ℕ} (w : V → V [⋀^Fin (q + 1)]→L[ℝ] F) (p : V) : V [⋀^Fin q]→L[ℝ] F :=
+def hk (W : V → V) (t : ℝ) {q : ℕ} (w : V → V [⋀^Fin (q + 1)]→L[ℝ] F) (p : V)
+    : V [⋀^Fin q]→L[ℝ] F :=
   ((w (flow W t p)).curryLeft (W p)).compContinuousLinearMap (fderiv ℝ (flow W t) p)
 
-theorem hk_apply (W : V → V) (t : ℝ) {q : ℕ} (w : V → V [⋀^Fin (q + 1)]→L[ℝ] F) (p : V) (v : Fin q → V) :
-    hk W t w p v = w (flow W t p) (Matrix.vecCons (W p) fun i => fderiv ℝ (flow W t) p (v i)) := rfl
+theorem hk_apply
+    (W : V → V) (t : ℝ) {q : ℕ} (w : V → V [⋀^Fin (q + 1)]→L[ℝ] F) (p : V) (v : Fin q → V)
+    : hk W t w p v = w (flow W t p) (Matrix.vecCons (W p) fun i => fderiv ℝ (flow W t) p (v i)) :=
+  rfl
 
 def hom (W : V → V) {q : ℕ} (w : V → V [⋀^Fin (q + 1)]→L[ℝ] F) (p : V) : V [⋀^Fin q]→L[ℝ] F :=
   ∫ t in (0 : ℝ)..1, hk W t w p
@@ -42,26 +48,35 @@ end Abs
 
 section Om
 
-variable {Γ V S : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V] {d : ℕ} (G : Dr.Geo Γ V S d)
+variable
+  {Γ V S : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V] {d : ℕ} (G : Dr.Geo Γ V S d)
 
 structure IsFlow (W : S → V → V) : Prop where
   field : ∀ s, IsField G.Y (W s)
   equiv : ∀ γ s, ∀ p ∈ G.Y, W (G.σ γ s) (G.ρ γ p) = G.ρ γ (W s p)
   homog : ∀ s (t : ℝ), 0 < t → ∀ p ∈ G.Y, W s (t • p) = t • W s p
 
-theorem isFlow_zero : IsFlow G 0 :=
-  ⟨fun _ => ⟨contDiffOn_const, fun p hp t _ => by simpa [flow] using hp⟩, fun _ _ _ _ => by simp, fun _ _ _ _ _ => by simp⟩
-
+theorem isFlow_zero : IsFlow G 0 := ⟨
+  fun _ => ⟨contDiffOn_const, fun p hp t _ => by simpa [flow] using hp⟩,
+  fun _ _ _ _ => by simp,
+  fun _ _ _ _ _ => by simp
+⟩
 
 open Classical in
 def toOm {q : ℕ} (z : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) : G.Om q :=
-  if h : ∀ s, ContDiffOn ℝ ∞ (z s) G.Y then
-    ⟨fun s => G.Y.indicator (z s), fun s =>
-      ⟨(h s).congr fun _ hp => Set.indicator_of_mem hp _, fun _ hp => Set.indicator_of_notMem hp _⟩⟩
-  else 0
+  if h : ∀ s, ContDiffOn ℝ ∞ (z s) G.Y then ⟨
+    fun s => G.Y.indicator (z s),
+    fun s =>
+      ⟨(h s).congr fun _ hp => Set.indicator_of_mem hp _, fun _ hp => Set.indicator_of_notMem hp _⟩
+  ⟩
+  else
+    0
 
-theorem toOm_apply {q : ℕ} {z : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)} (h : ∀ s, ContDiffOn ℝ ∞ (z s) G.Y) (s : S) {p : V}
-    (hp : p ∈ G.Y) : (toOm G z).1 s p = z s p := by
+theorem toOm_apply
+    {q : ℕ} {z : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)} (h : ∀ s, ContDiffOn ℝ ∞ (z s) G.Y)
+    (s : S)
+    {p : V} (hp : p ∈ G.Y)
+    : (toOm G z).1 s p = z s p := by
   rw [toOm, dite_eq_left h]
   exact Set.indicator_of_mem hp _
 
@@ -85,14 +100,21 @@ structure IsFld (U : Subgroup (GL (Fin a) (Af E))) (Y : GA E a → Herm E a) (C 
   left : ∀ γ t g, Y (ratGL E a γ * splitCentre E a t * g) = Y g
   cpt : ∀ (k : Kinf E a) g, adHerm k (Y (g * infGL E a (Unitary.toUnits k))) = Y g
   lev : ∀ u ∈ U, ∀ g, Y (g * finGL E a u) = Y g
-  root : ∀ g (t : ℝ), |t| ≤ 1 → ∃ h : GL (Fin a) (Cinf E), h.val * star h.val = 1 + t • (Y g).1 ∧
-    ‖toL h.val‖ ≤ C ∧ ‖toL (h⁻¹).val‖ ≤ C
+  root
+    : ∀ g (t : ℝ),
+      |t| ≤ 1
+        → ∃ h : GL (Fin a) (Cinf E),
+          h.val * star h.val = 1 + t • (Y g).1 ∧ ‖toL h.val‖ ≤ C ∧ ‖toL (h⁻¹).val‖ ≤ C
 
-theorem IsStep.fld {U : Subgroup (GL (Fin a) (Af E))} {f : GA E a → ℝ} {Y : GA E a → Herm E a} {C c f₀ : ℝ}
-    (h : IsStep U f Y C c f₀) : IsFld U Y C := ⟨h.Y_sm, h.Y_left, h.Y_cpt, h.Y_lev, h.root⟩
+theorem IsStep.fld
+    {U : Subgroup (GL (Fin a) (Af E))} {f : GA E a → ℝ} {Y : GA E a → Herm E a} {C c f₀ : ℝ}
+    (h : IsStep U f Y C c f₀)
+    : IsFld U Y C :=
+  ⟨h.Y_sm, h.Y_left, h.Y_cpt, h.Y_lev, h.root⟩
 
-theorem IsFld.neg {U : Subgroup (GL (Fin a) (Af E))} {Y : GA E a → Herm E a} {C : ℝ} (h : IsFld U Y C) :
-    IsFld U (-Y) C := by
+theorem IsFld.neg
+    {U : Subgroup (GL (Fin a) (Af E))} {Y : GA E a → Herm E a} {C : ℝ} (h : IsFld U Y C)
+    : IsFld U (-Y) C := by
   refine { sm := ?_, left := ?_, cpt := ?_, lev := ?_, root := ?_ }
   · intro i j w
     obtain ⟨φ, h1, h2⟩ := h.sm i j w
@@ -111,18 +133,25 @@ theorem IsFld.neg {U : Subgroup (GL (Fin a) (Af E))} {Y : GA E a → Herm E a} {
     obtain ⟨x, h1, h2⟩ := h.root g (-t) (by rwa [abs_neg])
     exact ⟨x, by rw [h1, neg_smul]; exact congrArg (1 + ·) (smul_neg t (Y g).1).symm, h2⟩
 
-def FCorr (U : Subgroup (GL (Fin a) (Af E))) (Y : GA E a → Herm E a) (W : (GL (Fin a) (Af E) ⧸ U) → HV E a → HV E a) : Prop :=
+def FCorr
+    (U : Subgroup (GL (Fin a) (Af E)))
+    (Y : GA E a → Herm E a) (W : (GL (Fin a) (Af E) ⧸ U) → HV E a → HV E a)
+    : Prop :=
   ∀ (g : GL (Fin a) (Cinf E)) (x : GL (Fin a) (Af E)),
     W (x : GL (Fin a) (Af E) ⧸ U) (sand g (hOne E a)) = sand g (hv (Y (infGL E a g * finGL E a x)))
 
 def Bd {Ξ : AlgRep E a} {q : ℕ} (α : Co Ξ q) (g : GA E a) (M : ℝ) : Prop :=
-  ∀ X : Fin q → Herm E a, ‖ev (α X) (retractOne g : KernelIndexFullLattice.G1 E a).1‖ ≤ M * ∏ i, ‖hv (X i)‖
+  ∀ X : Fin q → Herm E a,
+    ‖ev (α X) (retractOne g : KernelIndexFullLattice.G1 E a).1‖ ≤ M * ∏ i, ‖hv (X i)‖
 
-theorem Bd.mono {Ξ : AlgRep E a} {q : ℕ} {α : Co Ξ q} {g : GA E a} {M M' : ℝ} (h : Bd α g M) (hM : M ≤ M') : Bd α g M' :=
-  fun X => (h X).trans (mul_le_mul_of_nonneg_right hM (Finset.prod_nonneg fun _ _ => norm_nonneg _))
+theorem Bd.mono
+    {Ξ : AlgRep E a} {q : ℕ} {α : Co Ξ q} {g : GA E a} {M M' : ℝ} (h : Bd α g M) (hM : M ≤ M')
+    : Bd α g M' := fun X =>
+  (h X).trans (mul_le_mul_of_nonneg_right hM (Finset.prod_nonneg fun _ _ => norm_nonneg _))
 
-theorem Bd.sub {Ξ : AlgRep E a} {q : ℕ} {α β : Co Ξ q} {g : GA E a} {M M' : ℝ} (h : Bd α g M) (h' : Bd β g M') :
-    Bd (α - β) g (M + M') := fun X => by
+theorem Bd.sub
+    {Ξ : AlgRep E a} {q : ℕ} {α β : Co Ξ q} {g : GA E a} {M M' : ℝ} (h : Bd α g M) (h' : Bd β g M')
+    : Bd (α - β) g (M + M') := fun X => by
   rw [sub_apply, map_sub, Pi.sub_apply, add_mul]
   exact (norm_sub_le _ _).trans (add_le_add (h X) (h' X))
 

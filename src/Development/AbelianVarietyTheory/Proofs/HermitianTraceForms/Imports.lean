@@ -8,16 +8,20 @@ namespace GlobalTheory.IntSmulIntegral
 
 open NumberField
 
-theorem exists_int_mul_integral {K : Type} [Field K] [NumberField K] (a : K) :
-    ∃ (m : ℤ) (z : 𝓞 K), m ≠ 0 ∧ (z : K) = m • a := by
+theorem exists_int_mul_integral {K : Type} [Field K] [NumberField K] (a : K)
+    : ∃ (m : ℤ) (z : 𝓞 K), m ≠ 0 ∧ (z : K) = m • a := by
   have : Algebra.IsAlgebraic ℤ ℚ := IsLocalization.isAlgebraic ℚ (nonZeroDivisors ℤ)
   have : Algebra.IsAlgebraic ℚ K := Algebra.IsAlgebraic.of_finite ℚ K
-  obtain ⟨m, hm, hint⟩ := ((Algebra.IsAlgebraic.isAlgebraic a : IsAlgebraic ℚ a).restrictScalars ℤ).exists_integral_multiple
+  obtain ⟨m, hm, hint⟩ :=
+    ((Algebra.IsAlgebraic.isAlgebraic a : IsAlgebraic ℚ a).restrictScalars
+      ℤ).exists_integral_multiple
   exact ⟨m, ⟨m • a, hint⟩, hm, rfl⟩
 
-theorem exists_int_smul_mem {r : ℕ} {K : Type} [Field K] [NumberField K]
-    {Λ : Submodule (𝓞 K) (Fin r → K)} (hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice Λ) (v : Fin r → K) :
-    ∃ n : ℤ, n ≠ 0 ∧ n • v ∈ Λ := by
+theorem exists_int_smul_mem
+    {r : ℕ} {K : Type} [Field K] [NumberField K]
+    {Λ : Submodule (𝓞 K) (Fin r → K)} (hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice Λ)
+    (v : Fin r → K)
+    : ∃ n : ℤ, n ≠ 0 ∧ n • v ∈ Λ := by
   have hv : v ∈ Submodule.span K (Λ : Set (Fin r → K)) := hΛ.2 ▸ Submodule.mem_top
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by rwa [one_smul]⟩

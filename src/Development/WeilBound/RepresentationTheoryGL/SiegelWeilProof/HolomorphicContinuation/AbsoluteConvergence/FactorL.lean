@@ -19,22 +19,24 @@ theorem factorL : FactorL := by
   have hl0 : l 0 = 0 := by
     have h := hbd 0 S.zero_mem 0 (by simp)
     simpa using h
-  let lS : S →ₗ[ℂ] ℂ :=
-    { toFun := fun F => l F.1
-      map_add' := fun F₁ F₂ => by
-        have h := hlin 1 F₁.1 F₁.2 F₂.1 F₂.2
-        simpa using h
-      map_smul' := fun a F => by
-        have h := hlin a F.1 F.2 0 S.zero_mem
-        simpa [hl0] using h }
-  let R : S →ₗ[ℂ] C(C, ℂ) :=
-    { toFun := fun F => ⟨fun x => F.1 x, (hcont F.1 F.2).comp continuous_subtype_val⟩
-      map_add' := fun F₁ F₂ => by
-        ext x
-        simp
-      map_smul' := fun a F => by
-        ext x
-        simp }
+  let lS : S →ₗ[ℂ] ℂ := {
+    toFun := fun F => l F.1
+    map_add' := fun F₁ F₂ => by
+      have h := hlin 1 F₁.1 F₁.2 F₂.1 F₂.2
+      simpa using h
+    map_smul' := fun a F => by
+      have h := hlin a F.1 F.2 0 S.zero_mem
+      simpa [hl0] using h
+  }
+  let R : S →ₗ[ℂ] C(C, ℂ) := {
+    toFun := fun F => ⟨fun x => F.1 x, (hcont F.1 F.2).comp continuous_subtype_val⟩
+    map_add' := fun F₁ F₂ => by
+      ext x
+      simp
+    map_smul' := fun a F => by
+      ext x
+      simp
+  }
   have hRnorm : ∀ F : S, ‖l F.1‖ ≤ ‖R F‖ := by
     intro F
     apply hbd F.1 F.2
@@ -73,7 +75,8 @@ theorem kRCpt : KRCpt := by
     · exact isClosed_eq
         ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul continuous_id)
         continuous_const
-    · exact isClosed_eq (continuous_id.matrix_conjTranspose.matrix_mul continuous_id) continuous_const
+    · exact isClosed_eq (continuous_id.matrix_conjTranspose.matrix_mul continuous_id)
+        continuous_const
   have hsub : S ⊆ univ.pi (fun _ => univ.pi (fun _ => Metric.closedBall (0 : ℂ) 1)) := by
     intro g hg i _ j _
     rw [Metric.mem_closedBall, dist_zero_right]
@@ -82,8 +85,8 @@ theorem kRCpt : KRCpt := by
       exact hg.2
     exact entry_norm_bound_of_unitary hu i j
   have hcpt : IsCompact S :=
-    (isCompact_univ_pi (fun _ => isCompact_univ_pi (fun _ => isCompact_closedBall (0 : ℂ) 1))).of_isClosed_subset
-      hcl hsub
+    (isCompact_univ_pi (fun _ =>
+      isCompact_univ_pi (fun _ => isCompact_closedBall (0 : ℂ) 1))).of_isClosed_subset hcl hsub
   haveI : CompactSpace S := isCompact_iff_compactSpace.mp hcpt
   have hinv : ∀ g : S, g.1 * g.1ᴴ = 1 := fun g => mul_eq_one_comm.mp g.2.2
   let u : S → GL (Fin n ⊕ Fin n) ℂ := fun g => ⟨g.1, g.1ᴴ, hinv g, g.2.2⟩

@@ -12,9 +12,12 @@ open GlobalTheory.ShFam.BdArc Filter Topology
 
 namespace GlobalTheory.ShFam.BdArc
 
-theorem exists_complexPoint_of_notMem {F A : Type} [Field F] [CommRing A] [Algebra F A] [Algebra.FiniteType F A]
-    (σ : F →+* ℂ) (P : Ideal A) [hP : P.IsPrime] {s : A} (hs : s ∉ P) :
-    ∃ ψ : A →+* ℂ, ψ.comp (algebraMap F A) = σ ∧ (∀ x ∈ P, ψ x = 0) ∧ ψ s ≠ 0 := by
+theorem exists_complexPoint_of_notMem
+    {F A : Type} [Field F] [CommRing A] [Algebra F A] [Algebra.FiniteType F A]
+    (σ : F →+* ℂ)
+    (P : Ideal A) [hP : P.IsPrime]
+    {s : A} (hs : s ∉ P)
+    : ∃ ψ : A →+* ℂ, ψ.comp (algebraMap F A) = σ ∧ (∀ x ∈ P, ψ x = 0) ∧ ψ s ≠ 0 := by
   have : IsJacobsonRing A := isJacobsonRing_of_finiteType (A := F)
   have hj : P.jacobson = P := IsJacobsonRing.out inferInstance hP.isRadical
   rw [← hj, Ideal.jacobson, Ideal.mem_sInf] at hs
@@ -25,8 +28,7 @@ theorem exists_complexPoint_of_notMem {F A : Type} [Field F] [CommRing A] [Algeb
   let _ : Algebra F ℂ := σ.toAlgebra
   let κ : (A ⧸ M) →ₐ[F] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨(κ.comp (Ideal.Quotient.mkₐ F M)).toRingHom, ?_, fun x hx => ?_, ?_⟩
   · ext x
@@ -37,11 +39,15 @@ theorem exists_complexPoint_of_notMem {F A : Type} [Field F] [CommRing A] [Algeb
     rw [map_ne_zero, Ne, Ideal.Quotient.eq_zero_iff_mem]
     exact hsM
 
-theorem dvd_or_dvd_of_height_eq_one {A : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
-    (P : Ideal A) [P.IsPrime] (hP : P.height = 1) (a b : A) :
-    (∃ s, s ∉ P ∧ a ∣ s * b) ∨ ∃ s, s ∉ P ∧ b ∣ s * a := by
+theorem dvd_or_dvd_of_height_eq_one
+    {A : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
+    (P : Ideal A) [P.IsPrime]
+    (hP : P.height = 1) (a b : A)
+    : (∃ s, s ∉ P ∧ a ∣ s * b) ∨ ∃ s, s ∉ P ∧ b ∣ s * a := by
   have := GlobalTheory.isDiscreteValuationRing_of_height_eq_one P hP (Localization.AtPrime P)
-  have key : ∀ x y : A, algebraMap A (Localization.AtPrime P) x ∣ algebraMap A _ y → ∃ s, s ∉ P ∧ x ∣ s * y := by
+  have key
+      : ∀ x y : A,
+        algebraMap A (Localization.AtPrime P) x ∣ algebraMap A _ y → ∃ s, s ∉ P ∧ x ∣ s * y := by
     rintro x y ⟨c, hc⟩
     obtain ⟨⟨n, d⟩, hnd⟩ := IsLocalization.surj P.primeCompl c
     refine ⟨d, d.2, n, ?_⟩
@@ -49,16 +55,27 @@ theorem dvd_or_dvd_of_height_eq_one {A : Type} [CommRing A] [IsDomain A] [IsNoet
     simp only at hnd
     rw [map_mul, map_mul, hc, ← hnd]
     ring
-  exact (ValuationRing.dvd_total (algebraMap A (Localization.AtPrime P) a) (algebraMap A _ b)).imp (key a b) (key b a)
+  exact (ValuationRing.dvd_total (algebraMap A (Localization.AtPrime P) a) (algebraMap A _ b)).imp
+    (key a b) (key b a)
 
-theorem exists_eq_mul_pow_of_tendsto_zero : ∀ (F A : Type) [Field F] [CommRing A] [IsDomain A] [Algebra F A], Algebra.Smooth F A → ∀ (σ : F →+* ℂ) (p a : A) (m : ℕ), p ≠ 0 → (∀ (ψ : ℂ → (A →+* ℂ)) (r : ℝ), IsHolPts ψ r → (∀ u ∈ Metric.ball (0 : ℂ) r, (ψ u).comp (algebraMap F A) = σ) → ψ 0 p = 0 → (∀ u ∈ Metric.ball (0 : ℂ) r, u ≠ 0 → ψ u p ≠ 0) → Tendsto (fun u => ψ u a / ψ u (p ^ m)) (𝓝[≠] 0) (𝓝 0)) → ∃ b : A, a = b * p ^ m ∧ b ∈ (Ideal.span {p}).radical := by
+theorem exists_eq_mul_pow_of_tendsto_zero
+    : ∀ (F A : Type) [Field F] [CommRing A] [IsDomain A] [Algebra F A],
+      Algebra.Smooth F A
+        → ∀ (σ : F →+* ℂ) (p a : A) (m : ℕ),
+          p ≠ 0
+            → (∀ (ψ : ℂ → (A →+* ℂ)) (r : ℝ),
+              IsHolPts ψ r → (∀ u ∈ Metric.ball (0 : ℂ) r, (ψ u).comp (algebraMap F A) = σ)
+                → ψ 0 p = 0 → (∀ u ∈ Metric.ball (0 : ℂ) r, u ≠ 0 → ψ u p ≠ 0)
+                → Tendsto (fun u => ψ u a / ψ u (p ^ m)) (𝓝[≠] 0) (𝓝 0))
+            → ∃ b : A, a = b * p ^ m ∧ b ∈ (Ideal.span {p}).radical := by
   intro F A _ _ _ _ hsm σ p a m hp h
   have : IsNoetherianRing A := Algebra.FiniteType.isNoetherianRing F A
   have : IsIntegrallyClosed A := GlobalTheory.isIntegrallyClosed_of_smooth F A
   have key : ∀ (P : Ideal A) [P.IsPrime], p ∈ P → ∀ s, s ∉ P → ¬ a ∣ s * p ^ m := by
     rintro P _ hpP s hs ⟨t, ht⟩
     obtain ⟨ψ₀, hσ, hP0, hs0⟩ := exists_complexPoint_of_notMem σ P hs
-    obtain ⟨ψ, r, hhol, h0, hσ', hne⟩ := GlobalTheory.T.exists_holomorphic_arc_smooth_algebra_nonvanishing F A hsm ψ₀ p hp
+    obtain ⟨ψ, r, hhol, h0, hσ', hne⟩ :=
+      GlobalTheory.T.exists_holomorphic_arc_smooth_algebra_nonvanishing F A hsm ψ₀ p hp
     have hlim := h ψ r hhol (fun u hu => (hσ' u hu).trans hσ) (by rw [h0]; exact hP0 p hpP) hne
     have hball : Metric.ball (0 : ℂ) r ∈ 𝓝 (0 : ℂ) := Metric.ball_mem_nhds _ hhol.1
     have hc : ∀ x, Tendsto (fun u => ψ u x) (𝓝[≠] 0) (𝓝 (ψ₀ x)) := fun x => by

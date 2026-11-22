@@ -32,8 +32,9 @@ theorem FibreOfEtale_of : FibreOfEtale := by
     rw [Scheme.Opens.range_ι]; rintro _ ⟨x, rfl⟩; exact ht x
   set t' := IsOpenImmersion.lift V.ι t.1 hr
   have ht' : t' ≫ V.ι = t.1 := IsOpenImmersion.lift_fac _ _ _
-  have s := (congrArg (IsPullback (equalizer.ι π (p ≫ t.1)) (equalizer.ι π (p ≫ t.1) ≫ p) π) ht').mpr
-    (isPullback_equalizer p r π hπ t)
+  have s :=
+    (congrArg (IsPullback (equalizer.ι π (p ≫ t.1)) (equalizer.ι π (p ≫ t.1) ≫ p) π) ht').mpr
+      (isPullback_equalizer p r π hπ t)
   have h := IsPullback.of_right' s (isPullback_morphismRestrict π V).flip
   exact MorphismProperty.of_isPullback h hE
 

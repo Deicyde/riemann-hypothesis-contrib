@@ -37,8 +37,7 @@ theorem ZChartSmul.proof : ZChartSmul.Statement.{u, v, w} := by
     refine Submodule.subset_span ⟨m + n, ?_⟩
     have e1 : xProd J ^ (m + n) • a • e = (a * h j ^ n * u ^ n) • xProd J ^ m • e := by
       rw [smul_smul, smul_smul, hxu]; ring_nf
-    have e2 : J.1.card * (m + n) = J.1.card * m + (n + (J.1.erase j).card * n) := by
-      rw [hk]; ring
+    have e2 : J.1.card * (m + n) = J.1.card * m + (n + (J.1.erase j).card * n) := by rw [hk]; ring
     rw [e1, e2]
     exact h1
   · rw [smul_zero]; exact Submodule.zero_mem _

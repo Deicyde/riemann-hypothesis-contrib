@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso tw)
@@ -31,32 +34,36 @@ private lemma rankOneRep_val (c : Γ →* kˣ) (g : Γ) (i j : Fin 1) :
     ((rk1 c g : GL (Fin 1) k) : Matrix (Fin 1) (Fin 1) k) i j = (c g : k) := by
   simp [rk1, Subsingleton.elim i j]
 
-private def resHom (r : Γ →* GL (Fin (m + 1)) k) {W' : Submodule k (Fin (m + 1) → k)}
-    (hinv : IsInv r W') : Γ →* Module.End k W' where
+private def resHom
+    (r : Γ →* GL (Fin (m + 1)) k) {W' : Submodule k (Fin (m + 1) → k)} (hinv : IsInv r W')
+    : Γ →* Module.End k W' where
   toFun g := (Matrix.mulVecLin (r g : Matrix (Fin (m + 1)) (Fin (m + 1)) k)).restrict (hinv g)
   map_one' := by ext x; simp
   map_mul' g h := by
     refine LinearMap.ext fun x => Subtype.ext ?_
-    change (r (g * h) : Matrix (Fin (m + 1)) (Fin (m + 1)) k).mulVec (x : Fin (m + 1) → k) =
-      (r g : Matrix (Fin (m + 1)) (Fin (m + 1)) k).mulVec
+    change (r (g * h) : Matrix (Fin (m + 1)) (Fin (m + 1)) k).mulVec (x : Fin (m + 1) → k)
+      = (r g : Matrix (Fin (m + 1)) (Fin (m + 1)) k).mulVec
         ((r h : Matrix (Fin (m + 1)) (Fin (m + 1)) k).mulVec (x : Fin (m + 1) → k))
     simp [Matrix.mulVec_mulVec]
 
-private def subRep (r : Γ →* GL (Fin (m + 1)) k) {W' : Submodule k (Fin (m + 1) → k)}
-    (hinv : IsInv r W') (b : Module.Basis (Fin m) k W') : Γ →* GL (Fin m) k :=
-  MonoidHom.toHomUnits
-    { toFun := fun g => LinearMap.toMatrix b b (resHom r hinv g)
-      map_one' := by simp [LinearMap.toMatrix_one]
-      map_mul' := fun g h => by
-        rw [map_mul, Module.End.mul_eq_comp, LinearMap.toMatrix_comp b b b] }
+private def subRep
+    (r : Γ →* GL (Fin (m + 1)) k)
+    {W' : Submodule k (Fin (m + 1) → k)} (hinv : IsInv r W') (b : Module.Basis (Fin m) k W')
+    : Γ →* GL (Fin m) k :=
+  MonoidHom.toHomUnits {
+    toFun := fun g => LinearMap.toMatrix b b (resHom r hinv g)
+    map_one' := by simp [LinearMap.toMatrix_one]
+    map_mul' := fun g h => by rw [map_mul, Module.End.mul_eq_comp, LinearMap.toMatrix_comp b b b]
+  }
 
 private lemma subRep_val (r : Γ →* GL (Fin (m + 1)) k) {W' : Submodule k (Fin (m + 1) → k)}
     (hinv : IsInv r W') (b : Module.Basis (Fin m) k W') (g : Γ) :
     ((subRep r hinv b g : GL (Fin m) k) : Matrix (Fin m) (Fin m) k) =
       LinearMap.toMatrix b b (resHom r hinv g) := rfl
 
-private def colM {W' : Submodule k (Fin (m + 1) → k)} (b : Module.Basis (Fin m) k W')
-    (v : Fin (m + 1) → k) : Matrix (Fin (m + 1)) (Fin m ⊕ Fin 1) k :=
+private def colM
+    {W' : Submodule k (Fin (m + 1) → k)} (b : Module.Basis (Fin m) k W') (v : Fin (m + 1) → k)
+    : Matrix (Fin (m + 1)) (Fin m ⊕ Fin 1) k :=
   Matrix.of fun i => Sum.elim (fun j => (b j : Fin (m + 1) → k) i) (fun _ => v i)
 
 private lemma intertw (r : Γ →* GL (Fin (m + 1)) k) {W' : Submodule k (Fin (m + 1) → k)}
@@ -123,14 +130,15 @@ theorem UpperTheory.Gal.TP.Sub.splitLine_holds : SplitLine := by
     rcases h : finSumFinEquiv.symm j with j' | j' <;> simp [Q, colM, Matrix.col, h]
   obtain ⟨q, hq⟩ := hQ
   refine ⟨subRep r hinv b, q⁻¹, fun g => ?_⟩
-  have key : (r g : Matrix (Fin (m + 1)) (Fin (m + 1)) k) * Q =
-      Q * (sumRep (subRep r hinv b) (rk1 c) g : GL (Fin (m + 1)) k) := by
+  have key
+      : (r g : Matrix (Fin (m + 1)) (Fin (m + 1)) k) * Q
+        = Q * (sumRep (subRep r hinv b) (rk1 c) g : GL (Fin (m + 1)) k) := by
     rw [sumRep_val]
-    change _ * (colM b v).submatrix id finSumFinEquiv.symm =
-      (colM b v).submatrix id finSumFinEquiv.symm * _
+    change _ * (colM b v).submatrix id finSumFinEquiv.symm
+      = (colM b v).submatrix id finSumFinEquiv.symm * _
     rw [Matrix.submatrix_mul_equiv, ← intertw r hinv b c v hv g]
     ext i j
     rfl
-  have key2 : r g * q = q * sumRep (subRep r hinv b) (rk1 c) g := Units.ext (by
-    simpa [hq] using key)
+  have key2 : r g * q = q * sumRep (subRep r hinv b) (rk1 c) g :=
+    Units.ext (by simpa [hq] using key)
   rw [inv_inv, mul_assoc, key2, ← mul_assoc, inv_mul_cancel, one_mul]

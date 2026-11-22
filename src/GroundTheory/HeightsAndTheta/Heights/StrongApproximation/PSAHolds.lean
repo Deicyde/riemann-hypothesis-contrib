@@ -13,13 +13,16 @@ namespace GroundTheory.Heights₂.Heights
 
 namespace StrongApprox
 
-open Matrix NumberField IsDedekindDomain TensorProduct Topology ReciprocityTheory.ChartRestriction.G.SA
+open Matrix NumberField IsDedekindDomain TensorProduct Topology
+  ReciprocityTheory.ChartRestriction.G.SA
 
-theorem SAHolds.of_neighbourhoods_truncation (hNb : AENeighbourhoods.Statement)
-    (hTr : Truncation.Statement) : SAHolds.Statement := by
+theorem SAHolds.of_neighbourhoods_truncation
+    (hNb : AENeighbourhoods.Statement) (hTr : Truncation.Statement)
+    : SAHolds.Statement := by
   classical
   intro F E _ _ _ _ _ c hrk hc N J hJ hdet hiso _ _ x hx
-  have : ContinuousAdd (AE F E) := IsModuleTopology.toContinuousAdd (FiniteAdeleRing (𝓞 F) F) (AE F E)
+  have : ContinuousAdd (AE F E) :=
+    IsModuleTopology.toContinuousAdd (FiniteAdeleRing (𝓞 F) F) (AE F E)
   obtain ⟨hN1, hN2⟩ := hNb F E c hrk hc
   change x ∈ Cl c J
   rw [Cl, ← closure_closure, mem_closure_iff_nhds]
@@ -54,13 +57,14 @@ theorem SAHolds.of_neighbourhoods_truncation (hNb : AENeighbourhoods.Statement)
       refine sub_mem ?_ hx'
       rw [Matrix.one_apply]
       split_ifs
-      · exact AddSubgroup.subset_closure
-          ⟨1, one_mem _, 1, by simp [Algebra.TensorProduct.one_def]⟩
+      · exact AddSubgroup.subset_closure ⟨1, one_mem _, 1, by simp [Algebra.TensorProduct.one_def]⟩
       · exact zero_mem _
   simpa using hmem
 
-theorem SAHolds.proof (_hHyp : HypPairExists.Statement) (hNb : AENeighbourhoods.Statement)
-    (hTr : Truncation.Statement) : SAHolds.Statement :=
+theorem SAHolds.proof
+    (_hHyp : HypPairExists.Statement) (hNb : AENeighbourhoods.Statement)
+    (hTr : Truncation.Statement)
+    : SAHolds.Statement :=
   SAHolds.of_neighbourhoods_truncation hNb hTr
 
 end StrongApprox

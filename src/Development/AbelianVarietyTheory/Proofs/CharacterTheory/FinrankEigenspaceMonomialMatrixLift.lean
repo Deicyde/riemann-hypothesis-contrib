@@ -10,12 +10,13 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.MonoEigen
 
-def orbProd {K : Type} [CommMonoid K] {n : ℕ} (σ : Equiv.Perm (Fin n)) (a : Fin n → K)
-    (m : ℕ) (j : Fin n) : K :=
+def orbProd
+    {K : Type} [CommMonoid K] {n : ℕ} (σ : Equiv.Perm (Fin n)) (a : Fin n → K) (m : ℕ) (j : Fin n)
+    : K :=
   ∏ i ∈ Finset.range m, a ((σ ^ i) j)
 
-def GoodRep {K : Type} [CommMonoid K] {n : ℕ} (σ : Equiv.Perm (Fin n)) (a : Fin n → K)
-    (j : Fin n) : Prop :=
+def GoodRep {K : Type} [CommMonoid K] {n : ℕ} (σ : Equiv.Perm (Fin n)) (a : Fin n → K) (j : Fin n)
+    : Prop :=
   (∀ m : ℕ, j ≤ (σ ^ m) j) ∧ ∀ m : ℕ, (σ ^ m) j = j → orbProd σ a m j = 1
 
 section
@@ -92,15 +93,14 @@ lemma exists_vec {s : Fin n} (hs : GoodRep σ a s) :
       exact hts (le_antisymm h1 (hs.1 m))
     simp only [v, dif_neg h']
 
-theorem finrank_eq_card (E : Submodule K (Fin n → K))
-    (hE : ∀ v, v ∈ E ↔ ∀ j, v (σ j) = a j * v j) :
-    Module.finrank K E = Nat.card {j // GoodRep σ a j} := by
+theorem finrank_eq_card (E : Submodule K (Fin n → K)) (hE : ∀ v, v ∈ E ↔ ∀ j, v (σ j) = a j * v j)
+    : Module.finrank K E = Nat.card {j // GoodRep σ a j} := by
   classical
-  let f : E →ₗ[K] ({j // GoodRep σ a j} → K) :=
-    (LinearMap.funLeft K K Subtype.val).comp E.subtype
+  let f : E →ₗ[K] ({j // GoodRep σ a j} → K) := (LinearMap.funLeft K K Subtype.val).comp E.subtype
   have hf : ∀ (v : E) s, f v s = v.1 s.1 := fun _ _ => rfl
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v h0
     have hv := (hE _).1 v.2
     ext i
@@ -149,19 +149,32 @@ lemma mem_eigenspace_iff (c : Fin n → K) (μ : K) (hμ : μ ≠ 0) (v : Fin n 
 
 end
 
-theorem finrank_eigenspace_monomial_lift :
-    ∀ (k : Type) [Field k] (θ : k →* ℂ), (∀ x y : k, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) → ∀ (n : ℕ) (σ : Equiv.Perm (Fin n)) (c : Fin n → k), (∀ j, c j ≠ 0) → ∀ μ : k, μ ≠ 0 → Module.finrank k (Module.End.eigenspace (Matrix.toLin' (Matrix.of fun i j => if i = σ j then c j else 0)) μ) = Module.finrank ℂ (Module.End.eigenspace (Matrix.toLin' (Matrix.of fun i j => if i = σ j then θ (c j) else 0)) (θ μ)) := by
+theorem finrank_eigenspace_monomial_lift
+    : ∀ (k : Type) [Field k] (θ : k →* ℂ),
+      (∀ x y : k, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+        → ∀ (n : ℕ) (σ : Equiv.Perm (Fin n)) (c : Fin n → k),
+          (∀ j, c j ≠ 0)
+            → ∀ μ : k,
+              μ ≠ 0
+                → Module.finrank k
+                    (Module.End.eigenspace
+                      (Matrix.toLin' (Matrix.of fun i j => if i = σ j then c j else 0)) μ)
+                  = Module.finrank ℂ
+                    (Module.End.eigenspace
+                      (Matrix.toLin' (Matrix.of fun i j => if i = σ j then θ (c j) else 0))
+                      (θ μ)) := by
   intro k _ θ hθ n σ c hc μ hμ
   have hmul : θ μ * θ μ⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel₀ hμ, map_one]
   have hθμ : θ μ ≠ 0 := left_ne_zero_of_mul_eq_one hmul
   have hinv : (θ μ)⁻¹ = θ μ⁻¹ := inv_eq_of_mul_eq_one_right hmul
   rw [finrank_eq_card σ (fun j => c j * μ⁻¹) _ (mem_eigenspace_iff σ c μ hμ),
-    finrank_eq_card σ (fun j => θ (c j) * (θ μ)⁻¹) _
-      (mem_eigenspace_iff σ (fun j => θ (c j)) (θ μ) hθμ)]
+    finrank_eq_card σ
+      (fun j => θ (c j) * (θ μ)⁻¹)
+      _ (mem_eigenspace_iff σ (fun j => θ (c j)) (θ μ) hθμ)]
   refine Nat.card_congr (Equiv.subtypeEquivRight fun j => ?_)
   refine and_congr_right fun _ => forall_congr' fun m => imp_congr_right fun _ => ?_
-  have h1 : orbProd σ (fun j => θ (c j) * (θ μ)⁻¹) m j
-      = θ (orbProd σ (fun j => c j * μ⁻¹) m j) := by
+  have h1
+      : orbProd σ (fun j => θ (c j) * (θ μ)⁻¹) m j = θ (orbProd σ (fun j => c j * μ⁻¹) m j) := by
     simp only [orbProd, map_prod, map_mul, hinv]
   have h2 : orbProd σ (fun j => c j * μ⁻¹) m j ≠ 0 :=
     Finset.prod_ne_zero_iff.2 fun i _ => mul_ne_zero (hc _) (inv_ne_zero hμ)

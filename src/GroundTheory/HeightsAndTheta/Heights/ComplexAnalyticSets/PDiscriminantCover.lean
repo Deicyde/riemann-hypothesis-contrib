@@ -15,14 +15,16 @@ open MvPolynomial
 
 noncomputable section
 
-theorem DiscriminantCover.proof (hP : PrimitiveElementFibres.Statement) :
-    DiscriminantCover.Statement := by
+theorem DiscriminantCover.proof (hP : PrimitiveElementFibres.Statement)
+    : DiscriminantCover.Statement := by
   intro n d J A hJ hdim hA
   obtain ⟨c, m, Δ, Q, hmon, hdeg, hΔ, hgood⟩ := hP n d J A hJ hdim hA
   set ℓ : (Fin n → ℂ) → ℂ := fun x => ∑ j, c j * x j with hℓ
 
-  have hdet : ∀ w, eval w Δ ≠ 0 → ∀ x ∈ fibre J A w,
-      x = fun j => ((Q j).map (eval w)).eval (ℓ x) / eval w Δ := by
+  have hdet
+      : ∀ w,
+        eval w Δ ≠ 0
+          → ∀ x ∈ fibre J A w, x = fun j => ((Q j).map (eval w)).eval (ℓ x) / eval w Δ := by
     intro w hw x hx
     funext j
     rw [eq_div_iff hw, mul_comm]
@@ -47,9 +49,11 @@ theorem DiscriminantCover.proof (hP : PrimitiveElementFibres.Statement) :
   have hder : (m.map (eval y)).derivative.eval (ℓ x) ≠ 0 := by
     have := hsep.aeval_derivative_ne_zero (x := ℓ x) (by simpa [Polynomial.aeval_def] using hroot)
     simpa [Polynomial.aeval_def] using this
-  obtain ⟨U₀, B, ψ, hU₀o, hyU₀, hBo, hτB, hψd, hψy, hψ⟩ := SimpleRootBranch.proof d m y (ℓ x) hroot hder
+  obtain ⟨U₀, B, ψ, hU₀o, hyU₀, hBo, hτB, hψd, hψy, hψ⟩ :=
+    SimpleRootBranch.proof d m y (ℓ x) hroot hder
   set U : Set (Fin d → ℂ) := U₀ ∩ {w | eval w Δ ≠ 0} with hU
-  have hUo : IsOpen U := hU₀o.inter (isOpen_ne_fun (MvPolynomial.continuous_eval Δ) continuous_const)
+  have hUo : IsOpen U :=
+    hU₀o.inter (isOpen_ne_fun (MvPolynomial.continuous_eval Δ) continuous_const)
   set g : (Fin d → ℂ) → (Fin n → ℂ) :=
     fun w j => ((Q j).map (eval w)).eval (ψ w) / eval w Δ with hg
 
@@ -61,20 +65,34 @@ theorem DiscriminantCover.proof (hP : PrimitiveElementFibres.Statement) :
     have he : x' = g w := by rw [hdet w hw.2 x' hx']; simp only [hg]; rw [hℓx'']
     exact ⟨he ▸ hx', he ▸ hℓx'⟩
   have hℓc : Continuous ℓ := by simp only [hℓ]; fun_prop
-  have hAc : Continuous fun z : Fin n → ℂ => A.mulVec z := continuous_const.matrix_mulVec continuous_id
-  refine ⟨U, {z | A.mulVec z ∈ U ∧ ℓ z ∈ B}, g, hUo, ⟨hyU₀, hy⟩,
-    (hUo.preimage hAc).inter (hBo.preimage hℓc), ⟨by rw [hx.2]; exact ⟨hyU₀, hy⟩, hτB⟩,
-    fun w hw => ?_, ?_, fun w hw => (hkey w hw).1.2, ?_⟩
-  ·
-    have hψw : DifferentiableAt ℂ ψ w := (hψd w hw.1).differentiableAt (hU₀o.mem_nhds hw.1)
+  have hAc : Continuous fun z : Fin n → ℂ => A.mulVec z :=
+    continuous_const.matrix_mulVec continuous_id
+  refine ⟨
+    U,
+    {z | A.mulVec z ∈ U ∧ ℓ z ∈ B},
+    g,
+    hUo,
+    ⟨hyU₀, hy⟩,
+    (hUo.preimage hAc).inter (hBo.preimage hℓc),
+    ⟨by rw [hx.2]; exact ⟨hyU₀, hy⟩, hτB⟩,
+    fun w hw => ?_,
+    ?_,
+    fun w hw => (hkey w hw).1.2,
+    ?_
+  ⟩
+  · have hψw : DifferentiableAt ℂ ψ w := (hψd w hw.1).differentiableAt (hU₀o.mem_nhds hw.1)
     refine DifferentiableAt.differentiableWithinAt (differentiableAt_pi.2 fun j => ?_)
     have hΔd : DifferentiableAt ℂ (fun w => eval w Δ) w :=
       (AnalyticOnNhd.eval_mvPolynomial Δ w trivial).differentiableAt
-    have hF : DifferentiableAt ℂ (fun v : (Fin d → ℂ) × ℂ => ((Q j).map (eval v.1)).eval v.2) (w, ψ w) :=
+    have hF : DifferentiableAt ℂ
+        (fun v : (Fin d → ℂ) × ℂ => ((Q j).map (eval v.1)).eval v.2)
+        (w, ψ w) :=
       (analyticAt_eval_map (Q j) (w, ψ w)).differentiableAt
     have hQd : DifferentiableAt ℂ (fun w => ((Q j).map (eval w)).eval (ψ w)) w :=
-      DifferentiableAt.comp (g := fun v : (Fin d → ℂ) × ℂ => ((Q j).map (eval v.1)).eval v.2)
-        (f := fun v => (v, ψ v)) w hF (differentiableAt_fun_id.prodMk hψw)
+      DifferentiableAt.comp
+        (g := fun v : (Fin d → ℂ) × ℂ => ((Q j).map (eval v.1)).eval v.2)
+        (f := fun v => (v, ψ v))
+        w hF (differentiableAt_fun_id.prodMk hψw)
     have hfun : (fun w => g w j) = fun w => ((Q j).map (eval w)).eval (ψ w) * (eval w Δ)⁻¹ := by
       funext v; simp only [hg, div_eq_mul_inv]
     rw [hfun]

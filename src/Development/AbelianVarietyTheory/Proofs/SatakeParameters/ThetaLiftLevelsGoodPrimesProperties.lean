@@ -12,16 +12,20 @@ public import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.ValBasic
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Polynomial
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.GoodPrimes
 
-theorem isConjPl_iff {D : D7} {P P' : Pl D.host.E} : Formalism.IndefR.Lev.IsConjPl P P' ↔ P' = Formalism.DivisionValues.conjPl P := by
+theorem isConjPl_iff {D : D7} {P P' : Pl D.host.E}
+    : Formalism.IndefR.Lev.IsConjPl P P' ↔ P' = Formalism.DivisionValues.conjPl P := by
   constructor
   · intro h
     apply HeightOneSpectrum.ext
@@ -34,19 +38,28 @@ theorem isConjPl_iff {D : D7} {P P' : Pl D.host.E} : Formalism.IndefR.Lev.IsConj
   · rintro rfl
     exact fun c hc => ⟨Formalism.DivisionValues.cO _ c, Ideal.mem_map_of_mem _ hc, rfl⟩
 
-theorem eq_or_conj_of_under_eq {D : D7} {P Q : Pl D.host.E} (h : Q.under (𝓞 D.host.F) = P.under (𝓞 D.host.F)) :
-    Q = P ∨ Q = Formalism.DivisionValues.conjPl P := by
-  have hsub : (Q.asIdeal : Set (𝓞 D.host.E)) ⊆ P.asIdeal ∪ (Formalism.DivisionValues.conjPl P).asIdeal := by
+theorem eq_or_conj_of_under_eq
+    {D : D7} {P Q : Pl D.host.E} (h : Q.under (𝓞 D.host.F) = P.under (𝓞 D.host.F))
+    : Q = P ∨ Q = Formalism.DivisionValues.conjPl P := by
+  have hsub
+      : (Q.asIdeal : Set (𝓞 D.host.E))
+        ⊆ P.asIdeal ∪ (Formalism.DivisionValues.conjPl P).asIdeal := by
     intro x hx
-    have hfix : star ((x : D.host.E) * star (x : D.host.E)) = (x : D.host.E) * star (x : D.host.E) := by
+    have hfix
+        : star ((x : D.host.E) * star (x : D.host.E)) = (x : D.host.E) * star (x : D.host.E) := by
       rw [star_mul', star_star, mul_comm]
     obtain ⟨y, hy⟩ := (D.sp.cm.fixed ((x : D.host.E) * star (x : D.host.E))).1 hfix
     have hint : IsIntegral ℤ y := by
       rw [← isIntegral_algebraMap_iff (B := D.host.E)]
-      have e : algebraMap D.host.F D.host.E y = ((x * Formalism.DivisionValues.cO _ x : 𝓞 D.host.E) : D.host.E) := hy
+      have e
+          : algebraMap D.host.F D.host.E y
+            = ((x * Formalism.DivisionValues.cO _ x : 𝓞 D.host.E) : D.host.E) :=
+        hy
       rw [e]
       exact (x * Formalism.DivisionValues.cO _ x).isIntegral_coe
-    have hn : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) ⟨y, hint⟩ = x * Formalism.DivisionValues.cO _ x := RingOfIntegers.ext hy
+    have hn
+        : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) ⟨y, hint⟩ = x * Formalism.DivisionValues.cO _ x :=
+      RingOfIntegers.ext hy
     have h1 : (⟨y, hint⟩ : 𝓞 D.host.F) ∈ (Q.under (𝓞 D.host.F)).asIdeal := by
       show algebraMap _ (𝓞 D.host.E) _ ∈ Q.asIdeal
       rw [hn]
@@ -55,16 +68,22 @@ theorem eq_or_conj_of_under_eq {D : D7} {P Q : Pl D.host.E} (h : Q.under (𝓞 D
     have h2 : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) ⟨y, hint⟩ ∈ P.asIdeal := h1
     rw [hn] at h2
     refine (P.isPrime.mem_or_mem h2).imp id fun h3 => ?_
-    have h4 : Formalism.DivisionValues.cO _ (Formalism.DivisionValues.cO _ x) ∈ (Formalism.DivisionValues.conjPl P).asIdeal := Ideal.mem_map_of_mem _ h3
-    have e : Formalism.DivisionValues.cO _ (Formalism.DivisionValues.cO _ x) = x := RingOfIntegers.ext (star_star (x : D.host.E))
+    have h4
+        : Formalism.DivisionValues.cO _ (Formalism.DivisionValues.cO _ x)
+          ∈ (Formalism.DivisionValues.conjPl P).asIdeal :=
+      Ideal.mem_map_of_mem _ h3
+    have e : Formalism.DivisionValues.cO _ (Formalism.DivisionValues.cO _ x) = x :=
+      RingOfIntegers.ext (star_star (x : D.host.E))
     rw [e] at h4
     exact h4
   exact (Ideal.subset_union.1 hsub).imp
     (fun h => HeightOneSpectrum.ext (Q.isMaximal.eq_of_le P.isPrime.ne_top h))
-    (fun h => HeightOneSpectrum.ext (Q.isMaximal.eq_of_le (Formalism.DivisionValues.conjPl P).isPrime.ne_top h))
+    (fun h =>
+      HeightOneSpectrum.ext (Q.isMaximal.eq_of_le (Formalism.DivisionValues.conjPl P).isPrime.ne_top
+        h))
 
-theorem offS_iff {D : D7} (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (P : Pl D.host.E) :
-    OffS D S P ↔ P.under (𝓞 D.host.F) ∉ S := by
+theorem offS_iff {D : D7} (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (P : Pl D.host.E)
+    : OffS D S P ↔ P.under (𝓞 D.host.F) ∉ S := by
   constructor
   · intro h hP
     obtain ⟨x, hx, hy⟩ := h _ hP
@@ -74,22 +93,43 @@ theorem offS_iff {D : D7} (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (P : 
     push Not at hc
     apply h
     have : v = P.under (𝓞 D.host.F) := by
-      refine HeightOneSpectrum.ext (v.isMaximal.eq_of_le (P.under (𝓞 D.host.F)).isPrime.ne_top fun x hx => ?_)
+      refine HeightOneSpectrum.ext (v.isMaximal.eq_of_le (P.under (𝓞 D.host.F)).isPrime.ne_top
+        fun x hx => ?_)
       obtain ⟨y, h1, h2⟩ := hc x hx
       have e : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) x = y := RingOfIntegers.ext h1.symm
       show algebraMap (𝓞 D.host.F) (𝓞 D.host.E) x ∈ P.asIdeal
       rwa [e]
     rwa [← this]
 
-theorem good_primes : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A), R.toLevCh.Is A.μ0 → R.Q A.μ0 = ∅ ∧ (∀ t P, Good R t P → ((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal ∧ Good R t (Formalism.DivisionValues.conjPl P) ∧ Good R A.μ0 P) ∧ (∀ SF, IsSF R SF → ∀ P, OffS D SF P ↔ Good R A.μ0 P) ∧ (R.IsFam → ∀ t, ∀ P ∈ A.ok t, Good R t (R.pl P) ∧ Formalism.DivisionValues.conjPl (R.pl P) ≠ R.pl P ∧ A.q P = Ideal.absNorm (R.pl P).asIdeal) := by
+theorem good_primes
+    : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A),
+      R.toLevCh.Is A.μ0
+        → R.Q A.μ0 = ∅
+          ∧ (∀ t P,
+            Good R t P
+              → ((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal
+                ∧ Good R t (Formalism.DivisionValues.conjPl P) ∧ Good R A.μ0 P)
+          ∧ (∀ SF, IsSF R SF → ∀ P, OffS D SF P ↔ Good R A.μ0 P)
+          ∧ (R.IsFam
+            → ∀ t, ∀ P ∈ A.ok t,
+              Good R t (R.pl P) ∧ Formalism.DivisionValues.conjPl (R.pl P) ≠ R.pl P
+                ∧ A.q P = Ideal.absNorm (R.pl P).asIdeal) := by
   intro D G _ _ Pl0 T A Ks _ _ _ R F hL
   have hQ : R.Q A.μ0 = ∅ := by
     refine Finset.eq_empty_of_forall_notMem fun PP h => ?_
     refine (hL.Q_ram A.μ0 PP).2 (Or.inl h) ?_
     rw [hL.xi_base]
     exact fun x _ => rfl
-  have hcc := fun w : Pl D.host.E => Formalism.DivisionValues.ValuationRepresentative.conjPl_conjPl w
-  refine ⟨hQ, fun t P hP => ⟨fun hg => ?_, fun PP h => ?_, fun PP h => ?_⟩, fun SF hSF P => ?_, fun hF t P hP => ?_⟩
+  have hcc := fun w : Pl D.host.E =>
+    Formalism.DivisionValues.ValuationRepresentative.conjPl_conjPl w
+  refine ⟨
+    hQ,
+    fun t P hP => ⟨fun hg => ?_, fun PP h => ?_, fun PP h => ?_⟩,
+    fun SF hSF P => ?_,
+    fun hF t P hP => ?_
+  ⟩
   · have hk : ∃ k, ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal := by
       rw [Nat.cast_mul] at hg
       rcases P.isPrime.mem_or_mem hg with h | h
@@ -111,13 +151,19 @@ theorem good_primes : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Typ
     · intro h PP hPP
       rw [hQ] at hPP
       have hPP' := hPP.resolve_right (Finset.notMem_empty _)
-      have key : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ≠ P.under (𝓞 D.host.F) := fun e =>
+      have key
+          : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)
+            ≠ P.under (𝓞 D.host.F) := fun e =>
         h ((hSF _).2 ⟨PP, hPP', by rw [← e]; rfl⟩)
-      exact ⟨fun e => key (by rw [e]), fun e => key (GlobalTheory.LevelPlaces.under_eq_of_isConjPl e)⟩
+      exact
+        ⟨fun e => key (by rw [e]), fun e => key (GlobalTheory.LevelPlaces.under_eq_of_isConjPl e)⟩
     · intro h hm
       obtain ⟨PP, hPP, e⟩ := (hSF _).1 hm
       obtain ⟨h1, h2⟩ := h PP (Or.inl hPP)
-      have e' : P.under (𝓞 D.host.F) = (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) := HeightOneSpectrum.ext e.symm
+      have e'
+          : P.under (𝓞 D.host.F)
+            = (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) :=
+        HeightOneSpectrum.ext e.symm
       rcases eq_or_conj_of_under_eq e' with h3 | h3
       · exact h1 h3.symm
       · exact h2 (isConjPl_iff.2 h3)

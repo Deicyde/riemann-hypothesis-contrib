@@ -9,11 +9,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.NumberField
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Tower
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Tower
 
-theorem UpperTheory.V.Tower.desc :
-    ∀ (k L Ω : Type) [Field k] [NumberField k] [Field L] [NumberField L] [Field Ω] [Algebra k L] [Algebra k Ω] [Algebra L Ω] [IsScalarTower k L Ω] [IsAlgClosure k Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (D : LData L Ω l) (e : ℤ) (U : Subgroup (G k Ω)) [U.Normal], e ≠ 0 → Procyc L Ω l → cycU l U = cycU l (galOf k L Ω) →
-        ∃ Φ : Sha D e ≃ₗ[ℤ_[l]] ShaD l l U (galOf k L Ω) e, IsDesc L D e U Φ.toLinearMap := by
+theorem UpperTheory.V.Tower.desc
+    : ∀ (k L Ω : Type) [Field k] [NumberField k] [Field L] [NumberField L] [Field Ω] [Algebra k L]
+        [Algebra k Ω] [Algebra L Ω] [IsScalarTower k L Ω] [IsAlgClosure k Ω] [IsAlgClosure L Ω]
+        (l : ℕ) [Fact l.Prime] (D : LData L Ω l) (e : ℤ) (U : Subgroup (G k Ω)) [U.Normal],
+      e ≠ 0 → Procyc L Ω l → cycU l U = cycU l (galOf k L Ω)
+        → ∃ Φ : Sha D e ≃ₗ[ℤ_[l]] ShaD l l U (galOf k L Ω) e, IsDesc L D e U Φ.toLinearMap := by
   intro k L Ω _ _ _ _ _ _ _ _ _ _ _ l _ D e U _ he hpro hcyc
   have hfam := galEmbFam k L Ω l
   have hcycE : ∀ h : G L Ω, cycZ k Ω l (galEmb k L Ω h) = cycZ L Ω l h := fun h => by
@@ -37,18 +42,26 @@ theorem UpperTheory.V.Tower.desc :
       refine ⟨h, Subgroup.mem_inf.2 ⟨Subgroup.mem_top _, ?_⟩, rfl⟩
       rw [MonoidHom.mem_ker, ← hcycE]
       exact hσK
-  obtain ⟨Ψ, hΨ⟩ := dinfTransport k Ω L Ω (algebraMap k L) (RingEquiv.refl Ω)
-    (fun x => IsScalarTower.algebraMap_apply k L Ω x) (galEmb k L Ω) (fun g x => rfl)
-    l l U ⊤ hmap
-  have hdTw : ∀ (g : G k Ω) (χ : Dinf l l U) (w : cycU l U),
-      ((dTw l l U e g χ : Dinf l l U) : cycU l U → QZ l) w =
-        (((cycZ k Ω l ^ (-e)) g : ℤ_[l]ˣ) : ℤ_[l]) • (χ : cycU l U → QZ l) (conjHom (cycU l U) g w) := by
+  obtain ⟨Ψ, hΨ⟩ :=
+    dinfTransport k Ω L Ω (algebraMap k L) (RingEquiv.refl Ω)
+      (fun x => IsScalarTower.algebraMap_apply k L Ω x)
+      (galEmb k L Ω)
+      (fun g x => rfl)
+      l l U ⊤ hmap
+  have hdTw
+      : ∀ (g : G k Ω) (χ : Dinf l l U) (w : cycU l U),
+        ((dTw l l U e g χ : Dinf l l U) : cycU l U → QZ l) w
+          = (((cycZ k Ω l ^ (-e)) g : ℤ_[l]ˣ) : ℤ_[l])
+            • (χ : cycU l U → QZ l) (conjHom (cycU l U) g w) := by
     intro g χ w
     rfl
-  have hq : ∀ (h : G L Ω) (m : QZ l),
-      qzG L Ω l e h m = (((cycZ L Ω l ^ (-e)) h : ℤ_[l]ˣ) : ℤ_[l]) • m := fun h m => rfl
-  have hqE : ∀ (h : G L Ω) (m : QZ l),
-      (((cycZ k Ω l ^ (-e)) (galEmb k L Ω h) : ℤ_[l]ˣ) : ℤ_[l]) • m = qzG L Ω l e h m := by
+  have hq
+      : ∀ (h : G L Ω) (m : QZ l),
+        qzG L Ω l e h m = (((cycZ L Ω l ^ (-e)) h : ℤ_[l]ˣ) : ℤ_[l]) • m := fun h m =>
+    rfl
+  have hqE
+      : ∀ (h : G L Ω) (m : QZ l),
+        (((cycZ k Ω l ^ (-e)) (galEmb k L Ω h) : ℤ_[l]ˣ) : ℤ_[l]) • m = qzG L Ω l e h m := by
     intro h m
     rw [← hfam.2.2.2 e]
     rfl
@@ -62,15 +75,21 @@ theorem UpperTheory.V.Tower.desc :
       exact w.2
     obtain ⟨u, hu, huw⟩ := hw
     exact ⟨⟨u, hu⟩, Subtype.ext huw⟩
-  have key : ∀ χ : Dinf l l U, χ ∈ ShaD l l U (galOf k L Ω) e ↔
-      ((Ψ χ : Dinf l l (⊤ : Subgroup (G L Ω))) : cycU l (⊤ : Subgroup (G L Ω)) → QZ l) ∈
-        EqHom l (Uinf L Ω l) (qzG L Ω l e) := by
+  have key
+      : ∀ χ : Dinf l l U,
+        χ ∈ ShaD l l U (galOf k L Ω) e
+          ↔ ((Ψ χ : Dinf l l (⊤ : Subgroup (G L Ω))) : cycU l (⊤ : Subgroup (G L Ω)) → QZ l)
+            ∈ EqHom l (Uinf L Ω l) (qzG L Ω l e) := by
     intro χ
-    have hX : ((Ψ χ : Dinf l l (⊤ : Subgroup (G L Ω))) : cycU l (⊤ : Subgroup (G L Ω)) → QZ l) ∈
-        XDual l (Uinf L Ω l) ℤ_[l] (QZ l) := (Ψ χ).2
-    have hΨE : ∀ u, ((Ψ χ : Dinf l l (⊤ : Subgroup (G L Ω))) :
-        cycU l (⊤ : Subgroup (G L Ω)) → QZ l) u = (χ : cycU l U → QZ l) (E u) :=
-      fun u => hΨ χ u (E u) rfl
+    have hX
+        : ((Ψ χ : Dinf l l (⊤ : Subgroup (G L Ω))) : cycU l (⊤ : Subgroup (G L Ω)) → QZ l)
+          ∈ XDual l (Uinf L Ω l) ℤ_[l] (QZ l) :=
+      (Ψ χ).2
+    have hΨE
+        : ∀ u,
+          ((Ψ χ : Dinf l l (⊤ : Subgroup (G L Ω))) : cycU l (⊤ : Subgroup (G L Ω)) → QZ l) u
+            = (χ : cycU l U → QZ l) (E u) := fun u =>
+      hΨ χ u (E u) rfl
     constructor
     · intro hinv
       refine Submodule.mem_inf.2 ⟨hX, (Submodule.mem_iInf _).2 fun h => ?_⟩
@@ -78,8 +97,9 @@ theorem UpperTheory.V.Tower.desc :
       rw [hΨE, hΨE]
       have hg : galEmb k L Ω h ∈ galOf k L Ω := fun x => h.commutes x
       have hinvg := (Representation.mem_invariants _ _).1 hinv ⟨_, hg⟩
-      have h2 : ((dTw l l U e (galEmb k L Ω h) χ : Dinf l l U) : cycU l U → QZ l) (E u') =
-          (χ : cycU l U → QZ l) (E u') :=
+      have h2
+          : ((dTw l l U e (galEmb k L Ω h) χ : Dinf l l U) : cycU l U → QZ l) (E u')
+            = (χ : cycU l U → QZ l) (E u') :=
         congrArg (fun y : Dinf l l U => (y : cycU l U → QZ l) (E u')) hinvg
       rw [hdTw] at h2
       have hconj : conjHom (cycU l U) (galEmb k L Ω h) (E u') = E u := by
@@ -107,9 +127,10 @@ theorem UpperTheory.V.Tower.desc :
         refine Subgroup.mem_inf.2 ⟨Subgroup.mem_top _, ?_⟩
         rw [MonoidHom.mem_ker, map_mul, map_mul, map_inv,
           MonoidHom.mem_ker.1 (Subgroup.mem_inf.1 u'.2).2, mul_one, inv_mul_cancel]
-      have hcond := hC h ⟨_, hu⟩ u' (fun x => by
-        show (u' : G L Ω) (h x) = h ((h⁻¹ * (u' : G L Ω) * h) x)
-        rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, AlgEquiv.aut_inv, AlgEquiv.apply_symm_apply])
+      have hcond :=
+        hC h ⟨_, hu⟩ u' (fun x => by
+          show (u' : G L Ω) (h x) = h ((h⁻¹ * (u' : G L Ω) * h) x)
+          rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, AlgEquiv.aut_inv, AlgEquiv.apply_symm_apply])
       rw [hΨE, hΨE] at hcond
       have hconj : conjHom (cycU l U) (g : G k Ω) (E u') = E ⟨_, hu⟩ := by
         apply Subtype.ext
@@ -126,9 +147,10 @@ theorem UpperTheory.V.Tower.desc :
   let R0 : Sha D e →ₗ[ℤ_[l]] Dinf l l (⊤ : Subgroup (G L Ω)) :=
     LinearMap.codRestrict _ ((resInf D e).comp (Sha D e).subtype) (fun x => hED _ (hR x))
   let f : Sha D e →ₗ[ℤ_[l]] ShaD l l U (galOf k L Ω) e :=
-    LinearMap.codRestrict _ (Ψ.symm.toLinearMap.comp R0) (fun x => (key _).2 (by
-      rw [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]
-      exact hR x))
+    LinearMap.codRestrict _ (Ψ.symm.toLinearMap.comp R0) (fun x =>
+      (key _).2 (by
+        rw [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]
+        exact hR x))
   have hfinj : Function.Injective f := by
     intro x y hxy
     have h1 : Ψ.symm (R0 x) = Ψ.symm (R0 y) := congrArg Subtype.val hxy

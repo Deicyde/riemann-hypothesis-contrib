@@ -12,8 +12,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Arith.SchemeCoh
 
-open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits MonoidalCategory
-  MvPolynomial
+open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits MonoidalCategory MvPolynomial
 
 universe w' u
 
@@ -44,8 +43,8 @@ lemma ι_appTop_toSpecZero (z : 𝒜 0) :
   simp
   rfl
 
-def projValue {U : (Proj 𝒜).Opens} (s : Γ(Proj 𝒜, U)) (x : Proj 𝒜) (hx : x ∈ U) :
-    ProjTwist.Loc 𝒜 x :=
+def projValue {U : (Proj 𝒜).Opens} (s : Γ(Proj 𝒜, U)) (x : Proj 𝒜) (hx : x ∈ U)
+    : ProjTwist.Loc 𝒜 x :=
   ((show (ProjectiveSpectrum.Proj.structureSheaf 𝒜).1.obj (op U) from s).1 ⟨x, hx⟩).val
 
 lemma projValue_toSpecZero (z : 𝒜 0) (x : Proj 𝒜) :
@@ -159,19 +158,25 @@ lemma lval_push_smul {k : ℤ} {p : ℕ} (a : A) (σ : Cochain (twistAb A n k) (
 
 section Leray
 
-variable [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (projectiveSpace A n).toTopCat) AddCommGrpCat.{u})]
+variable
+  [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (projectiveSpace A n).toTopCat)
+    AddCommGrpCat.{u})]
 
-def cechHLinearEquivTwist (k : ℤ) (p : ℕ) :
-    cechH (twistAb A n k) (cover A n) p ≃ₗ[A]
-      Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p :=
-  (cechHEquiv (isCoverSystem_affineUnder (fun j : Fin (n + 1) => (X j : MvPolynomial (Fin (n + 1)) A)))
-    (cover A n) iSup_stdOpen (fun {_} i => ⟨isAffineOpen_inter i, i 0, inter_le _ i 0⟩) p _
-    (goodAcyclic_twist _ (fun j => X_mem j) k)).toLinearEquiv fun a x => by
-      rw [cechH.smul_def, H.smul_def]
-      exact cechHEquiv_naturality _ (cover A n) iSup_stdOpen
-        (fun {_} i => ⟨isAffineOpen_inter i, i 0, inter_le _ i 0⟩) p _ _
-        (smulAbRingHom (twistingSheaf (grading A n) k)
-          (algebraMap A Γ(projectiveSpace A n, ⊤) a)).asHom x
+def cechHLinearEquivTwist (k : ℤ) (p : ℕ)
+    : cechH (twistAb A n k) (cover A n) p ≃ₗ[A]
+        Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p :=
+  (cechHEquiv
+      (isCoverSystem_affineUnder (fun j : Fin (n + 1) => (X j : MvPolynomial (Fin (n + 1)) A)))
+      (cover A n) iSup_stdOpen
+      (fun {_} i => ⟨isAffineOpen_inter i, i 0, inter_le _ i 0⟩)
+      p _ (goodAcyclic_twist _ (fun j => X_mem j) k)).toLinearEquiv fun a x => by
+    rw [cechH.smul_def, H.smul_def]
+    exact cechHEquiv_naturality _ (cover A n) iSup_stdOpen
+      (fun {_} i => ⟨isAffineOpen_inter i, i 0, inter_le _ i 0⟩)
+      p _ _
+      (smulAbRingHom (twistingSheaf (grading A n) k)
+        (algebraMap A Γ(projectiveSpace A n, ⊤) a)).asHom
+      x
 
 end Leray
 
@@ -184,20 +189,21 @@ lemma smul_cls {k : ℤ} {p : ℕ} (a : A) (σ : Cochain (twistAb A n k) (cover 
 
 instance finite_negMon (m : ℕ) (k : ℤ) : Finite (NegMon m k) := by
   refine Finite.of_injective (β := Fin (m + 1) → Set.Icc k (-1))
-    (fun e j => ⟨e.1 j, ?_, ?_⟩) fun e e' h => Subtype.ext (funext fun j => ?_)
+    (fun e j => ⟨e.1 j, ?_, ?_⟩)
+    fun e e' h => Subtype.ext (funext fun j => ?_)
   · have hsum := Finset.add_sum_erase Finset.univ e.1 (Finset.mem_univ j)
-    have hle : ∑ i ∈ Finset.univ.erase j, e.1 i ≤ 0 :=
-      Finset.sum_nonpos fun i _ => (e.2.1 i).le
+    have hle : ∑ i ∈ Finset.univ.erase j, e.1 i ≤ 0 := Finset.sum_nonpos fun i _ => (e.2.1 i).le
     rw [e.2.2] at hsum
     omega
   · have := e.2.1 j
     omega
   · exact congrArg Subtype.val (congrFun h j)
 
-theorem finite_cechH_top (k : ℤ) (m : ℕ) :
-    Module.Finite A (cechH (twistAb A (m + 1) k) (cover A (m + 1)) (m + 1)) := by
-  refine Module.Finite.equiv ((AddEquiv.ofBijective _
-    (topMap_bijective (A := A) (k := k) (m := m))).toLinearEquiv fun a c => ?_).symm
+theorem finite_cechH_top (k : ℤ) (m : ℕ)
+    : Module.Finite A (cechH (twistAb A (m + 1) k) (cover A (m + 1)) (m + 1)) := by
+  refine Module.Finite.equiv
+    ((AddEquiv.ofBijective _ (topMap_bijective (A := A) (k := k) (m := m))).toLinearEquiv fun a c =>
+      ?_).symm
   obtain ⟨σ, hσ, rfl⟩ := exists_cls c
   change topMap (a • cls σ hσ) = a • topMap (cls σ hσ)
   rw [smul_cls, topMap_cls, topMap_cls]
@@ -207,11 +213,13 @@ theorem finite_cechH_top (k : ℤ) (m : ℕ) :
 
 def zeroL (k : ℤ) : cechH (twistAb A n k) (cover A n) 0 →+ Laurent A n :=
   QuotientAddGroup.lift _
-    ((AddMonoidHom.mk' (fun σ : Cochain (twistAb A n k) (cover A n) 0 => lval σ fun _ => 0)
-      fun σ τ => lval_add σ τ _).comp (cocycles _ _ 0).subtype) (by
-    intro x hx
-    rw [AddSubgroup.mem_addSubgroupOf, coboundaries_zero, AddSubgroup.mem_bot] at hx
-    simp [hx])
+    ((AddMonoidHom.mk'
+      (fun σ : Cochain (twistAb A n k) (cover A n) 0 => lval σ fun _ => 0)
+      fun σ τ => lval_add σ τ _).comp (cocycles _ _ 0).subtype)
+    (by
+      intro x hx
+      rw [AddSubgroup.mem_addSubgroupOf, coboundaries_zero, AddSubgroup.mem_bot] at hx
+      simp [hx])
 
 lemma zeroL_cls {k : ℤ} (σ : Cochain (twistAb A n k) (cover A n) 0) (hσ : d _ _ 0 σ = 0) :
     zeroL k (cls σ hσ) = lval σ fun _ => 0 := rfl
@@ -273,8 +281,10 @@ lemma finite_allowed (k : ℤ) : {m : Fin (n + 1) → ℤ | ∀ j, Allowed {j} k
       exact fun j => allowed_bound hm j
 
 theorem finite_cechH_zero (k : ℤ) : Module.Finite A (cechH (twistAb A n k) (cover A n) 0) := by
-  let ζ : cechH (twistAb A n k) (cover A n) 0 →ₗ[A] Laurent A n :=
-    { zeroL k with map_smul' := zeroL_smul }
+  let ζ : cechH (twistAb A n k) (cover A n) 0 →ₗ[A] Laurent A n := {
+    zeroL k with
+    map_smul' := zeroL_smul
+  }
   have hζ : Function.Injective ζ := zeroL_injective
   let T : Set (Laurent A n) :=
     (fun m => AddMonoidAlgebra.single m (1 : A)) '' {m | ∀ j, Allowed {j} k m}
@@ -321,33 +331,38 @@ end ProjSpace
 
 namespace ProjSpace
 
-variable {A : Type u} [CommRing A] {n : ℕ}
-  [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (projectiveSpace A n).toTopCat) AddCommGrpCat.{u})]
+variable
+  {A : Type u} [CommRing A]
+  {n : ℕ}
+  [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (projectiveSpace A n).toTopCat)
+    AddCommGrpCat.{u})]
 
 attribute [local instance] algebraOfOver
 
-theorem finite_H_twistingSheaf (k : ℤ) (p : ℕ) :
-    Module.Finite A (Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p) :=
+theorem finite_H_twistingSheaf (k : ℤ) (p : ℕ)
+    : Module.Finite A (Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p) :=
   have := finite_cechH (A := A) (n := n) k p
   Module.Finite.equiv (cechHLinearEquivTwist k p)
 
-theorem subsingleton_H_twistingSheaf {k : ℤ} (hk : 0 ≤ k) {p : ℕ} (hp : 0 < p) :
-    Subsingleton (Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p) := by
+theorem subsingleton_H_twistingSheaf {k : ℤ} (hk : 0 ≤ k) {p : ℕ} (hp : 0 < p)
+    : Subsingleton (Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p) := by
   rcases eq_or_ne p n with rfl | hpn
   · obtain ⟨e⟩ := nonempty_HTop_equiv.{w'} (A := A) k hp
-    have : IsEmpty (NegMon p k) := ⟨fun m => by
-      have hlt : ∑ j, m.1 j < 0 :=
-        Finset.sum_neg (fun j _ => m.2.1 j) Finset.univ_nonempty
-      rw [m.2.2] at hlt
-      omega⟩
+    have : IsEmpty (NegMon p k) :=
+      ⟨fun m => by
+        have hlt : ∑ j, m.1 j < 0 := Finset.sum_neg (fun j _ => m.2.1 j) Finset.univ_nonempty
+        rw [m.2.2] at hlt
+        omega⟩
     exact e.toEquiv.subsingleton
   · exact subsingleton_H.{w'} k hp hpn
 
-theorem subsingleton_H_of_lt (G : (projectiveSpace A n).Modules) [G.IsQuasicoherent] {p : ℕ}
-    (hp : n < p) : Subsingleton (Sheaf.H.{w'} (modulesAb G) p) := by
+theorem subsingleton_H_of_lt
+    (G : (projectiveSpace A n).Modules) [G.IsQuasicoherent] {p : ℕ} (hp : n < p)
+    : Subsingleton (Sheaf.H.{w'} (modulesAb G) p) := by
   obtain ⟨e⟩ : Nonempty (cechH (modulesAb G).obj (stdOpen A n) p ≃+ Sheaf.H.{w'} (modulesAb G) p) :=
     SchemeCoh.nonempty_cechH_equiv_H G (stdOpen A n) iSup_stdOpen
-      (fun _ i => by rw [← inter_eq_iInf]; exact isAffineOpen_inter i) p
+      (fun _ i => by rw [← inter_eq_iInf]; exact isAffineOpen_inter i)
+      p
   have : Subsingleton (cechH (modulesAb G).obj (stdOpen A n) p) :=
     cechH_subsingleton _ _ (by rw [Nat.card_eq_fintype_card, Fintype.card_fin]; omega)
   exact e.symm.toEquiv.subsingleton

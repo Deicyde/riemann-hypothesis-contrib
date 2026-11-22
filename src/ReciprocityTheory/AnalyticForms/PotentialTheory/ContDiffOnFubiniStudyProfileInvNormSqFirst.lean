@@ -16,28 +16,32 @@ def p1Re : (Fin 1 → ℂ) →L[ℝ] ℝ :=
 def p1Im : (Fin 1 → ℂ) →L[ℝ] ℝ :=
   Complex.imCLM.comp (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin 1 => ℂ) 0)
 
-@[simp] theorem rea_apply (w : Fin 1 → ℂ) : p1Re w = (w 0).re := rfl
-@[simp] theorem ima_apply (w : Fin 1 → ℂ) : p1Im w = (w 0).im := rfl
+@[simp]
+theorem rea_apply (w : Fin 1 → ℂ) : p1Re w = (w 0).re := rfl
+@[simp]
+theorem ima_apply (w : Fin 1 → ℂ) : p1Im w = (w 0).im := rfl
 
 def projectiveLineNormSqDerivative : (Fin 1 → ℂ) →L[ℝ] ((Fin 1 → ℂ) →L[ℝ] ℝ) :=
   (2 : ℝ) • (p1Re.smulRight p1Re + p1Im.smulRight p1Im)
 
-theorem dNormSq_apply (w v : Fin 1 → ℂ) :
-    projectiveLineNormSqDerivative w v = 2 * ((w 0).re * (v 0).re + (w 0).im * (v 0).im) := by
-  simp only [projectiveLineNormSqDerivative, ContinuousLinearMap.smul_apply, ContinuousLinearMap.add_apply,
-    ContinuousLinearMap.smulRight_apply, rea_apply, ima_apply, smul_eq_mul]
+theorem dNormSq_apply (w v : Fin 1 → ℂ)
+    : projectiveLineNormSqDerivative w v = 2 * ((w 0).re * (v 0).re + (w 0).im * (v 0).im) := by
+  simp only [projectiveLineNormSqDerivative, ContinuousLinearMap.smul_apply,
+    ContinuousLinearMap.add_apply, ContinuousLinearMap.smulRight_apply, rea_apply, ima_apply,
+    smul_eq_mul]
 
 theorem projLine_norm_sq_eq (z : ℂ) : ‖z‖ ^ 2 = z.re * z.re + z.im * z.im := by
   rw [Complex.sq_norm, Complex.normSq_apply]
 
-theorem projLine_hasFDerivAt_normSq (w : Fin 1 → ℂ) :
-    HasFDerivAt (fun w : Fin 1 → ℂ => ‖w 0‖ ^ 2) (projectiveLineNormSqDerivative w) w := by
+theorem projLine_hasFDerivAt_normSq (w : Fin 1 → ℂ)
+    : HasFDerivAt (fun w : Fin 1 → ℂ => ‖w 0‖ ^ 2) (projectiveLineNormSqDerivative w) w := by
   have h : (fun w : Fin 1 → ℂ => ‖w 0‖ ^ 2) = fun w => p1Re w * p1Re w + p1Im w * p1Im w := by
     funext w
     rw [projLine_norm_sq_eq]
     rfl
   rw [h]
-  have h2 : HasFDerivAt (fun w => p1Re w * p1Re w + p1Im w * p1Im w)
+  have h2 : HasFDerivAt
+      (fun w => p1Re w * p1Re w + p1Im w * p1Im w)
       ((p1Re w • p1Re + p1Re w • p1Re) + (p1Im w • p1Im + p1Im w • p1Im)) w :=
     (p1Re.hasFDerivAt.mul p1Re.hasFDerivAt).add (p1Im.hasFDerivAt.mul p1Im.hasFDerivAt)
   convert h2 using 1
@@ -47,14 +51,18 @@ theorem projLine_hasFDerivAt_normSq (w : Fin 1 → ℂ) :
     ima_apply]
   ring
 
-theorem projLine_continuous_normSq : Continuous (fun w : Fin 1 → ℂ => ‖w 0‖ ^ 2) := (continuous_norm.comp (continuous_apply 0)).pow 2
+theorem projLine_continuous_normSq : Continuous (fun w : Fin 1 → ℂ => ‖w 0‖ ^ 2) :=
+  (continuous_norm.comp (continuous_apply 0)).pow 2
 
-theorem projLine_leviForm_radial {F : (Fin 1 → ℂ) → ℝ} {G G' : ℝ → ℝ} {G'' : ℝ} {y : Fin 1 → ℂ}
-    (hF : ∀ᶠ w in 𝓝 y, F w = G (‖w 0‖ ^ 2))
-    (hG : ∀ᶠ t in 𝓝 (‖y 0‖ ^ 2), HasDerivAt G (G' t) t)
-    (hG' : HasDerivAt G' G'' (‖y 0‖ ^ 2)) (v : Fin 1 → ℂ) :
-    levi F y v = (G'' * ‖y 0‖ ^ 2 + G' (‖y 0‖ ^ 2)) * ‖v 0‖ ^ 2 := by
-  have hqd : ∀ w : Fin 1 → ℂ, HasFDerivAt (fun w : Fin 1 → ℂ => ‖w 0‖ ^ 2) (projectiveLineNormSqDerivative w) w :=
+theorem projLine_leviForm_radial
+    {F : (Fin 1 → ℂ) → ℝ} {G G' : ℝ → ℝ} {G'' : ℝ} {y : Fin 1 → ℂ}
+    (hF : ∀ᶠ w in 𝓝 y, F w = G (‖w 0‖ ^ 2)) (hG : ∀ᶠ t in 𝓝 (‖y 0‖ ^ 2), HasDerivAt G (G' t) t)
+    (hG' : HasDerivAt G' G'' (‖y 0‖ ^ 2))
+    (v : Fin 1 → ℂ)
+    : levi F y v = (G'' * ‖y 0‖ ^ 2 + G' (‖y 0‖ ^ 2)) * ‖v 0‖ ^ 2 := by
+  have hqd
+      : ∀ w : Fin 1 → ℂ,
+        HasFDerivAt (fun w : Fin 1 → ℂ => ‖w 0‖ ^ 2) (projectiveLineNormSqDerivative w) w :=
     projLine_hasFDerivAt_normSq
   have hev : ∀ᶠ w in 𝓝 y, HasFDerivAt F (G' (‖w 0‖ ^ 2) • projectiveLineNormSqDerivative w) w := by
     have h1 : ∀ᶠ w in 𝓝 y, ∀ᶠ z in 𝓝 w, F z = G (‖z 0‖ ^ 2) := hF.eventually_nhds
@@ -64,9 +72,14 @@ theorem projLine_leviForm_radial {F : (Fin 1 → ℂ) → ℝ} {G G' : ℝ → �
     exact (hw2.comp_hasFDerivAt w (hqd w)).congr_of_eventuallyEq hw1
   have hfd : fderiv ℝ F =ᶠ[𝓝 y] fun w => G' (‖w 0‖ ^ 2) • projectiveLineNormSqDerivative w :=
     hev.mono fun w hw => hw.fderiv
-  have hc : HasFDerivAt (fun w : Fin 1 → ℂ => G' (‖w 0‖ ^ 2)) (G'' • projectiveLineNormSqDerivative y) y :=
+  have hc : HasFDerivAt
+      (fun w : Fin 1 → ℂ => G' (‖w 0‖ ^ 2))
+      (G'' • projectiveLineNormSqDerivative y) y :=
     hG'.comp_hasFDerivAt y (hqd y)
-  have hL : HasFDerivAt (fun w : Fin 1 → ℂ => projectiveLineNormSqDerivative w) projectiveLineNormSqDerivative y := projectiveLineNormSqDerivative.hasFDerivAt
+  have hL : HasFDerivAt
+      (fun w : Fin 1 → ℂ => projectiveLineNormSqDerivative w)
+      projectiveLineNormSqDerivative y :=
+    projectiveLineNormSqDerivative.hasFDerivAt
   have h2 := (hc.smul hL).congr_of_eventuallyEq hfd
   rw [levi, h2.fderiv]
   simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply,
@@ -76,8 +89,9 @@ theorem projLine_leviForm_radial {F : (Fin 1 → ℂ) → ℝ} {G G' : ℝ → �
   ring
 
 open scoped Classical in
-theorem continuous_chart1_inv :
-    Continuous (fun w : Fin 1 → ℂ => if w 0 = 0 then (∞ : OnePoint ℂ) else (((w 0)⁻¹ : ℂ) : OnePoint ℂ)) := by
+theorem continuous_chart1_inv
+    : Continuous (fun w : Fin 1 → ℂ =>
+      if w 0 = 0 then (∞ : OnePoint ℂ) else (((w 0)⁻¹ : ℂ) : OnePoint ℂ)) := by
   set g : ℂ → OnePoint ℂ := fun z => if z = 0 then (∞ : OnePoint ℂ) else ((z⁻¹ : ℂ) : OnePoint ℂ)
     with hg_def
   have hg : Continuous g := by
@@ -105,30 +119,38 @@ theorem continuous_chart1_inv :
       simp [hg_def, hw]
   exact hg.comp (continuous_apply 0)
 
-theorem projLine_analyticAt_apply_zero (w : Fin 1 → ℂ) : AnalyticAt ℂ (fun w : Fin 1 → ℂ => w 0) w := (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin 1 => ℂ) 0).analyticAt w
+theorem projLine_analyticAt_apply_zero (w : Fin 1 → ℂ)
+    : AnalyticAt ℂ (fun w : Fin 1 → ℂ => w 0) w :=
+  (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin 1 => ℂ) 0).analyticAt w
 
-theorem projLine_analyticAt_inv_apply_zero {w : Fin 1 → ℂ} (hw : w 0 ≠ 0) :
-    AnalyticAt ℂ (fun w : Fin 1 → ℂ => (w 0)⁻¹) w := (projLine_analyticAt_apply_zero w).inv hw
+theorem projLine_analyticAt_inv_apply_zero {w : Fin 1 → ℂ} (hw : w 0 ≠ 0)
+    : AnalyticAt ℂ (fun w : Fin 1 → ℂ => (w 0)⁻¹) w :=
+  (projLine_analyticAt_apply_zero w).inv hw
 
-theorem projLine_analyticAt_const_apply_zero (w : Fin 1 → ℂ) :
-    AnalyticAt ℂ (fun w : Fin 1 → ℂ => fun _ : Fin 1 => w 0) w := AnalyticAt.pi fun _ => projLine_analyticAt_apply_zero w
+theorem projLine_analyticAt_const_apply_zero (w : Fin 1 → ℂ)
+    : AnalyticAt ℂ (fun w : Fin 1 → ℂ => fun _ : Fin 1 => w 0) w :=
+  AnalyticAt.pi fun _ => projLine_analyticAt_apply_zero w
 
-theorem projLine_analyticAt_const_inv_apply_zero {w : Fin 1 → ℂ} (hw : w 0 ≠ 0) :
-    AnalyticAt ℂ (fun w : Fin 1 → ℂ => fun _ : Fin 1 => (w 0)⁻¹) w := AnalyticAt.pi fun _ => projLine_analyticAt_inv_apply_zero hw
+theorem projLine_analyticAt_const_inv_apply_zero {w : Fin 1 → ℂ} (hw : w 0 ≠ 0)
+    : AnalyticAt ℂ (fun w : Fin 1 → ℂ => fun _ : Fin 1 => (w 0)⁻¹) w :=
+  AnalyticAt.pi fun _ => projLine_analyticAt_inv_apply_zero hw
 
 def fubiniStudyProfile (t : ℝ) : ℝ := (1 / 2) * Real.log (1 + t)
 def fubiniStudyProfileInv (t : ℝ) : ℝ := (1 / 2) * Real.log (1 + t⁻¹)
 def fsQ (w : Fin 1 → ℂ) : ℝ := ‖w 0‖ ^ 2
 
-theorem contDiff_fsQ : ContDiff ℝ (⊤ : ℕ∞) fsQ := (contDiff_norm_sq ℝ).comp (contDiff_apply ℝ (fun _ => ℂ) 0)
+theorem contDiff_fsQ : ContDiff ℝ (⊤ : ℕ∞) fsQ :=
+  (contDiff_norm_sq ℝ).comp (contDiff_apply ℝ (fun _ => ℂ) 0)
 
-theorem contDiff_fubiniStudyProfile_normSqFirst : ContDiff ℝ (⊤ : ℕ∞) (fun w => fubiniStudyProfile (fsQ w)) := by
+theorem contDiff_fubiniStudyProfile_normSqFirst
+    : ContDiff ℝ (⊤ : ℕ∞) (fun w => fubiniStudyProfile (fsQ w)) := by
   unfold fubiniStudyProfile
   refine contDiff_const.mul ((contDiff_const.add contDiff_fsQ).log fun w => ?_)
   have h0 : 0 ≤ fsQ w := by unfold fsQ; positivity
   exact ne_of_gt (by linarith)
 
-theorem contDiffOn_fubiniStudyProfileInv_normSqFirst : ContDiffOn ℝ (⊤ : ℕ∞) (fun w => fubiniStudyProfileInv (fsQ w)) {w | w 0 ≠ 0} := by
+theorem contDiffOn_fubiniStudyProfileInv_normSqFirst
+    : ContDiffOn ℝ (⊤ : ℕ∞) (fun w => fubiniStudyProfileInv (fsQ w)) {w | w 0 ≠ 0} := by
   unfold fubiniStudyProfileInv
   have hne : ∀ w ∈ {w : Fin 1 → ℂ | w 0 ≠ 0}, fsQ w ≠ 0 := by
     intro w hw
@@ -140,8 +162,9 @@ theorem contDiffOn_fubiniStudyProfileInv_normSqFirst : ContDiffOn ℝ (⊤ : ℕ
   show 1 + (fsQ w)⁻¹ ≠ 0
   exact ne_of_gt (by linarith)
 
-theorem projLine_continuous_of_smooth {e : ℕ} {X : Type*} [TopologicalSpace X]
-    (A : FinHolAtlas e X) {f : X → ℝ} (hf : A.Smooth f) : Continuous f := by
+theorem projLine_continuous_of_smooth
+    {e : ℕ} {X : Type*} [TopologicalSpace X] (A : FinHolAtlas e X) {f : X → ℝ} (hf : A.Smooth f)
+    : Continuous f := by
   rw [continuous_iff_continuousAt]
   intro x
   obtain ⟨j, hj⟩ := A.cover x
@@ -157,13 +180,14 @@ theorem projLine_continuous_of_smooth {e : ℕ} {X : Type*} [TopologicalSpace X]
   filter_upwards [(A.chart j).open_source.mem_nhds hj] with y hy
   simp [(A.chart j).left_inv hy]
 
-theorem hasDerivAt_fubiniStudyProfile {t : ℝ} (ht : -1 < t) : HasDerivAt fubiniStudyProfile ((1 / 2) * (1 + t)⁻¹) t := by
+theorem hasDerivAt_fubiniStudyProfile {t : ℝ} (ht : -1 < t)
+    : HasDerivAt fubiniStudyProfile ((1 / 2) * (1 + t)⁻¹) t := by
   have h1 : HasDerivAt (fun x : ℝ => 1 + x) 1 t := (hasDerivAt_id t).const_add 1
   have h2 := (h1.log (ne_of_gt (by linarith))).const_mul (1 / 2 : ℝ)
   exact h2.congr_deriv (by simp only [one_div])
 
-theorem hasDerivAt_fubiniStudyProfileInv {t : ℝ} (ht : 0 < t) :
-    HasDerivAt fubiniStudyProfileInv (-(1 / 2) * (t * (t + 1))⁻¹) t := by
+theorem hasDerivAt_fubiniStudyProfileInv {t : ℝ} (ht : 0 < t)
+    : HasDerivAt fubiniStudyProfileInv (-(1 / 2) * (t * (t + 1))⁻¹) t := by
   have ht0 : t ≠ 0 := ht.ne'
   have ht1 : t + 1 ≠ 0 := by positivity
   have h1 : HasDerivAt (fun x : ℝ => 1 + x⁻¹) (-(t ^ 2)⁻¹) t := (hasDerivAt_inv ht0).const_add 1

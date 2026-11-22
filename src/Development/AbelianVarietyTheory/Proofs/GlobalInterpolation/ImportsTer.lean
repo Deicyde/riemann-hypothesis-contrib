@@ -19,16 +19,17 @@ theorem step (w : ℂ) (h : ‖w - 1‖ < 1 / 2) : (3 / 2 : ℝ) * ‖w - 1‖ �
   rw [mul_comm]
   exact mul_le_mul_of_nonneg_left h2 (norm_nonneg _)
 
-theorem iter {z : ℂ} (hz : ∀ n : ℕ, ‖z ^ n - (1 : ℂ)‖ < (1 / 2 : ℝ)) (k : ℕ) :
-    (3 / 2 : ℝ) ^ k * ‖z - 1‖ ≤ ‖z ^ (2 ^ k) - 1‖ := by
+theorem iter {z : ℂ} (hz : ∀ n : ℕ, ‖z ^ n - (1 : ℂ)‖ < (1 / 2 : ℝ)) (k : ℕ)
+    : (3 / 2 : ℝ) ^ k * ‖z - 1‖ ≤ ‖z ^ (2 ^ k) - 1‖ := by
   induction k with
   | zero => simp
   | succ k ih =>
     have hs := step (z ^ (2 ^ k)) (hz _)
-    have e : z ^ (2 ^ (k + 1)) = (z ^ (2 ^ k)) ^ 2 := by
-      rw [← pow_mul, pow_succ]
+    have e : z ^ (2 ^ (k + 1)) = (z ^ (2 ^ k)) ^ 2 := by rw [← pow_mul, pow_succ]
     rw [e, pow_succ]
-    calc (3 / 2 : ℝ) ^ k * (3 / 2) * ‖z - 1‖ = (3 / 2) * ((3 / 2) ^ k * ‖z - 1‖) := by ring
+    calc
+      (3 / 2 : ℝ) ^ k * (3 / 2) * ‖z - 1‖
+        = (3 / 2) * ((3 / 2) ^ k * ‖z - 1‖) := by ring
       _ ≤ (3 / 2) * ‖z ^ (2 ^ k) - 1‖ := by gcongr
       _ ≤ _ := hs
 

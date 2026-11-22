@@ -4,13 +4,15 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.DYhc9.IsLat :
-    {E : Type} → [inst : Field E] → {N : ℕ} → Submodule (NumberField.RingOfIntegers E) (Fin N → E) → Prop :=
-    fun {E : Type} [Field E] {N : ℕ} (Λ : Submodule (NumberField.RingOfIntegers E) (Fin N → E)) ↦
-      Λ.FG ∧ Submodule.span E (↑Λ : Set (Fin N → E)) = ⊤
+noncomputable def UpperTheory.Reformulated.B.DYhc9.IsLat
+    : {E : Type} → [inst : Field E] → {N : ℕ} → Submodule (NumberField.RingOfIntegers E) (Fin N → E)
+      → Prop :=
+  fun {E : Type} [Field E] {N : ℕ} (Λ : Submodule (NumberField.RingOfIntegers E) (Fin N → E)) ↦
+    Λ.FG ∧ Submodule.span E (↑Λ : Set (Fin N → E)) = ⊤
 
-private theorem UpperTheory.Reformulated.B.DYhc9.exists_denom {E : Type} [Field E] [NumberField E] (a : E) :
-    ∃ d : ℕ, d ≠ 0 ∧ IsIntegral ℤ ((d : E) * a) := by
+private theorem UpperTheory.Reformulated.B.DYhc9.exists_denom
+    {E : Type} [Field E] [NumberField E] (a : E)
+    : ∃ d : ℕ, d ≠ 0 ∧ IsIntegral ℤ ((d : E) * a) := by
   have halg : IsAlgebraic ℤ a := by
     have : Algebra.IsAlgebraic ℤ E :=
       (IsFractionRing.comap_isAlgebraic_iff (A := ℤ) (K := ℚ)).mpr inferInstance
@@ -29,12 +31,13 @@ private theorem UpperTheory.Reformulated.B.DYhc9.exists_denom {E : Type} [Field 
     rw [this, neg_mul]
     exact hint'.neg
 
-theorem UpperTheory.Reformulated.B.DYhc9.main :
-    ∀ {E : Type} [inst : Field E] [NumberField E] {N : ℕ} {Λ : Submodule (NumberField.RingOfIntegers E) (Fin N → E)},
-      UpperTheory.Reformulated.B.DYhc9.IsLat Λ → ∀ (x : Fin N → E), ∃ (m : ℕ), m ≠ (0 : ℕ) ∧ (↑m : E) • x ∈ Λ := by
+theorem UpperTheory.Reformulated.B.DYhc9.main
+    : ∀ {E : Type} [inst : Field E] [NumberField E] {N : ℕ}
+        {Λ : Submodule (NumberField.RingOfIntegers E) (Fin N → E)},
+      UpperTheory.Reformulated.B.DYhc9.IsLat Λ
+        → ∀ (x : Fin N → E), ∃ (m : ℕ), m ≠ (0 : ℕ) ∧ (↑m : E) • x ∈ Λ := by
   intro E _ _ N Λ h x
-  have hx : x ∈ Submodule.span E (Λ : Set (Fin N → E)) := by
-    rw [h.2]; trivial
+  have hx : x ∈ Submodule.span E (Λ : Set (Fin N → E)) := by rw [h.2]; trivial
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -52,8 +55,9 @@ theorem UpperTheory.Reformulated.B.DYhc9.main :
     obtain ⟨m, hm, hmy⟩ := hy
     obtain ⟨d, hd, hint⟩ := UpperTheory.Reformulated.B.DYhc9.exists_denom a
     refine ⟨d * m, mul_ne_zero hd hm, ?_⟩
-    obtain ⟨b, hb⟩ : ∃ b : NumberField.RingOfIntegers E,
-        algebraMap (NumberField.RingOfIntegers E) E b = (d : E) * a :=
+    obtain ⟨b, hb⟩
+        : ∃ b : NumberField.RingOfIntegers E,
+          algebraMap (NumberField.RingOfIntegers E) E b = (d : E) * a :=
       ⟨_, IsIntegralClosure.algebraMap_mk' _ _ hint⟩
     have key : ((d * m : ℕ) : E) • (a • y) = b • ((m : E) • y) := by
       ext i

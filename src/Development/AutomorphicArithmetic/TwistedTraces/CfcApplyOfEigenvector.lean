@@ -7,11 +7,17 @@ public import Mathlib.Topology.ContinuousMap.StoneWeierstrass
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C
 
-theorem UpperTheory.cfc_apply_of_eigenvector :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (A : H →L[ℂ] H), IsSelfAdjoint A → ∀ (φ : ℝ → ℝ), Continuous φ → ∀ (x : ℝ) (v : H), A v = (x : ℂ) • v → (cfc φ A : H →L[ℂ] H) v = (φ x : ℂ) • v := by
+theorem UpperTheory.cfc_apply_of_eigenvector
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (A : H →L[ℂ] H),
+      IsSelfAdjoint A
+        → ∀ (φ : ℝ → ℝ),
+          Continuous φ
+            → ∀ (x : ℝ) (v : H), A v = (x : ℂ) • v → (cfc φ A : H →L[ℂ] H) v = (φ x : ℂ) • v := by
   intro H _ _ _ A hA φ hφ x v hv
   by_cases hv0 : v = 0
   · simp [hv0]
@@ -23,10 +29,8 @@ theorem UpperTheory.cfc_apply_of_eigenvector :
     rw [spectrum.mem_iff]
     rintro ⟨u, hu⟩
     apply hv0
-    have h0 : (u : H →L[ℂ] H) v = 0 := by
-      rw [hu, ContinuousLinearMap.sub_apply, halg, hv, sub_self]
-    have h1 : ((↑u⁻¹ * ↑u : H →L[ℂ] H)) v = v := by
-      rw [Units.inv_mul]; rfl
+    have h0 : (u : H →L[ℂ] H) v = 0 := by rw [hu, ContinuousLinearMap.sub_apply, halg, hv, sub_self]
+    have h1 : ((↑u⁻¹ * ↑u : H →L[ℂ] H)) v = v := by rw [Units.inv_mul]; rfl
     rw [← h1, ContinuousLinearMap.mul_apply, h0, map_zero]
   have key : ∀ f : C(spectrum ℝ A, ℝ), (cfcHom hA f : H →L[ℂ] H) v = ((f ⟨x, hx⟩ : ℝ) : ℂ) • v := by
     intro f
@@ -46,7 +50,8 @@ theorem UpperTheory.cfc_apply_of_eigenvector :
       rw [map_mul, ContinuousLinearMap.mul_apply, hg, map_smul, hf, smul_smul]
       simp [mul_comm]
     | frequently f hf =>
-      have hc : IsClosed {g : C(spectrum ℝ A, ℝ) | (cfcHom hA g : H →L[ℂ] H) v = ((g ⟨x, hx⟩ : ℝ) : ℂ) • v} := by
+      have hc : IsClosed
+          {g : C(spectrum ℝ A, ℝ) | (cfcHom hA g : H →L[ℂ] H) v = ((g ⟨x, hx⟩ : ℝ) : ℂ) • v} := by
         apply isClosed_eq
         · exact (cfcHom_continuous hA).clm_apply continuous_const
         · exact (Complex.continuous_ofReal.comp (continuous_eval_const _)).smul continuous_const

@@ -6,8 +6,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
@@ -39,8 +42,7 @@ private lemma UpperTheory.Gal.crystallineComparison.Mod.tensor_decomp (p : ℕ) 
     obtain ⟨d, b', rfl⟩ := hb
     exact ⟨c + d, a' + b', by rw [TensorProduct.add_tmul, smul_add]; abel⟩
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.oMod_of :
-    OMod := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.oMod_of : OMod := by
   intro p _ D hm x
   obtain ⟨e⟩ := D.splitP
   have hsub : Subsingleton (Fin D.m) := by rw [hm]; infer_instance
@@ -53,11 +55,13 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.oMod_of :
     obtain rfl := Subsingleton.elim j i0
     rw [ha]
     simp [M', Matrix.algebraMap_matrix_apply, Algebra.TensorProduct.algebraMap_apply]
-  have hx : x ⊗ₜ[ℤ] (1 : ℤ_[p]) =
-      (algebraMap (𝓞 D.F) D.O c) ⊗ₜ[ℤ] (1 : ℤ_[p]) + (p : ℤ) • e.symm M' := by
+  have hx
+      : x ⊗ₜ[ℤ] (1 : ℤ_[p])
+        = (algebraMap (𝓞 D.F) D.O c) ⊗ₜ[ℤ] (1 : ℤ_[p]) + (p : ℤ) • e.symm M' := by
     have := congrArg e.symm hM
     rw [e.symm_apply_apply, map_add (f := _), map_zsmul, AlgEquiv.commutes,
-      Algebra.TensorProduct.algebraMap_apply] at this
+        Algebra.TensorProduct.algebraMap_apply]
+      at this
     exact this
   let P : Submodule ℤ D.O := LinearMap.range (LinearMap.lsmul ℤ D.O (p : ℤ))
   have hP : ∀ q : D.O ⧸ P, p • q = 0 := by
@@ -66,8 +70,9 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.oMod_of :
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
     exact ⟨y, by simp⟩
   letI : Module (ZMod p) (D.O ⧸ P) := AddCommGroup.zmodModule hP
-  let Φ : D.O ⊗[ℤ] ℤ_[p] →ₗ[ℤ] D.O ⧸ P := TensorProduct.lift <|
-    LinearMap.mk₂ ℤ (fun y z => PadicInt.toZMod z • (Submodule.Quotient.mk y : D.O ⧸ P))
+  let Φ : D.O ⊗[ℤ] ℤ_[p] →ₗ[ℤ] D.O ⧸ P :=
+    TensorProduct.lift <| LinearMap.mk₂ ℤ
+      (fun y z => PadicInt.toZMod z • (Submodule.Quotient.mk y : D.O ⧸ P))
       (fun y y' z => by simp [smul_add])
       (fun n y z => by rw [Submodule.Quotient.mk_smul]; exact smul_comm _ _ _)
       (fun y z z' => by simp [add_smul])
@@ -78,8 +83,7 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.oMod_of :
     rw [map_one, one_smul]
   have h2 := congrArg Φ hx
   rw [map_add (f := _), map_zsmul, h1, h1] at h2
-  have h3 : (p : ℤ) • Φ (e.symm M') = 0 := by
-    rw [natCast_zsmul]; exact hP _
+  have h3 : (p : ℤ) • Φ (e.symm M') = 0 := by rw [natCast_zsmul]; exact hP _
   rw [h3, add_zero, Submodule.Quotient.eq] at h2
   obtain ⟨y, hy⟩ := h2
   refine ⟨c, y, ?_⟩

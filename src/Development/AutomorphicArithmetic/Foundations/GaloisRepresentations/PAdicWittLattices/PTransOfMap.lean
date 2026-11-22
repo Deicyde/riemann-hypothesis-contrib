@@ -7,20 +7,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilIsOfHeck
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
 
-private theorem tiso_congr {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [CommRing R] [Algebra ℚ R] {gb : GBase D.toG R}
-    {S : Scheme.{0}} {s : S ⟶ Sp R} {N : ℕ} (o : GObj gb N s) {k : Type} [Field k] {t t' : Sp k ⟶ S} (e : t = t')
-    (I : UpperTheory.Gal.Int.Geo.TIso o t) (hI : Ind o I) :
-    ∃ J : UpperTheory.Gal.Int.Geo.TIso o t', Ind o J ∧ ∀ n x, (J.ev n x).left = (I.ev n x).left := by
+private theorem tiso_congr
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {R : Type} [CommRing R] [Algebra ℚ R]
+    {gb : GBase D.toG R} {S : Scheme.{0}} {s : S ⟶ Sp R} {N : ℕ} (o : GObj gb N s)
+    {k : Type} [Field k]
+    {t t' : Sp k ⟶ S} (e : t = t') (I : UpperTheory.Gal.Int.Geo.TIso o t) (hI : Ind o I)
+    : ∃ J : UpperTheory.Gal.Int.Geo.TIso o t',
+      Ind o J ∧ ∀ n x, (J.ev n x).left = (I.ev n x).left := by
   subst e
   exact ⟨I, hI, fun _ _ => rfl⟩
 
-private theorem lbIso_hecke_lbPow_one {X : Scheme.{0}} {P : LB X} (hP : P.IsLB) : LBIso (Hecke.lbPow P 1) P := by
+private theorem lbIso_hecke_lbPow_one {X : Scheme.{0}} {P : LB X} (hP : P.IsLB)
+    : LBIso (Hecke.lbPow P 1) P := by
   have h1 : (Hecke.lbPow P 1).IsLB := LB.isLB_linComb hP _ _
   have h2 : (lbPow P 1).IsLB := GlobalTheory.isLB_lbPow hP 1
   have h3 : ((Hecke.lbPow P 1).pull (𝟙 X)).IsLB := pull_isLB h1 _
@@ -29,8 +37,7 @@ private theorem lbIso_hecke_lbPow_one {X : Scheme.{0}} {P : LB X} (hP : P.IsLB) 
       (GlobalTheory.BiextPairing.lbIso_lbPow_hecke hP 1).symm)
     (GlobalTheory.lbIso_lbPow_one hP)
 
-theorem UpperTheory.Gal.G3.pTransOfMap :
-    MultBasic → RelComp → TatePull → TransOfMap := by
+theorem UpperTheory.Gal.G3.pTransOfMap : MultBasic → RelComp → TatePull → TransOfMap := by
   intro MB RC TP p _ D G L R _ _ gb S s N o o' m
   have hw : m.φ ≫ o'.A.hom = o.A.hom := by simpa using m.cart.1.w
   let θ : o.A ⟶ o'.A := Over.homMk m.φ hw
@@ -57,7 +64,8 @@ theorem UpperTheory.Gal.G3.pTransOfMap :
   have hinvmon : IsMonHom (inv θ) := (inferInstance : IsMonHom (asIso θ).inv)
   refine ⟨hmon, hact, ⟨inv θ, 1, hinvmon, ?_, ?_, ?_, by simp⟩, ⟨1, by simp, ?_, ?_⟩, ?_⟩
   · intro c
-    rw [IsIso.eq_inv_comp, ← Category.assoc, ← hact c, Category.assoc, IsIso.hom_inv_id, Category.comp_id]
+    rw [IsIso.eq_inv_comp, ← Category.assoc, ← hact c, Category.assoc, IsIso.hom_inv_id,
+      Category.comp_id]
   · rw [pow_one]
     exact IsIso.hom_inv_id θ
   · rw [pow_one]
@@ -80,6 +88,7 @@ theorem UpperTheory.Gal.G3.pTransOfMap :
     have hint : Integ L 1 := by
       intro v hv
       simpa using hv
-    have hR := (RC p D G L R gb S s (↑N) (↑N) (↑N) o' o' o' k t J J J (𝟙 _) (𝟙 _) 1 1
-      inferInstance inferInstance hint).1 n hn hcop x y
+    have hR :=
+      (RC p D G L R gb S s (↑N) (↑N) (↑N) o' o' o' k t J J J (𝟙 _) (𝟙 _) 1 1 inferInstance
+        inferInstance hint).1 n hn hcop x y
     simpa using hR

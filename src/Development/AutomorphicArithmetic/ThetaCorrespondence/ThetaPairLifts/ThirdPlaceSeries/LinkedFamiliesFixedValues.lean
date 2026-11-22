@@ -14,8 +14,9 @@ noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions
 namespace Formalism.L2
 section
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L} {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D}
-  {cX : ExtraC}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L}
+  {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
 structure TiedDataSAlt (ex : Extra D L hT Gi Gl K Y cX) where
   host : Host.HostTied D
   level : Host.LevelTied D
@@ -42,14 +43,18 @@ structure TiedDataSAlt (ex : Extra D L hT Gi Gl K Y cX) where
   g : G.GroupCompatibilityAll D hT ex.cmp
   herm_eq : g.herm = full.1.to0
   forms_eq : g.forms = fun u => (cols.forms u).to0
-def ExtraDataSelfDual (ex : Extra D L hT Gi Gl K Y cX) : Prop := Nonempty (_root_.Formalism.L2.TiedDataSAlt ex)
+def ExtraDataSelfDual (ex : Extra D L hT Gi Gl K Y cX) : Prop :=
+  Nonempty (_root_.Formalism.L2.TiedDataSAlt ex)
 end
 def SecondChernLinkedClass : FamClass := fun {_} Fm =>
-  ∃ x0 : ℝ, ∀ x (hx : Fm.x1 < x), x0 ≤ x → ∀ i : Fm.Ix x, _root_.Formalism.L2.ExtraDataSelfDual (Fm.ex x hx i)
-def LinkedFamiliesFixedValues' : FamClass := Formalism.MainNotions.WithPage _root_.Formalism.L2.SecondChernLinkedClass
+  ∃ x0 : ℝ, ∀ x (hx : Fm.x1 < x),
+    x0 ≤ x → ∀ i : Fm.Ix x, _root_.Formalism.L2.ExtraDataSelfDual (Fm.ex x hx i)
+def LinkedFamiliesFixedValues' : FamClass :=
+  Formalism.MainNotions.WithPage _root_.Formalism.L2.SecondChernLinkedClass
 def LinkedFamiliesAligned' : FamClass := fun {_} Fm =>
-  _root_.Formalism.L2.LinkedFamiliesFixedValues' Fm ∧ Formalism.MainNotions.DIV.Align.SmallFirstModulusBelowScale Fm ∧
-    Formalism.MainNotions.TameDistinctF Fm
+  _root_.Formalism.L2.LinkedFamiliesFixedValues' Fm
+    ∧ Formalism.MainNotions.DIV.Align.SmallFirstModulusBelowScale Fm
+    ∧ Formalism.MainNotions.TameDistinctF Fm
 end Formalism.L2
 end
 end

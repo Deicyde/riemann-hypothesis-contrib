@@ -12,24 +12,26 @@ noncomputable section
 
 namespace PI.VolStabS.TopoNuFin
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory Filter Topology
-  PI.VolFromSW PI.VolStabS.PositiveNearLattice
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory Filter Topology PI.VolFromSW PI.VolStabS.PositiveNearLattice
 open scoped TensorProduct ENNReal
 
 section Adele
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem eventually_int_of_compact {C : Set (Af F)} (hC : IsCompact C) :
-    ∀ᶠ v in cofinite, ∀ x ∈ C, x v ∈ v.adicCompletionIntegers F := by
+theorem eventually_int_of_compact {C : Set (Af F)} (hC : IsCompact C)
+    : ∀ᶠ v in cofinite, ∀ x ∈ C, x v ∈ v.adicCompletionIntegers F := by
   classical
   let U : Set (Af F) := {y | ∀ v, y v ∈ v.adicCompletionIntegers F}
   have hU : IsOpen U :=
     RestrictedProduct.isOpen_forall_mem (fun v => PI.VolStabS.TopoAF.isOpen_integers (F := F) v)
   have h0 : (0 : Af F) ∈ U := fun v => zero_mem _
-  obtain ⟨t, ht⟩ := hC.elim_finite_subcover (fun x : C => (fun y => y - (x : Af F)) ⁻¹' U)
-    (fun x => hU.preimage (continuous_sub_right _))
-    (fun x hx => Set.mem_iUnion.mpr ⟨⟨x, hx⟩, by simpa using h0⟩)
+  obtain ⟨t, ht⟩ :=
+    hC.elim_finite_subcover
+      (fun x : C => (fun y => y - (x : Af F)) ⁻¹' U)
+      (fun x => hU.preimage (continuous_sub_right _))
+      (fun x hx => Set.mem_iUnion.mpr ⟨⟨x, hx⟩, by simpa using h0⟩)
   have hfin : ∀ᶠ v in cofinite, ∀ i ∈ t, ((i : C) : Af F) v ∈ v.adicCompletionIntegers F :=
     (Filter.eventually_all_finset t).mpr fun i _ => i.1.2
   filter_upwards [hfin] with v hv x hx
@@ -47,31 +49,37 @@ end Adele
 
 section Local
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
-  {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  {d : ℕ} (b : Module.Basis (Fin d) F E)
+  (v : HeightOneSpectrum (𝓞 F))
 
 theorem zero_mem_latV (a M : ℕ) : (0 : Fin a → Fin M → Fv F v ⊗[F] E) ∈ latV b v := by
-
   simp only [latV, Set.mem_setOf_eq, Pi.zero_apply, map_zero, Finsupp.zero_apply]
   exact fun _ _ _ => zero_mem _
 
-
 include b in
-theorem exists_clopen_compact {a M : ℕ} {K : Set (Fin a → Fin M → Fv F v ⊗[F] E)}
-    (hK : IsCompact K) : ∃ C, IsClopen C ∧ IsCompact C ∧ K ⊆ C := by
+theorem exists_clopen_compact {a M : ℕ} {K : Set (Fin a → Fin M → Fv F v ⊗[F] E)} (hK : IsCompact K)
+    : ∃ C, IsClopen C ∧ IsCompact C ∧ K ⊆ C := by
   classical
   let b := Module.finBasis F E
   let L := latV (M := M) (n := a) b v
   have hLo := isClopen_latV b v a M
   have hLc := isCompact_latV b v a M
-  let tr : (Fin a → Fin M → Fv F v ⊗[F] E) → Set (Fin a → Fin M → Fv F v ⊗[F] E) :=
-    fun y => (Homeomorph.subRight y) ⁻¹' L
-  obtain ⟨t, ht⟩ := hK.elim_finite_subcover (fun y : K => tr (y : Fin a → Fin M → Fv F v ⊗[F] E))
-    (fun y => hLo.isOpen.preimage (Homeomorph.subRight _).continuous)
-    (fun z hz => Set.mem_iUnion.2 ⟨⟨z, hz⟩, by
-      show z - z ∈ L
-      rw [sub_self]
-      exact zero_mem_latV b v a M⟩)
+  let tr : (Fin a → Fin M → Fv F v ⊗[F] E) → Set (Fin a → Fin M → Fv F v ⊗[F] E) := fun y =>
+    (Homeomorph.subRight y) ⁻¹' L
+  obtain ⟨t, ht⟩ :=
+    hK.elim_finite_subcover
+      (fun y : K => tr (y : Fin a → Fin M → Fv F v ⊗[F] E))
+      (fun y => hLo.isOpen.preimage (Homeomorph.subRight _).continuous)
+      (fun z hz =>
+        Set.mem_iUnion.2 ⟨
+          ⟨z, hz⟩,
+          by
+            show z - z ∈ L
+            rw [sub_self]
+            exact zero_mem_latV b v a M
+        ⟩)
   refine ⟨⋃ y ∈ t, tr (y : Fin a → Fin M → Fv F v ⊗[F] E), ?_, ?_, ht⟩
   · exact isClopen_biUnion_finset fun y _ => hLo.preimage (Homeomorph.subRight _).continuous
   · exact t.isCompact_biUnion fun y _ => (Homeomorph.subRight _).isCompact_preimage.2 hLc
@@ -82,15 +90,20 @@ end PI.VolStabS.TopoNuFin
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory Filter Topology
-  PI.VolFromSW PI.VolStabS.PositiveNearLattice PI.VolStabS.TopoNuFin
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory Filter Topology PI.VolFromSW PI.VolStabS.PositiveNearLattice
+  PI.VolStabS.TopoNuFin
 open scoped TensorProduct ENNReal
 
-theorem nuFin_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
-    [FiniteDimensional F E] (σ : E →ₐ[F] E) {M a : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    (T : Matrix (Fin a) (Fin a) E) (hT : ∀ i j, σ (T j i) = T i j) (ψ : AddChar (AF F) ℂ)
-    (νX : Measure (Fin a → Fin M → AF F ⊗[F] E)) (hν : IsOmT F E σ M J ψ T hT νX)
-    (K : Set (Fin a → Fin M → AF F ⊗[F] E)) (hK : IsCompact K) : νX K < ⊤ := by
+theorem nuFin_gen
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+    (σ : E →ₐ[F] E)
+    {M a : ℕ}
+    (J : Matrix (Fin M) (Fin M) E) (T : Matrix (Fin a) (Fin a) E) (hT : ∀ i j, σ (T j i) = T i j)
+    (ψ : AddChar (AF F) ℂ) (νX : Measure (Fin a → Fin M → AF F ⊗[F] E))
+    (hν : IsOmT F E σ M J ψ T hT νX)
+    (K : Set (Fin a → Fin M → AF F ⊗[F] E)) (hK : IsCompact K)
+    : νX K < ⊤ := by
   classical
   obtain ⟨⟨μinf, hμinf⟩, h1⟩ := hν.2
   obtain ⟨⟨νinf, hνinf⟩, h2⟩ := h1 μinf hμinf
@@ -109,8 +122,8 @@ theorem nuFin_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
   have hΦis : HasCompactSupport Φinf := hfc.comp_left Complex.ofReal_zero
 
   have hKf : IsCompact (projFin '' K) := hK.image (continuous_projFin b)
-  let Kv : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fin a → Fin M → Fv F v ⊗[F] E) :=
-    fun v => projV v '' (projFin '' K)
+  let Kv : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fin a → Fin M → Fv F v ⊗[F] E) := fun v =>
+    projV v '' (projFin '' K)
   have hKv : ∀ v, IsCompact (Kv v) := fun v => hKf.image (TopoMeas.continuous_projV b v)
   have hev : ∀ᶠ v in cofinite, Kv v ⊆ latV b v := by
     have h := fun (x : Fin a) (i : Fin M) (k : Fin (Module.finrank F E)) =>
@@ -125,8 +138,8 @@ theorem nuFin_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
     rw [e]
     exact hv x i k _ ⟨Y, hY, rfl⟩
   choose C hCo hCc hKC using fun v => exists_clopen_compact b v (hKv v)
-  let Cv : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fin a → Fin M → Fv F v ⊗[F] E) :=
-    fun v => if Kv v ⊆ latV b v then latV b v else C v
+  let Cv : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fin a → Fin M → Fv F v ⊗[F] E) := fun v =>
+    if Kv v ⊆ latV b v then latV b v else C v
   have hCvo : ∀ v, IsClopen (Cv v) := fun v => by
     by_cases h : Kv v ⊆ latV b v
     · rw [show Cv v = latV b v from if_pos h]; exact isClopen_latV b v a M
@@ -139,13 +152,14 @@ theorem nuFin_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
     by_cases h : Kv v ⊆ latV b v
     · rw [show Cv v = latV b v from if_pos h]; exact h
     · rw [show Cv v = C v from if_neg h]; exact hKC v
-  let Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ :=
-    fun v => (Cv v).indicator 1
+  let Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ := fun v =>
+    (Cv v).indicator 1
   let Φf : (Fin a → Fin M → Af F ⊗[F] E) → ℂ := fun Y => ∏ᶠ v, Φv v (projV v Y)
   let Φ : (Fin a → Fin M → AF F ⊗[F] E) → ℂ := fun X => Φinf (projInf X) * Φf (projFin X)
-  have hSB : ∀ v, IsSB (Φv v) := fun v =>
-    ⟨(LocallyConstant.indicator (LocallyConstant.const _ (1 : ℂ)) (hCvo v)).isLocallyConstant,
-      HasCompactSupport.intro' (hCvc v) (hCvo v).isClosed fun Y hY => Set.indicator_of_notMem hY _⟩
+  have hSB : ∀ v, IsSB (Φv v) := fun v => ⟨
+    (LocallyConstant.indicator (LocallyConstant.const _ (1 : ℂ)) (hCvo v)).isLocallyConstant,
+    HasCompactSupport.intro' (hCvc v) (hCvo v).isClosed fun Y hY => Set.indicator_of_notMem hY _
+  ⟩
   have hpure : IsPureFin b Φf Φv := by
     refine ⟨hSB, ?_, fun _ => rfl⟩
     filter_upwards [hev] with v hv
@@ -159,15 +173,15 @@ theorem nuFin_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
       refine finprod_eq_one_of_forall_eq_one fun v => ?_
       exact Set.indicator_of_mem (hKCv v ⟨projFin X, ⟨X, hX, rfl⟩, rfl⟩) _
     simp only [Φ, h1, h2, mul_one]
-  calc νX K ≤ νX {X | 1 ≤ ‖Φ X‖ₑ} := measure_mono fun X hX => by
-        simp [hone X hX]
+  calc
+    νX K
+      ≤ νX {X | 1 ≤ ‖Φ X‖ₑ} := measure_mono fun X hX => by simp [hone X hX]
     _ ≤ ∫⁻ X, ‖Φ X‖ₑ ∂νX := by
-        have := mul_meas_ge_le_lintegral₀ hint.aestronglyMeasurable.enorm 1
-        simpa using this
+      have := mul_meas_ge_le_lintegral₀ hint.aestronglyMeasurable.enorm 1
+      simpa using this
     _ < ⊤ := hint.2
 
 theorem nuFin_holds : NuFin := by
-
   intro F E _ _ _ _ _ σ hCM M J hJ h1 h2 a ha haM X0 hT hdet ψ hψ νX hν K hK
   haveI : FiniteDimensional F E := by
     first

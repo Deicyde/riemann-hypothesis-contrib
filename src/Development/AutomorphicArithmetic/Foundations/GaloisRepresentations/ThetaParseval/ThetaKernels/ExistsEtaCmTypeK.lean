@@ -18,8 +18,12 @@ open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHeck
 open Formalism.IndefR.DatumF
 noncomputable section
 namespace GlobalTheory.EtaCMType
-theorem exists_eta_cmType_k : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
-    _root_.UpperTheory.TP.W.GoodK σ B → ∃ η : (AF F ⊗[F] E)ˣ →* Circle, IsHeckeCharF η ∧ ResEtaF η 1 ∧ HasExp B.emb η (fun _ => 1) := by
+theorem exists_eta_cmType_k
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      _root_.UpperTheory.TP.W.GoodK σ B
+        → ∃ η : (AF F ⊗[F] E)ˣ →* Circle,
+          IsHeckeCharF η ∧ ResEtaF η 1 ∧ HasExp B.emb η (fun _ => 1) := by
   intro F E _ _ _ _ _ σ B hB
   obtain ⟨ξ, hξ, hξe⟩ := _root_.GlobalTheory.T.exists_hecke_character_trivial_exponent F E σ B hB
   obtain ⟨η₀, hη₀, huniq⟩ := GlobalTheory.IdeleNormChar.globalNormIndexTwo F E hB.cm.2.2.1
@@ -43,8 +47,10 @@ theorem exists_eta_cmType_k : ∀ (F E : Type) [Field F] [NumberField F] [Field 
       refine Finset.prod_congr rfl fun w _ => ?_
       rw [zpow_one]
     rw [hlam, e3, mul_inv_cancel]
-  obtain ⟨lam', hl'H, hl'inf, hl'res⟩ := _root_.GlobalTheory.T.extend_character_to_norm_group F E σ B hB lam hlc hlF hlinf
-  refine ⟨ξ * lam'⁻¹, ⟨hξ.1.mul hl'H.1.inv, fun x => ?_⟩, ⟨⟨η₀, hη₀'⟩, fun η hη a => ?_⟩, fun z hz => ?_⟩
+  obtain ⟨lam', hl'H, hl'inf, hl'res⟩ :=
+    _root_.GlobalTheory.T.extend_character_to_norm_group F E σ B hB lam hlc hlF hlinf
+  refine
+    ⟨ξ * lam'⁻¹, ⟨hξ.1.mul hl'H.1.inv, fun x => ?_⟩, ⟨⟨η₀, hη₀'⟩, fun η hη a => ?_⟩, fun z hz => ?_⟩
   · change ξ _ * (lam' _)⁻¹ = 1
     rw [hξ.2, hl'H.2, inv_one, one_mul]
   · change ξ _ * (lam' _)⁻¹ = _

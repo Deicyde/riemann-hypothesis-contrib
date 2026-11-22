@@ -11,9 +11,11 @@ noncomputable section
 
 namespace GlobalTheory.LowTypeRestriction
 
-theorem determinedByLowTypes : DeterminedByLowTypes := GlobalTheory.T.multiplicitySpace_eq_zero_of_lowestKTypes
+theorem determinedByLowTypes : DeterminedByLowTypes :=
+  GlobalTheory.T.multiplicitySpace_eq_zero_of_lowestKTypes
 
-theorem resInj : GlobalTheory.IndefiniteRowSideFullHecke.ResidueInjectivityAt.ResInj := resInj_of_determined determinedByLowTypes
+theorem resInj : GlobalTheory.IndefiniteRowSideFullHecke.ResidueInjectivityAt.ResInj :=
+  resInj_of_determined determinedByLowTypes
 
 end GlobalTheory.LowTypeRestriction
 

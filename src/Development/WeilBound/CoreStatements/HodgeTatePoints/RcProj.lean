@@ -17,19 +17,22 @@ open scoped Matrix
 
 section Gen
 
-variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] {F : Type} [Field F]
-  [Fintype F] [DecidableEq F]
+variable
+  {C : Type} [Field C]
+  {R : Type} [CommRing R] [Algebra R C]
+  {F : Type} [Field F] [Fintype F] [DecidableEq F]
 variable {N X : Type} [AddCommGroup N] [Module F N] [AddCommGroup X] [Module F X]
 
 def projL (χ : MulChar F R) : (N → C) →ₗ[R] (N → C) where
   toFun := GlobalTheory.CompanionTheory.Ar.GR.proj χ
   map_add' g h := by
     funext x
-    simp only [GlobalTheory.CompanionTheory.Ar.GR.proj, Pi.add_apply, mul_add, Finset.sum_add_distrib]
+    simp only [GlobalTheory.CompanionTheory.Ar.GR.proj, Pi.add_apply, mul_add,
+      Finset.sum_add_distrib]
   map_smul' r g := by
     funext x
-    simp only [GlobalTheory.CompanionTheory.Ar.GR.proj, Pi.smul_apply, Algebra.smul_def, RingHom.id_apply,
-      Finset.mul_sum]
+    simp only [GlobalTheory.CompanionTheory.Ar.GR.proj, Pi.smul_apply, Algebra.smul_def,
+      RingHom.id_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun a _ => by ring
 
 lemma projL_apply (χ : MulChar F R) (g : N → C) (x : N) :

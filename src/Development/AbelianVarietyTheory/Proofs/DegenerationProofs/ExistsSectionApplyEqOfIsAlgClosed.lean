@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsIntegra
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
@@ -149,15 +150,16 @@ private lemma exists_section_through_closed_fiber_point (V K : Type) [CommRing V
       PrimeSpectrum.ext hψq
     exact (congrArg hU.fromSpec this).trans hqx
 
-
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
-theorem _root_.GlobalTheory.exists_section_of_quasiFinite_flat :
-    ∀ (V K : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [IsAlgClosed K]
-      [Algebra V K] [IsFractionRing V K] (X : Scheme.{0}) (f : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp V) [IsSeparated f]
-      [QuasiCompact f] [LocallyOfFiniteType f] [LocallyQuasiFinite f] [Flat f] (x : X),
-      f x = IsLocalRing.closedPoint V →
-        ∃ s : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp V ⟶ X, s ≫ f = 𝟙 _ ∧ s (IsLocalRing.closedPoint V) = x := by
+theorem _root_.GlobalTheory.exists_section_of_quasiFinite_flat
+    : ∀ (V K : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [IsAlgClosed K]
+        [Algebra V K] [IsFractionRing V K] (X : Scheme.{0})
+        (f : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp V) [IsSeparated f]
+        [QuasiCompact f] [LocallyOfFiniteType f] [LocallyQuasiFinite f] [Flat f] (x : X),
+      f x = IsLocalRing.closedPoint V
+        → ∃ s : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp V ⟶ X,
+          s ≫ f = 𝟙 _ ∧ s (IsLocalRing.closedPoint V) = x := by
   intro V K _ _ _ _ _ _ _ X f _ _ _ _ _ x hx
   exact exists_section_through_closed_fiber_point V K X f x hx
 

@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.MinusHatsPass
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory GlobalTheory.HatNF
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd
+  Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory
+  GlobalTheory.HatNF
 
 namespace GlobalTheory.HatNF
 
@@ -15,8 +17,12 @@ section
 
 variable {P : M.Par} {A : Type} [Ring A] [StarRing A] [Algebra ℂ A]
 
-theorem bmon_mul_mem_nfSpan_of_mem (d : Q.NFData P A) (T : Set A) (i j n : ℕ) {c : A} (hc : c ∈ bmon d)
-    {x : A} (hx : x ∈ nfSpan d T i j n) : c * x ∈ nfSpan d T i j n := by
+theorem bmon_mul_mem_nfSpan_of_mem
+    (d : Q.NFData P A)
+    (T : Set A) (i j n : ℕ)
+    {c : A} (hc : c ∈ bmon d)
+    {x : A} (hx : x ∈ nfSpan d T i j n)
+    : c * x ∈ nfSpan d T i j n := by
   unfold nfSpan at hx ⊢
   induction hx using Submodule.span_induction with
   | mem y hy =>
@@ -29,9 +35,11 @@ theorem bmon_mul_mem_nfSpan_of_mem (d : Q.NFData P A) (T : Set A) (i j n : ℕ) 
   | add y z _ _ hy hz => rw [mul_add]; exact Submodule.add_mem _ hy hz
   | smul a y _ hy => rw [mul_smul_comm]; exact Submodule.smul_mem _ a hy
 
-theorem nfSpan_one_mul_mem_of_letters (d : Q.NFData P A) (T : Set A) {c : A}
-    (hc : ∀ X ∈ T, X * c ∈ nfSpan d T 0 0 1) {x : A} (hx : x ∈ nfSpan d T 0 0 1) :
-    x * c ∈ nfSpan d T 0 0 1 := by
+theorem nfSpan_one_mul_mem_of_letters
+    (d : Q.NFData P A) (T : Set A)
+    {c : A} (hc : ∀ X ∈ T, X * c ∈ nfSpan d T 0 0 1)
+    {x : A} (hx : x ∈ nfSpan d T 0 0 1)
+    : x * c ∈ nfSpan d T 0 0 1 := by
   unfold nfSpan at hx
   induction hx using Submodule.span_induction with
   | mem y hy =>
@@ -39,8 +47,7 @@ theorem nfSpan_one_mul_mem_of_letters (d : Q.NFData P A) (T : Set A) {c : A}
     rcases H with _ | ⟨h, _ | ⟨h', t⟩⟩
     · simp at hHl
     · have hhT : h ∈ T := hH h (by simp)
-      have e : y * c = b * (h * c) := by
-        rw [hrest]; simp [mul_assoc]
+      have e : y * c = b * (h * c) := by rw [hrest]; simp [mul_assoc]
       rw [e]
       exact bmon_mul_mem_nfSpan_of_mem d T 0 0 1 hb (hc h hhT)
     · simp at hHl
@@ -50,7 +57,10 @@ theorem nfSpan_one_mul_mem_of_letters (d : Q.NFData P A) (T : Set A) {c : A}
 
 end
 
-theorem hats_mul_bmon_mem_nfSpan : ∀ (P : M.Par) (A : Type) [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A] (d : Q.NFData P A), HatHyp d → ∀ X ∈ hats d.L, ∀ b ∈ bmon d, X * b ∈ nfSpan d (hats d.L) 0 0 1 := by
+theorem hats_mul_bmon_mem_nfSpan
+    : ∀ (P : M.Par) (A : Type) [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
+        (d : Q.NFData P A),
+      HatHyp d → ∀ X ∈ hats d.L, ∀ b ∈ bmon d, X * b ∈ nfSpan d (hats d.L) 0 0 1 := by
   intro P A _ _ _ _ d hd X hX b hb
   have key : ∀ X ∈ hats d.L, X * b ∈ nfSpan d (hats d.L) 0 0 1 := by
     clear hX X

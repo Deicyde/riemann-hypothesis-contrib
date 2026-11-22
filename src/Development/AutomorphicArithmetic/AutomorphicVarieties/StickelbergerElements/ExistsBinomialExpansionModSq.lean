@@ -6,10 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Stickelberg
 
 open Finset UpperTheory.V.Bern UpperTheory.V.Stk
 
-theorem UpperTheory.V.Stk.exists_binomial_expansion_mod_sq :
-    ∀ (b j M : ℤ) (e : ℕ),
-      (∃ z : ℤ, (b + M * j) ^ (e + 1) = b ^ (e + 1) + ((e : ℤ) + 1) * b ^ e * (M * j) + M ^ 2 * z) ∧
-      ∃ w : ℤ, (b + M * j) ^ e = b ^ e + M * w := by
+theorem UpperTheory.V.Stk.exists_binomial_expansion_mod_sq
+    : ∀ (b j M : ℤ) (e : ℕ),
+      (∃ z : ℤ, (b + M * j) ^ (e + 1) = b ^ (e + 1) + ((e : ℤ) + 1) * b ^ e * (M * j) + M ^ 2 * z)
+        ∧ ∃ w : ℤ, (b + M * j) ^ e = b ^ e + M * w := by
   intro b j M e
   have h2 : ∀ n : ℕ, ∃ w : ℤ, (b + M * j) ^ n = b ^ n + M * w := by
     intro n

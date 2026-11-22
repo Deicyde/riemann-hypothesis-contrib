@@ -28,18 +28,17 @@ def complexUnitsHom {w : InfinitePlace K} (hw : w.IsComplex) : ℂˣ →ₜ* (w.
   toMonoidHom := Units.map ((ringEquivComplexOfIsComplex hw).symm : ℂ →+* w.Completion).toMonoidHom
   continuous_toFun := Units.continuous_map (isometryEquivComplexOfIsComplex hw).symm.continuous
 
-
-
 omit [NumberField K] in
-theorem realUnitsHom_surjective {w : InfinitePlace K} (hw : w.IsReal) (a : (w.Completion)ˣ) :
-    realUnitsHom hw (Units.map (ringEquivRealOfIsReal hw : w.Completion →+* ℝ).toMonoidHom a) = a :=
+theorem realUnitsHom_surjective {w : InfinitePlace K} (hw : w.IsReal) (a : (w.Completion)ˣ)
+    : realUnitsHom hw (Units.map (ringEquivRealOfIsReal hw : w.Completion →+* ℝ).toMonoidHom a)
+      = a :=
   Units.ext ((ringEquivRealOfIsReal hw).symm_apply_apply _)
 
-
 omit [NumberField K] in
-theorem complexUnitsHom_surjective {w : InfinitePlace K} (hw : w.IsComplex) (a : (w.Completion)ˣ) :
-    complexUnitsHom hw
-      (Units.map (ringEquivComplexOfIsComplex hw : w.Completion →+* ℂ).toMonoidHom a) = a :=
+theorem complexUnitsHom_surjective {w : InfinitePlace K} (hw : w.IsComplex) (a : (w.Completion)ˣ)
+    : complexUnitsHom hw
+        (Units.map (ringEquivComplexOfIsComplex hw : w.Completion →+* ℂ).toMonoidHom a)
+      = a :=
   Units.ext ((ringEquivComplexOfIsComplex hw).symm_apply_apply _)
 
 end Completions
@@ -59,8 +58,8 @@ theorem toFinite_ofInfinite (x : (InfiniteAdeleRing K)ˣ) : toFinite K (ofInfini
   change ((prodEquiv K) ((ContinuousMulEquiv.symm (prodEquiv K)) (x, 1))).2 = 1
   rw [ContinuousMulEquiv.apply_symm_apply]
 
-theorem ofFinite_mul_ofInfinite (x : IdeleGroup K) :
-    ofFinite (toFinite K x) * ofInfinite (toInfinite K x) = x := by
+theorem ofFinite_mul_ofInfinite (x : IdeleGroup K)
+    : ofFinite (toFinite K x) * ofInfinite (toInfinite K x) = x := by
   apply (prodEquiv K).injective
   refine Prod.ext ?_ ?_
   · change toInfinite K (ofFinite (toFinite K x) * ofInfinite (toInfinite K x)) = toInfinite K x
@@ -73,31 +72,32 @@ def infiniteComponent (w : InfinitePlace K) : (InfiniteAdeleRing K)ˣ →* (w.Co
 
 omit [NumberField K] in
 @[simp]
-theorem coe_infiniteComponent (w : InfinitePlace K) (x : (InfiniteAdeleRing K)ˣ) :
-    ((infiniteComponent w x : (w.Completion)ˣ) : w.Completion) = (x : InfiniteAdeleRing K) w :=
+theorem coe_infiniteComponent (w : InfinitePlace K) (x : (InfiniteAdeleRing K)ˣ)
+    : ((infiniteComponent w x : (w.Completion)ˣ) : w.Completion) = (x : InfiniteAdeleRing K) w :=
   rfl
 
-theorem ofInfinite_map_infiniteAdeleSingle (w : InfinitePlace K) (a : (w.Completion)ˣ) :
-    ofInfinite (Units.map (infiniteAdeleSingle w) a) = infiniteEmbedding w a :=
+theorem ofInfinite_map_infiniteAdeleSingle (w : InfinitePlace K) (a : (w.Completion)ˣ)
+    : ofInfinite (Units.map (infiniteAdeleSingle w) a) = infiniteEmbedding w a :=
   Units.ext rfl
 
-theorem prod_map_infiniteAdeleSingle (x : (InfiniteAdeleRing K)ˣ) :
-    ∏ w, Units.map (infiniteAdeleSingle w) (infiniteComponent w x) = x := by
+theorem prod_map_infiniteAdeleSingle (x : (InfiniteAdeleRing K)ˣ)
+    : ∏ w, Units.map (infiniteAdeleSingle w) (infiniteComponent w x) = x := by
   classical
   apply Units.ext
   rw [Units.coe_prod]
   exact Finset.univ_prod_mulSingle (fun w : InfinitePlace K ↦ (x : InfiniteAdeleRing K) w)
 
-theorem ofInfinite_eq_prod (x : (InfiniteAdeleRing K)ˣ) :
-    ofInfinite x = ∏ w, infiniteEmbedding w (infiniteComponent w x) := by
+theorem ofInfinite_eq_prod (x : (InfiniteAdeleRing K)ˣ)
+    : ofInfinite x = ∏ w, infiniteEmbedding w (infiniteComponent w x) := by
   conv_lhs => rw [← prod_map_infiniteAdeleSingle x]
   rw [map_prod]
   simp only [ofInfinite_map_infiniteAdeleSingle]
 
 variable (K) in
 def infinitePositive : Subgroup (InfiniteAdeleRing K)ˣ where
-  carrier := {x | ∀ (w : InfinitePlace K) (hw : w.IsReal),
-    0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal hw ((x : InfiniteAdeleRing K) w)}
+  carrier :=
+    {x | ∀ (w : InfinitePlace K) (hw : w.IsReal),
+      0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal hw ((x : InfiniteAdeleRing K) w)}
   one_mem' w hw := by
     show 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal hw (1 : w.Completion)
     rw [map_one]
@@ -108,35 +108,40 @@ def infinitePositive : Subgroup (InfiniteAdeleRing K)ˣ where
     rw [map_mul]
     exact mul_pos (ha w hw) (hb w hw)
   inv_mem' {a} ha w hw := by
-    have h0 : ((a⁻¹ : (InfiniteAdeleRing K)ˣ) : InfiniteAdeleRing K) w *
-        (a : InfiniteAdeleRing K) w = 1 :=
+    have h0
+        : ((a⁻¹ : (InfiniteAdeleRing K)ˣ) : InfiniteAdeleRing K) w * (a : InfiniteAdeleRing K) w
+          = 1 :=
       congrFun a.inv_mul w
-    have h1 : InfinitePlace.Completion.extensionEmbeddingOfIsReal hw
-        (((a⁻¹ : (InfiniteAdeleRing K)ˣ) : InfiniteAdeleRing K) w) *
-        InfinitePlace.Completion.extensionEmbeddingOfIsReal hw ((a : InfiniteAdeleRing K) w) = 1 := by
+    have h1
+        : InfinitePlace.Completion.extensionEmbeddingOfIsReal hw
+              (((a⁻¹ : (InfiniteAdeleRing K)ˣ) : InfiniteAdeleRing K) w)
+            * InfinitePlace.Completion.extensionEmbeddingOfIsReal hw ((a : InfiniteAdeleRing K) w)
+          = 1 := by
       rw [← map_mul, h0, map_one]
     rw [eq_inv_of_mul_eq_one_left h1]
     exact inv_pos.2 (ha w hw)
 
 omit [NumberField K] in
-theorem mem_infinitePositive {x : (InfiniteAdeleRing K)ˣ} :
-    x ∈ infinitePositive K ↔ ∀ (w : InfinitePlace K) (hw : w.IsReal),
-      0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal hw ((x : InfiniteAdeleRing K) w) :=
+theorem mem_infinitePositive {x : (InfiniteAdeleRing K)ˣ}
+    : x ∈ infinitePositive K
+      ↔ ∀ (w : InfinitePlace K) (hw : w.IsReal),
+        0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal hw ((x : InfiniteAdeleRing K) w) :=
   Iff.rfl
 
 variable (K) in
 def infiniteSign : (InfiniteAdeleRing K)ˣ →* ({w : InfinitePlace K // w.IsReal} → SignTypeˣ) :=
-  MonoidHom.pi fun w ↦ (Units.map (signHom : ℝ →*₀ SignType).toMonoidHom).comp
-    ((Units.map (InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2 :
-      w.1.Completion →+* ℝ).toMonoidHom).comp (infiniteComponent w.1))
+  MonoidHom.pi fun w ↦
+    (Units.map (signHom : ℝ →*₀ SignType).toMonoidHom).comp
+      ((Units.map
+        (InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
+          : w.1.Completion →+* ℝ).toMonoidHom).comp (infiniteComponent w.1))
 
 omit [NumberField K] in
-theorem infiniteSign_apply_val (x : (InfiniteAdeleRing K)ˣ) (w : {w : InfinitePlace K // w.IsReal}) :
-    ((infiniteSign K x w : SignTypeˣ) : SignType) =
-      SignType.sign (InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
+theorem infiniteSign_apply_val (x : (InfiniteAdeleRing K)ˣ) (w : {w : InfinitePlace K // w.IsReal})
+    : ((infiniteSign K x w : SignTypeˣ) : SignType)
+      = SignType.sign (InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
         ((x : InfiniteAdeleRing K) w.1)) :=
   rfl
-
 
 omit [NumberField K] in
 theorem infinitePositive_eq_ker : infinitePositive K = (infiniteSign K).ker := by
@@ -160,25 +165,25 @@ variable (K) in
 def rayGroup (𝔪 : Ideal (𝓞 K)) : Subgroup (IdeleGroup K) :=
   (diagonal K).range ⊔ (idealLevel 𝔪).map ofFinite ⊔ (infinitePositive K).map ofInfinite
 
-theorem map_idealLevel_le_standardOpenSubgroup (𝔪 : Ideal (𝓞 K)) :
-    (idealLevel 𝔪).map ofFinite ≤ standardOpenSubgroup K := by
+theorem map_idealLevel_le_standardOpenSubgroup (𝔪 : Ideal (𝓞 K))
+    : (idealLevel 𝔪).map ofFinite ≤ standardOpenSubgroup K := by
   rintro _ ⟨x, hx, rfl⟩
   rw [mem_standardOpenSubgroup_iff_toFinite_mem, toFinite_ofFinite]
   exact finiteLevel_le_finiteLevel_zero _ hx
 
-theorem map_infinitePositive_le_standardOpenSubgroup :
-    (infinitePositive K).map ofInfinite ≤ standardOpenSubgroup K := by
+theorem map_infinitePositive_le_standardOpenSubgroup
+    : (infinitePositive K).map ofInfinite ≤ standardOpenSubgroup K := by
   rintro _ ⟨x, -, rfl⟩
   rw [mem_standardOpenSubgroup_iff_toFinite_mem, toFinite_ofInfinite]
   exact one_mem _
 
-theorem rayGroup_le (𝔪 : Ideal (𝓞 K)) :
-    rayGroup K 𝔪 ≤ (diagonal K).range ⊔ standardOpenSubgroup K :=
+theorem rayGroup_le (𝔪 : Ideal (𝓞 K))
+    : rayGroup K 𝔪 ≤ (diagonal K).range ⊔ standardOpenSubgroup K :=
   sup_le (sup_le le_sup_left ((map_idealLevel_le_standardOpenSubgroup 𝔪).trans le_sup_right))
     (map_infinitePositive_le_standardOpenSubgroup.trans le_sup_right)
 
-theorem finite_quotient_idealLevel {𝔪 : Ideal (𝓞 K)} (h𝔪 : 𝔪 ≠ ⊥) :
-    Finite (finiteLevel (K := K) 0 ⧸ (idealLevel 𝔪).subgroupOf (finiteLevel 0)) := by
+theorem finite_quotient_idealLevel {𝔪 : Ideal (𝓞 K)} (h𝔪 : 𝔪 ≠ ⊥)
+    : Finite (finiteLevel (K := K) 0 ⧸ (idealLevel 𝔪).subgroupOf (finiteLevel 0)) := by
   have hc : IsCompact (finiteLevel (K := K) 0 : Set (FiniteAdeleRing (𝓞 K) K)ˣ) := by
     convert isCompact_finite_units_integral K using 1
     ext x
@@ -197,24 +202,29 @@ theorem finite_quotient_idealLevel {𝔪 : Ideal (𝓞 K)} (h𝔪 : 𝔪 ≠ ⊥
   exact Subgroup.quotient_finite_of_isOpen _
     ((isOpen_finiteLevel hs).preimage continuous_subtype_val)
 
-def standardOpenInfiniteHom : standardOpenSubgroup K →* (InfiniteAdeleRing K)ˣ ⧸ infinitePositive K :=
+def standardOpenInfiniteHom
+    : standardOpenSubgroup K →* (InfiniteAdeleRing K)ˣ ⧸ infinitePositive K :=
   (QuotientGroup.mk' _).comp ((toInfinite K).comp (standardOpenSubgroup K).subtype)
 
-def standardOpenFiniteHom (𝔪 : Ideal (𝓞 K)) :
-    standardOpenSubgroup K →* finiteLevel (K := K) 0 ⧸ (idealLevel 𝔪).subgroupOf (finiteLevel 0) :=
-  (QuotientGroup.mk' _).comp (((toFinite K).comp (standardOpenSubgroup K).subtype).codRestrict _
-    fun u ↦ (mem_standardOpenSubgroup_iff_toFinite_mem _).1 u.2)
+def standardOpenFiniteHom (𝔪 : Ideal (𝓞 K))
+    : standardOpenSubgroup K
+      →* finiteLevel (K := K) 0 ⧸ (idealLevel 𝔪).subgroupOf (finiteLevel 0) :=
+  (QuotientGroup.mk' _).comp
+    (((toFinite K).comp (standardOpenSubgroup K).subtype).codRestrict _ fun u ↦
+      (mem_standardOpenSubgroup_iff_toFinite_mem _).1 u.2)
 
-theorem ker_inf_ker_le (𝔪 : Ideal (𝓞 K)) :
-    (standardOpenInfiniteHom (K := K)).ker ⊓ (standardOpenFiniteHom 𝔪).ker ≤
-      ((idealLevel 𝔪).map ofFinite ⊔ (infinitePositive K).map ofInfinite).subgroupOf
+theorem ker_inf_ker_le (𝔪 : Ideal (𝓞 K))
+    : (standardOpenInfiniteHom (K := K)).ker ⊓ (standardOpenFiniteHom 𝔪).ker
+      ≤ ((idealLevel 𝔪).map ofFinite ⊔ (infinitePositive K).map ofInfinite).subgroupOf
         (standardOpenSubgroup K) := by
   intro u hu
   obtain ⟨h1, h2⟩ := Subgroup.mem_inf.1 hu
-  rw [MonoidHom.mem_ker, standardOpenInfiniteHom, MonoidHom.comp_apply,
-    QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h1
-  rw [MonoidHom.mem_ker, standardOpenFiniteHom, MonoidHom.comp_apply,
-    QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf] at h2
+  rw [MonoidHom.mem_ker, standardOpenInfiniteHom, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff]
+    at h1
+  rw [MonoidHom.mem_ker, standardOpenFiniteHom, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
+    at h2
   rw [Subgroup.mem_subgroupOf, ← ofFinite_mul_ofInfinite (u : IdeleGroup K)]
   exact mul_mem (Subgroup.mem_sup_left ⟨_, h2, rfl⟩) (Subgroup.mem_sup_right ⟨_, h1, rfl⟩)
 
@@ -244,12 +254,15 @@ theorem RayClassGroup.finite {𝔪 : Ideal (𝓞 K)} (h𝔪 : 𝔪 ≠ ⊥) : Fi
     Finite.of_injective _ Subtype.val_injective
   have : (standardOpenInfiniteHom (K := K)).ker.FiniteIndex := Subgroup.finiteIndex_ker _
   have : (standardOpenFiniteHom (K := K) 𝔪).ker.FiniteIndex := Subgroup.finiteIndex_ker _
-  have h2 : (((idealLevel 𝔪).map ofFinite ⊔ (infinitePositive K).map ofInfinite).subgroupOf
-      U).FiniteIndex := Subgroup.finiteIndex_of_le (ker_inf_ker_le 𝔪)
+  have h2
+      : (((idealLevel 𝔪).map ofFinite ⊔ (infinitePositive K).map ofInfinite).subgroupOf
+        U).FiniteIndex :=
+    Subgroup.finiteIndex_of_le (ker_inf_ker_le 𝔪)
   have hWP : (idealLevel 𝔪).map ofFinite ⊔ (infinitePositive K).map ofInfinite ≤ R :=
     sup_le (le_sup_right.trans le_sup_left) le_sup_right
   have h3 : (R.subgroupOf U).FiniteIndex :=
-    Subgroup.finiteIndex_of_le fun x hx ↦ Subgroup.mem_subgroupOf.2 (hWP (Subgroup.mem_subgroupOf.1 hx))
+    Subgroup.finiteIndex_of_le fun x hx ↦
+      Subgroup.mem_subgroupOf.2 (hWP (Subgroup.mem_subgroupOf.1 hx))
 
   have hUR : U ⊔ R = M :=
     le_antisymm (sup_le le_sup_right (rayGroup_le 𝔪))

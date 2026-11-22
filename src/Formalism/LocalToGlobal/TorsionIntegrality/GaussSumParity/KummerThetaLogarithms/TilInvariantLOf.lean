@@ -169,8 +169,8 @@ theorem dual_expansion : DualExpand := by
     show Fintype.card ι = Fintype.card {s : ZMod d // s.val % 2 = 0}
     omega
   have hBA : B * A = 1 := (Matrix.mul_eq_one_comm_of_equiv (Fintype.equivOfCardEq hce)).1 hAB
-  have hBA' : ∀ s s' : E, ∑ r, σ^[s.1.val] (oms r) * σ^[s'.1.val] (om r) =
-      if s = s' then 1 else 0 := by
+  have hBA'
+      : ∀ s s' : E, ∑ r, σ^[s.1.val] (oms r) * σ^[s'.1.val] (om r) = if s = s' then 1 else 0 := by
     intro s s'
     have := congrFun (congrFun hBA s) s'
     rw [Matrix.mul_apply, Matrix.one_apply] at this
@@ -196,8 +196,9 @@ theorem dual_expansion : DualExpand := by
     · simp
   · simp_rw [sum_even, Finset.sum_mul]
     rw [Finset.sum_comm]
-    have : ∀ s : E, ∑ r' : ι, σ^[s.1.val] (x * oms r * om r') * oms r' =
-        σ^[s.1.val] (x * oms r) * if z = s then 1 else 0 := by
+    have : ∀ s : E,
+        ∑ r' : ι, σ^[s.1.val] (x * oms r * om r') * oms r'
+          = σ^[s.1.val] (x * oms r) * if z = s then 1 else 0 := by
       intro s
       rw [← hBA' z s, Finset.mul_sum]
       refine Finset.sum_congr rfl fun r' _ => ?_
@@ -207,8 +208,9 @@ theorem dual_expansion : DualExpand := by
     simp [hz]
   · simp_rw [sum_even, Finset.sum_mul]
     rw [Finset.sum_comm]
-    have : ∀ s : E, ∑ r : ι, σ^[s.1.val] (x * oms r * om r') * om r =
-        σ^[s.1.val] (x * om r') * if s = z then 1 else 0 := by
+    have : ∀ s : E,
+        ∑ r : ι, σ^[s.1.val] (x * oms r * om r') * om r
+          = σ^[s.1.val] (x * om r') * if s = z then 1 else 0 := by
       intro s
       rw [← hBA' s z, Finset.mul_sum]
       refine Finset.sum_congr rfl fun r _ => ?_
@@ -217,10 +219,11 @@ theorem dual_expansion : DualExpand := by
     simp_rw [this]
     simp [hz]
 
-theorem TilInvariantL_of : PairRules → SubstTil → TorusTil → TeichSigma → ShiftIP → IPClosure →
-    DualExpand → FrobSq → TilInvariantL := by
-  intro hPR hST hTT hTS hSI hIC hDE hFS K _ _ _ l d _ σ hU hd2 hd F hF be0 hF1 hF2 ι _ _ om oms
-    hOw hT u hu τ _ L hL
+theorem TilInvariantL_of
+    : PairRules → SubstTil → TorusTil → TeichSigma → ShiftIP → IPClosure → DualExpand → FrobSq
+      → TilInvariantL := by
+  intro hPR hST hTT hTS hSI hIC hDE hFS K _ _ _ l d _ σ hU hd2 hd F hF be0 hF1 hF2 ι _ _ om oms hOw
+    hT u hu τ _ L hL
   have hl2 : 2 ≤ l := hU.1.two_le
   have hσ := (hFS K l σ hU).2
   have h1 : 1 < l ^ d := Nat.one_lt_pow (by omega) hU.1.one_lt
@@ -241,18 +244,23 @@ theorem TilInvariantL_of : PairRules → SubstTil → TorusTil → TeichSigma �
   have hud : σ^[d] u = u := by
     have e : l ^ d = (l ^ d - 1) + 1 := by omega
     rw [hiter, e, pow_succ, hu, one_mul]
-  have hui : σ^[d] u⁻¹ = u⁻¹ := by
-    rw [← RingHom.coe_pow, map_inv₀, RingHom.coe_pow, hud]
+  have hui : σ^[d] u⁻¹ = u⁻¹ := by rw [← RingHom.coe_pow, map_inv₀, RingHom.coe_pow, hud]
   have hnui : ‖u⁻¹‖ = 1 := by rw [norm_inv, hnu, inv_one]
   obtain ⟨hPR1, hPR2, hPR3⟩ := hPR K l σ hU F hF be0 hF1 τ
   have hPR3 := hPR3 hF2
   obtain ⟨hI0, hIadd, hImul⟩ := hIC K l σ τ
   obtain ⟨hc1, hc2, hc3⟩ := hDE K d σ hd ι om oms hOw.2 hT u hud
-  obtain ⟨c, hcn, hc1, hc2, hc3⟩ : ∃ c : ι → ι → K, (∀ r r', ‖c r r'‖ ≤ 1) ∧
-      (∀ r r', σ (σ (c r r')) = c r r') ∧ (∀ r, u * oms r = ∑ r', c r r' * oms r') ∧
-      (∀ r', u * om r' = ∑ r, c r r' * om r) := by
-    refine ⟨fun r r' => ∑ s : ZMod d, if s.val % 2 = 0 then σ^[s.val] (u * oms r * om r') else 0,
-      ?_, hc1, hc2, hc3⟩
+  obtain ⟨c, hcn, hc1, hc2, hc3⟩
+      : ∃ c : ι → ι → K,
+        (∀ r r', ‖c r r'‖ ≤ 1) ∧ (∀ r r', σ (σ (c r r')) = c r r')
+          ∧ (∀ r, u * oms r = ∑ r', c r r' * oms r') ∧ (∀ r', u * om r' = ∑ r, c r r' * om r) := by
+    refine ⟨
+      fun r r' => ∑ s : ZMod d, if s.val % 2 = 0 then σ^[s.val] (u * oms r * om r') else 0,
+      ?_,
+      hc1,
+      hc2,
+      hc3
+    ⟩
     intro r r'
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun s _ => ?_
     split_ifs
@@ -263,8 +271,7 @@ theorem TilInvariantL_of : PairRules → SubstTil → TorusTil → TeichSigma �
   have hA : ∀ r, IP l σ (linEL σ (oms r) L) := fun r =>
     (hSI K l d σ hU hd τ L hL (oms r) (hOw.1 r).2 (hOw.2 r).2).1
   have hBu : ∀ r, IP l σ (linOL σ (u⁻¹ * om r) L) := fun r =>
-    (hSI K l d σ hU hd τ L hL (u⁻¹ * om r)
-      (by rw [norm_mul, hnui, one_mul]; exact (hOw.1 r).1)
+    (hSI K l d σ hU hd τ L hL (u⁻¹ * om r) (by rw [norm_mul, hnui, one_mul]; exact (hOw.1 r).1)
       (by rw [iterate_map_mul, hui, (hOw.2 r).1])).2
   have hAu : ∀ r, linEL σ (u * oms r) L = ∑ r', C (c r r') * linEL σ (oms r') L := by
     intro r
@@ -282,24 +289,34 @@ theorem TilInvariantL_of : PairRules → SubstTil → TorusTil → TeichSigma �
     hST K l d σ hl2 be0 ι om oms τ L hL0]
   show Simeq (∑ r, subst ![linEL σ (u * oms r) L, linOL σ (u⁻¹ * om r) L] (addC l be0))
     (∑ r, subst ![linEL σ (oms r) L, linOL σ (om r) L] (addC l be0))
-  have s1 : ∀ r, Simeq (subst ![linEL σ (u * oms r) L, linOL σ (u⁻¹ * om r) L] (addC l be0))
-      (∑ r', subst ![C (c r r') * linEL σ (oms r') L, linOL σ (u⁻¹ * om r) L] (addC l be0)) := by
-    intro r
-    rw [hAu r]
-    exact (sum_rule hI0 hIadd (fun G => subst ![G, linOL σ (u⁻¹ * om r) L] (addC l be0))
-      (fun g g' hg hg' => hPR1 g g' _ hg hg' (hBu r)) Finset.univ _
-      (fun r' _ => hImul _ _ (hcn r r') (hc1 r r') (hA r'))).2
-  have s2 : ∀ r r',
-      Simeq (subst ![C (c r r') * linEL σ (oms r') L, linOL σ (u⁻¹ * om r) L] (addC l be0))
-        (subst ![linEL σ (oms r') L, C (σ (c r r')) * linOL σ (u⁻¹ * om r) L] (addC l be0)) :=
+  have s1
+      : ∀ r,
+        Simeq (subst ![linEL σ (u * oms r) L, linOL σ (u⁻¹ * om r) L] (addC l be0))
+          (∑ r', subst ![C (c r r') * linEL σ (oms r') L, linOL σ (u⁻¹ * om r) L] (addC l be0)) :=
+    by
+      intro r
+      rw [hAu r]
+      exact (sum_rule hI0 hIadd
+        (fun G => subst ![G, linOL σ (u⁻¹ * om r) L] (addC l be0))
+        (fun g g' hg hg' => hPR1 g g' _ hg hg' (hBu r))
+        Finset.univ _
+        (fun r' _ => hImul _ _ (hcn r r') (hc1 r r') (hA r'))).2
+  have s2
+      : ∀ r r',
+        Simeq (subst ![C (c r r') * linEL σ (oms r') L, linOL σ (u⁻¹ * om r) L] (addC l be0))
+          (subst ![linEL σ (oms r') L, C (σ (c r r')) * linOL σ (u⁻¹ * om r) L] (addC l be0)) :=
     fun r r' => hPR3 _ _ _ (hcn r r') (hc1 r r') (hA r') (hBu r)
-  have s3 : ∀ r', Simeq (subst ![linEL σ (oms r') L, linOL σ (om r') L] (addC l be0))
-      (∑ r, subst ![linEL σ (oms r') L, C (σ (c r r')) * linOL σ (u⁻¹ * om r) L]
-        (addC l be0)) := by
+  have s3
+      : ∀ r',
+        Simeq (subst ![linEL σ (oms r') L, linOL σ (om r') L] (addC l be0))
+          (∑ r, subst ![linEL σ (oms r') L, C (σ (c r r')) * linOL σ (u⁻¹ * om r) L]
+            (addC l be0)) := by
     intro r'
     rw [hB r']
-    exact (sum_rule hI0 hIadd (fun H => subst ![linEL σ (oms r') L, H] (addC l be0))
-      (fun g g' hg hg' => hPR2 _ g g' (hA r') hg hg') Finset.univ _
+    exact (sum_rule hI0 hIadd
+      (fun H => subst ![linEL σ (oms r') L, H] (addC l be0))
+      (fun g g' hg hg' => hPR2 _ g g' (hA r') hg hg')
+      Finset.univ _
       (fun r _ => hImul _ _ (hσ _ (hcn r r')) (by rw [hc1]) (hBu r))).2
   refine sim_trans (sim_sum _ _ _ fun r _ => s1 r) ?_
   refine sim_trans (sim_sum _ _ _ fun r _ => sim_sum _ _ _ fun r' _ => s2 r r') ?_
@@ -318,25 +335,36 @@ theorem MeanSimeqL_of : TilInvariantL → MeanSimeqL := by
       rw [show (l ^ d - 1) + 1 = l ^ d by omega]
       exact dvd_pow_self l (by omega)
     exact hU.1.one_lt.ne' (Nat.dvd_one.1 ((Nat.dvd_add_right h).1 h2))
-  have hk : ∀ k : ℕ, Simeq (subst L (subst (torus l (ζ ^ k)) (beTil (d := d) l σ be0 om oms)) -
-      subst L (beTil (d := d) l σ be0 om oms)) 0 := by
+  have hk
+      : ∀ k : ℕ,
+        Simeq
+          (subst L (subst (torus l (ζ ^ k)) (beTil (d := d) l σ be0 om oms))
+            - subst L (beTil (d := d) l σ be0 om oms))
+          0 := by
     intro k
-    have h := hTI K l d σ hU hd2 hd F hF be0 hF1 hF2 ι om oms hOw hT (ζ ^ k)
-      (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]) τ L hL
+    have h :=
+      hTI K l d σ hU hd2 hd F hF be0 hF1 hF2 ι om oms hOw hT (ζ ^ k)
+        (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]) τ L hL
     unfold Simeq at h ⊢
     rwa [sub_zero]
   have hsum := sim_sum (Finset.range (l ^ d - 1)) _ _ fun k _ => hk k
   rw [Finset.sum_const_zero] at hsum
-  have hlam := Formalism.InvariantFactorPaths.G7.Top.lamModule K τ l σ hU.1 hU.2.2.1 hU.2.2.2.2 _ (l ^ d - 1) hdiv hsum
-  have e0 : (C (((l ^ d - 1 : ℕ) : K)⁻¹) : MvPowerSeries τ K) *
-      ((l ^ d - 1) • subst L (beTil (d := d) l σ be0 om oms)) =
-      subst L (beTil (d := d) l σ be0 om oms) := by
+  have hlam :=
+    Formalism.InvariantFactorPaths.G7.Top.lamModule K τ l σ hU.1 hU.2.2.1 hU.2.2.2.2 _ (l ^ d - 1)
+      hdiv hsum
+  have e0
+      : (C (((l ^ d - 1 : ℕ) : K)⁻¹) : MvPowerSeries τ K)
+          * ((l ^ d - 1) • subst L (beTil (d := d) l σ be0 om oms))
+        = subst L (beTil (d := d) l σ be0 om oms) := by
     rw [nsmul_eq_mul, ← mul_assoc, ← map_natCast (C : K →+* MvPowerSeries τ K), ← map_mul,
       inv_mul_cancel₀ hNK, map_one, one_mul]
-  have e : subst L (beMean (d := d) l σ be0 om oms ζ) - subst L (beTil (d := d) l σ be0 om oms) =
-      C (((l ^ d - 1 : ℕ) : K)⁻¹) * ∑ k ∈ Finset.range (l ^ d - 1),
-        (subst L (subst (torus l (ζ ^ k)) (beTil (d := d) l σ be0 om oms)) -
-          subst L (beTil (d := d) l σ be0 om oms)) - 0 := by
+  have e
+      : subst L (beMean (d := d) l σ be0 om oms ζ) - subst L (beTil (d := d) l σ be0 om oms)
+        = C (((l ^ d - 1 : ℕ) : K)⁻¹)
+            * ∑ k ∈ Finset.range (l ^ d - 1),
+              (subst L (subst (torus l (ζ ^ k)) (beTil (d := d) l σ be0 om oms)) -
+                subst L (beTil (d := d) l σ be0 om oms))
+          - 0 := by
     unfold beMean
     rw [subst_mul hLs, subst_C, Pair.subst_sum hLs, Finset.sum_sub_distrib, Finset.sum_const,
       Finset.card_range, mul_sub, sub_zero, e0]

@@ -16,16 +16,21 @@ namespace GlobalTheory.CompanionTheory.OrthoFamily
 theorem exists_minimal_of_no_family_below
     {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
     (L : Set (Submodule ℂ H))
-    (hcl : ∀ S ∈ L, IsClosed (S : Set H))
-    (hinf : ∀ S ∈ L, ∀ T ∈ L, S ⊓ Tᗮ ∈ L) (n : ℕ) :
-    ∀ S ∈ L, S ≠ ⊥ →
-      (∀ f : Fin n → Submodule ℂ H, (∀ i, f i ∈ L) → (∀ i, f i ≠ ⊥) → (∀ i, f i ≤ S) →
-        ¬ Pairwise fun i k => f i ⟂ f k) →
-      ∃ Q ∈ L, Q ≠ ⊥ ∧ ∀ T ∈ L, T ≤ Q → T = ⊥ ∨ T = Q := by
+    (hcl : ∀ S ∈ L, IsClosed (S : Set H)) (hinf : ∀ S ∈ L, ∀ T ∈ L, S ⊓ Tᗮ ∈ L)
+    (n : ℕ)
+    : ∀ S ∈ L,
+      S ≠ ⊥
+        → (∀ f : Fin n → Submodule ℂ H,
+          (∀ i, f i ∈ L) → (∀ i, f i ≠ ⊥) → (∀ i, f i ≤ S) → ¬ Pairwise fun i k => f i ⟂ f k)
+        → ∃ Q ∈ L, Q ≠ ⊥ ∧ ∀ T ∈ L, T ≤ Q → T = ⊥ ∨ T = Q := by
   induction n with
   | zero =>
     intro S _ _ hS
-    exact (hS (fun i => i.elim0) (fun i => i.elim0) (fun i => i.elim0) (fun i => i.elim0)
+    exact (hS
+      (fun i => i.elim0)
+      (fun i => i.elim0)
+      (fun i => i.elim0)
+      (fun i => i.elim0)
       (fun i => i.elim0)).elim
   | succ n ih =>
     intro S hSL hS0 hS
@@ -73,11 +78,13 @@ theorem exists_minimal_of_no_family_below
             rw [Fin.cons_succ, Fin.cons_succ]
             exact hpw (fun h => hik (congrArg Fin.succ h))
 
-theorem exists_minimal_of_orthogonal_bound :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (L : Set (Submodule ℂ H)) (m : ℕ)
-    (S₀ : Submodule ℂ H), (∀ S ∈ L, IsClosed (S : Set H)) → (∀ S ∈ L, ∀ T ∈ L, S ⊓ Tᗮ ∈ L) → S₀ ∈ L → S₀ ≠ ⊥ →
-    (∀ f : Fin (m + 1) → Submodule ℂ H, (∀ i, f i ∈ L) → (∀ i, f i ≠ ⊥) → ¬ Pairwise fun i k => f i ⟂ f k) →
-    ∃ Q ∈ L, Q ≠ ⊥ ∧ ∀ T ∈ L, T ≤ Q → T = ⊥ ∨ T = Q := by
+theorem exists_minimal_of_orthogonal_bound
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        (L : Set (Submodule ℂ H)) (m : ℕ) (S₀ : Submodule ℂ H),
+      (∀ S ∈ L, IsClosed (S : Set H)) → (∀ S ∈ L, ∀ T ∈ L, S ⊓ Tᗮ ∈ L) → S₀ ∈ L → S₀ ≠ ⊥
+        → (∀ f : Fin (m + 1) → Submodule ℂ H,
+          (∀ i, f i ∈ L) → (∀ i, f i ≠ ⊥) → ¬ Pairwise fun i k => f i ⟂ f k)
+        → ∃ Q ∈ L, Q ≠ ⊥ ∧ ∀ T ∈ L, T ≤ Q → T = ⊥ ∨ T = Q := by
   intro H _ _ _ L m S₀ hcl hinf hS₀ hS₀0 hfam
   exact exists_minimal_of_no_family_below L hcl hinf (m + 1) S₀ hS₀ hS₀0
     (fun f hfL hf0 _ => hfam f hfL hf0)

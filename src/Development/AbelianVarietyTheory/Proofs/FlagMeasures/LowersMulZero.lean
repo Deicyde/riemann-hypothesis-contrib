@@ -25,19 +25,23 @@ def lowers (F : ℕ → Submodule R (Fin n → K)) (c : ℕ) : Submodule R (Matr
     rw [Matrix.smul_mulVec]
     exact Submodule.smul_mem _ _ (hT b y hy)
 
-theorem mem_lowers {F : ℕ → Submodule R (Fin n → K)} {c : ℕ} {T : Matrix (Fin n) (Fin n) K} :
-    T ∈ lowers F c ↔ ∀ b, ∀ y ∈ F (b + c + 1), T *ᵥ y ∈ F b := Iff.rfl
+theorem mem_lowers {F : ℕ → Submodule R (Fin n → K)} {c : ℕ} {T : Matrix (Fin n) (Fin n) K}
+    : T ∈ lowers F c ↔ ∀ b, ∀ y ∈ F (b + c + 1), T *ᵥ y ∈ F b :=
+  Iff.rfl
 
-def IsDualFlag [StarRing K] (J : Matrix (Fin n) (Fin n) K) (F : ℕ → Submodule R (Fin n → K)) (m : ℕ) : Prop :=
-  Monotone F ∧ F 0 = ⊥ ∧ (∀ b, m ≤ b → F b = F m) ∧
-    ∀ b, b ≤ m → ∀ y, y ∈ F (m - b) ↔ y ∈ F m ∧ ∀ x ∈ F b, star x ⬝ᵥ (J *ᵥ y) = 0
+def IsDualFlag [StarRing K] (J : Matrix (Fin n) (Fin n) K) (F : ℕ → Submodule R (Fin n → K)) (m : ℕ)
+    : Prop :=
+  Monotone F ∧ F 0 = ⊥ ∧ (∀ b, m ≤ b → F b = F m)
+    ∧ ∀ b, b ≤ m → ∀ y, y ∈ F (m - b) ↔ y ∈ F m ∧ ∀ x ∈ F b, star x ⬝ᵥ (J *ᵥ y) = 0
 
-def Biorth (r : ℕ → ℕ) (m : ℕ) (T : ∀ b, Matrix (Fin n) (Fin (r b)) K)
-    (T' : ∀ b, Matrix (Fin (r b)) (Fin n) K) : Prop :=
+def Biorth
+    (r : ℕ → ℕ)
+    (m : ℕ) (T : ∀ b, Matrix (Fin n) (Fin (r b)) K) (T' : ∀ b, Matrix (Fin (r b)) (Fin n) K)
+    : Prop :=
   (∀ b, T' b * T b = 1) ∧ (∀ b b', b ≠ b' → T' b * T b' = 0) ∧ ∑ b ∈ Finset.range m, T b * T' b = 1
 
-theorem lowers_succ_le {F : ℕ → Submodule R (Fin n → K)} (hF : Monotone F) (c : ℕ) :
-    lowers F (c + 1) ≤ lowers F c := by
+theorem lowers_succ_le {F : ℕ → Submodule R (Fin n → K)} (hF : Monotone F) (c : ℕ)
+    : lowers F (c + 1) ≤ lowers F c := by
   intro T hT
   rw [mem_lowers] at hT ⊢
   intro b y hy
@@ -46,8 +50,10 @@ theorem lowers_succ_le {F : ℕ → Submodule R (Fin n → K)} (hF : Monotone F)
 theorem lowers_anti {F : ℕ → Submodule R (Fin n → K)} (hF : Monotone F) : Antitone (lowers F) :=
   antitone_nat_of_succ_le (lowers_succ_le hF)
 
-theorem lowers_mul {F : ℕ → Submodule R (Fin n → K)} {c c' : ℕ} {X Y : Matrix (Fin n) (Fin n) K}
-    (hX : X ∈ lowers F c) (hY : Y ∈ lowers F c') : X * Y ∈ lowers F (c + c' + 1) := by
+theorem lowers_mul
+    {F : ℕ → Submodule R (Fin n → K)} {c c' : ℕ} {X Y : Matrix (Fin n) (Fin n) K}
+    (hX : X ∈ lowers F c) (hY : Y ∈ lowers F c')
+    : X * Y ∈ lowers F (c + c' + 1) := by
   rw [mem_lowers] at hX hY ⊢
   intro b y hy
   rw [← Matrix.mulVec_mulVec]
@@ -57,18 +63,20 @@ theorem lowers_mul {F : ℕ → Submodule R (Fin n → K)} {c c' : ℕ} {X Y : M
   rw [e]
   exact hy
 
-theorem lowers_mul_zero {F : ℕ → Submodule R (Fin n → K)} {c : ℕ} {X Y : Matrix (Fin n) (Fin n) K}
-    (hX : X ∈ lowers F c) (hY : Y ∈ lowers F 0) :
-    X * Y ∈ lowers F (c + 1) ∧ Y * X ∈ lowers F (c + 1) := by
+theorem lowers_mul_zero
+    {F : ℕ → Submodule R (Fin n → K)} {c : ℕ} {X Y : Matrix (Fin n) (Fin n) K}
+    (hX : X ∈ lowers F c) (hY : Y ∈ lowers F 0)
+    : X * Y ∈ lowers F (c + 1) ∧ Y * X ∈ lowers F (c + 1) := by
   have h1 := lowers_mul hX hY
   have h2 := lowers_mul hY hX
   rw [Nat.add_zero] at h1
   rw [Nat.zero_add] at h2
   exact ⟨h1, h2⟩
 
-theorem lowers_eq_bot {F : ℕ → Submodule R (Fin n → K)} {m : ℕ} (h0 : F 0 = ⊥)
-    (hm : ∀ b, m ≤ b → F b = F m) (hsp : Submodule.span K (F m : Set (Fin n → K)) = ⊤) :
-    lowers F m = ⊥ := by
+theorem lowers_eq_bot
+    {F : ℕ → Submodule R (Fin n → K)} {m : ℕ} (h0 : F 0 = ⊥) (hm : ∀ b, m ≤ b → F b = F m)
+    (hsp : Submodule.span K (F m : Set (Fin n → K)) = ⊤)
+    : lowers F m = ⊥ := by
   rw [eq_bot_iff]
   intro T hT
   rw [mem_lowers] at hT
@@ -89,10 +97,13 @@ theorem lowers_eq_bot {F : ℕ → Submodule R (Fin n → K)} {m : ℕ} (h0 : F 
     rw [hlin, map_zero]
   exact (Submodule.mem_bot R).2 hT0
 
-theorem lowers_adj [StarRing K] {J : Matrix (Fin n) (Fin n) K} (hJ : Jᴴ = J)
-    {F : ℕ → Submodule R (Fin n → K)} {m : ℕ} (hF : IsDualFlag J F m) {c : ℕ}
-    {T T' : Matrix (Fin n) (Fin n) K} (hT : T ∈ lowers F c) (hadj : J * T' = Tᴴ * J)
-    (htop : ∀ y ∈ F m, T' *ᵥ y ∈ F m) : T' ∈ lowers F c := by
+theorem lowers_adj
+    [StarRing K]
+    {J : Matrix (Fin n) (Fin n) K} (hJ : Jᴴ = J)
+    {F : ℕ → Submodule R (Fin n → K)} {m : ℕ} (hF : IsDualFlag J F m)
+    {c : ℕ} {T T' : Matrix (Fin n) (Fin n) K}
+    (hT : T ∈ lowers F c) (hadj : J * T' = Tᴴ * J) (htop : ∀ y ∈ F m, T' *ᵥ y ∈ F m)
+    : T' ∈ lowers F c := by
   obtain ⟨hmono, h0, hstab, hdual⟩ := hF
   have hleM : ∀ k, F k ≤ F m := by
     intro k
@@ -105,8 +116,7 @@ theorem lowers_adj [StarRing K] {J : Matrix (Fin n) (Fin n) K} (hJ : Jᴴ = J)
   rcases le_total m b with hb | hb
   · rw [hstab b hb]
     exact htop y hyM
-  ·
-    have key : ∀ x ∈ F (m - b), star x ⬝ᵥ (J *ᵥ (T' *ᵥ y)) = 0 := by
+  · have key : ∀ x ∈ F (m - b), star x ⬝ᵥ (J *ᵥ (T' *ᵥ y)) = 0 := by
       intro x hx
       have e : star x ⬝ᵥ (J *ᵥ (T' *ᵥ y)) = star (T *ᵥ x) ⬝ᵥ (J *ᵥ y) := by
         rw [Matrix.mulVec_mulVec, hadj, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec,
@@ -122,8 +132,7 @@ theorem lowers_adj [StarRing K] {J : Matrix (Fin n) (Fin n) K} (hJ : Jᴴ = J)
           rw [show m - (m - (b + c + 1)) = b + c + 1 by omega]
           exact hy
         exact ((hdual _ (Nat.sub_le _ _) y).1 hy').2 _ hTx
-      ·
-        have hTx : T *ᵥ x ∈ F 0 := hT 0 x (hmono (by omega) hx)
+      · have hTx : T *ᵥ x ∈ F 0 := hT 0 x (hmono (by omega) hx)
         rw [h0] at hTx
         rw [(Submodule.mem_bot R).1 hTx, star_zero, zero_dotProduct]
     have hd := hdual (m - b) (Nat.sub_le _ _) (T' *ᵥ y)
@@ -136,23 +145,31 @@ section Loc
 
 variable {E : Type} [Field E] [NumberField E] {n : ℕ}
 
-def locFlag (φ : E →+* ℂ) (P : Matrix (Fin n) (Fin n) ℂ) (F : ℕ → Submodule (𝓞 E) (Fin n → E)) (b : ℕ) :
-    Submodule ℂ (Fin n → ℂ) :=
+def locFlag
+    (φ : E →+* ℂ) (P : Matrix (Fin n) (Fin n) ℂ) (F : ℕ → Submodule (𝓞 E) (Fin n → E)) (b : ℕ)
+    : Submodule ℂ (Fin n → ℂ) :=
   Submodule.span ℂ ((fun y : Fin n → E => P⁻¹ *ᵥ fun l => φ (y l)) '' (F b : Set _))
 
-def PlaceMatch {ι : Type} (φ : ι → E →+* ℂ) (P : ι → Matrix (Fin n) (Fin n) ℂ)
-    (X : InfinitePlace E → Matrix (Fin n) (Fin n) ℂ) : Prop :=
-  Function.Bijective (fun v => InfinitePlace.mk (φ v)) ∧
-    ∀ v, ((InfinitePlace.mk (φ v)).embedding = φ v ∧ X (InfinitePlace.mk (φ v)) = P v) ∨
-      ((InfinitePlace.mk (φ v)).embedding = (starRingEnd ℂ).comp (φ v) ∧
-        X (InfinitePlace.mk (φ v)) = (P v).map (starRingEnd ℂ))
+def PlaceMatch
+    {ι : Type} (φ : ι → E →+* ℂ) (P : ι → Matrix (Fin n) (Fin n) ℂ)
+    (X : InfinitePlace E → Matrix (Fin n) (Fin n) ℂ)
+    : Prop :=
+  Function.Bijective (fun v => InfinitePlace.mk (φ v))
+    ∧ ∀ v,
+      ((InfinitePlace.mk (φ v)).embedding = φ v ∧ X (InfinitePlace.mk (φ v)) = P v)
+        ∨ ((InfinitePlace.mk (φ v)).embedding = (starRingEnd ℂ).comp (φ v)
+          ∧ X (InfinitePlace.mk (φ v)) = (P v).map (starRingEnd ℂ))
 
-def pieceHt [StarRing E] (X : InfinitePlace E → Matrix (Fin n) (Fin n) ℂ)
-    (F : ℕ → Submodule (𝓞 E) (Fin n → E)) (b : ℕ) : ℝ :=
-  Formalism.HN.ht (Pi.basisFun E (Fin n)) X (F (b + 1)) / Formalism.HN.ht (Pi.basisFun E (Fin n)) X (F b)
+def pieceHt
+    [StarRing E]
+    (X : InfinitePlace E → Matrix (Fin n) (Fin n) ℂ) (F : ℕ → Submodule (𝓞 E) (Fin n → E)) (b : ℕ)
+    : ℝ :=
+  Formalism.HN.ht (Pi.basisFun E (Fin n)) X (F (b + 1))
+    / Formalism.HN.ht (Pi.basisFun E (Fin n)) X (F b)
 
 def covStd (j : ℕ) (Λ : Submodule (𝓞 E) (Fin j → E)) : ℝ :=
-  GlobalTheory.FlagBase.covAt E j (GlobalTheory.FlagBase.latAt E j Λ fun _ a b => if a = b then 1 else 0)
+  GlobalTheory.FlagBase.covAt E j
+    (GlobalTheory.FlagBase.latAt E j Λ fun _ a b => if a = b then 1 else 0)
 
 end Loc
 

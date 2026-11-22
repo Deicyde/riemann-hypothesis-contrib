@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.Grp
 
@@ -18,13 +19,17 @@ namespace JacquetImage
 
 variable {n : ℕ} (G : Grp k n)
 
-theorem leviEmb_mem_PO (m : Levi k (fun a : Fin G.s => Fin (G.d a)))
-    (hm : m ∈ leviK k (m := fun a : Fin G.s => Fin (G.d a))) : leviEmb k G.e m ∈ G.PO :=
+theorem leviEmb_mem_PO
+    (m : Levi k (fun a : Fin G.s => Fin (G.d a)))
+    (hm : m ∈ leviK k (m := fun a : Fin G.s => Fin (G.d a)))
+    : leviEmb k G.e m ∈ G.PO :=
   ⟨leviEmb_mem_KO (k := k) G.e hm, leviEmb_mem_parab k G.e m⟩
 
-theorem lam_leviEmb (hL : LeviSubgroupRestriction) (m : Levi k (fun a : Fin G.s => Fin (G.d a)))
-    (hm : m ∈ leviK k (m := fun a : Fin G.s => Fin (G.d a))) :
-    G.lam (leviEmb k G.e m) = G.eta m := by
+theorem lam_leviEmb
+    (hL : LeviSubgroupRestriction)
+    (m : Levi k (fun a : Fin G.s => Fin (G.d a)))
+    (hm : m ∈ leviK k (m := fun a : Fin G.s => Fin (G.d a)))
+    : G.lam (leviEmb k G.e m) = G.eta m := by
   have h := hL k n G ⟨leviEmb k G.e m, leviEmb_mem_parab k G.e m⟩ (leviEmb_mem_PO G m hm).1
   rw [leviProj_leviEmb] at h
   exact h

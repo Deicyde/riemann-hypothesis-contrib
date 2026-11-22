@@ -9,18 +9,28 @@ public import ReciprocityTheory.L2DbarEstimates.PlurisubharmonicCharts.APrimeI
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.OTY
 
-theorem measurable_nsq_extend_and_psi : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La] (A : WeightedAtlas n Y ι La), ∀ (la : La) (Ω : Set Y) (h : ι → Y → ℂ), IsOpen Ω → A.IsSecOn la Ω h → (∀ i y, y ∉ Ω → h i y = 0) → Measurable (A.nsq la h) ∧ ∀ (L : La) (s : Fin n → ι → Y → ℂ), (∀ k, A.IsSec L (s k)) → Measurable (psi A L s) := by
+theorem measurable_nsq_extend_and_psi
+    : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
+        [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La]
+        (A : WeightedAtlas n Y ι La),
+      ∀ (la : La) (Ω : Set Y) (h : ι → Y → ℂ),
+        IsOpen Ω → A.IsSecOn la Ω h → (∀ i y, y ∉ Ω → h i y = 0)
+          → Measurable (A.nsq la h)
+            ∧ ∀ (L : La) (s : Fin n → ι → Y → ℂ),
+              (∀ k, A.IsSec L (s k)) → Measurable (psi A L s) := by
   intro n Y _ _ _ _ _ ι La _ A la Ω h hΩ hs h0
   refine ⟨?_, fun L s hs' => ?_⟩
   · classical
     have hc := api_nsq_contOn A hΩ hs
-    have hm := ContinuousOn.measurable_piecewise hc
-      (continuousOn_const (c := (0 : ℝ)) (s := Ωᶜ)) hΩ.measurableSet
+    have hm :=
+      ContinuousOn.measurable_piecewise hc (continuousOn_const (c := (0 : ℝ)) (s := Ωᶜ))
+        hΩ.measurableSet
     convert hm using 1
     funext y
     by_cases hy : y ∈ Ω

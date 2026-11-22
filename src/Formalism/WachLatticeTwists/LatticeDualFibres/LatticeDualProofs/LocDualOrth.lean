@@ -13,10 +13,11 @@ noncomputable section
 
 namespace Formalism.RepresentationBoundsCohomology.LOC
 
-theorem mem_annih' {O A H : Type u} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [AddCommGroup A] [Module O A] [AddCommGroup H] [Module O H]
-    (pr : A →ₗ[O] H →ₗ[O] KO O) (M : Submodule O H) (x : A) :
-    x ∈ annih pr M ↔ ∀ m ∈ M, pr x m = 0 := by
+theorem mem_annih'
+    {O A H : Type u} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup A]
+    [Module O A] [AddCommGroup H] [Module O H]
+    (pr : A →ₗ[O] H →ₗ[O] KO O) (M : Submodule O H) (x : A)
+    : x ∈ annih pr M ↔ ∀ m ∈ M, pr x m = 0 := by
   simp only [annih, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.flip_apply]
 
 theorem locTorsDual : StatLocTorsDual.{u} := by
@@ -33,10 +34,12 @@ theorem locTorsDual : StatLocTorsDual.{u} := by
     rintro _ ⟨x, ⟨m, rfl⟩, rfl⟩
     have := (mem_annih' pr M _).1 (hS s hs) m m.2
     simpa only [LinearMap.lsmul_apply, Submodule.subtype_apply, Submodule.coe_smul, map_smul,
-      LinearMap.smul_apply] using this
-  let f : (S ⧸ (annih pr M).comap S.subtype) →ₗ[O]
-      (annih pr ((mulSub a M).map M.subtype) ⧸
-        (annih pr M).comap (annih pr ((mulSub a M).map M.subtype)).subtype) :=
+        LinearMap.smul_apply]
+      using this
+  let f
+      : (S ⧸ (annih pr M).comap S.subtype) →ₗ[O]
+        (annih pr ((mulSub a M).map M.subtype) ⧸
+          (annih pr M).comap (annih pr ((mulSub a M).map M.subtype)).subtype) :=
     Submodule.mapQ _ _ (Submodule.inclusion hSle) (by
       intro x hx
       exact hx)
@@ -46,9 +49,12 @@ theorem locTorsDual : StatLocTorsDual.{u} := by
   induction x using Submodule.Quotient.induction_on with
   | H x =>
     intro hx
-    have hx' : (Submodule.Quotient.mk (Submodule.inclusion hSle x) :
-        (annih pr ((mulSub a M).map M.subtype) ⧸
-          (annih pr M).comap (annih pr ((mulSub a M).map M.subtype)).subtype)) = 0 := hx
+    have hx'
+        : (Submodule.Quotient.mk (Submodule.inclusion hSle x)
+            : (annih pr ((mulSub a M).map M.subtype) ⧸
+                (annih pr M).comap (annih pr ((mulSub a M).map M.subtype)).subtype))
+          = 0 :=
+      hx
     have hx'' := (Submodule.Quotient.mk_eq_zero _).1 hx'
     exact (Submodule.Quotient.mk_eq_zero _).2 hx''
 

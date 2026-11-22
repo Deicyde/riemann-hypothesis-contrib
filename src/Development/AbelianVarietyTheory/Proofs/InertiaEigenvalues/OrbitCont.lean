@@ -35,13 +35,17 @@ theorem orbit_cont (y : ℂ_[l]) : Continuous fun g : GQ l => Formalism.Per.σC 
     rw [AlgEquiv.mul_apply] at h
     have h' := congrArg g₀ h
     rwa [← AlgEquiv.mul_apply, mul_inv_cancel, AlgEquiv.one_apply] at h'
-  have e : Formalism.Per.σC g y - Formalism.Per.σC g₀ y =
-      Formalism.Per.σC g (y - z) + Formalism.Per.σC g₀ ((z : ℂ_[l]) - y) := by
+  have e
+      : Formalism.Per.σC g y - Formalism.Per.σC g₀ y
+        = Formalism.Per.σC g (y - z) + Formalism.Per.σC g₀ ((z : ℂ_[l]) - y) := by
     rw [map_sub, map_sub, GlobalTheory.RingBasics.σC_coe, GlobalTheory.RingBasics.σC_coe, hgz]
     ring
   rw [dist_eq_norm, e]
-  calc _ ≤ ‖Formalism.Per.σC g (y - z)‖ + ‖Formalism.Per.σC g₀ ((z : ℂ_[l]) - y)‖ := norm_add_le _ _
-    _ = ‖y - z‖ + ‖y - z‖ := by rw [GlobalTheory.RingBasics.norm_σC, GlobalTheory.RingBasics.norm_σC, norm_sub_rev (z : ℂ_[l]) y]
+  calc
+    _ ≤ ‖Formalism.Per.σC g (y - z)‖ + ‖Formalism.Per.σC g₀ ((z : ℂ_[l]) - y)‖ := norm_add_le _ _
+    _ = ‖y - z‖ + ‖y - z‖ := by
+      rw [GlobalTheory.RingBasics.norm_σC, GlobalTheory.RingBasics.norm_σC,
+        norm_sub_rev (z : ℂ_[l]) y]
     _ < ε := by rw [← dist_eq_norm]; linarith
 
 end GlobalTheory.LTChar

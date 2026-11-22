@@ -13,18 +13,24 @@ open scoped TensorProduct
 
 namespace GlobalTheory.GoodEtaleBase
 
-theorem flat_noetherian_nzd_intClosed : ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] [IsIntegrallyClosed A]
-      [Algebra.EssFiniteType ℤ A]
-    (EA : Type) [CommRing EA] [Algebra (Polynomial A) EA] [Algebra A EA]
-      [IsScalarTower A (Polynomial A) EA] [Algebra.Etale (Polynomial A) EA]
-      (QA : Ideal EA) [QA.IsPrime],
-      QA.comap (algebraMap (Polynomial A) EA) = GlobalTheory.KeyOriginCut.originIdeal A →
-    ∀ (ρ : Localization.AtPrime QA →+* A), ρ.comp (algebraMap A (Localization.AtPrime QA)) = RingHom.id A →
-      RingHom.ker ρ = Ideal.span {algebraMap (Polynomial A) (Localization.AtPrime QA) Polynomial.X} →
-    Module.Flat A (Localization.AtPrime QA) ∧ IsNoetherianRing (Localization.AtPrime QA) ∧
-      algebraMap (Polynomial A) (Localization.AtPrime QA) Polynomial.X ∈ nonZeroDivisors (Localization.AtPrime QA) ∧
-      ∀ f : GlobalTheory.LocAcyc.GenFib A (Localization.AtPrime QA), IsIntegral (Localization.AtPrime QA) f →
-        ∃ r : Localization.AtPrime QA, algebraMap _ (GlobalTheory.LocAcyc.GenFib A (Localization.AtPrime QA)) r = f := by
+theorem flat_noetherian_nzd_intClosed
+    : ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A]
+        [IsIntegrallyClosed A] [Algebra.EssFiniteType ℤ A] (EA : Type) [CommRing EA]
+        [Algebra (Polynomial A) EA] [Algebra A EA] [IsScalarTower A (Polynomial A) EA]
+        [Algebra.Etale (Polynomial A) EA] (QA : Ideal EA) [QA.IsPrime],
+      QA.comap (algebraMap (Polynomial A) EA) = GlobalTheory.KeyOriginCut.originIdeal A
+        → ∀ (ρ : Localization.AtPrime QA →+* A),
+          ρ.comp (algebraMap A (Localization.AtPrime QA)) = RingHom.id A
+            → RingHom.ker ρ
+              = Ideal.span {algebraMap (Polynomial A) (Localization.AtPrime QA) Polynomial.X}
+            → Module.Flat A (Localization.AtPrime QA) ∧ IsNoetherianRing (Localization.AtPrime QA)
+              ∧ algebraMap (Polynomial A) (Localization.AtPrime QA) Polynomial.X
+                ∈ nonZeroDivisors (Localization.AtPrime QA)
+              ∧ ∀ f : GlobalTheory.LocAcyc.GenFib A (Localization.AtPrime QA),
+                IsIntegral (Localization.AtPrime QA) f
+                  → ∃ r : Localization.AtPrime QA,
+                    algebraMap _ (GlobalTheory.LocAcyc.GenFib A (Localization.AtPrime QA)) r
+                      = f := by
   intro A _ _ _ _ _ _ EA _ _ _ _ _ QA _ _ ρ _ _
   set R := Localization.AtPrime QA
   haveI : Algebra.Smooth A (Polynomial A) := Algebra.Smooth.mk
@@ -63,8 +69,9 @@ theorem flat_noetherian_nzd_intClosed : ∀ (A : Type) [CommRing A] [IsDomain A]
     have hf' : IsIntegral R (e f) := hf.map e.toAlgHom
     obtain ⟨y, hy⟩ := H.2 ⟨e f, hf'⟩
     have hy' : (TensorProduct.toIntegralClosure A R K y : R ⊗[A] K) = e f := congrArg Subtype.val hy
-    have key : ∀ y : R ⊗[A] integralClosure A K, ∃ b : R,
-        (TensorProduct.toIntegralClosure A R K y : R ⊗[A] K) = b ⊗ₜ[A] (1 : K) := by
+    have key
+        : ∀ y : R ⊗[A] integralClosure A K, ∃ b : R,
+          (TensorProduct.toIntegralClosure A R K y : R ⊗[A] K) = b ⊗ₜ[A] (1 : K) := by
       intro y
       induction y with
       | tmul b c =>

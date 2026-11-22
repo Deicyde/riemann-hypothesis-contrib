@@ -11,8 +11,18 @@ namespace PositivityTheory.JsR
 
 theorem localExpBound_holds : LocalExpBound := by
   intro k _ _ _ _ _ N V _ _ π hs hi hu hg
-  obtain ⟨h, δ, Δ, s, hΔ, hc, hb, hd⟩ := PositivityTheory.RgUd.Exp.genUnitCCOf PositivityTheory.RgUd.expBound GlobalTheory.RgGu.Holds.genericUnlinkedGL_holds
-    k N V π hs hi hu hg
-  exact ⟨h, δ, Δ, s, hΔ, fun j _ hω z => PositivityTheory.RgUd.UOrder.log_norm_centralChar_u (hΔ j) (hc j) hω z, hb, hd⟩
+  obtain ⟨h, δ, Δ, s, hΔ, hc, hb, hd⟩ :=
+    PositivityTheory.RgUd.Exp.genUnitCCOf PositivityTheory.RgUd.expBound
+      GlobalTheory.RgGu.Holds.genericUnlinkedGL_holds k N V π hs hi hu hg
+  exact ⟨
+    h,
+    δ,
+    Δ,
+    s,
+    hΔ,
+    fun j _ hω z => PositivityTheory.RgUd.UOrder.log_norm_centralChar_u (hΔ j) (hc j) hω z,
+    hb,
+    hd
+  ⟩
 
 end PositivityTheory.JsR

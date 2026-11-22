@@ -29,8 +29,8 @@ theorem norm_le_norm_of {a b : ℂ} (h1 : |a.re| ≤ |b.re|) (h2 : |a.im| ≤ |b
     nlinarith
   exact (pow_le_pow_iff_left₀ (norm_nonneg a) (norm_nonneg b) two_ne_zero).mp h
 
-theorem norm_sq_Gamma_half (t : ℝ) :
-    ‖Complex.Gamma (1 / 2 + t * I)‖ ^ 2 = Real.pi / Real.cosh (Real.pi * t) := by
+theorem norm_sq_Gamma_half (t : ℝ)
+    : ‖Complex.Gamma (1 / 2 + t * I)‖ ^ 2 = Real.pi / Real.cosh (Real.pi * t) := by
   set z : ℂ := 1 / 2 + t * I with hz
   have hconj : 1 - z = (starRingEnd ℂ) z := by
     apply Complex.ext
@@ -46,8 +46,7 @@ theorem norm_sq_Gamma_half (t : ℝ) :
   have h' : normSq (Complex.Gamma z) = Real.pi / Real.cosh (Real.pi * t) := by exact_mod_cast h
   rw [← h', Complex.normSq_eq_norm_sq]
 
-theorem half_line (t : ℝ) :
-    ‖Complex.Gamma (1 / 2 + t * I)‖ * Real.exp (Real.pi / 2 * |t|) ≤ 3 := by
+theorem half_line (t : ℝ) : ‖Complex.Gamma (1 / 2 + t * I)‖ * Real.exp (Real.pi / 2 * |t|) ≤ 3 := by
   have h := norm_sq_Gamma_half t
   have hpi := Real.pi_pos
   have hc : Real.exp (Real.pi * |t|) / 2 ≤ Real.cosh (Real.pi * t) := by
@@ -69,10 +68,12 @@ theorem half_line (t : ℝ) :
   rw [not_le] at hcon
   nlinarith
 
-def frobeniusStickelbergerDetMulSigmaCube (w : ℂ) : ℂ := Complex.Gamma w * Complex.exp (-(Real.pi / 2) * I * w) / (w + 1) ^ 5
+def frobeniusStickelbergerDetMulSigmaCube (w : ℂ) : ℂ :=
+  Complex.Gamma w * Complex.exp (-(Real.pi / 2) * I * w) / (w + 1) ^ 5
 
-theorem norm_twistedGamma (w : ℂ) :
-    ‖frobeniusStickelbergerDetMulSigmaCube w‖ = ‖Complex.Gamma w‖ * Real.exp (Real.pi / 2 * w.im) / ‖w + 1‖ ^ 5 := by
+theorem norm_twistedGamma (w : ℂ)
+    : ‖frobeniusStickelbergerDetMulSigmaCube w‖
+      = ‖Complex.Gamma w‖ * Real.exp (Real.pi / 2 * w.im) / ‖w + 1‖ ^ 5 := by
   unfold frobeniusStickelbergerDetMulSigmaCube
   rw [norm_div, norm_mul, norm_pow, Complex.norm_exp]
   congr 3
@@ -86,7 +87,8 @@ theorem one_le_norm_add_one {w : ℂ} (hw : 0 ≤ w.re) : 1 ≤ ‖w + 1‖ := b
 
 theorem eq_re_add_im (w : ℂ) : w = (w.re : ℂ) + w.im * I := (Complex.re_add_im w).symm
 
-theorem norm_twistedGamma_le_of_re_eq_half (w : ℂ) (hw : w.re = 1 / 2) : ‖frobeniusStickelbergerDetMulSigmaCube w‖ ≤ 3 := by
+theorem norm_twistedGamma_le_of_re_eq_half (w : ℂ) (hw : w.re = 1 / 2)
+    : ‖frobeniusStickelbergerDetMulSigmaCube w‖ ≤ 3 := by
   rw [norm_twistedGamma]
   have h1 := one_le_norm_add_one (w := w) (by rw [hw]; norm_num)
   have e : w = 1 / 2 + (w.im : ℂ) * I := by
@@ -103,8 +105,9 @@ theorem norm_twistedGamma_le_of_re_eq_half (w : ℂ) (hw : w.re = 1 / 2) : ‖fr
     (mul_le_mul_of_nonneg_left h3 (norm_nonneg _)).trans h2
   nlinarith
 
-theorem Gamma_add_five (z : ℂ) (hz : 0 < z.re) :
-    Complex.Gamma (z + 5) = (z + 4) * ((z + 3) * ((z + 2) * ((z + 1) * (z * Complex.Gamma z)))) := by
+theorem Gamma_add_five (z : ℂ) (hz : 0 < z.re)
+    : Complex.Gamma (z + 5)
+      = (z + 4) * ((z + 3) * ((z + 2) * ((z + 1) * (z * Complex.Gamma z)))) := by
   have ne : ∀ k : ℕ, z + k ≠ 0 := by
     intro k h
     have := congrArg Complex.re h
@@ -119,7 +122,8 @@ theorem Gamma_add_five (z : ℂ) (hz : 0 < z.re) :
   rw [show z + 5 = z + 4 + 1 by ring, h4, show z + 4 = z + 3 + 1 by ring, h3,
     show z + 3 = z + 2 + 1 by ring, h2, show z + 2 = z + 1 + 1 by ring, h1, h0]
 
-theorem norm_twistedGamma_le_of_re_eq_eleven_halves (w : ℂ) (hw : w.re = 11 / 2) : ‖frobeniusStickelbergerDetMulSigmaCube w‖ ≤ 3 := by
+theorem norm_twistedGamma_le_of_re_eq_eleven_halves (w : ℂ) (hw : w.re = 11 / 2)
+    : ‖frobeniusStickelbergerDetMulSigmaCube w‖ ≤ 3 := by
   rw [norm_twistedGamma]
   have h1 := one_le_norm_add_one (w := w) (by rw [hw]; norm_num)
   set z : ℂ := 1 / 2 + (w.im : ℂ) * I with hz
@@ -152,21 +156,25 @@ theorem norm_twistedGamma_le_of_re_eq_eleven_halves (w : ℂ) (hw : w.re = 11 / 
     set X := ‖w + 1‖
     have hX : 0 ≤ X := norm_nonneg _
     have hg := norm_nonneg (Complex.Gamma z)
-    calc ‖z + 4‖ * (‖z + 3‖ * (‖z + 2‖ * (‖z + 1‖ * (‖z‖ * ‖Complex.Gamma z‖))))
+    calc
+      ‖z + 4‖ * (‖z + 3‖ * (‖z + 2‖ * (‖z + 1‖ * (‖z‖ * ‖Complex.Gamma z‖))))
         ≤ X * (X * (X * (X * (X * ‖Complex.Gamma z‖)))) := by gcongr
       _ = X ^ 5 * ‖Complex.Gamma z‖ := by ring
   have hpos : 0 < ‖w + 1‖ ^ 5 := by positivity
   rw [div_le_iff₀ hpos]
-  calc ‖Complex.Gamma w‖ * Real.exp (Real.pi / 2 * w.im)
-      ≤ (‖w + 1‖ ^ 5 * ‖Complex.Gamma z‖) * Real.exp (Real.pi / 2 * |w.im|) :=
-        mul_le_mul hG h3 (Real.exp_pos _).le (by positivity)
+  calc
+    ‖Complex.Gamma w‖ * Real.exp (Real.pi / 2 * w.im)
+        ≤ (‖w + 1‖ ^ 5 * ‖Complex.Gamma z‖) * Real.exp (Real.pi / 2 * |w.im|) :=
+      mul_le_mul hG h3 (Real.exp_pos _).le (by positivity)
     _ = (‖Complex.Gamma z‖ * Real.exp (Real.pi / 2 * |w.im|)) * ‖w + 1‖ ^ 5 := by ring
     _ ≤ 3 * ‖w + 1‖ ^ 5 := mul_le_mul_of_nonneg_right h2 hpos.le
 
-theorem diffContOnCl_twistedGamma : DiffContOnCl ℂ frobeniusStickelbergerDetMulSigmaCube (re ⁻¹' Ioo (1 / 2 : ℝ) (11 / 2)) := by
+theorem diffContOnCl_twistedGamma
+    : DiffContOnCl ℂ frobeniusStickelbergerDetMulSigmaCube (re ⁻¹' Ioo (1 / 2 : ℝ) (11 / 2)) := by
   apply DifferentiableOn.diffContOnCl
   have hcl : closure (re ⁻¹' Ioo (1 / 2 : ℝ) (11 / 2)) ⊆ re ⁻¹' Icc (1 / 2 : ℝ) (11 / 2) :=
-    closure_minimal (preimage_mono Ioo_subset_Icc_self) (isClosed_Icc.preimage Complex.continuous_re)
+    closure_minimal (preimage_mono Ioo_subset_Icc_self)
+      (isClosed_Icc.preimage Complex.continuous_re)
   intro w hw
   have hw' := hcl hw
   have hre : (1 / 2 : ℝ) ≤ w.re := hw'.1
@@ -188,8 +196,10 @@ theorem diffContOnCl_twistedGamma : DiffContOnCl ℂ frobeniusStickelbergerDetMu
     simp at this
     linarith
 
-theorem norm_twistedGamma_le {w : ℂ} (h1 : 1 / 2 ≤ w.re) (h2 : w.re ≤ 11 / 2) : ‖frobeniusStickelbergerDetMulSigmaCube w‖ ≤ 3 := by
-  refine PhragmenLindelof.vertical_strip diffContOnCl_twistedGamma ?_ norm_twistedGamma_le_of_re_eq_half norm_twistedGamma_le_of_re_eq_eleven_halves h1 h2
+theorem norm_twistedGamma_le {w : ℂ} (h1 : 1 / 2 ≤ w.re) (h2 : w.re ≤ 11 / 2)
+    : ‖frobeniusStickelbergerDetMulSigmaCube w‖ ≤ 3 := by
+  refine PhragmenLindelof.vertical_strip diffContOnCl_twistedGamma ?_
+    norm_twistedGamma_le_of_re_eq_half norm_twistedGamma_le_of_re_eq_eleven_halves h1 h2
   refine ⟨1 / 2, ?_, Real.pi, ?_⟩
   · have := Real.pi_gt_three
     rw [lt_div_iff₀ (by norm_num)]
@@ -203,8 +213,8 @@ theorem norm_twistedGamma_le {w : ℂ} (h1 : 1 / 2 ≤ w.re) (h2 : w.re ≤ 11 /
     rw [norm_twistedGamma, Real.norm_eq_abs, abs_of_pos (Real.exp_pos _)]
     have a1 : ‖Complex.Gamma z‖ ≤ max (Real.Gamma (1 / 2)) (Real.Gamma (11 / 2)) :=
       (norm_Gamma_le (by linarith)).trans
-        (Real.convexOn_Gamma.le_max_of_mem_Icc (by norm_num [Set.mem_Ioi]) (by norm_num [Set.mem_Ioi])
-          ⟨hz1.le, hz2.le⟩)
+        (Real.convexOn_Gamma.le_max_of_mem_Icc (by norm_num [Set.mem_Ioi])
+          (by norm_num [Set.mem_Ioi]) ⟨hz1.le, hz2.le⟩)
     have a2 : Real.exp (Real.pi / 2 * z.im) ≤ Real.exp (Real.pi * Real.exp (1 / 2 * |z.im|)) := by
       apply Real.exp_le_exp.mpr
       have q1 := Real.add_one_le_exp (1 / 2 * |z.im|)
@@ -215,23 +225,28 @@ theorem norm_twistedGamma_le {w : ℂ} (h1 : 1 / 2 ≤ w.re) (h2 : w.re ≤ 11 /
     have a3 : (1 : ℝ) ≤ ‖z + 1‖ ^ 5 := one_le_pow₀ (one_le_norm_add_one (by linarith))
     rw [div_le_iff₀ (by linarith)]
     have a4 : 0 ≤ max (Real.Gamma (1 / 2)) (Real.Gamma (11 / 2)) := (norm_nonneg _).trans a1
-    calc ‖Complex.Gamma z‖ * Real.exp (Real.pi / 2 * z.im)
-        ≤ max (Real.Gamma (1 / 2)) (Real.Gamma (11 / 2)) *
-            Real.exp (Real.pi * Real.exp (1 / 2 * |z.im|)) :=
-          mul_le_mul a1 a2 (Real.exp_pos _).le a4
-      _ ≤ max (Real.Gamma (1 / 2)) (Real.Gamma (11 / 2)) *
-            Real.exp (Real.pi * Real.exp (1 / 2 * |z.im|)) * ‖z + 1‖ ^ 5 :=
-          le_mul_of_one_le_right (mul_nonneg a4 (Real.exp_pos _).le) a3
+    calc
+      ‖Complex.Gamma z‖ * Real.exp (Real.pi / 2 * z.im)
+          ≤ max (Real.Gamma (1 / 2)) (Real.Gamma (11 / 2))
+            * Real.exp (Real.pi * Real.exp (1 / 2 * |z.im|)) :=
+        mul_le_mul a1 a2 (Real.exp_pos _).le a4
+      _ ≤ max (Real.Gamma (1 / 2)) (Real.Gamma (11 / 2))
+          * Real.exp (Real.pi * Real.exp (1 / 2 * |z.im|)) * ‖z + 1‖ ^ 5 :=
+        le_mul_of_one_le_right (mul_nonneg a4 (Real.exp_pos _).le) a3
 
-theorem Gamma_decay {w : ℂ} (h1 : 1 / 2 ≤ w.re) (h2 : w.re ≤ 11 / 2) :
-    ‖Complex.Gamma w‖ * Real.exp (Real.pi / 2 * |w.im|) ≤ 3 * ‖w + 1‖ ^ 5 := by
-  have key : ∀ v : ℂ, 1 / 2 ≤ v.re → v.re ≤ 11 / 2 →
-      ‖Complex.Gamma v‖ * Real.exp (Real.pi / 2 * v.im) ≤ 3 * ‖v + 1‖ ^ 5 := by
+theorem Gamma_decay {w : ℂ} (h1 : 1 / 2 ≤ w.re) (h2 : w.re ≤ 11 / 2)
+    : ‖Complex.Gamma w‖ * Real.exp (Real.pi / 2 * |w.im|) ≤ 3 * ‖w + 1‖ ^ 5 := by
+  have key
+      : ∀ v : ℂ,
+        1 / 2 ≤ v.re → v.re ≤ 11 / 2
+          → ‖Complex.Gamma v‖ * Real.exp (Real.pi / 2 * v.im) ≤ 3 * ‖v + 1‖ ^ 5 := by
     intro v a b
     have h := norm_twistedGamma_le a b
-    rw [norm_twistedGamma, div_le_iff₀ (by
-      have := one_le_norm_add_one (w := v) (by linarith)
-      positivity)] at h
+    rw [norm_twistedGamma,
+        div_le_iff₀ (by
+          have := one_le_norm_add_one (w := v) (by linarith)
+          positivity)]
+      at h
     exact h
   rcases le_total 0 w.im with hi | hi
   · rw [abs_of_nonneg hi]

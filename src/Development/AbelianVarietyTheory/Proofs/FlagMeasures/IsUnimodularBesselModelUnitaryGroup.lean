@@ -12,7 +12,8 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.SgInf
 
-theorem isUnimod_GG : ∀ (k r : ℕ) (μ : Measure (Mt k r)), IsHaarOn (GG k r) μ → IsUnimod (GG k r) μ := by
+theorem isUnimod_GG
+    : ∀ (k r : ℕ) (μ : Measure (Mt k r)), IsHaarOn (GG k r) μ → IsUnimod (GG k r) μ := by
   intro k r μ hμ
   obtain ⟨hG, h⟩ := GlobalTheory.unitaryGroup_matGroup_unimodular k r
   obtain ⟨hM, hR⟩ := h μ hμ

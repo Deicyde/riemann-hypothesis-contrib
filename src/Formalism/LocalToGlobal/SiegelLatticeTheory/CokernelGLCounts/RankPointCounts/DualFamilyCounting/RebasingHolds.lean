@@ -13,7 +13,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.TemperedBoundGL3
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
 
 theorem rebasing_holds : G3.Rebase := by
   intro K V _ _ _ _ _ S π h hS hπ hs hd

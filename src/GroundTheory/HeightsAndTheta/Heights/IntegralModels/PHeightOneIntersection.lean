@@ -21,8 +21,8 @@ theorem HeightOneIntersection.proof : HeightOneIntersection.Statement := by
     simp only [Submodule.mem_iInf] at hx
     change x ∈ (⊥ : Subalgebra A K)
     rw [Algebra.mem_bot]
-    obtain ⟨y, hy⟩ := GroundTheory.Arith.Toric.mem_range_of_forall_height_one (A := A) (K := K) x
-      (fun p hp h1 => by
+    obtain ⟨y, hy⟩ :=
+      GroundTheory.Arith.Toric.mem_range_of_forall_height_one (A := A) (K := K) x (fun p hp h1 => by
         obtain ⟨s, hs, hsx⟩ := hx ⟨p, hp⟩ h1
         change s • x ∈ (⊥ : Subalgebra A K) at hsx
         obtain ⟨a, ha⟩ := Algebra.mem_bot.mp hsx

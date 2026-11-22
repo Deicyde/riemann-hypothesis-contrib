@@ -12,18 +12,33 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem dirG_pow_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {O : Type} [CommRing O] {N : ℕ} [NeZero N]
-    (χ : DirichletCharacter O N) {m : ℕ} (h : χ ^ m = 1) : UpperTheory.V.Chr.dirG ℚ Ω χ ^ m = 1 := by
+private theorem dirG_pow_one
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {O : Type} [CommRing O]
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter O N)
+    {m : ℕ} (h : χ ^ m = 1)
+    : UpperTheory.V.Chr.dirG ℚ Ω χ ^ m = 1 := by
   ext g
-  have hg := congrArg (fun ψ : DirichletCharacter O N => ψ ((UpperTheory.V.Chr.cls ℚ Ω N g : (ZMod N)ˣ) : ZMod N)) h
+  have hg :=
+    congrArg
+      (fun ψ : DirichletCharacter O N => ψ ((UpperTheory.V.Chr.cls ℚ Ω N g : (ZMod N)ˣ) : ZMod N))
+      h
   simp only [MulChar.pow_apply_coe, MulChar.one_apply_coe] at hg
   simp [UpperTheory.V.Chr.dirG, hg]
 
-private theorem dirG_unr {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {O : Type} [CommRing O] {N : ℕ} [NeZero N]
-    (χ : DirichletCharacter O N) {A : ValuationSubring Ω} {v : ℕ} (hA : A.valuation (v : Ω) < 1) (hN : v.Coprime N)
-    {g : G ℚ Ω} (hg : g ∈ Ine (F := ℚ) A) : UpperTheory.V.Chr.dirG ℚ Ω χ g = 1 := by
+private theorem dirG_unr
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {O : Type} [CommRing O]
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter O N)
+    {A : ValuationSubring Ω} {v : ℕ} (hA : A.valuation (v : Ω) < 1) (hN : v.Coprime N)
+    {g : G ℚ Ω} (hg : g ∈ Ine (F := ℚ) A)
+    : UpperTheory.V.Chr.dirG ℚ Ω χ g = 1 := by
   have hnot : ¬ A.valuation (N : Ω) < 1 := by
     intro hNv
     have hint : ∀ z : ℤ, A.valuation (z : Ω) ≤ 1 := fun z => A.valuation_le_one (⟨z, by simp⟩ : A)
@@ -43,8 +58,12 @@ private theorem dirG_unr {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ 
   rw [MonoidHom.mem_ker] at hker
   simp [UpperTheory.V.Chr.dirG, hker]
 
-private theorem not_dvd_card {Γ O : Type} [Group Γ] [CommRing O] [IsDomain O] (φ : Γ →* Oˣ) {m l : ℕ} [Fact l.Prime]
-    (hm : m ≠ 0) (hl : l.Coprime m) (h : φ ^ m = 1) (H : Subgroup Γ) : ¬ l ∣ Nat.card (H.map φ) := by
+private theorem not_dvd_card
+    {Γ O : Type} [Group Γ] [CommRing O] [IsDomain O]
+    (φ : Γ →* Oˣ)
+    {m l : ℕ} [Fact l.Prime]
+    (hm : m ≠ 0) (hl : l.Coprime m) (h : φ ^ m = 1) (H : Subgroup Γ)
+    : ¬ l ∣ Nat.card (H.map φ) := by
   intro hdvd
   haveI : NeZero m := ⟨hm⟩
   have hle : H.map φ ≤ rootsOfUnity m O := by
@@ -65,9 +84,13 @@ private theorem not_dvd_card {Γ O : Type} [Group Γ] [CommRing O] [IsDomain O] 
   have := Nat.Coprime.eq_one_of_dvd hl hym
   exact (Fact.out : l.Prime).one_lt.ne' this
 
-theorem UpperTheory.V.Ws.large₂.host3 :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), Ctx3 D → 5 ≤ l ∧ l - 1 ∣ 2 * D.e ∧ D.Sb = ∅ ∧ (∃ m : ℕ, Odd m ∧ l.Coprime m ∧ D.ψ ^ m = 1) ∧
-      ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → Ine (F := ℚ) A ≤ D.ξ.ker ⊓ D.ψ.ker := by
+theorem UpperTheory.V.Ws.large₂.host3
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      Ctx3 D
+        → 5 ≤ l ∧ l - 1 ∣ 2 * D.e ∧ D.Sb = ∅ ∧ (∃ m : ℕ, Odd m ∧ l.Coprime m ∧ D.ψ ^ m = 1)
+          ∧ ∀ A : ValuationSubring Ω,
+            A.valuation (l : Ω) < 1 → Ine (F := ℚ) A ≤ D.ξ.ker ⊓ D.ψ.ker := by
   intro Ω _ _ _ l _ c D h3
   obtain ⟨hG, h, t, e, ψ, hBig, he0, het, hX, hIII, hA⟩ := h3
   obtain ⟨he, hψ, hS, hx⟩ := hA
@@ -84,10 +107,8 @@ theorem UpperTheory.V.Ws.large₂.host3 :
     rw [Nat.Prime.coprime_iff_not_dvd hlp]
     intro hd
     exact hno (hd.trans (hdo.trans (Nat.div_dvd_of_dvd (Nat.ordProj_dvd _ _))))
-  have hpow : D.ψ ^ orderOf ψ = 1 := by
-    rw [hψ]; exact dirG_pow_one ψ (pow_orderOf_eq_one ψ)
-  have hm0 : orderOf ψ ≠ 0 := by
-    intro h0; rw [h0] at hodd; exact Nat.not_odd_zero hodd
+  have hpow : D.ψ ^ orderOf ψ = 1 := by rw [hψ]; exact dirG_pow_one ψ (pow_orderOf_eq_one ψ)
+  have hm0 : orderOf ψ ≠ 0 := by intro h0; rw [h0] at hodd; exact Nat.not_odd_zero hodd
   refine ⟨h5, he ▸ hle, ?_, ⟨orderOf ψ, hodd, hcop, hpow⟩, ?_⟩
   · rw [GradeZeroInterpolatingElement.Raw.Sb, Finset.filter_eq_empty_iff]
     rintro p - ⟨-, hd⟩
@@ -100,6 +121,7 @@ theorem UpperTheory.V.Ws.large₂.host3 :
       Nat.Coprime.pow_right _ ((Nat.coprime_primes hlp Nat.prime_two).2 hl2)
     refine ⟨?_, ?_⟩
     · show g ∈ D.ξ.ker
-      rw [MonoidHom.mem_ker, hξ, MonoidHom.mul_apply, dirG_unr ξ₀ hA hc1 hg, dirG_unr ξ' hA hc2 hg, mul_one]
+      rw [MonoidHom.mem_ker, hξ, MonoidHom.mul_apply, dirG_unr ξ₀ hA hc1 hg, dirG_unr ξ' hA hc2 hg,
+        mul_one]
     · show g ∈ D.ψ.ker
       rw [MonoidHom.mem_ker, hψ, dirG_unr ψ hA hcN hg]

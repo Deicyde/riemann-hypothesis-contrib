@@ -8,16 +8,18 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.KappaEndpoints
 
 noncomputable section
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full
-  Formalism.L2.SG.LocWSOf Formalism.MainNotions.S.Cnt Formalism.L2.SG.KappaOffDiagonal Formalism.MainNotions.LatticeGluingRadicals
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.LocWSOf
+  Formalism.MainNotions.S.Cnt Formalism.L2.SG.KappaOffDiagonal
+  Formalism.MainNotions.LatticeGluingRadicals
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TypeAsm
 open Formalism.HermitianLatticeCounting.S6
 
 section EmbGen
-variable {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-  {H : HermSpace K V} {r : ℕ}
+variable
+  {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {H : HermSpace K V} {r : ℕ}
 
 def frPerp (F : FlagD H r) : Submodule K V where
   carrier := {v | ∀ a, H.B (F.e a) v = 0}
@@ -42,7 +44,8 @@ theorem fr_indep (F : FlagD H r) : LinearIndependent K F.e := by
   rw [Fintype.linearIndependent_iff]
   intro c hc
   have hz : c (Fin.last r) = 0 := by
-    have h : H.B (∑ a, c a • F.e a) (F.e (Fin.last r)) = 0 := by rw [hc, map_zero, LinearMap.zero_apply]
+    have h : H.B (∑ a, c a • F.e a) (F.e (Fin.last r)) = 0 := by
+      rw [hc, map_zero, LinearMap.zero_apply]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply] at h
     rw [Fin.sum_univ_castSucc] at h
@@ -59,8 +62,7 @@ theorem fr_indep (F : FlagD H r) : LinearIndependent K F.e := by
   | last => exact hz
   | cast a => exact hcs a
 
-def frMap (F : FlagD H r) : V →ₗ[K] (Fin (r + 1) → K) :=
-  LinearMap.pi fun a => H.B.flip (F.e a)
+def frMap (F : FlagD H r) : V →ₗ[K] (Fin (r + 1) → K) := LinearMap.pi fun a => H.B.flip (F.e a)
 
 theorem frMap_apply (F : FlagD H r) (v : V) (a : Fin (r + 1)) : frMap F v a = H.B v (F.e a) := rfl
 
@@ -73,13 +75,14 @@ theorem ker_frMap (F : FlagD H r) : LinearMap.ker (frMap F) = frPerp F := by
 
 theorem range_frMap (F : FlagD H r) : LinearMap.range (frMap F) = ⊤ := by
   by_contra hne
-  obtain ⟨f, hf0, hf⟩ := Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hne) inferInstance
+  obtain ⟨f, hf0, hf⟩ :=
+    Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hne) inferInstance
   set c : Fin (r + 1) → K := fun a => f (fun j => if a = j then 1 else 0) with hcdef
   have hfx : ∀ x, f x = ∑ a, x a * c a := by
     intro x
     conv_lhs => rw [pi_eq_sum_univ x]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, smul_eq_mul, hcdef]
+    simp only [map_sum, map_smul, smul_eq_mul, hcdef]
   have hv : ∀ v, H.B v (∑ a, star (c a) • F.e a) = 0 := by
     intro v
     have h1 : f (frMap F v) = 0 := by
@@ -104,8 +107,8 @@ theorem range_frMap (F : FlagD H r) : LinearMap.range (frMap F) = ⊤ := by
   have : c a = 0 := by simpa using hc a
   rw [this, mul_zero]
 
-theorem finrank_frPerp [FiniteDimensional K V] (F : FlagD H r) :
-    Module.finrank K (frPerp F) + (r + 1) = Module.finrank K V := by
+theorem finrank_frPerp [FiniteDimensional K V] (F : FlagD H r)
+    : Module.finrank K (frPerp F) + (r + 1) = Module.finrank K V := by
   have h := LinearMap.finrank_range_add_finrank_ker (frMap F)
   rw [range_frMap, ker_frMap, finrank_top, Module.finrank_fin_fun] at h
   omega
@@ -125,15 +128,18 @@ theorem finrank_X (F : FlagD H r) : Module.finrank K F.X = r := by
     simp
   rw [h, finrank_span_eq_card F.indep, Fintype.card_fin]
 
-def resH (H : HermSpace K V) (W : Submodule K V) (hnd : ∀ x : W, (∀ y : W, H.B x y = 0) → x = 0) :
-    HermSpace K W where
+def resH (H : HermSpace K V) (W : Submodule K V) (hnd : ∀ x : W, (∀ y : W, H.B x y = 0) → x = 0)
+    : HermSpace K W where
   B := (H.B.comp W.subtype).compl₂ W.subtype
   herm x y := H.herm x y
   nondeg x h := hnd x h
 
-theorem exists_emb [FiniteDimensional K V] (F : FlagD H r) (τ₀ : K →+* ℂ) (hP : ∀ σ : K →+* ℂ, F.PosDefAt σ) :
-    ∃ (W : Submodule K V) (HW : HermSpace K W), GlobalTheory.DegAsm.IsEmb F HW W.subtype ∧
-      Module.finrank K W + (2 * r + 1) = Module.finrank K V ∧ GlobalTheory.Mass.PD HW.B.flip := by
+theorem exists_emb
+    [FiniteDimensional K V] (F : FlagD H r) (τ₀ : K →+* ℂ) (hP : ∀ σ : K →+* ℂ, F.PosDefAt σ)
+    : ∃ (W : Submodule K V) (HW : HermSpace K W),
+      GlobalTheory.DegAsm.IsEmb F HW W.subtype
+        ∧ Module.finrank K W + (2 * r + 1) = Module.finrank K V
+        ∧ GlobalTheory.Mass.PD HW.B.flip := by
   obtain ⟨Y, hY⟩ := Submodule.exists_isCompl F.X
   set W := Y ⊓ frPerp F with hW
   have hsup : F.X ⊔ W = frPerp F := by
@@ -176,7 +182,8 @@ theorem embC : EmbC := by
   have hR : D.R.rankY 0 = 2 * D.R.rS + D.R.k + 1 := by
     obtain ⟨c, hc⟩ := D.R.m_even
     have := D.R.two_le_m
-    simp only [Formalism.BasicNotions.Ranks.rankY, Formalism.BasicNotions.Ranks.rS, Formalism.BasicNotions.Ranks.r, zero_mul, add_zero]
+    simp only [Formalism.BasicNotions.Ranks.rankY, Formalism.BasicNotions.Ranks.rS,
+      Formalism.BasicNotions.Ranks.r, zero_mul, add_zero]
     omega
   rw [hV, hR] at h2
   omega

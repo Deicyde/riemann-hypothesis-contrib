@@ -6,30 +6,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
 section
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {O W : Type} [CommRing O] [AddCommGroup W] [Module O W]
 
-private theorem shT_mono (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω) (F : ℕ) {a b : O} (h : a ∣ b) :
-    ShT W α δ F a ≤ ShT W α δ F b := by
+private theorem shT_mono (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω) (F : ℕ) {a b : O} (h : a ∣ b)
+    : ShT W α δ F a ≤ ShT W α δ F b := by
   obtain ⟨t, rfl⟩ := h
   rintro c ⟨h1, h2, h3, h4, h5⟩
   refine ⟨h1, h2, fun g => by rw [mul_comm, mul_smul, h3, smul_zero], h4, fun A hA => ?_⟩
   obtain ⟨m, hm, h⟩ := h5 A hA
   exact ⟨m, by rw [mul_comm, mul_smul, hm, smul_zero], h⟩
 
-private theorem norm_coc (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω) (hδ : IsUnit ((α δ : O) - 1)) (c : G ℚ Ω → W)
-    (hc : IsCoc α c) : ∃ m : W, IsCoc α (fun g => c g - ((α g : O) • m - m)) ∧ c δ - ((α δ : O) • m - m) = 0 := by
+private theorem norm_coc
+    (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω) (hδ : IsUnit ((α δ : O) - 1)) (c : G ℚ Ω → W) (hc : IsCoc α c)
+    : ∃ m : W, IsCoc α (fun g => c g - ((α g : O) • m - m)) ∧ c δ - ((α δ : O) • m - m) = 0 := by
   set u := hδ.unit with hu0
   have hu : (u : O) = (α δ : O) - 1 := hδ.unit_spec
   refine ⟨((u⁻¹ : Oˣ) : O) • c δ, ⟨?_, fun g h => ?_⟩, ?_⟩
   · have hloc : IsLocallyConstant fun g : G ℚ Ω => c (g * δ) :=
       hc.1.comp_continuous (continuous_mul_const δ)
-    have heq : (fun g => c g - ((α g : O) • ((u⁻¹ : Oˣ) : O) • c δ - ((u⁻¹ : Oˣ) : O) • c δ)) =
-        fun g => c g - (((u⁻¹ : Oˣ) : O) • (c (g * δ) - c g) - ((u⁻¹ : Oˣ) : O) • c δ) := by
+    have heq
+        : (fun g => c g - ((α g : O) • ((u⁻¹ : Oˣ) : O) • c δ - ((u⁻¹ : Oˣ) : O) • c δ))
+          = fun g => c g - (((u⁻¹ : Oˣ) : O) • (c (g * δ) - c g) - ((u⁻¹ : Oˣ) : O) • c δ) := by
       funext g
       rw [hc.2 g δ, add_sub_cancel_left, smul_comm (α g : O)]
     rw [heq]
@@ -38,42 +42,51 @@ private theorem norm_coc (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω) (hδ : IsUnit 
   · beta_reduce
     rw [hc.2 g h, map_mul, Units.val_mul, mul_smul]
     module
-  · have e : (α δ : O) • (((u⁻¹ : Oˣ) : O) • c δ) - ((u⁻¹ : Oˣ) : O) • c δ =
-        (u : O) • (((u⁻¹ : Oˣ) : O) • c δ) := by
+  · have e
+        : (α δ : O) • (((u⁻¹ : Oˣ) : O) • c δ) - ((u⁻¹ : Oˣ) : O) • c δ
+          = (u : O) • (((u⁻¹ : Oˣ) : O) • c δ) := by
       rw [hu, sub_smul, one_smul]
     rw [e, smul_smul, Units.mul_inv, one_smul, sub_self]
 
-private theorem unit_kill {x : O} (hx : IsUnit x) {a : O} {w : W} (h : a • x • w = 0) : a • w = 0 := by
+private theorem unit_kill {x : O} (hx : IsUnit x) {a : O} {w : W} (h : a • x • w = 0)
+    : a • w = 0 := by
   obtain ⟨u, rfl⟩ := hx
-  calc a • w = ((u⁻¹ : Oˣ) : O) • (a • (u : O) • w) := by
-        rw [smul_comm _ a]
-        simp [smul_smul]
+  calc
+    a • w = ((u⁻¹ : Oˣ) : O) • (a • (u : O) • w) := by
+      rw [smul_comm _ a]
+      simp [smul_smul]
     _ = 0 := by rw [h, smul_zero]
 
-private theorem conj_cob (α : G ℚ Ω →* Oˣ) {c : G ℚ Ω → W} (hc : IsCoc α c) (σ x : G ℚ Ω) (m : W)
-    (h : c (σ⁻¹ * x * σ) = (α (σ⁻¹ * x * σ) : O) • m - m) :
-    c x = (α x : O) • ((α σ : O) • m - c σ) - ((α σ : O) • m - c σ) := by
+private theorem conj_cob
+    (α : G ℚ Ω →* Oˣ)
+    {c : G ℚ Ω → W} (hc : IsCoc α c)
+    (σ x : G ℚ Ω) (m : W) (h : c (σ⁻¹ * x * σ) = (α (σ⁻¹ * x * σ) : O) • m - m)
+    : c x = (α x : O) • ((α σ : O) • m - c σ) - ((α σ : O) • m - c σ) := by
   have hc1 : c 1 = 0 := by
     have := hc.2 1 1
     simp only [mul_one, map_one, Units.val_one, one_smul] at this
     exact left_eq_add.mp this
-  have e0 : c σ⁻¹ + (α σ⁻¹ : O) • c σ = 0 := by
-    rw [← hc.2, inv_mul_cancel, hc1]
+  have e0 : c σ⁻¹ + (α σ⁻¹ : O) • c σ = 0 := by rw [← hc.2, inv_mul_cancel, hc1]
   have e1 : c (σ⁻¹ * x * σ) = c σ⁻¹ + (α σ⁻¹ : O) • (c x + (α x : O) • c σ) := by
     rw [mul_assoc, hc.2, hc.2]
   have ea : (α (σ⁻¹ * x * σ) : O) = (α x : O) := by
     rw [map_mul, map_mul, map_inv]
     congr 1
-    calc (α σ)⁻¹ * α x * α σ = α x * ((α σ)⁻¹ * α σ) := by ac_rfl
+    calc
+      (α σ)⁻¹ * α x * α σ
+        = α x * ((α σ)⁻¹ * α σ) := by ac_rfl
       _ = α x := by rw [inv_mul_cancel, mul_one]
   have hs : (α σ : O) * (α σ⁻¹ : O) = 1 := by
     rw [← Units.val_mul, ← map_mul, mul_inv_cancel, map_one, Units.val_one]
   rw [e1, ea] at h
   linear_combination (norm := module) (α σ : O) • h - (α σ : O) • e0 - hs • (c x + (α x : O) • c σ - c σ)
 
-private theorem dec_of_ine (α : G ℚ Ω →* Oˣ) {c : G ℚ Ω → W} (hc : IsCoc α c) (g d : G ℚ Ω) (m : W)
-    (hg : IsUnit ((α g : O) - 1)) (h : c g = (α g : O) • m - m)
-    (h' : c (d⁻¹ * g * d) = (α (d⁻¹ * g * d) : O) • m - m) : c d = (α d : O) • m - m := by
+private theorem dec_of_ine
+    (α : G ℚ Ω →* Oˣ)
+    {c : G ℚ Ω → W} (hc : IsCoc α c)
+    (g d : G ℚ Ω) (m : W) (hg : IsUnit ((α g : O) - 1)) (h : c g = (α g : O) • m - m)
+    (h' : c (d⁻¹ * g * d) = (α (d⁻¹ * g * d) : O) • m - m)
+    : c d = (α d : O) • m - m := by
   have key := conj_cob α hc d g m h'
   rw [h] at key
   have e : ((α g : O) - 1) • m = ((α g : O) - 1) • ((α d : O) • m - c d) := by
@@ -84,14 +97,19 @@ private theorem dec_of_ine (α : G ℚ Ω →* Oˣ) {c : G ℚ Ω → W} (hc : I
 
 end
 
-private theorem mem_shT (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type)
+private theorem mem_shT
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    (O : Type)
     [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
-    (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω) (F : ℕ)
-    (h1 : ∀ A : ValuationSubring Ω, ¬ Over A F → ∀ g ∈ Ine (F := ℚ) A, α g = 1)
-    (h2 : ∀ A : ValuationSubring Ω, Over A F → ¬ Over A l → ∃ g ∈ Ine (F := ℚ) A, IsUnit ((α g : O) - 1))
+    (α : G ℚ Ω →* Oˣ)
+    (δ : G ℚ Ω)
+    (F : ℕ) (h1 : ∀ A : ValuationSubring Ω, ¬ Over A F → ∀ g ∈ Ine (F := ℚ) A, α g = 1)
+    (h2 : ∀ A : ValuationSubring Ω,
+      Over A F → ¬ Over A l → ∃ g ∈ Ine (F := ℚ) A, IsUnit ((α g : O) - 1))
     (c : G ℚ Ω → QO l O) (hc : IsCoc α c) (hδ : c δ = 0)
-    (hs : ∀ D ∈ shaFam ℚ Ω l, ∃ m : QO l O, ∀ g ∈ D, c g = (α g : O) • m - m) :
-    ∃ a : O, a ≠ 0 ∧ c ∈ ShT (QO l O) α δ F a := by
+    (hs : ∀ D ∈ shaFam ℚ Ω l, ∃ m : QO l O, ∀ g ∈ D, c g = (α g : O) • m - m)
+    : ∃ a : O, a ≠ 0 ∧ c ∈ ShT (QO l O) α δ F a := by
   classical
   obtain ⟨A0, hA0⟩ := (placeBasic Ω).1 l (Fact.out : l.Prime)
   obtain ⟨m0, hm0⟩ := hs (Dec A0) (Or.inl ⟨A0, hA0, rfl⟩)
@@ -99,11 +117,11 @@ private theorem mem_shT (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
   choose ann hann0 hann using (UpperTheory.V.ML.qoCyc l O).1
   let S : Finset (QO l O) := insert m0 hfin.toFinset
   refine ⟨∏ w ∈ S, ann w, Finset.prod_ne_zero_iff.mpr fun w _ => hann0 w, ?_⟩
-  have kill : ∀ w ∈ S, (∏ w ∈ S, ann w) • w = 0 :=
-    fun w hw => (hann w _).mpr (Finset.dvd_prod_of_mem _ hw)
+  have kill : ∀ w ∈ S, (∏ w ∈ S, ann w) • w = 0 := fun w hw =>
+    (hann w _).mpr (Finset.dvd_prod_of_mem _ hw)
   set a := ∏ w ∈ S, ann w
-  have killc : ∀ g, a • c g = 0 :=
-    fun g => kill _ (Finset.mem_insert_of_mem (hfin.mem_toFinset.mpr ⟨g, rfl⟩))
+  have killc : ∀ g, a • c g = 0 := fun g =>
+    kill _ (Finset.mem_insert_of_mem (hfin.mem_toFinset.mpr ⟨g, rfl⟩))
   have killm0 : a • m0 = 0 := kill _ (Finset.mem_insert_self _ _)
   refine ⟨hc, hδ, killc, fun A hA g hg => ?_, fun A hA => ?_⟩
   · obtain ⟨m, hm⟩ := hs (Ine A) (Or.inr ⟨A, rfl⟩)
@@ -126,18 +144,26 @@ private theorem mem_shT (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
           exact hh.mp hg0
         exact dec_of_ine α hc g0 d m hu (hm g0 hg0) (hm _ hg')
 
-theorem UpperTheory.V.ML.shaToShT :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω), IsUnit ((α δ : O) - 1) → ∀ F : ℕ, F ≠ 0 →
-    (∀ A : ValuationSubring Ω, ¬ Over A F → ∀ g ∈ Ine (F := ℚ) A, α g = 1) →
-    (∀ A : ValuationSubring Ω, Over A F → ¬ Over A l → ∃ g ∈ Ine (F := ℚ) A, IsUnit ((α g : O) - 1)) → ∀ n : ℕ∞,
-    (∀ a : O, a ≠ 0 → Module.length O (ShT (QO l O) α δ F a) ≤ n) → Module.length O (ShaU (twist₂ l α) l (⊤ : Subgroup (G ℚ Ω))) ≤ n := by
+theorem UpperTheory.V.ML.shaToShT
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type)
+        [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O]
+        [Module.Finite ℤ_[l] O] (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω),
+      IsUnit ((α δ : O) - 1)
+        → ∀ F : ℕ,
+          F ≠ 0 → (∀ A : ValuationSubring Ω, ¬ Over A F → ∀ g ∈ Ine (F := ℚ) A, α g = 1)
+            → (∀ A : ValuationSubring Ω,
+              Over A F → ¬ Over A l → ∃ g ∈ Ine (F := ℚ) A, IsUnit ((α g : O) - 1))
+            → ∀ n : ℕ∞,
+              (∀ a : O, a ≠ 0 → Module.length O (ShT (QO l O) α δ F a) ≤ n)
+                → Module.length O (ShaU (twist₂ l α) l (⊤ : Subgroup (G ℚ Ω))) ≤ n := by
   intro Ω _ _ _ l _ O _ _ _ _ _ α δ hδ F hF h1 h2 n hn
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   let T : Subgroup (G ℚ Ω) := ⊤
-  let ι : Z1U (twist₂ l α) T →ₗ[O] (G ℚ Ω → QO l O) :=
-    { toFun := fun z g => (z : T → QO l O) ⟨g, Subgroup.mem_top g⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let ι : Z1U (twist₂ l α) T →ₗ[O] (G ℚ Ω → QO l O) := {
+    toFun := fun z g => (z : T → QO l O) ⟨g, Subgroup.mem_top g⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hι : Function.Injective ι := by
     intro z z' h
     apply Subtype.ext
@@ -155,8 +181,11 @@ theorem UpperTheory.V.ML.shaToShT :
     obtain ⟨hzc, hzco⟩ := z.2
     set c : G ℚ Ω → QO l O := ι z with hcE
     have hcoc : IsCoc α c := by
-      refine ⟨(IsLocallyConstant.iff_continuous _).mpr
-        (hzc.comp (continuous_id.subtype_mk fun g => Subgroup.mem_top g)), fun g h => ?_⟩
+      refine ⟨
+        (IsLocallyConstant.iff_continuous _).mpr
+          (hzc.comp (continuous_id.subtype_mk fun g => Subgroup.mem_top g)),
+        fun g h => ?_
+      ⟩
       exact hzco ⟨g, Subgroup.mem_top g⟩ ⟨h, Subgroup.mem_top h⟩
     obtain ⟨m, hc', hδ'⟩ := norm_coc α δ hδ c hcoc
     set c' : G ℚ Ω → QO l O := fun g => c g - ((α g : O) • m - m) with hcE'
@@ -172,8 +201,11 @@ theorem UpperTheory.V.ML.shaToShT :
     obtain ⟨k, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha0 hϖ
     have hmem' : c' ∈ ShT (QO l O) α δ F (ϖ ^ k) :=
       shT_mono α δ F (Units.mul_left_dvd.mpr dvd_rfl) hmem
-    let z' : Z1U (twist₂ l α) T := ⟨fun v => c' v.1,
-      (hc'.1.comp_continuous continuous_subtype_val).continuous, fun v w => hc'.2 v.1 w.1⟩
+    let z' : Z1U (twist₂ l α) T := ⟨
+      fun v => c' v.1,
+      (hc'.1.comp_continuous continuous_subtype_val).continuous,
+      fun v w => hc'.2 v.1 w.1
+    ⟩
     have hq : Q z = Q z' := by
       simp only [Q, Submodule.mkQ_apply]
       rw [UpperTheory.V.Base.mk_eq_mk]
@@ -186,9 +218,10 @@ theorem UpperTheory.V.ML.shaToShT :
     exact Submodule.mem_iSup_of_mem k (Submodule.mem_map_of_mem (show z' ∈ _ from hmem'))
   · intro n₀
     refine ⟨n₀, le_rfl, ?_⟩
-    calc Module.length O (P n₀) ≤ Module.length O ((ShT (QO l O) α δ F (ϖ ^ n₀)).comap ι) :=
-          Module.length_le_of_surjective (Q.submoduleMap _) (LinearMap.submoduleMap_surjective Q _)
+    calc
+      Module.length O (P n₀) ≤ Module.length O ((ShT (QO l O) α δ F (ϖ ^ n₀)).comap ι) :=
+        Module.length_le_of_surjective (Q.submoduleMap _) (LinearMap.submoduleMap_surjective Q _)
       _ ≤ Module.length O (ShT (QO l O) α δ F (ϖ ^ n₀)) :=
-          Module.length_le_of_injective (ι.restrict fun x hx => hx)
-            (fun x y hxy => Subtype.ext (hι (congrArg Subtype.val hxy)))
+        Module.length_le_of_injective (ι.restrict fun x hx => hx)
+          (fun x y hxy => Subtype.ext (hι (congrArg Subtype.val hxy)))
       _ ≤ n := hn _ (pow_ne_zero _ hϖ.ne_zero)

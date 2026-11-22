@@ -29,7 +29,8 @@ def latticeDual {m : ℕ} (L : Submodule (𝓞 K) (Fin m → K)) : Submodule (�
     obtain ⟨a, ha⟩ := hφ v hv
     exact ⟨c * a, by rw [map_mul, ha, smul_dotProduct, Algebra.smul_def]⟩
 
-structure IsDualBasis {m N : ℕ} (L : Submodule (𝓞 K) (Fin m → K)) (φ : Fin (N + 1) → Fin m → K) : Prop where
+structure IsDualBasis {m N : ℕ} (L : Submodule (𝓞 K) (Fin m → K)) (φ : Fin (N + 1) → Fin m → K)
+    : Prop where
   independent : LinearIndependent ℤ φ
   span_eq : Submodule.span ℤ (Set.range φ) = (latticeDual L).restrictScalars ℤ
 

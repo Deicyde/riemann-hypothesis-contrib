@@ -6,7 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsIntOv
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -36,26 +39,29 @@ end
 
 variable {D : D7}
 
-theorem idem_inl_mul (v : FinPl D) (α : Af D.host.F) (m : D.host.E) :
-    idem D (.inl v) * (pairA D.host.F 0 α ⊗ₜ[D.host.F] m) =
-      pairA D.host.F 0 (singleV D.host.F v 1 * α) ⊗ₜ[D.host.F] m := by
-  have key : pairA D.host.F 0 (singleV D.host.F v 1) * pairA D.host.F 0 α =
-      pairA D.host.F 0 (singleV D.host.F v 1 * α) := Prod.ext (mul_zero _) rfl
-  simp only [idem, Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply,
-    Algebra.TensorProduct.tmul_mul_tmul, one_mul, key]
+theorem idem_inl_mul (v : FinPl D) (α : Af D.host.F) (m : D.host.E)
+    : idem D (.inl v) * (pairA D.host.F 0 α ⊗ₜ[D.host.F] m)
+      = pairA D.host.F 0 (singleV D.host.F v 1 * α) ⊗ₜ[D.host.F] m := by
+  have key
+      : pairA D.host.F 0 (singleV D.host.F v 1) * pairA D.host.F 0 α
+        = pairA D.host.F 0 (singleV D.host.F v 1 * α) :=
+    Prod.ext (mul_zero _) rfl
+  simp only [idem, Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_self,
+    RingHom.id_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul, key]
 
-theorem idem_inr_mul (τ : D.what₂.Tau) (α : Af D.host.F) (m : D.host.E) :
-    idem D (.inr τ) * (pairA D.host.F 0 α ⊗ₜ[D.host.F] m) = 0 := by
-  have key : pairA D.host.F (GlobalTheory.AutFunCompare.sgW (plTau D τ) 1) 0 * pairA D.host.F 0 α = 0 :=
+theorem idem_inr_mul (τ : D.what₂.Tau) (α : Af D.host.F) (m : D.host.E)
+    : idem D (.inr τ) * (pairA D.host.F 0 α ⊗ₜ[D.host.F] m) = 0 := by
+  have key
+      : pairA D.host.F (GlobalTheory.AutFunCompare.sgW (plTau D τ) 1) 0 * pairA D.host.F 0 α = 0 :=
     Prod.ext (mul_zero _) (zero_mul _)
-  simp only [idem, Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply,
-    Algebra.TensorProduct.tmul_mul_tmul, key, TensorProduct.zero_tmul]
+  simp only [idem, Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_self,
+    RingHom.id_apply, Algebra.TensorProduct.tmul_mul_tmul, key, TensorProduct.zero_tmul]
 
 theorem wAt_add {m n : ℕ} (p : Place D) (x y : Mx D m n) : wAt p (x + y) = wAt p x + wAt p y := by
   ext i j
   simp [wAt, mul_add]
 
-theorem wAt_neg {m n : ℕ} (p : Place D) (x : Mx D m n) : wAt p (-x) = -wAt p x := by
+theorem wAt_neg {m n : ℕ} (p : Place D) (x : Mx D m n) : wAt p (-x) = - wAt p x := by
   ext i j
   simp [wAt]
 
@@ -63,19 +69,29 @@ theorem wAt_zero {m n : ℕ} (p : Place D) : wAt p (0 : Mx D m n) = 0 := by
   ext i j
   simp [wAt]
 
-theorem wAt_mem_latO : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (P : FinPl D → Prop) (u : WO S T), u ∈ latO S T ΛS ΛT P → ∀ p : Place D, wAt p u ∈ (latO S T ΛS ΛT fun v => P v ∧ Sum.inl v = p) ∧ u - wAt p u ∈ (latO S T ΛS ΛT fun v => P v ∧ Sum.inl v ≠ p) ∧ ((∀ v, P v → Sum.inl v ≠ p) → wAt p u = 0) := by
+theorem wAt_mem_latO
+    : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+        (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (P : FinPl D → Prop) (u : WO S T),
+      u ∈ latO S T ΛS ΛT P
+        → ∀ p : Place D,
+          wAt p u ∈ (latO S T ΛS ΛT fun v => P v ∧ Sum.inl v = p)
+            ∧ u - wAt p u ∈ (latO S T ΛS ΛT fun v => P v ∧ Sum.inl v ≠ p)
+            ∧ ((∀ v, P v → Sum.inl v ≠ p) → wAt p u = 0) := by
   intro D S T ΛS ΛT P u hu p
   unfold latO at hu
   induction hu using AddSubgroup.closure_induction with
   | mem w hw =>
     obtain ⟨α, hα, hv, a, ha, s, hs, t, ht, hw⟩ := hw
 
-    obtain ⟨X, hX⟩ : ∃ X : Fin T.rank → Fin S.rank → D.host.E,
-        X = fun i j => a * t i * ∑ k, star (s k) * S.gram k j := ⟨_, rfl⟩
+    obtain ⟨X, hX⟩
+        : ∃ X : Fin T.rank → Fin S.rank → D.host.E,
+          X = fun i j => a * t i * ∑ k, star (s k) * S.gram k j :=
+      ⟨_, rfl⟩
 
-    have gen : ∀ (Q : FinPl D → Prop) (β : Af D.host.F), β ∈ intAf D.host.F →
-        (∀ v, ¬ Q v → evalV D.host.F v β = 0) →
-        (Matrix.of fun i j => pairA D.host.F 0 β ⊗ₜ[D.host.F] X i j) ∈ latO S T ΛS ΛT Q := by
+    have gen
+        : ∀ (Q : FinPl D → Prop) (β : Af D.host.F),
+          β ∈ intAf D.host.F → (∀ v, ¬ Q v → evalV D.host.F v β = 0)
+            → (Matrix.of fun i j => pairA D.host.F 0 β ⊗ₜ[D.host.F] X i j) ∈ latO S T ΛS ΛT Q := by
       intro Q β hβ hQ
       unfold latO
       refine AddSubgroup.subset_closure ?_
@@ -86,21 +102,26 @@ theorem wAt_mem_latO : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.
       exact hw
     subst hw'
     rcases p with v | τ
-    ·
-      have hs1 : ∀ v', evalV D.host.F v' (singleV D.host.F v 1) ∈ v'.adicCompletionIntegers D.host.F := by
+    · have hs1
+          : ∀ v',
+            evalV D.host.F v' (singleV D.host.F v 1) ∈ v'.adicCompletionIntegers D.host.F := by
         intro v'
         by_cases h : v' = v
         · rw [h, ev_self]
           exact one_mem _
         · rw [ev_ne _ h]
           exact zero_mem _
-      have e1 : wAt (.inl v) (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] X i j) =
-          Matrix.of fun i j => pairA D.host.F 0 (singleV D.host.F v 1 * α) ⊗ₜ[D.host.F] X i j := by
+      have e1
+          : wAt (.inl v) (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] X i j)
+            = Matrix.of fun i j =>
+              pairA D.host.F 0 (singleV D.host.F v 1 * α) ⊗ₜ[D.host.F] X i j := by
         ext i j
         simp only [wAt, Matrix.of_apply, idem_inl_mul]
-      have e2 : (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] X i j) -
-            wAt (.inl v) (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] X i j) =
-          Matrix.of fun i j => pairA D.host.F 0 (α - singleV D.host.F v 1 * α) ⊗ₜ[D.host.F] X i j := by
+      have e2
+          : (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] X i j)
+              - wAt (.inl v) (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] X i j)
+            = Matrix.of fun i j =>
+              pairA D.host.F 0 (α - singleV D.host.F v 1 * α) ⊗ₜ[D.host.F] X i j := by
         rw [e1]
         ext i j
         simp only [Matrix.sub_apply, Matrix.of_apply, ← TensorProduct.sub_tmul]
@@ -135,8 +156,7 @@ theorem wAt_mem_latO : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.
         ext i j
         simp only [Matrix.of_apply, Matrix.zero_apply]
         rw [show pairA D.host.F 0 0 = 0 from Prod.ext rfl rfl, TensorProduct.zero_tmul]
-    ·
-      have e0 : wAt (.inr τ) (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] X i j) = 0 := by
+    · have e0 : wAt (.inr τ) (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] X i j) = 0 := by
         ext i j
         simp only [wAt, Matrix.of_apply, Matrix.zero_apply, idem_inr_mul]
       refine ⟨?_, ?_, fun _ => e0⟩

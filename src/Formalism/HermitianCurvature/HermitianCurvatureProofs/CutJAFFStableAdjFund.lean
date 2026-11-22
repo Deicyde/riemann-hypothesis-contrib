@@ -13,16 +13,19 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.AdjointLeibn
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.FFS
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants MeasureTheory Filter Topology
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants MeasureTheory Filter
+  Topology
 open scoped ComplexConjugate ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 noncomputable section
 
-theorem fundG_hs_sub_left {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (A A' C : Wq →L[ℂ] Wp) :
-    B.hsInner (A - A') C = B.hsInner A C - B.hsInner A' C := by
+theorem fundG_hs_sub_left
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+    (A A' C : Wq →L[ℂ] Wp)
+    : B.hsInner (A - A') C = B.hsInner A C - B.hsInner A' C := by
   unfold B.hsInner
   simp only [← Formalism.FourierDecayAlt.P.B5.hsL_apply, map_sub, inner_sub_right]
 
@@ -35,7 +38,8 @@ theorem fundamental_domain_group : FundG := by
   by_contra hne
   set C : Wq →L[ℂ] Wp := A g₀ - A' g₀ with hC
   have hC0 : C ≠ 0 := sub_ne_zero.2 hne
-  have hvC : B.hsVec C ≠ 0 := fun h0 => hC0 (Formalism.FourierDecayAlt.P.JFxI.hsVec_injective (h0.trans (by
+  have hvC : B.hsVec C ≠ 0 := fun h0 =>
+    hC0 (Formalism.FourierDecayAlt.P.JFxI.hsVec_injective (h0.trans (by
       rw [← Formalism.FourierDecayAlt.P.B5.hsL_apply, map_zero])))
   set u : B.Mat k r → ℝ := fun x => (B.hsInner (A x) C - B.hsInner (A' x) C).re with hu
   have hu0 : u g₀ = ‖B.hsVec C‖ ^ 2 := by
@@ -85,22 +89,30 @@ theorem fundamental_domain_group : FundG := by
       have hβ0 : β g ≠ 0 := fun h0 => hg (by simp [hφ, h0])
       exact Metric.mem_closedBall.2 (le_of_lt (hβd g hβ0))
     have hGc : IsClosed (B.GV k r) := Formalism.FourierDecayAlt.P.B7.isClosed_GV
-    have hcl : IsClosed (Metric.closedBall g₀ (ε / 2) ∩ B.GV k r) := Metric.isClosed_closedBall.inter hGc
+    have hcl : IsClosed (Metric.closedBall g₀ (ε / 2) ∩ B.GV k r) :=
+      Metric.isClosed_closedBall.inter hGc
     have hx' := closure_minimal hsub hcl hx
     exact (hgood x hx'.2 (lt_of_le_of_lt (Metric.mem_closedBall.1 hx'.1) (by linarith))).2
   have hEq := hI φ (Formalism.FourierDecayAlt.P.CutMP.ER.ckOn_of_contDiff hφs ⊤ _) hφc hφsupp
 
-  have hGc' : IsClosed {x : Mt k r | Matrix.of x ∈ B.GV k r} := Formalism.FourierDecayAlt.P.B7.isClosed_GV
-  have hK : IsCompact ({x : Mt k r | Matrix.of x ∈ B.GV k r} ∩ tsupport φ) := hφc.isCompact.inter_left hGc'
-  have hint : ∀ A₁ : B.Mat k r → (Wq →L[ℂ] Wp), ContinuousOn A₁ (B.GV k r) →
-      Integrable (fun x : Mt k r => B.hsInner (A₁ (Matrix.of x)) (φ (Matrix.of x))) D.μG := by
+  have hGc' : IsClosed {x : Mt k r | Matrix.of x ∈ B.GV k r} :=
+    Formalism.FourierDecayAlt.P.B7.isClosed_GV
+  have hK : IsCompact ({x : Mt k r | Matrix.of x ∈ B.GV k r} ∩ tsupport φ) :=
+    hφc.isCompact.inter_left hGc'
+  have hint
+      : ∀ A₁ : B.Mat k r → (Wq →L[ℂ] Wp),
+        ContinuousOn A₁ (B.GV k r)
+          → Integrable (fun x : Mt k r => B.hsInner (A₁ (Matrix.of x)) (φ (Matrix.of x))) D.μG := by
     intro A₁ hA₁
     have hof : Continuous (fun x : Mt k r => (Matrix.of x : B.Mat k r)) := continuous_id
-    have hc : ContinuousOn (fun x : Mt k r => B.hsInner (A₁ (Matrix.of x)) (φ (Matrix.of x)))
+    have hc : ContinuousOn
+        (fun x : Mt k r => B.hsInner (A₁ (Matrix.of x)) (φ (Matrix.of x)))
         ({x : Mt k r | Matrix.of x ∈ B.GV k r} ∩ tsupport φ) :=
       (Formalism.FourierDecayAlt.P.B5.hs_continuous (Wp := Wp) (Wq := Wq)).comp_continuousOn
         (f := fun x : Mt k r => (A₁ (Matrix.of x), φ (Matrix.of x)))
-        ((hA₁.comp hof.continuousOn (fun x (hx : x ∈ {x : Mt k r | Matrix.of x ∈ B.GV k r} ∩ tsupport φ) => hx.1)).prodMk (hφs.continuous.comp hof).continuousOn)
+        ((hA₁.comp hof.continuousOn
+            (fun x (hx : x ∈ {x : Mt k r | Matrix.of x ∈ B.GV k r} ∩ tsupport φ) => hx.1)).prodMk
+          (hφs.continuous.comp hof).continuousOn)
     refine (hc.integrableOn_compact hK).integrable_of_ae_notMem_eq_zero ?_
     filter_upwards [Formalism.FourierDecayAlt.P.HaarUniquenessConjugation.ae_mem hμ] with x hxG hxK
     have hx : x ∉ tsupport φ := fun h => hxK ⟨hxG, h⟩
@@ -112,10 +124,14 @@ theorem fundamental_domain_group : FundG := by
   have i2 := hint A' hA'
 
   set h : Mt k r → ℝ := fun x => β (Matrix.of x) * u (Matrix.of x) with hh
-  have hpt : ∀ x : Mt k r, (B.hsInner (A (Matrix.of x)) (φ (Matrix.of x)) -
-      B.hsInner (A' (Matrix.of x)) (φ (Matrix.of x))).re = h x := by
+  have hpt
+      : ∀ x : Mt k r,
+        (B.hsInner (A (Matrix.of x)) (φ (Matrix.of x))
+            - B.hsInner (A' (Matrix.of x)) (φ (Matrix.of x))).re
+          = h x := by
     intro x
-    simp only [hh, hu, hφ, Formalism.FourierDecayAlt.P.B5.hs_smul_right, Complex.conj_ofReal, ← mul_sub, Complex.re_ofReal_mul]
+    simp only [hh, hu, hφ, Formalism.FourierDecayAlt.P.B5.hs_smul_right, Complex.conj_ofReal,
+      ← mul_sub, Complex.re_ofReal_mul]
   have hintR : Integrable h D.μG :=
     (i1.sub i2).re.congr (Eventually.of_forall fun x => by rw [← hpt x]; rfl)
   have hzero : ∫ x, h x ∂D.μG = 0 := by

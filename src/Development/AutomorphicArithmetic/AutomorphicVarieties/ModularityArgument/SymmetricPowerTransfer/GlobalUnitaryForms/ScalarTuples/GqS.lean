@@ -7,17 +7,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open NumberField UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
 
-theorem UpperTheory.V.Z.Sym.Glob.gqS :
-    UpperTheory.V.Z.Sym.Glob.GqS := by
+theorem UpperTheory.V.Z.Sym.Glob.gqS : UpperTheory.V.Z.Sym.Glob.GqS := by
   intro F _ _ Δ D hD ι hι t ht τ hτ γ j hγ hj
   haveI := hD.real
   have hreg : τ ^ 2 - 4 ≠ 0 := cm_ne hτ
-  have htr : ∀ (g : DX Δ) (v : Pl F), HasTr g τ → HasTr ((ι g).1 v) (cv v τ) :=
-    fun g v hg => hasTr_map (cv v) (hι g v) hg
+  have htr : ∀ (g : DX Δ) (v : Pl F), HasTr g τ → HasTr ((ι g).1 v) (cv v τ) := fun g v hg =>
+    hasTr_map (cv v) (hι g v) hg
   by_cases hA : D.admitted t τ
   · rw [show one (D.admitted t τ) = 1 from if_pos hA, one_mul]
-    refine gqD D hD ι hι t ht τ hτ hA γ j hγ hj γ (D.fSv t) ?_ (fun v => ((D.S v).cS : ℂ))
-      (fun v => gOrb (Ov v) (jstd ((cv v) τ)) 1 (toUnit QuadraticAlgebra.omega)) ?_
+    refine gqD D hD ι hι t ht τ hτ hA γ j hγ hj γ (D.fSv t) ?_
+      (fun v => ((D.S v).cS : ℂ))
+      (fun v => gOrb (Ov v) (jstd ((cv v) τ)) 1 (toUnit QuadraticAlgebra.omega))
+      ?_
     · intro v u hu x
       by_cases hv : v ∈ D.Sg
       · have hS := hD.sig v hv
@@ -53,9 +54,14 @@ theorem UpperTheory.V.Z.Sym.Glob.gqS :
           simp [Dat.fSv, hv]
         have e2 : D.J2v v = KD ((cv v) Δ) (Ov v) := by simp [Dat.J2v, hv]
         rw [e1, e2]
-        refine ⟨(finD _ _ _ _ hL hrv _ jv hgv hjv).1, fun h => absurd h hv, fun _ =>
-          ⟨(locD _ _ _ _ hL hrv _ jv hgv hjv (D.χ v) (hD.chi v).1 z hz).1, fun hK hu =>
-            ⟨if_pos hK, fun y hy => ?_⟩⟩⟩
+        refine ⟨
+          (finD _ _ _ _ hL hrv _ jv hgv hjv).1,
+          fun h => absurd h hv,
+          fun _ => ⟨
+            (locD _ _ _ _ hL hrv _ jv hgv hjv (D.χ v) (hD.chi v).1 z hz).1,
+            fun hK hu => ⟨if_pos hK, fun y hy => ?_⟩
+          ⟩
+        ⟩
         have hy' : y⁻¹ * (ι γ).1 v * y ∈ ZD ((cv v) Δ) ⊔ KD ((cv v) Δ) (Ov v) := by
           by_contra hn
           exact hy (if_neg (fun h => hn (le_sup_right (a := ZD ((cv v) Δ)) h)))
@@ -65,8 +71,10 @@ theorem UpperTheory.V.Z.Sym.Glob.gqS :
     intro y
     obtain ⟨v, hv, hI⟩ : ∃ v ∈ D.Sg, ¬ Ind (D.S v).H ((cv v) τ) (t v) := by
       simpa [Dat.admitted] using hA
-    have heq : ((Quotient.out y)⁻¹ * ι γ * Quotient.out y).1 v =
-        ((Quotient.out y).1 v)⁻¹ * (ι γ).1 v * (Quotient.out y).1 v := rfl
+    have heq
+        : ((Quotient.out y)⁻¹ * ι γ * Quotient.out y).1 v
+          = ((Quotient.out y).1 v)⁻¹ * (ι γ).1 v * (Quotient.out y).1 v :=
+      rfl
     have hgtr : HasTr (((Quotient.out y)⁻¹ * ι γ * Quotient.out y).1 v) (cv v τ) := by
       rw [heq]
       exact hasTr_conj (htr γ v hγ) _

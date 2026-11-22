@@ -4,10 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Bl
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Bl
 
-private theorem ent_eq {R : Type} [CommRing R] {X Z : M4 R} (hX : IsBlock X) (hZ : Z ∈ hAB R) (i j : Fin 4)
-    (h : ¬ lamW i < lamW j) : ((1 + Z) * X) i j = X i j := by
+private theorem ent_eq
+    {R : Type} [CommRing R]
+    {X Z : M4 R} (hX : IsBlock X) (hZ : Z ∈ hAB R)
+    (i j : Fin 4) (h : ¬ lamW i < lamW j)
+    : ((1 + Z) * X) i j = X i j := by
   have hZX : (Z * X) i j = 0 := by
     rw [Matrix.mul_apply]
     refine Finset.sum_eq_zero fun k _ => ?_
@@ -16,9 +21,13 @@ private theorem ent_eq {R : Type} [CommRing R] {X Z : M4 R} (hX : IsBlock X) (hZ
     · rw [hZ i k hik, zero_mul]
   rw [add_mul, one_mul, Matrix.add_apply, hZX, add_zero]
 
-theorem UpperTheory.V.Ws.Bl.twistPt :
-    ∀ (R : Type) [CommRing R] (X Z : M4 R), IsBlock X → Z ∈ uM R → (∀ ν Y, IsGSp ν Y → IsGSp ν ((1 + Z) * Y)) ∧ (∀ i j, lamW j < lamW i → ((1 + Z) * X) i j = 0) ∧
-          ((1 + Z) * X).submatrix ixB ixB = X.submatrix ixB ixB ∧ ((1 + Z) * X).charpoly = X.charpoly := by
+theorem UpperTheory.V.Ws.Bl.twistPt
+    : ∀ (R : Type) [CommRing R] (X Z : M4 R),
+      IsBlock X → Z ∈ uM R
+        → (∀ ν Y, IsGSp ν Y → IsGSp ν ((1 + Z) * Y))
+          ∧ (∀ i j, lamW j < lamW i → ((1 + Z) * X) i j = 0)
+          ∧ ((1 + Z) * X).submatrix ixB ixB = X.submatrix ixB ixB
+          ∧ ((1 + Z) * X).charpoly = X.charpoly := by
   intro R _ X Z hX hZ
   have hZa : Z ∈ hAB R := hZ.1
   have hZs : adj Z = -Z := hZ.2

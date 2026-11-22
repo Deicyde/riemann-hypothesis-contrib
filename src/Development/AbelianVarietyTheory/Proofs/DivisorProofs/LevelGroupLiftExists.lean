@@ -8,7 +8,11 @@ public import Formalism.LocalToGlobal.HermitianColumns.CoordinateLatticeSelfDual
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Lev GlobalTheory.IndefiniteRowSideFullHecke.LatticeBasisLifts GlobalTheory.GeoLevel
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+  Formalism.IndefR.Lev GlobalTheory.IndefiniteRowSideFullHecke.LatticeBasisLifts
+  GlobalTheory.GeoLevel
 open GlobalTheory.Member (FinCong IotaOK)
 open GlobalTheory.LevelCusp (IsMatch)
 open GlobalTheory.Dict (castFr)
@@ -17,9 +21,16 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.GeoLevel
 
-theorem isBaseFrame_of_isLatBasis {D : D7} (V : HSp D) (β : GL (Fin V.rank) (EAf D)) (h : IsLatBasis V rfl β) :
-    IsBaseFrame V β (GlobalTheory.Member.latC V) 1 := by
-  refine ⟨fun x => ?_, Formalism.L2.Herm.coordinate_lattice_self_dual D.sp.cm V, Nat.one_pos, fun x hx => ?_, fun x hx => ?_⟩
+theorem isBaseFrame_of_isLatBasis
+    {D : D7} (V : HSp D) (β : GL (Fin V.rank) (EAf D)) (h : IsLatBasis V rfl β)
+    : IsBaseFrame V β (GlobalTheory.Member.latC V) 1 := by
+  refine ⟨
+    fun x => ?_,
+    Formalism.L2.Herm.coordinate_lattice_self_dual D.sp.cm V,
+    Nat.one_pos,
+    fun x hx => ?_,
+    fun x hx => ?_
+  ⟩
   · obtain ⟨z, rfl⟩ := GlobalTheory.LiftLevel.swap_surj x
     refine Iff.trans ?_ (h z)
     rw [(GlobalTheory.Member.latHat_eq_hat_and_gram D V).1]
@@ -29,8 +40,10 @@ theorem isBaseFrame_of_isLatBasis {D : D7} (V : HSp D) (β : GL (Fin V.rank) (EA
   · rw [← GlobalTheory.Member.coe_selfDualLatticeInFrameCoordinates_eq]
     simpa using hx
 
-theorem not_isConjPl_of_le {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} (l : Level H)
-    {w w' : Formalism.L2.DIV.Pl D.host.E} (hw : l.Mb ≤ w.asIdeal) (hw' : l.Mb ≤ w'.asIdeal) : ¬ IsConjPl w w' := by
+theorem not_isConjPl_of_le
+    {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} (l : Level H)
+    {w w' : Formalism.L2.DIV.Pl D.host.E} (hw : l.Mb ≤ w.asIdeal) (hw' : l.Mb ≤ w'.asIdeal)
+    : ¬ IsConjPl w w' := by
   intro h
   apply w'.isPrime.ne_top
   rw [eq_top_iff, ← l.coprime]
@@ -40,7 +53,8 @@ theorem not_isConjPl_of_le {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Ge
     apply RingOfIntegers.coe_injective
     exact (H.bar_eq a).trans e.symm
   show H.bar a ∈ w'.asIdeal
-  rw [this]; exact hc'
+  rw [this]
+  exact hc'
 
 theorem finR_rfl {D : D7} (V : HSp D) (κ : GA D V) : finR V rfl κ = finE V κ := by
   apply Units.ext

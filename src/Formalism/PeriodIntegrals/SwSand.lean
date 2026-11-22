@@ -14,13 +14,14 @@ namespace PI.SwSand
 
 open PI.SwBig
 
-attribute [local instance] Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedSpace
-  Matrix.frobeniusNormedRing Matrix.frobeniusNormedAlgebra
+attribute [local instance]
+  Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedSpace Matrix.frobeniusNormedRing
+  Matrix.frobeniusNormedAlgebra
 
 abbrev Mt (k r : ℕ) := Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → ℂ
 
-def realifyFun {m : ℕ} (X : Matrix (Fin m) (Fin m) ℂ) : Fin m × Fin m × Bool → ℝ :=
-  fun p => if p.2.2 then (X p.1 p.2.1).im else (X p.1 p.2.1).re
+def realifyFun {m : ℕ} (X : Matrix (Fin m) (Fin m) ℂ) : Fin m × Fin m × Bool → ℝ := fun p =>
+  if p.2.2 then (X p.1 p.2.1).im else (X p.1 p.2.1).re
 
 def unrealify {m : ℕ} (x : EuclideanSpace ℝ (Fin m × Fin m × Bool)) : Matrix (Fin m) (Fin m) ℂ :=
   fun i j => ⟨x (i, j, false), x (i, j, true)⟩
@@ -28,13 +29,19 @@ def unrealify {m : ℕ} (x : EuclideanSpace ℝ (Fin m × Fin m × Bool)) : Matr
 def lieOf {m : ℕ} (S : Set (Matrix (Fin m) (Fin m) ℂ)) : Set (Matrix (Fin m) (Fin m) ℂ) :=
   {X | ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) ∈ S}
 
-def lieE {m : ℕ} (S : Set (Matrix (Fin m) (Fin m) ℂ)) : Submodule ℝ (EuclideanSpace ℝ (Fin m × Fin m × Bool)) :=
+def lieE {m : ℕ} (S : Set (Matrix (Fin m) (Fin m) ℂ))
+    : Submodule ℝ (EuclideanSpace ℝ (Fin m × Fin m × Bool)) :=
   Submodule.span ℝ ((fun X => (WithLp.equiv 2 _).symm (realifyFun X)) '' lieOf S)
 
 variable {k r : ℕ}
 
 def dg (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℕ :=
-  if i.val < r then i.val else if i.val ≤ r + k then r else i.val - k
+  if i.val < r then
+    i.val
+  else if i.val ≤ r + k then
+    r
+  else
+    i.val - k
 
 def Fil (p : ℕ) (X : Mat k r) : Prop := ∀ i j, dg k r j < dg k r i + p → X i j = 0
 
@@ -86,7 +93,8 @@ def lieNS (k r : ℕ) : Submodule ℝ (Mat k r) where
   zero_mem' := zero_mem_lieN
   smul_mem' := fun c X hX => by
     show c • X ∈ lieN k r
-    rw [← Complex.coe_smul]; exact lieN_smul hX c
+    rw [← Complex.coe_smul]
+    exact lieN_smul hX c
 
 def RL : Mat k r →ₗ[ℝ] EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool) where
   toFun X := (WithLp.equiv 2 _).symm (realifyFun X)
@@ -99,30 +107,39 @@ def RL : Mat k r →ₗ[ℝ] EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 *
     rcases p with ⟨i, j, b⟩
     cases b <;> simp [realifyFun]
 
-def expBall (S : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)) (ρ : ℝ) : Set (Mt k r) :=
-  (fun x : lieE S =>
-      fun i j => NormedSpace.exp (unrealify (x : EuclideanSpace ℝ _)) i j) '' Metric.ball 0 ρ
+def expBall (S : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)) (ρ : ℝ)
+    : Set (Mt k r) :=
+  (fun x : lieE S => fun i j => NormedSpace.exp (unrealify (x : EuclideanSpace ℝ _)) i j)
+    '' Metric.ball 0 ρ
 
 def gBall (k r : ℕ) (ρ : ℝ) : Set (Mt k r) := expBall (k := k) (r := r) (UH (Hpk k r)) ρ
 
-def rhoS (k r : ℕ) (S : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)) (x : Mt k r) : ℝ≥0∞ :=
+def rhoS (k r : ℕ) (S : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)) (x : Mt k r)
+    : ℝ≥0∞ :=
   ⨅ (Y : lieE S)
     (_ : (fun i j => NormedSpace.exp (unrealify (Y : EuclideanSpace ℝ _)) i j : Mt k r) = x),
     (‖(Y : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool))‖₊ : ℝ≥0∞)
 
 def Qf (k r : ℕ) (n : Mt k r) (c : Fin r → ℂ) (m n' : Mt k r) : ℝ≥0∞ :=
-  rhoS k r (Nset k r) n ^ 2 + ENNReal.ofReal (2 * ∑ a, ‖c a - 1‖ ^ 2) + rhoS k r (UWb k r) m ^ 2 +
-    rhoS k r (Nset k r) n' ^ 2
+  rhoS k r (Nset k r) n ^ 2 + ENNReal.ofReal (2 * ∑ a, ‖c a - 1‖ ^ 2) + rhoS k r (UWb k r) m ^ 2
+    + rhoS k r (Nset k r) n' ^ 2
 
-def Psi (k r : ℕ) (n : Mt k r) (c : Fin r → ℂ) (m n' : Mt k r) : Mt k r :=
-  fun i j => (w0B k r * (Matrix.of n * bigCell k r c 1 * Matrix.of m * (Matrix.of n')⁻¹)) i j
+def Psi (k r : ℕ) (n : Mt k r) (c : Fin r → ℂ) (m n' : Mt k r) : Mt k r := fun i j =>
+  (w0B k r * (Matrix.of n * bigCell k r c 1 * Matrix.of m * (Matrix.of n')⁻¹)) i j
 
 def Sandwich : Prop :=
-  ∀ (k r : ℕ) (ε : ℝ), 0 < ε → ε < 1 → ∃ δ : ℝ, 0 < δ ∧ ∀ ρ : ℝ, 0 < ρ → ρ < δ →
-    ∀ (n : Mt k r) (c : Fin r → ℂ) (m n' : Mt k r), Matrix.of n ∈ Nset k r → Matrix.of m ∈ UWb k r →
-      Matrix.of n' ∈ Nset k r →
-      (Psi k r n c m n' ∈ gBall k r ρ → Qf k r n c m n' < ENNReal.ofReal (((1 + ε) * ρ) ^ 2)) ∧
-      (Qf k r n c m n' < ENNReal.ofReal (((1 - ε) * ρ) ^ 2) → Psi k r n c m n' ∈ gBall k r ρ)
+  ∀ (k r : ℕ) (ε : ℝ),
+    0 < ε → ε < 1
+      → ∃ δ : ℝ,
+        0 < δ
+          ∧ ∀ ρ : ℝ,
+            0 < ρ → ρ < δ
+              → ∀ (n : Mt k r) (c : Fin r → ℂ) (m n' : Mt k r),
+                Matrix.of n ∈ Nset k r → Matrix.of m ∈ UWb k r → Matrix.of n' ∈ Nset k r
+                  → (Psi k r n c m n' ∈ gBall k r ρ
+                      → Qf k r n c m n' < ENNReal.ofReal (((1 + ε) * ρ) ^ 2))
+                    ∧ (Qf k r n c m n' < ENNReal.ofReal (((1 - ε) * ρ) ^ 2)
+                      → Psi k r n c m n' ∈ gBall k r ρ)
 
 def Mid (k r : ℕ) (i : Fin (2 * r + k + 1)) : Prop := r ≤ i.val ∧ i.val ≤ r + k
 
@@ -131,12 +148,14 @@ def uH (k r : ℕ) : Submodule ℝ (Mat k r) where
   add_mem' := by
     intro X Y hX hY
     simp only [Set.mem_ofPred_eq] at *
-    rw [adjH_add, show adjH X + adjH Y + (X + Y) = (adjH X + X) + (adjH Y + Y) by abel, hX, hY, add_zero]
+    rw [adjH_add, show adjH X + adjH Y + (X + Y) = (adjH X + X) + (adjH Y + Y) by abel, hX, hY,
+      add_zero]
   zero_mem' := by simp [adjH]
   smul_mem' := by
     intro c X hX
     simp only [Set.mem_ofPred_eq] at *
-    rw [← Complex.coe_smul, adjH_smul, Complex.star_def, Complex.conj_ofReal, ← smul_add, hX, smul_zero]
+    rw [← Complex.coe_smul, adjH_smul, Complex.star_def, Complex.conj_ofReal, ← smul_add, hX,
+      smul_zero]
 
 def uWb (k r : ℕ) : Submodule ℝ (Mat k r) where
   carrier := {X | adjH X + X = 0 ∧ ∀ i j, ¬ (Mid k r i ∧ Mid k r j) → X i j = 0}
@@ -155,17 +174,23 @@ def Vs (k r : ℕ) : Submodule ℝ (Mat k r × (Fin r → ℂ) × Mat k r × Mat
 
 def LieG : Prop := ∀ k r : ℕ, lieE (UH (Hpk k r)) = (uH k r).map RL
 
-def LieWb : Prop := ∀ k r : ℕ, (∀ Z ∈ uWb k r, NormedSpace.exp Z ∈ UWb k r) ∧
-  lieE (UWb k r) = (uWb k r).map RL
+def LieWb : Prop :=
+  ∀ k r : ℕ, (∀ Z ∈ uWb k r, NormedSpace.exp Z ∈ UWb k r) ∧ lieE (UWb k r) = (uWb k r).map RL
 
-def LIso : Prop := ∀ k r : ℕ, (∀ v ∈ Vs k r, Lm k r v ∈ uH k r) ∧ (∀ Y ∈ uH k r, ∃ v ∈ Vs k r, Lm k r v = Y) ∧
-  ∀ v ∈ Vs k r, ‖RL (Lm k r v)‖ ^ 2 = ‖RL v.1‖ ^ 2 + 2 * ∑ a, ‖v.2.1 a‖ ^ 2 + ‖RL v.2.2.1‖ ^ 2 + ‖RL v.2.2.2‖ ^ 2
+def LIso : Prop :=
+  ∀ k r : ℕ,
+    (∀ v ∈ Vs k r, Lm k r v ∈ uH k r) ∧ (∀ Y ∈ uH k r, ∃ v ∈ Vs k r, Lm k r v = Y)
+      ∧ ∀ v ∈ Vs k r,
+        ‖RL (Lm k r v)‖ ^ 2
+          = ‖RL v.1‖ ^ 2 + 2 * ∑ a, ‖v.2.1 a‖ ^ 2 + ‖RL v.2.2.1‖ ^ 2 + ‖RL v.2.2.2‖ ^ 2
 
 def LieEN : Prop := ∀ k r : ℕ, lieE (Nset k r) = (lieNS k r).map RL
 
 def ExpN : Prop := ∀ (k r : ℕ) (X : Mat k r), X ∈ lieN k r → NormedSpace.exp X ∈ Nset k r
 
 def SandwichOf : Prop :=
-  LieG → LieWb → GaussUniq → PhiForm → BigCellG → PhiDeriv → LIso → LongWeylElementSquare → LieEN → ExpN → Sandwich
+  LieG → LieWb → GaussUniq → PhiForm → BigCellG → PhiDeriv → LIso → LongWeylElementSquare → LieEN
+    → ExpN
+    → Sandwich
 
 end PI.SwSand

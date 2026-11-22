@@ -10,12 +10,18 @@ open scoped TensorProduct
 
 namespace GlobalTheory.GoodEtaleFinite
 
-theorem finite_of_trace_relation (A R C : Type) [CommRing A] [CommRing R] [Algebra A R] [IsNoetherianRing R] [CommRing C] [Algebra R C]
-    (G : Type) [Group G] [Fintype G] [DecidableEq G] (act : G →* (C ≃ₐ[R] C)) (T : C →ₗ[R] R) :
-    (∀ c, algebraMap R C (T c) = ∑ g, act g c) →
-    ∀ (a : A), a ≠ 0 → ∀ (n : ℕ) (x y : Fin n → C),
-      (∀ g, ∑ i, x i * act g (y i) = if g = 1 then algebraMap R C (algebraMap A R a) else 0) →
-    GlobalTheory.GoodEtale.TorsionFreeOver A R C → Module.Finite R C := by
+theorem finite_of_trace_relation
+    (A R C : Type)
+    [CommRing A] [CommRing R] [Algebra A R] [IsNoetherianRing R] [CommRing C] [Algebra R C]
+    (G : Type) [Group G] [Fintype G] [DecidableEq G]
+    (act : G →* (C ≃ₐ[R] C)) (T : C →ₗ[R] R)
+    : (∀ c, algebraMap R C (T c) = ∑ g, act g c)
+      → ∀ (a : A),
+        a ≠ 0
+          → ∀ (n : ℕ) (x y : Fin n → C),
+            (∀ g, ∑ i, x i * act g (y i) = if g = 1 then algebraMap R C (algebraMap A R a) else 0)
+              → GlobalTheory.GoodEtale.TorsionFreeOver A R C
+              → Module.Finite R C := by
   intro hT a ha n x y hrel htf
   set b : R := algebraMap A R a with hb
 
@@ -25,7 +31,8 @@ theorem finite_of_trace_relation (A R C : Type) [CommRing A] [CommRing R] [Algeb
       intro i
       rw [Algebra.smul_def, hT, Finset.sum_mul]
       refine Finset.sum_congr rfl fun g _ => ?_
-      rw [map_mul]; ring
+      rw [map_mul]
+      ring
     simp_rw [h1]
     rw [Finset.sum_comm]
     simp_rw [← Finset.sum_mul, hrel]

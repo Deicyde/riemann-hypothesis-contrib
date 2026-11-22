@@ -15,8 +15,12 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Wei
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.IndefR Formalism.IndefR.Links GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.ChiGrid GlobalTheory.Unf GlobalTheory.FunObj GlobalTheory.RowUnf GlobalTheory.RowChain
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.IndefR Formalism.IndefR.Links GlobalTheory.MixModel GlobalTheory.MixPer
+  GlobalTheory.Grow GlobalTheory.ChiGrid GlobalTheory.Unf GlobalTheory.FunObj GlobalTheory.RowUnf
+  GlobalTheory.RowChain
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -25,19 +29,24 @@ namespace GlobalTheory.RowChain.LastSeeSawStep
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts}
 
-theorem topOrthAt_emb (G : GridData L sc) {n : ℕ} (h : D.R.m = n) (h' : GA D (G.V (.grid D.R.m D.R.m))) :
-    (topOrthAt G h).emb (h', 1) = topEmb G h h' := by
+theorem topOrthAt_emb
+    (G : GridData L sc) {n : ℕ} (h : D.R.m = n) (h' : GA D (G.V (.grid D.R.m D.R.m)))
+    : (topOrthAt G h).emb (h', 1) = topEmb G h h' := by
   subst h
   exact topOrth_emb G h'
 
-theorem lastTau_gram :
-    (lastTau (D := D))ᴴ * ((GlobalTheory.SeeSaw.Model.nLine D).gram * lastTau) =
-      (-(D.host.xi0 * star D.host.xi0)) • (pLine D).gram := by
+theorem lastTau_gram
+    : (lastTau (D := D))ᴴ * ((GlobalTheory.SeeSaw.Model.nLine D).gram * lastTau)
+      = (-(D.host.xi0 * star D.host.xi0)) • (pLine D).gram := by
   refine Matrix.ext fun i j => ?_
   rw [pLine_gram]
-  have h1 : ∀ a b : Fin (GlobalTheory.SeeSaw.Model.nLine D).rank, (GlobalTheory.SeeSaw.Model.nLine D).gram a b = -1 := nLine_gram
+  have h1
+      : ∀ a b : Fin (GlobalTheory.SeeSaw.Model.nLine D).rank,
+        (GlobalTheory.SeeSaw.Model.nLine D).gram a b = -1 :=
+    nLine_gram
   simp only [Matrix.mul_apply, conjTranspose_apply, lastTau, Matrix.of_apply, Matrix.smul_apply, h1]
-  change ∑ x : Fin 1, star (-D.host.xi0) * ∑ y : Fin 1, (-1) * (-D.host.xi0) = (-(D.host.xi0 * star D.host.xi0)) * antiDiagonalSignGramMatrix (R := D.host.E) 1 1 i j
+  change ∑ x : Fin 1, star (-D.host.xi0) * ∑ y : Fin 1, (-1) * (-D.host.xi0)
+    = (-(D.host.xi0 * star D.host.xi0)) * antiDiagonalSignGramMatrix (R := D.host.E) 1 1 i j
   have hij : i = j := Subsingleton.elim (α := Fin 1) _ _
   subst hij
   have hi : (i : ℕ) = 0 := by have := i.2; change (i : ℕ) < 1 at this; omega
@@ -47,7 +56,6 @@ theorem lastTau_gram :
 end GlobalTheory.RowChain.LastSeeSawStep
 
 namespace GlobalTheory.RowChain.LastSeeSawStep
-
 
 set_option maxHeartbeats 2000000 in
 theorem main : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (Wl : G.Weil) (t : T) {M : GlobalTheory.FunObj.Vol G}

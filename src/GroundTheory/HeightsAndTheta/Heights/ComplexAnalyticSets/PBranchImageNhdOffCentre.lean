@@ -12,8 +12,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets Filter Topology
 
-theorem BranchImageNhdOffCentre.proof (h₁ : CurveRegularOffCentre.Statement) :
-    BranchImageNhdOffCentre.Statement := by
+theorem BranchImageNhdOffCentre.proof (h₁ : CurveRegularOffCentre.Statement)
+    : BranchImageNhdOffCentre.Statement := by
   intro n I q hdim
   obtain ⟨N, hN, hreg⟩ := h₁ n I q hdim
   refine ⟨N, hN, fun c x hx hxq => ?_⟩
@@ -60,7 +60,9 @@ theorem BranchImageNhdOffCentre.proof (h₁ : CurveRegularOffCentre.Statement) :
         ((hconst.and hΔ).filter_mono nhdsWithin_le_nhds).and self_mem_nhdsWithin
       obtain ⟨τ, ⟨hτφ, hτΔ⟩, hτne⟩ := hev.exists
       have h1 : f τ = f (σ₀ 0) := by
-        calc f τ = g (φ τ) := hfg τ hτΔ
+        calc
+          f τ
+            = g (φ τ) := hfg τ hτΔ
           _ = g (φ (σ₀ 0)) := by rw [hτφ]
           _ = f (σ₀ 0) := (hfg (σ₀ 0) (mem_of_mem_nhds hΔ)).symm
       exact hτne (he_inj (c.injOn (hBe τ hτΔ.1) (hBe _ ht₀) h1))
@@ -68,13 +70,18 @@ theorem BranchImageNhdOffCentre.proof (h₁ : CurveRegularOffCentre.Statement) :
   have hφx : φ (σ₀ 0) = A (c.toFun σ₀) := by
     show A (c.toFun (e (σ₀ 0))) = _
     rw [hσe]
-  refine ⟨V ∩ A ⁻¹' (φ '' Δ), inter_mem (hV.mem_nhds hxV)
-    (A.continuous.continuousAt.preimage_mem_nhds (hφx ▸ hopen)), ?_⟩
+  refine ⟨
+    V ∩ A ⁻¹' (φ '' Δ),
+    inter_mem (hV.mem_nhds hxV) (A.continuous.continuousAt.preimage_mem_nhds (hφx ▸ hopen)),
+    ?_
+  ⟩
   rintro y ⟨hyZ, hyV, τ, hτΔ, hτy⟩
   have hy : y ∈ g '' O := hZV ▸ ⟨hyZ, hyV⟩
   obtain ⟨w, hw, rfl⟩ := hy
   refine ⟨e τ, hBe τ hτΔ.1, ?_⟩
-  calc c.toFun (e τ) = f τ := rfl
+  calc
+    c.toFun (e τ)
+      = f τ := rfl
     _ = g (φ τ) := hfg τ hτΔ
     _ = g w := by rw [hτy, hAg w hw]
 

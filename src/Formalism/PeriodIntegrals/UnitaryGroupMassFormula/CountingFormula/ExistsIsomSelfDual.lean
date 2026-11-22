@@ -20,11 +20,14 @@ variable {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
 variable {S : Subring K} {h : V →ₗ⋆[K] V →ₗ[K] K}
 
 def PairUnit (S : Subring K) (h : V →ₗ⋆[K] V →ₗ[K] K) : Prop :=
-  ∀ w y : V, h y w = 1 → h w w ∈ S → h y y ∈ S →
-    ∃ c ∈ S, ∃ d ∈ S, IsUnitIn S (h (c • w + d • y) (c • w + d • y))
+  ∀ w y : V,
+    h y w = 1 → h w w ∈ S → h y y ∈ S
+      → ∃ c ∈ S, ∃ d ∈ S, IsUnitIn S (h (c • w + d • y) (c • w + d • y))
 
-theorem linIndep_orth {ι : Type} [Fintype ι] (x : ι → V) (hxo : ∀ i j, i ≠ j → h (x i) (x j) = 0)
-    (hx0 : ∀ i, h (x i) (x i) ≠ 0) : LinearIndependent K x := by
+theorem linIndep_orth
+    {ι : Type} [Fintype ι]
+    (x : ι → V) (hxo : ∀ i j, i ≠ j → h (x i) (x j) = 0) (hx0 : ∀ i, h (x i) (x i) ≠ 0)
+    : LinearIndependent K x := by
   classical
   rw [Fintype.linearIndependent_iff]
   intro c hc j
@@ -37,9 +40,11 @@ theorem linIndep_orth {ι : Type} [Fintype ι] (x : ι → V) (hxo : ∀ i j, i 
     rw [map_smul, hxo j i (Ne.symm hij), smul_zero]
   · simp
 
-theorem orth_sub_proj {ι : Type} [Fintype ι] (x : ι → V) (hxo : ∀ i j, i ≠ j → h (x i) (x j) = 0)
-    (hx0 : ∀ i, h (x i) (x i) ≠ 0) (v : V) (j : ι) :
-    h (x j) (v - ∑ i, ((h (x i) (x i))⁻¹ * h (x i) v) • x i) = 0 := by
+theorem orth_sub_proj
+    {ι : Type} [Fintype ι]
+    (x : ι → V) (hxo : ∀ i j, i ≠ j → h (x i) (x j) = 0) (hx0 : ∀ i, h (x i) (x i) ≠ 0)
+    (v : V) (j : ι)
+    : h (x j) (v - ∑ i, ((h (x i) (x i))⁻¹ * h (x i) v) • x i) = 0 := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sub, map_sum, Finset.sum_eq_single j]
@@ -48,18 +53,27 @@ theorem orth_sub_proj {ι : Type} [Fintype ι] (x : ι → V) (hxo : ∀ i j, i 
     rw [map_smul, hxo j i (Ne.symm hij), smul_zero]
   · simp
 
-theorem exists_ortho_unit [FiniteDimensional K V] (hS : IsHermSemilocal S) (hs : h.IsSymm)
-    (hnd : h.Nondegenerate) (hPU : PairUnit S h) {L : AddSubgroup V} (hL : IsSelfDualMod S h L) :
-    ∃ x : Fin (finrank K V) → V, (∀ i, x i ∈ L) ∧ (∀ i j, i ≠ j → h (x i) (x j) = 0) ∧
-      ∀ i, IsUnitIn S (h (x i) (x i)) :=
-  _root_.UpperTheory.Reformulated.B.ExistsOrthogonalBasisWithUnitNorms.exists_ortho_unit hS hs hnd hPU hL
+theorem exists_ortho_unit
+    [FiniteDimensional K V]
+    (hS : IsHermSemilocal S) (hs : h.IsSymm) (hnd : h.Nondegenerate) (hPU : PairUnit S h)
+    {L : AddSubgroup V} (hL : IsSelfDualMod S h L)
+    : ∃ x : Fin (finrank K V) → V,
+      (∀ i, x i ∈ L) ∧ (∀ i j, i ≠ j → h (x i) (x j) = 0) ∧ ∀ i, IsUnitIn S (h (x i) (x i)) :=
+  _root_.UpperTheory.Reformulated.B.ExistsOrthogonalBasisWithUnitNorms.exists_ortho_unit hS hs hnd
+    hPU hL
 
-theorem exists_isom_frameU (hS : IsHermSemilocal S) (hs : h.IsSymm) {M : AddSubgroup V}
-    (hM : IsSelfDualMod S h M) {n : ℕ} (x : Fin n → V) (hxo : ∀ i j, i ≠ j → h (x i) (x j) = 0)
-    (hxu : ∀ i, IsUnitIn S (h (x i) (x i))) :
-    ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, ∀ i, g (x i) ∈ M := by
+theorem exists_isom_frameU
+    (hS : IsHermSemilocal S) (hs : h.IsSymm)
+    {M : AddSubgroup V} (hM : IsSelfDualMod S h M)
+    {n : ℕ}
+    (x : Fin n → V) (hxo : ∀ i j, i ≠ j → h (x i) (x j) = 0) (hxu : ∀ i, IsUnitIn S (h (x i) (x i)))
+    : ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, ∀ i, g (x i) ∈ M := by
   classical
-  have P : ∀ k, k ≤ n → ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, ∀ i : Fin n, i.val < k → g (x i) ∈ M := by
+  have P
+      : ∀ k,
+        k ≤ n
+          → ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, ∀ i : Fin n,
+            i.val < k → g (x i) ∈ M := by
     intro k
     induction k with
     | zero => intro _; exact ⟨1, one_mem _, fun i hi => absurd hi (Nat.not_lt_zero _)⟩
@@ -110,9 +124,11 @@ theorem exists_isom_frameU (hS : IsHermSemilocal S) (hs : h.IsSymm) {M : AddSubg
   obtain ⟨g, hg, hgM⟩ := P n le_rfl
   exact ⟨g, hg, fun i => hgM i i.isLt⟩
 
-theorem exists_isom_selfDual [FiniteDimensional K V] (hS : IsHermSemilocal S) (hs : h.IsSymm)
-    (hnd : h.Nondegenerate) (hPU : PairUnit S h) {L M : AddSubgroup V} (hL : IsSelfDualMod S h L)
-    (hM : IsSelfDualMod S h M) : ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, ∀ v, v ∈ L ↔ g v ∈ M := by
+theorem exists_isom_selfDual
+    [FiniteDimensional K V]
+    (hS : IsHermSemilocal S) (hs : h.IsSymm) (hnd : h.Nondegenerate) (hPU : PairUnit S h)
+    {L M : AddSubgroup V} (hL : IsSelfDualMod S h L) (hM : IsSelfDualMod S h M)
+    : ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, ∀ v, v ∈ L ↔ g v ∈ M := by
   classical
   obtain ⟨x, hxL, hxo, hxu⟩ := exists_ortho_unit hS hs hnd hPU hL
   obtain ⟨g, hg, hgM⟩ := exists_isom_frameU hS hs hM x hxo hxu

@@ -8,7 +8,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.MainNotions.G.LatticeSystems
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
+  Formalism.MainNotions.G.LatticeSystems
 
 section Gen
 
@@ -16,10 +17,11 @@ variable {W Qq : Type} [CommRing W] [Field Qq] [Algebra W Qq] {k : ℕ}
 
 def emb (w : Fin k → W) : Fin k → Qq := fun i => algebraMap W Qq (w i)
 
-abbrev mapM (N : Matrix (Fin k) (Fin k) W) : Matrix (Fin k) (Fin k) Qq := (algebraMap W Qq).mapMatrix N
+abbrev mapM (N : Matrix (Fin k) (Fin k) W) : Matrix (Fin k) (Fin k) Qq :=
+  (algebraMap W Qq).mapMatrix N
 
-theorem mem_colSpan_iff (h : Matrix (Fin k) (Fin k) Qq) (x : Fin k → Qq) :
-    x ∈ colSpan W h ↔ ∃ y : Fin k → W, x = fun i => ∑ c, h i c * algebraMap W Qq (y c) := by
+theorem mem_colSpan_iff (h : Matrix (Fin k) (Fin k) Qq) (x : Fin k → Qq)
+    : x ∈ colSpan W h ↔ ∃ y : Fin k → W, x = fun i => ∑ c, h i c * algebraMap W Qq (y c) := by
   unfold colSpan
   rw [Submodule.mem_span_range_iff_exists_fun]
   constructor
@@ -30,31 +32,34 @@ theorem mem_colSpan_iff (h : Matrix (Fin k) (Fin k) Qq) (x : Fin k → Qq) :
     refine ⟨y, funext fun i => ?_⟩
     simp [Finset.sum_apply, Algebra.smul_def, mul_comm]
 
-theorem colSpan_mul_le (h : Matrix (Fin k) (Fin k) Qq) (N : Matrix (Fin k) (Fin k) W) :
-    colSpan W (h * mapM N) ≤ colSpan W h := by
+theorem colSpan_mul_le (h : Matrix (Fin k) (Fin k) Qq) (N : Matrix (Fin k) (Fin k) W)
+    : colSpan W (h * mapM N) ≤ colSpan W h := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨c, rfl⟩
   refine (mem_colSpan_iff h _).2 ⟨fun j => N j c, funext fun i => ?_⟩
   simp [Matrix.mul_apply, mapM, RingHom.mapMatrix_apply, Matrix.map_apply]
 
-theorem colSpan_unimod (h : Matrix (Fin k) (Fin k) Qq) (N : Matrix (Fin k) (Fin k) W) (hN : IsUnit N.det) :
-    colSpan W (h * mapM N) = colSpan W h := by
+theorem colSpan_unimod
+    (h : Matrix (Fin k) (Fin k) Qq) (N : Matrix (Fin k) (Fin k) W) (hN : IsUnit N.det)
+    : colSpan W (h * mapM N) = colSpan W h := by
   refine le_antisymm (colSpan_mul_le h N) ?_
   have h1 : h * mapM N * mapM N⁻¹ = h := by
     rw [Matrix.mul_assoc, ← map_mul, Matrix.mul_nonsing_inv N hN, map_one, Matrix.mul_one]
-  calc colSpan W h = colSpan W (h * mapM N * mapM N⁻¹) := by rw [h1]
+  calc
+    colSpan W h
+      = colSpan W (h * mapM N * mapM N⁻¹) := by rw [h1]
     _ ≤ colSpan W (h * mapM N) := colSpan_mul_le _ _
 
-theorem map_colSpan (g : GL (Fin k) Qq) (h : Matrix (Fin k) (Fin k) Qq) :
-    (colSpan W h).map (nt_phi W g) = colSpan W ((g : Matrix (Fin k) (Fin k) Qq) * h) := by
+theorem map_colSpan (g : GL (Fin k) Qq) (h : Matrix (Fin k) (Fin k) Qq)
+    : (colSpan W h).map (nt_phi W g) = colSpan W ((g : Matrix (Fin k) (Fin k) Qq) * h) := by
   unfold colSpan
   rw [Submodule.map_span, ← Set.range_comp]
   congr 2
 
-def dj (j : Fin k) (c : Qq) : Matrix (Fin k) (Fin k) Qq := Matrix.diagonal fun i => if i = j then c else 1
+def dj (j : Fin k) (c : Qq) : Matrix (Fin k) (Fin k) Qq :=
+  Matrix.diagonal fun i => if i = j then c else 1
 
-theorem dj_det (j : Fin k) (c : Qq) : (dj j c).det = c := by
-  simp [dj, Matrix.det_diagonal]
+theorem dj_det (j : Fin k) (c : Qq) : (dj j c).det = c := by simp [dj, Matrix.det_diagonal]
 
 theorem dj_mul (j : Fin k) (c d : Qq) : dj j c * dj j d = dj j (c * d) := by
   simp only [dj, Matrix.diagonal_mul_diagonal]
@@ -62,8 +67,7 @@ theorem dj_mul (j : Fin k) (c d : Qq) : dj j c * dj j d = dj j (c * d) := by
   funext i
   split_ifs <;> simp
 
-theorem dj_one (j : Fin k) : dj j (1 : Qq) = 1 := by
-  simp [dj]
+theorem dj_one (j : Fin k) : dj j (1 : Qq) = 1 := by simp [dj]
 
 end Gen
 
@@ -90,7 +94,8 @@ theorem embLin_inj : Function.Injective (embLin R k) := by
   funext i
   exact RS.injW R (congrFun hxy i)
 
-theorem colSpan_one_eq : colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq) = LinearMap.range (embLin R k) := by
+theorem colSpan_one_eq
+    : colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq) = LinearMap.range (embLin R k) := by
   ext x
   rw [mem_colSpan_iff, LinearMap.mem_range]
   constructor
@@ -101,23 +106,27 @@ theorem colSpan_one_eq : colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq) = LinearM
     refine ⟨y, funext fun i => ?_⟩
     simp [embLin, emb, Matrix.one_apply]
 
-theorem mem_dj_iff (j : Fin k) (x : Fin k → R.Qq) :
-    x ∈ colSpan R.W (dj j (p : R.Qq)) ↔ ∃ y : Fin k → R.W, x = emb (fun i => (if i = j then (p : R.W) else 1) * y i) := by
+theorem mem_dj_iff (j : Fin k) (x : Fin k → R.Qq)
+    : x ∈ colSpan R.W (dj j (p : R.Qq))
+      ↔ ∃ y : Fin k → R.W, x = emb (fun i => (if i = j then (p : R.W) else 1) * y i) := by
   rw [mem_colSpan_iff]
-  constructor <;> rintro ⟨y, rfl⟩ <;> refine ⟨y, funext fun i => ?_⟩ <;>
-    by_cases hij : i = j <;> simp [dj, emb, Matrix.diagonal_apply, hij]
+  constructor <;> rintro ⟨y, rfl⟩ <;> refine ⟨y, funext fun i => ?_⟩ <;> by_cases hij : i = j
+    <;> simp [dj, emb, Matrix.diagonal_apply, hij]
 
-theorem baseEdge (j : Fin k) :
-    IsEdge p n' 1 (⟨colSpan R.W (dj j (p : R.Qq)), colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq)⟩ :
-      Edge R.W R.Qq k) := by
+theorem baseEdge (j : Fin k)
+    : IsEdge p n' 1
+      (⟨colSpan R.W (dj j (p : R.Qq)), colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq)⟩
+        : Edge R.W R.Qq k) := by
   classical
   have hstd := R.std.1
   have htgt : ∀ x, x ∈ colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq) ↔ ∃ y, embLin R k y = x := by
     intro x
     rw [colSpan_one_eq R]
     exact LinearMap.mem_range
-  have hsrc : ∀ x, x ∈ colSpan R.W (dj j (p : R.Qq)) ↔
-      ∃ y : Fin k → R.W, x = emb y ∧ y j ∈ Ideal.span {(p : R.W)} := by
+  have hsrc
+      : ∀ x,
+        x ∈ colSpan R.W (dj j (p : R.Qq))
+          ↔ ∃ y : Fin k → R.W, x = emb y ∧ y j ∈ Ideal.span {(p : R.W)} := by
     intro x
     rw [mem_dj_iff R]
     constructor
@@ -144,16 +153,20 @@ theorem baseEdge (j : Fin k) :
     exact h2
   let ψ : colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq) →ₗ[R.W] R.W ⧸ Ideal.span {(p : R.W)} :=
     (Ideal.span {(p : R.W)}).mkQ ∘ₗ LinearMap.proj j ∘ₗ E.toLinearMap
-  have hψ : ∀ x, ψ x = (Submodule.Quotient.mk (E x j) : R.W ⧸ Ideal.span {(p : R.W)}) := fun x => rfl
+  have hψ : ∀ x, ψ x = (Submodule.Quotient.mk (E x j) : R.W ⧸ Ideal.span {(p : R.W)}) := fun x =>
+    rfl
   have hsurj : Function.Surjective ψ := by
     intro q
     obtain ⟨a, rfl⟩ := Submodule.Quotient.mk_surjective _ q
     refine ⟨E.symm (Pi.single j a), ?_⟩
     rw [hψ, LinearEquiv.apply_symm_apply, Pi.single_eq_same]
-  have hker : Submodule.comap (colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq)).subtype
-      (colSpan R.W (dj j (p : R.Qq))) = LinearMap.ker ψ := by
+  have hker
+      : Submodule.comap (colSpan R.W (1 : Matrix (Fin k) (Fin k) R.Qq)).subtype
+          (colSpan R.W (dj j (p : R.Qq)))
+        = LinearMap.ker ψ := by
     ext x
-    rw [Submodule.mem_comap, LinearMap.mem_ker, hψ, Submodule.Quotient.mk_eq_zero, Submodule.subtype_apply, hsrc]
+    rw [Submodule.mem_comap, LinearMap.mem_ker, hψ, Submodule.Quotient.mk_eq_zero,
+      Submodule.subtype_apply, hsrc]
     constructor
     · rintro ⟨y, hy, hyj⟩
       have hxy : E x = y := embLin_inj R ((hE x).trans hy)

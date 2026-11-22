@@ -16,10 +16,10 @@ namespace UpperTheory
 
 end UpperTheory
 
-theorem UpperTheory.finite_fiber_of_finiteType_parameter_ring :
-    ∀ (F K : Type) [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
-      (d : ℕ) (x : Fin (d + 1) → F), IsPd ℂ x → Algebra.FiniteType ℂ (rB ℂ K x {0}) →
-      Finite (fib ℂ K x) := by
+theorem UpperTheory.finite_fiber_of_finiteType_parameter_ring
+    : ∀ (F K : Type) [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K]
+        [IsScalarTower ℂ F K] (d : ℕ) (x : Fin (d + 1) → F),
+      IsPd ℂ x → Algebra.FiniteType ℂ (rB ℂ K x {0}) → Finite (fib ℂ K x) := by
   intro F K _ _ _ _ _ _ d x hx hft
   classical
   have hmem : ∀ c : rA ℂ x {0}, algebraMap F K (c : F) ∈ rB ℂ K x {0} := by
@@ -65,12 +65,14 @@ theorem UpperTheory.finite_fiber_of_finiteType_parameter_ring :
     obtain ⟨hm, hp⟩ := (hint b).choose_spec
     have h0 : Polynomial.eval₂ (ι : rA ℂ x {0} →+* rB ℂ K x {0}) b (hint b).choose = 0 := by
       apply Subtype.ext
-      have := Polynomial.hom_eval₂ (hint b).choose (ι : rA ℂ x {0} →+* rB ℂ K x {0})
-        (rB ℂ K x {0}).val.toRingHom b
+      have :=
+        Polynomial.hom_eval₂ (hint b).choose (ι : rA ℂ x {0} →+* rB ℂ K x {0})
+          (rB ℂ K x {0}).val.toRingHom b
       refine this.trans ?_
       rw [Subalgebra.coe_zero]
       exact hp
-    have h1 := Polynomial.hom_eval₂ (hint b).choose (ι : rA ℂ x {0} →+* rB ℂ K x {0}) e.1.toRingHom b
+    have h1 :=
+      Polynomial.hom_eval₂ (hint b).choose (ι : rA ℂ x {0} →+* rB ℂ K x {0}) e.1.toRingHom b
     rw [h0, map_zero] at h1
     have h2 : e.1.toRingHom.comp (ι : rA ℂ x {0} →+* rB ℂ K x {0}) = ψ :=
       RingHom.ext fun c => key e e0 c

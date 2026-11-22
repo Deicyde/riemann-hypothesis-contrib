@@ -5,7 +5,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCI
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.LeibPhi Topology
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.LeibPhi Topology
 open scoped TensorProduct
 
 noncomputable section
@@ -14,22 +15,27 @@ namespace GlobalTheory.CompanionTheory.LeibPhi.Kernel
 
 section Abstract
 
-variable {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [AddCommGroup W] [Module ℂ W]
+variable
+  {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
 
-theorem cInd_ext {H : Subgroup G} {σ : Representation ℂ H W} {a b : cIndSpace H σ}
-    (h : ∀ g, a.1.1.1 g = b.1.1.1 g) : a = b :=
+theorem cInd_ext
+    {H : Subgroup G} {σ : Representation ℂ H W} {a b : cIndSpace H σ}
+    (h : ∀ g, a.1.1.1 g = b.1.1.1 g)
+    : a = b :=
   Subtype.ext (Subtype.ext (Subtype.ext (funext h)))
 
-theorem cInd_left {H : Subgroup G} {σ : Representation ℂ H W} (a : cIndSpace H σ) {h : G}
-    (hh : h ∈ H) (g : G) : a.1.1.1 (h * g) = σ ⟨h, hh⟩ (a.1.1.1 g) :=
+theorem cInd_left
+    {H : Subgroup G} {σ : Representation ℂ H W} (a : cIndSpace H σ) {h : G} (hh : h ∈ H) (g : G)
+    : a.1.1.1 (h * g) = σ ⟨h, hh⟩ (a.1.1.1 g) :=
   a.1.1.2 ⟨h, hh⟩ g
 
-theorem indicator_mem (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U →* ℂˣ)
-    (σ : Representation ℂ H W) {E : Set G} (hE : IsHK H E) (a : cIndSpace H σ)
-    (ha : a ∈ twKer (cInd H σ) U θ) :
-    ∀ a' : cIndSpace H σ, (∀ g ∈ E, a'.1.1.1 g = a.1.1.1 g) → (∀ g, g ∉ E → a'.1.1.1 g = 0) →
-      a' ∈ twKer (cInd H σ) U θ := by
+theorem indicator_mem
+    (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U →* ℂˣ) (σ : Representation ℂ H W)
+    {E : Set G} (hE : IsHK H E)
+    (a : cIndSpace H σ) (ha : a ∈ twKer (cInd H σ) U θ)
+    : ∀ a' : cIndSpace H σ,
+      (∀ g ∈ E, a'.1.1.1 g = a.1.1.1 g) → (∀ g, g ∉ E → a'.1.1.1 g = 0)
+        → a' ∈ twKer (cInd H σ) U θ := by
   have hR : ∀ (g : G) (u : U), g * (u : G) ∈ E ↔ g ∈ E := by
     intro g u
     have e : g * (u : G) = (g * (u : G) * g⁻¹) * g := by group
@@ -96,11 +102,14 @@ theorem indicator_mem (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U
     rw [e]
     exact Submodule.smul_mem _ c (hx x' hx1 hx2)
 
-theorem exists_local (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U →* ℂˣ)
-    (σ : Representation ℂ H W) (f f' : cIndSpace H σ) (hf' : f' ∈ twKer (cInd H σ) U θ) (g₀ : G)
-    (he : f'.1.1.1 g₀ = f.1.1.1 g₀) :
-    ∃ E : Set G, g₀ ∈ E ∧ IsHK H E ∧ ∃ b ∈ twKer (cInd H σ) U θ,
-      (∀ g ∈ E, b.1.1.1 g = f.1.1.1 g) ∧ (∀ g, g ∉ E → b.1.1.1 g = 0) := by
+theorem exists_local
+    (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U →* ℂˣ) (σ : Representation ℂ H W)
+    (f f' : cIndSpace H σ) (hf' : f' ∈ twKer (cInd H σ) U θ)
+    (g₀ : G) (he : f'.1.1.1 g₀ = f.1.1.1 g₀)
+    : ∃ E : Set G,
+      g₀ ∈ E ∧ IsHK H E
+        ∧ ∃ b ∈ twKer (cInd H σ) U θ,
+          (∀ g ∈ E, b.1.1.1 g = f.1.1.1 g) ∧ (∀ g, g ∉ E → b.1.1.1 g = 0) := by
   obtain ⟨K, hK, hKi⟩ := cInd_right_inv H σ (f - f')
   have hE := isHK_doubleCoset H K hK g₀
   refine ⟨{g | ∃ a ∈ H, ∃ x ∈ K, g = a * g₀ * x}, ⟨1, one_mem H, 1, one_mem K, by simp⟩, hE, ?_⟩
@@ -116,25 +125,49 @@ theorem exists_local (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U 
   have h2 : f.1.1.1 (a * g₀ * x) - f'.1.1.1 (a * g₀ * x) = 0 := h1
   exact (sub_eq_zero.1 h2).symm
 
-theorem mem_of_local (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U →* ℂˣ)
-    (σ : Representation ℂ H W) (f : cIndSpace H σ)
-    (hloc : ∀ g₀ : G, ∃ E : Set G, g₀ ∈ E ∧ IsHK H E ∧ ∃ b ∈ twKer (cInd H σ) U θ,
-      (∀ g ∈ E, b.1.1.1 g = f.1.1.1 g) ∧ (∀ g, g ∉ E → b.1.1.1 g = 0)) :
-    f ∈ twKer (cInd H σ) U θ := by
+theorem mem_of_local
+    (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U →* ℂˣ) (σ : Representation ℂ H W)
+    (f : cIndSpace H σ)
+    (hloc : ∀ g₀ : G, ∃ E : Set G,
+      g₀ ∈ E ∧ IsHK H E
+        ∧ ∃ b ∈ twKer (cInd H σ) U θ,
+          (∀ g ∈ E, b.1.1.1 g = f.1.1.1 g) ∧ (∀ g, g ∉ E → b.1.1.1 g = 0))
+    : f ∈ twKer (cInd H σ) U θ := by
   obtain ⟨C, hC, hf⟩ := f.2
-  have key : ∃ E : Set G, C ⊆ E ∧ IsHK H E ∧ ∃ b ∈ twKer (cInd H σ) U θ,
-      (∀ g ∈ E, b.1.1.1 g = f.1.1.1 g) ∧ (∀ g, g ∉ E → b.1.1.1 g = 0) := by
-    refine hC.induction_on (p := fun S => ∃ E : Set G, S ⊆ E ∧ IsHK H E ∧
-      ∃ b ∈ twKer (cInd H σ) U θ,
-        (∀ g ∈ E, b.1.1.1 g = f.1.1.1 g) ∧ (∀ g, g ∉ E → b.1.1.1 g = 0)) ?_ ?_ ?_ ?_
-    · refine ⟨∅, subset_rfl, ⟨by simp, ⊤, isOpen_univ, by simp⟩, 0, Submodule.zero_mem _, by simp,
-        fun g _ => rfl⟩
+  have key
+      : ∃ E : Set G,
+        C ⊆ E ∧ IsHK H E
+          ∧ ∃ b ∈ twKer (cInd H σ) U θ,
+            (∀ g ∈ E, b.1.1.1 g = f.1.1.1 g) ∧ (∀ g, g ∉ E → b.1.1.1 g = 0) := by
+    refine hC.induction_on
+      (p := fun S =>
+        ∃ E : Set G,
+          S ⊆ E ∧ IsHK H E
+            ∧ ∃ b ∈ twKer (cInd H σ) U θ,
+              (∀ g ∈ E, b.1.1.1 g = f.1.1.1 g) ∧ (∀ g, g ∉ E → b.1.1.1 g = 0))
+      ?_ ?_ ?_ ?_
+    · refine ⟨
+        ∅,
+        subset_rfl,
+        ⟨by simp, ⊤, isOpen_univ, by simp⟩,
+        0,
+        Submodule.zero_mem _,
+        by simp,
+        fun g _ => rfl
+      ⟩
     · rintro S T hST ⟨E, hTE, r⟩
       exact ⟨E, hST.trans hTE, r⟩
     · rintro S T ⟨E, hSE, hE, b, hb, hb1, hb2⟩ ⟨E', hTE, hE', b', hb', hb1', hb2'⟩
       obtain ⟨c, hc1, hc2⟩ := exists_indicator H σ hE.compl b'
-      refine ⟨E ∪ E', Set.union_subset_union hSE hTE, hE.union hE', b + c,
-        Submodule.add_mem _ hb (indicator_mem H U hUH hU θ σ hE.compl b' hb' c hc1 hc2), ?_, ?_⟩
+      refine ⟨
+        E ∪ E',
+        Set.union_subset_union hSE hTE,
+        hE.union hE',
+        b + c,
+        Submodule.add_mem _ hb (indicator_mem H U hUH hU θ σ hE.compl b' hb' c hc1 hc2),
+        ?_,
+        ?_
+      ⟩
       · intro g hg
         show b.1.1.1 g + c.1.1.1 g = f.1.1.1 g
         by_cases h : g ∈ E
@@ -164,24 +197,31 @@ theorem mem_of_local (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U 
 
 end Abstract
 
-theorem mem_twKer_of_restrict_zero {G G' W W' : Type} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] [Group G']
+theorem mem_twKer_of_restrict_zero
+    {G G' W W' : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group G']
     [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
-    (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U →* ℂˣ) (ι : G' →* G)
-    (hst : ∀ (m : G') (n : U), ∃ h : ι m * (n : G) * (ι m)⁻¹ ∈ U, θ ⟨_, h⟩ = θ n)
-    (σ : Representation ℂ H W) (q : W →ₗ[ℂ] W') (hσ : IsSmooth σ)
-    (hq : ∀ w, q w = 0 ↔ w ∈ Submodule.span ℂ {y | ∃ (u : U) (v : W), y = σ ⟨u, hUH u.2⟩ v - (θ u : ℂ) • v})
-    (hdich : ∀ g : G, (∃ h ∈ H, ∃ x : G', g = h * ι x) ∨
-      ∃ u : U, ∃ hx : g * (u : G) * g⁻¹ ∈ H, (∀ w, σ ⟨_, hx⟩ w = w) ∧ θ u ≠ 1)
-    (hbase : ∀ O ∈ 𝓝 (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
-    (f : cIndSpace H σ) (hf : ∀ x, q (f.1.1.1 (ι x)) = 0) : f ∈ twKer (cInd H σ) U θ := by
+    (H U : Subgroup G) (hUH : U ≤ H) (hU : U.Normal) (θ : U →* ℂˣ)
+    (ι : G' →* G) (hst : ∀ (m : G') (n : U), ∃ h : ι m * (n : G) * (ι m)⁻¹ ∈ U, θ ⟨_, h⟩ = θ n)
+    (σ : Representation ℂ H W) (q : W →ₗ[ℂ] W')
+    (hσ : IsSmooth σ)
+    (hq : ∀ w,
+      q w = 0 ↔ w ∈ Submodule.span ℂ {y | ∃ (u : U) (v : W), y = σ ⟨u, hUH u.2⟩ v - (θ u : ℂ) • v})
+    (hdich : ∀ g : G,
+      (∃ h ∈ H, ∃ x : G', g = h * ι x)
+        ∨ ∃ u : U, ∃ hx : g * (u : G) * g⁻¹ ∈ H, (∀ w, σ ⟨_, hx⟩ w = w) ∧ θ u ≠ 1)
+    (hbase : ∀ O ∈ 𝓝 (1 : G), ∃ K : Subgroup G,
+      IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
+    (f : cIndSpace H σ) (hf : ∀ x, q (f.1.1.1 (ι x)) = 0)
+    : f ∈ twKer (cInd H σ) U θ := by
   refine mem_of_local H U hUH hU θ σ f fun g₀ => ?_
   suffices hp : ∃ f' ∈ twKer (cInd H σ) U θ, f'.1.1.1 g₀ = f.1.1.1 g₀ by
     obtain ⟨f', hf', he⟩ := hp
     exact exists_local H U hUH hU θ σ f f' hf' g₀ he
   rcases hdich g₀ with ⟨h, hh, x, rfl⟩ | ⟨u, hx, hfix, hθ⟩
-  · have hval : ∀ y ∈ Submodule.span ℂ {y | ∃ (u : U) (v : W), y = σ ⟨u, hUH u.2⟩ v - (θ u : ℂ) • v},
-        ∃ f' ∈ twKer (cInd H σ) U θ, f'.1.1.1 (ι x) = y := by
+  · have hval
+        : ∀ y ∈ Submodule.span ℂ {y | ∃ (u : U) (v : W), y = σ ⟨u, hUH u.2⟩ v - (θ u : ℂ) • v},
+          ∃ f' ∈ twKer (cInd H σ) U θ,
+            f'.1.1.1 (ι x) = y := by
       intro y hy
       induction hy using Submodule.span_induction with
       | mem y hy =>
@@ -194,7 +234,8 @@ theorem mem_twKer_of_restrict_zero {G G' W W' : Type} [Group G] [TopologicalSpac
           group
         show e.1.1.1 (ι x * (ι x⁻¹ * (v : G) * (ι x⁻¹)⁻¹)) - (θ ⟨_, hm⟩ : ℂ) • e.1.1.1 (ι x) = _
         rw [e1, cInd_left e (hUH v.2), he, hθ]
-      | zero => exact ⟨0, Submodule.zero_mem _, rfl⟩
+      | zero =>
+        exact ⟨0, Submodule.zero_mem _, rfl⟩
       | add a b _ _ ha hb =>
         obtain ⟨a', ha', ea⟩ := ha
         obtain ⟨b', hb', eb⟩ := hb

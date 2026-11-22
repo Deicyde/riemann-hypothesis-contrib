@@ -15,13 +15,16 @@ variable {g : ℕ} [Fact g.Prime] {N : ℕ}
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] {N : ℕ} in
-theorem _root_.GlobalTheory.GLm.Pattern.inPat_mul {Φ : Fin N → Fin N → Prop}
-    (ht : ∀ a b c, Φ a b → Φ b c → Φ a c) {M M' : _root_.GlobalTheory.GLq.Mt g N}
-    (h : _root_.GlobalTheory.GLm.InPat Φ M) (h' : _root_.GlobalTheory.GLm.InPat Φ M') :
-    _root_.GlobalTheory.GLm.InPat Φ (M * M') := by
+theorem _root_.GlobalTheory.GLm.Pattern.inPat_mul
+    {Φ : Fin N → Fin N → Prop} (ht : ∀ a b c, Φ a b → Φ b c → Φ a c)
+    {M M' : _root_.GlobalTheory.GLq.Mt g N}
+    (h : _root_.GlobalTheory.GLm.InPat Φ M) (h' : _root_.GlobalTheory.GLm.InPat Φ M')
+    : _root_.GlobalTheory.GLm.InPat Φ (M * M') := by
   intro a b hab
-  have hone : (1 : _root_.GlobalTheory.GLq.Mt g N) a b =
-      ((1 : _root_.GlobalTheory.GLq.Mt g N) * 1) a b := by rw [one_mul]
+  have hone
+      : (1 : _root_.GlobalTheory.GLq.Mt g N) a b
+        = ((1 : _root_.GlobalTheory.GLq.Mt g N) * 1) a b := by
+    rw [one_mul]
   rw [hone, Matrix.mul_apply, Matrix.mul_apply]
   refine Finset.sum_congr rfl fun c _ => ?_
   by_cases hac : Φ a c
@@ -35,8 +38,9 @@ theorem _root_.GlobalTheory.GLm.Pattern.inPat_mul {Φ : Fin N → Fin N → Prop
     · subst e; rw [h' a b hab]
     · rw [Matrix.one_apply_ne e, zero_mul, zero_mul]
 
-def patSub (g : ℕ) [Fact g.Prime] {N : ℕ} (Φ : Fin N → Fin N → Prop)
-    (ht : ∀ a b c, Φ a b → Φ b c → Φ a c) : Subgroup (Gn g N) where
+def patSub
+    (g : ℕ) [Fact g.Prime] {N : ℕ} (Φ : Fin N → Fin N → Prop) (ht : ∀ a b c, Φ a b → Φ b c → Φ a c)
+    : Subgroup (Gn g N) where
   carrier := {x | InPat Φ (x : Mt g N)}
   one_mem' := fun _ _ _ => rfl
   mul_mem' := fun ha hb => inPat_mul ht ha hb
@@ -51,14 +55,16 @@ def patSub (g : ℕ) [Fact g.Prime] {N : ℕ} (Φ : Fin N → Fin N → Prop)
     have : x⁻¹ = x ^ (orderOf x - 1) := by
       rw [inv_eq_iff_mul_eq_one, ← pow_succ', Nat.sub_add_cancel ho, pow_orderOf_eq_one]
     show InPat Φ ((x⁻¹ : Gn g N) : Mt g N)
-    rw [this]; exact hp _
+    rw [this]
+    exact hp _
 
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] {N : ℕ} in
-private theorem isUnit_of_inPat_irrefl_trans {Φ : Fin N → Fin N → Prop} (hirr : ∀ a, ¬ Φ a a)
-    (htrans : ∀ a b c, Φ a b → Φ b c → Φ a c) {M : _root_.GlobalTheory.GLq.Mt g N}
-    (h : _root_.GlobalTheory.GLm.InPat Φ M) : IsUnit M := by
+private theorem isUnit_of_inPat_irrefl_trans
+    {Φ : Fin N → Fin N → Prop} (hirr : ∀ a, ¬ Φ a a) (htrans : ∀ a b c, Φ a b → Φ b c → Φ a c)
+    {M : _root_.GlobalTheory.GLq.Mt g N} (h : _root_.GlobalTheory.GLm.InPat Φ M)
+    : IsUnit M := by
   let r : Fin N → ℕ := fun i => (Finset.univ.filter fun j => Φ j i).card
   have hr : ∀ i j, Φ i j → r i < r j := by
     intro i j hij
@@ -84,48 +90,58 @@ private theorem isUnit_of_inPat_irrefl_trans {Φ : Fin N → Fin N → Prop} (hi
   rw [Matrix.isUnit_iff_isUnit_det, hbt.det]
   simp [hblock]
 
-
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] {N : ℕ} in
-theorem _root_.GlobalTheory.GLm.Pattern.pattern_group : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ)
-    (Φ : Fin N → Fin N → Prop), (∀ a, ¬ Φ a a) → (∀ a b c, Φ a b → Φ b c → Φ a c) →
-    (∃ H : Subgroup (_root_.GlobalTheory.GLq.Gn g N),
-      (∀ x, x ∈ H ↔ _root_.GlobalTheory.GLm.InPat Φ (x : _root_.GlobalTheory.GLq.Mt g N)) ∧
-      Nat.card H = g ^ (Finset.univ.filter fun p : Fin N × Fin N => Φ p.1 p.2).card) ∧
-    (∀ M : _root_.GlobalTheory.GLq.Mt g N, _root_.GlobalTheory.GLm.InPat Φ M → IsUnit M) ∧
-    ∀ E : Fin N → Fin N → Prop, (∀ a b c, Φ a b → Φ b c → ¬ E a c) → (∀ a, ¬ E a a) →
-      ∀ M M' : _root_.GlobalTheory.GLq.Mt g N, _root_.GlobalTheory.GLm.InPat Φ M →
-        _root_.GlobalTheory.GLm.InPat Φ M' →
-        _root_.GlobalTheory.GLm.sumAt E (M * M') =
-          _root_.GlobalTheory.GLm.sumAt E M + _root_.GlobalTheory.GLm.sumAt E M' := by
+theorem _root_.GlobalTheory.GLm.Pattern.pattern_group
+    : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ) (Φ : Fin N → Fin N → Prop),
+      (∀ a, ¬ Φ a a) → (∀ a b c, Φ a b → Φ b c → Φ a c)
+        → (∃ H : Subgroup (_root_.GlobalTheory.GLq.Gn g N),
+            (∀ x, x ∈ H ↔ _root_.GlobalTheory.GLm.InPat Φ (x : _root_.GlobalTheory.GLq.Mt g N))
+              ∧ Nat.card H = g ^ (Finset.univ.filter fun p : Fin N × Fin N => Φ p.1 p.2).card)
+          ∧ (∀ M : _root_.GlobalTheory.GLq.Mt g N, _root_.GlobalTheory.GLm.InPat Φ M → IsUnit M)
+          ∧ ∀ E : Fin N → Fin N → Prop,
+            (∀ a b c, Φ a b → Φ b c → ¬ E a c) → (∀ a, ¬ E a a)
+              → ∀ M M' : _root_.GlobalTheory.GLq.Mt g N,
+                _root_.GlobalTheory.GLm.InPat Φ M → _root_.GlobalTheory.GLm.InPat Φ M'
+                  → _root_.GlobalTheory.GLm.sumAt E (M * M')
+                    = _root_.GlobalTheory.GLm.sumAt E M + _root_.GlobalTheory.GLm.sumAt E M' := by
   intro g _ N Φ hirr htrans
   have hunit : ∀ M : _root_.GlobalTheory.GLq.Mt g N, _root_.GlobalTheory.GLm.InPat Φ M → IsUnit M :=
     fun M hM => isUnit_of_inPat_irrefl_trans hirr htrans hM
   refine ⟨⟨_root_.GlobalTheory.GLm.Pattern.patSub g Φ htrans, fun x => Iff.rfl, ?_⟩, hunit, ?_⟩
-  · have e1 : Nat.card (_root_.GlobalTheory.GLm.Pattern.patSub g Φ htrans) =
-        Nat.card {M : _root_.GlobalTheory.GLq.Mt g N // _root_.GlobalTheory.GLm.InPat Φ M} := by
-      refine Nat.card_congr (Equiv.ofBijective
-        (fun x => ⟨(x.1 : _root_.GlobalTheory.GLq.Mt g N), x.2⟩) ⟨?_, ?_⟩)
+  · have e1
+        : Nat.card (_root_.GlobalTheory.GLm.Pattern.patSub g Φ htrans)
+          = Nat.card {M : _root_.GlobalTheory.GLq.Mt g N // _root_.GlobalTheory.GLm.InPat Φ M} := by
+      refine Nat.card_congr
+        (Equiv.ofBijective (fun x => ⟨(x.1 : _root_.GlobalTheory.GLq.Mt g N), x.2⟩) ⟨?_, ?_⟩)
       · intro x y hxy
         exact Subtype.ext (Units.ext (congrArg Subtype.val hxy))
       · intro M
         exact ⟨⟨(hunit M.1 M.2).unit, M.2⟩, rfl⟩
-    let e2 : {M : _root_.GlobalTheory.GLq.Mt g N // _root_.GlobalTheory.GLm.InPat Φ M} ≃
-        ({p : Fin N × Fin N // Φ p.1 p.2} → ZMod g) :=
-      { toFun := fun M p => M.1 p.1.1 p.1.2
-        invFun := fun f => ⟨fun a b => if h : Φ a b then f ⟨(a, b), h⟩
-            else (1 : _root_.GlobalTheory.GLq.Mt g N) a b, fun a b h => by simp [h]⟩
-        left_inv := fun M => by
-          apply Subtype.ext
-          refine Matrix.ext fun a b => ?_
-          dsimp only
-          split_ifs with h
-          · rfl
-          · exact (M.2 a b h).symm
-        right_inv := fun f => by
-          funext p
-          simp [p.2] }
+    let e2
+        : {M : _root_.GlobalTheory.GLq.Mt g N // _root_.GlobalTheory.GLm.InPat Φ M}
+          ≃ ({p : Fin N × Fin N // Φ p.1 p.2} → ZMod g) := {
+      toFun := fun M p => M.1 p.1.1 p.1.2
+      invFun := fun f => ⟨
+        fun a b =>
+          if h : Φ a b then
+            f ⟨(a, b), h⟩
+          else
+            (1 : _root_.GlobalTheory.GLq.Mt g N) a b,
+        fun a b h => by simp [h]
+      ⟩
+      left_inv := fun M => by
+        apply Subtype.ext
+        refine Matrix.ext fun a b => ?_
+        dsimp only
+        split_ifs with h
+        · rfl
+        · exact (M.2 a b h).symm
+      right_inv := fun f => by
+        funext p
+        simp [p.2]
+    }
     rw [e1, Nat.card_congr e2, Nat.card_fun, Nat.card_zmod, Nat.card_eq_fintype_card,
       Fintype.card_subtype]
   · intro E hE hEirr M M' hM hM'
@@ -138,8 +154,8 @@ theorem _root_.GlobalTheory.GLm.Pattern.pattern_group : ∀ (g : ℕ) [Fact g.Pr
     · rw [Matrix.mul_apply]
       have hne : a ≠ c := by rintro rfl; exact hEirr a hac
       rw [Fintype.sum_eq_add a c hne]
-      · rw [hM a a (hirr a), hM' c c (hirr c), Matrix.one_apply_eq, Matrix.one_apply_eq,
-          one_mul, mul_one, add_comm]
+      · rw [hM a a (hirr a), hM' c c (hirr c), Matrix.one_apply_eq, Matrix.one_apply_eq, one_mul,
+          mul_one, add_comm]
       · rintro b ⟨hba, hbc⟩
         by_cases hab : Φ a b
         · rw [hM' b c (fun hbc' => hE a b c hab hbc' hac), Matrix.one_apply_ne hbc, mul_zero]

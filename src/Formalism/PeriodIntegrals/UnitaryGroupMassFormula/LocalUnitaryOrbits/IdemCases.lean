@@ -9,25 +9,29 @@ noncomputable section
 
 namespace PI.OmLocU.Red
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Formalism.UG
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Formalism.UG
 open PI.VolStabSW PI.OmLocU
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-  (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
 
 def QProd : Prop :=
-  StdHyp σ J ψ → UnramAt (E := E) v → ¬ (IE (E := E) v).IsPrime →
-    ∃ e : QE (E := E) v ≃+* (𝓞 F ⧸ v.asIdeal) × (𝓞 F ⧸ v.asIdeal),
-      ∀ c, e (algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c) = (c, c)
+  StdHyp σ J ψ → UnramAt (E := E) v → ¬(IE (E := E) v).IsPrime
+    → ∃ e : QE (E := E) v ≃+* (𝓞 F ⧸ v.asIdeal) × (𝓞 F ⧸ v.asIdeal), ∀ c,
+      e (algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c) = (c, c)
 
-theorem sq_mem (h : IsCMExt F E σ) (x : QE (E := E) v) (hx : sigQ σ v x = x) :
-    ∃ c, algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c = x * x := by
+theorem sq_mem (h : IsCMExt F E σ) (x : QE (E := E) v) (hx : sigQ σ v x = x)
+    : ∃ c, algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c = x * x := by
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective x
   have hs : Ideal.Quotient.mk (IE (E := E) v) (sigO σ y) = Ideal.Quotient.mk _ y := by
     rw [← sigQ_mk]; exact hx
-  have hss : sigO σ (sigO σ y) = y := RingOfIntegers.ext (by simp only [sigO_coe]; exact sig_sig σ h _)
+  have hss : sigO σ (sigO σ y) = y :=
+    RingOfIntegers.ext (by simp only [sigO_coe]; exact sig_sig σ h _)
   obtain ⟨b, hb⟩ := fix_int σ h (y * sigO σ y) (by rw [map_mul, hss, mul_comm])
   refine ⟨Ideal.Quotient.mk _ b, ?_⟩
   rw [Ideal.Quotient.algebraMap_quotient_map_quotient, hb, map_mul, hs]
@@ -52,7 +56,9 @@ theorem qSplit_of (hP : QProd σ J ψ v) : QSplit σ J ψ v := by
     have hid : e (sigQ σ v z) * e (sigQ σ v z) = e (sigQ σ v z) := by rw [← map_mul, ← map_mul, hzz]
     have h1 := idem_cases ((Prod.fst_mul _ _).symm.trans (congrArg Prod.fst hid))
     have h2 := idem_cases ((Prod.snd_mul _ _).symm.trans (congrArg Prod.snd hid))
-    have h10 : ((1, 0) : (𝓞 F ⧸ v.asIdeal) × (𝓞 F ⧸ v.asIdeal)).1 ≠ ((1, 0) : (𝓞 F ⧸ v.asIdeal) × (𝓞 F ⧸ v.asIdeal)).2 :=
+    have h10
+        : ((1, 0) : (𝓞 F ⧸ v.asIdeal) × (𝓞 F ⧸ v.asIdeal)).1
+          ≠ ((1, 0) : (𝓞 F ⧸ v.asIdeal) × (𝓞 F ⧸ v.asIdeal)).2 :=
       one_ne_zero
     rcases h1 with h1 | h1 <;> rcases h2 with h2 | h2
     · exfalso
@@ -75,14 +81,17 @@ theorem qSplit_of (hP : QProd σ J ψ v) : QSplit σ J ψ v := by
       rw [hez] at this
       exact zero_ne_one (congrArg Prod.snd this)
   intro x
-  have hx : x = algebraMap _ (QE (E := E) v) (e x).1 * z + algebraMap _ (QE (E := E) v) (e x).2 * (1 - z) := by
+  have hx
+      : x
+        = algebraMap _ (QE (E := E) v) (e x).1 * z
+          + algebraMap _ (QE (E := E) v) (e x).2 * (1 - z) := by
     apply e.injective
     rw [map_add (f := _), map_mul, map_mul, he, he, map_sub, map_one, hez]
     ext <;> simp
   have key : e (sigQ σ v x) = ((e x).2, (e x).1) := by
     conv_lhs => rw [hx]
-    rw [map_add (f := _), map_mul, map_mul, sigQ_alg, sigQ_alg, map_sub, map_one, map_add (f := _), map_mul, map_mul, he, he,
-      map_sub, map_one, hw]
+    rw [map_add (f := _), map_mul, map_mul, sigQ_alg, sigQ_alg, map_sub, map_one, map_add (f := _),
+      map_mul, map_mul, he, he, map_sub, map_one, hw]
     ext <;> simp
   rw [key]
   rfl

@@ -14,8 +14,11 @@ private lemma UpperTheory.exists_finite_span_kummerSelmer_representatives.diviso
   | zero => simp [divisor_one]
   | succ n ih => rw [pow_succ, divisor_mul (pow_ne_zero _ hx) hx, ih, succ_nsmul]
 
-theorem UpperTheory.exists_finite_span_kummerSelmer_representatives :
-    ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra k K] [IsFunctionField k K] (q : ℕ) [NeZero q], ∃ (n : ℕ) (v : Fin n → K), ∀ f ∈ SelAll k K q, ∃ g ∈ SelAll k K q, (∃ c : Fin n → k, (g : K) = ∑ i, c i • v i) ∧ ∃ u : Kˣ, f = g * u ^ q := by
+theorem UpperTheory.exists_finite_span_kummerSelmer_representatives
+    : ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra k K] [IsFunctionField k K] (q : ℕ)
+        [NeZero q],
+      ∃ (n : ℕ) (v : Fin n → K), ∀ f ∈ SelAll k K q, ∃ g ∈ SelAll k K q,
+        (∃ c : Fin n → k, (g : K) = ∑ i, c i • v i) ∧ ∃ u : Kˣ, f = g * u ^ q := by
   intro k K _ _ _ _ _ q _
   have hcl : algebraicClosure k K = ⊥ := by
     rw [eq_bot_iff]
@@ -71,7 +74,8 @@ theorem UpperTheory.exists_finite_span_kummerSelmer_representatives :
   have hval : ((f * u ^ q : Kˣ) : K) = (f : K) * h ^ q := by simp [u]
   have hgne : ((f * u ^ q : Kˣ) : K) ≠ 0 := Units.ne_zero _
   have hgdiv : divisor ((f * u ^ q : Kˣ) : K) = q • (D + divisor h) := by
-    rw [hval, divisor_mul f.ne_zero (pow_ne_zero _ hh), UpperTheory.exists_finite_span_kummerSelmer_representatives.divisor_pow' hh, hD, smul_add]
+    rw [hval, divisor_mul f.ne_zero (pow_ne_zero _ hh),
+      UpperTheory.exists_finite_span_kummerSelmer_representatives.divisor_pow' hh, hD, smul_add]
   have hgV : ((f * u ^ q : Kˣ) : K) ∈ V := by
     rw [hV, Divisor.mem_L_iff_le hgne, hgdiv, ← smul_add]
     have h3 : D + divisor h + E = divisor h + (D + E) := by abel

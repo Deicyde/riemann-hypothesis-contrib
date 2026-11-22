@@ -11,7 +11,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.QCoh GlobalTheory.Twist GlobalTheory.CechPic
 
 namespace GlobalTheory.Vert
@@ -20,31 +21,40 @@ section Length
 
 variable {R : Type*} [CommRing R]
 
-theorem length_eq_range_add_range {A B C : Type*} [AddCommGroup A] [AddCommGroup B]
-    [AddCommGroup C] [Module R A] [Module R B] [Module R C] {f : A →ₗ[R] B} {g : B →ₗ[R] C}
-    (h : Function.Exact f g) :
-    Module.length R B = Module.length R (LinearMap.range f) + Module.length R (LinearMap.range g) :=
+theorem length_eq_range_add_range
+    {A B C : Type*}
+    [AddCommGroup A] [AddCommGroup B] [AddCommGroup C] [Module R A] [Module R B] [Module R C]
+    {f : A →ₗ[R] B} {g : B →ₗ[R] C} (h : Function.Exact f g)
+    : Module.length R B
+      = Module.length R (LinearMap.range f) + Module.length R (LinearMap.range g) :=
   Module.length_eq_add_of_exact (LinearMap.range f).subtype g.rangeRestrict
-    (Submodule.subtype_injective _) g.surjective_rangeRestrict fun x => by
+    (Submodule.subtype_injective _) g.surjective_rangeRestrict
+    fun x => by
       rw [← LinearMap.mem_ker, LinearMap.ker_rangeRestrict, h.linearMap_ker_eq, Set.mem_range]
       exact ⟨fun hx => ⟨⟨x, hx⟩, rfl⟩, fun ⟨y, hy⟩ => hy ▸ y.2⟩
 
-theorem toNat_length_eq_range_add_range {A B C : Type*} [AddCommGroup A] [AddCommGroup B]
-    [AddCommGroup C] [Module R A] [Module R B] [Module R C] {f : A →ₗ[R] B} {g : B →ₗ[R] C}
-    (h : Function.Exact f g) (hB : Module.length R B ≠ ⊤) :
-    ((Module.length R B).toNat : ℤ) = (Module.length R (LinearMap.range f)).toNat +
-      (Module.length R (LinearMap.range g)).toNat := by
+theorem toNat_length_eq_range_add_range
+    {A B C : Type*}
+    [AddCommGroup A] [AddCommGroup B] [AddCommGroup C] [Module R A] [Module R B] [Module R C]
+    {f : A →ₗ[R] B} {g : B →ₗ[R] C} (h : Function.Exact f g)
+    (hB : Module.length R B ≠ ⊤)
+    : ((Module.length R B).toNat : ℤ)
+      = (Module.length R (LinearMap.range f)).toNat
+        + (Module.length R (LinearMap.range g)).toNat := by
   rw [length_eq_range_add_range h] at hB ⊢
   rw [ENat.toNat_add (WithTop.add_ne_top.1 hB).1 (WithTop.add_ne_top.1 hB).2, Nat.cast_add]
 
-theorem length_ne_top_of_exact {A B C : Type*} [AddCommGroup A] [AddCommGroup B]
-    [AddCommGroup C] [Module R A] [Module R B] [Module R C] {f : A →ₗ[R] B} {g : B →ₗ[R] C}
-    (h : Function.Exact f g) (hA : Module.length R A ≠ ⊤) (hC : Module.length R C ≠ ⊤) :
-    Module.length R B ≠ ⊤ := by
+theorem length_ne_top_of_exact
+    {A B C : Type*}
+    [AddCommGroup A] [AddCommGroup B] [AddCommGroup C] [Module R A] [Module R B] [Module R C]
+    {f : A →ₗ[R] B} {g : B →ₗ[R] C} (h : Function.Exact f g)
+    (hA : Module.length R A ≠ ⊤) (hC : Module.length R C ≠ ⊤)
+    : Module.length R B ≠ ⊤ := by
   rw [length_eq_range_add_range h]
-  exact WithTop.add_ne_top.2
-    ⟨ne_top_of_le_ne_top hA (Module.length_le_of_surjective _ f.surjective_rangeRestrict),
-      ne_top_of_le_ne_top hC (Module.length_le_of_injective _ (Submodule.subtype_injective _))⟩
+  exact WithTop.add_ne_top.2 ⟨
+    ne_top_of_le_ne_top hA (Module.length_le_of_surjective _ f.surjective_rangeRestrict),
+    ne_top_of_le_ne_top hC (Module.length_le_of_injective _ (Submodule.subtype_injective _))
+  ⟩
 
 end Length
 
@@ -53,24 +63,23 @@ section Chi
 variable {X Y : Scheme.{0}} (R : Type) [CommRing R] [Algebra R Γ(X, ⊤)]
 
 structure FiniteLenCoh (F : X.Modules) : Prop where
-
   ne_top : ∀ n, Module.length R (coh F n) ≠ ⊤
-
   eventually_zero : ∃ N, ∀ n, N ≤ n → Subsingleton (coh F n)
 
 def chiLen (F : X.Modules) : ℤ := ∑ᶠ n, (-1 : ℤ) ^ n * (Module.length R (coh F n)).toNat
 
 variable {F G : X.Modules} {S : ShortComplex X.Modules}
 
-theorem chiLen_eq_sum_range (N : ℕ) (hN : ∀ n, N ≤ n → Subsingleton (coh F n)) :
-    chiLen R F = ∑ n ∈ Finset.range N, (-1 : ℤ) ^ n * (Module.length R (coh F n)).toNat :=
+theorem chiLen_eq_sum_range (N : ℕ) (hN : ∀ n, N ≤ n → Subsingleton (coh F n))
+    : chiLen R F = ∑ n ∈ Finset.range N, (-1 : ℤ) ^ n * (Module.length R (coh F n)).toNat :=
   finsum_eq_sum_of_support_subset _ fun n hn => by
     by_contra h
     have := hN n (by simpa using h)
     exact hn (by simp [Module.length_eq_zero])
 
-theorem chiLen_eq_of_linearEquiv [Algebra R Γ(Y, ⊤)] {H : Y.Modules}
-    (e : ∀ n, coh F n ≃ₗ[R] coh H n) : chiLen R F = chiLen R H :=
+theorem chiLen_eq_of_linearEquiv
+    [Algebra R Γ(Y, ⊤)] {H : Y.Modules} (e : ∀ n, coh F n ≃ₗ[R] coh H n)
+    : chiLen R F = chiLen R H :=
   finsum_congr fun n => by rw [(e n).length_eq]
 
 theorem chiLen_congr (e : F ≅ G) : chiLen R F = chiLen R G :=
@@ -79,36 +88,37 @@ theorem chiLen_congr (e : F ≅ G) : chiLen R F = chiLen R G :=
 theorem chiLen_eq_zero_of_isZero (h : IsZero F) : chiLen R F = 0 := by
   rw [chiLen_eq_sum_range R 0 fun n _ => cohOn.subsingleton_of_isZero h ⊤ n]; simp
 
-theorem chiLen_eq_chi (k : Type) [Field k] [Algebra k Γ(X, ⊤)] (F : X.Modules) :
-    chiLen k F = chi k F :=
-  finsum_congr fun n => by
-    rw [hdim_def, Module.length_eq_rank, Cardinal.toNat_toENat]; rfl
+theorem chiLen_eq_chi (k : Type) [Field k] [Algebra k Γ(X, ⊤)] (F : X.Modules)
+    : chiLen k F = chi k F :=
+  finsum_congr fun n => by rw [hdim_def, Module.length_eq_rank, Cardinal.toNat_toENat]; rfl
 
-theorem chiLen_eq_of_surjective (k : Type) [CommRing k] [Algebra R k] [Algebra k Γ(X, ⊤)]
-    [IsScalarTower R k Γ(X, ⊤)] (h : Function.Surjective (algebraMap R k)) (F : X.Modules) :
-    chiLen R F = chiLen k F :=
+theorem chiLen_eq_of_surjective
+    (k : Type) [CommRing k] [Algebra R k] [Algebra k Γ(X, ⊤)] [IsScalarTower R k Γ(X, ⊤)]
+    (h : Function.Surjective (algebraMap R k)) (F : X.Modules)
+    : chiLen R F = chiLen k F :=
   finsum_congr fun n => by rw [Module.length_eq_of_surjective (M := coh F n) h]
 
 variable {R}
 
-private theorem exists_coh_boundary_exact (hS : S.ShortExact) (n : ℕ) :
-    ∃ δ : coh S.X₃ n →ₗ[R] coh S.X₁ (n + 1),
-      Function.Exact (cohOn.map R S.g ⊤ n) δ ∧
-        Function.Exact δ (cohOn.map R S.f ⊤ (n + 1)) := by
+private theorem exists_coh_boundary_exact (hS : S.ShortExact) (n : ℕ)
+    : ∃ δ : coh S.X₃ n →ₗ[R] coh S.X₁ (n + 1),
+      Function.Exact (cohOn.map R S.g ⊤ n) δ ∧ Function.Exact δ (cohOn.map R S.f ⊤ (n + 1)) := by
   have hAb := shortExact_toAbSheaf hS
   let δ : coh S.X₃ n →ₗ[R] coh S.X₁ (n + 1) :=
     WithAction.linearMap (cohOn.action S.X₃ ⊤ n) (cohOn.action S.X₁ ⊤ (n + 1)) R
-      (SheafLES.δ hAb n ⊤) fun r x => by
+      (SheafLES.δ hAb n ⊤)
+      fun r x => by
         rw [cohOn.action_apply, cohOn.action_apply]
-        let φ : S ⟶ S :=
-          { τ₁ := smulHom S.X₁ r
-            τ₂ := smulHom S.X₂ r
-            τ₃ := smulHom S.X₃ r
-            comm₁₂ := smulHom_comp r S.f
-            comm₂₃ := smulHom_comp r S.g }
+        let φ : S ⟶ S := {
+          τ₁ := smulHom S.X₁ r
+          τ₂ := smulHom S.X₂ r
+          τ₃ := smulHom S.X₃ r
+          comm₁₂ := smulHom_comp r S.f
+          comm₂₃ := smulHom_comp r S.g
+        }
         simpa only [SheafLES.map, SiteCoh.map, Functor.mapShortComplex_map_τ₁,
-          Functor.mapShortComplex_map_τ₃, φ] using
-          (SheafLES.δ_naturality hAb hAb ((toAbSheaf X).mapShortComplex.map φ) n ⊤ x).symm
+            Functor.mapShortComplex_map_τ₃, φ]
+          using (SheafLES.δ_naturality hAb hAb ((toAbSheaf X).mapShortComplex.map φ) n ⊤ x).symm
   exact ⟨δ, SheafLES.exact₃ hAb n ⊤, SheafLES.exact₁ hAb n ⊤⟩
 
 namespace FiniteLenCoh
@@ -120,8 +130,8 @@ theorem of_iso (h : FiniteLenCoh R F) (e : F ≅ G) : FiniteLenCoh R G := by
   have := hN n hn
   exact (cohOn.mapIso R ⊤ n e).symm.injective.subsingleton
 
-theorem of_shortExact₂ (hS : S.ShortExact) (h₁ : FiniteLenCoh R S.X₁) (h₃ : FiniteLenCoh R S.X₃) :
-    FiniteLenCoh R S.X₂ := by
+theorem of_shortExact₂ (hS : S.ShortExact) (h₁ : FiniteLenCoh R S.X₁) (h₃ : FiniteLenCoh R S.X₃)
+    : FiniteLenCoh R S.X₂ := by
   constructor
   · intro n
     have h₂ : Function.Exact (cohOn.map R S.f ⊤ n) (cohOn.map R S.g ⊤ n) :=
@@ -131,34 +141,39 @@ theorem of_shortExact₂ (hS : S.ShortExact) (h₁ : FiniteLenCoh R S.X₁) (h�
     obtain ⟨N₃, hN₃⟩ := h₃.eventually_zero
     exact ⟨max N₁ N₃, fun n hn => cohOn.subsingleton₂ hS ⊤ n (hN₁ n (by omega)) (hN₃ n (by omega))⟩
 
-theorem of_shortExact₃ (hS : S.ShortExact) (h₁ : FiniteLenCoh R S.X₁) (h₂ : FiniteLenCoh R S.X₂) :
-    FiniteLenCoh R S.X₃ := by
+theorem of_shortExact₃ (hS : S.ShortExact) (h₁ : FiniteLenCoh R S.X₁) (h₂ : FiniteLenCoh R S.X₂)
+    : FiniteLenCoh R S.X₃ := by
   constructor
   · intro n
     obtain ⟨_, h₃, _⟩ := exists_coh_boundary_exact (R := R) hS n
     exact length_ne_top_of_exact h₃ (h₂.ne_top n) (h₁.ne_top (n + 1))
   · obtain ⟨N₁, hN₁⟩ := h₁.eventually_zero
     obtain ⟨N₂, hN₂⟩ := h₂.eventually_zero
-    exact ⟨max N₁ N₂, fun n hn => cohOn.subsingleton₃ hS ⊤ n (hN₂ n (by omega)) (hN₁ (n + 1) (by omega))⟩
+    exact ⟨
+      max N₁ N₂,
+      fun n hn => cohOn.subsingleton₃ hS ⊤ n (hN₂ n (by omega)) (hN₁ (n + 1) (by omega))
+    ⟩
 
 end FiniteLenCoh
 
-theorem chiLen_shortExact (hS : S.ShortExact) (h₁ : FiniteLenCoh R S.X₁)
-    (h₃ : FiniteLenCoh R S.X₃) : chiLen R S.X₂ = chiLen R S.X₁ + chiLen R S.X₃ := by
+theorem chiLen_shortExact (hS : S.ShortExact) (h₁ : FiniteLenCoh R S.X₁) (h₃ : FiniteLenCoh R S.X₃)
+    : chiLen R S.X₂ = chiLen R S.X₁ + chiLen R S.X₃ := by
   have h₂ := h₁.of_shortExact₂ hS h₃
   obtain ⟨N₁, hN₁⟩ := h₁.eventually_zero
   obtain ⟨N₂, hN₂⟩ := h₂.eventually_zero
   obtain ⟨N₃, hN₃⟩ := h₃.eventually_zero
   let a : ℕ → ℤ := fun n => (Module.length R (LinearMap.ker (cohOn.map R S.f ⊤ n))).toNat
-  have key (N : ℕ) : ∑ n ∈ Finset.range N, (-1 : ℤ) ^ n * (Module.length R (coh S.X₁ n)).toNat +
-      ∑ n ∈ Finset.range N, (-1 : ℤ) ^ n * (Module.length R (coh S.X₃ n)).toNat =
-      ∑ n ∈ Finset.range N, (-1 : ℤ) ^ n * (Module.length R (coh S.X₂ n)).toNat +
-        (a 0 - (-1) ^ N * a N) := by
+  have key (N : ℕ)
+      : ∑ n ∈ Finset.range N, (-1 : ℤ) ^ n * (Module.length R (coh S.X₁ n)).toNat
+          + ∑ n ∈ Finset.range N, (-1 : ℤ) ^ n * (Module.length R (coh S.X₃ n)).toNat
+        = ∑ n ∈ Finset.range N, (-1 : ℤ) ^ n * (Module.length R (coh S.X₂ n)).toNat
+          + (a 0 - (-1) ^ N * a N) := by
     induction N with
     | zero => simp
     | succ N ih =>
-      have e₁ := toNat_length_eq_range_add_range (LinearMap.exact_subtype_ker_map
-        (cohOn.map R S.f ⊤ N)) (h₁.ne_top N)
+      have e₁ :=
+        toNat_length_eq_range_add_range (LinearMap.exact_subtype_ker_map (cohOn.map R S.f ⊤ N))
+          (h₁.ne_top N)
       have hfg : Function.Exact (cohOn.map R S.f ⊤ N) (cohOn.map R S.g ⊤ N) :=
         SheafLES.exact₂ (shortExact_toAbSheaf hS) N ⊤
       obtain ⟨δ, hgδ, hδf⟩ := exists_coh_boundary_exact (R := R) hS N
@@ -194,27 +209,27 @@ variable {X Y : Scheme.{0}} (R : Type) [CommRing R] [Algebra R Γ(X, ⊤)]
 def FiniteLenTwists (F : X.Modules) : Prop := ∀ M : LB X, M.IsLB → FiniteLenCoh R (twist F M)
 
 def chiLenPic (F : X.Modules) : Pic X → ℤ :=
-  Quotient.lift (fun M => chiLen R (twist F M.1)) fun M N h =>
-    (Twist.nonempty_iso_of_lbIso M.2 N.2 h).elim (chiLen_congr R)
+  Quotient.lift
+    (fun M => chiLen R (twist F M.1))
+    fun M N h => (Twist.nonempty_iso_of_lbIso M.2 N.2 h).elim (chiLen_congr R)
 
 def interLen {ι : Type} [Fintype ι] (F : X.Modules) (L : ι → LB X) : ℤ :=
   ∑ S : Finset ι, (-1 : ℤ) ^ S.card * chiLen R (twist F (lbInvProd L S))
 
 variable {F G : X.Modules} {M N : LB X} {S : ShortComplex X.Modules}
 
-
 variable (F) in
-@[simp] theorem chiLenPic_cls (hM : M.IsLB) : chiLenPic R F (cls M hM) = chiLen R (twist F M) := rfl
+@[simp]
+theorem chiLenPic_cls (hM : M.IsLB) : chiLenPic R F (cls M hM) = chiLen R (twist F M) := rfl
 
 theorem chiLenPic_congr (e : F ≅ G) : chiLenPic R F = chiLenPic R G := by
   funext c
   obtain ⟨M, hM, rfl⟩ := cls_surj c
   exact chiLen_congr R ((twistFunctor M).mapIso e)
 
-
 variable (F) in
-theorem chiLenPic_twist (hM : M.IsLB) (c : Pic X) :
-    chiLenPic R (twist F M) c = chiLenPic R F (cls M hM + c) := by
+theorem chiLenPic_twist (hM : M.IsLB) (c : Pic X)
+    : chiLenPic R (twist F M) c = chiLenPic R F (cls M hM + c) := by
   obtain ⟨N, hN, rfl⟩ := cls_surj c
   exact (nonempty_twist_twist_iso_of_cls_eq F hM hN (isLB_tens hM hN) rfl).elim (chiLen_congr R)
 
@@ -223,26 +238,27 @@ theorem chiLenPic_eq_zero_of_isZero (h : IsZero F) : chiLenPic R F = 0 := by
   obtain ⟨M, hM, rfl⟩ := cls_surj c
   exact chiLen_eq_zero_of_isZero R ((isZero_twist_iff hM).2 h)
 
-
 variable (F) in
-theorem interLen_eq_multiDiff {ι : Type} [Fintype ι] {L : ι → LB X} (hL : ∀ i, (L i).IsLB) :
-    interLen R F L = multiDiff (fun i => cls (L i) (hL i)) (chiLenPic R F) 0 :=
+theorem interLen_eq_multiDiff {ι : Type} [Fintype ι] {L : ι → LB X} (hL : ∀ i, (L i).IsLB)
+    : interLen R F L = multiDiff (fun i => cls (L i) (hL i)) (chiLenPic R F) 0 :=
   Finset.sum_congr rfl fun S _ => by
     rw [zero_sub, ← cls_lbInvProd hL S (isLB_lbInvProd hL S), chiLenPic_cls, smul_eq_mul]
 
-theorem chiLenPic_pushforward (k : Type) [Field k] [Algebra R k] [Algebra k Γ(Y, ⊤)]
-    (hk : Function.Surjective (algebraMap R k)) (i : Y ⟶ X) [IsClosedImmersion i]
+theorem chiLenPic_pushforward
+    (k : Type) [Field k] [Algebra R k] [Algebra k Γ(Y, ⊤)]
+    (hk : Function.Surjective (algebraMap R k))
+    (i : Y ⟶ X) [IsClosedImmersion i]
     (hi : ∀ r : R, i.appTop (algebraMap R Γ(X, ⊤) r) = algebraMap k Γ(Y, ⊤) (algebraMap R k r))
-    (H : Y.Modules) :
-    chiLenPic R ((Scheme.Modules.pushforward i).obj H) = chiPic k H ∘ pull i := by
+    (H : Y.Modules)
+    : chiLenPic R ((Scheme.Modules.pushforward i).obj H) = chiPic k H ∘ pull i := by
   funext c
   obtain ⟨M, hM, rfl⟩ := cls_surj c
   letI : Algebra R Γ(Y, ⊤) := ((algebraMap k Γ(Y, ⊤)).comp (algebraMap R k)).toAlgebra
   have : IsScalarTower R k Γ(Y, ⊤) := .of_algebraMap_eq fun _ => rfl
   refine (chiLen_congr R (Twist.projIso M i H)).symm.trans ?_
-  rw [chiLen_eq_of_linearEquiv R fun n => LinearEquiv.ofBijective _
-    (cohPushMap_bijective_of_isClosedImmersion R i hi _ ⊤ n), chiLen_eq_of_surjective R k hk,
-    chiLen_eq_chi]
+  rw [chiLen_eq_of_linearEquiv R fun n =>
+      LinearEquiv.ofBijective _ (cohPushMap_bijective_of_isClosedImmersion R i hi _ ⊤ n),
+    chiLen_eq_of_surjective R k hk, chiLen_eq_chi]
   rfl
 
 variable {R}
@@ -250,26 +266,28 @@ variable {R}
 theorem FiniteLenTwists.of_iso (h : FiniteLenTwists R F) (e : F ≅ G) : FiniteLenTwists R G :=
   fun M hM => (h M hM).of_iso ((twistFunctor M).mapIso e)
 
-theorem FiniteLenTwists.twist (h : FiniteLenTwists R F) (hM : M.IsLB) :
-    FiniteLenTwists R (twist F M) :=
-  fun N hN => (nonempty_twist_twist_iso_of_cls_eq F hM hN (isLB_tens hM hN) rfl).elim
-    fun e => (h _ (isLB_tens hM hN)).of_iso e.symm
+theorem FiniteLenTwists.twist (h : FiniteLenTwists R F) (hM : M.IsLB)
+    : FiniteLenTwists R (twist F M) := fun N hN =>
+  (nonempty_twist_twist_iso_of_cls_eq F hM hN (isLB_tens hM hN) rfl).elim fun e =>
+    (h _ (isLB_tens hM hN)).of_iso e.symm
 
-theorem FiniteLenTwists.of_shortExact₃ (hS : S.ShortExact) (h₁ : FiniteLenTwists R S.X₁)
-    (h₂ : FiniteLenTwists R S.X₂) : FiniteLenTwists R S.X₃ :=
-  fun M hM => FiniteLenCoh.of_shortExact₃ (Twist.shortExact_map hM hS) (h₁ M hM) (h₂ M hM)
+theorem FiniteLenTwists.of_shortExact₃
+    (hS : S.ShortExact) (h₁ : FiniteLenTwists R S.X₁) (h₂ : FiniteLenTwists R S.X₂)
+    : FiniteLenTwists R S.X₃ := fun M hM =>
+  FiniteLenCoh.of_shortExact₃ (Twist.shortExact_map hM hS) (h₁ M hM) (h₂ M hM)
 
-theorem chiLenPic_shortExact (hS : S.ShortExact) (h₁ : FiniteLenTwists R S.X₁)
-    (h₃ : FiniteLenTwists R S.X₃) :
-    chiLenPic R S.X₂ = chiLenPic R S.X₁ + chiLenPic R S.X₃ := by
+theorem chiLenPic_shortExact
+    (hS : S.ShortExact) (h₁ : FiniteLenTwists R S.X₁) (h₃ : FiniteLenTwists R S.X₃)
+    : chiLenPic R S.X₂ = chiLenPic R S.X₁ + chiLenPic R S.X₃ := by
   funext c
   obtain ⟨M, hM, rfl⟩ := cls_surj c
   have := chiLen_shortExact (Twist.shortExact_map hM hS) (h₁ M hM) (h₃ M hM)
   exact this
 
-theorem bwdDiff_chiLenPic {L : LB X} (hL : L.IsLB) (s : L.Sec) [Mono (cutHom F hL s)]
-    (h : FiniteLenTwists R F) : FiniteLenTwists R (cut F hL s) ∧
-      bwdDiff (cls L hL) (chiLenPic R F) = chiLenPic R (cut F hL s) := by
+theorem bwdDiff_chiLenPic
+    {L : LB X} (hL : L.IsLB) (s : L.Sec) [Mono (cutHom F hL s)] (h : FiniteLenTwists R F)
+    : FiniteLenTwists R (cut F hL s)
+      ∧ bwdDiff (cls L hL) (chiLenPic R F) = chiLenPic R (cut F hL s) := by
   have hS : (cutComplex F hL s).ShortExact := by
     exact ShortComplex.ShortExact.mk' (ShortComplex.exact_cokernel (cutHom F hL s))
       (inferInstanceAs (Mono (cutHom F hL s))) (epi_cutπ F hL s)
@@ -277,15 +295,17 @@ theorem bwdDiff_chiLenPic {L : LB X} (hL : L.IsLB) (s : L.Sec) [Mono (cutHom F h
   have h₃ := h₁.of_shortExact₃ hS h
   refine ⟨h₃, funext fun c => ?_⟩
   have e := congrFun (chiLenPic_shortExact hS h₁ h₃) c
-  change chiLenPic R F c =
-    chiLenPic R (twist F (lbZPow L (-1))) c + chiLenPic R (cut F hL s) c at e
-  rw [chiLenPic_twist R F (isLB_lbZPow hL (-1)), cls_lbZPow hL, neg_one_zsmul,
-    neg_add_eq_sub] at e
+  change chiLenPic R F c = chiLenPic R (twist F (lbZPow L (-1))) c + chiLenPic R (cut F hL s) c at e
+  rw [chiLenPic_twist R F (isLB_lbZPow hL (-1)), cls_lbZPow hL, neg_one_zsmul, neg_add_eq_sub] at e
   rw [bwdDiff_apply, e, add_sub_cancel_left]
 
-theorem diffVanish_chiLenPic [IsLocallyNoetherian X] {A : LB X} (hA : IsAmpleLB A)
-    [IsFiniteQC F] (h : FiniteLenTwists R F) {n : ℕ} (hn : suppDim F < n) :
-    DiffVanish n (chiLenPic R F) := by
+theorem diffVanish_chiLenPic
+    [IsLocallyNoetherian X]
+    {A : LB X} (hA : IsAmpleLB A)
+    [IsFiniteQC F]
+    (h : FiniteLenTwists R F)
+    {n : ℕ} (hn : suppDim F < n)
+    : DiffVanish n (chiLenPic R F) := by
   induction n generalizing F with
   | zero => exact diffVanish_zero_iff.2 (chiLenPic_eq_zero_of_isZero R (suppDim_lt_zero_iff.1 hn))
   | succ n ih =>
@@ -305,11 +325,11 @@ theorem diffVanish_chiLenPic [IsLocallyNoetherian X] {A : LB X} (hA : IsAmpleLB 
       push_cast
       exact add_le_add_left hc 1
 
-theorem exists_smulHom_pow_eq_zero [CompactSpace X] [IsFiniteQC F] (a : Γ(X, ⊤))
-    (h : ∀ x ∈ support F, x ∉ X.basicOpen a) : ∃ m : ℕ, smulHom F (a ^ m) = 0 := by
+theorem exists_smulHom_pow_eq_zero
+    [CompactSpace X] [IsFiniteQC F] (a : Γ(X, ⊤)) (h : ∀ x ∈ support F, x ∉ X.basicOpen a)
+    : ∃ m : ℕ, smulHom F (a ^ m) = 0 := by
   let i := (annihilatorSheaf F).subschemeι
-  have : CompactSpace (annihilatorSheaf F).subscheme :=
-    QuasiCompact.compactSpace_of_compactSpace i
+  have : CompactSpace (annihilatorSheaf F).subscheme := QuasiCompact.compactSpace_of_compactSpace i
   have hb : (annihilatorSheaf F).subscheme.basicOpen (i.appTop a) = ⊥ := by
     refine (Scheme.preimage_basicOpen i a).symm.trans (eq_bot_iff.2 fun y hy => ?_)
     exact h _ (range_annihilatorSheaf_subschemeι F ▸ ⟨y, rfl⟩) hy
@@ -320,22 +340,33 @@ theorem exists_smulHom_pow_eq_zero [CompactSpace X] [IsFiniteQC F] (a : Γ(X, �
   rw [← cancel_mono (isoPushforwardOnAnnihilator F).hom, smulHom_comp, zero_comp]
   exact (congrArg _ e.symm).trans comp_zero
 
-theorem finiteLenTwists_of_support [IsDomain R] [IsNoetherianRing R] [Ring.KrullDimLE 1 R]
+theorem finiteLenTwists_of_support
+    [IsDomain R] [IsNoetherianRing R] [Ring.KrullDimLE 1 R]
     {f : X ⟶ Sp R} (hf : ∀ r, algebraMap R Γ(X, ⊤) r = f.appTop ((Scheme.ΓSpecIso (.of R)).inv r))
-    (hp : IsProjOver f) [IsFiniteQC F] {n : ℕ} (hn : suppDim F < n) {a : R} (ha : a ≠ 0)
-    (h : ∀ x ∈ support F, x ∉ X.basicOpen (algebraMap R Γ(X, ⊤) a)) : FiniteLenTwists R F := by
+    (hp : IsProjOver f)
+    [IsFiniteQC F]
+    {n : ℕ} (hn : suppDim F < n)
+    {a : R} (ha : a ≠ 0) (h : ∀ x ∈ support F, x ∉ X.basicOpen (algebraMap R Γ(X, ⊤) a))
+    : FiniteLenTwists R F := by
   intro M hM
   have := isNoetherian_of_isProjOver hp
   have := isFiniteQC_twist (F := F) hM
-  refine ⟨fun i => ?_, n, fun i hi => subsingleton_coh_of_isProjOver hp _
-    (((suppDim_twist hM).trans_lt hn).trans_le (by exact_mod_cast hi))⟩
+  refine ⟨
+    fun i => ?_,
+    n,
+    fun i hi =>
+      subsingleton_coh_of_isProjOver hp _
+        (((suppDim_twist hM).trans_lt hn).trans_le (by exact_mod_cast hi))
+  ⟩
   have := finite_coh_of_isProjOver hf (twist F M) hp i
   obtain ⟨m, hm⟩ := exists_smulHom_pow_eq_zero (F := twist F M) _ (by rwa [support_twist hM])
   have hk : a ^ m ∈ Module.annihilator R (coh (twist F M) i) :=
-    Module.mem_annihilator.2 fun x => (cohOn.toH' _ _ _).injective (by
-      rw [cohOn.toH'_smul, map_pow, hm, Functor.map_zero, map_zero, SiteCoh.map_zero_apply])
-  have := isFiniteLength_iff_isNoetherian_isArtinian.1
-    (isFiniteLength_quotient_span_singleton R (mem_nonZeroDivisors_of_ne_zero (pow_ne_zero m ha)))
+    Module.mem_annihilator.2 fun x =>
+      (cohOn.toH' _ _ _).injective
+        (by rw [cohOn.toH'_smul, map_pow, hm, Functor.map_zero, map_zero, SiteCoh.map_zero_apply])
+  have :=
+    isFiniteLength_iff_isNoetherian_isArtinian.1 (isFiniteLength_quotient_span_singleton R
+      (mem_nonZeroDivisors_of_ne_zero (pow_ne_zero m ha)))
   have : IsArtinian R (R ⧸ Module.annihilator R (coh (twist F M) i)) :=
     have := this.2
     isArtinian_of_surjective _ (Submodule.factor ((Ideal.span_singleton_le_iff_mem _).2 hk))
@@ -349,7 +380,6 @@ section Sym
 
 variable {G H : Type*} [AddCommGroup G] [AddCommGroup H]
 
-
 variable (G) in
 abbrev SymQ : Type _ := SymmetricAlgebra ℚ (ℚ ⊗[ℤ] G)
 
@@ -361,22 +391,23 @@ theorem symOf_apply (g : G) : symOf g = SymmetricAlgebra.ι ℚ _ ((1 : ℚ) ⊗
 def symLift {A : Type*} [CommRing A] [Algebra ℚ A] (f : G →+ A) : SymQ G →ₐ[ℚ] A :=
   SymmetricAlgebra.lift (LinearMap.liftBaseChange ℚ f.toIntLinearMap)
 
-@[simp] theorem symLift_symOf {A : Type*} [CommRing A] [Algebra ℚ A] (f : G →+ A) (g : G) :
-    symLift f (symOf g) = f g := by
+@[simp]
+theorem symLift_symOf {A : Type*} [CommRing A] [Algebra ℚ A] (f : G →+ A) (g : G)
+    : symLift f (symOf g) = f g := by
   simp [symLift, symOf_apply]
 
 def symMap (f : G →+ H) : SymQ G →ₐ[ℚ] SymQ H := symLift (symOf.comp f)
 
-@[simp] theorem symMap_symOf (f : G →+ H) (g : G) : symMap f (symOf g) = symOf (f g) :=
-  symLift_symOf _ g
-
+@[simp]
+theorem symMap_symOf (f : G →+ H) (g : G) : symMap f (symOf g) = symOf (f g) := symLift_symOf _ g
 
 variable (G) in
 def symDeg (n : ℕ) : Submodule ℚ (SymQ G) :=
   Submodule.span ℚ (Set.range fun g : Fin n → G => ∏ i, symOf (g i))
 
-theorem span_prod_symOf : Submodule.span ℚ
-    (Set.range fun s : Multiset G => (s.map symOf).prod) = (⊤ : Submodule ℚ (SymQ G)) := by
+theorem span_prod_symOf
+    : Submodule.span ℚ (Set.range fun s : Multiset G => (s.map symOf).prod)
+      = (⊤ : Submodule ℚ (SymQ G)) := by
   refine eq_top_iff.2 fun x hx => ?_
   clear hx
   induction x using SymmetricAlgebra.induction with
@@ -399,8 +430,11 @@ theorem span_prod_symOf : Submodule.span ℚ
     exact ⟨s + t, by simp⟩
   | add a b ha hb => exact add_mem ha hb
 
-theorem symQ_linearMap_ext {N : Type*} [AddCommGroup N] [Module ℚ N] {l l' : SymQ G →ₗ[ℚ] N}
-    (h : ∀ (n : ℕ) (g : Fin n → G), l (∏ i, symOf (g i)) = l' (∏ i, symOf (g i))) : l = l' := by
+theorem symQ_linearMap_ext
+    {N : Type*} [AddCommGroup N] [Module ℚ N]
+    {l l' : SymQ G →ₗ[ℚ] N}
+    (h : ∀ (n : ℕ) (g : Fin n → G), l (∏ i, symOf (g i)) = l' (∏ i, symOf (g i)))
+    : l = l' := by
   refine LinearMap.ext_on_range span_prod_symOf fun s => ?_
   induction s using Quotient.inductionOn with
   | h s =>
@@ -409,8 +443,8 @@ theorem symQ_linearMap_ext {N : Type*} [AddCommGroup N] [Module ℚ N] {l l' : S
 
 variable {φ ψ : G → ℤ} {d : ℕ}
 
-theorem exists_topForm (h : DiffVanish (d + 1) φ) : ∃ l : SymQ G →ₗ[ℚ] ℚ,
-    ∀ (ι : Type) [Fintype ι] (g : ι → G),
+theorem exists_topForm (h : DiffVanish (d + 1) φ)
+    : ∃ l : SymQ G →ₗ[ℚ] ℚ, ∀ (ι : Type) [Fintype ι] (g : ι → G),
       l (∏ i, symOf (g i)) = if Fintype.card ι = d then ((multiDiff g φ 0 : ℤ) : ℚ) else 0 := by
   classical
   let f : Multiset G → ℚ := fun s =>
@@ -435,8 +469,9 @@ theorem exists_topForm (h : DiffVanish (d + 1) φ) : ∃ l : SymQ G →ₗ[ℚ] 
     (MvPolynomial.basisMonomials G ℚ).constr ℚ fun m => f (Finsupp.toMultiset m)
   have hl (m : G →₀ ℕ) : l (MvPolynomial.monomial m 1) = f (Finsupp.toMultiset m) :=
     (MvPolynomial.basisMonomials G ℚ).constr_basis ℚ _ m
-  let J : Ideal (MvPolynomial G ℚ) := Ideal.span (Set.range fun p : G × G =>
-    MvPolynomial.X (p.1 + p.2) - (MvPolynomial.X p.1 + MvPolynomial.X p.2))
+  let J : Ideal (MvPolynomial G ℚ) :=
+    Ideal.span (Set.range fun p : G × G =>
+      MvPolynomial.X (p.1 + p.2) - (MvPolynomial.X p.1 + MvPolynomial.X p.2))
   have hJ : J.restrictScalars ℚ ≤ LinearMap.ker l := by
     intro x hx
     suffices ∀ r, l (r * x) = 0 by simpa using this 1
@@ -447,7 +482,8 @@ theorem exists_topForm (h : DiffVanish (d + 1) φ) : ∃ l : SymQ G →ₗ[ℚ] 
       induction r using MvPolynomial.induction_on' with
       | monomial m c =>
         rw [show MvPolynomial.monomial m c = c • MvPolynomial.monomial m (1 : ℚ) by
-          simp [MvPolynomial.smul_monomial], smul_mul_assoc, map_smul]
+            simp [MvPolynomial.smul_monomial],
+          smul_mul_assoc, map_smul]
         simp only [mul_sub, mul_add, map_sub, map_add (f := _), MvPolynomial.X,
           MvPolynomial.monomial_mul, mul_one, hl, Finsupp.toMultiset_single, one_nsmul, hf]
         simp
@@ -455,19 +491,26 @@ theorem exists_topForm (h : DiffVanish (d + 1) φ) : ∃ l : SymQ G →ₗ[ℚ] 
     | zero => simp
     | add x y _ _ hx hy => intro r; rw [mul_add, map_add (f := _), hx, hy, add_zero]
     | smul a x _ hx => intro r; rw [smul_eq_mul, ← mul_assoc, hx]
-  let c : G →+ MvPolynomial G ℚ ⧸ J := AddMonoidHom.mk' (fun g => Ideal.Quotient.mk J (.X g))
-    fun a b => by
-      rw [← map_add (f := _), Ideal.Quotient.eq]
-      exact Ideal.subset_span ⟨(a, b), rfl⟩
-  refine ⟨(J.restrictScalars ℚ).liftQ l hJ ∘ₗ
-    (Submodule.Quotient.restrictScalarsEquiv ℚ J).symm.toLinearMap ∘ₗ (symLift c).toLinearMap,
-    fun ι _ g => ?_⟩
-  have e : symLift c (∏ i, symOf (g i)) =
-      Ideal.Quotient.mk J (MvPolynomial.monomial (∑ i, Finsupp.single (g i) 1) 1) := by
+  let c : G →+ MvPolynomial G ℚ ⧸ J :=
+    AddMonoidHom.mk'
+      (fun g => Ideal.Quotient.mk J (.X g))
+      fun a b => by
+        rw [← map_add (f := _), Ideal.Quotient.eq]
+        exact Ideal.subset_span ⟨(a, b), rfl⟩
+  refine ⟨
+    (J.restrictScalars ℚ).liftQ l hJ
+      ∘ₗ (Submodule.Quotient.restrictScalarsEquiv ℚ J).symm.toLinearMap ∘ₗ (symLift c).toLinearMap,
+    fun ι _ g => ?_
+  ⟩
+  have e
+      : symLift c (∏ i, symOf (g i))
+        = Ideal.Quotient.mk J (MvPolynomial.monomial (∑ i, Finsupp.single (g i) 1) 1) := by
     rw [MvPolynomial.monomial_sum_one, map_prod, map_prod]
     exact Finset.prod_congr rfl fun i _ => symLift_symOf c _
-  refine (congrArg (fun x => (J.restrictScalars ℚ).liftQ l hJ
-    ((Submodule.Quotient.restrictScalarsEquiv ℚ J).symm x)) e).trans ((hl _).trans ?_)
+  refine (congrArg
+    (fun x =>
+      (J.restrictScalars ℚ).liftQ l hJ ((Submodule.Quotient.restrictScalarsEquiv ℚ J).symm x))
+    e).trans ((hl _).trans ?_)
   have e' : Finsupp.toMultiset (∑ i, Finsupp.single (g i) 1) = Finset.univ.val.map g := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, Finsupp.toMultiset_single, one_nsmul]
@@ -479,19 +522,23 @@ theorem exists_topForm (h : DiffVanish (d + 1) φ) : ∃ l : SymQ G →ₗ[ℚ] 
 
 def topForm (h : DiffVanish (d + 1) φ) : SymQ G →ₗ[ℚ] ℚ := (exists_topForm h).choose
 
-theorem topForm_prod (h : DiffVanish (d + 1) φ) {ι : Type} [Fintype ι] (g : ι → G) :
-    topForm h (∏ i, symOf (g i)) = if Fintype.card ι = d then ((multiDiff g φ 0 : ℤ) : ℚ) else 0 :=
+theorem topForm_prod (h : DiffVanish (d + 1) φ) {ι : Type} [Fintype ι] (g : ι → G)
+    : topForm h (∏ i, symOf (g i))
+      = if Fintype.card ι = d then ((multiDiff g φ 0 : ℤ) : ℚ) else 0 :=
   (exists_topForm h).choose_spec ι g
 
-theorem topForm_eq_zero (h : DiffVanish (d + 1) φ) {n : ℕ} (hn : n ≠ d) {x : SymQ G}
-    (hx : x ∈ symDeg G n) : topForm h x = 0 := by
+theorem topForm_eq_zero
+    (h : DiffVanish (d + 1) φ) {n : ℕ} (hn : n ≠ d) {x : SymQ G} (hx : x ∈ symDeg G n)
+    : topForm h x = 0 := by
   refine (Submodule.span_le (p := LinearMap.ker (topForm h))).2 ?_ hx
   rintro _ ⟨g, rfl⟩
   exact (topForm_prod h g).trans (if_neg (by simpa using hn))
 
-theorem topForm_eq_add {χ : G → ℤ} (h : DiffVanish (d + 1) χ) (h₁ : DiffVanish (d + 1) φ)
-    (h₂ : DiffVanish (d + 1) ψ) (a : G) (e : ∀ x, χ x = φ (a + x) + ψ x) :
-    topForm h = topForm h₁ + topForm h₂ := by
+theorem topForm_eq_add
+    {χ : G → ℤ} (h : DiffVanish (d + 1) χ)
+    (h₁ : DiffVanish (d + 1) φ) (h₂ : DiffVanish (d + 1) ψ)
+    (a : G) (e : ∀ x, χ x = φ (a + x) + ψ x)
+    : topForm h = topForm h₁ + topForm h₂ := by
   refine symQ_linearMap_ext fun n g => ?_
   simp only [LinearMap.add_apply, topForm_prod]
   split_ifs with hn
@@ -506,44 +553,47 @@ section SmallPic
 variable {X Y Z : Scheme.{0}}
 
 instance small_pic : Small.{0} (Pic X) := by
-  refine small_of_surjective (α := {p : Σ U : X → X.Opens, ∀ i j, Γ(X, U i ⊓ U j)ˣ //
-    LB.IsLB ⟨X, p.1, p.2⟩}) (f := fun p => cls _ p.2) fun c => ?_
+  refine small_of_surjective
+    (α := {p : Σ U : X → X.Opens, ∀ i j, Γ(X, U i ⊓ U j)ˣ // LB.IsLB ⟨X, p.1, p.2⟩})
+    (f := fun p => cls _ p.2)
+    fun c => ?_
   obtain ⟨L, hL, rfl⟩ := cls_surj c
   choose j hj using LB.mem_of_cover hL
-  have h : LB.IsLB ⟨X, fun x => L.U (j x), fun x y => L.g (j x) (j y)⟩ :=
-    ⟨top_le_iff.1 fun x _ => Opens.mem_iSup.2 ⟨x, hj x⟩, fun _ => hL.g_self _,
-      fun _ _ _ => hL.cocycle _ _ _⟩
-  exact ⟨⟨⟨_, _⟩, h⟩, (cls_eq_iff h hL).2
-    (iso_of_chart hL ⟨j, fun _ => le_rfl, fun _ _ _ _ _ => rfl⟩)⟩
-
+  have h : LB.IsLB ⟨X, fun x => L.U (j x), fun x y => L.g (j x) (j y)⟩ := ⟨
+    top_le_iff.1 fun x _ => Opens.mem_iSup.2 ⟨x, hj x⟩,
+    fun _ => hL.g_self _,
+    fun _ _ _ => hL.cocycle _ _ _
+  ⟩
+  exact
+    ⟨⟨⟨_, _⟩, h⟩, (cls_eq_iff h hL).2 (iso_of_chart hL ⟨j, fun _ => le_rfl, fun _ _ _ _ _ => rfl⟩)⟩
 
 variable (X) in
 abbrev SmallPic : Type := Shrink.{0} (Pic X)
-
 
 variable (X) in
 def smallPicEquiv : SmallPic X ≃+ Pic X := Shrink.addEquiv
 
 def smallCls (L : LB X) (hL : L.IsLB) : SmallPic X := (smallPicEquiv X).symm (cls L hL)
 
-@[simp] theorem smallPicEquiv_smallCls (L : LB X) (hL : L.IsLB) :
-    smallPicEquiv X (smallCls L hL) = cls L hL := (smallPicEquiv X).apply_symm_apply _
+@[simp]
+theorem smallPicEquiv_smallCls (L : LB X) (hL : L.IsLB)
+    : smallPicEquiv X (smallCls L hL) = cls L hL :=
+  (smallPicEquiv X).apply_symm_apply _
 
 theorem smallCls_surj (c : SmallPic X) : ∃ L hL, smallCls L hL = c :=
   have ⟨L, hL, e⟩ := cls_surj (smallPicEquiv X c)
   ⟨L, hL, (smallPicEquiv X).symm_apply_eq.2 e⟩
 
-theorem smallCls_eq_iff {L M : LB X} (hL : L.IsLB) (hM : M.IsLB) :
-    smallCls L hL = smallCls M hM ↔ LBIso L M :=
+theorem smallCls_eq_iff {L M : LB X} (hL : L.IsLB) (hM : M.IsLB)
+    : smallCls L hL = smallCls M hM ↔ LBIso L M :=
   (smallPicEquiv X).symm.injective.eq_iff.trans (cls_eq_iff hL hM)
 
 def smallPull (f : Y ⟶ X) : SmallPic X →+ SmallPic Y :=
   (smallPicEquiv Y).symm.toAddMonoidHom.comp ((pull f).comp (smallPicEquiv X).toAddMonoidHom)
 
-theorem smallPull_smallCls (f : Y ⟶ X) {L : LB X} (hL : L.IsLB) (h : (L.pull f).IsLB) :
-    smallPull f (smallCls L hL) = smallCls (L.pull f) h := by
+theorem smallPull_smallCls (f : Y ⟶ X) {L : LB X} (hL : L.IsLB) (h : (L.pull f).IsLB)
+    : smallPull f (smallCls L hL) = smallCls (L.pull f) h := by
   simp [smallPull, smallCls, cls_pull hL]
-
 
 variable (X) in
 abbrev PicSym : Type := SymQ (SmallPic X)
@@ -554,12 +604,12 @@ def firstChernPic : Pic X →+ PicSym X := symOf.comp (smallPicEquiv X).symm.toA
 
 def picSymPull (f : Y ⟶ X) : PicSym X →ₐ[ℚ] PicSym Y := symMap (smallPull f)
 
-theorem pullback_firstChern (f : Y ⟶ X) {L : LB X} (hL : L.IsLB) (h : (L.pull f).IsLB) :
-    picSymPull f (c1 L hL) = c1 (L.pull f) h :=
+theorem pullback_firstChern (f : Y ⟶ X) {L : LB X} (hL : L.IsLB) (h : (L.pull f).IsLB)
+    : picSymPull f (c1 L hL) = c1 (L.pull f) h :=
   (symMap_symOf _ _).trans (congrArg symOf (smallPull_smallCls f hL h))
 
-theorem picSymPull_c1Pic (f : Y ⟶ X) (c : Pic X) :
-    picSymPull f (firstChernPic c) = firstChernPic (pull f c) := by
+theorem picSymPull_c1Pic (f : Y ⟶ X) (c : Pic X)
+    : picSymPull f (firstChernPic c) = firstChernPic (pull f c) := by
   obtain ⟨L, hL, rfl⟩ := cls_surj c
   exact pullback_firstChern f hL _
 
@@ -568,23 +618,32 @@ variable {d : ℕ} {φ ψ : Pic X → ℤ}
 def picForm (h : DiffVanish (d + 1) φ) : PicSym X →ₗ[ℚ] ℚ :=
   topForm (h.comap (smallPicEquiv X).toAddMonoidHom)
 
-theorem picForm_prod (h : DiffVanish (d + 1) φ) {ι : Type} [Fintype ι] (g : ι → Pic X) :
-    picForm h (∏ i, firstChernPic (g i)) = if Fintype.card ι = d then ((multiDiff g φ 0 : ℤ) : ℚ) else 0 := by
+theorem picForm_prod (h : DiffVanish (d + 1) φ) {ι : Type} [Fintype ι] (g : ι → Pic X)
+    : picForm h (∏ i, firstChernPic (g i))
+      = if Fintype.card ι = d then ((multiDiff g φ 0 : ℤ) : ℚ) else 0 := by
   refine (topForm_prod _ fun i => (smallPicEquiv X).symm (g i)).trans ?_
   rw [multiDiff_comap]
   simp [Function.comp_def]
 
-theorem picSym_linearMap_ext {N : Type*} [AddCommGroup N] [Module ℚ N] {l l' : PicSym X →ₗ[ℚ] N}
-    (h : ∀ (n : ℕ) (g : Fin n → Pic X), l (∏ i, firstChernPic (g i)) = l' (∏ i, firstChernPic (g i))) : l = l' :=
+theorem picSym_linearMap_ext
+    {N : Type*} [AddCommGroup N] [Module ℚ N]
+    {l l' : PicSym X →ₗ[ℚ] N}
+    (h
+      : ∀ (n : ℕ) (g : Fin n → Pic X), l (∏ i, firstChernPic (g i)) = l' (∏ i, firstChernPic (g i)))
+    : l = l' :=
   symQ_linearMap_ext fun n g => by simpa [firstChernPic] using h n fun i => smallPicEquiv X (g i)
 
-theorem picForm_eq_add {χ : Pic X → ℤ} (h : DiffVanish (d + 1) χ) (h₁ : DiffVanish (d + 1) φ)
-    (h₂ : DiffVanish (d + 1) ψ) (a : Pic X) (e : ∀ x, χ x = φ (a + x) + ψ x) :
-    picForm h = picForm h₁ + picForm h₂ :=
+theorem picForm_eq_add
+    {χ : Pic X → ℤ} (h : DiffVanish (d + 1) χ)
+    (h₁ : DiffVanish (d + 1) φ) (h₂ : DiffVanish (d + 1) ψ)
+    (a : Pic X) (e : ∀ x, χ x = φ (a + x) + ψ x)
+    : picForm h = picForm h₁ + picForm h₂ :=
   topForm_eq_add _ _ _ ((smallPicEquiv X).symm a) fun x => by simpa using e _
 
-theorem picForm_eq_zero (h : DiffVanish (d + 1) φ) {n : ℕ} (hn : n ≠ d) {x : PicSym X}
-    (hx : x ∈ symDeg (SmallPic X) n) : picForm h x = 0 := topForm_eq_zero _ hn hx
+theorem picForm_eq_zero
+    (h : DiffVanish (d + 1) φ) {n : ℕ} (hn : n ≠ d) {x : PicSym X} (hx : x ∈ symDeg (SmallPic X) n)
+    : picForm h x = 0 :=
+  topForm_eq_zero _ hn hx
 
 end SmallPic
 

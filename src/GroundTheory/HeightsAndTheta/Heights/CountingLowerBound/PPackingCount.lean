@@ -13,10 +13,12 @@ open MeasureTheory Metric
 
 noncomputable section
 
-theorem PackingCount.card_mul_le {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [FiniteDimensional ℝ E] (T : Finset E) {lam R : ℝ} (hlam : 0 < lam) (hR : 0 ≤ R)
-    (hT : ∀ x ∈ T, ‖x‖ < R) (hsep : ∀ x ∈ T, ∀ y ∈ T, x ≠ y → lam ≤ ‖x - y‖) :
-    (T.card : ℝ) * (lam / 2) ^ Module.finrank ℝ E ≤ (R + lam / 2) ^ Module.finrank ℝ E := by
+theorem PackingCount.card_mul_le
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+    (T : Finset E)
+    {lam R : ℝ} (hlam : 0 < lam) (hR : 0 ≤ R) (hT : ∀ x ∈ T, ‖x‖ < R)
+    (hsep : ∀ x ∈ T, ∀ y ∈ T, x ≠ y → lam ≤ ‖x - y‖)
+    : (T.card : ℝ) * (lam / 2) ^ Module.finrank ℝ E ≤ (R + lam / 2) ^ Module.finrank ℝ E := by
   let _ : MeasurableSpace E := borel E
   have _ : BorelSpace E := ⟨rfl⟩
   set μ : Measure E := Measure.addHaar
@@ -38,12 +40,14 @@ theorem PackingCount.card_mul_le {E : Type*} [NormedAddCommGroup E] [NormedSpace
   have h2 := measure_mono (μ := μ) hsub
   rw [measure_biUnion_finset hd (fun x _ => measurableSet_ball)] at h2
   rw [Finset.sum_congr rfl (fun x _ => Measure.addHaar_ball_of_pos μ x (half_pos hlam))] at h2
-  rw [Finset.sum_const, nsmul_eq_mul, Measure.addHaar_ball_of_pos μ (0 : E) (r := R + lam / 2) (by positivity),
-    ← mul_assoc] at h2
+  rw [Finset.sum_const, nsmul_eq_mul,
+      Measure.addHaar_ball_of_pos μ (0 : E) (r := R + lam / 2) (by positivity), ← mul_assoc]
+    at h2
   have hc0 : μ (ball 0 1) ≠ 0 := (measure_ball_pos μ (0 : E) one_pos).ne'
   have hc1 : μ (ball 0 1) ≠ ⊤ := measure_ball_lt_top.ne
-  rw [ENNReal.mul_le_mul_iff_left hc0 hc1, ← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul
-    (Nat.cast_nonneg _), ENNReal.ofReal_le_ofReal_iff (by positivity)] at h2
+  rw [ENNReal.mul_le_mul_iff_left hc0 hc1, ← ENNReal.ofReal_natCast,
+      ← ENNReal.ofReal_mul (Nat.cast_nonneg _), ENNReal.ofReal_le_ofReal_iff (by positivity)]
+    at h2
   exact h2
 
 theorem PackingCount.proof : PackingCount.Statement := by
@@ -60,19 +64,19 @@ theorem PackingCount.proof : PackingCount.Statement := by
     intro T hT
     have hW : ∀ v ∈ T, v ∈ W := fun v hv => h.short_mem v (hT hv).1 (hT hv).2
     set T' : Finset W := T.subtype (· ∈ W)
-    have hcard : T'.card = T.card := by
-      rw [Finset.card_subtype, Finset.filter_true_of_mem hW]
-    have hbd := PackingCount.card_mul_le T' hlam hr.le
-      (fun x hx => by
-        rw [Finset.mem_subtype] at hx
-        rw [Submodule.coe_norm]
-        exact (hT hx).2)
-      (fun x hx y hy hxy => by
-        rw [Finset.mem_subtype] at hx hy
-        rw [Submodule.coe_norm, Submodule.coe_sub]
-        apply h.lam_le_norm _ (h.sub_mem _ (hT hx).1 _ (hT hy).1)
-        intro h0
-        exact hxy (Subtype.ext (sub_eq_zero.mp h0)))
+    have hcard : T'.card = T.card := by rw [Finset.card_subtype, Finset.filter_true_of_mem hW]
+    have hbd :=
+      PackingCount.card_mul_le T' hlam hr.le
+        (fun x hx => by
+          rw [Finset.mem_subtype] at hx
+          rw [Submodule.coe_norm]
+          exact (hT hx).2)
+        (fun x hx y hy hxy => by
+          rw [Finset.mem_subtype] at hx hy
+          rw [Submodule.coe_norm, Submodule.coe_sub]
+          apply h.lam_le_norm _ (h.sub_mem _ (hT hx).1 _ (hT hy).1)
+          intro h0
+          exact hxy (Subtype.ext (sub_eq_zero.mp h0)))
     rw [hcard, h.finrank_eq] at hbd
     have hpos : 0 < (lam / 2) ^ a := by positivity
     rw [← le_div_iff₀ hpos, ← div_pow] at hbd
@@ -97,8 +101,9 @@ theorem PackingCount.proof : PackingCount.Statement := by
     rw [show (1 : ℝ) + 2 * r / lam = (lam + 2 * r) / lam by field_simp]
     exact div_le_div_of_nonneg_right (by linarith) hlam.le
   refine ⟨hfin.subset hsub, ?_⟩
-  calc (({v | v ∈ L ∧ v ≠ 0 ∧ ‖v‖ < r} : Set V).ncard : ℝ) ≤ S.ncard := by
-        exact_mod_cast Set.ncard_le_ncard hsub hfin
+  calc
+    (({v | v ∈ L ∧ v ≠ 0 ∧ ‖v‖ < r} : Set V).ncard : ℝ)
+      ≤ S.ncard := by exact_mod_cast Set.ncard_le_ncard hsub hfin
     _ ≤ B := hSB
     _ ≤ (3 * r / lam) ^ a := hB3
 

@@ -9,28 +9,31 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.FactorizationCo
 
 @[expose] public section
 
-open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module TensorProduct GlobalTheory.Pass
+open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module TensorProduct
+  GlobalTheory.Pass
 
 noncomputable section
 
 namespace GlobalTheory.WildCycGen
 
 def ex {l : ℕ} (hl : l.Prime) (k : ℕ) : ℕ :=
-  (Nat.chineseRemainder (Nat.Coprime.pow_left (k + 1)
-    (Nat.coprime_ordCompl hl (Nat.factorial_ne_zero k))) 1 0).1
+  (Nat.chineseRemainder
+    (Nat.Coprime.pow_left (k + 1) (Nat.coprime_ordCompl hl (Nat.factorial_ne_zero k))) 1 0).1
 
 theorem ex_modEq {l : ℕ} (hl : l.Prime) (k : ℕ) : ex hl k ≡ 1 [MOD l ^ (k + 1)] :=
-  (Nat.chineseRemainder (Nat.Coprime.pow_left (k + 1)
-    (Nat.coprime_ordCompl hl (Nat.factorial_ne_zero k))) 1 0).2.1
+  (Nat.chineseRemainder
+    (Nat.Coprime.pow_left (k + 1) (Nat.coprime_ordCompl hl (Nat.factorial_ne_zero k))) 1 0).2.1
 
-theorem ex_dvd {l : ℕ} (hl : l.Prime) (k : ℕ) :
-    (k.factorial / l ^ (k.factorial).factorization l) ∣ ex hl k :=
-  Nat.modEq_zero_iff_dvd.1 (Nat.chineseRemainder (Nat.Coprime.pow_left (k + 1)
-    (Nat.coprime_ordCompl hl (Nat.factorial_ne_zero k))) 1 0).2.2
+theorem ex_dvd {l : ℕ} (hl : l.Prime) (k : ℕ)
+    : (k.factorial / l ^ (k.factorial).factorization l) ∣ ex hl k :=
+  Nat.modEq_zero_iff_dvd.1 (Nat.chineseRemainder
+    (Nat.Coprime.pow_left (k + 1) (Nat.coprime_ordCompl hl (Nat.factorial_ne_zero k))) 1 0).2.2
 
-theorem pow_ex {Q : Type*} [Group Q] {l : ℕ} (hl : l.Prime) (x : Q) {d : ℕ} (hd : 0 < d)
-    (hx : x ^ d = 1) :
-    (∀ k, d ≤ k → x ^ ex hl k = x ^ ex hl d) ∧ x ^ (ex hl d * l ^ d.factorization l) = 1 := by
+theorem pow_ex
+    {Q : Type*} [Group Q] {l : ℕ} (hl : l.Prime) (x : Q) {d : ℕ} (hd : 0 < d) (hx : x ^ d = 1)
+    : (∀ k, d ≤ k → x ^ ex hl k = x ^ ex hl d) ∧ x ^ (ex hl d * l ^ d.factorization l) = 1 := by
   set a := d.factorization l
   set d' := d / l ^ a
   have hdd : l ^ a * d' = d := Nat.ordProj_mul_ordCompl_eq_self d l
@@ -45,19 +48,25 @@ theorem pow_ex {Q : Type*} [Group Q] {l : ℕ} (hl : l.Prime) (x : Q) {d : ℕ} 
   refine ⟨fun k hk => ?_, ?_⟩
   · rw [pow_eq_pow_iff_modEq]
     refine Nat.ModEq.of_dvd hord ?_
-    have h := (Nat.modEq_and_modEq_iff_modEq_mul hco).1 ⟨(hmod1 k hk).trans (hmod1 d le_rfl).symm,
-      (Nat.modEq_zero_iff_dvd.2 (hdvd k hk)).trans (Nat.modEq_zero_iff_dvd.2 (hdvd d le_rfl)).symm⟩
+    have h :=
+      (Nat.modEq_and_modEq_iff_modEq_mul hco).1 ⟨
+        (hmod1 k hk).trans (hmod1 d le_rfl).symm,
+        (Nat.modEq_zero_iff_dvd.2 (hdvd k hk)).trans (Nat.modEq_zero_iff_dvd.2 (hdvd d le_rfl)).symm
+      ⟩
     rwa [hdd] at h
   · obtain ⟨t, ht⟩ := hdvd d le_rfl
     have e : ex hl d * l ^ a = d * t := by rw [ht, ← hdd]; ring
     rw [e, pow_mul, hx, one_pow]
 
-theorem exists_proL {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-    {l : ℕ} (hl : l.Prime) (σ : G) : ∃ g0 : G,
-    (∀ C : Set G, IsClosed C → (∀ k, σ ^ ex hl k ∈ C) → g0 ∈ C) ∧
-    ∀ N : Subgroup G, N.Normal → IsOpen (N : Set G) → ∃ a : ℕ, g0 ^ (l ^ a) ∈ N := by
-  obtain ⟨g0, -, hg0⟩ := isCompact_univ.exists_clusterPt
-    (f := Filter.map (fun k => σ ^ ex hl k) Filter.atTop) (by simp)
+theorem exists_proL
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+    {l : ℕ} (hl : l.Prime)
+    (σ : G)
+    : ∃ g0 : G,
+      (∀ C : Set G, IsClosed C → (∀ k, σ ^ ex hl k ∈ C) → g0 ∈ C)
+        ∧ ∀ N : Subgroup G, N.Normal → IsOpen (N : Set G) → ∃ a : ℕ, g0 ^ (l ^ a) ∈ N := by
+  obtain ⟨g0, -, hg0⟩ :=
+    isCompact_univ.exists_clusterPt (f := Filter.map (fun k => σ ^ ex hl k) Filter.atTop) (by simp)
   have hmem : ∀ C : Set G, IsClosed C → (∀ᶠ k in Filter.atTop, σ ^ ex hl k ∈ C) → g0 ∈ C := by
     intro C hC hev
     have h := hg0.mem_closure_of_mem (s := C) hev
@@ -87,10 +96,13 @@ end GlobalTheory.WildCycGen
 
 namespace GlobalTheory.WildCycGen
 
-theorem wild_of_pow {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+theorem wild_of_pow
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
     {A : ValuationSubring Ω} {l : ℕ} (hl : l.Prime) (hA : A.valuation (l : Ω) < 1)
-    {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A) {y : Ω} (hy : y ≠ 0) {n : ℕ} (hn : (σ ^ (l ^ n)) y = y) :
-    A.valuation (σ y / y - 1) < 1 := by
+    {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A)
+    {y : Ω} (hy : y ≠ 0)
+    {n : ℕ} (hn : (σ ^ (l ^ n)) y = y)
+    : A.valuation (σ y / y - 1) < 1 := by
   have hdec : σ ∈ Dec (F := E) A := hσ.1
   have hvs : ∀ (j : ℕ) (z : Ω), A.valuation ((σ ^ j) z) = A.valuation z := fun j z =>
     GlobalTheory.PrimeToInertia.valuation_apply_eq (pow_mem hdec j) z
@@ -113,8 +125,11 @@ theorem wild_of_pow {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra 
     | zero => simp
     | succ k ih =>
       rw [Finset.prod_range_succ, pow_succ]
-      have e : (∏ j ∈ Finset.range k, (σ ^ j) x) * (σ ^ k) x - x ^ k * x =
-          ((∏ j ∈ Finset.range k, (σ ^ j) x) - x ^ k) * (σ ^ k) x + x ^ k * ((σ ^ k) x - x) := by ring
+      have e
+          : (∏ j ∈ Finset.range k, (σ ^ j) x) * (σ ^ k) x - x ^ k * x
+            = ((∏ j ∈ Finset.range k, (σ ^ j) x) - x ^ k) * (σ ^ k) x
+              + x ^ k * ((σ ^ k) x - x) := by
+        ring
       rw [e]
       refine Valuation.map_add_lt _ ?_ ?_
       · rw [map_mul, hvs k x, hx1, mul_one]; exact ih
@@ -142,8 +157,7 @@ theorem wild_of_pow {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra 
     simpa [xa] using hxN
   have h2 : IsLocalRing.residue A (xa - 1) = 0 := by
     rw [map_sub, map_pow, map_one] at h1
-    have h3 : (IsLocalRing.residue A xa - 1) ^ (l ^ n) = 0 := by
-      rw [sub_pow_char_pow, one_pow, h1]
+    have h3 : (IsLocalRing.residue A xa - 1) ^ (l ^ n) = 0 := by rw [sub_pow_char_pow, one_pow, h1]
     rw [map_sub, map_one]
     exact pow_eq_zero_iff (pow_ne_zero _ hl.ne_zero) |>.1 h3
   rw [IsLocalRing.residue_eq_zero_iff, ValuationSubring.valuation_lt_one_iff] at h2
@@ -153,8 +167,8 @@ end GlobalTheory.WildCycGen
 
 namespace GlobalTheory.WildCycGen
 
-theorem one_add_pow_sub_mem {l : ℕ} [Fact l.Prime] {s c : ℕ} (hs : 1 ≤ s) (hc : c % l = 1) :
-    (1 + (l : ℤ_[l]) ^ s) ^ c - (1 + (l : ℤ_[l]) ^ s) ∈ Ideal.span {(l : ℤ_[l]) ^ (s + 1)} := by
+theorem one_add_pow_sub_mem {l : ℕ} [Fact l.Prime] {s c : ℕ} (hs : 1 ≤ s) (hc : c % l = 1)
+    : (1 + (l : ℤ_[l]) ^ s) ^ c - (1 + (l : ℤ_[l]) ^ s) ∈ Ideal.span {(l : ℤ_[l]) ^ (s + 1)} := by
   rw [← PadicInt.ker_toZModPow, RingHom.mem_ker]
   simp only [map_sub, map_pow, map_add (f := _), map_one, map_natCast]
   obtain ⟨s', rfl⟩ : ∃ s', s = s' + 1 := ⟨s - 1, by omega⟩
@@ -184,7 +198,16 @@ theorem ex_mod {l : ℕ} (hl : l.Prime) (k : ℕ) : ex hl k % l = 1 := by
   rw [Nat.ModEq, Nat.mod_eq_of_lt hl.one_lt] at h
   exact h
 
-theorem main : ∀ (D : D7) (i : D.nd.Loc) (k : Fin 2), D.nd.l i = D.host.g k → ∃ g0 : GE D.nd, (∃ w ∈ placesOver D.host.E (D.nd.l i), g0 ∈ Ine (F := D.host.E) (D.nd.plOm.1 w)) ∧ (∃ u : ℤ_[D.nd.l i]ˣ, ((cycZ (F := D.host.E) (Ω := D.nd.Om) (D.nd.l i) g0 : ℤ_[D.nd.l i]ˣ) : ℤ_[D.nd.l i]) = 1 + (D.nd.l i : ℤ_[D.nd.l i]) ^ D.nd.s0 i * (u : ℤ_[D.nd.l i])) ∧ ∀ w ∈ placesOver D.host.E (D.nd.l i), g0 ∈ Ine (F := D.host.E) (D.nd.plOm.1 w) → g0 ∈ wildSet D.nd (D.nd.plOm.1 w) := by
+theorem main
+    : ∀ (D : D7) (i : D.nd.Loc) (k : Fin 2),
+      D.nd.l i = D.host.g k
+        → ∃ g0 : GE D.nd,
+          (∃ w ∈ placesOver D.host.E (D.nd.l i), g0 ∈ Ine (F := D.host.E) (D.nd.plOm.1 w))
+            ∧ (∃ u : ℤ_[D.nd.l i]ˣ,
+              ((cycZ (F := D.host.E) (Ω := D.nd.Om) (D.nd.l i) g0 : ℤ_[D.nd.l i]ˣ) : ℤ_[D.nd.l i])
+                = 1 + (D.nd.l i : ℤ_[D.nd.l i]) ^ D.nd.s0 i * (u : ℤ_[D.nd.l i]))
+            ∧ ∀ w ∈ placesOver D.host.E (D.nd.l i),
+              g0 ∈ Ine (F := D.host.E) (D.nd.plOm.1 w) → g0 ∈ wildSet D.nd (D.nd.plOm.1 w) := by
   intro D i k hk
   have hl : (D.nd.l i).Prime := Fact.out
 
@@ -195,22 +218,28 @@ theorem main : ∀ (D : D7) (i : D.nd.Loc) (k : Fin 2), D.nd.l i = D.host.g k �
     rw [h5]
     have hord := D.R.toFrame.ord_pos
     positivity
-  obtain ⟨σ, hσI, hσc⟩ := GlobalTheory.PtCore.EpsAll.exists_generator (GlobalTheory.EpsInertia.epsAll D i) w hw
+  obtain ⟨σ, hσI, hσc⟩ :=
+    GlobalTheory.PtCore.EpsAll.exists_generator (GlobalTheory.EpsInertia.epsAll D i) w hw
   obtain ⟨g0, hC, hP⟩ := exists_proL hl σ
-  have hs : 1 ≤ D.nd.s0 i := by
-    exact UpperTheory.KStar.S0.one_le_localLevel D.nd i
-  refine ⟨g0, ⟨w, hw, hC _ (isClosed_Ine (F := D.host.E) (D.nd.plOm.1 w)) fun k => pow_mem hσI _⟩, ?_, ?_⟩
-  ·
-    set L : ℤ_[D.nd.l i] := (D.nd.l i : ℤ_[D.nd.l i])
+  have hs : 1 ≤ D.nd.s0 i := by exact UpperTheory.KStar.S0.one_le_localLevel D.nd i
+  refine ⟨
+    g0,
+    ⟨w, hw, hC _ (isClosed_Ine (F := D.host.E) (D.nd.plOm.1 w)) fun k => pow_mem hσI _⟩,
+    ?_,
+    ?_
+  ⟩
+  · set L : ℤ_[D.nd.l i] := (D.nd.l i : ℤ_[D.nd.l i])
     have hcont : Continuous fun τ : GE D.nd =>
         ‖((cycZ (F := D.host.E) (Ω := D.nd.Om) (D.nd.l i) τ : ℤ_[D.nd.l i]ˣ) : ℤ_[D.nd.l i]) -
           (1 + L ^ D.nd.s0 i)‖ :=
-      continuous_norm.comp ((Units.continuous_val.comp (continuous_cycZ _ _ (D.nd.l i))).sub continuous_const)
-    have hg := hC _ (isClosed_le hcont continuous_const) fun k => by
-      show ‖((cycZ (F := D.host.E) (Ω := D.nd.Om) (D.nd.l i) (σ ^ ex hl k) : ℤ_[D.nd.l i]ˣ) : ℤ_[D.nd.l i]) -
-          (1 + L ^ D.nd.s0 i)‖ ≤ ((D.nd.l i : ℝ)) ^ (-((D.nd.s0 i + 1 : ℕ) : ℤ))
-      rw [PadicInt.norm_le_pow_iff_mem_span_pow, map_pow, Units.val_pow_eq_pow_val, hσc]
-      exact one_add_pow_sub_mem hs (ex_mod hl k)
+      continuous_norm.comp ((Units.continuous_val.comp (continuous_cycZ _ _ (D.nd.l i))).sub
+        continuous_const)
+    have hg :=
+      hC _ (isClosed_le hcont continuous_const) fun k => by
+        show ‖((cycZ (F := D.host.E) (Ω := D.nd.Om) (D.nd.l i) (σ ^ ex hl k) : ℤ_[D.nd.l i]ˣ) : ℤ_[D.nd.l i]) -
+            (1 + L ^ D.nd.s0 i)‖ ≤ ((D.nd.l i : ℝ)) ^ (-((D.nd.s0 i + 1 : ℕ) : ℤ))
+        rw [PadicInt.norm_le_pow_iff_mem_span_pow, map_pow, Units.val_pow_eq_pow_val, hσc]
+        exact one_add_pow_sub_mem hs (ex_mod hl k)
     rw [Set.mem_setOf_eq, PadicInt.norm_le_pow_iff_mem_span_pow, Ideal.mem_span_singleton'] at hg
     obtain ⟨t, ht⟩ := hg
     have hu : IsUnit (1 + L * t) := by
@@ -220,16 +249,17 @@ theorem main : ∀ (D : D7) (i : D.nd.Loc) (k : Fin 2), D.nd.l i = D.host.g k �
     refine ⟨hu.unit, ?_⟩
     rw [IsUnit.unit_spec]
     linear_combination (-1 : ℤ_[D.nd.l i]) * ht
-  ·
-    intro w' hw' hine y hy
+  · intro w' hw' hine y hy
     have hA : (D.nd.plOm.1 w').valuation ((D.nd.l i : ℕ) : D.nd.Om) < 1 := by
       have h := (D.nd.plOm.2 w' ((D.nd.l i : ℕ) : 𝓞 D.host.E)).2 hw'
       simpa using h
     have hfd : FiniteDimensional D.host.E (IntermediateField.adjoin D.host.E {y}) :=
       IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral y)
     have ho := IntermediateField.fixingSubgroup_isOpen (IntermediateField.adjoin D.host.E {y})
-    obtain ⟨H, hH⟩ := IsTopologicalGroup.exist_openNormalSubgroup_sub_clopen_nhds_of_one
-      ⟨Subgroup.isClosed_of_isOpen _ ho, ho⟩ (IntermediateField.adjoin D.host.E {y}).fixingSubgroup.one_mem
+    obtain ⟨H, hH⟩ :=
+      IsTopologicalGroup.exist_openNormalSubgroup_sub_clopen_nhds_of_one
+        ⟨Subgroup.isClosed_of_isOpen _ ho, ho⟩
+        (IntermediateField.adjoin D.host.E {y}).fixingSubgroup.one_mem
     obtain ⟨a, ha⟩ := hP H.toSubgroup H.isNormal' H.isOpen
     have hfix : (g0 ^ (D.nd.l i ^ a)) y = y :=
       (IntermediateField.mem_fixingSubgroup_iff _ _).1 (hH ha) y

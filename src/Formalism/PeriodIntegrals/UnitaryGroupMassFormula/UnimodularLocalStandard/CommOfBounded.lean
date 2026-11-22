@@ -25,9 +25,9 @@ lemma mem_stdLat_iff (L : PeriodPair) (v : m → ℂ) : v ∈ stdLat L m ↔ ∀
 private theorem mul_div_cancel_left_of_ne_zero {w : ℂ} (hw : w ≠ 0) (x : ℂ) : w * x / w = x := by
   rw [mul_comm, mul_div_assoc, div_self hw, mul_one]
 
-private theorem mem_cmL_lattice_iff (z : ℂ) :
-    z ∈ (PI.ULS.cmL a b d ha hd lam hlam).lattice ↔
-      ∃ p q : ℤ, z = lam * ((p : ℂ) * a + q * PI.ULS.cmTheta b d) := by
+private theorem mem_cmL_lattice_iff (z : ℂ)
+    : z ∈ (PI.ULS.cmL a b d ha hd lam hlam).lattice
+      ↔ ∃ p q : ℤ, z = lam * ((p : ℂ) * a + q * PI.ULS.cmTheta b d) := by
   rw [lattice_iff]
   simp only [cmL_omega1, cmL_omega2, Complex.real_smul, Complex.ofReal_intCast]
   constructor
@@ -47,7 +47,8 @@ lemma isKv_of_mem {s : m → ℂ} (hs : s ∈ stdLat (cmL a b d ha hd lam hlam) 
 private theorem natCast_smul_eq_nsmul (N : ℕ) (y : m → ℂ) : (N : ℂ) • y = N • y := by
   exact Nat.cast_smul_eq_nsmul ℂ N y
 
-private theorem nsmul_apply_eq_natCast_mul (N : ℕ) (v : m → ℂ) (i : m) : (N • v) i = (N : ℂ) * v i := by
+private theorem nsmul_apply_eq_natCast_mul (N : ℕ) (v : m → ℂ) (i : m)
+    : (N • v) i = (N : ℂ) * v i := by
   rw [← natCast_smul_eq_nsmul, Pi.smul_apply, smul_eq_mul]
 
 lemma exists_nsmul_mem {v : m → ℂ} (h : IsKv b d lam v) :
@@ -141,15 +142,19 @@ lemma isK_H {e : ℤ} (hn : cmTheta b d * (b - cmTheta b d) = (e : ℂ)) (L : Pe
 private theorem intCast_smul_eq_zsmul (p : ℤ) (y : m → ℂ) : (p : ℂ) • y = p • y := by
   exact Int.cast_smul_eq_zsmul ℂ p y
 
-private theorem nsmul_intCast_smul_comm (N : ℕ) (p : ℤ) (y : m → ℂ) : N • ((p : ℂ) • y) = p • (N • y) := by
-  rw [← natCast_smul_eq_nsmul N ((p : ℂ) • y), ← natCast_smul_eq_nsmul N y, smul_comm (N : ℂ) (p : ℂ) y,
-    intCast_smul_eq_zsmul p ((N : ℂ) • y)]
+private theorem nsmul_intCast_smul_comm (N : ℕ) (p : ℤ) (y : m → ℂ)
+    : N • ((p : ℂ) • y) = p • (N • y) := by
+  rw [← natCast_smul_eq_nsmul N ((p : ℂ) • y), ← natCast_smul_eq_nsmul N y,
+    smul_comm (N : ℂ) (p : ℂ) y, intCast_smul_eq_zsmul p ((N : ℂ) • y)]
 
-private theorem nsmul_mem_of_dvd_of_nsmul_mem {S : AddSubgroup (m → ℂ)} {x : m → ℂ} {n N : ℕ} (hnN : n ∣ N)
-    (hx : n • x ∈ S) : N • x ∈ S := by
+private theorem nsmul_mem_of_dvd_of_nsmul_mem
+    {S : AddSubgroup (m → ℂ)} {x : m → ℂ} {n N : ℕ} (hnN : n ∣ N) (hx : n • x ∈ S)
+    : N • x ∈ S := by
   obtain ⟨k, rfl⟩ := hnN
   have e : (n * k) • x = k • (n • x) := by
-    calc (n * k) • x = ((n * k : ℕ) : ℂ) • x := (natCast_smul_eq_nsmul _ _).symm
+    calc
+      (n * k) • x
+        = ((n * k : ℕ) : ℂ) • x := (natCast_smul_eq_nsmul _ _).symm
       _ = (k : ℂ) • (n : ℂ) • x := by rw [smul_smul, Nat.cast_mul, mul_comm]
       _ = k • n • x := by rw [natCast_smul_eq_nsmul, natCast_smul_eq_nsmul]
   rw [e]

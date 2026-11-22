@@ -13,7 +13,8 @@ noncomputable def expNegTop : WithTop ℚ → ℝ≥0
   | ⊤ => 0
   | (q : ℚ) => ⟨Real.exp (-(q : ℝ)), (Real.exp_pos _).le⟩
 
-@[simp] theorem expNegTop_top : expNegTop ⊤ = 0 := rfl
+@[simp]
+theorem expNegTop_top : expNegTop ⊤ = 0 := rfl
 
 theorem expNegTop_coe (q : ℚ) : ((expNegTop (q : WithTop ℚ) : ℝ≥0) : ℝ) = Real.exp (-(q : ℝ)) := rfl
 
@@ -48,8 +49,8 @@ theorem expNegTop_le_iff (a b : WithTop ℚ) : expNegTop a ≤ expNegTop b ↔ b
       rw [← NNReal.coe_le_coe, expNegTop_coe, expNegTop_coe, Real.exp_le_exp, neg_le_neg_iff,
         Rat.cast_le, WithTop.coe_le_coe]
 
-noncomputable def expNegValuation {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) :
-    Valuation F ℝ≥0 where
+noncomputable def expNegValuation {F : Type} [Field F] (v : AddValuation F (WithTop ℚ))
+    : Valuation F ℝ≥0 where
   toFun x := expNegTop (v x)
   map_zero' := by simp
   map_one' := by simp [expNegTop_zero]
@@ -59,16 +60,18 @@ noncomputable def expNegValuation {F : Type} [Field F] (v : AddValuation F (With
     · exact le_max_of_le_left ((expNegTop_le_iff _ _).mpr h)
     · exact le_max_of_le_right ((expNegTop_le_iff _ _).mpr h)
 
-theorem expNegValuation_apply {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) (x : F) :
-    expNegValuation v x = expNegTop (v x) := rfl
+theorem expNegValuation_apply {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) (x : F)
+    : expNegValuation v x = expNegTop (v x) :=
+  rfl
 
-theorem expNegValuation_le_one_iff {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) (x : F) :
-    expNegValuation v x ≤ 1 ↔ 0 ≤ v x := by
+theorem expNegValuation_le_one_iff {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) (x : F)
+    : expNegValuation v x ≤ 1 ↔ 0 ≤ v x := by
   rw [expNegValuation_apply, ← expNegTop_zero, expNegTop_le_iff]
 
-theorem exists_nnreal_valuation_of_addValuation :
-    ∀ (F : Type) [Field F] (v : AddValuation F (WithTop ℚ)), ∃ v' : Valuation F NNReal,
-      (∀ x y, v' x ≤ v' y ↔ v y ≤ v x) ∧ v'.Integers (ReciprocityTheory.ChartRestriction.G.DVR.TWO.Ov v) := by
+theorem exists_nnreal_valuation_of_addValuation
+    : ∀ (F : Type) [Field F] (v : AddValuation F (WithTop ℚ)), ∃ v' : Valuation F NNReal,
+      (∀ x y, v' x ≤ v' y ↔ v y ≤ v x)
+        ∧ v'.Integers (ReciprocityTheory.ChartRestriction.G.DVR.TWO.Ov v) := by
   intro F _ v
   refine ⟨expNegValuation v, fun x y => expNegTop_le_iff _ _, ?_, ?_, ?_⟩
   · exact Subtype.val_injective

@@ -7,17 +7,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BoundedEigen
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical
 
 noncomputable section
 
 namespace GlobalTheory.LKCx.PadicPolys
 
-theorem minpoly_coeff_bdd : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (K' : Subgroup (Gr G 1)) (f' : Gr G 1 → ℂ),
-    IsTest (sigG G 1) (KHT p G.m G.n 1 G.Fw) K' f' → ∀ β : G.Cˣ, ∃ B : ℝ, ∀ (y : grp G β) (h : Gr G 1),
-      f' (h⁻¹ * toP1 G β y * h) ≠ 0 → ∀ (φ : G.F →+* PadicAlgCl p) (k : ℕ),
-        ‖φ ((minpoly G.F (((y : G.Cˣ × ℚˣ).1 : G.Cˣ) : G.C)).coeff k)‖ ≤ B := by
+theorem minpoly_coeff_bdd
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (K' : Subgroup (Gr G 1)) (f' : Gr G 1 → ℂ),
+      IsTest (sigG G 1) (KHT p G.m G.n 1 G.Fw) K' f'
+        → ∀ β : G.Cˣ, ∃ B : ℝ, ∀ (y : grp G β) (h : Gr G 1),
+          f' (h⁻¹ * toP1 G β y * h) ≠ 0
+            → ∀ (φ : G.F →+* PadicAlgCl p) (k : ℕ),
+              ‖φ ((minpoly G.F (((y : G.Cˣ × ℚˣ).1 : G.Cˣ) : G.C)).coeff k)‖ ≤ B := by
   intro p _ G K' f' hf β
   obtain ⟨k0, hk0⟩ := GlobalTheory.AtPBd.main p G 1 K' f' one_pos hf
   set R : ℝ := (p : ℝ) ^ k0 with hR
@@ -28,7 +32,8 @@ theorem minpoly_coeff_bdd : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (K' : S
     show nrmG (sigG G 1) 1 _ = _
     simp [nrmG]
     rfl
-  obtain ⟨hs, -, hrt, hrti⟩ := hk0 (locC G (y : G.Cˣ × ℚˣ)) (h⁻¹ * toP1 G β y * h) h 1 hnrm (by simpa using hy)
+  obtain ⟨hs, -, hrt, hrti⟩ :=
+    hk0 (locC G (y : G.Cˣ × ℚˣ)) (h⁻¹ * toP1 G β y * h) h 1 hnrm (by simpa using hy)
   set yC : G.C := (((y : G.Cˣ × ℚˣ).1 : G.Cˣ) : G.C) with hyC
   have hint : IsIntegral G.F yC := Algebra.IsIntegral.isIntegral _
   have hmon : (minpoly G.F yC).Monic := minpoly.monic hint
@@ -46,10 +51,14 @@ theorem minpoly_coeff_bdd : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (K' : S
       exact (hrt i ν hνr).trans (le_mul_of_one_le_left (by linarith) hR1)
     · have h2 := GlobalTheory.GlobEig.isRoot_minpoly_sh G yC φ μ hμ'
       obtain ⟨i, ν, hν, hνr⟩ := GlobalTheory.GlobEig.exists_root_rho G _ hφ (sh G yC) μ h2
-      have h3 := GlobalTheory.GlobEig.isRoot_inv G i β (y : G.Cˣ × ℚˣ).1 (y : G.Cˣ × ℚˣ).2 y.2.1 ν hνr
+      have h3 :=
+        GlobalTheory.GlobEig.isRoot_inv G i β (y : G.Cˣ × ℚˣ).1 (y : G.Cˣ × ℚˣ).2 y.2.1 ν hνr
       have h4 := hrti i _ h3
       rw [← hν]
-      have e : ν = ν * (((y : G.Cˣ × ℚˣ).2 : ℚ) : PadicAlgCl p)⁻¹ * (((y : G.Cˣ × ℚˣ).2 : ℚ) : PadicAlgCl p) := by
+      have e
+          : ν
+            = ν * (((y : G.Cˣ × ℚˣ).2 : ℚ) : PadicAlgCl p)⁻¹
+              * (((y : G.Cˣ × ℚˣ).2 : ℚ) : PadicAlgCl p) := by
         field_simp
       rw [e, norm_mul]
       exact mul_le_mul h4 hsn (norm_nonneg _) (by linarith)

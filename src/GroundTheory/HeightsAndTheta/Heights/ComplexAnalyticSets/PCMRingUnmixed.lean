@@ -37,7 +37,8 @@ theorem CMRingUnmixed.proof : CMRingUnmixed.Statement := by
     ringKrullDim_le_of_surjective _ Ideal.Quotient.mk_surjective
   rw [ringKrullDim_quotient_eq_coheight, hdim] at h2
   rw [ringKrullDim_quotient_eq_coheight, hdim] at heq
-  have e1 : Order.coheight (⟨p, hprime⟩ : PrimeSpectrum A) = (rs.length : ℕ∞) := by exact_mod_cast heq
+  have e1 : Order.coheight (⟨p, hprime⟩ : PrimeSpectrum A) = (rs.length : ℕ∞) := by
+    exact_mod_cast heq
   have e2 : Order.coheight (⟨q, hq'⟩ : PrimeSpectrum A) ≤ (rs.length : ℕ∞) := by exact_mod_cast h2
   rw [e1] at h1
   have h3 : ((rs.length + 1 : ℕ) : ℕ∞) ≤ (rs.length : ℕ) := by exact_mod_cast h1.trans e2

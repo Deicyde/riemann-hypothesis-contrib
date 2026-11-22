@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.SelmerC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction GlobalTheory.IndefiniteRowSideFullHecke.SelmerCrystallineCocycles
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  GlobalTheory.IndefiniteRowSideFullHecke.SelmerCrystallineCocycles
 
 namespace GlobalTheory.AntiRam
 
@@ -15,20 +17,22 @@ section General
 
 variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
 
-theorem valuation_comap_lt_one (c : Ω ≃+* Ω) (A : ValuationSubring Ω) (y : Ω) :
-    (A.comap c.symm.toRingHom).valuation y < 1 ↔ A.valuation (c.symm y) < 1 := by
+theorem valuation_comap_lt_one (c : Ω ≃+* Ω) (A : ValuationSubring Ω) (y : Ω)
+    : (A.comap c.symm.toRingHom).valuation y < 1 ↔ A.valuation (c.symm y) < 1 := by
   rw [valuation_lt_one_iff', valuation_lt_one_iff', ValuationSubring.mem_comap,
     ValuationSubring.mem_comap, ← map_inv₀, map_eq_zero_iff _ c.symm.injective]
   rfl
 
-theorem exists_conj_mem_Ine (c : Ω ≃+* Ω) (κ : E → E)
+theorem exists_conj_mem_Ine
+    (c : Ω ≃+* Ω) (κ : E → E)
     (hc : ∀ x, c (algebraMap E Ω x) = algebraMap E Ω (κ x)) (hκ : ∀ x, κ (κ x) = x)
-    (A : ValuationSubring Ω) (σ : G E Ω) (hσ : σ ∈ Ine (F := E) A) :
-    ∃ σ' : G E Ω, (∀ x, σ' x = c (σ (c.symm x))) ∧ σ' ∈ Ine (F := E) (A.comap c.symm.toRingHom) := by
+    (A : ValuationSubring Ω) (σ : G E Ω) (hσ : σ ∈ Ine (F := E) A)
+    : ∃ σ' : G E Ω,
+      (∀ x, σ' x = c (σ (c.symm x))) ∧ σ' ∈ Ine (F := E) (A.comap c.symm.toRingHom) := by
   have hs : ∀ x, c.symm (algebraMap E Ω x) = algebraMap E Ω (κ x) := fun x => by
     rw [RingEquiv.symm_apply_eq, hc, hκ]
-  let σ' : Ω ≃ₐ[E] Ω := AlgEquiv.ofRingEquiv (f := (c.symm.trans (σ : Ω ≃ₐ[E] Ω).toRingEquiv).trans c)
-    (fun x => by
+  let σ' : Ω ≃ₐ[E] Ω :=
+    AlgEquiv.ofRingEquiv (f := (c.symm.trans (σ : Ω ≃ₐ[E] Ω).toRingEquiv).trans c) (fun x => by
       show c (σ (c.symm (algebraMap E Ω x))) = _
       rw [hs, AlgEquiv.commutes, hc, hκ])
   have h' : ∀ x, σ' x = c (σ (c.symm x)) := fun _ => rfl
@@ -47,7 +51,10 @@ theorem exists_conj_mem_Ine (c : Ω ≃+* Ω) (κ : E → E)
 
 end General
 
-theorem ramExactly_conj : ∀ (D : D7) (M : Type) [CommGroup M] (ψ : G D.host.E D.nd.Om →* M) (Q : Set (PlE D.host)), AntiHom D.ntw.cc ψ → RamExactly ψ Q → ∀ P ∈ Q, ∀ P' : PlE D.host, IsConjPl D.host P P' → P' ∈ Q := by
+theorem ramExactly_conj
+    : ∀ (D : D7) (M : Type) [CommGroup M] (ψ : G D.host.E D.nd.Om →* M) (Q : Set (PlE D.host)),
+      AntiHom D.ntw.cc ψ → RamExactly ψ Q
+        → ∀ P ∈ Q, ∀ P' : PlE D.host, IsConjPl D.host P P' → P' ∈ Q := by
   intro D M _ ψ Q hA hR P hP P' hPP
   haveI : IsCMField D.host.E := D.host.isCMField_hostE
   have hst : ∀ x : D.host.E, IsCMField.complexConj D.host.E x = D.host.conj x :=
@@ -55,14 +62,18 @@ theorem ramExactly_conj : ∀ (D : D7) (M : Type) [CommGroup M] (ψ : G D.host.E
   obtain ⟨⟨j, hj⟩, -⟩ := D.ntw.cc_cm
   have hκ : ∀ x, D.host.conj (D.host.conj x) = x := fun x => by
     rw [← hst, ← hst, IsCMField.complexConj_apply_apply]
-  have hc : ∀ x, D.ntw.cc (algebraMap D.host.E D.nd.Om x) =
-      algebraMap D.host.E D.nd.Om (D.host.conj x) := fun x => by
+  have hc
+      : ∀ x,
+        D.ntw.cc (algebraMap D.host.E D.nd.Om x)
+          = algebraMap D.host.E D.nd.Om (D.host.conj x) := fun x => by
     apply j.injective
     rw [hj, ← hst]
-    exact (IsCMField.complexEmbedding_complexConj D.host.E
-      (j.comp (algebraMap D.host.E D.nd.Om)) x).symm
-  have hs : ∀ x, D.ntw.cc.symm (algebraMap D.host.E D.nd.Om x) =
-      algebraMap D.host.E D.nd.Om (D.host.conj x) := fun x => by
+    exact (IsCMField.complexEmbedding_complexConj D.host.E (j.comp (algebraMap D.host.E D.nd.Om))
+      x).symm
+  have hs
+      : ∀ x,
+        D.ntw.cc.symm (algebraMap D.host.E D.nd.Om x)
+          = algebraMap D.host.E D.nd.Om (D.host.conj x) := fun x => by
     rw [RingEquiv.symm_apply_eq, hc, hκ]
   have hpl : IsPlaceOver (D.nd.plOm.1 P) P := D.nd.plOm.2 P
   obtain ⟨σ, hσ, hne⟩ := (hR P _ hpl).2 hP

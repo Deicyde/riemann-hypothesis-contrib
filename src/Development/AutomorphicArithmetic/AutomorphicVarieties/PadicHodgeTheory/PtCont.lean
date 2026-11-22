@@ -7,35 +7,52 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module
+  UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial
 
-private theorem ptc_field {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsLocalRing R] [Algebra ℤ_[l] R]
-    {K : Type} [Field K] [Algebra ℚ_[l] K] [Module.Finite ℚ_[l] K] [Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K]
-    (x : R →ₐ[ℤ_[l]] K) (a : R) (ha : a ∈ maximalIdeal R) :
-    IsIntegral ℤ_[l] (x a) ∧ ∃ n : ℕ, ∃ b, IsIntegral ℤ_[l] b ∧ x a ^ n = (l : K) * b :=
+private theorem ptc_field
+    {l : ℕ} [Fact l.Prime]
+    {R : Type} [CommRing R] [IsLocalRing R] [Algebra ℤ_[l] R]
+    {K : Type} [Field K] [Algebra ℚ_[l] K] [Module.Finite ℚ_[l] K] [Algebra ℤ_[l] K]
+    [IsScalarTower ℤ_[l] ℚ_[l] K]
+    (x : R →ₐ[ℤ_[l]] K)
+    (a : R) (ha : a ∈ maximalIdeal R)
+    : IsIntegral ℤ_[l] (x a) ∧ ∃ n : ℕ, ∃ b, IsIntegral ℤ_[l] b ∧ x a ^ n = (l : K) * b :=
   _root_.UpperTheory.Reformulated.B.IntegralOfNormBounded.ptc_field x a ha
 
-private theorem ptc_field' {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsLocalRing R] [Algebra ℤ_[l] R]
+private theorem ptc_field'
+    {l : ℕ} [Fact l.Prime]
+    {R : Type} [CommRing R] [IsLocalRing R] [Algebra ℤ_[l] R]
     (hR : ∀ a : R, ∃ c, IsIntegral ℤ_[l] c ∧ a - c ∈ maximalIdeal R)
-    {K : Type} [Field K] [Algebra ℚ_[l] K] [Module.Finite ℚ_[l] K] [Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K]
-    (x : R →ₐ[ℤ_[l]] K) (a : R) : IsIntegral ℤ_[l] (x a) := by
+    {K : Type} [Field K] [Algebra ℚ_[l] K] [Module.Finite ℚ_[l] K] [Algebra ℤ_[l] K]
+    [IsScalarTower ℤ_[l] ℚ_[l] K]
+    (x : R →ₐ[ℤ_[l]] K) (a : R)
+    : IsIntegral ℤ_[l] (x a) := by
   obtain ⟨c, hc, hm⟩ := hR a
   have := (ptc_field x _ hm).1.add (hc.map x)
   simpa using this
 
-private theorem ptc_finite {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    [Algebra ℤ_[l] R] (hR : ∀ a : R, ∃ c, IsIntegral ℤ_[l] c ∧ a - c ∈ maximalIdeal R)
-    {B : Type} [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra ℤ_[l] B] [IsScalarTower ℤ_[l] ℚ_[l] B]
-    (x : R →ₐ[ℤ_[l]] B) : Module.Finite ℤ_[l] x.range := by
+private theorem ptc_finite
+    {l : ℕ} [Fact l.Prime]
+    {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [Algebra ℤ_[l] R]
+    (hR : ∀ a : R, ∃ c, IsIntegral ℤ_[l] c ∧ a - c ∈ maximalIdeal R)
+    {B : Type} [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra ℤ_[l] B]
+    [IsScalarTower ℤ_[l] ℚ_[l] B]
+    (x : R →ₐ[ℤ_[l]] B)
+    : Module.Finite ℤ_[l] x.range := by
   haveI : IsArtinianRing B := IsArtinianRing.of_finite ℚ_[l] B
   haveI : IsNoetherianRing x.range := isNoetherianRing_of_surjective R _ x.rangeRestrict.toRingHom
     x.rangeRestrict_surjective
-  have hfin : ∀ m : MaximalSpectrum B, Module.Finite ℤ_[l] (integralClosure ℤ_[l] (B ⧸ m.asIdeal)) := fun m => by
+  have hfin
+      : ∀ m : MaximalSpectrum B,
+        Module.Finite ℤ_[l] (integralClosure ℤ_[l] (B ⧸ m.asIdeal)) := fun m => by
     haveI := m.isMaximal
     letI := Ideal.Quotient.field m.asIdeal
     exact IsIntegralClosure.finite ℤ_[l] ℚ_[l] (B ⧸ m.asIdeal) _
-  have hint : ∀ (m : MaximalSpectrum B) (z : x.range),
-      ((Ideal.Quotient.mkₐ ℤ_[l] m.asIdeal).comp x.range.val) z ∈ integralClosure ℤ_[l] (B ⧸ m.asIdeal) := by
+  have hint
+      : ∀ (m : MaximalSpectrum B) (z : x.range),
+        ((Ideal.Quotient.mkₐ ℤ_[l] m.asIdeal).comp x.range.val) z
+          ∈ integralClosure ℤ_[l] (B ⧸ m.asIdeal) := by
     rintro m ⟨_, a, rfl⟩
     haveI := m.isMaximal
     letI := Ideal.Quotient.field m.asIdeal
@@ -44,8 +61,8 @@ private theorem ptc_finite {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsL
     Pi.algHom _ _ fun m => AlgHom.codRestrict _ _ (hint m)
   haveI : Module.Finite ℤ_[l] g.range :=
     Module.Finite.of_injective g.range.val.toLinearMap Subtype.val_injective
-  refine Module.finite_of_surjective_of_ker_le_nilradical g.rangeRestrict g.rangeRestrict_surjective ?_
-    (IsNoetherian.noetherian _)
+  refine Module.finite_of_surjective_of_ker_le_nilradical g.rangeRestrict g.rangeRestrict_surjective
+    ?_ (IsNoetherian.noetherian _)
   intro z hz
   have hz' : g z = 0 := congrArg Subtype.val hz
   have hj : (z : B) ∈ Ideal.jacobson (⊥ : Ideal B) := by
@@ -59,10 +76,12 @@ private theorem ptc_finite {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsL
   rw [hn] at this
   simpa using this
 
-private theorem ptc_pow {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+private theorem ptc_pow
+    {l : ℕ} [Fact l.Prime]
+    {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
     {A : Type} [CommRing A] [Algebra ℤ_[l] A] [Module.Finite ℤ_[l] A]
-    (y : R →+* A) (hy : Function.Surjective y) :
-    ∃ N : ℕ, ∀ k : ℕ, ∀ a ∈ maximalIdeal R ^ (N * k), ∃ b : A, y a = (l : ℤ_[l]) ^ k • b := by
+    (y : R →+* A) (hy : Function.Surjective y)
+    : ∃ N : ℕ, ∀ k : ℕ, ∀ a ∈ maximalIdeal R ^ (N * k), ∃ b : A, y a = (l : ℤ_[l]) ^ k • b := by
   have h1 : (maximalIdeal R).map y ≤ (Ideal.span {(l : A)}).radical := by
     rw [Ideal.radical_eq_sInf, le_sInf_iff]
     rintro P ⟨hP, hPp⟩
@@ -77,7 +96,8 @@ private theorem ptc_pow {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsLoca
     haveI : P.IsMaximal := Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := ℤ_[l]) P hc
     have := eq_maximalIdeal (Ideal.comap_isMaximal_of_surjective y hy (K := P))
     rw [Ideal.map_le_iff_le_comap, this]
-  obtain ⟨N, hN⟩ := Ideal.exists_pow_le_of_le_radical_of_fg h1 (Ideal.FG.map (IsNoetherian.noetherian _) y)
+  obtain ⟨N, hN⟩ :=
+    Ideal.exists_pow_le_of_le_radical_of_fg h1 (Ideal.FG.map (IsNoetherian.noetherian _) y)
   refine ⟨N, fun k a ha => ?_⟩
   have h2 := Ideal.mem_map_of_mem y ha
   rw [Ideal.map_pow, pow_mul] at h2
@@ -86,8 +106,11 @@ private theorem ptc_pow {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsLoca
   obtain ⟨b, hb⟩ := h3
   exact ⟨b, by rw [hb, Algebra.smul_def, map_pow, map_natCast]⟩
 
-private theorem ptc_bdd {l : ℕ} [Fact l.Prime] {A : Type} [AddCommGroup A] [Module ℤ_[l] A] [Module.Finite ℤ_[l] A]
-    (φ : A →ₗ[ℤ_[l]] ℚ_[l]) : ∃ C : ℝ, ∀ b, ‖φ b‖ ≤ C := by
+private theorem ptc_bdd
+    {l : ℕ} [Fact l.Prime]
+    {A : Type} [AddCommGroup A] [Module ℤ_[l] A] [Module.Finite ℤ_[l] A]
+    (φ : A →ₗ[ℤ_[l]] ℚ_[l])
+    : ∃ C : ℝ, ∀ b, ‖φ b‖ ≤ C := by
   obtain ⟨n, s, hs⟩ := Module.Finite.exists_fin (R := ℤ_[l]) (M := A)
   refine ⟨∑ i, ‖φ (s i)‖, fun b => ?_⟩
   have hb : b ∈ Submodule.span ℤ_[l] (Set.range s) := hs ▸ Submodule.mem_top
@@ -98,11 +121,15 @@ private theorem ptc_bdd {l : ℕ} [Fact l.Prime] {A : Type} [AddCommGroup A] [Mo
   rw [map_smul, Algebra.smul_def, norm_mul]
   exact mul_le_of_le_one_left (norm_nonneg _) (PadicInt.norm_le_one (c i))
 
-private theorem ptc_cont {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+private theorem ptc_cont
+    {l : ℕ} [Fact l.Prime]
+    {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
     {A : Type} [CommRing A] [Algebra ℤ_[l] A] [Module.Finite ℤ_[l] A]
-    (y : R →+* A) (hy : Function.Surjective y) (φ : A →ₗ[ℤ_[l]] ℚ_[l])
-    {X : Type} [TopologicalSpace X] (f : X → R) (hf : AdicCont (maximalIdeal R) f) :
-    Continuous fun g => φ (y (f g)) := by
+    (y : R →+* A) (hy : Function.Surjective y)
+    (φ : A →ₗ[ℤ_[l]] ℚ_[l])
+    {X : Type} [TopologicalSpace X]
+    (f : X → R) (hf : AdicCont (maximalIdeal R) f)
+    : Continuous fun g => φ (y (f g)) := by
   obtain ⟨N, hN⟩ := ptc_pow (l := l) y hy
   obtain ⟨C, hC⟩ := ptc_bdd φ
   refine continuous_iff_continuousAt.2 fun g => Metric.tendsto_nhds.2 fun ε hε => ?_
@@ -112,11 +139,21 @@ private theorem ptc_cont {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] [IsLoc
   obtain ⟨k, hk⟩ := (ht.eventually (gt_mem_nhds hε)).exists
   filter_upwards [(hf (N * k)).eventually_eq g] with g' hg'
   obtain ⟨b, hb⟩ := hN k _ (Ideal.Quotient.eq.1 hg')
-  rw [dist_eq_norm, ← map_sub, ← map_sub, hb, map_smul, Algebra.smul_def, map_pow, map_natCast, norm_mul, norm_pow]
+  rw [dist_eq_norm, ← map_sub, ← map_sub, hb, map_smul, Algebra.smul_def, map_pow, map_natCast,
+    norm_mul, norm_pow]
   exact lt_of_le_of_lt (mul_le_mul_of_nonneg_left (hC b) (by positivity)) hk
 
-theorem UpperTheory.V.Loc.ptCont :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (B : Type) [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra O B] [Algebra ℤ_[l] B] [IsScalarTower ℤ_[l] O B] [IsScalarTower ℤ_[l] ℚ_[l] B] (x : R →ₐ[O] B), (∀ (X : Type) [TopologicalSpace X] (f : X → R), AdicCont (maximalIdeal R) f → QCont l fun g => x (f g)) ∧ (IsField B → (∀ a, IsIntegral ℤ_[l] (x a)) ∧ ∀ a ∈ maximalIdeal R, ∃ n : ℕ, ∃ b, IsIntegral ℤ_[l] b ∧ x a ^ n = (l : B) * b) := by
+theorem UpperTheory.V.Loc.ptCont
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O]
+        (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (B : Type) [CommRing B] [Algebra ℚ_[l] B]
+        [Module.Finite ℚ_[l] B] [Algebra O B] [Algebra ℤ_[l] B] [IsScalarTower ℤ_[l] O B]
+        [IsScalarTower ℤ_[l] ℚ_[l] B] (x : R →ₐ[O] B),
+      (∀ (X : Type) [TopologicalSpace X] (f : X → R),
+          AdicCont (maximalIdeal R) f → QCont l fun g => x (f g))
+        ∧ (IsField B
+          → (∀ a, IsIntegral ℤ_[l] (x a))
+            ∧ ∀ a ∈ maximalIdeal R, ∃ n : ℕ, ∃ b, IsIntegral ℤ_[l] b ∧ x a ^ n = (l : B) * b) := by
   intro l _ O _ _ _ _ _ _ _ R _ _ _ B _ _ _ _ _ _ _ x
   letI : Algebra ℤ_[l] R := ((algebraMap O R).comp (algebraMap ℤ_[l] O)).toAlgebra
   haveI : IsScalarTower ℤ_[l] O R := IsScalarTower.of_algebraMap_eq fun _ => rfl
@@ -131,9 +168,12 @@ theorem UpperTheory.V.Loc.ptCont :
     haveI : ContinuousAdd B := IsModuleTopology.toContinuousAdd ℚ_[l] B
     let e := (Module.finBasis ℚ_[l] B).equivFun
     have he : Continuous e.symm := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap
-    have h1 : Continuous fun g => e (x (f g)) := continuous_pi fun i =>
-      ptc_cont x'.rangeRestrict.toRingHom x'.rangeRestrict_surjective
-        ((((LinearMap.proj i).comp e.toLinearMap).restrictScalars ℤ_[l]).comp x'.range.val.toLinearMap) f hf
+    have h1 : Continuous fun g => e (x (f g)) :=
+      continuous_pi fun i =>
+        ptc_cont x'.rangeRestrict.toRingHom x'.rangeRestrict_surjective
+          ((((LinearMap.proj i).comp e.toLinearMap).restrictScalars ℤ_[l]).comp
+            x'.range.val.toLinearMap)
+          f hf
     have h2 := he.comp h1
     simpa [QCont, Function.comp_def] using h2
   · letI := hB.toField

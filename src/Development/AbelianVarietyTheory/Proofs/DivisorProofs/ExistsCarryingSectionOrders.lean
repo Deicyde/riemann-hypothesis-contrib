@@ -24,7 +24,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrameExponen
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.CovHt
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
+  GlobalTheory.BigTop GlobalTheory.CovHt
 
 set_option autoImplicit false
 set_option synthInstance.maxHeartbeats 400000
@@ -37,32 +40,44 @@ open GlobalTheory.FlatLine GlobalTheory.FlatTw GlobalTheory.ThetaConst GlobalThe
 
 section Free
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
-
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
 
 variable (Dw) in
-theorem wtZ_zero_eq (m : ℕ) : wtZ (0 : (E →+* ℂ) × ℕ → ℕ) (2 * m) = wtOf Dw (weightOf Dw 0 m) m := by
+theorem wtZ_zero_eq (m : ℕ)
+    : wtZ (0 : (E →+* ℂ) × ℕ → ℕ) (2 * m) = wtOf Dw (weightOf Dw 0 m) m := by
   refine Prod.ext (funext fun x => ?_) (by simp [wtZ, wtOf])
   simp only [wtZ, wtOf, weightOf]
   split_ifs <;> simp <;> omega
 
-theorem nsmul_wtOf (k : ℕ) (la : AllWt.Weight Dw) (m : ℤ) : k • wtOf Dw la m = wtOf Dw (k • la) (k * m) := by
+theorem nsmul_wtOf (k : ℕ) (la : AllWt.Weight Dw) (m : ℤ)
+    : k • wtOf Dw la m = wtOf Dw (k • la) (k * m) := by
   induction k with
   | zero => simp [wtOf_zero]
   | succ k ih => rw [succ_nsmul, ih, ← wtOf_add, succ_nsmul]; congr 1; push_cast; ring
 
-theorem homN_pow {σ : c.F →+* ℂ} (U : Unf Xo c σ r) (x : ℝ) {G : WTZ E} (hG : Even G.2) (f : Rul Xo c)
-    (z : Σ k, Frame (U.X k).Ψ r) (hz : z.2 ∈ (U.X z.1).dom) (k : ℕ) :
-    homN U x ((k + 1) • G) (f ^ (k + 1)) z = homN U x G f z ^ (k + 1) := by
+theorem homN_pow
+    {σ : c.F →+* ℂ} (U : Unf Xo c σ r)
+    (x : ℝ)
+    {G : WTZ E} (hG : Even G.2)
+    (f : Rul Xo c)
+    (z : Σ k, Frame (U.X k).Ψ r) (hz : z.2 ∈ (U.X z.1).dom)
+    (k : ℕ)
+    : homN U x ((k + 1) • G) (f ^ (k + 1)) z = homN U x G f z ^ (k + 1) := by
   induction k with
   | zero => simp
   | succ k ih =>
-    rw [succ_nsmul, pow_succ, homN_mul U x (by simpa using hG.mul_left _) hG _ _ z hz, ih, ← pow_succ]
+    rw [succ_nsmul, pow_succ, homN_mul U x (by simpa using hG.mul_left _) hG _ _ z hz, ih,
+      ← pow_succ]
 
-theorem le_val_pow {K R : Type} [Field K] [NumberField K] [CommRing R] [Algebra K R] {la : HeightOneSpectrum (𝓞 K)}
-    {v : R → EReal} (hv : IsVal la v) {f : R} {a : ℝ} (h : (a : EReal) ≤ v f) (k : ℕ) :
-    (((k + 1 : ℕ) * a : ℝ) : EReal) ≤ v (f ^ (k + 1)) := by
+theorem le_val_pow
+    {K R : Type} [Field K] [NumberField K] [CommRing R] [Algebra K R]
+    {la : HeightOneSpectrum (𝓞 K)} {v : R → EReal} (hv : IsVal la v)
+    {f : R} {a : ℝ} (h : (a : EReal) ≤ v f)
+    (k : ℕ)
+    : (((k + 1 : ℕ) * a : ℝ) : EReal) ≤ v (f ^ (k + 1)) := by
   induction k with
   | zero => simpa using h
   | succ k ih =>
@@ -73,24 +88,33 @@ theorem le_val_pow {K R : Type} [Field K] [NumberField K] [CommRing R] [Algebra 
     push_cast
     ring
 
-theorem wtOf_hodge_anti (n : ℕ) (τ : E →+* ℂ) (i j : ℕ) (hij : i ≤ j) :
-    (wtOf Dw ((n : ℤ) • hodgeWt Dw) 0).1 (τ, j) ≤ (wtOf Dw ((n : ℤ) • hodgeWt Dw) 0).1 (τ, i) := by
+theorem wtOf_hodge_anti (n : ℕ) (τ : E →+* ℂ) (i j : ℕ) (hij : i ≤ j)
+    : (wtOf Dw ((n : ℤ) • hodgeWt Dw) 0).1 (τ, j)
+      ≤ (wtOf Dw ((n : ℤ) • hodgeWt Dw) 0).1 (τ, i) := by
   simp only [wtOf, hodgeWt, barWt, Pi.smul_apply, smul_eq_mul]
   split_ifs <;> simp_all <;> omega
 
-theorem pow_mul_mem {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {Z : Comp Xo c} {G₀ : WTZ E} (h₀ : Even G₀.2) {θ : Rul Xo c}
-    (h : ∀ G : WTZ E, Even G.2 → ∀ f ∈ cuspOn U Z G, f * θ ∈ cuspOn U Z (G + G₀)) (k : ℕ) {G : WTZ E} (hG : Even G.2)
-    {f : Rul Xo c} (hf : f ∈ cuspOn U Z G) : θ ^ k * f ∈ cuspOn U Z (G + k • G₀) := by
+theorem pow_mul_mem
+    {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {Z : Comp Xo c} {G₀ : WTZ E} (h₀ : Even G₀.2)
+    {θ : Rul Xo c} (h : ∀ G : WTZ E, Even G.2 → ∀ f ∈ cuspOn U Z G, f * θ ∈ cuspOn U Z (G + G₀))
+    (k : ℕ)
+    {G : WTZ E} (hG : Even G.2)
+    {f : Rul Xo c} (hf : f ∈ cuspOn U Z G)
+    : θ ^ k * f ∈ cuspOn U Z (G + k • G₀) := by
   induction k with
   | zero => simpa using hf
   | succ k ih =>
     have := h _ (hG.add (by simpa using h₀.mul_left _)) _ ih
     rwa [add_assoc, ← succ_nsmul, mul_right_comm, ← pow_succ] at this
 
-theorem cost_const {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x : ℝ} {Z : Comp Xo c} {la : AllWt.Weight Dw}
-    (S : ConstSec U x Z la 0) (s : ℝ) : ∃ e : HeightOneSpectrum (𝓞 c.F) →₀ ℝ, (∀ w, e w = -S.rho_vw w / 8) ∧
-      cost e (fun σ => s + Real.log (S.cInf σ) / 8) = s - S.deg / 8 := by
-  have hfin : (Function.support fun w => -S.rho_vw w / 8).Finite :=
+theorem cost_const
+    {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x : ℝ} {Z : Comp Xo c} {la : AllWt.Weight Dw}
+    (S : ConstSec U x Z la 0)
+    (s : ℝ)
+    : ∃ e : HeightOneSpectrum (𝓞 c.F) →₀ ℝ,
+      (∀ w, e w = - S.rho_vw w / 8)
+        ∧ cost e (fun σ => s + Real.log (S.cInf σ) / 8) = s - S.deg / 8 := by
+  have hfin : (Function.support fun w => - S.rho_vw w / 8).Finite :=
     S.finite_rho.subset fun w hw h0 => hw (by simp [h0])
   refine ⟨Finsupp.ofSupportFinite _ hfin, fun _ => rfl, ?_⟩
   have hn : (Module.finrank ℚ c.F : ℝ) ≠ 0 := by exact_mod_cast Module.finrank_pos.ne'
@@ -99,25 +123,32 @@ theorem cost_const {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x : ℝ} {Z : Co
       simp only [Set.Finite.coe_toFinset, Function.mem_support] at hw ⊢
       intro h0
       exact hw (by rw [show S.rho_vw w = 0 by linarith, zero_mul])
-  have h2 : ((Finsupp.ofSupportFinite _ hfin).sum fun w a => a * Real.log (Ideal.absNorm w.asIdeal : ℝ)) =
-      -(Module.finrank ℚ c.F : ℝ) / 8 * ∑ w ∈ hfin.toFinset, S.rho_vw w * lw c.F w := by
+  have h2
+      : ((Finsupp.ofSupportFinite _ hfin).sum fun w a => a * Real.log (Ideal.absNorm w.asIdeal : ℝ))
+        = -(Module.finrank ℚ c.F : ℝ) / 8 * ∑ w ∈ hfin.toFinset, S.rho_vw w * lw c.F w := by
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun w _ => ?_
     show -S.rho_vw w / 8 * _ = _
     unfold lw
     field_simp
   unfold cost ConstSec.deg lineDeg
-  rw [h1, h2, Finset.sum_add_distrib, ← Finset.sum_div, Finset.sum_const, Finset.card_univ, NumberField.Embeddings.card,
-    nsmul_eq_mul]
+  rw [h1, h2, Finset.sum_add_distrib, ← Finset.sum_div, Finset.sum_const, Finset.card_univ,
+    NumberField.Embeddings.card, nsmul_eq_mul]
   field_simp
   ring
 
-theorem exists_twist {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x om : ℝ} (h : FlatDegree U x om) (Z : Comp Xo c)
-    (hZ : HasPts U Z) (n : ℤ) : ∃ S : ConstSec U x Z (parWt Dw fun _ => -n) 0,
+theorem exists_twist
+    {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x om : ℝ} (h : FlatDegree U x om)
+    (Z : Comp Xo c) (hZ : HasPts U Z)
+    (n : ℤ)
+    : ∃ S : ConstSec U x Z (parWt Dw fun _ => -n) 0,
       S.deg = n * (Fintype.card (Psi H) * (((Dw.p : ℝ) - Dw.q) / 2 * om)) := by
   have s : ∀ τ, FlatSec U x Z τ := fun τ => (h Z τ).1.some
-  refine ⟨(ConstSec.prod hZ Finset.univ fun τ => (s τ).toFrame.zpow n).copy
-    (by rw [parWt_eq_sum]; simp only [neg_neg]; convert rfl) (by simp), ?_⟩
+  refine ⟨
+    (ConstSec.prod hZ Finset.univ fun τ => (s τ).toFrame.zpow n).copy
+      (by rw [parWt_eq_sum]; simp only [neg_neg]; convert rfl) (by simp),
+    ?_
+  ⟩
   refine (ConstSec.prod_spec hZ Finset.univ fun τ => (s τ).toFrame.zpow n).2.2.2.2.trans ?_
   have : ∀ τ, ((s τ).toFrame.zpow n).deg = n * (((Dw.p : ℝ) - Dw.q) / 2 * om) := fun τ => by
     have h1 := (h Z τ).2 (s τ)
@@ -128,27 +159,44 @@ theorem exists_twist {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x om : ℝ} (h
 
 end Free
 
-
 set_option maxHeartbeats 1000000 in
-theorem exists_section {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l}
-    {c : Coeff l} {r : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (x : ℝ) (V : (c.F →+* ℂ) → HSp D)
-    (dict : ∀ σ, GA D (V σ) → Σ k, Frame ((U σ).X k).Ψ r) (hL : GlobalTheory.FlatCore.Laws U x) (hM : 5 ^ 4 ∣ l.M) (Z : Comp Xo c)
-    (S : ConstSec U x Z (parWt Dw fun _ => -(12 * ((Dw.p + Dw.q : ℕ) : ℤ))) 0) (u : AllWt.Weight Dw) (β A : ℝ)
-    (hb : ∀ (xs : Fin (Dw.p + Dw.q) → LatMod Dw (5 ^ 4)) (f : Rul Xo c), Submodule.span (𝓞 D.host.E) (Set.range xs) = ⊤ →
-      IsTauRule Xo c 5 (fun _ : Unit => 1) (fun _ => xs) f → ∀ σ, GoodEmb c σ → ∀ y : FPt (U σ).X,
-      (⟨y.1, y.2.1⟩ : Σ k, Frame ((U σ).X k).Ψ r) ∈ framesOn (U σ) Z →
-        homN (U σ) x (wtZ 0 (2 * (Dw.p + Dw.q))) (f ^ 2) ⟨y.1, y.2.1⟩ ≤ A ∧
-        ENNReal.ofReal (homN (U σ) x (wtZ 0 (2 * (Dw.p + Dw.q))) (f ^ 2) ⟨y.1, y.2.1⟩) ^ 3 ≤
-          ENNReal.ofReal (Real.exp β) * bergOn (U σ) (V σ) (dict σ) Z (wtOf Dw u 0) y) :
-    ∃ (θ : Rul Xo c) (e : HeightOneSpectrum (𝓞 c.F) →₀ ℝ) (t : (c.F →+* ℂ) → ℝ), Carries U Z u (uPrime Dw u) θ ∧
-      (∀ (la : HeightOneSpectrum (𝓞 c.F)) (T : CDVR) (io : c.F →+* T.Fr) (e₀ : ℕ), OverLa la T.V io e₀ →
-        ∀ y : IntFr Xo c T io, y.IsAlg → ∀ φ : ℝ, GlobalTheory.SlopeRec.HasPhi y φ →
-          ((8 / 2500 * φ / e₀ - 8 * e la : ℝ) : EReal) ≤ nval T.V e₀ (evI y θ)) ∧
-      InfBd U x V dict Z (wtOf Dw u 0) (wtOf Dw ((8 : ℤ) • (u - uPrime Dw u)) 0) 8 θ t ∧
-      cost e t = β / 2 + ((3 * (Dw.p + Dw.q) : ℕ) : ℝ) *
-        (2 * ((Nat.card (Psi H) * (Dw.p + Dw.q) : ℕ) : ℝ) * Real.log (2 * Real.pi)) / 8 - S.deg / 8 := by
+theorem exists_section
+    {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H}
+    {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r)
+    (x : ℝ)
+    (V : (c.F →+* ℂ) → HSp D) (dict : ∀ σ, GA D (V σ) → Σ k, Frame ((U σ).X k).Ψ r)
+    (hL : GlobalTheory.FlatCore.Laws U x) (hM : 5 ^ 4 ∣ l.M)
+    (Z : Comp Xo c) (S : ConstSec U x Z (parWt Dw fun _ => -(12 * ((Dw.p + Dw.q : ℕ) : ℤ))) 0)
+    (u : AllWt.Weight Dw) (β A : ℝ)
+    (hb : ∀ (xs : Fin (Dw.p + Dw.q) → LatMod Dw (5 ^ 4)) (f : Rul Xo c),
+      Submodule.span (𝓞 D.host.E) (Set.range xs) = ⊤
+        → IsTauRule Xo c 5 (fun _ : Unit => 1) (fun _ => xs) f
+        → ∀ σ,
+          GoodEmb c σ
+            → ∀ y : FPt (U σ).X,
+              (⟨y.1, y.2.1⟩ : Σ k, Frame ((U σ).X k).Ψ r) ∈ framesOn (U σ) Z
+                → homN (U σ) x (wtZ 0 (2 * (Dw.p + Dw.q))) (f ^ 2) ⟨y.1, y.2.1⟩ ≤ A
+                  ∧ ENNReal.ofReal (homN (U σ) x (wtZ 0 (2 * (Dw.p + Dw.q))) (f ^ 2) ⟨y.1, y.2.1⟩)
+                      ^ 3
+                    ≤ ENNReal.ofReal (Real.exp β) * bergOn (U σ) (V σ) (dict σ) Z (wtOf Dw u 0) y)
+    : ∃ (θ : Rul Xo c) (e : HeightOneSpectrum (𝓞 c.F) →₀ ℝ) (t : (c.F →+* ℂ) → ℝ),
+      Carries U Z u (uPrime Dw u) θ
+        ∧ (∀ (la : HeightOneSpectrum (𝓞 c.F)) (T : CDVR) (io : c.F →+* T.Fr) (e₀ : ℕ),
+          OverLa la T.V io e₀
+            → ∀ y : IntFr Xo c T io,
+              y.IsAlg
+                → ∀ φ : ℝ,
+                  GlobalTheory.SlopeRec.HasPhi y φ
+                    → ((8 / 2500 * φ / e₀ - 8 * e la : ℝ) : EReal) ≤ nval T.V e₀ (evI y θ))
+        ∧ InfBd U x V dict Z (wtOf Dw u 0) (wtOf Dw ((8 : ℤ) • (u - uPrime Dw u)) 0) 8 θ t
+        ∧ cost e t
+          = β / 2
+            + ((3 * (Dw.p + Dw.q) : ℕ) : ℝ)
+              * (2 * ((Nat.card (Psi H) * (Dw.p + Dw.q) : ℕ) : ℝ) * Real.log (2 * Real.pi)) / 8
+            - S.deg / 8 := by
   have h5 : Odd 5 := by decide
-  obtain ⟨hks, hK⟩ := GlobalTheory.KeyPowTw.exists_twSec_keyPow _ H Dw l Xo c r U x hL.unf hL.xi hL.geo hL.pos hL.good
+  obtain ⟨hks, hK⟩ :=
+    GlobalTheory.KeyPowTw.exists_twSec_keyPow _ H Dw l Xo c r U x hL.unf hL.xi hL.geo hL.pos hL.good
   obtain ⟨K, hK0, hK1⟩ := hK Z (3 * (Dw.p + Dw.q))
   set κ : ℝ := ((3 * (Dw.p + Dw.q) : ℕ) : ℝ) *
     (2 * ((Nat.card (Psi H) * (Dw.p + Dw.q) : ℕ) : ℝ) * Real.log (2 * Real.pi)) with hκ
@@ -162,14 +210,16 @@ theorem exists_section {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.To
     congr 1
     push_cast
     ring
-  have hG : (11 + 1) • wtZ (0 : (D.host.E →+* ℂ) × ℕ → ℕ) (2 * (Dw.p + Dw.q)) +
-      wtOf Dw 0 (-(4 * ((3 * (Dw.p + Dw.q) : ℕ) : ℤ))) + wtOf Dw (parWt Dw fun _ => -(12 * ((Dw.p + Dw.q : ℕ) : ℤ))) 0 =
-      wtOf Dw ((8 : ℤ) • (u - uPrime Dw u)) 0 := by
+  have hG
+      : (11 + 1) • wtZ (0 : (D.host.E →+* ℂ) × ℕ → ℕ) (2 * (Dw.p + Dw.q))
+          + wtOf Dw 0 (-(4 * ((3 * (Dw.p + Dw.q) : ℕ) : ℤ)))
+          + wtOf Dw (parWt Dw fun _ => -(12 * ((Dw.p + Dw.q : ℕ) : ℤ))) 0
+        = wtOf Dw ((8 : ℤ) • (u - uPrime Dw u)) 0 := by
     rw [wtZ_zero_eq Dw, nsmul_wtOf, ← wtOf_add, ← wtOf_add, hw]
     congr 1
     · funext τ j
-      simp only [weightOf, hodgeWt, barWt, parWt, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply,
-        nsmul_eq_mul, Pi.mul_apply, Pi.natCast_apply]
+      simp only [weightOf, hodgeWt, barWt, parWt, Pi.add_apply, Pi.smul_apply, smul_eq_mul,
+        Pi.zero_apply, nsmul_eq_mul, Pi.mul_apply, Pi.natCast_apply]
       split_ifs <;> push_cast <;> ring
     · push_cast
       ring
@@ -183,47 +233,76 @@ theorem exists_section {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.To
     convert pow_mem_secZ this 2 using 2
     funext i
     cases i <;> simp [exZ, wtZ, ex]
-  have hmem : (f ^ 2) ^ (11 + 1) * K.sig * S.sig ∈ secZ Xo c (exZ Dw (wtOf Dw ((8 : ℤ) • (u - uPrime Dw u)) 0)) := by
+  have hmem
+      : (f ^ 2) ^ (11 + 1) * K.sig * S.sig
+        ∈ secZ Xo c (exZ Dw (wtOf Dw ((8 : ℤ) • (u - uPrime Dw u)) 0)) := by
     rw [← hG, exZ_add_eq, exZ_add_eq]
     refine mul_mem_secZ (mul_mem_secZ ?_ K.sig_mem) S.sig_mem
     convert pow_mem_secZ hf2 (11 + 1) using 2
     funext i
     cases i <;> simp [exZ, wtZ]
   have hsupp : (f ^ 2) ^ (11 + 1) * K.sig * S.sig ∈ suppOn Z := mul_mem_suppOn _ S.sig_mem_suppOn
-  have hnorm : ∀ σ, GoodEmb c σ → ∀ z ∈ framesOn (U σ) Z,
-      homN (U σ) x (wtOf Dw ((8 : ℤ) • (u - uPrime Dw u)) 0) ((f ^ 2) ^ (11 + 1) * K.sig * S.sig) z =
-        homN (U σ) x (wtZ 0 (2 * (Dw.p + Dw.q))) (f ^ 2) z ^ (11 + 1) * K.cInf σ * S.cInf σ := fun σ hσ => by
-    have h1 := fun z hz => S.homN_mul_sig (G := (11 + 1) • wtZ 0 (2 * (Dw.p + Dw.q)) +
-      wtOf Dw 0 (-(4 * ((3 * (Dw.p + Dw.q) : ℕ) : ℤ)))) (hev'.add K.even) ((f ^ 2) ^ (11 + 1) * K.sig) (σ := σ) (z := z) hz
+  have hnorm
+      : ∀ σ,
+        GoodEmb c σ
+          → ∀ z ∈ framesOn (U σ) Z,
+            homN (U σ) x (wtOf Dw ((8 : ℤ) • (u - uPrime Dw u)) 0)
+                ((f ^ 2) ^ (11 + 1) * K.sig * S.sig) z
+              = homN (U σ) x (wtZ 0 (2 * (Dw.p + Dw.q))) (f ^ 2) z ^ (11 + 1) * K.cInf σ
+                * S.cInf σ := fun σ hσ => by
+    have h1 := fun z hz =>
+      S.homN_mul_sig
+        (G :=
+          (11 + 1) • wtZ 0 (2 * (Dw.p + Dw.q)) + wtOf Dw 0 (-(4 * ((3 * (Dw.p + Dw.q) : ℕ) : ℤ))))
+        (hev'.add K.even) ((f ^ 2) ^ (11 + 1) * K.sig) (σ := σ) (z := z) hz
     have h2 := fun z hz => K.homN_mul_sig hev' ((f ^ 2) ^ (11 + 1)) (σ := σ) (z := z) hz
     rw [show goodOf c σ = σ from if_pos hσ] at h1 h2
     intro z hz
     rw [← hG, ← homN_pow (U σ) x hev _ z hz.1, ← h2 z hz]
     exact h1 z hz
-  refine ⟨(f ^ 2) ^ (11 + 1) * K.sig * S.sig, e, _, ⟨hmem, ?_, fun k g hg => ?_⟩, ?_, ⟨fun σ => ?_, ?_⟩, hc⟩
+  refine ⟨
+    (f ^ 2) ^ (11 + 1) * K.sig * S.sig,
+    e,
+    _,
+    ⟨hmem, ?_, fun k g hg => ?_⟩,
+    ?_,
+    ⟨fun σ => ?_, ?_⟩,
+    hc
+  ⟩
   · have h1 := congrArg (genVal Z) K.mul_inv
     have h2 := congrArg (genVal Z) S.mul_inv
     rw [map_mul, genVal_idem] at h1 h2
     rw [map_mul, map_mul, map_pow, map_pow]
-    exact mul_ne_zero (mul_ne_zero (pow_ne_zero _ (pow_ne_zero _ hfZ)) (left_ne_zero_of_mul_eq_one h1))
+    exact mul_ne_zero
+      (mul_ne_zero (pow_ne_zero _ (pow_ne_zero _ hfZ)) (left_ne_zero_of_mul_eq_one h1))
       (left_ne_zero_of_mul_eq_one h2)
-  · have h1 := GlobalTheory.BddCusp.mul_mem_cuspOn_of_bdd _ H Dw l Xo c r U x Z _ _ hks hL.unf hL.pos (even_wtOf _ _)
-      (fun τ i j hij _ => by rw [hw]; exact wtOf_hodge_anti _ τ i j hij) hmem hsupp fun σ hσ =>
-        ⟨A ^ (11 + 1) * K.cInf σ * S.cInf σ, fun z hz => by
-          rw [hnorm σ hσ z hz]
-          exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
-            (pow_le_pow_left₀ (homN_nonneg _ _ _ _ _) (hb σ hσ ⟨z.1, z.2, hz.1⟩ hz).1 _) (K.cInf_pos σ).le)
-            (S.cInf_pos σ).le⟩
+  · have h1 :=
+      GlobalTheory.BddCusp.mul_mem_cuspOn_of_bdd _ H Dw l Xo c r U x Z _ _ hks hL.unf hL.pos
+        (even_wtOf _ _)
+        (fun τ i j hij _ => by rw [hw]; exact wtOf_hodge_anti _ τ i j hij)
+        hmem hsupp
+        fun σ hσ => ⟨
+          A ^ (11 + 1) * K.cInf σ * S.cInf σ,
+          fun z hz => by
+            rw [hnorm σ hσ z hz]
+            exact mul_le_mul_of_nonneg_right
+              (mul_le_mul_of_nonneg_right
+                (pow_le_pow_left₀ (homN_nonneg _ _ _ _ _) (hb σ hσ ⟨z.1, z.2, hz.1⟩ hz).1 _)
+                (K.cInf_pos σ).le)
+              (S.cInf_pos σ).le
+        ⟩
     have h2 := pow_mul_mem (even_wtOf _ _) h1 k (by rw [nsmul_wtOf]; exact even_wtOf _ _) hg
     convert h2 using 2
     rw [nsmul_wtOf, nsmul_wtOf, nsmul_wtOf, ← wtOf_add]
     congr 1
     · funext τ j
-      simp only [Pi.add_apply, Pi.smul_apply, Pi.sub_apply, smul_eq_mul, nsmul_eq_mul, Pi.mul_apply, Pi.natCast_apply]
+      simp only [Pi.add_apply, Pi.smul_apply, Pi.sub_apply, smul_eq_mul, nsmul_eq_mul, Pi.mul_apply,
+        Pi.natCast_apply]
       push_cast
       ring
   · intro la T io e₀ ho y hy φ hφ
-    have hv : (fun g => nval T.V e₀ (evI y g)) ∈ valSet Xo c (algCls Xo c) la := ⟨PtV.mk la ho y hy () trivial, rfl⟩
+    have hv : (fun g => nval T.V e₀ (evI y g)) ∈ valSet Xo c (algCls Xo c) la :=
+      ⟨PtV.mk la ho y hy () trivial, rfl⟩
     rcases mem_valOn_or (Z := Z) hv with hv | hv
     · have h1 : ((φ / 625 / e₀ : ℝ) : EReal) ≤ nval T.V e₀ (evI y f) := by
         by_cases h0 : evI y f = 0
@@ -258,23 +337,30 @@ theorem exists_section {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.To
     have hk0 := K.cInf_pos σ
     rw [hnorm σ hσ _ hy]
     generalize homN (U σ) x (wtZ 0 (2 * (Dw.p + Dw.q))) (f ^ 2) ⟨y.1, y.2.1⟩ = a at h1 ha
-    have h2 : Real.exp (2 * (8 : ℕ) * (β / 2 + κ / 8 + Real.log (S.cInf σ) / 8)) =
-        (Real.exp κ * S.cInf σ) ^ 2 * Real.exp β ^ 8 := by
-      rw [← Real.exp_log hs, ← Real.exp_add, ← Real.exp_nat_mul, ← Real.exp_nat_mul, ← Real.exp_add, Real.log_exp]
+    have h2
+        : Real.exp (2 * (8 : ℕ) * (β / 2 + κ / 8 + Real.log (S.cInf σ) / 8))
+          = (Real.exp κ * S.cInf σ) ^ 2 * Real.exp β ^ 8 := by
+      rw [← Real.exp_log hs, ← Real.exp_add, ← Real.exp_nat_mul, ← Real.exp_nat_mul, ← Real.exp_add,
+        Real.log_exp]
       congr 1
       push_cast
       ring
-    rw [h2, ENNReal.ofReal_mul (sq_nonneg _), ENNReal.ofReal_pow (Real.exp_pos β).le, mul_assoc (ENNReal.ofReal _),
-      ← mul_pow]
+    rw [h2, ENNReal.ofReal_mul (sq_nonneg _), ENNReal.ofReal_pow (Real.exp_pos β).le,
+      mul_assoc (ENNReal.ofReal _), ← mul_pow]
     refine le_trans ?_ (mul_le_mul_right h1 _)
-    rw [← pow_mul, ← ENNReal.ofReal_pow ha, ← ENNReal.ofReal_pow (by positivity), ← ENNReal.ofReal_mul (by positivity)]
+    rw [← pow_mul, ← ENNReal.ofReal_pow ha, ← ENNReal.ofReal_pow (by positivity),
+      ← ENNReal.ofReal_mul (by positivity)]
     refine ENNReal.ofReal_le_ofReal ?_
-    calc (a ^ (11 + 1) * K.cInf σ * S.cInf σ) ^ 2 ≤ (a ^ (11 + 1) * Real.exp κ * S.cInf σ) ^ 2 := by gcongr
+    calc
+      (a ^ (11 + 1) * K.cInf σ * S.cInf σ) ^ 2
+        ≤ (a ^ (11 + 1) * Real.exp κ * S.cInf σ) ^ 2 := by gcongr
       _ = _ := by ring
 
-theorem twist_cost_le {f r p q L om PP : ℝ} (hf : 1 ≤ f) (hr : 1 ≤ r) (hL : 1 ≤ L) (hp : 0 ≤ p) (hq : 0 ≤ q) (hpq : p + q = r)
-    (ho : |om| ≤ 3 * L) (hP : (f * r * L) ^ 12 ≤ PP) :
-    3 * r * (2 * (f * r) * Real.log (2 * Real.pi)) / 8 - 12 * r * (f * ((p - q) / 2 * om)) / 8 ≤ 10 * PP := by
+theorem twist_cost_le
+    {f r p q L om PP : ℝ} (hf : 1 ≤ f) (hr : 1 ≤ r) (hL : 1 ≤ L) (hp : 0 ≤ p) (hq : 0 ≤ q)
+    (hpq : p + q = r) (ho : |om| ≤ 3 * L) (hP : (f * r * L) ^ 12 ≤ PP)
+    : 3 * r * (2 * (f * r) * Real.log (2 * Real.pi)) / 8 - 12 * r * (f * ((p - q) / 2 * om)) / 8
+      ≤ 10 * PP := by
   have h1 : Real.log (2 * Real.pi) ≤ 7 := by
     have := Real.log_le_sub_one_of_pos (show 0 < 2 * Real.pi by positivity)
     linarith [Real.pi_le_four]
@@ -294,7 +380,6 @@ theorem twist_cost_le {f r p q L om PP : ℝ} (hf : 1 ≤ f) (hr : 1 ≤ r) (hL 
   have h5 := mul_le_mul_of_nonneg_left h1 (show 0 ≤ f * r * r by positivity)
   have h6 := mul_le_mul_of_nonneg_left h2 (show 0 ≤ f * r by positivity)
   nlinarith
-
 
 end GlobalTheory.CovHt.KeySection
 

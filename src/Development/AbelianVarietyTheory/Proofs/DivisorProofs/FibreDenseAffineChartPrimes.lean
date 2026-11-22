@@ -8,12 +8,18 @@ open AlgebraicGeometry CategoryTheory Limits Topology
 
 namespace GlobalTheory
 
-theorem fibre_dense_affine_chart_primes : ∀ (X T : Scheme.{0}) (p : X ⟶ T) (W : X.Opens) (U : X.Opens) (V : T.Opens),
-    IsAffineOpen U → IsAffineOpen V → ∀ (e : U ≤ p ⁻¹ᵁ V),
-    (∀ x : X, x ∈ closure ((W : Set X) ∩ p ⁻¹' {p x})) →
-    ∀ b : Γ(X, U), (∀ (x : X) (hx : x ∈ U), x ∈ W → X.presheaf.germ U x hx b = 0) →
-    ∀ q : PrimeSpectrum Γ(X, U), q ∈ closure ({P : PrimeSpectrum Γ(X, U) | ∃ s ∉ P.asIdeal, s * b = 0} ∩
-      PrimeSpectrum.comap (p.appLE V U e).hom ⁻¹' {PrimeSpectrum.comap (p.appLE V U e).hom q}) := by
+theorem fibre_dense_affine_chart_primes
+    : ∀ (X T : Scheme.{0}) (p : X ⟶ T) (W : X.Opens) (U : X.Opens) (V : T.Opens),
+      IsAffineOpen U → IsAffineOpen V
+        → ∀ (e : U ≤ p ⁻¹ᵁ V),
+          (∀ x : X, x ∈ closure ((W : Set X) ∩ p ⁻¹' {p x}))
+            → ∀ b : Γ(X, U),
+              (∀ (x : X) (hx : x ∈ U), x ∈ W → X.presheaf.germ U x hx b = 0)
+                → ∀ q : PrimeSpectrum Γ(X, U),
+                  q ∈ closure
+                    ({P : PrimeSpectrum Γ(X, U) | ∃ s ∉ P.asIdeal, s * b = 0}
+                      ∩ PrimeSpectrum.comap (p.appLE V U e).hom
+                        ⁻¹' {PrimeSpectrum.comap (p.appLE V U e).hom q}) := by
   intro X T p W U V hU hV e hW b hb q
   set f := hU.fromSpec with hf
   have hemb : IsOpenEmbedding f := f.isOpenEmbedding
@@ -21,8 +27,9 @@ theorem fibre_dense_affine_chart_primes : ∀ (X T : Scheme.{0}) (p : X ⟶ T) (
   have hmemU : ∀ P : PrimeSpectrum Γ(X, U), f P ∈ U := fun P => hU.range_fromSpec.le ⟨P, rfl⟩
   have hprime : ∀ P : PrimeSpectrum Γ(X, U), hU.primeIdealOf ⟨f P, hmemU P⟩ = P := fun P =>
     hemb.injective (hU.fromSpec_primeIdealOf _)
-  have hcomap : ∀ P : PrimeSpectrum Γ(X, U),
-      PrimeSpectrum.comap (p.appLE V U e).hom P = hV.primeIdealOf ⟨p (f P), e (hmemU P)⟩ := by
+  have hcomap
+      : ∀ P : PrimeSpectrum Γ(X, U),
+        PrimeSpectrum.comap (p.appLE V U e).hom P = hV.primeIdealOf ⟨p (f P), e (hmemU P)⟩ := by
     intro P
     have := IsAffineOpen.comap_primeIdealOf_appLE (f := p) V hV U hU e (hmemU P)
     rw [hprime P] at this

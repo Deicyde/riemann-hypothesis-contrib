@@ -23,8 +23,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FinrankMa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.GalCut GlobalTheory.Published
 
@@ -34,39 +36,53 @@ namespace GlobalTheory.CMFam
 
 open IntermediateField
 
-theorem exists_qcm_adjoin (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (p : ℕ) (hp : 0 < p) (δ : Ω) (hδ : δ ^ 2 = -(p : Ω))
-    (hn : δ ∉ Set.range (algebraMap E Ω)) :
-    ∃ Q : GlobalTheory.RealGal.QCM E Ω, Q.K = IntermediateField.adjoin E {δ} :=
+theorem exists_qcm_adjoin
+    (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (p : ℕ) (hp : 0 < p)
+    (δ : Ω) (hδ : δ ^ 2 = -(p : Ω)) (hn : δ ∉ Set.range (algebraMap E Ω))
+    : ∃ Q : GlobalTheory.RealGal.QCM E Ω, Q.K = IntermediateField.adjoin E {δ} :=
   GlobalTheory.T.exists_cmQuadratic_adjoin_sqrt_neg_nat E Ω p hp δ hδ hn
 
-theorem isSplitAt_of_dvd (L : Type) [Field L] [NumberField L] [IsCMField L] (p q : ℕ) (δ : L) (hp : 0 < p)
-    (hδ : δ ^ 2 = -(p : L)) (hq : ((8 * q : ℕ) : ℤ) ∣ (p : ℤ) + 1) (w : HeightOneSpectrum (𝓞 L))
-    (hw : (q : 𝓞 L) ∈ w.asIdeal) : GlobalTheory.UnitaryBC.IsSplitAt w :=
+theorem isSplitAt_of_dvd
+    (L : Type) [Field L] [NumberField L] [IsCMField L]
+    (p q : ℕ)
+    (δ : L)
+    (hp : 0 < p) (hδ : δ ^ 2 = -(p : L)) (hq : ((8 * q : ℕ) : ℤ) ∣ (p : ℤ) + 1)
+    (w : HeightOneSpectrum (𝓞 L)) (hw : (q : 𝓞 L) ∈ w.asIdeal)
+    : GlobalTheory.UnitaryBC.IsSplitAt w :=
   GlobalTheory.T.isSplitPlaceBelowCMField_of_sqrt_neg_prime L p q δ hp hδ hq w hw
 
-theorem not_isUnramifiedAt (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] [Algebra E K]
-    (p : ℕ) (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr E) (δ : K) (hδ : δ ^ 2 = -(p : K))
-    (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈ w.asIdeal) :
-    ¬ Algebra.IsUnramifiedAt (𝓞 E) w.asIdeal :=
+theorem not_isUnramifiedAt
+    (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] [Algebra E K]
+    (p : ℕ) (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr E)
+    (δ : K) (hδ : δ ^ 2 = -(p : K))
+    (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈ w.asIdeal)
+    : ¬ Algebra.IsUnramifiedAt (𝓞 E) w.asIdeal :=
   GlobalTheory.T.not_isUnramifiedAt_of_sq_eq_neg_prime E K p hp hd δ hδ w hw
 
-theorem exists_unram (E : Type) [Field E] [NumberField E] [IsCMField E] :
-    ∃ N : ℕ, N ≠ 0 ∧ ∀ (K : Type) [Field K] [NumberField K] [IsCMField K] [Algebra E K]
-      (w : HeightOneSpectrum (𝓞 K)), (N : 𝓞 K) ∉ w.asIdeal →
-        Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield K)) w.asIdeal :=
+theorem exists_unram (E : Type) [Field E] [NumberField E] [IsCMField E]
+    : ∃ N : ℕ,
+      N ≠ 0
+        ∧ ∀ (K : Type) [Field K] [NumberField K] [IsCMField K] [Algebra E K]
+            (w : HeightOneSpectrum (𝓞 K)),
+          (N : 𝓞 K) ∉ w.asIdeal → Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield K)) w.asIdeal :=
   GlobalTheory.T.exists_nat_unramified_over_maximalRealSubfield E
 
-theorem even_finrank (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω]
-    (Q : GlobalTheory.RealGal.QCM E Ω) : Even (Module.finrank ℚ (maximalRealSubfield Q.K)) :=
+theorem even_finrank
+    (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω]
+    (Q : GlobalTheory.RealGal.QCM E Ω)
+    : Even (Module.finrank ℚ (maximalRealSubfield Q.K)) :=
   GlobalTheory.T.finrank_maximal_real_even E Ω Q
 
 end GlobalTheory.CMFam
 
 namespace GlobalTheory.CMFam
 
-theorem dvd_of_mem {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) {q n : ℕ} (hq : q.Prime)
-    (hqw : (q : 𝓞 K) ∈ w.asIdeal) (hn : (n : 𝓞 K) ∈ w.asIdeal) : q ∣ n := by
+theorem dvd_of_mem
+    {K : Type} [Field K] [NumberField K]
+    (w : HeightOneSpectrum (𝓞 K))
+    {q n : ℕ} (hq : q.Prime) (hqw : (q : 𝓞 K) ∈ w.asIdeal) (hn : (n : 𝓞 K) ∈ w.asIdeal)
+    : q ∣ n := by
   by_contra h
   have hc : Nat.gcd q n = 1 := (Nat.Prime.coprime_iff_not_dvd hq).2 h
   have hm : (((Nat.gcd q n : ℕ) : ℤ) : 𝓞 K) ∈ w.asIdeal := by
@@ -77,13 +93,14 @@ theorem dvd_of_mem {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (
   simp only [Nat.cast_one, Int.cast_one] at hm
   exact w.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 hm)
 
-theorem natCast_mem_under {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K] [Algebra E K]
-    (w : HeightOneSpectrum (𝓞 K)) (n : ℕ) : (n : 𝓞 E) ∈ (w.under (𝓞 E)).asIdeal ↔ (n : 𝓞 K) ∈ w.asIdeal := by
+theorem natCast_mem_under
+    {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K] [Algebra E K]
+    (w : HeightOneSpectrum (𝓞 K)) (n : ℕ)
+    : (n : 𝓞 E) ∈ (w.under (𝓞 E)).asIdeal ↔ (n : 𝓞 K) ∈ w.asIdeal := by
   change _ ∈ Ideal.comap _ _ ↔ _
   rw [Ideal.mem_comap, map_natCast]
 
 end GlobalTheory.CMFam
-
 
 open GlobalTheory.CMFam GlobalTheory.ExSplitCM in
 theorem GlobalTheory.GalCut.infinite_qcm_split_good : AutomorphicFormsFiniteGL → ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (a : ℕ) (π : CuspSub E a) (w₀ : HeightOneSpectrum (𝓞 E)), {Q : GlobalTheory.RealGal.QCM E Ω | (∀ A : ValuationSubring Ω, IsPlaceOver A w₀ → Dec (F := E) A ≤ (UpperTheory.V.Af.Bc.res E Ω ↥Q.K).range) ∧ (∀ w : HeightOneSpectrum (𝓞 ↥Q.K), w.under (𝓞 E) = w₀ → GlobalTheory.UnitaryBC.IsSplitAt w) ∧ (∃ w : HeightOneSpectrum (𝓞 ↥Q.K), ¬ Algebra.IsUnramifiedAt (𝓞 E) w.asIdeal ∧ ∃ B, (CG.mk π).HasSat (w.under (𝓞 E)) B) ∧ ∀ P : CuspSub ↥Q.K a, IsLift π P → Good l P}.Infinite := by

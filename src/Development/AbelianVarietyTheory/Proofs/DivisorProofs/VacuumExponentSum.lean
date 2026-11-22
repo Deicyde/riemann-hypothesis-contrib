@@ -15,7 +15,9 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsRealPoi
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct Kronecker ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -25,8 +27,8 @@ section Lin
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem idem_trace_det (P : Matrix ι ι ℂ) (hP : P * P = P) :
-    P.trace = P.rank ∧ ∀ u : ℂ, (u • P + (1 - P)).det = u ^ P.rank := by
+theorem idem_trace_det (P : Matrix ι ι ℂ) (hP : P * P = P)
+    : P.trace = P.rank ∧ ∀ u : ℂ, (u • P + (1 - P)).det = u ^ P.rank := by
   have hi : IsIdempotentElem (Matrix.toLin' P) := by
     unfold IsIdempotentElem
     rw [Module.End.mul_eq_comp, ← Matrix.toLin'_mul, hP]
@@ -38,36 +40,44 @@ theorem idem_trace_det (P : Matrix ι ι ℂ) (hP : P * P = P) :
   · rw [← LinearMap.det_toLin']
     have e := hp.eq_conj_prodMap
     set c := (Submodule.prodEquivOfIsCompl _ _ hp.isCompl)
-    have e2 : Matrix.toLin' (u • P + (1 - P)) = c.conj (LinearMap.prodMap (u • LinearMap.id) LinearMap.id) := by
-      have : LinearMap.prodMap (u • LinearMap.id) LinearMap.id =
-          u • LinearMap.prodMap (LinearMap.id : LinearMap.range (Matrix.toLin' P) →ₗ[ℂ] _) (0 : LinearMap.ker (Matrix.toLin' P) →ₗ[ℂ] _)
+    have e2
+        : Matrix.toLin' (u • P + (1 - P))
+          = c.conj (LinearMap.prodMap (u • LinearMap.id) LinearMap.id) := by
+      have : LinearMap.prodMap (u • LinearMap.id) LinearMap.id
+          = u • LinearMap.prodMap (LinearMap.id : LinearMap.range (Matrix.toLin' P) →ₗ[ℂ] _)
+              (0 : LinearMap.ker (Matrix.toLin' P) →ₗ[ℂ] _)
             + (1 - LinearMap.prodMap LinearMap.id 0) := by
         refine LinearMap.ext fun x => ?_
         ext <;> simp
-      rw [this, map_add (f := _), map_add (f := _), map_smul, map_smul, map_sub, map_sub, ← e, Matrix.toLin'_one]
+      rw [this, map_add (f := _), map_add (f := _), map_smul, map_smul, map_sub, map_sub, ← e,
+        Matrix.toLin'_one]
       congr 2
       exact (LinearEquiv.conj_id c).symm
-    rw [e2, LinearEquiv.conj_apply, LinearMap.comp_assoc, LinearMap.det_conj, LinearMap.det_prodMap, LinearMap.det_smul,
-      LinearMap.det_id, LinearMap.det_id, hr, mul_one, mul_one]
+    rw [e2, LinearEquiv.conj_apply, LinearMap.comp_assoc, LinearMap.det_conj, LinearMap.det_prodMap,
+      LinearMap.det_smul, LinearMap.det_id, LinearMap.det_id, hr, mul_one, mul_one]
 
-theorem half_idem {s : Matrix ι ι ℂ} (hs : s * s = 1) :
-    ((1 / 2 : ℂ) • (1 + s)) * ((1 / 2 : ℂ) • (1 + s)) = (1 / 2 : ℂ) • (1 + s) := by
+theorem half_idem {s : Matrix ι ι ℂ} (hs : s * s = 1)
+    : ((1 / 2 : ℂ) • (1 + s)) * ((1 / 2 : ℂ) • (1 + s)) = (1 / 2 : ℂ) • (1 + s) := by
   simp only [Matrix.smul_mul, Matrix.mul_smul, mul_add, add_mul, hs, mul_one, one_mul]
   module
 
-theorem le_rank_half {m : ℕ} {G s t : Matrix ι ι ℂ} (hpos : (G * s).PosDef) (ht : t = s ∨ t = -s)
-    (B : Matrix ι (Fin m) ℂ) (C : Matrix (Fin m) ι ℂ) (hC : C * B = 1) (hB : Bᴴ * G * B = 0) :
-    m ≤ ((1 / 2 : ℂ) • (1 + t)).rank := by
+theorem le_rank_half
+    {m : ℕ} {G s t : Matrix ι ι ℂ} (hpos : (G * s).PosDef) (ht : t = s ∨ t = -s)
+    (B : Matrix ι (Fin m) ℂ) (C : Matrix (Fin m) ι ℂ) (hC : C * B = 1) (hB : Bᴴ * G * B = 0)
+    : m ≤ ((1 / 2 : ℂ) • (1 + t)).rank := by
   refine le_trans ?_ (Matrix.rank_mul_le_left _ B)
   have hinj : Function.Injective (((1 / 2 : ℂ) • (1 + t)) * B).mulVecLin := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     have h1 : B *ᵥ a + t *ᵥ (B *ᵥ a) = 0 := by
-      rw [Matrix.mulVecLin_apply, ← Matrix.mulVec_mulVec, Matrix.smul_mulVec, Matrix.add_mulVec, Matrix.one_mulVec] at ha
+      rw [Matrix.mulVecLin_apply, ← Matrix.mulVec_mulVec, Matrix.smul_mulVec, Matrix.add_mulVec,
+          Matrix.one_mulVec]
+        at ha
       exact (smul_eq_zero.1 ha).resolve_left (by norm_num)
     have h2 : star (B *ᵥ a) ⬝ᵥ G *ᵥ (B *ᵥ a) = 0 := by
-      rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hB,
-        Matrix.zero_mulVec, dotProduct_zero]
+      rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
+        Matrix.mulVec_mulVec, hB, Matrix.zero_mulVec, dotProduct_zero]
     have h3 : star (B *ᵥ a) ⬝ᵥ (G * s) *ᵥ (B *ᵥ a) = 0 := by
       rw [← Matrix.mulVec_mulVec]
       rcases ht with rfl | rfl
@@ -82,15 +92,19 @@ theorem le_rank_half {m : ℕ} {G s t : Matrix ι ι ℂ} (hpos : (G * s).PosDef
   rw [LinearMap.finrank_range_of_inj hinj]
   simp
 
-theorem trace_eq_zero {m : ℕ} {G s : Matrix ι ι ℂ} (hs : s * s = 1) (hpos : (G * s).PosDef) (hm : 2 * m = Fintype.card ι)
-    (B : Matrix ι (Fin m) ℂ) (C : Matrix (Fin m) ι ℂ) (hC : C * B = 1) (hB : Bᴴ * G * B = 0) : s.trace = 0 := by
+theorem trace_eq_zero
+    {m : ℕ} {G s : Matrix ι ι ℂ}
+    (hs : s * s = 1) (hpos : (G * s).PosDef) (hm : 2 * m = Fintype.card ι) (B : Matrix ι (Fin m) ℂ)
+    (C : Matrix (Fin m) ι ℂ) (hC : C * B = 1) (hB : Bᴴ * G * B = 0)
+    : s.trace = 0 := by
   have a1 := le_rank_half hpos (Or.inl rfl) B C hC hB
   have a2 := le_rank_half hpos (Or.inr rfl) B C hC hB
   have b1 := (idem_trace_det _ (half_idem hs)).1
   have b2 := (idem_trace_det _ (half_idem (s := -s) (by rw [neg_mul_neg, hs]))).1
   rw [Matrix.trace_smul, Matrix.trace_add, Matrix.trace_one, ← hm, smul_eq_mul] at b1 b2
   rw [Matrix.trace_neg] at b2
-  have c : ((((1 / 2 : ℂ) • (1 + s)).rank + ((1 / 2 : ℂ) • (1 + -s)).rank : ℕ) : ℂ) = (2 * m : ℕ) := by
+  have c
+      : ((((1 / 2 : ℂ) • (1 + s)).rank + ((1 / 2 : ℂ) • (1 + -s)).rank : ℕ) : ℂ) = (2 * m : ℕ) := by
     rw [Nat.cast_add, ← b1, ← b2]; ring
   have c' := Nat.cast_injective c
   have d : ((1 / 2 : ℂ) • (1 + s)).rank = m := by omega

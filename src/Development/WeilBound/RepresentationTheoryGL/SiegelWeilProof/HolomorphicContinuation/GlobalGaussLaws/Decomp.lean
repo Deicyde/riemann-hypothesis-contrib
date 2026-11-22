@@ -61,8 +61,9 @@ theorem decomp : Decomp := by
     intro X Y hX hY
     unfold InG at *
     rw [conjTranspose_mul]
-    calc Yᴴ * Xᴴ * JJ n * (X * Y) = Yᴴ * (Xᴴ * JJ n * X) * Y := by
-          simp only [Matrix.mul_assoc]
+    calc
+      Yᴴ * Xᴴ * JJ n * (X * Y)
+        = Yᴴ * (Xᴴ * JJ n * X) * Y := by simp only [Matrix.mul_assoc]
       _ = JJ n := by rw [hX, hY]
   have hg : InG (mR y) := y.2
   have hdet : IsUnit (mR y).det := Matrix.isUnits_det_units (y : GL (Fin n ⊕ Fin n) ℂ)
@@ -88,25 +89,29 @@ theorem decomp : Decomp := by
   obtain ⟨s1, -, s3, -⟩ := inG_blocks_dual hG
   have hb : (P⁻¹ * Q)ᴴ = P⁻¹ * Q := by
     rw [conjTranspose_mul, conjTranspose_nonsing_inv]
-    calc Qᴴ * Pᴴ⁻¹ = P⁻¹ * (P * Qᴴ) * Pᴴ⁻¹ := by
-          rw [← Matrix.mul_assoc P⁻¹, nonsing_inv_mul _ hPu, Matrix.one_mul]
+    calc
+      Qᴴ * Pᴴ⁻¹ = P⁻¹ * (P * Qᴴ) * Pᴴ⁻¹ := by
+        rw [← Matrix.mul_assoc P⁻¹, nonsing_inv_mul _ hPu, Matrix.one_mul]
       _ = P⁻¹ * (Q * Pᴴ) * Pᴴ⁻¹ := by rw [s1]
       _ = P⁻¹ * Q := by
-          rw [Matrix.mul_assoc, Matrix.mul_assoc, mul_nonsing_inv _ hPHu, Matrix.mul_one]
+        rw [Matrix.mul_assoc, Matrix.mul_assoc, mul_nonsing_inv _ hPHu, Matrix.mul_one]
   have hc : (C * P⁻¹)ᴴ = C * P⁻¹ := by
     rw [conjTranspose_mul, conjTranspose_nonsing_inv]
-    calc Pᴴ⁻¹ * Cᴴ = Pᴴ⁻¹ * (Cᴴ * P) * P⁻¹ := by
-          rw [Matrix.mul_assoc (Pᴴ⁻¹), Matrix.mul_assoc Cᴴ, mul_nonsing_inv _ hPu, Matrix.mul_one]
+    calc
+      Pᴴ⁻¹ * Cᴴ = Pᴴ⁻¹ * (Cᴴ * P) * P⁻¹ := by
+        rw [Matrix.mul_assoc (Pᴴ⁻¹), Matrix.mul_assoc Cᴴ, mul_nonsing_inv _ hPu, Matrix.mul_one]
       _ = Pᴴ⁻¹ * (Pᴴ * C) * P⁻¹ := by rw [r1]
-      _ = C * P⁻¹ := by
-          rw [← Matrix.mul_assoc, nonsing_inv_mul _ hPHu, Matrix.one_mul]
+      _ = C * P⁻¹ := by rw [← Matrix.mul_assoc, nonsing_inv_mul _ hPHu, Matrix.one_mul]
   have hD : D = C * (P⁻¹ * Q) + Pᴴ⁻¹ := by
     have h1 : D * Pᴴ = C * Qᴴ + 1 := by
-      calc D * Pᴴ = C * Qᴴ - (C * Qᴴ - D * Pᴴ) := by abel
+      calc
+        D * Pᴴ
+          = C * Qᴴ - (C * Qᴴ - D * Pᴴ) := by abel
         _ = C * Qᴴ + 1 := by rw [s3]; abel
     have h2 := hb
     rw [conjTranspose_mul, conjTranspose_nonsing_inv] at h2
-    calc D = D * Pᴴ * Pᴴ⁻¹ := by rw [Matrix.mul_assoc, mul_nonsing_inv _ hPHu, Matrix.mul_one]
+    calc
+      D = D * Pᴴ * Pᴴ⁻¹ := by rw [Matrix.mul_assoc, mul_nonsing_inv _ hPHu, Matrix.mul_one]
       _ = (C * Qᴴ + 1) * Pᴴ⁻¹ := by rw [h1]
       _ = C * (Qᴴ * Pᴴ⁻¹) + Pᴴ⁻¹ := by rw [Matrix.add_mul, Matrix.one_mul, Matrix.mul_assoc]
       _ = C * (P⁻¹ * Q) + Pᴴ⁻¹ := by rw [h2]
@@ -123,12 +128,17 @@ theorem decomp : Decomp := by
     unfold nU
     rw [fromBlocks_multiply]
     simp [hP, hQ]
-  refine ⟨mkGR (nU ((t : ℂ) • 1)) (by rw [det_nU]; exact isUnit_one) (inG_nU (by simp)),
+  refine ⟨
+    mkGR (nU ((t : ℂ) • 1)) (by rw [det_nU]; exact isUnit_one) (inG_nU (by simp)),
     mkGR (nbar (C * P⁻¹)) (by rw [det_nbar]; exact isUnit_one) (inG_nbar hc),
     mkGR (mM P) (isUnit_det_mM hPu) (inG_mM hPu),
-    mkGR (nU (P⁻¹ * Q)) (by rw [det_nU]; exact isUnit_one) (inG_nU hb), ?_,
-    ⟨t, mR_mkGR _ _ _⟩, ⟨C * P⁻¹, hc, mR_mkGR _ _ _⟩, ⟨P, hPu, mR_mkGR _ _ _⟩,
-    ⟨P⁻¹ * Q, hb, mR_mkGR _ _ _⟩⟩
+    mkGR (nU (P⁻¹ * Q)) (by rw [det_nU]; exact isUnit_one) (inG_nU hb),
+    ?_,
+    ⟨t, mR_mkGR _ _ _⟩,
+    ⟨C * P⁻¹, hc, mR_mkGR _ _ _⟩,
+    ⟨P, hPu, mR_mkGR _ _ _⟩,
+    ⟨P⁻¹ * Q, hb, mR_mkGR _ _ _⟩
+  ⟩
   apply Subtype.ext
   apply Units.ext
   show mR y = mR _ * mR _ * mR _ * mR _

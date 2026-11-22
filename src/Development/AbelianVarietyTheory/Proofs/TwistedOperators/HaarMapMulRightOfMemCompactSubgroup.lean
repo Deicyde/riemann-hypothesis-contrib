@@ -9,10 +9,13 @@ open scoped Pointwise NNReal ENNReal
 
 namespace GlobalTheory
 
-theorem haar_map_mul_right_of_mem_compact_subgroup {G : Type} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G]
-    [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (K : Subgroup G) (hK : IsCompact (K : Set G))
-    (k : G) (hk : k ∈ K) : Measure.map (fun g => g * k) μ = μ := by
+theorem haar_map_mul_right_of_mem_compact_subgroup
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsHaarMeasure]
+    (K : Subgroup G) (hK : IsCompact (K : Set G))
+    (k : G) (hk : k ∈ K)
+    : Measure.map (fun g => g * k) μ = μ := by
   have h := Measure.isMulLeftInvariant_eq_smul (Measure.map (fun g => g * k) μ) μ
   set c := Measure.haarScalarFactor (Measure.map (fun g => g * k) μ) μ with hc
   obtain ⟨C, hC, hC1⟩ := exists_compact_mem_nhds (1 : G)

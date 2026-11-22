@@ -12,12 +12,15 @@ noncomputable section
 open MeasureTheory Matrix Finset GlobalTheory.OpTrace GlobalTheory.AutomorphicL2Unitary
 open scoped InnerProductSpace ComplexConjugate ContDiff
 open PositivityTheory.RgTw (Mat G th IsThetaOp)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem UpperTheory.RealTr.kerReg :
-    ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (E : KMod n) (k : Mat n → (E.V →L[ℂ] E.V)) (val : Inf n → ℂ) (T : ℝ), IsMult μ E k val T → KerReg E k := by
+theorem UpperTheory.RealTr.kerReg
+    : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
+        (E : KMod n) (k : Mat n → (E.V →L[ℂ] E.V)) (val : Inf n → ℂ) (T : ℝ),
+      IsMult μ E k val T → KerReg E k := by
   intro n _ _ μ _ E k val T hM
   obtain ⟨m, c, w, g, ks, hks, hsum, -⟩ := hM
   have hmem : ∀ x : Mat n, x ∈ GLs n ↔ IsUnit x := (UpperTheory.RealTr.basic n).2.1

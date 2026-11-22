@@ -8,7 +8,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 @[expose] public section
 
 open PositivityTheory.Rg.Mass
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology Filter
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology Filter
 open scoped TensorProduct ENNReal NNReal
 
 noncomputable section
@@ -17,25 +18,29 @@ namespace GlobalTheory.CompanionTheory.SW.FibreCpt
 
 open GlobalTheory.CompanionTheory.SW.FibreRatio
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E}
 
-theorem masses_field (R : Type) [Field R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R]
-    [BorelSpace R] (hloc : IsLocR R) (h : IsCMExt F E σ) (hJ : IsHermND σ J)
-    {d : ℕ} (b : Module.Basis (Fin d) F E) (lam : Measure R) (hlam : lam.IsAddHaarMeasure)
+theorem masses_field
+    (R : Type) [Field R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R] [BorelSpace R]
+    (hloc : IsLocR R) (h : IsCMExt F E σ) (hJ : IsHermND σ J)
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (lam : Measure R) (hlam : lam.IsAddHaarMeasure)
     (m : HermR R σ 1 → Measure (Fin 1 → Fin M → R ⊗[F] E))
     (hfib : IsGramFib R σ J 1 (coordW R b lam 1 M) (coordHerm R σ b lam 1) m)
-    (A : Set (Fin 1 → Fin M → R ⊗[F] E)) (hAc : IsCompact A) (hAo : IsOpen A)
-    (hAU : A ⊆ {X | IsUnit (gramR R σ J X).det}) :
-    Continuous (fun s : R => (m (hermScal R σ s) A).toReal) ∧
-    HasCompactSupport (fun s : R => (m (hermScal R σ s) A).toReal) ∧
-    ENNReal.ofReal (∫ s, (m (hermScal R σ s) A).toReal ∂lam) = coordW R b lam 1 M A := by
+    (A : Set (Fin 1 → Fin M → R ⊗[F] E))
+    (hAc : IsCompact A) (hAo : IsOpen A) (hAU : A ⊆ {X | IsUnit (gramR R σ J X).det})
+    : Continuous (fun s : R => (m (hermScal R σ s) A).toReal)
+      ∧ HasCompactSupport (fun s : R => (m (hermScal R σ s) A).toReal)
+      ∧ ENNReal.ofReal (∫ s, (m (hermScal R σ s) A).toReal ∂lam) = coordW R b lam 1 M A := by
   obtain ⟨h1, h2, h3, h4, -⟩ := id hloc
   haveI := h1
   haveI := h2
   haveI := h3
   haveI := h4
-  obtain ⟨-, -, -, hT2, -, htr, -, hBor, -, hgr⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ h R
+  obtain ⟨-, -, -, hT2, -, htr, -, hBor, -, hgr⟩ :=
+    GlobalTheory.T.tensor_locally_compact_ring F E σ h R
   haveI := hT2
   haveI := hBor 1 M
   haveI : BorelSpace (HermR R σ 1) := ⟨rfl⟩
@@ -49,7 +54,9 @@ theorem masses_field (R : Type) [Field R] [Algebra F R] [TopologicalSpace R] [Me
     continuous_indicator (by simp [hAclopen.frontier_eq]) continuousOn_const
   have hφs : HasCompactSupport φ :=
     HasCompactSupport.intro hAc fun x hx => Set.indicator_of_notMem hx _
-  obtain ⟨⟨hg, -⟩, -⟩ := GlobalTheory.T.gram_fiber_integral_isContDensityOn F E σ h M J hJ R hloc 1 _ _ m hμ hν hfib φ hφc hφs
+  obtain ⟨⟨hg, -⟩, -⟩ :=
+    GlobalTheory.T.gram_fiber_integral_isContDensityOn F E σ h M J hJ R hloc 1 _ _ m hμ hν hfib φ
+      hφc hφs
   have hfin : ∀ S, m S A < ⊤ := fun S => by
     haveI := (GlobalTheory.T.gram_fiber_measure_locallyFinite_and_ne_zero_of_isOpen F E σ h M J hJ R hloc 1 _ _ m hμ hν hfib S).1
     exact hAc.measure_lt_top
@@ -94,8 +101,9 @@ theorem masses_field (R : Type) [Field R] [Algebra F R] [TopologicalSpace R] [Me
         filter_upwards [hKc.isClosed.isOpen_compl.mem_nhds hK0] with t ht
         simp [hzero t ht]
       exact continuousAt_const.congr hev
-    · have hunit : hermScal R σ s ∈
-          {S : HermR R σ 1 | IsUnit (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)).det} := by
+    · have hunit
+          : hermScal R σ s
+            ∈ {S : HermR R σ 1 | IsUnit (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)).det} := by
         show IsUnit (Matrix.det _)
         rw [Matrix.det_fin_one]
         exact isUnit_tmul R hs
@@ -122,23 +130,29 @@ theorem masses_field (R : Type) [Field R] [Algebra F R] [TopologicalSpace R] [Me
   have hgS : ∀ S, m S A = ENNReal.ofReal ((m (hermScal R σ (qS R σ S)) A).toReal) := fun S => by
     rw [hermScal_qS R h S, ENNReal.ofReal_toReal (hfin S).ne]
   have hgm : Measurable fun S : HermR R σ 1 => m S A := by
-    have e : (fun S : HermR R σ 1 => m S A) =
-        fun S => ENNReal.ofReal ((m (hermScal R σ (qS R σ S)) A).toReal) := funext hgS
+    have e
+        : (fun S : HermR R σ 1 => m S A)
+          = fun S => ENNReal.ofReal ((m (hermScal R σ (qS R σ S)) A).toReal) :=
+      funext hgS
     rw [e]
     exact ENNReal.measurable_ofReal.comp (hcont.comp (continuous_qS R htr)).measurable
   have hV : MeasurableSet ({0}ᶜ : Set R) := (measurableSet_singleton 0).compl
   have hP : MeasurableSet {S : HermR R σ 1 | qS R σ S ∈ ({0}ᶜ : Set R)} :=
     (continuous_qS R htr).measurable hV
-  have hQ : MeasurableSet {X : Fin 1 → Fin M → R ⊗[F] E |
-      algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (gramR R σ J X 0 0) ∈ ({0}ᶜ : Set R)} :=
+  have hQ : MeasurableSet
+      {X : Fin 1 → Fin M → R ⊗[F] E |
+        algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (gramR R σ J X 0 0) ∈ ({0}ᶜ : Set R)} :=
     hqc.measurable hV
   have heq := mass_eq_lintegral R h hJ hfib hAm (V := {0}ᶜ) (by simp) hQ hP
-  have hAQ : A ∩ {X : Fin 1 → Fin M → R ⊗[F] E |
-      algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (gramR R σ J X 0 0) ∈ ({0}ᶜ : Set R)} = A := by
+  have hAQ
+      : A ∩ {X : Fin 1 → Fin M → R ⊗[F] E |
+          algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (gramR R σ J X 0 0) ∈ ({0}ᶜ : Set R)}
+        = A := by
     refine Set.inter_eq_left.mpr fun X hX e => hK0 ⟨X, hX, e⟩
   rw [hAQ, ← lintegral_indicator hP] at heq
-  have hind : {S : HermR R σ 1 | qS R σ S ∈ ({0}ᶜ : Set R)}.indicator (fun S => m S A) =
-      fun S => m S A := by
+  have hind
+      : {S : HermR R σ 1 | qS R σ S ∈ ({0}ᶜ : Set R)}.indicator (fun S => m S A)
+        = fun S => m S A := by
     funext S
     by_cases hS : S ∈ {S : HermR R σ 1 | qS R σ S ∈ ({0}ᶜ : Set R)}
     · exact Set.indicator_of_mem hS _
@@ -148,19 +162,32 @@ theorem masses_field (R : Type) [Field R] [Algebra F R] [TopologicalSpace R] [Me
       rw [e, hzero 0 hK0]
   rw [hind, hνeq, lintegral_map hgm hcs.measurable] at heq
   rw [ofReal_integral_eq_lintegral_ofReal (hcont.integrable_of_hasCompactSupport hsupp)
-    (ae_of_all _ fun _ => ENNReal.toReal_nonneg), heq]
+      (ae_of_all _ fun _ => ENNReal.toReal_nonneg),
+    heq]
   exact lintegral_congr fun s => ENNReal.ofReal_toReal (hfin _).ne
 
-theorem fibre_masses : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ →
-  ∀ (J : Matrix (Fin 2) (Fin 2) E), IsHermND σ J → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-  (lam : Measure (Fv F v)), IsStdV v lam → ∀ (m : HermR (Fv F v) σ 1 → Measure (Fin 1 → Fin 2 → Fv F v ⊗[F] E)),
-  IsGramFib (Fv F v) σ J 1 (coordW (Fv F v) b lam 1 2) (coordHerm (Fv F v) σ b lam 1) m →
-  ∀ A : Set (Fin 1 → Fin 2 → Fv F v ⊗[F] E), IsCompact A → IsOpen A → A ⊆ {X | IsUnit (gramR (Fv F v) σ J X).det} →
-  Continuous (fun s : Fv F v => (m (hermScal (Fv F v) σ s) A).toReal) ∧
-  HasCompactSupport (fun s : Fv F v => (m (hermScal (Fv F v) σ s) A).toReal) ∧
-  ENNReal.ofReal (∫ s, (m (hermScal (Fv F v) σ s) A).toReal ∂lam) = coordW (Fv F v) b lam 1 2 A := by
+theorem fibre_masses
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (J : Matrix (Fin 2) (Fin 2) E),
+          IsHermND σ J
+            → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
+                (lam : Measure (Fv F v)),
+              IsStdV v lam
+                → ∀ (m : HermR (Fv F v) σ 1 → Measure (Fin 1 → Fin 2 → Fv F v ⊗[F] E)),
+                  IsGramFib (Fv F v) σ J 1 (coordW (Fv F v) b lam 1 2)
+                      (coordHerm (Fv F v) σ b lam 1) m
+                    → ∀ A : Set (Fin 1 → Fin 2 → Fv F v ⊗[F] E),
+                      IsCompact A → IsOpen A → A ⊆ {X | IsUnit (gramR (Fv F v) σ J X).det}
+                        → Continuous (fun s : Fv F v => (m (hermScal (Fv F v) σ s) A).toReal)
+                          ∧ HasCompactSupport (fun s : Fv F v =>
+                            (m (hermScal (Fv F v) σ s) A).toReal)
+                          ∧ ENNReal.ofReal (∫ s, (m (hermScal (Fv F v) σ s) A).toReal ∂lam)
+                            = coordW (Fv F v) b lam 1 2 A := by
   intro F E _ _ _ _ _ σ hσ J hJ d b v lam hlam m hfib A hAc hAo hAU
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
-  exact masses_field (Fv F v) (GlobalTheory.T.completion_is_local_ring F v) hσ hJ b lam hlam.1 m hfib A hAc hAo hAU
+  exact masses_field (Fv F v) (GlobalTheory.T.completion_is_local_ring F v) hσ hJ b lam hlam.1 m
+    hfib A hAc hAo hAU
 
 end GlobalTheory.CompanionTheory.SW.FibreCpt

@@ -6,12 +6,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open MeasureTheory NumberField IsDedekindDomain Filter ValuativeRel
 open GroundTheory.Global GroundTheory.Global.SemiLocal
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Loc GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Loc
+  GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open UpperTheory.Gal.LocD UpperTheory.Gal.InertialTypesAlt.G UpperTheory.Gal.Join
 open scoped Classical
 
-theorem UpperTheory.Gal.Join.traceQuot :
-    UpperTheory.Gal.Join.TraceQuot := by
+theorem UpperTheory.Gal.Join.traceQuot : UpperTheory.Gal.Join.TraceQuot := by
   intro V W _ _ _ _ S _ B p T hB hBT hnil
   have hTP : ∀ y ∈ Submodule.map p S, T y ∈ Submodule.map p S := by
     rintro _ ⟨v, hv, rfl⟩
@@ -24,10 +25,13 @@ theorem UpperTheory.Gal.Join.traceQuot :
   refine ⟨inferInstance, ?_⟩
   unfold trIn
   rw [dite_eq_left hTP]
-  have h1 : LinearMap.trace ℂ (LinearMap.range B) (B.restrict (fun x _ => (⟨x, rfl⟩ : B x ∈ LinearMap.range B)))
-      = LinearMap.trace ℂ S (B.restrict hBS) := by
-    have key := LinearMap.trace_restrict_eq_of_forall_mem ((LinearMap.range B).comap S.subtype)
-      (B.restrict hBS) (fun x => show B x ∈ LinearMap.range B from ⟨x, rfl⟩)
+  have h1
+      : LinearMap.trace ℂ (LinearMap.range B)
+          (B.restrict (fun x _ => (⟨x, rfl⟩ : B x ∈ LinearMap.range B)))
+        = LinearMap.trace ℂ S (B.restrict hBS) := by
+    have key :=
+      LinearMap.trace_restrict_eq_of_forall_mem ((LinearMap.range B).comap S.subtype)
+        (B.restrict hBS) (fun x => show B x ∈ LinearMap.range B from ⟨x, rfl⟩)
     rw [← key, ← LinearMap.trace_conj' _ (Submodule.comapSubtypeEquivOfLe hRS)]
     congr 1
   rw [h1]
@@ -76,7 +80,8 @@ theorem UpperTheory.Gal.Join.traceQuot :
         rw [pow_succ', Module.End.mul_apply, pow_succ', Module.End.mul_apply, ← ih]
         have hy : q ((f ^ n) k).1 = 0 := ((f ^ n) k).2
         show ((E (BS ((f ^ n) k).1)) : V) = B ((f ^ n) k).1.1
-        rw [hEdef, LinearMap.sub_apply, LinearMap.id_apply, LinearMap.comp_apply, hqB _ hy, map_zero, sub_zero]
+        rw [hEdef, LinearMap.sub_apply, LinearMap.id_apply, LinearMap.comp_apply, hqB _ hy,
+          map_zero, sub_zero]
         rfl
     apply Subtype.ext
     apply Subtype.ext

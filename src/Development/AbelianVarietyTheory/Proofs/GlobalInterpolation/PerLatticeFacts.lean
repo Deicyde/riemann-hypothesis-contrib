@@ -7,26 +7,39 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.RelInd
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.L2.Th1.H GlobalTheory.IndefiniteRowSideFullHecke.JetSumTable GlobalTheory.MomT
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.L2.Th1.H
+  GlobalTheory.IndefiniteRowSideFullHecke.JetSumTable GlobalTheory.MomT
 
 namespace GlobalTheory.MomT.LatFin
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.MomT.LatFin.per_lattice_facts : ∀ (X : _root_.Formalism.L2.Col.Fields) (A : _root_.Formalism.L2.Ker.Amb X) (a b : ℕ)
-    (N : Submodule (𝓞 X.E) (_root_.Formalism.L2.Col.Sp X.E a)) (N' : Submodule (𝓞 X.E) (_root_.Formalism.L2.Col.Sp X.E b)),
-    A.AA.FG → A.AA ≠ ⊥ → _root_.Formalism.L2.Col.IsSdLat N → _root_.Formalism.L2.Col.IsSdLat N' → (_root_.GlobalTheory.MomT.per A N N').FG ∧
-    (∀ x : _root_.Formalism.L2.Col.HomE X.E a b, ∃ n : ℕ, 0 < n ∧ (n : X.E) • x ∈ _root_.GlobalTheory.MomT.per A N N') ∧
-    (∀ r : 𝓞 X.E, r ≠ 0 → (_root_.GlobalTheory.MomT.smulLat (r : X.E)
-      (_root_.GlobalTheory.MomT.per A N N')).toAddSubgroup.relIndex
-        (_root_.GlobalTheory.MomT.per A N N').toAddSubgroup ≠ 0) ∧
-    ∀ P : HeightOneSpectrum (𝓞 X.E), _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal A.AA =
-      _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (1 : Submodule (𝓞 X.E) X.E) → ∀ y : _root_.Formalism.L2.Col.HomE X.E a b,
-      y ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (_root_.GlobalTheory.MomT.per A N N') ↔
-        ∀ v ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N, y v ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N' := by
+theorem _root_.GlobalTheory.MomT.LatFin.per_lattice_facts
+    : ∀ (X : _root_.Formalism.L2.Col.Fields) (A : _root_.Formalism.L2.Ker.Amb X) (a b : ℕ)
+        (N : Submodule (𝓞 X.E) (_root_.Formalism.L2.Col.Sp X.E a))
+        (N' : Submodule (𝓞 X.E) (_root_.Formalism.L2.Col.Sp X.E b)),
+      A.AA.FG → A.AA ≠ ⊥ → _root_.Formalism.L2.Col.IsSdLat N → _root_.Formalism.L2.Col.IsSdLat N'
+        → (_root_.GlobalTheory.MomT.per A N N').FG
+          ∧ (∀ x : _root_.Formalism.L2.Col.HomE X.E a b, ∃ n : ℕ,
+            0 < n ∧ (n : X.E) • x ∈ _root_.GlobalTheory.MomT.per A N N')
+          ∧ (∀ r : 𝓞 X.E,
+            r ≠ 0
+              → (_root_.GlobalTheory.MomT.smulLat (r : X.E)
+                    (_root_.GlobalTheory.MomT.per A N N')).toAddSubgroup.relIndex
+                  (_root_.GlobalTheory.MomT.per A N N').toAddSubgroup
+                ≠ 0)
+          ∧ ∀ P : HeightOneSpectrum (𝓞 X.E),
+            _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal A.AA
+                = _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+                  (1 : Submodule (𝓞 X.E) X.E)
+              → ∀ y : _root_.Formalism.L2.Col.HomE X.E a b,
+                y ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+                    (_root_.GlobalTheory.MomT.per A N N')
+                  ↔ ∀ v ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N,
+                    y v ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N' := by
   intro X A a b N N' hAfg hA hN hN'
-  have full_of_sd {n : ℕ} {L : Submodule (𝓞 X.E) (Sp X.E n)}
-      (hL : IsSdLat L) : Submodule.IsFullLattice X.E L := by
+  have full_of_sd {n : ℕ} {L : Submodule (𝓞 X.E) (Sp X.E n)} (hL : IsSdLat L)
+      : Submodule.IsFullLattice X.E L := by
     let := hL.1
     refine { span_eq_top := ?_ }
     let W := Submodule.span X.E (L : Set (Sp X.E n))
@@ -45,15 +58,19 @@ theorem _root_.GlobalTheory.MomT.LatFin.per_lattice_facts : ∀ (X : _root_.Form
       intro y hy
       apply hStd_mem_one_symm
       have hxy : hStd X.E n (e x) y = 0 :=
-        congrArg (fun f : Module.Dual X.E W => f ⟨y, Submodule.subset_span hy⟩) (LinearMap.mem_ker.mp hx)
+        congrArg
+          (fun f : Module.Dual X.E W => f ⟨y, Submodule.subset_span hy⟩)
+          (LinearMap.mem_ker.mp hx)
       simp [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hxy]
     let i : X.E →ₗ[𝓞 X.E] L :=
       ((LinearMap.toSpanSingleton X.E _ (e x)).restrictScalars (𝓞 X.E)).codRestrict L hsmul
     let : Module.Finite (𝓞 X.E) L := Module.Finite.iff_fg.mpr hL.1.fg
-    let : Module.Finite (𝓞 X.E) X.E := Module.Finite.of_injective i fun c d hcd =>
-      smul_left_injective X.E (fun hz => hx₀ (e.map_eq_zero_iff.mp hz)) (congrArg Subtype.val hcd)
+    let : Module.Finite (𝓞 X.E) X.E :=
+      Module.Finite.of_injective i fun c d hcd =>
+        smul_left_injective X.E (fun hz => hx₀ (e.map_eq_zero_iff.mp hz)) (congrArg Subtype.val hcd)
     exact RingOfIntegers.not_isField X.E
-      (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E) (Field.toIsField X.E))
+      (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E)
+        (Field.toIsField X.E))
   have hNfull := full_of_sd hN
   have hN'full := full_of_sd hN'
   obtain ⟨hNl, -⟩ := hN
@@ -65,8 +82,9 @@ theorem _root_.GlobalTheory.MomT.LatFin.per_lattice_facts : ∀ (X : _root_.Form
       (_root_.GlobalTheory.ThetaMove.VolumePos.homO_fg hNl.fg hN'l.fg (by
         let := hNfull
         exact Submodule.IsFullLattice.span_eq_top))
-  have hmult : ∀ x : _root_.Formalism.L2.Col.HomE X.E a b, ∃ n : ℕ, 0 < n ∧
-      (n : X.E) • x ∈ _root_.GlobalTheory.MomT.per A N N' := by
+  have hmult
+      : ∀ x : _root_.Formalism.L2.Col.HomE X.E a b, ∃ n : ℕ,
+        0 < n ∧ (n : X.E) • x ∈ _root_.GlobalTheory.MomT.per A N N' := by
     intro x
     obtain ⟨n, hn, hx⟩ := hfull x
     refine ⟨n, hn, ?_⟩

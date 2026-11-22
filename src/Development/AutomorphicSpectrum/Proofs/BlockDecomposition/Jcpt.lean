@@ -28,50 +28,65 @@ theorem jcpt : StdGood → GrpTop → JTop → JCpt := by
     fun p => ((M p.2 * (p.1.1)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R) (Sum.inl i) (Sum.inl i)
   have hval : Continuous (Subtype.val : A.U ε ι → GL (ι ⊕ ι) R) := continuous_subtype_val
   have hφ : Continuous φ := by
-    have : Continuous fun p : A.U ε ι × GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) =>
-        (p.1.1 * (M p.2)⁻¹ : GL (ι ⊕ ι) R) :=
+    have : Continuous
+        fun p : A.U ε ι × GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) =>
+          (p.1.1 * (M p.2)⁻¹ : GL (ι ⊕ ι) R) :=
       (hval.comp continuous_fst).mul (hM.comp continuous_snd).inv
     exact (Units.continuous_val.comp this).matrix_elem _ _
   have hψ : Continuous ψ := by
-    have : Continuous fun p : A.U ε ι × GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) =>
-        (M p.2 * (p.1.1)⁻¹ : GL (ι ⊕ ι) R) :=
+    have : Continuous
+        fun p : A.U ε ι × GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) =>
+          (M p.2 * (p.1.1)⁻¹ : GL (ι ⊕ ι) R) :=
       (hM.comp continuous_snd).mul (hval.comp continuous_fst).inv
     exact (Units.continuous_val.comp this).matrix_elem _ _
 
-  have hrel : ∀ x : cover A ν ι, ((j x).1 : Matrix (ι ⊕ ι) (ι ⊕ ι) R) = (x.1.1 : R) • (M x.1.2 : Matrix (ι ⊕ ι) (ι ⊕ ι) R) :=
+  have hrel
+      : ∀ x : cover A ν ι,
+        ((j x).1 : Matrix (ι ⊕ ι) (ι ⊕ ι) R) = (x.1.1 : R) • (M x.1.2 : Matrix (ι ⊕ ι) (ι ⊕ ι) R) :=
     fun x => hJ x
   have hφv : ∀ x : cover A ν ι, φ (j x, x.1.2) = (x.1.1 : R) := by
     intro x
-    have e : (((j x).1 * (M x.1.2)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R) = (x.1.1 : R) • 1 := by
+    have e
+        : (((j x).1 * (M x.1.2)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R)
+          = (x.1.1 : R) • 1 := by
       rw [Units.val_mul, hrel x, Matrix.smul_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one]
     show (((j x).1 * (M x.1.2)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R) (Sum.inl i) (Sum.inl i) = _
-    rw [e]; simp
+    rw [e]
+    simp
   have hψv : ∀ x : cover A ν ι, ψ (j x, x.1.2) = ((x.1.1⁻¹ : Rˣ) : R) := by
     intro x
-    have e0 : (x.1.1 : R) • ((M x.1.2 * ((j x).1)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R) = 1 := by
-      rw [Units.val_mul, ← Matrix.smul_mul, ← hrel x, ← Units.val_mul, mul_inv_cancel, Units.val_one]
-    have e : ((M x.1.2 * ((j x).1)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R) = ((x.1.1⁻¹ : Rˣ) : R) • 1 := by
+    have e0
+        : (x.1.1 : R) • ((M x.1.2 * ((j x).1)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R)
+          = 1 := by
+      rw [Units.val_mul, ← Matrix.smul_mul, ← hrel x, ← Units.val_mul, mul_inv_cancel,
+        Units.val_one]
+    have e
+        : ((M x.1.2 * ((j x).1)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R)
+          = ((x.1.1⁻¹ : Rˣ) : R) • 1 := by
       rw [← e0, smul_smul, Units.inv_mul, one_smul]
     show ((M x.1.2 * ((j x).1)⁻¹ : GL (ι ⊕ ι) R) : Matrix (ι ⊕ ι) (ι ⊕ ι) R) (Sum.inl i) (Sum.inl i) = _
-    rw [e]; simp
+    rw [e]
+    simp
 
   let C₂ : Set (GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F)) :=
     ((((adStd F).kGL (ι ⊕ ι)).map (MulAut.conj (dg ι α)).toMonoidHom : Subgroup _) : Set _)
   have hC₂ : IsCompact C₂ := by
-    have h0 := ((hS F).kcpt (ι ⊕ ι)).image
-      (f := fun k => (MulAut.conj (dg ι α)).toMonoidHom k)
-      (by
+    have h0 :=
+      ((hS F).kcpt (ι ⊕ ι)).image (f := fun k => (MulAut.conj (dg ι α)).toMonoidHom k) (by
         show Continuous fun k => dg ι α * k * (dg ι α)⁻¹
         exact (continuous_const.mul continuous_id).mul continuous_const)
     exact h0
   let C₁ : Set (A.U ε ι) := (A.uK ε ι : Set (A.U ε ι))
   have hC : IsCompact (C₁ ×ˢ C₂) := hUK.prod hC₂
   have hS₁ := hC.image hφ
-  have hS₂ : IsCompact (MulOpposite.op '' (ψ '' (C₁ ×ˢ C₂))) := (hC.image hψ).image MulOpposite.continuous_op
-  let B : Set Rˣ := Units.embedProduct R ⁻¹' ((φ '' (C₁ ×ˢ C₂)) ×ˢ (MulOpposite.op '' (ψ '' (C₁ ×ˢ C₂))))
+  have hS₂ : IsCompact (MulOpposite.op '' (ψ '' (C₁ ×ˢ C₂))) :=
+    (hC.image hψ).image MulOpposite.continuous_op
+  let B : Set Rˣ :=
+    Units.embedProduct R ⁻¹' ((φ '' (C₁ ×ˢ C₂)) ×ˢ (MulOpposite.op '' (ψ '' (C₁ ×ˢ C₂))))
   have hBc : IsCompact B := Units.isClosedEmbedding_embedProduct.isCompact_preimage (hS₁.prod hS₂)
 
-  have hdet : Continuous (Matrix.GeneralLinearGroup.det (n := ι ⊕ ι) (R := NumberField.AdeleRing (NumberField.RingOfIntegers F) F)) := by
+  have hdet : Continuous (Matrix.GeneralLinearGroup.det (n := ι ⊕ ι)
+      (R := NumberField.AdeleRing (NumberField.RingOfIntegers F) F)) := by
     refine Units.continuous_iff.2 ⟨?_, ?_⟩
     · show Continuous fun g : GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) =>
         (g : Matrix (ι ⊕ ι) (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F)).det
@@ -83,9 +98,13 @@ theorem jcpt : StdGood → GrpTop → JTop → JCpt := by
   have hσ : Continuous A.σ := hGood.σcont
   have hUσ : Continuous (Units.map A.σ.toMonoidHom) := Continuous.units_map _ hσ
   have hUν : Continuous (Units.map ν.toMonoidHom) := Continuous.units_map _ hν
-  have hcl : IsClosed ((cover A ν ι : Subgroup _) : Set (Rˣ × GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F))) := by
-    have hf : Continuous fun p : Rˣ × GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) =>
-        p.1 * Units.map A.σ.toMonoidHom p.1 * Units.map ν.toMonoidHom (Matrix.GeneralLinearGroup.det p.2) :=
+  have hcl : IsClosed
+      ((cover A ν ι : Subgroup _)
+        : Set (Rˣ × GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F))) := by
+    have hf : Continuous
+        fun p : Rˣ × GL (ι ⊕ ι) (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) =>
+          p.1 * Units.map A.σ.toMonoidHom p.1
+            * Units.map ν.toMonoidHom (Matrix.GeneralLinearGroup.det p.2) :=
       (continuous_fst.mul (hUσ.comp continuous_fst)).mul (hUν.comp (hdet.comp continuous_snd))
     exact isClosed_singleton.preimage hf
   have hemb := hcl.isClosedEmbedding_subtypeVal
@@ -94,7 +113,7 @@ theorem jcpt : StdGood → GrpTop → JTop → JCpt := by
   have hprj : Continuous (prj A ν ι) := continuous_snd.comp continuous_subtype_val
   have hclK : IsClosed (cK α j : Set (cover A ν ι)) := by
     set_option synthInstance.maxHeartbeats 200000 in
-      exact (hUK.isClosed.preimage hj).inter (hC₂.isClosed.preimage hprj)
+    exact (hUK.isClosed.preimage hj).inter (hC₂.isClosed.preimage hprj)
   refine hP.of_isClosed_subset hclK ?_
   intro x hx
   have h1 : j x ∈ C₁ := hx.1

@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -22,7 +24,8 @@ def pin (n : ℕ) : (A ℚ)ˣ := ∏ᶠ v : H.P ℚ, pv v ^ (n.factorization (no
 
 def TT (L : ℕ) : Set (A ℚ)ˣ := {t | t ∈ UU ∧ ∀ v, Dv L v ((t : A ℚ) - 1)}
 
-def cT (L : ℕ) : ℝ := (finiteIdeleMeasure ℚ ((fun u => (IdeleGroup.prodEquiv ℚ).symm (1, u)) ⁻¹' TT L)).toReal
+def cT (L : ℕ) : ℝ :=
+  (finiteIdeleMeasure ℚ ((fun u => (IdeleGroup.prodEquiv ℚ).symm (1, u)) ⁻¹' TT L)).toReal
 
 def SS (N : ℕ) : Set (G1 ℚ) := {k | ∀ v, Dv N v (k 1 0)}
 

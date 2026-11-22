@@ -88,17 +88,20 @@ theorem rot : Rot := by
   let F : (Fin m → Fin n → ℂ) → ℂ := fun x =>
     evX (monomial d 1) x * gs c x * Complex.exp (Complex.I * t * (b * gramX ε x).trace)
   have hcont : Continuous F :=
-    ((GI.continuous_evX _).mul (GI.continuous_gs c)).mul (Complex.continuous_exp.comp
-      (continuous_const.mul ((continuous_const.matrix_mul (continuous_gramX ε)).matrix_trace)))
+    ((GI.continuous_evX _).mul (GI.continuous_gs c)).mul
+      (Complex.continuous_exp.comp (continuous_const.mul ((continuous_const.matrix_mul
+        (continuous_gramX ε)).matrix_trace)))
   have hcomp : (fun x => F (ζ • x)) = fun x => ζ ^ N * F x := by
     funext x
     simp only [F, evX_smul_mono ζ d hd, gs_smul c ζ hζ, gramX_smul ε ζ hζ]
     ring
   have hint : ∫ x, F (ζ • x) = ∫ x, F x := by
-    rw [← integral_map (μ := volume) (φ := fun x : Fin m → Fin n → ℂ => ζ • x)
-      (continuous_const_smul ζ).measurable.aemeasurable
-      (by rw [map_smul_volume ζ hζ]; exact hcont.aestronglyMeasurable), map_smul_volume ζ hζ]
-  have h2 : ∫ x, F x = -∫ x, F x := by
+    rw [← integral_map (μ := volume)
+        (φ := fun x : Fin m → Fin n → ℂ => ζ • x)
+        (continuous_const_smul ζ).measurable.aemeasurable
+        (by rw [map_smul_volume ζ hζ]; exact hcont.aestronglyMeasurable),
+      map_smul_volume ζ hζ]
+  have h2 : ∫ x, F x = - ∫ x, F x := by
     conv_lhs => rw [← hint, hcomp, integral_const_mul, hζN, neg_one_mul]
   show ∫ x, F x = 0
   linear_combination (1 / 2 : ℂ) * h2

@@ -25,8 +25,9 @@ theorem EvalKerKrullDim.proof : EvalKerKrullDim.Statement := by
   have hker : RingHom.ker (aeval y : MRingOver F ι →ₐ[F] L) = RingHom.ker f := by
     ext p
     simp [f, RingHom.mem_ker, Subtype.ext_iff]
-  let e : (MRingOver F ι ⧸ RingHom.ker (aeval y : MRingOver F ι →ₐ[F] L)) ≃ₐ[F]
-      Algebra.adjoin F (Set.range y) :=
+  let e
+      : (MRingOver F ι ⧸ RingHom.ker (aeval y : MRingOver F ι →ₐ[F] L)) ≃ₐ[F]
+        Algebra.adjoin F (Set.range y) :=
     (Ideal.quotientEquivAlgOfEq F hker).trans (Ideal.quotientKerAlgEquivOfSurjective hf)
   rw [ringKrullDim_eq_of_ringEquiv e.toRingEquiv]
   have _ : Algebra.FiniteType F (Algebra.adjoin F (Set.range y)) :=

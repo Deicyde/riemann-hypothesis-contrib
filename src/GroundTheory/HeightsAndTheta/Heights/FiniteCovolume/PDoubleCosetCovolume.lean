@@ -16,33 +16,34 @@ noncomputable section
 
 section Setup
 
-variable {G G₁ G₂ : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [MeasurableSpace G] [BorelSpace G] [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁]
-  [MeasurableSpace G₁] [BorelSpace G₁] [Group G₂] [TopologicalSpace G₂] [IsTopologicalGroup G₂]
+variable
+  {G G₁ G₂ : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+  [BorelSpace G] [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁] [MeasurableSpace G₁]
+  [BorelSpace G₁] [Group G₂] [TopologicalSpace G₂] [IsTopologicalGroup G₂]
 
 def doubleCosetSetoid (Φ : G ≃ₜ* G₁ × G₂) (Γ : Subgroup G) (K : Subgroup G₂) : Setoid G₂ where
   r y y' := ∃ γ ∈ Γ, ∃ k ∈ K, y' = (Φ γ).2 * y * k
-  iseqv :=
-    { refl := fun y => ⟨1, Γ.one_mem, 1, K.one_mem, by simp⟩
-      symm := by
-        rintro y y' ⟨γ, hγ, k, hk, rfl⟩
-        refine ⟨γ⁻¹, Γ.inv_mem hγ, k⁻¹, K.inv_mem hk, ?_⟩
-        simp [mul_assoc]
-      trans := by
-        rintro y y' y'' ⟨γ, hγ, k, hk, rfl⟩ ⟨γ', hγ', k', hk', rfl⟩
-        refine ⟨γ' * γ, Γ.mul_mem hγ' hγ, k * k', K.mul_mem hk hk', ?_⟩
-        simp [mul_assoc] }
+  iseqv := {
+    refl := fun y => ⟨1, Γ.one_mem, 1, K.one_mem, by simp⟩
+    symm := by
+      rintro y y' ⟨γ, hγ, k, hk, rfl⟩
+      refine ⟨γ⁻¹, Γ.inv_mem hγ, k⁻¹, K.inv_mem hk, ?_⟩
+      simp [mul_assoc]
+    trans := by
+      rintro y y' y'' ⟨γ, hγ, k, hk, rfl⟩ ⟨γ', hγ', k', hk', rfl⟩
+      refine ⟨γ' * γ, Γ.mul_mem hγ' hγ, k * k', K.mul_mem hk hk', ?_⟩
+      simp [mul_assoc]
+  }
 
 def leftCosetSet (K : Subgroup G₂) (s : G₂) : Set G₂ := {y | s⁻¹ * y ∈ K}
 
-theorem isOpen_leftCosetSet {K : Subgroup G₂} (hK : IsOpen (K : Set G₂)) (s : G₂) :
-    IsOpen (leftCosetSet K s) :=
+theorem isOpen_leftCosetSet {K : Subgroup G₂} (hK : IsOpen (K : Set G₂)) (s : G₂)
+    : IsOpen (leftCosetSet K s) :=
   hK.preimage (continuous_const_mul s⁻¹)
 
-theorem isCompact_leftCosetSet {K : Subgroup G₂} (hK : IsCompact (K : Set G₂)) (s : G₂) :
-    IsCompact (leftCosetSet K s) := by
-  have : leftCosetSet K s = (s * ·) '' (K : Set G₂) := by
-    rw [Set.image_mul_left]; rfl
+theorem isCompact_leftCosetSet {K : Subgroup G₂} (hK : IsCompact (K : Set G₂)) (s : G₂)
+    : IsCompact (leftCosetSet K s) := by
+  have : leftCosetSet K s = (s * ·) '' (K : Set G₂) := by rw [Set.image_mul_left]; rfl
   rw [this]
   exact hK.image (continuous_const_mul s)
 
@@ -57,37 +58,37 @@ theorem measurable_fst_comp (Φ : G ≃ₜ* G₁ × G₂) : Measurable fun x => 
 theorem measurableSet_preimage_univ_prod (hV : IsOpen V) : MeasurableSet (Φ ⁻¹' (univ ×ˢ V)) :=
   ((isOpen_univ.prod hV).preimage Φ.continuous).measurableSet
 
-theorem preimage_prod_eq (A : Set G₁) :
-    Φ ⁻¹' (A ×ˢ V) = (fun x => (Φ x).1) ⁻¹' A ∩ Φ ⁻¹' (univ ×ˢ V) := by
+theorem preimage_prod_eq (A : Set G₁)
+    : Φ ⁻¹' (A ×ˢ V) = (fun x => (Φ x).1) ⁻¹' A ∩ Φ ⁻¹' (univ ×ˢ V) := by
   ext x
   simp [mem_prod]
 
-theorem measure_preimage_prod_eq_restrict (hV : IsOpen V) (A : Set G₁) :
-    μ (Φ ⁻¹' (A ×ˢ V)) = μ.restrict (Φ ⁻¹' (univ ×ˢ V)) ((fun x => (Φ x).1) ⁻¹' A) := by
+theorem measure_preimage_prod_eq_restrict (hV : IsOpen V) (A : Set G₁)
+    : μ (Φ ⁻¹' (A ×ˢ V)) = μ.restrict (Φ ⁻¹' (univ ×ˢ V)) ((fun x => (Φ x).1) ⁻¹' A) := by
   rw [Measure.restrict_apply' (measurableSet_preimage_univ_prod hV), preimage_prod_eq]
 
-theorem sliceMeasure_apply (hV : IsOpen V) {A : Set G₁} (hA : MeasurableSet A) :
-    sliceMeasure Φ μ V A = μ (Φ ⁻¹' (A ×ˢ V)) := by
+theorem sliceMeasure_apply (hV : IsOpen V) {A : Set G₁} (hA : MeasurableSet A)
+    : sliceMeasure Φ μ V A = μ (Φ ⁻¹' (A ×ˢ V)) := by
   rw [sliceMeasure, Measure.map_apply (measurable_fst_comp Φ) hA,
     measure_preimage_prod_eq_restrict hV]
 
-theorem measure_preimage_prod_le (hV : IsOpen V) (A : Set G₁) :
-    μ (Φ ⁻¹' (A ×ˢ V)) ≤ sliceMeasure Φ μ V A := by
+theorem measure_preimage_prod_le (hV : IsOpen V) (A : Set G₁)
+    : μ (Φ ⁻¹' (A ×ˢ V)) ≤ sliceMeasure Φ μ V A := by
   rw [measure_preimage_prod_eq_restrict hV]
   exact Measure.le_map_apply (measurable_fst_comp Φ).aemeasurable A
 
-theorem sliceMeasure_isMulLeftInvariant [μ.IsMulLeftInvariant] (hV : IsOpen V) :
-    (sliceMeasure Φ μ V).IsMulLeftInvariant := by
+theorem sliceMeasure_isMulLeftInvariant [μ.IsMulLeftInvariant] (hV : IsOpen V)
+    : (sliceMeasure Φ μ V).IsMulLeftInvariant := by
   refine (forall_measure_preimage_mul_iff _).1 fun g A hA => ?_
   rw [sliceMeasure_apply hV (measurable_const_mul g hA), sliceMeasure_apply hV hA]
-  have : Φ ⁻¹' (((g * ·) ⁻¹' A) ×ˢ V) =
-      (fun x => Φ.symm (g, 1) * x) ⁻¹' (Φ ⁻¹' (A ×ˢ V)) := by
+  have : Φ ⁻¹' (((g * ·) ⁻¹' A) ×ˢ V) = (fun x => Φ.symm (g, 1) * x) ⁻¹' (Φ ⁻¹' (A ×ˢ V)) := by
     ext x
     simp [mem_prod]
   rw [this, measure_preimage_mul]
 
-theorem sliceMeasure_isFiniteMeasureOnCompacts [T2Space G₁] [IsFiniteMeasureOnCompacts μ]
-    (hV : IsOpen V) (hVc : IsCompact V) : IsFiniteMeasureOnCompacts (sliceMeasure Φ μ V) := by
+theorem sliceMeasure_isFiniteMeasureOnCompacts
+    [T2Space G₁] [IsFiniteMeasureOnCompacts μ] (hV : IsOpen V) (hVc : IsCompact V)
+    : IsFiniteMeasureOnCompacts (sliceMeasure Φ μ V) := by
   refine ⟨fun A hA => ?_⟩
   rw [sliceMeasure_apply hV hA.isClosed.measurableSet]
   have : IsCompact (Φ ⁻¹' (A ×ˢ V)) :=
@@ -96,34 +97,38 @@ theorem sliceMeasure_isFiniteMeasureOnCompacts [T2Space G₁] [IsFiniteMeasureOn
 
 variable [LocallyCompactSpace G₁] [T2Space G₁] [SecondCountableTopology G₁] [μ.IsHaarMeasure]
 
-theorem sliceMeasure_eq_smul_haar (hV : IsOpen V) (hVc : IsCompact V) :
-    ∃ c : ℝ≥0, sliceMeasure Φ μ V = c • Measure.haar := by
+theorem sliceMeasure_eq_smul_haar (hV : IsOpen V) (hVc : IsCompact V)
+    : ∃ c : ℝ≥0, sliceMeasure Φ μ V = c • Measure.haar := by
   have := sliceMeasure_isMulLeftInvariant (Φ := Φ) (μ := μ) hV
   have := sliceMeasure_isFiniteMeasureOnCompacts (Φ := Φ) (μ := μ) hV hVc
   exact ⟨_, Measure.isMulLeftInvariant_eq_smul _ _⟩
 
-theorem quasiMeasurePreserving_fst_comp (hV : IsOpen V) (hVc : IsCompact V) :
-    Measure.QuasiMeasurePreserving (fun x => (Φ x).1) (μ.restrict (Φ ⁻¹' (univ ×ˢ V)))
-      (Measure.haar : Measure G₁) := by
+theorem quasiMeasurePreserving_fst_comp (hV : IsOpen V) (hVc : IsCompact V)
+    : Measure.QuasiMeasurePreserving
+      (fun x => (Φ x).1)
+      (μ.restrict (Φ ⁻¹' (univ ×ˢ V))) (Measure.haar : Measure G₁) := by
   refine ⟨(measurable_fst_comp Φ).aemeasurable, fun A hA => ?_⟩
   change sliceMeasure Φ μ V A = 0
   obtain ⟨c, hc⟩ := sliceMeasure_eq_smul_haar (Φ := Φ) (μ := μ) hV hVc
   rw [hc, Measure.smul_apply, hA, smul_zero]
 
-theorem measure_preimage_prod_null (hV : IsOpen V) (hVc : IsCompact V) {N : Set G₁}
-    (hN : (Measure.haar : Measure G₁) N = 0) : μ (Φ ⁻¹' (N ×ˢ V)) = 0 := by
+theorem measure_preimage_prod_null
+    (hV : IsOpen V) (hVc : IsCompact V) {N : Set G₁} (hN : (Measure.haar : Measure G₁) N = 0)
+    : μ (Φ ⁻¹' (N ×ˢ V)) = 0 := by
   rw [measure_preimage_prod_eq_restrict hV]
   exact QuasiMeasurePreserving.preimage_null (quasiMeasurePreserving_fst_comp hV hVc) hN
 
-theorem nullMeasurableSet_preimage_prod (hV : IsOpen V) (hVc : IsCompact V) {A : Set G₁}
-    (hA : NullMeasurableSet A (Measure.haar : Measure G₁)) :
-    NullMeasurableSet (Φ ⁻¹' (A ×ˢ V)) μ := by
+theorem nullMeasurableSet_preimage_prod
+    (hV : IsOpen V) (hVc : IsCompact V)
+    {A : Set G₁} (hA : NullMeasurableSet A (Measure.haar : Measure G₁))
+    : NullMeasurableSet (Φ ⁻¹' (A ×ˢ V)) μ := by
   rw [preimage_prod_eq]
   exact (nullMeasurableSet_restrict (measurableSet_preimage_univ_prod hV).nullMeasurableSet).1
     (hA.preimage (quasiMeasurePreserving_fst_comp hV hVc))
 
-theorem measure_preimage_prod_lt_top (hV : IsOpen V) (hVc : IsCompact V) {A : Set G₁}
-    (hA : (Measure.haar : Measure G₁) A < ∞) : μ (Φ ⁻¹' (A ×ˢ V)) < ∞ := by
+theorem measure_preimage_prod_lt_top
+    (hV : IsOpen V) (hVc : IsCompact V) {A : Set G₁} (hA : (Measure.haar : Measure G₁) A < ∞)
+    : μ (Φ ⁻¹' (A ×ˢ V)) < ∞ := by
   refine (measure_preimage_prod_le hV A).trans_lt ?_
   obtain ⟨c, hc⟩ := sliceMeasure_eq_smul_haar (Φ := Φ) (μ := μ) hV hVc
   rw [hc, Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
@@ -131,19 +136,20 @@ theorem measure_preimage_prod_lt_top (hV : IsOpen V) (hVc : IsCompact V) {A : Se
 
 end Setup
 
-theorem DoubleCosetCovolume.proof (G G₁ G₂ : Type*) [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G] [Group G₁] [TopologicalSpace G₁]
-    [IsTopologicalGroup G₁] [LocallyCompactSpace G₁] [T2Space G₁] [SecondCountableTopology G₁]
-    [MeasurableSpace G₁] [BorelSpace G₁] [Group G₂] [TopologicalSpace G₂] [IsTopologicalGroup G₂] :
-    DoubleCosetCovolume.Statement G G₁ G₂ := by
+theorem DoubleCosetCovolume.proof
+    (G G₁ G₂ : Type*) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+    [BorelSpace G] [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁] [LocallyCompactSpace G₁]
+    [T2Space G₁] [SecondCountableTopology G₁] [MeasurableSpace G₁] [BorelSpace G₁] [Group G₂]
+    [TopologicalSpace G₂] [IsTopologicalGroup G₂]
+    : DoubleCosetCovolume.Statement G G₁ G₂ := by
   intro Φ Γ _ K S hKc hKo hinj hcover hFD μ _
   classical
   let R := doubleCosetSetoid Φ Γ K
 
-  let rep : Quotient R → G₂ := fun q =>
-    if h : ∃ t ∈ S, Quotient.mk R t = q then h.choose else 1
-  have rep_spec : ∀ t ∈ S, rep (Quotient.mk R t) ∈ S ∧
-      Quotient.mk R (rep (Quotient.mk R t)) = Quotient.mk R t := by
+  let rep : Quotient R → G₂ := fun q => if h : ∃ t ∈ S, Quotient.mk R t = q then h.choose else 1
+  have rep_spec
+      : ∀ t ∈ S,
+        rep (Quotient.mk R t) ∈ S ∧ Quotient.mk R (rep (Quotient.mk R t)) = Quotient.mk R t := by
     intro t ht
     have h : ∃ t' ∈ S, Quotient.mk R t' = Quotient.mk R t := ⟨t, ht, rfl⟩
     simp only [rep, dif_pos h]
@@ -156,8 +162,10 @@ theorem DoubleCosetCovolume.proof (G G₁ G₂ : Type*) [Group G] [TopologicalSp
 
   let F : G₂ → Set G₁ := fun s =>
     if hs : s ∈ S then (hFD s hs (Measure.haar : Measure G₁)).choose else ∅
-  have hF : ∀ s ∈ S, IsFundamentalDomain (sliceGroup Φ Γ K s) (F s) Measure.haar ∧
-      (Measure.haar : Measure G₁) (F s) < ∞ := by
+  have hF
+      : ∀ s ∈ S,
+        IsFundamentalDomain (sliceGroup Φ Γ K s) (F s) Measure.haar
+          ∧ (Measure.haar : Measure G₁) (F s) < ∞ := by
     intro s hs
     simp only [F, dif_pos hs]
     exact (hFD s hs Measure.haar).choose_spec
@@ -165,13 +173,12 @@ theorem DoubleCosetCovolume.proof (G G₁ G₂ : Type*) [Group G] [TopologicalSp
   have hVc := isCompact_leftCosetSet hKc
   let P : G₂ → Set G := fun s => Φ ⁻¹' (F s ×ˢ leftCosetSet K s)
   refine ⟨⋃ q ∈ T, P (rep q), IsFundamentalDomain.mk'' ?_ ?_ ?_ ?_, ?_⟩
-  ·
-    refine NullMeasurableSet.biUnion T.countable_toSet fun q hq => ?_
+  · refine NullMeasurableSet.biUnion T.countable_toSet fun q hq => ?_
     exact nullMeasurableSet_preimage_prod (hVo _) (hVc _) (hF _ (hT q hq).1).1.nullMeasurableSet
-  ·
-    let Nbad : G₂ → Set G₁ := fun s => {a | ¬ ∃ δ : sliceGroup Φ Γ K s, δ • a ∈ F s}
-    let B : Set G := ⋃ η : Γ, ⋃ s ∈ S,
-      (fun x => (η : G)⁻¹ * x) ⁻¹' (Φ ⁻¹' (Nbad s ×ˢ leftCosetSet K s))
+  · let Nbad : G₂ → Set G₁ := fun s => {a | ¬ ∃ δ : sliceGroup Φ Γ K s, δ • a ∈ F s}
+    let B : Set G :=
+      ⋃ η : Γ, ⋃ s ∈ S,
+        (fun x => (η : G)⁻¹ * x) ⁻¹' (Φ ⁻¹' (Nbad s ×ˢ leftCosetSet K s))
     have hB : μ B = 0 := by
       refine measure_iUnion_null fun η => ?_
       refine (measure_biUnion_null_iff S.countable_toSet).2 fun s hs => ?_
@@ -186,8 +193,7 @@ theorem DoubleCosetCovolume.proof (G G₁ G₂ : Type*) [Group G] [TopologicalSp
     obtain ⟨hs, hsq⟩ := rep_spec t ht
     obtain ⟨η, hη, k', hk', hx2⟩ : R (rep (Quotient.mk R t)) (Φ x).2 :=
       Quotient.exact (hsq.trans ht')
-    have e2 : (Φ ((η : G)⁻¹ * x)).2 = rep (Quotient.mk R t) * k' := by
-      simp [hx2, mul_assoc]
+    have e2 : (Φ ((η : G)⁻¹ * x)).2 = rep (Quotient.mk R t) * k' := by simp [hx2, mul_assoc]
     have hgood : ¬ (Φ ((η : G)⁻¹ * x)).1 ∈ Nbad (rep (Quotient.mk R t)) := by
       intro hbad
       apply hxB
@@ -208,15 +214,15 @@ theorem DoubleCosetCovolume.proof (G G₁ G₂ : Type*) [Group G] [TopologicalSp
       exact hδ
     · show (rep (Quotient.mk R t))⁻¹ * ((Φ ζ).2 * (Φ ((η : G)⁻¹ * x)).2) ∈ K
       rw [e2]
-      have : (rep (Quotient.mk R t))⁻¹ * ((Φ ζ).2 * (rep (Quotient.mk R t) * k')) =
-          (rep (Quotient.mk R t))⁻¹ * (Φ ζ).2 * rep (Quotient.mk R t) * k' := by
+      have : (rep (Quotient.mk R t))⁻¹ * ((Φ ζ).2 * (rep (Quotient.mk R t) * k'))
+          = (rep (Quotient.mk R t))⁻¹ * (Φ ζ).2 * rep (Quotient.mk R t) * k' := by
         simp only [mul_assoc]
       rw [this]
       exact K.mul_mem hζK hk'
-  ·
-    intro g hg
-    let M : G₂ → Set G := fun s => ⋃ (h : (Φ g).1 ∈ sliceGroup Φ Γ K s),
-      Φ ⁻¹' ((((⟨(Φ g).1, h⟩ : sliceGroup Φ Γ K s) • F s) ∩ F s) ×ˢ leftCosetSet K s)
+  · intro g hg
+    let M : G₂ → Set G := fun s =>
+      ⋃ (h : (Φ g).1 ∈ sliceGroup Φ Γ K s),
+        Φ ⁻¹' ((((⟨(Φ g).1, h⟩ : sliceGroup Φ Γ K s) • F s) ∩ F s) ×ˢ leftCosetSet K s)
     have hM : μ (⋃ s ∈ S, M s) = 0 := by
       refine (measure_biUnion_null_iff S.countable_toSet).2 fun s hs => ?_
       refine measure_iUnion_null fun h => ?_
@@ -246,13 +252,12 @@ theorem DoubleCosetCovolume.proof (G G₁ G₂ : Type*) [Group G] [TopologicalSp
       Quotient.sound ⟨g, g.2, _, hzK, by group⟩
     have e2 : Quotient.mk R (rep q') = Quotient.mk R (Φ z).2 :=
       Quotient.sound ⟨1, Γ.one_mem, _, hzK', by simp⟩
-    have hqq : q = q' := by
-      rw [← (hT q hq).2, ← (hT q' hq').2, e1, e2]
+    have hqq : q = q' := by rw [← (hT q hq).2, ← (hT q' hq').2, e1, e2]
     subst hqq
     have hslice : (Φ g).1 ∈ sliceGroup Φ Γ K (rep q) := by
       refine mem_sliceGroup.2 ⟨g, g.2, ?_, rfl⟩
-      have : (rep q)⁻¹ * (Φ g).2 * rep q =
-          ((rep q)⁻¹ * (Φ z).2) * ((rep q)⁻¹ * ((Φ g).2⁻¹ * (Φ z).2))⁻¹ := by
+      have : (rep q)⁻¹ * (Φ g).2 * rep q
+          = ((rep q)⁻¹ * (Φ z).2) * ((rep q)⁻¹ * ((Φ g).2⁻¹ * (Φ z).2))⁻¹ := by
         group
       rw [this]
       exact K.mul_mem hzK' (K.inv_mem hzK)
@@ -260,10 +265,8 @@ theorem DoubleCosetCovolume.proof (G G₁ G₂ : Type*) [Group G] [TopologicalSp
     refine ⟨⟨?_, hzF'⟩, hzK'⟩
     rw [mem_smul_set_iff_inv_smul_mem, Subgroup.smul_def, smul_eq_mul]
     exact hzF
-  ·
-    exact fun g => (measurePreserving_smul g μ).quasiMeasurePreserving
-  ·
-    refine (measure_biUnion_finset_le T _).trans_lt (ENNReal.sum_lt_top.2 fun q hq => ?_)
+  · exact fun g => (measurePreserving_smul g μ).quasiMeasurePreserving
+  · refine (measure_biUnion_finset_le T _).trans_lt (ENNReal.sum_lt_top.2 fun q hq => ?_)
     exact measure_preimage_prod_lt_top (hVo _) (hVc _) (hF _ (hT q hq).1).2
 
 end

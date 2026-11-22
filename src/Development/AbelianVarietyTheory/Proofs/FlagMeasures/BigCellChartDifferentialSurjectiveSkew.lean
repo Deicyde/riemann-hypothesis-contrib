@@ -8,7 +8,8 @@ public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.CellDens
+open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S
+  GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.CellDens
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.CellDens.Onto
@@ -91,19 +92,21 @@ lemma exists_lieElement_middleBlockPart (k r : ℕ) (M : Mat k r) (h : Mᴴ * Hp
   · rw [if_neg (by split_ifs at h1 h2 <;> omega), if_neg (by split_ifs at h1 h2 <;> omega)]
     simp
 
-theorem dchart_onto : ∀ (k r : ℕ) (Z : Mat k r), Zᴴ * Hpk k r + Hpk k r * Z = 0 →
-    ∃ v : EE k r, dchart k r v = Z := by
+theorem dchart_onto
+    : ∀ (k r : ℕ) (Z : Mat k r),
+      Zᴴ * Hpk k r + Hpk k r * Z = 0 → ∃ v : EE k r, dchart k r v = Z := by
   intro k r Z hZ
   have hZ' := (skew_iff k r Z).1 hZ
   obtain ⟨X', hX'⟩ := exists_N k r Z hZ
   obtain ⟨Y, hY⟩ := exists_lieElement_middleBlockPart k r Z hZ
-  obtain ⟨X, hX⟩ := exists_N k r (Matrix.of fun i j => -Z (sig k r i) (sig k r j)) (by
-    rw [skew_iff]
-    intro i j
-    have := hZ' (sig k r i) (sig k r j)
-    simp only [sig_sig, sgn_sig] at this
-    simp only [Matrix.of_apply, sig_sig, star_neg]
-    linear_combination -this)
+  obtain ⟨X, hX⟩ :=
+    exists_N k r (Matrix.of fun i j => - Z (sig k r i) (sig k r j)) (by
+      rw [skew_iff]
+      intro i j
+      have := hZ' (sig k r i) (sig k r j)
+      simp only [sig_sig, sgn_sig] at this
+      simp only [Matrix.of_apply, sig_sig, star_neg]
+      linear_combination -this)
   refine ⟨((X, X'), (fun a => Z (eI k r a) (eI k r a), Y)), ?_⟩
   ext i j
   have h1 := lev_sig k r i
@@ -131,8 +134,24 @@ theorem dchart_onto : ∀ (k r : ℕ) (Z : Mat k r), Zᴴ * Hpk k r + Hpk k r * 
       · rw [dite_eq_right c', if_pos (by omega), zero_add]
   · rw [if_neg hij, add_zero]
     have hij' : i.val ≠ j.val := fun h => hij (Fin.ext h)
-    have l1 : lev k r i = if i.val < r then i.val else if i.val ≤ r + k then r else i.val - k := rfl
-    have l2 : lev k r j = if j.val < r then j.val else if j.val ≤ r + k then r else j.val - k := rfl
+    have l1
+        : lev k r i
+          = if i.val < r then
+              i.val
+            else if i.val ≤ r + k then
+              r
+            else
+              i.val - k :=
+      rfl
+    have l2
+        : lev k r j
+          = if j.val < r then
+              j.val
+            else if j.val ≤ r + k then
+              r
+            else
+              j.val - k :=
+      rfl
     rcases lt_trichotomy (lev k r i) (lev k r j) with c | c | c
     · rw [if_neg (by omega), if_neg (by split_ifs at l1 l2 <;> omega), if_pos c]; simp
     · rw [if_neg (by omega), if_pos (by split_ifs at l1 l2 <;> omega), if_neg (by omega)]; simp

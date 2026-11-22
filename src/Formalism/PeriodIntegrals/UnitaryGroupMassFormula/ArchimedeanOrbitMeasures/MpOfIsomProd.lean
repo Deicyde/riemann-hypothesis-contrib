@@ -13,13 +13,13 @@ open MeasureTheory Matrix ComplexConjugate
 
 section Iso
 
-variable {E F : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
-  [MeasurableSpace E] [BorelSpace E]
-  [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
-  [MeasurableSpace F] [BorelSpace F]
+variable
+  {E F : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+  [MeasurableSpace E] [BorelSpace E] [NormedAddCommGroup F] [InnerProductSpace ℝ F]
+  [FiniteDimensional ℝ F] [MeasurableSpace F] [BorelSpace F]
 
-theorem mp_of_isom (f : E →ₗ[ℝ] F) (hn : ∀ x, ‖f x‖ = ‖x‖) (hs : Function.Surjective f) :
-    MeasurePreserving f volume volume := by
+theorem mp_of_isom (f : E →ₗ[ℝ] F) (hn : ∀ x, ‖f x‖ = ‖x‖) (hs : Function.Surjective f)
+    : MeasurePreserving f volume volume := by
   have hinj : Function.Injective f := by
     intro a b hab
     have h0 : ‖a - b‖ = 0 := by rw [← hn, map_sub, hab, sub_self, norm_zero]
@@ -28,12 +28,15 @@ theorem mp_of_isom (f : E →ₗ[ℝ] F) (hn : ∀ x, ‖f x‖ = ‖x‖) (hs :
   let g : E ≃ₗᵢ[ℝ] F := { e with norm_map' := hn }
   exact g.measurePreserving
 
-variable {U V : Type} [NormedAddCommGroup U] [InnerProductSpace ℝ U] [FiniteDimensional ℝ U]
-  [MeasurableSpace U] [BorelSpace U] [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  [MeasurableSpace V] [BorelSpace V]
+variable
+  {U V : Type} [NormedAddCommGroup U] [InnerProductSpace ℝ U] [FiniteDimensional ℝ U]
+  [MeasurableSpace U] [BorelSpace U] [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+  [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 
-theorem mp_of_isom_prod (f : U × V →ₗ[ℝ] F) (hn : ∀ a b, ‖f (a, b)‖ ^ 2 = ‖a‖ ^ 2 + ‖b‖ ^ 2)
-    (hs : Function.Surjective f) : MeasurePreserving f volume volume := by
+theorem mp_of_isom_prod
+    (f : U × V →ₗ[ℝ] F)
+    (hn : ∀ a b, ‖f (a, b)‖ ^ 2 = ‖a‖ ^ 2 + ‖b‖ ^ 2) (hs : Function.Surjective f)
+    : MeasurePreserving f volume volume := by
   let L : WithLp 2 (U × V) ≃ₗ[ℝ] U × V := WithLp.linearEquiv 2 ℝ (U × V)
   have h1 : MeasurePreserving (f.comp L.toLinearMap) volume volume := by
     apply mp_of_isom
@@ -67,8 +70,8 @@ def reimL {n m : ℕ} : Matrix (Fin n) (Fin m) ℂ →ₗ[ℝ] EuclideanSpace �
 
 theorem reimL_apply {n m : ℕ} (Y : Matrix (Fin n) (Fin m) ℂ) : reimL Y = reim Y := rfl
 
-theorem norm_reim_sq {n m : ℕ} (Y : Matrix (Fin n) (Fin m) ℂ) :
-    ‖reim Y‖ ^ 2 = ∑ i, ∑ j, ‖Y i j‖ ^ 2 := by
+theorem norm_reim_sq {n m : ℕ} (Y : Matrix (Fin n) (Fin m) ℂ)
+    : ‖reim Y‖ ^ 2 = ∑ i, ∑ j, ‖Y i j‖ ^ 2 := by
   rw [EuclideanSpace.norm_eq, Real.sq_sqrt (Finset.sum_nonneg (fun _ _ => sq_nonneg _))]
   simp only [reim, Fintype.sum_prod_type, Fintype.sum_bool]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
@@ -76,15 +79,15 @@ theorem norm_reim_sq {n m : ℕ} (Y : Matrix (Fin n) (Fin m) ℂ) :
   simp
   ring
 
-theorem reim_surj {n m : ℕ} (y : EuclideanSpace ℝ (Fin n × Fin m × Bool)) :
-    ∃ Y : Matrix (Fin n) (Fin m) ℂ, reim Y = y := by
+theorem reim_surj {n m : ℕ} (y : EuclideanSpace ℝ (Fin n × Fin m × Bool))
+    : ∃ Y : Matrix (Fin n) (Fin m) ℂ, reim Y = y := by
   refine ⟨Matrix.of fun i j => ⟨y.ofLp (i, j, true), y.ofLp (i, j, false)⟩, ?_⟩
   ext p
   rcases p with ⟨i, j, s⟩
   cases s <;> simp [reim]
 
-theorem herm_cross {m : ℕ} (A B : Matrix (Fin m) (Fin m) ℂ) (hA : Aᴴ = A) (hB : Bᴴ = B) :
-    (∑ i, ∑ j, A i j * conj (B i j)).im = 0 := by
+theorem herm_cross {m : ℕ} (A B : Matrix (Fin m) (Fin m) ℂ) (hA : Aᴴ = A) (hB : Bᴴ = B)
+    : (∑ i, ∑ j, A i j * conj (B i j)).im = 0 := by
   have hA' : ∀ i j, A j i = conj (A i j) := fun i j => by
     simpa [Matrix.conjTranspose_apply] using (congrFun (congrFun hA j) i).symm
   have hB' : ∀ i j, B j i = conj (B i j) := fun i j => by
@@ -97,10 +100,12 @@ theorem herm_cross {m : ℕ} (A B : Matrix (Fin m) (Fin m) ℂ) (hA : Aᴴ = A) 
     rw [hA' j i, hB' j i, Complex.conj_conj]
   exact Complex.conj_eq_iff_im.mp hc
 
-theorem herm_pyth {m : ℕ} (A B : Matrix (Fin m) (Fin m) ℂ) (hA : Aᴴ = A) (hB : Bᴴ = B) :
-    ∑ i, ∑ j, ‖(Complex.I • A + B) i j‖ ^ 2 = ∑ i, ∑ j, ‖A i j‖ ^ 2 + ∑ i, ∑ j, ‖B i j‖ ^ 2 := by
-  have key : ∀ i j, ‖(Complex.I • A + B) i j‖ ^ 2 =
-      ‖A i j‖ ^ 2 + ‖B i j‖ ^ 2 - 2 * (A i j * conj (B i j)).im := by
+theorem herm_pyth {m : ℕ} (A B : Matrix (Fin m) (Fin m) ℂ) (hA : Aᴴ = A) (hB : Bᴴ = B)
+    : ∑ i, ∑ j, ‖(Complex.I • A + B) i j‖ ^ 2 = ∑ i, ∑ j, ‖A i j‖ ^ 2 + ∑ i, ∑ j, ‖B i j‖ ^ 2 := by
+  have key
+      : ∀ i j,
+        ‖(Complex.I • A + B) i j‖ ^ 2
+          = ‖A i j‖ ^ 2 + ‖B i j‖ ^ 2 - 2 * (A i j * conj (B i j)).im := by
     intro i j
     simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Complex.sq_norm,
       Complex.normSq_apply, Complex.add_re, Complex.add_im, Complex.mul_re, Complex.mul_im,
@@ -111,8 +116,8 @@ theorem herm_pyth {m : ℕ} (A B : Matrix (Fin m) (Fin m) ℂ) (hA : Aᴴ = A) (
   simp only [key, Finset.sum_sub_distrib, Finset.sum_add_distrib, ← Finset.mul_sum, h0]
   ring
 
-def psiLp {m : ℕ} {η : Type} [Fintype η] (H : EuclideanSpace ℝ η →ₗ[ℝ] Matrix (Fin m) (Fin m) ℂ) :
-    EuclideanSpace ℝ η × EuclideanSpace ℝ η →ₗ[ℝ] EuclideanSpace ℝ (Fin m × Fin m × Bool) where
+def psiLp {m : ℕ} {η : Type} [Fintype η] (H : EuclideanSpace ℝ η →ₗ[ℝ] Matrix (Fin m) (Fin m) ℂ)
+    : EuclideanSpace ℝ η × EuclideanSpace ℝ η →ₗ[ℝ] EuclideanSpace ℝ (Fin m × Fin m × Bool) where
   toFun z := reimL (Complex.I • H z.1 + H z.2)
   map_add' a b := by
     show reimL (Complex.I • H (a + b).1 + H (a + b).2) =
@@ -125,13 +130,19 @@ def psiLp {m : ℕ} {η : Type} [Fintype η] (H : EuclideanSpace ℝ η →ₗ[�
     simp only [Prod.smul_fst, Prod.smul_snd, map_smul, RingHom.id_apply]
     rw [smul_comm Complex.I c, ← smul_add, map_smul]
 
-theorem psiLp_apply {m : ℕ} {η : Type} [Fintype η] (H : EuclideanSpace ℝ η →ₗ[ℝ] Matrix (Fin m) (Fin m) ℂ)
-    (z : EuclideanSpace ℝ η × EuclideanSpace ℝ η) : psiLp H z = reim (Complex.I • H z.1 + H z.2) := rfl
+theorem psiLp_apply
+    {m : ℕ} {η : Type} [Fintype η]
+    (H : EuclideanSpace ℝ η →ₗ[ℝ] Matrix (Fin m) (Fin m) ℂ)
+    (z : EuclideanSpace ℝ η × EuclideanSpace ℝ η)
+    : psiLp H z = reim (Complex.I • H z.1 + H z.2) :=
+  rfl
 
-theorem psi_mp {m : ℕ} {η : Type} [Fintype η] (H : EuclideanSpace ℝ η →ₗ[ℝ] Matrix (Fin m) (Fin m) ℂ)
+theorem psi_mp
+    {m : ℕ} {η : Type} [Fintype η]
+    (H : EuclideanSpace ℝ η →ₗ[ℝ] Matrix (Fin m) (Fin m) ℂ)
     (hH : ∀ t, (H t)ᴴ = H t) (hn : ∀ t, ∑ i, ∑ j, ‖H t i j‖ ^ 2 = ‖t‖ ^ 2)
-    (hs : ∀ M : Matrix (Fin m) (Fin m) ℂ, Mᴴ = M → ∃ t, H t = M) :
-    MeasurePreserving (psiLp H) volume volume := by
+    (hs : ∀ M : Matrix (Fin m) (Fin m) ℂ, Mᴴ = M → ∃ t, H t = M)
+    : MeasurePreserving (psiLp H) volume volume := by
   apply mp_of_isom_prod
   · intro a b
     rw [psiLp_apply, norm_reim_sq, herm_pyth _ _ (hH a) (hH b), hn a, hn b]

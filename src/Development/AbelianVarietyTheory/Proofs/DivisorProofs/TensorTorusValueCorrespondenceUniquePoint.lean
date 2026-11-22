@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensFacts
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -17,7 +19,12 @@ open GlobalTheory.Ex GlobalTheory.Mum.TensTor
 
 namespace GlobalTheory.Mum.TensTor
 
-theorem gtRelV_unique : ∀ (F : Type) [Field F] (N N' : NumD F) {r : ℕ} (W : Matrix (Fin r) (Fin r) ℤ) (φ : N'.A → Fin r → N.A) (e : N'.X → Fin r → N.X) (wv : N'.A → F), TensFacts W φ e wv → ∀ (v' u' : N'.Gt) (vs : Fin r → N.Gt), GtRelV W φ e wv v' vs → GtRelV W φ e wv u' vs → v' = u' := by
+theorem gtRelV_unique
+    : ∀ (F : Type) [Field F] (N N' : NumD F) {r : ℕ} (W : Matrix (Fin r) (Fin r) ℤ)
+        (φ : N'.A → Fin r → N.A) (e : N'.X → Fin r → N.X) (wv : N'.A → F),
+      TensFacts W φ e wv
+        → ∀ (v' u' : N'.Gt) (vs : Fin r → N.Gt),
+          GtRelV W φ e wv v' vs → GtRelV W φ e wv u' vs → v' = u' := by
   intro F _ N N' r W φ e wv hT v' u' vs hv hu
   obtain ⟨-, hφ, -, -, -, hw, -⟩ := hT
   obtain ⟨hv1, hv2⟩ := hv

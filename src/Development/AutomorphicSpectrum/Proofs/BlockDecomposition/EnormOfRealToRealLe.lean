@@ -16,30 +16,41 @@ namespace GlobalTheory.CompanionTheory.QuotStageInt
 
 section Norm
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [SecondCountableTopology G]
 
-theorem exists_open_cover :
-    ∃ (U K : ℕ → Set G), (∀ i, IsOpen (U i)) ∧ (∀ i, IsCompact (K i)) ∧ (∀ i, U i ⊆ K i) ∧
-      ∀ g, ∃ i, g ∈ U i := by
+theorem exists_open_cover
+    : ∃ (U K : ℕ → Set G),
+      (∀ i, IsOpen (U i)) ∧ (∀ i, IsCompact (K i)) ∧ (∀ i, U i ⊆ K i) ∧ ∀ g, ∃ i, g ∈ U i := by
   have hs : ∀ x : G, ∃ K, IsCompact K ∧ K ∈ 𝓝 x := fun x => exists_compact_mem_nhds x
   choose K hK hKn using hs
-  obtain ⟨s, hsc, hsu⟩ := TopologicalSpace.countable_cover_nhds
-    (f := fun x => interior (K x)) (fun x => interior_mem_nhds.2 (hKn x))
+  obtain ⟨s, hsc, hsu⟩ :=
+    TopologicalSpace.countable_cover_nhds
+      (f := fun x => interior (K x))
+      (fun x => interior_mem_nhds.2 (hKn x))
   have hne : s.Nonempty := by
     have : (1 : G) ∈ ⋃ x ∈ s, interior (K x) := by rw [hsu]; trivial
     obtain ⟨x, hx, -⟩ := mem_iUnion₂.1 this
     exact ⟨x, hx⟩
   obtain ⟨e, rfl⟩ := hsc.exists_eq_range hne
-  refine ⟨fun i => interior (K (e i)), fun i => K (e i), fun i => isOpen_interior,
-    fun i => hK _, fun i => interior_subset, fun g => ?_⟩
+  refine ⟨
+    fun i => interior (K (e i)),
+    fun i => K (e i),
+    fun i => isOpen_interior,
+    fun i => hK _,
+    fun i => interior_subset,
+    fun g => ?_
+  ⟩
   have : g ∈ ⋃ x ∈ range e, interior (K x) := by rw [hsu]; trivial
   simpa using this
 
 variable [MeasurableSpace G] [BorelSpace G]
 
-theorem exists_normaliser (T : Subgroup G) (hT : IsClosed (T : Set G)) (μT : Measure T)
-    [μT.IsHaarMeasure] [μT.IsInvInvariant] : ∃ ρ, IsQuotNormaliser T μT ρ := by
+theorem exists_normaliser
+    (T : Subgroup G) (hT : IsClosed (T : Set G)) (μT : Measure T)
+    [μT.IsHaarMeasure] [μT.IsInvInvariant]
+    : ∃ ρ, IsQuotNormaliser T μT ρ := by
   classical
   haveI : LocallyCompactSpace T := hT.isClosedEmbedding_subtypeVal.locallyCompactSpace
   haveI : μT.IsMulRightInvariant := by
@@ -93,8 +104,7 @@ theorem exists_normaliser (T : Subgroup G) (hT : IsClosed (T : Set G)) (μT : Me
     by_cases h : g ∈ B i
     · simp only [c, indicator_of_mem h, indicator_of_mem ((hBinv i s g).2 h), hinv]
     · simp only [c, indicator_of_notMem h, indicator_of_notMem (fun h' => h ((hBinv i s g).1 h'))]
-  refine ⟨fun g => ∑' i, c i g * f i g, Measurable.tsum fun i => (hc i).mul (hf i),
-    fun g => ?_⟩
+  refine ⟨fun g => ∑' i, c i g * f i g, Measurable.tsum fun i => (hc i).mul (hf i), fun g => ?_⟩
   have e1 : ∫⁻ t : T, ∑' i, c i ((t : G) * g) * f i ((t : G) * g) ∂μT = ∑' i, c i g * m i g := by
     have hmt : ∀ i, AEMeasurable (fun t : T => c i ((t : G) * g) * f i ((t : G) * g)) μT := fun i =>
       (((hc i).mul (hf i)).comp (measurable_subtype_coe.mul_const g)).aemeasurable
@@ -124,23 +134,24 @@ end Norm
 
 section Count
 
-theorem count_inv {K : Type*} [Group K] [MeasurableSpace K] [MeasurableSingletonClass K]
-    [Countable K] : (Measure.count : Measure K).IsInvInvariant := by
+theorem count_inv
+    {K : Type*} [Group K] [MeasurableSpace K] [MeasurableSingletonClass K] [Countable K]
+    : (Measure.count : Measure K).IsInvInvariant := by
   have hmi : Measurable (fun h : K => h⁻¹) := measurable_of_countable _
   refine ⟨?_⟩
   ext s hs
   change Measure.map (fun h : K => h⁻¹) Measure.count s = _
   rw [Measure.map_apply hmi hs]
-  have : (Inv.inv ⁻¹' s : Set K) = (fun h : K => h⁻¹) '' s := by
-    ext x; simp
+  have : (Inv.inv ⁻¹' s : Set K) = (fun h : K => h⁻¹) '' s := by ext x; simp
   rw [this, Measure.count_injective_image' inv_injective hs ((Set.to_countable _).measurableSet)]
 
-theorem quotIntegral_strict {K : Type*} [Group K] [MeasurableSpace K] [MeasurableMul₂ K]
-    [MeasurableInv K] {ν : Measure K} [ν.IsMulLeftInvariant] [SFinite ν] {Γ : Subgroup K}
-    [Countable Γ] [MeasurableSingletonClass Γ] {D : Set K} (hDm : MeasurableSet D)
-    (hD : ∀ t : K, ∃! h : Γ, (h : K) * t ∈ D) {f : K → ℂ} (hf : Measurable f)
-    (hfΓ : ∀ h ∈ Γ, ∀ t, f (h * t) = f t) :
-    quotIntegral ν Γ Measure.count f = ∫ t in D, f t ∂ν := by
+theorem quotIntegral_strict
+    {K : Type*} [Group K] [MeasurableSpace K] [MeasurableMul₂ K] [MeasurableInv K]
+    {ν : Measure K} [ν.IsMulLeftInvariant] [SFinite ν]
+    {Γ : Subgroup K} [Countable Γ] [MeasurableSingletonClass Γ]
+    {D : Set K} (hDm : MeasurableSet D) (hD : ∀ t : K, ∃! h : Γ, (h : K) * t ∈ D)
+    {f : K → ℂ} (hf : Measurable f) (hfΓ : ∀ h ∈ Γ, ∀ t, f (h * t) = f t)
+    : quotIntegral ν Γ Measure.count f = ∫ t in D, f t ∂ν := by
   haveI : (Measure.count : Measure Γ).IsInvInvariant := count_inv
   have hρ : IsQuotNormaliser Γ Measure.count (D.indicator (1 : K → ℝ≥0∞)) := by
     refine ⟨measurable_one.indicator hDm, fun g => ?_⟩
@@ -160,8 +171,8 @@ section PiLocalization₂
 
 variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem map_discrete (T : Subgroup G) (Γ₀ : Subgroup T) [DiscreteTopology Γ₀] :
-    DiscreteTopology (Γ₀.map T.subtype) := by
+theorem map_discrete (T : Subgroup G) (Γ₀ : Subgroup T) [DiscreteTopology Γ₀]
+    : DiscreteTopology (Γ₀.map T.subtype) := by
   apply discreteTopology_of_isOpen_singleton_one
   obtain ⟨V', hV'o, hV'⟩ := isOpen_induced_iff.1 (isOpen_discrete ({1} : Set Γ₀))
   obtain ⟨V, hVo, rfl⟩ := isOpen_induced_iff.1 hV'o
@@ -174,13 +185,15 @@ theorem map_discrete (T : Subgroup G) (Γ₀ : Subgroup T) [DiscreteTopology Γ�
   have h' : ((⟨T.subtype γ, hh⟩ : Γ₀.map T.subtype) : G) = 1 := congrArg Subtype.val h
   exact Subtype.ext (Subtype.ext h')
 
-variable [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+variable
+  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
   {T : Subgroup G} {μT : Measure T} [μT.IsMulLeftInvariant] [SFinite μT] [μT.IsInvInvariant]
 
-theorem stage_normaliser (Γ₀ : Subgroup T) [Countable Γ₀]
-    [MeasurableSingletonClass (Γ₀.map T.subtype)] {D : Set T} (hDm : MeasurableSet D)
-    (hD : ∀ t : T, ∃! h : Γ₀, (h : T) * t ∈ D) {σ : G → ℝ≥0∞} (hσ : IsQuotNormaliser T μT σ) :
-    IsQuotNormaliser (Γ₀.map T.subtype) Measure.count
+theorem stage_normaliser
+    (Γ₀ : Subgroup T) [Countable Γ₀] [MeasurableSingletonClass (Γ₀.map T.subtype)]
+    {D : Set T} (hDm : MeasurableSet D) (hD : ∀ t : T, ∃! h : Γ₀, (h : T) * t ∈ D)
+    {σ : G → ℝ≥0∞} (hσ : IsQuotNormaliser T μT σ)
+    : IsQuotNormaliser (Γ₀.map T.subtype) Measure.count
       (fun x => ∫⁻ t in D, σ (((t⁻¹ : T) : G) * x) ∂μT) := by
   haveI : SecondCountableTopology T := IsEmbedding.subtypeVal.secondCountableTopology
   have hj : Measurable fun p : G × T => ((p.2⁻¹ : T) : G) * p.1 :=
@@ -190,8 +203,10 @@ theorem stage_normaliser (Γ₀ : Subgroup T) [Countable Γ₀]
   let e : Γ₀ ≃ Γ₀.map T.subtype := (Γ₀.equivMapOfInjective T.subtype T.subtype_injective).toEquiv
   have he : ∀ γ : Γ₀, ((e γ : Γ₀.map T.subtype) : G) = ((γ : T) : G) := fun _ => rfl
   rw [← e.tsum_eq]
-  have e1 : ∀ γ : Γ₀, ∫⁻ t in D, σ (((t⁻¹ : T) : G) * (((e γ : Γ₀.map T.subtype) : G) * x)) ∂μT =
-      ∫⁻ s : T, D.indicator (1 : T → ℝ≥0∞) ((γ : T) * s) * σ (((s⁻¹ : T) : G) * x) ∂μT := by
+  have e1
+      : ∀ γ : Γ₀,
+        ∫⁻ t in D, σ (((t⁻¹ : T) : G) * (((e γ : Γ₀.map T.subtype) : G) * x)) ∂μT
+          = ∫⁻ s : T, D.indicator (1 : T → ℝ≥0∞) ((γ : T) * s) * σ (((s⁻¹ : T) : G) * x) ∂μT := by
     intro γ
     rw [← lintegral_indicator hDm, ← lintegral_mul_left_eq_self _ (γ : T)]
     refine lintegral_congr fun s => ?_
@@ -200,17 +215,21 @@ theorem stage_normaliser (Γ₀ : Subgroup T) [Countable Γ₀]
     · simp [hs, mul_assoc]
     · simp [hs]
   simp_rw [e1]
-  have hm : ∀ γ : Γ₀, AEMeasurable (fun s : T => D.indicator (1 : T → ℝ≥0∞) ((γ : T) * s) *
-      σ (((s⁻¹ : T) : G) * x)) μT := fun γ =>
+  have hm
+      : ∀ γ : Γ₀,
+        AEMeasurable
+          (fun s : T => D.indicator (1 : T → ℝ≥0∞) ((γ : T) * s) * σ (((s⁻¹ : T) : G) * x))
+          μT := fun γ =>
     (((measurable_one.indicator hDm).comp (measurable_const_mul _)).mul
       (hσ.1.comp ((measurable_subtype_coe.comp measurable_inv).mul_const x))).aemeasurable
   rw [← lintegral_tsum hm]
-  have e2 : ∀ s : T, ∑' γ : Γ₀, D.indicator (1 : T → ℝ≥0∞) ((γ : T) * s) * σ (((s⁻¹ : T) : G) * x) =
-      σ (((s⁻¹ : T) : G) * x) := by
+  have e2
+      : ∀ s : T,
+        ∑' γ : Γ₀, D.indicator (1 : T → ℝ≥0∞) ((γ : T) * s) * σ (((s⁻¹ : T) : G) * x)
+          = σ (((s⁻¹ : T) : G) * x) := by
     intro s
     obtain ⟨h₀, h₁, hu⟩ := hD s
-    rw [tsum_eq_single h₀ fun h hh => by
-      simp [indicator_of_notMem (fun hm => hh (hu h hm))]]
+    rw [tsum_eq_single h₀ fun h hh => by simp [indicator_of_notMem (fun hm => hh (hu h hm))]]
     simp [h₁]
   simp_rw [e2]
   rw [lintegral_inv_eq_self (fun s : T => σ ((s : G) * x))]
@@ -220,28 +239,33 @@ end PiLocalization₂
 
 section Fubini
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+  [MeasurableSpace G] [BorelSpace G]
 
 theorem enorm_ofReal_toReal_le (r : ℝ≥0∞) : ‖((r.toReal : ℝ) : ℂ)‖ₑ ≤ r := by
   rw [← ofReal_norm_eq_enorm, Complex.norm_real, Real.norm_of_nonneg ENNReal.toReal_nonneg]
   exact ENNReal.ofReal_toReal_le
 
-theorem integral_stage {T : Subgroup G} (μ : Measure G) [μ.IsMulLeftInvariant] [SFinite μ]
-    (ν : Measure T) [SFinite ν] {F : G → ℂ} (hF : Measurable F) {σ : G → ℝ≥0∞} (hσ : Measurable σ)
-    (hae : ∀ᵐ x ∂μ, ∫⁻ t, σ (((t⁻¹ : T) : G) * x) ∂ν < ∞)
-    (hfin : ∫⁻ x, ‖F x‖ₑ * ∫⁻ t, σ (((t⁻¹ : T) : G) * x) ∂ν ∂μ ≠ ∞) :
-    ∫ x, F x * (((∫⁻ t, σ (((t⁻¹ : T) : G) * x) ∂ν).toReal : ℝ) : ℂ) ∂μ =
-      ∫ x, (∫ t, F ((t : G) * x) ∂ν) * (((σ x).toReal : ℝ) : ℂ) ∂μ := by
+theorem integral_stage
+    {T : Subgroup G}
+    (μ : Measure G) [μ.IsMulLeftInvariant] [SFinite μ]
+    (ν : Measure T) [SFinite ν]
+    {F : G → ℂ} (hF : Measurable F)
+    {σ : G → ℝ≥0∞} (hσ : Measurable σ) (hae : ∀ᵐ x ∂μ, ∫⁻ t, σ (((t⁻¹ : T) : G) * x) ∂ν < ∞)
+    (hfin : ∫⁻ x, ‖F x‖ₑ * ∫⁻ t, σ (((t⁻¹ : T) : G) * x) ∂ν ∂μ ≠ ∞)
+    : ∫ x, F x * (((∫⁻ t, σ (((t⁻¹ : T) : G) * x) ∂ν).toReal : ℝ) : ℂ) ∂μ
+      = ∫ x, (∫ t, F ((t : G) * x) ∂ν) * (((σ x).toReal : ℝ) : ℂ) ∂μ := by
   haveI : SecondCountableTopology T := IsEmbedding.subtypeVal.secondCountableTopology
   let A : T × G → ℂ := fun p => F p.2 * (((σ (((p.1⁻¹ : T) : G) * p.2)).toReal : ℝ) : ℂ)
   let ψ : T × G → T × G := fun p => (p.1, (p.1 : G) * p.2)
   have hj : Measurable fun p : T × G => ((p.1⁻¹ : T) : G) * p.2 :=
     (measurable_subtype_coe.comp measurable_fst.inv).mul measurable_snd
-  have hAm : Measurable A := (hF.comp measurable_snd).mul
-    (Complex.measurable_ofReal.comp (hσ.comp hj).ennreal_toReal)
+  have hAm : Measurable A :=
+    (hF.comp measurable_snd).mul (Complex.measurable_ofReal.comp (hσ.comp hj).ennreal_toReal)
   have hψ : MeasurePreserving ψ (ν.prod μ) (ν.prod μ) :=
-    (MeasurePreserving.id ν).skew_product (g := fun (t : T) (x : G) => (t : G) * x)
+    (MeasurePreserving.id ν).skew_product
+      (g := fun (t : T) (x : G) => (t : G) * x)
       ((measurable_subtype_coe.comp measurable_fst).mul measurable_snd)
       (ae_of_all _ fun t => map_mul_left_eq_self μ (t : G))
   have hAi : Integrable A (ν.prod μ) := by
@@ -254,10 +278,10 @@ theorem integral_stage {T : Subgroup G} (μ : Measure G) [μ.IsMulLeftInvariant]
     refine lintegral_mono fun t => ?_
     simp only [A, enorm_mul]
     exact mul_le_mul_right (enorm_ofReal_toReal_le _) _
-  have hBi : Integrable (A ∘ ψ) (ν.prod μ) :=
-    (hψ.integrable_comp hAm.aestronglyMeasurable).2 hAi
-  have e1 : ∫ x, F x * (((∫⁻ t, σ (((t⁻¹ : T) : G) * x) ∂ν).toReal : ℝ) : ℂ) ∂μ =
-      ∫ p, A p ∂(ν.prod μ) := by
+  have hBi : Integrable (A ∘ ψ) (ν.prod μ) := (hψ.integrable_comp hAm.aestronglyMeasurable).2 hAi
+  have e1
+      : ∫ x, F x * (((∫⁻ t, σ (((t⁻¹ : T) : G) * x) ∂ν).toReal : ℝ) : ℂ) ∂μ
+        = ∫ p, A p ∂(ν.prod μ) := by
     rw [integral_prod_symm _ hAi]
     refine integral_congr_ae ?_
     filter_upwards [hae] with x hx
@@ -269,8 +293,9 @@ theorem integral_stage {T : Subgroup G} (μ : Measure G) [μ.IsMulLeftInvariant]
   have e2 : ∫ p, A p ∂(ν.prod μ) = ∫ p, A (ψ p) ∂(ν.prod μ) := by
     conv_lhs => rw [← hψ.map_eq]
     exact integral_map hψ.measurable.aemeasurable hAm.aestronglyMeasurable
-  have e3 : ∫ p, A (ψ p) ∂(ν.prod μ) =
-      ∫ x, (∫ t, F ((t : G) * x) ∂ν) * (((σ x).toReal : ℝ) : ℂ) ∂μ := by
+  have e3
+      : ∫ p, A (ψ p) ∂(ν.prod μ)
+        = ∫ x, (∫ t, F ((t : G) * x) ∂ν) * (((σ x).toReal : ℝ) : ℂ) ∂μ := by
     rw [show ∫ p, A (ψ p) ∂(ν.prod μ) = ∫ p, (A ∘ ψ) p ∂(ν.prod μ) from rfl,
       integral_prod_symm _ hBi]
     refine integral_congr_ae (ae_of_all _ fun x => ?_)
@@ -311,8 +336,10 @@ theorem quotStage_holds : PositivityTheory.Rg.BcB.D4.QuotStage := by
     intro x h hh t
     have := hFΓ h hh ((t : G) * x)
     simpa [mul_assoc] using this
-  have hin : ∀ x, quotIntegral μT Γ₀ Measure.count (fun t : T => F ((t : G) * x)) =
-      ∫ t in D, F ((t : G) * x) ∂μT := fun x =>
+  have hin
+      : ∀ x,
+        quotIntegral μT Γ₀ Measure.count (fun t : T => F ((t : G) * x))
+          = ∫ t in D, F ((t : G) * x) ∂μT := fun x =>
     quotIntegral_strict hDm hD (hmt x) (hΓt x)
   have hΦm : Measurable fun x => ∫ t in D, F ((t : G) * x) ∂μT := by
     have hj : Measurable fun p : G × T => F ((p.2 : G) * p.1) :=
@@ -326,7 +353,8 @@ theorem quotStage_holds : PositivityTheory.Rg.BcB.D4.QuotStage := by
     have hD' : ∀ t : T, ∃! h : Γ₀, (h : T) * t ∈ D' := by
       intro t
       obtain ⟨h, h₁, hu⟩ := hD (t * s'⁻¹)
-      exact ⟨h, by simpa [D', mul_assoc] using h₁, fun k hk => hu k (by simpa [D', mul_assoc] using hk)⟩
+      exact
+        ⟨h, by simpa [D', mul_assoc] using h₁, fun k hk => hu k (by simpa [D', mul_assoc] using hk)⟩
     have e : ∫ t in D, F ((t : G) * (s * x)) ∂μT = ∫ t in D', F ((t : G) * x) ∂μT := by
       rw [← integral_indicator hDm, ← integral_indicator hD'm]
       refine (integral_mul_right_eq_self _ s'⁻¹).symm.trans ?_
@@ -337,17 +365,23 @@ theorem quotStage_holds : PositivityTheory.Rg.BcB.D4.QuotStage := by
         simp [s', mul_assoc]
       · rw [indicator_of_notMem ht, indicator_of_notMem (show t ∉ D' from ht)]
     rw [e, ← quotIntegral_strict hD'm hD' (hmt x) (hΓt x), hin]
-  have hΨ : (fun x => quotIntegral μT Γ₀ Measure.count fun t : T => F ((t : G) * x)) =
-      fun x => ∫ t in D, F ((t : G) * x) ∂μT := funext hin
+  have hΨ
+      : (fun x => quotIntegral μT Γ₀ Measure.count fun t : T => F ((t : G) * x))
+        = fun x => ∫ t in D, F ((t : G) * x) ∂μT :=
+    funext hin
   rw [hΨ, GlobalTheory.CompanionTheory.QuotNorm.quotIntegral_eq hF hFH hρ,
     GlobalTheory.CompanionTheory.QuotNorm.quotIntegral_eq hΦm hΦT hσ]
   have hfin' : ∫⁻ x, ‖F x‖ₑ * ∫⁻ t in D, σ (((t⁻¹ : T) : G) * x) ∂μT ∂μ ≠ ∞ := by
     have hex : ∃ ρ, IsQuotNormaliser (Γ₀.map T.subtype) Measure.count ρ := ⟨_, hρ⟩
     rw [quotLIntegral, dite_eq_left hex] at hfin
-    rwa [lintegral_normaliser_eq hF.enorm (fun h hh g => by simp only [hFH h hh g]) hρ hex.choose_spec]
+    rwa [lintegral_normaliser_eq hF.enorm
+      (fun h hh g => by simp only [hFH h hh g])
+      hρ hex.choose_spec]
   exact integral_stage μ (μT.restrict D) hF hσ.1
     (GlobalTheory.CompanionTheory.QuotNorm.ae_lt_top_of_normaliser hρ) hfin'
 
-theorem quotStage_of (_ : PositivityTheory.Rg.BcB.D4.NormEq) : PositivityTheory.Rg.BcB.D4.QuotStage := quotStage_holds
+theorem quotStage_of (_ : PositivityTheory.Rg.BcB.D4.NormEq)
+    : PositivityTheory.Rg.BcB.D4.QuotStage :=
+  quotStage_holds
 
 end GlobalTheory.CompanionTheory.QuotStageInt

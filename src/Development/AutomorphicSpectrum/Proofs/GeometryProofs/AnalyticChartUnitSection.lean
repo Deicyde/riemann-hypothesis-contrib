@@ -16,52 +16,71 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.UnitAtDivOfI
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
-open ReciprocityTheory.ChartRestriction.G.TB.ValAt ReciprocityTheory.ChartRestriction.G.PullbackSections
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
+open ReciprocityTheory.ChartRestriction.G.TB.ValAt
+  ReciprocityTheory.ChartRestriction.G.PullbackSections
 open GlobalTheory.CompanionTheory.Ar.Flat.GagaC
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.GagaC
 
-theorem exists_hChart_of_extendsUnitAt : ∀ (X : Scheme.{0}) (s : X ⟶ Sp ℂ) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (W U N : X.Opens) (F : (Sp ℂ ⟶ X) → ℂ) (T t : Ω) (v : Γ(X, N)) (d : ℕ) (B : Set (Fin d → ℂ)) (Y : (Fin d → ℂ) → (Sp ℂ ⟶ X)) (b₁ : Fin d → ℂ), IsCptGen ξ → IsChart s B Y → b₁ ∈ B → (∀ b ∈ B, centre (Y b) ∈ N ∧ genPt ξ ⤳ centre (Y b)) → N ≤ U → (∀ O : Set (Fin d → ℂ), IsOpen O → O ⊆ B → O.Nonempty → ∃ b ∈ O, centre (Y b) ∈ W) → IsUnit v → (∀ (q : X) (hq : genPt ξ ⤳ q) (h : q ∈ N), genMap ξ ⟨q, hq⟩ (X.presheaf.germ N q h v) = t / T) → T ≠ 0 → ExtendsUnitAt s (RingHom.id ℂ) ξ W F t (Y b₁) → ∃ (B₂ : Set (Fin d → ℂ)) (H : (Fin d → ℂ) → ℂ), b₁ ∈ B₂ ∧ HChart s ξ W U F T B₂ Y H := by
+theorem exists_hChart_of_extendsUnitAt
+    : ∀ (X : Scheme.{0}) (s : X ⟶ Sp ℂ) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (W U N : X.Opens)
+        (F : (Sp ℂ ⟶ X) → ℂ) (T t : Ω) (v : Γ(X, N)) (d : ℕ) (B : Set (Fin d → ℂ))
+        (Y : (Fin d → ℂ) → (Sp ℂ ⟶ X)) (b₁ : Fin d → ℂ),
+      IsCptGen ξ → IsChart s B Y → b₁ ∈ B → (∀ b ∈ B, centre (Y b) ∈ N ∧ genPt ξ ⤳ centre (Y b))
+        → N ≤ U → (∀ O : Set (Fin d → ℂ), IsOpen O → O ⊆ B → O.Nonempty → ∃ b ∈ O, centre (Y b) ∈ W)
+        → IsUnit v
+        → (∀ (q : X) (hq : genPt ξ ⤳ q) (h : q ∈ N),
+          genMap ξ ⟨q, hq⟩ (X.presheaf.germ N q h v) = t / T)
+        → T ≠ 0 → ExtendsUnitAt s (RingHom.id ℂ) ξ W F t (Y b₁)
+        → ∃ (B₂ : Set (Fin d → ℂ)) (H : (Fin d → ℂ) → ℂ), b₁ ∈ B₂ ∧ HChart s ξ W U F T B₂ Y H := by
   intro X s Ω _ ξ W U N F T t v d B Y b₁ hξ hY hb₁ hN hNU hW hv hg hT hE
-  have hid : spMap (RingHom.id ℂ) = 𝟙 (Sp ℂ) := by
-    simp [spMap]
-  obtain ⟨ε, h', hε, hd, h0, hrel⟩ := hE d B Y hY.isOpen hY.hol
-    (fun b hb => (hY.isOver b hb).trans hid.symm) b₁ hb₁ rfl
+  have hid : spMap (RingHom.id ℂ) = 𝟙 (Sp ℂ) := by simp [spMap]
+  obtain ⟨ε, h', hε, hd, h0, hrel⟩ :=
+    hE d B Y hY.isOpen hY.hol (fun b hb => (hY.isOver b hb).trans hid.symm) b₁ hb₁ rfl
   have hopen : IsOpen (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ) :=
     hd.continuousOn.isOpen_inter_preimage isOpen_ball isOpen_compl_singleton
   have hB₂ : IsOpen (B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ)) := hY.isOpen.inter hopen
   have hsub : B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ) ⊆ B := Set.inter_subset_left
   have htop : ∀ b ∈ B, ⊤ ≤ Y b ⁻¹ᵁ N := fun b hb => (top_le_iff_centre _ _).2 (hN b hb).1
-  refine ⟨B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ), fun b => h' b * valAt' (Y b) N v,
-    ⟨hb₁, Metric.mem_ball_self hε, h0⟩, ?_⟩
-  refine
-    { chart := by
-        refine { isOpen := hB₂, hol := ?_, isOver := fun b hb => hY.isOver b (hsub hb), factor := ?_ }
-        · intro U f
-          have e : {b ∈ B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ) | ⊤ ≤ Y b ⁻¹ᵁ U} =
-              (B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ)) ∩ {b ∈ B | ⊤ ≤ Y b ⁻¹ᵁ U} := by
-            ext b
-            exact ⟨fun hb => ⟨hb.1, hsub hb.1, hb.2⟩, fun hb => ⟨hb.1, hb.2.2⟩⟩
-          rw [e]
-          exact ⟨hB₂.inter (hY.hol U f).1, (hY.hol U f).2.mono Set.inter_subset_right⟩
-        · intro m B' y oB hy ov b₀ h₀ b₂ h₂ e
-          obtain ⟨ε', κ, ε0, sub, dκ, k₀, hκ⟩ := hY.factor m B' y oB hy ov b₀ h₀ b₂ (hsub h₂) e
-          have c : ContinuousAt κ b₀ := (dκ.differentiableAt (ball_mem_nhds _ ε0)).continuousAt
-          have m₂ : κ ⁻¹' (B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ)) ∈ 𝓝 b₀ :=
-            c.preimage_mem_nhds (hB₂.mem_nhds (k₀ ▸ h₂))
-          obtain ⟨δ, δ0, hδ⟩ := Metric.mem_nhds_iff.1 (Filter.inter_mem m₂ (ball_mem_nhds b₀ ε0))
-          have sb : ball b₀ δ ⊆ ball b₀ ε' := fun b hb => (hδ hb).2
-          exact ⟨δ, κ, δ0, sb.trans sub, dκ.mono sb, k₀, fun b hb => ⟨(hδ hb).1, (hκ b (sb hb)).2⟩⟩
-      inU := fun b hb => hNU (hN b hb.1).1
-      cpt := fun b hb => (hN b hb.1).2
-      dense := fun O oO sO nO => hW O oO (sO.trans hsub) nO
-      hol := ?_
-      ne := ?_
-      rel := ?_ }
+  refine ⟨
+    B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ),
+    fun b => h' b * valAt' (Y b) N v,
+    ⟨hb₁, Metric.mem_ball_self hε, h0⟩,
+    ?_
+  ⟩
+  refine {
+    chart := by
+      refine { isOpen := hB₂, hol := ?_, isOver := fun b hb => hY.isOver b (hsub hb), factor := ?_ }
+      · intro U f
+        have e
+            : {b ∈ B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ) | ⊤ ≤ Y b ⁻¹ᵁ U}
+              = (B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ)) ∩ {b ∈ B | ⊤ ≤ Y b ⁻¹ᵁ U} := by
+          ext b
+          exact ⟨fun hb => ⟨hb.1, hsub hb.1, hb.2⟩, fun hb => ⟨hb.1, hb.2.2⟩⟩
+        rw [e]
+        exact ⟨hB₂.inter (hY.hol U f).1, (hY.hol U f).2.mono Set.inter_subset_right⟩
+      · intro m B' y oB hy ov b₀ h₀ b₂ h₂ e
+        obtain ⟨ε', κ, ε0, sub, dκ, k₀, hκ⟩ := hY.factor m B' y oB hy ov b₀ h₀ b₂ (hsub h₂) e
+        have c : ContinuousAt κ b₀ := (dκ.differentiableAt (ball_mem_nhds _ ε0)).continuousAt
+        have m₂ : κ ⁻¹' (B ∩ (ball b₁ ε ∩ h' ⁻¹' {0}ᶜ)) ∈ 𝓝 b₀ :=
+          c.preimage_mem_nhds (hB₂.mem_nhds (k₀ ▸ h₂))
+        obtain ⟨δ, δ0, hδ⟩ := Metric.mem_nhds_iff.1 (Filter.inter_mem m₂ (ball_mem_nhds b₀ ε0))
+        have sb : ball b₀ δ ⊆ ball b₀ ε' := fun b hb => (hδ hb).2
+        exact ⟨δ, κ, δ0, sb.trans sub, dκ.mono sb, k₀, fun b hb => ⟨(hδ hb).1, (hκ b (sb hb)).2⟩⟩
+    inU := fun b hb => hNU (hN b hb.1).1
+    cpt := fun b hb => (hN b hb.1).2
+    dense := fun O oO sO nO => hW O oO (sO.trans hsub) nO
+    hol := ?_
+    ne := ?_
+    rel := ?_
+  }
   · refine DifferentiableOn.mul (hd.mono fun b hb => hb.2.1) ?_
     exact (hY.hol N v).2.mono fun b hb => ⟨hb.1, htop b hb.1⟩
   · intro b hb

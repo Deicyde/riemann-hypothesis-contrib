@@ -8,9 +8,11 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.Metric.Telescope
 
-theorem fin_iic_telescope : ∀ (N : ℕ) (M : Type) [AddCommGroup M] (f : Fin N → M) (i : Fin N),
-    f i = -∑ k ∈ Finset.Iic i, (if h : (k : ℕ) = 0 then -f k else
-      f ⟨(k : ℕ) - 1, by have := k.2; omega⟩ - f k) := by
+theorem fin_iic_telescope
+    : ∀ (N : ℕ) (M : Type) [AddCommGroup M] (f : Fin N → M) (i : Fin N),
+      f i
+        = - ∑ k ∈ Finset.Iic i, (if h : (k : ℕ) = 0 then -f k else
+          f ⟨(k : ℕ) - 1, by have := k.2; omega⟩ - f k) := by
   intro N M _ f i
   obtain ⟨n, hn⟩ := i
   induction n with
@@ -31,8 +33,8 @@ theorem fin_iic_telescope : ∀ (N : ℕ) (M : Type) [AddCommGroup M] (f : Fin N
       omega
     have hs := (neg_eq_iff_eq_neg.mpr (ih hn')).symm
     rw [hset, Finset.sum_insert hnot, dite_eq_right (by simp), hs]
-    have e : ∀ p, f ⟨(⟨n + 1, hn⟩ : Fin N).val - 1, p⟩ = f ⟨n, hn'⟩ :=
-      fun p => congrArg f (Fin.ext (by simp))
+    have e : ∀ p, f ⟨(⟨n + 1, hn⟩ : Fin N).val - 1, p⟩ = f ⟨n, hn'⟩ := fun p =>
+      congrArg f (Fin.ext (by simp))
     rw [e]
     abel
 

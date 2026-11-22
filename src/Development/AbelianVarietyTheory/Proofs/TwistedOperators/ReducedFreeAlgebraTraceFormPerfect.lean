@@ -10,9 +10,10 @@ open GlobalTheory.RegSS
 
 namespace GlobalTheory.RegSS
 
-theorem eq_zero_of_trace_mul_eq_zero {F L : Type} [Field F] [CharZero F] [CommRing L]
-    [Algebra F L] [Module.Finite F L] [IsReduced L] (x : L)
-    (hx : ∀ y : L, Algebra.trace F L (x * y) = 0) : x = 0 := by
+theorem eq_zero_of_trace_mul_eq_zero
+    {F L : Type} [Field F] [CharZero F] [CommRing L] [Algebra F L] [Module.Finite F L] [IsReduced L]
+    (x : L) (hx : ∀ y : L, Algebra.trace F L (x * y) = 0)
+    : x = 0 := by
   have : IsArtinianRing L := IsArtinianRing.of_finite F L
   have : IsSemisimpleRing L := IsArtinianRing.isSemisimpleRing_of_isReduced L
 
@@ -53,8 +54,7 @@ theorem tracePerfect : TracePerfect := by
   let g : L →ₗ[E] L := b.toDualEquiv.symm.toLinearMap ∘ₗ Algebra.traceForm E L
   have ginj : Function.Injective g := b.toDualEquiv.symm.injective.comp inj
   refine ⟨inj, fun f => ?_⟩
-  obtain ⟨x, hx⟩ := (IsArtinian.bijective_of_injective_endomorphism g ginj).2
-    (b.toDualEquiv.symm f)
+  obtain ⟨x, hx⟩ := (IsArtinian.bijective_of_injective_endomorphism g ginj).2 (b.toDualEquiv.symm f)
   exact ⟨x, b.toDualEquiv.symm.injective hx⟩
 
 end GlobalTheory.RegSS

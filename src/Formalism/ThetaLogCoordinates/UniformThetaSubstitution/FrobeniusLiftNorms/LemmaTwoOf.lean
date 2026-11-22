@@ -28,8 +28,8 @@ def sl (G : MvPowerSeries (Fin 2) K) (m : ℕ) : PowerSeries K :=
 def ext3 (e : Fin 2 →₀ ℕ) (m : ℕ) : Fin 3 →₀ ℕ :=
   Finsupp.embDomain Fin.castSuccEmb e + Finsupp.single 2 m
 
-theorem include_three_eq_rename (g : MvPowerSeries (Fin 2) K) :
-    in3 g = MvPowerSeries.rename (Fin.castSuccEmb (n := 2)) g := by
+theorem include_three_eq_rename (g : MvPowerSeries (Fin 2) K)
+    : in3 g = MvPowerSeries.rename (Fin.castSuccEmb (n := 2)) g := by
   rw [MvPowerSeries.rename_eq_subst, in3]
   congr 1
   funext i
@@ -43,21 +43,24 @@ theorem embDomain_two (e : Fin 2 →₀ ℕ) : Finsupp.embDomain Fin.castSuccEmb
   simp at h1
   omega
 
-private theorem coeff_rename_map_lemma {σ τ : Type} (f : σ → τ) [Filter.TendstoCofinite f]
-    (hf : Function.Injective f) (g : MvPowerSeries σ K) (u : σ →₀ ℕ) :
-    MvPowerSeries.coeff (Finsupp.mapDomain f u) (MvPowerSeries.rename f g) = MvPowerSeries.coeff u g := by
+private theorem coeff_rename_map_lemma
+    {σ τ : Type} (f : σ → τ) [Filter.TendstoCofinite f]
+    (hf : Function.Injective f) (g : MvPowerSeries σ K) (u : σ →₀ ℕ)
+    : MvPowerSeries.coeff (Finsupp.mapDomain f u) (MvPowerSeries.rename f g)
+      = MvPowerSeries.coeff u g := by
   classical
   rw [MvPowerSeries.coeff_rename, Finset.sum_eq_single_of_mem u]
   · simp
   · intro b hb hne
     exfalso
     apply hne
-    simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq] at hb
+    simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq]
+      at hb
     exact Finsupp.mapDomain_injective hf hb
 
-theorem coeff_include_three_mul (g : MvPowerSeries (Fin 2) K) (e : Fin 2 →₀ ℕ) (m j : ℕ) :
-    MvPowerSeries.coeff (ext3 e m) (in3 g * MvPowerSeries.X 2 ^ j) =
-      if j = m then MvPowerSeries.coeff e g else 0 := by
+theorem coeff_include_three_mul (g : MvPowerSeries (Fin 2) K) (e : Fin 2 →₀ ℕ) (m j : ℕ)
+    : MvPowerSeries.coeff (ext3 e m) (in3 g * MvPowerSeries.X 2 ^ j)
+      = if j = m then MvPowerSeries.coeff e g else 0 := by
   classical
   rw [include_three_eq_rename]
   by_cases h : j = m
@@ -87,31 +90,36 @@ theorem coeff_include_three_mul (g : MvPowerSeries (Fin 2) K) (e : Fin 2 →₀ 
         omega
     · rw [mul_zero]
 
-theorem constantCoeff_law_first_two_of_three {g : MvPowerSeries (Fin 2) K} (hg : MvPowerSeries.constantCoeff g = 0) :
-    MvPowerSeries.constantCoeff (in3 g) = 0 := by
+theorem constantCoeff_law_first_two_of_three
+    {g : MvPowerSeries (Fin 2) K} (hg : MvPowerSeries.constantCoeff g = 0)
+    : MvPowerSeries.constantCoeff (in3 g) = 0 := by
   rw [include_three_eq_rename, MvPowerSeries.constantCoeff_rename, hg]
 
 theorem include_three_pow (g : MvPowerSeries (Fin 2) K) (k : ℕ) : in3 g ^ k = in3 (g ^ k) := by
   rw [include_three_eq_rename, include_three_eq_rename, map_pow]
 
-theorem include_three_X (i : Fin 2) :
-    in3 (MvPowerSeries.X i : MvPowerSeries (Fin 2) K) = MvPowerSeries.X (Fin.castSucc i) := by
+theorem include_three_X (i : Fin 2)
+    : in3 (MvPowerSeries.X i : MvPowerSeries (Fin 2) K) = MvPowerSeries.X (Fin.castSucc i) := by
   rw [include_three_eq_rename, MvPowerSeries.rename_X]
   rfl
 
-theorem fin_two_vector_eq_matrixVecCons (d : Fin 2 →₀ ℕ) : d = Finsupp.single 0 (d 0) + Finsupp.single 1 (d 1) := by
+theorem fin_two_vector_eq_matrixVecCons (d : Fin 2 →₀ ℕ)
+    : d = Finsupp.single 0 (d 0) + Finsupp.single 1 (d 1) := by
   ext i
   fin_cases i <;> simp
 
-theorem coeff_pow_high {ι : Type} {f : MvPowerSeries ι K} (hf : MvPowerSeries.constantCoeff f = 0)
-    {e : ι →₀ ℕ} {k : ℕ} (hk : e.degree < k) : MvPowerSeries.coeff e (f ^ k) = 0 :=
+theorem coeff_pow_high
+    {ι : Type} {f : MvPowerSeries ι K} (hf : MvPowerSeries.constantCoeff f = 0)
+    {e : ι →₀ ℕ} {k : ℕ} (hk : e.degree < k)
+    : MvPowerSeries.coeff e (f ^ k) = 0 :=
   MvPowerSeries.coeff_of_lt_order (lt_of_lt_of_le (by exact_mod_cast hk)
     (MvPowerSeries.le_order_pow_of_constantCoeff_eq_zero k hf))
 
-theorem coeff_subst_slice {f : MvPowerSeries (Fin 2) K} (hf : MvPowerSeries.constantCoeff f = 0)
-    (G : MvPowerSeries (Fin 2) K) (e : Fin 2 →₀ ℕ) (m : ℕ) :
-    MvPowerSeries.coeff (ext3 e m) (MvPowerSeries.subst ![in3 f, MvPowerSeries.X 2] G) =
-      MvPowerSeries.coeff e (PowerSeries.subst f (sl G m)) := by
+theorem coeff_subst_slice
+    {f : MvPowerSeries (Fin 2) K} (hf : MvPowerSeries.constantCoeff f = 0)
+    (G : MvPowerSeries (Fin 2) K) (e : Fin 2 →₀ ℕ) (m : ℕ)
+    : MvPowerSeries.coeff (ext3 e m) (MvPowerSeries.subst ![in3 f, MvPowerSeries.X 2] G)
+      = MvPowerSeries.coeff e (PowerSeries.subst f (sl G m)) := by
   classical
   have ha : MvPowerSeries.HasSubst ![in3 f, (MvPowerSeries.X 2 : MvPowerSeries (Fin 3) K)] :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun s => by
@@ -120,16 +128,21 @@ theorem coeff_subst_slice {f : MvPowerSeries (Fin 2) K} (hf : MvPowerSeries.cons
       · simp)
   have hb : PowerSeries.HasSubst f := PowerSeries.HasSubst.of_constantCoeff_zero hf
   rw [MvPowerSeries.coeff_subst ha, PowerSeries.coeff_subst hb]
-  have hterm : ∀ d : Fin 2 →₀ ℕ, MvPowerSeries.coeff (ext3 e m)
-      (d.prod fun s k => (![in3 f, MvPowerSeries.X 2] : Fin 2 → MvPowerSeries (Fin 3) K) s ^ k) =
-        if d 1 = m then MvPowerSeries.coeff e (f ^ d 0) else 0 := by
+  have hterm
+      : ∀ d : Fin 2 →₀ ℕ,
+        MvPowerSeries.coeff (ext3 e m)
+            (d.prod fun s k =>
+              (![in3 f, MvPowerSeries.X 2] : Fin 2 → MvPowerSeries (Fin 3) K) s ^ k)
+          = if d 1 = m then MvPowerSeries.coeff e (f ^ d 0) else 0 := by
     intro d
     rw [Finsupp.prod_fintype _ _ (fun i => pow_zero _), Fin.prod_univ_two]
     simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
     rw [include_three_pow, coeff_include_three_mul]
   simp_rw [hterm]
   rw [finsum_eq_sum_of_support_subset _
-      (s := (Finset.range (e.degree + 1)).image (fun i => Finsupp.single (0 : Fin 2) i + Finsupp.single 1 m)),
+      (s :=
+        (Finset.range (e.degree + 1)).image
+          (fun i => Finsupp.single (0 : Fin 2) i + Finsupp.single 1 m)),
     finsum_eq_sum_of_support_subset _ (s := Finset.range (e.degree + 1))]
   · rw [Finset.sum_image]
     · apply Finset.sum_congr rfl
@@ -154,13 +167,16 @@ theorem coeff_subst_slice {f : MvPowerSeries (Fin 2) K} (hf : MvPowerSeries.cons
         exact (fin_two_vector_eq_matrixVecCons d).symm
     · exact absurd (smul_zero _) hd
 
-theorem coeff_partial_coboundary {F : MvPowerSeries (Fin 2) K} (hF : MvPowerSeries.constantCoeff F = 0)
-    (G : MvPowerSeries (Fin 2) K) (e : Fin 2 →₀ ℕ) (m : ℕ) :
-    MvPowerSeries.coeff (ext3 e m) (d1 F G) = MvPowerSeries.coeff e (cob F (sl G m)) := by
-  have h0 := coeff_subst_slice (f := (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) K))
-    (MvPowerSeries.constantCoeff_X 0) G e m
-  have h1 := coeff_subst_slice (f := (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) K))
-    (MvPowerSeries.constantCoeff_X 1) G e m
+theorem coeff_partial_coboundary
+    {F : MvPowerSeries (Fin 2) K} (hF : MvPowerSeries.constantCoeff F = 0)
+    (G : MvPowerSeries (Fin 2) K) (e : Fin 2 →₀ ℕ) (m : ℕ)
+    : MvPowerSeries.coeff (ext3 e m) (d1 F G) = MvPowerSeries.coeff e (cob F (sl G m)) := by
+  have h0 :=
+    coeff_subst_slice (f := (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) K))
+      (MvPowerSeries.constantCoeff_X 0) G e m
+  have h1 :=
+    coeff_subst_slice (f := (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) K))
+      (MvPowerSeries.constantCoeff_X 1) G e m
   rw [include_three_X] at h0 h1
   rw [d1, map_sub, map_sub, coeff_subst_slice hF, cob, map_sub, map_sub, at1, at1]
   rw [← h0, ← h1]
@@ -190,19 +206,21 @@ theorem coeff_one_lgF {p : ℕ} (hp : 2 ≤ p) : PowerSeries.coeff 1 (lgF K p) =
   have hne : (1 : ℕ) ≠ (p ^ 2) ^ 1 := by rw [pow_one]; omega
   rw [if_neg hne, if_pos (by rw [pow_zero]), pow_zero, inv_one, add_zero]
 
-theorem swap_two_eq_rename (H : MvPowerSeries (Fin 2) K) :
-    swap2 H = MvPowerSeries.rename (Equiv.swap (0 : Fin 2) 1).toEmbedding H := by
+theorem swap_two_eq_rename (H : MvPowerSeries (Fin 2) K)
+    : swap2 H = MvPowerSeries.rename (Equiv.swap (0 : Fin 2) 1).toEmbedding H := by
   rw [MvPowerSeries.rename_eq_subst, swap2]
   congr 1
   funext i
   fin_cases i <;> rfl
 
-theorem coeff_swap2 (H : MvPowerSeries (Fin 2) K) (i k : ℕ) :
-    MvPowerSeries.coeff (Finsupp.single 0 i + Finsupp.single 1 k) (swap2 H) =
-      MvPowerSeries.coeff (Finsupp.single 0 k + Finsupp.single 1 i) H := by
+theorem coeff_swap2 (H : MvPowerSeries (Fin 2) K) (i k : ℕ)
+    : MvPowerSeries.coeff (Finsupp.single 0 i + Finsupp.single 1 k) (swap2 H)
+      = MvPowerSeries.coeff (Finsupp.single 0 k + Finsupp.single 1 i) H := by
   rw [swap_two_eq_rename]
-  have hu : Finsupp.mapDomain (⇑(Equiv.swap (0 : Fin 2) 1).toEmbedding)
-      (Finsupp.single 0 k + Finsupp.single 1 i) = Finsupp.single 0 i + Finsupp.single 1 k := by
+  have hu
+      : Finsupp.mapDomain (⇑(Equiv.swap (0 : Fin 2) 1).toEmbedding)
+          (Finsupp.single 0 k + Finsupp.single 1 i)
+        = Finsupp.single 0 i + Finsupp.single 1 k := by
     rw [Finsupp.mapDomain_add, Finsupp.mapDomain_single, Finsupp.mapDomain_single]
     simp only [Equiv.coe_toEmbedding, Equiv.swap_apply_left, Equiv.swap_apply_right]
     exact add_comm _ _
@@ -216,15 +234,15 @@ theorem pow_parity {p : ℕ} (hp : 2 ≤ p) (i j : ℕ) : p * (p ^ 2) ^ i ≠ (p
   have := Nat.pow_right_injective hp h
   omega
 
-theorem coeff_lgF_odd {p : ℕ} (hp : 2 ≤ p) (i : ℕ) :
-    PowerSeries.coeff (p * (p ^ 2) ^ i) (lgF K p) = 0 := by
+theorem coeff_lgF_odd {p : ℕ} (hp : 2 ≤ p) (i : ℕ)
+    : PowerSeries.coeff (p * (p ^ 2) ^ i) (lgF K p) = 0 := by
   rw [lgF, PowerSeries.coeff_mk]
   apply Finset.sum_eq_zero
   intro j _
   rw [if_neg (pow_parity hp i j)]
 
-theorem coeff_g0F_even {p : ℕ} (hp : 2 ≤ p) (i : ℕ) :
-    PowerSeries.coeff ((p ^ 2) ^ i) (g0F K p) = 0 := by
+theorem coeff_g0F_even {p : ℕ} (hp : 2 ≤ p) (i : ℕ)
+    : PowerSeries.coeff ((p ^ 2) ^ i) (g0F K p) = 0 := by
   rw [g0F, PowerSeries.coeff_mk]
   apply Finset.sum_eq_zero
   intro j _
@@ -244,7 +262,6 @@ end Norm
 
 end LemTwo
 
-
 open LemTwo in
 theorem LemmaTwo_of (h1 : LemmaOne) (hL : LawSymm) : LemmaTwo := by
   open LemTwo in
@@ -255,7 +272,8 @@ theorem LemmaTwo_of (h1 : LemmaOne) (hL : LawSymm) : LemmaTwo := by
   have np : ∀ k : ℕ, ‖((p : K) ^ k)⁻¹‖ = (p : ℝ) ^ k := by
     intro k
     rw [norm_inv, norm_pow, hnp, inv_pow, inv_inv]
-  have zero_of_bdd : ∀ (c : K) (M : ℝ), (∀ N : ℕ, ∃ k, N ≤ k ∧ ‖c * ((p : K) ^ k)⁻¹‖ ≤ M) → c = 0 := by
+  have zero_of_bdd
+      : ∀ (c : K) (M : ℝ), (∀ N : ℕ, ∃ k, N ≤ k ∧ ‖c * ((p : K) ^ k)⁻¹‖ ≤ M) → c = 0 := by
     intro c M h
     by_contra hc
     have hcpos : 0 < ‖c‖ := norm_pos_iff.2 hc
@@ -269,7 +287,9 @@ theorem LemmaTwo_of (h1 : LemmaOne) (hL : LawSymm) : LemmaTwo := by
     linarith [mul_comm ‖c‖ ((p : ℝ) ^ k)]
   have ultra : ∀ {a b : K} {M : ℝ}, ‖a - b‖ ≤ 1 → ‖b‖ ≤ M → 1 ≤ M → ‖a‖ ≤ M := by
     intro a b M h hb hM
-    calc ‖a‖ = ‖(a - b) + b‖ := by rw [sub_add_cancel]
+    calc
+      ‖a‖
+        = ‖(a - b) + b‖ := by rw [sub_add_cancel]
       _ ≤ max ‖a - b‖ ‖b‖ := IsUltrametricDist.norm_add_le_max _ _
       _ ≤ M := max_le (h.trans hM) hb
   have hpp : 2 ≤ p ^ 2 := by nlinarith
@@ -321,11 +341,13 @@ theorem LemmaTwo_of (h1 : LemmaOne) (hL : LawSymm) : LemmaTwo := by
       simp [h]
     · left
       simp [h]
-  have cobInt : ∀ G : MvPowerSeries (Fin 2) K, Integral (d1 F G) → ∀ m, Integral (cob F (sl G m)) := by
+  have cobInt
+      : ∀ G : MvPowerSeries (Fin 2) K, Integral (d1 F G) → ∀ m, Integral (cob F (sl G m)) := by
     intro G hG m e
     rw [← LemTwo.coeff_partial_coboundary hF0 G e m]
     exact hG _
-  have c0 : ∀ G : MvPowerSeries (Fin 2) K, DivAB G → ∀ m, PowerSeries.constantCoeff (sl G m) = 0 := by
+  have c0
+      : ∀ G : MvPowerSeries (Fin 2) K, DivAB G → ∀ m, PowerSeries.constantCoeff (sl G m) = 0 := by
     intro G hG m
     rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, sl, PowerSeries.coeff_mk]
     apply hG
@@ -334,26 +356,34 @@ theorem LemmaTwo_of (h1 : LemmaOne) (hL : LawSymm) : LemmaTwo := by
   choose α β R hα hR hsl using fun m => h1 K p σ hU F hF (sl H m) (c0 H hH m) (cobInt H hd m)
   choose α' β' R' hα' hR' hsl' using fun m =>
     h1 K p σ hU F hF (sl (swap2 H) m) (c0 _ hH2 m) (cobInt _ hd' m)
-  have cH : ∀ i m, MvPowerSeries.coeff (Finsupp.single 0 i + Finsupp.single 1 m) H =
-      α m * PowerSeries.coeff i (g0F K p) + β m * PowerSeries.coeff i (lgF K p) +
-        PowerSeries.coeff i (R m) := by
+  have cH
+      : ∀ i m,
+        MvPowerSeries.coeff (Finsupp.single 0 i + Finsupp.single 1 m) H
+          = α m * PowerSeries.coeff i (g0F K p) + β m * PowerSeries.coeff i (lgF K p)
+            + PowerSeries.coeff i (R m) := by
     intro i m
     have h3 := congrArg (PowerSeries.coeff i) (hsl m)
     rw [sl, PowerSeries.coeff_mk] at h3
     rw [h3, map_add (f := _), map_add (f := _), PowerSeries.coeff_C_mul, PowerSeries.coeff_C_mul]
-  have cH' : ∀ i m, MvPowerSeries.coeff (Finsupp.single 0 i + Finsupp.single 1 m) H =
-      α' i * PowerSeries.coeff m (g0F K p) + β' i * PowerSeries.coeff m (lgF K p) +
-        PowerSeries.coeff m (R' i) := by
+  have cH'
+      : ∀ i m,
+        MvPowerSeries.coeff (Finsupp.single 0 i + Finsupp.single 1 m) H
+          = α' i * PowerSeries.coeff m (g0F K p) + β' i * PowerSeries.coeff m (lgF K p)
+            + PowerSeries.coeff m (R' i) := by
     intro i m
     have h3 := congrArg (PowerSeries.coeff m) (hsl' i)
     rw [sl, PowerSeries.coeff_mk, LemTwo.coeff_swap2] at h3
     rw [h3, map_add (f := _), map_add (f := _), PowerSeries.coeff_C_mul, PowerSeries.coeff_C_mul]
-  have star : ∀ i m, ‖(α m * PowerSeries.coeff i (g0F K p) + β m * PowerSeries.coeff i (lgF K p)) -
-      (α' i * PowerSeries.coeff m (g0F K p) + β' i * PowerSeries.coeff m (lgF K p))‖ ≤ 1 := by
+  have star
+      : ∀ i m,
+        ‖(α m * PowerSeries.coeff i (g0F K p) + β m * PowerSeries.coeff i (lgF K p)) -
+            (α' i * PowerSeries.coeff m (g0F K p) + β' i * PowerSeries.coeff m (lgF K p))‖
+          ≤ 1 := by
     intro i m
-    have e : (α m * PowerSeries.coeff i (g0F K p) + β m * PowerSeries.coeff i (lgF K p)) -
-        (α' i * PowerSeries.coeff m (g0F K p) + β' i * PowerSeries.coeff m (lgF K p)) =
-        PowerSeries.coeff m (R' i) - PowerSeries.coeff i (R m) := by
+    have e
+        : (α m * PowerSeries.coeff i (g0F K p) + β m * PowerSeries.coeff i (lgF K p))
+            - (α' i * PowerSeries.coeff m (g0F K p) + β' i * PowerSeries.coeff m (lgF K p))
+          = PowerSeries.coeff m (R' i) - PowerSeries.coeff i (R m) := by
       have e1 := cH i m
       have e2 := cH' i m
       linear_combination e2 - e1
@@ -406,9 +436,11 @@ theorem LemmaTwo_of (h1 : LemmaOne) (hL : LawSymm) : LemmaTwo := by
     rw [LemTwo.coeff_g0F_even hp2 N, lg_pow N, LemTwo.coeff_g0F_even hp2 l, lg_pow l, hB] at s1
     rw [LemTwo.coeff_g0F_even hp2 N, lg_pow N, g01, lg1, hB] at s2
     simp only [mul_zero, zero_mul, add_zero, zero_add, mul_one] at s1 s2
-    have e : (β ((p ^ 2) ^ l) - β 1 * ((p : K) ^ l)⁻¹) * ((p : K) ^ N)⁻¹ =
-        (β ((p ^ 2) ^ l) * ((p : K) ^ N)⁻¹ - β' ((p ^ 2) ^ N) * ((p : K) ^ l)⁻¹) -
-          ((p : K) ^ l)⁻¹ * (β 1 * ((p : K) ^ N)⁻¹ - β' ((p ^ 2) ^ N)) := by ring
+    have e
+        : (β ((p ^ 2) ^ l) - β 1 * ((p : K) ^ l)⁻¹) * ((p : K) ^ N)⁻¹
+          = (β ((p ^ 2) ^ l) * ((p : K) ^ N)⁻¹ - β' ((p ^ 2) ^ N) * ((p : K) ^ l)⁻¹)
+            - ((p : K) ^ l)⁻¹ * (β 1 * ((p : K) ^ N)⁻¹ - β' ((p ^ 2) ^ N)) := by
+      ring
     rw [e]
     have usub : ∀ a b : K, ‖a - b‖ ≤ max ‖a‖ ‖b‖ := fun a b => by
       rw [sub_eq_add_neg]
@@ -423,13 +455,17 @@ theorem LemmaTwo_of (h1 : LemmaOne) (hL : LawSymm) : LemmaTwo := by
   rw [LemTwo.fin_two_vector_eq_matrixVecCons n]
   set i := n 0
   set m := n 1
-  rw [map_sub, MvPowerSeries.coeff_C_mul, at1, at1, PowerSeries.coeff_subst_X_zero_subst_mul_X_one, cH,
-    hB m]
-  have ev0 : (Finsupp.single (0 : Fin 2) i + Finsupp.single (1 : Fin 2) m : Fin 2 →₀ ℕ) 0 = i := by simp
-  have ev1 : (Finsupp.single (0 : Fin 2) i + Finsupp.single (1 : Fin 2) m : Fin 2 →₀ ℕ) 1 = m := by simp
+  rw [map_sub, MvPowerSeries.coeff_C_mul, at1, at1, PowerSeries.coeff_subst_X_zero_subst_mul_X_one,
+    cH, hB m]
+  have ev0 : (Finsupp.single (0 : Fin 2) i + Finsupp.single (1 : Fin 2) m : Fin 2 →₀ ℕ) 0 = i := by
+    simp
+  have ev1 : (Finsupp.single (0 : Fin 2) i + Finsupp.single (1 : Fin 2) m : Fin 2 →₀ ℕ) 1 = m := by
+    simp
   rw [ev0, ev1]
-  have key : β m * PowerSeries.coeff i (lgF K p) -
-      β 1 * (PowerSeries.coeff i (lgF K p) * PowerSeries.coeff m (lgF K p)) = 0 := by
+  have key
+      : β m * PowerSeries.coeff i (lgF K p)
+          - β 1 * (PowerSeries.coeff i (lgF K p) * PowerSeries.coeff m (lgF K p))
+        = 0 := by
     by_cases hm : ∃ l, m = (p ^ 2) ^ l
     · obtain ⟨l, hl⟩ := hm
       rw [hl, hD l, lg_pow l]
@@ -437,10 +473,14 @@ theorem LemmaTwo_of (h1 : LemmaOne) (hL : LawSymm) : LemmaTwo := by
     · push_neg at hm
       rw [hC m hm, lg_zero m hm]
       ring
-  have e : 0 * PowerSeries.coeff i (g0F K p) + β m * PowerSeries.coeff i (lgF K p) + PowerSeries.coeff i (R m) -
-      β 1 * (PowerSeries.coeff i (lgF K p) * PowerSeries.coeff m (lgF K p)) =
-      PowerSeries.coeff i (R m) + (β m * PowerSeries.coeff i (lgF K p) -
-        β 1 * (PowerSeries.coeff i (lgF K p) * PowerSeries.coeff m (lgF K p))) := by ring
+  have e
+      : 0 * PowerSeries.coeff i (g0F K p) + β m * PowerSeries.coeff i (lgF K p)
+          + PowerSeries.coeff i (R m)
+          - β 1 * (PowerSeries.coeff i (lgF K p) * PowerSeries.coeff m (lgF K p))
+        = PowerSeries.coeff i (R m)
+          + (β m * PowerSeries.coeff i (lgF K p)
+            - β 1 * (PowerSeries.coeff i (lgF K p) * PowerSeries.coeff m (lgF K p))) := by
+    ring
   rw [e, key, add_zero]
   exact hR m i
 

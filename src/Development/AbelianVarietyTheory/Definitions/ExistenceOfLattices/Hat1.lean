@@ -20,12 +20,14 @@ variable {E}
 def fv {n : ℕ} (v : Fin n → E) : Fin n → RA F E := fun i => (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ v i
 
 def hat {n : ℕ} (L : Set (Fin n → E)) : AddSubgroup (Fin n → RA F E) :=
-  AddSubgroup.closure {z | ∃ a : FiniteAdeleRing (𝓞 F) F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧
-    ∃ x ∈ L, z = fun i => a ⊗ₜ x i}
+  AddSubgroup.closure
+    {z | ∃ a : FiniteAdeleRing (𝓞 F) F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧
+      ∃ x ∈ L, z = fun i => a ⊗ₜ x i}
 
 def hat1 (J : Set E) : AddSubgroup (RA F E) :=
-  AddSubgroup.closure {z | ∃ a : FiniteAdeleRing (𝓞 F) F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧
-    ∃ x ∈ J, z = a ⊗ₜ x}
+  AddSubgroup.closure
+    {z | ∃ a : FiniteAdeleRing (𝓞 F) F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧
+      ∃ x ∈ J, z = a ⊗ₜ x}
 
 def latOf {n : ℕ} (g : Matrix (Fin n) (Fin n) (RA F E)) (L : Set (Fin n → E)) : Set (Fin n → E) :=
   {v | fv F v ∈ g.mulVec '' (hat F L : Set (Fin n → RA F E))}

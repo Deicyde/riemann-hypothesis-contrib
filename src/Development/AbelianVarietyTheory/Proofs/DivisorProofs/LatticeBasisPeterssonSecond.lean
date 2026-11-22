@@ -57,9 +57,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DivLeSubMulD
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
-open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp GlobalTheory.DegVal GlobalTheory.DegCmp
-open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
+open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp
+  GlobalTheory.DegVal GlobalTheory.DegCmp
+open GlobalTheory.AllWt
+  (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
 open GlobalTheory.CompHt (hodgeWt)
 open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pull KeepsCusp)
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
@@ -72,25 +75,30 @@ namespace GlobalTheory.HSShortRoad
 
 section Weights
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
 
-theorem antitone_of_gapGe {g : ℤ} (hg : 0 ≤ g) {la : AllWt.Weight Dw} (h : GapGe g la) (τ : Psi H) :
-    Antitone (la τ) := by
+theorem antitone_of_gapGe {g : ℤ} (hg : 0 ≤ g) {la : AllWt.Weight Dw} (h : GapGe g la) (τ : Psi H)
+    : Antitone (la τ) := by
   intro a i hai
   have h0 : ∀ k, 0 ≤ gap (la τ) k := fun k => by
     by_cases hk : k + 1 < Dw.p + Dw.q
     · exact hg.trans (h τ k hk)
     · rw [gap, dite_eq_right hk]
   have e := ofGaps_gap (la τ) a i
-  have := Finset.sum_le_sum_of_subset_of_nonneg (f := gap (la τ)) (Finset.range_mono (show (a : ℕ) ≤ i from hai))
-    fun k _ _ => h0 k
+  have :=
+    Finset.sum_le_sum_of_subset_of_nonneg (f := gap (la τ))
+      (Finset.range_mono (show (a : ℕ) ≤ i from hai)) fun k _ _ => h0 k
   rw [ofGaps] at e
   linarith
 
-theorem gapGe_wt {P : WtPar Dw} (h : WtBig P) (j : ℕ) : GapGe (FlagTan.dimFlag Dw + 1) (P.wt j) := by
-  have h₁ : GapGe (FlagTan.dimFlag Dw + 3) P.u₁ := h.gaps.mono (by
-    push_cast
-    exact le_mul_of_one_le_right (by positivity) (by omega))
+theorem gapGe_wt {P : WtPar Dw} (h : WtBig P) (j : ℕ)
+    : GapGe (FlagTan.dimFlag Dw + 1) (P.wt j) := by
+  have h₁ : GapGe (FlagTan.dimFlag Dw + 3) P.u₁ :=
+    h.gaps.mono (by
+      push_cast
+      exact le_mul_of_one_le_right (by positivity) (by omega))
   intro τ k hk
   have a := h₁ τ k hk
   have b := (P.gap_rem τ k).1
@@ -108,45 +116,56 @@ theorem one_le_sz {la : AllWt.Weight Dw} (h : 0 < sz la) : 1 ≤ sz la := by
 
 end Weights
 
-theorem log_le_of_le_exp {s y : ℝ} (h0 : 0 ≤ s) (hy : 0 ≤ y) (h : s ≤ Real.exp y) : Real.log s ≤ y := by
+theorem log_le_of_le_exp {s y : ℝ} (h0 : 0 ≤ s) (hy : 0 ≤ y) (h : s ≤ Real.exp y)
+    : Real.log s ≤ y := by
   rcases h0.eq_or_lt with rfl | h0
   · simpa using hy
   · exact (Real.log_le_iff_le_exp h0).2 h
 
-theorem log_size_le {a L κ s : ℝ} (ha : 0 < a) (hL : 1 ≤ L) (h₁ : Real.log a ≤ L) (hκ : 1 ≤ κ)
-    (h₂ : Real.log κ ≤ 2 * L) (h0 : 0 ≤ s) (h : s ≤ 2 * ((a * L) ^ 2 * κ)) : Real.log s ≤ 10 * L := by
+theorem log_size_le
+    {a L κ s : ℝ} (ha : 0 < a) (hL : 1 ≤ L) (h₁ : Real.log a ≤ L) (hκ : 1 ≤ κ)
+    (h₂ : Real.log κ ≤ 2 * L) (h0 : 0 ≤ s) (h : s ≤ 2 * ((a * L) ^ 2 * κ))
+    : Real.log s ≤ 10 * L := by
   have hp : 0 < 2 * ((a * L) ^ 2 * κ) := by positivity
   refine log_le_of_le_exp h0 (by linarith) (h.trans ((Real.log_le_iff_le_exp hp).1 ?_))
-  rw [Real.log_mul (by norm_num) (by positivity), Real.log_mul (by positivity) (by positivity), Real.log_pow,
-    Real.log_mul ha.ne' (by positivity)]
+  rw [Real.log_mul (by norm_num) (by positivity), Real.log_mul (by positivity) (by positivity),
+    Real.log_pow, Real.log_mul ha.ne' (by positivity)]
   have := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 2 by norm_num)
   have := Real.log_le_sub_one_of_pos (show (0 : ℝ) < L by linarith)
   push_cast
   linarith
 
-theorem span_of_shortGen {F V κ : Type} [Field F] [NumberField F] [AddCommGroup V] [Module F V] [Module (𝓞 F) V]
-    {Nm : κ → V → ℝ} {M : Submodule (𝓞 F) V} {n : ℕ} {w : Fin n → V} {Λ : ℝ} (h : CompHt.IsShortGen Nm M w Λ)
-    (hM : Submodule.span F (M : Set V) = ⊤) : (∀ i, w i ∈ M) ∧ Submodule.span F (Set.range w) = ⊤ :=
-  ⟨fun i => (h.gen _).2 (Submodule.subset_span ⟨i, rfl⟩), top_le_iff.1 (hM.ge.trans (Submodule.span_le.2 fun x hx =>
-    Submodule.span_subset_span ℤ F _ ((h.gen x).1 hx)))⟩
+theorem span_of_shortGen
+    {F V κ : Type} [Field F] [NumberField F] [AddCommGroup V] [Module F V] [Module (𝓞 F) V]
+    {Nm : κ → V → ℝ} {M : Submodule (𝓞 F) V} {n : ℕ} {w : Fin n → V} {Λ : ℝ}
+    (h : CompHt.IsShortGen Nm M w Λ) (hM : Submodule.span F (M : Set V) = ⊤)
+    : (∀ i, w i ∈ M) ∧ Submodule.span F (Set.range w) = ⊤ := ⟨
+  fun i => (h.gen _).2 (Submodule.subset_span ⟨i, rfl⟩),
+  top_le_iff.1 (hM.ge.trans (Submodule.span_le.2 fun x hx =>
+    Submodule.span_subset_span ℤ F _ ((h.gen x).1 hx)))
+⟩
 
-theorem sum_univ_inst {α : Type} {i1 i2 : Fintype α} (f : α → ℝ) :
-    @Finset.sum α ℝ _ (@Finset.univ α i1) f = @Finset.sum α ℝ _ (@Finset.univ α i2) f := by
+theorem sum_univ_inst {α : Type} {i1 i2 : Fintype α} (f : α → ℝ)
+    : @Finset.sum α ℝ _ (@Finset.univ α i1) f = @Finset.sum α ℝ _ (@Finset.univ α i2) f := by
   obtain rfl : i1 = i2 := Subsingleton.elim _ _
   rfl
 
-theorem bound_le {C Z PP κ : ℝ} (hC : 0 ≤ C) (hZ : 1 ≤ Z) (hCZ : 6 * C ≤ Z) (hP : Z ^ 12 ≤ PP) (hκ : 1 ≤ κ) :
-    C * (Z ^ 3 * (Z ^ 2 * κ) + Z ^ 5) ≤ PP * κ := by
+theorem bound_le
+    {C Z PP κ : ℝ} (hC : 0 ≤ C) (hZ : 1 ≤ Z) (hCZ : 6 * C ≤ Z) (hP : Z ^ 12 ≤ PP) (hκ : 1 ≤ κ)
+    : C * (Z ^ 3 * (Z ^ 2 * κ) + Z ^ 5) ≤ PP * κ := by
   have h5 : 0 ≤ Z ^ 5 := by positivity
   have e : C * (Z ^ 3 * (Z ^ 2 * κ) + Z ^ 5) = C * Z ^ 5 * (κ + 1) := by ring
-  have a1 : C * Z ^ 5 * (κ + 1) ≤ C * Z ^ 5 * (2 * κ) := mul_le_mul_of_nonneg_left (by linarith) (by positivity)
+  have a1 : C * Z ^ 5 * (κ + 1) ≤ C * Z ^ 5 * (2 * κ) :=
+    mul_le_mul_of_nonneg_left (by linarith) (by positivity)
   have a2 : 2 * C * Z ^ 5 ≤ Z * Z ^ 5 := mul_le_mul_of_nonneg_right (by linarith) h5
   have a3 : Z * Z ^ 5 ≤ Z ^ 12 := by
     rw [← pow_succ']
     exact pow_le_pow_right₀ hZ (by norm_num)
   have a4 : 2 * C * Z ^ 5 ≤ PP := a2.trans (a3.trans hP)
   rw [e]
-  calc C * Z ^ 5 * (κ + 1) ≤ C * Z ^ 5 * (2 * κ) := a1
+  calc
+    C * Z ^ 5 * (κ + 1)
+      ≤ C * Z ^ 5 * (2 * κ) := a1
     _ = (2 * C * Z ^ 5) * κ := by ring
     _ ≤ PP * κ := mul_le_mul_of_nonneg_right a4 (by linarith)
 

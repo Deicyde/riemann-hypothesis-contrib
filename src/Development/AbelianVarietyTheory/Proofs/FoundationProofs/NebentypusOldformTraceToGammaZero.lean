@@ -17,8 +17,10 @@ def rep (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) : Option (Fin l)
   | some j => gaOld N l a b h j
 
 def sig (l : ℕ) [NeZero l] (x : SL(2, ℤ)) : Option (Fin l) :=
-  if (l : ℤ) ∣ mat x 1 0 then none
-  else some ⟨(((mat x 1 1 : ℤ) : ZMod l) * ((mat x 1 0 : ℤ) : ZMod l)⁻¹).val, ZMod.val_lt _⟩
+  if (l : ℤ) ∣ mat x 1 0 then
+    none
+  else
+    some ⟨(((mat x 1 1 : ℤ) : ZMod l) * ((mat x 1 0 : ℤ) : ZMod l)⁻¹).val, ZMod.val_lt _⟩
 
 lemma mul_11 (x y : SL(2, ℤ)) : mat (x * y) 1 1 = mat x 1 0 * mat y 0 1 + mat x 1 1 * mat y 1 1 := by
   simp only [mat, Matrix.SpecialLinearGroup.coe_mul, Matrix.mul_apply, Fin.sum_univ_two]
@@ -130,11 +132,11 @@ end
 
 end GlobalTheory.HeckeFamilyMatrices.TrOld
 
-
 open GlobalTheory.HeckeFamilyMatrices.TrOld in
-theorem GlobalTheory.HeckeFamilyMatrices.chiInv_trOld : ∀ (N l : ℕ) (k : ℤ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1)
-    (χ : DirichletCharacter ℂ N) (G : ℍ → ℂ), 0 < N → l.Prime → ChiInv k N (N * l) χ G →
-    ChiInv k N N χ (trOld k N l a b h G) := by
+theorem GlobalTheory.HeckeFamilyMatrices.chiInv_trOld
+    : ∀ (N l : ℕ) (k : ℤ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) (χ : DirichletCharacter ℂ N)
+        (G : ℍ → ℂ),
+      0 < N → l.Prime → ChiInv k N (N * l) χ G → ChiInv k N N χ (trOld k N l a b h G) := by
   intro N l k a b h χ G hN hl hG γ hγ
   have : NeZero l := ⟨hl.ne_zero⟩
   have rep_mem : ∀ o, rep N l a b h o ∈ Gamma0 N := fun o => Gamma0_mem.2 (rep_10 o)
@@ -144,23 +146,29 @@ theorem GlobalTheory.HeckeFamilyMatrices.chiInv_trOld : ∀ (N l : ℕ) (k : ℤ
     unfold trOld
     congr 1
     exact (Fin.sum_univ_eq_sum_range (fun j => G ∣[k] gaOld N l a b h j) l).symm
-  have hterm : ∀ o, (G ∣[k] rep N l a b h o) ∣[k] γ =
-      χ ((mat γ 1 1 : ℤ) : ZMod N) • (G ∣[k] rep N l a b h (sig l (rep N l a b h o * γ))) := by
+  have hterm
+      : ∀ o,
+        (G ∣[k] rep N l a b h o) ∣[k] γ
+          = χ ((mat γ 1 1 : ℤ) : ZMod N)
+            • (G ∣[k] rep N l a b h (sig l (rep N l a b h o * γ))) := by
     intro o
     have hA : rep N l a b h o * γ ∈ Gamma0 N := mul_mem (rep_mem o) hγ
     have hη := sig_mem (h := h) hl _ hA
     have hA0 : ((mat (rep N l a b h o * γ) 1 0 : ℤ) : ZMod N) = 0 := Gamma0_mem.1 hA
-    have hchar : ((mat (rep N l a b h o * γ * (rep N l a b h (sig l (rep N l a b h o * γ)))⁻¹) 1 1 : ℤ)
-        : ZMod N) = ((mat γ 1 1 : ℤ) : ZMod N) := by
+    have hchar
+        : ((mat (rep N l a b h o * γ * (rep N l a b h (sig l (rep N l a b h o * γ)))⁻¹) 1 1 : ℤ)
+            : ZMod N)
+          = ((mat γ 1 1 : ℤ) : ZMod N) := by
       rw [mulInv_11, rep_00]
       push_cast
       rw [hA0, mul_11]
       push_cast
       rw [rep_10, rep_11]
       ring
-    have e : G ∣[k] (rep N l a b h o * γ) =
-        (G ∣[k] (rep N l a b h o * γ * (rep N l a b h (sig l (rep N l a b h o * γ)))⁻¹)) ∣[k]
-          rep N l a b h (sig l (rep N l a b h o * γ)) := by
+    have e
+        : G ∣[k] (rep N l a b h o * γ)
+          = (G ∣[k] (rep N l a b h o * γ * (rep N l a b h (sig l (rep N l a b h o * γ)))⁻¹)) ∣[k]
+              rep N l a b h (sig l (rep N l a b h o * γ)) := by
       rw [← SlashAction.slash_mul, inv_mul_cancel_right]
     rw [← SlashAction.slash_mul, e, hG _ hη, ModularForm.SL_smul_slash, hchar]
   have hinj : Function.Injective (fun o => sig l (rep N l a b h o * γ)) := by

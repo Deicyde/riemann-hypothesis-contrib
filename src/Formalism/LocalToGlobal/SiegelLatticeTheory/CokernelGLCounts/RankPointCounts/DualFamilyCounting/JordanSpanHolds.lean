@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.G3
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
 
 theorem local_span_holds : LocSpan := by
   intro K F V _ _ _ _ _ _ _ _ _ _ hK hF P hP n b v
@@ -20,8 +21,11 @@ theorem local_span_holds : LocSpan := by
     obtain ⟨s, hs, hsv⟩ := Formalism.HermitianLatticesTheory.locBasic_mem_locS.mp hv
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun (𝓞 K)).mp hsv
     have hs0 := algebraMap_ne_zero_of_mem_hcompl hPp hs
-    refine ⟨fun i => algebraMap (𝓞 K) K (c i) / algebraMap (𝓞 K) K s,
-      fun i => div_mem_locRing hPp (c i) hs, ?_⟩
+    refine ⟨
+      fun i => algebraMap (𝓞 K) K (c i) / algebraMap (𝓞 K) K s,
+      fun i => div_mem_locRing hPp (c i) hs,
+      ?_
+    ⟩
     have e : v = (algebraMap (𝓞 K) K s)⁻¹ • (algebraMap (𝓞 K) K s • v) := by
       rw [smul_smul, inv_mul_cancel₀ hs0, one_smul]
     rw [e, algebraMap_smul, ← hc, Finset.smul_sum]
@@ -32,14 +36,16 @@ theorem local_span_holds : LocSpan := by
     refine Submodule.sum_mem _ fun i _ => smul_mem_loc hPp (hd i) ?_
     exact Formalism.HermitianLatticesTheory.locBasic_le_locS _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem jordan_span_holds :
-    ∀ (K F V : Type) [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F]
-      [Algebra F K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-      [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-      (L : Submodule (𝓞 K) V), Submodule.IsFullLattice K L → ∀ 𝔭 : Ideal (𝓞 F),
-      𝔭.IsMaximal → ∀ (n : ℕ) (b : Fin n → V),
-      locF 𝔭 (Submodule.span (𝓞 K) (Set.range b)) = locF 𝔭 L →
-        Submodule.span K (Set.range b) = ⊤ := by
+theorem jordan_span_holds
+    : ∀ (K F V : Type) [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F]
+        [Algebra F K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
+        [IsScalarTower (𝓞 K) K V] (L : Submodule (𝓞 K) V),
+      Submodule.IsFullLattice K L
+        → ∀ 𝔭 : Ideal (𝓞 F),
+          𝔭.IsMaximal
+            → ∀ (n : ℕ) (b : Fin n → V),
+              locF 𝔭 (Submodule.span (𝓞 K) (Set.range b)) = locF 𝔭 L
+                → Submodule.span K (Set.range b) = ⊤ := by
   intro K F V _ _ _ _ _ _ _ _ _ _ _ L hL 𝔭 h𝔭 n b hb
   letI : Submodule.IsFullLattice K L := hL
   rw [eq_top_iff, ← Submodule.IsFullLattice.span_eq_top (A := K) (M := L), Submodule.span_le]
@@ -57,8 +63,8 @@ theorem jordan_span_holds :
     rw [h2]
     exact 𝔭.zero_mem
   have hmem := Submodule.span_le_restrictScalars (𝓞 K) K (Set.range b) htx
-  have e : x = (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t))⁻¹ •
-      (algebraMap (𝓞 F) (𝓞 K) t • x) := by
+  have e
+      : x = (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t))⁻¹ • (algebraMap (𝓞 F) (𝓞 K) t • x) := by
     rw [← algebraMap_smul K (algebraMap (𝓞 F) (𝓞 K) t) x, smul_smul, inv_mul_cancel₀ ht0, one_smul]
   rw [e]
   exact Submodule.smul_mem _ _ hmem

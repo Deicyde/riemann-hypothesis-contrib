@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAffCoverSp
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.W1 GlobalTheory.PD GlobalTheory.CechDR KaehlerDifferential
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.W1
+  GlobalTheory.PD GlobalTheory.CechDR KaehlerDifferential
 
 set_option autoImplicit false
 
@@ -14,7 +15,12 @@ noncomputable section
 
 namespace GlobalTheory.W1
 
-theorem dv_mem_span_of_formallyUnramified : ∀ (k K L : Type) [Field k] [Field K] [Field L] [Algebra k K] [Algebra k L] [Algebra K L] [IsScalarTower k K L] (B : Subalgebra k K) (B' : Subalgebra k L) (φ : B →+* B'), (∀ x : B, (φ x : L) = algebraMap K L x) → φ.FormallyUnramified → ∀ v ∈ B', ∃ (m : ℕ) (b : Fin m → L) (w : Fin m → K), (∀ j, b j ∈ B' ∧ w j ∈ B) ∧ ι1 (D k L v) = ∑ j, b j • mapDR k K L (ι1 (D k K (w j))) := by
+theorem dv_mem_span_of_formallyUnramified
+    : ∀ (k K L : Type) [Field k] [Field K] [Field L] [Algebra k K] [Algebra k L] [Algebra K L]
+        [IsScalarTower k K L] (B : Subalgebra k K) (B' : Subalgebra k L) (φ : B →+* B'),
+      (∀ x : B, (φ x : L) = algebraMap K L x) → φ.FormallyUnramified
+        → ∀ v ∈ B', ∃ (m : ℕ) (b : Fin m → L) (w : Fin m → K),
+          (∀ j, b j ∈ B' ∧ w j ∈ B) ∧ ι1 (D k L v) = ∑ j, b j • mapDR k K L (ι1 (D k K (w j))) := by
   intro k K L _ _ _ _ _ _ _ B B' φ hφ hU v hv
   letI := φ.toAlgebra
   haveI : IsScalarTower k B B' := IsScalarTower.of_algebraMap_eq fun c => by
@@ -41,17 +47,23 @@ theorem dv_mem_span_of_formallyUnramified : ∀ (k K L : Type) [Field k] [Field 
         obtain ⟨a, rfl⟩ := hx
         rw [KaehlerDifferential.map_D]
         exact Submodule.subset_span ⟨a, rfl⟩
-      | zero => simp
-      | add _ _ _ _ h1 h2 => rw [map_add]; exact add_mem h1 h2
+      | zero =>
+        simp
+      | add _ _ _ _ h1 h2 =>
+        rw [map_add]; exact add_mem h1 h2
       | smul a x _ hx =>
         rw [map_smul, ← algebraMap_smul B' a]
         exact Submodule.smul_mem _ _ hx
-  have hmem : KaehlerDifferential.D k B' ⟨v, hv⟩ ∈
-      Submodule.span B' (Set.range fun a : B => KaehlerDifferential.D k B' (φ a)) := hspan ▸ Submodule.mem_top
+  have hmem
+      : KaehlerDifferential.D k B' ⟨v, hv⟩
+        ∈ Submodule.span B' (Set.range fun a : B => KaehlerDifferential.D k B' (φ a)) :=
+    hspan ▸ Submodule.mem_top
   obtain ⟨n, f, g, hsum⟩ := Submodule.mem_span_set'.mp hmem
   choose w hw using fun j => (g j).2
   refine ⟨n, fun j => (f j : L), fun j => (w j : K), fun j => ⟨(f j).2, (w j).2⟩, ?_⟩
-  have key : KaehlerDifferential.D k L v = ∑ j, (f j : L) • KaehlerDifferential.D k L (algebraMap K L (w j)) := by
+  have key
+      : KaehlerDifferential.D k L v
+        = ∑ j, (f j : L) • KaehlerDifferential.D k L (algebraMap K L (w j)) := by
     have h := congrArg (KaehlerDifferential.map k k B' L) hsum
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, KaehlerDifferential.map_D] at h
@@ -64,6 +76,6 @@ theorem dv_mem_span_of_formallyUnramified : ∀ (k K L : Type) [Field k] [Field 
     rw [mapDR, ExteriorAlgebra.lift_ι_apply]
     simp [map1]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [hpull, key, map_sum, map_smul]
+  simp_rw [hpull, key, map_sum, map_smul]
 
 end GlobalTheory.W1

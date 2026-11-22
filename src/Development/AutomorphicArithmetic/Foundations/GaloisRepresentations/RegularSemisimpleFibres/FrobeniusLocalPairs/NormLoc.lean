@@ -11,16 +11,19 @@ public import GroundTheory.GlobalFields.NormResidueSymbol.FunctorialFinite
 
 noncomputable section
 
-open MeasureTheory NumberField IsDedekindDomain ValuativeRel Matrix GroundTheory.Global GroundTheory.Global.SemiLocal
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets PositivityTheory.Rg.Tf.Loc UpperTheory.ConvolutionTheory.Loc
+open MeasureTheory NumberField IsDedekindDomain ValuativeRel Matrix GroundTheory.Global
+  GroundTheory.Global.SemiLocal
+open GlobalTheory.PRep GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets PositivityTheory.Rg.Tf.Loc
+  UpperTheory.ConvolutionTheory.Loc
 open GlobalTheory.SmGL hiding iwahori
 open PositivityTheory.Rg.Tf.Geo (incFin galFin)
 open UpperTheory.V.Published UpperTheory.CBC
 open scoped Classical
 
 open GroundTheory.Global.AdeleBaseChange in
-theorem UpperTheory.Gal.InertialTypesAlt.L.normLoc :
-    UpperTheory.Gal.InertialTypesAlt.L.NormLoc := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.normLoc
+    : UpperTheory.Gal.InertialTypesAlt.L.NormLoc := by
   intro F E _ _ _ _ _ _ _ _ σ hσ hp v w hw i1 i2 i3 i4 hmap η hη u
   obtain ⟨w0, hw0⟩ := w
   obtain rfl : below F w0 = v := (below_eq_iff w0 v).2 hw0

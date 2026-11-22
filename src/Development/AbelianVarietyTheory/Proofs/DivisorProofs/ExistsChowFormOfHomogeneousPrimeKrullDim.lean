@@ -17,16 +17,19 @@ namespace GlobalTheory.ChowHt
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-theorem exists_isChowFormInt_of_ringKrullDim_eq (K : Type) [Field K] (N D : ℕ)
-    (P : Ideal (MvPolynomial (Fin N) K)) (hP : P.IsPrime)
-    (hh : ∀ g ∈ P, ∀ n : ℕ, homogeneousComponent n g ∈ P)
-    (hdim : ringKrullDim (MvPolynomial (Fin N) K ⧸ P) = (D + 1 : ℕ)) :
-    ∃ (δ : ℕ) (f : MvPolynomial (Fin (D + 1) × Fin N) K), IsChowFormInt P D δ f := by
+theorem exists_isChowFormInt_of_ringKrullDim_eq
+    (K : Type) [Field K]
+    (N D : ℕ) (P : Ideal (MvPolynomial (Fin N) K))
+    (hP : P.IsPrime) (hh : ∀ g ∈ P, ∀ n : ℕ, homogeneousComponent n g ∈ P)
+    (hdim : ringKrullDim (MvPolynomial (Fin N) K ⧸ P) = (D + 1 : ℕ))
+    : ∃ (δ : ℕ) (f : MvPolynomial (Fin (D + 1) × Fin N) K), IsChowFormInt P D δ f := by
   classical
   have hI : P.IsHomogeneous (homogeneousSubmodule (Fin N) K) := by
     intro n g hg
-    have h1 : (DirectSum.decompose (homogeneousSubmodule (Fin N) K) g n : MvPolynomial (Fin N) K) =
-        homogeneousComponent n g := MvPolynomial.decomposition.decompose'_apply g n
+    have h1
+        : (DirectSum.decompose (homogeneousSubmodule (Fin N) K) g n : MvPolynomial (Fin N) K)
+          = homogeneousComponent n g :=
+      MvPolynomial.decomposition.decompose'_apply g n
     rw [h1]
     exact hh g hg n
   have hX : ∃ j, X j ∉ P := by
@@ -39,8 +42,10 @@ theorem exists_isChowFormInt_of_ringKrullDim_eq (K : Type) [Field K] (N D : ℕ)
     omega
   have hdim' : ringKrullDim (MvPolynomial (Fin N) K ⧸ P) = (Fintype.card (Fin (D + 1)) : ℕ) := by
     rw [Fintype.card_fin]; exact hdim
-  have hprime : (GlobalTheory.Chow.elimIdeal (β := Fin (D + 1)) P).IsPrime := GlobalTheory.Chow.isPrime_elimIdeal hX
-  have hne : GlobalTheory.Chow.elimIdeal (β := Fin (D + 1)) P ≠ ⊥ := GlobalTheory.Chow.elimIdeal_ne_bot hI hX hdim'.le
+  have hprime : (GlobalTheory.Chow.elimIdeal (β := Fin (D + 1)) P).IsPrime :=
+    GlobalTheory.Chow.isPrime_elimIdeal hX
+  have hne : GlobalTheory.Chow.elimIdeal (β := Fin (D + 1)) P ≠ ⊥ :=
+    GlobalTheory.Chow.elimIdeal_ne_bot hI hX hdim'.le
   obtain ⟨f, hf⟩ := (GlobalTheory.Chow.isPrincipal_elimIdeal hdim').principal
   have hf' : GlobalTheory.Chow.elimIdeal (β := Fin (D + 1)) P = Ideal.span {f} := hf
   have hf0 : f ≠ 0 := by
@@ -48,10 +53,12 @@ theorem exists_isChowFormInt_of_ringKrullDim_eq (K : Type) [Field K] (N D : ℕ)
     exact hne (by rw [hf', Ideal.span_singleton_eq_bot])
   have hfmem : f ∈ GlobalTheory.Chow.elimIdeal (β := Fin (D + 1)) P := hf' ▸ Ideal.subset_span rfl
   have hfp : Prime f := (Ideal.span_singleton_prime hf0).1 (hf' ▸ hprime)
-  obtain ⟨a, ha⟩ := GlobalTheory.Chow.exists_isWeightedHomogeneous_of_dvd
-    (GlobalTheory.Chow.blockWeight : Fin (D + 1) × Fin N → Fin (D + 1) → ℕ) (f := f) (fun a => by
-      rw [← Ideal.mem_span_singleton, ← hf']
-      exact GlobalTheory.Chow.weightedHomogeneousComponent_mem_elimIdeal hfmem a)
+  obtain ⟨a, ha⟩ :=
+    GlobalTheory.Chow.exists_isWeightedHomogeneous_of_dvd
+      (GlobalTheory.Chow.blockWeight : Fin (D + 1) × Fin N → Fin (D + 1) → ℕ) (f := f)
+      (fun a => by
+        rw [← Ideal.mem_span_singleton, ← hf']
+        exact GlobalTheory.Chow.weightedHomogeneousComponent_mem_elimIdeal hfmem a)
   have ha' : GlobalTheory.Chow.IsBlockHomogeneous f a := ha
   have hconst : ∀ i, a i = a 0 := by
     intro i

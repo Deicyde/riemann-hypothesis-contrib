@@ -6,17 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open MulAction
 
-private theorem idx {H T : Type} [Group H] [CommGroup T] (φ : H →* T) (H₀ : Subgroup H) (C S : Subgroup T) (hS : S ≤ C)
-    (h0 : H₀ ≤ S.comap φ) :
-    (φ.range ⊔ S).index * H₀.relIndex (C.comap φ) = (φ.range ⊔ C).index * S.relIndex C * H₀.relIndex (S.comap φ) := by
+private theorem idx
+    {H T : Type} [Group H] [CommGroup T]
+    (φ : H →* T) (H₀ : Subgroup H) (C S : Subgroup T) (hS : S ≤ C) (h0 : H₀ ≤ S.comap φ)
+    : (φ.range ⊔ S).index * H₀.relIndex (C.comap φ)
+      = (φ.range ⊔ C).index * S.relIndex C * H₀.relIndex (S.comap φ) := by
   set R := φ.range
   have hA := Subgroup.relIndex_mul_relIndex H₀ (S.comap φ) (C.comap φ) h0 (Subgroup.comap_mono hS)
   have hB := Subgroup.relIndex_mul_index (H := R ⊔ S) (K := R ⊔ C) (sup_le_sup_left hS R)
   have hC : (S.comap φ).relIndex (C.comap φ) = S.relIndex (R ⊓ C) := by
     rw [Subgroup.relIndex_comap, Subgroup.map_comap_eq]
   have hD : (R ⊔ S).relIndex (R ⊔ C) = (R ⊔ S).relIndex C := by
-    have : R ⊔ C = (R ⊔ S) ⊔ C := by
-      rw [sup_assoc, sup_eq_right.mpr hS]
+    have : R ⊔ C = (R ⊔ S) ⊔ C := by rw [sup_assoc, sup_eq_right.mpr hS]
     rw [this, Subgroup.relIndex_sup_left]
   have hE : S ⊔ (R ⊓ C) = (R ⊔ S) ⊓ C := by
     apply le_antisymm
@@ -36,18 +37,25 @@ private theorem idx {H T : Type} [Group H] [CommGroup T] (φ : H →* T) (H₀ :
   rw [← hB, ← hA, hC, hD, ← hG, ← hF]
   ring
 
-private theorem card_fib {H T Y : Type} [Group H] [CommGroup T] [MulAction T Y] [MulAction H Y] (φ : H →* T)
-    (hφ : ∀ h (y : Y), h • y = φ h • y) (O : orbitRel.Quotient T Y) :
-    Nat.card {o : orbitRel.Quotient H Y // (Quotient.mk'' o.out : orbitRel.Quotient T Y) = O} = (φ.range ⊔ stabilizer T O.out).index := by
+private theorem card_fib
+    {H T Y : Type} [Group H] [CommGroup T] [MulAction T Y] [MulAction H Y]
+    (φ : H →* T) (hφ : ∀ h (y : Y), h • y = φ h • y)
+    (O : orbitRel.Quotient T Y)
+    : Nat.card {o : orbitRel.Quotient H Y // (Quotient.mk'' o.out : orbitRel.Quotient T Y) = O}
+      = (φ.range ⊔ stabilizer T O.out).index := by
   classical
   set y₀ : Y := O.out with hy₀
   set K : Subgroup T := φ.range ⊔ stabilizer T y₀
   have hO : (Quotient.mk'' y₀ : orbitRel.Quotient T Y) = O := Quotient.out_eq' O
-  have fib : ∀ t : T, (Quotient.mk'' (Quotient.out (Quotient.mk'' (t • y₀) : orbitRel.Quotient H Y)) :
-      orbitRel.Quotient T Y) = O := by
+  have fib
+      : ∀ t : T,
+        (Quotient.mk'' (Quotient.out (Quotient.mk'' (t • y₀) : orbitRel.Quotient H Y))
+            : orbitRel.Quotient T Y)
+          = O := by
     intro t
-    obtain ⟨h, hh⟩ := (Quotient.exact' (Quotient.out_eq' (Quotient.mk'' (t • y₀) : orbitRel.Quotient H Y)) :
-      Quotient.out (Quotient.mk'' (t • y₀) : orbitRel.Quotient H Y) ∈ orbit H (t • y₀))
+    obtain ⟨h, hh⟩ :=
+      (Quotient.exact' (Quotient.out_eq' (Quotient.mk'' (t • y₀) : orbitRel.Quotient H Y))
+        : Quotient.out (Quotient.mk'' (t • y₀) : orbitRel.Quotient H Y) ∈ orbit H (t • y₀))
     rw [← hO]
     apply Quotient.sound'
     refine ⟨φ h * t, ?_⟩
@@ -59,33 +67,33 @@ private theorem card_fib {H T Y : Type} [Group H] [CommGroup T] [MulAction T Y] 
   have resp : ∀ a b : T, a⁻¹ * b ∈ K → g a = g b := by
     intro a b hab
     obtain ⟨r, ⟨h, rfl⟩, s, hs, hrs⟩ := Subgroup.mem_sup.mp hab
-    have hb : b = φ h * a * s := by
-      rw [mul_comm (φ h) a, mul_assoc, hrs, mul_inv_cancel_left]
+    have hb : b = φ h * a * s := by rw [mul_comm (φ h) a, mul_assoc, hrs, mul_inv_cancel_left]
     have e : h • (a • y₀) = b • y₀ := by
       rw [hb, mul_smul, MulAction.mem_stabilizer_iff.mp hs, mul_smul, hφ]
     have e' : (Quotient.mk'' (b • y₀) : orbitRel.Quotient H Y) = Quotient.mk'' (a • y₀) :=
       Quotient.sound' (MulAction.orbitRel_apply.mpr (MulAction.mem_orbit_iff.mpr ⟨h, e⟩))
     exact Subtype.ext e'.symm
-  let F : T ⧸ K → {o : orbitRel.Quotient H Y // (Quotient.mk'' o.out : orbitRel.Quotient T Y) = O} :=
+  let F
+      : T ⧸ K → {o : orbitRel.Quotient H Y // (Quotient.mk'' o.out : orbitRel.Quotient T Y) = O} :=
     fun q => Quotient.liftOn' q g (fun a b hab => resp a b (QuotientGroup.leftRel_apply.mp hab))
   have hF : ∀ t : T, F (QuotientGroup.mk t) = g t := fun t => rfl
   have inj : Function.Injective F := by
     intro p q hpq
     induction p using QuotientGroup.induction_on with
     | H a =>
-    induction q using QuotientGroup.induction_on with
-    | H b =>
-    rw [hF, hF] at hpq
-    have e1 : (Quotient.mk'' (a • y₀) : orbitRel.Quotient H Y) = Quotient.mk'' (b • y₀) :=
-      congrArg Subtype.val hpq
-    obtain ⟨h, hh0⟩ := (Quotient.exact' e1.symm : b • y₀ ∈ orbit H (a • y₀))
-    have hh : h • a • y₀ = b • y₀ := hh0
-    rw [hφ, ← mul_smul] at hh
-    apply QuotientGroup.eq.mpr
-    refine Subgroup.mem_sup.mpr ⟨φ h, ⟨h, rfl⟩, (φ h)⁻¹ * a⁻¹ * b, ?_, ?_⟩
-    · rw [MulAction.mem_stabilizer_iff, mul_smul, mul_smul, ← hh, ← mul_smul, ← mul_smul]
-      rw [← mul_inv_rev, mul_comm (φ h) a, inv_mul_cancel, one_smul]
-    · rw [mul_assoc, mul_inv_cancel_left]
+      induction q using QuotientGroup.induction_on with
+      | H b =>
+        rw [hF, hF] at hpq
+        have e1 : (Quotient.mk'' (a • y₀) : orbitRel.Quotient H Y) = Quotient.mk'' (b • y₀) :=
+          congrArg Subtype.val hpq
+        obtain ⟨h, hh0⟩ := (Quotient.exact' e1.symm : b • y₀ ∈ orbit H (a • y₀))
+        have hh : h • a • y₀ = b • y₀ := hh0
+        rw [hφ, ← mul_smul] at hh
+        apply QuotientGroup.eq.mpr
+        refine Subgroup.mem_sup.mpr ⟨φ h, ⟨h, rfl⟩, (φ h)⁻¹ * a⁻¹ * b, ?_, ?_⟩
+        · rw [MulAction.mem_stabilizer_iff, mul_smul, mul_smul, ← hh, ← mul_smul, ← mul_smul]
+          rw [← mul_inv_rev, mul_comm (φ h) a, inv_mul_cancel, one_smul]
+        · rw [mul_assoc, mul_inv_cancel_left]
   have surj : Function.Surjective F := by
     rintro ⟨o, ho⟩
     have e2 : (Quotient.mk'' o.out : orbitRel.Quotient T Y) = Quotient.mk'' y₀ := ho.trans hO.symm
@@ -101,11 +109,16 @@ private theorem card_fib {H T Y : Type} [Group H] [CommGroup T] [MulAction T Y] 
   exact (Nat.card_congr (Equiv.ofBijective F ⟨inj, surj⟩)).symm
 
 open UpperTheory.V.Z.Sym in
-private theorem gq_mass {H T Y : Type} [Group H] [CommGroup T] [MulAction T Y] [MulAction H Y] (φ : H →* T)
-    (hφ : ∀ h (y : Y), h • y = φ h • y) (H₀ : Subgroup H) (C : Subgroup T) (k : Y → ℂ) (hk : ∀ (t : T) y, k (t • y) = k y)
-    (fin : {O : orbitRel.Quotient T Y | k O.out ≠ 0}.Finite) (h0 : ∀ z ∈ H₀, ∀ y : Y, φ z • y = y)
-    (h1 : (φ.range ⊔ C).index ≠ 0) (h2 : H₀.relIndex (C.comap φ) ≠ 0)
-    (h3 : ∀ y, k y ≠ 0 → stabilizer T y ≤ C ∧ (stabilizer T y).relIndex C ≠ 0) : gq H₀ k = mass φ H₀ C * wcount C k := by
+private theorem gq_mass
+    {H T Y : Type} [Group H] [CommGroup T] [MulAction T Y] [MulAction H Y]
+    (φ : H →* T) (hφ : ∀ h (y : Y), h • y = φ h • y)
+    (H₀ : Subgroup H) (C : Subgroup T)
+    (k : Y → ℂ)
+    (hk : ∀ (t : T) y, k (t • y) = k y) (fin : {O : orbitRel.Quotient T Y | k O.out ≠ 0}.Finite)
+    (h0 : ∀ z ∈ H₀, ∀ y : Y, φ z • y = y) (h1 : (φ.range ⊔ C).index ≠ 0)
+    (h2 : H₀.relIndex (C.comap φ) ≠ 0)
+    (h3 : ∀ y, k y ≠ 0 → stabilizer T y ≤ C ∧ (stabilizer T y).relIndex C ≠ 0)
+    : gq H₀ k = mass φ H₀ C * wcount C k := by
   classical
   set R := φ.range with hR
   let π : orbitRel.Quotient H Y → orbitRel.Quotient T Y := fun o => Quotient.mk'' o.out
@@ -125,25 +138,30 @@ private theorem gq_mass {H T Y : Type} [Group H] [CommGroup T] [MulAction T Y] [
     intro o
     obtain ⟨t, ht⟩ := orbT o
     rw [← ht, hk]
-  have termeq : ∀ o, k o.out / (H₀.relIndex (stabilizer H o.out) : ℂ) =
-      k (π o).out / (H₀.relIndex ((stabilizer T (π o).out).comap φ) : ℂ) := by
+  have termeq
+      : ∀ o,
+        k o.out / (H₀.relIndex (stabilizer H o.out) : ℂ)
+          = k (π o).out / (H₀.relIndex ((stabilizer T (π o).out).comap φ) : ℂ) := by
     intro o
     obtain ⟨t, ht⟩ := orbT o
     rw [← ht, hk, stabT, stabH]
-  have h0S : ∀ y : Y, H₀ ≤ (stabilizer T y).comap φ :=
-    fun y z hz => MulAction.mem_stabilizer_iff.mpr (h0 z hz y)
+  have h0S : ∀ y : Y, H₀ ≤ (stabilizer T y).comap φ := fun y z hz =>
+    MulAction.mem_stabilizer_iff.mpr (h0 z hz y)
   have nzS : ∀ y : Y, k y ≠ 0 → H₀.relIndex ((stabilizer T y).comap φ) ≠ 0 := by
     intro y hy h
     apply h2
-    rw [← Subgroup.relIndex_mul_relIndex H₀ _ _ (h0S y) (Subgroup.comap_mono (h3 y hy).1), h, zero_mul]
+    rw [← Subgroup.relIndex_mul_relIndex H₀ _ _ (h0S y) (Subgroup.comap_mono (h3 y hy).1), h,
+      zero_mul]
   have nzR : ∀ y : Y, k y ≠ 0 → (R ⊔ stabilizer T y).index ≠ 0 := by
     intro y hy h
     have e := idx φ H₀ C (stabilizer T y) (h3 y hy).1 (h0S y)
     rw [← hR, h, zero_mul] at e
     exact mul_ne_zero (mul_ne_zero h1 (h3 y hy).2) (nzS y hy) e.symm
-  have key : ∀ y : Y, k y ≠ 0 → ((R ⊔ stabilizer T y).index : ℂ) *
-      (k y / (H₀.relIndex ((stabilizer T y).comap φ) : ℂ)) =
-      mass φ H₀ C * (((stabilizer T y).relIndex C : ℂ) * k y) := by
+  have key
+      : ∀ y : Y,
+        k y ≠ 0
+          → ((R ⊔ stabilizer T y).index : ℂ) * (k y / (H₀.relIndex ((stabilizer T y).comap φ) : ℂ))
+            = mass φ H₀ C * (((stabilizer T y).relIndex C : ℂ) * k y) := by
     intro y hy
     have e := congrArg (Nat.cast : ℕ → ℂ) (idx φ H₀ C (stabilizer T y) (h3 y hy).1 (h0S y))
     rw [← hR] at e
@@ -197,13 +215,14 @@ private theorem gq_mass {H T Y : Type} [Group H] [CommGroup T] [MulAction T Y] [
   have cnt : (sH.filter (fun o => π o = O)).card = (R ⊔ stabilizer T O.out).index := by
     rw [fil, ← Set.ncard_eq_toFinset_card _ (finFib O hO), ← Nat.card_coe_set_eq]
     exact card_fib φ hφ O
-  rw [Finset.sum_congr rfl (g := fun _ => k O.out / (H₀.relIndex ((stabilizer T O.out).comap φ) : ℂ))
-    (fun o ho => by rw [(Finset.mem_filter.mp ho).2]), Finset.sum_const, nsmul_eq_mul, cnt]
+  rw [Finset.sum_congr rfl
+      (g := fun _ => k O.out / (H₀.relIndex ((stabilizer T O.out).comap φ) : ℂ))
+      (fun o ho => by rw [(Finset.mem_filter.mp ho).2]),
+    Finset.sum_const, nsmul_eq_mul, cnt]
   exact key O.out ((memT O).mp hO)
 
 open UpperTheory.V.Z.Sym in
-theorem UpperTheory.V.Z.Sym.Tf.gqMass :
-    UpperTheory.V.Z.Sym.Tf.GqMass := by
+theorem UpperTheory.V.Z.Sym.Tf.gqMass : UpperTheory.V.Z.Sym.Tf.GqMass := by
   intro H T G _ _ _ φ ι H₀ C θ U f δ hf hδ hfin h0 h1 h2 h3 hle
   letI iT : MulAction T (G ⧸ U) := MulAction.compHom _ ι
   letI iH : MulAction H (G ⧸ U) := MulAction.compHom _ (ι.comp φ)
@@ -220,17 +239,20 @@ theorem UpperTheory.V.Z.Sym.Tf.gqMass :
     show f ((Quotient.out (t • y))⁻¹ * δ * θ (Quotient.out (t • y))) = f ((Quotient.out y)⁻¹ * δ * θ (Quotient.out y))
     rw [e, hu]
     set g := Quotient.out y
-    calc f ((ι t * g * ↑u)⁻¹ * δ * θ (ι t * g * ↑u))
-        = f ((↑u)⁻¹ * (g⁻¹ * ((ι t)⁻¹ * δ * θ (ι t)) * θ g) * θ ↑u) := by
-          rw [map_mul, map_mul]
-          congr 1
-          group
+    calc
+      f ((ι t * g * ↑u)⁻¹ * δ * θ (ι t * g * ↑u))
+          = f ((↑u)⁻¹ * (g⁻¹ * ((ι t)⁻¹ * δ * θ (ι t)) * θ g) * θ ↑u) := by
+        rw [map_mul, map_mul]
+        congr 1
+        group
       _ = f ((↑u)⁻¹ * (g⁻¹ * δ * θ g) * θ ↑u) := by rw [hδ t]
       _ = f (g⁻¹ * δ * θ g) := hf u u.2 _
   have fin : {O : orbitRel.Quotient T (G ⧸ U) | k O.out ≠ 0}.Finite := by
     obtain ⟨S, hS⟩ := hfin
-    refine Set.Finite.subset (S.finite_toSet.image
-      (fun s => (Quotient.mk'' (QuotientGroup.mk s : G ⧸ U) : orbitRel.Quotient T (G ⧸ U)))) ?_
+    refine Set.Finite.subset
+      (S.finite_toSet.image (fun s =>
+        (Quotient.mk'' (QuotientGroup.mk s : G ⧸ U) : orbitRel.Quotient T (G ⧸ U))))
+      ?_
     intro O hO
     obtain ⟨t, s, hs, u, hu, hg⟩ := hS _ hO
     refine ⟨s, hs, ?_⟩
@@ -242,5 +264,9 @@ theorem UpperTheory.V.Z.Sym.Tf.gqMass :
     refine MulAction.orbitRel_apply.mpr (MulAction.mem_orbit_iff.mpr ⟨t⁻¹, ?_⟩)
     rw [e, inv_smul_smul]
   have stab : ∀ y : G ⧸ U, stabilizer T y = (stabilizer G y).comap ι := fun y => rfl
-  exact gq_mass φ (fun h y => rfl) H₀ C k hk fin (fun z hz y => h0 z hz y) h1 h2
+  exact gq_mass φ
+    (fun h y => rfl)
+    H₀ C k hk fin
+    (fun z hz y => h0 z hz y)
+    h1 h2
     (fun y hy => by rw [stab]; exact h3 y hy)

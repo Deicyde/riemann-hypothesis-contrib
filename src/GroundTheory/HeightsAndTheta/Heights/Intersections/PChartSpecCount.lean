@@ -17,11 +17,11 @@ open Polynomial
 
 namespace ChartSpecCount
 
-theorem exists_pow_mul_eq_map {R : Type*} [CommRing R] (E : R) {Q : Type*}
-    (F : MvPolynomial Q (Localization.Away E)) :
-    ∃ (n : ℕ) (F' : MvPolynomial Q R),
-      MvPolynomial.map (algebraMap R (Localization.Away E)) F' =
-        MvPolynomial.C (algebraMap R (Localization.Away E) (E ^ n)) * F := by
+theorem exists_pow_mul_eq_map
+    {R : Type*} [CommRing R] (E : R) {Q : Type*} (F : MvPolynomial Q (Localization.Away E))
+    : ∃ (n : ℕ) (F' : MvPolynomial Q R),
+      MvPolynomial.map (algebraMap R (Localization.Away E)) F'
+        = MvPolynomial.C (algebraMap R (Localization.Away E) (E ^ n)) * F := by
   induction F using MvPolynomial.induction_on with
   | C a =>
     obtain ⟨n, b, hb⟩ := IsLocalization.Away.surj E a
@@ -37,24 +37,29 @@ theorem exists_pow_mul_eq_map {R : Type*} [CommRing R] (E : R) {Q : Type*}
     obtain ⟨n, F', hF'⟩ := hF
     exact ⟨n, F' * MvPolynomial.X i, by rw [map_mul, MvPolynomial.map_X, hF', mul_assoc]⟩
 
-theorem eval₂_mvEval₂_C {A K Q : Type*} [CommRing A] [CommRing K] (k : A →+* K) (x : K) (G : Q → A[X])
-    (F : MvPolynomial Q A) :
-    (MvPolynomial.eval₂ C G F).eval₂ k x = MvPolynomial.eval₂ k (fun q => (G q).eval₂ k x) F := by
+theorem eval₂_mvEval₂_C
+    {A K Q : Type*} [CommRing A] [CommRing K]
+    (k : A →+* K) (x : K) (G : Q → A[X]) (F : MvPolynomial Q A)
+    : (MvPolynomial.eval₂ C G F).eval₂ k x = MvPolynomial.eval₂ k (fun q => (G q).eval₂ k x) F := by
   induction F using MvPolynomial.induction_on with
   | C a => simp
   | add F G' hF hG => simp [Polynomial.eval₂_add, hF, hG]
   | mul_X F i hF => simp [Polynomial.eval₂_mul, hF]
 
-theorem mvEval₂_eval₂_C {A K Q : Type*} [CommRing A] [CommRing K] (k : A →+* K) (y : Q → K)
-    (τ : MvPolynomial Q A) (p : A[X]) :
-    MvPolynomial.eval₂ k y (p.eval₂ MvPolynomial.C τ) = p.eval₂ k (MvPolynomial.eval₂ k y τ) := by
+theorem mvEval₂_eval₂_C
+    {A K Q : Type*} [CommRing A] [CommRing K]
+    (k : A →+* K) (y : Q → K) (τ : MvPolynomial Q A) (p : A[X])
+    : MvPolynomial.eval₂ k y (p.eval₂ MvPolynomial.C τ) = p.eval₂ k (MvPolynomial.eval₂ k y τ) := by
   induction p using Polynomial.induction_on' with
   | add p p' hp hp' => simp [Polynomial.eval₂_add, hp, hp']
   | monomial n a => simp [Polynomial.eval₂_monomial]
 
-theorem dvd_map_of_dvd_map {A Φ K : Type*} [CommRing A] [Field Φ] [CommRing K] (fA : A →+* Φ) (σ : A →+* K)
-    (hker : RingHom.ker fA ≤ RingHom.ker σ) {mA : A[X]} (hm : mA.Monic) {p : A[X]}
-    (hp : mA.map fA ∣ p.map fA) : mA.map σ ∣ p.map σ := by
+theorem dvd_map_of_dvd_map
+    {A Φ K : Type*} [CommRing A] [Field Φ] [CommRing K]
+    (fA : A →+* Φ) (σ : A →+* K) (hker : RingHom.ker fA ≤ RingHom.ker σ)
+    {mA : A[X]} (hm : mA.Monic)
+    {p : A[X]} (hp : mA.map fA ∣ p.map fA)
+    : mA.map σ ∣ p.map σ := by
   have h0 : (p %ₘ mA).map fA = 0 := by
     rw [map_modByMonic fA hm]
     exact (modByMonic_eq_zero_iff_dvd (hm.map fA)).2 hp
@@ -68,10 +73,9 @@ theorem dvd_map_of_dvd_map {A Φ K : Type*} [CommRing A] [Field Φ] [CommRing K]
 
 end ChartSpecCount
 
-
 open ChartSpecCount in
-theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.Statement) :
-    ChartSpecCount.Statement := by
+theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.Statement)
+    : ChartSpecCount.Statement := by
   classical
   intro R _ Φ _ _ Φ' _ _ φ Q _ r hfrac hfin
   obtain ⟨τ, g, u, hdeg, hg, hu, -, hh⟩ := hPE Φ Φ' Q r hfin
@@ -87,7 +91,8 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
     intro q hq0
     simp only [hq, dif_pos hq0]
     exact (hh q hq0).choose_spec
-  let S : Finset Φ := m.coeffs ∪ u.coeffs ∪ τ.coeffs ∪ Finset.univ.biUnion (fun q => (g q).coeffs ∪ (hq q).coeffs)
+  let S : Finset Φ :=
+    m.coeffs ∪ u.coeffs ∪ τ.coeffs ∪ Finset.univ.biUnion (fun q => (g q).coeffs ∪ (hq q).coeffs)
   obtain ⟨E, hE, hS, hker⟩ := hLA R Φ φ S hfrac
   set φA : Localization.Away E →+* Φ := IsLocalization.Away.lift E hE with hφA
   have hφAR : φA.comp (algebraMap R (Localization.Away E)) = φ := by
@@ -100,26 +105,36 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
     by_cases hn : p.coeff n = 0
     · exact ⟨0, by rw [hn, map_zero]⟩
     · exact hS _ (hp (coeff_mem_coeffs hn))
-  obtain ⟨mA, hmA, hmAdeg, hmAmon⟩ := lifts_and_natDegree_eq_and_monic
-    (hlift m (fun c hc => by
-      simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
-      exact Or.inl (Or.inl (Or.inl hc)))) (minpoly.monic hint)
-  obtain ⟨uA, huA⟩ := (mem_lifts u).1 (hlift u (fun c hc => by
-      simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
-      exact Or.inl (Or.inl (Or.inr hc))))
-  have hgl : ∀ q, ∃ gq : (Localization.Away E)[X], gq.map φA = g q := fun q => (mem_lifts _).1
-    (hlift (g q) (fun c hc => by
-      simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
-      exact Or.inr ⟨q, Or.inl hc⟩))
+  obtain ⟨mA, hmA, hmAdeg, hmAmon⟩ :=
+    lifts_and_natDegree_eq_and_monic
+      (hlift m (fun c hc => by
+        simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
+        exact Or.inl (Or.inl (Or.inl hc))))
+      (minpoly.monic hint)
+  obtain ⟨uA, huA⟩ :=
+    (mem_lifts u).1
+      (hlift u (fun c hc => by
+        simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
+        exact Or.inl (Or.inl (Or.inr hc))))
+  have hgl : ∀ q, ∃ gq : (Localization.Away E)[X], gq.map φA = g q := fun q =>
+    (mem_lifts _).1
+      (hlift (g q) (fun c hc => by
+        simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
+        exact Or.inr ⟨q, Or.inl hc⟩))
   choose gA hgA using hgl
-  have hhl : ∀ q, ∃ hq' : (Localization.Away E)[X], hq'.map φA = hq q := fun q => (mem_lifts _).1
-    (hlift (hq q) (fun c hc => by
-      simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
-      exact Or.inr ⟨q, Or.inr hc⟩))
+  have hhl : ∀ q, ∃ hq' : (Localization.Away E)[X], hq'.map φA = hq q := fun q =>
+    (mem_lifts _).1
+      (hlift (hq q) (fun c hc => by
+        simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
+        exact Or.inr ⟨q, Or.inr hc⟩))
   choose hA hhA using hhl
-  obtain ⟨τA, hτA⟩ := MvPolynomial.mem_range_map_iff_coeffs_subset.2 (fun c hc => hS c (by
-      simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
-      exact Or.inl (Or.inr (Finset.mem_coe.1 hc))) : (τ.coeffs : Set Φ) ⊆ Set.range φA)
+  obtain ⟨τA, hτA⟩ :=
+    MvPolynomial.mem_range_map_iff_coeffs_subset.2
+      (fun c hc =>
+          hS c (by
+            simp only [S, Finset.mem_union, Finset.mem_biUnion, Finset.mem_univ, true_and]
+            exact Or.inl (Or.inr (Finset.mem_coe.1 hc)))
+        : (τ.coeffs : Set Φ) ⊆ Set.range φA)
   set f : Localization.Away E →+* Φ' := (algebraMap Φ Φ').comp φA with hf
   have hfφ : f.comp (algebraMap R (Localization.Away E)) = (algebraMap Φ Φ').comp φ := by
     rw [hf, RingHom.comp_assoc, hφAR]
@@ -138,8 +153,8 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
     rw [hτθ, sub_self]
   have hθu : (uA * derivative mA - 1).eval₂ f θ = 0 := by
     obtain ⟨c, hc⟩ := hu
-    rw [hevθ, Polynomial.map_sub, Polynomial.map_mul, Polynomial.map_one, ← derivative_map, huA, hmA, hc,
-      map_mul, hm, minpoly.aeval, zero_mul]
+    rw [hevθ, Polynomial.map_sub, Polynomial.map_mul, Polynomial.map_one, ← derivative_map, huA,
+      hmA, hc, map_mul, hm, minpoly.aeval, zero_mul]
   have hθh : ∀ q, r q ≠ 0 → (hA q * gA q - 1).eval₂ f θ = 0 := by
     intro q hq0
     obtain ⟨c, hc⟩ := hhq q hq0
@@ -149,8 +164,10 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
   intro ψ hkerψ hψ0
   have hψu : IsUnit (ψ E) := hψ0.isUnit
   have hσ := hker ℂ ψ hψu hkerψ
-  have hσψ : (IsLocalization.Away.lift E hψu : Localization.Away E →+* ℂ).comp
-      (algebraMap R (Localization.Away E)) = ψ := by
+  have hσψ
+      : (IsLocalization.Away.lift E hψu : Localization.Away E →+* ℂ).comp
+          (algebraMap R (Localization.Away E))
+        = ψ := by
     ext x
     simp only [RingHom.comp_apply, IsLocalization.Away.lift_eq]
   generalize (IsLocalization.Away.lift E hψu : Localization.Away E →+* ℂ) = σ at hσ hσψ
@@ -160,17 +177,21 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
     refine dvd_map_of_dvd_map φA σ hσ hmAmon ?_
     rw [hmA, hm]
     exact minpoly.dvd Φ θ (by rw [← hevθ]; exact hp)
-  have hDr : ∀ p : (Localization.Away E)[X], p.eval₂ f θ = 0 → ∀ t : ℂ, mA.eval₂ σ t = 0 →
-      p.eval₂ σ t = 0 := by
+  have hDr
+      : ∀ p : (Localization.Away E)[X],
+        p.eval₂ f θ = 0 → ∀ t : ℂ, mA.eval₂ σ t = 0 → p.eval₂ σ t = 0 := by
     intro p hp t ht
     obtain ⟨c, hc⟩ := hD p hp
     have := congrArg (eval t) hc
     rw [eval_mul, eval_map, eval_map, ht, zero_mul] at this
     exact this
 
-  have hZA : ∀ y : Q → ℂ, (∀ F : MvPolynomial Q R, MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F = 0 →
-      MvPolynomial.eval₂ ψ y F = 0) →
-      ∀ F : MvPolynomial Q (Localization.Away E), MvPolynomial.eval₂ f r F = 0 → MvPolynomial.eval₂ σ y F = 0 := by
+  have hZA
+      : ∀ y : Q → ℂ,
+        (∀ F : MvPolynomial Q R,
+            MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F = 0 → MvPolynomial.eval₂ ψ y F = 0)
+          → ∀ F : MvPolynomial Q (Localization.Away E),
+            MvPolynomial.eval₂ f r F = 0 → MvPolynomial.eval₂ σ y F = 0 := by
     intro y hy F hF
     obtain ⟨n, F', hF'⟩ := exists_pow_mul_eq_map E F
     have h1 : MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F' = 0 := by
@@ -184,10 +205,15 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
   let G : ℂ → Q → ℂ := fun t q => (gA q).eval₂ σ t
   let T : Set ℂ := {t | mA.eval₂ σ t = 0}
 
-  have hb : ∀ t ∈ T, ∀ F : MvPolynomial Q R, MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F = 0 →
-      MvPolynomial.eval₂ ψ (G t) F = 0 := by
+  have hb
+      : ∀ t ∈ T, ∀ F : MvPolynomial Q R,
+        MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F = 0
+          → MvPolynomial.eval₂ ψ (G t) F = 0 := by
     intro t ht F hF
-    have hp : (MvPolynomial.eval₂ C gA (MvPolynomial.map (algebraMap R (Localization.Away E)) F)).eval₂ f θ = 0 := by
+    have hp
+        : (MvPolynomial.eval₂ C gA (MvPolynomial.map (algebraMap R (Localization.Away E)) F)).eval₂
+            f θ
+          = 0 := by
       rw [eval₂_mvEval₂_C]
       simp only [hθg]
       rw [MvPolynomial.eval₂_map, hfφ]
@@ -196,8 +222,11 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
     rw [eval₂_mvEval₂_C, MvPolynomial.eval₂_map, hσψ] at this
     exact this
 
-  have ha : ∀ y : Q → ℂ, (∀ F : MvPolynomial Q R, MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F = 0 →
-      MvPolynomial.eval₂ ψ y F = 0) → MvPolynomial.eval₂ σ y τA ∈ T ∧ G (MvPolynomial.eval₂ σ y τA) = y := by
+  have ha
+      : ∀ y : Q → ℂ,
+        (∀ F : MvPolynomial Q R,
+            MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F = 0 → MvPolynomial.eval₂ ψ y F = 0)
+          → MvPolynomial.eval₂ σ y τA ∈ T ∧ G (MvPolynomial.eval₂ σ y τA) = y := by
     intro y hy
     have hyA := hZA y hy
     refine ⟨?_, ?_⟩
@@ -205,8 +234,9 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
       rw [mvEval₂_eval₂_C] at this
       exact this
     · funext q
-      have := hyA (MvPolynomial.X q - (gA q).eval₂ MvPolynomial.C τA)
-        (by rw [MvPolynomial.eval₂_sub, MvPolynomial.eval₂_X, mvEval₂_eval₂_C, hτθ, hθg, sub_self])
+      have :=
+        hyA (MvPolynomial.X q - (gA q).eval₂ MvPolynomial.C τA) (by
+          rw [MvPolynomial.eval₂_sub, MvPolynomial.eval₂_X, mvEval₂_eval₂_C, hτθ, hθg, sub_self])
       rw [MvPolynomial.eval₂_sub, MvPolynomial.eval₂_X, mvEval₂_eval₂_C, sub_eq_zero] at this
       exact this.symm
 
@@ -215,8 +245,10 @@ theorem ChartSpecCount.proof (hPE : ChartPrimElt.Statement) (hLA : LocAwaySpec.S
     have := hDr _ hθτ t ht
     rw [Polynomial.eval₂_sub, eval₂_mvEval₂_C, Polynomial.eval₂_X, sub_eq_zero] at this
     exact this
-  have hZ : {y : Q → ℂ | ∀ F : MvPolynomial Q R, MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F = 0 →
-      MvPolynomial.eval₂ ψ y F = 0} = G '' T := by
+  have hZ
+      : {y : Q → ℂ | ∀ F : MvPolynomial Q R, MvPolynomial.eval₂ ((algebraMap Φ Φ').comp φ) r F = 0 →
+          MvPolynomial.eval₂ ψ y F = 0}
+        = G '' T := by
     ext y
     constructor
     · intro hy

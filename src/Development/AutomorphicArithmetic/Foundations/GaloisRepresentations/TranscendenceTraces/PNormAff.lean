@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.normAff_of :
-    Chart → NormSpec → NormAff := by
+theorem UpperTheory.Gal.TranscendenceTraces.normAff_of : Chart → NormSpec → NormAff := by
   intro hC hN Z S p _ U hU hD hI
   obtain ⟨B, _, _, v, hfin, hpb⟩ := hC p Γ(S, U) hU.fromSpec
   obtain ⟨w, hw⟩ := hN Γ(S, U) B

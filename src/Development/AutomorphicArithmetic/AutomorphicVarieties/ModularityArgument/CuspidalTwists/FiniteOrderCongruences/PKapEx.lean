@@ -8,8 +8,11 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N IsLocalRing Polynomial
-open UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N IsLocalRing Polynomial
+open UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement GlobalTheory.CuspRep GlobalTheory.HeckeGal
+  GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
 open UpperTheory.V.Cu
 open scoped Matrix
 
@@ -39,26 +42,35 @@ def W (l : ℕ) [Fact l.Prime] : Subgroup (Qbar l)ˣ where
     rw [e, norm_neg, norm_mul, norm_inv, norm_eq_one ha, inv_one, one_mul]
     exact ha
 
-theorem isOpen_kappaOpenNeighbourhood (l : ℕ) [Fact l.Prime] : IsOpen ((W l : Subgroup (Qbar l)ˣ) : Set (Qbar l)ˣ) := by
+theorem isOpen_kappaOpenNeighbourhood (l : ℕ) [Fact l.Prime]
+    : IsOpen ((W l : Subgroup (Qbar l)ˣ) : Set (Qbar l)ˣ) := by
   show IsOpen {a : (Qbar l)ˣ | ‖(a : Qbar l) - 1‖ < 1}
-  exact isOpen_lt (continuous_norm.comp (Units.continuous_val.sub continuous_const)) continuous_const
+  exact isOpen_lt (continuous_norm.comp (Units.continuous_val.sub continuous_const))
+    continuous_const
 
 theorem cong_of_mem {l : ℕ} [Fact l.Prime] {x : (Qbar l)ˣ} (hx : x ∈ W l) : Cong x 1 := by
   unfold Cong
   rw [Units.val_one]
   exact hx
 
-theorem exists_pow_cong {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    {l : ℕ} [Fact l.Prime] (f : Γ →* (Qbar l)ˣ) (hf : Continuous f) : ∃ d : ℕ, 0 < d ∧ ∀ g, f g ^ d ∈ W l := by
-  have hU : IsOpen (((W l).comap f : Subgroup Γ) : Set Γ) := (isOpen_kappaOpenNeighbourhood l).preimage hf
+theorem exists_pow_cong
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    {l : ℕ} [Fact l.Prime]
+    (f : Γ →* (Qbar l)ˣ) (hf : Continuous f)
+    : ∃ d : ℕ, 0 < d ∧ ∀ g, f g ^ d ∈ W l := by
+  have hU : IsOpen (((W l).comap f : Subgroup Γ) : Set Γ) :=
+    (isOpen_kappaOpenNeighbourhood l).preimage hf
   haveI := Subgroup.quotient_finite_of_isOpen _ hU
   have hi : ((W l).comap f).index ≠ 0 := Subgroup.index_ne_zero_of_finite
   refine ⟨((W l).comap f).index.factorial, Nat.factorial_pos _, fun g => ?_⟩
   rw [← map_pow]
   exact Subgroup.pow_mem_of_index_ne_zero_of_dvd hi g fun n h0 hn => Nat.dvd_factorial h0 hn
 
-theorem cc_notMem {Ω : Type} [Field Ω] [CharZero Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω] [_root_.NumberField.IsTotallyComplex K]
-    {c : G ℚ Ω} (hc : Sd.IsCC c) : c ∉ galOf ℚ K Ω := by
+theorem cc_notMem
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (K : Type) [Field K] [NumberField K] [Algebra K Ω] [_root_.NumberField.IsTotallyComplex K]
+    {c : G ℚ Ω} (hc : Sd.IsCC c)
+    : c ∉ galOf ℚ K Ω := by
   obtain ⟨j, hj⟩ := hc
   intro h
   refine IsTotallyComplex.complexEmbedding_not_isReal (j.comp (algebraMap K Ω)) ?_

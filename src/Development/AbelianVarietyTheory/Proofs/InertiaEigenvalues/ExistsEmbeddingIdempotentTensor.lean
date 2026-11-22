@@ -8,12 +8,13 @@ open TensorProduct
 
 namespace GlobalTheory
 
-
 open TensorProduct in
-theorem _root_.GlobalTheory.exists_embedding_idempotent_tensor (F K L : Type) [Field F] [CharZero F] [Field K]
-    [Field L] [Algebra F K] [Algebra F L] [FiniteDimensional F K] (τ : K →ₐ[F] L) :
-    ∃ (m : ℕ) (c : Fin m → L) (k : Fin m → K), ∑ j, c j * τ (k j) = 1 ∧
-      ∀ y : K, ∑ j, c j ⊗ₜ[F] (y * k j) = ∑ j, (τ y * c j) ⊗ₜ[F] k j := by
+theorem _root_.GlobalTheory.exists_embedding_idempotent_tensor
+    (F K L : Type)
+    [Field F] [CharZero F] [Field K] [Field L] [Algebra F K] [Algebra F L] [FiniteDimensional F K]
+    (τ : K →ₐ[F] L)
+    : ∃ (m : ℕ) (c : Fin m → L) (k : Fin m → K),
+      ∑ j, c j * τ (k j) = 1 ∧ ∀ y : K, ∑ j, c j ⊗ₜ[F] (y * k j) = ∑ j, (τ y * c j) ⊗ₜ[F] k j := by
   classical
   have hB : (Algebra.traceForm F K).Nondegenerate := traceForm_nondegenerate F K
   have hsymm : (Algebra.traceForm F K).IsSymm := Algebra.traceForm_isSymm F
@@ -46,18 +47,21 @@ theorem _root_.GlobalTheory.exists_embedding_idempotent_tensor (F K L : Type) [F
     rw [h, map_zero] at htr
     exact (Module.finrank_pos (R := F) (M := K)).ne' (Nat.cast_eq_zero.mp htr.symm)
   refine ⟨Module.finrank F K, fun j => τ (s⁻¹ * b j), d, ?_, fun y => ?_⟩
-  · calc ∑ j, τ (s⁻¹ * b j) * τ (d j) = τ (s⁻¹ * s) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp only [← map_mul, ← map_sum, hs, Finset.mul_sum, mul_assoc]
+  · calc
+      ∑ j, τ (s⁻¹ * b j) * τ (d j) = τ (s⁻¹ * s) := by
+        set_option synthInstance.maxHeartbeats 100000 in
+        simp only [← map_mul, ← map_sum, hs, Finset.mul_sum, mul_assoc]
       _ = 1 := by rw [inv_mul_cancel₀ hs0, map_one]
-  · have lhs : ∑ j, τ (s⁻¹ * b j) ⊗ₜ[F] (y * d j) =
-        ∑ j, ∑ i, (Algebra.trace F K (y * d j * b i) • τ (s⁻¹ * b j)) ⊗ₜ[F] d i := by
+  · have lhs
+        : ∑ j, τ (s⁻¹ * b j) ⊗ₜ[F] (y * d j)
+          = ∑ j, ∑ i, (Algebra.trace F K (y * d j * b i) • τ (s⁻¹ * b j)) ⊗ₜ[F] d i := by
       refine Finset.sum_congr rfl fun j _ => ?_
       conv_lhs => rw [← hd (y * d j)]
       rw [TensorProduct.tmul_sum]
       simp_rw [TensorProduct.tmul_smul, TensorProduct.smul_tmul']
-    have rhs : ∑ i, (τ y * τ (s⁻¹ * b i)) ⊗ₜ[F] d i =
-        ∑ i, ∑ j, (Algebra.trace F K (y * b i * d j) • τ (s⁻¹ * b j)) ⊗ₜ[F] d i := by
+    have rhs
+        : ∑ i, (τ y * τ (s⁻¹ * b i)) ⊗ₜ[F] d i
+          = ∑ i, ∑ j, (Algebra.trace F K (y * b i * d j) • τ (s⁻¹ * b j)) ⊗ₜ[F] d i := by
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [← map_mul, mul_left_comm]
       conv_lhs => rw [← hb (y * b i)]

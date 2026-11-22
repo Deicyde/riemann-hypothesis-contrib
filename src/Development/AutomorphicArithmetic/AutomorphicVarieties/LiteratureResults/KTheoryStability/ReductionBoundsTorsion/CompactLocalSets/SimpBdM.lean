@@ -254,10 +254,15 @@ lemma exists_big {q : ℕ} (τ : Fin (q + 1) → ℝ) (hs : ∑ j, τ j = 1) : �
   rw [mul_one_div_cancel hq] at hlt
   exact lt_irrefl _ hlt
 
-private theorem exists_ne_zero_smul_mem_of_mem_span' (μ : Measure V) [μ.IsAddHaarMeasure] {q : ℕ} (A : Fin (q + 1) → V ≃L[ℝ] V) {B : Set V}
-    (hB : IsCompact B) (ω : V → V [⋀^Fin q]→L[ℝ] ℝ) (hω : ContinuousOn ω (KS (fun j => (A j : V →L[ℝ] V)) B))
-    (b : Fin (q + 1) → Bool) (y₀ : V) (hy₀ : y₀ ∈ B) :
-    Integrable (fun y : Fin (q + 1) → V => iS ω fun j => A j (if b j then y j else y₀))
+private theorem exists_ne_zero_smul_mem_of_mem_span'
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    {q : ℕ} (A : Fin (q + 1) → V ≃L[ℝ] V)
+    {B : Set V} (hB : IsCompact B)
+    (ω : V → V [⋀^Fin q]→L[ℝ] ℝ) (hω : ContinuousOn ω (KS (fun j => (A j : V →L[ℝ] V)) B))
+    (b : Fin (q + 1) → Bool)
+    (y₀ : V) (hy₀ : y₀ ∈ B)
+    : Integrable
+      (fun y : Fin (q + 1) → V => iS ω fun j => A j (if b j then y j else y₀))
       (Measure.pi fun _ => nm μ B) := by
   have hw : Continuous fun y : Fin (q + 1) → V => fun j => if b j then y j else y₀ := by
     refine continuous_pi fun j => ?_
@@ -266,8 +271,9 @@ private theorem exists_ne_zero_smul_mem_of_mem_span' (μ : Measure V) [μ.IsAddH
       exact continuous_apply j
     · simp only [h]
       exact continuous_const
-  have hwB : ∀ y ∈ Set.univ.pi (fun _ : Fin (q + 1) => B),
-      (fun j => if b j then y j else y₀) ∈ Set.univ.pi fun _ : Fin (q + 1) => B := by
+  have hwB
+      : ∀ y ∈ Set.univ.pi (fun _ : Fin (q + 1) => B),
+        (fun j => if b j then y j else y₀) ∈ Set.univ.pi fun _ : Fin (q + 1) => B := by
     intro y hy j _
     by_cases h : b j = true
     · simp only [h, if_true]
@@ -276,10 +282,13 @@ private theorem exists_ne_zero_smul_mem_of_mem_span' (μ : Measure V) [μ.IsAddH
       exact hy₀
   exact integ_iS μ (fun j => (A j : V →L[ℝ] V)) hB ω hω _ hw hwB
 
-private theorem main_lemma_2 {q : ℕ} (f : V [⋀^Fin q]→L[ℝ] ℝ) (m : Fin q → V) (K : ℝ) (hK0 : 0 ≤ K)
-    (hm : ∏ j, ‖m j‖ ≤ K) : ‖f m‖ₑ ≤ ENNReal.ofReal K * (‖f‖₊ : ℝ≥0∞) := by
+private theorem main_lemma_2
+    {q : ℕ} (f : V [⋀^Fin q]→L[ℝ] ℝ) (m : Fin q → V) (K : ℝ) (hK0 : 0 ≤ K) (hm : ∏ j, ‖m j‖ ≤ K)
+    : ‖f m‖ₑ ≤ ENNReal.ofReal K * (‖f‖₊ : ℝ≥0∞) := by
   have h1 : ‖f m‖ ≤ K * ‖f‖ :=
-    calc ‖f m‖ ≤ ‖f‖ * ∏ j, ‖m j‖ := f.le_opNorm m
+    calc
+      ‖f m‖
+        ≤ ‖f‖ * ∏ j, ‖m j‖ := f.le_opNorm m
       _ ≤ ‖f‖ * K := mul_le_mul_of_nonneg_left hm (norm_nonneg _)
       _ = K * ‖f‖ := mul_comm _ _
   rw [← ofReal_norm_eq_enorm]
@@ -289,14 +298,19 @@ private theorem main_lemma_2 {q : ℕ} (f : V [⋀^Fin q]→L[ℝ] ℝ) (m : Fin
   rw [ofReal_norm_eq_enorm]
   rfl
 
-theorem main (μ : Measure V) [μ.IsAddHaarMeasure] (q : ℕ) (A : Fin (q + 1) → V ≃L[ℝ] V) (B : Set V)
-    (hB : IsCompact B) : ∃ C : ℝ, ∀ ω : V → V [⋀^Fin q]→L[ℝ] ℝ,
-      ContinuousOn ω (KS (fun j => (A j : V →L[ℝ] V)) B) →
-      (∀ (b : Fin (q + 1) → Bool) (y₀ : V), y₀ ∈ B →
-        Integrable (fun y : Fin (q + 1) → V => iS ω fun j => A j (if b j then y j else y₀))
-          (Measure.pi fun _ => nm μ B)) ∧
-      ENNReal.ofReal (∫ y, |iS ω fun j => A j (y j)| ∂(Measure.pi fun _ => nm μ B)) ≤
-        ENNReal.ofReal C * ∫⁻ p in KS (fun j => (A j : V →L[ℝ] V)) B, ‖ω p‖₊ ∂μ := by
+theorem main
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (q : ℕ) (A : Fin (q + 1) → V ≃L[ℝ] V)
+    (B : Set V) (hB : IsCompact B)
+    : ∃ C : ℝ, ∀ ω : V → V [⋀^Fin q]→L[ℝ] ℝ,
+      ContinuousOn ω (KS (fun j => (A j : V →L[ℝ] V)) B)
+        → (∀ (b : Fin (q + 1) → Bool) (y₀ : V),
+            y₀ ∈ B
+              → Integrable
+                (fun y : Fin (q + 1) → V => iS ω fun j => A j (if b j then y j else y₀))
+                (Measure.pi fun _ => nm μ B))
+          ∧ ENNReal.ofReal (∫ y, |iS ω fun j => A j (y j)| ∂(Measure.pi fun _ => nm μ B))
+            ≤ ENNReal.ofReal C * ∫⁻ p in KS (fun j => (A j : V →L[ℝ] V)) B, ‖ω p‖₊ ∂μ := by
   classical
   have hBm : MeasurableSet B := hB.isClosed.measurableSet
   have hBt : μ B ≠ ⊤ := hB.measure_lt_top.ne
@@ -307,26 +321,41 @@ theorem main (μ : Measure V) [μ.IsAddHaarMeasure] (q : ℕ) (A : Fin (q + 1) �
   have hr0 : 0 ≤ max r 0 := le_max_right _ _
   have hAx : ∀ j, ∀ x ∈ B, ‖A j x‖ ≤ a * max r 0 := by
     intro j x hx
-    calc ‖A j x‖ = ‖(A j : V →L[ℝ] V) x‖ := rfl
+    calc
+      ‖A j x‖
+        = ‖(A j : V →L[ℝ] V) x‖ := rfl
       _ ≤ ‖(A j : V →L[ℝ] V)‖ * ‖x‖ := (A j : V →L[ℝ] V).le_opNorm x
-      _ ≤ a * max r 0 := mul_le_mul (ha ▸ Finset.single_le_sum (f := fun i => ‖(A i : V →L[ℝ] V)‖)
-            (fun i _ => norm_nonneg _) (Finset.mem_univ j))
+      _ ≤ a * max r 0 :=
+        mul_le_mul
+          (ha ▸ Finset.single_le_sum
+            (f := fun i => ‖(A i : V →L[ℝ] V)‖)
+            (fun i _ => norm_nonneg _)
+            (Finset.mem_univ j))
           ((hr x hx).trans (le_max_left _ _)) (norm_nonneg _) ha0
   obtain ⟨K, hK⟩ : ∃ K : ℝ, K = (2 * a * max r 0) ^ q := ⟨_, rfl⟩
   have hc0 : 0 ≤ 2 * a * max r 0 := mul_nonneg (mul_nonneg (by norm_num) ha0) hr0
   have hK0 : 0 ≤ K := hK ▸ pow_nonneg hc0 _
-  have hprod : ∀ y ∈ Set.univ.pi (fun _ : Fin (q + 1) => B),
-      ∏ j : Fin q, ‖A j.succ (y j.succ) - A 0 (y 0)‖ ≤ K := by
+  have hprod
+      : ∀ y ∈ Set.univ.pi (fun _ : Fin (q + 1) => B),
+        ∏ j : Fin q, ‖A j.succ (y j.succ) - A 0 (y 0)‖ ≤ K := by
     intro y hy
     have hy' : ∀ j, y j ∈ B := fun j => hy j (Set.mem_univ j)
-    calc ∏ j : Fin q, ‖A j.succ (y j.succ) - A 0 (y 0)‖ ≤ ∏ _j : Fin q, (2 * a * max r 0) :=
-          Finset.prod_le_prod₀ (fun j _ => norm_nonneg _) fun j _ => by
-            calc ‖A j.succ (y j.succ) - A 0 (y 0)‖ ≤ ‖A j.succ (y j.succ)‖ + ‖A 0 (y 0)‖ := norm_sub_le _ _
+    calc
+      ∏ j : Fin q, ‖A j.succ (y j.succ) - A 0 (y 0)‖ ≤ ∏ _j : Fin q, (2 * a * max r 0) :=
+        Finset.prod_le_prod₀
+          (fun j _ => norm_nonneg _)
+          fun j _ => by
+            calc
+              ‖A j.succ (y j.succ) - A 0 (y 0)‖
+                ≤ ‖A j.succ (y j.succ)‖ + ‖A 0 (y 0)‖ := norm_sub_le _ _
               _ ≤ a * max r 0 + a * max r 0 := add_le_add (hAx _ _ (hy' _)) (hAx _ _ (hy' _))
               _ = 2 * a * max r 0 := by ring
       _ = K := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin, hK]
   by_cases h0 : μ B = 0
-  · refine ⟨0, fun ω hω => ⟨fun b y₀ hy₀ => exists_ne_zero_smul_mem_of_mem_span' μ A hB ω hω b y₀ hy₀, ?_⟩⟩
+  · refine ⟨
+      0,
+      fun ω hω => ⟨fun b y₀ hy₀ => exists_ne_zero_smul_mem_of_mem_span' μ A hB ω hω b y₀ hy₀, ?_⟩
+    ⟩
     have hnm : nm μ B = 0 := by simp [nm, Measure.restrict_eq_zero.2 h0]
     have hP : Measure.pi (fun _ : Fin (q + 1) => nm μ B) = 0 := by
       rw [hnm]
@@ -336,16 +365,26 @@ theorem main (μ : Measure V) [μ.IsAddHaarMeasure] (q : ℕ) (A : Fin (q + 1) �
     rw [hP, integral_zero_measure]
     simp
   haveI := nm_prob μ B h0 hBt
-  obtain ⟨S, hS⟩ : ∃ S : ℝ≥0∞, S = ∑ i, ENNReal.ofReal (((q : ℝ) + 1) ^ Module.finrank ℝ V *
-      |(LinearMap.det ((A i : V →L[ℝ] V) : V →ₗ[ℝ] V))⁻¹|) := ⟨_, rfl⟩
+  obtain ⟨S, hS⟩
+      : ∃ S : ℝ≥0∞,
+        S = ∑ i, ENNReal.ofReal (((q : ℝ) + 1) ^ Module.finrank ℝ V *
+          |(LinearMap.det ((A i : V →L[ℝ] V) : V →ₗ[ℝ] V))⁻¹|) :=
+    ⟨_, rfl⟩
   have hSt : S ≠ ⊤ := hS ▸ ENNReal.sum_ne_top.2 fun _ _ => ENNReal.ofReal_ne_top
   obtain ⟨Cε, hCε⟩ : ∃ C : ℝ≥0∞, C = ENNReal.ofReal K * ((μ B)⁻¹ * S) * volume (Sx q) := ⟨_, rfl⟩
-  have hCt : Cε ≠ ⊤ := hCε ▸ ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofReal_ne_top
-    (ENNReal.mul_ne_top (ENNReal.inv_ne_top.2 h0) hSt)) (vol_Sx q).ne
-  refine ⟨Cε.toReal, fun ω hω => ⟨fun b y₀ hy₀ => exists_ne_zero_smul_mem_of_mem_span' μ A hB ω hω b y₀ hy₀, ?_⟩⟩
+  have hCt : Cε ≠ ⊤ :=
+    hCε ▸ ENNReal.mul_ne_top
+      (ENNReal.mul_ne_top ENNReal.ofReal_ne_top (ENNReal.mul_ne_top (ENNReal.inv_ne_top.2 h0) hSt))
+      (vol_Sx q).ne
+  refine ⟨
+    Cε.toReal,
+    fun ω hω => ⟨fun b y₀ hy₀ => exists_ne_zero_smul_mem_of_mem_span' μ A hB ω hω b y₀ hy₀, ?_⟩
+  ⟩
   rw [ENNReal.ofReal_toReal hCt]
-  obtain ⟨G, hGdef⟩ : ∃ G : V → ℝ≥0∞, G = (KS (fun j => (A j : V →L[ℝ] V)) B).indicator
-      (fun p => (‖ω p‖₊ : ℝ≥0∞)) := ⟨_, rfl⟩
+  obtain ⟨G, hGdef⟩
+      : ∃ G : V → ℝ≥0∞,
+        G = (KS (fun j => (A j : V →L[ℝ] V)) B).indicator (fun p => (‖ω p‖₊ : ℝ≥0∞)) :=
+    ⟨_, rfl⟩
   have hKSm : MeasurableSet (KS (fun j => (A j : V →L[ℝ] V)) B) :=
     (isCompact_KS _ hB).isClosed.measurableSet
   have hGm : Measurable G := by
@@ -355,24 +394,28 @@ theorem main (μ : Measure V) [μ.IsAddHaarMeasure] (q : ℕ) (A : Fin (q + 1) �
   have hGint : ∫⁻ x, G x ∂μ = ∫⁻ p in KS (fun j => (A j : V →L[ℝ] V)) B, ‖ω p‖₊ ∂μ := by
     rw [hGdef]
     exact lintegral_indicator hKSm _
-  have hpt : ∀ y ∈ Set.univ.pi (fun _ : Fin (q + 1) => B),
-      ENNReal.ofReal |iS ω fun j => A j (y j)| ≤
-        ∫⁻ t in Sx q, ENNReal.ofReal K * G (A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0))) := by
-    intro y hy
-    have hy' : ∀ j, y j ∈ B := fun j => hy j (Set.mem_univ j)
-    rw [← Real.enorm_eq_ofReal_abs]
-    simp only [iS]
-    refine (enorm_integral_le_lintegral_enorm _).trans ?_
-    refine setLIntegral_mono ?_ ?_
-    · exact measurable_const.mul (hGm.comp (continuous_const.add
-        (by fun_prop)).measurable)
-    · intro t ht
-      have hmem : A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0)) ∈
-          KS (fun j => (A j : V →L[ℝ] V)) B := mem_KS _ B ht hy'
-      rw [hGdef, Set.indicator_of_mem hmem]
-      exact main_lemma_2 _ _ K hK0 (hprod y hy)
-  have h1 : ENNReal.ofReal (∫ y, |iS ω fun j => A j (y j)| ∂(Measure.pi fun _ => nm μ B)) ≤
-      ∫⁻ y, ENNReal.ofReal |iS ω fun j => A j (y j)| ∂(Measure.pi fun _ => nm μ B) := by
+  have hpt
+      : ∀ y ∈ Set.univ.pi (fun _ : Fin (q + 1) => B),
+        ENNReal.ofReal |iS ω fun j => A j (y j)|
+          ≤ ∫⁻ t in Sx q, ENNReal.ofReal K * G (A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0))) :=
+    by
+      intro y hy
+      have hy' : ∀ j, y j ∈ B := fun j => hy j (Set.mem_univ j)
+      rw [← Real.enorm_eq_ofReal_abs]
+      simp only [iS]
+      refine (enorm_integral_le_lintegral_enorm _).trans ?_
+      refine setLIntegral_mono ?_ ?_
+      · exact measurable_const.mul (hGm.comp (continuous_const.add (by fun_prop)).measurable)
+      · intro t ht
+        have hmem
+            : A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0))
+              ∈ KS (fun j => (A j : V →L[ℝ] V)) B :=
+          mem_KS _ B ht hy'
+        rw [hGdef, Set.indicator_of_mem hmem]
+        exact main_lemma_2 _ _ K hK0 (hprod y hy)
+  have h1
+      : ENNReal.ofReal (∫ y, |iS ω fun j => A j (y j)| ∂(Measure.pi fun _ => nm μ B))
+        ≤ ∫⁻ y, ENNReal.ofReal |iS ω fun j => A j (y j)| ∂(Measure.pi fun _ => nm μ B) := by
     refine (ENNReal.ofReal_le_ofReal (le_abs_self _)).trans ?_
     rw [← Real.enorm_eq_ofReal_abs]
     refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq ?_)
@@ -384,25 +427,37 @@ theorem main (μ : Measure V) [μ.IsAddHaarMeasure] (q : ℕ) (A : Fin (q + 1) �
       ENNReal.ofReal K * G (A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0)))) := by
     refine measurable_const.mul (hGm.comp ?_)
     fun_prop
-  have h3 := lintegral_lintegral_swap (μ := Measure.pi fun _ : Fin (q + 1) => nm μ B)
-    (ν := volume.restrict (Sx q)) hmeas.aemeasurable
-  have h4 : ∀ t ∈ Sx q, ∫⁻ y, ENNReal.ofReal K * G (A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0)))
-      ∂(Measure.pi fun _ => nm μ B) ≤ ENNReal.ofReal K * ((μ B)⁻¹ * S * ∫⁻ x, G x ∂μ) := by
+  have h3 :=
+    lintegral_lintegral_swap (μ := Measure.pi fun _ : Fin (q + 1) => nm μ B)
+      (ν := volume.restrict (Sx q)) hmeas.aemeasurable
+  have h4
+      : ∀ t ∈ Sx q,
+        ∫⁻ y, ENNReal.ofReal K * G (A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0)))
+            ∂(Measure.pi fun _ => nm μ B)
+          ≤ ENNReal.ofReal K * ((μ B)⁻¹ * S * ∫⁻ x, G x ∂μ) := by
     intro t ht
-    have hmt : Measurable fun y : Fin (q + 1) → V => A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0)) := by
+    have hmt : Measurable fun y : Fin (q + 1) → V =>
+        A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0)) := by
       fun_prop
     rw [lintegral_const_mul (ENNReal.ofReal K)
-      (f := fun y : Fin (q + 1) → V => G (A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0)))) (hGm.comp hmt)]
+      (f := fun y : Fin (q + 1) → V => G (A 0 (y 0) + ∑ j, t j • (A j.succ (y j.succ) - A 0 (y 0))))
+      (hGm.comp hmt)]
     gcongr ENNReal.ofReal K * ?_
     simp_rw [pt_eqA A t]
     obtain ⟨i, hi⟩ := exists_big (bary t) (bary_sum t)
     refine (coord_step μ A B h0 hBt hGm (bary t) i hi).trans ?_
     gcongr (μ B)⁻¹ * ?_ * _
     rw [hS]
-    exact Finset.single_le_sum (f := fun i => ENNReal.ofReal (((q : ℝ) + 1) ^ Module.finrank ℝ V *
-      |(LinearMap.det ((A i : V →L[ℝ] V) : V →ₗ[ℝ] V))⁻¹|)) (fun _ _ => zero_le) (Finset.mem_univ i)
-  have h5 := (setLIntegral_mono' (isClosed_Sx q).measurableSet h4).trans
-    (le_of_eq (setLIntegral_const (μ := volume) _ _))
+    exact Finset.single_le_sum
+      (f := fun i =>
+        ENNReal.ofReal
+          (((q : ℝ) + 1) ^ Module.finrank ℝ V
+            * |(LinearMap.det ((A i : V →L[ℝ] V) : V →ₗ[ℝ] V))⁻¹|))
+      (fun _ _ => zero_le)
+      (Finset.mem_univ i)
+  have h5 :=
+    (setLIntegral_mono' (isClosed_Sx q).measurableSet h4).trans
+      (le_of_eq (setLIntegral_const (μ := volume) _ _))
   refine h1.trans (h2.trans ((le_of_eq h3).trans (h5.trans (le_of_eq ?_))))
   rw [hCε, ← hGint]
   ring

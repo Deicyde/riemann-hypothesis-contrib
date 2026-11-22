@@ -27,16 +27,24 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Exi
 
 noncomputable section
 open scoped Matrix NNReal ENNReal TensorProduct Pointwise
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter NumberField
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.Rg.Rsw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter NumberField
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.SphPole
 
-theorem setLIntegral_le_of_disjoint {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
-    [BorelSpace G] [SecondCountableTopology G] (μ : Measure G) [μ.IsMulLeftInvariant] (Γ : Subgroup G) [Countable Γ] (𝓕 U : Set G)
-    (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (hU : MeasurableSet U) (hd : ∀ γ ∈ Γ, ∀ x ∈ U, γ * x ∈ U → γ = 1)
-    (f : G → ℝ≥0∞) (hinv : ∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) : ∫⁻ g in U, f g ∂μ ≤ ∫⁻ g in 𝓕, f g ∂μ := by
+theorem setLIntegral_le_of_disjoint
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+    [BorelSpace G] [SecondCountableTopology G]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (Γ : Subgroup G) [Countable Γ]
+    (𝓕 U : Set G) (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (hU : MeasurableSet U)
+    (hd : ∀ γ ∈ Γ, ∀ x ∈ U, γ * x ∈ U → γ = 1)
+    (f : G → ℝ≥0∞) (hinv : ∀ γ ∈ Γ, ∀ g, f (γ * g) = f g)
+    : ∫⁻ g in U, f g ∂μ ≤ ∫⁻ g in 𝓕, f g ∂μ := by
   rw [h𝓕.setLIntegral_eq_tsum' f U]
   have e : ∀ γ : Γ, ∫⁻ x in γ • U ∩ 𝓕, f (γ⁻¹ • x) ∂μ = ∫⁻ x in γ • U ∩ 𝓕, f x ∂μ := fun γ => by
     refine lintegral_congr fun x => ?_
@@ -60,8 +68,10 @@ theorem setLIntegral_le_of_disjoint {G : Type} [Group G] [TopologicalSpace G] [I
   rw [← lintegral_iUnion₀ hm hdis]
   exact lintegral_mono_set (Set.iUnion_subset fun γ => Set.inter_subset_right)
 
-theorem exists_compact_nhds_separated {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
-    (Γ : Subgroup G) [DiscreteTopology Γ] : ∃ U : Set G, IsCompact U ∧ U ∈ nhds (1 : G) ∧ ∀ γ ∈ Γ, ∀ x ∈ U, γ * x ∈ U → γ = 1 := by
+theorem exists_compact_nhds_separated
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    (Γ : Subgroup G) [DiscreteTopology Γ]
+    : ∃ U : Set G, IsCompact U ∧ U ∈ nhds (1 : G) ∧ ∀ γ ∈ Γ, ∀ x ∈ U, γ * x ∈ U → γ = 1 := by
   obtain ⟨O, hO, hO1⟩ := isOpen_induced_iff.1 (isOpen_discrete ({1} : Set Γ))
   have h1 : (1 : G) ∈ O := by
     have : (1 : Γ) ∈ Subtype.val ⁻¹' O := by rw [hO1]; rfl
@@ -79,32 +89,47 @@ theorem exists_compact_nhds_separated {G : Type} [Group G] [TopologicalSpace G] 
   rw [hO1] at h4
   exact congrArg Subtype.val h4
 
-theorem frame_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (n : ℕ)
-    (J : Matrix (Fin n) (Fin n) E) (r : ℕ) (X Y : Matrix (Fin n) (Fin (r + 1)) E) (L : Submodule (𝓞 E) (Fin n → E))
-    (a : GL (Fin n) (AF F ⊗[F] E)) (h : GAd σ J → ℝ), GlobalTheory.ResidueEisenstein.DataJ σ J X Y L a h → ∀ T, GlobalTheory.ResidueEisenstein.IsRepsJ σ J X T →
-    ∃ B : ℝ, ∀ ε : ℝ, 0 < ε → ε ≤ 1 → ε * ∑' t : T, h t.1.1 ^ (((n : ℝ) - (r + 1)) + ε) ≤ B := by
+theorem frame_bound
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (r : ℕ)
+        (X Y : Matrix (Fin n) (Fin (r + 1)) E) (L : Submodule (𝓞 E) (Fin n → E))
+        (a : GL (Fin n) (AF F ⊗[F] E)) (h : GAd σ J → ℝ),
+      GlobalTheory.ResidueEisenstein.DataJ σ J X Y L a h
+        → ∀ T,
+          GlobalTheory.ResidueEisenstein.IsRepsJ σ J X T
+            → ∃ B : ℝ, ∀ ε : ℝ,
+              0 < ε → ε ≤ 1 → ε * ∑' t : T, h t.1.1 ^ (((n : ℝ) - (r + 1)) + ε) ≤ B := by
   intro F E _ _ _ _ _ σ n J r X Y L a h hD T hT
-  obtain ⟨hK, hht, -⟩ := GlobalTheory.T.isCompact_level_height_scales_isotropicFrame F E σ n J r X Y L a h hD
-  obtain ⟨hperm, -, hinv, hrep⟩ := GlobalTheory.T.isotropicEisensteinSeries_rationalPoints_permute_terms F E σ n J r X Y L a h hD T hT
-  obtain ⟨hn, -⟩ := GlobalTheory.T.wittFrame_rank_le_and_exists_rational_swap F E σ n J r X Y hD.cm hD.herm hD.witt
+  obtain ⟨hK, hht, -⟩ :=
+    GlobalTheory.T.isCompact_level_height_scales_isotropicFrame F E σ n J r X Y L a h hD
+  obtain ⟨hperm, -, hinv, hrep⟩ :=
+    GlobalTheory.T.isotropicEisensteinSeries_rationalPoints_permute_terms F E σ n J r X Y L a h hD T
+      hT
+  obtain ⟨hn, -⟩ :=
+    GlobalTheory.T.wittFrame_rank_le_and_exists_rational_swap F E σ n J r X Y hD.cm hD.herm hD.witt
   set d : ℝ := (n : ℝ) - (r + 1) with hdd
   have hd : (0 : ℝ) < d := by
     have : (2 * ((r : ℝ) + 1)) ≤ n := by exact_mod_cast hn
     have : (0 : ℝ) ≤ r := Nat.cast_nonneg r
-    rw [hdd]; linarith
+    rw [hdd]
+    linarith
   let μ : Measure (GAd σ J) := Measure.haar
   let Λ : Subgroup (GAd σ J) := ratPts σ J ⊓ GlobalTheory.StdPar.frameStab σ J X ⊤
   haveI : DiscreteTopology Λ := inferInstance
   haveI : Countable (ratPts σ J) := inferInstance
   have h𝓕 := GlobalTheory.AutomorphicL2Unitary.isFundamentalDomain_stdDom (ratPts σ J) μ
   have hDom := GlobalTheory.AutomorphicL2Unitary.isFundamentalDomain_stdDom Λ μ
-  obtain ⟨B₀, hB₀, hsh⟩ := GlobalTheory.T.measure_heightShell_le_isotropicFrame_quotient F E σ n J r X Y L a h hD μ _ inferInstance hDom
+  obtain ⟨B₀, hB₀, hsh⟩ :=
+    GlobalTheory.T.measure_heightShell_le_isotropicFrame_quotient F E σ n J r X Y L a h hD μ _
+      inferInstance hDom
   have hm : Measurable h := hht.cont.measurable
 
   obtain ⟨U, hUc, hU1, hUd⟩ := exists_compact_nhds_separated (ratPts σ J)
   have hKU := hK.prod hUc
-  have hc1 : Continuous fun u : GAd σ J × GAd σ J => h (u.1 * u.2) := hht.cont.comp (continuous_fst.mul continuous_snd)
-  have hc2 : Continuous fun u : GAd σ J × GAd σ J => (h (u.1 * u.2))⁻¹ := hc1.inv₀ fun u => (hht.pos _).ne'
+  have hc1 : Continuous fun u : GAd σ J × GAd σ J => h (u.1 * u.2) :=
+    hht.cont.comp (continuous_fst.mul continuous_snd)
+  have hc2 : Continuous fun u : GAd σ J × GAd σ J => (h (u.1 * u.2))⁻¹ :=
+    hc1.inv₀ fun u => (hht.pos _).ne'
   obtain ⟨M₀, hM₀⟩ := hKU.exists_bound_of_continuousOn hc1.continuousOn
   obtain ⟨m₀, hm₀⟩ := hKU.exists_bound_of_continuousOn hc2.continuousOn
   set M : ℝ := max M₀ 1 with hM
@@ -136,35 +161,46 @@ theorem frame_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
 
   let f : ℝ → GAd σ J → ℝ≥0∞ := fun ε x => if h x ≤ 1 then ENNReal.ofReal (h x ^ (d + ε)) else 0
   have hf : ∀ ε : ℝ, Measurable (f ε) := fun ε =>
-    Measurable.ite (measurableSet_le hm measurable_const) (hm.pow_const _).ennreal_ofReal measurable_const
+    Measurable.ite (measurableSet_le hm measurable_const) (hm.pow_const _).ennreal_ofReal
+      measurable_const
   let Φ : ℝ → GAd σ J → ℝ≥0∞ := fun ε g => ∑' t : T, f ε (t.1.1 * g)
   have hΦ : ∀ ε, ∀ γ ∈ ratPts σ J, ∀ g, Φ ε (γ * g) = Φ ε g := by
     intro ε γ hγ g
     obtain ⟨π, hπ⟩ := hperm γ hγ
-    have : ∀ i : T, f ε (i.1.1 * (γ * g)) = f ε ((π i).1.1 * g) := fun i => by
-      simp only [f, hπ i g]
+    have : ∀ i : T, f ε (i.1.1 * (γ * g)) = f ε ((π i).1.1 * g) := fun i => by simp only [f, hπ i g]
     simp only [Φ, this]
     exact π.tsum_eq fun t : T => f ε (t.1.1 * g)
-  have hint : ∀ ε : ℝ, 0 < ε → ε ≤ 1 → ENNReal.ofReal ε * ∫⁻ g in GlobalTheory.AutomorphicL2Unitary.stdDom (ratPts σ J), Φ ε g ∂μ ≤ 2 * B₀ := by
+  have hint
+      : ∀ ε : ℝ,
+        0 < ε → ε ≤ 1
+          → ENNReal.ofReal ε
+              * ∫⁻ g in GlobalTheory.AutomorphicL2Unitary.stdDom (ratPts σ J), Φ ε g ∂μ
+            ≤ 2 * B₀ := by
     intro ε h0 h1
-    have hu := GlobalTheory.T.setLIntegral_tsum_unfold_of_cosetRepresentatives (GAd σ J) μ (ratPts σ J) Λ T _ _ inferInstance inf_le_left hrep h𝓕 hDom _ (hf ε)
-      (fun γ hγ g => by simp only [f, hinv γ hγ g])
+    have hu :=
+      GlobalTheory.T.setLIntegral_tsum_unfold_of_cosetRepresentatives (GAd σ J) μ (ratPts σ J) Λ T _
+        _ inferInstance inf_le_left hrep h𝓕 hDom _ (hf ε)
+        (fun γ hγ g => by simp only [f, hinv γ hγ g])
     simp only [Φ]
     rw [hu]
     exact GlobalTheory.T.mul_lintegral_rpow_le_of_shell_bound' _ _ h _ B₀ hm hht.pos hd hsh ε h0 h1
   have hUm : MeasurableSet U := hUc.measurableSet
-  have hμU : 0 < μ U := lt_of_lt_of_le
-    ((isOpen_interior.measure_pos μ ⟨1, mem_interior_iff_mem_nhds.2 hU1⟩)) (measure_mono interior_subset)
+  have hμU : 0 < μ U :=
+    lt_of_lt_of_le ((isOpen_interior.measure_pos μ ⟨1, mem_interior_iff_mem_nhds.2 hU1⟩))
+      (measure_mono interior_subset)
   have hμU' : μ U ≠ ⊤ := hUc.measure_ne_top
   set c₀ : ℝ := (m ^ (d + 1))⁻¹ with hc₀
   have hc₀0 : 0 < c₀ := by positivity
 
   let b : ℝ → T → ℝ := fun ε t => if h t.1.1 ≤ M⁻¹ then h t.1.1 ^ (d + ε) else 0
   have hb0 : ∀ ε t, 0 ≤ b ε t := fun ε t => by
-    simp only [b]; split_ifs
+    simp only [b]
+    split_ifs
     · exact Real.rpow_nonneg (hht.pos _).le _
     · exact le_rfl
-  have hpt : ∀ ε : ℝ, 0 < ε → ε ≤ 1 → ∀ u ∈ U, ENNReal.ofReal c₀ * ∑' t : T, ENNReal.ofReal (b ε t) ≤ Φ ε u := by
+  have hpt
+      : ∀ ε : ℝ,
+        0 < ε → ε ≤ 1 → ∀ u ∈ U, ENNReal.ofReal c₀ * ∑' t : T, ENNReal.ofReal (b ε t) ≤ Φ ε u := by
     intro ε h0 h1 u hu
     rw [← ENNReal.tsum_mul_left]
     refine ENNReal.tsum_le_tsum fun t => ?_
@@ -190,12 +226,17 @@ theorem frame_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
       rw [hc₀, inv_mul_le_iff₀ h7]
       exact h4.trans (mul_le_mul_of_nonneg_right h5 h6)
     · rw [if_neg ht]; simp
-  have hB₁ : ∀ ε : ℝ, 0 < ε → ε ≤ 1 → ENNReal.ofReal ε * (μ U * (ENNReal.ofReal c₀ * ∑' t : T, ENNReal.ofReal (b ε t))) ≤ 2 * B₀ := by
+  have hB₁
+      : ∀ ε : ℝ,
+        0 < ε → ε ≤ 1
+          → ENNReal.ofReal ε * (μ U * (ENNReal.ofReal c₀ * ∑' t : T, ENNReal.ofReal (b ε t)))
+            ≤ 2 * B₀ := by
     intro ε h0 h1
     refine le_trans (mul_le_mul_right ?_ _) (hint ε h0 h1)
-    calc μ U * (ENNReal.ofReal c₀ * ∑' t : T, ENNReal.ofReal (b ε t))
-        = ∫⁻ _ in U, ENNReal.ofReal c₀ * ∑' t : T, ENNReal.ofReal (b ε t) ∂μ := by
-          rw [setLIntegral_const, mul_comm]
+    calc
+      μ U * (ENNReal.ofReal c₀ * ∑' t : T, ENNReal.ofReal (b ε t))
+          = ∫⁻ _ in U, ENNReal.ofReal c₀ * ∑' t : T, ENNReal.ofReal (b ε t) ∂μ := by
+        rw [setLIntegral_const, mul_comm]
       _ ≤ ∫⁻ g in U, Φ ε g ∂μ := setLIntegral_mono' hUm (hpt ε h0 h1)
       _ ≤ _ := setLIntegral_le_of_disjoint μ (ratPts σ J) _ U h𝓕 hUm hUd _ (hΦ ε)
   have hw0 : μ U * ENNReal.ofReal c₀ ≠ 0 := mul_ne_zero hμU.ne' (by simpa using hc₀0)
@@ -203,19 +244,23 @@ theorem frame_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
   set B₁ : ℝ≥0∞ := 2 * B₀ / (μ U * ENNReal.ofReal c₀) with hB₁d
   have hB₁t : B₁ ≠ ⊤ := ENNReal.div_ne_top (ENNReal.mul_ne_top (by simp) hB₀) hw0
   have hS : ∀ e : ℝ, d < e → Summable fun t : T => h t.1.1 ^ e := fun e he => by
-    simpa using GlobalTheory.T.godement_summable_height_rpow_representatives F E σ n J r X Y L a h hD T hT 1 e he
+    simpa using
+      GlobalTheory.T.godement_summable_height_rpow_representatives F E σ n J r X Y L a h hD T hT 1 e
+        he
   set S₁ : ℝ := ∑' t : T, h t.1.1 ^ (d + 1) with hS₁
   have hS₁0 : 0 ≤ S₁ := tsum_nonneg fun t => Real.rpow_nonneg (hht.pos _).le _
   refine ⟨B₁.toReal + M * S₁, fun ε h0 h1 => ?_⟩
   have hSε := hS (d + ε) (by linarith)
   have hS1 := hS (d + 1) (by linarith)
   have hbS : ∀ t, b ε t ≤ h t.1.1 ^ (d + ε) := fun t => by
-    simp only [b]; split_ifs
+    simp only [b]
+    split_ifs
     · exact le_rfl
     · exact Real.rpow_nonneg (hht.pos _).le _
   have hbs : Summable (b ε) := Summable.of_nonneg_of_le (hb0 ε) hbS hSε
   have hA : ENNReal.ofReal (ε * ∑' t : T, b ε t) ≤ B₁ := by
-    rw [ENNReal.ofReal_mul h0.le, ENNReal.ofReal_tsum_of_nonneg (hb0 ε) hbs, hB₁d, ENNReal.le_div_iff_mul_le (Or.inl hw0) (Or.inl hwt)]
+    rw [ENNReal.ofReal_mul h0.le, ENNReal.ofReal_tsum_of_nonneg (hb0 ε) hbs, hB₁d,
+      ENNReal.le_div_iff_mul_le (Or.inl hw0) (Or.inl hwt)]
     refine le_trans (le_of_eq ?_) (hB₁ ε h0 h1)
     ring
   have hA' : ε * ∑' t : T, b ε t ≤ B₁.toReal := (ENNReal.ofReal_le_iff_le_toReal hB₁t).1 hA
@@ -243,13 +288,17 @@ theorem frame_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
   have hsum : ∑' t : T, h t.1.1 ^ (d + ε) ≤ ∑' t : T, b ε t + M * S₁ := by
     rw [hS₁, ← tsum_mul_left, ← (hbs.tsum_add (hS1.mul_left M))]
     exact hSε.tsum_le_tsum hsplit (hbs.add (hS1.mul_left M))
-  calc ε * ∑' t : T, h t.1.1 ^ (d + ε) ≤ ε * (∑' t : T, b ε t + M * S₁) := mul_le_mul_of_nonneg_left hsum h0.le
+  calc
+    ε * ∑' t : T, h t.1.1 ^ (d + ε)
+      ≤ ε * (∑' t : T, b ε t + M * S₁) := mul_le_mul_of_nonneg_left hsum h0.le
     _ = ε * ∑' t : T, b ε t + ε * (M * S₁) := by ring
     _ ≤ B₁.toReal + 1 * (M * S₁) := add_le_add hA' (mul_le_mul_of_nonneg_right h1 (by positivity))
     _ = _ := by ring
 
-theorem continuous_chart_symm (D : D7) (A : HSp D) (μ : D.host.E) (hμ : IsSkew μ) (κ : GA D (dblSp A) ≃* G D A.rank)
-    (hκ : IsChart A μ κ) : Continuous κ.symm := by
+theorem continuous_chart_symm
+    (D : D7) (A : HSp D) (μ : D.host.E) (hμ : IsSkew μ) (κ : GA D (dblSp A) ≃* G D A.rank)
+    (hκ : IsChart A μ κ)
+    : Continuous κ.symm := by
   haveI := isTopologicalRing_tens (F := D.host.F) (E := D.host.E) (R := AF D.host.F)
   obtain ⟨-, hdet, -⟩ := GlobalTheory.T.doubledBasisSkewColumnMatrix_gram_inverse D A μ hμ
   have hTi' : rat (Tm A μ) * rat (Tm A μ)⁻¹ = 1 := by
@@ -261,7 +310,8 @@ theorem continuous_chart_symm (D : D7) (A : HSp D) (μ : D.host.E) (hμ : IsSkew
     rw [← Matrix.mul_assoc, h, Matrix.mul_assoc, hTi', Matrix.mul_one]
   have hm : Continuous fun g : G D A.rank => rat (Tm A μ) * (mat g * rat (Tm A μ)⁻¹) :=
     continuous_const.matrix_mul (HeightExists.continuous_mat.matrix_mul continuous_const)
-  refine (isEmbedding_matHom (AF D.host.F) D.sp.cm.sig (dblSp A).gram).continuous_iff.2 (Units.continuous_iff.2 ⟨?_, ?_⟩)
+  refine (isEmbedding_matHom (AF D.host.F) D.sp.cm.sig (dblSp A).gram).continuous_iff.2
+    (Units.continuous_iff.2 ⟨?_, ?_⟩)
   · exact hm.congr fun g => (e g).symm
   · refine (hm.comp continuous_inv).congr fun g => ?_
     have := e g⁻¹
@@ -270,50 +320,79 @@ theorem continuous_chart_symm (D : D7) (A : HSp D) (μ : D.host.E) (hμ : IsSkew
     simp only [Function.comp_apply, map_inv]
     rfl
 
-theorem height_bound : ∀ (D : D7) (r : ℕ), ∃ H' : G D (r + 1) → ℝ≥0, PositivityTheory.Rg.Rsw.IsHt H' ∧ ∃ B : ℝ, ∀ ε : ℝ, 0 < ε → ε ≤ 1 →
-    Summable (fun q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)) => (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε)) ∧
-    ε * ∑' q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)), (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) ≤ B := by
+theorem height_bound
+    : ∀ (D : D7) (r : ℕ), ∃ H' : G D (r + 1) → ℝ≥0,
+      PositivityTheory.Rg.Rsw.IsHt H'
+        ∧ ∃ B : ℝ, ∀ ε : ℝ,
+          0 < ε → ε ≤ 1
+            → Summable (fun q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)) =>
+                (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε))
+              ∧ ε * ∑' q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)), (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε)
+                ≤ B := by
   intro D r
-  let A : HSp D := Formalism.BasicNotions.Examples₂.posSpace (E := D.host.E) Formalism.BasicNotions.Examples₂.star_isIntegral (r + 1)
+  let A : HSp D :=
+    Formalism.BasicNotions.Examples₂.posSpace (E := D.host.E)
+      Formalism.BasicNotions.Examples₂.star_isIntegral (r + 1)
   obtain ⟨μ, hμ, -⟩ := ConjElt.exists_isConj D
   obtain ⟨κ, hκ⟩ : ∃ κ : GA D (dblSp A) ≃* G D (r + 1), IsChart A μ κ := chart_exists D A μ hμ
-  let d : HypDec (dblSp A) (GlobalTheory.Core.Rk.SWLaw.zeroSp D) (r + 1) := GlobalTheory.Core.Rk.SWLaw.dblDec A
+  let d : HypDec (dblSp A) (GlobalTheory.Core.Rk.SWLaw.zeroSp D) (r + 1) :=
+    GlobalTheory.Core.Rk.SWLaw.dblDec A
   obtain ⟨l, hl⟩ := GlobalTheory.RegSch.Inhab.exists_good (dblSp A)
   have hIw := GlobalTheory.Published.SiegelSectionIwasawa.hasIw_of_good d l hl
-  obtain ⟨hD, -, -⟩ := GlobalTheory.T.wittDecomposition_isotropicFrameEisenstein_dictionary D (dblSp A) (GlobalTheory.Core.Rk.SWLaw.zeroSp D) r d (GlobalTheory.EisCont.isAniso_zeroSp D) l hl hIw
-  have hstabS : siegel A = GlobalTheory.RegSW.stab d := (GlobalTheory.T.doubled_space_maximal_level_lattice D A).1
-  have hsc : ∀ q : GlobalTheory.RegSW.stab d, GlobalTheory.ResidueEisenstein.ScalesBy D.sp.cm.sig (dblSp A).gram d.e (q : GA D (dblSp A)) (GlobalTheory.RegSW.onX d q) :=
-    fun q => GlobalTheory.RegSW.mul_jX d q
+  obtain ⟨hD, -, -⟩ :=
+    GlobalTheory.T.wittDecomposition_isotropicFrameEisenstein_dictionary D (dblSp A)
+      (GlobalTheory.Core.Rk.SWLaw.zeroSp D) r d (GlobalTheory.EisCont.isAniso_zeroSp D) l hl hIw
+  have hstabS : siegel A = GlobalTheory.RegSW.stab d :=
+    (GlobalTheory.T.doubled_space_maximal_level_lattice D A).1
+  have hsc
+      : ∀ q : GlobalTheory.RegSW.stab d,
+        GlobalTheory.ResidueEisenstein.ScalesBy D.sp.cm.sig (dblSp A).gram d.e (q : GA D (dblSp A))
+          (GlobalTheory.RegSW.onX d q) := fun q =>
+    GlobalTheory.RegSW.mul_jX d q
   have hstab := (GlobalTheory.EisCont.parFlag_stab_leftInv D (dblSp A) _ (r + 1) d).2.2.1
   have hPs : ∀ x : GA D (dblSp A), x ∈ GlobalTheory.RegSW.stab d ↔ κ x ∈ P D (r + 1) := fun x => by
-    rw [← hstabS]; exact GlobalTheory.T.mem_doublingSiegelParabolic_iff_chart_mem_siegelUnn D A μ hμ κ hκ x
-  have hiff : ∀ x : GA D (dblSp A), (∃ β, GlobalTheory.ResidueEisenstein.ScalesBy D.sp.cm.sig (dblSp A).gram d.e x β) ↔ κ x ∈ P D (r + 1) := fun x =>
+    rw [← hstabS]
+    exact GlobalTheory.T.mem_doublingSiegelParabolic_iff_chart_mem_siegelUnn D A μ hμ κ hκ x
+  have hiff
+      : ∀ x : GA D (dblSp A),
+        (∃ β, GlobalTheory.ResidueEisenstein.ScalesBy D.sp.cm.sig (dblSp A).gram d.e x β)
+          ↔ κ x ∈ P D (r + 1) := fun x =>
     ⟨fun ⟨β, e⟩ => (hPs x).1 (hstab x β e).1, fun hx => ⟨_, hsc ⟨x, (hPs x).2 hx⟩⟩⟩
   have hG : ∀ g, g ∈ GQ (dblSp A) ↔ κ g ∈ GF D (r + 1) := chart_mem_GF_iff D A μ hμ κ hκ
-  let t : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)) → ratPts D.sp.cm.sig (dblSp A).gram := fun q =>
-    ⟨κ.symm (q.out : GF D (r + 1)), (hG _).2 (by simp)⟩
+  let t
+      : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)) → ratPts D.sp.cm.sig (dblSp A).gram :=
+    fun q => ⟨κ.symm (q.out : GF D (r + 1)), (hG _).2 (by simp)⟩
   have ht_inj : Function.Injective t := fun q q' e => by
-    have h1 : κ.symm (q.out : GF D (r + 1)) = κ.symm (q'.out : GF D (r + 1)) := congrArg Subtype.val e
+    have h1 : κ.symm (q.out : GF D (r + 1)) = κ.symm (q'.out : GF D (r + 1)) :=
+      congrArg Subtype.val e
     have h2 : q.out = q'.out := Subtype.ext (κ.symm.injective h1)
     exact Quotient.out_injective h2
-  have hmk : ∀ u v : GF D (r + 1), GlobalTheory.AutomorphicL2Unitary.mk ((P D (r + 1)).subgroupOf (GF D (r + 1))) u =
-      GlobalTheory.AutomorphicL2Unitary.mk ((P D (r + 1)).subgroupOf (GF D (r + 1))) v ↔ ((v * u⁻¹ : GF D (r + 1)) : G D (r + 1)) ∈ P D (r + 1) := fun u v => by
+  have hmk
+      : ∀ u v : GF D (r + 1),
+        GlobalTheory.AutomorphicL2Unitary.mk ((P D (r + 1)).subgroupOf (GF D (r + 1))) u
+            = GlobalTheory.AutomorphicL2Unitary.mk ((P D (r + 1)).subgroupOf (GF D (r + 1))) v
+          ↔ ((v * u⁻¹ : GF D (r + 1)) : G D (r + 1)) ∈ P D (r + 1) := fun u v => by
     rw [GlobalTheory.AutomorphicL2Unitary.mk_eq_iff]
     constructor
     · rintro ⟨δ, hδ⟩
       have : (v * u⁻¹ : GF D (r + 1)) = δ := by rw [← hδ]; group
-      rw [this]; exact δ.2
+      rw [this]
+      exact δ.2
     · intro h
       exact ⟨⟨v * u⁻¹, h⟩, by simp⟩
   let T : Set (ratPts D.sp.cm.sig (dblSp A).gram) := Set.range t
-  have hκt : ∀ (γ : ratPts D.sp.cm.sig (dblSp A).gram) (q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1))),
-      κ ((γ * (t q)⁻¹ : ratPts D.sp.cm.sig (dblSp A).gram) : GA D (dblSp A)) = κ γ.1 * ((q.out : GF D (r + 1)) : G D (r + 1))⁻¹ := by
+  have hκt
+      : ∀ (γ : ratPts D.sp.cm.sig (dblSp A).gram)
+          (q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1))),
+        κ ((γ * (t q)⁻¹ : ratPts D.sp.cm.sig (dblSp A).gram) : GA D (dblSp A))
+          = κ γ.1 * ((q.out : GF D (r + 1)) : G D (r + 1))⁻¹ := by
     intro γ q
     simp [t, map_mul, map_inv]
   have hT : GlobalTheory.ResidueEisenstein.IsRepsJ D.sp.cm.sig (dblSp A).gram d.e T := by
     intro γ
     let g₀ : GF D (r + 1) := ⟨κ γ.1, (hG _).1 γ.2⟩
-    let q₀ : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)) := GlobalTheory.AutomorphicL2Unitary.mk _ g₀
+    let q₀ : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)) :=
+      GlobalTheory.AutomorphicL2Unitary.mk _ g₀
     refine ⟨t q₀, ⟨⟨q₀, rfl⟩, (hiff _).2 ?_⟩, ?_⟩
     · rw [hκt]
       exact (hmk q₀.out g₀).1 (Quotient.out_eq _)
@@ -324,15 +403,25 @@ theorem height_bound : ∀ (D : D7) (r : ℕ), ∃ H' : G D (r + 1) → ℝ≥0,
       have e2 : q = q₀ := (Quotient.out_eq q).symm.trans e
       rw [e2]
   obtain ⟨B, hB⟩ := frame_bound _ _ _ _ _ _ _ _ _ _ _ hD T hT
-  obtain ⟨-, hht, hlaw⟩ := GlobalTheory.T.isCompact_level_height_scales_isotropicFrame _ _ _ _ _ _ _ _ _ _ _ hD
-  have hNc : Continuous fun g : GA D (dblSp A) => GlobalTheory.Doubling.iwAbs (GlobalTheory.RegSW.absDet d) l.K g := by
+  obtain ⟨-, hht, hlaw⟩ :=
+    GlobalTheory.T.isCompact_level_height_scales_isotropicFrame _ _ _ _ _ _ _ _ _ _ _ hD
+  have hNc : Continuous fun g : GA D (dblSp A) =>
+      GlobalTheory.Doubling.iwAbs (GlobalTheory.RegSW.absDet d) l.K g := by
     have := continuous_real_toNNReal.comp hht.cont
     refine this.congr fun g => ?_
     simp
-  let H' : G D (r + 1) → ℝ≥0 := fun g => GlobalTheory.Doubling.iwAbs (GlobalTheory.RegSW.absDet d) l.K (κ.symm g)
-  refine ⟨H', ⟨hNc.comp (continuous_chart_symm D A μ hμ κ hκ), fun g => ?_, fun q hq a ha g => ?_⟩, B, fun ε h0 h1 => ?_⟩
+  let H' : G D (r + 1) → ℝ≥0 := fun g =>
+    GlobalTheory.Doubling.iwAbs (GlobalTheory.RegSW.absDet d) l.K (κ.symm g)
+  refine ⟨
+    H',
+    ⟨hNc.comp (continuous_chart_symm D A μ hμ κ hκ), fun g => ?_, fun q hq a ha g => ?_⟩,
+    B,
+    fun ε h0 h1 => ?_
+  ⟩
   · exact NNReal.coe_pos.1 (hht.pos _)
-  · have hq1 : κ.symm q ∈ siegel A := (GlobalTheory.T.mem_doublingSiegelParabolic_iff_chart_mem_siegelUnn D A μ hμ κ hκ _).2 (show κ (κ.symm q) ∈ P D (r + 1) by rw [κ.apply_symm_apply]; exact hq)
+  · have hq1 : κ.symm q ∈ siegel A :=
+      (GlobalTheory.T.mem_doublingSiegelParabolic_iff_chart_mem_siegelUnn D A μ hμ κ hκ _).2
+        (show κ (κ.symm q) ∈ P D (r + 1) by rw [κ.apply_symm_apply]; exact hq)
     have hq2 : κ.symm q ∈ GlobalTheory.RegSW.stab d := hstabS ▸ hq1
     have h1 := hlaw _ _ (hsc ⟨_, hq2⟩) (κ.symm g)
     have h2 := (GlobalTheory.T.doubled_space_maximal_level_lattice D A).2.1 _ hq1 hq2
@@ -341,14 +430,21 @@ theorem height_bound : ∀ (D : D7) (r : ℕ), ∃ H' : G D (r + 1) → ℝ≥0,
     apply NNReal.coe_injective
     show ((GlobalTheory.Doubling.iwAbs (GlobalTheory.RegSW.absDet d) l.K (κ.symm (q * g)) : ℝ≥0) : ℝ) = _
     rw [map_mul, h1]
-    have h4 : Matrix.GeneralLinearGroup.det (GlobalTheory.RegSW.onX d ⟨_, hq2⟩) = Matrix.GeneralLinearGroup.det a := h2.symm.trans h3
+    have h4
+        : Matrix.GeneralLinearGroup.det (GlobalTheory.RegSW.onX d ⟨_, hq2⟩)
+          = Matrix.GeneralLinearGroup.det a :=
+      h2.symm.trans h3
     rw [h4]
     push_cast
     rfl
   · have hn : ((dblSp A).rank : ℝ) - ((r : ℝ) + 1) + ε = ((r + 1 : ℕ) : ℝ) + ε := by
       have : ((dblSp A).rank : ℝ) = ((r + 1 + (r + 1) : ℕ) : ℝ) := rfl
-      rw [this]; push_cast; ring
-    have hs := GlobalTheory.T.godement_summable_height_rpow_representatives _ _ _ _ _ _ _ _ _ _ _ hD T hT 1 (((dblSp A).rank : ℝ) - ((r : ℝ) + 1) + ε) (by linarith)
+      rw [this]
+      push_cast
+      ring
+    have hs :=
+      GlobalTheory.T.godement_summable_height_rpow_representatives _ _ _ _ _ _ _ _ _ _ _ hD T hT 1
+        (((dblSp A).rank : ℝ) - ((r : ℝ) + 1) + ε) (by linarith)
     have hb := hB ε h0 h1
     rw [hn] at hs hb
     let e : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)) ≃ T := Equiv.ofInjective t ht_inj
@@ -369,8 +465,10 @@ theorem sphBound_of_htExist : HtExist → SphBound := by
   have hHc : Continuous fun g : G D (r + 1) => (H g : ℝ) := NNReal.continuous_coe.comp hH.1
   have hHc' : Continuous fun g : G D (r + 1) => (H' g : ℝ) := NNReal.continuous_coe.comp hH'.1
   have hpos' : ∀ g, (0 : ℝ) < H' g := fun g => NNReal.coe_pos.2 (hH'.2.1 g)
-  have hcont : Continuous (fun u : G D (r + 1) × G D (r + 1) => (H (u.1 * u.2) : ℝ) / (H' u.1 : ℝ)) :=
-    (hHc.comp (continuous_fst.mul continuous_snd)).div (hHc'.comp continuous_fst) fun u => (hpos' _).ne'
+  have hcont
+      : Continuous (fun u : G D (r + 1) × G D (r + 1) => (H (u.1 * u.2) : ℝ) / (H' u.1 : ℝ)) :=
+    (hHc.comp (continuous_fst.mul continuous_snd)).div (hHc'.comp continuous_fst) fun u =>
+      (hpos' _).ne'
   obtain ⟨c, hc⟩ := (hC₀.prod hC).exists_bound_of_continuousOn hcont.continuousOn
   set c₁ : ℝ := max c 1 with hc₁
   have hc₁1 : 1 ≤ c₁ := le_max_right _ _
@@ -384,7 +482,8 @@ theorem sphBound_of_htExist : HtExist → SphBound := by
     have e2 : H' (q * c₀) = absA D (Matrix.GeneralLinearGroup.det a) * H' c₀ := hH'.2.2 q hq a rfl _
     have h3 : (H (c₀ * h) : ℝ) ≤ c₁ * H' c₀ := by
       have := hc (c₀, h) ⟨hc₀, hh⟩
-      have h4 : (H (c₀ * h) : ℝ) / H' c₀ ≤ c₁ := ((le_abs_self _).trans this).trans (le_max_left _ _)
+      have h4 : (H (c₀ * h) : ℝ) / H' c₀ ≤ c₁ :=
+        ((le_abs_self _).trans this).trans (le_max_left _ _)
       exact (div_le_iff₀ (hpos' _)).1 h4
     rw [e1, e2]
     push_cast
@@ -400,28 +499,36 @@ theorem sphBound_of_htExist : HtExist → SphBound := by
   have hx : σ + ((r + 1 : ℕ) : ℝ) / 2 = ((r + 1 : ℕ) : ℝ) + ε := by rw [hε]; ring
   rw [hx]
   obtain ⟨hS, hle⟩ := hB ε hε0 hε1
-  have hterm : ∀ q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)),
-      (H ((q.out : GF D (r + 1)) * h) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) ≤
-        c₂ * (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) := by
+  have hterm
+      : ∀ q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)),
+        (H ((q.out : GF D (r + 1)) * h) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε)
+          ≤ c₂ * (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) := by
     intro q
     have hx0 : 0 ≤ ((r + 1 : ℕ) : ℝ) + ε := by positivity
-    calc _ ≤ (c₁ * H' (q.out : GF D (r + 1))) ^ (((r + 1 : ℕ) : ℝ) + ε) :=
-          Real.rpow_le_rpow (NNReal.coe_nonneg _) (key _ h hh) hx0
-      _ = c₁ ^ (((r + 1 : ℕ) : ℝ) + ε) * (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) :=
-          Real.mul_rpow hc₁0.le (NNReal.coe_nonneg _)
-      _ ≤ _ := mul_le_mul_of_nonneg_right (Real.rpow_le_rpow_of_exponent_le hc₁1 (by linarith))
+    calc
+      _ ≤ (c₁ * H' (q.out : GF D (r + 1))) ^ (((r + 1 : ℕ) : ℝ) + ε) :=
+        Real.rpow_le_rpow (NNReal.coe_nonneg _) (key _ h hh) hx0
+      _ = c₁ ^ (((r + 1 : ℕ) : ℝ) + ε)
+          * (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) :=
+        Real.mul_rpow hc₁0.le (NNReal.coe_nonneg _)
+      _ ≤ _ :=
+        mul_le_mul_of_nonneg_right (Real.rpow_le_rpow_of_exponent_le hc₁1 (by linarith))
           (by positivity)
   have hS2 := hS.mul_left c₂
   have hs : Summable fun q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)) =>
       (H ((q.out : GF D (r + 1)) * h) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) :=
     Summable.of_nonneg_of_le (fun _ => by positivity) hterm hS2
   refine ⟨hs, ?_⟩
-  calc _ ≤ ε * ∑' q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)),
-        c₂ * (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) :=
-        mul_le_mul_of_nonneg_left (hs.tsum_le_tsum hterm hS2) hε0.le
-    _ = c₂ * (ε * ∑' q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)),
-        (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε)) := by
-        rw [tsum_mul_left]; ring
+  calc
+    _ ≤ ε
+        * ∑' q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)),
+          c₂ * (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε) :=
+      mul_le_mul_of_nonneg_left (hs.tsum_le_tsum hterm hS2) hε0.le
+    _ = c₂
+        * (ε
+          * ∑' q : GlobalTheory.Eis.Cosets (P D (r + 1)) (GF D (r + 1)),
+            (H' (q.out : GF D (r + 1)) : ℝ) ^ (((r + 1 : ℕ) : ℝ) + ε)) := by
+      rw [tsum_mul_left]; ring
     _ ≤ _ := mul_le_mul_of_nonneg_left hle hc₂0
 
 end GlobalTheory.CompanionTheory.SphPole

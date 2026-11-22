@@ -12,7 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.AddNsm
 
 open NumberField IsDedekindDomain
 open scoped TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.CoverRead
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.CoverRead
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -22,8 +25,11 @@ set_option maxHeartbeats 1000000
 
 namespace GlobalTheory.HalfLatFin
 
-theorem isHalf_of_nsmul {D : D7} {m n : ℕ} (e : AE D) {N : ℕ} (hN : 0 < N) {t t' w : Mx D m n}
-    (ht : IsHalf e t) (ht' : IsHalf e t') (hw : t = t' + N • w) : IsHalf e w := by
+theorem isHalf_of_nsmul
+    {D : D7} {m n : ℕ} (e : AE D)
+    {N : ℕ} (hN : 0 < N)
+    {t t' w : Mx D m n} (ht : IsHalf e t) (ht' : IsHalf e t') (hw : t = t' + N • w)
+    : IsHalf e w := by
   intro i j
   have h0 : t i j = t' i j + N • w i j := by
     have := congrFun (congrFun hw i) j

@@ -19,14 +19,21 @@ section loc
 
 variable {r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-theorem pOp_locO (l : Fin r) {f₁ f₂ : (Fin r → ℂ) → E} (h : ∀ c ∈ OmX r, f₁ c = f₂ c) {c : Fin r → ℂ}
-    (hc : c ∈ OmX r) : pOp l f₁ c = pOp l f₂ c := by
+theorem pOp_locO
+    (l : Fin r)
+    {f₁ f₂ : (Fin r → ℂ) → E} (h : ∀ c ∈ OmX r, f₁ c = f₂ c)
+    {c : Fin r → ℂ} (hc : c ∈ OmX r)
+    : pOp l f₁ c = pOp l f₂ c := by
   have hev : f₁ =ᶠ[nhds c] f₂ := by
     filter_upwards [(Formalism.FourierDecayAlt.P.Qx3.isOpen_OmX r).mem_nhds hc] with c' hc' using h c' hc'
   simp only [pOp, wirt, ite_eq_left hc, hev.fderiv_eq]
 
-theorem vAB_loc (Y : ℂ) : ∀ (i : ℕ) (f₁ f₂ : (Fin r → ℂ) → E), (∀ c ∈ OmX r, f₁ c = f₂ c) →
-    ∀ c ∈ OmX r, (Q.vAB r Y i).1 f₁ c = (Q.vAB r Y i).1 f₂ c ∧ (Q.vAB r Y i).2 f₁ c = (Q.vAB r Y i).2 f₂ c := by
+theorem vAB_loc (Y : ℂ)
+    : ∀ (i : ℕ) (f₁ f₂ : (Fin r → ℂ) → E),
+      (∀ c ∈ OmX r, f₁ c = f₂ c)
+        → ∀ c ∈ OmX r,
+          (Q.vAB r Y i).1 f₁ c = (Q.vAB r Y i).1 f₂ c
+            ∧ (Q.vAB r Y i).2 f₁ c = (Q.vAB r Y i).2 f₂ c := by
   intro i f₁ f₂ h
   induction i with
   | zero =>
@@ -48,19 +55,21 @@ end loc
 
 section jd
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-theorem jf_dinv (Bs : B.RealPlaceData k r Wp Wq) (H : B.Mat k r → (Wq →L[ℂ] Wp)) (g : B.Mat k r) :
-    B.JF Bs (fun x => (Dmin k r Bs.z Bs.z' x (Fin.last _))⁻¹ • H x) g =
-      (Dmin k r Bs.z Bs.z' g (Fin.last _))⁻¹ • B.JF Bs H g := by
+theorem jf_dinv (Bs : B.RealPlaceData k r Wp Wq) (H : B.Mat k r → (Wq →L[ℂ] Wp)) (g : B.Mat k r)
+    : B.JF Bs (fun x => (Dmin k r Bs.z Bs.z' x (Fin.last _))⁻¹ • H x) g
+      = (Dmin k r Bs.z Bs.z' g (Fin.last _))⁻¹ • B.JF Bs H g := by
   show ∫ p, JF.xiP Bs p • B.rho Bs p (fun x => (Dmin k r Bs.z Bs.z' x (Fin.last _))⁻¹ • H x) g ∂Bs.μSS =
     (Dmin k r Bs.z Bs.z' g (Fin.last _))⁻¹ • ∫ p, JF.xiP Bs p • B.rho Bs p H g ∂Bs.μSS
   rw [← integral_smul]
   refine integral_congr_ae ?_
   filter_upwards [Formalism.FourierDecayAlt.P.B5.ae_inSS Bs] with p hp
   simp only [B.rho]
-  rw [Formalism.FourierDecayAlt.P.BigCellZetaMinors.dmin_sgs Bs hp, ContinuousLinearMap.smul_comp, ContinuousLinearMap.comp_smul, smul_comm]
+  rw [Formalism.FourierDecayAlt.P.BigCellZetaMinors.dmin_sgs Bs hp, ContinuousLinearMap.smul_comp,
+    ContinuousLinearMap.comp_smul, smul_comm]
 
 end jd
 
@@ -68,7 +77,8 @@ end Formalism.FourierDecayAlt.P.PBN
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.P.PBN
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.P.PBN
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -85,18 +95,22 @@ theorem radial_raising_top_of_parts : PBN.RadAATopOfParts := by
   show ((X.fn 1 ((L.Ar (y : ℂ)).1 Φ) : Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π') :
     Q.Fn P.k P.r (Wq →L[ℂ] Wp)) x.1 x.2 = _
   rw [X.fn_apply 1 _ x hx, hR P.k P.r Bs.z Bs.z' Wp Wq Bs.π Bs.π' X L (y : ℂ) hL Φ x hx]
-  have eΦ : Q.crd (Q.vAB P.r (y : ℂ) P.r).1 (Φ : Q.Fn P.k P.r (Wq →L[ℂ] Wp)) x.1 x.2 =
-      Q.crd (Q.vAB P.r (y : ℂ) P.r).1 (Q.resG P.k P.r (Fin.last P.r) (B.JF Bs F)) x.1 x.2 :=
+  have eΦ
+      : Q.crd (Q.vAB P.r (y : ℂ) P.r).1 (Φ : Q.Fn P.k P.r (Wq →L[ℂ] Wp)) x.1 x.2
+        = Q.crd (Q.vAB P.r (y : ℂ) P.r).1 (Q.resG P.k P.r (Fin.last P.r) (B.JF Bs F)) x.1 x.2 :=
     (vAB_loc (y : ℂ) P.r _ _ (fun c' hc' => hΦ (c', x.2) ⟨hc', hx.2⟩) x.1 hx.1).1
   rw [eΦ, ← hM P.k P.r Wp Wq Bs F (y : ℂ) hF x hx]
 
   simp only [Q.resG]
-  have eJ : B.JF Bs (aaTop Bs y F) (Q.wCell P.k P.r (Fin.last P.r) x.1 * x.2) =
-      (Q.zetaL P.k P.r Bs.z Bs.z' (Fin.last P.r) x.2)⁻¹ •
-        qminorOp (EabH (Hpk P.k P.r)) (C3.xR P.k P.r P.r le_rfl) (C3.xR P.k P.r P.r le_rfl)
-          ((y : ℂ) + ((2 * P.r + P.k : ℕ) : ℂ) / 2) (B.JF Bs F) (Q.wCell P.k P.r (Fin.last P.r) x.1 * x.2) := by
+  have eJ
+      : B.JF Bs (aaTop Bs y F) (Q.wCell P.k P.r (Fin.last P.r) x.1 * x.2)
+        = (Q.zetaL P.k P.r Bs.z Bs.z' (Fin.last P.r) x.2)⁻¹
+          • qminorOp (EabH (Hpk P.k P.r)) (C3.xR P.k P.r P.r le_rfl) (C3.xR P.k P.r P.r le_rfl)
+            ((y : ℂ) + ((2 * P.r + P.k : ℕ) : ℂ) / 2) (B.JF Bs F)
+            (Q.wCell P.k P.r (Fin.last P.r) x.1 * x.2) := by
     unfold aaTop
-    rw [jf_dinv, hJ P.k P.r Wp Wq Bs F _ hF _ hγ, hC P.k P.r _ _ _ _ _ hx.2.1, hcell.2.2.1, smul_smul]
+    rw [jf_dinv, hJ P.k P.r Wp Wq Bs F _ hF _ hγ, hC P.k P.r _ _ _ _ _ hx.2.1, hcell.2.2.1,
+      smul_smul]
     congr 1
     rw [mul_inv, mul_comm, ← mul_assoc, mul_inv_cancel₀ hc0, one_mul]
   rw [eJ, smul_comm]

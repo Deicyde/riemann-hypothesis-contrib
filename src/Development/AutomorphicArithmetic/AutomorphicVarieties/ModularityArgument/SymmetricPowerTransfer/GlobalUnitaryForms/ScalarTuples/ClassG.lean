@@ -19,46 +19,56 @@ namespace UpperTheory.V.Z.Sym.Glob
 
 open Loc
 
-private theorem unitary_form' {K : Type} [Field K] {Δ : K} (g : U3 Δ) (v w : Fin 3 → Lsq K Δ) :
-    ∑ i, ((g : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ v) i * star (((g : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ w) i) =
-      ∑ i, v i * star (w i) := by
-  have hu : (g : Matrix (Fin 3) (Fin 3) (Lsq K Δ))ᴴ * (g : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) = 1 := by
+private theorem unitary_form' {K : Type} [Field K] {Δ : K} (g : U3 Δ) (v w : Fin 3 → Lsq K Δ)
+    : ∑ i, ((g : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ v) i * star (((g : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ w) i)
+      = ∑ i, v i * star (w i) := by
+  have hu
+      : (g : Matrix (Fin 3) (Fin 3) (Lsq K Δ))ᴴ * (g : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) = 1 := by
     have := g.2
     rw [Matrix.mem_unitaryGroup_iff'] at this
     simpa [Matrix.star_eq_conjTranspose] using this
   have e1 : ∀ a b : Fin 3 → Lsq K Δ, ∑ i, a i * star (b i) = star b ⬝ᵥ a := by
     intro a b
     simp [dotProduct, mul_comm]
-  rw [e1, e1, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, hu, Matrix.one_mulVec]
+  rw [e1, e1, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, hu,
+    Matrix.one_mulVec]
 
 end UpperTheory.V.Z.Sym.Glob
 
-private theorem map_star_mul_divisor {R : Type} [CommRing R] [StarRing R] (A : Matrix (Fin 3) (Fin 3) R) :
-    (A * A.map star).map star = A.map star * A := by
+private theorem map_star_mul_divisor
+    {R : Type} [CommRing R] [StarRing R] (A : Matrix (Fin 3) (Fin 3) R)
+    : (A * A.map star).map star = A.map star * A := by
   apply Matrix.ext
   intro i j
   simp only [Matrix.map_apply, Matrix.mul_apply, star_sum, star_mul', star_star]
 
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc in
-theorem UpperTheory.V.Z.Sym.Glob.classG :
-    UpperTheory.V.Z.Sym.Glob.ClassG := by
+theorem UpperTheory.V.Z.Sym.Glob.classG : UpperTheory.V.Z.Sym.Glob.ClassG := by
   unfold ClassG
   intro K _ _ Δ τ d m hΔ hD δ hδ
   have hreg := hD.reg
   have hnorm := hD.d_norm
-  obtain ⟨B, hBB, hNB, hBw⟩ := UpperTheory.exists_hermitian_conjugation_of_unitary_tau K Δ τ hreg d hnorm δ hδ _ rfl
+  obtain ⟨B, hBB, hNB, hBw⟩ :=
+    UpperTheory.exists_hermitian_conjugation_of_unitary_tau K Δ τ hreg d hnorm δ hδ _ rfl
   have hchar := hδ
   rw [HasTau.eq_1] at hchar
-  obtain ⟨e, v, hBe, hBv, hNe, hNv, hdet⟩ := UpperTheory.exists_star_fixed_rotation_basis_of_charpoly K Δ τ hΔ hreg B _ hBB hNB hchar
+  obtain ⟨e, v, hBe, hBv, hNe, hNv, hdet⟩ :=
+    UpperTheory.exists_star_fixed_rotation_basis_of_charpoly K Δ τ hΔ hreg B _ hBB hNB hchar
   set N : Matrix (Fin 3) (Fin 3) (Lsq K Δ) := ((δ * theta Δ δ : U3 Δ) : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) with hN
   have hδe : (δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ star e = e := (hBw e hBe).1 hNe
-  have hδv : (δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ star v = d.re • v + d.im • N *ᵥ v := (hBw v hBv).2 hNv
-  obtain ⟨c, m', hm'u, hm's, hform⟩ := UpperTheory.exists_hermitian_form_of_unitary_rotation_basis K Δ τ hreg N (δ * theta Δ δ).property e v hNe hNv hdet
+  have hδv : (δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ star v = d.re • v + d.im • N *ᵥ v :=
+    (hBw v hBv).2 hNv
+  obtain ⟨c, m', hm'u, hm's, hform⟩ :=
+    UpperTheory.exists_hermitian_form_of_unitary_rotation_basis K Δ τ hreg N
+      (δ * theta Δ δ).property e v hNe hNv hdet
   obtain ⟨P, hP⟩ := UpperTheory.exists_linearEquiv_sp_of_isUnit_det_basis K Δ τ e v (N *ᵥ v) hdet
   have hform' : ∀ x y : Sp Δ τ, herm (c : K) m' x y = ∑ i, P x i * star (P y i) := by
     intro x y
     rw [hform, hP, hP]
-  have h1 : N = (δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) * (δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ)).map star := by
+  have h1
+      : N
+        = (δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ))
+          * (δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ)).map star := by
     rw [hN]
     rfl
   have hA : (δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) * N.map star = N * δ := by

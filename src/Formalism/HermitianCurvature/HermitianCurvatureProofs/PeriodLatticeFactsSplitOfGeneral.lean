@@ -10,8 +10,8 @@ open Formalism.FourierDecayAlt.S6
 open NumberField NumberField.IsCMField Module
 open scoped nonZeroDivisors
 
-theorem mem_twLat (E : Type) [Field E] [NumberField E] [IsCMField E] (A B : FI E) (s : ℕ) (t : E) :
-    t ∈ twLat E A B s ↔ t ∈ A ∧ t - (-1) ^ s * complexConj E t ∈ B := by
+theorem mem_twLat (E : Type) [Field E] [NumberField E] [IsCMField E] (A B : FI E) (s : ℕ) (t : E)
+    : t ∈ twLat E A B s ↔ t ∈ A ∧ t - (-1) ^ s * complexConj E t ∈ B := by
   unfold twLat
   rw [Submodule.mem_inf, Submodule.mem_comap]
   have : ((LinearMap.id : E →ₗ[ℤ] E) - ((-1 : ℤ) ^ s) • conjZ E) t
@@ -19,17 +19,20 @@ theorem mem_twLat (E : Type) [Field E] [NumberField E] [IsCMField E] (A B : FI E
     rw [LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply, zsmul_eq_mul]
     push_cast
     rfl
-  rw [this]; rfl
+  rw [this]
+  rfl
 
-theorem conj_real (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (a : 𝓞 (maximalRealSubfield E)) :
-    complexConj E (algebraMap (𝓞 (maximalRealSubfield E)) E a)
+theorem conj_real (E : Type) [Field E] [NumberField E] [IsCMField E] (a : 𝓞 (maximalRealSubfield E))
+    : complexConj E (algebraMap (𝓞 (maximalRealSubfield E)) E a)
       = algebraMap (𝓞 (maximalRealSubfield E)) E a :=
   complexConj_apply_eq_self E (a : maximalRealSubfield E)
 
-theorem smul_mem_FI (E : Type) [Field E] [NumberField E] [IsCMField E] (A : FI E)
-    (a : 𝓞 (maximalRealSubfield E)) (t : E) (ht : t ∈ A) :
-    algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ A := by
+theorem smul_mem_FI
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (A : FI E)
+    (a : 𝓞 (maximalRealSubfield E))
+    (t : E) (ht : t ∈ A)
+    : algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ A := by
   have := (A : Submodule (𝓞 E) E).smul_mem (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) a) ht
   rw [Algebra.smul_def] at this
   exact this
@@ -46,25 +49,29 @@ theorem unramRelative : Formalism.FourierDecayAlt.S6.UnramRelative := by
   intro E _ _ _ hU
   have h := differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 (maximalRealSubfield E)) (𝓞 E)
   unfold Unram at hU
-  have h0 : (differentIdeal ℤ (𝓞 (maximalRealSubfield E))).map
-      (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) ≠ ⊥ := by
+  have h0
+      : (differentIdeal ℤ (𝓞 (maximalRealSubfield E))).map
+          (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E))
+        ≠ ⊥ := by
     rw [← hU]; exact differentIdeal_ne_bot
   have h1 : differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) = ⊤ := by
     rw [hU] at h
-    have h2 : differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) *
-        (differentIdeal ℤ (𝓞 (maximalRealSubfield E))).map
-          (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) =
-        1 * (differentIdeal ℤ (𝓞 (maximalRealSubfield E))).map
-          (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) := by rw [one_mul]; exact h.symm
+    have h2
+        : differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E)
+            * (differentIdeal ℤ (𝓞 (maximalRealSubfield E))).map
+              (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E))
+          = 1 * (differentIdeal ℤ (𝓞 (maximalRealSubfield E))).map
+            (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) := by
+      rw [one_mul]; exact h.symm
     simpa using mul_right_cancel₀ h0 h2
   refine ⟨h1, fun g => ?_⟩
   unfold UnramAbove
-  rw [h1, Ideal.isCoprime_iff_sup_eq]; simp
+  rw [h1, Ideal.isCoprime_iff_sup_eq]
+  simp
 
 theorem degreeFacts_statement : Formalism.FourierDecayAlt.S6.DegreeFacts := by
   intro E _ _ _
-  have h2 : finrank (maximalRealSubfield E) E = 2 :=
-    Algebra.IsQuadraticExtension.finrank_eq_two _ _
+  have h2 : finrank (maximalRealSubfield E) E = 2 := Algebra.IsQuadraticExtension.finrank_eq_two _ _
   have h3 := finrank_mul_finrank ℚ (maximalRealSubfield E) E
   have h4 : 0 < finrank ℚ (maximalRealSubfield E) := finrank_pos
   rw [h2] at h3
@@ -82,14 +89,18 @@ theorem localAwayFromLevel : Formalism.FourierDecayAlt.S6.LocOrdinary := by
     apply hg
     have : g = 0 := by exact_mod_cast h
     simp [this]
-  have key : ∀ (k k' : ℤ) (t : E), t ∈ locAt E P (zsub E (idl E g k ν)) →
-      t ∈ locAt E P (zsub E (idl E g k' ν)) := by
+  have key
+      : ∀ (k k' : ℤ) (t : E),
+        t ∈ locAt E P (zsub E (idl E g k ν)) → t ∈ locAt E P (zsub E (idl E g k' ν)) := by
     intro k k' t
     rintro ⟨a, ha, h⟩
     obtain ⟨n, hn⟩ : ∃ n : ℕ, k' ≤ k + n := ⟨(k' - k).toNat, by omega⟩
     obtain ⟨m, hm⟩ : ∃ m : ℕ, k + n = k' + m := ⟨(k + n - k').toNat, by omega⟩
-    refine ⟨(g : 𝓞 (maximalRealSubfield E)) ^ n * a,
-      fun hh => (hP.mem_or_mem hh).elim (fun h' => hg (hP.mem_of_pow_mem _ h')) ha, ?_⟩
+    refine ⟨
+      (g : 𝓞 (maximalRealSubfield E)) ^ n * a,
+      fun hh => (hP.mem_or_mem hh).elim (fun h' => hg (hP.mem_of_pow_mem _ h')) ha,
+      ?_
+    ⟩
     change _ ∈ idl E g k ν at h
     show _ ∈ idl E g k' ν
     unfold idl at h ⊢
@@ -113,15 +124,20 @@ theorem localTwistedLattice : Formalism.FourierDecayAlt.S6.LocTw := by
     have := h.2
     rw [map_mul, conj_real] at this
     show _ ∈ B
-    convert this using 1; ring
+    convert this using 1
+    ring
   · rintro ⟨⟨a, ha, h1⟩, ⟨b, hb, h2⟩⟩
     refine ⟨a * b, fun h => (hP.mem_or_mem h).elim ha hb, ?_⟩
     rw [mem_twLat]
     constructor
     · have := smul_mem_FI E A b _ h1
-      rw [map_mul]; convert this using 1; ring
+      rw [map_mul]
+      convert this using 1
+      ring
     · have := smul_mem_FI E B a _ h2
-      rw [map_mul, map_mul, map_mul, conj_real, conj_real]; convert this using 1; ring
+      rw [map_mul, map_mul, map_mul, conj_real, conj_real]
+      convert this using 1
+      ring
 
 theorem scaledIdealNorm : Formalism.FourierDecayAlt.S6.NormIdl := by
   intro E _ _ _ g k ν hg
@@ -143,8 +159,9 @@ theorem scaledIdealNorm : Formalism.FourierDecayAlt.S6.NormIdl := by
   have h1 : FractionalIdeal.absNorm (dd E) = ((|discr E| : ℤ) : ℚ) := by
     unfold dd
     rw [FractionalIdeal.coeIdeal_absNorm, absNorm_differentIdeal E, Nat.cast_natAbs]
-  have h2 : FractionalIdeal.absNorm (FractionalIdeal.spanSingleton (𝓞 E)⁰ ((g : E) ^ k))
-      = ((g : ℚ) ^ (2 * deg E)) ^ k := by
+  have h2
+      : FractionalIdeal.absNorm (FractionalIdeal.spanSingleton (𝓞 E)⁰ ((g : E) ^ k))
+        = ((g : ℚ) ^ (2 * deg E)) ^ k := by
     rw [FractionalIdeal.absNorm_span_singleton,
       show (g : E) ^ k = algebraMap ℚ E ((g : ℚ) ^ k) by rw [map_zpow₀, map_natCast],
       Algebra.norm_algebraMap, hdeg.1, abs_of_nonneg (by positivity)]

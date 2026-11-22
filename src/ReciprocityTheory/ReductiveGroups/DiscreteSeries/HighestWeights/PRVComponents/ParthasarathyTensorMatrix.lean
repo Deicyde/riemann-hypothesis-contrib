@@ -18,12 +18,13 @@ variable {n : ℕ} {ε : Fin n → Bool}
 
 section Graph
 
-variable {P : Type*} [NormedAddCommGroup P] [InnerProductSpace ℂ P] [FiniteDimensional ℂ P]
+variable
+  {P : Type*} [NormedAddCommGroup P] [InnerProductSpace ℂ P] [FiniteDimensional ℂ P]
   {M : Type*} [AddCommGroup M] [Module ℂ M]
 
-def prodEndomorphismFamily (E : Fin n → Fin n → Module.End ℂ P) (F : Fin n → Fin n → Module.End ℂ M) :
-    Fin n → Fin n → Module.End ℂ (P × M) :=
-  fun a b => LinearMap.prodMap (E a b) (F a b)
+def prodEndomorphismFamily (E : Fin n → Fin n → Module.End ℂ P) (F : Fin n → Fin n → Module.End ℂ M)
+    : Fin n → Fin n → Module.End ℂ (P × M) := fun a b =>
+  LinearMap.prodMap (E a b) (F a b)
 
 lemma product_action_apply (E : Fin n → Fin n → Module.End ℂ P) (F : Fin n → Fin n → Module.End ℂ M) (a b : Fin n)
     (y : P × M) : prodEndomorphismFamily E F a b y = (E a b y.1, F a b y.2) := rfl
@@ -39,12 +40,16 @@ lemma product_action_lie_relations {E : Fin n → Fin n → Module.End ℂ P} {F
   · split_ifs at hE' ⊢ <;> simpa [product_action_apply] using hE'
   · split_ifs at hF' ⊢ <;> simpa [product_action_apply] using hF'
 
-theorem highest_weight_graph_submodule {E : Fin n → Fin n → Module.End ℂ P} {F : Fin n → Fin n → Module.End ℂ M}
-    (hE : KRel ε E) (hEu : KUnit ε E) (hF : KRel ε F) {Λ : Fin n → ℝ} {V : Submodule ℂ M}
-    (hV : IsKIrrHW ε F Λ V) {x0 : P} (hx0 : KHighest ε E Λ x0) (hx00 : x0 ≠ 0) {w : M} (hwV : w ∈ V)
-    (hw0 : w ≠ 0) (hw : IsKHWVec ε F Λ w) :
-    ∃ Γ : Submodule ℂ (P × M), (∀ a b, ε a = ε b → ∀ y ∈ Γ, prodEndomorphismFamily E F a b y ∈ Γ) ∧
-      (∀ y : P, ∃ v, (y, v) ∈ Γ) ∧ (∀ v, ((0 : P), v) ∈ Γ → v = 0) ∧ (∀ y ∈ Γ, y.2 ∈ V) ∧ (x0, w) ∈ Γ := by
+theorem highest_weight_graph_submodule
+    {E : Fin n → Fin n → Module.End ℂ P} {F : Fin n → Fin n → Module.End ℂ M}
+    (hE : KRel ε E) (hEu : KUnit ε E) (hF : KRel ε F)
+    {Λ : Fin n → ℝ} {V : Submodule ℂ M} (hV : IsKIrrHW ε F Λ V)
+    {x0 : P} (hx0 : KHighest ε E Λ x0) (hx00 : x0 ≠ 0)
+    {w : M} (hwV : w ∈ V) (hw0 : w ≠ 0) (hw : IsKHWVec ε F Λ w)
+    : ∃ Γ : Submodule ℂ (P × M),
+      (∀ a b, ε a = ε b → ∀ y ∈ Γ, prodEndomorphismFamily E F a b y ∈ Γ)
+        ∧ (∀ y : P, ∃ v, (y, v) ∈ Γ) ∧ (∀ v, ((0 : P), v) ∈ Γ → v = 0) ∧ (∀ y ∈ Γ, y.2 ∈ V)
+        ∧ (x0, w) ∈ Γ := by
   classical
   have hQ : KRel ε (prodEndomorphismFamily E F) := product_action_lie_relations hE hF
   set Z := kSpan ε E x0 with hZ
@@ -88,9 +93,12 @@ theorem highest_weight_graph_submodule {E : Fin n → Fin n → Module.End ℂ P
       exact (Submodule.mem_bot ℂ).1 hvN
     · exfalso
       have hwN : w ∈ N := h ▸ hwV
-      have hkh : KHighest ε (prodEndomorphismFamily E F) Λ (x0, w) :=
-        ⟨fun a => Prod.ext (hx0.1 a) (hw.1 a), fun a b hab he => Prod.ext (hx0.2 a b hab he) (hw.2 a b hab he)⟩
-      have hwt : IsWeight (prodEndomorphismFamily E F) Λ ((0 : P), w) := fun a => Prod.ext (by simp [product_action_apply]) (hw.1 a)
+      have hkh : KHighest ε (prodEndomorphismFamily E F) Λ (x0, w) := ⟨
+        fun a => Prod.ext (hx0.1 a) (hw.1 a),
+        fun a b hab he => Prod.ext (hx0.2 a b hab he) (hw.2 a b hab he)
+      ⟩
+      have hwt : IsWeight (prodEndomorphismFamily E F) Λ ((0 : P), w) := fun a =>
+        Prod.ext (by simp [product_action_apply]) (hw.1 a)
       have hmem : ((0 : P), w) ∈ lowSpan ε (prodEndomorphismFamily E F) (x0, w) := by
         rw [← compact_span_eq_lowering hQ hkh]
         exact hwN
@@ -146,17 +154,21 @@ theorem highest_weight_graph_submodule {E : Fin n → Fin n → Module.End ℂ P
 
 end Graph
 
-theorem parthasarathy_tensor_matrix_alt (ε : Fin n → Bool) {M : Type*} [AddCommGroup M] [Module ℂ M]
+theorem parthasarathy_tensor_matrix_alt
+    (ε : Fin n → Bool)
+    {M : Type*} [AddCommGroup M] [Module ℂ M]
     {F : Fin n → Fin n → Module.End ℂ M} (hF : Formalism.REAL.KRel ε F)
     {Λ : Fin n → ℝ} {V : Submodule ℂ M} (hV : IsKIrrHW ε F Λ V)
-    {ι : Type*} [Fintype ι] [DecidableEq ι] {G : Fin n → Fin n → Matrix ι ι ℂ} (hG : Formalism.REAL.KRel ε G)
-    (hGu : ∀ a b, ε a = ε b → G b a = (G a b)ᴴ)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {G : Fin n → Fin n → Matrix ι ι ℂ}
+    (hG : Formalism.REAL.KRel ε G) (hGu : ∀ a b, ε a = ε b → G b a = (G a b)ᴴ)
     {ν : Fin n → ℝ} {f : ι → ℂ} (hf0 : f ≠ 0) (hfw : ∀ a, G a a *ᵥ f = ((ν a : ℝ) : ℂ) • f)
     (hfl : ∀ a b, b < a → ε a = ε b → G a b *ᵥ f = 0)
-    (hdom : ∀ a b, a < b → ε a = ε b → (Λ + ν) b ≤ (Λ + ν) a) :
-    ∃ x : ι → M, (∀ i, x i ∈ V) ∧ x ≠ 0 ∧
-      (∀ a i, F a a (x i) + ∑ j, G a a i j • x j = (((Λ + ν) a : ℝ) : ℂ) • x i) ∧
-      ∀ a b, a < b → ε a = ε b → ∀ i, F a b (x i) + ∑ j, G a b i j • x j = 0 := by
+    (hdom : ∀ a b, a < b → ε a = ε b → (Λ + ν) b ≤ (Λ + ν) a)
+    : ∃ x : ι → M,
+      (∀ i, x i ∈ V) ∧ x ≠ 0
+        ∧ (∀ a i, F a a (x i) + ∑ j, G a a i j • x j = (((Λ + ν) a : ℝ) : ℂ) • x i)
+        ∧ ∀ a b, a < b → ε a = ε b → ∀ i, F a b (x i) + ∑ j, G a b i j • x j = 0 := by
   classical
   obtain ⟨w, hwV, hw0, hw⟩ := hV.2.2.2
   have : FiniteDimensional ℂ V := hV.1
@@ -164,8 +176,11 @@ theorem parthasarathy_tensor_matrix_alt (ε : Fin n → Bool) {M : Type*} [AddCo
   set μ : Fin n → ℝ := Λ + ν with hμ
   set t : Fin n → ℝ := fun a => Int.fract (μ a) with htdef
   have ht : ∀ a b, ε a = ε b → t a = t b := fun a b h => Int.fract_eq_fract.2 (hint a b h)
-  obtain ⟨T⟩ := kType_exists_of_dom ε (fun a => ((⌊μ a⌋ : ℤ) : ℝ)) (fun a => ⟨⌊μ a⌋, rfl⟩)
-    (fun a b hab he => by exact_mod_cast Int.floor_le_floor (hdom a b hab he))
+  obtain ⟨T⟩ :=
+    kType_exists_of_dom ε
+      (fun a => ((⌊μ a⌋ : ℤ) : ℝ))
+      (fun a => ⟨⌊μ a⌋, rfl⟩)
+      (fun a b hab he => by exact_mod_cast Int.floor_le_floor (hdom a b hab he))
   set A := endomorphismFamilyShift (kunits T) t with hAdef
   have hA : KRel ε A := ext1Shift_kRel (KType.kRel T) ht
   have hAu : KUnit ε A := ext1Shift_kUnit (KType.kUnit T) t
@@ -204,7 +219,8 @@ theorem parthasarathy_tensor_matrix_alt (ε : Fin n → Bool) {M : Type*} [AddCo
     exact hi ((smul_eq_zero.1 h1).resolve_right (KType.w_ne_zero T))
   have hE : KRel ε (tensAct A D) := tensor_action_lie_relations hA (ext1Dual_kRel hG)
   have hEu : KUnit ε (tensAct A D) := tensor_action_unitary hAu (ext1Dual_conjT hGu)
-  obtain ⟨Γ, hΓst, hΓex, hΓ0, hΓV, hx0w⟩ := highest_weight_graph_submodule hE hEu hF hV hx0 hx00 hwV hw0 hw
+  obtain ⟨Γ, hΓst, hΓex, hΓ0, hΓV, hx0w⟩ :=
+    highest_weight_graph_submodule hE hEu hF hV hx0 hx00 hwV hw0 hw
   have huniq : ∀ y v v', (y, v) ∈ Γ → (y, v') ∈ Γ → v = v' := by
     intro y v v' h1 h2
     have h3 := Γ.sub_mem h1 h2
@@ -214,15 +230,21 @@ theorem parthasarathy_tensor_matrix_alt (ε : Fin n → Bool) {M : Type*} [AddCo
   choose xv hxv using hΓex
   set si : ι → PiLp 2 (fun _ : ι => T.V) := fun i => WithLp.toLp 2 (Pi.single i T.w) with hsidef
 
-  have key : ∀ a b, ε a = ε b → ∀ c : ℂ, A a b T.w = c • T.w → ∀ i,
-      F a b (xv (si i)) = c • xv (si i) - ∑ j, G a b i j • xv (si j) := by
+  have key
+      : ∀ a b,
+        ε a = ε b
+          → ∀ c : ℂ,
+            A a b T.w = c • T.w
+              → ∀ i, F a b (xv (si i)) = c • xv (si i) - ∑ j, G a b i j • xv (si j) := by
     intro a b hab c hc i
-    have h1 : prodEndomorphismFamily (tensAct A D) F a b (si i, xv (si i)) ∈ Γ := hΓst a b hab _ (hxv _)
+    have h1 : prodEndomorphismFamily (tensAct A D) F a b (si i, xv (si i)) ∈ Γ :=
+      hΓst a b hab _ (hxv _)
     rw [product_action_apply] at h1
     have h2 : c • (si i, xv (si i)) - ∑ j, G a b i j • (si j, xv (si j)) ∈ Γ :=
       Γ.sub_mem (Γ.smul_mem c (hxv _)) (Γ.sum_mem fun j _ => Γ.smul_mem _ (hxv _))
-    have e : c • (si i, xv (si i)) - ∑ j, G a b i j • (si j, xv (si j)) =
-        (c • si i - ∑ j, G a b i j • si j, c • xv (si i) - ∑ j, G a b i j • xv (si j)) := by
+    have e
+        : c • (si i, xv (si i)) - ∑ j, G a b i j • (si j, xv (si j))
+          = (c • si i - ∑ j, G a b i j • si j, c • xv (si i) - ∑ j, G a b i j • xv (si j)) := by
       refine Prod.ext ?_ ?_ <;> simp [Prod.fst_sum, Prod.snd_sum]
     rw [e] at h2
     have hsi : tensAct A D a b (si i) = c • si i - ∑ j, G a b i j • si j :=

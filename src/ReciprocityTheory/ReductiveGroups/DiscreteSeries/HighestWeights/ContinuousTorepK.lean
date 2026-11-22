@@ -15,8 +15,8 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-def torepUnit (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε) :
-    (Matrix (Fin n) (Fin n) ℂ)ˣ :=
+def torepUnit (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε)
+    : (Matrix (Fin n) (Fin n) ℂ)ˣ :=
   ⟨g, star g, Unitary.mul_star_self_of_mem hg.1, Unitary.star_mul_self_of_mem hg.1⟩
 
 lemma torep_inUJ (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε) : inUJ ε g := by
@@ -45,10 +45,9 @@ lemma continuous_torepK (ε : Fin n → Bool) :
   refine Units.continuous_iff.2 ⟨continuous_subtype_val, ?_⟩
   exact continuous_star.comp continuous_subtype_val
 
-
 open Classical in
-def torepSig {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (g : Matrix (Fin n) (Fin n) ℂ) :
-    T.V →L[ℂ] T.V :=
+def torepSig {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (g : Matrix (Fin n) (Fin n) ℂ)
+    : T.V →L[ℂ] T.V :=
   if h : g ∈ Kset ε then T.op (torepK ε h) else 1
 
 lemma torepSig_of_mem {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) {g : Matrix (Fin n) (Fin n) ℂ}
@@ -390,12 +389,18 @@ lemma torep_dτ_of_wt {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε �
   rw [hXs, map_smul, ContinuousLinearMap.smul_apply, mul_comm, ← smul_smul] at heq
   exact smul_right_injective T.V Complex.I_ne_zero heq
 
-theorem KType.exists_rep {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) :
-    ∃ σ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V), (∀ k : KG ε, σ (toMK k) = T.op k) ∧
-      Formalism.MainNotions.S.IsURepOn (Formalism.REAL.Kset ε) σ ∧ Formalism.MainNotions.S.IsKTypeOf ε σ Λ ⊤ := by
+theorem KType.exists_rep {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
+    : ∃ σ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V),
+      (∀ k : KG ε, σ (toMK k) = T.op k) ∧ Formalism.MainNotions.S.IsURepOn (Formalism.REAL.Kset ε) σ
+        ∧ Formalism.MainNotions.S.IsKTypeOf ε σ Λ ⊤ := by
   refine ⟨torepSig T, torepSig_toMK T, torep_isURepOn T, ?_⟩
-  refine ⟨inferInstance, fun g _ v _ => Submodule.mem_top, ?_,
-    ⟨T.w, Submodule.mem_top, ?_, torep_wt_w T⟩, ?_⟩
+  refine ⟨
+    inferInstance,
+    fun g _ v _ => Submodule.mem_top,
+    ?_,
+    ⟨T.w, Submodule.mem_top, ?_, torep_wt_w T⟩,
+    ?_
+  ⟩
   · intro S' _ hS'
     exact T.irred S' (fun k v hv => by
       have := hS' (toMK k) k.2 v hv
@@ -405,7 +410,8 @@ theorem KType.exists_rep {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType �
     rw [h, norm_zero] at this
     exact zero_ne_one this
   · intro μ v _ hv hwt
-    obtain ⟨c, hc, he⟩ := ReciprocityTheory.ChartRestriction.DS.HW.KType.weight_le T hv (torep_dτ_of_wt T hwt)
+    obtain ⟨c, hc, he⟩ :=
+      ReciprocityTheory.ChartRestriction.DS.HW.KType.weight_le T hv (torep_dτ_of_wt T hwt)
     exact ⟨c, hc, he⟩
 
 end ReciprocityTheory.ChartRestriction.DS.HW

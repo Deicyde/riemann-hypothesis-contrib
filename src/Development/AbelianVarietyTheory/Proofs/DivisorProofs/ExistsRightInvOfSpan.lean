@@ -12,13 +12,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 namespace GlobalTheory.HSShort
 
-theorem exists_rightInv_of_span {F : Type} [Field F] {N n : ℕ} {w : Matrix (Fin N) (Fin n) F}
-    (hw : Submodule.span F (Set.range w.col) = ⊤) : ∃ P : Matrix (Fin n) (Fin N) F, w * P = 1 := by
+theorem exists_rightInv_of_span
+    {F : Type} [Field F]
+    {N n : ℕ} {w : Matrix (Fin N) (Fin n) F} (hw : Submodule.span F (Set.range w.col) = ⊤)
+    : ∃ P : Matrix (Fin n) (Fin N) F, w * P = 1 := by
   refine GlobalTheory.ZeroCycleHt.exists_rightInv fun v => ?_
   have hv : v ∈ Submodule.span F (Set.range w.col) := hw ▸ Submodule.mem_top
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun F).1 hv

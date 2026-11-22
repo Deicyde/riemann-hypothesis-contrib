@@ -8,19 +8,21 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem prod_arg_real_unit_eq_one (E : Type) [Field E] [NumberField E] [IsCMField E] (q : ℕ)
-    (hq : q.Prime) (hq2 : 2 < q)
+theorem prod_arg_real_unit_eq_one
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (q : ℕ) (hq : q.Prime) (hq2 : 2 < q)
     (u : (𝓞 E)ˣ) (hu : (u : 𝓞 E) - 1 ∈ Ideal.span {((q : ℕ) : 𝓞 E)})
-    (hreal : ∀ φ : E →+* ℂ, starRingEnd ℂ (φ ((u : 𝓞 E) : E)) = φ ((u : 𝓞 E) : E)) :
-    ∏ w : InfinitePlace E, (w.embedding ((u : 𝓞 E) : E) /
-      ((‖w.embedding ((u : 𝓞 E) : E)‖ : ℝ) : ℂ)) = 1 := by
+    (hreal : ∀ φ : E →+* ℂ, starRingEnd ℂ (φ ((u : 𝓞 E) : E)) = φ ((u : 𝓞 E) : E))
+    : ∏ w : InfinitePlace E, (w.embedding ((u : 𝓞 E) : E) /
+        ((‖w.embedding ((u : 𝓞 E) : E)‖ : ℝ) : ℂ))
+      = 1 := by
   set x : E := ((u : 𝓞 E) : E) with hx
   have hnorm : ∏ w : InfinitePlace E, ‖w.embedding x‖ = 1 := by
     have h1 := InfinitePlace.prod_eq_abs_norm x
     have hN : |Algebra.norm ℚ x| = 1 := Units.norm E u
     rw [hN] at h1
-    have h2 : ∏ w : InfinitePlace E, w x ^ w.mult =
-        (∏ w : InfinitePlace E, ‖w.embedding x‖) ^ 2 := by
+    have h2
+        : ∏ w : InfinitePlace E, w x ^ w.mult = (∏ w : InfinitePlace E, ‖w.embedding x‖) ^ 2 := by
       rw [← Finset.prod_pow]
       refine Finset.prod_congr rfl fun w _ => ?_
       rw [IsTotallyComplex.mult_eq, InfinitePlace.norm_embedding_eq]
@@ -37,10 +39,13 @@ theorem prod_arg_real_unit_eq_one (E : Type) [Field E] [NumberField E] [IsCMFiel
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.mp hu
   have hxy : x = 1 + ((y : 𝓞 E) : E) * (q : E) := by
     have : (u : 𝓞 E) = 1 + y * (q : 𝓞 E) := by rw [hy]; ring
-    rw [hx, this]; push_cast; ring
+    rw [hx, this]
+    push_cast
+    ring
   have hcong : ∃ s ∈ integralClosure ℤ ℂ, P = 1 + s * (q : ℂ) := by
     rw [hP]
-    refine Finset.prod_induction _ (fun z => ∃ s ∈ integralClosure ℤ ℂ, z = 1 + s * (q : ℂ))
+    refine Finset.prod_induction _
+      (fun z => ∃ s ∈ integralClosure ℤ ℂ, z = 1 + s * (q : ℂ))
       ?_ ⟨0, zero_mem _, by ring⟩ ?_
     · rintro a b ⟨s, hs, rfl⟩ ⟨t, ht, rfl⟩
       refine ⟨s + t + s * t * q, ?_, by ring⟩
@@ -65,13 +70,13 @@ theorem prod_arg_real_unit_eq_one (E : Type) [Field E] [NumberField E] [IsCMFiel
       field_simp
       linear_combination -hPs
     rw [mem_integralClosure_iff, hs'] at hs
-    have hint : IsIntegral ℤ ((-2 / q : ℚ)) :=
-      (isIntegral_algebraMap_iff ).mp hs
+    have hint : IsIntegral ℤ ((-2 / q : ℚ)) := (isIntegral_algebraMap_iff).mp hs
     obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.mp hint
     have hqQ : (q : ℚ) ≠ 0 := by exact_mod_cast hq.ne_zero
     have h2 : (n : ℚ) * q = -2 := by
       rw [show (algebraMap ℤ ℚ n) = (n : ℚ) from rfl] at hn
-      rw [hn]; field_simp
+      rw [hn]
+      field_simp
     have h3 : n * (q : ℤ) = -2 := by exact_mod_cast h2
     have h4 : (q : ℤ) ∣ 2 := ⟨-n, by linarith⟩
     have h5 : q ∣ 2 := by exact_mod_cast h4

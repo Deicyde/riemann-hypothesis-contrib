@@ -4,12 +4,13 @@ public import Development.EtaleCohomology.TateTwists.EtaleSheafSectionsSeparated
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations
 
-theorem sec_glue_forget_isSheaf (R : Type) [CommRing R] (F : Shv R) :
-    Presieve.IsSheaf Scheme.etaleTopology.{0} (F.obj ⋙ forget (ModuleCat.{1} (ULift.{1} R))) := by
+theorem sec_glue_forget_isSheaf (R : Type) [CommRing R] (F : Shv R)
+    : Presieve.IsSheaf Scheme.etaleTopology.{0} (F.obj ⋙ forget (ModuleCat.{1} (ULift.{1} R))) := by
   have : PreservesLimitsOfSize.{0, 1} (forget (ModuleCat.{1} (ULift.{1} R))) :=
     preservesLimitsOfSize_shrink.{1, 0, 0, 1} _
   exact (isSheaf_iff_isSheaf_of_type _ _).1

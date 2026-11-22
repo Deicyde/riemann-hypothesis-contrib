@@ -8,7 +8,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.FdomEx
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta MeasureTheory NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta MeasureTheory
+  NumberField
 
 namespace Formalism.IndefR.Eqv
 
@@ -16,14 +18,15 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable (D : D7)
 
-theorem ga_facts (V : HSp D) :
-    IsTopologicalGroup (GA D V) ∧ T2Space (GA D V) ∧ LocallyCompactSpace (GA D V) ∧
-      SecondCountableTopology (GA D V) ∧ BorelSpace (GA D V) := by
+theorem ga_facts (V : HSp D)
+    : IsTopologicalGroup (GA D V) ∧ T2Space (GA D V) ∧ LocallyCompactSpace (GA D V)
+      ∧ SecondCountableTopology (GA D V) ∧ BorelSpace (GA D V) := by
   obtain ⟨h1, h2, h3⟩ := G5.af_facts D.host.F
   exact G5.ha_facts (AF D.host.F) D.sp.cm.deg2 D.sp.cm.sig V.gram
 
-theorem ae_facts : IsTopologicalRing (AE D) ∧ T2Space (AE D) ∧ LocallyCompactSpace (AE D) ∧
-    SecondCountableTopology (AE D) ∧ BorelSpace (AE D) := by
+theorem ae_facts
+    : IsTopologicalRing (AE D) ∧ T2Space (AE D) ∧ LocallyCompactSpace (AE D)
+      ∧ SecondCountableTopology (AE D) ∧ BorelSpace (AE D) := by
   obtain ⟨h1, h2, h3⟩ := G5.af_facts D.host.F
   exact G5.tens_facts (AF D.host.F) D.sp.cm.deg2
 

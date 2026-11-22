@@ -16,51 +16,58 @@ namespace ReciprocityTheory.ChartRestriction.DS.DecInf
 
 variable {n : ℕ}
 
-theorem opPow_congr {ε : Fin n → Bool} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+theorem opPow_congr
+    {ε : Fin n → Bool} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
     (A : Fin n → Fin n → (Matrix (Fin n) (Fin n) ℂ → E) → (Matrix (Fin n) (Fin n) ℂ → E))
-    (hA : ∀ a b (f f' : Matrix (Fin n) (Fin n) ℂ → E), (∀ g, inUJ ε g → f g = f' g) →
-      ∀ g, inUJ ε g → A a b f g = A a b f' g) :
-    ∀ (k : ℕ) (a b : Fin n) (f f' : Matrix (Fin n) (Fin n) ℂ → E), (∀ g, inUJ ε g → f g = f' g) →
-      ∀ g, inUJ ε g → S7.opPow A k a b f g = S7.opPow A k a b f' g
+    (hA : ∀ a b (f f' : Matrix (Fin n) (Fin n) ℂ → E),
+      (∀ g, inUJ ε g → f g = f' g) → ∀ g, inUJ ε g → A a b f g = A a b f' g)
+    : ∀ (k : ℕ) (a b : Fin n) (f f' : Matrix (Fin n) (Fin n) ℂ → E),
+      (∀ g, inUJ ε g → f g = f' g) → ∀ g, inUJ ε g → S7.opPow A k a b f g = S7.opPow A k a b f' g
   | 0, a, b, f, f', h, g, hg => by
-      simp only [S7.opPow]
-      split_ifs
-      · exact h g hg
-      · rfl
+    simp only [S7.opPow]
+    split_ifs
+    · exact h g hg
+    · rfl
   | k + 1, a, b, f, f', h, g, hg => by
-      simp only [S7.opPow, Finset.sum_apply]
-      refine Finset.sum_congr rfl fun c _ => ?_
-      exact hA a c _ _ (fun g' hg' => opPow_congr A hA k c b f f' h g' hg') g hg
+    simp only [S7.opPow, Finset.sum_apply]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    exact hA a c _ _ (fun g' hg' => opPow_congr A hA k c b f f' h g' hg') g hg
 
-theorem opGelfand_congr {ε : Fin n → Bool} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+theorem opGelfand_congr
+    {ε : Fin n → Bool} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
     (A : Fin n → Fin n → (Matrix (Fin n) (Fin n) ℂ → E) → (Matrix (Fin n) (Fin n) ℂ → E))
-    (hA : ∀ a b (f f' : Matrix (Fin n) (Fin n) ℂ → E), (∀ g, inUJ ε g → f g = f' g) →
-      ∀ g, inUJ ε g → A a b f g = A a b f' g)
-    (k : ℕ) {f f' : Matrix (Fin n) (Fin n) ℂ → E} (h : ∀ g, inUJ ε g → f g = f' g)
-    {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) :
-    S7.opGelfand A k f g = S7.opGelfand A k f' g := by
+    (hA : ∀ a b (f f' : Matrix (Fin n) (Fin n) ℂ → E),
+      (∀ g, inUJ ε g → f g = f' g) → ∀ g, inUJ ε g → A a b f g = A a b f' g)
+    (k : ℕ)
+    {f f' : Matrix (Fin n) (Fin n) ℂ → E} (h : ∀ g, inUJ ε g → f g = f' g)
+    {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
+    : S7.opGelfand A k f g = S7.opGelfand A k f' g := by
   delta S7.opGelfand
   simp only [Finset.sum_apply]
   exact Finset.sum_congr rfl fun a _ => opPow_congr A hA k a a f f' h g hg
 
-theorem rightE_congr {ε : Fin n → Bool} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] :
-    ∀ a b (f f' : Matrix (Fin n) (Fin n) ℂ → E), (∀ g, inUJ ε g → f g = f' g) →
-      ∀ g, inUJ ε g → S7.rightE ε a b f g = S7.rightE ε a b f' g :=
+theorem rightE_congr {ε : Fin n → Bool} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    : ∀ a b (f f' : Matrix (Fin n) (Fin n) ℂ → E),
+      (∀ g, inUJ ε g → f g = f' g) → ∀ g, inUJ ε g → S7.rightE ε a b f g = S7.rightE ε a b f' g :=
   fun a b _ _ h _ hg => icx_eabV_congr h a b hg
 
-theorem rightEanti_congr {ε : Fin n → Bool} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] :
-    ∀ a b (f f' : Matrix (Fin n) (Fin n) ℂ → E), (∀ g, inUJ ε g → f g = f' g) →
-      ∀ g, inUJ ε g → S7.rightEanti ε a b f g = S7.rightEanti ε a b f' g := by
+theorem rightEanti_congr {ε : Fin n → Bool} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    : ∀ a b (f f' : Matrix (Fin n) (Fin n) ℂ → E),
+      (∀ g, inUJ ε g → f g = f' g)
+        → ∀ g, inUJ ε g → S7.rightEanti ε a b f g = S7.rightEanti ε a b f' g := by
   intro a b f f' h g hg
   exact congrArg (fun x : E => -x) (icx_eabV_congr h (Fin.rev b) (Fin.rev a) hg)
 
-theorem psiFor_pos_gelfand {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)}
-    {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} (hlam : S7.IsHCParam lam) {h : ℝ}
-    (hgap : GapAtLeast ε lam h) (hth : thrStar ε < h) (hq : 1 ≤ S7.q0 ε) (hP : IsPsiFor ε lam T Ψ) :
-    (∀ X, inP ε X → (Ψ (NormedSpace.exp X)).IsPositive) ∧
-      ∀ (k : ℕ) (g : Matrix (Fin n) (Fin n) ℂ), inUJ ε g →
-        S7.opGelfand (S7.rightE ε) k Ψ g = gval (icShift lam) k • Ψ g ∧
-          S7.opGelfand (S7.rightEanti ε) k Ψ g = gval (icShift (-lam)) k • Ψ g := by
+theorem psiFor_pos_gelfand
+    {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)}
+    {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} (hlam : S7.IsHCParam lam)
+    {h : ℝ} (hgap : GapAtLeast ε lam h) (hth : thrStar ε < h)
+    (hq : 1 ≤ S7.q0 ε) (hP : IsPsiFor ε lam T Ψ)
+    : (∀ X, inP ε X → (Ψ (NormedSpace.exp X)).IsPositive)
+      ∧ ∀ (k : ℕ) (g : Matrix (Fin n) (Fin n) ℂ),
+        inUJ ε g
+          → S7.opGelfand (S7.rightE ε) k Ψ g = gval (icShift lam) k • Ψ g
+            ∧ S7.opGelfand (S7.rightEanti ε) k Ψ g = gval (icShift (-lam)) k • Ψ g := by
   obtain ⟨Ψ', h1, h2, h3, h4, -, h6, h7, h8⟩ := S7.psiAll (n := n) ε lam h T hlam hgap hq
   have hT1 : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 ≤ thrStar ε := le_max_left _ _
   have hT2 : 16 * (n : ℝ) * (S7.q0 ε : ℝ) + 8 * Real.sqrt (2 * (S7.q0 ε : ℝ)) ≤ thrStar ε :=

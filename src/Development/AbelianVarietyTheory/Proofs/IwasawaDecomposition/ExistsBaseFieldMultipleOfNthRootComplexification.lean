@@ -10,8 +10,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.KeyFourth
 
-theorem exists_eq_smul_of_pow_eq_pow {R : Type*} [CommRing R] [IsDomain R] [Algebra ℂ R]
-    {n : ℕ} (hn : 0 < n) {x y : R} (h : x ^ n = y ^ n) : ∃ z : ℂ, x = z • y := by
+theorem exists_eq_smul_of_pow_eq_pow
+    {R : Type*} [CommRing R] [IsDomain R] [Algebra ℂ R]
+    {n : ℕ} (hn : 0 < n)
+    {x y : R} (h : x ^ n = y ^ n)
+    : ∃ z : ℂ, x = z • y := by
   have : NeZero n := ⟨hn.ne'⟩
   have h0 := Complex.isPrimitiveRoot_exp n hn.ne'
   have h1 := h0.map_of_injective (algebraMap ℂ R).injective
@@ -24,10 +27,10 @@ theorem exists_eq_smul_of_pow_eq_pow {R : Type*} [CommRing R] [IsDomain R] [Alge
   rw [Algebra.smul_def, map_pow, hi]
   exact sub_eq_zero.1 hz
 
-theorem exists_eq_smul_pow_of_pow_eq_tmul :
-    ∀ (K : Type) [Field K] [Algebra K ℂ] (A : Type) [CommRing A] [Algebra K A]
-      [IsDomain (ℂ ⊗[K] A)] (n : ℕ) (w : ℂ ⊗[K] A) (C : ℂ) (u : A), 0 < n → C ≠ 0 → u ≠ 0 →
-      w ^ n = C ⊗ₜ[K] u → ∃ (a : K) (b : A), a ≠ 0 ∧ u = a • b ^ n := by
+theorem exists_eq_smul_pow_of_pow_eq_tmul
+    : ∀ (K : Type) [Field K] [Algebra K ℂ] (A : Type) [CommRing A] [Algebra K A]
+        [IsDomain (ℂ ⊗[K] A)] (n : ℕ) (w : ℂ ⊗[K] A) (C : ℂ) (u : A),
+      0 < n → C ≠ 0 → u ≠ 0 → w ^ n = C ⊗ₜ[K] u → ∃ (a : K) (b : A), a ≠ 0 ∧ u = a • b ^ n := by
   intro K _ _ A _ _ _ n w C u hn hC hu hw
   obtain ⟨f, hf⟩ := Module.Projective.exists_dual_eq_one K (one_ne_zero : (1 : ℂ) ≠ 0)
   let T : ℂ ⊗[K] A →ₗ[K] A := (TensorProduct.lid K A).toLinearMap ∘ₗ LinearMap.rTensor A f
@@ -44,8 +47,9 @@ theorem exists_eq_smul_pow_of_pow_eq_tmul :
     rintro rfl
     rw [zero_pow hn.ne'] at hw
     exact hne C u hC hu hw.symm
-  have hst : ∀ σ : ℂ ≃ₐ[K] ℂ, ∀ x ∈ Submodule.span ℂ {w},
-      σ.toLinearMap.rTensor A x ∈ Submodule.span ℂ {w} := by
+  have hst
+      : ∀ σ : ℂ ≃ₐ[K] ℂ, ∀ x ∈ Submodule.span ℂ {w},
+        σ.toLinearMap.rTensor A x ∈ Submodule.span ℂ {w} := by
     intro σ x hx
     obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hx
     let S : ℂ ⊗[K] A →ₐ[K] ℂ ⊗[K] A := Algebra.TensorProduct.map σ.toAlgHom (AlgHom.id K A)
@@ -56,12 +60,10 @@ theorem exists_eq_smul_pow_of_pow_eq_tmul :
       | add x y hx hy => simp only [map_add (f := _), hx, hy]
     obtain ⟨μ, hμ⟩ := IsAlgClosed.exists_pow_nat_eq (σ C / C) hn
     have h1 : (S w) ^ n = (μ • w) ^ n := by
-      rw [← map_pow, smul_pow, hw, hμ, TensorProduct.smul_tmul', smul_eq_mul,
-        div_mul_cancel₀ _ hC]
+      rw [← map_pow, smul_pow, hw, hμ, TensorProduct.smul_tmul', smul_eq_mul, div_mul_cancel₀ _ hC]
       simp [S]
     obtain ⟨z, hz⟩ := exists_eq_smul_of_pow_eq_pow hn h1
-    have h2 : c • w = (c ⊗ₜ[K] (1 : A)) * w := by
-      rw [Algebra.smul_def]; rfl
+    have h2 : c • w = (c ⊗ₜ[K] (1 : A)) * w := by rw [Algebra.smul_def]; rfl
     have h3 : S (c ⊗ₜ[K] (1 : A)) * S w = σ c • S w := by
       rw [Algebra.smul_def]
       simp [S]
@@ -79,7 +81,8 @@ theorem exists_eq_smul_pow_of_pow_eq_tmul :
   have hpow : (1 : ℂ) ⊗ₜ[K] (b ^ n) = (l ^ n * C) ⊗ₜ[K] u := by
     have := congrArg (· ^ n) hl
     simp only [smul_pow, hw, Algebra.TensorProduct.tmul_pow, one_pow, TensorProduct.smul_tmul',
-      smul_eq_mul] at this
+        smul_eq_mul]
+      at this
     exact this.symm
   have hbn : b ^ n ≠ 0 := by
     intro h

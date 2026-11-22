@@ -18,12 +18,13 @@ theorem anisotropic' : Anisotropic := by
   have hxx := hcon x hx
   have hyy := hcon _ (U.smul_mem (star (B x y)) hy)
   have hyx : B y x = star (B x y) := (hB x y).symm
-  have e1 : B x (star (B x y) • y) = star (B x y) * B x y := by
-    rw [LinearMap.map_smul, smul_eq_mul]
+  have e1 : B x (star (B x y) • y) = star (B x y) * B x y := by rw [LinearMap.map_smul, smul_eq_mul]
   have e2 : B (star (B x y) • y) x = B x y * star (B x y) := by
     rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, star_star, hyx]
-  have e3 : B (x + star (B x y) • y) (x + star (B x y) • y) =
-      B x x + B x (star (B x y) • y) + (B (star (B x y) • y) x + B (star (B x y) • y) (star (B x y) • y)) := by
+  have e3
+      : B (x + star (B x y) • y) (x + star (B x y) • y)
+        = B x x + B x (star (B x y) • y)
+          + (B (star (B x y) • y) x + B (star (B x y) • y) (star (B x y) • y)) := by
     rw [LinearMap.map_add₂, map_add (f := _), map_add (f := _)]
   rw [e3, hxx, hyy, e1, e2] at h0
   have h2 : (2 : K) * (B x y * star (B x y)) = 0 := by linear_combination h0

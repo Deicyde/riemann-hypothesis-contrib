@@ -10,7 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ContinuousIdel
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.IndefiniteRowSideFullHecke.CompletedLStripBounds GlobalTheory.HeckeEps GlobalTheory.CompanionTheory.HeckeBridge GroundTheory.Global GroundTheory.LocalField GroundTheory.Global.IdeleGroup
+open NumberField IsDedekindDomain GlobalTheory.CMVal
+  GlobalTheory.IndefiniteRowSideFullHecke.CompletedLStripBounds GlobalTheory.HeckeEps
+  GlobalTheory.CompanionTheory.HeckeBridge GroundTheory.Global GroundTheory.LocalField
+  GroundTheory.Global.IdeleGroup
 open GroundTheory.Automorphic.GodementSection (localChar)
 open Formalism.L2.Host (unif atFin unif_spec)
 
@@ -18,8 +21,8 @@ namespace GlobalTheory.CompanionTheory.HeckeBridge
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem unrAt_iff_not_dvd_conductor (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E)) :
-    χ.UnrAt v ↔ ¬ v.asIdeal ∣ (toHecke χ hu).conductor := by
+theorem unrAt_iff_not_dvd_conductor (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E))
+    : χ.UnrAt v ↔ ¬ v.asIdeal ∣ (toHecke χ hu).conductor := by
   rw [HeckeCharacter.not_dvd_conductor_iff]
   constructor
   · intro h a ha
@@ -49,24 +52,29 @@ theorem unrAt_iff_not_dvd_conductor (χ : HChar E) (hu : IsUnitary χ) (v : Heig
     ext
     simpa using h2.symm
 
-theorem coeff_eq_val (χ : HChar E) (hu : IsUnitary χ) {v : HeightOneSpectrum (𝓞 E)}
-    (hv : ¬ v.asIdeal ∣ (toHecke χ hu).conductor) :
-    (toHecke χ hu).coeff v.asIdeal = (χ.val v : ℂ) := by
-  rw [(toHecke χ hu).coeff_asIdeal_eq_toIdele hv (unif_spec v), ← HeckeCharacter.localComponent_apply,
-    coe_localComponent]
+theorem coeff_eq_val
+    (χ : HChar E) (hu : IsUnitary χ)
+    {v : HeightOneSpectrum (𝓞 E)} (hv : ¬ v.asIdeal ∣ (toHecke χ hu).conductor)
+    : (toHecke χ hu).coeff v.asIdeal = (χ.val v : ℂ) := by
+  rw [(toHecke χ hu).coeff_asIdeal_eq_toIdele hv (unif_spec v),
+    ← HeckeCharacter.localComponent_apply, coe_localComponent]
   rfl
 
-theorem hasProd_eulerFactor_toHecke : ∀ (E : Type) [Field E] [NumberField E] (χ : HChar E) (hu : IsUnitary χ) (s : ℂ),
-    1 < s.re → HasProd (eulerFactor χ s) ((toHecke χ hu).LFunction s) := by
+theorem hasProd_eulerFactor_toHecke
+    : ∀ (E : Type) [Field E] [NumberField E] (χ : HChar E) (hu : IsUnitary χ) (s : ℂ),
+      1 < s.re → HasProd (eulerFactor χ s) ((toHecke χ hu).LFunction s) := by
   intro E _ _ χ hu s hs
-  have h : eulerFactor χ s = fun v : HeightOneSpectrum (𝓞 E) ↦
-      (1 - (toHecke χ hu).coeff v.asIdeal * (Ideal.absNorm v.asIdeal : ℂ) ^ (-s))⁻¹ := by
+  have h
+      : eulerFactor χ s
+        = fun v : HeightOneSpectrum (𝓞 E) ↦
+          (1 - (toHecke χ hu).coeff v.asIdeal * (Ideal.absNorm v.asIdeal : ℂ) ^ (-s))⁻¹ := by
     funext v
     unfold eulerFactor
     by_cases hv : χ.UnrAt v
     · rw [if_pos hv, coeff_eq_val χ hu ((unrAt_iff_not_dvd_conductor χ hu v).1 hv)]
-    · rw [if_neg hv, HeckeCharacter.coeff_asIdeal_of_dvd _
-        (not_not.1 (mt (unrAt_iff_not_dvd_conductor χ hu v).2 hv))]
+    · rw [if_neg hv,
+        HeckeCharacter.coeff_asIdeal_of_dvd _
+          (not_not.1 (mt (unrAt_iff_not_dvd_conductor χ hu v).2 hv))]
       simp
   rw [h]
   exact (toHecke χ hu).LFunction_hasProd_all hs

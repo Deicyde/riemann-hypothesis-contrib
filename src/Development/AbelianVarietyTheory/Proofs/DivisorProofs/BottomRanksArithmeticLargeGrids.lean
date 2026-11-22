@@ -12,8 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasSignature
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest GlobalTheory.SqTop GlobalTheory.SquareComm
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
+  GlobalTheory.SqTop GlobalTheory.SquareComm
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -22,9 +26,9 @@ noncomputable section
 
 namespace GlobalTheory.BotRankSize
 
-theorem bot_arith (D : D7) (i j : ℕ) :
-    Even (SqNum.botBig D i j + SqNum.botSmall D i j) ∧ SqNum.botSmall D i j + 2 < SqNum.botBig D i j ∧
-      1 < SqNum.botSmall D i j := by
+theorem bot_arith (D : D7) (i j : ℕ)
+    : Even (SqNum.botBig D i j + SqNum.botSmall D i j)
+      ∧ SqNum.botSmall D i j + 2 < SqNum.botBig D i j ∧ 1 < SqNum.botSmall D i j := by
   have hk := D.R.k_even
   have hm := D.R.m_even
   have ht := D.R.t_odd
@@ -34,14 +38,21 @@ theorem bot_arith (D : D7) (i j : ℕ) :
   rw [Nat.odd_iff] at ht
   simp only [SqNum.botBig, SqNum.botSmall, rankV, sLen, Formalism.BasicNotions.Ranks.r]
   have e1 : (j + 1) * D.R.t = j * D.R.t + D.R.t := by ring
-  have e2 : (i + 1) * (D.R.k + D.R.m - 1 + 6) = i * (D.R.k + D.R.m - 1 + 6) + (D.R.k + D.R.m - 1 + 6) := by ring
+  have e2
+      : (i + 1) * (D.R.k + D.R.m - 1 + 6)
+        = i * (D.R.k + D.R.m - 1 + 6) + (D.R.k + D.R.m - 1 + 6) := by
+    ring
   rw [e1, e2]
   generalize j * D.R.t = A
   generalize i * (D.R.k + D.R.m - 1 + 6) = B
   rw [Nat.even_iff]
   omega
 
-theorem bottom_ranks : GBig fun {D} {T} {Lc} {sc} G _ _ _ _ => ∀ i j : Fin D.R.m, Even (SqNum.botBig D i j + SqNum.botSmall D i j) ∧ SqNum.botSmall D i j + 2 < SqNum.botBig D i j ∧ 1 < SqNum.botSmall D i j := by
+theorem bottom_ranks
+    : GBig fun {D} {T} {Lc} {sc} G _ _ _ _ =>
+      ∀ i j : Fin D.R.m,
+        Even (SqNum.botBig D i j + SqNum.botSmall D i j)
+          ∧ SqNum.botSmall D i j + 2 < SqNum.botBig D i j ∧ 1 < SqNum.botSmall D i j := by
   refine ⟨0, fun ε CF _ => ⟨0, 0, fun C _ D large₂ _ _ _ T Lc μ₀ _ G => ?_⟩⟩
   intro i j
   exact bot_arith D i j

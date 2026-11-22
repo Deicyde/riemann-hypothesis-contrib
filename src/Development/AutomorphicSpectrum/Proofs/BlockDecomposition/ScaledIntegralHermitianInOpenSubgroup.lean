@@ -11,8 +11,12 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CompanionTheory.SiegelND.Integ GlobalTheory.CompanionTheory.SiegelND.Integ.Hua
@@ -23,8 +27,8 @@ namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.Commens
 
 open Topology
 
-theorem exists_den {F : Type} [Field F] [NumberField F] (y : F) :
-    ∃ D : ℕ, 0 < D ∧ ∃ r : 𝓞 F, algebraMap (𝓞 F) F r = (D : F) * y := by
+theorem exists_den {F : Type} [Field F] [NumberField F] (y : F)
+    : ∃ D : ℕ, 0 < D ∧ ∃ r : 𝓞 F, algebraMap (𝓞 F) F r = (D : F) * y := by
   have hal : IsAlgebraic ℤ y :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ F).mpr (Algebra.IsAlgebraic.isAlgebraic y)
   obtain ⟨z, hz, hint⟩ := hal.exists_integral_multiple
@@ -46,8 +50,8 @@ theorem exists_den {F : Type} [Field F] [NumberField F] (y : F) :
       exact hint.neg
   exact ⟨IsIntegralClosure.mk' (𝓞 F) _ hint', IsIntegralClosure.algebraMap_mk' _ _ _⟩
 
-theorem exists_common_den {F : Type} [Field F] [NumberField F] {ι : Type} [Fintype ι] (y : ι → F) :
-    ∃ D : ℕ, 0 < D ∧ ∀ i, ∃ r : 𝓞 F, algebraMap (𝓞 F) F r = (D : F) * y i := by
+theorem exists_common_den {F : Type} [Field F] [NumberField F] {ι : Type} [Fintype ι] (y : ι → F)
+    : ∃ D : ℕ, 0 < D ∧ ∀ i, ∃ r : 𝓞 F, algebraMap (𝓞 F) F r = (D : F) * y i := by
   choose D hD r hr using fun i => exists_den (y i)
   refine ⟨∏ i, D i, Finset.prod_pos fun i _ => hD i, fun i => ?_⟩
   obtain ⟨m, hm⟩ := Finset.dvd_prod_of_mem D (Finset.mem_univ i)
@@ -56,20 +60,24 @@ theorem exists_common_den {F : Type} [Field F] [NumberField F] {ι : Type} [Fint
   push_cast
   ring
 
-theorem coords_den {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {d : ℕ} (b : Module.Basis (Fin d) F E) :
-    ∃ D : ℕ, 0 < D ∧ ∀ (o : 𝓞 E) (k : Fin d), ∃ r : 𝓞 F,
-      algebraMap (𝓞 F) F r = (D : F) * b.repr (algebraMap (𝓞 E) E o) k := by
+theorem coords_den
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    : ∃ D : ℕ,
+      0 < D
+        ∧ ∀ (o : 𝓞 E) (k : Fin d), ∃ r : 𝓞 F,
+          algebraMap (𝓞 F) F r = (D : F) * b.repr (algebraMap (𝓞 E) E o) k := by
   let e := RingOfIntegers.basis E
-  obtain ⟨D, hD, h⟩ := exists_common_den (F := F)
-    (fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin d => b.repr (algebraMap (𝓞 E) E (e p.1)) p.2)
+  obtain ⟨D, hD, h⟩ :=
+    exists_common_den (F := F) (fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin d =>
+      b.repr (algebraMap (𝓞 E) E (e p.1)) p.2)
   refine ⟨D, hD, fun o k => ?_⟩
   choose r hr using h
   refine ⟨∑ i, (e.repr o i) • r (i, k), ?_⟩
   have ho : algebraMap (𝓞 E) E o = ∑ i, (e.repr o i) • algebraMap (𝓞 E) E (e i) := by
     conv_lhs => rw [← e.sum_repr o]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum]
+    simp [map_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [ho, map_sum, map_sum, Finsupp.finsetSum_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -77,8 +85,10 @@ theorem coords_den {F E : Type} [Field F] [NumberField F] [Field E] [NumberField
   simp only [zsmul_eq_mul]
   ring
 
-theorem nhds_unif {ι Y : Type} [Finite ι] [TopologicalSpace Y] (y0 : Y) (W : Set (ι → Y))
-    (hW : W ∈ 𝓝 (fun _ => y0)) : ∃ V ∈ 𝓝 y0, ∀ y : ι → Y, (∀ i, y i ∈ V) → y ∈ W := by
+theorem nhds_unif
+    {ι Y : Type} [Finite ι] [TopologicalSpace Y]
+    (y0 : Y) (W : Set (ι → Y)) (hW : W ∈ 𝓝 (fun _ => y0))
+    : ∃ V ∈ 𝓝 y0, ∀ y : ι → Y, (∀ i, y i ∈ V) → y ∈ W := by
   rw [nhds_pi, Filter.mem_pi'] at hW
   obtain ⟨I, t, ht, hsub⟩ := hW
   refine ⟨⋂ i, t i, Filter.iInter_mem.mpr ht, fun y hy => hsub ?_⟩
@@ -91,9 +101,15 @@ namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.Commens
 
 open Topology
 
-theorem exists_smul_mem_open : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
-    IsCMExt F E σ → ∀ (n : ℕ) (U : AddSubgroup (HermR (Af F) σ n)), IsOpen (U : Set (HermR (Af F) σ n)) →
-    ∀ t : F, t ≠ 0 → ∃ τ : ℕ, 0 < τ ∧ ∀ c ∈ hermO σ n, hermIn (Af F) σ n (((τ : F) / t) • c) ∈ U := by
+theorem exists_smul_mem_open
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (n : ℕ) (U : AddSubgroup (HermR (Af F) σ n)),
+          IsOpen (U : Set (HermR (Af F) σ n))
+            → ∀ t : F,
+              t ≠ 0
+                → ∃ τ : ℕ, 0 < τ ∧ ∀ c ∈ hermO σ n, hermIn (Af F) σ n (((τ : F) / t) • c) ∈ U := by
   intro F E _ _ _ _ _ σ hcm n U hU t ht
   obtain ⟨-, hSC, hT2, -, -, -, hF, hN, -, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   haveI : SecondCountableTopology (Af F) := hSC
@@ -106,8 +122,8 @@ theorem exists_smul_mem_open : ∀ (F E : Type) [Field F] [NumberField F] [Field
   have happ : ∀ (y : Af F ⊗[F] E) k, h y k = (Algebra.TensorProduct.basis (Af F) b).repr y k :=
     fun _ _ => rfl
   obtain ⟨U', hU'o, hU'⟩ := isOpen_induced_iff.mp hU
-  let G : (Fin n × Fin n × Fin (Module.finrank F E) → Af F) →
-      Matrix (Fin n) (Fin n) (Af F ⊗[F] E) :=
+  let G
+      : (Fin n × Fin n × Fin (Module.finrank F E) → Af F) → Matrix (Fin n) (Fin n) (Af F ⊗[F] E) :=
     fun x a c => h.symm (fun k => x (a, c, k))
   have hG : Continuous G := by
     refine continuous_matrix fun a c => ?_
@@ -137,16 +153,19 @@ theorem exists_smul_mem_open : ∀ (F E : Type) [Field F] [NumberField F] [Field
     rintro ⟨a, a', k⟩
     obtain ⟨o, ho⟩ := hc a a'
     obtain ⟨r, hr⟩ := hco o k
-    have hval : b.repr (((((D₁ * D₂ * N : ℕ) : F) / t) • c).1 a a') k
-        = (N : F) * (algebraMap (𝓞 F) F p * algebraMap (𝓞 F) F r) := by
+    have hval
+        : b.repr (((((D₁ * D₂ * N : ℕ) : F) / t) • c).1 a a') k
+          = (N : F) * (algebraMap (𝓞 F) F p * algebraMap (𝓞 F) F r) := by
       have : (((((D₁ * D₂ * N : ℕ) : F) / t) • c).1 a a')
           = (((D₁ * D₂ * N : ℕ) : F) / t) • algebraMap (𝓞 E) E o := by
         rw [ho]; rfl
       rw [this, map_smul, Finsupp.smul_apply, hp, hr, smul_eq_mul, div_eq_mul_inv]
       push_cast
       ring
-    have hmem : algebraMap F (Af F) (algebraMap (𝓞 F) F p * algebraMap (𝓞 F) F r) ∈
-        GlobalTheory.CompanionTheory.SW.Core.Oh F := (hF _).mpr ⟨p * r, by simp⟩
+    have hmem
+        : algebraMap F (Af F) (algebraMap (𝓞 F) F p * algebraMap (𝓞 F) F r)
+          ∈ GlobalTheory.CompanionTheory.SW.Core.Oh F :=
+      (hF _).mpr ⟨p * r, by simp⟩
     have := hNV _ hmem
     show algebraMap F (Af F) (b.repr (((((D₁ * D₂ * N : ℕ) : F) / t) • c).1 a a') k) ∈ V
     rw [hval, map_mul, map_natCast]
@@ -160,12 +179,15 @@ theorem exists_smul_mem_open : ∀ (F E : Type) [Field F] [NumberField F] [Field
     funext k
     rw [happ]
     show y (a, a', k) = _
-    have hentry : (hermIn (Af F) σ n ((((D₁ * D₂ * N : ℕ) : F) / t) • c)).1 a a' =
-        (1 : Af F) ⊗ₜ[F] (((((D₁ * D₂ * N : ℕ) : F) / t) • c).1 a a') := rfl
+    have hentry
+        : (hermIn (Af F) σ n ((((D₁ * D₂ * N : ℕ) : F) / t) • c)).1 a a'
+          = (1 : Af F) ⊗ₜ[F] (((((D₁ * D₂ * N : ℕ) : F) / t) • c).1 a a') :=
+      rfl
     rw [hentry, Algebra.TensorProduct.basis_repr_tmul]
     simp only [Finsupp.smul_apply, one_smul, Finsupp.mapRange_apply]
     rfl
-  have hfin : hermIn (Af F) σ n ((((D₁ * D₂ * N : ℕ) : F) / t) • c) ∈ (U : Set (HermR (Af F) σ n)) := by
+  have hfin
+      : hermIn (Af F) σ n ((((D₁ * D₂ * N : ℕ) : F) / t) • c) ∈ (U : Set (HermR (Af F) σ n)) := by
     rw [← hU']
     show _ ∈ U'
     rw [← heq]

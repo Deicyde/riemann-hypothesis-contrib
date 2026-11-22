@@ -9,7 +9,12 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 
 namespace GlobalTheory
 
-theorem isoSub_span_map : ∀ {k Γ : Type} [Field k] [Group Γ] {L : Type} [Field L] (f : k →+* L) {a : ℕ} (ρ : Γ →* GL (Fin a) k) (W₁ W₂ : Submodule k (Fin a → k)), IsInv ρ W₁ → IsInv ρ W₂ → IsoSub ρ W₁ W₂ → IsoSub (mapRep f ρ) (Submodule.span L ((fun v => f ∘ v) '' (W₁ : Set (Fin a → k)))) (Submodule.span L ((fun v => f ∘ v) '' (W₂ : Set (Fin a → k)))) := by
+theorem isoSub_span_map
+    : ∀ {k Γ : Type} [Field k] [Group Γ] {L : Type} [Field L] (f : k →+* L) {a : ℕ}
+        (ρ : Γ →* GL (Fin a) k) (W₁ W₂ : Submodule k (Fin a → k)),
+      IsInv ρ W₁ → IsInv ρ W₂ → IsoSub ρ W₁ W₂
+        → IsoSub (mapRep f ρ) (Submodule.span L ((fun v => f ∘ v) '' (W₁ : Set (Fin a → k))))
+          (Submodule.span L ((fun v => f ∘ v) '' (W₂ : Set (Fin a → k)))) := by
   intro k Γ _ _ L _ f a ρ W₁ W₂ h₁ h₂ ⟨e, he⟩
   obtain ⟨g₁, hg₁⟩ := LinearMap.exists_extend (W₂.subtype ∘ₗ (e : W₁ →ₗ[k] W₂))
   obtain ⟨g₂, hg₂⟩ := LinearMap.exists_extend (W₁.subtype ∘ₗ (e.symm : W₂ →ₗ[k] W₁))
@@ -17,8 +22,9 @@ theorem isoSub_span_map : ∀ {k Γ : Type} [Field k] [Group Γ] {L : Type} [Fie
     simpa using LinearMap.congr_fun hg₁ v
   have hg₂' : ∀ v : W₂, g₂ v = (e.symm v : Fin a → k) := fun v => by
     simpa using LinearMap.congr_fun hg₂ v
-  have key : ∀ (M : Matrix (Fin a) (Fin a) k) (v : Fin a → k),
-      (M.map f).mulVec (f ∘ v) = f ∘ (M.mulVec v) := by
+  have key
+      : ∀ (M : Matrix (Fin a) (Fin a) k) (v : Fin a → k),
+        (M.map f).mulVec (f ∘ v) = f ∘ (M.mulVec v) := by
     intro M v; funext i; exact (RingHom.map_mulVec f M v i).symm
   let φ : (Fin a → L) →ₗ[L] (Fin a → L) := ((LinearMap.toMatrix' g₁).map f).mulVecLin
   let ψ : (Fin a → L) →ₗ[L] (Fin a → L) := ((LinearMap.toMatrix' g₂).map f).mulVecLin
@@ -72,9 +78,11 @@ theorem isoSub_span_map : ∀ {k Γ : Type} [Field k] [Group Γ] {L : Type} [Fie
     exact LinearMap.eqOn_span' this hx
   let φ' : Submodule.span L S₁ →ₗ[L] Submodule.span L S₂ := φ.restrict mφ
   let ψ' : Submodule.span L S₂ →ₗ[L] Submodule.span L S₁ := ψ.restrict mψ
-  refine ⟨LinearEquiv.ofLinear φ' ψ'
-    (LinearMap.ext fun x => Subtype.ext (φψ x x.2))
-    (LinearMap.ext fun x => Subtype.ext (ψφ x x.2)), ?_⟩
+  refine ⟨
+    LinearEquiv.ofLinear φ' ψ' (LinearMap.ext fun x => Subtype.ext (φψ x x.2))
+      (LinearMap.ext fun x => Subtype.ext (ψφ x x.2)),
+    ?_
+  ⟩
   intro g v hv
   show φ (((ρ g : Matrix (Fin a) (Fin a) k).map f).mulVec v)
       = ((ρ g : Matrix (Fin a) (Fin a) k).map f).mulVec (φ v)

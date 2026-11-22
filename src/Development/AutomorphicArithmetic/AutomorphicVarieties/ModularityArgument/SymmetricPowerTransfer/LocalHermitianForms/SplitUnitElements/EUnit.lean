@@ -8,18 +8,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra Matrix UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-theorem UpperTheory.V.Z.Sym.Loc.One.eUnit :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ →
-        (∃ u : Oˣ, algebraMap O K u = τ ^ 2 - 4) → ∀ u : (Etau K τ)ˣ, (∃ ε : Oˣ, QuadraticAlgebra.norm (u : Etau K τ) = algebraMap O K ε) →
-        ∃ z v : (Etau K τ)ˣ, IsIntegral O (v : Etau K τ) ∧ IsIntegral O ((v⁻¹ : (Etau K τ)ˣ) : Etau K τ) ∧ (u : Etau K τ) = quo z * v := by
+theorem UpperTheory.V.Z.Sym.Loc.One.eUnit
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ → (∃ u : Oˣ, algebraMap O K u = τ ^ 2 - 4)
+        → ∀ u : (Etau K τ)ˣ,
+          (∃ ε : Oˣ, QuadraticAlgebra.norm (u : Etau K τ) = algebraMap O K ε)
+            → ∃ z v : (Etau K τ)ˣ,
+              IsIntegral O (v : Etau K τ) ∧ IsIntegral O ((v⁻¹ : (Etau K τ)ˣ) : Etau K τ)
+                ∧ (u : Etau K τ) = quo z * v := by
   intro O K _ _ _ _ _ Δ τ L hU u hε0
   obtain ⟨U, hU⟩ := hU
   obtain ⟨ε, hε⟩ := hε0
   haveI := L.frac
   let D : K := τ ^ 2 - 4
   have L' : IsLoc O D := ⟨L.frac, L.compl, L.fin, L.two, ⟨U, 1, one_ne_zero, by simp [D, hU]⟩⟩
-  have hw : ((2 : K) • (ω : Etau K τ) - algebraMap K _ τ) * ((2 : K) • ω - algebraMap K _ τ)
-      = D • 1 + (0 : K) • ((2 : K) • ω - algebraMap K _ τ) := by
+  have hw
+      : ((2 : K) • (ω : Etau K τ) - algebraMap K _ τ) * ((2 : K) • ω - algebraMap K _ τ)
+        = D • 1 + (0 : K) • ((2 : K) • ω - algebraMap K _ τ) := by
     ext <;> simp [D] <;> ring
   let φ : Lsq K D →ₐ[K] Etau K τ := QuadraticAlgebra.lift ⟨_, hw⟩
   have hφ : ∀ z : Lsq K D, φ z = ⟨z.re - τ * z.im, 2 * z.im⟩ := by
@@ -44,7 +50,10 @@ theorem UpperTheory.V.Z.Sym.Loc.One.eUnit :
     exact IsIntegral.map (φ.restrictScalars O) hνi
   let β : Etau K τ := (u : Etau K τ) * ((v⁻¹ : (Etau K τ)ˣ) : Etau K τ)
   have hβn : QuadraticAlgebra.norm β = 1 := by
-    have h1 : QuadraticAlgebra.norm (v : Etau K τ) * QuadraticAlgebra.norm ((v⁻¹ : (Etau K τ)ˣ) : Etau K τ) = 1 := by
+    have h1
+        : QuadraticAlgebra.norm (v : Etau K τ)
+            * QuadraticAlgebra.norm ((v⁻¹ : (Etau K τ)ˣ) : Etau K τ)
+          = 1 := by
       rw [← map_mul, Units.mul_inv, map_one]
     rw [hv, hv0n] at h1
     simp only [β, map_mul, hε]
@@ -59,11 +68,13 @@ theorem UpperTheory.V.Z.Sym.Loc.One.eUnit :
   let w : (Etau K τ)ˣ := Units.map (φ : Lsq K D →* Etau K τ) y
   have hw' : (w : Etau K τ) = φ y := rfl
   refine ⟨w⁻¹, v, hvi, ?_, ?_⟩
-  · have e : ((v⁻¹ : (Etau K τ)ˣ) : Etau K τ)
-        = star (v : Etau K τ) * algebraMap O (Etau K τ) ((ε⁻¹ : Oˣ) : O) := by
+  · have e
+        : ((v⁻¹ : (Etau K τ)ˣ) : Etau K τ)
+          = star (v : Etau K τ) * algebraMap O (Etau K τ) ((ε⁻¹ : Oˣ) : O) := by
       apply Units.inv_eq_of_mul_eq_one_right
       rw [← mul_assoc, ← QuadraticAlgebra.algebraMap_norm_eq_mul_star, hv, hv0n,
-        algebraMap_etau (τ := τ) ((ε⁻¹ : Oˣ) : O), ← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
+        algebraMap_etau (τ := τ) ((ε⁻¹ : Oˣ) : O), ← map_mul, ← map_mul, Units.mul_inv, map_one,
+        map_one]
     rw [e]
     exact (isIntegral_star hvi).mul isIntegral_algebraMap
   · have hq : quo w⁻¹ = β := by

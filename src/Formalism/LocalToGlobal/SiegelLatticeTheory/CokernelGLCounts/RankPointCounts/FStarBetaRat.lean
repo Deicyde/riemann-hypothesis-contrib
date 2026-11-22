@@ -11,9 +11,10 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical
-open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
-  Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount Formalism.L2.SG.Pf.FrameGlobalPatching Formalism.L2.SG.Saturated
-  Formalism.L2.SG.Pf.ScalarFramePf
+open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+  Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount
+  Formalism.L2.SG.Pf.FrameGlobalPatching Formalism.L2.SG.Saturated Formalism.L2.SG.Pf.ScalarFramePf
 
 namespace Formalism.L2.SG.Pf.FrameGlobalPatching.FStar
 
@@ -21,11 +22,12 @@ open BwdCut BwdBetaCut OmP BwdBetaS
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : Formalism.BasicNotions.D7} (Zd : LocDat D) {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)}
-  {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
+variable
+  {D : Formalism.BasicNotions.D7} (Zd : LocDat D)
+  {u u' : D.what₂.Word}
+  {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
 variable (u u' F0 what₂)
-
 
 set_option maxHeartbeats 1000000 in
 theorem betaRat_holds : BetaRat Zd u u' F0 what₂ := by
@@ -41,9 +43,9 @@ theorem betaRat_holds : BetaRat Zd u u' F0 what₂ := by
   set g := frame (repF γ) with hg
   set F₂ := F'₂.fl with hF₂
   set Z₁ := starZh f g with hZ₁
-  have hlm : ∀ l, leadMinorE Z₁ l = leadMinorE (starZh f (starFrame γ)) l := fun l => (star_frame_lead_minor γ l).symm
-  have hZ₁d : Z₁.det ≠ 0 := by
-    rw [← FsLA.leadMinorE_full, hlm, FsLA.leadMinorE_full]; exact hZ₁d'
+  have hlm : ∀ l, leadMinorE Z₁ l = leadMinorE (starZh f (starFrame γ)) l := fun l =>
+    (star_frame_lead_minor γ l).symm
+  have hZ₁d : Z₁.det ≠ 0 := by rw [← FsLA.leadMinorE_full, hlm, FsLA.leadMinorE_full]; exact hZ₁d'
   have hx : leadMinorE Z₁ D.R.rS * Z.det = leadMinorE Z D.R.rS * Z₁.det := by
     rw [hlm, ← FsLA.leadMinorE_full Z₁, hlm, FsLA.leadMinorE_full]; exact hx'
   have hfF : f = F0.fvec := rfl
@@ -58,14 +60,17 @@ theorem betaRat_holds : BetaRat Zd u u' F0 what₂ := by
     FsLA.gram_fvec_last (repF γ).fl
   have h1f : ∀ a b, (a ≠ Fin.last D.R.rS ∨ b ≠ Fin.last D.R.rS) → (VS D).hT (f a) (f b) = 0 :=
     fun a b h => FsLA.gram_fvec_zero F0 a b h
-  have h2f : (VS D).hT (f (Fin.last D.R.rS)) (f (Fin.last D.R.rS)) = -CntLocal.Tn u := FsLA.gram_fvec_last F0
+  have h2f : (VS D).hT (f (Fin.last D.R.rS)) (f (Fin.last D.R.rS)) = - CntLocal.Tn u :=
+    FsLA.gram_fvec_last F0
   have hdZ1h : Z₁ᴴ.det ≠ 0 := by rw [Matrix.det_conjTranspose]; exact star_ne_zero.2 hZ₁d
   have hdg2 : (FsLA.gram (VS D) f F₂.fvec).det ≠ 0 := by
     rw [hg2, Matrix.det_conjTranspose]; exact star_ne_zero.2 hZd
-  have hx2 : leadMinorE (FsLA.gram (VS D) f F₂.fvec) D.R.rS * Z₁ᴴ.det =
-      leadMinorE Z₁ᴴ D.R.rS * (FsLA.gram (VS D) f F₂.fvec).det := by
-    rw [hg2, FsLA.lm_conjTranspose, FsLA.lm_conjTranspose, Matrix.det_conjTranspose, Matrix.det_conjTranspose,
-      ← star_mul', ← star_mul', mul_comm (leadMinorE Z D.R.rS), hx, mul_comm]
+  have hx2
+      : leadMinorE (FsLA.gram (VS D) f F₂.fvec) D.R.rS * Z₁ᴴ.det
+        = leadMinorE Z₁ᴴ D.R.rS * (FsLA.gram (VS D) f F₂.fvec).det := by
+    rw [hg2, FsLA.lm_conjTranspose, FsLA.lm_conjTranspose, Matrix.det_conjTranspose,
+      Matrix.det_conjTranspose, ← star_mul', ← star_mul', mul_comm (leadMinorE Z D.R.rS), hx,
+      mul_comm]
   obtain ⟨F₃, hZ3, hom3, hsp3⟩ := FsLA.frame_la F₂ f h1f h2f Z₁ᴴ hdZ1h hdg2 hx2
   set h := F₃.fvec with hh
   set uu := Sum.elim f g with huu
@@ -102,24 +107,30 @@ theorem betaRat_holds : BetaRat Zd u u' F0 what₂ := by
     · exact k2 a b
     · exact k3 a b
     · exact k4 a b
-  have hGg : (FsLA.gram (VS D) g F0.fvec).det * star (FsLA.gram (VS D) g F0.fvec).det -
-      CntLocal.Tn u * ((Tu D u' : ℕ) : D.host.E) *
-        (leadMinorE (FsLA.gram (VS D) g F0.fvec) D.R.rS * star (leadMinorE (FsLA.gram (VS D) g F0.fvec) D.R.rS))
+  have hGg
+      : (FsLA.gram (VS D) g F0.fvec).det * star (FsLA.gram (VS D) g F0.fvec).det
+          - CntLocal.Tn u * ((Tu D u' : ℕ) : D.host.E)
+            * (leadMinorE (FsLA.gram (VS D) g F0.fvec) D.R.rS
+              * star (leadMinorE (FsLA.gram (VS D) g F0.fvec) D.R.rS))
         ≠ 0 := by
     rw [← FsLA.leadMinorE_full]; exact hGv
   have hdet : (FsLA.gram (VS D) uu uu).det ≠ 0 := FsLA.gram_pair_det F0 g h1g h2g hZ₁d hGg
   have hGZ : Gflag F0 F₂ ≠ 0 := hTH.1.2.2
-  have hGg₂ : (FsLA.gram (VS D) F₂.fvec F0.fvec).det * star (FsLA.gram (VS D) F₂.fvec F0.fvec).det -
-      CntLocal.Tn u * ((Tu D u' : ℕ) : D.host.E) *
-        (leadMinorE (FsLA.gram (VS D) F₂.fvec F0.fvec) D.R.rS *
-          star (leadMinorE (FsLA.gram (VS D) F₂.fvec F0.fvec) D.R.rS)) ≠ 0 := by
+  have hGg₂
+      : (FsLA.gram (VS D) F₂.fvec F0.fvec).det * star (FsLA.gram (VS D) F₂.fvec F0.fvec).det
+          - CntLocal.Tn u * ((Tu D u' : ℕ) : D.host.E)
+            * (leadMinorE (FsLA.gram (VS D) F₂.fvec F0.fvec) D.R.rS
+              * star (leadMinorE (FsLA.gram (VS D) F₂.fvec F0.fvec) D.R.rS))
+        ≠ 0 := by
     rw [← FsLA.leadMinorE_full]; exact hGZ
   have hdetZ : (Zhat F0 F₂).det ≠ 0 := by
     have e : Zhat F0 F₂ = Z := hZ
-    rw [e]; exact hZd
+    rw [e]
+    exact hZd
   have hdetw : (FsLA.gram (VS D) ww ww).det ≠ 0 :=
-    FsLA.gram_pair_det F0 F₂.fvec (fun a b hab => FsLA.gram_fvec_zero F₂ a b hab) (FsLA.gram_fvec_last F₂)
-      hdetZ hGg₂
+    FsLA.gram_pair_det F0 F₂.fvec
+      (fun a b hab => FsLA.gram_fvec_zero F₂ a b hab)
+      (FsLA.gram_fvec_last F₂) hdetZ hGg₂
   have hsp : ∀ i, uu' i ∈ Submodule.span D.host.E (Set.range ww) := by
     have hsub : Set.range (Sum.elim F₂.fvec f) ⊆ Submodule.span D.host.E (Set.range ww) := by
       rintro _ ⟨k, rfl⟩
@@ -160,13 +171,14 @@ theorem betaRat_holds : BetaRat Zd u u' F0 what₂ := by
         rintro _ ⟨i, rfl⟩
         exact Submodule.subset_span ⟨Sum.inl i.castSucc, by simp [huu, hf, frame, FlagG.fvec]⟩
       rw [h1, hyU _ (hXu _ hΩd), add_zero]
-  have hkey : ∀ y y', (∀ k, (VS D).hT (uu k) y = 0) → (∀ k, (VS D).hT (uu k) y' = 0) →
-      (VS D).hT (FsLA.lin ww (FsLA.pc ww y)) (FsLA.lin ww (FsLA.pc ww y')) = 0 :=
+  have hkey
+      : ∀ y y',
+        (∀ k, (VS D).hT (uu k) y = 0) → (∀ k, (VS D).hT (uu k) y' = 0)
+          → (VS D).hT (FsLA.lin ww (FsLA.pc ww y)) (FsLA.lin ww (FsLA.pc ww y')) = 0 :=
     fun y y' hy hy' => NMoveP.hT_X_X F0 (hXq y hy) (hXq y' hy')
   obtain ⟨β, hiso, hβu, hβy⟩ := BRat.isometry_extension_two uu uu' ww hGr hdet hdetw hsp hkey
   refine ⟨β, hiso, fun b => hβu (Sum.inr b), fun w0 hw0 => ?_, ?_⟩
-  ·
-    have hw0u : ∀ k, (VS D).hT (uu k) w0 = 0 := fun k =>
+  · have hw0u : ∀ k, (VS D).hT (uu k) w0 = 0 := fun k =>
       (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth (VS D)).1 hw0 _
         (PI.PairCorankPos.W.frame_mem_UUE γ.lam hΛ (lf D F0) (repF γ) hLlf hLrep k)
     refine ⟨β w0, ?_, ?_, by rw [sub_self]; exact zero_mem _⟩
@@ -177,8 +189,7 @@ theorem betaRat_holds : BetaRat Zd u u' F0 what₂ := by
       exact (FsLA.hT_span_rem ww hdetw w0 x hxw).1
     · rw [hβy w0 hw0u, sub_sub_cancel]
       exact hXq w0 hw0u
-  ·
-    have homf : FsLA.om (VS D) F₂.fvec f = starOmL f (frame F'₂) := by
+  · have homf : FsLA.om (VS D) F₂.fvec f = starOmL f (frame F'₂) := by
       rw [FsLA.om, hg2, ← Matrix.adjugate_conjTranspose]
       simp only [starOmL, Matrix.conjTranspose_apply]
       rw [← hZ]

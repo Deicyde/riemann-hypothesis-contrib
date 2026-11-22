@@ -5,21 +5,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OmAOneApply
 
 @[expose] public section
 
-open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
+open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM
+  GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
 
 namespace GlobalTheory.RankFibreKer
 
-theorem indicator_slice_orbit_isLocallyConstant : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (a d : ℕ) (K : Subgroup (GL (Fin a) k)), IsOpen (K : Set (GL (Fin a) k)) → K ≤ KO k (Fin a) →
-    (∀ Y : Matrix (Fin a) (Fin d) k, Y.rank = a ↔ ∃ J, minor Y J ≠ 0) →
-    ∀ (s : Matrix (Fin a) (Fin d) k → GL (Fin a) k), ContinuousOn s {Y | Y.rank = a} →
-    (∀ Y : Matrix (Fin a) (Fin d) k, Y.rank = a → ((s Y)⁻¹).val * Y ∈ slice (k := k) a d) →
-    (∀ (Z : Matrix (Fin a) (Fin d) k) (g : GL (Fin a) k), Z ∈ slice (k := k) a d → g.val * Z ∈ slice (k := k) a d → g = 1) →
-    IsLocallyConstant (Set.indicator {Y : Matrix (Fin a) (Fin d) k | ∃ x ∈ K, ∃ Z ∈ slice (k := k) a d, Y = x.val * Z}
-      (1 : Matrix (Fin a) (Fin d) k → ℂ)) := by
+theorem indicator_slice_orbit_isLocallyConstant
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (a d : ℕ) (K : Subgroup (GL (Fin a) k)),
+      IsOpen (K : Set (GL (Fin a) k)) → K ≤ KO k (Fin a)
+        → (∀ Y : Matrix (Fin a) (Fin d) k, Y.rank = a ↔ ∃ J, minor Y J ≠ 0)
+        → ∀ (s : Matrix (Fin a) (Fin d) k → GL (Fin a) k),
+          ContinuousOn s {Y | Y.rank = a}
+            → (∀ Y : Matrix (Fin a) (Fin d) k, Y.rank = a → ((s Y)⁻¹).val * Y ∈ slice (k := k) a d)
+            → (∀ (Z : Matrix (Fin a) (Fin d) k) (g : GL (Fin a) k),
+              Z ∈ slice (k := k) a d → g.val * Z ∈ slice (k := k) a d → g = 1)
+            → IsLocallyConstant (Set.indicator
+              {Y : Matrix (Fin a) (Fin d) k | ∃ x ∈ K, ∃ Z ∈ slice (k := k) a d, Y = x.val * Z}
+              (1 : Matrix (Fin a) (Fin d) k → ℂ)) := by
   intro k _ _ _ _ a d K hKo hKO hrank s hs hsec huniq
   set T : Set (Matrix (Fin a) (Fin d) k) := {Y | ∃ x ∈ K, ∃ Z ∈ slice (k := k) a d, Y = x.val * Z} with hTdef
   set O : Set (Matrix (Fin a) (Fin d) k) := {Y | Y.rank = a} with hOdef
-  have hmc : ∀ J : Fin a ↪ Fin d, Continuous fun Y : Matrix (Fin a) (Fin d) k => minor Y J := fun J => by
+  have hmc
+      : ∀ J : Fin a ↪ Fin d, Continuous fun Y : Matrix (Fin a) (Fin d) k => minor Y J := fun J => by
     unfold minor
     exact (continuous_id.matrix_submatrix id J).matrix_det
 
@@ -33,7 +41,8 @@ theorem indicator_slice_orbit_isLocallyConstant : ∀ (k : Type) [Field k] [Valu
       have h3 : x = s (x.val * Z) := by
         have := congrArg (fun g => s (x.val * Z) * g) h2
         simpa [← mul_assoc] using this
-      rw [← h3]; exact hx
+      rw [← h3]
+      exact hx
     · intro h
       refine ⟨s Y, h, _, hsec Y hY, ?_⟩
       rw [← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mul]
@@ -65,8 +74,7 @@ theorem indicator_slice_orbit_isLocallyConstant : ∀ (k : Type) [Field k] [Valu
     constructor
     · intro h; exact ⟨hTO h, (hT Y (hTO h)).1 h⟩
     · rintro ⟨h1, h2⟩; exact (hT Y h1).2 h2
-  have hTopen : IsOpen T := by
-    rw [hTeq]; exact hs.isOpen_inter_preimage hOopen hKo
+  have hTopen : IsOpen T := by rw [hTeq]; exact hs.isOpen_inter_preimage hOopen hKo
   have h0 : {x : k | valuation k x < 1} ∈ nhds (0 : k) := by
     have := (IsValuativeTopology.hasBasis_nhds_zero k).mem_of_mem (i := 1) trivial
     simpa using this
@@ -75,15 +83,18 @@ theorem indicator_slice_orbit_isLocallyConstant : ∀ (k : Type) [Field k] [Valu
     intro Y hY
     by_cases hYO : Y ∈ O
     · have hsY : s Y ∉ K := fun h => hY ((hT Y hYO).2 h)
-      have ho : IsOpen (O ∩ s ⁻¹' (K : Set (GL (Fin a) k))ᶜ) := hs.isOpen_inter_preimage hOopen hKc.isOpen_compl
+      have ho : IsOpen (O ∩ s ⁻¹' (K : Set (GL (Fin a) k))ᶜ) :=
+        hs.isOpen_inter_preimage hOopen hKc.isOpen_compl
       refine Filter.mem_of_superset (ho.mem_nhds ⟨hYO, hsY⟩) fun Y' hY' hT' => hY'.2 ?_
       exact (hT Y' hY'.1).1 hT'
-    · have hz : ∀ J, minor Y J = 0 := by
-        intro J; by_contra hne; exact hYO ((hrank Y).2 ⟨J, hne⟩)
-      have hW : (⋂ J : Fin a ↪ Fin d, (fun Y' => minor Y' J) ⁻¹' {x : k | valuation k x < 1}) ∈ nhds Y := by
+    · have hz : ∀ J, minor Y J = 0 := by intro J; by_contra hne; exact hYO ((hrank Y).2 ⟨J, hne⟩)
+      have hW
+          : (⋂ J : Fin a ↪ Fin d, (fun Y' => minor Y' J) ⁻¹' {x : k | valuation k x < 1})
+            ∈ nhds Y := by
         refine Filter.iInter_mem.2 fun J => ?_
         refine (hmc J).continuousAt.preimage_mem_nhds ?_
-        rw [hz J]; exact h0
+        rw [hz J]
+        exact h0
       refine Filter.mem_of_superset hW fun Y' hY' hT' => ?_
       obtain ⟨J, hJ⟩ := hTmin Y' hT'
       have := Set.mem_iInter.1 hY' J

@@ -13,7 +13,8 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.DivisionValues Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.HermitianLatticesTheory
+open Formalism.BasicNotions Formalism.DivisionValues Formalism.L2.DIV
+  Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.HermitianLatticesTheory
 
 namespace GFam
 
@@ -34,14 +35,13 @@ structure Rat : Prop where
 
 def Free : Prop := ∀ b, (F.mem b).Free
 
-@[reducible] def toH (h : F.Ok) (L : Submodule (𝓞 K) F.Forms) : HLat K where
+@[reducible]
+def toH (h : F.Ok) (L : Submodule (𝓞 K) F.Forms) : HLat K where
   V := F.Forms
   ι := Fin (F.toCSD h).dim
   b := (F.toCSD h).basis.map (F.res h).symm
   X := stdFrame (F.toCSD h).H
   L := L
-
-
 
 variable {F}
 
@@ -72,10 +72,12 @@ end GSD
 
 section FormFam
 
-variable {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))} {β : Type} [Fintype β] [DecidableEq β]
+variable
+  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))} {β : Type}
+  [Fintype β] [DecidableEq β]
 
-
-variable (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : β → LevFam X.E X.K n SG)
+variable
+  (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : β → LevFam X.E X.K n SG)
 
 end FormFam
 

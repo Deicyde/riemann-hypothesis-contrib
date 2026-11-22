@@ -13,22 +13,29 @@ open PrismSpan
 variable {P Q : Type} [Group P] [Group Q]
 
 def ColKillP : Prop :=
-  ∀ (P Q : Type) [Group P] [Group Q] (pr : P →* Q) (s : Q →* P), (∀ g, pr (s g) = g) →
-    ∀ (u : Q), (∀ g, g * u = u * g) → ∀ (q : ℕ) (f : Polynomial ℝ),
-    (∀ c : (Fin (q + 2) → P) → ℝ, InvS (pr.ker : Set P) c → dc c = 0 →
-      ∃ e : (Fin (q + 1) → P) → ℝ, InvS (pr.ker : Set P) e ∧
-        Polynomial.aeval (mapOp (fun y => (s u)⁻¹ * y * s u) (q + 2)) f c = dc e) →
-    ∀ {a : ℕ} (x : Bi P Q (a + 1) (q + 2)), PInv pr x → dv x = 0 →
-      ∃ E : Bi P Q (a + 1) (q + 1), PInv pr E ∧ Polynomial.aeval (TcL (s u) (a + 1) (q + 2)) f x = dv E
+  ∀ (P Q : Type) [Group P] [Group Q] (pr : P →* Q) (s : Q →* P),
+    (∀ g, pr (s g) = g)
+      → ∀ (u : Q),
+        (∀ g, g * u = u * g)
+          → ∀ (q : ℕ) (f : Polynomial ℝ),
+            (∀ c : (Fin (q + 2) → P) → ℝ,
+                InvS (pr.ker : Set P) c → dc c = 0
+                  → ∃ e : (Fin (q + 1) → P) → ℝ,
+                    InvS (pr.ker : Set P) e
+                      ∧ Polynomial.aeval (mapOp (fun y => (s u)⁻¹ * y * s u) (q + 2)) f c = dc e)
+              → ∀ {a : ℕ} (x : Bi P Q (a + 1) (q + 2)),
+                PInv pr x → dv x = 0
+                  → ∃ E : Bi P Q (a + 1) (q + 1),
+                    PInv pr E ∧ Polynomial.aeval (TcL (s u) (a + 1) (q + 2)) f x = dv E
 
 section
 variable (pr : P →* Q) (s : Q →* P) (hs : ∀ g, pr (s g) = g) (u : Q) (hu : ∀ g, g * u = u * g)
 include hs hu
 
-theorem ru_tc {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 0) :
-    Ru u z - Tc (s u) z = dv (Tc (s u) (Hv (s u)⁻¹ z)) := by
-  have prism_sub {Y : Type} (φ : Y → Y) : ∀ {n : ℕ} (F G : (Fin (n + 1) → Y) → ℝ),
-      prism φ (F - G) = prism φ F - prism φ G := by
+theorem ru_tc {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 0)
+    : Ru u z - Tc (s u) z = dv (Tc (s u) (Hv (s u)⁻¹ z)) := by
+  have prism_sub {Y : Type} (φ : Y → Y)
+      : ∀ {n : ℕ} (F G : (Fin (n + 1) → Y) → ℝ), prism φ (F - G) = prism φ F - prism φ G := by
     intro n
     induction n with
     | zero =>
@@ -39,30 +46,39 @@ theorem ru_tc {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 
       intro F G
       funext y
       rw [Pi.sub_apply, prism_succ, prism_succ, prism_succ]
-      have hsub : prism φ (fun w => F (Fin.cons (y 0) w) - G (Fin.cons (y 0) w)) (Fin.tail y) =
-          prism φ (fun w => F (Fin.cons (y 0) w)) (Fin.tail y) -
-            prism φ (fun w => G (Fin.cons (y 0) w)) (Fin.tail y) :=
+      have hsub
+          : prism φ (fun w => F (Fin.cons (y 0) w) - G (Fin.cons (y 0) w)) (Fin.tail y)
+            = prism φ (fun w => F (Fin.cons (y 0) w)) (Fin.tail y)
+              - prism φ (fun w => G (Fin.cons (y 0) w)) (Fin.tail y) :=
         congrFun (ih (fun w => F (Fin.cons (y 0) w)) (fun w => G (Fin.cons (y 0) w))) (Fin.tail y)
-      change _ - _ - prism φ (fun w => F (Fin.cons (y 0) w) - G (Fin.cons (y 0) w))
-        (Fin.tail y) = _
+      change _ - _ - prism φ (fun w => F (Fin.cons (y 0) w) - G (Fin.cons (y 0) w)) (Fin.tail y) = _
       rw [hsub]
       ring
-  have prism_dc {Y : Type} (φ : Y → Y) : ∀ (m : ℕ) (F : (Fin (m + 2) → Y) → ℝ) (y : Fin (m + 2) → Y),
-      dc (prism φ F) y + prism φ (dc F) y = F (fun i => φ (y i)) - F y := by
+  have prism_dc {Y : Type} (φ : Y → Y)
+      : ∀ (m : ℕ) (F : (Fin (m + 2) → Y) → ℝ) (y : Fin (m + 2) → Y),
+        dc (prism φ F) y + prism φ (dc F) y = F (fun i => φ (y i)) - F y := by
     intro m
     induction m with
     | zero =>
       intro F y
       simp [dc, prism, Fin.sum_univ_succ, Fin.tail]
-      have h1 : (Fin.cons (y 0) (fun i : Fin 1 => φ (y (Fin.succAbove 1 i))) : Fin 2 → Y) =
-          fun j => (Fin.cons (y 0) (fun i => φ (y i)) : Fin 3 → Y) (Fin.succAbove 2 j) := by
+      have h1
+          : (Fin.cons (y 0) (fun i : Fin 1 => φ (y (Fin.succAbove 1 i))) : Fin 2 → Y)
+            = fun j => (Fin.cons (y 0) (fun i => φ (y i)) : Fin 3 → Y) (Fin.succAbove 2 j) := by
         funext j; fin_cases j <;> rfl
-      have h2 : (fun j => (Fin.cons (y 0) (Fin.cons (y 1) (fun i : Fin 1 => φ (y i.succ)) : Fin 2 → Y) :
-          Fin 3 → Y) (Fin.succAbove 1 j)) =
-          fun j => (Fin.cons (y 0) (fun i => φ (y i)) : Fin 3 → Y) (Fin.succAbove 1 j) := by
+      have h2
+          : (fun j =>
+              (Fin.cons (y 0) (Fin.cons (y 1) (fun i : Fin 1 => φ (y i.succ)) : Fin 2 → Y)
+                  : Fin 3 → Y)
+                (Fin.succAbove 1 j))
+            = fun j => (Fin.cons (y 0) (fun i => φ (y i)) : Fin 3 → Y) (Fin.succAbove 1 j) := by
         funext j; fin_cases j <;> rfl
-      have h3 : (fun j => (Fin.cons (y 0) (Fin.cons (y 1) (fun i : Fin 1 => φ (y i.succ)) : Fin 2 → Y) :
-          Fin 3 → Y) (Fin.succAbove 2 j)) = y := by
+      have h3
+          : (fun j =>
+              (Fin.cons (y 0) (Fin.cons (y 1) (fun i : Fin 1 => φ (y i.succ)) : Fin 2 → Y)
+                  : Fin 3 → Y)
+                (Fin.succAbove 2 j))
+            = y := by
         funext j; fin_cases j <;> rfl
       rw [h1, h2, h3]
       ring
@@ -73,22 +89,25 @@ theorem ru_tc {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 
       set w := Fin.tail y
       have h := ih (fun w' => F (Fin.cons a w')) w
       rw [dc_cons, prism_cons]
-      have e1 : (fun w' => prism φ F (Fin.cons a w')) =
-          (fun w' => F (Fin.cons a (Fin.cons (φ a) (fun i => φ (w' i))))) -
-            prism φ (fun w' => F (Fin.cons a w')) := by
+      have e1
+          : (fun w' => prism φ F (Fin.cons a w'))
+            = (fun w' => F (Fin.cons a (Fin.cons (φ a) (fun i => φ (w' i)))))
+              - prism φ (fun w' => F (Fin.cons a w')) := by
         funext w'; rw [prism_cons]; rfl
-      have e2 : (fun w' => dc F (Fin.cons a w')) =
-          F - dc (fun w' => F (Fin.cons a w')) := by
+      have e2 : (fun w' => dc F (Fin.cons a w')) = F - dc (fun w' => F (Fin.cons a w')) := by
         funext w'; rw [dc_cons]; rfl
       rw [e1, e2, dc_sub, prism_sub, dc_cons, dc_cons]
       simp only [Pi.sub_apply]
       rw [comp_cons']
-      have e4 : dc (fun w' => F (Fin.cons a (Fin.cons (φ a) (fun i => φ (w' i))))) w =
-          dc (fun w' => F (Fin.cons a (Fin.cons (φ a) w'))) (fun i => φ (w i)) := rfl
+      have e4
+          : dc (fun w' => F (Fin.cons a (Fin.cons (φ a) (fun i => φ (w' i))))) w
+            = dc (fun w' => F (Fin.cons a (Fin.cons (φ a) w'))) (fun i => φ (w i)) :=
+        rfl
       rw [e4]
       linarith only [h]
-  have hpz : ∀ (n : ℕ) (y : Fin n → P),
-      prism (fun p => p * (s u)⁻¹) (0 : (Fin (n + 1) → P) → ℝ) y = 0 := by
+  have hpz
+      : ∀ (n : ℕ) (y : Fin n → P),
+        prism (fun p => p * (s u)⁻¹) (0 : (Fin (n + 1) → P) → ℝ) y = 0 := by
     intro n
     induction n with
     | zero => intro y; rfl
@@ -106,8 +125,10 @@ theorem ru_tc {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 
   simp only [Pi.sub_apply]
   exact h.symm
 
-theorem pow_closed {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 0) :
-    ∀ k : ℕ, PInv pr (((RuL (P := P) u a (b + 2)) ^ k) z) ∧ dv (((RuL (P := P) u a (b + 2)) ^ k) z) = 0 := by
+theorem pow_closed {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 0)
+    : ∀ k : ℕ,
+      PInv pr (((RuL (P := P) u a (b + 2)) ^ k) z)
+        ∧ dv (((RuL (P := P) u a (b + 2)) ^ k) z) = 0 := by
   intro k
   induction k with
   | zero => exact ⟨hz, hdz⟩
@@ -123,26 +144,30 @@ theorem pow_closed {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv
     · funext x y
       exact congrFun (congrFun h2 (fun i => x i * u)) y
 
-theorem pow_diff {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 0) :
-    ∀ k : ℕ, ∃ E : Bi P Q a (b + 1), PInv pr E ∧
-      ((RuL (P := P) u a (b + 2)) ^ k) z - ((TcL (s u) a (b + 2)) ^ k) z = dv E := by
-  have htr : ∀ (n : ℕ) (G : (Fin (n + 1) → P) → ℝ) (g : P) (y : Fin n → P),
-      prism (fun p => p * (s u)⁻¹) G (fun j => g * y j) =
-        prism (fun p => p * (s u)⁻¹) (fun v => G (fun j => g * v j)) y := by
+theorem pow_diff {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 0)
+    : ∀ k : ℕ, ∃ E : Bi P Q a (b + 1),
+      PInv pr E ∧ ((RuL (P := P) u a (b + 2)) ^ k) z - ((TcL (s u) a (b + 2)) ^ k) z = dv E := by
+  have htr
+      : ∀ (n : ℕ) (G : (Fin (n + 1) → P) → ℝ) (g : P) (y : Fin n → P),
+        prism (fun p => p * (s u)⁻¹) G (fun j => g * y j)
+          = prism (fun p => p * (s u)⁻¹) (fun v => G (fun j => g * v j)) y := by
     intro n
     induction n with
     | zero => intro G g y; rfl
     | succ n ih =>
       intro G g y
       rw [prism_succ, prism_succ]
-      have e1 : (Fin.cons (g * y 0) (fun i => g * y i * (s u)⁻¹) : Fin (n + 2) → P) =
-          fun j => g * (Fin.cons (y 0) (fun i => y i * (s u)⁻¹) : Fin (n + 2) → P) j := by
+      have e1
+          : (Fin.cons (g * y 0) (fun i => g * y i * (s u)⁻¹) : Fin (n + 2) → P)
+            = fun j => g * (Fin.cons (y 0) (fun i => y i * (s u)⁻¹) : Fin (n + 2) → P) j := by
         funext j
         refine Fin.cases ?_ (fun i => ?_) j
         · simp
         · simp [mul_assoc]
-      have e2 : ∀ v : Fin (n + 1) → P, (Fin.cons (g * y 0) (fun j => g * v j) : Fin (n + 2) → P) =
-          fun j => g * (Fin.cons (y 0) v : Fin (n + 2) → P) j := by
+      have e2
+          : ∀ v : Fin (n + 1) → P,
+            (Fin.cons (g * y 0) (fun j => g * v j) : Fin (n + 2) → P)
+              = fun j => g * (Fin.cons (y 0) v : Fin (n + 2) → P) j := by
         intro v
         funext j
         refine Fin.cases ?_ (fun i => ?_) j
@@ -159,15 +184,16 @@ theorem pow_diff {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z
     intro c F hF g x y
     have h := hF ((s u)⁻¹ * g * s u) x (fun j => (s u)⁻¹ * y j * s u)
     rw [hg] at h
-    change F (fun i => pr g * x i) (fun j => (s u)⁻¹ * (g * y j) * s u) = F x (fun j => (s u)⁻¹ * y j * s u)
+    change F (fun i => pr g * x i) (fun j => (s u)⁻¹ * (g * y j) * s u)
+      = F x (fun j => (s u)⁻¹ * y j * s u)
     rw [← h]
     congr 1
     funext j
     group
   have hHvP : ∀ {c : ℕ} (F : Bi P Q a (c + 1)), PInv pr F → PInv pr (Hv (s u)⁻¹ F) := by
     intro c F hF g x y
-    change prism (fun p => p * (s u)⁻¹) (F (fun i => pr g * x i)) (fun j => g * y j) =
-      prism (fun p => p * (s u)⁻¹) (F x) y
+    change prism (fun p => p * (s u)⁻¹) (F (fun i => pr g * x i)) (fun j => g * y j)
+      = prism (fun p => p * (s u)⁻¹) (F x) y
     rw [htr]
     congr 1
     funext v
@@ -193,8 +219,10 @@ theorem pow_diff {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z
       rw [pow_succ', pow_succ', Module.End.mul_apply, Module.End.mul_apply]
       generalize ((RuL (P := P) u a (b + 2)) ^ k) z = w at hEq h1 hw1 hw2 ⊢
       generalize ((TcL (s u) a (b + 2)) ^ k) z = T at hEq ⊢
-      have hsplit : RuL (P := P) u a (b + 2) w - TcL (s u) a (b + 2) T =
-          (RuL (P := P) u a (b + 2) w - TcL (s u) a (b + 2) w) + TcL (s u) a (b + 2) (w - T) := by
+      have hsplit
+          : RuL (P := P) u a (b + 2) w - TcL (s u) a (b + 2) T
+            = (RuL (P := P) u a (b + 2) w - TcL (s u) a (b + 2) w)
+              + TcL (s u) a (b + 2) (w - T) := by
         rw [map_sub]
         abel
       rw [hsplit, hEq, hdvadd]
@@ -202,9 +230,13 @@ theorem pow_diff {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z
       rw [h1]
       rfl
 
-theorem aeval_diff {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 0) (f : Polynomial ℝ) :
-    ∃ E : Bi P Q a (b + 1), PInv pr E ∧
-      Polynomial.aeval (RuL (P := P) u a (b + 2)) f z - Polynomial.aeval (TcL (s u) a (b + 2)) f z = dv E := by
+theorem aeval_diff
+    {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv z = 0) (f : Polynomial ℝ)
+    : ∃ E : Bi P Q a (b + 1),
+      PInv pr E
+        ∧ Polynomial.aeval (RuL (P := P) u a (b + 2)) f z
+            - Polynomial.aeval (TcL (s u) a (b + 2)) f z
+          = dv E := by
   have hdvadd : ∀ A B : Bi P Q a (b + 1), dv (A + B) = dv A + dv B := by
     intro A B
     funext x y
@@ -221,7 +253,8 @@ theorem aeval_diff {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv
     · intro g x y
       simp only [Pi.add_apply]
       rw [h1 g x y, h2 g x y]
-    · rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, hdvadd, ← e1, ← e2]
+    · rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, hdvadd,
+        ← e1, ← e2]
       abel
   | monomial n c =>
     obtain ⟨E, hE, e⟩ := pow_diff pr s hs u hu hz hdz n
@@ -230,8 +263,8 @@ theorem aeval_diff {a b : ℕ} {z : Bi P Q a (b + 2)} (hz : PInv pr z) (hdz : dv
       simp only [Pi.smul_apply]
       rw [hE g x y]
     · rw [Polynomial.aeval_monomial, Polynomial.aeval_monomial, Module.End.mul_apply,
-        Module.End.mul_apply, Module.algebraMap_end_apply, Module.algebraMap_end_apply,
-        ← smul_sub, e, hdvsmul]
+        Module.End.mul_apply, Module.algebraMap_end_apply, Module.algebraMap_end_apply, ← smul_sub,
+        e, hdvsmul]
 
 end
 
@@ -259,15 +292,16 @@ theorem e2VanishingFirstColumn_of_colKillP (hK : ColKillP) : E2VanishingFirstCol
     change w (fun i => x i * u) y = w x y
     have hx1 : (fun i : Fin 1 => x i * u) = fun _ => x 0 * u := by
       funext i; rw [Subsingleton.elim i 0]
-    have hx2 : x = fun _ => x 0 := by
-      funext i; rw [Subsingleton.elim i 0]
+    have hx2 : x = fun _ => x 0 := by funext i; rw [Subsingleton.elim i 0]
     rw [hx1]
     conv_rhs => rw [hx2]
     linarith
-  have hev : ∀ g : Polynomial ℝ, Polynomial.aeval (RuL (P := P) u 1 (q + 2)) g w = g.eval 1 • w := by
+  have hev
+      : ∀ g : Polynomial ℝ, Polynomial.aeval (RuL (P := P) u 1 (q + 2)) g w = g.eval 1 • w := by
     intro g
     induction g using Polynomial.induction_on' with
-    | add p r hp hr => rw [map_add (f := _), LinearMap.add_apply, hp, hr, Polynomial.eval_add, add_smul]
+    | add p r hp hr =>
+      rw [map_add (f := _), LinearMap.add_apply, hp, hr, Polynomial.eval_add, add_smul]
     | monomial n c =>
       rw [Polynomial.aeval_monomial, Module.End.mul_apply, Module.algebraMap_end_apply,
         Polynomial.eval_monomial, one_pow, mul_one]
@@ -284,8 +318,8 @@ theorem e2VanishingFirstColumn_of_colKillP (hK : ColKillP) : E2VanishingFirstCol
 
 theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherColumns := by
   intro P Q _ _ pr s hs u hu m hm p q hq x hx hdx hdh
-  have prism_sub {Y : Type} (φ : Y → Y) : ∀ {n : ℕ} (F G : (Fin (n + 1) → Y) → ℝ),
-      prism φ (F - G) = prism φ F - prism φ G := by
+  have prism_sub {Y : Type} (φ : Y → Y)
+      : ∀ {n : ℕ} (F G : (Fin (n + 1) → Y) → ℝ), prism φ (F - G) = prism φ F - prism φ G := by
     intro n
     induction n with
     | zero =>
@@ -296,30 +330,39 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
       intro F G
       funext y
       rw [Pi.sub_apply, prism_succ, prism_succ, prism_succ]
-      have hsub : prism φ (fun w => F (Fin.cons (y 0) w) - G (Fin.cons (y 0) w)) (Fin.tail y) =
-          prism φ (fun w => F (Fin.cons (y 0) w)) (Fin.tail y) -
-            prism φ (fun w => G (Fin.cons (y 0) w)) (Fin.tail y) :=
+      have hsub
+          : prism φ (fun w => F (Fin.cons (y 0) w) - G (Fin.cons (y 0) w)) (Fin.tail y)
+            = prism φ (fun w => F (Fin.cons (y 0) w)) (Fin.tail y)
+              - prism φ (fun w => G (Fin.cons (y 0) w)) (Fin.tail y) :=
         congrFun (ih (fun w => F (Fin.cons (y 0) w)) (fun w => G (Fin.cons (y 0) w))) (Fin.tail y)
-      change _ - _ - prism φ (fun w => F (Fin.cons (y 0) w) - G (Fin.cons (y 0) w))
-        (Fin.tail y) = _
+      change _ - _ - prism φ (fun w => F (Fin.cons (y 0) w) - G (Fin.cons (y 0) w)) (Fin.tail y) = _
       rw [hsub]
       ring
-  have prism_dc {Y : Type} (φ : Y → Y) : ∀ (m : ℕ) (F : (Fin (m + 2) → Y) → ℝ) (y : Fin (m + 2) → Y),
-      dc (prism φ F) y + prism φ (dc F) y = F (fun i => φ (y i)) - F y := by
+  have prism_dc {Y : Type} (φ : Y → Y)
+      : ∀ (m : ℕ) (F : (Fin (m + 2) → Y) → ℝ) (y : Fin (m + 2) → Y),
+        dc (prism φ F) y + prism φ (dc F) y = F (fun i => φ (y i)) - F y := by
     intro m
     induction m with
     | zero =>
       intro F y
       simp [dc, prism, Fin.sum_univ_succ, Fin.tail]
-      have h1 : (Fin.cons (y 0) (fun i : Fin 1 => φ (y (Fin.succAbove 1 i))) : Fin 2 → Y) =
-          fun j => (Fin.cons (y 0) (fun i => φ (y i)) : Fin 3 → Y) (Fin.succAbove 2 j) := by
+      have h1
+          : (Fin.cons (y 0) (fun i : Fin 1 => φ (y (Fin.succAbove 1 i))) : Fin 2 → Y)
+            = fun j => (Fin.cons (y 0) (fun i => φ (y i)) : Fin 3 → Y) (Fin.succAbove 2 j) := by
         funext j; fin_cases j <;> rfl
-      have h2 : (fun j => (Fin.cons (y 0) (Fin.cons (y 1) (fun i : Fin 1 => φ (y i.succ)) : Fin 2 → Y) :
-          Fin 3 → Y) (Fin.succAbove 1 j)) =
-          fun j => (Fin.cons (y 0) (fun i => φ (y i)) : Fin 3 → Y) (Fin.succAbove 1 j) := by
+      have h2
+          : (fun j =>
+              (Fin.cons (y 0) (Fin.cons (y 1) (fun i : Fin 1 => φ (y i.succ)) : Fin 2 → Y)
+                  : Fin 3 → Y)
+                (Fin.succAbove 1 j))
+            = fun j => (Fin.cons (y 0) (fun i => φ (y i)) : Fin 3 → Y) (Fin.succAbove 1 j) := by
         funext j; fin_cases j <;> rfl
-      have h3 : (fun j => (Fin.cons (y 0) (Fin.cons (y 1) (fun i : Fin 1 => φ (y i.succ)) : Fin 2 → Y) :
-          Fin 3 → Y) (Fin.succAbove 2 j)) = y := by
+      have h3
+          : (fun j =>
+              (Fin.cons (y 0) (Fin.cons (y 1) (fun i : Fin 1 => φ (y i.succ)) : Fin 2 → Y)
+                  : Fin 3 → Y)
+                (Fin.succAbove 2 j))
+            = y := by
         funext j; fin_cases j <;> rfl
       rw [h1, h2, h3]
       ring
@@ -330,21 +373,24 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
       set w := Fin.tail y
       have h := ih (fun w' => F (Fin.cons a w')) w
       rw [dc_cons, prism_cons]
-      have e1 : (fun w' => prism φ F (Fin.cons a w')) =
-          (fun w' => F (Fin.cons a (Fin.cons (φ a) (fun i => φ (w' i))))) -
-            prism φ (fun w' => F (Fin.cons a w')) := by
+      have e1
+          : (fun w' => prism φ F (Fin.cons a w'))
+            = (fun w' => F (Fin.cons a (Fin.cons (φ a) (fun i => φ (w' i)))))
+              - prism φ (fun w' => F (Fin.cons a w')) := by
         funext w'; rw [prism_cons]; rfl
-      have e2 : (fun w' => dc F (Fin.cons a w')) =
-          F - dc (fun w' => F (Fin.cons a w')) := by
+      have e2 : (fun w' => dc F (Fin.cons a w')) = F - dc (fun w' => F (Fin.cons a w')) := by
         funext w'; rw [dc_cons]; rfl
       rw [e1, e2, dc_sub, prism_sub, dc_cons, dc_cons]
       simp only [Pi.sub_apply]
       rw [comp_cons']
-      have e4 : dc (fun w' => F (Fin.cons a (Fin.cons (φ a) (fun i => φ (w' i))))) w =
-          dc (fun w' => F (Fin.cons a (Fin.cons (φ a) w'))) (fun i => φ (w i)) := rfl
+      have e4
+          : dc (fun w' => F (Fin.cons a (Fin.cons (φ a) (fun i => φ (w' i))))) w
+            = dc (fun w' => F (Fin.cons a (Fin.cons (φ a) w'))) (fun i => φ (w i)) :=
+        rfl
       rw [e4]
       linarith only [h]
-  have hpz : ∀ (n : ℕ) (y : Fin n → Q), prism (fun v => v * u) (0 : (Fin (n + 1) → Q) → ℝ) y = 0 := by
+  have hpz
+      : ∀ (n : ℕ) (y : Fin n → Q), prism (fun v => v * u) (0 : (Fin (n + 1) → Q) → ℝ) y = 0 := by
     intro n
     induction n with
     | zero => intro y; rfl
@@ -354,8 +400,10 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
       have : (fun w : Fin (n + 1) → Q => (0 : (Fin (n + 2) → Q) → ℝ) (Fin.cons (y 0) w)) = 0 := rfl
       rw [this, ih]
       simp
-  have hlin : ∀ (n : ℕ) (k : ℕ) (c : Fin k → ℝ) (F : Fin k → (Fin (n + 1) → Q) → ℝ) (y : Fin n → Q),
-      prism (fun v => v * u) (fun w => ∑ i, c i * F i w) y = ∑ i, c i * prism (fun v => v * u) (F i) y := by
+  have hlin
+      : ∀ (n : ℕ) (k : ℕ) (c : Fin k → ℝ) (F : Fin k → (Fin (n + 1) → Q) → ℝ) (y : Fin n → Q),
+        prism (fun v => v * u) (fun w => ∑ i, c i * F i w) y
+          = ∑ i, c i * prism (fun v => v * u) (F i) y := by
     intro n
     induction n with
     | zero =>
@@ -370,23 +418,27 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
       congr 1
       funext i
       ring
-  have htr : ∀ (n : ℕ) (G : (Fin (n + 1) → Q) → ℝ) (g : Q) (y : Fin n → Q),
-      prism (fun v => v * u) G (fun j => g * y j) =
-        prism (fun v => v * u) (fun v => G (fun j => g * v j)) y := by
+  have htr
+      : ∀ (n : ℕ) (G : (Fin (n + 1) → Q) → ℝ) (g : Q) (y : Fin n → Q),
+        prism (fun v => v * u) G (fun j => g * y j)
+          = prism (fun v => v * u) (fun v => G (fun j => g * v j)) y := by
     intro n
     induction n with
     | zero => intro G g y; rfl
     | succ n ih =>
       intro G g y
       rw [prism_succ, prism_succ]
-      have e1 : (Fin.cons (g * y 0) (fun i => g * y i * u) : Fin (n + 2) → Q) =
-          fun j => g * (Fin.cons (y 0) (fun i => y i * u) : Fin (n + 2) → Q) j := by
+      have e1
+          : (Fin.cons (g * y 0) (fun i => g * y i * u) : Fin (n + 2) → Q)
+            = fun j => g * (Fin.cons (y 0) (fun i => y i * u) : Fin (n + 2) → Q) j := by
         funext j
         refine Fin.cases ?_ (fun i => ?_) j
         · simp
         · simp [mul_assoc]
-      have e2 : ∀ v : Fin (n + 1) → Q, (Fin.cons (g * y 0) (fun j => g * v j) : Fin (n + 2) → Q) =
-          fun j => g * (Fin.cons (y 0) v : Fin (n + 2) → Q) j := by
+      have e2
+          : ∀ v : Fin (n + 1) → Q,
+            (Fin.cons (g * y 0) (fun j => g * v j) : Fin (n + 2) → Q)
+              = fun j => g * (Fin.cons (y 0) v : Fin (n + 2) → Q) j := by
         intro v
         funext j
         refine Fin.cases ?_ (fun i => ?_) j
@@ -407,8 +459,8 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
     exact h
   have hB : PInv pr H := by
     intro g x' y
-    change prism (fun v => v * u) (fun x'' => x x'' (fun j => g * y j)) (fun i => pr g * x' i) =
-      prism (fun v => v * u) (fun x'' => x x'' y) x'
+    change prism (fun v => v * u) (fun x'' => x x'' (fun j => g * y j)) (fun i => pr g * x' i)
+      = prism (fun v => v * u) (fun x'' => x x'' y) x'
     rw [htr]
     congr 1
     funext v
@@ -417,9 +469,15 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
     funext x' y
     change dc (fun y' => prism (fun v => v * u) (fun x'' => x x'' y') x') y = 0
     simp only [dc]
-    have := hlin (p + 1) (q + 3) (fun i => (-1) ^ (i : ℕ)) (fun i x'' => x x'' (fun j => y (i.succAbove j))) x'
+    have :=
+      hlin (p + 1) (q + 3)
+        (fun i => (-1) ^ (i : ℕ))
+        (fun i x'' => x x'' (fun j => y (i.succAbove j)))
+        x'
     rw [← this]
-    have h0 : (fun w => ∑ i : Fin (q + 3), (-1 : ℝ) ^ (i : ℕ) * x w (fun j => y (i.succAbove j))) = 0 := by
+    have h0
+        : (fun w => ∑ i : Fin (q + 3), (-1 : ℝ) ^ (i : ℕ) * x w (fun j => y (i.succAbove j)))
+          = 0 := by
       funext w
       exact congrFun (congrFun hdx w) y
     rw [h0, hpz]
@@ -439,8 +497,10 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
     intro a b c A
     funext x y
     simp [dh, dc, Finset.mul_sum, mul_left_comm]
-  have hD : ∀ g : Polynomial ℝ, PInv pr (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H) ∧
-      dv (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H) = 0 := by
+  have hD
+      : ∀ g : Polynomial ℝ,
+        PInv pr (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H)
+          ∧ dv (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H) = 0 := by
     intro g
     induction g using Polynomial.induction_on' with
     | add r t hr ht =>
@@ -458,13 +518,15 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
         simp only [Pi.smul_apply]
         rw [h1 g' x' y]
       · rw [hdvsmul, h2, smul_zero]
-  have hE : ∀ (g : Polynomial ℝ) (F : Bi P Q (p + 1) (q + 2)),
-      Polynomial.aeval (RuL (P := P) u (p + 2) (q + 2)) g (dh F) =
-        dh (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g F) := by
+  have hE
+      : ∀ (g : Polynomial ℝ) (F : Bi P Q (p + 1) (q + 2)),
+        Polynomial.aeval (RuL (P := P) u (p + 2) (q + 2)) g (dh F)
+          = dh (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g F) := by
     intro g F
     induction g using Polynomial.induction_on' with
     | add r t hr ht =>
-      rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, hr, ht, hdhadd]
+      rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, hr, ht,
+        hdhadd]
     | monomial n c =>
       rw [Polynomial.aeval_monomial, Polynomial.aeval_monomial, Module.End.mul_apply,
         Module.End.mul_apply, Module.algebraMap_end_apply, Module.algebraMap_end_apply, hdhsmul]
@@ -485,15 +547,24 @@ theorem e2VanishingOtherColumns_of_colKillP (hK : ColKillP) : E2VanishingOtherCo
   have hdiv := (Polynomial.mul_divByMonic_eq_iff_isRoot (a := (1 : ℝ))).mpr hroot
   rw [mul_comm] at hdiv
   set g := (f - Polynomial.C c) /ₘ (Polynomial.X - Polynomial.C 1)
-  have hkey : Polynomial.aeval (RuL (P := P) u (p + 2) (q + 2)) f x - c • x =
-      dh (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H) := by
+  have hkey
+      : Polynomial.aeval (RuL (P := P) u (p + 2) (q + 2)) f x - c • x
+        = dh (Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H) := by
     have h := congrArg (fun r => Polynomial.aeval (RuL (P := P) u (p + 2) (q + 2)) r x) hdiv
     simp only [map_mul, map_sub, Polynomial.aeval_X, Polynomial.aeval_C, Module.End.mul_apply,
-      LinearMap.sub_apply, Module.algebraMap_end_apply, map_one, Module.End.one_apply, one_smul] at h
+        LinearMap.sub_apply, Module.algebraMap_end_apply, map_one, Module.End.one_apply, one_smul]
+      at h
     rw [← h, ← hE, hA, map_sub]
     rfl
   obtain ⟨hG1, hG2⟩ := hD g
-  refine ⟨-(c⁻¹) • Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H, c⁻¹ • (E2 + E1), ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    -(c⁻¹) • Polynomial.aeval (RuL (P := P) u (p + 1) (q + 2)) g H,
+    c⁻¹ • (E2 + E1),
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro g' x' y
     simp only [Pi.smul_apply]
     rw [hG1 g' x' y]

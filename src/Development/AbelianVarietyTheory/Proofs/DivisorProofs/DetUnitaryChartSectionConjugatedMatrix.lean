@@ -5,12 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemDomOfOrth
 
 @[expose] public section
 
-open NumberField Matrix ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates GlobalTheory.SUVol GlobalTheory.RiemConst GlobalTheory.SUChartSection
+open NumberField Matrix ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates GlobalTheory.SUVol GlobalTheory.RiemConst
+  GlobalTheory.SUChartSection
 open scoped ComplexConjugate ContDiff
 
 namespace GlobalTheory.SUChartSection
 
-theorem det_secM_eq_one : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r) {x : Frame X.Ψ r}, IsOrth X x → ∀ {w : V (nd X)}, cpt X x w ∈ X.dom → ∀ τ : X.Ψ, (secM X x w τ).det = 1 := by
+theorem det_secM_eq_one
+    : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r) {x : Frame X.Ψ r},
+      IsOrth X x → ∀ {w : V (nd X)}, cpt X x w ∈ X.dom → ∀ τ : X.Ψ, (secM X x w τ).det = 1 := by
   intro E _ _ _ r X x hx w hw τ
   have hG := FrameDegreeData.ortho_bOf X hw τ
   rw [bOf_cpt X hx w] at hG
@@ -31,10 +36,10 @@ theorem det_secM_eq_one : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E]
     rw [Matrix.det_of_lowerTriangular _ (fun a b hab => ?_)]
     · rw [gsU, Matrix.det_of_upperTriangular (FrameDegreeData.uMat_upper _)]
       simp only [FrameDegreeData.uMat_diag, Finset.prod_const_one, one_mul]
-      have : ∀ i, mat (nmat X w) τ i i = 1 := fun i => by
-        simp [mat, nmat]
+      have : ∀ i, mat (nmat X w) τ i i = 1 := fun i => by simp [mat, nmat]
       simp only [this, Finset.prod_const_one, one_mul]
-      push_cast; rfl
+      push_cast
+      rfl
     · show nmat X w τ a b = 0
       simp only [nmat]
       have hab' : a < b := hab
@@ -44,14 +49,22 @@ theorem det_secM_eq_one : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E]
   have hpos : 0 ≤ t := Finset.prod_nonneg fun k _ => inv_nonneg.2 (Real.sqrt_nonneg _)
   rw [hY, Complex.conj_ofReal] at hd
   have htt : ((t * t : ℝ) : ℂ) = 1 := by
-    have h2 : (t : ℂ) * (Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)).det * (t : ℂ) =
-      1 * (Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)).det := by rw [hd, one_mul]
+    have h2
+        : (t : ℂ) * (Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)).det * (t : ℂ)
+          = 1 * (Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)).det := by
+      rw [hd, one_mul]
     push_cast
-    have h3 : ((t : ℂ) * t) * (Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)).det =
-      1 * (Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)).det := by rw [← h2]; ring
+    have h3
+        : ((t : ℂ) * t) * (Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)).det
+          = 1 * (Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)).det := by
+      rw [← h2]; ring
     exact mul_right_cancel₀ hJ h3
   have htt' : t * t = 1 := by exact_mod_cast htt
   have ht1 : t = 1 := by nlinarith
-  rw [secM, Matrix.det_conj ((Matrix.isUnit_iff_isUnit_det _).2 (isUnit_iff_ne_zero.2 (det_ne_of_orth X hx τ))) (yM X w τ), hY, ht1, Complex.ofReal_one]
+  rw [secM,
+    Matrix.det_conj
+      ((Matrix.isUnit_iff_isUnit_det _).2 (isUnit_iff_ne_zero.2 (det_ne_of_orth X hx τ)))
+      (yM X w τ),
+    hY, ht1, Complex.ofReal_one]
 
 end GlobalTheory.SUChartSection

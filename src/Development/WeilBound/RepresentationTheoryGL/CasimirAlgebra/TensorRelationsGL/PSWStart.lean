@@ -12,7 +12,8 @@ namespace PositivityTheory.Rg.Cz
 
 namespace SWS
 
-variable {n : ℕ} {ι Γ : Type} [Fintype ι] [DecidableEq ι] [Group Γ] [TopologicalSpace Γ]
+variable
+  {n : ℕ} {ι Γ : Type} [Fintype ι] [DecidableEq ι] [Group Γ] [TopologicalSpace Γ]
   {bar : ι → ι} {κ : ι → Γ → Matrix (Fin n) (Fin n) ℂ}
 
 section Int
@@ -21,10 +22,12 @@ variable [MeasurableSpace Γ] [BorelSpace Γ] [CompactSpace Γ] (μ : Measure Γ
 
 variable {M : Type} [AddCommGroup M] [Module ℂ M]
 
-theorem int_exists (ρ : Γ → Module.End ℂ M) (y : M)
+theorem int_exists
+    (ρ : Γ → Module.End ℂ M) (y : M)
     (hfin : FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun γ => ρ γ y)))
-    (hcont : ∀ lam : M →ₗ[ℂ] ℂ, Continuous fun γ => lam (ρ γ y)) {g : Γ → ℂ} (hg : Continuous g) :
-    ∃ x : M, ∀ lam : M →ₗ[ℂ] ℂ, lam x = ∫ k, g k * lam (ρ k y) ∂μ := by
+    (hcont : ∀ lam : M →ₗ[ℂ] ℂ, Continuous fun γ => lam (ρ γ y))
+    {g : Γ → ℂ} (hg : Continuous g)
+    : ∃ x : M, ∀ lam : M →ₗ[ℂ] ℂ, lam x = ∫ k, g k * lam (ρ k y) ∂μ := by
   classical
   haveI := hfin
   set V := Submodule.span ℂ (Set.range fun γ => ρ γ y) with hV
@@ -48,16 +51,17 @@ theorem int_exists (ρ : Γ → Module.End ℂ M) (y : M)
     intro k
     conv_lhs => rw [hrepr k]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finset.mul_sum, mul_assoc]
+    simp [map_sum, Finset.mul_sum, mul_assoc]
   simp_rw [hpt]
   rw [MeasureTheory.integral_finsetSum _ (fun i _ => (hint i).mul_const _)]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, smul_eq_mul, integral_mul_const]
+  simp only [map_sum, map_smul, smul_eq_mul, integral_mul_const]
 
 omit [MeasurableSpace Γ] [BorelSpace Γ] [CompactSpace Γ] in
-theorem mono_left (hK : IsKD bar κ) {m : ℕ} (lab : Fin m → ι) (c : ι → ℤ) (I K : Fin m → Fin n) (γ k : Γ) :
-    ∑ J : Fin m → Fin n, (∏ p, κ (lab p) γ (I p) (J p)) * mono κ lab c J K k =
-      (∏ τ, (κ τ γ).det ^ (-c τ)) * mono κ lab c I K (γ * k) := by
+theorem mono_left
+    (hK : IsKD bar κ) {m : ℕ} (lab : Fin m → ι) (c : ι → ℤ) (I K : Fin m → Fin n) (γ k : Γ)
+    : ∑ J : Fin m → Fin n, (∏ p, κ (lab p) γ (I p) (J p)) * mono κ lab c J K k
+      = (∏ τ, (κ τ γ).det ^ (-c τ)) * mono κ lab c I K (γ * k) := by
   have hd : ∀ τ, (κ τ γ).det ≠ 0 := fun τ => det_ne hK τ γ
   have hc : (∏ τ, (κ τ γ).det ^ (-c τ)) * ∏ τ, (κ τ γ).det ^ (c τ) = 1 := by
     rw [← Finset.prod_mul_distrib]
@@ -65,25 +69,29 @@ theorem mono_left (hK : IsKD bar κ) {m : ℕ} (lab : Fin m → ι) (c : ι → 
     intro τ _
     rw [← zpow_add₀ (hd τ)]
     simp
-  calc ∑ J : Fin m → Fin n, (∏ p, κ (lab p) γ (I p) (J p)) * mono κ lab c J K k
-      = ∑ J : Fin m → Fin n, (∏ τ, (κ τ k).det ^ (c τ)) *
-          ∏ p, (κ (lab p) γ (I p) (J p) * κ (lab p) k (J p) (K p)) := by
-        apply Finset.sum_congr rfl
-        intro J _
-        simp only [mono, Finset.prod_mul_distrib]
-        ring
-    _ = (∏ τ, (κ τ k).det ^ (c τ)) *
-          ∏ p, ∑ j, κ (lab p) γ (I p) j * κ (lab p) k j (K p) := by
-        rw [Fintype.prod_sum, Finset.mul_sum]
+  calc
+    ∑ J : Fin m → Fin n, (∏ p, κ (lab p) γ (I p) (J p)) * mono κ lab c J K k
+        = ∑ J : Fin m → Fin n, (∏ τ, (κ τ k).det ^ (c τ)) *
+            ∏ p, (κ (lab p) γ (I p) (J p) * κ (lab p) k (J p) (K p)) := by
+      apply Finset.sum_congr rfl
+      intro J _
+      simp only [mono, Finset.prod_mul_distrib]
+      ring
+    _ = (∏ τ, (κ τ k).det ^ (c τ)) * ∏ p, ∑ j, κ (lab p) γ (I p) j * κ (lab p) k j (K p) := by
+      rw [Fintype.prod_sum, Finset.mul_sum]
     _ = (∏ τ, (κ τ γ).det ^ (-c τ)) * mono κ lab c I K (γ * k) := by
-        simp only [mono, hK.mul, Matrix.det_mul, mul_zpow, Finset.prod_mul_distrib, Matrix.mul_apply]
-        rw [← mul_assoc, ← mul_assoc, hc, one_mul]
+      simp only [mono, hK.mul, Matrix.det_mul, mul_zpow, Finset.prod_mul_distrib, Matrix.mul_apply]
+      rw [← mul_assoc, ← mul_assoc, hc, one_mul]
 
-theorem tensor_exists [IsTopologicalGroup Γ] [μ.IsMulLeftInvariant] {E : ι → Fin n → Fin n → Module.End ℂ M}
-    {ρ : Γ → Module.End ℂ M} (hK : IsKD bar κ) (hG : IsGK bar κ E ρ) (y : M) {m : ℕ} (lab : Fin m → ι)
-    (c : ι → ℤ) (K : Fin m → Fin n) :
-    ∃ ξ : TV n M (Fin m), (∀ γ, actT lab κ ρ γ ξ = (∏ τ, (κ τ γ).det ^ (-c τ)) • ξ) ∧
-      ∀ I (lam : M →ₗ[ℂ] ℂ), lam (ξ I) = ∫ k, mono κ lab c I K k * lam (ρ k y) ∂μ := by
+theorem tensor_exists
+    [IsTopologicalGroup Γ] [μ.IsMulLeftInvariant]
+    {E : ι → Fin n → Fin n → Module.End ℂ M} {ρ : Γ → Module.End ℂ M}
+    (hK : IsKD bar κ) (hG : IsGK bar κ E ρ) (y : M)
+    {m : ℕ} (lab : Fin m → ι)
+    (c : ι → ℤ) (K : Fin m → Fin n)
+    : ∃ ξ : TV n M (Fin m),
+      (∀ γ, actT lab κ ρ γ ξ = (∏ τ, (κ τ γ).det ^ (-c τ)) • ξ)
+        ∧ ∀ I (lam : M →ₗ[ℂ] ℂ), lam (ξ I) = ∫ k, mono κ lab c I K k * lam (ρ k y) ∂μ := by
   classical
   choose ξ hξ using fun I : Fin m → Fin n =>
     int_exists μ ρ y (hG.fin y) (hG.cont y) (g := mono κ lab c I K) (mono_cont hK lab c I K)
@@ -105,7 +113,8 @@ theorem tensor_exists [IsTopologicalGroup Γ] [μ.IsMulLeftInvariant] {E : ι �
   simp_rw [← integral_const_mul]
   rw [← MeasureTheory.integral_finsetSum]
   · rw [← integral_mul_left_eq_self
-      (fun x => (∏ τ, (κ τ γ).det ^ (c τ))⁻¹ * (mono κ lab c I K x * lam (ρ x y))) γ]
+      (fun x => (∏ τ, (κ τ γ).det ^ (c τ))⁻¹ * (mono κ lab c I K x * lam (ρ x y)))
+      γ]
     congr 1
     funext k
     rw [← mul_assoc, ← hD, ← mono_left hK lab c I K γ k, Finset.sum_mul]

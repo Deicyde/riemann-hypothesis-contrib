@@ -14,22 +14,35 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.CdScaleTi
 
 @[expose] public section
 
-open Formalism.MainNotions.ArithmeticCylinders IsDedekindDomain MeasureTheory Formalism.MainNotions.S Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult GlobalTheory.RowLev NumberField Matrix
+open Formalism.MainNotions.ArithmeticCylinders IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.S Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.IndefR.Mult GlobalTheory.RowLev NumberField Matrix
 open scoped InnerProductSpace TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.RowLev
 
-theorem isEnum_parA_zero (D : D7) {n : ℕ} (hn : n = D.R.r) (τ : D.what₂.Tau) :
-    IsEnum (parA (tparRec D) 0 τ) (fun i : Fin n => lamS D.R (D.hc τ) (Fin.cast hn i))
+theorem isEnum_parA_zero (D : D7) {n : ℕ} (hn : n = D.R.r) (τ : D.what₂.Tau)
+    : IsEnum (parA (tparRec D) 0 τ)
+      (fun i : Fin n => lamS D.R (D.hc τ) (Fin.cast hn i))
       (fun i => epsS D.R (Fin.cast hn i)) := by
   subst hn
   have hm := D.R.two_le_m
   have hk := D.R.m_add_three_le_k
   have hr : D.R.r = D.R.k + D.R.m - 1 := rfl
   simp only [Fin.cast_eq_self]
-  refine ⟨?_, fun i => if h : i.val < D.R.k - 1 then (D.hc τ).v ⟨i.val, h⟩
-    else if h' : i.val - (D.R.k - 1) < D.R.m then -(D.hc τ).b ⟨i.val - (D.R.k - 1), h'⟩ else 0, ?_, ?_⟩
+  refine ⟨
+    ?_,
+    fun i =>
+      if h : i.val < D.R.k - 1 then
+        (D.hc τ).v ⟨i.val, h⟩
+      else if h' : i.val - (D.R.k - 1) < D.R.m then
+        - (D.hc τ).b ⟨i.val - (D.R.k - 1), h'⟩
+      else
+        0,
+    ?_,
+    ?_
+  ⟩
   · have h := (GlobalTheory.Mem.Vol.lamSH_isHCParam D.R (D.hc τ)).1
     intro a b hab
     have := h (a := Fin.cast (dimS_eq D.R).symm a) (b := Fin.cast (dimS_eq D.R).symm b) hab

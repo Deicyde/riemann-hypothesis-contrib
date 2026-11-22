@@ -8,11 +8,10 @@ open NumberField
 
 namespace GlobalTheory
 
-
 open NumberField in
-theorem _root_.GlobalTheory.formallyUnramified_ringOfIntegers_iff_differentIdeal_eq_top (F E : Type) [Field F]
-    [NumberField F] [Field E] [NumberField E] [Algebra F E] :
-    Algebra.FormallyUnramified (𝓞 F) (𝓞 E) ↔ differentIdeal (𝓞 F) (𝓞 E) = ⊤ := by
+theorem _root_.GlobalTheory.formallyUnramified_ringOfIntegers_iff_differentIdeal_eq_top
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    : Algebra.FormallyUnramified (𝓞 F) (𝓞 E) ↔ differentIdeal (𝓞 F) (𝓞 E) = ⊤ := by
   rw [← Algebra.unramifiedLocus_eq_univ_iff, Set.eq_univ_iff_forall]
   constructor
   · intro h

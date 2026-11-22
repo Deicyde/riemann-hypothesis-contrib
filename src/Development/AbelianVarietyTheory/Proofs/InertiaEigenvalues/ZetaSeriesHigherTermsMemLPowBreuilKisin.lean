@@ -24,7 +24,16 @@ theorem nat_mul_add_le_pow {l : ℕ} (hl : 2 ≤ l) (n : ℕ) : n * l + l ≤ l 
     have h2 := Nat.mul_le_mul_left (n * l + l) hl
     nlinarith
 
-theorem zeta_add_lphi_conn_mem : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H), ∀ (y₀ : Vec K a ι), 1 ≤ η → η < H → 14 * H < l → E K l e ^ η • y₀ ∈ D.M → ∃ r ∈ D.MM, D.zeta ((X : K⟦X⟧) ^ e • y₀) + D.lphi (D.conn ((X : K⟦X⟧) ^ e • y₀)) = (l : K) ^ (l - 14 * H) • r := by
+theorem zeta_add_lphi_conn_mem
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+        [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H),
+      ∀ (y₀ : Vec K a ι),
+        1 ≤ η → η < H → 14 * H < l → E K l e ^ η • y₀ ∈ D.M
+          → ∃ r ∈ D.MM,
+            D.zeta ((X : K⟦X⟧) ^ e • y₀) + D.lphi (D.conn ((X : K⟦X⟧) ^ e • y₀))
+              = (l : K) ^ (l - 14 * H) • r := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ η H D y₀ hη hηH hHl hy₀
   set y : Vec K a ι := (X : K⟦X⟧) ^ e • y₀ with hy
   set A := l - 14 * H with hA
@@ -35,8 +44,12 @@ theorem zeta_add_lphi_conn_mem : ∀ (O K : Type) [CommRing O] [NormedField K] [
   let t : ℕ → Vec K a ι := fun n => -(c • (D.lphi ^ (n + 2)) (D.conn y))
   have hterm : ∀ n, ∃ v ∈ D.MM, t n = (l : K) ^ n • v := by
     intro n
-    obtain ⟨w₁, hw₁, h₁⟩ := GlobalTheory.T.prime_pow_smul_connection_series_term_mem_lattice O K l e a ι η H D y₀ hη hy₀ (n + 1)
-    obtain ⟨w', hw', h₂⟩ := GlobalTheory.T.exists_X_pow_smul_eq_prime_pow_smul_phiModule O K l e a ι D.toPhiMod (n + 1) w₁ hw₁
+    obtain ⟨w₁, hw₁, h₁⟩ :=
+      GlobalTheory.T.prime_pow_smul_connection_series_term_mem_lattice O K l e a ι η H D y₀ hη hy₀
+        (n + 1)
+    obtain ⟨w', hw', h₂⟩ :=
+      GlobalTheory.T.exists_X_pow_smul_eq_prime_pow_smul_phiModule O K l e a ι D.toPhiMod (n + 1) w₁
+        hw₁
     set B := H + 2 * η + (n + 1) * (η - 1) with hB
     have hl2 : 2 ≤ l := (Fact.out : l.Prime).two_le
     have hineq : B + A + n ≤ l ^ (n + 1) := by
@@ -57,14 +70,24 @@ theorem zeta_add_lphi_conn_mem : ∀ (O K : Type) [CommRing O] [NormedField K] [
     intro m
     have key := D.zeta_add_sum_mem y (m + 1)
     rw [Finset.sum_range_succ'] at key
-    have heq : w - ∑ n ∈ Finset.range m, t n = c • (D.zeta y + (∑ n ∈ Finset.range m,
-        (D.lphi ^ (n + 1 + 1)) (D.conn y) + (D.lphi ^ (0 + 1)) (D.conn y))) := by
+    have heq
+        : w - ∑ n ∈ Finset.range m, t n
+          = c
+            • (D.zeta y
+              + (∑ n ∈ Finset.range m,
+                  (D.lphi ^ (n + 1 + 1)) (D.conn y)
+                + (D.lphi ^ (0 + 1)) (D.conn y))) := by
       simp only [t, hw, Finset.sum_neg_distrib, sub_neg_eq_add, zero_add, pow_one, smul_add,
         Finset.smul_sum]
       abel
     rw [heq]
     exact Submodule.smul_of_tower_mem _ c (uPow_anti (by omega) key)
-  refine ⟨w, GlobalTheory.T.mem_phiModuleLattice_of_adic_series_prime_pow_terms O K l e a ι D.toPhiMod w t hterm hpart, ?_⟩
+  refine ⟨
+    w,
+    GlobalTheory.T.mem_phiModuleLattice_of_adic_series_prime_pow_terms O K l e a ι D.toPhiMod w t
+      hterm hpart,
+    ?_
+  ⟩
   rw [hw, hc, smul_inv_smul₀ hlA]
 
 end GlobalTheory

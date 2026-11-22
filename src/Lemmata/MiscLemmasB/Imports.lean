@@ -8,10 +8,11 @@ open MeasureTheory Topology
 
 namespace Bl.SecondBlockLemmaC
 
-theorem goal1 {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [SecondCountableTopology G] [MeasurableSpace G] [OpensMeasurableSpace G]
-    (Γ : Subgroup G) [DiscreteTopology Γ] :
-    ∃ s : Set G, MeasurableSet s ∧ ∀ μ : Measure G, IsFundamentalDomain Γ s μ := by
+theorem goal1
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+    [MeasurableSpace G] [OpensMeasurableSpace G]
+    (Γ : Subgroup G) [DiscreteTopology Γ]
+    : ∃ s : Set G, MeasurableSet s ∧ ∀ μ : Measure G, IsFundamentalDomain Γ s μ := by
   open scoped Pointwise in
   classical
   obtain ⟨U, hUo, hU⟩ := isOpen_induced_iff.mp (isOpen_discrete ({1} : Set Γ))
@@ -40,12 +41,15 @@ theorem goal1 {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
       exact ⟨γ * δ⁻¹, by simpa [mul_assoc] using hγ⟩
   have hQex : ∀ x, ∃ n, Q x n := by
     intro x
-    obtain ⟨n, hn⟩ := hu.exists_mem_open (s := {g | x * g⁻¹ ∈ W})
-      (hWo.preimage (by fun_prop)) ⟨x, by simpa using h1W⟩
+    obtain ⟨n, hn⟩ :=
+      hu.exists_mem_open (s := {g | x * g⁻¹ ∈ W}) (hWo.preimage (by fun_prop))
+        ⟨x, by simpa using h1W⟩
     exact ⟨n, 1, by simpa using hn⟩
   let s : Set G := {x | ∃ n, x * (u n)⁻¹ ∈ W ∧ ∀ m < n, ¬ Q x m}
-  have hs : s = ⋃ n, ({x | x * (u n)⁻¹ ∈ W} ∩
-      ⋂ m, ⋂ (_ : m < n), (⋃ γ : Γ, {x | (γ : G) * x * (u m)⁻¹ ∈ W})ᶜ) := by
+  have hs
+      : s
+        = ⋃ n, ({x | x * (u n)⁻¹ ∈ W} ∩
+          ⋂ m, ⋂ (_ : m < n), (⋃ γ : Γ, {x | (γ : G) * x * (u m)⁻¹ ∈ W})ᶜ) := by
     ext x
     simp [s, Q]
   have hsm : MeasurableSet s := by
@@ -72,8 +76,10 @@ theorem goal1 {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
       · exact absurd ((hQinv δ x _).mpr (Nat.find_spec (hQex x))) (hkmin _ h)
       · omega
     rw [hk'] at hk
-    have hd : ((δ * γ⁻¹ : Γ) : G) = ((δ : G) * x * (u (Nat.find (hQex x)))⁻¹) *
-        ((γ : G) * x * (u (Nat.find (hQex x)))⁻¹)⁻¹ := by
+    have hd
+        : ((δ * γ⁻¹ : Γ) : G)
+          = ((δ : G) * x * (u (Nat.find (hQex x)))⁻¹)
+            * ((γ : G) * x * (u (Nat.find (hQex x)))⁻¹)⁻¹ := by
       simp [mul_assoc]
     have h1 := key _ hγ _ hk _ hd
     exact mul_inv_eq_one.mp h1

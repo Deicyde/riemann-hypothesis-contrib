@@ -7,24 +7,33 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Split
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.CuspRep UpperTheory.Gal.TP.Loc
+open NumberField IsDedekindDomain ValuativeRel
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.CuspRep UpperTheory.Gal.TP.Loc
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.Gal.TP.Loc.compUnit :
-    UpperTheory.Gal.TP.Loc.CompUnit := by
+theorem UpperTheory.Gal.TP.Loc.compUnit : UpperTheory.Gal.TP.Loc.CompUnit := by
   intro E _ _ _ n U hU w hw τ hτ
   obtain ⟨e, he⟩ := GlobalTheory.T.splitPlace_unitaryLocalPoints_equiv_GL E n w hw
   obtain ⟨B, hh, hp, hd, hi⟩ := GlobalTheory.DefU.Petersson.exists_invariant_pos_form E n
   obtain ⟨hirr, f, h0, hf, h2⟩ := hτ
-  have key : ∀ g, ∃ x : GlobalTheory.UnitaryBC.UA E n, ∀ v, f (τ.ρ g v) = GlobalTheory.UnitaryBC.RU E n x (f v) := fun g =>
-    ⟨(e.symm g).1, fun v => by
+  have key
+      : ∀ g, ∃ x : GlobalTheory.UnitaryBC.UA E n, ∀ v,
+        f (τ.ρ g v) = GlobalTheory.UnitaryBC.RU E n x (f v) := fun g => ⟨
+    (e.symm g).1,
+    fun v => by
       have h3 := h2 (e.symm g) v
-      have hy : ((GlobalTheory.UnitaryBC.cLoc w).comp (GlobalTheory.UnitaryBC.locU n w).subtype) (e.symm g) = g := by
+      have hy
+          : ((GlobalTheory.UnitaryBC.cLoc w).comp (GlobalTheory.UnitaryBC.locU n w).subtype) (e.symm
+              g)
+            = g := by
         have := he (e.symm g)
         rw [e.apply_symm_apply] at this
         exact this.symm
       rw [hy] at h3
-      exact h3⟩
+      exact h3
+  ⟩
   have hinj : Function.Injective f := by
     rw [← LinearMap.ker_eq_bot]
     have hst : ∀ g, ∀ v ∈ LinearMap.ker f, τ.ρ g v ∈ LinearMap.ker f := fun g v hv => by
@@ -39,8 +48,17 @@ theorem UpperTheory.Gal.TP.Loc.compUnit :
   have heq : ∀ g, ∃ x, ∀ v, f' (τ.ρ g v) = GlobalTheory.DefU.autRep E n x (f' v) := fun g => by
     obtain ⟨x, hx⟩ := key g
     exact ⟨x, fun v => Subtype.ext (hx v)⟩
-  refine ⟨LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun v u => B (f' u) (f' v))
-    (fun _ _ _ => by simp) (fun _ _ _ => by simp) (fun _ _ _ => by simp) (fun _ _ _ => by simp), ?_, ?_, ?_⟩
+  refine ⟨
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun v u => B (f' u) (f' v))
+      (fun _ _ _ => by simp)
+      (fun _ _ _ => by simp)
+      (fun _ _ _ => by simp)
+      (fun _ _ _ => by simp),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro v u
     simpa using (hh (f' u) (f' v)).symm
   · intro v hv

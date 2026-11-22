@@ -14,28 +14,33 @@ open MvPolynomial
 
 universe u
 
-theorem zero_le_divCycle {K : Type*} {ι : K → Type*} {R : Type*} [CommRing R] (P : Ideal (MRing ι R))
-    (f : MRing ι R) (W : Ideal (MRing ι R)) : 0 ≤ divCycle P f W := by
+theorem zero_le_divCycle
+    {K : Type*} {ι : K → Type*} {R : Type*} [CommRing R]
+    (P : Ideal (MRing ι R)) (f : MRing ι R) (W : Ideal (MRing ι R))
+    : 0 ≤ divCycle P f W := by
   unfold divCycle
   split_ifs <;> positivity
 
-theorem BlowUpExcessDecreases.proof (hpos : ExcessPositive.Statement.{u})
-    (hres : ResidualComparison.Statement.{u}) (hexc : ExceptionalComparison.Statement.{u}) :
-    BlowUpExcessDecreases.Statement.{u} := by
+theorem BlowUpExcessDecreases.proof
+    (hpos : ExcessPositive.Statement.{u}) (hres : ResidualComparison.Statement.{u})
+    (hexc : ExceptionalComparison.Statement.{u})
+    : BlowUpExcessDecreases.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH hcommon
   set N := commonExcess ϖ P f g s with hN
   have hε : 0 < N := hpos O ϖ hϖ K ι P d hP b f g hD s hsP hcommon
 
   have hbdd : BddAbove (Set.range fun G : {G : Ideal (MRing ι O) // (C ϖ : MRing ι O) ∈ G} =>
       (divCycle P s G.1 * ratDiv P f g G.1).toNat) := by
-    refine (((DivCycleFiniteSupport.proof O K ι P s).image
-      fun G => (divCycle P s G * ratDiv P f g G).toNat).insert 0).bddAbove.mono ?_
+    refine (((DivCycleFiniteSupport.proof O K ι P s).image fun G =>
+      (divCycle P s G * ratDiv P f g G).toNat).insert 0).bddAbove.mono ?_
     rintro _ ⟨G, rfl⟩
     by_cases h : divCycle P s G.1 = 0
     · left; simp [h]
     · right; exact ⟨G.1, h, rfl⟩
-  have hle : ∀ G, (C ϖ : MRing ι O) ∈ G → ∀ x y : ℤ, 0 ≤ x → 0 ≤ y → x ≤ divCycle P s G →
-      y ≤ ratDiv P f g G → x * y ≤ N := by
+  have hle
+      : ∀ G,
+        (C ϖ : MRing ι O) ∈ G
+          → ∀ x y : ℤ, 0 ≤ x → 0 ≤ y → x ≤ divCycle P s G → y ≤ ratDiv P f g G → x * y ≤ N := by
     intro G hG x y hx hy hxG hyG
     have h1 : (divCycle P s G * ratDiv P f g G).toNat ≤ N := le_ciSup hbdd ⟨G, hG⟩
     have h2 : x * y ≤ divCycle P s G * ratDiv P f g G := mul_le_mul hxG hyG hy (hx.trans hxG)
@@ -53,21 +58,25 @@ theorem BlowUpExcessDecreases.proof (hpos : ExcessPositive.Statement.{u})
         omega
     · obtain rfl : x = 0 := le_antisymm hx' hx
       simp
-  have hne : Nonempty {G' : Ideal (MRing (extIdx ι (BlowUpIdx ι)) O) //
-      (C ϖ : MRing (extIdx ι (BlowUpIdx ι)) O) ∈ G'} := ⟨⟨⊤, Submodule.mem_top⟩⟩
+  have hne : Nonempty
+      {G' : Ideal (MRing (extIdx ι (BlowUpIdx ι)) O)
+        // (C ϖ : MRing (extIdx ι (BlowUpIdx ι)) O) ∈ G'} :=
+    ⟨⟨⊤, Submodule.mem_top⟩⟩
   constructor
-  ·
-    have h : commonExcess ϖ (blowUpOf P (blowUpGens s g f m e)) (newVar (some none)) (liftForm m)
-        (liftForm s) ≤ N - 1 := by
+  · have h
+        : commonExcess ϖ (blowUpOf P (blowUpGens s g f m e)) (newVar (some none)) (liftForm m)
+            (liftForm s)
+          ≤ N - 1 := by
       refine ciSup_le fun G' => hterm _ _ (zero_le_divCycle _ _ _) fun hx hy => ?_
       obtain ⟨G, hG, h1, h2⟩ :=
         hres O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G'.1 G'.2 hx hy
       have h3 := hle G hG _ _ hx.le (add_nonneg hx.le hy.le) h1 h2
       exact (mul_lt_mul_of_pos_left (lt_add_of_pos_left _ hx) hx).trans_le h3
     omega
-  ·
-    have h : commonExcess ϖ (blowUpOf P (blowUpGens s g f m e)) (liftForm (f * m))
-        (liftForm g * newVar (some none)) (newVar none) ≤ N - 1 := by
+  · have h
+        : commonExcess ϖ (blowUpOf P (blowUpGens s g f m e)) (liftForm (f * m))
+            (liftForm g * newVar (some none)) (newVar none)
+          ≤ N - 1 := by
       refine ciSup_le fun G' => hterm _ _ (zero_le_divCycle _ _ _) fun hx hy => ?_
       obtain ⟨G, hG, h1, h2⟩ :=
         hexc O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G'.1 G'.2 hx hy

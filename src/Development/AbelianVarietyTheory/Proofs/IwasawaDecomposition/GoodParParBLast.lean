@@ -9,16 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GridFirstCol
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.ChainModels
 
 open Finset GlobalTheory.SignedHC GlobalTheory.ContragredientPar
 
-theorem goodPar_image {ι : Type} [Fintype ι] {n p q : ℕ} (f : ι → ℚ × Bool) (hf : Function.Injective fun a => (f a).1)
+theorem goodPar_image
+    {ι : Type} [Fintype ι]
+    {n p q : ℕ}
+    (f : ι → ℚ × Bool) (hf : Function.Injective fun a => (f a).1)
     (hn : Fintype.card ι = n) (hc : ∀ a, ∃ z : ℤ, (f a).1 = ((n : ℚ) - 1) / 2 + z)
-    (hq : (univ.filter fun a => (f a).2 = false).card = q) (hpq : p + q = n) : GoodPar n p q (univ.image f) := by
+    (hq : (univ.filter fun a => (f a).2 = false).card = q) (hpq : p + q = n)
+    : GoodPar n p q (univ.image f) := by
   have hinj : Function.Injective f := fun a c h => hf (congrArg Prod.fst h)
   have hcard : (univ.image f).card = n := by rw [card_image_of_injective _ hinj, card_univ, hn]
   have hminus : SignedHC.nMinus (univ.image f) = q := by
@@ -53,24 +59,32 @@ theorem e_le_b {a c : Fin R.m} (h : c < a) : P.e c + ((R.t : ℚ) + 3) / 2 ≤ P
 
 def entAt (j : ℕ) (hj : j ≤ R.m) (s : ℚ) : Fin (R.k - 1) ⊕ Fin R.m ⊕ Fin j × Fin R.t → ℚ × Bool
   | .inl i => (P.v i + s, true)
-  | .inr (.inl i) => (-P.b i + s, decide (i.1 ≤ j ∨ Even (i.1 - j)))
-  | .inr (.inr x) => (-P.e (Fin.castLE hj x.1) + ((R.t : ℚ) - 1) / 2 - (x.2 : ℕ) + s, true)
+  | .inr (.inl i) => (- P.b i + s, decide (i.1 ≤ j ∨ Even (i.1 - j)))
+  | .inr (.inr x) => (- P.e (Fin.castLE hj x.1) + ((R.t : ℚ) - 1) / 2 - (x.2 : ℕ) + s, true)
 
-theorem entAt_inj (j : ℕ) (hj : j ≤ R.m) (s : ℚ) : Function.Injective fun a => (entAt P j hj s a).1 := by
+theorem entAt_inj (j : ℕ) (hj : j ≤ R.m) (s : ℚ)
+    : Function.Injective fun a => (entAt P j hj s a).1 := by
   have hb : ∀ a : Fin R.t, (0 : ℚ) ≤ (a : ℕ) ∧ ((a : ℕ) : ℚ) + 1 ≤ R.t := fun a =>
     ⟨Nat.cast_nonneg _, by exact_mod_cast a.2⟩
-  have hvb : ∀ i (c : Fin R.m) (a : Fin R.t), P.v i ≠ -P.e c + ((R.t : ℚ) - 1) / 2 - (a : ℕ) := fun i c a h => by
+  have hvb
+      : ∀ i (c : Fin R.m) (a : Fin R.t),
+        P.v i ≠ - P.e c + ((R.t : ℚ) - 1) / 2 - (a : ℕ) := fun i c a h => by
     have := neg_v_lt_b P i c
     have := b_le_e P (le_refl c)
     have := hb a
     linarith [this.1]
-  have hbb : ∀ (i c : Fin R.m) (a : Fin R.t), -P.b i ≠ -P.e c + ((R.t : ℚ) - 1) / 2 - (a : ℕ) := fun i c a h => by
+  have hbb
+      : ∀ (i c : Fin R.m) (a : Fin R.t),
+        - P.b i ≠ - P.e c + ((R.t : ℚ) - 1) / 2 - (a : ℕ) := fun i c a h => by
     have := hb a
     rcases le_or_gt i c with h' | h'
     · linarith [b_le_e P h', this.1]
     · linarith [e_le_b P h', this.2]
-  have hee : ∀ (c c' : Fin R.m) (a a' : Fin R.t), c < c' →
-      -P.e c + ((R.t : ℚ) - 1) / 2 - (a : ℕ) ≠ -P.e c' + ((R.t : ℚ) - 1) / 2 - (a' : ℕ) := fun c c' a a' h' h => by
+  have hee
+      : ∀ (c c' : Fin R.m) (a a' : Fin R.t),
+        c < c'
+          → - P.e c + ((R.t : ℚ) - 1) / 2 - (a : ℕ)
+            ≠ - P.e c' + ((R.t : ℚ) - 1) / 2 - (a' : ℕ) := fun c c' a a' h' h => by
     linarith [e_le_b P h', b_le_e P (le_refl c'), (hb a).2, (hb a').1]
   rintro (a | a | ⟨a, x⟩) (c | c | ⟨c, y⟩) h <;> simp only [entAt, add_left_inj] at h
   · rw [(v_strictAnti P).injective h]
@@ -87,7 +101,8 @@ theorem entAt_inj (j : ℕ) (hj : j ≤ R.m) (s : ℚ) : Function.Injective fun 
       rw [Fin.ext (Nat.cast_injective this : (x : ℕ) = y)]
     · exact absurd h.symm (hee _ _ _ _ h')
 
-theorem card_minus (j m : ℕ) : ((range m).filter fun i => ¬ (i ≤ j ∨ Even (i - j))).card = (m - j) / 2 := by
+theorem card_minus (j m : ℕ)
+    : ((range m).filter fun i => ¬(i ≤ j ∨ Even (i - j))).card = (m - j) / 2 := by
   induction m with
   | zero => simp
   | succ m ih =>
@@ -100,8 +115,8 @@ theorem card_minus (j m : ℕ) : ((range m).filter fun i => ¬ (i ≤ j ∨ Even
       rw [Nat.even_iff] at h
       omega
 
-theorem card_entAt_false (j : ℕ) (hj : j ≤ R.m) (s : ℚ) :
-    (univ.filter fun a => (entAt P j hj s a).2 = false).card = (R.m - j) / 2 := by
+theorem card_entAt_false (j : ℕ) (hj : j ≤ R.m) (s : ℚ)
+    : (univ.filter fun a => (entAt P j hj s a).2 = false).card = (R.m - j) / 2 := by
   rw [← card_minus j R.m]
   symm
   refine card_bij (fun i hi => .inr (.inl ⟨i, mem_range.1 (mem_filter.1 hi).1⟩)) ?_ ?_ ?_
@@ -115,8 +130,9 @@ theorem card_entAt_false (j : ℕ) (hj : j ≤ R.m) (s : ℚ) :
     · exact ⟨a.1, mem_filter.2 ⟨mem_range.2 a.2, by simpa [entAt] using hx⟩, rfl⟩
     · simp [entAt] at hx
 
-theorem goodPar_entAt (j : ℕ) (hj : j ≤ R.m) :
-    GoodPar (R.rankY j) (sigYD R j).1 (sigYD R j).2 (univ.image (entAt P j hj (if Odd j then -(1 / 2) else 0))) := by
+theorem goodPar_entAt (j : ℕ) (hj : j ≤ R.m)
+    : GoodPar (R.rankY j) (sigYD R j).1 (sigYD R j).2
+      (univ.image (entAt P j hj (if Odd j then -(1 / 2) else 0))) := by
   have hk := R.m_add_three_le_k
   have hm := R.two_le_m
   obtain ⟨k', hk'⟩ := R.k_even
@@ -145,17 +161,20 @@ theorem goodPar_entAt (j : ℕ) (hj : j ≤ R.m) :
     · obtain ⟨z, hz⟩ := P.e_int (Fin.castLE hj a)
       refine ⟨-z + t' - (x : ℕ) + w, ?_⟩
       have ht : (R.t : ℚ) = 2 * t' + 1 := by exact_mod_cast ht'
-      simp only [entAt, hz, ht]; push_cast; ring
+      simp only [entAt, hz, ht]
+      push_cast
+      ring
   · simp only [sigYD, Ranks.rankY, Ranks.r]
     omega
 
-theorem Dpar_eq (D : D7) (j : ℕ) (hj : j ≤ D.R.m) (τ : D.what₂.Tau) :
-    (Ptw D).Dpar j τ = univ.image (entAt (D.hc τ) j hj (if Odd j then -(1 / 2) else 0)) := by
+theorem Dpar_eq (D : D7) (j : ℕ) (hj : j ≤ D.R.m) (τ : D.what₂.Tau)
+    : (Ptw D).Dpar j τ = univ.image (entAt (D.hc τ) j hj (if Odd j then -(1 / 2) else 0)) := by
   ext x
-  simp only [TPar.Dpar, TPar.block, mem_image, mem_union, mem_biUnion, mem_filter, mem_univ, true_and, mem_range,
-    Sum.exists, Prod.exists, entAt]
+  simp only [TPar.Dpar, TPar.block, mem_image, mem_union, mem_biUnion, mem_filter, mem_univ,
+    true_and, mem_range, Sum.exists, Prod.exists, entAt]
   constructor
-  · rintro ⟨_, _, (⟨i, e⟩ | ⟨i, e⟩) | ⟨i, hi, _, ⟨a, ha, rfl⟩, e⟩, rfl⟩ <;> obtain ⟨rfl, rfl⟩ := Prod.mk.inj e
+  · rintro ⟨_, _, (⟨i, e⟩ | ⟨i, e⟩) | ⟨i, hi, _, ⟨a, ha, rfl⟩, e⟩, rfl⟩
+      <;> obtain ⟨rfl, rfl⟩ := Prod.mk.inj e
     · exact Or.inl ⟨i, rfl⟩
     · exact Or.inr (Or.inl ⟨i, rfl⟩)
     · exact Or.inr (Or.inr ⟨⟨i.1, hi⟩, ⟨a, ha⟩, rfl⟩)
@@ -164,32 +183,38 @@ theorem Dpar_eq (D : D7) (j : ℕ) (hj : j ≤ D.R.m) (τ : D.what₂.Tau) :
     · exact ⟨_, _, Or.inl (Or.inr ⟨i, rfl⟩), rfl⟩
     · exact ⟨_, _, Or.inr ⟨Fin.castLE hj i, i.2, _, ⟨a.1, a.2, rfl⟩, rfl⟩, rfl⟩
 
-theorem goodPar_parB (D : D7) (j : ℕ) (hj : j ≤ D.R.m) (τ : D.what₂.Tau) :
-    GoodPar (D.sp.Y j).rank ((D.sp.Y j).sig (tauE D τ)).1 ((D.sp.Y j).sig (tauE D τ)).2 (parB (Ptw D) j τ) := by
+theorem goodPar_parB (D : D7) (j : ℕ) (hj : j ≤ D.R.m) (τ : D.what₂.Tau)
+    : GoodPar (D.sp.Y j).rank ((D.sp.Y j).sig (tauE D τ)).1 ((D.sp.Y j).sig (tauE D τ)).2
+      (parB (Ptw D) j τ) := by
   rw [D.sp.Y_rank j hj, D.Y_sigval j hj, parB, Dpar_eq D j hj]
   exact GlobalTheory.RealGeo.FrameModels.goodPar_dualPar (goodPar_entAt (D.hc τ) j hj)
 
-theorem goodPar_parB_last (D : D7) (τ : D.what₂.Tau) :
-    GoodPar D.sp.X'.rank (D.sp.X'.sig (tauE D τ)).1 (D.sp.X'.sig (tauE D τ)).2 (parB (Ptw D) D.R.m τ) := by
+theorem goodPar_parB_last (D : D7) (τ : D.what₂.Tau)
+    : GoodPar D.sp.X'.rank (D.sp.X'.sig (tauE D τ)).1 (D.sp.X'.sig (tauE D τ)).2
+      (parB (Ptw D) D.R.m τ) := by
   have h := goodPar_parB D D.R.m le_rfl τ
   rw [D.sp.Y_rank _ le_rfl] at h
   rw [GlobalTheory.ChiGrid.sig_X'_eq_sig_Y, D.sp.X'_rank]
   exact h
 
-theorem nonempty_modelY (h : GlobalTheory.Published.DiscreteSeriesExists) (D : D7) (j : ℕ) :
-    Nonempty (DSModel (Yc D j) (parB (Ptw D) (min j D.R.m))) :=
-  GlobalTheory.Published.dsExists_of_discreteSeriesExists h D _ _ (D.sp.Y_sig _) (goodPar_parB D _ (min_le_right _ _))
+theorem nonempty_modelY (h : GlobalTheory.Published.DiscreteSeriesExists) (D : D7) (j : ℕ)
+    : Nonempty (DSModel (Yc D j) (parB (Ptw D) (min j D.R.m))) :=
+  GlobalTheory.Published.dsExists_of_discreteSeriesExists h D _ _ (D.sp.Y_sig _)
+    (goodPar_parB D _ (min_le_right _ _))
 
-theorem nonempty_modelX (h : GlobalTheory.Published.DiscreteSeriesExists) (D : D7) :
-    Nonempty (DSModel D.sp.X' (parB (Ptw D) D.R.m)) :=
+theorem nonempty_modelX (h : GlobalTheory.Published.DiscreteSeriesExists) (D : D7)
+    : Nonempty (DSModel D.sp.X' (parB (Ptw D) D.R.m)) :=
   GlobalTheory.Published.dsExists_of_discreteSeriesExists h D _ _ D.sp.X'_sig (goodPar_parB_last D)
 
 theorem labE_embLL (D : D7) (τ : D.what₂.Tau) : labE D.what₂.embLL τ = tauE D τ := by
   ext x
   exact DFunLike.congr_fun D.embE_φ₀ (D.host.sigmaOf (D.eTau τ).1 x)
 
-theorem labE_lab_embLL (D : D7) (ρ : D.what₂.Tau) : labE D.what₂.embLL (lab D.what₂.embLL ρ) = tauE D ρ := by
-  have h : ∃ τ, labE D.what₂.embLL τ = tauE D ρ ∨ labE D.what₂.embLL τ = (starRingEnd ℂ).comp (tauE D ρ) :=
+theorem labE_lab_embLL (D : D7) (ρ : D.what₂.Tau)
+    : labE D.what₂.embLL (lab D.what₂.embLL ρ) = tauE D ρ := by
+  have h
+      : ∃ τ,
+        labE D.what₂.embLL τ = tauE D ρ ∨ labE D.what₂.embLL τ = (starRingEnd ℂ).comp (tauE D ρ) :=
     ⟨ρ, Or.inl (labE_embLL D ρ)⟩
   unfold lab
   rw [dite_eq_left h]
@@ -205,12 +230,18 @@ theorem labE_lab_embLL (D : D7) (ρ : D.what₂.Tau) : labE D.what₂.embLL (lab
     simp at a
     linarith
 
-theorem exists_models : GlobalTheory.Published.DiscreteSeriesExists → ∀ D : D7,
-    ((∀ j, Nonempty (DSModel (Yc D j) (parB (Ptw D) (min j D.R.m)))) ∧ Nonempty (DSModel D.sp.X' (parB (Ptw D) D.R.m))) ∧
-    ∀ (Ks : Type) [Field Ks] [Algebra Ks D.what₂.LL], (∀ x : D.host.E, ∃ y : Ks, algebraMap Ks D.what₂.LL y = D.embE x) →
-      ∃ MW : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), DSModel (Wc D i) (parAt (Wc D i) σ),
-        (∀ i τ a, (MW i D.what₂.embLL).ε τ a = decide ((a : ℕ) < ((Wc D i).sig (tauE D τ)).1)) ∧
-          GlobalTheory.RealGeo.FrameKs Ks MW := by
+theorem exists_models
+    : GlobalTheory.Published.DiscreteSeriesExists
+      → ∀ D : D7,
+        ((∀ j, Nonempty (DSModel (Yc D j) (parB (Ptw D) (min j D.R.m))))
+            ∧ Nonempty (DSModel D.sp.X' (parB (Ptw D) D.R.m)))
+          ∧ ∀ (Ks : Type) [Field Ks] [Algebra Ks D.what₂.LL],
+            (∀ x : D.host.E, ∃ y : Ks, algebraMap Ks D.what₂.LL y = D.embE x)
+              → ∃ MW
+                  : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), DSModel (Wc D i) (parAt (Wc D i) σ),
+                (∀ i τ a,
+                    (MW i D.what₂.embLL).ε τ a = decide ((a : ℕ) < ((Wc D i).sig (tauE D τ)).1))
+                  ∧ GlobalTheory.RealGeo.FrameKs Ks MW := by
   intro h D
   refine ⟨⟨nonempty_modelY h D, nonempty_modelX h D⟩, fun Ks _ _ hK => ?_⟩
   obtain ⟨MW, hMW⟩ := GlobalTheory.RealGeo.FrameModels.exists_frameKs h D Ks hK

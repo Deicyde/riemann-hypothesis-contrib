@@ -5,16 +5,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.CompanionTheory.CTFin GlobalTheory.LFun Formalism.UG Formalism.UG.P
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace UpperTheory.ConvolutionTheory.BW
+open MeasureTheory NumberField IsDedekindDomain GlobalTheory.CuspRep
+  GlobalTheory.CompanionTheory.CTFin GlobalTheory.LFun Formalism.UG Formalism.UG.P
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace UpperTheory.ConvolutionTheory.BW
 
-private theorem out_eq_cuspQuot {E : Type} [Field E] [NumberField E] {r : ℕ}
-    (F : AdelicGLn.AdelicGL E r → ℂ) (h : AutomorphicForm.IsLeftInvariant F)
-    (y : RightCosetSpace (rationalGLOne (K := E) (n := r))) :
-    F ((Quotient.out y : normOneGL (K := E) (n := r)) : AdelicGLn.AdelicGL E r) = CuspidalSpectrum.cuspQuot h y := by
-  have e : RightCosetSpace.mk (rationalGLOne (K := E) (n := r)) (Quotient.out y) = y := Quotient.out_eq y
-  calc F ((Quotient.out y : normOneGL (K := E) (n := r)) : AdelicGLn.AdelicGL E r)
-      = CuspidalSpectrum.cuspQuot h (RightCosetSpace.mk (rationalGLOne (K := E) (n := r)) (Quotient.out y)) := rfl
+private theorem out_eq_cuspQuot
+    {E : Type} [Field E] [NumberField E]
+    {r : ℕ} (F : AdelicGLn.AdelicGL E r → ℂ) (h : AutomorphicForm.IsLeftInvariant F)
+    (y : RightCosetSpace (rationalGLOne (K := E) (n := r)))
+    : F ((Quotient.out y : normOneGL (K := E) (n := r)) : AdelicGLn.AdelicGL E r)
+      = CuspidalSpectrum.cuspQuot h y := by
+  have e : RightCosetSpace.mk (rationalGLOne (K := E) (n := r)) (Quotient.out y) = y :=
+    Quotient.out_eq y
+  calc
+    F ((Quotient.out y : normOneGL (K := E) (n := r)) : AdelicGLn.AdelicGL E r)
+        = CuspidalSpectrum.cuspQuot h
+          (RightCosetSpace.mk (rationalGLOne (K := E) (n := r)) (Quotient.out y)) :=
+      rfl
     _ = CuspidalSpectrum.cuspQuot h y := by rw [e]
 
 theorem UpperTheory.integrable_translate_mul_conj_and_inner_self_ne_zero :

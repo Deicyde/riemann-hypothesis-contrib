@@ -15,7 +15,8 @@ variable {K : Type} [Field K] [NumberField K] {p : ℕ} [Fact p.Prime]
 
 theorem norm_le_one_of_isIntegral_int {x : PadicAlgCl p} (hx : IsIntegral ℤ x) : ‖x‖ ≤ 1 := by
   have h1 : IsIntegral (NormedField.valuation (K := PadicAlgCl p)).integer x := hx.tower_top
-  have h2 := (Valuation.integer.integers (NormedField.valuation (K := PadicAlgCl p))).mem_of_integral h1
+  have h2 :=
+    (Valuation.integer.integers (NormedField.valuation (K := PadicAlgCl p))).mem_of_integral h1
   have h3 : ‖x‖₊ ≤ 1 := h2
   exact_mod_cast h3
 
@@ -41,7 +42,8 @@ def smallIdeal (σ : K →+* PadicAlgCl p) : Ideal (𝓞 K) where
     have h1 := norm_int_le σ c
     nlinarith [norm_nonneg (σ (c : K)), norm_nonneg (σ (a : K))]
 
-theorem mem_smallIdeal (σ : K →+* PadicAlgCl p) (y : 𝓞 K) : y ∈ smallIdeal σ ↔ ‖σ (y : K)‖ < 1 := Iff.rfl
+theorem mem_smallIdeal (σ : K →+* PadicAlgCl p) (y : 𝓞 K) : y ∈ smallIdeal σ ↔ ‖σ (y : K)‖ < 1 :=
+  Iff.rfl
 
 theorem smallIdeal_isPrime (σ : K →+* PadicAlgCl p) : (smallIdeal σ).IsPrime := by
   refine ⟨?_, ?_⟩
@@ -56,8 +58,11 @@ theorem smallIdeal_isPrime (σ : K →+* PadicAlgCl p) : (smallIdeal σ).IsPrime
     push_neg at hcon
     nlinarith [hcon.1, hcon.2]
 
-theorem dvd_of_natCast_mem {R : Type*} [CommRing R] (I : Ideal R) (hI : I ≠ ⊤) {q M : ℕ} (hq : q.Prime)
-    (h1 : (q : R) ∈ I) (h2 : (M : R) ∈ I) : q ∣ M := by
+theorem dvd_of_natCast_mem
+    {R : Type*} [CommRing R]
+    (I : Ideal R) (hI : I ≠ ⊤)
+    {q M : ℕ} (hq : q.Prime) (h1 : (q : R) ∈ I) (h2 : (M : R) ∈ I)
+    : q ∣ M := by
   by_contra hnd
   have hc : Nat.Coprime q M := (Nat.Prime.coprime_iff_not_dvd hq).2 hnd
   obtain ⟨u, v, huv⟩ : IsCoprime (q : R) (M : R) := Nat.Coprime.cast hc
@@ -70,8 +75,8 @@ theorem norm_p_lt_one : ‖(p : PadicAlgCl p)‖ < 1 := by
   rw [← h, map_natCast] at h2
   exact h2
 
-theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈ w.asIdeal) :
-    ∃ σ : K →+* PadicAlgCl p, w.asIdeal = smallIdeal σ := by
+theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈ w.asIdeal)
+    : ∃ σ : K →+* PadicAlgCl p, w.asIdeal = smallIdeal σ := by
   by_contra hcon
   push_neg at hcon
   have hnle : ∀ σ : K →ₐ[ℚ] PadicAlgCl p, ¬ w.asIdeal ≤ smallIdeal (σ : K →+* PadicAlgCl p) := by
@@ -79,12 +84,11 @@ theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈
     exact hcon (σ : K →+* PadicAlgCl p) (w.isMaximal.eq_of_le (smallIdeal_isPrime _).ne_top hle)
   have σ0 : K →ₐ[ℚ] PadicAlgCl p := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
-  have hav : ¬ ((w.asIdeal : Set (𝓞 K)) ⊆
-      ⋃ σ ∈ ((Finset.univ : Finset (K →ₐ[ℚ] PadicAlgCl p)) : Set (K →ₐ[ℚ] PadicAlgCl p)),
-        (smallIdeal (σ : K →+* PadicAlgCl p) : Set (𝓞 K))) := by
+  have hav : ¬((w.asIdeal : Set (𝓞 K))
+      ⊆ ⋃ σ ∈ ((Finset.univ : Finset (K →ₐ[ℚ] PadicAlgCl p)) : Set (K →ₐ[ℚ] PadicAlgCl p)),
+          (smallIdeal (σ : K →+* PadicAlgCl p) : Set (𝓞 K))) := by
     rw [Ideal.subset_union_prime σ0 σ0 (fun σ _ _ _ => smallIdeal_isPrime _)]
     rintro ⟨σ, -, hle⟩
     exact hnle σ hle
@@ -105,9 +109,14 @@ theorem exists_embedding (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈
     simp
   have h1 : 1 ≤ ‖((Algebra.norm ℤ x : ℤ) : PadicAlgCl p)‖ := by
     rw [hprod, norm_prod]
-    exact Finset.prod_induction _ (fun t : ℝ => 1 ≤ t) (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
-      le_rfl fun σ _ => hxσ σ
-  have h2 : ((Algebra.norm ℤ x : ℤ) : PadicAlgCl p) = (p : PadicAlgCl p) * ((m : ℤ) : PadicAlgCl p) := by
+    exact Finset.prod_induction _
+      (fun t : ℝ => 1 ≤ t)
+      (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
+      le_rfl
+      fun σ _ => hxσ σ
+  have h2
+      : ((Algebra.norm ℤ x : ℤ) : PadicAlgCl p)
+        = (p : PadicAlgCl p) * ((m : ℤ) : PadicAlgCl p) := by
     rw [hm]; push_cast; ring
   have h3 : ‖((m : ℤ) : PadicAlgCl p)‖ ≤ 1 := IsUltrametricDist.norm_intCast_le_one _ m
   rw [h2, norm_mul] at h1

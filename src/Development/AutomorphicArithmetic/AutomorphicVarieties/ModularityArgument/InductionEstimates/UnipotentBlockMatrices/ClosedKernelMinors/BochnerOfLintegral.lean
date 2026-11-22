@@ -12,16 +12,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open MeasureTheory NumberField Set Filter Topology
 open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 
-private theorem bochner_of_lintegral {ι Y P Q : Type*} [Countable ι] [MeasurableSpace Y] [MeasurableSpace P]
-    [MeasurableSpace Q] (ν : Measure Y) (m : Measure P) (f : ι → Y → Q) (g : P → Q) (hf : ∀ i, Measurable (f i))
-    (hg : Measurable g) (c : ℝ) (hc : 0 ≤ c)
-    (H : ∀ h : Q → ℝ≥0∞, Measurable h → ∫⁻ y, ∑' i, h (f i y) ∂ν = ENNReal.ofReal c * ∫⁻ p, h (g p) ∂m)
-    (h : Q → ℂ) (hh : Measurable h) (hi : Integrable (fun p => h (g p)) m) :
-    ∫ y, ∑' i, h (f i y) ∂ν = c * ∫ p, h (g p) ∂m := by
+private theorem bochner_of_lintegral
+    {ι Y P Q : Type*} [Countable ι] [MeasurableSpace Y] [MeasurableSpace P] [MeasurableSpace Q]
+    (ν : Measure Y)
+    (m : Measure P)
+    (f : ι → Y → Q)
+    (g : P → Q)
+    (hf : ∀ i, Measurable (f i)) (hg : Measurable g)
+    (c : ℝ) (hc : 0 ≤ c)
+    (H : ∀ h : Q → ℝ≥0∞,
+      Measurable h → ∫⁻ y, ∑' i, h (f i y) ∂ν = ENNReal.ofReal c * ∫⁻ p, h (g p) ∂m)
+    (h : Q → ℂ) (hh : Measurable h) (hi : Integrable (fun p => h (g p)) m)
+    : ∫ y, ∑' i, h (f i y) ∂ν = c * ∫ p, h (g p) ∂m := by
   have key : Measure.sum (fun i => ν.map (f i)) = ENNReal.ofReal c • m.map g := by
     refine Measure.ext_of_lintegral _ fun φ hφ => ?_
     rw [lintegral_sum_measure, lintegral_smul_measure, lintegral_map hφ hg, smul_eq_mul, ← H φ hφ,
@@ -38,23 +45,28 @@ private theorem bochner_of_lintegral {ι Y P Q : Type*} [Countable ι] [Measurab
   rw [integral_tsum (f := fun i y => h (f i y)) (fun i => (hh.comp (hf i)).aestronglyMeasurable) h3,
     ← integral_map hg.aemeasurable hh.aestronglyMeasurable,
     ← tsum_congr fun i => integral_map (hf i).aemeasurable hh.aestronglyMeasurable,
-    ← integral_sum_measure h2, key, integral_smul_measure, ENNReal.toReal_ofReal hc, Complex.real_smul]
+    ← integral_sum_measure h2, key, integral_smul_measure, ENNReal.toReal_ofReal hc,
+    Complex.real_smul]
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.unf :
-    ∀ {K : Type} [Field K] [NumberField K] (μ : Measure (G1 K (2 + 2))) [μ.IsHaarMeasure]
-      (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure] (κ : Measure (KG K (2 + 2))) [κ.IsHaarMeasure],
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.unf
+    : ∀ {K : Type} [Field K] [NumberField K] (μ : Measure (G1 K (2 + 2))) [μ.IsHaarMeasure]
+        (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure] (κ : Measure (KG K (2 + 2))) [κ.IsHaarMeasure],
       (∃ c, Unf μ μ₂ κ c) ∧ 0 < volN K := by
   intro K _ _ μ _ μ₂ _ κ _
   refine ⟨?_, ?_⟩
   swap
   · rw [volN, Measure.real, unipMeasure_unipFundamentalDomain]; simp
   have hle : PK K ≤ Gam K (2 + 2) := Subgroup.map_subtype_le _
-  have : DiscreteTopology (PK K) := DiscreteTopology.of_subset (s := (Gam K (2 + 2) : Set (G1 K (2 + 2))))
-    (inferInstanceAs (DiscreteTopology (Gam K (2 + 2)))) hle
+  have : DiscreteTopology (PK K) :=
+    DiscreteTopology.of_subset (s := (Gam K (2 + 2) : Set (G1 K (2 + 2))))
+      (inferInstanceAs (DiscreteTopology (Gam K (2 + 2)))) hle
   obtain ⟨E, hE, hEu⟩ := RightCosetSpace.exists_fundamentalDomain (PK K)
   obtain ⟨c, hc, hI⟩ := iwaInt μ μ₂ κ
-  have hL : ∀ Ψ : G1 K (2 + 2) → ℝ≥0∞, Measurable Ψ → (∀ γ ∈ PK K, ∀ g, Ψ (γ * g) = Ψ g) →
-      ∫⁻ y, ∑' q : Cos K, Ψ ((q.out : G1 K (2 + 2)) * y) ∂fd μ = ENNReal.ofReal c * ∫⁻ p, Ψ (pt p) ∂parM μ₂ κ := by
+  have hL
+      : ∀ Ψ : G1 K (2 + 2) → ℝ≥0∞,
+        Measurable Ψ → (∀ γ ∈ PK K, ∀ g, Ψ (γ * g) = Ψ g)
+          → ∫⁻ y, ∑' q : Cos K, Ψ ((q.out : G1 K (2 + 2)) * y) ∂fd μ
+            = ENNReal.ofReal c * ∫⁻ p, Ψ (pt p) ∂parM μ₂ κ := by
     intro Ψ hΨ hinv
     rw [tower μ E hE hEu Ψ hΨ hinv, ← coordUnf μ₂ κ E hE hEu Ψ hΨ hinv, ← hI _ (hΨ.indicator hE),
       lintegral_indicator hE]
@@ -69,15 +81,20 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.unf :
     exact ((h2.comp measurable_snd.snd.snd.snd).mul (h1.comp h3)).mul
       (measurable_subtype_coe.comp measurable_snd.snd.snd.fst)
   have hmk : Measurable (RightCosetSpace.mk (PK K)) := measurable_quotient_mk''
-  let h : RightCosetSpace (PK K) → ℂ := Quotient.lift Ψ fun a b hab => by
-    obtain ⟨γ, hγ⟩ := MulAction.orbitRel_apply.1 hab
-    rw [← hγ]
-    exact hinv γ γ.2 b
+  let h : RightCosetSpace (PK K) → ℂ :=
+    Quotient.lift Ψ fun a b hab => by
+      obtain ⟨γ, hγ⟩ := MulAction.orbitRel_apply.1 hab
+      rw [← hγ]
+      exact hinv γ γ.2 b
   have hh : Measurable h := measurable_from_quotient.2 hΨ
   exact bochner_of_lintegral (fd μ) (parM μ₂ κ)
     (fun (q : Cos K) y => RightCosetSpace.mk (PK K) ((q.out : G1 K (2 + 2)) * y))
     (fun p => RightCosetSpace.mk (PK K) (pt p))
-    (fun q => hmk.comp (measurable_const_mul _)) (hmk.comp hpt) c hc.le
-    (fun φ hφ => hL (fun g => φ (RightCosetSpace.mk (PK K) g)) (hφ.comp hmk)
-      (fun γ hγ g => congrArg φ (RightCosetSpace.mk_mul_of_mem hγ g)))
+    (fun q => hmk.comp (measurable_const_mul _))
+    (hmk.comp hpt) c hc.le
+    (fun φ hφ =>
+      hL
+        (fun g => φ (RightCosetSpace.mk (PK K) g))
+        (hφ.comp hmk)
+        (fun γ hγ g => congrArg φ (RightCosetSpace.mk_mul_of_mem hγ g)))
     h hh hint

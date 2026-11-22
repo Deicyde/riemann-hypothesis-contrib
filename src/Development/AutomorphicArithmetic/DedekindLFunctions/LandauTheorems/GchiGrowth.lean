@@ -10,11 +10,13 @@ noncomputable section
 
 namespace Deduction
 
-theorem Gchi_growth_ramp (f : ℕ → ℂ) (hf : ∀ n, ‖f n‖ ≤ 1) {y : ℝ} (hy : 1 ≤ y) :
-    ‖ramp f y‖ ≤ 2 * y ^ 2 := by
+theorem Gchi_growth_ramp (f : ℕ → ℂ) (hf : ∀ n, ‖f n‖ ≤ 1) {y : ℝ} (hy : 1 ≤ y)
+    : ‖ramp f y‖ ≤ 2 * y ^ 2 := by
   have hy0 : 0 ≤ y := by linarith
-  have key : ∀ n ∈ Finset.range (⌊y⌋₊ + 1),
-      ‖((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ) * f n * ((max (y / n - 1) 0 : ℝ) : ℂ)‖ ≤ y := by
+  have key
+      : ∀ n ∈ Finset.range (⌊y⌋₊ + 1),
+        ‖((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ) * f n * ((max (y / n - 1) 0 : ℝ) : ℂ)‖
+          ≤ y := by
     intro n _
     rcases Nat.eq_zero_or_pos n with rfl | hn
     · simpa using hy0
@@ -26,9 +28,10 @@ theorem Gchi_growth_ramp (f : ℕ → ℂ) (hf : ∀ n, ‖f n‖ ≤ 1) {y : �
     have h3 : 0 ≤ max (y / n - 1) 0 := le_max_right _ _
     rw [norm_mul, norm_mul, Complex.norm_real, Complex.norm_real, Real.norm_of_nonneg h0,
       Real.norm_of_nonneg h3]
-    calc _ ≤ (n : ℝ) * 1 * (y / n) := by
-          gcongr
-          exact hf n
+    calc
+      _ ≤ (n : ℝ) * 1 * (y / n) := by
+        gcongr
+        exact hf n
       _ = y := by field_simp
   have h := (norm_sum_le _ _).trans (Finset.sum_le_card_nsmul _ _ _ key)
   rw [Finset.card_range, nsmul_eq_mul] at h
@@ -38,8 +41,8 @@ theorem Gchi_growth_ramp (f : ℕ → ℂ) (hf : ∀ n, ‖f n‖ ≤ 1) {y : �
   push_cast
   nlinarith
 
-theorem Gchi_growth {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) :
-    ∃ C : ℝ, ∀ y : ℝ, 1 ≤ y → ‖Gchi χ y‖ ≤ C * y ^ 2 := by
+theorem Gchi_growth {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N)
+    : ∃ C : ℝ, ∀ y : ℝ, 1 ≤ y → ‖Gchi χ y‖ ≤ C * y ^ 2 := by
   by_cases h : χ = 1
   · refine ⟨2 + 1 + |1 + Real.eulerMascheroniConstant|, fun y hy => ?_⟩
     have hr := Gchi_growth_ramp (fun n => χ n) (fun n => χ.norm_le_one _) hy
@@ -56,8 +59,10 @@ theorem Gchi_growth {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) :
     have h1 : y * Real.log y ≤ y ^ 2 := by nlinarith
     have h2 := mul_le_mul_of_nonneg_left hyy (abs_nonneg (1 + Real.eulerMascheroniConstant))
     linarith
-  · refine ⟨2 + ‖deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1‖,
-      fun y hy => ?_⟩
+  · refine ⟨
+      2 + ‖deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1‖,
+      fun y hy => ?_
+    ⟩
     have hr := Gchi_growth_ramp (fun n => χ n) (fun n => χ.norm_le_one _) hy
     have hy0 : 0 ≤ y := by linarith
     have hyy : y ≤ y ^ 2 := by nlinarith
@@ -65,8 +70,9 @@ theorem Gchi_growth {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) :
     rw [if_neg h]
     refine (norm_add_le _ _).trans ?_
     rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg hy0]
-    have h2 := mul_le_mul_of_nonneg_left hyy
-      (norm_nonneg (deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1))
+    have h2 :=
+      mul_le_mul_of_nonneg_left hyy
+        (norm_nonneg (deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1))
     linarith
 
 end Deduction

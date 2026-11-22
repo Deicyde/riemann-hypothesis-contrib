@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Hec
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto GlobalTheory.ChainNS
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,7 +24,8 @@ namespace GlobalTheory.ChainNS
 theorem chainNS_holds : ∀ D : D7, ChainNS D := by
   intro D c hc S' hS' B hB hBi k hk
   obtain ⟨p, hp, -, hpS, v, hv⟩ :=
-    GlobalTheory.SplitChoice.exists_split_prime D (S' : Set (HeightOneSpectrum (𝓞 D.host.F))) 1 (Finset.finite_toSet _) one_ne_zero
+    GlobalTheory.SplitChoice.exists_split_prime D (S' : Set (HeightOneSpectrum (𝓞 D.host.F))) 1
+      (Finset.finite_toSet _) one_ne_zero
   have hvS : v ∉ S' := fun h => hpS v (Finset.mem_coe.2 h) hv
   refine ⟨v, hvS, GlobalTheory.SplitPlace.isSplit_of_splitsCompletely D p hp v hv, ?_⟩
   intro w hw β hβ k' hk'
@@ -35,12 +39,16 @@ theorem chainNS_holds : ∀ D : D7, ChainNS D := by
     exact h
   have hwc : w.under (𝓞 D.host.F) ∉ c.S := fun h => hvS (hw ▸ hS' h)
   set x := GlobalTheory.LFun.val (F := D.host.F) (c.chT (k + 1)) w with hx
-  have hmem : x⁻¹ * β ∈ GlobalTheory.LFun.twist (chainPar c B k) (GlobalTheory.LFun.val (F := D.host.F) (c.chT (k + 1)))⁻¹ w := by
+  have hmem
+      : x⁻¹ * β ∈ GlobalTheory.LFun.twist (chainPar c B k)
+        (GlobalTheory.LFun.val (F := D.host.F) (c.chT (k + 1)))⁻¹ w := by
     simp only [GlobalTheory.LFun.twist, Pi.inv_apply]
     exact Multiset.mem_map_of_mem _ hβ
   rw [chainPar_twist_chT] at hmem
   have key : ((x⁻¹ * β : ℂˣ) : ℂ) ≠ GlobalTheory.LFun.npow w ((k' : ℂ) / 2) := by
-    have hN := GlobalTheory.T.small_entries_and_strings_avoid_excluded_norm_powers D.host.E w D.R.r D.R.t hrt k' hk'
+    have hN :=
+      GlobalTheory.T.small_entries_and_strings_avoid_excluded_norm_powers D.host.E w D.R.r D.R.t hrt
+        k' hk'
     simp only [Pi.add_apply, Finset.sum_apply, Multiset.mem_add, Multiset.mem_sum] at hmem
     rcases hmem with h | ⟨i, hi, h⟩
     · simp only [GlobalTheory.LFun.twist, Pi.inv_apply] at h
@@ -48,7 +56,8 @@ theorem chainNS_holds : ∀ D : D7, ChainNS D := by
       rw [← hb']
       have hb1 := (hB w hwS).2 b hb
       have hb2 := (hBi w hwS).2 b⁻¹ (Multiset.mem_map_of_mem _ hb)
-      have hu : ‖((GlobalTheory.LFun.val (F := D.host.F) (c.μ (k + 1)) w : ℂˣ) : ℂ)‖ = 1 := GlobalTheory.LFun.norm_val _ _
+      have hu : ‖((GlobalTheory.LFun.val (F := D.host.F) (c.μ (k + 1)) w : ℂˣ) : ℂ)‖ = 1 :=
+        GlobalTheory.LFun.norm_val _ _
       refine hN.1 _ (Units.ne_zero _) ?_ ?_
       · rw [Units.val_mul, norm_mul, Units.val_inv_eq_inv_val, norm_inv, hu, inv_one, one_mul]
         exact hb1
@@ -57,7 +66,9 @@ theorem chainNS_holds : ∀ D : D7, ChainNS D := by
         exact hb2
     · have hi' := Finset.mem_Icc.1 hi
       exact hN.2 _ (GlobalTheory.LFun.norm_val _ _)
-        (GlobalTheory.T.heckeCharQuotient_ne_one_completelySplitPrime D c hc i (k + 1) hi'.1 (by omega) (by omega) p hp w hpw hwc) _ h
+        (GlobalTheory.T.heckeCharQuotient_ne_one_completelySplitPrime D c hc i (k + 1) hi'.1
+          (by omega) (by omega) p hp w hpw hwc)
+        _ h
   intro he
   apply key
   rw [Units.val_mul, Units.val_inv_eq_inv_val, mul_comm]

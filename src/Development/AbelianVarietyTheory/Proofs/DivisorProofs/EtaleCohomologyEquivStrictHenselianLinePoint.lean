@@ -20,51 +20,67 @@ namespace GlobalTheory.EtC.LineLocal
 
 open Polynomial
 
-theorem bijective_of_subsingleton {X Y : Type*} [Subsingleton X] [Subsingleton Y] (f : X → Y) (x : X) :
-    Function.Bijective f :=
+theorem bijective_of_subsingleton
+    {X Y : Type*} [Subsingleton X] [Subsingleton Y] (f : X → Y) (x : X)
+    : Function.Bijective f :=
   ⟨fun a b _ => Subsingleton.elim a b, fun y => ⟨x, Subsingleton.elim _ _⟩⟩
 
-theorem idem_of_domain {A : Type} [CommRing A] [IsDomain A] (e : A) (he : IsIdempotentElem e) :
-    e = 0 ∨ e = 1 := by
+theorem idem_of_domain {A : Type} [CommRing A] [IsDomain A] (e : A) (he : IsIdempotentElem e)
+    : e = 0 ∨ e = 1 := by
   have h : e * (e - 1) = 0 := by rw [mul_sub, mul_one, he.eq, sub_self]
   rcases mul_eq_zero.mp h with h | h
   · exact Or.inl h
   · exact Or.inr (sub_eq_zero.mp h)
 
-
 attribute [local instance] Algebra.TensorProduct.rightAlgebra in
-theorem isDomain_tensor_fractionRing (T O : Type) [CommRing T] [IsDomain T] [CommRing O] [IsDomain O]
-    [Algebra T O] (hinj : Function.Injective (algebraMap T O)) : IsDomain (O ⊗[T] FractionRing T) := by
+theorem isDomain_tensor_fractionRing
+    (T O : Type) [CommRing T] [IsDomain T] [CommRing O] [IsDomain O] [Algebra T O]
+    (hinj : Function.Injective (algebraMap T O))
+    : IsDomain (O ⊗[T] FractionRing T) := by
   haveI : IsLocalization (Algebra.algebraMapSubmonoid O (nonZeroDivisors T))
       (O ⊗[T] FractionRing T) := by
     rw [Algebra.isLocalization_iff_isPushout (nonZeroDivisors T) (FractionRing T)]
     infer_instance
-  exact IsLocalization.isDomain_of_le_nonZeroDivisors (M := Algebra.algebraMapSubmonoid O (nonZeroDivisors T))
-    (O ⊗[T] FractionRing T) (by
+  exact IsLocalization.isDomain_of_le_nonZeroDivisors
+    (M := Algebra.algebraMapSubmonoid O (nonZeroDivisors T)) (O ⊗[T] FractionRing T)
+    (by
       rintro _ ⟨a, ha, rfl⟩
-      exact mem_nonZeroDivisors_of_ne_zero ((map_ne_zero_iff _ hinj).mpr (nonZeroDivisors.ne_zero ha)))
+      exact mem_nonZeroDivisors_of_ne_zero ((map_ne_zero_iff _ hinj).mpr
+        (nonZeroDivisors.ne_zero ha)))
 
-theorem eqv_local : ∀ (q : ℕ) [NeZero q] (T : Type) [CommRing T] [IsDomain T] [IsLocalRing T], AIC T →
-    IsUnit (q : T) → ∀ (O : Type) [CommRing O] [Algebra (Polynomial T) O] [Algebra T O]
-    [IsScalarTower T (Polynomial T) O], SH O → IndEt (Polynomial T) O → ∀ i : ℤ,
-    Eqv _ (spMap (Algebra.TensorProduct.includeRight (R := T) (A := FractionRing T) (B := O)).toRingHom)
-      (tw q i) := by
+theorem eqv_local
+    : ∀ (q : ℕ) [NeZero q] (T : Type) [CommRing T] [IsDomain T] [IsLocalRing T],
+      AIC T → IsUnit (q : T)
+        → ∀ (O : Type) [CommRing O] [Algebra (Polynomial T) O] [Algebra T O]
+            [IsScalarTower T (Polynomial T) O],
+          SH O → IndEt (Polynomial T) O
+            → ∀ i : ℤ,
+              Eqv _
+                (spMap (Algebra.TensorProduct.includeRight (R := T) (A := FractionRing T)
+                  (B := O)).toRingHom)
+                (tw q i) := by
   intro q _ T _ _ _ hT hq O _ _ _ _ hSH hInd i
   unfold Eqv
   intro n
-  have hfac : ∀ a : O, ∃ (E : Type) (_ : CommRing E) (_ : Algebra (Polynomial T) E)
-      (_ : Algebra.Etale (Polynomial T) E) (φ : E →ₐ[Polynomial T] O), a ∈ φ.range := by
+  have hfac
+      : ∀ a : O,
+        ∃ (E : Type) (_ : CommRing E) (_ : Algebra (Polynomial T) E)
+            (_ : Algebra.Etale (Polynomial T) E) (φ : E →ₐ[Polynomial T] O),
+          a ∈ φ.range := by
     intro a
-    obtain ⟨C, _, _, _, ψ, χ, h⟩ := exists_etale_factor_of_indEt (Polynomial T) O hInd
-      (Polynomial (Polynomial T)) (Polynomial.aeval a)
+    obtain ⟨C, _, _, _, ψ, χ, h⟩ :=
+      exists_etale_factor_of_indEt (Polynomial T) O hInd (Polynomial (Polynomial T))
+        (Polynomial.aeval a)
     refine ⟨C, ‹_›, ‹_›, ‹_›, χ, ⟨ψ Polynomial.X, ?_⟩⟩
     have := DFunLike.congr_fun h Polynomial.X
     simpa using this
   rcases lt_trichotomy n 0 with hn | rfl | hn
   · have h1 : ∀ E : Spc, ∀ n : ℤ, n < 0 → Subsingleton (H (ZMod q) E (tw q i) n) := by
       intro E n hn
-      have hz : ∀ α : CochainComplex.HomComplex.Cochain ((chains (ZMod q)).obj E)
-          (res (ZMod q) (tw q i)) n, α = 0 := by
+      have hz
+          : ∀ α : CochainComplex.HomComplex.Cochain ((chains (ZMod q)).obj E)
+              (res (ZMod q) (tw q i)) n,
+            α = 0 := by
         intro α
         apply (GlobalTheory.T.etaleCochainEvalOnSimplex_basic_properties (ZMod q)).2.2.1 α 0
         intro p s h U x
@@ -95,8 +111,9 @@ theorem eqv_local : ∀ (q : ℕ) [NeZero q] (T : Type) [CommRing T] [IsDomain T
     have hqO : IsUnit (q : O) := by
       have := hq.map (algebraMap T O)
       rwa [map_natCast] at this
-    obtain ⟨z, hz⟩ := hT (Polynomial.cyclotomic q T) (Polynomial.cyclotomic.monic q T) (by
-      rw [Polynomial.natDegree_cyclotomic]; exact Nat.totient_pos.2 (NeZero.pos q))
+    obtain ⟨z, hz⟩ :=
+      hT (Polynomial.cyclotomic q T) (Polynomial.cyclotomic.monic q T)
+        (by rw [Polynomial.natDegree_cyclotomic]; exact Nat.totient_pos.2 (NeZero.pos q))
     have hζ : Polynomial.aeval (algebraMap T O z) (Polynomial.cyclotomic q ℤ) = 0 := by
       rw [Polynomial.aeval_algebraMap_apply, Polynomial.aeval_def, Polynomial.eval₂_eq_eval_map,
         Polynomial.map_cyclotomic, hz, map_zero]

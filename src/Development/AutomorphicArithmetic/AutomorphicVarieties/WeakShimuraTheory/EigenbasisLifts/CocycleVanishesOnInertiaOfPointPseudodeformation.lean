@@ -11,16 +11,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Eb GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Eb
+  GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Ws.Eb.cocycle_vanishes_on_inertia_of_point_pseudodeformation :
-    ∀ {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L]
-      [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] {s : W.HidaSetting l L Ω} (V : s.Lev)
-      {c : Coef l} {n : ℕ} {r : W.Resid (W.HidaSetting.Lev.frame V) c.O n}
-      (B : W.UniversalOrdinaryDeterminantRing r) (x : B.Pt)
-      (ρ : (W.HidaSetting.Lev.frame V).G₀ →* GL (Fin n) (PadicAlgCl l)),
-      r.V0ok → B.u.D.map (x : B.B →+* PadicAlgCl l) = W.GDet.ofRep (W.mat ρ) →
-      Continuous ρ → ∀ y ∈ Z1 (Loc.adGL ρ), ∀ g ∈ (W.HidaSetting.Lev.frame V).I0, y g = 0 := by
+theorem UpperTheory.V.Ws.Eb.cocycle_vanishes_on_inertia_of_point_pseudodeformation
+    : ∀ {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω]
+        [Algebra L Ω] [IsAlgClosure L Ω] {s : W.HidaSetting l L Ω} (V : s.Lev) {c : Coef l} {n : ℕ}
+        {r : W.Resid (W.HidaSetting.Lev.frame V) c.O n} (B : W.UniversalOrdinaryDeterminantRing r)
+        (x : B.Pt) (ρ : (W.HidaSetting.Lev.frame V).G₀ →* GL (Fin n) (PadicAlgCl l)),
+      r.V0ok → B.u.D.map (x : B.B →+* PadicAlgCl l) = W.GDet.ofRep (W.mat ρ) → Continuous ρ
+        → ∀ y ∈ Z1 (Loc.adGL ρ), ∀ g ∈ (W.HidaSetting.Lev.frame V).I0, y g = 0 := by
   intro l _ L Ω _ _ _ _ _ _ s V c n r B x ρ hok hB hρ y hy g hg
   rcases Nat.eq_zero_or_pos n with hn | hn
   · subst hn
@@ -35,7 +37,8 @@ theorem UpperTheory.V.Ws.Eb.cocycle_vanishes_on_inertia_of_point_pseudodeformati
     rw [← s.hw s.v0]
     have h := (s.hA s.v0 _).mpr hpv
     simpa using h
-  obtain ⟨j, hj⟩ := (Loc.decEmb (F := L) (Ω := Ω) (v := s.p)).1 (s.A s.v0) (s.w s.v0) (s.hw s.v0) hpw
+  obtain ⟨j, hj⟩ :=
+    (Loc.decEmb (F := L) (Ω := Ω) (v := s.p)).1 (s.A s.v0) (s.w s.v0) (s.hw s.v0) hpw
   obtain ⟨-, φ, hφo, -, -, hφI, hφc, -⟩ := (Loc.decEmb (F := L) (Ω := Ω) (v := s.p)).2 j
   change g ∈ Subgroup.map V.pr (Ine (s.A s.v0)) at hg
   change ∀ i, Subgroup.map V.pr (Ine (s.A s.v0)) ≤ (r.chib i).ker at hI0
@@ -47,7 +50,9 @@ theorem UpperTheory.V.Ws.Eb.cocycle_vanishes_on_inertia_of_point_pseudodeformati
   have hψc : Continuous ψ := (V.pr_cont W.continuous_resP).comp continuous_subtype_val
   haveI : CompactSpace ↥(Dec (Loc.placeJ j)) := isCompact_iff_compactSpace.mp (isClosed_Dec (F := L) (Loc.placeJ j)).isCompact
   let κ : ↥(Dec (Loc.placeJ j)) →* (ResidueField c.O)ˣ := (r.chib ⟨0, hn⟩).comp ψ
-  have main := inertia_trivial_of_charpoly_roots_near_character s.p_ne φ hφo c κ ?_ ?_ (ρ₂.comp ψ) (hρ₂c.comp hψc) ?_
+  have main :=
+    inertia_trivial_of_charpoly_roots_near_character s.p_ne φ hφo c κ ?_ ?_ (ρ₂.comp ψ)
+      (hρ₂c.comp hψc) ?_
   · obtain ⟨h, hh, rfl⟩ := hg
     apply hρ₂y
     exact main ⟨h, Ine_le_Dec _ hh⟩ ((hφI ⟨h, Ine_le_Dec _ hh⟩).2 hh)
@@ -65,7 +70,8 @@ theorem UpperTheory.V.Ws.Eb.cocycle_vanishes_on_inertia_of_point_pseudodeformati
     apply Units.ext
     unfold W.GFrame.eps W.pushCh
     change (algebraMap c.O (ResidueField c.O)) (algebraMap ℤ_[l] c.O
-      ↑(V.frame.ε (V.frame.η.ker.subtype (V.pr h)))) = 1
+        ↑(V.frame.ε (V.frame.η.ker.subtype (V.pr h))))
+      = 1
     change (residue c.O) (algebraMap ℤ_[l] c.O ↑(cycZ L Ω l h)) = 1 at heq
     rw [e1, IsLocalRing.ResidueField.algebraMap_eq]
     exact heq

@@ -15,29 +15,28 @@ noncomputable section
 def traceFormℂ : ℂ →L[ℝ] ℂ →L[ℝ] ℝ :=
   (2 : ℝ) • (ContinuousLinearMap.compL ℝ ℂ ℂ ℝ Complex.reCLM).comp (ContinuousLinearMap.mul ℝ ℂ)
 
-@[simp] theorem traceFormℂ_apply (z w : ℂ) : traceFormℂ z w = 2 * (z * w).re := by
-  simp [traceFormℂ]
+@[simp]
+theorem traceFormℂ_apply (z w : ℂ) : traceFormℂ z w = 2 * (z * w).re := by simp [traceFormℂ]
 
 def complexPlaceMeasure : Measure ℂ := (2 : ℝ≥0∞) • volume
 
-def complexFourier (f : ℂ → ℂ) (w : ℂ) : ℂ :=
-  ∫ z, 𝐞 (-(2 * (z * w).re)) • f z ∂complexPlaceMeasure
+def complexFourier (f : ℂ → ℂ) (w : ℂ) : ℂ := ∫ z, 𝐞 (-(2 * (z * w).re)) • f z ∂complexPlaceMeasure
 
-theorem complexFourier_eq_fourierIntegral (f : ℂ → ℂ) :
-    complexFourier f =
-      VectorFourier.fourierIntegral 𝐞 complexPlaceMeasure traceFormℂ.toLinearMap₁₂ f := by
+theorem complexFourier_eq_fourierIntegral (f : ℂ → ℂ)
+    : complexFourier f
+      = VectorFourier.fourierIntegral 𝐞 complexPlaceMeasure traceFormℂ.toLinearMap₁₂ f := by
   funext w
   simp [complexFourier, VectorFourier.fourierIntegral]
 
 def complexGaussian (m : ℤ) (z : ℂ) : ℂ :=
   (if 0 ≤ m then z ^ m.natAbs else conj z ^ m.natAbs) * Complex.exp (-2 * π * (‖z‖ : ℂ) ^ 2)
 
-theorem complexGaussian_zero (z : ℂ) :
-    complexGaussian 0 z = Complex.exp (-2 * π * (‖z‖ : ℂ) ^ 2) := by
+theorem complexGaussian_zero (z : ℂ)
+    : complexGaussian 0 z = Complex.exp (-2 * π * (‖z‖ : ℂ) ^ 2) := by
   simp [complexGaussian]
 
-theorem complexFourier_eq_two_mul_fourier (f : ℂ → ℂ) (w : ℂ) :
-    complexFourier f w = 2 * 𝓕 f (2 * conj w) := by
+theorem complexFourier_eq_two_mul_fourier (f : ℂ → ℂ) (w : ℂ)
+    : complexFourier f w = 2 * 𝓕 f (2 * conj w) := by
   rw [complexFourier, complexPlaceMeasure, integral_smul_measure, fourier_eq]
   simp only [ENNReal.toReal_ofNat, Complex.real_smul, ofReal_ofNat]
   congr 2
@@ -47,8 +46,8 @@ theorem complexFourier_eq_two_mul_fourier (f : ℂ → ℂ) (w : ℂ) :
   simp [Complex.mul_re]
   ring
 
-theorem complexFourier_complexGaussian_zero :
-    complexFourier (complexGaussian 0) = complexGaussian 0 := by
+theorem complexFourier_complexGaussian_zero
+    : complexFourier (complexGaussian 0) = complexGaussian 0 := by
   funext w
   rw [complexFourier_eq_two_mul_fourier]
   have hb : 0 < ((2 * π : ℝ) : ℂ).re := by simp [Real.pi_pos]
@@ -61,27 +60,31 @@ theorem complexFourier_complexGaussian_zero :
   rw [hn]
   have h1 : ((π : ℂ) / ((2 * π : ℝ) : ℂ)) ^ (((2 : ℕ) : ℂ) / 2) = 1 / 2 := by
     have : ((2 : ℕ) : ℂ) / 2 = 1 := by norm_num
-    rw [this, cpow_one]; push_cast; field_simp
+    rw [this, cpow_one]
+    push_cast
+    field_simp
   rw [h1]
   push_cast
   rw [← mul_assoc, show (2 : ℂ) * (1 / 2) = 1 by norm_num, one_mul]
   congr 1
   field_simp
 
-theorem integrable_norm_pow_mul_exp_neg_two_pi_mul_sq (k : ℕ) :
-    Integrable (fun z : ℂ ↦ ‖z‖ ^ k * Real.exp (-(2 * π) * ‖z‖ ^ 2)) := by
-  have h := (integrable_fun_norm_addHaar (volume : Measure ℂ)
-    (f := fun y : ℝ ↦ y ^ k * Real.exp (-(2 * π) * y ^ 2))).2
+theorem integrable_norm_pow_mul_exp_neg_two_pi_mul_sq (k : ℕ)
+    : Integrable (fun z : ℂ ↦ ‖z‖ ^ k * Real.exp (-(2 * π) * ‖z‖ ^ 2)) := by
+  have h :=
+    (integrable_fun_norm_addHaar (volume : Measure ℂ)
+      (f := fun y : ℝ ↦ y ^ k * Real.exp (-(2 * π) * y ^ 2))).2
   refine h ?_
   rw [Complex.finrank_real_complex]
-  have h2 := integrableOn_rpow_mul_exp_neg_mul_sq (b := 2 * π) (by positivity)
-    (s := ((k + 1 : ℕ) : ℝ)) (by have := Nat.cast_nonneg (α := ℝ) (k + 1); linarith)
+  have h2 :=
+    integrableOn_rpow_mul_exp_neg_mul_sq (b := 2 * π) (by positivity) (s := ((k + 1 : ℕ) : ℝ))
+      (by have := Nat.cast_nonneg (α := ℝ) (k + 1); linarith)
   refine h2.congr_fun (fun y _ ↦ ?_) measurableSet_Ioi
   simp only [Real.rpow_natCast, smul_eq_mul]
   ring
 
-theorem integrable_norm_pow_smul_complexGaussian (m : ℤ) (k : ℕ) :
-    Integrable (fun z : ℂ ↦ (‖z‖ ^ k : ℝ) • complexGaussian m z) := by
+theorem integrable_norm_pow_smul_complexGaussian (m : ℤ) (k : ℕ)
+    : Integrable (fun z : ℂ ↦ (‖z‖ ^ k : ℝ) • complexGaussian m z) := by
   refine (integrable_norm_pow_mul_exp_neg_two_pi_mul_sq (k + m.natAbs)).mono' ?_ ?_
   · refine Continuous.aestronglyMeasurable ?_
     unfold complexGaussian
@@ -94,17 +97,17 @@ theorem integrable_norm_pow_smul_complexGaussian (m : ℤ) (k : ℕ) :
     rw [this]
     split_ifs <;> simp [pow_add, mul_assoc]
 
-theorem integrable_norm_pow_smul_complexGaussian' (m : ℤ) (k : ℕ) :
-    Integrable (fun z : ℂ ↦ (‖z‖ ^ k : ℝ) • complexGaussian m z) complexPlaceMeasure :=
+theorem integrable_norm_pow_smul_complexGaussian' (m : ℤ) (k : ℕ)
+    : Integrable (fun z : ℂ ↦ (‖z‖ ^ k : ℝ) • complexGaussian m z) complexPlaceMeasure :=
   (integrable_norm_pow_smul_complexGaussian m k).smul_measure (by simp)
 
-theorem integrable_complexGaussian (m : ℤ) :
-    Integrable (complexGaussian m) complexPlaceMeasure := by
+theorem integrable_complexGaussian (m : ℤ)
+    : Integrable (complexGaussian m) complexPlaceMeasure := by
   simpa using integrable_norm_pow_smul_complexGaussian' m 0
 
-theorem complexGaussian_mul_zpow {z : ℂ} (hz : z ≠ 0) (m : ℤ) :
-    complexGaussian m z * (z / (‖z‖ : ℂ)) ^ (-m) =
-      (‖z‖ : ℂ) ^ m.natAbs * Complex.exp (-2 * π * (‖z‖ : ℂ) ^ 2) := by
+theorem complexGaussian_mul_zpow {z : ℂ} (hz : z ≠ 0) (m : ℤ)
+    : complexGaussian m z * (z / (‖z‖ : ℂ)) ^ (-m)
+      = (‖z‖ : ℂ) ^ m.natAbs * Complex.exp (-2 * π * (‖z‖ : ℂ) ^ 2) := by
   have hn : (‖z‖ : ℂ) ≠ 0 := by simpa using hz
   rw [complexGaussian]
   split_ifs with hm
@@ -121,8 +124,8 @@ theorem complexGaussian_mul_zpow {z : ℂ} (hz : z ≠ 0) (m : ℤ) :
     field_simp
     linear_combination this
 
-theorem integral_comp_norm_complexPlaceMeasure (f : ℝ → ℂ) :
-    ∫ z, f ‖z‖ ∂complexPlaceMeasure = 4 * π * ∫ y in Ioi (0 : ℝ), (y : ℂ) * f y := by
+theorem integral_comp_norm_complexPlaceMeasure (f : ℝ → ℂ)
+    : ∫ z, f ‖z‖ ∂complexPlaceMeasure = 4 * π * ∫ y in Ioi (0 : ℝ), (y : ℂ) * f y := by
   rw [complexPlaceMeasure, integral_smul_measure, integral_fun_norm_addHaar volume f,
     Complex.finrank_real_complex]
   have hb : (volume : Measure ℂ).real (Metric.ball 0 1) = π := by
@@ -133,16 +136,20 @@ theorem integral_comp_norm_complexPlaceMeasure (f : ℝ → ℂ) :
   push_cast
   ring
 
-theorem integral_complexGaussian_mul_zpow_mul_cpow (m : ℤ) {s : ℂ}
-    (hs : 0 < s.re + m.natAbs / 2) :
-    ∫ z, complexGaussian m z * (z / (‖z‖ : ℂ)) ^ (-m) * ((‖z‖ ^ 2 : ℝ) : ℂ) ^ s /
-        ((‖z‖ ^ 2 : ℝ) : ℂ) ∂complexPlaceMeasure =
-      π * Gammaℂ (s + m.natAbs / 2) := by
+theorem integral_complexGaussian_mul_zpow_mul_cpow (m : ℤ) {s : ℂ} (hs : 0 < s.re + m.natAbs / 2)
+    : ∫ z, complexGaussian m z * (z / (‖z‖ : ℂ)) ^ (-m) * ((‖z‖ ^ 2 : ℝ) : ℂ) ^ s /
+          ((‖z‖ ^ 2 : ℝ) : ℂ) ∂complexPlaceMeasure
+      = π * Gammaℂ (s + m.natAbs / 2) := by
   set n := m.natAbs with hn
-  have h : (fun z : ℂ ↦ complexGaussian m z * (z / (‖z‖ : ℂ)) ^ (-m) *
-        ((‖z‖ ^ 2 : ℝ) : ℂ) ^ s / ((‖z‖ ^ 2 : ℝ) : ℂ)) =
-      fun z ↦ (fun y : ℝ ↦ (y : ℂ) ^ n * ((Real.exp (-(2 * π * y ^ 2)) : ℝ) : ℂ) *
-        ((y ^ 2 : ℝ) : ℂ) ^ s / ((y ^ 2 : ℝ) : ℂ)) ‖z‖ := by
+  have h
+      : (fun z : ℂ ↦
+          complexGaussian m z * (z / (‖z‖ : ℂ)) ^ (-m) * ((‖z‖ ^ 2 : ℝ) : ℂ) ^ s
+            / ((‖z‖ ^ 2 : ℝ) : ℂ))
+        = fun z ↦
+          (fun y : ℝ ↦
+              (y : ℂ) ^ n * ((Real.exp (-(2 * π * y ^ 2)) : ℝ) : ℂ) * ((y ^ 2 : ℝ) : ℂ) ^ s
+                / ((y ^ 2 : ℝ) : ℂ))
+            ‖z‖ := by
     funext z
     by_cases hz : z = 0
     · subst hz; simp
@@ -150,12 +157,14 @@ theorem integral_complexGaussian_mul_zpow_mul_cpow (m : ℤ) {s : ℂ}
       rw [complexGaussian_mul_zpow hz, ofReal_exp, ← hn]
       push_cast
       ring_nf
-  rw [h, integral_comp_norm_complexPlaceMeasure (fun y : ℝ ↦ (y : ℂ) ^ n *
-    ((Real.exp (-(2 * π * y ^ 2)) : ℝ) : ℂ) * ((y ^ 2 : ℝ) : ℂ) ^ s / ((y ^ 2 : ℝ) : ℂ))]
+  rw [h,
+    integral_comp_norm_complexPlaceMeasure (fun y : ℝ ↦
+      (y : ℂ) ^ n * ((Real.exp (-(2 * π * y ^ 2)) : ℝ) : ℂ) * ((y ^ 2 : ℝ) : ℂ) ^ s
+        / ((y ^ 2 : ℝ) : ℂ))]
   have ha : 0 < (2 * s + n).re := by simp; linarith
   have : ∫ y in Ioi (0 : ℝ), (y : ℂ) * ((y : ℂ) ^ n * ((Real.exp (-(2 * π * y ^ 2)) : ℝ) : ℂ) *
-        ((y ^ 2 : ℝ) : ℂ) ^ s / ((y ^ 2 : ℝ) : ℂ)) =
-      mellin (fun t : ℝ ↦ ((Real.exp (-(2 * π * t ^ 2)) : ℝ) : ℂ)) (2 * s + n) := by
+        ((y ^ 2 : ℝ) : ℂ) ^ s / ((y ^ 2 : ℝ) : ℂ))
+      = mellin (fun t : ℝ ↦ ((Real.exp (-(2 * π * t ^ 2)) : ℝ) : ℂ)) (2 * s + n) := by
     rw [mellin]
     refine setIntegral_congr_fun measurableSet_Ioi fun y hy ↦ ?_
     have hy0 : (y : ℂ) ≠ 0 := ofReal_ne_zero.mpr (ne_of_gt hy)

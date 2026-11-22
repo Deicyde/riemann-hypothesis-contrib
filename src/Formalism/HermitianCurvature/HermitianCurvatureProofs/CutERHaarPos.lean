@@ -12,20 +12,31 @@ namespace Formalism.FourierDecayAlt.P.CutMP.ER
 
 open Formalism.FourierDecayAlt Formalism.QuantumDeterminants MeasureTheory
 
-theorem haar_open_pos {k r : ℕ} {μ : Measure (Mt k r)} (hμ : B.IsHaarOn (B.GV k r) μ) {O : Set (Mt k r)}
-    (hO : IsOpen O) {g₀ : Mt k r} (hg₀ : Matrix.of g₀ ∈ B.GV k r) (hg₀O : g₀ ∈ O) : μ O ≠ 0 := by
+theorem haar_open_pos
+    {k r : ℕ} {μ : Measure (Mt k r)} (hμ : B.IsHaarOn (B.GV k r) μ)
+    {O : Set (Mt k r)} (hO : IsOpen O)
+    {g₀ : Mt k r} (hg₀ : Matrix.of g₀ ∈ B.GV k r) (hg₀O : g₀ ∈ O)
+    : μ O ≠ 0 := by
   intro h0
   have hnull : ∀ b ∈ B.GV k r, μ (lmulM (k := k) (r := r) b ⁻¹' O) = 0 := by
     intro b hb
-    have hm : Measurable (lmulM (k := k) (r := r) b) := (BesselUnitaryEquiv.continuous_lmulM b).measurable
+    have hm : Measurable (lmulM (k := k) (r := r) b) :=
+      (BesselUnitaryEquiv.continuous_lmulM b).measurable
     rw [← Measure.map_apply hm hO.measurableSet, hμ.left b hb, h0]
-  let U : {b : B.Mat k r // b ∈ B.GV k r} → Set (Mt k r) := fun b => lmulM (k := k) (r := r) b.1 ⁻¹' O
+  let U : {b : B.Mat k r // b ∈ B.GV k r} → Set (Mt k r) := fun b =>
+    lmulM (k := k) (r := r) b.1 ⁻¹' O
   have hUo : ∀ i, IsOpen (U i) := fun i => hO.preimage (BesselUnitaryEquiv.continuous_lmulM i.1)
   obtain ⟨T, hTc, hT⟩ := TopologicalSpace.isOpen_iUnion_countable U hUo
   have hcov : {x : Mt k r | Matrix.of x ∈ B.GV k r} ⊆ ⋃ i, U i := by
     intro x hx
-    refine Set.mem_iUnion.2 ⟨⟨Matrix.of g₀ * (Matrix.of x)⁻¹,
-      Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul hg₀ (Formalism.FourierDecayAlt.P.NFRadRedLocSec.uh_inv_mem hx)⟩, ?_⟩
+    refine Set.mem_iUnion.2 ⟨
+      ⟨
+        Matrix.of g₀ * (Matrix.of x)⁻¹,
+        Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul hg₀
+          (Formalism.FourierDecayAlt.P.NFRadRedLocSec.uh_inv_mem hx)
+      ⟩,
+      ?_
+    ⟩
     have hx' : Matrix.of x ∈ B.GV k r := hx
     have e : lmulM (k := k) (r := r) (Matrix.of g₀ * (Matrix.of x)⁻¹) x = g₀ := by
       unfold lmulM

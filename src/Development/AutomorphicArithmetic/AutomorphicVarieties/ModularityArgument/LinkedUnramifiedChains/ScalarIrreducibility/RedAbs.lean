@@ -14,7 +14,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
 theorem UpperTheory.V.J.redAbs : UpperTheory.V.J.RedAbs := by
   set_option synthInstance.maxHeartbeats 200000 in
@@ -25,8 +27,10 @@ theorem UpperTheory.V.J.redAbs : UpperTheory.V.J.RedAbs := by
   have hN : Q.height ≤ ((n * F.d + 1 : ℕ) : ℕ∞) :=
     UpperTheory.V.J.htUp l c F C₀ n hF hn S M hAG (fun Z hZ hMZ => (hDB Z hZ hMZ).1) _ x L Q hO hTI
   have hass := (UpperTheory.V.J.htLow l c F C₀ n hF hn S _ x L Q hO).2 hN
-  have hTIle : ∀ P : Ideal S.A, P ≤ RingHom.ker ξ → S.u.TI P := fun P hle =>
-    ⟨⟨fun h => hTI.1.1 (h.trans hle), fun h => hTI.1.2 (h.trans hle)⟩, fun h3 h => hTI.2 h3 (h.trans hle)⟩
+  have hTIle : ∀ P : Ideal S.A, P ≤ RingHom.ker ξ → S.u.TI P := fun P hle => ⟨
+    ⟨fun h => hTI.1.1 (h.trans hle), fun h => hTI.1.2 (h.trans hle)⟩,
+    fun h3 h => hTI.2 h3 (h.trans hle)
+  ⟩
   have hmin : ∀ P ∈ minimalPrimes S.A, P ≤ RingHom.ker ξ → ∀ a ∈ P, ∃ s ∉ P, s * a = 0 := by
     intro P hP hPq
     have hPp : P.IsPrime := hP.1.1
@@ -48,6 +52,7 @@ theorem UpperTheory.V.J.redAbs : UpperTheory.V.J.RedAbs := by
     have hht := (UpperTheory.V.J.htLow l c F C₀ n hF hn S _ x' L' Q' hO').1
     have hdom := UpperTheory.V.J.regDom l c S.A ξ' (n * F.d + 1) hrk hht
     exact UpperTheory.V.J.domMin S.A (RingHom.ker ξ') hdom P hP hPk
-  obtain ⟨s, hs, hsb⟩ := UpperTheory.V.J.redCrit S.A (RingHom.ker ξ) hq hass hmin (S.inc b)
-    (fun P hPp hPq => hAG P hPp (hTIle P hPq) hb)
+  obtain ⟨s, hs, hsb⟩ :=
+    UpperTheory.V.J.redCrit S.A (RingHom.ker ξ) hq hass hmin (S.inc b)
+      (fun P hPp hPq => hAG P hPp (hTIle P hPq) hb)
   exact ⟨s, fun h => hs (RingHom.mem_ker.2 h), hsb⟩

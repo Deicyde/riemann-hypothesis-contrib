@@ -56,8 +56,10 @@ theorem fuAt_sig : fuAt (curveL W) (sig he X) (sig he (wSer W)) = sig he (fu W) 
     WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₄]
 
 theorem wEq_sig : WEq (curveL W) (sig he X) (sig he (wSer W)) := by
-  have hw : wSer W = X ^ 3 + C W.a₁ * X * wSer W + C W.a₂ * X ^ 2 * wSer W + C W.a₃ * wSer W ^ 2
-      + C W.a₄ * X * wSer W ^ 2 + C W.a₆ * wSer W ^ 3 :=
+  have hw
+      : wSer W
+        = X ^ 3 + C W.a₁ * X * wSer W + C W.a₂ * X ^ 2 * wSer W + C W.a₃ * wSer W ^ 2
+          + C W.a₄ * X * wSer W ^ 2 + C W.a₆ * wSer W ^ 3 :=
     (Formalism.ELL.wSeriesUnique K W).choose_spec.1.2
   have h := congrArg (sig he) hw
   simp only [map_add (f := _), map_mul, map_pow, sig_C] at h
@@ -65,14 +67,17 @@ theorem wEq_sig : WEq (curveL W) (sig he X) (sig he (wSer W)) := by
     WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆]
   exact h
 
-theorem isFlowUW_sig (hc : ∀ f : K⟦X⟧, derivative (f.subst e) = (D W f).subst e) :
-    IsFlowUW (curveL W) dL (sig he X) (sig he (wSer W)) := by
-  have hw : wSer W = X ^ 3 + C W.a₁ * X * wSer W + C W.a₂ * X ^ 2 * wSer W + C W.a₃ * wSer W ^ 2
-      + C W.a₄ * X * wSer W ^ 2 + C W.a₆ * wSer W ^ 3 :=
+theorem isFlowUW_sig (hc : ∀ f : K⟦X⟧, derivative (f.subst e) = (D W f).subst e)
+    : IsFlowUW (curveL W) dL (sig he X) (sig he (wSer W)) := by
+  have hw
+      : wSer W
+        = X ^ 3 + C W.a₁ * X * wSer W + C W.a₂ * X ^ 2 * wSer W + C W.a₃ * wSer W ^ 2
+          + C W.a₄ * X * wSer W ^ 2 + C W.a₆ * wSer W ^ 3 :=
     (Formalism.ELL.wSeriesUnique K W).choose_spec.1.2
   have hd := congrArg PowerSeries.derivative hw
   simp only [map_add (f := _), Derivation.leibniz, Derivation.leibniz_pow, PowerSeries.derivative_C,
-    PowerSeries.derivative_X, smul_eq_mul, nsmul_eq_mul] at hd
+      PowerSeries.derivative_X, smul_eq_mul, nsmul_eq_mul]
+    at hd
   have hDw : D W (wSer W) = fu W := by
     rw [D, Derivation.smul_apply, smul_eq_mul, fw, fu]
     linear_combination hd
@@ -88,22 +93,22 @@ theorem isFlowUW_sig (hc : ∀ f : K⟦X⟧, derivative (f.subst e) = (D W f).su
       rw [sig_apply, sig_apply, dL_toL, hc (wSer W), hDw]
     rw [h2, fuAt_sig]
 
-theorem inv_mul_sig (hne : toL e ≠ 0) :
-    (toL e)⁻¹ ^ 3 * sig he (xS W) * sig he (wSer W) = 1 := by
+theorem inv_mul_sig (hne : toL e ≠ 0) : (toL e)⁻¹ ^ 3 * sig he (xS W) * sig he (wSer W) = 1 := by
   have h1 : sig he (wU W) * sig he (xS W) = 1 := by rw [← map_mul, CurveSer.wU_mul_xS, map_one]
   have h2 : (toL e)⁻¹ * toL e = 1 := inv_mul_cancel₀ hne
   rw [CurveSer.wSer_eq, map_mul, map_pow, sig_X]
-  calc (toL e)⁻¹ ^ 3 * sig he (xS W) * (toL e ^ 3 * sig he (wU W))
+  calc
+    (toL e)⁻¹ ^ 3 * sig he (xS W) * (toL e ^ 3 * sig he (wU W))
       = ((toL e)⁻¹ * toL e) ^ 3 * (sig he (wU W) * sig he (xS W)) := by ring
     _ = 1 := by rw [h1, h2, one_pow, one_mul]
 
 include he in
-theorem isFlow_sig (hc : ∀ f : K⟦X⟧, derivative (f.subst e) = (D W f).subst e)
-    (hne : toL e ≠ 0) :
-    IsFlow (curveL W) dL ((toL e)⁻¹ ^ 2 * toL ((xS W).subst e))
+theorem isFlow_sig (hc : ∀ f : K⟦X⟧, derivative (f.subst e) = (D W f).subst e) (hne : toL e ≠ 0)
+    : IsFlow (curveL W) dL ((toL e)⁻¹ ^ 2 * toL ((xS W).subst e))
       ((toL e)⁻¹ ^ 3 * toL ((yS W).subst e)) := by
-  have h := chartFlowToFlow _ (curveL W) dL (sig he X) (sig he (wSer W))
-    ((toL e)⁻¹ ^ 3 * sig he (xS W)) isDer_dL' (isFlowUW_sig W he hc) (inv_mul_sig W he hne)
+  have h :=
+    chartFlowToFlow _ (curveL W) dL (sig he X) (sig he (wSer W)) ((toL e)⁻¹ ^ 3 * sig he (xS W))
+      isDer_dL' (isFlowUW_sig W he hc) (inv_mul_sig W he hne)
   have h2 : (toL e)⁻¹ * toL e = 1 := inv_mul_cancel₀ hne
   have hx : sig he X * ((toL e)⁻¹ ^ 3 * sig he (xS W)) = (toL e)⁻¹ ^ 2 * toL ((xS W).subst e) := by
     rw [sig_X, sig_apply]
@@ -113,13 +118,14 @@ theorem isFlow_sig (hc : ∀ f : K⟦X⟧, derivative (f.subst e) = (D W f).subs
   rwa [hx, hy] at h
 
 include he in
-theorem mul_yZ_sig (hne : toL e ≠ 0) :
-    toL e * ((toL e)⁻¹ ^ 3 * toL ((yS W).subst e)) = -((toL e)⁻¹ ^ 2 * toL ((xS W).subst e)) := by
+theorem mul_yZ_sig (hne : toL e ≠ 0)
+    : toL e * ((toL e)⁻¹ ^ 3 * toL ((yS W).subst e)) = -((toL e)⁻¹ ^ 2 * toL ((xS W).subst e)) := by
   have hy : (yS W).subst e = -((xS W).subst e) := by
     rw [yS, ← PowerSeries.coe_substAlgHom he, map_neg]
   rw [hy, map_neg]
   have ht : toL e * (toL e)⁻¹ = 1 := mul_inv_cancel₀ hne
-  calc toL e * ((toL e)⁻¹ ^ 3 * -toL ((xS W).subst e))
+  calc
+    toL e * ((toL e)⁻¹ ^ 3 * - toL ((xS W).subst e))
       = -((toL e * (toL e)⁻¹) * ((toL e)⁻¹ ^ 2 * toL ((xS W).subst e))) := by ring
     _ = -((toL e)⁻¹ ^ 2 * toL ((xS W).subst e)) := by rw [ht, one_mul]
 
@@ -131,7 +137,8 @@ theorem flowZ_of (hE : ExpSpec.{u}) (hC : ChainZ.{u}) : FlowZ.{u} := by
   intro K _ _ W
   obtain ⟨h0, h1, -, -, -⟩ := hE K W
   have he : HasSubst (expSer W) := HasSubst.of_constantCoeff_zero' h0
-  have inj : Function.Injective (toL : K⟦X⟧ →+* LaurentSeries K) := HahnSeries.ofPowerSeries_injective
+  have inj : Function.Injective (toL : K⟦X⟧ →+* LaurentSeries K) :=
+    HahnSeries.ofPowerSeries_injective
   have hne : toL (expSer W) ≠ 0 := by
     intro h
     have h' : expSer W = 0 := inj (by rw [h, map_zero])
@@ -159,16 +166,18 @@ theorem wpODE_of (hE : ExpSpec.{u}) (hC : ChainZ.{u}) : WpODE.{u} := by
     congr 1
     rw [g₃]
     field_simp
-  obtain ⟨h1, h2, h3⟩ := flowWeierstrassForm _ (curveL W) dL (xZ W) (yZ W) (HahnSeries.C (W.b₂ / 12))
-    (HahnSeries.C (g₂ W)) (HahnSeries.C (g₃ W)) isDer_dL' (constCurve_dL W) hF h6 hb hg2 hg3
+  obtain ⟨h1, h2, h3⟩ :=
+    flowWeierstrassForm _ (curveL W) dL (xZ W) (yZ W) (HahnSeries.C (W.b₂ / 12))
+      (HahnSeries.C (g₂ W)) (HahnSeries.C (g₃ W)) isDer_dL' (constCurve_dL W) hF h6 hb hg2 hg3
   refine ⟨?_, h2, ?_⟩
   · simpa only [wpL, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃] using h1
   · have hh : (HahnSeries.C (1 / 2 : K) : LaurentSeries K) * 2 = 1 := by
       rw [← map_ofNat (HahnSeries.C : K →+* LaurentSeries K) 2, ← map_mul, ← map_one HahnSeries.C]
       congr 1
       norm_num
-    have hg : (HahnSeries.C (g₂ W / 2) : LaurentSeries K)
-        = HahnSeries.C (1 / 2 : K) * HahnSeries.C (g₂ W) := by
+    have hg
+        : (HahnSeries.C (g₂ W / 2) : LaurentSeries K)
+          = HahnSeries.C (1 / 2 : K) * HahnSeries.C (g₂ W) := by
       rw [← map_mul]
       congr 1
       ring

@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 noncomputable section
 
@@ -166,7 +167,15 @@ lemma isUnit_pow_sub_pow_of_le {q : ℕ} [NeZero q] {A : Type} [CommRing A] (ζ 
   rw [e]
   exact (((isUnit_val ζ).pow b).mul (isUnit_one_sub ζ d hd)).neg
 
-theorem prim_basic : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], (∀ ζ : Prim q A, ζ.1 ^ q = 1) ∧ (∀ (ζ : Prim q A) (a : ℕ), Nat.Coprime a q → ∃ ξ : Prim q A, ξ.1 = ζ.1 ^ a) ∧ (∀ (ζ : Prim q A) (a b : ℕ), ¬ a ≡ b [MOD q] → IsUnit (ζ.1 ^ a - ζ.1 ^ b)) ∧ (∀ (ζ : Prim q A) (x : A), x ^ q = 1 → ∏ a ∈ Finset.range q, (x - ζ.1 ^ a) = 0) ∧ (∀ (ζ ξ : Prim q A), ∏ a ∈ (Finset.range q).filter (fun a => Nat.Coprime a q), (ξ.1 - ζ.1 ^ a) = 0) ∧ ∀ (r : ℕ), r ∣ q → ∀ ζ : Prim q A, ∃ ξ : Prim r A, ξ.1 = ζ.1 ^ (q / r) := by
+theorem prim_basic
+    : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A],
+      (∀ ζ : Prim q A, ζ.1 ^ q = 1)
+        ∧ (∀ (ζ : Prim q A) (a : ℕ), Nat.Coprime a q → ∃ ξ : Prim q A, ξ.1 = ζ.1 ^ a)
+        ∧ (∀ (ζ : Prim q A) (a b : ℕ), ¬ a ≡ b [MOD q] → IsUnit (ζ.1 ^ a - ζ.1 ^ b))
+        ∧ (∀ (ζ : Prim q A) (x : A), x ^ q = 1 → ∏ a ∈ Finset.range q, (x - ζ.1 ^ a) = 0)
+        ∧ (∀ (ζ ξ : Prim q A),
+          ∏ a ∈ (Finset.range q).filter (fun a => Nat.Coprime a q), (ξ.1 - ζ.1 ^ a) = 0)
+        ∧ ∀ (r : ℕ), r ∣ q → ∀ ζ : Prim q A, ∃ ξ : Prim r A, ξ.1 = ζ.1 ^ (q / r) := by
   intro q _ A _
   refine ⟨fun ζ => prim_pow_q ζ, ?_, ?_, ?_, ?_, ?_⟩
   · intro ζ a ha
@@ -181,7 +190,8 @@ theorem prim_basic : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], (∀ ζ :
     · exact isUnit_pow_sub_pow_of_le ζ a b hab hle
     · have := isUnit_pow_sub_pow_of_le ζ b a (fun h => hab h.symm) hle
       have e : ζ.1 ^ a - ζ.1 ^ b = -(ζ.1 ^ b - ζ.1 ^ a) := by ring
-      rw [e]; exact this.neg
+      rw [e]
+      exact this.neg
   · intro ζ x hx
     have h := congrArg (eval x) (prod_range ζ)
     simpa [eval_prod, hx] using h
@@ -192,7 +202,8 @@ theorem prim_basic : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], (∀ ζ :
   · intro r hr ζ
     have hq0 : q ≠ 0 := NeZero.ne q
     have hr0 : r ≠ 0 := by rintro rfl; exact hq0 (Nat.eq_zero_of_zero_dvd hr)
-    have hk0 : q / r ≠ 0 := (Nat.div_pos (Nat.le_of_dvd (NeZero.pos q) hr) (Nat.pos_of_ne_zero hr0)).ne'
+    have hk0 : q / r ≠ 0 :=
+      (Nat.div_pos (Nat.le_of_dvd (NeZero.pos q) hr) (Nat.pos_of_ne_zero hr0)).ne'
     have hunit : IsUnit (r : A) := by
       obtain ⟨k, hk⟩ := hr
       have : IsUnit ((r : A) * k) := by rw [← Nat.cast_mul, ← hk]; exact ζ.2.1
@@ -204,6 +215,7 @@ theorem prim_basic : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], (∀ ζ :
       have hp := (μc_prim q).pow_of_dvd hk0 (Nat.div_dvd_of_dvd hr)
       rw [Nat.div_div_self hr hq0] at hp
       exact hp.isRoot_cyclotomic (Nat.pos_of_ne_zero hr0)
-    exact ⟨(⟨ζ.1 ^ (q / r), hunit, h⟩ : {z : A // IsUnit (r : A) ∧ aeval z (cyclotomic r ℤ) = 0}), rfl⟩
+    exact
+      ⟨(⟨ζ.1 ^ (q / r), hunit, h⟩ : {z : A // IsUnit (r : A) ∧ aeval z (cyclotomic r ℤ) = 0}), rfl⟩
 
 end GlobalTheory.EtC.PrimBasic

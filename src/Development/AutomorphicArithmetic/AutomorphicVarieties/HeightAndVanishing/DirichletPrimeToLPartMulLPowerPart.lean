@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V.Base UpperTheory.Top
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V.Base UpperTheory.Top
 
 namespace UpperTheory.V.HV
 
@@ -24,7 +25,8 @@ section Parts
 
 variable {Γ : Type} [Group Γ]
 
-def lPart (l : ℕ) (x : Γ) : Γ := x ^ (ordCompl[l] (orderOf x)) ^ Nat.totient (ordProj[l] (orderOf x))
+def lPart (l : ℕ) (x : Γ) : Γ :=
+  x ^ (ordCompl[l] (orderOf x)) ^ Nat.totient (ordProj[l] (orderOf x))
 
 def lPrime (l : ℕ) (x : Γ) : Γ := x * (lPart l x)⁻¹
 
@@ -52,13 +54,15 @@ theorem idem_mul_idem (r N : ℕ) : idem r N * idem r N = idem r N := by
     Nat.ModEq.pow_totient hcop
   have hdvd : ordCompl[r] N ∣ ordCompl[r] N ^ Nat.totient (ordProj[r] N) :=
     dvd_pow_self _ (Nat.totient_pos.mpr hapos).ne'
-  have hA : ordCompl[r] N ^ Nat.totient (ordProj[r] N) * ordCompl[r] N ^ Nat.totient (ordProj[r] N) ≡
-      ordCompl[r] N ^ Nat.totient (ordProj[r] N) [MOD ordProj[r] N] := by
+  have hA
+      : ordCompl[r] N ^ Nat.totient (ordProj[r] N) * ordCompl[r] N ^ Nat.totient (ordProj[r] N) ≡
+        ordCompl[r] N ^ Nat.totient (ordProj[r] N) [MOD ordProj[r] N] := by
     refine (he1.mul he1).trans ?_
     rw [one_mul]
     exact he1.symm
-  have hC : ordCompl[r] N ^ Nat.totient (ordProj[r] N) * ordCompl[r] N ^ Nat.totient (ordProj[r] N) ≡
-      ordCompl[r] N ^ Nat.totient (ordProj[r] N) [MOD ordCompl[r] N] :=
+  have hC
+      : ordCompl[r] N ^ Nat.totient (ordProj[r] N) * ordCompl[r] N ^ Nat.totient (ordProj[r] N) ≡
+        ordCompl[r] N ^ Nat.totient (ordProj[r] N) [MOD ordCompl[r] N] :=
     (Nat.modEq_zero_iff_dvd.mpr (dvd_mul_of_dvd_left hdvd _)).trans
       (Nat.modEq_zero_iff_dvd.mpr hdvd).symm
   have key := (Nat.modEq_and_modEq_iff_modEq_mul hcop.symm).mp ⟨hA, hC⟩
@@ -85,9 +89,11 @@ def th0 (l : ℕ) (ψ : DirichletCharacter O N) : DirichletCharacter O N := lPri
 
 def psi2 (ψ : DirichletCharacter O N) : DirichletCharacter O N := comp 2 ψ
 
-def th1 (l : ℕ) (ψ : DirichletCharacter O N) : DirichletCharacter O N := th0 l ψ * (comp 2 (th0 l ψ))⁻¹
+def th1 (l : ℕ) (ψ : DirichletCharacter O N) : DirichletCharacter O N :=
+  th0 l ψ * (comp 2 (th0 l ψ))⁻¹
 
-def chiP (l : ℕ) (ψ : DirichletCharacter O N) : DirichletCharacter O N := th0 l ψ * (comp l (th0 l ψ))⁻¹
+def chiP (l : ℕ) (ψ : DirichletCharacter O N) : DirichletCharacter O N :=
+  th0 l ψ * (comp l (th0 l ψ))⁻¹
 
 def kapL (l : ℕ) (ψ : DirichletCharacter O N) : DirichletCharacter O N := comp l (kap l ψ)
 
@@ -95,13 +101,14 @@ def kapB (l : ℕ) (ψ : DirichletCharacter O N) : DirichletCharacter O N := kap
 
 def c2 (ψ : DirichletCharacter O N) : ℕ := (psi2 ψ).conductor.factorization 2
 
-
 open Classical in
-def Sb (l : ℕ) (ψ : DirichletCharacter O N) : Finset ℕ := N.primeFactors.filter fun p => p ≠ l ∧ comp p (kap l ψ) ≠ 1
+def Sb (l : ℕ) (ψ : DirichletCharacter O N) : Finset ℕ :=
+  N.primeFactors.filter fun p => p ≠ l ∧ comp p (kap l ψ) ≠ 1
 
 def Tb (l : ℕ) (ψ : DirichletCharacter O N) : Finset ℕ := insert l (Sb l ψ)
 
-def f0 (l : ℕ) (ψ : DirichletCharacter O N) : ℕ := orderOf (l : ZMod (Nat.lcm 4 (orderOf (th1 l ψ))))
+def f0 (l : ℕ) (ψ : DirichletCharacter O N) : ℕ :=
+  orderOf (l : ZMod (Nat.lcm 4 (orderOf (th1 l ψ))))
 
 def n0 (l : ℕ) (ψ : DirichletCharacter O N) : ℕ := (l ^ f0 l ψ - 1).factorization 2
 
@@ -109,19 +116,26 @@ def PsiEven (e : ℕ) (ψ : DirichletCharacter O N) : Prop := ψ (-1) = (-1) ^ e
 
 def EV (l : ℕ) (ψ : DirichletCharacter O N) : Prop := Even (orderOf (chiP l ψ))
 
-theorem dirichletPrimeToLPart_mul_lPowerPart (l : ℕ) (ψ : DirichletCharacter O N) : th0 l ψ * kap l ψ = ψ := lPrime_mul_lPart l ψ
+theorem dirichletPrimeToLPart_mul_lPowerPart (l : ℕ) (ψ : DirichletCharacter O N)
+    : th0 l ψ * kap l ψ = ψ :=
+  lPrime_mul_lPart l ψ
 
 end Data
 
 section Len
 
-variable (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (c : Coef l) {N : ℕ} [NeZero N]
+variable
+  (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+  {l : ℕ} [Fact l.Prime]
+  (c : Coef l)
+  {N : ℕ} [NeZero N]
 
 def Vlen (e : ℕ) (ψ : DirichletCharacter c.O N) : ℕ∞ := Chr.V' l N e (Chr.dirG ℚ Ω ψ)
 
 def Vn (e : ℕ) (ψ : DirichletCharacter c.O N) : ℝ := Chr.nrm l c.O (Vlen Ω c e ψ)
 
-def VLe (e : ℕ) (ψ : DirichletCharacter c.O N) (B : ℝ) : Prop := Vlen Ω c e ψ ≠ ⊤ ∧ Vn Ω c e ψ * Real.log l ≤ B
+def VLe (e : ℕ) (ψ : DirichletCharacter c.O N) (B : ℝ) : Prop :=
+  Vlen Ω c e ψ ≠ ⊤ ∧ Vn Ω c e ψ * Real.log l ≤ B
 
 def hLen (e : ℕ) (ψ : DirichletCharacter c.O N) : ℕ∞ :=
   ∑ᶠ (v : HeightOneSpectrum (𝓞 ℚ)) (_ : ((l * N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal),
@@ -131,13 +145,15 @@ def hn (e : ℕ) (ψ : DirichletCharacter c.O N) : ℝ := Chr.nrm l c.O (hLen Ω
 
 theorem Vn_nonneg (e : ℕ) (ψ : DirichletCharacter c.O N) : 0 ≤ Vn Ω c e ψ := Chr.nrm_nonneg _ _
 
-theorem VLe.mono {e : ℕ} {ψ : DirichletCharacter c.O N} {B B' : ℝ} (h : VLe Ω c e ψ B) (hB : B ≤ B') : VLe Ω c e ψ B' :=
+theorem VLe.mono {e : ℕ} {ψ : DirichletCharacter c.O N} {B B' : ℝ} (h : VLe Ω c e ψ B) (hB : B ≤ B')
+    : VLe Ω c e ψ B' :=
   ⟨h.1, h.2.trans hB⟩
 
 def orb (H : Subgroup (ZMod N)ˣ) : Finset (DirichletCharacter c.O N) :=
   (Set.toFinite {ψ : DirichletCharacter c.O N | ψ.toUnitHom.ker = H}).toFinset
 
-theorem mem_orb {H : Subgroup (ZMod N)ˣ} {ψ : DirichletCharacter c.O N} : ψ ∈ orb c H ↔ ψ.toUnitHom.ker = H :=
+theorem mem_orb {H : Subgroup (ZMod N)ˣ} {ψ : DirichletCharacter c.O N}
+    : ψ ∈ orb c H ↔ ψ.toUnitHom.ker = H :=
   Set.Finite.mem_toFinset _
 
 end Len
@@ -174,19 +190,23 @@ theorem host_q1_dvd_N : h.q1 ∣ h.N := (dvd_mul_right _ _).mul_left _
 theorem d_dvd : h.d ∣ h.N := (dvd_mul_left _ _).mul_left _
 
 def H : Subgroup (ZMod h.N)ˣ :=
-  (Subgroup.zpowers (-1)).comap (ZMod.unitsMap h.two_pow_dvd) ⊓ h.chi.χ.toUnitHom.ker.comap (ZMod.unitsMap h.q_dvd) ⊓
-    (powMonoidHom 2).range.comap (ZMod.unitsMap h.host_q1_dvd_N) ⊓ (powMonoidHom 2).range.comap (ZMod.unitsMap h.d_dvd)
+  (Subgroup.zpowers (-1)).comap (ZMod.unitsMap h.two_pow_dvd)
+    ⊓ h.chi.χ.toUnitHom.ker.comap (ZMod.unitsMap h.q_dvd)
+    ⊓ (powMonoidHom 2).range.comap (ZMod.unitsMap h.host_q1_dvd_N)
+    ⊓ (powMonoidHom 2).range.comap (ZMod.unitsMap h.d_dvd)
 
 def IsChar {O : Type} [CommRing O] (ψ : DirichletCharacter O h.N) : Prop := h.H ≤ ψ.toUnitHom.ker
 
 def Big (t : ℕ) : Prop :=
-  2 * t + 1 < h.q1 ∧ 2 * t + 1 < h.d ∧ ∀ y ∈ [h.q, h.o, pK h.chi, hStar h.chi, pOne h.chi], y < h.q1 ∧ y < h.d
+  2 * t + 1 < h.q1 ∧ 2 * t + 1 < h.d
+    ∧ ∀ y ∈ [h.q, h.o, pK h.chi, hStar h.chi, pOne h.chi], y < h.q1 ∧ y < h.d
 
 def X {l : ℕ} [Fact l.Prime] (c : Coef l) (e : ℕ) : Finset (DirichletCharacter c.O h.N) :=
   (Set.toFinite (Chr.evenSet c.O h.H e)).toFinset
 
-theorem mem_X {l : ℕ} [Fact l.Prime] {c : Coef l} {e : ℕ} {ψ : DirichletCharacter c.O h.N} :
-    ψ ∈ h.X c e ↔ h.IsChar ψ ∧ PsiEven e ψ := Set.Finite.mem_toFinset _
+theorem mem_X {l : ℕ} [Fact l.Prime] {c : Coef l} {e : ℕ} {ψ : DirichletCharacter c.O h.N}
+    : ψ ∈ h.X c e ↔ h.IsChar ψ ∧ PsiEven e ψ :=
+  Set.Finite.mem_toFinset _
 
 variable {O : Type} [CommRing O]
 
@@ -196,12 +216,14 @@ def CaseI (l e : ℕ) : Prop := l ∉ Bchi h.chi ∧ ¬ l - 1 ∣ 2 * e
 
 def CaseZ (l e : ℕ) (ψ : DirichletCharacter O h.N) : Prop := l ∉ Bchi h.chi ∧ l - 1 ∣ 2 * e ∧ ψ = 1
 
-def CaseII (l e : ℕ) (ψ : DirichletCharacter O h.N) : Prop := 2 ≤ e ∧ EV l ψ ∧ (l ∈ Bchi h.chi ∨ l - 1 ∣ 2 * e)
+def CaseII (l e : ℕ) (ψ : DirichletCharacter O h.N) : Prop :=
+  2 ≤ e ∧ EV l ψ ∧ (l ∈ Bchi h.chi ∨ l - 1 ∣ 2 * e)
 
 def CaseIII (l e : ℕ) (ψ : DirichletCharacter O h.N) : Prop :=
   l ∉ Bchi h.chi ∧ l - 1 ∣ 2 * e ∧ Odd (orderOf ψ) ∧ ψ ≠ 1
 
-def CaseIV (l e : ℕ) (ψ : DirichletCharacter O h.N) : Prop := l ∈ Bchi h.chi ∧ 2 ≤ e ∧ Odd (orderOf (chiP l ψ))
+def CaseIV (l e : ℕ) (ψ : DirichletCharacter O h.N) : Prop :=
+  l ∈ Bchi h.chi ∧ 2 ≤ e ∧ Odd (orderOf (chiP l ψ))
 
 def CaseV (l e : ℕ) : Prop := l ∈ Bchi h.chi ∧ e = 1
 
@@ -213,7 +235,8 @@ def nIII (l : ℕ) (ψ : DirichletCharacter O h.N) : ℕ :=
 
 end Host
 
-theorem exists_coef (l : ℕ) [Fact l.Prime] (n : ℕ) [NeZero n] : ∃ c : Coef l, HasEnoughRootsOfUnity c.O n := by
+theorem exists_coef (l : ℕ) [Fact l.Prime] (n : ℕ) [NeZero n]
+    : ∃ c : Coef l, HasEnoughRootsOfUnity c.O n := by
   obtain ⟨O, a, b, c⟩ := existsO l n
   exact ⟨⟨O, a, b⟩, c⟩
 

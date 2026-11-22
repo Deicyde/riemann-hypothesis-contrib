@@ -12,28 +12,39 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-theorem tensor_eq_zero_of_forall_contract {V W : Type} [AddCommGroup V] [Module ℚ V] [AddCommGroup W]
-    [Module ℚ W] (t : V ⊗[ℚ] W)
-    (h : ∀ m : W →ₗ[ℚ] ℚ, TensorProduct.rid ℚ V (LinearMap.lTensor V m t) = 0) : t = 0 := by
+theorem tensor_eq_zero_of_forall_contract
+    {V W : Type} [AddCommGroup V] [Module ℚ V] [AddCommGroup W] [Module ℚ W]
+    (t : V ⊗[ℚ] W) (h : ∀ m : W →ₗ[ℚ] ℚ, TensorProduct.rid ℚ V (LinearMap.lTensor V m t) = 0)
+    : t = 0 := by
   first
   | exact @_root_.GlobalTheory.CoefficientContraction.eq_zero_of_contractions
   | exact _root_.GlobalTheory.CoefficientContraction.eq_zero_of_contractions
   | (apply _root_.GlobalTheory.CoefficientContraction.eq_zero_of_contractions <;> assumption)
-  | (intros; apply _root_.GlobalTheory.CoefficientContraction.eq_zero_of_contractions <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.CoefficientContraction.eq_zero_of_contractions <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.CoefficientContraction.eq_zero_of_contractions <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.CoefficientContraction.eq_zero_of_contractions
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.CoefficientContraction.eq_zero_of_contractions ..)
 
-theorem aeval_sum_elim_eq_zero_of_tensor {ι : Type} [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ))
-    (hΓ : ∀ σ : ℂ ≃+* ℂ, ∀ g ∈ Γ, g.map σ ∈ Γ)
+theorem aeval_sum_elim_eq_zero_of_tensor
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (Γ : Set (Matrix ι ι ℂ)) (hΓ : ∀ σ : ℂ ≃+* ℂ, ∀ g ∈ Γ, g.map σ ∈ Γ)
     (t : MvPolynomial (ι × ι) ℚ ⊗[ℚ] MvPolynomial (ι × ι) ℚ)
-    (ht : ∀ g ∈ Γ, ∀ h ∈ Γ, Algebra.TensorProduct.productMap
-      (MvPolynomial.aeval (fun ij : ι × ι => g ij.1 ij.2))
-      (MvPolynomial.aeval (fun ij : ι × ι => h ij.1 ij.2)) t = (0 : ℂ))
-    (R : Type) [CommRing R] [Algebra ℚ R] (x : Matrix ι ι R) (hx : x ∈ pts Γ R)
-    (y : Matrix ι ι R) (hy : y ∈ pts Γ R) :
-    Algebra.TensorProduct.productMap
-      (MvPolynomial.aeval (fun ij : ι × ι => x ij.1 ij.2))
-      (MvPolynomial.aeval (fun ij : ι × ι => y ij.1 ij.2)) t = (0 : R) := by
+    (ht : ∀ g ∈ Γ, ∀ h ∈ Γ,
+      Algebra.TensorProduct.productMap (MvPolynomial.aeval (fun ij : ι × ι => g ij.1 ij.2))
+          (MvPolynomial.aeval (fun ij : ι × ι => h ij.1 ij.2)) t
+        = (0 : ℂ))
+    (R : Type) [CommRing R] [Algebra ℚ R]
+    (x : Matrix ι ι R) (hx : x ∈ pts Γ R)
+    (y : Matrix ι ι R) (hy : y ∈ pts Γ R)
+    : Algebra.TensorProduct.productMap (MvPolynomial.aeval (fun ij : ι × ι => x ij.1 ij.2))
+        (MvPolynomial.aeval (fun ij : ι × ι => y ij.1 ij.2)) t
+      = (0 : R) := by
   set ex : MvPolynomial (ι × ι) ℚ →ₐ[ℚ] R := MvPolynomial.aeval (fun ij : ι × ι => x ij.1 ij.2) with hex
   set ey : MvPolynomial (ι × ι) ℚ →ₐ[ℚ] R := MvPolynomial.aeval (fun ij : ι × ι => y ij.1 ij.2) with hey
   have key : TensorProduct.map ex.toLinearMap ey.toLinearMap t = 0 := by
@@ -65,7 +76,8 @@ theorem aeval_sum_elim_eq_zero_of_tensor {ι : Type} [Fintype ι] [DecidableEq �
           | zero => simp
           | tmul a b =>
             simp [φ, MvPolynomial.coeff_map, Algebra.ofId_apply]
-            rw [mul_comm (eg a), ← eq_ratCast (algebraMap ℚ ℂ), ← Algebra.smul_def, map_smul, smul_eq_mul, mul_comm]
+            rw [mul_comm (eg a), ← eq_ratCast (algebraMap ℚ ℂ), ← Algebra.smul_def, map_smul,
+              smul_eq_mul, mul_comm]
           | add s t hs ht => simp only [map_add (f := _), MvPolynomial.coeff_add, hs, ht]
       have h3 : ey _ = 0 := hy _ h2
       have h4 := congrArg m h3
@@ -93,17 +105,31 @@ theorem aeval_sum_elim_eq_zero_of_tensor {ι : Type} [Fintype ι] [DecidableEq �
   | tmul a b => simp
   | add s t hs ht => simp only [map_add (f := _), hs, ht]
 
-theorem aeval_sum_elim_eq_zero_of_mem_pts : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)), (∀ σ : ℂ ≃+* ℂ, ∀ g ∈ Γ, g.map σ ∈ Γ) → ∀ F : MvPolynomial ((ι × ι) ⊕ (ι × ι)) ℚ, (∀ g ∈ Γ, ∀ h ∈ Γ, MvPolynomial.aeval (Sum.elim (fun ij : ι × ι => g ij.1 ij.2) (fun ij : ι × ι => h ij.1 ij.2)) F = (0 : ℂ)) → ∀ (R : Type) [CommRing R] [Algebra ℚ R], ∀ x ∈ pts Γ R, ∀ y ∈ pts Γ R, MvPolynomial.aeval (Sum.elim (fun ij : ι × ι => x ij.1 ij.2) (fun ij : ι × ι => y ij.1 ij.2)) F = (0 : R) := by
+theorem aeval_sum_elim_eq_zero_of_mem_pts
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)),
+      (∀ σ : ℂ ≃+* ℂ, ∀ g ∈ Γ, g.map σ ∈ Γ)
+        → ∀ F : MvPolynomial ((ι × ι) ⊕ (ι × ι)) ℚ,
+          (∀ g ∈ Γ, ∀ h ∈ Γ,
+              MvPolynomial.aeval
+                  (Sum.elim (fun ij : ι × ι => g ij.1 ij.2) (fun ij : ι × ι => h ij.1 ij.2)) F
+                = (0 : ℂ))
+            → ∀ (R : Type) [CommRing R] [Algebra ℚ R], ∀ x ∈ pts Γ R, ∀ y ∈ pts Γ R,
+              MvPolynomial.aeval
+                  (Sum.elim (fun ij : ι × ι => x ij.1 ij.2) (fun ij : ι × ι => y ij.1 ij.2)) F
+                = (0 : R) := by
   intro ι _ _ Γ hΓ F hF R _ _ x hx y hy
-  let T : MvPolynomial ((ι × ι) ⊕ (ι × ι)) ℚ →ₐ[ℚ]
-      MvPolynomial (ι × ι) ℚ ⊗[ℚ] MvPolynomial (ι × ι) ℚ :=
-    MvPolynomial.aeval (Sum.elim (fun ij => MvPolynomial.X ij ⊗ₜ 1) (fun ij => 1 ⊗ₜ MvPolynomial.X ij))
-  have hT : ∀ (S : Type) [CommRing S] [Algebra ℚ S] (a b : ι × ι → S),
-      Algebra.TensorProduct.productMap (MvPolynomial.aeval a) (MvPolynomial.aeval b) (T F) =
-        MvPolynomial.aeval (Sum.elim a b) F := by
+  let T
+      : MvPolynomial ((ι × ι) ⊕ (ι × ι)) ℚ →ₐ[ℚ]
+        MvPolynomial (ι × ι) ℚ ⊗[ℚ] MvPolynomial (ι × ι) ℚ :=
+    MvPolynomial.aeval
+      (Sum.elim (fun ij => MvPolynomial.X ij ⊗ₜ 1) (fun ij => 1 ⊗ₜ MvPolynomial.X ij))
+  have hT
+      : ∀ (S : Type) [CommRing S] [Algebra ℚ S] (a b : ι × ι → S),
+        Algebra.TensorProduct.productMap (MvPolynomial.aeval a) (MvPolynomial.aeval b) (T F)
+          = MvPolynomial.aeval (Sum.elim a b) F := by
     intro S _ _ a b
-    have : (Algebra.TensorProduct.productMap (MvPolynomial.aeval a) (MvPolynomial.aeval b)).comp T =
-        MvPolynomial.aeval (Sum.elim a b) := by
+    have : (Algebra.TensorProduct.productMap (MvPolynomial.aeval a) (MvPolynomial.aeval b)).comp T
+        = MvPolynomial.aeval (Sum.elim a b) := by
       ext (i | i) <;> simp [T]
     exact DFunLike.congr_fun this F
   rw [← hT]

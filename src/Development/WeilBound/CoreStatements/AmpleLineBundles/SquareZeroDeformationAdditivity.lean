@@ -8,15 +8,19 @@ public import Development.WeilBound.CoreStatements.AmpleLineBundles.TopLePreimag
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CompanionTheory.Ar
 
 namespace CoverDenseAlt
 
-private theorem val_spMap_comp_eq {Z : Scheme} {A A' : Type} [CommRing A] [CommRing A'] (g : A →+* A')
-    (z : Sp A ⟶ Z) (V : Z.Opens) (h : ⊤ ≤ z ⁻¹ᵁ V) (h' : ⊤ ≤ (spMap g ≫ z) ⁻¹ᵁ V) (f : Γ(Z, V)) :
-    val (spMap g ≫ z) V h' f = g (val z V h f) := by
+private theorem val_spMap_comp_eq
+    {Z : Scheme} {A A' : Type} [CommRing A] [CommRing A']
+    (g : A →+* A') (z : Sp A ⟶ Z) (V : Z.Opens)
+    (h : ⊤ ≤ z ⁻¹ᵁ V) (h' : ⊤ ≤ (spMap g ≫ z) ⁻¹ᵁ V) (f : Γ(Z, V))
+    : val (spMap g ≫ z) V h' f = g (val z V h f) := by
   have e1 : Scheme.Hom.appLE (spMap g ≫ z) V ⊤ h' = z.appLE V ⊤ h ≫ (spMap g).appTop := by
     rw [Scheme.Hom.comp_appLE]
     show _ = (z.app V ≫ (Sp A).presheaf.map (homOfLE h).op) ≫ _
@@ -28,17 +32,21 @@ private theorem val_spMap_comp_eq {Z : Scheme} {A A' : Type} [CommRing A] [CommR
   erw [e2]
   rfl
 
-private theorem spec_map_val_comp_fromSpec_eq {X : Scheme} {B : Type} [CommRing B] (z : Sp B ⟶ X) {W : X.Opens}
-    (hW : IsAffineOpen W) (h : ⊤ ≤ z ⁻¹ᵁ W) :
-    Spec.map (CommRingCat.ofHom (val z W h)) ≫ hW.fromSpec = z := by
+private theorem spec_map_val_comp_fromSpec_eq
+    {X : Scheme} {B : Type} [CommRing B]
+    (z : Sp B ⟶ X)
+    {W : X.Opens} (hW : IsAffineOpen W) (h : ⊤ ≤ z ⁻¹ᵁ W)
+    : Spec.map (CommRingCat.ofHom (val z W h)) ≫ hW.fromSpec = z := by
   simp only [val, CommRingCat.ofHom_hom, Spec.map_comp, Category.assoc,
     IsAffineOpen.SpecMap_appLE_fromSpec z hW (isAffineOpen_top _) h, IsAffineOpen.fromSpec_top,
     Scheme.isoSpec_Spec]
   simp [← Spec.map_comp]
 
-private theorem cover_of_spMap_comp_cover_of_square_zero_kernel {X : Scheme} {R R' : Type} [CommRing R] [CommRing R'] (g : R →+* R')
-    (hg : Function.Surjective g) (hk : ∀ r, g r = 0 → r * r = 0) (z : Sp R ⟶ X) (V : X.Opens)
-    (h : ⊤ ≤ (spMap g ≫ z) ⁻¹ᵁ V) : ⊤ ≤ z ⁻¹ᵁ V := by
+private theorem cover_of_spMap_comp_cover_of_square_zero_kernel
+    {X : Scheme} {R R' : Type} [CommRing R] [CommRing R']
+    (g : R →+* R') (hg : Function.Surjective g) (hk : ∀ r, g r = 0 → r * r = 0)
+    (z : Sp R ⟶ X) (V : X.Opens) (h : ⊤ ≤ (spMap g ≫ z) ⁻¹ᵁ V)
+    : ⊤ ≤ z ⁻¹ᵁ V := by
   intro p _
   have hp : p ∈ Set.range (PrimeSpectrum.comap g) := by
     rw [range_comap_of_surjective _ g hg]
@@ -47,11 +55,20 @@ private theorem cover_of_spMap_comp_cover_of_square_zero_kernel {X : Scheme} {R 
   obtain ⟨q, rfl⟩ := hp
   exact h (Set.mem_univ q)
 
-private theorem exists_subring_fin_four_of_square_zero_ideal {A : Type} [CommRing A] (J : Ideal A) (hJ : ∀ j ∈ J, ∀ k ∈ J, j * k = 0) :
-    ∃ Q : Subring (Fin 4 → A), ∀ v, v ∈ Q ↔ (∀ i, v i - v 0 ∈ J) ∧ v 0 + v 1 = v 2 + v 3 := by
-  refine ⟨{ carrier := {v | (∀ i, v i - v 0 ∈ J) ∧ v 0 + v 1 = v 2 + v 3}
-            mul_mem' := ?_, one_mem' := ?_, add_mem' := ?_, zero_mem' := ?_, neg_mem' := ?_ },
-    fun v => Iff.rfl⟩
+private theorem exists_subring_fin_four_of_square_zero_ideal
+    {A : Type} [CommRing A] (J : Ideal A) (hJ : ∀ j ∈ J, ∀ k ∈ J, j * k = 0)
+    : ∃ Q : Subring (Fin 4 → A), ∀ v, v ∈ Q ↔ (∀ i, v i - v 0 ∈ J) ∧ v 0 + v 1 = v 2 + v 3 := by
+  refine ⟨
+    {
+      carrier := {v | (∀ i, v i - v 0 ∈ J) ∧ v 0 + v 1 = v 2 + v 3}
+      mul_mem' := ?_
+      one_mem' := ?_
+      add_mem' := ?_
+      zero_mem' := ?_
+      neg_mem' := ?_
+    },
+    fun v => Iff.rfl
+  ⟩
   · rintro v w ⟨hv, hs⟩ ⟨hw, ht⟩
     refine ⟨fun i => ?_, ?_⟩
     · have e : (v * w) i - (v * w) 0 = (v i - v 0) * w i + v 0 * (w i - w 0) := by
@@ -88,15 +105,22 @@ private theorem exists_subring_fin_four_of_square_zero_ideal {A : Type} [CommRin
     · simp only [Pi.neg_apply]
       linear_combination -hs
 
-theorem val_add {S : Scheme.{0}} {G : Over S} [GrpObj G] {A : Type} [CommRing A] (a : Sp A ⟶ S) {J : Ideal A}
-    (hJ : J ^ 2 = ⊥) {U : S.Opens} (hU : IsAffineOpen U) (ha : ⊤ ≤ a ⁻¹ᵁ U) {W : G.left.Opens}
-    (hW : IsAffineOpen W) (ho : ⊤ ≤ (1 : Over.mk a ⟶ G).left ⁻¹ᵁ W) (x y : Over.mk a ⟶ G)
-    (ex : spMap (Ideal.Quotient.mk J) ≫ x.left = spMap (Ideal.Quotient.mk J) ≫ (1 : Over.mk a ⟶ G).left)
-    (ey : spMap (Ideal.Quotient.mk J) ≫ y.left = spMap (Ideal.Quotient.mk J) ≫ (1 : Over.mk a ⟶ G).left)
-    (V : G.left.Opens) (hx : ⊤ ≤ x.left ⁻¹ᵁ V) (hy : ⊤ ≤ y.left ⁻¹ᵁ V) (hxy : ⊤ ≤ (x * y).left ⁻¹ᵁ V)
-    (h1 : ⊤ ≤ (1 : Over.mk a ⟶ G).left ⁻¹ᵁ V) (f : Γ(G.left, V)) :
-    val (A := A) (x * y).left V hxy f + val (A := A) (1 : Over.mk a ⟶ G).left V h1 f =
-      val (A := A) x.left V hx f + val (A := A) y.left V hy f := by
+theorem val_add
+    {S : Scheme.{0}} {G : Over S} [GrpObj G]
+    {A : Type} [CommRing A]
+    (a : Sp A ⟶ S)
+    {J : Ideal A} (hJ : J ^ 2 = ⊥)
+    {U : S.Opens} (hU : IsAffineOpen U) (ha : ⊤ ≤ a ⁻¹ᵁ U)
+    {W : G.left.Opens} (hW : IsAffineOpen W) (ho : ⊤ ≤ (1 : Over.mk a ⟶ G).left ⁻¹ᵁ W)
+    (x y : Over.mk a ⟶ G)
+    (ex : spMap (Ideal.Quotient.mk J) ≫ x.left
+      = spMap (Ideal.Quotient.mk J) ≫ (1 : Over.mk a ⟶ G).left)
+    (ey : spMap (Ideal.Quotient.mk J) ≫ y.left
+      = spMap (Ideal.Quotient.mk J) ≫ (1 : Over.mk a ⟶ G).left)
+    (V : G.left.Opens) (hx : ⊤ ≤ x.left ⁻¹ᵁ V) (hy : ⊤ ≤ y.left ⁻¹ᵁ V)
+    (hxy : ⊤ ≤ (x * y).left ⁻¹ᵁ V) (h1 : ⊤ ≤ (1 : Over.mk a ⟶ G).left ⁻¹ᵁ V) (f : Γ(G.left, V))
+    : val (A := A) (x * y).left V hxy f + val (A := A) (1 : Over.mk a ⟶ G).left V h1 f
+      = val (A := A) x.left V hx f + val (A := A) y.left V hy f := by
   have hJz : ∀ j ∈ J, ∀ k ∈ J, j * k = 0 := by
     intro j hj k hk
     have hm : j * k ∈ J ^ 2 := by
@@ -106,18 +130,23 @@ theorem val_add {S : Scheme.{0}} {G : Over S} [GrpObj G] {A : Type} [CommRing A]
     exact Ideal.mem_bot.mp hm
   have hnilJ : ∀ r, Ideal.Quotient.mk J r = 0 → r * r = 0 := fun r hr =>
     hJz r (Ideal.Quotient.eq_zero_iff_mem.mp hr) r (Ideal.Quotient.eq_zero_iff_mem.mp hr)
-  have hvcongr : ∀ {B : Type} [CommRing B] {X' : Scheme} {z z' : Sp B ⟶ X'} (_ : z = z')
-      (V' : X'.Opens) (h h') (g : Γ(X', V')), val z V' h g = val z' V' h' g := by
+  have hvcongr
+      : ∀ {B : Type} [CommRing B] {X' : Scheme} {z z' : Sp B ⟶ X'} (_ : z = z') (V' : X'.Opens)
+          (h h') (g : Γ(X', V')),
+        val z V' h g = val z' V' h' g := by
     rintro B _ X' z _ rfl V' h h' g
     rfl
   set e := (1 : Over.mk a ⟶ G).left with he
-  have hxW : ⊤ ≤ x.left ⁻¹ᵁ W := cover_of_spMap_comp_cover_of_square_zero_kernel (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective
-    hnilJ x.left W (by rw [ex]; exact fun p _ => ho (Set.mem_univ _))
-  have hyW : ⊤ ≤ y.left ⁻¹ᵁ W := cover_of_spMap_comp_cover_of_square_zero_kernel (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective
-    hnilJ y.left W (by rw [ey]; exact fun p _ => ho (Set.mem_univ _))
-  have hmod : ∀ (z : Sp A ⟶ G.left) (hz : ⊤ ≤ z ⁻¹ᵁ W),
-      spMap (Ideal.Quotient.mk J) ≫ z = spMap (Ideal.Quotient.mk J) ≫ e →
-        ∀ r, val z W hz r - val e W ho r ∈ J := by
+  have hxW : ⊤ ≤ x.left ⁻¹ᵁ W :=
+    cover_of_spMap_comp_cover_of_square_zero_kernel (Ideal.Quotient.mk J)
+      Ideal.Quotient.mk_surjective hnilJ x.left W (by rw [ex]; exact fun p _ => ho (Set.mem_univ _))
+  have hyW : ⊤ ≤ y.left ⁻¹ᵁ W :=
+    cover_of_spMap_comp_cover_of_square_zero_kernel (Ideal.Quotient.mk J)
+      Ideal.Quotient.mk_surjective hnilJ y.left W (by rw [ey]; exact fun p _ => ho (Set.mem_univ _))
+  have hmod
+      : ∀ (z : Sp A ⟶ G.left) (hz : ⊤ ≤ z ⁻¹ᵁ W),
+        spMap (Ideal.Quotient.mk J) ≫ z = spMap (Ideal.Quotient.mk J) ≫ e
+          → ∀ r, val z W hz r - val e W ho r ∈ J := by
     intro z hz hze r
     rw [← Ideal.Quotient.eq,
       ← val_spMap_comp_eq (Ideal.Quotient.mk J) z W hz (fun p _ => hz (Set.mem_univ _)) r,
@@ -165,9 +194,10 @@ theorem val_add {S : Scheme.{0}} {G : Over S} [GrpObj G] {A : Type} [CommRing A]
   let α : Γ(G.left, W) →+* Q := (Pi.ringHom ![φx, φ1, φx, φ1]).codRestrict Q hαmem
   let β : Γ(G.left, W) →+* Q := (Pi.ringHom ![φy, φ1, φ1, φy]).codRestrict Q hβmem
   let pr : Fin 4 → (Q →+* A) := fun i => (Pi.evalRingHom (fun _ => A) i).comp Q.subtype
-  have hπ : ∀ (ψ : Γ(G.left, W) →+* Q) (i : Fin 4),
-      spMap (pr i) ≫ Spec.map (CommRingCat.ofHom ψ) ≫ hW.fromSpec =
-        Spec.map (CommRingCat.ofHom ((pr i).comp ψ)) ≫ hW.fromSpec := by
+  have hπ
+      : ∀ (ψ : Γ(G.left, W) →+* Q) (i : Fin 4),
+        spMap (pr i) ≫ Spec.map (CommRingCat.ofHom ψ) ≫ hW.fromSpec
+          = Spec.map (CommRingCat.ofHom ((pr i).comp ψ)) ≫ hW.fromSpec := by
     intro ψ i
     rw [← Category.assoc]
     congr 1
@@ -204,10 +234,12 @@ theorem val_add {S : Scheme.{0}} {G : Over S} [GrpObj G] {A : Type} [CommRing A]
     exact hJz _ hvi _ hvi
   have hU' : ∀ T : Sp Q ⟶ S, spMap (pr 0) ≫ T = a → ⊤ ≤ T ⁻¹ᵁ U := fun T hT =>
     cover_of_spMap_comp_cover_of_square_zero_kernel (pr 0) hpr0 hnil0 T U (by rw [hT]; exact ha)
-  have hsame : ∀ T1 T2 : Sp Q ⟶ S, (∀ i, spMap (pr i) ≫ T1 = a) →
-      (∀ i, spMap (pr i) ≫ T2 = a) → T1 = T2 := by
+  have hsame
+      : ∀ T1 T2 : Sp Q ⟶ S,
+        (∀ i, spMap (pr i) ≫ T1 = a) → (∀ i, spMap (pr i) ≫ T2 = a) → T1 = T2 := by
     intro T1 T2 h1' h2'
-    rw [← spec_map_val_comp_fromSpec_eq T1 hU (hU' T1 (h1' 0)), ← spec_map_val_comp_fromSpec_eq T2 hU (hU' T2 (h2' 0))]
+    rw [← spec_map_val_comp_fromSpec_eq T1 hU (hU' T1 (h1' 0)),
+      ← spec_map_val_comp_fromSpec_eq T2 hU (hU' T2 (h2' 0))]
     have hv : val T1 U (hU' T1 (h1' 0)) = val T2 U (hU' T2 (h2' 0)) := by
       refine RingHom.ext fun r => ?_
       apply Subtype.ext
@@ -235,11 +267,15 @@ theorem val_add {S : Scheme.{0}} {G : Over S} [GrpObj G] {A : Type} [CommRing A]
       · exact Over.w (1 : Over.mk a ⟶ G)
       · exact Over.w y
   let Ψ : Sp Q ⟶ G.left := pullback.lift Xα Xβ hS ≫ (MonObj.mul (X := G)).left
-  have hΨgen : ∀ (i : Fin 4) (z w : Over.mk a ⟶ G), spMap (pr i) ≫ Xα = z.left →
-      spMap (pr i) ≫ Xβ = w.left → spMap (pr i) ≫ Ψ = (z * w).left := by
+  have hΨgen
+      : ∀ (i : Fin 4) (z w : Over.mk a ⟶ G),
+        spMap (pr i) ≫ Xα = z.left → spMap (pr i) ≫ Xβ = w.left
+          → spMap (pr i) ≫ Ψ = (z * w).left := by
     intro i z w hz hw
-    have hzw : (z * w).left =
-        pullback.lift z.left w.left (z.w.trans w.w.symm) ≫ (MonObj.mul (X := G)).left := rfl
+    have hzw
+        : (z * w).left
+          = pullback.lift z.left w.left (z.w.trans w.w.symm) ≫ (MonObj.mul (X := G)).left :=
+      rfl
     rw [hzw]
     show spMap (pr i) ≫ pullback.lift Xα Xβ hS ≫ _ = _
     rw [← Category.assoc]
@@ -250,15 +286,14 @@ theorem val_add {S : Scheme.{0}} {G : Over S} [GrpObj G] {A : Type} [CommRing A]
     · rw [Category.assoc, pullback.lift_snd, pullback.lift_snd]
       exact hw
   have h0 : spMap (pr 0) ≫ Ψ = (x * y).left := hΨgen 0 x y (hXα 0) (hXβ 0)
-  have h1' : spMap (pr 1) ≫ Ψ = e := by
-    rw [hΨgen 1 1 1 (hXα 1) (hXβ 1), _root_.mul_one]
-  have h2' : spMap (pr 2) ≫ Ψ = x.left := by
-    rw [hΨgen 2 x 1 (hXα 2) (hXβ 2), _root_.mul_one]
-  have h3' : spMap (pr 3) ≫ Ψ = y.left := by
-    rw [hΨgen 3 1 y (hXα 3) (hXβ 3), _root_.one_mul]
-  have hΨV : ⊤ ≤ Ψ ⁻¹ᵁ V := cover_of_spMap_comp_cover_of_square_zero_kernel (pr 0) hpr0 hnil0 Ψ V (by rw [h0]; exact hxy)
-  have k : ∀ (i : Fin 4) (z : Sp A ⟶ G.left) (hz : spMap (pr i) ≫ Ψ = z) (hzV : ⊤ ≤ z ⁻¹ᵁ V),
-      ((val Ψ V hΨV f : Q) : Fin 4 → A) i = val z V hzV f := by
+  have h1' : spMap (pr 1) ≫ Ψ = e := by rw [hΨgen 1 1 1 (hXα 1) (hXβ 1), _root_.mul_one]
+  have h2' : spMap (pr 2) ≫ Ψ = x.left := by rw [hΨgen 2 x 1 (hXα 2) (hXβ 2), _root_.mul_one]
+  have h3' : spMap (pr 3) ≫ Ψ = y.left := by rw [hΨgen 3 1 y (hXα 3) (hXβ 3), _root_.one_mul]
+  have hΨV : ⊤ ≤ Ψ ⁻¹ᵁ V :=
+    cover_of_spMap_comp_cover_of_square_zero_kernel (pr 0) hpr0 hnil0 Ψ V (by rw [h0]; exact hxy)
+  have k
+      : ∀ (i : Fin 4) (z : Sp A ⟶ G.left) (hz : spMap (pr i) ≫ Ψ = z) (hzV : ⊤ ≤ z ⁻¹ᵁ V),
+        ((val Ψ V hΨV f : Q) : Fin 4 → A) i = val z V hzV f := by
     intro i z hz hzV
     have k' := val_spMap_comp_eq (pr i) Ψ V hΨV (by rw [hz]; exact hzV) f
     rw [hvcongr hz V _ hzV f] at k'

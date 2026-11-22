@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IwahoriPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC Formalism.UG
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC
+  Formalism.UG
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -15,7 +16,16 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.CentOk
 
-theorem centraliser_hyps : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] (θ : G →* G), Continuous θ → ∀ (K I C : Subgroup G) (δ : G), IsCompact (K : Set G) → IsOpen (I : Set G) → IsCompact (C : Set G) → cptPart (twCent θ δ) = twCent θ δ ⊓ C → ∀ x : G, twCent θ δ ⊓ K.map (MulAut.conj x).toMonoidHom ≤ cptPart (twCent θ δ) ∧ (twCent θ δ ⊓ I.map (MulAut.conj x).toMonoidHom).relIndex (cptPart (twCent θ δ)) ≠ 0 := by
+theorem centraliser_hyps
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] (θ : G →* G),
+      Continuous θ
+        → ∀ (K I C : Subgroup G) (δ : G),
+          IsCompact (K : Set G) → IsOpen (I : Set G) → IsCompact (C : Set G)
+            → cptPart (twCent θ δ) = twCent θ δ ⊓ C
+            → ∀ x : G,
+              twCent θ δ ⊓ K.map (MulAut.conj x).toMonoidHom ≤ cptPart (twCent θ δ)
+                ∧ (twCent θ δ ⊓ I.map (MulAut.conj x).toMonoidHom).relIndex (cptPart (twCent θ δ))
+                  ≠ 0 := by
   intro G _ _ _ _ θ hθ K I C δ hK hI hC hcpt x
   have hTc : IsClosed (twCent θ δ : Set G) := by
     have : (twCent θ δ : Set G) = {g | g * δ = δ * θ g} := rfl
@@ -39,15 +49,15 @@ theorem centraliser_hyps : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopo
     have hHc : IsCompact (cptPart (twCent θ δ) : Set G) := by
       rw [hcpt, Subgroup.coe_inf]
       exact hC.inter_left hTc
-    have hHT : cptPart (twCent θ δ) ≤ twCent θ δ := by
-      rw [hcpt]; exact inf_le_left
+    have hHT : cptPart (twCent θ δ) ≤ twCent θ δ := by rw [hcpt]; exact inf_le_left
     have e : (twCent θ δ ⊓ A) ⊓ cptPart (twCent θ δ) = A ⊓ cptPart (twCent θ δ) := by
       ext g
       simp only [Subgroup.mem_inf]
       exact ⟨fun h => ⟨h.1.2, h.2⟩, fun h => ⟨⟨hHT h.2, h.1⟩, h.2⟩⟩
     rw [← Subgroup.inf_relIndex_right, e, Subgroup.inf_relIndex_right]
     haveI : CompactSpace (cptPart (twCent θ δ)) := isCompact_iff_compactSpace.mp hHc
-    have ho : IsOpen ((A.subgroupOf (cptPart (twCent θ δ)) : Subgroup _) : Set (cptPart (twCent θ δ))) :=
+    have ho : IsOpen
+        ((A.subgroupOf (cptPart (twCent θ δ)) : Subgroup _) : Set (cptPart (twCent θ δ))) :=
       hAo.preimage continuous_subtype_val
     haveI := Subgroup.quotient_finite_of_isOpen _ ho
     exact Subgroup.index_ne_zero_of_finite

@@ -12,26 +12,29 @@ noncomputable section
 namespace GlobalTheory.EZ.Ext
 variable {C : Type*} [Category* C] [Preadditive C] [HasZeroObject C]
 
-abbrev ext1 (K : HomologicalComplex₂ C (ComplexShape.down ℕ) (ComplexShape.down ℕ)) :
-    HomologicalComplex (CochainComplex C ℤ) (ComplexShape.down ℕ) where
+abbrev ext1 (K : HomologicalComplex₂ C (ComplexShape.down ℕ) (ComplexShape.down ℕ))
+    : HomologicalComplex (CochainComplex C ℤ) (ComplexShape.down ℕ) where
   X a := (K.X a).extend ComplexShape.embeddingDownNat
   d a b := HomologicalComplex.extendMap (K.d a b) ComplexShape.embeddingDownNat
   shape a b h := by rw [K.shape a b h, HomologicalComplex.extendMap_zero]
-  d_comp_d' a b c _ _ := by rw [← HomologicalComplex.extendMap_comp, K.d_comp_d, HomologicalComplex.extendMap_zero]
+  d_comp_d' a b c _ _ := by
+    rw [← HomologicalComplex.extendMap_comp, K.d_comp_d, HomologicalComplex.extendMap_zero]
 
-abbrev ext2 (K : HomologicalComplex₂ C (ComplexShape.down ℕ) (ComplexShape.down ℕ)) :
-    HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
+abbrev ext2 (K : HomologicalComplex₂ C (ComplexShape.down ℕ) (ComplexShape.down ℕ))
+    : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
   (ext1 K).extend ComplexShape.embeddingDownNat
 
 lemma fN (a : ℕ) : ComplexShape.embeddingDownNat.f a = -(a : ℤ) := by simp
 
 variable (K : HomologicalComplex₂ C (ComplexShape.down ℕ) (ComplexShape.down ℕ))
 
-def kX {p q : ℤ} {a b : ℕ}
-    (ha : ComplexShape.embeddingDownNat.f a = p) (hb : ComplexShape.embeddingDownNat.f b = q) :
-    ((ext2 K).X p).X q ≅ (K.X a).X b :=
-  (HomologicalComplex.eval _ _ q).mapIso (HomologicalComplex.extendXIso _ ComplexShape.embeddingDownNat ha) ≪≫
-    HomologicalComplex.extendXIso _ ComplexShape.embeddingDownNat hb
+def kX
+    {p q : ℤ} {a b : ℕ}
+    (ha : ComplexShape.embeddingDownNat.f a = p) (hb : ComplexShape.embeddingDownNat.f b = q)
+    : ((ext2 K).X p).X q ≅ (K.X a).X b :=
+  (HomologicalComplex.eval _ _ q).mapIso
+      (HomologicalComplex.extendXIso _ ComplexShape.embeddingDownNat ha)
+    ≪≫ HomologicalComplex.extendXIso _ ComplexShape.embeddingDownNat hb
 
 lemma isZero_ext_of_pos {p q : ℤ} (h : 0 < p ∨ 0 < q) : IsZero (((ext2 K).X p).X q) := by
   rcases le_or_gt p 0 with hp | hp
@@ -84,12 +87,15 @@ lemma kX_d₂ (a b : ℕ) :
 section Tot
 variable [K.HasTotal (ComplexShape.down ℕ)] [(ext2 K).HasTotal (ComplexShape.up ℤ)]
 
-def cmp {p q n : ℤ} (a b m : ℕ) (ha : ComplexShape.embeddingDownNat.f a = p)
+def cmp
+    {p q n : ℤ} (a b m : ℕ) (ha : ComplexShape.embeddingDownNat.f a = p)
     (hb : ComplexShape.embeddingDownNat.f b = q) (hm : ComplexShape.embeddingDownNat.f m = n)
-    (h : ComplexShape.π (ComplexShape.down ℕ) (ComplexShape.down ℕ) (ComplexShape.down ℕ) (a, b) = m) :
-    ((ext2 K).X p).X q ⟶ ((K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat).X n :=
-  (kX K ha hb).hom ≫ K.ιTotal (ComplexShape.down ℕ) a b m h ≫
-    ((K.total (ComplexShape.down ℕ)).extendXIso ComplexShape.embeddingDownNat hm).inv
+    (h
+      : ComplexShape.π (ComplexShape.down ℕ) (ComplexShape.down ℕ) (ComplexShape.down ℕ) (a, b) = m)
+    : ((ext2 K).X p).X q
+      ⟶ ((K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat).X n :=
+  (kX K ha hb).hom ≫ K.ιTotal (ComplexShape.down ℕ) a b m h
+    ≫ ((K.total (ComplexShape.down ℕ)).extendXIso ComplexShape.embeddingDownNat hm).inv
 
 lemma cmp_congr {p q n : ℤ} (a b m a' b' m' : ℕ) (ha : ComplexShape.embeddingDownNat.f a = p)
     (hb : ComplexShape.embeddingDownNat.f b = q) (hm : ComplexShape.embeddingDownNat.f m = n)
@@ -103,14 +109,16 @@ lemma cmp_congr {p q n : ℤ} (a b m a' b' m' : ℕ) (ha : ComplexShape.embeddin
   obtain rfl : m = m' := ComplexShape.embeddingDownNat.injective_f (hm.trans hm'.symm)
   rfl
 
-def homF (n : ℤ) : ((ext2 K).total (ComplexShape.up ℤ)).X n ⟶
-    ((K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat).X n :=
+def homF (n : ℤ)
+    : ((ext2 K).total (ComplexShape.up ℤ)).X n
+      ⟶ ((K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat).X n :=
   (ext2 K).totalDesc (fun p q h =>
     if hpq : p ≤ 0 ∧ q ≤ 0 then
       cmp K (-p).toNat (-q).toNat (-n).toNat (by simp; omega) (by simp; omega)
         (by simp only [ComplexShape.π_def] at h; simp; omega)
         (by simp only [ComplexShape.π_def] at h ⊢; omega)
-    else 0)
+    else
+      0)
 
 lemma ι_homF (a b m : ℕ) (h : a + b = m) :
     (ext2 K).ιTotal (ComplexShape.up ℤ) (-(a : ℤ)) (-(b : ℤ)) (-(m : ℤ)) (by simp only [ComplexShape.π_def]; omega) ≫
@@ -120,20 +128,22 @@ lemma ι_homF (a b m : ℕ) (h : a + b = m) :
   rw [homF, HomologicalComplex₂.ι_totalDesc, dite_eq_left (by omega)]
   exact cmp_congr K _ _ _ a b m _ _ _ _ (fN a) (fN b) (fN m) h
 
-def invC {n : ℤ} (m : ℕ) (hm : ComplexShape.embeddingDownNat.f m = n) :
-    ((K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat).X n ⟶
-      ((ext2 K).total (ComplexShape.up ℤ)).X n :=
-  ((K.total (ComplexShape.down ℕ)).extendXIso ComplexShape.embeddingDownNat hm).hom ≫
-    K.totalDesc (fun a b h => (kN K a b).inv ≫ (ext2 K).ιTotal (ComplexShape.up ℤ) (-(a : ℤ)) (-(b : ℤ)) n
-      (by simp only [ComplexShape.π_def] at h ⊢; simp at hm; omega))
+def invC {n : ℤ} (m : ℕ) (hm : ComplexShape.embeddingDownNat.f m = n)
+    : ((K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat).X n
+      ⟶ ((ext2 K).total (ComplexShape.up ℤ)).X n :=
+  ((K.total (ComplexShape.down ℕ)).extendXIso ComplexShape.embeddingDownNat hm).hom
+    ≫ K.totalDesc (fun a b h =>
+      (kN K a b).inv ≫ (ext2 K).ιTotal (ComplexShape.up ℤ) (-(a : ℤ)) (-(b : ℤ)) n
+        (by simp only [ComplexShape.π_def] at h ⊢; simp at hm; omega))
 
 lemma invC_congr {n : ℤ} (m m' : ℕ) (hm : ComplexShape.embeddingDownNat.f m = n)
     (hm' : ComplexShape.embeddingDownNat.f m' = n) : invC K m hm = invC K m' hm' := by
   obtain rfl : m = m' := ComplexShape.embeddingDownNat.injective_f (hm.trans hm'.symm)
   rfl
 
-def invF (n : ℤ) : ((K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat).X n ⟶
-    ((ext2 K).total (ComplexShape.up ℤ)).X n :=
+def invF (n : ℤ)
+    : ((K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat).X n
+      ⟶ ((ext2 K).total (ComplexShape.up ℤ)).X n :=
   if hn : n ≤ 0 then invC K (-n).toNat (by simp; omega) else 0
 
 lemma ι_invF (a b m : ℕ) (h : a + b = m) :
@@ -231,38 +241,49 @@ end Tot2
 section Tot3
 variable [K.HasTotal (ComplexShape.down ℕ)] [(ext2 K).HasTotal (ComplexShape.up ℤ)]
 
-def totIso : (ext2 K).total (ComplexShape.up ℤ) ≅ (K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat :=
-  HomologicalComplex.Hom.isoOfComponents (fun n => ⟨homF K n, invF K n, homF_invF K n, invF_homF K n⟩)
+def totIso
+    : (ext2 K).total (ComplexShape.up ℤ)
+      ≅ (K.total (ComplexShape.down ℕ)).extend ComplexShape.embeddingDownNat :=
+  HomologicalComplex.Hom.isoOfComponents
+    (fun n => ⟨homF K n, invF K n, homF_invF K n, invF_homF K n⟩)
     (fun i j h => homF_comm K i j h)
 
 lemma totIso_inv_f (n : ℤ) : (totIso K).inv.f n = invF K n := rfl
 
 end Tot3
 
-def extHE {A B : ChainComplex C ℕ} (e : HomotopyEquiv A B) :
-    HomotopyEquiv (A.extend ComplexShape.embeddingDownNat) (B.extend ComplexShape.embeddingDownNat) where
+def extHE {A B : ChainComplex C ℕ} (e : HomotopyEquiv A B)
+    : HomotopyEquiv (A.extend ComplexShape.embeddingDownNat)
+      (B.extend ComplexShape.embeddingDownNat) where
   hom := HomologicalComplex.extendMap e.hom ComplexShape.embeddingDownNat
   inv := HomologicalComplex.extendMap e.inv ComplexShape.embeddingDownNat
-  homotopyHomInvId := (Homotopy.ofEq (HomologicalComplex.extendMap_comp _ _ _).symm).trans
-    ((e.homotopyHomInvId.extend ComplexShape.embeddingDownNat).trans
-      (Homotopy.ofEq (HomologicalComplex.extendMap_id _ _)))
-  homotopyInvHomId := (Homotopy.ofEq (HomologicalComplex.extendMap_comp _ _ _).symm).trans
-    ((e.homotopyInvHomId.extend ComplexShape.embeddingDownNat).trans
-      (Homotopy.ofEq (HomologicalComplex.extendMap_id _ _)))
+  homotopyHomInvId :=
+    (Homotopy.ofEq (HomologicalComplex.extendMap_comp _ _ _).symm).trans
+      ((e.homotopyHomInvId.extend ComplexShape.embeddingDownNat).trans
+        (Homotopy.ofEq (HomologicalComplex.extendMap_id _ _)))
+  homotopyInvHomId :=
+    (Homotopy.ofEq (HomologicalComplex.extendMap_comp _ _ _).symm).trans
+      ((e.homotopyInvHomId.extend ComplexShape.embeddingDownNat).trans
+        (Homotopy.ofEq (HomologicalComplex.extendMap_id _ _)))
 
 section Sheaves
 open GlobalTheory.EtC
 variable (R : Type) [CommRing R]
 
-def diagSIso (X : SimplicialObject Spc) :
-    ((SimplicialObject.whiskering _ _).obj (free R)).obj (bidiag.obj X) ≅ GlobalTheory.EZ.diag.obj ((freeBi R).obj X) :=
-  NatIso.ofComponents (fun _ => Iso.refl _) (fun f => by
-    simp only [Iso.refl_hom, Category.comp_id, Category.id_comp]
-    exact ((free R).map_comp _ _))
+def diagSIso (X : SimplicialObject Spc)
+    : ((SimplicialObject.whiskering _ _).obj (free R)).obj (bidiag.obj X)
+      ≅ GlobalTheory.EZ.diag.obj ((freeBi R).obj X) :=
+  NatIso.ofComponents
+    (fun _ => Iso.refl _)
+    (fun f => by
+      simp only [Iso.refl_hom, Category.comp_id, Category.id_comp]
+      exact ((free R).map_comp _ _))
 
-def diagIso (X : SimplicialObject Spc) :
-    (chains R).obj (bidiag.obj X) ≅ (diagCx ((freeBi R).obj X)).extend ComplexShape.embeddingDownNat :=
-  (ComplexShape.embeddingDownNat.extendFunctor _).mapIso ((alternatingFaceMapComplex _).mapIso (diagSIso R X))
+def diagIso (X : SimplicialObject Spc)
+    : (chains R).obj (bidiag.obj X)
+      ≅ (diagCx ((freeBi R).obj X)).extend ComplexShape.embeddingDownNat :=
+  (ComplexShape.embeddingDownNat.extendFunctor _).mapIso
+    ((alternatingFaceMapComplex _).mapIso (diagSIso R X))
 
 set_option backward.isDefEq.respectTransparency false in
 lemma diagIso_hom_f (X : SimplicialObject Spc) (n : ℕ) :
@@ -283,15 +304,26 @@ lemma ev_awO (X : SimplicialObject Spc) (n a : ℕ) (ha : a ≤ n) :
 
 end Sheaves
 
-
 set_option backward.isDefEq.respectTransparency false in
-theorem homotopyEquiv_chains_totChains : ∀ (R : Type) [CommRing R] (X : SimplicialObject GlobalTheory.EtC.Spc), (∃ e : HomotopyEquiv (diagCx ((freeBi R).obj X)) (tot ((freeBi R).obj X)), ∀ n : ℕ, e.hom.f n = awF _ n) → ∃ e : HomotopyEquiv ((GlobalTheory.EtC.chains R).obj (GlobalTheory.EtC.bidiag.obj X)) (totChains R X), ∀ n : ℕ, e.hom.f (-(n : ℤ)) = awZ R X n := by
+theorem homotopyEquiv_chains_totChains
+    : ∀ (R : Type) [CommRing R] (X : SimplicialObject GlobalTheory.EtC.Spc),
+      (∃ e : HomotopyEquiv (diagCx ((freeBi R).obj X)) (tot ((freeBi R).obj X)), ∀ n : ℕ,
+          e.hom.f n = awF _ n)
+        → ∃ e : HomotopyEquiv ((GlobalTheory.EtC.chains R).obj (GlobalTheory.EtC.bidiag.obj X))
+            (totChains R X),
+          ∀ n : ℕ,
+            e.hom.f (-(n : ℤ)) = awZ R X n := by
   intro R _ X ⟨e, he⟩
   haveI : (ext2 (dbl ((freeBi R).obj X))).HasTotal (ComplexShape.up ℤ) := hasTotal_biChains R X
-  refine ⟨(HomotopyEquiv.ofIso (diagIso R X)).trans ((extHE e).trans
-    (HomotopyEquiv.ofIso (totIso (dbl ((freeBi R).obj X))).symm)), fun n => ?_⟩
-  change (diagIso R X).hom.f (-(n:ℤ)) ≫ (HomologicalComplex.extendMap e.hom ComplexShape.embeddingDownNat).f (-(n:ℤ)) ≫
-    (totIso (dbl ((freeBi R).obj X))).inv.f (-(n:ℤ)) = _
+  refine ⟨
+    (HomotopyEquiv.ofIso (diagIso R X)).trans
+      ((extHE e).trans (HomotopyEquiv.ofIso (totIso (dbl ((freeBi R).obj X))).symm)),
+    fun n => ?_
+  ⟩
+  change (diagIso R X).hom.f (-(n : ℤ))
+      ≫ (HomologicalComplex.extendMap e.hom ComplexShape.embeddingDownNat).f (-(n : ℤ))
+      ≫ (totIso (dbl ((freeBi R).obj X))).inv.f (-(n : ℤ))
+    = _
   rw [diagIso_hom_f, HomologicalComplex.extendMap_f _ _ (fN n), he n, totIso_inv_f]
   simp only [Category.assoc, Iso.inv_hom_id_assoc]
   rw [awZ, awF]

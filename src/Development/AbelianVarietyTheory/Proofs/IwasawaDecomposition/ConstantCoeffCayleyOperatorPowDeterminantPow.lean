@@ -12,9 +12,9 @@ open MvPolynomial ReciprocityTheory.PGsh GlobalTheory.CayleyBlock
 
 namespace GlobalTheory
 
-theorem cayOp_pow_cayDet_pow (p s k : ℕ) :
-    (cayOp p ℂ ^ k) (cayDet p ℂ ^ (s + k)) =
-      (∏ t ∈ Finset.range k, ∏ j ∈ Finset.range p, (s + 1 + t + j)) • cayDet p ℂ ^ s := by
+theorem cayOp_pow_cayDet_pow (p s k : ℕ)
+    : (cayOp p ℂ ^ k) (cayDet p ℂ ^ (s + k))
+      = (∏ t ∈ Finset.range k, ∏ j ∈ Finset.range p, (s + 1 + t + j)) • cayDet p ℂ ^ s := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -26,8 +26,8 @@ theorem cayOp_pow_cayDet_pow (p s k : ℕ) :
     refine Finset.prod_congr rfl fun j _ => ?_
     ring
 
-theorem prod_succ_mul_factorial (j q : ℕ) :
-    (∏ t ∈ Finset.range q, (1 + t + j)) * j.factorial = (q + j).factorial := by
+theorem prod_succ_mul_factorial (j q : ℕ)
+    : (∏ t ∈ Finset.range q, (1 + t + j)) * j.factorial = (q + j).factorial := by
   induction q with
   | zero => simp
   | succ q ih =>
@@ -35,9 +35,10 @@ theorem prod_succ_mul_factorial (j q : ℕ) :
       Nat.factorial_succ]
     ring
 
-theorem constantCoeff_cayOp_pow_cayDet_pow : ∀ (p q : ℕ),
-    constantCoeff ((cayOp p ℂ ^ q) (cayDet p ℂ ^ q)) =
-      ∏ i ∈ Finset.range p, (((q + i).factorial : ℂ) / i.factorial) := by
+theorem constantCoeff_cayOp_pow_cayDet_pow
+    : ∀ (p q : ℕ),
+      constantCoeff ((cayOp p ℂ ^ q) (cayDet p ℂ ^ q))
+        = ∏ i ∈ Finset.range p, (((q + i).factorial : ℂ) / i.factorial) := by
   intro p q
   have h := cayOp_pow_cayDet_pow p 0 q
   rw [zero_add] at h

@@ -9,14 +9,29 @@ open GlobalTheory.FinGL Formalism.L2.DIV Module
 
 namespace GlobalTheory.FinGL.MackeyCut
 
-theorem eig_eq_bot_of_cut : ∀ (F : Type) [Field F] (ψ : AddChar F ℂ) (r : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (b : Fin r → ℕ) (σ : Representation ℂ (blockTri (κ := F) b) V), IsCuspDatum b σ → ∀ (j : ℕ) (w : Equiv.Perm (Fin r)) (x : GL (Fin r) F), (∀ (g : GL (Fin r) F) (a c : Fin r), ((x⁻¹ * g * x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) a c = (g : Matrix (Fin r) (Fin r) F) (w a) (w c)) → ∀ a c : Fin r, a.val < j → j ≤ c.val → b (w a) = b (w c) → eig σ {p | x⁻¹ * (p : GL (Fin r) F) * x ∈ unip F r} (fun p => ψ (edgeSum (cutEdge j) (x⁻¹ * (p : GL (Fin r) F) * x))) = ⊥ := by
+theorem eig_eq_bot_of_cut
+    : ∀ (F : Type) [Field F] (ψ : AddChar F ℂ) (r : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
+        (b : Fin r → ℕ) (σ : Representation ℂ (blockTri (κ := F) b) V),
+      IsCuspDatum b σ
+        → ∀ (j : ℕ) (w : Equiv.Perm (Fin r)) (x : GL (Fin r) F),
+          (∀ (g : GL (Fin r) F) (a c : Fin r),
+              ((x⁻¹ * g * x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) a c
+                = (g : Matrix (Fin r) (Fin r) F) (w a) (w c))
+            → ∀ a c : Fin r,
+              a.val < j → j ≤ c.val → b (w a) = b (w c)
+                → eig σ {p | x⁻¹ * (p : GL (Fin r) F) * x ∈ unip F r}
+                    (fun p => ψ (edgeSum (cutEdge j) (x⁻¹ * (p : GL (Fin r) F) * x)))
+                  = ⊥ := by
   intro F _ ψ r V _ _ b σ hσ j w x hx a c haj hjc hb
   obtain ⟨_, _, _, hcusp⟩ := hσ
 
-  have hy' : ∀ y ∈ eig σ {p | x⁻¹ * (p : GL (Fin r) F) * x ∈ unip F r}
-      (fun p => ψ (edgeSum (cutEdge j) (x⁻¹ * (p : GL (Fin r) F) * x))),
-      ∀ p : blockTri (κ := F) b, x⁻¹ * (p : GL (Fin r) F) * x ∈ unip F r →
-        σ p y = ψ (edgeSum (cutEdge j) (x⁻¹ * (p : GL (Fin r) F) * x)) • y := by
+  have hy'
+      : ∀ y
+          ∈ eig σ {p | x⁻¹ * (p : GL (Fin r) F) * x ∈ unip F r}
+            (fun p => ψ (edgeSum (cutEdge j) (x⁻¹ * (p : GL (Fin r) F) * x))),
+        ∀ p : blockTri (κ := F) b,
+          x⁻¹ * (p : GL (Fin r) F) * x ∈ unip F r
+            → σ p y = ψ (edgeSum (cutEdge j) (x⁻¹ * (p : GL (Fin r) F) * x)) • y := by
     intro y hy p hp
     unfold eig at hy
     simp only [Submodule.mem_iInf, LinearMap.mem_ker] at hy
@@ -34,12 +49,16 @@ theorem eig_eq_bot_of_cut : ∀ (F : Type) [Field F] (ψ : AddChar F ℂ) (r : �
     exact hjc
   · intro u hu
 
-    have hent : ∀ a' c' : Fin r, (c'.val ≤ a'.val ∨ (c'.val = a'.val + 1 ∧ a'.val + 1 ≠ j)) →
-        ((u : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) (w a') (w c') = (1 : Matrix (Fin r) (Fin r) F) (w a') (w c') := by
+    have hent
+        : ∀ a' c' : Fin r,
+          (c'.val ≤ a'.val ∨ (c'.val = a'.val + 1 ∧ a'.val + 1 ≠ j))
+            → ((u : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) (w a') (w c')
+              = (1 : Matrix (Fin r) (Fin r) F) (w a') (w c') := by
       intro a' c' h
       by_contra hne
       obtain ⟨_, h1, h2⟩ := hu _ _ hne
-      simp only [S, Finset.mem_filter, Finset.mem_univ, true_and, Equiv.symm_apply_apply, not_lt] at h1 h2
+      simp only [S, Finset.mem_filter, Finset.mem_univ, true_and, Equiv.symm_apply_apply, not_lt]
+        at h1 h2
       omega
     have hU : x⁻¹ * (u : GL (Fin r) F) * x ∈ unip F r := by
       show x⁻¹ * (u : GL (Fin r) F) * x ∈ blockTri (κ := F) (fun a : Fin r => a.val) ∧

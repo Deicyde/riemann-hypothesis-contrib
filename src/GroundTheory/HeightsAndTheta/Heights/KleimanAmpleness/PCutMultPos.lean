@@ -13,10 +13,10 @@ noncomputable section
 
 open IsLocalRing
 
-def locQuotEquiv {R : Type*} [CommRing R] (q : Ideal R) [q.IsPrime] (J : Ideal R) :
-    (Localization.AtPrime q ⧸ J.localized' (Localization.AtPrime q) q.primeCompl
-      (Algebra.linearMap R (Localization.AtPrime q))) ≃ₗ[Localization.AtPrime q]
-      LocalizedModule q.primeCompl (R ⧸ J) :=
+def locQuotEquiv {R : Type*} [CommRing R] (q : Ideal R) [q.IsPrime] (J : Ideal R)
+    : (Localization.AtPrime q ⧸ J.localized' (Localization.AtPrime q) q.primeCompl
+        (Algebra.linearMap R (Localization.AtPrime q))) ≃ₗ[Localization.AtPrime q]
+        LocalizedModule q.primeCompl (R ⧸ J) :=
   have := IsLocalization.linearMap_compatibleSMul q.primeCompl
   (IsLocalizedModule.linearEquiv q.primeCompl
     (J.toLocalizedQuotient' (Localization.AtPrime q) q.primeCompl

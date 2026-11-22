@@ -6,21 +6,25 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Eigenchar
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso tw)
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open UpperTheory.Gal.TP.Sub
 
-private theorem dg_mulVec {Γ k : Type} [Group Γ] [Field k] {t : ℕ} (a : Fin t → Γ →* kˣ) (g : Γ)
-    (u : Fin t → k) (i : Fin t) :
-    ((dg a g : GL (Fin t) k) : Matrix (Fin t) (Fin t) k).mulVec u i = (a i g : k) * u i := by
+private theorem dg_mulVec
+    {Γ k : Type} [Group Γ] [Field k]
+    {t : ℕ} (a : Fin t → Γ →* kˣ)
+    (g : Γ) (u : Fin t → k) (i : Fin t)
+    : ((dg a g : GL (Fin t) k) : Matrix (Fin t) (Fin t) k).mulVec u i = (a i g : k) * u i := by
   simp [dg, Matrix.mulVec_diagonal]
 
-theorem UpperTheory.Gal.TP.Sub.eigSum_holds :
-    EigSum := by
+theorem UpperTheory.Gal.TP.Sub.eigSum_holds : EigSum := by
   intro Γ k _ _ m t r a c
   refine ⟨?_, ?_⟩
   · rintro ⟨i, hi⟩

@@ -13,12 +13,13 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open MvPolynomial Finset
 
-theorem aeval_vandermondeOf_X {m : ℕ} (v : Fin m → ℂ) :
-    aeval v (vandermondeOf (fun i : Fin m => (X i : MvPolynomial (Fin m) ℚ))) = vandermondeOf v := by
+theorem aeval_vandermondeOf_X {m : ℕ} (v : Fin m → ℂ)
+    : aeval v (vandermondeOf (fun i : Fin m => (X i : MvPolynomial (Fin m) ℚ)))
+      = vandermondeOf v := by
   simp [vandermondeOf, map_prod, map_sub, aeval_X]
 
-theorem SchRootOfUnityBialternant.proof (h1 : SchSchurEvalMatrix.Statement) :
-    SchRootOfUnityBialternant.Statement := by
+theorem SchRootOfUnityBialternant.proof (h1 : SchSchurEvalMatrix.Statement)
+    : SchRootOfUnityBialternant.Statement := by
   intro k nu hk
   have hw : ∀ j : Fin k, rootOfUnityPoint k k j = rootOfUnity k ^ (j : ℕ) := fun j => by
     simp [rootOfUnityPoint, j.isLt]

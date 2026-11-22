@@ -13,12 +13,16 @@ open PositivityTheory.RgEis PositivityTheory.RgEis.MG GroundTheory.Global Ground
 
 namespace GlobalTheory.CompanionTheory.EisTestK
 
-theorem nhd_choice {K K₀ : Type} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
-    [Group K₀] [TopologicalSpace K₀] [IsTopologicalGroup K₀] [CompactSpace K₀] [T2Space K₀]
-    (j : K →* K₀) (hj : Continuous j) (S : Subgroup K₀) (hS : IsClosed (S : Set K₀))
-    (N₁ : Set K₀) (hN : N₁ ∈ 𝓝 (1 : K₀)) (V : Set K) (hV : V ∈ 𝓝 (1 : K)) :
-    ∃ U ∈ 𝓝 (1 : K₀), ∀ (κ : K) (p u : K₀), p ∈ S → u ∈ U → j κ = p * u →
-      ∃ r v : K, j r ∈ S ∧ v ∈ V ∧ κ = r * v ∧ ∀ u' ∈ U, j v * u'⁻¹ ∈ N₁ := by
+theorem nhd_choice
+    {K K₀ : Type} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K] [Group K₀]
+    [TopologicalSpace K₀] [IsTopologicalGroup K₀] [CompactSpace K₀] [T2Space K₀]
+    (j : K →* K₀) (hj : Continuous j)
+    (S : Subgroup K₀) (hS : IsClosed (S : Set K₀))
+    (N₁ : Set K₀) (hN : N₁ ∈ 𝓝 (1 : K₀))
+    (V : Set K) (hV : V ∈ 𝓝 (1 : K))
+    : ∃ U ∈ 𝓝 (1 : K₀), ∀ (κ : K) (p u : K₀),
+      p ∈ S → u ∈ U → j κ = p * u
+        → ∃ r v : K, j r ∈ S ∧ v ∈ V ∧ κ = r * v ∧ ∀ u' ∈ U, j v * u'⁻¹ ∈ N₁ := by
   have hcont : Tendsto (fun x : K₀ × K₀ => x.1 * x.2⁻¹) (𝓝 1 ×ˢ 𝓝 1) (𝓝 1) := by
     have h : Continuous (fun x : K₀ × K₀ => x.1 * x.2⁻¹) := by fun_prop
     have := h.tendsto ((1 : K₀), (1 : K₀))
@@ -38,7 +42,8 @@ theorem nhd_choice {K K₀ : Type} [Group K] [TopologicalSpace K] [IsTopological
     apply hx
     have hjx : j x ∈ S := by
       have : j x = p⁻¹ := eq_inv_of_mul_eq_one_right hpc
-      rw [this]; exact S.inv_mem hp
+      rw [this]
+      exact S.inv_mem hp
     exact ⟨x, hjx, 1, h1, by simp⟩
   refine ⟨W ∩ Tᶜ, Filter.inter_mem hW (hT.isClosed.isOpen_compl.mem_nhds h1T), ?_⟩
   intro κ p u hp hu hκ
@@ -53,15 +58,16 @@ theorem nhd_choice {K K₀ : Type} [Group K] [TopologicalSpace K] [IsTopological
 
 section Concrete
 
-variable {k : Type} [Field k] [NumberField k] {ι : Type} [Fintype ι] [DecidableEq ι] {G : Type} [Group G]
+variable
+  {k : Type} [Field k] [NumberField k] {ι : Type} [Fintype ι] [DecidableEq ι] {G : Type} [Group G]
 
 theorem dgl_mem_stab (d : ι → IdeleGroup k) (i : ι) : dgl d ∈ stab 𝔸[k] ({i} : Set ι) := by
   intro r hr c hc
   have hrc : r ≠ c := fun h => hr (h ▸ hc)
   exact ⟨Matrix.diagonal_apply_ne _ hrc, Matrix.diagonal_apply_ne _ hrc⟩
 
-theorem kap_mem_stab_iff (π : G →* GL ι 𝔸[k]) (d : ι → IdeleGroup k) (i : ι) (g : G) :
-    kap π d g ∈ stab 𝔸[k] ({i} : Set ι) ↔ π g ∈ stab 𝔸[k] ({i} : Set ι) := by
+theorem kap_mem_stab_iff (π : G →* GL ι 𝔸[k]) (d : ι → IdeleGroup k) (i : ι) (g : G)
+    : kap π d g ∈ stab 𝔸[k] ({i} : Set ι) ↔ π g ∈ stab 𝔸[k] ({i} : Set ι) := by
   have hD := dgl_mem_stab d i
   constructor
   · intro h
@@ -71,9 +77,12 @@ theorem kap_mem_stab_iff (π : G →* GL ι 𝔸[k]) (d : ι → IdeleGroup k) (
   · intro h
     exact mul_mem (mul_mem (inv_mem hD) h) hD
 
-theorem bdet_congr {R : Type} [CommRing R] {s : Set ι} {g g' : GL ι R}
-    (h : (g : Matrix ι ι R).submatrix (Subtype.val : s → ι) (Subtype.val : s → ι) =
-      (g' : Matrix ι ι R).submatrix (Subtype.val : s → ι) (Subtype.val : s → ι)) : bdet s g = bdet s g' := by
+theorem bdet_congr
+    {R : Type} [CommRing R]
+    {s : Set ι} {g g' : GL ι R}
+    (h : (g : Matrix ι ι R).submatrix (Subtype.val : s → ι) (Subtype.val : s → ι)
+      = (g' : Matrix ι ι R).submatrix (Subtype.val : s → ι) (Subtype.val : s → ι))
+    : bdet s g = bdet s g' := by
   unfold bdet
   split_ifs with h1 h2 h2
   · exact Units.ext (by rw [IsUnit.unit_spec, IsUnit.unit_spec, h])
@@ -81,16 +90,19 @@ theorem bdet_congr {R : Type} [CommRing R] {s : Set ι} {g g' : GL ι R}
   · exact absurd (by rwa [← h] at h2) h1
   · rfl
 
-theorem bdet_kap (π : G →* GL ι 𝔸[k]) (d : ι → IdeleGroup k) (i : ι) (g : G) :
-    bdet ({i} : Set ι) (kap π d g) = bdet ({i} : Set ι) (π g) := by
+theorem bdet_kap (π : G →* GL ι 𝔸[k]) (d : ι → IdeleGroup k) (i : ι) (g : G)
+    : bdet ({i} : Set ι) (kap π d g) = bdet ({i} : Set ι) (π g) := by
   apply bdet_congr
   ext ⟨a, ha⟩ ⟨b, hb⟩
   obtain rfl : a = i := ha
   obtain rfl : b = a := hb
-  have e : (((dgl d)⁻¹ : GL ι 𝔸[k]) : Matrix ι ι 𝔸[k]) =
-      Matrix.diagonal fun i => (((d i)⁻¹ : IdeleGroup k) : 𝔸[k]) := rfl
+  have e
+      : (((dgl d)⁻¹ : GL ι 𝔸[k]) : Matrix ι ι 𝔸[k])
+        = Matrix.diagonal fun i => (((d i)⁻¹ : IdeleGroup k) : 𝔸[k]) :=
+    rfl
   have e' : ((dgl d : GL ι 𝔸[k]) : Matrix ι ι 𝔸[k]) = Matrix.diagonal fun i => (d i : 𝔸[k]) := rfl
-  simp only [Matrix.submatrix_apply, kap, Units.val_mul, e, e', Matrix.mul_diagonal, Matrix.diagonal_mul]
+  simp only [Matrix.submatrix_apply, kap, Units.val_mul, e, e', Matrix.mul_diagonal,
+    Matrix.diagonal_mul]
   rw [mul_right_comm, Units.inv_mul, one_mul]
 
 end Concrete
@@ -100,10 +112,11 @@ theorem testK : StdGood → BdetLaw → TestFun → TestK := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.1 hK
   haveI : CompactSpace ((adStd k).kGL ι) := isCompact_iff_compactSpace.1 ((hStd k).kcpt ι)
   obtain ⟨hcl, hmul, hcb, -, -, -⟩ := hB k 𝔸[k] (adStd k) (hStd k) ι ({i} : Set ι)
-  let j : K →* (adStd k).kGL ι :=
-    { toFun := fun κ => ⟨kap π d κ, hSide.piK κ κ.2⟩
-      map_one' := by apply Subtype.ext; simp [kap]
-      map_mul' := fun a b => by apply Subtype.ext; simp [kap, mul_assoc] }
+  let j : K →* (adStd k).kGL ι := {
+    toFun := fun κ => ⟨kap π d κ, hSide.piK κ κ.2⟩
+    map_one' := by apply Subtype.ext; simp [kap]
+    map_mul' := fun a b => by apply Subtype.ext; simp [kap, mul_assoc]
+  }
   have hj : Continuous j := by
     refine Continuous.subtype_mk ?_ _
     unfold kap
@@ -119,12 +132,16 @@ theorem testK : StdGood → BdetLaw → TestFun → TestK := by
     rw [hb1]
     simp [HeckeCharacter.toIdele_apply]
   have hfc : ContinuousOn f (S : Set ((adStd k).kGL ι)) := by
-    have h1 : ContinuousOn (fun p : (adStd k).kGL ι => bdet ({i} : Set ι) p.1) (S : Set ((adStd k).kGL ι)) :=
+    have h1 : ContinuousOn
+        (fun p : (adStd k).kGL ι => bdet ({i} : Set ι) p.1)
+        (S : Set ((adStd k).kGL ι)) :=
       hcb.comp continuous_subtype_val.continuousOn fun p hp => hp
     exact continuous_subtype_val.comp_continuousOn (ω.continuous_toIdele.comp_continuousOn h1)
   obtain ⟨N₁, hN₁, hNf⟩ : ∃ N₁ ∈ 𝓝 (1 : (adStd k).kGL ι), ∀ p ∈ S, p ∈ N₁ → ‖f p - 1‖ ≤ 1 / 4 := by
     have h := hfc 1 (one_mem S)
-    have hm : f ⁻¹' Metric.closedBall 1 (1 / 4) ∈ 𝓝[(S : Set ((adStd k).kGL ι))] (1 : (adStd k).kGL ι) :=
+    have hm
+        : f ⁻¹' Metric.closedBall 1 (1 / 4)
+          ∈ 𝓝[(S : Set ((adStd k).kGL ι))] (1 : (adStd k).kGL ι) :=
       h (by rw [hf1]; exact Metric.closedBall_mem_nhds _ (by norm_num))
     obtain ⟨u, huo, hu1, hus⟩ := mem_nhdsWithin.1 hm
     refine ⟨u, huo.mem_nhds hu1, fun p hp hpu => ?_⟩
@@ -135,7 +152,8 @@ theorem testK : StdGood → BdetLaw → TestFun → TestK := by
   refine ⟨Ψ, Ψ₁, ψ ∘ j, hΨ, hΨ₁, hψc.comp hj, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · simpa using hψ1
   · intro r κ hr
-    have hrS : (j r).1 ∈ stab 𝔸[k] ({i} : Set ι) := (kap_mem_stab_iff π d i r).2 ((hSide.mem _).1 hr)
+    have hrS : (j r).1 ∈ stab 𝔸[k] ({i} : Set ι) :=
+      (kap_mem_stab_iff π d i r).2 ((hSide.mem _).1 hr)
     show ψ (j (r * κ)) = c r * ψ (j κ)
     rw [map_mul, hlaw _ _ hrS, (hSide.val _ hr).1]
     rw [show (j r).1 = kap π d r from rfl, bdet_kap]
@@ -146,9 +164,10 @@ theorem testK : StdGood → BdetLaw → TestFun → TestK := by
     have hrP : (r : G) ∈ P := (hSide.mem _).2 ((kap_mem_stab_iff π d i r).1 hr)
     refine ⟨r, v, hrP, hv, rfl, ?_⟩
     have hl := hlaw (j r) (j v) hrS
-    have hφv : ψ (j v) ≠ 0 := fun h => hκ (by
-      show ψ (j (r * v)) = 0
-      rw [map_mul, hl, h, mul_zero])
+    have hφv : ψ (j v) ≠ 0 := fun h =>
+      hκ (by
+        show ψ (j (r * v)) = 0
+        rw [map_mul, hl, h, mul_zero])
     obtain ⟨p', hp', u', hu', hve, hval⟩ := hsupp (j v) hφv
     have hpN : p' ∈ N₁ := by
       have := hvN u' hu'

@@ -15,8 +15,9 @@ noncomputable section
 
 namespace ProjIdealFormValue
 
-theorem weight_blockWeight_apply {K : Type*} [DecidableEq K] {ι : K → Type*} (m : (Σ k, ι k) →₀ ℕ)
-    (k : K) : Finsupp.weight (blockWeight ι) m k = Finsupp.mapDomain Sigma.fst m k := by
+theorem weight_blockWeight_apply
+    {K : Type*} [DecidableEq K] {ι : K → Type*} (m : (Σ k, ι k) →₀ ℕ) (k : K)
+    : Finsupp.weight (blockWeight ι) m k = Finsupp.mapDomain Sigma.fst m k := by
   rw [Finsupp.weight_apply, Finsupp.mapDomain, Finsupp.sum, Finsupp.sum, Finset.sum_apply,
     Finsupp.finsetSum_apply]
   refine Finset.sum_congr rfl fun v _ => ?_
@@ -24,10 +25,13 @@ theorem weight_blockWeight_apply {K : Type*} [DecidableEq K] {ι : K → Type*} 
   · simp [blockWeight, h]
   · simp [blockWeight, Ne.symm h]
 
-theorem eval₂_monomial_cone {F Φ : Type*} [CommRing F] [CommRing Φ] (α : F →+* Φ) {K : Type*}
-    {ι : K → Type*} (z : (Σ k, ι k) → Φ) (m : (Σ k, ι k) →₀ ℕ) (c : F) :
-    eval₂ (C.comp α) (fun p => C (z p) * X p.1) (monomial m c) =
-      C (eval₂ α z (monomial m c)) * monomial (Finsupp.mapDomain Sigma.fst m) (1 : Φ) := by
+theorem eval₂_monomial_cone
+    {F Φ : Type*} [CommRing F] [CommRing Φ]
+    (α : F →+* Φ)
+    {K : Type*} {ι : K → Type*} (z : (Σ k, ι k) → Φ) (m : (Σ k, ι k) →₀ ℕ)
+    (c : F)
+    : eval₂ (C.comp α) (fun p => C (z p) * X p.1) (monomial m c)
+      = C (eval₂ α z (monomial m c)) * monomial (Finsupp.mapDomain Sigma.fst m) (1 : Φ) := by
   rw [eval₂_monomial, eval₂_monomial, monomial_eq, C_1, one_mul,
     Finsupp.prod_mapDomain_index (fun _ => pow_zero _) (fun _ _ _ => pow_add _ _ _)]
   simp only [mul_pow, Finsupp.prod_mul, map_mul, RingHom.coe_comp, Function.comp_apply,
@@ -48,10 +52,12 @@ theorem proof : ProjIdealFormValue.Statement := by
     ext o
     rw [← weight_blockWeight_apply, ← weight_blockWeight_apply, hx' (mem_support_iff.mp hm),
       hx' (mem_support_iff.mp hm₀)]
-  have key : eval₂ (C.comp ((algebraMap Ω Φ).comp (algebraMap F Ω)))
-      (fun p => C (projCoord y w φ t p) * X p.1) x =
-      C (eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) x) *
-        monomial (Finsupp.mapDomain Sigma.fst m₀) 1 := by
+  have key
+      : eval₂ (C.comp ((algebraMap Ω Φ).comp (algebraMap F Ω)))
+          (fun p => C (projCoord y w φ t p) * X p.1)
+          x
+        = C (eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) x)
+          * monomial (Finsupp.mapDomain Sigma.fst m₀) 1 := by
     conv_lhs => rw [x.as_sum]
     conv_rhs => rw [x.as_sum]
     set_option synthInstance.maxHeartbeats 100000 in

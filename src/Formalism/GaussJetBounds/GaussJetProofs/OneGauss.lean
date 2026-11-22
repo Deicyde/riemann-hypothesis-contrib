@@ -21,10 +21,14 @@ open Formalism.IncomingBounds
 
 namespace OneGauss
 
-def expo {K : Type} [Field K] {τ ι : Type} [Fintype τ] (v : τ → MvPowerSeries ι K) (sgn ep : K)
-    (be : MvPowerSeries (ZMod 2) K) : MvPowerSeries ι K :=
-  (sgn / 2) • ∑ x : τ, MvPowerSeries.subst
-    (fun s : ZMod 2 => (if s = 0 then (1 : K) else ep) • v x) be
+def expo
+    {K : Type} [Field K]
+    {τ ι : Type} [Fintype τ]
+    (v : τ → MvPowerSeries ι K) (sgn ep : K) (be : MvPowerSeries (ZMod 2) K)
+    : MvPowerSeries ι K :=
+  (sgn / 2)
+    • ∑ x : τ, MvPowerSeries.subst
+      (fun s : ZMod 2 => (if s = 0 then (1 : K) else ep) • v x) be
 
 section Expo
 
@@ -137,9 +141,9 @@ lemma subst_thetaOne {ι : Type} {a : Fin N0 × Fin N1 → MvPowerSeries ι K}
 
 end Theta
 
-def frA {K : Type} [Field K] {N0 N1 : ℕ} (Y : Fin N0 × Fin N0 → K) :
-    Fin N0 × Fin N1 → Fin N0 × Fin N1 → K :=
-  fun y z => if y.2 = z.2 then Y (y.1, z.1) else 0
+def frA {K : Type} [Field K] {N0 N1 : ℕ} (Y : Fin N0 × Fin N0 → K)
+    : Fin N0 × Fin N1 → Fin N0 × Fin N1 → K := fun y z =>
+  if y.2 = z.2 then Y (y.1, z.1) else 0
 
 lemma sum_frA_row {K : Type} [Field K] {N0 N1 : ℕ} (Y : Fin N0 × Fin N0 → K) (i : Fin N0)
     (b : Fin N1) :
@@ -234,8 +238,11 @@ theorem one_letter_gauss_sum : OneLetterGauss := by
     rw [MvPolynomial.aeval_X] at h
     exact h.le
   have hbe0 : MvPowerSeries.constantCoeff be = 0 := Transfer.cc_of_noLow hbe.2.2.1
-  have hG := gauss_sum_powers ℂ_[l] K φ (Fin N0 × Fin N0) Y hY (fun _ => 1) (fun _ => one_ne_zero)
-    (frameJetOne p hp I (thetaOne g U sgn ep be)) n
+  have hG :=
+    gauss_sum_powers ℂ_[l] K φ (Fin N0 × Fin N0) Y hY
+      (fun _ => 1)
+      (fun _ => one_ne_zero)
+      (frameJetOne p hp I (thetaOne g U sgn ep be)) n
   simp only [pow_one] at hG
   refine hG.trans ?_
   rw [eval₂_frameJetOne φ g hg U sgn ep be hbe0 p hp I Y]
@@ -243,12 +250,15 @@ theorem one_letter_gauss_sum : OneLetterGauss := by
   have hg' : ∀ x, MvPowerSeries.constantCoeff (MvPowerSeries.map φ (g x)) = 0 := by
     intro x
     simp [hg x]
-  have hgl' : ∀ x : Fin N0 × Fin N1, MvPowerSeries.subst (fun y => MvPowerSeries.map φ (g y)) (oneLog (K := K) l x) =
-      MvPowerSeries.X x := by
+  have hgl'
+      : ∀ x : Fin N0 × Fin N1,
+        MvPowerSeries.subst (fun y => MvPowerSeries.map φ (g y)) (oneLog (K := K) l x)
+          = MvPowerSeries.X x := by
     intro x
     have h := congrArg (MvPowerSeries.map φ) (hgl x)
     rwa [MvPowerSeries.map_subst (MvPowerSeries.hasSubst_of_constantCoeff_zero hg), map_oneLog,
-      MvPowerSeries.map_X] at h
+        MvPowerSeries.map_X]
+      at h
   have hsgn' : φ sgn = 1 ∨ φ sgn = -1 := by
     rcases hsgn with h | h
     · left
@@ -261,13 +271,19 @@ theorem one_letter_gauss_sum : OneLetterGauss := by
     split_ifs
     · exact hYn _
     · simp
-  have hmin : ∀ κ, ‖AddMonoidAlgebra.coeff (minorProd (fun (i : Fin N0) (b : Fin N1) =>
-      (MvPolynomial.X (i, b) : MvPolynomial (Fin N0 × Fin N1) K)) p hp I) κ‖ ≤ 1 := by
-    have hm := minorProd_mem_opInt (K := K) (σ := Fin N0 × Fin N1)
-      (fun (i : Fin N0) (b : Fin N1) => (MvPolynomial.X (i, b) : MvPolynomial (Fin N0 × Fin N1) K))
-      (fun i b κ => by
-        rw [MvPolynomial.coeff_X']
-        split_ifs <;> simp) p hp I
+  have hmin
+      : ∀ κ,
+        ‖AddMonoidAlgebra.coeff (minorProd (fun (i : Fin N0) (b : Fin N1) =>
+            (MvPolynomial.X (i, b) : MvPolynomial (Fin N0 × Fin N1) K)) p hp I) κ‖
+          ≤ 1 := by
+    have hm :=
+      minorProd_mem_opInt (K := K) (σ := Fin N0 × Fin N1)
+        (fun (i : Fin N0) (b : Fin N1) =>
+          (MvPolynomial.X (i, b) : MvPolynomial (Fin N0 × Fin N1) K))
+        (fun i b κ => by
+          rw [MvPolynomial.coeff_X']
+          split_ifs <;> simp)
+        p hp I
     exact hm
   have hlpos : 0 < ‖(l : ℂ_[l])‖ := by
     rw [norm_pos_iff]
@@ -275,11 +291,14 @@ theorem one_letter_gauss_sum : OneLetterGauss := by
   unfold jetPair
   apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity)
   intro κ hκ
-  have hR := oneLetterR K l N0 N1 hprime (hprime.odd_of_ne_two (by omega)) (hlK ▸ hl1)
-    (Subfield.map φ K0) (TB.1 hK0) (φ ζ) (hζ.map_of_injective φ.injective)
-    (MvPowerSeries.map φ be) (TB.2.1 hbe) (φ ep) (by rw [hφ, hep]) (Fin N0 × Fin N1)
-    (fun x i => frA Y i x) (fun x i => hfrA x i) (fun y => MvPowerSeries.map φ (g y)) hg' hgl'
-    (MvPowerSeries.map φ U) (Transfer.integral_map φ hφ hU) (φ sgn) hsgn' κ
+  have hR :=
+    oneLetterR K l N0 N1 hprime (hprime.odd_of_ne_two (by omega)) (hlK ▸ hl1) (Subfield.map φ K0)
+      (TB.1 hK0) (φ ζ) (hζ.map_of_injective φ.injective) (MvPowerSeries.map φ be) (TB.2.1 hbe)
+      (φ ep) (by rw [hφ, hep]) (Fin N0 × Fin N1)
+      (fun x i => frA Y i x)
+      (fun x i => hfrA x i)
+      (fun y => MvPowerSeries.map φ (g y))
+      hg' hgl' (MvPowerSeries.map φ U) (Transfer.integral_map φ hφ hU) (φ sgn) hsgn' κ
   rw [degree_plain p hp I κ hκ, hlK] at hR
   rw [mul_assoc, norm_mul]
   refine le_trans (mul_le_of_le_one_left (norm_nonneg _) (hmin κ)) (le_trans hR ?_)

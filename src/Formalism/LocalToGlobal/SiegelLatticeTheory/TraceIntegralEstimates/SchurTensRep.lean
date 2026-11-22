@@ -14,14 +14,18 @@ namespace Formalism.L2.S.Pv.SchurTens
 
 open Formalism.L2.SG.Pf.EnergyAbs
 
-variable {ι : Type} [Fintype ι] {G : ι → Type} [∀ v, Group (G v)] [∀ v, TopologicalSpace (G v)]
+variable
+  {ι : Type} [Fintype ι]
+  {G : ι → Type} [∀ v, Group (G v)] [∀ v, TopologicalSpace (G v)]
   {H : ι → Type} [∀ v, NormedAddCommGroup (H v)] [∀ v, InnerProductSpace ℂ (H v)]
   {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
 
-def IsTensAbs (σ : ∀ v, G v → (H v →L[ℂ] H v)) (σs : (∀ v, G v) → (Hs →L[ℂ] Hs))
-    (tens : (∀ v, H v) → Hs) : Prop :=
-  (∀ x y, ⟪tens x, tens y⟫_ℂ = ∏ v, ⟪x v, y v⟫_ℂ) ∧ (∀ g x, σs g (tens x) = tens fun v => σ v (g v) (x v)) ∧
-    Dense (Submodule.span ℂ (Set.range tens) : Set Hs)
+def IsTensAbs
+    (σ : ∀ v, G v → (H v →L[ℂ] H v)) (σs : (∀ v, G v) → (Hs →L[ℂ] Hs)) (tens : (∀ v, H v) → Hs)
+    : Prop :=
+  (∀ x y, ⟪tens x, tens y⟫_ℂ = ∏ v, ⟪x v, y v⟫_ℂ)
+    ∧ (∀ g x, σs g (tens x) = tens fun v => σ v (g v) (x v))
+    ∧ Dense (Submodule.span ℂ (Set.range tens) : Set Hs)
 
 variable {σ : ∀ v, G v → (H v →L[ℂ] H v)} {σs : (∀ v, G v) → (Hs →L[ℂ] Hs)} {tens : (∀ v, H v) → Hs}
 
@@ -43,8 +47,9 @@ theorem continuous_tens (h : IsTensAbs σ σs tens) : Continuous tens := by
   rw [hF0, Real.sqrt_zero] at h2
   exact h2
 
-theorem tens_unit (hσ : ∀ v, IsUnitRep (σ v)) (h : IsTensAbs σ σs tens) (g : ∀ v, G v) (a : Hs) (x : ∀ v, H v) :
-    ⟪σs g (tens x), σs g a⟫_ℂ = ⟪tens x, a⟫_ℂ := by
+theorem tens_unit
+    (hσ : ∀ v, IsUnitRep (σ v)) (h : IsTensAbs σ σs tens) (g : ∀ v, G v) (a : Hs) (x : ∀ v, H v)
+    : ⟪σs g (tens x), σs g a⟫_ℂ = ⟪tens x, a⟫_ℂ := by
   have hS : ∀ b ∈ Submodule.span ℂ (Set.range tens), ⟪σs g (tens x), σs g b⟫_ℂ = ⟪tens x, b⟫_ℂ := by
     intro b hb
     induction hb using Submodule.span_induction with
@@ -61,8 +66,9 @@ theorem tens_unit (hσ : ∀ v, IsUnitRep (σ v)) (h : IsTensAbs σ σs tens) (g
   rw [h.2.2.closure_eq] at hsub
   exact hsub (Set.mem_univ a)
 
-theorem tens_unit_all (hσ : ∀ v, IsUnitRep (σ v)) (h : IsTensAbs σ σs tens) (g : ∀ v, G v) (a b : Hs) :
-    ⟪σs g a, σs g b⟫_ℂ = ⟪a, b⟫_ℂ := by
+theorem tens_unit_all
+    (hσ : ∀ v, IsUnitRep (σ v)) (h : IsTensAbs σ σs tens) (g : ∀ v, G v) (a b : Hs)
+    : ⟪σs g a, σs g b⟫_ℂ = ⟪a, b⟫_ℂ := by
   have hS : ∀ c ∈ Submodule.span ℂ (Set.range tens), ⟪σs g c, σs g b⟫_ℂ = ⟪c, b⟫_ℂ := by
     intro c hc
     induction hc using Submodule.span_induction with
@@ -90,7 +96,8 @@ theorem isUnitRep_tens (hσ : ∀ v, IsUnitRep (σ v)) (h : IsTensAbs σ σs ten
       have e : (fun g => σs g (tens x)) = fun g => tens (fun v => σ v (g v) (x v)) :=
         funext fun g => h.2.1 g x
       rw [e]
-      exact (continuous_tens h).comp (continuous_pi fun v => ((hσ v).2.2.2 (x v)).comp (continuous_apply v))
+      exact (continuous_tens h).comp
+        (continuous_pi fun v => ((hσ v).2.2.2 (x v)).comp (continuous_apply v))
     | zero => simp only [map_zero]; exact continuous_const
     | add b c _ _ hb hc => simp only [map_add (f := _)]; exact hb.add hc
     | smul t b _ hb => simp only [map_smul]; exact hb.const_smul t
@@ -125,9 +132,10 @@ theorem isUnitRep_tens (hσ : ∀ v, IsUnitRep (σ v)) (h : IsTensAbs σ σs ten
       rw [dist_eq_norm, dist_eq_norm, ← map_sub, hnorm]
     have h2 : dist (σs g0 b) (σs g0 a) = dist a b := by
       rw [dist_eq_norm, dist_eq_norm, ← map_sub, hnorm, norm_sub_rev]
-    calc dist (σs g a) (σs g0 a)
-        ≤ dist (σs g a) (σs g b) + dist (σs g b) (σs g0 b) + dist (σs g0 b) (σs g0 a) :=
-          dist_triangle4 _ _ _ _
+    calc
+      dist (σs g a) (σs g0 a)
+          ≤ dist (σs g a) (σs g b) + dist (σs g b) (σs g0 b) + dist (σs g0 b) (σs g0 a) :=
+        dist_triangle4 _ _ _ _
       _ < ε := by rw [h1, h2]; linarith
 
 end Formalism.L2.S.Pv.SchurTens

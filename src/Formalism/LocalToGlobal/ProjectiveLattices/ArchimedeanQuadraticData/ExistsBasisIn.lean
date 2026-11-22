@@ -10,9 +10,9 @@ noncomputable section
 
 namespace Formalism.L2.Pj.FundamentalDomainD5
 
-theorem exists_basis_in {K : Type} [Field K] {r : ℕ} (S : Set (Fin r → K))
-    (hS : Submodule.span K S = ⊤) :
-    ∃ v : Fin r → Fin r → K, (∀ j, v j ∈ S) ∧ LinearIndependent K v := by
+theorem exists_basis_in
+    {K : Type} [Field K] {r : ℕ} (S : Set (Fin r → K)) (hS : Submodule.span K S = ⊤)
+    : ∃ v : Fin r → Fin r → K, (∀ j, v j ∈ S) ∧ LinearIndependent K v := by
   obtain ⟨b, hbS, hspan, hli⟩ := exists_linearIndependent K S
   have htop : ⊤ ≤ Submodule.span K (Set.range ((↑) : b → Fin r → K)) := by
     rw [Subtype.range_coe, hspan, hS]

@@ -7,14 +7,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HermitianMul
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 namespace GlobalTheory.HSShort.DetNe
 
-theorem det_ne_zero_of_indep : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A] [IsScalarTower (𝓞 F) F A] (S : Sys F A), S.Hyp → ∀ (E A' : Type) [Field E] [Algebra F E] [AddCommGroup A'] [Module E A'] (s : Fin S.D → Fin S.N → E) (δ : ℕ) (Φ : S.Flat E A' s δ) (d : ℕ) (b : Module.Basis (Fin d) F (S.V S.T)) (c : Fin d → A →ₗ[F] F), S.IsCo b c → ∀ (col : Fin d → S.Col) (u : Fin (S.D + 1) × Fin S.N → E), LinearIndependent E (fun k => word Φ.mul (fun q j => u ((col k).β q, j)) (Φ.ι (col k).x)) → S.det c col ≠ 0 := by
+theorem det_ne_zero_of_indep
+    : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A]
+        [IsScalarTower (𝓞 F) F A] (S : Sys F A),
+      S.Hyp
+        → ∀ (E A' : Type) [Field E] [Algebra F E] [AddCommGroup A'] [Module E A']
+            (s : Fin S.D → Fin S.N → E) (δ : ℕ) (Φ : S.Flat E A' s δ) (d : ℕ)
+            (b : Module.Basis (Fin d) F (S.V S.T)) (c : Fin d → A →ₗ[F] F),
+          S.IsCo b c
+            → ∀ (col : Fin d → S.Col) (u : Fin (S.D + 1) × Fin S.N → E),
+              LinearIndependent E
+                  (fun k => word Φ.mul (fun q j => u ((col k).β q, j)) (Φ.ι (col k).x))
+                → S.det c col ≠ 0 := by
   intro F A _ _ _ _ _ _ S hS E A' _ _ _ _ s δ Φ d b c hc col u hind hdet
-  obtain ⟨c', hspan, hval⟩ := GlobalTheory.T.hermitianMultiplicationFlat_columns_eval F A S hS E A' s δ Φ d b c hc
+  obtain ⟨c', hspan, hval⟩ :=
+    GlobalTheory.T.hermitianMultiplicationFlat_columns_eval F A S hS E A' s δ Φ d b c hc
   set v : Fin d → A' := fun k => word Φ.mul (fun q j => u ((col k).β q, j)) (Φ.ι (col k).x) with hv
   set M : Matrix (Fin d) (Fin d) E := Matrix.of fun i k => c' i (v k) with hM
   have hMdet : M.det = 0 := by

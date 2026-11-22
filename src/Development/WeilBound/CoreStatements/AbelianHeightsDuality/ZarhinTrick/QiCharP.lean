@@ -16,9 +16,13 @@ namespace PositivityTheory.PrwZar.Qi
 
 variable {K H : Type} [Field K] [CommRing H] [Algebra K H]
 
-theorem pw_charP (p : ℕ) [Fact p.Prime] [CharP K p] (Δ : H →ₐ[K] H ⊗[K] H) (ε : H →ₐ[K] K)
-    (hL : CounitL Δ ε) (hR : CounitR Δ ε) (hmul : ∀ a b : ℕ, pw Δ ε (a * b) = (pw Δ ε a).comp (pw Δ ε b))
-    (r : ℕ) {x : H} (hx : x ∈ RingHom.ker ε) : pw Δ ε (p ^ r) x ∈ RingHom.ker ε ^ (2 ^ r) := by
+theorem pw_charP
+    (p : ℕ) [Fact p.Prime] [CharP K p]
+    (Δ : H →ₐ[K] H ⊗[K] H) (ε : H →ₐ[K] K) (hL : CounitL Δ ε) (hR : CounitR Δ ε)
+    (hmul : ∀ a b : ℕ, pw Δ ε (a * b) = (pw Δ ε a).comp (pw Δ ε b))
+    (r : ℕ)
+    {x : H} (hx : x ∈ RingHom.ker ε)
+    : pw Δ ε (p ^ r) x ∈ RingHom.ker ε ^ (2 ^ r) := by
   induction r generalizing x with
   | zero =>
     rw [pow_zero, pow_zero, pow_one, RingHom.mem_ker]

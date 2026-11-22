@@ -10,7 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SerreCla
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR GlobalTheory.HodgeCoh CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Om CrystallineSemistableComparison.Om.Glob GlobalTheory.CompanionTheory.CechSerre
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR
+  GlobalTheory.HodgeCoh CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+  CrystallineSemistableComparison.Om CrystallineSemistableComparison.Om.Glob
+  GlobalTheory.CompanionTheory.CechSerre
 universe w
 
 noncomputable section
@@ -27,8 +30,10 @@ theorem Dv_mem (W : ∀ p q, K.X p q) (p q : ℕ) : K.Dv W p q ∈ (K.col p).B q
     exact Submodule.zero_mem _
   | succ q => exact ⟨W p q, rfl⟩
 
-theorem dv_low (W x : ∀ p q, K.X p q) (hD : K.D W = x) (k q : ℕ) (h0 : ∀ p q, p < k → W p q = 0)
-    (hx : x k (q + 1) = 0) : K.dv k q (W k q) = 0 := by
+theorem dv_low
+    (W x : ∀ p q, K.X p q) (hD : K.D W = x)
+    (k q : ℕ) (h0 : ∀ p q, p < k → W p q = 0) (hx : x k (q + 1) = 0)
+    : K.dv k q (W k q) = 0 := by
   have h1 := congrFun (congrFun hD k) (q + 1)
   rw [DCx.D_apply, hx] at h1
   have h2 : K.Dh W k (q + 1) = 0 := by
@@ -40,19 +45,20 @@ theorem dv_low (W x : ∀ p q, K.X p q) (hD : K.D W = x) (k q : ℕ) (h0 : ∀ p
   rw [h2, zero_add] at h1
   exact Auxfb.zsm_cancel k _ h1
 
-theorem push_step (n k q : ℕ) (hkq : k + q + 1 = n) (W : ∀ p q, K.X p q)
+theorem push_step
+    (n k q : ℕ) (hkq : k + q + 1 = n) (W : ∀ p q, K.X p q)
     (hs : ∀ p q, p + q + 1 ≠ n → W p q = 0) (h0 : ∀ p q, p < k → W p q = 0)
-    (hv : K.dv k q (W k q) = 0) (hH : Subsingleton ((K.col k).H q)) (hq : 0 < q) :
-    ∃ W' : ∀ p q, K.X p q, (∀ p q, p + q + 1 ≠ n → W' p q = 0) ∧ K.D W' = K.D W ∧
-      ∀ p q, p < k + 1 → W' p q = 0 := by
-  have hB : W k q ∈ (K.col k).B q :=
-    ((P.cls_surj (K.col k) q).2.1 _ hv).1 (Subsingleton.elim _ _)
+    (hv : K.dv k q (W k q) = 0) (hH : Subsingleton ((K.col k).H q)) (hq : 0 < q)
+    : ∃ W' : ∀ p q, K.X p q,
+      (∀ p q, p + q + 1 ≠ n → W' p q = 0) ∧ K.D W' = K.D W ∧ ∀ p q, p < k + 1 → W' p q = 0 := by
+  have hB : W k q ∈ (K.col k).B q := ((P.cls_surj (K.col k) q).2.1 _ hv).1 (Subsingleton.elim _ _)
   obtain ⟨q, rfl⟩ : ∃ r, q = r + 1 := ⟨q - 1, by omega⟩
   obtain ⟨y, hy⟩ := hB
   have hy' : K.dv k q y = W k (q + 1) := hy
   have hsq : ((-1 : ℤ) ^ k * (-1) ^ k) = 1 := by rw [← mul_pow]; simp
-  have hDY : K.D (K.sgl k q ((-1 : ℤ) ^ k • y)) =
-      K.sgl (k + 1) q (K.dh k q ((-1 : ℤ) ^ k • y)) + K.sgl k (q + 1) (W k (q + 1)) := by
+  have hDY
+      : K.D (K.sgl k q ((-1 : ℤ) ^ k • y))
+        = K.sgl (k + 1) q (K.dh k q ((-1 : ℤ) ^ k • y)) + K.sgl k (q + 1) (W k (q + 1)) := by
     rw [K.D_sgl, map_zsmul (K.dv k q), hy', map_zsmul (K.sgl k (q + 1)), smul_smul, hsq, one_smul]
   refine ⟨W - K.D (K.sgl k q ((-1 : ℤ) ^ k • y)), fun p r h => ?_, ?_, fun p r hp => ?_⟩
   · rw [hDY, Pi.sub_apply, Pi.sub_apply, Pi.add_apply, Pi.add_apply, hs p r h,
@@ -69,23 +75,26 @@ theorem push_step (n k q : ℕ) (hkq : k + q + 1 = n) (W : ∀ p q, K.X p q)
       · exact h0 p r hpk
       · exact hs p r (by omega)
 
-theorem push (n a i : ℕ) (hn : n = a + (i + 1)) (W : ∀ p q, K.X p q)
+theorem push
+    (n a i : ℕ) (hn : n = a + (i + 1))
+    (W : ∀ p q, K.X p q)
     (hs : ∀ p q, p + q + 1 ≠ n → W p q = 0) (hx : ∀ p q, p < i + 1 → K.D W p q = 0)
-    (hac : ∀ p q, a < q → Subsingleton ((K.col p).H q)) (k : ℕ) (hk : k ≤ i) :
-    ∃ W' : ∀ p q, K.X p q, (∀ p q, p + q + 1 ≠ n → W' p q = 0) ∧ K.D W' = K.D W ∧
-      ∀ p q, p < k → W' p q = 0 := by
+    (hac : ∀ p q, a < q → Subsingleton ((K.col p).H q))
+    (k : ℕ) (hk : k ≤ i)
+    : ∃ W' : ∀ p q, K.X p q,
+      (∀ p q, p + q + 1 ≠ n → W' p q = 0) ∧ K.D W' = K.D W ∧ ∀ p q, p < k → W' p q = 0 := by
   induction k with
   | zero => exact ⟨W, hs, rfl, fun p q hp => absurd hp (Nat.not_lt_zero p)⟩
   | succ k ih =>
     obtain ⟨W₁, hs₁, hD₁, h₁⟩ := ih (by omega)
     have hv : K.dv k (a + i - k) (W₁ k (a + i - k)) = 0 :=
       dv_low K W₁ _ rfl k _ h₁ (by rw [hD₁]; exact hx k _ (by omega))
-    obtain ⟨W₂, hs₂, hD₂, h₂⟩ := push_step K n k (a + i - k) (by omega) W₁ hs₁ h₁ hv
-      (hac k _ (by omega)) (by omega)
+    obtain ⟨W₂, hs₂, hD₂, h₂⟩ :=
+      push_step K n k (a + i - k) (by omega) W₁ hs₁ h₁ hv (hac k _ (by omega)) (by omega)
     exact ⟨W₂, hs₂, hD₂.trans hD₁, h₂⟩
 
-theorem exists_prim {n : ℕ} (z : K.tot.Z n) (hz : K.tot.cls z.1 z.2 = 0) :
-    ∃ W : ∀ p q, K.X p q, (∀ p q, p + q + 1 ≠ n → W p q = 0) ∧ K.D W = z.1.1 := by
+theorem exists_prim {n : ℕ} (z : K.tot.Z n) (hz : K.tot.cls z.1 z.2 = 0)
+    : ∃ W : ∀ p q, K.X p q, (∀ p q, p + q + 1 ≠ n → W p q = 0) ∧ K.D W = z.1.1 := by
   have hB : z.1 ∈ K.tot.B n := ((P.cls_surj K.tot n).2.1 _ _).1 hz
   cases n with
   | zero =>
@@ -97,9 +106,10 @@ theorem exists_prim {n : ℕ} (z : K.tot.Z n) (hz : K.tot.cls z.1 z.2 = 0) :
     obtain ⟨u, hu⟩ := hB
     exact ⟨u.1, fun p q h => u.2 p q (by omega), congrArg Subtype.val hu⟩
 
-theorem leadE_eq_zero : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (a j : ℕ),
-    (∀ p q, a < q → Subsingleton ((K.col p).H q)) →
-    ∀ z : Zf K (a + j) j, clsZ K (a + j) j z = 0 → leadE K j a z = 0 := by
+theorem leadE_eq_zero
+    : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (a j : ℕ),
+      (∀ p q, a < q → Subsingleton ((K.col p).H q))
+        → ∀ z : Zf K (a + j) j, clsZ K (a + j) j z = 0 → leadE K j a z = 0 := by
   intro R _ K a j hac z hz
   obtain ⟨W, hs, hD⟩ := exists_prim K z.1 hz
   have hv : (K.col j).d a (z.1.1.1 j a) = 0 := dv_lead K _ (D_zero K z.1) j a z.2
@@ -117,8 +127,8 @@ theorem leadE_eq_zero : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (a j : ℕ),
     rw [Submodule.mem_bot, leadC_eq K 0 a z hv]
     exact ((P.cls_surj _ a).2.1 _ hv).2 h1
   | succ i =>
-    obtain ⟨W', -, hD', h0⟩ := push K (a + (i + 1)) a i rfl W hs
-      (fun p q hp => by rw [hD]; exact z.2 p q hp) hac i le_rfl
+    obtain ⟨W', -, hD', h0⟩ :=
+      push K (a + (i + 1)) a i rfl W hs (fun p q hp => by rw [hD]; exact z.2 p q hp) hac i le_rfl
     have hD'' : K.D W' = z.1.1.1 := hD'.trans hD
     have hy : K.dv i a (W' i a) = 0 := dv_low K W' _ hD'' i a h0 (z.2 i _ (by omega))
     have hb : (K.col (i + 1)).d a ((colMap K i).f a (W' i a)) = 0 := by
@@ -131,8 +141,9 @@ theorem leadE_eq_zero : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (a j : ℕ),
     have h2 : z.1.1.1 (i + 1) a = K.dh i a (W' i a) + (-1 : ℤ) ^ (i + 1) • K.Dv W' (i + 1) a := by
       rw [← hD'', DCx.D_apply]
       rfl
-    have e : (colMap K i).f a (W' i a) - z.1.1.1 (i + 1) a =
-        -((-1 : ℤ) ^ (i + 1) • K.Dv W' (i + 1) a) := by
+    have e
+        : (colMap K i).f a (W' i a) - z.1.1.1 (i + 1) a
+          = -((-1 : ℤ) ^ (i + 1) • K.Dv W' (i + 1) a) := by
       rw [h2]
       show K.dh i a (W' i a) - _ = _
       abel

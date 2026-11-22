@@ -16,8 +16,8 @@ section TruncEval
 
 variable {S : Type*} [CommRing S] [Algebra ℚ S]
 
-theorem aeval_trunc_coe_of_pow_eq_zero {n : ℕ} {s : S} (hs : s ^ n = 0) (P : Polynomial ℚ) :
-    Polynomial.aeval s (trunc n (P : ℚ⟦X⟧)) = Polynomial.aeval s P := by
+theorem aeval_trunc_coe_of_pow_eq_zero {n : ℕ} {s : S} (hs : s ^ n = 0) (P : Polynomial ℚ)
+    : Polynomial.aeval s (trunc n (P : ℚ⟦X⟧)) = Polynomial.aeval s P := by
   have hdvd : Polynomial.X ^ n ∣ P - trunc n (P : ℚ⟦X⟧) := by
     rw [Polynomial.X_pow_dvd_iff]
     intro d hd
@@ -36,19 +36,18 @@ def truncEval {n : ℕ} (s : S) (hs : s ^ n = 0) : ℚ⟦X⟧ →ₐ[ℚ] S wher
     · rw [← Polynomial.coe_one, aeval_trunc_coe_of_pow_eq_zero hs, map_one]
   map_mul' f g := by
     rw [← trunc_trunc_mul_trunc, ← Polynomial.coe_mul, aeval_trunc_coe_of_pow_eq_zero hs, map_mul]
-  map_zero' := by
-    rw [map_zero, map_zero]
-  map_add' f g := by
-    rw [map_add (f := _), map_add (f := _)]
+  map_zero' := by rw [map_zero, map_zero]
+  map_add' f g := by rw [map_add (f := _), map_add (f := _)]
   commutes' r := by
     rw [Algebra.algebraMap_eq_smul_one, map_smul, map_smul, ← Polynomial.coe_one,
       aeval_trunc_coe_of_pow_eq_zero hs, map_one, ← Algebra.algebraMap_eq_smul_one]
 
-theorem truncEval_apply {n : ℕ} (s : S) (hs : s ^ n = 0) (f : ℚ⟦X⟧) :
-    truncEval s hs f = Polynomial.aeval s (trunc n f) := rfl
+theorem truncEval_apply {n : ℕ} (s : S) (hs : s ^ n = 0) (f : ℚ⟦X⟧)
+    : truncEval s hs f = Polynomial.aeval s (trunc n f) :=
+  rfl
 
-theorem truncEval_eq_sum {n : ℕ} (s : S) (hs : s ^ n = 0) (f : ℚ⟦X⟧) :
-    truncEval s hs f = ∑ i ∈ Finset.range n, algebraMap ℚ S (coeff i f) * s ^ i := by
+theorem truncEval_eq_sum {n : ℕ} (s : S) (hs : s ^ n = 0) (f : ℚ⟦X⟧)
+    : truncEval s hs f = ∑ i ∈ Finset.range n, algebraMap ℚ S (coeff i f) * s ^ i := by
   rcases n with _ | n
   · have : Subsingleton S := subsingleton_of_zero_eq_one (by simpa using hs.symm)
     exact Subsingleton.elim _ _
@@ -65,8 +64,8 @@ theorem truncEval_X {n : ℕ} (s : S) (hs : s ^ n = 0) : truncEval s hs X = s :=
     rw [truncEval_eq_sum, Finset.sum_range_one, coeff_zero_X, map_zero, zero_mul, hs]
   · rw [truncEval_apply, trunc_X, Polynomial.aeval_X]
 
-theorem truncEval_unique {n : ℕ} (ψ : ℚ⟦X⟧ →ₐ[ℚ] S) (s : S) (hs : s ^ n = 0) (hψ : ψ X = s) :
-    ψ = truncEval s hs := by
+theorem truncEval_unique {n : ℕ} (ψ : ℚ⟦X⟧ →ₐ[ℚ] S) (s : S) (hs : s ^ n = 0) (hψ : ψ X = s)
+    : ψ = truncEval s hs := by
   have hpoly : (ψ.comp (Polynomial.coeToPowerSeries.algHom ℚ)) = Polynomial.aeval s := by
     apply Polynomial.algHom_ext
     simp [hψ]
@@ -94,17 +93,16 @@ theorem eq_of_forall_sub_mem_pow [IsHausdorff I B] {x y : B} (h : ∀ n, x - y �
   rw [SModEq.sub_mem, sub_zero, smul_eq_mul, Ideal.mul_top]
   exact h n
 
-theorem pow_mk_eq_zero {z : B} (hz : z ∈ I) (n : ℕ) :
-    (Ideal.Quotient.mk (I ^ n) z) ^ n = 0 := by
+theorem pow_mk_eq_zero {z : B} (hz : z ∈ I) (n : ℕ) : (Ideal.Quotient.mk (I ^ n) z) ^ n = 0 := by
   rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]
   exact Ideal.pow_mem_pow hz n
 
 variable [Algebra ℚ B]
 
-theorem factorₐ_comp_truncEval {z : B} (hz : z ∈ I) {m n : ℕ} (hle : m ≤ n) :
-    (Ideal.Quotient.factorₐ ℚ (Ideal.pow_le_pow_right hle)).comp
-        (truncEval (Ideal.Quotient.mk (I ^ n) z) (pow_mk_eq_zero I hz n)) =
-      truncEval (Ideal.Quotient.mk (I ^ m) z) (pow_mk_eq_zero I hz m) := by
+theorem factorₐ_comp_truncEval {z : B} (hz : z ∈ I) {m n : ℕ} (hle : m ≤ n)
+    : (Ideal.Quotient.factorₐ ℚ (Ideal.pow_le_pow_right hle)).comp
+        (truncEval (Ideal.Quotient.mk (I ^ n) z) (pow_mk_eq_zero I hz n))
+      = truncEval (Ideal.Quotient.mk (I ^ m) z) (pow_mk_eq_zero I hz m) := by
   apply truncEval_unique
   rw [AlgHom.comp_apply, truncEval_X]
   rfl
@@ -118,19 +116,21 @@ def seriesEval (z : B) (hz : z ∈ I) : ℚ⟦X⟧ →ₐ[ℚ] B :=
 
 variable {I}
 
-theorem mk_seriesEval {z : B} (hz : z ∈ I) (f : ℚ⟦X⟧) (n : ℕ) :
-    Ideal.Quotient.mk (I ^ n) (seriesEval I z hz f) =
-      Ideal.Quotient.mk (I ^ n) (∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i f) * z ^ i) := by
-  have h := IsAdicComplete.mk_liftAlgHom I
-    (fun n => truncEval (Ideal.Quotient.mk (I ^ n) z) (pow_mk_eq_zero I hz n))
-    (fun hle => factorₐ_comp_truncEval I hz hle) n f
+theorem mk_seriesEval {z : B} (hz : z ∈ I) (f : ℚ⟦X⟧) (n : ℕ)
+    : Ideal.Quotient.mk (I ^ n) (seriesEval I z hz f)
+      = Ideal.Quotient.mk (I ^ n) (∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i f) * z ^ i) := by
+  have h :=
+    IsAdicComplete.mk_liftAlgHom I
+      (fun n => truncEval (Ideal.Quotient.mk (I ^ n) z) (pow_mk_eq_zero I hz n))
+      (fun hle => factorₐ_comp_truncEval I hz hle)
+      n f
   set_option synthInstance.maxHeartbeats 100000 in
     rw [seriesEval, h, truncEval_eq_sum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, map_pow, ← Ideal.Quotient.algebraMap_eq, ← IsScalarTower.algebraMap_apply]
 
-theorem seriesEval_sub_sum_mem {z : B} (hz : z ∈ I) (f : ℚ⟦X⟧) (n : ℕ) :
-    seriesEval I z hz f - ∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i f) * z ^ i ∈ I ^ n :=
+theorem seriesEval_sub_sum_mem {z : B} (hz : z ∈ I) (f : ℚ⟦X⟧) (n : ℕ)
+    : seriesEval I z hz f - ∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i f) * z ^ i ∈ I ^ n :=
   Ideal.Quotient.eq.1 (mk_seriesEval hz f n)
 
 @[simp]
@@ -139,41 +139,49 @@ theorem seriesEval_X {z : B} (hz : z ∈ I) : seriesEval I z hz X = z := by
   refine Ideal.pow_le_pow_right (Nat.le_add_right n 2) ?_
   have h := seriesEval_sub_sum_mem hz X (n + 2)
   rwa [Finset.sum_range_succ', Finset.sum_range_succ', Finset.sum_eq_zero, coeff_zero_X,
-    coeff_one_X, map_zero, map_one, zero_mul, add_zero, pow_one, one_mul, zero_add] at h
+      coeff_one_X, map_zero, map_one, zero_mul, add_zero, pow_one, one_mul, zero_add]
+    at h
   intro i _
   rw [coeff_X, if_neg (by omega), map_zero, zero_mul]
 
-theorem seriesEval_subst {z : B} (hz : z ∈ I) {g : ℚ⟦X⟧} (hg : constantCoeff g = 0) {w : B}
-    (hw : w ∈ I) (hgw : seriesEval I z hz g = w) (f : ℚ⟦X⟧) :
-    seriesEval I w hw f = seriesEval I z hz (f.subst g) := by
+theorem seriesEval_subst
+    {z : B} (hz : z ∈ I)
+    {g : ℚ⟦X⟧} (hg : constantCoeff g = 0)
+    {w : B} (hw : w ∈ I) (hgw : seriesEval I z hz g = w)
+    (f : ℚ⟦X⟧)
+    : seriesEval I w hw f = seriesEval I z hz (f.subst g) := by
   have hS := HasSubst.of_constantCoeff_zero' hg
   have key : seriesEval I w hw = (seriesEval I z hz).comp (substAlgHom hS) := by
     refine IsAdicComplete.algHom_ext I fun n => ?_
     have hwn : (Ideal.Quotient.mkₐ ℚ (I ^ n) w) ^ n = 0 := pow_mk_eq_zero I hw n
     rw [truncEval_unique ((Ideal.Quotient.mkₐ ℚ (I ^ n)).comp (seriesEval I w hw)) _ hwn
-      (by rw [AlgHom.comp_apply, seriesEval_X]),
-      truncEval_unique ((Ideal.Quotient.mkₐ ℚ (I ^ n)).comp ((seriesEval I z hz).comp
-        (substAlgHom hS))) _ hwn (by
-        rw [AlgHom.comp_apply, AlgHom.comp_apply, coe_substAlgHom, subst_X hS, hgw])]
+        (by rw [AlgHom.comp_apply, seriesEval_X]),
+      truncEval_unique
+        ((Ideal.Quotient.mkₐ ℚ (I ^ n)).comp ((seriesEval I z hz).comp (substAlgHom hS))) _ hwn
+        (by rw [AlgHom.comp_apply, AlgHom.comp_apply, coe_substAlgHom, subst_X hS, hgw])]
   rw [key, AlgHom.comp_apply, coe_substAlgHom]
 
-
 omit [IsAdicComplete I B] in
-theorem map_partialSum {B' : Type*} [CommRing B'] [Algebra ℚ B'] (F : B →+* B') (z : B)
-    (f : ℚ⟦X⟧) (n : ℕ) :
-    F (∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i f) * z ^ i) =
-      ∑ i ∈ Finset.range n, algebraMap ℚ B' (coeff i f) * F z ^ i := by
+theorem map_partialSum
+    {B' : Type*} [CommRing B'] [Algebra ℚ B'] (F : B →+* B') (z : B) (f : ℚ⟦X⟧) (n : ℕ)
+    : F (∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i f) * z ^ i)
+      = ∑ i ∈ Finset.range n, algebraMap ℚ B' (coeff i f) * F z ^ i := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, map_pow, RingHom.map_rat_algebraMap]
 
-theorem map_seriesEval {B' : Type*} [CommRing B'] [Algebra ℚ B'] {I' : Ideal B'}
-    [IsAdicComplete I' B'] (F : B →+* B') (hF : I.map F ≤ I') {z : B} (hz : z ∈ I)
-    (hFz : F z ∈ I') (f : ℚ⟦X⟧) : F (seriesEval I z hz f) = seriesEval I' (F z) hFz f := by
+theorem map_seriesEval
+    {B' : Type*} [CommRing B'] [Algebra ℚ B']
+    {I' : Ideal B'} [IsAdicComplete I' B']
+    (F : B →+* B') (hF : I.map F ≤ I')
+    {z : B} (hz : z ∈ I) (hFz : F z ∈ I')
+    (f : ℚ⟦X⟧)
+    : F (seriesEval I z hz f) = seriesEval I' (F z) hFz f := by
   refine eq_of_forall_sub_mem_pow I' fun n => ?_
-  have h1 : F (seriesEval I z hz f - ∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i f) * z ^ i) ∈
-      I' ^ n := by
+  have h1
+      : F (seriesEval I z hz f - ∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i f) * z ^ i)
+        ∈ I' ^ n := by
     have := Ideal.mem_map_of_mem F (seriesEval_sub_sum_mem hz f n)
     rw [Ideal.map_pow] at this
     exact Ideal.pow_right_mono hF n this
@@ -194,15 +202,16 @@ theorem one_add_X_mul_geom : (1 + X : ℚ⟦X⟧) * mk (fun n => algebraMap ℚ 
   · rw [coeff_succ_X_mul, coeff_mk, coeff_mk, if_neg (Nat.succ_ne_zero n)]
     simp [pow_succ]
 
-theorem log_subst_one_add_X_pow_sub_one (k : ℕ) :
-    (log ℚ).subst ((1 + X) ^ k - 1 : ℚ⟦X⟧) = (k : ℚ⟦X⟧) * log ℚ := by
+theorem log_subst_one_add_X_pow_sub_one (k : ℕ)
+    : (log ℚ).subst ((1 + X) ^ k - 1 : ℚ⟦X⟧) = (k : ℚ⟦X⟧) * log ℚ := by
   have hg : constantCoeff ((1 + X) ^ k - 1 : ℚ⟦X⟧) = 0 := by simp
   have hS := HasSubst.of_constantCoeff_zero' hg
   apply derivative.ext
   · set G : ℚ⟦X⟧ := mk (fun n => (-1 : ℚ) ^ n) with hG
     have hsub : ((1 + X : ℚ⟦X⟧) ^ k) * G.subst ((1 + X) ^ k - 1 : ℚ⟦X⟧) = 1 := by
       have h := congrArg (substAlgHom hS) one_add_X_mul_geom
-      rw [map_mul, map_one, map_add (f := _), map_one, coe_substAlgHom, subst_X hS, add_sub_cancel] at h
+      rw [map_mul, map_one, map_add (f := _), map_one, coe_substAlgHom, subst_X hS, add_sub_cancel]
+        at h
       exact h
     rw [derivative_subst hS, derivative_log, ← hG]
     have hd : d⁄dX ((k : ℚ⟦X⟧) * log ℚ) = (k : ℚ⟦X⟧) * G := by
@@ -218,10 +227,13 @@ theorem log_subst_one_add_X_pow_sub_one (k : ℕ) :
     rcases k with _ | k
     · simp
     · have h1 : (1 + X : ℚ⟦X⟧) * G = 1 := one_add_X_mul_geom
-      calc (1 + X : ℚ⟦X⟧) ^ (k + 1) * (G.subst ((1 + X) ^ (k + 1) - 1 : ℚ⟦X⟧) *
-              (((k + 1 : ℕ) : ℚ⟦X⟧) * (1 + X) ^ (k + 1 - 1)))
-          = ((1 + X : ℚ⟦X⟧) ^ (k + 1) * G.subst ((1 + X) ^ (k + 1) - 1 : ℚ⟦X⟧)) *
-              (((k + 1 : ℕ) : ℚ⟦X⟧) * (1 + X) ^ k) := by rw [Nat.add_sub_cancel]; ring
+      calc
+        (1 + X : ℚ⟦X⟧) ^ (k + 1)
+              * (G.subst ((1 + X) ^ (k + 1) - 1 : ℚ⟦X⟧)
+                * (((k + 1 : ℕ) : ℚ⟦X⟧) * (1 + X) ^ (k + 1 - 1)))
+            = ((1 + X : ℚ⟦X⟧) ^ (k + 1) * G.subst ((1 + X) ^ (k + 1) - 1 : ℚ⟦X⟧))
+              * (((k + 1 : ℕ) : ℚ⟦X⟧) * (1 + X) ^ k) := by
+          rw [Nat.add_sub_cancel]; ring
         _ = ((k + 1 : ℕ) : ℚ⟦X⟧) * (1 + X) ^ k * ((1 + X) * G) := by rw [hsub, h1]; ring
         _ = (1 + X : ℚ⟦X⟧) ^ (k + 1) * (((k + 1 : ℕ) : ℚ⟦X⟧) * G) := by ring
   · have h0 : MvPowerSeries.constantCoeff ((1 + X) ^ k - 1 : ℚ⟦X⟧) = 0 := hg
@@ -231,16 +243,15 @@ theorem log_subst_one_add_X_pow_sub_one (k : ℕ) :
 
 variable {B : Type*} [CommRing B] [Algebra ℚ B] {I : Ideal B} [IsAdicComplete I B]
 
-
 variable (I) in
-def logOnePlus (z : B) (hz : z ∈ I) : B :=
-  seriesEval I z hz (log ℚ)
+def logOnePlus (z : B) (hz : z ∈ I) : B := seriesEval I z hz (log ℚ)
 
-theorem logOnePlus_sub_sum_mem {z : B} (hz : z ∈ I) (n : ℕ) :
-    logOnePlus I z hz - ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ B ((-1) ^ (i + 1) / i) * z ^ i ∈
-      I ^ n := by
-  have hs : ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ B ((-1) ^ (i + 1) / i) * z ^ i =
-      ∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i (log ℚ)) * z ^ i := by
+theorem logOnePlus_sub_sum_mem {z : B} (hz : z ∈ I) (n : ℕ)
+    : logOnePlus I z hz - ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ B ((-1) ^ (i + 1) / i) * z ^ i
+      ∈ I ^ n := by
+  have hs
+      : ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ B ((-1) ^ (i + 1) / i) * z ^ i
+        = ∑ i ∈ Finset.range n, algebraMap ℚ B (coeff i (log ℚ)) * z ^ i := by
     rcases n with _ | n
     · simp
     · rw [Finset.range_eq_Ico, Finset.sum_eq_sum_Ico_succ_bot (Nat.succ_pos n), coeff_log,
@@ -259,11 +270,12 @@ theorem logOnePlus_eq_mul {z : B} (hz : z ∈ I) : ∃ u, u - 1 ∈ I ∧ logOne
   refine ⟨seriesEval I z hz h, ?_, ?_⟩
   · have h1 := seriesEval_sub_sum_mem hz h 1
     rwa [Finset.sum_range_one, pow_zero, mul_one, pow_one, coeff_mk, zero_add, coeff_one_log,
-      map_one] at h1
+        map_one]
+      at h1
   · rw [logOnePlus, hlog, map_mul, seriesEval_X]
 
-theorem logOnePlus_pow {z : B} (hz : z ∈ I) (k : ℕ) (hk : (1 + z) ^ k - 1 ∈ I) :
-    logOnePlus I ((1 + z) ^ k - 1) hk = k * logOnePlus I z hz := by
+theorem logOnePlus_pow {z : B} (hz : z ∈ I) (k : ℕ) (hk : (1 + z) ^ k - 1 ∈ I)
+    : logOnePlus I ((1 + z) ^ k - 1) hk = k * logOnePlus I z hz := by
   have hg : constantCoeff ((1 + X) ^ k - 1 : ℚ⟦X⟧) = 0 := by simp
   rw [logOnePlus, seriesEval_subst hz hg hk (by simp), log_subst_one_add_X_pow_sub_one, map_mul,
     map_natCast, logOnePlus]

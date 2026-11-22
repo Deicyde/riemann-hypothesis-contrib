@@ -44,23 +44,28 @@ theorem isUnit_OK_iff (a : OK l K) : IsUnit a ↔ ‖((a : K) : PadicAlgCl l)‖
   · rintro ⟨u, rfl⟩
     have h1 := norm_OK_le (u : OK l K)
     have h2 := norm_OK_le ((u⁻¹ : (OK l K)ˣ) : OK l K)
-    have h3 : ((((u : OK l K) : K) : PadicAlgCl l)) * (((((u⁻¹ : (OK l K)ˣ) : OK l K) : K) : PadicAlgCl l)) = 1 := by
+    have h3
+        : ((((u : OK l K) : K) : PadicAlgCl l))
+            * (((((u⁻¹ : (OK l K)ˣ) : OK l K) : K) : PadicAlgCl l))
+          = 1 := by
       have := congrArg (fun z : OK l K => ((z : K) : PadicAlgCl l)) u.mul_inv
       exact this
     have h4 := congrArg norm h3
     rw [norm_mul, norm_one] at h4
     refine le_antisymm h1 ?_
-    calc (1 : ℝ) = _ := h4.symm
+    calc
+      (1 : ℝ)
+        = _ := h4.symm
       _ ≤ _ := mul_le_of_le_one_right (norm_nonneg _) h2
   · intro h
-    have ha : (a : K) ≠ 0 := by
-      intro e; rw [e] at h; simp at h
+    have ha : (a : K) ≠ 0 := by intro e; rw [e] at h; simp at h
     refine isUnit_iff_exists_inv.2 ⟨⟨(a : K)⁻¹, (mem_OK _).2 ?_⟩, Subtype.ext ?_⟩
     · rw [IntermediateField.coe_inv, norm_inv, h, inv_one]
     · show (a : K) * (a : K)⁻¹ = 1
       exact mul_inv_cancel₀ ha
 
-theorem norm_lt_one_of_irreducible {ϖ : OK l K} (h : Irreducible ϖ) : ‖((ϖ : K) : PadicAlgCl l)‖ < 1 :=
+theorem norm_lt_one_of_irreducible {ϖ : OK l K} (h : Irreducible ϖ)
+    : ‖((ϖ : K) : PadicAlgCl l)‖ < 1 :=
   lt_of_le_of_ne (norm_OK_le ϖ) fun e => h.not_isUnit ((isUnit_OK_iff ϖ).2 e)
 
 theorem ne_zero_of_irreducible {ϖ : OK l K} (h : Irreducible ϖ) : ((ϖ : K) : PadicAlgCl l) ≠ 0 := by
@@ -98,12 +103,13 @@ theorem OK_away {ϖ : OK l K} (h : Irreducible ϖ) : IsLocalization.Away ϖ K :=
 
 variable [FiniteDimensional ℚ_[l] K]
 
-instance : IsLocalRing (OK l K) := .of_nonunits_add fun a b ha hb => by
-  rw [mem_nonunits_iff, isUnit_OK_iff] at *
-  have h1 := lt_of_le_of_ne (norm_OK_le a) ha
-  have h2 := lt_of_le_of_ne (norm_OK_le b) hb
-  show ‖((a : K) : PadicAlgCl l) + ((b : K) : PadicAlgCl l)‖ ≠ 1
-  exact ((PadicAlgCl.isNonarchimedean l _ _).trans_lt (max_lt h1 h2)).ne
+instance : IsLocalRing (OK l K) :=
+  .of_nonunits_add fun a b ha hb => by
+    rw [mem_nonunits_iff, isUnit_OK_iff] at *
+    have h1 := lt_of_le_of_ne (norm_OK_le a) ha
+    have h2 := lt_of_le_of_ne (norm_OK_le b) hb
+    show ‖((a : K) : PadicAlgCl l) + ((b : K) : PadicAlgCl l)‖ ≠ 1
+    exact ((PadicAlgCl.isNonarchimedean l _ _).trans_lt (max_lt h1 h2)).ne
 
 theorem OK_dvr : IsDiscreteValuationRing (OK l K) := by
   have hded : IsDedekindDomain (OK l K) := by
@@ -111,7 +117,10 @@ theorem OK_dvr : IsDiscreteValuationRing (OK l K) := by
     exact IsIntegralClosure.isDedekindDomain ℤ_[l] ℚ_[l] K (integralClosure ℤ_[l] K)
   have hlm : ((l : ℕ) : OK l K) ∈ IsLocalRing.maximalIdeal (OK l K) := by
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_OK_iff]
-    have e : (((((l : ℕ) : OK l K) : K)) : PadicAlgCl l) = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by simp
+    have e
+        : (((((l : ℕ) : OK l K) : K)) : PadicAlgCl l)
+          = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by
+      simp
     rw [e, PadicAlgCl.norm_extends]
     exact Padic.norm_p_lt_one.ne
   have hnf : ¬ IsField (OK l K) := fun hf => by

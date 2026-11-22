@@ -15,21 +15,24 @@ namespace Formalism.L2.Pj
 
 section Base
 
-variable {R : Type} [CommRing R] [IsDedekindDomain R] {K : Type} [Field K] [Algebra R K]
-  [IsFractionRing R K]
+variable
+  {R : Type} [CommRing R] [IsDedekindDomain R]
+  {K : Type} [Field K] [Algebra R K] [IsFractionRing R K]
 
-def vLa (la : HeightOneSpectrum R) (x : K) : ℤ := -WithZero.log (la.valuation K x)
+def vLa (la : HeightOneSpectrum R) (x : K) : ℤ := - WithZero.log (la.valuation K x)
 
 end Base
 
 section Dvr
 
-variable (V : Type) {K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K']
-  [Algebra V K'] [IsFractionRing V K']
+variable
+  (V : Type)
+  {K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
+  [IsFractionRing V K']
 
 def valV : Valuation K' ℤᵐ⁰ := (IsDiscreteValuationRing.maximalIdeal V).valuation K'
 
-def vV (x : K') : ℤ := -WithZero.log (valV V x)
+def vV (x : K') : ℤ := - WithZero.log (valV V x)
 
 variable {V}
 
@@ -52,7 +55,8 @@ lemma min_le_vV_add {x y : K'} (hx : x ≠ 0) (hy : y ≠ 0) (hxy : x + y ≠ 0)
 variable (V)
 
 def nval (e : ℕ) (x : K') : EReal :=
-  open Classical in if x = 0 then ⊤ else (((vV V x : ℝ) / e : ℝ) : EReal)
+  open Classical in
+  if x = 0 then ⊤ else (((vV V x : ℝ) / e : ℝ) : EReal)
 
 variable {V}
 
@@ -104,7 +108,6 @@ lemma nval_bc {V' K'' : Type} [CommRing V'] [IsDomain V'] [IsDiscreteValuationRi
 end Dvr
 
 structure CDVR where
-
   V : Type
   [cr : CommRing V]
   [dom : IsDomain V]
@@ -120,15 +123,21 @@ def CDVR.FinRes (T : CDVR) : Prop := Finite (IsLocalRing.ResidueField T.V)
 
 section Over
 
-variable {R : Type} [CommRing R] [IsDedekindDomain R] {K : Type} [Field K] [Algebra R K]
-  [IsFractionRing R K]
+variable
+  {R : Type} [CommRing R] [IsDedekindDomain R]
+  {K : Type} [Field K] [Algebra R K] [IsFractionRing R K]
 
-def OverLa (la : HeightOneSpectrum R) (V : Type) {K' : Type} [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] [Field K'] [Algebra V K'] [IsFractionRing V K'] (ι : K →+* K')
-    (e : ℕ) : Prop :=
+def OverLa
+    (la : HeightOneSpectrum R)
+    (V : Type)
+    {K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
+    [IsFractionRing V K']
+    (ι : K →+* K') (e : ℕ)
+    : Prop :=
   0 < e ∧ ∀ a : K, vV V (ι a) = (e : ℤ) * vLa la a
 
-variable {la : HeightOneSpectrum R} {V : Type} {K' : Type} [CommRing V] [IsDomain V]
+variable
+  {la : HeightOneSpectrum R} {V : Type} {K' : Type} [CommRing V] [IsDomain V]
   [IsDiscreteValuationRing V] [Field K'] [Algebra V K'] [IsFractionRing V K']
 
 lemma nval_smul {ι : K →+* K'} {e : ℕ} (ho : OverLa la V ι e) {a : K} (ha : a ≠ 0) (x : K') :
@@ -144,9 +153,12 @@ lemma OverLa.bc {ι : K →+* K'} {e : ℕ} (ho : OverLa la V ι e) {V' K'' : Ty
     OverLa la V' (i.comp ι) (r * e) :=
   ⟨Nat.mul_pos hr ho.1, fun a => by rw [RingHom.comp_apply, hi, ho.2 a]; push_cast; ring⟩
 
-structure IsEval {W : Type} {Cusp : W → Type} [∀ w, AddCommGroup (Cusp w)] [∀ w, Module K (Cusp w)]
-    (wadd : W → W → W) (mulC : ∀ w w', Cusp w → Cusp w' → Cusp (wadd w w')) {F : Type} [Field F]
-    (ι : K →+* F) (ev : ∀ w, Cusp w → F) : Prop where
+structure IsEval
+    {W : Type} {Cusp : W → Type} [∀ w, AddCommGroup (Cusp w)] [∀ w, Module K (Cusp w)]
+    (wadd : W → W → W) (mulC : ∀ w w', Cusp w → Cusp w' → Cusp (wadd w w'))
+    {F : Type} [Field F]
+    (ι : K →+* F) (ev : ∀ w, Cusp w → F)
+    : Prop where
   add : ∀ w f g, ev w (f + g) = ev w f + ev w g
   smul : ∀ w (a : K) f, ev w (a • f) = ι a * ev w f
   mul : ∀ w w' f g, ev (wadd w w') (mulC w w' f g) = ev w f * ev w' g
@@ -170,7 +182,8 @@ lemma finitePlace_eq_zpow {a : K} (ha : a ≠ 0) :
   simp [vLa, WithZero.toAdd_unzero_eq_log]
 
 def nrmOf (v : EReal) : ℝ :=
-  open Classical in if v = ⊤ then 0 else (Ideal.absNorm la.asIdeal : ℝ) ^ (-v.toReal)
+  open Classical in
+  if v = ⊤ then 0 else (Ideal.absNorm la.asIdeal : ℝ) ^ (-v.toReal)
 
 lemma one_lt_absNorm_real : (1 : ℝ) < (Ideal.absNorm la.asIdeal : ℝ) := by
   exact_mod_cast NumberField.HeightOneSpectrum.one_lt_absNorm la

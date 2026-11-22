@@ -10,34 +10,41 @@ open Filter Topology
 
 namespace PI.Landherr₃
 
-theorem unitNormLoc_norm_add_eq_left {K : Type} [NormedField K] [IsUltrametricDist K] (x y : K)
-    (h : ‖y‖ < ‖x‖) : ‖x + y‖ = ‖x‖ := by
+theorem unitNormLoc_norm_add_eq_left
+    {K : Type} [NormedField K] [IsUltrametricDist K] (x y : K) (h : ‖y‖ < ‖x‖)
+    : ‖x + y‖ = ‖x‖ := by
   rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h.ne', max_eq_left h.le]
 
-theorem unitNormLoc_norm_two_le {K : Type} [NormedField K] [IsUltrametricDist K] : ‖(2 : K)‖ ≤ 1 := by
+theorem unitNormLoc_norm_two_le {K : Type} [NormedField K] [IsUltrametricDist K]
+    : ‖(2 : K)‖ ≤ 1 := by
   have h := IsUltrametricDist.norm_add_le_max (1 : K) 1
   rw [one_add_one_eq_two, norm_one, max_self] at h
   exact h
 
-theorem unitNormLoc_add_lt {K : Type} [NormedField K] [IsUltrametricDist K] {x y : K} {r : ℝ}
-    (hx : ‖x‖ < r) (hy : ‖y‖ < r) : ‖x + y‖ < r := (IsUltrametricDist.norm_add_le_max x y).trans_lt (max_lt hx hy)
+theorem unitNormLoc_add_lt
+    {K : Type} [NormedField K] [IsUltrametricDist K] {x y : K} {r : ℝ} (hx : ‖x‖ < r) (hy : ‖y‖ < r)
+    : ‖x + y‖ < r :=
+  (IsUltrametricDist.norm_add_le_max x y).trans_lt (max_lt hx hy)
 
-theorem unitNormLoc_add_le {K : Type} [NormedField K] [IsUltrametricDist K] {x y : K} {r : ℝ}
-    (hx : ‖x‖ ≤ r) (hy : ‖y‖ ≤ r) : ‖x + y‖ ≤ r := (IsUltrametricDist.norm_add_le_max x y).trans (max_le hx hy)
+theorem unitNormLoc_add_le
+    {K : Type} [NormedField K] [IsUltrametricDist K] {x y : K} {r : ℝ} (hx : ‖x‖ ≤ r) (hy : ‖y‖ ≤ r)
+    : ‖x + y‖ ≤ r :=
+  (IsUltrametricDist.norm_add_le_max x y).trans (max_le hx hy)
 
-theorem unitNormLoc_mul_lt {K : Type} [NormedField K] {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ < 1) :
-    ‖x * y‖ < 1 := by
+theorem unitNormLoc_mul_lt {K : Type} [NormedField K] {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ < 1)
+    : ‖x * y‖ < 1 := by
   rw [norm_mul]
   exact lt_of_le_of_lt (mul_le_of_le_one_left (norm_nonneg _) hx) hy
 
-theorem unitNormLoc_mul_le {K : Type} [NormedField K] {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) :
-    ‖x * y‖ ≤ 1 := by
+theorem unitNormLoc_mul_le {K : Type} [NormedField K] {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1)
+    : ‖x * y‖ ≤ 1 := by
   rw [norm_mul]
   nlinarith [norm_nonneg x, norm_nonneg y]
 
-theorem unitNormLoc_newton {K : Type} [NormedField K] [CompleteSpace K] [IsUltrametricDist K]
-    (α β γ a : K) (hα : ‖α‖ ≤ 1) (h : ‖α * a ^ 2 + β * a + γ‖ < ‖2 * α * a + β‖ ^ 2) :
-    ∃ x : K, α * x ^ 2 + β * x + γ = 0 := by
+theorem unitNormLoc_newton
+    {K : Type} [NormedField K] [CompleteSpace K] [IsUltrametricDist K]
+    (α β γ a : K) (hα : ‖α‖ ≤ 1) (h : ‖α * a ^ 2 + β * a + γ‖ < ‖2 * α * a + β‖ ^ 2)
+    : ∃ x : K, α * x ^ 2 + β * x + γ = 0 := by
   obtain ⟨f, hf⟩ : ∃ f : K → K, ∀ x, f x = α * x ^ 2 + β * x + γ := ⟨_, fun _ => rfl⟩
   obtain ⟨g, hg⟩ : ∃ g : K → K, ∀ x, g x = 2 * α * x + β := ⟨_, fun _ => rfl⟩
   obtain ⟨s, hs0, hs⟩ : ∃ s : ℕ → K, s 0 = a ∧ ∀ n, s (n + 1) = s n - f (s n) / g (s n) :=
@@ -84,12 +91,16 @@ theorem unitNormLoc_newton {K : Type} [NormedField K] [CompleteSpace K] [IsUltra
       have hh : ‖f (s n) / g (s n)‖ = ‖f (s n)‖ / d := by rw [norm_div, hgn]
       have hhd : ‖f (s n) / g (s n)‖ < d := by
         rw [hh, div_lt_iff₀ hd0]
-        calc ‖f (s n)‖ ≤ d ^ 2 * t := hft
+        calc
+          ‖f (s n)‖
+            ≤ d ^ 2 * t := hft
           _ < d ^ 2 * 1 := mul_lt_mul_of_pos_left ht1 (by positivity)
           _ = d * d := by ring
       have h2a : ‖-(2 * α * (f (s n) / g (s n)))‖ < ‖g (s n)‖ := by
         rw [norm_neg, norm_mul, norm_mul, hgn]
-        calc ‖(2 : K)‖ * ‖α‖ * ‖f (s n) / g (s n)‖ ≤ 1 * 1 * ‖f (s n) / g (s n)‖ := by gcongr
+        calc
+          ‖(2 : K)‖ * ‖α‖ * ‖f (s n) / g (s n)‖
+            ≤ 1 * 1 * ‖f (s n) / g (s n)‖ := by gcongr
           _ < d := by rw [one_mul, one_mul]; exact hhd
       have e1 : g (s n) * (f (s n) / g (s n)) = f (s n) := by field_simp
       refine ⟨?_, ?_⟩
@@ -99,8 +110,9 @@ theorem unitNormLoc_newton {K : Type} [NormedField K] [CompleteSpace K] [IsUltra
         have e5 : ‖f (s n)‖ / d ^ 2 ≤ t := by
           rw [div_le_iff₀ (by positivity)]
           linarith [hft]
-        calc ‖α‖ * (‖f (s n)‖ / d) ^ 2 ≤ 1 * (‖f (s n)‖ / d) ^ 2 :=
-              mul_le_mul_of_nonneg_right hα (sq_nonneg _)
+        calc
+          ‖α‖ * (‖f (s n)‖ / d) ^ 2
+            ≤ 1 * (‖f (s n)‖ / d) ^ 2 := mul_le_mul_of_nonneg_right hα (sq_nonneg _)
           _ = ‖f (s n)‖ * (‖f (s n)‖ / d ^ 2) := by rw [one_mul, e4]
           _ ≤ ‖f (s n)‖ * t := mul_le_mul_of_nonneg_left e5 (norm_nonneg _)
           _ ≤ d ^ 2 * t ^ (n + 1) * t := mul_le_mul_of_nonneg_right hfn ht0
@@ -109,7 +121,9 @@ theorem unitNormLoc_newton {K : Type} [NormedField K] [CompleteSpace K] [IsUltra
     intro n
     obtain ⟨hgn, hfn⟩ := inv n
     rw [dist_eq_norm, hs, sub_sub_cancel, norm_div, hgn, div_le_iff₀ hd0]
-    calc ‖f (s n)‖ ≤ d ^ 2 * t ^ (n + 1) := hfn
+    calc
+      ‖f (s n)‖
+        ≤ d ^ 2 * t ^ (n + 1) := hfn
       _ = d * t * t ^ n * d := by ring
   have hc : CauchySeq s := cauchySeq_of_le_geometric t (d * t) ht1 hdist
   obtain ⟨L, hL⟩ := cauchySeq_tendsto_of_complete hc
@@ -123,7 +137,9 @@ theorem unitNormLoc_newton {K : Type} [NormedField K] [CompleteSpace K] [IsUltra
     rwa [mul_zero] at h3
   have h0 : Tendsto (fun n => f (s n)) atTop (𝓝 0) := by
     refine squeeze_zero_norm (fun n => ?_) hlim
-    calc ‖f (s n)‖ ≤ d ^ 2 * t ^ (n + 1) := (inv n).2
+    calc
+      ‖f (s n)‖
+        ≤ d ^ 2 * t ^ (n + 1) := (inv n).2
       _ = d ^ 2 * t * t ^ n := by ring
   have hfL : f L = 0 := tendsto_nhds_unique h1 h0
   exact ⟨L, by rw [← hf]; exact hfL⟩

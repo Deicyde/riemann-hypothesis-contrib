@@ -16,9 +16,9 @@ noncomputable section
 universe u
 
 def ContractRelDimLe.Statement : Prop :=
-  ∀ (F : Type u) [Field F] (K K' : Type) [Fintype K] [DecidableEq K] [Fintype K']
-    [DecidableEq K'] (j : K ↪ K') (ι' : K' → Type) [∀ k, Fintype (ι' k)]
-    (P' : Ideal (MRing ι' F)), IsMultiProjPrime P' → relDim (contractPrime j P') ≤ relDim P'
+  ∀ (F : Type u) [Field F] (K K' : Type) [Fintype K] [DecidableEq K] [Fintype K'] [DecidableEq K']
+      (j : K ↪ K') (ι' : K' → Type) [∀ k, Fintype (ι' k)] (P' : Ideal (MRing ι' F)),
+    IsMultiProjPrime P' → relDim (contractPrime j P') ≤ relDim P'
 
 end
 

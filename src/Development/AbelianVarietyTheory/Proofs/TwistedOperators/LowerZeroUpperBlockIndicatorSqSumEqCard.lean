@@ -9,24 +9,30 @@ open Classical
 
 namespace GlobalTheory.LevelVecNorm
 
-theorem finsum_indicator_one_eq_ncard' {α : Type} (s : Set α) :
-    (∑ᶠ x, s.indicator (fun _ => (1:ℝ)) x) = (s.ncard : ℝ) := by
+theorem finsum_indicator_one_eq_ncard' {α : Type} (s : Set α)
+    : (∑ᶠ x, s.indicator (fun _ => (1:ℝ)) x) = (s.ncard : ℝ) := by
   by_cases hs : s.Finite
   · rw [← finsum_mem_def, finsum_mem_eq_finite_toFinset_sum _ hs, Set.ncard_eq_toFinset_card s hs]
     simp
-  · have hsupp : Function.support (s.indicator (fun _ => (1:ℝ))) = s := by
+  · have hsupp : Function.support (s.indicator (fun _ => (1 : ℝ))) = s := by
       ext x; by_cases hx : x ∈ s <;> simp [hx]
     rw [finsum_of_infinite_support (by rw [hsupp]; exact hs), Set.Infinite.ncard hs]
     simp
 
-theorem suppInd_sq_sum_eq_card : ∀ {k : Type} [CommRing k] {b a : ℕ} (r t : ℕ), b = r + t → a = r → ∀ H : Subgroup (GL (Fin r) k),
-    ∑ᶠ z : Matrix (Fin b) (Fin a) k, GlobalTheory.LevelVecNorm.suppInd r H z ^ 2 = (Nat.card H : ℝ) := by
+theorem suppInd_sq_sum_eq_card
+    : ∀ {k : Type} [CommRing k] {b a : ℕ} (r t : ℕ),
+      b = r + t → a = r
+        → ∀ H : Subgroup (GL (Fin r) k),
+          ∑ᶠ z : Matrix (Fin b) (Fin a) k, GlobalTheory.LevelVecNorm.suppInd r H z ^ 2
+            = (Nat.card H : ℝ) := by
   intro k _ b a r t hb ha H
-  subst hb; subst a
+  subst hb
+  subst a
   let f : GL (Fin r) k → Matrix (Fin (r + t)) (Fin r) k := fun g i j =>
     if h : i.val < r then (g : Matrix (Fin r) (Fin r) k) ⟨i.val, h⟩ j else 0
   have htop : ∀ g, Formalism.IndefR.Datum.topL r (f g) = (g : Matrix (Fin r) (Fin r) k) := by
-    intro g; ext i j
+    intro g
+    ext i j
     simp [Formalism.IndefR.Datum.topL, f, i.isLt, j.isLt, show i.val < r + t by omega]
   have hlow : ∀ g, Formalism.IndefR.Datum.LowZero r (f g) := by
     intro g i j hi _
@@ -50,18 +56,22 @@ theorem suppInd_sq_sum_eq_card : ∀ {k : Type} [CommRing k] {b a : ℕ} (r t : 
       · simp [f, hi, hz i j (by omega) j.isLt]
     · rintro ⟨g, hg, rfl⟩
       exact ⟨hlow g, g, hg, (htop g).symm⟩
-  have hfun : ∀ z, GlobalTheory.LevelVecNorm.suppInd r H z ^ 2 = S.indicator (fun _ => (1:ℝ)) z := by
+  have hfun
+      : ∀ z, GlobalTheory.LevelVecNorm.suppInd r H z ^ 2 = S.indicator (fun _ => (1 : ℝ)) z := by
     intro z
     unfold GlobalTheory.LevelVecNorm.suppInd
     by_cases hz : z ∈ S
     · have hz' := hz
       simp only [S, Set.mem_ofPred_eq] at hz'
-      rw [if_pos hz', Set.indicator_of_mem hz]; norm_num
+      rw [if_pos hz', Set.indicator_of_mem hz]
+      norm_num
     · have hz' := hz
       simp only [S, Set.mem_ofPred_eq] at hz'
-      rw [if_neg hz', Set.indicator_of_notMem hz]; norm_num
+      rw [if_neg hz', Set.indicator_of_notMem hz]
+      norm_num
   simp_rw [hfun]
-  rw [finsum_indicator_one_eq_ncard', hS, Set.ncard_image_of_injective _ hinj, ← Nat.card_coe_set_eq]
+  rw [finsum_indicator_one_eq_ncard', hS, Set.ncard_image_of_injective _ hinj,
+    ← Nat.card_coe_set_eq]
   rfl
 
 end GlobalTheory.LevelVecNorm

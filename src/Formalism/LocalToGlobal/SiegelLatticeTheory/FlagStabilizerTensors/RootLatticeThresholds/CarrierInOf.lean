@@ -28,30 +28,47 @@ def embE (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (j : Fin (nfE D)) : D.ho
   (X.B.I.φ (tauE X e j)).comp X.ιE.symm.toRingHom
 
 def PlaceTie (e : InfinitePlace D.host.E ≃ D.what₂.Tau) : Prop :=
-  ∀ x : InfinitePlace D.host.E, InfinitePlace.mk ((X.B.I.φ (X.pl.symm (e x))).comp X.ιE.symm.toRingHom) = x
+  ∀ x : InfinitePlace D.host.E,
+    InfinitePlace.mk ((X.B.I.φ (X.pl.symm (e x))).comp X.ιE.symm.toRingHom) = x
 
-theorem hembE (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (h : PlaceTie X e) (j : Fin (nfE D)) :
-    InfinitePlace.mk (embE X e j) = plE D j := h (plE D j)
+theorem hembE (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (h : PlaceTie X e) (j : Fin (nfE D))
+    : InfinitePlace.mk (embE X e j) = plE D j :=
+  h (plE D j)
 
-def castLoc (u : D.what₂.Word) {v w : InfinitePlace X.B.I.F} (h : v = w) : X.Vloc u v ≃ₗᵢ[ℂ] X.Vloc u w := by
+def castLoc (u : D.what₂.Word) {v w : InfinitePlace X.B.I.F} (h : v = w)
+    : X.Vloc u v ≃ₗᵢ[ℂ] X.Vloc u w := by
   subst h; exact LinearIsometryEquiv.refl ℂ _
 
-theorem tauE_symm (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (v : InfinitePlace X.B.I.F) :
-    X.pl.symm (e (plE D ((tauE X e).symm v))) = v := by
+theorem tauE_symm (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (v : InfinitePlace X.B.I.F)
+    : X.pl.symm (e (plE D ((tauE X e).symm v))) = v := by
   simp [tauE]
 
-def carrierInOf (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e)
-    (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2) {θ : ℝ} (C : Formalism.L2.SG.LocWSOf.Choice X θ)
-    (CA : ℝ) (de de' : ℕ → ℝ) (l : ℕ) (grid : Fin (nfE D) → ℕ → Finset ℝ) (grid1 : Fin (nfE D) → Finset ℝ)
-    (T : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.D.LevTower D.R.k D.R.rS (X.Vloc u (tauE X e j)) (X.Vloc u' (tauE X e j)))
-    (hT : ∀ j, Formalism.QuantumDeterminants.Tz D.R.k D.R.rS (T j).base.z = ((D.mem u).A.T : ℝ) ∧
-      Formalism.QuantumDeterminants.Tz D.R.k D.R.rS (T j).base.z' = ((D.mem u').A.T : ℝ))
-    (fc : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS → (X.Vloc u' (tauE X e j) →L[ℂ] X.Vloc u (tauE X e j)))
+def carrierInOf
+    (u u' : D.what₂.Word)
+    (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e)
+    (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2)
+    {θ : ℝ} (C : Formalism.L2.SG.LocWSOf.Choice X θ)
+    (CA : ℝ) (de de' : ℕ → ℝ) (l : ℕ) (grid : Fin (nfE D) → ℕ → Finset ℝ)
+    (grid1 : Fin (nfE D) → Finset ℝ)
+    (T : ∀ j : Fin (nfE D),
+      Formalism.FourierDecayAlt.D.LevTower D.R.k D.R.rS (X.Vloc u (tauE X e j))
+        (X.Vloc u' (tauE X e j)))
+    (hT : ∀ j,
+      Formalism.QuantumDeterminants.Tz D.R.k D.R.rS (T j).base.z = ((D.mem u).A.T : ℝ)
+        ∧ Formalism.QuantumDeterminants.Tz D.R.k D.R.rS (T j).base.z' = ((D.mem u').A.T : ℝ))
+    (fc : ∀ j : Fin (nfE D),
+      Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS
+        → (X.Vloc u' (tauE X e j) →L[ℂ] X.Vloc u (tauE X e j)))
     (χ : ℝ → ℝ) (sg : Fin (nfE D) → ℂ) (ν' : Fin (nfE D) → Fin (2 * D.R.rS + D.R.k + 1) → ℂ)
     (m₀ : Fin (nfE D) → Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS)
-    (top : ∀ j : Fin (nfE D), (Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS → (X.Vloc u' (tauE X e j) →L[ℂ] X.Vloc u (tauE X e j))) →
-      List Formalism.FourierDecayAlt.C.Letter → Formalism.FourierDecayAlt.C.LPt → Formalism.FourierDecayAlt.C.LPt → ℂ) (A₀ : ℝ) :
-    CarrierIn X u u' where
+    (top : ∀ j : Fin (nfE D),
+      (Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS
+          → (X.Vloc u' (tauE X e j) →L[ℂ] X.Vloc u (tauE X e j)))
+        → List Formalism.FourierDecayAlt.C.Letter → Formalism.FourierDecayAlt.C.LPt
+        → Formalism.FourierDecayAlt.C.LPt
+        → ℂ)
+    (A₀ : ℝ)
+    : CarrierIn X u u' where
   Wp := fun x => X.Vloc u (X.pl.symm (e x))
   Wq := fun x => X.Vloc u' (X.pl.symm (e x))
   nf := nfE D

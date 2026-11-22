@@ -164,14 +164,20 @@ private lemma exists_GLint_mul_clears_below_diag_from {n : ℕ} (M : Matrix (Fin
     field_simp
     ring
 
-theorem spherical_iwasawa {n : ℕ} (g : GL (Fin n) (v.adicCompletion F)) :
-    ∃ b k : GL (Fin n) (v.adicCompletion F),
-      (b : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id ∧
-      k ∈ GLint (Fin n) (Ov F v) ∧ g = b * k := by
+theorem spherical_iwasawa {n : ℕ} (g : GL (Fin n) (v.adicCompletion F))
+    : ∃ b k : GL (Fin n) (v.adicCompletion F),
+      (b : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id
+        ∧ k ∈ GLint (Fin n) (Ov F v) ∧ g = b * k := by
   classical
-  have key : ∀ r, r ≤ n → ∃ k ∈ GLint (Fin n) (Ov F v), ∀ i j : Fin n, n - r ≤ i.val → j < i →
-      ((g : Matrix (Fin n) (Fin n) (v.adicCompletion F)) *
-        (k : Matrix (Fin n) (Fin n) (v.adicCompletion F))) i j = 0 := by
+  have key
+      : ∀ r,
+        r ≤ n
+          → ∃ k ∈ GLint (Fin n) (Ov F v), ∀ i j : Fin n,
+            n - r ≤ i.val → j < i
+              → ((g : Matrix (Fin n) (Fin n) (v.adicCompletion F))
+                    * (k : Matrix (Fin n) (Fin n) (v.adicCompletion F)))
+                  i j
+                = 0 := by
     intro r
     induction r with
     | zero =>
@@ -182,9 +188,12 @@ theorem spherical_iwasawa {n : ℕ} (g : GL (Fin n) (v.adicCompletion F)) :
     | succ r ih =>
       intro hr
       obtain ⟨k, hk, hup⟩ := ih (by omega)
-      obtain ⟨k2, hk2, h2⟩ := exists_GLint_mul_clears_below_diag_from F v
-        ((g : Matrix (Fin n) (Fin n) (v.adicCompletion F)) * (k : Matrix (Fin n) (Fin n) (v.adicCompletion F)))
-        ⟨n - r - 1, by omega⟩ (fun i j hi hj => hup i j (by rw [Fin.lt_def] at hi; simp at hi; omega) hj)
+      obtain ⟨k2, hk2, h2⟩ :=
+        exists_GLint_mul_clears_below_diag_from F v
+          ((g : Matrix (Fin n) (Fin n) (v.adicCompletion F))
+            * (k : Matrix (Fin n) (Fin n) (v.adicCompletion F)))
+          ⟨n - r - 1, by omega⟩
+          (fun i j hi hj => hup i j (by rw [Fin.lt_def] at hi; simp at hi; omega) hj)
       refine ⟨k * k2, Subgroup.mul_mem _ hk hk2, fun i j hi hj => ?_⟩
       rw [Units.val_mul, ← Matrix.mul_assoc]
       exact h2 i j (by rw [Fin.le_def]; simp; omega) hj
@@ -195,35 +204,45 @@ theorem spherical_iwasawa {n : ℕ} (g : GL (Fin n) (v.adicCompletion F)) :
   rw [Units.val_mul]
   exact hup i j (by omega) hji
 
-theorem spherical_wd {n : ℕ} (α : Fin n → ℂ) (hα : ∀ i, α i ≠ 0) (b b' k k' : GL (Fin n) (v.adicCompletion F))
+theorem spherical_wd
+    {n : ℕ} (α : Fin n → ℂ) (hα : ∀ i, α i ≠ 0) (b b' k k' : GL (Fin n) (v.adicCompletion F))
     (hb : (b : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id)
     (hb' : (b' : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id)
-    (hk : k ∈ GLint (Fin n) (Ov F v)) (hk' : k' ∈ GLint (Fin n) (Ov F v)) (h : b * k = b' * k') :
-    chiDelta F v α b = chiDelta F v α b' := by
+    (hk : k ∈ GLint (Fin n) (Ov F v)) (hk' : k' ∈ GLint (Fin n) (Ov F v)) (h : b * k = b' * k')
+    : chiDelta F v α b = chiDelta F v α b' := by
   have hq : b'⁻¹ * b = k' * k⁻¹ := by
-    calc b'⁻¹ * b = b'⁻¹ * (b * k) * k⁻¹ := by group
+    calc
+      b'⁻¹ * b
+        = b'⁻¹ * (b * k) * k⁻¹ := by group
       _ = b'⁻¹ * (b' * k') * k⁻¹ := by rw [h]
       _ = k' * k⁻¹ := by group
-  have hup : ((b'⁻¹ * b : GL (Fin n) (v.adicCompletion F)) : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id :=
+  have hup
+      : ((b'⁻¹ * b : GL (Fin n) (v.adicCompletion F))
+        : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id :=
     spherical_upper_mul _ _ (spherical_upper_inv _ hb') hb
   have hint : b'⁻¹ * b ∈ GLint (Fin n) (Ov F v) := by
     rw [hq]
     exact Subgroup.mul_mem _ hk' (Subgroup.inv_mem _ hk)
   have hb_eq : b = b' * (b'⁻¹ * b) := by group
-  rw [hb_eq, spherical_chiDelta_mul F v α hα b' _ hb' hup, spherical_chiDelta_int F v α _ hup hint, mul_one]
+  rw [hb_eq, spherical_chiDelta_mul F v α hα b' _ hb' hup, spherical_chiDelta_int F v α _ hup hint,
+    mul_one]
 
 theorem exists_spherical_function : Formalism.UG.SphericalExists := by
   intro F _ _ v n α hα
   classical
   have dec := fun g : GL (Fin n) (v.adicCompletion F) => spherical_iwasawa F v g
   let φ : GL (Fin n) (v.adicCompletion F) → ℂ := fun g => chiDelta F v α (Classical.choose (dec g))
-  have hφ : ∀ g b k : GL (Fin n) (v.adicCompletion F),
-      (b : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id →
-      k ∈ GLint (Fin n) (Ov F v) → g = b * k → φ g = chiDelta F v α b := by
+  have hφ
+      : ∀ g b k : GL (Fin n) (v.adicCompletion F),
+        (b : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id
+          → k ∈ GLint (Fin n) (Ov F v) → g = b * k
+          → φ g = chiDelta F v α b := by
     intro g b k hb hk hg
     obtain ⟨k0, hb0, hk0, hg0⟩ := Classical.choose_spec (dec g)
     exact spherical_wd F v α hα _ _ _ _ hb0 hb hk0 hk (hg0.symm.trans hg)
-  have hone : ((1 : GL (Fin n) (v.adicCompletion F)) : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id :=
+  have hone
+      : ((1 : GL (Fin n) (v.adicCompletion F))
+        : Matrix (Fin n) (Fin n) (v.adicCompletion F)).BlockTriangular id :=
     (spherical_upper_iff 1).mp (fun i j h => by simp [Matrix.one_apply_ne (ne_of_gt h)])
   refine ⟨φ, ?_, ?_, ?_⟩
   · intro b g k hb hk

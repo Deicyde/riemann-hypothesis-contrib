@@ -16,11 +16,17 @@ noncomputable section
 
 namespace GlobalTheory.FirstRows
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.FormalSeriesBounds GlobalTheory.GoodDepth GlobalTheory.RunDepth
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.FormalSeriesBounds GlobalTheory.GoodDepth
+  GlobalTheory.RunDepth
 
-theorem sum_ite_le {ι β : Type} [Fintype ι] (φ : ι → β) (hφ : Function.Injective φ) (y : β)
-    [∀ t, Decidable (y = φ t)] (g : ι → ℝ) (B : ℝ) (hB : 0 ≤ B) (hg : ∀ t, g t ≤ B) :
-    (∑ t, if y = φ t then g t else 0) ≤ B := by
+theorem sum_ite_le
+    {ι β : Type} [Fintype ι]
+    (φ : ι → β) (hφ : Function.Injective φ)
+    (y : β) [∀ t, Decidable (y = φ t)]
+    (g : ι → ℝ) (B : ℝ) (hB : 0 ≤ B) (hg : ∀ t, g t ≤ B)
+    : (∑ t, if y = φ t then g t else 0) ≤ B := by
   classical
   by_cases h : ∃ t, y = φ t
   · obtain ⟨t, rfl⟩ := h
@@ -35,17 +41,21 @@ theorem sum_ite_le {ι β : Type} [Fintype ι] (φ : ι → β) (hφ : Function.
 theorem tauEmb_injective (D : D7) : Function.Injective (DV.tauEmb D) := fun _ _ h =>
   D.eTau.injective (Subtype.ext ((factEmb D.R D.host).1.1 h))
 
-theorem conj_tauEmb_injective (D : D7) :
-    Function.Injective fun t => ReciprocityTheory.ChartRestriction.G.Geo.Tor.conjEmb (DV.tauEmb D t) := by
+theorem conj_tauEmb_injective (D : D7)
+    : Function.Injective fun t =>
+      ReciprocityTheory.ChartRestriction.G.Geo.Tor.conjEmb (DV.tauEmb D t) := by
   intro s t h
   apply tauEmb_injective D
   ext x
   have := RingHom.congr_fun h x
   exact (starRingEnd ℂ).injective this
 
-theorem mul_wtA_le {D : D7} {j : ℕ} (w : WeightFamilies.Wt D j) (T A B : ℝ) (hA : 0 ≤ A) (hB : 0 ≤ B) (i : ℕ)
-    (hP : ∀ t, T * (ext0 (w.aP t) i : ℝ) ≤ A) (hM : ∀ t, T * (ext0 (w.aM t) i : ℝ) ≤ B) (τ : D.host.E →+* ℂ) :
-    T * wtA w (τ, i) ≤ A + B := by
+theorem mul_wtA_le
+    {D : D7} {j : ℕ} (w : WeightFamilies.Wt D j)
+    (T A B : ℝ) (hA : 0 ≤ A) (hB : 0 ≤ B)
+    (i : ℕ) (hP : ∀ t, T * (ext0 (w.aP t) i : ℝ) ≤ A) (hM : ∀ t, T * (ext0 (w.aM t) i : ℝ) ≤ B)
+    (τ : D.host.E →+* ℂ)
+    : T * wtA w (τ, i) ≤ A + B := by
   classical
   unfold wtA
   push_cast
@@ -66,8 +76,12 @@ theorem w''_le (s : Scale) (n : ℕ) (hn : 1 ≤ n) (hx : 3 ≤ s.x) : s.w'' n �
   have hn' : (1 : ℝ) ≤ n := by exact_mod_cast hn
   exact div_le_div_of_nonneg_left (b'_pos s).le (by norm_num) (by nlinarith)
 
-theorem first_rows_and_sizes : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm) (hK : DV.KapDef D) (j : ℕ), InR D j → 3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b →
-  (∀ τ : D.host.E →+* ℂ, (Tp.TO : ℝ) * wtA (lR Tp hK j) (τ, 0) ≤ 3 * L.sc.b) ∧ ∀ z : RPl D.R, L.sc.w'' D.R.n ≤ (numOf D L).w j z ∧ (numOf D L).w j z ≤ 2 * L.sc.b := by
+theorem first_rows_and_sizes
+    : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm)
+        (hK : DV.KapDef D) (j : ℕ),
+      InR D j → 3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b
+        → (∀ τ : D.host.E →+* ℂ, (Tp.TO : ℝ) * wtA (lR Tp hK j) (τ, 0) ≤ 3 * L.sc.b)
+          ∧ ∀ z : RPl D.R, L.sc.w'' D.R.n ≤ (numOf D L).w j z ∧ (numOf D L).w j z ≤ 2 * L.sc.b := by
   intro D L Pm Tp hK j hj hx hkb
   obtain ⟨-, hsz⟩ := GlobalTheory.RunDepth.sizes_le_two_mul D L Pm hx hkb
   obtain ⟨hw, -, hnum⟩ := hsz j hj
@@ -88,14 +102,20 @@ theorem first_rows_and_sizes : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterC
   have hScp := L.Sc_pos
   have hetap := L.etaSz_pos
   refine ⟨fun τ => ?_, fun z => ⟨?_, ?_⟩⟩
-  · have := mul_wtA_le (lR Tp hK j) (Tp.TO : ℝ) (2 * L.sc.b + L.Sc) L.etaSz (by linarith) hetap.le 0 ?_ ?_ τ
+  · have :=
+      mul_wtA_le (lR Tp hK j) (Tp.TO : ℝ) (2 * L.sc.b + L.Sc) L.etaSz (by linarith) hetap.le 0 ?_ ?_
+        τ
     · linarith
     · intro t
       unfold ext0
       split_ifs with h
       · have h1 := (GlobalTheory.RunDepth.mul_rows_lR_le_kaR D L Pm Tp hK j t).1 ⟨0, h⟩
-        have h2 := (GlobalTheory.WeightRows.kappa_entries_le D L Pm Tp hK j hj t).1 ⟨0, h⟩ (by show 0 < D.R.k - 1; omega)
-        have h3 : (Tp.TO : ℝ) * ((lR Tp hK j).aP t ⟨0, h⟩ : ℝ) ≤ ((kaR Tp hK j).aP t ⟨0, h⟩ : ℝ) := by exact_mod_cast h1
+        have h2 :=
+          (GlobalTheory.WeightRows.kappa_entries_le D L Pm Tp hK j hj t).1 ⟨0, h⟩
+            (by show 0 < D.R.k - 1; omega)
+        have h3
+            : (Tp.TO : ℝ) * ((lR Tp hK j).aP t ⟨0, h⟩ : ℝ) ≤ ((kaR Tp hK j).aP t ⟨0, h⟩ : ℝ) := by
+          exact_mod_cast h1
         linarith [(hw t).2]
       · simp only [Nat.cast_zero, mul_zero]; linarith
     · intro t
@@ -103,7 +123,9 @@ theorem first_rows_and_sizes : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterC
       split_ifs with h
       · have h1 := (GlobalTheory.RunDepth.mul_rows_lR_le_kaR D L Pm Tp hK j t).2.1 ⟨0, h⟩
         have h2 := (GlobalTheory.WeightRows.kappa_entries_le D L Pm Tp hK j hj t).2.2 ⟨0, h⟩
-        have h3 : (Tp.TO : ℝ) * ((lR Tp hK j).aM t ⟨0, h⟩ : ℝ) ≤ ((kaR Tp hK j).aM t ⟨0, h⟩ : ℝ) := by exact_mod_cast h1
+        have h3
+            : (Tp.TO : ℝ) * ((lR Tp hK j).aM t ⟨0, h⟩ : ℝ) ≤ ((kaR Tp hK j).aM t ⟨0, h⟩ : ℝ) := by
+          exact_mod_cast h1
         linarith
       · simp only [Nat.cast_zero, mul_zero]; linarith
   · rw [hnum z]

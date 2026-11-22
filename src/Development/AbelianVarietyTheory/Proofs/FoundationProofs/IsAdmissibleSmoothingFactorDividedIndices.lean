@@ -40,20 +40,27 @@ lemma codiscreteWithin_Hs_neBot : (Filter.codiscreteWithin Hs).NeBot := by
   · exact ⟨z, h⟩
   · exact absurd hz2 h
 
-theorem siegel_distribution : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε)
-    (c : ℕ) (m : ℕ) (x : Fin 2 → ℚ), admitted c x → 0 < m → Nat.Coprime c m →
-    ∏ a ∈ Finset.range m, ∏ b ∈ Finset.range m, siegel T c ![(x 0 + a) / m, (x 1 + b) / m] = siegel T c x := by
+theorem siegel_distribution
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε) (c : ℕ)
+        (m : ℕ) (x : Fin 2 → ℚ),
+      admitted c x → 0 < m → Nat.Coprime c m
+        → ∏ a ∈ Finset.range m, ∏ b ∈ Finset.range m, siegel T c ![(x 0 + a) / m, (x 1 + b) / m]
+          = siegel T c x := by
   intro Ω _ _ _ ε T c m x hA hm hcm
   haveI := codiscreteWithin_Hs_neBot
   apply T.an.injective
   rw [map_prod, GlobalTheory.T.siegelUnitInTower_an_eq_siegelUnitOnComplex Ω ε T c x hA]
   simp_rw [map_prod]
-  have h1 : ∀ a ∈ Finset.range m, ∏ b ∈ Finset.range m, T.an (siegel T c ![(x 0 + a) / m, (x 1 + b) / m])
-      = Filter.Germ.coeRingHom _ (∏ b ∈ Finset.range m, sgC c ![(x 0 + a) / m, (x 1 + b) / m]) := by
+  have h1
+      : ∀ a ∈ Finset.range m,
+        ∏ b ∈ Finset.range m, T.an (siegel T c ![(x 0 + a) / m, (x 1 + b) / m])
+          = Filter.Germ.coeRingHom _
+            (∏ b ∈ Finset.range m, sgC c ![(x 0 + a) / m, (x 1 + b) / m]) := by
     intro a _
     rw [map_prod]
     refine Finset.prod_congr rfl fun b _ => ?_
-    rw [GlobalTheory.T.siegelUnitInTower_an_eq_siegelUnitOnComplex Ω ε T c _ (isAdmissibleSmoothingFactor_divided_indices c m x a b hA hm)]
+    rw [GlobalTheory.T.siegelUnitInTower_an_eq_siegelUnitOnComplex Ω ε T c _
+      (isAdmissibleSmoothingFactor_divided_indices c m x a b hA hm)]
     rfl
   rw [Finset.prod_congr rfl h1, ← map_prod]
   show ((∏ a ∈ Finset.range m, ∏ b ∈ Finset.range m, sgC c ![(x 0 + a) / m, (x 1 + b) / m] : ℂ → ℂ) : Mero) = _

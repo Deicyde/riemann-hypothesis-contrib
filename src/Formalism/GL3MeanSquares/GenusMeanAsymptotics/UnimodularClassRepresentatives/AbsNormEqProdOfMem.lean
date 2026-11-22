@@ -17,19 +17,20 @@ variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberFi
 def rEmb (w : {w : InfinitePlace F // w.IsReal}) : 𝓞 F →+* ℝ :=
   (InfinitePlace.embedding_of_isReal w.2).comp (algebraMap (𝓞 F) F)
 
-theorem rEmb_apply (w : {w : InfinitePlace F // w.IsReal}) (n : 𝓞 F) :
-    rEmb w n = InfinitePlace.embedding_of_isReal w.2 (n : F) := rfl
+theorem rEmb_apply (w : {w : InfinitePlace F // w.IsReal}) (n : 𝓞 F)
+    : rEmb w n = InfinitePlace.embedding_of_isReal w.2 (n : F) :=
+  rfl
 
-theorem mem_boxSet_iff (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {T : ℝ} {n : 𝓞 F} :
-    n ∈ boxSet K F T ↔ ∀ w : {w : InfinitePlace F // w.IsReal}, 0 < rEmb w n ∧ rEmb w n ≤ T := by
+theorem mem_boxSet_iff
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {T : ℝ} {n : 𝓞 F}
+    : n ∈ boxSet K F T ↔ ∀ w : {w : InfinitePlace F // w.IsReal}, 0 < rEmb w n ∧ rEmb w n ≤ T := by
   have hR : IsTotallyReal F := QuadraticExtensionConjugation.isTotallyReal hK hF
   constructor
   · intro h w
     let _ : Algebra F ℂ := w.1.embedding.toAlgebra
     let φ : K →ₐ[F] ℂ := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     have h1 : φ (algebraMap F K (n : F)) = w.1.embedding (n : F) := φ.commutes _
     have h2 := h φ.toRingHom
@@ -47,39 +48,45 @@ theorem mem_boxSet_iff (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF 
     rw [h3]
     exact h _
 
-theorem absNorm_eq_prod [IsTotallyReal F] (n : 𝓞 F) :
-    (Ideal.absNorm (Ideal.span {n}) : ℝ) = ∏ w : {w : InfinitePlace F // w.IsReal}, |rEmb w n| := by
+theorem absNorm_eq_prod [IsTotallyReal F] (n : 𝓞 F)
+    : (Ideal.absNorm (Ideal.span {n}) : ℝ)
+      = ∏ w : {w : InfinitePlace F // w.IsReal}, |rEmb w n| := by
   have h1 : (Ideal.absNorm (Ideal.span {n}) : ℝ) = |((Algebra.norm ℚ (n : F) : ℚ) : ℝ)| := by
     rw [Ideal.absNorm_span_singleton, Nat.cast_natAbs, ← Algebra.coe_norm_int]
     push_cast
     rfl
   rw [h1, ← Rat.cast_abs, ← InfinitePlace.prod_eq_abs_norm]
   have h2 : ∀ w : InfinitePlace F, w.IsReal := fun w => IsTotallyReal.isReal w
-  rw [Finset.prod_subtype (p := fun w : InfinitePlace F => w.IsReal) Finset.univ (by simp [h2])
+  rw [Finset.prod_subtype
+    (p := fun w : InfinitePlace F => w.IsReal)
+    Finset.univ (by simp [h2])
     (fun w => w (n : F) ^ w.mult)]
   refine Finset.prod_congr rfl fun w _ => ?_
   rw [w.2.mult_eq_one, pow_one, rEmb_apply, ← Real.norm_eq_abs,
     InfinitePlace.norm_embedding_of_isReal]
 
-theorem absNorm_eq_prod_of_mem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {T : ℝ} {n : 𝓞 F}
-    (hn : n ∈ boxSet K F T) :
-    (Ideal.absNorm (Ideal.span {n}) : ℝ) = ∏ w : {w : InfinitePlace F // w.IsReal}, rEmb w n := by
+theorem absNorm_eq_prod_of_mem
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {T : ℝ} {n : 𝓞 F} (hn : n ∈ boxSet K F T)
+    : (Ideal.absNorm (Ideal.span {n}) : ℝ) = ∏ w : {w : InfinitePlace F // w.IsReal}, rEmb w n := by
   have hR : IsTotallyReal F := QuadraticExtensionConjugation.isTotallyReal hK hF
   rw [absNorm_eq_prod]
   exact Finset.prod_congr rfl fun w _ => abs_of_pos (((mem_boxSet_iff hK hF).1 hn) w).1
 
-theorem card_real (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) :
-    Fintype.card {w : InfinitePlace F // w.IsReal} = Formalism.HermitianLatticesTheory.fDeg K := by
+theorem card_real (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    : Fintype.card {w : InfinitePlace F // w.IsReal}
+      = Formalism.HermitianLatticesTheory.fDeg K := by
   have hR : IsTotallyReal F := QuadraticExtensionConjugation.isTotallyReal hK hF
   have h1 := (discrTower K F hK hF).2.1
   rw [← h1, IsTotallyReal.finrank]
 
-theorem finite_boxSet (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (T : ℝ) :
-    (boxSet K F T).Finite := by
+theorem finite_boxSet (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (T : ℝ)
+    : (boxSet K F T).Finite := by
   have hR : IsTotallyReal F := QuadraticExtensionConjugation.isTotallyReal hK hF
   have h0 := Embeddings.finite_of_norm_le F ℂ T
-  refine Set.Finite.of_finite_image (f := fun n : 𝓞 F => (n : F)) (h0.subset ?_)
-    (RingOfIntegers.coe_injective.injOn)
+  refine Set.Finite.of_finite_image
+    (f := fun n : 𝓞 F => (n : F))
+    (h0.subset ?_) (RingOfIntegers.coe_injective.injOn)
   rintro _ ⟨n, hn, rfl⟩
   refine ⟨n.2, fun ψ => ?_⟩
   have hw : (InfinitePlace.mk ψ).IsReal := IsTotallyReal.isReal _
@@ -96,11 +103,13 @@ theorem ne_zero_of_mem_boxSet {T : ℝ} {n : 𝓞 F} (hn : n ∈ boxSet K F T) :
   have := (hn φ).1
   simp at this
 
-theorem absNorm_le_of_mem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {T : ℝ} {n : 𝓞 F}
-    (hn : n ∈ boxSet K F T) :
-    (Ideal.absNorm (Ideal.span {n}) : ℝ) ≤ T ^ Formalism.HermitianLatticesTheory.fDeg K := by
+theorem absNorm_le_of_mem
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {T : ℝ} {n : 𝓞 F} (hn : n ∈ boxSet K F T)
+    : (Ideal.absNorm (Ideal.span {n}) : ℝ) ≤ T ^ Formalism.HermitianLatticesTheory.fDeg K := by
   rw [absNorm_eq_prod_of_mem hK hF hn, ← card_real hK hF, ← Finset.card_univ, ← Finset.prod_const]
-  exact Finset.prod_le_prod₀ (fun w _ => (((mem_boxSet_iff hK hF).1 hn) w).1.le)
+  exact Finset.prod_le_prod₀
+    (fun w _ => (((mem_boxSet_iff hK hF).1 hn) w).1.le)
     fun w _ => (((mem_boxSet_iff hK hF).1 hn) w).2
 
 end Formalism.HermitianLattices.Ext.L3.BoxSum

@@ -23,8 +23,10 @@ lemma smulHom_inj {w : ℂ} (hw : w ≠ 0) : Function.Injective (smulHom (V := V
   have h := congrArg (fun v => w⁻¹ • v) hxy
   simpa [smul_smul, inv_mul_cancel₀ hw] using h
 
-private theorem relIndex_ne_zero_of_finite_cover {A B : AddSubgroup V} {ι : Type*} [Finite ι] (φ : ι → V)
-    (hφ : ∀ i, φ i ∈ B) (hcov : ∀ b ∈ B, ∃ i, b - φ i ∈ A) : A.relIndex B ≠ 0 := by
+private theorem relIndex_ne_zero_of_finite_cover
+    {A B : AddSubgroup V} {ι : Type*} [Finite ι]
+    (φ : ι → V) (hφ : ∀ i, φ i ∈ B) (hcov : ∀ b ∈ B, ∃ i, b - φ i ∈ A)
+    : A.relIndex B ≠ 0 := by
   have hsurj : Function.Surjective (fun i => ((⟨φ i, hφ i⟩ : B) : B ⧸ A.addSubgroupOf B)) := by
     intro q
     obtain ⟨b, rfl⟩ := QuotientAddGroup.mk_surjective q
@@ -75,11 +77,14 @@ lemma relIdx_ne_zero_of_cover {A B : AddSubgroup V} {ι : Type*} [Finite ι] (φ
   relIndex_ne_zero_of_finite_cover φ hφ hcov
 
 private theorem relIndex_ne_zero_of_le {A B : AddSubgroup V} (h : B ≤ A) : A.relIndex B ≠ 0 :=
-  relIndex_ne_zero_of_finite_cover (ι := Unit) (fun _ => 0) (fun _ => B.zero_mem)
+  relIndex_ne_zero_of_finite_cover (ι := Unit)
+    (fun _ => 0)
+    (fun _ => B.zero_mem)
     (fun b hb => ⟨(), by simpa using h hb⟩)
 
-private theorem relIndex_ne_zero_trans' {A B C : AddSubgroup V} (h : A.relIndex B ≠ 0)
-    (h' : B.relIndex C ≠ 0) : A.relIndex C ≠ 0 := by
+private theorem relIndex_ne_zero_trans'
+    {A B C : AddSubgroup V} (h : A.relIndex B ≠ 0) (h' : B.relIndex C ≠ 0)
+    : A.relIndex C ≠ 0 := by
   exact AddSubgroup.relIndex_ne_zero_trans h h'
 
 lemma comm_smul {S X : AddSubgroup V} {w : ℂ} (hw : w ≠ 0) {N : ℕ} (hN : N ≠ 0)
@@ -116,8 +121,8 @@ lemma comm_smul {S X : AddSubgroup V} {w : ℂ} (hw : w ≠ 0) {N : ℕ} (hN : N
 
 end Idx
 
-private theorem mem_lattice_iff_exists_int_comb (L : PeriodPair) (z : ℂ) :
-    z ∈ L.lattice ↔ ∃ p q : ℤ, (p : ℂ) * L.ω₁ + (q : ℂ) * L.ω₂ = z := by
+private theorem mem_lattice_iff_exists_int_comb (L : PeriodPair) (z : ℂ)
+    : z ∈ L.lattice ↔ ∃ p q : ℤ, (p : ℂ) * L.ω₁ + (q : ℂ) * L.ω₂ = z := by
   exact PeriodPair.mem_lattice
 
 lemma stdLat_smul_idx (L : PeriodPair) (m : Type*) [Fintype m] {N : ℕ} (hN : N ≠ 0) :

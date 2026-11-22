@@ -4,25 +4,24 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.Qf15.CardLe :
-    Type → ℕ → Prop :=
-    fun (M : Type) (B : ℕ) ↦ Finite M ∧ Nat.card M ≤ B
+noncomputable def UpperTheory.Reformulated.B.Qf15.CardLe : Type → ℕ → Prop :=
+  fun (M : Type) (B : ℕ) ↦ Finite M ∧ Nat.card M ≤ B
 
-noncomputable def UpperTheory.Reformulated.B.Qf15.TorsLe :
-    (M : Type) → [AddCommGroup M] → ℕ → Prop :=
-    fun (M : Type) [AddCommGroup M] (B : ℕ) ↦ Finite ↥(AddCommGroup.torsion M) ∧ Nat.card ↥(AddCommGroup.torsion M) ≤ B
+noncomputable def UpperTheory.Reformulated.B.Qf15.TorsLe
+    : (M : Type) → [AddCommGroup M] → ℕ → Prop := fun (M : Type) [AddCommGroup M] (B : ℕ) ↦
+  Finite ↥(AddCommGroup.torsion M) ∧ Nat.card ↥(AddCommGroup.torsion M) ≤ B
 
-theorem UpperTheory.Reformulated.B.Qf15.torsStep :
-    ∀ (A B C : Type) [inst : AddCommGroup A] [inst_1 : AddCommGroup B] [inst_2 : AddCommGroup C] (f : A →+ B) (g : B →+ C)
-      (a c : ℕ),
-      Function.Exact (⇑f : A → B) (⇑g : B → C) →
-        UpperTheory.Reformulated.B.Qf15.CardLe A a → UpperTheory.Reformulated.B.Qf15.TorsLe C c → UpperTheory.Reformulated.B.Qf15.TorsLe B (a * c) := by
+theorem UpperTheory.Reformulated.B.Qf15.torsStep
+    : ∀ (A B C : Type) [inst : AddCommGroup A] [inst_1 : AddCommGroup B] [inst_2 : AddCommGroup C]
+        (f : A →+ B) (g : B →+ C) (a c : ℕ),
+      Function.Exact (⇑f : A → B) (⇑g : B → C) → UpperTheory.Reformulated.B.Qf15.CardLe A a
+        → UpperTheory.Reformulated.B.Qf15.TorsLe C c
+        → UpperTheory.Reformulated.B.Qf15.TorsLe B (a * c) := by
   intro A B C _ _ _ f g a c hfg hA hC
   obtain ⟨hAf, hAc⟩ := hA
   obtain ⟨hCf, hCc⟩ := hC
   let φ : AddCommGroup.torsion B →+ AddCommGroup.torsion C :=
-    (g.comp (AddCommGroup.torsion B).subtype).codRestrict _
-      (fun x => g.isOfFinAddOrder x.2)
+    (g.comp (AddCommGroup.torsion B).subtype).codRestrict _ (fun x => g.isOfFinAddOrder x.2)
   have hk : ∀ x : φ.ker, ∃ y : A, f y = ((x : AddCommGroup.torsion B) : B) := by
     intro x
     have hx : φ x = 0 := x.2
@@ -40,6 +39,7 @@ theorem UpperTheory.Reformulated.B.Qf15.torsStep :
   have h2 : Nat.card (AddCommGroup.torsion B ⧸ φ.ker) ≤ c := by
     rw [Nat.card_congr e]
     exact (Nat.card_le_card_of_injective _ Subtype.val_injective).trans hCc
-  refine ⟨Finite.of_equiv _ (AddSubgroup.addGroupEquivQuotientProdAddSubgroup (s := φ.ker)).symm, ?_⟩
+  refine
+    ⟨Finite.of_equiv _ (AddSubgroup.addGroupEquivQuotientProdAddSubgroup (s := φ.ker)).symm, ?_⟩
   rw [AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup φ.ker, mul_comm]
   exact Nat.mul_le_mul h1 h2

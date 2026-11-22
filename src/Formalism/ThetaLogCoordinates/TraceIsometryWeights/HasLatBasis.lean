@@ -41,9 +41,12 @@ def res (G : GlW K V n) (U : Submodule K V) (hU : G.Stable U) : GlW K U n where
 def IsoW (G : GlW K V n) (W : Submodule K V) (la : Fin n → ℤ) : Submodule K V :=
   G.gS {v | G.IsHW la v ∧ v ∈ W}
 
-def WtBound2 {V₁ V₂ : Type} [AddCommGroup V₁] [Module K V₁] [AddCommGroup V₂] [Module K V₂]
-    (G₁ : GlW K V₁ n) (G₂ : GlW K V₂ n) (W : Submodule K V₂) (l : ℕ) : Prop :=
-  ∀ (μ ν : Fin n → ℤ) (x : V₁) (y : V₂), x ≠ 0 → y ≠ 0 → y ∈ W → G₁.IsWt μ x → G₂.IsWt ν y → ∀ c, |ν c - μ c| ≤ (l : ℤ)
+def WtBound2
+    {V₁ V₂ : Type} [AddCommGroup V₁] [Module K V₁] [AddCommGroup V₂] [Module K V₂]
+    (G₁ : GlW K V₁ n) (G₂ : GlW K V₂ n) (W : Submodule K V₂) (l : ℕ)
+    : Prop :=
+  ∀ (μ ν : Fin n → ℤ) (x : V₁) (y : V₂),
+    x ≠ 0 → y ≠ 0 → y ∈ W → G₁.IsWt μ x → G₂.IsWt ν y → ∀ c, |ν c - μ c| ≤ (l : ℤ)
 
 end gen
 
@@ -55,15 +58,17 @@ def DeltaLat (G : GlW ℚ_[p] V n) (s : Set V) : AddSubgroup V :=
   sInf {L | s ⊆ L ∧ ZpClosed p L ∧ DivStable G.E L}
 
 def HasLatBasis (M : AddSubgroup V) (U : Submodule ℚ_[p] V) : Prop :=
-  ∃ (k : ℕ) (b : Module.Basis (Fin k) ℚ_[p] U), (∀ i, ((b i : U) : V) ∈ M) ∧
-    ∀ x : U, (x : V) ∈ M → ∀ i, ‖b.repr x i‖ ≤ 1
+  ∃ (k : ℕ) (b : Module.Basis (Fin k) ℚ_[p] U),
+    (∀ i, ((b i : U) : V) ∈ M) ∧ ∀ x : U, (x : V) ∈ M → ∀ i, ‖b.repr x i‖ ≤ 1
 
-structure LatData (G : GlW ℚ_[p] V n) (W : Submodule ℚ_[p] V) (M : AddSubgroup V) (l : ℕ) : Prop where
+structure LatData (G : GlW ℚ_[p] V n) (W : Submodule ℚ_[p] V) (M : AddSubgroup V) (l : ℕ)
+    : Prop where
   stable : G.Stable W
   fd : FiniteDimensional ℚ_[p] W
   finW : G.FinW W
-  bound : ∀ (μ ν : Fin n → ℤ) (x y : V), x ≠ 0 → y ≠ 0 → x ∈ W → y ∈ W → G.IsWt μ x → G.IsWt ν y →
-    ∀ c, |ν c - μ c| ≤ (l : ℤ)
+  bound
+    : ∀ (μ ν : Fin n → ℤ) (x y : V),
+      x ≠ 0 → y ≠ 0 → x ∈ W → y ∈ W → G.IsWt μ x → G.IsWt ν y → ∀ c, |ν c - μ c| ≤ (l : ℤ)
   closed : ZpClosed p M
   div : DivStable G.E M
   graded : ∀ μ, ∀ x ∈ M, G.comp μ x ∈ M

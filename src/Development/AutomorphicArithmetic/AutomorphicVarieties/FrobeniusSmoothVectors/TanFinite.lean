@@ -26,11 +26,11 @@ private theorem hom_eq_res (g : R →ₐ[O] ResidueField O) (x : R) : g x = res 
   rw [map_sub, sub_eq_zero] at h1 h2
   rw [h1, h2, AlgHom.commutes, AlgHom.commutes]
 
-private theorem tan_mul (D : Tan O R) (f g : R) :
-    D.1 (f * g) = res O R f * D.1 g + res O R g * D.1 f := D.2 f g
+private theorem tan_mul (D : Tan O R) (f g : R)
+    : D.1 (f * g) = res O R f * D.1 g + res O R g * D.1 f :=
+  D.2 f g
 
-private theorem tan_one (D : Tan O R) : D.1 1 = 0 := by
-  simpa using tan_mul D 1 1
+private theorem tan_one (D : Tan O R) : D.1 1 = 0 := by simpa using tan_mul D 1 1
 
 private theorem tan_alg (D : Tan O R) (a : O) : D.1 (algebraMap O R a) = 0 := by
   rw [Algebra.algebraMap_eq_smul_one, map_smul, tan_one, smul_zero]
@@ -38,10 +38,11 @@ private theorem tan_alg (D : Tan O R) (a : O) : D.1 (algebraMap O R a) = 0 := by
 private theorem tan_finite : Module.Finite (ResidueField O) (Tan O R) := by
   classical
   obtain ⟨s, hs⟩ := (IsNoetherian.noetherian (maximalIdeal R) : (maximalIdeal R).FG)
-  let φ : Tan O R →ₗ[ResidueField O] (s → ResidueField O) :=
-    { toFun := fun D i => D.1 (i : R)
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let φ : Tan O R →ₗ[ResidueField O] (s → ResidueField O) := {
+    toFun := fun D i => D.1 (i : R)
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   refine Module.Finite.of_injective φ ((injective_iff_map_eq_zero φ).2 fun D hD => ?_)
   have h0 : ∀ i ∈ s, D.1 i = 0 := fun i hi => congrFun hD ⟨i, hi⟩
   have hm : ∀ y ∈ maximalIdeal R, D.1 y = 0 := by
@@ -65,23 +66,29 @@ private theorem tan_finite : Module.Finite (ResidueField O) (Tan O R) := by
   exact h
 
 private noncomputable def tanEquiv : (R →ₐ[O] DualNumber (ResidueField O)) ≃ Tan O R where
-  toFun f := ⟨{ toFun := fun x => (f x).snd
-                map_add' := fun x y => by simp
-                map_smul' := fun a x => by simp }, fun x y => by
-    have h : ∀ z, (f z).fst = res O R z := fun z =>
-      hom_eq_res ((TrivSqZeroExt.fstHom O (ResidueField O) (ResidueField O)).comp f) z
-    show (f (x * y)).snd = res O R x • (f y).snd + res O R y • (f x).snd
-    rw [map_mul, DualNumber.snd_mul, h, h, smul_eq_mul, smul_eq_mul, mul_comm (f x).snd]⟩
-  invFun D :=
-    { toFun := fun x => TrivSqZeroExt.inl (res O R x) + TrivSqZeroExt.inr (D.1 x)
-      map_one' := by ext <;> simp [tan_one]
-      map_mul' := fun x y => by ext <;> simp [tan_mul, mul_comm]
-      map_zero' := by ext <;> simp
-      map_add' := fun x y => by ext <;> simp
-      commutes' := fun a => by
-        ext
-        · simp [TrivSqZeroExt.algebraMap_eq_inl']
-        · simp [tan_alg, TrivSqZeroExt.algebraMap_eq_inl'] }
+  toFun f := ⟨
+    {
+      toFun := fun x => (f x).snd
+      map_add' := fun x y => by simp
+      map_smul' := fun a x => by simp
+    },
+    fun x y => by
+      have h : ∀ z, (f z).fst = res O R z := fun z =>
+        hom_eq_res ((TrivSqZeroExt.fstHom O (ResidueField O) (ResidueField O)).comp f) z
+      show (f (x * y)).snd = res O R x • (f y).snd + res O R y • (f x).snd
+      rw [map_mul, DualNumber.snd_mul, h, h, smul_eq_mul, smul_eq_mul, mul_comm (f x).snd]
+  ⟩
+  invFun D := {
+    toFun := fun x => TrivSqZeroExt.inl (res O R x) + TrivSqZeroExt.inr (D.1 x)
+    map_one' := by ext <;> simp [tan_one]
+    map_mul' := fun x y => by ext <;> simp [tan_mul, mul_comm]
+    map_zero' := by ext <;> simp
+    map_add' := fun x y => by ext <;> simp
+    commutes' := fun a => by
+      ext
+      · simp [TrivSqZeroExt.algebraMap_eq_inl']
+      · simp [tan_alg, TrivSqZeroExt.algebraMap_eq_inl']
+  }
   left_inv f := by
     have h : ∀ z, (f z).fst = res O R z := fun z =>
       hom_eq_res ((TrivSqZeroExt.fstHom O (ResidueField O) (ResidueField O)).comp f) z
@@ -91,7 +98,9 @@ private noncomputable def tanEquiv : (R →ₐ[O] DualNumber (ResidueField O)) �
 
 end
 
-theorem UpperTheory.V.Fr.pr_tan :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O], ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R], Module.Finite (ResidueField O) (Tan O R) ∧ Nat.card (R →ₐ[O] (DualNumber (ResidueField O))) = Nat.card (Tan O R) := by
+theorem UpperTheory.V.Fr.pr_tan
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O], ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R],
+      Module.Finite (ResidueField O) (Tan O R)
+        ∧ Nat.card (R →ₐ[O] (DualNumber (ResidueField O))) = Nat.card (Tan O R) := by
   intro O _ _ R _ _ _
   exact ⟨tan_finite, Nat.card_congr tanEquiv⟩

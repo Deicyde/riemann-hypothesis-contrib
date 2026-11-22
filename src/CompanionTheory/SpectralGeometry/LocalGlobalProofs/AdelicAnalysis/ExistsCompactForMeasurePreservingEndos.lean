@@ -9,20 +9,25 @@ open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.Adelic
 
-theorem lattice_pigeonhole_measure_preserving :
-    ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
-      [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
-      (μ : Measure V) [μ.IsAddHaarMeasure], μ Set.univ = ⊤ →
-      ∀ (Λ : Type) [AddCommGroup Λ] [Countable Λ] (j : Λ →+ V) (C : Set V), IsCompact C →
-        (∀ y, ∃ l, y - j l ∈ C) →
-        ∃ Ω : Set V, IsCompact Ω ∧ ∀ e : V →+ V, Continuous e → μ.map e = μ →
-          ∃ l, l ≠ 0 ∧ e (j l) ∈ Ω := by
+theorem lattice_pigeonhole_measure_preserving
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+        [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+        (μ : Measure V) [μ.IsAddHaarMeasure],
+      μ Set.univ = ⊤
+        → ∀ (Λ : Type) [AddCommGroup Λ] [Countable Λ] (j : Λ →+ V) (C : Set V),
+          IsCompact C → (∀ y, ∃ l, y - j l ∈ C)
+            → ∃ Ω : Set V,
+              IsCompact Ω
+                ∧ ∀ e : V →+ V, Continuous e → μ.map e = μ → ∃ l, l ≠ 0 ∧ e (j l) ∈ Ω := by
   intro V _ _ _ _ _ _ _ _ μ _ htop Λ _ _ j C hC hcov
   have hCfin : μ C < ⊤ := hC.measure_lt_top
   obtain ⟨K, -, hKc, hK⟩ :=
     isOpen_univ.exists_lt_isCompact (μ := μ) (r := μ C) (by rw [htop]; exact hCfin)
-  refine ⟨(fun p : V × V => p.1 - p.2) '' (K ×ˢ K),
-    (hKc.prod hKc).image (continuous_fst.sub continuous_snd), fun e he hμ => ?_⟩
+  refine ⟨
+    (fun p : V × V => p.1 - p.2) '' (K ×ˢ K),
+    (hKc.prod hKc).image (continuous_fst.sub continuous_snd),
+    fun e he hμ => ?_
+  ⟩
   by_contra hno
   push_neg at hno
   have hKm : MeasurableSet K := hKc.isClosed.measurableSet
@@ -62,7 +67,9 @@ theorem lattice_pigeonhole_measure_preserving :
       simp [S]
     rw [hS, measure_preimage_add_right]
   have hle : μ K ≤ μ C := by
-    calc μ K = μ (e ⁻¹' K) := hμA.symm
+    calc
+      μ K
+        = μ (e ⁻¹' K) := hμA.symm
       _ ≤ μ (⋃ l, (e ⁻¹' K) ∩ ((fun x => x - j l) ⁻¹' C)) := measure_mono hcover
       _ ≤ ∑' l, μ ((e ⁻¹' K) ∩ ((fun x => x - j l) ⁻¹' C)) := measure_iUnion_le _
       _ = ∑' l, μ (S l) := by simp_rw [hpiece]

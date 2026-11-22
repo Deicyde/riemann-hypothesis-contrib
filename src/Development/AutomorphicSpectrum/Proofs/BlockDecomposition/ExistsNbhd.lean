@@ -16,22 +16,33 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
 
 namespace GlobalTheory.CompanionTheory.Cot
 
-theorem spMap_inj {A B : Type} [CommRing A] [CommRing B] {f g : A →+* B} (h : spMap f = spMap g) : f = g :=
+theorem spMap_inj {A B : Type} [CommRing A] [CommRing B] {f g : A →+* B} (h : spMap f = spMap g)
+    : f = g :=
   congrArg CommRingCat.Hom.hom (Spec.map_injective h)
 
-theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
-    spMap (g.comp f) = spMap g ≫ spMap f := by
+theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap (g.comp f) = spMap g ≫ spMap f := by
   simp [spMap, CommRingCat.ofHom_comp, Spec.map_comp]
 
-theorem spMap_id {A : Type} [CommRing A] : spMap (RingHom.id A) = 𝟙 _ := by
-  simp [spMap]
+theorem spMap_id {A : Type} [CommRing A] : spMap (RingHom.id A) = 𝟙 _ := by simp [spMap]
 
-theorem exists_nbhd : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R) (e : Sp R ⟶ X), e ≫ s = 𝟙 _ → ∃ (P : Type) (_ : CommRing P) (α : R →+* P) (ε : P →+* R) (j : Sp P ⟶ X), ε.comp α = RingHom.id R ∧ (∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) ∧ j ≫ s = spMap α ∧ spMap ε ≫ j = e ∧ Mono j ∧ ∀ (Q B : Type) [CommRing Q] [CommRing B] (q : Q →+* B) (ρ : R →+* B) (y : Sp Q ⟶ X), Function.Surjective q → (∀ a b : Q, q a = 0 → q b = 0 → a * b = 0) → spMap q ≫ y = spMap ρ ≫ e → ∃ φ : P →+* Q, spMap φ ≫ j = y := by
+theorem exists_nbhd
+    : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R) (e : Sp R ⟶ X),
+      e ≫ s = 𝟙 _
+        → ∃ (P : Type) (_ : CommRing P) (α : R →+* P) (ε : P →+* R) (j : Sp P ⟶ X),
+          ε.comp α = RingHom.id R ∧ (∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) ∧ j ≫ s = spMap α
+            ∧ spMap ε ≫ j = e ∧ Mono j
+            ∧ ∀ (Q B : Type) [CommRing Q] [CommRing B] (q : Q →+* B) (ρ : R →+* B) (y : Sp Q ⟶ X),
+              Function.Surjective q → (∀ a b : Q, q a = 0 → q b = 0 → a * b = 0)
+                → spMap q ≫ y = spMap ρ ≫ e
+                → ∃ φ : P →+* Q, spMap φ ≫ j = y := by
   intro R _ X s e he
   have : IsImmersion (e ≫ s) := by rw [he]; infer_instance
   have : IsImmersion e := IsImmersion.of_comp e s
@@ -40,7 +51,8 @@ theorem exists_nbhd : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp
   have he' : e' ≫ U.ι = e := e.liftCoborder_ι
   let t : (U : Scheme.{0}) ⟶ Sp R := U.ι ≫ s
   have het : e' ≫ t = 𝟙 _ := by simp only [t]; rw [← Category.assoc, he', he]
-  have hE : IsAffine (e'.ker ^ 2).subscheme := GlobalTheory.T.square_zero_neighbourhood_affine R U t e' het
+  have hE : IsAffine (e'.ker ^ 2).subscheme :=
+    GlobalTheory.T.square_zero_neighbourhood_affine R U t e' het
   let c := (e'.ker ^ 2).subschemeι
   have hle : c.ker ≤ e'.ker := by
     simp only [c, Scheme.IdealSheafData.ker_subschemeι]
@@ -76,9 +88,12 @@ theorem exists_nbhd : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp
       have h3 : (Scheme.ΓSpecIso (.of R)).hom (i'.appTop a) = 0 := by
         have := congrArg (fun f ↦ f.hom a) h0
         simpa [ha] using this.symm
-      exact (map_eq_zero_iff _ (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (.of R)).hom).1).1 h3
+      exact
+        (map_eq_zero_iff _ (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (.of R)).hom).1).1
+          h3
     intro a b ha hb
-    exact GlobalTheory.T.square_zero_neighbourhood_product_zero R U e' i' hi' a b (hk a ha) (hk b hb)
+    exact GlobalTheory.T.square_zero_neighbourhood_product_zero R U e' i' hi' a b (hk a ha)
+      (hk b hb)
   · intro Q B _ _ q ρ y hq hsq hy
     have hsurj : Function.Surjective (spMap q) := by
       intro x
@@ -113,20 +128,26 @@ theorem exists_nbhd : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp
 theorem cotSt : CotSt := by
   intro R _ X s e g he hs
   obtain ⟨P, _, α, ε, j, h1, h2, h3, h4, h5, h6⟩ := exists_nbhd R X s e he
-  obtain ⟨W, i1, i2, i3, i4, y₀, hy⟩ := GlobalTheory.T.closed_immersion_universal_square_zero R X s e P α ε j h1 h2 h3 h4 h5 h6
-  refine ⟨W, i1, i2, i3, i4, y₀, GlobalTheory.T.vector_bundle_of_local_freeness R W g fun p ↦ ?_, hy⟩
-  obtain ⟨r, A, C, _, _, _, _, j, k, hr, _, _, hjs, hε, f1, f2, f3⟩ := GlobalTheory.T.exists_local_chart_at_prime R X s e g he hs p
+  obtain ⟨W, i1, i2, i3, i4, y₀, hy⟩ :=
+    GlobalTheory.T.closed_immersion_universal_square_zero R X s e P α ε j h1 h2 h3 h4 h5 h6
+  refine
+    ⟨W, i1, i2, i3, i4, y₀, GlobalTheory.T.vector_bundle_of_local_freeness R W g fun p ↦ ?_, hy⟩
+  obtain ⟨r, A, C, _, _, _, _, j, k, hr, _, _, hjs, hε, f1, f2, f3⟩ :=
+    GlobalTheory.T.exists_local_chart_at_prime R X s e g he hs p
   obtain ⟨E⟩ := GlobalTheory.T.cotangent_local_open_chart_exists R X s e he W y₀ hy r A C j k hjs hε
   have : Nontrivial (Localization.Away r) := by
     refine ⟨⟨algebraMap R _ 1, algebraMap R _ 0, fun h ↦ ?_⟩⟩
     obtain ⟨⟨_, n, rfl⟩, hc⟩ := (IsLocalization.eq_iff_exists (Submonoid.powers r) _).1 h
     have h0 : r ^ n ∈ p.asIdeal := by
       have : r ^ n = 0 := by simpa using hc
-      rw [this]; exact zero_mem _
+      rw [this]
+      exact zero_mem _
     exact hr (p.2.mem_of_pow_mem n h0)
   have : Nontrivial A := (algebraMap A (Localization.Away r)).domain_nontrivial
-  have hf : Module.Free (Localization.Away r) (Localization.Away r ⊗[R] W) := Module.Free.of_equiv E.symm
-  have hn : Module.Finite (Localization.Away r) (Localization.Away r ⊗[R] W) := Module.Finite.equiv E.symm
+  have hf : Module.Free (Localization.Away r) (Localization.Away r ⊗[R] W) :=
+    Module.Free.of_equiv E.symm
+  have hn : Module.Finite (Localization.Away r) (Localization.Away r ⊗[R] W) :=
+    Module.Finite.equiv E.symm
   exact ⟨r, hr, hf, hn, by rw [E.finrank_eq, Module.finrank_baseChange, f3]⟩
 
 end GlobalTheory.CompanionTheory.Cot

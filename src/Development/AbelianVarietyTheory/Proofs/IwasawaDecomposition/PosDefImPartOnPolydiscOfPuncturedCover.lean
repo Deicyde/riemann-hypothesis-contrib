@@ -15,7 +15,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Punct
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
 open Matrix
 open scoped ComplexOrder Topology
@@ -25,7 +28,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem posDef_im_on_ball_of_logExp : ∀ (n a : ℕ) (J : Type) [Fintype J] [DecidableEq J] (Δ : (Fin n → ℂ) → Matrix J J ℂ), (∀ i j, DifferentiableOn ℂ (fun z => Δ z i j) (Metric.ball 0 1)) → (∀ s ∈ logDom n a, ((Δ (logExp a s)).map Complex.im).PosDef) → ∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, ((Δ z).map Complex.im).PosDef := by
+theorem posDef_im_on_ball_of_logExp
+    : ∀ (n a : ℕ) (J : Type) [Fintype J] [DecidableEq J] (Δ : (Fin n → ℂ) → Matrix J J ℂ),
+      (∀ i j, DifferentiableOn ℂ (fun z => Δ z i j) (Metric.ball 0 1))
+        → (∀ s ∈ logDom n a, ((Δ (logExp a s)).map Complex.im).PosDef)
+        → ∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, ((Δ z).map Complex.im).PosDef := by
   intro n a J _ _ Δ hΔ hpos z hz
   set U := Metric.ball (0 : Fin n → ℂ) 1 with hU
   have hcont : ∀ i j, ContinuousOn (fun w => Δ w i j) U := fun i j => (hΔ i j).continuousOn
@@ -37,7 +44,9 @@ theorem posDef_im_on_ball_of_logExp : ∀ (n a : ℕ) (J : Type) [Fintype J] [De
     exact Complex.continuous_im.comp_continuousOn (hcont j i)
   have hsymm : ((Δ z).map Complex.im)ᵀ = (Δ z).map Complex.im := by
     refine eq_on_ball_of_eq_on_logExp_image n a 1 (Matrix J J ℝ)
-      (fun w => ((Δ w).map Complex.im)ᵀ) (fun w => (Δ w).map Complex.im) le_rfl hMT hM ?_ z hz
+      (fun w => ((Δ w).map Complex.im)ᵀ)
+      (fun w => (Δ w).map Complex.im)
+      le_rfl hMT hM ?_ z hz
     intro s hs _
     have h1 := (hpos s hs).1
     unfold Matrix.IsHermitian at h1
@@ -67,9 +76,13 @@ theorem posDef_im_on_ball_of_logExp : ∀ (n a : ℕ) (J : Type) [Fintype J] [De
     Complex.continuous_im.comp_continuousOn hqd.continuousOn
   have hnn : ∀ w ∈ U, 0 ≤ (q w).im := by
     intro w hw
-    have := eq_on_ball_of_eq_on_logExp_image n a 1 ℝ (fun w => min (q w).im 0) (fun _ => 0)
-      le_rfl ((continuous_id.min continuous_const).comp_continuousOn hqc) continuousOn_const
-      (fun s hs _ => min_eq_right (hqpos s hs).le) w hw
+    have :=
+      eq_on_ball_of_eq_on_logExp_image n a 1 ℝ
+        (fun w => min (q w).im 0)
+        (fun _ => 0)
+        le_rfl ((continuous_id.min continuous_const).comp_continuousOn hqc) continuousOn_const
+        (fun s hs _ => min_eq_right (hqpos s hs).le)
+        w hw
     exact (min_eq_right_iff.1 this)
   rw [← hqim]
   rcases (hnn z hz).lt_or_eq with h | h0
@@ -84,8 +97,9 @@ theorem posDef_im_on_ball_of_logExp : ∀ (n a : ℕ) (J : Type) [Fintype J] [De
     intro w hw
     simp only [Set.mem_setOf_eq, Function.comp, hFn, ← h0, neg_zero]
     exact Real.exp_le_exp.2 (by linarith [hnn w hw])
-  have heq := Complex.eqOn_of_isPreconnected_of_isMaxOn_norm (convex_ball (0 : Fin n → ℂ) 1).isPreconnected
-    Metric.isOpen_ball hFd hz hmax
+  have heq :=
+    Complex.eqOn_of_isPreconnected_of_isMaxOn_norm (convex_ball (0 : Fin n → ℂ) 1).isPreconnected
+      Metric.isOpen_ball hFd hz hmax
   obtain ⟨s, hs⟩ := (GlobalTheory.ShFam.Hor.Mark.nonempty_logDom : (logDom n a).Nonempty)
   have hmem : logExp a s ∈ U := GlobalTheory.ShFam.Hor.Mark.logExp_mem hs
   have h2 := congrArg norm (heq hmem)

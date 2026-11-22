@@ -11,16 +11,18 @@ open scoped FourierTransform ContDiff
 
 namespace GlobalTheory.JSW.MirCinf
 
-theorem rowCutInf_unipB_mul_levSetInf : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (ρ : Fin n),
-    ∀ g ∈ levSetInf E n (ρ + 1),
-    (∀ u ∈ GlobalTheory.SmGL.unipB (Cinf E) (Fin n), rowCutInf ρ ((u * g : GL (Fin n) (Cinf E)) : Matrix (Fin n) (Fin n) (Cinf E)) =
-      rowCutInf ρ (g : Matrix (Fin n) (Fin n) (Cinf E))) ∧
-    ∀ w, ∃ j, j ≤ ρ ∧ rowCutInf ρ (g : Matrix (Fin n) (Fin n) (Cinf E)) j w ≠ 0 := by
+theorem rowCutInf_unipB_mul_levSetInf
+    : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (ρ : Fin n), ∀ g ∈ levSetInf E n (ρ + 1),
+      (∀ u ∈ GlobalTheory.SmGL.unipB (Cinf E) (Fin n),
+          rowCutInf ρ ((u * g : GL (Fin n) (Cinf E)) : Matrix (Fin n) (Fin n) (Cinf E))
+            = rowCutInf ρ (g : Matrix (Fin n) (Fin n) (Cinf E)))
+        ∧ ∀ w, ∃ j, j ≤ ρ ∧ rowCutInf ρ (g : Matrix (Fin n) (Fin n) (Cinf E)) j w ≠ 0 := by
   intro E _ _ n ρ g hg
   have hw : ∀ w, compGL w g ∈ levSet n (ρ + 1) := hg
-  have hc : ∀ w (x : GL (Fin n) (Cinf E)) j,
-      rowCut ρ ((compGL w x : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) j =
-        rowCutInf ρ (x : Matrix (Fin n) (Fin n) (Cinf E)) j w := by
+  have hc
+      : ∀ w (x : GL (Fin n) (Cinf E)) j,
+        rowCut ρ ((compGL w x : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) j
+          = rowCutInf ρ (x : Matrix (Fin n) (Fin n) (Cinf E)) j w := by
     intro w x j
     unfold rowCut rowCutInf
     split_ifs <;> rfl

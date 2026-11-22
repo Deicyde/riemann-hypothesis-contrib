@@ -18,9 +18,11 @@ section Loc
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem updn_den {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P) (a : E ⊗[F] Formalism.L2.Herm.Af F)
-    (h : prV (E := E) v a ∈ Formalism.BasicNotions.intV E v) :
-    ∃ t : 𝓞 E, t ∉ P.asIdeal ∧ iA F E (algebraMap (𝓞 E) E t) * a ∈ Formalism.L2.Herm.intAf F E := by
+theorem updn_den
+    {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P)
+    (a : E ⊗[F] Formalism.L2.Herm.Af F) (h : prV (E := E) v a ∈ Formalism.BasicNotions.intV E v)
+    : ∃ t : 𝓞 E,
+      t ∉ P.asIdeal ∧ iA F E (algebraMap (𝓞 E) E t) * a ∈ Formalism.L2.Herm.intAf F E := by
   obtain ⟨D, hD, hDa⟩ := levelaf_denom (E := E) a
   obtain ⟨p, hp, hp0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot P.ne_bot
   set DE : 𝓞 E := algebraMap (𝓞 F) (𝓞 E) D with hDE
@@ -30,28 +32,48 @@ theorem updn_den {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P) 
   have hI : (Ideal.span {p * DE} : Ideal (𝓞 E)) ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact mul_ne_zero hp0 hDE0
-  obtain ⟨q, hq⟩ := Formalism.L2.DIV.cmpS_surj (F := F) _ hI (Ideal.Quotient.mk _ (Formalism.L2.DIV.lc_eps E v))
+  obtain ⟨q, hq⟩ :=
+    Formalism.L2.DIV.cmpS_surj (F := F) _ hI (Ideal.Quotient.mk _ (Formalism.L2.DIV.lc_eps E v))
   obtain ⟨t, rfl⟩ := Ideal.Quotient.mk_surjective q
-  have hq' : Ideal.Quotient.mk (Formalism.L2.DIV.idS F (Ideal.span {p * DE})) (Formalism.L2.DIV.oToS F E t) =
-      Ideal.Quotient.mk _ (Formalism.L2.DIV.lc_eps E v) := hq
+  have hq'
+      : Ideal.Quotient.mk (Formalism.L2.DIV.idS F (Ideal.span {p * DE}))
+          (Formalism.L2.DIV.oToS F E t)
+        = Ideal.Quotient.mk _ (Formalism.L2.DIV.lc_eps E v) :=
+    hq
   have hd := Ideal.Quotient.eq.1 hq'
   unfold Formalism.L2.DIV.idS at hd
   rw [Ideal.map_span, Set.image_singleton, Ideal.mem_span_singleton'] at hd
   obtain ⟨y, hy⟩ := hd
-  have ht : Formalism.L2.DIV.oToS F E t = Formalism.L2.DIV.lc_eps E v + y * Formalism.L2.DIV.oToS F E p * Formalism.L2.DIV.oToS F E DE := by
+  have ht
+      : Formalism.L2.DIV.oToS F E t
+        = Formalism.L2.DIV.lc_eps E v
+          + y * Formalism.L2.DIV.oToS F E p * Formalism.L2.DIV.oToS F E DE := by
     rw [mul_assoc, ← map_mul, hy]; ring
   refine ⟨t, ?_, ?_⟩
   · intro htP
     have h1 := congrArg (resS F P) ht
-    rw [map_add (f := _), map_mul, map_mul, Formalism.L2.DIV.lc_res_eps P v hov, Formalism.L2.DIV.resS_oToS, Formalism.L2.DIV.resS_oToS,
-      Ideal.Quotient.eq_zero_iff_mem.2 htP, Ideal.Quotient.eq_zero_iff_mem.2 hp, mul_zero, zero_mul, add_zero] at h1
+    rw [map_add (f := _), map_mul, map_mul, Formalism.L2.DIV.lc_res_eps P v hov,
+        Formalism.L2.DIV.resS_oToS, Formalism.L2.DIV.resS_oToS,
+        Ideal.Quotient.eq_zero_iff_mem.2 htP, Ideal.Quotient.eq_zero_iff_mem.2 hp, mul_zero,
+        zero_mul, add_zero]
+      at h1
     exact zero_ne_one h1
-  · have hC : ((Formalism.L2.DIV.oToS F E DE : Formalism.L2.Herm.intAf F E) : E ⊗[F] Formalism.L2.Herm.Af F) = levelafC E D := by
+  · have hC
+        : ((Formalism.L2.DIV.oToS F E DE : Formalism.L2.Herm.intAf F E)
+            : E ⊗[F] Formalism.L2.Herm.Af F)
+          = levelafC E D := by
       rw [Formalism.L2.DIV.levelafC_eq_incl, ← iA_coe, hDE, ← IsScalarTower.algebraMap_apply]
     rw [iA_coe, ht]
-    have e : ((Formalism.L2.DIV.lc_eps E v + y * Formalism.L2.DIV.oToS F E p * Formalism.L2.DIV.oToS F E DE : Formalism.L2.Herm.intAf F E) :
-        E ⊗[F] Formalism.L2.Herm.Af F) * a = afsplitIE v (prV (E := E) v a) +
-          ((y * Formalism.L2.DIV.oToS F E p : Formalism.L2.Herm.intAf F E) : E ⊗[F] Formalism.L2.Herm.Af F) * (levelafC E D * a) := by
+    have e
+        : ((Formalism.L2.DIV.lc_eps E v
+                  + y * Formalism.L2.DIV.oToS F E p * Formalism.L2.DIV.oToS F E DE
+                : Formalism.L2.Herm.intAf F E)
+              : E ⊗[F] Formalism.L2.Herm.Af F)
+            * a
+          = afsplitIE v (prV (E := E) v a)
+            + ((y * Formalism.L2.DIV.oToS F E p : Formalism.L2.Herm.intAf F E)
+                : E ⊗[F] Formalism.L2.Herm.Af F)
+              * (levelafC E D * a) := by
       rw [afsplit_decomp, ← hC, Subring.coe_add, Subring.coe_mul, add_mul, mul_assoc]
       rfl
     rw [e]
@@ -59,9 +81,11 @@ theorem updn_den {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P) 
 
 variable {n : ℕ}
 
-theorem updn_prV_pullV {v : HeightOneSpectrum (𝓞 F)} {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)}
-    (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x') (z : Fin n → E) (i : Fin n) :
-    prV (E := E) v (pullV x z i) = prV (E := E) v (pullV x' z i) := by
+theorem updn_prV_pullV
+    {v : HeightOneSpectrum (𝓞 F)} {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)}
+    (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x')
+    (z : Fin n → E) (i : Fin n)
+    : prV (E := E) v (pullV x z i) = prV (E := E) v (pullV x' z i) := by
   have h' : bc (prV (E := E) v) x⁻¹ = bc (prV (E := E) v) x'⁻¹ := by rw [map_inv, map_inv, h]
   unfold pullV
   simp only [Matrix.mulVec, dotProduct]
@@ -70,19 +94,27 @@ theorem updn_prV_pullV {v : HeightOneSpectrum (𝓞 F)} {x x' : GL (Fin n) (E �
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, map_mul]
   congr 1
-  exact congrArg (fun g : GL (Fin n) (E ⊗[F] v.adicCompletion F) =>
-    (g : Matrix (Fin n) (Fin n) (E ⊗[F] v.adicCompletion F)) i j) h'
+  exact congrArg
+    (fun g : GL (Fin n) (E ⊗[F] v.adicCompletion F) =>
+      (g : Matrix (Fin n) (Fin n) (E ⊗[F] v.adicCompletion F)) i j)
+    h'
 
 variable [StarRing E]
 
-theorem localized_globalLattice_le {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P)
-    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)} (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x') :
-    localization₂ P.asIdeal (Formalism.UG.CS.globLat x (stdLat E n)) ≤ localization₂ P.asIdeal (Formalism.UG.CS.globLat x' (stdLat E n)) := by
+theorem localized_globalLattice_le
+    {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P)
+    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)}
+    (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x')
+    : localization₂ P.asIdeal (Formalism.UG.CS.globLat x (stdLat E n))
+      ≤ localization₂ P.asIdeal (Formalism.UG.CS.globLat x' (stdLat E n)) := by
   classical
   intro z hz
   obtain ⟨s, hs, hsz⟩ := (mem_locP P _ z).1 hz
-  have h1 : ∀ i, ∃ t : 𝓞 E, t ∉ P.asIdeal ∧
-      iA F E (algebraMap (𝓞 E) E t) * pullV x' (s • z) i ∈ Formalism.L2.Herm.intAf F E := fun i =>
+  have h1
+      : ∀ i, ∃ t : 𝓞 E,
+        t ∉ P.asIdeal
+          ∧ iA F E (algebraMap (𝓞 E) E t) * pullV x' (s • z) i
+            ∈ Formalism.L2.Herm.intAf F E := fun i =>
     updn_den hov _ (by
       rw [← updn_prV_pullV h]
       exact afsplit_prV_int v _ ((mem_globLat x _).1 hsz i))
@@ -94,19 +126,27 @@ theorem localized_globalLattice_le {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (
   refine (mem_locP P _ z).2 ⟨(∏ i, t i) * s, fun hm => (P.isPrime.mem_or_mem hm).elim hT hs, ?_⟩
   rw [mul_smul, mem_globLat]
   intro i
-  rw [pullV_osmul, ← Finset.prod_erase_mul Finset.univ t (Finset.mem_univ i), map_mul, map_mul, mul_assoc]
+  rw [pullV_osmul, ← Finset.prod_erase_mul Finset.univ t (Finset.mem_univ i), map_mul, map_mul,
+    mul_assoc]
   exact mul_mem (iA_mem _) (hti i)
 
-theorem updn_mem_loc {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P)
-    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)} (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x') :
-    localization₂ P.asIdeal (Formalism.UG.CS.globLat x (stdLat E n)) = localization₂ P.asIdeal (Formalism.UG.CS.globLat x' (stdLat E n)) :=
+theorem updn_mem_loc
+    {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P)
+    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)}
+    (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x')
+    : localization₂ P.asIdeal (Formalism.UG.CS.globLat x (stdLat E n))
+      = localization₂ P.asIdeal (Formalism.UG.CS.globLat x' (stdLat E n)) :=
   le_antisymm (localized_globalLattice_le hov h) (localized_globalLattice_le hov h.symm)
 
-theorem updn_red_loc {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P)
-    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)} (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x') {z : Fin n → E}
-    (hz : z ∈ localization₂ P.asIdeal (Formalism.UG.CS.globLat x (stdLat E n))) (i : Fin n) :
-    redA P (pullV x z i) = redA P (pullV x' z i) := by
-  have hz' : z ∈ localization₂ P.asIdeal (Formalism.UG.CS.globLat x' (stdLat E n)) := localized_globalLattice_le hov h hz
+theorem updn_red_loc
+    {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v P)
+    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)}
+    (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x')
+    {z : Fin n → E} (hz : z ∈ localization₂ P.asIdeal (Formalism.UG.CS.globLat x (stdLat E n)))
+    (i : Fin n)
+    : redA P (pullV x z i) = redA P (pullV x' z i) := by
+  have hz' : z ∈ localization₂ P.asIdeal (Formalism.UG.CS.globLat x' (stdLat E n)) :=
+    localized_globalLattice_le hov h hz
   obtain ⟨s, hs, hsz⟩ := pullV_den hz
   obtain ⟨s', hs', hsz'⟩ := pullV_den hz'
   have hss : s * s' ∉ P.asIdeal := fun hm => (P.isPrime.mem_or_mem hm).elim hs hs'
@@ -125,9 +165,11 @@ theorem updn_red_loc {v : HeightOneSpectrum (𝓞 F)} {P : Pl E} (hov : IsOver v
 
 variable [NeZero n] (ST SG : Finset (Pl E))
 
-theorem updn_f_loc {v : HeightOneSpectrum (𝓞 F)} (P : ST) (hov : IsOver v P.1)
-    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)} (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x') :
-    (decoRaw ST SG x).f P = (decoRaw ST SG x').f P := by
+theorem updn_f_loc
+    {v : HeightOneSpectrum (𝓞 F)} (P : ST) (hov : IsOver v P.1)
+    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)}
+    (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x')
+    : (decoRaw ST SG x).f P = (decoRaw ST SG x').f P := by
   funext z
   show (open Classical in if z ∈ localization₂ P.1.asIdeal (Formalism.UG.CS.globLat x (stdLat E n))
       then redA P.1 (pullV x z (lastIdx n)) else 0) =
@@ -138,9 +180,11 @@ theorem updn_f_loc {v : HeightOneSpectrum (𝓞 F)} (P : ST) (hov : IsOver v P.1
   · rw [if_pos hz, if_pos hz, updn_red_loc hov h hz]
   · rw [if_neg hz, if_neg hz]
 
-theorem updn_be_loc {v : HeightOneSpectrum (𝓞 F)} (w : SG) (hov : IsOver v w.1)
-    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)} (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x') :
-    (decoRaw ST SG x).be w = (decoRaw ST SG x').be w := by
+theorem updn_be_loc
+    {v : HeightOneSpectrum (𝓞 F)} (w : SG) (hov : IsOver v w.1)
+    {x x' : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)}
+    (h : bc (prV (E := E) v) x = bc (prV (E := E) v) x')
+    : (decoRaw ST SG x).be w = (decoRaw ST SG x').be w := by
   funext z
   show (open Classical in if z ∈ localization₂ w.1.asIdeal (Formalism.UG.CS.globLat x (stdLat E n))
       then fun i => redA w.1 (pullV x z i) else 0) =
@@ -163,7 +207,10 @@ end Loc
 section Move
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
-variable (hc : Formalism.BasicNotions.CMData F E) (n : ℕ) [NeZero n] (ST SG : Finset (Pl E)) (H : Subgroup (GLG (E := E) (n := n) (SG := SG)))
+variable
+  (hc : Formalism.BasicNotions.CMData F E)
+  (n : ℕ) [NeZero n]
+  (ST SG : Finset (Pl E)) (H : Subgroup (GLG (E := E) (n := n) (SG := SG)))
 
 end Move
 

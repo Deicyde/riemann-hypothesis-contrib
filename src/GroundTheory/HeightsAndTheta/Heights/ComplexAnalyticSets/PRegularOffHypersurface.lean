@@ -14,15 +14,16 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial
 
-theorem exists_ringKrullDim_quotient_eq_nat {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) (hJ : J.IsPrime) :
-    ∃ d : ℕ, ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d := by
+theorem exists_ringKrullDim_quotient_eq_nat
+    {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) (hJ : J.IsPrime)
+    : ∃ d : ℕ, ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d := by
   have : J.IsPrime := hJ
   have hge : (0 : WithBot ℕ∞) ≤ ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) :=
     ringKrullDim_nonneg_of_nontrivial
   have hle : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) ≤ (n : WithBot ℕ∞) := by
     refine (ringKrullDim_quotient_le J).trans ?_
-    rw [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field, Nat.card_eq_fintype_card,
-      Fintype.card_fin, zero_add]
+    rw [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
+      Nat.card_eq_fintype_card, Fintype.card_fin, zero_add]
   generalize ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = x at hge hle
   induction x using WithBot.recBotCoe with
   | bot => exact absurd hge (by simp)
@@ -31,26 +32,32 @@ theorem exists_ringKrullDim_quotient_eq_nat {n : ℕ} (J : Ideal (MvPolynomial (
     | top => exact absurd hle (by norm_cast)
     | coe d => exact ⟨d, rfl⟩
 
-theorem analyticOnNhd_of_differentiableOn_fin {d : ℕ} {σ : Type} [Fintype σ] {U : Set (Fin d → ℂ)}
-    {G : (Fin d → ℂ) → σ → ℂ} (hU : IsOpen U) (hG : DifferentiableOn ℂ G U) : AnalyticOnNhd ℂ G U := by
+theorem analyticOnNhd_of_differentiableOn_fin
+    {d : ℕ} {σ : Type} [Fintype σ]
+    {U : Set (Fin d → ℂ)} {G : (Fin d → ℂ) → σ → ℂ} (hU : IsOpen U) (hG : DifferentiableOn ℂ G U)
+    : AnalyticOnNhd ℂ G U := by
   intro y hy
   refine AnalyticAt.pi fun s => ?_
   have hs : DifferentiableOn ℂ (fun x => G x s) U :=
-    (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) s).differentiable.comp_differentiableOn hG
+    (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) s).differentiable.comp_differentiableOn
+      hG
   refine analyticOnNhd_of_continuousOn_of_separately hU hs.continuousOn (fun z hz i => ?_) y hy
   have h1 : DifferentiableAt ℂ (fun x => G x s) (Function.update z i (z i)) := by
     rw [Function.update_eq_self]
     exact hs.differentiableAt (hU.mem_nhds hz)
   exact h1.comp (z i) (hasFDerivAt_update (𝕜 := ℂ) z (z i)).differentiableAt
 
-theorem RegularOffHypersurface.proof (hG : FrameGraphGeneric.Statement) : RegularOffHypersurface.Statement := by
+theorem RegularOffHypersurface.proof (hG : FrameGraphGeneric.Statement)
+    : RegularOffHypersurface.Statement := by
   intro σ _ I hI
   set n := Fintype.card σ
   set e : σ ≃ Fin n := Fintype.equivFin σ
   set φ : MvPolynomial (Fin n) ℂ ≃ₐ[ℂ] MvPolynomial σ ℂ := renameEquiv ℂ e.symm
   set J : Ideal (MvPolynomial (Fin n) ℂ) := I.comap φ
   have hJ : J.IsPrime := Ideal.IsPrime.comap _
-  have hφ : ∀ (x : σ → ℂ) (q : MvPolynomial (Fin n) ℂ), eval x (φ q) = eval (x ∘ e.symm) q := fun x q => by
+  have hφ
+      : ∀ (x : σ → ℂ) (q : MvPolynomial (Fin n) ℂ),
+        eval x (φ q) = eval (x ∘ e.symm) q := fun x q => by
     simp [φ, eval_rename]
   obtain ⟨d, hd⟩ := exists_ringKrullDim_quotient_eq_nat J hJ
   let b := EuclideanSpace.basisFun (Fin n) ℂ
@@ -58,9 +65,11 @@ theorem RegularOffHypersurface.proof (hG : FrameGraphGeneric.Statement) : Regula
 
   let T : (σ → ℂ) →L[ℂ] EuclideanSpace ℂ (Fin n) :=
     ((EuclideanSpace.equiv (Fin n) ℂ).symm : (Fin n → ℂ) →L[ℂ] EuclideanSpace ℂ (Fin n)).comp
-      (ContinuousLinearMap.pi fun i : Fin n => ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) (e.symm i))
+      (ContinuousLinearMap.pi fun i : Fin n =>
+        ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) (e.symm i))
   let S : EuclideanSpace ℂ (Fin n) →L[ℂ] (σ → ℂ) :=
-    (ContinuousLinearMap.pi fun s : σ => ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin n => ℂ) (e s)).comp
+    (ContinuousLinearMap.pi fun s : σ =>
+        ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin n => ℂ) (e s)).comp
       ((EuclideanSpace.equiv (Fin n) ℂ : EuclideanSpace ℂ (Fin n) →L[ℂ] (Fin n → ℂ)))
   have hT : ∀ x i, T x i = x (e.symm i) := fun x i => rfl
   have hS : ∀ w s, S w s = w (e s) := fun w s => rfl
@@ -79,20 +88,34 @@ theorem RegularOffHypersurface.proof (hG : FrameGraphGeneric.Statement) : Regula
       rwa [← hφ, AlgEquiv.apply_symm_apply] at this
   refine ⟨φ q, fun h => hqJ (Ideal.mem_comap.mpr h), ?_⟩
   intro z hz hzh
-  obtain ⟨Ω, V, g, hΩ, hV, hzV, hg, hproj, hgraph⟩ :=
-    hreg (T z) ((hZ z).mp hz) (by rwa [hφ] at hzh)
+  obtain ⟨Ω, V, g, hΩ, hV, hzV, hg, hproj, hgraph⟩ := hreg (T z) ((hZ z).mp hz) (by rwa [hφ] at hzh)
   let eI : I₀ ≃ Fin d := I₀.equivFinOfCardEq hcard
   let Ψ : (Fin d → ℂ) →L[ℂ] (I₀ → ℂ) :=
-    ContinuousLinearMap.pi fun i : I₀ => ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin d => ℂ) (eI i)
+    ContinuousLinearMap.pi fun i : I₀ =>
+      ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin d => ℂ) (eI i)
   let A : (σ → ℂ) →L[ℂ] (Fin d → ℂ) :=
     ContinuousLinearMap.pi fun k : Fin d =>
       ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) (e.symm (eI.symm k))
   have hΨ : ∀ y i, Ψ y i = y (eI i) := fun y i => rfl
   have hA : ∀ x k, A x k = x (e.symm (eI.symm k)) := fun x k => rfl
   have hO : IsOpen (Ψ ⁻¹' Ω) := hΩ.preimage Ψ.continuous
-  refine ⟨hz, d, A, Ψ ⁻¹' Ω, T ⁻¹' V, fun y => S (g (Ψ y)), hO, hV.preimage T.continuous, hzV, ?_, ?_, ?_⟩
-  · exact analyticOnNhd_of_differentiableOn_fin hO (S.differentiable.comp_differentiableOn
-      (hg.comp Ψ.differentiable.differentiableOn fun y hy => hy))
+  refine ⟨
+    hz,
+    d,
+    A,
+    Ψ ⁻¹' Ω,
+    T ⁻¹' V,
+    fun y => S (g (Ψ y)),
+    hO,
+    hV.preimage T.continuous,
+    hzV,
+    ?_,
+    ?_,
+    ?_
+  ⟩
+  · exact analyticOnNhd_of_differentiableOn_fin hO
+      (S.differentiable.comp_differentiableOn (hg.comp Ψ.differentiable.differentiableOn fun y hy =>
+        hy))
   · intro y hy
     ext k
     have h1 := congrFun (hproj (Ψ y) hy) (eI.symm k)
@@ -115,6 +138,7 @@ theorem RegularOffHypersurface.proof (hG : FrameGraphGeneric.Statement) : Regula
       refine ⟨(hZ _).mpr ?_, ?_⟩
       · rw [hTS]; exact hmem.1
       · show T (S (g (Ψ y))) ∈ V
-        rw [hTS]; exact hmem.2
+        rw [hTS]
+        exact hmem.2
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets

@@ -14,20 +14,21 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 
 namespace GlobalTheory
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
-theorem _root_.GlobalTheory.finrank_int_eq_mul_of_finite {O M : Type*} [CommRing O] [IsDomain O] [CharZero O]
-    [Module.Free ℤ O] [Module.Finite ℤ O] [AddCommGroup M] [Module O M] [Module.Finite O M] :
-    Module.finrank ℤ M = Module.finrank ℤ O * Module.finrank O M := by
+theorem _root_.GlobalTheory.finrank_int_eq_mul_of_finite
+    {O M : Type*} [CommRing O] [IsDomain O] [CharZero O] [Module.Free ℤ O] [Module.Finite ℤ O]
+    [AddCommGroup M] [Module O M] [Module.Finite O M]
+    : Module.finrank ℤ M = Module.finrank ℤ O * Module.finrank O M := by
   classical
   let K := FractionRing O
   let N := LocalizedModule O⁰ M
   let f : M →ₗ[O] N := LocalizedModule.mkLinearMap O⁰ M
   let T := Algebra.algebraMapSubmonoid O (nonZeroDivisors ℤ)
   have hdvd : ∀ s ∈ O⁰, ∃ n : ℤ, n ≠ 0 ∧ s ∣ (n : O) := fun s hs => by
-    obtain ⟨r, hr, hd⟩ := IsAlgebraic.exists_nonzero_dvd (R := ℤ)
-      (Algebra.IsIntegral.isIntegral (R := ℤ) s).isAlgebraic hs
+    obtain ⟨r, hr, hd⟩ :=
+      IsAlgebraic.exists_nonzero_dvd (R := ℤ) (Algebra.IsIntegral.isIntegral (R := ℤ) s).isAlgebraic
+        hs
     exact ⟨r, hr, by simpa using hd⟩
   have hT : ∀ t ∈ T, t ≠ 0 := by
     rintro _ ⟨n, hn, rfl⟩
@@ -70,11 +71,13 @@ theorem _root_.GlobalTheory.finrank_int_eq_mul_of_finite {O M : Type*} [CommRing
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.datum_free_int {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) : Module.Free ℤ D.La := by
+theorem _root_.GlobalTheory.datum_free_int
+    {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+    (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H)
+    : Module.Free ℤ D.La := by
   haveI := D.fin
   haveI := D.proj
   haveI : Module.Finite ℤ D.La := Module.Finite.trans (𝓞 E) D.La
@@ -82,12 +85,13 @@ theorem _root_.GlobalTheory.datum_free_int {H : _root_.ReciprocityTheory.ChartRe
   haveI : Module.IsTorsionFree ℤ D.La := Module.IsTorsionFree.trans (𝓞 E)
   exact Module.free_of_finite_type_torsion_free'
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.datum_finrank_int {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) :
-    Module.finrank ℤ D.La = 2 * (Module.finrank ℚ E / 2 * (D.p + D.q)) := by
+theorem _root_.GlobalTheory.datum_finrank_int
+    {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+    (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H)
+    : Module.finrank ℤ D.La = 2 * (Module.finrank ℚ E / 2 * (D.p + D.q)) := by
   haveI := D.fin
   rw [_root_.GlobalTheory.finrank_int_eq_mul_of_finite (O := 𝓞 E), D.rank, RingOfIntegers.rank]
   have h1 := NumberField.InfinitePlace.card_add_two_mul_card_eq_rank E
@@ -95,9 +99,12 @@ theorem _root_.GlobalTheory.datum_finrank_int {H : _root_.ReciprocityTheory.Char
     nrRealPlaces_eq_zero_iff.mpr inferInstance
   rw [h2, zero_add] at h1
   rw [← h1]
-  have h3 : 2 * NumberField.InfinitePlace.nrComplexPlaces E / 2 =
-      NumberField.InfinitePlace.nrComplexPlaces E := by omega
-  rw [h3]; ring
+  have h3
+      : 2 * NumberField.InfinitePlace.nrComplexPlaces E / 2
+        = NumberField.InfinitePlace.nrComplexPlaces E := by
+    omega
+  rw [h3]
+  ring
 
 open NumberField Matrix in
 open scoped nonZeroDivisors in
@@ -153,16 +160,22 @@ private lemma host_bar_w0 (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.T
   · exact absurd h3 two_ne_zero
   · exact sub_eq_zero.mp h3
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.exists_symplectic_basis_adapted_mod_eight :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (g : ℕ),
-      g = Module.finrank ℚ E / 2 * (D.p + D.q) → ∃ (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] D.La),
-        (∀ a b, D.EF (bas a) (bas b) = -_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.omegaStd a b) ∧
-        (∀ k, ∃ e, H.w0 ^ 4 • bas (Pi.single (Sum.inl k) 1) = bas (Pi.single (Sum.inl k) 1) + (8 : ℕ) • e) ∧
-        (∀ k, ∃ e, H.w0 ^ 4 • bas (Pi.single (Sum.inr k) 1) = (8 : ℕ) • e) := by
+theorem _root_.GlobalTheory.exists_symplectic_basis_adapted_mod_eight
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+        (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (g : ℕ),
+      g = Module.finrank ℚ E / 2 * (D.p + D.q)
+        → ∃ (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] D.La),
+          (∀ a b,
+              D.EF (bas a) (bas b)
+                = - _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.omegaStd a b)
+            ∧ (∀ k, ∃ e,
+              H.w0 ^ 4 • bas (Pi.single (Sum.inl k) 1)
+                = bas (Pi.single (Sum.inl k) 1) + (8 : ℕ) • e)
+            ∧ (∀ k, ∃ e, H.w0 ^ 4 • bas (Pi.single (Sum.inr k) 1) = (8 : ℕ) • e) := by
   intro E _ _ _ H D g hg
   haveI := D.fin
   haveI : Module.Free ℤ D.La := _root_.GlobalTheory.datum_free_int D
@@ -174,7 +187,8 @@ theorem _root_.GlobalTheory.exists_symplectic_basis_adapted_mod_eight :
     linear_combination (2 * w ^ 2 - 2 * w + 4 - 4 * m) * hsq
   have hB : w ^ 4 * (1 - w) ^ 4 = 8 * (2 * m ^ 4) := by
     have h : w * (1 - w) = 2 * m := by linear_combination -hsq
-    rw [← mul_pow, h]; ring
+    rw [← mul_pow, h]
+    ring
   have hC : w ^ 4 * w ^ 4 = w ^ 4 + 8 * ((m ^ 2 - m) * w ^ 4 - 2 * m ^ 4) := by
     linear_combination w ^ 4 * hA - hB
   have hbar4 : H.bar (w ^ 4) = (1 - w) ^ 4 := by rw [map_pow, hw, host_bar_w0]
@@ -188,41 +202,45 @@ theorem _root_.GlobalTheory.exists_symplectic_basis_adapted_mod_eight :
     rw [h8, map_smul, LinearMap.smul_apply, smul_eq_mul]
   have hE8' : ∀ u v : D.La, D.EF u ((8 : 𝓞 E) • v) = 8 * D.EF u v := fun u v => by
     rw [h8, map_smul, smul_eq_mul]
-  let P : Submodule ℤ D.La :=
-    { carrier := {x | ∃ e, w ^ 4 • x = x + (8 : 𝓞 E) • e}
-      add_mem' := by
-        rintro x y ⟨a, ha⟩ ⟨b, hb⟩
-        exact ⟨a + b, by rw [smul_add, ha, hb, smul_add]; abel⟩
-      zero_mem' := ⟨0, by simp⟩
-      smul_mem' := by
-        rintro c x ⟨a, ha⟩
-        exact ⟨c • a, by rw [smul_comm (w ^ 4) c x, ha, smul_add, smul_comm c (8 : 𝓞 E) a]⟩ }
-  let Q : Submodule ℤ D.La :=
-    { carrier := {x | ∃ e, w ^ 4 • x = (8 : 𝓞 E) • e}
-      add_mem' := by
-        rintro x y ⟨a, ha⟩ ⟨b, hb⟩
-        exact ⟨a + b, by rw [smul_add, ha, hb, smul_add]⟩
-      zero_mem' := ⟨0, by simp⟩
-      smul_mem' := by
-        rintro c x ⟨a, ha⟩
-        exact ⟨c • a, by rw [smul_comm (w ^ 4) c x, ha, smul_comm c (8 : 𝓞 E) a]⟩ }
-  have hP8 : ∀ x : D.La, ((8 : ℕ) : ℤ) • x ∈ P := fun x =>
-    ⟨w ^ 4 • x - x, by
+  let P : Submodule ℤ D.La := {
+    carrier := {x | ∃ e, w ^ 4 • x = x + (8 : 𝓞 E) • e}
+    add_mem' := by
+      rintro x y ⟨a, ha⟩ ⟨b, hb⟩
+      exact ⟨a + b, by rw [smul_add, ha, hb, smul_add]; abel⟩
+    zero_mem' := ⟨0, by simp⟩
+    smul_mem' := by
+      rintro c x ⟨a, ha⟩
+      exact ⟨c • a, by rw [smul_comm (w ^ 4) c x, ha, smul_add, smul_comm c (8 : 𝓞 E) a]⟩
+  }
+  let Q : Submodule ℤ D.La := {
+    carrier := {x | ∃ e, w ^ 4 • x = (8 : 𝓞 E) • e}
+    add_mem' := by
+      rintro x y ⟨a, ha⟩ ⟨b, hb⟩
+      exact ⟨a + b, by rw [smul_add, ha, hb, smul_add]⟩
+    zero_mem' := ⟨0, by simp⟩
+    smul_mem' := by
+      rintro c x ⟨a, ha⟩
+      exact ⟨c • a, by rw [smul_comm (w ^ 4) c x, ha, smul_comm c (8 : 𝓞 E) a]⟩
+  }
+  have hP8 : ∀ x : D.La, ((8 : ℕ) : ℤ) • x ∈ P := fun x => ⟨
+    w ^ 4 • x - x,
+    by
       rw [show ((8 : ℕ) : ℤ) = 8 by norm_num, ← h8, smul_comm (w ^ 4) (8 : 𝓞 E) x, smul_sub]
-      abel⟩
+      abel
+  ⟩
   have hQ8 : ∀ x : D.La, ((8 : ℕ) : ℤ) • x ∈ Q := fun x =>
     ⟨w ^ 4 • x, by rw [show ((8 : ℕ) : ℤ) = 8 by norm_num, ← h8, smul_comm (w ^ 4) (8 : 𝓞 E) x]⟩
   have hPiso : ∀ x ∈ P, ∀ y ∈ P, (8 : ℤ) ∣ D.EF x y := by
     rintro x ⟨a, ha⟩ y ⟨b, hb⟩
     have hy : (1 - w) ^ 4 • y = (8 : 𝓞 E) • ((2 * m ^ 4) • y - (1 - w) ^ 4 • b) := by
-      calc (1 - w) ^ 4 • y = (1 - w) ^ 4 • (w ^ 4 • y - (8 : 𝓞 E) • b) := by
-            rw [hb, add_sub_cancel_right]
+      calc
+        (1 - w) ^ 4 • y
+          = (1 - w) ^ 4 • (w ^ 4 • y - (8 : 𝓞 E) • b) := by rw [hb, add_sub_cancel_right]
         _ = ((1 - w) ^ 4 * w ^ 4) • y - ((1 - w) ^ 4 * 8) • b := by
-            rw [smul_sub, smul_smul, smul_smul]
+          rw [smul_sub, smul_smul, smul_smul]
         _ = (8 * (2 * m ^ 4)) • y - (8 * (1 - w) ^ 4) • b := by
-            rw [mul_comm ((1 - w) ^ 4) (w ^ 4), hB, mul_comm ((1 - w) ^ 4) 8]
-        _ = (8 : 𝓞 E) • ((2 * m ^ 4) • y - (1 - w) ^ 4 • b) := by
-            simp only [smul_sub, mul_smul]
+          rw [mul_comm ((1 - w) ^ 4) (w ^ 4), hB, mul_comm ((1 - w) ^ 4) 8]
+        _ = (8 : 𝓞 E) • ((2 * m ^ 4) • y - (1 - w) ^ 4 • b) := by simp only [smul_sub, mul_smul]
     have hx : D.EF x y = D.EF (w ^ 4 • x) y - 8 * D.EF a y := by
       rw [ha, map_add (f := _), LinearMap.add_apply, hE8]; ring
     rw [hx, D.adj, hbar4, hy, hE8']
@@ -230,13 +248,12 @@ theorem _root_.GlobalTheory.exists_symplectic_basis_adapted_mod_eight :
   have hQiso : ∀ x ∈ Q, ∀ y ∈ Q, (8 : ℤ) ∣ D.EF x y := by
     rintro x ⟨a, ha⟩ y ⟨b, hb⟩
     have hx : x = (8 : 𝓞 E) • (a - (m ^ 2 - m) • x) + (1 - w) ^ 4 • x := by
-      calc x = (1 : 𝓞 E) • x := (one_smul _ _).symm
-        _ = (w ^ 4 + (1 - w) ^ 4 - 8 * (m ^ 2 - m)) • x := by
-            congr 1; linear_combination -hA
-        _ = w ^ 4 • x + (1 - w) ^ 4 • x - (8 * (m ^ 2 - m)) • x := by
-            rw [sub_smul, add_smul]
+      calc
+        x = (1 : 𝓞 E) • x := (one_smul _ _).symm
+        _ = (w ^ 4 + (1 - w) ^ 4 - 8 * (m ^ 2 - m)) • x := by congr 1; linear_combination -hA
+        _ = w ^ 4 • x + (1 - w) ^ 4 • x - (8 * (m ^ 2 - m)) • x := by rw [sub_smul, add_smul]
         _ = (8 : 𝓞 E) • (a - (m ^ 2 - m) • x) + (1 - w) ^ 4 • x := by
-            rw [ha, mul_smul, smul_sub]; abel
+          rw [ha, mul_smul, smul_sub]; abel
     have hxy : D.EF x y = 8 * D.EF (a - (m ^ 2 - m) • x) y + D.EF ((1 - w) ^ 4 • x) y := by
       conv_lhs => rw [hx]
       rw [map_add (f := _), LinearMap.add_apply, hE8]
@@ -244,18 +261,21 @@ theorem _root_.GlobalTheory.exists_symplectic_basis_adapted_mod_eight :
     exact (dvd_mul_right _ _).add (dvd_mul_right _ _)
   have hsup : P ⊔ Q = ⊤ := by
     refine eq_top_iff.mpr fun x _ => Submodule.mem_sup.mpr ⟨w ^ 4 • x, ?_, x - w ^ 4 • x, ?_, ?_⟩
-    · exact ⟨((m ^ 2 - m) * w ^ 4 - 2 * m ^ 4) • x, by
-        rw [smul_smul, hC, add_smul, mul_smul]⟩
-    · exact ⟨-(((m ^ 2 - m) * w ^ 4 - 2 * m ^ 4) • x), by
-        rw [smul_sub, smul_smul, hC, add_smul, mul_smul, smul_neg]; abel⟩
+    · exact ⟨((m ^ 2 - m) * w ^ 4 - 2 * m ^ 4) • x, by rw [smul_smul, hC, add_smul, mul_smul]⟩
+    · exact ⟨
+        -(((m ^ 2 - m) * w ^ 4 - 2 * m ^ 4) • x),
+        by rw [smul_sub, smul_smul, hC, add_smul, mul_smul, smul_neg]; abel
+      ⟩
     · abel
   have halt : (-D.EF).IsAlt := fun x => by simp [D.alt]
   have hfin : Module.finrank ℤ D.La = 2 * g := by
     rw [hg]; exact _root_.GlobalTheory.datum_finrank_int D
-  obtain ⟨c, hc, hcP, hcQ⟩ := _root_.GlobalTheory.exists_isSymplecticBasis_adapted_dvd halt
-    (_root_.GlobalTheory.bijective_neg_bilinForm D.unimod) hfin (N := 8) (by norm_num) hP8 hQ8
-    (fun x hx y hy => by simpa using hPiso x hx y hy)
-    (fun x hx y hy => by simpa using hQiso x hx y hy) hsup
+  obtain ⟨c, hc, hcP, hcQ⟩ :=
+    _root_.GlobalTheory.exists_isSymplecticBasis_adapted_dvd halt
+      (_root_.GlobalTheory.bijective_neg_bilinForm D.unimod) hfin (N := 8) (by norm_num) hP8 hQ8
+      (fun x hx y hy => by simpa using hPiso x hx y hy)
+      (fun x hx y hy => by simpa using hQiso x hx y hy)
+      hsup
   have hrepr : ∀ a j, c.repr (c.equivFun.symm a) j = a j := fun a j => by
     rw [← Module.Basis.equivFun_apply, LinearEquiv.apply_symm_apply]
   have hsingle : ∀ i, c.equivFun.symm (Pi.single i 1) = c i := fun i => by simp

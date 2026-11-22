@@ -10,16 +10,16 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem pIdx_pTor_ker_range_ne_zero :
-    ∀ (p : ℕ) (A A' : Type) [CommGroup A] [CommGroup A'] (g : A →* A'),
-      pIdx p (⊤ : Subgroup A) ≠ 0 → pTor p (⊤ : Subgroup A) ≠ 0 → pTor p g.range ≠ 0 →
-      pIdx p g.ker ≠ 0 ∧ pTor p g.ker ≠ 0 ∧ pIdx p g.range ≠ 0 := by
+theorem pIdx_pTor_ker_range_ne_zero
+    : ∀ (p : ℕ) (A A' : Type) [CommGroup A] [CommGroup A'] (g : A →* A'),
+      pIdx p (⊤ : Subgroup A) ≠ 0 → pTor p (⊤ : Subgroup A) ≠ 0 → pTor p g.range ≠ 0
+        → pIdx p g.ker ≠ 0 ∧ pTor p g.ker ≠ 0 ∧ pIdx p g.range ≠ 0 := by
   intro p A A' _ _ g h1 h2 h3
   unfold pIdx pTor pows at *
   refine ⟨?_, ?_, ?_⟩
   · set f : A →* A := powMonoidHom p with hf
-    have hP : ((⊤ : Subgroup A).map f).relIndex g.ker ≠ 0 :=
-      fun h0 => h1 (Subgroup.relIndex_eq_zero_of_le_right le_top h0)
+    have hP : ((⊤ : Subgroup A).map f).relIndex g.ker ≠ 0 := fun h0 =>
+      h1 (Subgroup.relIndex_eq_zero_of_le_right le_top h0)
     have hBD : g.ker ≤ g.ker.comap f := by
       intro x hx
       exact g.ker.pow_mem hx p
@@ -76,8 +76,9 @@ theorem pIdx_pTor_ker_range_ne_zero :
     intro h0
     have hd := Subgroup.relIndex_map_map g ((⊤ : Subgroup A).map (powMonoidHom p)) ⊤
     rw [← MonoidHom.range_eq_map g, h0, top_sup_eq] at hd
-    have hdv : ((⊤ : Subgroup A).map (powMonoidHom p) ⊔ g.ker).relIndex ⊤ ∣
-        ((⊤ : Subgroup A).map (powMonoidHom p)).relIndex ⊤ :=
+    have hdv
+        : ((⊤ : Subgroup A).map (powMonoidHom p) ⊔ g.ker).relIndex ⊤
+          ∣ ((⊤ : Subgroup A).map (powMonoidHom p)).relIndex ⊤ :=
       Subgroup.relIndex_dvd_of_le_left _ le_sup_left
     rw [← hd] at hdv
     exact h1 (Nat.eq_zero_of_zero_dvd hdv)

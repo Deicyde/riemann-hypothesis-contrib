@@ -11,11 +11,14 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.SW.Rescale
 
-theorem isFibreFamily_rescale (V X Y : Type) [TopologicalSpace V] [MeasurableSpace V]
-    [TopologicalSpace X] [MeasurableSpace X] (μ : Measure V) (ν : Measure X) (f : V → Y)
-    (ι : X → Y) (U : Set V) (B : Set X) (fib : X → Measure V)
-    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B fib) (a c : ℝ≥0) (hc : c ≠ 0) :
-    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily (a • μ) f ι U (c • ν) B (fun b => (a / c) • fib b) := by
+theorem isFibreFamily_rescale
+    (V X Y : Type) [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X] [MeasurableSpace X]
+    (μ : Measure V) (ν : Measure X) (f : V → Y) (ι : X → Y) (U : Set V) (B : Set X)
+    (fib : X → Measure V)
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B fib)
+    (a c : ℝ≥0) (hc : c ≠ 0)
+    : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily (a • μ) f ι U (c • ν)
+      B (fun b => (a / c) • fib b) := by
   unfold Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily at h ⊢
   refine ⟨fun b => ?_, fun φ hφ => ?_, fun φ hφc hφs hφU => ?_⟩
   · rw [Measure.smul_apply, h.1 b, smul_zero]
@@ -24,7 +27,9 @@ theorem isFibreFamily_rescale (V X Y : Type) [TopologicalSpace V] [MeasurableSpa
       mul_comm c, div_mul_cancel₀ a hc]
   · obtain ⟨h1, h2⟩ := h.2.2 φ hφc hφs hφU
     refine ⟨fun b hb => (h1 b hb).smul_measure_nnreal, ?_⟩
-    have e : (fun b => ∫ v, φ v ∂((a / c) • fib b)) = fun b => ((a / c : ℝ≥0) : ℝ) • ∫ v, φ v ∂fib b := by
+    have e
+        : (fun b => ∫ v, φ v ∂((a / c) • fib b))
+          = fun b => ((a / c : ℝ≥0) : ℝ) • ∫ v, φ v ∂fib b := by
       funext b
       rw [integral_smul_nnreal_measure, NNReal.smul_def]
     rw [e]

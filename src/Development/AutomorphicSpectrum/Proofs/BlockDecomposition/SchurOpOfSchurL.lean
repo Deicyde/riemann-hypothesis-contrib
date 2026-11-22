@@ -20,15 +20,17 @@ theorem eLpNorm_two_sq (f : α → ℂ) : eLpNorm' f 2 ν ^ 2 = ∫⁻ x, ‖f x
   simpa [ENNReal.rpow_ofNat] using
     (lintegral_rpow_eNorm_eq_rpow_eLpNorm' (f := f) (μ := ν) (q := 2) (by norm_num)).symm
 
-theorem schur_memLp (hS : SchurL) [SFinite ν] (k : α → α → ℂ) (A : ℝ≥0∞)
-    (hk : Measurable (Function.uncurry k)) (hA : A ≠ ⊤)
+theorem schur_memLp
+    (hS : SchurL)
+    [SFinite ν]
+    (k : α → α → ℂ) (A : ℝ≥0∞) (hk : Measurable (Function.uncurry k)) (hA : A ≠ ⊤)
     (hr : ∀ x, ∫⁻ y, ‖k x y‖ₑ ∂ν ≤ A) (hc : ∀ y, ∫⁻ x, ‖k x y‖ₑ ∂ν ≤ A)
-    (g : α → ℂ) (hg : MemLp g 2 ν) :
-    MemLp (fun x => ∫ y, k x y * g y ∂ν) 2 ν ∧
-      eLpNorm (fun x => ∫ y, k x y * g y ∂ν) 2 ν ≤ A * eLpNorm g 2 ν ∧
-      ∀ᵐ x ∂ν, Integrable (fun y => k x y * g y) ν := by
-  have norm_sq (f : α → ℂ) (hf : AEStronglyMeasurable f ν) :
-      eLpNorm f 2 ν ^ 2 = ∫⁻ x, ‖f x‖ₑ ^ 2 ∂ν := by
+    (g : α → ℂ) (hg : MemLp g 2 ν)
+    : MemLp (fun x => ∫ y, k x y * g y ∂ν) 2 ν
+      ∧ eLpNorm (fun x => ∫ y, k x y * g y ∂ν) 2 ν ≤ A * eLpNorm g 2 ν
+      ∧ ∀ᵐ x ∂ν, Integrable (fun y => k x y * g y) ν := by
+  have norm_sq (f : α → ℂ) (hf : AEStronglyMeasurable f ν)
+      : eLpNorm f 2 ν ^ 2 = ∫⁻ x, ‖f x‖ₑ ^ 2 ∂ν := by
     simpa [ENNReal.rpow_ofNat] using eLpNorm_nnreal_pow_eq_lintegral (p := 2) (by norm_num) hf
   have hkK : Measurable (Function.uncurry fun x y => ‖k x y‖ₑ) := hk.eNorm
   have hgSm := hg.aestronglyMeasurable
@@ -41,8 +43,7 @@ theorem schur_memLp (hS : SchurL) [SFinite ν] (k : α → α → ℂ) (A : ℝ�
   have hfin : (A * eLpNorm g 2 ν) ^ 2 ≠ ⊤ := ENNReal.pow_ne_top (ENNReal.mul_ne_top hA hgfin)
   have hprod : AEStronglyMeasurable (fun p : α × α => k p.1 p.2 * g p.2) (ν.prod ν) :=
     hk.stronglyMeasurable.aestronglyMeasurable.mul hgSm.comp_snd
-  have hSm : AEStronglyMeasurable (fun x => ∫ y, k x y * g y ∂ν) ν :=
-    hprod.integral_prod_right'
+  have hSm : AEStronglyMeasurable (fun x => ∫ y, k x y * g y ∂ν) ν := hprod.integral_prod_right'
   have hhm : AEMeasurable (fun x => ∫⁻ y, ‖k x y‖ₑ * ‖g y‖ₑ ∂ν) ν := by
     have : AEMeasurable (fun p : α × α => ‖k p.1 p.2‖ₑ * ‖g p.2‖ₑ) (ν.prod ν) := by
       simpa [eNorm_mul] using hprod.eNorm
@@ -68,32 +69,33 @@ theorem schur_memLp (hS : SchurL) [SFinite ν] (k : α → α → ℂ) (A : ℝ�
 theorem schurOp_of_schurL (hS : SchurL) : SchurOp := by
   intro α _ ν _ k A hk hA hr hc
   have H := fun f : Lp ℂ 2 ν => schur_memLp hS k A hk hA hr hc (f : α → ℂ) (Lp.memLp f)
-  let L : Lp ℂ 2 ν →ₗ[ℂ] Lp ℂ 2 ν :=
-    { toFun := fun f => (H f).1.toLp _
-      map_add' := by
-        intro f g
-        apply Lp.ext
-        have h1 := (H (f + g)).1.coeFn_toLp
-        have h2 := (H f).1.coeFn_toLp
-        have h3 := (H g).1.coeFn_toLp
-        have h4 := Lp.coeFn_add ((H f).1.toLp _) ((H g).1.toLp _)
-        filter_upwards [h1, h2, h3, h4, (H f).2.2, (H g).2.2] with x e1 e2 e3 e4 i1 i2
-        rw [e1, e4, Pi.add_apply, e2, e3, ← integral_add i1 i2]
-        refine integral_congr_ae ?_
-        filter_upwards [Lp.coeFn_add f g] with y hy
-        rw [hy, Pi.add_apply, mul_add]
-      map_smul' := by
-        intro c f
-        apply Lp.ext
-        have h1 := (H (c • f)).1.coeFn_toLp
-        have h2 := (H f).1.coeFn_toLp
-        have h4 := Lp.coeFn_smul c ((H f).1.toLp _)
-        filter_upwards [h1, h2, h4] with x e1 e2 e4
-        rw [e1, RingHom.id_apply, e4, Pi.smul_apply, e2, smul_eq_mul, ← integral_const_mul]
-        refine integral_congr_ae ?_
-        filter_upwards [Lp.coeFn_smul c f] with y hy
-        rw [hy, Pi.smul_apply, smul_eq_mul]
-        ring }
+  let L : Lp ℂ 2 ν →ₗ[ℂ] Lp ℂ 2 ν := {
+    toFun := fun f => (H f).1.toLp _
+    map_add' := by
+      intro f g
+      apply Lp.ext
+      have h1 := (H (f + g)).1.coeFn_toLp
+      have h2 := (H f).1.coeFn_toLp
+      have h3 := (H g).1.coeFn_toLp
+      have h4 := Lp.coeFn_add ((H f).1.toLp _) ((H g).1.toLp _)
+      filter_upwards [h1, h2, h3, h4, (H f).2.2, (H g).2.2] with x e1 e2 e3 e4 i1 i2
+      rw [e1, e4, Pi.add_apply, e2, e3, ← integral_add i1 i2]
+      refine integral_congr_ae ?_
+      filter_upwards [Lp.coeFn_add f g] with y hy
+      rw [hy, Pi.add_apply, mul_add]
+    map_smul' := by
+      intro c f
+      apply Lp.ext
+      have h1 := (H (c • f)).1.coeFn_toLp
+      have h2 := (H f).1.coeFn_toLp
+      have h4 := Lp.coeFn_smul c ((H f).1.toLp _)
+      filter_upwards [h1, h2, h4] with x e1 e2 e4
+      rw [e1, RingHom.id_apply, e4, Pi.smul_apply, e2, smul_eq_mul, ← integral_const_mul]
+      refine integral_congr_ae ?_
+      filter_upwards [Lp.coeFn_smul c f] with y hy
+      rw [hy, Pi.smul_apply, smul_eq_mul]
+      ring
+  }
   refine ⟨L.mkContinuous A.toReal ?_, fun f => (H f).1.coeFn_toLp⟩
   intro f
   change ‖(H f).1.toLp _‖ ≤ A.toReal * ‖f‖

@@ -16,10 +16,14 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Exi
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -39,14 +43,18 @@ theorem chiPer : ChiPer := by
   intro D n ψ hψ β l hl
   have hl' : (hermA D n).subtype l ∈ ratMx D n n := AddSubgroup.mem_comap.1 hl
   obtain ⟨γ, hγ⟩ := hl'
-  have e : Matrix.trace (HMul.hMul (β.1.map (incA D)) l.1 : Mx D n n) = incA D (Matrix.trace (β.1 * γ)) := by
+  have e
+      : Matrix.trace (HMul.hMul (β.1.map (incA D)) l.1 : Mx D n n)
+        = incA D (Matrix.trace (β.1 * γ)) := by
     change Matrix.trace (β.1.map (incA D) * ((hermA D n).subtype l)) = _
     rw [← hγ]
     change Matrix.trace (β.1.map (incA D) * γ.map (incA D)) = _
     rw [← Matrix.map_mul]
     exact (AddMonoidHom.map_trace (incA D).toAddMonoidHom (β.1 * γ)).symm
   rw [e]
-  have h2 : -halfTr (incA D (Matrix.trace (β.1 * γ))) = halfTr (incA D (-(Matrix.trace (β.1 * γ)))) := by
+  have h2
+      : - halfTr (incA D (Matrix.trace (β.1 * γ)))
+        = halfTr (incA D (-(Matrix.trace (β.1 * γ)))) := by
     simp only [halfTr, map_neg, mul_neg]
   rw [h2]
   exact GlobalTheory.CompanionTheory.EisUnfold.Summand.psi_halfTr_incA ψ hψ _
@@ -63,7 +71,8 @@ theorem nbTauP : NbTauP := by
     have h2 : D.sp.cm.sig (β.1 j i) = β.1 i j := by
       have := congrFun (congrFun h1 i) j
       simpa [Matrix.transpose_apply, Matrix.map_apply] using this
-    have h3 : tauE D τ (D.sp.cm.sig (β.1 j i)) = starRingEnd ℂ (tauE D τ (β.1 j i)) := D.sp.cm.cmUnram.2.1 _ _
+    have h3 : tauE D τ (D.sp.cm.sig (β.1 j i)) = starRingEnd ℂ (tauE D τ (β.1 j i)) :=
+      D.sp.cm.cmUnram.2.1 _ _
     simp only [Matrix.conjTranspose_apply, Matrix.map_apply]
     rw [← h2, h3]
     rfl
@@ -80,7 +89,8 @@ theorem nbTauP : NbTauP := by
       have hm := congrArg mat h3
       rw [hnb b, hnb b0] at hm
       have := congrArg PlaceFactsH.bOf hm
-      rw [PlaceFactsH.upper_right_entry_block_matrix, PlaceFactsH.upper_right_entry_block_matrix] at this
+      rw [PlaceFactsH.upper_right_entry_block_matrix, PlaceFactsH.upper_right_entry_block_matrix]
+        at this
       exact Subtype.ext this
     subst hbb
     set t := Matrix.trace (HMul.hMul (β.1.map (incA D)) b.1 : Mx D n n) with ht
@@ -90,29 +100,43 @@ theorem nbTauP : NbTauP := by
       refine Prod.ext rfl ?_
       have h2 : (Algebra.trace (AF D.host.F) (AE D) t).2 = 0 := by rw [hT]; rfl
       show (algebraMap D.host.F (AF D.host.F) (1 / 2) * Algebra.trace (AF D.host.F) (AE D) t).2 = 0
-      rw [show (algebraMap D.host.F (AF D.host.F) (1 / 2) * Algebra.trace (AF D.host.F) (AE D) t).2 =
-        (algebraMap D.host.F (AF D.host.F) (1 / 2)).2 * (Algebra.trace (AF D.host.F) (AE D) t).2 from rfl, h2, mul_zero]
+      rw [show (algebraMap D.host.F (AF D.host.F) (1 / 2) * Algebra.trace (AF D.host.F) (AE D) t).2
+            = (algebraMap D.host.F (AF D.host.F) (1 / 2)).2
+              * (Algebra.trace (AF D.host.F) (AE D) t).2 from
+          rfl,
+        h2, mul_zero]
     rw [hH]
     have hpsi := hl (fstA D.host.F (halfTr t))
-    rw [show psiInf D.host.F ψ (fstA D.host.F (halfTr t)) = ψ (pairA D.host.F (fstA D.host.F (halfTr t)) 0) from rfl]
+    rw [show psiInf D.host.F ψ (fstA D.host.F (halfTr t))
+          = ψ (pairA D.host.F (fstA D.host.F (halfTr t)) 0) from
+        rfl]
       at hpsi
     rw [hpsi]
 
-    have hθv : ∀ ρ, θ ρ (fstA D.host.F (halfTr t) ⊗ₜ[D.host.F] (1 : D.host.E)) = ((θ ρ (infPart D t)).re : ℂ) := by
+    have hθv
+        : ∀ ρ,
+          θ ρ (fstA D.host.F (halfTr t) ⊗ₜ[D.host.F] (1 : D.host.E))
+            = ((θ ρ (infPart D t)).re : ℂ) := by
       intro ρ
-      have h2t : Algebra.trace (AF D.host.F) (AE D) t = algebraMap D.host.F (AF D.host.F) 2 * halfTr t := by
+      have h2t
+          : Algebra.trace (AF D.host.F) (AE D) t
+            = algebraMap D.host.F (AF D.host.F) 2 * halfTr t := by
         show _ = algebraMap D.host.F (AF D.host.F) 2 *
           (algebraMap D.host.F (AF D.host.F) (1 / 2) * Algebra.trace (AF D.host.F) (AE D) t)
         rw [← mul_assoc, ← map_mul]
         norm_num
-      have hf : fstA D.host.F (Algebra.trace (AF D.host.F) (AE D) t) = 2 * fstA D.host.F (halfTr t) := by
+      have hf
+          : fstA D.host.F (Algebra.trace (AF D.host.F) (AE D) t)
+            = 2 * fstA D.host.F (halfTr t) := by
         rw [h2t, map_mul, AlgHom.commutes, map_ofNat]
       have hT2 := GlobalTheory.PhaseReal.theta_trace θ hθ ρ t
       rw [hf] at hT2
-      have hmul : θ ρ ((2 * fstA D.host.F (halfTr t)) ⊗ₜ[D.host.F] (1 : D.host.E)) =
-          2 * θ ρ (fstA D.host.F (halfTr t) ⊗ₜ[D.host.F] (1 : D.host.E)) := by
-        have e : (2 * fstA D.host.F (halfTr t)) ⊗ₜ[D.host.F] (1 : D.host.E) =
-            2 * (fstA D.host.F (halfTr t) ⊗ₜ[D.host.F] (1 : D.host.E)) := by
+      have hmul
+          : θ ρ ((2 * fstA D.host.F (halfTr t)) ⊗ₜ[D.host.F] (1 : D.host.E))
+            = 2 * θ ρ (fstA D.host.F (halfTr t) ⊗ₜ[D.host.F] (1 : D.host.E)) := by
+        have e
+            : (2 * fstA D.host.F (halfTr t)) ⊗ₜ[D.host.F] (1 : D.host.E)
+              = 2 * (fstA D.host.F (halfTr t) ⊗ₜ[D.host.F] (1 : D.host.E)) := by
           rw [two_mul, TensorProduct.add_tmul, two_mul]
         rw [e, map_mul, map_ofNat]
       rw [hmul] at hT2
@@ -123,15 +147,17 @@ theorem nbTauP : NbTauP := by
       fun ρ => GlobalTheory.PhaseReal.theta_pair θ hθ ρ β.1 b.1
     rw [Finset.sum_eq_single τ]
     · rw [hpair, hτ]
-      have hreal : (((Matrix.trace (β.1.map (tauE D τ) * herm x)).re : ℝ) : ℂ) =
-          Matrix.trace (β.1.map (tauE D τ) * herm x) := by
+      have hreal
+          : (((Matrix.trace (β.1.map (tauE D τ) * herm x)).re : ℝ) : ℂ)
+            = Matrix.trace (β.1.map (tauE D τ) * herm x) := by
         apply Complex.conj_eq_iff_re.1
         rw [← Complex.star_def, ← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul,
           PlaceFactsH.herm_conjTranspose, hβh.eq, Matrix.trace_mul_comm]
       rw [hreal]
       simp only [eTr, Matrix.smul_mul, Matrix.trace_smul, smul_eq_mul]
     · intro ρ _ hρ
-      rw [hpair, hoth ρ hρ, Matrix.mul_zero, Matrix.trace_zero, Complex.zero_re, Complex.ofReal_zero, mul_zero]
+      rw [hpair, hoth ρ hρ, Matrix.mul_zero, Matrix.trace_zero, Complex.zero_re,
+        Complex.ofReal_zero, mul_zero]
     · intro h; exact absurd (Finset.mem_univ τ) h
 
 end LamTopH
@@ -139,7 +165,8 @@ end LamTopH
 open LamTopH
 
 theorem gLsing_of (hFZ : FourierZeroN) (hTS : TwoSided) (hD : DenseTau) : GLsing :=
-  gLsing_core hFZ hTS hD GlobalTheory.T.coefficient_data_exists nbFacts charFacts hermCocompact splitTauP nbTauP chiPer
+  gLsing_core hFZ hTS hD GlobalTheory.T.coefficient_data_exists nbFacts charFacts hermCocompact
+    splitTauP nbTauP chiPer
 
 theorem gLsing (hTS : TwoSided) (hD : DenseTau) : GLsing := gLsing_of fourierZeroN hTS hD
 

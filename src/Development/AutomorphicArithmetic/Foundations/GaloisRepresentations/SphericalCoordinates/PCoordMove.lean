@@ -4,26 +4,32 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-private theorem rd_add' {p : ℕ} [Fact (Nat.Prime p)] {D : UPel.HT.Datum p} {G : HTGroup p}
-    (L : Link D G) (x : (AfP p ⊗[ℚ] G.C)ˣ) (h : G.GAf) (a b : VQ D) :
-    rd L x h (a + b) = rd L x h a + rd L x h b := by
+private theorem rd_add'
+    {p : ℕ} [Fact (Nat.Prime p)]
+    {D : UPel.HT.Datum p} {G : HTGroup p}
+    (L : Link D G) (x : (AfP p ⊗[ℚ] G.C)ˣ) (h : G.GAf) (a b : VQ D)
+    : rd L x h (a + b) = rd L x h a + rd L x h b := by
   simp only [rd, TensorProduct.tmul_add, map_add (f := _)]
 
-private theorem rd_nsmul' {p : ℕ} [Fact (Nat.Prime p)] {D : UPel.HT.Datum p} {G : HTGroup p}
-    (L : Link D G) (x : (AfP p ⊗[ℚ] G.C)ˣ) (h : G.GAf) (N : ℕ) (a : VQ D) :
-    rd L x h (N • a) = N • rd L x h a := by
+private theorem rd_nsmul'
+    {p : ℕ} [Fact (Nat.Prime p)]
+    {D : UPel.HT.Datum p} {G : HTGroup p} (L : Link D G) (x : (AfP p ⊗[ℚ] G.C)ˣ) (h : G.GAf)
+    (N : ℕ) (a : VQ D)
+    : rd L x h (N • a) = N • rd L x h a := by
   induction N with
   | zero => simp only [zero_smul, rd, TensorProduct.tmul_zero, map_zero]
   | succ n ih => rw [succ_nsmul, rd_add', ih, succ_nsmul]
 
-theorem UpperTheory.Gal.W2.coordMove_of :
-    UpperTheory.Gal.W2.CoordMove := by
+theorem UpperTheory.Gal.W2.coordMove_of : UpperTheory.Gal.W2.CoordMove := by
   intro p _ D G L v t₀ ρ B PD RD N D' t P D'' t'' P'' w hw hP j j'' hj a ha
   obtain ⟨hiso, hmark⟩ := hw
   obtain ⟨⟨hinj, hact, hsurj, s, hs, hform⟩, ⟨hA1, hA2⟩, hloc, Q, hQ, hQj, hrel⟩ := ha

@@ -10,28 +10,28 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem latRank_one_eq_ideal_smul {K : Type} [Field K] [NumberField K] {m : ℕ}
-    (ell : Submodule (𝓞 K) (Fin m → K)) :
-    ReciprocityTheory.GeometryOfNumbersTheory.latRank K ell = 1 → ell.FG →
-    ∃ v : Fin m → K, v ≠ 0 ∧ ∃ 𝔟 : Submodule (𝓞 K) K, 𝔟.FG ∧ 𝔟 ≠ ⊥ ∧
-      ∀ e, e ∈ ell ↔ ∃ β ∈ 𝔟, e = β • v := by
+theorem latRank_one_eq_ideal_smul
+    {K : Type} [Field K] [NumberField K] {m : ℕ} (ell : Submodule (𝓞 K) (Fin m → K))
+    : ReciprocityTheory.GeometryOfNumbersTheory.latRank K ell = 1 → ell.FG
+      → ∃ v : Fin m → K,
+        v ≠ 0 ∧ ∃ 𝔟 : Submodule (𝓞 K) K, 𝔟.FG ∧ 𝔟 ≠ ⊥ ∧ ∀ e, e ∈ ell ↔ ∃ β ∈ 𝔟, e = β • v := by
   intro hr hfg
   unfold ReciprocityTheory.GeometryOfNumbersTheory.latRank at hr
   obtain ⟨w, hw0, hw⟩ := (finrank_eq_one_iff').mp hr
-  have hvW : (w : Fin m → K) ≠ 0 := by
-    intro h; exact hw0 (Subtype.ext h)
+  have hvW : (w : Fin m → K) ≠ 0 := by intro h; exact hw0 (Subtype.ext h)
   have hmul : ∀ e ∈ ell, ∃ β : K, e = β • (w : Fin m → K) := by
     intro e he
     obtain ⟨c, hc⟩ := hw ⟨e, Submodule.subset_span he⟩
     refine ⟨c, ?_⟩
     have := congrArg Subtype.val hc
     exact this.symm
-  let f : K →ₗ[𝓞 K] (Fin m → K) :=
-    { toFun := fun β => β • (w : Fin m → K)
-      map_add' := fun a b => add_smul a b _
-      map_smul' := fun r b => by
-        simp only [RingHom.id_apply]
-        exact smul_assoc r b _ }
+  let f : K →ₗ[𝓞 K] (Fin m → K) := {
+    toFun := fun β => β • (w : Fin m → K)
+    map_add' := fun a b => add_smul a b _
+    map_smul' := fun r b => by
+      simp only [RingHom.id_apply]
+      exact smul_assoc r b _
+  }
   have hf : ∀ β, f β = β • (w : Fin m → K) := fun _ => rfl
   have finj : Function.Injective f := by
     intro a b hab
@@ -47,11 +47,13 @@ theorem latRank_one_eq_ideal_smul {K : Type} [Field K] [NumberField K] {m : ℕ}
       intro e he
       obtain ⟨β, rfl⟩ := hmul e he
       exact ⟨β, he, rfl⟩
-    rw [this]; exact hfg
+    rw [this]
+    exact hfg
   · intro hbot
     apply hw0
     have hell : ell = ⊥ := by
-      rw [eq_bot_iff]; intro e he
+      rw [eq_bot_iff]
+      intro e he
       obtain ⟨β, rfl⟩ := hmul e he
       have : β ∈ ell.comap f := he
       rw [hbot, Submodule.mem_bot] at this

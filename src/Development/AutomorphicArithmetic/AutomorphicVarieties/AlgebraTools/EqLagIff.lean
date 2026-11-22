@@ -10,15 +10,22 @@ open Polynomial
 
 namespace UpperTheory.V.AlgebraTools
 
-def lag {R E ι : Type*} [CommRing R] [Ring E] [Algebra R E] [Fintype ι] [DecidableEq ι]
-    (a : ι → R) (P : E) (i : ι) : E :=
-  Ring.inverse (∏ j ∈ Finset.univ.erase i, (a i - a j)) •
-    aeval P (∏ j ∈ Finset.univ.erase i, (X - C (a j)))
+def lag
+    {R E ι : Type*} [CommRing R] [Ring E] [Algebra R E] [Fintype ι] [DecidableEq ι]
+    (a : ι → R) (P : E) (i : ι)
+    : E :=
+  Ring.inverse (∏ j ∈ Finset.univ.erase i, (a i - a j))
+    • aeval P (∏ j ∈ Finset.univ.erase i, (X - C (a j)))
 
-theorem eq_lag_iff {R E ι : Type*} [CommRing R] [Ring E] [Algebra R E] [Fintype ι] [DecidableEq ι]
-    (a : ι → R) (P : E) (i : ι) (h : ∀ j, j ≠ i → IsUnit (a i - a j)) (f : E) :
-    f = lag a P i ↔ (∏ j ∈ Finset.univ.erase i, (a i - a j)) • f =
-      aeval P (∏ j ∈ Finset.univ.erase i, (X - C (a j))) := by
+theorem eq_lag_iff
+    {R E ι : Type*} [CommRing R] [Ring E] [Algebra R E] [Fintype ι] [DecidableEq ι]
+    (a : ι → R)
+    (P : E)
+    (i : ι) (h : ∀ j, j ≠ i → IsUnit (a i - a j))
+    (f : E)
+    : f = lag a P i
+      ↔ (∏ j ∈ Finset.univ.erase i, (a i - a j)) • f
+        = aeval P (∏ j ∈ Finset.univ.erase i, (X - C (a j))) := by
   have hu : IsUnit (∏ j ∈ Finset.univ.erase i, (a i - a j)) := by
     refine Finset.prod_induction _ IsUnit (fun x y hx hy => hx.mul hy) isUnit_one ?_
     intro j hj
@@ -34,7 +41,8 @@ def pat {ι : Type*} (R : Type*) [CommRing R] (p : ι → ι → Prop) : Submodu
   zero_mem' := fun _ _ _ => rfl
   smul_mem' := fun c X hX i j h => by simp [hX i j h]
 
-theorem mem_pat {ι R : Type*} [CommRing R] {p : ι → ι → Prop} {X : Matrix ι ι R} :
-    X ∈ pat R p ↔ ∀ i j, ¬ p i j → X i j = 0 := Iff.rfl
+theorem mem_pat {ι R : Type*} [CommRing R] {p : ι → ι → Prop} {X : Matrix ι ι R}
+    : X ∈ pat R p ↔ ∀ i j, ¬ p i j → X i j = 0 :=
+  Iff.rfl
 
 end UpperTheory.V.AlgebraTools

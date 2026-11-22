@@ -10,10 +10,10 @@ namespace GlobalTheory
 
 theorem exists_span_eq_top_of_card_hom_residueField_le
     (Λ : Type) [CommRing Λ] [IsLocalRing Λ] [Finite (IsLocalRing.ResidueField Λ)]
-    (A : Type) [AddCommGroup A] [Module Λ A] [Module.Finite Λ A] (a : ℕ)
-    (h : Nat.card (A →ₗ[Λ] IsLocalRing.ResidueField Λ) ≤
-      Nat.card (IsLocalRing.ResidueField Λ) ^ a) :
-    ∃ v : Fin a → A, Submodule.span Λ (Set.range v) = ⊤ := by
+    (A : Type) [AddCommGroup A] [Module Λ A] [Module.Finite Λ A]
+    (a : ℕ)
+    (h : Nat.card (A →ₗ[Λ] IsLocalRing.ResidueField Λ) ≤ Nat.card (IsLocalRing.ResidueField Λ) ^ a)
+    : ∃ v : Fin a → A, Submodule.span Λ (Set.range v) = ⊤ := by
   classical
   set k := IsLocalRing.ResidueField Λ
   let V := k ⊗[Λ] A
@@ -34,7 +34,8 @@ theorem exists_span_eq_top_of_card_hom_residueField_le
     apply TensorProduct.AlgebraTensorModule.ext
     intro x y
     have h' := LinearMap.congr_fun h y
-    simp only [Φ, LinearMap.comp_apply, LinearMap.restrictScalars_apply, TensorProduct.mk_apply] at h'
+    simp only [Φ, LinearMap.comp_apply, LinearMap.restrictScalars_apply, TensorProduct.mk_apply]
+      at h'
     have e : x ⊗ₜ[Λ] y = x • ((1 : k) ⊗ₜ[Λ] y) := by
       rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
     rw [e, map_smul, map_smul]

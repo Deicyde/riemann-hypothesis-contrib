@@ -4,23 +4,31 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.ResidueLocPlace
 
-theorem norm_le_one_of_finite {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
-    [Module.Finite ℤ_[p] O] (f : O →+* Qbar p)
-    (hf : ∀ z : ℤ_[p], f (algebraMap ℤ_[p] O z) = algebraMap ℚ_[p] (Qbar p) (z : ℚ_[p])) (y : O) :
-    ‖f y‖ ≤ 1 := by
+theorem norm_le_one_of_finite
+    {p : ℕ} [Fact p.Prime]
+    {O : Type} [CommRing O] [Algebra ℤ_[p] O] [Module.Finite ℤ_[p] O]
+    (f : O →+* Qbar p)
+    (hf : ∀ z : ℤ_[p], f (algebraMap ℤ_[p] O z) = algebraMap ℚ_[p] (Qbar p) (z : ℚ_[p]))
+    (y : O)
+    : ‖f y‖ ≤ 1 := by
   have hy : IsIntegral ℤ_[p] y := Algebra.IsIntegral.isIntegral y
   let v := NormedField.valuation (K := Qbar p)
-  have hmem : ∀ z : ℤ_[p], ((algebraMap ℚ_[p] (Qbar p)).comp PadicInt.Coe.ringHom) z ∈ v.integer := by
+  have hmem
+      : ∀ z : ℤ_[p], ((algebraMap ℚ_[p] (Qbar p)).comp PadicInt.Coe.ringHom) z ∈ v.integer := by
     intro z
     rw [Valuation.mem_integer_iff, NormedField.valuation_apply]
     have : ‖algebraMap ℚ_[p] (Qbar p) (z : ℚ_[p])‖ ≤ 1 := by
       rw [PadicAlgCl.norm_extends p]; exact PadicInt.norm_le_one z
     exact_mod_cast this
-  let φ : ℤ_[p] →+* v.integer := ((algebraMap ℚ_[p] (Qbar p)).comp PadicInt.Coe.ringHom).codRestrict v.integer hmem
+  let φ : ℤ_[p] →+* v.integer :=
+    ((algebraMap ℚ_[p] (Qbar p)).comp PadicInt.Coe.ringHom).codRestrict v.integer hmem
   have hI : IsIntegral v.integer (f y) := by
     refine IsIntegral.map_of_comp_eq φ f ?_ hy
     ext z
@@ -30,11 +38,14 @@ theorem norm_le_one_of_finite {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [
   rw [Valuation.mem_integer_iff, NormedField.valuation_apply] at h
   exact_mod_cast h
 
-theorem norm_lt_one_of_mem_maximalIdeal {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [Algebra ℤ_[p] O]
-    [Module.Finite ℤ_[p] O] (f : O →+* Qbar p)
-    (hf : ∀ z : ℤ_[p], f (algebraMap ℤ_[p] O z) = algebraMap ℚ_[p] (Qbar p) (z : ℚ_[p])) {y : O}
-    (hy : y ∈ IsLocalRing.maximalIdeal O) : ‖f y‖ < 1 := by
+theorem norm_lt_one_of_mem_maximalIdeal
+    {p : ℕ} [Fact p.Prime]
+    {O : Type}
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[p] O] [Module.Finite ℤ_[p] O]
+    (f : O →+* Qbar p)
+    (hf : ∀ z : ℤ_[p], f (algebraMap ℤ_[p] O z) = algebraMap ℚ_[p] (Qbar p) (z : ℚ_[p]))
+    {y : O} (hy : y ∈ IsLocalRing.maximalIdeal O)
+    : ‖f y‖ < 1 := by
   have hle : ∀ z : O, ‖f z‖ ≤ 1 := norm_le_one_of_finite f hf
   have hfp : ‖f (p : O)‖ = (p : ℝ)⁻¹ := by
     have h1 := hf (p : ℤ_[p])
@@ -43,9 +54,9 @@ theorem norm_lt_one_of_mem_maximalIdeal {p : ℕ} [Fact p.Prime] {O : Type} [Com
     simp [Padic.norm_p]
   have hp1 : (p : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : p.Prime).one_lt)
   have hp0 : (p : O) ≠ 0 := by
-    intro h; rw [h, map_zero, norm_zero] at hfp
-    have : (0 : ℝ) < (p : ℝ)⁻¹ := by
-      have := (Fact.out : p.Prime).pos; positivity
+    intro h
+    rw [h, map_zero, norm_zero] at hfp
+    have : (0 : ℝ) < (p : ℝ)⁻¹ := by have := (Fact.out : p.Prime).pos; positivity
     linarith
   have hpu : ¬ IsUnit (p : O) := by
     rintro ⟨u, hu⟩
@@ -60,8 +71,7 @@ theorem norm_lt_one_of_mem_maximalIdeal {p : ℕ} [Fact p.Prime] {O : Type} [Com
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨e, u, hpe⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hp0 hπ
   obtain ⟨k, w, hyk⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hy0 hπ
-  have he : e ≠ 0 := by
-    rintro rfl; apply hpu; rw [hpe, pow_zero, mul_one]; exact u.isUnit
+  have he : e ≠ 0 := by rintro rfl; apply hpu; rw [hpe, pow_zero, mul_one]; exact u.isUnit
   have hk : k ≠ 0 := by
     rintro rfl
     rw [hyk, pow_zero, mul_one] at hy
@@ -74,16 +84,16 @@ theorem norm_lt_one_of_mem_maximalIdeal {p : ℕ} [Fact p.Prime] {O : Type} [Com
     have h6 := hle (u : O)
     have h5 : 0 ≤ ‖f (u : O)‖ := norm_nonneg _
     nlinarith [mul_le_mul_of_nonneg_left h4 h5]
-  have key : y ^ e * (u : O) ^ k = (p : O) ^ k * (w : O) ^ e := by
-    rw [hpe, hyk]; ring
+  have key : y ^ e * (u : O) ^ k = (p : O) ^ k * (w : O) ^ e := by rw [hpe, hyk]; ring
   have hn := congrArg (fun z => ‖f z‖) key
   simp only [map_mul, map_pow, norm_mul, norm_pow, hu1, one_pow, mul_one, hfp] at hn
   have hw := hle (w : O)
   have hA : ‖f y‖ ^ e ≤ ((p : ℝ)⁻¹) ^ k := by
     rw [hn]
-    calc ((p : ℝ)⁻¹) ^ k * ‖f (w : O)‖ ^ e ≤ ((p : ℝ)⁻¹) ^ k * 1 := by
-          gcongr
-          exact pow_le_one₀ (norm_nonneg _) hw
+    calc
+      ((p : ℝ)⁻¹) ^ k * ‖f (w : O)‖ ^ e ≤ ((p : ℝ)⁻¹) ^ k * 1 := by
+        gcongr
+        exact pow_le_one₀ (norm_nonneg _) hw
       _ = _ := mul_one _
   have hB : ((p : ℝ)⁻¹) ^ k < 1 := pow_lt_one₀ (by positivity) hp1 hk
   exact (pow_lt_one_iff_of_nonneg (norm_nonneg _) he).1 (lt_of_le_of_lt hA hB)
@@ -92,14 +102,18 @@ end GlobalTheory.ResidueLocPlace
 
 namespace GlobalTheory.ResidueLocPlace
 
-theorem exists_residue_lift {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (h : p = q) (hp : p.Prime)
-    (hq : q.Prime) (ι : Qbar p ≃+* ℂ) (B : ValuationSubring ℂ) (hB : ∀ z, z ∈ B ↔ ‖ι.symm z‖ ≤ 1)
+theorem exists_residue_lift
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (h : p = q) (hp : p.Prime) (hq : q.Prime)
+    (ι : Qbar p ≃+* ℂ) (B : ValuationSubring ℂ) (hB : ∀ z, z ∈ B ↔ ‖ι.symm z‖ ≤ 1)
     (κB : IsLocalRing.ResidueField B ≃+* Formalism.CyclotomicNorms.Fbar p)
-    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[q] O]
-    [Module.Finite ℤ_[q] O] (iq : FractionRing O →+* Qbar q)
-    (iq_alg : ∀ z : ℤ_[q], iq (algebraMap O (FractionRing O) (algebraMap ℤ_[q] O z)) =
-      algebraMap ℚ_[q] (Qbar q) (z : ℚ_[q])) :
-    ∃ κ : IsLocalRing.ResidueField O →+* Formalism.CyclotomicNorms.Fbar q, ∀ y : O,
+    {O : Type}
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[q] O] [Module.Finite ℤ_[q] O]
+    (iq : FractionRing O →+* Qbar q)
+    (iq_alg : ∀ z : ℤ_[q],
+      iq (algebraMap O (FractionRing O) (algebraMap ℤ_[q] O z))
+        = algebraMap ℚ_[q] (Qbar q) (z : ℚ_[q]))
+    : ∃ κ : IsLocalRing.ResidueField O →+* Formalism.CyclotomicNorms.Fbar q, ∀ y : O,
       ∃ hy : (((qCast h ι).toRingHom.comp iq).comp (algebraMap O (FractionRing O))) y ∈ B,
         fbCast h hp hq (κB (IsLocalRing.residue B ⟨_, hy⟩)) = κ (IsLocalRing.residue O y) := by
   subst h
@@ -108,7 +122,8 @@ theorem exists_residue_lift {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (h : p = q
   have hmem : ∀ y, ι (f y) ∈ B := fun y =>
     (hB _).2 (by rw [RingEquiv.symm_apply_apply]; exact norm_le_one_of_finite f hf y)
   let g : O →+* B := (ι.toRingHom.comp f).codRestrict B.toSubring hmem
-  let F : O →+* Formalism.CyclotomicNorms.Fbar p := κB.toRingHom.comp ((IsLocalRing.residue B).comp g)
+  let F : O →+* Formalism.CyclotomicNorms.Fbar p :=
+    κB.toRingHom.comp ((IsLocalRing.residue B).comp g)
   have hF : ∀ a ∈ IsLocalRing.maximalIdeal O, F a = 0 := by
     intro a ha
     have hlt := norm_lt_one_of_mem_maximalIdeal f hf ha

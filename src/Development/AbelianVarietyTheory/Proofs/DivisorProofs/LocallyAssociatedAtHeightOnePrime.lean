@@ -9,36 +9,45 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_notMem_dvd_mul_of_algebraMap_dvd {B : Type} [CommRing B] (Q : Ideal B) [Q.IsPrime]
+theorem exists_notMem_dvd_mul_of_algebraMap_dvd
+    {B : Type} [CommRing B]
+    (Q : Ideal B) [Q.IsPrime]
     {a b : B}
-    (h : algebraMap B (Localization.AtPrime Q) a ∣ algebraMap B (Localization.AtPrime Q) b) :
-    ∃ t ∉ Q, a ∣ t * b := by
+    (h : algebraMap B (Localization.AtPrime Q) a ∣ algebraMap B (Localization.AtPrime Q) b)
+    : ∃ t ∉ Q, a ∣ t * b := by
   obtain ⟨y, hy⟩ := h
   obtain ⟨⟨z, s⟩, hs⟩ := IsLocalization.surj Q.primeCompl y
-  have e : algebraMap B (Localization.AtPrime Q) (b * s) =
-      algebraMap B (Localization.AtPrime Q) (a * z) := by
+  have e
+      : algebraMap B (Localization.AtPrime Q) (b * s)
+        = algebraMap B (Localization.AtPrime Q) (a * z) := by
     rw [map_mul, map_mul, hy, mul_assoc, hs]
   obtain ⟨c, hc⟩ := (IsLocalization.eq_iff_exists Q.primeCompl _).mp e
   refine ⟨c * s, Q.primeCompl.mul_mem c.2 s.2, c * z, ?_⟩
   linear_combination hc
 
-theorem exists_locally_associated_algebraMap_of_height_eq_one (A' B' : Type) [CommRing A']
-    [CommRing B'] [IsDomain B'] [IsNoetherianRing B'] [IsIntegrallyClosed B'] [Algebra A' B']
-    (𝔭 : Ideal A') (hQ : (𝔭.map (algebraMap A' B')).IsPrime)
-    (h1 : (𝔭.map (algebraMap A' B')).height = 1) (c : B') (hc : c ≠ 0) :
-    ∃ j : A', (∃ t ∉ 𝔭.map (algebraMap A' B'), c ∣ t * algebraMap A' B' j) ∧
-      (∃ t ∉ 𝔭.map (algebraMap A' B'), algebraMap A' B' j ∣ t * c) := by
+theorem exists_locally_associated_algebraMap_of_height_eq_one
+    (A' B' : Type) [CommRing A'] [CommRing B'] [IsDomain B'] [IsNoetherianRing B']
+    [IsIntegrallyClosed B'] [Algebra A' B']
+    (𝔭 : Ideal A')
+    (hQ : (𝔭.map (algebraMap A' B')).IsPrime) (h1 : (𝔭.map (algebraMap A' B')).height = 1)
+    (c : B') (hc : c ≠ 0)
+    : ∃ j : A',
+      (∃ t ∉ 𝔭.map (algebraMap A' B'), c ∣ t * algebraMap A' B' j)
+        ∧ (∃ t ∉ 𝔭.map (algebraMap A' B'), algebraMap A' B' j ∣ t * c) := by
   have hdvr : IsDiscreteValuationRing (Localization.AtPrime (𝔭.map (algebraMap A' B'))) :=
     isDiscreteValuationRing_of_height_eq_one _ h1 _
-  obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible
-    (Localization.AtPrime (𝔭.map (algebraMap A' B')))
+  obtain ⟨ϖ, hϖ⟩ :=
+    IsDiscreteValuationRing.exists_irreducible (Localization.AtPrime (𝔭.map (algebraMap A' B')))
   have hm : maximalIdeal (Localization.AtPrime (𝔭.map (algebraMap A' B'))) = Ideal.span {ϖ} :=
     hϖ.maximalIdeal_eq
-  obtain ⟨p, hp𝔭, hp⟩ : ∃ p ∈ 𝔭, ¬ ϖ ^ 2 ∣
-      algebraMap B' (Localization.AtPrime (𝔭.map (algebraMap A' B'))) (algebraMap A' B' p) := by
+  obtain ⟨p, hp𝔭, hp⟩
+      : ∃ p ∈ 𝔭,
+        ¬ ϖ ^ 2
+          ∣ algebraMap B' (Localization.AtPrime (𝔭.map (algebraMap A' B')))
+            (algebraMap A' B' p) := by
     by_contra! H
-    have hle : maximalIdeal (Localization.AtPrime (𝔭.map (algebraMap A' B'))) ≤
-        Ideal.span {ϖ ^ 2} := by
+    have hle
+        : maximalIdeal (Localization.AtPrime (𝔭.map (algebraMap A' B'))) ≤ Ideal.span {ϖ ^ 2} := by
       rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_map, Ideal.map_le_iff_le_comap]
       intro q hq
       rw [Ideal.mem_comap, Ideal.mem_span_singleton]
@@ -51,12 +60,14 @@ theorem exists_locally_associated_algebraMap_of_height_eq_one (A' B' : Type) [Co
     apply mul_left_cancel₀ hϖ.ne_zero
     rw [mul_one]
     linear_combination -hr
-  have hxm : algebraMap B' (Localization.AtPrime (𝔭.map (algebraMap A' B')))
-      (algebraMap A' B' p) ∈ maximalIdeal (Localization.AtPrime (𝔭.map (algebraMap A' B'))) := by
+  have hxm
+      : algebraMap B' (Localization.AtPrime (𝔭.map (algebraMap A' B'))) (algebraMap A' B' p)
+        ∈ maximalIdeal (Localization.AtPrime (𝔭.map (algebraMap A' B'))) := by
     rw [← Localization.AtPrime.map_eq_maximalIdeal]
     exact Ideal.mem_map_of_mem _ (Ideal.mem_map_of_mem _ hp𝔭)
-  have hx0 : algebraMap B' (Localization.AtPrime (𝔭.map (algebraMap A' B')))
-      (algebraMap A' B' p) ≠ 0 := fun h => hp (h ▸ dvd_zero _)
+  have hx0
+      : algebraMap B' (Localization.AtPrime (𝔭.map (algebraMap A' B'))) (algebraMap A' B' p) ≠ 0 :=
+    fun h => hp (h ▸ dvd_zero _)
   obtain ⟨n, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hx0 hϖ
   have hn : n = 1 := by
     rcases n with _ | _ | n
@@ -82,7 +93,10 @@ theorem exists_locally_associated_algebraMap_of_height_eq_one (A' B' : Type) [Co
     rw [map_pow, map_pow, hu, hv, pow_one, mul_pow]
     exact (associated_unit_mul_left _ _ v.isUnit).trans
       (associated_unit_mul_left _ _ (u.isUnit.pow m)).symm
-  exact ⟨p ^ m, exists_notMem_dvd_mul_of_algebraMap_dvd _ hass.dvd,
-    exists_notMem_dvd_mul_of_algebraMap_dvd _ hass.symm.dvd⟩
+  exact ⟨
+    p ^ m,
+    exists_notMem_dvd_mul_of_algebraMap_dvd _ hass.dvd,
+    exists_notMem_dvd_mul_of_algebraMap_dvd _ hass.symm.dvd
+  ⟩
 
 end GlobalTheory

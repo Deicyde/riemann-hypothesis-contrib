@@ -7,8 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -42,7 +44,6 @@ variable (L : D S G)
 
 variable {L}
 
-
 variable {χ : (∀ v, Fin 3 → G v) → ℂ}
 
 section X
@@ -63,34 +64,40 @@ end Ord
 
 end UpperTheory.V.Z.Sym.So.CS
 
-private theorem dom_of_valuation_monotone_fin_three {k : Type} [Field k] [ValuativeRel k] {x : Fin 3 → kˣ}
-    (h01 : valuation k (x 0 : k) ≤ valuation k (x 1 : k))
-    (h12 : valuation k (x 1 : k) ≤ valuation k (x 2 : k)) : Dom x := by
+private theorem dom_of_valuation_monotone_fin_three
+    {k : Type} [Field k] [ValuativeRel k]
+    {x : Fin 3 → kˣ} (h01 : valuation k (x 0 : k) ≤ valuation k (x 1 : k))
+    (h12 : valuation k (x 1 : k) ≤ valuation k (x 2 : k))
+    : Dom x := by
   unfold Dom
   intro i j hij
   fin_cases i <;> fin_cases j
-  all_goals first
+  all_goals
+    first
     | exact le_rfl
     | exact h01
     | exact h12
     | exact h01.trans h12
     | exact absurd hij (by decide)
 
-private theorem dom_mul' {k : Type} [Field k] [ValuativeRel k] {n : ℕ} {x y : Fin n → kˣ}
-    (hx : Dom x) (hy : Dom y) : Dom (x * y) := by
+private theorem dom_mul'
+    {k : Type} [Field k] [ValuativeRel k] {n : ℕ} {x y : Fin n → kˣ} (hx : Dom x) (hy : Dom y)
+    : Dom (x * y) := by
   unfold Dom at *
   intro i j hij
   simp only [Pi.mul_apply, Units.val_mul, map_mul]
   exact mul_le_mul' (hx i j hij) (hy i j hij)
 
-private theorem valuation_monotone_of_dom_fin_three {k : Type} [Field k] [ValuativeRel k] {x : Fin 3 → kˣ} (hx : Dom x) :
-    valuation k (x 0 : k) ≤ valuation k (x 1 : k) ∧ valuation k (x 1 : k) ≤ valuation k (x 2 : k) := by
+private theorem valuation_monotone_of_dom_fin_three
+    {k : Type} [Field k] [ValuativeRel k] {x : Fin 3 → kˣ} (hx : Dom x)
+    : valuation k (x 0 : k) ≤ valuation k (x 1 : k)
+      ∧ valuation k (x 1 : k) ≤ valuation k (x 2 : k) := by
   unfold Dom at hx
   exact ⟨hx 0 1 (by decide), hx 1 2 (by decide)⟩
 
-private theorem valuation_unif_eq_uniformizer' (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] :
-    valuation k (unif k : k) = ValuativeRel.uniformizer k := by
+private theorem valuation_unif_eq_uniformizer'
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : valuation k (unif k : k) = ValuativeRel.uniformizer k := by
   unfold unif
   apply Classical.epsilon_spec (p := fun x : kˣ => valuation k (x : k) = ValuativeRel.uniformizer k)
   obtain ⟨y, hy⟩ := ValuativeRel.valuation_surjective (ValuativeRel.uniformizer k)
@@ -100,16 +107,16 @@ private theorem valuation_unif_eq_uniformizer' (k : Type) [Field k] [ValuativeRe
     exact ValuativeRel.uniformizer_ne_zero hy.symm
   exact ⟨Units.mk0 y hy0, by simpa using hy⟩
 
-private theorem valuation_unif_pos_and_lt_one (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] :
-    0 < valuation k (unif k : k) ∧ valuation k (unif k : k) < 1 := by
+private theorem valuation_unif_pos_and_lt_one
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : 0 < valuation k (unif k : k) ∧ valuation k (unif k : k) < 1 := by
   rw [valuation_unif_eq_uniformizer']
   exact ⟨ValuativeRel.uniformizer_pos, ValuativeRel.uniformizer_lt_one⟩
 
-private theorem valuation_mul_unif_pow_inv_le_one_of_lt_sq (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {t : kˣ}
-    (h : valuation k (t : k) < valuation k (unif k : k) ^ 2) :
-    valuation k ((t * (unif k ^ 3)⁻¹ : kˣ) : k) ≤ 1 := by
+private theorem valuation_mul_unif_pow_inv_le_one_of_lt_sq
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {t : kˣ} (h : valuation k (t : k) < valuation k (unif k : k) ^ 2)
+    : valuation k ((t * (unif k ^ 3)⁻¹ : kˣ) : k) ≤ 1 := by
   simp only [Units.val_mul, Units.val_inv_eq_inv_val, Units.val_pow_eq_pow_val, map_mul, map_inv₀,
     map_pow]
   rw [valuation_unif_eq_uniformizer'] at h ⊢
@@ -121,28 +128,31 @@ private theorem valuation_mul_unif_pow_inv_le_one_of_lt_sq (k : Type) [Field k] 
   rw [← div_eq_mul_inv, div_le_one₀ (pow_pos hπ0 3), pow_succ']
   exact h3
 
-private theorem valuation_div_le_valuation_div_of_le {k : Type} [Field k] [ValuativeRel k] {a b c : kˣ}
-    (h : valuation k (a : k) ≤ valuation k (b : k)) :
-    valuation k ((a / c : kˣ) : k) ≤ valuation k ((b / c : kˣ) : k) := by
+private theorem valuation_div_le_valuation_div_of_le
+    {k : Type} [Field k] [ValuativeRel k]
+    {a b c : kˣ} (h : valuation k (a : k) ≤ valuation k (b : k))
+    : valuation k ((a / c : kˣ) : k) ≤ valuation k ((b / c : kˣ) : k) := by
   rw [div_eq_mul_inv, div_eq_mul_inv, Units.val_mul, Units.val_mul, map_mul, map_mul]
   exact mul_le_mul' h le_rfl
 
-private theorem valuation_div_le_one_of_le {k : Type} [Field k] [ValuativeRel k] {a b : kˣ}
-    (h : valuation k (a : k) ≤ valuation k (b : k)) :
-    valuation k ((a / b : kˣ) : k) ≤ 1 := by
+private theorem valuation_div_le_one_of_le
+    {k : Type} [Field k] [ValuativeRel k] {a b : kˣ} (h : valuation k (a : k) ≤ valuation k (b : k))
+    : valuation k ((a / b : kˣ) : k) ≤ 1 := by
   have h1 := valuation_div_le_valuation_div_of_le (c := b) h
   rw [div_self', Units.val_one, map_one] at h1
   exact h1
 
-private theorem one_le_valuation_inv_of_le_one {k : Type} [Field k] [ValuativeRel k] {a : kˣ}
-    (h : valuation k (a : k) ≤ 1) : 1 ≤ valuation k ((a⁻¹ : kˣ) : k) := by
-  have h1 := valuation_div_le_valuation_div_of_le (a := a) (b := 1) (c := a) (by rw [Units.val_one, map_one]; exact h)
+private theorem one_le_valuation_inv_of_le_one
+    {k : Type} [Field k] [ValuativeRel k] {a : kˣ} (h : valuation k (a : k) ≤ 1)
+    : 1 ≤ valuation k ((a⁻¹ : kˣ) : k) := by
+  have h1 :=
+    valuation_div_le_valuation_div_of_le (a := a) (b := 1) (c := a)
+      (by rw [Units.val_one, map_one]; exact h)
   rw [div_self', one_div, Units.val_one, map_one] at h1
   exact h1
 
 open UpperTheory.V.Z.Sym.So.CS in
-theorem UpperTheory.V.Z.Sym.So.charShape :
-    UpperTheory.V.Z.Sym.So.CharShape := by
+theorem UpperTheory.V.Z.Sym.So.charShape : UpperTheory.V.Z.Sym.So.CharShape := by
   classical
   intro F _ _ Δ A hA χ hmul hlev hsg
   obtain ⟨e1, he1⟩ : ∃ e1 : Dat.Par F → ParN F 3, ∀ t v, e1 t v = ![t v, 1, 1] :=
@@ -151,17 +161,20 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
     ⟨fun z v => ![z v, z v, z v], fun _ _ => rfl⟩
   obtain ⟨pp, hpp⟩ : ∃ pp : Dat.Par F, ∀ v, pp v = unif (Kv v) :=
     ⟨fun v => unif (Kv v), fun _ => rfl⟩
-  obtain ⟨hat, hhat⟩ : ∃ hat : ((v : A.Sg) → (Kv v.1)ˣ) → Dat.Par F,
-      ∀ y v, hat y v = if h : v ∈ A.Sg then y ⟨v, h⟩ else (1 : (Kv v)ˣ) :=
+  obtain ⟨hat, hhat⟩
+      : ∃ hat : ((v : A.Sg) → (Kv v.1)ˣ) → Dat.Par F, ∀ y v,
+        hat y v = if h : v ∈ A.Sg then y ⟨v, h⟩ else (1 : (Kv v)ˣ) :=
     ⟨fun y v => if h : v ∈ A.Sg then y ⟨v, h⟩ else (1 : (Kv v)ˣ), fun _ _ => rfl⟩
-  obtain ⟨M, hM⟩ : ∃ M : ((v : A.Sg) → (Kv v.1)ˣ) → ParN F 3,
-      ∀ y v, M y v = ![pp v, hat y v, (pp v)⁻¹] :=
+  obtain ⟨M, hM⟩
+      : ∃ M : ((v : A.Sg) → (Kv v.1)ˣ) → ParN F 3, ∀ y v, M y v = ![pp v, hat y v, (pp v)⁻¹] :=
     ⟨fun y v => ![pp v, hat y v, (pp v)⁻¹], fun _ _ => rfl⟩
-  have hdm : ∀ {d d' : ParN F 3}, A.DomS d → A.DomS d' → A.DomS (d * d') :=
-    fun hd hd' v hv => dom_mul' (hd v hv) (hd' v hv)
+  have hdm : ∀ {d d' : ParN F 3}, A.DomS d → A.DomS d' → A.DomS (d * d') := fun hd hd' v hv =>
+    dom_mul' (hd v hv) (hd' v hv)
   have hχ1 : χ 1 = 1 := hlev 1 (fun v _ i => by simp [Subgroup.one_mem])
-  have hπ : ∀ v, 0 < valuation (Kv v) ((pp v : (Kv v)ˣ) : Kv v) ∧
-      valuation (Kv v) ((pp v : (Kv v)ˣ) : Kv v) < 1 := fun v => by
+  have hπ
+      : ∀ v,
+        0 < valuation (Kv v) ((pp v : (Kv v)ˣ) : Kv v)
+          ∧ valuation (Kv v) ((pp v : (Kv v)ˣ) : Kv v) < 1 := fun v => by
     rw [hpp]
     exact valuation_unif_pos_and_lt_one _
   have e1mul : ∀ t t', e1 (t * t') = e1 t * e1 t' := by
@@ -172,8 +185,9 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
     intro z z'
     funext v i
     fin_cases i <;> simp [hsc]
-  have de1 : ∀ t : Dat.Par F, (∀ v ∈ A.Sg, valuation (Kv v) ((t v : (Kv v)ˣ) : Kv v) ≤ 1) →
-      A.DomS (e1 t) := by
+  have de1
+      : ∀ t : Dat.Par F,
+        (∀ v ∈ A.Sg, valuation (Kv v) ((t v : (Kv v)ˣ) : Kv v) ≤ 1) → A.DomS (e1 t) := by
     intro t ht v hv
     rw [he1]
     apply dom_of_valuation_monotone_fin_three <;> simp [ht v hv]
@@ -194,7 +208,9 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
       rw [mul_inv_cancel]
       funext v i
       fin_cases i <;> simp [hsc]
-    calc χ (sc z) * χ (sc z) = χ (sc z) * χ (SD.sg (sc z)) := by rw [hsg _ (dsc z)]
+    calc
+      χ (sc z) * χ (sc z)
+        = χ (sc z) * χ (SD.sg (sc z)) := by rw [hsg _ (dsc z)]
       _ = 1 := by rw [hs, ← σmul, h1, hχ1]
   have cone_le : ∀ t, A.Cone t → ∀ v ∈ A.Sg, valuation (Kv v) ((t v : (Kv v)ˣ) : Kv v) ≤ 1 := by
     intro t ht v hv
@@ -257,8 +273,10 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
       rintro h
       apply hb
       simp [h]
-    obtain ⟨Aa, hAa⟩ : ∃ Aa : Dat.Par F → ℂ, ∀ u, Aa u =
-        ∏ v ∈ A.Sg, ((a v (u v) : ℂ) * (absPow (Kv v) (-1) (u v) : ℂ)) := ⟨_, fun _ => rfl⟩
+    obtain ⟨Aa, hAa⟩
+        : ∃ Aa : Dat.Par F → ℂ, ∀ u,
+          Aa u = ∏ v ∈ A.Sg, ((a v (u v) : ℂ) * (absPow (Kv v) (-1) (u v) : ℂ)) :=
+      ⟨_, fun _ => rfl⟩
     have hAmul : ∀ u u', Aa (u * u') = Aa u * Aa u' := by
       intro u u'
       simp only [hAa, ← Finset.prod_mul_distrib]
@@ -280,8 +298,9 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
       rw [hAa]
       unfold SD.exG
       exact Finset.prod_congr rfl (fun v _ => (expoEq (Kv v) (a v)).1 (d v))
-    have step1 : ∀ t : Dat.Par F, (∀ v ∈ A.Sg, valuation (Kv v) ((t v : (Kv v)ˣ) : Kv v) ≤ 1) →
-        χ (e1 t) = Aa t := by
+    have step1
+        : ∀ t : Dat.Par F,
+          (∀ v ∈ A.Sg, valuation (Kv v) ((t v : (Kv v)ˣ) : Kv v) ≤ 1) → χ (e1 t) = Aa t := by
       intro t ht
       have hq : A.Cone (pp ^ 3) := by
         intro v hv
@@ -293,22 +312,25 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
         intro v hv
         have h := hq v hv
         simp only [Pi.mul_apply, Units.val_mul, map_mul]
-        calc _ ≤ 1 * valuation (Kv v) (((pp ^ 3) v : (Kv v)ˣ) : Kv v) := mul_le_mul' (ht v hv) le_rfl
+        calc
+          _ ≤ 1 * valuation (Kv v) (((pp ^ 3) v : (Kv v)ˣ) : Kv v) := mul_le_mul' (ht v hv) le_rfl
           _ < _ := by rw [one_mul]; exact h
       have h1 : χ (e1 (t * pp ^ 3)) = A.exS a (t * pp ^ 3) := ha _ htq
       have h2 : χ (e1 (pp ^ 3)) = A.exS a (pp ^ 3) := ha _ hq
       rw [hexS] at h1 h2
       rw [e1mul, hmul _ _ (de1 t ht) (de1 _ (cone_le _ hq)), h2, hAmul] at h1
       exact mul_right_cancel₀ (hAne _) h1
-    have step3 : ∀ d : ParN F 3, A.DomS d →
-        χ d = Aa (fun v => d v 0 / d v 2) * χ (sc (fun v => d v 1)) := by
+    have step3
+        : ∀ d : ParN F 3,
+          A.DomS d → χ d = Aa (fun v => d v 0 / d v 2) * χ (sc (fun v => d v 1)) := by
       intro d hd
       obtain ⟨x, hx⟩ : ∃ x : Dat.Par F, x = fun v => d v 0 / d v 2 := ⟨_, rfl⟩
       obtain ⟨w, hw⟩ : ∃ w : Dat.Par F, w = fun v => d v 1 / d v 2 := ⟨_, rfl⟩
       rw [← hx]
-      have hvx : ∀ v ∈ A.Sg, valuation (Kv v) ((x v : (Kv v)ˣ) : Kv v) ≤
-          valuation (Kv v) ((w v : (Kv v)ˣ) : Kv v) ∧
-          valuation (Kv v) ((w v : (Kv v)ˣ) : Kv v) ≤ 1 := by
+      have hvx
+          : ∀ v ∈ A.Sg,
+            valuation (Kv v) ((x v : (Kv v)ˣ) : Kv v) ≤ valuation (Kv v) ((w v : (Kv v)ˣ) : Kv v)
+              ∧ valuation (Kv v) ((w v : (Kv v)ˣ) : Kv v) ≤ 1 := by
         intro v hv
         obtain ⟨h01, h12⟩ := valuation_monotone_of_dom_fin_three (hd v hv)
         subst hx hw
@@ -352,7 +374,9 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
       have eq6 : w * (fun v => d v 2) = fun v => d v 1 := by
         funext v
         simp [hw]
-      calc χ d = χ (X * sc (fun v => d v 2)) := congrArg χ eq1
+      calc
+        χ d
+          = χ (X * sc (fun v => d v 2)) := congrArg χ eq1
         _ = χ X * χ (sc (fun v => d v 2)) := hmul _ _ dX (dsc _)
         _ = Aa (x / w) * (χ (sc w) * Aa w) * χ (sc (fun v => d v 2)) := by
           rw [eq2, hmul _ _ (de1 _ dxw) dT, step1 _ dxw, eq3, hmul _ _ (dsc _) dN, ← hsg _ dN, eq4,
@@ -380,30 +404,37 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
       by_contra hne
       have hneg : χ (sc z0) = -1 := (mul_self_eq_one_iff.mp (hχsc z0)).resolve_left hne
       apply hsum
-      have hsq : ∀ (w : A.Sg) (u : (Kv w.1)ˣ), ∃! y, y ∈ A.Ry w.1 ∧
-          ∃ s : (Kv w.1)ˣ, u / (y * s ^ 2) ∈ (A.V w.1).H := by
+      have hsq
+          : ∀ (w : A.Sg) (u : (Kv w.1)ˣ),
+            ∃! y, y ∈ A.Ry w.1 ∧
+              ∃ s : (Kv w.1)ˣ, u / (y * s ^ 2) ∈ (A.V w.1).H := by
         intro w u
         have h := hA.ry w.1 w.2
         unfold Lev.IsSqReps at h
         exact h.2 u
       choose rep hrepR sq hsqH using fun w u => (hsq w u).exists
-      have hinv : ∀ (w : A.Sg) (g y : (Kv w.1)ˣ), y ∈ A.Ry w.1 →
-          rep w (g⁻¹ * rep w (g * y)) = y := by
+      have hinv
+          : ∀ (w : A.Sg) (g y : (Kv w.1)ˣ), y ∈ A.Ry w.1 → rep w (g⁻¹ * rep w (g * y)) = y := by
         intro w g y hy
         symm
         refine (hsq w _).unique ⟨hy, (sq w (g * y))⁻¹, ?_⟩ ⟨hrepR w _, sq w _, hsqH w _⟩
         have h := (A.V w.1).H.inv_mem (hsqH w (g * y))
-        have e : g⁻¹ * rep w (g * y) / (y * (sq w (g * y))⁻¹ ^ 2) =
-            (g * y / (rep w (g * y) * sq w (g * y) ^ 2))⁻¹ := by
+        have e
+            : g⁻¹ * rep w (g * y) / (y * (sq w (g * y))⁻¹ ^ 2)
+              = (g * y / (rep w (g * y) * sq w (g * y) ^ 2))⁻¹ := by
           ext
           push_cast
           field_simp
         rw [e]
         exact h
-      obtain ⟨φ, hφ⟩ : ∃ φ : ((v : A.Sg) → (Kv v.1)ˣ) → ((v : A.Sg) → (Kv v.1)ˣ),
-          ∀ y w, φ y w = rep w (z0 w.1 * y w) := ⟨_, fun _ _ => rfl⟩
-      obtain ⟨ψ, hψ⟩ : ∃ ψ : ((v : A.Sg) → (Kv v.1)ˣ) → ((v : A.Sg) → (Kv v.1)ˣ),
-          ∀ y w, ψ y w = rep w ((z0 w.1)⁻¹ * y w) := ⟨_, fun _ _ => rfl⟩
+      obtain ⟨φ, hφ⟩
+          : ∃ φ : ((v : A.Sg) → (Kv v.1)ˣ) → ((v : A.Sg) → (Kv v.1)ˣ), ∀ y w,
+            φ y w = rep w (z0 w.1 * y w) :=
+        ⟨_, fun _ _ => rfl⟩
+      obtain ⟨ψ, hψ⟩
+          : ∃ ψ : ((v : A.Sg) → (Kv v.1)ˣ) → ((v : A.Sg) → (Kv v.1)ˣ), ∀ y w,
+            ψ y w = rep w ((z0 w.1)⁻¹ * y w) :=
+        ⟨_, fun _ _ => rfl⟩
       have memφ : ∀ y, φ y ∈ A.Ys := fun y =>
         Fintype.mem_piFinset.mpr (fun w => by rw [hφ]; exact hrepR w _)
       have memψ : ∀ y, ψ y ∈ A.Ys := fun y =>
@@ -420,16 +451,20 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
         funext w
         rw [hψ, hφ]
         exact hinv w (z0 w.1) (y w) (Fintype.mem_piFinset.mp hy w)
-      have hflip : ∀ y ∈ A.Ys, χ (sc (hat (φ y))) = -χ (sc (hat y)) := by
+      have hflip : ∀ y ∈ A.Ys, χ (sc (hat (φ y))) = - χ (sc (hat y)) := by
         intro y hy
-        obtain ⟨Sq, hSq⟩ : ∃ Sq : Dat.Par F, ∀ v, Sq v =
-            if h : v ∈ A.Sg then sq ⟨v, h⟩ (z0 v * y ⟨v, h⟩) else (1 : (Kv v)ˣ) := ⟨_, fun _ => rfl⟩
+        obtain ⟨Sq, hSq⟩
+            : ∃ Sq : Dat.Par F, ∀ v,
+              Sq v = if h : v ∈ A.Sg then sq ⟨v, h⟩ (z0 v * y ⟨v, h⟩) else (1 : (Kv v)ˣ) :=
+          ⟨_, fun _ => rfl⟩
         obtain ⟨L, hL⟩ : ∃ L : Dat.Par F, L = (hat (φ y) * Sq * Sq)⁻¹ * (z0 * hat y) := ⟨_, rfl⟩
         have hLv : ∀ v ∈ A.Sg, L v ∈ (A.V v).H := by
           intro v hv
           have h := hsqH ⟨v, hv⟩ (z0 v * y ⟨v, hv⟩)
-          have e : L v = z0 v * y ⟨v, hv⟩ / (rep ⟨v, hv⟩ (z0 v * y ⟨v, hv⟩) *
-              sq ⟨v, hv⟩ (z0 v * y ⟨v, hv⟩) ^ 2) := by
+          have e
+              : L v
+                = z0 v * y ⟨v, hv⟩
+                  / (rep ⟨v, hv⟩ (z0 v * y ⟨v, hv⟩) * sq ⟨v, hv⟩ (z0 v * y ⟨v, hv⟩) ^ 2) := by
             rw [hL]
             simp only [Pi.mul_apply, Pi.inv_apply, hhat, hSq, dif_pos hv, hφ]
             ext
@@ -442,16 +477,18 @@ theorem UpperTheory.V.Z.Sym.So.charShape :
           intro v hv i
           rw [hsc]
           fin_cases i <;> simpa using hLv v hv
-        have hdec : z0 * hat y = hat (φ y) * Sq * Sq * L := by
-          rw [hL, mul_inv_cancel_left]
+        have hdec : z0 * hat y = hat (φ y) * Sq * Sq * L := by rw [hL, mul_inv_cancel_left]
         have key : χ (sc z0) * χ (sc (hat y)) = χ (sc (hat (φ y))) := by
           rw [← σmul, hdec, σmul, σmul, σmul, hLlev, mul_one, mul_assoc, hχsc, mul_one]
         rw [hneg] at key
         linear_combination -key
       have hperm : ∑ y ∈ A.Ys, χ (sc (hat y)) = ∑ y ∈ A.Ys, χ (sc (hat (φ y))) :=
-        Finset.sum_nbij' ψ φ (fun y _ => memψ y) (fun y _ => memφ y) φψ ψφ
+        Finset.sum_nbij' ψ φ
+          (fun y _ => memψ y)
+          (fun y _ => memφ y)
+          φψ ψφ
           (fun y hy => by rw [φψ y hy])
-      have h1 : ∑ y ∈ A.Ys, χ (sc (hat y)) = -∑ y ∈ A.Ys, χ (sc (hat y)) := by
+      have h1 : ∑ y ∈ A.Ys, χ (sc (hat y)) = - ∑ y ∈ A.Ys, χ (sc (hat y)) := by
         conv_lhs => rw [hperm]
         rw [← Finset.sum_neg_distrib]
         exact Finset.sum_congr rfl hflip

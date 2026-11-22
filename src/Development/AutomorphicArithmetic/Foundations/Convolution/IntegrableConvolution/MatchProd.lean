@@ -10,7 +10,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Integrab
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global GroundTheory.Global.SemiLocal
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global
+  GroundTheory.Global.SemiLocal
 open PositivityTheory.Rg.Tf.Geo
 
 private lemma haar_unique {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
@@ -32,8 +33,8 @@ private lemma cmp_eq {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   ext a b
   simp [UpperTheory.ConvolutionTheory.GM.cmp, UpperTheory.ConvolutionTheory.L1.Split.comp, hD]
 
-theorem UpperTheory.ConvolutionTheory.L1.matchProd :
-    UpperTheory.ConvolutionTheory.L1.MatchProd := by
+theorem UpperTheory.ConvolutionTheory.L1.matchProd
+    : UpperTheory.ConvolutionTheory.L1.MatchProd := by
   intro F E _ _ _ _ _ _ σ hσ m hm n v w₀ hs
   obtain ⟨D, w, hw0, hD⟩ := UpperTheory.ConvolutionTheory.L1.finSplit F E σ hσ m hm v w₀ hs
   refine ⟨w, hw0, ?_⟩
@@ -53,19 +54,26 @@ theorem UpperTheory.ConvolutionTheory.L1.matchProd :
     have : φ i = h (w i) ∘ e := funext fun g => by simp [hφ, he]
     rw [this]
     exact ⟨(hh _).1.comp e.continuous, (hh _).2.comp_homeomorph e.toHomeomorph⟩
-  obtain ⟨c, hc, hμ, hM, hT⟩ := UpperTheory.ConvolutionTheory.L1.matchFin F E σ m v D n mE mF hE hHaar
+  obtain ⟨c, hc, hμ, hM, hT⟩ :=
+    UpperTheory.ConvolutionTheory.L1.matchFin F E σ m v D n mE mF hE hHaar
   obtain ⟨hc1, hc2, hT'⟩ := hT φ hφc
-  obtain ⟨-, -, -, hgc, hcc, -⟩ := UpperTheory.ConvolutionTheory.L1.glueBasic _ _ (incFin E v) (galFin σ v) m D n
+  obtain ⟨-, -, -, hgc, hcc, -⟩ :=
+    UpperTheory.ConvolutionTheory.L1.glueBasic _ _ (incFin E v) (galFin σ v) m D n
   have hpf : UpperTheory.ConvolutionTheory.GM.prodFn h = D.tens n φ := by
     funext g
     simp only [UpperTheory.ConvolutionTheory.GM.prodFn, UpperTheory.ConvolutionTheory.L1.Split.tens]
     rw [← finprod_comp_equiv w, finprod_eq_prod_of_fintype]
     exact Finset.prod_congr rfl fun i _ => by rw [cmp_eq D w hD i g]
-  have hU : ∀ g, g ∈ unitSet E n v ↔ ∀ i, D.comp n i g ∈ GLnLocal.integralGL (v.adicCompletion F) n := by
+  have hU
+      : ∀ g,
+        g ∈ unitSet E n v ↔ ∀ i, D.comp n i g ∈ GLnLocal.integralGL (v.adicCompletion F) n := by
     intro g
     constructor
     · intro hg i
-      have h1 : UpperTheory.ConvolutionTheory.GM.cmp (w i) g ∈ GLnLocal.integralGL ((w i).1.adicCompletion E) n := hg (w i)
+      have h1
+          : UpperTheory.ConvolutionTheory.GM.cmp (w i) g
+            ∈ GLnLocal.integralGL ((w i).1.adicCompletion E) n :=
+        hg (w i)
       rw [cmp_eq D w hD i g] at h1
       exact ((hsl i).2.1 _).1 h1
     · intro hg u
@@ -74,20 +82,26 @@ theorem UpperTheory.ConvolutionTheory.L1.matchProd :
       rw [← cmp_eq D w hD i g] at h1
       exact h1
   have hcomp := (UpperTheory.ConvolutionTheory.L1.glueBasic _ _ (incFin E v) (galFin σ v) m D n).1
-  have hset : D.glue n ⁻¹' unitSet E n v =
-      Set.pi Set.univ fun _ => (GLnLocal.integralGL (v.adicCompletion F) n : Set _) := by
+  have hset
+      : D.glue n ⁻¹' unitSet E n v
+        = Set.pi Set.univ fun _ => (GLnLocal.integralGL (v.adicCompletion F) n : Set _) := by
     ext g
     simp [hU, hcomp]
-  have hKm : MeasurableSet (GLnLocal.integralGL (v.adicCompletion F) n : Set (GL (Fin n) (v.adicCompletion F))) :=
+  have hKm : MeasurableSet
+      (GLnLocal.integralGL (v.adicCompletion F) n : Set (GL (Fin n) (v.adicCompletion F))) :=
     (GLnLocal.isOpen_integralGL _ n).measurableSet
   have hmeas : MeasurableSet (unitSet E n v) := by
-    have : unitSet E n v = ⋂ i, D.comp n i ⁻¹' (GLnLocal.integralGL (v.adicCompletion F) n : Set _) := by
+    have : unitSet E n v
+        = ⋂ i, D.comp n i ⁻¹' (GLnLocal.integralGL (v.adicCompletion F) n : Set _) := by
       ext g
       simp [hU]
     rw [this]
     exact MeasurableSet.iInter fun i => (hcc i).measurable hKm
-  have hpi : Measure.pi (fun _ : Fin (m + 1) => mF)
-      (Set.pi Set.univ fun _ => (GLnLocal.integralGL (v.adicCompletion F) n : Set _)) = 1 := by
+  have hpi
+      : Measure.pi
+          (fun _ : Fin (m + 1) => mF)
+          (Set.pi Set.univ fun _ => (GLnLocal.integralGL (v.adicCompletion F) n : Set _))
+        = 1 := by
     rw [Measure.pi_pi]
     simp [hvol]
   have hone : ENNReal.ofReal c = 1 := by

@@ -20,9 +20,10 @@ variable {n : ℕ}
 
 def mulLL (a : Mat n) : Mat n →L[ℝ] Mat n := LinearMap.toContinuousLinearMap (LinearMap.mulLeft ℝ a)
 
-theorem hb_conj_back' (k : Matrix.unitaryGroup (Fin n) ℂ) (X : Mat n) :
-    (k.1)ᴴ * (k.1 * X * (k.1)ᴴ) * k.1 = X := by
-  rw [show (k.1)ᴴ * (k.1 * X * (k.1)ᴴ) * k.1 = (k.1)ᴴ * (((k.1 * X * (k.1)ᴴ)) * k.1) by simp only [Matrix.mul_assoc],
+theorem hb_conj_back' (k : Matrix.unitaryGroup (Fin n) ℂ) (X : Mat n)
+    : (k.1)ᴴ * (k.1 * X * (k.1)ᴴ) * k.1 = X := by
+  rw [show (k.1)ᴴ * (k.1 * X * (k.1)ᴴ) * k.1 = (k.1)ᴴ * (((k.1 * X * (k.1)ᴴ)) * k.1) by
+      simp only [Matrix.mul_assoc],
     hb_conj_back]
 
 theorem kapEquiv : KapEquiv := by
@@ -72,7 +73,8 @@ theorem kapEquiv : KapEquiv := by
         intro p
         unfold Rd
         rw [show y * k₂.1 * hb p = (y * Y p) * k₂.1 by
-          simp only [hYdef, Matrix.mul_assoc, unit_star_mul, Matrix.mul_one], hD]
+            simp only [hYdef, Matrix.mul_assoc, unit_star_mul, Matrix.mul_one],
+          hD]
       have hε : ∀ p, E.ρ k₂ * ε (hb p) = ε (Y p) * E.ρ k₂ := by
         intro p
         rw [eps_rho h k₂ (Y p) (conj_herm _ _ (hb_herm p)), hYdef]
@@ -83,21 +85,27 @@ theorem kapEquiv : KapEquiv := by
         have := dFr_conj h k₂ (Y p)
         rw [hYdef, hb_conj_back] at this
         rw [this, ← mul_assoc, ← mul_assoc, rho_mul_inv, one_mul]
-      let B : Mat n →ₗ[ℝ] Mat n →ₗ[ℝ] (E.V →L[ℂ] E.V) := LinearMap.mk₂ ℝ
-        (fun H H' => -(fderiv ℝ k y (y * H')) * ε H + k y * ε H * fderiv ℝ Fr 1 H')
-        (fun H₁ H₂ H' => by simp only [map_add (f := _), mul_add, add_mul]; abel)
-        (fun c H H' => by simp only [map_smul, mul_smul_comm, smul_mul_assoc, smul_add])
-        (fun H H₁ H₂ => by simp only [Matrix.mul_add, map_add (f := _), neg_add, add_mul, mul_add]; abel)
-        (fun c H H' => by
-          simp only [Matrix.mul_smul, map_smul, neg_smul, smul_mul_assoc, mul_smul_comm, smul_add, ← smul_neg])
+      let B : Mat n →ₗ[ℝ] Mat n →ₗ[ℝ] (E.V →L[ℂ] E.V) :=
+        LinearMap.mk₂ ℝ
+          (fun H H' => -(fderiv ℝ k y (y * H')) * ε H + k y * ε H * fderiv ℝ Fr 1 H')
+          (fun H₁ H₂ H' => by simp only [map_add (f := _), mul_add, add_mul]; abel)
+          (fun c H H' => by simp only [map_smul, mul_smul_comm, smul_mul_assoc, smul_add])
+          (fun H H₁ H₂ => by
+            simp only [Matrix.mul_add, map_add (f := _), neg_add, add_mul, mul_add]; abel)
+          (fun c H H' => by
+            simp only [Matrix.mul_smul, map_smul, neg_smul, smul_mul_assoc, mul_smul_comm, smul_add,
+              ← smul_neg])
       have hkapR : kapR ε Fr k y = ∑ p, B (hb p) (hb p) := rfl
-      have hterm : ∀ p, -(Rd (hb p) k (y * k₂.1)) * ε (hb p) + k (y * k₂.1) * ε (hb p) * fderiv ℝ Fr 1 (hb p) =
-          B (Y p) (Y p) * E.ρ k₂ := by
+      have hterm
+          : ∀ p,
+            -(Rd (hb p) k (y * k₂.1)) * ε (hb p) + k (y * k₂.1) * ε (hb p) * fderiv ℝ Fr 1 (hb p)
+              = B (Y p) (Y p) * E.ρ k₂ := by
         intro p
         rw [hRd, hkK y hy k₂]
         show -(Rd (Y p) k y * E.ρ k₂) * ε (hb p) + k y * E.ρ k₂ * ε (hb p) * fderiv ℝ Fr 1 (hb p) =
           (-(fderiv ℝ k y (y * Y p)) * ε (Y p) + k y * ε (Y p) * fderiv ℝ Fr 1 (Y p)) * E.ρ k₂
-        rw [neg_mul, mul_assoc (Rd (Y p) k y), hε, mul_assoc (k y), hε, mul_assoc (k y), mul_assoc (ε (Y p)), hF]
+        rw [neg_mul, mul_assoc (Rd (Y p) k y), hε, mul_assoc (k y), hε, mul_assoc (k y),
+          mul_assoc (ε (Y p)), hF]
         simp only [Rd, add_mul, neg_mul, mul_assoc]
       unfold kapR
       rw [Finset.sum_congr rfl (fun p _ => hterm p), ← Finset.sum_mul]

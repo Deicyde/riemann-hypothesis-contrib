@@ -7,19 +7,24 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix SchwartzMap Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 open GlobalTheory.Doubling (absE)
 
 namespace PositivityTheory.SiegelWeilFormula
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 namespace SD
 
 variable (d : SD σ)
 
-theorem incM_mul' {p : Type} [Fintype p] (M N : Matrix p p E) : incM F (M * N) = incM F M * incM F N := by
+theorem incM_mul' {p : Type} [Fintype p] (M N : Matrix p p E)
+    : incM F (M * N) = incM F M * incM F N := by
   unfold incM
   exact Matrix.map_mul
 
@@ -39,9 +44,11 @@ theorem matrixRep_one : mat2 (1 : d.G) = 1 := rfl
 
 theorem inFrame_mul (x y : d.G) : inFrame d.b (x * y) = inFrame d.b x * inFrame d.b y := by
   simp only [inFrame, matrixRep_mul]
-  calc incM F (d.b⁻¹).1 * (mat2 x * mat2 y) * incM F d.b.1
-      = incM F (d.b⁻¹).1 * mat2 x * (incM F d.b.1 * incM F (d.b⁻¹).1) * mat2 y * incM F d.b.1 := by
-        rw [d.bb1]; simp only [Matrix.mul_one, Matrix.mul_assoc]
+  calc
+    incM F (d.b⁻¹).1 * (mat2 x * mat2 y) * incM F d.b.1
+        = incM F (d.b⁻¹).1 * mat2 x * (incM F d.b.1 * incM F (d.b⁻¹).1) * mat2 y
+          * incM F d.b.1 := by
+      rw [d.bb1]; simp only [Matrix.mul_one, Matrix.mul_assoc]
     _ = _ := by simp only [Matrix.mul_assoc]
 
 theorem inFrame_one : inFrame d.b (1 : d.G) = 1 := by

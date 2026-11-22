@@ -7,11 +7,31 @@ public import Development.AutomorphicArithmetic.TwistedTraces.FiniteDimensionalF
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.C.Sf
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.C.Sf
 
-theorem UpperTheory.twisted_intertwiner_fixedVectors_of_irreducible :
-    ∀ (G H S : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] [AddCommGroup S] [Module ℂ S] (τ : Representation ℂ G S) (_ : GroundTheory.Automorphic.IsSmooth τ) (_ : τ.IsIrreducible) (π : UnitaryRep G H) (s : G ≃ₜ* G) (I : S ≃ₗ[ℂ] S), (∀ g x, I (τ g x) = τ (s g) (I x)) → (∀ K : Subgroup G, IsCompact (K : Set G) → IsOpen (K : Set G) → FiniteDimensional ℂ (fixedVectors τ K)) → ∀ K : Subgroup G, IsCompact (K : Set G) → IsOpen (K : Set G) → fixedVectors τ K ≠ ⊥ → ∃ (T : H →L[ℂ] H) (A : S →ₗ[ℂ] S) (t : ℂ), ((∀ v, T v ∈ fixU π K) ∧ (∀ x, A x ∈ fixedVectors τ K) ∧ (∀ D : Submodule ℂ H, IsClosed (D : Set H) → π.IsInvariant D → ∀ v ∈ D, T v ∈ D) ∧ (∀ (G' : Type) [Group G'] [TopologicalSpace G'] (π' : UnitaryRep G' H), (∀ g h v, π g (π' h v) = π' h (π g v)) → ∀ h v, T (π' h v) = π' h (T v)) ∧ (∀ f, Eqv τ π ⊤ f → ∀ x, T (f x) = f (A x))) ∧ HasFinTrace (A ∘ₗ (I : S →ₗ[ℂ] S)) t ∧ t ≠ 0 := by
+theorem UpperTheory.twisted_intertwiner_fixedVectors_of_irreducible
+    : ∀ (G H S : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [TotallyDisconnectedSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        [CompleteSpace H] [AddCommGroup S] [Module ℂ S] (τ : Representation ℂ G S)
+        (_ : GroundTheory.Automorphic.IsSmooth τ) (_ : τ.IsIrreducible) (π : UnitaryRep G H)
+        (s : G ≃ₜ* G) (I : S ≃ₗ[ℂ] S),
+      (∀ g x, I (τ g x) = τ (s g) (I x))
+        → (∀ K : Subgroup G,
+          IsCompact (K : Set G) → IsOpen (K : Set G) → FiniteDimensional ℂ (fixedVectors τ K))
+        → ∀ K : Subgroup G,
+          IsCompact (K : Set G) → IsOpen (K : Set G) → fixedVectors τ K ≠ ⊥
+            → ∃ (T : H →L[ℂ] H) (A : S →ₗ[ℂ] S) (t : ℂ),
+              ((∀ v, T v ∈ fixU π K) ∧ (∀ x, A x ∈ fixedVectors τ K)
+                  ∧ (∀ D : Submodule ℂ H, IsClosed (D : Set H) → π.IsInvariant D → ∀ v ∈ D, T v ∈ D)
+                  ∧ (∀ (G' : Type) [Group G'] [TopologicalSpace G'] (π' : UnitaryRep G' H),
+                    (∀ g h v, π g (π' h v) = π' h (π g v)) → ∀ h v, T (π' h v) = π' h (T v))
+                  ∧ (∀ f, Eqv τ π ⊤ f → ∀ x, T (f x) = f (A x)))
+                ∧ HasFinTrace (A ∘ₗ (I : S →ₗ[ℂ] S)) t ∧ t ≠ 0 := by
   intro G H S _ _ _ _ _ _ _ _ _ _ _ τ hτ hirr π s I hI hfd K hKc hKo hne
   let sK : Subgroup G := K.map s.toMulEquiv.toMonoidHom
   have hsKc : IsCompact (sK : Set G) := by
@@ -53,7 +73,8 @@ theorem UpperTheory.twisted_intertwiner_fixedVectors_of_irreducible :
       ((I.symm : S →ₗ[ℂ] S) ∘ₗ (fixedVectors τ sK).subtype ∘ₗ ε ∘ₗ (fixedVectors τ K₁).subtype)
       (fun x => hPle _ (hIs _ (ε x).2))
   obtain ⟨T₀, A₀, ⟨c1, c2, c3, c4, c5⟩, c6⟩ :=
-    UpperTheory.finiteDimensional_fixedVectors_isotypic_of_irreducible G H S τ hτ hirr π K₁ hK₁c hK₁o (hfd K₁ hK₁c hK₁o) hne₁ h
+    UpperTheory.finiteDimensional_fixedVectors_isotypic_of_irreducible G H S τ hτ hirr π K₁ hK₁c
+      hK₁o (hfd K₁ hK₁c hK₁o) hne₁ h
   obtain ⟨p1, -, p3, -⟩ := UpperTheory.fixedProjection_invariant_and_commuting_reps G G H π π K K
   let e : S →ₗ[ℂ] fixedVectors τ K := fixedProj τ hτ hKc hKo
   let A : S →ₗ[ℂ] S := (fixedVectors τ K).subtype ∘ₗ e ∘ₗ A₀
@@ -64,7 +85,10 @@ theorem UpperTheory.twisted_intertwiner_fixedVectors_of_irreducible :
     have h1 : A₀ (I x) = x := by
       have h2 := c6 ⟨I x, hsle _ hIx⟩
       have h3 : ((ε (I x) : fixedVectors τ sK) : S) = I x := fixedProj_apply_of_mem hτ hsKc hsKo hIx
-      have h4 : ((h ⟨I x, hsle _ hIx⟩ : fixedVectors τ K₁) : S) = I.symm (ε (I x) : fixedVectors τ sK) := rfl
+      have h4
+          : ((h ⟨I x, hsle _ hIx⟩ : fixedVectors τ K₁) : S)
+            = I.symm (ε (I x) : fixedVectors τ sK) :=
+        rfl
       rw [h4, h3, I.symm_apply_apply] at h2
       exact h2
     show ((e (A₀ (I x)) : fixedVectors τ K) : S) = x
@@ -82,16 +106,25 @@ theorem UpperTheory.twisted_intertwiner_fixedVectors_of_irreducible :
   haveI : Nontrivial (LinearMap.range B) := by
     rw [hR]
     exact Submodule.nontrivial_iff_ne_bot.2 hne
-  have hrest : (B.restrict (p := LinearMap.range B) (q := LinearMap.range B)
-      fun v _ => LinearMap.mem_range_self B v) = LinearMap.id :=
+  have hrest
+      : (B.restrict (p := LinearMap.range B) (q := LinearMap.range B) fun v _ =>
+          LinearMap.mem_range_self B v)
+        = LinearMap.id :=
     LinearMap.ext fun y => Subtype.ext (hB y (hR ▸ y.2))
-  refine ⟨prj (fixU π K) ∘L T₀, A, (Module.finrank ℂ (LinearMap.range B) : ℂ),
-    ⟨fun v => p1 _, fun x => (e _).2, ?_, ?_, ?_⟩, ⟨hfdR, ?_⟩, ?_⟩
+  refine ⟨
+    prj (fixU π K) ∘L T₀,
+    A,
+    (Module.finrank ℂ (LinearMap.range B) : ℂ),
+    ⟨fun v => p1 _, fun x => (e _).2, ?_, ?_, ?_⟩,
+    ⟨hfdR, ?_⟩,
+    ?_
+  ⟩
   · intro D hD hinv v hv
     exact p3 D hD hinv _ (c3 D hD hinv v hv)
   · intro G' _ _ π' hc g v
     show prj (fixU π K) (T₀ (π' g v)) = π' g (prj (fixU π K) (T₀ v))
-    rw [c4 G' π' hc, ((UpperTheory.fixedProjection_invariant_and_commuting_reps G G' H π π' K ⊥).2.2.2 hc).1]
+    rw [c4 G' π' hc,
+      ((UpperTheory.fixedProjection_invariant_and_commuting_reps G G' H π π' K ⊥).2.2.2 hc).1]
   · intro f hf x
     show prj (fixU π K) (T₀ (f x)) = f (e (A₀ x))
     rw [c5 f hf]

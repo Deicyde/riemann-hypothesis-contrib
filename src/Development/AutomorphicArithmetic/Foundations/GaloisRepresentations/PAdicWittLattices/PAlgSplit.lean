@@ -6,16 +6,20 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
 namespace UpperTheory.Gal.G3.AlgebraSplitting
 
-private noncomputable def sec {A A' C J : Type} [CommRing A] [CommRing A'] [CommRing C] [Algebra A A'] [Algebra A C]
-    (τ : J → (A' →ₐ[A] C)) : C ⊗[A] A' →ₐ[C] (J → C) :=
-  Pi.algHom C (fun _ => C) fun j =>
-    Algebra.TensorProduct.lift (AlgHom.id C C) (τ j) fun _ _ => Commute.all _ _
+private noncomputable def sec
+    {A A' C J : Type} [CommRing A] [CommRing A'] [CommRing C] [Algebra A A'] [Algebra A C]
+    (τ : J → (A' →ₐ[A] C))
+    : C ⊗[A] A' →ₐ[C] (J → C) :=
+  Pi.algHom C
+    (fun _ => C)
+    fun j => Algebra.TensorProduct.lift (AlgHom.id C C) (τ j) fun _ _ => Commute.all _ _
 
 private lemma sec_tmul {A A' C J : Type} [CommRing A] [CommRing A'] [CommRing C] [Algebra A A'] [Algebra A C]
     (τ : J → (A' →ₐ[A] C)) (c : C) (b : A') (j : J) : sec τ (c ⊗ₜ b) j = c * τ j b := by
@@ -42,8 +46,7 @@ private lemma bij_of_pts (hiso : AlgIsoPts) {C D E : Type} [CommRing C] [CommRin
 end UpperTheory.Gal.G3.AlgebraSplitting
 
 open UpperTheory.Gal.G3.AlgebraSplitting in
-theorem UpperTheory.Gal.G3.pAlgSplit :
-    AlgIsoPts → AlgSplit := by
+theorem UpperTheory.Gal.G3.pAlgSplit : AlgIsoPts → AlgSplit := by
   intro hiso A A' C _ _ _ _ _ _ J _ τ h
   refine ⟨AlgEquiv.ofBijective (sec τ) (bij_of_pts hiso (sec τ) ?_), fun b j => ?_⟩
   swap

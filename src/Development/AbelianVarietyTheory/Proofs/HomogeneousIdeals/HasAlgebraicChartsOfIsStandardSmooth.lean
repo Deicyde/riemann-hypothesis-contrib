@@ -10,8 +10,7 @@ namespace GlobalTheory.AffinePoints
 open Topology Filter Set MvPolynomial
 open scoped Manifold ContDiff
 
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
-  {A : Type*} [CommRing A] [Algebra 𝕜 A] {d : ℕ}
+variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {A : Type*} [CommRing A] [Algebra 𝕜 A] {d : ℕ}
 
 structure IsAlgebraicChart (e : OpenPartialHomeomorph (A →ₐ[𝕜] 𝕜) (Fin d → 𝕜)) : Prop where
   exists_eq_div : ∃ (x : Fin d → A) (s : A), ∀ p ∈ e.source, p s ≠ 0 ∧ ∀ i, e p i = p (x i) / p s
@@ -19,29 +18,32 @@ structure IsAlgebraicChart (e : OpenPartialHomeomorph (A →ₐ[𝕜] 𝕜) (Fin
 
 variable [CompleteSpace 𝕜]
 
-theorem exists_isAlgebraicChart_of_etale (g : MvPolynomial (Fin d) 𝕜 →ₐ[𝕜] A) (hg : g.Etale)
-    (p : A →ₐ[𝕜] 𝕜) :
-    ∃ e : OpenPartialHomeomorph (A →ₐ[𝕜] 𝕜) (Fin d → 𝕜), IsAlgebraicChart e ∧ p ∈ e.source ∧
-      (e : (A →ₐ[𝕜] 𝕜) → Fin d → 𝕜) = coords g := by
+theorem exists_isAlgebraicChart_of_etale
+    (g : MvPolynomial (Fin d) 𝕜 →ₐ[𝕜] A) (hg : g.Etale) (p : A →ₐ[𝕜] 𝕜)
+    : ∃ e : OpenPartialHomeomorph (A →ₐ[𝕜] 𝕜) (Fin d → 𝕜),
+      IsAlgebraicChart e ∧ p ∈ e.source ∧ (e : (A →ₐ[𝕜] 𝕜) → Fin d → 𝕜) = coords g := by
   obtain ⟨e, hp, he, ha⟩ := exists_chart_of_etale g hg p
   refine ⟨e, ⟨⟨fun i => g (X i), 1, fun q _ => ⟨by simp, fun i => ?_⟩⟩, ha⟩, hp, he⟩
   rw [he]
   simp [coords]
 
-theorem exists_isAlgebraicChart_of_away (s : A) (B : Type*) [CommRing B] [Algebra 𝕜 B]
-    [Algebra A B] [IsScalarTower 𝕜 A B] [IsLocalization.Away s B]
-    [Algebra.IsStandardSmoothOfRelativeDimension d 𝕜 B] (p : A →ₐ[𝕜] 𝕜) (hp : p s ≠ 0) :
-    ∃ e : OpenPartialHomeomorph (A →ₐ[𝕜] 𝕜) (Fin d → 𝕜), IsAlgebraicChart e ∧ p ∈ e.source := by
+theorem exists_isAlgebraicChart_of_away
+    (s : A) (B : Type*) [CommRing B] [Algebra 𝕜 B] [Algebra A B] [IsScalarTower 𝕜 A B]
+    [IsLocalization.Away s B] [Algebra.IsStandardSmoothOfRelativeDimension d 𝕜 B]
+    (p : A →ₐ[𝕜] 𝕜) (hp : p s ≠ 0)
+    : ∃ e : OpenPartialHomeomorph (A →ₐ[𝕜] 𝕜) (Fin d → 𝕜), IsAlgebraicChart e ∧ p ∈ e.source := by
   obtain ⟨g, hg⟩ := Algebra.IsStandardSmoothOfRelativeDimension.exists_etale_mvPolynomial d 𝕜 B
   have hj : IsOpenEmbedding (comap (IsScalarTower.toAlgHom 𝕜 A B) : (B →ₐ[𝕜] 𝕜) → (A →ₐ[𝕜] 𝕜)) :=
     isOpenEmbedding_comap_away s
-  obtain ⟨q, rfl⟩ : p ∈ range (comap (IsScalarTower.toAlgHom 𝕜 A B) : (B →ₐ[𝕜] 𝕜) → (A →ₐ[𝕜] 𝕜)) := by
+  obtain ⟨q, rfl⟩
+      : p ∈ range (comap (IsScalarTower.toAlgHom 𝕜 A B) : (B →ₐ[𝕜] 𝕜) → (A →ₐ[𝕜] 𝕜)) := by
     rw [range_comap_away s]
     exact hp
   have : Nonempty (B →ₐ[𝕜] 𝕜) := ⟨q⟩
-  obtain ⟨F, hFs, hFt, hFc⟩ : ∃ F : OpenPartialHomeomorph (B →ₐ[𝕜] 𝕜) (A →ₐ[𝕜] 𝕜),
-      F.source = univ ∧ F.target = range (comap (IsScalarTower.toAlgHom 𝕜 A B)) ∧
-      ⇑F = comap (IsScalarTower.toAlgHom 𝕜 A B) :=
+  obtain ⟨F, hFs, hFt, hFc⟩
+      : ∃ F : OpenPartialHomeomorph (B →ₐ[𝕜] 𝕜) (A →ₐ[𝕜] 𝕜),
+        F.source = univ ∧ F.target = range (comap (IsScalarTower.toAlgHom 𝕜 A B))
+          ∧ ⇑F = comap (IsScalarTower.toAlgHom 𝕜 A B) :=
     ⟨IsOpenEmbedding.toOpenPartialHomeomorph _ hj, by simp, by simp, by simp⟩
   have hinv : ∀ q', F.symm (comap (IsScalarTower.toAlgHom 𝕜 A B) q') = q' := fun q' => by
     have := F.left_inv (x := q') (by rw [hFs]; trivial)
@@ -77,7 +79,8 @@ theorem exists_isAlgebraicChart_of_away (s : A) (B : Type*) [CommRing B] [Algebr
     refine ⟨mul_ne_zero hc0 hb0, fun i => ?_⟩
     rw [(hB q' hp'4).2 i, h1 i, h2]
     field_simp
-  · have hfun : (fun z => (F.symm.trans eB).symm z a') = fun z => eB.symm z (algebraMap A B a') := by
+  · have hfun
+        : (fun z => (F.symm.trans eB).symm z a') = fun z => eB.symm z (algebraMap A B a') := by
       funext z
       simp [hFc, comap_apply]
     rw [hfun]

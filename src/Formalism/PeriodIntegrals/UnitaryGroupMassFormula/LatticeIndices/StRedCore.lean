@@ -32,7 +32,8 @@ theorem secondSplit_conj (t : T) : t2 θ (s t) = t1 θ t := by
 
 variable {n : Type} [Fintype n] [DecidableEq n]
 
-theorem group_law_jacobian_eq (J : Matrix n n T) (hJ : Formalism.UG.cT s J = J) : J.map (t2 θ) = (J.map (t1 θ))ᵀ := by
+theorem group_law_jacobian_eq (J : Matrix n n T) (hJ : Formalism.UG.cT s J = J)
+    : J.map (t2 θ) = (J.map (t1 θ))ᵀ := by
   ext i j
   have hij := congrArg (fun M : Matrix n n T => M i j) hJ
   simp only [Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply] at hij

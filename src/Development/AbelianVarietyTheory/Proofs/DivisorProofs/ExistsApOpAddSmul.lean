@@ -11,7 +11,14 @@ open scoped ContDiff BoundedContinuousFunction
 
 namespace GlobalTheory.HCA
 
-theorem exists_apOp_add_smul : ∀ (d m m' : ℕ) (U : Set (E d)) (a a' : (n : ℕ) → (Fin n → Fin d) → E d → ℂ) (t : ℂ), m' ≤ m → (∀ n w, ContDiffOn ℝ ∞ (a n w) U) → (∀ n w, ContDiffOn ℝ ∞ (a' n w) U) → ∃ a'' : (n : ℕ) → (Fin n → Fin d) → E d → ℂ, (∀ n w, ContDiffOn ℝ ∞ (a'' n w) U) ∧ (∀ x ξ : E d, symb m a'' x ξ = symb m a x ξ + if m' = m then t * symb m' a' x ξ else 0) ∧ ∀ (u : E d → ℂ) (x : E d), apOp m a'' u x = apOp m a u x + t * apOp m' a' u x := by
+theorem exists_apOp_add_smul
+    : ∀ (d m m' : ℕ) (U : Set (E d)) (a a' : (n : ℕ) → (Fin n → Fin d) → E d → ℂ) (t : ℂ),
+      m' ≤ m → (∀ n w, ContDiffOn ℝ ∞ (a n w) U) → (∀ n w, ContDiffOn ℝ ∞ (a' n w) U)
+        → ∃ a'' : (n : ℕ) → (Fin n → Fin d) → E d → ℂ,
+          (∀ n w, ContDiffOn ℝ ∞ (a'' n w) U)
+            ∧ (∀ x ξ : E d,
+              symb m a'' x ξ = symb m a x ξ + if m' = m then t * symb m' a' x ξ else 0)
+            ∧ ∀ (u : E d → ℂ) (x : E d), apOp m a'' u x = apOp m a u x + t * apOp m' a' u x := by
   intro d m m' U a a' t hm ha ha'
   refine ⟨fun n w x => a n w x + if n ≤ m' then t * a' n w x else 0, ?_, ?_, ?_⟩
   · intro n w

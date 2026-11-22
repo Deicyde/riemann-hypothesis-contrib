@@ -10,8 +10,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct ContDiff
 open GlobalTheory.KS
 
@@ -40,44 +42,65 @@ private lemma triv_secOn_ext {X : Scheme.{0}} {W : X.Opens} (σ τ : SecOn (LB.t
       (show LB.secGroup (LB.triv X) W from τ).1 PUnit.unit) : σ = τ :=
   Subtype.ext (funext fun _ => h)
 
-theorem isCob_of_isAffineOpen : ∀ (X : Scheme.{0}) (J : Type) (U : J → X.Opens) (c : C1 U),
-    IsAffineOpen (⨆ α, U α) → IsCoc U c → IsCob U c := by
+theorem isCob_of_isAffineOpen
+    : ∀ (X : Scheme.{0}) (J : Type) (U : J → X.Opens) (c : C1 U),
+      IsAffineOpen (⨆ α, U α) → IsCoc U c → IsCob U c := by
   intro X J U c hA hc
 
   let φ : ∀ a b, SecOn (LB.triv X) (U a ⊓ U b) := fun a b =>
-    show LB.secGroup (LB.triv X) (U a ⊓ U b) from
-      ⟨fun _ => resG X inf_le_left (c a b), by
+    show LB.secGroup (LB.triv X) (U a ⊓ U b) from ⟨
+      fun _ => resG X inf_le_left (c a b),
+      by
         simp only [LB.secGroup, LB.triv]
         show _ ∈ secOn _ _
         simp only [secOn, Set.mem_ofPred_eq]
         intro i j
-        rw [Units.val_one, map_one, _root_.one_mul, resG_resG_divisors]⟩
+        rw [Units.val_one, map_one, _root_.one_mul, resG_resG_divisors]
+    ⟩
   have hφ : IsCocycle (LB.triv X) U φ := by
     intro a b d W ha hb hd
     apply triv_secOn_ext
     have h0 := hc a b d
-    rw [rsT_eq_resG (c a b) (le_inf (inf_le_left.trans inf_le_left) (inf_le_left.trans inf_le_right)),
-      rsT_eq_resG (c b d) (le_inf (inf_le_left.trans inf_le_right) inf_le_right),
-      rsT_eq_resG (c a d) (le_inf (inf_le_left.trans inf_le_left) inf_le_right)] at h0
-    have e := congrArg (resG X (inf_le_left.trans (le_inf (le_inf ha hb) hd) :
-      W ⊓ (LB.triv X).U PUnit.unit ≤ U a ⊓ U b ⊓ U d)) h0
+    rw [rsT_eq_resG (c a b)
+          (le_inf (inf_le_left.trans inf_le_left) (inf_le_left.trans inf_le_right)),
+        rsT_eq_resG (c b d) (le_inf (inf_le_left.trans inf_le_right) inf_le_right),
+        rsT_eq_resG (c a d) (le_inf (inf_le_left.trans inf_le_left) inf_le_right)]
+      at h0
+    have e :=
+      congrArg
+        (resG X
+          (inf_le_left.trans (le_inf (le_inf ha hb) hd)
+            : W ⊓ (LB.triv X).U PUnit.unit ≤ U a ⊓ U b ⊓ U d))
+        h0
     rw [map_add (f := _), resG_resG_divisors, resG_resG_divisors, resG_resG_divisors] at e
     change resG X _ (resG X _ (c a b)) + resG X _ (resG X _ (c b d)) = resG X _ (resG X _ (c a d))
     rw [resG_resG_divisors, resG_resG_divisors, resG_resG_divisors]
     exact e
 
-  obtain ⟨ψ, hψ⟩ := cechHOneVanishesOnOpen_of_isAffineOpen (LB.isLB_triv X) hA J U (fun a => le_iSup U a) le_rfl φ hφ
-  refine ⟨fun i => -resG X (le_inf le_rfl le_top : U i ≤ U i ⊓ (LB.triv X).U PUnit.unit)
-    ((show LB.secGroup (LB.triv X) (U i) from ψ i).1 PUnit.unit), ?_⟩
+  obtain ⟨ψ, hψ⟩ :=
+    cechHOneVanishesOnOpen_of_isAffineOpen (LB.isLB_triv X) hA J U
+      (fun a => le_iSup U a)
+      le_rfl φ hφ
+  refine ⟨
+    fun i =>
+      - resG X (le_inf le_rfl le_top : U i ≤ U i ⊓ (LB.triv X).U PUnit.unit)
+        ((show LB.secGroup (LB.triv X) (U i) from ψ i).1 PUnit.unit),
+    ?_
+  ⟩
   intro i j
-  have e := congrArg (fun σ : SecOn (LB.triv X) (U i ⊓ U j) =>
-    (show LB.secGroup (LB.triv X) (U i ⊓ U j) from σ).1 PUnit.unit) (hψ i j)
-  change resG X inf_le_left (c i j) =
-    resG X (inf_le_inf_right _ inf_le_left) ((show LB.secGroup (LB.triv X) (U i) from ψ i).1 PUnit.unit) -
-      resG X (inf_le_inf_right _ inf_le_right)
-        ((show LB.secGroup (LB.triv X) (U j) from ψ j).1 PUnit.unit) at e
-  have e' := congrArg (resG X (le_inf le_rfl le_top :
-    U i ⊓ U j ≤ U i ⊓ U j ⊓ (LB.triv X).U PUnit.unit)) e
+  have e :=
+    congrArg
+      (fun σ : SecOn (LB.triv X) (U i ⊓ U j) =>
+        (show LB.secGroup (LB.triv X) (U i ⊓ U j) from σ).1 PUnit.unit)
+      (hψ i j)
+  change resG X inf_le_left (c i j)
+      = resG X (inf_le_inf_right _ inf_le_left)
+          ((show LB.secGroup (LB.triv X) (U i) from ψ i).1 PUnit.unit)
+        - resG X (inf_le_inf_right _ inf_le_right)
+          ((show LB.secGroup (LB.triv X) (U j) from ψ j).1 PUnit.unit)
+    at e
+  have e' :=
+    congrArg (resG X (le_inf le_rfl le_top : U i ⊓ U j ≤ U i ⊓ U j ⊓ (LB.triv X).U PUnit.unit)) e
   rw [map_sub, resG_resG_divisors, resG_resG_divisors, resG_resG_divisors, resG_self_moduli] at e'
   rw [rsT_eq_resG _ inf_le_right, rsT_eq_resG _ inf_le_left, map_neg, map_neg, resG_resG_divisors,
     resG_resG_divisors, e']

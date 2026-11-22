@@ -15,12 +15,13 @@ namespace GlobalTheory.CompanionTheory.JSBound
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-theorem continuous_of_trivial_integer {ψ : AddChar F ℂ} (h : ∀ x ∈ 𝒪[F], ψ x = 1) : Continuous ψ := by
+theorem continuous_of_trivial_integer {ψ : AddChar F ℂ} (h : ∀ x ∈ 𝒪[F], ψ x = 1)
+    : Continuous ψ := by
   refine IsLocallyConstant.continuous ?_
   rw [IsLocallyConstant.iff_exists_open]
   intro x
-  refine ⟨(fun y => y - x) ⁻¹' (𝒪[F] : Set F),
-    (Valuation.isOpen_integer).preimage (by fun_prop), ?_, ?_⟩
+  refine
+    ⟨(fun y => y - x) ⁻¹' (𝒪[F] : Set F), (Valuation.isOpen_integer).preimage (by fun_prop), ?_, ?_⟩
   · simpa using (𝒪[F]).zero_mem
   · intro y hy
     have hxy : y = x + (y - x) := by ring
@@ -29,9 +30,10 @@ theorem continuous_of_trivial_integer {ψ : AddChar F ℂ} (h : ∀ x ∈ 𝒪[F
 theorem uniformizer_pow_ne_zero (M : ℕ) : (uniformizer F : F) ^ M ≠ 0 :=
   pow_ne_zero _ ((Valuation.ne_zero_iff _).mp (valuation_uniformizer_ne_zero F))
 
-theorem lat_eq_preimage (m M : ℕ) : lat F m M =
-    (Homeomorph.smulOfNeZero ((uniformizer F : F) ^ M) (uniformizer_pow_ne_zero M)) ⁻¹'
-      Measures.box (F := F) (ι := Fin m) := by
+theorem lat_eq_preimage (m M : ℕ)
+    : lat F m M
+      = (Homeomorph.smulOfNeZero ((uniformizer F : F) ^ M) (uniformizer_pow_ne_zero M))
+        ⁻¹' Measures.box (F := F) (ι := Fin m) := by
   ext x
   simp [lat, Measures.mem_box]
 
@@ -49,34 +51,33 @@ theorem zero_mem_lat (m M : ℕ) : (0 : Fin m → F) ∈ lat F m M := by
 
 variable [MeasurableSpace F] [BorelSpace F] (μ : Measure F) [μ.IsAddHaarMeasure]
 
-theorem lat_measure_pos (m M : ℕ) :
-    0 < (Measure.pi fun _ : Fin m => μ).real (lat F m M) := by
+theorem lat_measure_pos (m M : ℕ) : 0 < (Measure.pi fun _ : Fin m => μ).real (lat F m M) := by
   haveI := Measures.sigmaCompactSpace F
-  have h0 := (isOpen_lat (F := F) m M).measure_ne_zero (Measure.pi fun _ : Fin m => μ)
-    ⟨0, zero_mem_lat m M⟩
+  have h0 :=
+    (isOpen_lat (F := F) m M).measure_ne_zero (Measure.pi fun _ : Fin m => μ) ⟨0, zero_mem_lat m M⟩
   have h1 := (isCompact_lat (F := F) m M).measure_lt_top (μ := Measure.pi fun _ : Fin m => μ)
   exact ENNReal.toReal_pos h0 h1.ne
 
-theorem setIntegral_image_mulVec {m : ℕ} (g : GL (Fin m) F) (A : Set (Fin m → F))
-    (f : (Fin m → F) → ℂ) :
-    ∫ x in (fun x => (g : Matrix (Fin m) (Fin m) F) *ᵥ x) '' A, f x ∂(Measure.pi fun _ => μ) =
-      ((Measures.modulus (g : Matrix (Fin m) (Fin m) F).det : ℝ) : ℂ) *
-        ∫ x in A, f ((g : Matrix (Fin m) (Fin m) F) *ᵥ x) ∂(Measure.pi fun _ => μ) := by
+theorem setIntegral_image_mulVec
+    {m : ℕ} (g : GL (Fin m) F) (A : Set (Fin m → F)) (f : (Fin m → F) → ℂ)
+    : ∫ x in (fun x => (g : Matrix (Fin m) (Fin m) F) *ᵥ x) '' A, f x ∂(Measure.pi fun _ => μ)
+      = ((Measures.modulus (g : Matrix (Fin m) (Fin m) F).det : ℝ) : ℂ)
+        * ∫ x in A, f ((g : Matrix (Fin m) (Fin m) F) *ᵥ x) ∂(Measure.pi fun _ => μ) := by
   haveI := Measures.sigmaCompactSpace F
   haveI := Measures.metrizableSpace F
   set ν : Measure (Fin m → F) := Measure.pi fun _ => μ with hν
   set L := Measures.glEquiv g with hL
   let e : (Fin m → F) ≃ᵐ (Fin m → F) := (Homeomorph.smul L).toMeasurableEquiv
   have he : ∀ x, e x = (g : Matrix (Fin m) (Fin m) F) *ᵥ x := fun x => Measures.glEquiv_apply g x
-  have hc : distribHaarChar (Fin m → F) L =
-      Measures.modulus (g : Matrix (Fin m) (Fin m) F).det := by
+  have hc
+      : distribHaarChar (Fin m → F) L = Measures.modulus (g : Matrix (Fin m) (Fin m) F).det := by
     rw [hL, Measures.distribHaarChar_glEquiv, ← Measures.modulus_units]
     rfl
   have hmap : ν.map e.symm = (Measures.modulus (g : Matrix (Fin m) (Fin m) F).det) • ν := by
     refine Measure.ext fun s _ => ?_
     have hs : e.symm ⁻¹' s = L • s := (e.image_eq_preimage_symm s).symm
-    rw [e.symm.map_apply, hs, ← distribHaarChar_mul ν L s, hc, Measure.smul_apply,
-      ENNReal.smul_def, smul_eq_mul]
+    rw [e.symm.map_apply, hs, ← distribHaarChar_mul ν L s, hc, Measure.smul_apply, ENNReal.smul_def,
+      smul_eq_mul]
   have himg : (fun x => (g : Matrix (Fin m) (Fin m) F) *ᵥ x) '' A = e.symm ⁻¹' A := by
     rw [← e.image_eq_preimage_symm]
     exact Set.image_congr fun x _ => (he x).symm

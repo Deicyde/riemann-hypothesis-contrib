@@ -9,7 +9,9 @@ noncomputable section
 
 namespace GlobalTheory.HeightCounting.Up.Model
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem
+  GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
   GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -17,7 +19,9 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 2000000
 
-variable {hL : GlobalTheory.Published.LocalLanglandsGL} {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {P : Pre2 K w}
+variable
+  {hL : GlobalTheory.Published.LocalLanglandsGL} {K : Ctx} {B : Base}
+  {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {P : Pre2 K w}
 
 theorem qOf_off (v : B.places.Pl) (h : v ∉ P.Wt) : QOf P v = ∅ := if_neg h
 
@@ -35,15 +39,19 @@ theorem mem_of_twisted (x : St P) (v : B.places.Pl) (h : TwistedAt (Dof x) v) : 
   by_contra hv
   exact h (P.q.mu.off v hv)
 
-theorem del_mul_ne_one {p : ℕ} (hp : p.Prime) (hS : p ∈ offSet B.toPre) {δ : HChar B.host.E} (hδ : IsDelta (H := B.host) p δ)
-    (v : B.places.Pl) : δ * T.psi v ≠ 1 := by
+theorem del_mul_ne_one
+    {p : ℕ} (hp : p.Prime) (hS : p ∈ offSet B.toPre)
+    {δ : HChar B.host.E} (hδ : IsDelta (H := B.host) p δ)
+    (v : B.places.Pl)
+    : δ * T.psi v ≠ 1 := by
   intro h
   obtain ⟨Q, hQ, hpQ⟩ : ∃ Q : Ideal (𝓞 B.host.E), Q.IsMaximal ∧ ((p : ℕ) : 𝓞 B.host.E) ∈ Q := by
     have hne : Ideal.span {((p : ℕ) : 𝓞 B.host.E)} ≠ ⊤ := by
       intro ht
       have := congrArg Ideal.absNorm ht
       rw [Ideal.absNorm_span_singleton, Ideal.absNorm_top] at this
-      have h2 : Algebra.norm ℤ ((p : ℕ) : 𝓞 B.host.E) = (p : ℤ) ^ Module.finrank ℤ (𝓞 B.host.E) := by
+      have h2
+          : Algebra.norm ℤ ((p : ℕ) : 𝓞 B.host.E) = (p : ℤ) ^ Module.finrank ℤ (𝓞 B.host.E) := by
         rw [← map_natCast (algebraMap ℤ (𝓞 B.host.E)), Algebra.norm_algebraMap]
       rw [h2, Int.natAbs_pow, Int.natAbs_natCast] at this
       rcases Nat.pow_eq_one.1 this with h3 | h3
@@ -62,14 +70,17 @@ theorem del_mul_ne_one {p : ℕ} (hp : p.Prime) (hS : p ∈ offSet B.toPre) {δ 
     have h3 : ((Ideal.absNorm u.asIdeal : ℕ) : 𝓞 B.host.E) ∈ u.asIdeal := Ideal.absNorm_mem _
     by_cases e : Ideal.absNorm u.asIdeal = p
     · exact h2 (e ▸ hS)
-    · obtain ⟨a, b, hab⟩ : IsCoprime ((Ideal.absNorm u.asIdeal : ℕ) : 𝓞 B.host.E) (p : 𝓞 B.host.E) :=
+    · obtain ⟨a, b, hab⟩
+          : IsCoprime ((Ideal.absNorm u.asIdeal : ℕ) : 𝓞 B.host.E) (p : 𝓞 B.host.E) :=
         Nat.Coprime.cast ((Nat.coprime_primes h1 hp).2 e)
-      exact u.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 (hab ▸ Ideal.add_mem _ (Ideal.mul_mem_left _ _ h3) (Ideal.mul_mem_left _ _ hpQ)))
-  have h15 := (hδ.ine u hu 1).1 fun x hx => by
-    have e := congrArg (fun χ : HChar B.host.E => χ.loc u x) h
-    change δ.loc u x * (T.psi v).loc u x = 1 at e
-    rw [hψ x hx, mul_one] at e
-    rw [pow_one, e]
+      exact u.isPrime.ne_top ((Ideal.eq_top_iff_one _).2
+        (hab ▸ Ideal.add_mem _ (Ideal.mul_mem_left _ _ h3) (Ideal.mul_mem_left _ _ hpQ)))
+  have h15 :=
+    (hδ.ine u hu 1).1 fun x hx => by
+      have e := congrArg (fun χ : HChar B.host.E => χ.loc u x) h
+      change δ.loc u x * (T.psi v).loc u x = 1 at e
+      rw [hψ x hx, mul_one] at e
+      rw [pow_one, e]
   omega
 
 theorem twisted_iff (x : St P) (v : B.places.Pl) : TwistedAt (Dof x) v ↔ v ∈ P.Wt := by

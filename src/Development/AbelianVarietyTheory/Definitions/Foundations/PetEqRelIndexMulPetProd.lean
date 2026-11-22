@@ -44,9 +44,9 @@ def pmGrp (Γ : Subgroup SL(2, ℤ)) : Subgroup SL(2, ℤ) where
     rintro a (ha | ha)
     · exact Or.inl (Γ.inv_mem ha)
     · refine Or.inr ?_
-      have h : -a⁻¹ = (-a)⁻¹ := by
-        rw [eq_inv_iff_mul_eq_one]; simp
-      rw [h]; exact Γ.inv_mem ha
+      have h : -a⁻¹ = (-a)⁻¹ := by rw [eq_inv_iff_mul_eq_one]; simp
+      rw [h]
+      exact Γ.inv_mem ha
 
 theorem le_pmGrp (Γ : Subgroup SL(2, ℤ)) : Γ ≤ pmGrp Γ := fun _ h => Or.inl h
 
@@ -62,14 +62,14 @@ theorem pmGrp_eq_self {Γ : Subgroup SL(2, ℤ)} (h : -1 ∈ Γ) : pmGrp Γ = Γ
 instance pmGrp_finiteIndex (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex] : (pmGrp Γ).FiniteIndex :=
   Subgroup.finiteIndex_of_le (le_pmGrp Γ)
 
-theorem relIndex_pmGrp_of_notMem {Γ : Subgroup SL(2, ℤ)} (h : -1 ∉ Γ) :
-    Γ.relIndex (pmGrp Γ) = 2 := by
+theorem relIndex_pmGrp_of_notMem {Γ : Subgroup SL(2, ℤ)} (h : -1 ∉ Γ)
+    : Γ.relIndex (pmGrp Γ) = 2 := by
   unfold Subgroup.relIndex
   rw [Subgroup.index_eq_two_iff]
   refine ⟨⟨-1, neg_one_mem_pmGrp Γ⟩, ?_⟩
   rintro ⟨b, hb⟩
   simp only [Subgroup.mem_subgroupOf, Subgroup.coe_mul, mul_neg, mul_one]
-  have hne : ¬ (b ∈ Γ ∧ -b ∈ Γ) := fun ⟨h1, h2⟩ => h (by simpa using Γ.mul_mem h2 (Γ.inv_mem h1))
+  have hne : ¬(b ∈ Γ ∧ -b ∈ Γ) := fun ⟨h1, h2⟩ => h (by simpa using Γ.mul_mem h2 (Γ.inv_mem h1))
   rcases hb with hb | hb
   · exact Or.inr ⟨hb, fun h2 => hne ⟨hb, h2⟩⟩
   · exact Or.inl ⟨hb, fun h1 => hne ⟨h1, hb⟩⟩
@@ -88,8 +88,8 @@ theorem neg_one_notMem_lev {N : ℕ} (l : ℕ) (hN : 3 ≤ N) : -1 ∉ lev N l :
 def petProd (Γ : Subgroup SL(2, ℤ)) (k : ℤ) (f g : ℍ → ℂ) : ℂ :=
   ∑ᶠ γ : SL(2, ℤ) ⧸ pmGrp Γ, ∫ z in ModularGroup.fd, petersson k g f (γ.out⁻¹ • z)
 
-theorem petProd_smul_left (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex] (k : ℤ) (c : ℂ) (f g : ℍ → ℂ) :
-    petProd Γ k (c • f) g = c * petProd Γ k f g := by
+theorem petProd_smul_left (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex] (k : ℤ) (c : ℂ) (f g : ℍ → ℂ)
+    : petProd Γ k (c • f) g = c * petProd Γ k f g := by
   unfold petProd
   haveI : Fintype (SL(2, ℤ) ⧸ pmGrp Γ) := Fintype.ofFinite _
   rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype, Finset.mul_sum]
@@ -100,8 +100,8 @@ theorem petProd_smul_left (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex] (k : ℤ) 
   simp [petersson]
   ring
 
-theorem petProd_smul_right (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex] (k : ℤ) (c : ℂ) (f g : ℍ → ℂ) :
-    petProd Γ k f (c • g) = (starRingEnd ℂ) c * petProd Γ k f g := by
+theorem petProd_smul_right (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex] (k : ℤ) (c : ℂ) (f g : ℍ → ℂ)
+    : petProd Γ k f (c • g) = (starRingEnd ℂ) c * petProd Γ k f g := by
   unfold petProd
   haveI : Fintype (SL(2, ℤ) ⧸ pmGrp Γ) := Fintype.ofFinite _
   rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype, Finset.mul_sum]
@@ -112,9 +112,11 @@ theorem petProd_smul_right (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex] (k : ℤ)
   simp [petersson]
   ring
 
-theorem petProd_level_one (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex] (k : ℤ) {f g : ℍ → ℂ}
-    (hf : ∀ γ : SL(2, ℤ), f ∣[k] γ = f) (hg : ∀ γ : SL(2, ℤ), g ∣[k] γ = g) :
-    petProd Γ k f g = ((pmGrp Γ).index : ℂ) * ∫ z in ModularGroup.fd, petersson k g f z := by
+theorem petProd_level_one
+    (Γ : Subgroup SL(2, ℤ)) [Γ.FiniteIndex]
+    (k : ℤ)
+    {f g : ℍ → ℂ} (hf : ∀ γ : SL(2, ℤ), f ∣[k] γ = f) (hg : ∀ γ : SL(2, ℤ), g ∣[k] γ = g)
+    : petProd Γ k f g = ((pmGrp Γ).index : ℂ) * ∫ z in ModularGroup.fd, petersson k g f z := by
   unfold petProd
   haveI : Fintype (SL(2, ℤ) ⧸ pmGrp Γ) := Fintype.ofFinite _
   simp only [← petersson_slash_SL, hf, hg]

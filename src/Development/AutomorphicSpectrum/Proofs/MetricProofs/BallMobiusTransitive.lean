@@ -9,7 +9,10 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IntEmbInjectiv
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+  GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
 open scoped ENNReal InnerProductSpace
 open scoped ComplexOrder
 
@@ -23,7 +26,8 @@ open scoped MatrixOrder
 
 variable {a b : Type} [Fintype a] [Fintype b] [DecidableEq a] [DecidableEq b]
 
-theorem exists_congr_one {A : Matrix a a ℂ} (hA : A.PosDef) : ∃ X : Matrix a a ℂ, Xᴴ * A * X = 1 ∧ IsUnit X.det := by
+theorem exists_congr_one {A : Matrix a a ℂ} (hA : A.PosDef)
+    : ∃ X : Matrix a a ℂ, Xᴴ * A * X = 1 ∧ IsUnit X.det := by
   have h0 : 0 ≤ A := Matrix.nonneg_iff_posSemidef.mpr hA.posSemidef
   have hs : (CFC.sqrt A).PosSemidef := Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg A)
   obtain ⟨C, hCA⟩ : ∃ C : Matrix a a ℂ, A = Cᴴ * C :=
@@ -34,8 +38,9 @@ theorem exists_congr_one {A : Matrix a a ℂ} (hA : A.PosDef) : ∃ X : Matrix a
     exact isUnit_of_mul_isUnit_right hd
   have h1 : C * C⁻¹ = 1 := Matrix.mul_nonsing_inv C hC
   refine ⟨C⁻¹, ?_, ?_⟩
-  · calc (C⁻¹)ᴴ * A * C⁻¹ = (C * C⁻¹)ᴴ * (C * C⁻¹) := by
-          rw [hCA, Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
+  · calc
+      (C⁻¹)ᴴ * A * C⁻¹ = (C * C⁻¹)ᴴ * (C * C⁻¹) := by
+        rw [hCA, Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
       _ = 1 := by rw [h1]; simp
   · exact (Matrix.isUnit_nonsing_inv_det_iff).2 hC
 
@@ -50,16 +55,18 @@ theorem posDef_one_sub_swap {W : Matrix b a ℂ} (h : (1 - W * Wᴴ).PosDef) : (
     have e : Wᴴ * B⁻¹ * W * (Wᴴ * W) = Wᴴ * B⁻¹ * (W * Wᴴ) * W := by simp only [Matrix.mul_assoc]
     have e3 : Wᴴ * B⁻¹ * (1 - B) * W = Wᴴ * B⁻¹ * W - Wᴴ * W := by
       have hBi' : B⁻¹ * B = 1 := Matrix.nonsing_inv_mul B hBu
-      rw [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Matrix.mul_assoc (Wᴴ) (B⁻¹) B, hBi', Matrix.mul_one]
+      rw [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Matrix.mul_assoc (Wᴴ) (B⁻¹) B, hBi',
+        Matrix.mul_one]
     rw [Matrix.mul_sub, Matrix.mul_one, Matrix.add_mul, Matrix.one_mul, e, e2, e3]
     abel
   have : (1 - Wᴴ * W) = (1 + Wᴴ * B⁻¹ * W)⁻¹ := (Matrix.inv_eq_right_inv hinv).symm
   rw [this]
   exact hP.inv
 
-theorem exists_boost {W : Matrix b a ℂ} (h : (1 - W * Wᴴ).PosDef) :
-    ∃ u : Matrix (a ⊕ b) (a ⊕ b) ℂ,
-      uᴴ * fromBlocks 1 0 0 (-1) * u = fromBlocks 1 0 0 (-1) ∧ u.toBlocks₂₁ * u.toBlocks₁₁⁻¹ = W := by
+theorem exists_boost {W : Matrix b a ℂ} (h : (1 - W * Wᴴ).PosDef)
+    : ∃ u : Matrix (a ⊕ b) (a ⊕ b) ℂ,
+      uᴴ * fromBlocks 1 0 0 (-1) * u = fromBlocks 1 0 0 (-1)
+        ∧ u.toBlocks₂₁ * u.toBlocks₁₁⁻¹ = W := by
   obtain ⟨X, hX, hXu⟩ := exists_congr_one (posDef_one_sub_swap h)
   obtain ⟨Y, hY, -⟩ := exists_congr_one h
   refine ⟨fromBlocks X (Wᴴ * Y) (W * X) Y, ?_, ?_⟩
@@ -71,8 +78,8 @@ theorem exists_boost {W : Matrix b a ℂ} (h : (1 - W * Wᴴ).PosDef) :
       simp only [Matrix.mul_one, Matrix.mul_assoc]
       abel
     rw [Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
-    simp only [Matrix.mul_one, Matrix.mul_zero, Matrix.mul_neg, add_zero, zero_add, Matrix.conjTranspose_mul,
-      Matrix.conjTranspose_conjTranspose, Matrix.neg_mul]
+    simp only [Matrix.mul_one, Matrix.mul_zero, Matrix.mul_neg, add_zero, zero_add,
+      Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.neg_mul]
     congr 1
     · simp only [Matrix.mul_assoc, add_neg_cancel]
     · simp only [Matrix.mul_assoc, add_neg_cancel]
@@ -86,12 +93,16 @@ end GlobalTheory.CompanionTheory.Ar.Cusp.Dict.Boost
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.Dict
 
-theorem moebBall_transitive : ∀ (Ψ : Type) [Fintype Ψ] (j j' n : ℕ) (q : Ψ × Fin j × Fin j' ≃ Fin n) (t : Fin n → ℂ), t ∈ ballDom q → ∃ u : Ψ → Matrix (Sg j j') (Sg j j') ℂ, (∀ τ, IsSgU (u τ)) ∧ moebBall q u 0 = t := by
+theorem moebBall_transitive
+    : ∀ (Ψ : Type) [Fintype Ψ] (j j' n : ℕ) (q : Ψ × Fin j × Fin j' ≃ Fin n) (t : Fin n → ℂ),
+      t ∈ ballDom q
+        → ∃ u : Ψ → Matrix (Sg j j') (Sg j j') ℂ, (∀ τ, IsSgU (u τ)) ∧ moebBall q u 0 = t := by
   intro Ψ _ j j' n q t ht
   have hW : ∀ τ, (1 - (ballMat q t τ)ᵀ * ((ballMat q t τ)ᵀ)ᴴ).PosDef := by
     intro τ
     have h := (ht τ).transpose
-    have e : (1 - (ballMat q t τ)ᴴ * ballMat q t τ)ᵀ = 1 - (ballMat q t τ)ᵀ * ((ballMat q t τ)ᵀ)ᴴ := by
+    have e
+        : (1 - (ballMat q t τ)ᴴ * ballMat q t τ)ᵀ = 1 - (ballMat q t τ)ᵀ * ((ballMat q t τ)ᵀ)ᴴ := by
       rw [Matrix.transpose_sub, Matrix.transpose_one, Matrix.transpose_mul]
       congr 2
     rwa [e] at h

@@ -28,8 +28,9 @@ namespace HCSS
 
 variable {n : ℕ}
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {G : Set (Matrix (Fin n) (Fin n) ℂ)}
-  {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {G : Set (Matrix (Fin n) (Fin n) ℂ)} {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
 end HCSS
 

@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace KrullIntersectionUnits.KrullIntersectionLemmas
 
-theorem exists_unit_kills_of_idempotent {A : Type} [CommRing A] (J : Ideal A) (S : Finset A) :
-    (∀ x ∈ S, ∃ r ∈ J, r * x = x) → ∃ s : A, s - 1 ∈ J ∧ ∀ x ∈ S, s * x = 0 := by
+theorem exists_unit_kills_of_idempotent {A : Type} [CommRing A] (J : Ideal A) (S : Finset A)
+    : (∀ x ∈ S, ∃ r ∈ J, r * x = x) → ∃ s : A, s - 1 ∈ J ∧ ∀ x ∈ S, s * x = 0 := by
   classical
   refine Finset.induction_on S ?_ ?_
   · intro _
@@ -26,9 +26,11 @@ theorem exists_unit_kills_of_idempotent {A : Type} [CommRing A] (J : Ideal A) (S
       · have e : s * (1 - r) * y = (1 - r) * (s * y) := by ring
         rw [e, hs2 y hy, mul_zero]
 
-theorem exists_unit_finite_lift {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (hf : φ.Finite)
-    (J : Ideal A) (hsurj : ∀ b : B, ∃ a : A, b - φ a ∈ Ideal.map φ J) :
-    ∃ s : A, s - 1 ∈ J ∧ ∀ b : B, ∃ a : A, φ s * b = φ a := by
+theorem exists_unit_finite_lift
+    {A B : Type} [CommRing A] [CommRing B]
+    (φ : A →+* B) (hf : φ.Finite)
+    (J : Ideal A) (hsurj : ∀ b : B, ∃ a : A, b - φ a ∈ Ideal.map φ J)
+    : ∃ s : A, s - 1 ∈ J ∧ ∀ b : B, ∃ a : A, φ s * b = φ a := by
   letI : Algebra A B := φ.toAlgebra
   haveI : Module.Finite A B := hf
   let Nr : Submodule A B := LinearMap.range (Algebra.linearMap A B)
@@ -43,8 +45,7 @@ theorem exists_unit_finite_lift {A B : Type} [CommRing A] [CommRing B] (φ : A �
     have h0 : Nr.mkQ (φ a) = 0 := by
       rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
       exact ⟨a, rfl⟩
-    have e : Nr.mkQ b = Nr.mkQ (b - φ a) := by
-      rw [map_sub, h0, sub_zero]
+    have e : Nr.mkQ b = Nr.mkQ (b - φ a) := by rw [map_sub, h0, sub_zero]
     rw [e]
     have hm := Submodule.mem_map_of_mem (f := Nr.mkQ) hy
     rw [Submodule.map_smul''] at hm
@@ -58,8 +59,9 @@ theorem exists_unit_finite_lift {A B : Type} [CommRing A] [CommRing B] (φ : A �
   obtain ⟨a, ha⟩ := h1
   exact ⟨a, ha.symm⟩
 
-theorem exists_mem_mul_eq_of_mem_pow {A : Type} [CommRing A] [IsNoetherianRing A] (J : Ideal A) (x : A)
-    (hx : ∀ n : ℕ, x ∈ J ^ n) : ∃ r ∈ J, r * x = x := by
+theorem exists_mem_mul_eq_of_mem_pow
+    {A : Type} [CommRing A] [IsNoetherianRing A] (J : Ideal A) (x : A) (hx : ∀ n : ℕ, x ∈ J ^ n)
+    : ∃ r ∈ J, r * x = x := by
   have h : x ∈ (⨅ i : ℕ, J ^ i • ⊤ : Submodule A A) := by
     rw [Submodule.mem_iInf]
     intro i
@@ -68,8 +70,17 @@ theorem exists_mem_mul_eq_of_mem_pow {A : Type} [CommRing A] [IsNoetherianRing A
   obtain ⟨r, hr⟩ := (Ideal.mem_iInf_smul_pow_eq_bot_iff (I := J) x).mp h
   exact ⟨r, r.2, hr⟩
 
-theorem GlobalTheory.CompanionTheory.Formal.IsoThick.exists_unit_kills :
-    ∀ {A B : Type} [inst : CommRing A] [inst_1 : CommRing B] [IsNoetherianRing A] (φ : A →+* B), φ.Finite → ∀ (J : Ideal A), (∀ (b : B), ∃ (a : A), b - DFunLike.coe φ a ∈ Ideal.map φ J) → (∀ (a : A), DFunLike.coe φ a = OfNat.ofNat (nat_lit 0) → ∀ (n : ℕ), a ∈ J ^ n) → ∃ (s : A), s - OfNat.ofNat (nat_lit 1) ∈ J ∧ (∀ (k : A), DFunLike.coe φ k = OfNat.ofNat (nat_lit 0) → s * k = OfNat.ofNat (nat_lit 0)) ∧ ∀ (b : B), ∃ (a : A), DFunLike.coe φ s * b = DFunLike.coe φ a := by
+theorem GlobalTheory.CompanionTheory.Formal.IsoThick.exists_unit_kills
+    : ∀ {A B : Type} [inst : CommRing A] [inst_1 : CommRing B] [IsNoetherianRing A] (φ : A →+* B),
+      φ.Finite
+        → ∀ (J : Ideal A),
+          (∀ (b : B), ∃ (a : A), b - DFunLike.coe φ a ∈ Ideal.map φ J)
+            → (∀ (a : A), DFunLike.coe φ a = OfNat.ofNat (nat_lit 0) → ∀ (n : ℕ), a ∈ J ^ n)
+            → ∃ (s : A),
+              s - OfNat.ofNat (nat_lit 1) ∈ J
+                ∧ (∀ (k : A),
+                  DFunLike.coe φ k = OfNat.ofNat (nat_lit 0) → s * k = OfNat.ofNat (nat_lit 0))
+                ∧ ∀ (b : B), ∃ (a : A), DFunLike.coe φ s * b = DFunLike.coe φ a := by
   intro A B _ _ _ φ hf J hsurj hker
   obtain ⟨s1, hs1J, hs1⟩ := exists_unit_finite_lift φ hf J hsurj
   obtain ⟨S, hS⟩ : ∃ S : Finset A, Submodule.span A (S : Set A) = RingHom.ker φ :=

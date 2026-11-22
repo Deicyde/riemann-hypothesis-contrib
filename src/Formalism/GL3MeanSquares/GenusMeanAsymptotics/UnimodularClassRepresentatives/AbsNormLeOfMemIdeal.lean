@@ -16,8 +16,8 @@ open BoxSum
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
-theorem absNorm_le_of_mem_ideal {b : Ideal (𝓞 F)} {n : 𝓞 F} (hn : n ∈ b) (h0 : n ≠ 0) :
-    (Ideal.absNorm b : ℝ) ≤ (Ideal.absNorm (Ideal.span {n}) : ℝ) := by
+theorem absNorm_le_of_mem_ideal {b : Ideal (𝓞 F)} {n : 𝓞 F} (hn : n ∈ b) (h0 : n ≠ 0)
+    : (Ideal.absNorm b : ℝ) ≤ (Ideal.absNorm (Ideal.span {n}) : ℝ) := by
   have h1 : Ideal.absNorm b ∣ Ideal.absNorm (Ideal.span {n}) :=
     Ideal.absNorm_dvd_absNorm_of_le ((Ideal.span_singleton_le_iff_mem b).2 hn)
   have h2 : Ideal.absNorm (Ideal.span {n}) ≠ 0 := by
@@ -25,14 +25,19 @@ theorem absNorm_le_of_mem_ideal {b : Ideal (𝓞 F)} {n : 𝓞 F} (hn : n ∈ b)
     exact h0
   exact_mod_cast Nat.le_of_dvd (Nat.pos_of_ne_zero h2) h1
 
-theorem absNorm_le_pow (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {b : Ideal (𝓞 F)} {T : ℝ}
-    {n : 𝓞 F} (hn : n ∈ boxSet K F T) (hb : n ∈ b) :
-    (Ideal.absNorm b : ℝ) ≤ T ^ Formalism.HermitianLatticesTheory.fDeg K :=
+theorem absNorm_le_pow
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {b : Ideal (𝓞 F)} {T : ℝ} {n : 𝓞 F} (hn : n ∈ boxSet K F T) (hb : n ∈ b)
+    : (Ideal.absNorm b : ℝ) ≤ T ^ Formalism.HermitianLatticesTheory.fDeg K :=
   (absNorm_le_of_mem_ideal hb (ne_zero_of_mem_boxSet hn)).trans (absNorm_le_of_mem hK hF hn)
 
-theorem eq_of_close (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {b : Ideal (𝓞 F)} {δ : ℝ}
-    (hδ : δ ^ Formalism.HermitianLatticesTheory.fDeg K ≤ (Ideal.absNorm b : ℝ)) {n n' : 𝓞 F} (hn : n ∈ b) (hn' : n' ∈ b)
-    (hc : ∀ w : {w : InfinitePlace F // w.IsReal}, |rEmb w n - rEmb w n'| < δ) : n = n' := by
+theorem eq_of_close
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {b : Ideal (𝓞 F)} {δ : ℝ}
+    (hδ : δ ^ Formalism.HermitianLatticesTheory.fDeg K ≤ (Ideal.absNorm b : ℝ))
+    {n n' : 𝓞 F} (hn : n ∈ b) (hn' : n' ∈ b)
+    (hc : ∀ w : {w : InfinitePlace F // w.IsReal}, |rEmb w n - rEmb w n'| < δ)
+    : n = n' := by
   have hR : IsTotallyReal F := QuadraticExtensionConjugation.isTotallyReal hK hF
   by_contra hne
   have h0 : n - n' ≠ 0 := sub_ne_zero.2 hne
@@ -41,8 +46,9 @@ theorem eq_of_close (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : I
   have hne' : (Finset.univ : Finset {w : InfinitePlace F // w.IsReal}).Nonempty := by
     obtain ⟨w⟩ : Nonempty (InfinitePlace F) := inferInstance
     exact ⟨⟨w, IsTotallyReal.isReal w⟩, Finset.mem_univ _⟩
-  have h2 : ∏ w : {w : InfinitePlace F // w.IsReal}, |rEmb w (n - n')| <
-      ∏ _w : {w : InfinitePlace F // w.IsReal}, δ := by
+  have h2
+      : ∏ w : {w : InfinitePlace F // w.IsReal}, |rEmb w (n - n')|
+        < ∏ _w : {w : InfinitePlace F // w.IsReal}, δ := by
     refine Finset.prod_lt_prod_of_nonempty₀ (fun w _ => ?_) (fun w _ => ?_) hne'
     · rw [abs_pos]
       intro h3
@@ -55,8 +61,9 @@ theorem eq_of_close (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : I
   rw [Finset.prod_const, Finset.card_univ, card_real hK hF] at h2
   linarith
 
-theorem abs_sub_lt_of_floor_eq {δ a a' : ℝ} (hδ : 0 < δ) (ha : 0 ≤ a) (ha' : 0 ≤ a')
-    (h : ⌊a / δ⌋₊ = ⌊a' / δ⌋₊) : |a - a'| < δ := by
+theorem abs_sub_lt_of_floor_eq
+    {δ a a' : ℝ} (hδ : 0 < δ) (ha : 0 ≤ a) (ha' : 0 ≤ a') (h : ⌊a / δ⌋₊ = ⌊a' / δ⌋₊)
+    : |a - a'| < δ := by
   have h1 := Nat.floor_le (div_nonneg ha hδ.le)
   have h2 := Nat.lt_floor_add_one (a / δ)
   have h3 := Nat.floor_le (div_nonneg ha' hδ.le)
@@ -68,13 +75,18 @@ theorem abs_sub_lt_of_floor_eq {δ a a' : ℝ} (hδ : 0 < δ) (ha : 0 ≤ a) (ha
   rw [abs_lt]
   constructor <;> linarith
 
-theorem card_le_pow (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {b : Ideal (𝓞 F)} {δ T : ℝ}
-    (hδ0 : 0 < δ) (hδ : δ ^ Formalism.HermitianLatticesTheory.fDeg K ≤ (Ideal.absNorm b : ℝ)) :
-    Nat.card {n : 𝓞 F // n ∈ boxSet K F T ∧ n ∈ b} ≤ (⌊T / δ⌋₊ + 1) ^ Formalism.HermitianLatticesTheory.fDeg K := by
+theorem card_le_pow
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {b : Ideal (𝓞 F)} {δ T : ℝ}
+    (hδ0 : 0 < δ) (hδ : δ ^ Formalism.HermitianLatticesTheory.fDeg K ≤ (Ideal.absNorm b : ℝ))
+    : Nat.card {n : 𝓞 F // n ∈ boxSet K F T ∧ n ∈ b}
+      ≤ (⌊T / δ⌋₊ + 1) ^ Formalism.HermitianLatticesTheory.fDeg K := by
   let W := {w : InfinitePlace F // w.IsReal}
-  let g : {n : 𝓞 F // n ∈ boxSet K F T ∧ n ∈ b} → (W → Fin (⌊T / δ⌋₊ + 1)) := fun n w =>
-    ⟨⌊rEmb w n.1 / δ⌋₊, Nat.lt_succ_of_le (Nat.floor_le_floor
-      (div_le_div_of_nonneg_right (((mem_boxSet_iff hK hF).1 n.2.1) w).2 hδ0.le))⟩
+  let g : {n : 𝓞 F // n ∈ boxSet K F T ∧ n ∈ b} → (W → Fin (⌊T / δ⌋₊ + 1)) := fun n w => ⟨
+    ⌊rEmb w n.1 / δ⌋₊,
+    Nat.lt_succ_of_le (Nat.floor_le_floor (div_le_div_of_nonneg_right
+      (((mem_boxSet_iff hK hF).1 n.2.1) w).2 hδ0.le))
+  ⟩
   have hg : Function.Injective g := by
     intro n n' h
     refine Subtype.ext (eq_of_close hK hF hδ n.2.2 n'.2.2 fun w => ?_)
@@ -82,16 +94,21 @@ theorem card_le_pow (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : I
     exact abs_sub_lt_of_floor_eq hδ0 (((mem_boxSet_iff hK hF).1 n.2.1) w).1.le
       (((mem_boxSet_iff hK hF).1 n'.2.1) w).1.le h1
   have h1 := Nat.card_le_card_of_injective g hg
-  have h2 : Nat.card (W → Fin (⌊T / δ⌋₊ + 1)) = (⌊T / δ⌋₊ + 1) ^ Formalism.HermitianLatticesTheory.fDeg K := by
+  have h2
+      : Nat.card (W → Fin (⌊T / δ⌋₊ + 1))
+        = (⌊T / δ⌋₊ + 1) ^ Formalism.HermitianLatticesTheory.fDeg K := by
     rw [Nat.card_eq_fintype_card, Fintype.card_fun, Fintype.card_fin, card_real hK hF]
   rwa [h2] at h1
 
 theorem fDeg_pos : 0 < Formalism.HermitianLatticesTheory.fDeg K := Fintype.card_pos
 
-theorem card_box_le (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {b : Ideal (𝓞 F)}
-    (hb : b ≠ ⊥) {T : ℝ} (hT0 : 0 ≤ T) :
-    (Nat.card {n : 𝓞 F // n ∈ boxSet K F T ∧ n ∈ b} : ℝ) ≤
-      2 ^ Formalism.HermitianLatticesTheory.fDeg K * T ^ Formalism.HermitianLatticesTheory.fDeg K / (Ideal.absNorm b : ℝ) := by
+theorem card_box_le
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {b : Ideal (𝓞 F)} (hb : b ≠ ⊥)
+    {T : ℝ} (hT0 : 0 ≤ T)
+    : (Nat.card {n : 𝓞 F // n ∈ boxSet K F T ∧ n ∈ b} : ℝ)
+      ≤ 2 ^ Formalism.HermitianLatticesTheory.fDeg K * T ^ Formalism.HermitianLatticesTheory.fDeg K
+        / (Ideal.absNorm b : ℝ) := by
   have hf : Formalism.HermitianLatticesTheory.fDeg K ≠ 0 := (fDeg_pos (K := K)).ne'
   have hN : (0 : ℝ) < (Ideal.absNorm b : ℝ) := by
     have : Ideal.absNorm b ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
@@ -106,7 +123,8 @@ theorem card_box_le (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : I
     exact (hn φ).1.trans_le (hn φ).2
   set δ : ℝ := (Ideal.absNorm b : ℝ) ^ ((Formalism.HermitianLatticesTheory.fDeg K : ℝ)⁻¹) with hδdef
   have hδ0 : 0 < δ := Real.rpow_pos_of_pos hN _
-  have hδ : δ ^ Formalism.HermitianLatticesTheory.fDeg K = (Ideal.absNorm b : ℝ) := Real.rpow_inv_natCast_pow hN.le hf
+  have hδ : δ ^ Formalism.HermitianLatticesTheory.fDeg K = (Ideal.absNorm b : ℝ) :=
+    Real.rpow_inv_natCast_pow hN.le hf
   have hδT : δ ≤ T := by
     have := absNorm_le_pow hK hF hn hnb
     rw [← hδ] at this
@@ -118,10 +136,13 @@ theorem card_box_le (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : I
     push_cast
     rw [mul_div_assoc]
     linarith
-  calc (Nat.card {n : 𝓞 F // n ∈ boxSet K F T ∧ n ∈ b} : ℝ)
-      ≤ (((⌊T / δ⌋₊ + 1) ^ Formalism.HermitianLatticesTheory.fDeg K : ℕ) : ℝ) := by exact_mod_cast h1
+  calc
+    (Nat.card {n : 𝓞 F // n ∈ boxSet K F T ∧ n ∈ b} : ℝ)
+        ≤ (((⌊T / δ⌋₊ + 1) ^ Formalism.HermitianLatticesTheory.fDeg K : ℕ) : ℝ) := by
+      exact_mod_cast h1
     _ = ((⌊T / δ⌋₊ + 1 : ℕ) : ℝ) ^ Formalism.HermitianLatticesTheory.fDeg K := by push_cast; rfl
-    _ ≤ (2 * T / δ) ^ Formalism.HermitianLatticesTheory.fDeg K := pow_le_pow_left₀ (by positivity) h2 _
+    _ ≤ (2 * T / δ) ^ Formalism.HermitianLatticesTheory.fDeg K :=
+      pow_le_pow_left₀ (by positivity) h2 _
     _ = _ := by rw [div_pow, mul_pow, hδ]
 
 end Formalism.HermitianLattices.Ext.L3.BoxCube

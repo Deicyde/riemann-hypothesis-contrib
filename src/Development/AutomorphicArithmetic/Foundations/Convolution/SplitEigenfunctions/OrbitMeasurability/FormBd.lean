@@ -8,17 +8,21 @@ public import GroundTheory.AutomorphicForms.CuspidalDiscreteness.CuspFormsSiegel
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff UpperTheory.ConvolutionTheory.RankTwoDescent
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
+  UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 
-private theorem dM_fin (t : (A ℚ)ˣ) (ht : (t : A ℚ).1 = 1) :
-    finGL ℚ 2 (Matrix.GeneralLinearGroup.map (pFin ℚ) (dM t)) = dM t := by
+private theorem dM_fin (t : (A ℚ)ˣ) (ht : (t : A ℚ).1 = 1)
+    : finGL ℚ 2 (Matrix.GeneralLinearGroup.map (pFin ℚ) (dM t)) = dM t := by
   have h := TR.infGL_mul_finGL (dM t)
   have h1 : Matrix.GeneralLinearGroup.map (TR.pInf ℚ) (dM t) = 1 := by
     have ht' : TR.pInf ℚ (t : A ℚ) = 1 := by
       change (TR.infEq ℚ).symm (t : A ℚ).1 = 1
-      rw [ht]; exact map_one _
+      rw [ht]
+      exact map_one _
     refine Units.ext ?_
     ext i j
     fin_cases i <;> fin_cases j <;> simp [ht']
@@ -26,8 +30,8 @@ private theorem dM_fin (t : (A ℚ)ˣ) (ht : (t : A ℚ).1 = 1) :
   exact h
 
 open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction in
-theorem UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.formBd :
-    UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.FormBd := by
+theorem UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.formBd
+    : UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.FormBd := by
   intro π hπ f hf
   have hL := (UpperTheory.ConvolutionTheory.R2.Pp.cuspZero ℚ π f hf).1
   refine ⟨⟨hL.1, hL.2, ?_, fun s x => hπ f hf s x⟩, fun t ht => ?_⟩
@@ -36,7 +40,8 @@ theorem UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.formBd :
     subst hφ
     refine ⟨B₀, fun x => ?_⟩
     have h2 : (centralSection ℚ 2 (detModule ℚ 2 x))⁻¹ * x ∈ normOneGL (K := ℚ) (n := 2) := by
-      rw [mem_normOneGL_iff_detModule, map_mul, map_inv, detModule_centralSection two_pos, inv_mul_cancel]
+      rw [mem_normOneGL_iff_detModule, map_mul, map_inv, detModule_centralSection two_pos,
+        inv_mul_cancel]
     have h3 := hπ _ hf (detModule ℚ 2 x) ((centralSection ℚ 2 (detModule ℚ 2 x))⁻¹ * x)
     rw [mul_inv_cancel_left] at h3
     rw [h3]

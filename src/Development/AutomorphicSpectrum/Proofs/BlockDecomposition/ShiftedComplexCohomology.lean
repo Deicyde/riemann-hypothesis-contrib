@@ -10,7 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HodgeXD
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct DirectSum GlobalTheory.LogCris CrystallineSemistableComparison CrystallineSemistableComparison.Onto CrystallineSemistableComparison.Pb CrystallineSemistableComparison.HT GlobalTheory.CompanionTheory.KunGlue
+open CategoryTheory AlgebraicGeometry TensorProduct DirectSum GlobalTheory.LogCris
+  CrystallineSemistableComparison CrystallineSemistableComparison.Onto
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.HT
+  GlobalTheory.CompanionTheory.KunGlue
 
 noncomputable section
 
@@ -29,27 +32,40 @@ def ev (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) : (Sh �
     rfl
   right_inv _ := rfl
 
-theorem ev_apply (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (y : (Sh ς k C).X n) :
-    ev ς k C h y = y ⟨m, h⟩ := rfl
+theorem ev_apply (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (y : (Sh ς k C).X n)
+    : ev ς k C h y = y ⟨m, h⟩ :=
+  rfl
 
-theorem d_apply_succ (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (y : (Sh ς k C).X n) (h' : m + 1 + k = n + 1) :
-    (Sh ς k C).d n y ⟨m + 1, h'⟩ = (ς : ℤ) • C.d m (y ⟨m, h⟩) := rfl
+theorem d_apply_succ
+    (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K)
+    {m n : ℕ} (h : m + k = n) (y : (Sh ς k C).X n) (h' : m + 1 + k = n + 1)
+    : (Sh ς k C).d n y ⟨m + 1, h'⟩ = (ς : ℤ) • C.d m (y ⟨m, h⟩) :=
+  rfl
 
-theorem d_apply_zero (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {n : ℕ} (y : (Sh ς k C).X n) (h' : 0 + k = n + 1) :
-    (Sh ς k C).d n y ⟨0, h'⟩ = 0 := rfl
+theorem d_apply_zero
+    (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {n : ℕ} (y : (Sh ς k C).X n) (h' : 0 + k = n + 1)
+    : (Sh ς k C).d n y ⟨0, h'⟩ = 0 :=
+  rfl
 
-theorem unit_smul_eq_zero (ς : ℤˣ) {M : Type*} [AddCommGroup M] {x : M} : (ς : ℤ) • x = 0 ↔ x = 0 := by
+theorem unit_smul_eq_zero (ς : ℤˣ) {M : Type*} [AddCommGroup M] {x : M}
+    : (ς : ℤ) • x = 0 ↔ x = 0 := by
   rcases Int.units_eq_one_or ς with rfl | rfl <;> simp
 
-theorem unit_smul_smul (ς : ℤˣ) {M : Type*} [AddCommGroup M] (x : M) : (ς : ℤ) • (ς : ℤ) • x = x := by
+theorem unit_smul_smul (ς : ℤˣ) {M : Type*} [AddCommGroup M] (x : M)
+    : (ς : ℤ) • (ς : ℤ) • x = x := by
   rcases Int.units_eq_one_or ς with rfl | rfl <;> simp
 
-theorem ext_at (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) {y z : (Sh ς k C).X n}
-    (e : y ⟨m, h⟩ = z ⟨m, h⟩) : y = z :=
+theorem ext_at
+    (ς : ℤˣ)
+    (k : ℕ)
+    (C : Cx.{1} K)
+    {m n : ℕ} (h : m + k = n)
+    {y z : (Sh ς k C).X n} (e : y ⟨m, h⟩ = z ⟨m, h⟩)
+    : y = z :=
   (ev ς k C h).injective e
 
-theorem mem_Z_iff (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (y : (Sh ς k C).X n) :
-    (Sh ς k C).d n y = 0 ↔ C.d m (y ⟨m, h⟩) = 0 := by
+theorem mem_Z_iff (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (y : (Sh ς k C).X n)
+    : (Sh ς k C).d n y = 0 ↔ C.d m (y ⟨m, h⟩) = 0 := by
   have h' : m + 1 + k = n + 1 := by omega
   constructor
   · intro e
@@ -61,8 +77,8 @@ theorem mem_Z_iff (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k =
     rw [d_apply_succ ς k C h y h', e, smul_zero]
     rfl
 
-theorem mem_B_iff (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (y : (Sh ς k C).X n) :
-    y ∈ (Sh ς k C).B n ↔ y ⟨m, h⟩ ∈ C.B m := by
+theorem mem_B_iff (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (y : (Sh ς k C).X n)
+    : y ∈ (Sh ς k C).B n ↔ y ⟨m, h⟩ ∈ C.B m := by
   cases n with
   | zero =>
     obtain rfl : m = 0 := by omega
@@ -112,8 +128,8 @@ def evZ (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) : C.Z 
     · intro hy
       exact ⟨ev ς k C h y, (mem_Z_iff ς k C h y).1 hy, (ev ς k C h).symm_apply_apply y⟩)
 
-theorem evZ_coe (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (x : C.Z m) :
-    ev ς k C h (evZ ς k C h x).1 = x.1 :=
+theorem evZ_coe (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) (x : C.Z m)
+    : ev ς k C h (evZ ς k C h x).1 = x.1 :=
   (ev ς k C h).apply_symm_apply x.1
 
 def evH (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) : C.H m ≃ₗ[K] (Sh ς k C).H n :=
@@ -137,7 +153,12 @@ def evH (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) {m n : ℕ} (h : m + k = n) : C.H 
       rw [← this]
       exact (mem_B_iff ς k C h _).1 hy')
 
-theorem main : ∀ {K : Type} [Field K] (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) (n : ℕ), (n < k → Subsingleton ((Sh ς k C).H n)) ∧ ∀ (m : ℕ) (h : m + k = n), ∃ e : C.H m ≃ₗ[K] (Sh ς k C).H n, ∀ (y : (Sh ς k C).X n) (hy : (Sh ς k C).d n y = 0) (hy' : C.d m (y ⟨m, h⟩) = 0), e (C.cls (y ⟨m, h⟩) hy') = (Sh ς k C).cls y hy := by
+theorem main
+    : ∀ {K : Type} [Field K] (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) (n : ℕ),
+      (n < k → Subsingleton ((Sh ς k C).H n))
+        ∧ ∀ (m : ℕ) (h : m + k = n), ∃ e : C.H m ≃ₗ[K] (Sh ς k C).H n,
+          ∀ (y : (Sh ς k C).X n) (hy : (Sh ς k C).d n y = 0) (hy' : C.d m (y ⟨m, h⟩) = 0),
+            e (C.cls (y ⟨m, h⟩) hy') = (Sh ς k C).cls y hy := by
   intro K _ ς k C n
   refine ⟨fun hn => ?_, fun m h => ⟨evH ς k C h, fun y hy hy' => ?_⟩⟩
   · have : IsEmpty {m : ℕ // m + k = n} := ⟨fun x => by have := x.2; omega⟩
@@ -145,7 +166,8 @@ theorem main : ∀ {K : Type} [Field K] (ς : ℤˣ) (k : ℕ) (C : Cx.{1} K) (n
       inferInstanceAs (Subsingleton (∀ m : {m : ℕ // m + k = n}, C.X m.1))
     have hZ : Subsingleton ((Sh ς k C).Z n) := ⟨fun a b => Subtype.ext (hX.elim _ _)⟩
     exact Quotient.instSubsingletonQuotient _
-  · refine congrArg (Submodule.Quotient.mk (p := ((Sh ς k C).B n).submoduleOf ((Sh ς k C).Z n))) (Subtype.ext ?_)
+  · refine congrArg (Submodule.Quotient.mk (p := ((Sh ς k C).B n).submoduleOf ((Sh ς k C).Z n)))
+      (Subtype.ext ?_)
     exact (ev ς k C h).symm_apply_apply y
 
 end GlobalTheory.CompanionTheory.KunGlue.ShiftCoh

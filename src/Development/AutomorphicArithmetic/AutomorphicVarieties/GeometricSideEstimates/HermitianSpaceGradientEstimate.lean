@@ -11,9 +11,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GeometricSi
 
 open UpperTheory.V.Lit.Geo
 
-private theorem gradB_pt {z n W q c : ℝ} (hc : 0 < c) (hq : 0 ≤ q)
-    (h1 : n ^ 2 ≤ z) (h2 : z ≤ W * q) (h3 : z = 0 ∨ c ≤ n) :
-    z ≤ W ^ 2 / c ^ 2 * (1 + q) ^ 2 := by
+private theorem gradB_pt
+    {z n W q c : ℝ} (hc : 0 < c) (hq : 0 ≤ q) (h1 : n ^ 2 ≤ z) (h2 : z ≤ W * q) (h3 : z = 0 ∨ c ≤ n)
+    : z ≤ W ^ 2 / c ^ 2 * (1 + q) ^ 2 := by
   have hc2 : 0 < c ^ 2 := by positivity
   rcases h3 with h | h
   · rw [h]; positivity
@@ -26,8 +26,7 @@ private theorem gradB_pt {z n W q c : ℝ} (hc : 0 < c) (hq : 0 ≤ q)
     have a4 : W ^ 2 * q ^ 2 ≤ W ^ 2 * (1 + q) ^ 2 := mul_le_mul_of_nonneg_left a3 (sq_nonneg W)
     nlinarith
 
-theorem UpperTheory.hermitian_space_gradient_estimate :
-    GradB := by
+theorem UpperTheory.hermitian_space_gradient_estimate : GradB := by
   intro E _ _ _ a ha L hL
   obtain ⟨N, hN⟩ := UpperTheory.geometry_of_numbers_lattice_estimate E a ha L hL
   obtain ⟨C, hC0, hC⟩ := UpperTheory.moment_bound_of_pointwise_moments N 2
@@ -38,15 +37,20 @@ theorem UpperTheory.hermitian_space_gradient_estimate :
   have hR := (UpperTheory.traceForm_cauchy_schwarz_cmDatum E a w).2.2
   rw [UpperTheory.hermitian_space_moment_identity E a ha L hL g, div_le_iff₀ hTh0]
   have hK : 0 ≤ qf w ^ 2 / c ^ 2 := by positivity
-  have hpt : ∀ v : lat L g, quad (Matrix.vecMulVec w (star w)) (pt (rt g) v.1) * gauss (pt (rt g) v.1) ≤
-      qf w ^ 2 / c ^ 2 * ((1 + qf (pt (rt g) v.1)) ^ 2 * Real.exp (-Real.pi * qf (pt (rt g) v.1))) := by
+  have hpt
+      : ∀ v : lat L g,
+        quad (Matrix.vecMulVec w (star w)) (pt (rt g) v.1) * gauss (pt (rt g) v.1)
+          ≤ qf w ^ 2 / c ^ 2
+            * ((1 + qf (pt (rt g) v.1)) ^ 2 * Real.exp (-Real.pi * qf (pt (rt g) v.1))) := by
     intro v
     obtain ⟨r1, r2, r3⟩ := hR (pt (rt g) v.1)
     rw [← mul_assoc]
-    exact mul_le_mul_of_nonneg_right
-      (gradB_pt hc (qf_nonneg _) r1 r2 ((hsep v.1 v.2).imp r3 id)) (Real.exp_pos _).le
-  have hnn : ∀ v : lat L g, 0 ≤ quad (Matrix.vecMulVec w (star w)) (pt (rt g) v.1) * gauss (pt (rt g) v.1) :=
-    fun v => mul_nonneg ((sq_nonneg _).trans (hR _).1) (Real.exp_pos _).le
+    exact mul_le_mul_of_nonneg_right (gradB_pt hc (qf_nonneg _) r1 r2 ((hsep v.1 v.2).imp r3 id))
+      (Real.exp_pos _).le
+  have hnn
+      : ∀ v : lat L g,
+        0 ≤ quad (Matrix.vecMulVec w (star w)) (pt (rt g) v.1) * gauss (pt (rt g) v.1) := fun v =>
+    mul_nonneg ((sq_nonneg _).trans (hR _).1) (Real.exp_pos _).le
   have hs2 := hs.mul_left (qf w ^ 2 / c ^ 2)
   have hs1 := Summable.of_nonneg_of_le hnn hpt hs2
   refine (hs1.tsum_le_tsum hpt hs2).trans ?_

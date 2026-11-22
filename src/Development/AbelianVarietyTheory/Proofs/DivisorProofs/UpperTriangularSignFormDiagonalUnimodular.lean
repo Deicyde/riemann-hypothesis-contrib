@@ -5,15 +5,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsUnitDetOfI
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Filter Topology GlobalTheory.SUVol GlobalTheory.RiemConst ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates GlobalTheory.TorusFrame
+open NumberField MeasureTheory Matrix Filter Topology GlobalTheory.SUVol GlobalTheory.RiemConst
+  ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+  GlobalTheory.TorusFrame
 open scoped ENNReal
 
-theorem GlobalTheory.upperTriangular_signForm_diagonal : ∀ (r : ℕ) (b : Matrix (Fin r) (Fin r) ℂ) (s : Fin r → ℝ), (∀ a, s a = 1 ∨ s a = -1) → IsUnit b.det → (∀ a c : Fin r, c < a → b a c = 0) → bᵀ * diagonal (fun a => (s a : ℂ)) * b.map (starRingEnd ℂ) = diagonal (fun a => (s a : ℂ)) → (∀ a c : Fin r, a ≠ c → b a c = 0) ∧ ∀ a, ‖b a a‖ = 1 := by
+theorem GlobalTheory.upperTriangular_signForm_diagonal
+    : ∀ (r : ℕ) (b : Matrix (Fin r) (Fin r) ℂ) (s : Fin r → ℝ),
+      (∀ a, s a = 1 ∨ s a = -1) → IsUnit b.det → (∀ a c : Fin r, c < a → b a c = 0)
+        → bᵀ * diagonal (fun a => (s a : ℂ)) * b.map (starRingEnd ℂ) = diagonal (fun a => (s a : ℂ))
+        → (∀ a c : Fin r, a ≠ c → b a c = 0) ∧ ∀ a, ‖b a a‖ = 1 := by
   intro r b s hs hdet hup hJ
   classical
   set J : Matrix (Fin r) (Fin r) ℂ := diagonal (fun a => (s a : ℂ)) with hJdef
-  have hss : ∀ a, (s a : ℂ) * (s a : ℂ) = 1 := by
-    intro a; rcases hs a with h | h <;> simp [h]
+  have hss : ∀ a, (s a : ℂ) * (s a : ℂ) = 1 := by intro a; rcases hs a with h | h <;> simp [h]
   have hJJ : J * J = 1 := by
     rw [hJdef, diagonal_mul_diagonal]
     ext i j
@@ -24,16 +30,16 @@ theorem GlobalTheory.upperTriangular_signForm_diagonal : ∀ (r : ℕ) (b : Matr
   haveI : Invertible b := b.invertibleOfIsUnitDet hdet
   have hinv : BlockTriangular b⁻¹ id := blockTriangular_inv_of_blockTriangular hbt
   have hright : bᵀ * (J * b.map (starRingEnd ℂ) * J) = 1 := by
-    calc bᵀ * (J * b.map (starRingEnd ℂ) * J) = (bᵀ * J * b.map (starRingEnd ℂ)) * J := by
-          simp only [Matrix.mul_assoc]
+    calc
+      bᵀ * (J * b.map (starRingEnd ℂ) * J)
+        = (bᵀ * J * b.map (starRingEnd ℂ)) * J := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hJ, hJJ]
   have heq : J * b.map (starRingEnd ℂ) * J = (bᵀ)⁻¹ := (Matrix.inv_eq_right_inv hright).symm
   rw [← Matrix.transpose_nonsing_inv] at heq
   have hoff : ∀ a c : Fin r, a < c → b a c = 0 := by
     intro a c hac
     have h1 := congrFun (congrFun heq a) c
-    have h2 : (b⁻¹)ᵀ a c = 0 := by
-      rw [transpose_apply]; exact hinv hac
+    have h2 : (b⁻¹)ᵀ a c = 0 := by rw [transpose_apply]; exact hinv hac
     rw [h2, hJdef, mul_diagonal, diagonal_mul] at h1
     simp only [map_apply] at h1
     have hsa : (s a : ℂ) ≠ 0 := by rcases hs a with h | h <;> simp [h]

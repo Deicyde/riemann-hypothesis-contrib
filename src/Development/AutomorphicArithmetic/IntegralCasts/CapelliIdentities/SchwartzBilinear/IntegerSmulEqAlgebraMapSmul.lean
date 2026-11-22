@@ -6,13 +6,16 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.P6.r03a
 
-theorem integer_smul_eq_algebraMap_smul {K : Type} [Field K] [NumberField K] {n : ℕ}
-    (r : NumberField.RingOfIntegers K) (x : Fin n → K) :
-    r • x = (algebraMap (NumberField.RingOfIntegers K) K r) • x :=
+theorem integer_smul_eq_algebraMap_smul
+    {K : Type} [Field K] [NumberField K] {n : ℕ} (r : NumberField.RingOfIntegers K) (x : Fin n → K)
+    : r • x = (algebraMap (NumberField.RingOfIntegers K) K r) • x :=
   (algebraMap_smul K r x).symm
 
-theorem GlobalTheory.CompanionTheory.Adelic.SatLine.exists_smul_mem :
-    ∀ {K : Type} [inst : Field K] [NumberField K] {n : ℕ} (M : Submodule (NumberField.RingOfIntegers K) (Fin n → K)) {x : Fin n → K}, x ∈ Submodule.span K (SetLike.coe M) → ∃ (c : NumberField.RingOfIntegers K), c ≠ OfNat.ofNat (nat_lit 0) ∧ c • x ∈ M := by
+theorem GlobalTheory.CompanionTheory.Adelic.SatLine.exists_smul_mem
+    : ∀ {K : Type} [inst : Field K] [NumberField K] {n : ℕ}
+        (M : Submodule (NumberField.RingOfIntegers K) (Fin n → K)) {x : Fin n → K},
+      x ∈ Submodule.span K (SetLike.coe M)
+        → ∃ (c : NumberField.RingOfIntegers K), c ≠ OfNat.ofNat (nat_lit 0) ∧ c • x ∈ M := by
   intro K _ _ n M x hx
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hy⟩
@@ -28,12 +31,16 @@ theorem GlobalTheory.CompanionTheory.Adelic.SatLine.exists_smul_mem :
   | smul a y _ hy =>
     obtain ⟨c, hc, h⟩ := hy
     obtain ⟨⟨p, q⟩, hpq⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers K)) a
-    refine ⟨(q : NumberField.RingOfIntegers K) * c, mul_ne_zero (nonZeroDivisors.ne_zero q.2) hc, ?_⟩
-    have hpq' : a * algebraMap (NumberField.RingOfIntegers K) K (q : NumberField.RingOfIntegers K)
-        = algebraMap (NumberField.RingOfIntegers K) K p := hpq
+    refine
+      ⟨(q : NumberField.RingOfIntegers K) * c, mul_ne_zero (nonZeroDivisors.ne_zero q.2) hc, ?_⟩
+    have hpq'
+        : a * algebraMap (NumberField.RingOfIntegers K) K (q : NumberField.RingOfIntegers K)
+          = algebraMap (NumberField.RingOfIntegers K) K p :=
+      hpq
     have e : ((q : NumberField.RingOfIntegers K) * c) • (a • y) = p • (c • y) := by
-      rw [integer_smul_eq_algebraMap_smul ((q : NumberField.RingOfIntegers K) * c) (a • y), integer_smul_eq_algebraMap_smul p (c • y),
-        integer_smul_eq_algebraMap_smul c y, smul_smul, smul_smul, map_mul, ← hpq']
+      rw [integer_smul_eq_algebraMap_smul ((q : NumberField.RingOfIntegers K) * c) (a • y),
+        integer_smul_eq_algebraMap_smul p (c • y), integer_smul_eq_algebraMap_smul c y, smul_smul,
+        smul_smul, map_mul, ← hpq']
       congr 1
       ring
     rw [e]

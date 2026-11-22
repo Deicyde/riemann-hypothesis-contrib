@@ -16,16 +16,19 @@ noncomputable section
 namespace GroundTheory.Heights₂.Heights
 
 open MeasureTheory Filter Topology Matrix ComplexSets
-open ReciprocityTheory.ChartRestriction.G.Geo (MRing IsArithVar IsGoodProj mcPts segre fibre IsSheet)
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (MRing IsArithVar IsGoodProj mcPts segre fibre IsSheet)
 
 namespace PtsGenericCount
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {e m : ℕ}
 
-theorem mem_fibre_iff {P : Ideal (MRing ι)} (σ : Fin m ≃ ((k : K) → ι k))
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (y : Fin e → ℂ) (x : Fin m → ℂ) :
-    (fun i' => x (σ.symm i')) ∈ fibre P Ψ y ↔
-      x ∈ projChartSet P σ Ψ ∧ chartProjMatrix σ Ψ *ᵥ x = y := by
+theorem mem_fibre_iff
+    {P : Ideal (MRing ι)}
+    (σ : Fin m ≃ ((k : K) → ι k)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    (y : Fin e → ℂ) (x : Fin m → ℂ)
+    : (fun i' => x (σ.symm i')) ∈ fibre P Ψ y
+      ↔ x ∈ projChartSet P σ Ψ ∧ chartProjMatrix σ Ψ *ᵥ x = y := by
   constructor
   · rintro ⟨z, hz, hzw, hΨ⟩
     have hx : x = fun a => segre z (σ a) := by
@@ -51,8 +54,10 @@ theorem mem_fibre_iff {P : Ideal (MRing ι)} (σ : Fin m ≃ ((k : K) → ι k))
       rw [h]
       rfl
 
-theorem proof (hA : GoodChartModel.Statement) (hB : ComponentsGenericCount.Statement)
-    (hC : SheetLift.Statement) : PtsGenericCount.Statement := by
+theorem proof
+    (hA : GoodChartModel.Statement) (hB : ComponentsGenericCount.Statement)
+    (hC : SheetLift.Statement)
+    : PtsGenericCount.Statement := by
   classical
   intro K _ ι _ P e Ψ hP hΨ
   set σ := (Fintype.equivFin ((k : K) → ι k)).symm
@@ -73,12 +78,16 @@ theorem proof (hA : GoodChartModel.Statement) (hB : ComponentsGenericCount.State
       have : (RingHom.ker (MvPolynomial.eval x)).IsPrime := RingHom.ker_isPrime _
       obtain ⟨J, hJm, hJle⟩ := Ideal.exists_minimalPrimes_le hle
       exact ⟨J, (hF J).2 hJm, fun q hq => RingHom.mem_ker.1 (hJle hq)⟩
-  obtain ⟨hle, Δ, hΔ, hgen⟩ := hB _ e F A
-    (fun J hJF => ⟨((hF J).1 hJF).1.1, hJ J ((hF J).1 hJF)⟩)
-    (fun J hJF J' hJ'F hJJ' => le_antisymm hJJ' (((hF J').1 hJ'F).2 ((hF J).1 hJF).1 hJJ'))
+  obtain ⟨hle, Δ, hΔ, hgen⟩ :=
+    hB _ e F A
+      (fun J hJF => ⟨((hF J).1 hJF).1.1, hJ J ((hF J).1 hJF)⟩)
+      (fun J hJF J' hJ'F hJJ' => le_antisymm hJJ' (((hF J').1 hJ'F).2 ((hF J).1 hJF).1 hJJ'))
 
-  have hfib : ∀ y, fibre P Ψ y = (fun x : Fin _ → ℂ => fun i' => x (σ.symm i')) ''
-      {x | (∃ J ∈ F, x ∈ zeroSet J) ∧ A *ᵥ x = y} := by
+  have hfib
+      : ∀ y,
+        fibre P Ψ y
+          = (fun x : Fin _ → ℂ => fun i' => x (σ.symm i'))
+            '' {x | (∃ J ∈ F, x ∈ zeroSet J) ∧ A *ᵥ x = y} := by
     intro y
     ext w
     constructor
@@ -95,8 +104,10 @@ theorem proof (hA : GoodChartModel.Statement) (hB : ComponentsGenericCount.State
     intro x x' h
     funext a
     simpa using congrFun h (σ a)
-  have henc : ∀ y, (fibre P Ψ y).encard = {x | (∃ J ∈ F, x ∈ zeroSet J) ∧ A *ᵥ x = y}.encard :=
-    fun y => by rw [hfib y, hinj.injOn.encard_image]
+  have henc
+      : ∀ y,
+        (fibre P Ψ y).encard = {x | (∃ J ∈ F, x ∈ zeroSet J) ∧ A *ᵥ x = y}.encard := fun y => by
+    rw [hfib y, hinj.injOn.encard_image]
   refine ⟨∑ J ∈ F, projDegree J A, fun y => (henc y).trans_le (hle y), ?_⟩
   refine measure_mono_null (fun y hy => ?_) (DiscriminantSheetCover.volume_zero_set Δ hΔ)
   by_contra h0

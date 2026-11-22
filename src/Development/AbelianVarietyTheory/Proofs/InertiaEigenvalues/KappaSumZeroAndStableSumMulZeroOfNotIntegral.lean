@@ -9,11 +9,12 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.UnitLemma
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.UnitLemma.isIntegral_of_isLat_stable {O E A : Type} [CommRing O] [Field E] [CommRing A] [Algebra O A]
-    [Algebra E A] (L : Submodule O A) (hL : _root_.GlobalTheory.UnitLemma.IsLat O E L) (g : A) (hg : ∀ y ∈ L, g * y ∈ L) :
-    IsIntegral O g := by
+theorem _root_.GlobalTheory.UnitLemma.isIntegral_of_isLat_stable
+    {O E A : Type} [CommRing O] [Field E] [CommRing A] [Algebra O A] [Algebra E A]
+    (L : Submodule O A) (hL : _root_.GlobalTheory.UnitLemma.IsLat O E L)
+    (g : A) (hg : ∀ y ∈ L, g * y ∈ L)
+    : IsIntegral O g := by
   obtain ⟨hfg, hspan⟩ := hL
   haveI : Module.Finite O L := Module.Finite.iff_fg.mpr hfg
   let f : Module.End O L := (LinearMap.mulLeft O g).restrict hg
@@ -56,13 +57,11 @@ private lemma stableLatticeCountSum_eq_zero_of_not_isIntegral_lemma_2 (K : _root
   unfold _root_.GlobalTheory.UnitLemma.InvAlg.stSum
   exact finsum_eq_zero_of_forall_eq_zero fun k => latticeCount_eq_zero_of_not_isIntegral_lemma K B hB k
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.UnitLemma.kapSum_eq_zero_and_stSum_mul_eq_zero_of_not_isIntegral :
-    ∀ (K : _root_.GlobalTheory.UnitLemma.UQ) (B₁ B₂ : _root_.GlobalTheory.UnitLemma.InvAlg K),
-      ¬ (IsIntegral K.O B₁.g ∧ IsIntegral K.O B₂.g) →
-      _root_.GlobalTheory.UnitLemma.InvAlg.kapSum B₁ B₂ = 0 ∧
-        B₁.stSum * B₂.stSum = 0 := by
+theorem _root_.GlobalTheory.UnitLemma.kapSum_eq_zero_and_stSum_mul_eq_zero_of_not_isIntegral
+    : ∀ (K : _root_.GlobalTheory.UnitLemma.UQ) (B₁ B₂ : _root_.GlobalTheory.UnitLemma.InvAlg K),
+      ¬(IsIntegral K.O B₁.g ∧ IsIntegral K.O B₂.g)
+        → _root_.GlobalTheory.UnitLemma.InvAlg.kapSum B₁ B₂ = 0 ∧ B₁.stSum * B₂.stSum = 0 := by
   intro K B₁ B₂ h
   have hprod : ¬ IsIntegral K.O (B₁.prod B₂).g := by
     intro hi
@@ -74,7 +73,8 @@ theorem _root_.GlobalTheory.UnitLemma.kapSum_eq_zero_and_stSum_mul_eq_zero_of_no
     refine finsum_eq_zero_of_forall_eq_zero fun k => ?_
     rw [latticeCount_eq_zero_of_not_isIntegral_lemma K _ hprod k, mul_zero]
   · by_cases h₁ : IsIntegral K.O B₁.g
-    · rw [stableLatticeCountSum_eq_zero_of_not_isIntegral_lemma_2 K B₂ fun h₂ => h ⟨h₁, h₂⟩, mul_zero]
+    · rw [stableLatticeCountSum_eq_zero_of_not_isIntegral_lemma_2 K B₂ fun h₂ => h ⟨h₁, h₂⟩,
+        mul_zero]
     · rw [stableLatticeCountSum_eq_zero_of_not_isIntegral_lemma_2 K B₁ h₁, zero_mul]
 
 end GlobalTheory.UnitLemma

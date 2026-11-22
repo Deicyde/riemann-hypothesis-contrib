@@ -15,7 +15,9 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix GlobalTheory.BKGal.XiFil
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix GlobalTheory.BKGal.XiFil
 open scoped Formalism.Per
 
 noncomputable section
@@ -34,21 +36,25 @@ theorem FilD_anti {a b : ℤ} (h : a ≤ b) : Per.FilD l b ≤ Per.FilD l a := b
     have := (GlobalTheory.MemLoc.filD_laws l).1 (a + k)
     simpa [add_assoc] using this
 
-theorem alg_mem_FilD_iff (n : ℕ) (y : Per.BdRp l) :
-    algebraMap (Per.BdRp l) (Per.BdR l) y ∈ Per.FilD l n ↔ y ∈ Per.FilP l n :=
+theorem alg_mem_FilD_iff (n : ℕ) (y : Per.BdRp l)
+    : algebraMap (Per.BdRp l) (Per.BdR l) y ∈ Per.FilD l n ↔ y ∈ Per.FilP l n :=
   (GlobalTheory.MemLoc.filD_laws l).2.2.2.2.2.2 n y
 
 variable {O : Type} [CommRing O] [Algebra ℤ_[l] O]
 
-theorem tmul_mem_filO {C : GlobalTheory.MemLoc.Core l} {n : ℤ} {β : Per.Bcris l} (h : C.ι β ∈ Per.FilD l n) :
-    (1 : O) ⊗ₜ[ℤ_[l]] β ∈ filO O C n :=
+theorem tmul_mem_filO
+    {C : GlobalTheory.MemLoc.Core l} {n : ℤ} {β : Per.Bcris l} (h : C.ι β ∈ Per.FilD l n)
+    : (1 : O) ⊗ₜ[ℤ_[l]] β ∈ filO O C n :=
   Submodule.subset_span ⟨β, h, rfl⟩
 
-theorem filO_anti {C : GlobalTheory.MemLoc.Core l} {a b : ℤ} (h : a ≤ b) : filO O C b ≤ filO O C a :=
+theorem filO_anti {C : GlobalTheory.MemLoc.Core l} {a b : ℤ} (h : a ≤ b)
+    : filO O C b ≤ filO O C a :=
   Submodule.span_mono fun _ ⟨β, hβ, hx⟩ => ⟨β, FilD_anti h hβ, hx⟩
 
-theorem mul_mem_filO {C : GlobalTheory.MemLoc.Core l} {a b : ℤ} {x y : OB l O} (hx : x ∈ filO O C a)
-    (hy : y ∈ filO O C b) : x * y ∈ filO O C (a + b) := by
+theorem mul_mem_filO
+    {C : GlobalTheory.MemLoc.Core l} {a b : ℤ} {x y : OB l O}
+    (hx : x ∈ filO O C a) (hy : y ∈ filO O C b)
+    : x * y ∈ filO O C (a + b) := by
   induction hx using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨β, hβ, rfl⟩ := hx
@@ -66,20 +72,23 @@ theorem mul_mem_filO {C : GlobalTheory.MemLoc.Core l} {a b : ℤ} {x y : OB l O}
   | add x x' _ _ h h' => rw [add_mul]; exact add_mem h h'
   | smul o x _ h => rw [smul_mul_assoc]; exact Submodule.smul_mem _ o h
 
-theorem toOB_tmul_mem_filO {C : GlobalTheory.MemLoc.Core l} {n : ℕ} {c : Per.Acris l} (h : C.j c ∈ Per.FilP l n) :
-    toOB l O ((1 : O) ⊗ₜ[ℤ_[l]] c) ∈ filO O C n := by
+theorem toOB_tmul_mem_filO
+    {C : GlobalTheory.MemLoc.Core l} {n : ℕ} {c : Per.Acris l} (h : C.j c ∈ Per.FilP l n)
+    : toOB l O ((1 : O) ⊗ₜ[ℤ_[l]] c) ∈ filO O C n := by
   refine tmul_mem_filO ?_
   change C.ι (algebraMap (Per.Acris l) (Per.Bcris l) c) ∈ _
   rw [C.ι_j]
   exact (alg_mem_FilD_iff n _).2 h
 
-theorem toOB_mem_filO_zero (C : GlobalTheory.MemLoc.Core l) (x : OCr l O) : toOB l O x ∈ filO O C 0 := by
+theorem toOB_mem_filO_zero (C : GlobalTheory.MemLoc.Core l) (x : OCr l O)
+    : toOB l O x ∈ filO O C 0 := by
   induction x using TensorProduct.inductionOn with
   | tmul o c =>
     have : (o ⊗ₜ[ℤ_[l]] c : OCr l O) = o • ((1 : O) ⊗ₜ[ℤ_[l]] c) := by
       rw [smul_tmul', smul_eq_mul, mul_one]
     rw [this, map_smul]
-    exact Submodule.smul_mem _ o (toOB_tmul_mem_filO (n := 0) (GlobalTheory.BdRQuot.mem_filtration_zero _))
+    exact Submodule.smul_mem _ o
+      (toOB_tmul_mem_filO (n := 0) (GlobalTheory.BdRQuot.mem_filtration_zero _))
   | add x y hx hy => rw [map_add]; exact add_mem hx hy
 
 theorem isUnit_l_BdRp : IsUnit (l : Per.BdRp l) := by
@@ -87,8 +96,10 @@ theorem isUnit_l_BdRp : IsUnit (l : Per.BdRp l) := by
   rw [map_natCast]
   exact_mod_cast (Fact.out : l.Prime).ne_zero
 
-theorem mem_filO_of_pow_mul {C : GlobalTheory.MemLoc.Core l} {n : ℤ} {s : ℕ} {x : OB l O}
-    (h : (l : OB l O) ^ s * x ∈ filO O C n) : x ∈ filO O C n := by
+theorem mem_filO_of_pow_mul
+    {C : GlobalTheory.MemLoc.Core l} {n : ℤ} {s : ℕ} {x : OB l O}
+    (h : (l : OB l O) ^ s * x ∈ filO O C n)
+    : x ∈ filO O C n := by
   obtain ⟨u, hu⟩ := (GlobalTheory.MemLoc.isUnit_l_Bcris l).exists_right_inv
   have hι : C.ι u ∈ Per.FilD l 0 := by
     obtain ⟨v, hv⟩ := (isUnit_l_BdRp (l := l)).exists_right_inv
@@ -98,8 +109,9 @@ theorem mem_filO_of_pow_mul {C : GlobalTheory.MemLoc.Core l} {n : ℤ} {s : ℕ}
         rw [← map_mul, hv, map_one]
       rw [map_natCast] at h2
       rw [map_natCast] at h3
-      calc C.ι u = (algebraMap (Per.BdRp l) (Per.BdR l) v * (l : Per.BdR l)) * C.ι u := by
-            rw [mul_comm (algebraMap _ _ v), h3, one_mul]
+      calc
+        C.ι u = (algebraMap (Per.BdRp l) (Per.BdR l) v * (l : Per.BdR l)) * C.ι u := by
+          rw [mul_comm (algebraMap _ _ v), h3, one_mul]
         _ = _ := by rw [mul_assoc, h2, mul_one]
     rw [h1]
     exact (mem_FilD_zero_iff _).2 ⟨v, rfl⟩
@@ -110,21 +122,23 @@ theorem mem_filO_of_pow_mul {C : GlobalTheory.MemLoc.Core l} {n : ℤ} {s : ℕ}
     have hk : ∀ k : ℕ, C.ι u ^ k ∈ Per.FilD l 0 := fun k => by
       induction k with
       | zero => rw [pow_zero]; exact (GlobalTheory.MemLoc.filD_laws l).2.1
-      | succ k ih => rw [pow_succ]; simpa using (GlobalTheory.MemLoc.filD_laws l).2.2.1 0 0 _ _ ih hι
+      | succ k ih =>
+        rw [pow_succ]; simpa using (GlobalTheory.MemLoc.filD_laws l).2.2.1 0 0 _ _ ih hι
     exact hk s
   have h1 : ((1 : O) ⊗ₜ[ℤ_[l]] u) ^ s * ((l : OB l O) ^ s * x) = x := by
     have h2 : ((1 : O) ⊗ₜ[ℤ_[l]] u) * (l : OB l O) = 1 := by
       rw [show (l : OB l O) = (1 : O) ⊗ₜ[ℤ_[l]] (l : Per.Bcris l) from
-        (map_natCast (Algebra.TensorProduct.includeRight : Per.Bcris l →ₐ[ℤ_[l]] OB l O) l).symm,
+          (map_natCast (Algebra.TensorProduct.includeRight : Per.Bcris l →ₐ[ℤ_[l]] OB l O) l).symm,
         Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_comm, hu]
       rfl
     rw [← mul_assoc, ← mul_pow, h2, one_pow, one_mul]
   rw [← h1]
   simpa using mul_mem_filO hU h
 
-theorem j_mem_FilP_of_approx (C : GlobalTheory.MemLoc.Core l) (m : ℕ) (x : Per.Acris l)
-    (h : ∀ r : ℕ, ∃ y z : Per.Acris l, x = y + (l : Per.Acris l) ^ r * z ∧ C.j y ∈ Per.FilP l m) :
-    C.j x ∈ Per.FilP l m := by
+theorem j_mem_FilP_of_approx
+    (C : GlobalTheory.MemLoc.Core l) (m : ℕ) (x : Per.Acris l)
+    (h : ∀ r : ℕ, ∃ y z : Per.Acris l, x = y + (l : Per.Acris l) ^ r * z ∧ C.j y ∈ Per.FilP l m)
+    : C.j x ∈ Per.FilP l m := by
   obtain ⟨N, hN⟩ := C.j_cris.bdd m
   obtain ⟨a, ha⟩ := hN x
   have hq : Ideal.Quotient.mk (Per.kerP l ^ m) (algebraMap (Per.Ainf l) (Per.AinfP l) a) = 0 := by
@@ -132,7 +146,8 @@ theorem j_mem_FilP_of_approx (C : GlobalTheory.MemLoc.Core l) (m : ℕ) (x : Per
     obtain ⟨y, z, hxyz, hy⟩ := h r
     obtain ⟨b, hb⟩ := hN z
     refine ⟨b, ?_⟩
-    have hy' : Per.ev l m (C.j y) = 0 := (GlobalTheory.RingIface.mem_filtration_iff_mem_kerTheta_pow l m _).1 hy
+    have hy' : Per.ev l m (C.j y) = 0 :=
+      (GlobalTheory.RingIface.mem_filtration_iff_mem_kerTheta_pow l m _).1 hy
     rw [← ha, ← hb, hxyz]
     simp only [map_add (f := _), map_mul, map_pow, map_natCast, hy']
     ring

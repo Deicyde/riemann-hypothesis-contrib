@@ -9,13 +9,13 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open Matrix
 
-theorem hadamard_gram {R : Type*} [Fintype R] [DecidableEq R] {n : ℕ} (hR : Fintype.card R = n)
-    (M : R → Fin n → ℂ) (ν : R → ℝ) (s : Fin n → ℝ) (hν : ∀ r, 0 < ν r)
-    (hM : ∀ r k, ‖M r k‖ * ν r ≤ s k) :
-    ‖(Matrix.of fun k l : Fin n => ∑ r, M r k * M r l).det‖ * ∏ r, ν r ^ 2 ≤
-      (n : ℝ) ^ n * ∏ k, s k ^ 2 := by
+theorem hadamard_gram
+    {R : Type*} [Fintype R] [DecidableEq R]
+    {n : ℕ} (hR : Fintype.card R = n) (M : R → Fin n → ℂ)
+    (ν : R → ℝ) (s : Fin n → ℝ) (hν : ∀ r, 0 < ν r) (hM : ∀ r k, ‖M r k‖ * ν r ≤ s k)
+    : ‖(Matrix.of fun k l : Fin n => ∑ r, M r k * M r l).det‖ * ∏ r, ν r ^ 2
+      ≤ (n : ℝ) ^ n * ∏ k, s k ^ 2 := by
   classical
-
   let e : R ≃ Fin n := Fintype.equivFinOfCardEq hR
   let A : Matrix (Fin n) (Fin n) ℂ := Matrix.of fun i k => M (e.symm i) k
   let N : Matrix (Fin n) (Fin n) ℂ := Matrix.of fun i k => (ν (e.symm i) : ℂ) * M (e.symm i) k
@@ -33,8 +33,8 @@ theorem hadamard_gram {R : Type*} [Fintype R] [DecidableEq R] {n : ℕ} (hR : Fi
     congr 1
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [Complex.norm_real, Real.norm_eq_abs, abs_of_pos (hν _)]
-  have hleft : ‖(Matrix.of fun k l : Fin n => ∑ r, M r k * M r l).det‖ * ∏ r, ν r ^ 2
-      = ‖N.det‖ ^ 2 := by
+  have hleft
+      : ‖(Matrix.of fun k l : Fin n => ∑ r, M r k * M r l).det‖ * ∏ r, ν r ^ 2 = ‖N.det‖ ^ 2 := by
     rw [hG, Matrix.det_mul, Matrix.det_transpose, norm_mul, hdetN, Finset.prod_pow]
     ring
   rw [hleft]
@@ -52,18 +52,20 @@ theorem hadamard_gram {R : Type*} [Fintype R] [DecidableEq R] {n : ℕ} (hR : Fi
         ring
       rw [h1]
       exact pow_le_pow_left₀ (mul_nonneg (norm_nonneg _) (hν _).le) (hM _ _) 2
-    calc ∑ i, ‖N i k‖ ^ 2 ≤ ∑ _i : Fin n, s k ^ 2 := Finset.sum_le_sum fun i _ => this i
+    calc
+      ∑ i, ‖N i k‖ ^ 2
+        ≤ ∑ _i : Fin n, s k ^ 2 := Finset.sum_le_sum fun i _ => this i
       _ = (n : ℝ) * s k ^ 2 := by simp
-  calc ‖N.det‖ ^ 2 ≤ (∏ k, Real.sqrt (∑ i, ‖N i k‖ ^ 2)) ^ 2 :=
-        pow_le_pow_left₀ (norm_nonneg _) hH 2
+  calc
+    ‖N.det‖ ^ 2
+      ≤ (∏ k, Real.sqrt (∑ i, ‖N i k‖ ^ 2)) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) hH 2
     _ = ∏ k, ∑ i, ‖N i k‖ ^ 2 := by
-        rw [← Finset.prod_pow]
-        exact Finset.prod_congr rfl fun k _ =>
-          Real.sq_sqrt (Finset.sum_nonneg fun i _ => by positivity)
+      rw [← Finset.prod_pow]
+      exact Finset.prod_congr rfl fun k _ =>
+        Real.sq_sqrt (Finset.sum_nonneg fun i _ => by positivity)
     _ ≤ ∏ k, ((n : ℝ) * s k ^ 2) :=
-        Finset.prod_le_prod₀ (fun k _ => Finset.sum_nonneg fun i _ => by positivity)
-          fun k _ => hcol k
+      Finset.prod_le_prod₀ (fun k _ => Finset.sum_nonneg fun i _ => by positivity) fun k _ => hcol k
     _ = (n : ℝ) ^ n * ∏ k, s k ^ 2 := by
-        rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+      rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
 
 end ReciprocityTheory.ChartRestriction.G.T0

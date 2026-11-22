@@ -16,8 +16,10 @@ public import ReciprocityTheory.AnalyticForms.AnalyticCharts.Osgood
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
 open GroundTheory.Heights₂.Heights TensorProduct
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Sl
 
@@ -25,8 +27,8 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.TorsOff
 
-def proj {n : ℕ} (p : Fin n → ℝ) : Fin n → AddCircle (1 : ℝ) :=
-  fun j => ((p j : ℝ) : AddCircle (1 : ℝ))
+def proj {n : ℕ} (p : Fin n → ℝ) : Fin n → AddCircle (1 : ℝ) := fun j =>
+  ((p j : ℝ) : AddCircle (1 : ℝ))
 
 theorem proj_surjective {n : ℕ} : Function.Surjective (proj (n := n)) := by
   intro x
@@ -36,8 +38,8 @@ theorem proj_surjective {n : ℕ} : Function.Surjective (proj (n := n)) := by
 theorem continuous_proj {n : ℕ} : Continuous (proj (n := n)) :=
   continuous_pi fun j => (AddCircle.continuous_mk' (1 : ℝ)).comp (continuous_apply j)
 
-theorem proj_eq_iff {n : ℕ} {p q : Fin n → ℝ} :
-    proj p = proj q ↔ ∃ k : Fin n → ℤ, p - q = fun α => (k α : ℝ) := by
+theorem proj_eq_iff {n : ℕ} {p q : Fin n → ℝ}
+    : proj p = proj q ↔ ∃ k : Fin n → ℤ, p - q = fun α => (k α : ℝ) := by
   constructor
   · intro h
     have key : ∀ j, ∃ k : ℤ, p j - q j = k := by
@@ -62,8 +64,8 @@ theorem proj_zero {n : ℕ} : proj (0 : Fin n → ℝ) = 0 := by
   funext j
   simp [proj]
 
-theorem proj_eq_zero_iff {n : ℕ} {p : Fin n → ℝ} :
-    proj p = 0 ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ) := by
+theorem proj_eq_zero_iff {n : ℕ} {p : Fin n → ℝ}
+    : proj p = 0 ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ) := by
   rw [← proj_zero, proj_eq_iff, sub_zero]
 
 theorem nsmul_proj {n : ℕ} (m : ℕ) (p : Fin n → ℝ) : m • proj p = proj ((m : ℝ) • p) := by
@@ -71,8 +73,8 @@ theorem nsmul_proj {n : ℕ} (m : ℕ) (p : Fin n → ℝ) : m • proj p = proj
   simp only [proj, Pi.smul_apply, smul_eq_mul]
   rw [← nsmul_eq_mul, AddCircle.coe_nsmul]
 
-theorem norm_coe_eq_infDist (t : ℝ) :
-    ‖((t : ℝ) : AddCircle (1 : ℝ))‖ = Metric.infDist t (Set.range ((↑) : ℤ → ℝ)) := by
+theorem norm_coe_eq_infDist (t : ℝ)
+    : ‖((t : ℝ) : AddCircle (1 : ℝ))‖ = Metric.infDist t (Set.range ((↑) : ℤ → ℝ)) := by
   have h1 : ‖((t : ℝ) : AddCircle (1 : ℝ))‖ = |t - round t| := UnitAddCircle.norm_eq
   rw [h1]
   apply le_antisymm
@@ -80,15 +82,20 @@ theorem norm_coe_eq_infDist (t : ℝ) :
     rintro _ ⟨k, rfl⟩
     rw [Real.dist_eq]
     exact round_le t k
-  · have h2 := Metric.infDist_le_dist_of_mem (x := t) (s := Set.range ((↑) : ℤ → ℝ))
-      (y := (round t : ℝ)) (Set.mem_range_self (round t))
+  · have h2 :=
+      Metric.infDist_le_dist_of_mem (x := t) (s := Set.range ((↑) : ℤ → ℝ)) (y := (round t : ℝ))
+        (Set.mem_range_self (round t))
     rwa [Real.dist_eq] at h2
 
-theorem volume_eq_zero_of_proj {n : ℕ} {Z : Set (Fin n → AddCircle (1 : ℝ))}
-    (hZ : MeasurableSet Z) (h : volume (proj ⁻¹' Z) = 0) : volume Z = 0 := by
-  have hmp : ∀ _ : Fin n, MeasurePreserving ((↑) : ℝ → AddCircle (1 : ℝ))
-      (volume.restrict (Set.Ioc (0 : ℝ) (0 + 1))) volume :=
-    fun _ => AddCircle.measurePreserving_mk 1 0
+theorem volume_eq_zero_of_proj
+    {n : ℕ} {Z : Set (Fin n → AddCircle (1 : ℝ))}
+    (hZ : MeasurableSet Z) (h : volume (proj ⁻¹' Z) = 0)
+    : volume Z = 0 := by
+  have hmp
+      : ∀ _ : Fin n,
+        MeasurePreserving ((↑) : ℝ → AddCircle (1 : ℝ)) (volume.restrict (Set.Ioc (0 : ℝ) (0 + 1)))
+          volume := fun _ =>
+    AddCircle.measurePreserving_mk 1 0
   have hpi := measurePreserving_pi _ _ hmp
   rw [volume_pi, ← hpi.measure_preimage hZ.nullMeasurableSet, ← Measure.restrict_pi_pi]
   refine le_antisymm ?_ zero_le
@@ -96,17 +103,20 @@ theorem volume_eq_zero_of_proj {n : ℕ} {Z : Set (Fin n → AddCircle (1 : ℝ)
   rw [← volume_pi]
   exact h.le
 
-theorem volume_zero_set {n g : ℕ} {θ : (Fin g → ℂ) → ℂ} (L : (Fin n → ℝ) ≃ₗ[ℝ] (Fin g → ℂ))
-    (hθ : Differentiable ℂ θ) {w : Fin g → ℂ} (hw : θ w ≠ 0) :
-    volume {p : Fin n → ℝ | θ (L p) = 0} = 0 := by
+theorem volume_zero_set
+    {n g : ℕ} {θ : (Fin g → ℂ) → ℂ} (L : (Fin n → ℝ) ≃ₗ[ℝ] (Fin g → ℂ)) (hθ : Differentiable ℂ θ)
+    {w : Fin g → ℂ} (hw : θ w ≠ 0)
+    : volume {p : Fin n → ℝ | θ (L p) = 0} = 0 := by
   have han := ReciprocityTheory.AnForm.Osgood.osgood g Set.univ θ isOpen_univ hθ.differentiableOn
-  have h0 := ReciprocityTheory.AnForm.volume_zero_set_of_analyticOnNhd isOpen_univ isPreconnected_univ han
-    ⟨w, Set.mem_univ _, hw⟩
+  have h0 :=
+    ReciprocityTheory.AnForm.volume_zero_set_of_analyticOnNhd isOpen_univ isPreconnected_univ han
+      ⟨w, Set.mem_univ _, hw⟩
   have h0' : volume {z : Fin g → ℂ | θ z = 0} = 0 := by simpa using h0
   let Lc : (Fin n → ℝ) ≃L[ℝ] (Fin g → ℂ) := L.toContinuousLinearEquiv
   let e : (Fin n → ℝ) ≃ᵐ (Fin g → ℂ) := Lc.toHomeomorph.toMeasurableEquiv
   have he : (e : (Fin n → ℝ) → Fin g → ℂ) = Lc := rfl
-  have hμ := Measure.isAddLeftInvariant_eq_smul (Measure.map Lc volume) (volume : Measure (Fin g → ℂ))
+  have hμ :=
+    Measure.isAddLeftInvariant_eq_smul (Measure.map Lc volume) (volume : Measure (Fin g → ℂ))
   have h1 : (Measure.map Lc volume) {z : Fin g → ℂ | θ z = 0} = 0 := by
     rw [hμ, Measure.smul_apply, h0', smul_zero]
   rw [← he, e.map_apply] at h1
@@ -114,47 +124,54 @@ theorem volume_zero_set {n g : ℕ} {θ : (Fin g → ℂ) → ℂ} (L : (Fin n �
 
 section Lattice
 
-variable {n g : ℕ} {Λ : Submodule ℤ (Fin g → ℂ)} {θ : (Fin g → ℂ) → ℂ}
-  {L : (Fin n → ℝ) ≃ₗ[ℝ] (Fin g → ℂ)}
+variable
+  {n g : ℕ} {Λ : Submodule ℤ (Fin g → ℂ)} {θ : (Fin g → ℂ) → ℂ} {L : (Fin n → ℝ) ≃ₗ[ℝ] (Fin g → ℂ)}
 
-def zeroSet (θ : (Fin g → ℂ) → ℂ) (L : (Fin n → ℝ) ≃ₗ[ℝ] (Fin g → ℂ)) :
-    Set (Fin n → AddCircle (1 : ℝ)) :=
+def zeroSet (θ : (Fin g → ℂ) → ℂ) (L : (Fin n → ℝ) ≃ₗ[ℝ] (Fin g → ℂ))
+    : Set (Fin n → AddCircle (1 : ℝ)) :=
   proj '' {p | θ (L p) = 0}
 
-theorem zero_iff_of_proj_eq (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
-    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) {p q : Fin n → ℝ} (h : proj p = proj q) :
-    θ (L p) = 0 ↔ θ (L q) = 0 := by
+theorem zero_iff_of_proj_eq
+    (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
+    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0)
+    {p q : Fin n → ℝ} (h : proj p = proj q)
+    : θ (L p) = 0 ↔ θ (L q) = 0 := by
   obtain ⟨k, hk⟩ := proj_eq_iff.1 h
   have hmem : L (p - q) ∈ Λ := (hL _).2 ⟨k, hk⟩
   have h1 := hΛ _ hmem (L q)
   rwa [← map_add, add_comm, sub_add_cancel] at h1
 
-theorem proj_mem_zeroSet (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
-    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) (p : Fin n → ℝ) :
-    proj p ∈ zeroSet θ L ↔ θ (L p) = 0 := by
+theorem proj_mem_zeroSet
+    (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
+    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) (p : Fin n → ℝ)
+    : proj p ∈ zeroSet θ L ↔ θ (L p) = 0 := by
   constructor
   · rintro ⟨q, hq, hqp⟩
     exact (zero_iff_of_proj_eq hL hΛ hqp).1 hq
   · exact fun h => ⟨p, h, rfl⟩
 
-theorem isClosed_zeroSet (hθ : Continuous θ)
-    (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
-    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) : IsClosed (zeroSet θ L) := by
+theorem isClosed_zeroSet
+    (hθ : Continuous θ) (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
+    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0)
+    : IsClosed (zeroSet θ L) := by
   have hLc : Continuous L := L.toLinearMap.continuous_of_finiteDimensional
-  have hcl : IsClosed {p : Fin n → ℝ | θ (L p) = 0} :=
-    isClosed_eq (hθ.comp hLc) continuous_const
+  have hcl : IsClosed {p : Fin n → ℝ | θ (L p) = 0} := isClosed_eq (hθ.comp hLc) continuous_const
   have hbox : IsCompact (Set.pi Set.univ fun _ : Fin n => Set.Icc (0 : ℝ) 1) :=
     isCompact_univ_pi fun _ => isCompact_Icc
   have hcomp := (hbox.inter_left hcl).image (continuous_proj (n := n))
-  have hEq : zeroSet θ L =
-      proj '' ({p | θ (L p) = 0} ∩ Set.pi Set.univ fun _ : Fin n => Set.Icc (0 : ℝ) 1) := by
+  have hEq
+      : zeroSet θ L
+        = proj '' ({p | θ (L p) = 0} ∩ Set.pi Set.univ fun _ : Fin n => Set.Icc (0 : ℝ) 1) := by
     apply Set.Subset.antisymm
     · rintro _ ⟨p, hp, rfl⟩
       have hq : proj (fun j => Int.fract (p j)) = proj p :=
-        proj_eq_iff.2 ⟨fun j => -⌊p j⌋, by
-          funext j
-          simp only [Pi.sub_apply, Int.cast_neg, Int.fract]
-          ring⟩
+        proj_eq_iff.2 ⟨
+          fun j => - ⌊p j⌋,
+          by
+            funext j
+            simp only [Pi.sub_apply, Int.cast_neg, Int.fract]
+            ring
+        ⟩
       refine ⟨fun j => Int.fract (p j), ⟨?_, ?_⟩, hq⟩
       · exact (zero_iff_of_proj_eq hL hΛ hq).2 hp
       · intro j _
@@ -163,9 +180,12 @@ theorem isClosed_zeroSet (hθ : Continuous θ)
   rw [hEq]
   exact hcomp.isClosed
 
-theorem volume_zeroSet (hθ : Differentiable ℂ θ) {w : Fin g → ℂ} (hw : θ w ≠ 0)
+theorem volume_zeroSet
+    (hθ : Differentiable ℂ θ)
+    {w : Fin g → ℂ} (hw : θ w ≠ 0)
     (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
-    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) : volume (zeroSet θ L) = 0 := by
+    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0)
+    : volume (zeroSet θ L) = 0 := by
   refine volume_eq_zero_of_proj (isClosed_zeroSet hθ.continuous hL hΛ).measurableSet ?_
   have hpre : proj ⁻¹' zeroSet θ L = {p | θ (L p) = 0} := by
     ext p
@@ -178,17 +198,17 @@ theorem natCast_smul_map (m : ℕ) (p : Fin n → ℝ) : (m : ℂ) • L p = L (
   funext j
   simp
 
-theorem proj_mem_torsion_iff (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
-    (m : ℕ) (p : Fin n → ℝ) : proj p ∈ torusTorsion n m ↔ (m : ℂ) • L p ∈ Λ := by
+theorem proj_mem_torsion_iff
+    (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ)) (m : ℕ) (p : Fin n → ℝ)
+    : proj p ∈ torusTorsion n m ↔ (m : ℂ) • L p ∈ Λ := by
   change m • proj p = 0 ↔ _
   rw [nsmul_proj, natCast_smul_map, hL, proj_eq_zero_iff]
 
-theorem eventually_exists_off (hθ : Continuous θ) {w : Fin g → ℂ} (hw : θ w ≠ 0) :
-    ∀ᶠ m : ℕ in Filter.atTop, ∃ p : Fin n → ℝ,
-      (∃ k : Fin n → ℤ, (m : ℝ) • p = fun α => (k α : ℝ)) ∧ θ (L p) ≠ 0 := by
+theorem eventually_exists_off (hθ : Continuous θ) {w : Fin g → ℂ} (hw : θ w ≠ 0)
+    : ∀ᶠ m : ℕ in Filter.atTop, ∃ p : Fin n → ℝ,
+        (∃ k : Fin n → ℤ, (m : ℝ) • p = fun α => (k α : ℝ)) ∧ θ (L p) ≠ 0 := by
   have hLc : Continuous L := L.toLinearMap.continuous_of_finiteDimensional
-  have hopen : IsOpen {p : Fin n → ℝ | θ (L p) ≠ 0} :=
-    isOpen_ne_fun (hθ.comp hLc) continuous_const
+  have hopen : IsOpen {p : Fin n → ℝ | θ (L p) ≠ 0} := isOpen_ne_fun (hθ.comp hLc) continuous_const
   have hmem : L.symm w ∈ {p : Fin n → ℝ | θ (L p) ≠ 0} := by simpa using hw
   obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.1 hopen _ hmem
   have hev : ∀ᶠ m : ℕ in Filter.atTop, 1 / (m : ℝ) < ε :=
@@ -206,26 +226,29 @@ theorem eventually_exists_off (hθ : Continuous θ) {w : Fin g → ℂ} (hw : θ
     set x := L.symm w j
     have h1 := Int.floor_le ((m : ℝ) * x)
     have h2 := Int.lt_floor_add_one ((m : ℝ) * x)
-    have h3 : (⌊(m : ℝ) * x⌋ : ℝ) / m - x = ((⌊(m : ℝ) * x⌋ : ℝ) - m * x) / m := by
-      field_simp
+    have h3 : (⌊(m : ℝ) * x⌋ : ℝ) / m - x = ((⌊(m : ℝ) * x⌋ : ℝ) - m * x) / m := by field_simp
     rw [h3, abs_div, abs_of_pos hmR]
     refine lt_of_le_of_lt ?_ hm
     apply div_le_div_of_nonneg_right _ hmR.le
     rw [abs_le]
     constructor <;> linarith
 
-theorem core (hn : 0 < n) (c₀ : ℝ) (hθ : Differentiable ℂ θ) (hw : ∃ w, θ w ≠ 0)
+theorem core
+    (hn : 0 < n)
+    (c₀ : ℝ)
+    (hθ : Differentiable ℂ θ) (hw : ∃ w, θ w ≠ 0)
     (hL : ∀ p, L p ∈ Λ ↔ ∃ k : Fin n → ℤ, p = fun α => (k α : ℝ))
-    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) (hc : ∃ k : ℤ, c₀ = k / 2) :
-    ∀ᶠ m : ℕ in Filter.atTop, ∀ (Ix : Type) [Fintype Ix] (r : Ix → Fin g → ℂ),
-      (∀ i, (m : ℂ) • r i ∈ Λ ∧ θ (r i) ≠ 0) →
-      (∀ w : Fin g → ℂ, (m : ℂ) • w ∈ Λ → θ w ≠ 0 → ∃! i, w - r i ∈ Λ) →
-      Nonempty Ix ∧ Fintype.card Ix ≤
-        3 * {i | (1 / 4 : ℝ) ≤
-          Metric.infDist (L.symm (r i) ⟨0, hn⟩ + c₀) (Set.range ((↑) : ℤ → ℝ))}.ncard := by
+    (hΛ : ∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) (hc : ∃ k : ℤ, c₀ = k / 2)
+    : ∀ᶠ m : ℕ in Filter.atTop, ∀ (Ix : Type) [Fintype Ix] (r : Ix → Fin g → ℂ),
+        (∀ i, (m : ℂ) • r i ∈ Λ ∧ θ (r i) ≠ 0) →
+        (∀ w : Fin g → ℂ, (m : ℂ) • w ∈ Λ → θ w ≠ 0 → ∃! i, w - r i ∈ Λ) →
+        Nonempty Ix ∧ Fintype.card Ix ≤
+          3 * {i | (1 / 4 : ℝ) ≤
+            Metric.infDist (L.symm (r i) ⟨0, hn⟩ + c₀) (Set.range ((↑) : ℤ → ℝ))}.ncard := by
   obtain ⟨w, hw⟩ := hw
-  have hfull := TorsionEquidistribution.full n hn (zeroSet θ L) c₀
-    (isClosed_zeroSet hθ.continuous hL hΛ) (volume_zeroSet hθ hw hL hΛ) hc
+  have hfull :=
+    TorsionEquidistribution.full n hn (zeroSet θ L) c₀ (isClosed_zeroSet hθ.continuous hL hΛ)
+      (volume_zeroSet hθ hw hL hΛ) hc
   filter_upwards [hfull, eventually_exists_off (L := L) hθ.continuous hw]
   rintro m h1 ⟨p, hp1, hp2⟩ Ix _ r hr hu
   have hmp : (m : ℂ) • L p ∈ Λ := by
@@ -262,15 +285,19 @@ theorem core (hn : 0 < n) (c₀ : ℝ) (hθ : Differentiable ℂ θ) (hw : ∃ w
   have hcard : Fintype.card Ix = (torusTorsion n m \ zeroSet θ L).ncard := by
     rw [← hrange, ← Set.image_univ, Set.ncard_image_of_injective _ hinj, Set.ncard_univ,
       Nat.card_eq_fintype_card]
-  have hnorm : ∀ i, ‖f i ⟨0, hn⟩ + (c₀ : AddCircle (1 : ℝ))‖ =
-      Metric.infDist (L.symm (r i) ⟨0, hn⟩ + c₀) (Set.range ((↑) : ℤ → ℝ)) := by
+  have hnorm
+      : ∀ i,
+        ‖f i ⟨0, hn⟩ + (c₀ : AddCircle (1 : ℝ))‖
+          = Metric.infDist (L.symm (r i) ⟨0, hn⟩ + c₀) (Set.range ((↑) : ℤ → ℝ)) := by
     intro i
     rw [← norm_coe_eq_infDist, AddCircle.coe_add]
     rfl
-  have hgood : {x ∈ torusTorsion n m \ zeroSet θ L |
-        (1 / 4 : ℝ) ≤ ‖x ⟨0, hn⟩ + (c₀ : AddCircle (1 : ℝ))‖} =
-      f '' {i | (1 / 4 : ℝ) ≤
-        Metric.infDist (L.symm (r i) ⟨0, hn⟩ + c₀) (Set.range ((↑) : ℤ → ℝ))} := by
+  have hgood
+      : {x ∈ torusTorsion n m \ zeroSet θ L |
+          (1 / 4 : ℝ) ≤ ‖x ⟨0, hn⟩ + (c₀ : AddCircle (1 : ℝ))‖}
+        = f
+          '' {i | (1 / 4 : ℝ) ≤
+            Metric.infDist (L.symm (r i) ⟨0, hn⟩ + c₀) (Set.range ((↑) : ℤ → ℝ))} := by
     ext x
     constructor
     · rintro ⟨hx, hx2⟩
@@ -287,44 +314,45 @@ theorem core (hn : 0 < n) (c₀ : ℝ) (hθ : Differentiable ℂ θ) (hw : ∃ w
 
 end Lattice
 
-theorem torsion_off_zeros : ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (θ : (Fin g → ℂ) → ℂ)
-    (L : (Fin g ⊕ Fin g → ℝ) ≃ₗ[ℝ] (Fin g → ℂ)) (i₀ : Fin g ⊕ Fin g) (c₀ : ℝ),
-    Differentiable ℂ θ → (∃ w, θ w ≠ 0) →
-    (∀ p, L p ∈ Λ ↔ ∃ k : Fin g ⊕ Fin g → ℤ, p = fun α => (k α : ℝ)) →
-    (∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) →
-    (∃ k : ℤ, c₀ = k / 2) →
-    ∀ᶠ m : ℕ in Filter.atTop, ∀ (Ix : Type) [Fintype Ix] (r : Ix → Fin g → ℂ),
-      (∀ i, (m : ℂ) • r i ∈ Λ ∧ θ (r i) ≠ 0) →
-      (∀ w : Fin g → ℂ, (m : ℂ) • w ∈ Λ → θ w ≠ 0 → ∃! i, w - r i ∈ Λ) →
-      Nonempty Ix ∧ Fintype.card Ix ≤
-        3 * {i | (1 / 4 : ℝ) ≤ Metric.infDist (L.symm (r i) i₀ + c₀) (Set.range ((↑) : ℤ → ℝ))}.ncard := by
-  intro g Λ θ L i₀ c₀ hθ hw hL hΛ hc
-  have hn : 0 < Fintype.card (Fin g ⊕ Fin g) := Fintype.card_pos_iff.2 ⟨i₀⟩
-  let e0 := Fintype.equivFin (Fin g ⊕ Fin g)
-  let e : (Fin g ⊕ Fin g) ≃ Fin (Fintype.card (Fin g ⊕ Fin g)) :=
-    e0.trans (Equiv.swap (e0 i₀) ⟨0, hn⟩)
-  have hi0 : e i₀ = ⟨0, hn⟩ := by simp [e]
-  let L' : (Fin (Fintype.card (Fin g ⊕ Fin g)) → ℝ) ≃ₗ[ℝ] (Fin g → ℂ) :=
-    (LinearEquiv.funCongrLeft ℝ ℝ e).trans L
-  have hL'a : ∀ q, L' q = L (q ∘ e) := fun _ => rfl
-  have hsymm : ∀ w, L'.symm w ⟨0, hn⟩ = L.symm w i₀ := by
-    intro w
-    have h1 : (L'.symm w) ∘ e = L.symm w := by
-      rw [LinearEquiv.eq_symm_apply, ← hL'a]
-      exact L'.apply_symm_apply w
-    rw [← h1, Function.comp_apply, hi0]
-  have hL' : ∀ q, L' q ∈ Λ ↔ ∃ k : Fin (Fintype.card (Fin g ⊕ Fin g)) → ℤ,
-      q = fun α => (k α : ℝ) := by
-    intro q
-    rw [hL'a, hL]
-    constructor
-    · rintro ⟨k, hk⟩
-      refine ⟨k ∘ e.symm, ?_⟩
-      funext j
-      simpa using congrFun hk (e.symm j)
-    · rintro ⟨k, rfl⟩
-      exact ⟨k ∘ e, rfl⟩
-  filter_upwards [core (L := L') hn c₀ hθ hw hL' hΛ hc] with m hm Ix _ r h1 h2
-  simpa only [hsymm] using hm Ix r h1 h2
+theorem torsion_off_zeros
+    : ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (θ : (Fin g → ℂ) → ℂ)
+        (L : (Fin g ⊕ Fin g → ℝ) ≃ₗ[ℝ] (Fin g → ℂ)) (i₀ : Fin g ⊕ Fin g) (c₀ : ℝ),
+      Differentiable ℂ θ → (∃ w, θ w ≠ 0)
+        → (∀ p, L p ∈ Λ ↔ ∃ k : Fin g ⊕ Fin g → ℤ, p = fun α => (k α : ℝ))
+        → (∀ l ∈ Λ, ∀ w, θ (w + l) = 0 ↔ θ w = 0) → (∃ k : ℤ, c₀ = k / 2)
+        → ∀ᶠ m : ℕ in Filter.atTop, ∀ (Ix : Type) [Fintype Ix] (r : Ix → Fin g → ℂ),
+            (∀ i, (m : ℂ) • r i ∈ Λ ∧ θ (r i) ≠ 0) →
+            (∀ w : Fin g → ℂ, (m : ℂ) • w ∈ Λ → θ w ≠ 0 → ∃! i, w - r i ∈ Λ) →
+            Nonempty Ix ∧ Fintype.card Ix ≤
+              3 * {i | (1 / 4 : ℝ) ≤ Metric.infDist (L.symm (r i) i₀ + c₀) (Set.range ((↑) : ℤ → ℝ))}.ncard :=
+  by
+    intro g Λ θ L i₀ c₀ hθ hw hL hΛ hc
+    have hn : 0 < Fintype.card (Fin g ⊕ Fin g) := Fintype.card_pos_iff.2 ⟨i₀⟩
+    let e0 := Fintype.equivFin (Fin g ⊕ Fin g)
+    let e : (Fin g ⊕ Fin g) ≃ Fin (Fintype.card (Fin g ⊕ Fin g)) :=
+      e0.trans (Equiv.swap (e0 i₀) ⟨0, hn⟩)
+    have hi0 : e i₀ = ⟨0, hn⟩ := by simp [e]
+    let L' : (Fin (Fintype.card (Fin g ⊕ Fin g)) → ℝ) ≃ₗ[ℝ] (Fin g → ℂ) :=
+      (LinearEquiv.funCongrLeft ℝ ℝ e).trans L
+    have hL'a : ∀ q, L' q = L (q ∘ e) := fun _ => rfl
+    have hsymm : ∀ w, L'.symm w ⟨0, hn⟩ = L.symm w i₀ := by
+      intro w
+      have h1 : (L'.symm w) ∘ e = L.symm w := by
+        rw [LinearEquiv.eq_symm_apply, ← hL'a]
+        exact L'.apply_symm_apply w
+      rw [← h1, Function.comp_apply, hi0]
+    have hL'
+        : ∀ q, L' q ∈ Λ ↔ ∃ k : Fin (Fintype.card (Fin g ⊕ Fin g)) → ℤ, q = fun α => (k α : ℝ) := by
+      intro q
+      rw [hL'a, hL]
+      constructor
+      · rintro ⟨k, hk⟩
+        refine ⟨k ∘ e.symm, ?_⟩
+        funext j
+        simpa using congrFun hk (e.symm j)
+      · rintro ⟨k, rfl⟩
+        exact ⟨k ∘ e, rfl⟩
+    filter_upwards [core (L := L') hn c₀ hθ hw hL' hΛ hc] with m hm Ix _ r h1 h2
+    simpa only [hsymm] using hm Ix r h1 h2
 
 end GlobalTheory.CompanionTheory.TorsOff

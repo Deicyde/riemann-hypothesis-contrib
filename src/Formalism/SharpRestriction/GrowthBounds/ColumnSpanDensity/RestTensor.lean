@@ -9,7 +9,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.MainNotions.G.LatticeSystems
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
+  Formalism.MainNotions.G.LatticeSystems
 
 theorem restLeLat : RestLeLat := by
   intro p n' R m e he s

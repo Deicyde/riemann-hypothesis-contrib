@@ -11,8 +11,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem NormFormDvd.proof (h₁ : NormFormEmbeddings.Statement) (h₂ : LinearFormPrime.Statement)
-    (h₃ : MapDvdDescent.Statement) : NormFormDvd.Statement := by
+theorem NormFormDvd.proof
+    (h₁ : NormFormEmbeddings.Statement) (h₂ : LinearFormPrime.Statement)
+    (h₃ : MapDvdDescent.Statement)
+    : NormFormDvd.Statement := by
   intro K L _ _ _ _ _ _ n η t P hgen ht hdvd
   classical
   apply h₃ K (AlgebraicClosure K) (Fin n)
@@ -26,7 +28,7 @@ theorem NormFormDvd.proof (h₁ : NormFormEmbeddings.Statement) (h₂ : LinearFo
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_one, Algebra.smul_def, map_mul, AlgHom.commutes] at h
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [hθ, map_sum, mul_comm] using h
+    simpa [hθ, map_sum, mul_comm] using h
 
   have hcoord : ∀ σ m, eval (Pi.single m 1) (θ σ) = σ (η m) := by
     intro σ m
@@ -48,7 +50,7 @@ theorem NormFormDvd.proof (h₁ : NormFormEmbeddings.Statement) (h₂ : LinearFo
     rw [h]
     congr 1
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [hθ, map_sum]
+    simp [hθ, map_sum]
   have hinj : ∀ a b, θ a ∣ θ b → a = b := by
     intro a b hab
     obtain ⟨u, hu⟩ := (hprime a).associated_of_dvd (hprime b) hab
@@ -60,8 +62,9 @@ theorem NormFormDvd.proof (h₁ : NormFormEmbeddings.Statement) (h₂ : LinearFo
     refine AlgHom.ext_of_adjoin_eq_top hgen ?_
     rintro _ ⟨m, rfl⟩
     rw [← hcoord a m, ← hcoord b m, hu]
-  have key : ∀ s : Finset (L →ₐ[K] AlgebraicClosure K),
-      ∏ σ ∈ s, θ σ ∣ map (algebraMap K (AlgebraicClosure K)) P := by
+  have key
+      : ∀ s : Finset (L →ₐ[K] AlgebraicClosure K),
+        ∏ σ ∈ s, θ σ ∣ map (algebraMap K (AlgebraicClosure K)) P := by
     intro s
     induction s using Finset.induction_on with
     | empty => simp

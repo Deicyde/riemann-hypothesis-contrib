@@ -8,24 +8,27 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
 
 namespace GlobalTheory.SerreTateIndep
 
-variable {l : ℕ} [Fact l.Prime] {act : GQ l →* (PadicComplex l ≃+* PadicComplex l)}
-  {χ : GQ l →* ℚ_[l]ˣ} {r : ℕ} {U : GQ l → Matrix (Fin r) (Fin r) (PadicComplex l)}
+variable
+  {l : ℕ} [Fact l.Prime]
+  {act : GQ l →* (PadicComplex l ≃+* PadicComplex l)} {χ : GQ l →* ℚ_[l]ˣ} {r : ℕ}
+  {U : GQ l → Matrix (Fin r) (Fin r) (PadicComplex l)}
 
 theorem chiC_add (i j : ℤ) (g : GQ l) : chiC χ (i + j) g = chiC χ i g * chiC χ j g := by
   simp [chiC, zpow_add]
 
-theorem twAct_twist (i j : ℤ) (g : GQ l) (y : Fin r → PadicComplex l) :
-    twAct act χ (i + j) U g y = chiC χ i g • twAct act χ j U g y := by
+theorem twAct_twist (i j : ℤ) (g : GQ l) (y : Fin r → PadicComplex l)
+    : twAct act χ (i + j) U g y = chiC χ i g • twAct act χ j U g y := by
   unfold twAct
   rw [chiC_add, mul_smul]
 
-theorem twAct_comb {n : ℕ} (i : ℤ) (g : GQ l) (c : Fin n → PadicComplex l)
-    (x : Fin n → Fin r → PadicComplex l) :
-    twAct act χ i U g (∑ k, c k • x k) = ∑ k, act g (c k) • twAct act χ i U g (x k) := by
+theorem twAct_comb
+    {n : ℕ} (i : ℤ) (g : GQ l) (c : Fin n → PadicComplex l) (x : Fin n → Fin r → PadicComplex l)
+    : twAct act χ i U g (∑ k, c k • x k) = ∑ k, act g (c k) • twAct act χ i U g (x k) := by
   unfold twAct
   have : (fun b => act g ((∑ k, c k • x k) b)) = ∑ k, act g (c k) • fun b => act g (x k b) := by
     funext b; simp [Finset.sum_apply]
@@ -35,24 +38,26 @@ theorem twAct_comb {n : ℕ} (i : ℤ) (g : GQ l) (c : Fin n → PadicComplex l)
 
 theorem twAct_zero (i : ℤ) (g : GQ l) : twAct act χ i U g 0 = 0 := by
   unfold twAct
-  have : (fun b => act g ((0 : Fin r → PadicComplex l) b)) = 0 := by
-    funext b; simp
+  have : (fun b => act g ((0 : Fin r → PadicComplex l) b)) = 0 := by funext b; simp
   rw [this, Matrix.mulVec_zero, smul_zero]
 
-theorem linearIndependent_of_weightwise (l : ℕ) [Fact l.Prime]
-    (act : GQ l →* (PadicComplex l ≃+* PadicComplex l)) (χ : GQ l →* ℚ_[l]ˣ)
-    (G : Subgroup (GQ l)) (E : IntermediateField ℚ_[l] (Om l))
-    (hinv : ∀ (i : ℤ) (y : PadicComplex l), (∀ g ∈ G, chiC χ i g * act g y = y) →
-      (i ≠ 0 → y = 0) ∧ (i = 0 → y ∈ inC E))
+theorem linearIndependent_of_weightwise
+    (l : ℕ) [Fact l.Prime]
+    (act : GQ l →* (PadicComplex l ≃+* PadicComplex l)) (χ : GQ l →* ℚ_[l]ˣ) (G : Subgroup (GQ l))
+    (E : IntermediateField ℚ_[l] (Om l))
+    (hinv : ∀ (i : ℤ) (y : PadicComplex l),
+      (∀ g ∈ G, chiC χ i g * act g y = y) → (i ≠ 0 → y = 0) ∧ (i = 0 → y ∈ inC E))
     (r n : ℕ) (U : GQ l → Matrix (Fin r) (Fin r) (PadicComplex l))
     (e : Fin n → Fin r → PadicComplex l) (u : Fin n → ℤ)
     (he : ∀ σ ∈ G, ∀ k, twAct act χ (u k) U σ (e k) = e k)
-    (hE : ∀ (a : ℤ) (c : Fin n → ↥E), (∀ k, u k ≠ a → c k = 0) →
-      ∑ k, (((c k : ↥E) : Om l) : PadicComplex l) • e k = 0 → ∀ k, c k = 0) :
-    LinearIndependent (PadicComplex l) e := by
+    (hE : ∀ (a : ℤ) (c : Fin n → ↥E),
+      (∀ k, u k ≠ a → c k = 0) → ∑ k, (((c k : ↥E) : Om l) : PadicComplex l) • e k = 0
+        → ∀ k, c k = 0)
+    : LinearIndependent (PadicComplex l) e := by
   classical
-  have key : ∀ (s : Finset (Fin n)) (c : Fin n → PadicComplex l), (∀ k, k ∉ s → c k = 0) →
-      ∑ k, c k • e k = 0 → ∀ k, c k = 0 := by
+  have key
+      : ∀ (s : Finset (Fin n)) (c : Fin n → PadicComplex l),
+        (∀ k, k ∉ s → c k = 0) → ∑ k, c k • e k = 0 → ∀ k, c k = 0 := by
     intro s
     induction s using Finset.induction_on with
     | empty => intro c hc _ k; exact hc k (by simp)
@@ -86,7 +91,8 @@ theorem linearIndependent_of_weightwise (l : ℕ) [Fact l.Prime]
           · have : c k = 0 := hc k (by simp [hkk, hk])
             simp [hd, this]
         · simp only [sub_smul, Finset.sum_sub_distrib, h1, hds, sub_self]
-      have hex : ∀ k, ∃ x : ↥E, (((x : ↥E) : Om l) : PadicComplex l) = d k ∧ (u k ≠ u k0 → x = 0) := by
+      have hex
+          : ∀ k, ∃ x : ↥E, (((x : ↥E) : Om l) : PadicComplex l) = d k ∧ (u k ≠ u k0 → x = 0) := by
         intro k
         by_cases hu : u k = u k0
         · obtain ⟨x, hx, hxd⟩ := (hinv _ _ (hfix k)).2 (by rw [hu, sub_self])

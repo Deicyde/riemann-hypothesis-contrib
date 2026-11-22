@@ -10,10 +10,9 @@ open Submodule
 
 variable {O B : Type} [CommRing O] [CommRing B] [Algebra O B] {n r : ℕ}
 
-
-
-theorem mulVec_span_stable (A : Matrix (Fin n) (Fin n) B) (G : Set (Fin n → B))
-    (hG : ∀ x ∈ G, A.mulVec x ∈ span O G) : ∀ x ∈ span O G, A.mulVec x ∈ span O G := by
+theorem mulVec_span_stable
+    (A : Matrix (Fin n) (Fin n) B) (G : Set (Fin n → B)) (hG : ∀ x ∈ G, A.mulVec x ∈ span O G)
+    : ∀ x ∈ span O G, A.mulVec x ∈ span O G := by
   intro x hx
   induction hx using Submodule.span_induction with
   | mem x hx => exact hG x hx
@@ -21,14 +20,16 @@ theorem mulVec_span_stable (A : Matrix (Fin n) (Fin n) B) (G : Set (Fin n → B)
   | add x y _ _ hx hy => rw [Matrix.mulVec_add]; exact add_mem hx hy
   | smul a x _ hx => rw [Matrix.mulVec_smul]; exact Submodule.smul_mem _ a hx
 
-private theorem sep_lemma' (c v : Fin r → Fin n → B)
-    (h : ∀ a b, c b ⬝ᵥ v a = if a = b then 1 else 0) (g : Fin n → B)
-    (hg : g ∈ span B (Set.range v)) : g = ∑ a, (c a ⬝ᵥ g) • v a := by
+private theorem sep_lemma'
+    (c v : Fin r → Fin n → B) (h : ∀ a b, c b ⬝ᵥ v a = if a = b then 1 else 0)
+    (g : Fin n → B) (hg : g ∈ span B (Set.range v))
+    : g = ∑ a, (c a ⬝ᵥ g) • v a := by
   induction hg using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨a', rfl⟩ := hx
     simp [h]
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     simp only [dotProduct_add, add_smul, Finset.sum_add_distrib]
     rw [← hx, ← hy]
@@ -36,8 +37,11 @@ private theorem sep_lemma' (c v : Fin r → Fin n → B)
     simp only [dotProduct_smul, smul_eq_mul, mul_smul]
     rw [← Finset.smul_sum, ← hx]
 
-private theorem units_eq_of_res_eq_of_le_iSup (c v : Fin r → Fin n → B) (h : ∀ a b, c b ⬝ᵥ v a = 0) (g : Fin n → B)
-    (hg : g ∈ span B (Set.range v)) (b : Fin r) : c b ⬝ᵥ g = 0 := by
+private theorem units_eq_of_res_eq_of_le_iSup
+    (c v : Fin r → Fin n → B) (h : ∀ a b, c b ⬝ᵥ v a = 0)
+    (g : Fin n → B) (hg : g ∈ span B (Set.range v))
+    (b : Fin r)
+    : c b ⬝ᵥ g = 0 := by
   induction hg using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨a', rfl⟩ := hx
@@ -46,16 +50,15 @@ private theorem units_eq_of_res_eq_of_le_iSup (c v : Fin r → Fin n → B) (h :
   | add x y _ _ hx hy => rw [dotProduct_add, hx, hy, add_zero]
   | smul s x _ hx => rw [dotProduct_smul, hx, smul_zero]
 
-theorem sep (e f ce cf : Fin r → Fin n → B)
-    (hee : ∀ a b, ce b ⬝ᵥ e a = 0)
-    (hef : ∀ a b, ce b ⬝ᵥ f a = if a = b then 1 else 0)
+theorem sep
+    (e f ce cf : Fin r → Fin n → B)
+    (hee : ∀ a b, ce b ⬝ᵥ e a = 0) (hef : ∀ a b, ce b ⬝ᵥ f a = if a = b then 1 else 0)
     (hfe : ∀ a b, cf b ⬝ᵥ e a = if a = b then 1 else 0)
-    (GX GW GY : Set (Fin n → B))
-    (hGX : GX ⊆ span B (Set.range e)) (hGY : GY ⊆ span B (Set.range f))
+    (GX GW GY : Set (Fin n → B)) (hGX : GX ⊆ span B (Set.range e)) (hGY : GY ⊆ span B (Set.range f))
     (hGW : ∀ w ∈ GW, ∀ b, ce b ⬝ᵥ w = 0 ∧ cf b ⬝ᵥ w = 0)
-    (z y : Fin n → B) (hz : ∀ b, ce b ⬝ᵥ z = 0 ∧ cf b ⬝ᵥ z = 0)
-    (hy : y ∈ span O (GX ∪ GW ∪ GY)) (hzy : z - y ∈ span B (Set.range e)) :
-    z ∈ span O (GX ∪ GW ∪ GY) := by
+    (z y : Fin n → B) (hz : ∀ b, ce b ⬝ᵥ z = 0 ∧ cf b ⬝ᵥ z = 0) (hy : y ∈ span O (GX ∪ GW ∪ GY))
+    (hzy : z - y ∈ span B (Set.range e))
+    : z ∈ span O (GX ∪ GW ∪ GY) := by
   rw [Submodule.span_union, Submodule.span_union] at hy
   obtain ⟨s, hs, u, hu, rfl⟩ := Submodule.mem_sup.mp hy
   obtain ⟨x, hx, w, hw, rfl⟩ := Submodule.mem_sup.mp hs

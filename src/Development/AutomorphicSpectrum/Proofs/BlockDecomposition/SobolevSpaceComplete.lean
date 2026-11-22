@@ -22,11 +22,12 @@ section Limit
 variable {n : ℕ} [MeasurableSpace (G n)] {μ : Measure (G n)}
 variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
-theorem ae_eq_of_tendsto {K : ℕ → Mat n → V} {L : Mat n → V} {y : Lp V 2 μ}
+theorem ae_eq_of_tendsto
+    {K : ℕ → Mat n → V} {L : Mat n → V} {y : Lp V 2 μ}
     (hK : ∀ k, MemLp (fun g : G n => K k g.val) 2 μ)
     (hy : Tendsto (fun k => cls μ (K k)) atTop (𝓝 y))
-    (hp : ∀ g : G n, Tendsto (fun k => K k g.val) atTop (𝓝 (L g.val))) :
-    y =ᵐ[μ] fun g : G n => L g.val := by
+    (hp : ∀ g : G n, Tendsto (fun k => K k g.val) atTop (𝓝 (L g.val)))
+    : y =ᵐ[μ] fun g : G n => L g.val := by
   have hm : TendstoInMeasure μ (fun k => (cls μ (K k) : G n → V)) atTop y :=
     tendstoInMeasure_of_tendsto_Lp hy
   obtain ⟨ns, hns0, hns⟩ := hm.exists_seq_tendsto_ae
@@ -41,19 +42,27 @@ theorem ae_eq_of_tendsto {K : ℕ → Mat n → V} {L : Mat n → V} {y : Lp V 2
 
 end Limit
 
-theorem sob_complete : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (V : Type)
-    [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V], SobG →
-    ∀ a : ℕ → Mat n → V, (∀ k, Sob μ (a k)) → (∀ w, CauchySeq fun k => cls μ (Rw w (a k))) →
-    ∃ b : Mat n → V, Sob μ b ∧ (∀ w, Tendsto (fun k => cls μ (Rw w (a k))) atTop (𝓝 (cls μ (Rw w b)))) ∧
-      ∀ g ∈ GLs n, Tendsto (fun k => a k g) atTop (𝓝 (b g)) := by
+theorem sob_complete
+    : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
+        (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V],
+      SobG
+        → ∀ a : ℕ → Mat n → V,
+          (∀ k, Sob μ (a k)) → (∀ w, CauchySeq fun k => cls μ (Rw w (a k)))
+            → ∃ b : Mat n → V,
+              Sob μ b ∧ (∀ w, Tendsto (fun k => cls μ (Rw w (a k))) atTop (𝓝 (cls μ (Rw w b))))
+                ∧ ∀ g ∈ GLs n, Tendsto (fun k => a k g) atTop (𝓝 (b g)) := by
   intro n _ _ μ _ V _ _ _ hS a ha hC
   obtain ⟨S, C, hb'⟩ := GlobalTheory.CompanionTheory.CurveJ.sup_bound hS n μ
   have hb := hb' V
-  have hs : ∀ k w, Sob μ (Rw w (a k)) := fun k w => GlobalTheory.CompanionTheory.SobOpsPf.sob_Rw w (ha k)
+  have hs : ∀ k w, Sob μ (Rw w (a k)) := fun k w =>
+    GlobalTheory.CompanionTheory.SobOpsPf.sob_Rw w (ha k)
   have hU : ∀ w, UniformCauchySeqOn (fun k => Rw w (a k)) atTop (GLs n) := by
     intro w
-    have hT : Tendsto (fun p : ℕ × ℕ => C * ∑ w' ∈ S,
-        dist (cls μ (Rw w' (Rw w (a p.1)))) (cls μ (Rw w' (Rw w (a p.2))))) (atTop ×ˢ atTop) (𝓝 0) := by
+    have hT : Tendsto
+        (fun p : ℕ × ℕ =>
+          C * ∑ w' ∈ S,
+            dist (cls μ (Rw w' (Rw w (a p.1)))) (cls μ (Rw w' (Rw w (a p.2)))))
+        (atTop ×ˢ atTop) (𝓝 0) := by
       have e0 : (C * ∑ w' ∈ S, (0 : ℝ)) = 0 := by simp
       rw [← e0]
       refine Tendsto.const_mul C (tendsto_finsetSum _ fun w' _ => ?_)
@@ -68,14 +77,19 @@ theorem sob_complete : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] 
     have b := GlobalTheory.CompanionTheory.CurveJ.bound3 hb (hs p.1 w) (hs p.2 w) (hs p.2 w) 0 hx
     simp only [zero_smul, sub_zero, ← dist_eq_norm] at b
     exact lt_of_le_of_lt b hp
-  obtain ⟨Gf, hG, hsm, hR⟩ := GlobalTheory.T.uniform_limit_right_derivatives n V a (fun k => (ha k).1) hU
+  obtain ⟨Gf, hG, hsm, hR⟩ :=
+    GlobalTheory.T.uniform_limit_right_derivatives n V a (fun k => (ha k).1) hU
   have hy : ∀ w, ∃ y : Lp V 2 μ, Tendsto (fun k => cls μ (Rw w (a k))) atTop (𝓝 y) := fun w =>
     cauchySeq_tendsto_of_complete (hC w)
   choose y hy using hy
   have hae : ∀ w, y w =ᵐ[μ] fun g : G n => Rw w (Gf []) g.val := by
     intro w
-    have h := ae_eq_of_tendsto (fun k => (hs k w).2 []) (K := fun k => Rw w (a k)) (L := Gf w) (hy w)
-      (fun g => (hG w).tendsto_at (GlobalTheory.CompanionTheory.SobOpsPf.val_mem g))
+    have h :=
+      ae_eq_of_tendsto
+        (fun k => (hs k w).2 [])
+        (K := fun k => Rw w (a k))
+        (L := Gf w) (hy w)
+        (fun g => (hG w).tendsto_at (GlobalTheory.CompanionTheory.SobOpsPf.val_mem g))
     filter_upwards [h] with g hg
     rw [hg, hR w _ (GlobalTheory.CompanionTheory.SobOpsPf.val_mem g)]
   have hM : ∀ w, MemLp (fun g : G n => Rw w (Gf []) g.val) 2 μ := fun w =>

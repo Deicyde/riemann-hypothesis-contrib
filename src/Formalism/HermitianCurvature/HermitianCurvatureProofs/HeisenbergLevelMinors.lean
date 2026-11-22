@@ -23,7 +23,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.HeisenbergLevelMinors
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 

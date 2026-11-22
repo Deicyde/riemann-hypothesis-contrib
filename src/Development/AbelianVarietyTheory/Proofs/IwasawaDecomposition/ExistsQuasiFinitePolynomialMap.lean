@@ -8,14 +8,16 @@ namespace GlobalTheory.NoetherInt
 
 open Polynomial
 
-theorem quasiFinite_quotient_of_isUnit_coeff {R : Type*} [CommRing R] (G : R[X]) (k : ℕ)
-    (hc : IsUnit (G.coeff k)) : Algebra.QuasiFinite R (R[X] ⧸ Ideal.span {G}) := by
+theorem quasiFinite_quotient_of_isUnit_coeff
+    {R : Type*} [CommRing R] (G : R[X]) (k : ℕ) (hc : IsUnit (G.coeff k))
+    : Algebra.QuasiFinite R (R[X] ⧸ Ideal.span {G}) := by
   refine ⟨fun P _ => ?_⟩
   let f : R[X] →ₐ[R] (R[X] ⧸ Ideal.span {G}) := Ideal.Quotient.mkₐ R _
   have hf : Function.Surjective f := Ideal.Quotient.mkₐ_surjective R _
   let e := Polynomial.fiberEquivQuotient f hf P
   let I : Ideal (P.ResidueField[X]) :=
-    (RingHom.ker (f : R[X] →+* (R[X] ⧸ Ideal.span {G}))).map (mapRingHom (algebraMap R P.ResidueField))
+    (RingHom.ker (f : R[X] →+* (R[X] ⧸ Ideal.span {G}))).map
+      (mapRingHom (algebraMap R P.ResidueField))
   let Gb : P.ResidueField[X] := G.map (algebraMap R P.ResidueField)
   have hG : Gb ≠ 0 := by
     intro h
@@ -28,8 +30,9 @@ theorem quasiFinite_quotient_of_isUnit_coeff {R : Type*} [CommRing R] (G : R[X])
     exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self G)
   have hM : (Gb * C Gb.leadingCoeff⁻¹).Monic := monic_mul_leadingCoeff_inv hG
   have hMI : Gb * C Gb.leadingCoeff⁻¹ ∈ I := I.mul_mem_right _ hmem
-  have h1 : Module.Finite P.ResidueField
-      (P.ResidueField[X] ⧸ Ideal.span {Gb * C Gb.leadingCoeff⁻¹}) := hM.finite_quotient
+  have h1
+      : Module.Finite P.ResidueField (P.ResidueField[X] ⧸ Ideal.span {Gb * C Gb.leadingCoeff⁻¹}) :=
+    hM.finite_quotient
   have hle : Ideal.span {Gb * C Gb.leadingCoeff⁻¹} ≤ I := by
     rw [Ideal.span_singleton_le_iff_mem]; exact hMI
   have h2 : Module.Finite P.ResidueField (P.ResidueField[X] ⧸ I) :=
@@ -37,18 +40,20 @@ theorem quasiFinite_quotient_of_isUnit_coeff {R : Type*} [CommRing R] (G : R[X])
       (Ideal.Quotient.factor_surjective hle)
   exact Module.Finite.of_surjective e.symm.toLinearMap e.symm.surjective
 
-theorem quasiFinite_of_eval₂_eq_zero {R T : Type*} [CommRing R] [CommRing T] (φ : R →+* T) (t : T)
-    (h : (eval₂RingHom φ t).QuasiFinite) (G : R[X]) (hG : eval₂ φ t G = 0) (k : ℕ)
-    (hc : IsUnit (G.coeff k)) : φ.QuasiFinite := by
+theorem quasiFinite_of_eval₂_eq_zero
+    {R T : Type*} [CommRing R] [CommRing T]
+    (φ : R →+* T) (t : T) (h : (eval₂RingHom φ t).QuasiFinite)
+    (G : R[X]) (hG : eval₂ φ t G = 0)
+    (k : ℕ) (hc : IsUnit (G.coeff k))
+    : φ.QuasiFinite := by
   have hker : ∀ a ∈ Ideal.span {G}, eval₂RingHom φ t a = 0 := by
     intro a ha
     obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.mp ha
     simp [hG]
   let ψ : (R[X] ⧸ Ideal.span {G}) →+* T := Ideal.Quotient.lift _ (eval₂RingHom φ t) hker
-  have h1 : ψ.comp (Ideal.Quotient.mk (Ideal.span {G})) = eval₂RingHom φ t := by
-    ext <;> simp [ψ]
-  have h2 : ψ.QuasiFinite := RingHom.QuasiFinite.of_comp (g := Ideal.Quotient.mk (Ideal.span {G}))
-    (h1 ▸ h)
+  have h1 : ψ.comp (Ideal.Quotient.mk (Ideal.span {G})) = eval₂RingHom φ t := by ext <;> simp [ψ]
+  have h2 : ψ.QuasiFinite :=
+    RingHom.QuasiFinite.of_comp (g := Ideal.Quotient.mk (Ideal.span {G})) (h1 ▸ h)
   have h3 : (algebraMap R (R[X] ⧸ Ideal.span {G})).QuasiFinite :=
     RingHom.quasiFinite_algebraMap.2 (quasiFinite_quotient_of_isUnit_coeff G k hc)
   have h4 : ψ.comp (algebraMap R (R[X] ⧸ Ideal.span {G})) = φ := by
@@ -56,24 +61,29 @@ theorem quasiFinite_of_eval₂_eq_zero {R T : Type*} [CommRing R] [CommRing T] (
     simp [ψ, IsScalarTower.algebraMap_apply R R[X] (R[X] ⧸ Ideal.span {G})]
   exact h4 ▸ h2.comp h3
 
-theorem quasiFinite_of_isUnit_coeff {R T : Type*} [CommRing R] [CommRing T] (φ : R →+* T) (t : T)
-    (h : (eval₂RingHom φ t).QuasiFinite) (G : R[X]) (hG : eval₂ φ t G = 0) (k : ℕ)
-    (hc : IsUnit (φ (G.coeff k))) : φ.QuasiFinite := by
+theorem quasiFinite_of_isUnit_coeff
+    {R T : Type*} [CommRing R] [CommRing T]
+    (φ : R →+* T) (t : T) (h : (eval₂RingHom φ t).QuasiFinite)
+    (G : R[X]) (hG : eval₂ φ t G = 0)
+    (k : ℕ) (hc : IsUnit (φ (G.coeff k)))
+    : φ.QuasiFinite := by
   let c := G.coeff k
   let φ' : Localization.Away c →+* T := IsLocalization.Away.lift c hc
   have hφ : φ'.comp (algebraMap R (Localization.Away c)) = φ := IsLocalization.Away.lift_comp c hc
   have hφx : ∀ a, φ' (algebraMap R (Localization.Away c) a) = φ a := fun a => by
     rw [← RingHom.comp_apply, hφ]
-  have hι : (eval₂RingHom φ' t).comp (mapRingHom (algebraMap R (Localization.Away c)))
-      = eval₂RingHom φ t := by
+  have hι
+      : (eval₂RingHom φ' t).comp (mapRingHom (algebraMap R (Localization.Away c)))
+        = eval₂RingHom φ t := by
     ext <;> simp [hφx]
-  have h1 : (eval₂RingHom φ' t).QuasiFinite := RingHom.QuasiFinite.of_comp
-    (g := mapRingHom (algebraMap R (Localization.Away c))) (hι ▸ h)
+  have h1 : (eval₂RingHom φ' t).QuasiFinite :=
+    RingHom.QuasiFinite.of_comp (g := mapRingHom (algebraMap R (Localization.Away c))) (hι ▸ h)
   have hG' : eval₂ φ' t (G.map (algebraMap R (Localization.Away c))) = 0 := by
     have h5 := DFunLike.congr_fun hι G
     simpa [hG] using h5
-  have h2 : φ'.QuasiFinite := quasiFinite_of_eval₂_eq_zero φ' t h1 _ hG' k (by
-    rw [coeff_map]; exact IsLocalization.Away.algebraMap_isUnit c)
+  have h2 : φ'.QuasiFinite :=
+    quasiFinite_of_eval₂_eq_zero φ' t h1 _ hG' k
+      (by rw [coeff_map]; exact IsLocalization.Away.algebraMap_isUnit c)
   have h3 : (algebraMap R (Localization.Away c)).QuasiFinite :=
     RingHom.quasiFinite_algebraMap.2 (.of_isLocalization (.powers c))
   exact hφ ▸ h2.comp h3
@@ -88,8 +98,8 @@ section shear
 
 variable {A : Type*} [CommRing A] {n : ℕ}
 
-noncomputable def shearHom (A : Type*) [CommRing A] (n u : ℕ) (c : A) :
-    MvPolynomial (Fin (n + 1)) A →ₐ[A] MvPolynomial (Fin (n + 1)) A :=
+noncomputable def shearHom (A : Type*) [CommRing A] (n u : ℕ) (c : A)
+    : MvPolynomial (Fin (n + 1)) A →ₐ[A] MvPolynomial (Fin (n + 1)) A :=
   aeval fun i ↦ if i = 0 then X 0 else X i + c • X 0 ^ (u ^ i.1)
 
 lemma shearHom_comp_neg (u : ℕ) (c : A) :
@@ -98,10 +108,9 @@ lemma shearHom_comp_neg (u : ℕ) (c : A) :
   intro i
   cases i using Fin.cases <;> simp [shearHom]
 
-noncomputable def shear (A : Type*) [CommRing A] (n u : ℕ) :
-    MvPolynomial (Fin (n + 1)) A ≃ₐ[A] MvPolynomial (Fin (n + 1)) A :=
-  AlgEquiv.ofAlgHom (shearHom A n u 1) (shearHom A n u (-1))
-    (shearHom_comp_neg u 1)
+noncomputable def shear (A : Type*) [CommRing A] (n u : ℕ)
+    : MvPolynomial (Fin (n + 1)) A ≃ₐ[A] MvPolynomial (Fin (n + 1)) A :=
+  AlgEquiv.ofAlgHom (shearHom A n u 1) (shearHom A n u (-1)) (shearHom_comp_neg u 1)
     (by have := shearHom_comp_neg (A := A) (n := n) u (-1); rwa [neg_neg] at this)
 
 lemma map_shear {B : Type*} [CommRing B] (φ : A →+* B) (u : ℕ)
@@ -191,34 +200,40 @@ private lemma leadingCoeff_finSuccEquiv_t {u : ℕ} (hu : 0 < u) (a : k) :
     simp only [h0, map_pow, Polynomial.leadingCoeff_pow, this, one_pow, Finset.prod_const_one, mul_one]
   exact fun i ↦ pow_zero _
 
-theorem shear_leadingCoeff_isUnit (fne : f ≠ 0) :
-    IsUnit (finSuccEquiv k n (shear k n (2 + f.totalDegree) f)).leadingCoeff := by
+theorem shear_leadingCoeff_isUnit (fne : f ≠ 0)
+    : IsUnit (finSuccEquiv k n (shear k n (2 + f.totalDegree) f)).leadingCoeff := by
   let T := shear k n (2 + f.totalDegree)
   change IsUnit (finSuccEquiv k n (T f)).leadingCoeff
-  obtain ⟨v, vin, vs⟩ := Finset.exists_max_image f.support
-    (fun v ↦ (T (monomial v (f.coeff v))).degreeOf 0) (support_nonempty.mpr fne)
+  obtain ⟨v, vin, vs⟩ :=
+    Finset.exists_max_image f.support
+      (fun v ↦ (T (monomial v (f.coeff v))).degreeOf 0)
+      (support_nonempty.mpr fne)
   let h := fun w ↦ monomial w (f.coeff w)
   simp only [← natDegree_finSuccEquiv] at vs
-  replace vs : ∀ x ∈ f.support \ {v}, (finSuccEquiv k n (T (h x))).degree <
-      (finSuccEquiv k n (T (h v))).degree := by
+  replace vs
+      : ∀ x ∈ f.support \ {v},
+        (finSuccEquiv k n (T (h x))).degree < (finSuccEquiv k n (T (h v))).degree := by
     intro x hx
     obtain ⟨h1, h2⟩ := Finset.mem_sdiff.mp hx
     apply Polynomial.degree_lt_degree <| lt_of_le_of_ne (vs x h1) ?_
-    simpa only [natDegree_finSuccEquiv]
-      using degreeOf_t_ne_of_ne f _ _ h1 vin (fun heq ↦ h2 (Finset.mem_singleton.mpr heq))
-  have hcoeff : (finSuccEquiv k n (T (h v + ∑ x ∈ f.support \ {v}, h x))).leadingCoeff =
-      (finSuccEquiv k n (T (h v))).leadingCoeff := by
+    simpa only [natDegree_finSuccEquiv] using
+      degreeOf_t_ne_of_ne f _ _ h1 vin (fun heq ↦ h2 (Finset.mem_singleton.mpr heq))
+  have hcoeff
+      : (finSuccEquiv k n (T (h v + ∑ x ∈ f.support \ {v}, h x))).leadingCoeff
+        = (finSuccEquiv k n (T (h v))).leadingCoeff := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_add (f := _), map_sum]
     rw [add_comm]
-    apply Polynomial.leadingCoeff_add_of_degree_lt <| (lt_of_le_of_lt <| Polynomial.degree_sum_le _ _) ?_
+    apply Polynomial.leadingCoeff_add_of_degree_lt <|
+      (lt_of_le_of_lt <| Polynomial.degree_sum_le _ _) ?_
     have h2 : h v ≠ 0 := by simpa [h] using mem_support_iff.mp vin
-    replace h2 : (finSuccEquiv k n (T (h v))) ≠ 0 := fun eq ↦ h2 <|
-      by simpa only [map_eq_zero_iff _ (AlgEquiv.injective _)] using eq
+    replace h2 : (finSuccEquiv k n (T (h v))) ≠ 0 := fun eq ↦
+      h2 <| by simpa only [map_eq_zero_iff _ (AlgEquiv.injective _)] using eq
     exact (Finset.sup_lt_iff <| Ne.bot_lt (fun x ↦ h2 <| Polynomial.degree_eq_bot.mp x)).mpr vs
-  have hf : f = h v + ∑ x ∈ f.support \ {v}, h x := calc
-    f = ∑ x ∈ f.support, h x := f.support_sum_monomial_coeff.symm
-    _ = _ := Finset.sum_eq_add_sum_sdiff_singleton_of_mem vin h
+  have hf : f = h v + ∑ x ∈ f.support \ {v}, h x :=
+    calc
+      f = ∑ x ∈ f.support, h x := f.support_sum_monomial_coeff.symm
+      _ = _ := Finset.sum_eq_add_sum_sdiff_singleton_of_mem vin h
   rw [← hf] at hcoeff
   have hlead : (finSuccEquiv k n (T (h v))).leadingCoeff = algebraMap k _ (f.coeff v) :=
     leadingCoeff_finSuccEquiv_t v (by omega) (f.coeff v)
@@ -233,22 +248,30 @@ namespace GlobalTheory.NoetherInt
 
 open MvPolynomial
 
-theorem exists_coeff_map_eq_C {K : Type*} [Field K] {n : ℕ} (φ : ℤ →+* K)
-    (g : MvPolynomial (Fin (n + 1)) ℤ) (hg : MvPolynomial.map φ g ≠ 0) :
-    ∃ (u k : ℕ) (a : K), a ≠ 0 ∧
-      MvPolynomial.map φ ((finSuccEquiv ℤ n (shear ℤ n u g)).coeff k) = MvPolynomial.C a := by
+theorem exists_coeff_map_eq_C
+    {K : Type*} [Field K]
+    {n : ℕ} (φ : ℤ →+* K) (g : MvPolynomial (Fin (n + 1)) ℤ) (hg : MvPolynomial.map φ g ≠ 0)
+    : ∃ (u k : ℕ) (a : K),
+      a ≠ 0
+        ∧ MvPolynomial.map φ ((finSuccEquiv ℤ n (shear ℤ n u g)).coeff k) = MvPolynomial.C a := by
   set f := MvPolynomial.map φ g with hf
   have hU := shear_leadingCoeff_isUnit f hg
   obtain ⟨a, ha, hE⟩ := MvPolynomial.isUnit_iff_eq_C_of_isReduced.mp hU
-  refine ⟨2 + f.totalDegree, (finSuccEquiv K n (shear K n (2 + f.totalDegree) f)).natDegree, a,
-    ha.ne_zero, ?_⟩
+  refine ⟨
+    2 + f.totalDegree,
+    (finSuccEquiv K n (shear K n (2 + f.totalDegree) f)).natDegree,
+    a,
+    ha.ne_zero,
+    ?_
+  ⟩
   rw [← Polynomial.coeff_map, map_finSuccEquiv, map_shear, ← hf]
   exact hE
 
-theorem exists_primitive_of_aeval_eq_zero {S : Type*} [CommRing S] [IsDomain S] [CharZero S]
-    {n : ℕ} (y : Fin n → S) (g : MvPolynomial (Fin n) ℤ) (hg0 : g ≠ 0)
-    (hg : aeval y g = 0) (I : Ideal ℤ) (hI : I ≠ ⊤) :
-    ∃ g₀ : MvPolynomial (Fin n) ℤ, aeval y g₀ = 0 ∧ ∃ v, g₀.coeff v ∉ I := by
+theorem exists_primitive_of_aeval_eq_zero
+    {S : Type*} [CommRing S] [IsDomain S] [CharZero S]
+    {n : ℕ} (y : Fin n → S) (g : MvPolynomial (Fin n) ℤ) (hg0 : g ≠ 0) (hg : aeval y g = 0)
+    (I : Ideal ℤ) (hI : I ≠ ⊤)
+    : ∃ g₀ : MvPolynomial (Fin n) ℤ, aeval y g₀ = 0 ∧ ∃ v, g₀.coeff v ∉ I := by
   classical
   have hs : g.support.Nonempty := support_nonempty.mpr hg0
   obtain ⟨b, hb, hgcd⟩ := Finset.extract_gcd (fun v => g.coeff v) hs
@@ -280,16 +303,17 @@ theorem exists_primitive_of_aeval_eq_zero {S : Type*} [CommRing S] [IsDomain S] 
   · by_contra hall
     push_neg at hall
     obtain ⟨l, hl⟩ := (IsPrincipalIdealRing.principal I).principal
-    have hdvd : l ∣ g.support.gcd b := Finset.dvd_gcd fun v hv => by
-      have := hall v
-      rw [hc v hv, hl] at this
-      exact Ideal.mem_span_singleton.mp this
+    have hdvd : l ∣ g.support.gcd b :=
+      Finset.dvd_gcd fun v hv => by
+        have := hall v
+        rw [hc v hv, hl] at this
+        exact Ideal.mem_span_singleton.mp this
     rw [hgcd] at hdvd
     exact hI (by rw [hl]; exact Ideal.span_singleton_eq_top.mpr (isUnit_of_dvd_one hdvd))
 
-theorem quasiFiniteAt_iff {R S : Type*} [CommRing R] [CommRing S] (f : R →+* S) (q : Ideal S)
-    [q.IsPrime] :
-    f.QuasiFiniteAt q ↔ ((algebraMap S (Localization.AtPrime q)).comp f).QuasiFinite := by
+theorem quasiFiniteAt_iff
+    {R S : Type*} [CommRing R] [CommRing S] (f : R →+* S) (q : Ideal S) [q.IsPrime]
+    : f.QuasiFiniteAt q ↔ ((algebraMap S (Localization.AtPrime q)).comp f).QuasiFinite := by
   letI := f.toAlgebra
   have : f = algebraMap R S := rfl
   rw [this, ← IsScalarTower.algebraMap_eq R S (Localization.AtPrime q),
@@ -301,12 +325,13 @@ namespace GlobalTheory.NoetherInt
 
 open MvPolynomial
 
-theorem exists_quasiFiniteAt_of_not_injective {S : Type*} [CommRing S] [IsDomain S] [CharZero S]
-    (q : Ideal S) [q.IsPrime] {n : ℕ} (y : Fin (n + 1) → S)
+theorem exists_quasiFiniteAt_of_not_injective
+    {S : Type*} [CommRing S] [IsDomain S] [CharZero S]
+    (q : Ideal S) [q.IsPrime]
+    {n : ℕ} (y : Fin (n + 1) → S)
     (h : (aeval y : MvPolynomial (Fin (n + 1)) ℤ →ₐ[ℤ] S).toRingHom.QuasiFiniteAt q)
-    (hy : ¬ Function.Injective (aeval y : MvPolynomial (Fin (n + 1)) ℤ →ₐ[ℤ] S)) :
-    ∃ y' : Fin n → S, (aeval y' : MvPolynomial (Fin n) ℤ →ₐ[ℤ] S).toRingHom.QuasiFiniteAt q := by
-
+    (hy : ¬ Function.Injective (aeval y : MvPolynomial (Fin (n + 1)) ℤ →ₐ[ℤ] S))
+    : ∃ y' : Fin n → S, (aeval y' : MvPolynomial (Fin n) ℤ →ₐ[ℤ] S).toRingHom.QuasiFiniteAt q := by
   obtain ⟨g, hg0, hg⟩ : ∃ g : MvPolynomial (Fin (n + 1)) ℤ, g ≠ 0 ∧ aeval y g = 0 := by
     rw [injective_iff_map_eq_zero] at hy
     push_neg at hy
@@ -316,8 +341,8 @@ theorem exists_quasiFiniteAt_of_not_injective {S : Type*} [CommRing S] [IsDomain
   let K := IsLocalRing.ResidueField (Localization.AtPrime q)
   let res : Localization.AtPrime q →+* K := IsLocalRing.residue _
   let ι : ℤ →+* K := Int.castRingHom K
-  obtain ⟨g₁, hg₁, v, hv⟩ := exists_primitive_of_aeval_eq_zero y g hg0 hg (RingHom.ker ι)
-    (RingHom.ker_ne_top ι)
+  obtain ⟨g₁, hg₁, v, hv⟩ :=
+    exists_primitive_of_aeval_eq_zero y g hg0 hg (RingHom.ker ι) (RingHom.ker_ne_top ι)
   have hne : MvPolynomial.map ι g₁ ≠ 0 := by
     intro h0
     apply hv
@@ -331,8 +356,8 @@ theorem exists_quasiFiniteAt_of_not_injective {S : Type*} [CommRing S] [IsDomain
   let y₁ : Fin (n + 1) → S := fun i => aeval y (σ.symm (X i))
   have h1 : ∀ p, aeval y₁ p = aeval y (σ.symm p) := by
     intro p
-    have : (aeval y₁ : MvPolynomial (Fin (n + 1)) ℤ →ₐ[ℤ] S) =
-        (aeval y).comp (σ.symm : _ →ₐ[ℤ] _) := by
+    have : (aeval y₁ : MvPolynomial (Fin (n + 1)) ℤ →ₐ[ℤ] S)
+        = (aeval y).comp (σ.symm : _ →ₐ[ℤ] _) := by
       apply MvPolynomial.algHom_ext
       intro i
       simp [y₁]
@@ -347,7 +372,8 @@ theorem exists_quasiFiniteAt_of_not_injective {S : Type*} [CommRing S] [IsDomain
     | C a =>
       rw [← Polynomial.coe_eval₂RingHom]
       simp only [eq_intCast, map_intCast]
-    | add p r hp hr => simp [hp, hr, Polynomial.eval₂_add]
+    | add p r hp hr =>
+      simp [hp, hr, Polynomial.eval₂_add]
     | mul_X p i hp =>
       simp only [map_mul, Polynomial.eval₂_mul, hp]
       congr 1
@@ -356,8 +382,9 @@ theorem exists_quasiFiniteAt_of_not_injective {S : Type*} [CommRing S] [IsDomain
       | succ i => simp [e, φ, y', finSuccEquiv_X_succ]
   let E : Polynomial (MvPolynomial (Fin n) ℤ) ≃+* MvPolynomial (Fin (n + 1)) ℤ :=
     (e.symm.trans σ.symm).toRingEquiv
-  have hE : Polynomial.eval₂RingHom φ t =
-      (L.comp (aeval y : MvPolynomial (Fin (n + 1)) ℤ →ₐ[ℤ] S).toRingHom).comp E.toRingHom := by
+  have hE
+      : Polynomial.eval₂RingHom φ t
+        = (L.comp (aeval y : MvPolynomial (Fin (n + 1)) ℤ →ₐ[ℤ] S).toRingHom).comp E.toRingHom := by
     refine RingHom.ext fun p => ?_
     obtain ⟨p, rfl⟩ := e.surjective p
     rw [Polynomial.coe_eval₂RingHom, key, h1]
@@ -365,28 +392,31 @@ theorem exists_quasiFiniteAt_of_not_injective {S : Type*} [CommRing S] [IsDomain
   have hq : (Polynomial.eval₂RingHom φ t).QuasiFinite := by
     rw [hE]
     exact ((quasiFiniteAt_iff _ q).mp h).comp (RingHom.QuasiFinite.of_finite E.finite)
-  have hG : Polynomial.eval₂ φ t (e (σ g₁)) = 0 := by
-    rw [key, h1]; simp [hg₁]
+  have hG : Polynomial.eval₂ φ t (e (σ g₁)) = 0 := by rw [key, h1]; simp [hg₁]
   have hunit : IsUnit (φ ((e (σ g₁)).coeff k)) := by
-    have hΦ : res.comp φ =
-        (MvPolynomial.eval fun i => res (φ (X i))).comp (MvPolynomial.map ι) := by
+    have hΦ
+        : res.comp φ = (MvPolynomial.eval fun i => res (φ (X i))).comp (MvPolynomial.map ι) := by
       apply MvPolynomial.ringHom_ext
       · intro m; simp [ι]
       · intro i; simp
     have h2 : res (φ ((e (σ g₁)).coeff k)) = a := by
-      have : res (φ ((e (σ g₁)).coeff k)) = MvPolynomial.eval (fun i => res (φ (X i)))
-          (MvPolynomial.map ι ((e (σ g₁)).coeff k)) := DFunLike.congr_fun hΦ ((e (σ g₁)).coeff k)
+      have : res (φ ((e (σ g₁)).coeff k))
+          = MvPolynomial.eval (fun i => res (φ (X i))) (MvPolynomial.map ι ((e (σ g₁)).coeff k)) :=
+        DFunLike.congr_fun hΦ ((e (σ g₁)).coeff k)
       rw [this]
       simp only [e, σ]
-      rw [hc]; simp
+      rw [hc]
+      simp
     exact (IsLocalRing.residue_ne_zero_iff_isUnit _).mp (h2 ▸ ha)
   exact ⟨y', (quasiFiniteAt_iff _ q).mpr (quasiFinite_of_isUnit_coeff φ t hq _ hG k hunit)⟩
 
-theorem exists_algebraicIndependent_of_quasiFiniteAt {S : Type*} [CommRing S] [IsDomain S]
-    [CharZero S] (q : Ideal S) [q.IsPrime] (n : ℕ) :
-    ∀ y : Fin n → S, (aeval y : MvPolynomial (Fin n) ℤ →ₐ[ℤ] S).toRingHom.QuasiFiniteAt q →
-    ∃ (r : ℕ) (y' : Fin r → S), AlgebraicIndependent ℤ y' ∧
-      (aeval y' : MvPolynomial (Fin r) ℤ →ₐ[ℤ] S).toRingHom.QuasiFiniteAt q := by
+theorem exists_algebraicIndependent_of_quasiFiniteAt
+    {S : Type*} [CommRing S] [IsDomain S] [CharZero S] (q : Ideal S) [q.IsPrime] (n : ℕ)
+    : ∀ y : Fin n → S,
+      (aeval y : MvPolynomial (Fin n) ℤ →ₐ[ℤ] S).toRingHom.QuasiFiniteAt q
+        → ∃ (r : ℕ) (y' : Fin r → S),
+          AlgebraicIndependent ℤ y'
+            ∧ (aeval y' : MvPolynomial (Fin r) ℤ →ₐ[ℤ] S).toRingHom.QuasiFiniteAt q := by
   induction n with
   | zero =>
     intro y h
@@ -406,19 +436,25 @@ namespace GlobalTheory
 
 open IsLocalRing
 
-theorem exists_algebraicIndependent_int_quasiFiniteAt :
-    ∀ (S : Type) [CommRing S] [IsDomain S] [CharZero S] [Algebra.FiniteType ℤ S] (𝔮 : Ideal S) [𝔮.IsPrime], ∃ (r : ℕ) (y : Fin r → S), AlgebraicIndependent ℤ y ∧ @Algebra.QuasiFiniteAt (MvPolynomial (Fin r) ℤ) S _ _ (MvPolynomial.aeval y : MvPolynomial (Fin r) ℤ →ₐ[ℤ] S).toRingHom.toAlgebra 𝔮 _ := by
+theorem exists_algebraicIndependent_int_quasiFiniteAt
+    : ∀ (S : Type) [CommRing S] [IsDomain S] [CharZero S] [Algebra.FiniteType ℤ S] (𝔮 : Ideal S)
+        [𝔮.IsPrime],
+      ∃ (r : ℕ) (y : Fin r → S),
+        AlgebraicIndependent ℤ y ∧ @Algebra.QuasiFiniteAt (MvPolynomial (Fin r) ℤ) S _ _
+          (MvPolynomial.aeval y : MvPolynomial (Fin r) ℤ →ₐ[ℤ] S).toRingHom.toAlgebra 𝔮 _ := by
   intro S _ _ _ hS 𝔮 _
   obtain ⟨n, f, hf⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.mp hS
-  have hfe : (MvPolynomial.aeval (fun i => f (MvPolynomial.X i)) :
-      MvPolynomial (Fin n) ℤ →ₐ[ℤ] S) = f := by
+  have hfe
+      : (MvPolynomial.aeval (fun i => f (MvPolynomial.X i)) : MvPolynomial (Fin n) ℤ →ₐ[ℤ] S)
+        = f := by
     apply MvPolynomial.algHom_ext
-    intro i; simp
-  refine NoetherInt.exists_algebraicIndependent_of_quasiFiniteAt 𝔮 n
-    (fun i => f (MvPolynomial.X i)) ?_
+    intro i
+    simp
+  refine
+    NoetherInt.exists_algebraicIndependent_of_quasiFiniteAt 𝔮 n (fun i => f (MvPolynomial.X i)) ?_
   rw [NoetherInt.quasiFiniteAt_iff, hfe]
-  refine RingHom.QuasiFinite.comp ?_ (RingHom.QuasiFinite.of_finite
-    (RingHom.Finite.of_surjective _ hf))
+  refine RingHom.QuasiFinite.comp ?_
+    (RingHom.QuasiFinite.of_finite (RingHom.Finite.of_surjective _ hf))
   exact RingHom.quasiFinite_algebraMap.2 (.of_isLocalization 𝔮.primeCompl)
 
 end GlobalTheory

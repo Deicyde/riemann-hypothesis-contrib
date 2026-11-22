@@ -16,9 +16,10 @@ open Polynomial
 
 variable {K : Type} [Field K] {R : Type} [CommRing R] [IsDomain R] [Algebra K R]
 
-theorem chart_ext_scale (A T : Subalgebra K R) (w : R) (hwA : w ∈ A)
-    (hscale : ∀ x ∈ T, ∃ N : ℕ, w ^ N * x ∈ A) (g : R) (hg : IsIntegral T g) :
-    ∃ N : ℕ, IsIntegral A (w ^ N * g) := by
+theorem chart_ext_scale
+    (A T : Subalgebra K R) (w : R) (hwA : w ∈ A) (hscale : ∀ x ∈ T, ∃ N : ℕ, w ^ N * x ∈ A)
+    (g : R) (hg : IsIntegral T g)
+    : ∃ N : ℕ, IsIntegral A (w ^ N * g) := by
   obtain ⟨p, hpm, hp⟩ := hg
   have hmono : ∀ (x : R) (n m : ℕ), n ≤ m → w ^ n * x ∈ A → w ^ m * x ∈ A := by
     intro x n m hnm hx
@@ -26,20 +27,19 @@ theorem chart_ext_scale (A T : Subalgebra K R) (w : R) (hwA : w ∈ A)
       rw [← mul_assoc, ← pow_add, Nat.sub_add_cancel hnm]
     rw [this]
     exact A.mul_mem (A.pow_mem hwA _) hx
-  have hc : ∀ i : ℕ, ∃ n : ℕ, w ^ n * ((p.coeff i : T) : R) ∈ A := fun i =>
-    hscale _ (p.coeff i).2
+  have hc : ∀ i : ℕ, ∃ n : ℕ, w ^ n * ((p.coeff i : T) : R) ∈ A := fun i => hscale _ (p.coeff i).2
   choose n hn using hc
   set N : ℕ := ∑ i ∈ Finset.range (p.natDegree + 1), n i with hN
   have hcN : ∀ i ≤ p.natDegree, w ^ N * ((p.coeff i : T) : R) ∈ A := by
     intro i hi
     refine hmono _ (n i) N ?_ (hn i)
-    exact Finset.single_le_sum (f := n) (fun _ _ => Nat.zero_le _)
+    exact Finset.single_le_sum (f := n)
+      (fun _ _ => Nat.zero_le _)
       (Finset.mem_range.2 (Nat.lt_succ_of_le hi))
   set P : R[X] := p.map (algebraMap T R) with hP
   have hPm : P.Monic := hpm.map _
   have hPdeg : P.natDegree = p.natDegree := hpm.natDegree_map _
-  have hPcoeff : ∀ i, P.coeff i = ((p.coeff i : T) : R) := fun i => by
-    rw [hP, coeff_map]; rfl
+  have hPcoeff : ∀ i, P.coeff i = ((p.coeff i : T) : R) := fun i => by rw [hP, coeff_map]; rfl
   set Q : R[X] := P.scaleRoots (w ^ N) with hQ
   have hQm : Q.Monic := (monic_scaleRoots_iff _).2 hPm
   have hQlift : Q ∈ lifts (algebraMap A R) := by
@@ -64,12 +64,14 @@ theorem chart_ext_scale (A T : Subalgebra K R) (w : R) (hwA : w ∈ A)
   refine ⟨N, q, hqm, ?_⟩
   rw [← eval_map, hqQ, hQ, scaleRoots_eval_mul, hP, eval_map, hp, mul_zero]
 
-theorem chart_ext_pf (A T B0 Bu : Subalgebra K R) (hAT : A ≤ T) (hAB0 : A ≤ B0) (hB0 : B0 ≤ Bu) (hTBu : T ≤ Bu)
-    (hB0FG : B0.FG) (hB0Int : ∀ b ∈ B0, IsIntegral A b) (hBuFG : Bu.FG) (hBuInt : ∀ b ∈ Bu, IsIntegral T b)
-    (hFrac : ∀ r : R, ∃ b ∈ Bu, ∃ b' ∈ Bu, b' ≠ 0 ∧ r * b' = b)
-    (w : R) (hwA : w ∈ A) (hw0 : w ≠ 0) (hscale : ∀ x ∈ T, ∃ N : ℕ, w ^ N * x ∈ A) :
-    ∃ B' : Subalgebra K R, B0 ≤ B' ∧ B'.FG ∧ (∀ b ∈ B', IsIntegral A b) ∧
-      ∀ r : R, ∃ b ∈ B', ∃ b' ∈ B', b' ≠ 0 ∧ r * b' = b := by
+theorem chart_ext_pf
+    (A T B0 Bu : Subalgebra K R) (hAT : A ≤ T) (hAB0 : A ≤ B0) (hB0 : B0 ≤ Bu) (hTBu : T ≤ Bu)
+    (hB0FG : B0.FG) (hB0Int : ∀ b ∈ B0, IsIntegral A b) (hBuFG : Bu.FG)
+    (hBuInt : ∀ b ∈ Bu, IsIntegral T b) (hFrac : ∀ r : R, ∃ b ∈ Bu, ∃ b' ∈ Bu, b' ≠ 0 ∧ r * b' = b)
+    (w : R) (hwA : w ∈ A) (hw0 : w ≠ 0) (hscale : ∀ x ∈ T, ∃ N : ℕ, w ^ N * x ∈ A)
+    : ∃ B' : Subalgebra K R,
+      B0 ≤ B' ∧ B'.FG ∧ (∀ b ∈ B', IsIntegral A b)
+        ∧ ∀ r : R, ∃ b ∈ B', ∃ b' ∈ B', b' ≠ 0 ∧ r * b' = b := by
   classical
   obtain ⟨t, ht⟩ := hB0FG
   obtain ⟨s, hs⟩ := hBuFG
@@ -139,9 +141,11 @@ theorem chart_ext_pf (A T B0 Bu : Subalgebra K R) (hAT : A ≤ T) (hAB0 : A ≤ 
     obtain ⟨L2, h2⟩ := hpow b' hb'
     refine ⟨w ^ (L1 + L2) * b, ?_, w ^ (L1 + L2) * b', ?_, ?_, ?_⟩
     · have : w ^ (L1 + L2) * b = w ^ L2 * (w ^ L1 * b) := by ring
-      rw [this]; exact B'.mul_mem (B'.pow_mem hwB' _) h1
+      rw [this]
+      exact B'.mul_mem (B'.pow_mem hwB' _) h1
     · have : w ^ (L1 + L2) * b' = w ^ L1 * (w ^ L2 * b') := by ring
-      rw [this]; exact B'.mul_mem (B'.pow_mem hwB' _) h2
+      rw [this]
+      exact B'.mul_mem (B'.pow_mem hwB' _) h2
     · exact mul_ne_zero (pow_ne_zero _ hw0) hb'0
     · rw [← hrb]; ring
 

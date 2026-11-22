@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegrableOn
 
 set_option autoImplicit false
 open CategoryTheory AlgebraicGeometry Limits TopologicalSpace MvPolynomial MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts
+  GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
 open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ
@@ -21,10 +23,13 @@ open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.MixZ
 
-theorem isPotential_pullback_locPot : ∀ {k : Type} [CommRing k] {X : Scheme.{0}} {q : X ⟶ Sp k} {σ : k →+* ℂ} {D : ℕ} {T : Type}
-    [TopologicalSpace T] (A : FinHolAtlas D T) (F : T → GlobalTheory.CxPts q σ) (hF : Continuous F),
-    (∀ (W : X.Opens) (f : Γ(X, W)), A.HoloOn (F ⁻¹' ptsIn q σ W) (ev q σ W f ∘ F)) →
-    ∀ {B : LB X} (φ : GlobalTheory.Weight q σ B), φ.IsCInf → IsPotential A (φ.locPot.pullback F hF) := by
+theorem isPotential_pullback_locPot
+    : ∀ {k : Type} [CommRing k] {X : Scheme.{0}} {q : X ⟶ Sp k} {σ : k →+* ℂ} {D : ℕ} {T : Type}
+        [TopologicalSpace T] (A : FinHolAtlas D T) (F : T → GlobalTheory.CxPts q σ)
+        (hF : Continuous F),
+      (∀ (W : X.Opens) (f : Γ(X, W)), A.HoloOn (F ⁻¹' ptsIn q σ W) (ev q σ W f ∘ F))
+        → ∀ {B : LB X} (φ : GlobalTheory.Weight q σ B),
+          φ.IsCInf → IsPotential A (φ.locPot.pullback F hF) := by
   intro k _ X q σ D T _ A F hF hol B φ hφ
   refine ⟨fun x j v hv => ?_, fun x x' y hy => ?_⟩
   · have hv1 : v ∈ (A.chart j).target := hv.1
@@ -54,10 +59,14 @@ theorem isPotential_pullback_locPot : ∀ {k : Type} [CommRing k] {X : Scheme.{0
     have hgc : ContinuousOn g S :=
       (continuousOn_ev (B.g i i').val).comp hF.continuousOn fun _ h => h
     have h0 : g y ≠ 0 := gv_ne_zero hyi hyi'
-    refine ⟨S ∩ (fun z => g z * (g y)⁻¹) ⁻¹' Complex.slitPlane,
+    refine ⟨
+      S ∩ (fun z => g z * (g y)⁻¹) ⁻¹' Complex.slitPlane,
       (hgc.mul continuousOn_const).isOpen_inter_preimage hSo Complex.isOpen_slitPlane,
-      ⟨hyS, ?_⟩, fun z => Complex.log (g z * (g y)⁻¹) + (Real.log ‖g y‖ : ℂ),
-      fun j v hv => ?_, fun z hz => ?_⟩
+      ⟨hyS, ?_⟩,
+      fun z => Complex.log (g z * (g y)⁻¹) + (Real.log ‖g y‖ : ℂ),
+      fun j v hv => ?_,
+      fun z hz => ?_
+    ⟩
     · simp [mul_inv_cancel₀ h0]
     · have ha : AnalyticAt ℂ (g ∘ (A.chart j).symm) v := hgh j v ⟨hv.1, hv.2.1⟩
       exact ((ha.mul analyticAt_const).clog hv.2.2).add analyticAt_const

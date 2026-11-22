@@ -4,9 +4,17 @@ public import Development.WeilBound.CoreStatements.PlurisubharmonicCones.ExistsS
 
 @[expose] public section
 
-open NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights
+open NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+  GroundTheory.Heights₂.Heights
 
-theorem LevelTowerAlt.label_degree_commensurable_bound : ∀ (E L Ψ : Type) [Field E] [NumberField E] [Field L] [NumberField L] [Fintype Ψ] (V : Type) [AddCommGroup V] [Module L V] [Module (𝓞 L) V] [IsScalarTower (𝓞 L) L V] (A : LinPt E L Ψ V) (r k : ℕ) (v : Fin r → V) (s : Ψ ⊕ Ψ) (q : Fin k → A.Λ) (F : Submodule (𝓞 L) V) (𝔞 : Ideal (𝓞 L)), A.IsAdapted s v q → 𝔞 ≠ ⊥ → 𝔞 • F ≤ A.eig s → 𝔞 • A.eig s ≤ F → |A.labDeg s F v q - A.labDeg s (A.eig s) v q| ≤ (r + k) * Real.log (Ideal.absNorm 𝔞) / Module.finrank ℚ L := by
+theorem LevelTowerAlt.label_degree_commensurable_bound
+    : ∀ (E L Ψ : Type) [Field E] [NumberField E] [Field L] [NumberField L] [Fintype Ψ] (V : Type)
+        [AddCommGroup V] [Module L V] [Module (𝓞 L) V] [IsScalarTower (𝓞 L) L V] (A : LinPt E L Ψ V)
+        (r k : ℕ) (v : Fin r → V) (s : Ψ ⊕ Ψ) (q : Fin k → A.Λ) (F : Submodule (𝓞 L) V)
+        (𝔞 : Ideal (𝓞 L)),
+      A.IsAdapted s v q → 𝔞 ≠ ⊥ → 𝔞 • F ≤ A.eig s → 𝔞 • A.eig s ≤ F
+        → |A.labDeg s F v q - A.labDeg s (A.eig s) v q|
+          ≤ (r + k) * Real.log (Ideal.absNorm 𝔞) / Module.finrank ℚ L := by
   intro E L Ψ _ _ _ _ _ V _ _ _ _ A r k v s q F 𝔞 had h𝔞 h1 h2
   obtain ⟨h3, h4⟩ := LevelTowerAlt.sub_eig A had.2
   have h5 := (LevelTowerAlt.Sub.of_smul_le h𝔞 h1).trans h3

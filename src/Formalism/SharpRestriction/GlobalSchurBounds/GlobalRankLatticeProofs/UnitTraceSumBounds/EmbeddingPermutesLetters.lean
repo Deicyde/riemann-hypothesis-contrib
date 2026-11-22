@@ -18,11 +18,15 @@ theorem embT_injective (D : D7) : Function.Injective (embT D) := by
 
 theorem card_Tau_eq (D : D7) : Fintype.card D.what₂.Tau = Module.finrank D.host.K D.host.E := by
   have h1 := Module.finrank_mul_finrank ℚ D.host.K D.host.E
-  rw [Formalism.MainNotions.Ext.finrank_K D.host, Formalism.MainNotions.StandardLattice.finrank_host D] at h1
+  rw [Formalism.MainNotions.Ext.finrank_K D.host,
+      Formalism.MainNotions.StandardLattice.finrank_host D]
+    at h1
   rw [D.what₂.card_Tau]
   omega
 
-theorem trace_sum_over_letters (H : TraceSum) (D : D7) : StandardLatticesGL3.TraceMapNormalisation D :=
-  H D.host.E D.host.K D.host.φ₀ D.what₂.Tau (embT D) (embT_injective D) (GL3Theta.induced_cm_type D) (card_Tau_eq D)
+theorem trace_sum_over_letters (H : TraceSum) (D : D7)
+    : StandardLatticesGL3.TraceMapNormalisation D :=
+  H D.host.E D.host.K D.host.φ₀ D.what₂.Tau (embT D) (embT_injective D) (GL3Theta.induced_cm_type D)
+    (card_Tau_eq D)
 
 end Formalism.MainNotions.Ext

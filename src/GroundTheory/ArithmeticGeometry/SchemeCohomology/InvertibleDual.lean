@@ -16,10 +16,10 @@ variable {X : Scheme.{u}}
 
 @[ext]
 structure DualSec (P : PMod X) (U : X.Opens) where
-
   app : ∀ (V : X.Opens), V ≤ U → P.obj (op V) →ₗ[ringOn X V] ringOn X V
-  compat : ∀ (V W : X.Opens) (h : V ≤ U) (i : W ≤ V) (m : P.obj (op V)),
-    app W (i.trans h) (resM P i m) = resR i (app V h m)
+  compat
+    : ∀ (V W : X.Opens) (h : V ≤ U) (i : W ≤ V) (m : P.obj (op V)),
+      app W (i.trans h) (resM P i m) = resR i (app V h m)
 
 lemma resR_refl {V : X.Opens} (r : ringOn X V) : resR (le_refl V) r = r := by
   change ((X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).map (𝟙 (op V))).hom r = r
@@ -33,27 +33,44 @@ namespace DualSec
 variable {P : PMod X} {U : X.Opens}
 
 instance : Zero (DualSec P U) := ⟨⟨fun _ _ => 0, fun _ _ _ _ _ => (map_zero _).symm⟩⟩
-instance : Add (DualSec P U) := ⟨fun φ ψ => ⟨fun V h => φ.app V h + ψ.app V h,
-  fun V W h i m => by simp only [LinearMap.add_apply]; rw [φ.compat, ψ.compat, map_add (f := _)]⟩⟩
-instance : Neg (DualSec P U) := ⟨fun φ => ⟨fun V h => -φ.app V h,
-  fun V W h i m => by simp only [LinearMap.neg_apply]; rw [φ.compat, map_neg]⟩⟩
-instance : Sub (DualSec P U) := ⟨fun φ ψ => ⟨fun V h => φ.app V h - ψ.app V h,
-  fun V W h i m => by simp only [LinearMap.sub_apply]; rw [φ.compat, ψ.compat, map_sub]⟩⟩
-instance : SMul ℕ (DualSec P U) := ⟨fun n φ => ⟨fun V h => n • φ.app V h,
-  fun V W h i m => by simp only [LinearMap.smul_apply]; rw [φ.compat, map_nsmul]⟩⟩
-instance : SMul ℤ (DualSec P U) := ⟨fun n φ => ⟨fun V h => n • φ.app V h,
-  fun V W h i m => by simp only [LinearMap.smul_apply]; rw [φ.compat, map_zsmul]⟩⟩
+instance : Add (DualSec P U) :=
+  ⟨fun φ ψ => ⟨
+    fun V h => φ.app V h + ψ.app V h,
+    fun V W h i m => by simp only [LinearMap.add_apply]; rw [φ.compat, ψ.compat, map_add (f := _)]
+  ⟩⟩
+instance : Neg (DualSec P U) :=
+  ⟨fun φ => ⟨
+    fun V h => - φ.app V h,
+    fun V W h i m => by simp only [LinearMap.neg_apply]; rw [φ.compat, map_neg]
+  ⟩⟩
+instance : Sub (DualSec P U) :=
+  ⟨fun φ ψ => ⟨
+    fun V h => φ.app V h - ψ.app V h,
+    fun V W h i m => by simp only [LinearMap.sub_apply]; rw [φ.compat, ψ.compat, map_sub]
+  ⟩⟩
+instance : SMul ℕ (DualSec P U) :=
+  ⟨fun n φ => ⟨
+    fun V h => n • φ.app V h,
+    fun V W h i m => by simp only [LinearMap.smul_apply]; rw [φ.compat, map_nsmul]
+  ⟩⟩
+instance : SMul ℤ (DualSec P U) :=
+  ⟨fun n φ => ⟨
+    fun V h => n • φ.app V h,
+    fun V W h i m => by simp only [LinearMap.smul_apply]; rw [φ.compat, map_zsmul]
+  ⟩⟩
 
 @[simp] lemma add_app' (φ ψ : DualSec P U) (V : X.Opens) (h : V ≤ U) :
     (φ + ψ).app V h = φ.app V h + ψ.app V h := rfl
 
 instance : AddCommGroup (DualSec P U) where
-  add_assoc a b c := by apply DualSec.ext; funext V h; exact add_assoc (a.app V h) (b.app V h) (c.app V h)
+  add_assoc a b c := by
+    apply DualSec.ext; funext V h; exact add_assoc (a.app V h) (b.app V h) (c.app V h)
   zero_add a := by apply DualSec.ext; funext V h; exact zero_add (a.app V h)
   add_zero a := by apply DualSec.ext; funext V h; exact add_zero (a.app V h)
   add_comm a b := by apply DualSec.ext; funext V h; exact add_comm (a.app V h) (b.app V h)
   neg_add_cancel a := by apply DualSec.ext; funext V h; exact neg_add_cancel (a.app V h)
-  sub_eq_add_neg a b := by apply DualSec.ext; funext V h; exact sub_eq_add_neg (a.app V h) (b.app V h)
+  sub_eq_add_neg a b := by
+    apply DualSec.ext; funext V h; exact sub_eq_add_neg (a.app V h) (b.app V h)
   nsmul n φ := n • φ
   zsmul n φ := n • φ
   nsmul_zero a := by apply DualSec.ext; funext V h; exact zero_nsmul (a.app V h)
@@ -70,10 +87,13 @@ instance : AddCommGroup (DualSec P U) where
     change Int.negSucc n • a.app V h = -((n + 1 : ℤ) • a.app V h)
     rw [Int.negSucc_eq, neg_zsmul]
 
-noncomputable instance : SMul (ringOn X U) (DualSec P U) := ⟨fun r φ => ⟨fun V h => resR h r • φ.app V h,
-  fun V W h i m => by
-    simp only [LinearMap.smul_apply, smul_eq_mul]
-    rw [φ.compat, map_mul, resR_resR]⟩⟩
+noncomputable instance : SMul (ringOn X U) (DualSec P U) :=
+  ⟨fun r φ => ⟨
+    fun V h => resR h r • φ.app V h,
+    fun V W h i m => by
+      simp only [LinearMap.smul_apply, smul_eq_mul]
+      rw [φ.compat, map_mul, resR_resR]
+  ⟩⟩
 
 @[simp] lemma smul_app' (r : ringOn X U) (φ : DualSec P U) (V : X.Opens) (h : V ≤ U) :
     (r • φ).app V h = resR h r • φ.app V h := rfl
@@ -132,7 +152,6 @@ lemma resR_injective_of_le {V W : X.Opens} (h : W ≤ V) (h' : V ≤ W) :
   rw [resR_resR, resR_resR, resR_refl, resR_refl] at this
   exact this
 
-
 variable (P : PMod X) in
 noncomputable def dualAb (P : PMod X) : TopCat.Presheaf Ab X where
   obj U := AddCommGrpCat.of (DualSec P U.unop)
@@ -140,10 +159,9 @@ noncomputable def dualAb (P : PMod X) : TopCat.Presheaf Ab X where
   map_id _ := rfl
   map_comp _ _ := rfl
 
-noncomputable instance (P : PMod X) (U : (Opens X)ᵒᵖ) :
-    Module ((X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).obj U) ((dualAb P).obj U) :=
+noncomputable instance (P : PMod X) (U : (Opens X)ᵒᵖ)
+    : Module ((X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).obj U) ((dualAb P).obj U) :=
   inferInstanceAs (Module (ringOn X U.unop) (DualSec P U.unop))
-
 
 variable (P : PMod X) in
 noncomputable def dualPre (P : PMod X) : PMod X :=
@@ -156,8 +174,9 @@ noncomputable def glueLocal {V : X.Opens} (m : P.obj (op V)) (i : ι) : ringOn X
   (sf i).app (V ⊓ U i) inf_le_right (resM P inf_le_left m)
 
 variable {sf}
-variable (hsf : ∀ i j (V : X.Opens) (hi : V ≤ U i) (hj : V ≤ U j) (m : P.obj (op V)),
-  (sf i).app V hi m = (sf j).app V hj m)
+variable
+  (hsf : ∀ i j (V : X.Opens) (hi : V ≤ U i) (hj : V ≤ U j) (m : P.obj (op V)),
+    (sf i).app V hi m = (sf j).app V hj m)
 include hsf
 
 lemma glueLocal_compat {V : X.Opens} (m : P.obj (op V)) (i j : ι) :
@@ -190,22 +209,26 @@ lemma glueFun_spec {V : X.Opens} (hV : V ≤ iSup U) (m : P.obj (op V)) (i : ι)
     resR (inf_le_left : V ⊓ U i ≤ V) (glueFun hsf hV m) = glueLocal sf m i :=
   Classical.choose_spec (exists_glue hsf hV m) i
 
-noncomputable def glueLin {V : X.Opens} (hV : V ≤ iSup U) : P.obj (op V) →ₗ[ringOn X V] ringOn X V where
+noncomputable def glueLin {V : X.Opens} (hV : V ≤ iSup U)
+    : P.obj (op V) →ₗ[ringOn X V] ringOn X V where
   toFun := glueFun hsf hV
   map_add' m m' := by
     refine glue_unique hV _ _ _ (glueFun_spec hsf hV _) (fun i => ?_)
-    rw [map_add (f := _), glueFun_spec, glueFun_spec, glueLocal, glueLocal, glueLocal, resM_add, map_add (f := _)]
+    rw [map_add (f := _), glueFun_spec, glueFun_spec, glueLocal, glueLocal, glueLocal, resM_add,
+      map_add (f := _)]
   map_smul' r m := by
     refine glue_unique hV _ _ _ (glueFun_spec hsf hV _) (fun i => ?_)
     rw [RingHom.id_apply, smul_eq_mul, map_mul, glueFun_spec, glueLocal, glueLocal, resM_smul,
       map_smul, smul_eq_mul]
 
-noncomputable def glue : DualSec P (iSup U) :=
-  ⟨fun V hV => glueLin hsf hV, fun V W hV i m => by
+noncomputable def glue : DualSec P (iSup U) := ⟨
+  fun V hV => glueLin hsf hV,
+  fun V W hV i m => by
     change glueFun hsf (i.trans hV) (resM P i m) = resR i (glueFun hsf hV m)
     refine glue_unique (i.trans hV) _ _ _ (glueFun_spec hsf _ _) (fun j => ?_)
     rw [resR_resR, ← resR_resR (inf_le_left : V ⊓ U j ≤ V) (inf_le_inf_right (U j) i), glueFun_spec,
-      glueLocal, glueLocal, ← (sf j).compat, resM_resM, resM_resM]⟩
+      glueLocal, glueLocal, ← (sf j).compat, resM_resM, resM_resM]
+⟩
 
 lemma glue_restr (i : ι) : restr (le_iSup U i) (glue hsf) = sf i := by
   ext V h m
@@ -247,10 +270,11 @@ noncomputable def dualSheaf (M : X.Modules) : X.Modules where
   val := dualPre ((preMod X).obj M)
   isSheaf := dualAb_isSheaf _
 
-noncomputable def pairingLin (M : X.Modules) (U : X.Opens) :
-    DualSec ((preMod X).obj M) U →ₗ[ringOn X U] ((preMod X).obj M).obj (op U) →ₗ[ringOn X U]
-      ringOn X U :=
-  LinearMap.mk₂ (ringOn X U) (fun φ m => φ.app U le_rfl m)
+noncomputable def pairingLin (M : X.Modules) (U : X.Opens)
+    : DualSec ((preMod X).obj M) U →ₗ[ringOn X U] ((preMod X).obj M).obj (op U) →ₗ[ringOn X U]
+        ringOn X U :=
+  LinearMap.mk₂ (ringOn X U)
+    (fun φ m => φ.app U le_rfl m)
     (fun φ ψ m => rfl)
     (fun r φ m => by
       change (resR le_rfl r • φ.app U le_rfl) m = r * φ.app U le_rfl m
@@ -259,13 +283,15 @@ noncomputable def pairingLin (M : X.Modules) (U : X.Opens) :
     (fun φ m m' => map_add _ _ _)
     (fun r φ m => map_smul _ _ _)
 
-noncomputable def evalPre (M : X.Modules) :
-    (preMod X).obj (dualSheaf M) ⊗ (preMod X).obj M ⟶ (preMod X).obj (𝟙_ X.Modules) where
-  app U := ModuleCat.ofHom (X := ((preMod X).obj (dualSheaf M) ⊗ (preMod X).obj M).obj U)
-    (Y := ((preMod X).obj (𝟙_ X.Modules)).obj U) (by exact TensorProduct.lift (pairingLin M U.unop))
+noncomputable def evalPre (M : X.Modules)
+    : (preMod X).obj (dualSheaf M) ⊗ (preMod X).obj M ⟶ (preMod X).obj (𝟙_ X.Modules) where
+  app U :=
+    ModuleCat.ofHom (X := ((preMod X).obj (dualSheaf M) ⊗ (preMod X).obj M).obj U)
+      (Y := ((preMod X).obj (𝟙_ X.Modules)).obj U)
+      (by exact TensorProduct.lift (pairingLin M U.unop))
   naturality {U V} f := by
-    refine ModuleCat.MonoidalCategory.tensor_ext
-      (M₁ := ((preMod X).obj (dualSheaf M)).obj U) (M₂ := ((preMod X).obj M).obj U) ?_
+    refine ModuleCat.MonoidalCategory.tensor_ext (M₁ := ((preMod X).obj (dualSheaf M)).obj U)
+      (M₂ := ((preMod X).obj M).obj U) ?_
     intro φ m
     change (φ.app V.unop f.unop.le (resM _ f.unop.le m)) = resR f.unop.le (φ.app U.unop le_rfl m)
     rw [← φ.compat]
@@ -279,8 +305,8 @@ lemma resM_refl (P : PMod X) {U : X.Opens} (x : P.obj (op U)) : resM P (le_refl 
 namespace DualSec
 variable {P : PMod X} {U : X.Opens} {s : P.obj (op U)}
 
-noncomputable def coordEquiv (hs : IsBasisOn P U s) (V : X.Opens) (h : V ≤ U) :
-    ringOn X V ≃ₗ[ringOn X V] P.obj (op V) :=
+noncomputable def coordEquiv (hs : IsBasisOn P U s) (V : X.Opens) (h : V ≤ U)
+    : ringOn X V ≃ₗ[ringOn X V] P.obj (op V) :=
   LinearEquiv.ofBijective (LinearMap.toSpanSingleton (ringOn X V) _ (resM P h s)) (hs V h)
 
 lemma coordEquiv_apply (hs : IsBasisOn P U s) (V : X.Opens) (h : V ≤ U) (r : ringOn X V) :
@@ -327,20 +353,23 @@ lemma isBasisOn_dualBasis (hs : IsBasisOn P U s) : IsBasisOn (dualPre P) U (dual
 
 end DualSec
 
-noncomputable def dualIsoHom (M : X.Modules) : dualPre ((preMod X).obj M) ⟶ (preMod X).obj (dualSheaf M) where
-  app U := ModuleCat.ofHom (X := (dualPre ((preMod X).obj M)).obj U)
-    (Y := ((preMod X).obj (dualSheaf M)).obj U)
-    { toFun := fun φ => φ, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
+noncomputable def dualIsoHom (M : X.Modules)
+    : dualPre ((preMod X).obj M) ⟶ (preMod X).obj (dualSheaf M) where
+  app U :=
+    ModuleCat.ofHom (X := (dualPre ((preMod X).obj M)).obj U)
+      (Y := ((preMod X).obj (dualSheaf M)).obj U)
+      { toFun := fun φ => φ, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
   naturality _ := rfl
 
-noncomputable def dualIsoInv (M : X.Modules) : (preMod X).obj (dualSheaf M) ⟶ dualPre ((preMod X).obj M) where
-  app U := ModuleCat.ofHom (X := ((preMod X).obj (dualSheaf M)).obj U)
-    (Y := (dualPre ((preMod X).obj M)).obj U)
-    { toFun := fun φ => φ, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
+noncomputable def dualIsoInv (M : X.Modules)
+    : (preMod X).obj (dualSheaf M) ⟶ dualPre ((preMod X).obj M) where
+  app U :=
+    ModuleCat.ofHom (X := ((preMod X).obj (dualSheaf M)).obj U)
+      (Y := (dualPre ((preMod X).obj M)).obj U)
+      { toFun := fun φ => φ, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
   naturality _ := rfl
 
-instance (M : X.Modules) : IsIso (dualIsoHom M) :=
-  ⟨dualIsoInv M, rfl, rfl⟩
+instance (M : X.Modules) : IsIso (dualIsoHom M) := ⟨dualIsoInv M, rfl, rfl⟩
 
 lemma isIso_dualEval {M : X.Modules} (hM : IsInvertibleSheaf M) : IsIso (dualEval M) := by
   apply isIso_of_isBasisOn

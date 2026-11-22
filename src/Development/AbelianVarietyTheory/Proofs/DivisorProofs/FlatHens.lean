@@ -17,18 +17,18 @@ namespace GlobalTheory.Henselisation
 
 variable {R : Type} [CommRing R] [IsLocalRing R]
 
-theorem Hens.of_trans {i j : EtNbhd R} (h : i ≤ j) (y : i.B) :
-    Hens.of j (EtNbhd.trans h y) = Hens.of i y :=
+theorem Hens.of_trans {i j : EtNbhd R} (h : i ≤ j) (y : i.B)
+    : Hens.of j (EtNbhd.trans h y) = Hens.of i y :=
   Ring.DirectLimit.of_f h y
 
-theorem Hens.exists_of (hdir : IsDirected (EtNbhd R) (· ≤ ·)) (z : Hens R) :
-    ∃ (i : EtNbhd R) (y : i.B), Hens.of i y = z :=
+theorem Hens.exists_of (hdir : IsDirected (EtNbhd R) (· ≤ ·)) (z : Hens R)
+    : ∃ (i : EtNbhd R) (y : i.B), Hens.of i y = z :=
   haveI : IsDirectedOrder (EtNbhd R) := hdir
-  Ring.DirectLimit.exists_of (G := fun i : EtNbhd R => i.B)
-    (f := fun _ _ h => ⇑(EtNbhd.trans h)) z
+  Ring.DirectLimit.exists_of (G := fun i : EtNbhd R => i.B) (f := fun _ _ h => ⇑(EtNbhd.trans h)) z
 
-theorem Hens.exists_of_fin (hdir : IsDirected (EtNbhd R) (· ≤ ·)) :
-    ∀ (l : ℕ) (x : Fin l → Hens R), ∃ (i : EtNbhd R) (y : Fin l → i.B), ∀ k, Hens.of i (y k) = x k := by
+theorem Hens.exists_of_fin (hdir : IsDirected (EtNbhd R) (· ≤ ·))
+    : ∀ (l : ℕ) (x : Fin l → Hens R), ∃ (i : EtNbhd R) (y : Fin l → i.B), ∀ k,
+      Hens.of i (y k) = x k := by
   intro l
   induction l with
   | zero => exact fun x => ⟨EtNbhd.base, fun k => k.elim0, fun k => k.elim0⟩
@@ -43,10 +43,11 @@ theorem Hens.exists_of_fin (hdir : IsDirected (EtNbhd R) (· ≤ ·)) :
     | last => dsimp only; rw [Fin.lastCases_last, Hens.of_trans, hz]
     | cast k => dsimp only; rw [Fin.lastCases_castSucc, Hens.of_trans, hy]
 
-theorem flat_hens_of_stages (hdir : IsDirected (EtNbhd R) (· ≤ ·))
-    (hinj : ∀ i : EtNbhd R, Function.Injective (Hens.of i))
+theorem flat_hens_of_stages
+    (hdir : IsDirected (EtNbhd R) (· ≤ ·)) (hinj : ∀ i : EtNbhd R, Function.Injective (Hens.of i))
     (halg : ∀ (i : EtNbhd R) (r : R), Hens.of i (algebraMap R i.B r) = algebraMap R (Hens R) r)
-    (hflat : ∀ i : EtNbhd R, Module.Flat R i.B) : Module.Flat R (Hens R) := by
+    (hflat : ∀ i : EtNbhd R, Module.Flat R i.B)
+    : Module.Flat R (Hens R) := by
   have hsmul : ∀ (i : EtNbhd R) (r : R) (y : i.B), Hens.of i (r • y) = r • Hens.of i y := by
     intro i r y
     rw [Algebra.smul_def, Algebra.smul_def, map_mul, halg]
@@ -65,7 +66,11 @@ theorem flat_hens_of_stages (hdir : IsDirected (EtNbhd R) (· ≤ ·))
     rw [← hy m, hya m, map_sum]
   simp only [hsmul]
 
-theorem flat_hens : ∀ (R : Type) [CommRing R] [IsLocalRing R], Module.Flat R (Hens R) :=
-  fun R _ _ => flat_hens_of_stages (GlobalTheory.T.pointedEtaleNeighbourhoodLocalRing_isDirected R) (GlobalTheory.T.etaleNbhdLocalRingToHenselisation_injective_of_nbhd R) (GlobalTheory.T.etaleNbhdLocalRingToHenselisation_algebraMap R) (GlobalTheory.T.flat_localRing_pointedEtaleNeighbourhood R)
+theorem flat_hens
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R], Module.Flat R (Hens R) := fun R _ _ =>
+  flat_hens_of_stages (GlobalTheory.T.pointedEtaleNeighbourhoodLocalRing_isDirected R)
+    (GlobalTheory.T.etaleNbhdLocalRingToHenselisation_injective_of_nbhd R)
+    (GlobalTheory.T.etaleNbhdLocalRingToHenselisation_algebraMap R)
+    (GlobalTheory.T.flat_localRing_pointedEtaleNeighbourhood R)
 
 end GlobalTheory.Henselisation

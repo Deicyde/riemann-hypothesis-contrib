@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.UnitaryNorms.UnrAe
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Filter Topology
+open NumberField IsDedekindDomain Formalism.L2.Host Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+  Filter Topology
 
 namespace Formalism.L2.Fam.IdTrans
 
@@ -33,7 +34,9 @@ theorem eq_one_of_pow {a : ℂ} (h : ∀ n : ℤ, ‖a ^ n - 1‖ < 1) (ha : a �
   have hb : ∀ n : ℤ, ‖a‖ ^ n < 2 := fun n => by
     have h2 := h n
     rw [← norm_zpow]
-    calc ‖a ^ n‖ = ‖(a ^ n - 1) + 1‖ := by ring_nf
+    calc
+      ‖a ^ n‖
+        = ‖(a ^ n - 1) + 1‖ := by ring_nf
       _ ≤ ‖a ^ n - 1‖ + ‖(1 : ℂ)‖ := norm_add_le _ _
       _ < 2 := by rw [norm_one]; linarith
   have hpos : 0 < ‖a‖ := norm_pos_iff.2 ha
@@ -66,7 +69,9 @@ theorem eq_one_of_pow {a : ℂ} (h : ∀ n : ℤ, ‖a ^ n - 1‖ < 1) (ha : a �
         have h5 := Complex.re_le_norm (a ^ (2 ^ n))
         rw [hnorm] at h5
         linarith
-      have h6 : 3 * (1 - (a ^ (2 ^ n)).re) ≤ 2 * (1 - (a ^ (2 ^ n)).re) * (1 + (a ^ (2 ^ n)).re) := by nlinarith
+      have h6
+          : 3 * (1 - (a ^ (2 ^ n)).re) ≤ 2 * (1 - (a ^ (2 ^ n)).re) * (1 + (a ^ (2 ^ n)).re) := by
+        nlinarith
       nlinarith
   have hd0 : 1 - a.re ≤ 0 := by
     by_contra hpos0
@@ -91,15 +96,18 @@ section Top
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem isOpen_integers (v : HeightOneSpectrum (𝓞 L)) :
-    IsOpen (v.adicCompletionIntegers L : Set (v.adicCompletion L)) := by
+theorem isOpen_integers (v : HeightOneSpectrum (𝓞 L))
+    : IsOpen (v.adicCompletionIntegers L : Set (v.adicCompletion L)) := by
   exact Valued.isOpen_integer _
 
 open Classical in
-theorem finiteSingle_eq (v : HeightOneSpectrum (𝓞 L)) (x : v.adicCompletion L) (hx : x ∈ v.adicCompletionIntegers L) :
-    finiteSingle L v x = RestrictedProduct.structureMap (fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L)
-      (fun w => (w.adicCompletionIntegers L : Set (w.adicCompletion L))) cofinite
-      (Pi.mulSingle v (⟨x, hx⟩ : v.adicCompletionIntegers L)) := by
+theorem finiteSingle_eq
+    (v : HeightOneSpectrum (𝓞 L)) (x : v.adicCompletion L) (hx : x ∈ v.adicCompletionIntegers L)
+    : finiteSingle L v x
+      = RestrictedProduct.structureMap
+        (fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L)
+        (fun w => (w.adicCompletionIntegers L : Set (w.adicCompletion L)))
+        cofinite (Pi.mulSingle v (⟨x, hx⟩ : v.adicCompletionIntegers L)) := by
   apply RestrictedProduct.ext
   intro w
   show (Pi.mulSingle (M := fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L) v x w) =
@@ -111,25 +119,43 @@ theorem finiteSingle_eq (v : HeightOneSpectrum (𝓞 L)) (x : v.adicCompletion L
   · rw [Pi.mulSingle_eq_of_ne h, Pi.mulSingle_eq_of_ne h]
     rfl
 
-theorem single_mem_nhds {S : Set (AdeleRing (𝓞 L) L)} (hS : S ∈ 𝓝 (1 : AdeleRing (𝓞 L) L)) :
-    ∃ I : Set (HeightOneSpectrum (𝓞 L)), I.Finite ∧ ∀ v ∉ I, ∀ (x : v.adicCompletion L) (_hx : x ∈ v.adicCompletionIntegers L),
-      (((1 : InfiniteAdeleRing L), finiteSingle L v x) : AdeleRing (𝓞 L) L) ∈ S := by
-  have hS' : S ∈ 𝓝 (((1 : InfiniteAdeleRing L), (1 : FiniteAdeleRing (𝓞 L) L)) : InfiniteAdeleRing L × FiniteAdeleRing (𝓞 L) L) := hS
+theorem single_mem_nhds {S : Set (AdeleRing (𝓞 L) L)} (hS : S ∈ 𝓝 (1 : AdeleRing (𝓞 L) L))
+    : ∃ I : Set (HeightOneSpectrum (𝓞 L)),
+      I.Finite
+        ∧ ∀ v ∉ I, ∀ (x : v.adicCompletion L) (_hx : x ∈ v.adicCompletionIntegers L),
+          (((1 : InfiniteAdeleRing L), finiteSingle L v x) : AdeleRing (𝓞 L) L) ∈ S := by
+  have hS'
+      : S ∈ 𝓝
+        (((1 : InfiniteAdeleRing L), (1 : FiniteAdeleRing (𝓞 L) L))
+          : InfiniteAdeleRing L × FiniteAdeleRing (𝓞 L) L) :=
+    hS
   obtain ⟨u, hu, w, hw, huw⟩ := mem_nhds_prod_iff.mp hS'
-  have hw' : w ∈ Filter.map (RestrictedProduct.structureMap (fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L)
-      (fun w => (w.adicCompletionIntegers L : Set (w.adicCompletion L))) cofinite)
-      (𝓝 (1 : Π v : HeightOneSpectrum (𝓞 L), v.adicCompletionIntegers L)) := by
+  have hw'
+      : w ∈ Filter.map
+        (RestrictedProduct.structureMap
+          (fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L)
+          (fun w => (w.adicCompletionIntegers L : Set (w.adicCompletion L)))
+          cofinite)
+        (𝓝 (1 : Π v : HeightOneSpectrum (𝓞 L), v.adicCompletionIntegers L)) := by
     rw [← RestrictedProduct.nhds_eq_map_structureMap (fun v => isOpen_integers v)]
     exact hw
-  have hw'' : RestrictedProduct.structureMap (fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L)
-      (fun w => (w.adicCompletionIntegers L : Set (w.adicCompletion L))) cofinite ⁻¹' w ∈
-      𝓝 (1 : Π v : HeightOneSpectrum (𝓞 L), v.adicCompletionIntegers L) := hw'
+  have hw''
+      : RestrictedProduct.structureMap
+            (fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L)
+            (fun w => (w.adicCompletionIntegers L : Set (w.adicCompletion L)))
+            cofinite
+          ⁻¹' w
+        ∈ 𝓝 (1 : Π v : HeightOneSpectrum (𝓞 L), v.adicCompletionIntegers L) :=
+    hw'
   rw [nhds_pi, Filter.mem_pi] at hw''
   obtain ⟨I, hI, t, ht, hIt⟩ := hw''
   refine ⟨I, hI, fun v hv x hx => huw ⟨mem_of_mem_nhds hu, ?_⟩⟩
   classical
-  have hf : (Pi.mulSingle v (⟨x, hx⟩ : v.adicCompletionIntegers L) : Π v : HeightOneSpectrum (𝓞 L),
-      v.adicCompletionIntegers L) ∈ I.pi t := by
+  have hf
+      : (Pi.mulSingle v (⟨x, hx⟩ : v.adicCompletionIntegers L)
+          : Π v : HeightOneSpectrum (𝓞 L),
+            v.adicCompletionIntegers L)
+        ∈ I.pi t := by
     intro w' hw'
     have hne : w' ≠ v := fun h => hv (h ▸ hw')
     rw [Pi.mulSingle_eq_of_ne hne]
@@ -145,7 +171,8 @@ theorem unrAE {L : Type} [Field L] [NumberField L] : UnrAE L := by
   intro χ hχ
   classical
   set W : Set ℂˣ := {z | ‖(z : ℂ) - 1‖ < 1} with hWdef
-  have hWo : IsOpen W := isOpen_lt (continuous_norm.comp (Units.continuous_val.sub continuous_const)) continuous_const
+  have hWo : IsOpen W :=
+    isOpen_lt (continuous_norm.comp (Units.continuous_val.sub continuous_const)) continuous_const
   have hW1 : (1 : ℂˣ) ∈ W := by simp [hWdef]
   have hN : χ ⁻¹' W ∈ 𝓝 (1 : Ideles L) := by
     apply hχ.continuousAt.preimage_mem_nhds
@@ -160,13 +187,15 @@ theorem unrAE {L : Type} [Field L] [NumberField L] : UnrAE L := by
     MulOpposite.continuous_op.continuousAt.preimage_mem_nhds (by rw [MulOpposite.op_one]; exact hT2)
   obtain ⟨I1, hI1, h1⟩ := single_mem_nhds hT1
   obtain ⟨I2, hI2, h2⟩ := single_mem_nhds hT2'
-  have hmem : ∀ v ∉ I1 ∪ I2, ∀ x : (v.adicCompletion L)ˣ, IsUnitAt v x → χ (localIdele L v x) ∈ W := by
+  have hmem
+      : ∀ v ∉ I1 ∪ I2, ∀ x : (v.adicCompletion L)ˣ, IsUnitAt v x → χ (localIdele L v x) ∈ W := by
     intro v hv x hx
     have hv1 : v ∉ I1 := fun h => hv (Or.inl h)
     have hv2 : v ∉ I2 := fun h => hv (Or.inr h)
     have hxO : (x : v.adicCompletion L) ∈ v.adicCompletionIntegers L := by
       rw [HeightOneSpectrum.mem_adicCompletionIntegers]; exact le_of_eq hx
-    have hxO' : ((x⁻¹ : (v.adicCompletion L)ˣ) : v.adicCompletion L) ∈ v.adicCompletionIntegers L := by
+    have hxO'
+        : ((x⁻¹ : (v.adicCompletion L)ˣ) : v.adicCompletion L) ∈ v.adicCompletionIntegers L := by
       rw [HeightOneSpectrum.mem_adicCompletionIntegers, Units.val_inv_eq_inv_val, map_inv₀]
       rw [show Valued.v (x : v.adicCompletion L) = 1 from hx, inv_one]
     apply hTN
@@ -181,18 +210,19 @@ theorem unrAE {L : Type} [Field L] [NumberField L] : UnrAE L := by
   intro n
   have hxn : IsUnitAt v (x ^ n) := by
     show Valued.v (((x ^ n : (v.adicCompletion L)ˣ)) : v.adicCompletion L) = 1
-    rw [Units.val_zpow_eq_zpow_val, map_zpow₀, show Valued.v (x : v.adicCompletion L) = 1 from hx, one_zpow]
+    rw [Units.val_zpow_eq_zpow_val, map_zpow₀, show Valued.v (x : v.adicCompletion L) = 1 from hx,
+      one_zpow]
   have := hmem v hv (x ^ n) hxn
   rw [map_zpow, map_zpow] at this
   have h' : ‖(((χ (localIdele L v x)) ^ n : ℂˣ) : ℂ) - 1‖ < 1 := this
   rwa [Units.val_zpow_eq_zpow_val] at h'
 
-theorem unrAe {L : Type} [Field L] [NumberField L] (χ : HChar L) : ∀ᶠ v in cofinite, χ.UnrAt v := (unrAE (L := L) χ.1 χ.2.1).mono fun v hv x hx => hv x hx
+theorem unrAe {L : Type} [Field L] [NumberField L] (χ : HChar L) : ∀ᶠ v in cofinite, χ.UnrAt v :=
+  (unrAE (L := L) χ.1 χ.2.1).mono fun v hv x hx => hv x hx
 
 section UnitsTriv
 
 variable {L : Type} [Field L] [NumberField L]
-
 
 end UnitsTriv
 

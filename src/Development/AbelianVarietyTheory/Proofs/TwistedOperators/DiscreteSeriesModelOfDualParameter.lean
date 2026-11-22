@@ -8,7 +8,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.DatumVec
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR
+open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Mult
+  Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -31,7 +34,8 @@ instance : Module ℂ (Cj H) := Module.compHom H (starRingEnd ℂ)
 instance : InnerProductSpace ℂ (Cj H) where
   norm_smul_le a x := by
     change ‖(starRingEnd ℂ a) • (show H from x)‖ ≤ ‖a‖ * ‖(show H from x)‖
-    rw [norm_smul]; simp
+    rw [norm_smul]
+    simp
   inner x y := ⟪(show H from y), (show H from x)⟫_ℂ
   norm_sq_eq_re_inner x := norm_sq_eq_re_inner (𝕜 := ℂ) (show H from x)
   conj_inner_symm x y := inner_conj_symm (𝕜 := ℂ) (show H from y) (show H from x)
@@ -63,7 +67,8 @@ section Rev
 
 variable {n : ℕ}
 
-def rv (g : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ := g.submatrix Fin.revPerm Fin.revPerm
+def rv (g : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
+  g.submatrix Fin.revPerm Fin.revPerm
 
 theorem rv_rv (g : Matrix (Fin n) (Fin n) ℂ) : rv (rv g) = g := by
   ext i j
@@ -99,30 +104,33 @@ theorem rv_Jm (he : ∀ a, ε' a = ε a.rev) : rv (Formalism.REAL.Jm ε') = Form
   funext a
   simp [he]
 
-theorem rv_UJ (he : ∀ a, ε' a = ε a.rev) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε') : rv g ∈ UJset ε := by
+theorem rv_UJ (he : ∀ a, ε' a = ε a.rev) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε')
+    : rv g ∈ UJset ε := by
   have h0 : gᴴ * Formalism.REAL.Jm ε' * g = Formalism.REAL.Jm ε' := hg
   show (rv g)ᴴ * Formalism.REAL.Jm ε * rv g = Formalism.REAL.Jm ε
   rw [← rv_ct, ← rv_Jm he, ← rv_mul, ← rv_mul, h0]
 
-theorem rv_K (he : ∀ a, ε' a = ε a.rev) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Formalism.REAL.Kset ε') :
-    rv g ∈ Formalism.REAL.Kset ε := by
+theorem rv_K
+    (he : ∀ a, ε' a = ε a.rev) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Formalism.REAL.Kset ε')
+    : rv g ∈ Formalism.REAL.Kset ε := by
   obtain ⟨hu, hc⟩ := hg
   refine ⟨?_, ?_⟩
   · rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose] at hu ⊢
     rw [← rv_ct, ← rv_mul, hu, rv_one]
   · rw [← rv_Jm he, ← rv_mul, ← rv_mul, hc]
 
-def nr (μ : Fin n → ℝ) : Fin n → ℝ := fun a => -μ a.rev
+def nr (μ : Fin n → ℝ) : Fin n → ℝ := fun a => - μ a.rev
 
 theorem nr_nr (μ : Fin n → ℝ) : nr (nr μ) = μ := by
   funext a
   simp [nr]
 
-theorem card_rev (p : Fin n → Prop) [DecidablePred p] :
-    (Finset.univ.filter fun b : Fin n => p b.rev).card = (Finset.univ.filter p).card := by
+theorem card_rev (p : Fin n → Prop) [DecidablePred p]
+    : (Finset.univ.filter fun b : Fin n => p b.rev).card = (Finset.univ.filter p).card := by
   refine Finset.card_nbij' Fin.rev Fin.rev ?_ ?_ ?_ ?_ <;> intro a ha <;> simp_all
 
-theorem rhoC_rev (he : ∀ a, ε' a = ε a.rev) : Formalism.REAL.rhoC ε' = nr (Formalism.REAL.rhoC ε) := by
+theorem rhoC_rev (he : ∀ a, ε' a = ε a.rev)
+    : Formalism.REAL.rhoC ε' = nr (Formalism.REAL.rhoC ε) := by
   funext a
   have h1 := card_rev (fun b => a.rev < b ∧ ε b = ε a.rev)
   have h2 := card_rev (fun b => b < a.rev ∧ ε b = ε a.rev)
@@ -131,7 +139,8 @@ theorem rhoC_rev (he : ∀ a, ε' a = ε a.rev) : Formalism.REAL.rhoC ε' = nr (
   rw [h1, h2]
   ring
 
-theorem rhoN_rev (he : ∀ a, ε' a = ε a.rev) : Formalism.REAL.rhoN ε' = nr (Formalism.REAL.rhoN ε) := by
+theorem rhoN_rev (he : ∀ a, ε' a = ε a.rev)
+    : Formalism.REAL.rhoN ε' = nr (Formalism.REAL.rhoN ε) := by
   funext a
   have h1 := card_rev (fun b => a.rev < b ∧ ε b ≠ ε a.rev)
   have h2 := card_rev (fun b => b < a.rev ∧ ε b ≠ ε a.rev)
@@ -140,19 +149,22 @@ theorem rhoN_rev (he : ∀ a, ε' a = ε a.rev) : Formalism.REAL.rhoN ε' = nr (
   rw [h1, h2]
   ring
 
-theorem lowK_rev (he : ∀ a, ε' a = ε a.rev) (lam : Fin n → ℝ) :
-    Formalism.QuantumDeterminants.lowK ε' (nr lam) = nr (Formalism.QuantumDeterminants.lowK ε lam) := by
+theorem lowK_rev (he : ∀ a, ε' a = ε a.rev) (lam : Fin n → ℝ)
+    : Formalism.QuantumDeterminants.lowK ε' (nr lam)
+      = nr (Formalism.QuantumDeterminants.lowK ε lam) := by
   funext a
-  simp only [Formalism.QuantumDeterminants.lowK, rhoN_rev he, rhoC_rev he, nr, Pi.add_apply, Pi.sub_apply]
+  simp only [Formalism.QuantumDeterminants.lowK, rhoN_rev he, rhoC_rev he, nr, Pi.add_apply,
+    Pi.sub_apply]
   ring
 
-theorem vNormSq_rev (he : ∀ a, ε' a = ε a.rev) (μ : Fin n → ℝ) : vNormSq ε' (nr μ) = vNormSq ε μ := by
+theorem vNormSq_rev (he : ∀ a, ε' a = ε a.rev) (μ : Fin n → ℝ)
+    : vNormSq ε' (nr μ) = vNormSq ε μ := by
   simp only [vNormSq, Formalism.REAL.nsq, Formalism.REAL.dot, rhoC_rev he]
   exact Fintype.sum_equiv Fin.revPerm _ _ (fun a => by simp [nr]; ring)
 
-private theorem sum_rev_smul_root_apply (c : Fin n → Fin n → ℕ) (x : Fin n) :
-    (∑ a, ∑ b, ((c b.rev a.rev : ℕ) : ℝ) • Formalism.REAL.root a b) x =
-      -((∑ a, ∑ b, ((c a b : ℕ) : ℝ) • Formalism.REAL.root a b) x.rev) := by
+private theorem sum_rev_smul_root_apply (c : Fin n → Fin n → ℕ) (x : Fin n)
+    : (∑ a, ∑ b, ((c b.rev a.rev : ℕ) : ℝ) • Formalism.REAL.root a b) x
+      = -((∑ a, ∑ b, ((c a b : ℕ) : ℝ) • Formalism.REAL.root a b) x.rev) := by
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
   rw [Finset.sum_comm, ← Finset.sum_neg_distrib]
   refine Fintype.sum_equiv Fin.revPerm _ _ (fun b => ?_)
@@ -161,7 +173,8 @@ private theorem sum_rev_smul_root_apply (c : Fin n → Fin n → ℕ) (x : Fin n
   simp only [Formalism.REAL.root, Pi.sub_apply, Pi.single_apply, Fin.revPerm_apply, Fin.rev_inj]
   split_ifs <;> ring
 
-theorem cdom_rev (he : ∀ a, ε' a = ε a.rev) {μ Λ : Fin n → ℝ} (h : CDom ε' μ Λ) : CDom ε (nr μ) (nr Λ) := by
+theorem cdom_rev (he : ∀ a, ε' a = ε a.rev) {μ Λ : Fin n → ℝ} (h : CDom ε' μ Λ)
+    : CDom ε (nr μ) (nr Λ) := by
   obtain ⟨c, hc, hsum⟩ := h
   refine ⟨fun a b => c b.rev a.rev, fun a b hab => ?_, ?_⟩
   · obtain ⟨h1, h2⟩ := hc _ _ hab
@@ -176,9 +189,14 @@ theorem cdom_rev (he : ∀ a, ε' a = ε a.rev) {μ Λ : Fin n → ℝ} (h : CDo
     ring
 
 def rvU (he : ∀ a, ε' a = ε a.rev) : Formalism.REAL.UJ ε' ≃* Formalism.REAL.UJ ε where
-  toFun g := ⟨⟨rv g.1.1, rv g.1.2, by rw [← rv_mul, g.1.3, rv_one], by rw [← rv_mul, g.1.4, rv_one]⟩, rv_UJ he g.2⟩
-  invFun g := ⟨⟨rv g.1.1, rv g.1.2, by rw [← rv_mul, g.1.3, rv_one], by rw [← rv_mul, g.1.4, rv_one]⟩,
-    rv_UJ (sg_symm he) g.2⟩
+  toFun g := ⟨
+    ⟨rv g.1.1, rv g.1.2, by rw [← rv_mul, g.1.3, rv_one], by rw [← rv_mul, g.1.4, rv_one]⟩,
+    rv_UJ he g.2
+  ⟩
+  invFun g := ⟨
+    ⟨rv g.1.1, rv g.1.2, by rw [← rv_mul, g.1.3, rv_one], by rw [← rv_mul, g.1.4, rv_one]⟩,
+    rv_UJ (sg_symm he) g.2
+  ⟩
   left_inv g := Subtype.ext (Units.ext (rv_rv _))
   right_inv g := Subtype.ext (Units.ext (rv_rv _))
   map_mul' g h := Subtype.ext (Units.ext (rv_mul _ _))
@@ -189,15 +207,18 @@ theorem rvU_cont (he : ∀ a, ε' a = ε a.rev) : Continuous (rvU he) := by
   · exact rv_cont.comp (Units.continuous_val.comp continuous_subtype_val)
   · exact rv_cont.comp (Units.continuous_coe_inv.comp continuous_subtype_val)
 
-theorem memLp_rev (he : ∀ a, ε' a = ε a.rev) {F : Formalism.REAL.UJ ε → ℂ} (hF : MemLp F 2 (Formalism.REAL.muG ε)) :
-    MemLp (F ∘ rvU he) 2 (Formalism.REAL.muG ε') := by
+theorem memLp_rev
+    (he : ∀ a, ε' a = ε a.rev) {F : Formalism.REAL.UJ ε → ℂ} (hF : MemLp F 2 (Formalism.REAL.muG ε))
+    : MemLp (F ∘ rvU he) 2 (Formalism.REAL.muG ε') := by
   have hc : Continuous (rvU he) := rvU_cont he
   have hcs : Continuous (rvU he).symm := rvU_cont (sg_symm he)
   have : (Measure.map (rvU he) (Formalism.REAL.muG ε')).IsHaarMeasure :=
     (rvU he).isHaarMeasure_map (Formalism.REAL.muG ε') hc hcs
-  have hmap : Measure.map (rvU he) (Formalism.REAL.muG ε') =
-      Measure.haarScalarFactor (Measure.map (rvU he) (Formalism.REAL.muG ε')) (Formalism.REAL.muG ε) •
-        Formalism.REAL.muG ε :=
+  have hmap
+      : Measure.map (rvU he) (Formalism.REAL.muG ε')
+        = Measure.haarScalarFactor (Measure.map (rvU he) (Formalism.REAL.muG ε'))
+            (Formalism.REAL.muG ε)
+          • Formalism.REAL.muG ε :=
     Measure.isMulLeftInvariant_eq_smul _ _
   refine MemLp.comp_of_map ?_ hc.measurable.aemeasurable
   rw [hmap]
@@ -207,12 +228,13 @@ end Rev
 
 section Transfer
 
-variable {n : ℕ} {ε ε' : Fin n → Bool} {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
+variable
+  {n : ℕ} {ε ε' : Fin n → Bool} {H H' : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')}
 
-theorem symm_inter (T : H' ≃ₗᵢ⋆[ℂ] H) (h : ∀ g v, T (σ' g v) = σ (rv g) (T v)) :
-    ∀ g v, T.symm (σ g v) = σ' (rv g) (T.symm v) := by
+theorem symm_inter (T : H' ≃ₗᵢ⋆[ℂ] H) (h : ∀ g v, T (σ' g v) = σ (rv g) (T v))
+    : ∀ g v, T.symm (σ g v) = σ' (rv g) (T.symm v) := by
   intro g v
   apply T.injective
   rw [T.apply_symm_apply, h, rv_rv, T.apply_symm_apply]
@@ -232,12 +254,15 @@ theorem inner_conj_map (T : H' ≃ₗᵢ⋆[ℂ] H) (x y : H') : ⟪T x, T y⟫_
   · simp only [RCLike.re_to_complex] at h1 s1 ⊢
     rw [h1, s1]
   · simp only [RCLike.re_to_complex, RCLike.im_to_complex, Complex.conj_I, Complex.mul_re,
-      Complex.neg_re, Complex.neg_im, Complex.I_re, Complex.I_im] at h2 s2 ⊢
+        Complex.neg_re, Complex.neg_im, Complex.I_re, Complex.I_im]
+      at h2 s2 ⊢
     linarith
 
-theorem wt_transfer (he : ∀ a, ε' a = ε a.rev) (T : H' ≃ₗᵢ⋆[ℂ] H) (h : ∀ g v, T (σ' g v) = σ (rv g) (T v))
-    {μ : Fin n → ℝ} {v : H'} (hv : IsWtOn (Formalism.REAL.Kset ε') σ' μ v) :
-    IsWtOn (Formalism.REAL.Kset ε) σ (nr μ) (T v) := by
+theorem wt_transfer
+    (he : ∀ a, ε' a = ε a.rev)
+    (T : H' ≃ₗᵢ⋆[ℂ] H) (h : ∀ g v, T (σ' g v) = σ (rv g) (T v))
+    {μ : Fin n → ℝ} {v : H'} (hv : IsWtOn (Formalism.REAL.Kset ε') σ' μ v)
+    : IsWtOn (Formalism.REAL.Kset ε) σ (nr μ) (T v) := by
   intro θ hθ
   have hK := rv_K (sg_symm he) hθ
   rw [rv_diag] at hK
@@ -249,22 +274,24 @@ theorem wt_transfer (he : ∀ a, ε' a = ε a.rev) (T : H' ≃ₗᵢ⋆[ℂ] H) 
   congr 1
   rw [← Complex.exp_conj, map_mul, Complex.conj_ofReal, Complex.conj_I]
   congr 1
-  have hs : ∑ a, nr μ a * θ a = -∑ a, μ a * θ a.rev := by
+  have hs : ∑ a, nr μ a * θ a = - ∑ a, μ a * θ a.rev := by
     rw [← Finset.sum_neg_distrib]
     exact Fintype.sum_equiv Fin.revPerm _ _ (fun a => by simp [nr])
   rw [hs]
   push_cast
   ring
 
-theorem finite_comap (T : H ≃ₗᵢ⋆[ℂ] H') (S : Submodule ℂ H') [FiniteDimensional ℂ S] :
-    FiniteDimensional ℂ (S.comap (T.toLinearEquiv : H →ₗ⋆[ℂ] H')) := by
+theorem finite_comap (T : H ≃ₗᵢ⋆[ℂ] H') (S : Submodule ℂ H') [FiniteDimensional ℂ S]
+    : FiniteDimensional ℂ (S.comap (T.toLinearEquiv : H →ₗ⋆[ℂ] H')) := by
   have hS : S.FG := Module.Finite.iff_fg.mp inferInstance
   rw [Submodule.comap_equiv_eq_map_symm]
   exact Module.Finite.iff_fg.mpr (hS.map _)
 
-theorem ktype_transfer (he : ∀ a, ε' a = ε a.rev) (T : H' ≃ₗᵢ⋆[ℂ] H) (h : ∀ g v, T (σ' g v) = σ (rv g) (T v))
-    {Λ : Fin n → ℝ} {S : Submodule ℂ H'} (hS : IsKTypeOf ε' σ' Λ S) :
-    IsKTypeOf ε σ (nr Λ) (S.comap (T.symm.toLinearEquiv : H →ₗ⋆[ℂ] H')) := by
+theorem ktype_transfer
+    (he : ∀ a, ε' a = ε a.rev)
+    (T : H' ≃ₗᵢ⋆[ℂ] H) (h : ∀ g v, T (σ' g v) = σ (rv g) (T v))
+    {Λ : Fin n → ℝ} {S : Submodule ℂ H'} (hS : IsKTypeOf ε' σ' Λ S)
+    : IsKTypeOf ε σ (nr Λ) (S.comap (T.symm.toLinearEquiv : H →ₗ⋆[ℂ] H')) := by
   obtain ⟨hfin, hst, hirr, ⟨v, hvS, hv0, hvw⟩, hdom⟩ := hS
   have hinv := symm_inter T h
   refine ⟨finite_comap T.symm S, ?_, ?_, ?_, ?_⟩
@@ -310,11 +337,13 @@ theorem ktype_transfer (he : ∀ a, ε' a = ε a.rev) (T : H' ≃ₗᵢ⋆[ℂ] 
     have := cdom_rev he hd
     rwa [nr_nr] at this
 
-theorem isDS_transfer (he : ∀ a, ε' a = ε a.rev) (T : H' ≃ₗᵢ⋆[ℂ] H) (h : ∀ g v, T (σ' g v) = σ (rv g) (T v))
-    {lam : Fin n → ℝ} (hσ : IsDS ε lam σ) : IsDS ε' (nr lam) σ' := by
+theorem isDS_transfer
+    (he : ∀ a, ε' a = ε a.rev)
+    (T : H' ≃ₗᵢ⋆[ℂ] H) (h : ∀ g v, T (σ' g v) = σ (rv g) (T v))
+    {lam : Fin n → ℝ} (hσ : IsDS ε lam σ)
+    : IsDS ε' (nr lam) σ' := by
   obtain ⟨hcomp, hnt, ⟨⟨h1, hmul⟩, hnorm, hcont⟩, hirr, hsq, ⟨S0, hS0⟩, hmin⟩ := hσ
-  have key : ∀ g v, σ' g v = T.symm (σ (rv g) (T v)) := fun g v => by
-    rw [← h, T.symm_apply_apply]
+  have key : ∀ g v, σ' g v = T.symm (σ (rv g) (T v)) := fun g v => by rw [← h, T.symm_apply_apply]
   have hinv := symm_inter T h
   refine ⟨?_, ?_, ⟨⟨?_, ?_⟩, ?_, ?_⟩, ?_, ?_, ?_, ?_⟩
   · have := hcomp
@@ -333,13 +362,14 @@ theorem isDS_transfer (he : ∀ a, ε' a = ε a.rev) (T : H' ≃ₗᵢ⋆[ℂ] H
   · intro v
     have hfun : (fun g => σ' g v) = fun g => T.symm (σ (rv g) (T v)) := funext fun g => key g v
     rw [hfun]
-    exact T.symm.continuous.comp_continuousOn
-      ((hcont (T v)).comp rv_cont.continuousOn (fun g hg => rv_UJ he hg))
+    exact T.symm.continuous.comp_continuousOn ((hcont (T v)).comp rv_cont.continuousOn
+      (fun g hg => rv_UJ he hg))
   · intro S hcl hst
     have hcl' : IsClosed ((S.comap (T.symm.toLinearEquiv : H →ₗ⋆[ℂ] H') : Submodule ℂ H) : Set H) :=
       hcl.preimage T.symm.continuous
-    have hst' : ∀ g ∈ UJset ε, ∀ w ∈ S.comap (T.symm.toLinearEquiv : H →ₗ⋆[ℂ] H'),
-        σ g w ∈ S.comap (T.symm.toLinearEquiv : H →ₗ⋆[ℂ] H') := by
+    have hst'
+        : ∀ g ∈ UJset ε, ∀ w ∈ S.comap (T.symm.toLinearEquiv : H →ₗ⋆[ℂ] H'),
+          σ g w ∈ S.comap (T.symm.toLinearEquiv : H →ₗ⋆[ℂ] H') := by
       intro g hg w hw
       show T.symm (σ g w) ∈ S
       rw [hinv]
@@ -364,8 +394,9 @@ theorem isDS_transfer (he : ∀ a, ε' a = ε a.rev) (T : H' ≃ₗᵢ⋆[ℂ] H
       simpa using this
   · intro v w
     have hm := memLp_rev he (hsq (T v) (T w))
-    have hfun : coefOn (ε := ε') σ' v w =
-        fun g => starRingEnd ℂ ((coefOn (ε := ε) σ (T v) (T w) ∘ rvU he) g) := by
+    have hfun
+        : coefOn (ε := ε') σ' v w
+          = fun g => starRingEnd ℂ ((coefOn (ε := ε) σ (T v) (T w) ∘ rvU he) g) := by
       funext g
       simp only [coefOn, Function.comp]
       conv_lhs => rw [← T.symm_apply_apply w, key]
@@ -382,10 +413,10 @@ theorem isDS_transfer (he : ∀ a, ε' a = ε a.rev) (T : H' ≃ₗᵢ⋆[ℂ] H
     rw [lowK_rev he, vNormSq_rev he, ← nr_nr μ, vNormSq_rev he]
     exact hle
 
-theorem isEnum_dual {S : SPar} {lam : Fin n → ℝ} (h : IsEnum S lam ε) :
-    IsEnum (dualPar S) (nr lam) (fun a => ε a.rev) := by
+theorem isEnum_dual {S : SPar} {lam : Fin n → ℝ} (h : IsEnum S lam ε)
+    : IsEnum (dualPar S) (nr lam) (fun a => ε a.rev) := by
   obtain ⟨hanti, q, hq, hS⟩ := h
-  refine ⟨fun a b hab => ?_, fun a => -q a.rev, fun a => ?_, ?_⟩
+  refine ⟨fun a b hab => ?_, fun a => - q a.rev, fun a => ?_, ?_⟩
   · simp only [nr]
     exact neg_lt_neg (hanti (Fin.rev_lt_rev.mpr hab))
   · simp [nr, hq]
@@ -398,12 +429,15 @@ theorem isEnum_dual {S : SPar} {lam : Fin n → ℝ} (h : IsEnum S lam ε) :
     · rintro ⟨a, rfl⟩
       exact ⟨a.rev, rfl⟩
 
-private theorem rv_revPerm_conj_eq_conj {n : ℕ} (A g : Matrix (Fin n) (Fin n) ℂ) :
-    rv (A.submatrix Fin.revPerm (Equiv.refl (Fin n)) * g * (A.submatrix Fin.revPerm (Equiv.refl (Fin n)))⁻¹) =
-      A * g * A⁻¹ := by
+private theorem rv_revPerm_conj_eq_conj {n : ℕ} (A g : Matrix (Fin n) (Fin n) ℂ)
+    : rv
+        (A.submatrix Fin.revPerm (Equiv.refl (Fin n)) * g
+          * (A.submatrix Fin.revPerm (Equiv.refl (Fin n)))⁻¹)
+      = A * g * A⁻¹ := by
   rw [inv_submatrix_equiv]
-  have e1 : A.submatrix Fin.revPerm (Equiv.refl (Fin n)) * g =
-      (A * g).submatrix Fin.revPerm (Equiv.refl (Fin n)) := by
+  have e1
+      : A.submatrix Fin.revPerm (Equiv.refl (Fin n)) * g
+        = (A * g).submatrix Fin.revPerm (Equiv.refl (Fin n)) := by
     rw [← submatrix_mul_equiv A g Fin.revPerm (Equiv.refl (Fin n)) (Equiv.refl (Fin n))]
     simp
   rw [e1, submatrix_mul_equiv]
@@ -413,8 +447,8 @@ private theorem rv_revPerm_conj_eq_conj {n : ℕ} (A g : Matrix (Fin n) (Fin n) 
 
 end Transfer
 
-def conjModel {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S) :
-    DSModel V (fun τ => dualPar (S τ)) where
+def conjModel {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S)
+    : DSModel V (fun τ => dualPar (S τ)) where
   H τ := Cj (M.H τ)
   σ τ g := cjOp (M.σ τ (rv g))
   lam τ := nr (M.lam τ)
@@ -428,7 +462,11 @@ def conjModel {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S
       conjTranspose_submatrix, submatrix_mul_equiv, submatrix_mul_equiv]
     rfl
 
-theorem exists_conjModel : ∀ {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S), ∃ (M' : DSModel V (fun τ => dualPar (S τ))) (c : ∀ τ, M'.H τ ≃ₗᵢ⋆[ℂ] M.H τ), ∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ), ∀ w, c τ (M'.rep τ g w) = M.rep τ g (c τ w) := by
+theorem exists_conjModel
+    : ∀ {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S),
+      ∃ (M' : DSModel V (fun τ => dualPar (S τ))) (c : ∀ τ, M'.H τ ≃ₗᵢ⋆[ℂ] M.H τ), ∀ τ,
+        ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ), ∀ w,
+          c τ (M'.rep τ g w) = M.rep τ g (c τ w) := by
   intro D V S M
   refine ⟨conjModel M, fun τ => cj (M.H τ), fun τ g _ w => ?_⟩
   simp only [DSModel.rep, conjModel]

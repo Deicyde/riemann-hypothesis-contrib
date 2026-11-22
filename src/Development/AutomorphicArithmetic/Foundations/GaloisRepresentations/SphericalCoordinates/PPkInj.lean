@@ -4,8 +4,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
@@ -24,13 +27,14 @@ private def mv (A : MF G) (z : Loc G) : Loc G := fun w => A w *ᵥ z w
 
 private def sc (k : ℕ) (A : MF G) : MF G := fun w => (p ^ k) • A w
 
-private theorem int_mul {w : Fin G.m} {a b : G.Fw w} (ha : ‖(a : PadicAlgCl p)‖ ≤ 1)
-    (hb : ‖(b : PadicAlgCl p)‖ ≤ 1) : ‖((a * b : G.Fw w) : PadicAlgCl p)‖ ≤ 1 := by
+private theorem int_mul
+    {w : Fin G.m} {a b : G.Fw w} (ha : ‖(a : PadicAlgCl p)‖ ≤ 1) (hb : ‖(b : PadicAlgCl p)‖ ≤ 1)
+    : ‖((a * b : G.Fw w) : PadicAlgCl p)‖ ≤ 1 := by
   rw [IntermediateField.coe_mul, norm_mul]
   exact mul_le_one₀ ha (norm_nonneg _) hb
 
-private theorem int_sum {w : Fin G.m} (f : Fin G.n → G.Fw w) (h : ∀ i, ‖(f i : PadicAlgCl p)‖ ≤ 1) :
-    ‖((∑ i, f i : G.Fw w) : PadicAlgCl p)‖ ≤ 1 := by
+private theorem int_sum {w : Fin G.m} (f : Fin G.n → G.Fw w) (h : ∀ i, ‖(f i : PadicAlgCl p)‖ ≤ 1)
+    : ‖((∑ i, f i : G.Fw w) : PadicAlgCl p)‖ ≤ 1 := by
   have e : ((∑ i, f i : G.Fw w) : PadicAlgCl p) = ∑ i, (f i : PadicAlgCl p) :=
     map_sum (G.Fw w).val f Finset.univ
   rw [e]
@@ -39,11 +43,11 @@ private theorem int_sum {w : Fin G.m} (f : Fin G.n → G.Fw w) (h : ∀ i, ‖(f
 private theorem mv_int {A : MF G} {z : Loc G} (hA : IntM A) (hz : IntL z) : IntL (mv A z) :=
   fun w i => int_sum _ fun j => int_mul (hA w i j) (hz w j)
 
-private theorem intM_mul {A B : MF G} (hA : IntM A) (hB : IntM B) : IntM (fun w => A w * B w) :=
-  fun w i j => by
-    show ‖(((A w * B w) i j : G.Fw w) : PadicAlgCl p)‖ ≤ 1
-    rw [Matrix.mul_apply]
-    exact int_sum _ fun l => int_mul (hA w i l) (hB w l j)
+private theorem intM_mul {A B : MF G} (hA : IntM A) (hB : IntM B)
+    : IntM (fun w => A w * B w) := fun w i j => by
+  show ‖(((A w * B w) i j : G.Fw w) : PadicAlgCl p)‖ ≤ 1
+  rw [Matrix.mul_apply]
+  exact int_sum _ fun l => int_mul (hA w i l) (hB w l j)
 
 private theorem intL_add {a b : Loc G} (ha : IntL a) (hb : IntL b) : IntL (a + b) := fun w i => by
   change ‖(a w i : PadicAlgCl p) + (b w i : PadicAlgCl p)‖ ≤ 1
@@ -64,12 +68,16 @@ private theorem norm_p_lt : ‖((p : ℕ) : PadicAlgCl p)‖ < 1 := by
 private theorem small (A : MF G) : ∀ᶠ k in Filter.atTop, IntM (sc k A : MF G) := by
   simp only [IntM, Filter.eventually_all]
   intro w i j
-  have ht : Filter.Tendsto (fun k : ℕ => ‖((p : ℕ) : PadicAlgCl p)‖ ^ k * ‖(A w i j : PadicAlgCl p)‖)
+  have ht : Filter.Tendsto
+      (fun k : ℕ => ‖((p : ℕ) : PadicAlgCl p)‖ ^ k * ‖(A w i j : PadicAlgCl p)‖)
       Filter.atTop (nhds 0) := by
-    simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) norm_p_lt).mul_const
-      ‖(A w i j : PadicAlgCl p)‖
+    simpa using
+      (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) norm_p_lt).mul_const
+        ‖(A w i j : PadicAlgCl p)‖
   filter_upwards [ht.eventually (Iio_mem_nhds zero_lt_one)] with k hk
-  have e : ((sc k A w i j : G.Fw w) : PadicAlgCl p) = ((p : ℕ) : PadicAlgCl p) ^ k * (A w i j : PadicAlgCl p) := by
+  have e
+      : ((sc k A w i j : G.Fw w) : PadicAlgCl p)
+        = ((p : ℕ) : PadicAlgCl p) ^ k * (A w i j : PadicAlgCl p) := by
     simp [sc, Matrix.smul_apply, nsmul_eq_mul]
   rw [e, norm_mul, norm_pow]
   exact le_of_lt hk
@@ -82,10 +90,11 @@ private theorem mv_one (z : Loc G) : mv (fun _ => 1) z = z := by
   funext w
   exact Matrix.one_mulVec _
 
-private theorem mv_add_sc (B : MF G) (a a' : Loc G) (k : ℕ) :
-    mv B (a + p ^ k • a') = mv B a + mv (sc k B) a' := by
+private theorem mv_add_sc (B : MF G) (a a' : Loc G) (k : ℕ)
+    : mv B (a + p ^ k • a') = mv B a + mv (sc k B) a' := by
   funext w
-  simp only [mv, sc, Pi.add_apply, Pi.smul_apply, Matrix.mulVec_add, Matrix.smul_mulVec, Matrix.mulVec_smul]
+  simp only [mv, sc, Pi.add_apply, Pi.smul_apply, Matrix.mulVec_add, Matrix.smul_mulVec,
+    Matrix.mulVec_smul]
 
 private theorem intM_of {C : MF G} (h : ∀ z, IntL z → IntL (mv C z)) : IntM C := by
   intro w i j
@@ -102,12 +111,15 @@ private theorem intM_of {C : MF G} (h : ∀ z, IntL z → IntL (mv C z)) : IntM 
 
 variable {D : Datum p} {L : Link D G} {β : G.Cˣ}
 
-private theorem core (A : PFrame L β) {P P' Q Q' R S : MF G}
-    (hP : ∀ w, P' w * R w = 1) (hQ : ∀ w, Q' w * S w = 1)
-    (h : ∀ x, IntL (mv P' (A.T x)) → IntL (mv Q' (A.T' x)) → IntL (mv P (A.T x)) ∧ IntL (mv Q (A.T' x)))
-    {z z' : Loc G} (hz : IntL z) (hz' : IntL z') :
-    IntL (mv (fun w => P w * R w) z) ∧ IntL (mv (fun w => Q w * S w) z') := by
-  obtain ⟨k, hk1, hk2, hk3, hk4⟩ := ((small P).and ((small P').and ((small Q).and (small Q')))).exists
+private theorem core
+    (A : PFrame L β)
+    {P P' Q Q' R S : MF G} (hP : ∀ w, P' w * R w = 1) (hQ : ∀ w, Q' w * S w = 1)
+    (h : ∀ x,
+      IntL (mv P' (A.T x)) → IntL (mv Q' (A.T' x)) → IntL (mv P (A.T x)) ∧ IntL (mv Q (A.T' x)))
+    {z z' : Loc G} (hz : IntL z) (hz' : IntL z')
+    : IntL (mv (fun w => P w * R w) z) ∧ IntL (mv (fun w => Q w * S w) z') := by
+  obtain ⟨k, hk1, hk2, hk3, hk4⟩ :=
+    ((small P).and ((small P').and ((small Q).and (small Q')))).exists
   obtain ⟨x, a', b', ha', hb', hT, hT'⟩ := A.dense (mv R z) (mv S z') k
   have e1 : ∀ B : MF G, mv B (A.T x) = mv (fun w => B w * R w) z + mv (sc k B) a' := fun B => by
     rw [hT, mv_add_sc, mv_mv]
@@ -126,18 +138,18 @@ private theorem core (A : PFrame L β) {P P' Q Q' R S : MF G}
   · simpa using intL_sub r1 (mv_int hk1 ha')
   · simpa using intL_sub r2 (mv_int hk3 hb')
 
-private def Pm (g : Gp G) : MF G :=
-  fun w => (((g.2 w)⁻¹ : GL (Fin G.n) (G.Fw w)) : Matrix (Fin G.n) (Fin G.n) (G.Fw w))
+private def Pm (g : Gp G) : MF G := fun w =>
+  (((g.2 w)⁻¹ : GL (Fin G.n) (G.Fw w)) : Matrix (Fin G.n) (Fin G.n) (G.Fw w))
 
 private def Gm (g : Gp G) : MF G := fun w => (g.2 w : Matrix (Fin G.n) (Fin G.n) (G.Fw w))
 
 private def sca (t : ℚ_[p]) (w : Fin G.m) : G.Fw w := algebraMap ℚ_[p] (G.Fw w) t
 
-private def Bm (d : ∀ w : Fin G.m, G.Fw w) (g : Gp G) : MF G :=
-  fun w => (d w * sca ((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p]) w) • (Gm g w)ᵀ
+private def Bm (d : ∀ w : Fin G.m, G.Fw w) (g : Gp G) : MF G := fun w =>
+  (d w * sca ((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p]) w) • (Gm g w)ᵀ
 
-private def Qi (d : ∀ w : Fin G.m, G.Fw w) (g : Gp G) : MF G :=
-  fun w => (sca (g.1 : ℚ_[p]) w * (d w)⁻¹) • (Pm g w)ᵀ
+private def Qi (d : ∀ w : Fin G.m, G.Fw w) (g : Gp G) : MF G := fun w =>
+  (sca (g.1 : ℚ_[p]) w * (d w)⁻¹) • (Pm g w)ᵀ
 
 private theorem pm_gm (g : Gp G) (w : Fin G.m) : Pm g w * Gm g w = 1 := Units.inv_mul _
 
@@ -146,50 +158,64 @@ private theorem gm_pm (g : Gp G) (w : Fin G.m) : Gm g w * Pm g w = 1 := Units.mu
 private theorem norm_sca (t : ℚ_[p]) (w : Fin G.m) : ‖(sca t w : PadicAlgCl p)‖ = ‖t‖ :=
   norm_algebraMap' (PadicAlgCl p) t
 
-private theorem pair_mv (t : ℚ_[p]) (a z : Loc G) (B : MF G) :
-    t * pairL a (mv B z) = pairL (fun w => sca t w • ((B w)ᵀ *ᵥ a w)) z := by
+private theorem pair_mv (t : ℚ_[p]) (a z : Loc G) (B : MF G)
+    : t * pairL a (mv B z) = pairL (fun w => sca t w • ((B w)ᵀ *ᵥ a w)) z := by
   simp only [pairL, Finset.mul_sum]
   refine Finset.sum_congr rfl fun w _ => ?_
   have e : (sca t w • ((B w)ᵀ *ᵥ a w)) ⬝ᵥ z w = t • (a w ⬝ᵥ mv B z w) := by
-    rw [smul_dotProduct, smul_eq_mul, Algebra.smul_def t, mv, Matrix.dotProduct_mulVec, Matrix.mulVec_transpose]
+    rw [smul_dotProduct, smul_eq_mul, Algebra.smul_def t, mv, Matrix.dotProduct_mulVec,
+      Matrix.mulVec_transpose]
     rfl
   rw [e, map_smul, smul_eq_mul]
 
-private theorem mem_iff {d : ∀ w : Fin G.m, G.Fw w}
+private theorem mem_iff
+    {d : ∀ w : Fin G.m, G.Fw w}
     (hd : ∀ a : Loc G, (∀ z : Loc G, IntL z → ‖pairL a z‖ ≤ 1) ↔ IntL (fun w => d w • a w))
-    (A : PFrame L β) (g : Gp G) (x : VQ D) :
-    A.Mem g x ↔ IntL (mv (Pm g) (A.T x)) ∧ IntL (mv (Bm d g) (A.T' x)) := by
-  have key : (∀ z : Loc G, IntL z →
-      ‖((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p]) * pairL (A.T' x) (mv (Gm g) z)‖ ≤ 1) ↔ IntL (mv (Bm d g) (A.T' x)) := by
+    (A : PFrame L β) (g : Gp G) (x : VQ D)
+    : A.Mem g x ↔ IntL (mv (Pm g) (A.T x)) ∧ IntL (mv (Bm d g) (A.T' x)) := by
+  have key
+      : (∀ z : Loc G, IntL z → ‖((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p]) * pairL (A.T' x) (mv (Gm g) z)‖ ≤ 1)
+        ↔ IntL (mv (Bm d g) (A.T' x)) := by
     simp_rw [pair_mv]
     rw [hd]
-    have e : (fun w => d w • sca ((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p]) w • ((Gm g w)ᵀ *ᵥ A.T' x w)) = mv (Bm d g) (A.T' x) := by
+    have e
+        : (fun w => d w • sca ((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p]) w • ((Gm g w)ᵀ *ᵥ A.T' x w))
+          = mv (Bm d g) (A.T' x) := by
       funext w
       simp only [mv, Bm, Matrix.smul_mulVec, smul_smul]
     rw [e]
   exact and_congr Iff.rfl key
 
-private theorem bq {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0) (g g' : Gp G) (w : Fin G.m) :
-    Bm d g w * Qi d g' w = sca ((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p]) w • (Pm g' w * Gm g w)ᵀ := by
+private theorem bq {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0) (g g' : Gp G) (w : Fin G.m)
+    : Bm d g w * Qi d g' w = sca ((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p]) w • (Pm g' w * Gm g w)ᵀ := by
   simp only [Bm, Qi, Matrix.smul_mul, Matrix.mul_smul, smul_smul, Matrix.transpose_mul]
   congr 1
-  have e : sca ((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p]) w = sca ((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p]) w * sca (g'.1 : ℚ_[p]) w := by
+  have e
+      : sca ((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p]) w
+        = sca ((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p]) w * sca (g'.1 : ℚ_[p]) w := by
     simp [sca, Units.val_mul, map_mul]
   rw [e]
   field_simp [hd0 w]
 
-private theorem bq_self {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0) (g : Gp G) (w : Fin G.m) :
-    Bm d g w * Qi d g w = 1 := by
+private theorem bq_self {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0) (g : Gp G) (w : Fin G.m)
+    : Bm d g w * Qi d g w = 1 := by
   rw [bq hd0, pm_gm]
   simp [sca]
 
-private theorem half {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0)
+private theorem half
+    {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0)
     (hd : ∀ a : Loc G, (∀ z : Loc G, IntL z → ‖pairL a z‖ ≤ 1) ↔ IntL (fun w => d w • a w))
-    (hw : Nonempty (Fin G.m)) (A : PFrame L β) (g g' : Gp G) (h : ∀ x, A.Mem g' x → A.Mem g x) :
-    IntM (fun w => Pm g w * Gm g' w) ∧ ‖((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p])‖ ≤ 1 := by
-  have hc : ∀ z : Loc G, IntL z → IntL (mv (fun w => Pm g w * Gm g' w) z) ∧ IntL (mv (fun w => Bm d g w * Qi d g' w) z) :=
-    fun z hz => core A (P' := Pm g') (Q' := Bm d g') (pm_gm g') (bq_self hd0 g')
-      (fun x h1 h2 => (mem_iff hd A g x).1 (h x ((mem_iff hd A g' x).2 ⟨h1, h2⟩))) hz hz
+    (hw : Nonempty (Fin G.m))
+    (A : PFrame L β) (g g' : Gp G) (h : ∀ x, A.Mem g' x → A.Mem g x)
+    : IntM (fun w => Pm g w * Gm g' w) ∧ ‖((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p])‖ ≤ 1 := by
+  have hc
+      : ∀ z : Loc G,
+        IntL z
+          → IntL (mv (fun w => Pm g w * Gm g' w) z)
+            ∧ IntL (mv (fun w => Bm d g w * Qi d g' w) z) := fun z hz =>
+    core A (P' := Pm g') (Q' := Bm d g') (pm_gm g') (bq_self hd0 g')
+      (fun x h1 h2 => (mem_iff hd A g x).1 (h x ((mem_iff hd A g' x).2 ⟨h1, h2⟩)))
+      hz hz
   have h1 : IntM (fun w => Pm g w * Gm g' w) := intM_of fun z hz => (hc z hz).1
   have h2 : IntM (fun w => Bm d g w * Qi d g' w) := intM_of fun z hz => (hc z hz).2
   refine ⟨h1, ?_⟩
@@ -197,39 +223,46 @@ private theorem half {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0)
   have h3 := intM_mul h2 h1t
   obtain ⟨w⟩ := hw
   have i : Fin G.n := ⟨0, G.n_pos⟩
-  have e : Bm d g w * Qi d g' w * (Pm g w * Gm g' w)ᵀ = sca ((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p]) w • 1 := by
+  have e
+      : Bm d g w * Qi d g' w * (Pm g w * Gm g' w)ᵀ
+        = sca ((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p]) w • 1 := by
     rw [bq hd0, Matrix.smul_mul, ← Matrix.transpose_mul]
     have : Pm g w * Gm g' w * (Pm g' w * Gm g w) = 1 := by
       rw [Matrix.mul_assoc, ← Matrix.mul_assoc (Gm g' w), gm_pm, Matrix.one_mul, pm_gm]
     rw [this, Matrix.transpose_one]
-  have h4 : ‖(((Bm d g w * Qi d g' w * (Pm g w * Gm g' w)ᵀ) i i : G.Fw w) : PadicAlgCl p)‖ ≤ 1 := h3 w i i
+  have h4 : ‖(((Bm d g w * Qi d g' w * (Pm g w * Gm g' w)ᵀ) i i : G.Fw w) : PadicAlgCl p)‖ ≤ 1 :=
+    h3 w i i
   rw [e] at h4
   simpa [Matrix.smul_apply, norm_sca] using h4
 
-private theorem inv_val (g g' : Gp G) (w : Fin G.m) :
-    ((((g⁻¹ * g').2 w)⁻¹ : GL (Fin G.n) (G.Fw w)) : Matrix (Fin G.n) (Fin G.n) (G.Fw w)) = Pm g' w * Gm g w := by
+private theorem inv_val (g g' : Gp G) (w : Fin G.m)
+    : ((((g⁻¹ * g').2 w)⁻¹ : GL (Fin G.n) (G.Fw w)) : Matrix (Fin G.n) (Fin G.n) (G.Fw w))
+      = Pm g' w * Gm g w := by
   have e : (((g⁻¹ * g').2 w)⁻¹ : GL (Fin G.n) (G.Fw w)) = (g'.2 w)⁻¹ * g.2 w := by
     show ((g.2 w)⁻¹ * g'.2 w)⁻¹ = _
     rw [_root_.mul_inv_rev, _root_.inv_inv]
   rw [e]
   rfl
 
-private theorem norm_swap (g g' : Gp G) :
-    ‖((g'.1⁻¹ * g.1 : ℚ_[p]ˣ) : ℚ_[p])‖ = ‖((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p])‖⁻¹ := by
-  have e : (g'.1⁻¹ * g.1 : ℚ_[p]ˣ) = (g.1⁻¹ * g'.1)⁻¹ := by
-    rw [_root_.mul_inv_rev, _root_.inv_inv]
+private theorem norm_swap (g g' : Gp G)
+    : ‖((g'.1⁻¹ * g.1 : ℚ_[p]ˣ) : ℚ_[p])‖ = ‖((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p])‖⁻¹ := by
+  have e : (g'.1⁻¹ * g.1 : ℚ_[p]ˣ) = (g.1⁻¹ * g'.1)⁻¹ := by rw [_root_.mul_inv_rev, _root_.inv_inv]
   rw [e, Units.val_inv_eq_inv_val, norm_inv]
 
-private theorem intPt_of {g g' : Gp G} (hH : IntM (fun w => Pm g w * Gm g' w))
-    (hI : IntM (fun w => Pm g' w * Gm g w)) (hs : ‖((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p])‖ = 1) :
-    IntPt (g⁻¹ * g') :=
+private theorem intPt_of
+    {g g' : Gp G} (hH : IntM (fun w => Pm g w * Gm g' w)) (hI : IntM (fun w => Pm g' w * Gm g w))
+    (hs : ‖((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p])‖ = 1)
+    : IntPt (g⁻¹ * g') :=
   ⟨hs, fun w i j => ⟨hH w i j, by simpa only [inv_val] using hI w i j⟩⟩
 
-private theorem mono {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0)
+private theorem mono
+    {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0)
     (hd : ∀ a : Loc G, (∀ z : Loc G, IntL z → ‖pairL a z‖ ≤ 1) ↔ IntL (fun w => d w • a w))
-    (A : PFrame L β) (g g' : Gp G) (hH : IntM (fun w => Pm g w * Gm g' w))
-    (hI : IntM (fun w => Pm g' w * Gm g w)) (hs : ‖((g'.1⁻¹ * g.1 : ℚ_[p]ˣ) : ℚ_[p])‖ ≤ 1)
-    (x : VQ D) (hx : A.Mem g x) : A.Mem g' x := by
+    (A : PFrame L β)
+    (g g' : Gp G) (hH : IntM (fun w => Pm g w * Gm g' w)) (hI : IntM (fun w => Pm g' w * Gm g w))
+    (hs : ‖((g'.1⁻¹ * g.1 : ℚ_[p]ˣ) : ℚ_[p])‖ ≤ 1)
+    (x : VQ D) (hx : A.Mem g x)
+    : A.Mem g' x := by
   obtain ⟨h1, h2⟩ := (mem_iff hd A g x).1 hx
   refine (mem_iff hd A g' x).2 ⟨?_, ?_⟩
   · have e : mv (Pm g') (A.T x) = mv (fun w => Pm g' w * Gm g w) (mv (Pm g) (A.T x)) := by
@@ -254,8 +287,8 @@ private theorem mono {d : ∀ w : Fin G.m, G.Fw w} (hd0 : ∀ w, d w ≠ 0)
 end UpperTheory.Gal.W2.PeriodInjective
 
 open UpperTheory.Gal.W2.PeriodInjective in
-theorem UpperTheory.Gal.W2.pkInj_of :
-    UpperTheory.Gal.W2.MemDual → UpperTheory.Gal.W2.EmbAll → UpperTheory.Gal.W2.PkInj := by
+theorem UpperTheory.Gal.W2.pkInj_of
+    : UpperTheory.Gal.W2.MemDual → UpperTheory.Gal.W2.EmbAll → UpperTheory.Gal.W2.PkInj := by
   intro hMD hEA p _ D G L β A g g'
   obtain ⟨d, hd0, hd⟩ := hMD p G
   have hw : Nonempty (Fin G.m) := by
@@ -275,5 +308,7 @@ theorem UpperTheory.Gal.W2.pkInj_of :
       rw [inv_val] at h2
       exact h2
     have hs : ‖((g.1⁻¹ * g'.1 : ℚ_[p]ˣ) : ℚ_[p])‖ = 1 := h.1
-    exact ⟨mono hd0 hd A g g' hH hI (by rw [norm_swap, hs, inv_one]) x,
-      mono hd0 hd A g' g hI hH hs.le x⟩
+    exact ⟨
+      mono hd0 hd A g g' hH hI (by rw [norm_swap, hs, inv_one]) x,
+      mono hd0 hd A g' g hI hH hs.le x
+    ⟩

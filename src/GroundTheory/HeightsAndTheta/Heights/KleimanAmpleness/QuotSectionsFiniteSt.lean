@@ -15,7 +15,7 @@ universe u w
 
 def QuotSectionsFinite.Statement : Prop :=
   ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
-    (Q : LineBundle k x) (J : Ideal (Poly k N)),
+      (Q : LineBundle k x) (J : Ideal (Poly k N)),
     Module.Finite k (SubSystem.quotH Q.toSubSystem (Q.toSubSystem.twist (idealSys x J)) 0)
 
 end

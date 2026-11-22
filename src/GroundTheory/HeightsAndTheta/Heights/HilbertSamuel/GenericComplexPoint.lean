@@ -13,8 +13,8 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Cardinal
 
 noncomputable section
 
-theorem exists_ringHom_complex_of_charZero (F : Type) [Field F] [CharZero F] (hF : #F ≤ 𝔠) :
-    Nonempty (F →+* ℂ) := by
+theorem exists_ringHom_complex_of_charZero (F : Type) [Field F] [CharZero F] (hF : #F ≤ 𝔠)
+    : Nonempty (F →+* ℂ) := by
   let M := MvPolynomial ℂ F
   let E := FractionRing M
   let L := AlgebraicClosure E
@@ -30,15 +30,17 @@ theorem exists_ringHom_complex_of_charZero (F : Type) [Field F] [CharZero F] (hF
     (Algebra.IsAlgebraic.cardinalMk_le_max E L).trans (max_le (hE ▸ hM) aleph0_le_continuum)
   have hinj : Function.Injective (fun c : ℂ => algebraMap E L (algebraMap M E (X c))) :=
     (algebraMap E L).injective.comp ((IsFractionRing.injective M E).comp MvPolynomial.X_injective)
-  have hLc : #L = #ℂ :=
-    le_antisymm (hL.trans_eq mk_complex.symm) (Cardinal.mk_le_of_injective hinj)
-  obtain ⟨σ⟩ := IsAlgClosed.ringEquiv_of_equiv_of_charZero (K := L) (L := ℂ)
-    (by rw [hLc, mk_complex]; exact aleph0_lt_continuum) (Cardinal.eq.1 hLc)
+  have hLc : #L = #ℂ := le_antisymm (hL.trans_eq mk_complex.symm) (Cardinal.mk_le_of_injective hinj)
+  obtain ⟨σ⟩ :=
+    IsAlgClosed.ringEquiv_of_equiv_of_charZero (K := L) (L := ℂ)
+      (by rw [hLc, mk_complex]; exact aleph0_lt_continuum) (Cardinal.eq.1 hLc)
   exact ⟨σ.toRingHom.comp ((algebraMap E L).comp ((algebraMap M E).comp C))⟩
 
-theorem exists_mcPts_not_mem_mcPts {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {P J : Ideal (MRing ι)} {d : ℕ} (hP : IsArithVar P d) (hJ : ¬ J ≤ P) :
-    ∃ z, z ∈ mcPts P ∧ z ∉ mcPts J := by
+theorem exists_mcPts_not_mem_mcPts
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P J : Ideal (MRing ι)} {d : ℕ} (hP : IsArithVar P d) (hJ : ¬ J ≤ P)
+    : ∃ z, z ∈ mcPts P ∧ z ∉ mcPts J := by
   obtain ⟨_, ⟨hprime, -, hrel⟩, hhor, -⟩ := hP
   obtain ⟨g, hgJ, hgP⟩ := SetLike.not_le_iff_exists.mp hJ
   have := hprime
@@ -59,16 +61,18 @@ theorem exists_mcPts_not_mem_mcPts {K : Type} [Fintype K] {ι : K → Type} [∀
     rw [Cardinal.mk_fractionRing]
     refine (Cardinal.mk_le_of_surjective (Ideal.Quotient.mk_surjective (I := P))).trans ?_
     refine MvPolynomial.cardinalMk_le_max.trans ?_
-    exact max_le (max_le (mk_int.le.trans aleph0_le_continuum)
-      (Cardinal.mk_le_aleph0.trans aleph0_le_continuum)) aleph0_le_continuum
+    exact max_le
+      (max_le (mk_int.le.trans aleph0_le_continuum)
+        (Cardinal.mk_le_aleph0.trans aleph0_le_continuum))
+      aleph0_le_continuum
   obtain ⟨ψ⟩ := exists_ringHom_complex_of_charZero F hcard
   let φ : MRing ι →+* ℂ := (ψ.comp (algebraMap Q F)).comp (Ideal.Quotient.mk P)
   have hker : ∀ f, φ f = 0 ↔ f ∈ P := by
     intro f
     have hi : Function.Injective (ψ.comp (algebraMap Q F)) :=
       ψ.injective.comp (IsFractionRing.injective Q F)
-    rw [show φ f = (ψ.comp (algebraMap Q F)) (Ideal.Quotient.mk P f) from rfl,
-      map_eq_zero_iff _ hi, Ideal.Quotient.eq_zero_iff_mem]
+    rw [show φ f = (ψ.comp (algebraMap Q F)) (Ideal.Quotient.mk P f) from rfl, map_eq_zero_iff _ hi,
+      Ideal.Quotient.eq_zero_iff_mem]
   let z : (Σ k, ι k) → ℂ := fun p => φ (X p)
   have hev : ∀ f : MRing ι, eval z (map (Int.castRingHom ℂ) f) = φ f := by
     intro f

@@ -8,28 +8,32 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Generali
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
 open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Automorphic.Spherical
 open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.GM
 open scoped Pointwise
 
-theorem UpperTheory.ConvolutionTheory.GM.wordHt :
-    WordHt := by
+theorem UpperTheory.ConvolutionTheory.GM.wordHt : WordHt := by
   intro K _ _ n hn ν _ a₀ ha₀
   have hT : IsCompact (tsupport (a₀ : archGroup K n → ℂ)) := a₀.hasCompactSupport
   set S : Set (AdelicGLn.AdelicGL K n) := (infEmb K n) '' tsupport (a₀ : archGroup K n → ℂ) with hS
-  obtain ⟨Y, hY1, -, hY⟩ := UpperTheory.ConvolutionTheory.Tf.htCompact K n S (hT.image AutomorphicForm.continuous_infEmb)
-  have hlet : ∀ (x : Option (Ix K n)) (y : archGroup K n), letter a₀ x y ≠ 0 →
-      y ∈ tsupport (a₀ : archGroup K n → ℂ) := by
+  obtain ⟨Y, hY1, -, hY⟩ :=
+    UpperTheory.ConvolutionTheory.Tf.htCompact K n S (hT.image AutomorphicForm.continuous_infEmb)
+  have hlet
+      : ∀ (x : Option (Ix K n)) (y : archGroup K n),
+        letter a₀ x y ≠ 0 → y ∈ tsupport (a₀ : archGroup K n → ℂ) := by
     intro x y hy
     cases x with
     | none => exact subset_tsupport _ hy
     | some x =>
       obtain ⟨-, -, h2, -⟩ := UpperTheory.ConvolutionTheory.Tf.lactSpec K n a₀ ha₀
       exact (h2 (zc x.1 x.2)).2 (subset_tsupport _ hy)
-  have key : ∀ (wd : List (Option (Ix K n))) (g : archGroup K n), word ν a₀ wd g ≠ 0 →
-      infEmb K n g ∈ S ^ (wd.length + 1) := by
+  have key
+      : ∀ (wd : List (Option (Ix K n))) (g : archGroup K n),
+        word ν a₀ wd g ≠ 0 → infEmb K n g ∈ S ^ (wd.length + 1) := by
     intro wd
     induction wd with
     | nil =>

@@ -10,8 +10,8 @@ namespace GlobalTheory.FGFieldEmb
 
 open Cardinal
 
-theorem nonempty_ringHom_complex_of_mk_le (K : Type) [Field K] [CharZero K] (hK : #K ≤ 𝔠) :
-    Nonempty (K →+* ℂ) := by
+theorem nonempty_ringHom_complex_of_mk_le (K : Type) [Field K] [CharZero K] (hK : #K ≤ 𝔠)
+    : Nonempty (K →+* ℂ) := by
   let F := FractionRing (MvPolynomial ℝ K)
   let L := AlgebraicClosure F
   have hF : #F = 𝔠 := by
@@ -23,12 +23,14 @@ theorem nonempty_ringHom_complex_of_mk_le (K : Type) [Field K] [CharZero K] (hK 
     rwa [hF, max_eq_left Cardinal.aleph0_le_continuum] at this
   let j : K →+* L := (algebraMap F L).comp ((algebraMap (MvPolynomial ℝ K) F).comp MvPolynomial.C)
   have : CharZero L := (RingHom.charZero_iff j.injective).1 inferInstance
-  obtain ⟨e⟩ := IsAlgClosed.ringEquiv_of_equiv_of_charZero (K := L) (L := ℂ)
-    (hL ▸ Cardinal.aleph0_lt_continuum) (Cardinal.eq.1 (hL.trans Cardinal.mk_complex.symm))
+  obtain ⟨e⟩ :=
+    IsAlgClosed.ringEquiv_of_equiv_of_charZero (K := L) (L := ℂ) (hL ▸ Cardinal.aleph0_lt_continuum)
+      (Cardinal.eq.1 (hL.trans Cardinal.mk_complex.symm))
   exact ⟨e.toRingHom.comp j⟩
 
-theorem nonempty_ringHom_complex_of_fg :
-    ∀ (K : Type) [Field K] [CharZero K] (k : IntermediateField ℚ K), k.FG → Nonempty (k →+* ℂ) := by
+theorem nonempty_ringHom_complex_of_fg
+    : ∀ (K : Type) [Field K] [CharZero K] (k : IntermediateField ℚ K),
+      k.FG → Nonempty (k →+* ℂ) := by
   intro K _ _ k hk
   obtain ⟨t, rfl⟩ := hk
   refine nonempty_ringHom_complex_of_mk_le _ ?_

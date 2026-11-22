@@ -8,31 +8,38 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.AddMonoi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published GlobalTheory.CMModel Formalism.L2.Th1.F
+open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published
+  GlobalTheory.CMModel Formalism.L2.Th1.F
 open scoped IntermediateField BigOperators Topology
 
 namespace GlobalTheory.CMModel
 
-theorem ker_sqrtNegNat_cyclic : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (L : PeriodPair) (t : ℂ), p.Prime → p % 4 = 3 → 3 < p → Datum p F L t → (∀ k : ℤ, (k : ℂ) * t ∈ L.lattice ↔ (p : ℤ) ∣ k) ∧ (∀ z, sqrtNegNat p * z ∈ L.lattice → ∃ k : ℕ, k < p ∧ z - (k : ℂ) * t ∈ L.lattice) ∧ IsKerReps L (sqrtNegNat p) ((Finset.Ico 1 p).image fun k : ℕ => (k : ℂ) * t) := by
+theorem ker_sqrtNegNat_cyclic
+    : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (L : PeriodPair) (t : ℂ),
+      p.Prime → p % 4 = 3 → 3 < p → Datum p F L t
+        → (∀ k : ℤ, (k : ℂ) * t ∈ L.lattice ↔ (p : ℤ) ∣ k)
+          ∧ (∀ z, sqrtNegNat p * z ∈ L.lattice → ∃ k : ℕ, k < p ∧ z - (k : ℂ) * t ∈ L.lattice)
+          ∧ IsKerReps L (sqrtNegNat p) ((Finset.Ico 1 p).image fun k : ℕ => (k : ℂ) * t) := by
   intro p F L t hp _ _ D
   have hsq : sqrtNegNat p ^ 2 = -(p : ℂ) := sqrtNegNat_sq p
   have hz : ∀ (n : ℤ) (x : ℂ), x ∈ L.lattice → (n : ℂ) * x ∈ L.lattice := fun n x hx => by
     simpa [zsmul_eq_mul] using L.lattice.smul_mem n hx
   have hpt : (p : ℂ) * t ∈ L.lattice := by
     have h := L.lattice.neg_mem (D.mul _ D.ker)
-    have e : -(sqrtNegNat p * (sqrtNegNat p * t)) = (p : ℂ) * t := by
-      linear_combination (-t) * hsq
+    have e : -(sqrtNegNat p * (sqrtNegNat p * t)) = (p : ℂ) * t := by linear_combination (-t) * hsq
     rwa [e] at h
   have h1 : ∀ k : ℤ, (k : ℂ) * t ∈ L.lattice ↔ (p : ℤ) ∣ k := by
     intro k
     constructor
     · intro hk
       by_contra hnd
-      have hc : IsCoprime (p : ℤ) k := (Nat.prime_iff_prime_int.mp hp).irreducible.coprime_iff_not_dvd.mpr hnd
+      have hc : IsCoprime (p : ℤ) k :=
+        (Nat.prime_iff_prime_int.mp hp).irreducible.coprime_iff_not_dvd.mpr hnd
       obtain ⟨a, b, hab⟩ := hc
       apply D.notMem
       have h := L.lattice.add_mem (hz a _ hpt) (hz b _ hk)
-      have hab' : (a : ℂ) * (p : ℂ) + (b : ℂ) * (k : ℂ) = 1 := by exact_mod_cast congrArg (Int.cast (R := ℂ)) hab
+      have hab' : (a : ℂ) * (p : ℂ) + (b : ℂ) * (k : ℂ) = 1 := by
+        exact_mod_cast congrArg (Int.cast (R := ℂ)) hab
       have e : (a : ℂ) * ((p : ℂ) * t) + (b : ℂ) * ((k : ℂ) * t) = t := by
         linear_combination t * hab'
       rwa [e] at h
@@ -49,7 +56,9 @@ theorem ker_sqrtNegNat_cyclic : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (L
     have h' : (p : ℤ) ∣ (k : ℤ) := (h1 k).mp (by exact_mod_cast h)
     have := Nat.le_of_dvd hk.1 (Int.natCast_dvd_natCast.mp h')
     omega
-  have hinj : ∀ k ∈ Finset.Ico 1 p, ∀ l ∈ Finset.Ico 1 p, (k : ℂ) * t - (l : ℂ) * t ∈ L.lattice → k = l := by
+  have hinj
+      : ∀ k ∈ Finset.Ico 1 p, ∀ l ∈ Finset.Ico 1 p,
+        (k : ℂ) * t - (l : ℂ) * t ∈ L.lattice → k = l := by
     intro k hk l hl h
     rw [Finset.mem_Ico] at hk hl
     have e : (k : ℂ) * t - (l : ℂ) * t = (((k : ℤ) - (l : ℤ) : ℤ) : ℂ) * t := by push_cast; ring
@@ -70,14 +79,18 @@ theorem ker_sqrtNegNat_cyclic : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (L
     rw [hn] at h
     exact_mod_cast h
   choose f hfS hf using fun k (hk : k ∈ Finset.Ico 1 p) => hS.2.2 _ (hker k) (hnot k hk)
-  have hsurj := Finset.surj_on_of_inj_on_of_card_le f hfS
-    (fun k l hk hl h => hinj k hk l hl (by
-      have h' := L.lattice.sub_mem (hf k hk) (hf l hl)
-      rw [h] at h'
-      simpa using h'))
-    (by rw [Nat.card_Ico]; omega)
-  have h3 : ∀ z, sqrtNegNat p * z ∈ L.lattice → z ∉ L.lattice →
-      ∃ k ∈ Finset.Ico 1 p, z - (k : ℂ) * t ∈ L.lattice := by
+  have hsurj :=
+    Finset.surj_on_of_inj_on_of_card_le f hfS
+      (fun k l hk hl h =>
+        hinj k hk l hl (by
+          have h' := L.lattice.sub_mem (hf k hk) (hf l hl)
+          rw [h] at h'
+          simpa using h'))
+      (by rw [Nat.card_Ico]; omega)
+  have h3
+      : ∀ z,
+        sqrtNegNat p * z ∈ L.lattice → z ∉ L.lattice
+          → ∃ k ∈ Finset.Ico 1 p, z - (k : ℂ) * t ∈ L.lattice := by
     intro z hz1 hz2
     obtain ⟨P, hP, hzP⟩ := hS.2.2 z hz1 hz2
     obtain ⟨k, hk, rfl⟩ := hsurj P hP

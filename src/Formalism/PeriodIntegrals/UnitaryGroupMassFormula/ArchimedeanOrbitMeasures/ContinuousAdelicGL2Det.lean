@@ -17,9 +17,9 @@ variable {P Q : ℕ}
 
 local notation "Mat" => Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ
 
-theorem chart_units (G Y : Mat) (h : G * ((1 + 1) - Y) = (1 + 1) + Y) :
-    (G + 1) * ((1 + 1) - Y) = (4 : ℂ) • (1 : Mat) ∧ IsUnit (G + 1).det ∧
-      IsUnit ((1 + 1) - Y).det := by
+theorem chart_units (G Y : Mat) (h : G * ((1 + 1) - Y) = (1 + 1) + Y)
+    : (G + 1) * ((1 + 1) - Y) = (4 : ℂ) • (1 : Mat) ∧ IsUnit (G + 1).det
+      ∧ IsUnit ((1 + 1) - Y).det := by
   have h4 : (G + 1) * ((1 + 1) - Y) = (4 : ℂ) • (1 : Mat) := by
     rw [add_mul, h, one_mul, show (4 : ℂ) = 1 + 1 + 1 + 1 by norm_num, add_smul, add_smul, add_smul,
       one_smul]
@@ -31,8 +31,9 @@ theorem chart_units (G Y : Mat) (h : G * ((1 + 1) - Y) = (1 + 1) + Y) :
   rw [← hd] at h4ne
   exact ⟨h4, isUnit_of_mul_isUnit_left h4ne, isUnit_of_mul_isUnit_right h4ne⟩
 
-theorem cay_exists (X : lieU P Q) (hX : X ∈ D0 P Q) :
-    ∃ g : UpqT P Q, UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Mat)) = (1 + 1) + ((X : lieU P Q) : Mat) := by
+theorem cay_exists (X : lieU P Q) (hX : X ∈ D0 P Q)
+    : ∃ g : UpqT P Q,
+      UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Mat)) = (1 + 1) + ((X : lieU P Q) : Mat) := by
   set Y : Mat := ((X : lieU P Q) : Mat) with hY
   have hXm : Yᴴ * HcS.UG.Jpq P Q + HcS.UG.Jpq P Q * Y = 0 := X.2
   have hB : IsUnit ((1 + 1) - Y).det := hX
@@ -51,22 +52,23 @@ theorem cay_exists (X : lieU P Q) (hX : X ∈ D0 P Q) :
   have hcomm : ((1 + 1) - Y) * ((1 + 1) + Y) = ((1 + 1) + Y) * ((1 + 1) - Y) := by noncomm_ring
   obtain ⟨G, hG⟩ : ∃ G : Mat, G = ((1 + 1) + Y) * ((1 + 1) - Y)⁻¹ := ⟨_, rfl⟩
   have hU : Gᴴ * HcS.UG.Jpq P Q * G = HcS.UG.Jpq P Q := by
-    calc Gᴴ * HcS.UG.Jpq P Q * G
-        = (((1 + 1) - Y)ᴴ)⁻¹ * ((((1 + 1) + Y)ᴴ * HcS.UG.Jpq P Q) * ((1 + 1) + Y)) *
-            ((1 + 1) - Y)⁻¹ := by
-          rw [hG, Matrix.conjTranspose_mul, Matrix.conjTranspose_nonsing_inv]
-          simp only [Matrix.mul_assoc]
-      _ = (((1 + 1) - Y)ᴴ)⁻¹ * HcS.UG.Jpq P Q * (((1 + 1) - Y) * ((1 + 1) + Y)) *
-            ((1 + 1) - Y)⁻¹ := by
-          rw [h1]
-          simp only [Matrix.mul_assoc]
-      _ = (((1 + 1) - Y)ᴴ)⁻¹ * (HcS.UG.Jpq P Q * ((1 + 1) + Y)) *
-            (((1 + 1) - Y) * ((1 + 1) - Y)⁻¹) := by
-          rw [hcomm]
-          simp only [Matrix.mul_assoc]
+    calc
+      Gᴴ * HcS.UG.Jpq P Q * G
+          = (((1 + 1) - Y)ᴴ)⁻¹ * ((((1 + 1) + Y)ᴴ * HcS.UG.Jpq P Q) * ((1 + 1) + Y))
+            * ((1 + 1) - Y)⁻¹ := by
+        rw [hG, Matrix.conjTranspose_mul, Matrix.conjTranspose_nonsing_inv]
+        simp only [Matrix.mul_assoc]
+      _ = (((1 + 1) - Y)ᴴ)⁻¹ * HcS.UG.Jpq P Q * (((1 + 1) - Y) * ((1 + 1) + Y))
+          * ((1 + 1) - Y)⁻¹ := by
+        rw [h1]
+        simp only [Matrix.mul_assoc]
+      _ = (((1 + 1) - Y)ᴴ)⁻¹ * (HcS.UG.Jpq P Q * ((1 + 1) + Y))
+          * (((1 + 1) - Y) * ((1 + 1) - Y)⁻¹) := by
+        rw [hcomm]
+        simp only [Matrix.mul_assoc]
       _ = HcS.UG.Jpq P Q := by
-          rw [h2, Matrix.mul_nonsing_inv _ hB, Matrix.mul_one, ← Matrix.mul_assoc,
-            Matrix.nonsing_inv_mul _ hBH, Matrix.one_mul]
+        rw [h2, Matrix.mul_nonsing_inv _ hB, Matrix.mul_one, ← Matrix.mul_assoc,
+          Matrix.nonsing_inv_mul _ hBH, Matrix.one_mul]
   have hJ : IsUnit (HcS.UG.Jpq P Q).det := by
     rw [HcS.UG.Jpq, Matrix.det_fromBlocks_zero₂₁, Matrix.det_one, Matrix.det_neg, Matrix.det_one,
       one_mul, mul_one]
@@ -86,46 +88,52 @@ theorem cay_exists (X : lieU P Q) (hX : X ∈ D0 P Q) :
   · show G * ((1 + 1) - Y) = (1 + 1) + Y
     rw [hG, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hB, Matrix.mul_one]
 
-theorem cayF_spec (X : lieU P Q) (hX : X ∈ D0 P Q) :
-    UpqT.mat (cayF P Q X) * ((1 + 1) - ((X : lieU P Q) : Mat)) = (1 + 1) + ((X : lieU P Q) : Mat) := by
+theorem cayF_spec (X : lieU P Q) (hX : X ∈ D0 P Q)
+    : UpqT.mat (cayF P Q X) * ((1 + 1) - ((X : lieU P Q) : Mat))
+      = (1 + 1) + ((X : lieU P Q) : Mat) := by
   have hex := cay_exists X hX
   unfold cayF
   rw [dite_eq_left hex]
   exact Classical.choose_spec hex
 
-theorem mem_cayley_domain_of (g : UpqT P Q) (X : lieU P Q)
-    (h : UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Mat)) = (1 + 1) + ((X : lieU P Q) : Mat)) :
-    X ∈ D0 P Q := by
+theorem mem_cayley_domain_of
+    (g : UpqT P Q) (X : lieU P Q)
+    (h : UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Mat)) = (1 + 1) + ((X : lieU P Q) : Mat))
+    : X ∈ D0 P Q := by
   exact (chart_units _ _ h).2.2
 
 private theorem upqT_eq_of_mat_eq {g h : UpqT P Q} (e : UpqT.mat g = UpqT.mat h) : g = h :=
   Subtype.ext (Units.ext e)
 
-theorem cayF_eq_of (g : UpqT P Q) (X : lieU P Q)
-    (h : UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Mat)) = (1 + 1) + ((X : lieU P Q) : Mat)) :
-    cayF P Q X = g := by
+theorem cayF_eq_of
+    (g : UpqT P Q) (X : lieU P Q)
+    (h : UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Mat)) = (1 + 1) + ((X : lieU P Q) : Mat))
+    : cayF P Q X = g := by
   have hX := mem_cayley_domain_of g X h
   have hB : IsUnit ((1 + 1) - ((X : lieU P Q) : Mat)).det := hX
   have he := (cayF_spec X hX).trans h.symm
   apply upqT_eq_of_mat_eq
-  calc UpqT.mat (cayF P Q X)
-      = UpqT.mat (cayF P Q X) * ((1 + 1) - ((X : lieU P Q) : Mat)) *
-          ((1 + 1) - ((X : lieU P Q) : Mat))⁻¹ := by
-        rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hB, Matrix.mul_one]
+  calc
+    UpqT.mat (cayF P Q X)
+        = UpqT.mat (cayF P Q X) * ((1 + 1) - ((X : lieU P Q) : Mat))
+          * ((1 + 1) - ((X : lieU P Q) : Mat))⁻¹ := by
+      rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hB, Matrix.mul_one]
     _ = UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Mat)) * ((1 + 1) - ((X : lieU P Q) : Mat))⁻¹ := by
-        rw [he]
+      rw [he]
     _ = UpqT.mat g := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hB, Matrix.mul_one]
 
-theorem cayF_mat (X : lieU P Q) (hX : X ∈ D0 P Q) :
-    UpqT.mat (cayF P Q X) = ((1 + 1) + ((X : lieU P Q) : Mat)) * ((1 + 1) - ((X : lieU P Q) : Mat))⁻¹ := by
+theorem cayF_mat (X : lieU P Q) (hX : X ∈ D0 P Q)
+    : UpqT.mat (cayF P Q X)
+      = ((1 + 1) + ((X : lieU P Q) : Mat)) * ((1 + 1) - ((X : lieU P Q) : Mat))⁻¹ := by
   have hB : IsUnit ((1 + 1) - ((X : lieU P Q) : Mat)).det := hX
   rw [← cayF_spec X hX, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hB, Matrix.mul_one]
 
 theorem cayInv_cayF (X : lieU P Q) (hX : X ∈ D0 P Q) : cayInv P Q (cayF P Q X) = X := by
   exact cayley_inverse_iff P Q (cayF P Q X) X (cayF_spec X hX)
 
-theorem cayInv_rel (g : UpqT P Q) (hu : IsUnit (UpqT.mat g + 1).det) :
-    UpqT.mat g * ((1 + 1) - ((cayInv P Q g : lieU P Q) : Mat)) = (1 + 1) + ((cayInv P Q g : lieU P Q) : Mat) := by
+theorem cayInv_rel (g : UpqT P Q) (hu : IsUnit (UpqT.mat g + 1).det)
+    : UpqT.mat g * ((1 + 1) - ((cayInv P Q g : lieU P Q) : Mat))
+      = (1 + 1) + ((cayInv P Q g : lieU P Q) : Mat) := by
   rw [cayInv_eq]
   show UpqT.mat g * ((1 + 1) - cayCand P Q g) = (1 + 1) + cayCand P Q g
   unfold cayCand
@@ -145,7 +153,8 @@ theorem cayInv_rel (g : UpqT P Q) (hu : IsUnit (UpqT.mat g + 1).det) :
     rw [Matrix.mul_assoc, mul_sub, hAG]
     noncomm_ring
   rw [e1]
-  have e2 : G * ((1 + 1) - ((1 + 1) - (1 + 1) * A - (1 + 1) * A)) = G * A + G * A + G * A + G * A := by
+  have e2
+      : G * ((1 + 1) - ((1 + 1) - (1 + 1) * A - (1 + 1) * A)) = G * A + G * A + G * A + G * A := by
     noncomm_ring
   rw [e2, hGA]
   noncomm_ring
@@ -158,19 +167,20 @@ theorem cayley_domain_eq : cayS (D0 P Q) = {g : UpqT P Q | IsUnit (UpqT.mat g + 
   · intro hu
     exact ⟨cayInv P Q g, mem_cayley_domain_of g _ (cayInv_rel g hu), cayInv_rel g hu⟩
 
-theorem continuous_mat : Continuous (UpqT.mat (P := P) (Q := Q)) :=
-  (isInducing_mat P Q).continuous
+theorem continuous_mat : Continuous (UpqT.mat (P := P) (Q := Q)) := (isInducing_mat P Q).continuous
 
 theorem isOpen_cayley_domain : IsOpen (cayS (D0 P Q)) := by
   rw [cayley_domain_eq]
-  have h : {g : UpqT P Q | IsUnit (UpqT.mat g + 1).det} =
-      (fun g => (UpqT.mat g + 1).det) ⁻¹' {0}ᶜ := by
+  have h
+      : {g : UpqT P Q | IsUnit (UpqT.mat g + 1).det}
+        = (fun g => (UpqT.mat g + 1).det) ⁻¹' {0}ᶜ := by
     ext g
     simp [isUnit_iff_ne_zero]
   rw [h]
   exact isOpen_compl_singleton.preimage ((continuous_mat.add continuous_const).matrix_det)
 
-theorem continuous_adelicGL2_det : Continuous fun X : lieU P Q => ((1 + 1) - ((X : lieU P Q) : Mat)).det := by
+theorem continuous_adelicGL2_det
+    : Continuous fun X : lieU P Q => ((1 + 1) - ((X : lieU P Q) : Mat)).det := by
   exact (continuous_const.sub continuous_subtype_val).matrix_det
 
 theorem isOpen_cell_domain : IsOpen (D0 P Q) := by
@@ -189,8 +199,8 @@ theorem zero_mem_cayley_domain : (0 : lieU P Q) ∈ D0 P Q := by
 theorem mat_one : UpqT.mat (1 : UpqT P Q) = 1 := rfl
 
 theorem cayF_zero : cayF P Q 0 = 1 := by
-  exact cayF_eq_of 1 0 (by
-    rw [mat_one, show ((0 : lieU P Q) : Mat) = 0 from rfl, Matrix.one_mul, sub_zero, add_zero])
+  exact cayF_eq_of 1 0
+    (by rw [mat_one, show ((0 : lieU P Q) : Mat) = 0 from rfl, Matrix.one_mul, sub_zero, add_zero])
 
 theorem cayF_off (X : lieU P Q) (hX : X ∉ D0 P Q) : cayF P Q X = 1 := by
   unfold cayF
@@ -198,20 +208,24 @@ theorem cayF_off (X : lieU P Q) (hX : X ∉ D0 P Q) : cayF P Q X = 1 := by
   rintro ⟨g, hg⟩
   exact hX (mem_cayley_domain_of g X hg)
 
-private theorem continuous_inv_of_det_ne_zero {α : Type*} [TopologicalSpace α] {f : α → Mat}
-    (hf : Continuous f) (hd : ∀ x, (f x).det ≠ 0) : Continuous fun x => (f x)⁻¹ := by
+private theorem continuous_inv_of_det_ne_zero
+    {α : Type*} [TopologicalSpace α] {f : α → Mat} (hf : Continuous f) (hd : ∀ x, (f x).det ≠ 0)
+    : Continuous fun x => (f x)⁻¹ := by
   simp only [Matrix.inv_def, Ring.inverse_eq_inv]
   exact (hf.matrix_det.inv₀ hd).smul hf.matrix_adjugate
 
 theorem continuousOn_cayF : ContinuousOn (cayF P Q) (D0 P Q) := by
   rw [continuousOn_iff_continuous_domRestrict]
   have hval : Continuous fun x : D0 P Q => UpqT.mat (cayF P Q x) := by
-    have h : (fun x : D0 P Q => UpqT.mat (cayF P Q x)) = fun x : D0 P Q =>
-        ((1 + 1) + ((x.1 : lieU P Q) : Mat)) * ((1 + 1) - ((x.1 : lieU P Q) : Mat))⁻¹ :=
+    have h
+        : (fun x : D0 P Q => UpqT.mat (cayF P Q x))
+          = fun x : D0 P Q =>
+            ((1 + 1) + ((x.1 : lieU P Q) : Mat)) * ((1 + 1) - ((x.1 : lieU P Q) : Mat))⁻¹ :=
       funext fun x => cayF_mat x.1 x.2
     rw [h]
     exact (continuous_const.add (continuous_subtype_val.comp continuous_subtype_val)).mul
-      (continuous_inv_of_det_ne_zero (continuous_const.sub (continuous_subtype_val.comp continuous_subtype_val))
+      (continuous_inv_of_det_ne_zero
+        (continuous_const.sub (continuous_subtype_val.comp continuous_subtype_val))
         fun x => isUnit_iff_ne_zero.1 x.2)
   have hinv : Continuous fun x : D0 P Q => (UpqT.mat (cayF P Q x))⁻¹ :=
     continuous_inv_of_det_ne_zero hval fun x => (Matrix.isUnits_det_units _).ne_zero
@@ -242,7 +256,8 @@ theorem continuousAt_rhoH (X : lieU P Q) (hX : X ∈ D0 P Q) : ContinuousAt (rho
 
 theorem rhoH_pos (X : lieU P Q) (hX : X ∈ D0 P Q) : rhoH P Q X ≠ 0 := by
   unfold rhoH
-  exact (ENNReal.ofReal_pos.2 (pow_pos (inv_pos.2 (norm_pos_iff.2 (isUnit_iff_ne_zero.1 hX))) _)).ne'
+  exact (ENNReal.ofReal_pos.2 (pow_pos (inv_pos.2 (norm_pos_iff.2 (isUnit_iff_ne_zero.1 hX)))
+    _)).ne'
 
 end Chart
 

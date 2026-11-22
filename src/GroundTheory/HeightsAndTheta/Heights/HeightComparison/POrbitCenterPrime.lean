@@ -12,34 +12,42 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G
 
-theorem OrbitCenterPrime.proof (hIff : OrbitCenterMemIff.Statement) :
-    OrbitCenterPrime.Statement := by
+theorem OrbitCenterPrime.proof (hIff : OrbitCenterMemIff.Statement)
+    : OrbitCenterPrime.Statement := by
   intro ι _ _ n x hx v
   classical
   let _ : LinearOrder ι := LinearOrder.lift' (Fintype.equivFin ι) (Fintype.equivFin ι).injective
   let w : Coord n → Lex (ι → ℕ) := fun c ↦ toLex (coordDeg n c)
   let _ : DecidableEq (Lex (ι → ℕ)) := LinearOrder.toDecidableEq
   have _ : GradedRing (weightedHomogeneousSubmodule ℤ w) := MvPolynomial.weightedGradedAlgebra ℤ w
-  have hw : ∀ (F : MvPolynomial (Coord n) ℤ) (d : ι → ℕ),
-      IsWeightedHomogeneous w F (toLex d) ↔ IsWeightedHomogeneous (coordDeg n) F d :=
-    fun _ _ ↦ Iff.rfl
+  have hw
+      : ∀ (F : MvPolynomial (Coord n) ℤ) (d : ι → ℕ),
+        IsWeightedHomogeneous w F (toLex d) ↔ IsWeightedHomogeneous (coordDeg n) F d := fun _ _ ↦
+    Iff.rfl
   set M : (ι → ℕ) → ℝ := fun d ↦ ∏ k, (⨆ i, v (coordVec x k i)) ^ d k with hM
   have hM0 : ∀ d, 0 ≤ M d := fun d ↦
     Finset.prod_nonneg fun k _ ↦ pow_nonneg (Real.iSup_nonneg fun i ↦ apply_nonneg v _) _
   have hMadd : ∀ d e, M (d + e) = M d * M e := fun d e ↦ by
     simp only [hM, Pi.add_apply, pow_add, Finset.prod_mul_distrib]
 
-  have hform : ∀ F, SetLike.IsHomogeneousElem (weightedHomogeneousSubmodule ℤ w) F →
-      ∃ d, Geo.IsMultiHomog (ι := blockIdx n) F d := by
+  have hform
+      : ∀ F,
+        SetLike.IsHomogeneousElem (weightedHomogeneousSubmodule ℤ w) F
+          → ∃ d, Geo.IsMultiHomog (ι := blockIdx n) F d := by
     rintro F ⟨i, hi⟩
-    exact ⟨ofLex i, (geoMultiHomog_iff _ _).mpr
-      ((hw F (ofLex i)).mp ((mem_weightedHomogeneousSubmodule _ _ _ _).mp hi))⟩
+    exact ⟨
+      ofLex i,
+      (geoMultiHomog_iff _ _).mpr
+        ((hw F (ofLex i)).mp ((mem_weightedHomogeneousSubmodule _ _ _ _).mp hi))
+    ⟩
   refine Ideal.IsHomogeneous.isPrime_of_homogeneous_mem_or_mem
     (𝒜 := weightedHomogeneousSubmodule ℤ w) ?_ ?_ ?_
   · refine Ideal.homogeneous_span _ _ ?_
     rintro F ⟨d, hd, -⟩
-    exact ⟨toLex d, (mem_weightedHomogeneousSubmodule _ _ _ _).mpr
-      ((hw F d).mpr ((geoMultiHomog_iff _ _).mp hd))⟩
+    exact ⟨
+      toLex d,
+      (mem_weightedHomogeneousSubmodule _ _ _ _).mpr ((hw F d).mpr ((geoMultiHomog_iff _ _).mp hd))
+    ⟩
   · rw [Ne, Ideal.eq_top_iff_one]
     intro h
     have h1 : Geo.IsMultiHomog (ι := blockIdx n) (1 : MvPolynomial (Coord n) ℤ) 0 :=

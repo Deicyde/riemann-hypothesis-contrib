@@ -6,23 +6,27 @@ public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 
 @[expose] public section
 
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.zSimple_pf :
-    GenLoc → LocComm → SphOp → YLoc → ZSimple := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.zSimple_pf
+    : GenLoc → LocComm → SphOp → YLoc → ZSimple := by
   intro hG hC hS hY E _ _ _ n S Z N hSec hZ hN π y W hW hst
-  have key : ∀ U : Submodule ℂ (Sm E n), U ≤ y.Y →
-      (∀ i, Sl S i → ∀ f, IsHecke (N i.1) f → ∀ x ∈ U, Lw N i.1 i.2 f x ∈ U) →
-      U = ⊥ ∨ U = y.Y := by
+  have key
+      : ∀ U : Submodule ℂ (Sm E n),
+        U ≤ y.Y → (∀ i, Sl S i → ∀ f, IsHecke (N i.1) f → ∀ x ∈ U, Lw N i.1 i.2 f x ∈ U)
+          → U = ⊥ ∨ U = y.Y := by
     intro U hU hUs
     have hgen := hG E n S Z N hSec hZ hN U (hU.trans y.fix) hUs
-    have hs := y.simple (U.comap y.Y.subtype) (by
-      intro h hh x hx
-      have hmem : ((y.r h x : y.Y) : Sm E n) ∈ U := by
-        rw [y.act h hh x]
-        exact hgen h hh _ hx
-      exact hmem)
+    have hs :=
+      y.simple (U.comap y.Y.subtype) (by
+        intro h hh x hx
+        have hmem : ((y.r h x : y.Y) : Sm E n) ∈ U := by
+          rw [y.act h hh x]
+          exact hgen h hh _ hx
+        exact hmem)
     rcases hs with hs | hs
     · left
       rw [eq_bot_iff]
@@ -37,14 +41,16 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.zSimple_pf :
         rw [hs]
         exact Submodule.mem_top
       exact hx'
-  have scal : ∀ i, Sl S i → i.1 ∉ Z → ∀ f, IsHecke (N i.1) f →
-      ∃ c : ℂ, ∀ x ∈ y.Y, Lw N i.1 i.2 f x = c • x := by
+  have scal
+      : ∀ i,
+        Sl S i → i.1 ∉ Z
+          → ∀ f, IsHecke (N i.1) f → ∃ c : ℂ, ∀ x ∈ y.Y, Lw N i.1 i.2 f x = c • x := by
     intro i hi hiZ f hf
     haveI := y.fd
     haveI : Nontrivial y.Y := Submodule.nontrivial_iff_ne_bot.2 y.ne
     have hNw : N i.1 = KGL i.1 (n := n) := (hN i.1).2.2.2 hiZ
-    let T : Module.End ℂ y.Y := (Lw N i.1 i.2 f).restrict
-      (fun x hx => hY E n S Z N hSec hZ hN π y i hi f hf x hx)
+    let T : Module.End ℂ y.Y :=
+      (Lw N i.1 i.2 f).restrict (fun x hx => hY E n S Z N hSec hZ hN π y i hi f hf x hx)
     obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue T
     obtain ⟨v, hv⟩ := hc.exists_hasEigenvector
     refine ⟨c, ?_⟩
@@ -52,12 +58,18 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.zSimple_pf :
     have memU : ∀ x, x ∈ U ↔ x ∈ y.Y ∧ Lw N i.1 i.2 f x = c • x := by
       intro x
       simp [U, Submodule.mem_inf, LinearMap.mem_ker, sub_eq_zero]
-    have hcomm : ∀ k, Sl S k → ∀ g, IsHecke (N k.1) g → ∀ x ∈ y.Y,
-        Lw N i.1 i.2 f (Lw N k.1 k.2 g x) = Lw N k.1 k.2 g (Lw N i.1 i.2 f x) := by
+    have hcomm
+        : ∀ k,
+          Sl S k
+            → ∀ g,
+              IsHecke (N k.1) g
+                → ∀ x ∈ y.Y,
+                  Lw N i.1 i.2 f (Lw N k.1 k.2 g x) = Lw N k.1 k.2 g (Lw N i.1 i.2 f x) := by
       intro k hk g hg x hx
       by_cases hik : i = k
       · subst hik
-        have hxf : x ∈ fixed (rw' n i.1 i.2) (N i.1) := ((hC E n S Z N hSec hZ hN i hi f hf).1 x (y.fix hx)).1
+        have hxf : x ∈ fixed (rw' n i.1 i.2) (N i.1) :=
+          ((hC E n S Z N hSec hZ hN i hi f hf).1 x (y.fix hx)).1
         rw [hNw] at hf hg hxf
         simp only [Lw]
         rw [hNw]

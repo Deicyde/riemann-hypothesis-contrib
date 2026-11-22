@@ -17,14 +17,17 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Spher
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
   NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.AutQuot
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-theorem autIso_symm {π π' : NG.AutRep L n} (h : π.Iso π') : π'.Iso π := (NG.AutRep.iso_equivalence (L := L) (n := n)).symm h
+theorem autIso_symm {π π' : NG.AutRep L n} (h : π.Iso π') : π'.Iso π :=
+  (NG.AutRep.iso_equivalence (L := L) (n := n)).symm h
 
 theorem autIso_trans {π π' π'' : NG.AutRep L n} (h : π.Iso π') (h' : π'.Iso π'') : π.Iso π'' :=
   (NG.AutRep.iso_equivalence (L := L) (n := n)).trans h h'
@@ -70,8 +73,10 @@ theorem sphAt_iso {π π' : NG.AutRep L n} (h : π.Iso π') {v} (hs : π.SphAt v
     exact this.symm
 
 omit [NumberField L] [IsCMField L] in
-theorem overPl_unique {w : HeightOneSpectrum (𝓞 L)} {v v' : HeightOneSpectrum (𝓞 (maximalRealSubfield L))}
-    (h : NG.OverPl w v) (h' : NG.OverPl w v') : v = v' :=
+theorem overPl_unique
+    {w : HeightOneSpectrum (𝓞 L)} {v v' : HeightOneSpectrum (𝓞 (maximalRealSubfield L))}
+    (h : NG.OverPl w v) (h' : NG.OverPl w v')
+    : v = v' :=
   HeightOneSpectrum.ext (h.symm.trans h')
 
 section
@@ -81,16 +86,22 @@ theorem locAt_of_split (π : NG.AutRep L n) (s : SplitPlace L) : ∃ x, LocAt π
   obtain ⟨σ, hσ, -⟩ := GlobalTheory.T.splitPlaceLocalComponent_exists_unique_class L n π s
   exact ⟨_, s, σ, rfl, hσ, HEq.rfl⟩
 
-theorem locAt_unique {π π' : NG.AutRep L n} (hi : π.Iso π') {w : HeightOneSpectrum (𝓞 L)} {x x'}
-    (hx : LocAt π w x) (hx' : LocAt π' w x') : x = x' := by
+theorem locAt_unique
+    {π π' : NG.AutRep L n} (hi : π.Iso π')
+    {w : HeightOneSpectrum (𝓞 L)} {x x'} (hx : LocAt π w x) (hx' : LocAt π' w x')
+    : x = x' := by
   obtain ⟨s, σ, hs, hσ, e⟩ := hx
   obtain ⟨s', σ', hs', hσ', e'⟩ := hx'
   obtain ⟨σ₀, -, hu⟩ := GlobalTheory.T.splitPlaceLocalComponent_exists_unique_class L n π s
   have h1 := hu π s rfl σ ((NG.AutRep.iso_equivalence (L := L) (n := n)).refl π) hσ
   have h2 := hu π' s' (hs'.trans hs.symm) σ' hi hσ'
-  have key : ∀ (u u' : HeightOneSpectrum (𝓞 L)) (_ : u = u') (a : GlobalTheory.SmGL.IrrCl (GL (Fin n) (u.adicCompletion L)))
-      (b : GlobalTheory.SmGL.IrrCl (GL (Fin n) (u'.adicCompletion L))), HEq a b →
-      HEq (⟨n, a⟩ : GlobalTheory.LocGL.IrrGL (k := u.adicCompletion L)) (⟨n, b⟩ : GlobalTheory.LocGL.IrrGL (k := u'.adicCompletion L)) := by
+  have key
+      : ∀ (u u' : HeightOneSpectrum (𝓞 L)) (_ : u = u')
+          (a : GlobalTheory.SmGL.IrrCl (GL (Fin n) (u.adicCompletion L)))
+          (b : GlobalTheory.SmGL.IrrCl (GL (Fin n) (u'.adicCompletion L))),
+        HEq a b
+          → HEq (⟨n, a⟩ : GlobalTheory.LocGL.IrrGL (k := u.adicCompletion L))
+            (⟨n, b⟩ : GlobalTheory.LocGL.IrrGL (k := u'.adicCompletion L)) := by
     intro u u' hu a b hab
     subst hu
     cases eq_of_heq hab
@@ -110,44 +121,61 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 
 variable (D : D7)
 
-theorem f_sat (π : NG.AutRep D.host.E D.R.nV) (v : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E))) (w : PlE D.host)
-    (hv : NG.OverPl w v) (Dv : InertDatum D.host.E D.R.nV v w) (hα : ∃ α, NG.SatAt π Dv α) :
-    ∃ α, NG.SatAt π Dv α ∧ satOf (clsA π).rep w = Finset.univ.val.map α := by
+theorem f_sat
+    (π : NG.AutRep D.host.E D.R.nV) (v : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)))
+    (w : PlE D.host)
+    (hv : NG.OverPl w v) (Dv : InertDatum D.host.E D.R.nV v w) (hα : ∃ α, NG.SatAt π Dv α)
+    : ∃ α, NG.SatAt π Dv α ∧ satOf (clsA π).rep w = Finset.univ.val.map α := by
   obtain ⟨α, hα⟩ := hα
-  have hex : ∃ (v' : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E))) (Dv' : InertDatum D.host.E D.R.nV v' w)
-      (α' : Fin (D.R.nV / 2) → ℂ), NG.OverPl w v' ∧ NG.SatAt (clsA π).rep Dv' α' :=
-    ⟨v, Dv, α, hv, GlobalTheory.T.satakeParameters_inertPlace_independent_of_model _ _ π _ (autIso_symm (rep_iso π)) v w hv Dv Dv α hα⟩
+  have hex
+      : ∃ (v' : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)))
+          (Dv' : InertDatum D.host.E D.R.nV v' w) (α' : Fin (D.R.nV / 2) → ℂ),
+        NG.OverPl w v' ∧ NG.SatAt (clsA π).rep Dv' α' := ⟨
+    v,
+    Dv,
+    α,
+    hv,
+    GlobalTheory.T.satakeParameters_inertPlace_independent_of_model _ _ π _
+      (autIso_symm (rep_iso π)) v w hv Dv Dv α hα
+  ⟩
   unfold satOf
   rw [dite_eq_left hex]
-  have key : ∀ (v' : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E))) (Dv' : InertDatum D.host.E D.R.nV v' w)
-      (α' : Fin (D.R.nV / 2) → ℂ), NG.OverPl w v' → NG.SatAt (clsA π).rep Dv' α' → NG.SatAt π Dv α' := by
+  have key
+      : ∀ (v' : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)))
+          (Dv' : InertDatum D.host.E D.R.nV v' w) (α' : Fin (D.R.nV / 2) → ℂ),
+        NG.OverPl w v' → NG.SatAt (clsA π).rep Dv' α' → NG.SatAt π Dv α' := by
     intro v' Dv' α' hv' hs'
     have e := overPl_unique hv hv'
     subst e
-    exact GlobalTheory.T.satakeParameters_inertPlace_independent_of_model _ _ _ π (rep_iso π) v w hv _ Dv _ hs'
+    exact GlobalTheory.T.satakeParameters_inertPlace_independent_of_model _ _ _ π (rep_iso π) v w hv
+      _ Dv _ hs'
   obtain ⟨hv', hs'⟩ := hex.choose_spec.choose_spec.choose_spec
   exact ⟨_, key _ _ _ hv' hs', rfl⟩
 
-theorem f_wt (π : NG.AutRep D.host.E D.R.nV) (a : NG.AlgWt D.host.E D.R.nV) (hd : π.toAlgWt.IsDual a) :
-    wtOf D (clsA π).rep = clsW a := by
+theorem f_wt
+    (π : NG.AutRep D.host.E D.R.nV) (a : NG.AlgWt D.host.E D.R.nV) (hd : π.toAlgWt.IsDual a)
+    : wtOf D (clsA π).rep = clsW a := by
   have hπ : (clsA π).rep.toAlgWt.Iso π.toAlgWt := (rep_iso π).1
   obtain ⟨b, hb, hbu, hba⟩ := GlobalTheory.T.algWeight_contragredient_exists_unique _ _ π.toAlgWt
   have hrb : (clsA π).rep.toAlgWt.IsDual b := (hba _ hπ.symm).1
   have hex : ∃ b, (clsA π).rep.toAlgWt.IsDual b := ⟨b, hrb⟩
   unfold wtOf
   rw [dite_eq_left hex]
-  obtain ⟨b', -, hbu', -⟩ := GlobalTheory.T.algWeight_contragredient_exists_unique _ _ (clsA π).rep.toAlgWt
+  obtain ⟨b', -, hbu', -⟩ :=
+    GlobalTheory.T.algWeight_contragredient_exists_unique _ _ (clsA π).rep.toAlgWt
   have h1 : b'.Iso hex.choose := (hbu' _).1 hex.choose_spec
   have h2 : b'.Iso b := (hbu' _).1 hrb
   have h3 : b.Iso a := (hbu a).1 hd
   exact (clsW_eq_iff _ _).2 ((h1.symm.trans h2).trans h3)
 
-theorem f_infW (a : NG.AlgWt D.host.E D.R.nV) (τ : D.host.E →+* ℂ) (lam : Fin D.R.nV → ℤ) (hl : a.HWAt τ lam) :
-    NG.infOf (hwOf (clsW a).rep τ) = NG.infOf lam := by
+theorem f_infW
+    (a : NG.AlgWt D.host.E D.R.nV) (τ : D.host.E →+* ℂ) (lam : Fin D.R.nV → ℤ) (hl : a.HWAt τ lam)
+    : NG.infOf (hwOf (clsW a).rep τ) = NG.infOf lam := by
   have hi : a.Iso (clsW a).rep := (repW_iso a).symm
   obtain ⟨b0, hb0, hb0', hhw⟩ := GlobalTheory.T.algWeight_contragredient_exists_unique _ _ a
   have hr : (clsW a).rep.HWAt τ lam := ((hhw _ hi).2 τ lam hl)
-  obtain ⟨huniq, hanti⟩ := GlobalTheory.T.algWeight_highestWeight_exists_unique_antitone _ _ (clsW a).rep τ
+  obtain ⟨huniq, hanti⟩ :=
+    GlobalTheory.T.algWeight_highestWeight_exists_unique_antitone _ _ (clsW a).rep τ
   have hex : ∃ lam, (clsW a).rep.HWAt τ lam ∧ Antitone lam := ⟨lam, hr, hanti lam hr⟩
   unfold hwOf
   rw [dite_eq_left hex, huniq.unique hex.choose_spec.1 hr]

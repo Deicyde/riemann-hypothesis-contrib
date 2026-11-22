@@ -82,8 +82,9 @@ end Witt
 
 section Tilt
 
-variable {p : ℕ} [hp : Fact p.Prime] {O : Type*} [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {O : Type*} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 lemma pflat_mul_eq_zero (hO : ∀ x : O, (p : O) * x = 0 → x = 0) (pflat : PreTilt O p)
     (hpf : pflat.untilt = (p : O)) (x : PreTilt O p) (hx : pflat * x = 0) : x = 0 := by
@@ -115,8 +116,9 @@ end Tilt
 
 section Main
 
-variable (p : ℕ) [hp : Fact p.Prime] (O : Type) [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O]
+variable
+  (p : ℕ) [hp : Fact p.Prime]
+  (O : Type) [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 theorem regular (hO : ∀ x : O, (p : O) * x = 0 → x = 0) : RegularStatement p O := by
   intro pflat hpf
@@ -126,20 +128,22 @@ theorem regular (hO : ∀ x : O, (p : O) * x = 0 → x = 0) : RegularStatement p
     rw [WittVector.mul_coeff_zero, WittVector.teichmuller_coeff_zero] at hx
     exact pflat_mul_eq_zero hO pflat hpf _ hx
   · intro htop
-    have h1 : (1 : WittVector p (PreTilt O p)) ∈
-        span {(p : WittVector p (PreTilt O p)), teichmuller p pflat} := by
+    have h1
+        : (1 : WittVector p (PreTilt O p))
+          ∈ span {(p : WittVector p (PreTilt O p)), teichmuller p pflat} := by
       rw [htop]; exact Submodule.mem_top
     obtain ⟨c, e, hce⟩ := Ideal.mem_span_pair.mp h1
     have h2 := congrArg (fun z => WittVector.coeff z 0) hce
     simp only [WittVector.add_coeff_zero, WittVector.mul_coeff_zero,
-      WittVector.teichmuller_coeff_zero, WittVector.one_coeff_zero] at h2
+        WittVector.teichmuller_coeff_zero, WittVector.one_coeff_zero]
+      at h2
     have hp0 : (p : WittVector p (PreTilt O p)).coeff 0 = 0 := by
       rw [← mem_span_p_iff]; exact Ideal.mem_span_singleton_self _
     rw [hp0, mul_zero, zero_add, mul_comm] at h2
     have hu : IsUnit pflat := ⟨⟨pflat, _, h2, by rw [mul_comm]; exact h2⟩, rfl⟩
     have h3 := hu.map (PreTilt.untilt (O := O) (p := p))
     rw [hpf] at h3
-    exact (Fact.out : ¬IsUnit (p : O)) h3
+    exact (Fact.out : ¬ IsUnit (p : O)) h3
 
 end Main
 

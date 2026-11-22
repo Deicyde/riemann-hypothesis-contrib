@@ -16,16 +16,19 @@ open Polynomial
 
 namespace GlobalTheory.OrbDesc
 
-theorem commute_aeval_of_commute {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    {F f : Module.End K V} (h : Commute F f) (p : K[X]) : Commute F (aeval f p) := by
+theorem commute_aeval_of_commute
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V]
+    {F f : Module.End K V} (h : Commute F f)
+    (p : K[X])
+    : Commute F (aeval f p) := by
   induction p using Polynomial.induction_on' with
   | add p q hp hq => rw [map_add (f := _)]; exact hp.add_right hq
   | monomial n c =>
     rw [aeval_monomial]
     exact (Algebra.commute_algebraMap_right c F).mul_right (h.pow_right n)
 
-theorem natDegree_pos_of_not_isUnit {K : Type} [Field K] {p : K[X]} (hp0 : p ≠ 0)
-    (hp : ¬ IsUnit p) : 0 < p.natDegree := by
+theorem natDegree_pos_of_not_isUnit {K : Type} [Field K] {p : K[X]} (hp0 : p ≠ 0) (hp : ¬ IsUnit p)
+    : 0 < p.natDegree := by
   by_contra h
   push_neg at h
   apply hp
@@ -33,10 +36,14 @@ theorem natDegree_pos_of_not_isUnit {K : Type} [Field K] {p : K[X]} (hp0 : p ≠
   simp only [Nat.cast_eq_zero]
   omega
 
-theorem exists_conj_cent_le_blockLevi : ∀ (K : Type) [Field K] (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] (γ : GL ι K),
-  (γ : Matrix ι ι K).charpoly.Separable → ¬ Irreducible (γ : Matrix ι ι K).charpoly →
-  ∃ (a b : ℕ) (e : ι ≃ Fin a ⊕ Fin b), 0 < a ∧ 0 < b ∧ ∃ c : GL ι K,
-    GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) (c⁻¹ * γ * c) ≤ GlobalTheory.OrbDesc.blockLevi e := by
+theorem exists_conj_cent_le_blockLevi
+    : ∀ (K : Type) [Field K] (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] (γ : GL ι K),
+      (γ : Matrix ι ι K).charpoly.Separable → ¬ Irreducible (γ : Matrix ι ι K).charpoly
+        → ∃ (a b : ℕ) (e : ι ≃ Fin a ⊕ Fin b),
+          0 < a ∧ 0 < b
+            ∧ ∃ c : GL ι K,
+              GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) (c⁻¹ * γ * c)
+                ≤ GlobalTheory.OrbDesc.blockLevi e := by
   intro K _ ι _ _ _ γ hsep hirr
   set M : Matrix ι ι K := (γ : Matrix ι ι K) with hMdef
   have hχ0 : M.charpoly ≠ 0 := M.charpoly_monic.ne_zero
@@ -48,10 +55,13 @@ theorem exists_conj_cent_le_blockLevi : ∀ (K : Type) [Field K] (ι : Type) [Fi
   obtain ⟨p, q, hpq, hp, hq⟩ : ∃ p q, M.charpoly = p * q ∧ ¬ IsUnit p ∧ ¬ IsUnit q := by
     by_contra hc
     push_neg at hc
-    exact hirr (irreducible_iff.mpr ⟨hχu, fun p q h => by
-      by_contra h'
-      push_neg at h'
-      exact h'.2 (hc p q h h'.1)⟩)
+    exact hirr (irreducible_iff.mpr ⟨
+      hχu,
+      fun p q h => by
+        by_contra h'
+        push_neg at h'
+        exact h'.2 (hc p q h h'.1)
+    ⟩)
   have hcop : IsCoprime p q := (hpq ▸ hsep).isCoprime
   have hp0 : p ≠ 0 := by rintro rfl; rw [zero_mul] at hpq; exact hχ0 hpq
   have hq0 : q ≠ 0 := by rintro rfl; rw [mul_zero] at hpq; exact hχ0 hpq
@@ -63,9 +73,12 @@ theorem exists_conj_cent_le_blockLevi : ∀ (K : Type) [Field K] (ι : Type) [Fi
   have hχf : aeval f M.charpoly = 0 := by rw [haev, Matrix.aeval_self_charpoly, map_zero]
   set V₁ := LinearMap.ker (aeval f p) with hV₁
   set V₂ := LinearMap.ker (aeval f q) with hV₂
-  have hc : IsCompl V₁ V₂ := ⟨Polynomial.disjoint_ker_aeval_of_isCoprime f hcop, by
-    rw [codisjoint_iff, Polynomial.sup_ker_aeval_eq_ker_aeval_mul_of_coprime f hcop, ← hpq, hχf,
-      LinearMap.ker_zero]⟩
+  have hc : IsCompl V₁ V₂ := ⟨
+    Polynomial.disjoint_ker_aeval_of_isCoprime f hcop,
+    by
+      rw [codisjoint_iff, Polynomial.sup_ker_aeval_eq_ker_aeval_mul_of_coprime f hcop, ← hpq, hχf,
+        LinearMap.ker_zero]
+  ⟩
   have hcharf : LinearMap.charpoly f = M.charpoly := Matrix.charpoly_toLin' M
   have hdvd : M.charpoly ∣ minpoly K f := by
     have := GlobalTheory.UnitLemma.charpoly_dvd_minpoly_of_separable f (by rw [hcharf]; exact hsep)
@@ -95,8 +108,7 @@ theorem exists_conj_cent_le_blockLevi : ∀ (K : Type) [Field K] (ι : Type) [Fi
   let e : ι ≃ Fin (Module.finrank K V₁) ⊕ Fin (Module.finrank K V₂) :=
     (b0.indexEquiv (Pi.basisFun K ι)).symm
   let bb := b0.reindex e.symm
-  have hbb : ∀ i, bb i = b0 (e i) := fun i => by
-    simp [bb, Module.Basis.reindex_apply]
+  have hbb : ∀ i, bb i = b0 (e i) := fun i => by simp [bb, Module.Basis.reindex_apply]
   have hbbr : ∀ v i, bb.repr v i = b0.repr v (e i) := fun v i => by
     simp [bb, Module.Basis.repr_reindex_apply]
   have hmem1 : ∀ k, b0 (Sum.inl k) ∈ V₁ := fun k => by
@@ -110,15 +122,21 @@ theorem exists_conj_cent_le_blockLevi : ∀ (K : Type) [Field K] (ι : Type) [Fi
     have : φ.symm v = (0, ⟨v, hv⟩) := Submodule.prodEquivOfIsCompl_symm_apply_right V₁ V₂ hc ⟨v, hv⟩
     simp [b0, Module.Basis.map_repr, this]
   let std := Pi.basisFun K ι
-  let c : GL ι K := ⟨std.toMatrix bb, bb.toMatrix std,
-    Module.Basis.toMatrix_mul_toMatrix_flip _ _, Module.Basis.toMatrix_mul_toMatrix_flip _ _⟩
+  let c : GL ι K := ⟨
+    std.toMatrix bb,
+    bb.toMatrix std,
+    Module.Basis.toMatrix_mul_toMatrix_flip _ _,
+    Module.Basis.toMatrix_mul_toMatrix_flip _ _
+  ⟩
   refine ⟨_, _, e, Module.finrank_pos_iff.mpr ?_, Module.finrank_pos_iff.mpr ?_, c, ?_⟩
   · exact Submodule.nontrivial_iff_ne_bot.mpr hV1
   · exact Submodule.nontrivial_iff_ne_bot.mpr hV2
   intro g hg
   have hg' : g * (c⁻¹ * γ * c) = (c⁻¹ * γ * c) * g := hg
   have hN : (c * g * c⁻¹) * γ = γ * (c * g * c⁻¹) := by
-    calc (c * g * c⁻¹) * γ = c * (g * (c⁻¹ * γ * c)) * c⁻¹ := by group
+    calc
+      (c * g * c⁻¹) * γ
+        = c * (g * (c⁻¹ * γ * c)) * c⁻¹ := by group
       _ = c * ((c⁻¹ * γ * c) * g) * c⁻¹ := by rw [hg']
       _ = γ * (c * g * c⁻¹) := by group
   let F : Module.End K (ι → K) := Matrix.toLin' ((c * g * c⁻¹ : GL ι K) : Matrix ι ι K)
@@ -137,7 +155,9 @@ theorem exists_conj_cent_le_blockLevi : ∀ (K : Type) [Field K] (ι : Type) [Fi
     simp only [Module.End.mul_apply, hv, map_zero] at this
     exact this.symm
   have hg2 : g = c⁻¹ * (c * g * c⁻¹) * c := by group
-  have hgm : (g : Matrix ι ι K) = bb.toMatrix std * ((c * g * c⁻¹ : GL ι K) : Matrix ι ι K) * std.toMatrix bb := by
+  have hgm
+      : (g : Matrix ι ι K)
+        = bb.toMatrix std * ((c * g * c⁻¹ : GL ι K) : Matrix ι ι K) * std.toMatrix bb := by
     conv_lhs => rw [hg2]
     rfl
   have hgF : (g : Matrix ι ι K) = LinearMap.toMatrix bb bb F := by

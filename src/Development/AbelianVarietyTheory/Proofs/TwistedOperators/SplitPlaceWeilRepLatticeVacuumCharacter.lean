@@ -6,15 +6,41 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsInv
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.WeilParts GlobalTheory.VecInv
+open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.WeilParts GlobalTheory.VecInv
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.VecInv
 
-
 open GlobalTheory.SplitScalar GlobalTheory.SplitHecke in
-theorem om_latVac_split : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (χS χT : (AE D)ˣ →* Circle) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)), IsWeilDatumO ψ S T χS χT om → IsSelfDualC S ΛS → IsSelfDualC T ΛT → ∀ e, IsSplitIdem D e → ∀ g h, Formalism.L2.Theta.SuppAt e S g → Formalism.L2.Theta.SuppAt e T h → (∀ u, u ∈ (latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True) ↔ actO S T g h u ∈ (latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)) → ∀ x y, IsDetAt e S g x → IsDetAt e T h y → ∀ f, IsThetaFunO ψ S T f → IsLatVac (heisO ψ S T) (latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True) f → om (g, h) f = ((splitFacO χS χT x y : Circle) : ℂ) • f := by
+theorem om_latVac_split
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
+        (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+        (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (χS χT : (AE D)ˣ →* Circle)
+        (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
+      IsWeilDatumO ψ S T χS χT om → IsSelfDualC S ΛS → IsSelfDualC T ΛT
+        → ∀ e,
+          IsSplitIdem D e
+            → ∀ g h,
+              Formalism.L2.Theta.SuppAt e S g → Formalism.L2.Theta.SuppAt e T h
+                → (∀ u,
+                  u ∈ (latO S T (ΛS : Set (Fin S.rank → D.host.E))
+                      (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)
+                    ↔ actO S T g h u ∈ (latO S T (ΛS : Set (Fin S.rank → D.host.E))
+                      (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True))
+                → ∀ x y,
+                  IsDetAt e S g x → IsDetAt e T h y
+                    → ∀ f,
+                      IsThetaFunO ψ S T f
+                        → IsLatVac (heisO ψ S T)
+                          (latO S T (ΛS : Set (Fin S.rank → D.host.E))
+                            (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)
+                          f
+                        → om (g, h) f = ((splitFacO χS χT x y : Circle) : ℂ) • f := by
   intro D ψ S T ΛS ΛT χS χT om hW hS hT e he g h hg hh hlat x y hx hy f hf hv
 
   set Λ := (latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True) with hΛ
@@ -45,15 +71,19 @@ theorem om_latVac_split : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : H
     rw [Finset.mem_singleton] at hu
     subst hu
     exact ⟨(hmem 0).2 (zero_mem _), GlobalTheory.SplitScalar.isHalf_zero e⟩
-  have hRu : ∀ w, actO S T g⁻¹ h⁻¹ w ∈ Λ → IsHalf e w → ∃! v, v ∈ ({0} : Finset (WO S T)) ∧ w - v ∈ Λ := by
+  have hRu
+      : ∀ w,
+        actO S T g⁻¹ h⁻¹ w ∈ Λ → IsHalf e w → ∃! v, v ∈ ({0} : Finset (WO S T)) ∧ w - v ∈ Λ := by
     intro w hw _
     refine ⟨0, ⟨Finset.mem_singleton_self _, by simpa using (hmem w).1 hw⟩, ?_⟩
     rintro v ⟨hv0, -⟩
     exact Finset.mem_singleton.1 hv0
   have hle : ∀ w ∈ Λ, IsHalf e w → actO S T g⁻¹ h⁻¹ w ∈ Λ := fun w hw _ => (hmem w).2 hw
-  obtain ⟨r, hr, hom⟩ := GlobalTheory.SplitHecke.om_eq_smul_sum hW he hdd hd hd' hg hh hx hy hR hRu hle
+  obtain ⟨r, hr, hom⟩ :=
+    GlobalTheory.SplitHecke.om_eq_smul_sum hW he hdd hd hd' hg hh hx hy hR hRu hle
   have key : om (g, h) f = ((r : ℂ) * (splitFacO χS χT x y : ℂ)) • f := by
-    have hk := hom f hf (fun u hu hue => hv.2 e he u hu hue) (fun u hu hue => hv.2 (cA D e) he' u hu hue)
+    have hk :=
+      hom f hf (fun u hu hue => hv.2 e he u hu hue) (fun u hu hue => hv.2 (cA D e) he' u hu hue)
     rwa [Finset.sum_singleton, GlobalTheory.WeilVacMove.heisO_zero] at hk
 
   by_cases hf0 : f = 0
@@ -74,8 +104,10 @@ theorem om_latVac_split : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : H
   obtain ⟨-, -, hI, -⟩ := hNf μ 𝓕 hμ h𝓕
   have hu := hW.om_unit μ 𝓕 hμ h𝓕 (g, h) f hf
   rw [key] at hu
-  have hpt : ∀ w, ‖(((r : ℂ) * (splitFacO χS χT x y : ℂ)) • f) w‖ₑ ^ 2 =
-      ‖(r : ℂ) * (splitFacO χS χT x y : ℂ)‖ₑ ^ 2 * ‖f w‖ₑ ^ 2 := fun w => by
+  have hpt
+      : ∀ w,
+        ‖(((r : ℂ) * (splitFacO χS χT x y : ℂ)) • f) w‖ₑ ^ 2
+          = ‖(r : ℂ) * (splitFacO χS χT x y : ℂ)‖ₑ ^ 2 * ‖f w‖ₑ ^ 2 := fun w => by
     rw [Pi.smul_apply, smul_eq_mul, enorm_mul (a := (r : ℂ) * (splitFacO χS χT x y : ℂ)), mul_pow]
   simp_rw [hpt] at hu
   rw [lintegral_const_mul' _ _ (ENNReal.pow_ne_top enorm_ne_top), hI, h1, one_mul] at hu
@@ -90,10 +122,7 @@ theorem om_latVac_split : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : H
   have hnorm : ‖(r : ℂ) * (splitFacO χS χT x y : ℂ)‖ = r := by
     rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hr]
     have hs1 : ‖(splitFacO χS χT x y : ℂ)‖ = 1 := by
-      first
-        | exact Circle.norm_coe _
-        | exact Circle.abs_coe _
-        | simp
+      first | exact Circle.norm_coe _ | exact Circle.abs_coe _ | simp
     rw [hs1, mul_one]
   have hr1 : r = 1 := by
     have hc : ‖(r : ℂ) * (splitFacO χS χT x y : ℂ)‖₊ ^ 2 = 1 := by

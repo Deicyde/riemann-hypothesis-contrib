@@ -22,11 +22,12 @@ abbrev VC (ι : Type) (N N' : ℕ) : Type := ι → Fin N' → Fin N → ℂ
 def lamOf (cc : Ideal (𝓞 H.K)) (δ : ℂ) : AddSubgroup ℂ :=
   AddSubgroup.closure {w | ∃ c ∈ cc, w = δ * H.φ₀ (((c : H.K) : H.E))}
 
-def IsDiscriminantTwelfthRootOfIdealLattice (cc : Ideal (𝓞 H.K)) (δ : ℂ) : Prop := δ ^ 12 = TaylorLogMetric.discr (lamOf H cc 1)
+def IsDiscriminantTwelfthRootOfIdealLattice (cc : Ideal (𝓞 H.K)) (δ : ℂ) : Prop :=
+  δ ^ 12 = TaylorLogMetric.discr (lamOf H cc 1)
 
 def IsTwoTorsionPointUnkilled (Λ : AddSubgroup ℂ) (t : ℂ) : Prop :=
-  2 * t ∈ Λ ∧ ((1 + Complex.I * (Real.sqrt H.d : ℂ)) / 2) * t ∉ Λ ∧
-    ((1 - Complex.I * (Real.sqrt H.d : ℂ)) / 2) * t ∉ Λ
+  2 * t ∈ Λ ∧ ((1 + Complex.I * (Real.sqrt H.d : ℂ)) / 2) * t ∉ Λ
+    ∧ ((1 - Complex.I * (Real.sqrt H.d : ℂ)) / 2) * t ∉ Λ
 
 def stdL (N : ℕ) : Lt H N := Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 H.E) H.E)
 
@@ -37,7 +38,8 @@ def YYl {N N' : ℕ} (L : Lt H N) (L' : Lt H N') : Submodule (𝓞 H.E) (Matrix 
   Submodule.span (𝓞 H.E) {B | ∃ a ∈ (H.AA0 : Submodule (𝓞 H.E) H.E), ∃ A ∈ homL H L L', B = a • A}
 
 def La (Λ : AddSubgroup ℂ) {N N' : ℕ} (L : Lt H N) (L' : Lt H N') : AddSubgroup (VC ι N N') :=
-  AddSubgroup.closure {z | ∃ w ∈ Λ, ∃ A ∈ YYl H L L', z = w • (fun τ i j => emb τ (A i j) : VC ι N N')}
+  AddSubgroup.closure
+    {z | ∃ w ∈ Λ, ∃ A ∈ YYl H L L', z = w • (fun τ i j => emb τ (A i j) : VC ι N N')}
 
 def Hf (Λ : AddSubgroup ℂ) {N N' : ℕ} (z w : VC ι N N') : ℂ :=
   (∑ τ, ∑ i, ∑ j, z τ i j * (starRingEnd ℂ) (w τ i j)) / (TaylorLogMetric.area Λ : ℂ)
@@ -45,49 +47,52 @@ def Hf (Λ : AddSubgroup ℂ) {N N' : ℕ} (z w : VC ι N N') : ℂ :=
 def al (Λ : AddSubgroup ℂ) {N N' : ℕ} (x : VC ι N N') : ℂ :=
   (-1 : ℂ) ^ (round (Real.sqrt H.d / 2 * (Hf Λ x x).re))
 
-def U (Λ : AddSubgroup ℂ) {N N' : ℕ} (x : VC ι N N') (G : VC ι N N' → ℂ) : VC ι N N' → ℂ :=
-  fun z => G (z + x) * Complex.exp (-(Real.pi : ℂ) * Hf Λ z x - (Real.pi : ℂ) * Hf Λ x x / 2)
+def U (Λ : AddSubgroup ℂ) {N N' : ℕ} (x : VC ι N N') (G : VC ι N N' → ℂ) : VC ι N N' → ℂ := fun z =>
+  G (z + x) * Complex.exp (-(Real.pi : ℂ) * Hf Λ z x - (Real.pi : ℂ) * Hf Λ x x / 2)
 
-def Iop (Λ : AddSubgroup ℂ) {N N' : ℕ} (La₁ La₂ : AddSubgroup (VC ι N N')) (G : VC ι N N' → ℂ) : VC ι N N' → ℂ :=
-  fun z => ((Real.sqrt ((La₁.addSubgroupOf La₂).index : ℝ))⁻¹ : ℂ) *
-    ∑ᶠ q : La₂ ⧸ La₁.addSubgroupOf La₂,
-      al H Λ ((Quotient.out q : La₂) : VC ι N N') * U Λ ((Quotient.out q : La₂) : VC ι N N') G z
+def Iop (Λ : AddSubgroup ℂ) {N N' : ℕ} (La₁ La₂ : AddSubgroup (VC ι N N')) (G : VC ι N N' → ℂ)
+    : VC ι N N' → ℂ := fun z =>
+  ((Real.sqrt ((La₁.addSubgroupOf La₂).index : ℝ))⁻¹ : ℂ)
+    * ∑ᶠ q : La₂ ⧸ La₁.addSubgroupOf La₂,
+        al H Λ ((Quotient.out q : La₂) : VC ι N N') * U Λ ((Quotient.out q : La₂) : VC ι N N') G z
 
 def detId {N : ℕ} (L L' : Lt H N) : Submodule (𝓞 H.E) H.E :=
-  Submodule.span (𝓞 H.E) {x | ∃ A : Matrix (Fin N) (Fin N) H.E, (∀ v ∈ L, A.mulVec v ∈ L') ∧ x = A.det}
+  Submodule.span (𝓞 H.E)
+    {x | ∃ A : Matrix (Fin N) (Fin N) H.E, (∀ v ∈ L, A.mulVec v ∈ L') ∧ x = A.det}
 
 def lamMM (Λ : AddSubgroup ℂ) : AddSubgroup (ι → ℂ) :=
   AddSubgroup.closure {z | ∃ w ∈ Λ, ∃ a ∈ H.AA0, z = fun τ => w * emb τ a}
 
 def mmM (M : IntermediateField ℚ ℂ) [NumberField M] : Submodule (𝓞 M) (ι → M) :=
-  Submodule.span (𝓞 M) {v | ∃ a ∈ (H.AA0 : Submodule (𝓞 H.E) H.E), v = fun τ => TaylorLogMetric.liftM M (emb τ a)}
+  Submodule.span (𝓞 M)
+    {v | ∃ a ∈ (H.AA0 : Submodule (𝓞 H.E) H.E), v = fun τ => TaylorLogMetric.liftM M (emb τ a)}
 
 def ellT (M : IntermediateField ℚ ℂ) [NumberField M] (τ : ι) : Submodule (𝓞 M) M :=
   (mmM H emb M).comap (LinearMap.single (𝓞 M) (fun _ : ι => (M : Type)) τ)
 
 def IsDgen (cD : ι → ℂ) : Prop :=
-  ∃ (M : IntermediateField ℚ ℂ) (_ : NumberField M), (∀ τ x, emb τ x ∈ M) ∧ ∀ τ, ∃ s : M, (s : ℂ) = cD τ ∧
-    ellT H emb M τ = Submodule.span (𝓞 M) {s}
+  ∃ (M : IntermediateField ℚ ℂ) (_ : NumberField M),
+    (∀ τ x, emb τ x ∈ M) ∧ ∀ τ, ∃ s : M, (s : ℂ) = cD τ ∧ ellT H emb M τ = Submodule.span (𝓞 M) {s}
 
 def SplitK (p : ℕ) : Prop := p = 2 ∨ jacobiSym (-(H.d : ℤ)) p = 1
-
 
 variable (ι) in
 abbrev IsoK : Type := IsoKG H.K H.E H.conj ι
 
-
 variable {H} in
 def AtP (γ : IsoK H ι) (p : ℕ) : Prop :=
-  (∀ x : Fin 4 → H.E, (∀ a, x a ∈ H.AA0) → ∃ s : ℕ, Nat.Coprime s p ∧
-    ∀ w, (s : H.K) * γ.g x w ∈ (algebraMap (𝓞 H.K) H.K).range) ∧
-  ∀ v : Fin 4 × ι → H.K, (∀ w, v w ∈ (algebraMap (𝓞 H.K) H.K).range) →
-    ∃ s : ℕ, Nat.Coprime s p ∧ ∀ a, (s : H.E) * γ.g.symm v a ∈ H.AA0
-
+  (∀ x : Fin 4 → H.E,
+      (∀ a, x a ∈ H.AA0)
+        → ∃ s : ℕ, Nat.Coprime s p ∧ ∀ w, (s : H.K) * γ.g x w ∈ (algebraMap (𝓞 H.K) H.K).range)
+    ∧ ∀ v : Fin 4 × ι → H.K,
+      (∀ w, v w ∈ (algebraMap (𝓞 H.K) H.K).range)
+        → ∃ s : ℕ, Nat.Coprime s p ∧ ∀ a, (s : H.E) * γ.g.symm v a ∈ H.AA0
 
 variable {H} in
 def detRel (γ γ₀ : IsoK H ι) : H.K :=
-  LinearMap.det ((γ₀.g.symm.trans γ.g : (Fin 4 × ι → H.K) ≃ₗ[H.K] _) : (Fin 4 × ι → H.K) →ₗ[H.K] (Fin 4 × ι → H.K))
-
+  LinearMap.det
+    ((γ₀.g.symm.trans γ.g : (Fin 4 × ι → H.K) ≃ₗ[H.K] _)
+      : (Fin 4 × ι → H.K) →ₗ[H.K] (Fin 4 × ι → H.K))
 
 variable {H} in
 structure KapIn (γ₀ : IsoK H ι) where
@@ -98,14 +103,15 @@ structure KapIn (γ₀ : IsoK H ι) where
   gaP : ℕ → IsoK H ι
   gaP_at : ∀ p, p.Prime → SplitK H p → AtP (gaP p) p
   rt : ℕ → ℂ
-  rt_pow : ∀ p, p.Prime → SplitK H p → rt p ^ (2 * classNumber H.K)
-    = H.φ₀ (((pi p : 𝓞 H.K) : H.K) : H.E) / H.φ₀ (H.conj (((pi p : 𝓞 H.K) : H.K) : H.E))
-
+  rt_pow
+    : ∀ p,
+      p.Prime → SplitK H p
+        → rt p ^ (2 * classNumber H.K)
+          = H.φ₀ (((pi p : 𝓞 H.K) : H.K) : H.E) / H.φ₀ (H.conj (((pi p : 𝓞 H.K) : H.K) : H.E))
 
 variable {H} in
 def KapIn.yP {γ₀ : IsoK H ι} (k : KapIn γ₀) (p : ℕ) : ℤ :=
-  -WithZero.log ((k.pp p).valuation H.K (detRel (k.gaP p) γ₀))
-
+  - WithZero.log ((k.pp p).valuation H.K (detRel (k.gaP p) γ₀))
 
 variable {H} in
 def KapIn.kappa {γ₀ : IsoK H ι} (k : KapIn γ₀) : ℂ :=
@@ -118,11 +124,13 @@ structure VacIn (cc : Ideal (𝓞 H.K)) (δ : ℂ) where
   t0 : IsTwoTorsionPointUnkilled H (lamOf H cc δ) (ω₀ / 2)
   γ₀ : IsoK H ι
   gC : (Fin 4 × ι → ℂ) ≃ₗ[ℂ] (Fin 4 × ι → ℂ)
-  gC_spec : ∀ x : Fin 4 → H.E, gC (fun w => emb w.2 (x w.1)) = fun w => H.φ₀ ((γ₀.g x w : H.K) : H.E)
+  gC_spec
+    : ∀ x : Fin 4 → H.E, gC (fun w => emb w.2 (x w.1)) = fun w => H.φ₀ ((γ₀.g x w : H.K) : H.E)
   kc : KapIn γ₀
 
 def chiFac (χ : Submodule (𝓞 H.E) H.E → ℂ) (N N' : ℕ) (L : Lt H N) (L' : Lt H N') : ℂ :=
-  χ (detId H (stdL H N) L) ^ (((N' / 2 : ℕ) : ℤ)) * χ (detId H (stdL H N') L') ^ (-((N / 2 : ℕ) : ℤ))
+  χ (detId H (stdL H N) L) ^ (((N' / 2 : ℕ) : ℤ))
+    * χ (detId H (stdL H N') L') ^ (-((N / 2 : ℕ) : ℤ))
 
 def perAA (cc : Ideal (𝓞 H.K)) : Submodule (𝓞 H.E) H.E :=
   Submodule.span (𝓞 H.E) {r | ∃ c ∈ cc, ∃ t ∈ H.AA0, r = (((c : 𝓞 H.K) : H.K) : H.E) * t}
@@ -131,15 +139,18 @@ namespace VacIn
 
 variable {H emb} {cc : Ideal (𝓞 H.K)} {δ : ℂ} (V : VacIn H emb cc δ)
 
-def thMM : (ι → ℂ) → ℂ := thM V.L V.ω₀ (Real.sqrt H.d / 2) (lamMM H emb (lamOf H cc δ)) V.gC V.kc.kappa
+def thMM : (ι → ℂ) → ℂ :=
+  thM V.L V.ω₀ (Real.sqrt H.d / 2) (lamMM H emb (lamOf H cc δ)) V.gC V.kc.kappa
 
 def thZero (N N' : ℕ) : VC ι N N' → ℂ := tensPow V.thMM N N'
 
 def thHalf (N N' : ℕ) (L : Lt H N) : VC ι N N' → ℂ :=
-  Iop H (lamOf H cc δ) (La H emb (lamOf H cc δ) (stdL H N) (stdL H N')) (La H emb (lamOf H cc δ) L (stdL H N')) (V.thZero N N')
+  Iop H (lamOf H cc δ) (La H emb (lamOf H cc δ) (stdL H N) (stdL H N'))
+    (La H emb (lamOf H cc δ) L (stdL H N')) (V.thZero N N')
 
 def thMoved (N N' : ℕ) (L : Lt H N) (L' : Lt H N') : VC ι N N' → ℂ :=
-  Iop H (lamOf H cc δ) (La H emb (lamOf H cc δ) L (stdL H N')) (La H emb (lamOf H cc δ) L L') (V.thHalf N N' L)
+  Iop H (lamOf H cc δ) (La H emb (lamOf H cc δ) L (stdL H N')) (La H emb (lamOf H cc δ) L L')
+    (V.thHalf N N' L)
 
 def eNat (χ : Submodule (𝓞 H.E) H.E → ℂ) (N N' : ℕ) (L : Lt H N) (L' : Lt H N') : VC ι N N' → ℂ :=
   fun z => chiFac H χ N N' L L' * V.thMoved N N' L L' z
@@ -150,7 +161,10 @@ section Record
 
 variable (D : D7)
 
-theorem isDiscriminantTwelfthRoot_host_iff (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) : IsDiscriminantTwelfthRootOfIdealLattice D.host cc δ ↔ TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ := Iff.rfl
+theorem isDiscriminantTwelfthRoot_host_iff (cc : Ideal (𝓞 D.host.K)) (δ : ℂ)
+    : IsDiscriminantTwelfthRootOfIdealLattice D.host cc δ
+      ↔ TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ :=
+  Iff.rfl
 
 variable {D} {cc : Ideal (𝓞 D.host.K)} {δ : ℂ}
 

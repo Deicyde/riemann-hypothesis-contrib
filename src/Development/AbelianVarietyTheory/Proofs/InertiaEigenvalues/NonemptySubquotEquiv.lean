@@ -8,22 +8,38 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun
+  GlobalTheory.Published
 
 namespace GlobalTheory.LocEulerScalars
 
-theorem nonempty_subquot_equiv {R R' X : Type*} [Ring R] [Ring R'] [AddCommGroup X] [Module R X]
-    [Module R' X] (Z B : Submodule R X) (Z' B' : Submodule R' X)
-    (hZ : ∀ x, x ∈ Z ↔ x ∈ Z') (hB : ∀ x, x ∈ B ↔ x ∈ B') :
-    Nonempty ((Z ⧸ B.comap Z.subtype) ≃ (Z' ⧸ B'.comap Z'.subtype)) := by
+theorem nonempty_subquot_equiv
+    {R R' X : Type*} [Ring R] [Ring R'] [AddCommGroup X] [Module R X] [Module R' X]
+    (Z B : Submodule R X) (Z' B' : Submodule R' X)
+    (hZ : ∀ x, x ∈ Z ↔ x ∈ Z') (hB : ∀ x, x ∈ B ↔ x ∈ B')
+    : Nonempty ((Z ⧸ B.comap Z.subtype) ≃ (Z' ⧸ B'.comap Z'.subtype)) := by
   refine ⟨Quotient.congr (Equiv.subtypeEquivRight hZ) fun a b => ?_⟩
-  change (B.comap Z.subtype).quotientRel a b ↔
-    (B'.comap Z'.subtype).quotientRel (Equiv.subtypeEquivRight hZ a) (Equiv.subtypeEquivRight hZ b)
+  change (B.comap Z.subtype).quotientRel a b
+    ↔ (B'.comap Z'.subtype).quotientRel (Equiv.subtypeEquivRight hZ a)
+      (Equiv.subtypeEquivRight hZ b)
   rw [Submodule.quotientRel_def, Submodule.quotientRel_def, Submodule.mem_comap,
     Submodule.mem_comap]
   exact hB _
 
-theorem localEulerChar_above : LocalFiniteness → LocalEulerChar → ∀ (F Ω : Type) [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (Λ M : Type) [CommRing Λ] [AddCommGroup M] [Module Λ M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)) (ρ : Representation Λ (Dec (F := F) A) M), (∀ m : M, l • m = 0) → IsPlaceOver A v → ((l : ℕ) : 𝓞 F) ∈ v.asIdeal → ContAction ρ → Finite (H1 ρ) ∧ Finite (H2 ρ) ∧ Nat.card (H1 ρ) = Nat.card (H0 ρ) * Nat.card (H2 ρ) * Nat.card M ^ ReciprocityTheory.Gal.locDeg v := by
+theorem localEulerChar_above
+    : LocalFiniteness → LocalEulerChar
+      → ∀ (F Ω : Type) [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F] [Field Ω]
+          [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (Λ M : Type) [CommRing Λ]
+          [AddCommGroup M] [Module Λ M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
+          (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F))
+          (ρ : Representation Λ (Dec (F := F) A) M),
+        (∀ m : M, l • m = 0) → IsPlaceOver A v → ((l : ℕ) : 𝓞 F) ∈ v.asIdeal → ContAction ρ
+          → Finite (H1 ρ) ∧ Finite (H2 ρ)
+            ∧ Nat.card (H1 ρ)
+              = Nat.card (H0 ρ) * Nat.card (H2 ρ)
+                * Nat.card M ^ ReciprocityTheory.Gal.locDeg v := by
   intro hF hE F Ω _ _ _ _ _ _ l _ Λ M _ _ _ _ _ _ A v ρ hl hA hv hc
 
   let _ : Module (ZMod (l ^ 1)) M := AddCommGroup.zmodModule fun m => by rw [pow_one]; exact hl m

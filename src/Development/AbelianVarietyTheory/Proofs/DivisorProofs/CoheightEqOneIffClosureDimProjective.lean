@@ -18,16 +18,19 @@ open GlobalTheory
 
 namespace GlobalTheory.FieldDimCoheight
 
-theorem coheight_add_dim_closure_eq (F : Type) [Field F] (X : Scheme.{0}) [IsIntegral X]
-    (p : X ⟶ Sp F) [LocallyOfFiniteType p] (z : X) :
-    (Order.coheight z : WithBot ℕ∞) + topologicalKrullDim (closure ({z} : Set X)) =
-      topologicalKrullDim X := by
+theorem coheight_add_dim_closure_eq
+    (F : Type) [Field F]
+    (X : Scheme.{0}) [IsIntegral X]
+    (p : X ⟶ Sp F) [LocallyOfFiniteType p]
+    (z : X)
+    : (Order.coheight z : WithBot ℕ∞) + topologicalKrullDim (closure ({z} : Set X))
+      = topologicalKrullDim X := by
   refine le_antisymm ?_ ?_
   · rw [add_comm]
     haveI : QuasiSober (closure ({z} : Set X)) :=
       isClosed_closure.isClosedEmbedding_subtypeVal.quasiSober
-    exact DimCodim.dim_add_le_of_le_coheight continuous_subtype_val Subtype.val_injective _
-      fun w => Order.coheight_anti (specializes_iff_mem_closure.2 w.2)
+    exact DimCodim.dim_add_le_of_le_coheight continuous_subtype_val Subtype.val_injective _ fun w =>
+      Order.coheight_anti (specializes_iff_mem_closure.2 w.2)
   obtain ⟨_, ⟨U, hU, rfl⟩, hzU, -⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ z) isOpen_univ
   have hU : IsAffineOpen U := hU
@@ -57,8 +60,9 @@ theorem coheight_add_dim_closure_eq (F : Type) [Field F] (X : Scheme.{0}) [IsInt
   rw [← hA, ← h2, hPh]
   exact add_le_add le_rfl h3
 
-theorem eq_one_iff_of_add_eq {c : ℕ∞} {t : WithBot ℕ∞} {e : ℕ}
-    (h : (c : WithBot ℕ∞) + t = (e + 1 : ℕ)) : c = 1 ↔ t = e := by
+theorem eq_one_iff_of_add_eq
+    {c : ℕ∞} {t : WithBot ℕ∞} {e : ℕ} (h : (c : WithBot ℕ∞) + t = (e + 1 : ℕ))
+    : c = 1 ↔ t = e := by
   induction t using WithBot.recBotCoe with
   | bot => rw [WithBot.add_bot] at h; exact absurd h.symm (WithBot.natCast_ne_bot _)
   | coe t =>
@@ -78,9 +82,10 @@ theorem eq_one_iff_of_add_eq {c : ℕ∞} {t : WithBot ℕ∞} {e : ℕ}
       have : c = 1 := by omega
       exact_mod_cast this
 
-theorem coheight_eq_one_iff : ∀ (F : Type) [Field F] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp F)
-    (e : ℕ), IsProjOver p → topologicalKrullDim X = (e + 1 : ℕ) → ∀ z : X,
-    Order.coheight z = 1 ↔ topologicalKrullDim (closure ({z} : Set X)) = e := by
+theorem coheight_eq_one_iff
+    : ∀ (F : Type) [Field F] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp F) (e : ℕ),
+      IsProjOver p → topologicalKrullDim X = (e + 1 : ℕ)
+        → ∀ z : X, Order.coheight z = 1 ↔ topologicalKrullDim (closure ({z} : Set X)) = e := by
   intro F _ X _ p e hp hd z
   have : IsProper p := by
     obtain ⟨N, c, hc, rfl⟩ := hp

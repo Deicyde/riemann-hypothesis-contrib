@@ -29,17 +29,19 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-theorem exists_isOpen_inter_subset_of_maximal {α : Type*} [TopologicalSpace α]
-    [TopologicalSpace.NoetherianSpace α] (A : Set α) (hA : IsClosed A) (C : Set α)
-    (hC : IsIrreducible C) (hCA : C ⊆ A)
-    (hmax : ∀ C' : Set α, IsIrreducible C' → C ⊆ C' → C' ⊆ A → C' = C) :
-    ∃ O : Set α, IsOpen O ∧ (O ∩ A).Nonempty ∧ O ∩ A ⊆ C := by
+theorem exists_isOpen_inter_subset_of_maximal
+    {α : Type*} [TopologicalSpace α] [TopologicalSpace.NoetherianSpace α]
+    (A : Set α) (hA : IsClosed A)
+    (C : Set α) (hC : IsIrreducible C) (hCA : C ⊆ A)
+    (hmax : ∀ C' : Set α, IsIrreducible C' → C ⊆ C' → C' ⊆ A → C' = C)
+    : ∃ O : Set α, IsOpen O ∧ (O ∩ A).Nonempty ∧ O ∩ A ⊆ C := by
   classical
   obtain ⟨S, hirr, hsup⟩ :=
     TopologicalSpace.NoetherianSpace.exists_finset_irreducible
       (⟨A, hA⟩ : TopologicalSpace.Closeds α)
-  have hcoe : ∀ S' : Finset (TopologicalSpace.Closeds α),
-      ((S'.sup id : TopologicalSpace.Closeds α) : Set α) = ⋃ k ∈ S', (k : Set α) := by
+  have hcoe
+      : ∀ S' : Finset (TopologicalSpace.Closeds α),
+        ((S'.sup id : TopologicalSpace.Closeds α) : Set α) = ⋃ k ∈ S', (k : Set α) := by
     intro S'
     refine Finset.induction_on S' ?_ ?_
     · simp
@@ -47,10 +49,11 @@ theorem exists_isOpen_inter_subset_of_maximal {α : Type*} [TopologicalSpace α]
       simp [Finset.sup_insert, ih]
   have hA' : A = ⋃ k ∈ S, (k : Set α) :=
     (congrArg (fun s : TopologicalSpace.Closeds α => (s : Set α)) hsup).trans (hcoe S)
-  obtain ⟨T, hTdef⟩ : ∃ T : Finset (TopologicalSpace.Closeds α),
-      T = S.filter (fun k : TopologicalSpace.Closeds α => ¬ ((k : Set α) ⊆ C)) := ⟨_, rfl⟩
-  have hmemT : ∀ k : TopologicalSpace.Closeds α,
-      k ∈ T ↔ k ∈ S ∧ ¬ ((k : Set α) ⊆ C) := by
+  obtain ⟨T, hTdef⟩
+      : ∃ T : Finset (TopologicalSpace.Closeds α),
+        T = S.filter (fun k : TopologicalSpace.Closeds α => ¬((k : Set α) ⊆ C)) :=
+    ⟨_, rfl⟩
+  have hmemT : ∀ k : TopologicalSpace.Closeds α, k ∈ T ↔ k ∈ S ∧ ¬((k : Set α) ⊆ C) := by
     intro k
     rw [hTdef]
     exact Finset.mem_filter
@@ -88,11 +91,13 @@ theorem exists_isOpen_inter_subset_of_maximal {α : Type*} [TopologicalSpace α]
     · exact hk hzk
     · exact absurd (Set.mem_iUnion₂.mpr ⟨k, (hmemT k).mpr ⟨hkS, hk⟩, hzk⟩) hzO
 
-theorem exists_specializes_of_homeomorph {α β : Type*} [TopologicalSpace α] [TopologicalSpace β]
-    (p : α → Prop) (q : β → Prop) (f : α → β) (e : {x : α // p x} ≃ₜ {y : β // q y})
-    (he : ∀ x : {x : α // p x}, ((e x : β)) = f (x : α))
-    (ξ : β) (hξ : q ξ) (y : α) (hy : p y) (hs : f y ∈ closure ({ξ} : Set β)) :
-    ∃ x : α, p x ∧ f x = ξ ∧ y ∈ closure ({x} : Set α) := by
+theorem exists_specializes_of_homeomorph
+    {α β : Type*} [TopologicalSpace α] [TopologicalSpace β]
+    (p : α → Prop) (q : β → Prop) (f : α → β)
+    (e : {x : α // p x} ≃ₜ {y : β // q y}) (he : ∀ x : {x : α // p x}, ((e x : β)) = f (x : α))
+    (ξ : β) (hξ : q ξ)
+    (y : α) (hy : p y) (hs : f y ∈ closure ({ξ} : Set β))
+    : ∃ x : α, p x ∧ f x = ξ ∧ y ∈ closure ({x} : Set α) := by
   refine ⟨((e.symm ⟨ξ, hξ⟩ : {x : α // p x}) : α), (e.symm ⟨ξ, hξ⟩).2, ?_, ?_⟩
   · have h1 := he (e.symm ⟨ξ, hξ⟩)
     rw [← h1]
@@ -108,38 +113,45 @@ theorem exists_specializes_of_homeomorph {α β : Type*} [TopologicalSpace α] [
     have h5 := closure_subtype.mp h4
     rwa [Set.image_singleton] at h5
 
-theorem exists_lift_of_specializes_of_isBlowupAlongIdealSheaf {X X' : Scheme.{u}} (π : X' ⟶ X)
-    (Z : X.IdealSheafData) (h : Blowup.IsBlowupAlongIdealSheaf π Z) (ξ : ↥X) (hξ : ξ ∉ Z.support)
-    (y : ↥X') (hy : π y ∉ Z.support) (hs : π y ∈ closure ({ξ} : Set ↥X)) :
-    ∃ x : ↥X', π x = ξ ∧ y ∈ closure ({x} : Set ↥X') := by
+theorem exists_lift_of_specializes_of_isBlowupAlongIdealSheaf
+    {X X' : Scheme.{u}}
+    (π : X' ⟶ X) (Z : X.IdealSheafData) (h : Blowup.IsBlowupAlongIdealSheaf π Z) (ξ : ↥X)
+    (hξ : ξ ∉ Z.support) (y : ↥X') (hy : π y ∉ Z.support) (hs : π y ∈ closure ({ξ} : Set ↥X))
+    : ∃ x : ↥X', π x = ξ ∧ y ∈ closure ({x} : Set ↥X') := by
   have h1 := h.restrict Z.support.compl
   rw [Blowup.comap_ι_support_compl_eq_top Z] at h1
   have hiso : IsIso (π ∣_ Z.support.compl) := h1.isIso_of_top
-  obtain ⟨e, he⟩ : ∃ e : {a : ↥X' // a ∈ (π ⁻¹ᵁ Z.support.compl)} ≃ₜ
-      {b : ↥X // b ∈ Z.support.compl},
-      ∀ a : {a : ↥X' // a ∈ (π ⁻¹ᵁ Z.support.compl)},
-        ((e a : ↥X)) = (⇑π.base) (a : ↥X') :=
-    ⟨Scheme.homeoOfIso (asIso (π ∣_ Z.support.compl)),
-      fun a => morphismRestrict_base_coe π Z.support.compl a⟩
+  obtain ⟨e, he⟩
+      : ∃ e : {a : ↥X' // a ∈ (π ⁻¹ᵁ Z.support.compl)} ≃ₜ {b : ↥X // b ∈ Z.support.compl},
+        ∀ a : {a : ↥X' // a ∈ (π ⁻¹ᵁ Z.support.compl)},
+          ((e a : ↥X)) = (⇑π.base) (a : ↥X') := ⟨
+    Scheme.homeoOfIso (asIso (π ∣_ Z.support.compl)),
+    fun a => morphismRestrict_base_coe π Z.support.compl a
+  ⟩
   have hξ' : ξ ∈ Z.support.compl := hξ
   have hy' : y ∈ (π ⁻¹ᵁ Z.support.compl) := hy
   obtain ⟨x, -, hx1, hx2⟩ :=
-    exists_specializes_of_homeomorph (fun a : ↥X' => a ∈ (π ⁻¹ᵁ Z.support.compl))
-      (fun b : ↥X => b ∈ Z.support.compl) (fun a => (⇑π.base) a) e he ξ hξ' y hy' hs
+    exists_specializes_of_homeomorph
+      (fun a : ↥X' => a ∈ (π ⁻¹ᵁ Z.support.compl))
+      (fun b : ↥X => b ∈ Z.support.compl)
+      (fun a => (⇑π.base) a)
+      e he ξ hξ' y hy' hs
   exact ⟨x, hx1, hx2⟩
 
-theorem eq_of_isBlowupAlongIdealSheaf_of_notMem_support {X X' : Scheme.{u}} (π : X' ⟶ X)
-    (Z : X.IdealSheafData) (h : Blowup.IsBlowupAlongIdealSheaf π Z) (x y : ↥X')
-    (hx : π x ∉ Z.support) (hy : π y ∉ Z.support) (hxy : π x = π y) : x = y := by
+theorem eq_of_isBlowupAlongIdealSheaf_of_notMem_support
+    {X X' : Scheme.{u}} (π : X' ⟶ X) (Z : X.IdealSheafData) (h : Blowup.IsBlowupAlongIdealSheaf π Z)
+    (x y : ↥X') (hx : π x ∉ Z.support) (hy : π y ∉ Z.support) (hxy : π x = π y)
+    : x = y := by
   have h1 := h.restrict Z.support.compl
   rw [Blowup.comap_ι_support_compl_eq_top Z] at h1
   have hiso : IsIso (π ∣_ Z.support.compl) := h1.isIso_of_top
-  obtain ⟨e, he⟩ : ∃ e : {a : ↥X' // a ∈ (π ⁻¹ᵁ Z.support.compl)} ≃ₜ
-      {b : ↥X // b ∈ Z.support.compl},
-      ∀ a : {a : ↥X' // a ∈ (π ⁻¹ᵁ Z.support.compl)},
-        ((e a : ↥X)) = (⇑π.base) (a : ↥X') :=
-    ⟨Scheme.homeoOfIso (asIso (π ∣_ Z.support.compl)),
-      fun a => morphismRestrict_base_coe π Z.support.compl a⟩
+  obtain ⟨e, he⟩
+      : ∃ e : {a : ↥X' // a ∈ (π ⁻¹ᵁ Z.support.compl)} ≃ₜ {b : ↥X // b ∈ Z.support.compl},
+        ∀ a : {a : ↥X' // a ∈ (π ⁻¹ᵁ Z.support.compl)},
+          ((e a : ↥X)) = (⇑π.base) (a : ↥X') := ⟨
+    Scheme.homeoOfIso (asIso (π ∣_ Z.support.compl)),
+    fun a => morphismRestrict_base_coe π Z.support.compl a
+  ⟩
   have hx' : x ∈ (π ⁻¹ᵁ Z.support.compl) := hx
   have hy' : y ∈ (π ⁻¹ᵁ Z.support.compl) := hy
   have key : e ⟨x, hx'⟩ = e ⟨y, hy'⟩ := by
@@ -148,32 +160,33 @@ theorem eq_of_isBlowupAlongIdealSheaf_of_notMem_support {X X' : Scheme.{u}} (π 
     exact hxy
   exact congrArg Subtype.val (e.injective key)
 
-theorem notMem_support_exceptionalIdeal {X X' : Scheme.{u}} (π : X' ⟶ X)
-    (Z : X.IdealSheafData) (y : ↥X') (hy : π y ∉ Z.support) :
-    y ∉ (Blowup.exceptionalIdeal π Z).support := by
-  have h1 : (((Z.comap π).support : TopologicalSpace.Closeds ↥X') : Set ↥X')
-      = ⇑π.base ⁻¹' ((Z.support : TopologicalSpace.Closeds ↥X) : Set ↥X) := by
+theorem notMem_support_exceptionalIdeal
+    {X X' : Scheme.{u}} (π : X' ⟶ X) (Z : X.IdealSheafData) (y : ↥X') (hy : π y ∉ Z.support)
+    : y ∉ (Blowup.exceptionalIdeal π Z).support := by
+  have h1
+      : (((Z.comap π).support : TopologicalSpace.Closeds ↥X') : Set ↥X')
+        = ⇑π.base ⁻¹' ((Z.support : TopologicalSpace.Closeds ↥X) : Set ↥X) := by
     rw [Scheme.IdealSheafData.support_comap]; rfl
   intro hmem
   have hmem' : y ∈ (((Z.comap π).support : TopologicalSpace.Closeds ↥X') : Set ↥X') := hmem
   rw [h1] at hmem'
   exact hy hmem'
 
-theorem exists_eq_closure_of_isIrreducibleComponentOf_strictTransform :
-    ∀ (T : MarkedIdealWithBoundary.{u}), T.IsAdmissible →
-      ∀ (Z : T.scheme.IdealSheafData),
-        AlgebraicGeometry.Smooth (CategoryTheory.CategoryStruct.comp Z.subschemeι T.structMap) →
-        HasStrictNormalCrossingsWith T.structMap Z T.boundary →
-        ∀ (X' : Scheme.{u}) (π : X' ⟶ T.scheme), Blowup.IsBlowupAlongIdealSheaf π Z →
-          ∀ D ∈ T.boundary,
-            ∀ C' : Set ↥X',
-              IsIrreducibleComponentOf C' (↑(Blowup.strictTransform π Z D).support : Set ↥X') →
-              ∃ (η' : ↥X') (C : Set ↥T.scheme),
-                C' = closure ({η'} : Set ↥X') ∧
-                η' ∉ (Blowup.exceptionalIdeal π Z).support ∧
-                IsIrreducibleComponentOf C (↑D.support : Set ↥T.scheme) ∧
-                ¬ C ⊆ (↑Z.support : Set ↥T.scheme) ∧
-                C = closure ({π η'} : Set ↥T.scheme) := by
+theorem exists_eq_closure_of_isIrreducibleComponentOf_strictTransform
+    : ∀ (T : MarkedIdealWithBoundary.{u}),
+      T.IsAdmissible
+        → ∀ (Z : T.scheme.IdealSheafData),
+          AlgebraicGeometry.Smooth (CategoryTheory.CategoryStruct.comp Z.subschemeι T.structMap)
+            → HasStrictNormalCrossingsWith T.structMap Z T.boundary
+            → ∀ (X' : Scheme.{u}) (π : X' ⟶ T.scheme),
+              Blowup.IsBlowupAlongIdealSheaf π Z
+                → ∀ D ∈ T.boundary, ∀ C' : Set ↥X',
+                  IsIrreducibleComponentOf C' (↑(Blowup.strictTransform π Z D).support : Set ↥X')
+                    → ∃ (η' : ↥X') (C : Set ↥T.scheme),
+                      C' = closure ({η'} : Set ↥X') ∧ η' ∉ (Blowup.exceptionalIdeal π Z).support
+                        ∧ IsIrreducibleComponentOf C (↑D.support : Set ↥T.scheme)
+                        ∧ ¬ C ⊆ (↑Z.support : Set ↥T.scheme)
+                        ∧ C = closure ({π η'} : Set ↥T.scheme) := by
   intro T hT Z _hsm _hsnc X' π hπ D _hD C' hC'
   have hTnoeth : AlgebraicGeometry.IsNoetherian T.scheme := hT.isNoetherian
   have hX'noeth : AlgebraicGeometry.IsNoetherian X' := isNoetherian_of_isBlowupAlongIdealSheaf hπ
@@ -183,14 +196,13 @@ theorem exists_eq_closure_of_isIrreducibleComponentOf_strictTransform :
   have hcont : Continuous (⇑π.base) := π.continuous
   have hSclosed : IsClosed (↑(Blowup.strictTransform π Z D).support : Set ↥X') :=
     (Blowup.strictTransform π Z D).support.2
-  have hSeq : (↑(Blowup.strictTransform π Z D).support : Set ↥X')
-      = closure (⇑π.base ⁻¹'
-          ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme))) :=
+  have hSeq
+      : (↑(Blowup.strictTransform π Z D).support : Set ↥X')
+        = closure (⇑π.base ⁻¹' ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme))) :=
     support_strictTransform_eq_closure_preimage π Z D
   have hC'closed : IsClosed C' := by
     have h1 : closure C' = C' :=
-      hC'max (closure C') hC'irr.closure subset_closure
-        (hSclosed.closure_subset_iff.mpr hC'sub)
+      hC'max (closure C') hC'irr.closure subset_closure (hSclosed.closure_subset_iff.mpr hC'sub)
     rw [← h1]
     exact isClosed_closure
   obtain ⟨η', hgen⟩ := QuasiSober.sober hC'irr hC'closed
@@ -199,12 +211,12 @@ theorem exists_eq_closure_of_isIrreducibleComponentOf_strictTransform :
     exists_isOpen_inter_subset_of_maximal (↑(Blowup.strictTransform π Z D).support : Set ↥X')
       hSclosed C' hC'irr hC'sub hC'max
   obtain ⟨w, hwO, hwS⟩ := hOne
-  have hwA : w ∈ closure (⇑π.base ⁻¹'
-      ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme))) := by
+  have hwA
+      : w
+        ∈ closure (⇑π.base ⁻¹' ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme))) := by
     rw [← hSeq]; exact hwS
   obtain ⟨a, haO, haA⟩ := mem_closure_iff.mp hwA O hOopen hwO
-  have haA' : (⇑π.base) a
-      ∈ ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme)) := haA
+  have haA' : (⇑π.base) a ∈ ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme)) := haA
   have haS : a ∈ (↑(Blowup.strictTransform π Z D).support : Set ↥X') := by
     rw [hSeq]
     exact subset_closure haA
@@ -223,23 +235,24 @@ theorem exists_eq_closure_of_isIrreducibleComponentOf_strictTransform :
     rw [← hη'']
     exact subset_closure rfl
   have hπη'D : (⇑π.base) η' ∈ (↑D.support : Set ↥T.scheme) := by
-    have h2 : η' ∈ closure (⇑π.base ⁻¹'
-        ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme))) := by
+    have h2
+        : η' ∈ closure
+          (⇑π.base ⁻¹' ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme))) := by
       rw [← hSeq]; exact hη'S
-    have h3 : closure (⇑π.base ⁻¹'
-          ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme)))
-        ⊆ ⇑π.base ⁻¹' (↑D.support : Set ↥T.scheme) :=
-      closure_minimal (Set.preimage_mono Set.sdiff_subset)
-        (IsClosed.preimage hcont D.support.2)
+    have h3
+        : closure (⇑π.base ⁻¹' ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme)))
+          ⊆ ⇑π.base ⁻¹' (↑D.support : Set ↥T.scheme) :=
+      closure_minimal (Set.preimage_mono Set.sdiff_subset) (IsClosed.preimage hcont D.support.2)
     exact h3 h2
   have hCirr : IsIrreducible (closure ({((⇑π.base) η')} : Set ↥T.scheme)) :=
     isIrreducible_singleton.closure
   have hCsub : closure ({((⇑π.base) η')} : Set ↥T.scheme) ⊆ (↑D.support : Set ↥T.scheme) :=
     closure_minimal (Set.singleton_subset_iff.mpr hπη'D) D.support.2
-  have hCmax : ∀ C₂ : Set ↥T.scheme, IsIrreducible C₂ →
-      closure ({((⇑π.base) η')} : Set ↥T.scheme) ⊆ C₂ →
-      C₂ ⊆ (↑D.support : Set ↥T.scheme) →
-      C₂ = closure ({((⇑π.base) η')} : Set ↥T.scheme) := by
+  have hCmax
+      : ∀ C₂ : Set ↥T.scheme,
+        IsIrreducible C₂ → closure ({((⇑π.base) η')} : Set ↥T.scheme) ⊆ C₂
+          → C₂ ⊆ (↑D.support : Set ↥T.scheme)
+          → C₂ = closure ({((⇑π.base) η')} : Set ↥T.scheme) := by
     intro C₂ hC₂irr hCC₂ hC₂D
     obtain ⟨ξ, hgen2⟩ := QuasiSober.sober hC₂irr.closure isClosed_closure
     have hξ2 : closure ({ξ} : Set ↥T.scheme) = closure C₂ := hgen2
@@ -255,8 +268,7 @@ theorem exists_eq_closure_of_isIrreducibleComponentOf_strictTransform :
     obtain ⟨x, hx1, hx2⟩ :=
       exists_lift_of_specializes_of_isBlowupAlongIdealSheaf π Z hπ ξ hξZ η' hπη' hspec
     have hx1' : (⇑π.base) x = ξ := hx1
-    have hxmem : (⇑π.base) x
-        ∈ ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme)) := by
+    have hxmem : (⇑π.base) x ∈ ((↑D.support : Set ↥T.scheme) \ (↑Z.support : Set ↥T.scheme)) := by
       rw [hx1']
       exact ⟨hξD, hξZ⟩
     have hxS : x ∈ (↑(Blowup.strictTransform π Z D).support : Set ↥X') := by
@@ -275,16 +287,23 @@ theorem exists_eq_closure_of_isIrreducibleComponentOf_strictTransform :
     have himg : (⇑π.base) x ∈ closure (⇑π.base '' ({η'} : Set ↥X')) :=
       image_closure_subset_closure_image hcont ⟨x, hxC', rfl⟩
     rw [Set.image_singleton] at himg
-    have hξC : ξ ∈ closure ({((⇑π.base) η')} : Set ↥T.scheme) := by
-      rw [← hx1']; exact himg
+    have hξC : ξ ∈ closure ({((⇑π.base) η')} : Set ↥T.scheme) := by rw [← hx1']; exact himg
     refine Set.Subset.antisymm ?_ hCC₂
     refine subset_trans subset_closure ?_
     rw [← hξ2]
     exact closure_minimal (Set.singleton_subset_iff.mpr hξC) isClosed_closure
   have hcomp : IsIrreducibleComponentOf (closure ({((⇑π.base) η')} : Set ↥T.scheme))
-      (↑D.support : Set ↥T.scheme) := ⟨hCirr, hCsub, hCmax⟩
-  refine ⟨η', closure ({((⇑π.base) η')} : Set ↥T.scheme), hη''.symm,
-    notMem_support_exceptionalIdeal π Z η' hπη', hcomp, ?_, rfl⟩
+      (↑D.support : Set ↥T.scheme) :=
+    ⟨hCirr, hCsub, hCmax⟩
+  refine ⟨
+    η',
+    closure ({((⇑π.base) η')} : Set ↥T.scheme),
+    hη''.symm,
+    notMem_support_exceptionalIdeal π Z η' hπη',
+    hcomp,
+    ?_,
+    rfl
+  ⟩
   intro hsub
   exact hπη' (hsub (subset_closure rfl))
 

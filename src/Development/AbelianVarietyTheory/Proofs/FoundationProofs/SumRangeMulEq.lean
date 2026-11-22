@@ -12,8 +12,9 @@ open scoped MatrixGroups ModularForm Manifold
 
 namespace GlobalTheory.Hk
 
-theorem sum_range_mul_eq (h : ℕ → ℂ) (q r : ℕ) :
-    ∑ i ∈ Finset.range r, ∑ j ∈ Finset.range q, h (j + q * i) = ∑ m ∈ Finset.range (q * r), h m := by
+theorem sum_range_mul_eq (h : ℕ → ℂ) (q r : ℕ)
+    : ∑ i ∈ Finset.range r, ∑ j ∈ Finset.range q, h (j + q * i)
+      = ∑ m ∈ Finset.range (q * r), h m := by
   induction r with
   | zero => simp
   | succ r ih =>
@@ -27,9 +28,10 @@ theorem im_div_pos (τ : ℍ) (j q : ℕ) (hq : 0 < q) : 0 < (((τ : ℂ) + j) /
   simp only [Complex.add_im, Complex.natCast_im, add_zero]
   exact div_pos τ.im_pos (by exact_mod_cast hq)
 
-theorem uOp_uOp_eq (f : ℍ → ℂ) (a b : ℕ) (ha : 0 < a) (hb : 0 < b) (τ : ℍ) :
-    uOp a (uOp b f) τ =
-      ((a : ℂ) * b)⁻¹ * ∑ m ∈ Finset.range (a * b), f (ofComplex (((τ : ℂ) + m) / ((a : ℂ) * b))) := by
+theorem uOp_uOp_eq (f : ℍ → ℂ) (a b : ℕ) (ha : 0 < a) (hb : 0 < b) (τ : ℍ)
+    : uOp a (uOp b f) τ
+      = ((a : ℂ) * b)⁻¹
+        * ∑ m ∈ Finset.range (a * b), f (ofComplex (((τ : ℂ) + m) / ((a : ℂ) * b))) := by
   have ha' : (a : ℂ) ≠ 0 := by exact_mod_cast ha.ne'
   have hb' : (b : ℂ) ≠ 0 := by exact_mod_cast hb.ne'
   simp only [uOp]
@@ -47,13 +49,13 @@ theorem uOp_uOp_eq (f : ℍ → ℂ) (a b : ℕ) (ha : 0 < a) (hb : 0 < b) (τ :
   field_simp
   ring
 
-theorem uOp_comm (f : ℍ → ℂ) (q r : ℕ) (hq : 0 < q) (hr : 0 < r) :
-    uOp q (uOp r f) = uOp r (uOp q f) := by
+theorem uOp_comm (f : ℍ → ℂ) (q r : ℕ) (hq : 0 < q) (hr : 0 < r)
+    : uOp q (uOp r f) = uOp r (uOp q f) := by
   funext τ
   rw [uOp_uOp_eq f q r hq hr, uOp_uOp_eq f r q hr hq, mul_comm (r : ℂ), Nat.mul_comm r q]
 
-theorem sum_mul_mod (G : ℕ → ℂ) (q r : ℕ) (hq : 0 < q) (hc : Nat.Coprime q r) :
-    ∑ j ∈ Finset.range q, G (r * j % q) = ∑ j ∈ Finset.range q, G j := by
+theorem sum_mul_mod (G : ℕ → ℂ) (q r : ℕ) (hq : 0 < q) (hc : Nat.Coprime q r)
+    : ∑ j ∈ Finset.range q, G (r * j % q) = ∑ j ∈ Finset.range q, G j := by
   have hinj : Set.InjOn (fun j => r * j % q) (Finset.range q : Set ℕ) := by
     intro a ha b hb hab
     simp only [Finset.coe_range, Set.mem_Iio] at ha hb
@@ -69,8 +71,8 @@ theorem sum_mul_mod (G : ℕ → ℂ) (q r : ℕ) (hq : 0 < q) (hc : Nat.Coprime
     · rw [Finset.card_image_of_injOn hinj]
   rw [← Finset.sum_image hinj, himg]
 
-theorem per_ofComplex (g : ℍ → ℂ) (hper : ∀ τ : ℍ, g ((1 : ℝ) +ᵥ τ) = g τ) (z : ℂ) (hz : 0 < z.im) :
-    g (ofComplex (z + 1)) = g (ofComplex z) := by
+theorem per_ofComplex (g : ℍ → ℂ) (hper : ∀ τ : ℍ, g ((1 : ℝ) +ᵥ τ) = g τ) (z : ℂ) (hz : 0 < z.im)
+    : g (ofComplex (z + 1)) = g (ofComplex z) := by
   have hz1 : 0 < (z + 1).im := by simpa using hz
   have h1 : ofComplex (z + 1) = (1 : ℝ) +ᵥ ofComplex z := by
     apply UpperHalfPlane.ext
@@ -79,9 +81,11 @@ theorem per_ofComplex (g : ℍ → ℂ) (hper : ∀ τ : ℍ, g ((1 : ℝ) +ᵥ 
     ring
   rw [h1, hper]
 
-theorem uOp_vOp (g : ℍ → ℂ) (q r : ℕ) (hq : 0 < q) (hr : 0 < r) (hc : Nat.Coprime q r)
-    (hper : ∀ τ : ℍ, g ((1 : ℝ) +ᵥ τ) = g τ) :
-    uOp q (vOp r g) = vOp r (uOp q g) := by
+theorem uOp_vOp
+    (g : ℍ → ℂ)
+    (q r : ℕ) (hq : 0 < q) (hr : 0 < r) (hc : Nat.Coprime q r)
+    (hper : ∀ τ : ℍ, g ((1 : ℝ) +ᵥ τ) = g τ)
+    : uOp q (vOp r g) = vOp r (uOp q g) := by
   funext τ
   have hq' : (q : ℂ) ≠ 0 := by exact_mod_cast hq.ne'
   have hw : 0 < ((r : ℂ) * τ).im := by
@@ -111,15 +115,16 @@ theorem uOp_vOp (g : ℍ → ℂ) (q r : ℕ) (hq : 0 < q) (hr : 0 < r) (hc : Na
   have hmod : ∀ m, G m = G (m % q) := fun m => by
     conv_lhs => rw [← Nat.mod_add_div m q]
     exact hGq _ _
-  calc ∑ j ∈ Finset.range q, g (ofComplex ((r : ℂ) * ↑(ofComplex (((τ : ℂ) + j) / q))))
-      = ∑ j ∈ Finset.range q, G (r * j) := by
-        refine Finset.sum_congr rfl fun j _ => ?_
-        simp only [hG]
-        rw [ofComplex_apply_of_im_pos (im_div_pos τ j q hq)]
-        congr 2
-        rw [hwdef]
-        push_cast
-        field_simp
+  calc
+    ∑ j ∈ Finset.range q, g (ofComplex ((r : ℂ) * ↑(ofComplex (((τ : ℂ) + j) / q))))
+        = ∑ j ∈ Finset.range q, G (r * j) := by
+      refine Finset.sum_congr rfl fun j _ => ?_
+      simp only [hG]
+      rw [ofComplex_apply_of_im_pos (im_div_pos τ j q hq)]
+      congr 2
+      rw [hwdef]
+      push_cast
+      field_simp
     _ = ∑ j ∈ Finset.range q, G (r * j % q) := Finset.sum_congr rfl fun j _ => hmod _
     _ = ∑ j ∈ Finset.range q, G j := sum_mul_mod G q r hq hc
     _ = _ := rfl
@@ -139,9 +144,12 @@ theorem T_mem_lev (N l : ℕ) : ModularGroup.T ∈ lev N l := by
   · rw [Gamma0_mem]
     simp [ModularGroup.T]
 
-theorem uOp_heckeT_comm : ∀ (N l q r : ℕ) (k : ℤ) (σ : SL(2, ℤ)), 0 < N → 0 < l → q.Prime → q ∣ N * l →
-    r.Prime → ¬ r ∣ N * l → GlobalTheory.Hk.IsDia N l r σ → ∀ f : ModularForm (GlobalTheory.Hk.lev N l) k,
-    GlobalTheory.Hk.uOp q (GlobalTheory.Hk.heckeT k r σ ⇑f) = GlobalTheory.Hk.heckeT k r σ (GlobalTheory.Hk.uOp q ⇑f) := by
+theorem uOp_heckeT_comm
+    : ∀ (N l q r : ℕ) (k : ℤ) (σ : SL(2, ℤ)),
+      0 < N → 0 < l → q.Prime → q ∣ N * l → r.Prime → ¬ r ∣ N * l → GlobalTheory.Hk.IsDia N l r σ
+        → ∀ f : ModularForm (GlobalTheory.Hk.lev N l) k,
+          GlobalTheory.Hk.uOp q (GlobalTheory.Hk.heckeT k r σ ⇑f)
+            = GlobalTheory.Hk.heckeT k r σ (GlobalTheory.Hk.uOp q ⇑f) := by
   intro N l q r k σ hN hl hq hqd hr hrd hσ f
   have hq0 : 0 < q := hq.pos
   have hr0 : 0 < r := hr.pos
@@ -160,7 +168,8 @@ theorem uOp_heckeT_comm : ∀ (N l q r : ℕ) (k : ℤ) (σ : SL(2, ℤ)), 0 < N
       rw [denom]; simp [ModularGroup.coe_T]
     rw [SL_slash_apply, modular_T_smul] at h2
     simpa [hden] using h2
-  have hd := GlobalTheory.T.heckeUOperatorExplicit_comm_diamondOperatorOfMatrix N l q k r σ hN hl hq hqd hσ f
+  have hd :=
+    GlobalTheory.T.heckeUOperatorExplicit_comm_diamondOperatorOfMatrix N l q k r σ hN hl hq hqd hσ f
   unfold GlobalTheory.Hk.dia at hd
   simp only [GlobalTheory.Hk.heckeT]
   rw [uOp_add, uOp_smul, uOp_comm _ q r hq0 hr0, uOp_vOp _ q r hq0 hr0 hcop hper, hd]

@@ -8,16 +8,23 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem dualV_pairing_exists : ∀ (r g rk : ℕ) (Mq : Matrix (Fin r) (Fin r) ℚ) (V : Submodule ℚ (Fin r → ℚ)) (ε : Fin g → Fin r → ℚ), Mqᵀ = -Mq → LinearIndependent ℚ ε → (∀ i : Fin g, i.val < rk → ∀ w ∈ V, ε i ⬝ᵥ Mq *ᵥ w = 0) → (∀ y : Fin r → ℚ, (∀ w ∈ V, y ⬝ᵥ Mq *ᵥ w = 0) → y ∈ Submodule.span ℚ (ε '' {i | i.val < rk})) → ∀ j : Fin g, rk ≤ j.val → ∃ x ∈ V, ∀ i, x ⬝ᵥ Mq *ᵥ ε i = if i = j then 1 else 0 := by
+theorem dualV_pairing_exists
+    : ∀ (r g rk : ℕ) (Mq : Matrix (Fin r) (Fin r) ℚ) (V : Submodule ℚ (Fin r → ℚ))
+        (ε : Fin g → Fin r → ℚ),
+      Mqᵀ = -Mq → LinearIndependent ℚ ε → (∀ i : Fin g, i.val < rk → ∀ w ∈ V, ε i ⬝ᵥ Mq *ᵥ w = 0)
+        → (∀ y : Fin r → ℚ,
+          (∀ w ∈ V, y ⬝ᵥ Mq *ᵥ w = 0) → y ∈ Submodule.span ℚ (ε '' {i | i.val < rk}))
+        → ∀ j : Fin g, rk ≤ j.val → ∃ x ∈ V, ∀ i, x ⬝ᵥ Mq *ᵥ ε i = if i = j then 1 else 0 := by
   intro r g rk Mq V ε hskew hli horth hperp j hj
   have skew : ∀ x y : Fin r → ℚ, x ⬝ᵥ Mq *ᵥ y = -(y ⬝ᵥ Mq *ᵥ x) := by
     intro x y
     rw [dotProduct_mulVec x Mq y, dotProduct_comm y, ← vecMul_transpose, hskew, vecMul_neg,
       neg_dotProduct, neg_neg]
-  let Φ : (Fin r → ℚ) →ₗ[ℚ] (Fin g → ℚ) :=
-    { toFun := fun x i => x ⬝ᵥ Mq *ᵥ ε i
-      map_add' := by intro x y; funext i; simp [add_dotProduct]
-      map_smul' := by intro c x; funext i; simp [smul_dotProduct] }
+  let Φ : (Fin r → ℚ) →ₗ[ℚ] (Fin g → ℚ) := {
+    toFun := fun x i => x ⬝ᵥ Mq *ᵥ ε i
+    map_add' := by intro x y; funext i; simp [add_dotProduct]
+    map_smul' := by intro c x; funext i; simp [smul_dotProduct]
+  }
   have hΦ : ∀ x i, Φ x i = x ⬝ᵥ Mq *ᵥ ε i := fun _ _ => rfl
   suffices h : Pi.single j (1 : ℚ) ∈ V.map Φ by
     obtain ⟨x, hx, hxe⟩ := h
@@ -60,7 +67,7 @@ theorem dualV_pairing_exists : ∀ (r g rk : ℕ) (Mq : Matrix (Fin r) (Fin r) �
   have heV : ∀ w ∈ V, e ⬝ᵥ Mq *ᵥ w = 0 := by
     intro w hw
     rw [he, sum_dotProduct]
-    have : ∑ i, (a' i • ε i) ⬝ᵥ Mq *ᵥ w = -∑ i, a' i * Φ w i := by
+    have : ∑ i, (a' i • ε i) ⬝ᵥ Mq *ᵥ w = - ∑ i, a' i * Φ w i := by
       rw [← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [smul_dotProduct, smul_eq_mul, hΦ, skew w, mul_neg, neg_neg]
@@ -71,7 +78,8 @@ theorem dualV_pairing_exists : ∀ (r g rk : ℕ) (Mq : Matrix (Fin r) (Fin r) �
   let c' : Fin g → ℚ := fun i => l i
   have hc' : ∑ i, c' i • ε i = e := by
     rw [← hc, Finsupp.linearCombination_apply, Finsupp.sum_fintype]
-    intro i; simp
+    intro i
+    simp
   have hzero : ∑ i, (a' i - c' i) • ε i = 0 := by
     simp only [sub_smul, Finset.sum_sub_distrib, hc', he, sub_self]
   have := Fintype.linearIndependent_iff.mp hli _ hzero j

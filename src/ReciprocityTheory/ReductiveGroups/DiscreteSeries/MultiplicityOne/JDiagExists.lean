@@ -14,13 +14,14 @@ namespace ReciprocityTheory.ChartRestriction.DS.Mult1
 
 open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
 
-theorem isHaarOn_smul_of {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (hμ : IsHaarOn U μ)
-    {c : ℝ≥0∞} (hc0 : c ≠ 0) (hct : c ≠ ∞) : IsHaarOn U (c • μ) := by
+theorem isHaarOn_smul_of
+    {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (hμ : IsHaarOn U μ)
+    {c : ℝ≥0∞} (hc0 : c ≠ 0) (hct : c ≠ ∞)
+    : IsHaarOn U (c • μ) := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rw [smul_apply, hμ.conc, smul_zero]
   · intro a ha
-    have hcont : Continuous (lmulM (k := k) (r := r) a) :=
-      continuous_const.matrix_mul continuous_id
+    have hcont : Continuous (lmulM (k := k) (r := r) a) := continuous_const.matrix_mul continuous_id
     rw [Measure.map_smul c hcont.measurable.aemeasurable, hμ.left a ha]
   · intro a ha
     have hcont : Continuous (rmulF a) := continuous_id.matrix_mul continuous_const
@@ -59,17 +60,17 @@ theorem stDiagExists (h : UnitaryGroupStructuralFacts) : StDiagExists := by
     exact ne_top_of_le_ne_top (hW.finite_compact _ hcomp).ne h1
   have hc0 : (D.μW Set.univ)⁻¹ ≠ 0 := ENNReal.inv_ne_zero.mpr hmt
   have hct : (D.μW Set.univ)⁻¹ ≠ ∞ := ENNReal.inv_ne_top.mpr hm0
-  have hH : IsHaarOn (UWset k r D.z) ((D.μW Set.univ)⁻¹ • D.μW) :=
-    isHaarOn_smul_of D.haarW hc0 hct
+  have hH : IsHaarOn (UWset k r D.z) ((D.μW Set.univ)⁻¹ • D.μW) := isHaarOn_smul_of D.haarW hc0 hct
   have hH' : IsHaarOn (UWset k r D.z') ((D.μW Set.univ)⁻¹ • D.μW) := by
     rw [hDz', ← hDz]
     exact hH
-  let D' : RealPlaceData k r Wp Wp :=
-    { D with
-      μW := (D.μW Set.univ)⁻¹ • D.μW
-      μW' := (D.μW Set.univ)⁻¹ • D.μW
-      haarW := hH
-      haarW' := hH' }
+  let D' : RealPlaceData k r Wp Wp := {
+    D with
+    μW := (D.μW Set.univ)⁻¹ • D.μW
+    μW' := (D.μW Set.univ)⁻¹ • D.μW
+    haarW := hH
+    haarW' := hH'
+  }
   refine ⟨D', hDz, hDπ, ?_⟩
   refine ⟨hDz'.trans hDz.symm, hDπ'.trans hDπ.symm, rfl, ?_, ?_⟩
   · show ((D.μW Set.univ)⁻¹ • D.μW) Set.univ = 1

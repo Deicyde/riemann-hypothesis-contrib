@@ -12,16 +12,27 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemHatIff
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.RecTie Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3 ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.RecTie Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3
+  ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.PlaceOverSplit
 
-theorem eq_or_eq_cP : ∀ (D : D7), D.host.F = maximalRealSubfield D.host.E → ∀ (s : SplitPlace D.host.E) (Q : Formalism.L2.DIV.Pl D.host.E), Q.asIdeal.comap (algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E)) = s.v.asIdeal → Q = s.w ∨ Q = GlobalTheory.IdemSupport.cP s.w := by
+theorem eq_or_eq_cP
+    : ∀ (D : D7),
+      D.host.F = maximalRealSubfield D.host.E
+        → ∀ (s : SplitPlace D.host.E) (Q : Formalism.L2.DIV.Pl D.host.E),
+          Q.asIdeal.comap (algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E)) = s.v.asIdeal
+            → Q = s.w ∨ Q = GlobalTheory.IdemSupport.cP s.w := by
   intro D _ s Q hQ
-  rcases GlobalTheory.SplitConjPlace.eq_or_eq_conjPlE (D := D) s.w Q (hQ.trans s.w_under.symm) with e | e
+  rcases GlobalTheory.SplitConjPlace.eq_or_eq_conjPlE (D := D) s.w Q (hQ.trans s.w_under.symm) with
+    e | e
   · exact Or.inl e
   · refine Or.inr (e.trans (HeightOneSpectrum.ext (Ideal.ext fun x => ?_)))
     rw [GlobalTheory.SplitConjPlace.mem_conjPlE, GlobalTheory.IdemSupport.mem_cP]

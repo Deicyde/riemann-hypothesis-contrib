@@ -4,11 +4,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open scoped TensorProduct
 
-theorem UpperTheory.V.Lit.Bor.ipDef :
-    UpperTheory.V.Lit.Bor.IpDef := by
+theorem UpperTheory.V.Lit.Bor.ipDef : UpperTheory.V.Lit.Bor.IpDef := by
   intro E _ _ _ a n e he M _ _ _ _ H N hH q
   refine ⟨fun ω η => ?_, fun ω hω => ⟨?_, fun h0 => ?_⟩⟩
   set_option synthInstance.maxHeartbeats 100000 in

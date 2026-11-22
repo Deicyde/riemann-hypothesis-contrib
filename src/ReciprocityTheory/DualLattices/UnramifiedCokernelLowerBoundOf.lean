@@ -13,27 +13,33 @@ namespace ReciprocityTheory.PGsh.Up
 
 open ReciprocityTheory.PGsh.L2
 
-abbrev cokGen {g : ℕ} {R : Type} [CommRing R] (Ht : Matrix (Fin g) (Ix g) R)
-    (A : Matrix (Fin g) (Fin g) R) (B : Matrix (Ix g) (Ix g) R) :=
+abbrev cokGen
+    {g : ℕ} {R : Type} [CommRing R]
+    (Ht : Matrix (Fin g) (Ix g) R) (A : Matrix (Fin g) (Fin g) R) (B : Matrix (Ix g) (Ix g) R) :=
   LinearMap.range (Matrix.mulVecLin Aᵀ) ⧸
     ((LinearMap.range (Matrix.mulVecLin B)).map (Matrix.mulVecLin Ht)).comap
       (LinearMap.range (Matrix.mulVecLin Aᵀ)).subtype
 
 def LenExStatement : Prop :=
   ∀ (C : Type) [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
-    v.Integers R → ∀ (g : ℕ) (Ht : Matrix (Fin g) (Ix g) R) (A : Matrix (Fin g) (Fin g) R)
-    (B : Matrix (Ix g) (Ix g) R), ∃ x, HasLen v R (cokGen Ht A B) x
+    v.Integers R
+      → ∀ (g : ℕ) (Ht : Matrix (Fin g) (Ix g) R) (A : Matrix (Fin g) (Fin g) R)
+          (B : Matrix (Ix g) (Ix g) R),
+        ∃ x,
+          HasLen v R (cokGen Ht A B) x
 
 def KilledGenStatement : Prop :=
   ∀ (C : Type) [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
-    v.Integers R → ∀ (M : Type) [AddCommGroup M] [Module R M] (x : NNReal) (d : ℕ) (c : R),
-    HasLen v R M x → (∃ y : Fin d → M, Submodule.span R (Set.range y) = ⊤) →
-    (∀ m : M, c • m = 0) → v (algebraMap R C c) ^ d ≤ x
+    v.Integers R
+      → ∀ (M : Type) [AddCommGroup M] [Module R M] (x : NNReal) (d : ℕ) (c : R),
+        HasLen v R M x → (∃ y : Fin d → M, Submodule.span R (Set.range y) = ⊤)
+          → (∀ m : M, c • m = 0)
+          → v (algebraMap R C c) ^ d ≤ x
 
 def IdemGenStatement : Prop :=
-  ∀ (R : Type) [CommRing R] (g d : ℕ) (P : Matrix (Fin g) (Fin g) R), P * P = P →
-    Nonempty (LinearMap.range (Matrix.mulVecLin P) ≃ₗ[R] (Fin d → R)) →
-    ∃ y : Fin d → LinearMap.range (Matrix.mulVecLin Pᵀ), Submodule.span R (Set.range y) = ⊤
+  ∀ (R : Type) [CommRing R] (g d : ℕ) (P : Matrix (Fin g) (Fin g) R),
+    P * P = P → Nonempty (LinearMap.range (Matrix.mulVecLin P) ≃ₗ[R] (Fin d → R))
+      → ∃ y : Fin d → LinearMap.range (Matrix.mulVecLin Pᵀ), Submodule.span R (Set.range y) = ⊤
 
 private lemma mul_eq_smul_one_comm_of_ne_zero {n : Type*} [Fintype n] [DecidableEq n] {R : Type*} [CommRing R]
     [IsDomain R] {A B : Matrix n n R} {c : R} (hc : c ≠ 0) (h : A * B = c • 1) :
@@ -86,8 +92,11 @@ lemma span_mk_top {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] (N : S
 
 section HTDfacts
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
 
 lemma htd_domain (hS : HodgeTateSetting p v R O σ cp) : IsDomain R := by
@@ -153,15 +162,16 @@ lemma vp_rpow (hS : HodgeTateSetting p v R O σ cp) (d : ℕ) :
 
 end HTDfacts
 
-theorem permutedCokernelLowerBound_of (hU6 : CokernelLengthComparisonStatement) (hEx : LenExStatement) (hKG : KilledGenStatement)
-    (hIG : IdemGenStatement) : PermutedCokernelLowerBoundStatement := by
+theorem permutedCokernelLowerBound_of
+    (hU6 : CokernelLengthComparisonStatement) (hEx : LenExStatement) (hKG : KilledGenStatement)
+    (hIG : IdemGenStatement)
+    : PermutedCokernelLowerBoundStatement := by
   unfold PermutedCokernelLowerBoundStatement
   intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hS H m e π he hσ hP1 hP2 hL1 hL2 w hw d hd cw hcw
-  have hidem : H.ρL (e (π w)) * H.ρL (e (π w)) = H.ρL (e (π w)) := by
-    rw [← map_mul, he, if_pos rfl]
+  have hidem : H.ρL (e (π w)) * H.ρL (e (π w)) = H.ρL (e (π w)) := by rw [← map_mul, he, if_pos rfl]
   obtain ⟨y, hy⟩ := hIG R g d (H.ρL (e (π w))) hidem hd
-  obtain ⟨cwb, hcwb⟩ := hEx C v R hS.integers g H.Ht (H.ρL (e (π w)))
-    ((H.ρ (e w)).map (algebraMap ℤ_[p] R))
+  obtain ⟨cwb, hcwb⟩ :=
+    hEx C v R hS.integers g H.Ht (H.ρL (e (π w))) ((H.ρ (e w)).map (algebraMap ℤ_[p] R))
   have hkill := av_kill hS H (e (π w)) (e w) (hσ w)
   have hgen : ∃ y' : Fin d → htCoker H (e (π w)) (e w), Submodule.span R (Set.range y') = ⊤ :=
     ⟨fun k => Submodule.Quotient.mk (y k), span_mk_top _ y hy⟩
@@ -172,8 +182,11 @@ theorem permutedCokernelLowerBound_of (hU6 : CokernelLengthComparisonStatement) 
 
 section Unram
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
 
 lemma cj_cj (hS : HodgeTateSetting p v R O σ cp) {H : HodgeTateDatum p g v R O σ cp}
@@ -249,26 +262,30 @@ lemma up_kill (hS : HodgeTateSetting p v R O σ cp) (H : HodgeTateDatum p g v R 
 
 end Unram
 
-theorem unramifiedCokernelLowerBound_of (hU7 : UnramifiedCokernelLengthStatement) (hEx : LenExStatement) (hKG : KilledGenStatement)
-    (hIG : IdemGenStatement) : UnramifiedCokernelLowerBoundStatement := by
+theorem unramifiedCokernelLowerBound_of
+    (hU7 : UnramifiedCokernelLengthStatement) (hEx : LenExStatement) (hKG : KilledGenStatement)
+    (hIG : IdemGenStatement)
+    : UnramifiedCokernelLowerBoundStatement := by
   unfold UnramifiedCokernelLowerBoundStatement
   intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hp2 hS H U i V1 hV1
-  have hidem : U.εL (U.cj i) * U.εL (U.cj i) = U.εL (U.cj i) := by
-    rw [U.εL_orth, if_pos rfl]
+  have hidem : U.εL (U.cj i) * U.εL (U.cj i) = U.εL (U.cj i) := by rw [U.εL_orth, if_pos rfl]
   obtain ⟨y, hy⟩ := hIG R g (U.r (U.cj i)) (U.εL (U.cj i)) hidem (U.rank (U.cj i))
   obtain ⟨V2, hV2⟩ := hEx C v R hS.integers g H.Ht (U.εL (U.cj i)) (U.εT i)
   have hkill := up_kill hS H U i
-  have hgen : ∃ y' : Fin (U.r (U.cj i)) → cokE H.Ht U.εT U.εL (U.cj i) i,
-      Submodule.span R (Set.range y') = ⊤ :=
+  have hgen
+      : ∃ y' : Fin (U.r (U.cj i)) → cokE H.Ht U.εT U.εL (U.cj i) i,
+        Submodule.span R (Set.range y') = ⊤ :=
     ⟨fun k => Submodule.Quotient.mk (y k), span_mk_top _ y hy⟩
-  have h1 := hKG C v R hS.integers (cokE H.Ht U.εT U.εL (U.cj i) i) V2 (U.r (U.cj i)) cp hV2
-    hgen hkill
+  have h1 :=
+    hKG C v R hS.integers (cokE H.Ht U.εT U.εL (U.cj i) i) V2 (U.r (U.cj i)) cp hV2 hgen hkill
   have h2 := hU7 p g C v R O σ cp hp2 hS H U i V1 V2 hV1 hV2
   have h3 := vp_rpow hS (U.r (U.cj i))
   have hx : (0 : ℝ) < (v (algebraMap R C (p : R)) : ℝ) :=
     NNReal.coe_pos.2 (pos_iff_ne_zero.2 hS.p_ne)
-  have hsplit : ((U.r i : ℝ) + U.r (U.cj i)) / (p - 1) - frobSum U i =
-      (U.r (U.cj i) : ℝ) / (p - 1) + ((U.r i : ℝ) / (p - 1) - frobSum U i) := by ring
+  have hsplit
+      : ((U.r i : ℝ) + U.r (U.cj i)) / (p - 1) - frobSum U i
+        = (U.r (U.cj i) : ℝ) / (p - 1) + ((U.r i : ℝ) / (p - 1) - frobSum U i) := by
+    ring
   rw [hsplit, Real.rpow_add hx, h2, h3]
   apply mul_le_mul_of_nonneg_right _ (Real.rpow_nonneg hx.le _)
   exact_mod_cast h1

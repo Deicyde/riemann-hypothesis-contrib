@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPinned
 
 @[expose] public section
 
-open NumberField AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj GlobalTheory.GeoLevel GlobalTheory.LevelCusp GlobalTheory.FrameUnif
+open NumberField AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj GlobalTheory.GeoLevel
+  GlobalTheory.LevelCusp GlobalTheory.FrameUnif
 open GlobalTheory.Dict (castFr)
 open GlobalTheory.FrameNorm (IsUnitFr)
 open scoped Matrix
@@ -37,15 +40,19 @@ private lemma col_mul_eq_mulVec_col' {r : ℕ} (A M : Matrix (Fin r) (Fin r) ℂ
   funext k
   simp [_root_.ReciprocityTheory.ChartRestriction.G.FD.col, Matrix.mulVec, dotProduct, Matrix.mul_apply]
 
-
 open NumberField AlgebraicGeometry CategoryTheory in
 open scoped Matrix in
-theorem _root_.GlobalTheory.GeoLevel.perFr_lact_of_isMatch : ∀ (E : Type) [Field E] [NumberField E]
-    [IsCMField E] (r : ℕ) (X X' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) (a : GL (Fin r) E)
-    (h : _root_.GlobalTheory.LevelCusp.IsMatch X X' a) (x : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r) (v : Fin r → E)
-    (τ : E →+* ℂ) (i : ℕ),
-    _root_.Formalism.L2.PjFree.perFr X' (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact a (_root_.GlobalTheory.Dict.castFr h.psi x))
-        ((a : Matrix (Fin r) (Fin r) E) *ᵥ v) τ i = _root_.Formalism.L2.PjFree.perFr X x v τ i := by
+theorem _root_.GlobalTheory.GeoLevel.perFr_lact_of_isMatch
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
+        (X X' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) (a : GL (Fin r) E)
+        (h : _root_.GlobalTheory.LevelCusp.IsMatch X X' a)
+        (x : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r) (v : Fin r → E)
+        (τ : E →+* ℂ) (i : ℕ),
+      _root_.Formalism.L2.PjFree.perFr X'
+          (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact a
+            (_root_.GlobalTheory.Dict.castFr h.psi x))
+          ((a : Matrix (Fin r) (Fin r) E) *ᵥ v) τ i
+        = _root_.Formalism.L2.PjFree.perFr X x v τ i := by
   intro E _ _ _ r X X' a h x v τ i
   have hΨ := h.psi
   have hp := h.p0
@@ -60,8 +67,9 @@ theorem _root_.GlobalTheory.GeoLevel.perFr_lact_of_isMatch : ∀ (E : Type) [Fie
     · have hi' : X'.p0 + i < r := hp ▸ hi
       rw [dite_eq_left hi', dite_eq_left hi]
       have hfin : (⟨X'.p0 + i, hi'⟩ : Fin r) = ⟨X.p0 + i, hi⟩ := Fin.ext (by simp [hp])
-      rw [hfin, mat_lact_castFr_eq_map_mul hΨ a x τ hτ' hτ, emb_mulVec_eq_map_mulVec_emb, Matrix.mul_inv_rev,
-        Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hA, Matrix.mul_one]
+      rw [hfin, mat_lact_castFr_eq_map_mul hΨ a x τ hτ' hτ, emb_mulVec_eq_map_mulVec_emb,
+        Matrix.mul_inv_rev, Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hA,
+        Matrix.mul_one]
     · have hi' : ¬ X'.p0 + i < r := hp ▸ hi
       rw [dite_eq_right hi', dite_eq_right hi]
   · have hτ' : τ ∉ X'.Ψ := hΨ ▸ hτ
@@ -73,7 +81,8 @@ theorem _root_.GlobalTheory.GeoLevel.perFr_lact_of_isMatch : ∀ (E : Type) [Fie
       · have hj' : X'.p0 - 1 - i < r := hp ▸ hj
         rw [dite_eq_left hj', dite_eq_left hj]
         have hfin : (⟨X'.p0 - 1 - i, hj'⟩ : Fin r) = ⟨X.p0 - 1 - i, hj⟩ := Fin.ext (by simp [hp])
-        rw [hfin, mat_lact_castFr_eq_map_mul hΨ a x _ hσ' hσ, col_mul_eq_mulVec_col', emb_mulVec_eq_map_mulVec_emb]
+        rw [hfin, mat_lact_castFr_eq_map_mul hΨ a x _ hσ' hσ, col_mul_eq_mulVec_col',
+          emb_mulVec_eq_map_mulVec_emb]
         exact h.hermC_eq _ _ _
       · have hj' : ¬ X'.p0 - 1 - i < r := hp ▸ hj
         rw [dite_eq_right hj', dite_eq_right hj]

@@ -10,12 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmThetaNo
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.NormSum
 
-theorem intSt_and_archSt : IntSt ∧ ArchSt :=
-  ⟨GlobalTheory.T.classSumDenominatorBound_of_cmThetaHypotheses GlobalTheory.T.cmThetaNormBoundHypotheses_satisfied, GlobalTheory.T.thetaJetClassSum_archimedeanBound_of_cmTheta GlobalTheory.T.cmThetaNormBoundHypotheses_satisfied⟩
+theorem intSt_and_archSt : IntSt ∧ ArchSt := ⟨
+  GlobalTheory.T.classSumDenominatorBound_of_cmThetaHypotheses
+    GlobalTheory.T.cmThetaNormBoundHypotheses_satisfied,
+  GlobalTheory.T.thetaJetClassSum_archimedeanBound_of_cmTheta
+    GlobalTheory.T.cmThetaNormBoundHypotheses_satisfied
+⟩
 
 end GlobalTheory.NormSum

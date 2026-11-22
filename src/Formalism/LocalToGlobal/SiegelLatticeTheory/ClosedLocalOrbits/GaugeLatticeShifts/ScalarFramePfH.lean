@@ -11,9 +11,11 @@ open scoped Classical
 
 namespace Formalism.L2.SG.Pf.ScalarFramePf
 
-open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc
-open PI.ScalarPairDr.W (mem_orth hT_swap orth_orth finrank_orth fvec_castSucc fvec_last mem_orth_Xplus
-  X_le_orth_Xplus mem_ThPairs hT_add_left hT_sub_left hT_smul_left)
+open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc
+open PI.ScalarPairDr.W
+  (mem_orth hT_swap orth_orth finrank_orth fvec_castSucc fvec_last mem_orth_Xplus X_le_orth_Xplus
+    mem_ThPairs hT_add_left hT_sub_left hT_smul_left)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,17 +24,20 @@ section Lat
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
 theorem exists_hos : ∃ _P : HeightOneSpectrum (𝓞 E), True := by
-  obtain ⟨p, hp0, hp⟩ := Ring.not_isField_iff_exists_prime.1 (NumberField.RingOfIntegers.not_isField E)
+  obtain ⟨p, hp0, hp⟩ :=
+    Ring.not_isField_iff_exists_prime.1 (NumberField.RingOfIntegers.not_isField E)
   exact ⟨⟨p, hp, hp0⟩, trivial⟩
 
-theorem X_le_spanE_of_conv (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (g : ℕ) (hc : IsFixedConv Λ g F) :
-    Xsp F ≤ spanE S (XLam Λ F) := by
+theorem X_le_spanE_of_conv
+    (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (g : ℕ) (hc : IsFixedConv Λ g F)
+    : Xsp F ≤ spanE S (XLam Λ F) := by
   obtain ⟨P, -⟩ := exists_hos (E := E)
   have := P.isPrime
   obtain ⟨c, hc0, -, heq⟩ := hc.1 P
   rw [Xsp, FlagG.X, Submodule.span_le]
   rintro _ ⟨a, rfl⟩
-  have h1 : c a • F.fl.e a ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F) := by
+  have h1
+      : c a • F.fl.e a ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F) := by
     rw [heq]
     exact ⟨1, Submonoid.one_mem _, by rw [one_smul]; exact Submodule.subset_span ⟨a, rfl⟩⟩
   obtain ⟨s, hs, hsx⟩ := h1
@@ -44,8 +49,8 @@ theorem X_le_spanE_of_conv (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (g : 
     exact P.asIdeal.zero_mem
   have hmem : s • (c a • F.fl.e a) ∈ spanE S (XLam Λ F) := Submodule.subset_span hsx
   have e : F.fl.e a = ((algebraMap (𝓞 E) E s) * c a)⁻¹ • (s • (c a • F.fl.e a)) := by
-    rw [algebra_compatible_smul E s, smul_smul, smul_smul, mul_assoc, inv_mul_cancel₀ (mul_ne_zero hs0 (hc0 a)),
-      one_smul]
+    rw [algebra_compatible_smul E s, smul_smul, smul_smul, mul_assoc,
+      inv_mul_cancel₀ (mul_ne_zero hs0 (hc0 a)), one_smul]
   rw [SetLike.mem_coe, e]
   exact Submodule.smul_mem _ _ hmem
 
@@ -115,12 +120,13 @@ theorem hT_X_alt (F : FlagG S r T) {x : S.V} (hx : x ∈ F.X) : S.hT x F.z = 0 :
     | smul c x _ ihx => rw [hT_smul_left, ihx, mul_zero]
   exact key F.z F.z_orth x hx
 
-theorem theta_eq (Λ : Submodule (𝓞 E) S.V) (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T')
-    (β : S.V ≃ₗ[E] S.V) (hn : finrank E S.V = k + 2 * r + 1)
-    (hd1 : finrank E (UUE Λ F F') = 2 * r + 2) (hd2 : finrank E (UUE Λ F F'') = 2 * r + 2)
+theorem theta_eq
+    (Λ : Submodule (𝓞 E) S.V) (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
+    (hn : finrank E S.V = k + 2 * r + 1) (hd1 : finrank E (UUE Λ F F') = 2 * r + 2)
+    (hd2 : finrank E (UUE Λ F F'') = 2 * r + 2)
     (hU1 : UUE Λ F F' = Submodule.span E (Set.range (Sum.elim F.fl.fvec F'.fl.fvec)))
-    (hG' : Gval F F' ≠ 0) (hs : s0 Λ F F' F'' β k = 1) :
-    Th Λ F F' F'' β = Hp Λ F F' ∧ Th'' Λ F F' F'' β = Hp Λ F F'' := by
+    (hG' : Gval F F' ≠ 0) (hs : s0 Λ F F' F'' β k = 1)
+    : Th Λ F F' F'' β = Hp Λ F F' ∧ Th'' Λ F F' F'' β = Hp Λ F F'' := by
   have hH1 : finrank E (Hp Λ F F') + 1 = k := by
     have := finrank_orth S (UUE Λ F F')
     rw [Hp]
@@ -165,9 +171,11 @@ theorem theta_eq (Λ : Submodule (𝓞 E) S.V) (k : ℕ) (F : LFlag S r T) (F' F
   have h3 := Submodule.finrank_mono hTh''le
   omega
 
-theorem ylift_tr (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
-    (hTh : Th Λ F F' F'' β = Hp Λ F F') {y : S.V} (hy : y ∈ UUE Λ F F'') (hyo : y ∈ orth S (Xplus F)) :
-    y ∈ UUE Λ F F' := by
+theorem ylift_tr
+    (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
+    (hTh : Th Λ F F' F'' β = Hp Λ F F')
+    {y : S.V} (hy : y ∈ UUE Λ F F'') (hyo : y ∈ orth S (Xplus F))
+    : y ∈ UUE Λ F F' := by
   rw [← orth_orth S (UUE Λ F F'), mem_orth]
   intro v hv
   have hv' : v ∈ Th Λ F F' F'' β := by rw [hTh]; exact hv
@@ -181,9 +189,11 @@ theorem ylift_tr (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFlag
   show S.hT p.1 y = 0
   rw [this, hT_add_left, e1, e2, add_zero]
 
-theorem ylift_tr' (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
-    (hTh : Th'' Λ F F' F'' β = Hp Λ F F'') {y : S.V} (hy : y ∈ UUE Λ F F') (hyo : y ∈ orth S (Xplus F)) :
-    y ∈ UUE Λ F F'' := by
+theorem ylift_tr'
+    (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
+    (hTh : Th'' Λ F F' F'' β = Hp Λ F F'')
+    {y : S.V} (hy : y ∈ UUE Λ F F') (hyo : y ∈ orth S (Xplus F))
+    : y ∈ UUE Λ F F'' := by
   rw [← orth_orth S (UUE Λ F F''), mem_orth]
   intro v hv
   have hv' : v ∈ Th'' Λ F F' F'' β := by rw [hTh]; exact hv
@@ -197,10 +207,12 @@ theorem ylift_tr' (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFla
   show S.hT p.2 y = 0
   rw [this, hT_sub_left, e1, e2, sub_zero]
 
-theorem ylift_beta (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
+theorem ylift_beta
+    (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
     (hiso : ∀ x y, S.hT (β x) (β y) = S.hT x y) (hX : ∀ x ∈ Xsp F'', β.symm x ∈ Xsp F')
-    (hTh : Th'' Λ F F' F'' β = Hp Λ F F'') {y : S.V} (hy : y ∈ UUE Λ F F') (hyo : y ∈ orth S (Xsp F')) :
-    β y ∈ UUE Λ F F'' := by
+    (hTh : Th'' Λ F F' F'' β = Hp Λ F F'')
+    {y : S.V} (hy : y ∈ UUE Λ F F') (hyo : y ∈ orth S (Xsp F'))
+    : β y ∈ UUE Λ F F'' := by
   rw [← orth_orth S (UUE Λ F F''), mem_orth]
   intro v hv
   have hv' : v ∈ Th'' Λ F F' F'' β := by rw [hTh]; exact hv

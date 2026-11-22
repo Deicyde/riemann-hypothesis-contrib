@@ -13,27 +13,44 @@ namespace GlobalTheory.HypPrimVec
 section
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E}
 
-theorem hconj (x y : S.V) : star (S.hT x y) = S.hT y x :=
-  LinearMap.isSymm_def.mp S.herm x y
+theorem hconj (x y : S.V) : star (S.hT x y) = S.hT y x := LinearMap.isSymm_def.mp S.herm x y
 
-theorem mem_dual_iff (Λ : Submodule (𝓞 E) S.V) (x : S.V) :
-    x ∈ Formalism.HermitianLatticesTheory.dual S.hT Λ ↔ ∀ y ∈ Λ, ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x := by
-  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-    LinearMap.restrictScalars_apply, Submodule.mem_one]
+theorem mem_dual_iff (Λ : Submodule (𝓞 E) S.V) (x : S.V)
+    : x ∈ Formalism.HermitianLatticesTheory.dual S.hT Λ
+      ↔ ∀ y ∈ Λ, ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x := by
+  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+    Submodule.mem_comap, LinearMap.restrictScalars_apply, Submodule.mem_one]
 
-theorem mem_of_dual {Λ : Submodule (𝓞 E) S.V} (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) {x : S.V}
-    (h : ∀ y ∈ Λ, ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x) : x ∈ Λ := by
+theorem mem_of_dual
+    {Λ : Submodule (𝓞 E) S.V} (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ)
+    {x : S.V} (h : ∀ y ∈ Λ, ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x)
+    : x ∈ Λ := by
   have hx : x ∈ Formalism.HermitianLatticesTheory.dual S.hT Λ := (mem_dual_iff Λ x).2 h
   rwa [hU] at hx
 
-theorem pair_mem {Λ : Submodule (𝓞 E) S.V} (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) {x y : S.V}
-    (hx : x ∈ Λ) (hy : y ∈ Λ) : ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x := by
+theorem pair_mem
+    {Λ : Submodule (𝓞 E) S.V} (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ)
+    {x y : S.V} (hx : x ∈ Λ) (hy : y ∈ Λ)
+    : ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x := by
   have hx' : x ∈ Formalism.HermitianLatticesTheory.dual S.hT Λ := by rw [hU]; exact hx
   exact (mem_dual_iff Λ x).1 hx' y hy
 
 end
 
-theorem exists_primitive_norm_neg : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E], CMData F E → ∀ (S : HSpace E) (Λ : Submodule (𝓞 E) S.V), Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ → (∃ x : 𝓞 E, (x : E) + star (x : E) = 1) → ∀ (e f : S.V) (c : FractionalIdeal (nonZeroDivisors (𝓞 E)) E), c ≠ 0 → S.hT e e = 0 → S.hT f f = 0 → S.hT e f = 1 → (∀ x ∈ c, x • e ∈ Λ) → (∀ y ∈ Λ, S.hT f y ∈ c) → ∀ T : ℕ, T ≠ 0 → ∃ z : S.V, z ∈ Submodule.span E {e, f} ∧ z ∈ Λ ∧ S.hT z z = -((T : ℕ) : E) ∧ ∀ γ : E, γ • z ∈ Λ → ∃ o : 𝓞 E, (o : E) = γ := by
+theorem exists_primitive_norm_neg
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E],
+      CMData F E
+        → ∀ (S : HSpace E) (Λ : Submodule (𝓞 E) S.V),
+          Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ
+            → (∃ x : 𝓞 E, (x : E) + star (x : E) = 1)
+            → ∀ (e f : S.V) (c : FractionalIdeal (nonZeroDivisors (𝓞 E)) E),
+              c ≠ 0 → S.hT e e = 0 → S.hT f f = 0 → S.hT e f = 1 → (∀ x ∈ c, x • e ∈ Λ)
+                → (∀ y ∈ Λ, S.hT f y ∈ c)
+                → ∀ T : ℕ,
+                  T ≠ 0
+                    → ∃ z : S.V,
+                      z ∈ Submodule.span E {e, f} ∧ z ∈ Λ ∧ S.hT z z = -((T : ℕ) : E)
+                        ∧ ∀ γ : E, γ • z ∈ Λ → ∃ o : 𝓞 E, (o : E) = γ := by
   intro F E _ _ _ _ _ _ hcm S Λ hU hx e f c hc hee hff hef hce hfc T hT
   obtain ⟨x, hx⟩ := hx
 
@@ -45,13 +62,14 @@ theorem exists_primitive_norm_neg : ∀ (F E : Type) [Field F] [NumberField F] [
     have h' := congrArg (fun r : 𝓞 E => (r : E)) h
     simpa using h'
 
-  obtain ⟨P, hP0, hPP, ⟨t, p0, hp0, htp⟩, α, hα⟩ := GlobalTheory.T.exists_ideal_coprime_conj_mul_eq_spanSingleton' F E hcm c hc (T : 𝓞 E) hTne
+  obtain ⟨P, hP0, hPP, ⟨t, p0, hp0, htp⟩, α, hα⟩ :=
+    GlobalTheory.T.exists_ideal_coprime_conj_mul_eq_spanSingleton' F E hcm c hc (T : 𝓞 E) hTne
   have htpE : (t : E) * (T : E) + (p0 : E) = 1 := by
     have h' := congrArg (fun r : 𝓞 E => (r : E)) htp
     simpa using h'
 
-  obtain ⟨p, hp, q, hq, hpq⟩ := Submodule.mem_sup.1
-    (show (1 : 𝓞 E) ∈ P ⊔ P.comap (RingOfIntegers.mapRingHom (starRingEnd E)) by
+  obtain ⟨p, hp, q, hq, hpq⟩ :=
+    Submodule.mem_sup.1 (show (1 : 𝓞 E) ∈ P ⊔ P.comap (RingOfIntegers.mapRingHom (starRingEnd E)) by
       rw [hPP]; exact Submodule.mem_top)
   have hq' : RingOfIntegers.mapRingHom (starRingEnd E) q ∈ P := Ideal.mem_comap.1 hq
   have hpqE : (p : E) + (q : E) = 1 := by
@@ -61,8 +79,7 @@ theorem exists_primitive_norm_neg : ∀ (F E : Type) [Field F] [NumberField F] [
     RingOfIntegers.mapRingHom (starRingEnd E) x with hw
   have hwP : w ∈ P := P.add_mem (P.mul_mem_right _ hp) (P.mul_mem_right _ hq')
   have hwE : (w : E) + star (w : E) = 1 := by
-    have e1 : (w : E) = (p : E) * x + star (q : E) * star (x : E) := by
-      rw [hw]; push_cast; rfl
+    have e1 : (w : E) = (p : E) * x + star (q : E) * star (x : E) := by rw [hw]; push_cast; rfl
     have hs : star (p : E) + star (q : E) = 1 := by rw [← star_add, hpqE, star_one]
     rw [e1, star_add, star_mul', star_mul', star_star, star_star]
     linear_combination (x : E) * hpqE + star (x : E) * hs + hx
@@ -101,10 +118,9 @@ theorem exists_primitive_norm_neg : ∀ (F E : Type) [Field F] [NumberField F] [
 
   set b : E := star (-(T : E) * (w : E) / α) with hb
   have h1 : star α * b = -(T : E) * star (w : E) := by
-    rw [hb, ← star_mul', show α * (-(T : E) * (w : E) / α) = -(T : E) * w by field_simp,
-      star_mul', star_neg, star_natCast]
-  have h2 : star b * α = -(T : E) * (w : E) := by
-    rw [hb, star_star]; field_simp
+    rw [hb, ← star_mul', show α * (-(T : E) * (w : E) / α) = -(T : E) * w by field_simp, star_mul',
+      star_neg, star_natCast]
+  have h2 : star b * α = -(T : E) * (w : E) := by rw [hb, star_star]; field_simp
   refine ⟨α • e + b • f, ?_, ?_, ?_, ?_⟩
   · exact Submodule.add_mem _ (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
       (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
@@ -112,7 +128,9 @@ theorem exists_primitive_norm_neg : ∀ (F E : Type) [Field F] [NumberField F] [
     obtain ⟨o, ho⟩ := hPc w hwP (S.hT f y) (hfc y hy)
     refine ⟨-(T : 𝓞 E) * RingOfIntegers.mapRingHom (starRingEnd E) o, ?_⟩
     have key : -(T : E) * w / α * S.hT f y = -(T : E) * o := by
-      calc -(T : E) * w / α * S.hT f y = -(T : E) * ((w : E) * S.hT f y) / α := by ring
+      calc
+        -(T : E) * w / α * S.hT f y
+          = -(T : E) * ((w : E) * S.hT f y) / α := by ring
         _ = -(T : E) * ((o : E) * α) / α := by rw [ho]
         _ = -(T : E) * o := by field_simp
     rw [LinearMap.map_smul, ← hconj f y, smul_eq_mul, hb, ← star_mul', key, star_mul', star_neg,
@@ -126,7 +144,8 @@ theorem exists_primitive_norm_neg : ∀ (F E : Type) [Field F] [NumberField F] [
     linear_combination h1 + h2 - (T : E) * hwE
   · intro γ hγ
     have hfz : S.hT f (γ • (α • e + b • f)) = γ * α := by
-      simp only [map_add (f := _), LinearMap.map_smul, smul_eq_mul, hff, hfe, RingHom.id_apply]; ring
+      simp only [map_add (f := _), LinearMap.map_smul, smul_eq_mul, hff, hfe, RingHom.id_apply]
+      ring
     have hγα : γ * α ∈ c := hfz ▸ hfc _ hγ
     obtain ⟨o1, ho1⟩ := hPc p0 hp0 _ hγα
     obtain ⟨o2, ho2⟩ := hPc w hwP _ hγα
@@ -136,13 +155,16 @@ theorem exists_primitive_norm_neg : ∀ (F E : Type) [Field F] [NumberField F] [
     have E3 : (o3 : E) = -(T : E) * γ * star (w : E) := by
       have hez : S.hT (α • e) (γ • (α • e + b • f)) = γ * (star α * b) := by
         simp only [map_add (f := _), LinearMap.map_smulₛₗ, LinearMap.smul_apply, LinearMap.map_smul,
-          smul_eq_mul, hee, hef, starRingEnd_apply, RingHom.id_apply]; ring
+          smul_eq_mul, hee, hef, starRingEnd_apply, RingHom.id_apply]
+        ring
       rw [hez, h1] at ho3
       change (o3 : E) = _ at ho3
-      rw [ho3]; ring
+      rw [ho3]
+      ring
     refine ⟨o2 + (-t * o3 + RingOfIntegers.mapRingHom (starRingEnd E) w * o1), ?_⟩
-    have hcast : ((o2 + (-t * o3 + RingOfIntegers.mapRingHom (starRingEnd E) w * o1) : 𝓞 E) : E) =
-        (o2 : E) + (-(t : E) * o3 + star (w : E) * o1) := by
+    have hcast
+        : ((o2 + (-t * o3 + RingOfIntegers.mapRingHom (starRingEnd E) w * o1) : 𝓞 E) : E)
+          = (o2 : E) + (-(t : E) * o3 + star (w : E) * o1) := by
       push_cast; rfl
     rw [hcast]
     linear_combination E2 - (t : E) * E3 + star (w : E) * E1 + γ * star (w : E) * htpE + γ * hwE

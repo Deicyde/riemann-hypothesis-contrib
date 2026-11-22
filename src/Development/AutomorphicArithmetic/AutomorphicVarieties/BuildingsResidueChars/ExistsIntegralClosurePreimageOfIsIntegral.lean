@@ -5,8 +5,10 @@ public import Mathlib
 @[expose] public section
 
 open Polynomial in
-theorem UpperTheory.exists_integralClosure_preimage_of_isIntegral :
-    ∀ (R E k : Type) [CommRing R] [Field E] [IsAlgClosed E] [Algebra R E] [CommRing k] [IsDomain k] (ψ : integralClosure R E →+* k) (x : k), IsIntegral ℤ x → ∃ y, ψ y = x := by
+theorem UpperTheory.exists_integralClosure_preimage_of_isIntegral
+    : ∀ (R E k : Type) [CommRing R] [Field E] [IsAlgClosed E] [Algebra R E] [CommRing k]
+        [IsDomain k] (ψ : integralClosure R E →+* k) (x : k),
+      IsIntegral ℤ x → ∃ y, ψ y = x := by
   intro R E k _ _ _ _ _ _ ψ x hx
   classical
   obtain ⟨p, hpm, hpx⟩ := hx
@@ -17,15 +19,23 @@ theorem UpperTheory.exists_integralClosure_preimage_of_isIntegral :
   have hlift : ∀ a ∈ q.roots, ((lift a : integralClosure R E) : E) = a := by
     intro a ha
     have hr : q.IsRoot a := (mem_roots hqm.ne_zero).1 ha
-    have hi : IsIntegral ℤ a := ⟨p, hpm, by
-      rw [eval₂_eq_eval_map]
-      exact hr⟩
+    have hi : IsIntegral ℤ a := ⟨
+      p,
+      hpm,
+      by
+        rw [eval₂_eq_eval_map]
+        exact hr
+    ⟩
     have hiR : IsIntegral R a := hi.tower_top
     simp [lift, hiR]
-  have hfac : p.map (algebraMap ℤ (integralClosure R E)) = (q.roots.map fun a => X - C (lift a)).prod := by
+  have hfac
+      : p.map (algebraMap ℤ (integralClosure R E))
+        = (q.roots.map fun a => X - C (lift a)).prod := by
     apply Polynomial.map_injective (algebraMap (integralClosure R E) E) Subtype.val_injective
     rw [Polynomial.map_map, Polynomial.map_multiset_prod, Multiset.map_map]
-    have e : (algebraMap (integralClosure R E) E).comp (algebraMap ℤ (integralClosure R E)) = algebraMap ℤ E :=
+    have e
+        : (algebraMap (integralClosure R E) E).comp (algebraMap ℤ (integralClosure R E))
+          = algebraMap ℤ E :=
       RingHom.ext_int _ _
     rw [e, ← hq]
     conv_lhs => rw [hqs.eq_prod_roots_of_monic hqm]

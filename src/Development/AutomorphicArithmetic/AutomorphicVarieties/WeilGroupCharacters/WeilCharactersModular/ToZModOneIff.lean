@@ -4,15 +4,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.W
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.HV UpperTheory.V.W
 
-private theorem toZMod_one_iff {l : ℕ} [Fact l.Prime] (x : ℤ_[l]) :
-    PadicInt.toZMod x = 1 ↔ PadicInt.toZModPow 1 x = 1 := by
-  rw [← map_one (PadicInt.toZMod (p := l)), ← map_one (PadicInt.toZModPow (p := l) 1), ← RingHom.sub_mem_ker_iff,
-    ← RingHom.sub_mem_ker_iff, PadicInt.ker_toZMod, PadicInt.ker_toZModPow, PadicInt.maximalIdeal_eq_span_p, pow_one]
+private theorem toZMod_one_iff {l : ℕ} [Fact l.Prime] (x : ℤ_[l])
+    : PadicInt.toZMod x = 1 ↔ PadicInt.toZModPow 1 x = 1 := by
+  rw [← map_one (PadicInt.toZMod (p := l)), ← map_one (PadicInt.toZModPow (p := l) 1),
+    ← RingHom.sub_mem_ker_iff, ← RingHom.sub_mem_ker_iff, PadicInt.ker_toZMod,
+    PadicInt.ker_toZModPow, PadicInt.maximalIdeal_eq_span_p, pow_one]
 
-private theorem fix_iff {l : ℕ} [Fact l.Prime] {Ω : Type} [Field Ω] {ζ : Ω} (hζ : IsPrimitiveRoot ζ l) (x : ℤ_[l]) :
-    ζ ^ (PadicInt.toZModPow 1 x).val = ζ ↔ PadicInt.toZMod x = 1 := by
+private theorem fix_iff
+    {l : ℕ} [Fact l.Prime] {Ω : Type} [Field Ω] {ζ : Ω} (hζ : IsPrimitiveRoot ζ l) (x : ℤ_[l])
+    : ζ ^ (PadicInt.toZModPow 1 x).val = ζ ↔ PadicInt.toZMod x = 1 := by
   have h1 : 1 < l ^ 1 := by simpa using (Fact.out : l.Prime).one_lt
   haveI : Fact (1 < l ^ 1) := ⟨h1⟩
   haveI : NeZero (l ^ 1) := ⟨by omega⟩
@@ -26,8 +29,11 @@ private theorem fix_iff {l : ℕ} [Fact l.Prime] {Ω : Type} [Field Ω] {ζ : Ω
   · intro h
     rw [h, ZMod.val_one, pow_one]
 
-theorem UpperTheory.V.W.muL :
-    ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (V : s.Lev), (¬ ∃ ζ : L, IsPrimitiveRoot ζ l) ↔ ∃ g : V.frame.G₀, PadicInt.toZMod ((V.frame.ε g : ℤ_[l]ˣ) : ℤ_[l]) ≠ 1 := by
+theorem UpperTheory.V.W.muL
+    : ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω]
+        [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (V : s.Lev),
+      (¬ ∃ ζ : L, IsPrimitiveRoot ζ l)
+        ↔ ∃ g : V.frame.G₀, PadicInt.toZMod ((V.frame.ε g : ℤ_[l]ˣ) : ℤ_[l]) ≠ 1 := by
   intro l _ L Ω _ _ _ _ _ _ s V
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed L
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap L Ω).injective
@@ -35,10 +41,14 @@ theorem UpperTheory.V.W.muL :
   have : IsGalois L Ω := ⟨⟩
   have hε : ∀ σ : G L Ω, V.ε (V.pr σ).1 = cycZ (Lp L) Ω l (resP L Ω σ) := fun σ =>
     DFunLike.congr_fun V.hε (resP L Ω σ)
-  have key : ∀ (σ : G L Ω) (ζ : Ω), IsPrimitiveRoot ζ l →
-      (σ ζ = ζ ↔ PadicInt.toZMod ((V.ε (V.pr σ).1 : ℤ_[l]ˣ) : ℤ_[l]) = 1) := fun σ ζ hζ => by
-    have h : σ ζ = ζ ^ (PadicInt.toZModPow 1 ((cycZ (Lp L) Ω l (resP L Ω σ) : ℤ_[l]ˣ) : ℤ_[l])).val :=
-      cyclotomicCharacter.spec (L := Ω) l (MulSemiringAction.toRingAut (Ω ≃ₐ[Lp L] Ω) Ω (resP L Ω σ)) ζ
+  have key
+      : ∀ (σ : G L Ω) (ζ : Ω),
+        IsPrimitiveRoot ζ l
+          → (σ ζ = ζ ↔ PadicInt.toZMod ((V.ε (V.pr σ).1 : ℤ_[l]ˣ) : ℤ_[l]) = 1) := fun σ ζ hζ => by
+    have h
+        : σ ζ = ζ ^ (PadicInt.toZModPow 1 ((cycZ (Lp L) Ω l (resP L Ω σ) : ℤ_[l]ˣ) : ℤ_[l])).val :=
+      cyclotomicCharacter.spec (L := Ω) l
+        (MulSemiringAction.toRingAut (Ω ≃ₐ[Lp L] Ω) Ω (resP L Ω σ)) ζ
         (by rw [pow_one, hζ.pow_eq_one])
     rw [hε, h, fix_iff hζ]
   have hsurj : ∀ g : V.η.ker, ∃ σ : G L Ω, V.pr σ = g := fun g => by

@@ -9,17 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLocalizati
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem locModel_fracField_algEquiv : ∀ {K κ : Type} [Field K] [Field κ] [Algebra ℂ K] [Algebra ℂ κ]
-  (R : Subring K) (π : R →+* κ), IsLocModel (algebraMap ℂ K) R →
-  (∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a) →
-  (∀ f : κ, ∃ a b : R, π b ≠ 0 ∧ f * π b = π a) → Function.Injective π →
-  ∃ e : K ≃ₐ[ℂ] κ, ∀ r : R, e r = π r := by
+theorem locModel_fracField_algEquiv
+    : ∀ {K κ : Type} [Field K] [Field κ] [Algebra ℂ K] [Algebra ℂ κ] (R : Subring K) (π : R →+* κ),
+      IsLocModel (algebraMap ℂ K) R
+        → (∀ a (h : algebraMap ℂ K a ∈ R), π ⟨algebraMap ℂ K a, h⟩ = algebraMap ℂ κ a)
+        → (∀ f : κ, ∃ a b : R, π b ≠ 0 ∧ f * π b = π a) → Function.Injective π
+        → ∃ e : K ≃ₐ[ℂ] κ, ∀ r : R, e r = π r := by
   intro K κ _ _ _ _ R π hR hc hsurj hinj
   haveI : FaithfulSMul R K :=
     (faithfulSMul_iff_algebraMap_injective R K).mpr Subtype.val_injective

@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
 private lemma exists_pow_mem_of_fixed (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L]
     [Normal K L] (q : ℕ) [ExpChar K q] (x : L) (hx : ∀ σ : L ≃ₐ[K] L, σ x = x) :
@@ -82,7 +83,8 @@ theorem UpperTheory.Gal.TranscendenceTraces.galTrans_of : InvTrans → GalTrans 
     change g • ((a : integralClosure A L) * b) = (a : integralClosure A L) * (g • b)
     rw [smul_mul', show g • (a : integralClosure A L) = a from a.2 g]⟩
   haveI : Algebra.IsInvariant A' (integralClosure A L) G := ⟨fun b hb => ⟨⟨b, hb⟩, rfl⟩⟩
-  obtain ⟨g, hg⟩ := hInv A' (integralClosure A L) G Ω φ φ' (by
-    ext a
-    exact eq_of_fixed A L Ω φ φ' h a fun g => a.2 g)
+  obtain ⟨g, hg⟩ :=
+    hInv A' (integralClosure A L) G Ω φ φ' (by
+      ext a
+      exact eq_of_fixed A L Ω φ φ' h a fun g => a.2 g)
   exact ⟨g, hg⟩

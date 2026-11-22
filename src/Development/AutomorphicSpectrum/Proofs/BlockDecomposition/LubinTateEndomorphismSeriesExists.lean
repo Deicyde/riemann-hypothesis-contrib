@@ -7,29 +7,38 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Valuatio
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
 open scoped Classical
 set_option maxSynthPendingDepth 1
 
 namespace GlobalTheory.CompanionTheory.LTPer
 
-theorem map_subst_comm {A B : Type} [CommRing A] [CommRing B] (h : A →+* B) {F G : PowerSeries A}
-    {F' : PowerSeries B} (hF' : PowerSeries.map h F = F')
-    (hF : PowerSeries.constantCoeff F = 0) (hG : PowerSeries.constantCoeff G = 0)
-    (hs : PowerSeries.subst G F = PowerSeries.subst F G) :
-    PowerSeries.subst (PowerSeries.map h G) F' = PowerSeries.subst F' (PowerSeries.map h G) := by
+theorem map_subst_comm
+    {A B : Type} [CommRing A] [CommRing B]
+    (h : A →+* B)
+    {F G : PowerSeries A} {F' : PowerSeries B}
+    (hF' : PowerSeries.map h F = F') (hF : PowerSeries.constantCoeff F = 0)
+    (hG : PowerSeries.constantCoeff G = 0) (hs : PowerSeries.subst G F = PowerSeries.subst F G)
+    : PowerSeries.subst (PowerSeries.map h G) F' = PowerSeries.subst F' (PowerSeries.map h G) := by
   subst hF'
   have h2 := congrArg (MvPowerSeries.map h) hs
   rw [PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero hG),
-    PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero hF)] at h2
+      PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero hF)]
+    at h2
   exact h2
 
-
-open GlobalTheory.CompanionTheory.LTHodge.CharEx GroundTheory.LocalField GroundTheory.LocalField.FormalGroup ValuativeRel in
-theorem exists_series_comm : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π : ↥(OL K)), Irreducible π → ∀ a : ↥(OL K),
-    ∃ φ : PowerSeries ↥(OL K), PowerSeries.constantCoeff φ = 0 ∧ PowerSeries.coeff 1 φ = a ∧
-      PowerSeries.subst φ (ltSeries π) = PowerSeries.subst (ltSeries π) φ := by
+open GlobalTheory.CompanionTheory.LTHodge.CharEx GroundTheory.LocalField
+  GroundTheory.LocalField.FormalGroup ValuativeRel in
+theorem exists_series_comm
+    : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π : ↥(OL K)),
+      Irreducible π
+        → ∀ a : ↥(OL K), ∃ φ : PowerSeries ↥(OL K),
+          PowerSeries.constantCoeff φ = 0 ∧ PowerSeries.coeff 1 φ = a
+            ∧ PowerSeries.subst φ (ltSeries π) = PowerSeries.subst (ltSeries π) φ := by
   intro l _ K π hπ a
   have : FiniteDimensional ℚ_[l] ↥K.1 := K.2
   let e : ↥(OL K) ≃+* 𝒪[↥K.1] := intEquiv K

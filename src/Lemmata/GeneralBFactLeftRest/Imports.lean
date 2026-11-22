@@ -8,8 +8,10 @@ open NumberField Module
 
 namespace Bl.general_b_fact_left_rest
 
-theorem goal1 {G T : Type*} [Group G] (N : Subgroup G) (f : G → T) (hs : Function.Surjective f)
-    (hf : ∀ a b, f a = f b ↔ a⁻¹ * b ∈ N) : N.index = Nat.card T := by
+theorem goal1
+    {G T : Type*} [Group G]
+    (N : Subgroup G) (f : G → T) (hs : Function.Surjective f) (hf : ∀ a b, f a = f b ↔ a⁻¹ * b ∈ N)
+    : N.index = Nat.card T := by
   show Nat.card (G ⧸ N) = Nat.card T
   refine Nat.card_congr (Equiv.ofBijective (Quotient.lift f ?_) ⟨?_, ?_⟩)
   · intro a b h

@@ -9,10 +9,13 @@ public import GroundTheory.GlobalFields.TateThesis.AdelePoissonUniform
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Base
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af
+  UpperTheory.V.Base
 open scoped Matrix SchwartzMap ContDiff
-open MeasureTheory GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.V.Sd UpperTheory.V.Published
+open MeasureTheory GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.V.Sd
+  UpperTheory.V.Published
 
 namespace UpperTheory.HilbertEisensteinWeightOne.EisensteinSmoothness
 
@@ -50,18 +53,23 @@ def rowv (g : GA F 2) (a : Ideles F) (ξ : Fin 2 → F) : Fin 2 → Ad F :=
 def colv (g : GA F 2) (a : Ideles F) (ξ : Fin 2 → F) : Fin 2 → Ad F :=
   ((Mcol g a : GA F 2) : Matrix (Fin 2) (Fin 2) (Ad F)) *ᵥ rowA ξ
 
-
 open Classical in
 def finRow (c : HeightOneSpectrum (𝓞 F) → ℕ) (y : Fin 2 → Ad F) : ℂ :=
-  if ∀ w, Valued.v (pLoc F w (pFin F (y 0))) ≤ WithZero.exp (-(c w : ℤ)) ∧
-      Valued.v (pLoc F w (pFin F (y 1)) - 1) ≤ WithZero.exp (-(c w : ℤ)) then 1 else 0
-
+  if ∀ w,
+      Valued.v (pLoc F w (pFin F (y 0))) ≤ WithZero.exp (-(c w : ℤ))
+        ∧ Valued.v (pLoc F w (pFin F (y 1)) - 1) ≤ WithZero.exp (-(c w : ℤ)) then
+    1
+  else
+    0
 
 open Classical in
 def finCol (c : HeightOneSpectrum (𝓞 F) → ℕ) (y : Fin 2 → Ad F) : ℂ :=
-  if ∀ w, Valued.v (pLoc F w (pFin F (y 0))) ≤ WithZero.exp ((c w : ℤ) + dd w) ∧
-      Valued.v (pLoc F w (pFin F (y 1))) ≤ WithZero.exp ((c w : ℤ) + dd w)
-  then ((finiteAdelicChar F (pFin F (y 1)) : Circle) : ℂ) else 0
+  if ∀ w,
+      Valued.v (pLoc F w (pFin F (y 0))) ≤ WithZero.exp ((c w : ℤ) + dd w)
+        ∧ Valued.v (pLoc F w (pFin F (y 1))) ≤ WithZero.exp ((c w : ℤ) + dd w) then
+    ((finiteAdelicChar F (pFin F (y 1)) : Circle) : ℂ)
+  else
+    0
 
 def vInf (y : Fin 2 → Ad F) : Vr F := fun i => UpperTheory.V.TR.pInf F (y i)
 
@@ -76,14 +84,18 @@ def kap2 (χ : HChar F) (c : HeightOneSpectrum (𝓞 F) → ℕ) (g : GA F 2) (q
 def w2 (g : GA F 2) (q : Pp F × Xi F) : Vr F := vInf (colv g (av q.1) q.2.1)
 
 def B1lin : Vr F →ₗ[ℝ] UpperTheory.V.TR.Lie F 2 →ₗ[ℝ] Vr F :=
-  LinearMap.mk₂ ℝ (fun w x => w ᵥ* Matrix.of x)
-    (fun w w' x => Matrix.add_vecMul _ _ _) (fun r w x => Matrix.smul_vecMul _ _ _)
+  LinearMap.mk₂ ℝ
+    (fun w x => w ᵥ* Matrix.of x)
+    (fun w w' x => Matrix.add_vecMul _ _ _)
+    (fun r w x => Matrix.smul_vecMul _ _ _)
     (fun w x x' => by exact Matrix.vecMul_add _ _ _)
     (fun r w x => by exact Matrix.vecMul_smul (R := ℝ) _ _ _)
 
 def B2lin : Vr F →ₗ[ℝ] UpperTheory.V.TR.Lie F 2 →ₗ[ℝ] Vr F :=
-  LinearMap.mk₂ ℝ (fun w z => Matrix.of z *ᵥ w)
-    (fun w w' z => Matrix.mulVec_add _ _ _) (fun r w z => Matrix.mulVec_smul _ _ _)
+  LinearMap.mk₂ ℝ
+    (fun w z => Matrix.of z *ᵥ w)
+    (fun w w' z => Matrix.mulVec_add _ _ _)
+    (fun r w z => Matrix.mulVec_smul _ _ _)
     (fun w z z' => by exact Matrix.add_mulVec _ _ _)
     (fun r w z => by exact Matrix.smul_mulVec (R := ℝ) _ _ _)
 
@@ -93,11 +105,17 @@ def B1 : Vr F →L[ℝ] UpperTheory.V.TR.Lie F 2 →L[ℝ] Vr F :=
 def B2 : Vr F →L[ℝ] UpperTheory.V.TR.Lie F 2 →L[ℝ] Vr F :=
   LinearMap.toContinuousLinearMap (LinearMap.toContinuousLinearMap.toLinearMap ∘ₗ B2lin)
 
-@[simp] theorem left_bilinear_apply (w : Vr F) (x : UpperTheory.V.TR.Lie F 2) : B1 w x = w ᵥ* Matrix.of x := rfl
+@[simp]
+theorem left_bilinear_apply (w : Vr F) (x : UpperTheory.V.TR.Lie F 2) : B1 w x = w ᵥ* Matrix.of x :=
+  rfl
 
-@[simp] theorem right_bilinear_apply (w : Vr F) (z : UpperTheory.V.TR.Lie F 2) : B2 w z = Matrix.of z *ᵥ w := rfl
+@[simp]
+theorem right_bilinear_apply (w : Vr F) (z : UpperTheory.V.TR.Lie F 2)
+    : B2 w z = Matrix.of z *ᵥ w :=
+  rfl
 
-def invL (x : UpperTheory.V.TR.Lie F 2) : UpperTheory.V.TR.Lie F 2 := UpperTheory.V.TR.toL (Matrix.of x)⁻¹
+def invL (x : UpperTheory.V.TR.Lie F 2) : UpperTheory.V.TR.Lie F 2 :=
+  UpperTheory.V.TR.toL (Matrix.of x)⁻¹
 
 def dl (g : GA F 2) (x : UpperTheory.V.TR.Lie F 2) : ℝ := absD g * ∏ v, (Matrix.det (Matrix.of x)) v
 

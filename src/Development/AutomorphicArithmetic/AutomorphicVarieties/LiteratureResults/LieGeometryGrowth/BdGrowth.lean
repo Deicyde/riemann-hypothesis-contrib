@@ -7,15 +7,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open UpperTheory.V.Lit.Geo NumberField GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
+open UpperTheory.V.Lit.Geo NumberField GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
 
-theorem UpperTheory.V.Lit.Geo.bdGrowth :
-    BdGrowth := by
+theorem UpperTheory.V.Lit.Geo.bdGrowth : BdGrowth := by
   intro E _ _ _ a Ξ q α
   obtain ⟨T, B, hB, hT⟩ := bdBasis E a Ξ q
   have hq := (qhtFacts E a).1
-  have hr : ∀ g, qht (E := E) (a := a)
-      (GroundTheory.Automorphic.CuspidalSpectrum.retractOne g : KernelIndexFullLattice.G1 E a).1 = qht g := fun g => by
+  have hr
+      : ∀ g,
+        qht (E := E) (a := a)
+            (GroundTheory.Automorphic.CuspidalSpectrum.retractOne g
+              : KernelIndexFullLattice.G1 E a).1
+          = qht g := fun g => by
     obtain ⟨t, ht⟩ := (retrFacts E a).1 g
     have h := (qhtFacts E a).2.1 1 t g
     rw [map_one, one_mul] at h

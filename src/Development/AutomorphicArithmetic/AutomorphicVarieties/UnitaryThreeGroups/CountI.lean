@@ -10,21 +10,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CMFieldExpo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp
+  Matrix IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
-private theorem absorb (A N t e : ℝ) (k a : ℕ) (hk : A ≤ 16 ^ k) (hN : 16 ≤ N) (he : 0 ≤ e) (het : e + 1 ≤ t) :
-    A * N * (N * (e + 1)) ^ a ≤ (N * t) ^ (k + 1 + a) := by
+private theorem absorb
+    (A N t e : ℝ) (k a : ℕ) (hk : A ≤ 16 ^ k) (hN : 16 ≤ N) (he : 0 ≤ e) (het : e + 1 ≤ t)
+    : A * N * (N * (e + 1)) ^ a ≤ (N * t) ^ (k + 1 + a) := by
   have h0 : 0 ≤ N := by linarith
   have ht : 1 ≤ t := by linarith
   have h1 : A ≤ N ^ k := hk.trans (pow_le_pow_left₀ (by norm_num) hN k)
   have h2 : N ≤ N * t := le_mul_of_one_le_right h0 ht
-  calc A * N * (N * (e + 1)) ^ a ≤ N ^ k * N * (N * t) ^ a := by gcongr
+  calc
+    A * N * (N * (e + 1)) ^ a
+      ≤ N ^ k * N * (N * t) ^ a := by gcongr
     _ ≤ (N * t) ^ k * (N * t) * (N * t) ^ a := by gcongr
     _ = (N * t) ^ (k + 1 + a) := by ring
 
-theorem UpperTheory.V.U3.countI :
-    CorGK → CountI := by
+theorem UpperTheory.V.U3.countI : CorGK → CountI := by
   intro hC χ
   classical
   obtain ⟨hpK, hpK4, hpK7, hpKcop⟩ := (pK_pOne_prime_conditions χ).1
@@ -32,7 +36,9 @@ theorem UpperTheory.V.U3.countI :
   obtain ⟨c₅, A, hcor⟩ := hC (Kstar (pK χ))
   obtain ⟨r₁, hr₁B, hr₁⟩ := Nat.exists_infinite_primes (30 * χ.N * pK χ + 1)
   obtain ⟨r₂, hr₂B, hr₂⟩ := Nat.exists_infinite_primes (r₁ + 1)
-  obtain ⟨k, hk⟩ := pow_unbounded_of_one_lt (2 * (c₅ : ℝ) * (Real.log r₁ + Real.log r₂)) (by norm_num : (1 : ℝ) < 16)
+  obtain ⟨k, hk⟩ :=
+    pow_unbounded_of_one_lt (2 * (c₅ : ℝ) * (Real.log r₁ + Real.log r₂))
+      (by norm_num : (1 : ℝ) < 16)
   refine ⟨k + 1 + A, r₁, r₂, hr₁, hr₂, ?_⟩
   intro h hχ h1q h1d h2q h2d t hBig e he het Ω _ _ _ c Ls hLs
   subst hχ
@@ -42,8 +48,10 @@ theorem UpperTheory.V.U3.countI :
   obtain ⟨-, -, h16, -, -, hprimeN, -⟩ := hostIndex h
   have hN0 := h.N_pos
   have hqpos : 0 < h.chi.N := Nat.pos_of_ne_zero (h.chi.ne.out)
-  have hnd : ∀ p : ℕ, p.Prime → 30 * h.chi.N * pK h.chi + 1 ≤ p → p < h.q1 → p < h.d →
-      ¬ p ∣ 30 * h.N * (NumberField.discr (Kstar (pK h.chi))).natAbs := by
+  have hnd
+      : ∀ p : ℕ,
+        p.Prime → 30 * h.chi.N * pK h.chi + 1 ≤ p → p < h.q1 → p < h.d
+          → ¬ p ∣ 30 * h.N * (NumberField.discr (Kstar (pK h.chi))).natAbs := by
     intro p hp hpB hpq hpd hdiv
     rw [hdisc, Int.natAbs_neg, Int.natAbs_natCast] at hdiv
     have hp30 : 30 < p := by nlinarith [hpK7]
@@ -64,19 +72,25 @@ theorem UpperTheory.V.U3.countI :
   have hne : r₁ ≠ r₂ := by omega
   set T : Finset (Subgroup (ZMod h.N)ˣ) :=
     Ls.biUnion (fun l => (h.X (c l) e).image (fun ψ => (MulChar.toUnitHom ψ).ker)) with hT
-  have hcorK : ∀ K' : Subgroup (ZMod h.N)ˣ,
-      (∀ l ∈ Ls.filter (fun l => ∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K'),
-        ∀ ψ ∈ orb (c l) K', Vlen Ω (c l) e ψ ≠ ⊤) ∧
-      ∑ l ∈ Ls.filter (fun l => ∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K'),
-        Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ orb (c l) K', Vn Ω (c l) e ψ ≤
-        2 * (c₅ : ℝ) * (K'.index.totient : ℝ) * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A *
-          (Real.log r₁ + Real.log r₂) := by
+  have hcorK
+      : ∀ K' : Subgroup (ZMod h.N)ˣ,
+        (∀ l ∈ Ls.filter (fun l => ∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K'),
+            ∀ ψ ∈ orb (c l) K',
+              Vlen Ω (c l) e ψ ≠ ⊤)
+          ∧ ∑ l ∈ Ls.filter (fun l => ∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K'),
+              Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ orb (c l) K', Vn Ω (c l) e ψ
+            ≤ 2 * (c₅ : ℝ) * (K'.index.totient : ℝ) * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A
+              * (Real.log r₁ + Real.log r₂) := by
     intro K'
     refine hcor Ω e h.N K' r₁ r₂ hr₁ hr₂ hne hnd1 hnd2 c _ ?_
     intro l hl
     obtain ⟨hlLs, ψ, hψ, hker⟩ := Finset.mem_filter.1 hl
     obtain ⟨hchar, hpar⟩ := (Host.mem_X h).1 hψ
-    exact ⟨ψ, (mem_orb _).2 hker, gdOfHost h t hBig Ω l e (hLs l hlLs).1 he het (hLs l hlLs).2 _ ψ hchar hpar⟩
+    exact ⟨
+      ψ,
+      (mem_orb _).2 hker,
+      gdOfHost h t hBig Ω l e (hLs l hlLs).1 he het (hLs l hlLs).2 _ ψ hchar hpar
+    ⟩
   have hmapT : ∀ l ∈ Ls, ∀ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker ∈ T := by
     intro l hl ψ hψ
     rw [hT, Finset.mem_biUnion]
@@ -94,16 +108,19 @@ theorem UpperTheory.V.U3.countI :
       exact Nat.totient_le _
     exact_mod_cast h1.trans h2
   have hc5 : (0 : ℝ) ≤ c₅ := by positivity
-  have hL : 0 ≤ Real.log r₁ + Real.log r₂ := add_nonneg (Real.log_natCast_nonneg _) (Real.log_natCast_nonneg _)
+  have hL : 0 ≤ Real.log r₁ + Real.log r₂ :=
+    add_nonneg (Real.log_natCast_nonneg _) (Real.log_natCast_nonneg _)
   have hP : 0 ≤ ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A := by positivity
   have hN16 : (16 : ℝ) ≤ h.N := by exact_mod_cast Nat.le_of_dvd hN0 h16
   have het' : (e : ℝ) + 1 ≤ t := by exact_mod_cast Nat.succ_le_of_lt het
   refine ⟨?_, ?_⟩
   · intro l hl ψ hψ
     exact (hcorK _).1 l (Finset.mem_filter.2 ⟨hl, ψ, hψ, rfl⟩) ψ ((mem_orb _).2 rfl)
-  · have hstep : ∀ l ∈ Ls, Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ h.X (c l) e, Vn Ω (c l) e ψ ≤
-        ∑ K' ∈ T, if (∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K') then
-          Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ orb (c l) K', Vn Ω (c l) e ψ else 0 := by
+  · have hstep
+        : ∀ l ∈ Ls,
+          Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ h.X (c l) e, Vn Ω (c l) e ψ
+            ≤ ∑ K' ∈ T, if (∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K') then
+                Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ orb (c l) K', Vn Ω (c l) e ψ else 0 := by
       intro l hl
       have hlog : 0 ≤ Real.log ((l : ℕ) : ℝ) := Real.log_natCast_nonneg _
       rw [← Finset.sum_fiberwise_of_maps_to (hmapT l hl), Finset.mul_sum]
@@ -120,21 +137,28 @@ theorem UpperTheory.V.U3.countI :
           intro ψ hψ hk
           exact hex ⟨ψ, hψ, hk⟩
         rw [hempty, Finset.sum_empty, mul_zero]
-    calc _ ≤ ∑ l ∈ Ls, ∑ K' ∈ T, (if (∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K') then
-          Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ orb (c l) K', Vn Ω (c l) e ψ else 0) := Finset.sum_le_sum hstep
+    calc
+      _ ≤ ∑ l ∈ Ls, ∑ K' ∈ T, (if (∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K') then
+          Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ orb (c l) K', Vn Ω (c l) e ψ else 0) :=
+        Finset.sum_le_sum hstep
       _ = ∑ K' ∈ T, ∑ l ∈ Ls.filter (fun l => ∃ ψ ∈ h.X (c l) e, (MulChar.toUnitHom ψ).ker = K'),
           Real.log ((l : ℕ) : ℝ) * ∑ ψ ∈ orb (c l) K', Vn Ω (c l) e ψ := by
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun K' _ => ?_
         rw [Finset.sum_filter]
       _ ≤ ∑ K' ∈ T, 2 * (c₅ : ℝ) * (K'.index.totient : ℝ) * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A *
-          (Real.log r₁ + Real.log r₂) := Finset.sum_le_sum fun K' _ => (hcorK K').2
-      _ = (2 * (c₅ : ℝ) * (Real.log r₁ + Real.log r₂)) * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A *
-          ∑ K' ∈ T, ((K'.index.totient : ℕ) : ℝ) := by
+          (Real.log r₁ + Real.log r₂) :=
+        Finset.sum_le_sum fun K' _ => (hcorK K').2
+      _ = (2 * (c₅ : ℝ) * (Real.log r₁ + Real.log r₂)) * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A
+          * ∑ K' ∈ T, ((K'.index.totient : ℕ) : ℝ) := by
         rw [Finset.mul_sum]
         exact Finset.sum_congr rfl fun K' _ => by ring
-      _ ≤ (2 * (c₅ : ℝ) * (Real.log r₁ + Real.log r₂)) * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A * (h.N : ℝ) :=
-        mul_le_mul_of_nonneg_left hsumT (mul_nonneg (mul_nonneg (mul_nonneg (by norm_num) hc5) hL) hP)
-      _ = (2 * (c₅ : ℝ) * (Real.log r₁ + Real.log r₂)) * (h.N : ℝ) * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A := by ring
+      _ ≤ (2 * (c₅ : ℝ) * (Real.log r₁ + Real.log r₂)) * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A
+          * (h.N : ℝ) :=
+        mul_le_mul_of_nonneg_left hsumT
+          (mul_nonneg (mul_nonneg (mul_nonneg (by norm_num) hc5) hL) hP)
+      _ = (2 * (c₅ : ℝ) * (Real.log r₁ + Real.log r₂)) * (h.N : ℝ)
+          * ((h.N : ℝ) * ((e : ℝ) + 1)) ^ A := by
+        ring
       _ ≤ ((h.N : ℝ) * (t : ℝ)) ^ (k + 1 + A) :=
         absorb _ _ _ _ k A hk.le hN16 (Nat.cast_nonneg e) het'

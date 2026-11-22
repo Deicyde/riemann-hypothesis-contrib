@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem coeff_mem_of_mem_maximalIdeal {O σ : Type} [CommRing O] [IsLocalRing O]
+private theorem coeff_mem_of_mem_maximalIdeal
+    {O σ : Type} [CommRing O] [IsLocalRing O]
     {g : MvPowerSeries σ O} (hg : g ∈ IsLocalRing.maximalIdeal (MvPowerSeries σ O))
-    (b : σ →₀ ℕ) :
-    MvPowerSeries.coeff b g ∈ IsLocalRing.maximalIdeal O ^ (1 - Finsupp.degree b) := by
+    (b : σ →₀ ℕ)
+    : MvPowerSeries.coeff b g ∈ IsLocalRing.maximalIdeal O ^ (1 - Finsupp.degree b) := by
   by_cases hb : b = 0
   · subst hb
     rw [map_zero, Nat.sub_zero, pow_one, MvPowerSeries.coeff_zero_eq_constantCoeff_apply,
@@ -18,13 +19,11 @@ private theorem coeff_mem_of_mem_maximalIdeal {O σ : Type} [CommRing O] [IsLoca
     rw [h2, pow_zero, Ideal.one_eq_top]
     exact Submodule.mem_top
 
-theorem UpperTheory.Reformulated.B.PreservedCoefficient.pres_new_coeff :
-    ∀ {O σ : Type} [inst : CommRing O] [inst_1 : IsLocalRing O]
-    (N : ℕ),
-    ∀ h ∈ IsLocalRing.maximalIdeal (MvPowerSeries σ O) ^ N,
-      ∀ (a : σ →₀ ℕ),
-        (MvPowerSeries.coeff a : MvPowerSeries σ O → O) h ∈
-          IsLocalRing.maximalIdeal O ^ (N - (Finsupp.degree : (σ →₀ ℕ) → ℕ) a) := by
+theorem UpperTheory.Reformulated.B.PreservedCoefficient.pres_new_coeff
+    : ∀ {O σ : Type} [inst : CommRing O] [inst_1 : IsLocalRing O] (N : ℕ),
+      ∀ h ∈ IsLocalRing.maximalIdeal (MvPowerSeries σ O) ^ N, ∀ (a : σ →₀ ℕ),
+        (MvPowerSeries.coeff a : MvPowerSeries σ O → O) h
+          ∈ IsLocalRing.maximalIdeal O ^ (N - (Finsupp.degree : (σ →₀ ℕ) → ℕ) a) := by
   intro O σ _ _ N
   classical
   induction N with

@@ -7,23 +7,33 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.HasBa
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Mum
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Mum
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.MumFam GlobalTheory.MumProd GlobalTheory.ProdUnif
 
 namespace GlobalTheory.ProdUnif
 
-theorem famDim_of_expBij : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (D : DegData R I) (A : PolAV (Sp (FractionRing R))) (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G] (U : UnifPre I D A G) (k : ℕ), 1 ≤ k → U.ExpBij k → Module.finrank (FractionRing R) (Fam D.toPre (FractionRing R) k) = k ^ A.g := by
+theorem famDim_of_expBij
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (D : DegData R I)
+        (A : PolAV (Sp (FractionRing R))) (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
+        (U : UnifPre I D A G) (k : ℕ),
+      1 ≤ k → U.ExpBij k
+        → Module.finrank (FractionRing R) (Fam D.toPre (FractionRing R) k) = k ^ A.g := by
   intro R _ _ I D A G _ _ U k hk hbij
-  obtain ⟨b, hex, huniq⟩ := GlobalTheory.GenericSectionBasis.exists_secK_basis
-    GlobalTheory.abelianSchemeLaws_all.1.secBaseChange R I D A G U k hk
+  obtain ⟨b, hex, huniq⟩ :=
+    GlobalTheory.GenericSectionBasis.exists_secK_basis
+      GlobalTheory.abelianSchemeLaws_all.1.secBaseChange R I D A G U k hk
   choose F hF using fun i => (hbij.1 (b i)).exists
-  have hlin : ∀ (c : Fin (k ^ A.g) → FractionRing R) (s : U.SecK k),
-      (∀ j, s.f j = ∑ i, resTop _ (scal (pullback.snd G.hom (jK R)) (c i)) * (b i).f j) →
-      U.Expands k s (∑ i, c i • F i) := fun c s hs =>
+  have hlin
+      : ∀ (c : Fin (k ^ A.g) → FractionRing R) (s : U.SecK k),
+        (∀ j, s.f j = ∑ i, resTop _ (scal (pullback.snd G.hom (jK R)) (c i)) * (b i).f j)
+          → U.Expands k s (∑ i, c i • F i) := fun c s hs =>
     GlobalTheory.UnifPowAdm.expands_comb U k (s := b) hF (fun j => hs j)
   let φ : (Fin (k ^ A.g) → FractionRing R) →ₗ[FractionRing R] Fam D.toPre (FractionRing R) k :=
     Fintype.linearCombination (FractionRing R) F

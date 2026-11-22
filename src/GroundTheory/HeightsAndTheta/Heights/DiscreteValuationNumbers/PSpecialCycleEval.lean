@@ -13,13 +13,13 @@ open MvPolynomial
 
 universe u
 
-theorem SpecialCycleEval.proof (h1 : SpecialIdealCorresp.Statement.{u})
-    (h2 : SpecialIdealSurj.Statement.{u}) (h3 : SpecialMultAt.Statement.{u}) :
-    SpecialCycleEval.Statement.{u} := by
+theorem SpecialCycleEval.proof
+    (h1 : SpecialIdealCorresp.Statement.{u}) (h2 : SpecialIdealSurj.Statement.{u})
+    (h3 : SpecialMultAt.Statement.{u})
+    : SpecialCycleEval.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P n
   classical
-  let s : Set (Ideal (MRing ι O)) :=
-    {W | W ∈ (P ⊔ Ideal.span {C ϖ}).minimalPrimes ∧ IsRelevant W}
+  let s : Set (Ideal (MRing ι O)) := {W | W ∈ (P ⊔ Ideal.span {C ϖ}).minimalPrimes ∧ IsRelevant W}
   let t : Set (Ideal (MRing ι (IsLocalRing.ResidueField O))) :=
     {V | V ∈ (specialIdeal P).minimalPrimes ∧ IsRelevant V}
   have hsupp1 : Function.support (fun W => divCycle P (C ϖ) W * n (specialIdeal W)) ⊆ s := by
@@ -27,7 +27,7 @@ theorem SpecialCycleEval.proof (h1 : SpecialIdealCorresp.Statement.{u})
     by_contra h
     apply hW
     show divCycle P (C ϖ) W * n (specialIdeal W) = 0
-    have h' : ¬ (W ∈ (P ⊔ Ideal.span {C ϖ}).minimalPrimes ∧ IsRelevant W) := h
+    have h' : ¬(W ∈ (P ⊔ Ideal.span {C ϖ}).minimalPrimes ∧ IsRelevant W) := h
     unfold divCycle
     rw [dite_eq_right h', zero_mul]
   have hsupp2 : Function.support (fun V => idealCycle (specialIdeal P) V * n V) ⊆ t := by
@@ -35,7 +35,7 @@ theorem SpecialCycleEval.proof (h1 : SpecialIdealCorresp.Statement.{u})
     by_contra h
     apply hV
     show idealCycle (specialIdeal P) V * n V = 0
-    have h' : ¬ (V ∈ (specialIdeal P).minimalPrimes ∧ IsRelevant V) := h
+    have h' : ¬(V ∈ (specialIdeal P).minimalPrimes ∧ IsRelevant V) := h
     unfold idealCycle
     rw [dite_eq_right h', zero_mul]
   have hmem : ∀ W ∈ s, W.IsPrime ∧ (C ϖ : MRing ι O) ∈ W := fun W hW =>
@@ -45,11 +45,13 @@ theorem SpecialCycleEval.proof (h1 : SpecialIdealCorresp.Statement.{u})
     obtain ⟨hp, hc⟩ := hmem W hW
     obtain ⟨-, hmin, hrel, -⟩ := h1 O ϖ hϖ K ι P W hp hc
     exact ⟨hmin.mp hW.1, hrel.mp hW.2⟩
-  have e1 : (∑ᶠ W, divCycle P (C ϖ) W * n (specialIdeal W)) =
-      ∑ᶠ W ∈ s, divCycle P (C ϖ) W * n (specialIdeal W) := by
+  have e1
+      : (∑ᶠ W, divCycle P (C ϖ) W * n (specialIdeal W))
+        = ∑ᶠ W ∈ s, divCycle P (C ϖ) W * n (specialIdeal W) := by
     rw [finsum_mem_def, Set.indicator_eq_self.mpr hsupp1]
-  have e2 : (∑ᶠ V, idealCycle (specialIdeal P) V * n V) =
-      ∑ᶠ V ∈ t, idealCycle (specialIdeal P) V * n V := by
+  have e2
+      : (∑ᶠ V, idealCycle (specialIdeal P) V * n V)
+        = ∑ᶠ V ∈ t, idealCycle (specialIdeal P) V * n V := by
     rw [finsum_mem_def, Set.indicator_eq_self.mpr hsupp2]
   show (∑ᶠ W, divCycle P (C ϖ) W * n (specialIdeal W)) =
     ∑ᶠ V, idealCycle (specialIdeal P) V * n V

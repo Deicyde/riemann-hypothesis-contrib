@@ -35,10 +35,20 @@ lemma smF_congr {K : Type} [Field K] [CharZero K] (c : ℤ) (j M : ℕ) (ζ : K)
     smF c j M ζ a₁ a₂ n = smF c j M ζ a₁ a₂' n := by
   simp only [smF, eisF_congr j M ζ hζ hM a₁ a₂ a₂' h, eisF_congr j M ζ hζ hM _ _ _ (h.mul_left c)]
 
-def diagOneUnit {R : Type} [CommRing R] (b : Rˣ) : GL (Fin 2) R :=
-  ⟨Matrix.diagonal ![1, (b : R)], Matrix.diagonal ![1, ((b⁻¹ : Rˣ) : R)],
-    by rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]; congr 1; funext i; fin_cases i <;> simp,
-    by rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]; congr 1; funext i; fin_cases i <;> simp⟩
+def diagOneUnit {R : Type} [CommRing R] (b : Rˣ) : GL (Fin 2) R := ⟨
+  Matrix.diagonal ![1, (b : R)],
+  Matrix.diagonal ![1, ((b⁻¹ : Rˣ) : R)],
+  by
+    rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+    congr 1
+    funext i
+    fin_cases i <;> simp,
+  by
+    rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+    congr 1
+    funext i
+    fin_cases i <;> simp
+⟩
 
 lemma diagOneUnit_mul {R : Type} [CommRing R] (a b : Rˣ) : diagOneUnit a * diagOneUnit b = diagOneUnit (a * b) := by
   ext i j
@@ -88,19 +98,24 @@ lemma smF_rowT_subst {K : Type} [Field K] [CharZero K] (N p m : ℕ) [NeZero p] 
   push_cast at hu ⊢
   linear_combination (-(N : ℤ)) * hu - ((p : ℤ) ^ m * w.2) * hv
 
-theorem psum_galois_unitPiece : ∀ (N p m k : ℕ) [NeZero p] (K : Type) [Field K] [CharZero K]
-    (ψ : DirichletCharacter K (p ^ m)) (c d : ℤ) (w w' : ℤ × ℤ)
-    (ζ : K) (β : (ZMod (p ^ m))ˣ → ℕ), p.Prime → 0 < N → Nat.Coprime p N → 1 ≤ m → IsPrimitiveRoot ζ (N * p ^ m) →
-    (∀ b, ((β b : ℕ) : ZMod (p ^ m)) = b ∧ ((β b : ℕ) : ZMod N) = 1) →
-    ∀ r : ℕ, ∑ b : (ZMod (p ^ m))ˣ, ψ b * pieceT N p m m k (1 : DirichletCharacter K (p ^ m)) c d w w' (ζ ^ β b)
-        ((unitSet p m).filter (fun γ => (γ : Matrix (Fin 2) (Fin 2) (ZMod (p ^ m))).det = 1)) r =
-      pieceT N p m m k ψ c d w w' ζ (unitSet p m) r := by
+theorem psum_galois_unitPiece
+    : ∀ (N p m k : ℕ) [NeZero p] (K : Type) [Field K] [CharZero K]
+        (ψ : DirichletCharacter K (p ^ m)) (c d : ℤ) (w w' : ℤ × ℤ) (ζ : K)
+        (β : (ZMod (p ^ m))ˣ → ℕ),
+      p.Prime → 0 < N → Nat.Coprime p N → 1 ≤ m → IsPrimitiveRoot ζ (N * p ^ m)
+        → (∀ b, ((β b : ℕ) : ZMod (p ^ m)) = b ∧ ((β b : ℕ) : ZMod N) = 1)
+        → ∀ r : ℕ,
+          ∑ b : (ZMod (p ^ m))ˣ, ψ b * pieceT N p m m k (1 : DirichletCharacter K (p ^ m)) c d w w' (ζ ^ β b)
+              ((unitSet p m).filter (fun γ => (γ : Matrix (Fin 2) (Fin 2) (ZMod (p ^ m))).det = 1)) r
+            = pieceT N p m m k ψ c d w w' ζ (unitSet p m) r := by
   intro N p m k _ K _ _ ψ c d w w' ζ β _ hN _ _ hζ hβ r
   unfold pieceT
   simp_rw [Finset.mul_sum]
   rw [← Finset.sum_product']
-  apply Finset.sum_nbij' (fun x => x.2 * diagOneUnit x.1)
-    (fun γ => (Matrix.GeneralLinearGroup.det γ, γ * diagOneUnit (Matrix.GeneralLinearGroup.det γ)⁻¹))
+  apply Finset.sum_nbij'
+    (fun x => x.2 * diagOneUnit x.1)
+    (fun γ =>
+      (Matrix.GeneralLinearGroup.det γ, γ * diagOneUnit (Matrix.GeneralLinearGroup.det γ)⁻¹))
   · rintro ⟨b, γ⟩ h
     simp only [Finset.mem_product, Finset.mem_filter, unitSet, Finset.mem_univ, true_and] at h ⊢
     simp only [(coe_mul_diagOneUnit γ b 0).1, (coe_mul_diagOneUnit γ b 1).1]

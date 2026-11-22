@@ -10,27 +10,34 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSmoothO
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory
+  MonObj
 open scoped TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.DimSplit
 
-theorem idem_eq_of {S : Type} [CommRing S] {a b : S} (ha : IsIdempotentElem a) (hb : IsIdempotentElem b)
-    (hab : ∀ q : PrimeSpectrum S, a ∉ q.asIdeal ↔ b ∉ q.asIdeal) : a = b := by
-  have := (PrimeSpectrum.isIdempotentElemEquivClopens (R := S)).injective
-    (a₁ := ⟨a, ha⟩) (a₂ := ⟨b, hb⟩) (by
-      ext q
-      show q ∈ PrimeSpectrum.basicOpen a ↔ q ∈ PrimeSpectrum.basicOpen b
-      simp only [PrimeSpectrum.mem_basicOpen]
-      exact hab q)
+theorem idem_eq_of
+    {S : Type} [CommRing S]
+    {a b : S} (ha : IsIdempotentElem a) (hb : IsIdempotentElem b)
+    (hab : ∀ q : PrimeSpectrum S, a ∉ q.asIdeal ↔ b ∉ q.asIdeal)
+    : a = b := by
+  have :=
+    (PrimeSpectrum.isIdempotentElemEquivClopens (R := S)).injective (a₁ := ⟨a, ha⟩) (a₂ := ⟨b, hb⟩)
+      (by
+        ext q
+        show q ∈ PrimeSpectrum.basicOpen a ↔ q ∈ PrimeSpectrum.basicOpen b
+        simp only [PrimeSpectrum.mem_basicOpen]
+        exact hab q)
   exact congrArg Subtype.val this
 
-theorem exists_idempotents_of_isLocallyConstant {R α : Type} [CommRing R] (d : PrimeSpectrum R → α)
-    (hd : IsLocallyConstant d) :
-    ∃ (n : ℕ) (e : Fin n → R), CompleteOrthogonalIdempotents e ∧
-      ∀ k, ∃ a : α, ∀ p : PrimeSpectrum R, 1 - e k ∈ p.asIdeal → d p = a := by
+theorem exists_idempotents_of_isLocallyConstant
+    {R α : Type} [CommRing R] (d : PrimeSpectrum R → α) (hd : IsLocallyConstant d)
+    : ∃ (n : ℕ) (e : Fin n → R),
+      CompleteOrthogonalIdempotents e
+        ∧ ∀ k, ∃ a : α, ∀ p : PrimeSpectrum R, 1 - e k ∈ p.asIdeal → d p = a := by
   classical
   have hfin : (Set.range d).Finite := hd.range_finite
   let s := hfin.toFinset
@@ -38,7 +45,8 @@ theorem exists_idempotents_of_isLocallyConstant {R α : Type} [CommRing R] (d : 
   have hg : Function.Injective g := fun i j h => s.equivFin.symm.injective (Subtype.val_injective h)
   let C : Fin s.card → TopologicalSpace.Clopens (PrimeSpectrum R) := fun k =>
     ⟨d ⁻¹' {g k}, hd.isClopen_fiber _⟩
-  let e : Fin s.card → R := fun k => ((PrimeSpectrum.isIdempotentElemEquivClopens (R := R)).symm (C k)).1
+  let e : Fin s.card → R := fun k =>
+    ((PrimeSpectrum.isIdempotentElemEquivClopens (R := R)).symm (C k)).1
   have he : ∀ k, IsIdempotentElem (e k) := fun k =>
     ((PrimeSpectrum.isIdempotentElemEquivClopens (R := R)).symm (C k)).2
   have hmem : ∀ k (p : PrimeSpectrum R), e k ∉ p.asIdeal ↔ d p = g k := by
@@ -74,9 +82,14 @@ end GlobalTheory.DimSplit
 
 namespace GlobalTheory.DimSplit
 
-theorem exists_idempotents_smoothOfRelativeDimension : ∀ (R₀ : Type) [CommRing R₀] (A : Over (Sp R₀)) [GrpObj A],
-    IsAbelianScheme A → ∃ (n : ℕ) (e : Fin n → R₀), CompleteOrthogonalIdempotents e ∧ ∀ k, ∃ g : ℕ,
-      SmoothOfRelativeDimension g (Limits.pullback.snd A.hom (spMap (Ideal.Quotient.mk (Ideal.span {1 - e k})))) := by
+theorem exists_idempotents_smoothOfRelativeDimension
+    : ∀ (R₀ : Type) [CommRing R₀] (A : Over (Sp R₀)) [GrpObj A],
+      IsAbelianScheme A
+        → ∃ (n : ℕ) (e : Fin n → R₀),
+          CompleteOrthogonalIdempotents e
+            ∧ ∀ k, ∃ g : ℕ,
+              SmoothOfRelativeDimension g
+                (Limits.pullback.snd A.hom (spMap (Ideal.Quotient.mk (Ideal.span {1 - e k})))) := by
   intro R₀ _ A _ hA
   have := hA.smooth
   have := hA.proper
@@ -112,7 +125,11 @@ theorem exists_idempotents_smoothOfRelativeDimension : ∀ (R₀ : Type) [CommRi
   obtain ⟨m, e, he, hk⟩ := exists_idempotents_of_isLocallyConstant d hdl
   refine ⟨m, e, he, fun k => ?_⟩
   obtain ⟨g, hg⟩ := hk k
-  refine ⟨g, GlobalTheory.SmoothNearFibre.smoothOfRelativeDimension_pullback_snd A.hom _ g fun z w hzw => ⟨W z, hW z, ?_⟩⟩
+  refine ⟨
+    g,
+    GlobalTheory.SmoothNearFibre.smoothOfRelativeDimension_pullback_snd A.hom _ g fun z w hzw =>
+      ⟨W z, hW z, ?_⟩
+  ⟩
   have hn : n z = g := by
     rw [← hdn z, hzw]
     apply hg

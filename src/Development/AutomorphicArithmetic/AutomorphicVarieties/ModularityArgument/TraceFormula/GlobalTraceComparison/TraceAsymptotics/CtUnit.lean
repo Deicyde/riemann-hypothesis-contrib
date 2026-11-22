@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8
 open UpperTheory.V.Af.Bc (cPl)
 open scoped Classical
@@ -229,45 +230,55 @@ private lemma absHalf_one {w : Pl E} {x : w.adicCompletion E} (hx : Valued.v x =
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctUnit :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.CtUnit := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctUnit
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.CtUnit := by
   intro E _ _ _ w n a b h
   funext m
   unfold ct
-  have hconj : ∀ y : GLw n w, (avg fun k : KGL w (n := n) =>
-      (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) ((k : GLw n w)⁻¹ * y * k)) =
-      (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) y := by
+  have hconj
+      : ∀ y : GLw n w,
+        (avg fun k : KGL w (n := n) =>
+            (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) ((k : GLw n w)⁻¹ * y * k))
+          = (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) y := by
     intro y
-    have hf : (fun k : KGL w (n := n) => (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) ((k : GLw n w)⁻¹ * y * k)) =
-        fun _ => (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) y := by
+    have hf
+        : (fun k : KGL w (n := n) =>
+            (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) ((k : GLw n w)⁻¹ * y * k))
+          = fun _ => (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) y := by
       funext k
       have hiff : (k : GLw n w)⁻¹ * y * k ∈ KGL w (n := n) ↔ y ∈ KGL w (n := n) := by
         constructor
         · intro hy
-          have := (KGL w (n := n)).mul_mem ((KGL w (n := n)).mul_mem k.2 hy) ((KGL w (n := n)).inv_mem k.2)
+          have :=
+            (KGL w (n := n)).mul_mem ((KGL w (n := n)).mul_mem k.2 hy)
+              ((KGL w (n := n)).inv_mem k.2)
           simpa [mul_assoc] using this
         · intro hy
-          exact (KGL w (n := n)).mul_mem ((KGL w (n := n)).mul_mem ((KGL w (n := n)).inv_mem k.2) hy) k.2
+          exact (KGL w (n := n)).mul_mem
+            ((KGL w (n := n)).mul_mem ((KGL w (n := n)).inv_mem k.2) hy) k.2
       by_cases hy : y ∈ KGL w (n := n)
       · rw [Set.indicator_of_mem (show _ ∈ (KGL w (n := n) : Set (GLw n w)) from hiff.2 hy),
           Set.indicator_of_mem (show _ ∈ (KGL w (n := n) : Set (GLw n w)) from hy)]
         rfl
-      · rw [Set.indicator_of_notMem (show _ ∉ (KGL w (n := n) : Set (GLw n w)) from fun h' => hy (hiff.1 h')),
+      · rw [Set.indicator_of_notMem (show _ ∉ (KGL w (n := n) : Set (GLw n w)) from fun h' =>
+            hy (hiff.1 h')),
           Set.indicator_of_notMem (show _ ∉ (KGL w (n := n) : Set (GLw n w)) from hy)]
     rw [hf, avg_const]
   simp only [hconj]
   by_cases hm : m ∈ K2 a b w
-  · have hu : (fun X : Multiplicative (Matrix (Fin a) (Fin b) (w.adicCompletion E)) =>
-        (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) (blk h w m (Multiplicative.toAdd X))) =
-        (intMat a b w : Set _).indicator 1 := by
+  · have hu
+        : (fun X : Multiplicative (Matrix (Fin a) (Fin b) (w.adicCompletion E)) =>
+            (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ)
+              (blk h w m (Multiplicative.toAdd X)))
+          = (intMat a b w : Set _).indicator 1 := by
       funext X
       by_cases hX : X ∈ intMat a b w
       · rw [Set.indicator_of_mem (show _ ∈ (KGL w (n := n) : Set (GLw n w)) from
             (blk_mem_iff h w m _).2 ⟨hm, (mem_intMat X).1 hX⟩),
           Set.indicator_of_mem (show X ∈ (intMat a b w : Set _) from hX)]
         rfl
-      · rw [Set.indicator_of_notMem (show _ ∉ (KGL w (n := n) : Set (GLw n w)) from
-            fun h' => hX ((mem_intMat X).2 ((blk_mem_iff h w m _).1 h').2)),
+      · rw [Set.indicator_of_notMem (show _ ∉ (KGL w (n := n) : Set (GLw n w)) from fun h' =>
+            hX ((mem_intMat X).2 ((blk_mem_iff h w m _).1 h').2)),
           Set.indicator_of_notMem (show X ∉ (intMat a b w : Set _) from hX)]
     obtain ⟨k1, k2⟩ := Subgroup.mem_prod.1 hm
     have hx : Valued.v (m.1.val.det ^ b / m.2.val.det ^ a) = 1 := by
@@ -275,9 +286,11 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ctUnit :
       simp
     rw [hu, hint_ind, absHalf_one hx, Set.indicator_of_mem (show m ∈ (K2 a b w : Set _) from hm)]
     simp
-  · have hu : (fun X : Multiplicative (Matrix (Fin a) (Fin b) (w.adicCompletion E)) =>
-        (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) (blk h w m (Multiplicative.toAdd X))) =
-        fun _ => 0 := by
+  · have hu
+        : (fun X : Multiplicative (Matrix (Fin a) (Fin b) (w.adicCompletion E)) =>
+            (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ)
+              (blk h w m (Multiplicative.toAdd X)))
+          = fun _ => 0 := by
       funext X
       exact Set.indicator_of_notMem (fun h' => hm ((blk_mem_iff h w m _).1 h').1) _
     rw [hu, hint_zero, mul_zero, Set.indicator_of_notMem (show m ∉ (K2 a b w : Set _) from hm)]

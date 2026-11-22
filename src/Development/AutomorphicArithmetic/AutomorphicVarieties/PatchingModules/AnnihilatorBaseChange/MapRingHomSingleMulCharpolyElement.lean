@@ -8,19 +8,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem lam_dom {n : ℕ} {S H G : Type} [CommRing S] [Group H] [Group G] (D : GDet n S G) (φ : H →* G)
-    (i : ℕ) (z : MonoidAlgebra S H) : (D.comap φ).lam i z = D.lam i (MonoidAlgebra.mapDomainRingHom S φ z) := by
+private theorem lam_dom
+    {n : ℕ} {S H G : Type} [CommRing S] [Group H] [Group G]
+    (D : GDet n S G) (φ : H →* G) (i : ℕ) (z : MonoidAlgebra S H)
+    : (D.comap φ).lam i z = D.lam i (MonoidAlgebra.mapDomainRingHom S φ z) := by
   unfold GDet.lam
   congr 2
-  change (D.D (Polynomial S) (MonoidAlgebra.mapDomainRingHom (Polynomial S) φ _)).coeff =
-    (D.D (Polynomial S) _).coeff
+  change (D.D (Polynomial S) (MonoidAlgebra.mapDomainRingHom (Polynomial S) φ _)).coeff
+    = (D.D (Polynomial S) _).coeff
   ext k
-  have hcomm : ∀ z : MonoidAlgebra S H,
-      MonoidAlgebra.mapDomainRingHom (Polynomial S) φ (MonoidAlgebra.mapRingHom H Polynomial.C z) =
-        MonoidAlgebra.mapRingHom G Polynomial.C (MonoidAlgebra.mapDomainRingHom S φ z) := by
+  have hcomm
+      : ∀ z : MonoidAlgebra S H,
+        MonoidAlgebra.mapDomainRingHom (Polynomial S) φ (MonoidAlgebra.mapRingHom H Polynomial.C z)
+          = MonoidAlgebra.mapRingHom G Polynomial.C (MonoidAlgebra.mapDomainRingHom S φ z) := by
     intro z
     induction z using MonoidAlgebra.induction_linear with
     | zero => simp
@@ -31,9 +35,10 @@ private theorem lam_dom {n : ℕ} {S H G : Type} [CommRing S] [Group H] [Group G
   rw [hcomm]
   simp
 
-private theorem mapDomain_single_mul_charpoly_element {n : ℕ} {S H G : Type} [CommRing S] [Group H] [Group G] (φ : H →* G) (h g : H)
-    (U : Fin n → S) : MonoidAlgebra.mapDomainRingHom S φ (MonoidAlgebra.single h 1 * q1El g U) =
-      MonoidAlgebra.single (φ h) 1 * q1El (φ g) U := by
+private theorem mapDomain_single_mul_charpoly_element
+    {n : ℕ} {S H G : Type} [CommRing S] [Group H] [Group G] (φ : H →* G) (h g : H) (U : Fin n → S)
+    : MonoidAlgebra.mapDomainRingHom S φ (MonoidAlgebra.single h 1 * q1El g U)
+      = MonoidAlgebra.single (φ h) 1 * q1El (φ g) U := by
   rw [map_mul, q1El, q1El, map_list_prod, List.map_ofFn]
   congr 1
   · simp
@@ -42,9 +47,11 @@ private theorem mapDomain_single_mul_charpoly_element {n : ℕ} {S H G : Type} [
     rw [Function.comp_apply, map_sub]
     simp
 
-private theorem mapRingHom_single_mul_charpoly_element {n : ℕ} {R S H : Type} [CommRing R] [CommRing S] [Group H] (f : R →+* S) (h g : H)
-    (U : Fin n → R) : MonoidAlgebra.mapRingHom H f (MonoidAlgebra.single h 1 * q1El g U) =
-      MonoidAlgebra.single h 1 * q1El g fun i => f (U i) := by
+private theorem mapRingHom_single_mul_charpoly_element
+    {n : ℕ} {R S H : Type} [CommRing R] [CommRing S] [Group H]
+    (f : R →+* S) (h g : H) (U : Fin n → R)
+    : MonoidAlgebra.mapRingHom H f (MonoidAlgebra.single h 1 * q1El g U)
+      = MonoidAlgebra.single h 1 * q1El g fun i => f (U i) := by
   rw [map_mul, q1El, q1El, map_list_prod, List.map_ofFn, MonoidAlgebra.mapRingHom_single, map_one]
   congr 3
   funext i

@@ -135,12 +135,15 @@ lemma stab_iSup {ν : Sort*} {F : ν → Submodule ℂ H} (hF : ∀ k, Stab ρ (
     iSup_le fun k x hx => Submodule.mem_iSup_of_mem k (hF k i x hx)
   exact hle hv
 
-theorem exists_hit (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j v) = ρ' j (ρ i v))
+theorem exists_hit
+    (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j v) = ρ' j (ρ i v))
     {S X W : Submodule ℂ H} (hSρ' : Stab ρ' S)
-    (hSirr : ∀ S' : Submodule ℂ H, S' ≤ S → Stab ρ S' → Stab ρ' S' → S' = ⊥ ∨ S' = S)
-    (hXS : X ≤ S) (hXs : Stab ρ X) (hXi : Irr ρ X) {x₀ : H} (hx₀ : x₀ ∈ X) (h0 : x₀ ≠ 0)
-    [FiniteDimensional ℂ W] (hWS : W ≤ S) (hW0 : W ≠ ⊥) (hWs : Stab ρ W) :
-    ∃ c : H →ₗ[ℂ] H, Comm ρ c ∧ c x₀ ∈ W ∧ c x₀ ≠ 0 := by
+    (hSirr : ∀ S' : Submodule ℂ H, S' ≤ S → Stab ρ S' → Stab ρ' S' → S' = ⊥ ∨ S' = S) (hXS : X ≤ S)
+    (hXs : Stab ρ X) (hXi : Irr ρ X)
+    {x₀ : H} (hx₀ : x₀ ∈ X) (h0 : x₀ ≠ 0)
+    [FiniteDimensional ℂ W]
+    (hWS : W ≤ S) (hW0 : W ≠ ⊥) (hWs : Stab ρ W)
+    : ∃ c : H →ₗ[ℂ] H, Comm ρ c ∧ c x₀ ∈ W ∧ c x₀ ≠ 0 := by
   set P : H →ₗ[ℂ] H := (W.starProjection : H →ₗ[ℂ] H) with hP
   have hPc : Comm ρ P := proj_comm hρ hWs
   have hρ'c : ∀ j, Comm ρ (ρ' j : H →ₗ[ℂ] H) := fun j i v => (hcomm i j v).symm
@@ -195,11 +198,14 @@ theorem exists_hit (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (�
     rw [← h2]
     exact h1
 
-theorem schur2 (hρ : Good ρ) {X W : Submodule ℂ H} [FiniteDimensional ℂ X] [FiniteDimensional ℂ W]
-    (hXs : Stab ρ X) (hXi : Irr ρ X) (hWs : Stab ρ W) (hWi : Irr ρ W) {x₀ : H} (hx₀ : x₀ ∈ X)
-    (h0 : x₀ ≠ 0) {c c' : H →ₗ[ℂ] H} (hc : Comm ρ c) (hc' : Comm ρ c') (hcW : c x₀ ∈ W)
-    (hc0 : c x₀ ≠ 0) (hc'W : c' x₀ ∈ W) :
-    finrank ℂ X = finrank ℂ W ∧ ∃ μ : ℂ, c' x₀ = μ • c x₀ := by
+theorem schur2
+    (hρ : Good ρ)
+    {X W : Submodule ℂ H} [FiniteDimensional ℂ X] [FiniteDimensional ℂ W]
+    (hXs : Stab ρ X) (hXi : Irr ρ X) (hWs : Stab ρ W) (hWi : Irr ρ W)
+    {x₀ : H} (hx₀ : x₀ ∈ X) (h0 : x₀ ≠ 0)
+    {c c' : H →ₗ[ℂ] H}
+    (hc : Comm ρ c) (hc' : Comm ρ c') (hcW : c x₀ ∈ W) (hc0 : c x₀ ≠ 0) (hc'W : c' x₀ ∈ W)
+    : finrank ℂ X = finrank ℂ W ∧ ∃ μ : ℂ, c' x₀ = μ • c x₀ := by
   have hAW : ∀ x : X, c x ∈ W := fun x => into hρ hc hWs hXs hXi hx₀ h0 hcW x x.2
   have hBW : ∀ x : X, c' x ∈ W := fun x => into hρ hc' hWs hXs hXi hx₀ h0 hc'W x x.2
   have hinj : Function.Injective (c.domRestrict X) := by
@@ -231,7 +237,9 @@ theorem schur2 (hρ : Good ρ) {X W : Submodule ℂ H} [FiniteDimensional ℂ X]
   obtain ⟨v, hv⟩ := hμ.exists_hasEigenvector
   have hTv : T v = μ • v := hv.apply_eq_smul
   have hBv : B v = μ • A v :=
-    calc B v = e (T v) := (e.apply_symm_apply (B v)).symm
+    calc
+      B v
+        = e (T v) := (e.apply_symm_apply (B v)).symm
       _ = e (μ • v) := by rw [hTv]
       _ = μ • e v := map_smul e μ v
       _ = μ • A v := rfl

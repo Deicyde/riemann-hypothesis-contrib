@@ -12,20 +12,36 @@ public import GroundTheory.AutomorphicForms.L2LocalComponents.CenterCommute
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open scoped TensorProduct InnerProductSpace ComplexConjugate Pointwise
 
-theorem UpperTheory.ConvolutionTheory.Tf.tensCont :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), 0 < n → ∀ (β : CompactlySupportedContinuousMap (archGroup K n) ℂ) (e : CompactlySupportedContinuousMap (AdelicGLn.FiniteAdelicGL K n) ℂ),
-    (Continuous fun x : normOneGL (K := K) (n := n) => kbar β (infPart K n (x : AdelicGLn.AdelicGL K n)) * e (finPart K n (x : AdelicGLn.AdelicGL K n))) ∧
-    (HasCompactSupport fun x : normOneGL (K := K) (n := n) => kbar β (infPart K n (x : AdelicGLn.AdelicGL K n)) * e (finPart K n (x : AdelicGLn.AdelicGL K n))) ∧
-    ∀ x : normOneGL (K := K) (n := n), kbar β (infPart K n (x : AdelicGLn.AdelicGL K n)) * e (finPart K n (x : AdelicGLn.AdelicGL K n)) ≠ 0 →
-      ∃ a ∈ tsupport β, ∃ h ∈ tsupport e, x = archP K n a * MultiplicityOne.finProj K n h := by
+theorem UpperTheory.ConvolutionTheory.Tf.tensCont
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ),
+      0 < n
+        → ∀ (β : CompactlySupportedContinuousMap (archGroup K n) ℂ)
+            (e : CompactlySupportedContinuousMap (AdelicGLn.FiniteAdelicGL K n) ℂ),
+          (Continuous fun x : normOneGL (K := K) (n := n) =>
+              kbar β (infPart K n (x : AdelicGLn.AdelicGL K n))
+                * e (finPart K n (x : AdelicGLn.AdelicGL K n)))
+            ∧ (HasCompactSupport fun x : normOneGL (K := K) (n := n) =>
+              kbar β (infPart K n (x : AdelicGLn.AdelicGL K n))
+                * e (finPart K n (x : AdelicGLn.AdelicGL K n)))
+            ∧ ∀ x : normOneGL (K := K) (n := n),
+              kbar β (infPart K n (x : AdelicGLn.AdelicGL K n))
+                    * e (finPart K n (x : AdelicGLn.AdelicGL K n))
+                  ≠ 0
+                → ∃ a ∈ tsupport β, ∃ h ∈ tsupport e,
+                  x = archP K n a * MultiplicityOne.finProj K n h := by
   intro K _ _ n hn β e
-  have key : ∀ x : normOneGL (K := K) (n := n), kbar β (infPart K n (x : AdelicGLn.AdelicGL K n)) *
-      e (finPart K n (x : AdelicGLn.AdelicGL K n)) ≠ 0 →
-      ∃ a ∈ tsupport β, ∃ h ∈ tsupport e, x = archP K n a * MultiplicityOne.finProj K n h := by
+  have key
+      : ∀ x : normOneGL (K := K) (n := n),
+        kbar β (infPart K n (x : AdelicGLn.AdelicGL K n))
+              * e (finPart K n (x : AdelicGLn.AdelicGL K n))
+            ≠ 0
+          → ∃ a ∈ tsupport β, ∃ h ∈ tsupport e,
+            x = archP K n a * MultiplicityOne.finProj K n h := by
     intro x hx
     have hk := left_ne_zero_of_mul hx
     have he := right_ne_zero_of_mul hx
@@ -39,10 +55,12 @@ theorem UpperTheory.ConvolutionTheory.Tf.tensCont :
       infEmb_infPart_mul_finEmb_finPart, retractOne_coe]
   refine ⟨?_, ?_, key⟩
   · exact ((continuous_kbar hn β.continuous β.hasCompactSupport).comp
-      (continuous_infPart.comp continuous_subtype_val)).mul
+        (continuous_infPart.comp continuous_subtype_val)).mul
       (e.continuous.comp (continuous_finPart.comp continuous_subtype_val))
-  · have hC : IsCompact ((fun p : archGroup K n × AdelicGLn.FiniteAdelicGL K n =>
-        archP K n p.1 * MultiplicityOne.finProj K n p.2) '' (tsupport β ×ˢ tsupport e)) :=
+  · have hC : IsCompact
+        ((fun p : archGroup K n × AdelicGLn.FiniteAdelicGL K n =>
+            archP K n p.1 * MultiplicityOne.finProj K n p.2)
+          '' (tsupport β ×ˢ tsupport e)) :=
       (β.hasCompactSupport.isCompact.prod e.hasCompactSupport.isCompact).image
         ((continuous_archP.comp continuous_fst).mul
           (MultiplicityOne.continuous_finProj.comp continuous_snd))

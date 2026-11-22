@@ -6,26 +6,42 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem par_equiv {ι : Type} [Fintype ι] (v : ι → ZMod 2) :
-    ∃ (a g : ℕ) (e : Fin a ⊕ Fin g ≃ ι), ∀ s, v (e s) = Space.Loc.par a g s := by
+private theorem par_equiv {ι : Type} [Fintype ι] (v : ι → ZMod 2)
+    : ∃ (a g : ℕ) (e : Fin a ⊕ Fin g ≃ ι), ∀ s, v (e s) = Space.Loc.par a g s := by
   classical
-  refine ⟨_, _, (Equiv.sumCongr (Fintype.equivFin {i // v i = 0}).symm
-    (Fintype.equivFin {i // ¬ v i = 0}).symm).trans (Equiv.sumCompl fun i => v i = 0), ?_⟩
+  refine ⟨
+    _,
+    _,
+    (Equiv.sumCongr (Fintype.equivFin {i // v i = 0}).symm
+      (Fintype.equivFin {i // ¬ v i = 0}).symm).trans (Equiv.sumCompl fun i => v i = 0),
+    ?_
+  ⟩
   have h2 : ∀ j : ZMod 2, ¬ j = 0 → j = 1 := by decide
   rintro (s | s)
   · exact ((Fintype.equivFin {i // v i = 0}).symm s).2
   · exact h2 _ ((Fintype.equivFin {i // ¬ v i = 0}).symm s).2
 
-theorem UpperTheory.V.Fr.ep_basis :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O], IsUnit (2 : O) → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R), (∀ y, σ (σ y) = y) → ∀ J N : Ideal R, (∀ y ∈ J, σ y ∈ J) → (∀ y ∈ N, σ y ∈ N) → maximalIdeal R * J ≤ N → ∃ (a g : ℕ) (z : Fin a ⊕ Fin g → R), (∀ s, z s ∈ J ∧ z s ∈ evp σ (Space.Loc.par a g s)) ∧ J ≤ Ideal.span (Set.range z) ⊔ N ∧ ∀ c : Fin a ⊕ Fin g → O, ∑ s, c s • z s ∈ N → ∀ s, c s ∈ maximalIdeal O := by
+theorem UpperTheory.V.Fr.ep_basis
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O],
+      IsUnit (2 : O)
+        → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R),
+          (∀ y, σ (σ y) = y)
+            → ∀ J N : Ideal R,
+              (∀ y ∈ J, σ y ∈ J) → (∀ y ∈ N, σ y ∈ N) → maximalIdeal R * J ≤ N
+                → ∃ (a g : ℕ) (z : Fin a ⊕ Fin g → R),
+                  (∀ s, z s ∈ J ∧ z s ∈ evp σ (Space.Loc.par a g s))
+                    ∧ J ≤ Ideal.span (Set.range z) ⊔ N
+                    ∧ ∀ c : Fin a ⊕ Fin g → O, ∑ s, c s • z s ∈ N → ∀ s, c s ∈ maximalIdeal O := by
   classical
   intro O _ _ _ _ h2 R _ _ _ σ hσ J N hJ hN hmJ
   haveI : IsLocalHom (algebraMap O R) := IsCO.isLocalHom
   obtain ⟨T, hT⟩ := (IsNoetherian.noetherian J : J.FG)
-  obtain ⟨u, hu2, hucomm⟩ : ∃ u : R, u * 2 = 1 ∧ ∀ x, σ (u * x) = u * σ x :=
-    ⟨algebraMap O R ↑h2.unit⁻¹, by
-      rw [← map_ofNat (algebraMap O R) 2, ← map_mul, h2.val_inv_mul, map_one],
-      fun x => by rw [map_mul, AlgHom.commutes]⟩
+  obtain ⟨u, hu2, hucomm⟩ : ∃ u : R, u * 2 = 1 ∧ ∀ x, σ (u * x) = u * σ x := ⟨
+    algebraMap O R ↑h2.unit⁻¹,
+    by rw [← map_ofNat (algebraMap O R) 2, ← map_mul, h2.val_inv_mul, map_one],
+    fun x => by rw [map_mul, AlgHom.commutes]
+  ⟩
   have hsg : ∀ p : ZMod 2, sg R p * sg R p = 1 := by
     intro p
     simp only [sg, ← pow_add, ← two_mul, pow_mul]
@@ -54,9 +70,9 @@ theorem UpperTheory.V.Fr.ep_basis :
     exact hmJ (Ideal.mul_mem_mul (map_nonunit (algebraMap O R) c hc) hy)
   let Indep : Finset (T × ZMod 2) → Prop := fun S =>
     ∀ c : T × ZMod 2 → O, ∑ s ∈ S, c s • w s ∈ N → ∀ s ∈ S, c s ∈ maximalIdeal O
-  obtain ⟨S, hS, hmax⟩ := Finset.exists_max_image
-    (Finset.univ.powerset.filter Indep) Finset.card
-    ⟨∅, Finset.mem_filter.mpr ⟨by simp, fun c _ s hs => absurd hs (Finset.notMem_empty s)⟩⟩
+  obtain ⟨S, hS, hmax⟩ :=
+    Finset.exists_max_image (Finset.univ.powerset.filter Indep) Finset.card
+      ⟨∅, Finset.mem_filter.mpr ⟨by simp, fun c _ s hs => absurd hs (Finset.notMem_empty s)⟩⟩
   have hS' : Indep S := (Finset.mem_filter.mp hS).2
   obtain ⟨a, g, e, he⟩ := par_equiv (ι := S) (fun i => i.1.2)
   refine ⟨a, g, fun s => w (e s).1, ?_, ?_, ?_⟩
@@ -93,8 +109,7 @@ theorem UpperTheory.V.Fr.ep_basis :
           rw [Algebra.smul_def]
           exact Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨e.symm ⟨s, hs⟩, by simp⟩)
         have hcw : c j • w j ∈ Ideal.span (Set.range fun s => w (e s).1) ⊔ N := by
-          have : c j • w j = (c j • w j + ∑ s ∈ S, c s • w s) - ∑ s ∈ S, c s • w s := by
-            abel
+          have : c j • w j = (c j • w j + ∑ s ∈ S, c s • w s) - ∑ s ∈ S, c s • w s := by abel
           rw [this]
           exact Submodule.sub_mem _ (Ideal.mem_sup_right hc) (Ideal.mem_sup_left hsumS)
         obtain ⟨d, hd⟩ := hunit.exists_left_inv

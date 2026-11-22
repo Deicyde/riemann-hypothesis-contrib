@@ -64,11 +64,15 @@ private lemma upperTri_sub {i : ℕ} (hi : i ≤ n) {c' : Matrix (Fin n) (Fin n)
   rw [Fin.lt_def, Fin.coe_castLE, Fin.coe_castLE]
   exact hab'
 
-theorem lead_tri_mul {c z c' : Matrix (Fin n) (Fin n) ℂ} (hc : IsLowerTri c) (hc' : IsUpperTri c') (i : ℕ) (hi : i ≤ n) :
-    lead i (c * z * c') =
-      (∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < i), c l l * c' l l) * lead i z := by
-  have hp : ∀ f : Fin n → ℂ, ∏ a : Fin i, f (Fin.castLE hi a) =
-      ∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < i), f l := by
+theorem lead_tri_mul
+    {c z c' : Matrix (Fin n) (Fin n) ℂ} (hc : IsLowerTri c) (hc' : IsUpperTri c')
+    (i : ℕ) (hi : i ≤ n)
+    : lead i (c * z * c')
+      = (∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < i), c l l * c' l l) * lead i z := by
+  have hp
+      : ∀ f : Fin n → ℂ,
+        ∏ a : Fin i, f (Fin.castLE hi a)
+          = ∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < i), f l := by
     intro f
     rw [Finset.prod_filter]
     refine Fintype.prod_of_injective (Fin.castLE hi) (Fin.castLE_injective hi) _ _ ?_ ?_
@@ -79,14 +83,15 @@ theorem lead_tri_mul {c z c' : Matrix (Fin n) (Fin n) ℂ} (hc : IsLowerTri c) (
     · intro a
       rw [if_pos (by rw [Fin.coe_castLE]; exact a.2)]
   unfold lead
-  rw [dite_eq_left hi, dite_eq_left hi, sub_mul_upper hi hc', sub_lower_mul hi hc, Matrix.det_mul, Matrix.det_mul,
-    Matrix.det_of_lowerTriangular _ (lowerTri_sub hi hc), Matrix.det_of_upperTriangular (upperTri_sub hi hc'),
-    Finset.prod_mul_distrib, ← hp (fun l => c l l), ← hp (fun l => c' l l)]
+  rw [dite_eq_left hi, dite_eq_left hi, sub_mul_upper hi hc', sub_lower_mul hi hc, Matrix.det_mul,
+    Matrix.det_mul, Matrix.det_of_lowerTriangular _ (lowerTri_sub hi hc),
+    Matrix.det_of_upperTriangular (upperTri_sub hi hc'), Finset.prod_mul_distrib,
+    ← hp (fun l => c l l), ← hp (fun l => c' l l)]
   simp only [Matrix.submatrix_apply]
   ring
 
-theorem lead_posDef {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) (i : ℕ) (hi : i ≤ n) :
-    0 < (lead i x).re ∧ (lead i x).im = 0 := by
+theorem lead_posDef {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) (i : ℕ) (hi : i ≤ n)
+    : 0 < (lead i x).re ∧ (lead i x).im = 0 := by
   have hp := (hx.submatrix (Fin.castLE_injective hi)).det_pos
   unfold lead
   rw [dite_eq_left hi]

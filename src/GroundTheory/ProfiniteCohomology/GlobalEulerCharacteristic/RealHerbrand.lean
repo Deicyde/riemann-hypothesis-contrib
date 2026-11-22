@@ -23,12 +23,11 @@ theorem ker_id_add_eq_fixedSub_neg : (AddMonoidHom.id M + σ).ker = fixedSub (-�
   rw [AddMonoidHom.mem_ker, mem_fixedSub, AddMonoidHom.add_apply, AddMonoidHom.id_apply,
     AddMonoidHom.neg_apply, neg_eq_iff_eq_neg, eq_neg_iff_add_eq_zero, add_comm]
 
-theorem card_tateQuot_mul_card (hσ : ∀ x, σ (σ x) = x) :
-    Nat.card (tateQuot σ) * Nat.card M = Nat.card (fixedSub σ) * Nat.card (fixedSub (-σ)) := by
-  have h1 : Nat.card (fixedSub σ) =
-      Nat.card (tateQuot σ) * Nat.card (traceSub σ) := by
-    rw [AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup
-      ((traceSub σ).addSubgroupOf (fixedSub σ)),
+theorem card_tateQuot_mul_card (hσ : ∀ x, σ (σ x) = x)
+    : Nat.card (tateQuot σ) * Nat.card M = Nat.card (fixedSub σ) * Nat.card (fixedSub (-σ)) := by
+  have h1 : Nat.card (fixedSub σ) = Nat.card (tateQuot σ) * Nat.card (traceSub σ) := by
+    rw [AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup ((traceSub σ).addSubgroupOf
+        (fixedSub σ)),
       Nat.card_congr (AddSubgroup.addSubgroupOfEquivOfLe (traceSub_le_fixedSub hσ)).toEquiv]
   have h2 : Nat.card (traceSub σ) * Nat.card (fixedSub (-σ)) = Nat.card M := by
     rw [← ker_id_add_eq_fixedSub_neg, traceSub]
@@ -37,8 +36,8 @@ theorem card_tateQuot_mul_card (hσ : ∀ x, σ (σ x) = x) :
 
 variable [Finite M]
 
-theorem card_tateQuot_neg (hσ : ∀ x, σ (σ x) = x) :
-    Nat.card (tateQuot (-σ)) = Nat.card (tateQuot σ) := by
+theorem card_tateQuot_neg (hσ : ∀ x, σ (σ x) = x)
+    : Nat.card (tateQuot (-σ)) = Nat.card (tateQuot σ) := by
   have hσ' : ∀ x, (-σ) ((-σ) x) = x := fun x => by
     rw [AddMonoidHom.neg_apply, AddMonoidHom.neg_apply, map_neg, neg_neg, hσ]
   have e1 := card_tateQuot_mul_card hσ
@@ -52,10 +51,11 @@ namespace OrderTwo
 
 section Card
 
-variable {k G : Type} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [DiscreteTopology G] (A : Rep.{0} k G) [IsDiscreteRep A] {c : G}
-  (hG : ∀ g : G, g = 1 ∨ g = c) (hc : c ≠ 1)
-
+variable
+  {k G : Type}
+  [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [DiscreteTopology G]
+  (A : Rep.{0} k G) [IsDiscreteRep A]
+  {c : G} (hG : ∀ g : G, g = 1 ∨ g = c) (hc : c ≠ 1)
 
 omit [TopologicalSpace G] [IsTopologicalGroup G] [DiscreteTopology G] [IsDiscreteRep A] in
 include hG hc in
@@ -65,22 +65,19 @@ theorem act_act (x : A) : act A c (act A c x) = x := by
 
 variable [Finite A]
 
-
 include hG hc in
 theorem finite_cohomology_one : Finite (cohomology A 1) :=
   Finite.of_equiv _ (h1EquivOfOrderTwo A hG hc).toEquiv
-
 
 include hG hc in
 theorem finite_cohomology_two : Finite (cohomology A 2) :=
   Finite.of_equiv _ (h2EquivOfOrderTwo A hG hc).toEquiv
 
-
 include hG hc in
 theorem card_cohomology_one_eq_two : Nat.card (cohomology A 1) = Nat.card (cohomology A 2) := by
-  rw [← Nat.card_congr (h1EquivOfOrderTwo A hG hc).toEquiv, ← Nat.card_congr (h2EquivOfOrderTwo A hG hc).toEquiv]
+  rw [← Nat.card_congr (h1EquivOfOrderTwo A hG hc).toEquiv,
+    ← Nat.card_congr (h2EquivOfOrderTwo A hG hc).toEquiv]
   exact Involution.card_tateQuot_neg (act_act A hG hc)
-
 
 include hG hc in
 theorem eulerChar_eq_card_cohomology_zero : eulerChar A = Nat.card (cohomology A 0) := by
@@ -100,17 +97,14 @@ section RealPlace
 
 open NumberField GroundTheory.Global
 
-variable {K : FiniteSubfield} (v : InfinitePlace K.1) (hv : v.IsReal)
-  (M : Rep.{0} (ULift.{0} ℤ) Gal(AlgebraicClosure v.Completion / v.Completion)) [IsDiscreteRep M]
-  [Finite M]
-
-
+variable
+  {K : FiniteSubfield} (v : InfinitePlace K.1) (hv : v.IsReal)
+  (M : Rep.{0} (ULift.{0} ℤ) Gal(AlgebraicClosure v.Completion / v.Completion))
+  [IsDiscreteRep M] [Finite M]
 
 include hv in
-theorem eulerChar_eq_card_cohomology_zero_of_isReal :
-    eulerChar M = Nat.card (cohomology M 0) :=
+theorem eulerChar_eq_card_cohomology_zero_of_isReal : eulerChar M = Nat.card (cohomology M 0) :=
   OrderTwo.eulerChar_eq_card_cohomology_zero M (eq_one_or_eq_realConj v hv) (realConj_ne_one v hv)
-
 
 include hv in
 theorem finite_cohomology_of_isReal (n : ℕ) (hn : n ≤ 2) : Finite (cohomology M n) := by
@@ -127,18 +121,19 @@ open NumberField IsDedekindDomain GroundTheory.Global
 
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
-variable {K : FiniteSubfield} (S : Set (HeightOneSpectrum (𝓞 K.1)))
+variable
+  {K : FiniteSubfield} (S : Set (HeightOneSpectrum (𝓞 K.1)))
   (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
   (M : Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S)) [IsDiscreteRep M] [Finite M]
   (v : {v : InfinitePlace K.1 // v.IsReal})
 
-theorem gsReal_eulerChar_eq_card_cohomology_zero :
-    eulerChar (Rep.res (gsRealFamily S ιr v).toMonoidHom M) =
-      Nat.card (cohomology (Rep.res (gsRealFamily S ιr v).toMonoidHom M) 0) :=
+theorem gsReal_eulerChar_eq_card_cohomology_zero
+    : eulerChar (Rep.res (gsRealFamily S ιr v).toMonoidHom M)
+      = Nat.card (cohomology (Rep.res (gsRealFamily S ιr v).toMonoidHom M) 0) :=
   eulerChar_eq_card_cohomology_zero_of_isReal v.1 v.2 _
 
-theorem gsReal_finite_cohomology (n : ℕ) (hn : n ≤ 2) :
-    Finite (cohomology (Rep.res (gsRealFamily S ιr v).toMonoidHom M) n) :=
+theorem gsReal_finite_cohomology (n : ℕ) (hn : n ≤ 2)
+    : Finite (cohomology (Rep.res (gsRealFamily S ιr v).toMonoidHom M) n) :=
   finite_cohomology_of_isReal v.1 v.2 _ n hn
 
 end GS

@@ -7,12 +7,16 @@ public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.FormalSeriesBounds GlobalTheory.GoodDepth GlobalTheory.RunDepth
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.FormalSeriesBounds GlobalTheory.GoodDepth
+  GlobalTheory.RunDepth
 
 namespace GlobalTheory.GoodDepth
 
-theorem not_dvd_discr_host : ∀ (Rk : Ranks) (H : Formalism.BasicNotions.Host Rk) (p : ℕ), p.Prime → p ∉ H.small →
-    p ≠ H.q → p ≠ H.d → ¬ (p : ℤ) ∣ NumberField.discr H.E := by
+theorem not_dvd_discr_host
+    : ∀ (Rk : Ranks) (H : Formalism.BasicNotions.Host Rk) (p : ℕ),
+      p.Prime → p ∉ H.small → p ≠ H.q → p ≠ H.d → ¬ (p : ℤ) ∣ NumberField.discr H.E := by
   intro Rk H p hp hs hq hd hdvd
   have hc : p ∣ H.QS * H.q * H.d := H.der.discr_primes.1 p hp hdvd
   rcases (hp.dvd_mul).1 hc with h | h

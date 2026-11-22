@@ -8,13 +8,14 @@ open PowerSeries IsLocalRing UpperTheory.V.abelian₂
 open IsDiscreteValuationRing (addVal)
 open scoped Pointwise TensorProduct Topology
 
-private theorem mem_max_iff {O : Type} [CommRing O] [IsLocalRing O] (f : O⟦X⟧) :
-    f ∈ maximalIdeal O⟦X⟧ ↔ constantCoeff f ∈ maximalIdeal O := by
+private theorem mem_max_iff {O : Type} [CommRing O] [IsLocalRing O] (f : O⟦X⟧)
+    : f ∈ maximalIdeal O⟦X⟧ ↔ constantCoeff f ∈ maximalIdeal O := by
   rw [IsLocalRing.mem_maximalIdeal, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
     mem_nonunits_iff, PowerSeries.isUnit_iff_constantCoeff]
 
-private theorem C_mem_pow {O : Type} [CommRing O] [IsLocalRing O] (k : ℕ) (a : O)
-    (ha : a ∈ maximalIdeal O ^ k) : (C a : O⟦X⟧) ∈ maximalIdeal O⟦X⟧ ^ k := by
+private theorem C_mem_pow
+    {O : Type} [CommRing O] [IsLocalRing O] (k : ℕ) (a : O) (ha : a ∈ maximalIdeal O ^ k)
+    : (C a : O⟦X⟧) ∈ maximalIdeal O⟦X⟧ ^ k := by
   have h1 : Ideal.map (C : O →+* O⟦X⟧) (maximalIdeal O) ≤ maximalIdeal O⟦X⟧ := by
     rw [Ideal.map_le_iff_le_comap]
     intro x hx
@@ -24,8 +25,8 @@ private theorem C_mem_pow {O : Type} [CommRing O] [IsLocalRing O] (k : ℕ) (a :
   rw [Ideal.map_pow] at h2
   exact Ideal.pow_right_mono h1 k h2
 
-theorem UpperTheory.V.abelian₂.mem_max_pow :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (f : O⟦X⟧) (n : ℕ),
+theorem UpperTheory.V.abelian₂.mem_max_pow
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (f : O⟦X⟧) (n : ℕ),
       f ∈ maximalIdeal O⟦X⟧ ^ n ↔ ∀ i, coeff i f ∈ maximalIdeal O ^ (n - i) := by
   intro O _ _ f n
   constructor

@@ -30,8 +30,9 @@ theorem SubvarDrop.proof : SubvarDrop.Statement.{u, w} := by
 
   have hnf : ¬ IsField (Poly k N ⧸ pp) := by
     intro hF
-    obtain ⟨v, hv⟩ := hF.mul_inv_cancel (a := Ideal.Quotient.mk pp (X j))
-      (by rwa [Ne, Ideal.Quotient.eq_zero_iff_mem])
+    obtain ⟨v, hv⟩ :=
+      hF.mul_inv_cancel (a := Ideal.Quotient.mk pp (X j))
+        (by rwa [Ne, Ideal.Quotient.eq_zero_iff_mem])
     obtain ⟨g, rfl⟩ := Ideal.Quotient.mk_surjective v
     rw [← map_mul, ← map_one (Ideal.Quotient.mk pp), Ideal.Quotient.eq] at hv
     have h0 := hhom _ hv 0
@@ -58,9 +59,12 @@ theorem SubvarDrop.proof : SubvarDrop.Statement.{u, w} := by
       rw [← WithBot.coe_add, WithBot.coe_le_coe, top_add] at hup
       exact absurd hup (by simp)
     | coe n =>
-      obtain ⟨e, rfl⟩ : ∃ e, n = e + 1 := ⟨n - 1, by
-        have : n ≠ 0 := by rintro rfl; exact hne0 rfl
-        omega⟩
+      obtain ⟨e, rfl⟩ : ∃ e, n = e + 1 := ⟨
+        n - 1,
+        by
+          have : n ≠ 0 := by rintro rfl; exact hne0 rfl
+          omega
+      ⟩
       refine ⟨e, ?_, ⟨hpp, hhom, hle, ⟨j, hj⟩, hD⟩⟩
       rw [← WithBot.coe_add, WithBot.coe_le_coe] at hup
       have : ((e + 1 + 1 : ℕ) : ℕ∞) ≤ ((d + 1 + 1 : ℕ) : ℕ∞) := by exact_mod_cast hup

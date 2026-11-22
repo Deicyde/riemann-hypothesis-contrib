@@ -7,12 +7,26 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Induced
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 namespace GlobalTheory.ZH
 
-theorem isNm_of_isCl_veronese : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (J : Type) [Fintype J] (t : J → Ω) (e n : ℕ) (z : Fin (n + 1) → Ω), 1 ≤ e → M.IsCl z → (∀ i, ∃ k, z k = t i ^ e) → (∀ i, t i ≠ 0 → ∀ x, x ∈ Algebra.adjoin o (Set.range fun k => z k / t i ^ e) ↔ IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) x) → (∀ k, z k ≠ 0 → ∃ c : J → Algebra.adjoin o (Set.range fun l => z l / z k), ∑ i, (c i : Ω) * (t i ^ e / z k) = 1) → M.IsNm t := by
+theorem isNm_of_isCl_veronese
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (J : Type) [Fintype J]
+        (t : J → Ω) (e n : ℕ) (z : Fin (n + 1) → Ω),
+      1 ≤ e → M.IsCl z → (∀ i, ∃ k, z k = t i ^ e)
+        → (∀ i,
+          t i ≠ 0
+            → ∀ x,
+              x ∈ Algebra.adjoin o (Set.range fun k => z k / t i ^ e)
+                ↔ IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) x)
+        → (∀ k,
+          z k ≠ 0
+            → ∃ c : J → Algebra.adjoin o (Set.range fun l => z l / z k),
+              ∑ i, (c i : Ω) * (t i ^ e / z k) = 1)
+        → M.IsNm t := by
   intro o Ω _ _ _ M J _ t e n z he hcl hk hint hsum
   choose κ hκ using hk
   have hle : ∀ k p, M.Div z k p → Algebra.adjoin o (Set.range fun l => z l / z k) ≤ M.O p :=

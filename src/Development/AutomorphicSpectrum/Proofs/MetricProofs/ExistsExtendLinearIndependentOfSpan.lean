@@ -9,11 +9,11 @@ public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.IsPshLoc
 
 namespace GlobalTheory.CompanionTheory.Ar.Exchange
 
-theorem exists_completion_by_members (g m r : ℕ) (w : Fin r → Fin g → ℂ) (b : Fin m → Fin g → ℂ)
-    (hw : LinearIndependent ℂ w) (hb : LinearIndependent ℂ b)
-    (hwb : ∀ a, w a ∈ Submodule.span ℂ (Set.range b)) :
-    ∃ (k : ℕ) (J : Fin k → Fin m), r + k = m ∧
-      LinearIndependent ℂ (Fin.append w (fun j => b (J j))) := by
+theorem exists_completion_by_members
+    (g m r : ℕ) (w : Fin r → Fin g → ℂ) (b : Fin m → Fin g → ℂ) (hw : LinearIndependent ℂ w)
+    (hb : LinearIndependent ℂ b) (hwb : ∀ a, w a ∈ Submodule.span ℂ (Set.range b))
+    : ∃ (k : ℕ) (J : Fin k → Fin m),
+      r + k = m ∧ LinearIndependent ℂ (Fin.append w (fun j => b (J j))) := by
   classical
   let v : Fin r ⊕ Fin m → (Fin g → ℂ) := Sum.elim w b
   have hs : LinearIndepOn ℂ v (Set.range Sum.inl) := by
@@ -24,8 +24,11 @@ theorem exists_completion_by_members (g m r : ℕ) (w : Fin r → Fin g → ℂ)
   let J : Fin S.card → Fin m := S.orderEmbOfFin rfl
   let φ : Fin (r + S.card) → Fin r ⊕ Fin m := Fin.append Sum.inl (Sum.inr ∘ J)
   have hφ : Function.Injective φ :=
-    Fin.append_injective_iff.mpr ⟨Sum.inl_injective,
-      Sum.inr_injective.comp (S.orderEmbOfFin rfl).injective, fun _ _ => Sum.inl_ne_inr⟩
+    Fin.append_injective_iff.mpr ⟨
+      Sum.inl_injective,
+      Sum.inr_injective.comp (S.orderEmbOfFin rfl).injective,
+      fun _ _ => Sum.inl_ne_inr
+    ⟩
   have hJS : ∀ l, J l ∈ S := fun l => S.orderEmbOfFin_mem rfl l
   have hφB : Set.range φ ⊆ B := by
     rintro _ ⟨l, rfl⟩

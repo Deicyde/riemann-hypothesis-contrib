@@ -22,10 +22,14 @@ def eI (k r : ℕ) (a : Fin r) : Fin (2 * r + k + 1) := ⟨a.val, by omega⟩
 def esI (k r : ℕ) (a : Fin r) : Fin (2 * r + k + 1) := ⟨2 * r + k - a.val, by omega⟩
 
 def Hpk (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ := fun i j =>
-  if i.val < r ∧ i.val + j.val = 2 * r + k then 1
-  else if j.val < r ∧ i.val + j.val = 2 * r + k then 1
-  else if r ≤ i.val ∧ i.val ≤ r + k ∧ i = j then (if i.val = r + k then -1 else 1)
-  else 0
+  if i.val < r ∧ i.val + j.val = 2 * r + k then
+    1
+  else if j.val < r ∧ i.val + j.val = 2 * r + k then
+    1
+  else if r ≤ i.val ∧ i.val ≤ r + k ∧ i = j then
+    (if i.val = r + k then -1 else 1)
+  else
+    0
 
 def bvec {m : ℕ} (i : Fin m) : Fin m → ℂ := Pi.single i 1
 
@@ -41,25 +45,27 @@ def Nset (k r : ℕ) : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) �
     (∀ i j : Fin (2 * r + k + 1), r ≤ j.val → j.val ≤ r + k → r ≤ i.val →
       g i j = if i = j then 1 else 0)}
 
-def UWset (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) :
-    Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
+def UWset (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
+    : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
   {g | g ∈ UH (Hpk k r) ∧
     (∀ a : Fin r, g *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ g *ᵥ bvec (esI k r a) = bvec (esI k r a)) ∧
     g *ᵥ z = z}
 
-def Sset (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) :
-    Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
+def Sset (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
+    : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
   {s | ∃ h ∈ UWset k r z, ∃ m ∈ Nset k r, s = h * m}
 
 end QuotSetU
 
-
 open QuotSetU in
 def QuotSetU : Prop :=
-  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), inWb k r z → 0 < Tz k r z →
-    IsMatGroup (UH (Hpk k r)) ∧ IsMatGroup (Sset k r z) ∧ Sset k r z ⊆ UH (Hpk k r) ∧
-    (∀ μG : Measure (MtM (2 * r + k + 1)), IsHaarOnM (UH (Hpk k r)) μG → IsRightInvM (UH (Hpk k r)) μG) ∧
-    (∀ μS : Measure (MtM (2 * r + k + 1)), IsHaarOnM (Sset k r z) μS → IsRightInvM (Sset k r z) μS)
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ),
+    inWb k r z → 0 < Tz k r z
+      → IsMatGroup (UH (Hpk k r)) ∧ IsMatGroup (Sset k r z) ∧ Sset k r z ⊆ UH (Hpk k r)
+        ∧ (∀ μG : Measure (MtM (2 * r + k + 1)),
+          IsHaarOnM (UH (Hpk k r)) μG → IsRightInvM (UH (Hpk k r)) μG)
+        ∧ (∀ μS : Measure (MtM (2 * r + k + 1)),
+          IsHaarOnM (Sset k r z) μS → IsRightInvM (Sset k r z) μS)
 
 end PI
 

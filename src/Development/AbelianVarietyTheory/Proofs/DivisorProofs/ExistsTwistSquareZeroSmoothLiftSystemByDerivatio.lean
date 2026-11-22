@@ -9,7 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulEqZeroOfM
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.LiftSys GlobalTheory.Published
+open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift
+  GlobalTheory.LiftSys GlobalTheory.Published
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -20,9 +23,14 @@ namespace GlobalTheory.LiftSys.Twist
 
 variable {R R₀ : Type} [CommRing R] [CommRing R₀] {I : Ideal R} {π : R →+* R₀}
 
-def twistHom {B B₀ B' : Type} [CommRing B] [Algebra R B] [CommRing B₀] [Algebra R₀ B₀] [CommRing B']
-    [Algebra R B'] (hI : I ^ 2 = 0) (p : B →+* B₀) (hp : SemiHom π p) (α : B →ₐ[R] B') (θ : Ω[B₀⁄R₀] →+ B')
-    (hsm : ∀ b w, θ (p b • w) = α b * θ w) (hmem : ∀ w, θ w ∈ I.map (algebraMap R B')) : B →ₐ[R] B' where
+def twistHom
+    {B B₀ B' : Type}
+    [CommRing B] [Algebra R B] [CommRing B₀] [Algebra R₀ B₀] [CommRing B'] [Algebra R B']
+    (hI : I ^ 2 = 0)
+    (p : B →+* B₀) (hp : SemiHom π p)
+    (α : B →ₐ[R] B') (θ : Ω[B₀⁄R₀] →+ B')
+    (hsm : ∀ b w, θ (p b • w) = α b * θ w) (hmem : ∀ w, θ w ∈ I.map (algebraMap R B'))
+    : B →ₐ[R] B' where
   toFun b := α b + θ (D R₀ B₀ (p b))
   map_one' := by simp
   map_mul' b c := by
@@ -32,30 +40,36 @@ def twistHom {B B₀ B' : Type} [CommRing B] [Algebra R B] [CommRing B₀] [Alge
   map_zero' := by simp
   map_add' b c := by simp only [map_add (f := _)]; abel
   commutes' r := by
-    simp only [SemiHom.map_algebraMap hp, Derivation.map_algebraMap, map_zero, add_zero, AlgHom.commutes]
+    simp only [SemiHom.map_algebraMap hp, Derivation.map_algebraMap, map_zero, add_zero,
+      AlgHom.commutes]
 
-variable {X₀ : Scheme.{0}} {s₀ : X₀ ⟶ Sp R₀} (S : Sys I π s₀) (hI : I ^ 2 = 0)
+variable
+  {X₀ : Scheme.{0}} {s₀ : X₀ ⟶ Sp R₀} (S : Sys I π s₀)
+  (hI : I ^ 2 = 0)
   (θ : ∀ (U V : AffOp X₀) (_ : U ⟶ V), Ω[Sec s₀ U.unop.1⁄R₀] →+ S.F.obj V)
   (hsm : ∀ (U V : AffOp X₀) (a : U ⟶ V) b w, θ U V a (S.p U b • w) = mp S.F a b * θ U V a w)
   (hmem : ∀ (U V : AffOp X₀) (a : U ⟶ V) w, θ U V a w ∈ I.map (algebraMap R (S.F.obj V)))
   (hid : ∀ U, θ U U (𝟙 U) = 0)
   (hcomp : ∀ (U V W : AffOp X₀) (a : U ⟶ V) (b : V ⟶ W) (c : S.F.obj U),
-    θ U W (a ≫ b) (D R₀ _ (S.p U c)) =
-      mp S.F b (θ U V a (D R₀ _ (S.p U c))) + θ V W b (D R₀ _ (S.p V (mp S.F a c))))
+    θ U W (a ≫ b) (D R₀ _ (S.p U c))
+      = mp S.F b (θ U V a (D R₀ _ (S.p U c))) + θ V W b (D R₀ _ (S.p V (mp S.F a c))))
 
 def twistF : AffOp X₀ ⥤ CommAlgCat.{0} R where
   obj := S.F.obj
-  map {U V} a := CommAlgCat.ofHom (twistHom hI (S.p U) (S.semi U) (mp S.F a) (θ U V a) (hsm U V a) (hmem U V a))
-  map_id U := CommAlgCat.hom_ext (AlgHom.ext fun b ↦ by
-    change mp S.F (𝟙 U) b + θ U U (𝟙 U) (D R₀ _ (S.p U b)) = b
-    rw [hid, AddMonoidHom.zero_apply, add_zero, mp_id])
-  map_comp {U V W} a b := CommAlgCat.hom_ext (AlgHom.ext fun c ↦ by
-    change mp S.F (a ≫ b) c + θ U W (a ≫ b) (D R₀ _ (S.p U c)) =
-      mp S.F b (mp S.F a c + θ U V a (D R₀ _ (S.p U c))) +
-        θ V W b (D R₀ _ (S.p V (mp S.F a c + θ U V a (D R₀ _ (S.p U c)))))
-    have h0 : S.p V (θ U V a (D R₀ _ (S.p U c))) = 0 := (S.ker V _).2 (hmem U V a _)
-    rw [map_add (S.p V), h0, add_zero, hcomp, mp_comp, map_add (f := _)]
-    abel)
+  map {U V} a :=
+    CommAlgCat.ofHom (twistHom hI (S.p U) (S.semi U) (mp S.F a) (θ U V a) (hsm U V a) (hmem U V a))
+  map_id U :=
+    CommAlgCat.hom_ext (AlgHom.ext fun b ↦ by
+      change mp S.F (𝟙 U) b + θ U U (𝟙 U) (D R₀ _ (S.p U b)) = b
+      rw [hid, AddMonoidHom.zero_apply, add_zero, mp_id])
+  map_comp {U V W} a b :=
+    CommAlgCat.hom_ext (AlgHom.ext fun c ↦ by
+      change mp S.F (a ≫ b) c + θ U W (a ≫ b) (D R₀ _ (S.p U c))
+        = mp S.F b (mp S.F a c + θ U V a (D R₀ _ (S.p U c)))
+          + θ V W b (D R₀ _ (S.p V (mp S.F a c + θ U V a (D R₀ _ (S.p U c)))))
+      have h0 : S.p V (θ U V a (D R₀ _ (S.p U c))) = 0 := (S.ker V _).2 (hmem U V a _)
+      rw [map_add (S.p V), h0, add_zero, hcomp, mp_comp, map_add (f := _)]
+      abel)
 
 def twistSys : Sys I π s₀ where
   F := twistF S hI θ hsm hmem hid hcomp
@@ -69,8 +83,8 @@ def twistSys : Sys I π s₀ where
   ker := S.ker
   smooth := S.smooth
 
-def ev {S' : Sys I π s₀} (v : GlobForm s₀ →+ Z1 S'.F) {U V : AffOp X₀}
-    (a : U ⟶ V) : GlobForm s₀ →+ S'.F.obj V where
+def ev {S' : Sys I π s₀} (v : GlobForm s₀ →+ Z1 S'.F) {U V : AffOp X₀} (a : U ⟶ V)
+    : GlobForm s₀ →+ S'.F.obj V where
   toFun w := (v w).1 U V a
   map_zero' := by simp
   map_add' w w' := by simp
@@ -81,25 +95,41 @@ namespace GlobalTheory.LiftSys
 
 open Twist
 
-theorem exists_twist : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀) (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (X₀ : Scheme.{0}) (s₀ : X₀ ⟶ Sp R₀), Par s₀ → ∀ (S : Sys I π s₀) (v : GlobForm s₀ →+ Z1 S.F), (∀ w, S.IsIdealValuedLiftSystemCocycle (v w)) → (∀ (r : R) w, v (π r • w) = r • v w) → ∃ (S' : Sys I π s₀) (Φ : S.LocIso S') (θ : ∀ (U V : AffOp X₀) (_ : U ⟶ V), Ω[Sec s₀ U.unop.1⁄R₀] →+ S'.F.obj V), Φ.IsDefect θ ∧ ∀ (w : GlobForm s₀) U V a, θ U V a (w.1 U) = Φ.φ V ((v w).1 U V a) := by
+theorem exists_twist
+    : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀)
+        (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (X₀ : Scheme.{0}) (s₀ : X₀ ⟶ Sp R₀),
+      Par s₀
+        → ∀ (S : Sys I π s₀) (v : GlobForm s₀ →+ Z1 S.F),
+          (∀ w, S.IsIdealValuedLiftSystemCocycle (v w)) → (∀ (r : R) w, v (π r • w) = r • v w)
+            → ∃ (S' : Sys I π s₀) (Φ : S.LocIso S')
+                (θ : ∀ (U V : AffOp X₀) (_ : U ⟶ V), Ω[Sec s₀ U.unop.1⁄R₀] →+ S'.F.obj V),
+              Φ.IsDefect θ
+                ∧ ∀ (w : GlobForm s₀) U V a, θ U V a (w.1 U) = Φ.φ V ((v w).1 U V a) := by
   intro R R₀ _ _ I hI π hπ hk X₀ s₀ hpar S v hv hs
-  have hex : ∀ (U V : AffOp X₀) (a : U ⟶ V), ∃! θ : Ω[Sec s₀ U.unop.1⁄R₀] →+ S.F.obj V,
-      (∀ b w, θ (S.p U b • w) = mp S.F a b * θ w) ∧ (∀ w, θ w ∈ I.map (algebraMap R (S.F.obj V))) ∧
-        ∀ w : GlobForm s₀, θ (w.1 U) = (v w).1 U V a := fun U V a ↦
-    exists_unique_formExt R R₀ I hI π hπ hk X₀ s₀ hpar U _ _ (S.p U) (S.semi U) (S.surj U) (S.ker U) (mp S.F a)
-      (ev v a) (fun r w ↦ by show (v (π r • w)).1 U V a = r • (v w).1 U V a; rw [hs]; rfl) (fun w ↦ hv w U V a)
+  have hex
+      : ∀ (U V : AffOp X₀) (a : U ⟶ V),
+        ∃! θ : Ω[Sec s₀ U.unop.1⁄R₀] →+ S.F.obj V,
+          (∀ b w, θ (S.p U b • w) = mp S.F a b * θ w) ∧ (∀ w, θ w ∈ I.map (algebraMap R (S.F.obj V))) ∧
+            ∀ w : GlobForm s₀, θ (w.1 U) = (v w).1 U V a := fun U V a ↦
+    exists_unique_formExt R R₀ I hI π hπ hk X₀ s₀ hpar U _ _ (S.p U) (S.semi U) (S.surj U) (S.ker U)
+      (mp S.F a) (ev v a)
+      (fun r w ↦ by show (v (π r • w)).1 U V a = r • (v w).1 U V a; rw [hs]; rfl)
+      (fun w ↦ hv w U V a)
   choose θ hθ huniq using hex
   have hsm := fun U V a ↦ (hθ U V a).1
   have hmem := fun U V a ↦ (hθ U V a).2.1
   have hglob := fun U V a ↦ (hθ U V a).2.2
-  have hid : ∀ U, θ U U (𝟙 U) = 0 := fun U ↦ (huniq U U (𝟙 U) 0
-    ⟨fun b w ↦ by simp, fun w ↦ by simp, fun w ↦ by rw [AddMonoidHom.zero_apply, Z1.id]⟩).symm
-  have hcomp' : ∀ (U V W : AffOp X₀) (a : U ⟶ V) (b : V ⟶ W) (x : Ω[Sec s₀ U.unop.1⁄R₀]),
-      θ U W (a ≫ b) x = mp S.F b (θ U V a x) + θ V W b (p1 (OAff s₀) a x) := by
+  have hid : ∀ U, θ U U (𝟙 U) = 0 := fun U ↦
+    (huniq U U (𝟙 U) 0
+      ⟨fun b w ↦ by simp, fun w ↦ by simp, fun w ↦ by rw [AddMonoidHom.zero_apply, Z1.id]⟩).symm
+  have hcomp'
+      : ∀ (U V W : AffOp X₀) (a : U ⟶ V) (b : V ⟶ W) (x : Ω[Sec s₀ U.unop.1⁄R₀]),
+        θ U W (a ≫ b) x = mp S.F b (θ U V a x) + θ V W b (p1 (OAff s₀) a x) := by
     intro U V W a b
     let ψ : Ω[Sec s₀ U.unop.1⁄R₀] →+ S.F.obj W :=
-      AddMonoidHom.mk' (fun x ↦ mp S.F b (θ U V a x) + θ V W b (p1 (OAff s₀) a x)) (fun x y ↦ by
-        simp only [map_add (f := _)]; abel)
+      AddMonoidHom.mk'
+        (fun x ↦ mp S.F b (θ U V a x) + θ V W b (p1 (OAff s₀) a x))
+        (fun x y ↦ by simp only [map_add (f := _)]; abel)
     have e : ψ = θ U W (a ≫ b) := by
       refine huniq U W (a ≫ b) ψ ⟨fun c x ↦ ?_, fun x ↦ ?_, fun w ↦ ?_⟩
       · show mp S.F b (θ U V a (S.p U c • x)) + θ V W b (p1 (OAff s₀) a (S.p U c • x)) =
@@ -111,9 +141,10 @@ theorem exists_twist : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ide
     intro x
     rw [← e]
     rfl
-  have hcomp : ∀ (U V W : AffOp X₀) (a : U ⟶ V) (b : V ⟶ W) (c : S.F.obj U),
-      θ U W (a ≫ b) (D R₀ _ (S.p U c)) =
-        mp S.F b (θ U V a (D R₀ _ (S.p U c))) + θ V W b (D R₀ _ (S.p V (mp S.F a c))) := by
+  have hcomp
+      : ∀ (U V W : AffOp X₀) (a : U ⟶ V) (b : V ⟶ W) (c : S.F.obj U),
+        θ U W (a ≫ b) (D R₀ _ (S.p U c))
+          = mp S.F b (θ U V a (D R₀ _ (S.p U c))) + θ V W b (D R₀ _ (S.p V (mp S.F a c))) := by
     intro U V W a b c
     rw [hcomp', p1_D, S.nat]
   let S' := twistSys S hI θ hsm hmem hid hcomp

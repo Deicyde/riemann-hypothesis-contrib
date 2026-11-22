@@ -8,16 +8,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ValuationLift
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
 
 namespace GlobalTheory.LocStructNak
 
-variable {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A]
+variable
+  {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A]
 
-theorem dvd_of_vL_le [∀ ζ : Pts O A, IsDVRAt ζ] (c b : ↥(As O A))
-    (h : ∀ ζ : Pts O A, vL ζ c ≤ vL ζ b) : c ∣ b := by
-  have h0 : ∀ ζ : Pts O A, algebraMap ↥(As O A) (Loc ζ) b ∈
-      Ideal.map (algebraMap ↥(As O A) (Loc ζ)) (Ideal.span {c}) := by
+theorem dvd_of_vL_le
+    [∀ ζ : Pts O A, IsDVRAt ζ] (c b : ↥(As O A)) (h : ∀ ζ : Pts O A, vL ζ c ≤ vL ζ b)
+    : c ∣ b := by
+  have h0
+      : ∀ ζ : Pts O A,
+        algebraMap ↥(As O A) (Loc ζ) b
+          ∈ Ideal.map (algebraMap ↥(As O A) (Loc ζ)) (Ideal.span {c}) := by
     intro ζ
     have h1 := h ζ
     rw [vL_eq_addVal, vL_eq_addVal, IsDiscreteValuationRing.addVal_le_iff_dvd] at h1
@@ -25,11 +30,11 @@ theorem dvd_of_vL_le [∀ ζ : Pts O A, IsDVRAt ζ] (c b : ↥(As O A))
     exact h1
   exact Ideal.mem_span_singleton.1 (Ideal.mem_of_localization_maximal (fun P hP => h0 ⟨P, hP⟩))
 
-
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-theorem exists_residue (C : Subalgebra O ↥(As O A)) (ζ : Pts O A) (b c d : ↥(As O A))
-    (hc : c ∈ C) (hd : d ∈ C) (hd0 : d ∉ ζ.asIdeal) (h : d * b - c ∈ ζ.asIdeal) :
-    ∃ c' ∈ C, b - c' ∈ ζ.asIdeal := by
+theorem exists_residue
+    (C : Subalgebra O ↥(As O A)) (ζ : Pts O A) (b c d : ↥(As O A))
+    (hc : c ∈ C) (hd : d ∈ C) (hd0 : d ∉ ζ.asIdeal) (h : d * b - c ∈ ζ.asIdeal)
+    : ∃ c' ∈ C, b - c' ∈ ζ.asIdeal := by
   haveI : Algebra.IsIntegral ↥C ↥(As O A) := Algebra.IsIntegral.tower_top O
   haveI := ζ.isMaximal
   have hmax : (ζ.asIdeal.comap (algebraMap ↥C ↥(As O A))).IsMaximal :=
@@ -38,15 +43,16 @@ theorem exists_residue (C : Subalgebra O ↥(As O A)) (ζ : Pts O A) (b c d : �
   have hz' : (z : ↥(As O A)) ∈ ζ.asIdeal := hz
   have hyz' : (y : ↥(As O A)) * d + z = 1 := congrArg Subtype.val hyz
   refine ⟨y * c, C.mul_mem y.2 hc, ?_⟩
-  have e : b - y * c = y * (d * b - c) + b * z := by
-    linear_combination (-b) * hyz'
+  have e : b - y * c = y * (d * b - c) + b * z := by linear_combination (-b) * hyz'
   rw [e]
   exact ζ.asIdeal.add_mem (ζ.asIdeal.mul_mem_left _ h) (ζ.asIdeal.mul_mem_left _ hz')
 
-theorem exists_approx [∀ ζ : Pts O A, IsDVRAt ζ] [Finite (Pts O A)] (C : Subalgebra O ↥(As O A))
-    (hval : ∀ n : Pts O A → ℕ, ∃ c ∈ C, ∀ ζ, vL ζ c = (n ζ : ℕ∞))
+theorem exists_approx
+    [∀ ζ : Pts O A, IsDVRAt ζ] [Finite (Pts O A)]
+    (C : Subalgebra O ↥(As O A)) (hval : ∀ n : Pts O A → ℕ, ∃ c ∈ C, ∀ ζ, vL ζ c = (n ζ : ℕ∞))
     (hres : ∀ (ζ : Pts O A) (b : ↥(As O A)), ∃ c ∈ C, b - c ∈ ζ.asIdeal)
-    (n : Pts O A → ℕ) (b : ↥(As O A)) : ∃ c ∈ C, ∀ ζ, (n ζ : ℕ∞) ≤ vL ζ (b - c) := by
+    (n : Pts O A → ℕ) (b : ↥(As O A))
+    : ∃ c ∈ C, ∀ ζ, (n ζ : ℕ∞) ≤ vL ζ (b - c) := by
   classical
   letI := Fintype.ofFinite (Pts O A)
   obtain ⟨N, hN⟩ : ∃ N, ∑ ζ, n ζ = N := ⟨_, rfl⟩
@@ -56,8 +62,8 @@ theorem exists_approx [∀ ζ : Pts O A, IsDVRAt ζ] [Finite (Pts O A)] (C : Sub
     rw [(Finset.sum_eq_zero_iff.1 hN) ζ (Finset.mem_univ _)]
     simp
   | succ N ih =>
-    obtain ⟨ζ₀, -, h0⟩ := Finset.exists_ne_zero_of_sum_ne_zero (s := Finset.univ) (f := n)
-      (by rw [hN]; omega)
+    obtain ⟨ζ₀, -, h0⟩ :=
+      Finset.exists_ne_zero_of_sum_ne_zero (s := Finset.univ) (f := n) (by rw [hN]; omega)
     have hsum : ∑ ζ, Function.update n ζ₀ (n ζ₀ - 1) ζ = N := by
       rw [Finset.sum_update_of_mem (Finset.mem_univ _)]
       rw [← Finset.add_sum_erase _ _ (Finset.mem_univ ζ₀), ← Finset.sdiff_singleton_eq_erase] at hN
@@ -75,21 +81,25 @@ theorem exists_approx [∀ ζ : Pts O A, IsDVRAt ζ] [Finite (Pts O A)] (C : Sub
         rw [Order.one_le_iff_ne_zero, Ne, vL_eq_zero_iff]
         exact not_not.2 hm
       rw [Function.update_self]
-      calc (n ζ : ℕ∞) = ((n ζ - 1 : ℕ) : ℕ∞) + 1 := by
-            have : n ζ = (n ζ - 1) + 1 := by omega
-            conv_lhs => rw [this]
-            push_cast
-            rfl
+      calc
+        (n ζ : ℕ∞) = ((n ζ - 1 : ℕ) : ℕ∞) + 1 := by
+          have : n ζ = (n ζ - 1) + 1 := by omega
+          conv_lhs => rw [this]
+          push_cast
+          rfl
         _ ≤ _ := add_le_add le_rfl h1
     · rw [Function.update_of_ne hζ]
       exact le_self_add
 
-theorem as_le_of_val_of_residue (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [CommRing A] [Algebra O A] (ϖ : O) (hU : IsUnif A ϖ) [∀ ζ : Pts O A, IsDVRAt ζ] [Finite (Pts O A)]
-    [Module.Finite O ↥(As O A)] (C : Subalgebra O A) (hC : C ≤ As O A)
+theorem as_le_of_val_of_residue
+    (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A]
+    (ϖ : O) (hU : IsUnif A ϖ)
+    [∀ ζ : Pts O A, IsDVRAt ζ] [Finite (Pts O A)] [Module.Finite O ↥(As O A)]
+    (C : Subalgebra O A) (hC : C ≤ As O A)
     (hval : ∀ n : Pts O A → ℕ, ∃ c ∈ C, ∀ ζ, ord ϖ ζ c = (((n ζ : ℕ) : ℤ) : WithTop ℤ))
-    (hres : ∀ (ζ : Pts O A), ∀ b ∈ As O A, ∃ c ∈ C, ∃ d ∈ C,
-      ord ϖ ζ d = 0 ∧ 0 < ord ϖ ζ (d * b - c)) : As O A ≤ C := by
+    (hres
+      : ∀ (ζ : Pts O A), ∀ b ∈ As O A, ∃ c ∈ C, ∃ d ∈ C, ord ϖ ζ d = 0 ∧ 0 < ord ϖ ζ (d * b - c))
+    : As O A ≤ C := by
   set C' : Subalgebra O ↥(As O A) := C.comap (As O A).val with hC'
   have hinj : Function.Injective (ENat.map (Nat.cast : ℕ → ℤ)) :=
     (ENat.strictMono_map_iff.2 Nat.strictMono_cast).injective
@@ -119,12 +129,13 @@ theorem as_le_of_val_of_residue (O A : Type) [CommRing O] [IsDomain O] [IsDiscre
       Module.Finite.fg_top (IsLocalRing.maximalIdeal_le_jacobson _) ?_
     intro b _
     obtain ⟨c, hc, h⟩ := exists_approx C' hval' hres' (ep ϖ) b
-    obtain ⟨b', hb'⟩ := dvd_of_vL_le (algebraMap O ↥(As O A) ϖ) (b - c)
-      (fun ζ => by rw [← coe_ep ζ hU]; exact h ζ)
+    obtain ⟨b', hb'⟩ :=
+      dvd_of_vL_le (algebraMap O ↥(As O A) ϖ) (b - c) (fun ζ => by rw [← coe_ep ζ hU]; exact h ζ)
     have e : b = c + ϖ • b' := by rw [Algebra.smul_def, ← hb']; ring
     rw [e]
-    exact Submodule.add_mem_sup hc (Submodule.smul_mem_smul
-      ((IsLocalRing.mem_maximalIdeal ϖ).2 hU.irreducible.not_isUnit) Submodule.mem_top)
+    exact Submodule.add_mem_sup hc
+      (Submodule.smul_mem_smul ((IsLocalRing.mem_maximalIdeal ϖ).2 hU.irreducible.not_isUnit)
+        Submodule.mem_top)
   intro x hx
   exact key (Submodule.mem_top (x := (⟨x, hx⟩ : ↥(As O A))))
 

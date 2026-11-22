@@ -13,15 +13,15 @@ open CategoryTheory Opposite TopologicalSpace
 
 universe w u
 
-variable {X : TopCat.{u}} {ι : Type w} (U : ι → Opens X)
-  {P P' P'' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}}
+variable
+  {X : TopCat.{u}} {ι : Type w} (U : ι → Opens X) {P P' P'' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}}
 
 structure CechFamily (P P' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}) where
-
   φ : ∀ {n : ℕ} (i : Fin (n + 1) → ι), P.obj (op (inter U i)) →+ P'.obj (op (inter U i))
-
-  res_comm : ∀ {m n : ℕ} (i : Fin (m + 1) → ι) (j : Fin (n + 1) → ι) (h : inter U i ≤ inter U j)
-    (x : P.obj (op (inter U j))), φ i (res P h x) = res P' h (φ j x)
+  res_comm
+    : ∀ {m n : ℕ} (i : Fin (m + 1) → ι) (j : Fin (n + 1) → ι) (h : inter U i ≤ inter U j)
+        (x : P.obj (op (inter U j))),
+      φ i (res P h x) = res P' h (φ j x)
 
 namespace CechFamily
 
@@ -66,12 +66,14 @@ lemma cochain_mem_coboundaries (Φ : CechFamily U P P') {n : ℕ} {σ : Cochain 
     obtain ⟨τ, rfl⟩ := hσ
     exact ⟨Φ.cochain n τ, (cochain_d Φ n τ).symm⟩
 
-def cocycles (Φ : CechFamily U P P') (n : ℕ) : cocycles P U n →+ GroundTheory.Arith.SchemeCoh.cocycles P' U n :=
-  AddMonoidHom.codRestrict ((Φ.cochain n).comp (GroundTheory.Arith.SchemeCoh.cocycles P U n).subtype) _
+def cocycles (Φ : CechFamily U P P') (n : ℕ)
+    : cocycles P U n →+ GroundTheory.Arith.SchemeCoh.cocycles P' U n :=
+  AddMonoidHom.codRestrict
+    ((Φ.cochain n).comp (GroundTheory.Arith.SchemeCoh.cocycles P U n).subtype) _
     fun σ => cochain_mem_cocycles Φ σ.2
 
-def cechH (Φ : CechFamily U P P') (n : ℕ) : GroundTheory.Arith.SchemeCoh.cechH P U n →+
-    GroundTheory.Arith.SchemeCoh.cechH P' U n :=
+def cechH (Φ : CechFamily U P P') (n : ℕ)
+    : GroundTheory.Arith.SchemeCoh.cechH P U n →+ GroundTheory.Arith.SchemeCoh.cechH P' U n :=
   QuotientAddGroup.map _ _ (Φ.cocycles n) fun σ hσ => by
     rw [AddSubgroup.mem_comap, AddSubgroup.mem_addSubgroupOf]
     exact cochain_mem_coboundaries Φ (AddSubgroup.mem_addSubgroupOf.1 hσ)

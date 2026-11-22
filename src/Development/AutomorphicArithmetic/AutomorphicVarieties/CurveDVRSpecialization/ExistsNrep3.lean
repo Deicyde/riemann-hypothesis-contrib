@@ -7,12 +7,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open NumberField IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Aut UpperTheory.V.Pr UpperTheory.V
+open NumberField IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Aut UpperTheory.V.Pr
+  UpperTheory.V
 open Matrix
 open scoped Pointwise
 
-private def diagCh {D A : Type} [Group D] [CommRing A] (T : D →* Matrix (Fin 3) (Fin 3) A)
-    (hT : ∀ g a b, b < a → T g a b = 0) (i : Fin 3) : D →* A where
+private def diagCh
+    {D A : Type} [Group D] [CommRing A]
+    (T : D →* Matrix (Fin 3) (Fin 3) A) (hT : ∀ g a b, b < a → T g a b = 0)
+    (i : Fin 3)
+    : D →* A where
   toFun g := T g i i
   map_one' := by simp
   map_mul' g h := by
@@ -23,34 +28,49 @@ private def diagCh {D A : Type} [Group D] [CommRing A] (T : D →* Matrix (Fin 3
       · rw [hT h b i h1, mul_zero]
     · exact fun h => absurd (Finset.mem_univ _) h
 
-private theorem ord_zero {D A : Type} [CommRing A] (T R : D → Matrix (Fin 3) (Fin 3) A)
-    (hT : ∀ g a b, b < a → T g a b = 0) (P Q : Matrix (Fin 3) (Fin 3) A) (hPQ : P * Q = 1) (hQP : Q * P = 1)
-    (hR : ∀ g, R g = P * T g * Q) (g : Fin 3 → D) : Fr.ordProd R (fun i s => T s i i) g = 0 := by
+private theorem ord_zero
+    {D A : Type} [CommRing A]
+    (T R : D → Matrix (Fin 3) (Fin 3) A) (hT : ∀ g a b, b < a → T g a b = 0)
+    (P Q : Matrix (Fin 3) (Fin 3) A)
+    (hPQ : P * Q = 1) (hQP : Q * P = 1) (hR : ∀ g, R g = P * T g * Q)
+    (g : Fin 3 → D)
+    : Fr.ordProd R (fun i s => T s i i) g = 0 := by
   have h10 : ∀ s, T s 1 0 = 0 := fun s => hT s 1 0 (by decide)
   have h20 : ∀ s, T s 2 0 = 0 := fun s => hT s 2 0 (by decide)
   have h21 : ∀ s, T s 2 1 = 0 := fun s => hT s 2 1 (by decide)
   have conj : ∀ s (t : A), R s - t • (1 : Matrix (Fin 3) (Fin 3) A) = P * (T s - t • 1) * Q := by
     intro s t
     rw [hR, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, hPQ]
-  have key : (T (g 0) - T (g 0) 0 0 • (1 : Matrix (Fin 3) (Fin 3) A)) *
-      ((T (g 1) - T (g 1) 1 1 • 1) * (T (g 2) - T (g 2) 2 2 • 1)) = 0 := by
+  have key
+      : (T (g 0) - T (g 0) 0 0 • (1 : Matrix (Fin 3) (Fin 3) A))
+          * ((T (g 1) - T (g 1) 1 1 • 1) * (T (g 2) - T (g 2) 2 2 • 1))
+        = 0 := by
     ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp [Matrix.mul_apply, Fin.sum_univ_three, Matrix.sub_apply, Matrix.one_apply, h10, h20, h21]
+    fin_cases i <;> fin_cases j
+      <;> simp [Matrix.mul_apply, Fin.sum_univ_three, Matrix.sub_apply, Matrix.one_apply, h10, h20,
+        h21]
   simp only [Fr.ordProd, List.ofFn_succ, List.ofFn_zero, List.prod_cons, List.prod_nil, mul_one]
   simp only [Fin.succ_zero_eq_one, Fin.succ_one_eq_two]
   rw [conj, conj, conj]
-  have e : P * (T (g 0) - T (g 0) 0 0 • 1) * Q * (P * (T (g 1) - T (g 1) 1 1 • 1) * Q *
-      (P * (T (g 2) - T (g 2) 2 2 • 1) * Q)) =
-      P * ((T (g 0) - T (g 0) 0 0 • 1) * ((T (g 1) - T (g 1) 1 1 • 1) * (T (g 2) - T (g 2) 2 2 • 1))) * Q := by
+  have e
+      : P * (T (g 0) - T (g 0) 0 0 • 1) * Q
+          * (P * (T (g 1) - T (g 1) 1 1 • 1) * Q * (P * (T (g 2) - T (g 2) 2 2 • 1) * Q))
+        = P
+          * ((T (g 0) - T (g 0) 0 0 • 1)
+            * ((T (g 1) - T (g 1) 1 1 • 1) * (T (g 2) - T (g 2) 2 2 • 1)))
+          * Q := by
     simp only [Matrix.mul_assoc]
     rw [← Matrix.mul_assoc Q P, hQP, Matrix.one_mul, ← Matrix.mul_assoc Q P, hQP, Matrix.one_mul]
   rw [e, key, Matrix.mul_zero, Matrix.zero_mul]
 
-private theorem descend {H Γ A : Type} [Group H] [TopologicalSpace H] [CompactSpace H] [Group Γ] [TopologicalSpace Γ]
-    [T2Space Γ] [CommRing A] (I : Ideal A) (p : H →* Γ) (hp : Continuous p) (hs : Function.Surjective p)
-    (r : H →* GG (m := 3) (R := A)) (hk : p.ker ≤ r.ker) (hc : UnitaryThreeInertia.AdicCont I r) :
-    ∃ r' : Γ →* GG (m := 3) (R := A), (∀ s, r' (p s) = r s) ∧ UnitaryThreeInertia.AdicCont I r' := by
+private theorem descend
+    {H Γ A : Type} [Group H] [TopologicalSpace H] [CompactSpace H] [Group Γ] [TopologicalSpace Γ]
+    [T2Space Γ] [CommRing A]
+    (I : Ideal A)
+    (p : H →* Γ) (hp : Continuous p) (hs : Function.Surjective p)
+    (r : H →* GG (m := 3) (R := A)) (hk : p.ker ≤ r.ker) (hc : UnitaryThreeInertia.AdicCont I r)
+    : ∃ r' : Γ →* GG (m := 3) (R := A),
+      (∀ s, r' (p s) = r s) ∧ UnitaryThreeInertia.AdicCont I r' := by
   let r' : Γ →* GG (m := 3) (R := A) :=
     p.liftOfRightInverse (Function.surjInv hs) (Function.rightInverse_surjInv hs) ⟨r, hk⟩
   have hr' : ∀ s, r' (p s) = r s := fun s => MonoidHom.liftOfRightInverse_comp_apply _ _ _ _ s
@@ -63,13 +83,16 @@ private theorem descend {H Γ A : Type} [Group H] [TopologicalSpace H] [CompactS
   ext s
   simp [hr']
 
-private theorem closed_one {H A : Type} [Group H] [TopologicalSpace H] [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
-    (r : H →* GG (m := 3) (R := A)) (hc : UnitaryThreeInertia.AdicCont (maximalIdeal A) r) :
-    IsClosed {s | (r s).mat = 1} := by
+private theorem closed_one
+    {H A : Type} [Group H] [TopologicalSpace H] [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
+    (r : H →* GG (m := 3) (R := A)) (hc : UnitaryThreeInertia.AdicCont (maximalIdeal A) r)
+    : IsClosed {s | (r s).mat = 1} := by
   have hne : maximalIdeal A ≠ ⊤ := (maximalIdeal.isMaximal A).ne_top
   have hbot := Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal A) hne
-  have e : {s | (r s).mat = 1} = ⋂ n : ℕ, {s | (r s).mat.map (Ideal.Quotient.mk (maximalIdeal A ^ n)) =
-      (1 : Matrix (Fin 3) (Fin 3) A).map (Ideal.Quotient.mk (maximalIdeal A ^ n))} := by
+  have e
+      : {s | (r s).mat = 1}
+        = ⋂ n : ℕ, {s | (r s).mat.map (Ideal.Quotient.mk (maximalIdeal A ^ n)) =
+          (1 : Matrix (Fin 3) (Fin 3) A).map (Ideal.Quotient.mk (maximalIdeal A ^ n))} := by
     ext s
     simp only [Set.mem_setOf_eq, Set.mem_iInter]
     constructor
@@ -89,26 +112,33 @@ private theorem closed_one {H A : Type} [Group H] [TopologicalSpace H] [CommRing
   rw [e]
   exact isClosed_iInter fun n => (hc n).isClosed_fiber _
 
-private theorem z_diag {A : Type} [CommRing A] (X : Matrix (Fin 3) (Fin 3) A)
-    (h01 : (X - Jmat A 3 * Xᵀ * Jmat A 3) 0 1 = 0) (h10 : (X - Jmat A 3 * Xᵀ * Jmat A 3) 1 0 = 0) (i j : Fin 3) (h : i ≠ j) :
-    (X - Jmat A 3 * Xᵀ * Jmat A 3) i j = 0 := by
-  fin_cases i <;> fin_cases j <;>
-    simp_all [Jmat, Matrix.mul_apply, Fin.sum_univ_three, Matrix.sub_apply, Matrix.transpose_apply, Fin.rev] <;>
-    first
-    | rfl
-    | linear_combination h01
-    | linear_combination -h01
-    | linear_combination h10
-    | linear_combination -h10
-    | exact absurd rfl h
+private theorem z_diag
+    {A : Type} [CommRing A]
+    (X : Matrix (Fin 3) (Fin 3) A)
+    (h01 : (X - Jmat A 3 * Xᵀ * Jmat A 3) 0 1 = 0) (h10 : (X - Jmat A 3 * Xᵀ * Jmat A 3) 1 0 = 0)
+    (i j : Fin 3) (h : i ≠ j)
+    : (X - Jmat A 3 * Xᵀ * Jmat A 3) i j = 0 := by
+  fin_cases i <;> fin_cases j
+    <;> simp_all [Jmat, Matrix.mul_apply, Fin.sum_univ_three, Matrix.sub_apply,
+      Matrix.transpose_apply, Fin.rev]
+    <;> first
+      | rfl
+      | linear_combination h01
+      | linear_combination -h01
+      | linear_combination h10
+      | linear_combination -h10
+      | exact absurd rfl h
 
-private theorem upl_compact (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (L : Type) [Field L] [NumberField L]
-    [Algebra L Ω] : CompactSpace (upl Ω L) := by
+private theorem upl_compact
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (L : Type) [Field L] [NumberField L] [Algebra L Ω]
+    : CompactSpace (upl Ω L) := by
   have stab : ∀ z : Ω, IsClosed {s : G ℚ Ω | s z = z} := by
     intro z
     have hz : IsIntegral ℚ z := (Algebra.IsAlgebraic.isAlgebraic (R := ℚ) z).isIntegral
     haveI := IntermediateField.adjoin.finiteDimensional hz
-    have hle : (IntermediateField.adjoin ℚ {z}).fixingSubgroup ≤ MulAction.stabilizer (G ℚ Ω) z := by
+    have hle
+        : (IntermediateField.adjoin ℚ {z}).fixingSubgroup ≤ MulAction.stabilizer (G ℚ Ω) z := by
       intro s hs
       rw [MulAction.mem_stabilizer_iff, AlgEquiv.smul_def]
       exact (IntermediateField.mem_fixingSubgroup_iff _ s).mp hs z
@@ -119,8 +149,9 @@ private theorem upl_compact (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure �
     ext s
     simp [MulAction.mem_stabilizer_iff, AlgEquiv.smul_def]
   have hcl : IsClosed ((upl Ω L : Subgroup (G ℚ Ω)) : Set (G ℚ Ω)) := by
-    have e : ((upl Ω L : Subgroup (G ℚ Ω)) : Set (G ℚ Ω)) =
-        ⋂ x ∈ maximalRealSubfield L, {s : G ℚ Ω | s (algebraMap L Ω x) = algebraMap L Ω x} := by
+    have e
+        : ((upl Ω L : Subgroup (G ℚ Ω)) : Set (G ℚ Ω))
+          = ⋂ x ∈ maximalRealSubfield L, {s : G ℚ Ω | s (algebraMap L Ω x) = algebraMap L Ω x} := by
       ext s
       simp [upl]
       exact Iff.rfl
@@ -128,39 +159,49 @@ private theorem upl_compact (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure �
     exact isClosed_biInter fun x _ => stab _
   exact isCompact_iff_compactSpace.mp hcl.isCompact
 
-private theorem mat_mul {A : Type} [CommRing A] (x y : GG (m := 3) (R := A)) (hx : x.right = 1) :
-    (x * y).mat = x.mat * y.mat := by
+private theorem mat_mul {A : Type} [CommRing A] (x y : GG (m := 3) (R := A)) (hx : x.right = 1)
+    : (x * y).mat = x.mat * y.mat := by
   simp [GG.mat, hx]
 
-private theorem conj_mat {G A : Type} [Group G] [CommRing A] (h : GL (Fin 3) A)
-    (r : G →* GG (m := 3) (R := A)) (s : G)
-    (hs : (r s).right = 1) : (conjBy h⁻¹ r s).mat = (h⁻¹ : GL (Fin 3) A).val * (r s).mat * h.val := by
-  simp [conjBy, GG.mat, MulAut.conj_apply, hs, SemidirectProduct.mul_left, SemidirectProduct.mul_right,
-    mul_assoc]
+private theorem conj_mat
+    {G A : Type} [Group G] [CommRing A]
+    (h : GL (Fin 3) A)
+    (r : G →* GG (m := 3) (R := A)) (s : G) (hs : (r s).right = 1)
+    : (conjBy h⁻¹ r s).mat = (h⁻¹ : GL (Fin 3) A).val * (r s).mat * h.val := by
+  simp [conjBy, GG.mat, MulAut.conj_apply, hs, SemidirectProduct.mul_left,
+    SemidirectProduct.mul_right, mul_assoc]
 
-private theorem local_chars {G H O A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
+private theorem local_chars
+    {G H O A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
     [TopologicalSpace H] [CommRing O] [IsLocalRing O] [CommRing A] [IsLocalRing A] [Algebra O A]
     (η : G →* ℤˣ) (Ψ : G →* Oˣ) (D I : Subgroup G) (r : G →* GG (m := 3) (R := A))
     (hr : UpperTheory.V.UnitaryThreeInertia.Red η Ψ r)
     (hc : UnitaryThreeInertia.AdicCont (maximalIdeal A) r)
-    (ht : UnitaryThreeInertia.CondT (η.comp D.subtype) (Ψ.comp D.subtype) (I.subgroupOf D) (r.comp D.subtype))
-    (φ : H →* G) (hφ : Continuous φ) (γ : G) (hγ : η γ = 1) (h1 : ∀ g, η (φ g) = 1) (hD : ∀ g, γ⁻¹ * φ g * γ ∈ D) :
-    ∃ ψ : Fin 3 → H →* Aˣ, (∀ g, Fr.ordProd (fun s => (r (φ s)).mat) (fun i s => (ψ i s : A)) g = 0) ∧
-      (∀ i, Alg.AdicCont (maximalIdeal A) fun g => (ψ i g : A)) ∧
-      (∀ i g, residue A (ψ i g) = residue A (algebraMap O A (UnitaryThreeInertia.psi Ψ i (φ g)))) ∧
-      ∀ i g, γ⁻¹ * φ g * γ ∈ I → (ψ i g : A) = algebraMap O A (UnitaryThreeInertia.psi Ψ i (φ g)) := by
+    (ht : UnitaryThreeInertia.CondT (η.comp D.subtype) (Ψ.comp D.subtype) (I.subgroupOf D)
+      (r.comp D.subtype))
+    (φ : H →* G) (hφ : Continuous φ)
+    (γ : G) (hγ : η γ = 1)
+    (h1 : ∀ g, η (φ g) = 1) (hD : ∀ g, γ⁻¹ * φ g * γ ∈ D)
+    : ∃ ψ : Fin 3 → H →* Aˣ,
+      (∀ g, Fr.ordProd (fun s => (r (φ s)).mat) (fun i s => (ψ i s : A)) g = 0)
+        ∧ (∀ i, Alg.AdicCont (maximalIdeal A) fun g => (ψ i g : A))
+        ∧ (∀ i g,
+          residue A (ψ i g) = residue A (algebraMap O A (UnitaryThreeInertia.psi Ψ i (φ g))))
+        ∧ ∀ i g,
+          γ⁻¹ * φ g * γ ∈ I → (ψ i g : A) = algebraMap O A (UnitaryThreeInertia.psi Ψ i (φ g)) := by
   obtain ⟨h, hh, htri⟩ := ht
   have hmult : ∀ g, (r g).right = η g := hr.mult
-  let d : H →* D :=
-    { toFun := fun g => ⟨γ⁻¹ * φ g * γ, hD g⟩
-      map_one' := by
-        ext
-        simp
-      map_mul' := by
-        intro a b
-        ext
-        simp only [map_mul, Subgroup.coe_mul]
-        group }
+  let d : H →* D := {
+    toFun := fun g => ⟨γ⁻¹ * φ g * γ, hD g⟩
+    map_one' := by
+      ext
+      simp
+    map_mul' := by
+      intro a b
+      ext
+      simp only [map_mul, Subgroup.coe_mul]
+      group
+  }
   have hd : ∀ g, ((d g : D) : G) = γ⁻¹ * φ g * γ := fun _ => rfl
   have hd_eta : ∀ g, η ((d g : D) : G) = 1 := by
     intro g
@@ -172,13 +213,13 @@ private theorem local_chars {G H O A : Type} [Group G] [TopologicalSpace G] [IsT
     intro x
     simp [R', conjBy, MulAut.conj_apply]
   have hrd : ∀ g, (r ((d g : D) : G)).right = 1 := fun g => by rw [hmult]; exact hd_eta g
-  let Tm : H →* Matrix (Fin 3) (Fin 3) A :=
-    { toFun := fun g => (R' (d g)).mat
-      map_one' := by
-        simp [GG.mat]
-      map_mul' := by
-        intro a b
-        rw [map_mul, map_mul, mat_mul _ _ (by rw [hright]; exact hrd a)] }
+  let Tm : H →* Matrix (Fin 3) (Fin 3) A := {
+    toFun := fun g => (R' (d g)).mat
+    map_one' := by simp [GG.mat]
+    map_mul' := by
+      intro a b
+      rw [map_mul, map_mul, mat_mul _ _ (by rw [hright]; exact hrd a)]
+  }
   have hTm : ∀ g, Tm g = (R' (d g)).mat := fun _ => rfl
   have hTconj : ∀ g, Tm g = (h⁻¹ : GL (Fin 3) A).val * (r ((d g : D) : G)).mat * h.val := by
     intro g
@@ -207,7 +248,8 @@ private theorem local_chars {G H O A : Type} [Group G] [TopologicalSpace G] [IsT
   have hhh' : (h⁻¹ : GL (Fin 3) A).val * h.val = 1 := by
     rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
   obtain ⟨P, hP⟩ : ∃ P : Matrix (Fin 3) (Fin 3) A, P = (r γ).mat * h.val := ⟨_, rfl⟩
-  obtain ⟨Q, hQ⟩ : ∃ Q : Matrix (Fin 3) (Fin 3) A, Q = (h⁻¹ : GL (Fin 3) A).val * (r γ⁻¹).mat := ⟨_, rfl⟩
+  obtain ⟨Q, hQ⟩ : ∃ Q : Matrix (Fin 3) (Fin 3) A, Q = (h⁻¹ : GL (Fin 3) A).val * (r γ⁻¹).mat :=
+    ⟨_, rfl⟩
   have hPQ : P * Q = 1 := by
     rw [hP, hQ, Matrix.mul_assoc, ← Matrix.mul_assoc h.val, hhh, Matrix.one_mul, hγγ]
   have hQP : Q * P = 1 := by
@@ -240,11 +282,14 @@ private theorem local_chars {G H O A : Type} [Group G] [TopologicalSpace G] [IsT
     have e := congrArg (fun X : Matrix (Fin 3) (Fin 3) A => X.map (residue A)) hhh'
     simp only [Matrix.map_mul, hmh, hone, Matrix.mul_one] at e
     exact e
-  have hΨ : ∀ g i, UnitaryThreeInertia.psi Ψ i ((d g : D) : G) = UnitaryThreeInertia.psi Ψ i (φ g) := by
+  have hΨ
+      : ∀ g i, UnitaryThreeInertia.psi Ψ i ((d g : D) : G) = UnitaryThreeInertia.psi Ψ i (φ g) := by
     intro g i
     unfold UnitaryThreeInertia.psi
     rw [hd, map_mul, map_mul, map_inv, mul_comm (Ψ γ)⁻¹, inv_mul_cancel_right]
-  have hres : ∀ i g, residue A (ψ i g : A) = residue A (algebraMap O A (UnitaryThreeInertia.psi Ψ i (φ g))) := by
+  have hres
+      : ∀ i g,
+        residue A (ψ i g : A) = residue A (algebraMap O A (UnitaryThreeInertia.psi Ψ i (φ g))) := by
     intro i g
     have e0 : (Tm g).map (residue A) = (r ((d g : D) : G)).mat.map (residue A) := by
       rw [hTconj g, Matrix.map_mul, Matrix.map_mul, hmh, hmhi, Matrix.mul_one, Matrix.one_mul]
@@ -253,15 +298,21 @@ private theorem local_chars {G H O A : Type} [Group G] [TopologicalSpace G] [IsT
     rw [hψ, e1, ← hΨ]
     refine req _ _ ?_
     have e2 := hr.red ((d g : D) : G) i i
-    have e3 : (r0 η Ψ ((d g : D) : G)).mat = ((tor O (Ψ ((d g : D) : G)) : GL (Fin 3) O) : Matrix (Fin 3) (Fin 3) O) := rfl
+    have e3
+        : (r0 η Ψ ((d g : D) : G)).mat
+          = ((tor O (Ψ ((d g : D) : G)) : GL (Fin 3) O) : Matrix (Fin 3) (Fin 3) O) :=
+      rfl
     rw [Matrix.sub_apply, Matrix.map_apply, e3, tor_val, Matrix.diagonal_apply_eq] at e2
     exact e2
   refine ⟨ψ, fun g => ord_zero Tm (fun s => (r (φ s)).mat) hT P Q hPQ hQP hR g, ?_, hres, ?_⟩
   · intro i N
-    have e : (fun g => Ideal.Quotient.mk (maximalIdeal A ^ N) (ψ i g : A)) =
-        (fun M : Matrix (Fin 3) (Fin 3) (A ⧸ maximalIdeal A ^ N) =>
-          (Q.map (Ideal.Quotient.mk (maximalIdeal A ^ N)) * M * P.map (Ideal.Quotient.mk (maximalIdeal A ^ N))) i i) ∘
-        (fun g => (r (φ g)).mat.map (Ideal.Quotient.mk (maximalIdeal A ^ N))) := by
+    have e
+        : (fun g => Ideal.Quotient.mk (maximalIdeal A ^ N) (ψ i g : A))
+          = (fun M : Matrix (Fin 3) (Fin 3) (A ⧸ maximalIdeal A ^ N) =>
+              (Q.map (Ideal.Quotient.mk (maximalIdeal A ^ N)) * M
+                  * P.map (Ideal.Quotient.mk (maximalIdeal A ^ N)))
+                i i)
+            ∘ (fun g => (r (φ g)).mat.map (Ideal.Quotient.mk (maximalIdeal A ^ N))) := by
       funext g
       simp only [Function.comp, hψ]
       rw [hT' g, ← Matrix.map_mul, ← Matrix.map_mul]
@@ -276,13 +327,20 @@ private theorem local_chars {G H O A : Type} [Group G] [TopologicalSpace G] [IsT
     rw [hψ, hTm, e, ← hΨ]
     rfl
 
-theorem UpperTheory.V.Pr.exists_nrep3 :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {η : G ℚ Ω →* ℤˣ} {Ψ : G ℚ Ω →* Oˣ} {σ g₁ : G ℚ Ω} {B : ValuationSubring Ω} {M : ℕ}
-      {L : Type} [Field L] [NumberField L] [Algebra L Ω] {Φ : Fr.Frame l (ResidueField O)} (k : GalLink η Ψ σ g₁ B M L Φ) [CharP (ResidueField O) l] {C₀ : ℕ}, Φ.Ok C₀ → l ∣ M → σ * σ = 1 →
-    ∀ {A : Type} [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] [Algebra O A] [IsLocalHom (algebraMap O A)]
-      (r : G ℚ Ω →* GG (m := 3) (R := A)), UpperTheory.V.Pr.OrdPt l η Ψ σ g₁ B r →
-      ∃ ρ : Fr.NRep Φ 3 A, IsLiftA O ρ ∧ (∀ s : G L Ω, ρ.r (k.p0 s) = (r (Base.galEmb ℚ L Ω s)).mat) ∧
-      ∀ v i, ∀ g ∈ Φ.Iv v, (ρ.ψ v i g : A) = algebraMap O A (UnitaryThreeInertia.psi Ψ i (k.j v g)) := by
+theorem UpperTheory.V.Pr.exists_nrep3
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {O : Type}
+        [CommRing O] [IsLocalRing O] {η : G ℚ Ω →* ℤˣ} {Ψ : G ℚ Ω →* Oˣ} {σ g₁ : G ℚ Ω}
+        {B : ValuationSubring Ω} {M : ℕ} {L : Type} [Field L] [NumberField L] [Algebra L Ω]
+        {Φ : Fr.Frame l (ResidueField O)} (k : GalLink η Ψ σ g₁ B M L Φ) [CharP (ResidueField O) l]
+        {C₀ : ℕ},
+      Φ.Ok C₀ → l ∣ M → σ * σ = 1
+        → ∀ {A : Type} [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] [Algebra O A]
+            [IsLocalHom (algebraMap O A)] (r : G ℚ Ω →* GG (m := 3) (R := A)),
+          UpperTheory.V.Pr.OrdPt l η Ψ σ g₁ B r
+            → ∃ ρ : Fr.NRep Φ 3 A,
+              IsLiftA O ρ ∧ (∀ s : G L Ω, ρ.r (k.p0 s) = (r (Base.galEmb ℚ L Ω s)).mat)
+                ∧ ∀ v i, ∀ g ∈ Φ.Iv v,
+                  (ρ.ψ v i g : A) = algebraMap O A (UnitaryThreeInertia.psi Ψ i (k.j v g)) := by
   intro Ω _ _ _ l _ O _ _ η Ψ σ g₁ B M L _ _ _ Φ k _ C₀ hOk hlM hσ A _ _ _ _ _ _ r hr
   haveI := upl_compact Ω L
   let ru : ↥(upl Ω L) →* GG (m := 3) (R := A) := r.comp (upl Ω L).subtype
@@ -291,20 +349,25 @@ theorem UpperTheory.V.Pr.exists_nrep3 :
   have hk : k.p.ker ≤ ru.ker := by
     intro s hs
     have hs1 : k.p s = 1 := hs
-    have hη : η s = 1 := by
-      rw [← k.del s, hs1, map_one]
-    have hN : Subgroup.normalClosure
-        {s : ↥(upl Ω L) | ∃ B' : ValuationSubring Ω, ¬B'.valuation (l : Ω) < 1 ∧ (s : G ℚ Ω) ∈ Ine B' ∧
-          η s = 1 ∧ (barChar O Ψ) s = 1} ≤ ru.ker := by
+    have hη : η s = 1 := by rw [← k.del s, hs1, map_one]
+    have hN
+        : Subgroup.normalClosure
+            {s : ↥(upl Ω L) | ∃ B' : ValuationSubring Ω, ¬B'.valuation (l : Ω) < 1 ∧ (s : G ℚ Ω) ∈ Ine B' ∧
+              η s = 1 ∧ (barChar O Ψ) s = 1}
+          ≤ ru.ker := by
       refine Subgroup.normalClosure_le_normal ?_
       rintro t ⟨B', hB', hI, ht1, hb⟩
       have hΨ : Ψ t = 1 := k.teich B' hB' t ⟨hI, t.2⟩ hb
       exact hr.away B' hB' t hI ht1 hΨ
     have hcl := closed_one ru ru_cont
     rw [k.p_ker] at hs
-    have hs2 : s ∈ closure ((Subgroup.normalClosure
-        {s : ↥(upl Ω L) | ∃ B' : ValuationSubring Ω, ¬B'.valuation (l : Ω) < 1 ∧ (s : G ℚ Ω) ∈ Ine B' ∧
-          η s = 1 ∧ (barChar O Ψ) s = 1} : Subgroup ↥(upl Ω L)) : Set ↥(upl Ω L)) := by
+    have hs2
+        : s ∈ closure
+          ((Subgroup.normalClosure
+                {s : ↥(upl Ω L) | ∃ B' : ValuationSubring Ω, ¬B'.valuation (l : Ω) < 1 ∧ (s : G ℚ Ω) ∈ Ine B' ∧
+                  η s = 1 ∧ (barChar O Ψ) s = 1}
+              : Subgroup ↥(upl Ω L))
+            : Set ↥(upl Ω L)) := by
       rw [← Subgroup.topologicalClosure_coe]
       exact hs
     have hmat : (ru s).mat = 1 := by
@@ -324,16 +387,17 @@ theorem UpperTheory.V.Pr.exists_nrep3 :
     rw [hr', k.del]
     exact hr.red.mult s
   have rt0 : ∀ g : Φ.G0, (r' g).right = 1 := fun g => (rt g).trans g.2
-  let ρr : Φ.G0 →* Matrix (Fin 3) (Fin 3) A :=
-    { toFun := fun g => (r' g).mat
-      map_one' := by
-        show (r' ((1 : Φ.G0) : Φ.Γ)).mat = 1
-        rw [OneMemClass.coe_one, map_one]
-        rfl
-      map_mul' := fun g h => by
-        show (r' ((g * h : Φ.G0) : Φ.Γ)).mat = (r' g).mat * (r' h).mat
-        rw [Subgroup.coe_mul, map_mul]
-        exact mat_mul _ _ (rt0 g) }
+  let ρr : Φ.G0 →* Matrix (Fin 3) (Fin 3) A := {
+    toFun := fun g => (r' g).mat
+    map_one' := by
+      show (r' ((1 : Φ.G0) : Φ.Γ)).mat = 1
+      rw [OneMemClass.coe_one, map_one]
+      rfl
+    map_mul' := fun g h => by
+      show (r' ((g * h : Φ.G0) : Φ.Γ)).mat = (r' g).mat * (r' h).mat
+      rw [Subgroup.coe_mul, map_mul]
+      exact mat_mul _ _ (rt0 g)
+  }
   have hρr : ∀ g : Φ.G0, ρr g = (r' g).mat := fun _ => rfl
   obtain ⟨hσu, hpσ⟩ := k.c
   obtain ⟨hg1u, hpg1⟩ := k.g0
@@ -363,11 +427,14 @@ theorem UpperTheory.V.Pr.exists_nrep3 :
     have z21 := hr.norm.z21
     simp only [zmat, hz] at z12 z21
     exact z_diag _ z12 z21 i j hij
-  have LC : ∀ v : Φ.V, ∃ ψ : Fin 3 → Φ.Gv v →* Aˣ,
-      (∀ g, Fr.ordProd (fun s => (r (k.j v s)).mat) (fun i s => (ψ i s : A)) g = 0) ∧
-      (∀ i, Alg.AdicCont (maximalIdeal A) fun g => (ψ i g : A)) ∧
-      (∀ i g, residue A (ψ i g) = residue A (algebraMap O A (UnitaryThreeInertia.psi Ψ i (k.j v g)))) ∧
-      ∀ i, ∀ g ∈ Φ.Iv v, (ψ i g : A) = algebraMap O A (UnitaryThreeInertia.psi Ψ i (k.j v g)) := by
+  have LC
+      : ∀ v : Φ.V, ∃ ψ : Fin 3 → Φ.Gv v →* Aˣ,
+        (∀ g, Fr.ordProd (fun s => (r (k.j v s)).mat) (fun i s => (ψ i s : A)) g = 0)
+          ∧ (∀ i, Alg.AdicCont (maximalIdeal A) fun g => (ψ i g : A))
+          ∧ (∀ i g,
+            residue A (ψ i g) = residue A (algebraMap O A (UnitaryThreeInertia.psi Ψ i (k.j v g))))
+          ∧ ∀ i, ∀ g ∈ Φ.Iv v,
+            (ψ i g : A) = algebraMap O A (UnitaryThreeInertia.psi Ψ i (k.j v g)) := by
     intro v
     obtain ⟨γ, hγ, hpl⟩ := k.pl_conj v
     have hlift : IsLift (RingEquiv.refl ℚ) (γ : Ω ≃ₐ[ℚ] Ω).toRingEquiv := fun x => γ.commutes x
@@ -390,8 +457,9 @@ theorem UpperTheory.V.Pr.exists_nrep3 :
       show η (k.j v g : G ℚ Ω) = 1
       rw [← k.del, ← k.j_loc]
       exact (Φ.loc0 v g).2
-    obtain ⟨ψ, h1', h2', h3', h4'⟩ := local_chars η Ψ (Dec B) (Ine B) r hr.red hr.cont hr.ord
-      ((upl Ω L).subtype.comp (k.j v)) (continuous_subtype_val.comp (k.j_cont v)) γ hγ h1 hD
+    obtain ⟨ψ, h1', h2', h3', h4'⟩ :=
+      local_chars η Ψ (Dec B) (Ine B) r hr.red hr.cont hr.ord ((upl Ω L).subtype.comp (k.j v))
+        (continuous_subtype_val.comp (k.j_cont v)) γ hγ h1 hD
     refine ⟨ψ, h1', h2', h3', fun i g hg => h4' i g ?_⟩
     show γ⁻¹ * ((k.j v g : G ℚ Ω)) * γ ∈ Ine B
     rw [hconj]
@@ -403,17 +471,22 @@ theorem UpperTheory.V.Pr.exists_nrep3 :
     show (r' (Φ.loc v s)).mat = _
     rw [k.j_loc, hr']
     rfl
-  have redg : ∀ (s : G ℚ Ω) (i j : Fin 3), residue A ((r s).mat i j) =
-      residue A (algebraMap O A ((Matrix.diagonal fun a => ((Ψ s ^ wt1 a : Oˣ) : O)) i j)) := by
+  have redg
+      : ∀ (s : G ℚ Ω) (i j : Fin 3),
+        residue A ((r s).mat i j)
+          = residue A
+            (algebraMap O A ((Matrix.diagonal fun a => ((Ψ s ^ wt1 a : Oˣ) : O)) i j)) := by
     intro s i j
     have h0 : (r0 η Ψ s).mat = Matrix.diagonal fun a => ((Ψ s ^ wt1 a : Oˣ) : O) := tor_val (Ψ s)
     have h := hr.red.red s i j
     rw [h0, Matrix.sub_apply, Matrix.map_apply] at h
     rw [← sub_eq_zero, ← map_sub]
     exact (residue_eq_zero_iff _).mpr h
-  have bar_eq : ∀ (s : ↥(upl Ω L)) (i : Fin 3),
-      ResidueField.map (algebraMap O A) ((Φ.Ψ (k.p s) ^ Fr.w 3 i : (ResidueField O)ˣ) : ResidueField O) =
-        residue A (algebraMap O A ((Ψ s ^ wt1 i : Oˣ) : O)) := by
+  have bar_eq
+      : ∀ (s : ↥(upl Ω L)) (i : Fin 3),
+        ResidueField.map (algebraMap O A)
+            ((Φ.Ψ (k.p s) ^ Fr.w 3 i : (ResidueField O)ˣ) : ResidueField O)
+          = residue A (algebraMap O A ((Ψ s ^ wt1 i : Oˣ) : O)) := by
     intro s i
     have hw : Fr.w 3 i = wt1 i := by simp [Fr.w, wt1]
     rw [k.psi, hw, barChar, MonoidHom.comp_apply, ← map_zpow, Units.coe_map]
@@ -424,7 +497,8 @@ theorem UpperTheory.V.Pr.exists_nrep3 :
     rw [e]
     exact hψ1 v g
   · intro i j N
-    have h := (hc' N).comp_continuous (continuous_subtype_val : Continuous (fun g : Φ.G0 => (g : Φ.Γ)))
+    have h :=
+      (hc' N).comp_continuous (continuous_subtype_val : Continuous (fun g : Φ.G0 => (g : Φ.Γ)))
     exact h.comp (fun X => X i j)
   · intro v i
     exact hψ2 v i

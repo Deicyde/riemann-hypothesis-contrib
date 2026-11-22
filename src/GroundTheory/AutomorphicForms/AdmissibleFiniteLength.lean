@@ -17,13 +17,16 @@ namespace Parabolic
 
 open Matrix Iwasawa GLnLocal Topology Filter Set
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ} {α : Type*} [LinearOrder α] {β : Fin n → α}
-  {V : Type*} [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin n) F) V}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  {n : ℕ} {α : Type*} [LinearOrder α]
+  {β : Fin n → α} {V : Type*} [AddCommGroup V] [Module ℂ V]
+  {π : Representation ℂ (GL (Fin n) F) V}
 
-theorem fixedVectors_jacquetRep_congruenceSubgroup (m : ℕ) :
-    fixedVectors (jacquetRep F n β π) ((congruenceSubgroup F n m).subgroupOf (levi F n β)) =
-      fixedVectors (jacquetAction F n β π) ((congruenceSubgroup F n m).subgroupOf (levi F n β)) := by
+theorem fixedVectors_jacquetRep_congruenceSubgroup (m : ℕ)
+    : fixedVectors (jacquetRep F n β π) ((congruenceSubgroup F n m).subgroupOf (levi F n β))
+      = fixedVectors (jacquetAction F n β π)
+        ((congruenceSubgroup F n m).subgroupOf (levi F n β)) := by
   ext x
   simp only [mem_fixedVectors]
   refine forall₂_congr fun y hy => ?_

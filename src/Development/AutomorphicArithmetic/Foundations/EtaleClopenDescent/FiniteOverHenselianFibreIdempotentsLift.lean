@@ -6,13 +6,15 @@ public import Development.EtaleCohomology.EtaleSheaves.FibreIdem
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut LateralTheory.E.StandardEtaleChartsIdempotentGluing LateralTheory.E.StdChartsProof
+open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut
+  LateralTheory.E.StandardEtaleChartsIdempotentGluing LateralTheory.E.StdChartsProof
 
 namespace UpperTheory.Cb.RestrictionHomomorphisms
 
 variable {A K : Type} [CommRing A] [IsLocalRing A] [Field K] [Algebra A K]
 
-private abbrev mI (A : Type) [CommRing A] [IsLocalRing A] (S : Type) [CommRing S] [Algebra A S] : Ideal S :=
+private abbrev mI (A : Type) [CommRing A] [IsLocalRing A] (S : Type) [CommRing S] [Algebra A S]
+    : Ideal S :=
   (IsLocalRing.maximalIdeal A).map (algebraMap A S)
 
 private lemma mem_mS_iff (S : Subalgebra A K) (s : S) : (s : K) ∈ mS S ↔ s ∈ mI A S := by
@@ -206,9 +208,10 @@ private lemma pair_of_maps (B C : Subalgebra A K) (t : K) (hc : Charts B C t) {F
     · exact (hWB q).2 (notin eB q hB')
     · exact (hWC q).2 (notin eC q hC')
 
-private def resHom (A : Type) [CommRing A] [IsLocalRing A] (S : Type) [CommRing S] [Algebra A S] :
-    IsLocalRing.ResidueField A →+* S ⧸ mI A S :=
-  Ideal.Quotient.lift (IsLocalRing.maximalIdeal A) ((Ideal.Quotient.mk (mI A S)).comp (algebraMap A S))
+private def resHom (A : Type) [CommRing A] [IsLocalRing A] (S : Type) [CommRing S] [Algebra A S]
+    : IsLocalRing.ResidueField A →+* S ⧸ mI A S :=
+  Ideal.Quotient.lift (IsLocalRing.maximalIdeal A)
+    ((Ideal.Quotient.mk (mI A S)).comp (algebraMap A S))
     (fun a ha => Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_map_of_mem _ ha))
 
 private lemma fibre_map {Z : Scheme.{0}} (p : Z ⟶ Spec (CommRingCat.of A)) {S : Type} [CommRing S] [Algebra A S]
@@ -266,13 +269,15 @@ private lemma fibre_pt {Z : Scheme.{0}} (p : Z ⟶ Spec (CommRingCat.of A)) {S :
 end UpperTheory.Cb.RestrictionHomomorphisms
 
 open UpperTheory.Cb.RestrictionHomomorphisms in
-theorem UpperTheory.Cb.finite_over_henselian_fibre_idempotents_lift :
-    LateralTheory.E.LZProperCut.LZHensFinite → LateralTheory.E.StdChartsProof.FibreIdem := by
+theorem UpperTheory.Cb.finite_over_henselian_fibre_idempotents_lift
+    : LateralTheory.E.LZProperCut.LZHensFinite → LateralTheory.E.StdChartsProof.FibreIdem := by
   intro _ A _ _ K _ _ Z p B C t hc hcov W hW
   obtain ⟨jU, jV, _, _, hrange, hU, hV, hiff⟩ := hcov.ex
   obtain ⟨gB, hgB⟩ := fibre_map p jU hU
   obtain ⟨gC, hgC⟩ := fibre_map p jV hV
-  refine pair_of_maps B C t hc (fun q => gB.base q) (fun q => gC.base q)
+  refine pair_of_maps B C t hc
+    (fun q => gB.base q)
+    (fun q => gC.base q)
     gB.base.hom.continuous gC.base.hom.continuous ?_ ?_ W hW
   · intro w
     have hw : (pullback.fst p (cpt A)).base w ∈ Set.range jU ∪ Set.range jV := by

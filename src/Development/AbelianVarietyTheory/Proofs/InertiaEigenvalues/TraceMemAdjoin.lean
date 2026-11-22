@@ -8,13 +8,19 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Cent
 
 @[expose] public section
 
-open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module TensorProduct GlobalTheory.Pass
+open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module TensorProduct
+  GlobalTheory.Pass
 
 namespace GlobalTheory.CentralIdem
 
-theorem trace_mem_adjoin {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    (T : Module.End ℂ V) {n : ℕ} (hn : n ≠ 0) (hT : T ^ (n + 1) = T) {ζ : ℂ} (hζ : IsPrimitiveRoot ζ n) :
-    LinearMap.trace ℂ V T ∈ Algebra.adjoin ℤ ({ζ} : Set ℂ) := by
+theorem trace_mem_adjoin
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (T : Module.End ℂ V)
+    {n : ℕ} (hn : n ≠ 0) (hT : T ^ (n + 1) = T)
+    {ζ : ℂ} (hζ : IsPrimitiveRoot ζ n)
+    : LinearMap.trace ℂ V T ∈ Algebra.adjoin ℤ ({ζ} : Set ℂ) := by
   haveI : NeZero n := ⟨hn⟩
   rw [Module.End.trace_eq_sum_roots_charpoly_of_splits (IsAlgClosed.splits _)]
   apply Subalgebra.multiset_sum_mem
@@ -34,13 +40,16 @@ theorem trace_mem_adjoin {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimen
     rw [← hi]
     exact Subalgebra.pow_mem _ (Algebra.subset_adjoin (Set.mem_singleton ζ)) _
 
-theorem trace_lmul {Γ : Type} [Group Γ] [Finite Γ] (x : MonoidAlgebra ℂ Γ) :
-    LinearMap.trace ℂ _ (Algebra.lmul ℂ (MonoidAlgebra ℂ Γ) x) = (Nat.card Γ : ℂ) * x.coeff 1 := by
+theorem trace_lmul {Γ : Type} [Group Γ] [Finite Γ] (x : MonoidAlgebra ℂ Γ)
+    : LinearMap.trace ℂ _ (Algebra.lmul ℂ (MonoidAlgebra ℂ Γ) x)
+      = (Nat.card Γ : ℂ) * x.coeff 1 := by
   classical
   haveI := Fintype.ofFinite Γ
   rw [LinearMap.trace_eq_matrix_trace ℂ (MonoidAlgebra.basis Γ ℂ), Matrix.trace]
-  have : ∀ g : Γ, (LinearMap.toMatrix (MonoidAlgebra.basis Γ ℂ) (MonoidAlgebra.basis Γ ℂ)
-      (Algebra.lmul ℂ (MonoidAlgebra ℂ Γ) x)).diag g = x.coeff 1 := by
+  have : ∀ g : Γ,
+      (LinearMap.toMatrix (MonoidAlgebra.basis Γ ℂ) (MonoidAlgebra.basis Γ ℂ)
+          (Algebra.lmul ℂ (MonoidAlgebra ℂ Γ) x)).diag g
+        = x.coeff 1 := by
     intro g
     rw [Matrix.diag, LinearMap.toMatrix_apply]
     have hb : MonoidAlgebra.basis Γ ℂ g = MonoidAlgebra.single g 1 := by simp
@@ -60,8 +69,9 @@ theorem centralIdemCoeff : CentralIdemCoeff := by
   have hp : x ^ (Nat.card Γ + 1) = x := by
     rw [hx, hcm.mul_pow, hid.pow_succ_eq, MonoidAlgebra.single_pow, one_pow, pow_succ,
       pow_card_eq_one', one_mul]
-  have hT := trace_mem_adjoin (Algebra.lmul ℂ (MonoidAlgebra ℂ Γ) x) (n := Nat.card Γ)
-    Nat.card_pos.ne' (by rw [← map_pow, hp]) hζ
+  have hT :=
+    trace_mem_adjoin (Algebra.lmul ℂ (MonoidAlgebra ℂ Γ) x) (n := Nat.card Γ) Nat.card_pos.ne'
+      (by rw [← map_pow, hp]) hζ
   rw [trace_lmul, hx, MonoidAlgebra.coeff_single_mul_apply] at hT
   simpa using hT
 

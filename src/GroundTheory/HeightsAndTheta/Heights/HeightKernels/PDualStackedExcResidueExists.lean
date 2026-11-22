@@ -20,8 +20,8 @@ namespace StackedExceptionalResidueExists
 
 variable {K : Type} [Field K] [NumberField K] {i : ℕ} {F F' : HermLattice K i}
 
-theorem exists_mem_not_mem (hlt : F'.lattice < F.lattice) :
-    ∃ φc ∈ dualLattice F', φc ∉ dualLattice F := by
+theorem exists_mem_not_mem (hlt : F'.lattice < F.lattice)
+    : ∃ φc ∈ dualLattice F', φc ∉ dualLattice F := by
   by_contra! h
   have h1 : (dualLattice F).toAddSubgroup.relIndex (dualLattice F').toAddSubgroup = 1 :=
     AddSubgroup.relIndex_eq_one.mpr fun φ hφ => h φ hφ
@@ -44,12 +44,16 @@ def annIdeal (F : HermLattice K i) (φc : Fin i → K) : Ideal (𝓞 K) where
     rw [map_mul, mul_smul]
     exact smul_mem_dual F c hx
 
-theorem mem_annIdeal {φc : Fin i → K} {μ : 𝓞 K} :
-    μ ∈ annIdeal F φc ↔ algebraMap (𝓞 K) K μ • φc ∈ dualLattice F := Iff.rfl
+theorem mem_annIdeal {φc : Fin i → K} {μ : 𝓞 K}
+    : μ ∈ annIdeal F φc ↔ algebraMap (𝓞 K) K μ • φc ∈ dualLattice F :=
+  Iff.rfl
 
-theorem annIdeal_isMaximal (hlt : F'.lattice < F.lattice)
-    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K), F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
-    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F) : (annIdeal F φc).IsMaximal := by
+theorem annIdeal_isMaximal
+    (hlt : F'.lattice < F.lattice)
+    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K),
+      F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
+    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F)
+    : (annIdeal F φc).IsMaximal := by
   rw [Ideal.isMaximal_iff]
   refine ⟨fun h => hc' ?_, fun J x hle hx hxJ => ?_⟩
   · have := mem_annIdeal.mp h
@@ -61,30 +65,42 @@ theorem annIdeal_isMaximal (hlt : F'.lattice < F.lattice)
   have h2 := J.add_mem (hle h1) (J.mul_mem_left l hxJ)
   rwa [sub_add_cancel] at h2
 
-theorem mk_eq_of {φc φ : Fin i → K} {l l' : 𝓞 K} (h : φ - algebraMap (𝓞 K) K l • φc ∈ dualLattice F)
-    (h' : φ - algebraMap (𝓞 K) K l' • φc ∈ dualLattice F) :
-    Ideal.Quotient.mk (annIdeal F φc) l = Ideal.Quotient.mk (annIdeal F φc) l' := by
+theorem mk_eq_of
+    {φc φ : Fin i → K} {l l' : 𝓞 K} (h : φ - algebraMap (𝓞 K) K l • φc ∈ dualLattice F)
+    (h' : φ - algebraMap (𝓞 K) K l' • φc ∈ dualLattice F)
+    : Ideal.Quotient.mk (annIdeal F φc) l = Ideal.Quotient.mk (annIdeal F φc) l' := by
   rw [Ideal.Quotient.eq, mem_annIdeal, map_sub, sub_smul]
-  have e : algebraMap (𝓞 K) K l • φc - algebraMap (𝓞 K) K l' • φc =
-      (φ - algebraMap (𝓞 K) K l' • φc) - (φ - algebraMap (𝓞 K) K l • φc) := by abel
+  have e
+      : algebraMap (𝓞 K) K l • φc - algebraMap (𝓞 K) K l' • φc
+        = (φ - algebraMap (𝓞 K) K l' • φc) - (φ - algebraMap (𝓞 K) K l • φc) := by
+    abel
   rw [e]
   exact sub_mem h' h
 
-def coeff (hlt : F'.lattice < F.lattice)
-    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K), F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
-    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F) (φ : dualLattice F') : 𝓞 K :=
+def coeff
+    (hlt : F'.lattice < F.lattice)
+    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K),
+      F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
+    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F)
+    (φ : dualLattice F')
+    : 𝓞 K :=
   (exists_sub_mem_dual hlt hcov hc hc' φ.2).choose
 
-theorem coeff_spec (hlt : F'.lattice < F.lattice)
-    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K), F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
-    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F) (φ : dualLattice F') :
-    (φ : Fin i → K) - algebraMap (𝓞 K) K (coeff hlt hcov hc hc' φ) • φc ∈ dualLattice F :=
+theorem coeff_spec
+    (hlt : F'.lattice < F.lattice)
+    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K),
+      F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
+    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F)
+    (φ : dualLattice F')
+    : (φ : Fin i → K) - algebraMap (𝓞 K) K (coeff hlt hcov hc hc' φ) • φc ∈ dualLattice F :=
   (exists_sub_mem_dual hlt hcov hc hc' φ.2).choose_spec
 
-def rhoDual (hlt : F'.lattice < F.lattice)
-    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K), F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
-    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F) :
-    dualLattice F' →+ 𝓞 K ⧸ annIdeal F φc where
+def rhoDual
+    (hlt : F'.lattice < F.lattice)
+    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K),
+      F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
+    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F)
+    : dualLattice F' →+ 𝓞 K ⧸ annIdeal F φc where
   toFun φ := Ideal.Quotient.mk _ (coeff hlt hcov hc hc' φ)
   map_zero' := by
     rw [← map_zero (Ideal.Quotient.mk (annIdeal F φc))]
@@ -94,28 +110,30 @@ def rhoDual (hlt : F'.lattice < F.lattice)
   map_add' φ ψ := by
     rw [← map_add (f := _)]
     refine mk_eq_of (coeff_spec hlt hcov hc hc' (φ + ψ)) ?_
-    have e : ((φ + ψ : dualLattice F') : Fin i → K) - algebraMap (𝓞 K) K
-        (coeff hlt hcov hc hc' φ + coeff hlt hcov hc hc' ψ) • φc =
-        ((φ : Fin i → K) - algebraMap (𝓞 K) K (coeff hlt hcov hc hc' φ) • φc) +
-        ((ψ : Fin i → K) - algebraMap (𝓞 K) K (coeff hlt hcov hc hc' ψ) • φc) := by
+    have e
+        : ((φ + ψ : dualLattice F') : Fin i → K)
+            - algebraMap (𝓞 K) K (coeff hlt hcov hc hc' φ + coeff hlt hcov hc hc' ψ) • φc
+          = ((φ : Fin i → K) - algebraMap (𝓞 K) K (coeff hlt hcov hc hc' φ) • φc)
+            + ((ψ : Fin i → K) - algebraMap (𝓞 K) K (coeff hlt hcov hc hc' ψ) • φc) := by
       rw [Submodule.coe_add, map_add (f := _), add_smul]
       abel
     rw [e]
     exact add_mem (coeff_spec hlt hcov hc hc' φ) (coeff_spec hlt hcov hc hc' ψ)
 
-theorem rhoDual_eq (hlt : F'.lattice < F.lattice)
-    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K), F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
-    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F) (φ : dualLattice F') (l : 𝓞 K)
-    (h : (φ : Fin i → K) - algebraMap (𝓞 K) K l • φc ∈ dualLattice F) :
-    rhoDual hlt hcov hc hc' φ = Ideal.Quotient.mk _ l :=
+theorem rhoDual_eq
+    (hlt : F'.lattice < F.lattice)
+    (hcov : ∀ N : Submodule (𝓞 K) (Fin i → K),
+      F'.lattice ≤ N → N ≤ F.lattice → N = F'.lattice ∨ N = F.lattice)
+    {φc : Fin i → K} (hc : φc ∈ dualLattice F') (hc' : φc ∉ dualLattice F)
+    (φ : dualLattice F') (l : 𝓞 K) (h : (φ : Fin i → K) - algebraMap (𝓞 K) K l • φc ∈ dualLattice F)
+    : rhoDual hlt hcov hc hc' φ = Ideal.Quotient.mk _ l :=
   mk_eq_of (coeff_spec hlt hcov hc hc' φ) h
 
 end StackedExceptionalResidueExists
 
-
 open StackedExceptionalResidueExists in
-theorem DualStackedExcResidueExists.proof (hσ : DualLatticeModPrime.Statement) :
-    DualStackedExcResidueExists.Statement := by
+theorem DualStackedExcResidueExists.proof (hσ : DualLatticeModPrime.Statement)
+    : DualStackedExcResidueExists.Statement := by
   intro K _ _ i F F' T _ _ b b' a _ hlt hcov _
   obtain ⟨φc, hc, hc'⟩ := exists_mem_not_mem hlt
   set 𝔭 := annIdeal F φc with h𝔭
@@ -144,15 +162,34 @@ theorem DualStackedExcResidueExists.proof (hσ : DualLatticeModPrime.Statement) 
     exact zero_mem _
   have hcard : Nat.card (𝓞 K ⧸ 𝔭) = F'.lattice.toAddSubgroup.relIndex F.lattice.toAddSubgroup := by
     rw [← DualLatticeIndex.proof K i F F' hlt.le]
-    have hk : (dualLattice F).toAddSubgroup.addSubgroupOf (dualLattice F').toAddSubgroup = ρ'.ker := by
+    have hk
+        : (dualLattice F).toAddSubgroup.addSubgroupOf (dualLattice F').toAddSubgroup = ρ'.ker := by
       ext φ
       rw [AddSubgroup.mem_addSubgroupOf, AddMonoidHom.mem_ker, hker]
       rfl
     rw [AddSubgroup.relIndex, hk, AddSubgroup.index_ker, AddMonoidHom.range_eq_top.mpr hsurj]
     exact (Nat.card_congr (Equiv.Set.univ _)).symm
-  refine ⟨𝓞 K ⧸ 𝔭, inferInstance, Fintype.ofFinite _, fun t => ρ' (b' t), fun t => σ (b t),
-    ⟨Ideal.Quotient.mk 𝔭, ρ', σ, Ideal.Quotient.mk_surjective, hsurj, hσs, hker, ?_, hσl,
-      fun t => rfl, fun t => rfl⟩, ?_⟩
+  refine ⟨
+    𝓞 K ⧸ 𝔭,
+    inferInstance,
+    Fintype.ofFinite _,
+    fun t => ρ' (b' t),
+    fun t => σ (b t),
+    ⟨
+      Ideal.Quotient.mk 𝔭,
+      ρ',
+      σ,
+      Ideal.Quotient.mk_surjective,
+      hsurj,
+      hσs,
+      hker,
+      ?_,
+      hσl,
+      fun t => rfl,
+      fun t => rfl
+    ⟩,
+    ?_
+  ⟩
   · intro μ φ ψ h
     rw [rhoDual_eq hlt hcov hc hc' ψ (μ * coeff hlt hcov hc hc' φ), map_mul]
     · rfl

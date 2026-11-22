@@ -36,13 +36,16 @@ namespace CrystallineSemistableComparison.Pb.Lat
 section Lat
 variable {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W) (l M : ℕ)
 
-theorem dp_ι (hc : DPClosed (ι f ξ l M) (γB f ξ)) : IsDPMorphism (γ f ξ l M hc) (γB f ξ) (ι f ξ l M) :=
+theorem dp_ι (hc : DPClosed (ι f ξ l M) (γB f ξ))
+    : IsDPMorphism (γ f ξ l M hc) (γB f ξ) (ι f ξ l M) :=
   ⟨Ideal.map_le_iff_le_comap.2 fun _ hx => hx, fun {n} a ha => (ι_γ f ξ l M hc ha).symm⟩
 
 end Lat
 
 section Map
-variable {W B W' B' : Type} [CommRing W] [CommRing B] [Algebra ℚ B] [CommRing W'] [CommRing B'] [Algebra ℚ B']
+variable
+  {W B W' B' : Type}
+  [CommRing W] [CommRing B] [Algebra ℚ B] [CommRing W'] [CommRing B'] [Algebra ℚ B']
   (f : W →+* B) (ξ : W) (f' : W' →+* B') (ξ' : W') (l M : ℕ)
 
 end Map

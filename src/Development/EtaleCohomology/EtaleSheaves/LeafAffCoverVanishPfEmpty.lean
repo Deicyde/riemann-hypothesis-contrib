@@ -5,14 +5,18 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafAffCoverVanishPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.E.E8
 
-theorem etaleFreeSheafOfRepresentable_isZero_of_isEmpty_scheme (R : Type) [CommRing R] (E : Scheme.{0}) [IsEmpty E] :
-    IsZero ((free R).obj (yoneda.obj E)) := by
+theorem etaleFreeSheafOfRepresentable_isZero_of_isEmpty_scheme
+    (R : Type) [CommRing R] (E : Scheme.{0}) [IsEmpty E]
+    : IsZero ((free R).obj (yoneda.obj E)) := by
   rw [IsZero.iff_id_eq_zero]
-  apply (sheafificationAdjunction Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R))).homEquiv _ _ |>.injective
+  apply (sheafificationAdjunction Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R))).homEquiv _
+      _
+    |>.injective
   ext T : 2
   by_cases hT : IsEmpty T.unop
   · haveI := hT
@@ -32,7 +36,8 @@ theorem leafEmptyVanish : LeafEmptyVanish := by
   intro R _ X F n
   have hE : IsEmpty (((⊥ : X.Opens) : Scheme.{0}) : Type) := by
     change IsEmpty ((⊥ : X.Opens) : Set X); simp
-  have hfree := etaleFreeSheafOfRepresentable_isZero_of_isEmpty_scheme R ((⊥ : X.Opens) : Scheme.{0})
+  have hfree :=
+    etaleFreeSheafOfRepresentable_isZero_of_isEmpty_scheme R ((⊥ : X.Opens) : Scheme.{0})
   have hN : IsZero ((chainsN R).obj (sch.obj ((⊥ : X.Opens) : Scheme.{0}))) := by
     rw [IsZero.iff_id_eq_zero]
     apply HomologicalComplex.hom_ext
@@ -43,9 +48,11 @@ theorem leafEmptyVanish : LeafEmptyVanish := by
     Functor.map_isZero (ComplexShape.embeddingDownNat.extendFunctor (Shv R)) hN
   have hX : ∀ p, IsZero (((chains R).obj (sch.obj ((⊥ : X.Opens) : Scheme.{0}))).X p) := fun p =>
     Functor.map_isZero (HomologicalComplex.eval _ _ p) hC
-  have : Subsingleton (Cochain ((chains R).obj (sch.obj ((⊥ : X.Opens) : Scheme.{0}))) (res R F) n) :=
+  have : Subsingleton (Cochain ((chains R).obj (sch.obj ((⊥ : X.Opens) : Scheme.{0}))) (res R F)
+      n) :=
     ⟨fun a b => Cochain.ext _ _ fun p q hpq => (hX p).eq_of_src _ _⟩
-  have : Subsingleton (Cocycle ((chains R).obj (sch.obj ((⊥ : X.Opens) : Scheme.{0}))) (res R F) n) :=
+  have : Subsingleton (Cocycle ((chains R).obj (sch.obj ((⊥ : X.Opens) : Scheme.{0}))) (res R F)
+      n) :=
     ⟨fun a b => Subtype.ext (Subsingleton.elim _ _)⟩
   change Subsingleton (CohomologyClass _ _ n)
   unfold CohomologyClass

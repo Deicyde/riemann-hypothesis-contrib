@@ -11,10 +11,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PDivCocycleM
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -27,8 +30,9 @@ namespace PDivGroup
 
 variable {p : ℕ} {R : Type} [CommRing R] (G : PDivGroup p R)
 
-theorem exists_injective_mulBy_pow_eq_comp_resOne (n : ℕ) : ∃ q : G.A 1 →ₐc[R] G.A (n + 1),
-    Function.Injective q ∧ ∀ a, mulBy R _ (p ^ n) a = q (G.resOne n a) := by
+theorem exists_injective_mulBy_pow_eq_comp_resOne (n : ℕ)
+    : ∃ q : G.A 1 →ₐc[R] G.A (n + 1),
+      Function.Injective q ∧ ∀ a, mulBy R _ (p ^ n) a = q (G.resOne n a) := by
   induction n with
   | zero =>
     refine ⟨BialgHom.id R _, Function.injective_id, fun a => ?_⟩
@@ -36,15 +40,15 @@ theorem exists_injective_mulBy_pow_eq_comp_resOne (n : ℕ) : ∃ q : G.A 1 →�
   | succ n ih =>
     obtain ⟨q, hq, hq'⟩ := ih
     refine ⟨(G.mulP (n + 1)).comp q, (Test.mulP_injective G (n + 1)).comp hq, fun a => ?_⟩
-    rw [pow_succ', ← mulBy_mulBy, ← mulP_res, map_mulBy, hq', BialgHom.comp_apply,
-      resOne_succ]
+    rw [pow_succ', ← mulBy_mulBy, ← mulP_res, map_mulBy, hq', BialgHom.comp_apply, resOne_succ]
 
 theorem mulBy_pow_zero_eq_id (n : ℕ) : mulBy R (G.A n) (p ^ 0) = BialgHom.id R _ := by
   rw [pow_zero, mulBy, pow_one]
 
-theorem exists_cob_eq_mulBy_eq (c : G.cocycles) (B : G.funs)
-    (hB : ∀ n, cobOne R _ (B.1 n) = pullbackTwo (mulBy R (G.A n) p) (c.1 n)) (h1 : B.1 1 = 0) :
-    ∃ e : G.funs, G.cob e = c ∧ ∀ n, mulBy R _ p (e.1 n) = B.1 n := by
+theorem exists_cob_eq_mulBy_eq
+    (c : G.cocycles) (B : G.funs)
+    (hB : ∀ n, cobOne R _ (B.1 n) = pullbackTwo (mulBy R (G.A n) p) (c.1 n)) (h1 : B.1 1 = 0)
+    : ∃ e : G.funs, G.cob e = c ∧ ∀ n, mulBy R _ p (e.1 n) = B.1 n := by
   have hlev : ∀ n, cobOne R _ (B.1 (n + 1)) = pullbackTwo (G.mulP n) (c.1 n) := by
     intro n
     rw [hB, ← mulP_comp_res, pullTwo_comp, (c.2 n).2]
@@ -62,9 +66,10 @@ theorem exists_cob_eq_mulBy_eq (c : G.cocycles) (B : G.funs)
   · change mulBy R _ p (e n) = B.1 n
     rw [← res_mulP, he n, B.2 n]
 
-theorem exists_cob_eq_mulBy_pow_eq [Fact p.Prime] (N : ℕ) : ∀ (c : G.cocycles) (B : G.funs),
-    (∀ n, cobOne R _ (B.1 n) = pullbackTwo (mulBy R (G.A n) (p ^ N)) (c.1 n)) → B.1 N = 0 →
-      ∃ e : G.funs, G.cob e = c ∧ ∀ n, mulBy R _ (p ^ N) (e.1 n) = B.1 n := by
+theorem exists_cob_eq_mulBy_pow_eq [Fact p.Prime] (N : ℕ)
+    : ∀ (c : G.cocycles) (B : G.funs),
+      (∀ n, cobOne R _ (B.1 n) = pullbackTwo (mulBy R (G.A n) (p ^ N)) (c.1 n)) → B.1 N = 0
+        → ∃ e : G.funs, G.cob e = c ∧ ∀ n, mulBy R _ (p ^ N) (e.1 n) = B.1 n := by
   induction N with
   | zero =>
     intro c B hB _
@@ -79,7 +84,8 @@ theorem exists_cob_eq_mulBy_pow_eq [Fact p.Prime] (N : ℕ) : ∀ (c : G.cocycle
     have hc' : ∀ n, c'.1 n = pullbackTwo (mulBy R (G.A n) p) (c.1 n) := fun n => by
       change pullbackTwo (Hom.app ((p : ℤ_[p]) • 𝟙 G) n) (c.1 n) = _
       rw [natCast_smul_id_app]
-    have hB' : ∀ n, cobOne R _ (B.1 n) = pullbackTwo (mulBy R (G.A n) (p ^ N)) (c'.1 n) := fun n => by
+    have hB'
+        : ∀ n, cobOne R _ (B.1 n) = pullbackTwo (mulBy R (G.A n) (p ^ N)) (c'.1 n) := fun n => by
       rw [hB n, hc' n, ← pullTwo_comp, pow_succ,
         show (mulBy R (G.A n) (p ^ N)).comp (mulBy R _ p) = mulBy R _ (p ^ N * p) from
           BialgHom.ext fun a => mulBy_mulBy _ _ a]
@@ -96,11 +102,12 @@ theorem exists_cob_eq_mulBy_pow_eq [Fact p.Prime] (N : ℕ) : ∀ (c : G.cocycle
 
 end PDivGroup
 
-theorem cocycle_mem_range_cob_of_pullback_mulBy_pow :
-    ∀ (p : ℕ) [Fact p.Prime]  (R : Type) [CommRing R] (G : PDivGroup p R) (N : ℕ) (c : G.cocycles)
-      (B : ∀ n, G.A n), (∀ n, G.res n (B (n + 1)) = B n) →
-      (∀ n, cobOne R (G.A n) (B n) = pullbackTwo (mulBy R (G.A n) (p ^ N)) (c.1 n)) → B N = 0 →
-        c ∈ LinearMap.range G.cob := by
+theorem cocycle_mem_range_cob_of_pullback_mulBy_pow
+    : ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (G : PDivGroup p R) (N : ℕ) (c : G.cocycles)
+        (B : ∀ n, G.A n),
+      (∀ n, G.res n (B (n + 1)) = B n)
+        → (∀ n, cobOne R (G.A n) (B n) = pullbackTwo (mulBy R (G.A n) (p ^ N)) (c.1 n)) → B N = 0
+        → c ∈ LinearMap.range G.cob := by
   intro p _ R _ G N c B hB hc hN
   obtain ⟨e, he, -⟩ := G.exists_cob_eq_mulBy_pow_eq N c ⟨B, hB⟩ hc hN
   exact ⟨e, he⟩

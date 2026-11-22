@@ -115,7 +115,8 @@ public import Formalism.LocalRingCardinality.NFLeTwoMulTSq
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.RT GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Fc
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.RT GlobalTheory.EX
+  GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Fc
 
 namespace GlobalTheory.Fc.AllAtMember
 
@@ -123,7 +124,9 @@ section large₂
 
 variable {KP : ∀ B : GlobalTheory.Mem.Base, Fr B.toPre → Prop} {Q Q' : V4.Slot}
 
-theorem eventually_coreProperty_mono {r r' : V4.Slot → Prop} (h : Lg1 KP Q Q' r) (hi : ∀ S, r S → r' S) : Lg1 KP Q Q' r' :=
+theorem eventually_coreProperty_mono
+    {r r' : V4.Slot → Prop} (h : Lg1 KP Q Q' r) (hi : ∀ S, r S → r' S)
+    : Lg1 KP Q Q' r' :=
   let ⟨R, hR, h⟩ := h; ⟨R, hR, hi _ h⟩
 
 end large₂

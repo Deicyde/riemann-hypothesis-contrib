@@ -18,10 +18,13 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace GlobalTheory.AlgConn
 
-theorem connectedSpace_specialFibre_of_morphisms : GlobalTheory.Published.FormalAlgebraisation.Morphisms →
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-      [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (Y : Scheme.{0}) (f : Y ⟶ Spec (.of O)),
-      IsProper f → ConnectedSpace ↑Y → ConnectedSpace ↑(GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialFibre f) := by
+theorem connectedSpace_specialFibre_of_morphisms
+    : GlobalTheory.Published.FormalAlgebraisation.Morphisms
+      → ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+          [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (Y : Scheme.{0}) (f : Y ⟶ Spec (.of O)),
+        IsProper f → ConnectedSpace ↑Y
+          → ConnectedSpace ↑(GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialFibre
+            f) := by
   intro H O _ _ _ hI Y f hP hY
   open GlobalTheory.SpecialConn GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits in
   have hT : Set.range (specialι f) = f ⁻¹' {IsLocalRing.closedPoint O} := by
@@ -50,7 +53,8 @@ theorem connectedSpace_specialFibre_of_morphisms : GlobalTheory.Published.Formal
     IsClosedImmersion.spec_of_surjective _ IsLocalRing.residue_surjective
   haveI : IsClosedImmersion (GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f) :=
     inferInstanceAs (IsClosedImmersion (pullback.fst f (Spec.map (CommRingCat.ofHom (IsLocalRing.residue O)))))
-  have hcl : Topology.IsClosedEmbedding (GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f) :=
+  have hcl : Topology.IsClosedEmbedding
+      (GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f) :=
     (GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f).isClosedEmbedding
   refine { toPreconnectedSpace := preconnectedSpace_iff_clopen.2 fun U hU => ?_, toNonempty := ‹_› }
   by_contra hcon
@@ -65,15 +69,23 @@ theorem connectedSpace_specialFibre_of_morphisms : GlobalTheory.Published.Formal
   let B := GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f '' Uᶜ
   have hA : IsClosed A := hcl.isClosedMap _ hU.1
   have hB : IsClosed B := hcl.isClosedMap _ hU.2.isClosed_compl
-  have hpt : ∀ n (z : GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialFibre f), ∃ x, GlobalTheory.SpecialConn.thickι f n x =
-      GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f z := fun n z => by
-    have : GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f z ∈ Set.range (GlobalTheory.SpecialConn.thickι f n) := by
+  have hpt
+      : ∀ n (z : GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialFibre f), ∃ x,
+        GlobalTheory.SpecialConn.thickι f n x
+          = GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f z := fun n z => by
+    have : GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f z
+        ∈ Set.range (GlobalTheory.SpecialConn.thickι f n) := by
       rw [hTn, ← hT]; exact ⟨z, rfl⟩
     exact this
-  have hAB : ∀ n, (GlobalTheory.SpecialConn.thickι f n ⁻¹' A)ᶜ = GlobalTheory.SpecialConn.thickι f n ⁻¹' B := by
+  have hAB
+      : ∀ n,
+        (GlobalTheory.SpecialConn.thickι f n ⁻¹' A)ᶜ
+          = GlobalTheory.SpecialConn.thickι f n ⁻¹' B := by
     intro n
     ext x
-    obtain ⟨z, hz⟩ : GlobalTheory.SpecialConn.thickι f n x ∈ Set.range (GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f) := by
+    obtain ⟨z, hz⟩
+        : GlobalTheory.SpecialConn.thickι f n x
+          ∈ Set.range (GlobalTheory.IndefiniteRowSideFullHecke.SpecialFibreUnits.specialι f) := by
       rw [hT, ← hTn n]; exact ⟨x, rfl⟩
     simp only [Set.mem_compl_iff, Set.mem_preimage, A, B, Set.mem_image]
     constructor
@@ -81,9 +93,12 @@ theorem connectedSpace_specialFibre_of_morphisms : GlobalTheory.Published.Formal
       exact ⟨z, fun hzU => h ⟨z, hzU, hz⟩, hz⟩
     · rintro ⟨w, hw, hw'⟩ ⟨w', hw'U, hw''⟩
       exact hw (hcl.injective (hw''.trans hw'.symm) ▸ hw'U)
-  have hclo : ∀ n, IsClopen (GlobalTheory.SpecialConn.thickι f n ⁻¹' A) := fun n =>
-    ⟨hA.preimage (GlobalTheory.SpecialConn.thickι f n).continuous,
-      by rw [← isClosed_compl_iff, hAB n]; exact hB.preimage (GlobalTheory.SpecialConn.thickι f n).continuous⟩
+  have hclo : ∀ n, IsClopen (GlobalTheory.SpecialConn.thickι f n ⁻¹' A) := fun n => ⟨
+    hA.preimage (GlobalTheory.SpecialConn.thickι f n).continuous,
+    by
+      rw [← isClosed_compl_iff, hAB n]
+      exact hB.preimage (GlobalTheory.SpecialConn.thickι f n).continuous
+  ⟩
   choose h hhp hhU using fun n => GlobalTheory.T.exists_hom_specProdSelf_preimage_eq_clopen O (GlobalTheory.SpecialConn.thickFib f n)
     (GlobalTheory.SpecialConn.thickι f n ≫ f) _ (hclo n)
   haveI : IsProper (Over.mk f).hom := hP
@@ -94,15 +109,22 @@ theorem connectedSpace_specialFibre_of_morphisms : GlobalTheory.Published.Formal
     · rw [Category.assoc, hhp, hhp, ← Category.assoc, GlobalTheory.SpecialConn.thickTr_ι]
     · refine TopologicalSpace.Opens.ext ?_
       rw [hhU n, Scheme.Hom.comp_preimage]
-      change GlobalTheory.SpecialConn.thickTr f n ⁻¹' ((h (n + 1) ⁻¹ᵁ _ : (GlobalTheory.SpecialConn.thickFib f (n+1)).Opens) : Set _) = _
+      change GlobalTheory.SpecialConn.thickTr f n
+          ⁻¹' ((h (n + 1) ⁻¹ᵁ _ : (GlobalTheory.SpecialConn.thickFib f (n + 1)).Opens) : Set _)
+        = _
       rw [hhU (n + 1), ← Set.preimage_comp, ← GlobalTheory.SpecialConn.thickTr_ι f n]
       rfl
-  obtain ⟨g, hg, -⟩ := GlobalTheory.Published.FormalAlgebraisation.Morphisms.existsUnique_thick H hI (Over.mk f)
-    (Over.mk (twoπ O)) h (fun n => hhp n) hc
+  obtain ⟨g, hg, -⟩ :=
+    GlobalTheory.Published.FormalAlgebraisation.Morphisms.existsUnique_thick H hI (Over.mk f)
+      (Over.mk (twoπ O)) h
+      (fun n => hhp n)
+      hc
   have hW : IsClopen ((g.left ⁻¹ᵁ (Spec (.of (O × O))).basicOpen (fst1 O) : Y.Opens) : Set Y) :=
     (isClopen_basicOpen_specProdSelfFirstIdempotent O).preimage g.left.continuous
-  have h0 : GlobalTheory.SpecialConn.thickι f 0 ⁻¹' ((g.left ⁻¹ᵁ (Spec (.of (O × O))).basicOpen (fst1 O) : Y.Opens) : Set Y) =
-      GlobalTheory.SpecialConn.thickι f 0 ⁻¹' A := by
+  have h0
+      : GlobalTheory.SpecialConn.thickι f 0
+          ⁻¹' ((g.left ⁻¹ᵁ (Spec (.of (O × O))).basicOpen (fst1 O) : Y.Opens) : Set Y)
+        = GlobalTheory.SpecialConn.thickι f 0 ⁻¹' A := by
     rw [← hhU 0, ← hg 0]
     rfl
   obtain ⟨x, hx⟩ := hpt 0 u
@@ -111,8 +133,10 @@ theorem connectedSpace_specialFibre_of_morphisms : GlobalTheory.Published.Formal
   · have hxA : x ∈ GlobalTheory.SpecialConn.thickι f 0 ⁻¹' A := ⟨u, hu, hx.symm⟩
     rw [← h0, hW0] at hxA
     simp at hxA
-  · have hxA : x' ∈ GlobalTheory.SpecialConn.thickι f 0 ⁻¹'
-        ((g.left ⁻¹ᵁ (Spec (.of (O × O))).basicOpen (fst1 O) : Y.Opens) : Set Y) := by
+  · have hxA
+        : x'
+          ∈ GlobalTheory.SpecialConn.thickι f 0
+            ⁻¹' ((g.left ⁻¹ᵁ (Spec (.of (O × O))).basicOpen (fst1 O) : Y.Opens) : Set Y) := by
       rw [hW1]; trivial
     rw [h0] at hxA
     obtain ⟨w, hw, hw'⟩ := hxA

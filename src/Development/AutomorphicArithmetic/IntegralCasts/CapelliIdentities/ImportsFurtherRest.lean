@@ -6,13 +6,10 @@ public import Formalism.ConjugateSelfDual.Statement
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Rb6.norm_le_one_of_mem :
-    ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] (c : UpperTheory.V.HV.Coef l)
-    {x : Formalism.ConjugateSelfDual.Qbar l},
-    x ∈ c.O →
-      ‖x‖ ≤
-        (1 :
-          ℝ) := by
+theorem UpperTheory.Reformulated.B.Rb6.norm_le_one_of_mem
+    : ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] (c : UpperTheory.V.HV.Coef l)
+        {x : Formalism.ConjugateSelfDual.Qbar l},
+      x ∈ c.O → ‖x‖ ≤ (1 : ℝ) := by
   intro l _ c x hx
   have h1 : IsIntegral ℤ_[l] (⟨x, hx⟩ : c.O) := Algebra.IsIntegral.isIntegral _
   have h2 : IsIntegral ℤ_[l] x := h1.map c.O.val

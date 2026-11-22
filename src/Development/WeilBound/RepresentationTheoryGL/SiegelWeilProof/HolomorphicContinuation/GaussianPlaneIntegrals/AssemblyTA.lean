@@ -11,8 +11,8 @@ open scoped ComplexOrder
 
 namespace PositivityTheory.Rg.Sw.FFTSteps.AsmA
 
-theorem eval_aeval' {σ τ : Type} (φ : σ → MvPolynomial τ ℂ) (z : τ → ℂ) (p : MvPolynomial σ ℂ) :
-    eval z (aeval φ p) = eval (fun v => eval z (φ v)) p := by
+theorem eval_aeval' {σ τ : Type} (φ : σ → MvPolynomial τ ℂ) (z : τ → ℂ) (p : MvPolynomial σ ℂ)
+    : eval z (aeval φ p) = eval (fun v => eval z (φ v)) p := by
   induction p using MvPolynomial.induction_on with
   | C a => simp only [aeval_C, MvPolynomial.algebraMap_eq, eval_C]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
@@ -21,20 +21,28 @@ theorem eval_aeval' {σ τ : Type} (φ : σ → MvPolynomial τ ℂ) (z : τ →
 variable {ι A B : Type} [Fintype ι]
 
 def act (g h : Matrix ι ι ℂ) (z : (ι × A) ⊕ (ι × B) → ℂ) : (ι × A) ⊕ (ι × B) → ℂ :=
-  Sum.elim (fun x => ∑ j, g x.1 j * z (Sum.inl (j, x.2))) (fun y => ∑ j, h y.1 j * z (Sum.inr (j, y.2)))
+  Sum.elim
+    (fun x => ∑ j, g x.1 j * z (Sum.inl (j, x.2)))
+    (fun y => ∑ j, h y.1 j * z (Sum.inr (j, y.2)))
 
-theorem eval_sub (g h : Matrix ι ι ℂ) (z : (ι × A) ⊕ (ι × B) → ℂ) (p : PV ι A B) :
-    eval z (sub g h p) = eval (act g h z) p := by
+theorem eval_sub (g h : Matrix ι ι ℂ) (z : (ι × A) ⊕ (ι × B) → ℂ) (p : PV ι A B)
+    : eval z (sub g h p) = eval (act g h z) p := by
   unfold sub
   rw [eval_aeval']
-  have e : (fun v => eval z (Sum.elim (fun x : ι × A => ∑ j, C (g x.1 j) * (X (Sum.inl (j, x.2)) : PV ι A B))
-      (fun y : ι × B => ∑ j, C (h y.1 j) * X (Sum.inr (j, y.2))) v)) = act g h z := by
+  have e
+      : (fun v =>
+          eval z
+            (Sum.elim
+              (fun x : ι × A => ∑ j, C (g x.1 j) * (X (Sum.inl (j, x.2)) : PV ι A B))
+              (fun y : ι × B => ∑ j, C (h y.1 j) * X (Sum.inr (j, y.2)))
+              v))
+        = act g h z := by
     funext v
     rcases v with ⟨i, a⟩ | ⟨i, b⟩ <;> simp [act, map_sum]
   rw [e]
 
-theorem act_act (g h g' h' : Matrix ι ι ℂ) (z : (ι × A) ⊕ (ι × B) → ℂ) :
-    act g h (act g' h' z) = act (g * g') (h * h') z := by
+theorem act_act (g h g' h' : Matrix ι ι ℂ) (z : (ι × A) ⊕ (ι × B) → ℂ)
+    : act g h (act g' h' z) = act (g * g') (h * h') z := by
   funext v
   rcases v with ⟨i, a⟩ | ⟨i, b⟩
   · simp only [act, Sum.elim_inl, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
@@ -42,13 +50,16 @@ theorem act_act (g h g' h' : Matrix ι ι ℂ) (z : (ι × A) ⊕ (ι × B) → 
   · simp only [act, Sum.elim_inr, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
     exact Finset.sum_comm
 
-theorem act_one_one (z : (ι × A) ⊕ (ι × B) → ℂ) [DecidableEq ι] : act (1 : Matrix ι ι ℂ) 1 z = z := by
+theorem act_one_one (z : (ι × A) ⊕ (ι × B) → ℂ) [DecidableEq ι]
+    : act (1 : Matrix ι ι ℂ) 1 z = z := by
   funext v
   rcases v with ⟨i, a⟩ | ⟨i, b⟩ <;> simp [act, Matrix.one_apply]
 
-theorem continuous_act_eval {X : Type} [TopologicalSpace X] {F G : X → Matrix ι ι ℂ} (hF : Continuous F)
-    (hG : Continuous G) (z : (ι × A) ⊕ (ι × B) → ℂ) (p : PV ι A B) :
-    Continuous fun x => eval (act (F x) (G x) z) p := by
+theorem continuous_act_eval
+    {X : Type} [TopologicalSpace X]
+    {F G : X → Matrix ι ι ℂ} (hF : Continuous F) (hG : Continuous G)
+    (z : (ι × A) ⊕ (ι × B) → ℂ) (p : PV ι A B)
+    : Continuous fun x => eval (act (F x) (G x) z) p := by
   refine (MvPolynomial.continuous_eval p).comp (continuous_pi fun v => ?_)
   rcases v with ⟨i, a⟩ | ⟨i, b⟩
   · simp only [act, Sum.elim_inl]
@@ -56,8 +67,9 @@ theorem continuous_act_eval {X : Type} [TopologicalSpace X] {F G : X → Matrix 
   · simp only [act, Sum.elim_inr]
     exact continuous_finsetSum _ fun j _ => (hG.matrix_elem i j).mul continuous_const
 
-theorem totalDegree_aeval_le {σ τ : Type} (φ : σ → MvPolynomial τ ℂ) (h : ∀ v, (φ v).totalDegree ≤ 1)
-    (p : MvPolynomial σ ℂ) : (aeval φ p).totalDegree ≤ p.totalDegree := by
+theorem totalDegree_aeval_le
+    {σ τ : Type} (φ : σ → MvPolynomial τ ℂ) (h : ∀ v, (φ v).totalDegree ≤ 1) (p : MvPolynomial σ ℂ)
+    : (aeval φ p).totalDegree ≤ p.totalDegree := by
   classical
   conv_lhs => rw [p.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -69,12 +81,13 @@ theorem totalDegree_aeval_le {σ τ : Type} (φ : σ → MvPolynomial τ ℂ) (h
     rw [MvPolynomial.algebraMap_eq]; exact totalDegree_C _
   rw [h1, zero_add, Finsupp.prod]
   refine (totalDegree_finsetProd _ _).trans ?_
-  refine le_trans (Finset.sum_le_sum fun i _ => (totalDegree_pow _ _).trans
-    (Nat.mul_le_mul_left _ (h i))) ?_
+  refine le_trans
+    (Finset.sum_le_sum fun i _ => (totalDegree_pow _ _).trans (Nat.mul_le_mul_left _ (h i))) ?_
   simp only [mul_one]
   exact le_totalDegree hm
 
-theorem totalDegree_sub_le (g h : Matrix ι ι ℂ) (p : PV ι A B) : (sub g h p).totalDegree ≤ p.totalDegree := by
+theorem totalDegree_sub_le (g h : Matrix ι ι ℂ) (p : PV ι A B)
+    : (sub g h p).totalDegree ≤ p.totalDegree := by
   refine totalDegree_aeval_le _ (fun v => ?_) p
   rcases v with ⟨i, a⟩ | ⟨i, b⟩
   · simp only [Sum.elim_inl]

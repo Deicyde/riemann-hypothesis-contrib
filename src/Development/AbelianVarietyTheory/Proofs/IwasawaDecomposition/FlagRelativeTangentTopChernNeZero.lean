@@ -5,15 +5,17 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
 
 namespace GlobalTheory.GoodMetric
 
 theorem rootDiscr_ne_zero : ∀ (ι : Type) [Fintype ι] (m : ι → ℕ), rootDiscr m ≠ 0 := by
   intro ι _ m
   unfold rootDiscr
-  refine Finset.prod_ne_zero_iff.mpr fun τ _ => Finset.prod_ne_zero_iff.mpr fun j _ =>
-    Finset.prod_ne_zero_iff.mpr fun i hi => ?_
+  refine Finset.prod_ne_zero_iff.mpr fun τ _ =>
+    Finset.prod_ne_zero_iff.mpr fun j _ => Finset.prod_ne_zero_iff.mpr fun i hi => ?_
   rw [sub_ne_zero]
   intro h
   have h2 := X_injective (σ := Root m) (R := ℝ) h

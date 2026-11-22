@@ -28,15 +28,21 @@ private theorem nr_c (X : Tower Ω ε) (c : Ω) : Nr X (algebraMap Ω X.K c) := 
   rw [X.gal_exp, AlgHom.commutes, HahnSeries.algebraMap_apply']
   by_cases h : r = 0 <;> simp [h, hs c (Finset.mem_singleton_self c)]
 
-private theorem nr_two (X : Tower Ω ε) {f g : X.K} (hf : Nr X f) (hg : Nr X g) :
-    ∃ T : Finset Ω, ∀ s : Ω ≃ₐ[ℚ] Ω, (∀ z ∈ T, s z = z) → X.gal s f = f ∧ X.gal s g = g := by
+private theorem nr_two (X : Tower Ω ε) {f g : X.K} (hf : Nr X f) (hg : Nr X g)
+    : ∃ T : Finset Ω, ∀ s : Ω ≃ₐ[ℚ] Ω, (∀ z ∈ T, s z = z) → X.gal s f = f ∧ X.gal s g = g := by
   classical
   obtain ⟨A, hA⟩ := hf
   obtain ⟨B, hB⟩ := hg
-  exact ⟨A ∪ B, fun s hs => ⟨hA s fun z hz => hs z (Finset.mem_union_left _ hz),
-    hB s fun z hz => hs z (Finset.mem_union_right _ hz)⟩⟩
+  exact ⟨
+    A ∪ B,
+    fun s hs => ⟨
+      hA s fun z hz => hs z (Finset.mem_union_left _ hz),
+      hB s fun z hz => hs z (Finset.mem_union_right _ hz)
+    ⟩
+  ⟩
 
-private theorem nr_adj (X : Tower Ω ε) (f : X.K) (hf : f ∈ IntermediateField.adjoin Ω {X.jK}) : Nr X f := by
+private theorem nr_adj (X : Tower Ω ε) (f : X.K) (hf : f ∈ IntermediateField.adjoin Ω {X.jK})
+    : Nr X f := by
   induction hf using IntermediateField.adjoin_induction with
   | mem x hx => rw [Set.mem_singleton_iff.1 hx]; exact nr_j X
   | algebraMap c => exact nr_c X c
@@ -52,8 +58,11 @@ private theorem nr_adj (X : Tower Ω ε) (f : X.K) (hf : f ∈ IntermediateField
 
 end
 
-theorem UpperTheory.V.Z.Kato.Sym.PC.galNear :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (f : X.K), ∃ T : Finset Ω, ∀ s : Ω ≃ₐ[ℚ] Ω, (∀ z ∈ T, s z = z) → X.gal s f = f := by
+theorem UpperTheory.V.Z.Kato.Sym.PC.galNear
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε)
+        (f : X.K),
+      ∃ T : Finset Ω, ∀ s : Ω ≃ₐ[ℚ] Ω,
+        (∀ z ∈ T, s z = z) → X.gal s f = f := by
   intro Ω _ _ _ ε X f
   classical
   obtain ⟨p, hp0, hpf⟩ := X.alg_j f
@@ -72,7 +81,10 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.galNear :
     exact hb (exp_inj X (HahnSeries.ext (funext h)))
   choose TC hTC using hc
   choose! rr hrr using hd
-  refine ⟨(q.support.biUnion TC) ∪ ((q.roots.toFinset.erase f).image (fun b => (X.exp f).coeff (rr b))), ?_⟩
+  refine ⟨
+    (q.support.biUnion TC) ∪ ((q.roots.toFinset.erase f).image (fun b => (X.exp f).coeff (rr b))),
+    ?_
+  ⟩
   intro s hs
   have hfix : ∀ i, X.gal s (q.coeff i) = q.coeff i := by
     intro i
@@ -84,14 +96,17 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.galNear :
     rw [Polynomial.coeff_map]
     exact hfix i
   have hroot : q.eval (X.gal s f) = 0 := by
-    have h1 : (q.map (X.gal s).toRingHom).eval ((X.gal s).toRingHom f) = (X.gal s).toRingHom (q.eval f) := by
+    have h1
+        : (q.map (X.gal s).toRingHom).eval ((X.gal s).toRingHom f)
+          = (X.gal s).toRingHom (q.eval f) := by
       rw [Polynomial.eval_map, Polynomial.eval₂_at_apply]
     rw [hmap, hqf, map_zero] at h1
     exact h1
   by_contra hne
   have hb : X.gal s f ∈ q.roots.toFinset.erase f :=
     Finset.mem_erase.mpr ⟨hne, Multiset.mem_toFinset.mpr ((Polynomial.mem_roots hq0).mpr hroot)⟩
-  have hsz := hs ((X.exp f).coeff (rr (X.gal s f)))
-    (Finset.mem_union_right _ (Finset.mem_image.mpr ⟨_, hb, rfl⟩))
+  have hsz :=
+    hs ((X.exp f).coeff (rr (X.gal s f)))
+      (Finset.mem_union_right _ (Finset.mem_image.mpr ⟨_, hb, rfl⟩))
   apply hrr _ hne
   rw [X.gal_exp, hsz]

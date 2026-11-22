@@ -13,20 +13,23 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.DirectFactor
 
-theorem bicommutant_restriction_prime :
-    ∀ (G G₁ H : Type) [Group G] [Group G₁] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (π : G →* (H →L[ℂ] H)), IsTopIrreducible π → ∀ (j : G₁ →* G) (p : G →* G₁),
-    (∀ x, p (j x) = x) → (∀ x g, p g = 1 → Commute (j x) g) → ∀ x y : H →L[ℂ] H,
-    (∀ T : H →L[ℂ] H, (∀ g, T * π (j g) = π (j g) * T) → T * y = y * T) → y ≠ 0 →
-    (∀ g, x * π (j g) * y = 0) → x = 0 := by
+theorem bicommutant_restriction_prime
+    : ∀ (G G₁ H : Type) [Group G] [Group G₁] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        (π : G →* (H →L[ℂ] H)),
+      IsTopIrreducible π
+        → ∀ (j : G₁ →* G) (p : G →* G₁),
+          (∀ x, p (j x) = x) → (∀ x g, p g = 1 → Commute (j x) g)
+            → ∀ x y : H →L[ℂ] H,
+              (∀ T : H →L[ℂ] H, (∀ g, T * π (j g) = π (j g) * T) → T * y = y * T) → y ≠ 0
+                → (∀ g, x * π (j g) * y = 0)
+                → x = 0 := by
   intro G G₁ H _ _ _ _ π hπ j p hp hc x y hy hy0 hxy
   let W₀ : Submodule ℂ H := Submodule.span ℂ (Set.range fun q : G₁ × H => π (j q.1) (y q.2))
   have hgen : ∀ (g' : G₁) (h : H), π (j g') (y h) ∈ W₀ := fun g' h =>
     Submodule.subset_span ⟨(g', h), rfl⟩
   have hinv : ∀ g, ∀ v ∈ W₀, π g v ∈ W₀ := by
     intro g v hv
-    obtain ⟨k, hk, hg⟩ : ∃ k, p k = 1 ∧ g = j (p g) * k :=
-      ⟨(j (p g))⁻¹ * g, by simp [hp], by simp⟩
+    obtain ⟨k, hk, hg⟩ : ∃ k, p k = 1 ∧ g = j (p g) * k := ⟨(j (p g))⁻¹ * g, by simp [hp], by simp⟩
     have hpg : π g = π (j (p g)) * π k := by
       have := congrArg π hg
       rwa [map_mul] at this

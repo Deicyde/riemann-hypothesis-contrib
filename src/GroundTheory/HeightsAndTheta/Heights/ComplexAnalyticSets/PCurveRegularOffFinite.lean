@@ -13,11 +13,11 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets Filter Topology
 
-theorem CurveRegularOffFinite.proof (hG : FrameGraphGeneric.Statement)
-    (hP : CurveProperClosedFinite.Statement) : CurveRegularOffFinite.Statement := by
+theorem CurveRegularOffFinite.proof
+    (hG : FrameGraphGeneric.Statement) (hP : CurveProperClosedFinite.Statement)
+    : CurveRegularOffFinite.Statement := by
   intro n W hW hdim
-  have hd : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = ((1 : ℕ) : WithBot ℕ∞) := by
-    rw [hdim]; rfl
+  have hd : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = ((1 : ℕ) : WithBot ℕ∞) := by rw [hdim]; rfl
   let b := EuclideanSpace.basisFun (Fin n) ℂ
   obtain ⟨I₀, q, hcard, hqW, hreg⟩ := hG n 1 W hW hd b
   obtain ⟨i₀, hI₀⟩ := Finset.card_eq_one.mp hcard
@@ -45,8 +45,8 @@ theorem CurveRegularOffFinite.proof (hG : FrameGraphGeneric.Statement)
   let A : (Fin n → ℂ) →L[ℂ] ℂ := ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin n => ℂ) i₀
   have hO : IsOpen (ι ⁻¹' Ω) := hΩ.preimage ι.continuous
   refine ⟨A, ι ⁻¹' Ω, T ⁻¹' V, fun y => S (g (ι y)), hO, hV.preimage T.continuous, hxV, ?_, ?_, ?_⟩
-  · exact (S.differentiable.comp_differentiableOn
-      (hg.comp ι.differentiable.differentiableOn fun y hy => hy)).analyticOnNhd hO
+  · exact (S.differentiable.comp_differentiableOn (hg.comp ι.differentiable.differentiableOn
+      fun y hy => hy)).analyticOnNhd hO
   · intro y hy
     have h1 := congrFun (hproj (ι y) hy) ⟨i₀, hi₀⟩
     simp only [frameProj, b, EuclideanSpace.basisFun_inner] at h1
@@ -64,6 +64,9 @@ theorem CurveRegularOffFinite.proof (hG : FrameGraphGeneric.Statement)
       · simp only [hιu, hgu, hST]
     · rintro ⟨y, hy, rfl⟩
       have hmem : g (ι y) ∈ zeroSetEuc W ∩ V := hgraph ▸ Set.mem_image_of_mem g hy
-      exact ⟨(hZ _).mpr (by rw [hTS]; exact hmem.1), by show T (S (g (ι y))) ∈ V; rw [hTS]; exact hmem.2⟩
+      exact ⟨
+        (hZ _).mpr (by rw [hTS]; exact hmem.1),
+        by show T (S (g (ι y))) ∈ V; rw [hTS]; exact hmem.2
+      ⟩
 
 end GroundTheory.Heights₂.Heights

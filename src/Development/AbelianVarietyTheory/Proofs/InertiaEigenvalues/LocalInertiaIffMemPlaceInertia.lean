@@ -14,9 +14,12 @@ noncomputable section
 
 namespace GlobalTheory.DecInertia
 
-theorem valuation_lt_one_iff_norm {p : ℕ} [Fact p.Prime] {Ω : Type} [Field Ω] {A : ValuationSubring Ω}
-    {j : Ω →+* PadicAlgCl p} (hj : ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1) (x : Ω) :
-    A.valuation x < 1 ↔ ‖j x‖ < 1 := by
+theorem valuation_lt_one_iff_norm
+    {p : ℕ} [Fact p.Prime]
+    {Ω : Type} [Field Ω]
+    {A : ValuationSubring Ω} {j : Ω →+* PadicAlgCl p} (hj : ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1)
+    (x : Ω)
+    : A.valuation x < 1 ↔ ‖j x‖ < 1 := by
   rw [valuation_lt_one_iff', hj, hj, map_inv₀, norm_inv]
   rcases eq_or_ne x 0 with rfl | hx
   · simp
@@ -24,13 +27,15 @@ theorem valuation_lt_one_iff_norm {p : ℕ} [Fact p.Prime] {Ω : Type} [Field Ω
     simp only [hx, false_or, not_le, one_lt_inv₀ h0]
     exact ⟨fun h => h.2, fun h => ⟨h.le, h⟩⟩
 
-theorem inertiaK_iff_mem_Ine (p : ℕ) [Fact p.Prime] (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosure F Ω] (A : ValuationSubring Ω) (j : Ω →+* PadicAlgCl p) (hj : ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1)
+theorem inertiaK_iff_mem_Ine
+    (p : ℕ) [Fact p.Prime]
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (A : ValuationSubring Ω) (j : Ω →+* PadicAlgCl p) (hj : ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1)
     (K : IntermediateField ℚ_[p] (PadicAlgCl p))
     (i : ↥(A.decompositionSubgroup F) ≃* (PadicAlgCl p ≃ₐ[↥K] PadicAlgCl p))
     (hi : ∀ (g : ↥(A.decompositionSubgroup F)) (x : Ω), i g (j x) = j ((g : Ω ≃ₐ[F] Ω) x))
-    (g : ↥(A.decompositionSubgroup F)) :
-    i g ∈ Formalism.GaloisCohomology.inertiaK p K ↔ (g : Ω ≃ₐ[F] Ω) ∈ Ine (F := F) A := by
+    (g : ↥(A.decompositionSubgroup F))
+    : i g ∈ Formalism.GaloisCohomology.inertiaK p K ↔ (g : Ω ≃ₐ[F] Ω) ∈ Ine (F := F) A := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   have hn : ∀ (σ : PadicAlgCl p ≃ₐ[↥K] PadicAlgCl p) (z : PadicAlgCl p), ‖σ z‖ = ‖z‖ := fun σ z =>
     GlobalTheory.PlaceBridge.norm_algEquiv (σ.restrictScalars ℚ_[p]) z
@@ -67,6 +72,7 @@ theorem inertiaK_iff_mem_Ine (p : ℕ) [Fact p.Prime] (F Ω : Type) [Field F] [N
       rw [map_sub]; ring
     rw [e]
     refine (hadd _ _).trans_lt (max_lt (by rw [hn]; exact hy) ((hadd _ _).trans_lt (max_lt hgy ?_)))
-    rw [norm_neg]; exact hy
+    rw [norm_neg]
+    exact hy
 
 end GlobalTheory.DecInertia

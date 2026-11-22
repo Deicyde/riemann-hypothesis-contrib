@@ -5,20 +5,26 @@ public import Mathlib
 @[expose] public section
 
 open Polynomial Finset MvPolynomial in
-private theorem exF {B : Type} [CommRing B] (σ : Type) [Fintype σ] [DecidableEq σ] (Q : B[X]) (r : ℕ) :
-    ∃ F : B[X], ∀ (R : Type) [CommRing R] (φ : B →+* R) (θ : σ → R),
-      Q.map φ = ∏ i, (Polynomial.X - Polynomial.C (θ i)) →
-      F.map φ = ∏ I ∈ Finset.powersetCard r (Finset.univ : Finset σ),
-        (Polynomial.X - Polynomial.C (∏ i ∈ I, θ i)) := by
+private theorem exF
+    {B : Type} [CommRing B] (σ : Type) [Fintype σ] [DecidableEq σ] (Q : B[X]) (r : ℕ)
+    : ∃ F : B[X], ∀ (R : Type) [CommRing R] (φ : B →+* R) (θ : σ → R),
+      Q.map φ = ∏ i, (Polynomial.X - Polynomial.C (θ i))
+        → F.map φ
+          = ∏ I ∈ Finset.powersetCard r (Finset.univ : Finset σ),
+            (Polynomial.X - Polynomial.C (∏ i ∈ I, θ i)) := by
   classical
   set n := Fintype.card σ with hn
-  let P : (MvPolynomial σ ℤ)[X] := ∏ I ∈ Finset.powersetCard r (Finset.univ : Finset σ),
-        (Polynomial.X - Polynomial.C (∏ i ∈ I, (MvPolynomial.X i : MvPolynomial σ ℤ)))
+  let P : (MvPolynomial σ ℤ)[X] :=
+    ∏ I ∈ Finset.powersetCard r (Finset.univ : Finset σ),
+      (Polynomial.X - Polynomial.C (∏ i ∈ I, (MvPolynomial.X i : MvPolynomial σ ℤ)))
   have hsym : ∀ j, (P.coeff j).IsSymmetric := by
     intro j e
     have h1 : P.map (MvPolynomial.rename e).toRingHom = P := by
       simp only [P, Polynomial.map_prod, Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C]
-      refine Finset.prod_bij' (fun I _ => I.map e.toEmbedding) (fun I _ => I.map e.symm.toEmbedding) ?_ ?_ ?_ ?_ ?_
+      refine Finset.prod_bij'
+        (fun I _ => I.map e.toEmbedding)
+        (fun I _ => I.map e.symm.toEmbedding)
+        ?_ ?_ ?_ ?_ ?_
       · intro I hI; simpa [Finset.mem_powersetCard] using hI
       · intro I hI; simpa [Finset.mem_powersetCard] using hI
       · intro I _; ext; simp
@@ -31,7 +37,8 @@ private theorem exF {B : Type} [CommRing B] (σ : Type) [Fintype σ] [DecidableE
   have hP : P ∈ Polynomial.lifts f := by
     rw [Polynomial.lifts_iff_coeff_lifts]
     intro j
-    obtain ⟨E, hE⟩ := MvPolynomial.esymmAlgHom_surjective ℤ  (σ := σ) (n := n) le_rfl ⟨P.coeff j, hsym j⟩
+    obtain ⟨E, hE⟩ :=
+      MvPolynomial.esymmAlgHom_surjective ℤ (σ := σ) (n := n) le_rfl ⟨P.coeff j, hsym j⟩
     refine ⟨E, ?_⟩
     have := congrArg Subtype.val hE
     simpa [MvPolynomial.esymmAlgHom_apply, f] using this
@@ -46,10 +53,13 @@ private theorem exF {B : Type} [CommRing B] (σ : Type) [Fintype σ] [DecidableE
     · intro i
       have hi : (i : ℕ) + 1 ≤ n := i.2
       have hs : Multiset.card ((Finset.univ : Finset σ).val.map θ) = n := by simp [hn]
-      have h1 : (Q.map φ).coeff (n - ((i : ℕ) + 1)) =
-          (-1) ^ ((i : ℕ) + 1) * ((Finset.univ : Finset σ).val.map θ).esymm ((i : ℕ) + 1) := by
-        have h2 : Q.map φ = (((Finset.univ : Finset σ).val.map θ).map
-            (fun t => Polynomial.X - Polynomial.C t)).prod := by
+      have h1
+          : (Q.map φ).coeff (n - ((i : ℕ) + 1))
+            = (-1) ^ ((i : ℕ) + 1) * ((Finset.univ : Finset σ).val.map θ).esymm ((i : ℕ) + 1) := by
+        have h2
+            : Q.map φ
+              = (((Finset.univ : Finset σ).val.map θ).map
+                (fun t => Polynomial.X - Polynomial.C t)).prod := by
           rw [hQ, Multiset.map_map]; rfl
         rw [h2, Multiset.prod_X_sub_C_coeff _ (by rw [hs]; omega), hs]
         have : n - (n - ((i : ℕ) + 1)) = (i : ℕ) + 1 := by omega
@@ -66,13 +76,17 @@ private theorem exF {B : Type} [CommRing B] (σ : Type) [Fintype σ] [DecidableE
   simp
 
 open Classical in
-private theorem card_zero {k L : Type} [Field k] [Field L] (ι : k →+* L) {σ : Type} [Fintype σ] [DecidableEq σ]
-    (q : Polynomial k) (θ : σ → L)
-    (h : q.map ι = ∏ i, (Polynomial.X - Polynomial.C (θ i))) :
-    (Finset.univ.filter (fun i => θ i = 0)).card = q.rootMultiplicity 0 := by
+private theorem card_zero
+    {k L : Type} [Field k] [Field L]
+    (ι : k →+* L)
+    {σ : Type} [Fintype σ] [DecidableEq σ]
+    (q : Polynomial k) (θ : σ → L) (h : q.map ι = ∏ i, (Polynomial.X - Polynomial.C (θ i)))
+    : (Finset.univ.filter (fun i => θ i = 0)).card = q.rootMultiplicity 0 := by
   classical
-  have h2 : q.map ι = (((Finset.univ : Finset σ).val.map θ).map
-      (fun t => Polynomial.X - Polynomial.C t)).prod := by
+  have h2
+      : q.map ι
+        = (((Finset.univ : Finset σ).val.map θ).map
+          (fun t => Polynomial.X - Polynomial.C t)).prod := by
     rw [h, Multiset.map_map]; rfl
   have h3 : q.rootMultiplicity 0 = (q.map ι).rootMultiplicity (ι 0) :=
     Polynomial.eq_rootMultiplicity_map ι.injective 0
@@ -83,71 +97,92 @@ private theorem card_zero {k L : Type} [Field k] [Field L] (ι : k →+* L) {σ 
   exact Multiset.filter_congr (fun i _ => eq_comm)
 
 open Classical in
-private theorem coeff_mid {L : Type} [Field L] {σ : Type} [Fintype σ] [DecidableEq σ] (θ : σ → L) :
-    (∏ i, (Polynomial.X - Polynomial.C (θ i))).coeff (Finset.univ.filter (fun i => θ i = 0)).card =
-      (-1) ^ (Finset.univ.filter (fun i => ¬ θ i = 0)).card *
-        ∏ i ∈ Finset.univ.filter (fun i => ¬ θ i = 0), θ i := by
+private theorem coeff_mid {L : Type} [Field L] {σ : Type} [Fintype σ] [DecidableEq σ] (θ : σ → L)
+    : (∏ i, (Polynomial.X - Polynomial.C (θ i))).coeff (Finset.univ.filter (fun i => θ i = 0)).card
+      = (-1) ^ (Finset.univ.filter (fun i => ¬ θ i = 0)).card
+        * ∏ i ∈ Finset.univ.filter (fun i => ¬ θ i = 0), θ i := by
   classical
   rw [← Finset.prod_filter_mul_prod_filter_not Finset.univ (fun i => θ i = 0)]
-  have h1 : ∏ i ∈ Finset.univ.filter (fun i => θ i = 0), (Polynomial.X - Polynomial.C (θ i))
-      = (Polynomial.X : Polynomial L) ^ (Finset.univ.filter (fun i => θ i = 0)).card := by
+  have h1
+      : ∏ i ∈ Finset.univ.filter (fun i => θ i = 0), (Polynomial.X - Polynomial.C (θ i))
+        = (Polynomial.X : Polynomial L) ^ (Finset.univ.filter (fun i => θ i = 0)).card := by
     rw [Finset.prod_congr rfl (g := fun _ => (Polynomial.X : Polynomial L))]
     · simp
     · intro i hi
       simp [(Finset.mem_filter.mp hi).2]
   rw [h1]
-  have := Polynomial.coeff_X_pow_mul (∏ i ∈ Finset.univ.filter (fun i => ¬ θ i = 0), (Polynomial.X - Polynomial.C (θ i))) (Finset.univ.filter (fun i => θ i = 0)).card 0
+  have :=
+    Polynomial.coeff_X_pow_mul
+      (∏ i ∈ Finset.univ.filter (fun i => ¬ θ i = 0), (Polynomial.X - Polynomial.C (θ i)))
+      (Finset.univ.filter (fun i => θ i = 0)).card 0
   rw [zero_add] at this
   rw [this, Polynomial.coeff_zero_eq_eval_zero, Polynomial.eval_prod]
   simp [Finset.prod_neg]
 
-private theorem data {B : Type} [CommRing B] [IsLocalRing B] {L : Type} [Field L] (ψ : B →+* L)
-    (hker : ∀ b, ψ b = 0 ↔ b ∈ IsLocalRing.maximalIdeal B) (Q : Polynomial B)
-    {σ : Type} [Fintype σ] [DecidableEq σ] (θ : σ → L)
-    (h : Q.map ψ = ∏ i, (Polynomial.X - Polynomial.C (θ i))) [DecidablePred fun i => θ i = 0] :
-    (Finset.univ.filter (fun i => θ i = 0)).card =
-      (Q.map (IsLocalRing.residue B)).rootMultiplicity 0 := by
+private theorem data
+    {B : Type} [CommRing B] [IsLocalRing B]
+    {L : Type} [Field L]
+    (ψ : B →+* L) (hker : ∀ b, ψ b = 0 ↔ b ∈ IsLocalRing.maximalIdeal B)
+    (Q : Polynomial B)
+    {σ : Type} [Fintype σ] [DecidableEq σ]
+    (θ : σ → L) (h : Q.map ψ = ∏ i, (Polynomial.X - Polynomial.C (θ i)))
+    [DecidablePred fun i => θ i = 0]
+    : (Finset.univ.filter (fun i => θ i = 0)).card
+      = (Q.map (IsLocalRing.residue B)).rootMultiplicity 0 := by
   let ι : IsLocalRing.ResidueField B →+* L :=
     Ideal.Quotient.lift (IsLocalRing.maximalIdeal B) ψ (fun b hb => (hker b).2 hb)
-  have hι : ι.comp (IsLocalRing.residue B) = ψ := by
-    ext b; rfl
+  have hι : ι.comp (IsLocalRing.residue B) = ψ := by ext b; rfl
   have h2 : (Q.map (IsLocalRing.residue B)).map ι = ∏ i, (Polynomial.X - Polynomial.C (θ i)) := by
     rw [Polynomial.map_map, hι, h]
   convert card_zero ι _ θ h2
 
-private theorem key {B S : Type} [CommRing B] [HenselianLocalRing B] [CommRing S] [IsDomain S]
-    [Algebra B S] [Algebra.IsIntegral B S] (hinj : Function.Injective (algebraMap B S))
-    {σ : Type} [Fintype σ] (Q : Polynomial B) (θ : σ → S)
+private theorem key
+    {B S : Type} [CommRing B] [HenselianLocalRing B] [CommRing S] [IsDomain S] [Algebra B S]
+    [Algebra.IsIntegral B S]
+    (hinj : Function.Injective (algebraMap B S))
+    {σ : Type} [Fintype σ]
+    (Q : Polynomial B) (θ : σ → S)
     (hQ : Q.map (algebraMap B S) = ∏ i, (Polynomial.X - Polynomial.C (θ i)))
-    (n1 n2 : Ideal S) (hn1 : n1.IsMaximal) (hn2 : n2.IsMaximal) (i0 : σ) (h2 : θ i0 ∉ n2) :
-    θ i0 ∉ n1 := by
+    (n1 n2 : Ideal S) (hn1 : n1.IsMaximal) (hn2 : n2.IsMaximal)
+    (i0 : σ) (h2 : θ i0 ∉ n2)
+    : θ i0 ∉ n1 := by
   classical
-  have hcomap : ∀ n : Ideal S, n.IsMaximal →
-      n.comap (algebraMap B S) = IsLocalRing.maximalIdeal B := by
+  have hcomap
+      : ∀ n : Ideal S, n.IsMaximal → n.comap (algebraMap B S) = IsLocalRing.maximalIdeal B := by
     intro n hn
     have := Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := B) n
     exact IsLocalRing.eq_maximalIdeal this
-  have hkerI : ∀ n : Ideal S, n.IsMaximal → ∀ b, algebraMap B S b ∈ n ↔ b ∈ IsLocalRing.maximalIdeal B := by
+  have hkerI
+      : ∀ n : Ideal S,
+        n.IsMaximal → ∀ b, algebraMap B S b ∈ n ↔ b ∈ IsLocalRing.maximalIdeal B := by
     intro n hn b
     rw [← hcomap n hn, Ideal.mem_comap]
   set a := (Q.map (IsLocalRing.residue B)).rootMultiplicity 0 with ha
-  have hmapn : ∀ n : Ideal S, Q.map ((Ideal.Quotient.mk n).comp (algebraMap B S)) =
-      ∏ i, (Polynomial.X - Polynomial.C (Ideal.Quotient.mk n (θ i))) := by
+  have hmapn
+      : ∀ n : Ideal S,
+        Q.map ((Ideal.Quotient.mk n).comp (algebraMap B S))
+          = ∏ i, (Polynomial.X - Polynomial.C (Ideal.Quotient.mk n (θ i))) := by
     intro n
     rw [← Polynomial.map_map, hQ, Polynomial.map_prod]
     simp
   have hcard : ∀ n : Ideal S, n.IsMaximal → (Finset.univ.filter (fun i => θ i ∈ n)).card = a := by
     intro n hn
     letI := Ideal.Quotient.field n
-    have := data ((Ideal.Quotient.mk n).comp (algebraMap B S)) (by
-      intro b
-      rw [RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem]
-      exact hkerI n hn b) Q (fun i => Ideal.Quotient.mk n (θ i)) (hmapn n)
+    have :=
+      data ((Ideal.Quotient.mk n).comp (algebraMap B S))
+        (by
+          intro b
+          rw [RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem]
+          exact hkerI n hn b)
+        Q
+        (fun i => Ideal.Quotient.mk n (θ i))
+        (hmapn n)
     simpa [Ideal.Quotient.eq_zero_iff_mem] using this
   set r := Fintype.card σ - a with hr
   have hcard' : ∀ n : Ideal S, n.IsMaximal → (Finset.univ.filter (fun i => θ i ∉ n)).card = r := by
     intro n hn
-    have h1 := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset σ)) (fun i => θ i ∈ n)
+    have h1 :=
+      Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset σ)) (fun i => θ i ∈ n)
     rw [hcard n hn, Finset.card_univ] at h1
     omega
   obtain ⟨F, hF⟩ := exF σ Q r
@@ -173,10 +208,10 @@ private theorem key {B S : Type} [CommRing B] [HenselianLocalRing B] [CommRing S
       rw [Ne, hzero]
       exact (Finset.mem_filter.mp hi).2
     set A : B := (-1) ^ r * Q.coeff a with hA
-    have hfil1 : Finset.univ.filter (fun i => θb i = 0) = Finset.univ.filter (fun i => θ i ∈ n2) := by
+    have hfil1
+        : Finset.univ.filter (fun i => θb i = 0) = Finset.univ.filter (fun i => θ i ∈ n2) := by
       ext i; simp [hzero]
-    have hfil2 : Finset.univ.filter (fun i => ¬ θb i = 0) = I0 := by
-      ext i; simp [hzero, hI0]
+    have hfil2 : Finset.univ.filter (fun i => ¬ θb i = 0) = I0 := by ext i; simp [hzero, hI0]
     have hψA : ψ A = c := by
       have h1 := coeff_mid θb
       rw [hfil1, hfil2, hcard n2 hn2, hcard' n2 hn2, ← hmapn n2, Polynomial.coeff_map] at h1
@@ -204,10 +239,13 @@ private theorem key {B S : Type} [CommRing B] [HenselianLocalRing B] [CommRing S
       rw [Finset.prod_eq_zero hiI hz]
       simpa using hc0
     have hev : (F.map ψ).eval c = 0 := by
-      rw [hFψ, Polynomial.eval_mul, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C, sub_self, zero_mul]
+      rw [hFψ, Polynomial.eval_mul, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C,
+        sub_self, zero_mul]
     have hder : (Polynomial.derivative (F.map ψ)).eval c ≠ 0 := by
       rw [hFψ, Polynomial.derivative_mul]
-      simp only [Polynomial.derivative_sub, Polynomial.derivative_X, Polynomial.derivative_C, sub_zero, one_mul, Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C, sub_self, zero_mul, add_zero]
+      simp only [Polynomial.derivative_sub, Polynomial.derivative_X, Polynomial.derivative_C,
+        sub_zero, one_mul, Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_sub,
+        Polynomial.eval_X, Polynomial.eval_C, sub_self, zero_mul, add_zero]
       rw [show c - ∏ i ∈ I0, θb i = 0 from sub_self _, zero_mul, add_zero]
       exact hGc
     have h1 : F.eval A ∈ IsLocalRing.maximalIdeal B := by
@@ -217,7 +255,9 @@ private theorem key {B S : Type} [CommRing B] [HenselianLocalRing B] [CommRing S
       by_contra hcon
       have hm : (Polynomial.derivative F).eval A ∈ IsLocalRing.maximalIdeal B :=
         (IsLocalRing.mem_maximalIdeal _).mpr hcon
-      rw [← hψ, ← Polynomial.eval₂_at_apply, ← Polynomial.eval_map, hψA, ← Polynomial.derivative_map] at hm
+      rw [← hψ, ← Polynomial.eval₂_at_apply, ← Polynomial.eval_map, hψA,
+          ← Polynomial.derivative_map]
+        at hm
       exact hder hm
     obtain ⟨τ, hτ, hτA⟩ := HenselianLocalRing.is_henselian F hmonic A h1 h2'
     refine ⟨τ, hτ, fun hm => ?_⟩
@@ -246,16 +286,20 @@ private theorem key {B S : Type} [CommRing B] [HenselianLocalRing B] [CommRing S
   rw [hIeq n1 hn1] at hi0
   exact (Finset.mem_filter.mp hi0).2
 
-private theorem ext_hom {B S C : Type} [CommRing B] [CommRing S] [Algebra B S] [Algebra.IsIntegral B S]
-    (hinj : Function.Injective (algebraMap B S)) [Field C] [IsAlgClosed C] (f : B →+* C) :
-    ∃ g : S →+* C, g.comp (algebraMap B S) = f := by
+private theorem ext_hom
+    {B S C : Type} [CommRing B] [CommRing S] [Algebra B S] [Algebra.IsIntegral B S]
+    (hinj : Function.Injective (algebraMap B S))
+    [Field C] [IsAlgClosed C]
+    (f : B →+* C)
+    : ∃ g : S →+* C, g.comp (algebraMap B S) = f := by
   have hp : (RingHom.ker f).IsPrime := RingHom.ker_isPrime f
-  obtain ⟨P, -, hP, hc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (RingHom.ker f) (⊥ : Ideal S)
-    (by
+  obtain ⟨P, -, hP, hc⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (RingHom.ker f) (⊥ : Ideal S) (by
       intro b hb
       have : algebraMap B S b = 0 := hb
       have hb0 : b = 0 := hinj (by rw [this, map_zero])
-      rw [hb0]; exact Ideal.zero_mem _)
+      rw [hb0]
+      exact Ideal.zero_mem _)
   set q := P.comap (algebraMap B S)
   have hq : q = RingHom.ker f := hc
   have hqk : ∀ b ∈ q, f b = 0 := by
@@ -264,7 +308,8 @@ private theorem ext_hom {B S C : Type} [CommRing B] [CommRing S] [Algebra B S] [
     exact hb
   let f1 : B ⧸ q →+* C := Ideal.Quotient.lift q f hqk
   have hf1 : Function.Injective f1 := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective a
     have : b ∈ q := by rw [hq]; exact ha
@@ -280,21 +325,23 @@ private theorem ext_hom {B S C : Type} [CommRing B] [CommRing S] [Algebra B S] [
   haveI : Algebra.IsAlgebraic (B ⧸ q) (S ⧸ P) := Algebra.IsIntegral.isAlgebraic
   let L : (S ⧸ P) →ₐ[B ⧸ q] C := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨(L : (S ⧸ P) →+* C).comp (Ideal.Quotient.mk P), ?_⟩
   ext b
-  have h1 : Ideal.Quotient.mk P (algebraMap B S b) = algebraMap (B ⧸ q) (S ⧸ P) (Ideal.Quotient.mk q b) := rfl
+  have h1
+      : Ideal.Quotient.mk P (algebraMap B S b)
+        = algebraMap (B ⧸ q) (S ⧸ P) (Ideal.Quotient.mk q b) :=
+    rfl
   simp only [RingHom.comp_apply, RingHom.coe_coe]
   rw [h1, L.commutes]
   rfl
 
-private theorem loc_hom {l : ℕ} [Fact (Nat.Prime l)] (κ : PadicAlgCl l) (hκ : 1 ≤ ‖κ‖) :
-    ∃ h : Polynomial ℤ_[l], h.eval₂ ((algebraMap ℚ_[l] (PadicAlgCl l)).comp (algebraMap ℤ_[l] ℚ_[l])) κ = 0 ∧
-      h.coeff 0 = 1 := by
-  have hκ0 : κ ≠ 0 := by
-    intro h; rw [h, norm_zero] at hκ; linarith
+private theorem loc_hom {l : ℕ} [Fact (Nat.Prime l)] (κ : PadicAlgCl l) (hκ : 1 ≤ ‖κ‖)
+    : ∃ h : Polynomial ℤ_[l],
+      h.eval₂ ((algebraMap ℚ_[l] (PadicAlgCl l)).comp (algebraMap ℤ_[l] ℚ_[l])) κ = 0
+        ∧ h.coeff 0 = 1 := by
+  have hκ0 : κ ≠ 0 := by intro h; rw [h, norm_zero] at hκ; linarith
   set w := κ⁻¹ with hw
   have hwn : ‖w‖ ≤ 1 := by
     rw [hw, norm_inv]
@@ -310,12 +357,15 @@ private theorem loc_hom {l : ℕ} [Fact (Nat.Prime l)] (κ : PadicAlgCl l) (hκ 
   obtain ⟨q, hq, -, hqm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic hl hm
   refine ⟨q.reverse, ?_, ?_⟩
   · letI : Invertible w := invertibleOfNonzero (inv_ne_zero hκ0)
-    have h1 := Polynomial.eval₂_reverse_mul_pow ((algebraMap ℚ_[l] (PadicAlgCl l)).comp (algebraMap ℤ_[l] ℚ_[l])) w q
-    have h2 : Polynomial.eval₂ ((algebraMap ℚ_[l] (PadicAlgCl l)).comp (algebraMap ℤ_[l] ℚ_[l])) w q = 0 := by
+    have h1 :=
+      Polynomial.eval₂_reverse_mul_pow
+        ((algebraMap ℚ_[l] (PadicAlgCl l)).comp (algebraMap ℤ_[l] ℚ_[l])) w q
+    have h2
+        : Polynomial.eval₂ ((algebraMap ℚ_[l] (PadicAlgCl l)).comp (algebraMap ℤ_[l] ℚ_[l])) w q
+          = 0 := by
       rw [← Polynomial.eval₂_map, hq]
       exact minpoly.aeval ℚ_[l] w
-    have h3 : ⅟w = κ := by
-      rw [invOf_eq_inv, hw, inv_inv]
+    have h3 : ⅟w = κ := by rw [invOf_eq_inv, hw, inv_inv]
     rw [h2, h3] at h1
     rcases mul_eq_zero.mp h1 with h4 | h4
     · exact h4
@@ -323,12 +373,14 @@ private theorem loc_hom {l : ℕ} [Fact (Nat.Prime l)] (κ : PadicAlgCl l) (hκ 
   · rw [Polynomial.coeff_zero_reverse]
     exact hqm
 
-private theorem cl_exists {B : Type} [CommRing B] [IsDomain B] [HenselianLocalRing B] (v : FractionRing B)
-    (hv : IsIntegral B v) :
-    ∃ (S : Type) (_ : CommRing S) (_ : Algebra B S), IsDomain S ∧ Algebra.IsIntegral B S ∧
-      IsLocalRing S ∧ Function.Injective (algebraMap B S) ∧
-      ∃ vS : S, ∀ a b : B, algebraMap B (FractionRing B) a * v = algebraMap B (FractionRing B) b →
-        algebraMap B S a * vS = algebraMap B S b := by
+private theorem cl_exists
+    {B : Type} [CommRing B] [IsDomain B] [HenselianLocalRing B]
+    (v : FractionRing B) (hv : IsIntegral B v)
+    : ∃ (S : Type) (_ : CommRing S) (_ : Algebra B S),
+      IsDomain S ∧ Algebra.IsIntegral B S ∧ IsLocalRing S ∧ Function.Injective (algebraMap B S)
+        ∧ ∃ vS : S, ∀ a b : B,
+          algebraMap B (FractionRing B) a * v = algebraMap B (FractionRing B) b
+            → algebraMap B S a * vS = algebraMap B S b := by
   classical
   let K := FractionRing B
   let Ω := AlgebraicClosure K
@@ -358,7 +410,8 @@ private theorem cl_exists {B : Type} [CommRing B] [IsDomain B] [HenselianLocalRi
       exact Multiset.attach_map_val s
     have hQS : Q.map (algebraMap B S) = (s'.map (fun a => Polynomial.X - Polynomial.C a)).prod := by
       apply Polynomial.map_injective (algebraMap S Ω) Subtype.val_injective
-      rw [Polynomial.map_map, ← IsScalarTower.algebraMap_eq, hsp, Polynomial.map_multiset_prod, Multiset.map_map]
+      rw [Polynomial.map_map, ← IsScalarTower.algebraMap_eq, hsp, Polynomial.map_multiset_prod,
+        Multiset.map_map]
       conv_lhs => rw [← hs']
       rw [Multiset.map_map]
       simp
@@ -370,8 +423,7 @@ private theorem cl_exists {B : Type} [CommRing B] [IsDomain B] [HenselianLocalRi
       rw [Multiset.map_map]
       rfl
     have hroot : ∃ i, θ0 = θ i := by
-      have h1 : (Q.map (algebraMap B S)).eval θ0 = 0 := by
-        rw [Polynomial.eval_map]; exact hQ0
+      have h1 : (Q.map (algebraMap B S)).eval θ0 = 0 := by rw [Polynomial.eval_map]; exact hQ0
       rw [hprod, Polynomial.eval_prod, Finset.prod_eq_zero_iff] at h1
       obtain ⟨i, -, hi⟩ := h1
       refine ⟨i, ?_⟩
@@ -385,39 +437,49 @@ private theorem cl_exists {B : Type} [CommRing B] [IsDomain B] [HenselianLocalRi
     intro z hz
     by_contra hcon
     exact hkey z n n' hn hn' hcon hz
-  refine ⟨S, inferInstance, inferInstance, inferInstance, hI, hloc, hinj,
-    ⟨algebraMap K Ω v, hv.algebraMap⟩, ?_⟩
+  refine ⟨
+    S,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    hI,
+    hloc,
+    hinj,
+    ⟨algebraMap K Ω v, hv.algebraMap⟩,
+    ?_
+  ⟩
   intro a b hab
   apply Subtype.ext
   have := congrArg (algebraMap K Ω) hab
   rw [map_mul, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply] at this
   exact this
 
-theorem UpperTheory.Reformulated.B.MajorantSquareBound.spl_near :
-    ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] {O B : Type}
-    [inst_1 : CommRing O] [inst_2 : Algebra ℤ_[l] O] [inst_3 : Algebra O (PadicAlgCl l)]
-    [IsScalarTower ℤ_[l] O (PadicAlgCl l)] [inst_5 : CommRing B] [IsDomain B] [HenselianLocalRing B]
-    [inst_8 : Algebra O B] (x y : B →ₐ[O] PadicAlgCl l) (d : O),
-    (Algebra.algebraMap O (PadicAlgCl l) : O → PadicAlgCl l) d ≠ (0 : PadicAlgCl l) →
-      ∀ (t : B),
-        (x : B → PadicAlgCl l) t = (0 : PadicAlgCl l) →
-          ∀ (v : FractionRing B),
-            IsIntegral B v →
-              (Algebra.algebraMap B (FractionRing B) : B → FractionRing B) ((Algebra.algebraMap O B : O → B) d) * v =
-                  (Algebra.algebraMap B (FractionRing B) : B → FractionRing B) t →
-                ∀ (κ : PadicAlgCl l),
-                  (Algebra.algebraMap O (PadicAlgCl l) : O → PadicAlgCl l) d * κ = (y : B → PadicAlgCl l) t →
-                    ‖κ‖ < (1 : ℝ) := by
+theorem UpperTheory.Reformulated.B.MajorantSquareBound.spl_near
+    : ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] {O B : Type} [inst_1 : CommRing O]
+        [inst_2 : Algebra ℤ_[l] O] [inst_3 : Algebra O (PadicAlgCl l)]
+        [IsScalarTower ℤ_[l] O (PadicAlgCl l)] [inst_5 : CommRing B] [IsDomain B]
+        [HenselianLocalRing B] [inst_8 : Algebra O B] (x y : B →ₐ[O] PadicAlgCl l) (d : O),
+      (Algebra.algebraMap O (PadicAlgCl l) : O → PadicAlgCl l) d ≠ (0 : PadicAlgCl l)
+        → ∀ (t : B),
+          (x : B → PadicAlgCl l) t = (0 : PadicAlgCl l)
+            → ∀ (v : FractionRing B),
+              IsIntegral B v
+                → (Algebra.algebraMap B (FractionRing B) : B → FractionRing B)
+                      ((Algebra.algebraMap O B : O → B) d)
+                    * v
+                  = (Algebra.algebraMap B (FractionRing B) : B → FractionRing B) t
+                → ∀ (κ : PadicAlgCl l),
+                  (Algebra.algebraMap O (PadicAlgCl l) : O → PadicAlgCl l) d * κ
+                      = (y : B → PadicAlgCl l) t
+                    → ‖κ‖ < (1 : ℝ) := by
   intro l _ O B _ _ _ _ _ _ _ _ x y d hd t hxt v hv hdv κ hκ
   by_contra hlt
   have hκ1 : 1 ≤ ‖κ‖ := not_lt.mp hlt
   obtain ⟨S, _, _, hdom, hintg, hloc, hinj, vS, hrel⟩ := cl_exists (B := B) v hv
   obtain ⟨gx, hgx⟩ := ext_hom hinj (x : B →+* PadicAlgCl l)
   obtain ⟨gy, hgy⟩ := ext_hom hinj (y : B →+* PadicAlgCl l)
-  have ex : ∀ b, gx (algebraMap B S b) = x b := fun b => by
-    rw [← RingHom.comp_apply, hgx]; rfl
-  have ey : ∀ b, gy (algebraMap B S b) = y b := fun b => by
-    rw [← RingHom.comp_apply, hgy]; rfl
+  have ex : ∀ b, gx (algebraMap B S b) = x b := fun b => by rw [← RingHom.comp_apply, hgx]; rfl
+  have ey : ∀ b, gy (algebraMap B S b) = y b := fun b => by rw [← RingHom.comp_apply, hgy]; rfl
   have hd' : algebraMap O (PadicAlgCl l) d ≠ 0 := hd
   have hκ' : algebraMap O (PadicAlgCl l) d * κ = y t := hκ
   have hS : algebraMap B S (algebraMap O B d) * vS = algebraMap B S t := hrel _ _ hdv

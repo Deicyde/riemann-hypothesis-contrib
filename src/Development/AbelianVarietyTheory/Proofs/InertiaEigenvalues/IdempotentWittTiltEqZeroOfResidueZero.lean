@@ -6,16 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.EqTopOf
 
 @[expose] public section
 
-open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps GlobalTheory.Present GlobalTheory.RedFun Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps
+  GlobalTheory.Present GlobalTheory.RedFun Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc
 open scoped LaurentSeries PowerSeries TensorProduct
 
 namespace GlobalTheory.IdemVanish
 
-theorem dvd_of_one_tmul_eq_zero {O k R : Type} [CommRing O] [CommRing k] [CommRing R]
-    [Algebra O k] [Algebra O R] (lam : O) (hs : Function.Surjective (algebraMap O k))
-    (hk : ∀ x, algebraMap O k x = 0 ↔ lam ∣ x) (x : R)
-    (hx : ((1 : k) ⊗ₜ[O] x : k ⊗[O] R) = 0) : algebraMap O R lam ∣ x := by
-
+theorem dvd_of_one_tmul_eq_zero
+    {O k R : Type} [CommRing O] [CommRing k] [CommRing R] [Algebra O k] [Algebra O R]
+    (lam : O)
+    (hs : Function.Surjective (algebraMap O k)) (hk : ∀ x, algebraMap O k x = 0 ↔ lam ∣ x)
+    (x : R) (hx : ((1 : k) ⊗ₜ[O] x : k ⊗[O] R) = 0)
+    : algebraMap O R lam ∣ x := by
   let f : O →ₐ[O] k := Algebra.ofId O k
   have hf : Function.Surjective f := hs
   have hker : RingHom.ker f = Ideal.span {lam} := by
@@ -36,7 +39,12 @@ theorem dvd_of_one_tmul_eq_zero {O k R : Type} [CommRing O] [CommRing k] [CommRi
   obtain ⟨y, -, hy⟩ := h2
   exact ⟨y, by rw [← hy, Algebra.smul_def]⟩
 
-theorem idem_eq_zero : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l) (k : Type) [Field k] [Algebra ↥(OL LL) k] (lam : ↥(OL LL)), Function.Surjective (algebraMap ↥(OL LL) k) → (∀ x, algebraMap ↥(OL LL) k x = 0 ↔ lam ∣ x) → ∀ x : RW LL, IsIdempotentElem x → ((1 : k) ⊗ₜ[↥(OL LL)] x : k ⊗[↥(OL LL)] RW LL) = 0 → x = 0 := by
+theorem idem_eq_zero
+    : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l) (k : Type) [Field k]
+        [Algebra ↥(OL LL) k] (lam : ↥(OL LL)),
+      Function.Surjective (algebraMap ↥(OL LL) k) → (∀ x, algebraMap ↥(OL LL) k x = 0 ↔ lam ∣ x)
+        → ∀ x : RW LL,
+          IsIdempotentElem x → ((1 : k) ⊗ₜ[↥(OL LL)] x : k ⊗[↥(OL LL)] RW LL) = 0 → x = 0 := by
   intro l _ P LL k _ _ lam hs hk x hx h1
 
   have hd : algebraMap (↥(OL LL)) (RW LL) lam ∣ x := dvd_of_one_tmul_eq_zero lam hs hk x h1
@@ -47,12 +55,13 @@ theorem idem_eq_zero : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinEx
   obtain ⟨m, hm⟩ := (GlobalTheory.EtaleExact.isUnit_or_dvd_pow P LL lam).resolve_left hnu
   apply GlobalTheory.EtaleExact.sep_RW LL x
   intro n
-  calc (l : RW LL) ^ n = algebraMap (↥(OL LL)) (RW LL) (((l : ℕ) : ↥(OL LL)) ^ n) := by
-        rw [map_pow, map_natCast]
+  calc
+    (l : RW LL) ^ n
+      = algebraMap (↥(OL LL)) (RW LL) (((l : ℕ) : ↥(OL LL)) ^ n) := by rw [map_pow, map_natCast]
     _ ∣ algebraMap (↥(OL LL)) (RW LL) (lam ^ (m * n)) :=
-        map_dvd _ (by rw [pow_mul]; exact pow_dvd_pow_of_dvd hm n)
+      map_dvd _ (by rw [pow_mul]; exact pow_dvd_pow_of_dvd hm n)
     _ ∣ algebraMap (↥(OL LL)) (RW LL) lam ^ (m * n + 1) := by
-        rw [map_pow]; exact pow_dvd_pow _ (Nat.le_succ _)
+      rw [map_pow]; exact pow_dvd_pow _ (Nat.le_succ _)
     _ ∣ x ^ (m * n + 1) := pow_dvd_pow_of_dvd hd _
     _ = x := hx.pow_succ_eq _
 

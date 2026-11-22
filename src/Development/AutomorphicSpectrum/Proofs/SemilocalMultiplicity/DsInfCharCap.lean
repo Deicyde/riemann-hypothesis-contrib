@@ -50,7 +50,9 @@ theorem hKFinStab : KFinStab := GlobalTheory.CompanionTheory.KFinStab.kFinStab
 theorem hKExp : KExp := GlobalTheory.CompanionTheory.DSICKExp.kExp
 theorem hStabLink : StabLink := GlobalTheory.CompanionTheory.DSStabLink.stabLink hKExp
 theorem hWtLink : WtLink := GlobalTheory.CompanionTheory.WtLinkPf.wtLink
-theorem hHWofType : HWofType := GlobalTheory.CompanionTheory.DSHighestOfKType.hwOfType hStabLink hWtLink
-theorem hTypeOfHW : TypeOfHW := GlobalTheory.CompanionTheory.DSKType.typeOfHW hLowSpan hStabLink hWtLink
+theorem hHWofType : HWofType :=
+  GlobalTheory.CompanionTheory.DSHighestOfKType.hwOfType hStabLink hWtLink
+theorem hTypeOfHW : TypeOfHW :=
+  GlobalTheory.CompanionTheory.DSKType.typeOfHW hLowSpan hStabLink hWtLink
 
 end GlobalTheory.CompanionTheory.TransS.InfChar

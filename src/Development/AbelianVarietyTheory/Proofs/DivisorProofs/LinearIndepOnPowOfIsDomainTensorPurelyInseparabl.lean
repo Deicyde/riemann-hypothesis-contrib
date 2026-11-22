@@ -8,17 +8,20 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem linearIndepOn_pow_of_isDomain_tensor_purelyInseparable (k B : Type) [Field k] [CommRing B]
-    [IsDomain B] [Algebra k B] (p : ℕ) (hp : p.Prime) (hk : CharP k p)
-    (hdom : ∀ (K : Type) [Field K] [Algebra k K], FiniteDimensional k K →
-      IsPurelyInseparable k K → IsDomain (K ⊗[k] B))
-    (s : Finset (FractionRing B)) (hs : LinearIndepOn k _root_.id (s : Set (FractionRing B))) :
-    LinearIndepOn k (· ^ p) (s : Set (FractionRing B)) := by
+theorem linearIndepOn_pow_of_isDomain_tensor_purelyInseparable
+    (k B : Type) [Field k] [CommRing B] [IsDomain B] [Algebra k B]
+    (p : ℕ) (hp : p.Prime) (hk : CharP k p)
+    (hdom : ∀ (K : Type) [Field K] [Algebra k K],
+      FiniteDimensional k K → IsPurelyInseparable k K → IsDomain (K ⊗[k] B))
+    (s : Finset (FractionRing B)) (hs : LinearIndepOn k _root_.id (s : Set (FractionRing B)))
+    : LinearIndepOn k (· ^ p) (s : Set (FractionRing B)) := by
   classical
   haveI : ExpChar k p := ExpChar.prime hp
   obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors B) s
-  have hb : ∀ x : (s : Set (FractionRing B)), ∃ b : B,
-      algebraMap B (FractionRing B) b = (d : B) • (x : FractionRing B) := fun x => hd x x.2
+  have hb
+      : ∀ x : (s : Set (FractionRing B)), ∃ b : B,
+        algebraMap B (FractionRing B) b = (d : B) • (x : FractionRing B) := fun x =>
+    hd x x.2
   choose b hb using hb
   have hinj := IsFractionRing.injective B (FractionRing B)
   have hd0 : algebraMap B (FractionRing B) (d : B) ≠ 0 :=
@@ -64,8 +67,7 @@ theorem linearIndepOn_pow_of_isDomain_tensor_purelyInseparable (k B : Type) [Fie
     charP_of_injective_algebraMap (algebraMap k (K ⊗[k] B)).injective p
   haveI : ExpChar (K ⊗[k] B) p := ExpChar.prime hp
   let y' := fun j => (⟨y j, IntermediateField.subset_adjoin _ _ ⟨j, rfl⟩⟩ : K)
-  have hy' : ∀ j, y' j ^ p = algebraMap k K (c j) := by
-    intro j; apply Subtype.ext; simp [y', hy]
+  have hy' : ∀ j, y' j ^ p = algebraMap k K (c j) := by intro j; apply Subtype.ext; simp [y', hy]
   have hz : (∑ j, y' j ⊗ₜ[k] b j) ^ p = 0 := by
     rw [sum_pow_char]
     simp only [Algebra.TensorProduct.tmul_pow, hy', Algebra.algebraMap_eq_smul_one,

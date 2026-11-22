@@ -42,23 +42,27 @@ private lemma key {O : Type*} {Y : Type*} [CommRing O] [AddCommGroup Y] [Module 
       simp only [f, g, Submodule.mapQ_apply, Submodule.Quotient.mk_eq_zero]
       exact ((hD x).1 x.2).2
 
-theorem goal1 :
-  ∀ {O : Type u_1} {Y : Type u_2} [inst : CommRing.{u_1} O] [inst_1 : AddCommGroup.{u_2} Y]
-  [inst_2 : Module.{u_1, u_2} O Y] (R S D E : Submodule.{u_1, u_2} O Y),
-  (∀ (y : Y),
-      Iff (Membership.mem.{u_2, u_2} D y) (And (Membership.mem.{u_2, u_2} R y) (Membership.mem.{u_2, u_2} S y))) →
-    LE.le.{u_2} E D →
-      Eq.{1}
-        (Module.length.{u_1, u_2} O
-          (HasQuotient.Quotient.{u_2, u_2} (Subtype.{u_2 + 1} fun (x : Y) ↦ Membership.mem.{u_2, u_2} R x)
-            (Submodule.comap.{u_1, u_1, u_2, u_2} (Submodule.subtype.{u_1, u_2} R) E)))
-        (HAdd.hAdd.{0, 0, 0}
+theorem goal1
+    : ∀ {O : Type u_1} {Y : Type u_2} [inst : CommRing.{u_1} O] [inst_1 : AddCommGroup.{u_2} Y]
+        [inst_2 : Module.{u_1, u_2} O Y] (R S D E : Submodule.{u_1, u_2} O Y),
+      (∀ (y : Y),
+          Iff (Membership.mem.{u_2, u_2} D y)
+            (And (Membership.mem.{u_2, u_2} R y) (Membership.mem.{u_2, u_2} S y)))
+        → LE.le.{u_2} E D
+        → Eq.{1}
           (Module.length.{u_1, u_2} O
-            (HasQuotient.Quotient.{u_2, u_2} (Subtype.{u_2 + 1} fun (x : Y) ↦ Membership.mem.{u_2, u_2} R x)
-              (Submodule.comap.{u_1, u_1, u_2, u_2} (Submodule.subtype.{u_1, u_2} R) S)))
-          (Module.length.{u_1, u_2} O
-            (HasQuotient.Quotient.{u_2, u_2} (Subtype.{u_2 + 1} fun (x : Y) ↦ Membership.mem.{u_2, u_2} D x)
-              (Submodule.comap.{u_1, u_1, u_2, u_2} (Submodule.subtype.{u_1, u_2} D) E)))) := by
+            (HasQuotient.Quotient.{u_2, u_2}
+              (Subtype.{u_2 + 1} fun (x : Y) ↦ Membership.mem.{u_2, u_2} R x)
+              (Submodule.comap.{u_1, u_1, u_2, u_2} (Submodule.subtype.{u_1, u_2} R) E)))
+          (HAdd.hAdd.{0, 0, 0}
+            (Module.length.{u_1, u_2} O
+              (HasQuotient.Quotient.{u_2, u_2}
+                (Subtype.{u_2 + 1} fun (x : Y) ↦ Membership.mem.{u_2, u_2} R x)
+                (Submodule.comap.{u_1, u_1, u_2, u_2} (Submodule.subtype.{u_1, u_2} R) S)))
+            (Module.length.{u_1, u_2} O
+              (HasQuotient.Quotient.{u_2, u_2}
+                (Subtype.{u_2 + 1} fun (x : Y) ↦ Membership.mem.{u_2, u_2} D x)
+                (Submodule.comap.{u_1, u_1, u_2, u_2} (Submodule.subtype.{u_1, u_2} D) E)))) := by
   intro O Y _ _ _ R S D E hD hE
   exact key R S D E hD hE
 

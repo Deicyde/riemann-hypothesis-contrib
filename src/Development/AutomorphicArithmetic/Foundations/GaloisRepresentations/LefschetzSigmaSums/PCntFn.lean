@@ -7,11 +7,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.LocalSmoothExtension
 
-theorem UpperTheory.Gal.LocalSmoothExtension.cntFn_of :
-    CntFn := by
+theorem UpperTheory.Gal.LocalSmoothExtension.cntFn_of : CntFn := by
   intro Γ _ K K' M h hKK' hMn hidx hconj
-  have hrep : ∀ (c m : K'), m ∈ M.subgroupOf K' → ∀ y : Γ,
-      (h * ((c * m : K') : Γ) * y ∈ K ↔ h * (c : Γ) * y ∈ K) := by
+  have hrep
+      : ∀ (c m : K'),
+        m ∈ M.subgroupOf K' → ∀ y : Γ, (h * ((c * m : K') : Γ) * y ∈ K ↔ h * (c : Γ) * y ∈ K) := by
     intro c m hm y
     have hm' : (m : Γ) ∈ M := Subgroup.mem_subgroupOf.mp hm
     have key : h * ((c * m : K') : Γ) * y = (h * (c : Γ) * m * (h * c)⁻¹) * (h * c * y) := by
@@ -19,8 +19,10 @@ theorem UpperTheory.Gal.LocalSmoothExtension.cntFn_of :
       group
     rw [key]
     exact Subgroup.mul_mem_cancel_left K (hconj c c.2 m hm')
-  have hnz : ∀ y : Γ, cntFn K K' M h y ≠ 0 →
-      ∃ q : K' ⧸ M.subgroupOf K', h * ((Quotient.out q : K') : Γ) * y ∈ K := by
+  have hnz
+      : ∀ y : Γ,
+        cntFn K K' M h y ≠ 0
+          → ∃ q : K' ⧸ M.subgroupOf K', h * ((Quotient.out q : K') : Γ) * y ∈ K := by
     intro y hy
     unfold cntFn at hy
     obtain ⟨⟨q, hq⟩⟩ := (Nat.card_ne_zero.mp (Nat.cast_ne_zero.mp hy)).1
@@ -36,9 +38,11 @@ theorem UpperTheory.Gal.LocalSmoothExtension.cntFn_of :
       refine Nat.card_congr (Equiv.subtypeEquiv
         (Equiv.mulRight (((⟨k, hKK' hk⟩ : K') : K' ⧸ M.subgroupOf K'))) ?_)
       intro q
-      obtain ⟨m, hm⟩ := QuotientGroup.mk_out_eq_mul (M.subgroupOf K') (Quotient.out q * ⟨k, hKK' hk⟩)
-      have hq : q * (((⟨k, hKK' hk⟩ : K') : K' ⧸ M.subgroupOf K')) =
-          ((Quotient.out q * ⟨k, hKK' hk⟩ : K') : K' ⧸ M.subgroupOf K') := by
+      obtain ⟨m, hm⟩ :=
+        QuotientGroup.mk_out_eq_mul (M.subgroupOf K') (Quotient.out q * ⟨k, hKK' hk⟩)
+      have hq
+          : q * (((⟨k, hKK' hk⟩ : K') : K' ⧸ M.subgroupOf K'))
+            = ((Quotient.out q * ⟨k, hKK' hk⟩ : K') : K' ⧸ M.subgroupOf K') := by
         rw [QuotientGroup.mk_mul, QuotientGroup.out_eq']
       simp only [Equiv.coe_mulRight]
       rw [hq, hm, hrep _ _ m.2]

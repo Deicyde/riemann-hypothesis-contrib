@@ -18,12 +18,15 @@ open CategoryTheory AlgebraicGeometry Limits GlobalTheory.LogCris DividedPowers
 namespace CrystallineSemistableComparison.Pb.Kap
 
 section NM
-variable {O A A' : Type} [CommRing O] [CommRing A] [CommRing A'] [Algebra O A] [Algebra O A'] {I : Ideal A} {I' : Ideal A'}
-  (γ : DividedPowers I) (γ' : DividedPowers I') {X X' : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of O))
-  (q' : X' ⟶ Spec (CommRingCat.of O))
+variable
+  {O A A' : Type} [CommRing O] [CommRing A] [CommRing A'] [Algebra O A] [Algebra O A']
+  {I : Ideal A} {I' : Ideal A'} (γ : DividedPowers I) (γ' : DividedPowers I')
+  {X X' : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of O)) (q' : X' ⟶ Spec (CommRingCat.of O))
 
-def nmK (σ : A →+* A') (hσ : IsDPMorphism γ γ' σ) (hO : ∀ a, σ (algebraMap O A a) = algebraMap O A' a) (u : X' ⟶ X)
-    (hu : u ≫ q = q') : NMor γ q (κA O I) γ' q' (κA O I') σ where
+def nmK
+    (σ : A →+* A') (hσ : IsDPMorphism γ γ' σ) (hO : ∀ a, σ (algebraMap O A a) = algebraMap O A' a)
+    (u : X' ⟶ X) (hu : u ≫ q = q')
+    : NMor γ q (κA O I) γ' q' (κA O I') σ where
   hI := hσ
   u := u
   g := RingHom.id O

@@ -102,14 +102,18 @@ private lemma log_prime_weighted_cost_bound (lp p k s c f N la b : ℝ) (hlp : 0
   refine (mul_le_mul_of_nonneg_left h4 hlp.le).trans (le_of_eq ?_)
   field_simp
 
-theorem UpperTheory.sum_log_mul_max_zero_le_of_odd_addOrderOf :
-    ∀ (ce : ErrC) (eps Ct CGam Cc CT2 : ℝ) (PK : List ℝ), ∃ C : ℝ, 0 ≤ C ∧ ∃ x0 : ℝ,
-    ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L), PI.SzEatI.Uni eps Ct CGam Cc CT2 PK D L P → x0 ≤ L.sc.x → Formalism.MainNotions.SizesAt L →
-    ∀ j ∈ SizeData₂.lifts D, ∀ S : Finset ℕ,
-    (∀ p ∈ S, p.Prime ∧ IsResidueClassZero D p ∧ Odd (addOrderOf (hP D p)) ∧ (p : ℝ) ≤ L.sc.X'' D.R.n) →
-    ∑ p ∈ S, Real.log p * max 0 (((D.R.k : ℝ) - 1) * (∑ z ∈ kindBC D p, wPl D j z) / (p : ℝ) ^ 3 +
-        ce.c6 * (D.R.f : ℝ) * Nm D ^ 2 * Real.logb p L.sc.a) ≤
-      C * (D.R.f : ℝ) * L.sc.b * Real.log (L.sc.X'' D.R.n) := by
+theorem UpperTheory.sum_log_mul_max_zero_le_of_odd_addOrderOf
+    : ∀ (ce : ErrC) (eps Ct CGam Cc CT2 : ℝ) (PK : List ℝ), ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L),
+          PI.SzEatI.Uni eps Ct CGam Cc CT2 PK D L P → x0 ≤ L.sc.x → Formalism.MainNotions.SizesAt L
+            → ∀ j ∈ SizeData₂.lifts D, ∀ S : Finset ℕ,
+              (∀ p ∈ S,
+                  p.Prime ∧ IsResidueClassZero D p ∧ Odd (addOrderOf (hP D p))
+                    ∧ (p : ℝ) ≤ L.sc.X'' D.R.n)
+                → ∑ p ∈ S, Real.log p * max 0 (((D.R.k : ℝ) - 1) * (∑ z ∈ kindBC D p, wPl D j z) / (p : ℝ) ^ 3 +
+                      ce.c6 * (D.R.f : ℝ) * Nm D ^ 2 * Real.logb p L.sc.a)
+                  ≤ C * (D.R.f : ℝ) * L.sc.b * Real.log (L.sc.X'' D.R.n) := by
   intro ce eps Ct CGam Cc CT2 PK
   obtain ⟨x0, hx0⟩ := PI.SzEatI.W.stepA ⟨0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0⟩ eps
   refine ⟨10 + |ce.c6|, by positivity, x0, ?_⟩
@@ -125,9 +129,9 @@ theorem UpperTheory.sum_log_mul_max_zero_le_of_odd_addOrderOf :
   have hla : 0 ≤ Real.log L.sc.a := Real.log_nonneg ha1
   have hn1 : (1 : ℝ) ≤ (D.R.n : ℝ) := PI.SzEatI.W.n_one_le
   have hN1 : 1 ≤ Nm D := by
-    have : 1 ≤ D.R.N D.R.m := by
-      unfold Ranks.N; have := D.R.m_add_three_le_k; omega
-    unfold Nm; exact_mod_cast this
+    have : 1 ≤ D.R.N D.R.m := by unfold Ranks.N; have := D.R.m_add_three_le_k; omega
+    unfold Nm
+    exact_mod_cast this
   have hla8 : Real.log L.sc.a ≤ Real.log (8 * (D.R.n : ℝ) * Nm D * L.sc.a) := by
     refine Real.log_le_log (by linarith) (le_mul_of_one_le_left (by linarith) ?_)
     exact one_le_mul_of_one_le_of_one_le (by linarith) hN1
@@ -136,10 +140,13 @@ theorem UpperTheory.sum_log_mul_max_zero_le_of_odd_addOrderOf :
     have : 0 ≤ Y := by linarith
     gcongr
     linarith
-  have hpt : ∀ p ∈ S, Real.log p * max 0 (((D.R.k : ℝ) - 1) * (∑ z ∈ kindBC D p, wPl D j z) / (p : ℝ) ^ 3 +
-        ce.c6 * (D.R.f : ℝ) * Nm D ^ 2 * Real.logb p L.sc.a) ≤
-      5 * (D.R.f : ℝ) * L.sc.b * ((D.R.k : ℝ) * (Real.log p / (p : ℝ) ^ 3)) +
-        |ce.c6| * (D.R.f : ℝ) * (Nm D ^ 2 * Real.log L.sc.a) := by
+  have hpt
+      : ∀ p ∈ S,
+        Real.log p * max 0
+            (((D.R.k : ℝ) - 1) * (∑ z ∈ kindBC D p, wPl D j z) / (p : ℝ) ^ 3
+              + ce.c6 * (D.R.f : ℝ) * Nm D ^ 2 * Real.logb p L.sc.a)
+          ≤ 5 * (D.R.f : ℝ) * L.sc.b * ((D.R.k : ℝ) * (Real.log p / (p : ℝ) ^ 3))
+            + |ce.c6| * (D.R.f : ℝ) * (Nm D ^ 2 * Real.log L.sc.a) := by
     intro p hp
     have hp1 : (1 : ℝ) < p := by exact_mod_cast (hS p hp).1.one_lt
     have hw : ∀ z ∈ kindBC D p, 0 ≤ wPl D j z ∧ wPl D j z ≤ 5 * L.sc.b := fun z _ => by
@@ -147,28 +154,36 @@ theorem UpperTheory.sum_log_mul_max_zero_le_of_odd_addOrderOf :
       exact ⟨this.1, by linarith [this.2]⟩
     have hs0 : 0 ≤ ∑ z ∈ kindBC D p, wPl D j z := Finset.sum_nonneg fun z hz => (hw z hz).1
     have hs : ∑ z ∈ kindBC D p, wPl D j z ≤ (D.R.f : ℝ) * (5 * L.sc.b) := by
-      calc ∑ z ∈ kindBC D p, wPl D j z ≤ ∑ _z ∈ kindBC D p, 5 * L.sc.b :=
-            Finset.sum_le_sum fun z hz => (hw z hz).2
+      calc
+        ∑ z ∈ kindBC D p, wPl D j z
+          ≤ ∑ _z ∈ kindBC D p, 5 * L.sc.b := Finset.sum_le_sum fun z hz => (hw z hz).2
         _ = ((kindBC D p).card : ℝ) * (5 * L.sc.b) := by rw [Finset.sum_const, nsmul_eq_mul]
         _ ≤ (D.R.f : ℝ) * (5 * L.sc.b) :=
-            mul_le_mul_of_nonneg_right (card_kind_le_rank D p) (by linarith)
-    exact log_prime_weighted_cost_bound _ _ _ _ _ _ _ _ _ (Real.log_pos hp1) (by linarith) hk hs0 hs hf hla
+          mul_le_mul_of_nonneg_right (card_kind_le_rank D p) (by linarith)
+    exact log_prime_weighted_cost_bound _ _ _ _ _ _ _ _ _ (Real.log_pos hp1) (by linarith) hk hs0 hs
+      hf hla
   obtain ⟨he, hke⟩ := rank_sizes_log_cube_bound L hSz
-  have hM := UpperTheory.sum_log_div_cube_le_of_two_pow_dvd D.R.e he S
-    (fun p hp => (UpperTheory.two_pow_dvd_sub_or_add_one_of_odd_addOrderOf_hP D p (hS p hp).1 (hS p hp).2.1 (hS p hp).2.2.1).1)
+  have hM :=
+    UpperTheory.sum_log_div_cube_le_of_two_pow_dvd D.R.e he S (fun p hp =>
+      (UpperTheory.two_pow_dvd_sub_or_add_one_of_odd_addOrderOf_hP D p (hS p hp).1 (hS p hp).2.1
+        (hS p hp).2.2.1).1)
   have hM2 : (D.R.k : ℝ) * ∑ p ∈ S, Real.log p / (p : ℝ) ^ 3 ≤ 2 :=
     (mul_le_mul_of_nonneg_left hM hk).trans hke
   have hcard : (S.card : ℝ) ≤ Y :=
-    PI.SzEatI.W.card_le_of_le S Y (by linarith) (fun p hp => ⟨(hS p hp).1.one_lt.le, (hS p hp).2.2.2⟩)
+    PI.SzEatI.W.card_le_of_le S Y (by linarith)
+      (fun p hp => ⟨(hS p hp).1.one_lt.le, (hS p hp).2.2.2⟩)
   refine (Finset.sum_le_sum hpt).trans ?_
   rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, Finset.sum_const, nsmul_eq_mul]
   have hb0 : 0 ≤ L.sc.b := by linarith
   have hcf : 0 ≤ |ce.c6| * (D.R.f : ℝ) := by positivity
-  calc 5 * (D.R.f : ℝ) * L.sc.b * ((D.R.k : ℝ) * ∑ p ∈ S, Real.log p / (p : ℝ) ^ 3) +
-        (S.card : ℝ) * (|ce.c6| * (D.R.f : ℝ) * (Nm D ^ 2 * Real.log L.sc.a))
-      ≤ 5 * (D.R.f : ℝ) * L.sc.b * 2 + Y * (|ce.c6| * (D.R.f : ℝ) * (Nm D ^ 2 * Real.log L.sc.a)) := by
-        gcongr
-    _ = 10 * (D.R.f : ℝ) * L.sc.b + |ce.c6| * (D.R.f : ℝ) * (Y * (Nm D ^ 2 * Real.log L.sc.a)) := by ring
+  calc
+    5 * (D.R.f : ℝ) * L.sc.b * ((D.R.k : ℝ) * ∑ p ∈ S, Real.log p / (p : ℝ) ^ 3)
+          + (S.card : ℝ) * (|ce.c6| * (D.R.f : ℝ) * (Nm D ^ 2 * Real.log L.sc.a))
+        ≤ 5 * (D.R.f : ℝ) * L.sc.b * 2
+          + Y * (|ce.c6| * (D.R.f : ℝ) * (Nm D ^ 2 * Real.log L.sc.a)) := by
+      gcongr
+    _ = 10 * (D.R.f : ℝ) * L.sc.b + |ce.c6| * (D.R.f : ℝ) * (Y * (Nm D ^ 2 * Real.log L.sc.a)) := by
+      ring
     _ ≤ 10 * (D.R.f : ℝ) * L.sc.b + |ce.c6| * (D.R.f : ℝ) * L.sc.b := by gcongr
     _ = (10 + |ce.c6|) * (D.R.f : ℝ) * L.sc.b * 1 := by ring
     _ ≤ (10 + |ce.c6|) * (D.R.f : ℝ) * L.sc.b * Real.log Y := by gcongr

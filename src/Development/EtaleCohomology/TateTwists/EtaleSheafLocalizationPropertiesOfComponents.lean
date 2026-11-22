@@ -5,7 +5,10 @@ public import Development.EtaleCohomology.TateTwists.EtaleSheafSectionsEqOfLocal
 @[expose] public section
 
 namespace LateralTheory.Fin.EtaleSheafificationSectionsLocallyFromPresheaf
-theorem etale_sheaf_localization_properties_of_components : LateralTheory.EtaleFoundations.EtaleSheafificationSectionsLocallyFromPresheaf := by
+theorem etale_sheaf_localization_properties_of_components
+    : LateralTheory.EtaleFoundations.EtaleSheafificationSectionsLocallyFromPresheaf := by
   apply LateralTheory.EtaleFoundations.ShfLocPf.etale_sheaf_sections_eq_of_locally_eq
-theorem intersectionNumber_baseChange : LateralTheory.EtaleFoundations.EtaleSheafificationSectionsLocallyFromPresheaf := etale_sheaf_localization_properties_of_components
+theorem intersectionNumber_baseChange
+    : LateralTheory.EtaleFoundations.EtaleSheafificationSectionsLocallyFromPresheaf :=
+  etale_sheaf_localization_properties_of_components
 end LateralTheory.Fin.EtaleSheafificationSectionsLocallyFromPresheaf

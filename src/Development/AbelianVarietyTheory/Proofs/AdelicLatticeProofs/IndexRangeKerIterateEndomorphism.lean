@@ -10,8 +10,8 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem card_ker_comp_eq {M : Type} [CommGroup M] (f g : M →* M) :
-    Nat.card (f.comp g).ker = Nat.card g.ker * Nat.card (g.range.subgroupOf f.ker) := by
+theorem card_ker_comp_eq {M : Type} [CommGroup M] (f g : M →* M)
+    : Nat.card (f.comp g).ker = Nat.card g.ker * Nat.card (g.range.subgroupOf f.ker) := by
   have hle : g.ker ≤ (f.comp g).ker := by
     intro x hx
     simp only [MonoidHom.mem_ker, MonoidHom.comp_apply] at hx ⊢
@@ -26,9 +26,9 @@ theorem card_ker_comp_eq {M : Type} [CommGroup M] (f g : M →* M) :
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_right).toEquiv
   rw [← h1, h2, h3, h4, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv]
 
-theorem index_range_comp_mul {M : Type} [CommGroup M] (f g : M →* M) :
-    (f.comp g).range.index * Nat.card f.ker * Nat.card g.ker =
-      f.range.index * g.range.index * Nat.card (f.comp g).ker := by
+theorem index_range_comp_mul {M : Type} [CommGroup M] (f g : M →* M)
+    : (f.comp g).range.index * Nat.card f.ker * Nat.card g.ker
+      = f.range.index * g.range.index * Nat.card (f.comp g).ker := by
   have h1 : (f.comp g).range.index = (g.range ⊔ f.ker).index * f.range.index := by
     rw [MonoidHom.range_comp, Subgroup.index_map]
   have h2 : g.range.relIndex f.ker * (g.range ⊔ f.ker).index = g.range.index := by
@@ -38,12 +38,12 @@ theorem index_range_comp_mul {M : Type} [CommGroup M] (f g : M →* M) :
   rw [h1, card_ker_comp_eq, ← h2, ← h3]
   ring
 
-theorem index_range_ker_pow_succ_endomorphism {M : Type} [CommGroup M] (f : Monoid.End M)
-    (hK : Nat.card (MonoidHom.ker f) ≠ 0) (k : ℕ) :
-    Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) ≠ 0 ∧
-    (MonoidHom.range (f ^ (k + 1) : Monoid.End M)).index * Nat.card (MonoidHom.ker f) ^ (k + 1) =
-      (MonoidHom.range f).index ^ (k + 1) *
-        Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) := by
+theorem index_range_ker_pow_succ_endomorphism
+    {M : Type} [CommGroup M] (f : Monoid.End M) (hK : Nat.card (MonoidHom.ker f) ≠ 0) (k : ℕ)
+    : Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) ≠ 0
+      ∧ (MonoidHom.range (f ^ (k + 1) : Monoid.End M)).index * Nat.card (MonoidHom.ker f) ^ (k + 1)
+        = (MonoidHom.range f).index ^ (k + 1)
+          * Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) := by
   induction k with
   | zero => simpa using hK
   | succ k ih =>
@@ -54,8 +54,9 @@ theorem index_range_ker_pow_succ_endomorphism {M : Type} [CommGroup M] (f : Mono
     constructor
     · refine (card_ker_comp_eq (M := M) f (f ^ (k + 1) : Monoid.End M)).trans_ne
         (mul_ne_zero ih1 ?_)
-      have h3 := Subgroup.card_mul_index
-        ((MonoidHom.range (f ^ (k + 1) : Monoid.End M)).subgroupOf (MonoidHom.ker f))
+      have h3 :=
+        Subgroup.card_mul_index ((MonoidHom.range (f ^ (k + 1) : Monoid.End M)).subgroupOf
+          (MonoidHom.ker f))
       intro h
       rw [h, zero_mul] at h3
       exact hK h3.symm
@@ -67,12 +68,21 @@ theorem index_range_ker_pow_succ_endomorphism {M : Type} [CommGroup M] (f : Mono
       generalize Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) = D at *
       generalize Nat.card (MonoidHom.ker f) = K at *
       generalize (MonoidHom.range f).index = I at *
-      calc A * K ^ (k + 1 + 1) * D = (A * K * D) * K ^ (k + 1) := by ring
+      calc
+        A * K ^ (k + 1 + 1) * D
+          = (A * K * D) * K ^ (k + 1) := by ring
         _ = I * B * (C * K ^ (k + 1)) := by rw [h]; ring
         _ = I ^ (k + 1 + 1) * B * D := by rw [ih2]; ring
 
-theorem index_ker_iterate :
-    ∀ (M : Type) [CommGroup M] (f : Monoid.End M) (k : ℕ), (MonoidHom.range (f ^ (k + 1) : Monoid.End M)).index ≠ 0 → Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) ≠ 0 → (MonoidHom.range f).index ≠ 0 ∧ Nat.card (MonoidHom.ker f) ≠ 0 ∧ (MonoidHom.range (f ^ (k + 1) : Monoid.End M)).index * Nat.card (MonoidHom.ker f) ^ (k + 1) = (MonoidHom.range f).index ^ (k + 1) * Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) := by
+theorem index_ker_iterate
+    : ∀ (M : Type) [CommGroup M] (f : Monoid.End M) (k : ℕ),
+      (MonoidHom.range (f ^ (k + 1) : Monoid.End M)).index ≠ 0
+        → Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) ≠ 0
+        → (MonoidHom.range f).index ≠ 0 ∧ Nat.card (MonoidHom.ker f) ≠ 0
+          ∧ (MonoidHom.range (f ^ (k + 1) : Monoid.End M)).index
+              * Nat.card (MonoidHom.ker f) ^ (k + 1)
+            = (MonoidHom.range f).index ^ (k + 1)
+              * Nat.card (MonoidHom.ker (f ^ (k + 1) : Monoid.End M)) := by
   intro M _ f k hI hK
   have hr : MonoidHom.range (f ^ (k + 1) : Monoid.End M) ≤ MonoidHom.range f := by
     rintro _ ⟨x, rfl⟩
@@ -85,7 +95,10 @@ theorem index_ker_iterate :
     rw [hx', map_one]
   have hK' : Nat.card (MonoidHom.ker f) ≠ 0 :=
     ne_zero_of_dvd_ne_zero hK (Subgroup.card_dvd_of_le hk)
-  exact ⟨ne_zero_of_dvd_ne_zero hI (Subgroup.index_dvd_of_le hr), hK',
-    (index_range_ker_pow_succ_endomorphism f hK' k).2⟩
+  exact ⟨
+    ne_zero_of_dvd_ne_zero hI (Subgroup.index_dvd_of_le hr),
+    hK',
+    (index_range_ker_pow_succ_endomorphism f hK' k).2
+  ⟩
 
 end GlobalTheory.CNorm

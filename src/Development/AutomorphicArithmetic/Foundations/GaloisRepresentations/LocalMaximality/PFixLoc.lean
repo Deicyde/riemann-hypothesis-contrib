@@ -5,15 +5,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
-private theorem fixLoc_key (hV : ValBasic) {L : Type} [Field L] [Algebra ℂ L] (B : Subalgebra ℂ L)
-    (e : B →ₐ[ℂ] ℂ) {d : ℕ} (g : Fin d → Fin d → L) (A : Matrix (Fin d) (Fin d) ℂ) (t r : Fin d → L)
+private theorem fixLoc_key
+    (hV : ValBasic)
+    {L : Type} [Field L] [Algebra ℂ L]
+    (B : Subalgebra ℂ L) (e : B →ₐ[ℂ] ℂ)
+    {d : ℕ} (g : Fin d → Fin d → L) (A : Matrix (Fin d) (Fin d) ℂ) (t r : Fin d → L)
     (hg : ∀ m l, Val B e (g m l) (A m l)) (hdet : (1 - A).det ≠ 0)
-    (hr : ∀ a, r a = t a - ∑ l, g a l * t l) :
-    ∃ N : Matrix (Fin d) (Fin d) L, (∀ a l, N a l ∈ loc B e) ∧ Val B e N.det (1 - A).det ∧
-      (∀ a, r a = ∑ l, N a l * t l) ∧ ∀ l, InSp (loc B e) r (t l) := by
+    (hr : ∀ a, r a = t a - ∑ l, g a l * t l)
+    : ∃ N : Matrix (Fin d) (Fin d) L,
+      (∀ a l, N a l ∈ loc B e) ∧ Val B e N.det (1 - A).det ∧ (∀ a, r a = ∑ l, N a l * t l)
+        ∧ ∀ l, InSp (loc B e) r (t l) := by
   obtain ⟨-, ⟨ev, hev⟩, -, hinv⟩ := hV L B e
   have hg' : ∀ m l, ∃ h : g m l ∈ loc B e, ev ⟨_, h⟩ = A m l := fun m l => (hev _ _).1 (hg m l)
   choose hmem hval using hg'
@@ -24,7 +29,8 @@ private theorem fixLoc_key (hV : ValBasic) {L : Type} [Field L] [Algebra ℂ L] 
   have hN'ε : ε.mapMatrix N' = 1 - A := by
     ext a l
     simp only [N', RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.sub_apply, map_sub]
-    have h1 : ε ((1 : Matrix (Fin d) (Fin d) (loc B e)) a l) = (1 : Matrix (Fin d) (Fin d) ℂ) a l := by
+    have h1
+        : ε ((1 : Matrix (Fin d) (Fin d) (loc B e)) a l) = (1 : Matrix (Fin d) (Fin d) ℂ) a l := by
       by_cases h : a = l
       · subst h; simp
       · simp [Matrix.one_apply_ne h]
@@ -55,8 +61,7 @@ private theorem fixLoc_key (hV : ValBasic) {L : Type} [Field L] [Algebra ℂ L] 
   · refine (loc B e).mul_mem hvi ?_
     rw [← RingHom.map_adjugate]
     exact (N'.adjugate l a).2
-  · have h3 : (ι.mapMatrix N').mulVec t = r := by
-      ext a; rw [hmul a]; rfl
+  · have h3 : (ι.mapMatrix N').mulVec t = r := by ext a; rw [hmul a]; rfl
     have h4 : ((ι.mapMatrix N').adjugate).mulVec r = (ι.mapMatrix N').det • t := by
       rw [← h3, Matrix.mulVec_mulVec, Matrix.adjugate_mul, Matrix.smul_mulVec, Matrix.one_mulVec]
     have h5 := congrFun h4 l
@@ -64,8 +69,7 @@ private theorem fixLoc_key (hV : ValBasic) {L : Type} [Field L] [Algebra ℂ L] 
     simp only [mul_assoc]
     rw [← Finset.mul_sum, h5, inv_mul_cancel_left₀ hv0]
 
-theorem UpperTheory.Gal.productCup_of_system.fixLoc_of :
-    ValBasic → FixLoc := by
+theorem UpperTheory.Gal.productCup_of_system.fixLoc_of : ValBasic → FixLoc := by
   intro hV F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 Fx A hY e he
   have htan := hY.tan e he
   choose g hgv hgs using htan
@@ -76,13 +80,16 @@ theorem UpperTheory.Gal.productCup_of_system.fixLoc_of :
     rw [Fin.succAbove_zero]
   have hx0 : algebraMap F K' (x 0 : F) ≠ 0 := by simp
   have hy0 : j2 (algebraMap F K (x 0 : F)) ≠ 0 := by simp
-  have hmu : (sysY x j2 d).mu (dj 0 a) = algebraMap F K' (x a.succ : F) * j2 (algebraMap F K (x 0 : F))
-      - algebraMap F K' (x 0 : F) * j2 (algebraMap F K (x a.succ : F)) := by
+  have hmu
+      : (sysY x j2 d).mu (dj 0 a)
+        = algebraMap F K' (x a.succ : F) * j2 (algebraMap F K (x 0 : F))
+          - algebraMap F K' (x 0 : F) * j2 (algebraMap F K (x a.succ : F)) := by
     unfold Sys.mu
     rw [hd]
     rfl
-  have hu : (((sysY x j2 d).u n11 0 0 (dj 0 a) : K'ˣ) : K') =
-      algebraMap F K' (x 0 : F) * j2 (algebraMap F K (x 0 : F)) := by
+  have hu
+      : (((sysY x j2 d).u n11 0 0 (dj 0 a) : K'ˣ) : K')
+        = algebraMap F K' (x 0 : F) * j2 (algebraMap F K (x 0 : F)) := by
     unfold Sys.u n11
     simp only [pow_one, Units.val_mul]
     rfl

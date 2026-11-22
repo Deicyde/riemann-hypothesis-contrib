@@ -7,16 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormGroupToP
 
 noncomputable section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx GlobalTheory.TorCls
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx GlobalTheory.TorCls
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.TorCls
 
-theorem exists_open_psiAway_mem_conj_level : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (L : G.Level) (β : G.Cˣ)
-    (x : (AfP p ⊗[ℚ] G.C)ˣ) (t : (AfP p)ˣ) (hx : Triv G (AfP p) β x t) (y : G.C) (r₁ : G.GAf),
-    letI : TopologicalSpace (AfP p ⊗[ℚ] G.C) := moduleTopology (AfP p) (AfP p ⊗[ℚ] G.C);
-    ∃ O : Set ((AfP p ⊗[ℚ] G.C)ˣ × (AfP p)ˣ), IsOpen O ∧ 1 ∈ O ∧ ∀ z ∈ O, InT G (AfP p) β y z →
-      ∃ k ∈ L.K.toSubgroup, ((r₁ * k * r₁⁻¹ : G.GAf) : (AfP p ⊗[ℚ] G.C)ˣ × (AfP p)ˣ) = psiAway G x z := by
+theorem exists_open_psiAway_mem_conj_level
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (L : G.Level) (β : G.Cˣ) (x : (AfP p ⊗[ℚ] G.C)ˣ)
+        (t : (AfP p)ˣ) (hx : Triv G (AfP p) β x t) (y : G.C) (r₁ : G.GAf),
+      letI : TopologicalSpace (AfP p ⊗[ℚ] G.C) := moduleTopology (AfP p) (AfP p ⊗[ℚ] G.C)
+      ∃ O : Set ((AfP p ⊗[ℚ] G.C)ˣ × (AfP p)ˣ),
+        IsOpen O ∧ 1 ∈ O
+          ∧ ∀ z ∈ O,
+            InT G (AfP p) β y z
+              → ∃ k ∈ L.K.toSubgroup,
+                ((r₁ * k * r₁⁻¹ : G.GAf) : (AfP p ⊗[ℚ] G.C)ˣ × (AfP p)ˣ) = psiAway G x z := by
   intro p _ G L β x t hx y r₁
   letI : TopologicalSpace (AfP p ⊗[ℚ] G.C) := moduleTopology (AfP p) (AfP p ⊗[ℚ] G.C)
   haveI : IsModuleTopology (AfP p) (AfP p ⊗[ℚ] G.C) := ⟨rfl⟩
@@ -39,7 +45,8 @@ theorem exists_open_psiAway_mem_conj_level : ∀ (p : ℕ) [Fact p.Prime] (G : H
   · intro z hz hT
     have hw : psiAway G x z ∈ UPts G.star (AfP p) := by
       rw [psiAway_apply]
-      exact conj_mul_star (starT G.star (AfP p)) (inC G (AfP p) (β : G.C)) x z.1 t (z.2 : AfP p) hx hT.1
+      exact conj_mul_star (starT G.star (AfP p)) (inC G (AfP p) (β : G.C)) x z.1 t (z.2 : AfP p) hx
+        hT.1
     let g : G.GAf := ⟨psiAway G x z, hw⟩
     have hg : g ∈ K' := by
       rw [← hV]

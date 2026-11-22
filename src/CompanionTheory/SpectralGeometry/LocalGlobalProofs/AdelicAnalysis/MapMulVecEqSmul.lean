@@ -13,13 +13,13 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.SW.ModDet
 
-variable {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K]
-  [LocallyCompactSpace K] [SecondCountableTopology K] [T2Space K] [MeasurableSpace K] [BorelSpace K]
+variable
+  {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
+  [SecondCountableTopology K] [T2Space K] [MeasurableSpace K] [BorelSpace K]
 
-theorem map_mul_unit (lam : Measure K) [lam.IsAddHaarMeasure] (u : Kˣ) :
-    lam.map (fun y => (u : K) * y) = (distribHaarChar K u)⁻¹ • lam := by
-  have hm : Measurable (fun y : K => (u : K) * y) :=
-    (continuous_const.mul continuous_id).measurable
+theorem map_mul_unit (lam : Measure K) [lam.IsAddHaarMeasure] (u : Kˣ)
+    : lam.map (fun y => (u : K) * y) = (distribHaarChar K u)⁻¹ • lam := by
+  have hm : Measurable (fun y : K => (u : K) * y) := (continuous_const.mul continuous_id).measurable
   ext s hs
   rw [Measure.map_apply hm hs, Measure.smul_apply, Measure.nnreal_smul_coe_apply, ← map_inv,
     distribHaarChar_mul lam u⁻¹ s]
@@ -27,16 +27,16 @@ theorem map_mul_unit (lam : Measure K) [lam.IsAddHaarMeasure] (u : Kˣ) :
   ext y
   simp [Set.mem_inv_smul_set_iff, Units.smul_def]
 
-theorem pi_smul_const {ι : Type} [Fintype ι] (lam : Measure K) [SigmaFinite lam] (c : ι → ℝ≥0) :
-    Measure.pi (fun i => c i • lam) = (∏ i, c i) • Measure.pi (fun _ : ι => lam) := by
+theorem pi_smul_const {ι : Type} [Fintype ι] (lam : Measure K) [SigmaFinite lam] (c : ι → ℝ≥0)
+    : Measure.pi (fun i => c i • lam) = (∏ i, c i) • Measure.pi (fun _ : ι => lam) := by
   refine Measure.pi_eq fun s hs => ?_
   rw [Measure.smul_apply, Measure.pi_pi]
   simp only [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul, Finset.prod_mul_distrib,
     ENNReal.ofNNReal_finsetProd]
 
-theorem pi_map_diag {ι : Type} [Fintype ι] (lam : Measure K) [lam.IsAddHaarMeasure] (D : ι → Kˣ) :
-    (Measure.pi fun _ : ι => lam).map (fun x i => (D i : K) * x i) =
-      (∏ i, (distribHaarChar K (D i))⁻¹) • Measure.pi fun _ : ι => lam := by
+theorem pi_map_diag {ι : Type} [Fintype ι] (lam : Measure K) [lam.IsAddHaarMeasure] (D : ι → Kˣ)
+    : (Measure.pi fun _ : ι => lam).map (fun x i => (D i : K) * x i)
+      = (∏ i, (distribHaarChar K (D i))⁻¹) • Measure.pi fun _ : ι => lam := by
   have hm : ∀ i, Measurable (fun y : K => (D i : K) * y) := fun i =>
     (continuous_const.mul continuous_id).measurable
   have hs : ∀ i, SigmaFinite (lam.map (fun y : K => (D i : K) * y)) := fun i => by
@@ -45,8 +45,8 @@ theorem pi_map_diag {ι : Type} [Fintype ι] (lam : Measure K) [lam.IsAddHaarMea
   simp_rw [map_mul_unit]
   exact pi_smul_const lam _
 
-theorem smul_cancel (lam : Measure K) [lam.IsAddHaarMeasure] {a b : ℝ≥0}
-    (h : a • lam = b • lam) : a = b := by
+theorem smul_cancel (lam : Measure K) [lam.IsAddHaarMeasure] {a b : ℝ≥0} (h : a • lam = b • lam)
+    : a = b := by
   obtain ⟨C, hC, hn⟩ := exists_compact_mem_nhds (0 : K)
   have h0 : lam C ≠ 0 := (Measure.measure_pos_of_mem_nhds lam hn).ne'
   have h1 : lam C ≠ ∞ := hC.measure_lt_top.ne
@@ -54,35 +54,40 @@ theorem smul_cancel (lam : Measure K) [lam.IsAddHaarMeasure] {a b : ℝ≥0}
   simp only [Measure.smul_apply, Measure.nnreal_smul_coe_apply] at e
   exact ENNReal.coe_injective ((ENNReal.mul_left_inj h0 h1).1 e)
 
-theorem map_transvections {ι : Type} [Fintype ι] [DecidableEq ι] (μ : Measure (ι → K))
-    [μ.IsAddHaarMeasure] (L : List (Matrix.TransvectionStruct ι K)) :
-    μ.map (fun x => (L.map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x) = μ := by
+theorem map_transvections
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (μ : Measure (ι → K)) [μ.IsAddHaarMeasure]
+    (L : List (Matrix.TransvectionStruct ι K))
+    : μ.map (fun x => (L.map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x) = μ := by
   induction L with
   | nil => simp
   | cons t L ih =>
     have hm : ∀ M : Matrix ι ι K, Measurable (fun x : ι → K => M *ᵥ x) := fun M =>
       (continuous_const.matrix_mulVec continuous_id).measurable
-    have e : (fun x : ι → K => ((t :: L).map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x) =
-        (fun x => t.toMatrix *ᵥ x) ∘
-          (fun x => (L.map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x) := by
+    have e
+        : (fun x : ι → K => ((t :: L).map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x)
+          = (fun x => t.toMatrix *ᵥ x)
+            ∘ (fun x => (L.map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x) := by
       funext x
       simp [Matrix.mulVec_mulVec]
     rw [e, ← Measure.map_map (hm _) (hm _), ih]
     exact GlobalTheory.T.haar_invariant_under_transvection K ι μ t
 
-theorem det_transvections {ι : Type} [Fintype ι] [DecidableEq ι]
-    (L : List (Matrix.TransvectionStruct ι K)) :
-    ((L.map Matrix.TransvectionStruct.toMatrix).prod).det = 1 := by
+theorem det_transvections
+    {ι : Type} [Fintype ι] [DecidableEq ι] (L : List (Matrix.TransvectionStruct ι K))
+    : ((L.map Matrix.TransvectionStruct.toMatrix).prod).det = 1 := by
   induction L with
   | nil => simp
   | cons t L ih => simp [Matrix.det_mul, ih, Matrix.TransvectionStruct.det]
 
-theorem map_mulVec_eq_smul : ∀ (K : Type) [CommRing K] [TopologicalSpace K] [IsTopologicalRing K]
-    [LocallyCompactSpace K] [SecondCountableTopology K] [T2Space K] [MeasurableSpace K]
-    [BorelSpace K] [IsArtinianRing K] [IsReduced K] (ι : Type) [Fintype ι] [DecidableEq ι]
-    (μ : Measure (ι → K)) [μ.IsAddHaarMeasure] (lam : Measure K) [lam.IsAddHaarMeasure]
-    (A : Matrix ι ι K), IsUnit A.det → ∀ c : ℝ≥0,
-      lam.map (fun y => A.det * y) = c • lam → μ.map (fun x => A *ᵥ x) = c • μ := by
+theorem map_mulVec_eq_smul
+    : ∀ (K : Type) [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
+        [SecondCountableTopology K] [T2Space K] [MeasurableSpace K] [BorelSpace K]
+        [IsArtinianRing K] [IsReduced K] (ι : Type) [Fintype ι] [DecidableEq ι]
+        (μ : Measure (ι → K)) [μ.IsAddHaarMeasure] (lam : Measure K) [lam.IsAddHaarMeasure]
+        (A : Matrix ι ι K),
+      IsUnit A.det
+        → ∀ c : ℝ≥0, lam.map (fun y => A.det * y) = c • lam → μ.map (fun x => A *ᵥ x) = c • μ := by
   intro K _ _ _ _ _ _ _ _ _ _ ι _ _ μ _ lam _ A hA c hc
   obtain ⟨L, L', D, hAeq⟩ := GlobalTheory.T.matrix_transvection_diagonal_decomposition K ι A
   have hdet : A.det = ∏ i, D i := by
@@ -97,8 +102,7 @@ theorem map_mulVec_eq_smul : ∀ (K : Type) [CommRing K] [TopologicalSpace K] [I
   have hcc : (∏ i, (distribHaarChar K (Du i))⁻¹) = c := by
     refine smul_cancel lam ?_
     rw [← hc, hdet]
-    have e : (∏ i, D i) = ((∏ i, Du i : Kˣ) : K) := by
-      simp [Units.coe_prod, hDu]
+    have e : (∏ i, D i) = ((∏ i, Du i : Kˣ) : K) := by simp [Units.coe_prod, hDu]
     rw [e, map_mul_unit, map_prod, Finset.prod_inv_distrib]
   have hμ := Measure.isAddLeftInvariant_eq_smul μ (Measure.pi fun _ : ι => lam)
   have hmd : Measurable (fun (x : ι → K) i => (Du i : K) * x i) :=
@@ -108,10 +112,11 @@ theorem map_mulVec_eq_smul : ∀ (K : Type) [CommRing K] [TopologicalSpace K] [I
     exact hmd.aemeasurable
   have hm : ∀ M : Matrix ι ι K, Measurable (fun x : ι → K => M *ᵥ x) := fun M =>
     (continuous_const.matrix_mulVec continuous_id).measurable
-  have e : (fun x : ι → K => A *ᵥ x) =
-      (fun x => (L.map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x) ∘
-        (fun (x : ι → K) i => (Du i : K) * x i) ∘
-          (fun x => (L'.map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x) := by
+  have e
+      : (fun x : ι → K => A *ᵥ x)
+        = (fun x => (L.map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x)
+          ∘ (fun (x : ι → K) i => (Du i : K) * x i)
+          ∘ (fun x => (L'.map Matrix.TransvectionStruct.toMatrix).prod *ᵥ x) := by
     funext x
     have hd : ∀ y : ι → K, (fun i => (Du i : K) * y i) = Matrix.diagonal D *ᵥ y := fun y => by
       funext i

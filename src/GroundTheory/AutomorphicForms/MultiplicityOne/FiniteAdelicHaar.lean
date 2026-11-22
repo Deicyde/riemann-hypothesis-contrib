@@ -16,8 +16,8 @@ noncomputable section
 
 variable (K : Type*) [Field K] [NumberField K] (n : ℕ)
 
-theorem isMulRightInvariant_finite (μ : Measure (AdelicGLn.FiniteAdelicGL K n)) [μ.IsHaarMeasure] :
-    μ.IsMulRightInvariant := by
+theorem isMulRightInvariant_finite (μ : Measure (AdelicGLn.FiniteAdelicGL K n)) [μ.IsHaarMeasure]
+    : μ.IsMulRightInvariant := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · have : Subsingleton (AdelicGLn.FiniteAdelicGL K 0) :=
       ⟨fun x y => Units.ext (Subsingleton.elim _ _)⟩

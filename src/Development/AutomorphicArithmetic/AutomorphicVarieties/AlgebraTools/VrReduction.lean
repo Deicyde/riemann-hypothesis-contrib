@@ -8,8 +8,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial Matrix IsLocalRing TensorProduct UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.vr_reduction :
-    ∀ {B E : Type} [CommRing B] [Ring E] [Algebra B E] (T : TrInv B E) {ι : Type} [Fintype ι] [DecidableEq ι] (o : ι → ι) (U : T.Units ι o) {F : Type} [CommRing F] [Algebra B F] (r : E →ₐ[B] Matrix ι ι F) (p q : ι), (∀ y, r (T.st y) = (r y)ᵀ) → (∀ i, r (U.x i) = single (o i) i 1) → (∀ y i j, o i ≠ o j → r y i j = 0) → (∀ y i j, algebraMap B F (U.vr p q y i j).ev = r y i j) ∧ (o p = p → o q = q → p ≠ q → (U.oddForm p q).red ≤ RingHom.ker (algebraMap B F)) := by
+theorem UpperTheory.V.AlgebraTools.vr_reduction
+    : ∀ {B E : Type} [CommRing B] [Ring E] [Algebra B E] (T : TrInv B E) {ι : Type} [Fintype ι]
+        [DecidableEq ι] (o : ι → ι) (U : T.Units ι o) {F : Type} [CommRing F] [Algebra B F]
+        (r : E →ₐ[B] Matrix ι ι F) (p q : ι),
+      (∀ y, r (T.st y) = (r y)ᵀ) → (∀ i, r (U.x i) = single (o i) i 1)
+        → (∀ y i j, o i ≠ o j → r y i j = 0)
+        → (∀ y i j, algebraMap B F (U.vr p q y i j).ev = r y i j)
+          ∧ (o p = p → o q = q → p ≠ q → (U.oddForm p q).red ≤ RingHom.ker (algebraMap B F)) := by
   intro B E _ _ _ T ι _ _ o U F _ _ r p q hst hx hr
   obtain ⟨-, -, h3, h4, h5, -, h7⟩ := units_basic T o U
   have hep : ∀ k, r (U.ep (o k)) = Matrix.single (o k) (o k) 1 := by
@@ -17,7 +23,8 @@ theorem UpperTheory.V.AlgebraTools.vr_reduction :
     rw [← U.x_base k, hx, U.o_o]
   have hz : ∀ w i j, r (U.x i * w * T.st (U.x j)) = Matrix.single (o i) (o j) (r w i j) := by
     intro w i j
-    rw [map_mul, map_mul, hst, hx, hx, Matrix.transpose_single, Matrix.single_mul_mul_single, one_mul, mul_one]
+    rw [map_mul, map_mul, hst, hx, hx, Matrix.transpose_single, Matrix.single_mul_mul_single,
+      one_mul, mul_one]
   have key : ∀ w i j, algebraMap B F (T.tr (U.x i * w * T.st (U.x j))) = r w i j := by
     intro w i j
     by_cases hij : o i = o j

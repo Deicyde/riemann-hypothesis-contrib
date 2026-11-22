@@ -6,8 +6,10 @@ public import Mathlib
 
 open IsLocalRing
 
-theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.closedSub :
-    ∀ {O T : Type} [CommRing O] [IsNoetherianRing O] [IsLocalRing O] [CommRing T] [IsLocalRing T] [Algebra O T] (I : Ideal T) [Module.Finite O (T ⧸ I)] (S : Subalgebra O T) (t : T), (∀ N : ℕ, ∃ s ∈ S, t - s ∈ maximalIdeal T ^ N) → ∃ s ∈ S, t - s ∈ I := by
+theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.closedSub
+    : ∀ {O T : Type} [CommRing O] [IsNoetherianRing O] [IsLocalRing O] [CommRing T] [IsLocalRing T]
+        [Algebra O T] (I : Ideal T) [Module.Finite O (T ⧸ I)] (S : Subalgebra O T) (t : T),
+      (∀ N : ℕ, ∃ s ∈ S, t - s ∈ maximalIdeal T ^ N) → ∃ s ∈ S, t - s ∈ I := by
   intro O T _ _ _ _ _ _ I _ S t ht
   let q : T →ₐ[O] T ⧸ I := Ideal.Quotient.mkₐ O I
   have hq : Function.Surjective q := Ideal.Quotient.mkₐ_surjective O I
@@ -39,9 +41,7 @@ theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.closedSub :
       exact Ideal.mem_map_of_mem _ hts
     have h2 : q (t - s) ∈ J ^ k := by
       rw [pow_mul] at h1
-      first
-        | exact Ideal.pow_right_mono hn k h1
-        | exact pow_le_pow_left' hn k h1
+      first | exact Ideal.pow_right_mono hn k h1 | exact pow_le_pow_left' hn k h1
     have h3 : q (t - s) ∈ ((maximalIdeal O) ^ k • ⊤ : Submodule O (T ⧸ I)) := by
       rw [Ideal.smul_top_eq_map, Ideal.map_pow]
       exact h2
@@ -52,8 +52,9 @@ theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.closedSub :
     rw [Submodule.map_smul'', Submodule.map_top, Submodule.range_mkQ] at h5
     rw [h4]
     exact h5
-  have hbot := Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (R := O) (M := (T ⧸ I) ⧸ Sb)
-    (maximalIdeal O) (maximalIdeal.isMaximal O).ne_top
+  have hbot :=
+    Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (R := O) (M := (T ⧸ I) ⧸ Sb) (maximalIdeal O)
+      (maximalIdeal.isMaximal O).ne_top
   have h0 : Sb.mkQ (q t) = 0 := by
     have hi : Sb.mkQ (q t) ∈ (⨅ i : ℕ, (maximalIdeal O) ^ i • ⊤ : Submodule O ((T ⧸ I) ⧸ Sb)) :=
       Submodule.mem_iInf _ |>.mpr hmem

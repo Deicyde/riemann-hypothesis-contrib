@@ -9,13 +9,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Antidia
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.UnitLemma.IsometryUnit
 
-theorem isometry_unit : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.UnitLemma.InvAlg K), B.P.Separable → ∀ (ε : B.A), (ε = 1 ∨ ε = -1) → ∀ (a : ℕ) (β β' : B.Aˣ), B.σ (β : B.A) = β * (ε * B.g) → B.σ (β' : B.A) = β' * (ε * B.g) → ∀ b b' : Module.Basis (Fin a) K.E B.A, (∀ i j, B.herm β (b i) (b j) = B.herm β' (b' i) (b' j)) → ∃ t : B.Aˣ, (β' : B.A) = β * (t * B.σ t) := by
+theorem isometry_unit
+    : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.UnitLemma.InvAlg K),
+      B.P.Separable
+        → ∀ (ε : B.A),
+          (ε = 1 ∨ ε = -1)
+            → ∀ (a : ℕ) (β β' : B.Aˣ),
+              B.σ (β : B.A) = β * (ε * B.g) → B.σ (β' : B.A) = β' * (ε * B.g)
+                → ∀ b b' : Module.Basis (Fin a) K.E B.A,
+                  (∀ i j, B.herm β (b i) (b j) = B.herm β' (b' i) (b' j))
+                    → ∃ t : B.Aˣ, (β' : B.A) = β * (t * B.σ t) := by
   intro K B hs ε hε a β β' hβ hβ' b b' hgram
   have hs' : (LinearMap.mulLeft K.E B.g).charpoly.Separable := hs
   have σsm : ∀ (r : K.E) (y : B.A), B.σ (r • y) = K.c r • B.σ y := by
@@ -32,16 +42,22 @@ theorem isometry_unit : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.Un
   have smulR : ∀ (x : B.A) (r : K.E) (u v : B.A), B.herm x u (r • v) = K.c r * B.herm x u v := by
     intro x r u v; unfold InvAlg.herm; rw [σsm, mul_smul_comm, map_smul, smul_eq_mul]
 
-  have asym : ∀ (x : B.A), B.σ x = x * (ε * B.g) → ∀ z y, K.c (B.herm x z y) = B.herm x (ε * B.g * y) z := by
-    intro x hx z y; unfold InvAlg.herm
-    rw [← trσ]; congr 1; simp only [map_mul, B.σ_σ, hx]; ring
+  have asym
+      : ∀ (x : B.A),
+        B.σ x = x * (ε * B.g) → ∀ z y, K.c (B.herm x z y) = B.herm x (ε * B.g * y) z := by
+    intro x hx z y
+    unfold InvAlg.herm
+    rw [← trσ]
+    congr 1
+    simp only [map_mul, B.σ_σ, hx]
+    ring
 
-  have nd : ∀ x : B.A, (∀ y, Algebra.trace K.E B.A (x * y) = 0) → x = 0 :=
-    fun x hx => GlobalTheory.UnitLemma.PairClass.trace_nondeg K.E B.A B.g hs' x hx
+  have nd : ∀ x : B.A, (∀ y, Algebra.trace K.E B.A (x * y) = 0) → x = 0 := fun x hx =>
+    GlobalTheory.UnitLemma.PairClass.trace_nondeg K.E B.A B.g hs' x hx
   have ndh : ∀ w : B.A, (∀ z, B.herm β w z = 0) → w = 0 := by
     intro w hw
-    have h0 : (β : B.A) * w = 0 := nd _ (fun y => by
-      have := hw (B.σ y); unfold InvAlg.herm at this; rwa [B.σ_σ] at this)
+    have h0 : (β : B.A) * w = 0 :=
+      nd _ (fun y => by have := hw (B.σ y); unfold InvAlg.herm at this; rwa [B.σ_σ] at this)
     have := congrArg (fun z => ((β⁻¹ : B.Aˣ) : B.A) * z) h0
     simpa [← mul_assoc] using this
 
@@ -49,15 +65,22 @@ theorem isometry_unit : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.Un
   have hφb : ∀ i, φ (b' i) = b i := fun i => by simp [φ, Module.Basis.equiv_apply]
   have hφ : ∀ u v, B.herm β (φ u) (φ v) = B.herm β' u v := by
     let F₁ : B.A →ₗ[K.E] B.A →ₛₗ[(K.c : K.E →+* K.E)] K.E :=
-      LinearMap.mk₂'ₛₗ (RingHom.id K.E) (K.c : K.E →+* K.E) (fun u v => B.herm β (φ u) (φ v))
-        (fun u u' v => by rw [map_add (f := _), addL]) (fun r u v => by rw [map_smul, smulL]; rfl)
-        (fun u v v' => by rw [map_add (f := _), addR]) (fun r u v => by rw [map_smul, smulR]; rfl)
+      LinearMap.mk₂'ₛₗ (RingHom.id K.E) (K.c : K.E →+* K.E)
+        (fun u v => B.herm β (φ u) (φ v))
+        (fun u u' v => by rw [map_add (f := _), addL])
+        (fun r u v => by rw [map_smul, smulL]; rfl)
+        (fun u v v' => by rw [map_add (f := _), addR])
+        (fun r u v => by rw [map_smul, smulR]; rfl)
     let F₂ : B.A →ₗ[K.E] B.A →ₛₗ[(K.c : K.E →+* K.E)] K.E :=
-      LinearMap.mk₂'ₛₗ (RingHom.id K.E) (K.c : K.E →+* K.E) (fun u v => B.herm β' u v)
-        (fun u u' v => addL _ _ _ _) (fun r u v => smulL _ _ _ _)
-        (fun u v v' => addR _ _ _ _) (fun r u v => smulR _ _ _ _)
-    have hF : F₁ = F₂ := LinearMap.ext_basis b' b' (fun i j => by
-      simp only [F₁, F₂, LinearMap.mk₂'ₛₗ_apply, hφb]; exact hgram i j)
+      LinearMap.mk₂'ₛₗ (RingHom.id K.E) (K.c : K.E →+* K.E)
+        (fun u v => B.herm β' u v)
+        (fun u u' v => addL _ _ _ _)
+        (fun r u v => smulL _ _ _ _)
+        (fun u v v' => addR _ _ _ _)
+        (fun r u v => smulR _ _ _ _)
+    have hF : F₁ = F₂ :=
+      LinearMap.ext_basis b' b'
+        (fun i j => by simp only [F₁, F₂, LinearMap.mk₂'ₛₗ_apply, hφb]; exact hgram i j)
     intro u v
     have := LinearMap.congr_fun₂ hF u v
     simp only [F₁, F₂, LinearMap.mk₂'ₛₗ_apply] at this
@@ -103,7 +126,9 @@ theorem isometry_unit : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.Un
   rw [hmul y] at h1
   unfold InvAlg.herm at h1
   rw [map_one B.σ, mul_one] at h1
-  have h2 : ((β' : B.A) - β * (φ 1 * B.σ (φ 1))) * y = (β' : B.A) * y - β * (y * φ 1) * B.σ (φ 1) := by ring
+  have h2
+      : ((β' : B.A) - β * (φ 1 * B.σ (φ 1))) * y = (β' : B.A) * y - β * (y * φ 1) * B.σ (φ 1) := by
+    ring
   rw [h2, map_sub, h1, sub_self]
 
 end GlobalTheory.UnitLemma.IsometryUnit

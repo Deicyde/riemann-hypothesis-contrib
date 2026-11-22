@@ -9,9 +9,9 @@ open GlobalTheory.BI GlobalTheory.BrauerZero
 
 namespace GlobalTheory.BrauerZero
 
-theorem ind_one_sub_index_mem_D0 {G : Type} [Group G] [Finite G] (K : Subgroup G)
-    (hK : ∀ a b : G, a * b * a⁻¹ * b⁻¹ ∈ K) :
-    ind K (fun _ => (1 : ℂ)) - (fun _ => (K.index : ℂ)) ∈ D0 G := by
+theorem ind_one_sub_index_mem_D0
+    {G : Type} [Group G] [Finite G] (K : Subgroup G) (hK : ∀ a b : G, a * b * a⁻¹ * b⁻¹ ∈ K)
+    : ind K (fun _ => (1 : ℂ)) - (fun _ => (K.index : ℂ)) ∈ D0 G := by
   classical
   haveI := Fintype.ofFinite G
   haveI hN : K.Normal := ⟨fun n hn g => by
@@ -48,8 +48,7 @@ theorem ind_one_sub_index_mem_D0 {G : Type} [Group G] [Finite G] (K : Subgroup G
     have hcl : ∀ g x : G, F ψ (x⁻¹ * g * x) = F ψ g := by
       intro g x
       rw [hFmul, hFmul, mul_comm (F ψ x⁻¹), mul_assoc, ← hFmul, inv_mul_cancel, hFone, mul_one]
-    have h1 : ind (⊤ : Subgroup G) (fun h => (χ h : ℂ)) = F ψ := by
-      exact (ind_top (F ψ) hcl : _)
+    have h1 : ind (⊤ : Subgroup G) (fun h => (χ h : ℂ)) = F ψ := by exact (ind_top (F ψ) hcl : _)
     have h2 : ind (⊤ : Subgroup G) (fun _ => (1 : ℂ)) = fun _ => (1 : ℂ) :=
       ind_top (fun _ => (1 : ℂ)) (fun _ _ => rfl)
     apply AddSubgroup.subset_closure
@@ -95,8 +94,9 @@ theorem ind_one_sub_index_mem_D0 {G : Type} [Group G] [Finite G] (K : Subgroup G
     · rw [if_neg (fun h => hg (he.1 h)), if_neg hg]
   have hcard : (Fintype.card (AddChar Q ℂ) : ℂ) = (K.index : ℂ) := by
     rw [AddChar.card_eq, Subgroup.index, ← Nat.card_eq_fintype_card]; rfl
-  have heq : ind K (fun _ => (1 : ℂ)) - (fun _ => (K.index : ℂ))
-      = ∑ ψ : AddChar Q ℂ, (F ψ - fun _ => (1 : ℂ)) := by
+  have heq
+      : ind K (fun _ => (1 : ℂ)) - (fun _ => (K.index : ℂ))
+        = ∑ ψ : AddChar Q ℂ, (F ψ - fun _ => (1 : ℂ)) := by
     funext g
     rw [Finset.sum_apply]
     simp only [Pi.sub_apply, Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ,

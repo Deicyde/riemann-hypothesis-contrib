@@ -11,7 +11,8 @@ open scoped ContDiff ComplexConjugate
 
 namespace ReciprocityTheory.ChartRestriction.DS.Mult1.InvCC
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -244,15 +245,17 @@ def TL (k r : ℕ) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) : Mat k r →�
     intro c A
     show Hpk k r * (gbar k r γ (c • A))ᴴ * Hpk k r = c • (Hpk k r * (gbar k r γ A)ᴴ * Hpk k r)
     have e1 : c • A = (c : ℂ) • A := (Complex.coe_smul c A).symm
-    rw [e1, gbar_rsmul, Matrix.conjTranspose_smul, Complex.star_def, Complex.conj_ofReal, Matrix.mul_smul,
-      Matrix.smul_mul, Complex.coe_smul]
+    rw [e1, gbar_rsmul, Matrix.conjTranspose_smul, Complex.star_def, Complex.conj_ofReal,
+      Matrix.mul_smul, Matrix.smul_mul, Complex.coe_smul]
 
 lemma TL_apply (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (A : Mat k r) :
     TL k r γ A = Hpk k r * (gbar k r γ A)ᴴ * Hpk k r := rfl
 
 section main
 
-variable {γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hE : IsUnit (embWb k r γ).det) (hEG : embWb k r γ ∈ GV k r)
+variable
+  {γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}
+  (hE : IsUnit (embWb k r γ).det) (hEG : embWb k r γ ∈ GV k r)
 include hE hEG
 
 lemma th_bound : ∃ C, ∀ g ∈ GV k r, gN (th k r γ g) ≤ C * gN g := by
@@ -285,10 +288,11 @@ lemma CkOn_th {m : ℕ} {F : Mat k r → ℂ} (hF : CkOn (m : ℕ∞) (GV k r) F
 
 end main
 
-theorem main (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (hγ : IsZFrame k r z γ) :
-    (∃ C : ℝ, ∀ g ∈ GV k r, gN (th k r γ g) ≤ C * gN g) ∧
-    ∀ (A : ℝ) (m : ℕ) (F : Mat k r → ℂ), InCC A m F → InCC A m (F ∘ th k r γ) := by
+theorem main
+    (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    (hγ : IsZFrame k r z γ)
+    : (∃ C : ℝ, ∀ g ∈ GV k r, gN (th k r γ g) ≤ C * gN g)
+      ∧ ∀ (A : ℝ) (m : ℕ) (F : Mat k r → ℂ), InCC A m F → InCC A m (F ∘ th k r γ) := by
   have hEG : embWb k r γ ∈ GV k r := emb_mem hγ.1
   have hE : IsUnit (embWb k r γ).det := isUnit_of_uh hEG
   refine ⟨th_bound hE hEG, ?_⟩
@@ -312,14 +316,18 @@ theorem main (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (γ : Matrix (Fin (k 
     have hXn : ‖X‖ ≤ 1 := (Matrix.norm_le_iff zero_le_one).mpr hX.2
     have h1 : ‖gbar k r γ X‖ ≤ M := by
       have := hB X
-      calc ‖gbar k r γ X‖ = ‖gbarL k r γ X‖ := rfl
+      calc
+        ‖gbar k r γ X‖
+          = ‖gbarL k r γ X‖ := rfl
         _ ≤ B * ‖X‖ := this
         _ ≤ M * 1 := mul_le_mul (le_max_left _ _) hXn (norm_nonneg _) hM0.le
         _ = M := mul_one M
     simp only [hYb, Matrix.smul_apply, smul_eq_mul, norm_mul, Complex.norm_real, Real.norm_eq_abs,
       abs_of_pos (inv_pos.mpr hM0)]
-    calc M⁻¹ * ‖gbar k r γ X i j‖ ≤ M⁻¹ * M :=
-          mul_le_mul_of_nonneg_left ((Matrix.norm_entry_le_entrywise_sup_norm _).trans h1) (inv_pos.mpr hM0).le
+    calc
+      M⁻¹ * ‖gbar k r γ X i j‖ ≤ M⁻¹ * M :=
+        mul_le_mul_of_nonneg_left ((Matrix.norm_entry_le_entrywise_sup_norm _).trans h1)
+          (inv_pos.mpr hM0).le
       _ = 1 := inv_mul_cancel₀ hM0.ne'
   refine ⟨M ^ m * C ^ |A| * max c 0, CkOn_th hE hEG hCk, ?_⟩
   intro u v hu hv hlen g hg
@@ -334,8 +342,9 @@ theorem main (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (γ : Matrix (Fin (k 
     rw [List.map_map]; exact List.map_congr_left (fun X _ => hgb X)
   have hFk : CkOn (((u.map Yb).length + (v.map Yb).length : ℕ) : ℕ∞) (GV k r) F :=
     CkOn_mono (by simp only [List.length_map]; omega) hCk
-  have key : dLR u v (F ∘ th k r γ) g =
-      (M ^ (u.length + v.length) : ℝ) • dLR (v.map Yb) (u.map Yb) F (th k r γ g) := by
+  have key
+      : dLR u v (F ∘ th k r γ) g
+        = (M ^ (u.length + v.length) : ℝ) • dLR (v.map Yb) (u.map Yb) F (th k r γ g) := by
     unfold dLR Rw
     rw [Rw_th hE, Lw_th hE, eu, ev, Rw_scale, Lw_scale, Rw_fsmul, smul_smul, Function.comp_apply,
       Pi.smul_apply, comm _ _ (fun X hX => (huY X hX).1) (fun X hX => (hvY X hX).1) F hFk _ hthg,
@@ -351,17 +360,19 @@ theorem main (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (γ : Matrix (Fin (k 
   have hMp : (0 : ℝ) ≤ M ^ (u.length + v.length) := pow_nonneg hM0.le _
   have hCA : (0 : ℝ) ≤ C ^ |A| := Real.rpow_nonneg hC0'.le _
   rw [key, norm_smul, Real.norm_eq_abs, abs_of_nonneg hMp]
-  calc gN g ^ A * (M ^ (u.length + v.length) * ‖dLR (v.map Yb) (u.map Yb) F (th k r γ g)‖)
-      ≤ (C ^ |A| * gN (th k r γ g) ^ A) * (M ^ (u.length + v.length) *
-          ‖dLR (v.map Yb) (u.map Yb) F (th k r γ g)‖) :=
-        mul_le_mul_of_nonneg_right hcmp (mul_nonneg hMp (norm_nonneg _))
-    _ = M ^ (u.length + v.length) * C ^ |A| *
-          (gN (th k r γ g) ^ A * ‖dLR (v.map Yb) (u.map Yb) F (th k r γ g)‖) := by ring
+  calc
+    gN g ^ A * (M ^ (u.length + v.length) * ‖dLR (v.map Yb) (u.map Yb) F (th k r γ g)‖)
+        ≤ (C ^ |A| * gN (th k r γ g) ^ A)
+          * (M ^ (u.length + v.length) * ‖dLR (v.map Yb) (u.map Yb) F (th k r γ g)‖) :=
+      mul_le_mul_of_nonneg_right hcmp (mul_nonneg hMp (norm_nonneg _))
+    _ = M ^ (u.length + v.length) * C ^ |A|
+        * (gN (th k r γ g) ^ A * ‖dLR (v.map Yb) (u.map Yb) F (th k r γ g)‖) := by
+      ring
     _ ≤ M ^ (u.length + v.length) * C ^ |A| * max c 0 :=
-        mul_le_mul_of_nonneg_left (hD.trans (le_max_left _ _)) (mul_nonneg hMp hCA)
+      mul_le_mul_of_nonneg_left (hD.trans (le_max_left _ _)) (mul_nonneg hMp hCA)
     _ ≤ M ^ m * C ^ |A| * max c 0 :=
-        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (pow_le_pow_right₀ hM1 hlen) hCA)
-          (le_max_right _ _)
+      mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (pow_le_pow_right₀ hM1 hlen) hCA)
+        (le_max_right _ _)
 
 end ReciprocityTheory.ChartRestriction.DS.Mult1.InvCC
 

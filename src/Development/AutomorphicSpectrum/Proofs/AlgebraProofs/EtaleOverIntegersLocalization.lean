@@ -11,16 +11,20 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.EqO
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Filter Topology
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Points GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjSpace GlobalTheory.CompanionTheory.Ar.BaseZ
+open GlobalTheory GlobalTheory.Points GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts
+  GlobalTheory.ProjSpace GlobalTheory.CompanionTheory.Ar.BaseZ
 
 namespace GlobalTheory.CompanionTheory.CommAlg.OrderEtale
 
-theorem formallyUnramified_fractionRing (k K : Type) [CommRing k] [IsDomain k] [CharZero k]
-    [Module.Finite ℤ k] [Field K] [Algebra k K] [IsFractionRing k K] [Algebra ℤ K] :
-    Algebra.FormallyUnramified ℤ K := by
+theorem formallyUnramified_fractionRing
+    (k K : Type) [CommRing k] [IsDomain k] [CharZero k] [Module.Finite ℤ k] [Field K] [Algebra k K]
+    [IsFractionRing k K] [Algebra ℤ K]
+    : Algebra.FormallyUnramified ℤ K := by
   have hinj : Function.Injective (algebraMap k K) := IsFractionRing.injective k K
   haveI : CharZero K := charZero_of_injective_algebraMap hinj
   letI : Algebra ℚ K := DivisionRing.toRatAlgebra
@@ -28,8 +32,7 @@ theorem formallyUnramified_fractionRing (k K : Type) [CommRing k] [IsDomain k] [
   haveI := IsScalarTower.of_algebraMap_eq' (R := ℤ) (S := k) (A := K) (RingHom.ext_int _ _)
   haveI : Algebra.IsIntegral ℤ k := Algebra.IsIntegral.of_finite ℤ k
   have hint : ∀ a : k, IsIntegral ℚ (algebraMap k K a) := fun a =>
-    IsIntegral.tower_top (A := ℚ)
-      ((Algebra.IsIntegral.isIntegral (R := ℤ) a).algebraMap (B := K))
+    IsIntegral.tower_top (A := ℚ) ((Algebra.IsIntegral.isIntegral (R := ℤ) a).algebraMap (B := K))
   haveI : Algebra.IsAlgebraic ℚ K := by
     constructor
     intro x
@@ -42,8 +45,8 @@ theorem formallyUnramified_fractionRing (k K : Type) [CommRing k] [IsDomain k] [
   haveI : Algebra.FormallyUnramified ℤ ℚ := Algebra.FormallyUnramified.of_isLocalization (nonZeroDivisors ℤ)
   exact Algebra.FormallyUnramified.comp ℤ ℚ K
 
-theorem isUnramifiedAt_bot (k : Type) [CommRing k] [IsDomain k] [CharZero k]
-    [Module.Finite ℤ k] : Algebra.IsUnramifiedAt ℤ (⊥ : Ideal k) := by
+theorem isUnramifiedAt_bot (k : Type) [CommRing k] [IsDomain k] [CharZero k] [Module.Finite ℤ k]
+    : Algebra.IsUnramifiedAt ℤ (⊥ : Ideal k) := by
   have hM : (⊥ : Ideal k).primeCompl = nonZeroDivisors k := by
     ext x
     simp [Ideal.mem_primeCompl_iff, mem_nonZeroDivisors_iff_ne_zero]
@@ -54,8 +57,8 @@ theorem isUnramifiedAt_bot (k : Type) [CommRing k] [IsDomain k] [CharZero k]
   letI : Field (Localization.AtPrime (⊥ : Ideal k)) := IsFractionRing.toField k
   exact formallyUnramified_fractionRing k (Localization.AtPrime (⊥ : Ideal k))
 
-theorem exists_etale_away (k : Type) [CommRing k] [IsDomain k] [CharZero k] [Module.Finite ℤ k] :
-    ∃ N : ℕ, N ≠ 0 ∧ (Int.castRingHom (Localization.Away (N : k))).Etale := by
+theorem exists_etale_away (k : Type) [CommRing k] [IsDomain k] [CharZero k] [Module.Finite ℤ k]
+    : ∃ N : ℕ, N ≠ 0 ∧ (Int.castRingHom (Localization.Away (N : k))).Etale := by
   have hU : IsOpen (Algebra.unramifiedLocus ℤ k) := Algebra.isOpen_unramifiedLocus
   have hbot : (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum k) ∈ Algebra.unramifiedLocus ℤ k :=
     isUnramifiedAt_bot k
@@ -69,7 +72,8 @@ theorem exists_etale_away (k : Type) [CommRing k] [IsDomain k] [CharZero k] [Mod
     Ideal.comap_ne_bot_of_integral_mem hf0 (Ideal.subset_span rfl) (Algebra.IsIntegral.isIntegral f)
   obtain ⟨m, hm, hm0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
   rw [Ideal.mem_comap, Ideal.mem_span_singleton, eq_intCast] at hm
-  have hmN : (m : k) ∣ ((m.natAbs : ℤ) : k) := map_dvd (Int.castRingHom k) (Int.dvd_natAbs.mpr dvd_rfl)
+  have hmN : (m : k) ∣ ((m.natAbs : ℤ) : k) :=
+    map_dvd (Int.castRingHom k) (Int.dvd_natAbs.mpr dvd_rfl)
   have hfN : f ∣ ((m.natAbs : ℕ) : k) := by
     have := hm.trans hmN
     simpa using this
@@ -82,18 +86,23 @@ theorem exists_etale_away (k : Type) [CommRing k] [IsDomain k] [CharZero k] [Mod
     exact PrimeSpectrum.basicOpen_mul_le_left f g
   have hfree : Module.Free ℤ k := Module.free_of_finite_type_torsion_free'
   have hflat : Module.Flat ℤ (Localization.Away ((m.natAbs : ℕ) : k)) := by
-    have := IsLocalization.flat (Localization.Away ((m.natAbs : ℕ) : k))
-      (Submonoid.powers ((m.natAbs : ℕ) : k))
+    have :=
+      IsLocalization.flat (Localization.Away ((m.natAbs : ℕ) : k))
+        (Submonoid.powers ((m.natAbs : ℕ) : k))
     exact Module.Flat.trans ℤ k _
   have hfp : Algebra.FinitePresentation ℤ (Localization.Away ((m.natAbs : ℕ) : k)) := by
-    have : Algebra.FinitePresentation ℤ k := Algebra.FinitePresentation.of_finiteType.mp inferInstance
-    have := IsLocalization.Away.finitePresentation (S := Localization.Away ((m.natAbs : ℕ) : k))
-      ((m.natAbs : ℕ) : k)
+    have : Algebra.FinitePresentation ℤ k :=
+      Algebra.FinitePresentation.of_finiteType.mp inferInstance
+    have :=
+      IsLocalization.Away.finitePresentation (S := Localization.Away ((m.natAbs : ℕ) : k))
+        ((m.natAbs : ℕ) : k)
     exact Algebra.FinitePresentation.trans ℤ k _
   have hE : Algebra.Etale ℤ (Localization.Away ((m.natAbs : ℕ) : k)) :=
     Algebra.Etale.of_formallyUnramified_of_flat
-  have h2 : Int.castRingHom (Localization.Away ((m.natAbs : ℕ) : k)) =
-      algebraMap ℤ (Localization.Away ((m.natAbs : ℕ) : k)) := RingHom.ext_int _ _
+  have h2
+      : Int.castRingHom (Localization.Away ((m.natAbs : ℕ) : k))
+        = algebraMap ℤ (Localization.Away ((m.natAbs : ℕ) : k)) :=
+    RingHom.ext_int _ _
   rw [h2, RingHom.etale_algebraMap]
   exact hE
 

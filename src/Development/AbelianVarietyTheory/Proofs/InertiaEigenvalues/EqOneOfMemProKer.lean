@@ -8,16 +8,23 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun GlobalTheory.Published GlobalTheory.ResSel GlobalTheory.StepTwo
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun
+  GlobalTheory.Published GlobalTheory.ResSel GlobalTheory.StepTwo
 
 namespace GlobalTheory.TameRead
 
 open GlobalTheory.TameQuot
 
-theorem eq_one_of_mem_proKer {I M : Type} [Group I] [TopologicalSpace I] [IsTopologicalGroup I]
-    [CompactSpace I] [AddCommGroup M] {l : ℕ} [Fact l.Prime] {k : ℕ}
-    (hM : ∀ m : M, (l ^ k) • m = 0) (θ : I →* Multiplicative M)
-    (ho : IsOpen (θ.ker : Set I)) {σ : I} (hσ : σ ∈ proKer l I) : θ σ = 1 := by
+theorem eq_one_of_mem_proKer
+    {I M : Type}
+    [Group I] [TopologicalSpace I] [IsTopologicalGroup I] [CompactSpace I] [AddCommGroup M]
+    {l : ℕ} [Fact l.Prime]
+    {k : ℕ} (hM : ∀ m : M, (l ^ k) • m = 0)
+    (θ : I →* Multiplicative M) (ho : IsOpen (θ.ker : Set I))
+    {σ : I} (hσ : σ ∈ proKer l I)
+    : θ σ = 1 := by
   refine mem_proKer.1 hσ θ.ker inferInstance ho ?_
   have := Subgroup.quotient_finite_of_isOpen _ ho
   refine IsPGroup.iff_card.1 fun x => ⟨k, ?_⟩
@@ -25,17 +32,31 @@ theorem eq_one_of_mem_proKer {I M : Type} [Group I] [TopologicalSpace I] [IsTopo
   rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff, MonoidHom.mem_ker, map_pow]
   exact hM (θ τ).toAdd
 
-theorem exists_gen_read : TameQuotient → ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)), IsPlaceOver A v → ((l : ℕ) : 𝓞 F) ∉ v.asIdeal → ∃ γ ∈ Ine (F := F) A, ∀ (R : Type) [CommRing R] (M : Type) [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M] (rho : Representation R (G F Ω) M) (k : ℕ), (∀ m : M, (l ^ k) • m = 0) → normV v ≡ 1 [MOD l ^ k] → (∀ σ ∈ Ine (F := F) A, ∀ m, rho σ m = m) → ∀ z : Z1 rho, (z.1 γ = 0 → ∀ σ ∈ Ine (F := F) A, z.1 σ = 0) ∧ ∀ φ : G F Ω, IsFrob A (normV v) φ → rho φ (z.1 γ) = z.1 γ := by
+theorem exists_gen_read
+    : TameQuotient
+      → ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+          [Fact l.Prime] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)),
+        IsPlaceOver A v → ((l : ℕ) : 𝓞 F) ∉ v.asIdeal
+          → ∃ γ ∈ Ine (F := F) A,
+            ∀ (R : Type) [CommRing R] (M : Type) [AddCommGroup M] [Module R M] [TopologicalSpace M]
+                [DiscreteTopology M] (rho : Representation R (G F Ω) M) (k : ℕ),
+              (∀ m : M, (l ^ k) • m = 0) → normV v ≡ 1 [MOD l ^ k]
+                → (∀ σ ∈ Ine (F := F) A, ∀ m, rho σ m = m)
+                → ∀ z : Z1 rho,
+                  (z.1 γ = 0 → ∀ σ ∈ Ine (F := F) A, z.1 σ = 0)
+                    ∧ ∀ φ : G F Ω, IsFrob A (normV v) φ → rho φ (z.1 γ) = z.1 γ := by
   intro hT F Ω _ _ _ _ _ l _ A v hA hl
   obtain ⟨-, -, -, -, ⟨γ, hγ⟩, hrel⟩ := hT F Ω l A v hA hl
   refine ⟨γ, hγ.1, ?_⟩
   intro R _ M _ _ _ _ rho k hM hq hI z
   have : CompactSpace (Ine (F := F) A) := isCompact_iff_compactSpace.1 (isClosed_Ine A).isCompact
   let θ : Ine (F := F) A →* Multiplicative M :=
-    MonoidHom.mk' (fun g => Multiplicative.ofAdd (z.1 g)) fun g h => by
-      have := z.2.2 (g : G F Ω) h
-      rw [hI _ g.2] at this
-      exact congrArg Multiplicative.ofAdd this
+    MonoidHom.mk'
+      (fun g => Multiplicative.ofAdd (z.1 g))
+      fun g h => by
+        have := z.2.2 (g : G F Ω) h
+        rw [hI _ g.2] at this
+        exact congrArg Multiplicative.ofAdd this
   have ho : IsOpen (θ.ker : Set (Ine (F := F) A)) :=
     (isOpen_discrete {0}).preimage (z.2.1.comp continuous_subtype_val)
   have hJ : ∀ σ ∈ ineKer F A l, z.1 σ = 0 := fun σ hσ =>

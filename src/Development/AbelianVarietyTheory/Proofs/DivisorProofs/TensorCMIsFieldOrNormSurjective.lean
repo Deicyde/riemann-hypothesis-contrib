@@ -7,22 +7,27 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Hermit
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published GlobalTheory.PlaneNorm
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.Published GlobalTheory.PlaneNorm
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.NormDichotomy
 
-theorem unit_or_norm : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (K : Type) [Field K] [Algebra F K], (∀ a : K ⊗[F] E, a ≠ 0 → IsUnit a) ∨ (∀ k : K, k ≠ 0 → ∃ t : K ⊗[F] E, t * sigR K σ t = algebraMap K (K ⊗[F] E) k) := by
+theorem unit_or_norm
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (K : Type) [Field K] [Algebra F K],
+          (∀ a : K ⊗[F] E, a ≠ 0 → IsUnit a)
+            ∨ (∀ k : K, k ≠ 0 → ∃ t : K ⊗[F] E, t * sigR K σ t = algebraMap K (K ⊗[F] E) k) := by
   intro F E _ _ _ _ _ σ h K _ _
 
   obtain ⟨e, he⟩ := GlobalTheory.HermLineZeros.exists_conj_ne h
   set d : E := e - σ e with hd
-  have hσd : σ d = -d := by
-    rw [hd, map_sub, GlobalTheory.HermLineZeros.conj_invol h]; ring
-  have hd0 : d ≠ 0 := by
-    intro h0; apply he; rw [hd, sub_eq_zero] at h0; exact h0.symm
+  have hσd : σ d = -d := by rw [hd, map_sub, GlobalTheory.HermLineZeros.conj_invol h]; ring
+  have hd0 : d ≠ 0 := by intro h0; apply he; rw [hd, sub_eq_zero] at h0; exact h0.symm
   have hfix : σ (d * d) = d * d := by rw [map_mul, hσd]; ring
   obtain ⟨c0, hc0⟩ := GlobalTheory.HermLineZeros.exists_of_fixed h _ hfix
   haveI : CharZero F := inferInstance
@@ -72,7 +77,8 @@ theorem unit_or_norm : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
     have h0 : bK 0 = 1 := by
       simp only [bK, Algebra.TensorProduct.basis_apply, hb, Matrix.cons_val_zero]; rfl
     have h1 : bK 1 = D := by
-      simp only [bK, Algebra.TensorProduct.basis_apply, hb, Matrix.cons_val_one, Matrix.head_cons]; rfl
+      simp only [bK, Algebra.TensorProduct.basis_apply, hb, Matrix.cons_val_one, Matrix.head_cons]
+      rfl
     rw [h0, h1, Algebra.smul_def, Algebra.smul_def, mul_one]
   by_cases hsq : ∃ r : K, r * r = c
   · right

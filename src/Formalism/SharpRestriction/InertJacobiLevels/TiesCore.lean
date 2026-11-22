@@ -42,8 +42,8 @@ def rhoB (D : GD) (K : Consts) (s : Scale) : ℝ :=
   4 * Nstar D s * s.x ^ s.eps * La K s / D.R.k + K.rho * K.CN * Real.log s.x * La K s / D.R.k
 
 def InBand (D : GD) (K : Consts) (s : Scale) (p : ℕ) : Prop :=
-  s.p0 D.R.k ≤ (p : ℝ) ∧ (p : ℝ) < s.X' ∧ ∃ d : ℕ, 1 ≤ d ∧
-    s.X' * (1 - rhoB D K s) ≤ (p : ℝ) ^ d ∧ (p : ℝ) ^ d ≤ s.X' * (1 + rhoB D K s)
+  s.p0 D.R.k ≤ (p : ℝ) ∧ (p : ℝ) < s.X'
+    ∧ ∃ d : ℕ, 1 ≤ d ∧ s.X' * (1 - rhoB D K s) ≤ (p : ℝ) ^ d ∧ (p : ℝ) ^ d ≤ s.X' * (1 + rhoB D K s)
 
 def hP (D : GD) (p : ℕ) : HH D := D.hPf p
 
@@ -80,19 +80,10 @@ def Good (_X : Inst D L) (p : ℕ) (t0 : HH D) : Prop :=
   IsGoodOrbit (addOrderOf (hP D p)) (topsPos D p t0) (L2 D L.sc) (KG L.sc) (rG L.sc) L.sc.delta1
     (hG L.sc) L.sc.x
 
-
-
-
-
 def Cand (D : GD) (L : GParameters D) (K : Consts) (p : ℕ) : Prop :=
-  p.Prime ∧ (p : ℝ) < L.sc.X' ∧ IsResidueClassZero D p ∧ L.sc.x ^ (L.sc.eps / 4) ≤ (addOrderOf (hP D p) : ℝ) ∧
-    (L.sc.p0 D.R.k ≤ (p : ℝ) → ¬ InBand D K L.sc p)
-
-
-
-
-
-
+  p.Prime ∧ (p : ℝ) < L.sc.X' ∧ IsResidueClassZero D p
+    ∧ L.sc.x ^ (L.sc.eps / 4) ≤ (addOrderOf (hP D p) : ℝ)
+    ∧ (L.sc.p0 D.R.k ≤ (p : ℝ) → ¬ InBand D K L.sc p)
 
 end Formalism.MainNotions.Inhab.GC
 

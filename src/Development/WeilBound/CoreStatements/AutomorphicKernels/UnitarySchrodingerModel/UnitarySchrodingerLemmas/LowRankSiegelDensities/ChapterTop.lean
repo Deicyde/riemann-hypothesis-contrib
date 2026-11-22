@@ -5,5 +5,7 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.UnitarySch
 
 @[expose] public section
 
-theorem PositivityTheory.PfSWUS.HMass.siegelDensitiesLowA : PositivityTheory.PfSWUS.HMass.SiegelDensitiesLowA :=
-  PositivityTheory.PfSWUS.HMass.siegelDensitiesLowA_of_sch PositivityTheory.PfSWUS.SchInf.schwartzDensInf
+theorem PositivityTheory.PfSWUS.HMass.siegelDensitiesLowA
+    : PositivityTheory.PfSWUS.HMass.SiegelDensitiesLowA :=
+  PositivityTheory.PfSWUS.HMass.siegelDensitiesLowA_of_sch
+    PositivityTheory.PfSWUS.SchInf.schwartzDensInf

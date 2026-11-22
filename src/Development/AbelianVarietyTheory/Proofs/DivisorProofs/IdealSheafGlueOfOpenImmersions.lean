@@ -30,8 +30,10 @@ lemma app_bijective {Q X : Scheme.{u}} (f : Q ⟶ X) [IsOpenImmersion f] (W : X.
   rw [f.image_preimage_eq_opensRange_inf]
   exact inf_eq_right.mpr hW
 
-noncomputable def loc {P X : Scheme.{u}} (f : P ⟶ X) (J : P.IdealSheafData) (W : X.affineOpens)
-    (h : IsAffineOpen (f ⁻¹ᵁ W.1)) : Ideal Γ(X, W) :=
+noncomputable def loc
+    {P X : Scheme.{u}}
+    (f : P ⟶ X) (J : P.IdealSheafData) (W : X.affineOpens) (h : IsAffineOpen (f ⁻¹ᵁ W.1))
+    : Ideal Γ(X, W) :=
   (J.ideal ⟨f ⁻¹ᵁ W.1, h⟩).comap (f.app W.1).hom
 
 lemma loc_congr {P X : Scheme.{u}} {f f' : P ⟶ X} (hf : f = f') {J J' : P.IdealSheafData}
@@ -122,27 +124,31 @@ lemma loc_indep {X : Scheme.{u}} {ι : Type*} (P : ι → Scheme.{u}) (e : ∀ i
       (W.2.preimage_of_isOpenImmersion _ hr') h']
   exact loc_congr hc (hK i j _ _ _ hc) _ _ _
 
-theorem idealSheaf_glue_of_openImmersions :
-    (∀ {X : Scheme.{0}} (𝒜 : Set X.affineOpens), (∀ W ∈ 𝒜, ∀ W' : X.affineOpens, W' ≤ W → W' ∈ 𝒜) →
-      (∀ x : X, ∃ W ∈ 𝒜, x ∈ W.1) → ∀ (k : ∀ W : X.affineOpens, Ideal Γ(X, W)),
-      (∀ W ∈ 𝒜, ∀ (W' : X.affineOpens) (h : W' ≤ W),
-        (k W).map (X.presheaf.map (homOfLE h).op).hom = k W') →
-      ∃ I : X.IdealSheafData, ∀ W ∈ 𝒜, I.ideal W = k W) →
-    ∀ {X : Scheme.{0}} {ι : Type*} (P : ι → Scheme.{0}) (e : ∀ i, P i ⟶ X),
-      (∀ i, IsOpenImmersion (e i)) → (∀ x : X, ∃ i, x ∈ Set.range (e i)) →
-      ∀ (K : ∀ i, (P i).IdealSheafData),
-      (∀ i j (Q : Scheme.{0}) (a : Q ⟶ P i) (b : Q ⟶ P j), a ≫ e i = b ≫ e j →
-        (K i).comap a = (K j).comap b) →
-      ∃ I : X.IdealSheafData, ∀ i, I.comap (e i) = K i := by
+theorem idealSheaf_glue_of_openImmersions
+    : (∀ {X : Scheme.{0}} (𝒜 : Set X.affineOpens),
+        (∀ W ∈ 𝒜, ∀ W' : X.affineOpens, W' ≤ W → W' ∈ 𝒜) → (∀ x : X, ∃ W ∈ 𝒜, x ∈ W.1)
+          → ∀ (k : ∀ W : X.affineOpens, Ideal Γ(X, W)),
+            (∀ W ∈ 𝒜, ∀ (W' : X.affineOpens) (h : W' ≤ W),
+                (k W).map (X.presheaf.map (homOfLE h).op).hom = k W')
+              → ∃ I : X.IdealSheafData, ∀ W ∈ 𝒜, I.ideal W = k W)
+      → ∀ {X : Scheme.{0}} {ι : Type*} (P : ι → Scheme.{0}) (e : ∀ i, P i ⟶ X),
+        (∀ i, IsOpenImmersion (e i)) → (∀ x : X, ∃ i, x ∈ Set.range (e i))
+          → ∀ (K : ∀ i, (P i).IdealSheafData),
+            (∀ i j (Q : Scheme.{0}) (a : Q ⟶ P i) (b : Q ⟶ P j),
+                a ≫ e i = b ≫ e j → (K i).comap a = (K j).comap b)
+              → ∃ I : X.IdealSheafData, ∀ i, I.comap (e i) = K i := by
   intro hA X ι P e he hcov K hK
   classical
   have haff : ∀ i (W : X.affineOpens), W.1 ≤ (e i).opensRange → IsAffineOpen ((e i) ⁻¹ᵁ W.1) :=
     fun i W hW => W.2.preimage_of_isOpenImmersion (e i) hW
   let k : ∀ W : X.affineOpens, Ideal Γ(X, W) := fun W =>
     if hex : ∃ i, W.1 ≤ (e i).opensRange then
-      loc (e hex.choose) (K hex.choose) W (haff _ W hex.choose_spec) else ⊤
-  have hk : ∀ i (W : X.affineOpens) (hW : W.1 ≤ (e i).opensRange),
-      k W = loc (e i) (K i) W (haff i W hW) := by
+      loc (e hex.choose) (K hex.choose) W (haff _ W hex.choose_spec)
+    else
+      ⊤
+  have hk
+      : ∀ i (W : X.affineOpens) (hW : W.1 ≤ (e i).opensRange),
+        k W = loc (e i) (K i) W (haff i W hW) := by
     intro i W hW
     have hex : ∃ i, W.1 ≤ (e i).opensRange := ⟨i, hW⟩
     simp only [k, dif_pos hex]
@@ -150,27 +156,31 @@ theorem idealSheaf_glue_of_openImmersions :
   have hcov' : ∀ x : X, ∃ W : X.affineOpens, ∃ i, W.1 ≤ (e i).opensRange ∧ x ∈ W.1 := by
     intro x
     obtain ⟨i, y, rfl⟩ := hcov x
-    obtain ⟨W, hW, hxW, hWle⟩ := TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens
-      (show e i y ∈ (e i).opensRange from ⟨y, rfl⟩)
+    obtain ⟨W, hW, hxW, hWle⟩ :=
+      TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens
+        (show e i y ∈ (e i).opensRange from ⟨y, rfl⟩)
     exact ⟨⟨W, hW⟩, i, hWle, hxW⟩
-  obtain ⟨I, hI⟩ := hA {W | ∃ i, W.1 ≤ (e i).opensRange}
-    (fun W ⟨i, hi⟩ W' hW' => ⟨i, (show W'.1 ≤ W.1 from hW').trans hi⟩)
-    (fun x => by
-      obtain ⟨W, i, hi, hx⟩ := hcov' x
-      exact ⟨W, ⟨i, hi⟩, hx⟩)
-    k
-    (fun W ⟨i, hi⟩ W' hW' => by
-      have hi' : W'.1 ≤ (e i).opensRange := (show W'.1 ≤ W.1 from hW').trans hi
-      rw [hk i W hi, hk i W' hi']
-      exact loc_map (e i) (K i) W W' hW' hi _ _)
+  obtain ⟨I, hI⟩ :=
+    hA {W | ∃ i, W.1 ≤ (e i).opensRange}
+      (fun W ⟨i, hi⟩ W' hW' => ⟨i, (show W'.1 ≤ W.1 from hW').trans hi⟩)
+      (fun x => by
+        obtain ⟨W, i, hi, hx⟩ := hcov' x
+        exact ⟨W, ⟨i, hi⟩, hx⟩)
+      k
+      (fun W ⟨i, hi⟩ W' hW' => by
+        have hi' : W'.1 ≤ (e i).opensRange := (show W'.1 ≤ W.1 from hW').trans hi
+        rw [hk i W hi, hk i W' hi']
+        exact loc_map (e i) (K i) W W' hW' hi _ _)
   refine ⟨I, fun i => ?_⟩
   refine Scheme.IdealSheafData.ext_of_iSup_eq_top
     (ι := {W : X.affineOpens // W.1 ≤ (e i).opensRange})
-    (fun W => ⟨(e i) ⁻¹ᵁ W.1.1, haff i W.1 W.2⟩) ?_ ?_
+    (fun W => ⟨(e i) ⁻¹ᵁ W.1.1, haff i W.1 W.2⟩)
+    ?_ ?_
   · rw [eq_top_iff]
     intro y _
-    obtain ⟨W, hW, hyW, hWle⟩ := TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens
-      (show e i y ∈ (e i).opensRange from ⟨y, rfl⟩)
+    obtain ⟨W, hW, hyW, hWle⟩ :=
+      TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens
+        (show e i y ∈ (e i).opensRange from ⟨y, rfl⟩)
     exact TopologicalSpace.Opens.mem_iSup.mpr ⟨⟨⟨W, hW⟩, hWle⟩, hyW⟩
   · intro W
     apply Ideal.comap_injective_of_surjective _ (app_bijective (e i) W.1.1 W.2).2

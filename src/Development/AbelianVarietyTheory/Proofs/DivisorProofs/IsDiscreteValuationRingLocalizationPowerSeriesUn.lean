@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValue
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke.FibreFramesOnModels
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.IndefiniteRowSideFullHecke.FibreFramesOnModels
 open GlobalTheory.KeyUnitModels
 open GlobalTheory.LocM (KeyAt)
 open GlobalTheory.FlagMod (GChart ev tau tau_le le_preimage_comp)
@@ -17,10 +19,10 @@ set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.PowerSeriesUniformiser
 
-theorem span_C_eq_ker {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {ϖ : A}
-    (hϖ : Irreducible ϖ) :
-    Ideal.span {(PowerSeries.C ϖ : PowerSeries A)} =
-      RingHom.ker (PowerSeries.map (IsLocalRing.residue A)) := by
+theorem span_C_eq_ker
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {ϖ : A} (hϖ : Irreducible ϖ)
+    : Ideal.span {(PowerSeries.C ϖ : PowerSeries A)}
+      = RingHom.ker (PowerSeries.map (IsLocalRing.residue A)) := by
   have hm : IsLocalRing.maximalIdeal A = Ideal.span {ϖ} :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).1 hϖ
   ext f
@@ -41,28 +43,35 @@ theorem span_C_eq_ker {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationR
     ext n
     rw [PowerSeries.coeff_C_mul, PowerSeries.coeff_mk, hb]
 
-theorem span_C_isPrime {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {ϖ : A}
-    (hϖ : Irreducible ϖ) : (Ideal.span {(PowerSeries.C ϖ : PowerSeries A)}).IsPrime := by
+theorem span_C_isPrime
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {ϖ : A} (hϖ : Irreducible ϖ)
+    : (Ideal.span {(PowerSeries.C ϖ : PowerSeries A)}).IsPrime := by
   rw [span_C_eq_ker hϖ]
   exact RingHom.ker_isPrime _
 
-theorem isDiscreteValuationRing_atPrime_span {R : Type} [CommRing R] [IsDomain R] [IsNoetherianRing R] {π : R}
-    (h0 : π ≠ 0) [(Ideal.span {π}).IsPrime] :
-    IsDiscreteValuationRing (Localization.AtPrime (Ideal.span {π})) := by
-  have hm : IsLocalRing.maximalIdeal (Localization.AtPrime (Ideal.span {π})) =
-      Ideal.span {algebraMap R _ π} := by
+theorem isDiscreteValuationRing_atPrime_span
+    {R : Type} [CommRing R] [IsDomain R] [IsNoetherianRing R]
+    {π : R} (h0 : π ≠ 0) [(Ideal.span {π}).IsPrime]
+    : IsDiscreteValuationRing (Localization.AtPrime (Ideal.span {π})) := by
+  have hm
+      : IsLocalRing.maximalIdeal (Localization.AtPrime (Ideal.span {π}))
+        = Ideal.span {algebraMap R _ π} := by
     rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_span, Set.image_singleton]
   have hinj : Function.Injective (algebraMap R (Localization.AtPrime (Ideal.span {π}))) :=
     IsLocalization.injective _ (Ideal.span {π}).primeCompl_le_nonZeroDivisors
   have hnf : ¬ IsField (Localization.AtPrime (Ideal.span {π})) := fun hf => by
     rw [IsLocalRing.isField_iff_maximalIdeal_eq, hm, Ideal.span_singleton_eq_bot] at hf
     exact h0 (hinj (hf.trans (map_zero _).symm))
-  have hp : (IsLocalRing.maximalIdeal (Localization.AtPrime (Ideal.span {π}))).IsPrincipal := ⟨_, hm⟩
+  have hp : (IsLocalRing.maximalIdeal (Localization.AtPrime (Ideal.span {π}))).IsPrincipal :=
+    ⟨_, hm⟩
   exact ((IsDiscreteValuationRing.TFAE _ hnf).out 1 5).2 hp
 
-theorem main : ∀ (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] (ϖ : A), Irreducible ϖ →
-    ∃ _ : (Ideal.span {(PowerSeries.C ϖ : PowerSeries A)}).IsPrime,
-      IsDiscreteValuationRing (Localization.AtPrime (Ideal.span {(PowerSeries.C ϖ : PowerSeries A)})) := by
+theorem main
+    : ∀ (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] (ϖ : A),
+      Irreducible ϖ
+        → ∃ _ : (Ideal.span {(PowerSeries.C ϖ : PowerSeries A)}).IsPrime,
+          IsDiscreteValuationRing (Localization.AtPrime (Ideal.span
+            {(PowerSeries.C ϖ : PowerSeries A)})) := by
   intro A _ _ _ ϖ hϖ
   haveI := span_C_isPrime hϖ
   refine ⟨this, isDiscreteValuationRing_atPrime_span ?_⟩

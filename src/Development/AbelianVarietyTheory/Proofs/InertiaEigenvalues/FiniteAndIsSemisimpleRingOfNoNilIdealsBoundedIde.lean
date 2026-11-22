@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.AlgRing
 
-private theorem exists_idempotent_of_not_isNilpotent (k R : Type) [Field k] [Ring R] [Algebra k R]
-    (x : R) (hx : IsIntegral k x) (hn : ¬ IsNilpotent x) :
-    ∃ e : R, IsIdempotentElem e ∧ e ≠ 0 ∧ ∃ q : Polynomial k, e = x * Polynomial.aeval x q := by
+private theorem exists_idempotent_of_not_isNilpotent
+    (k R : Type) [Field k] [Ring R] [Algebra k R]
+    (x : R) (hx : IsIntegral k x) (hn : ¬ IsNilpotent x)
+    : ∃ e : R, IsIdempotentElem e ∧ e ≠ 0 ∧ ∃ q : Polynomial k, e = x * Polynomial.aeval x q := by
   have hp0 : minpoly k x ≠ 0 := minpoly.ne_zero hx
   obtain ⟨g, hpg, hg⟩ :=
     Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd (minpoly k x) hp0 0
@@ -17,30 +18,33 @@ private theorem exists_idempotent_of_not_isNilpotent (k R : Type) [Field k] [Rin
   have hcop : IsCoprime (Polynomial.X ^ (s + 1)) g :=
     (Polynomial.irreducible_X.coprime_iff_not_dvd.mpr hg).pow_left
   obtain ⟨a, b, hab⟩ := hcop
-  have hev : Polynomial.aeval x (Polynomial.X ^ s * g) = 0 := by
-    rw [← hpg]; exact minpoly.aeval k x
-  have hE : ∀ P : Polynomial k,
-      Polynomial.aeval x (P * (Polynomial.X ^ s * g)) = 0 := fun P => by rw [map_mul, hev, mul_zero]
+  have hev : Polynomial.aeval x (Polynomial.X ^ s * g) = 0 := by rw [← hpg]; exact minpoly.aeval k x
+  have hE : ∀ P : Polynomial k, Polynomial.aeval x (P * (Polynomial.X ^ s * g)) = 0 := fun P => by
+    rw [map_mul, hev, mul_zero]
   refine ⟨Polynomial.aeval x (a * Polynomial.X ^ (s + 1)), ?_, ?_, ⟨a * Polynomial.X ^ s, ?_⟩⟩
-  · have hpoly : (a * Polynomial.X ^ (s + 1)) * (a * Polynomial.X ^ (s + 1)) =
-        a * Polynomial.X ^ (s + 1) + (-(a * b * Polynomial.X)) * (Polynomial.X ^ s * g) := by
+  · have hpoly
+        : (a * Polynomial.X ^ (s + 1)) * (a * Polynomial.X ^ (s + 1))
+          = a * Polynomial.X ^ (s + 1) + (-(a * b * Polynomial.X)) * (Polynomial.X ^ s * g) := by
       linear_combination (a * Polynomial.X ^ (s + 1)) * hab
     unfold IsIdempotentElem
     rw [← map_mul, hpoly, map_add (f := _), hE, add_zero]
   · intro he
     apply hn
     refine ⟨s, ?_⟩
-    have hpoly : (Polynomial.X : Polynomial k) ^ s =
-        Polynomial.X ^ s * (a * Polynomial.X ^ (s + 1)) + b * (Polynomial.X ^ s * g) := by
+    have hpoly
+        : (Polynomial.X : Polynomial k) ^ s
+          = Polynomial.X ^ s * (a * Polynomial.X ^ (s + 1)) + b * (Polynomial.X ^ s * g) := by
       linear_combination (Polynomial.X ^ s) * hab.symm
     have := congrArg (Polynomial.aeval x) hpoly
     rwa [map_add, hE, add_zero, map_mul, he, mul_zero, map_pow, Polynomial.aeval_X] at this
   · have h : a * Polynomial.X ^ (s + 1) = Polynomial.X * (a * Polynomial.X ^ s) := by ring
     rw [h, map_mul, Polynomial.aeval_X]
 
-private theorem exists_idempotent_mem_left_multiples (k R : Type) [Field k] [Ring R] [Algebra k R]
+private theorem exists_idempotent_mem_left_multiples
+    (k R : Type) [Field k] [Ring R] [Algebra k R]
     (hint : ∀ x : R, IsIntegral k x) (hnil : ∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0)
-    (x : R) (hx : x ≠ 0) : ∃ e r : R, IsIdempotentElem e ∧ e ≠ 0 ∧ e = r * x := by
+    (x : R) (hx : x ≠ 0)
+    : ∃ e r : R, IsIdempotentElem e ∧ e ≠ 0 ∧ e = r * x := by
   have : ¬ ∀ y : R, IsNilpotent (y * x) := fun h => hx (hnil x h)
   push_neg at this
   obtain ⟨y, hy⟩ := this
@@ -50,12 +54,12 @@ private theorem exists_idempotent_mem_left_multiples (k R : Type) [Field k] [Rin
   refine ⟨_, Polynomial.aeval (y * x) q * y, he, he0, ?_⟩
   rw [hcomm.eq, mul_assoc]
 
-private theorem sum_eq_one_of_maximal_orthogonalIdempotents (k R : Type) [Field k] [Ring R]
-    [Algebra k R] (hint : ∀ x : R, IsIntegral k x)
-    (hnil : ∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0) {m : ℕ} (e : Fin m → R)
-    (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
-    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False) :
-    ∑ i, e i = 1 := by
+private theorem sum_eq_one_of_maximal_orthogonalIdempotents
+    (k R : Type) [Field k] [Ring R] [Algebra k R]
+    (hint : ∀ x : R, IsIntegral k x) (hnil : ∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0)
+    {m : ℕ} (e : Fin m → R) (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
+    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False)
+    : ∑ i, e i = 1 := by
   by_contra hsum
   set f := 1 - ∑ i, e i with hfdef
   have hf0 : f ≠ 0 := sub_ne_zero.mpr (Ne.symm hsum)
@@ -66,11 +70,12 @@ private theorem sum_eq_one_of_maximal_orthogonalIdempotents (k R : Type) [Field 
   have hfe : ∀ i, f * e i = 0 := fun i => by
     rw [hfdef, sub_mul, one_mul, Finset.sum_mul,
       Finset.sum_eq_single i (fun j _ hj => he.ortho hj) (by simp), (he.idem i).eq, sub_self]
-  obtain ⟨e', r, he', he'0, rfl⟩ :=
-    exists_idempotent_mem_left_multiples k R hint hnil f hf0
+  obtain ⟨e', r, he', he'0, rfl⟩ := exists_idempotent_mem_left_multiples k R hint hnil f hf0
   have hg : IsIdempotentElem (f * (r * f)) := by
     unfold IsIdempotentElem
-    calc f * (r * f) * (f * (r * f)) = f * (r * (f * f)) * (r * f) := by noncomm_ring
+    calc
+      f * (r * f) * (f * (r * f))
+        = f * (r * (f * f)) * (r * f) := by noncomm_ring
       _ = f * (r * f) := by rw [hf.eq, mul_assoc, he'.eq]
   have hg0 : f * (r * f) ≠ 0 := by
     intro h0
@@ -83,7 +88,8 @@ private theorem sum_eq_one_of_maximal_orthogonalIdempotents (k R : Type) [Field 
     | zero =>
       induction j using Fin.cases with
       | zero => exact absurd rfl hij
-      | succ j => simp only [Fin.cons_zero, Fin.cons_succ]; rw [mul_assoc, mul_assoc, hfe, mul_zero, mul_zero]
+      | succ j =>
+        simp only [Fin.cons_zero, Fin.cons_succ]; rw [mul_assoc, mul_assoc, hfe, mul_zero, mul_zero]
     | succ i =>
       induction j using Fin.cases with
       | zero => simp only [Fin.cons_zero, Fin.cons_succ]; rw [← mul_assoc, hef, zero_mul]
@@ -93,8 +99,9 @@ private theorem sum_eq_one_of_maximal_orthogonalIdempotents (k R : Type) [Field 
   · refine Fin.cases hg0 (fun i => ?_) i
     simpa using hne i
 
-private theorem not_isNilpotent_mul_mul_of_mul_eq_of_not_isNilpotent {R : Type} [Ring R] (f a y : R) (hl : f * a = a)
-    (hy : ¬ IsNilpotent (y * a)) : ¬ IsNilpotent (a * y * f) := by
+private theorem not_isNilpotent_mul_mul_of_mul_eq_of_not_isNilpotent
+    {R : Type} [Ring R] (f a y : R) (hl : f * a = a) (hy : ¬ IsNilpotent (y * a))
+    : ¬ IsNilpotent (a * y * f) := by
   have hpow : ∀ j : ℕ, (a * y) ^ (j + 1) = (a * y * f) ^ j * (a * y) := by
     intro j
     induction j with
@@ -112,27 +119,34 @@ private theorem not_isNilpotent_mul_mul_of_mul_eq_of_not_isNilpotent {R : Type} 
     | succ j ih => rw [pow_succ, ih, pow_succ]; simp only [mul_assoc]
   exact hy ⟨n + 2, by rw [hya, hpow, hn, zero_mul, mul_zero, zero_mul]⟩
 
-private theorem eq_of_idempotent_in_corner_of_maximal {R : Type} [Ring R] {m : ℕ} (e : Fin m → R)
-    (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
-    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False)
-    (i : Fin m) (f : R) (hf : IsIdempotentElem f) (hf0 : f ≠ 0) (hl : e i * f = f)
-    (hr : f * e i = f) : f = e i := by
+private theorem eq_of_idempotent_in_corner_of_maximal
+    {R : Type} [Ring R]
+    {m : ℕ} (e : Fin m → R) (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
+    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False) (i : Fin m)
+    (f : R) (hf : IsIdempotentElem f) (hf0 : f ≠ 0) (hl : e i * f = f) (hr : f * e i = f)
+    : f = e i := by
   by_contra hfe
   have hg : IsIdempotentElem (e i - f) := by
     unfold IsIdempotentElem
-    rw [sub_mul, mul_sub, mul_sub, (he.idem i).eq, hl, hr, hf.eq]; abel
+    rw [sub_mul, mul_sub, mul_sub, (he.idem i).eq, hl, hr, hf.eq]
+    abel
   have hg0 : e i - f ≠ 0 := sub_ne_zero.mpr (Ne.symm hfe)
   have hgf : (e i - f) * f = 0 := by rw [sub_mul, hl, hf.eq, sub_self]
   have hfg : f * (e i - f) = 0 := by rw [mul_sub, hr, hf.eq, sub_self]
-  have hjf : ∀ j, j ≠ i → e j * f = 0 := fun j hj => by rw [← hl, ← mul_assoc, he.ortho hj, zero_mul]
-  have hfj : ∀ j, j ≠ i → f * e j = 0 := fun j hj => by rw [← hr, mul_assoc, he.ortho hj.symm, mul_zero]
-  have hjg : ∀ j, j ≠ i → e j * (e i - f) = 0 := fun j hj => by rw [mul_sub, he.ortho hj, hjf j hj, sub_self]
-  have hgj : ∀ j, j ≠ i → (e i - f) * e j = 0 := fun j hj => by rw [sub_mul, he.ortho hj.symm, hfj j hj, sub_self]
+  have hjf : ∀ j, j ≠ i → e j * f = 0 := fun j hj => by
+    rw [← hl, ← mul_assoc, he.ortho hj, zero_mul]
+  have hfj : ∀ j, j ≠ i → f * e j = 0 := fun j hj => by
+    rw [← hr, mul_assoc, he.ortho hj.symm, mul_zero]
+  have hjg : ∀ j, j ≠ i → e j * (e i - f) = 0 := fun j hj => by
+    rw [mul_sub, he.ortho hj, hjf j hj, sub_self]
+  have hgj : ∀ j, j ≠ i → (e i - f) * e j = 0 := fun j hj => by
+    rw [sub_mul, he.ortho hj.symm, hfj j hj, sub_self]
   set u := Function.update e i f
   have hu : ∀ j, u j = if j = i then f else e j := fun j => Function.update_apply e i f j
   refine hmax (Fin.cons (e i - f) u) ⟨fun j => ?_, fun a b hab => ?_⟩ fun j => ?_
   · refine Fin.cases hg (fun j => ?_) j
-    simp only [Fin.cons_succ, hu]; split_ifs
+    simp only [Fin.cons_succ, hu]
+    split_ifs
     · exact hf
     · exact he.idem j
   · induction a using Fin.cases with
@@ -140,13 +154,15 @@ private theorem eq_of_idempotent_in_corner_of_maximal {R : Type} [Ring R] {m : �
       induction b using Fin.cases with
       | zero => exact absurd rfl hab
       | succ b =>
-        simp only [Fin.cons_zero, Fin.cons_succ, hu]; split_ifs with hb
+        simp only [Fin.cons_zero, Fin.cons_succ, hu]
+        split_ifs with hb
         · exact hgf
         · exact hgj b hb
     | succ a =>
       induction b using Fin.cases with
       | zero =>
-        simp only [Fin.cons_zero, Fin.cons_succ, hu]; split_ifs with ha
+        simp only [Fin.cons_zero, Fin.cons_succ, hu]
+        split_ifs with ha
         · exact hfg
         · exact hjg a ha
       | succ b =>
@@ -158,33 +174,35 @@ private theorem eq_of_idempotent_in_corner_of_maximal {R : Type} [Ring R] {m : �
         · exact hjf a ha
         · exact he.ortho hab'
   · refine Fin.cases hg0 (fun j => ?_) j
-    simp only [Fin.cons_succ, hu]; split_ifs
+    simp only [Fin.cons_succ, hu]
+    split_ifs
     · exact hf0
     · exact hne j
 
-private theorem exists_right_inverse_in_corner_of_not_isNilpotent (k R : Type) [Field k] [Ring R] [Algebra k R]
-    (hint : ∀ x : R, IsIntegral k x) {m : ℕ} (e : Fin m → R)
-    (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
-    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False)
-    (i : Fin m) (z : R) (hl : e i * z = z) (hr : z * e i = z) (hz : ¬ IsNilpotent z) :
-    ∃ t, e i * t = t ∧ z * t = e i := by
+private theorem exists_right_inverse_in_corner_of_not_isNilpotent
+    (k R : Type) [Field k] [Ring R] [Algebra k R]
+    (hint : ∀ x : R, IsIntegral k x)
+    {m : ℕ} (e : Fin m → R) (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
+    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False) (i : Fin m)
+    (z : R) (hl : e i * z = z) (hr : z * e i = z) (hz : ¬ IsNilpotent z)
+    : ∃ t, e i * t = t ∧ z * t = e i := by
   obtain ⟨f, hf, hf0, q, rfl⟩ := exists_idempotent_of_not_isNilpotent k R z (hint z) hz
   have hcomm : Commute z (Polynomial.aeval z q) := by
     simpa using (Polynomial.commute_X q).map (Polynomial.aeval z)
-  have hfl : e i * (z * Polynomial.aeval z q) = z * Polynomial.aeval z q := by
-    rw [← mul_assoc, hl]
+  have hfl : e i * (z * Polynomial.aeval z q) = z * Polynomial.aeval z q := by rw [← mul_assoc, hl]
   have hfr : z * Polynomial.aeval z q * e i = z * Polynomial.aeval z q := by
     rw [hcomm.eq, mul_assoc, hr]
   have hfe := eq_of_idempotent_in_corner_of_maximal e he hne hmax i _ hf hf0 hfl hfr
   refine ⟨e i * Polynomial.aeval z q, by rw [← mul_assoc, (he.idem i).eq], ?_⟩
   rw [← mul_assoc, hr, hfe]
 
-private theorem eq_zero_of_isNilpotent_in_corner_of_maximal (k R : Type) [Field k] [Ring R] [Algebra k R]
+private theorem eq_zero_of_isNilpotent_in_corner_of_maximal
+    (k R : Type) [Field k] [Ring R] [Algebra k R]
     (hint : ∀ x : R, IsIntegral k x) (hnil : ∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0)
-    {m : ℕ} (e : Fin m → R)
-    (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
-    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False)
-    (i : Fin m) (w : R) (hl : e i * w = w) (hr : w * e i = w) (hw : IsNilpotent w) : w = 0 := by
+    {m : ℕ} (e : Fin m → R) (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
+    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False) (i : Fin m)
+    (w : R) (hl : e i * w = w) (hr : w * e i = w) (hw : IsNilpotent w)
+    : w = 0 := by
   by_contra hw0
   have : ¬ ∀ y : R, IsNilpotent (y * w) := fun h => hw0 (hnil w h)
   push_neg at this
@@ -206,8 +224,9 @@ private theorem eq_zero_of_isNilpotent_in_corner_of_maximal (k R : Type) [Field 
       | zero => simp
       | succ j ih => rw [pow_succ, ih, pow_succ]; simp only [mul_assoc]
     exact hy ⟨n + 2, by rw [hyw, hpow, hn, zero_mul, mul_zero, zero_mul]⟩
-  obtain ⟨t, het, hut⟩ := exists_right_inverse_in_corner_of_not_isNilpotent k R hint e he hne hmax i (w * y * e i)
-    (by rw [← mul_assoc, ← mul_assoc, hl]) (by rw [mul_assoc, (he.idem i).eq]) hu
+  obtain ⟨t, het, hut⟩ :=
+    exists_right_inverse_in_corner_of_not_isNilpotent k R hint e he hne hmax i (w * y * e i)
+      (by rw [← mul_assoc, ← mul_assoc, hl]) (by rw [mul_assoc, (he.idem i).eq]) hu
   set s := e i * (y * e i * t)
   have hs : e i * s = s := by rw [← mul_assoc, (he.idem i).eq]
   have hws : w * s = e i := by
@@ -218,19 +237,20 @@ private theorem eq_zero_of_isNilpotent_in_corner_of_maximal (k R : Type) [Field 
     induction j with
     | zero => simp [hws]
     | succ j ih =>
-      rw [pow_succ w (j + 1), pow_succ' s (j + 1), mul_assoc, ← mul_assoc w s, hws,
-        pow_succ' s j, ← mul_assoc (e i) s, hs, ← pow_succ']
+      rw [pow_succ w (j + 1), pow_succ' s (j + 1), mul_assoc, ← mul_assoc w s, hws, pow_succ' s j,
+        ← mul_assoc (e i) s, hs, ← pow_succ']
       exact ih
   obtain ⟨N, hN⟩ := hw
   apply hne i
   rw [hj N, pow_succ, hN, zero_mul, zero_mul]
 
-private theorem exists_eq_smul_idempotent_of_mem_corner (k R : Type) [Field k] [IsAlgClosed k] [Ring R]
-    [Algebra k R] (hint : ∀ x : R, IsIntegral k x)
-    (hnil : ∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0) {m : ℕ} (e : Fin m → R)
-    (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
-    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False)
-    (i : Fin m) (z : R) (hl : e i * z = z) (hr : z * e i = z) : ∃ c : k, z = c • e i := by
+private theorem exists_eq_smul_idempotent_of_mem_corner
+    (k R : Type) [Field k] [IsAlgClosed k] [Ring R] [Algebra k R]
+    (hint : ∀ x : R, IsIntegral k x) (hnil : ∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0)
+    {m : ℕ} (e : Fin m → R) (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
+    (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False) (i : Fin m)
+    (z : R) (hl : e i * z = z) (hr : z * e i = z)
+    : ∃ c : k, z = c • e i := by
   by_cases hz : IsNilpotent z
   · refine ⟨0, ?_⟩
     rw [zero_smul]
@@ -240,13 +260,13 @@ private theorem exists_eq_smul_idempotent_of_mem_corner (k R : Type) [Field k] [
     Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd (minpoly k z) hp0 0
   simp only [map_zero, sub_zero] at hpg hg
   set s := Polynomial.rootMultiplicity 0 (minpoly k z)
-  have hev : Polynomial.aeval z (Polynomial.X ^ s * g) = 0 := by
-    rw [← hpg]; exact minpoly.aeval k z
+  have hev : Polynomial.aeval z (Polynomial.X ^ s * g) = 0 := by rw [← hpg]; exact minpoly.aeval k z
   have hg0 : g ≠ 0 := by rintro rfl; rw [mul_zero] at hpg; exact hp0 hpg
   have hgdeg : g.degree ≠ 0 := by
     intro h0
     rw [Polynomial.eq_C_of_degree_eq_zero h0, map_mul, map_pow, Polynomial.aeval_X,
-      Polynomial.aeval_C, Algebra.algebraMap_eq_smul_one, mul_smul_comm, mul_one] at hev
+        Polynomial.aeval_C, Algebra.algebraMap_eq_smul_one, mul_smul_comm, mul_one]
+      at hev
     have hc : g.coeff 0 ≠ 0 := fun h => hg (Polynomial.X_dvd_iff.mpr h)
     exact hz ⟨s, by simpa [hc] using hev⟩
   obtain ⟨c, hc⟩ := IsAlgClosed.exists_root g hgdeg
@@ -259,22 +279,22 @@ private theorem exists_eq_smul_idempotent_of_mem_corner (k R : Type) [Field k] [
   have hei : e i * e i = e i := (he.idem i).eq
   have hwl : e i * w = w := by rw [hw, mul_sub, hl, mul_smul_comm, hei]
   have hwr : w * e i = w := by rw [hw, sub_mul, hr, smul_mul_assoc, hei]
-  have hwn : ¬ IsNilpotent w := fun hn => hno c (sub_eq_zero.mp
-    (eq_zero_of_isNilpotent_in_corner_of_maximal k R hint hnil e he hne hmax i w hwl hwr hn))
-  obtain ⟨t, het, hwt⟩ := exists_right_inverse_in_corner_of_not_isNilpotent k R hint e he hne hmax i w hwl hwr hwn
-  have hzu : Polynomial.aeval z (Polynomial.X - Polynomial.C c) *
-      (t - c⁻¹ • (1 - e i)) = 1 := by
+  have hwn : ¬ IsNilpotent w := fun hn =>
+    hno c
+      (sub_eq_zero.mp (eq_zero_of_isNilpotent_in_corner_of_maximal k R hint hnil e he hne hmax i w
+        hwl hwr hn))
+  obtain ⟨t, het, hwt⟩ :=
+    exists_right_inverse_in_corner_of_not_isNilpotent k R hint e he hne hmax i w hwl hwr hwn
+  have hzu : Polynomial.aeval z (Polynomial.X - Polynomial.C c) * (t - c⁻¹ • (1 - e i)) = 1 := by
     rw [map_sub, Polynomial.aeval_X, Polynomial.aeval_C, Algebra.algebraMap_eq_smul_one]
-    have h1 : z * t - c • t = e i := by
-      rw [← hwt, hw, sub_mul, smul_mul_assoc, het]
+    have h1 : z * t - c • t = e i := by rw [← hwt, hw, sub_mul, smul_mul_assoc, het]
     have h2 : (z - c • (1 : R)) * (1 - e i) = -(c • (1 - e i)) := by
       simp only [mul_sub, sub_mul, mul_one, one_mul, hr, smul_mul_assoc, smul_sub]
       abel
-    rw [mul_sub, mul_smul_comm, h2, smul_neg, smul_smul, inv_mul_cancel₀ hc0, one_smul,
-      sub_mul, smul_mul_assoc, one_mul, h1]
+    rw [mul_sub, mul_smul_comm, h2, smul_neg, smul_smul, inv_mul_cancel₀ hc0, one_smul, sub_mul,
+      smul_mul_assoc, one_mul, h1]
     abel
-  obtain ⟨h, hh⟩ : ∃ h, g = (Polynomial.X - Polynomial.C c) * h :=
-    Polynomial.dvd_iff_isRoot.mpr hc
+  obtain ⟨h, hh⟩ : ∃ h, g = (Polynomial.X - Polynomial.C c) * h := Polynomial.dvd_iff_isRoot.mpr hc
   have hcomm : Polynomial.X ^ s * g = (Polynomial.X ^ s * h) * (Polynomial.X - Polynomial.C c) := by
     rw [hh]; ring
   have hzero : Polynomial.aeval z (Polynomial.X ^ s * h) = 0 := by
@@ -283,22 +303,23 @@ private theorem exists_eq_smul_idempotent_of_mem_corner (k R : Type) [Field k] [
     rwa [mul_assoc, hzu, mul_one, zero_mul] at this
   have hh0 : Polynomial.X ^ s * h ≠ 0 := by
     refine mul_ne_zero (pow_ne_zero _ Polynomial.X_ne_zero) ?_
-    rintro rfl; exact hg0 (by rw [hh, mul_zero])
+    rintro rfl
+    exact hg0 (by rw [hh, mul_zero])
   have hdeg := minpoly.degree_le_of_ne_zero k z hh0 hzero
   rw [hpg, hcomm, Polynomial.degree_mul, Polynomial.degree_X_sub_C] at hdeg
-  have hfin : (Polynomial.X ^ s * h).degree ≠ ⊥ := by
-    rwa [Ne, Polynomial.degree_eq_bot]
+  have hfin : (Polynomial.X ^ s * h).degree ≠ ⊥ := by rwa [Ne, Polynomial.degree_eq_bot]
   obtain ⟨n, hn⟩ := WithBot.ne_bot_iff_exists.mp hfin
   rw [← hn] at hdeg
   rw [← WithBot.coe_one, ← WithBot.coe_add, WithBot.coe_le_coe] at hdeg
   omega
 
-private theorem exists_smul_eq_corner_of_maximal_orthogonalIdempotents (k R : Type) [Field k] [IsAlgClosed k] [Ring R]
-    [Algebra k R] (hint : ∀ x : R, IsIntegral k x)
-    (hnil : ∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0) {m : ℕ} (e : Fin m → R)
-    (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
+private theorem exists_smul_eq_corner_of_maximal_orthogonalIdempotents
+    (k R : Type) [Field k] [IsAlgClosed k] [Ring R] [Algebra k R]
+    (hint : ∀ x : R, IsIntegral k x) (hnil : ∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0)
+    {m : ℕ} (e : Fin m → R) (he : OrthogonalIdempotents e) (hne : ∀ i, e i ≠ 0)
     (hmax : ∀ e' : Fin (m + 1) → R, OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False)
-    (i j : Fin m) : ∃ a : R, ∀ r : R, ∃ c : k, e i * r * e j = c • a := by
+    (i j : Fin m)
+    : ∃ a : R, ∀ r : R, ∃ c : k, e i * r * e j = c • a := by
   by_cases h : ∀ r, e i * r * e j = 0
   · exact ⟨0, fun r => ⟨0, by rw [h r, smul_zero]⟩⟩
   push_neg at h
@@ -312,8 +333,9 @@ private theorem exists_smul_eq_corner_of_maximal_orthogonalIdempotents (k R : Ty
   push_neg at this
   obtain ⟨y, hy⟩ := this
   have hu := not_isNilpotent_mul_mul_of_mul_eq_of_not_isNilpotent (e i) a y hal hy
-  obtain ⟨ν, hν⟩ := exists_eq_smul_idempotent_of_mem_corner k R hint hnil e he hne hmax i (a * y * e i)
-    (by rw [← mul_assoc, ← mul_assoc, hal]) (by rw [mul_assoc, hii])
+  obtain ⟨ν, hν⟩ :=
+    exists_eq_smul_idempotent_of_mem_corner k R hint hnil e he hne hmax i (a * y * e i)
+      (by rw [← mul_assoc, ← mul_assoc, hal]) (by rw [mul_assoc, hii])
   have hν0 : ν ≠ 0 := by
     rintro rfl; rw [zero_smul] at hν; exact hu (by rw [hν]; exact IsNilpotent.zero)
   set b := ν⁻¹ • (e j * y * e i)
@@ -321,8 +343,9 @@ private theorem exists_smul_eq_corner_of_maximal_orthogonalIdempotents (k R : Ty
     simp only [b, mul_smul_comm, ← mul_assoc, har]
     rw [hν, smul_smul, inv_mul_cancel₀ hν0, one_smul]
   have hbe : b * e i = b := by simp only [b, smul_mul_assoc, mul_assoc, hii]
-  obtain ⟨μ, hμ⟩ := exists_eq_smul_idempotent_of_mem_corner k R hint hnil e he hne hmax j (b * a)
-    (by simp only [b, smul_mul_assoc, mul_smul_comm, ← mul_assoc, hjj]) (by rw [mul_assoc, har])
+  obtain ⟨μ, hμ⟩ :=
+    exists_eq_smul_idempotent_of_mem_corner k R hint hnil e he hne hmax j (b * a)
+      (by simp only [b, smul_mul_assoc, mul_smul_comm, ← mul_assoc, hjj]) (by rw [mul_assoc, har])
   have hμ0 : μ ≠ 0 := by
     rintro rfl
     rw [zero_smul] at hμ
@@ -332,26 +355,29 @@ private theorem exists_smul_eq_corner_of_maximal_orthogonalIdempotents (k R : Ty
   set c := e i * r * e j
   have hcl : e i * c = c := by simp only [c, ← mul_assoc, hii]
   have hcr : c * e j = c := by simp only [c, mul_assoc, hjj]
-  obtain ⟨l, hl⟩ := exists_eq_smul_idempotent_of_mem_corner k R hint hnil e he hne hmax i (c * b)
-    (by rw [← mul_assoc, hcl]) (by rw [mul_assoc, hbe])
+  obtain ⟨l, hl⟩ :=
+    exists_eq_smul_idempotent_of_mem_corner k R hint hnil e he hne hmax i (c * b)
+      (by rw [← mul_assoc, hcl]) (by rw [mul_assoc, hbe])
   refine ⟨μ⁻¹ * l, ?_⟩
-  calc c = c * e j := hcr.symm
+  calc
+    c = c * e j := hcr.symm
     _ = μ⁻¹ • (c * (b * a)) := by rw [hμ, mul_smul_comm, smul_smul, inv_mul_cancel₀ hμ0, one_smul]
     _ = (μ⁻¹ * l) • a := by rw [← mul_assoc, hl, smul_mul_assoc, hal, smul_smul]
 
-theorem _root_.GlobalTheory.AlgRing.finite_and_isSemisimpleRing :
-    ∀ (k R : Type) [Field k] [IsAlgClosed k] [Ring R] [Algebra k R] (d : ℕ),
-      (∀ x : R, IsIntegral k x) → (∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0) →
-      (∀ (m : ℕ) (e : Fin m → R), OrthogonalIdempotents e → (∀ i, e i ≠ 0) → m ≤ d) →
-      Module.Finite k R ∧ IsSemisimpleRing R := by
+theorem _root_.GlobalTheory.AlgRing.finite_and_isSemisimpleRing
+    : ∀ (k R : Type) [Field k] [IsAlgClosed k] [Ring R] [Algebra k R] (d : ℕ),
+      (∀ x : R, IsIntegral k x) → (∀ x : R, (∀ y : R, IsNilpotent (y * x)) → x = 0)
+        → (∀ (m : ℕ) (e : Fin m → R), OrthogonalIdempotents e → (∀ i, e i ≠ 0) → m ≤ d)
+        → Module.Finite k R ∧ IsSemisimpleRing R := by
   intro k R _ _ _ _ d hint hnil hidem
   have hfin : Module.Finite k R := by
     classical
     let P : ℕ → Prop := fun m => ∃ e : Fin m → R, OrthogonalIdempotents e ∧ ∀ i, e i ≠ 0
     have hP0 : P 0 := ⟨Fin.elim0, ⟨fun i => i.elim0, fun i => i.elim0⟩, fun i => i.elim0⟩
     obtain ⟨e, he, hne⟩ : P (Nat.findGreatest P d) := Nat.findGreatest_spec (Nat.zero_le d) hP0
-    have hmax : ∀ e' : Fin (Nat.findGreatest P d + 1) → R, OrthogonalIdempotents e' →
-        (∀ i, e' i ≠ 0) → False := fun e' he' hne' =>
+    have hmax
+        : ∀ e' : Fin (Nat.findGreatest P d + 1) → R,
+          OrthogonalIdempotents e' → (∀ i, e' i ≠ 0) → False := fun e' he' hne' =>
       Nat.findGreatest_is_greatest (Nat.lt_succ_self _) (hidem _ e' he' hne') ⟨e', he', hne'⟩
     have hsum := sum_eq_one_of_maximal_orthogonalIdempotents k R hint hnil e he hne hmax
     choose a ha using fun p : Fin (Nat.findGreatest P d) × Fin (Nat.findGreatest P d) =>

@@ -30,8 +30,8 @@ theorem isUnit_root (hP : IsPPol c r P) : IsUnit (AdjoinRoot.root P) := by
 
 def alpha (hP : IsPPol c r P) : (AdjoinRoot P)ˣ := (isUnit_root hP).unit
 
-theorem eval₂_conj_inv (hP : IsPPol c r P) :
-    P.eval₂ ((AdjoinRoot.of P).comp (c : E →+* E)) ((alpha hP)⁻¹ : (AdjoinRoot P)ˣ) = 0 := by
+theorem eval₂_conj_inv (hP : IsPPol c r P)
+    : P.eval₂ ((AdjoinRoot.of P).comp (c : E →+* E)) ((alpha hP)⁻¹ : (AdjoinRoot P)ˣ) = 0 := by
   rw [← eval₂_map]
   letI : Invertible (((alpha hP)⁻¹ : (AdjoinRoot P)ˣ) : AdjoinRoot P) := Units.invertible _
   have hd : (P.map (c : E →+* E)).natDegree ≤ r := hP.2.2.1 ▸ natDegree_map_le
@@ -45,27 +45,28 @@ theorem eval₂_conj_inv (hP : IsPPol c r P) :
     rw [sharp, ← mul_assoc, ← C_mul, mul_inv_cancel₀ hne, C_1, one_mul]
   rw [h1, h2, eval₂_mul, AdjoinRoot.eval₂_root, mul_zero]
 
-def starL (hP : IsPPol c r P) : AdjoinRoot P →ₐ[F] AdjoinRoot P :=
-  { AdjoinRoot.lift ((AdjoinRoot.of P).comp (c : E →+* E))
-      (((alpha hP)⁻¹ : (AdjoinRoot P)ˣ) : AdjoinRoot P) (eval₂_conj_inv hP) with
-    commutes' := fun a => by
-      have h : algebraMap F (AdjoinRoot P) a = AdjoinRoot.of P (algebraMap F E a) := rfl
-      rw [h]
-      simp }
+def starL (hP : IsPPol c r P) : AdjoinRoot P →ₐ[F] AdjoinRoot P := {
+  AdjoinRoot.lift ((AdjoinRoot.of P).comp (c : E →+* E))
+    (((alpha hP)⁻¹ : (AdjoinRoot P)ˣ) : AdjoinRoot P) (eval₂_conj_inv hP) with
+  commutes' := fun a => by
+    have h : algebraMap F (AdjoinRoot P) a = AdjoinRoot.of P (algebraMap F E a) := rfl
+    rw [h]
+    simp
+}
 
 def Lplus (hP : IsPPol c r P) : Subalgebra F (AdjoinRoot P) :=
   AlgHom.equalizer (starL hP) (AlgHom.id F (AdjoinRoot P))
 
 variable (k : Type) [Field k] [Algebra F k]
 
-@[reducible] def algLk (P : E[X]) : Algebra (E ⊗[F] k) (AdjoinRoot P ⊗[F] k) :=
+@[reducible]
+def algLk (P : E[X]) : Algebra (E ⊗[F] k) (AdjoinRoot P ⊗[F] k) :=
   (Algebra.TensorProduct.map (IsScalarTower.toAlgHom F E (AdjoinRoot P))
     (AlgHom.id F k)).toRingHom.toAlgebra
 
 attribute [local instance] algLk
 
-def starLk (hP : IsPPol c r P) : AdjoinRoot P ⊗[F] k →+* AdjoinRoot P ⊗[F] k :=
-  sigR (starL hP) k
+def starLk (hP : IsPPol c r P) : AdjoinRoot P ⊗[F] k →+* AdjoinRoot P ⊗[F] k := sigR (starL hP) k
 
 def inclPlus (hP : IsPPol c r P) : Lplus hP ⊗[F] k →+* AdjoinRoot P ⊗[F] k :=
   (Algebra.TensorProduct.map (Lplus hP).val (AlgHom.id F k)).toRingHom

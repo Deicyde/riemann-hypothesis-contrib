@@ -27,18 +27,20 @@ theorem integral_kθ : ∫ x, kθ x = 1 := by
 theorem le_tmax {ι : Type*} [Fintype ι] [Nonempty ι] (t : ι → ℝ) (i : ι) : t i ≤ tmax t :=
   Finset.le_sup' t (Finset.mem_univ i)
 
-theorem tmax_le {ι : Type*} [Fintype ι] [Nonempty ι] {t : ι → ℝ} {c : ℝ} (h : ∀ i, t i ≤ c) :
-    tmax t ≤ c :=
+theorem tmax_le {ι : Type*} [Fintype ι] [Nonempty ι] {t : ι → ℝ} {c : ℝ} (h : ∀ i, t i ≤ c)
+    : tmax t ≤ c :=
   Finset.sup'_le _ _ fun i _ => h i
 
-theorem tmax_comp_equiv {κ ι : Type*} [Fintype κ] [Nonempty κ] [Fintype ι] [Nonempty ι]
-    (e : κ ≃ ι) (t : ι → ℝ) : tmax (t ∘ e) = tmax t := by
+theorem tmax_comp_equiv
+    {κ ι : Type*} [Fintype κ] [Nonempty κ] [Fintype ι] [Nonempty ι] (e : κ ≃ ι) (t : ι → ℝ)
+    : tmax (t ∘ e) = tmax t := by
   refine le_antisymm (tmax_le fun k => le_tmax t (e k)) (tmax_le fun i => ?_)
   have := le_tmax (t ∘ e) (e.symm i)
   simpa using this
 
-theorem regMax_comp_equiv {κ ι : Type} [Fintype κ] [Nonempty κ] [Fintype ι] [Nonempty ι]
-    (e : κ ≃ ι) (η : ℝ) (t : ι → ℝ) : regMax η (t ∘ e) = regMax η t := by
+theorem regMax_comp_equiv
+    {κ ι : Type} [Fintype κ] [Nonempty κ] [Fintype ι] [Nonempty ι] (e : κ ≃ ι) (η : ℝ) (t : ι → ℝ)
+    : regMax η (t ∘ e) = regMax η t := by
   unfold regMax
   rw [← (volume_measurePreserving_piCongrLeft (fun _ : ι => ℝ) e).integral_comp']
   congr 1
@@ -56,20 +58,22 @@ theorem regMax_comp_equiv {κ ι : Type} [Fintype κ] [Nonempty κ] [Fintype ι]
     simp [hg]
   rw [h1, h2]
 
-theorem regMax_subtype {ι : Type} [Fintype ι] [Nonempty ι] (p : ι → Prop) [DecidablePred p]
-    [Nonempty {i // p i}] {η : ℝ} (hη : 0 ≤ η) (t : ι → ℝ)
-    (hdom : ∀ i, ¬ p i → ∃ k, p k ∧ t i + η ≤ t k) :
-    regMax η t = regMax η (fun k : {i // p i} => t k) := by
+theorem regMax_subtype
+    {ι : Type} [Fintype ι] [Nonempty ι]
+    (p : ι → Prop) [DecidablePred p] [Nonempty {i // p i}]
+    {η : ℝ} (hη : 0 ≤ η)
+    (t : ι → ℝ) (hdom : ∀ i, ¬ p i → ∃ k, p k ∧ t i + η ≤ t k)
+    : regMax η t = regMax η (fun k : {i // p i} => t k) := by
   unfold regMax
   set e := MeasurableEquiv.piEquivPiSubtypeProd (fun _ : ι => ℝ) p
   have hmp : MeasurePreserving e (volume : Measure (ι → ℝ))
       ((volume : Measure ({i // p i} → ℝ)).prod (volume : Measure ({i // ¬ p i} → ℝ))) :=
     measurePreserving_piEquivPiSubtypeProd (fun _ : ι => (volume : Measure ℝ)) p
   rw [← (hmp.symm e).integral_comp']
-  have hpt : ∀ q : ({i // p i} → ℝ) × ({i // ¬ p i} → ℝ),
-      tmax (fun j => t j + η * e.symm q j) * ∏ j, kθ (e.symm q j) =
-        (tmax (fun k : {i // p i} => t k + η * q.1 k) * ∏ k, kθ (q.1 k)) *
-          ∏ k, kθ (q.2 k) := by
+  have hpt
+      : ∀ q : ({i // p i} → ℝ) × ({i // ¬ p i} → ℝ),
+        tmax (fun j => t j + η * e.symm q j) * ∏ j, kθ (e.symm q j)
+          = (tmax (fun k : {i // p i} => t k + η * q.1 k) * ∏ k, kθ (q.1 k)) * ∏ k, kθ (q.2 k) := by
     intro q
     have hv1 : ∀ k : {i // p i}, e.symm q k = q.1 k := fun k => by
       simp [e, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd, k.2]
@@ -81,8 +85,9 @@ theorem regMax_subtype {ι : Type} [Fintype ι] [Nonempty ι] (p : ι → Prop) 
     rw [hprod]
     by_cases hall : ∀ j, kθ (e.symm q j) ≠ 0
     · have hb : ∀ j, |e.symm q j| < 1 / 2 := fun j => abs_lt_of_kθ_ne_zero (hall j)
-      have htm : tmax (fun j => t j + η * e.symm q j) =
-          tmax (fun k : {i // p i} => t k + η * q.1 k) := by
+      have htm
+          : tmax (fun j => t j + η * e.symm q j)
+            = tmax (fun k : {i // p i} => t k + η * q.1 k) := by
         refine le_antisymm (tmax_le fun j => ?_) (tmax_le fun k => ?_)
         · by_cases hj : p j
           · have := le_tmax (fun k : {i // p i} => t k + η * q.1 k) ⟨j, hj⟩
@@ -106,8 +111,8 @@ theorem regMax_subtype {ι : Type} [Fintype ι] [Nonempty ι] (p : ι → Prop) 
       · rw [h]; ring
       · rw [h]; ring
   simp_rw [hpt]
-  rw [integral_prod_mul (fun h1 : {i // p i} → ℝ =>
-      tmax (fun k : {i // p i} => t k + η * h1 k) * ∏ k, kθ (h1 k))
+  rw [integral_prod_mul
+    (fun h1 : {i // p i} → ℝ => tmax (fun k : {i // p i} => t k + η * h1 k) * ∏ k, kθ (h1 k))
     (fun h2 : {i // ¬ p i} → ℝ => ∏ k, kθ (h2 k))]
   have hH : ∫ h2 : {i // ¬ p i} → ℝ, ∏ k, kθ (h2 k) = 1 := by
     rw [show (volume : Measure ({i // ¬ p i} → ℝ)) = Measure.pi fun _ => volume from rfl,
@@ -115,13 +120,14 @@ theorem regMax_subtype {ι : Type} [Fintype ι] [Nonempty ι] (p : ι → Prop) 
     simp [integral_kθ]
   rw [hH, mul_one]
 
-theorem regMax_of_injective {κ ι : Type} [Fintype κ] [Nonempty κ] [Fintype ι] [Nonempty ι]
-    (f : κ → ι) (hf : Function.Injective f) {η : ℝ} (hη : 0 ≤ η) (t : ι → ℝ)
-    (hdom : ∀ i, (∀ k, f k ≠ i) → ∃ k, t i + η ≤ t (f k)) :
-    regMax η t = regMax η (t ∘ f) := by
+theorem regMax_of_injective
+    {κ ι : Type} [Fintype κ] [Nonempty κ] [Fintype ι] [Nonempty ι]
+    (f : κ → ι) (hf : Function.Injective f)
+    {η : ℝ} (hη : 0 ≤ η)
+    (t : ι → ℝ) (hdom : ∀ i, (∀ k, f k ≠ i) → ∃ k, t i + η ≤ t (f k))
+    : regMax η t = regMax η (t ∘ f) := by
   classical
-  have : Nonempty {i // i ∈ Set.range f} :=
-    ⟨⟨f (Classical.arbitrary κ), Set.mem_range_self _⟩⟩
+  have : Nonempty {i // i ∈ Set.range f} := ⟨⟨f (Classical.arbitrary κ), Set.mem_range_self _⟩⟩
   rw [regMax_subtype (fun i => i ∈ Set.range f) hη t ?_]
   · convert (regMax_comp_equiv (Equiv.ofInjective f hf) η
       (fun k : {i // i ∈ Set.range f} => t k)).symm using 2

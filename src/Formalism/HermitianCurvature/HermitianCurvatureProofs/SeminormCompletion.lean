@@ -6,13 +6,15 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BetaSesquili
 @[expose] public section
 
 open Matrix MeasureTheory
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL Formalism.QuantumDeterminants
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL
+  Formalism.QuantumDeterminants
 
 noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.Ux8
 
-theorem zero_notMem_detSet (hD : G.DetMatch) (n : ℕ) (Kc : Set ℂ) (h0 : (0:ℂ) ∉ Kc) : (0:ℂ) ∉ G.detSet n Kc := by
+theorem zero_notMem_detSet (hD : G.DetMatch) (n : ℕ) (Kc : Set ℂ) (h0 : (0 : ℂ) ∉ Kc)
+    : (0 : ℂ) ∉ G.detSet n Kc := by
   intro hmem
   simp only [G.detSet, Set.mem_image] at hmem
   obtain ⟨D, hDK, hD0⟩ := hmem
@@ -21,8 +23,10 @@ theorem zero_notMem_detSet (hD : G.DetMatch) (n : ℕ) (Kc : Set ℂ) (h0 : (0:�
   · exact hne h1
   · exact h0 (by rw [← h1]; exact hDK)
 
-private theorem nonneg_of_decayAll {N : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
-    {q : ℕ} {e : ℕ → ℝ} {K : ℝ} {Φ0 : G.Mat N → V} (h : DecayAll q e K Φ0) : 0 ≤ K := by
+private theorem nonneg_of_decayAll
+    {N : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {q : ℕ} {e : ℕ → ℝ} {K : ℝ} {Φ0 : G.Mat N → V} (h : DecayAll q e K Φ0)
+    : 0 ≤ K := by
   obtain ⟨_, hb⟩ := h
   have h1 := hb 0 (Nat.zero_le _) 0
   rw [norm_zero, add_zero, Real.one_rpow, mul_one] at h1
@@ -33,7 +37,8 @@ theorem useGermTopOfParts : UseGermTopOfParts := by
   obtain ⟨C₁, C₂, hGR⟩ := hG
   refine ⟨C₁, C₂, ?_⟩
   intro p m β hβ σ d hd e A hA he Kc hKc h0
-  obtain ⟨Cst₁, hC₁⟩ := hTC p (m + 1 + 1) β σ d hd (by omega) (C₂ * (m + 2) ^ 2) e (fun i hi => (he i hi).2)
+  obtain ⟨Cst₁, hC₁⟩ :=
+    hTC p (m + 1 + 1) β σ d hd (by omega) (C₂ * (m + 2) ^ 2) e (fun i hi => (he i hi).2)
   obtain ⟨Cst₂, hC₂⟩ := hGR m β hβ Kc hKc h0
   refine ⟨Cst₂ * Cst₁, ?_⟩
   intro V _ _ _ Φ0 K hΦ t c ht hc
@@ -41,7 +46,8 @@ theorem useGermTopOfParts : UseGermTopOfParts := by
   have hK : 0 ≤ Cst₁ * K := nonneg_of_decayAll hT
   have hA0 : 0 ≤ A := le_trans (by positivity) hA
   have hDB' : G.DerivBound (C₂ * (m + 2) ^ 2) (G.detSet (m + 1) Kc)
-      (fun Z => Cst₁ * K * min 1 (‖Z‖ ^ (-A))) (PhiTop β σ d Φ0) := by
+      (fun Z => Cst₁ * K * min 1 (‖Z‖ ^ (-A)))
+      (PhiTop β σ d Φ0) := by
     refine hDB (m + 1 + 1) (C₂ * (m + 2) ^ 2) V (PhiTop β σ d Φ0) A (Cst₁ * K) (G.detSet (m + 1) Kc)
       (by omega) hA0 hK (zero_notMem_detSet hD (m + 1) Kc h0) ?_
     intro Z _
@@ -51,20 +57,25 @@ theorem useGermTopOfParts : UseGermTopOfParts := by
     have hZ : (1 : ℝ) ≤ 1 + ‖Z‖ := le_add_of_nonneg_right (norm_nonneg _)
     have hexp : (1 + ‖Z‖) ^ (-(e q / (5 * ((p + (m + 1 + 1) : ℕ) : ℝ)))) ≤ (1 + ‖Z‖) ^ (-A) :=
       Real.rpow_le_rpow_of_exponent_le hZ (neg_le_neg (he q hq).1)
-    calc _ ≤ _ := h1
+    calc
+      _ ≤ _ := h1
       _ ≤ Cst₁ * K * (1 + ‖Z‖) ^ (-A) := mul_le_mul_of_nonneg_left hexp hK
   have hfin := hC₂ V (PhiTop β σ d Φ0) A (Cst₁ * K) (C₂ * (m + 2) ^ 2) hA le_rfl hDB' t c ht hc
-  calc _ ≤ Cst₂ * (Cst₁ * K) * ‖t‖ := hfin
+  calc
+    _ ≤ Cst₂ * (Cst₁ * K) * ‖t‖ := hfin
     _ = Cst₂ * Cst₁ * K * ‖t‖ := by ring
 
-private theorem nonneg_of_CCle_mat {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {A : ℝ} {m : ℕ}
-    {f : B.Mat k r → E} {c : ℝ} (hf : B.CCle A m f c) : 0 ≤ c := by
+private theorem nonneg_of_CCle_mat
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {A : ℝ} {m : ℕ} {f : B.Mat k r → E} {c : ℝ} (hf : B.CCle A m f c)
+    : 0 ≤ c := by
   have h1 : (1 : B.Mat k r) ∈ B.GV k r := by
     show (1 : B.Mat k r)ᴴ * _ * 1 = _
     simp
   obtain ⟨_, h2⟩ := hf
   have h := h2 [] [] (by simp) (by simp) (by simp) 1 h1
-  exact le_trans (mul_nonneg (Real.rpow_nonneg (by unfold B.gN; exact Real.sqrt_nonneg _) _) (norm_nonneg _)) h
+  exact le_trans
+    (mul_nonneg (Real.rpow_nonneg (by unfold B.gN; exact Real.sqrt_nonneg _) _) (norm_nonneg _)) h
 
 theorem useGermOfParts : UseGermOfParts := by
   intro hG hD hC hDB hPM hSM
@@ -91,9 +102,10 @@ theorem useGermOfParts : UseGermOfParts := by
   have hA0 : 0 ≤ U.a C₂ A₀ := le_trans (by positivity) hA'
   have hK0 : 0 ≤ max C 0 * c := mul_nonneg (le_max_right _ _) hc0
   have hDB' : G.DerivBound (C₂ * (m + 1 + 1) ^ 2) (G.detSet (m + 1) Kc)
-      (fun Z => max C 0 * c * min 1 (‖Z‖ ^ (-(U.a C₂ A₀)))) Φ := by
-    refine hDB (m + 1 + 1) (C₂ * (m + 1 + 1) ^ 2) V Φ (U.a C₂ A₀) (max C 0 * c) (G.detSet (m + 1) Kc)
-      (by omega) hA0 hK0 (zero_notMem_detSet hD (m + 1) Kc h0) ?_
+      (fun Z => max C 0 * c * min 1 (‖Z‖ ^ (-(U.a C₂ A₀))))
+      Φ := by
+    refine hDB (m + 1 + 1) (C₂ * (m + 1 + 1) ^ 2) V Φ (U.a C₂ A₀) (max C 0 * c)
+      (G.detSet (m + 1) Kc) (by omega) hA0 hK0 (zero_notMem_detSet hD (m + 1) Kc h0) ?_
     intro Z hZ
     obtain ⟨hcd, hb⟩ := hbd Z hZ
     refine ⟨hcd, fun q hq => le_trans (hb q hq) ?_⟩
@@ -102,26 +114,34 @@ theorem useGermOfParts : UseGermOfParts := by
   have h2 : 2 ≤ Mlev k ρ := by unfold Mlev; omega
   have hDR : ‖D‖ ≤ max R 0 := le_trans (hR D hD') (le_max_left R 0)
   have hpow : ‖D‖ ^ (Mlev k ρ - 2) ≤ max R 0 ^ (Mlev k ρ - 2) := by gcongr
-  have hrem := hCst V Φ (U.a C₂ A₀) (max C 0 * c) (C₂ * (m + 1 + 1) ^ 2) hA' (le_of_eq (by ring)) hDB' t
-    (D / t ^ (m + 1)) ht (by rw [div_mul_cancel₀ _ (pow_ne_zero _ ht)]; exact hD')
-  rw [hPM m (Mlev k ρ) betaU t D V Φ h2 ht, norm_smul, Complex.norm_real, Real.norm_of_nonneg (by positivity)]
-  calc ‖D‖ ^ (Mlev k ρ - 2) * ‖G.remainder betaU m (fun _ => 1) Φ t (D / t ^ (m + 1))‖
-      ≤ max R 0 ^ (Mlev k ρ - 2) * (Cst * (max C 0 * c) * ‖t‖) :=
-        mul_le_mul hpow hrem (norm_nonneg _) (pow_nonneg (le_max_right R 0) _)
+  have hrem :=
+    hCst V Φ (U.a C₂ A₀) (max C 0 * c) (C₂ * (m + 1 + 1) ^ 2) hA' (le_of_eq (by ring)) hDB' t
+      (D / t ^ (m + 1)) ht (by rw [div_mul_cancel₀ _ (pow_ne_zero _ ht)]; exact hD')
+  rw [hPM m (Mlev k ρ) betaU t D V Φ h2 ht, norm_smul, Complex.norm_real,
+    Real.norm_of_nonneg (by positivity)]
+  calc
+    ‖D‖ ^ (Mlev k ρ - 2) * ‖G.remainder betaU m (fun _ => 1) Φ t (D / t ^ (m + 1))‖
+        ≤ max R 0 ^ (Mlev k ρ - 2) * (Cst * (max C 0 * c) * ‖t‖) :=
+      mul_le_mul hpow hrem (norm_nonneg _) (pow_nonneg (le_max_right R 0) _)
     _ = max R 0 ^ (Mlev k ρ - 2) * Cst * max C 0 * c * ‖t‖ := by ring
 
-theorem cc_nonneg {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {A : ℝ} {m : ℕ}
-    {f : B.Mat k r → E} {c : ℝ} (hf : B.CCle A m f c) : 0 ≤ c := by
+theorem cc_nonneg
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {A : ℝ} {m : ℕ} {f : B.Mat k r → E} {c : ℝ} (hf : B.CCle A m f c)
+    : 0 ≤ c := by
   have h1 : (1 : B.Mat k r) ∈ B.GV k r := by
     show (1 : B.Mat k r)ᴴ * _ * 1 = _
     simp
   obtain ⟨_, h2⟩ := hf
   have h := h2 [] [] (by simp) (by simp) (by simp) 1 h1
-  exact le_trans (mul_nonneg (Real.rpow_nonneg (by unfold B.gN; exact Real.sqrt_nonneg _) _) (norm_nonneg _)) h
+  exact le_trans
+    (mul_nonneg (Real.rpow_nonneg (by unfold B.gN; exact Real.sqrt_nonneg _) _) (norm_nonneg _)) h
 
-private theorem star_mono_bound {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {k j ρ : ℕ}
-    {F₁ : B.Mat k (j + ρ) → E} {A₁ : ℝ} {Q : ℕ} {B₁ B₂ : ℝ} {K : Set ℝ}
-    (h : Star k j ρ F₁ A₁ Q B₁ K) (hB : B₁ ≤ B₂) : Star k j ρ F₁ A₁ Q B₂ K := by
+private theorem star_mono_bound
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {k j ρ : ℕ} {F₁ : B.Mat k (j + ρ) → E} {A₁ : ℝ} {Q : ℕ} {B₁ B₂ : ℝ} {K : Set ℝ}
+    (h : Star k j ρ F₁ A₁ Q B₁ K) (hB : B₁ ≤ B₂)
+    : Star k j ρ F₁ A₁ Q B₂ K := by
   obtain ⟨h1, h2, h3⟩ := h
   exact ⟨h1, h2, fun u v hu hv hl g hg => le_trans (h3 u v hu hv hl g hg) hB⟩
 
@@ -135,17 +155,20 @@ theorem corollary_u2_of_parts_holds : GermExpansionHypothesisFromComponents := b
   have hC1 : (0 : ℝ) ≤ C₁ := Nat.cast_nonneg _
   have hle : C₂ * s ^ 2 ≤ C₂ * (p + s + ρ + 1) ^ 2 :=
     Nat.mul_le_mul_left C₂ (Nat.pow_le_pow_left (by omega) 2)
-  obtain ⟨hb1, _, _, _, hb5⟩ := hBud (p + s + ρ) (C₂ * s ^ 2) U.mmB U.o (U.κ + (p + s) * U.o) U.As
-    (16 * ((C₁ : ℝ) + 1) + 20) A₀ (by omega) ((Nat.add_le_add_right hle 1).trans hC2) hmm ho hκ
-    (by linarith) hA₀
-  have hAeq : A₀ - ((U.κ + (p + s) * U.o : ℕ) : ℝ) - 2 * (((p + s + ρ : ℕ) : ℝ) + 1) *
-      ((C₂ * s ^ 2 + 1 + U.mmB + U.o : ℕ) : ℝ) =
-      A₀ - (U.κ : ℝ) - ((p + s : ℕ) : ℝ) * (U.o : ℝ) - 2 * (((p + s + ρ : ℕ) : ℝ) + 1) *
-      (((C₂ * s ^ 2 + 1 + U.mmB) + U.o : ℕ) : ℝ) := by push_cast; ring
+  obtain ⟨hb1, _, _, _, hb5⟩ :=
+    hBud (p + s + ρ) (C₂ * s ^ 2) U.mmB U.o (U.κ + (p + s) * U.o) U.As (16 * ((C₁ : ℝ) + 1) + 20) A₀
+      (by omega) ((Nat.add_le_add_right hle 1).trans hC2) hmm ho hκ (by linarith) hA₀
+  have hAeq
+      : A₀ - ((U.κ + (p + s) * U.o : ℕ) : ℝ)
+          - 2 * (((p + s + ρ : ℕ) : ℝ) + 1) * ((C₂ * s ^ 2 + 1 + U.mmB + U.o : ℕ) : ℝ)
+        = A₀ - (U.κ : ℝ) - ((p + s : ℕ) : ℝ) * (U.o : ℝ)
+          - 2 * (((p + s + ρ : ℕ) : ℝ) + 1) * (((C₂ * s ^ 2 + 1 + U.mmB) + U.o : ℕ) : ℝ) := by
+    push_cast; ring
   have hc16 : (16 * ((C₁ : ℝ) + 1) + 20 - 20) / 16 = (C₁ : ℝ) + 1 := by ring
   rw [hAeq, hc16] at hb5
-  obtain ⟨ht1, ht2, ht3⟩ := hTh (p + s + ρ) (2 * (p + s + ρ) + k + 1) s U.As C₁ ((C₁ : ℝ) + 1) U.AB
-    (by omega) (by omega) hn3 hAB (by linarith) (by linarith)
+  obtain ⟨ht1, ht2, ht3⟩ :=
+    hTh (p + s + ρ) (2 * (p + s + ρ) + k + 1) s U.As C₁ ((C₁ : ℝ) + 1) U.AB (by omega) (by omega)
+      hn3 hAB (by linarith) (by linarith)
   refine ⟨hb5, le_trans ht3 hb5, le_trans ht2 hb5, ?_⟩
   obtain ⟨_, hχc, hχ0⟩ := id hχ
   have hKc : IsCompact ((fun w : ℂ => ‖w‖) '' tsupport U.χ) :=
@@ -155,19 +178,24 @@ theorem corollary_u2_of_parts_holds : GermExpansionHypothesisFromComponents := b
     exact norm_pos_iff.2 (fun h => hχ0 (h ▸ hw))
   choose Ci hCi using fun i => hCU1 k (p + s) ρ Wp Wq U.z U.z' U.o U.κ (U.Θ i) U.χ U.χε U.ε (hDD i) hχ hχε
     (C₂ * s ^ 2 + 1 + U.mmB) (3 * U.As) A₀ hb1
-  obtain ⟨CT, hCT⟩ := hTU k p s ρ U.σ U.d hd hs1 _ hKc hK0 (C₂ * s ^ 2) U.mmB (C₂ * s ^ 2 + 1 + U.mmB) _ le_rfl
-    (lt_of_lt_of_le ht1 hb5)
+  obtain ⟨CT, hCT⟩ :=
+    hTU k p s ρ U.σ U.d hd hs1 _ hKc hK0 (C₂ * s ^ 2) U.mmB (C₂ * s ^ 2 + 1 + U.mmB) _ le_rfl
+      (lt_of_lt_of_le ht1 hb5)
   refine ⟨CT * (∑ i, |Ci i|), ?_⟩
   intro f c hf V _ _ _ M
   have hc0 : 0 ≤ c := cc_nonneg hf
   have hB : ∀ i, Ci i * c ≤ (∑ j, |Ci j|) * c := fun i =>
-    mul_le_mul_of_nonneg_right ((le_abs_self _).trans
-      (Finset.single_le_sum (fun j _ => abs_nonneg (Ci j)) (Finset.mem_univ i))) hc0
-  have hstar := hSP k (p + s) ρ ι (Wq →L[ℂ] Wp) (U.F1 f) _ _ _ _
-    (mul_nonneg (Finset.sum_nonneg fun i _ => abs_nonneg (Ci i)) hc0)
-    (fun i => star_mono_bound (hCi i f c hf) (hB i))
+    mul_le_mul_of_nonneg_right
+      ((le_abs_self _).trans
+        (Finset.single_le_sum (fun j _ => abs_nonneg (Ci j)) (Finset.mem_univ i)))
+      hc0
+  have hstar :=
+    hSP k (p + s) ρ ι (Wq →L[ℂ] Wp) (U.F1 f) _ _ _ _
+      (mul_nonneg (Finset.sum_nonneg fun i _ => abs_nonneg (Ci i)) hc0)
+      (fun i => star_mono_bound (hCi i f c hf) (hB i))
   obtain ⟨_, _, hmain⟩ := hCT U.z U.z' (ι → (Wq →L[ℂ] Wp)) (U.F1 f) _ hstar
-  obtain ⟨Φ, hev, hbd⟩ := hmain U.S V M (fun Z hZ γ hγ hγS => hPS k p s ρ Wp Wq ι U C₂ hOk2 f Z hZ γ hγ hγS)
+  obtain ⟨Φ, hev, hbd⟩ :=
+    hmain U.S V M (fun Z hZ γ hγ hγS => hPS k p s ρ Wp Wq ι U C₂ hOk2 f Z hZ γ hγ hγS)
   refine ⟨Φ, hev, fun Z hZ => ?_⟩
   obtain ⟨h1, h2⟩ := hbd Z hZ
   refine ⟨h1, fun q hq => ?_⟩
@@ -184,7 +212,9 @@ private theorem one_le_gN_of_mem_GV {k r : ℕ} (g : B.Mat k r) (hg : g ∈ B.GV
     simp [Hpk] at h00
     try (split_ifs at h00 <;> norm_num at h00)
   have h1 : ‖Hpk k r‖ ≤ ‖g‖ ^ 2 * ‖Hpk k r‖ := by
-    calc ‖Hpk k r‖ = ‖gᴴ * Hpk k r * g‖ := by rw [hH]
+    calc
+      ‖Hpk k r‖
+        = ‖gᴴ * Hpk k r * g‖ := by rw [hH]
       _ ≤ ‖gᴴ * Hpk k r‖ * ‖g‖ := Matrix.frobenius_norm_mul _ _
       _ ≤ ‖gᴴ‖ * ‖Hpk k r‖ * ‖g‖ :=
         mul_le_mul_of_nonneg_right (Matrix.frobenius_norm_mul _ _) (norm_nonneg _)
@@ -205,7 +235,8 @@ theorem ccMono : CCMono := by
   intro k ρ E _ _ a AB c mm F hAB hF
   obtain ⟨hck, hb⟩ := hF
   refine ⟨hck, fun u v hu hv hl g hg => le_trans ?_ (hb u v hu hv hl g hg)⟩
-  exact mul_le_mul_of_nonneg_right (Real.rpow_le_rpow_of_exponent_le (one_le_gN_of_mem_GV g hg) hAB) (norm_nonneg _)
+  exact mul_le_mul_of_nonneg_right (Real.rpow_le_rpow_of_exponent_le (one_le_gN_of_mem_GV g hg) hAB)
+    (norm_nonneg _)
 
 section
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (p : Seminorm ℂ V)
@@ -253,13 +284,13 @@ end pi
 
 theorem starPi : StarPi := by
   intro k j ρ ι E _ _ _ F₁ A₁ B₁ Q K hB h
-  have hC : B.CkOn (Q:ℕ∞) (B.GV k (j+ρ)) F₁ := CkOn_pi fun i => (h i).1
+  have hC : B.CkOn (Q : ℕ∞) (B.GV k (j + ρ)) F₁ := CkOn_pi fun i => (h i).1
   refine ⟨hC, ?_, ?_⟩
   · intro g hg hne
     obtain ⟨i, hi⟩ := Function.ne_iff.mp hne
     exact (h i).2.1 g hg hi
   · intro u v hu hv hl g hg
-    have hw : ∀ x ∈ wL u ++ wR v, inLie k (j+ρ) x.2 := by
+    have hw : ∀ x ∈ wL u ++ wR v, inLie k (j + ρ) x.2 := by
       intro x hx
       simp only [wL, wR, List.mem_append, List.mem_map] at hx
       rcases hx with ⟨X, hX, rfl⟩ | ⟨X, hX, rfl⟩
@@ -270,7 +301,8 @@ theorem starPi : StarPi := by
     rw [← le_div_iff₀' hpos]
     apply (pi_norm_le_iff_of_nonneg (div_nonneg hB hpos.le)).mpr
     intro i
-    rw [le_div_iff₀' hpos, dLR_eq, Dw_pi hw (sCkOn_mono (by exact_mod_cast hlen) hC) g hg i, ← dLR_eq]
+    rw [le_div_iff₀' hpos, dLR_eq, Dw_pi hw (sCkOn_mono (by exact_mod_cast hlen) hC) g hg i,
+      ← dLR_eq]
     exact (h i).2.2 u v hu hv hl g hg
 
 lemma cont_Zhat (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (a b : Fin (r + 1)) :
@@ -296,14 +328,15 @@ lemma cont_DjU (k j ρ : ℕ) : Continuous (DjU k j ρ) := by
       exact continuous_id.matrix_elem _ _
   exact h.matrix_det
 
-private theorem continuous_exp_real_smul_matrix {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) :
-    Continuous fun t : ℝ => NormedSpace.exp ((t : ℂ) • X) := by
+private theorem continuous_exp_real_smul_matrix {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ)
+    : Continuous fun t : ℝ => NormedSpace.exp ((t : ℂ) • X) := by
   letI : SeminormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpSemiNormedRing
   letI : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedRing
   letI : NormedAlgebra ℂ (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedAlgebra
   letI : NormedAlgebra ℚ (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedAlgebra
   have hcs : CompleteSpace (Matrix (Fin n) (Fin n) ℂ) := FiniteDimensional.complete ℂ _
-  exact (@NormedSpace.exp_continuous _ _ _ hcs).comp (Complex.continuous_ofReal.smul continuous_const)
+  exact (@NormedSpace.exp_continuous _ _ _ hcs).comp
+    (Complex.continuous_ofReal.smul continuous_const)
 
 lemma Rw_vanish {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {O : Set (B.Mat k r)} (hO : IsOpen O)
     {f : B.Mat k r → E} (h : ∀ g ∈ O, f g = 0) (w : List (B.Mat k r)) : ∀ g ∈ O, B.Rw w f g = 0 := by
@@ -328,7 +361,8 @@ theorem phiSuppGOfParts : PhiSuppGOfParts := by
   obtain ⟨_, _, hz, hz', _, hχ, hχε, _, hsupp, _⟩ := hOk
   obtain ⟨_, _, hχ0⟩ := hχ
   obtain ⟨_, _, hχε0⟩ := hχε
-  have hlow : Gf k ρ (lowV k (p + s) ρ U.z) (lowV k (p + s) ρ U.z') γ < U.ε' := not_le.mp (fun h => hγS h)
+  have hlow : Gf k ρ (lowV k (p + s) ρ U.z) (lowV k (p + s) ρ U.z') γ < U.ε' :=
+    not_le.mp (fun h => hγS h)
   let O : Set (B.Mat k (p + s + ρ)) :=
     {g | DjU k (p + s) ρ g ∉ tsupport U.χ} ∪ {g | Gf k (p + s + ρ) U.z U.z' g < U.ε}
   have hO : IsOpen O :=
@@ -361,7 +395,9 @@ theorem phiSuppGOfParts : PhiSuppGOfParts := by
         have hN : 0 < Complex.normSq (ZjH U.σ U.d ξ.2 Z).det := Complex.normSq_pos.2 hne
         have hs := hsupp _ hw
         rw [← Complex.normSq_eq_norm_sq] at hs
-        calc Complex.normSq (ZjH U.σ U.d ξ.2 Z).det * Gf k ρ (lowV k (p + s) ρ U.z) (lowV k (p + s) ρ U.z') γ
+        calc
+          Complex.normSq (ZjH U.σ U.d ξ.2 Z).det
+              * Gf k ρ (lowV k (p + s) ρ U.z) (lowV k (p + s) ρ U.z') γ
             < Complex.normSq (ZjH U.σ U.d ξ.2 Z).det * U.ε' := mul_lt_mul_of_pos_left hlow hN
           _ ≤ U.ε := by linarith [hs]
       · exact Or.inl hw
@@ -383,9 +419,12 @@ namespace Formalism.FourierDecayAlt.P
 
 theorem compactly_supported_monotone : Formalism.FourierDecayAlt.U.CCMono := Ux8.ccMono
 theorem star_projection : Formalism.FourierDecayAlt.U.StarPi := Ux8.starPi
-theorem phi_support_level_of_parts : Formalism.FourierDecayAlt.U.PhiSuppGOfParts := Ux8.phiSuppGOfParts
-theorem corollary_u2_of_parts : Formalism.FourierDecayAlt.U.GermExpansionHypothesisFromComponents := Ux8.corollary_u2_of_parts_holds
+theorem phi_support_level_of_parts : Formalism.FourierDecayAlt.U.PhiSuppGOfParts :=
+  Ux8.phiSuppGOfParts
+theorem corollary_u2_of_parts : Formalism.FourierDecayAlt.U.GermExpansionHypothesisFromComponents :=
+  Ux8.corollary_u2_of_parts_holds
 theorem germ_expansion_of_parts : Formalism.FourierDecayAlt.U.UseGermOfParts := Ux8.useGermOfParts
-theorem germ_top_level_of_parts : Formalism.FourierDecayAlt.U.UseGermTopOfParts := Ux8.useGermTopOfParts
+theorem germ_top_level_of_parts : Formalism.FourierDecayAlt.U.UseGermTopOfParts :=
+  Ux8.useGermTopOfParts
 
 end Formalism.FourierDecayAlt.P

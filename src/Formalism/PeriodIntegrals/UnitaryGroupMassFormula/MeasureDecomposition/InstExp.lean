@@ -11,13 +11,11 @@ open Matrix
 
 namespace PI.ScMuExists.UnitaryGroupMassFormula
 
-theorem inst_exp_real_entry (l : ℝ) (y : ℂ) :
-    NormedSpace.exp (l : ℂ) * y = y ↔ (l : ℂ) * y = 0 := by
+theorem inst_exp_real_entry (l : ℝ) (y : ℂ)
+    : NormedSpace.exp (l : ℂ) * y = y ↔ (l : ℂ) * y = 0 := by
   have hE : NormedSpace.exp (l : ℂ) = ((Real.exp l : ℝ) : ℂ) := by
     rw [Complex.ofReal_exp]
-    first
-      | rw [Complex.exp_eq_exp_ℂ]
-      | exact (congrFun Complex.exp_eq_exp_ℂ (l : ℂ)).symm
+    first | rw [Complex.exp_eq_exp_ℂ] | exact (congrFun Complex.exp_eq_exp_ℂ (l : ℂ)).symm
   rw [hE]
   constructor
   · intro h
@@ -33,35 +31,43 @@ theorem inst_exp_real_entry (l : ℝ) (y : ℂ) :
       simp [h3]
     · simp [hy]
 
-private theorem exists_unitary_diagonal_of_isHermitian {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (hX : X.IsHermitian) :
-    ∃ (U : Matrix (Fin n) (Fin n) ℂ) (d : Fin n → ℝ), star U * U = 1 ∧ U * star U = 1 ∧
-      X = U * diagonal (fun i => (d i : ℂ)) * star U := by
-  have h1 : star (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *
-      (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) = 1 := by
+private theorem exists_unitary_diagonal_of_isHermitian
+    {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (hX : X.IsHermitian)
+    : ∃ (U : Matrix (Fin n) (Fin n) ℂ) (d : Fin n → ℝ),
+      star U * U = 1 ∧ U * star U = 1 ∧ X = U * diagonal (fun i => (d i : ℂ)) * star U := by
+  have h1
+      : star (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+          * (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+        = 1 := by
     first
-      | exact hX.eigenvectorUnitary.2.1
-      | exact (Matrix.mem_unitaryGroup_iff'.mp hX.eigenvectorUnitary.2)
-      | exact Unitary.star_mul_self_of_mem hX.eigenvectorUnitary.2
-      | exact unitary.star_mul_self_of_mem hX.eigenvectorUnitary.2
-  have h2 : (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *
-      star (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) = 1 := by
+    | exact hX.eigenvectorUnitary.2.1
+    | exact (Matrix.mem_unitaryGroup_iff'.mp hX.eigenvectorUnitary.2)
+    | exact Unitary.star_mul_self_of_mem hX.eigenvectorUnitary.2
+    | exact unitary.star_mul_self_of_mem hX.eigenvectorUnitary.2
+  have h2
+      : (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+          * star (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+        = 1 := by
     first
-      | exact hX.eigenvectorUnitary.2.2
-      | exact (Matrix.mem_unitaryGroup_iff.mp hX.eigenvectorUnitary.2)
-      | exact Unitary.mul_star_self_of_mem hX.eigenvectorUnitary.2
-      | exact unitary.mul_star_self_of_mem hX.eigenvectorUnitary.2
+    | exact hX.eigenvectorUnitary.2.2
+    | exact (Matrix.mem_unitaryGroup_iff.mp hX.eigenvectorUnitary.2)
+    | exact Unitary.mul_star_self_of_mem hX.eigenvectorUnitary.2
+    | exact unitary.mul_star_self_of_mem hX.eigenvectorUnitary.2
   refine ⟨hX.eigenvectorUnitary, hX.eigenvalues, h1, h2, ?_⟩
   first
-    | (conv_lhs => rw [hX.spectral_theorem]); simp [Function.comp_def]
-    | (conv_lhs => rw [hX.spectral_theorem]); simp [Function.comp_def, Unitary.conjStarAlgAut_apply]
-    | (have h3 := hX.star_mul_self_mul_eq_diagonal
-       calc X = (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *
-              (star (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) * X *
-                (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)) *
-              star (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) := by
-             simp only [← Matrix.mul_assoc, h2, Matrix.one_mul]
-             rw [Matrix.mul_assoc, h2, Matrix.mul_one]
-         _ = _ := by rw [h3]; simp [Function.comp_def])
+  | (conv_lhs => rw [hX.spectral_theorem]); simp [Function.comp_def]
+  | (conv_lhs => rw [hX.spectral_theorem]); simp [Function.comp_def, Unitary.conjStarAlgAut_apply]
+  | (
+      have h3 := hX.star_mul_self_mul_eq_diagonal
+      calc
+        X = (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+            * (star (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) * X
+              * (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ))
+            * star (hX.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) := by
+          simp only [← Matrix.mul_assoc, h2, Matrix.one_mul]
+          rw [Matrix.mul_assoc, h2, Matrix.mul_one]
+        _ = _ := by rw [h3]; simp [Function.comp_def]
+    )
 
 theorem exponent_fixed_instance : InstExpFix := by
   intro n X hX w
@@ -70,18 +76,14 @@ theorem exponent_fixed_instance : InstExpFix := by
     have hunit : IsUnit U := ⟨⟨U, star U, hUU', hUU⟩, rfl⟩
     have hinv : U⁻¹ = star U := Matrix.inv_eq_left_inv hUU
     rw [hX', ← hinv]
-    have hd : NormedSpace.exp (diagonal (fun i => (d i : ℂ))) =
-        diagonal (fun i => NormedSpace.exp (d i : ℂ)) := by
+    have hd
+        : NormedSpace.exp (diagonal (fun i => (d i : ℂ)))
+          = diagonal (fun i => NormedSpace.exp (d i : ℂ)) := by
       rw [Matrix.exp_diagonal]
       congr 1
       funext i
-      first
-        | exact Pi.exp_apply _ _
-        | simp [Pi.exp_def]
-        | rfl
-    first
-      | rw [Matrix.exp_conj _ _ hunit, hd]
-      | rw [Matrix.exp_conj ℂ _ _ hunit, hd]
+      first | exact Pi.exp_apply _ _ | simp [Pi.exp_def] | rfl
+    first | rw [Matrix.exp_conj _ _ hunit, hd] | rw [Matrix.exp_conj ℂ _ _ hunit, hd]
   have inj : ∀ a b : Fin n → ℂ, U *ᵥ a = U *ᵥ b → a = b := by
     intro a b h
     have h2 := congrArg (fun v => star U *ᵥ v) h

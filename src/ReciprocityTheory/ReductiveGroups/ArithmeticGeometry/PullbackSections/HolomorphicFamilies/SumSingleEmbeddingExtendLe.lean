@@ -9,7 +9,9 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.PfTies1
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 theorem cuspTie : CuspTieSt := by
   intro D T h j hj w hlast x P hP f hf

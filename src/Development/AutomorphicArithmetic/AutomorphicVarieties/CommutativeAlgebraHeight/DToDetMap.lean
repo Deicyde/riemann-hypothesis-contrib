@@ -7,14 +7,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-theorem UpperTheory.V.CA.d_toDet_map :
-    ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (B : Type) [CommRing B] [Algebra A B], (D.map (algebraMap A B)).toDet = (D.toDet.baseChange B).pull (toT A G B) := by
+theorem UpperTheory.V.CA.d_toDet_map
+    : ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (B : Type) [CommRing B]
+        [Algebra A B],
+      (D.map (algebraMap A B)).toDet = (D.toDet.baseChange B).pull (toT A G B) := by
   intro n A G _ _ D B _ _
   refine Det.ext' fun S _ _ x => ?_
   letI : Algebra A S := ((algebraMap B S).comp (algebraMap A B)).toAlgebra
   haveI : IsScalarTower A B S := .of_algebraMap_eq fun _ => rfl
-  have h : ofT B G S x = ofT A G S (Det.cancel A (MonoidAlgebra A G) B S
-      (Algebra.TensorProduct.map (AlgHom.id S S) (toT A G B) x)) := by
+  have h
+      : ofT B G S x
+        = ofT A G S
+          (Det.cancel A (MonoidAlgebra A G) B S
+            (Algebra.TensorProduct.map (AlgHom.id S S) (toT A G B) x)) := by
     induction x with
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
     | tmul s y =>

@@ -16,6 +16,7 @@ open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris Divided
 namespace CrystallineSemistableComparison.Pb
 
 theorem gr_aff_pf : KH.GrAff :=
-  GlobalTheory.T.affine_graded_cohomology_vanishing locGr_h locVan_h polyTf_h globSerreSt_h globVanSt_h
+  GlobalTheory.T.affine_graded_cohomology_vanishing locGr_h locVan_h polyTf_h globSerreSt_h
+    globVanSt_h
 
 end CrystallineSemistableComparison.Pb

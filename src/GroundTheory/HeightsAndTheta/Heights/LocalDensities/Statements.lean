@@ -17,8 +17,8 @@ open scoped ComplexOrder ContDiff
 noncomputable section
 
 def HermitianDetMono.Statement : Prop :=
-  ∀ (n : ℕ) (A B : Matrix (Fin n) (Fin n) ℂ), B.PosSemidef → (A - B).PosSemidef →
-    B.det.re ≤ A.det.re
+  ∀ (n : ℕ) (A B : Matrix (Fin n) (Fin n) ℂ),
+    B.PosSemidef → (A - B).PosSemidef → B.det.re ≤ A.det.re
 
 section Examples
 

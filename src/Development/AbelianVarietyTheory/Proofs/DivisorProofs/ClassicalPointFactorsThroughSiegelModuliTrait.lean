@@ -12,8 +12,11 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ArcGene
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc
 
@@ -21,14 +24,25 @@ namespace GlobalTheory.Poinc.TraitOfPoint
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem base_integralClosure (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K] :
-    ∃ _ : IsDiscreteValuationRing (integralClosure ℤ_[p] K), GlobalTheory.Mum.Base (integralClosure ℤ_[p] K) := by
+theorem base_integralClosure
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K]
+    : ∃ _ : IsDiscreteValuationRing (integralClosure ℤ_[p] K),
+      GlobalTheory.Mum.Base (integralClosure ℤ_[p] K) := by
   haveI := GlobalTheory.isDiscreteValuationRing_integralClosure_padicInt p K
-  exact ⟨inferInstance, ⟨inferInstance, inferInstance, inferInstance,
-    GlobalTheory.DiscEval.isAdicComplete_integralClosure K⟩, GlobalTheory.charZero_integralClosure_padicInt⟩
+  exact ⟨
+    inferInstance,
+    ⟨
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      GlobalTheory.DiscEval.isAdicComplete_integralClosure K
+    ⟩,
+    GlobalTheory.charZero_integralClosure_padicInt
+  ⟩
 
-theorem lft_toInt {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] [h : ArithBase o Ω] (M : RatModel o Ω) :
-    LocallyOfFiniteType (M.s ≫ spMap (algebraMap ℤ o)) := by
+theorem lft_toInt
+    {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] [h : ArithBase o Ω] (M : RatModel o Ω)
+    : LocallyOfFiniteType (M.s ≫ spMap (algebraMap ℤ o)) := by
   have hft := h.ft
   have := M.lft
   have : LocallyOfFiniteType (spMap (algebraMap ℤ o)) := by
@@ -38,13 +52,23 @@ theorem lft_toInt {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] [h : Arit
 
 end GlobalTheory.Poinc.TraitOfPoint
 
-
 open GlobalTheory.Poinc.TraitOfPoint Polynomial in
-theorem GlobalTheory.Poinc.exists_trait_of_classical_point : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (Z : Scheme.{0}) (i : F.X ⟶ Z), IsOpenImmersion i → ∀ (W8 : Matrix (Fin 8) (Fin 8) ℤ) (X₁ : Setup F W8 i) (Y : RatModel X₁.o₁ X₁.Ω₁) (πY : Y.Z ⟶ X₁.M.Z) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ Y.Z), Set.range (gPt p ≫ y ≫ πY ≫ X₁.π) ⊆ Set.range i → ∃ (T : Trait F) (ι : FractionRing T.V →+* PadicAlgCl p) (j : T.V →+* OO p) (ξ : Sp T.V ⟶ Y.Z), (∀ x, ‖ι x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap T.V (FractionRing T.V))) ∧ (∀ v, (j v : PadicAlgCl p) = ι (algebraMap T.V (FractionRing T.V) v)) ∧ IsLocalHom j ∧ spMap j ≫ ξ = y ∧ jK T.V ≫ ξ ≫ πY ≫ X₁.π = T.y ≫ i := by
+theorem GlobalTheory.Poinc.exists_trait_of_classical_point
+    : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (Z : Scheme.{0}) (i : F.X ⟶ Z),
+      IsOpenImmersion i
+        → ∀ (W8 : Matrix (Fin 8) (Fin 8) ℤ) (X₁ : Setup F W8 i) (Y : RatModel X₁.o₁ X₁.Ω₁)
+            (πY : Y.Z ⟶ X₁.M.Z) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ Y.Z),
+          Set.range (gPt p ≫ y ≫ πY ≫ X₁.π) ⊆ Set.range i
+            → ∃ (T : Trait F) (ι : FractionRing T.V →+* PadicAlgCl p) (j : T.V →+* OO p)
+                (ξ : Sp T.V ⟶ Y.Z),
+              (∀ x, ‖ι x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap T.V (FractionRing T.V)))
+                ∧ (∀ v, (j v : PadicAlgCl p) = ι (algebraMap T.V (FractionRing T.V) v))
+                ∧ IsLocalHom j ∧ spMap j ≫ ξ = y ∧ jK T.V ≫ ξ ≫ πY ≫ X₁.π = T.y ≫ i := by
   intro g n F Z i hi W8 X₁ Y πY p _ y hy
   haveI := hi
   haveI := lft_toInt Y
-  obtain ⟨K, hK, H⟩ := GlobalTheory.padicAlgCl_integral_points.2 Y.Z (Y.s ≫ spMap (algebraMap ℤ X₁.o₁)) p y
+  obtain ⟨K, hK, H⟩ :=
+    GlobalTheory.padicAlgCl_integral_points.2 Y.Z (Y.s ≫ spMap (algebraMap ℤ X₁.o₁)) p y
   haveI := hK
   obtain ⟨j₀, y₀, hj₀, -, hy₀⟩ := H K le_rfl
   obtain ⟨hdvr, hbase⟩ := base_integralClosure K
@@ -68,7 +92,8 @@ theorem GlobalTheory.Poinc.exists_trait_of_classical_point : ∀ (g n : ℕ) (F 
     exact Scheme.Hom.comp_apply _ _ _
   let yK := IsOpenImmersion.lift i _ hrange
   obtain ⟨T, f, fK, hfinj, -, hffin, hfK, hTy⟩ :=
-    GlobalTheory.T.traitExistsAfterFiniteExtension_of_completeDVR g n (cycAway n) (zetaAway n) F (integralClosure ℤ_[p] K) hbase hdvr yK
+    GlobalTheory.T.traitExistsAfterFiniteExtension_of_completeDVR g n (cycAway n) (zetaAway n) F
+      (integralClosure ℤ_[p] K) hbase hdvr yK
 
   letI : Algebra (integralClosure ℤ_[p] K) T.V := f.toAlgebra
   haveI : Module.Finite (integralClosure ℤ_[p] K) T.V := hffin
@@ -86,20 +111,23 @@ theorem GlobalTheory.Poinc.exists_trait_of_classical_point : ∀ (g n : ℕ) (F 
     Algebra.IsAlgebraic.trans (integralClosure ℤ_[p] K) T.V (FractionRing T.V)
   let ι' : FractionRing T.V →ₐ[integralClosure ℤ_[p] K] PadicAlgCl p := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let ι : FractionRing T.V →+* PadicAlgCl p := ι'.toRingHom
-  have hιf : ∀ a : integralClosure ℤ_[p] K, ι (algebraMap T.V (FractionRing T.V) (f a)) = ((a : K) : PadicAlgCl p) := by
+  have hιf
+      : ∀ a : integralClosure ℤ_[p] K,
+        ι (algebraMap T.V (FractionRing T.V) (f a)) = ((a : K) : PadicAlgCl p) := by
     intro a
     have h1 := ι'.commutes a
     rw [IsScalarTower.algebraMap_apply (integralClosure ℤ_[p] K) T.V (FractionRing T.V)] at h1
     exact h1
 
   let φ : ℤ_[p] →+* T.V := f.comp (algebraMap ℤ_[p] (integralClosure ℤ_[p] K))
-  have hcomp : ι.comp ((algebraMap T.V (FractionRing T.V)).comp φ) = algebraMap ℤ_[p] (PadicAlgCl p) := by
+  have hcomp
+      : ι.comp ((algebraMap T.V (FractionRing T.V)).comp φ) = algebraMap ℤ_[p] (PadicAlgCl p) := by
     ext c
-    change ι (algebraMap T.V (FractionRing T.V) (f (algebraMap ℤ_[p] (integralClosure ℤ_[p] K) c))) = _
+    change ι (algebraMap T.V (FractionRing T.V) (f (algebraMap ℤ_[p] (integralClosure ℤ_[p] K) c)))
+      = _
     rw [hιf]
     rfl
   have hφint : φ.IsIntegral :=
@@ -125,8 +153,9 @@ theorem GlobalTheory.Poinc.exists_trait_of_classical_point : ∀ (g n : ℕ) (F 
       rw [Polynomial.hom_eval₂, map_zero] at h2
       rw [← hcomp, ← RingHom.comp_assoc]
       exact h2
-  let j : T.V →+* OO p := (ι.comp (algebraMap T.V (FractionRing T.V))).codRestrict (OO p) fun v =>
-    (mem_OO_iff _).2 ((hint _).2 ⟨v, rfl⟩)
+  let j : T.V →+* OO p :=
+    (ι.comp (algebraMap T.V (FractionRing T.V))).codRestrict (OO p) fun v =>
+      (mem_OO_iff _).2 ((hint _).2 ⟨v, rfl⟩)
   have hjf : j.comp f = j₀ := by
     ext a
     change ι (algebraMap T.V (FractionRing T.V) (f a)) = ((j₀ a : OO p) : PadicAlgCl p)
@@ -138,13 +167,16 @@ theorem GlobalTheory.Poinc.exists_trait_of_classical_point : ∀ (g n : ℕ) (F 
     have h0 : algebraMap T.V (FractionRing T.V) v ≠ 0 := fun h => by
       rw [h, map_zero, norm_zero] at h1
       exact zero_ne_one h1
-    obtain ⟨w, hw⟩ := (hint (algebraMap T.V (FractionRing T.V) v)⁻¹).1 (by rw [map_inv₀, norm_inv, h1, inv_one])
+    obtain ⟨w, hw⟩ :=
+      (hint (algebraMap T.V (FractionRing T.V) v)⁻¹).1 (by rw [map_inv₀, norm_inv, h1, inv_one])
     refine IsUnit.of_mul_eq_one w (IsFractionRing.injective T.V (FractionRing T.V) ?_)
     rw [map_mul, map_one, hw, mul_inv_cancel₀ h0]
-  · rw [← Category.assoc, GlobalTheory.ArcPointDescent.sp_comp (h := j₀) (fun a => by rw [← hjf]; rfl), hy₀]
+  · rw [← Category.assoc,
+      GlobalTheory.ArcPointDescent.sp_comp (h := j₀) (fun a => by rw [← hjf]; rfl), hy₀]
   · have e1 : jK T.V ≫ spMap f = spMap fK ≫ jK (integralClosure ℤ_[p] K) :=
       GlobalTheory.ArcPointDescent.sp_sq fun a => (hfK a).symm
-    have hyK : yK ≫ i = jK (integralClosure ℤ_[p] K) ≫ y₀ ≫ πY ≫ X₁.π := IsOpenImmersion.lift_fac _ _ _
+    have hyK : yK ≫ i = jK (integralClosure ℤ_[p] K) ≫ y₀ ≫ πY ≫ X₁.π :=
+      IsOpenImmersion.lift_fac _ _ _
     rw [hTy, Category.assoc (spMap fK) yK i, hyK]
     simp only [← Category.assoc]
     rw [e1]

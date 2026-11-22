@@ -26,9 +26,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
 open GlobalTheory.HSApp
@@ -40,8 +43,9 @@ namespace GlobalTheory.RefSum.JetsUb
 
 open GlobalTheory.AllWt GlobalTheory.CompHS
 
-theorem floorGaps_sub_le {N : ℕ} (a : ℕ) (m : ℤ) (v : Fin N → ℤ) (hv : Antitone v) {i j : Fin N} (hij : i ≤ j) :
-    floorGaps a m v i - floorGaps a m v j ≤ v i - v j := by
+theorem floorGaps_sub_le
+    {N : ℕ} (a : ℕ) (m : ℤ) (v : Fin N → ℤ) (hv : Antitone v) {i j : Fin N} (hij : i ≤ j)
+    : floorGaps a m v i - floorGaps a m v j ≤ v i - v j := by
   have hij' : (i : ℕ) ≤ j := hij
   have e1 : floorGaps a m v i - floorGaps a m v j = ∑ k ∈ Finset.Ico (i : ℕ) j, gap v k / m := by
     simp only [floorGaps, ofGaps]
@@ -63,10 +67,13 @@ theorem floorGaps_sub_le {N : ℕ} (a : ℕ) (m : ℤ) (v : Fin N → ℤ) (hv :
     omega
   exact Int.ediv_le_self _ h0
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
 
-theorem thA_ub_le (P : WtPar Dw) (n : ℕ) (hp : 0 < Dw.p) (hu : ∀ τ, Antitone (P.u₁ τ)) (x : (E →+* ℂ) × ℕ) :
-    thA Dw P.ub n x ≤ thA Dw P.u₁ n x := by
+theorem thA_ub_le
+    (P : WtPar Dw) (n : ℕ) (hp : 0 < Dw.p) (hu : ∀ τ, Antitone (P.u₁ τ)) (x : (E →+* ℂ) × ℕ)
+    : thA Dw P.ub n x ≤ thA Dw P.u₁ n x := by
   have hd : ∀ τ (i j : Fin (Dw.p + Dw.q)), i ≤ j → P.ub τ i - P.ub τ j ≤ P.u₁ τ i - P.u₁ τ j :=
     fun τ i j h => floorGaps_sub_le _ _ _ (hu τ) h
   show (thExpZ Dw P.ub n x).toNat ≤ (thExpZ Dw P.u₁ n x).toNat
@@ -80,19 +87,22 @@ theorem thA_ub_le (P : WtPar Dw) (n : ℕ) (hp : 0 < Dw.p) (hu : ∀ τ, Antiton
     · rw [thExpZ_big_ge _ n τ i (by omega), thExpZ_big_ge _ n τ i (by omega)]
   · by_cases hi : i < Dw.q
     · rw [thExpZ_small _ n hp τ i hi, thExpZ_small _ n hp τ i hi]
-      have := hd τ ⟨Dw.p - 1, by omega⟩ ⟨Dw.p + (Dw.q - 1 - i), by omega⟩ (Fin.mk_le_mk.2 (by omega))
+      have :=
+        hd τ ⟨Dw.p - 1, by omega⟩ ⟨Dw.p + (Dw.q - 1 - i), by omega⟩ (Fin.mk_le_mk.2 (by omega))
       omega
     · rw [thExpZ_small_ge _ n τ i (by omega), thExpZ_small_ge _ n τ i (by omega)]
 
-theorem DF_ub_le (P : WtPar Dw) (n : ℕ) (hp : 0 < Dw.p) (hu : ∀ τ, Antitone (P.u₁ τ)) :
-    Formalism.L2.Pj.DF Dw (thA Dw P.ub n) ≤ Formalism.L2.Pj.DF Dw (thA Dw P.u₁ n) := by
+theorem DF_ub_le (P : WtPar Dw) (n : ℕ) (hp : 0 < Dw.p) (hu : ∀ τ, Antitone (P.u₁ τ))
+    : Formalism.L2.Pj.DF Dw (thA Dw P.ub n) ≤ Formalism.L2.Pj.DF Dw (thA Dw P.u₁ n) := by
   unfold Formalism.L2.Pj.DF
   exact Finset.sum_le_sum fun τ _ => Finset.sum_le_sum fun i _ => thA_ub_le P n hp hu (τ, i)
 
 end GlobalTheory.RefSum.JetsUb
 
-theorem GlobalTheory.RefSum.JetNum.of_le {D : Formalism.BasicNotions.D7} {d d' : ℕ} {c : ℝ} (h : GlobalTheory.RefSum.JetNum D d c) (hd : d' ≤ d) :
-    GlobalTheory.RefSum.JetNum D d' c := fun k => by
+theorem GlobalTheory.RefSum.JetNum.of_le
+    {D : Formalism.BasicNotions.D7} {d d' : ℕ} {c : ℝ}
+    (h : GlobalTheory.RefSum.JetNum D d c) (hd : d' ≤ d)
+    : GlobalTheory.RefSum.JetNum D d' c := fun k => by
   obtain ⟨h1, h2, h3⟩ := h k
   have hd' : (d' : ℝ) ≤ d := by exact_mod_cast hd
   have hr : 0 ≤ GlobalTheory.PtTie.rr0 D := by unfold GlobalTheory.PtTie.rr0; positivity

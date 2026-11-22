@@ -10,7 +10,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical Matrix
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc
 
 namespace Formalism.L2.SG.Pf.FibD
 
@@ -18,10 +19,11 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : Formalism.BasicNotions.D7}
 
-theorem mem_ddS_pow (t : 𝓞 D.host.F) (ht : t ∈ differentIdeal ℤ (𝓞 D.host.F)) (k : ℕ) :
-    (((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) t) ^ k : 𝓞 D.host.E) : D.host.E) ∈ ddS D ^ k := by
-  have h1 : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) t ∈
-      Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (differentIdeal ℤ (𝓞 D.host.F)) :=
+theorem mem_ddS_pow (t : 𝓞 D.host.F) (ht : t ∈ differentIdeal ℤ (𝓞 D.host.F)) (k : ℕ)
+    : (((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) t) ^ k : 𝓞 D.host.E) : D.host.E) ∈ ddS D ^ k := by
+  have h1
+      : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) t
+        ∈ Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (differentIdeal ℤ (𝓞 D.host.F)) :=
     Ideal.mem_map_of_mem _ ht
   have h2 : ((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) t : 𝓞 D.host.E) : D.host.E) ∈ ddS D :=
     FractionalIdeal.mem_coeIdeal_of_mem _ h1
@@ -35,10 +37,14 @@ theorem dict_holds (Zd : LocDat D) : Formalism.L2.SG.Pf.TupGlob.Dict Zd := by
   have hAu : IsLoUni A := fun i j => ⟨hA.2 i j, fun h => h ▸ hA.1 i⟩
   have hBu : IsUpUni B := Formalism.L2.SG.Pf.TupGlob.isUpUni_of hB
   have hsh : ∀ p, Formalism.L2.SG.Pf.StabIntSh.LocEntryShape D p A B := fun p =>
-    (Formalism.L2.SG.Pf.StabIntSh.loc_iff Formalism.L2.SG.Pf.StabIntSh.locShapeL Formalism.L2.SG.Pf.StabIntSh.locShapeG (p := p)
-      Zd.agree hAu hBu).1
-      ⟨by rw [lOf_eq]; exact (hloc p).1, by rw [ρOf_eq]; exact Formalism.L2.SG.Pf.FibQ.sgn_conj_intUp Zd p (hloc p).2⟩
-  have hES := (Formalism.L2.SG.Pf.StabIntSh.glob_iff Formalism.L2.SG.Pf.StabIntSh.locGlob Formalism.L2.SG.Pf.StabIntSh.shapeNZ A B).1 hsh
+    (Formalism.L2.SG.Pf.StabIntSh.loc_iff Formalism.L2.SG.Pf.StabIntSh.locShapeL
+        Formalism.L2.SG.Pf.StabIntSh.locShapeG (p := p) Zd.agree hAu hBu).1 ⟨
+      by rw [lOf_eq]; exact (hloc p).1,
+      by rw [ρOf_eq]; exact Formalism.L2.SG.Pf.FibQ.sgn_conj_intUp Zd p (hloc p).2
+    ⟩
+  have hES :=
+    (Formalism.L2.SG.Pf.StabIntSh.glob_iff Formalism.L2.SG.Pf.StabIntSh.locGlob
+      Formalism.L2.SG.Pf.StabIntSh.shapeNZ A B).1 hsh
   refine ⟨fun c b hcb x hx => ?_, fun c b hcb x hx => ?_, fun P hP c b => ?_⟩
   · rw [Matrix.conjTranspose_apply, PI.UnitaryGroupMassFormula.CntFormula.star_eq_conjF]
     exact mem_aaF hcb hx (ddPow_conj Zd (by have := b.isLt; omega) (hES b c hcb).1)
@@ -56,11 +62,16 @@ theorem dict_holds (Zd : LocDat D) : Formalism.L2.SG.Pf.TupGlob.Dict Zd := by
       unfold Formalism.L2.SG.Pf.StabIntSh.ddPow at hprod
       rw [← zpow_natCast, ← zpow_add₀ (PI.NRCW.ddS_ne_zero D), add_neg_cancel, zpow_zero] at hprod
       obtain ⟨o, ho⟩ := (FractionalIdeal.mem_one_iff _).1 hprod
-      refine ⟨(algebraMap (𝓞 D.host.F) (𝓞 D.host.E) t) ^ (b.val - c.val), fun hs => htP (P.isPrime.mem_of_pow_mem _ hs),
-        o, ?_⟩
+      refine ⟨
+        (algebraMap (𝓞 D.host.F) (𝓞 D.host.E) t) ^ (b.val - c.val),
+        fun hs => htP (P.isPrime.mem_of_pow_mem _ hs),
+        o,
+        ?_
+      ⟩
       rw [Matrix.conjTranspose_apply, PI.UnitaryGroupMassFormula.CntFormula.star_eq_conjF, sg_entry]
-      have e1 : D.conjF (A b c) - Formalism.L2.SG.Pf.StabIntSh.bt D B c b =
-          D.conjF (algebraMap (𝓞 D.host.E) D.host.E ((gS D : ℕ) : 𝓞 D.host.E) * z) := by
+      have e1
+          : D.conjF (A b c) - Formalism.L2.SG.Pf.StabIntSh.bt D B c b
+            = D.conjF (algebraMap (𝓞 D.host.E) D.host.E ((gS D : ℕ) : 𝓞 D.host.E) * z) := by
         have := congrArg D.conjF hzy
         simpa only [map_sub, Formalism.L2.SG.Pf.LocalDenominators.conjF_invol] using this
       rw [e1, map_mul, map_natCast, map_natCast, mul_left_comm, ← ho]

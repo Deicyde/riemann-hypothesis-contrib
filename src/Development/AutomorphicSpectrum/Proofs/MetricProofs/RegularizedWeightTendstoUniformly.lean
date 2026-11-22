@@ -7,18 +7,25 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularizedWei
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp
 open ReciprocityTheory.AnForm (levi)
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp
 
-theorem tendstoUniformlyOn_regWeight_of_isTied :
-    ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (P : Ideal (ReciprocityTheory.ChartRestriction.G.Geo.MRing J)) (n : ℕ) (M : CxModel P n) (Xo : Set ((Σ k, J k) → ℂ)) (A : HermLine J) (S : LogLogRegularisationSetting M Xo A), S.IsTied → ∀ K' ⊆ S.R.Yo, IsCompact K' → TendstoUniformlyOn S.regWeight S.R.ph (𝓝[>] 0) K' := by
+theorem tendstoUniformlyOn_regWeight_of_isTied
+    : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)]
+        (P : Ideal (ReciprocityTheory.ChartRestriction.G.Geo.MRing J)) (n : ℕ) (M : CxModel P n)
+        (Xo : Set ((Σ k, J k) → ℂ)) (A : HermLine J) (S : LogLogRegularisationSetting M Xo A),
+      S.IsTied
+        → ∀ K' ⊆ S.R.Yo, IsCompact K' → TendstoUniformlyOn S.regWeight S.R.ph (𝓝[>] 0) K' := by
   intro K _ J _ P n M Xo A S hS K' hK'Y hK'
-  refine hK'.induction_on (p := fun s => TendstoUniformlyOn S.regWeight S.R.ph (𝓝[>] 0) s)
-    ?_ ?_ ?_ ?_
+  refine
+    hK'.induction_on (p := fun s => TendstoUniformlyOn S.regWeight S.R.ph (𝓝[>] 0) s) ?_ ?_ ?_ ?_
   · intro u _
     simp
   · intro s t hst ht
@@ -35,10 +42,10 @@ theorem tendstoUniformlyOn_regWeight_of_isTied :
     · exact Filter.inter_mem (mem_nhdsWithin_of_mem_nhds hCn) self_mem_nhdsWithin
     · have hcpt : IsCompact (C ∩ K') := hCc.inter hK'
       have himg : IsCompact ((M.atlas.chart j) '' (C ∩ K')) :=
-        hcpt.image_of_continuousOn
-          ((M.atlas.chart j).continuousOn.mono fun y hy => hCs hy.1)
-      have hsub : (M.atlas.chart j) '' (C ∩ K') ⊆
-          (M.atlas.chart j).target ∩ (M.atlas.chart j).symm ⁻¹' S.R.Yo := by
+        hcpt.image_of_continuousOn ((M.atlas.chart j).continuousOn.mono fun y hy => hCs hy.1)
+      have hsub
+          : (M.atlas.chart j) '' (C ∩ K')
+            ⊆ (M.atlas.chart j).target ∩ (M.atlas.chart j).symm ⁻¹' S.R.Yo := by
         rintro _ ⟨y, hy, rfl⟩
         refine ⟨(M.atlas.chart j).map_source (hCs hy.1), ?_⟩
         show (M.atlas.chart j).symm ((M.atlas.chart j) y) ∈ S.R.Yo

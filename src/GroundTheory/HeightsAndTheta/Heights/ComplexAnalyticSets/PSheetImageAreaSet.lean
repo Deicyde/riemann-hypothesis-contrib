@@ -30,12 +30,12 @@ theorem SheetImageAreaSet.proof : SheetImageAreaSet.Statement := by
     simp
   let Ue : Set (EuclideanSpace ℂ (Fin d)) := WithLp.ofLp ⁻¹' U
   have hUe : IsOpen Ue := hU.preimage (PiLp.continuous_ofLp 2 _)
-  let T : EuclideanSpace ℂ (Fin d) → EuclideanSpace ℂ (Fin n) := fun y => WithLp.toLp 2 (s (WithLp.ofLp y))
+  let T : EuclideanSpace ℂ (Fin d) → EuclideanSpace ℂ (Fin n) := fun y =>
+    WithLp.toLp 2 (s (WithLp.ofLp y))
   let P : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin d) :=
-    (WithLp.linearEquiv 2 ℂ (Fin d → ℂ)).symm.toLinearMap ∘ₗ Matrix.mulVecLin A ∘ₗ
-      (WithLp.linearEquiv 2 ℂ (Fin n → ℂ)).toLinearMap
-  have hPT : ∀ y ∈ Ue, P (T y) = y := fun y hy => by
-    simp [P, T, hA _ hy]
+    (WithLp.linearEquiv 2 ℂ (Fin d → ℂ)).symm.toLinearMap ∘ₗ Matrix.mulVecLin A
+      ∘ₗ (WithLp.linearEquiv 2 ℂ (Fin n → ℂ)).toLinearMap
+  have hPT : ∀ y ∈ Ue, P (T y) = y := fun y hy => by simp [P, T, hA _ hy]
   have hPs : Function.Surjective P := by
     have hle : Ue ⊆ (LinearMap.range P : Set _) := fun y hy => ⟨T y, hPT y hy⟩
     refine LinearMap.range_eq_top.1 (Submodule.eq_top_of_nonempty_interior' _
@@ -74,8 +74,9 @@ theorem SheetImageAreaSet.proof : SheetImageAreaSet.Statement := by
   have himg : Q '' (T '' B) = graphPt e F '' (L '' B) := by
     rw [Set.image_image, Set.image_image]
     exact Set.image_congr fun y hy => hQT y (hBU y hy)
-  have hGA := GraphAreaHolomorphic.proof (AreaGraph.proof
-    (AreaGraphBound.proof AreaGraphPiece.proof AreaGraphPartition.proof GraphJacContinuous.proof))
+  have hGA :=
+    GraphAreaHolomorphic.proof (AreaGraph.proof (AreaGraphBound.proof AreaGraphPiece.proof
+      AreaGraphPartition.proof GraphJacContinuous.proof))
   have hfin : finrank ℝ (EuclideanSpace ℂ (Fin d)) = 2 * d := by
     rw [finrank_real_of_complex, finrank_euclideanSpace_fin]
   have : (μH[((2 * d : ℕ) : ℝ)] : Measure (EuclideanSpace ℂ (Fin d))).IsAddHaarMeasure := by
@@ -85,36 +86,49 @@ theorem SheetImageAreaSet.proof : SheetImageAreaSet.Statement := by
     LinearMap.toContinuousLinearMap ((L : _ →ₗ[ℂ] _).restrictScalars ℝ)
   let Qr : EuclideanSpace ℂ (Fin n) →L[ℝ] EuclideanSpace ℂ (Fin n) :=
     LinearMap.toContinuousLinearMap (Q.restrictScalars ℝ)
-  have hCV := lintegral_image_eq_lintegral_abs_det_fderiv_mul (μH[((2 * d : ℕ) : ℝ)]) hB
-    (f := fun y => L y) (f' := fun _ => Lr) (fun y _ => Lr.hasFDerivAt.hasFDerivWithinAt) L.injective.injOn
-    (fun x => ENNReal.ofReal (areaJacobian (fderiv ℝ (graphPt e F) x :
-      EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n))))
+  have hCV :=
+    lintegral_image_eq_lintegral_abs_det_fderiv_mul (μH[((2 * d : ℕ) : ℝ)]) hB
+      (f := fun y => L y)
+      (f' := fun _ => Lr)
+      (fun y _ => Lr.hasFDerivAt.hasFDerivWithinAt)
+      L.injective.injOn
+      (fun x =>
+        ENNReal.ofReal (areaJacobian
+          (fderiv ℝ (graphPt e F) x : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n))))
   rw [← hQi.hausdorffMeasure_image (Or.inl (Nat.cast_nonneg _)), himg,
     hGA d m n e Ω F hΩ hFd (L '' B) hBΩ hLB, hCV]
   refine setLIntegral_congr_fun hB fun y hy => ?_
   have hy' : y ∈ Ue := hBU y hy
   let Mt : EuclideanSpace ℂ (Fin d) →L[ℝ] EuclideanSpace ℂ (Fin n) :=
     (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin n => ℂ)).symm.toContinuousLinearMap.comp
-      ((fderiv ℝ s (WithLp.ofLp y)).comp (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin d => ℂ)).toContinuousLinearMap)
+      ((fderiv ℝ s (WithLp.ofLp y)).comp
+        (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin d => ℂ)).toContinuousLinearMap)
   have hT : HasFDerivAt T Mt y :=
     (PiLp.hasFDerivAt_toLp (𝕜 := ℝ) 2 _).comp y
       (((hsd y hy').restrictScalars ℝ).hasFDerivAt.comp y (PiLp.hasFDerivAt_ofLp (𝕜 := ℝ) 2 y))
   have hx : L y ∈ Ω := hBΩ ⟨y, hy, rfl⟩
-  have hFR : DifferentiableAt ℝ F (L y) := ((hFd.differentiableAt (hΩ.mem_nhds hx)).restrictScalars ℝ)
+  have hFR : DifferentiableAt ℝ F (L y) :=
+    ((hFd.differentiableAt (hΩ.mem_nhds hx)).restrictScalars ℝ)
   have hG : HasFDerivAt (graphPt e F) (fderiv ℝ (graphPt e F) (L y)) (L y) :=
     (GraphAreaHolomorphic.differentiableAt_graphPt_real e hFR).hasFDerivAt
   have h1 : HasFDerivAt (fun z => Q (T z)) (Qr.comp Mt) y := Qr.hasFDerivAt.comp y hT
   have h2 : HasFDerivAt (fun z => graphPt e F (L z)) ((fderiv ℝ (graphPt e F) (L y)).comp Lr) y :=
     hG.comp y Lr.hasFDerivAt
   have hM : Qr.comp Mt = (fderiv ℝ (graphPt e F) (L y)).comp Lr :=
-    h1.unique (h2.congr_of_eventuallyEq (Filter.eventually_of_mem (hUe.mem_nhds hy') fun z hz => hQT z hz))
-  have hJ : sheetJac s (WithLp.ofLp y) =
-      areaJacobian (Mt : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n)) :=
+    h1.unique (h2.congr_of_eventuallyEq (Filter.eventually_of_mem (hUe.mem_nhds hy') fun z hz =>
+      hQT z hz))
+  have hJ
+      : sheetJac s (WithLp.ofLp y)
+        = areaJacobian (Mt : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n)) :=
     congrArg areaJacobian (LinearMap.ext fun v => rfl)
-  have hJ2 : areaJacobian (Mt : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n)) =
-      areaJacobian (fderiv ℝ (graphPt e F) (L y) : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n)) *
-        |LinearMap.det (Lr : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin d))| := by
-    have hQr : ∀ v, ‖(Qr : EuclideanSpace ℂ (Fin n) →ₗ[ℝ] EuclideanSpace ℂ (Fin n)) v‖ = ‖v‖ := fun v => by
+  have hJ2
+      : areaJacobian (Mt : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n))
+        = areaJacobian
+            (fderiv ℝ (graphPt e F) (L y) : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n))
+          * |LinearMap.det (Lr : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin d))| := by
+    have hQr
+        : ∀ v,
+          ‖(Qr : EuclideanSpace ℂ (Fin n) →ₗ[ℝ] EuclideanSpace ℂ (Fin n)) v‖ = ‖v‖ := fun v => by
       simp only [Qr, ContinuousLinearMap.coe_coe, LinearMap.coe_toContinuousLinearMap',
         LinearMap.coe_restrictScalars]
       exact hQn v

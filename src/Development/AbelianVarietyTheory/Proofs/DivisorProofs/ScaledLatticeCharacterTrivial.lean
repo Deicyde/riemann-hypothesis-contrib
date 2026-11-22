@@ -8,32 +8,57 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardAdel
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct Classical
 
 namespace GlobalTheory.TraceDualChar
 
-theorem psi_trivial_on_scaledInt : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsStd ψ → ∀ (κ : Type) [Fintype κ] (a : F), a ≠ 0 →
-    ∀ b : κ → F, (∀ ξ : κ → F, (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ GlobalTheory.EvAdm.scaledInt F κ a →
-        ∃ k : ℤ, Algebra.trace ℚ F (∑ i, ξ i * b i) = k) →
-    ∀ z ∈ GlobalTheory.EvAdm.scaledInt F κ a,
-      ψ (((0 : InfiniteAdeleRing F), ∑ i, z i * algebraMap F (FiniteAdeleRing (𝓞 F) F) (b i)) : AF F) = 1 := by
+theorem psi_trivial_on_scaledInt
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+      IsStd ψ
+        → ∀ (κ : Type) [Fintype κ] (a : F),
+          a ≠ 0
+            → ∀ b : κ → F,
+              (∀ ξ : κ → F,
+                  (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i))
+                      ∈ GlobalTheory.EvAdm.scaledInt F κ a
+                    → ∃ k : ℤ, Algebra.trace ℚ F (∑ i, ξ i * b i) = k)
+                → ∀ z ∈ GlobalTheory.EvAdm.scaledInt F κ a,
+                  ψ
+                      ((
+                         (0 : InfiniteAdeleRing F),
+                         ∑ i, z i * algebraMap F (FiniteAdeleRing (𝓞 F) F) (b i)
+                       )
+                        : AF F)
+                    = 1 := by
   intro F _ _ ψ hψ κ _ a _ b hb z hz
 
-  have hrat : ∀ ξ : κ → F, (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ GlobalTheory.EvAdm.scaledInt F κ a →
-      ψ (((0 : InfiniteAdeleRing F), ∑ i, algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i) *
-        algebraMap F (FiniteAdeleRing (𝓞 F) F) (b i)) : AF F) = 1 := by
+  have hrat
+      : ∀ ξ : κ → F,
+        (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ GlobalTheory.EvAdm.scaledInt F κ a
+          → ψ
+              ((
+                 (0 : InfiniteAdeleRing F),
+                 ∑ i, algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i) *
+                   algebraMap F (FiniteAdeleRing (𝓞 F) F) (b i)
+               )
+                : AF F)
+            = 1 := by
     intro ξ hξ
     obtain ⟨k, hk⟩ := hb ξ hξ
     set q : F := ∑ i, ξ i * b i with hq
-    have e1 : (∑ i, algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i) * algebraMap F (FiniteAdeleRing (𝓞 F) F) (b i)) =
-        algebraMap F (FiniteAdeleRing (𝓞 F) F) q := by
+    have e1
+        : (∑ i, algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i) * algebraMap F (FiniteAdeleRing (𝓞 F) F) (b i))
+          = algebraMap F (FiniteAdeleRing (𝓞 F) F) q := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [hq, map_sum]; simp only [map_mul]
+      rw [hq, map_sum]; simp only [map_mul]
     rw [e1]
     set y : AF F := (((algebraMap F (InfiniteAdeleRing F) q), (0 : FiniteAdeleRing (𝓞 F) F)) : AF F) with hy
-    have e2 : (show AF F from ((0 : InfiniteAdeleRing F), algebraMap F (FiniteAdeleRing (𝓞 F) F) q)) + y =
-        algebraMap F (AF F) q := by
+    have e2
+        : (show AF F from ((0 : InfiniteAdeleRing F), algebraMap F (FiniteAdeleRing (𝓞 F) F) q)) + y
+          = algebraMap F (AF F) q := by
       rw [hy]
       show (show AF F from ((0 : InfiniteAdeleRing F) + algebraMap F (InfiniteAdeleRing F) q,
         algebraMap F (FiniteAdeleRing (𝓞 F) F) q + 0)) = algebraMap F (AF F) q
@@ -52,7 +77,9 @@ theorem psi_trivial_on_scaledInt : ∀ (F : Type) [Field F] [NumberField F] (ψ 
     have hyv : ψ y = 1 := by
       rw [hψ.2.2 y hAt, hev, GlobalTheory.PsiNontriv.trace_mixedEmbedding, hk]
       rw [show ((((k : ℚ) : ℝ) : ℂ)) = (k : ℂ) by push_cast; ring]
-      rw [show -(2 * (Real.pi : ℂ) * Complex.I) * (k : ℂ) = ((-k : ℤ) : ℂ) * (2 * Real.pi * Complex.I) by push_cast; ring]
+      rw [show -(2 * (Real.pi : ℂ) * Complex.I) * (k : ℂ)
+          = ((-k : ℤ) : ℂ) * (2 * Real.pi * Complex.I) by
+        push_cast; ring]
       exact Complex.exp_int_mul_two_pi_mul_I (-k)
     have h3 := congrArg ψ e2
     rw [AddChar.map_add_eq_mul, hyv, mul_one, hψ.2.1] at h3
@@ -65,7 +92,8 @@ theorem psi_trivial_on_scaledInt : ∀ (F : Type) [Field F] [NumberField F] (ψ 
     refine hψ.1.comp ?_
     refine Continuous.prodMk continuous_const ?_
     exact continuous_finsetSum _ fun i _ => (continuous_apply i).mul continuous_const
-  have hU : IsOpen ((GlobalTheory.EvAdm.scaledInt F κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)) ∩ G ⁻¹' {1}ᶜ) :=
+  have hU : IsOpen
+      ((GlobalTheory.EvAdm.scaledInt F κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)) ∩ G ⁻¹' {1}ᶜ) :=
     (GlobalTheory.EvAdm.isOpen_scaledInt a).inter (isOpen_compl_singleton.preimage hGc)
   have hd : DenseRange (fun ξ : κ → F => fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) :=
     DenseRange.piMap fun _ => GlobalTheory.AdeleCharTwist.denseRange_fin

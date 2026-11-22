@@ -14,8 +14,9 @@ theorem SepTensor_of : LateralTheory.E.SHTensorPf.SepTensor := by
   obtain ⟨_, hXs⟩ := hX
   have hu : u.hom.IsIntegral := LateralTheory.E.SHTensorPf.intPush hp hb
   let f : X →+* IsLocalRing.ResidueField Z := (IsLocalRing.residue Z).comp u.hom
-  have hf : f.IsIntegral := RingHom.IsIntegral.trans u.hom (IsLocalRing.residue Z) hu
-    (RingHom.isIntegral_of_surjective _ IsLocalRing.residue_surjective)
+  have hf : f.IsIntegral :=
+    RingHom.IsIntegral.trans u.hom (IsLocalRing.residue Z) hu
+      (RingHom.isIntegral_of_surjective _ IsLocalRing.residue_surjective)
   let _ : Algebra X (IsLocalRing.ResidueField Z) := f.toAlgebra
   have : Algebra.IsIntegral X (IsLocalRing.ResidueField Z) := ⟨hf⟩
   have : Algebra.IsIntegral (IsLocalRing.ResidueField X) (IsLocalRing.ResidueField Z) :=

@@ -40,9 +40,8 @@ end DualCoord
 
 variable [NumberField K]
 
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E]
-
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
 
 omit [NumberField K] [Module.Projective (𝓞 K) E] in
 theorem fibre_finite (σ : K →+* ℂ) : Module.Finite ℂ (Fibre σ E) := by

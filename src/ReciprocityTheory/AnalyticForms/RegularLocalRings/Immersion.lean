@@ -10,21 +10,23 @@ open MvPolynomial ReciprocityTheory.AnForm.M Topology Filter
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem AlgRes.fderiv_affCoord_ker_eq_bot {P D : Ideal (MvPolynomial (Σ k, ι k) ℂ)} {e : ℕ}
-    (R : AlgRes ι P D e) (A : FinHolAtlas e R.M) (hA : R.IsGoodAtlas A) (i : Fin R.n)
-    (x : R.M) (hx : x ∈ R.src i) (hxD : (fun q => eval (R.coord i x) (R.lift i q)) ∉ conePts D)
+theorem AlgRes.fderiv_affCoord_ker_eq_bot
+    {P D : Ideal (MvPolynomial (Σ k, ι k) ℂ)} {e : ℕ}
+    (R : AlgRes ι P D e) (A : FinHolAtlas e R.M) (hA : R.IsGoodAtlas A) (i : Fin R.n) (x : R.M)
+    (hx : x ∈ R.src i) (hxD : (fun q => eval (R.coord i x) (R.lift i q)) ∉ conePts D)
     (p : (k : K) → ι k) (hp : ∀ k, eval (R.coord i x) (R.lift i ⟨k, p k⟩) ≠ 0)
-    (j : Fin A.n) (hj : x ∈ (A.chart j).source) :
-    (fderiv ℂ (fun y => affCoord p (fun q => eval (R.coord i ((A.chart j).symm y)) (R.lift i q)))
-      (A.chart j x)).ker = ⊥ := by
+    (j : Fin A.n) (hj : x ∈ (A.chart j).source)
+    : (fderiv ℂ
+        (fun y => affCoord p (fun q => eval (R.coord i ((A.chart j).symm y)) (R.lift i q)))
+        (A.chart j x)).ker
+      = ⊥ := by
   classical
   have hy0t : A.chart j x ∈ (A.chart j).target := (A.chart j).map_source hj
   have hsy0 : (A.chart j).symm (A.chart j x) = x := (A.chart j).left_inv hj
   set f : (Fin e → ℂ) → (Σ k, ι k) → ℂ :=
     fun y => affCoord p (fun q => eval (R.coord i ((A.chart j).symm y)) (R.lift i q)) with hfdef
   obtain ⟨O, hO, hxO, -, q, F, hOF⟩ := R.inv i x hx hxD p hp
-  obtain ⟨ψ, hψc, hxψ, hψs, hψ⟩ :=
-    hA.2 i x hx (R.sncAt i x hx).r (R.sncAt i x hx).span_eq O hO hxO
+  obtain ⟨ψ, hψc, hxψ, hψs, hψ⟩ := hA.2 i x hx (R.sncAt i x hx).r (R.sncAt i x hx).span_eq O hO hxO
   set r := (R.sncAt i x hx).r with hr
   have hw0 : f (A.chart j x) = affCoord p (fun q => eval (R.coord i x) (R.lift i q)) := by
     simp only [f, hsy0]
@@ -32,32 +34,41 @@ theorem AlgRes.fderiv_affCoord_ker_eq_bot {P D : Ideal (MvPolynomial (Σ k, ι k
   let H : ((Σ k, ι k) → ℂ) → Fin (R.amb i) → ℂ := fun w l => eval w (F l) / eval w q
   let G : ((Σ k, ι k) → ℂ) → Fin e → ℂ := fun w => (A.chart j ∘ ψ.symm) (evalFam r (H w))
   have hHx : ∀ y ∈ O, H (affCoord p fun q => eval (R.coord i y) (R.lift i q)) = R.coord i y := by
-    intro y hy; funext l; simp only [H]; rw [div_eq_iff (hOF y hy).2.1]; exact ((hOF y hy).2.2 l).symm
+    intro y hy
+    funext l
+    simp only [H]
+    rw [div_eq_iff (hOF y hy).2.1]
+    exact ((hOF y hy).2.2 l).symm
   have hH0 : H (f (A.chart j x)) = R.coord i x := by rw [hw0]; exact hHx x hxO
   have hHan : AnalyticAt ℂ H (f (A.chart j x)) := by
-    rw [analyticAt_pi_iff]; intro l
+    rw [analyticAt_pi_iff]
+    intro l
     exact (AnalyticOnNhd.eval_mvPolynomial (F l) _ (Set.mem_univ _)).div
       (AnalyticOnNhd.eval_mvPolynomial q _ (Set.mem_univ _)) hqw0
   have hEan : AnalyticAt ℂ (evalFam r) (H (f (A.chart j x))) := by
-    rw [analyticAt_pi_iff]; intro l
+    rw [analyticAt_pi_iff]
+    intro l
     exact AnalyticOnNhd.eval_mvPolynomial (r l) _ (Set.mem_univ _)
   have hTan : AnalyticAt ℂ (A.chart j ∘ ψ.symm) (evalFam r (H (f (A.chart j x)))) := by
     rw [hH0, ← hψ x hxψ]
     refine (hψc j).2 (ψ x) ⟨ψ.map_source hxψ, ?_⟩
     show ψ.symm (ψ x) ∈ (A.chart j).source
-    rw [ψ.left_inv hxψ]; exact hj
+    rw [ψ.left_inv hxψ]
+    exact hj
   have hGd : DifferentiableAt ℂ G (f (A.chart j x)) :=
     DifferentiableAt.comp (g := A.chart j ∘ ψ.symm) (f := evalFam r ∘ H) (f (A.chart j x))
       hTan.differentiableAt
       (DifferentiableAt.comp (f (A.chart j x)) hEan.differentiableAt hHan.differentiableAt)
   have hfd : DifferentiableAt ℂ f (A.chart j x) := by
-    rw [differentiableAt_pi]; intro q'
+    rw [differentiableAt_pi]
+    intro q'
     have hmem : A.chart j x ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' R.src i :=
       ⟨hy0t, by show (A.chart j).symm (A.chart j x) ∈ R.src i; rw [hsy0]; exact hx⟩
     have h1 := hA.1 i (R.lift i q') j (A.chart j x) hmem
     have h2 := hA.1 i (R.lift i ⟨q'.1, p q'.1⟩) j (A.chart j x) hmem
-    have hne : ((fun y => eval (R.coord i y) (R.lift i ⟨q'.1, p q'.1⟩)) ∘ (A.chart j).symm)
-        (A.chart j x) ≠ 0 := by
+    have hne
+        : ((fun y => eval (R.coord i y) (R.lift i ⟨q'.1, p q'.1⟩)) ∘ (A.chart j).symm) (A.chart j x)
+          ≠ 0 := by
       simp only [Function.comp, hsy0]; exact hp q'.1
     exact (h1.div h2 hne).differentiableAt
   have hev : (G ∘ f) =ᶠ[𝓝 (A.chart j x)] id := by

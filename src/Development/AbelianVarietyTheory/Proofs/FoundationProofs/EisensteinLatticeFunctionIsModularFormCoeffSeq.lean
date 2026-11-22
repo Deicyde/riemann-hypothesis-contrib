@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Regulariz
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisForm
@@ -113,12 +114,18 @@ end GlobalTheory.EisForm
 
 namespace GlobalTheory.EisForm
 
-theorem eis_latF_mf : ∀ (j L₁ L₂ : ℕ) (b χ₁ χ₂ : ℤ → ℂ) (φ : ZMod L₁ → ℂ), 1 ≤ j → 0 < L₁ → 0 < L₂ → hat φ 0 = 0 →
-    (∀ x, b (x + L₂) = b x) →
-    (∀ d : ℤ, IsCoprime d (L₁ * L₂ : ℕ) → (∀ y, φ y = χ₁ d * φ (y * d)) ∧ ∀ x, b (x * d) = χ₂ d * b x) →
-    χ₁ (-1) * χ₂ (-1) = (-1) ^ j →
-    ∃ c : ℂ, MF j (L₁ * L₂) (fun d => χ₁ d * χ₂ d) (eis j c (hat φ) b) ∧
-      ∀ τ : ℍ, lat j 0 L₁ (0, 1) (latF L₁ b φ) τ = 2 * (-2 * π * Complex.I / L₁) ^ j / (j - 1).factorial * qs (eis j c (hat φ) b) τ := by
+theorem eis_latF_mf
+    : ∀ (j L₁ L₂ : ℕ) (b χ₁ χ₂ : ℤ → ℂ) (φ : ZMod L₁ → ℂ),
+      1 ≤ j → 0 < L₁ → 0 < L₂ → hat φ 0 = 0 → (∀ x, b (x + L₂) = b x)
+        → (∀ d : ℤ,
+          IsCoprime d (L₁ * L₂ : ℕ) → (∀ y, φ y = χ₁ d * φ (y * d)) ∧ ∀ x, b (x * d) = χ₂ d * b x)
+        → χ₁ (-1) * χ₂ (-1) = (-1) ^ j
+        → ∃ c : ℂ,
+          MF j (L₁ * L₂) (fun d => χ₁ d * χ₂ d) (eis j c (hat φ) b)
+            ∧ ∀ τ : ℍ,
+              lat j 0 L₁ (0, 1) (latF L₁ b φ) τ
+                = 2 * (-2 * π * Complex.I / L₁) ^ j / (j - 1).factorial
+                  * qs (eis j c (hat φ) b) τ := by
   intro j L₁ L₂ b χ₁ χ₂ φ hj hL₁ hL₂ hhat hb hχ hpar
   haveI : NeZero L₁ := ⟨hL₁.ne'⟩
   obtain ⟨Cb, hCb⟩ := bdd_of_periodic L₂ hL₂ b hb
@@ -129,8 +136,10 @@ theorem eis_latF_mf : ∀ (j L₁ L₂ : ℕ) (b χ₁ χ₂ : ℤ → ℂ) (φ 
     have h2 := hbb x
     rw [show -(y : ZMod L₁) * ((-1 : ℤ) : ZMod L₁) = y by push_cast; ring] at h1
     rw [mul_neg_one] at h2
-    rw [h1, h2, ← hpar]; ring
-  obtain ⟨c, hP, hq⟩ := GlobalTheory.T.regularizedEisensteinLatticeSum_qExpansion j L₁ b φ hj hL₁ ⟨Cb, hCb⟩ hhat hparity
+    rw [h1, h2, ← hpar]
+    ring
+  obtain ⟨c, hP, hq⟩ :=
+    GlobalTheory.T.regularizedEisensteinLatticeSum_qExpansion j L₁ b φ hj hL₁ ⟨Cb, hCb⟩ hhat hparity
   refine ⟨c, ⟨hP, ?_⟩, hq⟩
   set K : ℂ := 2 * (-2 * π * Complex.I / L₁) ^ j / (j - 1).factorial with hKdef
   have hK : K ≠ 0 := by
@@ -145,8 +154,9 @@ theorem eis_latF_mf : ∀ (j L₁ L₂ : ℕ) (b χ₁ χ₂ : ℤ → ℂ) (φ 
     simp only [hΦ, latF]
     split_ifs
     · rw [norm_mul]
-      exact mul_le_mul (hCb _) (Finset.single_le_sum (f := fun y => ‖φ y‖) (fun _ _ => norm_nonneg _)
-        (Finset.mem_univ _)) (norm_nonneg _) hC0
+      exact mul_le_mul (hCb _)
+        (Finset.single_le_sum (f := fun y => ‖φ y‖) (fun _ _ => norm_nonneg _) (Finset.mem_univ _))
+        (norm_nonneg _) hC0
     · simpa using mul_nonneg hC0 (Finset.sum_nonneg fun y _ => norm_nonneg (φ y))
   intro γ hc τ
   obtain ⟨k, hk⟩ := hc
@@ -154,7 +164,8 @@ theorem eis_latF_mf : ∀ (j L₁ L₂ : ℕ) (b χ₁ χ₂ : ℤ → ℂ) (φ 
   have hdet : γ 0 0 * γ 1 1 - γ 0 1 * ((L₁ : ℤ) * L₂ * k) = 1 := by
     have := γ.2
     rw [Matrix.det_fin_two] at this
-    rw [← hk]; exact this
+    rw [← hk]
+    exact this
   have hunit : IsUnit ((γ 1 1 : ℤ) : ZMod L₁) := by
     refine isUnit_iff_exists_inv.mpr ⟨((γ 0 0 : ℤ) : ZMod L₁), ?_⟩
     have := congrArg (fun z : ℤ => (z : ZMod L₁)) hdet
@@ -162,7 +173,9 @@ theorem eis_latF_mf : ∀ (j L₁ L₂ : ℕ) (b χ₁ χ₂ : ℤ → ℂ) (φ 
     rw [ZMod.natCast_self] at this
     linear_combination this
   set χd := χ₁ (γ 1 1) * χ₂ (γ 1 1) with hχd
-  have htr : ∀ x : ℤ × ℤ, (fun y => χd * Φ y) (x.1 * γ 0 0 + x.2 * γ 1 0, x.1 * γ 0 1 + x.2 * γ 1 1) = Φ x := by
+  have htr
+      : ∀ x : ℤ × ℤ,
+        (fun y => χd * Φ y) (x.1 * γ 0 0 + x.2 * γ 1 0, x.1 * γ 0 1 + x.2 * γ 1 1) = Φ x := by
     intro x
     have := latF_trans L₁ L₂ hL₁ b χ₁ χ₂ φ hb hχ (γ 0 0) (γ 0 1) k (γ 1 1) hdet x
     rw [← hk] at this
@@ -171,15 +184,25 @@ theorem eis_latF_mf : ∀ (j L₁ L₂ : ℕ) (b χ₁ χ₂ : ℤ → ℂ) (φ 
     intro w
     unfold lat
     rw [← tsum_mul_left]
-    congr 1; ext x; ring
-  have hw : ((0 : ℤ) * γ 0 0 + 1 * γ 1 0, (0 : ℤ) * γ 0 1 + 1 * γ 1 1) = ((L₁ : ℤ) * L₂ * k, γ 1 1) := by
+    congr 1
+    ext x
+    ring
+  have hw
+      : ((0 : ℤ) * γ 0 0 + 1 * γ 1 0, (0 : ℤ) * γ 0 1 + 1 * γ 1 1)
+        = ((L₁ : ℤ) * L₂ * k, γ 1 1) := by
     simp [hk]
-  have hk1 : Kills L₁ ((L₁ : ℤ) * L₂ * k, γ 1 1) Φ := latF_kills L₁ L₂ hL₁ b φ hb hhat k (γ 1 1) hunit
-  have hk0 : Kills L₁ (0, 1) Φ := by
-    simpa using latF_kills L₁ L₂ hL₁ b φ hb hhat 0 1 (by simp)
-  rw [hq', hq', GlobalTheory.T.regularizedEisensteinLatticeSum_slTwo_smul j L₁ (0, 1) Φ (fun y => χd * Φ y) γ τ htr, hlin]
+  have hk1 : Kills L₁ ((L₁ : ℤ) * L₂ * k, γ 1 1) Φ :=
+    latF_kills L₁ L₂ hL₁ b φ hb hhat k (γ 1 1) hunit
+  have hk0 : Kills L₁ (0, 1) Φ := by simpa using latF_kills L₁ L₂ hL₁ b φ hb hhat 0 1 (by simp)
+  rw [hq', hq',
+    GlobalTheory.T.regularizedEisensteinLatticeSum_slTwo_smul j L₁ (0, 1) Φ
+      (fun y => χd * Φ y)
+      γ τ htr,
+    hlin]
   simp only [Prod.fst, Prod.snd]
-  rw [hw, GlobalTheory.T.regularizedEisensteinLatticeSum_direction_indep j L₁ _ (0, 1) Φ τ hj hL₁ hΦb hk1 hk0]
+  rw [hw,
+    GlobalTheory.T.regularizedEisensteinLatticeSum_direction_indep j L₁ _ (0, 1) Φ τ hj hL₁ hΦb hk1
+      hk0]
   ring
 
 end GlobalTheory.EisForm

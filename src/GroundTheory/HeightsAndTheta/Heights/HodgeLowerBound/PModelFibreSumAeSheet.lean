@@ -13,16 +13,25 @@ namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
 namespace ModelFibreSumAlmostEverywhere
 
-open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.AnForm.M
+open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.AnForm.M
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {P : Ideal (MRing ι)} {e : ℕ}
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {P : Ideal (MRing ι)} {e : ℕ}
   (M : CxModel P e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
 
-theorem exists_sheet (L : HermLine ι) (r : ℝ) (E : Set M.Xc) (hP : IsArithVar P (e + 1))
-    (hL : IsSmoothHerm L) (x : M.Xc) (hx : x ∉ modelBad M Ψ E) :
-    ∃ γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ, IsSheet P Ψ (modelQ M Ψ x) (modelW M Ψ x) γ ∧
-      maDensity (fun (_ : Fin e) y' => r * Real.log (L.h (γ y'))) (modelQ M Ψ x) =
-        pushDens M.atlas (fun _ => modelPot M L r) (modelQ M Ψ) x := by
+theorem exists_sheet
+    (L : HermLine ι)
+    (r : ℝ)
+    (E : Set M.Xc)
+    (hP : IsArithVar P (e + 1)) (hL : IsSmoothHerm L)
+    (x : M.Xc) (hx : x ∉ modelBad M Ψ E)
+    : ∃ γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ,
+      IsSheet P Ψ (modelQ M Ψ x) (modelW M Ψ x) γ
+        ∧ maDensity (fun (_ : Fin e) y' => r * Real.log (L.h (γ y'))) (modelQ M Ψ x)
+          = pushDens M.atlas (fun _ => modelPot M L r) (modelQ M Ψ) x := by
   classical
   obtain ⟨k0⟩ := hP.1
   have hPh : IsMultiHomogIdeal P := hP.2.1.2.1
@@ -64,8 +73,7 @@ theorem exists_sheet (L : HermLine ι) (r : ℝ) (E : Set M.Xc) (hP : IsArithVar
   set ψ0 : (Fin e → ℂ) → ℂ := fun y' => Ψ (segre (γ₀ y')) 0 with hψ0
   have hψ0a : AnalyticAt ℂ ψ0 (Q u) :=
     analyticAt_pi_iff.mp ((analyticAt_segre_lift M Ψ x j huU).comp_of_eq hσa hσu) 0
-  have hψ0u : ψ0 (Q u) ≠ 0 := by
-    simp only [hψ0, hγ₀u]; exact psi_zero_ne_of_not_mem_bad M Ψ hx
+  have hψ0u : ψ0 (Q u) ≠ 0 := by simp only [hψ0, hγ₀u]; exact psi_zero_ne_of_not_mem_bad M Ψ hx
   set c : (Fin e → ℂ) → K → ℂ := fun y' => Function.update (fun _ => (1 : ℂ)) k0 (ψ0 y')⁻¹
     with hcdef
   have hc_ne : ∀ y', ψ0 y' ≠ 0 → ∀ k, c y' k ≠ 0 := by
@@ -90,14 +98,19 @@ theorem exists_sheet (L : HermLine ι) (r : ℝ) (E : Set M.Xc) (hP : IsArithVar
     simp only [hψ0, hγ₀u]
     rfl
   · rw [← hy0]
-    have hU : ∀ᶠ y' in 𝓝 (Q u),
-        F.symm y' ∈ (M.atlas.chart j).target ∩ (M.atlas.chart j).symm ⁻¹' modelU M x :=
+    have hU
+        : ∀ᶠ y' in 𝓝 (Q u),
+          F.symm y' ∈ (M.atlas.chart j).target ∩ (M.atlas.chart j).symm ⁻¹' modelU M x :=
       hσa.continuousAt.preimage_mem_nhds (by
-        rw [hσu]; exact ((M.atlas.chart j).isOpen_inter_preimage_symm (modelU_isOpen M x)).mem_nhds huU)
+        rw [hσu]
+        exact ((M.atlas.chart j).isOpen_inter_preimage_symm (modelU_isOpen M x)).mem_nhds huU)
     filter_upwards [hγa.eventually_analyticAt, hU, F.open_target.mem_nhds hyt,
       hψ0a.continuousAt.eventually_ne hψ0u] with y' ha hUy ht h0
-    refine ⟨ha.differentiableAt,
-      mcPts_smul hPh (c y') (hc_ne y' h0) ((modelLift_spec M x).1 _ hUy.2).1, ?_⟩
+    refine ⟨
+      ha.differentiableAt,
+      mcPts_smul hPh (c y') (hc_ne y' h0) ((modelLift_spec M x).1 _ hUy.2).1,
+      ?_
+    ⟩
     have hq : Q (F.symm y') = y' := by
       have := F.right_inv ht
       rwa [hFc] at this
@@ -110,10 +123,10 @@ theorem exists_sheet (L : HermLine ι) (r : ℝ) (E : Set M.Xc) (hP : IsArithVar
     · simp only [Pi.smul_apply, smul_eq_mul, Fin.cons_succ]
       rw [← congrFun hq i, div_eq_inv_mul]
   · rw [← hy0]
-    have hblk : ∀ k, ∃ i, γ₀ (Q u) ⟨k, i⟩ ≠ 0 := by
-      rw [hγ₀u]; exact (lift_mem M x).1
-    have hH : cxHessian (fun y' => r * Real.log (L.h (γ y'))) (Q u) =
-        cxHessian (fun y' => r * Real.log (L.h (γ₀ y'))) (Q u) := by
+    have hblk : ∀ k, ∃ i, γ₀ (Q u) ⟨k, i⟩ ≠ 0 := by rw [hγ₀u]; exact (lift_mem M x).1
+    have hH
+        : cxHessian (fun y' => r * Real.log (L.h (γ y'))) (Q u)
+          = cxHessian (fun y' => r * Real.log (L.h (γ₀ y'))) (Q u) := by
       set G : (Fin e → ℂ) → ℂ :=
         fun y' => ((-(r * (L.a k0 : ℝ)) : ℝ) : ℂ) * Complex.log (ψ0 y' / ψ0 (Q u)) with hG
       set C : ℝ := -(r * (L.a k0 : ℝ) * Real.log ‖ψ0 (Q u)‖) with hC
@@ -122,52 +135,64 @@ theorem exists_sheet (L : HermLine ι) (r : ℝ) (E : Set M.Xc) (hP : IsArithVar
         show ψ0 (Q u) / ψ0 (Q u) ∈ Complex.slitPlane
         rw [div_self hψ0u]
         exact Complex.one_mem_slitPlane
-      have heq : (fun y' => r * Real.log (L.h (γ y'))) =ᶠ[𝓝 (Q u)]
-          fun y' => r * Real.log (L.h (γ₀ y')) + (G y').re + C := by
+      have heq
+          : (fun y' => r * Real.log (L.h (γ y'))) =ᶠ[𝓝 (Q u)]
+            fun y' => r * Real.log (L.h (γ₀ y')) + (G y').re + C := by
         filter_upwards [hψ0a.continuousAt.eventually_ne hψ0u,
           hγ₀a.continuousAt.eventually (isOpen_blockNonzero.mem_nhds hblk)] with y' h0 hb
         have hpos : 0 < L.h (γ₀ y') := L.pos _ hb
         have hn0 : ‖(ψ0 y')⁻¹‖ ^ L.a k0 ≠ 0 :=
           zpow_ne_zero _ (norm_ne_zero_iff.mpr (inv_ne_zero h0))
         simp only [hγdef]
-        rw [show bsmul (c y') (γ₀ y') = fun p => c y' p.1 * γ₀ y' p from rfl, L.smul _ _ (hc_ne y' h0),
-          prod_norm_update_zpow, Real.log_mul hn0 hpos.ne',
-          hG, hC, Complex.re_ofReal_mul, Complex.log_re, norm_div,
+        rw [show bsmul (c y') (γ₀ y') = fun p => c y' p.1 * γ₀ y' p from rfl,
+          L.smul _ _ (hc_ne y' h0), prod_norm_update_zpow, Real.log_mul hn0 hpos.ne', hG, hC,
+          Complex.re_ofReal_mul, Complex.log_re, norm_div,
           Real.log_div (norm_ne_zero_iff.mpr h0) (norm_ne_zero_iff.mpr hψ0u), Real.log_zpow,
           norm_inv, Real.log_inv]
         ring
-      rw [cxHessian_congr heq, cxHessian_add_re (φ := fun y' => r * Real.log (L.h (γ₀ y'))) C
-        (contDiffAt_const.mul (pot_contDiffAt hL hγ₀a hblk)) hGa]
-    have hmd : maDensity (fun (_ : Fin e) y' => r * Real.log (L.h (γ y'))) (Q u) =
-        maDensity (fun (_ : Fin e) y' => r * Real.log (L.h (γ₀ y'))) (Q u) := by
+      rw [cxHessian_congr heq,
+        cxHessian_add_re
+          (φ := fun y' => r * Real.log (L.h (γ₀ y')))
+          C (contDiffAt_const.mul (pot_contDiffAt hL hγ₀a hblk)) hGa]
+    have hmd
+        : maDensity (fun (_ : Fin e) y' => r * Real.log (L.h (γ y'))) (Q u)
+          = maDensity (fun (_ : Fin e) y' => r * Real.log (L.h (γ₀ y'))) (Q u) := by
       simp only [maDensity, hH]
     rw [hmd, maDensity_eq_maDens]
-    have hcd : ∀ i : Fin e, ContDiffAt ℝ 2
-        (fun v => r * Real.log (L.h (modelLift M x ((M.atlas.chart j).symm v)))) (F.symm (Q u)) := by
+    have hcd
+        : ∀ i : Fin e,
+          ContDiffAt ℝ 2
+            (fun v => r * Real.log (L.h (modelLift M x ((M.atlas.chart j).symm v))))
+            (F.symm (Q u)) := by
       intro i
       rw [hσu]
       exact contDiffAt_const.mul (pot_contDiffAt hL (analyticAt_lift_chart M x j huU)
         (by rw [hsu]; exact (lift_mem M x).1))
-    have hcomp : ReciprocityTheory.AnForm.maDens (fun (_ : Fin e) y' => r * Real.log (L.h (γ₀ y'))) (Q u) =
-        ReciprocityTheory.AnForm.maDens
-          (fun (_ : Fin e) v => r * Real.log (L.h (modelLift M x ((M.atlas.chart j).symm v))))
-          (F.symm (Q u)) * Complex.normSq (ReciprocityTheory.AnForm.A.jacC F.symm (Q u)).det :=
+    have hcomp
+        : ReciprocityTheory.AnForm.maDens (fun (_ : Fin e) y' => r * Real.log (L.h (γ₀ y'))) (Q u)
+          = ReciprocityTheory.AnForm.maDens
+              (fun (_ : Fin e) v => r * Real.log (L.h (modelLift M x ((M.atlas.chart j).symm v))))
+              (F.symm (Q u))
+            * Complex.normSq (ReciprocityTheory.AnForm.A.jacC F.symm (Q u)).det :=
       ReciprocityTheory.AnForm.A.maDens_comp
         (fun (_ : Fin e) v => r * Real.log (L.h (modelLift M x ((M.atlas.chart j).symm v))))
         F.symm (Q u) hσa hcd
-    have hdetinv : LinearMap.det ((Ce.symm : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) :
-        (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) = (LinearMap.det (Df : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))⁻¹ := by
+    have hdetinv
+        : LinearMap.det ((Ce.symm : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+          = (LinearMap.det (Df : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))⁻¹ := by
       have := ContinuousLinearEquiv.det_coe_symm Ce
       rw [hCe'] at this
       exact this
-    have hloc : ReciprocityTheory.AnForm.maDens
-        (fun (_ : Fin e) v => r * Real.log (L.h (modelLift M x ((M.atlas.chart j).symm v)))) u =
-        locDens M.atlas (fun _ => modelPot M L r) j u := by
+    have hloc
+        : ReciprocityTheory.AnForm.maDens
+            (fun (_ : Fin e) v => r * Real.log (L.h (modelLift M x ((M.atlas.chart j).symm v))))
+            u
+          = locDens M.atlas (fun _ => modelPot M L r) j u := by
       unfold locDens
       rw [hsu]
       rfl
-    rw [hcomp, hσu, ReciprocityTheory.AnForm.A.det_jacC, hσd.fderiv, hdetinv, hloc, Complex.normSq_inv,
-      Complex.normSq_eq_norm_sq]
+    rw [hcomp, hσu, ReciprocityTheory.AnForm.A.det_jacC, hσd.fderiv, hdetinv, hloc,
+      Complex.normSq_inv, Complex.normSq_eq_norm_sq]
     unfold pushDens
     rw [div_eq_mul_inv]
 

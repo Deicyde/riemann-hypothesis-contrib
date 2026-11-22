@@ -22,18 +22,20 @@ open ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
-theorem ujset_right_inv {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε) :
-    ∃ g' ∈ UJset ε, g * g' = 1 ∧ g' * g = 1 := by
+theorem ujset_right_inv {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε)
+    : ∃ g' ∈ UJset ε, g * g' = 1 ∧ g' * g = 1 := by
   obtain ⟨y, rfl⟩ := exists_unitary_preimage ε hg
   refine ⟨Formalism.MainNotions.S.umat y⁻¹, unitary_matrix_mem_set ε _, ?_, ?_⟩
   · simp [Formalism.MainNotions.S.umat]
   · simp [Formalism.MainNotions.S.umat]
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem orth_stable (hσ : IsURepOn (UJset ε) σ) (C : Submodule ℂ H)
-    (hC : ∀ g ∈ UJset ε, ∀ x ∈ C, σ g x ∈ C) : ∀ g ∈ UJset ε, ∀ u ∈ Cᗮ, σ g u ∈ Cᗮ := by
+theorem orth_stable
+    (hσ : IsURepOn (UJset ε) σ) (C : Submodule ℂ H) (hC : ∀ g ∈ UJset ε, ∀ x ∈ C, σ g x ∈ C)
+    : ∀ g ∈ UJset ε, ∀ u ∈ Cᗮ, σ g u ∈ Cᗮ := by
   intro g hg u hu
   obtain ⟨g', hg', h1, -⟩ := ujset_right_inv hg
   rw [Submodule.mem_orthogonal]
@@ -43,9 +45,11 @@ theorem orth_stable (hσ : IsURepOn (UJset ε) σ) (C : Submodule ℂ H)
   rw [← hv', inner_map_map_of_isURep hσ hg]
   exact (Submodule.mem_orthogonal _ _).1 hu _ (hC g' hg' v hv)
 
-theorem proj_comm (hσ : IsURepOn (UJset ε) σ) (C : Submodule ℂ H) [C.HasOrthogonalProjection]
-    (hC : ∀ g ∈ UJset ε, ∀ x ∈ C, σ g x ∈ C) : ∀ g ∈ UJset ε, ∀ v : H,
-      Cᗮ.starProjection (σ g v) = σ g (Cᗮ.starProjection v) := by
+theorem proj_comm
+    (hσ : IsURepOn (UJset ε) σ)
+    (C : Submodule ℂ H) [C.HasOrthogonalProjection]
+    (hC : ∀ g ∈ UJset ε, ∀ x ∈ C, σ g x ∈ C)
+    : ∀ g ∈ UJset ε, ∀ v : H, Cᗮ.starProjection (σ g v) = σ g (Cᗮ.starProjection v) := by
   intro g hg v
   refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero
     (orth_stable hσ C hC g hg _ (Cᗮ.starProjection_apply_mem v)) ?_
@@ -57,30 +61,45 @@ theorem proj_comm (hσ : IsURepOn (UJset ε) σ) (C : Submodule ℂ H) [C.HasOrt
   exact (Submodule.mem_orthogonal _ _).1 hw _ (hC g hg _ hm)
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace in
-theorem smooth_of_comm (P : H →L[ℂ] H) (hP : ∀ g ∈ UJset ε, ∀ v : H, P (σ g v) = σ g (P v)) {v : H}
-    (hv : v ∈ smD ε σ) : P v ∈ smD ε σ := by
+theorem smooth_of_comm
+    (P : H →L[ℂ] H) (hP : ∀ g ∈ UJset ε, ∀ v : H, P (σ g v) = σ g (P v)) {v : H} (hv : v ∈ smD ε σ)
+    : P v ∈ smD ε σ := by
   rw [mem_smD_iff] at hv ⊢
   intro g₀ hg₀
   obtain ⟨U, F, hU, hg, hF, hEq⟩ := hv g₀ hg₀
-  refine ⟨U, fun g => P (F g), hU, hg, (P.restrictScalars ℝ).contDiff.comp_contDiffOn hF, fun g hgU hgJ => ?_⟩
+  refine ⟨
+    U,
+    fun g => P (F g),
+    hU,
+    hg,
+    (P.restrictScalars ℝ).contDiff.comp_contDiffOn hF,
+    fun g hgU hgJ => ?_
+  ⟩
   show σ g (P v) = P (F g)
   rw [← hEq g hgU hgJ]
   exact (hP g hgJ v).symm
 
-theorem dS_comm (hσ : IsURepOn (UJset ε) σ) (P : H →L[ℂ] H)
-    (hP : ∀ g ∈ UJset ε, ∀ v : H, P (σ g v) = σ g (P v)) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X)
-    (v : smD ε σ) : dS σ X (P v) = P (dS σ X v) := by
+theorem dS_comm
+    (hσ : IsURepOn (UJset ε) σ)
+    (P : H →L[ℂ] H) (hP : ∀ g ∈ UJset ε, ∀ v : H, P (σ g v) = σ g (P v))
+    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X)
+    (v : smD ε σ)
+    : dS σ X (P v) = P (dS σ X v) := by
   have hf := (isDerivedOn_smE hσ).deriv X hX v
-  have heq : (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • X)) (P v)) =
-      fun t : ℝ => P (σ (NormedSpace.exp ((t : ℂ) • X)) v) :=
+  have heq
+      : (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • X)) (P v))
+        = fun t : ℝ => P (σ (NormedSpace.exp ((t : ℂ) • X)) v) :=
     funext fun t => (hP _ (exp_smul_mem_UJset hX t) v).symm
   unfold dS
   rw [heq, hf.deriv]
   exact ((P.restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ) hf).deriv
 
-theorem smE_comm (hσ : IsURepOn (UJset ε) σ) (P : H →L[ℂ] H)
-    (hP : ∀ g ∈ UJset ε, ∀ v : H, P (σ g v) = σ g (P v)) (v : smD ε σ) (hPv : P v ∈ smD ε σ)
-    (a b : Fin n) : ((smE ε σ a b ⟨P v, hPv⟩ : smD ε σ) : H) = P ((smE ε σ a b v : smD ε σ) : H) := by
+theorem smE_comm
+    (hσ : IsURepOn (UJset ε) σ)
+    (P : H →L[ℂ] H) (hP : ∀ g ∈ UJset ε, ∀ v : H, P (σ g v) = σ g (P v))
+    (v : smD ε σ) (hPv : P v ∈ smD ε σ)
+    (a b : Fin n)
+    : ((smE ε σ a b ⟨P v, hPv⟩ : smD ε σ) : H) = P ((smE ε σ a b v : smD ε σ) : H) := by
   rw [smE_apply hσ, smE_apply hσ, map_add (f := _), map_smul]
   congr 1
   · exact dS_comm hσ P hP (SmDerA.inG_cpart1 ε _) v
@@ -91,33 +110,45 @@ section Generic
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
-def projSm (P : L2 ε →L[ℂ] L2 ε) (hP : ∀ g ∈ UJset ε, ∀ v : L2 ε, P (rreg ε g v) = rreg ε g (P v)) :
-    smD ε (rreg ε) →ₗ[ℂ] smD ε (rreg ε) :=
+def projSm (P : L2 ε →L[ℂ] L2 ε) (hP : ∀ g ∈ UJset ε, ∀ v : L2 ε, P (rreg ε g v) = rreg ε g (P v))
+    : smD ε (rreg ε) →ₗ[ℂ] smD ε (rreg ε) :=
   LinearMap.codRestrict (smD ε (rreg ε)) (P.toLinearMap ∘ₗ (smD ε (rreg ε)).subtype)
     (fun v => smooth_of_comm P hP v.2)
 
-theorem projSm_coe (P : L2 ε →L[ℂ] L2 ε) (hP : ∀ g ∈ UJset ε, ∀ v : L2 ε, P (rreg ε g v) = rreg ε g (P v))
-    (v : smD ε (rreg ε)) : ((projSm P hP v : smD ε (rreg ε)) : L2 ε) = P v := rfl
+theorem projSm_coe
+    (P : L2 ε →L[ℂ] L2 ε) (hP : ∀ g ∈ UJset ε, ∀ v : L2 ε, P (rreg ε g v) = rreg ε g (P v))
+    (v : smD ε (rreg ε))
+    : ((projSm P hP v : smD ε (rreg ε)) : L2 ε) = P v :=
+  rfl
 
-theorem projSm_comm (P : L2 ε →L[ℂ] L2 ε) (hP : ∀ g ∈ UJset ε, ∀ v : L2 ε, P (rreg ε g v) = rreg ε g (P v))
-    (a b : Fin n) (v : smD ε (rreg ε)) :
-    projSm P hP (smE ε (rreg ε) a b v) = smE ε (rreg ε) a b (projSm P hP v) := by
+theorem projSm_comm
+    (P : L2 ε →L[ℂ] L2 ε) (hP : ∀ g ∈ UJset ε, ∀ v : L2 ε, P (rreg ε g v) = rreg ε g (P v))
+    (a b : Fin n) (v : smD ε (rreg ε))
+    : projSm P hP (smE ε (rreg ε) a b v) = smE ε (rreg ε) a b (projSm P hP v) := by
   apply Subtype.ext
   rw [projSm_coe]
   exact (smE_comm (rreg_isURepOn ε) P hP v _ a b).symm
 
-theorem image_le_closGen {Y : Type*} [AddCommGroup Y] [Module ℂ Y] (A : Fin n → Fin n → Module.End ℂ Y)
-    (G X : Submodule ℂ Y) (lam' : Fin n → ℝ) (φ : Y →ₗ[ℂ] smD ε (rreg ε))
-    (hφ : ∀ a b, ∀ y ∈ G, φ (A a b y) = smE ε (rreg ε) a b (φ y))
-    (hK3 : ∀ ψ : Y →ₗ[ℂ] smD ε (rreg ε), (∀ a b, ∀ y ∈ G, ψ (A a b y) = smE ε (rreg ε) a b (ψ y)) →
-      ∀ x ∈ X, ψ x ≠ 0 → ∃ W : Submodule ℂ (smD ε (rreg ε)), W ≤ X.map ψ ∧
-        IsKIrrHW ε (smE ε (rreg ε)) (lowK ε lam') W ∧
-        ∀ v ∈ W, casimir (smE ε (rreg ε)) v = (casVal lam' : ℂ) • v)
-    (ys : Y) (hline : ∀ ψ : Y →ₗ[ℂ] smD ε (rreg ε), (∀ a b, ∀ y ∈ G, ψ (A a b y) = smE ε (rreg ε) a b (ψ y)) →
-      ∀ w ∈ X.map ψ, IsKHWVec ε (smE ε (rreg ε)) (lowK ε lam') w → ∃ c : ℂ, w = c • ψ ys)
+theorem image_le_closGen
+    {Y : Type*} [AddCommGroup Y] [Module ℂ Y]
+    (A : Fin n → Fin n → Module.End ℂ Y)
+    (G X : Submodule ℂ Y)
+    (lam' : Fin n → ℝ)
+    (φ : Y →ₗ[ℂ] smD ε (rreg ε)) (hφ : ∀ a b, ∀ y ∈ G, φ (A a b y) = smE ε (rreg ε) a b (φ y))
+    (hK3 : ∀ ψ : Y →ₗ[ℂ] smD ε (rreg ε),
+      (∀ a b, ∀ y ∈ G, ψ (A a b y) = smE ε (rreg ε) a b (ψ y))
+        → ∀ x ∈ X,
+          ψ x ≠ 0
+            → ∃ W : Submodule ℂ (smD ε (rreg ε)),
+              W ≤ X.map ψ ∧ IsKIrrHW ε (smE ε (rreg ε)) (lowK ε lam') W
+                ∧ ∀ v ∈ W, casimir (smE ε (rreg ε)) v = (casVal lam' : ℂ) • v)
+    (ys : Y)
+    (hline : ∀ ψ : Y →ₗ[ℂ] smD ε (rreg ε),
+      (∀ a b, ∀ y ∈ G, ψ (A a b y) = smE ε (rreg ε) a b (ψ y))
+        → ∀ w ∈ X.map ψ, IsKHWVec ε (smE ε (rreg ε)) (lowK ε lam') w → ∃ c : ℂ, w = c • ψ ys)
     (W : Submodule ℂ (smD ε (rreg ε))) (hW : IsKIrrHW ε (smE ε (rreg ε)) (lowK ε lam') W)
-    (hcas : ∀ v ∈ W, casimir (smE ε (rreg ε)) v = (casVal lam' : ℂ) • v) (hys : φ ys ∈ W) :
-    ∀ x' ∈ X, ((φ x' : smD ε (rreg ε)) : L2 ε) ∈ closGen (smE ε (rreg ε)) W := by
+    (hcas : ∀ v ∈ W, casimir (smE ε (rreg ε)) v = (casVal lam' : ℂ) • v) (hys : φ ys ∈ W)
+    : ∀ x' ∈ X, ((φ x' : smD ε (rreg ε)) : L2 ε) ∈ closGen (smE ε (rreg ε)) W := by
   classical
   have hR := rreg_isURepOn ε
   have hDR := isDerivedOn_smE hR
@@ -154,25 +185,32 @@ theorem image_le_closGen {Y : Type*} [AddCommGroup Y] [Module ℂ Y] (A : Fin n 
   rw [Submodule.starProjection_apply_eq_zero_iff, Submodule.orthogonal_orthogonal] at h0
   exact h0
 
-theorem quot_generic {Y : Type*} [AddCommGroup Y] [Module ℂ Y] (A : Fin n → Fin n → Module.End ℂ Y)
-    (G X Z : Submodule ℂ Y) (lam' : Fin n → ℝ) (hgap : StdGap ε lam') (φ : Y →ₗ[ℂ] smD ε (rreg ε))
-    (hXG : X ≤ G)
-    (hφ : ∀ a b, ∀ y ∈ G, φ (A a b y) = smE ε (rreg ε) a b (φ y))
-    (hK3 : ∀ ψ : Y →ₗ[ℂ] smD ε (rreg ε), (∀ a b, ∀ y ∈ G, ψ (A a b y) = smE ε (rreg ε) a b (ψ y)) →
-      ∀ x ∈ X, ψ x ≠ 0 → ∃ W : Submodule ℂ (smD ε (rreg ε)), W ≤ X.map ψ ∧
-        IsKIrrHW ε (smE ε (rreg ε)) (lowK ε lam') W ∧
-        ∀ v ∈ W, casimir (smE ε (rreg ε)) v = (casVal lam' : ℂ) • v)
+theorem quot_generic
+    {Y : Type*} [AddCommGroup Y] [Module ℂ Y]
+    (A : Fin n → Fin n → Module.End ℂ Y)
+    (G X Z : Submodule ℂ Y)
+    (lam' : Fin n → ℝ) (hgap : StdGap ε lam')
+    (φ : Y →ₗ[ℂ] smD ε (rreg ε))
+    (hXG : X ≤ G) (hφ : ∀ a b, ∀ y ∈ G, φ (A a b y) = smE ε (rreg ε) a b (φ y))
+    (hK3 : ∀ ψ : Y →ₗ[ℂ] smD ε (rreg ε),
+      (∀ a b, ∀ y ∈ G, ψ (A a b y) = smE ε (rreg ε) a b (ψ y))
+        → ∀ x ∈ X,
+          ψ x ≠ 0
+            → ∃ W : Submodule ℂ (smD ε (rreg ε)),
+              W ≤ X.map ψ ∧ IsKIrrHW ε (smE ε (rreg ε)) (lowK ε lam') W
+                ∧ ∀ v ∈ W, casimir (smE ε (rreg ε)) v = (casVal lam' : ℂ) • v)
     (hline : ∃ ys ∈ X, ∀ ψ : Y →ₗ[ℂ] smD ε (rreg ε),
-      (∀ a b, ∀ y ∈ G, ψ (A a b y) = smE ε (rreg ε) a b (ψ y)) →
-      ∀ w ∈ X.map ψ, IsKHWVec ε (smE ε (rreg ε)) (lowK ε lam') w → ∃ c : ℂ, w = c • ψ ys)
-    (hkfin : ∀ x ∈ X, ∃ S : Submodule ℂ Y, S ≤ X ∧ FiniteDimensional ℂ S ∧ IsKStableSub ε A S ∧ x ∈ S)
+      (∀ a b, ∀ y ∈ G, ψ (A a b y) = smE ε (rreg ε) a b (ψ y))
+        → ∀ w ∈ X.map ψ, IsKHWVec ε (smE ε (rreg ε)) (lowK ε lam') w → ∃ c : ℂ, w = c • ψ ys)
+    (hkfin
+      : ∀ x ∈ X, ∃ S : Submodule ℂ Y, S ≤ X ∧ FiniteDimensional ℂ S ∧ IsKStableSub ε A S ∧ x ∈ S)
     (hZX : Z ≤ X) (hZA : ∀ a b, ∀ y ∈ Z, A a b y ∈ Z) (hZφ : ∀ y ∈ X, ∀ y' ∈ Z, φ y = φ y' → y ∈ Z)
-    {x : Y} (hx : x ∈ X) (hxZ : x ∉ Z) :
-    ∃ (Y' : Submodule ℂ Y) (W : Submodule ℂ (smD ε (rreg ε))), Y' ≤ X ∧
-      (∀ v, v ∈ W ↔ ∃ y ∈ Y', v = φ y) ∧ (∀ y ∈ Y', y ∈ Z → y = 0) ∧
-      IsKIrrHW ε (smE ε (rreg ε)) (lowK ε lam') W ∧
-      (∀ v ∈ W, casimir (smE ε (rreg ε)) v = (casVal lam' : ℂ) • v) ∧
-      ∀ k' ∈ Kset ε, ∀ v ∈ W, ∃ v'' ∈ W, (v'' : L2 ε) = rreg ε k' (v : L2 ε) := by
+    {x : Y} (hx : x ∈ X) (hxZ : x ∉ Z)
+    : ∃ (Y' : Submodule ℂ Y) (W : Submodule ℂ (smD ε (rreg ε))),
+      Y' ≤ X ∧ (∀ v, v ∈ W ↔ ∃ y ∈ Y', v = φ y) ∧ (∀ y ∈ Y', y ∈ Z → y = 0)
+        ∧ IsKIrrHW ε (smE ε (rreg ε)) (lowK ε lam') W
+        ∧ (∀ v ∈ W, casimir (smE ε (rreg ε)) v = (casVal lam' : ℂ) • v)
+        ∧ ∀ k' ∈ Kset ε, ∀ v ∈ W, ∃ v'' ∈ W, (v'' : L2 ε) = rreg ε k' (v : L2 ε) := by
   classical
   have hR := rreg_isURepOn ε
   have hDR := isDerivedOn_smE hR
@@ -187,7 +225,8 @@ theorem quot_generic {Y : Type*} [AddCommGroup Y] [Module ℂ Y] (A : Fin n → 
     obtain ⟨c, hc⟩ := hline φ hφ w (hWX hw) hwK
     have hc0 : c ≠ 0 := by rintro rfl; rw [zero_smul] at hc; exact hw0 hc
     have : φ ys = c⁻¹ • w := by rw [hc, smul_smul, inv_mul_cancel₀ hc0, one_smul]
-    rw [this]; exact W.smul_mem _ hw
+    rw [this]
+    exact W.smul_mem _ hw
   have hWK := kStable_of_isKStableSub hR hDR W hW.1 hW.2.1
   have hclos := image_le_closGen A G X lam' φ hφ hK3 ys hline W hW hcas hys
 
@@ -200,14 +239,16 @@ theorem quot_generic {Y : Type*} [AddCommGroup Y] [Module ℂ Y] (A : Fin n → 
       exact Submodule.mem_map_of_mem (hSk a b hab s hs)
     have hS'K := kStable_of_isKStableSub hR hDR S' inferInstance hS'k
     set SH : Submodule ℂ (L2 ε) := S'.map (smD ε (rreg ε)).subtype
-    have hle := data_kfin_le hgap hR hDR hW hcas hWK SH
-      (by rintro _ ⟨_, ⟨s, hs, rfl⟩, rfl⟩; exact hclos s (hSX hs)) inferInstance
-      (by
-        rintro k hk _ ⟨v, hv, rfl⟩
-        obtain ⟨w, hw, hweq⟩ := hS'K k hk v hv
-        rw [Submodule.subtype_apply, ← hweq]
-        exact Submodule.mem_map_of_mem hw)
-    obtain ⟨w, hw, hweq⟩ := Submodule.mem_map.1 (hle (Submodule.mem_map_of_mem (Submodule.mem_map_of_mem hxS)))
+    have hle :=
+      data_kfin_le hgap hR hDR hW hcas hWK SH
+        (by rintro _ ⟨_, ⟨s, hs, rfl⟩, rfl⟩; exact hclos s (hSX hs)) inferInstance
+        (by
+          rintro k hk _ ⟨v, hv, rfl⟩
+          obtain ⟨w, hw, hweq⟩ := hS'K k hk v hv
+          rw [Submodule.subtype_apply, ← hweq]
+          exact Submodule.mem_map_of_mem hw)
+    obtain ⟨w, hw, hweq⟩ :=
+      Submodule.mem_map.1 (hle (Submodule.mem_map_of_mem (Submodule.mem_map_of_mem hxS)))
     rwa [← Subtype.ext hweq]
 
   set N0 : Submodule ℂ (smD ε (rreg ε)) := Z.map φ
@@ -235,7 +276,8 @@ theorem quot_generic {Y : Type*} [AddCommGroup Y] [Module ℂ Y] (A : Fin n → 
     constructor
     · intro hv
       obtain ⟨y₀, hy₀, rfl⟩ := Submodule.mem_map.1 (hWX hv)
-      have hmem : (⟨y₀, Submodule.mem_inf.2 ⟨hy₀, hv⟩⟩ : Y0) ∈ K0 ⊔ Q := by rw [hQ.sup_eq_top]; trivial
+      have hmem : (⟨y₀, Submodule.mem_inf.2 ⟨hy₀, hv⟩⟩ : Y0) ∈ K0 ⊔ Q := by
+        rw [hQ.sup_eq_top]; trivial
       obtain ⟨k, hk, q, hq, hqk⟩ := Submodule.mem_sup.1 hmem
       refine ⟨q, Submodule.mem_map_of_mem hq, ?_⟩
       have hk0 : φ (k : Y) = 0 := hk

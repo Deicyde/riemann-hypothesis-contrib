@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTam
 @[expose] public section
 
 noncomputable section
-open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
 namespace GlobalTheory.MemN.TypesInhab
 
 section Tensor
@@ -19,11 +20,12 @@ variable {I : Type} [Fintype I] {Γ : I → Type} [∀ i, Group (Γ i)] [∀ i, 
 def ten (x : ∀ i, MonoidAlgebra ℂ (Γ i)) : MonoidAlgebra ℂ (∀ i, Γ i) :=
   MonoidAlgebra.ofCoeff <| Finsupp.equivFunOnFinite.symm fun g => ∏ i, (x i).coeff (g i)
 
-theorem coeff_ten (x : ∀ i, MonoidAlgebra ℂ (Γ i)) (g : ∀ i, Γ i) :
-    (ten x).coeff g = ∏ i, (x i).coeff (g i) := rfl
+theorem coeff_ten (x : ∀ i, MonoidAlgebra ℂ (Γ i)) (g : ∀ i, Γ i)
+    : (ten x).coeff g = ∏ i, (x i).coeff (g i) :=
+  rfl
 
-theorem coeff_mul_sum {Δ : Type} [Group Δ] [Fintype Δ] (x y : MonoidAlgebra ℂ Δ) (g : Δ) :
-    (x * y).coeff g = ∑ h, x.coeff h * y.coeff (h⁻¹ * g) := by
+theorem coeff_mul_sum {Δ : Type} [Group Δ] [Fintype Δ] (x y : MonoidAlgebra ℂ Δ) (g : Δ)
+    : (x * y).coeff g = ∑ h, x.coeff h * y.coeff (h⁻¹ * g) := by
   rw [MonoidAlgebra.coeff_mul_apply_left, Finsupp.sum_fintype]
   simp
 
@@ -37,8 +39,8 @@ theorem ten_mul (x y : ∀ i, MonoidAlgebra ℂ (Γ i)) : ten x * ten y = ten fu
   rw [Finset.prod_mul_distrib]
   rfl
 
-theorem ten_single (g : ∀ i, Γ i) :
-    ten (fun i => MonoidAlgebra.single (g i) (1 : ℂ)) = MonoidAlgebra.single g 1 := by
+theorem ten_single (g : ∀ i, Γ i)
+    : ten (fun i => MonoidAlgebra.single (g i) (1 : ℂ)) = MonoidAlgebra.single g 1 := by
   classical
   ext h
   rw [coeff_ten]
@@ -48,8 +50,8 @@ theorem ten_single (g : ∀ i, Γ i) :
     rw [Finset.prod_eq_zero (Finset.mem_univ i) (by simp [hi])]
     simp [hh]
 
-theorem ten_central (x : ∀ i, MonoidAlgebra ℂ (Γ i)) (hx : ∀ i a, x i * a = a * x i) :
-    ten x ∈ Subalgebra.center ℂ (MonoidAlgebra ℂ (∀ i, Γ i)) := by
+theorem ten_central (x : ∀ i, MonoidAlgebra ℂ (Γ i)) (hx : ∀ i a, x i * a = a * x i)
+    : ten x ∈ Subalgebra.center ℂ (MonoidAlgebra ℂ (∀ i, Γ i)) := by
   rw [Subalgebra.mem_center_iff]
   intro b
   induction b using MonoidAlgebra.induction_on with
@@ -76,8 +78,11 @@ theorem ten_ne_zero {x : ∀ i, MonoidAlgebra ℂ (Γ i)} (h : ∀ i, x i ≠ 0)
 
 end Tensor
 
-theorem exists_char {A : Type} [Ring A] [Algebra ℂ A] [Module.Finite ℂ A] (z : Subalgebra.center ℂ A) {t : A}
-    (ht : t ≠ 0) (h : (z : A) * t = 0) : ∃ ω : Subalgebra.center ℂ A →ₐ[ℂ] ℂ, ω z = 0 := by
+theorem exists_char
+    {A : Type} [Ring A] [Algebra ℂ A] [Module.Finite ℂ A]
+    (z : Subalgebra.center ℂ A)
+    {t : A} (ht : t ≠ 0) (h : (z : A) * t = 0)
+    : ∃ ω : Subalgebra.center ℂ A →ₐ[ℂ] ℂ, ω z = 0 := by
   have hz : Ideal.span {z} ≠ ⊤ := by
     rw [Ne, Ideal.span_singleton_eq_top]
     intro hu
@@ -93,22 +98,26 @@ theorem exists_char {A : Type} [Ring A] [Algebra ℂ A] [Module.Finite ℂ A] (z
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ ℂ M).toLinearMap (Ideal.Quotient.mkₐ_surjective ℂ M)
   let l : (Subalgebra.center ℂ A ⧸ M) →ₐ[ℂ] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨l.comp (Ideal.Quotient.mkₐ ℂ M), ?_⟩
-  exact (congrArg l (Ideal.Quotient.eq_zero_iff_mem.2 (hle (Ideal.mem_span_singleton_self z)))).trans (map_zero l)
-
+  exact
+    (congrArg l (Ideal.Quotient.eq_zero_iff_mem.2 (hle (Ideal.mem_span_singleton_self z)))).trans
+      (map_zero l)
 
 open Classical in
-theorem good_sum {I : Type} [Fintype I] {Γ : I → Type} [∀ i, Group (Γ i)] [∀ i, Finite (Γ i)]
-    {P : I → Type} [∀ i, Finite (P i)] (E : ∀ i, P i → MonoidAlgebra ℂ (Γ i)) (good : (∀ i, P i) → Prop)
+theorem good_sum
+    {I : Type} [Fintype I]
+    {Γ : I → Type} [∀ i, Group (Γ i)] [∀ i, Finite (Γ i)]
+    {P : I → Type} [∀ i, Finite (P i)]
+    (E : ∀ i, P i → MonoidAlgebra ℂ (Γ i)) (good : (∀ i, P i) → Prop)
     (e : MonoidAlgebra ℂ (∀ i, Γ i))
     (he : ∀ g, e.coeff g = ∑ᶠ a, if good a then ∏ i, (E i (a i)).coeff (g i) else 0)
     (h1 : ∀ i p, E i p * E i p = E i p) (h2 : ∀ i p a, E i p * a = a * E i p)
-    (h3 : ∀ i p q, p ≠ q → E i p * E i q = 0) :
-    e ∈ Subalgebra.center ℂ (MonoidAlgebra ℂ (∀ i, Γ i)) ∧
-      ∀ a : ∀ i, P i, e * ten (fun i => E i (a i)) = if good a then ten (fun i => E i (a i)) else 0 := by
+    (h3 : ∀ i p q, p ≠ q → E i p * E i q = 0)
+    : e ∈ Subalgebra.center ℂ (MonoidAlgebra ℂ (∀ i, Γ i))
+      ∧ ∀ a : ∀ i, P i,
+        e * ten (fun i => E i (a i)) = if good a then ten (fun i => E i (a i)) else 0 := by
   haveI := Fintype.ofFinite (∀ i, P i)
   have h : e = ∑ a : ∀ i, P i, if good a then ten (fun i => E i (a i)) else 0 := by
     ext g
@@ -139,20 +148,32 @@ section Types
 
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} {N : NData R H what₂} {A : NAut N}
 
-theorem goodTupleIdempotent_central_and_action (T : NTypes A) (hs : ∀ k f, f.Monic ∧ f.natDegree = R.r ∧ f.coeff 0 ≠ 0 → T.eSer k f ≠ 0) :
-    T.e0 ∈ Subalgebra.center ℂ (MonoidAlgebra ℂ (G0g N)) ∧
-      ∀ f : ∀ k, N.PlG k → (ZMod (H.g k))[X], (∀ k v, (f k v).Monic ∧ (f k v).natDegree = R.r ∧ (f k v).coeff 0 ≠ 0) →
-        ∃ t : MonoidAlgebra ℂ (G0g N), t ≠ 0 ∧ (T.goodTuple f → T.e0 * t = t) ∧ (¬ T.goodTuple f → T.e0 * t = 0) := by
+theorem goodTupleIdempotent_central_and_action
+    (T : NTypes A) (hs : ∀ k f, f.Monic ∧ f.natDegree = R.r ∧ f.coeff 0 ≠ 0 → T.eSer k f ≠ 0)
+    : T.e0 ∈ Subalgebra.center ℂ (MonoidAlgebra ℂ (G0g N))
+      ∧ ∀ f : ∀ k, N.PlG k → (ZMod (H.g k))[X],
+        (∀ k v, (f k v).Monic ∧ (f k v).natDegree = R.r ∧ (f k v).coeff 0 ≠ 0)
+          → ∃ t : MonoidAlgebra ℂ (G0g N),
+            t ≠ 0 ∧ (T.goodTuple f → T.e0 * t = t) ∧ (¬ T.goodTuple f → T.e0 * t = 0) := by
   haveI : ∀ k, NeZero (H.g k) := fun k => ⟨(H.g_prime k).ne_zero⟩
   haveI : ∀ k, Fact (H.g k).Prime := fun k => ⟨H.g_prime k⟩
-  obtain ⟨hc, hm⟩ := good_sum (I := Σ k : Fin 2, N.PlG k) (P := fun kv => Fin R.r → ZMod (H.g kv.1))
-    (fun kv p => T.eSer kv.1 (Formalism.CyclotomicNorms.monicOf p))
-    (fun a => T.goodTuple (fun k v => Formalism.CyclotomicNorms.monicOf (a ⟨k, v⟩))) T.e0 (fun g => rfl)
-    (fun _ _ => T.eSer_idem _ _) (fun _ _ => T.eSer_central _ _)
-    (fun _ p q hpq => T.eSer_orth _ _ _ fun h => hpq (funext fun i => by
-      rw [← Formalism.CyclotomicNorms.Sqf.coeff_monicOf_lt p i, h, Formalism.CyclotomicNorms.Sqf.coeff_monicOf_lt]))
+  obtain ⟨hc, hm⟩ :=
+    good_sum (I := Σ k : Fin 2, N.PlG k)
+      (P := fun kv => Fin R.r → ZMod (H.g kv.1))
+      (fun kv p => T.eSer kv.1 (Formalism.CyclotomicNorms.monicOf p))
+      (fun a => T.goodTuple (fun k v => Formalism.CyclotomicNorms.monicOf (a ⟨k, v⟩)))
+      T.e0
+      (fun g => rfl)
+      (fun _ _ => T.eSer_idem _ _)
+      (fun _ _ => T.eSer_central _ _)
+      (fun _ p q hpq =>
+        T.eSer_orth _ _ _ fun h =>
+          hpq (funext fun i => by
+            rw [← Formalism.CyclotomicNorms.Sqf.coeff_monicOf_lt p i, h,
+              Formalism.CyclotomicNorms.Sqf.coeff_monicOf_lt]))
   refine ⟨hc, fun f hf => ?_⟩
-  let a : ∀ kv : (Σ k : Fin 2, N.PlG k), Fin R.r → ZMod (H.g kv.1) := fun kv i => (f kv.1 kv.2).coeff i
+  let a : ∀ kv : (Σ k : Fin 2, N.PlG k), Fin R.r → ZMod (H.g kv.1) := fun kv i =>
+    (f kv.1 kv.2).coeff i
   have ha : ∀ kv, Formalism.CyclotomicNorms.monicOf (a kv) = f kv.1 kv.2 := fun kv =>
     Formalism.CyclotomicNorms.Sqf.monicOf_coeffs _ (hf _ _).1 (hf _ _).2.1
   have ha' : (fun k v => Formalism.CyclotomicNorms.monicOf (a ⟨k, v⟩)) = f := by
@@ -160,7 +181,8 @@ theorem goodTupleIdempotent_central_and_action (T : NTypes A) (hs : ∀ k f, f.M
     exact ha ⟨k, v⟩
   have := hm a
   rw [ha'] at this
-  refine ⟨_, ten_ne_zero fun kv => ?_, fun h => this.trans (if_pos h), fun h => this.trans (if_neg h)⟩
+  refine
+    ⟨_, ten_ne_zero fun kv => ?_, fun h => this.trans (if_pos h), fun h => this.trans (if_neg h)⟩
   rw [ha]
   exact hs _ _ (hf _ _)
 
@@ -179,8 +201,9 @@ theorem not_good_unip (T : NTypes A) : ¬ T.goodTuple (fun _ _ => (X - 1) ^ R.r)
   rw [pow_one] at h3
   omega
 
-theorem goodTupleIdempotent_coeff_mem_subring (T : NTypes A) (S : Subring ℂ) (hS : ∀ k f x, (T.eSer k f).coeff x ∈ S) (x : G0g N) :
-    T.e0.coeff x ∈ S := by
+theorem goodTupleIdempotent_coeff_mem_subring
+    (T : NTypes A) (S : Subring ℂ) (hS : ∀ k f x, (T.eSer k f).coeff x ∈ S) (x : G0g N)
+    : T.e0.coeff x ∈ S := by
   haveI : ∀ k, NeZero (H.g k) := fun k => ⟨(H.g_prime k).ne_zero⟩
   simp only [NTypes.e0, MonoidAlgebra.coeff_ofCoeff, Finsupp.coe_equivFunOnFinite_symm]
   refine finsum_induction (· ∈ S) (zero_mem S) (fun _ _ => add_mem) fun a => ?_
@@ -188,15 +211,18 @@ theorem goodTupleIdempotent_coeff_mem_subring (T : NTypes A) (S : Subring ℂ) (
   · exact prod_mem fun _ _ => hS _ _ _
   · exact zero_mem S
 
-
 set_option synthInstance.maxHeartbeats 400000 in
-def types0 [IsEmpty N.Loc] (hl : ∀ k w (p : A.LP w), A.items₂ k w p = (X - 1) ^ A.lpDim p)
+def types0
+    [IsEmpty N.Loc]
+    (hl : ∀ k w (p : A.LP w), A.items₂ k w p = (X - 1) ^ A.lpDim p)
     (hi : ∀ w (p : A.LP w) σ, A.inePol p σ = (X - 1) ^ A.lpDim p)
     (hc : ∀ k, H.g k % (H.QS * H.q * H.d) = 1)
-    (hB : Disjoint (Formalism.CyclotomicNorms.BB R.r (H.g 0)) (Formalism.CyclotomicNorms.BB R.r (H.g 1)))
+    (hB : Disjoint (Formalism.CyclotomicNorms.BB R.r (H.g 0))
+      (Formalism.CyclotomicNorms.BB R.r (H.g 1)))
     (tg : ∀ k, N.PlG k → G H.E N.Om) (htg : ∀ k v, TameGenAt (N.plOm.1 (A.plGw k v)) (tg k v))
     {n : ℕ} (e : ∀ k, (ZMod (H.g k))[X] → MonoidAlgebra ℂ (GL (Fin R.r) (ZMod (H.g k))))
-    (he : ∀ k, IsSer R.r (H.g k) n (e k)) : NTypes A where
+    (he : ∀ k, IsSer R.r (H.g k) n (e k))
+    : NTypes A where
   Mray := H.K
   Mray_gal := inferInstance
   Mray_ab := fun σ τ => Subsingleton.elim _ _
@@ -227,7 +253,8 @@ def types0 [IsEmpty N.Loc] (hl : ∀ k w (p : A.LP w), A.items₂ k w p = (X - 1
   teichC_inj := fun k => (@GaloisStage.exists_teichC (H.g k) ⟨H.g_prime k⟩).choose_spec
   inertiaCharpoly_type := fun k v L _ => by
     haveI : Fact (H.g k).Prime := ⟨H.g_prime k⟩
-    rw [hi, hl, GaloisStage.rootsBar_unip, Multiset.map_replicate, Multiset.prod_replicate, map_one, C_1]
+    rw [hi, hl, GaloisStage.rootsBar_unip, Multiset.map_replicate, Multiset.prod_replicate, map_one,
+      C_1]
   eSer := e
   eSer_idem := fun k => (he k).idem
   eSer_central := fun k => (he k).central
@@ -249,20 +276,34 @@ def types0 [IsEmpty N.Loc] (hl : ∀ k w (p : A.LP w), A.items₂ k w p = (X - 1
 
 end Types
 
-theorem isGood_comp {n g : ℕ} [Fact g.Prime] {P Q J : Type} (e : P ≃ Q) {f : Q → (ZMod g)[X]}
-    {χ : Q → J → (ZMod g)ˣ} (h : Formalism.CyclotomicNorms.IsGood n g f χ) :
-    Formalism.CyclotomicNorms.IsGood n g (fun v => f (e v)) (fun v => χ (e v)) := by
+theorem isGood_comp
+    {n g : ℕ} [Fact g.Prime]
+    {P Q J : Type} (e : P ≃ Q)
+    {f : Q → (ZMod g)[X]} {χ : Q → J → (ZMod g)ˣ} (h : Formalism.CyclotomicNorms.IsGood n g f χ)
+    : Formalism.CyclotomicNorms.IsGood n g (fun v => f (e v)) (fun v => χ (e v)) := by
   obtain ⟨h1, h2, h3, h4, h5, v, h6⟩ := h
-  refine ⟨fun v => h1 _, fun v => h2 _, fun l hl hb v => h3 l hl hb _, fun l hl hb v => h4 l hl hb _,
-    fun a ha hb => ?_, e.symm v, by simpa using h6⟩
+  refine ⟨
+    fun v => h1 _,
+    fun v => h2 _,
+    fun l hl hb v => h3 l hl hb _,
+    fun l hl hb v => h4 l hl hb _,
+    fun a ha hb => ?_,
+    e.symm v,
+    by simpa using h6
+  ⟩
   obtain ⟨v, hv⟩ := h5 a ha hb
   exact ⟨e.symm v, by simpa using hv⟩
 
-theorem adjoin_le (B : Base) : ∀ z ∈ IntermediateField.adjoin ℚ
-    {Complex.exp (2 * Real.pi * Complex.I / (B.toPre.restRowsFiniteGroupCard : ℕ))}, z ∈ (B.LL0.toSubfield.map B.embLL).toSubring := by
-  have h3 : IntermediateField.adjoin ℚ {Complex.exp (2 * Real.pi * Complex.I / (B.toPre.restRowsFiniteGroupCard : ℕ))} ≤
-      (B.LL0.toSubfield.map B.embLL).toIntermediateField
-        (fun q => by simpa using ratCast_mem (B.LL0.toSubfield.map B.embLL) q) := by
+theorem adjoin_le (B : Base)
+    : ∀ z
+        ∈ IntermediateField.adjoin ℚ
+          {Complex.exp (2 * Real.pi * Complex.I / (B.toPre.restRowsFiniteGroupCard : ℕ))},
+      z ∈ (B.LL0.toSubfield.map B.embLL).toSubring := by
+  have h3
+      : IntermediateField.adjoin ℚ
+          {Complex.exp (2 * Real.pi * Complex.I / (B.toPre.restRowsFiniteGroupCard : ℕ))}
+        ≤ (B.LL0.toSubfield.map B.embLL).toIntermediateField
+          (fun q => by simpa using ratCast_mem (B.LL0.toSubfield.map B.embLL) q) := by
     rw [IntermediateField.adjoin_simple_le_iff]
     obtain ⟨z, hz, hz'⟩ := B.roots_Ks _ List.mem_cons_self
     exact ⟨z, B.Ks_le hz, hz'⟩

@@ -7,8 +7,11 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNb
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
 open GlobalTheory.CompanionTheory.Ar.Flat.Rep
 
 noncomputable section
@@ -17,17 +20,23 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat.Rep
 
 section Grp
 
-variable {S S' : Scheme.{0}} {f : S' ⟶ S} {G' : Over S'} [GrpObj G'] {G : Over S} [GrpObj G]
+variable
+  {S S' : Scheme.{0}} {f : S' ⟶ S} {G' : Over S'} [GrpObj G']
+  {G : Over S} [GrpObj G]
   {φ : G'.left ⟶ G.left}
 
-theorem grpPull_mul (hφ : IsGrpPullback G' G f φ) (T : Over S') {g : T.left ⟶ S} (hg : g = T.hom ≫ f)
-    (x y : T ⟶ G') (x₀ y₀ : Over.mk g ⟶ G) (hx : x₀.left = x.left ≫ φ) (hy : y₀.left = y.left ≫ φ) :
-    (x₀ * y₀).left = (x * y).left ≫ φ := by
+theorem grpPull_mul
+    (hφ : IsGrpPullback G' G f φ)
+    (T : Over S')
+    {g : T.left ⟶ S} (hg : g = T.hom ≫ f)
+    (x y : T ⟶ G') (x₀ y₀ : Over.mk g ⟶ G) (hx : x₀.left = x.left ≫ φ) (hy : y₀.left = y.left ≫ φ)
+    : (x₀ * y₀).left = (x * y).left ≫ φ := by
   subst hg
   exact hφ.2 T x y x₀ y₀ hx hy
 
-theorem grpPull_one (hφ : IsGrpPullback G' G f φ) (T : Over S') {g : T.left ⟶ S} (hg : g = T.hom ≫ f) :
-    (1 : Over.mk g ⟶ G).left = (1 : T ⟶ G').left ≫ φ := by
+theorem grpPull_one
+    (hφ : IsGrpPullback G' G f φ) (T : Over S') {g : T.left ⟶ S} (hg : g = T.hom ≫ f)
+    : (1 : Over.mk g ⟶ G).left = (1 : T ⟶ G').left ≫ φ := by
   subst hg
   have hw : ((1 : T ⟶ G').left ≫ φ) ≫ G.hom = T.hom ≫ f := by
     rw [Category.assoc, hφ.1.w, ← Category.assoc]
@@ -41,8 +50,10 @@ theorem grpPull_one (hφ : IsGrpPullback G' G f φ) (T : Over S') {g : T.left �
 
 end Grp
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F}
 
 section Same
 
@@ -54,8 +65,10 @@ theorem sameVec_one (Y : Model Xo c β) (y : Sp F ⟶ Xo.XF c) : SameVec Y y 1 1
   · exact (grpPull_one Y.m0.cart T (Category.assoc _ _ _).symm).symm
   · exact (grpPull_one Y.m.cart T (Category.assoc _ _ _).symm).symm
 
-theorem sameVec_mul {a b : epsAt (under y) ⟶ Xo.univ.t.G} {a' b' : epsAt (y ≫ Y.j) ⟶ Y.t.G}
-    (h₁ : SameVec Y y a a') (h₂ : SameVec Y y b b') : SameVec Y y (a * b) (a' * b') := by
+theorem sameVec_mul
+    {a b : epsAt (under y) ⟶ Xo.univ.t.G} {a' b' : epsAt (y ≫ Y.j) ⟶ Y.t.G}
+    (h₁ : SameVec Y y a a') (h₂ : SameVec Y y b b')
+    : SameVec Y y (a * b) (a' * b') := by
   obtain ⟨u₁, p₁, q₁, r₁⟩ := h₁
   obtain ⟨u₂, p₂, q₂, r₂⟩ := h₂
   let T : Over (Xo.XF c) := epsAt y
@@ -65,9 +78,10 @@ theorem sameVec_mul {a b : epsAt (under y) ⟶ Xo.univ.t.G} {a' b' : epsAt (y �
   · exact (grpPull_mul Y.m0.cart T (Category.assoc _ _ _).symm x₁ x₂ a b q₁.symm q₂.symm).symm
   · exact (grpPull_mul Y.m.cart T (Category.assoc _ _ _).symm x₁ x₂ a' b' r₁.symm r₂.symm).symm
 
-theorem sameVec_scale {a u : epsAt (under y) ⟶ Xo.univ.t.G} {a' : epsAt (y ≫ Y.j) ⟶ Y.t.G} (h : SameVec Y y a a')
-    (r : F) (hu : u.left = spMap (GlobalTheory.CompanionTheory.Ar.epsMul r) ≫ a.left) :
-    SameVec Y y u (LieTangent.epsScale (y ≫ Y.j) r ≫ a') := by
+theorem sameVec_scale
+    {a u : epsAt (under y) ⟶ Xo.univ.t.G} {a' : epsAt (y ≫ Y.j) ⟶ Y.t.G} (h : SameVec Y y a a')
+    (r : F) (hu : u.left = spMap (GlobalTheory.CompanionTheory.Ar.epsMul r) ≫ a.left)
+    : SameVec Y y u (LieTangent.epsScale (y ≫ Y.j) r ≫ a') := by
   obtain ⟨u₀, p, q, t⟩ := h
   refine ⟨spMap (GlobalTheory.CompanionTheory.Ar.epsMul r) ≫ u₀, ?_, ?_, ?_⟩
   · rw [Category.assoc, p, ← Category.assoc, LieTangent.spec_eps_alg]
@@ -77,11 +91,13 @@ theorem sameVec_scale {a u : epsAt (under y) ⟶ Xo.univ.t.G} {a' : epsAt (y ≫
 
 end Same
 
-theorem valFam_sum {Y : Model Xo c β} {U : Set (Xo.XF c)} (Z : CptOver Y U) {F : Type} [Field F]
-    (y : Sp F ⟶ Xo.XF c) (hg : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j)) {n : ℕ} (e : Fin n → Z.V)
-    (u : Fin n → (epsAt (under y) ⟶ Xo.univ.t.G))
-    (h : ∀ j, ∃ a, Z.M.ValAt (y ≫ Y.j) (e j) a ∧ SameVec Y y (u j) a) :
-    ∃ w', Z.M.ValAt (y ≫ Y.j) (∑ j, e j) w' ∧ SameVec Y y (List.ofFn u).prod w' := by
+theorem valFam_sum
+    {Y : Model Xo c β} {U : Set (Xo.XF c)} (Z : CptOver Y U)
+    {F : Type} [Field F]
+    (y : Sp F ⟶ Xo.XF c) (hg : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j))
+    {n : ℕ} (e : Fin n → Z.V) (u : Fin n → (epsAt (under y) ⟶ Xo.univ.t.G))
+    (h : ∀ j, ∃ a, Z.M.ValAt (y ≫ Y.j) (e j) a ∧ SameVec Y y (u j) a)
+    : ∃ w', Z.M.ValAt (y ≫ Y.j) (∑ j, e j) w' ∧ SameVec Y y (List.ofFn u).prod w' := by
   induction n with
   | zero =>
     refine ⟨1, ?_, ?_⟩
@@ -96,7 +112,15 @@ theorem valFam_sum {Y : Model Xo c β} {U : Set (Xo.XF c)} (Z : CptOver Y U) {F 
     · rw [List.ofFn_succ, List.prod_cons]
       exact sameVec_mul hb hs
 
-theorem valFam_sum_comb : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (U : Set (Xo.XF c)) (Z : CptOver Y U) (F : Type) [Field F] (y : Sp F ⟶ Xo.XF c) (n : ℕ) (b : Fin n → Z.V) (v : Vecs y n) (s : Fin n → Z.Ω) (r : Fin n → F) (w : epsAt (under y) ⟶ Xo.univ.t.G), genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j) → IsValFam Z y b v → (∀ j, ValAt (Z.ξ₀ ≫ Y.j) (y ≫ Y.j) (s j) (r j)) → IsComb r v w → ∃ w', Z.M.ValAt (y ≫ Y.j) (∑ j, s j • b j) w' ∧ SameVec Y y w w' := by
+theorem valFam_sum_comb
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
+        (U : Set (Xo.XF c)) (Z : CptOver Y U) (F : Type) [Field F] (y : Sp F ⟶ Xo.XF c) (n : ℕ)
+        (b : Fin n → Z.V) (v : Vecs y n) (s : Fin n → Z.Ω) (r : Fin n → F)
+        (w : epsAt (under y) ⟶ Xo.univ.t.G),
+      genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j) → IsValFam Z y b v
+        → (∀ j, ValAt (Z.ξ₀ ≫ Y.j) (y ≫ Y.j) (s j) (r j)) → IsComb r v w
+        → ∃ w', Z.M.ValAt (y ≫ Y.j) (∑ j, s j • b j) w' ∧ SameVec Y y w w' := by
   intro E _ _ _ H D l Xo c O _ β Y U Z F _ y n b v s r w hg h hs hw
   obtain ⟨u, hu, rfl⟩ := hw
   refine valFam_sum Z y hg _ u fun j => ?_

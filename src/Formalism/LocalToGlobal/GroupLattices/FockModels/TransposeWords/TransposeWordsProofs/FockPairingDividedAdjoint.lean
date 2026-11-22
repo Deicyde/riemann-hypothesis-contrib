@@ -94,10 +94,8 @@ theorem fock_pairing_divided_adjoint : FockRRowDivAdj := by
         lclosedeq_rowDiv_map, lclosedeq_rowDiv_map]
       rw [adj_fockR_smul_left, adj_fockR_smul_right, adj_fockR_smul_left, adj_fockR_smul_right,
         adj_fockR_map, adj_fockR_map, adj_rowDiv_int]
-    | add g1 g2 h1 h2 =>
-      rw [rowDiv_add, adj_fockR_add_right, adj_fockR_add_right, h1, h2]
-  | add f1 f2 h1 h2 =>
-    rw [rowDiv_add, adj_fockR_add_left, adj_fockR_add_left, h1, h2]
+    | add g1 g2 h1 h2 => rw [rowDiv_add, adj_fockR_add_right, adj_fockR_add_right, h1, h2]
+  | add f1 f2 h1 h2 => rw [rowDiv_add, adj_fockR_add_left, adj_fockR_add_left, h1, h2]
 
 lemma adj_applyWord_cons {R : Type*} [CommRing R] {r n : ℕ} (x : Fin r × Fin r × ℕ)
     (w : List (Fin r × Fin r × ℕ)) (F : MvPolynomial (Fin r × Fin n) R) :
@@ -122,8 +120,8 @@ theorem fock_pairing_word_adjoint : FockRWordAdj := by
     rfl
   | cons x w ih =>
     intro F G
-    rw [adj_applyWord_cons, fock_pairing_divided_adjoint R r n x.1 x.2.1 x.2.2, ih, adj_transposeWord_cons,
-      adj_applyWord_append]
+    rw [adj_applyWord_cons, fock_pairing_divided_adjoint R r n x.1 x.2.1 x.2.2, ih,
+      adj_transposeWord_cons, adj_applyWord_append]
     rfl
 
 end Formalism.L2.G.Model.TS

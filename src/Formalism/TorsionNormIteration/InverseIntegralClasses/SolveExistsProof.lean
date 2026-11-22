@@ -24,4 +24,5 @@ theorem SolveExists_proof : Formalism.LT.SolveExists.{u, v} := by
 
 end Formalism.LT.SolveP
 
-theorem Formalism.LT.SolveExists_proof : Formalism.LT.SolveExists.{u, v} := Formalism.LT.SolveP.SolveExists_proof
+theorem Formalism.LT.SolveExists_proof : Formalism.LT.SolveExists.{u, v} :=
+  Formalism.LT.SolveP.SolveExists_proof

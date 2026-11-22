@@ -14,7 +14,10 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.AinfEPow
@@ -27,19 +30,19 @@ theorem evE_ne_zero : bk.ev bk.E ≠ 0 := fun h =>
 theorem theta_eq_zero_iff (x : Ainf l) : Per.θ l x = 0 ↔ bk.ev bk.E ∣ x := by
   rw [← RingHom.mem_ker, ← bk.span_ev, Ideal.mem_span_singleton]
 
-theorem theta_of_natPow_mul (n : ℕ) (c : Ainf l) (h : Per.θ l ((l : Ainf l) ^ n * c) = 0) :
-    Per.θ l c = 0 := by
+theorem theta_of_natPow_mul (n : ℕ) (c : Ainf l) (h : Per.θ l ((l : Ainf l) ^ n * c) = 0)
+    : Per.θ l c = 0 := by
   rw [map_mul, map_pow, map_natCast] at h
   have hne : ((l : Per.OC l)) ^ n ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.mpr hl.out.ne_zero)
   exact (mul_eq_zero.mp h).resolve_left hne
 
-theorem dvd_of_dvd_natPow_mul (n : ℕ) (c : Ainf l) (h : bk.ev bk.E ∣ (l : Ainf l) ^ n * c) :
-    bk.ev bk.E ∣ c := by
+theorem dvd_of_dvd_natPow_mul (n : ℕ) (c : Ainf l) (h : bk.ev bk.E ∣ (l : Ainf l) ^ n * c)
+    : bk.ev bk.E ∣ c := by
   rw [← theta_eq_zero_iff] at h ⊢
   exact theta_of_natPow_mul n c h
 
-theorem pow_dvd_of_pow_dvd_l_mul (m : ℕ) : ∀ a : Ainf l,
-    bk.ev bk.E ^ m ∣ (l : Ainf l) * a → bk.ev bk.E ^ m ∣ a := by
+theorem pow_dvd_of_pow_dvd_l_mul (m : ℕ)
+    : ∀ a : Ainf l, bk.ev bk.E ^ m ∣ (l : Ainf l) * a → bk.ev bk.E ^ m ∣ a := by
   induction m with
   | zero => intro a _; simp
   | succ m ih =>
@@ -53,8 +56,9 @@ theorem pow_dvd_of_pow_dvd_l_mul (m : ℕ) : ∀ a : Ainf l,
     rw [pow_succ', mul_left_comm] at h
     exact (mul_dvd_mul_iff_left (evE_ne_zero bk)).mp h
 
-theorem pow_dvd_of_pow_dvd_lpow_mul (m k : ℕ) (a : Ainf l)
-    (h : bk.ev bk.E ^ m ∣ (l : Ainf l) ^ k * a) : bk.ev bk.E ^ m ∣ a := by
+theorem pow_dvd_of_pow_dvd_lpow_mul
+    (m k : ℕ) (a : Ainf l) (h : bk.ev bk.E ^ m ∣ (l : Ainf l) ^ k * a)
+    : bk.ev bk.E ^ m ∣ a := by
   induction k generalizing a with
   | zero => simpa using h
   | succ k ih =>
@@ -63,8 +67,7 @@ theorem pow_dvd_of_pow_dvd_lpow_mul (m k : ℕ) (a : Ainf l)
     rw [← mul_assoc, ← pow_succ']
     exact h
 
-theorem pow_dvd_of_ev_pow_dvd (m : ℕ) : ∀ s : bk.S,
-    bk.ev bk.E ^ m ∣ bk.ev s → bk.E ^ m ∣ s := by
+theorem pow_dvd_of_ev_pow_dvd (m : ℕ) : ∀ s : bk.S, bk.ev bk.E ^ m ∣ bk.ev s → bk.E ^ m ∣ s := by
   induction m with
   | zero => intro s _; simp
   | succ m ih =>
@@ -86,17 +89,19 @@ theorem pow_dvd_of_ev_pow_dvd (m : ℕ) : ∀ s : bk.S,
     rw [pow_succ', map_mul] at h
     exact (mul_dvd_mul_iff_left (evE_ne_zero bk)).mp h
 
-theorem theta_eq_zero_of_forall (y : Per.OC l) (h : ∀ n : ℕ, ∃ z : Per.OC l, y = (l : Per.OC l) ^ n * z) :
-    y = 0 := by
+theorem theta_eq_zero_of_forall
+    (y : Per.OC l) (h : ∀ n : ℕ, ∃ z : Per.OC l, y = (l : Per.OC l) ^ n * z)
+    : y = 0 := by
   apply IsHausdorff.haus (IsAdicComplete.toIsHausdorff (I := Ideal.span {(l : Per.OC l)})) y
   intro n
   obtain ⟨z, hz⟩ := h n
   rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
   exact ⟨z, hz⟩
 
-theorem pow_dvd_of_forall_approx (m : ℕ) : ∀ a : Ainf l,
-    (∀ n : ℕ, ∃ b c : Ainf l, a = bk.ev bk.E ^ m * b + (l : Ainf l) ^ n * c) →
-      bk.ev bk.E ^ m ∣ a := by
+theorem pow_dvd_of_forall_approx (m : ℕ)
+    : ∀ a : Ainf l,
+      (∀ n : ℕ, ∃ b c : Ainf l, a = bk.ev bk.E ^ m * b + (l : Ainf l) ^ n * c)
+        → bk.ev bk.E ^ m ∣ a := by
   induction m with
   | zero => intro a _; simp
   | succ m ih =>
@@ -120,20 +125,23 @@ theorem pow_dvd_of_forall_approx (m : ℕ) : ∀ a : Ainf l,
     obtain ⟨c', rfl⟩ := dvd_of_dvd_natPow_mul bk n c hc
     refine ⟨b, c', ?_⟩
     apply mul_left_cancel₀ (evE_ne_zero bk)
-    rw [hbc]; ring
+    rw [hbc]
+    ring
 
-theorem ker_localizedTheta_eq_span_eisenstein (bk : BK K) : Per.kerP l = Ideal.span {(algebraMap (Per.Ainf l) (Per.AinfP l)) (bk.ev bk.E)} :=
+theorem ker_localizedTheta_eq_span_eisenstein (bk : BK K)
+    : Per.kerP l = Ideal.span {(algebraMap (Per.Ainf l) (Per.AinfP l)) (bk.ev bk.E)} :=
   GlobalTheory.MemLoc.ker_localizedTheta_eq_span_of_dvd l _ (fun a => theta_eq_zero_iff bk a)
 
-theorem mem_filtration_iff_eisenstein_pow_dvd (m : ℕ) (a : Ainf l) :
-    aDp l a ∈ Per.FilP l m ↔ bk.ev bk.E ^ m ∣ a := by
-  have key : aDp l a ∈ Per.FilP l m ↔
-      (algebraMap (Per.Ainf l) (Per.AinfP l)) a ∈ Per.kerP l ^ m := by
+theorem mem_filtration_iff_eisenstein_pow_dvd (m : ℕ) (a : Ainf l)
+    : aDp l a ∈ Per.FilP l m ↔ bk.ev bk.E ^ m ∣ a := by
+  have key
+      : aDp l a ∈ Per.FilP l m ↔ (algebraMap (Per.Ainf l) (Per.AinfP l)) a ∈ Per.kerP l ^ m := by
     rw [GlobalTheory.RingIface.mem_filtration_iff_mem_kerTheta_pow]
     unfold aDp
     rw [RingHom.comp_apply, GlobalTheory.RingIface.ev_alg]
     exact Ideal.Quotient.eq_zero_iff_mem
-  rw [key, ker_localizedTheta_eq_span_eisenstein bk, Ideal.span_singleton_pow, Ideal.mem_span_singleton, ← map_pow]
+  rw [key, ker_localizedTheta_eq_span_eisenstein bk, Ideal.span_singleton_pow,
+    Ideal.mem_span_singleton, ← map_pow]
   constructor
   · rintro ⟨y, hy⟩
     haveI : IsLocalization (Submonoid.powers (l : Per.Ainf l)) (Per.AinfP l) :=
@@ -155,9 +163,20 @@ theorem mem_filtration_iff_eisenstein_pow_dvd (m : ℕ) (a : Ainf l) :
     exact pow_dvd_of_pow_dvd_lpow_mul bk m k a ⟨b, heq⟩
   · exact fun h => map_dvd _ h
 
-theorem ePow_facts : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (m : ℕ), (∀ a : Ainf l, bk.ev bk.E ^ m ∣ (l : Ainf l) * a → bk.ev bk.E ^ m ∣ a) ∧ (∀ s : bk.S, bk.ev bk.E ^ m ∣ bk.ev s → bk.E ^ m ∣ s) ∧ (∀ a : Ainf l, aDp l a ∈ Per.FilP l m ↔ bk.ev bk.E ^ m ∣ a) ∧ ∀ a : Ainf l, (∀ n : ℕ, ∃ b c : Ainf l, a = bk.ev bk.E ^ m * b + (l : Ainf l) ^ n * c) → bk.ev bk.E ^ m ∣ a := by
+theorem ePow_facts
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (m : ℕ),
+      (∀ a : Ainf l, bk.ev bk.E ^ m ∣ (l : Ainf l) * a → bk.ev bk.E ^ m ∣ a)
+        ∧ (∀ s : bk.S, bk.ev bk.E ^ m ∣ bk.ev s → bk.E ^ m ∣ s)
+        ∧ (∀ a : Ainf l, aDp l a ∈ Per.FilP l m ↔ bk.ev bk.E ^ m ∣ a)
+        ∧ ∀ a : Ainf l,
+          (∀ n : ℕ, ∃ b c : Ainf l, a = bk.ev bk.E ^ m * b + (l : Ainf l) ^ n * c)
+            → bk.ev bk.E ^ m ∣ a := by
   intro l _ K bk m
-  exact ⟨pow_dvd_of_pow_dvd_l_mul bk m, pow_dvd_of_ev_pow_dvd bk m, mem_filtration_iff_eisenstein_pow_dvd bk m,
-    pow_dvd_of_forall_approx bk m⟩
+  exact ⟨
+    pow_dvd_of_pow_dvd_l_mul bk m,
+    pow_dvd_of_ev_pow_dvd bk m,
+    mem_filtration_iff_eisenstein_pow_dvd bk m,
+    pow_dvd_of_forall_approx bk m
+  ⟩
 
 end GlobalTheory.AinfEPow

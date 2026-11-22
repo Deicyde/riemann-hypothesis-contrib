@@ -12,13 +12,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.main :
-    CohomologyHyp → UpperTheory.V.Published.FerreroWashington → SeedII → SeedIII → PMEx → UpperTheory.V.Aut.Sp4In := by
+theorem UpperTheory.V.Ws.main
+    : CohomologyHyp → UpperTheory.V.Published.FerreroWashington → SeedII → SeedIII → PMEx
+      → UpperTheory.V.Aut.Sp4In := by
   intro hP hFW h2 h3 hPM Ω _ _ _ h t hB l _ c e _ he0 het ψ hψ D hD hcase
   have hctx : Ctx2 D ∨ Ctx3 D :=
-    hcase.imp (fun hc => ⟨hD, h, t, e, ψ, hB, he0, het, hψ, hc.1, hc.2⟩)
+    hcase.imp
+      (fun hc => ⟨hD, h, t, e, ψ, hB, he0, het, hψ, hc.1, hc.2⟩)
       (fun hc => ⟨hD, h, t, e, ψ, hB, he0, het, hψ, hc.1, hc.2⟩)
   obtain ⟨ι⟩ := (UpperTheory.V.Ws.ambZero l).2
   have hA := UpperTheory.V.Ws.thmA hP hFW h2 h3 hPM D hctx ι

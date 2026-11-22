@@ -8,9 +8,11 @@ open MvPolynomial
 
 namespace Formalism.GradedWeylDivisibility
 
-theorem ldtwist_map_rowAct {K L : Type*} [CommRing K] [CommRing L] (φ : K →+* L) {k n : ℕ}
-    (g : Matrix (Fin k) (Fin k) K) (F : MvPolynomial (Fin k × Fin n) K) :
-    map φ (rowAct K g F) = rowAct L (g.map φ) (map φ F) := by
+theorem ldtwist_map_rowAct
+    {K L : Type*} [CommRing K] [CommRing L]
+    (φ : K →+* L)
+    {k n : ℕ} (g : Matrix (Fin k) (Fin k) K) (F : MvPolynomial (Fin k × Fin n) K)
+    : map φ (rowAct K g F) = rowAct L (g.map φ) (map φ F) := by
   induction F using MvPolynomial.induction_on
   · rename_i a
     simp [rowAct]

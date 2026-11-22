@@ -235,7 +235,6 @@ end DualLatticeIndexBis
 
 namespace DualLatticeIndexBis
 
-
 open scoped Pointwise in
 lemma exists_codiff (E : Type) [Field E] [NumberField E] [StarRing E] :
     ∃ (δ : 𝓞 E) (K : Ideal (𝓞 E)), δ ≠ 0 ∧ K ≠ ⊥ ∧ ∀ z : E,
@@ -351,14 +350,17 @@ namespace DualLatticeIndexBis
 
 section Dual
 
-variable {E U : Type} [Field E] [NumberField E] [StarRing E] [AddCommGroup U] [Module E U]
-  [Module (𝓞 E) U] [IsScalarTower (𝓞 E) E U] [Module ℚ U] [IsScalarTower ℚ E U]
+variable
+  {E U : Type} [Field E] [NumberField E] [StarRing E] [AddCommGroup U] [Module E U] [Module (𝓞 E) U]
+  [IsScalarTower (𝓞 E) E U] [Module ℚ U] [IsScalarTower ℚ E U]
 
 noncomputable def trForm (h : U →ₗ[E] U →ₗ⋆[E] E) : U →ₗ[ℚ] U →ₗ[ℚ] ℚ :=
-  LinearMap.mk₂ ℚ (fun x y => Algebra.trace ℚ E (h x y))
+  LinearMap.mk₂ ℚ
+    (fun x y => Algebra.trace ℚ E (h x y))
     (fun x x' y => by simp only [map_add (f := _), LinearMap.add_apply])
     (fun q x y => by
-      rw [← algebraMap_smul E q x, map_smul, LinearMap.smul_apply, smul_eq_mul, ← Algebra.smul_def, map_smul])
+      rw [← algebraMap_smul E q x, map_smul, LinearMap.smul_apply, smul_eq_mul, ← Algebra.smul_def,
+        map_smul])
     (fun x y y' => by simp only [map_add (f := _)])
     (fun q x y => by
       rw [← algebraMap_smul E q y, LinearMap.map_smulₛₗ, RingHom.map_rat_algebraMap, smul_eq_mul,

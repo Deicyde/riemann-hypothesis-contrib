@@ -10,9 +10,9 @@ open TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_pow_eq_of_kaehlerDifferential_eq_zero_of_smooth_domain :
-    ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] (hk : (p : k) = 0) (S : Type)
-      [CommRing S] [IsDomain S] [Algebra k S] [Algebra.Smooth k S] (f : S),
+theorem exists_pow_eq_of_kaehlerDifferential_eq_zero_of_smooth_domain
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] (hk : (p : k) = 0) (S : Type)
+        [CommRing S] [IsDomain S] [Algebra k S] [Algebra.Smooth k S] (f : S),
       KaehlerDifferential.D k S f = 0 → ∃ h : S, h ^ p = f := by
   intro p hp k _ _ hk S _ _ _ _ f hf
   have hS : IsIntegrallyClosed S :=

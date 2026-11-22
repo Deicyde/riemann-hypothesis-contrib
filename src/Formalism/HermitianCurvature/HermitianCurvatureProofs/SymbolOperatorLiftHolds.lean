@@ -13,9 +13,9 @@ noncomputable section
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-def liftA {d o : ℕ} (a : (k : Fin (o + 1)) → (Fin k → Fin d) → (Fin d → ℝ) → ℂ) (m' : ℕ) :
-    (k : Fin (m' + 1)) → (Fin k → Fin d) → (Fin d → ℝ) → ℂ :=
-  fun k w x => if h : (k : ℕ) ≤ o then a ⟨k, by omega⟩ w x else 0
+def liftA {d o : ℕ} (a : (k : Fin (o + 1)) → (Fin k → Fin d) → (Fin d → ℝ) → ℂ) (m' : ℕ)
+    : (k : Fin (m' + 1)) → (Fin k → Fin d) → (Fin d → ℝ) → ℂ := fun k w x =>
+  if h : (k : ℕ) ≤ o then a ⟨k, by omega⟩ w x else 0
 
 theorem symbol_operator_lift_holds : SOpLift := by
   intro d S m' O hle hS
@@ -35,15 +35,17 @@ theorem symbol_operator_lift_holds : SOpLift := by
     simp only [SOp.app]
     let F : ℕ → ℂ := fun n =>
       if h : n ≤ o then ∑ w : Fin n → Fin d, a ⟨n, by omega⟩ w x * pdc (List.ofFn w) u x else 0
-    have h1 : ∑ k : Fin (m' + 1), ∑ w : Fin k → Fin d, liftA a m' k w x * pdc (List.ofFn w) u x =
-        ∑ k : Fin (m' + 1), F k := by
+    have h1
+        : ∑ k : Fin (m' + 1), ∑ w : Fin k → Fin d, liftA a m' k w x * pdc (List.ofFn w) u x
+          = ∑ k : Fin (m' + 1), F k := by
       refine Finset.sum_congr rfl fun k _ => ?_
       simp only [F, liftA]
       split_ifs with h
       · rfl
       · simp
-    have h2 : ∑ k : Fin (o + 1), ∑ w : Fin k → Fin d, a k w x * pdc (List.ofFn w) u x =
-        ∑ k : Fin (o + 1), F k := by
+    have h2
+        : ∑ k : Fin (o + 1), ∑ w : Fin k → Fin d, a k w x * pdc (List.ofFn w) u x
+          = ∑ k : Fin (o + 1), F k := by
       refine Finset.sum_congr rfl fun k _ => ?_
       simp only [F]
       rw [dif_pos (by omega)]

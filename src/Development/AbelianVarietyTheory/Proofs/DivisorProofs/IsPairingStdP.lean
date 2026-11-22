@@ -14,10 +14,11 @@ namespace GlobalTheory.ArchUniq
 
 section Real
 
-variable {V V₁ : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup V₁] [NormedSpace ℝ V₁]
+variable
+  {V V₁ : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup V₁] [NormedSpace ℝ V₁]
 
-def schrF (P : V → V → ℝ) (w : V × V) (f : V → ℂ) : V → ℂ :=
-  fun y => Complex.exp (-(2 * Real.pi * Complex.I) * ((P y w.2 + P w.1 w.2 / 2 : ℝ) : ℂ)) * f (y + w.1)
+def schrF (P : V → V → ℝ) (w : V × V) (f : V → ℂ) : V → ℂ := fun y =>
+  Complex.exp (-(2 * Real.pi * Complex.I) * ((P y w.2 + P w.1 w.2 / 2 : ℝ) : ℂ)) * f (y + w.1)
 
 def omega (P : V → V → ℝ) (w w' : V × V) : ℝ := P w.1 w'.2 - P w'.1 w.2
 
@@ -29,7 +30,8 @@ structure IsPairing (P : V → V → ℝ) : Prop where
   nondegL : ∀ x, (∀ y, P x y = 0) → x = 0
   nondegR : ∀ y, (∀ x, P x y = 0) → y = 0
 
-structure Setup (P : V → V → ℝ) (P₁ : V₁ → V₁ → ℝ) (j : V₁ × V₁ → V × V) (L : Set (V × V)) : Prop where
+structure Setup (P : V → V → ℝ) (P₁ : V₁ → V₁ → ℝ) (j : V₁ × V₁ → V × V) (L : Set (V × V))
+    : Prop where
   pair : IsPairing P
   pair₁ : IsPairing P₁
   add : ∀ w w', j (w + w') = j w + j w'
@@ -43,7 +45,6 @@ def stdP (P₁ : V₁ → V₁ → ℝ) (k : ℕ) (x y : V₁ × (Fin k → ℝ)
 
 def jStd (k : ℕ) (w : V₁ × V₁) : (V₁ × (Fin k → ℝ)) × (V₁ × (Fin k → ℝ)) := ((w.1, 0), (w.2, 0))
 
-
 variable (V₁) in
 def LStd (k : ℕ) : Set ((V₁ × (Fin k → ℝ)) × (V₁ × (Fin k → ℝ))) :=
   {l | ∃ b : Fin k → ℝ, l = ((0, 0), (0, b))}
@@ -51,15 +52,20 @@ def LStd (k : ℕ) : Set ((V₁ × (Fin k → ℝ)) × (V₁ × (Fin k → ℝ))
 theorem isPairing_stdP {P₁ : V₁ → V₁ → ℝ} (h : IsPairing P₁) (k : ℕ) : IsPairing (stdP P₁ k) := by
   exact {
     addL x x' y := by
-      simp only [stdP, Prod.fst_add, Prod.snd_add, h.addL, Pi.add_apply, add_mul, Finset.sum_add_distrib]; ring
+      simp only [stdP, Prod.fst_add, Prod.snd_add, h.addL, Pi.add_apply, add_mul,
+        Finset.sum_add_distrib]
+      ring
     addR x y y' := by
-      simp only [stdP, Prod.fst_add, Prod.snd_add, h.addR, Pi.add_apply, mul_add, Finset.sum_add_distrib]; ring
+      simp only [stdP, Prod.fst_add, Prod.snd_add, h.addR, Pi.add_apply, mul_add,
+        Finset.sum_add_distrib]
+      ring
     smulL c x y := by
-      simp only [stdP, Prod.smul_fst, Prod.smul_snd, h.smulL, Pi.smul_apply, smul_eq_mul, mul_assoc, ← Finset.mul_sum]
+      simp only [stdP, Prod.smul_fst, Prod.smul_snd, h.smulL, Pi.smul_apply, smul_eq_mul, mul_assoc,
+        ← Finset.mul_sum]
       ring
     smulR c x y := by
-      simp only [stdP, Prod.smul_fst, Prod.smul_snd, h.smulR, Pi.smul_apply, smul_eq_mul, mul_left_comm _ c,
-        ← Finset.mul_sum]
+      simp only [stdP, Prod.smul_fst, Prod.smul_snd, h.smulR, Pi.smul_apply, smul_eq_mul,
+        mul_left_comm _ c, ← Finset.mul_sum]
       ring
     nondegL x hx := by
       have h1 : x.1 = 0 := h.nondegL _ fun y => by simpa [stdP] using hx (y, 0)
@@ -69,7 +75,9 @@ theorem isPairing_stdP {P₁ : V₁ → V₁ → ℝ} (h : IsPairing P₁) (k : 
         rwa [show P₁ x.1 0 = 0 by simpa using h.smulR 0 x.1 0, zero_add] at this
       have h3 : x.2 = 0 := by
         funext i
-        have := (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => mul_self_nonneg (x.2 i))).1 h2 i (Finset.mem_univ _)
+        have :=
+          (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => mul_self_nonneg (x.2 i))).1 h2 i
+            (Finset.mem_univ _)
         simpa using this
       exact Prod.ext h1 h3
     nondegR y hy := by
@@ -80,7 +88,9 @@ theorem isPairing_stdP {P₁ : V₁ → V₁ → ℝ} (h : IsPairing P₁) (k : 
         rwa [show P₁ 0 y.1 = 0 by simpa using h.smulL 0 0 y.1, zero_add] at this
       have h3 : y.2 = 0 := by
         funext i
-        have := (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => mul_self_nonneg (y.2 i))).1 h2 i (Finset.mem_univ _)
+        have :=
+          (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => mul_self_nonneg (y.2 i))).1 h2 i
+            (Finset.mem_univ _)
         simpa using this
       exact Prod.ext h1 h3
   }
@@ -91,7 +101,8 @@ theorem IsPairing.zero_left {P : V → V → ℝ} (h : IsPairing P) (y : V) : P 
 theorem IsPairing.zero_right {P : V → V → ℝ} (h : IsPairing P) (x : V) : P x 0 = 0 := by
   simpa using h.smulR 0 x 0
 
-theorem setup_std {P₁ : V₁ → V₁ → ℝ} (h : IsPairing P₁) (k : ℕ) : Setup (stdP P₁ k) P₁ (jStd k) (LStd V₁ k) := by
+theorem setup_std {P₁ : V₁ → V₁ → ℝ} (h : IsPairing P₁) (k : ℕ)
+    : Setup (stdP P₁ k) P₁ (jStd k) (LStd V₁ k) := by
   exact {
     pair := isPairing_stdP h k
     pair₁ := h
@@ -108,17 +119,22 @@ theorem setup_std {P₁ : V₁ → V₁ → ℝ} (h : IsPairing P₁) (k : ℕ) 
       rintro ⟨⟨a₁, a₂⟩, ⟨b₁, b₂⟩⟩ hL hj
       have e2 : a₂ = 0 := by
         have := hL ((0, 0), (0, a₂)) ⟨a₂, rfl⟩
-        simp only [omega, stdP, h.zero_right, h.zero_left, Pi.zero_apply, zero_mul, Finset.sum_const_zero,
-          zero_add, sub_zero] at this
+        simp only [omega, stdP, h.zero_right, h.zero_left, Pi.zero_apply, zero_mul,
+            Finset.sum_const_zero, zero_add, sub_zero]
+          at this
         funext i
-        have := (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => mul_self_nonneg (a₂ i))).1 this i (Finset.mem_univ _)
+        have :=
+          (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => mul_self_nonneg (a₂ i))).1 this i
+            (Finset.mem_univ _)
         simpa using this
-      have e1 : a₁ = 0 := h.nondegL _ fun y => by
-        have := hj (0, y)
-        simpa [omega, stdP, jStd, h.zero_left] using this
-      have e3 : b₁ = 0 := h.nondegR _ fun x => by
-        have := hj (x, 0)
-        simpa [omega, stdP, jStd, h.zero_right] using this
+      have e1 : a₁ = 0 :=
+        h.nondegL _ fun y => by
+          have := hj (0, y)
+          simpa [omega, stdP, jStd, h.zero_left] using this
+      have e3 : b₁ = 0 :=
+        h.nondegR _ fun x => by
+          have := hj (x, 0)
+          simpa [omega, stdP, jStd, h.zero_right] using this
       exact ⟨b₂, by simp [e1, e2, e3]⟩
   }
 
@@ -137,10 +153,10 @@ end Real
 section Adelic
 
 open scoped Matrix
-open NumberField GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 variable {F : Type} [Field F] [NumberField F]
-
 
 variable (F) in
 def trP (κ : Type) [Fintype κ] (y b : κ → mixedEmbedding.mixedSpace F) : ℝ :=
@@ -148,8 +164,8 @@ def trP (κ : Type) [Fintype κ] (y b : κ → mixedEmbedding.mixedSpace F) : �
 
 def locV {κ : Type} (x : κ → AF F) : κ → mixedEmbedding.mixedSpace F := fun i => evI F (x i)
 
-def liftV {κ : Type} (y : κ → mixedEmbedding.mixedSpace F) : κ → AF F :=
-  fun i => ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (y i), 0)
+def liftV {κ : Type} (y : κ → mixedEmbedding.mixedSpace F) : κ → AF F := fun i =>
+  ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (y i), 0)
 
 variable {E : Type} [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 variable {n d d₁ : ℕ} {X : Spc F E n} {W : Spc F E d} {W₁ : Spc F E d₁}

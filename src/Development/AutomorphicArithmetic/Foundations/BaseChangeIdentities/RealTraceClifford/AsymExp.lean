@@ -12,11 +12,12 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
-private theorem cf_sum_smul {n : ℕ} (s : Finset (Wt n)) (c : Wt n → ℂ) (g : Wt n → FR n) (y : Wt n) :
-    cf (∑ x ∈ s, c x • g x) y = ∑ x ∈ s, c x * cf (g x) y := by
+private theorem cf_sum_smul {n : ℕ} (s : Finset (Wt n)) (c : Wt n → ℂ) (g : Wt n → FR n) (y : Wt n)
+    : cf (∑ x ∈ s, c x • g x) y = ∑ x ∈ s, c x * cf (g x) y := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [cf]
@@ -24,8 +25,10 @@ private theorem cf_sum_smul {n : ℕ} (s : Finset (Wt n)) (c : Wt n → ℂ) (g 
     rw [Finset.sum_insert ha, Finset.sum_insert ha, ((cfBasic n).2.2.2.1 _ _ (c a) y).1,
       ((cfBasic n).2.2.2.1 (g a) 0 (c a) y).2, ih]
 
-private theorem asym_eq_of_strictAnti {n : ℕ} {f g : FR n} (hf : ASym f) (hg : ASym g)
-    (h : ∀ y : Wt n, StrictAnti y → cf f y = cf g y) (y : Wt n) : cf f y = cf g y := by
+private theorem asym_eq_of_strictAnti
+    {n : ℕ} {f g : FR n}
+    (hf : ASym f) (hg : ASym g) (h : ∀ y : Wt n, StrictAnti y → cf f y = cf g y) (y : Wt n)
+    : cf f y = cf g y := by
   by_cases hy : Function.Injective y
   · obtain ⟨w, hw⟩ := ((rearr n).2.1 y).2.1
     have ha : Antitone (y ∘ ⇑w) := hw ▸ ((rearr n).2.1 y).1
@@ -44,8 +47,7 @@ private theorem asym_eq_of_strictAnti {n : ℕ} {f g : FR n} (hf : ASym f) (hg :
       · subst h1; exact hab.symm
       · subst h2; exact hab
       · rfl
-    have hsg : sg (Equiv.swap a b) = -1 := by
-      simp [sg, Equiv.Perm.sign_swap hne]
+    have hsg : sg (Equiv.swap a b) = -1 := by simp [sg, Equiv.Perm.sign_swap hne]
     have e1 := hf (Equiv.swap a b) y
     have e2 := hg (Equiv.swap a b) y
     rw [hfix, hsg] at e1 e2
@@ -53,8 +55,11 @@ private theorem asym_eq_of_strictAnti {n : ℕ} {f g : FR n} (hf : ASym f) (hg :
     have z2 : cf g y = 0 := by linear_combination e2 / 2
     rw [z1, z2]
 
-theorem UpperTheory.RealTr.asymExp :
-    ∀ (n : ℕ) (f : FR n), ASym f → ∃ s : Finset (Wt n), (∀ x ∈ s, StrictAnti x ∧ cf f x ≠ 0) ∧ f = ∑ x ∈ s, cf f x • alt x := by
+theorem UpperTheory.RealTr.asymExp
+    : ∀ (n : ℕ) (f : FR n),
+      ASym f
+        → ∃ s : Finset (Wt n),
+          (∀ x ∈ s, StrictAnti x ∧ cf f x ≠ 0) ∧ f = ∑ x ∈ s, cf f x • alt x := by
   intro n f hf
   classical
   set s := f.coeff.support.filter (fun x => StrictAnti x) with hs

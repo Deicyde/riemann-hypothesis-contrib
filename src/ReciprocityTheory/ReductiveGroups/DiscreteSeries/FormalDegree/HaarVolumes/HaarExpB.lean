@@ -12,10 +12,10 @@ open Filter Topology Metric NormedSpace Asymptotics
 
 variable {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸]
 
-theorem hasStrictFDerivAt_exp_zero_alt : HasStrictFDerivAt (exp : 𝔸 → 𝔸)
-    ((ContinuousLinearEquiv.refl ℝ 𝔸 : 𝔸 ≃L[ℝ] 𝔸) : 𝔸 →L[ℝ] 𝔸) 0 :=
+theorem hasStrictFDerivAt_exp_zero_alt
+    : HasStrictFDerivAt (exp : 𝔸 → 𝔸) ((ContinuousLinearEquiv.refl ℝ 𝔸 : 𝔸 ≃L[ℝ] 𝔸) : 𝔸 →L[ℝ] 𝔸)
+      0 :=
   hasStrictFDerivAt_exp_zero (𝕂 := ℝ)
-
 
 variable (𝔸) in
 def logA : 𝔸 → 𝔸 := (hasStrictFDerivAt_exp_zero_alt (𝔸 := 𝔸)).localInverse _ _ _
@@ -52,43 +52,45 @@ def F1 (p : 𝔸 × 𝔸) : 𝔸 := logA 𝔸 (exp (-p.1) * exp (p.1 + p.2))
 
 def F2 (p : 𝔸 × 𝔸) : 𝔸 := logA 𝔸 (exp p.1 * exp p.2)
 
-theorem hasStrict_exp_comp (L : 𝔸 × 𝔸 →L[ℝ] 𝔸) :
-    HasStrictFDerivAt (fun p : 𝔸 × 𝔸 => exp (L p)) L (0 : 𝔸 × 𝔸) := by
+theorem hasStrict_exp_comp (L : 𝔸 × 𝔸 →L[ℝ] 𝔸)
+    : HasStrictFDerivAt (fun p : 𝔸 × 𝔸 => exp (L p)) L (0 : 𝔸 × 𝔸) := by
   have h1 : HasStrictFDerivAt (exp : 𝔸 → 𝔸) (ContinuousLinearMap.id ℝ 𝔸) (L 0) := by
     rw [map_zero]; exact hasStrictFDerivAt_exp_zero_alt
   exact h1.comp (0 : 𝔸 × 𝔸) L.hasStrictFDerivAt
 
-theorem hasStrict_mul (L M : 𝔸 × 𝔸 →L[ℝ] 𝔸) :
-    HasStrictFDerivAt (fun p : 𝔸 × 𝔸 => logA 𝔸 (exp (L p) * exp (M p))) (L + M) (0 : 𝔸 × 𝔸) := by
+theorem hasStrict_mul (L M : 𝔸 × 𝔸 →L[ℝ] 𝔸)
+    : HasStrictFDerivAt (fun p : 𝔸 × 𝔸 => logA 𝔸 (exp (L p) * exp (M p))) (L + M) (0 : 𝔸 × 𝔸) := by
   have h := (hasStrict_exp_comp L).mul' (hasStrict_exp_comp M)
-  have hv : ((fun p : 𝔸 × 𝔸 => exp (L p)) * fun p : 𝔸 × 𝔸 => exp (M p)) 0 = 1 := by
-    simp [exp_zero]
+  have hv : ((fun p : 𝔸 × 𝔸 => exp (L p)) * fun p : 𝔸 × 𝔸 => exp (M p)) 0 = 1 := by simp [exp_zero]
   have h1 : HasStrictFDerivAt (logA 𝔸) (ContinuousLinearMap.id ℝ 𝔸)
       (((fun p : 𝔸 × 𝔸 => exp (L p)) * fun p : 𝔸 × 𝔸 => exp (M p)) 0) := by
     rw [hv]; exact hasStrict_logA
   refine (h1.comp (0 : 𝔸 × 𝔸) h).congr_fderiv ?_
   ext p <;> simp [exp_zero, add_comm]
 
-theorem hasStrictFDerivAt_translateLog : HasStrictFDerivAt (F1 (𝔸 := 𝔸)) (ContinuousLinearMap.snd ℝ 𝔸 𝔸) 0 := by
-  have := hasStrict_mul (-(ContinuousLinearMap.fst ℝ 𝔸 𝔸))
-    (ContinuousLinearMap.fst ℝ 𝔸 𝔸 + ContinuousLinearMap.snd ℝ 𝔸 𝔸)
+theorem hasStrictFDerivAt_translateLog
+    : HasStrictFDerivAt (F1 (𝔸 := 𝔸)) (ContinuousLinearMap.snd ℝ 𝔸 𝔸) 0 := by
+  have :=
+    hasStrict_mul (-(ContinuousLinearMap.fst ℝ 𝔸 𝔸))
+      (ContinuousLinearMap.fst ℝ 𝔸 𝔸 + ContinuousLinearMap.snd ℝ 𝔸 𝔸)
   refine this.congr_fderiv ?_
   ext p <;> simp
 
-theorem hasStrictFDerivAt_productLog : HasStrictFDerivAt (F2 (𝔸 := 𝔸))
-    (ContinuousLinearMap.fst ℝ 𝔸 𝔸 + ContinuousLinearMap.snd ℝ 𝔸 𝔸) 0 :=
+theorem hasStrictFDerivAt_productLog
+    : HasStrictFDerivAt (F2 (𝔸 := 𝔸))
+      (ContinuousLinearMap.fst ℝ 𝔸 𝔸 + ContinuousLinearMap.snd ℝ 𝔸 𝔸) 0 :=
   hasStrict_mul (ContinuousLinearMap.fst ℝ 𝔸 𝔸) (ContinuousLinearMap.snd ℝ 𝔸 𝔸)
 
-theorem eventually_pair {P : 𝔸 × 𝔸 → Prop} (h : ∀ᶠ p in 𝓝 (0 : 𝔸 × 𝔸), P p) :
-    ∃ δ > 0, ∀ X Y : 𝔸, ‖X‖ < δ → ‖Y‖ < δ → P (X, Y) := by
+theorem eventually_pair {P : 𝔸 × 𝔸 → Prop} (h : ∀ᶠ p in 𝓝 (0 : 𝔸 × 𝔸), P p)
+    : ∃ δ > 0, ∀ X Y : 𝔸, ‖X‖ < δ → ‖Y‖ < δ → P (X, Y) := by
   obtain ⟨δ, hδ, h⟩ := Metric.eventually_nhds_iff_ball.mp h
   refine ⟨δ, hδ, fun X Y hX hY => h _ ?_⟩
   rw [mem_ball_zero_iff, Prod.norm_def]
   exact max_lt hX hY
 
-theorem strict_est {F : 𝔸 × 𝔸 → 𝔸} {F' : 𝔸 × 𝔸 →L[ℝ] 𝔸} (hF : HasStrictFDerivAt F F' 0)
-    {ε : ℝ} (hε : 0 < ε) : ∃ δ > 0, ∀ X Y : 𝔸, ‖X‖ < δ → ‖Y‖ < δ →
-      ‖F (X, Y) - F (X, 0) - F' (0, Y)‖ ≤ ε * ‖Y‖ := by
+theorem strict_est
+    {F : 𝔸 × 𝔸 → 𝔸} {F' : 𝔸 × 𝔸 →L[ℝ] 𝔸} (hF : HasStrictFDerivAt F F' 0) {ε : ℝ} (hε : 0 < ε)
+    : ∃ δ > 0, ∀ X Y : 𝔸, ‖X‖ < δ → ‖Y‖ < δ → ‖F (X, Y) - F (X, 0) - F' (0, Y)‖ ≤ ε * ‖Y‖ := by
   have h := hF.isLittleO.def hε
   obtain ⟨δ, hδ, h⟩ := Metric.eventually_nhds_iff_ball.mp h
   refine ⟨δ, hδ, fun X Y hX hY => ?_⟩
@@ -99,9 +101,11 @@ theorem strict_est {F : 𝔸 × 𝔸 → 𝔸} {F' : 𝔸 × 𝔸 →L[ℝ] 𝔸
   have := h _ hm
   simpa [Prod.norm_def] using this
 
-theorem distortion {ε : ℝ} (hε : 0 < ε) : ∃ δ > 0, ∀ X Y : 𝔸, ‖X‖ < δ → ‖Y‖ < δ →
-    (exp (F1 (X, Y)) = exp (-X) * exp (X + Y) ∧ ‖F1 (X, Y) - Y‖ ≤ ε * ‖Y‖) ∧
-    (exp (F2 (X, Y)) = exp X * exp Y ∧ ‖F2 (X, Y) - X - Y‖ ≤ ε * ‖Y‖) := by
+theorem distortion {ε : ℝ} (hε : 0 < ε)
+    : ∃ δ > 0, ∀ X Y : 𝔸,
+      ‖X‖ < δ → ‖Y‖ < δ
+        → (exp (F1 (X, Y)) = exp (-X) * exp (X + Y) ∧ ‖F1 (X, Y) - Y‖ ≤ ε * ‖Y‖)
+          ∧ (exp (F2 (X, Y)) = exp X * exp Y ∧ ‖F2 (X, Y) - X - Y‖ ≤ ε * ‖Y‖) := by
   obtain ⟨δ1, h1, H1⟩ := strict_est (hasStrictFDerivAt_translateLog (𝔸 := 𝔸)) hε
   obtain ⟨δ2, h2, H2⟩ := strict_est (hasStrictFDerivAt_productLog (𝔸 := 𝔸)) hε
   have c1 : Tendsto (fun p : 𝔸 × 𝔸 => exp (-p.1) * exp (p.1 + p.2)) (𝓝 0) (𝓝 1) := by
@@ -170,8 +174,8 @@ theorem expG_cont : Continuous C.expG := by
   rw [this]
   exact exp_cont.comp continuous_subtype_val
 
-theorem exists_rho : ∃ ρ > 0, ∀ Z : 𝔸, ‖Z‖ < ρ →
-    logA 𝔸 (exp Z) = Z ∧ ((∃ g, C.mat g = exp Z) → Z ∈ V) := by
+theorem exists_rho
+    : ∃ ρ > 0, ∀ Z : 𝔸, ‖Z‖ < ρ → logA 𝔸 (exp Z) = Z ∧ ((∃ g, C.mat g = exp Z) → Z ∈ V) := by
   obtain ⟨ρ, hρ, h⟩ := Metric.eventually_nhds_iff_ball.mp ((logA_exp (𝔸 := 𝔸)).and C.H2)
   exact ⟨ρ, hρ, fun Z hZ => h Z (by simpa using hZ)⟩
 
@@ -185,12 +189,12 @@ theorem injOn : InjOn C.expG (ball (0 : V) ρ) := by
   have e : exp (X : 𝔸) = exp (Y : 𝔸) := by rw [← C.mat_expG, ← C.mat_expG, h]
   exact Subtype.ext (by rw [← (hR _ hX').1, e, (hR _ hY').1])
 
-variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
-  [MeasurableSpace G] [BorelSpace G]
+variable
+  [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] [MeasurableSpace G] [BorelSpace G]
 
 include hR in
-theorem meas_image {s : Set V} (hs : MeasurableSet s) (hsub : s ⊆ ball 0 ρ) :
-    MeasurableSet (C.expG '' s) := by
+theorem meas_image {s : Set V} (hs : MeasurableSet s) (hsub : s ⊆ ball 0 ρ)
+    : MeasurableSet (C.expG '' s) := by
   have : T2Space G := C.emb.t2Space
   exact hs.image_of_continuousOn_injOn C.expG_cont.continuousOn ((C.injOn hR).mono hsub)
 
@@ -200,12 +204,13 @@ def nu (ρ : ℝ) (μ : Measure G) : Measure V :=
 variable (μ : Measure G)
 
 include hR in
-theorem nu_apply {s : Set V} (hs : MeasurableSet s) :
-    C.nu ρ μ s = μ (C.expG '' (s ∩ ball 0 ρ)) := by
+theorem nu_apply {s : Set V} (hs : MeasurableSet s)
+    : C.nu ρ μ s = μ (C.expG '' (s ∩ ball 0 ρ)) := by
   have hinj : Function.Injective (fun x : ball (0 : V) ρ => C.expG x.1) := fun x y h =>
     Subtype.ext (C.injOn hR x.2 y.2 h)
-  have hm : ∀ t : Set (ball (0 : V) ρ), MeasurableSet t →
-      MeasurableSet ((fun x : ball (0 : V) ρ => C.expG x.1) '' t) := by
+  have hm
+      : ∀ t : Set (ball (0 : V) ρ),
+        MeasurableSet t → MeasurableSet ((fun x : ball (0 : V) ρ => C.expG x.1) '' t) := by
     intro t ht
     have : (fun x : ball (0 : V) ρ => C.expG x.1) '' t = C.expG '' (Subtype.val '' t) := by
       rw [Set.image_image]
@@ -254,7 +259,8 @@ theorem nu_pos (hρ : 0 < ρ) (r : ℝ) (hr : 0 < r) : 0 < C.nu ρ μ (closedBal
   · rw [mem_ball_zero_iff]; exact lt_of_lt_of_le hg1 (min_le_right _ _)
 
 include hR in
-theorem nu_qinv (hρ : 0 < ρ) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1) : ∃ δ > 0, QInv (C.nu ρ μ) ε δ := by
+theorem nu_qinv (hρ : 0 < ρ) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1)
+    : ∃ δ > 0, QInv (C.nu ρ μ) ε δ := by
   obtain ⟨δ0, hδ0, hD⟩ := distortion (𝔸 := 𝔸) hε0
   refine ⟨min δ0 (ρ / 4), by positivity, fun X hX r hr0 hr => ?_⟩
   have hXδ : ‖(X : 𝔸)‖ < δ0 := lt_of_lt_of_le hX (min_le_left _ _)
@@ -292,8 +298,9 @@ theorem nu_qinv (hρ : 0 < ρ) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1) : ∃ 
     · have hinv : C.mat (C.expG X)⁻¹ = exp (-(X : 𝔸)) := by
         have h1 : C.mat (C.expG X)⁻¹ * C.mat (C.expG X) = 1 := by rw [← map_mul]; simp
         rw [mat_expG] at h1
-        calc C.mat (C.expG X)⁻¹ = C.mat (C.expG X)⁻¹ * (exp (X : 𝔸) * exp (-(X : 𝔸))) := by
-              rw [exp_mul_neg, mul_one]
+        calc
+          C.mat (C.expG X)⁻¹
+            = C.mat (C.expG X)⁻¹ * (exp (X : 𝔸) * exp (-(X : 𝔸))) := by rw [exp_mul_neg, mul_one]
           _ = exp (-(X : 𝔸)) := by rw [← mul_assoc, h1, one_mul]
       rw [mat_expG, map_mul, hinv, mat_expG]
       show exp (F1 ((X : 𝔸), (Y : 𝔸))) = _
@@ -324,16 +331,22 @@ theorem nu_qinv (hρ : 0 < ρ) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1) : ∃ 
     · rw [mat_expG, map_mul, mat_expG, mat_expG]
       exact e1
 
-theorem exists_density_unif (lam : Measure V) [lam.IsAddHaarMeasure] :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧
-      (∀ D : ℝ≥0, c < D → ∃ δ > 0, ∀ s : Set V, MeasurableSet s → s ⊆ ball (0 : V) δ →
-        μ (C.img s) ≤ D * lam s) ∧
-      (∀ D : ℝ≥0, (D : ℝ≥0∞) < c → ∃ δ > 0, ∀ s : Set V, MeasurableSet s → s ⊆ ball (0 : V) δ →
-        D * lam s ≤ μ (C.img s)) := by
+theorem exists_density_unif (lam : Measure V) [lam.IsAddHaarMeasure]
+    : ∃ c : ℝ≥0∞,
+      c ≠ 0 ∧ c ≠ ⊤
+        ∧ (∀ D : ℝ≥0,
+          c < D
+            → ∃ δ > 0, ∀ s : Set V, MeasurableSet s → s ⊆ ball (0 : V) δ → μ (C.img s) ≤ D * lam s)
+        ∧ (∀ D : ℝ≥0,
+          (D : ℝ≥0∞) < c
+            → ∃ δ > 0, ∀ s : Set V,
+              MeasurableSet s → s ⊆ ball (0 : V) δ → D * lam s ≤ μ (C.img s)) := by
   obtain ⟨ρ, hρ, hR⟩ := C.exists_rho
   have := C.nu_finite hR μ
-  obtain ⟨c, hc0, hct, hup, hdown⟩ := HExp.exists_density lam (C.nu ρ μ)
-    (fun ε h0 h1 => C.nu_qinv hR μ hρ ε h0 h1) (fun r hr => C.nu_pos hR μ hρ r hr)
+  obtain ⟨c, hc0, hct, hup, hdown⟩ :=
+    HExp.exists_density lam (C.nu ρ μ)
+      (fun ε h0 h1 => C.nu_qinv hR μ hρ ε h0 h1)
+      (fun r hr => C.nu_pos hR μ hρ r hr)
   have key : ∀ s : Set V, MeasurableSet s → s ⊆ ball (0 : V) ρ → C.nu ρ μ s = μ (C.img s) := by
     intro s hs hsρ
     rw [C.nu_apply hR μ hs, Set.inter_eq_self_of_subset_left hsρ, img_eq]
@@ -349,15 +362,21 @@ theorem exists_density_unif (lam : Measure V) [lam.IsAddHaarMeasure] :
 
 end Chart
 
-theorem Chart.exists_density_unif' {V : Submodule ℝ 𝔸} {G : Type*} [Group G] [TopologicalSpace G]
+theorem Chart.exists_density_unif'
+    {V : Submodule ℝ 𝔸} {G : Type*} [Group G] [TopologicalSpace G]
     (C : Chart V G) (_hfd : FiniteDimensional ℝ V) (mV : MeasurableSpace V) (_hbV : BorelSpace V)
     (mG : MeasurableSpace G) (_hbG : BorelSpace G) (_hG : IsTopologicalGroup G)
-    (μ : Measure G) (_hμ : μ.IsHaarMeasure) (lam : Measure V) (_hlam : lam.IsAddHaarMeasure) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧
-      (∀ D : ℝ≥0, c < D → ∃ δ > 0, ∀ s : Set V, MeasurableSet s → s ⊆ ball (0 : V) δ →
-        μ (C.img s) ≤ D * lam s) ∧
-      (∀ D : ℝ≥0, (D : ℝ≥0∞) < c → ∃ δ > 0, ∀ s : Set V, MeasurableSet s → s ⊆ ball (0 : V) δ →
-        D * lam s ≤ μ (C.img s)) :=
+    (μ : Measure G) (_hμ : μ.IsHaarMeasure)
+    (lam : Measure V) (_hlam : lam.IsAddHaarMeasure)
+    : ∃ c : ℝ≥0∞,
+      c ≠ 0 ∧ c ≠ ⊤
+        ∧ (∀ D : ℝ≥0,
+          c < D
+            → ∃ δ > 0, ∀ s : Set V, MeasurableSet s → s ⊆ ball (0 : V) δ → μ (C.img s) ≤ D * lam s)
+        ∧ (∀ D : ℝ≥0,
+          (D : ℝ≥0∞) < c
+            → ∃ δ > 0, ∀ s : Set V,
+              MeasurableSet s → s ⊆ ball (0 : V) δ → D * lam s ≤ μ (C.img s)) :=
   C.exists_density_unif μ lam
 
 end ReciprocityTheory.ChartRestriction.DS.HExp

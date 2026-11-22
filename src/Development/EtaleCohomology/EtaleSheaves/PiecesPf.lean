@@ -43,8 +43,8 @@ lemma sq1 {T S C' C : Type} [CommRing T] [CommRing S] [CommRing C'] [CommRing C]
     have := congrArg (fun f => f.hom y) hm
     simpa using this
 
-theorem Pieces_of (hL : LateralTheory.E.t_E1Cut.EtLift) (hA : LateralTheory.E.t_E1Cut.EtAIC) :
-    LateralTheory.E.FinEtSectionPf.Pieces := by
+theorem Pieces_of (hL : LateralTheory.E.t_E1Cut.EtLift) (hA : LateralTheory.E.t_E1Cut.EtAIC)
+    : LateralTheory.E.FinEtSectionPf.Pieces := by
   intro _ _ S C _ _ _ _ hQA
   obtain ⟨T, _, _, π, hAIC, hπ⟩ := hQA
   obtain ⟨C', _, _, ρ, hEt, hρ, hcomm, hker⟩ := hL T S C π hπ

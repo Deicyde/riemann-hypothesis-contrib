@@ -9,27 +9,41 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.LogLeSelf
 @[expose] public section
 
 section
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
-open Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt Formalism.L2.LamCM GlobalTheory GlobalTheory.ArcQ GlobalTheory.LamF GlobalTheory.ArcCM
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
+open Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt Formalism.L2.LamCM GlobalTheory
+  GlobalTheory.ArcQ GlobalTheory.LamF GlobalTheory.ArcCM
 open scoped LaurentSeries
 
 namespace GlobalTheory.SplitConst
 
-theorem constants_bounded_sq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r p0 g NA NC : ℕ) (c₁ w Z : ℝ), 3 ≤ r → 1 ≤ p0 → p0 ≤ r → 1 ≤ g → 1 ≤ NA → 1 ≤ NC → 0 < c₁ → 1 ≤ w → 1 ≤ Z → (fdeg E : ℝ) ≤ Z → (r : ℝ) ≤ Z → Real.log (dE E) ≤ Z → Real.log g ≤ Z → Real.log NA ≤ Z → Real.log NC ≤ Z → Real.log c₁ ≤ Z → Real.log w ≤ Z → Real.log (nQ E r g NA NC c₁ w) ≤ 200 * Z ^ 2 ∧ Real.log (LaQ E r p0 g NA NC c₁ w) ≤ 200 * Z ^ 2 := by
+theorem constants_bounded_sq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r p0 g NA NC : ℕ) (c₁ w Z : ℝ),
+      3 ≤ r → 1 ≤ p0 → p0 ≤ r → 1 ≤ g → 1 ≤ NA → 1 ≤ NC → 0 < c₁ → 1 ≤ w → 1 ≤ Z → (fdeg E : ℝ) ≤ Z
+        → (r : ℝ) ≤ Z → Real.log (dE E) ≤ Z → Real.log g ≤ Z → Real.log NA ≤ Z → Real.log NC ≤ Z
+        → Real.log c₁ ≤ Z → Real.log w ≤ Z
+        → Real.log (nQ E r g NA NC c₁ w) ≤ 200 * Z ^ 2
+          ∧ Real.log (LaQ E r p0 g NA NC c₁ w) ≤ 200 * Z ^ 2 := by
   intro E _ _ _ r p0 g NA NC c w Z hr hp hpr hg hNA hNC hc hw hZ hfZ hrZ hdZ hgZ hNAZ hNCZ hcZ hwZ
   have hZX : Z + 1 ≤ Real.exp Z := Real.add_one_le_exp Z
   set X := Real.exp Z with hXdef
   have hX : 2 ≤ X := by linarith
-  have le_of_log : ∀ a : ℝ, 0 < a → Real.log a ≤ Z → a ≤ X := fun a ha h => (Real.log_le_iff_le_exp ha).1 h
+  have le_of_log : ∀ a : ℝ, 0 < a → Real.log a ≤ Z → a ≤ X := fun a ha h =>
+    (Real.log_le_iff_le_exp ha).1 h
   have hd : 1 ≤ dE E := by
     unfold dE
     have := NumberField.discr_ne_zero E
     have h2 : (1 : ℤ) ≤ |NumberField.discr E| := Int.one_le_abs this
     exact_mod_cast h2
   have hn : 2 ≤ Module.finrank ℚ E := by
-    have h1 := (letI : Module.Free (NumberField.maximalRealSubfield E) E := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank ℚ (NumberField.maximalRealSubfield E) E)
-    have h2 : Module.finrank (NumberField.maximalRealSubfield E) E = 2 := Algebra.IsQuadraticExtension.finrank_eq_two _ _
+    have h1 :=
+      (letI : Module.Free (NumberField.maximalRealSubfield E) E := Module.Free.of_divisionRing _ _
+       Module.finrank_mul_finrank ℚ (NumberField.maximalRealSubfield E) E)
+    have h2 : Module.finrank (NumberField.maximalRealSubfield E) E = 2 :=
+      Algebra.IsQuadraticExtension.finrank_eq_two _ _
     have h3 : 0 < Module.finrank ℚ (NumberField.maximalRealSubfield E) := Module.finrank_pos
     rw [h2] at h1
     omega
@@ -46,7 +60,9 @@ theorem constants_bounded_sq : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
   have hc' := le_of_log _ hc hcZ
   have hw' := le_of_log _ (by linarith) hwZ
   have hf' : (fdeg E : ℝ) ≤ X := by linarith
-  have pe := isBoundedByPowerOfAtLeastTwo_inv_d4ep0 hX hg1 hd hf hNA1 hNC1 hc hw hg' hd' hf' hNA' hNC' hc' hw'
+  have pe :=
+    isBoundedByPowerOfAtLeastTwo_inv_d4ep0 hX hg1 hd hf hNA1 hNC1 hc hw hg' hd' hf' hNA' hNC' hc'
+      hw'
   have ph := rh_inv hX hc hw hc' hw'
   have pd := PB.base hX (by linarith) hd'
   have pf := PB.base hX (by linarith) hf'
@@ -57,9 +73,10 @@ theorem constants_bounded_sq : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     have : ((r - 2 : ℕ) : ℝ) ≤ r := by exact_mod_cast Nat.sub_le r 2
     linarith
   have prd : PB X 1 (rdE E) :=
-    pd.of_le (Real.rpow_nonneg (by linarith) _) (rpow_le_self hd (by
-      have : 1 ≤ Module.finrank ℚ E := by omega
-      exact_mod_cast this))
+    pd.of_le (Real.rpow_nonneg (by linarith) _)
+      (rpow_le_self hd (by
+        have : 1 ≤ Module.finrank ℚ E := by omega
+        exact_mod_cast this))
   have p1 : PB X 0 1 := PB.const hX 0 (by norm_num) (by norm_num)
   have p2 : PB X 1 2 := PB.const hX 1 (by norm_num) (by norm_num)
   have p4 : PB X 2 4 := PB.const hX 2 (by norm_num) (by norm_num)
@@ -69,10 +86,16 @@ theorem constants_bounded_sq : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
   set rh := d6rh c w
   have hZ2 : Z ≤ Z ^ 2 := by nlinarith
   constructor
-  · have pm := (((pf.mul (((p2.mul pf).mul pr).pow 3)).mul pd).mul pNA).mul ((pNC.pow 2).mul prd |>.mul pe).sqrt
+  · have pm :=
+      (((pf.mul (((p2.mul pf).mul pr).pow 3)).mul pd).mul pNA).mul
+        ((pNC.pow 2).mul prd |>.mul pe).sqrt
     have py := (p1000.mul pm).mul ph
-    have hy : 1000 * frameIndexBound r (fdeg E) (dE E) (rdE E) NA NC ep / rh =
-        1000 * ((fdeg E : ℝ) * (2 * (fdeg E : ℝ) * ((r - 2 : ℕ) : ℝ)) ^ 3 * dE E * NA * √((NC : ℝ) ^ 2 * rdE E * ep⁻¹)) * rh⁻¹ := by
+    have hy
+        : 1000 * frameIndexBound r (fdeg E) (dE E) (rdE E) NA NC ep / rh
+          = 1000
+            * ((fdeg E : ℝ) * (2 * (fdeg E : ℝ) * ((r - 2 : ℕ) : ℝ)) ^ 3 * dE E * NA
+              * √((NC : ℝ) ^ 2 * rdE E * ep⁻¹))
+            * rh⁻¹ := by
       unfold frameIndexBound
       rw [div_eq_mul_inv, div_eq_mul_inv, Nat.cast_mul, Nat.cast_mul, Nat.cast_ofNat]
     rw [← hy] at py
@@ -86,10 +109,15 @@ theorem constants_bounded_sq : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     push_cast at this
     nlinarith
   · have pmu := ((p4.mul ((pf.mul pr).pow 3)).mul pd).mul pe.sqrt
-    have pb := ((p2.mul (((p4.mul pr.sqrt).mul pmu).mul (p40.mul ph))).mono (j := 100) (by norm_num)).pow (2 * p0 - 1)
-    have hy : d6La r p0 (fdeg E) (dE E) ep rh =
-        (2 * (4 * √((r - 2 : ℕ) : ℝ) * (4 * ((fdeg E : ℝ) * ((r - 2 : ℕ) : ℝ)) ^ 3 * dE E * √(ep⁻¹)) * (40 * rh⁻¹))) ^
-          (2 * p0 - 1) := by
+    have pb :=
+      ((p2.mul (((p4.mul pr.sqrt).mul pmu).mul (p40.mul ph))).mono (j := 100) (by norm_num)).pow
+        (2 * p0 - 1)
+    have hy
+        : d6La r p0 (fdeg E) (dE E) ep rh
+          = (2
+              * (4 * √((r - 2 : ℕ) : ℝ)
+                * (4 * ((fdeg E : ℝ) * ((r - 2 : ℕ) : ℝ)) ^ 3 * dE E * √(ep⁻¹)) * (40 * rh⁻¹)))
+            ^ (2 * p0 - 1) := by
       unfold d6La ReciprocityTheory.MultiplicativeHeights.approxR d5mu
       rw [div_eq_mul_inv _ (rh / 40), inv_div, div_eq_mul_inv 40, div_eq_mul_inv, ← Real.sqrt_inv]
     rw [← hy] at pb
@@ -106,10 +134,17 @@ theorem constants_bounded_sq : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
       mul_le_mul_of_nonneg_right (by linarith) (by linarith)
     nlinarith
 
-theorem constants_bounded_four : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r p0 g NA NC : ℕ) (c₁ w Z : ℝ), 3 ≤ r → 1 ≤ p0 → p0 ≤ r → 1 ≤ g → 1 ≤ NA → 1 ≤ NC → 0 < c₁ → 1 ≤ w → 1 ≤ Z → (fdeg E : ℝ) ≤ Z → (r : ℝ) ≤ Z → Real.log (dE E) ≤ Z → Real.log g ≤ Z → Real.log NA ≤ Z → Real.log NC ≤ Z → Real.log c₁ ≤ Z → Real.log w ≤ Z → Real.log (nQ E r g NA NC c₁ w) ≤ 200 * Z ^ (4 : ℝ) ∧ Real.log (LaQ E r p0 g NA NC c₁ w) ≤ 200 * Z ^ (4 : ℝ) := by
+theorem constants_bounded_four
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r p0 g NA NC : ℕ) (c₁ w Z : ℝ),
+      3 ≤ r → 1 ≤ p0 → p0 ≤ r → 1 ≤ g → 1 ≤ NA → 1 ≤ NC → 0 < c₁ → 1 ≤ w → 1 ≤ Z → (fdeg E : ℝ) ≤ Z
+        → (r : ℝ) ≤ Z → Real.log (dE E) ≤ Z → Real.log g ≤ Z → Real.log NA ≤ Z → Real.log NC ≤ Z
+        → Real.log c₁ ≤ Z → Real.log w ≤ Z
+        → Real.log (nQ E r g NA NC c₁ w) ≤ 200 * Z ^ (4 : ℝ)
+          ∧ Real.log (LaQ E r p0 g NA NC c₁ w) ≤ 200 * Z ^ (4 : ℝ) := by
   intro E _ _ _ r p0 g NA NC c w Z hr hp hpr hg hNA hNC hc hw hZ hfZ hrZ hdZ hgZ hNAZ hNCZ hcZ hwZ
-  obtain ⟨h1, h2⟩ := constants_bounded_sq E r p0 g NA NC c w Z hr hp hpr hg hNA hNC hc hw hZ hfZ hrZ hdZ hgZ
-    hNAZ hNCZ hcZ hwZ
+  obtain ⟨h1, h2⟩ :=
+    constants_bounded_sq E r p0 g NA NC c w Z hr hp hpr hg hNA hNC hc hw hZ hfZ hrZ hdZ hgZ hNAZ
+      hNCZ hcZ hwZ
   have h3 : Z ^ 2 ≤ Z ^ (4 : ℝ) := by
     rw [← Real.rpow_two]
     exact Real.rpow_le_rpow_of_exponent_le hZ (by norm_num)
@@ -119,22 +154,35 @@ end GlobalTheory.SplitConst
 
 end
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
-open Formalism.L2.Pj Formalism.L2.Pj.QAt Formalism.MainNotions Formalism.BasicNotions Formalism.L2.LamCM GlobalTheory.ArcCM
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
+open Formalism.L2.Pj Formalism.L2.Pj.QAt Formalism.MainNotions Formalism.BasicNotions
+  Formalism.L2.LamCM GlobalTheory.ArcCM
 
 namespace GlobalTheory.ArcCM.Room
 
-
 set_option maxHeartbeats 1000000 in
-theorem room_four : ∃ C₀ : ℝ → ℝ → ℝ → ℝ, (∀ a b c, 0 ≤ C₀ a b c) ∧ ∀ (D : D7) (large₂ : SizeData₂ D) (j : ℕ) (ka : WeightFamilies.Wt D j) (CA CR Ck Tt cc : ℝ), WeightAlgebra.ParA large₂ CA → Real.log (Ideal.absNorm D.host.ccK) ≤ large₂.sc.L → InR D j → j < D.R.m → 3 ≤ D.R.r → 0 ≤ CR → ka.size ≤ Ck * (D.R.k : ℝ) * (D.R.f : ℝ) * large₂.sc.b → 0 < Tt → 0 < cc → Tt * cc ≤ 1 → 1 ≤ zBase large₂ ∧ RoomAt large₂ j ka CR Tt cc (C₀ CA CR Ck) 4 := by
+theorem room_four
+    : ∃ C₀ : ℝ → ℝ → ℝ → ℝ,
+      (∀ a b c, 0 ≤ C₀ a b c)
+        ∧ ∀ (D : D7) (large₂ : SizeData₂ D) (j : ℕ) (ka : WeightFamilies.Wt D j)
+            (CA CR Ck Tt cc : ℝ),
+          WeightAlgebra.ParA large₂ CA → Real.log (Ideal.absNorm D.host.ccK) ≤ large₂.sc.L → InR D j
+            → j < D.R.m → 3 ≤ D.R.r → 0 ≤ CR
+            → ka.size ≤ Ck * (D.R.k : ℝ) * (D.R.f : ℝ) * large₂.sc.b → 0 < Tt → 0 < cc → Tt * cc ≤ 1
+            → 1 ≤ zBase large₂ ∧ RoomAt large₂ j ka CR Tt cc (C₀ CA CR Ck) 4 := by
   set C : ℝ := 200 with hCdef
   set A : ℝ := 4 with hAdef
   have hC : 0 ≤ C := by norm_num [hCdef]
   have hA : 1 ≤ A := by norm_num [hAdef]
   have H := GlobalTheory.SplitConst.constants_bounded_four
   rw [← hCdef, ← hAdef] at H
-  refine ⟨fun a b c => 17 + 2 * (20 + |a| + |b| * |a| + |c|) + C * (20 + |a| + |b| * |a| + |c|) ^ A,
-    fun a b c => by positivity, ?_⟩
+  refine ⟨
+    fun a b c => 17 + 2 * (20 + |a| + |b| * |a| + |c|) + C * (20 + |a| + |b| * |a| + |c|) ^ A,
+    fun a b c => by positivity,
+    ?_
+  ⟩
   intro D large₂ j ka CA CR Ck Tt cc hpar hNC hj hjm hr3 hCR hka hT hcc hTc
   obtain ⟨-, -, hdE, -, hg, -, hOm, -, -, -⟩ := hpar
   have : IsCMField D.host.E := D.host.isCMField_hostE
@@ -209,25 +257,37 @@ theorem room_four : ∃ C₀ : ℝ → ℝ → ℝ → ℝ, (∀ a b c, 0 ≤ C�
     Nat.one_le_iff_ne_zero.2 (fun h => D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 h))
   have hρ1 : (1 : ℝ) ≤ WeightFamilies.rho D j := by exact_mod_cast hp1
   have hρr : (WeightFamilies.rho D j : ℝ) ≤ D.R.r := by exact_mod_cast hpr
-  have hdP : (WeightFamilies.dP D j : ℝ) = 2 * D.R.f * WeightFamilies.rho D j := by unfold WeightFamilies.dP; push_cast; ring
+  have hdP : (WeightFamilies.dP D j : ℝ) = 2 * D.R.f * WeightFamilies.rho D j := by
+    unfold WeightFamilies.dP; push_cast; ring
   have hdP1 : (1 : ℝ) ≤ WeightFamilies.dP D j := by
     rw [hdP]; exact one_le_mul_of_one_le_of_one_le (by linarith) hρ1
   have hdPz : (WeightFamilies.dP D j : ℝ) ≤ 2 * z := by
     have := mul_le_mul_of_nonneg_left hρr (by linarith : (0 : ℝ) ≤ D.R.f)
-    rw [hdP]; linarith
+    rw [hdP]
+    linarith
   have hRR : 0 < WeightFamilies.RRv D CR := Real.rpow_pos_of_pos hrd0 _
   have hc1 : 0 < WeightFamilies.c1 D CR Tt cc j := by unfold WeightFamilies.c1; positivity
   have hlc : Real.log (WeightFamilies.c1 D CR Tt cc j) ≤ K * z := by
-    have h1 : WeightFamilies.c1 D CR Tt cc j ≤ WeightFamilies.RRv D CR * (WeightFamilies.dP D j : ℝ) ^ 2 * (WeightFamilies.rho D j : ℝ) := by
-      have h0 : 0 < WeightFamilies.RRv D CR * (WeightFamilies.dP D j : ℝ) ^ 2 * (WeightFamilies.rho D j : ℝ) := by positivity
-      have : WeightFamilies.c1 D CR Tt cc j =
-          (WeightFamilies.RRv D CR * (WeightFamilies.dP D j : ℝ) ^ 2 * (WeightFamilies.rho D j : ℝ)) * (Tt * cc) / 2 := by
+    have h1
+        : WeightFamilies.c1 D CR Tt cc j
+          ≤ WeightFamilies.RRv D CR * (WeightFamilies.dP D j : ℝ) ^ 2
+            * (WeightFamilies.rho D j : ℝ) := by
+      have h0
+          : 0
+            < WeightFamilies.RRv D CR * (WeightFamilies.dP D j : ℝ) ^ 2
+              * (WeightFamilies.rho D j : ℝ) := by
+        positivity
+      have : WeightFamilies.c1 D CR Tt cc j
+          = (WeightFamilies.RRv D CR * (WeightFamilies.dP D j : ℝ) ^ 2
+              * (WeightFamilies.rho D j : ℝ))
+            * (Tt * cc) / 2 := by
         unfold WeightFamilies.c1; ring
       rw [this]
       have := mul_le_of_le_one_right h0.le hTc
       linarith
     refine (Real.log_le_log hc1 h1).trans ?_
-    rw [Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity), Real.log_pow]
+    rw [Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
+      Real.log_pow]
     have h2 : Real.log (WeightFamilies.RRv D CR) = CR * Real.log D.host.rdE := Real.log_rpow hrd0 _
     have h3 : CR * Real.log D.host.rdE ≤ |CR| * |CA| * z := by
       rw [abs_of_nonneg hCR, mul_assoc]
@@ -244,7 +304,8 @@ theorem room_four : ∃ C₀ : ℝ → ℝ → ℝ → ℝ, (∀ a b c, 0 ≤ C�
       refine mul_le_mul (le_abs_self _) ?_ (by positivity) hc0
       have := mul_le_mul_of_nonneg_right hkr (by linarith : (0 : ℝ) ≤ D.R.f)
       linarith
-    have h2 : ka.size ≤ |Ck| * z * large₂.sc.b := hka.trans (mul_le_mul_of_nonneg_right h1 (by linarith))
+    have h2 : ka.size ≤ |Ck| * z * large₂.sc.b :=
+      hka.trans (mul_le_mul_of_nonneg_right h1 (by linarith))
     have h3 : ka.size + D.R.r ≤ (|Ck| * z + z) * large₂.sc.b := by
       have := le_mul_of_one_le_right (by linarith : (0 : ℝ) ≤ z) hb1
       linarith
@@ -253,10 +314,11 @@ theorem room_four : ∃ C₀ : ℝ → ℝ → ℝ → ℝ, (∀ a b c, 0 ≤ C�
     have h4 : Real.log large₂.sc.b = large₂.sc.L := Real.log_exp _
     have h5 := log_le_self' (by linarith : (0 : ℝ) ≤ |Ck| * z + z)
     linarith
-  obtain ⟨hn, hLa⟩ := H D.host.E D.R.r (D.R.sigW j).2 (D.host.g 0 * D.host.g 1) (discr D.host.E).natAbs
-    (Ideal.absNorm D.host.ccK) (WeightFamilies.c1 D CR Tt cc j) (ka.size + D.R.r) (K * z) hr3 hp1 hpr
-    (Nat.mul_pos hg0 hg1) hNA1 hNC1 hc1 (by linarith) (by linarith) (by rw [hfdeg]; linarith) (by linarith)
-    (by unfold dE; linarith) hlg (by rw [hNA]; linarith) (by linarith) hlc hlw
+  obtain ⟨hn, hLa⟩ :=
+    H D.host.E D.R.r (D.R.sigW j).2 (D.host.g 0 * D.host.g 1) (discr D.host.E).natAbs
+      (Ideal.absNorm D.host.ccK) (WeightFamilies.c1 D CR Tt cc j) (ka.size + D.R.r) (K * z) hr3 hp1
+      hpr (Nat.mul_pos hg0 hg1) hNA1 hNC1 hc1 (by linarith) (by linarith) (by rw [hfdeg]; linarith)
+      (by linarith) (by unfold dE; linarith) hlg (by rw [hNA]; linarith) (by linarith) hlc hlw
   rw [Real.mul_rpow (by linarith) (by linarith), ← mul_assoc] at hn hLa
   have hP : z ≤ z ^ A := by
     have := Real.rpow_le_rpow_of_exponent_le hz1 hA
@@ -270,7 +332,7 @@ theorem room_four : ∃ C₀ : ℝ → ℝ → ℝ → ℝ, (∀ a b c, 0 ≤ C�
     linarith
   have hR : Real.log (D.R.r : ℝ) ≤ z := (log_le_self' (by linarith)).trans hrz
   refine ⟨hz1, ?_⟩
-  exact assemble K (C * K ^ A) (z ^ A) z ka.size _ _ (Real.log D.host.rdE) _ _ _ _ hz1 hP (by linarith)
-    (by positivity) hs1 hmax hLa (by linarith) hR ho (by linarith) hn
+  exact assemble K (C * K ^ A) (z ^ A) z ka.size _ _ (Real.log D.host.rdE) _ _ _ _ hz1 hP
+    (by linarith) (by positivity) hs1 hmax hLa (by linarith) hR ho (by linarith) hn
 
 end GlobalTheory.ArcCM.Room

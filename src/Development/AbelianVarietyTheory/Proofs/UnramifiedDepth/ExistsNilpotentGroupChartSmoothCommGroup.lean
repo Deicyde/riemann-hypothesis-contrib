@@ -17,8 +17,11 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.PowerSerie
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -88,14 +91,22 @@ private lemma constantCoeff_germEvalTwo_eq_zero {R : Type} [CommRing R] {n d : �
   · exact (nv_at_zero _).trans (hb j)
   · exact (nv_at_zero _).trans (hc j)
 
-theorem exists_nilChart : ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G] (g : ℕ), SmoothOfRelativeDimension g G.hom → ∃ (F : FGLaw R g) (X : Fam G g), NilChart G F.F X := by
+theorem exists_nilChart
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over (Spec (CommRingCat.of R))) [GrpObj G]
+        [IsCommMonObj G] (g : ℕ),
+      SmoothOfRelativeDimension g G.hom → ∃ (F : FGLaw R g) (X : Fam G g), NilChart G F.F X := by
   intro R _ _ G _ _ g hG
   classical
   obtain ⟨x, h0, hnat, hinj, hsur⟩ := GlobalTheory.NilCoord.nilpotent_coordinates G g hG
   have hser := @GlobalTheory.exists_series_of_natural_on_nilpotent (@GlobalTheory.nEval_basic)
-  obtain ⟨F0, hF0⟩ := GlobalTheory.ChLaw.groupLaw_powerSeries (@GlobalTheory.nEval_basic) (@hser) G g x ⟨h0, hnat, hinj, hsur⟩
-  have hF : ∀ k : Fin g, ∃ f : PS R 2 g, ∀ (S : Type) [CommRing S] [Algebra R S] (u : Fin 2 × Fin g → S),
-      (∀ i, IsNilpotent (u i)) → fAdd F0 (fun j => u (0, j)) (fun j => u (1, j)) k = nEval f u := by
+  obtain ⟨F0, hF0⟩ :=
+    GlobalTheory.ChLaw.groupLaw_powerSeries (@GlobalTheory.nEval_basic) (@hser) G g x
+      ⟨h0, hnat, hinj, hsur⟩
+  have hF
+      : ∀ k : Fin g, ∃ f : PS R 2 g,
+        ∀ (S : Type) [CommRing S] [Algebra R S] (u : Fin 2 × Fin g → S),
+          (∀ i, IsNilpotent (u i))
+            → fAdd F0 (fun j => u (0, j)) (fun j => u (1, j)) k = nEval f u := by
     intro k
     refine hser (fun S _ _ u => fAdd F0 (fun j => u (0, j)) (fun j => u (1, j)) k) ?_
     intro S _ _ S' _ _ φ u hu
@@ -105,30 +116,38 @@ theorem exists_nilChart : ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over 
     funext i
     rcases i with i | i <;> rfl
   choose F hF using hF
-  have hFe : ∀ (S : Type) [CommRing S] [Algebra R S] (a b : Fin g → S), (∀ i, IsNilpotent (a i)) →
-      (∀ i, IsNilpotent (b i)) → fAdd F0 a b = fun k => nv (algebraMap R S) (F k) ![a, b] := by
+  have hFe
+      : ∀ (S : Type) [CommRing S] [Algebra R S] (a b : Fin g → S),
+        (∀ i, IsNilpotent (a i)) → (∀ i, IsNilpotent (b i))
+          → fAdd F0 a b = fun k => nv (algebraMap R S) (F k) ![a, b] := by
     intro S _ _ a b ha hb
     funext k
     rw [nv_eq_nEval, ← hF k S _ (by rintro ⟨i, j⟩; fin_cases i; exacts [ha j, hb j])]
     rfl
-  have law : ∀ (S : Type) [CommRing S] [Algebra R S] (a b : Fin g → S), (∀ i, IsNilpotent (a i)) →
-      (∀ i, IsNilpotent (b i)) → x S a * x S b = x S (fun k => nv (algebraMap R S) (F k) ![a, b]) := by
+  have law
+      : ∀ (S : Type) [CommRing S] [Algebra R S] (a b : Fin g → S),
+        (∀ i, IsNilpotent (a i)) → (∀ i, IsNilpotent (b i))
+          → x S a * x S b = x S (fun k => nv (algebraMap R S) (F k) ![a, b]) := by
     intro S _ _ a b ha hb
     rw [← hFe S a b ha hb]
     exact (hF0 S a b ha hb).2
-  have nil : ∀ (S : Type) [CommRing S] [Algebra R S] (a b : Fin g → S), (∀ i, IsNilpotent (a i)) →
-      (∀ i, IsNilpotent (b i)) → ∀ k, IsNilpotent (nv (algebraMap R S) (F k) ![a, b]) := by
+  have nil
+      : ∀ (S : Type) [CommRing S] [Algebra R S] (a b : Fin g → S),
+        (∀ i, IsNilpotent (a i)) → (∀ i, IsNilpotent (b i))
+          → ∀ k, IsNilpotent (nv (algebraMap R S) (F k) ![a, b]) := by
     intro S _ _ a b ha hb k
     have h1 := (hF0 S a b ha hb).1 k
     rw [hFe S a b ha hb] at h1
-    have h : Ideal.span (Set.range a ∪ Set.range b) ≤ nilradical S := Ideal.span_le.2 (by
-      rintro _ (⟨i, rfl⟩ | ⟨i, rfl⟩)
-      exacts [mem_nilradical.2 (ha i), mem_nilradical.2 (hb i)])
+    have h : Ideal.span (Set.range a ∪ Set.range b) ≤ nilradical S :=
+      Ideal.span_le.2 (by
+        rintro _ (⟨i, rfl⟩ | ⟨i, rfl⟩)
+        exacts [mem_nilradical.2 (ha i), mem_nilradical.2 (hb i)])
     exact mem_nilradical.1 (h h1)
-  have hz : ∀ (S : Type) [CommRing S] (i : Fin g), IsNilpotent ((0 : Fin g → S) i) :=
-    fun S _ i => IsNilpotent.zero
-  have unitL : ∀ (S : Type) [CommRing S] [Algebra R S] (a : Fin g → S), (∀ i, IsNilpotent (a i)) →
-      (fun k => nv (algebraMap R S) (F k) ![0, a]) = a := by
+  have hz : ∀ (S : Type) [CommRing S] (i : Fin g), IsNilpotent ((0 : Fin g → S) i) := fun S _ i =>
+    IsNilpotent.zero
+  have unitL
+      : ∀ (S : Type) [CommRing S] [Algebra R S] (a : Fin g → S),
+        (∀ i, IsNilpotent (a i)) → (fun k => nv (algebraMap R S) (F k) ![0, a]) = a := by
     intro S _ _ a ha
     refine hinj S _ _ (nil S _ _ (hz S) ha) ha ?_
     rw [← law S _ _ (hz S) ha, h0, _root_.one_mul]
@@ -143,14 +162,18 @@ theorem exists_nilChart : ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over 
   refine ⟨⟨F, const, ?_, ?_, ?_⟩, x, ⟨h0, hnat, hinj, ?_, law⟩⟩
   · intro k
     refine sep_nil _ _ fun S _ _ a ha => ?_
-    rw [nilpotent_eval_subst_pair _ a ha (0 : Fin g → PS R 1 g) _ _ (fun _ => map_zero _) (const_pt _), nv_pt _ a ha, nv_X _ a ha]
+    rw [nilpotent_eval_subst_pair _ a ha (0 : Fin g → PS R 1 g) _ _
+        (fun _ => map_zero _)
+        (const_pt _),
+      nv_pt _ a ha, nv_X _ a ha]
     have e : (fun j => nv (algebraMap R S) ((0 : Fin g → PS R 1 g) j) a) = 0 :=
       funext fun j => nv_zero _ a ha
     rw [e]
     exact congrFun (unitL S (a 0) (ha 0)) k
   · intro k
     refine sep_nil _ _ fun S _ _ a ha => ?_
-    rw [nilpotent_eval_subst_pair _ a ha _ _ _ (const_pt _) (const_pt _), nv_pt _ a ha, nv_pt _ a ha]
+    rw [nilpotent_eval_subst_pair _ a ha _ _ _ (const_pt _) (const_pt _), nv_pt _ a ha,
+      nv_pt _ a ha]
     have e : a = ![a 0, a 1] := by
       funext i
       fin_cases i <;> rfl
@@ -159,11 +182,16 @@ theorem exists_nilChart : ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over 
     rw [← law S _ _ (ha 1) (ha 0), ← law S _ _ (ha 0) (ha 1), _root_.mul_comm]
   · intro k
     refine sep_nil _ _ fun S _ _ a ha => ?_
-    rw [nilpotent_eval_subst_pair _ a ha _ _ _ (fun l => constantCoeff_germEvalTwo_eq_zero _ _ _ (const_pt _) (const_pt _) (const l)) (const_pt _),
-      nilpotent_eval_subst_pair _ a ha _ _ _ (const_pt _) (fun l => constantCoeff_germEvalTwo_eq_zero _ _ _ (const_pt _) (const_pt _) (const l))]
+    rw [nilpotent_eval_subst_pair _ a ha _ _ _
+        (fun l => constantCoeff_germEvalTwo_eq_zero _ _ _ (const_pt _) (const_pt _) (const l))
+        (const_pt _),
+      nilpotent_eval_subst_pair _ a ha _ _ _ (const_pt _)
+        (fun l => constantCoeff_germEvalTwo_eq_zero _ _ _ (const_pt _) (const_pt _) (const l))]
     simp only [nilpotent_eval_subst_pair _ a ha _ _ _ (const_pt _) (const_pt _), nv_pt _ a ha]
-    refine congrFun (hinj S _ _ (nil S _ _ (nil S _ _ (ha 0) (ha 1)) (ha 2))
-      (nil S _ _ (ha 0) (nil S _ _ (ha 1) (ha 2))) ?_) k
+    refine congrFun
+      (hinj S _ _ (nil S _ _ (nil S _ _ (ha 0) (ha 1)) (ha 2))
+        (nil S _ _ (ha 0) (nil S _ _ (ha 1) (ha 2))) ?_)
+      k
     rw [← law S _ _ (nil S _ _ (ha 0) (ha 1)) (ha 2), ← law S _ _ (ha 0) (nil S _ _ (ha 1) (ha 2)),
       ← law S _ _ (ha 0) (ha 1), ← law S _ _ (ha 1) (ha 2), _root_.mul_assoc]
   · intro S _ _ S' _ _ ρ σ hρσ hn z hz'

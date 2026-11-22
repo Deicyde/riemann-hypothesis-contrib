@@ -4,12 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem exists_semilinear_functional_nonzero {O B F M : Type} [CommRing O] [IsLocalRing O] [CommRing B] [Field F] [AddCommGroup M]
-    [Module B M] (φ : O →+* B) (f : O →+* F) (hf : Function.Surjective f)
-    (hM : ∀ o ∈ maximalIdeal O, ∀ m : M, φ o • m = 0) (q : M) (hq : q ≠ 0) :
-    ∃ Φ : M →+ F, (∀ o m, Φ (φ o • m) = f o * Φ m) ∧ Φ q ≠ 0 := by
+private theorem exists_semilinear_functional_nonzero
+    {O B F M : Type}
+    [CommRing O] [IsLocalRing O] [CommRing B] [Field F] [AddCommGroup M] [Module B M]
+    (φ : O →+* B)
+    (f : O →+* F) (hf : Function.Surjective f)
+    (hM : ∀ o ∈ maximalIdeal O, ∀ m : M, φ o • m = 0)
+    (q : M) (hq : q ≠ 0)
+    : ∃ Φ : M →+ F, (∀ o m, Φ (φ o • m) = f o * Φ m) ∧ Φ q ≠ 0 := by
   letI : Module O M := Module.compHom M φ
   haveI hmax : (RingHom.ker f).IsMaximal := RingHom.ker_isMaximal_of_surjective f hf
   have hker : RingHom.ker f = maximalIdeal O := IsLocalRing.eq_maximalIdeal hmax
@@ -29,8 +34,9 @@ private theorem exists_semilinear_functional_nonzero {O B F M : Type} [CommRing 
   · show e (Ψ q) ≠ 0
     exact fun h => hΨ (e.injective (h.trans (map_zero e).symm))
 
-theorem UpperTheory.V.Pa.phSep :
-    ∀ (l : ℕ) [Fact l.Prime] (S : Ctx l), ∀ y : S.U.N, (∀ Φ ∈ S.Ph, Φ y = 0) → y ∈ S.J2 • (⊤ : Submodule S.Bh S.U.N) := by
+theorem UpperTheory.V.Pa.phSep
+    : ∀ (l : ℕ) [Fact l.Prime] (S : Ctx l), ∀ y : S.U.N,
+      (∀ Φ ∈ S.Ph, Φ y = 0) → y ∈ S.J2 • (⊤ : Submodule S.Bh S.U.N) := by
   intro l _ S y hy
   by_contra hne
   let P := S.J2 • (⊤ : Submodule S.Bh S.U.N)
@@ -44,7 +50,8 @@ theorem UpperTheory.V.Pa.phSep :
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
     exact hJ _ (Ideal.mem_sup_left (Ideal.mem_sup_left (Ideal.mem_map_of_mem _ ho))) z
   obtain ⟨Φ0, hΦ0, hne0⟩ :=
-    exists_semilinear_functional_nonzero (algebraMap S.OO S.Bh) (S.rF.comp (algebraMap S.OO S.Bh)) S.oo_surj hM _ hq
+    exists_semilinear_functional_nonzero (algebraMap S.OO S.Bh) (S.rF.comp (algebraMap S.OO S.Bh))
+      S.oo_surj hM _ hq
   let Φ : S.U.N →+ S.F := Φ0.comp P.mkQ.toAddMonoidHom
   have hmem : Φ ∈ S.Ph := by
     refine ⟨fun o z => ?_, fun b hb z => ?_⟩

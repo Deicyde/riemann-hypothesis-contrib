@@ -11,16 +11,18 @@ open scoped FourierTransform ContDiff
 
 namespace WeakLimit
 
-theorem integral_fourier_mul_eq {f g : ℝ → ℂ} (hf : Integrable f) (hg : Integrable g) :
-    ∫ ξ, 𝓕 f ξ * g ξ = ∫ x, f x * 𝓕 g x := by
-  simpa using! (VectorFourier.integral_fourierIntegral_smul_eq_flip (L := innerₗ ℝ)
-      Real.continuous_fourierChar continuous_inner hf hg)
+theorem integral_fourier_mul_eq {f g : ℝ → ℂ} (hf : Integrable f) (hg : Integrable g)
+    : ∫ ξ, 𝓕 f ξ * g ξ = ∫ x, f x * 𝓕 g x := by
+  simpa using!
+    (VectorFourier.integral_fourierIntegral_smul_eq_flip (L := innerₗ ℝ) Real.continuous_fourierChar
+      continuous_inner hf hg)
 
-theorem integral_fourierInv_mul_eq {f g : ℝ → ℂ} (hf : Integrable f) (hg : Integrable g) :
-    ∫ ξ, 𝓕⁻ f ξ * g ξ = ∫ x, f x * 𝓕⁻ g x := by
+theorem integral_fourierInv_mul_eq {f g : ℝ → ℂ} (hf : Integrable f) (hg : Integrable g)
+    : ∫ ξ, 𝓕⁻ f ξ * g ξ = ∫ x, f x * 𝓕⁻ g x := by
   rw [Real.fourierInv_eq_fourier_comp_neg, integral_fourier_mul_eq hf.comp_neg hg,
     ← integral_neg_eq_self (fun x => f x * 𝓕⁻ g x)]
-  congr 1; funext x
+  congr 1
+  funext x
   simp [Real.fourierInv_eq_fourier_neg]
 
 theorem norm_fourier_le (f : ℝ → ℂ) (ξ : ℝ) : ‖𝓕 f ξ‖ ≤ ∫ x, ‖f x‖ :=
@@ -29,16 +31,21 @@ theorem norm_fourier_le (f : ℝ → ℂ) (ξ : ℝ) : ‖𝓕 f ξ‖ ≤ ∫ x
 theorem continuous_fourier_of_integrable {f : ℝ → ℂ} (hf : Integrable f) : Continuous (𝓕 f) :=
   VectorFourier.fourierIntegral_continuous Real.continuous_fourierChar continuous_inner hf
 
-theorem exists_smooth_near (a b : ℝ) {ψ : ℝ → ℂ} (hψ : Continuous ψ) {η : ℝ} (hη : 0 < η) :
-    ∃ ψ' : ℝ → ℂ, ContDiff ℝ ∞ ψ' ∧ HasCompactSupport ψ' ∧ ∀ t ∈ Icc a b, ‖ψ t - ψ' t‖ ≤ η := by
-  obtain ⟨p, hp⟩ := exists_polynomial_near_of_continuousOn a b (fun t => (ψ t).re)
-    (Complex.continuous_re.comp hψ).continuousOn (η / 2) (by positivity)
-  obtain ⟨q, hq⟩ := exists_polynomial_near_of_continuousOn a b (fun t => (ψ t).im)
-    (Complex.continuous_im.comp hψ).continuousOn (η / 2) (by positivity)
+theorem exists_smooth_near (a b : ℝ) {ψ : ℝ → ℂ} (hψ : Continuous ψ) {η : ℝ} (hη : 0 < η)
+    : ∃ ψ' : ℝ → ℂ, ContDiff ℝ ∞ ψ' ∧ HasCompactSupport ψ' ∧ ∀ t ∈ Icc a b, ‖ψ t - ψ' t‖ ≤ η := by
+  obtain ⟨p, hp⟩ :=
+    exists_polynomial_near_of_continuousOn a b
+      (fun t => (ψ t).re)
+      (Complex.continuous_re.comp hψ).continuousOn (η / 2) (by positivity)
+  obtain ⟨q, hq⟩ :=
+    exists_polynomial_near_of_continuousOn a b
+      (fun t => (ψ t).im)
+      (Complex.continuous_im.comp hψ).continuousOn (η / 2) (by positivity)
   have hpd : ∀ r : Polynomial ℝ, ContDiff ℝ ∞ (fun t : ℝ => r.eval t) := fun r => by
     simpa [Polynomial.coe_aeval_eq_eval] using r.contDiff_aeval (𝕜 := ℝ) ∞
   let χ : ContDiffBump ((a + b) / 2) := ⟨|b - a| + 1, |b - a| + 2, by positivity, by linarith⟩
-  refine ⟨fun t => (χ t : ℂ) * (((p.eval t : ℝ) : ℂ) + ((q.eval t : ℝ) : ℂ) * Complex.I), ?_, ?_, ?_⟩
+  refine
+    ⟨fun t => (χ t : ℂ) * (((p.eval t : ℝ) : ℂ) + ((q.eval t : ℝ) : ℂ) * Complex.I), ?_, ?_, ?_⟩
   · exact (Complex.ofRealCLM.contDiff.comp χ.contDiff).mul
       ((Complex.ofRealCLM.contDiff.comp (hpd p)).add
         ((Complex.ofRealCLM.contDiff.comp (hpd q)).mul contDiff_const))
@@ -47,8 +54,10 @@ theorem exists_smooth_near (a b : ℝ) {ψ : ℝ → ℂ} (hψ : Continuous ψ) 
     have hχ : χ t = 1 := by
       apply χ.one_of_mem_closedBall
       rw [Metric.mem_closedBall, Real.dist_eq]
-      have := ht.1; have := ht.2
-      rw [abs_le]; constructor <;> cases abs_cases (b - a) <;> linarith
+      have := ht.1
+      have := ht.2
+      rw [abs_le]
+      constructor <;> cases abs_cases (b - a) <;> linarith
     show ‖ψ t - (χ t : ℂ) * _‖ ≤ η
     rw [hχ, Complex.ofReal_one, one_mul]
     refine (Complex.norm_le_abs_re_add_abs_im _).trans ?_
@@ -62,15 +71,16 @@ theorem exists_smooth_near (a b : ℝ) {ψ : ℝ → ℂ} (hψ : Continuous ψ) 
 
 end WeakLimit
 
-theorem exists_smooth_weak_limit {K : ℕ → ℝ → ℝ} {a b : ℝ} (hKi : ∀ N, Integrable (K N))
-    (hK0 : ∀ N t, 0 ≤ K N t) (hK1 : ∀ N, ∫ t, K N t ≤ 1)
-    (hKs : ∀ N, Function.support (K N) ⊆ Icc a b)
+theorem exists_smooth_weak_limit
+    {K : ℕ → ℝ → ℝ} {a b : ℝ} (hKi : ∀ N, Integrable (K N)) (hK0 : ∀ N t, 0 ≤ K N t)
+    (hK1 : ∀ N, ∫ t, K N t ≤ 1) (hKs : ∀ N, Function.support (K N) ⊆ Icc a b)
     (hconv : ∀ ξ : ℝ, ∃ l : ℂ, Tendsto (fun N => 𝓕 (fun t => (K N t : ℂ)) ξ) atTop (𝓝 l))
     (hdecay : ∀ m : ℕ, ∃ C N₀, ∀ N ≥ N₀, ∀ ξ : ℝ,
-      ‖𝓕 (fun t => (K N t : ℂ)) ξ‖ ≤ C * (1 + |ξ|) ^ (-(m : ℝ))) :
-    ∃ g : ℝ → ℂ, ContDiff ℝ ∞ g ∧ tsupport g ⊆ Icc a b ∧
-      ∀ ψ : ℝ → ℂ, Continuous ψ →
-        Tendsto (fun N => ∫ t, ψ t * K N t) atTop (𝓝 (∫ t, ψ t * g t)) := by
+      ‖𝓕 (fun t => (K N t : ℂ)) ξ‖ ≤ C * (1 + |ξ|) ^ (-(m : ℝ)))
+    : ∃ g : ℝ → ℂ,
+      ContDiff ℝ ∞ g ∧ tsupport g ⊆ Icc a b
+        ∧ ∀ ψ : ℝ → ℂ,
+          Continuous ψ → Tendsto (fun N => ∫ t, ψ t * K N t) atTop (𝓝 (∫ t, ψ t * g t)) := by
   set Kc : ℕ → ℝ → ℂ := fun N t => (K N t : ℂ) with hKc
   have hKci : ∀ N, Integrable (Kc N) := fun N => (hKi N).ofReal
   have hKn : ∀ N ξ, ‖𝓕 (Kc N) ξ‖ ≤ 1 := by
@@ -96,20 +106,25 @@ theorem exists_smooth_weak_limit {K : ℕ → ℝ → ℝ} {a b : ℝ} (hKi : �
       (ae_of_all _ fun ξ => ?_)
     have h1 : 0 < 1 + |ξ| := by positivity
     rw [norm_mul, norm_pow, norm_norm, norm_norm, Real.norm_eq_abs]
-    calc |ξ| ^ n * ‖Φ ξ‖ ≤ (1 + |ξ|) ^ n * (C * (1 + |ξ|) ^ (-((n + 2 : ℕ) : ℝ))) :=
-          mul_le_mul (pow_le_pow_left₀ (abs_nonneg _) (by linarith) n) (hC ξ) (norm_nonneg _)
-            (by positivity)
+    calc
+      |ξ| ^ n * ‖Φ ξ‖ ≤ (1 + |ξ|) ^ n * (C * (1 + |ξ|) ^ (-((n + 2 : ℕ) : ℝ))) :=
+        mul_le_mul (pow_le_pow_left₀ (abs_nonneg _) (by linarith) n) (hC ξ) (norm_nonneg _)
+          (by positivity)
       _ = C * (1 + |ξ|) ^ (-(2 : ℝ)) := by
-          rw [← Real.rpow_natCast, mul_left_comm, ← Real.rpow_add h1]
-          congr 2; push_cast; ring
+        rw [← Real.rpow_natCast, mul_left_comm, ← Real.rpow_add h1]
+        congr 2
+        push_cast
+        ring
   have hΦi : Integrable Φ := (integrable_norm_iff hΦm).1 (by simpa using hΦint 0)
   set g : ℝ → ℂ := 𝓕⁻ Φ with hgdef
   have hg : ContDiff ℝ ∞ g := by
     rw [hgdef, Real.fourierInv_eq_fourier_comp_neg]
     exact Real.contDiff_fourier fun n _ => by simpa using (hΦint n).comp_neg
 
-  have hsmooth : ∀ ψ : ℝ → ℂ, ContDiff ℝ ∞ ψ → HasCompactSupport ψ →
-      Tendsto (fun N => ∫ t, ψ t * Kc N t) atTop (𝓝 (∫ t, ψ t * g t)) := by
+  have hsmooth
+      : ∀ ψ : ℝ → ℂ,
+        ContDiff ℝ ∞ ψ → HasCompactSupport ψ
+          → Tendsto (fun N => ∫ t, ψ t * Kc N t) atTop (𝓝 (∫ t, ψ t * g t)) := by
     intro ψ hψ hψc
     let ψS := hψc.toSchwartzMap hψ
     have hψi : Integrable ψ := hψ.continuous.integrable_of_hasCompactSupport hψc
@@ -127,10 +142,14 @@ theorem exists_smooth_weak_limit {K : ℕ → ℝ → ℝ} {a b : ℝ} (hKi : �
     have e2 : ∫ t, ψ t * g t = ∫ ξ, 𝓕⁻ ψ ξ * Φ ξ :=
       (WeakLimit.integral_fourierInv_mul_eq hψi hΦi).symm
     simp_rw [e1, e2]
-    refine tendsto_integral_of_dominated_convergence (fun ξ => ‖𝓕⁻ ψ ξ‖) (fun N => ?_)
-      hθi.norm (fun N => ae_of_all _ fun ξ => ?_) (ae_of_all _ fun ξ => (hΦ ξ).const_mul _)
-    · exact hθi.aestronglyMeasurable.mul
-        (WeakLimit.continuous_fourier_of_integrable (hKci N)).aestronglyMeasurable
+    refine tendsto_integral_of_dominated_convergence
+      (fun ξ => ‖𝓕⁻ ψ ξ‖)
+      (fun N => ?_)
+      hθi.norm
+      (fun N => ae_of_all _ fun ξ => ?_)
+      (ae_of_all _ fun ξ => (hΦ ξ).const_mul _)
+    · exact hθi.aestronglyMeasurable.mul (WeakLimit.continuous_fourier_of_integrable (hKci
+        N)).aestronglyMeasurable
     · rw [norm_mul]
       exact mul_le_of_le_one_right (norm_nonneg _) (hKn N ξ)
 
@@ -139,8 +158,10 @@ theorem exists_smooth_weak_limit {K : ℕ → ℝ → ℝ} {a b : ℝ} (hKi : �
     have hae : ∀ᵐ x, x ∈ (Icc a b)ᶜ → g x = 0 := by
       refine isClosed_Icc.isOpen_compl.ae_eq_zero_of_integral_contDiff_smul_eq_zero
         (hgi.locallyIntegrableOn _) fun φ hφ hφc hφs => ?_
-      have hlim := hsmooth (fun x => (φ x : ℂ)) (Complex.ofRealCLM.contDiff.comp hφ)
-        (hφc.comp_left Complex.ofReal_zero)
+      have hlim :=
+        hsmooth
+          (fun x => (φ x : ℂ))
+          (Complex.ofRealCLM.contDiff.comp hφ) (hφc.comp_left Complex.ofReal_zero)
       have h0 : ∀ N, ∫ t, (φ t : ℂ) * Kc N t = 0 := by
         intro N
         refine integral_eq_zero_of_ae (ae_of_all _ fun t => ?_)
@@ -198,7 +219,9 @@ theorem exists_smooth_weak_limit {K : ℕ → ℝ → ℝ} {a b : ℝ} (hKi : �
       exact mul_le_of_le_one_right hηpos.le (hK1 N)
   have hdiffg : ‖(∫ t, ψ' t * g t) - ∫ t, ψ t * g t‖ ≤ η * L := by
     rw [← integral_sub (hIg ψ' hψ'.continuous) (hIg ψ hψ), hLdef, ← integral_const_mul]
-    refine norm_integral_le_of_norm_le ((hg.continuous.norm.integrable_of_hasCompactSupport hgc.norm).const_mul η) (ae_of_all _ fun t => ?_)
+    refine norm_integral_le_of_norm_le
+      ((hg.continuous.norm.integrable_of_hasCompactSupport hgc.norm).const_mul η)
+      (ae_of_all _ fun t => ?_)
     rw [← sub_mul, norm_mul]
     by_cases ht : t ∈ Icc a b
     · rw [norm_sub_rev]
@@ -207,9 +230,10 @@ theorem exists_smooth_weak_limit {K : ℕ → ℝ → ℝ} {a b : ℝ} (hKi : �
       simp [this]
   have hmid : dist (∫ t, ψ' t * Kc N t) (∫ t, ψ' t * g t) < δ / 2 := hN₀ N hN
   rw [dist_eq_norm] at hmid ⊢
-  have h3 : ‖(∫ t, ψ t * Kc N t) - ∫ t, ψ t * g t‖ ≤
-      ‖(∫ t, ψ t * Kc N t) - ∫ t, ψ' t * Kc N t‖ +
-        ‖(∫ t, ψ' t * Kc N t) - ∫ t, ψ' t * g t‖ + ‖(∫ t, ψ' t * g t) - ∫ t, ψ t * g t‖ :=
+  have h3
+      : ‖(∫ t, ψ t * Kc N t) - ∫ t, ψ t * g t‖
+        ≤ ‖(∫ t, ψ t * Kc N t) - ∫ t, ψ' t * Kc N t‖ + ‖(∫ t, ψ' t * Kc N t) - ∫ t, ψ' t * g t‖
+          + ‖(∫ t, ψ' t * g t) - ∫ t, ψ t * g t‖ :=
     (norm_sub_le_norm_sub_add_norm_sub _ _ _).trans (by
       linarith [norm_sub_le_norm_sub_add_norm_sub (∫ t, ψ' t * Kc N t) (∫ t, ψ' t * g t)
         (∫ t, ψ t * g t)])

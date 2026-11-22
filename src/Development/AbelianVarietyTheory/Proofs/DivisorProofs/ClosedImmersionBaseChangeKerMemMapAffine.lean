@@ -10,7 +10,14 @@ open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
 
 namespace GlobalTheory
 
-theorem closedImmersion_baseChange_ker_mem_map : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z), IsPullback i' p' p i → IsAffineHom p → IsClosedImmersion i → ∀ W : X.Opens, IsAffineOpen W → ∀ s : Γ(X', p ⁻¹ᵁ W), (i'.app (p ⁻¹ᵁ W)).hom s = 0 → s ∈ Ideal.map (p.app W).hom (RingHom.ker (i.app W).hom) := by
+theorem closedImmersion_baseChange_ker_mem_map
+    : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z),
+      IsPullback i' p' p i → IsAffineHom p → IsClosedImmersion i
+        → ∀ W : X.Opens,
+          IsAffineOpen W
+            → ∀ s : Γ(X', p ⁻¹ᵁ W),
+              (i'.app (p ⁻¹ᵁ W)).hom s = 0
+                → s ∈ Ideal.map (p.app W).hom (RingHom.ker (i.app W).hom) := by
   intro X X' Z Z' p i i' p' h hp hi W hW s hs
   set J : Ideal Γ(X', p ⁻¹ᵁ W) := Ideal.map (p.app W).hom (RingHom.ker (i.app W).hom) with hJ
   have hU' : IsAffineOpen (p ⁻¹ᵁ W) := hW.preimage p
@@ -21,8 +28,7 @@ theorem closedImmersion_baseChange_ker_mem_map : ∀ (X X' Z Z' : Scheme.{0}) (p
     intro a ha
     simp only [RingHom.mem_ker, ψ, RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.mem_map_of_mem _ ha
-  let φ : Γ(Z, i ⁻¹ᵁ W) →+* (Γ(X', p ⁻¹ᵁ W) ⧸ J) :=
-    (i.app W).hom.liftOfSurjective hsurj ⟨ψ, hker⟩
+  let φ : Γ(Z, i ⁻¹ᵁ W) →+* (Γ(X', p ⁻¹ᵁ W) ⧸ J) := (i.app W).hom.liftOfSurjective hsurj ⟨ψ, hker⟩
   have hφ : φ.comp (i.app W).hom = ψ := (i.app W).hom.liftOfRightInverse_comp _ _ _
   let e : Spec (CommRingCat.of (Γ(X', p ⁻¹ᵁ W) ⧸ J)) ⟶ X' :=
     Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)) ≫ hU'.fromSpec
@@ -41,15 +47,24 @@ theorem closedImmersion_baseChange_ker_mem_map : ∀ (X X' Z Z' : Scheme.{0}) (p
   have hle : (⊤ : (Spec (CommRingCat.of (Γ(X', p ⁻¹ᵁ W) ⧸ J))).Opens) ≤ e ⁻¹ᵁ (p ⁻¹ᵁ W) := by
     simp [e, Scheme.Hom.comp_preimage, hU'.fromSpec_preimage_self]
   have h0 : (e.appLE (p ⁻¹ᵁ W) ⊤ hle).hom s = 0 := by
-    have key : ∀ (g : Spec (CommRingCat.of (Γ(X', p ⁻¹ᵁ W) ⧸ J)) ⟶ X') (hg : g = e) (hle' : ⊤ ≤ g ⁻¹ᵁ (p ⁻¹ᵁ W)),
-        g.appLE (p ⁻¹ᵁ W) ⊤ hle' = e.appLE (p ⁻¹ᵁ W) ⊤ hle := by
+    have key
+        : ∀ (g : Spec (CommRingCat.of (Γ(X', p ⁻¹ᵁ W) ⧸ J)) ⟶ X') (hg : g = e)
+            (hle' : ⊤ ≤ g ⁻¹ᵁ (p ⁻¹ᵁ W)),
+          g.appLE (p ⁻¹ᵁ W) ⊤ hle' = e.appLE (p ⁻¹ᵁ W) ⊤ hle := by
       rintro g rfl _; rfl
-    rw [← key (l ≫ i') hl (by rw [hl]; exact hle), Scheme.Hom.comp_appLE, CommRingCat.comp_apply, hs, map_zero]
-  have h1 : (e.appLE (p ⁻¹ᵁ W) ⊤ hle).hom s = (Scheme.ΓSpecIso (CommRingCat.of (Γ(X', p ⁻¹ᵁ W) ⧸ J))).inv.hom (Ideal.Quotient.mk J s) := by
+    rw [← key (l ≫ i') hl (by rw [hl]; exact hle), Scheme.Hom.comp_appLE, CommRingCat.comp_apply,
+      hs, map_zero]
+  have h1
+      : (e.appLE (p ⁻¹ᵁ W) ⊤ hle).hom s
+        = (Scheme.ΓSpecIso (CommRingCat.of (Γ(X', p ⁻¹ᵁ W) ⧸ J))).inv.hom
+          (Ideal.Quotient.mk J s) := by
     simp only [e, Scheme.Hom.comp_appLE, hU'.fromSpec_app_self]
     rw [Category.assoc]
     erw [Scheme.Hom.map_appLE]
-    rw [show ∀ hh, (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))).appLE ⊤ ⊤ hh = (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))).appTop from fun _ => (Scheme.Hom.app_eq_appLE _).symm]
+    rw [show ∀ hh,
+        (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))).appLE ⊤ ⊤ hh
+          = (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))).appTop from fun _ =>
+      (Scheme.Hom.app_eq_appLE _).symm]
     rw [← Scheme.ΓSpecIso_inv_naturality]
     rfl
   rw [h1] at h0

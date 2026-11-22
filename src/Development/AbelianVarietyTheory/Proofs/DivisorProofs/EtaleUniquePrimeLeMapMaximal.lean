@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem etale_prime_le_map_of_unique (B A : Type) [CommRing B] [CommRing A] [Algebra B A]
-    [Algebra.Etale B A] (P : Ideal B) (hP : P.IsMaximal) (Q : Ideal A)
-    (hQ : ∀ Q' : Ideal A, Q'.IsPrime → P.map (algebraMap B A) ≤ Q' → Q' = Q) :
-    Q ≤ P.map (algebraMap B A) := by
+theorem etale_prime_le_map_of_unique
+    (B A : Type) [CommRing B] [CommRing A] [Algebra B A] [Algebra.Etale B A]
+    (P : Ideal B) (hP : P.IsMaximal)
+    (Q : Ideal A) (hQ : ∀ Q' : Ideal A, Q'.IsPrime → P.map (algebraMap B A) ≤ Q' → Q' = Q)
+    : Q ≤ P.map (algebraMap B A) := by
   set I := P.map (algebraMap B A) with hI
   by_cases htop : I = ⊤
   · rw [htop]; exact le_top

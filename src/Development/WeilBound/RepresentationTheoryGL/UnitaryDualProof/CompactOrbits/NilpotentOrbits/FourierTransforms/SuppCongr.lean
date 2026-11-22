@@ -14,9 +14,12 @@ open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem supp_congr {n : ℕ} {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ}
-    (h : Supp ξ (Bz Z ×ˢ Set.univ)) {f g : Sp k n → ℂ} (hf : f ∈ supportedIn (Set.univ : Set (Sp k n)))
-    (hg : g ∈ supportedIn (Set.univ : Set (Sp k n))) (e : ∀ p ∈ Bz Z ×ˢ Set.univ, f p = g p) : ξ f = ξ g := by
+theorem supp_congr
+    {n : ℕ} {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ}
+    (h : Supp ξ (Bz Z ×ˢ Set.univ))
+    {f g : Sp k n → ℂ} (hf : f ∈ supportedIn (Set.univ : Set (Sp k n)))
+    (hg : g ∈ supportedIn (Set.univ : Set (Sp k n))) (e : ∀ p ∈ Bz Z ×ˢ Set.univ, f p = g p)
+    : ξ f = ξ g := by
   have := h (f - g) ((supportedIn Set.univ).sub_mem hf hg) fun p hp => by simp [e p hp]
   rwa [map_sub, sub_eq_zero] at this
 
@@ -26,10 +29,11 @@ theorem fourP_of (hΦ : PhiP (k := k)) (hC : CompP (k := k)) : FourP (k := k) :=
   obtain ⟨hCs, hCa, -, -⟩ := hC n Z hZ
   have hUU : ∀ f ∈ supportedIn (UU : Set (Sp k n)), f ∈ supportedIn (Set.univ : Set (Sp k n)) :=
     fun f hf => ⟨hf.1, Set.subset_univ _⟩
-  let F : ((Sp k n → ℂ) →ₗ[ℂ] ℂ) →ₗ[ℂ] (Sp k n → ℂ) →ₗ[ℂ] ℂ :=
-    { toFun := fun ξ => ξ ∘ₗ Φ
-      map_add' := fun a b => by ext; simp
-      map_smul' := fun a b => by ext; simp }
+  let F : ((Sp k n → ℂ) →ₗ[ℂ] ℂ) →ₗ[ℂ] (Sp k n → ℂ) →ₗ[ℂ] ℂ := {
+    toFun := fun ξ => ξ ∘ₗ Φ
+    map_add' := fun a b => by ext; simp
+    map_smul' := fun a b => by ext; simp
+  }
   have hF : ∀ ξ f, F ξ f = ξ (Φ f) := fun _ _ => rfl
   refine ⟨F, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro ξ hξ f hf hz

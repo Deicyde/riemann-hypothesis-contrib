@@ -31,26 +31,34 @@ theorem wittLBlt : WittLBlt := by
     simp only [transpose_apply]; exact hT b a
   have hd : V.gramᵀ.det ≠ 0 := by rw [det_transpose]; exact hH.2
 
-  have hsigτ : ∀ τ0 : D.what₂.Tau, k ≤ posIndex (V.gram.map (tauE D τ0)) ∧ k ≤ negIndex (V.gram.map (tauE D τ0)) := by
+  have hsigτ
+      : ∀ τ0 : D.what₂.Tau,
+        k ≤ posIndex (V.gram.map (tauE D τ0)) ∧ k ≤ negIndex (V.gram.map (tauE D τ0)) := by
     intro τ0
     obtain ⟨ε, fr, hu, hfr, hp, hq⟩ := hS τ0
     have hP : (fr.map (starRingEnd ℂ)).det ≠ 0 := by
-      have : (fr.map (starRingEnd ℂ)).det = starRingEnd ℂ fr.det := (RingHom.map_det (starRingEnd ℂ) fr).symm
+      have : (fr.map (starRingEnd ℂ)).det = starRingEnd ℂ fr.det :=
+        (RingHom.map_det (starRingEnd ℂ) fr).symm
       rw [this]
       exact (map_ne_zero _).2 hu.ne_zero
-    have hd' : (fr.map (starRingEnd ℂ))ᵀ * V.gram.map (tauE D τ0) * (fr.map (starRingEnd ℂ)).map (starRingEnd ℂ) =
-        diagonal (PositivityTheory.Rg.Sw.sgn ε) := by
-      have h1 : (fr.map (starRingEnd ℂ)).map (starRingEnd ℂ) = fr := by
-        ext a b; simp
+    have hd'
+        : (fr.map (starRingEnd ℂ))ᵀ * V.gram.map (tauE D τ0)
+            * (fr.map (starRingEnd ℂ)).map (starRingEnd ℂ)
+          = diagonal (PositivityTheory.Rg.Sw.sgn ε) := by
+      have h1 : (fr.map (starRingEnd ℂ)).map (starRingEnd ℂ) = fr := by ext a b; simp
       rw [h1]
       exact hfr
     rw [posIndex_eq_card_of_congr_diagonal hP hd', negIndex_eq_card_of_congr_diagonal hP hd']
-    have e1 : (Finset.univ.filter fun a => 0 < (PositivityTheory.Rg.Sw.sgn ε a).re) = Finset.univ.filter fun a => ε a = true := by
+    have e1
+        : (Finset.univ.filter fun a => 0 < (PositivityTheory.Rg.Sw.sgn ε a).re)
+          = Finset.univ.filter fun a => ε a = true := by
       apply Finset.filter_congr
       intro a _
       simp only [PositivityTheory.Rg.Sw.sgn]
       cases ε a <;> norm_num
-    have e2 : (Finset.univ.filter fun a => (PositivityTheory.Rg.Sw.sgn ε a).re < 0) = Finset.univ.filter fun a => ε a = false := by
+    have e2
+        : (Finset.univ.filter fun a => (PositivityTheory.Rg.Sw.sgn ε a).re < 0)
+          = Finset.univ.filter fun a => ε a = false := by
       apply Finset.filter_congr
       intro a _
       simp only [PositivityTheory.Rg.Sw.sgn]
@@ -64,7 +72,8 @@ theorem wittLBlt : WittLBlt := by
     · have hφ : φ = ComplexEmbedding.conjugate (tauE D τ0) := by rw [h]; exact (star_star φ).symm
       rw [hφ, posIndex_map_conjugate _ hT, negIndex_map_conjugate _ hT]
       exact hsigτ τ0
-  have hsigT : ∀ φ : D.host.E →+* ℂ, k ≤ posIndex (V.gramᵀ.map φ) ∧ k ≤ negIndex (V.gramᵀ.map φ) := by
+  have hsigT
+      : ∀ φ : D.host.E →+* ℂ, k ≤ posIndex (V.gramᵀ.map φ) ∧ k ≤ negIndex (V.gramᵀ.map φ) := by
     intro φ
     have hm : V.gramᵀ.map φ = V.gram.map (ComplexEmbedding.conjugate φ) := by
       rw [hTt]

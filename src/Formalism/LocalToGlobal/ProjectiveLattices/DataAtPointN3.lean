@@ -15,9 +15,12 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestric
 open Formalism.MainNotions.DIV.Cons (SCF intO)
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
-variable {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
+variable
+  {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F}
 
-structure DatAt (Y : Model Xo c β) {p : ℕ} {C : SCF p} (P : PointsOfFlagModel.PtC Y C) : Type 1 where
+structure DatAt (Y : Model Xo c β) {p : ℕ} {C : SCF p} (P : PointsOfFlagModel.PtC Y C)
+    : Type 1 where
   R : Type
   [ring : CommRing R]
   [dom : IsDomain R]
@@ -47,8 +50,7 @@ abbrev Ylat (A : DatAt Y P) : Type := A.U.D.toPre.X
 def beta (A : DatAt Y P) (a b : A.Ylat) : ℝ :=
   betaAt A.U.D.toPre ((intO ↥C.S).subtype.comp A.f) p a b
 
-theorem beta_symm (A : DatAt Y P) (a b : A.Ylat) : A.beta a b = A.beta b a :=
-  betaAt_symm _ _ _ a b
+theorem beta_symm (A : DatAt Y P) (a b : A.Ylat) : A.beta a b = A.beta b a := betaAt_symm _ _ _ a b
 
 end DatAt
 

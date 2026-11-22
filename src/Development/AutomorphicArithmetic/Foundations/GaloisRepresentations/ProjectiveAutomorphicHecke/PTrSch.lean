@@ -15,10 +15,11 @@ open Matrix Polynomial
 namespace UpperTheory.Gal.CertificateRingHomMap
 
 open UpperTheory.Gal.Schur in
-private theorem den_eq {n : ℕ} (t : Fin n → ℂ) :
-    (Matrix.of fun i j : Fin n => t i ^ (n - 1 - (j : ℕ))).det = vdm t := by
-  have hm : (Matrix.of fun i j : Fin n => t i ^ (n - 1 - (j : ℕ))) =
-      Matrix.projVandermonde (fun _ => (1 : ℂ)) t := by
+private theorem den_eq {n : ℕ} (t : Fin n → ℂ)
+    : (Matrix.of fun i j : Fin n => t i ^ (n - 1 - (j : ℕ))).det = vdm t := by
+  have hm
+      : (Matrix.of fun i j : Fin n => t i ^ (n - 1 - (j : ℕ)))
+        = Matrix.projVandermonde (fun _ => (1 : ℂ)) t := by
     ext i j
     simp only [Matrix.projVandermonde_apply, one_pow, one_mul, Matrix.of_apply, Fin.val_rev]
     congr 1
@@ -27,9 +28,9 @@ private theorem den_eq {n : ℕ} (t : Fin n → ℂ) :
   simp only [one_mul, vdm]
 
 open UpperTheory.Gal.Schur in
-private theorem num_eq' {n : ℕ} (l : Fin n → ℤ) (t : Fin n → ℂ) :
-    (Matrix.of fun i j : Fin n => t i ^ (l j + (n - 1 - (j : ℕ) : ℕ))).det =
-      altnZ (fun i => l i + n - 1 - (i : ℕ)) t := by
+private theorem num_eq' {n : ℕ} (l : Fin n → ℤ) (t : Fin n → ℂ)
+    : (Matrix.of fun i j : Fin n => t i ^ (l j + (n - 1 - (j : ℕ) : ℕ))).det
+      = altnZ (fun i => l i + n - 1 - (i : ℕ)) t := by
   rw [← Matrix.det_transpose]
   unfold altnZ
   congr 1
@@ -52,7 +53,9 @@ theorem pTrSch_of : TrSch := by
     rw [← key d, ← key t, ← hdchar, ← hchar]
   obtain ⟨π, hπ⟩ := GlobalTheory.ContraChar.exists_perm_of_map_eq d t hroots
   have ht0 : ∀ i, t i ≠ 0 := fun i => by rw [← hπ i]; exact hd0 _
-  have hgt : ReciprocityTheory.ChartRestriction.TR.Weyl.gtChar n lam.w t = ReciprocityTheory.ChartRestriction.TR.Weyl.gtChar n lam.w d := by
+  have hgt
+      : ReciprocityTheory.ChartRestriction.TR.Weyl.gtChar n lam.w t
+        = ReciprocityTheory.ChartRestriction.TR.Weyl.gtChar n lam.w d := by
     rw [← GlobalTheory.ContraChar.gtChar_perm lam d hd0 π]
     congr 1
     funext i
@@ -61,8 +64,11 @@ theorem pTrSch_of : TrSch := by
   rw [htr, ← hgt, ← hw]
   unfold PositivityTheory.RgBcC.weylChar
   rw [num_eq' lam.w t, den_eq t]
-  rw [UpperTheory.Gal.Schur.WeylTie_holds ℂ n lam.w m (fun i => (lam.w i + m).toNat) t
-    (fun i => (Int.toNat_of_nonneg (hpos i)).symm) ht ht0]
+  rw [UpperTheory.Gal.Schur.WeylTie_holds ℂ n lam.w m
+    (fun i => (lam.w i + m).toNat)
+    t
+    (fun i => (Int.toNat_of_nonneg (hpos i)).symm)
+    ht ht0]
   have hp : (∏ k, t k) ^ m ≠ 0 := pow_ne_zero _ (Finset.prod_ne_zero_iff.mpr fun i _ => ht0 i)
   exact div_mul_cancel₀ _ hp
 

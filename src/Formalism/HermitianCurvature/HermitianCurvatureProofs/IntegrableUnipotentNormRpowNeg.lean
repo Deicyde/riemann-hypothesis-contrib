@@ -34,18 +34,20 @@ def cut (μR : Measure (Mt k r)) (M : ℝ) (p : B.SS k r) : ℝ :=
 
 end weight
 
-private theorem rpa_lemma {a b z : ℝ} (ha : 0 < a) (hab : a ≤ b) (hz : 0 ≤ z) : b ^ (-z) ≤ a ^ (-z) := by
+private theorem rpa_lemma {a b z : ℝ} (ha : 0 < a) (hab : a ≤ b) (hz : 0 ≤ z)
+    : b ^ (-z) ≤ a ^ (-z) := by
   rw [Real.rpow_neg ha.le, Real.rpow_neg (ha.le.trans hab)]
   gcongr
 
-theorem key_real {N N' X Y Gg S θv Fv cR cF CP K1 Kγ A bN M : ℝ} {c : ℕ}
-    (hN : 1 ≤ N) (hS : 1 ≤ S) (hSX : S ≤ X) (hY : 1 ≤ Y) (hGg : 0 < Gg)
-    (hc : 1 ≤ c) (hXY : X ≤ CP * Y ^ c) (hN'le : N' ≤ Kγ * N * X ^ 2) (hN' : 1 ≤ N') (hYG : Y ≤ K1 * Gg)
-    (hθ : θv ≤ N ^ (-M) * S ^ M / cR) (hθ0 : 0 ≤ θv) (hF : Fv ≤ cF * Gg ^ (-A)) (hF0 : 0 ≤ Fv)
-    (hcR : 0 < cR) (hcF : 0 ≤ cF) (hCP : 0 < CP) (hK1 : 0 < K1) (hKγ : 0 < Kγ)
-    (hM : M = A / c - 2 * bN) (hbN : 0 ≤ bN) (hA : 4 * bN ≤ A / c) :
-    θv * Fv ≤ (cF * K1 ^ A * CP ^ (A / c) * Kγ ^ bN / cR) * (N ^ (-(A / c - 3 * bN)) * N' ^ (-bN)) := by
-  have hc0 : (0:ℝ) < c := Nat.cast_pos.mpr (by omega)
+theorem key_real
+    {N N' X Y Gg S θv Fv cR cF CP K1 Kγ A bN M : ℝ} {c : ℕ} (hN : 1 ≤ N) (hS : 1 ≤ S) (hSX : S ≤ X)
+    (hY : 1 ≤ Y) (hGg : 0 < Gg) (hc : 1 ≤ c) (hXY : X ≤ CP * Y ^ c) (hN'le : N' ≤ Kγ * N * X ^ 2)
+    (hN' : 1 ≤ N') (hYG : Y ≤ K1 * Gg) (hθ : θv ≤ N ^ (-M) * S ^ M / cR) (hθ0 : 0 ≤ θv)
+    (hF : Fv ≤ cF * Gg ^ (-A)) (hF0 : 0 ≤ Fv) (hcR : 0 < cR) (hcF : 0 ≤ cF) (hCP : 0 < CP)
+    (hK1 : 0 < K1) (hKγ : 0 < Kγ) (hM : M = A / c - 2 * bN) (hbN : 0 ≤ bN) (hA : 4 * bN ≤ A / c)
+    : θv * Fv
+      ≤ (cF * K1 ^ A * CP ^ (A / c) * Kγ ^ bN / cR) * (N ^ (-(A / c - 3 * bN)) * N' ^ (-bN)) := by
+  have hc0 : (0 : ℝ) < c := Nat.cast_pos.mpr (by omega)
   have ha0 : 0 ≤ A / c := le_trans (by positivity) hA
   have hA0 : 0 ≤ A := by
     have h := mul_nonneg ha0 hc0.le
@@ -61,7 +63,9 @@ theorem key_real {N N' X Y Gg S θv Fv cR cF CP K1 Kγ A bN M : ℝ} {c : ℕ}
     mul_le_mul hθ hF hF0 (le_trans hθ0 hθ)
   have s2 : S ^ M ≤ X ^ M := Real.rpow_le_rpow hS0 hSX hM0
   have s3 : Gg ^ (-A) ≤ K1 ^ A * Y ^ (-A) := by
-    calc Gg ^ (-A) ≤ (Y / K1) ^ (-A) := rpa_lemma (div_pos hY0 hK1) hGgY hA0
+    calc
+      Gg ^ (-A)
+        ≤ (Y / K1) ^ (-A) := rpa_lemma (div_pos hY0 hK1) hGgY hA0
       _ = K1 ^ A * Y ^ (-A) := by
         rw [Real.div_rpow hY0.le hK1.le, Real.rpow_neg hK1.le, div_inv_eq_mul, mul_comm]
   have s4 : Y ^ (-A) ≤ CP ^ (A / c) * X ^ (-(A / c)) := by
@@ -79,7 +83,8 @@ theorem key_real {N N' X Y Gg S θv Fv cR cF CP K1 Kγ A bN M : ℝ} {c : ℕ}
     have hX2 : X ^ (2 * bN) = (X ^ 2) ^ bN := by
       rw [← Real.rpow_natCast, ← Real.rpow_mul hX0.le]; norm_num
     have hN'b : N' ^ bN ≤ Kγ ^ bN * N ^ bN * X ^ (2 * bN) := by
-      rw [hX2, ← Real.mul_rpow hKγ.le hN0.le, ← Real.mul_rpow (mul_nonneg hKγ.le hN0.le) (sq_nonneg X)]
+      rw [hX2, ← Real.mul_rpow hKγ.le hN0.le,
+        ← Real.mul_rpow (mul_nonneg hKγ.le hN0.le) (sq_nonneg X)]
       exact Real.rpow_le_rpow hN'0.le hN'le hbN
     have hNb : 0 < N' ^ bN := by positivity
     have hXb : 0 < X ^ (2 * bN) := by positivity
@@ -92,16 +97,17 @@ theorem key_real {N N' X Y Gg S θv Fv cR cF CP K1 Kγ A bN M : ℝ} {c : ℕ}
     rw [← Real.rpow_add hX0]; congr 1; rw [hM]; ring
   have e4 : N ^ (-M) * N ^ bN = N ^ (-(A / c - 3 * bN)) := by
     rw [← Real.rpow_add hN0]; congr 1; rw [hM]; ring
-  calc θv * Fv ≤ (N ^ (-M) * S ^ M / cR) * (cF * Gg ^ (-A)) := s1
+  calc
+    θv * Fv
+      ≤ (N ^ (-M) * S ^ M / cR) * (cF * Gg ^ (-A)) := s1
     _ ≤ (N ^ (-M) * X ^ M / cR) * (cF * (K1 ^ A * CP ^ (A / c) * X ^ (-(A / c)))) := by
-        refine mul_le_mul ?_ ?_ (by positivity) (by positivity)
-        · gcongr
-        · gcongr
+      refine mul_le_mul ?_ ?_ (by positivity) (by positivity)
+      · gcongr
+      · gcongr
     _ = (cF * K1 ^ A * CP ^ (A / c) / cR) * N ^ (-M) * X ^ (-(2 * bN)) := by rw [← e3]; ring
-    _ ≤ (cF * K1 ^ A * CP ^ (A / c) / cR) * N ^ (-M) * (Kγ ^ bN * N ^ bN * N' ^ (-bN)) := by
-        gcongr
+    _ ≤ (cF * K1 ^ A * CP ^ (A / c) / cR) * N ^ (-M) * (Kγ ^ bN * N ^ bN * N' ^ (-bN)) := by gcongr
     _ = (cF * K1 ^ A * CP ^ (A / c) * Kγ ^ bN / cR) * (N ^ (-(A / c - 3 * bN)) * N' ^ (-bN)) := by
-        rw [← e4]; ring
+      rw [← e4]; ring
 
 section norms
 
@@ -111,35 +117,45 @@ private theorem gN_nonneg_lemma_2 (g : B.Mat k r) : 0 ≤ B.gN g := Real.sqrt_no
 
 theorem entry_le_gN (g : B.Mat k r) (i j : Fin (2 * r + k + 1)) : ‖g i j‖ ≤ B.gN g := by
   have h1 : Complex.normSq (g i j) ≤ ∑ j', Complex.normSq (g i j') :=
-    Finset.single_le_sum (f := fun j' => Complex.normSq (g i j')) (fun j' _ => Complex.normSq_nonneg _)
+    Finset.single_le_sum
+      (f := fun j' => Complex.normSq (g i j'))
+      (fun j' _ => Complex.normSq_nonneg _)
       (Finset.mem_univ j)
   have h2 : ∑ j', Complex.normSq (g i j') ≤ ∑ i', ∑ j', Complex.normSq (g i' j') :=
-    Finset.single_le_sum (f := fun i' => ∑ j', Complex.normSq (g i' j'))
-      (fun i' _ => Finset.sum_nonneg fun j' _ => Complex.normSq_nonneg _) (Finset.mem_univ i)
+    Finset.single_le_sum
+      (f := fun i' => ∑ j', Complex.normSq (g i' j'))
+      (fun i' _ => Finset.sum_nonneg fun j' _ => Complex.normSq_nonneg _)
+      (Finset.mem_univ i)
   have h3 : ‖g i j‖ ^ 2 ≤ ∑ i', ∑ j', Complex.normSq (g i' j') := by
     rw [← Complex.normSq_eq_norm_sq]; exact h1.trans h2
   unfold B.gN
   rw [← abs_of_nonneg (norm_nonneg (g i j))]
   exact Real.abs_le_sqrt h3
 
-theorem a_mv_le {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) (u : Fin m → ℂ) (i : Fin m) :
-    ‖(M *ᵥ u) i‖ ≤ ∑ j, ‖M i j‖ * ‖u j‖ := by
-  calc ‖(M *ᵥ u) i‖ = ‖∑ j, M i j * u j‖ := rfl
+theorem a_mv_le {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) (u : Fin m → ℂ) (i : Fin m)
+    : ‖(M *ᵥ u) i‖ ≤ ∑ j, ‖M i j‖ * ‖u j‖ := by
+  calc
+    ‖(M *ᵥ u) i‖
+      = ‖∑ j, M i j * u j‖ := rfl
     _ ≤ ∑ j, ‖M i j * u j‖ := norm_sum_le _ _
     _ = ∑ j, ‖M i j‖ * ‖u j‖ := by simp only [norm_mul]
 
-theorem a_gmv_le (g : B.Mat k r) (v : Fin (2 * r + k + 1) → ℂ) (j : Fin (2 * r + k + 1)) :
-    ‖(g *ᵥ v) j‖ ≤ B.gN g * ∑ l, ‖v l‖ := by
-  calc ‖(g *ᵥ v) j‖ ≤ ∑ l, ‖g j l‖ * ‖v l‖ := a_mv_le g v j
+theorem a_gmv_le (g : B.Mat k r) (v : Fin (2 * r + k + 1) → ℂ) (j : Fin (2 * r + k + 1))
+    : ‖(g *ᵥ v) j‖ ≤ B.gN g * ∑ l, ‖v l‖ := by
+  calc
+    ‖(g *ᵥ v) j‖
+      ≤ ∑ l, ‖g j l‖ * ‖v l‖ := a_mv_le g v j
     _ ≤ ∑ l, B.gN g * ‖v l‖ :=
-        Finset.sum_le_sum fun l _ => mul_le_mul_of_nonneg_right (entry_le_gN g j l) (norm_nonneg _)
+      Finset.sum_le_sum fun l _ => mul_le_mul_of_nonneg_right (entry_le_gN g j l) (norm_nonneg _)
     _ = B.gN g * ∑ l, ‖v l‖ := by rw [Finset.mul_sum]
 
-theorem a_herm_le (H g : B.Mat k r) (v w : Fin (2 * r + k + 1) → ℂ) :
-    ‖herm H (g *ᵥ v) w‖ ≤ B.gN g * (∑ i, ‖w i‖ * ∑ j, ‖H i j‖ * ∑ l, ‖v l‖) := by
+theorem a_herm_le (H g : B.Mat k r) (v w : Fin (2 * r + k + 1) → ℂ)
+    : ‖herm H (g *ᵥ v) w‖ ≤ B.gN g * (∑ i, ‖w i‖ * ∑ j, ‖H i j‖ * ∑ l, ‖v l‖) := by
   have hv : ∀ j, ‖(g *ᵥ v) j‖ ≤ B.gN g * ∑ l, ‖v l‖ := a_gmv_le g v
   have key : ‖herm H (g *ᵥ v) w‖ ≤ ∑ i, ‖w i‖ * ∑ j, ‖H i j‖ * (B.gN g * ∑ l, ‖v l‖) := by
-    calc ‖herm H (g *ᵥ v) w‖ = ‖∑ i, star (w i) * (H *ᵥ (g *ᵥ v)) i‖ := rfl
+    calc
+      ‖herm H (g *ᵥ v) w‖
+        = ‖∑ i, star (w i) * (H *ᵥ (g *ᵥ v)) i‖ := rfl
       _ ≤ ∑ i, ‖star (w i) * (H *ᵥ (g *ᵥ v)) i‖ := norm_sum_le _ _
       _ = ∑ i, ‖w i‖ * ‖(H *ᵥ (g *ᵥ v)) i‖ := by simp only [norm_mul, norm_star]
       _ ≤ ∑ i, ‖w i‖ * ∑ j, ‖H i j‖ * (B.gN g * ∑ l, ‖v l‖) := by
@@ -152,35 +168,48 @@ theorem a_herm_le (H g : B.Mat k r) (v w : Fin (2 * r + k + 1) → ℂ) :
   simp only [Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem uMap_entry_le_matrix_norm (z : Fin (2 * r + k + 1) → ℂ) (a b : Fin (r + 1)) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ g : B.Mat k r, ‖C2.uMap k r z g a b‖ ≤ C * B.gN g := by
+theorem uMap_entry_le_matrix_norm (z : Fin (2 * r + k + 1) → ℂ) (a b : Fin (r + 1))
+    : ∃ C : ℝ, 0 ≤ C ∧ ∀ g : B.Mat k r, ‖C2.uMap k r z g a b‖ ≤ C * B.gN g := by
   by_cases h : a.val < r
-  · refine ⟨∑ i, ‖bvec (esI k r ⟨a.val, h⟩) i‖ * ∑ j, ‖Hpk k r i j‖ * ∑ l, ‖fvec k r z b l‖,
-      by positivity, fun g => ?_⟩
+  · refine ⟨
+      ∑ i, ‖bvec (esI k r ⟨a.val, h⟩) i‖ * ∑ j, ‖Hpk k r i j‖ * ∑ l, ‖fvec k r z b l‖,
+      by positivity,
+      fun g => ?_
+    ⟩
     simp only [C2.uMap, dif_pos h]
     rw [mul_comm _ (B.gN g)]
     exact a_herm_le _ g _ _
-  · refine ⟨(∑ i, ‖z i‖ * ∑ j, ‖Hpk k r i j‖ * ∑ l, ‖fvec k r z b l‖) / ‖herm (Hpk k r) z z‖,
-      by positivity, fun g => ?_⟩
+  · refine ⟨
+      (∑ i, ‖z i‖ * ∑ j, ‖Hpk k r i j‖ * ∑ l, ‖fvec k r z b l‖) / ‖herm (Hpk k r) z z‖,
+      by positivity,
+      fun g => ?_
+    ⟩
     simp only [C2.uMap, dif_neg h]
     rw [norm_div, div_mul_eq_mul_div, mul_comm _ (B.gN g)]
     gcongr
     exact a_herm_le _ g _ _
 
-theorem uMap_le (z : Fin (2 * r + k + 1) → ℂ) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ (g : B.Mat k r) (a b : Fin (r + 1)), ‖C2.uMap k r z g a b‖ ≤ C * B.gN g := by
+theorem uMap_le (z : Fin (2 * r + k + 1) → ℂ)
+    : ∃ C : ℝ,
+      0 ≤ C ∧ ∀ (g : B.Mat k r) (a b : Fin (r + 1)), ‖C2.uMap k r z g a b‖ ≤ C * B.gN g := by
   choose C hC hb using fun a b => uMap_entry_le_matrix_norm (k := k) (r := r) z a b
-  refine ⟨∑ a, ∑ b, C a b, Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => hC a b,
-    fun g a b => (hb a b g).trans ?_⟩
+  refine ⟨
+    ∑ a, ∑ b, C a b,
+    Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => hC a b,
+    fun g a b => (hb a b g).trans ?_
+  ⟩
   refine mul_le_mul_of_nonneg_right ?_ (gN_nonneg_lemma_2 g)
   exact (Finset.single_le_sum (f := fun b => C a b) (fun b _ => hC a b) (Finset.mem_univ b)).trans
-    (Finset.single_le_sum (f := fun a => ∑ b, C a b)
-      (fun a _ => Finset.sum_nonneg fun b _ => hC a b) (Finset.mem_univ a))
+    (Finset.single_le_sum
+      (f := fun a => ∑ b, C a b)
+      (fun a _ => Finset.sum_nonneg fun b _ => hC a b)
+      (Finset.mem_univ a))
 
-theorem UW_bound (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z) :
-    ∃ K : ℝ, 1 ≤ K ∧ ∀ h ∈ UWset k r z, B.gN h ≤ K := by
-  obtain ⟨C, hC⟩ := (P.weyl_subgroup_compact k r z hz hT).exists_bound_of_continuousOn
-    (P.B6.gN_continuous (k := k) (r := r)).continuousOn
+theorem UW_bound (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
+    : ∃ K : ℝ, 1 ≤ K ∧ ∀ h ∈ UWset k r z, B.gN h ≤ K := by
+  obtain ⟨C, hC⟩ :=
+    (P.weyl_subgroup_compact k r z hz hT).exists_bound_of_continuousOn
+      (P.B6.gN_continuous (k := k) (r := r)).continuousOn
   refine ⟨max C 1, le_max_right _ _, fun h hh => ?_⟩
   have := hC h hh
   rw [Real.norm_of_nonneg (P.B6.gN_nonneg h)] at this
@@ -192,16 +221,17 @@ section intN
 
 variable {k r : ℕ}
 
-theorem b_fin {U : Set (B.Mat k r)} {μ : Measure (Mt k r)} (h : B.IsHaarOn U μ) (hU : IsCompact U) :
-    IsFiniteMeasure μ := by
+theorem b_fin {U : Set (B.Mat k r)} {μ : Measure (Mt k r)} (h : B.IsHaarOn U μ) (hU : IsCompact U)
+    : IsFiniteMeasure μ := by
   have hc : μ (@id (Set (Mt k r)) U)ᶜ = 0 := h.conc
   have hf : μ (@id (Set (Mt k r)) U) < ⊤ := h.finite_compact _ hU
   exact ⟨lt_of_le_of_lt (measure_univ_le_add_compl (@id (Set (Mt k r)) U))
     (ENNReal.add_lt_top.mpr ⟨hf, by rw [hc]; exact ENNReal.zero_lt_top⟩)⟩
 
-theorem integrable_unipotent_norm_rpow_neg {μN : Measure (Mt k r)} (hN : B.IsHaarOn (Nset k r) μN) (a : ℝ)
-    (ha : 4 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1) ≤ a) :
-    Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-a)) μN := by
+theorem integrable_unipotent_norm_rpow_neg
+    {μN : Measure (Mt k r)} (hN : B.IsHaarOn (Nset k r) μN)
+    (a : ℝ) (ha : 4 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1) ≤ a)
+    : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-a)) μN := by
   rcases Nat.eq_zero_or_pos r with hr | hr
   · subst hr
     have hsub : (Nset k 0 : Set (B.Mat k 0)) ⊆ {(1 : B.Mat k 0)} := by
@@ -209,7 +239,9 @@ theorem integrable_unipotent_norm_rpow_neg {μN : Measure (Mt k r)} (hN : B.IsHa
       exact P.SliceLastLevel.sz_N_zero hx
     have hfin : IsFiniteMeasure μN := by
       refine ⟨?_⟩
-      calc μN Set.univ ≤ μN (Nset k 0) + μN (Nset k 0)ᶜ := measure_univ_le_add_compl _
+      calc
+        μN Set.univ
+          ≤ μN (Nset k 0) + μN (Nset k 0)ᶜ := measure_univ_le_add_compl _
         _ = μN (Nset k 0) := by rw [hN.conc, add_zero]
         _ ≤ μN {(1 : B.Mat k 0)} := measure_mono hsub
         _ < ∞ := hN.finite_compact _ isCompact_singleton
@@ -229,44 +261,59 @@ theorem integrable_unipotent_norm_rpow_neg {μN : Measure (Mt k r)} (hN : B.IsHa
     push_cast
     nlinarith [mul_nonneg hk0 (show (0 : ℝ) ≤ r - 1 by linarith)]
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-theorem maj_int (D : B.RealPlaceData k r Wp Wq) (a b : ℝ)
-    (ha : 4 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1) ≤ a)
-    (hb : 4 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1) ≤ b) :
-    Integrable (fun p : B.SS k r => B.gN (Matrix.of p.1.2) ^ (-a) * B.gN (Matrix.of p.2.2) ^ (-b)) D.μSS := by
+theorem maj_int
+    (D : B.RealPlaceData k r Wp Wq)
+    (a b : ℝ) (ha : 4 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1) ≤ a)
+    (hb : 4 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1) ≤ b)
+    : Integrable
+      (fun p : B.SS k r => B.gN (Matrix.of p.1.2) ^ (-a) * B.gN (Matrix.of p.2.2) ^ (-b))
+      D.μSS := by
   have := P.Dx2.OrbJ.sigmaF D.haarW
   have := P.Dx2.OrbJ.sigmaF D.haarN
   have := P.Dx2.OrbJ.sigmaF D.haarW'
   have : IsFiniteMeasure D.μW := b_fin D.haarW (P.weyl_subgroup_compact k r D.z D.z_mem D.T_pos)
-  have : IsFiniteMeasure D.μW' := b_fin D.haarW' (P.weyl_subgroup_compact k r D.z' D.z'_mem D.T'_pos)
-  have i1 : Integrable (fun q : Mt k r × Mt k r => (1 : ℝ) * B.gN (Matrix.of q.2) ^ (-a)) (D.μW.prod D.μN) :=
+  have : IsFiniteMeasure D.μW' :=
+    b_fin D.haarW' (P.weyl_subgroup_compact k r D.z' D.z'_mem D.T'_pos)
+  have i1 : Integrable
+      (fun q : Mt k r × Mt k r => (1 : ℝ) * B.gN (Matrix.of q.2) ^ (-a))
+      (D.μW.prod D.μN) :=
     (integrable_const (1 : ℝ)).mul_prod (integrable_unipotent_norm_rpow_neg D.haarN a ha)
-  have i2 : Integrable (fun q : Mt k r × Mt k r => (1 : ℝ) * B.gN (Matrix.of q.2) ^ (-b)) (D.μW'.prod D.μN) :=
+  have i2 : Integrable
+      (fun q : Mt k r × Mt k r => (1 : ℝ) * B.gN (Matrix.of q.2) ^ (-b))
+      (D.μW'.prod D.μN) :=
     (integrable_const (1 : ℝ)).mul_prod (integrable_unipotent_norm_rpow_neg D.haarN b hb)
   have i3 := i1.mul_prod i2
   unfold B.RealPlaceData.μSS
   simpa only [one_mul] using i3
 
-theorem integrand_aesm (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV k r)
-    {F : B.Mat k r → (Wq →L[ℂ] Wp)} (hF : ContinuousOn F (B.GV k r)) :
-    AEStronglyMeasurable (Formalism.FourierDecayAlt.D.orbIntegrand D γ F) D.μSS := by
+theorem integrand_aesm
+    (D : B.RealPlaceData k r Wp Wq)
+    {γ : B.Mat k r} (hγ : γ ∈ B.GV k r)
+    {F : B.Mat k r → (Wq →L[ℂ] Wp)} (hF : ContinuousOn F (B.GV k r))
+    : AEStronglyMeasurable (Formalism.FourierDecayAlt.D.orbIntegrand D γ F) D.μSS := by
   set S : Set (B.SS k r) := {p | D.inSS p} with hS
   have hWc := (P.weyl_subgroup_closed k r D.z).closed
   have hWc' := (P.weyl_subgroup_closed k r D.z').closed
   have hNc := (P.unipotent_radical_closed k r).closed
   have hSc : IsClosed S := by
-    have e : S = (fun p : B.SS k r => (p.1.1 : B.Mat k r)) ⁻¹' (UWset k r D.z) ∩
-        ((fun p : B.SS k r => (p.1.2 : B.Mat k r)) ⁻¹' (Nset k r) ∩
-          ((fun p : B.SS k r => (p.2.1 : B.Mat k r)) ⁻¹' (UWset k r D.z') ∩
-            (fun p : B.SS k r => (p.2.2 : B.Mat k r)) ⁻¹' (Nset k r))) := by
+    have e
+        : S
+          = (fun p : B.SS k r => (p.1.1 : B.Mat k r)) ⁻¹' (UWset k r D.z)
+            ∩ ((fun p : B.SS k r => (p.1.2 : B.Mat k r)) ⁻¹' (Nset k r)
+              ∩ ((fun p : B.SS k r => (p.2.1 : B.Mat k r)) ⁻¹' (UWset k r D.z')
+                ∩ (fun p : B.SS k r => (p.2.2 : B.Mat k r)) ⁻¹' (Nset k r))) := by
       ext p; rfl
     rw [e]
-    exact (hWc.preimage continuous_fst.fst).inter ((hNc.preimage continuous_fst.snd).inter
-      ((hWc'.preimage continuous_snd.fst).inter (hNc.preimage continuous_snd.snd)))
+    exact (hWc.preimage continuous_fst.fst).inter
+      ((hNc.preimage continuous_fst.snd).inter
+        ((hWc'.preimage continuous_snd.fst).inter (hNc.preimage continuous_snd.snd)))
   have hxi : Continuous fun p : B.SS k r => B.xiTau D (1, 1) p :=
-    (P.B7.continuous_xi D).comp (by fun_prop : Continuous fun p : B.SS k r => (((1 : ℝ), (1 : ℝ)), p))
+    (P.B7.continuous_xi D).comp
+      (by fun_prop : Continuous fun p : B.SS k r => (((1 : ℝ), (1 : ℝ)), p))
   have hπ : ContinuousOn (fun p : B.SS k r => D.π (Matrix.of p.1.1)) S :=
     D.π_cont.comp (continuous_fst.fst).continuousOn (fun p hp => hp.1)
   have hinv1 : ContinuousOn (fun p : B.SS k r => (Matrix.of p.1.1 : B.Mat k r)⁻¹) S :=
@@ -296,17 +343,27 @@ end intN
 
 section omega
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-theorem intR (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV k r)
-    {w : Equiv.Perm (Fin (r + 1))} {d : Fin (r + 1) → ℂ} (hd : ∀ a, d a ≠ 0) (hG : P.Dx2.Rad.Good D γ w d)
-    {M : ℝ} (hM : 2 * ((r : ℝ) + 1) ^ 2 < M) :
-    Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) (Formalism.FourierDecayAlt.D.muR D γ w) := by
-  have hmu : Formalism.FourierDecayAlt.D.muR D γ w = (volume : Measure (C2.Lstidx w → ℂ)).map
-      (fun x => (Matrix.of.symm (P.Dx2.Rad.rhoF D γ w x) : Mt k r)) := rfl
+theorem intR
+    (D : B.RealPlaceData k r Wp Wq)
+    {γ : B.Mat k r} (hγ : γ ∈ B.GV k r)
+    {w : Equiv.Perm (Fin (r + 1))} {d : Fin (r + 1) → ℂ}
+    (hd : ∀ a, d a ≠ 0) (hG : P.Dx2.Rad.Good D γ w d)
+    {M : ℝ} (hM : 2 * ((r : ℝ) + 1) ^ 2 < M)
+    : Integrable
+      (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M))
+      (Formalism.FourierDecayAlt.D.muR D γ w) := by
+  have hmu
+      : Formalism.FourierDecayAlt.D.muR D γ w
+        = (volume : Measure (C2.Lstidx w → ℂ)).map
+          (fun x => (Matrix.of.symm (P.Dx2.Rad.rhoF D γ w x) : Mt k r)) :=
+    rfl
   have hm := P.Dx2.Rad.rhoF_meas D hγ hd hG
-  have hgm : Measurable fun x : Mt k r => B.gN (Matrix.of x) ^ (-M) := (P.HaarUniquenessConjugation.gN_meas k r).pow_const _
+  have hgm : Measurable fun x : Mt k r => B.gN (Matrix.of x) ^ (-M) :=
+    (P.HaarUniquenessConjugation.gN_meas k r).pow_const _
   rw [hmu, integrable_map_measure hgm.aestronglyMeasurable hm.aemeasurable]
   obtain ⟨C, hC0, hC⟩ := uMap_le (k := k) (r := r) D.z
   have hM0 : 0 ≤ M := by nlinarith [sq_nonneg ((r : ℝ) + 1)]
@@ -315,15 +372,21 @@ theorem intR (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV
       rw [Module.finrank_pi_fintype]
       simp [Complex.finrank_real_complex]
     have h2 : Fintype.card (C2.Lstidx w) ≤ (r + 1) ^ 2 := by
-      calc Fintype.card (C2.Lstidx w) ≤ Fintype.card (Fin (r + 1) × Fin (r + 1)) := Fintype.card_subtype_le _
+      calc
+        Fintype.card (C2.Lstidx w)
+          ≤ Fintype.card (Fin (r + 1) × Fin (r + 1)) := Fintype.card_subtype_le _
         _ = (r + 1) ^ 2 := by simp [sq]
     rw [h1]
     have h3 : ((Fintype.card (C2.Lstidx w) * 2 : ℕ) : ℝ) ≤ 2 * ((r : ℝ) + 1) ^ 2 := by
       have : (Fintype.card (C2.Lstidx w) : ℝ) ≤ ((r : ℝ) + 1) ^ 2 := by exact_mod_cast h2
-      push_cast; linarith
+      push_cast
+      linarith
     linarith
-  have hint := (integrable_one_add_norm (μ := (volume : Measure (C2.Lstidx w → ℂ))) hfin).const_mul ((1 + C) ^ M)
-  refine Integrable.mono' hint (hgm.comp hm).aestronglyMeasurable (Filter.Eventually.of_forall fun y => ?_)
+  have hint :=
+    (integrable_one_add_norm (μ := (volume : Measure (C2.Lstidx w → ℂ))) hfin).const_mul
+      ((1 + C) ^ M)
+  refine Integrable.mono' hint (hgm.comp hm).aestronglyMeasurable
+    (Filter.Eventually.of_forall fun y => ?_)
   obtain ⟨hρR, hρu⟩ := P.Dx2.Rad.rhoF_spec D hγ hd hG y
   set ρ := P.Dx2.Rad.rhoF D γ w y with hρ
   have hρ1 : 1 ≤ B.gN ρ := P.BetaSesquilinearity.gN_ge_one hρR.1.1
@@ -331,46 +394,56 @@ theorem intR (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV
     refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun q => ?_
     have e : C2.uMap k r D.z ρ q.1.2 q.1.1 = star (y q) := by
       rw [hρu, Matrix.conjTranspose_apply, P.Dx2.Rad.low_coord]
-    calc ‖y q‖ = ‖C2.uMap k r D.z ρ q.1.2 q.1.1‖ := by rw [e, norm_star]
+    calc
+      ‖y q‖
+        = ‖C2.uMap k r D.z ρ q.1.2 q.1.1‖ := by rw [e, norm_star]
       _ ≤ C * B.gN ρ := hC ρ _ _
   have hle : 1 + ‖y‖ ≤ (1 + C) * B.gN ρ := by nlinarith
   have hpos : 0 < (1 + ‖y‖) / (1 + C) := by positivity
   have hle' : (1 + ‖y‖) / (1 + C) ≤ B.gN ρ := by rw [div_le_iff₀ (by positivity)]; linarith
   simp only [Function.comp, Equiv.apply_symm_apply]
   rw [Real.norm_of_nonneg (Real.rpow_nonneg (P.B6.gN_nonneg _) _)]
-  calc B.gN ρ ^ (-M) ≤ ((1 + ‖y‖) / (1 + C)) ^ (-M) := Real.rpow_le_rpow_of_nonpos hpos hle' (by linarith)
+  calc
+    B.gN ρ ^ (-M)
+      ≤ ((1 + ‖y‖) / (1 + C)) ^ (-M) := Real.rpow_le_rpow_of_nonpos hpos hle' (by linarith)
     _ = (1 + C) ^ M * (1 + ‖y‖) ^ (-M) := by
-      rw [Real.div_rpow (by positivity) (by positivity), Real.rpow_neg (by positivity : (0 : ℝ) ≤ 1 + C)]
+      rw [Real.div_rpow (by positivity) (by positivity),
+        Real.rpow_neg (by positivity : (0 : ℝ) ≤ 1 + C)]
       field_simp
 
 variable {γ : B.Mat k r} {μR : Measure (Mt k r)}
 
-private theorem ae_R_lemma_6 (hR : B.IsHaarOn (C6.Rset γ) μR) : ∀ᵐ x ∂μR, Matrix.of x ∈ C6.Rset γ := by
+private theorem ae_R_lemma_6 (hR : B.IsHaarOn (C6.Rset γ) μR)
+    : ∀ᵐ x ∂μR, Matrix.of x ∈ C6.Rset γ := by
   have h0 : μR (@id (Set (Mt k r)) (C6.Rset γ))ᶜ = 0 := hR.conc
   filter_upwards [mem_ae_iff.mpr h0] with x hx
   exact hx
 
-theorem om_bound (hR : B.IsHaarOn (C6.Rset γ) μR) {M : ℝ} (hM : 0 ≤ M) {n : Mt k r}
-    (hn : Matrix.of n ∈ B.GV k r) :
-    ∀ᵐ x ∂μR, B.gN (Matrix.of x * Matrix.of n) ^ (-M) ≤ B.gN (Matrix.of n)⁻¹ ^ M * B.gN (Matrix.of x) ^ (-M) := by
-  filter_upwards [ae_R_lemma_6 hR] with x hx
-  have hxG : Matrix.of x ∈ B.GV k r := hx.1.1
-  have hc := PI.PolynomialProperness.GN.gN_pos hxG
-  have hb : 0 < B.gN (Matrix.of n)⁻¹ := by
-    rw [PI.PolynomialProperness.GN.gN_inv hn]; exact PI.PolynomialProperness.GN.gN_pos hn
-  have hle : B.gN (Matrix.of x) ≤ B.gN (Matrix.of x * Matrix.of n) * B.gN (Matrix.of n)⁻¹ := by
-    calc B.gN (Matrix.of x) = B.gN (Matrix.of x * Matrix.of n * (Matrix.of n)⁻¹) := by
+theorem om_bound
+    (hR : B.IsHaarOn (C6.Rset γ) μR) {M : ℝ} (hM : 0 ≤ M) {n : Mt k r} (hn : Matrix.of n ∈ B.GV k r)
+    : ∀ᵐ x ∂μR, B.gN (Matrix.of x * Matrix.of n) ^ (-M) ≤ B.gN (Matrix.of n)⁻¹ ^ M * B.gN (Matrix.of x) ^ (-M) :=
+  by
+    filter_upwards [ae_R_lemma_6 hR] with x hx
+    have hxG : Matrix.of x ∈ B.GV k r := hx.1.1
+    have hc := PI.PolynomialProperness.GN.gN_pos hxG
+    have hb : 0 < B.gN (Matrix.of n)⁻¹ := by
+      rw [PI.PolynomialProperness.GN.gN_inv hn]; exact PI.PolynomialProperness.GN.gN_pos hn
+    have hle : B.gN (Matrix.of x) ≤ B.gN (Matrix.of x * Matrix.of n) * B.gN (Matrix.of n)⁻¹ := by
+      calc
+        B.gN (Matrix.of x) = B.gN (Matrix.of x * Matrix.of n * (Matrix.of n)⁻¹) := by
           rw [Matrix.mul_assoc, PI.PolynomialProperness.GN.mul_inv hn, Matrix.mul_one]
-      _ ≤ _ := PI.PolynomialProperness.GN.gN_mul_le _ _
-  have hle' : B.gN (Matrix.of x) / B.gN (Matrix.of n)⁻¹ ≤ B.gN (Matrix.of x * Matrix.of n) := by
-    rw [div_le_iff₀ hb]; exact hle
-  calc B.gN (Matrix.of x * Matrix.of n) ^ (-M)
-      ≤ (B.gN (Matrix.of x) / B.gN (Matrix.of n)⁻¹) ^ (-M) := rpa_lemma (div_pos hc hb) hle' hM
-    _ = B.gN (Matrix.of n)⁻¹ ^ M * B.gN (Matrix.of x) ^ (-M) := by
+        _ ≤ _ := PI.PolynomialProperness.GN.gN_mul_le _ _
+    have hle' : B.gN (Matrix.of x) / B.gN (Matrix.of n)⁻¹ ≤ B.gN (Matrix.of x * Matrix.of n) := by
+      rw [div_le_iff₀ hb]; exact hle
+    calc
+      B.gN (Matrix.of x * Matrix.of n) ^ (-M)
+        ≤ (B.gN (Matrix.of x) / B.gN (Matrix.of n)⁻¹) ^ (-M) := rpa_lemma (div_pos hc hb) hle' hM
+      _ = B.gN (Matrix.of n)⁻¹ ^ M * B.gN (Matrix.of x) ^ (-M) := by
         rw [Real.div_rpow hc.le hb.le, Real.rpow_neg hb.le, div_inv_eq_mul, mul_comm]
 
-private theorem gNc_lemma_3 {X : Type*} [TopologicalSpace X] {f g : X → Mt k r} (hf : Continuous f)
-    (hg : Continuous g) : Continuous fun q => B.gN (Matrix.of (f q) * Matrix.of (g q)) := by
+private theorem gNc_lemma_3
+    {X : Type*} [TopologicalSpace X] {f g : X → Mt k r} (hf : Continuous f) (hg : Continuous g)
+    : Continuous fun q => B.gN (Matrix.of (f q) * Matrix.of (g q)) := by
   unfold B.gN
   refine Continuous.sqrt ?_
   refine continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ => ?_
@@ -379,38 +452,45 @@ private theorem gNc_lemma_3 {X : Type*} [TopologicalSpace X] {f g : X → Mt k r
     ((continuous_apply l).comp ((continuous_apply i).comp hf)).mul
       ((continuous_apply j).comp ((continuous_apply l).comp hg)))
 
-theorem om_meas_int (M : ℝ) (n : Mt k r) :
-    Measurable fun x : Mt k r => B.gN (Matrix.of x * Matrix.of n) ^ (-M) := by
-  exact ((gNc_lemma_3 (k := k) (r := r) (f := id) (g := fun _ => n) continuous_id
-    continuous_const).measurable).pow_const _
+theorem om_meas_int (M : ℝ) (n : Mt k r)
+    : Measurable fun x : Mt k r => B.gN (Matrix.of x * Matrix.of n) ^ (-M) := by
+  exact ((gNc_lemma_3 (k := k) (r := r) (f := id)
+    (g := fun _ => n)
+    continuous_id continuous_const).measurable).pow_const _
 
-theorem om_int (hR : B.IsHaarOn (C6.Rset γ) μR) {M : ℝ} (hM : 0 ≤ M)
-    (hI : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) μR) {n : Mt k r}
-    (hn : Matrix.of n ∈ B.GV k r) :
-    Integrable (fun x : Mt k r => B.gN (Matrix.of x * Matrix.of n) ^ (-M)) μR := by
+theorem om_int
+    (hR : B.IsHaarOn (C6.Rset γ) μR)
+    {M : ℝ} (hM : 0 ≤ M) (hI : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) μR)
+    {n : Mt k r} (hn : Matrix.of n ∈ B.GV k r)
+    : Integrable (fun x : Mt k r => B.gN (Matrix.of x * Matrix.of n) ^ (-M)) μR := by
   refine (hI.const_mul (B.gN (Matrix.of n)⁻¹ ^ M)).mono' (om_meas_int M n).aestronglyMeasurable ?_
   filter_upwards [om_bound hR hM hn] with x hx
   rw [Real.norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg (gN_nonneg_lemma_2 _) _)]
   exact hx
 
-private theorem gv_mul_lemma_5 {a b : B.Mat k r} (ha : a ∈ B.GV k r) (hb : b ∈ B.GV k r) :
-    a * b ∈ B.GV k r := by
+private theorem gv_mul_lemma_5 {a b : B.Mat k r} (ha : a ∈ B.GV k r) (hb : b ∈ B.GV k r)
+    : a * b ∈ B.GV k r := by
   have ha' : aᴴ * Hpk k r * a = Hpk k r := ha
   have hb' : bᴴ * Hpk k r * b = Hpk k r := hb
   show (a * b)ᴴ * Hpk k r * (a * b) = Hpk k r
-  calc (a * b)ᴴ * Hpk k r * (a * b) = bᴴ * (aᴴ * Hpk k r * a) * b := by
-        rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
+  calc
+    (a * b)ᴴ * Hpk k r * (a * b) = bᴴ * (aᴴ * Hpk k r * a) * b := by
+      rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
     _ = Hpk k r := by rw [ha', hb']
 
-theorem om_pos (hR : B.IsHaarOn (C6.Rset γ) μR) {M : ℝ} (hM : 0 ≤ M)
-    (hI : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) μR) {n : Mt k r}
-    (hn : Matrix.of n ∈ B.GV k r) : 0 < Om μR M n := by
+theorem om_pos
+    (hR : B.IsHaarOn (C6.Rset γ) μR)
+    {M : ℝ} (hM : 0 ≤ M) (hI : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) μR)
+    {n : Mt k r} (hn : Matrix.of n ∈ B.GV k r)
+    : 0 < Om μR M n := by
   unfold Om
   have hint := om_int hR hM hI hn
-  have hnn : ∀ x, 0 ≤ B.gN (Matrix.of x * Matrix.of n) ^ (-M) := fun x => Real.rpow_nonneg (gN_nonneg_lemma_2 _) _
+  have hnn : ∀ x, 0 ≤ B.gN (Matrix.of x * Matrix.of n) ^ (-M) := fun x =>
+    Real.rpow_nonneg (gN_nonneg_lemma_2 _) _
   rw [integral_pos_iff_support_of_nonneg hnn hint]
-  have hsub : @id (Set (Mt k r)) (C6.Rset γ) ⊆
-      Function.support (fun x : Mt k r => B.gN (Matrix.of x * Matrix.of n) ^ (-M)) := by
+  have hsub
+      : @id (Set (Mt k r)) (C6.Rset γ)
+        ⊆ Function.support (fun x : Mt k r => B.gN (Matrix.of x * Matrix.of n) ^ (-M)) := by
     intro x hx
     have hxG : Matrix.of x ∈ B.GV k r := (hx : Matrix.of x ∈ C6.Rset γ).1.1
     exact (Real.rpow_pos_of_pos (PI.PolynomialProperness.GN.gN_pos (gv_mul_lemma_5 hxG hn)) _).ne'
@@ -420,30 +500,35 @@ theorem om_pos (hR : B.IsHaarOn (C6.Rset γ) μR) {M : ℝ} (hM : 0 ≤ M)
     apply hR.ne_zero
     rw [← Measure.measure_univ_eq_zero]
     have hc : μR (@id (Set (Mt k r)) (C6.Rset γ))ᶜ = 0 := hR.conc
-    exact le_antisymm ((measure_univ_le_add_compl (@id (Set (Mt k r)) (C6.Rset γ))).trans
-      (le_of_eq (by rw [h0, hc, add_zero]))) (by simp)
+    exact le_antisymm
+      ((measure_univ_le_add_compl (@id (Set (Mt k r)) (C6.Rset γ))).trans
+        (le_of_eq (by rw [h0, hc, add_zero])))
+      (by simp)
   exact hpos.trans_le (measure_mono hsub)
 
-theorem om_shift (hR : B.IsHaarOn (C6.Rset γ) μR) (M : ℝ) {ρ : B.Mat k r} (hρ : ρ ∈ C6.Rset γ)
-    (n : Mt k r) : Om μR M (Matrix.of.symm (ρ * Matrix.of n)) = Om μR M n := by
+theorem om_shift
+    (hR : B.IsHaarOn (C6.Rset γ) μR) (M : ℝ) {ρ : B.Mat k r} (hρ : ρ ∈ C6.Rset γ) (n : Mt k r)
+    : Om μR M (Matrix.of.symm (ρ * Matrix.of n)) = Om μR M n := by
   have hmeas : Measurable (B.rmulF ρ) := by
     refine Continuous.measurable (continuous_pi fun i => continuous_pi fun j => ?_)
     simp only [B.rmulF, Matrix.mul_apply, Matrix.of_apply]
     exact continuous_finsetSum _ fun l _ => by fun_prop
   unfold Om
-  calc ∫ x, B.gN (Matrix.of x * Matrix.of (Matrix.of.symm (ρ * Matrix.of n))) ^ (-M) ∂μR
-      = ∫ x, (fun y : Mt k r => B.gN (Matrix.of y * Matrix.of n) ^ (-M)) (B.rmulF ρ x) ∂μR := by
-        refine integral_congr_ae (ae_of_all _ fun x => ?_)
-        show B.gN (Matrix.of x * (ρ * Matrix.of n)) ^ (-M) = B.gN (Matrix.of x * ρ * Matrix.of n) ^ (-M)
-        rw [mul_assoc]
+  calc
+    ∫ x, B.gN (Matrix.of x * Matrix.of (Matrix.of.symm (ρ * Matrix.of n))) ^ (-M) ∂μR
+        = ∫ x, (fun y : Mt k r => B.gN (Matrix.of y * Matrix.of n) ^ (-M)) (B.rmulF ρ x) ∂μR := by
+      refine integral_congr_ae (ae_of_all _ fun x => ?_)
+      show B.gN (Matrix.of x * (ρ * Matrix.of n)) ^ (-M) = B.gN (Matrix.of x * ρ * Matrix.of n) ^ (-M)
+      rw [mul_assoc]
     _ = ∫ y, B.gN (Matrix.of y * Matrix.of n) ^ (-M) ∂(μR.map (B.rmulF ρ)) :=
-        (integral_map hmeas.aemeasurable (om_meas_int M n).aestronglyMeasurable).symm
+      (integral_map hmeas.aemeasurable (om_meas_int M n).aestronglyMeasurable).symm
     _ = ∫ y, B.gN (Matrix.of y * Matrix.of n) ^ (-M) ∂μR := by rw [hR.right ρ hρ]
 
-theorem om_lower (hR : B.IsHaarOn (C6.Rset γ) μR) {M : ℝ} (hM : 0 ≤ M)
-    (hI : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) μR) {ρ σ : B.Mat k r}
-    (hρ : ρ ∈ C6.Rset γ) (hσ : σ ∈ B.GV k r) :
-    (∫ x, B.gN (Matrix.of x) ^ (-M) ∂μR) * B.gN σ ^ (-M) ≤ Om μR M (Matrix.of.symm (ρ * σ)) := by
+theorem om_lower
+    (hR : B.IsHaarOn (C6.Rset γ) μR)
+    {M : ℝ} (hM : 0 ≤ M) (hI : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) μR)
+    {ρ σ : B.Mat k r} (hρ : ρ ∈ C6.Rset γ) (hσ : σ ∈ B.GV k r)
+    : (∫ x, B.gN (Matrix.of x) ^ (-M) ∂μR) * B.gN σ ^ (-M) ≤ Om μR M (Matrix.of.symm (ρ * σ)) := by
   have hshift := om_shift hR M hρ (Matrix.of.symm σ)
   rw [Equiv.apply_symm_apply] at hshift
   rw [hshift]
@@ -468,12 +553,16 @@ private theorem gNc1_lemma_4 : Continuous fun x : Mt k r => B.gN (Matrix.of x) :
   exact Complex.continuous_normSq.comp ((continuous_apply j).comp (continuous_apply i))
 
 theorem cut_meas [SFinite μR] (M : ℝ) : Measurable (cut μR M) := by
-  have hf : StronglyMeasurable fun q : Mt k r × Mt k r => B.gN (Matrix.of q.2 * Matrix.of q.1) ^ (-M) :=
-    ((gNc_lemma_3 (f := fun q : Mt k r × Mt k r => q.2) (g := fun q => q.1) continuous_snd
-      continuous_fst).measurable.pow_const _).stronglyMeasurable
+  have hf
+      : StronglyMeasurable fun q : Mt k r × Mt k r => B.gN (Matrix.of q.2 * Matrix.of q.1) ^ (-M) :=
+    ((gNc_lemma_3
+      (f := fun q : Mt k r × Mt k r => q.2)
+      (g := fun q => q.1)
+      continuous_snd continuous_fst).measurable.pow_const _).stronglyMeasurable
   have hOm : Measurable fun n : Mt k r => Om μR M n :=
     (StronglyMeasurable.integral_prod_right' (ν := μR) hf).measurable
-  have hg : Measurable fun n : Mt k r => B.gN (Matrix.of n) ^ (-M) := (gNc1_lemma_4.measurable).pow_const _
+  have hg : Measurable fun n : Mt k r => B.gN (Matrix.of n) ^ (-M) :=
+    (gNc1_lemma_4.measurable).pow_const _
   exact (hg.comp measurable_fst.snd).div (hOm.comp measurable_fst.snd)
 
 theorem cut_nonneg (μR : Measure (Mt k r)) (M : ℝ) (p : B.SS k r) : 0 ≤ cut μR M p := by
@@ -481,14 +570,16 @@ theorem cut_nonneg (μR : Measure (Mt k r)) (M : ℝ) (p : B.SS k r) : 0 ≤ cut
   exact div_nonneg (Real.rpow_nonneg (gN_nonneg_lemma_2 _) _)
     (integral_nonneg fun x => Real.rpow_nonneg (gN_nonneg_lemma_2 _) _)
 
-theorem cut_norm (hR : B.IsHaarOn (C6.Rset γ) μR) {M : ℝ} (hM : 0 ≤ M)
-    (hI : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) μR) (p : B.SS k r)
-    (hn : Matrix.of p.1.2 ∈ Nset k r) :
-    ∫ x, cut μR M (C6.actR γ (Matrix.of x) p) ∂μR = 1 := by
+theorem cut_norm
+    (hR : B.IsHaarOn (C6.Rset γ) μR)
+    {M : ℝ} (hM : 0 ≤ M) (hI : Integrable (fun x : Mt k r => B.gN (Matrix.of x) ^ (-M)) μR)
+    (p : B.SS k r) (hn : Matrix.of p.1.2 ∈ Nset k r)
+    : ∫ x, cut μR M (C6.actR γ (Matrix.of x) p) ∂μR = 1 := by
   have hn' : Matrix.of p.1.2 ∈ B.GV k r := hn.1
   have hpos := om_pos hR hM hI hn'
-  have hae : ∀ᵐ x ∂μR, cut μR M (C6.actR γ (Matrix.of x) p) =
-      B.gN (Matrix.of x * Matrix.of p.1.2) ^ (-M) / Om μR M p.1.2 := by
+  have hae
+      : ∀ᵐ x ∂μR, cut μR M (C6.actR γ (Matrix.of x) p) =
+        B.gN (Matrix.of x * Matrix.of p.1.2) ^ (-M) / Om μR M p.1.2 := by
     filter_upwards [ae_R_lemma_6 hR] with x hx
     show B.gN (Matrix.of x * Matrix.of p.1.2) ^ (-M) /
       Om μR M (Matrix.of.symm (Matrix.of x * Matrix.of p.1.2)) = _
@@ -500,18 +591,24 @@ end omega
 
 section geom
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-theorem geom (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV k r) (hpos : 0 < Gf k r D.z D.z' γ)
+theorem geom
+    (D : B.RealPlaceData k r Wp Wq)
+    {γ : B.Mat k r} (hγ : γ ∈ B.GV k r) (hpos : 0 < Gf k r D.z D.z' γ)
     {e : ℕ} {CP : ℝ}
-    (hCP : ∀ σ ∈ C2.Sg k r D.z D.z' γ, ∀ s' ∈ Sset k r D.z', B.gN σ + B.gN s' ≤ CP * B.gN (σ⁻¹ * γ * s') ^ e)
+    (hCP : ∀ σ ∈ C2.Sg k r D.z D.z' γ, ∀ s' ∈ Sset k r D.z',
+      B.gN σ + B.gN s' ≤ CP * B.gN (σ⁻¹ * γ * s') ^ e)
     (hmono : C2.IsMonomial (Zhat k r D.z D.z' γ))
-    {n n' : B.Mat k r} (hn : n ∈ Nset k r) (hn' : n' ∈ Nset k r) :
-    ∃ ρ σ : B.Mat k r, ∃ X : ℝ, ρ ∈ C6.Rset γ ∧ σ ∈ B.GV k r ∧ n = ρ * σ ∧ B.gN σ ≤ X ∧
-      X ≤ CP * B.gN (n⁻¹ * γ * n') ^ e ∧ B.gN n' ≤ (B.gN γ⁻¹ * B.gN γ) * B.gN n * X ^ 2 := by
-  obtain ⟨⟨ρ, σ⟩, ⟨hρ, hσSg, hnρσ⟩, -⟩ := P.c2_section_decomp k r D.z D.z' γ (P.Dx2.Rad.std D) ⟨hγ, hpos⟩ hmono n
-    (P.Dx2.Rad.N_sub_S D.z hn)
+    {n n' : B.Mat k r} (hn : n ∈ Nset k r) (hn' : n' ∈ Nset k r)
+    : ∃ ρ σ : B.Mat k r, ∃ X : ℝ,
+      ρ ∈ C6.Rset γ ∧ σ ∈ B.GV k r ∧ n = ρ * σ ∧ B.gN σ ≤ X ∧ X ≤ CP * B.gN (n⁻¹ * γ * n') ^ e
+        ∧ B.gN n' ≤ (B.gN γ⁻¹ * B.gN γ) * B.gN n * X ^ 2 := by
+  obtain ⟨⟨ρ, σ⟩, ⟨hρ, hσSg, hnρσ⟩, -⟩ :=
+    P.c2_section_decomp k r D.z D.z' γ (P.Dx2.Rad.std D) ⟨hγ, hpos⟩ hmono n
+      (P.Dx2.Rad.N_sub_S D.z hn)
   simp only at hρ hσSg hnρσ
   rw [← P.Dx2.Rad.rset_eq D hγ hpos] at hρ
   have hγu : IsUnit γ.det := (P.unitary_group_closed k r).unit γ hγ
@@ -519,7 +616,8 @@ theorem geom (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV
   have hNg := P.unipotent_radical_closed k r
   have hρu : IsUnit ρ.det := hRg.unit ρ hρ
   have hρi : ρ⁻¹ ∈ C6.Rset γ := hRg.inv_mem ρ hρ
-  have hσe : σ = ρ⁻¹ * n := by rw [hnρσ, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hρu, Matrix.one_mul]
+  have hσe : σ = ρ⁻¹ * n := by
+    rw [hnρσ, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hρu, Matrix.one_mul]
   have hσN : σ ∈ Nset k r := by rw [hσe]; exact hNg.mul_mem _ hρi.1 _ hn
   have hσG : σ ∈ B.GV k r := hσN.1
   set s'' := γ⁻¹ * ρ⁻¹ * γ * n' with hs''
@@ -538,10 +636,13 @@ theorem geom (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV
       simp only [Matrix.mul_assoc]
       rw [Matrix.mul_nonsing_inv_cancel_left _ _ hγu, Matrix.mul_nonsing_inv_cancel_left _ _ hρu,
         Matrix.nonsing_inv_mul_cancel_left _ _ hγu]
-    have hρe : ρ = n * σ⁻¹ := by rw [hnρσ, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hσu, Matrix.mul_one]
+    have hρe : ρ = n * σ⁻¹ := by
+      rw [hnρσ, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hσu, Matrix.mul_one]
     have hgρ : B.gN ρ ≤ B.gN n * B.gN σ := by
       rw [hρe]
-      calc B.gN (n * σ⁻¹) ≤ B.gN n * B.gN σ⁻¹ := P.B6.gN_mul_le _ _
+      calc
+        B.gN (n * σ⁻¹)
+          ≤ B.gN n * B.gN σ⁻¹ := P.B6.gN_mul_le _ _
         _ = B.gN n * B.gN σ := by rw [(P.norm_of_inverse k r σ hσG).1]
     have h0 := P.B6.gN_nonneg (γ⁻¹ : B.Mat k r)
     have h0' := P.B6.gN_nonneg γ
@@ -549,7 +650,9 @@ theorem geom (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV
     have h0s := P.B6.gN_nonneg σ
     have h0s'' := P.B6.gN_nonneg s''
     have h0ρ := P.B6.gN_nonneg ρ
-    calc B.gN n' = B.gN (γ⁻¹ * ρ * γ * s'') := by rw [← hn'e]
+    calc
+      B.gN n'
+        = B.gN (γ⁻¹ * ρ * γ * s'') := by rw [← hn'e]
       _ ≤ B.gN γ⁻¹ * B.gN ρ * B.gN γ * B.gN s'' := by
         refine (P.B6.gN_mul_le _ _).trans (mul_le_mul_of_nonneg_right ?_ h0s'')
         refine (P.B6.gN_mul_le _ _).trans (mul_le_mul_of_nonneg_right ?_ h0')
@@ -561,9 +664,11 @@ theorem geom (D : B.RealPlaceData k r Wp Wq) {γ : B.Mat k r} (hγ : γ ∈ B.GV
       _ ≤ (B.gN γ⁻¹ * B.gN γ) * B.gN n * (B.gN σ + B.gN s'') ^ 2 := by
         have hX : B.gN σ * B.gN s'' ≤ (B.gN σ + B.gN s'') ^ 2 := by nlinarith
         have hc : 0 ≤ B.gN γ⁻¹ * B.gN γ * B.gN n := by positivity
-        calc B.gN γ⁻¹ * (B.gN n * B.gN σ) * B.gN γ * B.gN s''
+        calc
+          B.gN γ⁻¹ * (B.gN n * B.gN σ) * B.gN γ * B.gN s''
             = (B.gN γ⁻¹ * B.gN γ * B.gN n) * (B.gN σ * B.gN s'') := by ring
-          _ ≤ (B.gN γ⁻¹ * B.gN γ * B.gN n) * (B.gN σ + B.gN s'') ^ 2 := mul_le_mul_of_nonneg_left hX hc
+          _ ≤ (B.gN γ⁻¹ * B.gN γ * B.gN n) * (B.gN σ + B.gN s'') ^ 2 :=
+            mul_le_mul_of_nonneg_left hX hc
 
 end geom
 
@@ -586,17 +691,18 @@ theorem d_orbJConv : Formalism.FourierDecayAlt.D.OrbJConv := by
   have hccast : (c : ℝ) = ((c₁ : ℝ) + 1) * ((r : ℝ) + 1) ^ 2 := by rw [hc]; push_cast; ring
   have hAc : 16 * ((r : ℝ) * nn + 1) ≤ A / c := by
     rw [le_div_iff₀ hcpos, hccast]
-    calc 16 * ((r : ℝ) * nn + 1) * (((c₁ : ℝ) + 1) * ((r : ℝ) + 1) ^ 2)
+    calc
+      16 * ((r : ℝ) * nn + 1) * (((c₁ : ℝ) + 1) * ((r : ℝ) + 1) ^ 2)
         = 16 * ((c₁ : ℝ) + 1) * ((r : ℝ) + 1) ^ 2 * ((r : ℝ) * nn + 1) := by ring
       _ ≤ A := hA
   have hA4 : 4 * bN ≤ A / c := by rw [hbN]; linarith
   have hk1 : (1 : ℝ) ≤ k := by exact_mod_cast D.k_pos
   have hr2 : ((r : ℝ) + 1) ^ 2 ≤ (r : ℝ) * nn + 1 := by
-    rw [hnn]; push_cast
+    rw [hnn]
+    push_cast
     nlinarith [mul_nonneg (Nat.cast_nonneg r : (0 : ℝ) ≤ r)
       (show (0 : ℝ) ≤ r + k - 1 by linarith [(Nat.cast_nonneg r : (0 : ℝ) ≤ r)])]
-  have hMR : 2 * ((r : ℝ) + 1) ^ 2 < M := by
-    rw [hM, hbN]; nlinarith [sq_nonneg ((r : ℝ) + 1)]
+  have hMR : 2 * ((r : ℝ) + 1) ^ 2 < M := by rw [hM, hbN]; nlinarith [sq_nonneg ((r : ℝ) + 1)]
   have hM0 : 0 ≤ M := by nlinarith [sq_nonneg ((r : ℝ) + 1)]
   have hA0 : 0 ≤ A := by
     have := div_nonneg_iff.mp (show 0 ≤ A / c by linarith)
@@ -604,8 +710,11 @@ theorem d_orbJConv : Formalism.FourierDecayAlt.D.OrbJConv := by
     · exact h.1
     · linarith [h.2]
 
-  have hG : P.Dx2.Rad.Good D γ w d := ⟨P.Dx2.Rad.exists_rho D hγ hpos hd hZ, P.Dx2.Rad.u_inj D hγ hpos hd hZ,
-    fun ρ hρ => P.Dx2.Rad.u_lstg D hγ hpos hd hZ hρ⟩
+  have hG : P.Dx2.Rad.Good D γ w d := ⟨
+    P.Dx2.Rad.exists_rho D hγ hpos hd hZ,
+    P.Dx2.Rad.u_inj D hγ hpos hd hZ,
+    fun ρ hρ => P.Dx2.Rad.u_lstg D hγ hpos hd hZ hρ
+  ⟩
   have hR := P.Dx2.Rad.haar_good D hγ hd hG
   have := P.Dx2.OrbJ.sigmaF hR
   have hI := intR D hγ hd hG hMR
@@ -628,7 +737,9 @@ theorem d_orbJConv : Formalism.FourierDecayAlt.D.OrbJConv := by
     have hg1 : 1 ≤ B.gN g := P.BetaSesquilinearity.gN_ge_one hg
     have hpw : 0 < B.gN g ^ A := Real.rpow_pos_of_pos (by linarith) _
     rw [Real.rpow_neg (by linarith), ← div_eq_mul_inv, le_div_iff₀ hpw]
-    calc ‖F g‖ * B.gN g ^ A = B.gN g ^ A * ‖F g‖ := by ring
+    calc
+      ‖F g‖ * B.gN g ^ A
+        = B.gN g ^ A * ‖F g‖ := by ring
       _ ≤ sharpFunctionalExponent := h0
       _ ≤ cF := le_max_left _ _
   have hFc : ContinuousOn F (B.GV k r) := P.B5.ckOn_continuousOn hCC.1
@@ -651,27 +762,36 @@ theorem d_orbJConv : Formalism.FourierDecayAlt.D.OrbJConv := by
   have hN1' : 1 ≤ B.gN (Matrix.of p.2.2 : B.Mat k r) := P.BetaSesquilinearity.gN_ge_one h4.1
   have hS1 : 1 ≤ B.gN σ := P.BetaSesquilinearity.gN_ge_one hσ
   have hg0 : (Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2 ∈ B.GV k r :=
-    Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul (Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul (Formalism.QuantumDeterminants.WeylGroupFacts.uh_inv h2.1) hγ) h4.1
-  have hY1 : 1 ≤ B.gN ((Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2) := P.BetaSesquilinearity.gN_ge_one hg0
+    Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul
+      (Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul
+        (Formalism.QuantumDeterminants.WeylGroupFacts.uh_inv h2.1) hγ)
+      h4.1
+  have hY1 : 1 ≤ B.gN ((Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2) :=
+    P.BetaSesquilinearity.gN_ge_one hg0
   have hsgs := P.B7.sgs_mem D ⟨h1, h2, h3, h4⟩ hγ
   have hGg : 0 < B.gN (B.sgs p γ) := by linarith [P.BetaSesquilinearity.gN_ge_one hsgs]
-  have hYG : B.gN ((Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2) ≤ K1 * B.gN (B.sgs p γ) := by
+  have hYG
+      : B.gN ((Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2) ≤ K1 * B.gN (B.sgs p γ) := by
     have hhu : IsUnit (Matrix.of p.1.1 : B.Mat k r).det := (P.unitary_group_closed k r).unit _ h1.1
     have hh'u : IsUnit (Matrix.of p.2.1 : B.Mat k r).det := (P.unitary_group_closed k r).unit _ h3.1
-    have e : (Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2 =
-        (Matrix.of p.1.1 : B.Mat k r) * B.sgs p γ * (Matrix.of p.2.1 : B.Mat k r)⁻¹ := by
+    have e
+        : (Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2
+          = (Matrix.of p.1.1 : B.Mat k r) * B.sgs p γ * (Matrix.of p.2.1 : B.Mat k r)⁻¹ := by
       simp only [B.sgs, Matrix.mul_assoc]
       rw [Matrix.mul_nonsing_inv_cancel_left _ _ hhu, Matrix.mul_nonsing_inv _ hh'u, Matrix.mul_one]
     rw [e]
-    calc B.gN ((Matrix.of p.1.1 : B.Mat k r) * B.sgs p γ * (Matrix.of p.2.1 : B.Mat k r)⁻¹)
-        ≤ B.gN (Matrix.of p.1.1 : B.Mat k r) * B.gN (B.sgs p γ) * B.gN (Matrix.of p.2.1 : B.Mat k r)⁻¹ :=
-          (P.B6.gN_mul_le _ _).trans (mul_le_mul_of_nonneg_right (P.B6.gN_mul_le _ _) (P.B6.gN_nonneg _))
+    calc
+      B.gN ((Matrix.of p.1.1 : B.Mat k r) * B.sgs p γ * (Matrix.of p.2.1 : B.Mat k r)⁻¹)
+          ≤ B.gN (Matrix.of p.1.1 : B.Mat k r) * B.gN (B.sgs p γ)
+            * B.gN (Matrix.of p.2.1 : B.Mat k r)⁻¹ :=
+        (P.B6.gN_mul_le _ _).trans
+          (mul_le_mul_of_nonneg_right (P.B6.gN_mul_le _ _) (P.B6.gN_nonneg _))
       _ ≤ KW * B.gN (B.sgs p γ) * KW' := by
-          have a1 := hKW _ h1
-          have a2 := hKW' _ (Formalism.QuantumDeterminants.WeylGroupFacts.uw_inv h3)
-          have s0 := P.B6.gN_nonneg (B.sgs p γ)
-          exact mul_le_mul (mul_le_mul_of_nonneg_right a1 s0) a2 (P.B6.gN_nonneg _)
-            (mul_nonneg (by linarith) s0)
+        have a1 := hKW _ h1
+        have a2 := hKW' _ (Formalism.QuantumDeterminants.WeylGroupFacts.uw_inv h3)
+        have s0 := P.B6.gN_nonneg (B.sgs p γ)
+        exact mul_le_mul (mul_le_mul_of_nonneg_right a1 s0) a2 (P.B6.gN_nonneg _)
+          (mul_nonneg (by linarith) s0)
       _ = K1 * B.gN (B.sgs p γ) := by rw [hK1]; ring
   have hθ : cut μR M p ≤ B.gN (Matrix.of p.1.2 : B.Mat k r) ^ (-M) * B.gN σ ^ M / cR := by
     have hlow := om_lower hR hM0 hI hρ hσ
@@ -680,28 +800,32 @@ theorem d_orbJConv : Formalism.FourierDecayAlt.D.OrbJConv := by
     have hσp : 0 < B.gN σ ^ (-M) := Real.rpow_pos_of_pos (by linarith) _
     have hpos' : 0 < cR * B.gN σ ^ (-M) := mul_pos hcR hσp
     unfold cut
-    calc B.gN (Matrix.of p.1.2 : B.Mat k r) ^ (-M) / Om μR M p.1.2
-        ≤ B.gN (Matrix.of p.1.2 : B.Mat k r) ^ (-M) / (cR * B.gN σ ^ (-M)) :=
-          div_le_div_of_nonneg_left (Real.rpow_nonneg (P.B6.gN_nonneg _) _) hpos' hlow
+    calc
+      B.gN (Matrix.of p.1.2 : B.Mat k r) ^ (-M) / Om μR M p.1.2
+          ≤ B.gN (Matrix.of p.1.2 : B.Mat k r) ^ (-M) / (cR * B.gN σ ^ (-M)) :=
+        div_le_div_of_nonneg_left (Real.rpow_nonneg (P.B6.gN_nonneg _) _) hpos' hlow
       _ = B.gN (Matrix.of p.1.2 : B.Mat k r) ^ (-M) * B.gN σ ^ M / cR := by
-          rw [Real.rpow_neg (P.B6.gN_nonneg σ)]
-          have : 0 < B.gN σ ^ M := Real.rpow_pos_of_pos (by linarith) _
-          field_simp
+        rw [Real.rpow_neg (P.B6.gN_nonneg σ)]
+        have : 0 < B.gN σ ^ M := Real.rpow_pos_of_pos (by linarith) _
+        field_simp
   have hθ0 := cut_nonneg μR M p
   have hFv : ‖B.rho D p F γ‖ ≤ cF * B.gN (B.sgs p γ) ^ (-A) :=
     (P.B7.norm_rho_le D ⟨h1, h2, h3, h4⟩ F γ).trans (hFb _ hsgs)
   have hCP0 : 0 < CP := by
     by_contra hle'
     have hle := not_lt.mp hle'
-    have := mul_nonpos_of_nonpos_of_nonneg hle
-      (pow_nonneg (P.B6.gN_nonneg ((Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2)) (c₁ * (r + 1) ^ 2))
+    have :=
+      mul_nonpos_of_nonpos_of_nonneg hle
+        (pow_nonneg (P.B6.gN_nonneg ((Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2))
+          (c₁ * (r + 1) ^ 2))
     linarith
   have hec : c₁ * (r + 1) ^ 2 ≤ c := Nat.mul_le_mul_right _ (Nat.le_succ _)
   have hXY' : X ≤ CP * B.gN ((Matrix.of p.1.2 : B.Mat k r)⁻¹ * γ * Matrix.of p.2.2) ^ c :=
     hXY.trans (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hY1 hec) hCP0.le)
   have hK10 : 0 < K1 := by rw [hK1]; positivity
-  have hkey := key_real hN1 hS1 hσX hY1 hGg hc1 hXY' hn'le hN1' hYG hθ hθ0 hFv (norm_nonneg _) hcR
-    (le_max_right _ _) hCP0 hK10 hKγ0 hM hbN0 hA4
+  have hkey :=
+    key_real hN1 hS1 hσX hY1 hGg hc1 hXY' hn'le hN1' hYG hθ hθ0 hFv (norm_nonneg _) hcR
+      (le_max_right _ _) hCP0 hK10 hKγ0 hM hbN0 hA4
   rw [norm_smul, Real.norm_of_nonneg hθ0]
   unfold Formalism.FourierDecayAlt.D.orbIntegrand
   rw [norm_smul, P.B7.norm_xi, one_mul]
@@ -709,4 +833,6 @@ theorem d_orbJConv : Formalism.FourierDecayAlt.D.OrbJConv := by
 
 end Formalism.FourierDecayAlt.P.Dx3
 
-theorem Formalism.FourierDecayAlt.P.orbital_integral_converges : Formalism.FourierDecayAlt.D.OrbJConv := Formalism.FourierDecayAlt.P.Dx3.d_orbJConv
+theorem Formalism.FourierDecayAlt.P.orbital_integral_converges
+    : Formalism.FourierDecayAlt.D.OrbJConv :=
+  Formalism.FourierDecayAlt.P.Dx3.d_orbJConv

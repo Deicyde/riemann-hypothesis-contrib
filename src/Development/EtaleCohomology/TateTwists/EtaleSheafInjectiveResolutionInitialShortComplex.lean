@@ -4,7 +4,8 @@ public import Development.EtaleCohomology.TateTwists.EtaleInjectiveResolutionSec
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations.ResSecPf
 
@@ -56,7 +57,8 @@ lemma etaleSheaf_injectiveResolution_initial_shortComplex_comp_zero (F : Shv R) 
   simp
   rfl
 
-noncomputable abbrev S0 (F : Shv R) : ShortComplex (Shv R) := ShortComplex.mk _ _ (etaleSheaf_injectiveResolution_initial_shortComplex_comp_zero R F)
+noncomputable abbrev S0 (F : Shv R) : ShortComplex (Shv R) :=
+  ShortComplex.mk _ _ (etaleSheaf_injectiveResolution_initial_shortComplex_comp_zero R F)
 
 lemma etaleSheaf_injectiveResolution_initial_shortComplex_exact (F : Shv R) : (S0 R F).Exact := by
   let I := injectiveResolution F
@@ -74,8 +76,11 @@ lemma mono_resι_var (F : Shv R) : Mono (resι R F) := by
     rw [h]; assumption
   exact mono_of_mono _ ((injectiveResolution F).cochainComplexXIso 0 0 rfl).hom
 
-def exact_loc : Prop := ∀ (R : Type) [CommRing R] (S : ShortComplex (Shv R)), S.Exact →
-  ∀ U (b : Sec S.X₂ U), Sec.map S.g b = 0 → Loc U fun V g => ∃ a : Sec S.X₁ V, Sec.map S.f a = Sec.res g b
+def exact_loc : Prop :=
+  ∀ (R : Type) [CommRing R] (S : ShortComplex (Shv R)),
+    S.Exact
+      → ∀ U (b : Sec S.X₂ U),
+        Sec.map S.g b = 0 → Loc U fun V g => ∃ a : Sec S.X₁ V, Sec.map S.f a = Sec.res g b
 
 lemma part1 (F : Shv R) (U : Scheme.{0}) (z : Sec ((res R F).X 0) U) :
     Sec.map ((res R F).d 0 1) z = 0 ↔ ∃ a : Sec F U, Sec.map (resι R F) a = z := by
@@ -97,7 +102,10 @@ lemma part2 (F : Shv R) (U : Scheme.{0}) : Function.Injective (Sec.map (resι R 
 end LateralTheory.EtaleFoundations.ResSecPf
 
 open LateralTheory.EtaleFoundations.ResSecPf in
-theorem LateralTheory.EtaleFoundations.etaleSheaf_injectiveResolution_sections_exact_of_local_exactness (hL : exact_loc) : LateralTheory.EtaleFoundations.EtaleInjectiveResolutionSectionsLocallyExact := by
+theorem
+    LateralTheory.EtaleFoundations.etaleSheaf_injectiveResolution_sections_exact_of_local_exactness
+    (hL : exact_loc)
+    : LateralTheory.EtaleFoundations.EtaleInjectiveResolutionSectionsLocallyExact := by
   intro R _ F U
   refine ⟨part1 R F U, part2 R F U, ?_, fun n hn => subsing R F U n hn⟩
   intro m n k hn hm z hk hz

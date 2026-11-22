@@ -6,22 +6,29 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.
 
 namespace ReciprocityTheory.ChartRestriction.G.T0
 
-noncomputable def upMk {D N : ℕ} (ab : (Fin (D + 2) →₀ ℕ) × (Option (Fin (D + 2) × Fin (N + 1)) →₀ ℕ)) :
-    UXVar D N →₀ ℕ :=
+noncomputable def upMk
+    {D N : ℕ} (ab : (Fin (D + 2) →₀ ℕ) × (Option (Fin (D + 2) × Fin (N + 1)) →₀ ℕ))
+    : UXVar D N →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm (Sum.elim (fun p => ab.2 (some p)) (fun i => ab.1 i))
 
 noncomputable def upMono (D N n n' : ℕ) : Finset (UXVar D N →₀ ℕ) :=
-  ((Finset.univ : Finset (Fin (D + 2))).finsuppAntidiag n ×ˢ
-    (Finset.univ : Finset (Option (Fin (D + 2) × Fin (N + 1)))).finsuppAntidiag n').image upMk
+  ((Finset.univ : Finset (Fin (D + 2))).finsuppAntidiag n
+    ×ˢ (Finset.univ : Finset (Option (Fin (D + 2) × Fin (N + 1)))).finsuppAntidiag n').image upMk
 
-theorem upMk_apply_inl {D N : ℕ} (ab : (Fin (D + 2) →₀ ℕ) × (Option (Fin (D + 2) × Fin (N + 1)) →₀ ℕ))
-    (p : Fin (D + 2) × Fin (N + 1)) : upMk ab (Sum.inl p) = ab.2 (some p) := rfl
+theorem upMk_apply_inl
+    {D N : ℕ} (ab : (Fin (D + 2) →₀ ℕ) × (Option (Fin (D + 2) × Fin (N + 1)) →₀ ℕ))
+    (p : Fin (D + 2) × Fin (N + 1))
+    : upMk ab (Sum.inl p) = ab.2 (some p) :=
+  rfl
 
-theorem upMk_apply_inr {D N : ℕ} (ab : (Fin (D + 2) →₀ ℕ) × (Option (Fin (D + 2) × Fin (N + 1)) →₀ ℕ))
-    (i : Fin (D + 2)) : upMk ab (Sum.inr i) = ab.1 i := rfl
+theorem upMk_apply_inr
+    {D N : ℕ}
+    (ab : (Fin (D + 2) →₀ ℕ) × (Option (Fin (D + 2) × Fin (N + 1)) →₀ ℕ)) (i : Fin (D + 2))
+    : upMk ab (Sum.inr i) = ab.1 i :=
+  rfl
 
-theorem mem_upMono {D N n n' : ℕ} {s : UXVar D N →₀ ℕ} :
-    s ∈ upMono D N n n' ↔ xDeg s = n ∧ uDeg s ≤ n' := by
+theorem mem_upMono {D N n n' : ℕ} {s : UXVar D N →₀ ℕ}
+    : s ∈ upMono D N n n' ↔ xDeg s = n ∧ uDeg s ≤ n' := by
   classical
   unfold upMono
   rw [Finset.mem_image]
@@ -38,8 +45,15 @@ theorem mem_upMono {D N n n' : ℕ} {s : UXVar D N →₀ ℕ} :
       simp only [upMk_apply_inl]
       omega
   · rintro ⟨hx, hu⟩
-    refine ⟨(Finsupp.equivFunOnFinite.symm (fun i => s (Sum.inr i)),
-      Finsupp.equivFunOnFinite.symm (fun o => Option.elim o (n' - uDeg s) (fun p => s (Sum.inl p)))), ?_, ?_⟩
+    refine ⟨
+      (
+        Finsupp.equivFunOnFinite.symm (fun i => s (Sum.inr i)),
+        Finsupp.equivFunOnFinite.symm (fun o =>
+          Option.elim o (n' - uDeg s) (fun p => s (Sum.inl p)))
+      ),
+      ?_,
+      ?_
+    ⟩
     · rw [Finset.mem_product, Finset.mem_finsuppAntidiag, Finset.mem_finsuppAntidiag]
       refine ⟨⟨?_, Finset.subset_univ _⟩, ⟨?_, Finset.subset_univ _⟩⟩
       · simpa [xDeg] using hx
@@ -58,9 +72,11 @@ theorem card_upMono (D N n n' : ℕ) : (upMono D N n n').card = cardUX D N n n' 
     Fintype.card_option, Fintype.card_prod, Fintype.card_fin, Fintype.card_fin]
   · congr 1
     · rw [show D + 2 + n - 1 = n + (D + 1) by omega, Nat.choose_symm_add, Nat.add_assoc]
-    · rw [show (D + 2) * (N + 1) + 1 + n' - 1 = n' + (D + 2) * (N + 1) by omega, Nat.choose_symm_add]
+    · rw [show (D + 2) * (N + 1) + 1 + n' - 1 = n' + (D + 2) * (N + 1) by omega,
+        Nat.choose_symm_add]
   · rintro ⟨a, b⟩ hab ⟨a', b'⟩ hab' h
-    simp only [Finset.coe_product, Set.mem_prod, Finset.mem_coe, Finset.mem_finsuppAntidiag] at hab hab'
+    simp only [Finset.coe_product, Set.mem_prod, Finset.mem_coe, Finset.mem_finsuppAntidiag]
+      at hab hab'
     have h1 : ∀ i, a i = a' i := fun i => by
       have := congrArg (fun s => s (Sum.inr i)) h
       simpa [upMk] using this

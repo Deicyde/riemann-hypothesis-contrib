@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqZeroOfFora
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -23,25 +26,40 @@ namespace GlobalTheory.HeatV
 open GlobalTheory.LogKSBal GlobalTheory.KS GlobalTheory.TangentOrigin
 
 theorem spMap_resV (R : Type) [CommRing R] (c : R) : spMap (resV R c) = chart (bo R c) := by
-  have h := (isAffineOpen_top (Sp R)).map_fromSpec (bo R c).2
-    (homOfLE ((Sp R).basicOpen_le (U := ⊤) ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom c))).op
+  have h :=
+    (isAffineOpen_top (Sp R)).map_fromSpec (bo R c).2
+      (homOfLE ((Sp R).basicOpen_le (U := ⊤) ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom c))).op
   rw [IsAffineOpen.fromSpec_top, Scheme.isoSpec_Spec_inv, ← Spec.map_comp] at h
   exact h
 
-theorem exists_isTr {R : Type} [CommRing R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G] {S : Type} [CommRing S]
-    (φ : R →+* S) (g : Sp S ⟶ G.left) (hg : g ≫ G.hom = spMap φ) (v : TanM (𝟙 (Sp R)) G) : ∃ w, IsTr G φ g v w := by
-  have e : (dualMap φ).comp (algebraMap R (DualNumber R)) = (algebraMap S (DualNumber S)).comp φ := by
+theorem exists_isTr
+    {R : Type} [CommRing R]
+    (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
+    {S : Type} [CommRing S]
+    (φ : R →+* S) (g : Sp S ⟶ G.left) (hg : g ≫ G.hom = spMap φ)
+    (v : TanM (𝟙 (Sp R)) G)
+    : ∃ w, IsTr G φ g v w := by
+  have e
+      : (dualMap φ).comp (algebraMap R (DualNumber R)) = (algebraMap S (DualNumber S)).comp φ := by
     ext a <;> simp [dualMap, TrivSqZeroExt.algebraMap_eq_inl]
-  have h1 : (tv v).left ≫ G.hom = spMap (algebraMap R (DualNumber R)) := (Over.w (tv v)).trans (Category.comp_id _)
+  have h1 : (tv v).left ≫ G.hom = spMap (algebraMap R (DualNumber R)) :=
+    (Over.w (tv v)).trans (Category.comp_id _)
   have h2 : (spMap (dualMap φ) ≫ (tv v).left) ≫ G.hom = (tEpsG (g ≫ G.hom)).hom := by
     show _ = spMap (algebraMap S (DualNumber S)) ≫ g ≫ G.hom
-    rw [Category.assoc, h1, hg, ← Spec.map_comp, ← Spec.map_comp,
-      ← CommRingCat.ofHom_comp, ← CommRingCat.ofHom_comp, e]
-  exact ⟨_, Over.homMk (spMap (algebraMap S (DualNumber S)) ≫ g) (Category.assoc _ _ _),
-    Over.homMk (spMap (dualMap φ) ≫ (tv v).left) h2, rfl, rfl, rfl⟩
+    rw [Category.assoc, h1, hg, ← Spec.map_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp,
+      ← CommRingCat.ofHom_comp, e]
+  exact ⟨
+    _,
+    Over.homMk (spMap (algebraMap S (DualNumber S)) ≫ g) (Category.assoc _ _ _),
+    Over.homMk (spMap (dualMap φ) ≫ (tv v).left) h2,
+    rfl,
+    rfl,
+    rfl
+  ⟩
 
-theorem spMap_dualMap_comp_eq {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
-    spMap (dualMap (g.comp f)) = spMap (dualMap g) ≫ spMap (dualMap f) := by
+theorem spMap_dualMap_comp_eq
+    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap (dualMap (g.comp f)) = spMap (dualMap g) ≫ spMap (dualMap f) := by
   rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
   congr 2
   refine RingHom.ext fun a => ?_

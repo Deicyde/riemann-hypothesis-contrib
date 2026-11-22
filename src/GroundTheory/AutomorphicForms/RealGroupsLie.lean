@@ -33,20 +33,21 @@ theorem isOpen_expRegularSet : IsOpen (expRegularSet 𝕂 𝔸) :=
 theorem zero_mem_expRegularSet : (0 : 𝔸) ∈ expRegularSet 𝕂 𝔸 := by
   simp [expRegularSet, (hasFDerivAt_exp_zero (𝕂 := 𝕂) (𝔸 := 𝔸)).fderiv]
 
-theorem hasStrictFDerivAt_exp_zero_equiv :
-    HasStrictFDerivAt (exp : 𝔸 → 𝔸) ((ContinuousLinearEquiv.refl 𝕂 𝔸 : 𝔸 →L[𝕂] 𝔸)) 0 := by
+theorem hasStrictFDerivAt_exp_zero_equiv
+    : HasStrictFDerivAt (exp : 𝔸 → 𝔸) ((ContinuousLinearEquiv.refl 𝕂 𝔸 : 𝔸 →L[𝕂] 𝔸)) 0 := by
   convert (hasStrictFDerivAt_exp_zero (𝕂 := 𝕂) (𝔸 := 𝔸)) using 1
   exact ContinuousLinearMap.ext fun _ => rfl
 
 noncomputable def expPartialHomeomorph : OpenPartialHomeomorph 𝔸 𝔸 :=
-  ((hasStrictFDerivAt_exp_zero_equiv 𝕂 𝔸).toOpenPartialHomeomorph exp).restrOpen
-    (expRegularSet 𝕂 𝔸) (isOpen_expRegularSet 𝕂 𝔸)
+  ((hasStrictFDerivAt_exp_zero_equiv 𝕂 𝔸).toOpenPartialHomeomorph exp).restrOpen (expRegularSet 𝕂 𝔸)
+    (isOpen_expRegularSet 𝕂 𝔸)
 
 theorem coe_expPartialHomeomorph : ⇑(expPartialHomeomorph 𝕂 𝔸) = exp := rfl
 
-theorem zero_mem_expPartialHomeomorph_source : (0 : 𝔸) ∈ (expPartialHomeomorph 𝕂 𝔸).source :=
-  ⟨(hasStrictFDerivAt_exp_zero_equiv 𝕂 𝔸).mem_toOpenPartialHomeomorph_source,
-    zero_mem_expRegularSet 𝕂 𝔸⟩
+theorem zero_mem_expPartialHomeomorph_source : (0 : 𝔸) ∈ (expPartialHomeomorph 𝕂 𝔸).source := ⟨
+  (hasStrictFDerivAt_exp_zero_equiv 𝕂 𝔸).mem_toOpenPartialHomeomorph_source,
+  zero_mem_expRegularSet 𝕂 𝔸
+⟩
 
 theorem one_mem_expPartialHomeomorph_target : (1 : 𝔸) ∈ (expPartialHomeomorph 𝕂 𝔸).target := by
   simpa [coe_expPartialHomeomorph] using
@@ -56,38 +57,45 @@ theorem expPartialHomeomorph_symm_one : (expPartialHomeomorph 𝕂 𝔸).symm 1 
   simpa [coe_expPartialHomeomorph] using
     (expPartialHomeomorph 𝕂 𝔸).left_inv (zero_mem_expPartialHomeomorph_source 𝕂 𝔸)
 
-theorem expPartialHomeomorph_source_subset :
-    (expPartialHomeomorph 𝕂 𝔸).source ⊆ expRegularSet 𝕂 𝔸 := fun _ h => h.2
+theorem expPartialHomeomorph_source_subset
+    : (expPartialHomeomorph 𝕂 𝔸).source ⊆ expRegularSet 𝕂 𝔸 := fun _ h =>
+  h.2
 
-theorem contDiffOn_expPartialHomeomorph_symm {n : WithTop ℕ∞} :
-    ContDiffOn 𝕂 n (expPartialHomeomorph 𝕂 𝔸).symm (expPartialHomeomorph 𝕂 𝔸).target := by
+theorem contDiffOn_expPartialHomeomorph_symm {n : WithTop ℕ∞}
+    : ContDiffOn 𝕂 n (expPartialHomeomorph 𝕂 𝔸).symm (expPartialHomeomorph 𝕂 𝔸).target := by
   intro y hy
   set e := expPartialHomeomorph 𝕂 𝔸
   have hs : e.symm y ∈ e.source := e.map_target hy
-  have hu : IsUnit (fderiv 𝕂 (exp : 𝔸 → 𝔸) (e.symm y)) :=
-    expPartialHomeomorph_source_subset 𝕂 𝔸 hs
+  have hu : IsUnit (fderiv 𝕂 (exp : 𝔸 → 𝔸) (e.symm y)) := expPartialHomeomorph_source_subset 𝕂 𝔸 hs
   refine (e.contDiffAt_symm (f₀' := ContinuousLinearEquiv.unitsEquiv 𝕂 𝔸 hu.unit) hy ?_
     ?_).contDiffWithinAt
-  · have h1 : ((ContinuousLinearEquiv.unitsEquiv 𝕂 𝔸 hu.unit : 𝔸 ≃L[𝕂] 𝔸) : 𝔸 →L[𝕂] 𝔸) =
-        fderiv 𝕂 (exp : 𝔸 → 𝔸) (e.symm y) := by
+  · have h1
+        : ((ContinuousLinearEquiv.unitsEquiv 𝕂 𝔸 hu.unit : 𝔸 ≃L[𝕂] 𝔸) : 𝔸 →L[𝕂] 𝔸)
+          = fderiv 𝕂 (exp : 𝔸 → 𝔸) (e.symm y) := by
       ext x; simp
     rw [h1]
     exact ((contDiff_exp 𝕂 𝔸 (n := 1)).differentiable one_ne_zero _).hasFDerivAt
   · exact (contDiff_exp 𝕂 𝔸).contDiffAt
 
 include 𝕂 in
-noncomputable def expUnit (X : 𝔸) : 𝔸ˣ :=
-  ⟨exp X, exp (-X), by
-    rw [← exp_add_of_commute' 𝕂 (Commute.neg_right (Commute.refl X)), add_neg_cancel, exp_zero],
-   by rw [← exp_add_of_commute' 𝕂 (Commute.neg_left (Commute.refl X)), neg_add_cancel, exp_zero]⟩
+noncomputable def expUnit (X : 𝔸) : 𝔸ˣ := ⟨
+  exp X,
+  exp (-X),
+  by rw [← exp_add_of_commute' 𝕂 (Commute.neg_right (Commute.refl X)), add_neg_cancel, exp_zero],
+  by rw [← exp_add_of_commute' 𝕂 (Commute.neg_left (Commute.refl X)), neg_add_cancel, exp_zero]
+⟩
 
-@[simp] theorem coe_expUnit (X : 𝔸) : (expUnit 𝕂 𝔸 X : 𝔸) = exp X := rfl
+@[simp]
+theorem coe_expUnit (X : 𝔸) : (expUnit 𝕂 𝔸 X : 𝔸) = exp X := rfl
 
-@[simp] theorem coe_expUnit_inv (X : 𝔸) : ((expUnit 𝕂 𝔸 X)⁻¹ : 𝔸ˣ) = exp (-X) := rfl
+@[simp]
+theorem coe_expUnit_inv (X : 𝔸) : ((expUnit 𝕂 𝔸 X)⁻¹ : 𝔸ˣ) = exp (-X) := rfl
 
 theorem continuous_expUnit : Continuous (expUnit 𝕂 𝔸) :=
-  Units.continuous_iff.2 ⟨(contDiff_exp 𝕂 𝔸 (n := 0)).continuous,
-    (contDiff_exp 𝕂 𝔸 (n := 0)).continuous.comp continuous_neg⟩
+  Units.continuous_iff.2 ⟨
+    (contDiff_exp 𝕂 𝔸 (n := 0)).continuous,
+    (contDiff_exp 𝕂 𝔸 (n := 0)).continuous.comp continuous_neg
+  ⟩
 
 end ExpChart
 
@@ -110,20 +118,23 @@ variable {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpac
 local notation "𝔢" => expPartialHomeomorph ℝ 𝔸
 
 noncomputable def subspaceProj (𝔤 : Submodule ℝ 𝔸) : 𝔸 →L[ℝ] 𝔤 :=
-  LinearMap.toContinuousLinearMap
-    (Submodule.projectionOnto 𝔤 _ (Submodule.exists_isCompl 𝔤).choose_spec)
+  LinearMap.toContinuousLinearMap (Submodule.projectionOnto 𝔤 _
+    (Submodule.exists_isCompl 𝔤).choose_spec)
 
-@[simp] theorem subspaceProj_coe (𝔤 : Submodule ℝ 𝔸) (X : 𝔤) : subspaceProj 𝔤 (X : 𝔸) = X :=
+@[simp]
+theorem subspaceProj_coe (𝔤 : Submodule ℝ 𝔸) (X : 𝔤) : subspaceProj 𝔤 (X : 𝔸) = X :=
   Submodule.projectionOnto_apply_left _ X
 
-theorem subspaceProj_of_mem {𝔤 : Submodule ℝ 𝔸} {X : 𝔸} (hX : X ∈ 𝔤) :
-    (subspaceProj 𝔤 X : 𝔸) = X := by
+theorem subspaceProj_of_mem {𝔤 : Submodule ℝ 𝔸} {X : 𝔸} (hX : X ∈ 𝔤)
+    : (subspaceProj 𝔤 X : 𝔸) = X := by
   simpa using congrArg Subtype.val (subspaceProj_coe 𝔤 ⟨X, hX⟩)
 
 structure IsExpLieAlgebra (G : Subgroup 𝔸ˣ) (𝔤 : Submodule ℝ 𝔸) : Prop where
   expUnit_mem : ∀ X ∈ 𝔤, expUnit ℝ 𝔸 X ∈ G
-  exists_nhds : ∃ U : Set 𝔸, IsOpen U ∧ (0 : 𝔸) ∈ U ∧
-    U ⊆ (expPartialHomeomorph ℝ 𝔸).source ∧ ∀ X ∈ U, expUnit ℝ 𝔸 X ∈ G → X ∈ 𝔤
+  exists_nhds
+    : ∃ U : Set 𝔸,
+      IsOpen U ∧ (0 : 𝔸) ∈ U ∧ U ⊆ (expPartialHomeomorph ℝ 𝔸).source
+        ∧ ∀ X ∈ U, expUnit ℝ 𝔸 X ∈ G → X ∈ 𝔤
 
 theorem continuous_val_val (G : Subgroup 𝔸ˣ) : Continuous (fun x : G => ((x : 𝔸ˣ) : 𝔸)) :=
   Units.continuous_val.comp continuous_subtype_val
@@ -142,7 +153,8 @@ theorem mem_of_mem_nhd {X : 𝔸} (hX : X ∈ h.nhd) (hG : expUnit ℝ 𝔸 X �
 
 noncomputable def nhdOne : Set 𝔸 := 𝔢 '' h.nhd
 
-theorem isOpen_nhdOne : IsOpen h.nhdOne := (𝔢).isOpen_image_of_subset_source h.isOpen_nhd h.nhd_subset
+theorem isOpen_nhdOne : IsOpen h.nhdOne :=
+  (𝔢).isOpen_image_of_subset_source h.isOpen_nhd h.nhd_subset
 
 theorem nhdOne_subset_target : h.nhdOne ⊆ (𝔢).target := by
   rintro _ ⟨X, hX, rfl⟩; exact (𝔢).map_source (h.nhd_subset hX)
@@ -162,7 +174,8 @@ theorem one_mem_nhdOne : (1 : 𝔸) ∈ h.nhdOne := by
 
 noncomputable def expG (X : 𝔤) : G := ⟨expUnit ℝ 𝔸 X, h.expUnit_mem X X.2⟩
 
-@[simp] theorem coe_expG (X : 𝔤) : ((h.expG X : 𝔸ˣ) : 𝔸) = exp (X : 𝔸) := rfl
+@[simp]
+theorem coe_expG (X : 𝔤) : ((h.expG X : 𝔸ˣ) : 𝔸) = exp (X : 𝔸) := rfl
 
 theorem continuous_expG : Continuous h.expG :=
   ((continuous_expUnit ℝ 𝔸).comp continuous_subtype_val).subtype_mk _
@@ -170,7 +183,8 @@ theorem continuous_expG : Continuous h.expG :=
 theorem symm_mem_lie {x : G} (hx : ((x : 𝔸ˣ) : 𝔸) ∈ h.nhdOne) : (𝔢).symm ((x : 𝔸ˣ) : 𝔸) ∈ 𝔤 := by
   apply h.mem_of_mem_nhd (h.symm_mem_nhd hx)
   have : expUnit ℝ 𝔸 ((𝔢).symm ((x : 𝔸ˣ) : 𝔸)) = (x : 𝔸ˣ) := Units.ext (h.exp_symm hx)
-  rw [this]; exact x.2
+  rw [this]
+  exact x.2
 
 noncomputable def chart (g : G) : OpenPartialHomeomorph G 𝔤 where
   toFun x := subspaceProj 𝔤 ((𝔢).symm (((g⁻¹ * x : G) : 𝔸ˣ) : 𝔸))
@@ -187,21 +201,23 @@ noncomputable def chart (g : G) : OpenPartialHomeomorph G 𝔤 where
   left_inv' x hx := by
     have e1 := subspaceProj_of_mem (h.symm_mem_lie hx)
     have e2 := h.exp_symm hx
-    apply Subtype.ext; apply Units.ext
+    apply Subtype.ext
+    apply Units.ext
     simp only [Subgroup.coe_mul, Units.val_mul, coe_expG, Subgroup.coe_inv] at e1 e2 ⊢
     rw [e1, e2, ← mul_assoc, Units.mul_inv, one_mul]
   right_inv' X hX := by
     simp only [mem_ofPred_eq] at hX
     simp only [inv_mul_cancel_left, coe_expG]
     rw [h.symm_exp hX, subspaceProj_coe]
-  open_source := h.isOpen_nhdOne.preimage
-    ((continuous_val_val G).comp (continuous_const.mul continuous_id))
+  open_source :=
+    h.isOpen_nhdOne.preimage ((continuous_val_val G).comp (continuous_const.mul continuous_id))
   open_target := h.isOpen_nhd.preimage continuous_subtype_val
   continuousOn_toFun := by
     refine (subspaceProj 𝔤).continuous.comp_continuousOn ?_
     refine (𝔢).continuousOn_symm.comp
       ((continuous_val_val G).comp (continuous_const.mul continuous_id)).continuousOn ?_
-    intro x hx; exact h.nhdOne_subset_target hx
+    intro x hx
+    exact h.nhdOne_subset_target hx
   continuousOn_invFun := (continuous_const.mul h.continuous_expG).continuousOn
 
 end IsExpLieAlgebra
@@ -219,11 +235,12 @@ noncomputable def chartedSpace : ChartedSpace 𝔤 G where
     simpa using h.one_mem_nhdOne
   chart_mem_atlas g := mem_range_self g
 
-theorem contDiffOn_proj_symm_mul_exp {n : WithTop ℕ∞} (c : 𝔸) (s : Set 𝔤)
-    (hs : ∀ X ∈ s, c * exp (X : 𝔸) ∈ (𝔢).target) :
-    ContDiffOn ℝ n (fun X : 𝔤 => subspaceProj 𝔤 ((𝔢).symm (c * exp (X : 𝔸)))) s :=
-  (subspaceProj 𝔤).contDiff.comp_contDiffOn ((contDiffOn_expPartialHomeomorph_symm ℝ 𝔸).comp
-    (contDiff_const.mul ((contDiff_exp ℝ 𝔸).comp 𝔤.subtypeL.contDiff)).contDiffOn hs)
+theorem contDiffOn_proj_symm_mul_exp
+    {n : WithTop ℕ∞} (c : 𝔸) (s : Set 𝔤) (hs : ∀ X ∈ s, c * exp (X : 𝔸) ∈ (𝔢).target)
+    : ContDiffOn ℝ n (fun X : 𝔤 => subspaceProj 𝔤 ((𝔢).symm (c * exp (X : 𝔸)))) s :=
+  (subspaceProj 𝔤).contDiff.comp_contDiffOn
+    ((contDiffOn_expPartialHomeomorph_symm ℝ 𝔸).comp
+      (contDiff_const.mul ((contDiff_exp ℝ 𝔸).comp 𝔤.subtypeL.contDiff)).contDiffOn hs)
 
 theorem isManifold (n : WithTop ℕ∞) : (letI := h.chartedSpace; IsManifold 𝓘(ℝ, 𝔤) n G) := by
   let := h.chartedSpace
@@ -231,8 +248,10 @@ theorem isManifold (n : WithTop ℕ∞) : (letI := h.chartedSpace; IsManifold �
   rintro e e' ⟨g, rfl⟩ ⟨g', rfl⟩
   simp only [modelWithCornersSelf_coe, modelWithCornersSelf_coe_symm, Function.id_comp,
     Function.comp_id, preimage_id_eq, range_id, inter_univ]
-  have key : ∀ X : 𝔤, ((((g' : G)⁻¹ * (h.chart g).symm X : G) : 𝔸ˣ) : 𝔸) =
-      ((((g'⁻¹ * g : G) : 𝔸ˣ) : 𝔸)) * exp (X : 𝔸) := by
+  have key
+      : ∀ X : 𝔤,
+        ((((g' : G)⁻¹ * (h.chart g).symm X : G) : 𝔸ˣ) : 𝔸)
+          = ((((g'⁻¹ * g : G) : 𝔸ˣ) : 𝔸)) * exp (X : 𝔸) := by
     intro X; show _ = _; simp [chart, expG, mul_assoc]
   refine (contDiffOn_proj_symm_mul_exp ((((g'⁻¹ * g : G) : 𝔸ˣ) : 𝔸)) _ ?_).congr ?_
   · intro X hX
@@ -241,22 +260,26 @@ theorem isManifold (n : WithTop ℕ∞) : (letI := h.chartedSpace; IsManifold �
   · intro X _
     exact congrArg (fun a => subspaceProj 𝔤 ((𝔢).symm a)) (key X)
 
-theorem contMDiff_val (n : WithTop ℕ∞) : (letI := h.chartedSpace;
-    ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, 𝔸) n (fun x : G => ((x : 𝔸ˣ) : 𝔸))) := by
+theorem contMDiff_val (n : WithTop ℕ∞)
+    : (letI := h.chartedSpace
+       ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, 𝔸) n (fun x : G => ((x : 𝔸ˣ) : 𝔸))) := by
   let := h.chartedSpace
   intro x
   rw [contMDiffAt_iff_source]
-  have : (fun x : G => ((x : 𝔸ˣ) : 𝔸)) ∘ (extChartAt 𝓘(ℝ, 𝔤) x).symm =
-      fun X : 𝔤 => ((x : 𝔸ˣ) : 𝔸) * exp (X : 𝔸) := rfl
+  have : (fun x : G => ((x : 𝔸ˣ) : 𝔸)) ∘ (extChartAt 𝓘(ℝ, 𝔤) x).symm
+      = fun X : 𝔤 => ((x : 𝔸ˣ) : 𝔸) * exp (X : 𝔸) :=
+    rfl
   rw [this]
   exact (contDiff_const.mul ((contDiff_exp ℝ 𝔸).comp 𝔤.subtypeL.contDiff)).contMDiff.contMDiffAt
     |>.contMDiffWithinAt
 
-theorem contMDiffAt_of_val {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {H : Type*}
-    [TopologicalSpace H] {I : ModelWithCorners ℝ E H} {M : Type*} [TopologicalSpace M]
-    [ChartedSpace H M] {n : WithTop ℕ∞} {f : M → G} {x : M}
-    (hf : ContMDiffAt I 𝓘(ℝ, 𝔸) n (fun y => ((f y : 𝔸ˣ) : 𝔸)) x) :
-    (letI := h.chartedSpace; ContMDiffAt I 𝓘(ℝ, 𝔤) n f x) := by
+theorem contMDiffAt_of_val
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {H : Type*} [TopologicalSpace H]
+    {I : ModelWithCorners ℝ E H} {M : Type*} [TopologicalSpace M] [ChartedSpace H M]
+    {n : WithTop ℕ∞} {f : M → G} {x : M}
+    (hf : ContMDiffAt I 𝓘(ℝ, 𝔸) n (fun y => ((f y : 𝔸ˣ) : 𝔸)) x)
+    : (letI := h.chartedSpace; ContMDiffAt I 𝓘(ℝ, 𝔤) n f x) := by
   let := h.chartedSpace
   rw [contMDiffAt_iff_target]
   refine ⟨?_, ?_⟩
@@ -265,11 +288,12 @@ theorem contMDiffAt_of_val {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E
     exact hemb.continuousAt_iff.2 hf.continuousAt
   · set c : 𝔸 := ((((f x)⁻¹ : G) : 𝔸ˣ) : 𝔸) with hc
     have h1 : c * ((f x : 𝔸ˣ) : 𝔸) = 1 := by simp [c]
-    have hF : ContDiffAt ℝ n (fun a : 𝔸 => subspaceProj 𝔤 ((𝔢).symm (c * a)))
-        (((f x : 𝔸ˣ) : 𝔸)) := by
+    have hF
+        : ContDiffAt ℝ n (fun a : 𝔸 => subspaceProj 𝔤 ((𝔢).symm (c * a))) (((f x : 𝔸ˣ) : 𝔸)) := by
       refine (subspaceProj 𝔤).contDiff.contDiffAt.comp _ ?_
-      refine ContDiffAt.comp (g := (𝔢).symm) (f := fun a => c * a) _ ?_
-        (contDiff_const.mul contDiff_id).contDiffAt
+      refine ContDiffAt.comp (g := (𝔢).symm)
+        (f := fun a => c * a)
+        _ ?_ (contDiff_const.mul contDiff_id).contDiffAt
       simp only [h1]
       exact (contDiffOn_expPartialHomeomorph_symm ℝ 𝔸).contDiffAt
         ((𝔢).open_target.mem_nhds (one_mem_expPartialHomeomorph_target ℝ 𝔸))
@@ -283,15 +307,18 @@ theorem lieGroup (n : WithTop ℕ∞) : (letI := h.chartedSpace; LieGroup 𝓘(�
       refine h.contMDiffAt_of_val ?_
       have : ContMDiff (𝓘(ℝ, 𝔤).prod 𝓘(ℝ, 𝔤)) 𝓘(ℝ, 𝔸 × 𝔸) n
           (fun p : G × G => (((p.1 : 𝔸ˣ) : 𝔸), ((p.2 : 𝔸ˣ) : 𝔸))) :=
-        ((h.contMDiff_val n).comp contMDiff_fst).prodMk_space ((h.contMDiff_val n).comp contMDiff_snd)
+        ((h.contMDiff_val n).comp contMDiff_fst).prodMk_space
+          ((h.contMDiff_val n).comp contMDiff_snd)
       exact (contDiff_mul.comp_contMDiff this) p
     contMDiff_inv := fun x => by
       refine h.contMDiffAt_of_val ?_
       have hx : ContDiffAt ℝ n Ring.inverse (((x : 𝔸ˣ) : 𝔸)) := contDiffAt_ringInverse ℝ (x : 𝔸ˣ)
-      have := ContDiffAt.comp_contMDiffAt (f := fun x : G => ((x : 𝔸ˣ) : 𝔸)) hx ((h.contMDiff_val n) x)
+      have :=
+        ContDiffAt.comp_contMDiffAt (f := fun x : G => ((x : 𝔸ˣ) : 𝔸)) hx ((h.contMDiff_val n) x)
       convert this using 1
       funext y
-      simp }
+      simp
+  }
 
 end IsExpLieAlgebra
 
@@ -309,17 +336,20 @@ def indefJ : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ :=
 
 theorem indefJ_mul_self : indefJ p q * indefJ p q = 1 := by
   rw [indefJ, diagonal_mul_diagonal, ← diagonal_one]
-  congr 1; funext i; cases i <;> simp
+  congr 1
+  funext i
+  cases i <;> simp
 
 theorem indefJ_conjTranspose : (indefJ p q)ᴴ = indefJ p q := by
   rw [indefJ, diagonal_conjTranspose]
-  congr 1; funext i; cases i <;> simp
+  congr 1
+  funext i
+  cases i <;> simp
 
 theorem isUnit_indefJ : IsUnit (indefJ p q) :=
   ⟨⟨indefJ p q, indefJ p q, indefJ_mul_self p q, indefJ_mul_self p q⟩, rfl⟩
 
-theorem inv_indefJ : (indefJ p q)⁻¹ = indefJ p q :=
-  inv_eq_left_inv (indefJ_mul_self p q)
+theorem inv_indefJ : (indefJ p q)⁻¹ = indefJ p q := inv_eq_left_inv (indefJ_mul_self p q)
 
 theorem norm_indefJ_le : ‖indefJ p q‖ ≤ 1 := by
   rw [indefJ, l2_opNorm_diagonal]
@@ -331,29 +361,31 @@ def indefiniteUnitaryGroup : Subgroup (GL (Fin p ⊕ Fin q) ℂ) where
   one_mem' := by simp
   mul_mem' {a b} ha hb := by
     simp only [mem_ofPred_eq, Units.val_mul, conjTranspose_mul] at ha hb ⊢
-    calc b.valᴴ * a.valᴴ * indefJ p q * (a.val * b.val)
-        = b.valᴴ * (a.valᴴ * indefJ p q * a.val) * b.val := by
-          simp only [Matrix.mul_assoc]
+    calc
+      b.valᴴ * a.valᴴ * indefJ p q * (a.val * b.val)
+        = b.valᴴ * (a.valᴴ * indefJ p q * a.val) * b.val := by simp only [Matrix.mul_assoc]
       _ = indefJ p q := by rw [ha, hb]
   inv_mem' {a} ha := by
     simp only [mem_ofPred_eq] at ha ⊢
-    calc (a⁻¹).valᴴ * indefJ p q * (a⁻¹).val
+    calc
+      (a⁻¹).valᴴ * indefJ p q * (a⁻¹).val
         = (a⁻¹).valᴴ * (a.valᴴ * indefJ p q * a.val) * (a⁻¹).val := by rw [ha]
       _ = (a.val * (a⁻¹).val)ᴴ * indefJ p q * (a.val * (a⁻¹).val) := by
-          simp only [conjTranspose_mul, Matrix.mul_assoc]
+        simp only [conjTranspose_mul, Matrix.mul_assoc]
       _ = indefJ p q := by simp
 
 def indefiniteUnitaryLieAlgebra : Submodule ℝ (Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ) where
   carrier := {X | Xᴴ * indefJ p q + indefJ p q * X = 0}
   add_mem' {X Y} hX hY := by
     simp only [mem_ofPred_eq, conjTranspose_add, Matrix.add_mul, Matrix.mul_add] at hX hY ⊢
-    calc Xᴴ * indefJ p q + Yᴴ * indefJ p q + (indefJ p q * X + indefJ p q * Y)
+    calc
+      Xᴴ * indefJ p q + Yᴴ * indefJ p q + (indefJ p q * X + indefJ p q * Y)
         = (Xᴴ * indefJ p q + indefJ p q * X) + (Yᴴ * indefJ p q + indefJ p q * Y) := by abel
       _ = 0 := by rw [hX, hY, add_zero]
   zero_mem' := by simp
   smul_mem' r X hX := by
-    simp only [mem_ofPred_eq, conjTranspose_smul, star_trivial, Matrix.smul_mul,
-      Matrix.mul_smul] at hX ⊢
+    simp only [mem_ofPred_eq, conjTranspose_smul, star_trivial, Matrix.smul_mul, Matrix.mul_smul]
+      at hX ⊢
     rw [← smul_add, hX, smul_zero]
 
 end IndefiniteUnitary
@@ -367,23 +399,26 @@ variable (p q : ℕ)
 
 local notation "𝔐" => Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ
 
-theorem mem_indefiniteUnitaryLieAlgebra_iff {X : 𝔐} :
-    X ∈ indefiniteUnitaryLieAlgebra p q ↔ Xᴴ = -(indefJ p q * X * indefJ p q) := by
+theorem mem_indefiniteUnitaryLieAlgebra_iff {X : 𝔐}
+    : X ∈ indefiniteUnitaryLieAlgebra p q ↔ Xᴴ = -(indefJ p q * X * indefJ p q) := by
   change Xᴴ * indefJ p q + indefJ p q * X = 0 ↔ _
   constructor
   · intro h
     have h' : Xᴴ * indefJ p q = -(indefJ p q * X) := eq_neg_of_add_eq_zero_left h
-    calc Xᴴ = Xᴴ * indefJ p q * indefJ p q := by rw [Matrix.mul_assoc, indefJ_mul_self, Matrix.mul_one]
+    calc
+      Xᴴ
+        = Xᴴ * indefJ p q * indefJ p q := by rw [Matrix.mul_assoc, indefJ_mul_self, Matrix.mul_one]
       _ = -(indefJ p q * X * indefJ p q) := by rw [h', Matrix.neg_mul]
   · intro h
     rw [h, Matrix.neg_mul, Matrix.mul_assoc, Matrix.mul_assoc, indefJ_mul_self, Matrix.mul_one,
       neg_add_cancel]
 
-theorem mem_indefiniteUnitaryGroup_iff {g : GL (Fin p ⊕ Fin q) ℂ} :
-    g ∈ indefiniteUnitaryGroup p q ↔ g.valᴴ * indefJ p q * g.val = indefJ p q := Iff.rfl
+theorem mem_indefiniteUnitaryGroup_iff {g : GL (Fin p ⊕ Fin q) ℂ}
+    : g ∈ indefiniteUnitaryGroup p q ↔ g.valᴴ * indefJ p q * g.val = indefJ p q :=
+  Iff.rfl
 
-theorem exp_neg_conj_indefJ (X : 𝔐) :
-    exp (-(indefJ p q * X * indefJ p q)) = indefJ p q * exp (-X) * indefJ p q := by
+theorem exp_neg_conj_indefJ (X : 𝔐)
+    : exp (-(indefJ p q * X * indefJ p q)) = indefJ p q * exp (-X) * indefJ p q := by
   have := Matrix.exp_conj (indefJ p q) (-X) (isUnit_indefJ p q)
   rw [inv_indefJ] at this
   rw [← this, Matrix.mul_neg, Matrix.neg_mul]
@@ -391,8 +426,8 @@ theorem exp_neg_conj_indefJ (X : 𝔐) :
 theorem exp_mul_exp_neg (X : 𝔐) : exp X * exp (-X) = 1 := (expUnit ℝ 𝔐 X).mul_inv
 theorem exp_neg_mul_exp (X : 𝔐) : exp (-X) * exp X = 1 := (expUnit ℝ 𝔐 X).inv_mul
 
-theorem isExpLieAlgebra_indefiniteUnitary :
-    IsExpLieAlgebra (indefiniteUnitaryGroup p q) (indefiniteUnitaryLieAlgebra p q) := by
+theorem isExpLieAlgebra_indefiniteUnitary
+    : IsExpLieAlgebra (indefiniteUnitaryGroup p q) (indefiniteUnitaryLieAlgebra p q) := by
   refine ⟨?_, ?_⟩
   · intro X hX
     rw [mem_indefiniteUnitaryLieAlgebra_iff] at hX
@@ -401,31 +436,34 @@ theorem isExpLieAlgebra_indefiniteUnitary :
     simp only [Matrix.mul_assoc]
     rw [← Matrix.mul_assoc (indefJ p q) (indefJ p q), indefJ_mul_self, Matrix.one_mul,
       exp_neg_mul_exp, Matrix.mul_one]
-  · obtain ⟨ε, εpos, hε⟩ := Metric.isOpen_iff.1 (expPartialHomeomorph ℝ 𝔐).open_source 0
-      (zero_mem_expPartialHomeomorph_source ℝ 𝔐)
+  · obtain ⟨ε, εpos, hε⟩ :=
+      Metric.isOpen_iff.1 (expPartialHomeomorph ℝ 𝔐).open_source 0
+        (zero_mem_expPartialHomeomorph_source ℝ 𝔐)
     refine ⟨Metric.ball 0 ε, Metric.isOpen_ball, Metric.mem_ball_self εpos, hε, fun X hX hG => ?_⟩
     rw [mem_indefiniteUnitaryGroup_iff, coe_expUnit] at hG
     rw [mem_indefiniteUnitaryLieAlgebra_iff]
     have h1 : (exp X)ᴴ = indefJ p q * exp (-X) * indefJ p q := by
-      calc (exp X)ᴴ = (exp X)ᴴ * indefJ p q * (exp X * exp (-X)) * indefJ p q := by
-            rw [exp_mul_exp_neg, Matrix.mul_one, Matrix.mul_assoc, indefJ_mul_self, Matrix.mul_one]
-        _ = (exp X)ᴴ * indefJ p q * exp X * exp (-X) * indefJ p q := by
-            simp only [Matrix.mul_assoc]
+      calc
+        (exp X)ᴴ = (exp X)ᴴ * indefJ p q * (exp X * exp (-X)) * indefJ p q := by
+          rw [exp_mul_exp_neg, Matrix.mul_one, Matrix.mul_assoc, indefJ_mul_self, Matrix.mul_one]
+        _ = (exp X)ᴴ * indefJ p q * exp X * exp (-X) * indefJ p q := by simp only [Matrix.mul_assoc]
         _ = indefJ p q * exp (-X) * indefJ p q := by rw [hG]
     have h2 : exp Xᴴ = exp (-(indefJ p q * X * indefJ p q)) := by
       rw [Matrix.exp_conjTranspose, h1, exp_neg_conj_indefJ]
     have hX' : ‖X‖ < ε := mem_ball_zero_iff.1 hX
-    have hs1 : Xᴴ ∈ (expPartialHomeomorph ℝ 𝔐).source := hε (by
-      rw [mem_ball_zero_iff, l2_opNorm_conjTranspose]; exact hX')
-    have hs2 : -(indefJ p q * X * indefJ p q) ∈ (expPartialHomeomorph ℝ 𝔐).source := hε (by
-      rw [mem_ball_zero_iff, norm_neg]
-      calc ‖indefJ p q * X * indefJ p q‖ ≤ ‖indefJ p q‖ * ‖X‖ * ‖indefJ p q‖ :=
+    have hs1 : Xᴴ ∈ (expPartialHomeomorph ℝ 𝔐).source :=
+      hε (by rw [mem_ball_zero_iff, l2_opNorm_conjTranspose]; exact hX')
+    have hs2 : -(indefJ p q * X * indefJ p q) ∈ (expPartialHomeomorph ℝ 𝔐).source :=
+      hε (by
+        rw [mem_ball_zero_iff, norm_neg]
+        calc
+          ‖indefJ p q * X * indefJ p q‖ ≤ ‖indefJ p q‖ * ‖X‖ * ‖indefJ p q‖ :=
             (norm_mul_le _ _).trans (mul_le_mul_of_nonneg_right (norm_mul_le _ _) (norm_nonneg _))
-        _ ≤ 1 * ‖X‖ * 1 := by
+          _ ≤ 1 * ‖X‖ * 1 := by
             gcongr
             · exact norm_indefJ_le p q
             · exact norm_indefJ_le p q
-        _ < ε := by simpa using hX')
+          _ < ε := by simpa using hX')
     exact (expPartialHomeomorph ℝ 𝔐).injOn hs1 hs2 h2
 
 end IndefiniteUnitaryLie

@@ -12,12 +12,14 @@ namespace PositivityTheory.RgUd.TP.Desc.Piece.PDich
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {N : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {N : ℕ}
 
 open PositivityTheory.RgUd.TP.Desc.Piece
 
 section
-variable {Z : Subalgebra k (Matrix (Fin N) (Fin N) k)} {χ : k[X]} {q : ℕ} (D : SData Z χ q)
+variable
+  {Z : Subalgebra k (Matrix (Fin N) (Fin N) k)} {χ : k[X]} {q : ℕ} (D : SData Z χ q)
   {x : Matrix (Fin N) (Fin N) k}
 
 def Nx (x : Matrix (Fin N) (Fin N) k) : Submodule k (Matrix (Fin N) (Fin N) k) :=
@@ -27,8 +29,8 @@ theorem s_mem (j : Fin D.r) : pe (D.a j) x ∈ Sx D x := Algebra.subset_adjoin �
 
 theorem sx_le : Sx D x ≤ Cx Z x := Algebra.adjoin_le (by rintro _ ⟨j, rfl⟩; exact pe_mem (D.ha j))
 
-theorem sx_toSub (hx : x ∈ Bz Z) (hχ : aeval x χ = 0) :
-    (Sx D x).toSubmodule = Submodule.span k (Set.range fun j => pe (D.a j) x) := by
+theorem sx_toSub (hx : x ∈ Bz Z) (hχ : aeval x χ = 0)
+    : (Sx D x).toSubmodule = Submodule.span k (Set.range fun j => pe (D.a j) x) := by
   obtain ⟨h1, h2, -⟩ := D.spec x hx hχ
   apply le_antisymm
   · let P : Subalgebra k (Matrix (Fin N) (Fin N) k) :=
@@ -46,8 +48,11 @@ theorem sx_toSub (hx : x ∈ Bz Z) (hχ : aeval x χ = 0) :
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
     case mul =>
       intro a b ha hb
-      have hab : a * b ∈ Submodule.span k (Set.range fun j => pe (D.a j) x) *
-          Submodule.span k (Set.range fun j => pe (D.a j) x) := Submodule.mul_mem_mul ha hb
+      have hab
+          : a * b
+            ∈ Submodule.span k (Set.range fun j => pe (D.a j) x)
+              * Submodule.span k (Set.range fun j => pe (D.a j) x) :=
+        Submodule.mul_mem_mul ha hb
       rw [Submodule.span_mul_span] at hab
       refine (Submodule.span_le.2 ?_) hab
       rintro _ ⟨u, ⟨i, rfl⟩, v, ⟨j, rfl⟩, rfl⟩
@@ -92,8 +97,8 @@ theorem nx_mul (hZ : CR Z) (hx : x ∈ Bz Z) : ∀ c ∈ Cx Z x, ∀ n ∈ Nx D 
   rw [LinearMap.mulLeft_apply, LinearMap.mulLeft_apply, ← mul_assoc, ← mul_assoc,
     cx_comm hZ hx _ hc _ (pe_mem D.hb)]
 
-theorem re_mem (hZ : CR Z) (hx : x ∈ Bz Z) (γ' : Fin D.d → Fin D.r → k) :
-    re γ' (fun j => pe (D.a j) x) (pe D.b x) ∈ (Sx D x).toSubmodule ⊔ Nx D x := by
+theorem re_mem (hZ : CR Z) (hx : x ∈ Bz Z) (γ' : Fin D.d → Fin D.r → k)
+    : re γ' (fun j => pe (D.a j) x) (pe D.b x) ∈ (Sx D x).toSubmodule ⊔ Nx D x := by
   simp only [re]
   refine Submodule.sum_mem _ ?_
   intro l _
@@ -113,7 +118,8 @@ theorem re_mem (hZ : CR Z) (hx : x ∈ Bz Z) (γ' : Fin D.d → Fin D.r → k) :
     · exact (Cx Z x).mul_mem hs ((Cx Z x).pow_mem he m)
     · rw [LinearMap.mulLeft_apply]
 
-theorem z_le (hZ : CR Z) (hx : x ∈ Bz Z) (hχ : aeval x χ = 0) : Z.toSubmodule ≤ (Sx D x).toSubmodule ⊔ Nx D x := by
+theorem z_le (hZ : CR Z) (hx : x ∈ Bz Z) (hχ : aeval x χ = 0)
+    : Z.toSubmodule ≤ (Sx D x).toSubmodule ⊔ Nx D x := by
   obtain ⟨-, -, -, -, -, -, hz, -⟩ := D.spec x hx hχ
   rw [D.hz]
   refine Submodule.span_le.mpr ?_
@@ -121,13 +127,16 @@ theorem z_le (hZ : CR Z) (hx : x ∈ Bz Z) (hχ : aeval x χ = 0) : Z.toSubmodul
   rw [hz i]
   exact re_mem D hZ hx (D.γ i)
 
-theorem x_mem (hZ : CR Z) (hx : x ∈ Bz Z) (hχ : aeval x χ = 0) : x ∈ (Sx D x).toSubmodule ⊔ Nx D x := by
+theorem x_mem (hZ : CR Z) (hx : x ∈ Bz Z) (hχ : aeval x χ = 0)
+    : x ∈ (Sx D x).toSubmodule ⊔ Nx D x := by
   obtain ⟨-, -, -, -, -, -, -, hxb, -⟩ := D.spec x hx hχ
   have := re_mem D hZ hx D.β
   rwa [← hxb] at this
 
-theorem idem_mem (hZ : CR Z) (hx : x ∈ Bz Z) (hχ : aeval x χ = 0) {f : Matrix (Fin N) (Fin N) k} (hf : f ∈ Z)
-    (hfi : IsIdempotentElem f) : f ∈ Sx D x := by
+theorem idem_mem
+    (hZ : CR Z) (hx : x ∈ Bz Z) (hχ : aeval x χ = 0)
+    {f : Matrix (Fin N) (Fin N) k} (hf : f ∈ Z) (hfi : IsIdempotentElem f)
+    : f ∈ Sx D x := by
   have hfm : f ∈ (Sx D x).toSubmodule ⊔ Nx D x := z_le D hZ hx hχ hf
   obtain ⟨s, hs, n, hn, hsn⟩ := Submodule.mem_sup.1 hfm
   have hsS : s ∈ Sx D x := hs

@@ -16,8 +16,8 @@ section HomComplex
 
 variable {R : Type w} [Ring R] {C : Type u} [Category.{v} C] [Abelian C] [Linear R C]
 
-noncomputable def linearYonedaObjMap {X Y : ChainComplex C ℕ} (f : X ⟶ Y) (B : C) :
-    Y.linearYonedaObj R B ⟶ X.linearYonedaObj R B :=
+noncomputable def linearYonedaObjMap {X Y : ChainComplex C ℕ} (f : X ⟶ Y) (B : C)
+    : Y.linearYonedaObj R B ⟶ X.linearYonedaObj R B :=
   (HomologicalComplex.unopFunctor (ModuleCat R) (ComplexShape.down ℕ)).map
     ((((linearYoneda R C).obj B).rightOp.mapHomologicalComplex _).map f).op
 
@@ -35,28 +35,30 @@ lemma linearYonedaObjMap_id (X : ChainComplex C ℕ) (B : C) :
   rw [HomologicalComplex.id_f]
   exact Category.id_comp _
 
-noncomputable def linearYonedaObjHomotopy {X Y : ChainComplex C ℕ} {f g : X ⟶ Y}
-    (h : Homotopy f g) (B : C) :
-    Homotopy (linearYonedaObjMap (R := R) f B) (linearYonedaObjMap g B) :=
+noncomputable def linearYonedaObjHomotopy
+    {X Y : ChainComplex C ℕ} {f g : X ⟶ Y} (h : Homotopy f g) (B : C)
+    : Homotopy (linearYonedaObjMap (R := R) f B) (linearYonedaObjMap g B) :=
   ((((linearYoneda R C).obj B).rightOp).mapHomotopy h).unop
 
-noncomputable def linearYonedaObjHomotopyEquiv {X Y : ChainComplex C ℕ} (e : HomotopyEquiv X Y)
-    (B : C) : HomotopyEquiv (Y.linearYonedaObj R B) (X.linearYonedaObj R B) where
+noncomputable def linearYonedaObjHomotopyEquiv
+    {X Y : ChainComplex C ℕ} (e : HomotopyEquiv X Y) (B : C)
+    : HomotopyEquiv (Y.linearYonedaObj R B) (X.linearYonedaObj R B) where
   hom := linearYonedaObjMap e.hom B
   inv := linearYonedaObjMap e.inv B
-  homotopyHomInvId := (Homotopy.ofEq (linearYonedaObjMap_comp _ _ _).symm).trans
-    ((linearYonedaObjHomotopy e.homotopyInvHomId B).trans
-      (Homotopy.ofEq (linearYonedaObjMap_id _ _)))
-  homotopyInvHomId := (Homotopy.ofEq (linearYonedaObjMap_comp _ _ _).symm).trans
-    ((linearYonedaObjHomotopy e.homotopyHomInvId B).trans
-      (Homotopy.ofEq (linearYonedaObjMap_id _ _)))
+  homotopyHomInvId :=
+    (Homotopy.ofEq (linearYonedaObjMap_comp _ _ _).symm).trans
+      ((linearYonedaObjHomotopy e.homotopyInvHomId B).trans
+        (Homotopy.ofEq (linearYonedaObjMap_id _ _)))
+  homotopyInvHomId :=
+    (Homotopy.ofEq (linearYonedaObjMap_comp _ _ _).symm).trans
+      ((linearYonedaObjHomotopy e.homotopyHomInvId B).trans
+        (Homotopy.ofEq (linearYonedaObjMap_id _ _)))
 
 end HomComplex
 
 section Bar
 
 variable {k G : Type u} [CommRing k] [Group G]
-
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in

@@ -13,17 +13,22 @@ namespace PositivityTheory.RgUd.T.Nil.Orb.BModbound
 
 open PositivityTheory.RgUd.T
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-theorem isClosed_Gz (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) : IsClosed (Gz Z : Set (GL (Fin n) k)) := by
+theorem isClosed_Gz (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+    : IsClosed (Gz Z : Set (GL (Fin n) k)) := by
   have : (Gz Z : Set (GL (Fin n) k)) = ⋂ a ∈ Z, {g : GL (Fin n) k | a * g.val = g.val * a} := by
     ext g; simp [Gz]
   rw [this]
-  exact isClosed_biInter fun a _ => isClosed_eq (continuous_const.matrix_mul Units.continuous_val)
-    (Units.continuous_val.matrix_mul continuous_const)
+  exact isClosed_biInter fun a _ =>
+    isClosed_eq (continuous_const.matrix_mul Units.continuous_val)
+      (Units.continuous_val.matrix_mul continuous_const)
 
-private theorem exists_uniformizer_pow_mul_valuation_le_one (a : k) : ∃ e : ℕ,
-    valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ e * valuation k a ≤ 1 := by
+private theorem exists_uniformizer_pow_mul_valuation_le_one (a : k)
+    : ∃ e : ℕ,
+      valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ e * valuation k a
+        ≤ 1 := by
   by_cases ha : valuation k a ≤ 1
   · exact ⟨0, by rw [pow_zero, one_mul]; exact ha⟩
   have ha0 : a ≠ 0 := by
@@ -44,22 +49,35 @@ private theorem exists_uniformizer_pow_mul_valuation_le_one (a : k) : ∃ e : �
     exact h
   obtain ⟨e, u, hu⟩ := IsDiscreteValuationRing.associated_pow_irreducible hb0 hirr
   refine ⟨e, ?_⟩
-  have h1 : valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ e ≤ valuation k a⁻¹ := by
-    have h2 : (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ e = a⁻¹ * ((u : 𝒪[k]) : k) := by
+  have h1
+      : valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ e
+        ≤ valuation k a⁻¹ := by
+    have h2
+        : (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ e = a⁻¹ * ((u : 𝒪[k]) : k) := by
       have h3 := congrArg (fun z : 𝒪[k] => (z : k)) hu
       simpa [hb] using h3.symm
     rw [← map_pow, h2, map_mul]
-    calc _ ≤ valuation k a⁻¹ * 1 := mul_le_mul_right (u : 𝒪[k]).2 _
+    calc
+      _ ≤ valuation k a⁻¹ * 1 := mul_le_mul_right (u : 𝒪[k]).2 _
       _ = _ := mul_one _
-  calc _ ≤ valuation k a⁻¹ * valuation k a := mul_le_mul_left h1 _
+  calc
+    _ ≤ valuation k a⁻¹ * valuation k a := mul_le_mul_left h1 _
     _ = 1 := by rw [← map_mul, inv_mul_cancel₀ ha0, map_one]
 
-private theorem mul_mul_apply_mem_integers_of_valuation_bounds (E : ℕ) (P Q y : Matrix (Fin n) (Fin n) k)
-    (hP : ∀ i j, valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E * valuation k (P i j) ≤ 1)
-    (hQ : ∀ i j, valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E * valuation k (Q i j) ≤ 1)
-    (hy : ∀ i j, valuation k (y i j) ≤ valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E *
-      valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E)
-    (i j : Fin n) : (P * y * Q) i j ∈ 𝒪[k] := by
+private theorem mul_mul_apply_mem_integers_of_valuation_bounds
+    (E : ℕ) (P Q y : Matrix (Fin n) (Fin n) k)
+    (hP : ∀ i j,
+      valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E * valuation k (P i j)
+        ≤ 1)
+    (hQ : ∀ i j,
+      valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E * valuation k (Q i j)
+        ≤ 1)
+    (hy : ∀ i j,
+      valuation k (y i j)
+        ≤ valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E
+          * valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E)
+    (i j : Fin n)
+    : (P * y * Q) i j ∈ 𝒪[k] := by
   set c := valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E with hc
   rw [Matrix.mul_apply]
   refine sum_mem fun b _ => ?_
@@ -67,15 +85,19 @@ private theorem mul_mul_apply_mem_integers_of_valuation_bounds (E : ℕ) (P Q y 
   refine sum_mem fun a _ => ?_
   show valuation k (P i a * y a b * Q b j) ≤ 1
   rw [map_mul, map_mul]
-  calc valuation k (P i a) * valuation k (y a b) * valuation k (Q b j)
-      ≤ valuation k (P i a) * (c * c) * valuation k (Q b j) :=
-        mul_le_mul_left (mul_le_mul_right (hy a b) _) _
+  calc
+    valuation k (P i a) * valuation k (y a b) * valuation k (Q b j)
+        ≤ valuation k (P i a) * (c * c) * valuation k (Q b j) :=
+      mul_le_mul_left (mul_le_mul_right (hy a b) _) _
     _ = (c * valuation k (P i a)) * (c * valuation k (Q b j)) := by ac_rfl
     _ ≤ 1 * 1 := mul_le_mul' (hP i a) (hQ b j)
     _ = 1 := one_mul 1
 
-theorem exists_level (g : GL (Fin n) k) : ∃ m : ℕ, 1 ≤ m ∧ ∀ u ∈ congruenceSubgroup k n m,
-    g⁻¹ * u * g ∈ integralGL k n ∧ g * u * g⁻¹ ∈ integralGL k n := by
+theorem exists_level (g : GL (Fin n) k)
+    : ∃ m : ℕ,
+      1 ≤ m
+        ∧ ∀ u ∈ congruenceSubgroup k n m,
+          g⁻¹ * u * g ∈ integralGL k n ∧ g * u * g⁻¹ ∈ integralGL k n := by
   classical
   choose e he using fun a : k => exists_uniformizer_pow_mul_valuation_le_one (k := k) a
   set A : Matrix (Fin n) (Fin n) k := (g : Matrix (Fin n) (Fin n) k) with hA
@@ -83,17 +105,26 @@ theorem exists_level (g : GL (Fin n) k) : ∃ m : ℕ, 1 ≤ m ∧ ∀ u ∈ con
   set E : ℕ := ∑ i, ∑ j, (e (A i j) + e (B i j)) with hE
   have hπ1 : valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ≤ 1 :=
     (GroundTheory.Automorphic.GLnLocal.uniformizer k).2
-  have hbound : ∀ a : k, e a ≤ E →
-      valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E * valuation k a ≤ 1 := by
+  have hbound
+      : ∀ a : k,
+        e a ≤ E
+          → valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E * valuation k a
+            ≤ 1 := by
     intro a ha
     exact le_trans (mul_le_mul_left (pow_le_pow_right_of_le_one' hπ1 ha) _) (he a)
   have hrow : ∀ i j, e (A i j) + e (B i j) ≤ E := by
     intro i j
-    calc e (A i j) + e (B i j) ≤ ∑ j', (e (A i j') + e (B i j')) :=
-          Finset.single_le_sum (f := fun j' => e (A i j') + e (B i j'))
-            (fun _ _ => Nat.zero_le _) (Finset.mem_univ j)
-      _ ≤ E := Finset.single_le_sum (f := fun i' => ∑ j', (e (A i' j') + e (B i' j')))
-            (fun _ _ => Nat.zero_le _) (Finset.mem_univ i)
+    calc
+      e (A i j) + e (B i j) ≤ ∑ j', (e (A i j') + e (B i j')) :=
+        Finset.single_le_sum
+          (f := fun j' => e (A i j') + e (B i j'))
+          (fun _ _ => Nat.zero_le _)
+          (Finset.mem_univ j)
+      _ ≤ E :=
+        Finset.single_le_sum
+          (f := fun i' => ∑ j', (e (A i' j') + e (B i' j')))
+          (fun _ _ => Nat.zero_le _)
+          (Finset.mem_univ i)
   have heA : ∀ i j, e (A i j) ≤ E := fun i j => le_trans (Nat.le_add_right _ _) (hrow i j)
   have heB : ∀ i j, e (B i j) ≤ E := fun i j => le_trans (Nat.le_add_left _ _) (hrow i j)
   have hBA : B * A = 1 := Units.inv_mul g
@@ -105,28 +136,37 @@ theorem exists_level (g : GL (Fin n) k) : ∃ m : ℕ, 1 ≤ m ∧ ∀ u ∈ con
     · exact one_mem _
     · exact zero_mem _
   refine ⟨2 * E + 1, by omega, ?_⟩
-  have hconj : ∀ w ∈ congruenceSubgroup k n (2 * E + 1), ∀ i j,
-      ((g⁻¹ * w * g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j ∈ 𝒪[k] ∧
-      ((g * w * g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j ∈ 𝒪[k] := by
+  have hconj
+      : ∀ w ∈ congruenceSubgroup k n (2 * E + 1), ∀ i j,
+        ((g⁻¹ * w * g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j ∈ 𝒪[k]
+          ∧ ((g * w * g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j ∈ 𝒪[k] := by
     intro w hw i j
     rw [mem_congruenceSubgroup_iff] at hw
     set y : Matrix (Fin n) (Fin n) k := (w : Matrix (Fin n) (Fin n) k) - 1 with hy
     have hw' : (w : Matrix (Fin n) (Fin n) k) = 1 + y := by rw [hy]; abel
-    have hyb : ∀ a b, valuation k (y a b) ≤
-        valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E *
-          valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E := by
+    have hyb
+        : ∀ a b,
+          valuation k (y a b)
+            ≤ valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E
+              * valuation k (GroundTheory.Automorphic.GLnLocal.uniformizer k : k) ^ E := by
       intro a b
       rw [← pow_add]
       exact le_trans (hw.2 a b) (pow_le_pow_right_of_le_one' hπ1 (by omega))
     constructor
     · rw [Units.val_mul, Units.val_mul, ← hB, ← hA, hw', Matrix.mul_add, Matrix.add_mul,
         Matrix.mul_one, hBA, Matrix.add_apply]
-      exact add_mem (h1 i j) (mul_mul_apply_mem_integers_of_valuation_bounds E B A y (fun i j => hbound _ (heB i j))
-        (fun i j => hbound _ (heA i j)) hyb i j)
+      exact add_mem (h1 i j)
+        (mul_mul_apply_mem_integers_of_valuation_bounds E B A y
+          (fun i j => hbound _ (heB i j))
+          (fun i j => hbound _ (heA i j))
+          hyb i j)
     · rw [Units.val_mul, Units.val_mul, ← hB, ← hA, hw', Matrix.mul_add, Matrix.add_mul,
         Matrix.mul_one, hAB, Matrix.add_apply]
-      exact add_mem (h1 i j) (mul_mul_apply_mem_integers_of_valuation_bounds E A B y (fun i j => hbound _ (heA i j))
-        (fun i j => hbound _ (heB i j)) hyb i j)
+      exact add_mem (h1 i j)
+        (mul_mul_apply_mem_integers_of_valuation_bounds E A B y
+          (fun i j => hbound _ (heA i j))
+          (fun i j => hbound _ (heB i j))
+          hyb i j)
   intro u hu
   refine ⟨?_, ?_⟩
   · rw [mem_integralGL_iff]
@@ -140,9 +180,11 @@ theorem exists_level (g : GL (Fin n) k) : ∃ m : ℕ, 1 ≤ m ∧ ∀ u ∈ con
     rw [hinv]
     exact (hconj u⁻¹ (inv_mem hu) i j).2
 
-theorem exists_unit (m : ℕ) (hm : 1 ≤ m) (x : Matrix (Fin n) (Fin n) k)
-    (hx : ∀ i j, valuation k (x i j) ≤ valuation k (uniformizer k : k) ^ m) :
-    ∃ u ∈ congruenceSubgroup k n m, u.val = 1 + x := by
+theorem exists_unit
+    (m : ℕ) (hm : 1 ≤ m)
+    (x : Matrix (Fin n) (Fin n) k)
+    (hx : ∀ i j, valuation k (x i j) ≤ valuation k (uniformizer k : k) ^ m)
+    : ∃ u ∈ congruenceSubgroup k n m, u.val = 1 + x := by
   classical
   set π := GroundTheory.Automorphic.GLnLocal.uniformizer k with hπ
   have hπm : π ∈ 𝓂[k] := by

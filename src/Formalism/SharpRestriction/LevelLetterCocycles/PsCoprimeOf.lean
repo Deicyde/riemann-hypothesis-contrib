@@ -11,16 +11,19 @@ noncomputable section
 
 namespace Formalism.MainNotions.UnusedSlot80.KF
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80.KL Formalism.MainNotions.UnusedSlot80.ToolsR Formalism.MainNotions.WachCoordinates
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80.KL
+  Formalism.MainNotions.UnusedSlot80.ToolsR Formalism.MainNotions.WachCoordinates
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
 private lemma gammaA_apply_eq_gamma0 (W : LocWach PD LL O v n) (g : W.Gam) (a : LetA O n) (i : ZMod n) :
     W.γA g a i = W.γ₀ g (a i) := rfl
@@ -34,12 +37,11 @@ private lemma gammaA_phiA_comm (W : LocWach PD LL O v n) (g : W.Gam) (a : LetA O
   simp only [gammaA_apply_eq_gamma0, phiA_apply_eq_phi0_pred]
   exact (W.γ₀_comm g (a (i - 1))).symm
 
-theorem γA_φpow (W : LocWach PD LL O v n) (g : W.Gam) (t : ℕ) (a : LetA O n) :
-    W.γA g ((W.φA ^ t) a) = (W.φA ^ t) (W.γA g a) := by
+theorem γA_φpow (W : LocWach PD LL O v n) (g : W.Gam) (t : ℕ) (a : LetA O n)
+    : W.γA g ((W.φA ^ t) a) = (W.φA ^ t) (W.γA g a) := by
   induction t generalizing a with
   | zero => simp only [pow_zero, AlgHom.one_apply]
-  | succ t ih =>
-    rw [pow_succ, AlgHom.mul_apply, AlgHom.mul_apply, ih, gammaA_phiA_comm]
+  | succ t ih => rw [pow_succ, AlgHom.mul_apply, AlgHom.mul_apply, ih, gammaA_phiA_comm]
 
 private lemma mem_AΔ_iff_forall_gammaA_fixed (W : LocWach PD LL O v n) (a : LetA O n) :
     a ∈ W.AΔ ↔ ∀ δ ∈ W.DelF, W.γA δ a = a := Iff.rfl
@@ -152,7 +154,8 @@ private lemma Eat_X_add_p_pi0_eq_qA (W : LocWach PD LL O v n) :
   funext i
   simp [Formalism.MainNotions.DeltaInvariantLattices.Eat, qA, lA]
 
-theorem psStable_of [IsDomain O] [NeZero n] (W : LocWach PD LL O v n) (hR : RingP W) : PsStable W := by
+theorem psStable_of [IsDomain O] [NeZero n] (W : LocWach PD LL O v n) (hR : RingP W)
+    : PsStable W := by
   have hR' := hR
   obtain ⟨-, -, -, -, -, -, ⟨w, hw⟩, -⟩ := hR'
   have hw' : W.γA W.gam W.π₀ - W.π₀ = (w : LetA O n) * W.π₀ * qA W := by
@@ -179,14 +182,21 @@ theorem psStable_of [IsDomain O] [NeZero n] (W : LocWach PD LL O v n) (hR : Ring
   have hUm : (U : LetA O n) ∈ W.AΔ := by
     rw [hU]
     exact hu
-  refine ⟨(W.φA ^ t) (U : LetA O n), phiA_pow_mem_AΔ W t hUm, (W.φA ^ t) (↑U⁻¹ : LetA O n),
-    phiA_pow_mem_AΔ W t (mem_AΔ_of_mul_eq_one W hUm U.mul_inv), ?_, ?_⟩
+  refine ⟨
+    (W.φA ^ t) (U : LetA O n),
+    phiA_pow_mem_AΔ W t hUm,
+    (W.φA ^ t) (↑U⁻¹ : LetA O n),
+    phiA_pow_mem_AΔ W t (mem_AΔ_of_mul_eq_one W hUm U.mul_inv),
+    ?_,
+    ?_
+  ⟩
   · rw [← map_mul, U.mul_inv, map_one]
   · show W.γA W.gam ((W.φA ^ t) (qA W)) = (W.φA ^ t) (U : LetA O n) * ps W t
     rw [γA_φpow, hγq, map_mul, hU]
     exact mul_comm _ _
 
-theorem psUnitE_of [NeZero n] (W : LocWach PD LL O v n) (hR : RingP W) (hT : ToolsAlg W) : PsUnitE W := by
+theorem psUnitE_of [NeZero n] (W : LocWach PD LL O v n) (hR : RingP W) (hT : ToolsAlg W)
+    : PsUnitE W := by
   intro s
   obtain ⟨-, h2, -, -⟩ := hT
   obtain ⟨u, P, hu, hm, hdeg, hdiv, hpS⟩ := h2 s
@@ -200,19 +210,22 @@ theorem psUnitE_of [NeZero n] (W : LocWach PD LL O v n) (hR : RingP W) (hT : Too
   obtain ⟨ub, hub⟩ := hb
   rw [← hub, Polynomial.aeval_eq_sum_range, Finset.sum_range_succ, hm.coeff_natDegree, one_smul]
   haveI := W.EE_complete
-  have hz : (∑ i ∈ Finset.range P.natDegree, P.coeff i • (ub : W.EE) ^ i) ∈
-      Ideal.span {((PD.p : ℕ) : W.EE)} := by
+  have hz
+      : (∑ i ∈ Finset.range P.natDegree, P.coeff i • (ub : W.EE) ^ i)
+        ∈ Ideal.span {((PD.p : ℕ) : W.EE)} := by
     refine Ideal.sum_mem _ (fun i hi => ?_)
     obtain ⟨d, hd⟩ := hdiv i (by rw [← hdeg]; exact Finset.mem_range.mp hi)
     rw [Ideal.mem_span_singleton, hd, Algebra.smul_def, map_mul, map_natCast, mul_assoc]
     exact dvd_mul_right _ _
   have hj := IsAdicComplete.le_jacobson_bot (I := Ideal.span {((PD.p : ℕ) : W.EE)}) hz
   rw [Ideal.mem_jacobson_bot] at hj
-  have hN : ((ub : W.EE) * (↑ub⁻¹ : W.EE)) ^ P.natDegree = 1 := by
-    rw [Units.mul_inv, one_pow]
-  have key : (∑ i ∈ Finset.range P.natDegree, P.coeff i • (ub : W.EE) ^ i) + (ub : W.EE) ^ P.natDegree
-      = (ub : W.EE) ^ P.natDegree * ((∑ i ∈ Finset.range P.natDegree, P.coeff i • (ub : W.EE) ^ i) *
-        (↑ub⁻¹ : W.EE) ^ P.natDegree + 1) := by
+  have hN : ((ub : W.EE) * (↑ub⁻¹ : W.EE)) ^ P.natDegree = 1 := by rw [Units.mul_inv, one_pow]
+  have key
+      : (∑ i ∈ Finset.range P.natDegree, P.coeff i • (ub : W.EE) ^ i) + (ub : W.EE) ^ P.natDegree
+        = (ub : W.EE) ^ P.natDegree
+          * ((∑ i ∈ Finset.range P.natDegree, P.coeff i • (ub : W.EE) ^ i)
+              * (↑ub⁻¹ : W.EE) ^ P.natDegree
+            + 1) := by
     linear_combination (-(∑ i ∈ Finset.range P.natDegree, P.coeff i • (ub : W.EE) ^ i)) * hN
   rw [key]
   exact (ub.isUnit.pow _).mul (hj _)
@@ -253,8 +266,8 @@ private lemma exists_lA_eq_mul_ps_add_mul_ps_of_lt [IsDomain O] (W : LocWach PD 
   rw [hpt, hφt]
   ring
 
-theorem psCoprime_of [IsDomain O] [NeZero n] (W : LocWach PD LL O v n) (hR : RingP W) :
-    PsCoprime W := by
+theorem psCoprime_of [IsDomain O] [NeZero n] (W : LocWach PD LL O v n) (hR : RingP W)
+    : PsCoprime W := by
   intro s t hst
   refine ⟨1, ?_⟩
   rcases Nat.lt_or_gt_of_ne hst with h | h

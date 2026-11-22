@@ -9,19 +9,25 @@ namespace PI.UnitKronW
 
 open Matrix Polynomial ComplexOrder
 
-def StepA : Prop := ∀ (k : ℕ) (H G : Matrix (Fin k) (Fin k) ℂ), H.PosDef → Gᴴ * H * G = H →
-  ∀ μ : ℂ, G.charpoly.IsRoot μ → ‖μ‖ = 1
+def StepA : Prop :=
+  ∀ (k : ℕ) (H G : Matrix (Fin k) (Fin k) ℂ),
+    H.PosDef → Gᴴ * H * G = H → ∀ μ : ℂ, G.charpoly.IsRoot μ → ‖μ‖ = 1
 
-def StepB : Prop := ∀ (E : Type) [Field E] [NumberField E] (p : E[X]), p.Monic → (∀ i, IsIntegral ℤ (p.coeff i)) →
-  (∀ (φ : E →+* ℂ) (μ : ℂ), (p.map φ).IsRoot μ → ‖μ‖ = 1) →
-  ∀ (φ₀ : E →+* ℂ) (μ : ℂ), (p.map φ₀).IsRoot μ → ∃ m : ℕ, 0 < m ∧ μ ^ m = 1
+def StepB : Prop :=
+  ∀ (E : Type) [Field E] [NumberField E] (p : E[X]),
+    p.Monic → (∀ i, IsIntegral ℤ (p.coeff i))
+      → (∀ (φ : E →+* ℂ) (μ : ℂ), (p.map φ).IsRoot μ → ‖μ‖ = 1)
+      → ∀ (φ₀ : E →+* ℂ) (μ : ℂ), (p.map φ₀).IsRoot μ → ∃ m : ℕ, 0 < m ∧ μ ^ m = 1
 
-def StepC : Prop := ∀ (k : ℕ) (H G : Matrix (Fin k) (Fin k) ℂ), H.PosDef → Gᴴ * H * G = H →
-  ∀ n : ℕ, (∀ μ ∈ G.charpoly.roots, μ ^ n = 1) → G ^ n = 1
+def StepC : Prop :=
+  ∀ (k : ℕ) (H G : Matrix (Fin k) (Fin k) ℂ),
+    H.PosDef → Gᴴ * H * G = H → ∀ n : ℕ, (∀ μ ∈ G.charpoly.roots, μ ^ n = 1) → G ^ n = 1
 
-theorem map_relation {E : Type} [Field E] (c : E →+* E) (φ : E →+* ℂ)
-    (hc : ∀ x : E, φ (c x) = (starRingEnd ℂ) (φ x)) {k : ℕ} (J γ : Matrix (Fin k) (Fin k) E)
-    (hγ : (γ.map c)ᵀ * J * γ = J) : (γ.map φ)ᴴ * J.map φ * γ.map φ = J.map φ := by
+theorem map_relation
+    {E : Type} [Field E]
+    (c : E →+* E) (φ : E →+* ℂ) (hc : ∀ x : E, φ (c x) = (starRingEnd ℂ) (φ x))
+    {k : ℕ} (J γ : Matrix (Fin k) (Fin k) E) (hγ : (γ.map c)ᵀ * J * γ = J)
+    : (γ.map φ)ᴴ * J.map φ * γ.map φ = J.map φ := by
   have h := congrArg (fun M => M.map φ) hγ
   simp only [Matrix.map_mul] at h
   convert h using 3
@@ -31,8 +37,8 @@ theorem map_relation {E : Type} [Field E] (c : E →+* E) (φ : E →+* ℂ)
 theorem unitKron_of (hA : StepA) (hB : StepB) (hC : StepC) : PI.UnitKron := by
   intro E _ _ c hc k J γ hJ hγ hint
   obtain ⟨φ₀⟩ : Nonempty (E →+* ℂ) := inferInstance
-  have hrel : ∀ φ : E →+* ℂ, (γ.map φ)ᴴ * J.map φ * γ.map φ = J.map φ :=
-    fun φ => map_relation c φ (hc φ) J γ hγ
+  have hrel : ∀ φ : E →+* ℂ, (γ.map φ)ᴴ * J.map φ * γ.map φ = J.map φ := fun φ =>
+    map_relation c φ (hc φ) J γ hγ
   have hnorm : ∀ (φ : E →+* ℂ) (μ : ℂ), (γ.charpoly.map φ).IsRoot μ → ‖μ‖ = 1 := by
     intro φ μ hμ
     rw [← Matrix.charpoly_map] at hμ
@@ -51,7 +57,8 @@ theorem unitKron_of (hA : StepA) (hB : StepB) (hC : StepC) : PI.UnitKron := by
     · exact (hroot μ h).choose_spec.1
     · exact one_pos
   let S := (γ.map φ₀).charpoly.roots.toFinset
-  obtain ⟨H, hH, hHrel⟩ : ∃ H : Matrix (Fin k) (Fin k) ℂ, H.PosDef ∧ (γ.map φ₀)ᴴ * H * γ.map φ₀ = H := by
+  obtain ⟨H, hH, hHrel⟩
+      : ∃ H : Matrix (Fin k) (Fin k) ℂ, H.PosDef ∧ (γ.map φ₀)ᴴ * H * γ.map φ₀ = H := by
     rcases hJ φ₀ with hpos | hneg
     · exact ⟨_, hpos, hrel φ₀⟩
     · refine ⟨_, hneg, ?_⟩

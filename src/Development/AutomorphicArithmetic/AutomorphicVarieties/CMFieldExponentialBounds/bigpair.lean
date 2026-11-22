@@ -7,9 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.StmtFields
 
 open NumberField Formalism.HC UpperTheory.Top UpperTheory.V
 
-theorem UpperTheory.V.eventually_winPair_gt_power :
-    ∀ eps J Ct P : ℝ, 0 < eps → 0 < J → ∃ X0 : ℝ, ∀ X ≥ X0, ∀ q d : ℕ, WinPair eps (X ^ (1 / J)) q d →
-      2 * X ^ Ct + 1 < (q : ℝ) ∧ 2 * X ^ Ct + 1 < (d : ℝ) ∧ P < (q : ℝ) ∧ P < (d : ℝ) := by
+theorem UpperTheory.V.eventually_winPair_gt_power
+    : ∀ eps J Ct P : ℝ,
+      0 < eps → 0 < J
+        → ∃ X0 : ℝ, ∀ X ≥ X0, ∀ q d : ℕ,
+          WinPair eps (X ^ (1 / J)) q d
+            → 2 * X ^ Ct + 1 < (q : ℝ) ∧ 2 * X ^ Ct + 1 < (d : ℝ) ∧ P < (q : ℝ) ∧ P < (d : ℝ) := by
   intro eps J Ct P heps hJ
   set δ : ℝ := 1 / J * (eps / 5) with hδ
   have hδpos : 0 < δ := by positivity
@@ -28,8 +31,7 @@ theorem UpperTheory.V.eventually_winPair_gt_power :
     have := Real.add_one_le_exp J
     linarith
   have hX0 : 0 < X := by linarith
-  have hY : (X ^ (1 / J)) ^ (eps / 5) = X ^ δ := by
-    rw [← Real.rpow_mul hX0.le]
+  have hY : (X ^ (1 / J)) ^ (eps / 5) = X ^ δ := by rw [← Real.rpow_mul hX0.le]
   have hlogY : 1 ≤ Real.log (X ^ (1 / J)) := by
     rw [Real.log_rpow hX0]
     have hJl : J ≤ Real.log X := (Real.le_log_iff_exp_le hX0).2 hXe
@@ -52,8 +54,7 @@ theorem UpperTheory.V.eventually_winPair_gt_power :
     rw [lt_div_iff₀ hM]
     linarith
   have hmain : X ^ mC * (|P| + 3) < Real.exp y := by
-    have h1 : X ^ mC * (|P| + 3) < X ^ mC * (X / M) :=
-      mul_lt_mul_of_pos_left hXdiv (by linarith)
+    have h1 : X ^ mC * (|P| + 3) < X ^ mC * (X / M) := mul_lt_mul_of_pos_left hXdiv (by linarith)
     have h2 : X ^ mC * (X / M) = X ^ mC * X / M := by ring
     have h3 : X ^ mC * X / M ≤ X ^ (δ * n) / M := div_le_div_of_nonneg_right hpow hM.le
     linarith

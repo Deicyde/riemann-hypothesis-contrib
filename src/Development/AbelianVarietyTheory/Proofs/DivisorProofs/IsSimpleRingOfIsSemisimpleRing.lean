@@ -22,7 +22,8 @@ theorem Datum.tmul_one_injective : Function.Injective (fun x : D.La => (1 : ℚ)
   simpa using h
 
 theorem Datum.actQ_injective : Function.Injective D.actQ := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro b hb
   apply GlobalTheory.HTFaith.faithful p D b
   intro y
@@ -30,8 +31,8 @@ theorem Datum.actQ_injective : Function.Injective D.actQ := by
   have := congrArg (fun f : Module.End ℚ D.VQ => f (1 ⊗ₜ y)) hb
   simpa [D.actQ_tmul] using this
 
-theorem Datum.exists_of_mem_algO {g : Module.End ℚ D.VQ} (hg : g ∈ D.algO) :
-    ∃ (q : ℚ) (x : D.O), g = q • D.actQ x := by
+theorem Datum.exists_of_mem_algO {g : Module.End ℚ D.VQ} (hg : g ∈ D.algO)
+    : ∃ (q : ℚ) (x : D.O), g = q • D.actQ x := by
   induction hg using Algebra.adjoin_induction with
   | mem g hg => obtain ⟨x, rfl⟩ := hg; exact ⟨1, x, by rw [one_smul]⟩
   | algebraMap r => exact ⟨r, 1, by rw [map_one, Algebra.algebraMap_eq_smul_one]⟩
@@ -39,12 +40,14 @@ theorem Datum.exists_of_mem_algO {g : Module.End ℚ D.VQ} (hg : g ∈ D.algO) :
     obtain ⟨q, x, rfl⟩ := hg
     obtain ⟨q', x', rfl⟩ := hh
     refine ⟨1 / (q.den * q'.den), (q.num * q'.den : ℤ) • x + (q'.num * q.den : ℤ) • x', ?_⟩
-    rw [map_add (f := _), map_zsmul, map_zsmul, smul_add, ← Int.cast_smul_eq_zsmul ℚ, ← Int.cast_smul_eq_zsmul ℚ,
-      smul_smul, smul_smul]
+    rw [map_add (f := _), map_zsmul, map_zsmul, smul_add, ← Int.cast_smul_eq_zsmul ℚ,
+      ← Int.cast_smul_eq_zsmul ℚ, smul_smul, smul_smul]
     congr 2
-    · push_cast; conv_lhs => rw [← Rat.num_div_den q]
+    · push_cast
+      conv_lhs => rw [← Rat.num_div_den q]
       field_simp
-    · push_cast; conv_lhs => rw [← Rat.num_div_den q']
+    · push_cast
+      conv_lhs => rw [← Rat.num_div_den q']
       field_simp
   | mul g h _ _ hg hh =>
     obtain ⟨q, x, rfl⟩ := hg
@@ -55,8 +58,9 @@ end GlobalTheory.UPel.HT
 open NumberField
 namespace GlobalTheory.UPel.HT
 variable {p : ℕ} [Fact p.Prime]
-theorem Datum.center_algO (D : Datum p) (g : Module.End ℚ D.VQ) (hg : g ∈ D.algO)
-    (hc : ∀ h ∈ D.algO, h * g = g * h) : ∃ c : D.F, g = ((D.actF c : D.endO) : Module.End ℚ D.VQ) := by
+theorem Datum.center_algO
+    (D : Datum p) (g : Module.End ℚ D.VQ) (hg : g ∈ D.algO) (hc : ∀ h ∈ D.algO, h * g = g * h)
+    : ∃ c : D.F, g = ((D.actF c : D.endO) : Module.End ℚ D.VQ) := by
   obtain ⟨q, x, rfl⟩ := D.exists_of_mem_algO hg
   rcases eq_or_ne q 0 with hq | hq
   · exact ⟨0, by rw [hq, zero_smul, map_zero]; rfl⟩
@@ -66,18 +70,22 @@ theorem Datum.center_algO (D : Datum p) (g : Module.End ℚ D.VQ) (hg : g ∈ D.
     rw [mul_smul_comm, smul_mul_assoc] at h
     have h' := smul_right_injective _ hq h
     apply D.actQ_injective
-    rw [map_mul, map_mul]; exact h'.symm
+    rw [map_mul, map_mul]
+    exact h'.symm
   obtain ⟨c, e, he, hce⟩ := D.central x hx
   refine ⟨(q / e) • ((c : 𝓞 D.F) : D.F), ?_⟩
-  rw [map_smul, D.actF_coe, Subalgebra.coe_smul, D.coe_actInt, ← hce, map_zsmul, ← Int.cast_smul_eq_zsmul ℚ, smul_smul]
+  rw [map_smul, D.actF_coe, Subalgebra.coe_smul, D.coe_actInt, ← hce, map_zsmul,
+    ← Int.cast_smul_eq_zsmul ℚ, smul_smul]
   congr 1
   field_simp
 end GlobalTheory.UPel.HT
 
 namespace GlobalTheory.UPel.HT
 variable {p : ℕ} [Fact p.Prime]
-theorem Datum.finrank_algO (D : Datum p) : Module.finrank ℚ D.algO = D.m ^ 2 * Module.finrank ℚ D.F := by
-  haveI := D.freeO; haveI := D.finO
+theorem Datum.finrank_algO (D : Datum p)
+    : Module.finrank ℚ D.algO = D.m ^ 2 * Module.finrank ℚ D.F := by
+  haveI := D.freeO
+  haveI := D.finO
   let b := Module.Free.chooseBasis ℤ D.O
   let v : Module.Free.ChooseBasisIndex ℤ D.O → Module.End ℚ D.VQ := fun i => D.actQ (b i)
   let f : D.O →ₗ[ℤ] Module.End ℚ D.VQ := D.actQ.toAddMonoidHom.toIntLinearMap
@@ -98,8 +106,8 @@ theorem Datum.finrank_algO (D : Datum p) : Module.finrank ℚ D.algO = D.m ^ 2 *
       refine Submodule.sum_mem _ fun i _ => ?_
       rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℚ]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
-  rw [← Subalgebra.finrank_toSubmodule, ← hspan, finrank_span_eq_card hQ, ← Module.finrank_eq_card_chooseBasisIndex,
-    D.rankO]
+  rw [← Subalgebra.finrank_toSubmodule, ← hspan, finrank_span_eq_card hQ,
+    ← Module.finrank_eq_card_chooseBasisIndex, D.rankO]
 end GlobalTheory.UPel.HT
 
 noncomputable section
@@ -112,32 +120,36 @@ def Datum.toReal (D : Datum p) : D.VQ →ₗ[ℤ] ℝ ⊗[ℤ] D.La :=
 
 theorem Datum.toReal_tmul (D : Datum p) (q : ℚ) (x : D.La) : D.toReal (q ⊗ₜ x) = (q : ℝ) ⊗ₜ x := rfl
 
-theorem Datum.toReal_smul (D : Datum p) (q : ℚ) (t : D.VQ) : D.toReal (q • t) = (q : ℝ) • D.toReal t := by
+theorem Datum.toReal_smul (D : Datum p) (q : ℚ) (t : D.VQ)
+    : D.toReal (q • t) = (q : ℝ) • D.toReal t := by
   induction t using TensorProduct.induction_on with
   | zero => simp
   | add a b ha hb => rw [smul_add, map_add (f := _), ha, hb, map_add (f := _), smul_add]
   | tmul q' x =>
-    rw [TensorProduct.smul_tmul', D.toReal_tmul, D.toReal_tmul, TensorProduct.smul_tmul', smul_eq_mul, smul_eq_mul,
-      Rat.cast_mul]
+    rw [TensorProduct.smul_tmul', D.toReal_tmul, D.toReal_tmul, TensorProduct.smul_tmul',
+      smul_eq_mul, smul_eq_mul, Rat.cast_mul]
 
 theorem Datum.toReal_injective (D : Datum p) : Function.Injective D.toReal := by
   haveI := D.freeLa
-  exact Module.Flat.rTensor_preserves_injective_linearMap _ (fun a b h => by
-    simpa using h)
+  exact Module.Flat.rTensor_preserves_injective_linearMap _ (fun a b h => by simpa using h)
 
 def Datum.actReal (D : Datum p) (x : D.O) : ℝ ⊗[ℤ] D.La →ₗ[ℝ] ℝ ⊗[ℤ] D.La :=
   LinearMap.baseChange ℝ (DistribSMul.toLinearMap ℤ D.La x)
 
-theorem Datum.actReal_tmul (D : Datum p) (x : D.O) (r : ℝ) (y : D.La) : D.actReal x (r ⊗ₜ y) = r ⊗ₜ (x • y) := rfl
+theorem Datum.actReal_tmul (D : Datum p) (x : D.O) (r : ℝ) (y : D.La)
+    : D.actReal x (r ⊗ₜ y) = r ⊗ₜ (x • y) :=
+  rfl
 
-theorem Datum.toReal_actQ (D : Datum p) (x : D.O) (t : D.VQ) : D.toReal (D.actQ x t) = D.actReal x (D.toReal t) := by
+theorem Datum.toReal_actQ (D : Datum p) (x : D.O) (t : D.VQ)
+    : D.toReal (D.actQ x t) = D.actReal x (D.toReal t) := by
   induction t using TensorProduct.induction_on with
   | zero => simp
-  | add a b ha hb => rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _), map_add (f := _)]
+  | add a b ha hb =>
+    rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _), map_add (f := _)]
   | tmul q y => rw [D.actQ_tmul, D.toReal_tmul, D.toReal_tmul, D.actReal_tmul]
 
-theorem Datum.ER_actReal (D : Datum p) (x : D.O) (a c : ℝ ⊗[ℤ] D.La) :
-    D.EF.baseChange ℝ (D.actReal x a) c = D.EF.baseChange ℝ a (D.actReal (D.star x).unop c) := by
+theorem Datum.ER_actReal (D : Datum p) (x : D.O) (a c : ℝ ⊗[ℤ] D.La)
+    : D.EF.baseChange ℝ (D.actReal x a) c = D.EF.baseChange ℝ a (D.actReal (D.star x).unop c) := by
   induction a using TensorProduct.induction_on with
   | zero => simp
   | add a a' h h' => simp only [map_add (f := _), LinearMap.add_apply, h, h']
@@ -145,22 +157,30 @@ theorem Datum.ER_actReal (D : Datum p) (x : D.O) (a c : ℝ ⊗[ℤ] D.La) :
     induction c using TensorProduct.induction_on with
     | zero => simp
     | add c c' h h' => simp only [map_add (f := _), h, h']
-    | tmul r' z => rw [D.actReal_tmul, D.actReal_tmul, LinearMap.BilinForm.baseChange_tmul,
+    | tmul r' z =>
+      rw [D.actReal_tmul, D.actReal_tmul, LinearMap.BilinForm.baseChange_tmul,
         LinearMap.BilinForm.baseChange_tmul, D.adj]
 
-theorem Datum.exists_form (D : Datum p) : ∃ φ : D.VQ → D.VQ → ℝ,
-  (∀ u, u ≠ 0 → 0 < φ u u) ∧
-  (∀ (x : D.O) (u w : D.VQ), φ (D.actQ x u) w = φ u (D.actQ (D.star x).unop w)) ∧
-  (∀ (q : ℚ) (u w : D.VQ), φ (q • u) w = q * φ u w) ∧
-  (∀ (q : ℚ) (u w : D.VQ), φ u (q • w) = q * φ u w) := by
+theorem Datum.exists_form (D : Datum p)
+    : ∃ φ : D.VQ → D.VQ → ℝ,
+      (∀ u, u ≠ 0 → 0 < φ u u)
+        ∧ (∀ (x : D.O) (u w : D.VQ), φ (D.actQ x u) w = φ u (D.actQ (D.star x).unop w))
+        ∧ (∀ (q : ℚ) (u w : D.VQ), φ (q • u) w = q * φ u w)
+        ∧ (∀ (q : ℚ) (u w : D.VQ), φ u (q • w) = q * φ u w) := by
   obtain ⟨J, -, -, hJpos, hJO, -⟩ := D.dom
-  refine ⟨fun u w => D.EF.baseChange ℝ (J (D.toReal u)) (D.toReal w), fun u hu => ?_, fun x u w => ?_,
-    fun q u w => ?_, fun q u w => ?_⟩
+  refine ⟨
+    fun u w => D.EF.baseChange ℝ (J (D.toReal u)) (D.toReal w),
+    fun u hu => ?_,
+    fun x u w => ?_,
+    fun q u w => ?_,
+    fun q u w => ?_
+  ⟩
   · refine hJpos _ fun h => hu (D.toReal_injective ?_)
     rw [h, map_zero]
   · have hc : J ∘ₗ D.actReal x = D.actReal x ∘ₗ J := hJO x (D.actReal x) fun y => rfl
     simp only
-    rw [D.toReal_actQ, D.toReal_actQ, ← LinearMap.comp_apply J, hc, LinearMap.comp_apply, D.ER_actReal]
+    rw [D.toReal_actQ, D.toReal_actQ, ← LinearMap.comp_apply J, hc, LinearMap.comp_apply,
+      D.ER_actReal]
   · simp only
     rw [D.toReal_smul, map_smul, LinearMap.map_smul₂, smul_eq_mul]
   · simp only
@@ -172,12 +192,12 @@ end
 namespace GlobalTheory.UPel.HT
 variable {p : ℕ} [Fact p.Prime]
 
-theorem Datum.isSemisimpleRing_algO_of_form (D : Datum p) (φ : D.VQ → D.VQ → ℝ)
-    (hpos : ∀ u, u ≠ 0 → 0 < φ u u)
+theorem Datum.isSemisimpleRing_algO_of_form
+    (D : Datum p) (φ : D.VQ → D.VQ → ℝ) (hpos : ∀ u, u ≠ 0 → 0 < φ u u)
     (hadj : ∀ (x : D.O) (u w : D.VQ), φ (D.actQ x u) w = φ u (D.actQ (D.star x).unop w))
     (hl : ∀ (q : ℚ) (u w : D.VQ), φ (q • u) w = q * φ u w)
-    (hr : ∀ (q : ℚ) (u w : D.VQ), φ u (q • w) = q * φ u w) : IsSemisimpleRing D.algO := by
-
+    (hr : ∀ (q : ℚ) (u w : D.VQ), φ u (q • w) = q * φ u w)
+    : IsSemisimpleRing D.algO := by
   have hB : ∀ h ∈ D.algO, D.adjE h ∈ D.algO ∧ ∀ u w, φ (h u) w = φ u (D.adjE h w) := by
     intro h hh
     obtain ⟨q, x, rfl⟩ := D.exists_of_mem_algO hh
@@ -254,8 +274,10 @@ end GlobalTheory.UPel.HT
 namespace GlobalTheory.UPel.HT
 variable {p : ℕ} [Fact p.Prime]
 
-theorem isSimpleRing_of_isSemisimpleRing {R : Type} [Ring R] [Nontrivial R] [IsSemisimpleRing R]
-    (h : ∀ e : R, (∀ x : R, e * x = x * e) → e * e = e → e = 0 ∨ e = 1) : IsSimpleRing R := by
+theorem isSimpleRing_of_isSemisimpleRing
+    {R : Type} [Ring R] [Nontrivial R] [IsSemisimpleRing R]
+    (h : ∀ e : R, (∀ x : R, e * x = x * e) → e * e = e → e = 0 ∨ e = 1)
+    : IsSimpleRing R := by
   classical
   obtain ⟨n, K, d, _, hd, ⟨φ⟩⟩ := IsSemisimpleRing.exists_ringEquiv_pi_matrix_divisionRing R
   rcases Nat.lt_or_ge n 2 with hn | hn
@@ -275,7 +297,9 @@ theorem isSimpleRing_of_isSemisimpleRing {R : Type} [Ring R] [Nontrivial R] [IsS
       · subst hi; simp [e]
       · simp [e, Pi.single_apply, hi]
     have hid : φ.symm e * φ.symm e = φ.symm e := by
-      rw [← map_mul]; congr 1; funext i
+      rw [← map_mul]
+      congr 1
+      funext i
       by_cases hi : i = i0
       · subst hi; simp [e]
       · simp [e, Pi.single_apply, hi]

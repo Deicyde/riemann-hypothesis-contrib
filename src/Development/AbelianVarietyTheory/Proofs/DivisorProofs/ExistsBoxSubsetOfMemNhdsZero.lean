@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCuspSpaceB
 @[expose] public section
 
 open ValuativeRel Matrix MeasureTheory
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.LocLanglands GlobalTheory.GamMul DiscreteGroups.sglob.LConv
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.Whittaker GlobalTheory.LocLanglands GlobalTheory.GamMul DiscreteGroups.sglob.LConv
 
 namespace GlobalTheory.GamMul.NearOne
 
@@ -20,9 +21,11 @@ theorem eventually_valuation_sub_lt_one (a : k) : ∀ᶠ x in nhds a, valuation 
     simpa using this.tendsto a
   exact hc h0
 
-theorem exists_box_subset_of_mem_nhds_zero {p q : ℕ} {S : Set (Matrix (Fin p) (Fin q) k)} (hS : S ∈ nhds 0) :
-    ∃ d : kˣ, valuation k (d : k) ≤ 1 ∧ box p q d ⊆ S := by
-  have hk : ∀ s ∈ nhds (0 : k), ∀ᶠ d in nhds (0 : k), {x : k | valuation k x ≤ valuation k d} ⊆ s := by
+theorem exists_box_subset_of_mem_nhds_zero
+    {p q : ℕ} {S : Set (Matrix (Fin p) (Fin q) k)} (hS : S ∈ nhds 0)
+    : ∃ d : kˣ, valuation k (d : k) ≤ 1 ∧ box p q d ⊆ S := by
+  have hk
+      : ∀ s ∈ nhds (0 : k), ∀ᶠ d in nhds (0 : k), {x : k | valuation k x ≤ valuation k d} ⊆ s := by
     intro s hs
     obtain ⟨r, hr, hrs⟩ := (IsValuativeTopology.hasBasis_nhds_zero' k).mem_iff.mp hs
     have h0 : {x : k | valuation k x < r} ∈ nhds (0 : k) :=
@@ -39,12 +42,15 @@ theorem exists_box_subset_of_mem_nhds_zero {p q : ℕ} {S : Set (Matrix (Fin p) 
     obtain ⟨J, u, hu, hJ⟩ := h
     exact ⟨u, hu, fun x hx => hJ fun j _ => hx j trivial⟩
   choose u hu hut using ht'
-  have hev : ∀ᶠ d in nhds (0 : k), valuation k (d - 0) < 1 ∧
-      ∀ i j, {x : k | valuation k x ≤ valuation k d} ⊆ u i j :=
+  have hev
+      : ∀ᶠ d in nhds (0 : k), valuation k (d - 0) < 1 ∧
+        ∀ i j, {x : k | valuation k x ≤ valuation k d} ⊆ u i j :=
     (eventually_valuation_sub_lt_one 0).and
       (Filter.eventually_all.mpr fun i => Filter.eventually_all.mpr fun j => hk _ (hu i j))
-  have hne : ∃ d : k, d ≠ 0 ∧ valuation k (d - 0) < 1 ∧
-      ∀ i j, {x : k | valuation k x ≤ valuation k d} ⊆ u i j := by
+  have hne
+      : ∃ d : k,
+        d ≠ 0 ∧ valuation k (d - 0) < 1
+          ∧ ∀ i j, {x : k | valuation k x ≤ valuation k d} ⊆ u i j := by
     have hd : (nhdsWithin (0 : k) {0}ᶜ).NeBot := by
       rw [← mem_closure_iff_nhdsWithin_neBot, mem_closure_iff_nhds]
       intro s hs
@@ -58,16 +64,25 @@ theorem exists_box_subset_of_mem_nhds_zero {p q : ℕ} {S : Set (Matrix (Fin p) 
       exact mul_lt_of_lt_one_left (zero_lt_iff.mpr hr) hr1
     exact (eventually_mem_nhdsWithin.and (hev.filter_mono (nhdsWithin_le_nhds (s := {0}ᶜ)))).exists
   obtain ⟨d, hd0, hd1, hdu⟩ := hne
-  refine ⟨Units.mk0 d hd0, by simpa using hd1.le, fun X hX => hI fun i _ => hut i fun j _ => hdu i j (hX i j)⟩
+  refine ⟨
+    Units.mk0 d hd0,
+    by simpa using hd1.le,
+    fun X hX => hI fun i _ => hut i fun j _ => hdu i j (hX i j)
+  ⟩
 
-theorem one_add_small_near_one (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : ℕ) (U : Set (GL (Fin n) k)) (hU : U ∈ nhds (1 : GL (Fin n) k)) :
-    ∃ d : kˣ, valuation k (d : k) ≤ 1 ∧ ∀ N ∈ box n n d, ∃ A : GL (Fin n) k, A.val = 1 + N ∧ A ∈ U ∧
-      valuation k (GeneralLinearGroup.det A : k) = 1 ∧ A⁻¹.val ∈ box n n 1 := by
+theorem one_add_small_near_one
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : ℕ) (U : Set (GL (Fin n) k)) (hU : U ∈ nhds (1 : GL (Fin n) k))
+    : ∃ d : kˣ,
+      valuation k (d : k) ≤ 1
+        ∧ ∀ N ∈ box n n d, ∃ A : GL (Fin n) k,
+          A.val = 1 + N ∧ A ∈ U ∧ valuation k (GeneralLinearGroup.det A : k) = 1
+            ∧ A⁻¹.val ∈ box n n 1 := by
   have hadd : Filter.Tendsto (fun N : Matrix (Fin n) (Fin n) k => 1 + N) (nhds 0) (nhds 1) := by
     have : Continuous (fun N : Matrix (Fin n) (Fin n) k => 1 + N) := by fun_prop
     simpa using this.tendsto 0
-  have hdet : Filter.Tendsto (fun N : Matrix (Fin n) (Fin n) k => (1 + N).det) (nhds 0) (nhds 1) := by
+  have hdet
+      : Filter.Tendsto (fun N : Matrix (Fin n) (Fin n) k => (1 + N).det) (nhds 0) (nhds 1) := by
     have : Continuous (fun M : Matrix (Fin n) (Fin n) k => M.det) := continuous_id.matrix_det
     have h2 := (this.tendsto 1).comp hadd
     rw [det_one] at h2
@@ -87,7 +102,8 @@ theorem one_add_small_near_one (k : Type) [Field k] [ValuativeRel k] [Topologica
     simpa using this
   have hb : ∀ᶠ N : Matrix (Fin n) (Fin n) k in nhds 0, ∀ i j, valuation k ((1 + N)⁻¹ i j) ≤ 1 := by
     refine Filter.eventually_all.mpr fun i => Filter.eventually_all.mpr fun j => ?_
-    have hc : Continuous (fun M : Matrix (Fin n) (Fin n) k => M i j) := continuous_id.matrix_elem i j
+    have hc : Continuous (fun M : Matrix (Fin n) (Fin n) k => M i j) :=
+      continuous_id.matrix_elem i j
     filter_upwards [((hc.tendsto 1).comp hinv) (eventually_valuation_sub_lt_one _)] with N hN
     have hN' : valuation k ((1 + N)⁻¹ i j - (1 : Matrix (Fin n) (Fin n) k) i j) < 1 := hN
     have h1 : valuation k ((1 : Matrix (Fin n) (Fin n) k) i j) ≤ 1 := by
@@ -95,7 +111,9 @@ theorem one_add_small_near_one (k : Type) [Field k] [ValuativeRel k] [Topologica
       split_ifs <;> simp
     have := Valuation.map_add_le (valuation k) hN'.le h1
     simpa using this
-  have hval : ∀ N : Matrix (Fin n) (Fin n) k, valuation k (1 + N).det = 1 → (toGL (1 + N)).val = 1 + N := by
+  have hval
+      : ∀ N : Matrix (Fin n) (Fin n) k,
+        valuation k (1 + N).det = 1 → (toGL (1 + N)).val = 1 + N := by
     intro N hN
     have hu : IsUnit (1 + N) := by
       rw [Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero]
@@ -105,7 +123,8 @@ theorem one_add_small_near_one (k : Type) [Field k] [ValuativeRel k] [Topologica
     unfold toGL
     rw [dite_eq_left hu]
     rfl
-  have hGL : Filter.Tendsto (fun N : Matrix (Fin n) (Fin n) k => toGL (1 + N)) (nhds 0) (nhds 1) := by
+  have hGL
+      : Filter.Tendsto (fun N : Matrix (Fin n) (Fin n) k => toGL (1 + N)) (nhds 0) (nhds 1) := by
     rw [Units.isInducing_embedProduct.tendsto_nhds_iff]
     have h3 := hadd.prodMk_nhds ((MulOpposite.continuous_op.tendsto 1).comp hinv)
     have e : (Units.embedProduct _ (1 : GL (Fin n) k)) = (1, MulOpposite.op 1) := by simp
@@ -113,7 +132,8 @@ theorem one_add_small_near_one (k : Type) [Field k] [ValuativeRel k] [Topologica
     refine Filter.Tendsto.congr' ?_ h3
     filter_upwards [hv] with N hN
     simp only [Function.comp, Units.embedProduct_apply, Matrix.coe_units_inv, hval N hN]
-  obtain ⟨d, hd, hS⟩ := exists_box_subset_of_mem_nhds_zero (p := n) (q := n) (hv.and (hb.and (hGL hU)))
+  obtain ⟨d, hd, hS⟩ :=
+    exists_box_subset_of_mem_nhds_zero (p := n) (q := n) (hv.and (hb.and (hGL hU)))
   refine ⟨d, hd, fun N hN => ?_⟩
   obtain ⟨h1, h2, h3⟩ := hS hN
   refine ⟨toGL (1 + N), hval N h1, h3, ?_, fun i j => ?_⟩

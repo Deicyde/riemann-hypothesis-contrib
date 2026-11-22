@@ -9,8 +9,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.grLocal :
-    ∀ (p : ℕ) [Fact p.Prime] (R G : Type) [CommRing R] [IsLocalRing R] [CommGroup G] [Finite G], (p : R) ∈ IsLocalRing.maximalIdeal R → IsPGroup p G → ∃ _ : IsLocalRing (MonoidAlgebra R G), IsLocalRing.maximalIdeal (MonoidAlgebra R G) = (IsLocalRing.maximalIdeal R).comap (aug R G) ∧ IsLocalRing.maximalIdeal (MonoidAlgebra R G) = (IsLocalRing.maximalIdeal R).map (algebraMap R (MonoidAlgebra R G)) ⊔ augIdeal R G ∧ ∀ x, IsUnit x ↔ IsUnit (aug R G x) := by
+theorem UpperTheory.V.CF.grLocal
+    : ∀ (p : ℕ) [Fact p.Prime] (R G : Type) [CommRing R] [IsLocalRing R] [CommGroup G] [Finite G],
+      (p : R) ∈ IsLocalRing.maximalIdeal R → IsPGroup p G
+        → ∃ _ : IsLocalRing (MonoidAlgebra R G),
+          IsLocalRing.maximalIdeal (MonoidAlgebra R G)
+              = (IsLocalRing.maximalIdeal R).comap (aug R G)
+            ∧ IsLocalRing.maximalIdeal (MonoidAlgebra R G)
+              = (IsLocalRing.maximalIdeal R).map (algebraMap R (MonoidAlgebra R G)) ⊔ augIdeal R G
+            ∧ ∀ x, IsUnit x ↔ IsUnit (aug R G x) := by
   intro p _ R G _ _ _ _ hpm hG
   set J : Ideal (MonoidAlgebra R G) := (IsLocalRing.maximalIdeal R).comap (aug R G) with hJdef
   have hJ : J.IsMaximal :=
@@ -20,21 +27,25 @@ theorem UpperTheory.V.CF.grLocal :
   letI hloc : IsLocalRing (MonoidAlgebra R G) := IsLocalRing.of_unique_max_ideal huniq
   have hmax : IsLocalRing.maximalIdeal (MonoidAlgebra R G) = J :=
     (IsLocalRing.eq_maximalIdeal hJ).symm
-  have hsec : ∀ r : R, aug R G (algebraMap R (MonoidAlgebra R G) r) = r := fun r => (aug R G).commutes r
+  have hsec : ∀ r : R, aug R G (algebraMap R (MonoidAlgebra R G) r) = r := fun r =>
+    (aug R G).commutes r
   refine ⟨hloc, hmax, ?_, ?_⟩
   · rw [hmax]
     apply le_antisymm
     · intro x hx
       have hax : aug R G x ∈ IsLocalRing.maximalIdeal R := hx
-      have h1 : algebraMap R (MonoidAlgebra R G) (aug R G x) ∈
-          (IsLocalRing.maximalIdeal R).map (algebraMap R (MonoidAlgebra R G)) :=
+      have h1
+          : algebraMap R (MonoidAlgebra R G) (aug R G x)
+            ∈ (IsLocalRing.maximalIdeal R).map (algebraMap R (MonoidAlgebra R G)) :=
         Ideal.mem_map_of_mem _ hax
       have h2 : x - algebraMap R (MonoidAlgebra R G) (aug R G x) ∈ augIdeal R G := by
         rw [← (UpperTheory.V.CF.augKer R G).1, RingHom.mem_ker]
         show aug R G (x - algebraMap R (MonoidAlgebra R G) (aug R G x)) = 0
         rw [map_sub, hsec, sub_self]
-      have : x = algebraMap R (MonoidAlgebra R G) (aug R G x) +
-          (x - algebraMap R (MonoidAlgebra R G) (aug R G x)) := by ring
+      have : x
+          = algebraMap R (MonoidAlgebra R G) (aug R G x)
+            + (x - algebraMap R (MonoidAlgebra R G) (aug R G x)) := by
+        ring
       rw [this]
       exact Ideal.add_mem _ (Ideal.mem_sup_left h1) (Ideal.mem_sup_right h2)
     · apply sup_le

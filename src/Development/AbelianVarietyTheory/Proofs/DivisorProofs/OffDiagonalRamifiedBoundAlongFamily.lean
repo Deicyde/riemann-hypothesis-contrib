@@ -14,11 +14,14 @@ noncomputable section
 
 namespace GlobalTheory.RamifiedOffD
 
-open Formalism.MainNotions.G GlobalTheory.HCEntries GlobalTheory.FockDegreeGap GlobalTheory.RamifiedLoss
+open Formalism.MainNotions.G GlobalTheory.HCEntries GlobalTheory.FockDegreeGap
+  GlobalTheory.RamifiedLoss
 
 variable {D : D7} {L : SizeData₂ D}
 
-theorem offDiagonalRamified_bound_const_four (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.sc.x) : Formalism.MainNotions.WeightDegreeSizes.DiscriminantOffsetBound D L 4 := by
+theorem offDiagonalRamified_bound_const_four
+    (h : SizesAt L) (P : ParameterChoice' D L) (hx : 2 ≤ L.sc.x)
+    : Formalism.MainNotions.WeightDegreeSizes.DiscriminantOffsetBound D L 4 := by
   intro j hj
   have hp : D.host.d.Prime := D.host.hyp.2.1
   have hb := one_le_b L
@@ -51,10 +54,20 @@ theorem offDiagonalRamified_bound_const_four (h : SizesAt L) (P : ParameterChoic
     mul_le_mul hlog hE2 (abs_nonneg _) (by linarith)
   nlinarith
 
-theorem offDiagonalRamified_bound_along_family : ∀ {eps : ℝ} (Fm : FamP eps), 0 < eps → eps < 1 / 52 → ∃ C x0 : ℝ, 0 ≤ C ∧ ∀ x, x0 ≤ x → ∀ hx : Fm.x1 < x, ∀ i : Fm.Ix x, Formalism.MainNotions.WeightDegreeSizes.DiscriminantOffsetBound (Fm.D x i) (Fm.L x i) C := by
+theorem offDiagonalRamified_bound_along_family
+    : ∀ {eps : ℝ} (Fm : FamP eps),
+      0 < eps → eps < 1 / 52
+        → ∃ C x0 : ℝ,
+          0 ≤ C
+            ∧ ∀ x,
+              x0 ≤ x
+                → ∀ hx : Fm.x1 < x, ∀ i : Fm.Ix x,
+                  Formalism.MainNotions.WeightDegreeSizes.DiscriminantOffsetBound (Fm.D x i)
+                    (Fm.L x i) C := by
   intro eps Fm _ _
   refine ⟨4, 2, by norm_num, fun x hx0 hx i => ?_⟩
-  exact offDiagonalRamified_bound_const_four (Fm.sizes x hx i) (Fm.params x hx i) (by rw [Fm.L_x x i hx]; exact hx0)
+  exact offDiagonalRamified_bound_const_four (Fm.sizes x hx i) (Fm.params x hx i)
+    (by rw [Fm.L_x x i hx]; exact hx0)
 
 end GlobalTheory.RamifiedOffD
 

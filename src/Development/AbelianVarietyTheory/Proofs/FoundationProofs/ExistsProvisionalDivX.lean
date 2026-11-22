@@ -21,47 +21,59 @@ namespace GlobalTheory.ProvisionalDivX
 
 section Form
 
-variable {K : Type} [Field K] (e : K →+* ℂ) {W : Type} [AddCommGroup W] [Module ℂ W] {n : ℕ}
-  (c : Module.Basis (Fin n) ℂ W)
+variable
+  {K : Type} [Field K]
+  (e : K →+* ℂ)
+  {W : Type} [AddCommGroup W] [Module ℂ W]
+  {n : ℕ} (c : Module.Basis (Fin n) ℂ W)
 
 end Form
 
 structure MjForm (D : D7) (j : ℕ) where
-
   H : HLat D.what₂.LL
-
   jm : H.V →ₛₗ[D.what₂.embLL] D.what₂.Mj j
   good : H.Good
-  basis : LinearIndependent ℂ (fun i => jm (H.b i)) ∧
-    Submodule.span ℂ (Set.range (fun i => jm (H.b i))) = ⊤
-  lat : 1 ≤ j → j ≤ D.R.m → ∀ x, x ∈ H.L ↔ ∃ c : D.what₂.Mj j → 𝓞 D.what₂.LL,
-    jm x = ∑ v ∈ (D.what₂.MjLat j).gen, D.what₂.embLL ((c v : 𝓞 D.what₂.LL) : D.what₂.LL) • v
+  basis
+    : LinearIndependent ℂ (fun i => jm (H.b i))
+      ∧ Submodule.span ℂ (Set.range (fun i => jm (H.b i))) = ⊤
+  lat
+    : 1 ≤ j → j ≤ D.R.m
+      → ∀ x,
+        x ∈ H.L
+          ↔ ∃ c : D.what₂.Mj j → 𝓞 D.what₂.LL,
+            jm x
+              = ∑ v ∈ (D.what₂.MjLat j).gen, D.what₂.embLL ((c v : 𝓞 D.what₂.LL) : D.what₂.LL) • v
   sub : 1 ≤ j → j ≤ D.R.m → ∀ x ∈ (D.what₂.MjLat j).gen, x ∈ Set.range jm
-  metric : ∀ x, Formalism.HermitianLatticesTheory.cnorm (Formalism.HermitianLatticesTheory.fcoord H.b H.X
-    (InfinitePlace.mk D.what₂.embLL) x) = ‖jm x‖
+  metric
+    : ∀ x,
+      Formalism.HermitianLatticesTheory.cnorm (Formalism.HermitianLatticesTheory.fcoord H.b H.X
+          (InfinitePlace.mk D.what₂.embLL) x)
+        = ‖jm x‖
 
-theorem resChar_eq_iff (D : D7) {p : ℕ} (hp : p.Prime) (w : D.what₂.places.Pl) :
-    D.what₂.places.resChar w = p ↔ (p : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
+theorem resChar_eq_iff (D : D7) {p : ℕ} (hp : p.Prime) (w : D.what₂.places.Pl)
+    : D.what₂.places.resChar w = p ↔ (p : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
   constructor
   · intro h; rw [← h]; exact resChar_mem D w
   · intro hmem
     by_contra hne
     have hcop : Nat.Coprime (D.what₂.places.resChar w) p :=
       (Nat.coprime_primes (D.what₂.places.resChar_prime w) hp).mpr hne
-    obtain ⟨a, b, hab⟩ : IsCoprime ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) (p : 𝓞 D.what₂.LL) :=
+    obtain ⟨a, b, hab⟩
+        : IsCoprime ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) (p : 𝓞 D.what₂.LL) :=
       hcop.cast
     apply (D.plEq w).isPrime.ne_top
     rw [Ideal.eq_top_iff_one, ← hab]
     exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (resChar_mem D w)) (Ideal.mul_mem_left _ _ hmem)
 
-def placeEquiv (D : D7) (p : ℕ) [hp : Fact p.Prime] :
-    Formalism.L2.Geo.PlL D p ≃ {w : D.what₂.places.Pl // D.what₂.places.resChar w = p} :=
+def placeEquiv (D : D7) (p : ℕ) [hp : Fact p.Prime]
+    : Formalism.L2.Geo.PlL D p ≃ {w : D.what₂.places.Pl // D.what₂.places.resChar w = p} :=
   (D.plEq.subtypeEquiv (resChar_eq_iff D hp.out)).symm
 
-theorem wtL_eq_ramIdx_mul (D : D7) (p : ℕ) [hp : Fact p.Prime] (la : Formalism.L2.Geo.PlL D p) :
-    Formalism.L2.Geo.wtL D p la = (D.what₂.places.ramIdx (placeEquiv D p la).1 : ℝ) *
-      (padicValNat p (Ideal.absNorm (D.plEq (placeEquiv D p la).1).asIdeal) : ℝ) /
-        (Module.finrank ℚ D.what₂.LL : ℝ) := by
+theorem wtL_eq_ramIdx_mul (D : D7) (p : ℕ) [hp : Fact p.Prime] (la : Formalism.L2.Geo.PlL D p)
+    : Formalism.L2.Geo.wtL D p la
+      = (D.what₂.places.ramIdx (placeEquiv D p la).1 : ℝ)
+        * (padicValNat p (Ideal.absNorm (D.plEq (placeEquiv D p la).1).asIdeal) : ℝ)
+        / (Module.finrank ℚ D.what₂.LL : ℝ) := by
   have he : D.plEq (placeEquiv D p la).1 = la.1 := D.plEq.apply_symm_apply _
   have := liesOver_of_mem p hp.out la.1 la.2
   have hN := Ideal.pow_inertiaDeg p la.1.asIdeal
@@ -82,13 +94,16 @@ namespace GlobalTheory
 
 open ProvisionalDivX
 
-def provisionalDivX (D : D7) (G : DV.Geo D.what₂.LL) (Y : G.Var)
+def provisionalDivX
+    (D : D7) (G : DV.Geo D.what₂.LL) (Y : G.Var)
     (jc : ∀ (p : ℕ) [Fact p.Prime], DV.KW p →+* ℂ)
     (M : ∀ (p : ℕ) [Fact p.Prime] (r : ℕ),
       DV.Mdl D p (max r 2) (DV.rkOf (DV.PsiOf D (jc p)) (max r 2) 1))
-    (F : ∀ j, MjForm D j) : DivX D :=
+    (F : ∀ j, MjForm D j)
+    : DivX D :=
   letI := D.host.cmStar
-  { geo := G
+  {
+    geo := G
     Lev := Unit
     levPr := fun _ => ∅
     shv := fun S _ => smallShim D S.rank
@@ -112,11 +127,12 @@ def provisionalDivX (D : D7) (G : DV.Geo D.what₂.LL) (Y : G.Var)
     CurveM := fun _ _ _ _ _ _ => Empty
     degM := fun _ _ _ _ _ _ _ _ => 0
     htMdl := fun _ _ _ _ _ => ()
-    htCurve := fun _ _ p _ =>
-      { toFun := fun c => Empty.elim c
-        invFun := fun c => c.2
-        left_inv := fun c => Empty.elim c
-        right_inv := fun c => Empty.elim c.2 }
+    htCurve := fun _ _ p _ => {
+      toFun := fun c => Empty.elim c
+      invFun := fun c => c.2
+      left_inv := fun c => Empty.elim c
+      right_inv := fun c => Empty.elim c.2
+    }
     htCurve_deg := fun _ _ _ _ c => Empty.elim c
     MjH := fun j => (F j).H
     MjH_good := fun j => (F j).good
@@ -155,7 +171,8 @@ def provisionalDivX (D : D7) (G : DV.Geo D.what₂.LL) (Y : G.Var)
     surfCh2 := fun s => s.elim
     surfDegOm := fun s => s.elim
     SurfFp := Empty
-    surfFpCh2 := fun s => s.elim }
+    surfFpCh2 := fun s => s.elim
+  }
 
 end GlobalTheory
 

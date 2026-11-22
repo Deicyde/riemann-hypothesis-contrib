@@ -29,12 +29,14 @@ def polyS (S : Subring R) : Subring R[X] where
   add_mem' := by
     intro p q hp hq k
     show (p + q).coeff k ∈ S
-    rw [Polynomial.coeff_add]; exact S.add_mem (hp k) (hq k)
+    rw [Polynomial.coeff_add]
+    exact S.add_mem (hp k) (hq k)
   zero_mem' := by intro k; show (0 : R[X]).coeff k ∈ S; simp [S.zero_mem]
   neg_mem' := by
     intro p hp k
     show (-p).coeff k ∈ S
-    rw [Polynomial.coeff_neg]; exact S.neg_mem (hp k)
+    rw [Polynomial.coeff_neg]
+    exact S.neg_mem (hp k)
 
 lemma C_mem_polyS {S : Subring R} {c : R} (hc : c ∈ S) : C c ∈ polyS S := by
   intro k
@@ -60,8 +62,7 @@ lemma comp_mem_polyS {S : Subring R} {p q : R[X]} (hp : p ∈ polyS S) (hq : q �
 def term (ρ : G →* Matrix n n R) (L : R × ℕ × G) : Matrix n n R[X] :=
   (C L.1 * X ^ L.2.1) • (C : R →+* R[X]).mapMatrix (ρ L.2.2)
 
-def F (ρ : G →* Matrix n n R) (l : List (R × ℕ × G)) : R[X] :=
-  Matrix.det (1 - (l.map (term ρ)).sum)
+def F (ρ : G →* Matrix n n R) (l : List (R × ℕ × G)) : R[X] := Matrix.det (1 - (l.map (term ρ)).sum)
 
 def newL (L0 L : R × ℕ × G) (k : ℕ) : R × ℕ × G :=
   (L0.1 ^ k * L.1, k * L0.2.1 + L.2.1, L0.2.2 ^ k * L.2.2)
@@ -251,16 +252,17 @@ lemma allD (ρ : G →* Matrix n n R) (hS : ∀ g k, (Matrix.charpolyRev (ρ g))
 
 end Trunc
 
-theorem core {S : Subring R} (ρ : G →* Matrix n n R)
-    (hS : ∀ g k, (Matrix.charpolyRev (ρ g)).coeff k ∈ S)
-    (l : List (R × ℕ × G)) (hl : ∀ L ∈ l, L.1 ∈ S ∧ 1 ≤ L.2.1) (k : ℕ) : (F ρ l).coeff k ∈ S := by
+theorem core
+    {S : Subring R} (ρ : G →* Matrix n n R) (hS : ∀ g k, (Matrix.charpolyRev (ρ g)).coeff k ∈ S)
+    (l : List (R × ℕ × G)) (hl : ∀ L ∈ l, L.1 ∈ S ∧ 1 ≤ L.2.1)
+    (k : ℕ)
+    : (F ρ l).coeff k ∈ S := by
   have h := allD k ρ hS (k + 1) 1 le_rfl (by omega) l hl
   obtain ⟨q, hq, hqe⟩ := Subring.mem_map.1 h
   have hmem : F ρ l - q ∈ Ideal.span {(X : R[X]) ^ (k + 1)} := by
     rw [← Ideal.Quotient.eq]; exact hqe.symm
   obtain ⟨h', hh'⟩ := Ideal.mem_span_singleton'.1 hmem
-  have e : (F ρ l - q).coeff k = 0 := by
-    rw [← hh', Polynomial.coeff_mul_X_pow', if_neg (by omega)]
+  have e : (F ρ l - q).coeff k = 0 := by rw [← hh', Polynomial.coeff_mul_X_pow', if_neg (by omega)]
   rw [Polynomial.coeff_sub, sub_eq_zero] at e
   rw [e]
   exact hq k
@@ -297,20 +299,28 @@ def S1 (T : Subalgebra O (Xs → O)) (m : ℕ) : Subring (Xs → MvPolynomial (F
     intro f g hf hg α
     show (fun x => ((f * g) x).coeff α) ∈ MainNotions T
     simp only [Pi.mul_apply, MvPolynomial.coeff_mul]
-    have key : ∀ s : Finset ((Fin m →₀ ℕ) × (Fin m →₀ ℕ)),
-        (fun x => ∑ p ∈ s, (f x).coeff p.1 * (g x).coeff p.2) ∈ MainNotions T := by
+    have key
+        : ∀ s : Finset ((Fin m →₀ ℕ) × (Fin m →₀ ℕ)),
+          (fun x => ∑ p ∈ s, (f x).coeff p.1 * (g x).coeff p.2) ∈ MainNotions T := by
       intro s
       induction s using Finset.induction_on with
       | empty =>
-        have e : (fun x => ∑ p ∈ (∅ : Finset ((Fin m →₀ ℕ) × (Fin m →₀ ℕ))),
-            (f x).coeff p.1 * (g x).coeff p.2) = 0 := by funext x; simp
-        rw [e]; exact (MainNotions T).zero_mem
+        have e
+            : (fun x =>
+                ∑ p ∈ (∅ : Finset ((Fin m →₀ ℕ) × (Fin m →₀ ℕ))),
+                  (f x).coeff p.1 * (g x).coeff p.2)
+              = 0 := by
+          funext x; simp
+        rw [e]
+        exact (MainNotions T).zero_mem
       | insert a s ha ih =>
-        have e : (fun x => ∑ p ∈ insert a s, (f x).coeff p.1 * (g x).coeff p.2) =
-            (fun x => (f x).coeff a.1) * (fun x => (g x).coeff a.2) +
-              (fun x => ∑ p ∈ s, (f x).coeff p.1 * (g x).coeff p.2) := by
+        have e
+            : (fun x => ∑ p ∈ insert a s, (f x).coeff p.1 * (g x).coeff p.2)
+              = (fun x => (f x).coeff a.1) * (fun x => (g x).coeff a.2)
+                + (fun x => ∑ p ∈ s, (f x).coeff p.1 * (g x).coeff p.2) := by
           funext x; simp [Finset.sum_insert ha]
-        rw [e]; exact (MainNotions T).add_mem ((MainNotions T).mul_mem (hf _) (hg _)) ih
+        rw [e]
+        exact (MainNotions T).add_mem ((MainNotions T).mul_mem (hf _) (hg _)) ih
     exact key _
   one_mem' := by
     intro α
@@ -318,26 +328,32 @@ def S1 (T : Subalgebra O (Xs → O)) (m : ℕ) : Subring (Xs → MvPolynomial (F
     by_cases h : (0 : Fin m →₀ ℕ) = α
     · have e : (fun x => ((1 : Xs → MvPolynomial (Fin m) K) x).coeff α) = 1 := by
         funext x; simp [MvPolynomial.coeff_one, h]
-      rw [e]; exact (MainNotions T).one_mem
+      rw [e]
+      exact (MainNotions T).one_mem
     · have e : (fun x => ((1 : Xs → MvPolynomial (Fin m) K) x).coeff α) = 0 := by
         funext x; simp [MvPolynomial.coeff_one, h]
-      rw [e]; exact (MainNotions T).zero_mem
+      rw [e]
+      exact (MainNotions T).zero_mem
   add_mem' := by
     intro f g hf hg α
-    have e : (fun x => ((f + g) x).coeff α) = (fun x => (f x).coeff α) + (fun x => (g x).coeff α) := by
+    have e
+        : (fun x => ((f + g) x).coeff α) = (fun x => (f x).coeff α) + (fun x => (g x).coeff α) := by
       funext x; simp
     show (fun x => ((f + g) x).coeff α) ∈ MainNotions T
-    rw [e]; exact (MainNotions T).add_mem (hf α) (hg α)
+    rw [e]
+    exact (MainNotions T).add_mem (hf α) (hg α)
   zero_mem' := by
     intro α
     have e : (fun x => ((0 : Xs → MvPolynomial (Fin m) K) x).coeff α) = 0 := by funext x; simp
     show (fun x => ((0 : Xs → MvPolynomial (Fin m) K) x).coeff α) ∈ MainNotions T
-    rw [e]; exact (MainNotions T).zero_mem
+    rw [e]
+    exact (MainNotions T).zero_mem
   neg_mem' := by
     intro f hf α
     have e : (fun x => ((-f) x).coeff α) = -(fun x => (f x).coeff α) := by funext x; simp
     show (fun x => ((-f) x).coeff α) ∈ MainNotions T
-    rw [e]; exact (MainNotions T).neg_mem (hf α)
+    rw [e]
+    exact (MainNotions T).neg_mem (hf α)
 
 end
 
@@ -394,8 +410,8 @@ open DetPolyCore DetPolyApp
 theorem det_poly_statement : LemmaDetPoly := by
   intro O K Xs G _ _ _ _ n _ _ T r hchar m a ha s
   choose sg c hc hae using ha
-  let coefL : (Σ _ : Fin m, G) → Xs → MvPolynomial (Fin m) K :=
-    fun p x => MvPolynomial.X p.1 * MvPolynomial.C (algebraMap O K (c p.1 p.2 x))
+  let coefL : (Σ _ : Fin m, G) → Xs → MvPolynomial (Fin m) K := fun p x =>
+    MvPolynomial.X p.1 * MvPolynomial.C (algebraMap O K (c p.1 p.2 x))
   have hcoef : ∀ p, coefL p ∈ S1 (K := K) T m := by
     intro p α
     show FromT T (fun x => (MvPolynomial.X p.1 * MvPolynomial.C (algebraMap O K (c p.1 p.2 x))).coeff α)
@@ -410,16 +426,20 @@ theorem det_poly_statement : LemmaDetPoly := by
       exact mem_mainNotions_iff_fromT.1 (MainNotions (K := K) T).zero_mem
   have hS : ∀ g k, (Matrix.charpolyRev (rho r m g)).coeff k ∈ S1 (K := K) T m := by
     intro g k α
-    have e : ∀ x, (Matrix.charpolyRev (rho r m g)).coeff k x =
-        MvPolynomial.C ((Matrix.charpolyRev (r g x)).coeff k) := by
+    have e
+        : ∀ x,
+          (Matrix.charpolyRev (rho r m g)).coeff k x
+            = MvPolynomial.C ((Matrix.charpolyRev (r g x)).coeff k) := by
       intro x
-      have h1 : (Matrix.charpolyRev (rho r m g)).coeff k x =
-          ((Matrix.charpolyRev (rho r m g)).map
-            (Pi.evalRingHom (fun _ : Xs => MvPolynomial (Fin m) K) x)).coeff k := by
+      have h1
+          : (Matrix.charpolyRev (rho r m g)).coeff k x
+            = ((Matrix.charpolyRev (rho r m g)).map
+              (Pi.evalRingHom (fun _ : Xs => MvPolynomial (Fin m) K) x)).coeff k := by
         rw [Polynomial.coeff_map]; rfl
       rw [h1, charpolyRev_map,
-        show (rho r m g).map (Pi.evalRingHom (fun _ : Xs => MvPolynomial (Fin m) K) x) =
-          (r g x).map MvPolynomial.C from Matrix.ext fun i j => rfl,
+        show (rho r m g).map (Pi.evalRingHom (fun _ : Xs => MvPolynomial (Fin m) K) x)
+            = (r g x).map MvPolynomial.C from
+          Matrix.ext fun i j => rfl,
         ← charpolyRev_map, Polynomial.coeff_map]
     show FromT T (fun x => ((Matrix.charpolyRev (rho r m g)).coeff k x).coeff α)
     simp only [e, MvPolynomial.coeff_C]
@@ -446,10 +466,14 @@ theorem det_poly_statement : LemmaDetPoly := by
   rw [hF] at hcore
   have hdet : Mt.det ∈ S1 (K := K) T m := by
     rw [det_eq_coeff]
-    exact (S1 (K := K) T m).mul_mem ((S1 (K := K) T m).pow_mem
-      ((S1 (K := K) T m).neg_mem (S1 (K := K) T m).one_mem) _) hcore
-  have hx : ∀ x, Mt.det x = Matrix.det (∑ i, (MvPolynomial.X i : MvPolynomial (Fin m) K) •
-      (a i x).map MvPolynomial.C) := by
+    exact (S1 (K := K) T m).mul_mem
+      ((S1 (K := K) T m).pow_mem ((S1 (K := K) T m).neg_mem (S1 (K := K) T m).one_mem) _) hcore
+  have hx
+      : ∀ x,
+        Mt.det x
+          = Matrix.det
+            (∑ i, (MvPolynomial.X i : MvPolynomial (Fin m) K) •
+              (a i x).map MvPolynomial.C) := by
     intro x
     rw [show Mt.det x = Pi.evalRingHom (fun _ : Xs => MvPolynomial (Fin m) K) x Mt.det from rfl,
       RingHom.map_det]

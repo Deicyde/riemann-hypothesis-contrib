@@ -52,10 +52,14 @@ section Col
 variable {N r K : ℕ}
 
 structure ColOK (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) : Prop where
-  rise : ∀ (j : ℕ) (h : j < N), colH (mu ⟨j, by omega⟩) c < colH (mu ⟨j + 1, by omega⟩) c →
-    LL.vec ⟨j, h⟩ = true ∧ colH (mu ⟨j + 1, by omega⟩) c = colH (mu ⟨j, by omega⟩) c + 1
-  fall : ∀ (j : ℕ) (h : j < N), colH (mu ⟨j + 1, by omega⟩) c < colH (mu ⟨j, by omega⟩) c →
-    LL.vec ⟨j, h⟩ = false ∧ colH (mu ⟨j, by omega⟩) c = colH (mu ⟨j + 1, by omega⟩) c + 1
+  rise
+    : ∀ (j : ℕ) (h : j < N),
+      colH (mu ⟨j, by omega⟩) c < colH (mu ⟨j + 1, by omega⟩) c
+        → LL.vec ⟨j, h⟩ = true ∧ colH (mu ⟨j + 1, by omega⟩) c = colH (mu ⟨j, by omega⟩) c + 1
+  fall
+    : ∀ (j : ℕ) (h : j < N),
+      colH (mu ⟨j + 1, by omega⟩) c < colH (mu ⟨j, by omega⟩) c
+        → LL.vec ⟨j, h⟩ = false ∧ colH (mu ⟨j, by omega⟩) c = colH (mu ⟨j + 1, by omega⟩) c + 1
   start : 1 ≤ c → colH (mu ⟨0, by omega⟩) c = 0
   dual : ¬ 1 ≤ c → ∀ (j : ℕ) (h : j ≤ N), r < colH (mu ⟨j, by omega⟩) c
 

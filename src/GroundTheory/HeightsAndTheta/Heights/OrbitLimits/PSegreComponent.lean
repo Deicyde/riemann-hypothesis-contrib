@@ -11,16 +11,18 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1
 
 universe u v w
 
-theorem SegreComponent.proof (h₁ : ChartDimBound.Statement.{u, v, w})
-    (h₂ : ChartFiniteIrrel.Statement.{u, v, w}) : SegreComponent.Statement.{u, v, w} := by
+theorem SegreComponent.proof
+    (h₁ : ChartDimBound.Statement.{u, v, w}) (h₂ : ChartFiniteIrrel.Statement.{u, v, w})
+    : SegreComponent.Statement.{u, v, w} := by
   intro K _ ι _ F _ V n f hV hf
   by_contra hne
-  have hirr : ∀ W ∈ (V ⊔ Ideal.span {f}).minimalPrimes, ¬ IsRelevant W :=
-    fun W hW hrel => hne ⟨W, hW, hrel⟩
+  have hirr : ∀ W ∈ (V ⊔ Ideal.span {f}).minimalPrimes, ¬ IsRelevant W := fun W hW hrel =>
+    hne ⟨W, hW, hrel⟩
   obtain ⟨i, hi⟩ : ∃ i, IsChart V i :=
     ⟨fun k => (hV.1.2.2 k).choose, fun k => (hV.1.2.2 k).choose_spec⟩
   have := h₂ K ι F V f i hV.1.2.1 hf hirr

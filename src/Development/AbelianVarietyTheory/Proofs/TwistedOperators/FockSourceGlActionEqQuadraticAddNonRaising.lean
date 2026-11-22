@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ChosenSer
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Matrix GlobalTheory.Chain GlobalTheory.Chain.RealIt
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Matrix GlobalTheory.Chain
+  GlobalTheory.Chain.RealIt
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -15,8 +18,8 @@ namespace GlobalTheory.Chain.RealIt.FockSrcDec
 
 open GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators
 
-theorem deg_X_pderiv {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ) :
-    (MvPolynomial.X a * MvPolynomial.pderiv b P).totalDegree ≤ P.totalDegree := by
+theorem deg_X_pderiv {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ)
+    : (MvPolynomial.X a * MvPolynomial.pderiv b P).totalDegree ≤ P.totalDegree := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     conv_lhs => rw [P.as_sum, map_sum, Finset.mul_sum]
@@ -34,16 +37,16 @@ theorem deg_X_pderiv {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ) :
     rw [Finsupp.sum_add_index' (by simp) (by simp), Finsupp.sum_add_index' (by simp) (by simp)]
     simp [Function.id_def]
 
-theorem deg_pderiv {σ : Type} (b : σ) (P : MvPolynomial σ ℂ) :
-    (MvPolynomial.pderiv b P).totalDegree ≤ P.totalDegree := by
+theorem deg_pderiv {σ : Type} (b : σ) (P : MvPolynomial σ ℂ)
+    : (MvPolynomial.pderiv b P).totalDegree ≤ P.totalDegree := by
   by_cases h : MvPolynomial.pderiv b P = 0
   · simp [h]
   · have := deg_X_pderiv b b P
     rw [MvPolynomial.totalDegree_mul_of_isDomain (MvPolynomial.X_ne_zero _) h] at this
     omega
 
-theorem deg_pderiv_X {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ) :
-    (MvPolynomial.pderiv b (MvPolynomial.X a * P)).totalDegree ≤ P.totalDegree := by
+theorem deg_pderiv_X {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ)
+    : (MvPolynomial.pderiv b (MvPolynomial.X a * P)).totalDegree ≤ P.totalDegree := by
   classical
   rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul]
   refine (MvPolynomial.totalDegree_add _ _).trans (max_le (deg_X_pderiv _ _ _) ?_)
@@ -56,14 +59,17 @@ def nonRaising (σ : Type) : Submodule ℂ (Module.End ℂ (MvPolynomial σ ℂ)
   zero_mem' P := by simp
   smul_mem' c L h P := (MvPolynomial.totalDegree_smul_le _ _).trans (h P)
 
-theorem mem_nonRaising {σ : Type} {L : Module.End ℂ (MvPolynomial σ ℂ)} :
-    L ∈ nonRaising σ ↔ ∀ P, (L P).totalDegree ≤ P.totalDegree := Iff.rfl
+theorem mem_nonRaising {σ : Type} {L : Module.End ℂ (MvPolynomial σ ℂ)}
+    : L ∈ nonRaising σ ↔ ∀ P, (L P).totalDegree ≤ P.totalDegree :=
+  Iff.rfl
 
 variable {D : D7} {a b : ℕ} (τ : D.what₂.Tau) (ε : Fin a → Bool) (ε' : Fin b → Bool)
 
 def quad (i : Fin b) (j k : Fin a) : PolF D b a :=
   if ε' i = ε j ∧ ε' i ≠ ε k then
-    (sgn (ε j) * sgn (ε k)) • (MvPolynomial.X (τ, i, j) * MvPolynomial.X (τ, i, k)) else 0
+    (sgn (ε j) * sgn (ε k)) • (MvPolynomial.X (τ, i, j) * MvPolynomial.X (τ, i, k))
+  else
+    0
 
 theorem quad_hom (i : Fin b) (j k : Fin a) : (quad τ ε ε' i j k).IsHomogeneous 2 := by
   unfold quad
@@ -72,8 +78,9 @@ theorem quad_hom (i : Fin b) (j k : Fin a) : (quad τ ε ε' i j k).IsHomogeneou
       ((MvPolynomial.isHomogeneous_X ℂ _).mul (MvPolynomial.isHomogeneous_X ℂ _))
   · exact MvPolynomial.isHomogeneous_zero _ _ _
 
-theorem term_mem (i : Fin b) (j k : Fin a) :
-    raiO τ ε ε' i j * lowO τ ε ε' i k - LinearMap.mulLeft ℂ (quad τ ε ε' i j k) ∈ nonRaising (FVar D b a) := by
+theorem term_mem (i : Fin b) (j k : Fin a)
+    : raiO τ ε ε' i j * lowO τ ε ε' i k - LinearMap.mulLeft ℂ (quad τ ε ε' i j k)
+      ∈ nonRaising (FVar D b a) := by
   unfold raiO lowO quad
   by_cases h1 : ε' i = ε j <;> by_cases h2 : ε' i = ε k
   · rw [if_pos h1, if_pos h2, if_neg (fun h => h.2 h2), LinearMap.mulLeft_zero_eq_zero, sub_zero,
@@ -86,25 +93,25 @@ theorem term_mem (i : Fin b) (j k : Fin a) :
     simp [smul_smul, mul_assoc, mul_comm (sgn (ε k))]
   · rw [if_neg h1, if_pos h2, if_neg (fun h => h1 h.1), LinearMap.mulLeft_zero_eq_zero, sub_zero,
       smul_mul_smul_comm, neg_mul]
-    exact Submodule.smul_mem _ _ (Submodule.neg_mem _
-      (mem_nonRaising.2 fun P => (deg_pderiv _ _).trans (deg_pderiv _ P)))
+    exact Submodule.smul_mem _ _
+      (Submodule.neg_mem _ (mem_nonRaising.2 fun P => (deg_pderiv _ _).trans (deg_pderiv _ P)))
   · rw [if_neg h1, if_neg h2, if_neg (fun h => h1 h.1), LinearMap.mulLeft_zero_eq_zero, sub_zero,
       smul_mul_smul_comm, neg_mul]
-    exact Submodule.smul_mem _ _ (Submodule.neg_mem _
-      (mem_nonRaising.2 fun P => deg_pderiv_X _ _ P))
+    exact Submodule.smul_mem _ _
+      (Submodule.neg_mem _ (mem_nonRaising.2 fun P => deg_pderiv_X _ _ P))
 
-def quadS (X : Matrix (Fin a) (Fin a) ℂ) : PolF D b a :=
-  ∑ j, ∑ k, X j k • ∑ i, quad τ ε ε' i j k
+def quadS (X : Matrix (Fin a) (Fin a) ℂ) : PolF D b a := ∑ j, ∑ k, X j k • ∑ i, quad τ ε ε' i j k
 
 theorem quadS_hom (X : Matrix (Fin a) (Fin a) ℂ) : (quadS τ ε ε' X).IsHomogeneous 2 :=
   (MvPolynomial.homogeneousSubmodule _ ℂ 2).sum_mem fun j _ =>
-    Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ <|
-      Submodule.sum_mem _ fun i _ => quad_hom τ ε ε' i j k
+    Submodule.sum_mem _ fun k _ =>
+      Submodule.smul_mem _ _ <| Submodule.sum_mem _ fun i _ => quad_hom τ ε ε' i j k
 
-theorem rest_mem (X : Matrix (Fin a) (Fin a) ℂ) :
-    fockS τ ε ε' X - LinearMap.mulLeft ℂ (quadS τ ε ε' X) ∈ nonRaising (FVar D b a) := by
-  have h : LinearMap.mulLeft ℂ (quadS τ ε ε' X) =
-      ∑ j, ∑ k, X j k • ∑ i, LinearMap.mulLeft ℂ (quad τ ε ε' i j k) := by
+theorem rest_mem (X : Matrix (Fin a) (Fin a) ℂ)
+    : fockS τ ε ε' X - LinearMap.mulLeft ℂ (quadS τ ε ε' X) ∈ nonRaising (FVar D b a) := by
+  have h
+      : LinearMap.mulLeft ℂ (quadS τ ε ε' X)
+        = ∑ j, ∑ k, X j k • ∑ i, LinearMap.mulLeft ℂ (quad τ ε ε' i j k) := by
     refine LinearMap.ext fun P => ?_
     simp [quadS, Finset.sum_mul, LinearMap.sum_apply]
   rw [h, fockS, ← Finset.sum_sub_distrib]
@@ -119,16 +126,19 @@ theorem rest_mem (X : Matrix (Fin a) (Fin a) ℂ) :
   · exact Submodule.smul_mem _ _ (mem_nonRaising.2 fun P => le_rfl)
   · exact Submodule.zero_mem _
 
-theorem sgn_ne_zero (e : Bool) : sgn e ≠ 0 := by
-  cases e <;> simp [sgn]
+theorem sgn_ne_zero (e : Bool) : sgn e ≠ 0 := by cases e <;> simp [sgn]
 
-theorem quadS_ne_zero (X : Matrix (Fin a) (Fin a) ℂ) (i : Fin b) (j k : Fin a) (hj : ε' i = ε j)
-    (hk : ε' i ≠ ε k) (hX : X j k ≠ 0) : quadS τ ε ε' X ≠ 0 := by
+theorem quadS_ne_zero
+    (X : Matrix (Fin a) (Fin a) ℂ) (i : Fin b) (j k : Fin a)
+    (hj : ε' i = ε j) (hk : ε' i ≠ ε k) (hX : X j k ≠ 0)
+    : quadS τ ε ε' X ≠ 0 := by
   classical
   intro h0
   let f : FVar D b a → ℂ := fun v => if v = (τ, i, j) ∨ v = (τ, i, k) then 1 else 0
-  have key : ∀ i' j' k', MvPolynomial.aeval f (quad τ ε ε' i' j' k') =
-      if i' = i ∧ j' = j ∧ k' = k then sgn (ε j) * sgn (ε k) else 0 := by
+  have key
+      : ∀ i' j' k',
+        MvPolynomial.aeval f (quad τ ε ε' i' j' k')
+          = if i' = i ∧ j' = j ∧ k' = k then sgn (ε j) * sgn (ε k) else 0 := by
     intro i' j' k'
     by_cases h : i' = i ∧ j' = j ∧ k' = k
     · obtain ⟨rfl, rfl, rfl⟩ := h
@@ -158,10 +168,23 @@ theorem quadS_ne_zero (X : Matrix (Fin a) (Fin a) ℂ) (i : Fin b) (j k : Fin a)
   · intro i' _ h; simp [h]
   · simp
 
-theorem fockS_decomp : ∀ (D : D7) (a b : ℕ) (τ : D.what₂.Tau) (ε : Fin a → Bool) (ε' : Fin b → Bool) (X : Matrix (Fin a) (Fin a) ℂ), 0 < b → (∃ j k, ε j ≠ ε k ∧ X j k ≠ 0 ∧ X k j ≠ 0) → ∃ (Q : PolF D b a) (L : Module.End ℂ (PolF D b a)), Q ≠ 0 ∧ Q.IsHomogeneous 2 ∧ (∀ P, (L P).totalDegree ≤ P.totalDegree) ∧ GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.fockS τ ε ε' X = LinearMap.mulLeft ℂ Q + L := by
+theorem fockS_decomp
+    : ∀ (D : D7) (a b : ℕ) (τ : D.what₂.Tau) (ε : Fin a → Bool) (ε' : Fin b → Bool)
+        (X : Matrix (Fin a) (Fin a) ℂ),
+      0 < b → (∃ j k, ε j ≠ ε k ∧ X j k ≠ 0 ∧ X k j ≠ 0)
+        → ∃ (Q : PolF D b a) (L : Module.End ℂ (PolF D b a)),
+          Q ≠ 0 ∧ Q.IsHomogeneous 2 ∧ (∀ P, (L P).totalDegree ≤ P.totalDegree)
+            ∧ GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.fockS τ ε ε' X
+              = LinearMap.mulLeft ℂ Q + L := by
   rintro D a b τ ε ε' X hb ⟨j, k, hjk, h1, h2⟩
-  refine ⟨quadS τ ε ε' X, fockS τ ε ε' X - LinearMap.mulLeft ℂ (quadS τ ε ε' X), ?_, quadS_hom τ ε ε' X,
-    mem_nonRaising.1 (rest_mem τ ε ε' X), by abel⟩
+  refine ⟨
+    quadS τ ε ε' X,
+    fockS τ ε ε' X - LinearMap.mulLeft ℂ (quadS τ ε ε' X),
+    ?_,
+    quadS_hom τ ε ε' X,
+    mem_nonRaising.1 (rest_mem τ ε ε' X),
+    by abel
+  ⟩
   by_cases h : ε' ⟨0, hb⟩ = ε j
   · exact quadS_ne_zero τ ε ε' X ⟨0, hb⟩ j k h (h ▸ hjk) h1
   · refine quadS_ne_zero τ ε ε' X ⟨0, hb⟩ k j ?_ h h2

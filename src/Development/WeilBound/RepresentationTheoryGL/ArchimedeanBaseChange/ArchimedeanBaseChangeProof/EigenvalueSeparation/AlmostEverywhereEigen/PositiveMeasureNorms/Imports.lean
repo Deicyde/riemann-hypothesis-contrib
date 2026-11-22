@@ -31,9 +31,11 @@ theorem point : Point := by
     simp only [g, map_mul, map_star, ContinuousMap.mul_apply, ContinuousMap.star_apply]
     rw [Complex.ofReal_pow]
     exact Complex.conj_mul' _
-  obtain ⟨F, hF⟩ := isCompact_univ.elim_finite_subcover (fun s => {t : S | e (c s) t ≠ 0})
-    (fun s => isOpen_compl_singleton.preimage (e (c s)).continuous)
-    (fun t _ => Set.mem_iUnion.2 ⟨t, hec t⟩)
+  obtain ⟨F, hF⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun s => {t : S | e (c s) t ≠ 0})
+      (fun s => isOpen_compl_singleton.preimage (e (c s)).continuous)
+      (fun t _ => Set.mem_iUnion.2 ⟨t, hec t⟩)
   let G : B := ∑ s ∈ F, g s
   let v : S → ℝ := fun t => ∑ s ∈ F, ‖e (c s) t‖ ^ 2
   have hpG : p G = 0 := by simp [G, hpg]

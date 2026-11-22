@@ -13,32 +13,42 @@ namespace PI.AprimeInfK
 open MeasureTheory Topology Set
 open scoped ENNReal
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-variable {X : Type} [MulAction G X] [TopologicalSpace X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
+variable
+  {X : Type} [MulAction G X] [TopologicalSpace X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
 
-theorem ker_meas (x0 : X) (hc : Continuous fun g : G => g • x0)
-    (ν : Measure (MulAction.stabilizer G x0)) [ν.IsMulLeftInvariant] [SFinite ν] (s : X → G)
-    (hs : ∀ y, (∃ g : G, g • x0 = y) → s y • x0 = y) (h1 : ∀ y, ¬ (∃ g : G, g • x0 = y) → s y = 1) :
-    Measurable (fun y => Measure.map (fun h : MulAction.stabilizer G x0 => s y * (h : G)) ν) := by
+theorem ker_meas
+    (x0 : X) (hc : Continuous fun g : G => g • x0) (ν : Measure (MulAction.stabilizer G x0))
+    [ν.IsMulLeftInvariant] [SFinite ν]
+    (s : X → G)
+    (hs : ∀ y, (∃ g : G, g • x0 = y) → s y • x0 = y) (h1 : ∀ y, ¬(∃ g : G, g • x0 = y) → s y = 1)
+    : Measurable (fun y => Measure.map (fun h : MulAction.stabilizer G x0 => s y * (h : G)) ν) := by
   classical
-  have hcl : IsClosed ((MulAction.stabilizer G x0 : Subgroup G) : Set G) := isClosed_singleton.preimage hc
+  have hcl : IsClosed ((MulAction.stabilizer G x0 : Subgroup G) : Set G) :=
+    isClosed_singleton.preimage hc
   haveI : IsClosed ((MulAction.stabilizer G x0 : Subgroup G) : Set G) := hcl
   haveI : PolishSpace G := PI.AprimeInfA.polish_of_lcsc G
   haveI : PolishSpace (G ⧸ MulAction.stabilizer G x0) := PI.AprimeInfA.polish_of_lcsc _
   haveI : BorelSpace (G ⧸ MulAction.stabilizer G x0) := CosetSpace.borelSpace
   set ι : G ⧸ MulAction.stabilizer G x0 → X := fun q => q.out • x0 with hιdef
-  have hemb : MeasurableEmbedding ι := (PI.AprimeInfA.orb_cont x0 hc).measurableEmbedding (PI.AprimeInfA.orb_inj x0)
-  have hmv : ∀ t : G, Measurable (fun h : MulAction.stabilizer G x0 => t * (h : G)) :=
-    fun t => (continuous_const_mul t |>.comp continuous_subtype_val).measurable
+  have hemb : MeasurableEmbedding ι :=
+    (PI.AprimeInfA.orb_cont x0 hc).measurableEmbedding (PI.AprimeInfA.orb_inj x0)
+  have hmv : ∀ t : G, Measurable (fun h : MulAction.stabilizer G x0 => t * (h : G)) := fun t =>
+    (continuous_const_mul t |>.comp continuous_subtype_val).measurable
   refine Measure.measurable_of_measurable_coe _ fun A hA => ?_
   have hf : Measurable (A.indicator (1 : G → ℝ≥0∞)) := measurable_const.indicator hA
-  have eq : (fun y => Measure.map (fun h : MulAction.stabilizer G x0 => s y * (h : G)) ν A) =
-      Function.extend ι (fun q : G ⧸ MulAction.stabilizer G x0 =>
-        ∫⁻ h, A.indicator (1 : G → ℝ≥0∞) (q.out * (h : G)) ∂ν)
-        (fun _ => ∫⁻ h, A.indicator (1 : G → ℝ≥0∞) (h : G) ∂ν) := by
+  have eq
+      : (fun y => Measure.map (fun h : MulAction.stabilizer G x0 => s y * (h : G)) ν A)
+        = Function.extend ι
+          (fun q : G ⧸ MulAction.stabilizer G x0 =>
+            ∫⁻ h, A.indicator (1 : G → ℝ≥0∞) (q.out * (h : G)) ∂ν)
+          (fun _ => ∫⁻ h, A.indicator (1 : G → ℝ≥0∞) (h : G) ∂ν) := by
     funext y
-    have e0 : Measure.map (fun h : MulAction.stabilizer G x0 => s y * (h : G)) ν A = ∫⁻ h, A.indicator (1 : G → ℝ≥0∞) (s y * (h : G)) ∂ν := by
+    have e0
+        : Measure.map (fun h : MulAction.stabilizer G x0 => s y * (h : G)) ν A
+          = ∫⁻ h, A.indicator (1 : G → ℝ≥0∞) (s y * (h : G)) ∂ν := by
       rw [Measure.map_apply (hmv _) hA, ← lintegral_indicator_one ((hmv _) hA)]
       rfl
     rw [e0]
@@ -58,13 +68,15 @@ theorem ker_meas (x0 : X) (hc : Continuous fun g : G => g • x0)
       rw [h1 y hno]
       simp only [one_mul]
   rw [eq]
-  exact hemb.measurable_extend (PI.AprimeInfA.meas_avg_q (MulAction.stabilizer G x0) ν hf) measurable_const
+  exact hemb.measurable_extend (PI.AprimeInfA.meas_avg_q (MulAction.stabilizer G x0) ν hf)
+    measurable_const
 
 end PI.AprimeInfK
 
 namespace PI.AprimeInfW
 
-open MeasureTheory Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+open MeasureTheory Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
   Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal
 open scoped TensorProduct
 
@@ -90,7 +102,7 @@ theorem kerMeas_holds : KerMeas := by
   haveI : SigmaCompactSpace (MulAction.stabilizer (GI X) x0) := inferInstance
   haveI : SigmaFinite ν := inferInstance
   have hs : ∀ y, (∃ g : GI X, g • x0 = y) → sect X u' y • x0 = y := fun y hy => sect_spec X u' y hy
-  have h1 : ∀ y, ¬ (∃ g : GI X, g • x0 = y) → sect X u' y = 1 := by
+  have h1 : ∀ y, ¬(∃ g : GI X, g • x0 = y) → sect X u' y = 1 := by
     intro y hy
     unfold sect
     exact dif_neg hy

@@ -10,15 +10,17 @@ namespace Formalism.MainNotions.S.Pv.Frames
 
 open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S
 
-theorem col_of_fix {m : ℕ} {h : Matrix (Fin m) (Fin m) ℂ} {c : Fin m} (hc : h *ᵥ bvec c = bvec c) (p : Fin m) :
-    h p c = if p = c then 1 else 0 := by
+theorem col_of_fix
+    {m : ℕ} {h : Matrix (Fin m) (Fin m) ℂ} {c : Fin m} (hc : h *ᵥ bvec c = bvec c) (p : Fin m)
+    : h p c = if p = c then 1 else 0 := by
   have := congrFun hc p
   simp only [bvec, Matrix.mulVec, dotProduct, Pi.single_apply, mul_ite, mul_one, mul_zero,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true] at this
+      Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    at this
   exact this
 
-theorem Hpk_esI_row {k r : ℕ} (a : Fin r) (q : Fin (2 * r + k + 1)) :
-    Hpk k r (esI k r a) q = if q = eI k r a then 1 else 0 := by
+theorem Hpk_esI_row {k r : ℕ} (a : Fin r) (q : Fin (2 * r + k + 1))
+    : Hpk k r (esI k r a) q = if q = eI k r a then 1 else 0 := by
   have ha := a.isLt
   have e1 : (esI k r a).val = 2 * r + k - a.val := rfl
   unfold Hpk
@@ -29,8 +31,8 @@ theorem Hpk_esI_row {k r : ℕ} (a : Fin r) (q : Fin (2 * r + k + 1)) :
     rw [if_neg hq, if_neg (fun h => by have := h.1; omega), if_neg (fun h => by have := h.2; omega),
       if_neg (fun h => by have := h.1; have := h.2.1; omega)]
 
-theorem Hpk_eI_row {k r : ℕ} (a : Fin r) (q : Fin (2 * r + k + 1)) :
-    Hpk k r (eI k r a) q = if q = esI k r a then 1 else 0 := by
+theorem Hpk_eI_row {k r : ℕ} (a : Fin r) (q : Fin (2 * r + k + 1))
+    : Hpk k r (eI k r a) q = if q = esI k r a then 1 else 0 := by
   have ha := a.isLt
   have e1 : (eI k r a).val = a.val := rfl
   unfold Hpk
@@ -41,22 +43,31 @@ theorem Hpk_eI_row {k r : ℕ} (a : Fin r) (q : Fin (2 * r + k + 1)) :
     rw [if_neg hq, if_neg (fun h => by have := h.2; omega), if_neg (fun h => by have := h.2; omega),
       if_neg (fun h => by have := h.1; omega)]
 
-theorem Hpk_mid_col {k r : ℕ} (i j : Fin (2 * r + k + 1)) (hj1 : r ≤ j.val) (hj2 : j.val ≤ r + k)
-    (hi : i.val < r ∨ r + k < i.val) : Hpk k r i j = 0 := by
+theorem Hpk_mid_col
+    {k r : ℕ} (i j : Fin (2 * r + k + 1)) (hj1 : r ≤ j.val) (hj2 : j.val ≤ r + k)
+    (hi : i.val < r ∨ r + k < i.val)
+    : Hpk k r i j = 0 := by
   unfold Hpk
   rw [if_neg (fun h => by have := h.1; have := h.2; omega), if_neg (fun h => by have := h.1; omega),
     if_neg (fun h => by have := h.1; have := h.2.1; omega)]
 
-theorem UH_entry {m : ℕ} {H h : Matrix (Fin m) (Fin m) ℂ} (hUH : hᴴ * H * h = H) {c : Fin m}
-    (hc : ∀ p, h p c = if p = c then 1 else 0) (j : Fin m) : ∑ q, H c q * h q j = H c j := by
+theorem UH_entry
+    {m : ℕ} {H h : Matrix (Fin m) (Fin m) ℂ} (hUH : hᴴ * H * h = H)
+    {c : Fin m} (hc : ∀ p, h p c = if p = c then 1 else 0)
+    (j : Fin m)
+    : ∑ q, H c q * h q j = H c j := by
   have key := congrArg (fun M : Matrix (Fin m) (Fin m) ℂ => M c j) hUH
   simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, hc] at key
-  simpa [apply_ite star, star_one, star_zero, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ] using key
+  simpa [apply_ite star, star_one, star_zero, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq,
+      Finset.mem_univ]
+    using key
 
-theorem fix_dT {k r : ℕ} {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (hU : h ∈ UH (Hpk k r))
-    (hfix : ∀ a : Fin r, h *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ h *ᵥ bvec (esI k r a) = bvec (esI k r a))
-    (i j : Fin (2 * r + k + 1)) (hne : h i j ≠ 0) : dT k r i = dT k r j := by
+theorem fix_dT
+    {k r : ℕ} {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hU : h ∈ UH (Hpk k r))
+    (hfix : ∀ a : Fin r,
+      h *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ h *ᵥ bvec (esI k r a) = bvec (esI k r a))
+    (i j : Fin (2 * r + k + 1)) (hne : h i j ≠ 0)
+    : dT k r i = dT k r j := by
   have hU' : hᴴ * Hpk k r * h = Hpk k r := hU
   by_cases hjl : j.val < r
   · have := col_of_fix (hfix ⟨j.val, hjl⟩).1 i
@@ -69,7 +80,8 @@ theorem fix_dT {k r : ℕ} {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1
   by_cases hjh : r + k < j.val
   · have ha : 2 * r + k - j.val < r := by omega
     have := col_of_fix (hfix ⟨2 * r + k - j.val, ha⟩).2 i
-    have hj : esI k r ⟨2 * r + k - j.val, ha⟩ = j := Fin.ext (by show 2 * r + k - (2 * r + k - j.val) = j.val; omega)
+    have hj : esI k r ⟨2 * r + k - j.val, ha⟩ = j :=
+      Fin.ext (by show 2 * r + k - (2 * r + k - j.val) = j.val; omega)
     rw [hj] at this
     rw [this] at hne
     split_ifs at hne with e
@@ -105,23 +117,32 @@ theorem fix_dT {k r : ℕ} {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1
   push Not at hil hih
   exact dT_mid i hil hih
 
-theorem UW_dT {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (hh : h ∈ UWset k r z) (i j : Fin (2 * r + k + 1)) (hne : h i j ≠ 0) : dT k r i = dT k r j :=
+theorem UW_dT
+    {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ}
+    {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (hh : h ∈ UWset k r z) (i j : Fin (2 * r + k + 1)) (hne : h i j ≠ 0)
+    : dT k r i = dT k r j :=
   fix_dT hh.1 hh.2.1 i j hne
 
-theorem UW_conjI {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (hh : h ∈ UWset k r z) : tTi k r * h * tT k r = h := conjI_eq_self (UW_dT hh)
+theorem UW_conjI
+    {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ}
+    {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hh : h ∈ UWset k r z)
+    : tTi k r * h * tT k r = h :=
+  conjI_eq_self (UW_dT hh)
 
-theorem conjI_inv {k r : ℕ} (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    tTi k r * M⁻¹ * tT k r = (tTi k r * M * tT k r)⁻¹ := by
+theorem conjI_inv {k r : ℕ} (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : tTi k r * M⁻¹ * tT k r = (tTi k r * M * tT k r)⁻¹ := by
   rw [Matrix.mul_inv_rev, Matrix.mul_inv_rev, tTi_inv, tT_inv, Matrix.mul_assoc]
 
-theorem bigCell_dT {k r : ℕ} (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (i j : Fin (2 * r + k + 1))
-    (hne : bigCell k r c μ i j ≠ 0) : dT k r i = dT k r j := by
+theorem bigCell_dT
+    {k r : ℕ} (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (i j : Fin (2 * r + k + 1))
+    (hne : bigCell k r c μ i j ≠ 0)
+    : dT k r i = dT k r j := by
   unfold bigCell at hne
   split_ifs at hne with h1 h2 h3 h4 h5
   · rw [h2, dT_esI]
-    unfold dT; simp [h1]
+    unfold dT
+    simp [h1]
   · exact absurd rfl hne
   · rw [dT_mid i h4.1 h4.2, dT_mid j (by omega) h3]
   · exact absurd rfl hne

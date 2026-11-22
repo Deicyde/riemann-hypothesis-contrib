@@ -23,11 +23,8 @@ namespace Formalism.BasicNotions.Examples₂
 open NumberField IsDedekindDomain
 
 structure LocalGap {R : Ranks} (H : Host R) where
-
   nloc : LocTheory
-
   nlocA : ∀ (l : ℕ) [Fact l.Prime], LocAinf l (nloc l)
-
   nlocT : ∀ (l : ℕ) [Fact l.Prime], LocTied l (nloc l) (nlocA l)
 
 theorem LocalGap.tame {R : Ranks} {H : Host R} (_G : LocalGap H) : TameHyp H := tameHyp H
@@ -45,36 +42,39 @@ theorem exampleClassGroupCard_pos {R : Ranks} (H : Host R) : 0 < exampleClassGro
   exact Nat.card_pos
 
 abbrev rowsH : Rows.Data R0 :=
-  toyRowsOfNumberField H.E H.φ₀ (@placesOf H.E _ _ H.cmStar) Tau0 card_examplePsi_eq (dstarOf T) (shaExample H)
-    (shaExample_nonneg H) (exampleClassGroupCard H) (exampleClassGroupCard_pos H)
+  toyRowsOfNumberField H.E H.φ₀ (@placesOf H.E _ _ H.cmStar) Tau0 card_examplePsi_eq (dstarOf T)
+    (shaExample H) (shaExample_nonneg H) (exampleClassGroupCard H) (exampleClassGroupCard_pos H)
 
 abbrev memT : Member R0 Tau0 (fun _ => hc0) := trivialMember Tau0 T (dstarOf T) (dstarOf_pos T)
 
-theorem nHypH (hg : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E) :
-    NHyp H (rowsH H T) :=
-  { hsha := fun p _ e _ _ => shaExample_eq H p e
-    hcard := rfl
-    hg := hg }
+theorem nHypH (hg : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E)
+    : NHyp H (rowsH H T) := {
+  hsha := fun p _ e _ _ => shaExample_eq H p e
+  hcard := rfl
+  hg := hg
+}
 
-theorem normAt_empty {K V ι : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-    [Fintype ι] [DecidableEq ι] [IsEmpty ι] (b : Module.Basis ι K V)
-    (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (x : V) :
-    Formalism.HermitianLatticesTheory.normAt b X v x = 0 := by
+theorem normAt_empty
+    {K V ι : Type}
+    [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι] [IsEmpty ι]
+    (b : Module.Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (x : V)
+    : Formalism.HermitianLatticesTheory.normAt b X v x = 0 := by
   simp [Formalism.HermitianLatticesTheory.normAt, Formalism.HermitianLatticesTheory.cnorm]
 
-def spH (pz : H.E) (hpz : pz * H.conj pz = (T : H.E)) :
-    @Spaces R0 H.F H.E _ _ _ _ H.cmStar _ :=
+def spH (pz : H.E) (hpz : pz * H.conj pz = (T : H.E)) : @Spaces R0 H.F H.E _ _ _ _ H.cmStar _ :=
   letI := H.cmStar
   spacesExample star_isIntegral (cmData H) T hT.out pz
     (by rw [star_eq_conj H pz, mul_comm]; exact hpz)
     (exists_adelic_neg_one H (cmData H).sig (fun x => star_eq_conj H x))
 
-abbrev sDataH (hg : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E) (ht : THyp H) :
-    Formalism.MainNotions.S.Draft.SData R0 H.F H.E (conjF H) Unit Tau0 (fun _ _ => hc0) :=
-  toySData (conjF H) (fun _ _ => hc0) 1 one_pos (fun _ _ l h => exampleWeight_cloud_gap_four l h)
-    (fun _ _ l h => exampleWeight_middle_entries l h) (locAdj (conjF H) {H.g 0, H.g 1} (slocH H)
-      (fun p hp => (splH H hg ht.jac p hp).some))
-
+abbrev sDataH (hg : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E) (ht : THyp H)
+    : Formalism.MainNotions.S.Draft.SData R0 H.F H.E (conjF H) Unit Tau0 (fun _ _ => hc0) :=
+  toySData (conjF H)
+    (fun _ _ => hc0)
+    1 one_pos
+    (fun _ _ l h => exampleWeight_cloud_gap_four l h)
+    (fun _ _ l h => exampleWeight_middle_entries l h)
+    (locAdj (conjF H) {H.g 0, H.g 1} (slocH H) (fun p hp => (splH H hg ht.jac p hp).some))
 
 set_option synthInstance.maxHeartbeats 200000 in
 set_option maxHeartbeats 1600000 in
@@ -83,9 +83,11 @@ def exampleRecordOfData
     (hlev : T ∈ H.levelPrimes) (hpde : T ≠ H.pde ∧ T ≠ H.pde')
     (pz : 𝓞 H.E) (hK : (pz : H.E) ∈ H.K) (hpz : (pz : H.E) * H.conj (pz : H.E) = (T : H.E))
     (hcong : (pz - 1) ∈ Ideal.span {((H.QS * H.q * H.d * (H.g 0 * H.g 1) ^ 2 : ℕ) : 𝓞 H.E)})
-    (G : LocalGap H) : D7 :=
+    (G : LocalGap H)
+    : D7 :=
   letI : StarRing H.E := H.cmStar
-  { R := R0
+  {
+    R := R0
     host := H
     sp := spH H T pz hpz
     what₂ := rowsH H T
@@ -169,8 +171,8 @@ def exampleRecordOfData
     dsig := toyConstantOne _
     dsig_pos := toyConstantOne_pos _
     s := sDataH H hg ht
-    s_split := locAdj_split (conjF H) {H.g 0, H.g 1} (slocH H)
-      (fun p hp => (splH H hg ht.jac p hp).some)
+    s_split :=
+      locAdj_split (conjF H) {H.g 0, H.g 1} (slocH H) (fun p hp => (splH H hg ht.jac p hp).some)
     s_HH := toySData_HH _ _ _ _ _
     s_Cu := fun u => toySData_Cu _ _ _ _ _ u _ rfl
     s_PlF := toySData_PlF _ _ _ _ _
@@ -183,8 +185,11 @@ def exampleRecordOfData
     nbc := nbcToy H (rowsH H T) (nHypH H T hg)
     nexp := nexpToy H ⊤ (nHypH H T hg)
     ntypes := ntypesT H (rowsH H T) (nHypH H T hg) ht G.tame
-    nStage_trivialCharacter_compat := @ntypesT_E0Tie _ H (rowsH H T) (nHypH H T hg)
-      (fun _ => inferInstanceAs (Subsingleton Z0)) (fun _ _ => inferInstanceAs (Subsingleton Z0)) ht G.tame
+    nStage_trivialCharacter_compat :=
+      @ntypesT_E0Tie _ H (rowsH H T) (nHypH H T hg)
+        (fun _ => inferInstanceAs (Subsingleton Z0))
+        (fun _ _ => inferInstanceAs (Subsingleton Z0))
+        ht G.tame
     nth := nthToy H ⊤ (nHypH H T hg)
     nbr := fun i => Empty.elim i
     self_good := fun i => Empty.elim i
@@ -201,7 +206,8 @@ def exampleRecordOfData
     jetW1 := fun i => Empty.elim i
     resChar_thetaJetPlaceDegOne := fun i => Empty.elim i
     jetTau1 := fun i => Empty.elim i
-    nStage_trivialCharacter_coeff_eq := fun g => (map_zero H.φ₀).trans (newtypes_idempotent_zero H _ _ ht G.tame g).symm
+    nStage_trivialCharacter_coeff_eq := fun g =>
+      (map_zero H.φ₀).trans (newtypes_idempotent_zero H _ _ ht G.tame g).symm
     Z_tie := example_Z_compatibility H _ _
     Zgood_tie := example_goodZ_compatibility H _ _
     etaJ_tie := example_etaJ_compatibility H _ _ (fun _ _ => rfl)
@@ -217,8 +223,12 @@ def exampleRecordOfData
       exact (normAt_empty (ι := Fin 0) _ _ _ _).trans (normAt_empty (ι := Fin 0) _ _ _ _).symm
     jEE_norm := fun x => by
       exact (normAt_empty (ι := Fin 0) _ _ _ _).trans (norm_zero (E := Z0)).symm
-    sEE := ⟨0, fun x => (norm_zero (E := Z0)).trans
-      ((norm_zero (E := Z0)).symm.trans (congrArg norm (Subsingleton.elim (α := Z0) 0 x)))⟩
+    sEE := ⟨
+      0,
+      fun x =>
+        (norm_zero (E := Z0)).trans
+          ((norm_zero (E := Z0)).symm.trans (congrArg norm (Subsingleton.elim (α := Z0) 0 x)))
+    ⟩
     s_Cu_isom := fun _ φ ψ => by
       rw [Subsingleton.elim (α := Z0) φ 0]
       exact (inner_zero_left (𝕜 := ℂ) (E := Z0) ψ).trans (Finset.sum_of_isEmpty _).symm
@@ -233,6 +243,7 @@ def exampleRecordOfData
     gx := gxExample _ _
     gat := fun _ _ _ => gAtPExample _
     gat_d := fun _ _ _ => (gAtPExample_d _).trans (finrank_bot ℂ _).symm
-    Y_sigval := spacesExample_Ysig _ _ _ _ _ _ _ }
+    Y_sigval := spacesExample_Ysig _ _ _ _ _ _ _
+  }
 
 end Formalism.BasicNotions.Examples₂

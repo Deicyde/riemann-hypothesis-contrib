@@ -8,14 +8,15 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison
 
 namespace GlobalTheory.CompanionTheory.OmRes
 
-theorem restrict_pull_bijective_of_forall :
-    ∀ {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] (F : C ⥤ ModuleCat.{0} R)
-      (Q : ObjectProperty C), (∀ T, Q T) →
-      ∀ n : ℕ, Function.Bijective ((CH.Mor.restrict F Q.ι).pull n) := by
+theorem restrict_pull_bijective_of_forall
+    : ∀ {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] (F : C ⥤ ModuleCat.{0} R)
+        (Q : ObjectProperty C),
+      (∀ T, Q T) → ∀ n : ℕ, Function.Bijective ((CH.Mor.restrict F Q.ι).pull n) := by
   intro R _ C _ F Q h n
   haveI : Q.ι.EssSurj := ⟨fun Y => ⟨⟨Y, h Y⟩, ⟨Iso.refl _⟩⟩⟩
   haveI : Q.ι.IsEquivalence := { }

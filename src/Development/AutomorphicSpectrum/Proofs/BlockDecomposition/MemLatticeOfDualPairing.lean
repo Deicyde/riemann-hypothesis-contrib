@@ -9,13 +9,15 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.LatticeDualityAlt
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 open scoped Matrix
 
-theorem exists_extend {K : Type} [Field K] [NumberField K] {m : ℕ}
-    (L : Submodule (𝓞 K) (Fin m → K))
-    (hs : Submodule.span K (L : Set (Fin m → K)) = ⊤) (φ : L →ₗ[𝓞 K] 𝓞 K) :
-    ∃ G : (Fin m → K) →ₗ[K] K, ∀ x : L, G x = algebraMap (𝓞 K) K (φ x) := by
+theorem exists_extend
+    {K : Type} [Field K] [NumberField K]
+    {m : ℕ} (L : Submodule (𝓞 K) (Fin m → K)) (hs : Submodule.span K (L : Set (Fin m → K)) = ⊤)
+    (φ : L →ₗ[𝓞 K] 𝓞 K)
+    : ∃ G : (Fin m → K) →ₗ[K] K, ∀ x : L, G x = algebraMap (𝓞 K) K (φ x) := by
   classical
   have hs' : ⊤ ≤ Submodule.span K (L : Set (Fin m → K)) := hs.ge
   obtain ⟨ι, b, hb⟩ : ∃ (ι : Type) (b : Module.Basis ι K (Fin m → K)), ∀ i, b i ∈ L :=
@@ -25,8 +27,10 @@ theorem exists_extend {K : Type} [Field K] [NumberField K] {m : ℕ}
   let G : (Fin m → K) →ₗ[K] K := b.constr K (fun i => algebraMap (𝓞 K) K (φ ⟨b i, hb i⟩))
   have hGb : ∀ i, G (b i) = algebraMap (𝓞 K) K (φ ⟨b i, hb i⟩) := fun i => b.constr_basis _ _ _
   refine ⟨G, fun x => ?_⟩
-  obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (𝓞 K))
-    (fun i => b.repr (x : Fin m → K) i) (S := K)
+  obtain ⟨d, hd⟩ :=
+    IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (𝓞 K))
+      (fun i => b.repr (x : Fin m → K) i)
+      (S := K)
   choose e he using hd
   have hx : ((d : 𝓞 K) • (x : Fin m → K)) = ∑ i, e i • b i := by
     conv_lhs => rw [← b.sum_repr (x : Fin m → K)]
@@ -55,10 +59,13 @@ theorem exists_extend {K : Type} [Field K] [NumberField K] {m : ℕ}
   rw [map_mul] at h2
   exact mul_left_cancel₀ hd0 h2
 
-theorem mem_of_dot_integral : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ)
-    (L : Submodule (𝓞 K) (Fin m → K)), IsLat L → ∀ v : Fin m → K,
-    (∀ a : Fin m → K, (∀ x ∈ L, a ⬝ᵥ x ∈ (1 : Submodule (𝓞 K) K)) →
-      a ⬝ᵥ v ∈ (1 : Submodule (𝓞 K) K)) → v ∈ L := by
+theorem mem_of_dot_integral
+    : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ) (L : Submodule (𝓞 K) (Fin m → K)),
+      IsLat L
+        → ∀ v : Fin m → K,
+          (∀ a : Fin m → K,
+              (∀ x ∈ L, a ⬝ᵥ x ∈ (1 : Submodule (𝓞 K) K)) → a ⬝ᵥ v ∈ (1 : Submodule (𝓞 K) K))
+            → v ∈ L := by
   intro K _ _ m L hL v hv
   obtain ⟨hfg, hspan⟩ := hL
   haveI : Module.Finite (𝓞 K) L := Module.Finite.iff_fg.mpr hfg
@@ -98,9 +105,10 @@ theorem mem_of_dot_integral : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ)
     simpa [T, LinearMap.sum_apply] using h.symm
   have hint : ∀ i, ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = a i ⬝ᵥ v := by
     intro i
-    have h := hv (a i) (fun x hx => by
-      rw [(ha i x).trans (hG i ⟨x, hx⟩)]
-      exact Submodule.mem_one.mpr ⟨_, rfl⟩)
+    have h :=
+      hv (a i) (fun x hx => by
+        rw [(ha i x).trans (hG i ⟨x, hx⟩)]
+        exact Submodule.mem_one.mpr ⟨_, rfl⟩)
     exact Submodule.mem_one.mp h
   choose o ho using hint
   rw [hid v]

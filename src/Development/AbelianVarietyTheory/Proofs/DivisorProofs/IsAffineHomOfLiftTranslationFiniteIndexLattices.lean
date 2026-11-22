@@ -14,7 +14,8 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
   CartesianMonoidalCategory MonObj TensorProduct NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
 
 open scoped nonZeroDivisors
 
@@ -35,18 +36,27 @@ theorem ex_eq_of_sub_mem {z w : Fin g → ℂ} (h : z - w ∈ u.Λ) : u.ex z = u
   rw [sub_add_cancel, (u.ker _).2 h, _root_.one_mul] at e
   exact e
 
-theorem exists_ex_apply_eq [LocallyOfFiniteType A.hom] (x : A.left) (hx : IsClosed ({x} : Set A.left)) :
-    ∃ z, (u.ex z).left (IsLocalRing.closedPoint ℂ) = x := by
-  obtain ⟨z, hz⟩ := u.ex_onto (Over.homMk (U := 𝟙_ (Over (Sp ℂ))) (V := A) (pointOfClosedPoint A.hom x hx)
-    ((pointOfClosedPoint_comp A.hom x hx).trans rfl))
+theorem exists_ex_apply_eq
+    [LocallyOfFiniteType A.hom] (x : A.left) (hx : IsClosed ({x} : Set A.left))
+    : ∃ z, (u.ex z).left (IsLocalRing.closedPoint ℂ) = x := by
+  obtain ⟨z, hz⟩ :=
+    u.ex_onto (Over.homMk (U := 𝟙_ (Over (Sp ℂ))) (V := A) (pointOfClosedPoint A.hom x hx)
+      ((pointOfClosedPoint_comp A.hom x hx).trans rfl))
   exact ⟨z, by rw [hz]; exact pointOfClosedPoint_apply A.hom x hx _⟩
 
 end
 
-theorem isAffineHom_of_lift : ∀ (g : ℕ) (A : Over (Sp ℂ)) [GrpObj A], IsAbelianScheme A → ∀ (B : Over (Sp ℂ)) [GrpObj B], IsAbelianScheme B →
-    ∀ (L : LB A.left) (L' : LB B.left) (u : HolUnif A L g) (u' : HolUnif B L' g) (a : Fin g → ℂ) (N : ℕ),
-    0 < N → u.Λ ≤ u'.Λ → (∀ x ∈ u'.Λ, N • x ∈ u.Λ) →
-    ∀ ψ : A.left ⟶ B.left, ψ ≫ B.hom = A.hom → (∀ z, (u.ex z).left ≫ ψ = (u'.ex (z + a)).left) → IsAffineHom ψ := by
+theorem isAffineHom_of_lift
+    : ∀ (g : ℕ) (A : Over (Sp ℂ)) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ (B : Over (Sp ℂ)) [GrpObj B],
+          IsAbelianScheme B
+            → ∀ (L : LB A.left) (L' : LB B.left) (u : HolUnif A L g) (u' : HolUnif B L' g)
+                (a : Fin g → ℂ) (N : ℕ),
+              0 < N → u.Λ ≤ u'.Λ → (∀ x ∈ u'.Λ, N • x ∈ u.Λ)
+                → ∀ ψ : A.left ⟶ B.left,
+                  ψ ≫ B.hom = A.hom → (∀ z, (u.ex z).left ≫ ψ = (u'.ex (z + a)).left)
+                    → IsAffineHom ψ := by
   intro g A _ hA B _ hB L L' u u' a N hN hle hN' ψ hψ hex
   have := hA.proper
   have := hB.proper
@@ -70,22 +80,24 @@ theorem isAffineHom_of_lift : ∀ (g : ℕ) (A : Over (Sp ℂ)) [GrpObj A], IsAb
   have hLQF : LocallyQuasiFinite ψ := by
     refine GlobalTheory.locallyQuasiFinite_of_finite_fibres_closedPoints ψ fun y hy => ?_
     have hcl : IsClosed ({ψ y} : Set B.left) := by simpa using ψ.isClosedMap _ hy
-    refine GlobalTheory.finite_of_isClosed_of_finite_inter_closedPoints (hcl.preimage ψ.continuous) ?_
+    refine GlobalTheory.finite_of_isClosed_of_finite_inter_closedPoints (hcl.preimage ψ.continuous)
+      ?_
     obtain ⟨z₀, rfl⟩ := exists_ex_apply_eq u y hy
     let r := Function.surjInv (Submodule.Quotient.mk_surjective K)
-    have hr : ∀ q, Submodule.Quotient.mk (r q) = q := Function.surjInv_eq (Submodule.Quotient.mk_surjective K)
+    have hr : ∀ q, Submodule.Quotient.mk (r q) = q :=
+      Function.surjInv_eq (Submodule.Quotient.mk_surjective K)
     refine (Set.finite_range fun q : u'.Λ ⧸ K =>
       (u.ex (z₀ + ((r q : u'.Λ) : Fin g → ℂ))).left (IsLocalRing.closedPoint ℂ)).subset ?_
     rintro x ⟨hx, hxc⟩
     obtain ⟨z, rfl⟩ := exists_ex_apply_eq u x hxc
-    have hx' : ((u.ex z).left ≫ ψ) (IsLocalRing.closedPoint ℂ) =
-        ((u.ex z₀).left ≫ ψ) (IsLocalRing.closedPoint ℂ) := by
+    have hx'
+        : ((u.ex z).left ≫ ψ) (IsLocalRing.closedPoint ℂ)
+          = ((u.ex z₀).left ≫ ψ) (IsLocalRing.closedPoint ℂ) := by
       first | exact hx | simpa using hx | (simp only [Scheme.Hom.comp_apply]; exact hx)
     rw [hex, hex] at hx'
     have e1 : u'.ex (z + a) = u'.ex (z₀ + a) :=
       Over.OverMorphism.ext (ext_of_apply_closedPoint_eq B.hom (Over.w _) (Over.w _) hx')
-    have hl : z - z₀ ∈ u'.Λ := by
-      simpa [add_sub_add_right_eq_sub] using sub_mem_of_ex_eq u' e1
+    have hl : z - z₀ ∈ u'.Λ := by simpa [add_sub_add_right_eq_sub] using sub_mem_of_ex_eq u' e1
     refine ⟨Submodule.Quotient.mk ⟨z - z₀, hl⟩, ?_⟩
     have h2 : (r (Submodule.Quotient.mk ⟨z - z₀, hl⟩) - ⟨z - z₀, hl⟩ : u'.Λ) ∈ K :=
       (Submodule.Quotient.eq K).1 (hr _)

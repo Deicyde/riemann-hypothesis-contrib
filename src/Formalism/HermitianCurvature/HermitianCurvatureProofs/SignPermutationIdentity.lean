@@ -11,8 +11,10 @@ namespace Formalism.FourierDecayAlt.P.SignAntidiagonal
 open Formalism.FourierDecayAlt.C3
 
 theorem sgn_step (s : ℕ) : s * (s - 1) / 2 + (s + 1) * (s + 1 - 1) / 2 = s * s := by
-  have h1 : s * (s - 1) / 2 * 2 = s * (s - 1) := Nat.div_mul_cancel (Nat.even_mul_pred_self s).two_dvd
-  have h2 : (s + 1) * (s + 1 - 1) / 2 * 2 = (s + 1) * (s + 1 - 1) := Nat.div_mul_cancel (Nat.even_mul_pred_self (s + 1)).two_dvd
+  have h1 : s * (s - 1) / 2 * 2 = s * (s - 1) :=
+    Nat.div_mul_cancel (Nat.even_mul_pred_self s).two_dvd
+  have h2 : (s + 1) * (s + 1 - 1) / 2 * 2 = (s + 1) * (s + 1 - 1) :=
+    Nat.div_mul_cancel (Nat.even_mul_pred_self (s + 1)).two_dvd
   have h3 : s * (s - 1) + (s + 1) * (s + 1 - 1) = 2 * (s * s) := by
     cases s with
     | zero => simp
@@ -23,8 +25,10 @@ theorem sgn_step (s : ℕ) : s * (s - 1) / 2 + (s + 1) * (s + 1 - 1) / 2 = s * s
   omega
 
 theorem sgn_step2 (s : ℕ) : s * (s - 1) / 2 + (s + 2) * (s + 2 - 1) / 2 = s * (s + 1) + 1 := by
-  have h1 : s * (s - 1) / 2 * 2 = s * (s - 1) := Nat.div_mul_cancel (Nat.even_mul_pred_self s).two_dvd
-  have h2 : (s + 2) * (s + 2 - 1) / 2 * 2 = (s + 2) * (s + 2 - 1) := Nat.div_mul_cancel (Nat.even_mul_pred_self (s + 2)).two_dvd
+  have h1 : s * (s - 1) / 2 * 2 = s * (s - 1) :=
+    Nat.div_mul_cancel (Nat.even_mul_pred_self s).two_dvd
+  have h2 : (s + 2) * (s + 2 - 1) / 2 * 2 = (s + 2) * (s + 2 - 1) :=
+    Nat.div_mul_cancel (Nat.even_mul_pred_self (s + 2)).two_dvd
   have h3 : s * (s - 1) + (s + 2) * (s + 2 - 1) = 2 * (s * (s + 1) + 1) := by
     cases s with
     | zero => simp
@@ -43,13 +47,16 @@ theorem sign_permutation_identity : SignE := by
   intro s
   refine ⟨?_, ?_⟩
   · unfold sgnW; rw [← pow_add, sgn_step, neg_one_pow_sq]
-  · unfold sgnW; rw [← pow_add, sgn_step2, pow_succ, Even.neg_one_pow (Nat.even_mul_succ_self s)]; ring
+  · unfold sgnW
+    rw [← pow_add, sgn_step2, pow_succ, Even.neg_one_pow (Nat.even_mul_succ_self s)]
+    ring
 
 theorem sgnW_succ (m : ℕ) : sgnW (m + 1) = (-1) ^ m * sgnW m := by
   have h := (sign_permutation_identity m).1
-  have hsq : sgnW m * sgnW m = 1 := by
-    unfold sgnW; rw [← pow_add, ← two_mul, pow_mul]; simp
-  calc sgnW (m + 1) = (sgnW m * sgnW m) * sgnW (m + 1) := by rw [hsq, one_mul]
+  have hsq : sgnW m * sgnW m = 1 := by unfold sgnW; rw [← pow_add, ← two_mul, pow_mul]; simp
+  calc
+    sgnW (m + 1)
+      = (sgnW m * sgnW m) * sgnW (m + 1) := by rw [hsq, one_mul]
     _ = sgnW m * (sgnW m * sgnW (m + 1)) := by ring
     _ = (-1) ^ m * sgnW m := by rw [h]; ring
 

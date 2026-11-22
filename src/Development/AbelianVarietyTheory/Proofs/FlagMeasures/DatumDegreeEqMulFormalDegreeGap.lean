@@ -13,7 +13,8 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ModularCharacterEqOneO
 
 @[expose] public section
 
-open BranchingSupport GlobalTheory.CellAmp GlobalTheory.Amp Formalism.BasicNotions Formalism.MainNotions.S Formalism.QuantumDeterminants Matrix MeasureTheory Finset
+open BranchingSupport GlobalTheory.CellAmp GlobalTheory.Amp Formalism.BasicNotions
+  Formalism.MainNotions.S Formalism.QuantumDeterminants Matrix MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 noncomputable section
@@ -22,7 +23,19 @@ namespace GlobalTheory.GapDegreeTie
 
 open Formalism.FourierDecayAlt.P.HaarUniquenessConjugation
 
-theorem deg_eq_mul_fdegH : GlobalTheory.GapIn.Hyp → ∀ (D : D7) τ w w' θ (W : LocW D.R.k D.R.rS), cdScaleTie D → GoodW D τ w w' θ W → ∃ κ : ℝ, 0 < κ ∧ ∀ (lam : Fin (2 * D.R.rS + D.R.k + 1) → ℝ) (A : LocS W), GoodS D lam A → (∃ h : ℝ, GapAtLeast (epsSH D.R) lam h ∧ Formalism.FourierDecayAlt.ThreeDimData.GapOK D.R.k D.R.rS h) → ∀ v : A.H, v ≠ 0 → A.deg = κ * PI.BesselPeriodGGP.fdegH W.μG A.σ v ∧ 0 < A.deg := by
+theorem deg_eq_mul_fdegH
+    : GlobalTheory.GapIn.Hyp
+      → ∀ (D : D7) τ w w' θ (W : LocW D.R.k D.R.rS),
+        cdScaleTie D → GoodW D τ w w' θ W
+          → ∃ κ : ℝ,
+            0 < κ
+              ∧ ∀ (lam : Fin (2 * D.R.rS + D.R.k + 1) → ℝ) (A : LocS W),
+                GoodS D lam A
+                  → (∃ h : ℝ,
+                    GapAtLeast (epsSH D.R) lam h
+                      ∧ Formalism.FourierDecayAlt.ThreeDimData.GapOK D.R.k D.R.rS h)
+                  → ∀ v : A.H,
+                    v ≠ 0 → A.deg = κ * PI.BesselPeriodGGP.fdegH W.μG A.σ v ∧ 0 < A.deg := by
   intro _ D τ w w' θ W _ hW
   have hμ : PI.BesselPeriodGGP.IsHaarOn (GG D.R.k D.R.rS) W.μG := hW.2.2.2.2.2.2.1
   by_cases hQ : ∃ Q, IsCayley D.R.k D.R.rS (epsSH D.R) Q
@@ -43,9 +56,11 @@ theorem deg_eq_mul_fdegH : GlobalTheory.GapIn.Hyp → ∀ (D : D7) τ w w' θ (W
   obtain ⟨P, hP, hd, hS⟩ := hA.2.2.2.2.2.2.2.2.2.2
   have hPd : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det P).1 hP.1
   have hme : MeasurableEmbedding (phi (epsSH D.R) P) :=
-    (phi_closedEmbedding (ε := epsSH D.R) Formalism.REAL.isClosedEmbeddingMatrix hPd).measurableEmbedding
+    (phi_closedEmbedding (ε := epsSH D.R) Formalism.REAL.isClosedEmbeddingMatrix
+      hPd).measurableEmbedding
   have hb : W.μG = (a / s) • (s • Formalism.REAL.muG (epsSH D.R)).map (phi (epsSH D.R) P) := by
-    rw [Measure.map_smul, smul_smul, ENNReal.div_mul_cancel hs0 hst, GlobalTheory.DegreeTie.map_phi_eq hP hQ]
+    rw [Measure.map_smul, smul_smul, ENNReal.div_mul_cancel hs0 hst,
+      GlobalTheory.DegreeTie.map_phi_eq hP hQ]
     · exact ha
     · exact hme.measurable.aemeasurable
   have hf : PI.BesselPeriodGGP.fdegH W.μG A.σ v = A.deg / (a / s).toReal := by
@@ -57,9 +72,12 @@ theorem deg_eq_mul_fdegH : GlobalTheory.GapIn.Hyp → ∀ (D : D7) τ w w' θ (W
       rw [hme.integrable_map_iff]
       exact h1
     · rw [integral_smul_measure, hme.integral_map]
-      have h3 : ∫ g, ⟪w, A.σ (Matrix.of (phi (epsSH D.R) P g)) v⟫_ℂ *
-          star ⟪w', A.σ (Matrix.of (phi (epsSH D.R) P g)) v'⟫_ℂ
-          ∂(s • Formalism.REAL.muG (epsSH D.R)) = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / ((A.deg : ℝ) : ℂ) := h2
+      have h3
+          : ∫ g, ⟪w, A.σ (Matrix.of (phi (epsSH D.R) P g)) v⟫_ℂ *
+              star ⟪w', A.σ (Matrix.of (phi (epsSH D.R) P g)) v'⟫_ℂ
+              ∂(s • Formalism.REAL.muG (epsSH D.R))
+            = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / ((A.deg : ℝ) : ℂ) :=
+        h2
       rw [h3, Complex.ofReal_div, div_div_eq_mul_div, Complex.real_smul]
       ring
   refine ⟨?_, hd⟩

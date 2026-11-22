@@ -71,10 +71,9 @@ open Formalism.BasicNotions (D7)
 open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity (IsLat jL Uniformization CMTransitive)
 open Formalism.MainNotions.TaylorLogMetric (lamOf)
 
-
 open Filter Topology in
-theorem weierstrassP_eventuallyEq (L L' : PeriodPair) (h2 : L.g₂ = L'.g₂) (h3 : L.g₃ = L'.g₃) :
-    L.weierstrassP =ᶠ[𝓝[≠] 0] L'.weierstrassP := by
+theorem weierstrassP_eventuallyEq (L L' : PeriodPair) (h2 : L.g₂ = L'.g₂) (h3 : L.g₃ = L'.g₃)
+    : L.weierstrassP =ᶠ[𝓝[≠] 0] L'.weierstrassP := by
   set f := L.weierstrassPExcept 0
   set F := L'.weierstrassPExcept 0
   set f' := L.derivWeierstrassPExcept 0
@@ -86,7 +85,8 @@ theorem weierstrassP_eventuallyEq (L L' : PeriodPair) (h2 : L.g₂ = L'.g₂) (h
   have hw : AnalyticAt ℂ (fun z => f z - F z) 0 := hf.sub hF
   suffices hw0 : ∀ᶠ z in 𝓝 (0:ℂ), f z - F z = 0 by
     filter_upwards [nhdsWithin_le_nhds hw0] with z hz
-    rw [WeierstrassODE.wp_eq, WeierstrassODE.wp_eq]; linear_combination hz
+    rw [WeierstrassODE.wp_eq, WeierstrassODE.wp_eq]
+    linear_combination hz
   by_contra hne
   obtain ⟨n, g, hg, hg0, hwg⟩ := hw.exists_eventuallyEq_pow_smul_nonzero_iff.mpr hne
   simp only [sub_zero, smul_eq_mul] at hwg
@@ -101,7 +101,8 @@ theorem weierstrassP_eventuallyEq (L L' : PeriodPair) (h2 : L.g₂ = L'.g₂) (h
     rcases n with _ | m
     · simp
     · push_cast; ring
-  have hid : ∀ᶠ z in 𝓝[≠] (0:ℂ), (n * g z + z * deriv g z) *
+  have hid
+      : ∀ᶠ z in 𝓝[≠] (0:ℂ), (n * g z + z * deriv g z) *
         (z ^ 3 * (f' z + F' z) - 4) - g z *
         (4 * ((1 + z ^ 2 * f z) ^ 2 + (1 + z ^ 2 * f z) * (1 + z ^ 2 * F z)
           + (1 + z ^ 2 * F z) ^ 2) - L.g₂ * z ^ 4) = 0 := by
@@ -113,15 +114,21 @@ theorem weierstrassP_eventuallyEq (L L' : PeriodPair) (h2 : L.g₂ = L'.g₂) (h
     rw [hd, hwz] at e
     apply mul_left_cancel₀ (pow_ne_zero n hz0')
     linear_combination e
-  have hcont : ContinuousAt (fun z => (n * g z + z * deriv g z) *
-        (z ^ 3 * (f' z + F' z) - 4) - g z *
-        (4 * ((1 + z ^ 2 * f z) ^ 2 + (1 + z ^ 2 * f z) * (1 + z ^ 2 * F z)
-          + (1 + z ^ 2 * F z) ^ 2) - L.g₂ * z ^ 4)) 0 := by
+  have hcont : ContinuousAt
+      (fun z =>
+        (n * g z + z * deriv g z) * (z ^ 3 * (f' z + F' z) - 4)
+          - g z
+            * (4
+                * ((1 + z ^ 2 * f z) ^ 2 + (1 + z ^ 2 * f z) * (1 + z ^ 2 * F z)
+                  + (1 + z ^ 2 * F z) ^ 2)
+              - L.g₂ * z ^ 4))
+      0 := by
     have hgd : AnalyticAt ℂ (deriv g) 0 := hg.deriv
     apply AnalyticAt.continuousAt (𝕜 := ℂ)
     fun_prop
-  have hlim := tendsto_nhds_unique (hcont.tendsto.mono_left nhdsWithin_le_nhds)
-    (tendsto_const_nhds.congr' (EventuallyEq.symm hid))
+  have hlim :=
+    tendsto_nhds_unique (hcont.tendsto.mono_left nhdsWithin_le_nhds)
+      (tendsto_const_nhds.congr' (EventuallyEq.symm hid))
   simp at hlim
   have : (4 * (n : ℂ) + 12) * g 0 = 0 := by linear_combination -hlim
   rcases mul_eq_zero.mp this with h | h

@@ -36,11 +36,13 @@ theorem volMap : VolMap := by
     exact measurable_ofComplex.comp Complex.measurableEquivRealProd.symm.measurable
   refine ⟨hm, ?_⟩
   ext s hs
-  have hp : (volume : Measure ℝ).prod (volume.restrict (Ioi (0 : ℝ))) =
-      (volume : Measure (ℝ × ℝ)).restrict (univ ×ˢ Ioi 0) := by
+  have hp
+      : (volume : Measure ℝ).prod (volume.restrict (Ioi (0 : ℝ)))
+        = (volume : Measure (ℝ × ℝ)).restrict (univ ×ˢ Ioi 0) := by
     rw [Measure.volume_eq_prod, ← Measure.prod_restrict, Measure.restrict_univ]
-  have hset : (fun p : ℝ × ℝ => pt p.1 p.2) ⁻¹' s ∩ univ ×ˢ Ioi 0 =
-      Complex.measurableEquivRealProd.symm ⁻¹' (UpperHalfPlane.coe '' s) := by
+  have hset
+      : (fun p : ℝ × ℝ => pt p.1 p.2) ⁻¹' s ∩ univ ×ˢ Ioi 0
+        = Complex.measurableEquivRealProd.symm ⁻¹' (UpperHalfPlane.coe '' s) := by
     ext p
     simp only [mem_inter_iff, mem_preimage, mem_prod, mem_univ, true_and, mem_Ioi, mem_image, pt_eq]
     constructor
@@ -51,11 +53,10 @@ theorem volMap : VolMap := by
     · rintro ⟨z, hz, hzp⟩
       refine ⟨?_, ?_⟩
       · rw [← hzp, ofComplex_apply]; exact hz
-      · have h3 : 0 < (Complex.measurableEquivRealProd.symm p).im := by
-          rw [← hzp]; exact z.im_pos
+      · have h3 : 0 < (Complex.measurableEquivRealProd.symm p).im := by rw [← hzp]; exact z.im_pos
         simpa using h3
-  rw [Measure.map_apply hm hs, withDensity_apply _ (hm hs), hp, Measure.restrict_restrict (hm hs), hset,
-    volume_eq_lintegral,
+  rw [Measure.map_apply hm hs, withDensity_apply _ (hm hs), hp, Measure.restrict_restrict (hm hs),
+    hset, volume_eq_lintegral,
     ← (Complex.volume_preserving_equiv_real_prod.symm _).setLIntegral_comp_preimage_emb
       Complex.measurableEquivRealProd.symm.measurableEmbedding]
   refine lintegral_congr fun p => ?_

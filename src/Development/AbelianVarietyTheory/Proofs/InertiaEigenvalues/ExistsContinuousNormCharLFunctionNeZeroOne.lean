@@ -13,21 +13,23 @@ open scoped ContDiff Classical
 namespace GlobalTheory
 namespace NormCharL
 
-theorem norm_cast_eq_one (K : Type) [Field K] [NumberField K] (m : ℕ) (β : 𝓞 K)
-    (h : β - 1 ∈ Ideal.span {(m : 𝓞 K)}) : ((Algebra.norm ℤ β : ℤ) : ZMod m) = 1 := by
+theorem norm_cast_eq_one
+    (K : Type) [Field K] [NumberField K] (m : ℕ) (β : 𝓞 K) (h : β - 1 ∈ Ideal.span {(m : 𝓞 K)})
+    : ((Algebra.norm ℤ β : ℤ) : ZMod m) = 1 := by
   obtain ⟨γ, hγ⟩ := Ideal.mem_span_singleton'.1 h
   have hβ : β = 1 + (m : 𝓞 K) * γ := by rw [mul_comm, hγ]; ring
   let b := Module.Free.chooseBasis ℤ (𝓞 K)
   have key : (Int.castRingHom (ZMod m)).mapMatrix (Algebra.leftMulMatrix b β) = 1 := by
-    rw [hβ, map_add (f := _), map_one, map_mul, map_natCast, map_add (f := _), map_one, map_mul, map_natCast]
+    rw [hβ, map_add (f := _), map_one, map_mul, map_natCast, map_add (f := _), map_one, map_mul,
+      map_natCast]
     ext i j
     simp [Matrix.one_apply]
   have h2 := (Int.castRingHom (ZMod m)).map_det (Algebra.leftMulMatrix b β)
   rw [key, Matrix.det_one, ← Algebra.norm_eq_matrix_det] at h2
   simpa using h2
 
-theorem sup_eq_top_iff (K : Type) [Field K] [NumberField K] (m : ℕ) (hm : m.Prime)
-    (I : Ideal (𝓞 K)) : I ⊔ Ideal.span {(m : 𝓞 K)} = ⊤ ↔ ¬ m ∣ Ideal.absNorm I := by
+theorem sup_eq_top_iff (K : Type) [Field K] [NumberField K] (m : ℕ) (hm : m.Prime) (I : Ideal (𝓞 K))
+    : I ⊔ Ideal.span {(m : 𝓞 K)} = ⊤ ↔ ¬ m ∣ Ideal.absNorm I := by
   constructor
   · intro h hdvd
     obtain ⟨i, hi, y, hy, hiy⟩ := Submodule.mem_sup.1 ((Ideal.eq_top_iff_one _).1 h)
@@ -46,7 +48,8 @@ theorem sup_eq_top_iff (K : Type) [Field K] [NumberField K] (m : ℕ) (hm : m.Pr
     have : Fact m.Prime := ⟨hm⟩
     exact zero_ne_one h1
   · intro h
-    have hc : Nat.Coprime (Ideal.absNorm I) m := (Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hm).2 h))
+    have hc : Nat.Coprime (Ideal.absNorm I) m :=
+      (Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hm).2 h))
     obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.2 hc
     rw [Ideal.eq_top_iff_one]
     have : (1 : 𝓞 K) = (u : 𝓞 K) * (Ideal.absNorm I : 𝓞 K) + (v : 𝓞 K) * (m : 𝓞 K) := by
@@ -54,11 +57,23 @@ theorem sup_eq_top_iff (K : Type) [Field K] [NumberField K] (m : ℕ) (hm : m.Pr
       push_cast at this
       exact this.symm
     rw [this]
-    exact Submodule.add_mem _ (Submodule.mem_sup_left (Ideal.mul_mem_left _ _ (Ideal.absNorm_mem I)))
+    exact Submodule.add_mem _
+      (Submodule.mem_sup_left (Ideal.mul_mem_left _ _ (Ideal.absNorm_mem I)))
       (Submodule.mem_sup_right (Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)))
 
-theorem exists_continuous_ne_zero_one :
-    ∀ (K : Type) [Field K] [NumberField K] (m : ℕ), m.Prime → ∀ (χ : (ZMod m)ˣ →* ℂˣ) (cl : HeightOneSpectrum (𝓞 K) → (ZMod m)ˣ), (∀ P, ¬ m ∣ Ideal.absNorm P.asIdeal → (cl P : ZMod m) = (Ideal.absNorm P.asIdeal : ℕ)) → (∃ P, ¬ m ∣ Ideal.absNorm P.asIdeal ∧ χ (cl P) ≠ 1) → ∃ L : ℂ → ℂ, Continuous L ∧ L 1 ≠ 0 ∧ ∀ s : ℝ, 1 < s → Complex.exp (∑' P : HeightOneSpectrum (𝓞 K), -Complex.log (1 - ((χ (cl P) : ℂˣ) : ℂ) * ((Ideal.absNorm P.asIdeal : ℕ) : ℂ) ^ (-(s : ℂ)))) = L s := by
+theorem exists_continuous_ne_zero_one
+    : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ),
+      m.Prime
+        → ∀ (χ : (ZMod m)ˣ →* ℂˣ) (cl : HeightOneSpectrum (𝓞 K) → (ZMod m)ˣ),
+          (∀ P, ¬ m ∣ Ideal.absNorm P.asIdeal → (cl P : ZMod m) = (Ideal.absNorm P.asIdeal : ℕ))
+            → (∃ P, ¬ m ∣ Ideal.absNorm P.asIdeal ∧ χ (cl P) ≠ 1)
+            → ∃ L : ℂ → ℂ,
+              Continuous L ∧ L 1 ≠ 0
+                ∧ ∀ s : ℝ,
+                  1 < s
+                    → Complex.exp
+                        (∑' P : HeightOneSpectrum (𝓞 K), -Complex.log (1 - ((χ (cl P) : ℂˣ) : ℂ) * ((Ideal.absNorm P.asIdeal : ℕ) : ℂ) ^ (-(s : ℂ))))
+                      = L s := by
   intro K _ _ m hm χ cl hcl hχ
   have : Fact m.Prime := ⟨hm⟩
   set M : Ideal (𝓞 K) := Ideal.span {(m : 𝓞 K)} with hMdef
@@ -108,7 +123,8 @@ theorem exists_continuous_ne_zero_one :
   have hεε : ε * ε = 1 := by
     rw [hε, ← Units.val_mul, ← map_mul]
     simp
-  obtain ⟨φ, hφmul, hφhom, hφsm, hφnorm, hφβ⟩ := GlobalTheory.T.exists_mixedSpace_norm_sign_character K ε hεε
+  obtain ⟨φ, hφmul, hφhom, hφsm, hφnorm, hφβ⟩ :=
+    GlobalTheory.T.exists_mixedSpace_norm_sign_character K ε hεε
   have hXφ : ∀ β : 𝓞 K, β ≠ 0 → β - 1 ∈ M → X (Ideal.span {β}) = φ (mixedEmbedding K β) := by
     intro β hβ0 hβ1
     rw [hφβ β hβ0]
@@ -129,8 +145,8 @@ theorem exists_continuous_ne_zero_one :
       rw [this, hψunit]
   obtain ⟨P, hPm, hPχ⟩ := hχ
   have hPtop : P.asIdeal ⊔ M = ⊤ := (GlobalTheory.NormCharL.sup_eq_top_iff K m hm P.asIdeal).2 hPm
-  have hclX (Q : HeightOneSpectrum (𝓞 K)) (hQ : ¬ m ∣ Ideal.absNorm Q.asIdeal) :
-      X Q.asIdeal = ((χ (cl Q) : ℂˣ) : ℂ) := by
+  have hclX (Q : HeightOneSpectrum (𝓞 K)) (hQ : ¬ m ∣ Ideal.absNorm Q.asIdeal)
+      : X Q.asIdeal = ((χ (cl Q) : ℂˣ) : ℂ) := by
     show ψ (Ideal.absNorm Q.asIdeal : ZMod m) = _
     rw [← hcl Q hQ, hψunit]
   have hnt : ∃ J, J ≠ ⊥ ∧ J ⊔ M = ⊤ ∧ X J ≠ 1 := by
@@ -148,8 +164,9 @@ theorem exists_continuous_ne_zero_one :
       intro h
       exact hQ (h ▸ le_sup_right)
     rw [hclX Q ((GlobalTheory.NormCharL.sup_eq_top_iff K m hm Q.asIdeal).1 htop)]
-  obtain ⟨L, hLd, hLe, hL1⟩ := GlobalTheory.idealCharacterL_continuation_ne_zero_one K M X φ hM0 hX0 hXmul
-    hXnorm hXzero hφmul hφhom hφsm hφnorm hXφ hnt c hc hcX
+  obtain ⟨L, hLd, hLe, hL1⟩ :=
+    GlobalTheory.idealCharacterL_continuation_ne_zero_one K M X φ hM0 hX0 hXmul hXnorm hXzero hφmul
+      hφhom hφsm hφnorm hXφ hnt c hc hcX
   refine ⟨fun z => L ((max z.re 1 : ℝ) : ℂ), ?_, ?_, ?_⟩
   · refine hLd.continuousOn.comp_continuous (by fun_prop) (fun z => ?_)
     show (0 : ℝ) < ((max z.re 1 : ℝ) : ℂ).re

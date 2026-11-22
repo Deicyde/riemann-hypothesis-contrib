@@ -11,14 +11,25 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem exists_uniformizer_and_residue_representatives :
-    ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)), (∃ π : F, v.valuation F π = WithZero.exp (-1) ∧ Valued.v (algebraMap F (v.adicCompletion F) π) = WithZero.exp (-1)) ∧ (∀ x : F, Valued.v (algebraMap F (v.adicCompletion F) x) = v.valuation F x) ∧ (∀ x : v.adicCompletion F, Valued.v x ≤ 1 → ∃ a : 𝓞 F, Valued.v (x - algebraMap F (v.adicCompletion F) (a : F)) < 1) ∧ ∃ R : Finset (v.adicCompletion F), R.card ≤ Ideal.absNorm v.asIdeal ∧ (∀ r ∈ R, Valued.v r ≤ 1) ∧ ∀ x : v.adicCompletion F, Valued.v x ≤ 1 → ∃ r ∈ R, Valued.v (x - r) < 1 := by
+theorem exists_uniformizer_and_residue_representatives
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)),
+      (∃ π : F,
+          v.valuation F π = WithZero.exp (-1)
+            ∧ Valued.v (algebraMap F (v.adicCompletion F) π) = WithZero.exp (-1))
+        ∧ (∀ x : F, Valued.v (algebraMap F (v.adicCompletion F) x) = v.valuation F x)
+        ∧ (∀ x : v.adicCompletion F,
+          Valued.v x ≤ 1 → ∃ a : 𝓞 F, Valued.v (x - algebraMap F (v.adicCompletion F) (a : F)) < 1)
+        ∧ ∃ R : Finset (v.adicCompletion F),
+          R.card ≤ Ideal.absNorm v.asIdeal ∧ (∀ r ∈ R, Valued.v r ≤ 1)
+            ∧ ∀ x : v.adicCompletion F, Valued.v x ≤ 1 → ∃ r ∈ R, Valued.v (x - r) < 1 := by
   intro F _ _ v
   classical
-  have h2 : ∀ x : F, Valued.v (algebraMap F (v.adicCompletion F) x) = v.valuation F x :=
-    fun x => HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
-  have h3 : ∀ x : v.adicCompletion F, Valued.v x ≤ 1 →
-      ∃ a : 𝓞 F, Valued.v (x - algebraMap F (v.adicCompletion F) (a : F)) < 1 := by
+  have h2 : ∀ x : F, Valued.v (algebraMap F (v.adicCompletion F) x) = v.valuation F x := fun x =>
+    HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
+  have h3
+      : ∀ x : v.adicCompletion F,
+        Valued.v x ≤ 1
+          → ∃ a : 𝓞 F, Valued.v (x - algebraMap F (v.adicCompletion F) (a : F)) < 1 := by
     intro x hx
     obtain ⟨a, ha⟩ := GlobalTheory.Idele.exists_valued_sub_le v hx 1
     refine ⟨a, lt_of_le_of_lt ha ?_⟩
@@ -30,8 +41,13 @@ theorem exists_uniformizer_and_residue_representatives :
   · haveI : Finite (𝓞 F ⧸ v.asIdeal) := v.asIdeal.finiteQuotientOfFreeOfNeBot v.ne_bot
     letI : Fintype (𝓞 F ⧸ v.asIdeal) := Fintype.ofFinite _
     choose s hs using Ideal.Quotient.mk_surjective (I := v.asIdeal)
-    refine ⟨Finset.univ.image fun q : 𝓞 F ⧸ v.asIdeal =>
-      algebraMap F (v.adicCompletion F) ((s q : 𝓞 F) : F), ?_, ?_, ?_⟩
+    refine ⟨
+      Finset.univ.image fun q : 𝓞 F ⧸ v.asIdeal =>
+        algebraMap F (v.adicCompletion F) ((s q : 𝓞 F) : F),
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · refine Finset.card_image_le.trans (le_of_eq ?_)
       rw [Ideal.absNorm_apply, Submodule.cardQuot_apply, Finset.card_univ, Nat.card_eq_fintype_card]
     · intro r hr

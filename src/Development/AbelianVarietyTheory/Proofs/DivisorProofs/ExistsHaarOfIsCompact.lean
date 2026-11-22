@@ -10,12 +10,17 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 noncomputable section
 namespace GlobalTheory.StabHaar
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem mat_mul {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g h : UA σ J) : mat (g * h) = mat g * mat h := rfl
+theorem mat_mul {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g h : UA σ J)
+    : mat (g * h) = mat g * mat h :=
+  rfl
 
 theorem mat_mul_inv {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g : UA σ J) : mat g * mat g⁻¹ = 1 := by
   show (g.1 * g.1⁻¹ : GL (Fin n) (AE F E)).1 = 1
@@ -28,8 +33,9 @@ theorem mat_inv_mul {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g : UA σ J) : mat
 theorem mat_one {n : ℕ} {J : Matrix (Fin n) (Fin n) E} : mat (1 : UA σ J) = 1 := rfl
 
 def stabK (B : Base F E) {n : ℕ} (X : Spc F E n) : Subgroup (UA σ X.J) where
-  carrier := {g | (∀ w, Commute ((mat g).map (piInf (B.emb w))) (X.θ w)) ∧
-    ∀ z ∈ latHat X, mat g *ᵥ z ∈ latHat X ∧ mat g⁻¹ *ᵥ z ∈ latHat X}
+  carrier :=
+    {g | (∀ w, Commute ((mat g).map (piInf (B.emb w))) (X.θ w)) ∧
+      ∀ z ∈ latHat X, mat g *ᵥ z ∈ latHat X ∧ mat g⁻¹ *ᵥ z ∈ latHat X}
   one_mem' := by
     refine ⟨fun w => ?_, fun z hz => ?_⟩
     · rw [mat_one, Matrix.map_one _ (map_zero _) (map_one _)]; exact Commute.one_left _
@@ -51,17 +57,22 @@ def stabK (B : Base F E) {n : ℕ} (X : Spc F E n) : Subgroup (UA σ X.J) where
         rw [← Matrix.map_mul, mat_inv_mul, Matrix.map_one _ (map_zero _) (map_one _)]
       have hc := hg1 w
       show A' * X.θ w = X.θ w * A'
-      calc A' * X.θ w = A' * X.θ w * (A * A') := by rw [e1, Matrix.mul_one]
+      calc
+        A' * X.θ w
+          = A' * X.θ w * (A * A') := by rw [e1, Matrix.mul_one]
         _ = A' * (X.θ w * A) * A' := by simp only [Matrix.mul_assoc]
         _ = A' * (A * X.θ w) * A' := by rw [hc.eq]
         _ = (A' * A) * X.θ w * A' := by simp only [Matrix.mul_assoc]
         _ = X.θ w * A' := by rw [e2, Matrix.one_mul]
     · rw [inv_inv]; exact ⟨(hg2 z hz).2, (hg2 z hz).1⟩
 
-theorem isStab_stabK (B : Base F E) {n : ℕ} (X : Spc F E n) : IsStab B (stabK (σ := σ) B X) := fun _ => Iff.rfl
+theorem isStab_stabK (B : Base F E) {n : ℕ} (X : Spc F E n) : IsStab B (stabK (σ := σ) B X) :=
+  fun _ => Iff.rfl
 
-theorem exists_haar_of_isCompact {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (K : Subgroup (UA σ J))
-    (hK : IsCompact (K : Set (UA σ J))) : ∃ μ : Measure K, μ.IsHaarMeasure := by
+theorem exists_haar_of_isCompact
+    {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
+    (K : Subgroup (UA σ J)) (hK : IsCompact (K : Set (UA σ J)))
+    : ∃ μ : Measure K, μ.IsHaarMeasure := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.1 hK
   haveI : BorelSpace (UA σ J) := ⟨rfl⟩
   haveI : IsModuleTopology (AF F) (AE F E) := ⟨rfl⟩
@@ -82,23 +93,29 @@ theorem exists_haar_idele : ∃ μ : Measure (AE F E)ˣ, μ.IsHaarMeasure := by
   haveI : BorelSpace (AE F E)ˣ := ⟨rfl⟩
   exact ⟨Measure.haar, inferInstance⟩
 
-theorem isClosed_stabK (B : Base F E) {n : ℕ} (X : Spc F E n)
-    (hL : IsClosed ((latHat X : AddSubgroup (Fin n → AE F E)) : Set (Fin n → AE F E))) :
-    IsClosed ((stabK (σ := σ) B X : Subgroup (UA σ X.J)) : Set (UA σ X.J)) := by
+theorem isClosed_stabK
+    (B : Base F E)
+    {n : ℕ} (X : Spc F E n)
+    (hL : IsClosed ((latHat X : AddSubgroup (Fin n → AE F E)) : Set (Fin n → AE F E)))
+    : IsClosed ((stabK (σ := σ) B X : Subgroup (UA σ X.J)) : Set (UA σ X.J)) := by
   haveI : Module.Finite F E := Module.Finite.of_restrictScalars_finite ℚ F E
   haveI : IsModuleTopology (AF F) (AE F E) := ⟨rfl⟩
   haveI : IsTopologicalRing (AE F E) := IsModuleTopology.isTopologicalRing (AF F) _
   have hm : Continuous fun g : UA σ X.J => mat g := Units.continuous_val.comp continuous_subtype_val
   have hmi : Continuous fun g : UA σ X.J => mat g⁻¹ := hm.comp continuous_inv
-  have hp : ∀ w, Continuous (piInf (B.emb w)) := fun w => GlobalTheory.Grow.continuous_infEmb_compInf F w (B.emb w)
+  have hp : ∀ w, Continuous (piInf (B.emb w)) := fun w =>
+    GlobalTheory.Grow.continuous_infEmb_compInf F w (B.emb w)
   have h1 : IsClosed {g : UA σ X.J | ∀ w, Commute ((mat g).map (piInf (B.emb w))) (X.θ w)} := by
     simp only [Set.setOf_forall]
-    exact isClosed_iInter fun w => isClosed_eq ((hm.matrix_map (hp w)).matrix_mul continuous_const)
-      (continuous_const.matrix_mul (hm.matrix_map (hp w)))
-  have h2 : IsClosed {g : UA σ X.J | ∀ z ∈ latHat X, mat g *ᵥ z ∈ latHat X ∧ mat g⁻¹ *ᵥ z ∈ latHat X} := by
+    exact isClosed_iInter fun w =>
+      isClosed_eq ((hm.matrix_map (hp w)).matrix_mul continuous_const)
+        (continuous_const.matrix_mul (hm.matrix_map (hp w)))
+  have h2 : IsClosed
+      {g : UA σ X.J | ∀ z ∈ latHat X, mat g *ᵥ z ∈ latHat X ∧ mat g⁻¹ *ᵥ z ∈ latHat X} := by
     simp only [Set.setOf_forall]
     refine isClosed_iInter fun z => isClosed_iInter fun _ => ?_
-    exact (hL.preimage (hm.matrix_mulVec continuous_const)).inter (hL.preimage (hmi.matrix_mulVec continuous_const))
+    exact (hL.preimage (hm.matrix_mulVec continuous_const)).inter
+      (hL.preimage (hmi.matrix_mulVec continuous_const))
   exact h1.inter h2
 
 end GlobalTheory.StabHaar

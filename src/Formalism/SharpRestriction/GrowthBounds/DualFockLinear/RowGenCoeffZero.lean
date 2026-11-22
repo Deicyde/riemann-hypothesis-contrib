@@ -14,8 +14,8 @@ namespace Formalism.MainNotions.TestSideCounting
 open Formalism.GradedWeylDivisibility
 open Formalism.L2.G.Model.TS (fockR)
 
-theorem RE_X (K : Type) [CommRing K] (k : ℕ) (a b : Fin k) (v : Fin k × Fin k) :
-    RE K k a b (X v) = if v.1 = b then X (a, v.2) else 0 := by
+theorem RE_X (K : Type) [CommRing K] (k : ℕ) (a b : Fin k) (v : Fin k × Fin k)
+    : RE K k a b (X v) = if v.1 = b then X (a, v.2) else 0 := by
   unfold RE
   simp only [pderiv_X]
   by_cases h : v.1 = b
@@ -40,8 +40,9 @@ theorem RE_C (K : Type) [CommRing K] (k : ℕ) (a b : Fin k) (r : K) : RE K k a 
   unfold RE
   simp
 
-theorem rowGen_coeff_zero (K : Type) [CommRing K] (k : ℕ) (a b : Fin k) (f : MvPolynomial (Fin k × Fin k) K) :
-    (rowGen K a b f).coeff 0 = f := by
+theorem rowGen_coeff_zero
+    (K : Type) [CommRing K] (k : ℕ) (a b : Fin k) (f : MvPolynomial (Fin k × Fin k) K)
+    : (rowGen K a b f).coeff 0 = f := by
   induction f using MvPolynomial.induction_on with
   | C r => simp [rowGen, Polynomial.algebraMap_apply, MvPolynomial.algebraMap_eq]
   | add p q hp hq => rw [map_add (f := _), Polynomial.coeff_add, hp, hq]
@@ -51,12 +52,16 @@ theorem rowGen_coeff_zero (K : Type) [CommRing K] (k : ℕ) (a b : Fin k) (f : M
     simp only [rowGen, aeval_X]
     split_ifs <;> simp
 
-theorem RE_eq_rowDiv (K : Type) [CommRing K] (k : ℕ) (a b : Fin k) (f : MvPolynomial (Fin k × Fin k) K) :
-    RE K k a b f = rowDiv K a b 1 f := by
+theorem RE_eq_rowDiv
+    (K : Type) [CommRing K] (k : ℕ) (a b : Fin k) (f : MvPolynomial (Fin k × Fin k) K)
+    : RE K k a b f = rowDiv K a b 1 f := by
   unfold rowDiv
   induction f using MvPolynomial.induction_on with
-  | C r => rw [RE_C]; simp [rowGen, Polynomial.algebraMap_apply, MvPolynomial.algebraMap_eq, Polynomial.coeff_C]
-  | add p q hp hq => rw [RE_add, map_add (f := _), Polynomial.coeff_add, hp, hq]
+  | C r =>
+    rw [RE_C]
+    simp [rowGen, Polynomial.algebraMap_apply, MvPolynomial.algebraMap_eq, Polynomial.coeff_C]
+  | add p q hp hq =>
+    rw [RE_add, map_add (f := _), Polynomial.coeff_add, hp, hq]
   | mul_X p v hp =>
     rw [RE_mul, map_mul, Polynomial.mul_coeff_one, rowGen_coeff_zero, rowGen_coeff_zero, hp, RE_X]
     have : (rowGen K a b (X v)).coeff 1 = if v.1 = b then X (a, v.2) else 0 := by

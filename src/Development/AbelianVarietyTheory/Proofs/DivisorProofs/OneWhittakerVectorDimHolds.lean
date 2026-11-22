@@ -9,11 +9,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WhittakerSpa
 
 namespace GlobalTheory.GenericProduct
 
-theorem oneGenericVector : OneGenericVector := GlobalTheory.T.whittakerSpaceDim_parabolicInduction_cuspidal_eq_one
+theorem oneGenericVector : OneGenericVector :=
+  GlobalTheory.T.whittakerSpaceDim_parabolicInduction_cuspidal_eq_one
 
-theorem genericMultOne_holds : GlobalTheory.IndefiniteRowSideFullHecke.GenericMultiplicityOne.GenericMultOne := genericMultOne oneGenericVector
+theorem genericMultOne_holds
+    : GlobalTheory.IndefiniteRowSideFullHecke.GenericMultiplicityOne.GenericMultOne :=
+  genericMultOne oneGenericVector
 
-theorem oneWhittakerVector_holds : GlobalTheory.IndefiniteRowSideFullHecke.CuspidalInducedCharacter.OneWhittakerVector :=
+theorem oneWhittakerVector_holds
+    : GlobalTheory.IndefiniteRowSideFullHecke.CuspidalInducedCharacter.OneWhittakerVector :=
   GlobalTheory.CuspidalIdempotentCharacters.genericMultOne_iff.1 genericMultOne_holds
 
 end GlobalTheory.GenericProduct

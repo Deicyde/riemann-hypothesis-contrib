@@ -9,14 +9,25 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.PsiUnit
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 namespace GlobalTheory.Mum
 
-theorem qkPt_finite_reps : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (hB : D.TauBimult) (F : Type) [Field F] [Algebra (FractionRing R) F] (k : ℕ), k ≠ 0 → Finite {x : TF (R := R) F ⟶ D.P.A // x ^ k = 1} → ∃ Rep : Set (QkPt D F k), Rep.Finite ∧ ∀ p : QkPt D F k, ∃ p' ∈ Rep, ∃ (z : D.X) (t : GtPtF D F), t.b = 1 ∧ (letI := GlobalTheory.TorusExt.gtGroup D F; k • t = 0 ∧ p.g = p'.g + GlobalTheory.TorusExt.iota hB F z + t) := by
+theorem qkPt_finite_reps
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (hB : D.TauBimult) (F : Type) [Field F]
+        [Algebra (FractionRing R) F] (k : ℕ),
+      k ≠ 0 → Finite {x : TF (R := R) F ⟶ D.P.A // x ^ k = 1}
+        → ∃ Rep : Set (QkPt D F k),
+          Rep.Finite
+            ∧ ∀ p : QkPt D F k, ∃ p' ∈ Rep, ∃ (z : D.X) (t : GtPtF D F),
+              t.b = 1
+                ∧ (letI := GlobalTheory.TorusExt.gtGroup D F
+                   k • t = 0 ∧ p.g = p'.g + GlobalTheory.TorusExt.iota hB F z + t) := by
   intro R _ _ D hB F _ _ k hk hfin
   letI := GlobalTheory.TorusExt.gtGroup D F
   classical
@@ -42,14 +53,14 @@ theorem qkPt_finite_reps : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre 
   have hδk : ∀ p, k • δ p = 0 := by
     intro p
     simp only [δ, smul_sub, GlobalTheory.TorusExt.qk_nsmul hB, ← map_nsmul, hzOf]
-    rw [map_add (f := _), map_neg]; abel
+    rw [map_add (f := _), map_neg]
+    abel
   have hδb : ∀ p, (δ p).b ^ k = 1 := by
     intro p
     rw [← GlobalTheory.TorusExt.nsmul_b, hδk p, GlobalTheory.TorusExt.zero_b]
-  let Φ : QkPt D F k → (D.X ⧸ K) × {x : TF (R := R) F ⟶ D.P.A // x ^ k = 1} :=
-    fun p => (Q p, ⟨(δ p).b, hδb p⟩)
-  let rep : (D.X ⧸ K) × {x : TF (R := R) F ⟶ D.P.A // x ^ k = 1} → QkPt D F k :=
-    Function.invFun Φ
+  let Φ : QkPt D F k → (D.X ⧸ K) × {x : TF (R := R) F ⟶ D.P.A // x ^ k = 1} := fun p =>
+    (Q p, ⟨(δ p).b, hδb p⟩)
+  let rep : (D.X ⧸ K) × {x : TF (R := R) F ⟶ D.P.A // x ^ k = 1} → QkPt D F k := Function.invFun Φ
   have hrep : ∀ p, Φ (rep (Φ p)) = Φ p := fun p => Function.invFun_eq ⟨p, rfl⟩
   refine ⟨Set.range (rep ∘ Φ), ?_, ?_⟩
   · rw [Set.range_comp]; exact (Set.toFinite _).image _
@@ -58,7 +69,8 @@ theorem qkPt_finite_reps : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre 
   have h1 : Q p' = Q p := congrArg Prod.fst (hrep p)
   have h2 : (δ p').b = (δ p).b := congrArg (fun x => x.2.1) (hrep p)
   refine ⟨p', ⟨p, rfl⟩, zOf p - zOf p', δ p - δ p', ?_, ?_, ?_⟩
-  · rw [sub_eq_add_neg, GlobalTheory.TorusExt.add_b, GlobalTheory.TorusExt.neg_b, h2, mul_inv_cancel]
+  · rw [sub_eq_add_neg, GlobalTheory.TorusExt.add_b, GlobalTheory.TorusExt.neg_b, h2,
+      mul_inv_cancel]
   · rw [smul_sub, hδk, hδk, sub_zero]
   · have hb : bp (Q p') = bp (Q p) := by rw [h1]
     simp only [δ, hb, map_sub]

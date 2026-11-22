@@ -16,9 +16,9 @@ section Generic
 
 variable {G : Type} [Group G]
 
-theorem mem_dc_iff (K : Subgroup G) (g x : G) :
-    x ∈ DoubleCoset.doubleCoset g (K : Set G) (K : Set G) ↔
-      ∃ a : K, ∃ b : K, x = (a : G) * g * b := by
+theorem mem_dc_iff (K : Subgroup G) (g x : G)
+    : x ∈ DoubleCoset.doubleCoset g (K : Set G) (K : Set G)
+      ↔ ∃ a : K, ∃ b : K, x = (a : G) * g * b := by
   rw [DoubleCoset.mem_doubleCoset]
   constructor
   · rintro ⟨a, ha, b, hb, rfl⟩
@@ -26,8 +26,8 @@ theorem mem_dc_iff (K : Subgroup G) (g x : G) :
   · rintro ⟨a, b, rfl⟩
     exact ⟨a, a.2, b, b.2, rfl⟩
 
-theorem mem_dc_one (K : Subgroup G) (x : G) :
-    x ∈ DoubleCoset.doubleCoset (1 : G) (K : Set G) (K : Set G) ↔ x ∈ K := by
+theorem mem_dc_one (K : Subgroup G) (x : G)
+    : x ∈ DoubleCoset.doubleCoset (1 : G) (K : Set G) (K : Set G) ↔ x ∈ K := by
   rw [mem_dc_iff]
   constructor
   · rintro ⟨a, b, rfl⟩
@@ -36,9 +36,10 @@ theorem mem_dc_one (K : Subgroup G) (x : G) :
   · intro hx
     exact ⟨⟨x, hx⟩, 1, by simp⟩
 
-theorem ind_biInv (k : Type) [CommRing k] (K : Subgroup G) (T : Set G)
-    (hT : ∀ a b : K, ∀ x : G, x ∈ T → (a : G) * x * b ∈ T) :
-    IsBiInv K (T.indicator (1 : G → k)) := by
+theorem ind_biInv
+    (k : Type) [CommRing k]
+    (K : Subgroup G) (T : Set G) (hT : ∀ a b : K, ∀ x : G, x ∈ T → (a : G) * x * b ∈ T)
+    : IsBiInv K (T.indicator (1 : G → k)) := by
   unfold IsBiInv
   intro a b x
   by_cases hx : x ∈ T
@@ -50,22 +51,30 @@ theorem ind_biInv (k : Type) [CommRing k] (K : Subgroup G) (T : Set G)
       simpa [mul_assoc] using this
     simp [Set.indicator_apply, hx, h']
 
-theorem dc_stable (K : Subgroup G) (g : G) (a b : K) (x : G)
-    (hx : x ∈ DoubleCoset.doubleCoset g (K : Set G) (K : Set G)) :
-    (a : G) * x * b ∈ DoubleCoset.doubleCoset g (K : Set G) (K : Set G) := by
+theorem dc_stable
+    (K : Subgroup G)
+    (g : G)
+    (a b : K)
+    (x : G) (hx : x ∈ DoubleCoset.doubleCoset g (K : Set G) (K : Set G))
+    : (a : G) * x * b ∈ DoubleCoset.doubleCoset g (K : Set G) (K : Set G) := by
   rw [mem_dc_iff] at hx ⊢
   obtain ⟨c, d, rfl⟩ := hx
   exact ⟨a * c, d * b, by simp [mul_assoc]⟩
 
-theorem mem_hecke_iff (k : Type) [CommRing k] (K : Subgroup G) (f : G → k) :
-    f ∈ Hecke k K ↔ IsBiInv K f ∧ FinDosetSupp K f := Iff.rfl
+theorem mem_hecke_iff (k : Type) [CommRing k] (K : Subgroup G) (f : G → k)
+    : f ∈ Hecke k K ↔ IsBiInv K f ∧ FinDosetSupp K f :=
+  Iff.rfl
 
-theorem dosetInd_of_mem (k : Type) [CommRing k] (K : Subgroup G) (g x : G)
-    (hx : x ∈ DoubleCoset.doubleCoset g (K : Set G) (K : Set G)) : dosetInd k K g x = 1 := by
+theorem dosetInd_of_mem
+    (k : Type) [CommRing k]
+    (K : Subgroup G) (g x : G) (hx : x ∈ DoubleCoset.doubleCoset g (K : Set G) (K : Set G))
+    : dosetInd k K g x = 1 := by
   simp [dosetInd, hx]
 
-theorem dosetInd_of_not_mem (k : Type) [CommRing k] (K : Subgroup G) (g x : G)
-    (hx : x ∉ DoubleCoset.doubleCoset g (K : Set G) (K : Set G)) : dosetInd k K g x = 0 := by
+theorem dosetInd_of_not_mem
+    (k : Type) [CommRing k]
+    (K : Subgroup G) (g x : G) (hx : x ∉ DoubleCoset.doubleCoset g (K : Set G) (K : Set G))
+    : dosetInd k K g x = 0 := by
   simp [dosetInd, hx]
 
 end Generic

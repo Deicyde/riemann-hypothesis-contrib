@@ -16,8 +16,7 @@ section Formula
 
 variable {G : Type} [Group G]
 
-noncomputable def reprIco (u : AddCircle (1 : ℚ)) : ℚ :=
-  (AddCircle.equivIco 1 0 u : ℚ)
+noncomputable def reprIco (u : AddCircle (1 : ℚ)) : ℚ := (AddCircle.equivIco 1 0 u : ℚ)
 
 theorem reprIco_mem (u : AddCircle (1 : ℚ)) : reprIco u ∈ Set.Ico (0 : ℚ) 1 := by
   unfold reprIco
@@ -26,22 +25,26 @@ theorem reprIco_mem (u : AddCircle (1 : ℚ)) : reprIco u ∈ Set.Ico (0 : ℚ) 
 theorem coe_reprIco (u : AddCircle (1 : ℚ)) : ((reprIco u : ℚ) : AddCircle (1 : ℚ)) = u :=
   (AddCircle.equivIco (1 : ℚ) 0).symm_apply_apply u
 
-theorem reprIco_coe {q : ℚ} (hq : q ∈ Set.Ico (0 : ℚ) 1) :
-    reprIco (q : AddCircle (1 : ℚ)) = q := by
+theorem reprIco_coe {q : ℚ} (hq : q ∈ Set.Ico (0 : ℚ) 1) : reprIco (q : AddCircle (1 : ℚ)) = q := by
   unfold reprIco
   rw [AddCircle.equivIco_coe_eq (by simpa using hq)]
 
 noncomputable def charCocycle (χ : Additive G →+ AddCircle (1 : ℚ)) (p : G × G) : ℤ :=
   ⌊reprIco (χ (Additive.ofMul p.1)) + reprIco (χ (Additive.ofMul p.2))⌋
 
-theorem charCocycle_cast (χ : Additive G →+ AddCircle (1 : ℚ)) (x x' : G) :
-    (charCocycle χ (x, x') : ℚ) = reprIco (χ (Additive.ofMul x)) + reprIco (χ (Additive.ofMul x'))
-      - reprIco (χ (Additive.ofMul (x * x'))) := by
+theorem charCocycle_cast (χ : Additive G →+ AddCircle (1 : ℚ)) (x x' : G)
+    : (charCocycle χ (x, x') : ℚ)
+      = reprIco (χ (Additive.ofMul x)) + reprIco (χ (Additive.ofMul x'))
+        - reprIco (χ (Additive.ofMul (x * x'))) := by
   have h1 := reprIco_mem (χ (Additive.ofMul x))
   have h2 := reprIco_mem (χ (Additive.ofMul x'))
   have h3 := reprIco_mem (χ (Additive.ofMul (x * x')))
-  have hc : ((reprIco (χ (Additive.ofMul x)) + reprIco (χ (Additive.ofMul x'))
-      - reprIco (χ (Additive.ofMul (x * x'))) : ℚ) : AddCircle (1 : ℚ)) = 0 := by
+  have hc
+      : ((reprIco (χ (Additive.ofMul x)) + reprIco (χ (Additive.ofMul x'))
+              - reprIco (χ (Additive.ofMul (x * x')))
+            : ℚ)
+          : AddCircle (1 : ℚ))
+        = 0 := by
     rw [AddCircle.coe_sub, AddCircle.coe_add, coe_reprIco, coe_reprIco, coe_reprIco, ofMul_mul,
       map_add, sub_self]
   obtain ⟨n, hn⟩ := (AddCircle.coe_eq_zero_iff _).1 hc
@@ -55,18 +58,21 @@ theorem charCocycle_cast (χ : Additive G →+ AddCircle (1 : ℚ)) (x x' : G) :
 
 variable [Fintype G]
 
-theorem charCocycle_mem_and_eq (χ : Additive G →+ AddCircle (1 : ℚ)) :
-    ∃ hc : charCocycle χ ∈ cocycles₂ (Rep.trivial ℤ G ℤ),
+theorem charCocycle_mem_and_eq (χ : Additive G →+ AddCircle (1 : ℚ))
+    : ∃ hc : charCocycle χ ∈ cocycles₂ (Rep.trivial ℤ G ℤ),
       charClass χ = H2π (Rep.trivial ℤ G ℤ) ⟨charCocycle χ, hc⟩ :=
-  h2IntAddEquiv_symm_apply_eq_H2_class G χ (fun g => reprIco (χ (Additive.ofMul g)))
-    (fun _ => coe_reprIco _) (charCocycle χ) (fun g h => charCocycle_cast χ g h)
+  h2IntAddEquiv_symm_apply_eq_H2_class G χ
+    (fun g => reprIco (χ (Additive.ofMul g)))
+    (fun _ => coe_reprIco _)
+    (charCocycle χ)
+    (fun g h => charCocycle_cast χ g h)
 
-theorem charCocycle_mem (χ : Additive G →+ AddCircle (1 : ℚ)) :
-    charCocycle χ ∈ cocycles₂ (Rep.trivial ℤ G ℤ) :=
+theorem charCocycle_mem (χ : Additive G →+ AddCircle (1 : ℚ))
+    : charCocycle χ ∈ cocycles₂ (Rep.trivial ℤ G ℤ) :=
   (charCocycle_mem_and_eq χ).1
 
-theorem charClass_eq_H2π (χ : Additive G →+ AddCircle (1 : ℚ)) :
-    charClass χ = H2π (Rep.trivial ℤ G ℤ) ⟨charCocycle χ, charCocycle_mem χ⟩ :=
+theorem charClass_eq_H2π (χ : Additive G →+ AddCircle (1 : ℚ))
+    : charClass χ = H2π (Rep.trivial ℤ G ℤ) ⟨charCocycle χ, charCocycle_mem χ⟩ :=
   (charCocycle_mem_and_eq χ).2
 
 end Formula
@@ -77,8 +83,8 @@ attribute [local instance 2000] Rep.hV2
 
 variable {G : Type} [Group G] {A : Rep ℤ G}
 
-theorem smul_mem_cocycles₂ (c : cocycles₂ (Rep.trivial ℤ G ℤ)) (a : A.ρ.invariants) :
-    (fun p => c p • (a : A)) ∈ cocycles₂ A := by
+theorem smul_mem_cocycles₂ (c : cocycles₂ (Rep.trivial ℤ G ℤ)) (a : A.ρ.invariants)
+    : (fun p => c p • (a : A)) ∈ cocycles₂ A := by
   rw [mem_cocycles₂_iff]
   intro g h j
   have hc := (mem_cocycles₂_iff c).1 c.2 g h j
@@ -86,23 +92,26 @@ theorem smul_mem_cocycles₂ (c : cocycles₂ (Rep.trivial ℤ G ℤ)) (a : A.ρ
   change c (g * h, j) + c (g, h) = c (h, j) + c (g, h * j) at hc
   rw [map_zsmul, ha, ← add_zsmul, ← add_zsmul, hc]
 
-theorem H0Iso_inv_apply (a : A.ρ.invariants) :
-    (H0Iso A).inv.hom a = (π A 0).hom ((cocyclesIso₀ A).inv.hom a) := by
+theorem H0Iso_inv_apply (a : A.ρ.invariants)
+    : (H0Iso A).inv.hom a = (π A 0).hom ((cocyclesIso₀ A).inv.hom a) := by
   have e : (cocyclesIso₀ A).inv ≫ π A 0 = (H0Iso A).inv := by
     rw [Iso.inv_comp_eq, ← π_comp_H0Iso_hom, Category.assoc, Iso.hom_inv_id, Category.comp_id]
   rw [← e]
   rfl
 
-theorem cupCharClass_apply (χ : Additive G →+ AddCircle (1 : ℚ))
-    (c : cocycles₂ (Rep.trivial ℤ G ℤ)) (hc : charClass χ = H2π _ c) (a : A.ρ.invariants) :
-    (cupCharClass A χ).hom a = H2π A ⟨fun p => c p • (a : A), smul_mem_cocycles₂ c a⟩ := by
+theorem cupCharClass_apply
+    (χ : Additive G →+ AddCircle (1 : ℚ)) (c : cocycles₂ (Rep.trivial ℤ G ℤ))
+    (hc : charClass χ = H2π _ c)
+    (a : A.ρ.invariants)
+    : (cupCharClass A χ).hom a = H2π A ⟨fun p => c p • (a : A), smul_mem_cocycles₂ c a⟩ := by
   change (map (MonoidHom.id G) (ρ_ A).hom 2).hom
-    (cupH (A := A) (B := 𝟙_ (Rep ℤ G)) (zero_add 2) ((H0Iso A).inv.hom a) (charClass χ)) = _
+      (cupH (A := A) (B := 𝟙_ (Rep ℤ G)) (zero_add 2) ((H0Iso A).inv.hom a) (charClass χ))
+    = _
   rw [H0Iso_inv_apply, hc]
-  change map (MonoidHom.id G) (ρ_ A).hom 2 (cupH (A := A) (B := 𝟙_ (Rep ℤ G)) (zero_add 2)
-    (π A 0 ((cocyclesIso₀ A).inv a))
-    (π (𝟙_ (Rep ℤ G)) 2 ((isoCocycles₂ (𝟙_ (Rep ℤ G))).inv c))) =
-    π A 2 ((isoCocycles₂ A).inv ⟨fun p => c p • (a : A), smul_mem_cocycles₂ c a⟩)
+  change map (MonoidHom.id G) (ρ_ A).hom 2
+      (cupH (A := A) (B := 𝟙_ (Rep ℤ G)) (zero_add 2) (π A 0 ((cocyclesIso₀ A).inv a))
+        (π (𝟙_ (Rep ℤ G)) 2 ((isoCocycles₂ (𝟙_ (Rep ℤ G))).inv c)))
+    = π A 2 ((isoCocycles₂ A).inv ⟨fun p => c p • (a : A), smul_mem_cocycles₂ c a⟩)
   rw [cupH_π]
   refine (GroundTheory.GroupCoh.map_π_apply _ _).trans ?_
   congr 1
@@ -124,51 +133,56 @@ attribute [local instance 2000] Rep.hV2 Submodule.module Submodule.Quotient.modu
 
 variable {G : Type} [Group G] {A : Rep ℤ G}
 
-theorem reprIco_zero : reprIco 0 = 0 := by
-  simpa using reprIco_coe (q := 0) (by simp)
+theorem reprIco_zero : reprIco 0 = 0 := by simpa using reprIco_coe (q := 0) (by simp)
 
-theorem charCocycle_one_right (χ : Additive G →+ AddCircle (1 : ℚ)) (x : G) :
-    charCocycle χ (x, 1) = 0 := by
+theorem charCocycle_one_right (χ : Additive G →+ AddCircle (1 : ℚ)) (x : G)
+    : charCocycle χ (x, 1) = 0 := by
   unfold charCocycle
   rw [ofMul_one, map_zero, reprIco_zero, add_zero, Int.floor_eq_zero_iff]
   exact reprIco_mem _
 
-theorem charCocycle_one_left (χ : Additive G →+ AddCircle (1 : ℚ)) (x : G) :
-    charCocycle χ (1, x) = 0 := by
+theorem charCocycle_one_left (χ : Additive G →+ AddCircle (1 : ℚ)) (x : G)
+    : charCocycle χ (1, x) = 0 := by
   unfold charCocycle
   rw [ofMul_one, map_zero, reprIco_zero, zero_add, Int.floor_eq_zero_iff]
   exact reprIco_mem _
 
 variable [Fintype G]
 
-theorem charCocycle_cocycle (χ : Additive G →+ AddCircle (1 : ℚ)) (x y w : G) :
-    charCocycle χ (x * y, w) + charCocycle χ (x, y) =
-      charCocycle χ (y, w) + charCocycle χ (x, y * w) := by
+theorem charCocycle_cocycle (χ : Additive G →+ AddCircle (1 : ℚ)) (x y w : G)
+    : charCocycle χ (x * y, w) + charCocycle χ (x, y)
+      = charCocycle χ (y, w) + charCocycle χ (x, y * w) := by
   have h := (mem_cocycles₂_iff _).1 (charCocycle_mem χ) x y w
   exact h
 
-theorem sum_charCocycle_cast (χ : Additive G →+ AddCircle (1 : ℚ)) (g : G) :
-    ((∑ x, charCocycle χ (x, g) : ℤ) : ℚ) =
-      Fintype.card G * reprIco (χ (Additive.ofMul g)) := by
+theorem sum_charCocycle_cast (χ : Additive G →+ AddCircle (1 : ℚ)) (g : G)
+    : ((∑ x, charCocycle χ (x, g) : ℤ) : ℚ) = Fintype.card G * reprIco (χ (Additive.ofMul g)) := by
   push_cast
   simp_rw [charCocycle_cast]
   rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
-    Fintype.sum_equiv (Equiv.mulRight g) (fun x => reprIco (χ (Additive.ofMul (x * g))))
-      (fun x => reprIco (χ (Additive.ofMul x))) (fun x => rfl)]
+    Fintype.sum_equiv (Equiv.mulRight g)
+      (fun x => reprIco (χ (Additive.ofMul (x * g))))
+      (fun x => reprIco (χ (Additive.ofMul x)))
+      (fun x => rfl)]
   simp
 
 noncomputable def normWeight (χ : Additive G →+ AddCircle (1 : ℚ)) (h x : G) : ℤ :=
-  -⌊reprIco (χ (Additive.ofMul h)) - reprIco (χ (Additive.ofMul x))⌋
+  - ⌊reprIco (χ (Additive.ofMul h)) - reprIco (χ (Additive.ofMul x))⌋
 
 omit [Fintype G] in
-theorem normWeight_cast (χ : Additive G →+ AddCircle (1 : ℚ)) (h x : G) :
-    (normWeight χ h x : ℚ) = reprIco (χ (Additive.ofMul x)) - reprIco (χ (Additive.ofMul h))
-      + reprIco (χ (Additive.ofMul (x⁻¹ * h))) := by
+theorem normWeight_cast (χ : Additive G →+ AddCircle (1 : ℚ)) (h x : G)
+    : (normWeight χ h x : ℚ)
+      = reprIco (χ (Additive.ofMul x)) - reprIco (χ (Additive.ofMul h))
+        + reprIco (χ (Additive.ofMul (x⁻¹ * h))) := by
   have h1 := reprIco_mem (χ (Additive.ofMul h))
   have h2 := reprIco_mem (χ (Additive.ofMul x))
   have h3 := reprIco_mem (χ (Additive.ofMul (x⁻¹ * h)))
-  have hc : ((reprIco (χ (Additive.ofMul h)) - reprIco (χ (Additive.ofMul x))
-      - reprIco (χ (Additive.ofMul (x⁻¹ * h))) : ℚ) : AddCircle (1 : ℚ)) = 0 := by
+  have hc
+      : ((reprIco (χ (Additive.ofMul h)) - reprIco (χ (Additive.ofMul x))
+              - reprIco (χ (Additive.ofMul (x⁻¹ * h)))
+            : ℚ)
+          : AddCircle (1 : ℚ))
+        = 0 := by
     rw [AddCircle.coe_sub, AddCircle.coe_sub, coe_reprIco, coe_reprIco, coe_reprIco, ofMul_mul,
       ofMul_inv, map_add, map_neg]
     abel
@@ -183,12 +197,14 @@ theorem normWeight_cast (χ : Additive G →+ AddCircle (1 : ℚ)) (h x : G) :
   push_cast
   linarith
 
-theorem smul_norm_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)) (b : A) :
-    (fun p => charCocycle χ p • A.ρ.norm b) ∈ coboundaries₂ A := by
+theorem smul_norm_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)) (b : A)
+    : (fun p => charCocycle χ p • A.ρ.norm b) ∈ coboundaries₂ A := by
   refine ⟨fun x => ∑ h, normWeight χ h x • A.ρ h b, ?_⟩
   funext ⟨x, x'⟩
-  have hw : ∀ h : G, normWeight χ (x⁻¹ * h) x' - normWeight χ h (x * x') + normWeight χ h x =
-      charCocycle χ (x, x') := by
+  have hw
+      : ∀ h : G,
+        normWeight χ (x⁻¹ * h) x' - normWeight χ h (x * x') + normWeight χ h x
+          = charCocycle χ (x, x') := by
     intro h
     have e := charCocycle_cast χ x x'
     have e1 := normWeight_cast χ (x⁻¹ * h) x'
@@ -196,14 +212,14 @@ theorem smul_norm_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ))
     have e3 := normWeight_cast χ h x
     rw [← mul_assoc] at e1
     rw [mul_inv_rev] at e2
-    have : ((normWeight χ (x⁻¹ * h) x' - normWeight χ h (x * x') + normWeight χ h x : ℤ) : ℚ) =
-        (charCocycle χ (x, x') : ℚ) := by
+    have : ((normWeight χ (x⁻¹ * h) x' - normWeight χ h (x * x') + normWeight χ h x : ℤ) : ℚ)
+        = (charCocycle χ (x, x') : ℚ) := by
       push_cast
       rw [e, e1, e2, e3]
       ring
     exact_mod_cast this
-  have hshift : A.ρ x (∑ h, normWeight χ h x' • A.ρ h b) =
-      ∑ h, normWeight χ (x⁻¹ * h) x' • A.ρ h b := by
+  have hshift
+      : A.ρ x (∑ h, normWeight χ h x' • A.ρ h b) = ∑ h, normWeight χ (x⁻¹ * h) x' • A.ρ h b := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp_rw [map_zsmul, ← Module.End.mul_apply, ← map_mul]
@@ -214,9 +230,10 @@ theorem smul_norm_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ))
   refine Finset.sum_congr rfl fun h _ => ?_
   rw [← hw h, add_zsmul, sub_zsmul, sub_eq_add_neg]
 
-theorem exists_norm_eq_of_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)) (g : G)
-    (hg : ∑ x, charCocycle χ (x, g) = 1) (a : A)
-    (h : (fun p => charCocycle χ p • a) ∈ coboundaries₂ A) : ∃ b, A.ρ.norm b = a := by
+theorem exists_norm_eq_of_mem_coboundaries₂
+    (χ : Additive G →+ AddCircle (1 : ℚ)) (g : G) (hg : ∑ x, charCocycle χ (x, g) = 1)
+    (a : A) (h : (fun p => charCocycle χ p • a) ∈ coboundaries₂ A)
+    : ∃ b, A.ρ.norm b = a := by
   obtain ⟨f, hf⟩ := h
   refine ⟨f g, ?_⟩
   have e : ∀ x, A.ρ x (f g) - f (x * g) + f x = charCocycle χ (x, g) • a := fun x =>
@@ -227,14 +244,15 @@ theorem exists_norm_eq_of_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1
     simp only [zmultiplesHom_apply] at this
     exact this.symm
   rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, hsum, hg, one_zsmul,
-    Fintype.sum_equiv (Equiv.mulRight g) (fun x => f (x * g)) f (fun x => rfl), sub_add_cancel]
+      Fintype.sum_equiv (Equiv.mulRight g) (fun x => f (x * g)) f (fun x => rfl), sub_add_cancel]
     at hs
   rw [← hs, Representation.norm, LinearMap.sum_apply]
 
-theorem exists_sub_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)) (g : G)
-    (hgen : ∀ x, ∃ j : ℕ, g ^ j = x) (hg : ∑ x, charCocycle χ (x, g) = 1) (z : cocycles₂ A) :
-    ∃ a : A, (∀ h, A.ρ h a = a) ∧
-      (fun p => charCocycle χ p • a) - ⇑z ∈ coboundaries₂ A := by
+theorem exists_sub_mem_coboundaries₂
+    (χ : Additive G →+ AddCircle (1 : ℚ)) (g : G)
+    (hgen : ∀ x, ∃ j : ℕ, g ^ j = x) (hg : ∑ x, charCocycle χ (x, g) = 1)
+    (z : cocycles₂ A)
+    : ∃ a : A, (∀ h, A.ρ h a = a) ∧ (fun p => charCocycle χ p • a) - ⇑z ∈ coboundaries₂ A := by
   classical
   set m := Fintype.card G with hm
   set c := charCocycle χ with hcdef
@@ -248,11 +266,15 @@ theorem exists_sub_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)
       abel
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hadef, map_sum, Finset.sum_congr rfl (fun x _ => e x), Finset.sum_sub_distrib,
-      Finset.sum_add_distrib,
-      Fintype.sum_equiv (Equiv.mulLeft h) (fun x => z (h * x, g)) (fun x => z (x, g))
-        (fun x => rfl),
-      Fintype.sum_equiv (Equiv.mulRight g) (fun x => z (h, x * g)) (fun x => z (h, x))
-        (fun x => rfl)]
+        Finset.sum_add_distrib,
+        Fintype.sum_equiv (Equiv.mulLeft h)
+          (fun x => z (h * x, g))
+          (fun x => z (x, g))
+          (fun x => rfl),
+        Fintype.sum_equiv (Equiv.mulRight g)
+          (fun x => z (h, x * g))
+          (fun x => z (h, x))
+          (fun x => rfl)]
     abel
   set φ : G → A := fun x => c (x, g) • a - z (x, g) with hφdef
   have hsum : ∑ x, c (x, g) • a = (∑ x, c (x, g)) • a := by
@@ -288,8 +310,8 @@ theorem exists_sub_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)
     have e : ∑ i ∈ Finset.range m, φ (g ^ (j + i)) = 0 := by
       have := hsumpow (fun x => φ (g ^ j * x))
       simp only [← pow_add] at this
-      rw [this, Fintype.sum_equiv (Equiv.mulLeft (g ^ j)) (fun x => φ (g ^ j * x)) φ
-        (fun x => rfl), hφ]
+      rw [this, Fintype.sum_equiv (Equiv.mulLeft (g ^ j)) (fun x => φ (g ^ j * x)) φ (fun x => rfl),
+        hφ]
     simp only [hFdef, Finset.sum_range_add, e, add_zero]
   have hFmod : ∀ j, F j = F (j % m) := by
     have hk : ∀ k r, F (r + m * k) = F r := by
@@ -318,8 +340,8 @@ theorem exists_sub_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)
     have := hf 1
     rw [pow_one] at this
     rw [this, hFsucc, pow_zero, hFdef]
-    simp only [Finset.range_zero, Finset.sum_empty, add_zero, hφdef, hcdef,
-      charCocycle_one_left, zero_smul, cocycles₂_map_one_fst z g]
+    simp only [Finset.range_zero, Finset.sum_empty, add_zero, hφdef, hcdef, charCocycle_one_left,
+      zero_smul, cocycles₂_map_one_fst z g]
     abel
   have hfstep : ∀ x, f (x * g) = f x + φ x := by
     intro x
@@ -340,8 +362,9 @@ theorem exists_sub_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)
     have h1 := hz x y w
     have h2 := hdf x y w
     simp only [hz'def, map_sub]
-    rw [show z (x * y, w) - (d₁₂ A).hom f (x * y, w) + (z (x, y) - (d₁₂ A).hom f (x, y)) =
-      (z (x * y, w) + z (x, y)) - ((d₁₂ A).hom f (x * y, w) + (d₁₂ A).hom f (x, y)) by abel,
+    rw [show z (x * y, w) - (d₁₂ A).hom f (x * y, w) + (z (x, y) - (d₁₂ A).hom f (x, y))
+          = (z (x * y, w) + z (x, y)) - ((d₁₂ A).hom f (x * y, w) + (d₁₂ A).hom f (x, y)) by
+        abel,
       h1, h2]
     abel
   have hz'pow : ∀ j x, z' (x, g ^ j) = c (x, g ^ j) • a := by
@@ -371,9 +394,11 @@ theorem exists_sub_mem_coboundaries₂ (χ : Additive G →+ AddCircle (1 : ℚ)
   rw [← e]
   abel
 
-theorem exists_generator_sum_charCocycle [IsCyclic G] (χ : Additive G →+ AddCircle (1 : ℚ))
-    (hχ : Function.Injective χ) (hm : 2 ≤ Fintype.card G) :
-    ∃ g : G, (∀ x, ∃ j : ℕ, g ^ j = x) ∧ ∑ x, charCocycle χ (x, g) = 1 := by
+theorem exists_generator_sum_charCocycle
+    [IsCyclic G]
+    (χ : Additive G →+ AddCircle (1 : ℚ)) (hχ : Function.Injective χ)
+    (hm : 2 ≤ Fintype.card G)
+    : ∃ g : G, (∀ x, ∃ j : ℕ, g ^ j = x) ∧ ∑ x, charCocycle χ (x, g) = 1 := by
   obtain ⟨σ, hσ⟩ := IsCyclic.exists_generator (α := G)
   set m := Fintype.card G with hmdef
   have hordσ : orderOf σ = m := by
@@ -393,17 +418,19 @@ theorem exists_generator_sum_charCocycle [IsCyclic G] (χ : Additive G →+ AddC
   obtain ⟨s, hs⟩ : ∃ s : ℤ, s = Nat.gcdA r m := ⟨_, rfl⟩
   obtain ⟨t, ht⟩ : ∃ t : ℤ, t = Nat.gcdB r m := ⟨_, rfl⟩
   rw [← hs, ← ht] at hbez
-  have hσm : σ ^ (m : ℤ) = 1 := by
-    rw [zpow_natCast, ← hordσ, pow_orderOf_eq_one]
+  have hσm : σ ^ (m : ℤ) = 1 := by rw [zpow_natCast, ← hordσ, pow_orderOf_eq_one]
   have hσeq : (σ ^ s) ^ (r : ℤ) = σ := by
-    rw [← zpow_mul, show s * (r : ℤ) = 1 + (m : ℤ) * (-t) by linarith, zpow_add, zpow_one,
-      zpow_mul, hσm, one_zpow, mul_one]
+    rw [← zpow_mul, show s * (r : ℤ) = 1 + (m : ℤ) * (-t) by linarith, zpow_add, zpow_one, zpow_mul,
+      hσm, one_zpow, mul_one]
   refine ⟨σ ^ s, ?_, ?_⟩
   · intro x
     obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.1 (hσ x)
-    have hx : σ ^ k ∈ Subgroup.zpowers (σ ^ s) := ⟨(r : ℤ) * k, by
-      simp only
-      rw [zpow_mul, hσeq]⟩
+    have hx : σ ^ k ∈ Subgroup.zpowers (σ ^ s) := ⟨
+      (r : ℤ) * k,
+      by
+        simp only
+        rw [zpow_mul, hσeq]
+    ⟩
     rw [← mem_powers_iff_mem_zpowers] at hx
     obtain ⟨j, hj⟩ := hx
     exact ⟨j, hj⟩
@@ -426,23 +453,25 @@ theorem exists_generator_sum_charCocycle [IsCyclic G] (χ : Additive G →+ AddC
     rw [hy, mul_one_div_cancel hmpos.ne'] at this
     exact_mod_cast this
 
-
 omit [Fintype G] in
-theorem mem_coboundaries₂_of_subsingleton [Subsingleton G] (z : cocycles₂ A) :
-    ⇑z ∈ coboundaries₂ A := by
+theorem mem_coboundaries₂_of_subsingleton [Subsingleton G] (z : cocycles₂ A)
+    : ⇑z ∈ coboundaries₂ A := by
   refine ⟨fun _ => z (1, 1), ?_⟩
   funext ⟨x, y⟩
   rw [Subsingleton.elim x 1, Subsingleton.elim y 1]
   simp
 
-theorem cupCharClass_apply_charCocycle (χ : Additive G →+ AddCircle (1 : ℚ))
-    (a : A.ρ.invariants) :
-    (cupCharClass A χ).hom a = H2π A ⟨fun p => charCocycle χ p • (a : A),
-      smul_mem_cocycles₂ ⟨charCocycle χ, charCocycle_mem χ⟩ a⟩ :=
+theorem cupCharClass_apply_charCocycle (χ : Additive G →+ AddCircle (1 : ℚ)) (a : A.ρ.invariants)
+    : (cupCharClass A χ).hom a
+      = H2π A ⟨
+        fun p => charCocycle χ p • (a : A),
+        smul_mem_cocycles₂ ⟨charCocycle χ, charCocycle_mem χ⟩ a
+      ⟩ :=
   cupCharClass_apply χ _ (charClass_eq_H2π χ) a
 
-theorem cupCharClass_eq_zero_of_mem (χ : Additive G →+ AddCircle (1 : ℚ)) (a : A.ρ.invariants)
-    (ha : a ∈ normRangeInvariants A) : (cupCharClass A χ).hom a = 0 := by
+theorem cupCharClass_eq_zero_of_mem
+    (χ : Additive G →+ AddCircle (1 : ℚ)) (a : A.ρ.invariants) (ha : a ∈ normRangeInvariants A)
+    : (cupCharClass A χ).hom a = 0 := by
   obtain ⟨b, hb⟩ := (mem_normRangeInvariants_iff A a).1 ha
   rw [cupCharClass_apply_charCocycle, H2π_eq_zero_iff]
   change (fun p => charCocycle χ p • (a : A)) ∈ coboundaries₂ A
@@ -451,8 +480,9 @@ theorem cupCharClass_eq_zero_of_mem (χ : Additive G →+ AddCircle (1 : ℚ)) (
 
 variable [IsCyclic G]
 
-theorem cupCharClass_eq_zero_iff (χ : Additive G →+ AddCircle (1 : ℚ)) (hχ : Function.Injective χ)
-    (a : A.ρ.invariants) : (cupCharClass A χ).hom a = 0 ↔ a ∈ normRangeInvariants A := by
+theorem cupCharClass_eq_zero_iff
+    (χ : Additive G →+ AddCircle (1 : ℚ)) (hχ : Function.Injective χ) (a : A.ρ.invariants)
+    : (cupCharClass A χ).hom a = 0 ↔ a ∈ normRangeInvariants A := by
   refine ⟨fun h => ?_, cupCharClass_eq_zero_of_mem χ a⟩
   rw [mem_normRangeInvariants_iff]
   rcases Nat.lt_or_ge (Fintype.card G) 2 with hm | hm
@@ -464,8 +494,8 @@ theorem cupCharClass_eq_zero_iff (χ : Additive G →+ AddCircle (1 : ℚ)) (hχ
     rw [cupCharClass_apply_charCocycle, H2π_eq_zero_iff] at h
     exact exists_norm_eq_of_mem_coboundaries₂ χ g hg (a : A) h
 
-theorem cupCharClass_surjective (χ : Additive G →+ AddCircle (1 : ℚ)) (hχ : Function.Injective χ) :
-    Function.Surjective (cupCharClass A χ).hom := by
+theorem cupCharClass_surjective (χ : Additive G →+ AddCircle (1 : ℚ)) (hχ : Function.Injective χ)
+    : Function.Surjective (cupCharClass A χ).hom := by
   intro y
   induction y using H2_induction_on with
   | h z =>

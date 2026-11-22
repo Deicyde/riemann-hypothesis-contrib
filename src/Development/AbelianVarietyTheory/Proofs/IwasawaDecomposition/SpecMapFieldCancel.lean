@@ -66,16 +66,19 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Admissi
 
 open AlgebraicGeometry CategoryTheory
 
-theorem GlobalTheory.spec_map_field_cancel {K C : Type} [Field K] [Field C] (gam : K →+* C)
+theorem GlobalTheory.spec_map_field_cancel
+    {K C : Type} [Field K] [Field C]
+    (gam : K →+* C)
     {X : Scheme} (y y' : Spec (CommRingCat.of K) ⟶ X)
-    (h : Spec.map (CommRingCat.ofHom gam) ≫ y = Spec.map (CommRingCat.ofHom gam) ≫ y') :
-    y = y' := by
+    (h : Spec.map (CommRingCat.ofHom gam) ≫ y = Spec.map (CommRingCat.ofHom gam) ≫ y')
+    : y = y' := by
   obtain ⟨⟨p, φ⟩, rfl⟩ := (Scheme.SpecToEquivOfField K X).symm.surjective y
   obtain ⟨⟨p', φ'⟩, rfl⟩ := (Scheme.SpecToEquivOfField K X).symm.surjective y'
   simp only [Scheme.SpecToEquivOfField_symm_apply] at h ⊢
-  have e : ∀ (q : X) (ψ : X.residueField q ⟶ CommRingCat.of K),
-      Spec.map (CommRingCat.ofHom gam) ≫ (Spec.map ψ ≫ X.fromSpecResidueField q) =
-        (Scheme.SpecToEquivOfField C X).symm ⟨q, ψ ≫ CommRingCat.ofHom gam⟩ := by
+  have e
+      : ∀ (q : X) (ψ : X.residueField q ⟶ CommRingCat.of K),
+        Spec.map (CommRingCat.ofHom gam) ≫ (Spec.map ψ ≫ X.fromSpecResidueField q)
+          = (Scheme.SpecToEquivOfField C X).symm ⟨q, ψ ≫ CommRingCat.ofHom gam⟩ := by
     intro q ψ
     simp only [Scheme.SpecToEquivOfField_symm_apply, Spec.map_comp, Category.assoc]
   rw [e, e] at h

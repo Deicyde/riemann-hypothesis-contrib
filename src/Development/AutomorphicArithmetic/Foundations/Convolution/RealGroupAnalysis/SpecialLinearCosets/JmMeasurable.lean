@@ -7,8 +7,11 @@ public import GroundTheory.GlobalFields.TateThesis.RootNumberLocalPlace
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H UpperTheory.ConvolutionTheory.R2.I
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
+  UpperTheory.ConvolutionTheory.R2.I
 open scoped Classical
 
 section SlopeTestRemainingChoices
@@ -29,13 +32,14 @@ private lemma Jm_measurable : Measurable (Jm (v := v)) := by
 
 private noncomputable def JmE : (Fin 2 → Kv v) ≃ᵐ (Fin 2 → Kv v) where
   toFun := Jm
-  invFun := fun c => -Jm c
+  invFun := fun c => - Jm c
   left_inv := fun c => by
     show -Jm (Jm c) = c
     rw [Jm_Jm, neg_neg]
   right_inv := fun c => by
     show Jm (-Jm c) = c
-    funext i; fin_cases i <;> simp [Jm]
+    funext i
+    fin_cases i <;> simp [Jm]
   measurable_toFun := Jm_measurable
   measurable_invFun := measurable_neg.comp Jm_measurable
 
@@ -139,8 +143,9 @@ private lemma part1 {a : M2 v → ℂ} (ha : a ∈ SB (M2 v)) (p q : Fin 2 → K
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.ConvolutionTheory.R2.I.ptInv :
-    ∀ (F : Type) [Field F] [NumberField F] (v : P F), ∀ a ∈ SB (M2 v), (∀ m, Pt (fun X => Pt a (sw X)) (sw m) = a m) ∧ ∃ a' ∈ SB (M2 v), Pt a' = a := by
+theorem UpperTheory.ConvolutionTheory.R2.I.ptInv
+    : ∀ (F : Type) [Field F] [NumberField F] (v : P F), ∀ a ∈ SB (M2 v),
+      (∀ m, Pt (fun X => Pt a (sw X)) (sw m) = a m) ∧ ∃ a' ∈ SB (M2 v), Pt a' = a := by
   intro F _ _ v a ha
   have h1 : ∀ b ∈ SB (M2 v), ∀ m, Pt (fun X => Pt b (sw X)) (sw m) = b m := by
     intro b hb m

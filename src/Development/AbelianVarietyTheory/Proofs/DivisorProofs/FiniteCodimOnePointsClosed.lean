@@ -8,14 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Intersection
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 namespace GlobalTheory.Cartier
 
-theorem finite_coheight_one_of_ne_top : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsNoetherian Y]
-    (B : Closeds Y), B ≠ ⊤ → {v : Y | Order.coheight v = 1 ∧ v ∈ B}.Finite := by
+theorem finite_coheight_one_of_ne_top
+    : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsNoetherian Y] (B : Closeds Y),
+      B ≠ ⊤ → {v : Y | Order.coheight v = 1 ∧ v ∈ B}.Finite := by
   intro Y _ _ B hB
   classical
   have hgen : genericPoint Y ∉ (B : Set Y) := fun h =>
@@ -33,8 +36,8 @@ theorem finite_coheight_one_of_ne_top : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsN
     have e' : _ = genericPoint Y := (Specializes.antisymm e (genericPoint_specializes _)).eq
     exact hgen (e' ▸ hU.ge (Set.mem_sUnion.2 ⟨T, hT, hg.mem⟩))
   by_contra hne
-  have h₃ := Order.coheight_add_one_le (lt_of_le_not_ge h₁ fun e =>
-    hne (Specializes.antisymm h₁ e).eq)
+  have h₃ :=
+    Order.coheight_add_one_le (lt_of_le_not_ge h₁ fun e => hne (Specializes.antisymm h₁ e).eq)
   have h₄ := Order.coheight_add_one_le h₂
   rw [hz.1] at h₃
   have h₅ : (1 : ℕ∞) + 1 ≤ 1 := (add_le_add_left (le_add_self.trans h₄) 1).trans h₃

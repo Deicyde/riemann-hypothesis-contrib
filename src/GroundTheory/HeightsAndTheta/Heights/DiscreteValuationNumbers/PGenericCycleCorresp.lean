@@ -19,13 +19,13 @@ namespace GenericCycleCorresp
 
 section LocalizationLength
 
-variable {S T : Type*} [CommRing S] [CommRing T] [Algebra S T] (M : Submonoid S)
-  [IsLocalization M T]
+variable
+  {S T : Type*} [CommRing S] [CommRing T] [Algebra S T] (M : Submonoid S) [IsLocalization M T]
 
-theorem length_eq (J W : Ideal S) [W.IsPrime] (hW : Disjoint (M : Set S) W)
-    [(W.map (algebraMap S T)).IsPrime] :
-    Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (S ⧸ J)) =
-      Module.length (Localization.AtPrime (W.map (algebraMap S T)))
+theorem length_eq
+    (J W : Ideal S) [W.IsPrime] (hW : Disjoint (M : Set S) W) [(W.map (algebraMap S T)).IsPrime]
+    : Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (S ⧸ J))
+      = Module.length (Localization.AtPrime (W.map (algebraMap S T)))
         (LocalizedModule (W.map (algebraMap S T)).primeCompl (T ⧸ J.map (algebraMap S T))) := by
   set W' := W.map (algebraMap S T)
   set J' := J.map (algebraMap S T)
@@ -62,16 +62,17 @@ theorem length_eq (J W : Ideal S) [W.IsPrime] (hW : Disjoint (M : Set S) W)
   let q : (S ⧸ J) →ₐ[S] (T ⧸ J') :=
     Ideal.quotientMapₐ J' (Algebra.ofId S T)
       (fun x hx => Ideal.mem_comap.mpr (Ideal.mem_map_of_mem _ hx))
-  let g : (S ⧸ J) →ₗ[S] N :=
-    { toFun := fun x => LocalizedModule.mk (q x) 1
-      map_add' := fun x y => by
-        rw [map_add (f := _), LocalizedModule.mk_add_mk, one_smul, one_smul, mul_one]
-      map_smul' := fun s x => by
-        simp only [RingHom.id_apply]
-        rw [LocalizedModule.smul'_mk, map_smul] }
+  let g : (S ⧸ J) →ₗ[S] N := {
+    toFun := fun x => LocalizedModule.mk (q x) 1
+    map_add' := fun x y => by
+      rw [map_add (f := _), LocalizedModule.mk_add_mk, one_smul, one_smul, mul_one]
+    map_smul' := fun s x => by
+      simp only [RingHom.id_apply]
+      rw [LocalizedModule.smul'_mk, map_smul]
+  }
   have hm : ∀ m : M, (m : S) ∉ W := fun m hm => Set.disjoint_left.mp hW m.2 hm
-  have hden : ∀ (t : T) (b : S) (m' : M), t ∉ W' → t * algebraMap S T m' = algebraMap S T b →
-      b ∉ W := by
+  have hden
+      : ∀ (t : T) (b : S) (m' : M), t ∉ W' → t * algebraMap S T m' = algebraMap S T b → b ∉ W := by
     intro t b m' ht hb hbW
     have : t * algebraMap S T m' ∈ W' := hb ▸ Ideal.mem_map_of_mem _ hbW
     rcases (inferInstance : W'.IsPrime).mem_or_mem this with h | h
@@ -139,13 +140,15 @@ end LocalizationLength
 
 section DVR
 
-variable {K : Type*} {ι : K → Type*} {O : Type*} [CommRing O] [IsDomain O]
-  [IsDiscreteValuationRing O]
+variable
+  {K : Type*} {ι : K → Type*} {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem disjoint_nonZeroDivisors {ϖ : O} (hϖ : Irreducible ϖ) (W : Ideal (MRing ι O)) [W.IsPrime]
-    (hW : (C ϖ : MRing ι O) ∉ W) :
-    Disjoint (((nonZeroDivisors O).map (C (σ := (Σ k, ι k)) (R := O)) : Submonoid (MRing ι O)) :
-      Set (MRing ι O)) W := by
+theorem disjoint_nonZeroDivisors
+    {ϖ : O} (hϖ : Irreducible ϖ) (W : Ideal (MRing ι O)) [W.IsPrime] (hW : (C ϖ : MRing ι O) ∉ W)
+    : Disjoint
+      (((nonZeroDivisors O).map (C (σ := (Σ k, ι k)) (R := O)) : Submonoid (MRing ι O))
+        : Set (MRing ι O))
+      W := by
   rw [Set.disjoint_left]
   rintro _ ⟨a, ha, rfl⟩ haW
   have ha0 : a ≠ 0 := nonZeroDivisors.ne_zero ha
@@ -159,47 +162,59 @@ end DVR
 
 end GenericCycleCorresp
 
-
 attribute [local instance] MvPolynomial.algebraMvPolynomial in
 theorem GenericCycleCorresp.proof : GenericCycleCorresp.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P s _ _ _ n
   classical
   let M : Submonoid (MRing ι O) := (nonZeroDivisors O).map (C (σ := (Σ k, ι k)) (R := O))
-  have hgen : ∀ W : Ideal (MRing ι O),
-      genFib W = W.map (algebraMap (MRing ι O) (MRing ι (FractionRing O))) := fun _ => rfl
+  have hgen
+      : ∀ W : Ideal (MRing ι O),
+        genFib W = W.map (algebraMap (MRing ι O) (MRing ι (FractionRing O))) := fun _ =>
+    rfl
   set J := P ⊔ Ideal.span {s}
   set s' := MvPolynomial.map (algebraMap O (FractionRing O)) s
-  have hJ : genFib P ⊔ Ideal.span {s'} =
-      J.map (algebraMap (MRing ι O) (MRing ι (FractionRing O))) := by
+  have hJ
+      : genFib P ⊔ Ideal.span {s'} = J.map (algebraMap (MRing ι O) (MRing ι (FractionRing O))) := by
     rw [Ideal.map_sup, Ideal.map_span, Set.image_singleton]
     rfl
   have hϖM : (C ϖ : MRing ι O) ∈ M := ⟨ϖ, mem_nonZeroDivisors_of_ne_zero hϖ.ne_zero, rfl⟩
-  have hcorr : ∀ W : Ideal (MRing ι O), W.IsPrime → (C ϖ : MRing ι O) ∉ W →
-      (genFib W).IsPrime ∧
-        (genFib W).comap (algebraMap (MRing ι O) (MRing ι (FractionRing O))) = W := by
+  have hcorr
+      : ∀ W : Ideal (MRing ι O),
+        W.IsPrime → (C ϖ : MRing ι O) ∉ W
+          → (genFib W).IsPrime
+            ∧ (genFib W).comap (algebraMap (MRing ι O) (MRing ι (FractionRing O))) = W := by
     intro W hWp hWϖ
     have hd := GenericCycleCorresp.disjoint_nonZeroDivisors hϖ W hWϖ
-    exact ⟨IsLocalization.isPrime_of_isPrime_disjoint M _ W hWp hd,
-      IsLocalization.under_map_of_isPrime_disjoint M (MRing ι (FractionRing O)) hWp hd⟩
-  have hmin : ∀ W : Ideal (MRing ι O), W ∈ J.minimalPrimes → (C ϖ : MRing ι O) ∉ W →
-      genFib W ∈ (genFib P ⊔ Ideal.span {s'}).minimalPrimes := by
+    exact ⟨
+      IsLocalization.isPrime_of_isPrime_disjoint M _ W hWp hd,
+      IsLocalization.under_map_of_isPrime_disjoint M (MRing ι (FractionRing O)) hWp hd
+    ⟩
+  have hmin
+      : ∀ W : Ideal (MRing ι O),
+        W ∈ J.minimalPrimes → (C ϖ : MRing ι O) ∉ W
+          → genFib W ∈ (genFib P ⊔ Ideal.span {s'}).minimalPrimes := by
     intro W hWm hWϖ
     rw [hJ, IsLocalization.minimalPrimes_map M]
     show (genFib W).comap (algebraMap (MRing ι O) (MRing ι (FractionRing O))) ∈ J.minimalPrimes
     rw [(hcorr W hWm.1.1 hWϖ).2]
     exact hWm
-  have hkey : ∀ W : Ideal (MRing ι O), W ∈ J.minimalPrimes → (C ϖ : MRing ι O) ∉ W →
-      divCycle P s W = divCycle (genFib P) s' (genFib W) := by
+  have hkey
+      : ∀ W : Ideal (MRing ι O),
+        W ∈ J.minimalPrimes → (C ϖ : MRing ι O) ∉ W
+          → divCycle P s W = divCycle (genFib P) s' (genFib W) := by
     intro W hWm hWϖ
     haveI hWp : W.IsPrime := hWm.1.1
     obtain ⟨hWp', hcomap⟩ := hcorr W hWp hWϖ
     have hrel : IsRelevant (genFib W) ↔ IsRelevant W := by
       refine forall_congr' fun k => exists_congr fun i => not_congr ?_
-      have hX : (X ⟨k, i⟩ : MRing ι (FractionRing O)) =
-          algebraMap (MRing ι O) (MRing ι (FractionRing O)) (X ⟨k, i⟩) := (MvPolynomial.map_X _ _).symm
+      have hX
+          : (X ⟨k, i⟩ : MRing ι (FractionRing O))
+            = algebraMap (MRing ι O) (MRing ι (FractionRing O)) (X ⟨k, i⟩) :=
+        (MvPolynomial.map_X _ _).symm
       rw [hX, ← Ideal.mem_comap, hcomap]
-    have hl : ∀ (h₁ : W.IsPrime) (h₂ : (genFib W).IsPrime),
-        @multAt _ _ _ _ J W h₁ = @multAt _ _ _ _ (genFib P ⊔ Ideal.span {s'}) (genFib W) h₂ := by
+    have hl
+        : ∀ (h₁ : W.IsPrime) (h₂ : (genFib W).IsPrime),
+          @multAt _ _ _ _ J W h₁ = @multAt _ _ _ _ (genFib P ⊔ Ideal.span {s'}) (genFib W) h₂ := by
       intro h₁ h₂
       unfold multAt
       rw [hJ]
@@ -210,8 +225,9 @@ theorem GenericCycleCorresp.proof : GenericCycleCorresp.Statement.{u} := by
     by_cases hr : IsRelevant W
     · rw [dite_eq_left ⟨hWm, hr⟩, dite_eq_left ⟨hmin W hWm hWϖ, hrel.mpr hr⟩, hl]
     · rw [dite_eq_right (fun h => hr h.2), dite_eq_right (fun h => hr (hrel.mp h.2))]
-  have hsupp : ∀ (Q : Ideal (MRing ι (FractionRing O))) (x) (W : Ideal (MRing ι (FractionRing O))),
-      divCycle Q x W ≠ 0 → W ∈ (Q ⊔ Ideal.span {x}).minimalPrimes := by
+  have hsupp
+      : ∀ (Q : Ideal (MRing ι (FractionRing O))) (x) (W : Ideal (MRing ι (FractionRing O))),
+        divCycle Q x W ≠ 0 → W ∈ (Q ⊔ Ideal.span {x}).minimalPrimes := by
     intro Q x W h
     unfold divCycle at h
     split_ifs at h with hh
@@ -226,8 +242,9 @@ theorem GenericCycleCorresp.proof : GenericCycleCorresp.Statement.{u} := by
   unfold cycEval
   let A : Set (Ideal (MRing ι O)) := {W | W ∈ J.minimalPrimes ∧ (C ϖ : MRing ι O) ∉ W}
   let B : Set (Ideal (MRing ι (FractionRing O))) := (genFib P ⊔ Ideal.span {s'}).minimalPrimes
-  have hA : (∑ᶠ W, divCycle P s W * (if (C ϖ : MRing ι O) ∈ W then 0 else n (genFib W))) =
-      ∑ᶠ W ∈ A, divCycle P s W * (if (C ϖ : MRing ι O) ∈ W then 0 else n (genFib W)) := by
+  have hA
+      : (∑ᶠ W, divCycle P s W * (if (C ϖ : MRing ι O) ∈ W then 0 else n (genFib W)))
+        = ∑ᶠ W ∈ A, divCycle P s W * (if (C ϖ : MRing ι O) ∈ W then 0 else n (genFib W)) := by
     rw [finsum_mem_def]
     congr 1
     funext W

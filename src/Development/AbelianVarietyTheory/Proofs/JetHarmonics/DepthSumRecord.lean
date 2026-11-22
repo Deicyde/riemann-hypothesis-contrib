@@ -26,31 +26,40 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.SumLogPrimeDe
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory NumberField IsLocalRing IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps.EtaleWeightGaps
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons
+  Formalism.MainNotions.Gaps.EtaleWeightGaps
 open GlobalTheory.PtTie GlobalTheory.PlusRec
 namespace GlobalTheory.DepthSum
 
 noncomputable def primeBound (N Q q d : ℕ) (g : Fin 2 → ℕ) (a b : ℝ) (p : ℕ) : ℝ :=
-  (if p ∈ (Finset.range (N + 1)).filter Nat.Prime then (N : ℝ) / ((p : ℝ) - 1) else 0) +
-    ((padicValNat p Q : ℝ) * a + (if p = q then b else 0) + (if p = d then b else 0)) +
-    ∑ i : Fin 2, if p = g i then (N : ℝ) / ((g i : ℝ) - 1) else 0
+  (if p ∈ (Finset.range (N + 1)).filter Nat.Prime then (N : ℝ) / ((p : ℝ) - 1) else 0)
+    + ((padicValNat p Q : ℝ) * a + (if p = q then b else 0) + (if p = d then b else 0))
+    + ∑ i : Fin 2, if p = g i then (N : ℝ) / ((g i : ℝ) - 1) else 0
 
 theorem div_pred_nonneg (N : ℕ) {p : ℕ} (hp : p.Prime) : 0 ≤ (N : ℝ) / ((p : ℝ) - 1) := by
   have : (1 : ℝ) < p := by exact_mod_cast hp.one_lt
   exact div_nonneg (by positivity) (by linarith)
 
-theorem sum_primeBound (N Q q d : ℕ) (g : Fin 2 → ℕ) (a b : ℝ) (S : Finset ℕ)
-    (hA : (Finset.range (N + 1)).filter Nat.Prime ⊆ S) (h2 : Q.primeFactors ⊆ S) (hS : ∀ p ∈ S, p.Prime) (hq : q ∈ S) (hd : d ∈ S) (hg : ∀ i, g i ∈ S) :
-    ∑ p ∈ S, primeBound N Q q d g a b p * Real.log p =
-      (N : ℝ) * (∑ p ∈ (Finset.range (N + 1)).filter Nat.Prime, Real.log p / ((p : ℝ) - 1)) +
-        (a * Real.log Q + b * Real.log q + b * Real.log d) + ∑ i : Fin 2, (N : ℝ) / ((g i : ℝ) - 1) * Real.log (g i) := by
+theorem sum_primeBound
+    (N Q q d : ℕ) (g : Fin 2 → ℕ)
+    (a b : ℝ)
+    (S : Finset ℕ) (hA : (Finset.range (N + 1)).filter Nat.Prime ⊆ S) (h2 : Q.primeFactors ⊆ S)
+    (hS : ∀ p ∈ S, p.Prime) (hq : q ∈ S) (hd : d ∈ S) (hg : ∀ i, g i ∈ S)
+    : ∑ p ∈ S, primeBound N Q q d g a b p * Real.log p
+      = (N : ℝ) * (∑ p ∈ (Finset.range (N + 1)).filter Nat.Prime, Real.log p / ((p : ℝ) - 1))
+        + (a * Real.log Q + b * Real.log q + b * Real.log d)
+        + ∑ i : Fin 2, (N : ℝ) / ((g i : ℝ) - 1) * Real.log (g i) := by
   have hQ : ∑ p ∈ S, (padicValNat p Q : ℝ) * a * Real.log p = a * Real.log Q := by
     rw [Real.log_nat_eq_sum_factorization, Finsupp.sum, Nat.support_factorization, Finset.mul_sum]
     symm
     refine Finset.sum_subset_zero_on_sdiff h2 (fun p hp => ?_) fun p hp => ?_
     · obtain ⟨h3, h4⟩ := Finset.mem_sdiff.1 hp
-      rw [Nat.padicValNat_def, ← Nat.factorization_def _ (hS p h3), Finsupp.notMem_support_iff.1 (Nat.support_factorization Q ▸ h4)]; simp
+      rw [Nat.padicValNat_def, ← Nat.factorization_def _ (hS p h3),
+        Finsupp.notMem_support_iff.1 (Nat.support_factorization Q ▸ h4)]
+      simp
     · rw [Nat.factorization_def _ (Nat.prime_of_mem_primeFactors hp), Nat.padicValNat_def]; ring
   unfold primeBound
   simp only [add_mul, Finset.sum_add_distrib, ite_mul, zero_mul, Finset.sum_mul]
@@ -60,12 +69,15 @@ theorem sum_primeBound (N Q q d : ℕ) (g : Fin 2 → ℕ) (a b : ℝ) (S : Fins
   refine Finset.sum_congr rfl fun p _ => ?_
   ring
 
-theorem depth_sum {D : D7} (B : WeightFamilies.Prov D) {j : ℕ} (large₂ : SizeData₂ D) (w : WeightFamilies.Wt D j)
-    (hn : 2 * D.R.f * D.R.r ≤ w.n) (hL : Real.log (WeightAlgebra.DF w) ≤ 2 * large₂.sc.L)
-    (nu : HeightOneSpectrum (𝓞 B.KO) → ℝ) (h0 : ∀ la, 0 ≤ nu la)
-    (h1 : ∀ la, nu la ≤ (WeightAlgebra.DF w : ℝ) / ((resCharOf la : ℝ) - 1)) (h2 : ∀ la, WeightAlgebra.DF w < resCharOf la → nu la = 0) :
-    (∀ la, 0 ≤ nusOf B w nu la) ∧ (Function.support (nusOf B w nu)).Finite ∧
-      (∑ᶠ la, |nusOf B w nu la| * lw B.KO la) ≤ WeightAlgebra.PN D large₂ * w.size := by
+theorem depth_sum
+    {D : D7} (B : WeightFamilies.Prov D)
+    {j : ℕ} (large₂ : SizeData₂ D) (w : WeightFamilies.Wt D j) (hn : 2 * D.R.f * D.R.r ≤ w.n)
+    (hL : Real.log (WeightAlgebra.DF w) ≤ 2 * large₂.sc.L)
+    (nu : HeightOneSpectrum (𝓞 B.KO) → ℝ)
+    (h0 : ∀ la, 0 ≤ nu la) (h1 : ∀ la, nu la ≤ (WeightAlgebra.DF w : ℝ) / ((resCharOf la : ℝ) - 1))
+    (h2 : ∀ la, WeightAlgebra.DF w < resCharOf la → nu la = 0)
+    : (∀ la, 0 ≤ nusOf B w nu la) ∧ (Function.support (nusOf B w nu)).Finite
+      ∧ (∑ᶠ la, |nusOf B w nu la| * lw B.KO la) ≤ WeightAlgebra.PN D large₂ * w.size := by
   classical
   have hq : D.host.q.Prime := D.host.hyp.1
   have hd : D.host.d.Prime := D.host.hyp.2.1
@@ -108,8 +120,9 @@ theorem depth_sum {D : D7} (B : WeightFamilies.Prov D) {j : ℕ} (large₂ : Siz
     split_ifs with hp
     · exact div_pred_nonneg _ (hg _)
     · exact le_rfl
-  have e4 : ∀ la : HeightOneSpectrum (𝓞 B.KO),
-      nu la ≤ (if resCharOf la ∈ A then (N : ℝ) / ((resCharOf la : ℝ) - 1) else 0) := by
+  have e4
+      : ∀ la : HeightOneSpectrum (𝓞 B.KO),
+        nu la ≤ (if resCharOf la ∈ A then (N : ℝ) / ((resCharOf la : ℝ) - 1) else 0) := by
     intro la
     split_ifs with hp
     · exact h1 la
@@ -122,15 +135,24 @@ theorem depth_sum {D : D7} (B : WeightFamilies.Prov D) {j : ℕ} (large₂ : Siz
     simp only [hS, Finset.mem_union, Finset.mem_insert, Finset.mem_singleton] at hp
     rcases hp with hp | hp | rfl | rfl | rfl | rfl
     exacts [(Finset.mem_filter.1 hp).2, (D.host.mem_small_iff.1 hp).1, hq, hd, hg _, hg _]
-  have hQ : ∀ la : HeightOneSpectrum (𝓞 B.KO), ((D.host.QS : ℕ) : 𝓞 B.KO) ∈ la.asIdeal ↔ resCharOf la ∈ D.host.small :=
-    fun la => (UpperTheory.cmDatum_natCast_mem_heightOneSpectrum_iff D.host.toHostRaw B.KO la).1
-  have e5 : ∀ p : ℕ, (0 : ℝ) ≤ (padicValNat p D.host.QS : ℝ) * (c2 D w : ℝ) := fun p => by positivity
-  have key := GlobalTheory.T.sum_finitePlaces_le_sum_over_primes B.KO (primeBound N D.host.QS D.host.q D.host.d D.host.g (c2 D w) (cHalf w)) S hSp ?_
-    (nusOf B w nu) hpos ?_ ?_
+  have hQ
+      : ∀ la : HeightOneSpectrum (𝓞 B.KO),
+        ((D.host.QS : ℕ) : 𝓞 B.KO) ∈ la.asIdeal ↔ resCharOf la ∈ D.host.small := fun la =>
+    (UpperTheory.cmDatum_natCast_mem_heightOneSpectrum_iff D.host.toHostRaw B.KO la).1
+  have e5 : ∀ p : ℕ, (0 : ℝ) ≤ (padicValNat p D.host.QS : ℝ) * (c2 D w : ℝ) := fun p => by
+    positivity
+  have key :=
+    GlobalTheory.T.sum_finitePlaces_le_sum_over_primes B.KO
+      (primeBound N D.host.QS D.host.q D.host.d D.host.g (c2 D w) (cHalf w)) S hSp ?_ (nusOf B w nu)
+      hpos ?_ ?_
   · refine ⟨hpos, key.1, key.2.trans ?_⟩
-    rw [sum_primeBound _ _ _ _ _ _ _ S Finset.subset_union_left hsm hSp (by simp [hS]) (by simp [hS]) hgS]
-    refine le_trans ?_ (GlobalTheory.T.sum_log_prime_depth_bounds_le_mul_weight_size D large₂ j w hn1 hL)
-    have := mul_le_mul_of_nonneg_left (GlobalTheory.T.sum_prime_log_div_pred_le_log_add N) (Nat.cast_nonneg (α := ℝ) N)
+    rw [sum_primeBound _ _ _ _ _ _ _ S Finset.subset_union_left hsm hSp (by simp [hS])
+      (by simp [hS]) hgS]
+    refine le_trans ?_
+      (GlobalTheory.T.sum_log_prime_depth_bounds_le_mul_weight_size D large₂ j w hn1 hL)
+    have :=
+      mul_le_mul_of_nonneg_left (GlobalTheory.T.sum_prime_log_div_pred_le_log_add N)
+        (Nat.cast_nonneg (α := ℝ) N)
     linarith
   · intro p
     unfold primeBound
@@ -149,8 +171,10 @@ theorem depth_sum {D : D7} (B : WeightFamilies.Prov D) {j : ℕ} (large₂ : Siz
     · rw [dite_eq_left ha, mul_div_assoc]
       refine mul_le_mul_of_nonneg_left ?_ (by positivity)
       have hc := (H1algLink.prime_mem_iff la (hg _)).1 (Classical.choose_spec ha)
-      have := Finset.single_le_sum (fun i (_ : i ∈ Finset.univ) => e3 (resCharOf la) i)
-        (Finset.mem_univ (Classical.choose ha))
+      have :=
+        Finset.single_le_sum
+          (fun i (_ : i ∈ Finset.univ) => e3 (resCharOf la) i)
+          (Finset.mem_univ (Classical.choose ha))
       rw [if_pos hc] at this
       linarith
     · rw [dite_eq_right ha]
@@ -159,7 +183,8 @@ theorem depth_sum {D : D7} (B : WeightFamilies.Prov D) {j : ℕ} (large₂ : Siz
       · rw [if_pos hb, show ringChar (𝓞 B.KO ⧸ la.asIdeal) = resCharOf la from rfl]
         linarith
       · rw [if_neg hb]
-        by_cases hc : ((D.host.q : ℕ) : 𝓞 B.KO) ∈ la.asIdeal ∨ ((D.host.d : ℕ) : 𝓞 B.KO) ∈ la.asIdeal
+        by_cases hc
+          : ((D.host.q : ℕ) : 𝓞 B.KO) ∈ la.asIdeal ∨ ((D.host.d : ℕ) : 𝓞 B.KO) ∈ la.asIdeal
         · rw [if_pos hc]
           rw [H1algLink.prime_mem_iff la hq, H1algLink.prime_mem_iff la hd] at hc
           rcases hc with hc | hc
@@ -176,15 +201,27 @@ theorem depth_sum {D : D7} (B : WeightFamilies.Prov D) {j : ℕ} (large₂ : Siz
     have a5 := e4 la
     rw [if_neg hnA] at a5
     unfold nusOf
-    rw [dite_eq_right (fun ⟨i, hi⟩ => hne _ (hgS i) (hg i) hi), if_neg (fun h => hla (hsm ((hQ la).1 h))),
+    rw [dite_eq_right (fun ⟨i, hi⟩ => hne _ (hgS i) (hg i) hi),
+      if_neg (fun h => hla (hsm ((hQ la).1 h))),
       if_neg (not_or.2 ⟨hne _ (by simp [hS]) hq, hne _ (by simp [hS]) hd⟩), le_antisymm a5 (h0 la)]
     simp
 
-theorem depth_sum_record : ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j) (large₂ : SizeData₂ D) (w : WeightFamilies.Wt D j), 2 * D.R.f * D.R.r ≤ w.n → Real.log (WeightAlgebra.DF w) ≤ 2 * large₂.sc.L → WeightedPrimeSumBoundAlt large₂ (recPJ h j hj) w (nusOf (recB h.toLawsCore) w (nuWt T w)) ∧ ∀ (Nd : NormDatum (recB h.toLawsCore)), WeightedPrimeSumBoundAlt large₂ (Nd.X' (recPJ h j hj) (extAll h j hj) (intAtExt_extAll h j hj)) w (nusOf (recB h.toLawsCore) w (nuWt T w)) := by
+theorem depth_sum_record
+    : ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j) (large₂ : SizeData₂ D)
+        (w : WeightFamilies.Wt D j),
+      2 * D.R.f * D.R.r ≤ w.n → Real.log (WeightAlgebra.DF w) ≤ 2 * large₂.sc.L
+        → WeightedPrimeSumBoundAlt large₂ (recPJ h j hj) w (nusOf (recB h.toLawsCore) w (nuWt T w))
+          ∧ ∀ (Nd : NormDatum (recB h.toLawsCore)),
+            WeightedPrimeSumBoundAlt large₂
+              (Nd.X' (recPJ h j hj) (extAll h j hj) (intAtExt_extAll h j hj)) w
+              (nusOf (recB h.toLawsCore) w (nuWt T w)) := by
   intro D T h j hj large₂ w hn hL
   have hb := GlobalTheory.T.unscaledWeightDepth_finite_bounded_above_charts D T h j hj w hn
-  have key := depth_sum (recB h.toLawsCore) large₂ w hn hL (nuWt T w) (fun la => (hb la).2.1) (fun la => (hb la).2.2.1)
-    (fun la => (hb la).2.2.2.1)
+  have key :=
+    depth_sum (recB h.toLawsCore) large₂ w hn hL (nuWt T w)
+      (fun la => (hb la).2.1)
+      (fun la => (hb la).2.2.1)
+      (fun la => (hb la).2.2.2.1)
   exact ⟨key, fun _ => key⟩
 
 end GlobalTheory.DepthSum

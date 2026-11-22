@@ -11,10 +11,12 @@ open Matrix
 
 namespace GlobalTheory.Hk3
 
-theorem one_add_maximal_inv_int (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))]
-    (n : ℕ) (X : Matrix (Fin n) (Fin n) L) (hX : ∀ i j, Valued.v (X i j) < 1) :
-    ∃ k : GL (Fin n) L, (k : Matrix (Fin n) (Fin n) L) = 1 + X ∧
-      ∀ i j, ((k⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j ∈ Formalism.UG.intL L := by
+theorem one_add_maximal_inv_int
+    (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    (n : ℕ) (X : Matrix (Fin n) (Fin n) L) (hX : ∀ i j, Valued.v (X i j) < 1)
+    : ∃ k : GL (Fin n) L,
+      (k : Matrix (Fin n) (Fin n) L) = 1 + X
+        ∧ ∀ i j, ((k⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j ∈ Formalism.UG.intL L := by
   classical
   let v : Valuation L (WithZero (Multiplicative ℤ)) := Valued.v
   let O := v.valuationSubring
@@ -24,8 +26,7 @@ theorem one_add_maximal_inv_int (L : Type) [Field L] [Valued L (WithZero (Multip
     exact (Valuation.mem_maximalIdeal_iff L v).2 (hX i j)
   have h1 : (IsLocalRing.residue O).mapMatrix (1 + Y) = 1 := by
     rw [map_add (f := _), map_one]
-    have : (IsLocalRing.residue O).mapMatrix Y = 0 := by
-      ext i j; exact hY i j
+    have : (IsLocalRing.residue O).mapMatrix Y = 0 := by ext i j; exact hY i j
     rw [this, add_zero]
   have hd : IsUnit (1 + Y).det := by
     rw [← IsLocalRing.residue_ne_zero_iff_isUnit, RingHom.map_det, h1, det_one]

@@ -14,15 +14,22 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Spl
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
 
 namespace GlobalTheory.ZH.AbelianLocus
 
-theorem char_eq_zero_of_isProper {k : Type} [Field k] (E : SplitExt (Sp k)) (G : Over (Sp k)) [GrpObj G]
-    (D : E.GtDatum G) [IsProper G.hom] (a : E.X) : a = 0 := by
+theorem char_eq_zero_of_isProper
+    {k : Type} [Field k]
+    (E : SplitExt (Sp k))
+    (G : Over (Sp k)) [GrpObj G]
+    (D : E.GtDatum G)
+    [IsProper G.hom]
+    (a : E.X)
+    : a = 0 := by
   have hi := D.i_hom
   have h1 := GlobalTheory.splitTorus_hom_proper_trivial_field k E.X G D.i hi
   have h2 : 𝟙 (splitTorus (Sp k) E.X) = toUnit _ ≫ η[splitTorus (Sp k) E.X] := by
@@ -55,9 +62,14 @@ theorem proj_eq_one {T : AddSubgroup S.Gam} (h : T = ⊥) : S.proj T 0 = 1 := by
 
 variable {ρ : S.Real} {M : RatModel o Ω} {U₀ : M.Z.Opens} {EE : M.Lat S.J}
 
-theorem exists_crd_ne_zero (hB : BaseFacts S M U₀ EE) (Q : Clos ρ M U₀ EE) {K : Type} [Field K]
-    (x : Sp K ⟶ Q.P.left) {z : M.Z} (hz : Set.range (x ≫ Q.P.hom) = {z}) (hc : IsClosed ({z} : Set M.Z))
-    (hT : S.TT M z = ⊥) : ∃ v, Crd Q.O1 Q.st x v ∧ v ≠ 0 := by
+theorem exists_crd_ne_zero
+    (hB : BaseFacts S M U₀ EE)
+    (Q : Clos ρ M U₀ EE)
+    {K : Type} [Field K]
+    (x : Sp K ⟶ Q.P.left)
+    {z : M.Z}
+    (hz : Set.range (x ≫ Q.P.hom) = {z}) (hc : IsClosed ({z} : Set M.Z)) (hT : S.TT M z = ⊥)
+    : ∃ v, Crd Q.O1 Q.st x v ∧ v ≠ 0 := by
   have hxz : ∀ s, Q.P.hom (x s) = z := fun s => by
     have : (x ≫ Q.P.hom) s ∈ Set.range (x ≫ Q.P.hom) := ⟨_, rfl⟩
     rw [hz] at this
@@ -68,10 +80,10 @@ theorem exists_crd_ne_zero (hB : BaseFacts S M U₀ EE) (Q : Clos ρ M U₀ EE) 
     rw [Scheme.Opens.range_ι]
     change Q.P.hom (x s) ∈ Q.W l
     rwa [hxz]
-  obtain ⟨x', rfl⟩ : ∃ x', x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι = x :=
-    ⟨_, IsOpenImmersion.lift_fac _ x hr⟩
+  obtain ⟨x', rfl⟩ : ∃ x', x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι = x := ⟨_, IsOpenImmersion.lift_fac _ x hr⟩
   have hcov := (Q.imm l).1
-  have hm : x' (IsLocalRing.closedPoint K) ∈ ⨆ i ∈ (Set.univ : Set S.J), nonzeroLocus (Q.σ l i) := by
+  have hm
+      : x' (IsLocalRing.closedPoint K) ∈ ⨆ i ∈ (Set.univ : Set S.J), nonzeroLocus (Q.σ l i) := by
     rw [hcov]; trivial
   simp only [TopologicalSpace.Opens.mem_iSup] at hm
   obtain ⟨i, -, hi⟩ := hm
@@ -80,9 +92,9 @@ theorem exists_crd_ne_zero (hB : BaseFacts S M U₀ EE) (Q : Clos ρ M U₀ EE) 
     ⟨_, m, 1, (CrdCalc.top_le_iff x' _).2 (Scheme.basicOpen_le _ _ hm), fun _ => rfl⟩
   have hwi := ((CrdCalc.crd_isUnit_iff i hw).2 ((CrdCalc.top_le_iff x' _).2 hi)).ne_zero
   refine ⟨_, Q.rel l K x' _ hw, fun h0 => hwi ?_⟩
-  have hBm : ∀ a b, Q.B l a b ∈ M.O z := fun a => hB.zero z hc _
-    (by rw [Q.basis l z hl]; exact Submodule.subset_span ⟨a, rfl⟩)
-    (by rw [proj_eq_one hT, Matrix.map_one _ (map_zero _) (map_one _), Matrix.one_mulVec])
+  have hBm : ∀ a b, Q.B l a b ∈ M.O z := fun a =>
+    hB.zero z hc _ (by rw [Q.basis l z hl]; exact Submodule.subset_span ⟨a, rfl⟩)
+      (by rw [proj_eq_one hT, Matrix.map_one _ (map_zero _) (map_one _), Matrix.one_mulVec])
   let B' : Matrix S.J S.J (M.O z) := fun a b => ⟨_, hBm a b⟩
   let C' : Matrix S.J S.J (M.O z) := fun a b => ⟨_, RatModel.valF_mem_O hl (Q.c l a b)⟩
   have h1 : C' * B' = 1 := by
@@ -93,17 +105,23 @@ theorem exists_crd_ne_zero (hB : BaseFacts S M U₀ EE) (Q : Clos ρ M U₀ EE) 
   have h2 := congrArg (fun A => A.map (RatModel.valHom _ z hz)) (mul_eq_one_comm.1 h1)
   beta_reduce at h2
   rw [Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _)] at h2
-  have h3 : C'.map (RatModel.valHom _ z hz) =
-      (Q.c l).map (valR (x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι ≫ Q.P.hom) (Q.W l)) := by
+  have h3
+      : C'.map (RatModel.valHom _ z hz)
+        = (Q.c l).map (valR (x' ≫ (Q.P.hom ⁻¹ᵁ Q.W l).ι ≫ Q.P.hom) (Q.W l)) := by
     ext a b
     rw [← Category.assoc]
     exact RatModel.val_valF (by rw [hz]; exact Set.singleton_subset_iff.2 hl) _
   have h4 : w = 0 := by
     rw [← Matrix.one_mulVec w, ← h2, ← Matrix.mulVec_mulVec, h3, h0, Matrix.mulVec_zero]
-  rw [h4]; rfl
+  rw [h4]
+  rfl
 
-theorem mem_G [ArithBase o Ω] (hB : BaseFacts S M U₀ EE) (Q : Clos ρ M U₀ EE) (w : Q.P.left)
-    (hw : IsClosed ({w} : Set Q.P.left)) (hT : S.TT M (Q.P.hom w) = ⊥) : w ∈ Q.G := by
+theorem mem_G
+    [ArithBase o Ω]
+    (hB : BaseFacts S M U₀ EE)
+    (Q : Clos ρ M U₀ EE) (w : Q.P.left)
+    (hw : IsClosed ({w} : Set Q.P.left)) (hT : S.TT M (Q.P.hom w) = ⊥)
+    : w ∈ Q.G := by
   have := Q.proper
   have hc : IsClosed ({Q.P.hom w} : Set M.Z) := by
     rw [← Set.image_singleton]
@@ -114,8 +132,9 @@ theorem mem_G [ArithBase o Ω] (hB : BaseFacts S M U₀ EE) (Q : Clos ρ M U₀ 
     rw [RatModel.range_eq_singleton _ (IsLocalRing.closedPoint _)]
     exact congrArg (fun a => {Q.P.hom a}) (hx _)
   obtain ⟨v, hv, hv0⟩ := exists_crd_ne_zero hB Q x hz hc hT
-  have h := (OpenPart.le_preimage_G_iff o Ω S ρ M U₀ EE hB Q _ x _
-    (Spec.preimage (x ≫ Q.P.hom ≫ M.s)).hom v hz (Or.inl hc) (Spec.map_preimage _).symm hv).2 (by
+  have h :=
+    (OpenPart.le_preimage_G_iff o Ω S ρ M U₀ EE hB Q _ x _ (Spec.preimage (x ≫ Q.P.hom ≫ M.s)).hom v
+        hz (Or.inl hc) (Spec.map_preimage _).symm hv).2 (by
       obtain ⟨i, hi⟩ := Function.ne_iff.1 hv0
       refine ⟨i, ?_⟩
       rw [proj_eq_one hT, Finset.sum_eq_single i]
@@ -126,15 +145,36 @@ theorem mem_G [ArithBase o Ω] (hB : BaseFacts S M U₀ EE) (Q : Clos ρ M U₀ 
   rw [← hx (IsLocalRing.closedPoint _)]
   exact (CrdCalc.top_le_iff x _).1 h
 
-theorem abelian_locus : GlobalTheory.UT.LL → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω) (ρ : S.Real) (M : RatModel o Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J), BaseFacts S M U₀ EE → ∀ (Q : Clos ρ M U₀ EE) (ex : Q.Ext), S.Big → ρ.HasGeo → ex.core.Fib → IsOpen {z : M.Z | S.TT M z = ⊥} ∧ (∀ w : Q.P.left, IsClosed ({w} : Set Q.P.left) → S.TT M (Q.P.hom w) = ⊥ → w ∈ Q.G) ∧ ∀ z : M.Z, IsClosed ({z} : Set M.Z) → S.TT M z ≠ ⊥ → ∃ (p : ℕ) (_ : Fact p.Prime) (y : Sp (GlobalTheory.ZJ.OO p) ⟶ ex.core.Z) (τ : ex.core.Test y), y (GlobalTheory.ZJ.cPt p) = z ∧ ¬ IsProper (pullback.snd τ.H.hom (GlobalTheory.ZJ.rPt p ≫ spMap τ.j)) := by
+theorem abelian_locus
+    : GlobalTheory.UT.LL
+      → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
+          (ρ : S.Real) (M : RatModel o Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J),
+        BaseFacts S M U₀ EE
+          → ∀ (Q : Clos ρ M U₀ EE) (ex : Q.Ext),
+            S.Big → ρ.HasGeo → ex.core.Fib
+              → IsOpen {z : M.Z | S.TT M z = ⊥}
+                ∧ (∀ w : Q.P.left, IsClosed ({w} : Set Q.P.left) → S.TT M (Q.P.hom w) = ⊥ → w ∈ Q.G)
+                ∧ ∀ z : M.Z,
+                  IsClosed ({z} : Set M.Z) → S.TT M z ≠ ⊥
+                    → ∃ (p : ℕ) (_ : Fact p.Prime) (y : Sp (GlobalTheory.ZJ.OO p) ⟶ ex.core.Z)
+                        (τ : ex.core.Test y),
+                      y (GlobalTheory.ZJ.cPt p) = z ∧ ¬ IsProper (pullback.snd τ.H.hom
+                        (GlobalTheory.ZJ.rPt p ≫ spMap τ.j)) := by
   intro hL o Ω _ _ _ _ S ρ M U₀ EE hB Q ex hbig hgeo _
-  refine ⟨isOpen_iff_forall_mem_open.2 fun z hz => ⟨_, fun z' h => ?_, OpenPart.isOpen_supI_subset (S := S) z,
-    fun _ h => h⟩, mem_G hB Q, fun z hz hT => ?_⟩
+  refine ⟨
+    isOpen_iff_forall_mem_open.2 fun z hz =>
+      ⟨_, fun z' h => ?_, OpenPart.isOpen_supI_subset (S := S) z, fun _ h => h⟩,
+    mem_G hB Q,
+    fun z hz hT => ?_
+  ⟩
   · exact le_bot_iff.1 ((OpenPart.TT_le_TT h).trans (le_of_eq hz))
-  obtain ⟨h1, h2⟩ := GlobalTheory.T.exists_geometricTest_map_classicalPoint hL o Ω S ρ M U₀ EE hB Q hbig hgeo
+  obtain ⟨h1, h2⟩ :=
+    GlobalTheory.T.exists_geometricTest_map_classicalPoint hL o Ω S ρ M U₀ EE hB Q hbig hgeo
   obtain ⟨p, hp, y, hy⟩ := h2 z hz
   obtain ⟨y₀, t, c, ⟨tm⟩⟩ := h1 p y hy.2
-  obtain ⟨τ, e, he, -⟩ := GlobalTheory.T.exists_uniformisationTest_of_geometricTest hL o Ω S ρ M U₀ EE hB Q ex p y y₀ t c tm hbig
+  obtain ⟨τ, e, he, -⟩ :=
+    GlobalTheory.T.exists_uniformisationTest_of_geometricTest hL o Ω S ρ M U₀ EE hB Q ex p y y₀ t c
+      tm hbig
   refine ⟨p, hp, y, τ, hy.1, fun hpr => hT ?_⟩
   have : IsProper t.mod.Φ.G.hom := by
     rw [← he] at hpr

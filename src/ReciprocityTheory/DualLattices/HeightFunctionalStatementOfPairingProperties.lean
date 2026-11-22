@@ -274,8 +274,13 @@ private lemma exists_c (h1 : PairingPropertiesStatement B) {R : LAlg R₀} (Dp :
   obtain ⟨e, he⟩ := hd'
   exact ⟨Dp.π.1 d, z, hz, by linear_combination -hd - Dp.η * he + e * Dp.η_sq⟩
 
-private def cf (h1 : PairingPropertiesStatement B) {R : LAlg R₀} (Dp : DualPair R) (N : ℕ)
-    (hN : (N : (R : Type u)) = 0) (y : B.G R) (hy : N • y = 0) (v : B.gg) : (R : Type u) :=
+private def cf
+    (h1 : PairingPropertiesStatement B)
+    {R : LAlg R₀} (Dp : DualPair R)
+    (N : ℕ) (hN : (N : (R : Type u)) = 0)
+    (y : B.G R) (hy : N • y = 0)
+    (v : B.gg)
+    : (R : Type u) :=
   Classical.choose (exists_c h1 Dp N hN y hy v)
 
 private lemma cf_spec (h1 : PairingPropertiesStatement B) {R : LAlg R₀} (Dp : DualPair R) (N : ℕ)
@@ -337,8 +342,12 @@ private lemma cf_smul (h1 : PairingPropertiesStatement B) {R : LAlg R₀} (Dp : 
   rw [ez]
   simp [DualPair.fμ, Dp.sect, hπη] <;> ring
 
-private def hgt (h1 : PairingPropertiesStatement B) {R : LAlg R₀} (Dp : DualPair R) (N : ℕ)
-    (hN : (N : (R : Type u)) = 0) (y : B.G R) (hy : N • y = 0) : B.gg →ₗ[R₀] (R : Type u) where
+private def hgt
+    (h1 : PairingPropertiesStatement B)
+    {R : LAlg R₀} (Dp : DualPair R)
+    (N : ℕ) (hN : (N : (R : Type u)) = 0)
+    (y : B.G R) (hy : N • y = 0)
+    : B.gg →ₗ[R₀] (R : Type u) where
   toFun := cf h1 Dp N hN y hy
   map_add' := cf_add h1 Dp N hN y hy
   map_smul' r v := by rw [cf_smul h1 Dp N hN y hy, RingHom.id_apply, Algebra.smul_def]
@@ -369,9 +378,14 @@ private lemma part_c (h1 : PairingPropertiesStatement B) {R : LAlg R₀} (Dp : D
 
 end BX
 
-theorem heightFunctionalStatement_of_pairingProperties (B : BX R₀) (h1 : PairingPropertiesStatement B) : HighestWeightVectorUniformBounds B := by
+theorem heightFunctionalStatement_of_pairingProperties
+    (B : BX R₀) (h1 : PairingPropertiesStatement B)
+    : HighestWeightVectorUniformBounds B := by
   intro R Dp N hN
-  exact ⟨fun y v u hu => BX.part_a Dp N hN y v u hu, fun y hy => BX.part_b h1 Dp N hN y hy,
-    fun y y' h h' hh hh' => BX.part_c h1 Dp N y y' h h' hh hh'⟩
+  exact ⟨
+    fun y v u hu => BX.part_a Dp N hN y v u hu,
+    fun y hy => BX.part_b h1 Dp N hN y hy,
+    fun y y' h h' hh hh' => BX.part_c h1 Dp N y y' h h' hh hh'
+  ⟩
 
 end ReciprocityTheory.PGsh

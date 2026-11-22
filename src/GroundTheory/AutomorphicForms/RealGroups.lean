@@ -39,9 +39,10 @@ instance : SecondCountableTopology (upperPosSubgroup n ℂ) :=
 variable [WellFoundedLT n] [LocallyFiniteOrderBot n]
 
 theorem isClosed_upperPosSubgroupC : IsClosed (upperPosSubgroup n ℂ : Set (GL n ℂ)) := by
-  have e : (upperPosSubgroup n ℂ : Set (GL n ℂ)) =
-      (⋂ i, ⋂ j, {g : GL n ℂ | j < i → (g : Matrix n n ℂ) i j = 0}) ∩
-        ⋂ i, {g : GL n ℂ | 0 ≤ (g : Matrix n n ℂ) i i} := by
+  have e
+      : (upperPosSubgroup n ℂ : Set (GL n ℂ))
+        = (⋂ i, ⋂ j, {g : GL n ℂ | j < i → (g : Matrix n n ℂ) i j = 0})
+          ∩ ⋂ i, {g : GL n ℂ | 0 ≤ (g : Matrix n n ℂ) i i} := by
     ext g
     simp only [SetLike.mem_coe, mem_upperPosSubgroup, mem_inter_iff, mem_iInter, mem_ofPred_eq]
     constructor
@@ -67,11 +68,12 @@ instance : LocallyCompactSpace (upperPosSubgroup n ℂ) :=
 noncomputable def kbInvHomeomorphC : GL n ℂ ≃ₜ unitaryGroup n ℂ × upperPosSubgroup n ℂ :=
   kbHomeomorph.symm.trans ((Homeomorph.refl _).prodCongr (Homeomorph.inv _))
 
-theorem kbInvHomeomorphC_equivariant (q : unitaryGroup n ℂ × upperPosSubgroup n ℂ) (g : GL n ℂ) :
-    kbInvHomeomorphC (Unitary.toUnits q.1 * g * ((q.2 : GL n ℂ))⁻¹) = q * kbInvHomeomorphC g := by
+theorem kbInvHomeomorphC_equivariant (q : unitaryGroup n ℂ × upperPosSubgroup n ℂ) (g : GL n ℂ)
+    : kbInvHomeomorphC (Unitary.toUnits q.1 * g * ((q.2 : GL n ℂ))⁻¹) = q * kbInvHomeomorphC g := by
   obtain ⟨p, rfl⟩ := kbHomeomorph.surjective g
-  have e : Unitary.toUnits q.1 * kbHomeomorph p * ((q.2 : GL n ℂ))⁻¹ =
-      kbHomeomorph (q.1 * p.1, p.2 * q.2⁻¹) := by
+  have e
+      : Unitary.toUnits q.1 * kbHomeomorph p * ((q.2 : GL n ℂ))⁻¹
+        = kbHomeomorph (q.1 * p.1, p.2 * q.2⁻¹) := by
     simp only [kbHomeomorph_apply, map_mul, Subgroup.coe_mul, Subgroup.coe_inv, mul_assoc]
   rw [e]
   simp only [kbInvHomeomorphC, Homeomorph.trans_apply, Homeomorph.symm_apply_apply]
@@ -79,29 +81,31 @@ theorem kbInvHomeomorphC_equivariant (q : unitaryGroup n ℂ × upperPosSubgroup
   show (p.2 * q.2⁻¹)⁻¹ = q.2 * p.2⁻¹
   rw [_root_.mul_inv_rev, inv_inv]
 
-theorem haarGLComplex_eq_smul_map_kbHomeomorph (μ₀ : Measure (Matrix n n ℂ)) [μ₀.IsAddHaarMeasure]
+theorem haarGLComplex_eq_smul_map_kbHomeomorph
+    (μ₀ : Measure (Matrix n n ℂ)) [μ₀.IsAddHaarMeasure]
     (μK : Measure (unitaryGroup n ℂ)) [μK.IsHaarMeasure]
-    (μB : Measure (upperPosSubgroup n ℂ)) [μB.IsHaarMeasure] :
-    ∃ c : ℝ≥0, c ≠ 0 ∧
-      haarGLComplex μ₀ = c • Measure.map kbHomeomorph (μK.prod μB.inv) := by
+    (μB : Measure (upperPosSubgroup n ℂ)) [μB.IsHaarMeasure]
+    : ∃ c : ℝ≥0, c ≠ 0 ∧ haarGLComplex μ₀ = c • Measure.map kbHomeomorph (μK.prod μB.inv) := by
   set H := haarGLComplex μ₀ with hHdef
   set f := kbInvHomeomorphC (n := n)
   set ν := Measure.map f H with hνdef
-  have hν : ν.IsMulLeftInvariant := ⟨fun q => by
-    rw [hνdef, Measure.map_map (measurable_const_mul q) f.measurable]
-    have e1 : (fun x => q * x) ∘ f =
-        f ∘ (fun g => Unitary.toUnits q.1 * g * ((q.2 : GL n ℂ))⁻¹) :=
-      funext fun g => (kbInvHomeomorphC_equivariant q g).symm
-    have e2 : (fun g : GL n ℂ => Unitary.toUnits q.1 * g * ((q.2 : GL n ℂ))⁻¹) =
-        (fun g => g * ((q.2 : GL n ℂ))⁻¹) ∘ (fun g => Unitary.toUnits q.1 * g) := rfl
-    have hmT : Measurable (fun g : GL n ℂ => Unitary.toUnits q.1 * g * ((q.2 : GL n ℂ))⁻¹) := by
-      rw [e2]; exact (measurable_mul_const _).comp (measurable_const_mul _)
-    rw [e1, ← Measure.map_map f.measurable hmT, e2,
-      ← Measure.map_map (measurable_mul_const _) (measurable_const_mul _), map_mul_left_eq_self,
-      map_mul_right_eq_self]⟩
+  have hν : ν.IsMulLeftInvariant :=
+    ⟨fun q => by
+      rw [hνdef, Measure.map_map (measurable_const_mul q) f.measurable]
+      have e1
+          : (fun x => q * x) ∘ f = f ∘ (fun g => Unitary.toUnits q.1 * g * ((q.2 : GL n ℂ))⁻¹) :=
+        funext fun g => (kbInvHomeomorphC_equivariant q g).symm
+      have e2
+          : (fun g : GL n ℂ => Unitary.toUnits q.1 * g * ((q.2 : GL n ℂ))⁻¹)
+            = (fun g => g * ((q.2 : GL n ℂ))⁻¹) ∘ (fun g => Unitary.toUnits q.1 * g) :=
+        rfl
+      have hmT : Measurable (fun g : GL n ℂ => Unitary.toUnits q.1 * g * ((q.2 : GL n ℂ))⁻¹) := by
+        rw [e2]; exact (measurable_mul_const _).comp (measurable_const_mul _)
+      rw [e1, ← Measure.map_map f.measurable hmT, e2,
+        ← Measure.map_map (measurable_mul_const _) (measurable_const_mul _), map_mul_left_eq_self,
+        map_mul_right_eq_self]⟩
   have hνc : IsFiniteMeasureOnCompacts ν := IsFiniteMeasureOnCompacts.map H f
-  obtain ⟨c, key⟩ : ∃ c : ℝ≥0, ν = c • μK.prod μB :=
-    ⟨_, isMulLeftInvariant_eq_smul ν (μK.prod μB)⟩
+  obtain ⟨c, key⟩ : ∃ c : ℝ≥0, ν = c • μK.prod μB := ⟨_, isMulLeftInvariant_eq_smul ν (μK.prod μB)⟩
   have hH : H = Measure.map f.symm ν := by
     rw [hνdef, Measure.map_map f.symm.measurable f.measurable]
     simp
@@ -117,12 +121,16 @@ theorem haarGLComplex_eq_smul_map_kbHomeomorph (μ₀ : Measure (Matrix n n ℂ)
     rw [e3, ← Measure.map_map kbHomeomorph.measurable (measurable_id.prodMap measurable_inv),
       ← Measure.map_prod_map _ _ measurable_id measurable_inv, Measure.map_id, Measure.inv_def]
 
-theorem lintegral_haarGLComplex_iwasawa (μ₀ : Measure (Matrix n n ℂ)) [μ₀.IsAddHaarMeasure]
+theorem lintegral_haarGLComplex_iwasawa
+    (μ₀ : Measure (Matrix n n ℂ)) [μ₀.IsAddHaarMeasure]
     (μK : Measure (unitaryGroup n ℂ)) [μK.IsHaarMeasure]
-    (μB : Measure (upperPosSubgroup n ℂ)) [μB.IsHaarMeasure] :
-    ∃ c : ℝ≥0, c ≠ 0 ∧ ∀ f : GL n ℂ → ℝ≥0∞, Measurable f →
-      ∫⁻ g, f g ∂(haarGLComplex μ₀) =
-        c * ∫⁻ k, ∫⁻ b, f (Unitary.toUnits k * b) ∂μB.inv ∂μK := by
+    (μB : Measure (upperPosSubgroup n ℂ)) [μB.IsHaarMeasure]
+    : ∃ c : ℝ≥0,
+      c ≠ 0
+        ∧ ∀ f : GL n ℂ → ℝ≥0∞,
+          Measurable f
+            → ∫⁻ g, f g ∂(haarGLComplex μ₀)
+              = c * ∫⁻ k, ∫⁻ b, f (Unitary.toUnits k * b) ∂μB.inv ∂μK := by
   obtain ⟨c, hc, h⟩ := haarGLComplex_eq_smul_map_kbHomeomorph μ₀ μK μB
   refine ⟨c, hc, fun f hf => ?_⟩
   rw [h, lintegral_smul_measure, lintegral_map hf kbHomeomorph.measurable]

@@ -11,7 +11,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 noncomputable section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.LatCount
@@ -79,7 +80,20 @@ lemma exists_pos_lt {α : Type} {S : Set α} (hS : S.Finite) (f : α → ℝ) (h
     ∃ r : ℝ, 0 < r ∧ r ≤ 1 ∧ ∀ x ∈ S, r < f x :=
   _root_.Bl.FirstLemmaK.goal1 hS f hf
 
-theorem count_le : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ τ : Multiplicative ℝ →* (AF F ⊗[F] E)ˣ, IsFlow τ → ∀ (M : ℕ) (Ω : Set (Fin 1 → Fin M → AF F ⊗[F] E)), IsCompact Ω → ∃ x₀ C : ℝ, ∀ x : ℝ, ∑' X : {X : Fin 1 → Fin M → E // X ≠ 0}, (Set.indicator Ω (fun _ => (1 : ℝ≥0∞))) (((τ (Multiplicative.ofAdd (-x)) : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) • ratTup (AF F) X.1) ≤ if x < x₀ then 0 else ENNReal.ofReal (C * Real.exp (2 * Module.finrank ℚ F * M * x)) := by
+theorem count_le
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ τ : Multiplicative ℝ →* (AF F ⊗[F] E)ˣ,
+          IsFlow τ
+            → ∀ (M : ℕ) (Ω : Set (Fin 1 → Fin M → AF F ⊗[F] E)),
+              IsCompact Ω
+                → ∃ x₀ C : ℝ, ∀ x : ℝ,
+                  ∑' X : {X : Fin 1 → Fin M → E // X ≠ 0}, (Set.indicator Ω (fun _ => (1 : ℝ≥0∞))) (((τ (Multiplicative.ofAdd (-x)) : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) • ratTup (AF F) X.1)
+                    ≤ if x < x₀ then
+                        0
+                      else
+                        ENNReal.ofReal (C * Real.exp (2 * Module.finrank ℚ F * M * x)) := by
   intro F E _ _ _ _ _ σ hCM τ hτ M Ω hΩ
   have : Module.Finite F E := Module.finite_of_finrank_pos (by rw [hCM.2.2.1]; norm_num)
   let b := Module.finBasis F E
@@ -87,28 +101,28 @@ theorem count_le : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
   obtain ⟨-, hfin, -⟩ := GlobalTheory.T.rational_tuples_discrete_cocompact_adelic F E σ hCM 1 M
   obtain ⟨N, r, hN, hr, hsub⟩ := hexh Ω hΩ
 
-  obtain ⟨r₀, h0, h1, hsmall⟩ := exists_pos_lt
-    (((hfin _ (hcpt N 1 hN)).subset (Set.inter_subset_left
-      (t := {X : Fin 1 → Fin M → E | X ≠ 0}))))
-    (fun X => sizeTup b (projInf (ratTup (AF F) X)))
-    (fun X hX => sizeTup_ratTup_pos b X hX.2)
+  obtain ⟨r₀, h0, h1, hsmall⟩ :=
+    exists_pos_lt
+      (((hfin _ (hcpt N 1 hN)).subset
+        (Set.inter_subset_left (t := {X : Fin 1 → Fin M → E | X ≠ 0}))))
+      (fun X => sizeTup b (projInf (ratTup (AF F) X)))
+      (fun X hX => sizeTup_ratTup_pos b X hX.2)
   have hnone : ∀ X : Fin 1 → Fin M → E, X ≠ 0 → ratTup (AF F) X ∉ box b N r₀ := by
     intro X hX hmem
     have := hsmall X ⟨box_mono b N h1 hmem, hX⟩
     exact absurd hmem.2 (not_le.mpr this)
-  have hscale : ∀ (x : ℝ) (Y : Fin 1 → Fin M → AF F ⊗[F] E),
-      ((τ (Multiplicative.ofAdd (-x)) : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) • Y ∈ Ω →
-        Y ∈ box b N (Real.exp x * r) := by
+  have hscale
+      : ∀ (x : ℝ) (Y : Fin 1 → Fin M → AF F ⊗[F] E),
+        ((τ (Multiplicative.ofAdd (-x)) : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) • Y ∈ Ω
+          → Y ∈ box b N (Real.exp x * r) := by
     intro x Y hY
     refine (hflow τ hτ N (Real.exp x * r) (-x) Y).mp ?_
-    have : Real.exp (-x) * (Real.exp x * r) = r := by
-      rw [← mul_assoc, ← Real.exp_add]; simp
+    have : Real.exp (-x) * (Real.exp x * r) = r := by rw [← mul_assoc, ← Real.exp_add]; simp
     rw [this]
     exact hsub hY
   refine ⟨Real.log (r₀ / r), (5 * r / r₀) ^ (2 * Module.finrank ℚ F * M), fun x => ?_⟩
   split_ifs with hx
-  ·
-    have hlt : Real.exp x * r < r₀ := by
+  · have hlt : Real.exp x * r < r₀ := by
       have := (Real.lt_log_iff_exp_lt (div_pos h0 hr)).mp hx
       exact (lt_div_iff₀ hr).mp this
     refine le_of_eq (ENNReal.tsum_eq_zero.mpr fun X => Set.indicator_of_notMem ?_ _)
@@ -118,38 +132,45 @@ theorem count_le : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
       have := (Real.log_le_iff_le_exp (div_pos h0 hr)).mp (not_lt.mp hx)
       exact (div_le_iff₀ hr).mp this
     set e := ratHom (F := F) (E := E) M with he
-    have hone : ∑' l : Fin 1 → Fin M → E,
-        (Set.indicator (box b N r₀) (fun _ => (1 : ℝ≥0∞))) (e l) ≤ 1 := by
+    have hone
+        : ∑' l : Fin 1 → Fin M → E,
+            (Set.indicator (box b N r₀) (fun _ => (1 : ℝ≥0∞))) (e l)
+          ≤ 1 := by
       rw [tsum_eq_single 0]
       · exact Set.indicator_apply_le' (fun _ => le_rfl) (fun _ => by simp)
       · intro X hX
         exact Set.indicator_of_notMem (hnone X hX) _
-    have hpack := GlobalTheory.T.adelic_box_lattice_count_ratio F E σ hCM _ b M (Fin 1 → Fin M → E) e N r₀ (Real.exp x * r) h0 hge
-    calc ∑' X : {X : Fin 1 → Fin M → E // X ≠ 0}, (Set.indicator Ω (fun _ => (1 : ℝ≥0∞)))
-            (((τ (Multiplicative.ofAdd (-x)) : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) • ratTup (AF F) X.1)
-        ≤ ∑' X : {X : Fin 1 → Fin M → E // X ≠ 0},
-            (Set.indicator (box b N (Real.exp x * r)) (fun _ => (1 : ℝ≥0∞))) (e X.1) := by
-          refine ENNReal.tsum_le_tsum fun X => ?_
-          by_cases hm : ((τ (Multiplicative.ofAdd (-x)) : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) •
-              ratTup (AF F) X.1 ∈ Ω
-          · have hm' : e X.1 ∈ box b N (Real.exp x * r) := hscale x _ hm
-            rw [Set.indicator_of_mem hm, Set.indicator_of_mem hm']
-          · rw [Set.indicator_of_notMem hm]
-            exact bot_le
+    have hpack :=
+      GlobalTheory.T.adelic_box_lattice_count_ratio F E σ hCM _ b M (Fin 1 → Fin M → E) e N r₀
+        (Real.exp x * r) h0 hge
+    calc
+      ∑' X : {X : Fin 1 → Fin M → E // X ≠ 0}, (Set.indicator Ω (fun _ => (1 : ℝ≥0∞)))
+         (((τ (Multiplicative.ofAdd (-x)) : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) • ratTup (AF F) X.1)
+          ≤ ∑' X : {X : Fin 1 → Fin M → E // X ≠ 0},
+              (Set.indicator (box b N (Real.exp x * r)) (fun _ => (1 : ℝ≥0∞))) (e X.1) := by
+        refine ENNReal.tsum_le_tsum fun X => ?_
+        by_cases hm
+          : ((τ (Multiplicative.ofAdd (-x)) : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) • ratTup (AF F) X.1 ∈ Ω
+        · have hm' : e X.1 ∈ box b N (Real.exp x * r) := hscale x _ hm
+          rw [Set.indicator_of_mem hm, Set.indicator_of_mem hm']
+        · rw [Set.indicator_of_notMem hm]
+          exact bot_le
       _ ≤ ∑' l : Fin 1 → Fin M → E,
             (Set.indicator (box b N (Real.exp x * r)) (fun _ => (1 : ℝ≥0∞))) (e l) :=
-          ENNReal.tsum_comp_le_tsum_of_injective Subtype.val_injective
-            (fun l => (Set.indicator (box b N (Real.exp x * r)) (fun _ => (1 : ℝ≥0∞))) (e l))
+        ENNReal.tsum_comp_le_tsum_of_injective Subtype.val_injective
+          (fun l => (Set.indicator (box b N (Real.exp x * r)) (fun _ => (1 : ℝ≥0∞))) (e l))
       _ ≤ ENNReal.ofReal ((5 * (Real.exp x * r) / r₀) ^ (2 * Module.finrank ℚ F * M)) * 1 :=
-          hpack.trans (mul_le_mul_right hone _)
-      _ = ENNReal.ofReal ((5 * r / r₀) ^ (2 * Module.finrank ℚ F * M) *
-            Real.exp (2 * Module.finrank ℚ F * M * x)) := by
-          rw [mul_one]
-          congr 1
-          have : (2 * (Module.finrank ℚ F : ℝ) * M * x) =
-              ((2 * Module.finrank ℚ F * M : ℕ) : ℝ) * x := by push_cast; ring
-          rw [this, Real.exp_nat_mul, ← mul_pow]
-          congr 1
-          ring
+        hpack.trans (mul_le_mul_right hone _)
+      _ = ENNReal.ofReal
+          ((5 * r / r₀) ^ (2 * Module.finrank ℚ F * M)
+            * Real.exp (2 * Module.finrank ℚ F * M * x)) := by
+        rw [mul_one]
+        congr 1
+        have : (2 * (Module.finrank ℚ F : ℝ) * M * x)
+            = ((2 * Module.finrank ℚ F * M : ℕ) : ℝ) * x := by
+          push_cast; ring
+        rw [this, Real.exp_nat_mul, ← mul_pow]
+        congr 1
+        ring
 
 end GlobalTheory.CompanionTheory.SW.LatCount

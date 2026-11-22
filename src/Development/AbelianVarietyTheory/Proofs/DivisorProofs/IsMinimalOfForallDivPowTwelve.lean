@@ -8,11 +8,12 @@ open IsDedekindDomain WeierstrassCurve
 
 namespace GlobalTheory
 
-theorem isMinimal_of_forall_div_pow_twelve (R F : Type) [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] [Field F] [Algebra R F] [IsFractionRing R F]
+theorem isMinimal_of_forall_div_pow_twelve
+    (R F : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field F] [Algebra R F]
+    [IsFractionRing R F]
     (W : WeierstrassCurve F) (hI : W.IsIntegral R)
-    (h : ∀ x : R, x ≠ 0 → W.Δ / algebraMap R F x ^ 12 ∈ (algebraMap R F).range → IsUnit x) :
-    W.IsMinimal R := by
+    (h : ∀ x : R, x ≠ 0 → W.Δ / algebraMap R F x ^ 12 ∈ (algebraMap R F).range → IsUnit x)
+    : W.IsMinimal R := by
   refine ⟨⟨by simpa using hI, fun C hC _ => ?_⟩⟩
   simp only [one_smul]
   have hC' : (C • W).IsIntegral R := hC
@@ -28,8 +29,9 @@ theorem isMinimal_of_forall_div_pow_twelve (R F : Type) [CommRing R] [IsDomain R
       rintro rfl
       exact C.u.ne_zero (by simpa using hx.symm)
     obtain ⟨r, hr⟩ := Δ_integral_of_isIntegral R (C • W)
-    have hu : IsUnit x := h x hx0 ⟨r, by
-      rw [hr, variableChange_Δ, hx, Units.val_inv_eq_inv_val, inv_pow, div_eq_inv_mul]⟩
+    have hu : IsUnit x :=
+      h x hx0
+        ⟨r, by rw [hr, variableChange_Δ, hx, Units.val_inv_eq_inv_val, inv_pow, div_eq_inv_mul]⟩
     obtain ⟨y, hy⟩ := hu.exists_right_inv
     have : ((C.u⁻¹ : Fˣ) : F) = algebraMap R F y := by
       rw [Units.val_inv_eq_inv_val, ← hx]

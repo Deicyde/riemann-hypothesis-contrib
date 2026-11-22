@@ -16,20 +16,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.FW.cyc (l : ℕ) [hl : Fact l.Prime] (f : ℕ) (hf : f.Coprime l) (h1 : 1 < f) :
-    ∃ B n₀ : ℕ, ∀ n, n₀ ≤ n → ∀ (L : Type) [Field L] [NumberField L] [IsCyclotomicExtension {f * l ^ n} ℚ L],
-      IsTotallyComplex L ∧ (powR (Cl L) l).index ≤ B := by
+theorem UpperTheory.V.FW.cyc (l : ℕ) [hl : Fact l.Prime] (f : ℕ) (hf : f.Coprime l) (h1 : 1 < f)
+    : ∃ B n₀ : ℕ, ∀ n,
+      n₀ ≤ n
+        → ∀ (L : Type) [Field L] [NumberField L] [IsCyclotomicExtension {f * l ^ n} ℚ L],
+          IsTotallyComplex L ∧ (powR (Cl L) l).index ≤ B := by
   classical
   have hf0 : 0 < f := by omega
   have hl0 : 0 < l := hl.out.pos
   have hfl0 : 0 < f * l := Nat.mul_pos hf0 hl0
   have hcodd : Odd (2 * (f * l) + 1) := ⟨f * l, by ring⟩
   have hc1 : 1 < 2 * (f * l) + 1 := by omega
-  have hcfl : (2 * (f * l) + 1).Coprime (f * l) := by
-    simp [Nat.coprime_mul_left_add_left]
+  have hcfl : (2 * (f * l) + 1).Coprime (f * l) := by simp [Nat.coprime_mul_left_add_left]
   obtain ⟨N, n₀, hn₀2, hmem⟩ := memZ l f (2 * (f * l) + 1) hf hcodd hc1 hcfl
   obtain ⟨B, hB⟩ := ambCyc l f hf
   by_cases hl2 : l = 2
@@ -39,7 +42,8 @@ theorem UpperTheory.V.FW.cyc (l : ℕ) [hl : Fact l.Prime] (f : ℕ) (hf : f.Cop
     haveI : NeZero (f * 2 ^ n) := ⟨(Nat.mul_pos hf0 (pow_pos hl0 n)).ne'⟩
     have hM2 : 2 < f * 2 ^ n := by
       have : 4 ≤ 2 ^ n := by
-        calc 4 = 2 ^ 2 := by norm_num
+        calc
+          4 = 2 ^ 2 := by norm_num
           _ ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) (by omega)
       nlinarith
     haveI : IsCMField L := IsCyclotomicExtension.Rat.isCMField L ⟨f * 2 ^ n, Set.mem_singleton _, hM2⟩
@@ -48,10 +52,12 @@ theorem UpperTheory.V.FW.cyc (l : ℕ) [hl : Fact l.Prime] (f : ℕ) (hf : f.Cop
     have hcM : (2 * (f * 2) + 1).Coprime (f * 2 ^ n) := by
       obtain ⟨h1, h2⟩ := Nat.coprime_mul_iff_right.mp hcfl
       exact Nat.coprime_mul_iff_right.mpr ⟨h1, h2.pow_right n⟩
-    have hcore := core 2 (ZMod (f * 2 ^ n))ˣ (Cl L) (cycRep (f * 2 ^ n) L) (-1) γ
-      (clA (f * 2 ^ n) L (-1)) (clA (f * 2 ^ n) L γ) (thetaH (f * 2 ^ n) (2 * (f * 2) + 1)) N
-      (by simp) (fun x => cycRep_apply _ _ _ x) (fun x => cycRep_apply _ _ _ x)
-      (stickH _ _ L hcM hcodd hM2) hγmem
+    have hcore :=
+      core 2 (ZMod (f * 2 ^ n))ˣ (Cl L) (cycRep (f * 2 ^ n) L) (-1) γ (clA (f * 2 ^ n) L (-1))
+        (clA (f * 2 ^ n) L γ) (thetaH (f * 2 ^ n) (2 * (f * 2) + 1)) N (by simp)
+        (fun x => cycRep_apply _ _ _ x)
+        (fun x => cycRep_apply _ _ _ x)
+        (stickH _ _ L hcM hcodd hM2) hγmem
     have hamb := hB n L γ (by omega) hγ1
     have hbound : Nat.card ↥(difR (clA (f * 2 ^ n) L (-1)) ⊓ torK (Cl L) 2) ≤ B ^ N :=
       hcore.trans (Nat.pow_le_pow_left hamb N)
@@ -74,7 +80,8 @@ theorem UpperTheory.V.FW.cyc (l : ℕ) [hl : Fact l.Prime] (f : ℕ) (hf : f.Cop
       omega
     have hM2 : 2 < f * l ^ n := by
       have : 3 ≤ l ^ n := by
-        calc 3 ≤ l := hl3
+        calc
+          3 ≤ l := hl3
           _ = l ^ 1 := (pow_one l).symm
           _ ≤ l ^ n := Nat.pow_le_pow_right hl0 (by omega)
       nlinarith
@@ -84,16 +91,18 @@ theorem UpperTheory.V.FW.cyc (l : ℕ) [hl : Fact l.Prime] (f : ℕ) (hf : f.Cop
     have hcM : (2 * (f * l) + 1).Coprime (f * l ^ n) := by
       obtain ⟨h1, h2⟩ := Nat.coprime_mul_iff_right.mp hcfl
       exact Nat.coprime_mul_iff_right.mpr ⟨h1, h2.pow_right n⟩
-    have hcore := core l (ZMod (f * l ^ n))ˣ (Cl L) (cycRep (f * l ^ n) L) (-1) γ
-      (clA (f * l ^ n) L (-1)) (clA (f * l ^ n) L γ) (thetaH (f * l ^ n) (2 * (f * l) + 1)) N
-      (by simp) (fun x => cycRep_apply _ _ _ x) (fun x => cycRep_apply _ _ _ x)
-      (stickH _ _ L hcM hcodd hM2) hγmem
+    have hcore :=
+      core l (ZMod (f * l ^ n))ˣ (Cl L) (cycRep (f * l ^ n) L) (-1) γ (clA (f * l ^ n) L (-1))
+        (clA (f * l ^ n) L γ) (thetaH (f * l ^ n) (2 * (f * l) + 1)) N (by simp)
+        (fun x => cycRep_apply _ _ _ x)
+        (fun x => cycRep_apply _ _ _ x)
+        (stickH _ _ L hcM hcodd hM2) hγmem
     have hamb := hB n L γ (by omega) hγ1
     have hbound : Nat.card ↥(difR (clA (f * l ^ n) L (-1)) ⊓ torK (Cl L) l) ≤ B ^ N :=
       hcore.trans (Nat.pow_le_pow_left hamb N)
     have hlodd : Odd l := hl.out.odd_of_ne_two hl2
-    obtain ⟨ζ, hζ⟩ := IsCyclotomicExtension.exists_isPrimitiveRoot ℚ L (Set.mem_singleton (f * l ^ n))
-      (NeZero.ne _)
+    obtain ⟨ζ, hζ⟩ :=
+      IsCyclotomicExtension.exists_isPrimitiveRoot ℚ L (Set.mem_singleton (f * l ^ n)) (NeZero.ne _)
     have hsplit : f * l ^ n = f * l ^ (n - 1) * l := by
       rw [mul_assoc, ← pow_succ]
       congr 2

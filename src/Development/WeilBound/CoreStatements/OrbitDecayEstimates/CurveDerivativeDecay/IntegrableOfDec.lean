@@ -16,7 +16,8 @@ namespace CompanionTheory.Lime.T3
 
 def nG {m : ℕ} {ε : Fin m → Bool} (g : UJ ε) : ℝ := Real.sqrt (hs (uMat g))
 
-theorem nG_mul {m : ℕ} {ε : Fin m → Bool} (g h : UJ ε) : nG (g * h) ≤ nG g * nG h := sqrt_frobenius_mul_le _ _
+theorem nG_mul {m : ℕ} {ε : Fin m → Bool} (g h : UJ ε) : nG (g * h) ≤ nG g * nG h :=
+  sqrt_frobenius_mul_le _ _
 
 theorem one_le_nG {m : ℕ} (hm : 1 ≤ m) {ε : Fin m → Bool} (g : UJ ε) : 1 ≤ nG g :=
   Real.one_le_sqrt.2 (one_le_hsG hm g)
@@ -28,17 +29,21 @@ theorem nG_inv {m : ℕ} {ε : Fin m → Bool} (g : UJ ε) : nG g⁻¹ = nG g :=
   unfold nG
   rw [uMat_inv, hs_conjJ]
 
-theorem hs_of_compact {m : ℕ} {ε : Fin m → Bool} (hc : ∀ a b, ε a = ε b) (g : UJ ε) : hs (uMat g) = m := by
+theorem hs_of_compact {m : ℕ} {ε : Fin m → Bool} (hc : ∀ a b, ε a = ε b) (g : UJ ε)
+    : hs (uMat g) = m := by
   have hg : (uMat g)ᴴ * Jm ε * uMat g = Jm ε := g.2
   unfold hs
   rw [Finset.sum_comm]
   have : ∀ j, ∑ i, ‖uMat g i j‖ ^ 2 = 1 := by
     intro j
     have h1 := congrFun (congrFun hg j) j
-    simp only [Jm, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.diagonal_apply, mul_ite, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true] at h1
-    have h2 : ∀ i, (if ε i = true then star (uMat g i j) * 1 else star (uMat g i j) * -1) * uMat g i j =
-        (if ε j = true then 1 else -1) * ((‖uMat g i j‖ ^ 2 : ℝ) : ℂ) := by
+    simp only [Jm, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.diagonal_apply, mul_ite,
+        mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      at h1
+    have h2
+        : ∀ i,
+          (if ε i = true then star (uMat g i j) * 1 else star (uMat g i j) * -1) * uMat g i j
+            = (if ε j = true then 1 else -1) * ((‖uMat g i j‖ ^ 2 : ℝ) : ℂ) := by
       intro i
       have := Complex.conj_mul' (uMat g i j)
       rw [hc i j]
@@ -53,11 +58,14 @@ theorem hs_of_compact {m : ℕ} {ε : Fin m → Bool} (hc : ∀ a b, ε a = ε b
 
 variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-theorem dec_low {m N : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {π : Matrix (Fin m) (Fin m) ℂ → (H →L[ℂ] H)} (hm : 1 ≤ m)
-    (hmN : m ≤ N) (hl : Formalism.QuantumDeterminants.IsHCParam lam) (hDS : IsDS ε lam π)
-    (hg : Formalism.QuantumDeterminants.GapAtLeast ε lam (200 * (N : ℝ) ^ 3)) {v : H} (hv : v ∈ lowKSub ε lam π) (hv1 : ‖v‖ = 1)
-    {A : ℕ} (hA1 : 1 ≤ A) (hA : A ≤ 12 * N ^ 2) (g : UJ ε) :
-    ‖⟪v, π (uMat g) v⟫_ℂ‖ ≤ (Real.exp 1 * Real.sqrt m) ^ A * (nG g)⁻¹ ^ A := by
+theorem dec_low
+    {m N : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {π : Matrix (Fin m) (Fin m) ℂ → (H →L[ℂ] H)}
+    (hm : 1 ≤ m) (hmN : m ≤ N) (hl : Formalism.QuantumDeterminants.IsHCParam lam)
+    (hDS : IsDS ε lam π) (hg : Formalism.QuantumDeterminants.GapAtLeast ε lam (200 * (N : ℝ) ^ 3))
+    {v : H} (hv : v ∈ lowKSub ε lam π) (hv1 : ‖v‖ = 1)
+    {A : ℕ} (hA1 : 1 ≤ A) (hA : A ≤ 12 * N ^ 2)
+    (g : UJ ε)
+    : ‖⟪v, π (uMat g) v⟫_ℂ‖ ≤ (Real.exp 1 * Real.sqrt m) ^ A * (nG g)⁻¹ ^ A := by
   have : CompleteSpace H := hDS.1
   have hm2 : (1 : ℝ) ≤ m := by exact_mod_cast hm
   have hN2 : (m : ℝ) ≤ N := by exact_mod_cast hmN
@@ -84,19 +92,27 @@ theorem dec_low {m N : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {π : Ma
     obtain ⟨a, ha⟩ := hp
     obtain ⟨b, hb⟩ := hq
     exact le_min (Finset.card_pos.2 ⟨a, by simp [ha]⟩) (Finset.card_pos.2 ⟨b, by simp [hb]⟩)
-  have hq0 : (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ) ≤ m := le_trans (by exact_mod_cast min_le_left _ _) hpm
+  have hq0 : (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ) ≤ m :=
+    le_trans (by exact_mod_cast min_le_left _ _) hpm
   have hq1' : (1 : ℝ) ≤ ReciprocityTheory.ChartRestriction.DS.S7.q0 ε := by exact_mod_cast hq1
   have hmm : (m : ℝ) ^ 2 ≤ m ^ 3 := by nlinarith
-  have hpq : (ReciprocityTheory.ChartRestriction.DS.pOf ε : ℝ) * ReciprocityTheory.ChartRestriction.DS.qOf ε ≤ m * m :=
+  have hpq
+      : (ReciprocityTheory.ChartRestriction.DS.pOf ε : ℝ)
+          * ReciprocityTheory.ChartRestriction.DS.qOf ε
+        ≤ m * m :=
     mul_le_mul hpm hqm (Nat.cast_nonneg _) (by linarith)
-  obtain ⟨k, X, hX, e⟩ := ReciprocityTheory.ChartRestriction.DS.S7.polar_exists (ε := ε) (g := uMat g) g.2
-  have hd := ReciprocityTheory.ChartRestriction.DS.coef_dec_of_isDS hDS hl hg hq1 (by nlinarith) (by nlinarith) ⟨hv1, hv⟩ k hX
+  obtain ⟨k, X, hX, e⟩ :=
+    ReciprocityTheory.ChartRestriction.DS.S7.polar_exists (ε := ε) (g := uMat g) g.2
+  have hd :=
+    ReciprocityTheory.ChartRestriction.DS.coef_dec_of_isDS hDS hl hg hq1 (by nlinarith)
+      (by nlinarith) ⟨hv1, hv⟩ k hX
   rw [← e] at hd
   set c := Real.sqrt (2 * (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ)) with hc
   have hc1 : 1 ≤ c := Real.one_le_sqrt.2 (by linarith)
   have hcm : c ≤ 2 * N := Real.sqrt_le_iff.2 ⟨by linarith, by nlinarith⟩
   set s := Real.sqrt (ReciprocityTheory.ChartRestriction.DS.S7.hs X) with hs_def
-  have hsX : ReciprocityTheory.ChartRestriction.DS.S7.hs X = s ^ 2 := (Real.sq_sqrt (ReciprocityTheory.ChartRestriction.DS.S7.hs_nonnegVG X)).symm
+  have hsX : ReciprocityTheory.ChartRestriction.DS.S7.hs X = s ^ 2 :=
+    (Real.sq_sqrt (ReciprocityTheory.ChartRestriction.DS.S7.hs_nonnegVG X)).symm
   have hG1 := one_le_nG hm g
   have hN : 0 < Real.sqrt (m : ℝ) := Real.sqrt_pos.2 (by linarith)
   have hGle : nG g ≤ Real.sqrt m * Real.exp s := by
@@ -110,9 +126,12 @@ theorem dec_low {m N : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {π : Ma
     exact ReciprocityTheory.ChartRestriction.DS.S7.hs_exp_leVG X
   have hA' : (A : ℝ) ≤ 12 * N ^ 2 := by exact_mod_cast hA
   have hA1' : (1 : ℝ) ≤ A := by exact_mod_cast hA1
-  have hr := ReciprocityTheory.ChartRestriction.DS.sigZeroDecay_real (h := 8 * c * A) (s := s) (by positivity) hc1 hN (by linarith) hGle
-  rw [show 8 * c * A / (8 * c) = (A : ℝ) by field_simp, Real.rpow_neg (by linarith), Real.rpow_natCast,
-    Real.rpow_natCast, ← inv_pow] at hr
+  have hr :=
+    ReciprocityTheory.ChartRestriction.DS.sigZeroDecay_real (h := 8 * c * A) (s := s)
+      (by positivity) hc1 hN (by linarith) hGle
+  rw [show 8 * c * A / (8 * c) = (A : ℝ) by field_simp, Real.rpow_neg (by linarith),
+      Real.rpow_natCast, Real.rpow_natCast, ← inv_pow]
+    at hr
   rw [hsX] at hd
   have hmin : 0 ≤ min (s ^ 2) (s / c) := le_min (by positivity) (by positivity)
   have hle : 8 * c * A ≤ h := by
@@ -121,10 +140,13 @@ theorem dec_low {m N : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {π : Ma
   refine hd.trans ((Real.exp_le_exp.2 (by nlinarith)).trans (hr.trans (le_of_eq ?_)))
   rw [show Real.exp (A : ℝ) = Real.exp 1 ^ A by rw [← Real.exp_nat_mul, mul_one], ← mul_pow]
 
-theorem dec_conj {m : ℕ} {ε : Fin m → Bool} {π : Matrix (Fin m) (Fin m) ℂ → (H →L[ℂ] H)} (hm : 1 ≤ m)
-    (hπ : IsURepOn (UJset ε) π) {v : H} {C : ℝ} (hC : 0 ≤ C) {A : ℕ}
-    (hd : ∀ g : UJ ε, ‖⟪v, π (uMat g) v⟫_ℂ‖ ≤ C * (nG g)⁻¹ ^ A) (g₀ g : UJ ε) :
-    ‖⟪π (uMat g₀) v, π (uMat g) (π (uMat g₀) v)⟫_ℂ‖ ≤ C * hs (uMat g₀) ^ A * (nG g)⁻¹ ^ A := by
+theorem dec_conj
+    {m : ℕ} {ε : Fin m → Bool} {π : Matrix (Fin m) (Fin m) ℂ → (H →L[ℂ] H)}
+    (hm : 1 ≤ m) (hπ : IsURepOn (UJset ε) π)
+    {v : H} {C : ℝ} (hC : 0 ≤ C)
+    {A : ℕ} (hd : ∀ g : UJ ε, ‖⟪v, π (uMat g) v⟫_ℂ‖ ≤ C * (nG g)⁻¹ ^ A)
+    (g₀ g : UJ ε)
+    : ‖⟪π (uMat g₀) v, π (uMat g) (π (uMat g₀) v)⟫_ℂ‖ ≤ C * hs (uMat g₀) ^ A * (nG g)⁻¹ ^ A := by
   let U : H →ₗᵢ[ℂ] H := ⟨(π (uMat g₀)).toLinearMap, hπ.2.1 _ g₀.2⟩
   have e : π (uMat g) (π (uMat g₀) v) = π (uMat g₀) (π (uMat (g₀⁻¹ * g * g₀)) v) := by
     have h1 := hπ.1.2 (uMat g) g.2 (uMat g₀) g₀.2
@@ -142,17 +164,23 @@ theorem dec_conj {m : ℕ} {ε : Fin m → Bool} {π : Matrix (Fin m) (Fin m) �
   rw [mul_assoc C, ← mul_pow]
   refine mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by unfold nG; positivity) ?_ A) hC
   have h1 : nG g ≤ nG g₀ * nG (g₀⁻¹ * g * g₀) * nG g₀ := by
-    calc nG g = nG (g₀ * (g₀⁻¹ * g * g₀) * g₀⁻¹) := by congr 1; group
+    calc
+      nG g
+        = nG (g₀ * (g₀⁻¹ * g * g₀) * g₀⁻¹) := by congr 1; group
       _ ≤ nG (g₀ * (g₀⁻¹ * g * g₀)) * nG g₀⁻¹ := nG_mul _ _
-      _ ≤ _ := by rw [nG_inv]; exact mul_le_mul_of_nonneg_right (nG_mul _ _) (by unfold nG; positivity)
+      _ ≤ _ := by
+        rw [nG_inv]; exact mul_le_mul_of_nonneg_right (nG_mul _ _) (by unfold nG; positivity)
   have h2 := one_le_nG hm g
   have h3 := one_le_nG hm (g₀⁻¹ * g * g₀)
   rw [← nG_sq, ← div_eq_mul_inv, le_div_iff₀ (by linarith), inv_mul_le_iff₀ (by linarith)]
   nlinarith
 
-theorem nearSet_lt_top {m : ℕ} (ε : Fin m → Bool) (μ : Measure (UJ ε)) [μ.IsHaarMeasure] : μ (nearSet ε 1) < ⊤ := by
+theorem nearSet_lt_top {m : ℕ} (ε : Fin m → Bool) (μ : Measure (UJ ε)) [μ.IsHaarMeasure]
+    : μ (nearSet ε 1) < ⊤ := by
   have hc : IsCompact {g : UJ ε | hsG g ≤ (Real.sqrt m + 1) ^ 2} := by
-    have := (isClosedEmbeddingMatrix m ε).1.isCompact_preimage ((hermitian_small_ball m ε).1 ((Real.sqrt m + 1) ^ 2))
+    have :=
+      (isClosedEmbeddingMatrix m ε).1.isCompact_preimage ((hermitian_small_ball m ε).1
+        ((Real.sqrt m + 1) ^ 2))
     convert this using 1
     ext g
     simp only [Set.mem_ofPred_eq, Set.mem_preimage, hsG]
@@ -165,18 +193,23 @@ theorem nearSet_lt_top {m : ℕ} (ε : Fin m → Bool) (μ : Measure (UJ ε)) [�
   rw [← Real.sqrt_le_left (by positivity)]
   linarith
 
-theorem integrable_of_dec {m : ℕ} {ε : Fin m → Bool} (hm : 1 ≤ m) (μ : Measure (UJ ε)) [μ.IsHaarMeasure] {f : UJ ε → ℂ}
-    (hf : Continuous f) {C : ℝ} (hC : 0 ≤ C) {A : ℕ} (hA : 2 * m ^ 2 + 1 ≤ A) (hd : ∀ g, ‖f g‖ ≤ C * (nG g)⁻¹ ^ A) :
-    Integrable f μ := by
+theorem integrable_of_dec
+    {m : ℕ} {ε : Fin m → Bool} (hm : 1 ≤ m) (μ : Measure (UJ ε)) [μ.IsHaarMeasure]
+    {f : UJ ε → ℂ} (hf : Continuous f)
+    {C : ℝ} (hC : 0 ≤ C)
+    {A : ℕ} (hA : 2 * m ^ 2 + 1 ≤ A) (hd : ∀ g, ‖f g‖ ≤ C * (nG g)⁻¹ ^ A)
+    : Integrable f μ := by
   refine ⟨hf.aestronglyMeasurable, ?_⟩
   have h1 := int_ratio hm ε μ one_pos (by norm_num) hA
-  calc ∫⁻ g, ‖f g‖ₑ ∂μ ≤ ∫⁻ g, ENNReal.ofReal C * ENNReal.ofReal ((Real.sqrt (hsG g))⁻¹ ^ A) ∂μ := by
-        refine lintegral_mono fun g => ?_
-        rw [← ofReal_norm, ← ENNReal.ofReal_mul hC]
-        exact ENNReal.ofReal_le_ofReal (hd g)
+  calc
+    ∫⁻ g, ‖f g‖ₑ ∂μ ≤ ∫⁻ g, ENNReal.ofReal C * ENNReal.ofReal ((Real.sqrt (hsG g))⁻¹ ^ A) ∂μ := by
+      refine lintegral_mono fun g => ?_
+      rw [← ofReal_norm, ← ENNReal.ofReal_mul hC]
+      exact ENNReal.ofReal_le_ofReal (hd g)
     _ = ENNReal.ofReal C * ∫⁻ g, ENNReal.ofReal ((Real.sqrt (hsG g))⁻¹ ^ A) ∂μ :=
-        lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
-    _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top
+      lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
+    _ < ⊤ :=
+      ENNReal.mul_lt_top ENNReal.ofReal_lt_top
         (h1.trans_lt (ENNReal.mul_lt_top ENNReal.ofReal_lt_top (nearSet_lt_top ε μ)))
 
 end CompanionTheory.Lime.T3

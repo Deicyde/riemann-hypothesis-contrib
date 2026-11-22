@@ -9,8 +9,9 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR.LatTop
 
-theorem isLocallyConstant_indicator_one' {Z : Type} [TopologicalSpace Z] {W : Set Z} (hW : IsClopen W) :
-    IsLocallyConstant (W.indicator (1 : Z → ℂ)) := by
+theorem isLocallyConstant_indicator_one'
+    {Z : Type} [TopologicalSpace Z] {W : Set Z} (hW : IsClopen W)
+    : IsLocallyConstant (W.indicator (1 : Z → ℂ)) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   by_cases hx : x ∈ W
@@ -19,10 +20,11 @@ theorem isLocallyConstant_indicator_one' {Z : Type} [TopologicalSpace Z] {W : Se
   · filter_upwards [hW.isClosed.isOpen_compl.mem_nhds hx] with y hy
     simp [Set.indicator_of_notMem hy, Set.indicator_of_notMem hx]
 
-theorem lattice_isTest : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
-    [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (j : A.L ≃ₗ[E] (Fin r → E)),
-    IsOpen {y : A.L | ∀ i, ‖j y i‖ ≤ 1} ∧ IsCompact {y : A.L | ∀ i, ‖j y i‖ ≤ 1} ∧
-      IsTest (Set.indicator {y : A.L | ∀ i, ‖j y i‖ ≤ 1} (1 : A.L → ℂ)) := by
+theorem lattice_isTest
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (j : A.L ≃ₗ[E] (Fin r → E)),
+      IsOpen {y : A.L | ∀ i, ‖j y i‖ ≤ 1} ∧ IsCompact {y : A.L | ∀ i, ‖j y i‖ ≤ 1}
+        ∧ IsTest (Set.indicator {y : A.L | ∀ i, ‖j y i‖ ≤ 1} (1 : A.L → ℂ)) := by
   intro F E _ _ _ _ hU A r j
   haveI : IsUltrametricDist E := hU.ultraE
   haveI : LocallyCompactSpace F := hU.lcF
@@ -51,9 +53,12 @@ theorem lattice_isTest : ∀ (F E : Type) [NontriviallyNormedField F] [Nontrivia
   have hS' : jF ⁻¹' V = jF.symm '' V := (jF.toEquiv.image_symm_eq_preimage V).symm
   have hSo : IsOpen {y : A.L | ∀ i, ‖j y i‖ ≤ 1} := hS ▸ hVo.preimage hc
   have hSc : IsClosed {y : A.L | ∀ i, ‖j y i‖ ≤ 1} := hS ▸ hVc.preimage hc
-  have hSk : IsCompact {y : A.L | ∀ i, ‖j y i‖ ≤ 1} := by
-    rw [hS, hS']; exact hVk.image hcs
-  exact ⟨hSo, hSk, isLocallyConstant_indicator_one' ⟨hSc, hSo⟩,
-    HasCompactSupport.intro' hSk hSc fun x hx => Set.indicator_of_notMem hx _⟩
+  have hSk : IsCompact {y : A.L | ∀ i, ‖j y i‖ ≤ 1} := by rw [hS, hS']; exact hVk.image hcs
+  exact ⟨
+    hSo,
+    hSk,
+    isLocallyConstant_indicator_one' ⟨hSc, hSo⟩,
+    HasCompactSupport.intro' hSk hSc fun x hx => Set.indicator_of_notMem hx _
+  ⟩
 
 end GlobalTheory.JR.LatTop

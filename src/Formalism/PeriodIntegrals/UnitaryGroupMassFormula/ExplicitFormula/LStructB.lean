@@ -142,8 +142,9 @@ private lemma exists_differentiable_Gammaℝ_inv_eq_mul : ∃ g : ℂ → ℂ, D
       rw [key]
       ring
 
-theorem mult_zero_of_even {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive) (he : χ.Even)
-    (h1 : χ ≠ 1) : LFunction χ 0 = 0 ∧ analyticOrderNatAt (LFunction χ) 0 = 1 := by
+theorem mult_zero_of_even
+    {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive) (he : χ.Even) (h1 : χ ≠ 1)
+    : LFunction χ 0 = 0 ∧ analyticOrderNatAt (LFunction χ) 0 = 1 := by
   obtain ⟨g, hgd, hg0, hgz⟩ := exists_differentiable_Gammaℝ_inv_eq_mul
   have hN1 : N ≠ 1 := by
     intro hN
@@ -157,10 +158,12 @@ theorem mult_zero_of_even {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive)
   have hcd : Differentiable ℂ (completedLFunction χ) :=
     DirichletCharacter.differentiable_completedLFunction h1
   refine ⟨by rw [hLeq]; simp, ?_⟩
-  have hLa : AnalyticAt ℂ (LFunction χ) 0 := (DirichletCharacter.differentiable_LFunction h1).analyticAt 0
+  have hLa : AnalyticAt ℂ (LFunction χ) 0 :=
+    (DirichletCharacter.differentiable_LFunction h1).analyticAt 0
   have hord : analyticOrderAt (LFunction χ) 0 = ((1 : ℕ) : ℕ∞) := by
     rw [hLa.analyticOrderAt_eq_natCast]
-    refine ⟨fun s => completedLFunction χ s * g s, (hcd.mul hgd).analyticAt 0, mul_ne_zero hc0 hg0, ?_⟩
+    refine
+      ⟨fun s => completedLFunction χ s * g s, (hcd.mul hgd).analyticAt 0, mul_ne_zero hc0 hg0, ?_⟩
     filter_upwards with z
     rw [hLeq]
     simp only [sub_zero, pow_one, smul_eq_mul]

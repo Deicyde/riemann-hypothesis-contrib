@@ -19,13 +19,13 @@ open ReciprocityTheory.ChartRestriction.G.Geo
 
 open MvPolynomial MeasureTheory ReciprocityTheory.AnForm.M Topology Filter Set
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {P J : Ideal (MRing ι)} {e : ℕ}
+variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {P J : Ideal (MRing ι)} {e : ℕ}
 
-theorem brIntegrable_of (hLA : LogAbsLocIntStatement) (R : AnRes P J e)
-    (L : Fin e → HermLine ι) (A : HermLine ι) (s : MRing ι) (hL : ∀ j, IsSmoothHerm (L j))
-    (hA : IsSmoothHerm A) (hs : IsSectionOn P A s) :
-    MIntegrable R.A (fun j => potOf R (L j)) (fun x => logNorm A s (R.lift x x)) := by
+theorem brIntegrable_of
+    (hLA : LogAbsLocIntStatement) (R : AnRes P J e)
+    (L : Fin e → HermLine ι) (A : HermLine ι) (s : MRing ι)
+    (hL : ∀ j, IsSmoothHerm (L j)) (hA : IsSmoothHerm A) (hs : IsSectionOn P A s)
+    : MIntegrable R.A (fun j => potOf R (L j)) (fun x => logNorm A s (R.lift x x)) := by
   intro j K hK hKc
   refine LocallyIntegrableOn.integrableOn_compact_subset ?_ hK hKc
   intro u0 hu0
@@ -51,29 +51,32 @@ theorem brIntegrable_of (hLA : LogAbsLocIntStatement) (R : AnRes P J e)
     ((hA.continuousOn.continuousAt (isOpen_blockNonzero.mem_nhds (hblk u hu))).comp
       (hγ u hu).continuousAt).continuousWithinAt
   have hHpos : ∀ u ∈ V, 0 < H u := fun u hu => A.pos _ (hblk u hu)
-  have hF : ∀ u ∈ V, logNorm A s (R.lift ((R.A.chart j).symm u) ((R.A.chart j).symm u)) =
-      Real.log (‖f u‖ / H u) := by
+  have hF
+      : ∀ u ∈ V,
+        logNorm A s (R.lift ((R.A.chart j).symm u) ((R.A.chart j).symm u))
+          = Real.log (‖f u‖ / H u) := by
     intro u hu
     obtain ⟨c, hc, hzc⟩ := R.compat _ x0 _ ⟨R.mem_U _, hu.2⟩
     rw [hzc]
     exact logNorm_bsmul A ha hsa hc (γ u)
   have hDc : ContinuousOn (locDens R.A (fun i => potOf R (L i)) j) B :=
-    (locDensCont R.A _ (fun i => isPotential_potOf R (hL i)) j).mono
-      (hBV.trans inter_subset_left)
+    (locDensCont R.A _ (fun i => isPotential_potOf R (hL i)) j).mono (hBV.trans inter_subset_left)
   obtain ⟨M, hM⟩ := hBc.exists_bound_of_continuousOn hDc
   have hlogf : IntegrableOn (fun u => Real.log ‖f u‖) B :=
     (hLA e V f hV hf).integrableOn_compact_subset hBV hBc
   have hlogH : IntegrableOn (fun u => Real.log (H u)) B :=
     ((hHc.mono hBV).log fun u hu => (hHpos u (hBV hu)).ne').integrableOn_compact hBc
   have hfc : ContinuousOn f B := fun u hu => (hf u (hBV hu)).continuousAt.continuousWithinAt
-  have hmeas : AEStronglyMeasurable (fun u => Real.log (‖f u‖ / H u) *
-      locDens R.A (fun i => potOf R (L i)) j u) (volume.restrict B) := by
+  have hmeas : AEStronglyMeasurable
+      (fun u => Real.log (‖f u‖ / H u) * locDens R.A (fun i => potOf R (L i)) j u)
+      (volume.restrict B) := by
     have h1 : AEStronglyMeasurable (fun u => ‖f u‖ / H u) (volume.restrict B) :=
       (hfc.norm.div (hHc.mono hBV) fun u hu => (hHpos u (hBV hu)).ne').aestronglyMeasurable hBm
     exact (Real.measurable_log.comp_aemeasurable h1.aemeasurable).aestronglyMeasurable.mul
       (hDc.aestronglyMeasurable hBm)
-  have hint : IntegrableOn (fun u => Real.log (‖f u‖ / H u) *
-      locDens R.A (fun i => potOf R (L i)) j u) B := by
+  have hint : IntegrableOn
+      (fun u => Real.log (‖f u‖ / H u) * locDens R.A (fun i => potOf R (L i)) j u)
+      B := by
     refine Integrable.mono' ((hlogf.norm.add hlogH.norm).mul_const M) hmeas ?_
     refine ae_restrict_of_forall_mem hBm fun u hu => ?_
     rw [norm_mul]

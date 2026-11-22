@@ -42,7 +42,8 @@ lemma logb_nonneg' (ℓ : ℕ) (hℓ : 11 ≤ ℓ) (x : ℝ) (hx : 1 ≤ x) :
 end Formalism.KernelCokernelLengths.ThicknessSecondBoundLogLemmas
 
 open Formalism.KernelCokernelLengths.ThicknessSecondBoundLogLemmas in
-theorem Formalism.KernelCokernelLengths.thickness_second_bound : Formalism.KernelCokernelLengths.ThickB := by
+theorem Formalism.KernelCokernelLengths.thickness_second_bound
+    : Formalism.KernelCokernelLengths.ThickB := by
   refine ⟨1 / 100, by norm_num, 10000, ?_⟩
   intro ℓ hℓ b η S t bi h hb hη hS ht h1 h2 h3
   have hbR : (10000 : ℝ) ≤ b := by exact_mod_cast hb
@@ -78,16 +79,25 @@ theorem Formalism.KernelCokernelLengths.thickness_second_bound : Formalism.Kerne
   have hA0 : 0 ≤ (H : ℝ) * (2 * (ℓ : ℝ) - 1) / ((ℓ : ℝ) - 1) ^ 2 := by
     rw [mul_div_assoc]; positivity
   have haR0 : 0 ≤ Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ H := by
-    unfold Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.lam
+    unfold Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR
+      Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.lam
     linarith
-  have haR : Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ H ≤ (H : ℝ) * (21 / 100) + 4 + ((2 * (H : ℝ)) / 100 + 98) := by
-    unfold Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.lam
+  have haR
+      : Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ H
+        ≤ (H : ℝ) * (21 / 100) + 4 + ((2 * (H : ℝ)) / 100 + 98) := by
+    unfold Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR
+      Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.lam
     linarith
   have hceil := Nat.ceil_lt_add_one haR0
   have hηR : (100 : ℝ) * η ≤ b := by exact_mod_cast hη'
   have hSR : (100 : ℝ) * S ≤ b := by exact_mod_cast hS'
   have htR : (100 : ℝ) * t ≤ b := by exact_mod_cast ht'
-  have key : ((2 * ⌈Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ H⌉₊ + (η + t + 1) + 1 : ℕ) : ℝ) ≤ (bi : ℝ) := by
+  have key
+      : ((2 * ⌈Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ H⌉₊ + (η + t + 1)
+              + 1
+            : ℕ)
+          : ℝ)
+        ≤ (bi : ℝ) := by
     push_cast
     nlinarith
   exact_mod_cast key

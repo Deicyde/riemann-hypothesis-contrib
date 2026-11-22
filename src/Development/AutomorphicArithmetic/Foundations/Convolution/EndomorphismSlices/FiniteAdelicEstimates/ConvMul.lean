@@ -14,8 +14,11 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F
+  PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf TypeB TypeH finH)
 open UpperTheory.V.Z.Tf.GlobalTraceComparison
@@ -39,19 +42,27 @@ theorem convMul : ConvMul := by
   refine ⟨fun t t' ht ht' => ?_, fun ψ ψ' hψ hψ' => ?_⟩
   · have hT := PositivityTheory.Rg.BcB.F.Op.test B tensTest t ht
     have hT' := PositivityTheory.Rg.BcB.F.Op.test B tensTest t' ht'
-    have hm := (tensMul E B.a B.b B.D B.μa B.μb B.ν B.Ma B.Mb B.κ t.ka t'.ka t.kb t'.kb t.va t'.va t.vb t'.vb
-      t.T t'.T t.ψ t'.ψ B.compat ht.ka ht.kb ht'.ka ht'.kb ht.ψ ht'.ψ).2
+    have hm :=
+      (tensMul E B.a B.b B.D B.μa B.μb B.ν B.Ma B.Mb B.κ t.ka t'.ka t.kb t'.kb t.va t'.va t.vb t'.vb
+        t.T t'.T t.ψ t'.ψ B.compat ht.ka ht.kb ht'.ka ht'.kb ht.ψ ht'.ψ).2
     have e : (t.mul t').Φ = mulM B.D.μ t.Φ t'.Φ := hm.symm
     rw [e]
     exact PositivityTheory.Rg.BcB.F.Rd.B.conv_mulM B.D t.Φ t'.Φ hT hT' f hf
   · have hcf : Continuous fun h : Hf E B.a B.b => finH h :=
-      ((continuous_finGL' B.a).comp continuous_fst).prodMk ((continuous_finGL' B.b).comp continuous_snd)
+      ((continuous_finGL' B.a).comp continuous_fst).prodMk
+        ((continuous_finGL' B.b).comp continuous_snd)
     have hF : ∀ i x, Continuous fun h => f i (x * finH h) := fun i x =>
       (hf i).comp (continuous_const.mul hcf)
-    have hI : ∀ (φ : Matrix B.κ B.κ (Hf E B.a B.b → ℂ)), IsFinM φ → ∀ y z i x,
-        Integrable (fun h => φ y z h * f i (x * finH h)) B.ν := fun φ hφ y z i x =>
+    have hI
+        : ∀ (φ : Matrix B.κ B.κ (Hf E B.a B.b → ℂ)),
+          IsFinM φ
+            → ∀ y z i x, Integrable (fun h => φ y z h * f i (x * finH h)) B.ν := fun φ hφ y z i x =>
       ((hφ y z).1.mul (hF i x)).integrable_of_hasCompactSupport (hφ y z).2.mul_right
-    refine ⟨PositivityTheory.Rg.BcB.F.R3.convF_mulF_eq_convF_convF B.ν ψ ψ' hψ hψ' f hF, ?_, fun c => ⟨?_, ?_⟩⟩
+    refine ⟨
+      PositivityTheory.Rg.BcB.F.R3.convF_mulF_eq_convF_convF B.ν ψ ψ' hψ hψ' f hF,
+      ?_,
+      fun c => ⟨?_, ?_⟩
+    ⟩
     · funext i x
       simp only [convF, Pi.add_apply, Matrix.add_apply, add_mul]
       rw [← Finset.sum_add_distrib]

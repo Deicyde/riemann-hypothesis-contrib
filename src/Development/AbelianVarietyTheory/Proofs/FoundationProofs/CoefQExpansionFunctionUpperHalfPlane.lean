@@ -7,40 +7,45 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
 
-theorem summable_norm_mul_pow_of_polyB {a : ℕ → ℂ} (ha : PolyB a) {q : ℂ} (hq : ‖q‖ < 1) :
-    Summable fun n : ℕ => ‖a n * q ^ n‖ := by
+theorem summable_norm_mul_pow_of_polyB {a : ℕ → ℂ} (ha : PolyB a) {q : ℂ} (hq : ‖q‖ < 1)
+    : Summable fun n : ℕ => ‖a n * q ^ n‖ := by
   obtain ⟨C, A, hC⟩ := ha
   rcases eq_or_ne q 0 with rfl | hq0
   · exact (hasSum_single 0 (fun n hn => by simp [zero_pow hn])).summable
   · have hr0 : 0 < ‖q‖ := norm_pos_iff.2 hq0
     have hr : ‖‖q‖‖ < 1 := by rwa [norm_norm]
-    have h := (summable_nat_add_iff 1).mpr
-      (summable_pow_mul_geometric_of_norm_lt_one A hr : Summable fun m : ℕ => (m : ℝ) ^ A * ‖q‖ ^ m)
+    have h :=
+      (summable_nat_add_iff 1).mpr
+        (summable_pow_mul_geometric_of_norm_lt_one A hr
+          : Summable fun m : ℕ => (m : ℝ) ^ A * ‖q‖ ^ m)
     refine Summable.of_nonneg_of_le (fun n => norm_nonneg _) (fun n => ?_) (h.mul_left (C * ‖q‖⁻¹))
     rw [norm_mul, norm_pow]
     have hq' : ‖q‖ ≠ 0 := hr0.ne'
-    have e : C * ‖q‖⁻¹ * (((n + 1 : ℕ) : ℝ) ^ A * ‖q‖ ^ (n + 1)) = C * ((n : ℝ) + 1) ^ A * ‖q‖ ^ n := by
+    have e
+        : C * ‖q‖⁻¹ * (((n + 1 : ℕ) : ℝ) ^ A * ‖q‖ ^ (n + 1))
+          = C * ((n : ℝ) + 1) ^ A * ‖q‖ ^ n := by
       push_cast
       rw [pow_succ]
       field_simp
     rw [e]
     exact mul_le_mul_of_nonneg_right (hC n) (by positivity)
 
-theorem qs_term_eq (a : ℕ → ℂ) (τ : ℍ) (n : ℕ) :
-    a n * cexp (2 * π * Complex.I * n * τ) = a n • (Function.Periodic.qParam 1 (τ : ℂ)) ^ n := by
+theorem qs_term_eq (a : ℕ → ℂ) (τ : ℍ) (n : ℕ)
+    : a n * cexp (2 * π * Complex.I * n * τ) = a n • (Function.Periodic.qParam 1 (τ : ℂ)) ^ n := by
   simp only [smul_eq_mul, Function.Periodic.qParam]
   rw [← Complex.exp_nat_mul]
   congr 2
   push_cast
   ring
 
-theorem hasSum_qs {a : ℕ → ℂ} (ha : PolyB a) (τ : ℍ) :
-    HasSum (fun n : ℕ => a n • (Function.Periodic.qParam 1 (τ : ℂ)) ^ n) (qs a τ) := by
+theorem hasSum_qs {a : ℕ → ℂ} (ha : PolyB a) (τ : ℍ)
+    : HasSum (fun n : ℕ => a n • (Function.Periodic.qParam 1 (τ : ℂ)) ^ n) (qs a τ) := by
   have hq : ‖Function.Periodic.qParam 1 (τ : ℂ)‖ < 1 :=
     Function.Periodic.norm_qParam_lt_one one_pos τ.im_pos
   have hs : Summable fun n => a n • Function.Periodic.qParam 1 (τ : ℂ) ^ n := by
@@ -49,8 +54,8 @@ theorem hasSum_qs {a : ℕ → ℂ} (ha : PolyB a) (τ : ℍ) :
   show ∑' n, a n * cexp (2 * π * Complex.I * n * τ) = _
   exact tsum_congr fun n => qs_term_eq a τ n
 
-private theorem mdifferentiable_qs_of_polyB {a : ℕ → ℂ} (ha : PolyB a) :
-    MDifferentiable 𝓘(ℂ) 𝓘(ℂ) (qs a) := by
+private theorem mdifferentiable_qs_of_polyB {a : ℕ → ℂ} (ha : PolyB a)
+    : MDifferentiable 𝓘(ℂ) 𝓘(ℂ) (qs a) := by
   rw [UpperHalfPlane.mdifferentiable_iff]
   intro z hz
   have hz' : 0 < z.im := hz
@@ -67,9 +72,12 @@ private theorem mdifferentiable_qs_of_polyB {a : ℕ → ℂ} (ha : PolyB a) :
     rw [Complex.norm_real, Real.norm_eq_abs, abs_of_pos hr0, hrdef, Real.exp_lt_one_iff]
     have := Real.pi_pos
     nlinarith
-  have hD : DifferentiableOn ℂ (fun w : ℂ => ∑' n : ℕ, a n * cexp (2 * π * Complex.I * n * w)) U := by
+  have hD
+      : DifferentiableOn ℂ (fun w : ℂ => ∑' n : ℕ, a n * cexp (2 * π * Complex.I * n * w)) U := by
     refine Complex.differentiableOn_tsum_of_summable_norm (summable_norm_mul_pow_of_polyB ha hr1)
-      (fun n => (by fun_prop : Differentiable ℂ fun w : ℂ => a n * cexp (2 * π * Complex.I * n * w)).differentiableOn)
+      (fun n =>
+        (by fun_prop
+          : Differentiable ℂ fun w : ℂ => a n * cexp (2 * π * Complex.I * n * w)).differentiableOn)
       hU ?_
     intro n w hw
     rw [norm_mul, norm_mul, Complex.norm_exp, norm_pow, Complex.norm_real, Real.norm_eq_abs,
@@ -91,8 +99,8 @@ private theorem mdifferentiable_qs_of_polyB {a : ℕ → ℂ} (ha : PolyB a) :
   rw [Function.comp_apply, UpperHalfPlane.ofComplex_apply_of_im_pos hw']
   rfl
 
-private theorem periodic_qs_comp_ofComplex_one (a : ℕ → ℂ) :
-    Function.Periodic (qs a ∘ ofComplex) 1 := by
+private theorem periodic_qs_comp_ofComplex_one (a : ℕ → ℂ)
+    : Function.Periodic (qs a ∘ ofComplex) 1 := by
   intro w
   by_cases hw : 0 < w.im
   · have hw1 : 0 < (w + 1).im := by simpa using hw
@@ -101,16 +109,20 @@ private theorem periodic_qs_comp_ofComplex_one (a : ℕ → ℂ) :
       = ∑' n : ℕ, a n * cexp (2 * π * Complex.I * n * w)
     refine tsum_congr fun n => ?_
     congr 1
-    rw [show 2 * π * Complex.I * n * (w + 1) = 2 * π * Complex.I * n * w + n * (2 * π * Complex.I) by ring,
+    rw [show 2 * π * Complex.I * n * (w + 1)
+          = 2 * π * Complex.I * n * w + n * (2 * π * Complex.I) by
+        ring,
       Complex.exp_add, Complex.exp_nat_mul_two_pi_mul_I, mul_one]
   · push_neg at hw
     have hw1 : (w + 1).im ≤ 0 := by simpa using hw
-    simp only [Function.comp_apply, ofComplex_apply_of_im_nonpos hw1, ofComplex_apply_of_im_nonpos hw]
+    simp only [Function.comp_apply, ofComplex_apply_of_im_nonpos hw1,
+      ofComplex_apply_of_im_nonpos hw]
 
-theorem analyticAt_cuspFunction_qs {a : ℕ → ℂ} (ha : PolyB a) :
-    AnalyticAt ℂ (cuspFunction 1 (qs a)) 0 := by
+theorem analyticAt_cuspFunction_qs {a : ℕ → ℂ} (ha : PolyB a)
+    : AnalyticAt ℂ (cuspFunction 1 (qs a)) 0 := by
   exact analyticAt_cuspFunction_zero one_pos (periodic_qs_comp_ofComplex_one a)
-    (mdifferentiable_qs_of_polyB ha) (isBoundedAtImInfty_of_hasSum_qExpansion one_pos (hasSum_qs ha))
+    (mdifferentiable_qs_of_polyB ha)
+    (isBoundedAtImInfty_of_hasSum_qExpansion one_pos (hasSum_qs ha))
 
 theorem coef_qs : ∀ a : ℕ → ℂ, PolyB a → ∀ n, coef (qs a) n = a n := by
   intro a ha n

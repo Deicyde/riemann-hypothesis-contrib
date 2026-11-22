@@ -8,10 +8,12 @@ namespace GlobalTheory.IntSmulMemLattice
 
 open NumberField
 
-theorem exists_int_smul_mem {E V : Type} [Field E] [NumberField E] [AddCommGroup V] [Module E V]
+theorem exists_int_smul_mem
+    {E V : Type} [Field E] [NumberField E] [AddCommGroup V] [Module E V]
     [Module (RingOfIntegers E) V] [IsScalarTower (RingOfIntegers E) E V]
-    (L : Submodule (RingOfIntegers E) V) (hL : Submodule.span E (L : Set V) = ⊤) (v : V) :
-    ∃ n : ℤ, n ≠ 0 ∧ n • v ∈ L := by
+    (L : Submodule (RingOfIntegers E) V) (hL : Submodule.span E (L : Set V) = ⊤)
+    (v : V)
+    : ∃ n : ℤ, n ≠ 0 ∧ n • v ∈ L := by
   have hden : ∀ a : E, ∃ d : ℤ, d ≠ 0 ∧ IsIntegral ℤ (d • a) := fun a =>
     ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr
       (Algebra.IsAlgebraic.isAlgebraic a)).exists_integral_multiple

@@ -12,24 +12,26 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-theorem v2con_X_pderiv {R : Type*} [CommRing R] {σ : Type*} (v w : σ) (m : σ →₀ ℕ) (c : R) :
-    (X v : MvPolynomial σ R) * pderiv w (monomial m c) =
-      monomial (m - Finsupp.single w 1 + Finsupp.single v 1) (c * (m w : R)) := by
+theorem v2con_X_pderiv {R : Type*} [CommRing R] {σ : Type*} (v w : σ) (m : σ →₀ ℕ) (c : R)
+    : (X v : MvPolynomial σ R) * pderiv w (monomial m c)
+      = monomial (m - Finsupp.single w 1 + Finsupp.single v 1) (c * (m w : R)) := by
   rw [pderiv_monomial, show (X v : MvPolynomial σ R) = monomial (Finsupp.single v 1) 1 from rfl,
     monomial_mul, one_mul, add_comm (Finsupp.single v 1)]
 
-theorem v2con_X_pderiv_self {R : Type*} [CommRing R] {σ : Type*} (v : σ) (m : σ →₀ ℕ) (c : R) :
-    (X v : MvPolynomial σ R) * pderiv v (monomial m c) = monomial m (c * (m v : R)) := by
+theorem v2con_X_pderiv_self {R : Type*} [CommRing R] {σ : Type*} (v : σ) (m : σ →₀ ℕ) (c : R)
+    : (X v : MvPolynomial σ R) * pderiv v (monomial m c) = monomial m (c * (m v : R)) := by
   rw [v2con_X_pderiv]
   by_cases h : m v = 0
   · simp [h]
-  · have hle : Finsupp.single v 1 ≤ m := by
-      rw [Finsupp.single_le_iff]; omega
+  · have hle : Finsupp.single v 1 ≤ m := by rw [Finsupp.single_le_iff]; omega
     rw [tsub_add_cancel_of_le hle]
 
-theorem v2con_diag {R : Type*} [CommRing R] {ι : Type*} [Fintype ι] {n : ℕ} (LL : Letters ι) (S : Set ι)
-    (a : Fin n) (m : ι × Fin n →₀ ℕ) (c : R) :
-    glAct R LL S a a (monomial m c) = monomial m (((wtS LL S m a : ℤ) : R) * c) := by
+theorem v2con_diag
+    {R : Type*} [CommRing R]
+    {ι : Type*} [Fintype ι]
+    {n : ℕ}
+    (LL : Letters ι) (S : Set ι) (a : Fin n) (m : ι × Fin n →₀ ℕ) (c : R)
+    : glAct R LL S a a (monomial m c) = monomial m (((wtS LL S m a : ℤ) : R) * c) := by
   classical
   unfold glAct wtS
   rw [LinearMap.sum_apply]
@@ -37,12 +39,16 @@ theorem v2con_diag {R : Type*} [CommRing R] {ι : Type*} [Fintype ι] {n : ℕ} 
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_congr rfl (fun l _ => ?_)
-  by_cases h1 : l ∈ S <;> by_cases h2 : LL.vec l = true <;>
-    simp [h1, h2, -pderiv_monomial, v2con_X_pderiv_self, mul_comm]
+  by_cases h1 : l ∈ S <;> by_cases h2 : LL.vec l = true
+    <;> simp [h1, h2, -pderiv_monomial, v2con_X_pderiv_self, mul_comm]
 
-theorem v2con_coeff_diag {R : Type*} [CommRing R] {ι : Type*} [Fintype ι] {n : ℕ} (LL : Letters ι) (S : Set ι)
-    (a : Fin n) (x : MvPolynomial (ι × Fin n) R) (m : ι × Fin n →₀ ℕ) :
-    AddMonoidAlgebra.coeff (glAct R LL S a a x) m = ((wtS LL S m a : ℤ) : R) * AddMonoidAlgebra.coeff x m := by
+theorem v2con_coeff_diag
+    {R : Type*} [CommRing R]
+    {ι : Type*} [Fintype ι]
+    {n : ℕ}
+    (LL : Letters ι) (S : Set ι) (a : Fin n) (x : MvPolynomial (ι × Fin n) R) (m : ι × Fin n →₀ ℕ)
+    : AddMonoidAlgebra.coeff (glAct R LL S a a x) m
+      = ((wtS LL S m a : ℤ) : R) * AddMonoidAlgebra.coeff x m := by
   classical
   induction x using MvPolynomial.induction_on' with
   | monomial m' c =>
@@ -67,7 +73,8 @@ theorem monomials_are_weight_vectors : MonomialsAreWeightVectors := by
     funext a
     have h := hx a
     rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
-      sub_eq_zero] at h
+        sub_eq_zero]
+      at h
     have h2 := congrArg (AddMonoidAlgebra.coeff · m) h
     change AddMonoidAlgebra.coeff (glAct R LL S a a x) m = _ at h2
     rw [v2con_coeff_diag, coeff_smul, smul_eq_mul] at h2
@@ -75,30 +82,38 @@ theorem monomials_are_weight_vectors : MonomialsAreWeightVectors := by
     have h3 := mul_right_cancel₀ hc h2
     exact_mod_cast h3
 
-theorem v2con_stable {R : Type*} [CommRing R] {ι : Type*} [Fintype ι] {n : ℕ} (LL : Letters ι) (S : Set ι)
-    (N : ℕ) (a b : Fin n) (x : MvPolynomial (ι × Fin n) R)
-    (hx : x ∈ restrictSupport R {m : ι × Fin n →₀ ℕ | m.degree ≤ N}) :
-    glAct R LL S a b x ∈ restrictSupport R {m : ι × Fin n →₀ ℕ | m.degree ≤ N} := by
+theorem v2con_stable
+    {R : Type*} [CommRing R]
+    {ι : Type*} [Fintype ι]
+    {n : ℕ}
+    (LL : Letters ι) (S : Set ι)
+    (N : ℕ)
+    (a b : Fin n)
+    (x : MvPolynomial (ι × Fin n) R)
+    (hx : x ∈ restrictSupport R {m : ι × Fin n →₀ ℕ | m.degree ≤ N})
+    : glAct R LL S a b x ∈ restrictSupport R {m : ι × Fin n →₀ ℕ | m.degree ≤ N} := by
   classical
   rw [mem_restrictSupport_iff] at hx
-  have hmono : ∀ (m' : ι × Fin n →₀ ℕ) (c' : R), m'.degree ≤ N →
-      monomial m' c' ∈ restrictSupport R {m : ι × Fin n →₀ ℕ | m.degree ≤ N} := by
+  have hmono
+      : ∀ (m' : ι × Fin n →₀ ℕ) (c' : R),
+        m'.degree ≤ N → monomial m' c' ∈ restrictSupport R {m : ι × Fin n →₀ ℕ | m.degree ≤ N} := by
     intro m' c' hm'
     rw [mem_restrictSupport_iff]
     intro y hy
     have := Finset.mem_singleton.mp (support_monomial_subset hy)
     subst this
     exact hm'
-  have hterm : ∀ (m : ι × Fin n →₀ ℕ) (c : R) (u w : ι × Fin n), m.degree ≤ N →
-      (X u : MvPolynomial (ι × Fin n) R) * pderiv w (monomial m c) ∈
-        restrictSupport R {m : ι × Fin n →₀ ℕ | m.degree ≤ N} := by
+  have hterm
+      : ∀ (m : ι × Fin n →₀ ℕ) (c : R) (u w : ι × Fin n),
+        m.degree ≤ N
+          → (X u : MvPolynomial (ι × Fin n) R) * pderiv w (monomial m c)
+            ∈ restrictSupport R {m : ι × Fin n →₀ ℕ | m.degree ≤ N} := by
     intro m c u w hm
     rw [v2con_X_pderiv]
     by_cases h0 : m w = 0
     · simp [h0]
     · apply hmono
-      have hle : Finsupp.single w 1 ≤ m := by
-        rw [Finsupp.single_le_iff]; omega
+      have hle : Finsupp.single w 1 ≤ m := by rw [Finsupp.single_le_iff]; omega
       have e1 : (m - Finsupp.single w 1).degree + 1 = m.degree := by
         have := congrArg Finsupp.degree (tsub_add_cancel_of_le hle)
         rw [map_add (f := _), Finsupp.degree_single] at this

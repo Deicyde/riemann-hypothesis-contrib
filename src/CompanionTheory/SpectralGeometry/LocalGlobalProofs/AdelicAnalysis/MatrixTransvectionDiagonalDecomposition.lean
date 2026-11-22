@@ -11,14 +11,17 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.SW.ArtinElem
 
-variable {K K' : Type*} [CommRing K] [CommRing K'] {ι : Type*} [Fintype ι] [DecidableEq ι]
-  {M : Type*} [DecidableEq M] {F : M → Type*} [∀ m, CommRing (F m)]
+variable
+  {K K' : Type*} [CommRing K] [CommRing K']
+  {ι : Type*} [Fintype ι] [DecidableEq ι]
+  {M : Type*} [DecidableEq M]
+  {F : M → Type*} [∀ m, CommRing (F m)]
 
 noncomputable def coord (e : K ≃+* ∀ m, F m) (m : M) : K →+* F m :=
   (Pi.evalRingHom F m).comp e.toRingHom
 
-noncomputable def liftT (e : K ≃+* ∀ m, F m) (m : M) (t : TransvectionStruct ι (F m)) :
-    TransvectionStruct ι K :=
+noncomputable def liftT (e : K ≃+* ∀ m, F m) (m : M) (t : TransvectionStruct ι (F m))
+    : TransvectionStruct ι K :=
   ⟨t.i, t.j, t.hij, e.symm (Pi.single m t.c)⟩
 
 lemma coord_symm_single (e : K ≃+* ∀ m, F m) (m m' : M) (c : F m) :
@@ -60,8 +63,8 @@ lemma mapMatrix_prod_ne (e : K ≃+* ∀ m, F m) {m m' : M} (h : m' ≠ m)
   | cons t T ih =>
     simp only [List.map_cons, List.prod_cons, map_mul, ih, mapMatrix_liftT_ne e h, mul_one]
 
-noncomputable def big (e : K ≃+* ∀ m, F m) (T : ∀ m, List (TransvectionStruct ι (F m))) (l : List M) :
-    List (TransvectionStruct ι K) :=
+noncomputable def big (e : K ≃+* ∀ m, F m) (T : ∀ m, List (TransvectionStruct ι (F m))) (l : List M)
+    : List (TransvectionStruct ι K) :=
   l.flatMap fun m => (T m).map (liftT e m)
 
 lemma mapMatrix_big (e : K ≃+* ∀ m, F m) (T : ∀ m, List (TransvectionStruct ι (F m)))
@@ -90,21 +93,27 @@ lemma matrix_ext_coord (e : K ≃+* ∀ m, F m) {A B : Matrix ι ι K}
   have := congrFun (congrFun (h m) a) b
   simpa [coord] using this
 
-theorem factor_of_pi [Fintype M] (e : K ≃+* ∀ m, F m)
+theorem factor_of_pi
+    [Fintype M]
+    (e : K ≃+* ∀ m, F m)
     (hF : ∀ (m : M) (A : Matrix ι ι (F m)),
       ∃ (L L' : List (TransvectionStruct ι (F m))) (D : ι → F m),
-        A = (L.map TransvectionStruct.toMatrix).prod * diagonal D *
-          (L'.map TransvectionStruct.toMatrix).prod)
-    (A : Matrix ι ι K) :
-    ∃ (L L' : List (TransvectionStruct ι K)) (D : ι → K),
-      A = (L.map TransvectionStruct.toMatrix).prod * diagonal D *
-        (L'.map TransvectionStruct.toMatrix).prod := by
+        A = (L.map TransvectionStruct.toMatrix).prod * diagonal D
+          * (L'.map TransvectionStruct.toMatrix).prod)
+    (A : Matrix ι ι K)
+    : ∃ (L L' : List (TransvectionStruct ι K)) (D : ι → K),
+      A = (L.map TransvectionStruct.toMatrix).prod * diagonal D
+        * (L'.map TransvectionStruct.toMatrix).prod := by
   choose L L' D hD using fun m => hF m ((coord e m).mapMatrix A)
-  refine ⟨big e L Finset.univ.toList, big e L' Finset.univ.toList,
-    fun i => e.symm (fun m => D m i), matrix_ext_coord e fun m => ?_⟩
+  refine ⟨
+    big e L Finset.univ.toList,
+    big e L' Finset.univ.toList,
+    fun i => e.symm (fun m => D m i),
+    matrix_ext_coord e fun m => ?_
+  ⟩
   have hnd := Finset.nodup_toList (Finset.univ : Finset M)
-  have hdiag : (coord e m).mapMatrix (diagonal fun i => e.symm (fun m => D m i)) =
-      diagonal (D m) := by
+  have hdiag
+      : (coord e m).mapMatrix (diagonal fun i => e.symm (fun m => D m i)) = diagonal (D m) := by
     ext a b
     by_cases hab : a = b
     · subst hab; simp [coord]
@@ -117,15 +126,19 @@ end GlobalTheory.CompanionTheory.SW.ArtinElem
 namespace GlobalTheory.CompanionTheory.SW
 
 theorem artinian_reduced_list_transvec_mul_diagonal_mul_list_transvec
-    (K : Type) [CommRing K] [IsArtinianRing K] [IsReduced K] (ι : Type) [Fintype ι]
-    [DecidableEq ι] (A : Matrix ι ι K) :
-    ∃ (L L' : List (Matrix.TransvectionStruct ι K)) (D : ι → K),
-      A = (L.map Matrix.TransvectionStruct.toMatrix).prod * Matrix.diagonal D *
-        (L'.map Matrix.TransvectionStruct.toMatrix).prod := by
+    (K : Type) [CommRing K] [IsArtinianRing K] [IsReduced K]
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι K)
+    : ∃ (L L' : List (Matrix.TransvectionStruct ι K)) (D : ι → K),
+      A = (L.map Matrix.TransvectionStruct.toMatrix).prod * Matrix.diagonal D
+        * (L'.map Matrix.TransvectionStruct.toMatrix).prod := by
   classical
   letI : Fintype (MaximalSpectrum K) := Fintype.ofFinite _
-  refine ArtinElem.factor_of_pi (F := fun m : MaximalSpectrum K => K ⧸ m.asIdeal)
-    (IsArtinianRing.equivPi K).toRingEquiv (fun m B => ?_) A
+  refine ArtinElem.factor_of_pi
+    (F := fun m : MaximalSpectrum K => K ⧸ m.asIdeal)
+    (IsArtinianRing.equivPi K).toRingEquiv
+    (fun m B => ?_)
+    A
   letI : Field (K ⧸ m.asIdeal) := Ideal.Quotient.field m.asIdeal
   exact Matrix.Pivot.exists_list_transvec_mul_diagonal_mul_list_transvec B
 

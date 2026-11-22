@@ -8,7 +8,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemTwKer
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG ValuativeRel
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
+  ValuativeRel
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.BZPsiPG.FibKer
@@ -17,7 +19,8 @@ def fibM (X Z : Type) [TopologicalSpace X] [AddCommGroup Z] [Module ℂ Z] : Sub
   carrier := {φ | IsLocallyConstant φ ∧ HasCompactSupport φ}
   add_mem' ha hb := ⟨ha.1.add hb.1, ha.2.add hb.2⟩
   zero_mem' := ⟨IsLocallyConstant.const 0, HasCompactSupport.zero⟩
-  smul_mem' c φ hφ := ⟨hφ.1.comp (fun z => c • z), hφ.2.comp_left (g := fun z => c • z) (smul_zero c)⟩
+  smul_mem' c φ hφ :=
+    ⟨hφ.1.comp (fun z => c • z), hφ.2.comp_left (g := fun z => c • z) (smul_zero c)⟩
 
 section Cols
 
@@ -27,7 +30,9 @@ def topP (i t : ℕ) (y : Fin (i + t) → k) : Fin i → k := fun j => y (Fin.ca
 
 def middlePart (i t : ℕ) (y : Fin (i + t) → k) : Fin t → k := fun j => y (Fin.natAdd i j)
 
-theorem middlePart_add [Add k] (i t : ℕ) (a b : Fin (i + t) → k) : middlePart i t (a + b) = middlePart i t a + middlePart i t b := rfl
+theorem middlePart_add [Add k] (i t : ℕ) (a b : Fin (i + t) → k)
+    : middlePart i t (a + b) = middlePart i t a + middlePart i t b :=
+  rfl
 
 theorem continuous_topP [TopologicalSpace k] (i t : ℕ) : Continuous (topP (k := k) i t) :=
   continuous_pi fun _ => continuous_apply _
@@ -39,25 +44,33 @@ end Cols
 
 section Act
 
-variable {k Z : Type} [AddCommGroup k] [TopologicalSpace k] [IsTopologicalAddGroup k] [AddCommGroup Z] [Module ℂ Z]
+variable
+  {k Z : Type}
+  [AddCommGroup k] [TopologicalSpace k] [IsTopologicalAddGroup k] [AddCommGroup Z] [Module ℂ Z]
 
-def fibAct {i : ℕ} (t : ℕ) (ρ₀ : Representation ℂ (Multiplicative (Fin i → k)) Z) :
-    Representation ℂ (Multiplicative (Fin (i + t) → k)) (fibM (Fin t → k) Z) where
-  toFun y :=
-    { toFun := fun φ => ⟨fun v => ρ₀ (Multiplicative.ofAdd (topP i t y.toAdd)) (φ.1 (v + middlePart i t y.toAdd)), by
-        have hh : Continuous fun v : Fin t → k => v + middlePart i t y.toAdd := continuous_id.add continuous_const
-        have hl : IsLocallyConstant fun v : Fin t → k => φ.1 (v + middlePart i t y.toAdd) := φ.2.1.comp_continuous hh
+def fibAct {i : ℕ} (t : ℕ) (ρ₀ : Representation ℂ (Multiplicative (Fin i → k)) Z)
+    : Representation ℂ (Multiplicative (Fin (i + t) → k)) (fibM (Fin t → k) Z) where
+  toFun y := {
+    toFun := fun φ => ⟨
+      fun v => ρ₀ (Multiplicative.ofAdd (topP i t y.toAdd)) (φ.1 (v + middlePart i t y.toAdd)),
+      by
+        have hh : Continuous fun v : Fin t → k => v + middlePart i t y.toAdd :=
+          continuous_id.add continuous_const
+        have hl : IsLocallyConstant fun v : Fin t → k => φ.1 (v + middlePart i t y.toAdd) :=
+          φ.2.1.comp_continuous hh
         have hc : HasCompactSupport fun v : Fin t → k => φ.1 (v + middlePart i t y.toAdd) :=
           φ.2.2.comp_homeomorph (Homeomorph.addRight (middlePart i t y.toAdd))
-        exact ⟨hl.comp _, hc.comp_left (map_zero _)⟩⟩
-      map_add' := fun a b => by
-        apply Subtype.ext
-        funext v
-        exact map_add _ _ _
-      map_smul' := fun c a => by
-        apply Subtype.ext
-        funext v
-        exact map_smul _ _ _ }
+        exact ⟨hl.comp _, hc.comp_left (map_zero _)⟩
+    ⟩
+    map_add' := fun a b => by
+      apply Subtype.ext
+      funext v
+      exact map_add _ _ _
+    map_smul' := fun c a => by
+      apply Subtype.ext
+      funext v
+      exact map_smul _ _ _
+  }
   map_one' := by
     ext φ v
     show ρ₀ (Multiplicative.ofAdd (topP i t 0)) (φ.1 (v + middlePart i t 0)) = φ.1 v
@@ -69,14 +82,21 @@ def fibAct {i : ℕ} (t : ℕ) (ρ₀ : Representation ℂ (Multiplicative (Fin 
     ext φ v
     show ρ₀ (Multiplicative.ofAdd (topP i t (a.toAdd + b.toAdd))) (φ.1 (v + middlePart i t (a.toAdd + b.toAdd))) =
       ρ₀ (Multiplicative.ofAdd (topP i t a.toAdd)) (ρ₀ (Multiplicative.ofAdd (topP i t b.toAdd)) (φ.1 (v + middlePart i t a.toAdd + middlePart i t b.toAdd)))
-    have h1 : Multiplicative.ofAdd (topP i t (a.toAdd + b.toAdd)) =
-        Multiplicative.ofAdd (topP i t a.toAdd) * Multiplicative.ofAdd (topP i t b.toAdd) := rfl
+    have h1
+        : Multiplicative.ofAdd (topP i t (a.toAdd + b.toAdd))
+          = Multiplicative.ofAdd (topP i t a.toAdd) * Multiplicative.ofAdd (topP i t b.toAdd) :=
+      rfl
     rw [h1, map_mul, middlePart_add, add_assoc]
     rfl
 
-theorem fibAct_apply {i : ℕ} (t : ℕ) (ρ₀ : Representation ℂ (Multiplicative (Fin i → k)) Z)
-    (y : Multiplicative (Fin (i + t) → k)) (φ : fibM (Fin t → k) Z) (v : Fin t → k) :
-    (fibAct t ρ₀ y φ).1 v = ρ₀ (Multiplicative.ofAdd (topP i t y.toAdd)) (φ.1 (v + middlePart i t y.toAdd)) := rfl
+theorem fibAct_apply
+    {i : ℕ}
+    (t : ℕ)
+    (ρ₀ : Representation ℂ (Multiplicative (Fin i → k)) Z) (y : Multiplicative (Fin (i + t) → k))
+    (φ : fibM (Fin t → k) Z) (v : Fin t → k)
+    : (fibAct t ρ₀ y φ).1 v
+      = ρ₀ (Multiplicative.ofAdd (topP i t y.toAdd)) (φ.1 (v + middlePart i t y.toAdd)) :=
+  rfl
 
 end Act
 
@@ -100,9 +120,11 @@ def mulH {n : ℕ} (κ : GL (Fin n) k) : Multiplicative (Fin n → k) →* Multi
     rw [Matrix.mulVec_add]
     rfl
 
-def topRep {i : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (τ : Representation ℂ (Mir k i) V)
-    (W : Type) [AddCommGroup W] [Module ℂ W] :
-    Representation ℂ (Multiplicative (Fin i → k)) (V ⊗[ℂ] W) where
+def topRep
+    {i : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (τ : Representation ℂ (Mir k i) V)
+    (W : Type) [AddCommGroup W] [Module ℂ W]
+    : Representation ℂ (Multiplicative (Fin i → k)) (V ⊗[ℂ] W) where
   toFun x := LinearMap.rTensor W (τ (uM k i x.toAdd))
   map_one' := by
     show LinearMap.rTensor W (τ (uM k i 0)) = 1
@@ -133,19 +155,22 @@ def Lc (n : ℕ) (c : k) : Subgroup (Multiplicative (Fin n → k)) where
     exact zero_mem _
   inv_mem' := by
     intro a ha j
-    have : c * (a⁻¹).toAdd j = - (c * a.toAdd j) := by
+    have : c * (a⁻¹).toAdd j = -(c * a.toAdd j) := by
       show c * (- a.toAdd j) = _
       ring
     rw [this]
     exact neg_mem (ha j)
 
-theorem mem_Lc {n : ℕ} {c : k} {y : Multiplicative (Fin n → k)} : y ∈ Lc n c ↔ ∀ j, c * y.toAdd j ∈ 𝒪[k] := Iff.rfl
+theorem mem_Lc {n : ℕ} {c : k} {y : Multiplicative (Fin n → k)}
+    : y ∈ Lc n c ↔ ∀ j, c * y.toAdd j ∈ 𝒪[k] :=
+  Iff.rfl
 
 variable [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 theorem isOpen_Lc (n : ℕ) (c : k) : IsOpen (Lc n c : Set (Multiplicative (Fin n → k))) := by
-  have hset : (Lc n c : Set (Multiplicative (Fin n → k))) =
-      ⋂ j, (fun y : Multiplicative (Fin n → k) => c * y.toAdd j) ⁻¹' (𝒪[k] : Set k) := by
+  have hset
+      : (Lc n c : Set (Multiplicative (Fin n → k)))
+        = ⋂ j, (fun y : Multiplicative (Fin n → k) => c * y.toAdd j) ⁻¹' (𝒪[k] : Set k) := by
     ext y
     simp only [SetLike.mem_coe, mem_Lc, Set.mem_iInter, Set.mem_preimage]
   rw [hset]
@@ -153,7 +178,8 @@ theorem isOpen_Lc (n : ℕ) (c : k) : IsOpen (Lc n c : Set (Multiplicative (Fin 
   exact isOpen_iInter_of_finite fun j =>
     hO.preimage (continuous_const.mul ((continuous_apply j).comp continuous_toAdd))
 
-theorem isCompact_Lc (n : ℕ) {c : k} (hc : c ≠ 0) : IsCompact (Lc n c : Set (Multiplicative (Fin n → k))) := by
+theorem isCompact_Lc (n : ℕ) {c : k} (hc : c ≠ 0)
+    : IsCompact (Lc n c : Set (Multiplicative (Fin n → k))) := by
   have hK : IsCompact (Set.pi Set.univ fun _ : Fin n => {x : k | valuation k x ≤ 1}) :=
     isCompact_univ_pi fun _ => IsNonarchimedeanLocalField.isCompact_closedBall k 1
   have hf : Continuous fun x : Fin n → k => Multiplicative.ofAdd (c⁻¹ • x) :=
@@ -188,9 +214,12 @@ theorem isClopen_cosetSet (t : ℕ) (c : k) (a : Fin t → k) : IsClopen (cosetS
   have h1 : IsOpen (Lc t c : Set (Multiplicative (Fin t → k))) := isOpen_Lc t c
   exact ⟨(Subgroup.isClosed_of_isOpen _ h1).preimage hcont, h1.preimage hcont⟩
 
-theorem isCompact_cosetSet (t : ℕ) {c : k} (hc : c ≠ 0) (a : Fin t → k) : IsCompact (cosetSet t c a) := by
-  have h := (isCompact_Lc t hc).image (f := fun y : Multiplicative (Fin t → k) => y.toAdd + a)
-    ((continuous_toAdd).add continuous_const)
+theorem isCompact_cosetSet (t : ℕ) {c : k} (hc : c ≠ 0) (a : Fin t → k)
+    : IsCompact (cosetSet t c a) := by
+  have h :=
+    (isCompact_Lc t hc).image
+      (f := fun y : Multiplicative (Fin t → k) => y.toAdd + a)
+      ((continuous_toAdd).add continuous_const)
   convert h using 1
   ext v
   constructor
@@ -200,19 +229,30 @@ theorem isCompact_cosetSet (t : ℕ) {c : k} (hc : c ≠ 0) (a : Fin t → k) : 
     show Multiplicative.ofAdd (y.toAdd + a - a) ∈ Lc t c
     simpa using hy
 
-def cosetFn (t : ℕ) {c : k} (hc : c ≠ 0) (a : Fin t → k) (z : Z) : fibM (Fin t → k) Z :=
-  ⟨(cosetSet t c a).indicator fun _ => z, by
-      classical
-      rw [IsLocallyConstant.iff_exists_open]
-      intro x
-      by_cases hx : x ∈ cosetSet t c a
-      · exact ⟨_, (isClopen_cosetSet t c a).2, hx, fun y hy => by
-          rw [Set.indicator_of_mem hy, Set.indicator_of_mem hx]⟩
-      · exact ⟨_, (isClopen_cosetSet t c a).1.isOpen_compl, hx, fun y hy => by
-          rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hx]⟩,
-    by
-      haveI : T2Space k := inferInstance
-      exact HasCompactSupport.intro (isCompact_cosetSet t hc a) fun x hx => Set.indicator_of_notMem hx _⟩
+def cosetFn (t : ℕ) {c : k} (hc : c ≠ 0) (a : Fin t → k) (z : Z) : fibM (Fin t → k) Z := ⟨
+  (cosetSet t c a).indicator fun _ => z,
+  by
+    classical
+    rw [IsLocallyConstant.iff_exists_open]
+    intro x
+    by_cases hx : x ∈ cosetSet t c a
+    · exact ⟨
+        _,
+        (isClopen_cosetSet t c a).2,
+        hx,
+        fun y hy => by rw [Set.indicator_of_mem hy, Set.indicator_of_mem hx]
+      ⟩
+    · exact ⟨
+        _,
+        (isClopen_cosetSet t c a).1.isOpen_compl,
+        hx,
+        fun y hy => by rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hx]
+      ⟩,
+  by
+    haveI : T2Space k := inferInstance
+    exact HasCompactSupport.intro (isCompact_cosetSet t hc a) fun x hx =>
+      Set.indicator_of_notMem hx _
+⟩
 
 end Coset
 

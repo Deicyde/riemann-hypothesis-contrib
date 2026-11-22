@@ -21,7 +21,8 @@ theorem bru_lo_one : IsLoUni (1 : Matrix (Fin n) (Fin n) K) := fun i j =>
 theorem bru_up_one : IsUpUni (1 : Matrix (Fin n) (Fin n) K) := fun i j =>
   ⟨fun h => Matrix.one_apply_ne (ne_of_gt h), fun h => by subst h; exact Matrix.one_apply_eq i⟩
 
-theorem bru_lo_mul {A B : Matrix (Fin n) (Fin n) K} (hA : IsLoUni A) (hB : IsLoUni B) : IsLoUni (A * B) := by
+theorem bru_lo_mul {A B : Matrix (Fin n) (Fin n) K} (hA : IsLoUni A) (hB : IsLoUni B)
+    : IsLoUni (A * B) := by
   intro i j
   refine ⟨fun hij => ?_, fun hij => ?_⟩
   · rw [Matrix.mul_apply]
@@ -39,45 +40,62 @@ theorem bru_lo_mul {A B : Matrix (Fin n) (Fin n) K} (hA : IsLoUni A) (hB : IsLoU
     · intro h
       exact absurd (Finset.mem_univ i) h
 
-theorem bru_up_mul {A B : Matrix (Fin n) (Fin n) K} (hA : IsUpUni A) (hB : IsUpUni B) : IsUpUni (A * B) := by
-  first | exact GlobalTheory.UpperUnipotentMul.isUpUni_mul .. | (apply GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> assumption) | (intros; apply GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> assumption) | (apply @GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> assumption) | (intros; apply @GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> assumption) | (apply @GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> first | assumption | infer_instance) | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n A B hA hB | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n A B hA | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n A B | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n A | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K
+theorem bru_up_mul {A B : Matrix (Fin n) (Fin n) K} (hA : IsUpUni A) (hB : IsUpUni B)
+    : IsUpUni (A * B) := by
+  first
+  | exact GlobalTheory.UpperUnipotentMul.isUpUni_mul ..
+  | (apply GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> assumption)
+  | (intros; apply GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> assumption)
+  | (apply @GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> assumption)
+  | (intros; apply @GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> assumption)
+  | (apply @GlobalTheory.UpperUnipotentMul.isUpUni_mul <;> first | assumption | infer_instance)
+  | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n A B hA hB
+  | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n A B hA
+  | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n A B
+  | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n A
+  | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_› n
+  | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K ‹_›
+  | exact @GlobalTheory.UpperUnipotentMul.isUpUni_mul K
 
-def bruL (u : Fin n → K) (p : Fin n) : Matrix (Fin n) (Fin n) K :=
-  fun a k => (if a = k then 1 else 0) + u a * (if k = p then 1 else 0)
+def bruL (u : Fin n → K) (p : Fin n) : Matrix (Fin n) (Fin n) K := fun a k =>
+  (if a = k then 1 else 0) + u a * (if k = p then 1 else 0)
 
-def bruU (w : Fin n → K) (q : Fin n) : Matrix (Fin n) (Fin n) K :=
-  fun k c => (if k = c then 1 else 0) + (if k = q then 1 else 0) * w c
+def bruU (w : Fin n → K) (q : Fin n) : Matrix (Fin n) (Fin n) K := fun k c =>
+  (if k = c then 1 else 0) + (if k = q then 1 else 0) * w c
 
-theorem bruL_apply (u : Fin n → K) (p a k : Fin n) :
-    bruL u p a k = (if a = k then 1 else 0) + u a * (if k = p then 1 else 0) := rfl
+theorem bruL_apply (u : Fin n → K) (p a k : Fin n)
+    : bruL u p a k = (if a = k then 1 else 0) + u a * (if k = p then 1 else 0) :=
+  rfl
 
-theorem bruU_apply (w : Fin n → K) (q k c : Fin n) :
-    bruU w q k c = (if k = c then 1 else 0) + (if k = q then 1 else 0) * w c := rfl
+theorem bruU_apply (w : Fin n → K) (q k c : Fin n)
+    : bruU w q k c = (if k = c then 1 else 0) + (if k = q then 1 else 0) * w c :=
+  rfl
 
-theorem bru_left (u : Fin n → K) (p : Fin n) (X : Matrix (Fin n) (Fin n) K) (a c : Fin n) :
-    (bruL u p * X) a c = X a c + u a * X p c := by
+theorem bru_left (u : Fin n → K) (p : Fin n) (X : Matrix (Fin n) (Fin n) K) (a c : Fin n)
+    : (bruL u p * X) a c = X a c + u a * X p c := by
   simp only [Matrix.mul_apply, bruL, add_mul, Finset.sum_add_distrib]
   congr 1
   · simp
   · simp
 
-theorem bru_right (w : Fin n → K) (q : Fin n) (X : Matrix (Fin n) (Fin n) K) (a c : Fin n) :
-    (X * bruU w q) a c = X a c + X a q * w c := by
+theorem bru_right (w : Fin n → K) (q : Fin n) (X : Matrix (Fin n) (Fin n) K) (a c : Fin n)
+    : (X * bruU w q) a c = X a c + X a q * w c := by
   simp only [Matrix.mul_apply, bruU, mul_add, Finset.sum_add_distrib]
   congr 1
   · simp
   · simp
 
 def bruRed (m : ℕ) (M : Matrix (Fin n) (Fin n) K) (σ : Fin n → Fin n) : Prop :=
-  (∀ b b' : Fin n, b.val < m → b'.val < m → σ b = σ b' → b = b') ∧
-  (∀ b : Fin n, b.val < m → M (σ b) b ≠ 0) ∧
-  (∀ b : Fin n, b.val < m → ∀ a, a ≠ σ b → M a b = 0) ∧
-  (∀ b : Fin n, b.val < m → ∀ c, c ≠ b → M (σ b) c = 0)
+  (∀ b b' : Fin n, b.val < m → b'.val < m → σ b = σ b' → b = b')
+    ∧ (∀ b : Fin n, b.val < m → M (σ b) b ≠ 0) ∧ (∀ b : Fin n, b.val < m → ∀ a, a ≠ σ b → M a b = 0)
+    ∧ (∀ b : Fin n, b.val < m → ∀ c, c ≠ b → M (σ b) c = 0)
 
-theorem bru_step {m : ℕ} (hm : m < n) (M : Matrix (Fin n) (Fin n) K) (hdet : M.det ≠ 0) (σ : Fin n → Fin n)
-    (h : bruRed m M σ) :
-    ∃ (L U M' : Matrix (Fin n) (Fin n) K) (σ' : Fin n → Fin n), IsLoUni L ∧ IsUpUni U ∧ M = L * M' * U ∧
-      bruRed (m + 1) M' σ' := by
+theorem bru_step
+    {m : ℕ} (hm : m < n)
+    (M : Matrix (Fin n) (Fin n) K) (hdet : M.det ≠ 0)
+    (σ : Fin n → Fin n) (h : bruRed m M σ)
+    : ∃ (L U M' : Matrix (Fin n) (Fin n) K) (σ' : Fin n → Fin n),
+      IsLoUni L ∧ IsUpUni U ∧ M = L * M' * U ∧ bruRed (m + 1) M' σ' := by
   classical
   obtain ⟨h1, h2, h3, h4⟩ := h
   obtain ⟨q, hq⟩ : ∃ q : Fin n, q.val = m := ⟨⟨m, hm⟩, rfl⟩
@@ -109,12 +127,17 @@ theorem bru_step {m : ℕ} (hm : m < n) (M : Matrix (Fin n) (Fin n) K) (hdet : M
     rcases Nat.lt_succ_iff_lt_or_eq.1 hb with h | h
     · exact Or.inr h
     · exact Or.inl (Fin.ext (h.trans hq.symm))
-  obtain ⟨u, hu⟩ : ∃ u : Fin n → K, ∀ a, u a = if a = p then 0 else M a q / M p q := ⟨_, fun _ => rfl⟩
-  obtain ⟨w, hw⟩ : ∃ w : Fin n → K, ∀ c, w c = if c = q then 0 else M p c / M p q := ⟨_, fun _ => rfl⟩
-  obtain ⟨M', hM'⟩ : ∃ M' : Matrix (Fin n) (Fin n) K, ∀ a c, M' a c =
-      if a = p then (if c = q then M p q else 0) else M a c - M a q / M p q * M p c :=
-    ⟨Matrix.of fun a c => if a = p then (if c = q then M p q else 0) else M a c - M a q / M p q * M p c,
-      fun _ _ => rfl⟩
+  obtain ⟨u, hu⟩ : ∃ u : Fin n → K, ∀ a, u a = if a = p then 0 else M a q / M p q :=
+    ⟨_, fun _ => rfl⟩
+  obtain ⟨w, hw⟩ : ∃ w : Fin n → K, ∀ c, w c = if c = q then 0 else M p c / M p q :=
+    ⟨_, fun _ => rfl⟩
+  obtain ⟨M', hM'⟩
+      : ∃ M' : Matrix (Fin n) (Fin n) K, ∀ a c,
+        M' a c = if a = p then (if c = q then M p q else 0) else M a c - M a q / M p q * M p c := ⟨
+    Matrix.of fun a c =>
+      if a = p then (if c = q then M p q else 0) else M a c - M a q / M p q * M p c,
+    fun _ _ => rfl
+  ⟩
   refine ⟨bruL u p, bruU w q, M', Function.update σ q p, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro i j
     refine ⟨fun hij => ?_, fun hij => ?_⟩
@@ -188,18 +211,31 @@ theorem bru_step {m : ℕ} (hm : m < n) (M : Matrix (Fin n) (Fin n) K) (hdet : M
   · intro b hb c hc
     rcases hcase b hb with rfl | hb1
     · rw [Function.update_self, hM', if_pos rfl, if_neg hc]
-    · rw [Function.update_of_ne (hqb b hb1).symm, hM', if_neg (hpσ b hb1).symm,
-        h4 b hb1 c hc, h4 b hb1 q (hqb b hb1), zero_div, zero_mul, sub_zero]
+    · rw [Function.update_of_ne (hqb b hb1).symm, hM', if_neg (hpσ b hb1).symm, h4 b hb1 c hc,
+        h4 b hb1 q (hqb b hb1), zero_div, zero_mul, sub_zero]
 
-theorem bru_all (Z : Matrix (Fin n) (Fin n) K) (hdet : Z.det ≠ 0) : ∀ m : ℕ, m ≤ n →
-    ∃ (L U M : Matrix (Fin n) (Fin n) K) (σ : Fin n → Fin n), IsLoUni L ∧ IsUpUni U ∧ Z = L * M * U ∧ bruRed m M σ := by
+theorem bru_all (Z : Matrix (Fin n) (Fin n) K) (hdet : Z.det ≠ 0)
+    : ∀ m : ℕ,
+      m ≤ n
+        → ∃ (L U M : Matrix (Fin n) (Fin n) K) (σ : Fin n → Fin n),
+          IsLoUni L ∧ IsUpUni U ∧ Z = L * M * U ∧ bruRed m M σ := by
   intro m
   induction m with
   | zero =>
     intro _
-    exact ⟨1, 1, Z, id, bru_lo_one, bru_up_one, by simp,
-      fun b _ hb => absurd hb (Nat.not_lt_zero _), fun b hb => absurd hb (Nat.not_lt_zero _),
-      fun b hb => absurd hb (Nat.not_lt_zero _), fun b hb => absurd hb (Nat.not_lt_zero _)⟩
+    exact ⟨
+      1,
+      1,
+      Z,
+      id,
+      bru_lo_one,
+      bru_up_one,
+      by simp,
+      fun b _ hb => absurd hb (Nat.not_lt_zero _),
+      fun b hb => absurd hb (Nat.not_lt_zero _),
+      fun b hb => absurd hb (Nat.not_lt_zero _),
+      fun b hb => absurd hb (Nat.not_lt_zero _)
+    ⟩
   | succ m ih =>
     intro hm
     obtain ⟨L, U, M, σ, hL, hU, hZ, hR⟩ := ih (Nat.le_of_succ_le hm)
@@ -218,7 +254,17 @@ theorem cell_bruhat : BruhatDecomposition := by
   intro K _ n Z hdet
   obtain ⟨L, U, M, σ, hL, hU, hZ, h1, h2, h3, _⟩ := bru_all Z hdet n le_rfl
   have hinj : Function.Injective σ := fun b b' e => h1 b b' b.isLt b'.isLt e
-  refine ⟨L, U, σ, fun b => M (σ b) b, hL, hU, Finite.injective_iff_bijective.1 hinj, fun b => h2 b b.isLt, ?_⟩
+  refine ⟨
+    L,
+    U,
+    σ,
+    fun b => M (σ b) b,
+    hL,
+    hU,
+    Finite.injective_iff_bijective.1 hinj,
+    fun b => h2 b b.isLt,
+    ?_
+  ⟩
   have hMm : M = mono σ (fun b => M (σ b) b) := by
     ext a b
     unfold mono

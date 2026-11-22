@@ -13,7 +13,6 @@ section Val
 variable {F : Type*} [Field F] (v : AddValuation F (WithTop ℤ))
 
 theorem nonneg_of_isIntegral {y : F} (hy : IsIntegral ℤ y) : 0 ≤ v y := by
-
   let w := AddValuation.toValuation v
   have h1 : IsIntegral w.integer y := IsIntegral.tower_top hy
   have h2 := (Valuation.integer.integers w).mem_of_integral h1
@@ -29,8 +28,9 @@ theorem withTop_add_pos {x y : WithTop ℤ} (hx : 0 ≤ x) (hy : 0 < y) : 0 < x 
       norm_cast at hx hy ⊢
       omega
 
-theorem val_prime_eq_zero {l p : ℕ} (hl : l.Prime) (hp : p.Prime) (hne : p ≠ l) (hvl : 0 < v (l : F)) :
-    v (p : F) = 0 := by
+theorem val_prime_eq_zero
+    {l p : ℕ} (hl : l.Prime) (hp : p.Prime) (hne : p ≠ l) (hvl : 0 < v (l : F))
+    : v (p : F) = 0 := by
   have hI : ∀ a : ℤ, 0 ≤ v (a : F) := fun a =>
     nonneg_of_isIntegral v (by simpa using (isIntegral_algebraMap (R := ℤ) (A := F) (x := a)))
   have hp0 : 0 ≤ v (p : F) := by simpa using hI p
@@ -58,9 +58,11 @@ section DVR
 
 variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem mem_range_of_isRoot (P : (FractionRing O)[X]) (hm : P.Monic)
-    (hc : ∀ i, P.coeff i ∈ (algebraMap O (FractionRing O)).range) {μ : FractionRing O} (hμ : P.IsRoot μ) :
-    μ ∈ (algebraMap O (FractionRing O)).range := by
+theorem mem_range_of_isRoot
+    (P : (FractionRing O)[X])
+    (hm : P.Monic) (hc : ∀ i, P.coeff i ∈ (algebraMap O (FractionRing O)).range)
+    {μ : FractionRing O} (hμ : P.IsRoot μ)
+    : μ ∈ (algebraMap O (FractionRing O)).range := by
   have hlift : P ∈ Polynomial.lifts (algebraMap O (FractionRing O)) :=
     (Polynomial.lifts_iff_coeff_lifts P).mpr (fun n => hc n)
   obtain ⟨Q, hQ, -, hQm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic hlift hm

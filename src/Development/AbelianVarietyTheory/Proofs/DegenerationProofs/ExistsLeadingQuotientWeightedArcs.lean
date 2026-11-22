@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.AlgOver
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 open GlobalTheory.SS.ArcInf
 
@@ -146,18 +147,37 @@ private lemma coeff_subst_eq_pow_mul_eval_leading {k : Type} [Field k] {m n : �
       rw [prod_pow_fin_two, ← PowerSeries.coeff,
         (coeff_pow_mul_pow_of_le_order hz hw (e 0) (e 1)).1 D (by omega), smul_zero]
 
-
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
-theorem _root_.GlobalTheory.SS.exists_polynomial_leading_quotient_subst :
-    ∀ (k : Type) [Field k] [IsAlgClosed k] (m n : ℕ), 1 ≤ m → 1 ≤ n → ∀ (r : ℕ) (h : Fin r → MvPowerSeries (Fin 2) k) (d : MvPowerSeries (Fin 2) k), d ≠ 0 → (∀ i, MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i)) → ∃ (Pd : Polynomial k) (P : Fin r → Polynomial k), Pd ≠ 0 ∧ (∀ i, P i = 0 ↔ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d < MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i)) ∧ ∀ (s t : k) (z w : PowerSeries k), s ≠ 0 → (m : ℕ∞) ≤ z.order → (n : ℕ∞) ≤ w.order → PowerSeries.coeff m z = s ^ m → PowerSeries.coeff n w = s ^ n * t → Pd.eval t ≠ 0 → MvPowerSeries.subst (![z, w] : Fin 2 → PowerSeries k) d ≠ 0 ∧ ∃ y : Fin r → PowerSeries k, ∀ i, y i * MvPowerSeries.subst (![z, w] : Fin 2 → PowerSeries k) d = MvPowerSeries.subst (![z, w] : Fin 2 → PowerSeries k) (h i) ∧ PowerSeries.constantCoeff (y i) * Pd.eval t = (P i).eval t := by
+theorem _root_.GlobalTheory.SS.exists_polynomial_leading_quotient_subst
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (m n : ℕ),
+      1 ≤ m → 1 ≤ n
+        → ∀ (r : ℕ) (h : Fin r → MvPowerSeries (Fin 2) k) (d : MvPowerSeries (Fin 2) k),
+          d ≠ 0
+            → (∀ i,
+              MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d
+                ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i))
+            → ∃ (Pd : Polynomial k) (P : Fin r → Polynomial k),
+              Pd ≠ 0
+                ∧ (∀ i,
+                  P i = 0
+                    ↔ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d
+                      < MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i))
+                ∧ ∀ (s t : k) (z w : PowerSeries k),
+                  s ≠ 0 → (m : ℕ∞) ≤ z.order → (n : ℕ∞) ≤ w.order → PowerSeries.coeff m z = s ^ m
+                    → PowerSeries.coeff n w = s ^ n * t → Pd.eval t ≠ 0
+                    → MvPowerSeries.subst (![z, w] : Fin 2 → PowerSeries k) d ≠ 0
+                      ∧ ∃ y : Fin r → PowerSeries k, ∀ i,
+                        y i * MvPowerSeries.subst (![z, w] : Fin 2 → PowerSeries k) d
+                            = MvPowerSeries.subst (![z, w] : Fin 2 → PowerSeries k) (h i)
+                          ∧ PowerSeries.constantCoeff (y i) * Pd.eval t = (P i).eval t := by
   intro k _ _ m n hm hn r h d hd hdh
-  have hfin : ((MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d).toNat : ℕ∞) =
-      MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d :=
+  have hfin
+      : ((MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d).toNat : ℕ∞)
+        = MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d :=
     ENat.coe_toNat ((MvPowerSeries.weightedOrder_eq_top_iff _).not.2 hd)
   set D := (MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d).toNat with hD_def
-  have hWpos : ∀ x, (![m, n] : Fin 2 → ℕ) x ≠ 0 := by
-    intro x; fin_cases x <;> simp <;> omega
+  have hWpos : ∀ x, (![m, n] : Fin 2 → ℕ) x ≠ 0 := by intro x; fin_cases x <;> simp <;> omega
   set S := (Finsupp.finite_of_nat_weight_le _ hWpos D).toFinset.filter
     fun e => Finsupp.weight (![m, n] : Fin 2 → ℕ) e = D with hS_def
   have hS : ∀ e, e ∈ S ↔ Finsupp.weight (![m, n] : Fin 2 → ℕ) e = D := by
@@ -165,10 +185,15 @@ theorem _root_.GlobalTheory.SS.exists_polynomial_leading_quotient_subst :
     simp only [hS_def, Finset.mem_filter, Set.Finite.mem_toFinset, Set.mem_setOf_eq]
     exact ⟨fun h => h.2, fun h => ⟨h.le, h⟩⟩
   have hDd : (D : ℕ∞) ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d := hfin.le
-  have hDh : ∀ i, (D : ℕ∞) ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i) :=
-    fun i => hfin.le.trans (hdh i)
-  refine ⟨∑ e ∈ S, Polynomial.C (MvPowerSeries.coeff e d) * Polynomial.X ^ (e 1),
-    fun i => ∑ e ∈ S, Polynomial.C (MvPowerSeries.coeff e (h i)) * Polynomial.X ^ (e 1), ?_, ?_, ?_⟩
+  have hDh : ∀ i, (D : ℕ∞) ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i) := fun i =>
+    hfin.le.trans (hdh i)
+  refine ⟨
+    ∑ e ∈ S, Polynomial.C (MvPowerSeries.coeff e d) * Polynomial.X ^ (e 1),
+    fun i => ∑ e ∈ S, Polynomial.C (MvPowerSeries.coeff e (h i)) * Polynomial.X ^ (e 1),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro h0
     have := (leading_polynomial_eq_zero_iff_lt_weightedOrder hm d hDd S hS).1 h0
     rw [hfin] at this
@@ -186,30 +211,36 @@ theorem _root_.GlobalTheory.SS.exists_polynomial_leading_quotient_subst :
         fin_cases i
         · exact hz0
         · exact hw0
-    have factor : ∀ f : MvPowerSeries (Fin 2) k,
-        (D : ℕ∞) ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) f →
-        ∃ g : PowerSeries k, MvPowerSeries.subst (![z, w] : Fin 2 → PowerSeries k) f =
-          PowerSeries.X ^ D * g ∧ PowerSeries.constantCoeff g =
-            s ^ D * (∑ e ∈ S, Polynomial.C (MvPowerSeries.coeff e f) * Polynomial.X ^ (e 1)).eval t := by
+    have factor
+        : ∀ f : MvPowerSeries (Fin 2) k,
+          (D : ℕ∞) ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) f
+            → ∃ g : PowerSeries k,
+              MvPowerSeries.subst (![z, w] : Fin 2 → PowerSeries k) f = PowerSeries.X ^ D * g
+                ∧ PowerSeries.constantCoeff g
+                  = s ^ D
+                    * (∑ e ∈ S, Polynomial.C (MvPowerSeries.coeff e f) * Polynomial.X ^ (e 1)).eval
+                      t := by
       intro f hf
-      obtain ⟨g, hg⟩ := PowerSeries.X_pow_dvd_iff.2 fun j hj =>
-        coeff_subst_eq_zero_of_lt hz hw hsub hf hj
+      obtain ⟨g, hg⟩ :=
+        PowerSeries.X_pow_dvd_iff.2 fun j hj => coeff_subst_eq_zero_of_lt hz hw hsub hf hj
       refine ⟨g, hg, ?_⟩
       have := coeff_subst_eq_pow_mul_eval_leading hz hw hsub hzs hwt hf S hS
       rw [hg, PowerSeries.coeff_X_pow_mul', if_pos le_rfl, Nat.sub_self,
-        PowerSeries.coeff_zero_eq_constantCoeff] at this
+          PowerSeries.coeff_zero_eq_constantCoeff]
+        at this
       exact this
     obtain ⟨gd, hgd, hgd0⟩ := factor d hDd
     have hgd0' : PowerSeries.constantCoeff gd ≠ 0 := by
       rw [hgd0]; exact mul_ne_zero (pow_ne_zero _ hs0) hPd
     refine ⟨?_, fun i => (factor (h i) (hDh i)).choose * gd⁻¹, fun i => ?_⟩
     · rw [hgd]
-      exact mul_ne_zero (pow_ne_zero _ PowerSeries.X_ne_zero)
-        fun h0 => hgd0' (by rw [h0, map_zero])
+      exact mul_ne_zero (pow_ne_zero _ PowerSeries.X_ne_zero) fun h0 => hgd0' (by rw [h0, map_zero])
     · obtain ⟨hgi, hgi0⟩ := (factor (h i) (hDh i)).choose_spec
       constructor
-      · rw [hgd, hgi, show (factor (h i) (hDh i)).choose * gd⁻¹ * (PowerSeries.X ^ D * gd) =
-          PowerSeries.X ^ D * (factor (h i) (hDh i)).choose * (gd * gd⁻¹) by ring,
+      · rw [hgd, hgi,
+          show (factor (h i) (hDh i)).choose * gd⁻¹ * (PowerSeries.X ^ D * gd)
+              = PowerSeries.X ^ D * (factor (h i) (hDh i)).choose * (gd * gd⁻¹) by
+            ring,
           PowerSeries.mul_inv_cancel _ hgd0', _root_.mul_one]
       · rw [map_mul, PowerSeries.constantCoeff_inv, hgi0, hgd0]
         field_simp

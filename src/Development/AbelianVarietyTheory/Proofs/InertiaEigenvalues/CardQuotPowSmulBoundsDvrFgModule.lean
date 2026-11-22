@@ -12,25 +12,33 @@ namespace GlobalTheory.DVRQuotCount
 
 open scoped TensorProduct DirectSum
 
-theorem card_quot_smul_top_of_flat' {R N : Type} [CommRing R] [IsDomain R] [AddCommGroup N] [Module R N]
-    [Module.Finite R N] [Module.Flat R N] (I : Ideal R) [Finite (R ⧸ I)] :
-    Nat.card (N ⧸ (I • ⊤ : Submodule R N)) = Nat.card (R ⧸ I) ^ Module.finrank R N := by
+theorem card_quot_smul_top_of_flat'
+    {R N : Type}
+    [CommRing R] [IsDomain R] [AddCommGroup N] [Module R N] [Module.Finite R N] [Module.Flat R N]
+    (I : Ideal R) [Finite (R ⧸ I)]
+    : Nat.card (N ⧸ (I • ⊤ : Submodule R N)) = Nat.card (R ⧸ I) ^ Module.finrank R N := by
   have : IsArtinianRing (R ⧸ I) := isArtinian_of_finite
-  obtain ⟨b⟩ := Module.nonempty_basis_of_flat_of_finrank_eq (R ⧸ I) ((R ⧸ I) ⊗[R] N) (Module.finrank R N)
-    (fun P => by
-      have := P.isMaximal
-      let : Field ((R ⧸ I) ⧸ P.asIdeal) := Ideal.Quotient.field _
-      rw [(TensorProduct.AlgebraTensorModule.cancelBaseChange R (R ⧸ I) ((R ⧸ I) ⧸ P.asIdeal)
-        ((R ⧸ I) ⧸ P.asIdeal) N).finrank_eq]
-      have h1 := Module.rankAtStalk_baseChange (R := R) (M := N) (S := (R ⧸ I) ⧸ P.asIdeal) ⊥
-      rw [Module.rankAtStalk_eq_finrank_of_free, Module.rankAtStalk_eq, Ideal.finrank_fiber_eq_finrank] at h1
-      exact h1)
+  obtain ⟨b⟩ :=
+    Module.nonempty_basis_of_flat_of_finrank_eq (R ⧸ I) ((R ⧸ I) ⊗[R] N) (Module.finrank R N)
+      (fun P => by
+        have := P.isMaximal
+        let : Field ((R ⧸ I) ⧸ P.asIdeal) := Ideal.Quotient.field _
+        rw [(TensorProduct.AlgebraTensorModule.cancelBaseChange R (R ⧸ I) ((R ⧸ I) ⧸ P.asIdeal)
+          ((R ⧸ I) ⧸ P.asIdeal) N).finrank_eq]
+        have h1 := Module.rankAtStalk_baseChange (R := R) (M := N) (S := (R ⧸ I) ⧸ P.asIdeal) ⊥
+        rw [Module.rankAtStalk_eq_finrank_of_free, Module.rankAtStalk_eq,
+            Ideal.finrank_fiber_eq_finrank]
+          at h1
+        exact h1)
   rw [← Nat.card_congr (TensorProduct.quotTensorEquivQuotSMul N I).toEquiv,
-    Nat.card_congr b.equivFun.toEquiv, Nat.card_fun, Nat.card_eq_fintype_card (α := Fin _), Fintype.card_fin]
+    Nat.card_congr b.equivFun.toEquiv, Nat.card_fun, Nat.card_eq_fintype_card (α := Fin _),
+    Fintype.card_fin]
 
-theorem rank_prod_of_rank_zero {R A B : Type} [CommRing R] [IsDomain R] [AddCommGroup A] [Module R A]
-    [AddCommGroup B] [Module R B] (hB : ∀ x : B, ∃ a : R, a ≠ 0 ∧ a • x = 0) :
-    Module.rank R (A × B) = Module.rank R A := by
+theorem rank_prod_of_rank_zero
+    {R A B : Type}
+    [CommRing R] [IsDomain R] [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
+    (hB : ∀ x : B, ∃ a : R, a ≠ 0 ∧ a • x = 0)
+    : Module.rank R (A × B) = Module.rank R A := by
   have h := LinearMap.rank_range_add_rank_ker (LinearMap.fst R A B)
   have hk : Module.rank R (LinearMap.ker (LinearMap.fst R A B)) = 0 := by
     rw [rank_eq_zero_iff]
@@ -43,18 +51,24 @@ theorem rank_prod_of_rank_zero {R A B : Type} [CommRing R] [IsDomain R] [AddComm
   rw [LinearMap.range_eq_top.2 (fun a => ⟨(a, 0), rfl⟩), rank_top, hk, add_zero] at h
   exact h.symm
 
-theorem irreducible_dvd {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {p t : O}
-    (hp : Irreducible p) (ht : t ≠ 0) (htu : ¬ IsUnit t) : p ∣ t := by
+theorem irreducible_dvd
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {p t : O} (hp : Irreducible p) (ht : t ≠ 0) (htu : ¬ IsUnit t)
+    : p ∣ t := by
   obtain ⟨q, hq, hqt⟩ := WfDvdMonoid.exists_irreducible_factor htu ht
   exact (IsDiscreteValuationRing.associated_of_irreducible O hp hq).dvd.trans hqt
 
-theorem card_quot_pow_smul_bounds : ∀ (O M : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [AddCommGroup M] [Module O M] [Module.Finite O M] (t : O), t ≠ 0 → ¬ IsUnit t →
-    (∀ r : ℕ, Finite (O ⧸ Ideal.span {t ^ r})) → ∃ C : ℕ, 0 < C ∧ ∀ r : ℕ,
-      Nat.card (O ⧸ Ideal.span {t ^ r}) ^ finrank O M ≤
-        Nat.card (M ⧸ (Ideal.span {t ^ r} • ⊤ : Submodule O M)) ∧
-      Nat.card (M ⧸ (Ideal.span {t ^ r} • ⊤ : Submodule O M)) ≤
-        C * Nat.card (O ⧸ Ideal.span {t ^ r}) ^ finrank O M := by
+theorem card_quot_pow_smul_bounds
+    : ∀ (O M : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup M]
+        [Module O M] [Module.Finite O M] (t : O),
+      t ≠ 0 → ¬ IsUnit t → (∀ r : ℕ, Finite (O ⧸ Ideal.span {t ^ r}))
+        → ∃ C : ℕ,
+          0 < C
+            ∧ ∀ r : ℕ,
+              Nat.card (O ⧸ Ideal.span {t ^ r}) ^ finrank O M
+                  ≤ Nat.card (M ⧸ (Ideal.span {t ^ r} • ⊤ : Submodule O M))
+                ∧ Nat.card (M ⧸ (Ideal.span {t ^ r} • ⊤ : Submodule O M))
+                  ≤ C * Nat.card (O ⧸ Ideal.span {t ^ r}) ^ finrank O M := by
   intro O M _ _ _ _ _ _ t ht htu hfin
   obtain ⟨n, ι, _, p, hp, e, ⟨eqv⟩⟩ := Module.equiv_free_prod_directSum O M
   set T := ⨁ i : ι, O ⧸ O ∙ p i ^ e i
@@ -88,8 +102,9 @@ theorem card_quot_pow_smul_bounds : ∀ (O M : Type) [CommRing O] [IsDomain O] [
   refine ⟨Nat.card T, Nat.card_pos, fun r => ?_⟩
   set I : Ideal O := Ideal.span {t ^ r}
   haveI := hfin r
-  have hcard : Nat.card (M ⧸ (I • ⊤ : Submodule O M)) =
-      Nat.card (O ⧸ I) ^ n * Nat.card (T ⧸ (I • ⊤ : Submodule O T)) := by
+  have hcard
+      : Nat.card (M ⧸ (I • ⊤ : Submodule O M))
+        = Nat.card (O ⧸ I) ^ n * Nat.card (T ⧸ (I • ⊤ : Submodule O T)) := by
     rw [← Nat.card_congr (TensorProduct.quotTensorEquivQuotSMul M I).toEquiv,
       Nat.card_congr (TensorProduct.congr (LinearEquiv.refl O (O ⧸ I)) eqv).toEquiv,
       Nat.card_congr (TensorProduct.prodRight O O (O ⧸ I) F T).toEquiv, Nat.card_prod,

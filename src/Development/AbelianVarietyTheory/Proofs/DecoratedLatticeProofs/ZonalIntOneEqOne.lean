@@ -5,13 +5,19 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsCoTyp
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition GlobalTheory.SatakeBound GlobalTheory.ParHecke
+open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.Doubling GlobalTheory.GLDoubling
+  GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition
+  GlobalTheory.SatakeBound GlobalTheory.ParHecke
 
 namespace GlobalTheory.ZonalOne
 
-theorem zonalInt_one_eq_one (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (N : ℕ)
-    [MeasurableSpace (GL (Fin N) k)] [BorelSpace (GL (Fin N) k)] (μK : Measure (GL (Fin N) k)) [μK.IsHaarMeasure] :
-    μK (KO k (Fin N)) = 1 → ∀ (γ : Fin N → ℂ) (ψ : GL (Fin N) k → ℂ), IsBorelSph k γ ψ → zonalInt μK ψ 1 = 1 := by
+theorem zonalInt_one_eq_one
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (N : ℕ) [MeasurableSpace (GL (Fin N) k)] [BorelSpace (GL (Fin N) k)]
+    (μK : Measure (GL (Fin N) k)) [μK.IsHaarMeasure]
+    : μK (KO k (Fin N)) = 1
+      → ∀ (γ : Fin N → ℂ) (ψ : GL (Fin N) k → ℂ), IsBorelSph k γ ψ → zonalInt μK ψ 1 = 1 := by
   intro hK γ ψ hψ
   have h1 : ψ 1 = 1 := by
     rw [hψ.2 1 (one_mem _) (fun _ => 1) (fun i => by simp)]

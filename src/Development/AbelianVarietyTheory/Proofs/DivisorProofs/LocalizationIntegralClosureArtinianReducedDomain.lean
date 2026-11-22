@@ -12,42 +12,56 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem exists_mul_mul_eq_self_of_isArtinian_isReduced {A : Type} [CommRing A] [IsArtinianRing A]
-    [IsReduced A] (a : A) : ∃ y : A, a * a * y = a := by
+theorem exists_mul_mul_eq_self_of_isArtinian_isReduced
+    {A : Type} [CommRing A] [IsArtinianRing A] [IsReduced A] (a : A)
+    : ∃ y : A, a * a * y = a := by
   obtain ⟨n, y, hy⟩ := IsArtinian.exists_pow_succ_smul_dvd a (1 : A)
   simp only [smul_eq_mul, mul_one] at hy
   have hy' : a ^ (n + 1) * y = a ^ n := hy
   refine ⟨y, ?_⟩
-  have hc : IsNilpotent (a - a * a * y) := ⟨n + 1, by
-    calc (a - a * a * y) ^ (n + 1) = (a * (1 - a * y)) ^ (n + 1) := by ring
-    _ = a ^ (n + 1) * (1 - a * y) ^ (n + 1) := mul_pow _ _ _
-    _ = (a ^ (n + 1) - a * (a ^ (n + 1) * y)) * (1 - a * y) ^ n := by rw [pow_succ (1 - a * y)]; ring
-    _ = 0 := by rw [hy', ← pow_succ', sub_self, zero_mul]⟩
+  have hc : IsNilpotent (a - a * a * y) := ⟨
+    n + 1,
+    by
+      calc
+        (a - a * a * y) ^ (n + 1)
+          = (a * (1 - a * y)) ^ (n + 1) := by ring
+        _ = a ^ (n + 1) * (1 - a * y) ^ (n + 1) := mul_pow _ _ _
+        _ = (a ^ (n + 1) - a * (a ^ (n + 1) * y)) * (1 - a * y) ^ n := by
+          rw [pow_succ (1 - a * y)]; ring
+        _ = 0 := by rw [hy', ← pow_succ', sub_self, zero_mul]
+  ⟩
   exact (sub_eq_zero.mp hc.eq_zero).symm
 
-theorem idempotent_mul_aeval_mul {R A : Type} [CommRing R] [CommRing A] [Algebra R A] {f : A}
-    (hf : IsIdempotentElem f) (x : A) (p : R[X]) : f * aeval (f * x) p = f * aeval x p := by
+theorem idempotent_mul_aeval_mul
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
+    {f : A} (hf : IsIdempotentElem f)
+    (x : A) (p : R[X])
+    : f * aeval (f * x) p = f * aeval x p := by
   simp only [aeval_eq_sum_range, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [mul_smul_comm, mul_smul_comm, mul_pow, ← mul_assoc, ← pow_succ', hf.pow_succ_eq]
 
-theorem isIntegral_of_isIdempotentElem {R A : Type} [CommRing R] [CommRing A] [Algebra R A] {e : A}
-    (he : IsIdempotentElem e) : IsIntegral R e :=
-  ⟨X * (X - C 1), monic_X.mul (monic_X_sub_C 1), by
-    simp only [eval₂_mul, eval₂_X, eval₂_sub, eval₂_C, eval₂_one, map_one, mul_sub, mul_one,
-      he.eq, sub_self]⟩
+theorem isIntegral_of_isIdempotentElem
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A] {e : A} (he : IsIdempotentElem e)
+    : IsIntegral R e := ⟨
+  X * (X - C 1),
+  monic_X.mul (monic_X_sub_C 1),
+  by
+    simp only [eval₂_mul, eval₂_X, eval₂_sub, eval₂_C, eval₂_one, map_one, mul_sub, mul_one, he.eq,
+      sub_self]
+⟩
 
 theorem localization_integralClosure_isDomain_isIntegrallyClosed
     (R A : Type) [CommRing R] [CommRing A] [Algebra R A] [IsArtinianRing A] [IsReduced A]
-    (Q : Ideal (integralClosure R A)) [Q.IsPrime] :
-    IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q) := by
+    (Q : Ideal (integralClosure R A)) [Q.IsPrime]
+    : IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q) := by
   classical
   have hidem : ∀ e : A, IsIdempotentElem e → e ∈ integralClosure R A := fun e he =>
     (show IsIntegral R e from isIntegral_of_isIdempotentElem he)
   have hcompl : ∀ e : integralClosure R A, e ∈ Q → (1 - e) ∈ Q.primeCompl := by
     intro e he h1
-    exact (Ideal.IsPrime.ne_top inferInstance) ((Ideal.eq_top_iff_one _).mpr (by
-      simpa using Q.add_mem he h1))
+    exact (Ideal.IsPrime.ne_top inferInstance) ((Ideal.eq_top_iff_one _).mpr
+      (by simpa using Q.add_mem he h1))
   let T : Submonoid A := Algebra.algebraMapSubmonoid A Q.primeCompl
   let J : Ideal A := RingHom.ker (algebraMap A (Localization T))
   have memJ : ∀ a : A, a ∈ J ↔ ∃ s ∈ Q.primeCompl, (s : A) * a = 0 := by
@@ -72,8 +86,10 @@ theorem localization_integralClosure_isDomain_isIntegrallyClosed
       obtain ⟨y, hy⟩ := exists_mul_mul_eq_self_of_isArtinian_isReduced a
       have hei : IsIdempotentElem (a * y) := by
         unfold IsIdempotentElem
-        calc a * y * (a * y) = (a * a * y) * y := by ring
-        _ = a * y := by rw [hy]
+        calc
+          a * y * (a * y)
+            = (a * a * y) * y := by ring
+          _ = a * y := by rw [hy]
       let e : integralClosure R A := ⟨a * y, hidem _ hei⟩
       by_cases he : e ∈ Q
       · left
@@ -94,8 +110,9 @@ theorem localization_integralClosure_isDomain_isIntegrallyClosed
     intro s
     rw [isUnit_iff_ne_zero, g_eq, Ne, Ideal.Quotient.eq_zero_iff_mem]
     exact hS s.1 s.2
-  have hB0 : ∀ b : integralClosure R A,
-      algebraMap (integralClosure R A) (Localization.AtPrime Q) b = 0 ↔ g b = 0 := by
+  have hB0
+      : ∀ b : integralClosure R A,
+        algebraMap (integralClosure R A) (Localization.AtPrime Q) b = 0 ↔ g b = 0 := by
     intro b
     rw [IsLocalization.map_eq_zero_iff Q.primeCompl, g_eq, Ideal.Quotient.eq_zero_iff_mem, memJ]
     constructor
@@ -128,8 +145,10 @@ theorem localization_integralClosure_isDomain_isIntegrallyClosed
     obtain ⟨w, hw⟩ := exists_mul_mul_eq_self_of_isArtinian_isReduced (t : A)
     have hfi : IsIdempotentElem ((t : A) * w) := by
       unfold IsIdempotentElem
-      calc (t : A) * w * ((t : A) * w) = ((t : A) * t * w) * w := by ring
-      _ = (t : A) * w := by rw [hw]
+      calc
+        (t : A) * w * ((t : A) * w)
+          = ((t : A) * t * w) * w := by ring
+        _ = (t : A) * w := by rw [hw]
     let f : integralClosure R A := ⟨(t : A) * w, hidem _ hfi⟩
     have hf : f ∈ Q.primeCompl := by
       intro hfQ
@@ -141,30 +160,29 @@ theorem localization_integralClosure_isDomain_isIntegrallyClosed
     have hfa : IsIntegral R ((t : A) * w * a) := by
       refine ⟨X * p, monic_X.mul hpm, ?_⟩
       rw [← aeval_def, map_mul, aeval_X]
-      calc (t : A) * w * a * aeval ((t : A) * w * a) p
+      calc
+        (t : A) * w * a * aeval ((t : A) * w * a) p
           = a * ((t : A) * w * aeval ((t : A) * w * a) p) := by ring
-      _ = 0 := by rw [idempotent_mul_aeval_mul hfi, hfp, mul_zero]
+        _ = 0 := by rw [idempotent_mul_aeval_mul hfi, hfp, mul_zero]
     let c : integralClosure R A := ⟨(t : A) * w * a, (show IsIntegral R ((t : A) * w * a) from hfa)⟩
     refine ⟨IsLocalization.mk' (Localization.AtPrime Q) c (⟨s, hs⟩ : Q.primeCompl), ?_⟩
     rw [IsLocalization.lift_mk'_spec]
     have hf1 : g f = 1 := by
-      have hne : g f ≠ 0 := by
-        rw [g_eq, Ne, Ideal.Quotient.eq_zero_iff_mem]; exact hS f hf
-      have hid : g f * g f = g f := by
-        rw [← map_mul]; exact congrArg g (Subtype.ext hfi.eq)
+      have hne : g f ≠ 0 := by rw [g_eq, Ne, Ideal.Quotient.eq_zero_iff_mem]; exact hS f hf
+      have hid : g f * g f = g f := by rw [← map_mul]; exact congrArg g (Subtype.ext hfi.eq)
       have : g f * (g f - 1) = 0 := by rw [mul_sub, hid, mul_one, sub_self]
       exact sub_eq_zero.mp ((mul_eq_zero.mp this).resolve_left hne)
     have hsz : (⟨s, hs⟩ : Q.primeCompl) • z = g s * z := by
       rw [Submonoid.smul_def, Algebra.smul_def]
-    have hgc : g c = g f * Ideal.Quotient.mk J a := by
-      rw [g_eq, g_eq, ← map_mul]
+    have hgc : g c = g f * Ideal.Quotient.mk J a := by rw [g_eq, g_eq, ← map_mul]
     rw [hgc, hf1, one_mul, ha, hsz]
   rw [isIntegrallyClosed_iff (FractionRing (Localization.AtPrime Q))]
   intro x hx
   have hinj' : Function.Injective (algebraMap (Localization.AtPrime Q) (A ⧸ J)) := hinj
-  let ι := IsFractionRing.liftAlgHom (R := Localization.AtPrime Q) (A := Localization.AtPrime Q)
-    (K := FractionRing (Localization.AtPrime Q)) (L := A ⧸ J)
-    (g := Algebra.ofId (Localization.AtPrime Q) (A ⧸ J)) hinj'
+  let ι :=
+    IsFractionRing.liftAlgHom (R := Localization.AtPrime Q) (A := Localization.AtPrime Q)
+      (K := FractionRing (Localization.AtPrime Q)) (L := A ⧸ J)
+      (g := Algebra.ofId (Localization.AtPrime Q) (A ⧸ J)) hinj'
   obtain ⟨w, hw⟩ := hclosed (ι x) (hx.map ι)
   refine ⟨w, ι.toRingHom.injective ?_⟩
   change ι (algebraMap _ _ w) = ι x

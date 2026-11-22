@@ -56,19 +56,21 @@ private lemma gcdSum_surj (v : Fin 2 → ℤ) (hv : v ≠ 0) :
   · exact Int.mul_ediv_cancel' (Int.gcd_dvd_left (v 0) (v 1))
   · exact Int.mul_ediv_cancel' (Int.gcd_dvd_right (v 0) (v 1))
 
-theorem UpperTheory.V.Af.Rs.gcdSum :
-    UpperTheory.V.Af.Rs.GcdSum := by
+theorem UpperTheory.V.Af.Rs.gcdSum : UpperTheory.V.Af.Rs.GcdSum := by
   intro u c hu hc hu0 hc0 hmul
-  have hsupp : Function.support u ⊆
-      Set.range (fun p : ℕ × UpperTheory.V.Af.Rs.Cop => (((p.1 + 1 : ℕ) : ℤ)) • p.2.1) := by
+  have hsupp
+      : Function.support u
+        ⊆ Set.range (fun p : ℕ × UpperTheory.V.Af.Rs.Cop => (((p.1 + 1 : ℕ) : ℤ)) • p.2.1) := by
     intro v hv
     have hv0 : v ≠ 0 := by
       rintro rfl
       exact hv hu0
     exact gcdSum_surj v hv0
   rw [← gcdSum_inj.tsum_eq hsupp]
-  have hterm : ∀ p : ℕ × UpperTheory.V.Af.Rs.Cop,
-      u ((((p.1 + 1 : ℕ) : ℤ)) • p.2.1) = c (p.1 + 1) * u p.2.1 := fun p => hmul (p.1 + 1) p.2
+  have hterm
+      : ∀ p : ℕ × UpperTheory.V.Af.Rs.Cop,
+        u ((((p.1 + 1 : ℕ) : ℤ)) • p.2.1) = c (p.1 + 1) * u p.2.1 := fun p =>
+    hmul (p.1 + 1) p.2
   have hprod : Summable fun p : ℕ × UpperTheory.V.Af.Rs.Cop => c (p.1 + 1) * u p.2.1 := by
     have := hu.comp_injective gcdSum_inj
     refine this.congr fun p => ?_

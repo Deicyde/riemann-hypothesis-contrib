@@ -11,29 +11,35 @@ open _root_.Neutral.B1 ReciprocityTheory.DiscreteGroups.LocalClassField Polynomi
 variable {p : ℕ} [Fact p.Prime]
 
 noncomputable def red (x : PadicAlgCl p) : kbar p :=
-  open Classical in if h : ‖x‖ ≤ 1 then res ⟨x, mem_Obar_iff.2 h⟩ else 0
+  open Classical in
+  if h : ‖x‖ ≤ 1 then res ⟨x, mem_Obar_iff.2 h⟩ else 0
 
 theorem red_coe (x : Obar p) : red (x : PadicAlgCl p) = res x := dif_pos (norm_le_one x)
 
 theorem red_of_le {x : PadicAlgCl p} (h : ‖x‖ ≤ 1) : red x = res ⟨x, mem_Obar_iff.2 h⟩ := dif_pos h
 
-theorem red_eq_iff {x y : PadicAlgCl p} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) : red x = red y ↔ ‖x - y‖ < 1 := by
+theorem red_eq_iff {x y : PadicAlgCl p} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1)
+    : red x = red y ↔ ‖x - y‖ < 1 := by
   rw [red_of_le hx, red_of_le hy, res_eq_iff]
 
 theorem red_pow {x : PadicAlgCl p} (hx : ‖x‖ ≤ 1) (k : ℕ) : red (x ^ k) = red x ^ k := by
   rw [red_of_le hx, ← map_pow, ← red_coe]
   rfl
 
-theorem pow_qK_eq (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
-    {c : kbar p} (hc : c ∈ resK p K) : c ^ qK p K = c := by
+theorem pow_qK_eq
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
+    {c : kbar p} (hc : c ∈ resK p K)
+    : c ^ qK p K = c := by
   have := finite_resK K hK
   have := Fintype.ofFinite (resK p K)
   have h := FiniteField.pow_card (⟨c, hc⟩ : resK p K)
   rw [← Nat.card_eq_fintype_card] at h
   exact congrArg Subtype.val h
 
-theorem mem_resK_of_pow (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
-    {c : kbar p} (h : c ^ qK p K = c) : c ∈ resK p K := by
+theorem mem_resK_of_pow
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
+    {c : kbar p} (h : c ^ qK p K = c)
+    : c ∈ resK p K := by
   classical
   have := finite_resK K hK
   have := Fintype.ofFinite (resK p K)
@@ -65,8 +71,8 @@ theorem exists_primitiveRoot {m : ℕ} (hm : m ≠ 0) : ∃ ζ : PadicAlgCl p, I
   have : NeZero m := ⟨hm⟩
   exact HasEnoughRootsOfUnity.exists_primitiveRoot (PadicAlgCl p) m
 
-theorem exists_lift_root {m : ℕ} (hm : ¬ p ∣ m) {c : kbar p} (hc : c ^ m = 1) :
-    ∃ ζ : PadicAlgCl p, ζ ^ m = 1 ∧ red ζ = c := by
+theorem exists_lift_root {m : ℕ} (hm : ¬ p ∣ m) {c : kbar p} (hc : c ^ m = 1)
+    : ∃ ζ : PadicAlgCl p, ζ ^ m = 1 ∧ red ζ = c := by
   classical
   have hm0 : m ≠ 0 := by rintro rfl; exact hm (dvd_zero p)
   have hmp : 0 < m := Nat.pos_of_ne_zero hm0
@@ -80,8 +86,7 @@ theorem exists_lift_root {m : ℕ} (hm : ¬ p ∣ m) {c : kbar p} (hc : c ^ m = 
     have h1 := norm_sub_eq_one_of_pow_eq_one hm hx' hy' hne
     have h2 := (red_eq_iff (norm_eq_one_of_pow hm0 hx').le (norm_eq_one_of_pow hm0 hy').le).1 hxy
     exact absurd h1 (ne_of_lt h2)
-  have hT : T.card = m := by
-    rw [Finset.card_image_of_injOn hinj, hζ0.card_nthRootsFinset]
+  have hT : T.card = m := by rw [Finset.card_image_of_injOn hinj, hζ0.card_nthRootsFinset]
   have hsub : T ⊆ nthRootsFinset m (1 : kbar p) := by
     intro x hx
     obtain ⟨y, hy, rfl⟩ := Finset.mem_image.1 hx
@@ -98,14 +103,18 @@ theorem exists_lift_root {m : ℕ} (hm : ¬ p ∣ m) {c : kbar p} (hc : c ^ m = 
   obtain ⟨y, hy, rfl⟩ := Finset.mem_image.1 hc'
   exact ⟨y, (mem_nthRootsFinset hmp 1).1 hy, rfl⟩
 
-theorem mem_of_fixed (K : IntermediateField ℚ_[p] (PadicAlgCl p)) {x : PadicAlgCl p}
-    (h : ∀ σ : GK p K, σ x = x) : x ∈ K := by
-  obtain ⟨y, hy⟩ := (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := K) (K := PadicAlgCl p) x).2 h
+theorem mem_of_fixed
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) {x : PadicAlgCl p} (h : ∀ σ : GK p K, σ x = x)
+    : x ∈ K := by
+  obtain ⟨y, hy⟩ :=
+    (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := K) (K := PadicAlgCl p) x).2 h
   rw [← hy]
   exact y.2
 
-theorem mem_of_pow_qK_sub_one (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
-    {ζ : PadicAlgCl p} (hζ : ζ ^ (qK p K - 1) = 1) : ζ ∈ K := by
+theorem mem_of_pow_qK_sub_one
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
+    {ζ : PadicAlgCl p} (hζ : ζ ^ (qK p K - 1) = 1)
+    : ζ ∈ K := by
   have hq := one_lt_qK K hK
   have hnd : ¬ p ∣ qK p K - 1 := by simpa using not_dvd_qK_pow_sub_one K hK (n := 1) one_pos
   have hm0 : qK p K - 1 ≠ 0 := by omega
@@ -129,16 +138,19 @@ theorem mem_of_pow_qK_sub_one (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK
   have h4 : ‖σ ζ - ζ‖ < 1 := by
     rw [h3]
     refine lt_of_le_of_lt (norm_sub_le_max' _ _) (max_lt hxc ?_)
-    rw [norm_GK]; exact hxc
+    rw [norm_GK]
+    exact hxc
   exact absurd h2 (ne_of_lt h4)
 
-theorem exists_teichmuller (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
-    {x : PadicAlgCl p} (hx : x ∈ K) (h1 : ‖x‖ = 1) :
-    ∃ ζ ∈ K, ζ ^ (qK p K - 1) = 1 ∧ ‖x - ζ‖ < 1 := by
+theorem exists_teichmuller
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
+    {x : PadicAlgCl p} (hx : x ∈ K) (h1 : ‖x‖ = 1)
+    : ∃ ζ ∈ K, ζ ^ (qK p K - 1) = 1 ∧ ‖x - ζ‖ < 1 := by
   have hq := one_lt_qK K hK
   have hnd : ¬ p ∣ qK p K - 1 := by simpa using not_dvd_qK_pow_sub_one K hK (n := 1) one_pos
   have hm0 : qK p K - 1 ≠ 0 := by omega
-  have hmem : red x ∈ resK p K := (mem_resK_iff K _).2 ⟨⟨x, mem_Obar_iff.2 h1.le⟩, hx, (red_of_le h1.le).symm⟩
+  have hmem : red x ∈ resK p K :=
+    (mem_resK_iff K _).2 ⟨⟨x, mem_Obar_iff.2 h1.le⟩, hx, (red_of_le h1.le).symm⟩
   have hne : red x ≠ 0 := by
     rw [red_of_le h1.le, Ne, res_eq_zero_iff]
     exact not_lt.2 h1.ge

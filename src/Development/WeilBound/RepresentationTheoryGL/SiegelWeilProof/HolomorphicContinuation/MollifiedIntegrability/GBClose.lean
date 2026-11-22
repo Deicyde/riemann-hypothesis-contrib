@@ -12,6 +12,7 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 
 namespace PositivityTheory.Rg.Sw.WR.K.GB
 
-theorem clsGainB : PositivityTheory.Rg.Sw.WR.ClsGain := clsGainB_of cauchyW invar pBound link twist lagr
+theorem clsGainB : PositivityTheory.Rg.Sw.WR.ClsGain :=
+  clsGainB_of cauchyW invar pBound link twist lagr
 
 end PositivityTheory.Rg.Sw.WR.K.GB

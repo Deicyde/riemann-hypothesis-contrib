@@ -7,11 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntDvdOfEqNa
 @[expose] public section
 
 open NumberField
-open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
+open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes
+  GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
 open scoped TensorProduct
 
-theorem UpperTheory.integral_unit_congr_coprime_int_mod :
-    ∀ (p : ℕ) [Fact p.Prime] (ε : (AfP p)ˣ), IsIntAf (ε : AfP p) → IsIntAf ((ε⁻¹ : (AfP p)ˣ) : AfP p) → ∀ n : ℕ, 0 < n → n.Coprime p → ∃ (ν : ℤ) (b : AfP p), IsIntAf b ∧ (ε : AfP p) = (ν : AfP p) + (n : AfP p) * b ∧ IsCoprime ν (n : ℤ) := by
+theorem UpperTheory.integral_unit_congr_coprime_int_mod
+    : ∀ (p : ℕ) [Fact p.Prime] (ε : (AfP p)ˣ),
+      IsIntAf (ε : AfP p) → IsIntAf ((ε⁻¹ : (AfP p)ˣ) : AfP p)
+        → ∀ n : ℕ,
+          0 < n → n.Coprime p
+            → ∃ (ν : ℤ) (b : AfP p),
+              IsIntAf b ∧ (ε : AfP p) = (ν : AfP p) + (n : AfP p) * b ∧ IsCoprime ν (n : ℤ) := by
   intro p _ ε hε hε' n hn hnp
   obtain ⟨ν, b, hb, hνb⟩ := LaHatMod.exists_int_add_mul n hn hnp _ hε
   obtain ⟨μ, b', hb', hμb⟩ := LaHatMod.exists_int_add_mul n hn hnp _ hε'
@@ -21,8 +27,9 @@ theorem UpperTheory.integral_unit_congr_coprime_int_mod :
     simp only [map_add (f := _), map_mul, map_intCast, map_natCast]
     exact add_mem (add_mem (mul_mem (intCast_mem _ ν) (hb' v)) (mul_mem (intCast_mem _ μ) (hb v)))
       (mul_mem (mul_mem (natCast_mem _ n) (hb v)) (hb' v))
-  have hprod : (1 : AfP p) = (ν : AfP p) * μ +
-      n * ((ν : AfP p) * b' + (μ : AfP p) * b + (n : AfP p) * b * b') := by
+  have hprod
+      : (1 : AfP p)
+        = (ν : AfP p) * μ + n * ((ν : AfP p) * b' + (μ : AfP p) * b + (n : AfP p) * b * b') := by
     have : (ε : AfP p) * ((ε⁻¹ : (AfP p)ˣ) : AfP p) = 1 := Units.mul_inv ε
     rw [← this, hνb, hμb]
     ring

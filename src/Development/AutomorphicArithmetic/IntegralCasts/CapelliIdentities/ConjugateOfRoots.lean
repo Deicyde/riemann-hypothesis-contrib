@@ -8,11 +8,13 @@ open scoped ContDiff
 
 namespace UpperTheory.Reformulated.B.ConjugateOfRoots
 
-theorem conj_of_roots {K : Type} [Field K] {n : ℕ} (d : Fin n → K) (hd : Function.Injective d) (N D : GL (Fin n) K)
+theorem conj_of_roots
+    {K : Type} [Field K]
+    {n : ℕ} (d : Fin n → K) (hd : Function.Injective d) (N D : GL (Fin n) K)
     (hD : (D : Matrix (Fin n) (Fin n) K) = Matrix.diagonal d)
-    (hN : ∀ i, (N : Matrix (Fin n) (Fin n) K).charpoly.IsRoot (d i)) : ∃ g : GL (Fin n) K, N = g * D * g⁻¹ := by
-  have hv : ∀ i, ∃ v : Fin n → K, v ≠ 0 ∧
-      (N : Matrix (Fin n) (Fin n) K).mulVec v = d i • v := by
+    (hN : ∀ i, (N : Matrix (Fin n) (Fin n) K).charpoly.IsRoot (d i))
+    : ∃ g : GL (Fin n) K, N = g * D * g⁻¹ := by
+  have hv : ∀ i, ∃ v : Fin n → K, v ≠ 0 ∧ (N : Matrix (Fin n) (Fin n) K).mulVec v = d i • v := by
     intro i
     have h := hN i
     rw [Polynomial.IsRoot.def, Matrix.eval_charpoly] at h
@@ -24,8 +26,8 @@ theorem conj_of_roots {K : Type} [Field K] {n : ℕ} (d : Fin n → K) (hd : Fun
     simp [Matrix.mulVec_diagonal]
   choose v hv0 hv using hv
   have hli : LinearIndependent K v := by
-    refine Module.End.eigenvectors_linearIndependent'
-      (Matrix.toLin' (N : Matrix (Fin n) (Fin n) K)) d hd v fun i => ⟨?_, hv0 i⟩
+    refine Module.End.eigenvectors_linearIndependent' (Matrix.toLin' (N : Matrix (Fin n) (Fin n) K))
+      d hd v fun i => ⟨?_, hv0 i⟩
     rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply, hv i]
   have hP : IsUnit (Matrix.of v).transpose := by
     rw [← Matrix.linearIndependent_cols_iff_isUnit]

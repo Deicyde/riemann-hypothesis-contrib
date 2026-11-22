@@ -5,17 +5,29 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp
+  Matrix IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
-theorem UpperTheory.V.Z.J.ptHyp_ofU :
-    U3.CohInp → Z.Kato.KatoTwo → Th.RigI → Th.RigII → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
-      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) {U : (_root_.UpperTheory.V.U3.Univ (_root_.UpperTheory.V.U3.GCond.noCondition _ (D.η.comp D.ι) (D.Ψ.comp D.ι)))} {g₁ : G ℚ Ω}, D.Marked g₁ → ∀ (S : D.Ring U g₁), ∀ [IsCMField K] (ι : Qbar l ≃+* ℂ), Aut.AutB D ι g₁ → Aut.LemW D ι g₁ →
-      ∀ x₀ : S.R →ₐ[c.O] c.O, IsBase D.η D.Ψ S.r.hom x₀ → PtHyp D.η S.r.hom x₀ := by
+theorem UpperTheory.V.Z.J.ptHyp_ofU
+    : U3.CohInp → Z.Kato.KatoTwo → Th.RigI → Th.RigII
+      → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K]
+          [Algebra K Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ}
+          {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ)
+          {U : (_root_.UpperTheory.V.U3.Univ (_root_.UpperTheory.V.U3.GCond.noCondition _
+            (D.η.comp D.ι) (D.Ψ.comp D.ι)))}
+          {g₁ : G ℚ Ω},
+        D.Marked g₁
+          → ∀ (S : D.Ring U g₁), ∀ [IsCMField K] (ι : Qbar l ≃+* ℂ),
+            Aut.AutB D ι g₁ → Aut.LemW D ι g₁
+              → ∀ x₀ : S.R →ₐ[c.O] c.O, IsBase D.η D.Ψ S.r.hom x₀ → PtHyp D.η S.r.hom x₀ := by
   intro hC hK hRI hRII Ω _ _ _ K _ _ _ l _ c N _ e ψ D U g₁ hM S _ ι hB hW x₀ hx
-  have hCob {Γ κ : Type} [Group Γ] [CommRing κ] (r : Γ →* GG (m := 3) (R := κ))
-      (γ : Γ → Matrix (Fin 3) (Fin 3) κ) (h : γ ∈ ReciprocityTheory.Gal.B1 (adRep r)) :
-      ∃ X, γ = cob r X := by
+  have hCob
+      {Γ κ : Type} [Group Γ] [CommRing κ]
+      (r : Γ →* GG (m := 3) (R := κ)) (γ : Γ → Matrix (Fin 3) (Fin 3) κ)
+      (h : γ ∈ ReciprocityTheory.Gal.B1 (adRep r))
+      : ∃ X, γ = cob r X := by
     obtain ⟨X, hX⟩ := LinearMap.mem_range.mp h
     refine ⟨-X, funext fun g => ?_⟩
     rw [← hX]
@@ -63,9 +75,11 @@ theorem UpperTheory.V.Z.J.ptHyp_ofU :
   · have h1 := tanCoc_isBK hC D hM S F (hF ▸ hf.1)
     rw [hF] at h1
     have hp := isPt_push D hM S f hf.1
-    have hPush {O Γ R κ : Type} [CommRing O] [Group Γ] [CommRing R] [Algebra O R]
-        [CommRing κ] [Algebra O κ] (f' : R →ₐ[O] κ) (r : Γ →* GG (m := 3) (R := R)) :
-        IsPush (f'.comp (entAlg O r).val) r (push f' r) := by
+    have hPush
+        {O Γ R κ : Type}
+        [CommRing O] [Group Γ] [CommRing R] [Algebra O R] [CommRing κ] [Algebra O κ]
+        (f' : R →ₐ[O] κ) (r : Γ →* GG (m := 3) (R := R))
+        : IsPush (f'.comp (entAlg O r).val) r (push f' r) := by
       intro g
       refine ⟨rfl, fun a b => ⟨?_, rfl⟩⟩
       unfold entAlg

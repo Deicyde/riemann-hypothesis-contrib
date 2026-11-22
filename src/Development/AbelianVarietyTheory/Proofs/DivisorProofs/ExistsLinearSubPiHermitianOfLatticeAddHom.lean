@@ -9,12 +9,17 @@ open Complex Matrix
 
 namespace GlobalTheory
 
-theorem exists_linear_sub_pi_mul_form_of_addMonoidHom :
-    ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (H : Matrix (Fin g) (Fin g) ℂ), DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ H.mulVec (star z)).re) → ∀ p : Λ →+ ℂ, ∃ (f : (Fin g → ℂ) →L[ℂ] ℂ) (v : Fin g → ℂ), ∀ l : Λ, p l = f l - Real.pi * (v ⬝ᵥ H.mulVec (star (l : Fin g → ℂ))) := by
+theorem exists_linear_sub_pi_mul_form_of_addMonoidHom
+    : ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (H : Matrix (Fin g) (Fin g) ℂ),
+      DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
+        → (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ H.mulVec (star z)).re)
+        → ∀ p : Λ →+ ℂ, ∃ (f : (Fin g → ℂ) →L[ℂ] ℂ) (v : Fin g → ℂ), ∀ l : Λ,
+          p l = f l - Real.pi * (v ⬝ᵥ H.mulVec (star (l : Fin g → ℂ))) := by
   intro g Λ H _ hΛ hH p
   obtain ⟨F, hF⟩ := AppellHumbert.exists_real_extension Λ hΛ p
   have hinj : Function.Injective H.vecMulLinear := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v hv
     by_contra h0
     have := hH v h0
@@ -30,11 +35,10 @@ theorem exists_linear_sub_pi_mul_form_of_addMonoidHom :
     conv_lhs => rw [AppellHumbert.eq_sum_re_im u]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_add (f := _), map_smul, dotProduct, ← Finset.sum_add_distrib,
-      Pi.star_apply, real_smul, s, c]
+        Pi.star_apply, real_smul, s, c]
     refine Finset.sum_congr rfl fun b _ => ?_
     have h1 : u b = (u b).re + (u b).im * I := (re_add_im _).symm
-    have h2 : star (u b) = (u b).re - (u b).im * I := by
-      apply Complex.ext <;> simp
+    have h2 : star (u b) = (u b).re - (u b).im * I := by apply Complex.ext <;> simp
     rw [h2]
     generalize (u b).re = x at *
     generalize (u b).im = y at *

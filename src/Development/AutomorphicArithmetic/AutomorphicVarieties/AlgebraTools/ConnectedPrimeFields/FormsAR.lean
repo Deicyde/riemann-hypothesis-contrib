@@ -9,9 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-private theorem formsAR_embed {R M : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M]
-    [Module.Finite R M] [Module.IsTorsionFree R M] :
-    ∃ (ι : Type) (_ : Fintype ι) (f : M →ₗ[R] (ι → R)), Function.Injective f := by
+private theorem formsAR_embed
+    {R M : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    [Module.IsTorsionFree R M]
+    : ∃ (ι : Type) (_ : Fintype ι) (f : M →ₗ[R] (ι → R)), Function.Injective f := by
   classical
   obtain ⟨r, s, hs⟩ := Module.Finite.exists_fin (R := R) (M := M)
   obtain ⟨I, indepI, hI⟩ := exists_maximal_linearIndepOn R s
@@ -42,14 +43,14 @@ private theorem formsAR_embed {R M : Type} [CommRing R] [IsDomain R] [AddCommGro
     have h1 := N.smul_mem (∏ j ∈ {i}ᶜ, a j) (ha' i)
     rw [← mul_smul, ← Fintype.prod_eq_prod_compl_mul i] at h1
     exact h1
-  refine ⟨I, inferInstance,
-    b.equivFun.toLinearMap ∘ₗ φ.codRestrict N (fun x => hle ⟨x, rfl⟩), ?_⟩
+  refine ⟨I, inferInstance, b.equivFun.toLinearMap ∘ₗ φ.codRestrict N (fun x => hle ⟨x, rfl⟩), ?_⟩
   intro x y h
   have h2 := b.equivFun.injective h
   exact hφ (congrArg Subtype.val h2)
 
-private theorem formsAR_pi {R ι : Type} [CommRing R] [Fintype ι] (J : Ideal R) (x : ι → R)
-    (hx : ∀ i, x i ∈ J) : x ∈ J • (⊤ : Submodule R (ι → R)) := by
+private theorem formsAR_pi
+    {R ι : Type} [CommRing R] [Fintype ι] (J : Ideal R) (x : ι → R) (hx : ∀ i, x i ∈ J)
+    : x ∈ J • (⊤ : Submodule R (ι → R)) := by
   classical
   have : x = ∑ i, x i • (Pi.single i (1 : R) : ι → R) := by
     ext j
@@ -57,9 +58,10 @@ private theorem formsAR_pi {R ι : Type} [CommRing R] [Fintype ι] (J : Ideal R)
   rw [this]
   exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem_smul (hx i) trivial
 
-theorem UpperTheory.V.AlgebraTools.Conn.formsAR :
-    ∀ {A M : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A] [AddCommGroup M] [Module A M] [Module.Finite A M]
-      [Module.IsTorsionFree A M] (I : Ideal A), ∃ k : ℕ, ∀ (n : ℕ) (m : M),
+theorem UpperTheory.V.AlgebraTools.Conn.formsAR
+    : ∀ {A M : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A] [AddCommGroup M] [Module A M]
+        [Module.Finite A M] [Module.IsTorsionFree A M] (I : Ideal A),
+      ∃ k : ℕ, ∀ (n : ℕ) (m : M),
         (∀ l : Module.Dual A M, l m ∈ I ^ (n + k)) → m ∈ I ^ n • (⊤ : Submodule A M) := by
   intro A M _ _ _ _ _ _ _ I
   obtain ⟨ι, _, f, hf⟩ := formsAR_embed (R := A) (M := M)

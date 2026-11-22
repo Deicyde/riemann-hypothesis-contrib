@@ -12,8 +12,8 @@ namespace GlobalTheory.CompanionTheory.GlLowest
 
 open PositivityTheory.RgDs PositivityTheory.RgDs.K ReciprocityTheory.ChartRestriction.DS
 
-variable {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
-  {L : Fin n → Fin n → Module.End ℂ M} {Φ : M}
+variable
+  {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] {L : Fin n → Fin n → Module.End ℂ M} {Φ : M}
 
 def IsRaising (r : List (Fin n × Fin n)) : Prop := ∀ p ∈ r, p.1 < p.2
 
@@ -22,21 +22,23 @@ def raiseSpan (L : Fin n → Fin n → Module.End ℂ M) (Φ : M) : Submodule �
 
 def wt (r : List (Fin n × Fin n)) : Fin n → ℝ := (r.map fun p => Formalism.REAL.root p.1 p.2).sum
 
-theorem wt_cons (p : Fin n × Fin n) (r : List (Fin n × Fin n)) :
-    wt (p :: r) = Formalism.REAL.root p.1 p.2 + wt r := by
+theorem wt_cons (p : Fin n × Fin n) (r : List (Fin n × Fin n))
+    : wt (p :: r) = Formalism.REAL.root p.1 p.2 + wt r := by
   simp [wt]
 
-theorem root_apply (a b c : Fin n) :
-    Formalism.REAL.root a b c = (if c = a then 1 else 0) - (if c = b then 1 else 0) := by
+theorem root_apply (a b c : Fin n)
+    : Formalism.REAL.root a b c = (if c = a then 1 else 0) - (if c = b then 1 else 0) := by
   simp [Formalism.REAL.root, Pi.single_apply]
 
-theorem lword_cons (p : Fin n × Fin n) (r : List (Fin n × Fin n)) (y : M) :
-    lword L (p :: r) y = L p.1 p.2 (lword L r y) := rfl
+theorem lword_cons (p : Fin n × Fin n) (r : List (Fin n × Fin n)) (y : M)
+    : lword L (p :: r) y = L p.1 p.2 (lword L r y) :=
+  rfl
 
 theorem isRaising_nil : IsRaising ([] : List (Fin n × Fin n)) := fun _ h => by simp at h
 
-theorem isRaising_cons {p : Fin n × Fin n} {r : List (Fin n × Fin n)} (hp : p.1 < p.2)
-    (hr : IsRaising r) : IsRaising (p :: r) := by
+theorem isRaising_cons
+    {p : Fin n × Fin n} {r : List (Fin n × Fin n)} (hp : p.1 < p.2) (hr : IsRaising r)
+    : IsRaising (p :: r) := by
   intro q hq
   rcases List.mem_cons.mp hq with h | h
   · subst h; exact hp
@@ -57,17 +59,19 @@ theorem raise_stable {a b : Fin n} (h : a < b) : ∀ x ∈ raiseSpan L Φ, L a b
   | add y z _ _ hy hz => rw [map_add (f := _)]; exact Submodule.add_mem _ hy hz
   | smul c y _ hy => rw [map_smul]; exact Submodule.smul_mem _ c hy
 
-theorem gl_apply (hL : IsGlRep L) (a b c d : Fin n) (y : M) :
-    L a b (L c d y) = L c d (L a b y) +
-      ((if b = c then L a d y else 0) - (if d = a then L c b y else 0)) := by
+theorem gl_apply (hL : IsGlRep L) (a b c d : Fin n) (y : M)
+    : L a b (L c d y)
+      = L c d (L a b y) + ((if b = c then L a d y else 0) - (if d = a then L c b y else 0)) := by
   have h := congrArg (fun f : Module.End ℂ M => f y) (hL a b c d)
   simp only [LinearMap.sub_apply, Module.End.mul_apply] at h
   rw [← sub_eq_iff_eq_add', h]
   split_ifs <;> simp
 
-theorem letter_word_mem (hL : IsGlRep L) {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
-    (hlow : ∀ a b, b < a → L a b Φ = 0) :
-    ∀ r : List (Fin n × Fin n), IsRaising r → ∀ a b, L a b (lword L r Φ) ∈ raiseSpan L Φ := by
+theorem letter_word_mem
+    (hL : IsGlRep L)
+    {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
+    (hlow : ∀ a b, b < a → L a b Φ = 0)
+    : ∀ r : List (Fin n × Fin n), IsRaising r → ∀ a b, L a b (lword L r Φ) ∈ raiseSpan L Φ := by
   intro r
   induction r with
   | nil =>
@@ -93,9 +97,11 @@ theorem letter_word_mem (hL : IsGlRep L) {μ : Fin n → ℝ} (hd : ∀ a, L a a
       · exact ih hr' p.1 b
       · exact Submodule.zero_mem _
 
-theorem letter_stable (hL : IsGlRep L) {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
-    (hlow : ∀ a b, b < a → L a b Φ = 0) (a b : Fin n) :
-    ∀ x ∈ raiseSpan L Φ, L a b x ∈ raiseSpan L Φ := by
+theorem letter_stable
+    (hL : IsGlRep L)
+    {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
+    (hlow : ∀ a b, b < a → L a b Φ = 0) (a b : Fin n)
+    : ∀ x ∈ raiseSpan L Φ, L a b x ∈ raiseSpan L Φ := by
   intro x hx
   induction hx using Submodule.span_induction with
   | mem y hy =>
@@ -105,16 +111,18 @@ theorem letter_stable (hL : IsGlRep L) {μ : Fin n → ℝ} (hd : ∀ a, L a a �
   | add y z _ _ hy hz => rw [map_add (f := _)]; exact Submodule.add_mem _ hy hz
   | smul c y _ hy => rw [map_smul]; exact Submodule.smul_mem _ c hy
 
-theorem any_word_mem (hL : IsGlRep L) {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
-    (hlow : ∀ a b, b < a → L a b Φ = 0) (w : List (Fin n × Fin n)) :
-    lword L w Φ ∈ raiseSpan L Φ := by
+theorem any_word_mem
+    (hL : IsGlRep L)
+    {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
+    (hlow : ∀ a b, b < a → L a b Φ = 0) (w : List (Fin n × Fin n))
+    : lword L w Φ ∈ raiseSpan L Φ := by
   induction w with
   | nil => exact phi_mem
   | cons p w ih => exact letter_stable hL hd hlow p.1 p.2 _ ih
 
-theorem diag_word (hL : IsGlRep L) {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ) :
-    ∀ r : List (Fin n × Fin n), IsRaising r → ∀ c,
-      L c c (lword L r Φ) = (((μ + wt r) c : ℝ) : ℂ) • lword L r Φ := by
+theorem diag_word (hL : IsGlRep L) {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
+    : ∀ r : List (Fin n × Fin n),
+      IsRaising r → ∀ c, L c c (lword L r Φ) = (((μ + wt r) c : ℝ) : ℂ) • lword L r Φ := by
   intro r
   induction r with
   | nil =>
@@ -146,8 +154,8 @@ theorem diag_word (hL : IsGlRep L) {μ : Fin n → ℝ} (hd : ∀ a, L a a Φ = 
         push_cast
         module
 
-theorem inCone_add_wt (μ : Fin n → ℝ) :
-    ∀ r : List (Fin n × Fin n), IsRaising r → InCone μ (μ + wt r) := by
+theorem inCone_add_wt (μ : Fin n → ℝ)
+    : ∀ r : List (Fin n × Fin n), IsRaising r → InCone μ (μ + wt r) := by
   intro r
   induction r with
   | nil => intro _; simpa [wt] using inCone_refl μ
@@ -168,8 +176,10 @@ theorem inCone_add_wt (μ : Fin n → ℝ) :
         · rw [h0, if_neg h1] at hab'
           exact absurd rfl hab'
       · exact hc a b h0
-    · have hs : ∑ a, ∑ b, (((if a = p.1 then (if b = p.2 then 1 else 0) else 0 : ℕ) : ℝ)) •
-          Formalism.REAL.root a b = Formalism.REAL.root p.1 p.2 := by
+    · have hs
+          : ∑ a, ∑ b, (((if a = p.1 then (if b = p.2 then 1 else 0) else 0 : ℕ) : ℝ)) •
+              Formalism.REAL.root a b
+            = Formalism.REAL.root p.1 p.2 := by
         rw [Finset.sum_eq_single p.1, Finset.sum_eq_single p.2]
         · simp
         · intro b _ hb; simp [hb]
@@ -180,8 +190,9 @@ theorem inCone_add_wt (μ : Fin n → ℝ) :
       simp only [Nat.cast_add, add_smul, Finset.sum_add_distrib]
       rw [hs, ← he', wt_cons, add_comm (wt r)]
 
-theorem pair_wt : ∀ r : List (Fin n × Fin n), IsRaising r →
-    ∑ i : Fin n, (i : ℝ) * wt r i ≤ -(r.length : ℝ) := by
+theorem pair_wt
+    : ∀ r : List (Fin n × Fin n),
+      IsRaising r → ∑ i : Fin n, (i : ℝ) * wt r i ≤ -(r.length : ℝ) := by
   intro r
   induction r with
   | nil => intro _; simp [wt]
@@ -191,15 +202,15 @@ theorem pair_wt : ∀ r : List (Fin n × Fin n), IsRaising r →
     have hp : p.1 < p.2 := hr p List.mem_cons_self
     have h1 : ∑ i : Fin n, (i : ℝ) * Formalism.REAL.root p.1 p.2 i = (p.1 : ℝ) - (p.2 : ℝ) := by
       simp [root_apply, mul_sub, Finset.sum_sub_distrib]
-    have h2 : ((p.1 : ℕ) : ℝ) + 1 ≤ ((p.2 : ℕ) : ℝ) := by
-      exact_mod_cast hp
+    have h2 : ((p.1 : ℕ) : ℝ) + 1 ≤ ((p.2 : ℕ) : ℝ) := by exact_mod_cast hp
     have h3 := ih hr'
     rw [wt_cons]
     simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib, List.length_cons, h1]
     push_cast
     linarith
 
-theorem eq_nil_of_wt_eq_zero {r : List (Fin n × Fin n)} (hr : IsRaising r) (h : wt r = 0) : r = [] := by
+theorem eq_nil_of_wt_eq_zero {r : List (Fin n × Fin n)} (hr : IsRaising r) (h : wt r = 0)
+    : r = [] := by
   have h1 := pair_wt r hr
   rw [h] at h1
   simp only [Pi.zero_apply, mul_zero, Finset.sum_const_zero] at h1
@@ -218,15 +229,18 @@ theorem diag_commute (hL : IsGlRep L) (i j : Fin n) : Commute (L i i) (L j j) :=
     simp only [if_neg h, if_neg h', sub_self] at h1
     exact sub_eq_zero.mp h1
 
-theorem mem_span_of_weight (hL : IsGlRep L) {μ η : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
-    {x : M} (hx : x ∈ raiseSpan L Φ) (hη : ∀ c, L c c x = (η c : ℂ) • x) :
-    x ∈ Submodule.span ℂ {y | ∃ r, IsRaising r ∧ μ + wt r = η ∧ y = lword L r Φ} := by
+theorem mem_span_of_weight
+    (hL : IsGlRep L)
+    {μ η : Fin n → ℝ} (hd : ∀ a, L a a Φ = (μ a : ℂ) • Φ)
+    {x : M} (hx : x ∈ raiseSpan L Φ) (hη : ∀ c, L c c x = (η c : ℂ) • x)
+    : x ∈ Submodule.span ℂ {y | ∃ r, IsRaising r ∧ μ + wt r = η ∧ y = lword L r Φ} := by
   classical
   set S₁ : Set M := {y | ∃ r, IsRaising r ∧ μ + wt r = η ∧ y = lword L r Φ} with hS₁
   set S₂ : Set M := {y | ∃ r, IsRaising r ∧ μ + wt r ≠ η ∧ y = lword L r Φ} with hS₂
   let Wt : (Fin n → ℂ) → Submodule ℂ M := fun χ => ⨅ i, (L i i).maxGenEigenspace (χ i)
   have hind : iSupIndep Wt :=
-    Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo (fun i => L i i)
+    Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo
+      (fun i => L i i)
       (fun i j φ => Module.End.mapsTo_maxGenEigenspace_of_comm (diag_commute hL j i) φ)
   let χη : Fin n → ℂ := fun c => (η c : ℂ)
   have hmemW : ∀ (χ : Fin n → ℂ) (v : M), (∀ c, L c c v = χ c • v) → v ∈ Wt χ := by
@@ -264,7 +278,9 @@ theorem mem_span_of_weight (hL : IsGlRep L) {μ η : Fin n → ℝ} (hd : ∀ a,
 
 theorem lowAlg : LowAlg := by
   intro n M _ _ L μ η Φ x hL hd hlow hx hη h0
-  have hle : Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lword L w Φ) ≤ raiseSpan L Φ := by
+  have hle
+      : Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lword L w Φ)
+        ≤ raiseSpan L Φ := by
     refine Submodule.span_le.2 ?_
     rintro y ⟨w, rfl⟩
     exact any_word_mem hL hd hlow w
@@ -279,8 +295,9 @@ theorem lowAlg : LowAlg := by
     rw [← he]
     exact inCone_add_wt μ r hr
   · intro hμ
-    have hsub : Submodule.span ℂ {y | ∃ r, IsRaising r ∧ μ + wt r = η ∧ y = lword L r Φ} ≤
-        Submodule.span ℂ {Φ} := by
+    have hsub
+        : Submodule.span ℂ {y | ∃ r, IsRaising r ∧ μ + wt r = η ∧ y = lword L r Φ}
+          ≤ Submodule.span ℂ {Φ} := by
       refine Submodule.span_le.2 ?_
       rintro y ⟨r, hr, he, rfl⟩
       have hw : wt r = 0 := by

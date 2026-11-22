@@ -6,15 +6,18 @@ public import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.Selmer
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Polynomial
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Global GroundTheory.Global.SemiLocal
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Global GroundTheory.Global.SemiLocal
 open GroundTheory.Global.AdeleBaseChange
 open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.Tf.Geo
 open scoped ENNReal NumberField.AdeleRing TensorProduct
 
-theorem UpperTheory.unimodular_finite_quotientMeasure_of_cocompact :
-    ∀ (T : Type) [Group T] [TopologicalSpace T] [IsTopologicalGroup T] [LocallyCompactSpace T] [T2Space T] [SecondCountableTopology T] [MeasurableSpace T] [BorelSpace T] (Λ : Subgroup T) [DiscreteTopology Λ] (ν : Measure T) [ν.IsHaarMeasure],
-        (∃ C : Set T, IsCompact C ∧ ∀ t : T, ∃ g ∈ Λ, ∃ y ∈ C, t = g * y) →
-        ν.IsMulRightInvariant ∧ ν.IsInvInvariant ∧ quotientMeasure Λ ν Set.univ < ⊤ := by
+theorem UpperTheory.unimodular_finite_quotientMeasure_of_cocompact
+    : ∀ (T : Type) [Group T] [TopologicalSpace T] [IsTopologicalGroup T] [LocallyCompactSpace T]
+        [T2Space T] [SecondCountableTopology T] [MeasurableSpace T] [BorelSpace T] (Λ : Subgroup T)
+        [DiscreteTopology Λ] (ν : Measure T) [ν.IsHaarMeasure],
+      (∃ C : Set T, IsCompact C ∧ ∀ t : T, ∃ g ∈ Λ, ∃ y ∈ C, t = g * y)
+        → ν.IsMulRightInvariant ∧ ν.IsInvInvariant ∧ quotientMeasure Λ ν Set.univ < ⊤ := by
   intro T _ _ _ _ _ _ _ _ Λ _ ν _ hC
   obtain ⟨C, hC, h⟩ := hC
   haveI : CompactSpace (RightCosetSpace Λ) := by

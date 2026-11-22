@@ -15,20 +15,22 @@ namespace UpperTheory.Gal.InertialTypesAlt.L
 
 section
 
-variable {k K : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-    [Algebra k K] [ValuativeExtension k K] [FiniteDimensional k K]
+variable
+  {k K : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] [Algebra k K]
+  [ValuativeExtension k K] [FiniteDimensional k K]
 
 private theorem mem_int' (s : K ≃ₐ[k] K) (x : 𝒪[K]) : s (x : K) ∈ 𝒪[K] := by
   have hx := x.2
   rw [Valuation.mem_integer_iff] at hx ⊢
   rwa [GroundTheory.LocalField.valuation_algEquiv_apply k K s (x : K)]
 
-variable {F₀ F₁ : Type} [Field F₀] [Fintype F₀] [Field F₁] [Algebra F₀ F₁]
-    {rk : 𝒪[k] →+* F₀} {rK : 𝒪[K] →+* F₁} {s : K ≃ₐ[k] K} {sb : F₁ ≃ₐ[F₀] F₁}
+variable
+  {F₀ F₁ : Type} [Field F₀] [Fintype F₀] [Field F₁] [Algebra F₀ F₁]
+  {rk : 𝒪[k] →+* F₀} {rK : 𝒪[K] →+* F₁} {s : K ≃ₐ[k] K} {sb : F₁ ≃ₐ[F₀] F₁}
 
-private theorem pow_red' (h : IsRes rk rK s sb) (j : ℕ) (x y : 𝒪[K]) (hy : (y : K) = (s ^ j) x) :
-    rK y = (sb ^ j) (rK x) := by
+private theorem pow_red' (h : IsRes rk rK s sb) (j : ℕ) (x y : 𝒪[K]) (hy : (y : K) = (s ^ j) x)
+    : rK y = (sb ^ j) (rK x) := by
   induction j generalizing y with
   | zero =>
     have hyx : y = x := Subtype.ext (by simpa using hy)
@@ -43,8 +45,8 @@ private theorem pow_red' (h : IsRes rk rK s sb) (j : ℕ) (x y : 𝒪[K]) (hy : 
     rw [h.gal z y hyz, hz, pow_succ']
     rfl
 
-private theorem finrank_dvd' [Fintype F₁] (h : IsRes rk rK s sb) :
-    Module.finrank k K ∣ orderOf s := by
+private theorem finrank_dvd' [Fintype F₁] (h : IsRes rk rK s sb)
+    : Module.finrank k K ∣ orderOf s := by
   classical
   haveI : Algebra.IsAlgebraic F₀ F₁ := Algebra.IsAlgebraic.of_finite F₀ F₁
   have hsb : sb = FiniteField.frobeniusAlgEquivOfAlgebraic F₀ F₁ := by
@@ -75,8 +77,7 @@ end
 end UpperTheory.Gal.InertialTypesAlt.L
 
 open UpperTheory.Gal.InertialTypesAlt.L in
-theorem UpperTheory.Gal.InertialTypesAlt.L.derive :
-    UpperTheory.Gal.InertialTypesAlt.L.Derive := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.derive : UpperTheory.Gal.InertialTypesAlt.L.Derive := by
   intro k K _ _ _ _ _ _ _ _ _ hc F₀ F₁ _ _ _ _ _ rk rK s sb h
   haveI hv : ValuativeExtension k K := GlobalTheory.LBC.Inh.valuativeExtension hc
   have hpos : 0 < Module.finrank k K := by

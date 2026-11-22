@@ -13,11 +13,14 @@ namespace GlobalTheory.JR.FourGUnit
 
 variable {F : Type} [NontriviallyNormedField F]
 
-theorem integral_ball_char {r : ℕ} [MeasurableSpace F] [BorelSpace F] [IsUltrametricDist F] [ProperSpace F]
-    (μ : Measure F) [μ.IsAddHaarMeasure] (hvol : μ (Metric.closedBall 0 1) = 1) (ψ : AddChar F ℂ)
-    (hψ : IsStdChar ψ) (v : Fin r → F) :
-    ∫ x, {x : Fin r → F | ∀ i, ‖x i‖ ≤ 1}.indicator (fun x => ψ (x ⬝ᵥ v)) x ∂(Measure.pi fun _ => μ) =
-      {x : Fin r → F | ∀ i, ‖x i‖ ≤ 1}.indicator 1 v := by
+theorem integral_ball_char
+    {r : ℕ} [MeasurableSpace F] [BorelSpace F] [IsUltrametricDist F] [ProperSpace F]
+    (μ : Measure F) [μ.IsAddHaarMeasure]
+    (hvol : μ (Metric.closedBall 0 1) = 1)
+    (ψ : AddChar F ℂ) (hψ : IsStdChar ψ)
+    (v : Fin r → F)
+    : ∫ x, {x : Fin r → F | ∀ i, ‖x i‖ ≤ 1}.indicator (fun x => ψ (x ⬝ᵥ v)) x ∂(Measure.pi fun _ => μ)
+      = {x : Fin r → F | ∀ i, ‖x i‖ ≤ 1}.indicator 1 v := by
   set S : Set (Fin r → F) := {x | ∀ i, ‖x i‖ ≤ 1} with hSdef
   have hS : S = Set.univ.pi fun _ => Metric.closedBall (0 : F) 1 := by
     ext x; simp [S, Metric.mem_closedBall]
@@ -37,8 +40,7 @@ theorem integral_ball_char {r : ℕ} [MeasurableSpace F] [BorelSpace F] [IsUltra
     obtain ⟨i, hi⟩ : ∃ i, 1 < ‖v i‖ := by
       simp only [S, Set.mem_setOf_eq, not_forall, not_le] at hv; exact hv
     obtain ⟨x₀, hx₀, hx₀'⟩ := hψ.2
-    have hvi : v i ≠ 0 := by
-      intro h; rw [h, norm_zero] at hi; linarith
+    have hvi : v i ≠ 0 := by intro h; rw [h, norm_zero] at hi; linarith
     set z₀ : Fin r → F := Pi.single i (x₀ * (v i)⁻¹) with hz₀def
     have hz₀ : z₀ ∈ S := by
       intro j
@@ -54,8 +56,10 @@ theorem integral_ball_char {r : ℕ} [MeasurableSpace F] [BorelSpace F] [IsUltra
       exact hx₀
     have hadd : ∀ a b : Fin r → F, a ∈ S → b ∈ S → a + b ∈ S := fun a b ha hb i =>
       (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (ha i) (hb i))
-    have key : ∀ z, S.indicator (fun x => ψ (x ⬝ᵥ v)) (z + z₀) =
-        S.indicator (fun x => ψ (x ⬝ᵥ v)) z * ψ (z₀ ⬝ᵥ v) := by
+    have key
+        : ∀ z,
+          S.indicator (fun x => ψ (x ⬝ᵥ v)) (z + z₀)
+            = S.indicator (fun x => ψ (x ⬝ᵥ v)) z * ψ (z₀ ⬝ᵥ v) := by
       intro z
       by_cases hz : z ∈ S
       · rw [Set.indicator_of_mem (hadd _ _ hz hz₀), Set.indicator_of_mem hz, add_dotProduct,
@@ -63,10 +67,14 @@ theorem integral_ball_char {r : ℕ} [MeasurableSpace F] [BorelSpace F] [IsUltra
       · have hneg : -z₀ ∈ S := fun j => by rw [Pi.neg_apply, norm_neg]; exact hz₀ j
         have : z + z₀ ∉ S := fun h => hz (by simpa using hadd _ _ h hneg)
         rw [Set.indicator_of_notMem this, Set.indicator_of_notMem hz, zero_mul]
-    have h := integral_add_right_eq_self (μ := Measure.pi fun _ : Fin r => μ)
-      (fun z => S.indicator (fun x => ψ (x ⬝ᵥ v)) z) z₀
+    have h :=
+      integral_add_right_eq_self (μ := Measure.pi fun _ : Fin r => μ)
+        (fun z => S.indicator (fun x => ψ (x ⬝ᵥ v)) z)
+        z₀
     simp only [key, integral_mul_const] at h
-    have h2 : (∫ z, S.indicator (fun x => ψ (x ⬝ᵥ v)) z ∂(Measure.pi fun _ => μ)) * (ψ (z₀ ⬝ᵥ v) - 1) = 0 := by
+    have h2
+        : (∫ z, S.indicator (fun x => ψ (x ⬝ᵥ v)) z ∂(Measure.pi fun _ => μ)) * (ψ (z₀ ⬝ᵥ v) - 1)
+          = 0 := by
       rw [mul_sub, mul_one, h, sub_self]
     rcases mul_eq_zero.mp h2 with h1 | h1
     · exact h1
@@ -76,11 +84,11 @@ end GlobalTheory.JR.FourGUnit
 
 namespace GlobalTheory.JR
 
-
 open FourGUnit in
-theorem fourG_unitG : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
-    [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E) (ψ : AddChar F ℂ), IsStdChar ψ →
-    fourG M ψ (unitG r F) = unitG r F := by
+theorem fourG_unitG
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ → fourG M ψ (unitG r F) = unitG r F := by
   intro F E _ _ _ _ U r M ψ hψ
   letI := M.mF
   haveI := M.bF
@@ -96,8 +104,10 @@ theorem fourG_unitG : ∀ (F E : Type) [NontriviallyNormedField F] [Nontrivially
     ‖Y.2.2.2‖ ≤ 1} with hTdef
   have hT : unitG r F = T.indicator 1 := rfl
   by_cases hP : (∀ i j, ‖A i j‖ ≤ 1) ∧ ‖l‖ ≤ 1
-  · have hint : ∀ b' c' : Fin r → F, unitG r F (A, b', c', l) * ψ (c' ⬝ᵥ b + c ⬝ᵥ b') =
-        S.indicator (fun x => ψ (x ⬝ᵥ c)) b' * S.indicator (fun x => ψ (x ⬝ᵥ b)) c' := by
+  · have hint
+        : ∀ b' c' : Fin r → F,
+          unitG r F (A, b', c', l) * ψ (c' ⬝ᵥ b + c ⬝ᵥ b')
+            = S.indicator (fun x => ψ (x ⬝ᵥ c)) b' * S.indicator (fun x => ψ (x ⬝ᵥ b)) c' := by
       intro b' c'
       by_cases hb' : b' ∈ S
       · by_cases hc' : c' ∈ S
@@ -108,8 +118,10 @@ theorem fourG_unitG : ∀ (F E : Type) [NontriviallyNormedField F] [Nontrivially
             Set.indicator_of_notMem hc', zero_mul, mul_zero]
       · rw [hT, Set.indicator_of_notMem (show (A, b', c', l) ∉ T from fun h => hb' h.2.1),
           Set.indicator_of_notMem hb', zero_mul, zero_mul]
-    have hball : ∀ v : Fin r → F, ∫ x, S.indicator (fun x => ψ (x ⬝ᵥ v)) x ∂(Measure.pi fun _ => M.μF) =
-        S.indicator 1 v := integral_ball_char M.μF M.volF ψ hψ
+    have hball
+        : ∀ v : Fin r → F,
+          ∫ x, S.indicator (fun x => ψ (x ⬝ᵥ v)) x ∂(Measure.pi fun _ => M.μF) = S.indicator 1 v :=
+      integral_ball_char M.μF M.volF ψ hψ
     simp_rw [hint, integral_const_mul, hball, integral_mul_const, hball]
     by_cases hb : b ∈ S
     · by_cases hc : c ∈ S

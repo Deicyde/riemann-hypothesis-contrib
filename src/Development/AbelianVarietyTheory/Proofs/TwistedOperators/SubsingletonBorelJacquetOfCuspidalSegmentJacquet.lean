@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Subsingle
 
 @[expose] public section
 
-open GlobalTheory GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.SmGL.Exponents ValuativeRel
+open GlobalTheory GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.SmGL.Exponents ValuativeRel
 open scoped TensorProduct
 
 namespace GlobalTheory.SmGL.CuspSegment
@@ -14,8 +15,9 @@ namespace GlobalTheory.SmGL.CuspSegment
 def intervals (l d : ℕ) : (Σ _ : Fin l, Fin d) ≃ Fin (l * d) :=
   (Equiv.sigmaEquivProd _ _).trans finProdFinEquiv
 
-theorem intervals_lt {l d : ℕ} {a b : Fin l} {i j : Fin d}
-    (h : intervals l d ⟨a, i⟩ < intervals l d ⟨b, j⟩) : a < b ∨ (a = b ∧ i < j) := by
+theorem intervals_lt
+    {l d : ℕ} {a b : Fin l} {i j : Fin d} (h : intervals l d ⟨a, i⟩ < intervals l d ⟨b, j⟩)
+    : a < b ∨ (a = b ∧ i < j) := by
   have key : (i : ℕ) + d * a < j + d * b := by
     simpa [intervals, finProdFinEquiv, Fin.lt_def] using h
   rcases lt_trichotomy a b with hab | rfl | hab
@@ -46,8 +48,9 @@ theorem unipRad_intervals_le (l d : ℕ) : unipRad R (intervals l d) ≤ unipB R
     rw [hdiag]
     exact Matrix.one_apply_eq i
 
-theorem leviEmb_intervals_mem {l d : ℕ} (g : Levi R fun _ : Fin l => Fin d)
-    (hg : ∀ a, g a ∈ unipB R (Fin d)) : leviEmb R (intervals l d) g ∈ unipB R (Fin (l * d)) := by
+theorem leviEmb_intervals_mem
+    {l d : ℕ} (g : Levi R fun _ : Fin l => Fin d) (hg : ∀ a, g a ∈ unipB R (Fin d))
+    : leviEmb R (intervals l d) g ∈ unipB R (Fin (l * d)) := by
   rw [mem_unipB]
   refine ⟨fun p q hqp => ?_, fun p => ?_⟩
   · obtain ⟨⟨a, i⟩, rfl⟩ := (intervals l d).surjective p
@@ -60,10 +63,12 @@ theorem leviEmb_intervals_mem {l d : ℕ} (g : Levi R fun _ : Fin l => Fin d)
     rw [leviEmb_apply_same]
     exact ((mem_unipB (R := R)).1 (hg a)).2 i
 
-theorem twKer_unipB_eq_top {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {d : ℕ} (hd : 1 < d) {W : Type} [AddCommGroup W] [Module ℂ W]
-    {σ : Representation ℂ (GL (Fin d) k) W} (hσ : IsCuspidal σ) :
-    twKer σ (unipB k (Fin d)) 1 = ⊤ := by
+theorem twKer_unipB_eq_top
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {d : ℕ} (hd : 1 < d)
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {σ : Representation ℂ (GL (Fin d) k) W} (hσ : IsCuspidal σ)
+    : twKer σ (unipB k (Fin d)) 1 = ⊤ := by
   classical
   obtain ⟨-, hcusp⟩ := hσ
 
@@ -77,23 +82,28 @@ theorem twKer_unipB_eq_top {k : Type} [Field k] [ValuativeRel k] [TopologicalSpa
   have hsub : Subsingleton (Jacquet σ (unipRad k e)) := hcusp d (fun _ => 1) e hne
   have hB : Subsingleton (Jacquet σ (unipRad k (points (Fin d)))) :=
     CuspMax.subsingleton_jacquet_of_perm σ (e := e) (e' := points (Fin d)) (Equiv.refl _)
-      (fun i j h => h) hsub
+      (fun i j h => h)
+      hsub
   exact Submodule.Quotient.subsingleton_iff.1 hB
 
-private theorem deltaHalf_eq_one_of_unipB {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {l d : ℕ} (g : Levi k fun _ : Fin l => Fin d)
-    (hg : ∀ a, g a ∈ unipB k (Fin d)) : deltaHalf k (fun _ : Fin l => Fin d) g = 1 := by
+private theorem deltaHalf_eq_one_of_unipB
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {l d : ℕ} (g : Levi k fun _ : Fin l => Fin d) (hg : ∀ a, g a ∈ unipB k (Fin d))
+    : deltaHalf k (fun _ : Fin l => Fin d) g = 1 := by
   rw [deltaHalf_apply]
   refine Finset.prod_eq_one fun a _ => ?_
   rw [det_eq_one_of_mem_unipRad (hu := (show g a ∈ unipRad k (points (Fin d)) from hg a)), map_one]
 
-theorem subsingleton_jacquet_unipB (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (l d : ℕ) (hl : 0 < l) (hd : 1 < d) (V : Type) [AddCommGroup V]
-    [Module ℂ V] (W : Type) [AddCommGroup W] [Module ℂ W] (σ : Representation ℂ (GL (Fin d) k) W)
-    (π : Representation ℂ (GL (Fin (l * d)) k) V) (hσ : IsCuspidal σ)
+theorem subsingleton_jacquet_unipB
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (l d : ℕ) (hl : 0 < l) (hd : 1 < d)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (W : Type) [AddCommGroup W] [Module ℂ W]
+    (σ : Representation ℂ (GL (Fin d) k) W) (π : Representation ℂ (GL (Fin (l * d)) k) V)
+    (hσ : IsCuspidal σ)
     (h : ∀ e : (Σ _ : Fin l, Fin d) ≃ Fin (l * d),
-      Nonempty ((jac e π).Equiv (piTensor (segTerm σ l)))) :
-    Subsingleton (Jacquet π (unipB k (Fin (l * d)))) := by
+      Nonempty ((jac e π).Equiv (piTensor (segTerm σ l))))
+    : Subsingleton (Jacquet π (unipB k (Fin (l * d)))) := by
   classical
   obtain ⟨φ⟩ := h (intervals l d)
   obtain ⟨a₀⟩ : Nonempty (Fin l) := ⟨⟨0, hl⟩⟩
@@ -111,8 +121,9 @@ theorem subsingleton_jacquet_unipB (k : Type) [Field k] [ValuativeRel k] [Topolo
   have hP : ∀ v : V, P (Submodule.Quotient.mk v) = Submodule.Quotient.mk v := fun v =>
     Submodule.factor_mk hUK v
 
-  have hlevi : ∀ g : Levi k (fun _ : Fin l => Fin d), (∀ a, g a ∈ unipB k (Fin d)) →
-      ∀ q, P (jac (intervals l d) π g q) = P q := by
+  have hlevi
+      : ∀ g : Levi k (fun _ : Fin l => Fin d),
+        (∀ a, g a ∈ unipB k (Fin d)) → ∀ q, P (jac (intervals l d) π g q) = P q := by
     intro g hg q
     obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective _ q
     rw [jac_mk, deltaHalf_eq_one_of_unipB g hg, inv_one, Units.val_one, one_smul, hP, hP]
@@ -128,8 +139,9 @@ theorem subsingleton_jacquet_unipB (k : Type) [Field k] [ValuativeRel k] [Topolo
     rw [hfwd, Representation.Equiv.apply_symm_apply, Representation.Equiv.apply_symm_apply]
   let F : (⨂[ℂ] _ : Fin l, W) →ₗ[ℂ] V ⧸ K := P ∘ₗ φ.symm.toLinearMap
   have hFapp : ∀ y, F y = P (φ.symm y) := fun y => rfl
-  have hF : ∀ g : Levi k (fun _ : Fin l => Fin d), (∀ a, g a ∈ unipB k (Fin d)) →
-      ∀ y, F (piTensor (segTerm σ l) g y) = F y := by
+  have hF
+      : ∀ g : Levi k (fun _ : Fin l => Fin d),
+        (∀ a, g a ∈ unipB k (Fin d)) → ∀ y, F (piTensor (segTerm σ l) g y) = F y := by
     intro g hg y
     rw [hFapp, hFapp, hint]
     exact hlevi g hg _
@@ -142,16 +154,19 @@ theorem subsingleton_jacquet_unipB (k : Type) [Field k] [ValuativeRel k] [Topolo
     have hker : twKer (segTerm σ l a₀) (unipB k (Fin d)) 1 ≤ LinearMap.ker (F ∘ₗ Lx) := by
       refine Submodule.span_le.2 ?_
       rintro w ⟨u, v, rfl⟩
-      have hg : ∀ a, (Pi.mulSingle a₀ (u : GL (Fin d) k) : Levi k fun _ : Fin l => Fin d) a ∈
-          unipB k (Fin d) := by
+      have hg
+          : ∀ a,
+            (Pi.mulSingle a₀ (u : GL (Fin d) k) : Levi k fun _ : Fin l => Fin d) a
+              ∈ unipB k (Fin d) := by
         intro a
         by_cases ha : a = a₀
         · rw [ha, Pi.mulSingle_eq_same]
           exact u.2
         · rw [Pi.mulSingle_eq_of_ne ha]
           exact one_mem _
-      have hact : Lx (segTerm σ l a₀ u v) =
-          piTensor (segTerm σ l) (Pi.mulSingle a₀ (u : GL (Fin d) k)) (Lx v) := by
+      have hact
+          : Lx (segTerm σ l a₀ u v)
+            = piTensor (segTerm σ l) (Pi.mulSingle a₀ (u : GL (Fin d) k)) (Lx v) := by
         simp only [Lx, MultilinearMap.toLinearMap_apply, piTensor_tprod]
         congr 1
         funext a
@@ -161,8 +176,7 @@ theorem subsingleton_jacquet_unipB (k : Type) [Field k] [ValuativeRel k] [Topolo
         · simp [ha]
       simp only [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.comp_apply, MonoidHom.one_apply,
         Units.val_one, one_smul, map_sub, hact, hF _ hg, sub_self]
-    have hx : Lx (x a₀) = PiTensorProduct.tprod ℂ x := by
-      simp [Lx]
+    have hx : Lx (x a₀) = PiTensorProduct.tprod ℂ x := by simp [Lx]
     rw [← hx]
     exact LinearMap.mem_ker.1 (hker (by rw [htop]; exact Submodule.mem_top))
   have hF0 : F = 0 := PiTensorProduct.ext (MultilinearMap.ext fun x => by simpa using htens x)

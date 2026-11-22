@@ -10,12 +10,14 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.ChartIntegralLocal
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4 Formalism.FourierDecayAlt.P.Ux10
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.B4 Formalism.FourierDecayAlt.P.Ux10
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {α : Type*} [MeasurableSpace α] {μ : Measure α}
-  {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
+variable
+  {k r : ℕ} {α : Type*} [MeasurableSpace α]
+  {μ : Measure α} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
 
 lemma step_loc {b : Bool} {X : Mat k r} (hX : inLie k r X) (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1)
     (hψm : AEStronglyMeasurable ψ μ) (G : α → Mat k r → E) (hG1 : ∀ ξ, CkOn ((1 : ℕ) : ℕ∞) (GV k r) (G ξ))
@@ -55,15 +57,22 @@ lemma step_loc {b : Bool} {X : Mat k r} (hX : inLie k r X) (ψ : α → ℂ) (h�
   rw [e1.deriv_eq, key.2.deriv]
   simp only [cv_zero]
 
-theorem int_chart_loc (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1) (hψm : AEStronglyMeasurable ψ μ) (h : α → Mat k r → E)
-    (mm : ℕ) (hh : ∀ ξ, CkOn ((mm : ℕ) : ℕ∞) (GV k r) (h ξ)) {g0 : Mat k r} (hg0 : g0 ∈ GV k r) {δ : ℝ}
-    (hδp : 0 < δ) (hcl : Metric.closedBall (0 : J k r → ℝ) δ ⊆ Dom k r)
-    (hM : ∀ w : List (J k r), w.length ≤ mm → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
-      AEStronglyMeasurable (fun ξ => dLR (w.map Lt) [] (h ξ) (chart g0 Y)) μ)
+theorem int_chart_loc
+    (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1) (hψm : AEStronglyMeasurable ψ μ)
+    (h : α → Mat k r → E) (mm : ℕ) (hh : ∀ ξ, CkOn ((mm : ℕ) : ℕ∞) (GV k r) (h ξ))
+    {g0 : Mat k r} (hg0 : g0 ∈ GV k r)
+    {δ : ℝ} (hδp : 0 < δ) (hcl : Metric.closedBall (0 : J k r → ℝ) δ ⊆ Dom k r)
+    (hM : ∀ w : List (J k r),
+      w.length ≤ mm
+        → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
+          AEStronglyMeasurable (fun ξ => dLR (w.map Lt) [] (h ξ) (chart g0 Y)) μ)
     (β : α → ℝ) (hβ : Integrable β μ)
-    (hbd : ∀ w : List (J k r), w.length ≤ mm → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ, ∀ ξ,
-      ‖dLR (w.map Lt) [] (h ξ) (chart g0 Y)‖ ≤ β ξ) :
-    ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) (fun Y => ∫ ξ, ψ ξ • h ξ (chart g0 Y) ∂μ) (Metric.ball 0 δ) := by
+    (hbd : ∀ w : List (J k r),
+      w.length ≤ mm
+        → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ, ∀ ξ, ‖dLR (w.map Lt) [] (h ξ) (chart g0 Y)‖ ≤ β ξ)
+    : ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞)
+      (fun Y => ∫ ξ, ψ ξ • h ξ (chart g0 Y) ∂μ)
+      (Metric.ball 0 δ) := by
   have hΩ : Metric.ball (0 : J k r → ℝ) δ ⊆ Dom k r := Metric.ball_subset_closedBall.trans hcl
   have hcomp : IsCompact (Metric.closedBall (0 : J k r → ℝ) δ) := isCompact_closedBall _ _
   have hac : ContinuousOn (fun Y => ∑ i, ‖aC g0 i Y‖) (Metric.closedBall (0 : J k r → ℝ) δ) :=
@@ -77,33 +86,51 @@ theorem int_chart_loc (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1) (hψm 
     intro w X hX
     obtain ⟨i, _, rfl⟩ := List.mem_map.1 hX
     exact Lt_unit i
-  have hckw : ∀ ξ (w : List (J k r)) (m : ℕ), m + w.length ≤ mm →
-      CkOn ((m : ℕ) : ℕ∞) (GV k r) (dLR (w.map Lt) [] (h ξ)) := by
+  have hckw
+      : ∀ ξ (w : List (J k r)) (m : ℕ),
+        m + w.length ≤ mm → CkOn ((m : ℕ) : ℕ∞) (GV k r) (dLR (w.map Lt) [] (h ξ)) := by
     intro ξ w m hm'
     rw [dLR_eq]
-    exact smooth_on_of_word_derivatives _ (allLie_lr (hunit w) (by simp)) m (ckOn_mono (by rw [length_lr]; simp; omega) (hh ξ))
+    exact smooth_on_of_word_derivatives _ (allLie_lr (hunit w) (by simp)) m
+      (ckOn_mono (by rw [length_lr]; simp; omega) (hh ξ))
   have hsm : ∀ ξ (e : E), ‖ψ ξ • e‖ ≤ ‖e‖ := fun ξ e => by
     rw [norm_smul]; exact mul_le_of_le_one_left (norm_nonneg _) (hψ ξ)
-  have hbw : ∀ (w : List (J k r)), w.length ≤ mm → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ, ∀ ξ,
-      ‖ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)‖ ≤ β ξ := fun w hw Y hY ξ =>
+  have hbw
+      : ∀ (w : List (J k r)),
+        w.length ≤ mm
+          → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ, ∀ ξ,
+            ‖ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)‖ ≤ β ξ := fun w hw Y hY ξ =>
     (hsm ξ _).trans (hbd w hw Y hY ξ)
-  have hmw : ∀ (w : List (J k r)), w.length ≤ mm → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
-      AEStronglyMeasurable (fun ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)) μ := fun w hw Y hY =>
-    hψm.smul (hM w hw Y hY)
+  have hmw
+      : ∀ (w : List (J k r)),
+        w.length ≤ mm
+          → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
+            AEStronglyMeasurable (fun ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)) μ :=
+    fun w hw Y hY => hψm.smul (hM w hw Y hY)
   set L : List (J k r) → (J k r → ℝ) → E :=
     fun w Y => ∫ ξ, ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y) ∂μ with hL
-  have hLc : ∀ w : List (J k r), w.length ≤ mm → ContinuousOn (L w) (Metric.ball (0 : J k r → ℝ) δ) := by
+  have hLc
+      : ∀ w : List (J k r), w.length ≤ mm → ContinuousOn (L w) (Metric.ball (0 : J k r → ℝ) δ) := by
     intro w hw
-    refine continuousOn_of_dominated (F := fun Y ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)) (bound := β)
-      (fun Y hY => hmw w hw Y hY) (fun Y hY => Eventually.of_forall fun ξ => hbw w hw Y hY ξ) hβ
-      (Eventually.of_forall fun ξ => ?_)
+    refine continuousOn_of_dominated
+      (F := fun Y ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y))
+      (bound := β)
+      (fun Y hY => hmw w hw Y hY)
+      (fun Y hY => Eventually.of_forall fun ξ => hbw w hw Y hY ξ)
+      hβ (Eventually.of_forall fun ξ => ?_)
     exact ((cont_chart hg0 (hckw ξ w 0 (by omega))).mono hΩ).const_smul (ψ ξ)
-  have hLd : ∀ w : List (J k r), w.length < mm → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
-      HasFDerivAt (L w) (∑ i, (aC g0 i Y).smulRight (L (i :: w) Y)) Y := by
+  have hLd
+      : ∀ w : List (J k r),
+        w.length < mm
+          → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
+            HasFDerivAt (L w) (∑ i, (aC g0 i Y).smulRight (L (i :: w) Y)) Y := by
     intro w hw Y hY
-    have hD : ∀ ξ, ∀ Y' ∈ Metric.ball (0 : J k r → ℝ) δ,
-        HasFDerivAt (fun Y'' => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y''))
-          (∑ i, (aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))) Y' := by
+    have hD
+        : ∀ ξ, ∀ Y' ∈ Metric.ball (0 : J k r → ℝ) δ,
+          HasFDerivAt
+            (fun Y'' => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y''))
+            (∑ i, (aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y')))
+            Y' := by
       intro ξ Y' hY'
       have h1 := (hasFDeriv_chart hg0 (hckw ξ w 1 (by omega)) (hΩ hY')).const_smul (ψ ξ)
       refine h1.congr_fderiv ?_
@@ -115,47 +142,67 @@ theorem int_chart_loc (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1) (hψm 
       rfl
     have hβ0 : ∀ ξ, 0 ≤ β ξ := fun ξ =>
       (norm_nonneg _).trans (hbd [] (by simp) 0 (Metric.mem_ball_self hδp) ξ)
-    have hF'm : AEStronglyMeasurable (fun ξ => ∑ i, (aC g0 i Y).smulRight
-        (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y))) μ := by
+    have hF'm : AEStronglyMeasurable
+        (fun ξ =>
+          ∑ i, (aC g0 i Y).smulRight
+            (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y)))
+        μ := by
       refine Finset.aestronglyMeasurable_fun_sum _ fun i _ => ?_
-      exact (ContinuousLinearMap.smulRightL ℝ (J k r → ℝ) E (aC g0 i Y)).continuous.comp_aestronglyMeasurable
-        (hmw (i :: w) (by simp; omega) Y hY)
-    have hbF' : ∀ ξ, ∀ Y' ∈ Metric.ball (0 : J k r → ℝ) δ, ‖∑ i, (aC g0 i Y').smulRight
-        (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))‖ ≤ Ba * β ξ := by
+      exact (ContinuousLinearMap.smulRightL ℝ (J k r → ℝ) E
+        (aC g0 i Y)).continuous.comp_aestronglyMeasurable (hmw (i :: w) (by simp; omega) Y hY)
+    have hbF'
+        : ∀ ξ, ∀ Y' ∈ Metric.ball (0 : J k r → ℝ) δ,
+          ‖∑ i, (aC g0 i Y').smulRight
+              (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))‖
+            ≤ Ba * β ξ := by
       intro ξ Y' hY'
-      calc _ ≤ ∑ i, ‖(aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))‖ :=
-            norm_sum_le _ _
-        _ ≤ ∑ i, ‖aC g0 i Y'‖ * β ξ := Finset.sum_le_sum fun i _ => by
+      calc
+        _ ≤ ∑ i, ‖(aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))‖ :=
+          norm_sum_le _ _
+        _ ≤ ∑ i, ‖aC g0 i Y'‖ * β ξ :=
+          Finset.sum_le_sum fun i _ => by
             rw [ContinuousLinearMap.norm_smulRight_apply]
             exact mul_le_mul_of_nonneg_left (hbw (i :: w) (by simp; omega) Y' hY' ξ) (norm_nonneg _)
         _ = (∑ i, ‖aC g0 i Y'‖) * β ξ := by rw [Finset.sum_mul]
         _ ≤ Ba * β ξ := mul_le_mul_of_nonneg_right (hBa' Y' hY') (hβ0 ξ)
-    have key := hasFDerivAt_integral_of_dominated_of_fderiv_le (μ := μ) (𝕜 := ℝ)
-      (F := fun Y' ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y'))
-      (F' := fun Y' ξ => ∑ i, (aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y')))
-      (bound := fun ξ => Ba * β ξ) (Metric.isOpen_ball.mem_nhds hY)
-      (by filter_upwards [Metric.isOpen_ball.mem_nhds hY] with Y' hY' using hmw w hw.le Y' hY')
-      (hβ.mono' (hmw w hw.le Y hY) (Eventually.of_forall fun ξ => hbw w hw.le Y hY ξ))
-      hF'm (Eventually.of_forall fun ξ Y' hY' => hbF' ξ Y' hY') (hβ.const_mul Ba)
-      (Eventually.of_forall fun ξ Y' hY' => hD ξ Y' hY')
+    have key :=
+      hasFDerivAt_integral_of_dominated_of_fderiv_le (μ := μ) (𝕜 := ℝ)
+        (F := fun Y' ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y'))
+        (F' := fun Y' ξ =>
+          ∑ i, (aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y')))
+        (bound := fun ξ => Ba * β ξ)
+        (Metric.isOpen_ball.mem_nhds hY)
+        (by filter_upwards [Metric.isOpen_ball.mem_nhds hY] with Y' hY' using hmw w hw.le Y' hY')
+        (hβ.mono' (hmw w hw.le Y hY) (Eventually.of_forall fun ξ => hbw w hw.le Y hY ξ)) hF'm
+        (Eventually.of_forall fun ξ Y' hY' => hbF' ξ Y' hY') (hβ.const_mul Ba)
+        (Eventually.of_forall fun ξ Y' hY' => hD ξ Y' hY')
     refine key.congr_fderiv ?_
-    have hint : ∀ i, Integrable (fun ξ => ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y)) μ := fun i =>
+    have hint
+        : ∀ i, Integrable (fun ξ => ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y)) μ := fun i =>
       hβ.mono' (hmw (i :: w) (by simp; omega) Y hY)
         (Eventually.of_forall fun ξ => hbw (i :: w) (by simp; omega) Y hY ξ)
-    have hI : ∀ i, Integrable (fun ξ => (aC g0 i Y).smulRight
-        (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y))) μ := fun i =>
+    have hI
+        : ∀ i,
+          Integrable
+            (fun ξ => (aC g0 i Y).smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y)))
+            μ := fun i =>
       (ContinuousLinearMap.smulRightL ℝ (J k r → ℝ) E (aC g0 i Y)).integrable_comp (hint i)
     rw [integral_finsetSum _ (fun i _ => hI i)]
     refine Finset.sum_congr rfl fun i _ => ?_
     exact (ContinuousLinearMap.smulRightL ℝ (J k r → ℝ) E (aC g0 i Y)).integral_comp_comm (hint i)
-  have hAL := ALd (𝔤 := J k r → ℝ) (E := E) Metric.isOpen_ball (aC g0) (fun i => (aC_cd hg0 i).mono hΩ) mm L
-    hLc hLd
+  have hAL :=
+    ALd (𝔤 := J k r → ℝ) (E := E) Metric.isOpen_ball (aC g0)
+      (fun i => (aC_cd hg0 i).mono hΩ)
+      mm L hLc hLd
   exact hAL.congr fun Y _ => rfl
 
-theorem ck_at_of_chart {F : Mat k r → E} {mm : ℕ} {g0 : Mat k r} (hg0 : g0 ∈ GV k r) {δ : ℝ} (hδ : 0 < δ)
-    (hAL : ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) (fun Y => F (chart g0 Y)) (Metric.ball 0 δ)) :
-    ∃ (U : Set (Mat k r)) (F' : Mat k r → E), IsOpen U ∧ g0 ∈ U ∧
-      ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) F' U ∧ ∀ g ∈ U, g ∈ GV k r → F g = F' g := by
+theorem ck_at_of_chart
+    {F : Mat k r → E} {mm : ℕ} {g0 : Mat k r} (hg0 : g0 ∈ GV k r)
+    {δ : ℝ} (hδ : 0 < δ)
+    (hAL : ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) (fun Y => F (chart g0 Y)) (Metric.ball 0 δ))
+    : ∃ (U : Set (Mat k r)) (F' : Mat k r → E),
+      IsOpen U ∧ g0 ∈ U ∧ ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) F' U
+        ∧ ∀ g ∈ U, g ∈ GV k r → F g = F' g := by
   have hgu : IsUnit g0.det := Formalism.QuantumDeterminants.WeylGroupFacts.isUnit_of_uh hg0
   have hg1 : g0 * g0⁻¹ = 1 := Matrix.mul_nonsing_inv _ hgu
   set U := Sr g0 ∩ Formalism.FourierDecayAlt.P.Ux10.rho g0 ⁻¹' Metric.ball (0 : J k r → ℝ) δ with hUdef
@@ -172,13 +219,16 @@ theorem ck_at_of_chart {F : Mat k r → E} {mm : ℕ} {g0 : Mat k r} (hg0 : g0 �
         funext i
         simp only [Formalism.FourierDecayAlt.P.Ux10.rho, hg1, iot, sub_self, Matrix.zero_mul]
         exact co_zero i
-      rw [h3]; exact Metric.mem_ball_self hδ
+      rw [h3]
+      exact Metric.mem_ball_self hδ
   refine ⟨U, fun x => F (chart g0 (Formalism.FourierDecayAlt.P.Ux10.rho g0 x)), hUo, hg0U, ?_, ?_⟩
   · have h4 : ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) (Formalism.FourierDecayAlt.P.Ux10.rho g0) U :=
       ((rho_cd g0).mono Set.inter_subset_left).of_le (by exact_mod_cast le_top)
     exact hAL.comp h4 (by intro x hx; exact hx.2)
   · intro x hx hxG
-    have hh : x * g0⁻¹ ∈ GV k r := Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul hxG (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv hg0)
+    have hh : x * g0⁻¹ ∈ GV k r :=
+      Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul hxG
+        (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv hg0)
     obtain ⟨hl, -, hk⟩ := iot_facts hh hx.1
     show F x = F (kap (prj (Mv (co (iot (x * g0⁻¹))))) * g0)
     rw [Mv_co, prj_of_lie hl, hk, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hgu, Matrix.mul_one]

@@ -8,8 +8,11 @@ namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
 open Finset
 
-theorem pivot {K κ : Type*} [Field K] (R : Subring K) (hR : ∀ x : K, x ∈ R ∨ x⁻¹ ∈ R) (f : κ → K) (s : Finset κ) :
-    (∃ k ∈ s, f k ≠ 0) → ∃ k0 ∈ s, f k0 ≠ 0 ∧ ∀ k ∈ s, f k / f k0 ∈ R := by
+theorem pivot
+    {K κ : Type*} [Field K]
+    (R : Subring K) (hR : ∀ x : K, x ∈ R ∨ x⁻¹ ∈ R)
+    (f : κ → K) (s : Finset κ)
+    : (∃ k ∈ s, f k ≠ 0) → ∃ k0 ∈ s, f k0 ≠ 0 ∧ ∀ k ∈ s, f k / f k0 ∈ R := by
   classical
   induction s using Finset.induction_on with
   | empty => intro h; simp at h
@@ -26,14 +29,14 @@ theorem pivot {K κ : Type*} [Field K] (R : Subring K) (hR : ∀ x : K, x ∈ R 
       · have hinv : f k0 / f a ∈ R := by
           have := (hR (f a / f k0)).resolve_left hfa
           rwa [inv_div] at this
-        have hfa0 : f a ≠ 0 := by
-          intro h0; apply hfa; rw [h0, zero_div]; exact R.zero_mem
+        have hfa0 : f a ≠ 0 := by intro h0; apply hfa; rw [h0, zero_div]; exact R.zero_mem
         refine ⟨a, Finset.mem_insert_self a s, hfa0, ?_⟩
         intro k hk
         rcases Finset.mem_insert.1 hk with rfl | hk
         · rw [div_self hfa0]; exact R.one_mem
         · have : f k / f a = (f k / f k0) * (f k0 / f a) := by field_simp
-          rw [this]; exact R.mul_mem (hR0 k hk) hinv
+          rw [this]
+          exact R.mul_mem (hR0 k hk) hinv
     · push_neg at hs
       have hfa0 : f a ≠ 0 := by
         obtain ⟨k, hk, hfk⟩ := h
@@ -46,19 +49,23 @@ theorem pivot {K κ : Type*} [Field K] (R : Subring K) (hR : ∀ x : K, x ∈ R 
       · rw [div_self hfa0]; exact R.one_mem
       · rw [hs k hk, zero_div]; exact R.zero_mem
 
-private theorem coeff_mem_range_algebraMap_of_linearIndependent {K Kc V Vc M : Type*} [Field K] [Field Kc] [Algebra K Kc]
-    [AddCommGroup V] [Module K V] [AddCommGroup Vc] [Module Kc Vc]
+private theorem coeff_mem_range_algebraMap_of_linearIndependent
+    {K Kc V Vc M : Type*} [Field K] [Field Kc] [Algebra K Kc] [AddCommGroup V] [Module K V]
+    [AddCommGroup Vc] [Module Kc Vc]
     (ι : V →+ Vc) (hιs : ∀ (c : K) (v : V), ι (c • v) = algebraMap K Kc c • ι v)
     (π : M → V →ₗ[K] K) (πc : M → Vc →ₗ[Kc] Kc) (hπ : ∀ m v, πc m (ι v) = algebraMap K Kc (π m v))
-    (hsep : ∀ v : V, (∀ m, π m v = 0) → v = 0) {κ : Type*} (s : Finset κ) (z : κ → V)
-    (hind : ∀ w : s → K, ∑ k : s, w k • z k = 0 → w = 0)
-    (a : κ → Kc) (y : V) (hy : ι y = ∑ k ∈ s, a k • ι (z k)) (k0 : s) :
-    a k0 ∈ Set.range (algebraMap K Kc) := by
+    (hsep : ∀ v : V, (∀ m, π m v = 0) → v = 0)
+    {κ : Type*}
+    (s : Finset κ) (z : κ → V) (hind : ∀ w : s → K, ∑ k : s, w k • z k = 0 → w = 0) (a : κ → Kc)
+    (y : V) (hy : ι y = ∑ k ∈ s, a k • ι (z k))
+    (k0 : s)
+    : a k0 ∈ Set.range (algebraMap K Kc) := by
   classical
-  let T : (s → K) →ₗ[K] V :=
-    { toFun := fun w => ∑ k : s, w k • z k
-      map_add' := fun w w' => by simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := fun c w => by simp [Finset.smul_sum, smul_smul] }
+  let T : (s → K) →ₗ[K] V := {
+    toFun := fun w => ∑ k : s, w k • z k
+    map_add' := fun w w' => by simp [add_smul, Finset.sum_add_distrib]
+    map_smul' := fun c w => by simp [Finset.smul_sum, smul_smul]
+  }
   let φ : M → Module.Dual K (s → K) := fun m => (π m).comp T
   have hspan : Submodule.span K (Set.range φ) = ⊤ := by
     have h1 : (Submodule.span K (Set.range φ)).dualCoannihilator = ⊥ := by
@@ -78,8 +85,9 @@ private theorem coeff_mem_range_algebraMap_of_linearIndependent {K Kc V Vc M : T
     have h3 := congrArg (fun f : Module.Dual K (s → K) => f (Pi.single k 1)) hl
     have hT : ∀ m, φ m (Pi.single k 1) = π m (z k) := by
       intro m; simp [φ, T, Pi.single_apply, ite_smul]
-    simp only [Finsupp.sum, LinearMap.sum_apply, LinearMap.smul_apply,
-      LinearMap.proj_apply, hT, smul_eq_mul] at h3
+    simp only [Finsupp.sum, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.proj_apply, hT,
+        smul_eq_mul]
+      at h3
     rw [h3, Pi.single_apply]
     simp [eq_comm]
   have hy' : ι y = ∑ k : s, a k • ι (z k) := by
@@ -91,31 +99,41 @@ private theorem coeff_mem_range_algebraMap_of_linearIndependent {K Kc V Vc M : T
     rw [map_sum]
   simp only [map_mul, e1, Finset.mul_sum]
   rw [Finset.sum_comm]
-  have h4 : ∀ k : s, ∑ m ∈ l.support, algebraMap K Kc (l m) * (a k * algebraMap K Kc (π m (z k))) =
-      a k * algebraMap K Kc (if k = k0 then 1 else 0) := by
+  have h4
+      : ∀ k : s,
+        ∑ m ∈ l.support, algebraMap K Kc (l m) * (a k * algebraMap K Kc (π m (z k)))
+          = a k * algebraMap K Kc (if k = k0 then 1 else 0) := by
     intro k
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← hz k, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
-    rw [map_mul]; ring
+    rw [map_mul]
+    ring
   rw [Finset.sum_congr rfl (fun k _ => h4 k)]
   simp
 
-theorem descent_core {K Kc V Vc M : Type*} [Field K] [Field Kc] [Algebra K Kc]
-    [AddCommGroup V] [Module K V] [AddCommGroup Vc] [Module Kc Vc]
+theorem descent_core
+    {K Kc V Vc M : Type*} [Field K] [Field Kc] [Algebra K Kc] [AddCommGroup V] [Module K V]
+    [AddCommGroup Vc] [Module Kc Vc]
     (ι : V →+ Vc) (hιs : ∀ (c : K) (v : V), ι (c • v) = algebraMap K Kc c • ι v)
     (π : M → V →ₗ[K] K) (πc : M → Vc →ₗ[Kc] Kc) (hπ : ∀ m v, πc m (ι v) = algebraMap K Kc (π m v))
     (hsep : ∀ v : V, (∀ m, π m v = 0) → v = 0)
     (R : Subring K) (hR : ∀ x : K, x ∈ R ∨ x⁻¹ ∈ R)
-    (A : AddSubgroup Kc) (hA : ∀ r ∈ R, ∀ a ∈ A, algebraMap K Kc r * a ∈ A) {κ : Type*} [DecidableEq κ] :
-    ∀ (n : ℕ) (s : Finset κ), s.card = n → ∀ (z : κ → V) (a : κ → Kc), (∀ k ∈ s, a k ∈ A) → ∀ y : V,
-      ι y = ∑ k ∈ s, a k • ι (z k) →
-      ∃ c : κ → K, (∀ k ∈ s, algebraMap K Kc (c k) ∈ A) ∧ y = ∑ k ∈ s, c k • z k := by
+    (A : AddSubgroup Kc) (hA : ∀ r ∈ R, ∀ a ∈ A, algebraMap K Kc r * a ∈ A)
+    {κ : Type*} [DecidableEq κ]
+    : ∀ (n : ℕ) (s : Finset κ),
+      s.card = n
+        → ∀ (z : κ → V) (a : κ → Kc),
+          (∀ k ∈ s, a k ∈ A)
+            → ∀ y : V,
+              ι y = ∑ k ∈ s, a k • ι (z k)
+                → ∃ c : κ → K, (∀ k ∈ s, algebraMap K Kc (c k) ∈ A) ∧ y = ∑ k ∈ s, c k • z k := by
   classical
-  have hιinj : ∀ v : V, ι v = 0 → v = 0 := fun v hv => hsep v (fun m => by
-    have h0 := hπ m v
-    rw [hv, map_zero] at h0
-    exact (algebraMap K Kc).injective (h0.symm.trans (map_zero _).symm))
+  have hιinj : ∀ v : V, ι v = 0 → v = 0 := fun v hv =>
+    hsep v (fun m => by
+      have h0 := hπ m v
+      rw [hv, map_zero] at h0
+      exact (algebraMap K Kc).injective (h0.symm.trans (map_zero _).symm))
   intro n
   induction n with
   | zero =>
@@ -137,19 +155,23 @@ theorem descent_core {K Kc V Vc M : Type*} [Field K] [Field Kc] [Algebra K Kc]
         set_option synthInstance.maxHeartbeats 100000 in
           rw [eq_neg_of_add_eq_zero_left h1, map_neg, map_sum]
         simp only [hιs]
-      have hy' : ι y = ∑ k ∈ s.erase k0,
-          (a k - algebraMap K Kc (b k / b k0) * a k0) • ι (z k) := by
+      have hy'
+          : ι y
+            = ∑ k ∈ s.erase k0,
+              (a k - algebraMap K Kc (b k / b k0) * a k0) • ι (z k) := by
         rw [hy, ← Finset.add_sum_erase s _ hk0, hzk0, smul_neg, Finset.smul_sum,
           ← Finset.sum_neg_distrib, ← Finset.sum_add_distrib]
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [smul_smul, sub_smul, mul_comm (a k0)]
         abel
-      have hcard : (s.erase k0).card = n := by
-        rw [Finset.card_erase_of_mem hk0, hs]; rfl
-      obtain ⟨c, hcA, hyc⟩ := ih (s.erase k0) hcard z
-        (fun k => a k - algebraMap K Kc (b k / b k0) * a k0)
-        (fun k hk => A.sub_mem (ha k (Finset.mem_of_mem_erase hk))
-          (hA _ (hbR k (Finset.mem_of_mem_erase hk)) _ (ha k0 hk0))) y hy'
+      have hcard : (s.erase k0).card = n := by rw [Finset.card_erase_of_mem hk0, hs]; rfl
+      obtain ⟨c, hcA, hyc⟩ :=
+        ih (s.erase k0) hcard z
+          (fun k => a k - algebraMap K Kc (b k / b k0) * a k0)
+          (fun k hk =>
+            A.sub_mem (ha k (Finset.mem_of_mem_erase hk))
+              (hA _ (hbR k (Finset.mem_of_mem_erase hk)) _ (ha k0 hk0)))
+          y hy'
       refine ⟨fun k => if k = k0 then 0 else c k, fun k hk => ?_, ?_⟩
       · by_cases hkk : k = k0
         · simp only [hkk, if_true, map_zero]; exact A.zero_mem
@@ -161,8 +183,9 @@ theorem descent_core {K Kc V Vc M : Type*} [Field K] [Field Kc] [Algebra K Kc]
     · push_neg at hdep
       have hind : ∀ w : s → K, ∑ k : s, w k • z k = 0 → w = 0 := by
         intro w hw
-        have h5 := hdep (fun k => if h : k ∈ s then w ⟨k, h⟩ else 0) (by
-          rw [← Finset.sum_coe_sort]; simpa using hw)
+        have h5 :=
+          hdep (fun k => if h : k ∈ s then w ⟨k, h⟩ else 0) (by
+            rw [← Finset.sum_coe_sort]; simpa using hw)
         funext k
         simpa using h5 k k.2
       have hr : ∀ k (hk : k ∈ s), a k ∈ Set.range (algebraMap K Kc) := fun k hk =>

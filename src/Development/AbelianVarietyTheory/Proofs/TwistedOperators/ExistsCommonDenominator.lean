@@ -8,10 +8,13 @@ namespace GlobalTheory.CommonDenominatorLemma
 
 open NumberField
 
-theorem exists_common_denominator {E : Type} [inst : Field E] [NumberField E] [StarRing E] {N : ℕ}
-    (L : Submodule (NumberField.RingOfIntegers E) (Fin N → E)) (hL : Submodule.FG L) :
-    ∃ (b : NumberField.RingOfIntegers E), b ≠ (0 : NumberField.RingOfIntegers E) ∧
-      ∀ x ∈ L, ∀ (i : Fin N), ∃ (u : NumberField.RingOfIntegers E), (↑u : E) = (↑b : E) * x i := by
+theorem exists_common_denominator
+    {E : Type} [inst : Field E] [NumberField E] [StarRing E]
+    {N : ℕ} (L : Submodule (NumberField.RingOfIntegers E) (Fin N → E)) (hL : Submodule.FG L)
+    : ∃ (b : NumberField.RingOfIntegers E),
+      b ≠ (0 : NumberField.RingOfIntegers E)
+        ∧ ∀ x ∈ L, ∀ (i : Fin N), ∃ (u : NumberField.RingOfIntegers E),
+          (↑u : E) = (↑b : E) * x i := by
   obtain ⟨s, rfl⟩ := hL
   choose z hz using fun p : (Fin N → E) × Fin N =>
     IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) (p.1 p.2)
@@ -22,9 +25,11 @@ theorem exists_common_denominator {E : Type} [inst : Field E] [NumberField E] [S
   induction hx using Submodule.span_induction with
   | mem g hg =>
     intro i
-    obtain ⟨e, he⟩ := Finset.dvd_prod_of_mem (fun p => ((z p).2 : NumberField.RingOfIntegers E))
-      (show (g, i) ∈ s ×ˢ (Finset.univ : Finset (Fin N)) from
-        Finset.mem_product.mpr ⟨hg, Finset.mem_univ i⟩)
+    obtain ⟨e, he⟩ :=
+      Finset.dvd_prod_of_mem
+        (fun p => ((z p).2 : NumberField.RingOfIntegers E))
+        (show (g, i) ∈ s ×ˢ (Finset.univ : Finset (Fin N)) from
+          Finset.mem_product.mpr ⟨hg, Finset.mem_univ i⟩)
     refine ⟨e * (z (g, i)).1, ?_⟩
     have h := hz (g, i)
     simp only [← NumberField.RingOfIntegers.coe_eq_algebraMap] at h

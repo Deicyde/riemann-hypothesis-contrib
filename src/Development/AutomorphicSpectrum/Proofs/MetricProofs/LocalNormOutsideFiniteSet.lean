@@ -9,7 +9,14 @@ open scoped BigOperators ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.LogLin
 
-theorem exists_log_affine_le : ∀ C n K : ℝ, 0 ≤ C → 0 ≤ n → 0 ≤ K → ∃ C₁ : ℝ, 1 ≤ C₁ ∧ K ≤ C₁ ∧ ∀ x y : ℝ, -K ≤ x → y ≤ n * x + C → C * Real.log (2 + C + max y 0) + C ≤ C₁ * Real.log (2 + C₁ + x) := by
+theorem exists_log_affine_le
+    : ∀ C n K : ℝ,
+      0 ≤ C → 0 ≤ n → 0 ≤ K
+        → ∃ C₁ : ℝ,
+          1 ≤ C₁ ∧ K ≤ C₁
+            ∧ ∀ x y : ℝ,
+              -K ≤ x → y ≤ n * x + C
+                → C * Real.log (2 + C + max y 0) + C ≤ C₁ * Real.log (2 + C₁ + x) := by
   intro C n K hC hn hK
   obtain ⟨A, hA⟩ : ∃ A : ℝ, A = 2 + 2 * C + n := ⟨_, rfl⟩
   have hA0 : 0 < A := by rw [hA]; linarith
@@ -34,7 +41,7 @@ theorem exists_log_affine_le : ∀ C n K : ℝ, 0 ≤ C → 0 ≤ n → 0 ≤ K 
     exact Real.log_le_log (by linarith) hle
   have hlA : Real.log A ≤ A := (Real.log_le_sub_one_of_pos hA0).trans (by linarith)
   have hlu : 1 / 2 ≤ Real.log u := by
-    have h := Real.log_le_log (by norm_num : (0:ℝ) < 2) hu2
+    have h := Real.log_le_log (by norm_num : (0 : ℝ) < 2) hu2
     have h' := Real.log_two_gt_d9
     linarith
   have h3 : C * Real.log (2 + C + max y 0) ≤ C * (A + Real.log u) :=

@@ -9,27 +9,35 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomolo
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CxPts
 
 namespace GlobalTheory.CompanionTheory.Gaga
 
-theorem dim_eq_of_mem_inf {X Y : Scheme.{0}} (f : X ⟶ Y) {U V : X.Opens} {n m : ℕ}
+theorem dim_eq_of_mem_inf
+    {X Y : Scheme.{0}} (f : X ⟶ Y)
+    {U V : X.Opens} {n m : ℕ}
     (hU : SmoothOfRelativeDimension n (U.ι ≫ f)) (hV : SmoothOfRelativeDimension m (V.ι ≫ f))
-    {x : X} (hxU : x ∈ U) (hxV : x ∈ V) : n = m := by
+    {x : X} (hxU : x ∈ U) (hxV : x ∈ V)
+    : n = m := by
   have e₁ : SmoothOfRelativeDimension (0 + n) ((U ⊓ V).ι ≫ f) := by
     rw [← Scheme.homOfLE_ι _ (inf_le_left : U ⊓ V ≤ U), Category.assoc]; infer_instance
   have e₂ : SmoothOfRelativeDimension (0 + m) ((U ⊓ V).ι ≫ f) := by
     rw [← Scheme.homOfLE_ι _ (inf_le_right : U ⊓ V ≤ V), Category.assoc]; infer_instance
   simpa using ReciprocityTheory.ChartRestriction.G.H1.dim_unique _ e₁ e₂ ⟨x, hxU, hxV⟩
 
-theorem smoothOfRelativeDimension_iSup {X Y : Scheme.{0}} (f : X ⟶ Y) (D : ℕ) {ι : Type*}
-    (U : ι → X.Opens) (hU : ∀ i, SmoothOfRelativeDimension D ((U i).ι ≫ f)) :
-    SmoothOfRelativeDimension D ((⨆ i, U i).ι ≫ f) := by
+theorem smoothOfRelativeDimension_iSup
+    {X Y : Scheme.{0}} (f : X ⟶ Y)
+    (D : ℕ)
+    {ι : Type*} (U : ι → X.Opens) (hU : ∀ i, SmoothOfRelativeDimension D ((U i).ι ≫ f))
+    : SmoothOfRelativeDimension D ((⨆ i, U i).ι ≫ f) := by
   have : IsZariskiLocalAtSource (@SmoothOfRelativeDimension.{0} D) :=
     HasRingHomProperty.instIsZariskiLocalAtSource
   refine IsZariskiLocalAtSource.of_iSup_eq_top (P := @SmoothOfRelativeDimension.{0} D)
-    (fun i => (⨆ i, U i).ι ⁻¹ᵁ U i) ?_ fun i => ?_
+    (fun i => (⨆ i, U i).ι ⁻¹ᵁ U i)
+    ?_
+    fun i => ?_
   · refine top_le_iff.1 fun x _ => ?_
     obtain ⟨i, hi⟩ := Opens.mem_iSup.1 x.2
     exact Opens.mem_iSup.2 ⟨i, hi⟩
@@ -47,8 +55,12 @@ theorem smoothOfRelativeDimension_iSup {X Y : Scheme.{0}} (f : X ⟶ Y) (D : ℕ
     rw [e]
     exact IsZariskiLocalAtSource.comp (P := @SmoothOfRelativeDimension.{0} D) (hU i) k
 
-theorem exists_clopen_smoothOfRelativeDimension :
-    ∀ (X : Scheme.{0}) (s : X ⟶ Sp ℂ), Smooth s → ∃ W : ℕ → X.Opens, (∀ D, IsClosed (W D : Set X)) ∧ (∀ D, SmoothOfRelativeDimension D ((W D).ι ≫ s)) ∧ (⨆ D, W D) = ⊤ ∧ Pairwise fun D D' => W D ⊓ W D' = ⊥ := by
+theorem exists_clopen_smoothOfRelativeDimension
+    : ∀ (X : Scheme.{0}) (s : X ⟶ Sp ℂ),
+      Smooth s
+        → ∃ W : ℕ → X.Opens,
+          (∀ D, IsClosed (W D : Set X)) ∧ (∀ D, SmoothOfRelativeDimension D ((W D).ι ≫ s))
+            ∧ (⨆ D, W D) = ⊤ ∧ Pairwise fun D D' => W D ⊓ W D' = ⊥ := by
   intro X s hs
   let W : ℕ → X.Opens := fun D => ⨆ U : {U : X.Opens // SmoothOfRelativeDimension D (U.ι ≫ s)}, U.1
   have hsm : ∀ D, SmoothOfRelativeDimension D ((W D).ι ≫ s) := fun D =>

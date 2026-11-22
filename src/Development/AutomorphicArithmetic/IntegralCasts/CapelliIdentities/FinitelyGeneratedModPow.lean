@@ -6,16 +6,19 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.FinitelyGeneratedModPow
 
-theorem fg_mod_pow {O A : Type} [CommRing O] [CommRing A] [Algebra O A] [IsNoetherianRing A]
-    (m : Ideal A) (hres : ∀ x : A, ∃ a : O, x - algebraMap O A a ∈ m) (n : ℕ) :
-    ∃ N : Submodule O A, N.FG ∧ ∀ x : A, ∃ y ∈ N, x - y ∈ m ^ n := by
+theorem fg_mod_pow
+    {O A : Type} [CommRing O] [CommRing A] [Algebra O A] [IsNoetherianRing A]
+    (m : Ideal A) (hres : ∀ x : A, ∃ a : O, x - algebraMap O A a ∈ m)
+    (n : ℕ)
+    : ∃ N : Submodule O A, N.FG ∧ ∀ x : A, ∃ y ∈ N, x - y ∈ m ^ n := by
   induction n with
   | zero => exact ⟨⊥, Submodule.fg_bot, fun x => ⟨0, Submodule.zero_mem _, by simp⟩⟩
   | succ n ih =>
     obtain ⟨N, hN, hx⟩ := ih
     obtain ⟨s, hs⟩ : (m ^ n).FG := IsNoetherian.noetherian (m ^ n)
-    have key : ∀ z ∈ Ideal.span (s : Set A),
-        ∃ w ∈ Submodule.span O (s : Set A), z - w ∈ m ^ (n + 1) := by
+    have key
+        : ∀ z ∈ Ideal.span (s : Set A), ∃ w ∈ Submodule.span O (s : Set A),
+          z - w ∈ m ^ (n + 1) := by
       intro z hz
       induction hz using Submodule.span_induction with
       | mem z hz => exact ⟨z, Submodule.subset_span hz, by simp⟩

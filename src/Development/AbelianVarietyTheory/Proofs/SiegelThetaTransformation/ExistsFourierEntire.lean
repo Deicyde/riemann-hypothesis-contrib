@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 @[expose] public section
 
-open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open GlobalTheory.SW hiding Level
 open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
@@ -16,60 +17,84 @@ open scoped ComplexConjugate ComplexOrder Real Classical
 
 namespace GlobalTheory.Ker.LevelTheta
 
-theorem exists_fourier_entire {ι : Type} [Fintype ι] (f : (ι → ℂ) → ℂ) (hf : Differentiable ℂ f)
-    (hper : ∀ z, ∀ m : ι → ℤ, f (z + fun i => (m i : ℂ)) = f z) :
-    ∃ a : (ι → ℤ) → ℂ,
-      (∀ z, HasSum (fun ν : ι → ℤ => a ν * cexp (2 * π * I * ∑ i, (ν i : ℂ) * z i)) (f z)) ∧
-      ∀ (w : ι → ℂ) (ν : ι → ℤ), a ν = ∫ x in Set.Icc (0 : ι → ℝ) 1,
-        f ((fun i => (x i : ℂ)) + w) *
-          cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + w i))) := by
-  obtain ⟨a, h1, h2⟩ := exists_fourier_expansion_tube ι Set.univ f isOpen_univ convex_univ
-    hf.differentiableOn (fun z _ m => hper z m)
+theorem exists_fourier_entire
+    {ι : Type} [Fintype ι]
+    (f : (ι → ℂ) → ℂ)
+    (hf : Differentiable ℂ f) (hper : ∀ z, ∀ m : ι → ℤ, f (z + fun i => (m i : ℂ)) = f z)
+    : ∃ a : (ι → ℤ) → ℂ,
+      (∀ z, HasSum (fun ν : ι → ℤ => a ν * cexp (2 * π * I * ∑ i, (ν i : ℂ) * z i)) (f z))
+        ∧ ∀ (w : ι → ℂ) (ν : ι → ℤ),
+          a ν
+            = ∫ x in Set.Icc (0 : ι → ℝ) 1,
+              f ((fun i => (x i : ℂ)) + w) *
+                cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + w i))) := by
+  obtain ⟨a, h1, h2⟩ :=
+    exists_fourier_expansion_tube ι Set.univ f isOpen_univ convex_univ hf.differentiableOn
+      (fun z _ m => hper z m)
   refine ⟨a, fun z => h1 z trivial, fun w ν => ?_⟩
-  have key := Koecher.setIntegral_unitCube_tube (U := Set.univ)
-    (f := fun z => f z * cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * z i))) isOpen_univ
-    isPreconnected_univ (fun _ _ _ => trivial)
-    (hf.differentiableOn.mul (Differentiable.differentiableOn (by fun_prop))) (fun z hz i => ?_)
-    (Set.mem_univ (fun i => I * (((0 : ι → ℝ) i : ℝ) : ℂ))) (Set.mem_univ w)
+  have key :=
+    Koecher.setIntegral_unitCube_tube (U := Set.univ)
+      (f := fun z => f z * cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * z i)))
+      isOpen_univ isPreconnected_univ
+      (fun _ _ _ => trivial)
+      (hf.differentiableOn.mul (Differentiable.differentiableOn (by fun_prop)))
+      (fun z hz i => ?_)
+      (Set.mem_univ (fun i => I * (((0 : ι → ℝ) i : ℝ) : ℂ))) (Set.mem_univ w)
   · rw [h2 0 trivial ν]
     refine Eq.trans ?_ key
-    exact (setIntegral_congr_set (μ := volume) (Measure.univ_pi_Ico_ae_eq_Icc
-      (f := (0 : ι → ℝ)) (g := 1)))
+    exact (setIntegral_congr_set (μ := volume)
+      (Measure.univ_pi_Ico_ae_eq_Icc (f := (0 : ι → ℝ)) (g := 1)))
   · have e0 : (Pi.single i 1 : ι → ℂ) = fun j => (((Pi.single i 1 : ι → ℤ) j : ℤ) : ℂ) := by
       funext j
       by_cases hij : j = i
       · subst hij; simp
       · simp [hij]
-    have e : ∑ j, (ν j : ℂ) * (z + (Pi.single i 1 : ι → ℂ)) j
-        = ∑ j, (ν j : ℂ) * z j + ν i := by
+    have e : ∑ j, (ν j : ℂ) * (z + (Pi.single i 1 : ι → ℂ)) j = ∑ j, (ν j : ℂ) * z j + ν i := by
       simp [mul_add, Finset.sum_add_distrib, Pi.single_apply]
     rw [e, e0, hper z, mul_add, neg_add, Complex.exp_add]
     have : cexp (-(2 * π * I * (ν i : ℂ))) = 1 := by
-      rw [← Complex.exp_int_mul_two_pi_mul_I (-ν i)]
+      rw [← Complex.exp_int_mul_two_pi_mul_I (- ν i)]
       congr 1
       push_cast
       ring
     rw [this, mul_one]
 
-theorem quad_add {ι : Type} [Fintype ι] {τ : Matrix ι ι ℂ} (h : τ.IsSymm) (u v : ι → ℂ) :
-    (u + v) ⬝ᵥ τ *ᵥ (u + v) = u ⬝ᵥ τ *ᵥ u + 2 * (u ⬝ᵥ τ *ᵥ v) + v ⬝ᵥ τ *ᵥ v := by
+theorem quad_add {ι : Type} [Fintype ι] {τ : Matrix ι ι ℂ} (h : τ.IsSymm) (u v : ι → ℂ)
+    : (u + v) ⬝ᵥ τ *ᵥ (u + v) = u ⬝ᵥ τ *ᵥ u + 2 * (u ⬝ᵥ τ *ᵥ v) + v ⬝ᵥ τ *ᵥ v := by
   have : v ⬝ᵥ τ *ᵥ u = u ⬝ᵥ τ *ᵥ v := by
     rw [dotProduct_mulVec, ← mulVec_transpose, h.eq, dotProduct_comm]
   rw [mulVec_add, add_dotProduct, dotProduct_add, dotProduct_add, this]
   ring
 
-theorem exists_thS_eq : ∀ (n g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ), τ ∈ Siegel (Fin g) → ∀ (N : ℕ), 0 < N → ∀ Θ : (Fin n → Fin g → ℂ) → ℂ, Differentiable ℂ Θ → (∀ (a : Fin n → Fin g → ℤ) ζ, Θ (fun k i => ζ k i + N * a k i) = Θ ζ) → (∀ (b : Fin n → Fin g → ℤ) ζ, cexp (π * I * ∑ k, ((fun i => (N * b k i : ℂ)) ⬝ᵥ τ *ᵥ (fun i => (N * b k i : ℂ)) + 2 * ((fun i => (N * b k i : ℂ)) ⬝ᵥ ζ k))) * Θ (fun k => ζ k + τ *ᵥ fun i => (N * b k i : ℂ)) = Θ ζ) → ∃ φ : TF n g, IsSB φ ∧ ∀ ζ, thS φ τ ζ = Θ ζ := by
+theorem exists_thS_eq
+    : ∀ (n g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ),
+      τ ∈ Siegel (Fin g)
+        → ∀ (N : ℕ),
+          0 < N
+            → ∀ Θ : (Fin n → Fin g → ℂ) → ℂ,
+              Differentiable ℂ Θ
+                → (∀ (a : Fin n → Fin g → ℤ) ζ, Θ (fun k i => ζ k i + N * a k i) = Θ ζ)
+                → (∀ (b : Fin n → Fin g → ℤ) ζ,
+                  cexp
+                        (π * I
+                          * ∑ k, ((fun i => (N * b k i : ℂ)) ⬝ᵥ τ *ᵥ (fun i => (N * b k i : ℂ)) + 2 * ((fun i => (N * b k i : ℂ)) ⬝ᵥ ζ k)))
+                      * Θ (fun k => ζ k + τ *ᵥ fun i => (N * b k i : ℂ))
+                    = Θ ζ)
+                → ∃ φ : TF n g, IsSB φ ∧ ∀ ζ, thS φ τ ζ = Θ ζ := by
   intro n g τ hτ N hN Θ hΘ hp hq
   have hN0 : (N : ℂ) ≠ 0 := by exact_mod_cast hN.ne'
   have hNq : (N : ℚ) ≠ 0 := by exact_mod_cast hN.ne'
-  obtain ⟨a, hs, ha⟩ := exists_fourier_entire (ι := Fin n × Fin g)
-    (fun z => Θ fun k i => N * z (k, i)) (hΘ.comp (by fun_prop)) (fun z m => by
-      rw [← hp (fun k i => m (k, i)) fun k i => N * z (k, i)]
-      congr 1
-      funext k i
-      simp [mul_add])
-  let e : (Fin n × Fin g → ℤ) → Matrix (Fin n) (Fin g) ℚ :=
-    fun ν => Matrix.of fun k i => (ν (k, i) : ℚ) / N
+  obtain ⟨a, hs, ha⟩ :=
+    exists_fourier_entire (ι := Fin n × Fin g)
+      (fun z => Θ fun k i => N * z (k, i))
+      (hΘ.comp (by fun_prop))
+      (fun z m => by
+        rw [← hp (fun k i => m (k, i)) fun k i => N * z (k, i)]
+        congr 1
+        funext k i
+        simp [mul_add])
+  let e : (Fin n × Fin g → ℤ) → Matrix (Fin n) (Fin g) ℚ := fun ν =>
+    Matrix.of fun k i => (ν (k, i) : ℚ) / N
   have he : Function.Injective e := by
     intro m m' hmn
     funext ⟨k, i⟩
@@ -83,30 +108,33 @@ theorem exists_thS_eq : ∀ (n g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ), τ �
     simp only [φ]
     rw [Function.extend_apply' _ _ _ hx]
     simp
-  have hshift : ∀ (ν : Fin n × Fin g → ℤ) (b : Fin n → Fin g → ℤ),
-      e ν + (N : ℚ) • (Matrix.of fun k i => (b k i : ℚ)) =
-        e (fun p => ν p + N ^ 2 * b p.1 p.2) := by
+  have hshift
+      : ∀ (ν : Fin n × Fin g → ℤ) (b : Fin n → Fin g → ℤ),
+        e ν + (N : ℚ) • (Matrix.of fun k i => (b k i : ℚ))
+          = e (fun p => ν p + N ^ 2 * b p.1 p.2) := by
     intro ν b
     ext k i
     simp only [e, of_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
     push_cast
     field_simp
-  have hlaw : ∀ (ν : Fin n × Fin g → ℤ) (b : Fin n → Fin g → ℤ),
-      φ (e ν + (N : ℚ) • (Matrix.of fun k i => (b k i : ℚ))) = φ (e ν) := by
+  have hlaw
+      : ∀ (ν : Fin n × Fin g → ℤ) (b : Fin n → Fin g → ℤ),
+        φ (e ν + (N : ℚ) • (Matrix.of fun k i => (b k i : ℚ))) = φ (e ν) := by
     intro ν b
-    have hQ : Q (e ν + (N : ℚ) • (Matrix.of fun k i => (b k i : ℚ))) =
-        Q (e ν) + 2 * ∑ k, ∑ i, (ν (k, i) : ℂ) * (τ *ᵥ fun j => (b k j : ℂ)) i +
-          ∑ k, (fun i => (N * b k i : ℂ)) ⬝ᵥ τ *ᵥ (fun i => (N * b k i : ℂ)) := by
+    have hQ
+        : Q (e ν + (N : ℚ) • (Matrix.of fun k i => (b k i : ℚ)))
+          = Q (e ν) + 2 * ∑ k, ∑ i, (ν (k, i) : ℂ) * (τ *ᵥ fun j => (b k j : ℂ)) i
+            + ∑ k, (fun i => (N * b k i : ℂ)) ⬝ᵥ τ *ᵥ (fun i => (N * b k i : ℂ)) := by
       simp only [Q, Finset.mul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
-      have h1 : qv ((e ν + (N : ℚ) • (Matrix.of fun k i => (b k i : ℚ))) k) =
-          qv (e ν k) + fun i => (N * b k i : ℂ) := by
+      have h1
+          : qv ((e ν + (N : ℚ) • (Matrix.of fun k i => (b k i : ℚ))) k)
+            = qv (e ν k) + fun i => (N * b k i : ℂ) := by
         funext i
         simp [qv]
       rw [h1, quad_add hτ.1]
       congr 2
-      have h2 : (fun i => (N * b k i : ℂ)) = (N : ℂ) • fun i => (b k i : ℂ) := by
-        funext i; simp
+      have h2 : (fun i => (N * b k i : ℂ)) = (N : ℂ) • fun i => (b k i : ℂ) := by funext i; simp
       rw [h2, mulVec_smul, dotProduct, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       simp only [qv, e, of_apply, Pi.smul_apply, smul_eq_mul]
@@ -114,26 +142,31 @@ theorem exists_thS_eq : ∀ (n g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ), τ �
       field_simp
     have h := hφe (fun p => ν p + N ^ 2 * b p.1 p.2)
     rw [← hshift] at h
-    rw [h, hφe, hQ, ha 0, ha (fun p => (τ *ᵥ fun j => (b p.1 j : ℂ)) p.2) ν,
-      ← integral_mul_const, ← integral_mul_const]
+    rw [h, hφe, hQ, ha 0, ha (fun p => (τ *ᵥ fun j => (b p.1 j : ℂ)) p.2) ν, ← integral_mul_const,
+      ← integral_mul_const]
     congr 1
     funext x
     rw [← hq b]
-    have h3 : (fun k => (fun k i => (N : ℂ) * ((fun p : Fin n × Fin g => (x p : ℂ)) + 0) (k, i)) k +
-        τ *ᵥ fun i => (N * b k i : ℂ)) =
-        fun k i => (N : ℂ) * ((fun p : Fin n × Fin g => (x p : ℂ)) +
-          fun p : Fin n × Fin g => (τ *ᵥ fun j => (b p.1 j : ℂ)) p.2) (k, i) := by
+    have h3
+        : (fun k =>
+            (fun k i => (N : ℂ) * ((fun p : Fin n × Fin g => (x p : ℂ)) + 0) (k, i)) k
+              + τ *ᵥ fun i => (N * b k i : ℂ))
+          = fun k i =>
+            (N : ℂ)
+              * ((fun p : Fin n × Fin g => (x p : ℂ))
+                  + fun p : Fin n × Fin g => (τ *ᵥ fun j => (b p.1 j : ℂ)) p.2)
+                (k, i) := by
       funext k i
-      have h2 : (fun i => (N * b k i : ℂ)) = (N : ℂ) • fun i => (b k i : ℂ) := by
-        funext i; simp
+      have h2 : (fun i => (N * b k i : ℂ)) = (N : ℂ) • fun i => (b k i : ℂ) := by funext i; simp
       rw [h2, mulVec_smul]
       simp [mul_add]
     rw [h3, mul_comm (cexp _) (Θ _)]
     simp only [mul_assoc (Θ _), ← Complex.exp_add]
     congr 2
-    have h4 : ∑ k, (fun i => (N * b k i : ℂ)) ⬝ᵥ
-        (fun i => (N : ℂ) * ((fun p : Fin n × Fin g => (x p : ℂ)) + 0) (k, i)) =
-        ∑ k, ∑ i, (N : ℂ) ^ 2 * b k i * x (k, i) := by
+    have h4
+        : ∑ k, (fun i => (N * b k i : ℂ)) ⬝ᵥ
+            (fun i => (N : ℂ) * ((fun p : Fin n × Fin g => (x p : ℂ)) + 0) (k, i))
+          = ∑ k, ∑ i, (N : ℂ) ^ 2 * b k i * x (k, i) := by
       refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun i _ => ?_
       simp only [Pi.add_apply, Pi.zero_apply]
       ring

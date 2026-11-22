@@ -19,7 +19,8 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverM
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory
@@ -44,22 +45,31 @@ lemma translHom_mul (a c : 𝟙_ (Over (Sp K)) ⟶ A) :
 
 end FiniteQuot
 
-
 open FiniteQuot PointQuot AbelianQuotient in
-theorem exists_quotient_abelian_by_finite_points :
-    ∀ (k : Type) [Field k] [IsAlgClosed k] (A : Over (Sp k)) [GrpObj A], IsAbelianScheme A → ∀ C : Subgroup (𝟙_ (Over (Sp k)) ⟶ A), Finite C → ∃ (B : Over (Sp k)) (_ : GrpObj B) (ψ : A ⟶ B), IsAbelianScheme B ∧ IsMonHom ψ ∧ IsFinite ψ.left ∧ Etale ψ.left ∧ Surjective ψ.left ∧ ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (t : Sp k' ⟶ Sp k) (x : Over.mk t ⟶ A), x ≫ ψ = 1 ↔ ∃ c ∈ C, x = toUnit _ ≫ c := by
+theorem exists_quotient_abelian_by_finite_points
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (A : Over (Sp k)) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ C : Subgroup (𝟙_ (Over (Sp k)) ⟶ A),
+          Finite C
+            → ∃ (B : Over (Sp k)) (_ : GrpObj B) (ψ : A ⟶ B),
+              IsAbelianScheme B ∧ IsMonHom ψ ∧ IsFinite ψ.left ∧ Etale ψ.left ∧ Surjective ψ.left
+                ∧ ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (t : Sp k' ⟶ Sp k) (x : Over.mk t ⟶ A),
+                  x ≫ ψ = 1 ↔ ∃ c ∈ C, x = toUnit _ ≫ c := by
   open FiniteQuot PointQuot in
   intro k _ _ A _ hA C hC
   have := hA.comm
   have hq : IsQProjOver A.hom := by
-    obtain ⟨N, i, hi, e⟩ := (ProjSpace.isProjBy_iff_isProjOver A.hom).1
-      (AbelianProjective.isProjBy_of_isAbelianScheme k A hA)
+    obtain ⟨N, i, hi, e⟩ :=
+      (ProjSpace.isProjBy_iff_isProjOver A.hom).1
+        (AbelianProjective.isProjBy_of_isAbelianScheme k A hA)
     exact ⟨N, i, inferInstance, inferInstance, e⟩
   obtain ⟨Y, π, sY, hw, hG, hsep, hlft, -⟩ :=
-    ZM.exists_isGaloisCover_of_isQProjOver k A.left A.hom C (fun c => ((transl c.1).hom).left) hq
-      (congrArg CommaMorphism.left (translHom_one (A := A)))
+    ZM.exists_isGaloisCover_of_isQProjOver k A.left A.hom C
+      (fun c => ((transl c.1).hom).left)
+      hq (congrArg CommaMorphism.left (translHom_one (A := A)))
       (fun a c => congrArg CommaMorphism.left (translHom_mul a.1 c.1))
-      (fun a => Over.w _) (by
+      (fun a => Over.w _)
+      (by
         intro K _ _ y a h
         let y' : Over.mk (y ≫ A.hom) ⟶ A := Over.homMk y rfl
         have h' : y' ≫ (transl a.1).hom = y' := Over.OverMorphism.ext h
@@ -76,31 +86,34 @@ theorem exists_quotient_abelian_by_finite_points :
   let x : C → (𝟙_ (Over (Sp k)) ⟶ A) := Subtype.val
   have hmono := mono_constDesc x Subtype.val_injective
   obtain ⟨_, hi⟩ := exists_grpObj_constObj x C Subtype.range_coe
-  obtain ⟨_, hcomm, hhom, -⟩ := grpObj_of_flat_coset_quotient _ A _ B (constDesc x) q hi hmono
-    inferInstance hsurj inferInstance (by
-      intro Z g g'
-      constructor
-      · intro h
-        obtain ⟨t, ht⟩ := exists_lift x (g' / g) fun z => by
-          obtain ⟨V, a, hV, e⟩ :=
-            hG.exists_local_geom g.left g'.left (congrArg CommaMorphism.left h) z
-          have e' : openι Z V ≫ g ≫ (transl a.1).hom = openι Z V ≫ g' := Over.OverMorphism.ext e
-          refine ⟨V, hV, a, ?_⟩
-          rw [GrpObj.comp_div, ← e', ← Category.assoc, comp_translHom, mul_div_cancel_right]
-        exact ⟨t, by rw [ht, div_mul_cancel]⟩
-      · rintro ⟨t, rfl⟩
-        refine hom_ext_local _ _ fun z => ?_
-        obtain ⟨V, hV, c, hc⟩ := locally_const_desc x t z
-        refine ⟨V, hV, ?_⟩
-        rw [← Category.assoc _ (_ * _), MonObj.comp_mul, hc, ← comp_translHom, Category.assoc,
-          Category.assoc, hinv])
+  obtain ⟨_, hcomm, hhom, -⟩ :=
+    grpObj_of_flat_coset_quotient _ A _ B (constDesc x) q hi hmono inferInstance hsurj inferInstance
+      (by
+        intro Z g g'
+        constructor
+        · intro h
+          obtain ⟨t, ht⟩ :=
+            exists_lift x (g' / g) fun z => by
+              obtain ⟨V, a, hV, e⟩ :=
+                hG.exists_local_geom g.left g'.left (congrArg CommaMorphism.left h) z
+              have e' : openι Z V ≫ g ≫ (transl a.1).hom = openι Z V ≫ g' := Over.OverMorphism.ext e
+              refine ⟨V, hV, a, ?_⟩
+              rw [GrpObj.comp_div, ← e', ← Category.assoc, comp_translHom, mul_div_cancel_right]
+          exact ⟨t, by rw [ht, div_mul_cancel]⟩
+        · rintro ⟨t, rfl⟩
+          refine hom_ext_local _ _ fun z => ?_
+          obtain ⟨V, hV, c, hc⟩ := locally_const_desc x t z
+          refine ⟨V, hV, ?_⟩
+          rw [← Category.assoc _ (_ * _), MonObj.comp_mul, hc, ← comp_translHom, Category.assoc,
+            Category.assoc, hinv])
   refine ⟨B, inferInstance, q, ?_, hhom, hfin, het, hsurj, fun K _ _ t y => ⟨fun hy => ?_, ?_⟩⟩
   · have hw' : q.left ≫ B.hom = A.hom := Over.w q
     have := hA.smooth
     have := hA.proper
     have := hA.geomConnected
-    have := forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ A.hom hA.smooth
-      hA.geomConnected
+    have :=
+      forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ A.hom hA.smooth
+        hA.geomConnected
     have : IsSeparated B.hom := hsep
     have : LocallyOfFiniteType B.hom := hlft
     have : UniversallyClosed (q.left ≫ B.hom) := by rw [hw']; infer_instance
@@ -109,10 +122,14 @@ theorem exists_quotient_abelian_by_finite_points :
     have := UniversallyClosed.of_comp_surjective q.left B.hom
     have := AbelianQuotient.geometricallyReduced_of_comp q.left B.hom
     have : LocallyOfFinitePresentation B.hom := inferInstance
-    exact ⟨hcomm, AbelianQuotient.smooth_of_grpObj_of_flat B, ⟨⟩, AbelianQuotient.geometricallyConnected_of_comp q.left B.hom⟩
+    exact ⟨
+      hcomm,
+      AbelianQuotient.smooth_of_grpObj_of_flat B,
+      ⟨⟩,
+      AbelianQuotient.geometricallyConnected_of_comp q.left B.hom
+    ⟩
   · have h1 : (1 : Over.mk t ⟶ A) ≫ q = y ≫ q := by rw [hy, MonObj.one_comp]
-    obtain ⟨a, ha, -⟩ := hG.fibre K (1 : Over.mk t ⟶ A).left y.left
-      (congrArg CommaMorphism.left h1)
+    obtain ⟨a, ha, -⟩ := hG.fibre K (1 : Over.mk t ⟶ A).left y.left (congrArg CommaMorphism.left h1)
     have ha' : (1 : Over.mk t ⟶ A) ≫ (transl a.1).hom = y := Over.OverMorphism.ext ha
     exact ⟨a.1, a.2, by rw [← ha', comp_translHom, _root_.mul_one]⟩
   · rintro ⟨c, hc, rfl⟩

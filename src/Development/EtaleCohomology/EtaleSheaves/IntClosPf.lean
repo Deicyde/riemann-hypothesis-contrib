@@ -9,16 +9,19 @@ open CategoryTheory LateralTheory.E.t_E3Cut
 
 namespace LateralTheory.E.IntClosPf
 
-theorem intMul {A C : Type} [CommRing A] [CommRing C] [IsDomain C] [Algebra A C] (z : C) (p : Polynomial A)
-    (hp : ∃ n, algebraMap A C (p.coeff n) ≠ 0) (hz : Polynomial.aeval z p = 0) :
-    ∃ a : A, algebraMap A C a ≠ 0 ∧ IsIntegral A (algebraMap A C a * z) := by
+theorem intMul
+    {A C : Type} [CommRing A] [CommRing C] [IsDomain C] [Algebra A C]
+    (z : C) (p : Polynomial A)
+    (hp : ∃ n, algebraMap A C (p.coeff n) ≠ 0) (hz : Polynomial.aeval z p = 0)
+    : ∃ a : A, algebraMap A C a ≠ 0 ∧ IsIntegral A (algebraMap A C a * z) := by
   let A' := (algebraMap A C).range
   letI : Algebra A A' := (algebraMap A C).rangeRestrict.toAlgebra
   have : IsScalarTower A A' C := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   have hsurj : Function.Surjective (algebraMap A A') := (algebraMap A C).rangeRestrict_surjective
-  have : Algebra.IsIntegral A A' := ⟨fun x => by
-    obtain ⟨a, rfl⟩ := hsurj x
-    exact isIntegral_algebraMap⟩
+  have : Algebra.IsIntegral A A' :=
+    ⟨fun x => by
+      obtain ⟨a, rfl⟩ := hsurj x
+      exact isIntegral_algebraMap⟩
   set p' := p.map (algebraMap A A') with hp'def
   have h1 : Polynomial.aeval z p' = 0 := by rw [Polynomial.aeval_map_algebraMap]; exact hz
   have hp' : p' ≠ 0 := by
@@ -44,15 +47,30 @@ theorem IntClos_of (hH : HensInt) : IntClos := by
   obtain ⟨hHA, -⟩ := hSH
   letI : Algebra A C := c.hom.toAlgebra
   let B := integralClosure A C
-  refine ⟨CommRingCat.of B, CommRingCat.ofHom (algebraMap A B), CommRingCat.ofHom B.val.toRingHom, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    CommRingCat.of B,
+    CommRingCat.ofHom (algebraMap A B),
+    CommRingCat.ofHom B.val.toRingHom,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · ext x; rfl
   · intro x; exact integralClosure.isIntegral x
   · exact Subtype.val_injective
   · have hne : Nontrivial B := inferInstance
-    obtain ⟨h⟩ := hH A B (algebraMap A B) (fun x => integralClosure.isIntegral x) (fun e he => by
-      rcases (IsIdempotentElem.iff_eq_zero_or_one.mp (show IsIdempotentElem (e : C) from congrArg Subtype.val he)) with h | h
-      · left; exact Subtype.ext h
-      · right; exact Subtype.ext h)
+    obtain ⟨h⟩ :=
+      hH A B (algebraMap A B)
+        (fun x => integralClosure.isIntegral x)
+        (fun e he => by
+          rcases (IsIdempotentElem.iff_eq_zero_or_one.mp (show IsIdempotentElem (e : C) from
+              congrArg Subtype.val he))
+            with h | h
+          · left; exact Subtype.ext h
+          · right; exact Subtype.ext h)
     exact h.toIsLocalRing
   · intro p hm hdeg
     have hm' : (p.map B.val.toRingHom).Monic := hm.map _
@@ -69,8 +87,9 @@ theorem IntClos_of (hH : HensInt) : IntClos := by
   · intro z
     have hQ : (⊥ : Ideal C).IsPrime := Ideal.isPrime_bot
     obtain ⟨p, ⟨n, hn⟩, hz⟩ := hAR ⊥ hQ z
-    obtain ⟨a, ha, hint⟩ := intMul z p ⟨n, fun h => hn (by rw [Ideal.mem_bot]; exact h)⟩
-      (by rw [Ideal.mem_bot] at hz; exact hz)
+    obtain ⟨a, ha, hint⟩ :=
+      intMul z p ⟨n, fun h => hn (by rw [Ideal.mem_bot]; exact h)⟩
+        (by rw [Ideal.mem_bot] at hz; exact hz)
     refine ⟨algebraMap A B a, ⟨_, hint⟩, fun h => ha (congrArg Subtype.val h), rfl⟩
 
 end LateralTheory.E.IntClosPf

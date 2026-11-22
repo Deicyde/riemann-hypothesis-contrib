@@ -104,7 +104,8 @@ lemma continuousAt_halfLogRatioSqSecondDeriv {ε s : ℝ} (h : 0 < s + ε) : Con
 
 variable {n : ℕ}
 
-def complexLineSecondDeriv (F : V n → ℂ) (z e : V n) : ℂ := deriv (deriv (fun l : ℂ => F (z + l • e))) 0
+def complexLineSecondDeriv (F : V n → ℂ) (z e : V n) : ℂ :=
+  deriv (deriv (fun l : ℂ => F (z + l • e))) 0
 
 lemma real_smul_smul (t : ℝ) (μ : ℂ) (e : V n) : t • (μ • e) = ((t : ℂ) * μ) • e := by
   rw [← Complex.coe_smul, smul_smul]

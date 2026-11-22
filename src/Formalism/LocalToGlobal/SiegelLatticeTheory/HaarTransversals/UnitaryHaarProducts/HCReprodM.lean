@@ -15,29 +15,34 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 namespace Formalism.L2.SG.HCReprodM
 
 def HCReprodDSc : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), IsDS ε lam σ →
-    ∀ w ∈ lowKSub ε lam σ, ∃ α : Formalism.REAL.UJ ε → ℂ, Continuous α ∧ HasCompactSupport α ∧
-      Integrable (fun g => α g • σ (uMat g) w) (Formalism.REAL.muG ε) ∧
-      ∫ g, α g • σ (uMat g) w ∂(Formalism.REAL.muG ε) = w
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H]
+      [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+    IsDS ε lam σ
+      → ∀ w ∈ lowKSub ε lam σ, ∃ α : Formalism.REAL.UJ ε → ℂ,
+        Continuous α ∧ HasCompactSupport α
+          ∧ Integrable (fun g => α g • σ (uMat g) w) (Formalism.REAL.muG ε)
+          ∧ ∫ g, α g • σ (uMat g) w ∂(Formalism.REAL.muG ε) = w
 
 def HCReprodDSm : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), IsDS ε lam σ →
-    ∀ w ∈ lowKSub ε lam σ, ∃ (α : Formalism.REAL.UJ ε → ℂ) (Ω : Set (Formalism.REAL.UJ ε)) (a : ℝ), IsCompact Ω ∧
-      Measurable α ∧ (∀ g, α g ≠ 0 → g ∈ Ω) ∧ (∀ g, ‖α g‖ ≤ a) ∧
-      Integrable (fun g => α g • σ (uMat g) w) (Formalism.REAL.muG ε) ∧
-      ∫ g, α g • σ (uMat g) w ∂(Formalism.REAL.muG ε) = w
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H]
+      [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+    IsDS ε lam σ
+      → ∀ w ∈ lowKSub ε lam σ,
+        ∃ (α : Formalism.REAL.UJ ε → ℂ) (Ω : Set (Formalism.REAL.UJ ε)) (a : ℝ),
+          IsCompact Ω ∧ Measurable α ∧ (∀ g, α g ≠ 0 → g ∈ Ω) ∧ (∀ g, ‖α g‖ ≤ a)
+            ∧ Integrable (fun g => α g • σ (uMat g) w) (Formalism.REAL.muG ε)
+            ∧ ∫ g, α g • σ (uMat g) w ∂(Formalism.REAL.muG ε) = w
 
 section KFin
 
-variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem finsetSup_kstable (s : Finset (Submodule ℂ H))
-    (hs : ∀ S ∈ s, FiniteDimensional ℂ S ∧ IsKStableOn ε σ S) :
-    FiniteDimensional ℂ ↥(s.sup (id : Submodule ℂ H → Submodule ℂ H)) ∧
-      IsKStableOn ε σ (s.sup (id : Submodule ℂ H → Submodule ℂ H)) := by
+theorem finsetSup_kstable
+    (s : Finset (Submodule ℂ H)) (hs : ∀ S ∈ s, FiniteDimensional ℂ S ∧ IsKStableOn ε σ S)
+    : FiniteDimensional ℂ ↥(s.sup (id : Submodule ℂ H → Submodule ℂ H))
+      ∧ IsKStableOn ε σ (s.sup (id : Submodule ℂ H → Submodule ℂ H)) := by
   unfold IsKStableOn at hs ⊢
   revert hs
   refine Finset.induction_on s ?_ ?_
@@ -60,7 +65,8 @@ theorem finsetSup_kstable (s : Finset (Submodule ℂ H))
       rw [map_add (f := _)]
       exact Submodule.add_mem_sup (h1.2 g hg y hy) (h2.2 g hg z hz)
 
-theorem isKFin_of_mem_lowKSub {lam : Fin n → ℝ} {w : H} (hw : w ∈ lowKSub ε lam σ) : IsKFin ε σ w := by
+theorem isKFin_of_mem_lowKSub {lam : Fin n → ℝ} {w : H} (hw : w ∈ lowKSub ε lam σ)
+    : IsKFin ε σ w := by
   unfold IsKFin lowKSub at *
   unfold IsKTypeOf at hw
   obtain ⟨s, hs, hws⟩ := (Submodule.mem_sSup_iff_exists_finset).1 hw
@@ -82,13 +88,19 @@ theorem hcReprodDSc : HCReprodDSc := by
     · simp
     · simp [h0]
   · obtain ⟨Φ, hΦ, hx⟩ := kfin_mem_Vsub hσ hirr hadm h0 (isKFin_of_mem_lowKSub hw)
-    exact ⟨fun y => Φ (umat y), hΦ.1.continuous.comp continuous_umat, test_comp_cs hΦ,
-      vec_integrable hσ w hΦ, hx.symm⟩
+    exact ⟨
+      fun y => Φ (umat y),
+      hΦ.1.continuous.comp continuous_umat,
+      test_comp_cs hΦ,
+      vec_integrable hσ w hΦ,
+      hx.symm
+    ⟩
 
 theorem hcReprodDSm : HCReprodDSm := by
   intro n ε lam H _ _ _ σ hds w hw
   obtain ⟨α, hc, hcs, hi, he⟩ := hcReprodDSc n ε lam H σ hds w hw
   obtain ⟨a, ha⟩ := hc.bounded_above_of_compact_support hcs
-  exact ⟨α, tsupport α, a, hcs.isCompact, hc.measurable, fun g hg => subset_tsupport α hg, ha, hi, he⟩
+  exact
+    ⟨α, tsupport α, a, hcs.isCompact, hc.measurable, fun g hg => subset_tsupport α hg, ha, hi, he⟩
 
 end Formalism.L2.SG.HCReprodM

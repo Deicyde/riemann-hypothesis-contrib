@@ -18,17 +18,17 @@ private lemma addVal_prod_alt {O : Type u_1} [CommRing O] [IsDomain O] [IsDiscre
   | insert j s hj ih =>
     rw [Finset.prod_insert hj, Finset.sum_insert hj, IsDiscreteValuationRing.addVal_mul, ih]
 
-theorem goal1 :
-  ∀ {O : Type u_1} [inst : CommRing.{u_1} O] [inst_1 : IsDomain.{u_1} O] [inst_2 : IsDiscreteValuationRing.{u_1} O]
-  {ι : Type} [Fintype.{0} ι] [DecidableEq.{1} ι] (N : Submodule.{u_1, u_1} O (ι → O))
-  (e :
-    LinearEquiv.{u_1, u_1, u_1, u_1} (RingHom.id.{u_1} O) (ι → O)
-      (Subtype.{u_1 + 1} fun (x : ι → O) ↦ Membership.mem.{u_1, u_1} N x)),
-  Eq.{1} (Module.length.{u_1, u_1} O (HasQuotient.Quotient.{u_1, u_1} (ι → O) N))
-    (DFunLike.coe.{u_1 + 1, u_1 + 1, 1} (IsDiscreteValuationRing.addVal.{u_1} O)
-      (DFunLike.coe.{u_1 + 1, u_1 + 1, u_1 + 1} LinearMap.det.{u_1, u_1}
-        (LinearMap.comp.{u_1, u_1, u_1, u_1, u_1, u_1} (Submodule.subtype.{u_1, u_1} N)
-          (LinearEquiv.toLinearMap.{u_1, u_1, u_1, u_1} e)))) := by
+theorem goal1
+    : ∀ {O : Type u_1} [inst : CommRing.{u_1} O] [inst_1 : IsDomain.{u_1} O]
+        [inst_2 : IsDiscreteValuationRing.{u_1} O] {ι : Type} [Fintype.{0} ι] [DecidableEq.{1} ι]
+        (N : Submodule.{u_1, u_1} O (ι → O))
+        (e : LinearEquiv.{u_1, u_1, u_1, u_1} (RingHom.id.{u_1} O) (ι → O)
+          (Subtype.{u_1 + 1} fun (x : ι → O) ↦ Membership.mem.{u_1, u_1} N x)),
+      Eq.{1} (Module.length.{u_1, u_1} O (HasQuotient.Quotient.{u_1, u_1} (ι → O) N))
+        (DFunLike.coe.{u_1 + 1, u_1 + 1, 1} (IsDiscreteValuationRing.addVal.{u_1} O)
+          (DFunLike.coe.{u_1 + 1, u_1 + 1, u_1 + 1} LinearMap.det.{u_1, u_1}
+            (LinearMap.comp.{u_1, u_1, u_1, u_1, u_1, u_1} (Submodule.subtype.{u_1, u_1} N)
+              (LinearEquiv.toLinearMap.{u_1, u_1, u_1, u_1} e)))) := by
   intro O _ _ _ ι _ _ N e
   let b := Pi.basisFun O ι
   have h : Module.finrank O N = Module.finrank O (ι → O) := e.finrank_eq.symm
@@ -53,8 +53,9 @@ theorem goal1 :
     · simp [hij]
   have hdet : LinearMap.det (N.subtype ∘ₗ u.toLinearMap) = ∏ i, a i := by
     rw [← LinearMap.det_toMatrix b', hg, Matrix.det_diagonal]
-  have hfac : N.subtype ∘ₗ e.toLinearMap =
-      (N.subtype ∘ₗ u.toLinearMap) ∘ₗ (e.trans u.symm).toLinearMap := by
+  have hfac
+      : N.subtype ∘ₗ e.toLinearMap
+        = (N.subtype ∘ₗ u.toLinearMap) ∘ₗ (e.trans u.symm).toLinearMap := by
     ext x
     simp
   rw [hfac, LinearMap.det_comp, hdet, IsDiscreteValuationRing.addVal_mul, addVal_prod_alt,

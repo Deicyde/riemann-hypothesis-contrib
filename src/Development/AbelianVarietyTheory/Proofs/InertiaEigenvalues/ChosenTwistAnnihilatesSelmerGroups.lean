@@ -6,12 +6,16 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.CyclotomicOrder
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 namespace GlobalTheory.NLink
 
-theorem twist_kills_selmer : ∀ (D : D7) (C : NChoice D) (I : TwIn D) (ρ : FamilyRepresentationConstants.RhoFam D), NChTie D C → TwGoodAt D C I →
-    KillingConditions.SignatureChoiceCondition ρ C → KillingConditions.KillAt ρ := by
+theorem twist_kills_selmer
+    : ∀ (D : D7) (C : NChoice D) (I : TwIn D) (ρ : FamilyRepresentationConstants.RhoFam D),
+      NChTie D C → TwGoodAt D C I → KillingConditions.SignatureChoiceCondition ρ C
+        → KillingConditions.KillAt ρ := by
   intro D C I ρ hT hG hA i hi
   have hw : D.what₂.muAt (D.nd.w i) ≠ D.what₂.mu0 := hi
   obtain ⟨-, hg⟩ := hG (D.nd.w i) hw
@@ -24,8 +28,15 @@ theorem twist_kills_selmer : ∀ (D : D7) (C : NChoice D) (I : TwIn D) (ρ : Fam
   · obtain ⟨s, hs, hfin, hle⟩ := hA1 π hπ
     have h1 := hTle s hs
     have hsum : epsT s ≤ twEps D (C.twI (D.nd.w i)) :=
-      le_trans (Finset.single_le_sum (fun s _ => hT0 s) ((Formalism.MainNotions.BlochKatoReduction.Gen.mem_SigG _ _ s).2 hs)) hTs
-    have h0 : 0 ≤ (Formalism.MainNotions.BlochKatoReduction.Gen.nu D.ntw (C.twI (D.nd.w i)) : ℝ) + epsT s :=
+      le_trans
+        (Finset.single_le_sum
+          (fun s _ => hT0 s)
+          ((Formalism.MainNotions.BlochKatoReduction.Gen.mem_SigG _ _ s).2 hs))
+        hTs
+    have h0
+        : 0
+          ≤ (Formalism.MainNotions.BlochKatoReduction.Gen.nu D.ntw (C.twI (D.nd.w i)) : ℝ)
+            + epsT s :=
       add_nonneg (Nat.cast_nonneg _) (hT0 s)
     have h2 := le_trans hle h1
     refine ⟨hfin (ne_top_of_le_ne_top ENNReal.ofReal_ne_top h1), ?_⟩

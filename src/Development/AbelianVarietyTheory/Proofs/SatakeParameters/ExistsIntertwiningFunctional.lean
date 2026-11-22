@@ -8,27 +8,33 @@ universe u_1 u_2 u_3
 
 namespace GlobalTheory.IntertwiningFunctional
 
-private theorem freeAlgebra_lift_intertwine {K : Type u_1} {F : Type u_2} {V : Type u_3}
+private theorem freeAlgebra_lift_intertwine
+    {K : Type u_1} {F : Type u_2} {V : Type u_3}
     [AddCommGroup F] [Module ℂ F] [AddCommGroup V] [Module ℂ V]
     (r : K → F →ₗ[ℂ] F) (ρ : K → V →ₗ[ℂ] V) (T : V →ₗ[ℂ] F)
-    (hT : ∀ (k : K) (v : V), T (ρ k v) = r k (T v)) (a : FreeAlgebra ℂ K) :
-    ∀ v : V, T (FreeAlgebra.lift ℂ ρ a v) = FreeAlgebra.lift ℂ r a (T v) := by
+    (hT : ∀ (k : K) (v : V), T (ρ k v) = r k (T v))
+    (a : FreeAlgebra ℂ K)
+    : ∀ v : V, T (FreeAlgebra.lift ℂ ρ a v) = FreeAlgebra.lift ℂ r a (T v) := by
   induction a using FreeAlgebra.induction with
   | grade0 c => intro v; simp [AlgHom.commutes, Module.algebraMap_end_apply]
   | grade1 k => intro v; simp [FreeAlgebra.lift_ι_apply, hT]
   | mul a b ha hb => intro v; simp only [map_mul, Module.End.mul_apply]; rw [ha, hb]
   | add a b ha hb => intro v; simp only [map_add (f := _), LinearMap.add_apply]; rw [ha, hb]
 
-theorem exists_intertwining_functional {K : Type u_1} {F : Type u_2} {V : Type u_3}
+theorem exists_intertwining_functional
+    {K : Type u_1} {F : Type u_2} {V : Type u_3}
     [AddCommGroup F] [Module ℂ F] [AddCommGroup V] [Module ℂ V]
-    (r : K → F →ₗ[ℂ] F) (ρ : K → V →ₗ[ℂ] V)
+    (r : K → F →ₗ[ℂ] F)
+    (ρ : K → V →ₗ[ℂ] V)
     (hirr : ∀ (W : Submodule ℂ V), (∀ (k : K), ∀ v ∈ W, ρ k v ∈ W) → W = ⊥ ∨ W = ⊤)
     (P : (V →ₗ[ℂ] F) → Prop)
-    (hP : ∀ (T : V →ₗ[ℂ] F), P T → ∀ (k : K) (v : V), T (ρ k v) = r k (T v)) :
-    ∀ f ∈ ⨆ (T : V →ₗ[ℂ] F), ⨆ (_ : P T), LinearMap.range T, f ≠ (0 : F) →
-      ∃ (φ : F →ₗ[ℂ] V), φ f ≠ (0 : V) ∧ ∀ (k : K),
-        ∀ f' ∈ ⨆ (T : V →ₗ[ℂ] F), ⨆ (_ : P T), LinearMap.range T,
-          φ (r k f') = ρ k (φ f') := by
+    (hP : ∀ (T : V →ₗ[ℂ] F), P T → ∀ (k : K) (v : V), T (ρ k v) = r k (T v))
+    : ∀ f ∈ ⨆ (T : V →ₗ[ℂ] F), ⨆ (_ : P T), LinearMap.range T,
+      f ≠ (0 : F)
+        → ∃ (φ : F →ₗ[ℂ] V),
+          φ f ≠ (0 : V)
+            ∧ ∀ (k : K), ∀ f' ∈ ⨆ (T : V →ₗ[ℂ] F), ⨆ (_ : P T), LinearMap.range T,
+              φ (r k f') = ρ k (φ f') := by
   classical
   intro f hf hf0
   set S := ⨆ (T : V →ₗ[ℂ] F), ⨆ (_ : P T), LinearMap.range T with hSdef
@@ -52,10 +58,8 @@ theorem exists_intertwining_functional {K : Type u_1} {F : Type u_2} {V : Type u
   let : Module A V := Module.compHom V ρA.toRingHom
   have smulF : ∀ (a : A) (x : F), a • x = rA a x := fun _ _ => rfl
   have smulV : ∀ (a : A) (x : V), a • x = ρA a x := fun _ _ => rfl
-  have : IsScalarTower ℂ A F := ⟨fun c a x => by
-    rw [smulF, smulF, map_smul, LinearMap.smul_apply]⟩
-  have : IsScalarTower ℂ A V := ⟨fun c a x => by
-    rw [smulV, smulV, map_smul, LinearMap.smul_apply]⟩
+  have : IsScalarTower ℂ A F := ⟨fun c a x => by rw [smulF, smulF, map_smul, LinearMap.smul_apply]⟩
+  have : IsScalarTower ℂ A V := ⟨fun c a x => by rw [smulV, smulV, map_smul, LinearMap.smul_apply]⟩
   have hιF : ∀ (k : K) (x : F), (FreeAlgebra.ι ℂ k : A) • x = r k x := fun k x => by
     show FreeAlgebra.lift ℂ r (FreeAlgebra.ι ℂ k) x = r k x
     rw [FreeAlgebra.lift_ι_apply]
@@ -73,17 +77,17 @@ theorem exists_intertwining_functional {K : Type u_1} {F : Type u_2} {V : Type u
     · exact Or.inl (by simpa using h)
     · exact Or.inr (by simpa using h)
 
-  let mkA : ∀ T : V →ₗ[ℂ] F, (∀ (k : K) (v : V), T (ρ k v) = r k (T v)) → V →ₗ[A] F :=
-    fun T hT =>
-      { toFun := T
-        map_add' := T.map_add
-        map_smul' := fun a v => freeAlgebra_lift_intertwine r ρ T hT a v }
+  let mkA : ∀ T : V →ₗ[ℂ] F, (∀ (k : K) (v : V), T (ρ k v) = r k (T v)) → V →ₗ[A] F := fun T hT => {
+    toFun := T
+    map_add' := T.map_add
+    map_smul' := fun a v => freeAlgebra_lift_intertwine r ρ T hT a v
+  }
   let p : (V →ₗ[ℂ] F) → Submodule A F := fun T =>
     if h : ∀ (k : K) (v : V), T (ρ k v) = r k (T v) then LinearMap.range (mkA T h) else ⊥
   let s : Set (V →ₗ[ℂ] F) := {T | P T}
   let SA : Submodule A F := ⨆ T ∈ s, p T
-  have hpT : ∀ T (hT : T ∈ s), p T = LinearMap.range (mkA T (hP T hT)) :=
-    fun T hT => dif_pos (hP T hT)
+  have hpT : ∀ T (hT : T ∈ s), p T = LinearMap.range (mkA T (hP T hT)) := fun T hT =>
+    dif_pos (hP T hT)
   have hpSA : ∀ T (hT : T ∈ s), p T ≤ SA := fun T hT =>
     le_iSup₂ (f := fun T (_ : T ∈ s) => p T) T hT
   have memSA : ∀ x : F, x ∈ S ↔ x ∈ SA := by
@@ -99,8 +103,11 @@ theorem exists_intertwining_functional {K : Type u_1} {F : Type u_2} {V : Type u
         exact hpSA T hT h1
       exact hle hx
     · intro hx
-      refine Submodule.iSup_induction (fun T => ⨆ (_ : T ∈ s), p T) (motive := fun y => y ∈ S)
-        hx ?_ (Submodule.zero_mem _) (fun _ _ => Submodule.add_mem _)
+      refine Submodule.iSup_induction
+        (fun T => ⨆ (_ : T ∈ s), p T)
+        (motive := fun y => y ∈ S)
+        hx ?_ (Submodule.zero_mem _)
+        (fun _ _ => Submodule.add_mem _)
       intro T y hy
       by_cases hT : T ∈ s
       · have hy' : y ∈ p T := (iSup_le fun _ => le_rfl : (⨆ (_ : T ∈ s), p T) ≤ p T) hy
@@ -140,8 +147,8 @@ theorem exists_intertwining_functional {K : Type u_1} {F : Type u_2} {V : Type u
 
   have hmemT : ∀ T (hT : T ∈ s) (v : V), mkA T (hP T hT) v ∈ SA := fun T hT v =>
     hpSA T hT (by rw [hpT T hT]; exact ⟨v, rfl⟩)
-  obtain ⟨T, hT, hg⟩ : ∃ T, ∃ hT : T ∈ s,
-      π ∘ₗ LinearMap.codRestrict SA (mkA T (hP T hT)) (hmemT T hT) ≠ 0 := by
+  obtain ⟨T, hT, hg⟩
+      : ∃ T, ∃ hT : T ∈ s, π ∘ₗ LinearMap.codRestrict SA (mkA T (hP T hT)) (hmemT T hT) ≠ 0 := by
     by_contra hne
     push Not at hne
     apply hπf
@@ -150,7 +157,8 @@ theorem exists_intertwining_functional {K : Type u_1} {F : Type u_2} {V : Type u
       rw [hpT T hT]
       rintro _ ⟨v, rfl⟩
       refine ⟨LinearMap.codRestrict SA (mkA T (hP T hT)) (hmemT T hT) v, ?_, rfl⟩
-      rw [SetLike.mem_coe, LinearMap.mem_ker, ← LinearMap.comp_apply, hne T hT, LinearMap.zero_apply]
+      rw [SetLike.mem_coe, LinearMap.mem_ker, ← LinearMap.comp_apply, hne T hT,
+        LinearMap.zero_apply]
     obtain ⟨y, hy, hyf⟩ := hle f₀.2
     have hyeq : y = f₀ := Subtype.ext hyf
     rw [← hyeq]
@@ -163,17 +171,19 @@ theorem exists_intertwining_functional {K : Type u_1} {F : Type u_2} {V : Type u
     have h1 : e (φ₀ f₀) = π f₀ := e.apply_symm_apply (π f₀)
     rw [← h1, h, map_zero]
 
-  let ψ : S →ₗ[ℂ] V :=
-    { toFun := fun x => φ₀ ⟨x.1, (memSA x.1).mp x.2⟩
-      map_add' := fun x y => by
-        rw [← map_add (f := _)]
-        rfl
-      map_smul' := fun c x => by
-        have h1 : (⟨c • x.1, (memSA _).mp (S.smul_mem c x.2)⟩ : SA) =
-            algebraMap ℂ A c • (⟨x.1, (memSA _).mp x.2⟩ : SA) :=
-          Subtype.ext (algebraMap_smul (A := A) c x.1).symm
-        show φ₀ ⟨c • x.1, (memSA _).mp (S.smul_mem c x.2)⟩ = c • φ₀ ⟨x.1, (memSA _).mp x.2⟩
-        rw [h1, map_smul, algebraMap_smul] }
+  let ψ : S →ₗ[ℂ] V := {
+    toFun := fun x => φ₀ ⟨x.1, (memSA x.1).mp x.2⟩
+    map_add' := fun x y => by
+      rw [← map_add (f := _)]
+      rfl
+    map_smul' := fun c x => by
+      have h1
+          : (⟨c • x.1, (memSA _).mp (S.smul_mem c x.2)⟩ : SA)
+            = algebraMap ℂ A c • (⟨x.1, (memSA _).mp x.2⟩ : SA) :=
+        Subtype.ext (algebraMap_smul (A := A) c x.1).symm
+      show φ₀ ⟨c • x.1, (memSA _).mp (S.smul_mem c x.2)⟩ = c • φ₀ ⟨x.1, (memSA _).mp x.2⟩
+      rw [h1, map_smul, algebraMap_smul]
+  }
   obtain ⟨φ, hφext⟩ := LinearMap.exists_extend ψ
   have hφ : ∀ (x : F) (hx : x ∈ S), φ x = φ₀ ⟨x, (memSA x).mp hx⟩ := fun x hx =>
     LinearMap.congr_fun hφext ⟨x, hx⟩

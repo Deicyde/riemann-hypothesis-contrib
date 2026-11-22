@@ -6,8 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.PowerNearOneNorm
 
-theorem exists_pow_sub_one_norm_lt_one {p : ℕ} [hp : Fact (Nat.Prime p)] (x : PadicAlgCl p)
-    (hx : ‖x‖ = (1 : ℝ)) : ∃ n : ℕ, 0 < n ∧ ‖x ^ n - (1 : PadicAlgCl p)‖ < (1 : ℝ) := by
+theorem exists_pow_sub_one_norm_lt_one
+    {p : ℕ} [hp : Fact (Nat.Prime p)] (x : PadicAlgCl p) (hx : ‖x‖ = (1 : ℝ))
+    : ∃ n : ℕ, 0 < n ∧ ‖x ^ n - (1 : PadicAlgCl p)‖ < (1 : ℝ) := by
   have hint : IsIntegral ℚ_[p] x := Algebra.IsIntegral.isIntegral x
   let V : Submodule ℚ_[p] (PadicAlgCl p) := Subalgebra.toSubmodule (Algebra.adjoin ℚ_[p] {x})
   have : FiniteDimensional ℚ_[p] V := Module.Finite.iff_fg.mpr hint.fg_adjoin_singleton

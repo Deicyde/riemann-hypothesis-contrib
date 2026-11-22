@@ -4,11 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.PowerSeriesMemSpanAllVariables.pi_span_X :
-    ∀ {O σ : Type} [inst : CommRing O] (s : Finset σ)
-    (f : MvPowerSeries σ O),
-    (∀ (n : σ →₀ ℕ), (∀ i ∈ s, (n : σ → ℕ) i = (0 : ℕ)) → (MvPowerSeries.coeff n : MvPowerSeries σ O → O) f = (0 : O)) →
-      f ∈ Ideal.span (Set.range MvPowerSeries.X) := by
+theorem UpperTheory.Reformulated.B.PowerSeriesMemSpanAllVariables.pi_span_X
+    : ∀ {O σ : Type} [inst : CommRing O] (s : Finset σ) (f : MvPowerSeries σ O),
+      (∀ (n : σ →₀ ℕ),
+          (∀ i ∈ s, (n : σ → ℕ) i = (0 : ℕ))
+            → (MvPowerSeries.coeff n : MvPowerSeries σ O → O) f = (0 : O))
+        → f ∈ Ideal.span (Set.range MvPowerSeries.X) := by
   intro O σ inst s
   classical
   induction s using Finset.induction_on with
@@ -22,8 +23,9 @@ theorem UpperTheory.Reformulated.B.PowerSeriesMemSpanAllVariables.pi_span_X :
   | insert a t hat ih =>
     intro f hf
     let g : MvPowerSeries σ O := fun n => if n a = 0 then MvPowerSeries.coeff n f else 0
-    have hg : ∀ n : σ →₀ ℕ, MvPowerSeries.coeff n g =
-        if n a = 0 then MvPowerSeries.coeff n f else 0 := fun n => rfl
+    have hg
+        : ∀ n : σ →₀ ℕ, MvPowerSeries.coeff n g = if n a = 0 then MvPowerSeries.coeff n f else 0 :=
+      fun n => rfl
     have h1 : g ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) := by
       apply ih
       intro n hn

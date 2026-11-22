@@ -19,22 +19,33 @@ variable {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {Λ : Fin (2 * r + k + 
 
 theorem dgk_unit (t : Fin k → ℝ) : dgk t ∈ Matrix.unitaryGroup (Fin k) ℂ := (dgk_mem t).1
 
-theorem wt_full (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) {x : T.V}
-    (hx : x ∈ spanW (k := k) (r := r) T) {μ : Fin k → ℝ}
-    (hμ : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k)) (rhoK (k := k) (r := r) T) μ x) :
-    Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) (HW.torepSig T)
-      (fun a => if h : a.val < k then μ ⟨a.val, h⟩ else Λ a) x := by
+theorem wt_full
+    (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true)
+    {x : T.V} (hx : x ∈ spanW (k := k) (r := r) T)
+    {μ : Fin k → ℝ}
+    (hμ : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k))
+      (rhoK (k := k) (r := r) T) μ x)
+    : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) (HW.torepSig T)
+      (fun a => if h : a.val < k then μ ⟨a.val, h⟩ else Λ a)
+      x := by
   intro θ _
   change HW.torepSig T (dg θ) x = _
-  rw [dg_split, torep_mul T (kE_mem_Kset hε (dgk_unit _)) (dg_mem _), spanW_scalar T hε θ hx, map_smul]
-  have h1 : HW.torepSig T (kE k r (dgk (th1 θ))) x =
-      Complex.exp (((∑ q, μ q * th1 θ q : ℝ) : ℂ) * Complex.I) • x := hμ (th1 θ) (dgk_mem _)
+  rw [dg_split, torep_mul T (kE_mem_Kset hε (dgk_unit _)) (dg_mem _), spanW_scalar T hε θ hx,
+    map_smul]
+  have h1
+      : HW.torepSig T (kE k r (dgk (th1 θ))) x
+        = Complex.exp (((∑ q, μ q * th1 θ q : ℝ) : ℂ) * Complex.I) • x :=
+    hμ (th1 θ) (dgk_mem _)
   rw [h1, smul_smul, ← Complex.exp_add]
   congr 1
-  have hs : (∑ a, (if h : a.val < k then μ ⟨a.val, h⟩ else Λ a) * θ a) =
-      (∑ a, Λ a * th2 θ a) + ∑ q, μ q * th1 θ q := by
-    have e : ∑ q, μ q * th1 θ q = ∑ a : Fin (2 * r + k + 1), (if h : a.val < k then μ ⟨a.val, h⟩ * θ a else 0) := by
-      rw [sumF' (k := k) (r := r) (fun a : Fin (2 * r + k + 1) => if h : a.val < k then μ ⟨a.val, h⟩ * θ a else 0)
+  have hs
+      : (∑ a, (if h : a.val < k then μ ⟨a.val, h⟩ else Λ a) * θ a)
+        = (∑ a, Λ a * th2 θ a) + ∑ q, μ q * th1 θ q := by
+    have e
+        : ∑ q, μ q * th1 θ q
+          = ∑ a : Fin (2 * r + k + 1), (if h : a.val < k then μ ⟨a.val, h⟩ * θ a else 0) := by
+      rw [sumF' (k := k) (r := r)
+        (fun a : Fin (2 * r + k + 1) => if h : a.val < k then μ ⟨a.val, h⟩ * θ a else 0)
         (fun p hp => by rw [dite_eq_right hp])]
       refine Finset.sum_congr rfl fun q _ => ?_
       have hq : (fI k r q).val < k := q.2
@@ -47,9 +58,9 @@ theorem wt_full (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) {
     · simp [th2, ha]
   rw [hs, Complex.ofReal_add, add_mul]
 
-theorem root_sum_apply {m : ℕ} (c : Fin m → Fin m → ℕ) (x : Fin m) :
-    (∑ a, ∑ b, (c a b : ℝ) • (Pi.single a (1 : ℝ) - Pi.single b 1 : Fin m → ℝ)) x =
-      ∑ b, (c x b : ℝ) - ∑ a, (c a x : ℝ) := by
+theorem root_sum_apply {m : ℕ} (c : Fin m → Fin m → ℕ) (x : Fin m)
+    : (∑ a, ∑ b, (c a b : ℝ) • (Pi.single a (1 : ℝ) - Pi.single b 1 : Fin m → ℝ)) x
+      = ∑ b, (c x b : ℝ) - ∑ a, (c a x : ℝ) := by
   simp only [Finset.sum_apply, Pi.smul_apply, Pi.sub_apply, Pi.single_apply, smul_eq_mul, mul_sub,
     Finset.sum_sub_distrib, mul_ite, mul_one, mul_zero]
   congr 1
@@ -57,14 +68,20 @@ theorem root_sum_apply {m : ℕ} (c : Fin m → Fin m → ℕ) (x : Fin m) :
     simp [Finset.sum_ite_eq]
   · simp [Finset.sum_ite_eq]
 
-theorem wt_cdom (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) {x : T.V}
-    (hx : x ∈ spanW (k := k) (r := r) T) (hx0 : x ≠ 0) {μ : Fin k → ℝ}
-    (hμ : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k)) (rhoK (k := k) (r := r) T) μ x) :
-    Formalism.MainNotions.S.CDom (Formalism.MainNotions.S.allPos k) μ (fun q => Λ (fI k r q)) := by
+theorem wt_cdom
+    (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true)
+    {x : T.V} (hx : x ∈ spanW (k := k) (r := r) T) (hx0 : x ≠ 0)
+    {μ : Fin k → ℝ}
+    (hμ : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k))
+      (rhoK (k := k) (r := r) T) μ x)
+    : Formalism.MainNotions.S.CDom (Formalism.MainNotions.S.allPos k) μ
+      (fun q => Λ (fI k r q)) := by
   have hfull := wt_full T hε hx hμ
   obtain ⟨c, hc, he⟩ := HW.KType.weight_le T hx0 (HW.torep_dτ_of_wt T hfull)
-  have he' : ∀ y, (Λ - fun a => if h : a.val < k then μ ⟨a.val, h⟩ else Λ a) y =
-      ∑ b, (c y b : ℝ) - ∑ a, (c a y : ℝ) := by
+  have he'
+      : ∀ y,
+        (Λ - fun a => if h : a.val < k then μ ⟨a.val, h⟩ else Λ a) y
+          = ∑ b, (c y b : ℝ) - ∑ a, (c a y : ℝ) := by
     intro y
     rw [he]
     exact root_sum_apply c y
@@ -76,8 +93,9 @@ theorem wt_cdom (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) {
       by_cases hy : y.val < k
       · simp [g, hy]
       · rw [← he' y]; simp [g, hy]
-    have hsum2 : ∑ y, g y * (∑ b, (c y b : ℝ) - ∑ a, (c a y : ℝ)) =
-        ∑ a, ∑ b, (c a b : ℝ) * (g a - g b) := by
+    have hsum2
+        : ∑ y, g y * (∑ b, (c y b : ℝ) - ∑ a, (c a y : ℝ))
+          = ∑ a, ∑ b, (c a b : ℝ) * (g a - g b) := by
       simp only [mul_sub, Finset.mul_sum, Finset.sum_sub_distrib]
       congr 1
       · exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
@@ -94,10 +112,12 @@ theorem wt_cdom (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) {
         simp only [g]
         split_ifs with h1 h2 h2 <;> norm_num
         omega
-    have hall := (Finset.sum_eq_zero_iff_of_nonpos (fun a _ => Finset.sum_nonpos fun b _ => hnp a b)).1 hsum
+    have hall :=
+      (Finset.sum_eq_zero_iff_of_nonpos (fun a _ => Finset.sum_nonpos fun b _ => hnp a b)).1 hsum
     intro a b ha hb
-    have h1 := (Finset.sum_eq_zero_iff_of_nonpos (fun b _ => hnp a b)).1 (hall a (Finset.mem_univ _)) b
-      (Finset.mem_univ _)
+    have h1 :=
+      (Finset.sum_eq_zero_iff_of_nonpos (fun b _ => hnp a b)).1 (hall a (Finset.mem_univ _)) b
+        (Finset.mem_univ _)
     simp only [g, if_pos ha, if_neg hb] at h1
     norm_num at h1
     exact_mod_cast h1
@@ -131,8 +151,9 @@ section Irr
 
 variable {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {Λ : Fin (2 * r + k + 1) → ℝ} (T : S7.KType ε Λ)
 
-theorem kE_dgk (t : Fin k → ℝ) :
-    kE k r (dgk t) = dg (fun a : Fin (2 * r + k + 1) => if h : a.val < k then t ⟨a.val, h⟩ else 0) := by
+theorem kE_dgk (t : Fin k → ℝ)
+    : kE k r (dgk t)
+      = dg (fun a : Fin (2 * r + k + 1) => if h : a.val < k then t ⟨a.val, h⟩ else 0) := by
   ext i j
   simp only [dg, Matrix.diagonal_apply]
   by_cases hi : i.val < k
@@ -141,7 +162,8 @@ theorem kE_dgk (t : Fin k → ℝ) :
       by_cases hij : i = j
       · subst hij; simp
       · rw [if_neg hij, if_neg (by intro e; apply hij; exact Fin.ext (by simpa using e))]
-    · rw [kE_col _ _ hj, if_neg (by rintro rfl; exact hj hi)]; simp [show i ≠ j by rintro rfl; exact hj hi]
+    · rw [kE_col _ _ hj, if_neg (by rintro rfl; exact hj hi)]
+      simp [show i ≠ j by rintro rfl; exact hj hi]
   · rw [kE_row _ _ hi]
     by_cases hij : i = j
     · subst hij; simp [hi]
@@ -156,8 +178,11 @@ theorem kE_cont : Continuous (kE k r) := by
   · exact continuous_const
   · exact continuous_const
 
-theorem w_wtK : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k)) (rhoK (k := k) (r := r) T)
-    (fun q => Λ (fI k r q)) T.w := by
+theorem w_wtK
+    : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k))
+      (rhoK (k := k) (r := r) T)
+      (fun q => Λ (fI k r q))
+      T.w := by
   intro t _
   change HW.torepSig T (kE k r (dgk t)) T.w = _
   rw [kE_dgk]
@@ -165,7 +190,8 @@ theorem w_wtK : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.M
   rw [HW.torep_wt_w T _ (dg_mem _)]
   congr 3
   congr 1
-  refine (sumF' (M := ℝ) (k := k) (r := r) _ (fun p hp => ?_)).trans (Finset.sum_congr rfl fun q _ => ?_)
+  refine (sumF' (M := ℝ) (k := k) (r := r) _ (fun p hp => ?_)).trans
+    (Finset.sum_congr rfl fun q _ => ?_)
   · simp [hp]
   · have hq : (fI k r q).val < k := q.2
     simp only [dif_pos hq]
@@ -176,35 +202,50 @@ theorem rhoK_one (v : T.V) : rhoK (k := k) (r := r) T 1 v = v := by
   rw [kE_one, (HW.torep_isURepOn T).1.1]
   rfl
 
-theorem rhoK_mul (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) {a b : Matrix (Fin k) (Fin k) ℂ}
-    (ha : a ∈ Matrix.unitaryGroup (Fin k) ℂ) (hb : b ∈ Matrix.unitaryGroup (Fin k) ℂ) (v : T.V) :
-    rhoK (k := k) (r := r) T (a * b) v = rhoK (k := k) (r := r) T a (rhoK (k := k) (r := r) T b v) := by
+theorem rhoK_mul
+    (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true)
+    {a b : Matrix (Fin k) (Fin k) ℂ}
+    (ha : a ∈ Matrix.unitaryGroup (Fin k) ℂ) (hb : b ∈ Matrix.unitaryGroup (Fin k) ℂ)
+    (v : T.V)
+    : rhoK (k := k) (r := r) T (a * b) v
+      = rhoK (k := k) (r := r) T a (rhoK (k := k) (r := r) T b v) := by
   unfold rhoK
   rw [kE_mul, torep_mul T (kE_mem_Kset hε ha) (kE_mem_Kset hε hb)]
 
-theorem rhoK_norm (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) {a : Matrix (Fin k) (Fin k) ℂ}
-    (ha : a ∈ Matrix.unitaryGroup (Fin k) ℂ) (v : T.V) : ‖rhoK (k := k) (r := r) T a v‖ = ‖v‖ :=
+theorem rhoK_norm
+    (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true)
+    {a : Matrix (Fin k) (Fin k) ℂ} (ha : a ∈ Matrix.unitaryGroup (Fin k) ℂ)
+    (v : T.V)
+    : ‖rhoK (k := k) (r := r) T a v‖ = ‖v‖ :=
   (HW.torep_isURepOn T).2.1 _ (kE_mem_Kset hε ha) v
 
-theorem rhoK_adj (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) {h : Matrix (Fin k) (Fin k) ℂ}
-    (hh : h ∈ Matrix.unitaryGroup (Fin k) ℂ) (u v : T.V) :
-    ⟪u, rhoK (k := k) (r := r) T h v⟫_ℂ = ⟪rhoK (k := k) (r := r) T (star h) u, v⟫_ℂ := by
+theorem rhoK_adj
+    (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true)
+    {h : Matrix (Fin k) (Fin k) ℂ} (hh : h ∈ Matrix.unitaryGroup (Fin k) ℂ)
+    (u v : T.V)
+    : ⟪u, rhoK (k := k) (r := r) T h v⟫_ℂ = ⟪rhoK (k := k) (r := r) T (star h) u, v⟫_ℂ := by
   have hs : star h ∈ Matrix.unitaryGroup (Fin k) ℂ := Unitary.star_mem hh
   have hinv : rhoK (k := k) (r := r) T (star h) (rhoK (k := k) (r := r) T h v) = v := by
     rw [← rhoK_mul T hε hs hh, Unitary.star_mul_self_of_mem hh, rhoK_one]
-  let Lm : T.V →ₗᵢ[ℂ] T.V :=
-    { toLinearMap := (rhoK (k := k) (r := r) T (star h) : T.V →ₗ[ℂ] T.V), norm_map' := rhoK_norm T hε hs }
+  let Lm : T.V →ₗᵢ[ℂ] T.V := {
+    toLinearMap := (rhoK (k := k) (r := r) T (star h) : T.V →ₗ[ℂ] T.V)
+    norm_map' := rhoK_norm T hε hs
+  }
   have := Lm.inner_map_map u (rhoK (k := k) (r := r) T h v)
-  change ⟪rhoK (k := k) (r := r) T (star h) u, rhoK (k := k) (r := r) T (star h) (rhoK (k := k) (r := r) T h v)⟫_ℂ = _
+  change
+      ⟪rhoK (k := k) (r := r) T (star h) u, rhoK (k := k) (r := r) T (star h) (rhoK (k := k) (r := r) T h v)⟫_ℂ
+        = _
     at this
   rw [hinv] at this
   exact this.symm
 
-theorem spanW_irred (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true) (S' : Submodule ℂ T.V)
-    (hle : S' ≤ spanW (k := k) (r := r) T)
-    (hS' : ∀ h ∈ Matrix.unitaryGroup (Fin k) ℂ, ∀ v ∈ S', rhoK (k := k) (r := r) T h v ∈ S') :
-    S' = ⊥ ∨ spanW (k := k) (r := r) T ≤ S' := by
-  have hperp : ∀ h ∈ Matrix.unitaryGroup (Fin k) ℂ, ∀ v ∈ S'ᗮ, rhoK (k := k) (r := r) T h v ∈ S'ᗮ := by
+theorem spanW_irred
+    (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = true)
+    (S' : Submodule ℂ T.V) (hle : S' ≤ spanW (k := k) (r := r) T)
+    (hS' : ∀ h ∈ Matrix.unitaryGroup (Fin k) ℂ, ∀ v ∈ S', rhoK (k := k) (r := r) T h v ∈ S')
+    : S' = ⊥ ∨ spanW (k := k) (r := r) T ≤ S' := by
+  have hperp
+      : ∀ h ∈ Matrix.unitaryGroup (Fin k) ℂ, ∀ v ∈ S'ᗮ, rhoK (k := k) (r := r) T h v ∈ S'ᗮ := by
     intro h hh v hv
     rw [Submodule.mem_orthogonal] at hv ⊢
     intro u hu
@@ -216,8 +257,10 @@ theorem spanW_irred (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = tru
     rw [Submodule.inf_orthogonal_eq_bot] at hm
     exact (Submodule.mem_bot ℂ).1 hm
   obtain ⟨p, hp, q, hq, hpq⟩ := S'.exists_add_mem_mem_orthogonal T.w
-  have hpw : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k)) (rhoK (k := k) (r := r) T)
-      (fun q => Λ (fI k r q)) p := by
+  have hpw : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k))
+      (rhoK (k := k) (r := r) T)
+      (fun q => Λ (fI k r q))
+      p := by
     intro t ht
     have hu : dgk t ∈ Matrix.unitaryGroup (Fin k) ℂ := ht.1
     have h1 := w_wtK T t ht
@@ -225,16 +268,21 @@ theorem spanW_irred (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = tru
     change rhoK (k := k) (r := r) T (dgk t) T.w = c • T.w at h1
     change rhoK (k := k) (r := r) T (dgk t) p = c • p
     rw [hpq, map_add (f := _), smul_add] at h1
-    have hA : rhoK (k := k) (r := r) T (dgk t) p - c • p ∈ S' := S'.sub_mem (hS' _ hu _ hp) (S'.smul_mem _ hp)
+    have hA : rhoK (k := k) (r := r) T (dgk t) p - c • p ∈ S' :=
+      S'.sub_mem (hS' _ hu _ hp) (S'.smul_mem _ hp)
     have hB : rhoK (k := k) (r := r) T (dgk t) p - c • p ∈ S'ᗮ := by
-      have e : rhoK (k := k) (r := r) T (dgk t) p - c • p = c • q - rhoK (k := k) (r := r) T (dgk t) q := by
+      have e
+          : rhoK (k := k) (r := r) T (dgk t) p - c • p
+            = c • q - rhoK (k := k) (r := r) T (dgk t) q := by
         rw [sub_eq_sub_iff_add_eq_add, h1]
         exact add_comm _ _
       rw [e]
       exact S'ᗮ.sub_mem (S'ᗮ.smul_mem _ hq) (hperp _ hu _ hq)
     exact sub_eq_zero.1 (hbot _ hA hB)
-  have hqw : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k)) (rhoK (k := k) (r := r) T)
-      (fun q => Λ (fI k r q)) q := by
+  have hqw : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset (Formalism.MainNotions.S.allPos k))
+      (rhoK (k := k) (r := r) T)
+      (fun q => Λ (fI k r q))
+      q := by
     intro t ht
     have h1 := w_wtK T t ht
     have h2 := hpw t ht
@@ -243,8 +291,12 @@ theorem spanW_irred (hε : ∀ a : Fin (2 * r + k + 1), a.val < k → ε a = tru
   have hpS : p ∈ spanW (k := k) (r := r) T := hle hp
   have hqS : q ∈ spanW (k := k) (r := r) T := by
     have e : q = T.w - p := by rw [hpq]; abel
-    rw [e]; exact sub_mem (w_mem_spanW T) hpS
-  have hfix : (fun a : Fin (2 * r + k + 1) => if h : a.val < k then (fun q => Λ (fI k r q)) ⟨a.val, h⟩ else Λ a) = Λ := by
+    rw [e]
+    exact sub_mem (w_mem_spanW T) hpS
+  have hfix
+      : (fun a : Fin (2 * r + k + 1) =>
+          if h : a.val < k then (fun q => Λ (fI k r q)) ⟨a.val, h⟩ else Λ a)
+        = Λ := by
     funext a; split_ifs <;> rfl
   have hp2 := wt_full T hε hpS hpw
   have hq2 := wt_full T hε hqS hqw

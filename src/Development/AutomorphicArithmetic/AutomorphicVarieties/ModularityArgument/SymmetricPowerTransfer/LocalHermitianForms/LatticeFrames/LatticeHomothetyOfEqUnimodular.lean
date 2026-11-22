@@ -10,19 +10,24 @@ namespace UpperTheory.V.Z.Sym.Loc.CP
 
 open QuadraticAlgebra
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ τ : K}
-  {c t s : K} {ε : Oˣ} {β : Etau K τ}
+variable
+  {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+  {Δ τ : K} {c t s : K} {ε : Oˣ} {β : Etau K τ}
 
 theorem finrank_V : Module.finrank K (K × Etau K τ) = 3 := by
   rw [Module.finrank_prod, Module.finrank_self]
   exact congrArg (1 + ·) (QuadraticAlgebra.finrank_eq_two (-1 : K) τ)
 
-theorem Uni.frame (L : IsLoc O Δ) {S : Set (K × Etau K τ)} (hS : Uni O c t S) :
-    ∃ e ∈ S, ∃ f ∈ S, ∃ h ∈ S, ∃ η : Oˣ, Bf τ c t e e = 0 ∧ Bf τ c t f f = 0 ∧ Bf τ c t e f = 1 ∧ Bf τ c t e h = 0 ∧ Bf τ c t f h = 0 ∧
-      Bf τ c t h h = algebraMap O K η ∧ ∀ v ∈ S, ∃ a b d : O, v = a • e + b • f + d • h := by
+theorem Uni.frame (L : IsLoc O Δ) {S : Set (K × Etau K τ)} (hS : Uni O c t S)
+    : ∃ e ∈ S, ∃ f ∈ S, ∃ h ∈ S, ∃ η : Oˣ,
+      Bf τ c t e e = 0 ∧ Bf τ c t f f = 0 ∧ Bf τ c t e f = 1 ∧ Bf τ c t e h = 0 ∧ Bf τ c t f h = 0
+        ∧ Bf τ c t h h = algebraMap O K η ∧ ∀ v ∈ S, ∃ a b d : O, v = a • e + b • f + d • h := by
   obtain ⟨s, hs⟩ := hS.fg
-  have hd : ∀ y : K × Etau K τ, y ∈ Submodule.span O (s : Set (K × Etau K τ)) ↔
-      ∀ x ∈ Submodule.span O (s : Set (K × Etau K τ)), Bf τ c t x y ∈ (algebraMap O K).range := by
+  have hd
+      : ∀ y : K × Etau K τ,
+        y ∈ Submodule.span O (s : Set (K × Etau K τ))
+          ↔ ∀ x ∈ Submodule.span O (s : Set (K × Etau K τ)),
+            Bf τ c t x y ∈ (algebraMap O K).range := by
     intro y
     have := hS.dual y
     rw [hs] at this
@@ -32,9 +37,11 @@ theorem Uni.frame (L : IsLoc O Δ) {S : Set (K × Etau K τ)} (hS : Uni O c t S)
   rw [hs]
   exact ⟨e, he, f, hf, h, hh, η, h1, h2, h3, h4, h5, h6, h7⟩
 
-theorem exists_lat (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε * s ^ 2)
-    (hβ : QuadraticAlgebra.norm β * algebraMap O K ε * s ^ 2 = 2 * t) {S : Set (K × Etau K τ)} (hS : Uni O c t S) :
-    ∃ Λ, IsLat O τ Λ ∧ S = S0 s β Λ := by
+theorem exists_lat
+    (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε * s ^ 2)
+    (hβ : QuadraticAlgebra.norm β * algebraMap O K ε * s ^ 2 = 2 * t)
+    {S : Set (K × Etau K τ)} (hS : Uni O c t S)
+    : ∃ Λ, IsLat O τ Λ ∧ S = S0 s β Λ := by
   classical
   obtain ⟨e, heS, f, hfS, h, hhS, η, hee, hff, hef, heh, hfh, hhh, hspan⟩ := Uni.frame L hS
   haveI := L.frac
@@ -44,10 +51,10 @@ theorem exists_lat (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε *
     rwa [map_ofNat] at this
   set E : K := algebraMap O K ε with hE
   have hE0 : E ≠ 0 := (ε.isUnit.map (algebraMap O K)).ne_zero
-  have hinvE : algebraMap O K ↑ε⁻¹ * E = 1 := by
-    rw [hE, ← map_mul, Units.inv_mul, map_one]
-  have anti : ∀ v w y, E • (psi s β v (psi s β w y) + psi s β w (psi s β v y))
-      = (2 * Bf τ c t v w) • y := fun v w y => psi_anti hc hβ v w y
+  have hinvE : algebraMap O K ↑ε⁻¹ * E = 1 := by rw [hE, ← map_mul, Units.inv_mul, map_one]
+  have anti
+      : ∀ v w y, E • (psi s β v (psi s β w y) + psi s β w (psi s β v y)) = (2 * Bf τ c t v w) • y :=
+    fun v w y => psi_anti hc hβ v w y
   have sq0 : ∀ v, Bf τ c t v v = 0 → ∀ y, psi s β v (psi s β v y) = 0 := by
     intro v hv y
     have := anti v v y
@@ -55,7 +62,8 @@ theorem exists_lat (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε *
     rcases this with h0 | h0
     · exact absurd h0 (mul_ne_zero hE0 h2)
     · exact h0
-  have orth : ∀ v w, Bf τ c t v w = 0 → ∀ y, psi s β v (psi s β w y) = -psi s β w (psi s β v y) := by
+  have orth
+      : ∀ v w, Bf τ c t v w = 0 → ∀ y, psi s β v (psi s β w y) = - psi s β w (psi s β v y) := by
     intro v w hvw y
     have := anti v w y
     rw [hvw, mul_zero, zero_smul, smul_eq_zero] at this
@@ -70,8 +78,9 @@ theorem exists_lat (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε *
     intro y
     have := anti e f y
     rw [hef, mul_one] at this
-    calc _ = (algebraMap O K ↑ε⁻¹ * E) • (psi s β e (psi s β f y) + psi s β f (psi s β e y)) := by
-          rw [hinvE, one_smul]
+    calc
+      _ = (algebraMap O K ↑ε⁻¹ * E) • (psi s β e (psi s β f y) + psi s β f (psi s β e y)) := by
+        rw [hinvE, one_smul]
       _ = κ • y := by rw [mul_smul, this, smul_smul, hκ, map_mul, map_ofNat]
   obtain ⟨w0, hw0⟩ : ∃ w0, psi s β e w0 ≠ 0 := by
     by_contra H
@@ -128,20 +137,21 @@ theorem exists_lat (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε *
   have hhf : Bf τ c t h f = 0 := by rw [Bf_symm, hfh]
   obtain ⟨μ, hμ⟩ : ∃ μ : K, psi s β h y1 = μ • y1 := by
     obtain ⟨α, γ, hz⟩ : ∃ α γ : K, psi s β h y1 = α • y1 + γ • y2 := ⟨_, _, coord hind _⟩
-    have hpz : psi s β e (psi s β h y1) = 0 := by
-      rw [orth e h heh, pe1, map_zero, neg_zero]
-    rw [hz, map_add (f := _), map_smul, map_smul, pe1, pe2, smul_zero, zero_add, smul_smul, smul_eq_zero] at hpz
+    have hpz : psi s β e (psi s β h y1) = 0 := by rw [orth e h heh, pe1, map_zero, neg_zero]
+    rw [hz, map_add (f := _), map_smul, map_smul, pe1, pe2, smul_zero, zero_add, smul_smul,
+        smul_eq_zero]
+      at hpz
     rcases hpz with h0 | h0
     · rcases mul_eq_zero.mp h0 with h1 | h1
       · exact ⟨α, by rw [hz, h1, zero_smul, add_zero]⟩
       · exact absurd h1 hκ0
     · exact absurd h0 hy1
-  have ph2 : psi s β h y2 = -(μ • y2) := by
-    rw [hy2d, orth h f hhf, hμ, map_smul]
+  have ph2 : psi s β h y2 = -(μ • y2) := by rw [hy2d, orth h f hhf, hμ, map_smul]
   have hμ2 : E * (μ * μ) = algebraMap O K η := by
     have := anti h h y1
-    rw [hhh, hμ, map_smul, hμ, smul_smul, ← two_smul K, smul_smul, smul_smul, ← sub_eq_zero, ← sub_smul,
-      smul_eq_zero] at this
+    rw [hhh, hμ, map_smul, hμ, smul_smul, ← two_smul K, smul_smul, smul_smul, ← sub_eq_zero,
+        ← sub_smul, smul_eq_zero]
+      at this
     rcases this with h0 | h0
     · have h0' : 2 * (E * (μ * μ) - algebraMap O K η) = 0 := by linear_combination h0
       rcases mul_eq_zero.mp h0' with h1 | h1
@@ -150,12 +160,17 @@ theorem exists_lat (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε *
     · exact absurd h0 hy1
   obtain ⟨mμ, hmμ⟩ : ∃ mμ : O, algebraMap O K mμ = μ := by
     have hint : IsIntegral O μ := by
-      refine ⟨Polynomial.X ^ 2 - Polynomial.C (((ε⁻¹ : Oˣ) : O) * (η : O)), Polynomial.monic_X_pow_sub_C _ two_ne_zero, ?_⟩
+      refine ⟨
+        Polynomial.X ^ 2 - Polynomial.C (((ε⁻¹ : Oˣ) : O) * (η : O)),
+        Polynomial.monic_X_pow_sub_C _ two_ne_zero,
+        ?_
+      ⟩
       simp only [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C]
       rw [map_mul, ← hμ2, ← mul_assoc, hinvE, one_mul, sq, sub_self]
     exact IsIntegrallyClosed.isIntegral_iff.mp hint
-  obtain ⟨Λ, hΛ⟩ : ∃ Λ : Set (Etau K τ), ∀ b, b ∈ Λ ↔
-      ∃ p q : O, b = algebraMap O K p • y1 + algebraMap O K q • y2 :=
+  obtain ⟨Λ, hΛ⟩
+      : ∃ Λ : Set (Etau K τ), ∀ b,
+        b ∈ Λ ↔ ∃ p q : O, b = algebraMap O K p • y1 + algebraMap O K q • y2 :=
     ⟨{b | ∃ p q : O, b = algebraMap O K p • y1 + algebraMap O K q • y2}, fun _ => Iff.rfl⟩
   have hy1Λ : y1 ∈ Λ := (hΛ _).mpr ⟨1, 0, by simp⟩
   have hy2Λ : y2 ∈ Λ := (hΛ _).mpr ⟨0, 1, by simp⟩
@@ -176,8 +191,10 @@ theorem exists_lat (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε *
   have hsub : S ⊆ S0 s β Λ := by
     intro v hv
     obtain ⟨a, b, d, rfl⟩ := hspan v hv
-    rw [mem_S0_of_sum_eq hΛ, ← algebraMap_smul K a e, ← algebraMap_smul K b f, ← algebraMap_smul K d h]
-    simp only [map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply, pe1, pe2, pf1, pf2, hμ, ph2]
+    rw [mem_S0_of_sum_eq hΛ, ← algebraMap_smul K a e, ← algebraMap_smul K b f,
+      ← algebraMap_smul K d h]
+    simp only [map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply, pe1, pe2, pf1,
+      pf2, hμ, ph2]
     constructor
     · refine (hΛ _).mpr ⟨d * mμ, b, ?_⟩
       rw [map_mul, hmμ]
@@ -192,8 +209,10 @@ theorem exists_lat (L : IsLoc O Δ) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε *
     exact Bf_int h2O hc hβ hind hΛ (hsub hx) hy
   exact ⟨Λ, hLat, Set.Subset.antisymm hsub hsup⟩
 
-theorem lattice_homothety_of_eq_unimodular (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠ 0) (hs : s ≠ 0) (hu : IsUnit β) {Λ Λ' : Set (Etau K τ)} (hΛ : IsLat O τ Λ) (hΛ' : IsLat O τ Λ')
-    (hS : S0 s β Λ = S0 s β Λ') : ∃ k : Kˣ, Λ' = ((k : K) • ·) '' Λ := by
+theorem lattice_homothety_of_eq_unimodular
+    (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠ 0) (hs : s ≠ 0) (hu : IsUnit β)
+    {Λ Λ' : Set (Etau K τ)} (hΛ : IsLat O τ Λ) (hΛ' : IsLat O τ Λ') (hS : S0 s β Λ = S0 s β Λ')
+    : ∃ k : Kˣ, Λ' = ((k : K) • ·) '' Λ := by
   obtain ⟨y₁, y₂, hy, hb⟩ := lat_basis L hD hΛ
   have h2 : (2 : K) ≠ 0 := by
     have := (L.two.map (algebraMap O K)).ne_zero
@@ -205,8 +224,10 @@ theorem lattice_homothety_of_eq_unimodular (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠
   have h0 : (0 : Etau K τ) ∈ Λ := (hb 0).mpr ⟨0, 0, by simp⟩
   have hy1m : y₁ ∈ Λ := (hb _).mpr ⟨1, 0, by simp⟩
   have hy2m : y₂ ∈ Λ := (hb _).mpr ⟨0, 1, by simp⟩
-  have heS : e ∈ S0 s β Λ := (mem_S0_of_sum_eq hb).mpr ⟨by rw [he1]; exact h0, by rw [he2]; exact hy1m⟩
-  have hfS : f ∈ S0 s β Λ := (mem_S0_of_sum_eq hb).mpr ⟨by rw [hf1]; exact hy2m, by rw [hf2]; exact h0⟩
+  have heS : e ∈ S0 s β Λ :=
+    (mem_S0_of_sum_eq hb).mpr ⟨by rw [he1]; exact h0, by rw [he2]; exact hy1m⟩
+  have hfS : f ∈ S0 s β Λ :=
+    (mem_S0_of_sum_eq hb).mpr ⟨by rw [hf1]; exact hy2m, by rw [hf2]; exact h0⟩
   rw [hS] at heS hfS
   obtain ⟨u, hu'⟩ := hΛ'.fg
   have hspan := hΛ'.span
@@ -220,11 +241,14 @@ theorem lattice_homothety_of_eq_unimodular (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠
     intro p q hpq
     rw [hgp, hgp] at hpq
     exact smul_left_injective K hy1 hpq
-  have hJfg : J.FG := Submodule.fg_of_fg_map_injective g hginj
-    (Submodule.FG.of_le (Submodule.fg_span (Finset.finite_toSet u)) (Submodule.map_comap_le g M'))
+  have hJfg : J.FG :=
+    Submodule.fg_of_fg_map_injective g hginj
+      (Submodule.FG.of_le (Submodule.fg_span (Finset.finite_toSet u)) (Submodule.map_comap_le g M'))
   haveI := L.frac
-  obtain ⟨k, hk⟩ := (FractionalIdeal.isPrincipal
-    (⟨J, FractionalIdeal.isFractional_of_fg hJfg⟩ : FractionalIdeal (nonZeroDivisors O) K)).principal
+  obtain ⟨k, hk⟩ :=
+    (FractionalIdeal.isPrincipal
+      (⟨J, FractionalIdeal.isFractional_of_fg hJfg⟩
+        : FractionalIdeal (nonZeroDivisors O) K)).principal
   change J = Submodule.span O {k} at hk
   have hcoef : ∀ b ∈ M', ∀ p q : K, b = p • y₁ + q • y₂ → p ∈ J ∧ q ∈ J := by
     intro b hbM p q hbpq
@@ -233,7 +257,8 @@ theorem lattice_homothety_of_eq_unimodular (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠
     have h1 := hE _ (hF _ hbM)
     have h2' := hE _ hbM
     rw [hbpq] at h1 h2'
-    simp only [map_add (f := _), map_smul, he1, he2, hf1, hf2, smul_zero, add_zero, zero_add] at h1 h2'
+    simp only [map_add (f := _), map_smul, he1, he2, hf1, hf2, smul_zero, add_zero, zero_add]
+      at h1 h2'
     exact ⟨(hmemJ p).mpr h1, (hmemJ q).mpr h2'⟩
   have hback : ∀ p q : K, p ∈ J → q ∈ J → p • y₁ + q • y₂ ∈ M' := by
     intro p q hp hq
@@ -266,8 +291,8 @@ theorem lattice_homothety_of_eq_unimodular (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠
     obtain ⟨a, ha⟩ := hp
     obtain ⟨a', ha'⟩ := hq
     refine ⟨algebraMap O K a • y₁ + algebraMap O K a' • y₂, (hb _).mpr ⟨a, a', rfl⟩, ?_⟩
-    rw [hc, ← ha, ← ha', smul_add, smul_smul, smul_smul, Algebra.smul_def a k, Algebra.smul_def a' k,
-      mul_comm k, mul_comm k]
+    rw [hc, ← ha, ← ha', smul_add, smul_smul, smul_smul, Algebra.smul_def a k,
+      Algebra.smul_def a' k, mul_comm k, mul_comm k]
   · rintro ⟨y, hyΛ, rfl⟩
     obtain ⟨p, q, rfl⟩ := (hb y).mp hyΛ
     rw [smul_add, smul_smul, smul_smul]
@@ -278,15 +303,17 @@ theorem lattice_homothety_of_eq_unimodular (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠
       exact ⟨q, by rw [Algebra.smul_def, mul_comm]⟩
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-theorem unimodular_image_mul_unit (z : (Etau K τ)ˣ) (Λ : Set (Etau K τ)) :
-    S0 s β (((z : Etau K τ) * ·) '' Λ) = (fun v => (v.1, quo z * v.2)) '' S0 s β Λ := by
+theorem unimodular_image_mul_unit (z : (Etau K τ)ˣ) (Λ : Set (Etau K τ))
+    : S0 s β (((z : Etau K τ) * ·) '' Λ) = (fun v => (v.1, quo z * v.2)) '' S0 s β Λ := by
   have hq : quo z * quo z⁻¹ = 1 := by
     simp only [quo, inv_inv]
-    calc (z : Etau K τ) * star ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ) * (((z⁻¹ : (Etau K τ)ˣ) : Etau K τ) * star (z : Etau K τ))
-        = ((z : Etau K τ) * ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ))
-          * star ((z : Etau K τ) * ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ)) := by
-          rw [star_mul']
-          ring
+    calc
+      (z : Etau K τ) * star ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ)
+            * (((z⁻¹ : (Etau K τ)ˣ) : Etau K τ) * star (z : Etau K τ))
+          = ((z : Etau K τ) * ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ))
+            * star ((z : Etau K τ) * ((z⁻¹ : (Etau K τ)ˣ) : Etau K τ)) := by
+        rw [star_mul']
+        ring
       _ = 1 := by simp
   have hw2 : ∀ w : K × Etau K τ, w = ((w.1, quo z⁻¹ * w.2).1, quo z * (w.1, quo z⁻¹ * w.2).2) := by
     intro w
@@ -308,7 +335,8 @@ theorem unimodular_image_mul_unit (z : (Etau K τ)ˣ) (Λ : Set (Etau K τ)) :
     exact ⟨_, hv y hy, rfl⟩
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-theorem unimodular_image_smul_eq (k : Kˣ) (Λ : Set (Etau K τ)) : S0 s β (((k : K) • ·) '' Λ) = S0 s β Λ := by
+theorem unimodular_image_smul_eq (k : Kˣ) (Λ : Set (Etau K τ))
+    : S0 s β (((k : K) • ·) '' Λ) = S0 s β Λ := by
   ext v
   simp only [S0, Set.mem_setOf_eq]
   constructor
@@ -322,8 +350,8 @@ theorem unimodular_image_smul_eq (k : Kˣ) (Λ : Set (Etau K τ)) : S0 s β (((k
     rw [map_smul]
     exact ⟨_, h y hy, rfl⟩
 
-theorem Uni.iso (L : IsLoc O Δ) (ht : t ≠ 0) {S : Set (K × Etau K τ)} (hS : Uni O c t S) :
-    IsSquare (τ ^ 2 - 4) ∨ ∃ a b : K, a ^ 2 - (τ ^ 2 - 4) * b ^ 2 = -2 * c * t := by
+theorem Uni.iso (L : IsLoc O Δ) (ht : t ≠ 0) {S : Set (K × Etau K τ)} (hS : Uni O c t S)
+    : IsSquare (τ ^ 2 - 4) ∨ ∃ a b : K, a ^ 2 - (τ ^ 2 - 4) * b ^ 2 = -2 * c * t := by
   obtain ⟨e, -, f, -, h, -, η, hee, -, hef, -⟩ := Uni.frame L hS
   have h2 : (2 : K) ≠ 0 := by
     have := L.two.map (algebraMap O K)

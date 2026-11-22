@@ -12,7 +12,8 @@ noncomputable section
 namespace LateralTheory.EtaleFoundations
 
 abbrev secF (R : Type) [CommRing R] (U : Scheme.{0}) : Shv R ⥤ Type 1 :=
-  sheafToPresheaf Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R)) ⋙ (evaluation _ _).obj (op U) ⋙ forget _
+  sheafToPresheaf Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R))
+    ⋙ (evaluation _ _).obj (op U) ⋙ forget _
 
 lemma etale_sheaf_sections_map_comp_hom {R : Type} [CommRing R] {F G H : Shv R} (φ : F ⟶ G) (ψ : G ⟶ H) {U : Scheme.{0}} (x : Sec F U) :
     Sec.map (φ ≫ ψ) x = Sec.map ψ (Sec.map φ x) := rfl
@@ -39,24 +40,31 @@ lemma kernel_sec {R : Type} [CommRing R] {F G : Shv R} (g : F ⟶ G) (U : Scheme
   · obtain ⟨x, hx, -⟩ := hu b (hb.trans (etale_sheaf_sections_map_zero_hom (G := G) b).symm)
     exact ⟨x, hx⟩
 
-theorem etale_short_complex_exact_iff_locally_surjective_on_kernel : EtaleShortComplexExactIffLocallySurjectiveOnKernel := by
+theorem etale_short_complex_exact_iff_locally_surjective_on_kernel
+    : EtaleShortComplexExactIffLocallySurjectiveOnKernel := by
   intro R _ S
   rw [S.exact_iff_epi_kernel_lift, ← Sheaf.isLocallySurjective_iff_epi']
-  have hl : ∀ {V : Scheme.{0}} (a : Sec S.X₁ V),
-      Sec.map (kernel.ι S.g) (Sec.map (kernel.lift S.g S.f S.zero) a) = Sec.map S.f a := by
+  have hl
+      : ∀ {V : Scheme.{0}} (a : Sec S.X₁ V),
+        Sec.map (kernel.ι S.g) (Sec.map (kernel.lift S.g S.f S.zero) a) = Sec.map S.f a := by
     intro V a; rw [← etale_sheaf_sections_map_comp_hom, kernel.lift_ι]
   constructor
   · intro h U b hb
     obtain ⟨k, rfl⟩ := (kernel_sec S.g U).2 b hb
-    refine ⟨_, Presheaf.imageSieve_mem Scheme.etaleTopology (kernel.lift S.g S.f S.zero).hom (U := op U) k, ?_⟩
+    refine ⟨
+      _,
+      Presheaf.imageSieve_mem Scheme.etaleTopology (kernel.lift S.g S.f S.zero).hom (U := op U) k,
+      ?_
+    ⟩
     rintro V g ⟨t, ht⟩
     refine ⟨t, ?_⟩
     rw [← hl t, show Sec.map (kernel.lift S.g S.f S.zero) t = Sec.res g k from ht, sec_map_res]
   · intro h
     constructor
     intro U k
-    obtain ⟨T, hT, hTa⟩ := h U (Sec.map (kernel.ι S.g) k)
-      (by rw [← etale_sheaf_sections_map_comp_hom, kernel.condition]; rfl)
+    obtain ⟨T, hT, hTa⟩ :=
+      h U (Sec.map (kernel.ι S.g) k)
+        (by rw [← etale_sheaf_sections_map_comp_hom, kernel.condition]; rfl)
     refine Scheme.etaleTopology.superset_covering ?_ hT
     intro V g hg
     obtain ⟨a, ha⟩ := hTa V g hg

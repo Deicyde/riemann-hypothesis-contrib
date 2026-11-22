@@ -7,10 +7,11 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.LocalGro
 open MeasureTheory Topology
 open scoped ENNReal
 
-theorem UpperTheory.ConvolutionTheory.G.quotMap_of :
-    UpperTheory.ConvolutionTheory.G.NormEx → UpperTheory.ConvolutionTheory.G.QuotEq → UpperTheory.ConvolutionTheory.G.QuotMap := by
-  intro hN hE G _ _ _ _ _ _ _ _ T _ _ _ _ _ _ _ _ G' _ _ _ _ _ _ _ _ T' _ _ _ _ _ _ _ _
-    μ j ν hP μ' j' ν' hP' e y hμ hν F hF hinv
+theorem UpperTheory.ConvolutionTheory.G.quotMap_of
+    : UpperTheory.ConvolutionTheory.G.NormEx → UpperTheory.ConvolutionTheory.G.QuotEq
+      → UpperTheory.ConvolutionTheory.G.QuotMap := by
+  intro hN hE G _ _ _ _ _ _ _ _ T _ _ _ _ _ _ _ _ G' _ _ _ _ _ _ _ _ T' _ _ _ _ _ _ _ _ μ j ν hP μ'
+    j' ν' hP' e y hμ hν F hF hinv
   obtain ⟨ρ0, -, hρ, -⟩ := hN G' T' μ' j' ν' hP'
   set ρ : G' → ℝ≥0∞ := fun g => (ρ0 g : ℝ≥0∞) with hρdef
   have hjc : Continuous j := hP.2.1.continuous
@@ -25,8 +26,7 @@ theorem UpperTheory.ConvolutionTheory.G.quotMap_of :
     have ho : IsOpen (Set.range j')ᶜ := hcl.isOpen_compl
     have h0 : (ν.map (fun t => e (j t))) (Set.range j')ᶜ = 0 := by
       rw [hν, Measure.map_apply hj'c.measurable ho.measurableSet]
-      have : j' ⁻¹' (Set.range j')ᶜ = ∅ := by
-        ext t; simp
+      have : j' ⁻¹' (Set.range j')ᶜ = ∅ := by ext t; simp
       rw [this, measure_empty]
     rw [Measure.map_apply hejc.measurable ho.measurableSet] at h0
     have he := (ho.preimage hejc).eq_empty_of_measure_zero h0

@@ -19,17 +19,22 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc.EigenDegree
 
-theorem abstract {B D : Type} [CommRing B] [CommRing D] [IsDomain D] (ι : B →+* D)
-    (hι : Function.Injective ι) (φ : B →+* B) (F : ℤ → D → Prop) (h1 : F 0 1)
-    (hmul : ∀ a b x y, F a x → F b y → F (a + b) (x * y)) (p t : B) (hp : IsUnit p) (ht : IsUnit t)
-    (hφt : φ t = p * t) (ht2 : ¬ F 2 (ι t)) (hsucc : ∀ y, F 1 y → ∃ z, F 0 z ∧ y = ι t * z)
+theorem abstract
+    {B D : Type} [CommRing B] [CommRing D] [IsDomain D]
+    (ι : B →+* D) (hι : Function.Injective ι)
+    (φ : B →+* B)
+    (F : ℤ → D → Prop) (h1 : F 0 1) (hmul : ∀ a b x y, F a x → F b y → F (a + b) (x * y))
+    (p t : B) (hp : IsUnit p) (ht : IsUnit t) (hφt : φ t = p * t) (ht2 : ¬ F 2 (ι t))
+    (hsucc : ∀ y, F 1 y → ∃ z, F 0 z ∧ y = ι t * z)
     (hfund : ∀ b, φ b = b → F 0 (ι b) → b ≠ 0 → ∃ c, c * b = 1 ∧ F 0 (ι c))
-    (n : ℕ) (hn : 0 < n) (x : B) (hx : (⇑φ)^[n] x = p * x) (hx0 : x ≠ 0) (hx1 : F 1 (ι x))
-    (hj0 : ∀ j, j < n → F 0 (ι ((⇑φ)^[j] x))) :
-    IsUnit x ∧ ¬ F 2 (ι x) ∧ ∀ j, 0 < j → j < n → ¬ F 1 (ι ((⇑φ)^[j] x)) := by
+    (n : ℕ) (hn : 0 < n)
+    (x : B) (hx : (⇑φ)^[n] x = p * x) (hx0 : x ≠ 0) (hx1 : F 1 (ι x))
+    (hj0 : ∀ j, j < n → F 0 (ι ((⇑φ)^[j] x)))
+    : IsUnit x ∧ ¬ F 2 (ι x) ∧ ∀ j, 0 < j → j < n → ¬ F 1 (ι ((⇑φ)^[j] x)) := by
   haveI : IsDomain B := hι.isDomain ι
-  have hprod : ∀ (d : ℕ → ℤ) (f : ℕ → D) (s : Finset ℕ), (∀ i ∈ s, F (d i) (f i)) →
-      F (∑ i ∈ s, d i) (∏ i ∈ s, f i) := by
+  have hprod
+      : ∀ (d : ℕ → ℤ) (f : ℕ → D) (s : Finset ℕ),
+        (∀ i ∈ s, F (d i) (f i)) → F (∑ i ∈ s, d i) (∏ i ∈ s, f i) := by
     intro d f s
     induction s using Finset.induction_on with
     | empty => intro _; simpa using h1
@@ -57,11 +62,12 @@ theorem abstract {B D : Type} [CommRing B] [CommRing D] [IsDomain D] (ι : B →
     rw [← e2]
     ring
   have hN1 : F 1 (ι N) := by
-    have := hprod (fun i => if i = 0 then 1 else 0) (fun i => ι ((⇑φ)^[i] x)) (Finset.range n) (by
-      intro i hi
-      split_ifs with h
-      · subst h; exact hx1
-      · exact hj0 i (Finset.mem_range.1 hi))
+    have :=
+      hprod (fun i => if i = 0 then 1 else 0) (fun i => ι ((⇑φ)^[i] x)) (Finset.range n) (by
+        intro i hi
+        split_ifs with h
+        · subst h; exact hx1
+        · exact hj0 i (Finset.mem_range.1 hi))
     rw [← map_prod, ← hN] at this
     simpa [hn] using this
   obtain ⟨s, hs⟩ := ht.exists_right_inv
@@ -74,7 +80,8 @@ theorem abstract {B D : Type} [CommRing B] [CommRing D] [IsDomain D] (ι : B →
     rw [map_mul, hz', ← mul_assoc, ← map_mul, mul_comm s, hs, map_one, one_mul]
   obtain ⟨c, hc, hc0⟩ := hfund _ hφb (hbz ▸ hz) (fun h => hN0 (by rw [← hb, h, mul_zero]))
   have htc : t = c * N := by
-    calc t = t * (c * (s * N)) := by rw [hc, mul_one]
+    calc
+      t = t * (c * (s * N)) := by rw [hc, mul_one]
       _ = c * (t * (s * N)) := by ring
       _ = c * N := by rw [hb]
   have hNu : IsUnit N := isUnit_of_mul_isUnit_right (htc ▸ ht)
@@ -86,16 +93,20 @@ theorem abstract {B D : Type} [CommRing B] [CommRing D] [IsDomain D] (ι : B →
   have key : ∀ j, j < n → ¬ F ((if j = 0 then 1 else 0) + 1) (ι ((⇑φ)^[j] x)) := by
     intro j hj h
     apply hN2
-    have := hprod (fun i => (if i = 0 then 1 else 0) + (if i = j then 1 else 0))
-      (fun i => ι ((⇑φ)^[i] x)) (Finset.range n) (by
-      intro i hi
-      by_cases hij : i = j
-      · subst hij
-        simpa using h
-      · by_cases h0 : i = 0
-        · subst h0
-          simpa [hij] using hx1
-        · simpa [hij, h0] using hj0 i (Finset.mem_range.1 hi))
+    have :=
+      hprod
+        (fun i => (if i = 0 then 1 else 0) + (if i = j then 1 else 0))
+        (fun i => ι ((⇑φ)^[i] x))
+        (Finset.range n)
+        (by
+          intro i hi
+          by_cases hij : i = j
+          · subst hij
+            simpa using h
+          · by_cases h0 : i = 0
+            · subst h0
+              simpa [hij] using hx1
+            · simpa [hij, h0] using hj0 i (Finset.mem_range.1 hi))
     rw [← map_prod, ← hN, Finset.sum_add_distrib] at this
     simpa [hn, hj, one_add_one_eq_two] using this
   refine ⟨?_, ?_, fun j h0 hj => ?_⟩
@@ -108,19 +119,24 @@ theorem abstract {B D : Type} [CommRing B] [CommRing D] [IsDomain D] (ι : B →
 set_option allowUnsafeReducibility true in
 attribute [local irreducible] Per.Acris Per.Bcris
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (C : GlobalTheory.MemLoc.Core l) (n : ℕ), 0 < n → ∀ x : Per.Bcris l,
-    (⇑(Per.φB l))^[n] x = (l : Per.Bcris l) * x → x ≠ 0 → C.ι x ∈ Per.FilD l 1 →
-    (∀ j : ℕ, j < n → C.ι ((⇑(Per.φB l))^[j] x) ∈ Per.FilD l 0) →
-    IsUnit x ∧ C.ι x ∉ Per.FilD l 2 ∧
-      ∀ j : ℕ, 0 < j → j < n → C.ι ((⇑(Per.φB l))^[j] x) ∉ Per.FilD l 1 := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (C : GlobalTheory.MemLoc.Core l) (n : ℕ),
+      0 < n
+        → ∀ x : Per.Bcris l,
+          (⇑(Per.φB l))^[n] x = (l : Per.Bcris l) * x → x ≠ 0 → C.ι x ∈ Per.FilD l 1
+            → (∀ j : ℕ, j < n → C.ι ((⇑(Per.φB l))^[j] x) ∈ Per.FilD l 0)
+            → IsUnit x ∧ C.ι x ∉ Per.FilD l 2
+              ∧ ∀ j : ℕ, 0 < j → j < n → C.ι ((⇑(Per.φB l))^[j] x) ∉ Per.FilD l 1 := by
   intro l _ C n hn x hx hx0 hx1 hj0
   obtain ⟨-, h1, hmul, -, -, -, hP⟩ := filD_laws l
   obtain ⟨htu, -, ht2, hlu⟩ := core_t_unit_fil l C
   have he := core_isEps l C
   have hlog := (LogFun.log_fun l C.ε C.t he.1 C.t_log).2.2.2 C.j C.j_cris
   haveI : IsDomain (Per.BdR l) := (BdRField.bdR_isField l).2.2.1.isDomain
-  refine abstract C.ι (ULaws.u_laws l C).2.2.2.1 (Per.φB l) (fun a y => y ∈ Per.FilD l a) h1 hmul
-    (l : Per.Bcris l) (algebraMap (Per.Acris l) (Per.Bcris l) C.t) hlu htu ?_ ?_ ?_ ?_ n hn x hx hx0 hx1 hj0
+  refine abstract C.ι (ULaws.u_laws l C).2.2.2.1 (Per.φB l)
+    (fun a y => y ∈ Per.FilD l a)
+    h1 hmul (l : Per.Bcris l) (algebraMap (Per.Acris l) (Per.Bcris l) C.t) hlu htu ?_ ?_ ?_ ?_ n hn
+    x hx hx0 hx1 hj0
   · rw [fund_phiB_alg, TPhi.t_phi l C, map_mul, map_natCast]
   · intro h
     rw [C.ι_j] at h

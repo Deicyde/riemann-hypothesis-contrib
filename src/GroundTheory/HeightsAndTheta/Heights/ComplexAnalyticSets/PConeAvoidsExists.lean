@@ -20,36 +20,48 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 variable {n : ℕ}
 
-theorem leadIdeal_isHomogeneous (J : Ideal (MvPolynomial (Fin n) ℂ)) :
-    (leadIdeal J).IsHomogeneous (homogeneousSubmodule (Fin n) ℂ) :=
+theorem leadIdeal_isHomogeneous (J : Ideal (MvPolynomial (Fin n) ℂ))
+    : (leadIdeal J).IsHomogeneous (homogeneousSubmodule (Fin n) ℂ) :=
   Ideal.homogeneous_span _ _ (by
     rintro _ ⟨f, -, rfl⟩
-    exact ⟨f.totalDegree, (mem_homogeneousSubmodule _ _).2 (homogeneousComponent_isHomogeneous _ _)⟩)
+    exact
+      ⟨f.totalDegree, (mem_homogeneousSubmodule _ _).2 (homogeneousComponent_isHomogeneous _ _)⟩)
 
-theorem linIdeal_isHomogeneous {d : ℕ} (A : Matrix (Fin d) (Fin n) ℂ) :
-    (linIdeal A).IsHomogeneous (homogeneousSubmodule (Fin n) ℂ) :=
+theorem linIdeal_isHomogeneous {d : ℕ} (A : Matrix (Fin d) (Fin n) ℂ)
+    : (linIdeal A).IsHomogeneous (homogeneousSubmodule (Fin n) ℂ) :=
   Ideal.homogeneous_span _ _ (by
     rintro _ ⟨i, rfl⟩
-    exact ⟨1, (mem_homogeneousSubmodule _ _).2
-      (IsHomogeneous.sum _ _ _ (fun j _ => (isHomogeneous_X ℂ j).C_mul (A i j)))⟩)
+    exact ⟨
+      1,
+      (mem_homogeneousSubmodule _ _).2
+        (IsHomogeneous.sum _ _ _ (fun j _ => (isHomogeneous_X ℂ j).C_mul (A i j)))
+    ⟩)
 
-theorem linIdeal_cons {k : ℕ} (A : Matrix (Fin k) (Fin n) ℂ) (B : Matrix (Fin 1) (Fin n) ℂ) :
-    linIdeal (Matrix.of (Fin.cons (B 0) A : Fin (k + 1) → Fin n → ℂ)) = linIdeal A ⊔ linIdeal B := by
-  have h : linPoly (Matrix.of (Fin.cons (B 0) A : Fin (k + 1) → Fin n → ℂ)) =
-      Fin.cons (linPoly B 0) (linPoly A) := by
+theorem linIdeal_cons {k : ℕ} (A : Matrix (Fin k) (Fin n) ℂ) (B : Matrix (Fin 1) (Fin n) ℂ)
+    : linIdeal (Matrix.of (Fin.cons (B 0) A : Fin (k + 1) → Fin n → ℂ))
+      = linIdeal A ⊔ linIdeal B := by
+  have h
+      : linPoly (Matrix.of (Fin.cons (B 0) A : Fin (k + 1) → Fin n → ℂ))
+        = Fin.cons (linPoly B 0) (linPoly A) := by
     funext i
     exact Fin.cases rfl (fun i => rfl) i
   have hB : Set.range (linPoly B) = {linPoly B 0} := by
     rw [Set.range_unique]
     rfl
-  rw [linIdeal, linIdeal, linIdeal, h, Fin.range_cons, hB, Set.insert_eq, Ideal.span_union, sup_comm]
+  rw [linIdeal, linIdeal, linIdeal, h, Fin.range_cons, hB, Set.insert_eq, Ideal.span_union,
+    sup_comm]
 
-theorem ConeAvoidsExists.proof (hlead : LeadIdealDim.Statement) (hcut : LinearFormCut.Statement)
-    (hpow : HomogDimZeroPow.Statement) : ConeAvoidsExists.Statement := by
+theorem ConeAvoidsExists.proof
+    (hlead : LeadIdealDim.Statement) (hcut : LinearFormCut.Statement)
+    (hpow : HomogDimZeroPow.Statement)
+    : ConeAvoidsExists.Statement := by
   intro n d J _ hd
-  have key : ∀ k, k ≤ d → ∃ A : Matrix (Fin k) (Fin n) ℂ,
-      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (leadIdeal J ⊔ linIdeal A)) ≤
-        ((d - k : ℕ) : WithBot ℕ∞) := by
+  have key
+      : ∀ k,
+        k ≤ d
+          → ∃ A : Matrix (Fin k) (Fin n) ℂ,
+            ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (leadIdeal J ⊔ linIdeal A))
+              ≤ ((d - k : ℕ) : WithBot ℕ∞) := by
     intro k
     induction k with
     | zero =>

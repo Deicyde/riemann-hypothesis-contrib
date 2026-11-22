@@ -10,22 +10,31 @@ open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
 section
 
-variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {F : UpperTheory.V.Fr.Frame l (ResidueField O)} {n : ℕ}
-  (S : Space O F n)
+variable
+  {l : ℕ} [Fact l.Prime]
+  {O : Type} [CommRing O] [IsLocalRing O]
+  {F : UpperTheory.V.Fr.Frame l (ResidueField O)} {n : ℕ} (S : Space O F n)
 
 end
 
-theorem UpperTheory.V.Fr.cont_u :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, S.u.Cont S.x0 ∧ (∀ i, AdicCont S.mB fun g => S.aB g i) ∧ (∀ v i, AdicCont S.mB (S.ψB v i)) ∧ ∀ j (N : ℕ), ∃ M : ℕ, ∀ a ∈ S.gr j, (a : S.R) ∈ maximalIdeal S.R ^ M → a ∈ S.mB ^ N • S.gr j := by
+theorem UpperTheory.V.Fr.cont_u
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ S : Space O F n,
+          S.u.Cont S.x0 ∧ (∀ i, AdicCont S.mB fun g => S.aB g i) ∧ (∀ v i, AdicCont S.mB (S.ψB v i))
+            ∧ ∀ j (N : ℕ), ∃ M : ℕ, ∀ a ∈ S.gr j,
+              (a : S.R) ∈ maximalIdeal S.R ^ M → a ∈ S.mB ^ N • S.gr j := by
   intro l _ O _ _ _ _ F C₀ n hF hn S
   obtain ⟨W, hz, hr, hB, hA, hgr⟩ := wpres hF hn S
   have hAW : ∀ (j : ℤ) (q : S.R), q ∈ W.part j → q ∈ S.A := by
     intro j q hq
     rw [hA]
     exact Submodule.mem_iSup_of_mem j hq
-  have hmulB : ∀ (N : ℕ) (Q : Submodule O S.R),
-      (∀ y ∈ Q, ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N) →
-      ∀ y ∈ Q * W.part 0, ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N := by
+  have hmulB
+      : ∀ (N : ℕ) (Q : Submodule O S.R),
+        (∀ y ∈ Q, ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N)
+          → ∀ y ∈ Q * W.part 0, ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N := by
     intro N Q hQ y hy
     refine Submodule.mul_induction_on hy ?_ ?_
     · intro p hp q hq
@@ -34,8 +43,10 @@ theorem UpperTheory.V.Fr.cont_u :
       exact ⟨p' * ⟨q, hq0⟩, rfl, Ideal.mul_mem_right _ _ hp'⟩
     · rintro x z ⟨x', rfl, hx'⟩ ⟨z', rfl, hz'⟩
       exact ⟨x' + z', rfl, Ideal.add_mem _ hx' hz'⟩
-  have hP : ∀ (N : ℕ) (y : S.R), y ∈ (W.part 0 ⊓ Submodule.restrictScalars O (maximalIdeal S.R)) ^ N →
-      ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N := by
+  have hP
+      : ∀ (N : ℕ) (y : S.R),
+        y ∈ (W.part 0 ⊓ Submodule.restrictScalars O (maximalIdeal S.R)) ^ N
+          → ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N := by
     intro N
     induction N with
     | zero =>
@@ -58,9 +69,10 @@ theorem UpperTheory.V.Fr.cont_u :
         exact Ideal.mul_mem_mul hp' hqm
       · rintro x z ⟨x', rfl, hx'⟩ ⟨z', rfl, hz'⟩
         exact ⟨x' + z', rfl, Ideal.add_mem _ hx' hz'⟩
-  have hT : ∀ (N : ℕ) (j : ℤ) (y : S.R),
-      y ∈ (W.part 0 ⊓ Submodule.restrictScalars O (maximalIdeal S.R)) ^ N * W.part 0 * W.part j →
-      ∃ a : S.A, (a : S.R) = y ∧ a ∈ S.mB ^ N • S.gr j ∧ a ∈ S.x0 ^ N := by
+  have hT
+      : ∀ (N : ℕ) (j : ℤ) (y : S.R),
+        y ∈ (W.part 0 ⊓ Submodule.restrictScalars O (maximalIdeal S.R)) ^ N * W.part 0 * W.part j
+          → ∃ a : S.A, (a : S.R) = y ∧ a ∈ S.mB ^ N • S.gr j ∧ a ∈ S.x0 ^ N := by
     intro N j y hy
     refine Submodule.mul_induction_on hy ?_ ?_
     · intro p hp q hq
@@ -74,8 +86,10 @@ theorem UpperTheory.V.Fr.cont_u :
       exact Ideal.mul_mem_right _ _ hib
     · rintro x z ⟨x', rfl, hx1, hx2⟩ ⟨z', rfl, hz1, hz2⟩
       exact ⟨x' + z', rfl, Submodule.add_mem _ hx1 hz1, Ideal.add_mem _ hx2 hz2⟩
-  have hcA : ∀ {Γ : Type} [TopologicalSpace Γ] (j : ℤ) (f : Γ → S.A), (∀ g, (f g : S.R) ∈ W.part j) →
-      AdicCont (maximalIdeal S.R) (fun g => (f g : S.R)) → AdicCont S.x0 f := by
+  have hcA
+      : ∀ {Γ : Type} [TopologicalSpace Γ] (j : ℤ) (f : Γ → S.A),
+        (∀ g, (f g : S.R) ∈ W.part j) → AdicCont (maximalIdeal S.R) (fun g => (f g : S.R))
+          → AdicCont S.x0 f := by
     intro Γ _ j f hf hc N
     obtain ⟨M, hM⟩ := part_filt O ℤ S.R W hz j N
     have hcM := hc M
@@ -87,8 +101,9 @@ theorem UpperTheory.V.Fr.cont_u :
     have hax : f y - f x = a := Subtype.ext (by rw [ha]; rfl)
     rw [hax]
     exact ha2
-  have hcB : ∀ {Γ : Type} [TopologicalSpace Γ] (f : Γ → S.B),
-      AdicCont (maximalIdeal S.R) (fun g => (f g : S.R)) → AdicCont S.mB f := by
+  have hcB
+      : ∀ {Γ : Type} [TopologicalSpace Γ] (f : Γ → S.B),
+        AdicCont (maximalIdeal S.R) (fun g => (f g : S.R)) → AdicCont S.mB f := by
     intro Γ _ f hc N
     obtain ⟨M, hM⟩ := part_filt O ℤ S.R W hz 0 N
     have hcM := hc M

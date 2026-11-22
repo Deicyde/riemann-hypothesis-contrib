@@ -19,23 +19,23 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.CanonicalRigidImages
 
-def fnSec {Z Y : Scheme.{0}} (L : LB Z) (f : Γ(Y, ⊤)) :
-    LB.Sec (LB.LinComb L (Y := Y) (K := PEmpty) PEmpty.elim PEmpty.elim) where
+def fnSec {Z Y : Scheme.{0}} (L : LB Z) (f : Γ(Y, ⊤))
+    : LB.Sec (LB.LinComb L (Y := Y) (K := PEmpty) PEmpty.elim PEmpty.elim) where
   f := fun _ => (Y.presheaf.map (homOfLE le_top).op).hom f
   compat := by
     intro i j
-    have key : ∀ {U W : Y.Opens} (h : W ≤ U),
-        (Y.presheaf.map (homOfLE h).op).hom ((Y.presheaf.map (homOfLE (le_top : U ≤ ⊤)).op).hom f) =
-          (Y.presheaf.map (homOfLE (le_top : W ≤ ⊤)).op).hom f := by
+    have key
+        : ∀ {U W : Y.Opens} (h : W ≤ U),
+          (Y.presheaf.map (homOfLE h).op).hom ((Y.presheaf.map (homOfLE (le_top : U ≤ ⊤)).op).hom f)
+            = (Y.presheaf.map (homOfLE (le_top : W ≤ ⊤)).op).hom f := by
       intro U W h
       rw [← RingHom.comp_apply, ← CommRingCat.hom_comp, ← Functor.map_comp]
       rfl
-    have hg : (LB.LinComb L (Y := Y) (K := PEmpty) PEmpty.elim PEmpty.elim).g i j = 1 :=
-      rfl
+    have hg : (LB.LinComb L (Y := Y) (K := PEmpty) PEmpty.elim PEmpty.elim).g i j = 1 := rfl
     rw [key, key, hg, Units.val_one, _root_.one_mul]
 
-def unitGen {Z Y : Scheme.{0}} (L : LB Z) (u : Γ(Y, ⊤)ˣ) :
-    LB.Gen (LB.LinComb L (Y := Y) (K := PEmpty) PEmpty.elim PEmpty.elim) where
+def unitGen {Z Y : Scheme.{0}} (L : LB Z) (u : Γ(Y, ⊤)ˣ)
+    : LB.Gen (LB.LinComb L (Y := Y) (K := PEmpty) PEmpty.elim PEmpty.elim) where
   s := fun _ => res le_top u
 
 variable {R : Type} [CommRing R] [IsDomain R] (D : DegPre R) (I : Ideal R) (e : ℕ)
@@ -66,56 +66,59 @@ def oεinv : Fin 4 → ℤ := fun k => - oε k
 def cubAt {T : Over (Se R I e)} (a b d : up I e T ⟶ D.P.A) :=
   LB.pullGen (Z := T.left) D.P.L (thφ D.P.A (x3 D.P.A)) thε D.cub.t (lift a (lift b d)).left
 
-def IsImage {H : Over (Se R I e)} (q : H ⟶ Be D I e) (χ : D.X)
-    (x : LB.Gen (LB.LinComb D.P.L (oφ D I e q χ) oεinv)) (V : (Be D I e).left.Opens)
+def IsImage
+    {H : Over (Se R I e)} (q : H ⟶ Be D I e)
+    (χ : D.X) (x : LB.Gen (LB.LinComb D.P.L (oφ D I e q χ) oεinv))
+    (V : (Be D I e).left.Opens)
     (s : LB.Sec (LB.LinComb D.P.L (fun k => V.ι ≫ oφ D I e (𝟙 _) χ k) oε))
-    (h : Γ((q.left ⁻¹ᵁ V).toScheme, ⊤)) : Prop :=
+    (h : Γ((q.left ⁻¹ᵁ V).toScheme, ⊤))
+    : Prop :=
   GeneratorPullback.SecRel D.P.L _ _ (fnSec D.P.L h) _ _ s (q.left ∣_ V) _ _
     (LB.pullGen D.P.L _ _ x (q.left ⁻¹ᵁ V).ι)
 
 structure GtIso (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G] where
-
   q : thickObj R I e G ⟶ Be D I e
   q_hom : IsMonHom q
   q_affine : IsAffineHom q.left
-
   x : ∀ χ : D.X, LB.Gen (LB.LinComb D.P.L (oφ D I e q χ) oεinv)
   x_gen : ∀ χ, (x χ).IsGen
-
-  x_add : ∀ χ χ' : D.X, LB.Gen.Corr D.P.L _ _ _ _
-    (LB.mulGen D.P.L _ _ _ _ (x (χ + χ'))
-      (cubAt D I e (cPt D I e _ χ) (cPt D I e _ χ') (down D I e q)))
-    (LB.mulGen D.P.L _ _ _ _ (x χ) (x χ'))
-
-  x_mul : ∀ χ : D.X, LB.Gen.Corr D.P.L _ _ _ _
-    (LB.mulGen D.P.L _ _ _ _
-      (LB.pullGen D.P.L _ _ (x χ) (μ[thickObj R I e G]).left)
-      (cubAt D I e (cPt D I e _ χ)
-        (down D I e (fst (thickObj R I e G) (thickObj R I e G) ≫ q))
-        (down D I e (snd (thickObj R I e G) (thickObj R I e G) ≫ q))))
-    (LB.mulGen D.P.L _ _ _ _
-      (LB.pullGen D.P.L _ _ (x χ) (fst (thickObj R I e G) (thickObj R I e G)).left)
-      (LB.pullGen D.P.L _ _ (x χ) (snd (thickObj R I e G) (thickObj R I e G)).left))
-
-  span : ∀ (V : (Be D I e).left.Opens), IsAffineOpen V →
-    ∀ f : Γ((q.left ⁻¹ᵁ V).toScheme, ⊤),
-      ∃ (F : Finset D.X)
-        (s : ∀ χ, LB.Sec (LB.LinComb D.P.L (fun k => V.ι ≫ oφ D I e (𝟙 _) χ k) oε))
-        (h : D.X → Γ((q.left ⁻¹ᵁ V).toScheme, ⊤)),
-        (∀ χ ∈ F, IsImage D I e q χ (x χ) V (s χ) (h χ)) ∧ f = ∑ χ ∈ F, h χ
-
-  indep : ∀ (V : (Be D I e).left.Opens), IsAffineOpen V →
-    ∀ (F : Finset D.X)
-      (s : ∀ χ, LB.Sec (LB.LinComb D.P.L (fun k => V.ι ≫ oφ D I e (𝟙 _) χ k) oε))
-      (h : D.X → Γ((q.left ⁻¹ᵁ V).toScheme, ⊤)),
-      (∀ χ ∈ F, IsImage D I e q χ (x χ) V (s χ) (h χ)) → ∑ χ ∈ F, h χ = 0 →
-        ∀ χ ∈ F, ∀ j, (s χ).f j = 0
-
+  x_add
+    : ∀ χ χ' : D.X,
+      LB.Gen.Corr D.P.L _ _ _ _
+        (LB.mulGen D.P.L _ _ _ _ (x (χ + χ'))
+          (cubAt D I e (cPt D I e _ χ) (cPt D I e _ χ') (down D I e q)))
+        (LB.mulGen D.P.L _ _ _ _ (x χ) (x χ'))
+  x_mul
+    : ∀ χ : D.X,
+      LB.Gen.Corr D.P.L _ _ _ _
+        (LB.mulGen D.P.L _ _ _ _ (LB.pullGen D.P.L _ _ (x χ) (μ[thickObj R I e G]).left)
+          (cubAt D I e (cPt D I e _ χ) (down D I e (fst (thickObj R I e G) (thickObj R I e G) ≫ q))
+            (down D I e (snd (thickObj R I e G) (thickObj R I e G) ≫ q))))
+        (LB.mulGen D.P.L _ _ _ _
+          (LB.pullGen D.P.L _ _ (x χ) (fst (thickObj R I e G) (thickObj R I e G)).left)
+          (LB.pullGen D.P.L _ _ (x χ) (snd (thickObj R I e G) (thickObj R I e G)).left))
+  span
+    : ∀ (V : (Be D I e).left.Opens),
+      IsAffineOpen V
+        → ∀ f : Γ((q.left ⁻¹ᵁ V).toScheme, ⊤),
+          ∃ (F : Finset D.X)
+              (s : ∀ χ, LB.Sec (LB.LinComb D.P.L (fun k => V.ι ≫ oφ D I e (𝟙 _) χ k) oε))
+              (h : D.X → Γ((q.left ⁻¹ᵁ V).toScheme, ⊤)),
+            (∀ χ ∈ F, IsImage D I e q χ (x χ) V (s χ) (h χ)) ∧ f = ∑ χ ∈ F, h χ
+  indep
+    : ∀ (V : (Be D I e).left.Opens),
+      IsAffineOpen V
+        → ∀ (F : Finset D.X)
+            (s : ∀ χ, LB.Sec (LB.LinComb D.P.L (fun k => V.ι ≫ oφ D I e (𝟙 _) χ k) oε))
+            (h : D.X → Γ((q.left ⁻¹ᵁ V).toScheme, ⊤)),
+          (∀ χ ∈ F, IsImage D I e q χ (x χ) V (s χ) (h χ)) → ∑ χ ∈ F, h χ = 0
+            → ∀ χ ∈ F, ∀ j, (s χ).f j = 0
   i : splitTorus (Se R I e) D.X ⟶ thickObj R I e G
   i_hom : IsMonHom i
   i_q : i ≫ q = toUnit _ ≫ η[Be D I e]
-
-  i_char : ∀ χ : D.X, LB.Gen.Corr D.P.L _ _ _ _
-    (LB.pullGen D.P.L _ _ (x χ) i.left) (unitGen D.P.L (charUnit (Se R I e) D.X χ))
+  i_char
+    : ∀ χ : D.X,
+      LB.Gen.Corr D.P.L _ _ _ _ (LB.pullGen D.P.L _ _ (x χ) i.left)
+        (unitGen D.P.L (charUnit (Se R I e) D.X χ))
 
 end GlobalTheory.IndefiniteRowSideFullHecke.CanonicalRigidImages

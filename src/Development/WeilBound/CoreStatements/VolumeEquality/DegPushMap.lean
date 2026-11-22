@@ -11,20 +11,26 @@ noncomputable section
 
 namespace SheetDecomposition
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 open GroundTheory.Heights₂.Heights.NumbersDVR (pointIdeal pointConeMap intNum)
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ b, Fintype (ι b)]
 
-theorem pointIdeal_rat {Ω : Type} [Field Ω] [inst : Algebra ℚ Ω] (y : (Σ b, ι b) → Ω) :
-    pointIdeal ℚ y = (mCoordIdeal y).map (MvPolynomial.map (Int.castRingHom ℚ)) := by
-  have hcomp : ∀ F : MRing ι, pointConeMap ℚ y (MvPolynomial.map (Int.castRingHom ℚ) F) = mConeMap y F := by
+theorem pointIdeal_rat {Ω : Type} [Field Ω] [inst : Algebra ℚ Ω] (y : (Σ b, ι b) → Ω)
+    : pointIdeal ℚ y = (mCoordIdeal y).map (MvPolynomial.map (Int.castRingHom ℚ)) := by
+  have hcomp
+      : ∀ F : MRing ι,
+        pointConeMap ℚ y (MvPolynomial.map (Int.castRingHom ℚ) F) = mConeMap y F := by
     intro F
     simp only [pointConeMap, mConeMap, MvPolynomial.aeval_def, MvPolynomial.eval₂_map]
     congr 1
     exact RingHom.ext_int _ _
-  have key : ∀ G : MvPolynomial (Σ b, ι b) ℚ, ∃ n : ℕ, 0 < n ∧ ∃ F : MRing ι,
-      MvPolynomial.map (Int.castRingHom ℚ) F = (n : MvPolynomial (Σ b, ι b) ℚ) * G := by
+  have key
+      : ∀ G : MvPolynomial (Σ b, ι b) ℚ, ∃ n : ℕ,
+        0 < n
+          ∧ ∃ F : MRing ι,
+            MvPolynomial.map (Int.castRingHom ℚ) F = (n : MvPolynomial (Σ b, ι b) ℚ) * G := by
     intro G
     induction G using MvPolynomial.induction_on with
     | C a =>
@@ -60,9 +66,12 @@ theorem pointIdeal_rat {Ω : Type} [Field Ω] [inst : Algebra ℚ Ω] (y : (Σ b
     exact hF
 
 omit [Fintype K] [∀ b, Fintype (ι b)] in
-theorem pointIdeal_map {R Ω₂ Ω : Type} [CommRing R] [Field Ω₂] [Field Ω] [Algebra R Ω₂] [Algebra R Ω] (i : Ω₂ →ₐ[R] Ω)
-    (y : (Σ b, ι b) → Ω₂) : pointIdeal R (fun x => i (y x)) = pointIdeal R y := by
-  have h : (MvPolynomial.mapAlgHom i).comp (pointConeMap R y) = pointConeMap R (fun x => i (y x)) := by
+theorem pointIdeal_map
+    {R Ω₂ Ω : Type} [CommRing R] [Field Ω₂] [Field Ω] [Algebra R Ω₂] [Algebra R Ω]
+    (i : Ω₂ →ₐ[R] Ω) (y : (Σ b, ι b) → Ω₂)
+    : pointIdeal R (fun x => i (y x)) = pointIdeal R y := by
+  have h
+      : (MvPolynomial.mapAlgHom i).comp (pointConeMap R y) = pointConeMap R (fun x => i (y x)) := by
     apply MvPolynomial.algHom_ext
     intro p
     simp [pointConeMap]
@@ -77,22 +86,28 @@ theorem pointIdeal_map {R Ω₂ Ω : Type} [CommRing R] [Field Ω₂] [Field Ω]
   · intro h0
     rw [h0, map_zero]
 
-theorem ne_of_arith {Ω : Type} [Field Ω] {y : (Σ b, ι b) → Ω} {d : ℕ} (h : IsArithVar (mCoordIdeal y) d) (b : K) :
-    ∃ j, y ⟨b, j⟩ ≠ 0 := by
+theorem ne_of_arith
+    {Ω : Type} [Field Ω] {y : (Σ b, ι b) → Ω} {d : ℕ} (h : IsArithVar (mCoordIdeal y) d) (b : K)
+    : ∃ j, y ⟨b, j⟩ ≠ 0 := by
   obtain ⟨j, hj⟩ := h.2.1.2.2 b
   refine ⟨j, fun h0 => hj ?_⟩
   show mConeMap y (X ⟨b, j⟩) = 0
   simp [mConeMap, h0]
 
-theorem range_le_fnField {Ω₂ Ω : Type} [Field Ω₂] [Field Ω] (i : Ω₂ →+* Ω) {y : (Σ b, ι b) → Ω₂} (hb : Birational y)
-    (hy : ∀ b, ∃ j, y ⟨b, j⟩ ≠ 0) (k : Type) [Field k] [Algebra k Ω] :
-    i.fieldRange ≤ (fnField k fun x => i (y x)).toSubfield := by
+theorem range_le_fnField
+    {Ω₂ Ω : Type} [Field Ω₂] [Field Ω]
+    (i : Ω₂ →+* Ω)
+    {y : (Σ b, ι b) → Ω₂} (hb : Birational y) (hy : ∀ b, ∃ j, y ⟨b, j⟩ ≠ 0)
+    (k : Type) [Field k] [Algebra k Ω]
+    : i.fieldRange ≤ (fnField k fun x => i (y x)).toSubfield := by
   choose c hc using hy
   have htop := BirationalRatioClosure.full K ι Ω₂ y c hb hc
   rintro _ ⟨s, rfl⟩
-  have hs : s ∈ Subfield.closure (GroundTheory.Heights₂.Heights.coneRatios y c) := htop ▸ Subfield.mem_top s
-  have hle : Subfield.closure (GroundTheory.Heights₂.Heights.coneRatios y c) ≤
-      (fnField k fun x => i (y x)).toSubfield.comap i := by
+  have hs : s ∈ Subfield.closure (GroundTheory.Heights₂.Heights.coneRatios y c) :=
+    htop ▸ Subfield.mem_top s
+  have hle
+      : Subfield.closure (GroundTheory.Heights₂.Heights.coneRatios y c)
+        ≤ (fnField k fun x => i (y x)).toSubfield.comap i := by
     rw [Subfield.closure_le]
     rintro _ ⟨p, rfl⟩
     show i (y p / y ⟨p.1, c p.1⟩) ∈ (fnField k fun x => i (y x)).toSubfield
@@ -100,15 +115,19 @@ theorem range_le_fnField {Ω₂ Ω : Type} [Field Ω₂] [Field Ω] (i : Ω₂ �
     exact IntermediateField.subset_adjoin k _ ⟨p, ⟨p.1, c p.1⟩, rfl, rfl⟩
   exact hle hs
 
-private theorem finiteDimensional_of_subfield_le {Ω : Type} [Field Ω] (S T : Subfield Ω) (h : S ≤ T) [FiniteDimensional S Ω] :
-    FiniteDimensional T Ω := by
+private theorem finiteDimensional_of_subfield_le
+    {Ω : Type} [Field Ω] (S T : Subfield Ω) (h : S ≤ T) [FiniteDimensional S Ω]
+    : FiniteDimensional T Ω := by
   letI : Algebra S T := (Subfield.inclusion h).toAlgebra
   haveI : IsScalarTower S T Ω := IsScalarTower.of_algebraMap_eq fun x => rfl
   exact Module.Finite.of_restrictScalars_finite S T Ω
 
-private theorem trdeg_eq_of_finrank_fieldRange_pos {Ω₂ Ω : Type} [Field Ω₂] [Field Ω] [Algebra ℚ Ω₂] [Algebra ℚ Ω] (i : Ω₂ →+* Ω)
-    (d : ℕ) (hZ : Algebra.trdeg ℤ Ω₂ = d) (hfin : 0 < Module.finrank i.fieldRange Ω) :
-    Algebra.trdeg ℚ Ω = d := by
+private theorem trdeg_eq_of_finrank_fieldRange_pos
+    {Ω₂ Ω : Type} [Field Ω₂] [Field Ω] [Algebra ℚ Ω₂] [Algebra ℚ Ω]
+    (i : Ω₂ →+* Ω)
+    (d : ℕ) (hZ : Algebra.trdeg ℤ Ω₂ = d)
+    (hfin : 0 < Module.finrank i.fieldRange Ω)
+    : Algebra.trdeg ℚ Ω = d := by
   have hQ : Algebra.trdeg ℚ Ω₂ = d := by
     haveI := IsLocalization.isAlgebraic ℚ (nonZeroDivisors ℤ)
     have h := _root_.trdeg_add_eq ℤ ℚ (A := Ω₂)
@@ -136,7 +155,8 @@ theorem numMap : NumMap := by
     obtain ⟨j, hj⟩ := hy b
     exact ⟨j, (map_ne_zero i).2 hj⟩
   haveI : FiniteDimensional i.fieldRange Ω := Module.finite_of_finrank_pos hfin
-  have hFD : ∀ (k : Type) [Field k] [Algebra k Ω], FiniteDimensional (fnField k fun x => i (y x)) Ω := by
+  have hFD
+      : ∀ (k : Type) [Field k] [Algebra k Ω], FiniteDimensional (fnField k fun x => i (y x)) Ω := by
     intro k _ _
     haveI := finiteDimensional_of_subfield_le i.fieldRange _ (range_le_fnField i hb hy k)
     exact this
@@ -147,10 +167,17 @@ theorem numMap : NumMap := by
     · exact RingHom.mem_fieldRange.2 ⟨algebraMap ℚ Ω₂ q, by simp⟩
     · exact RingHom.mem_fieldRange.2 ⟨y p / y p', by rw [map_div₀]⟩
   have hrank : Module.finrank (fnField ℚ fun x => i (y x)) Ω = Module.finrank i.fieldRange Ω := by
-    rw [show Module.finrank (fnField ℚ fun x => i (y x)) Ω =
-      Module.finrank (fnField ℚ fun x => i (y x)).toSubfield Ω from rfl, heq]
+    rw [show Module.finrank (fnField ℚ fun x => i (y x)) Ω
+          = Module.finrank (fnField ℚ fun x => i (y x)).toSubfield Ω from
+        rfl,
+      heq]
   have hpi : pointIdeal ℚ (fun x => i (y x)) = pointIdeal ℚ y := pointIdeal_map i.toRatAlgHom y
-  refine ⟨⟨hiy, hFD ℚ, trdeg_eq_of_finrank_fieldRange_pos i d (FnFieldTrdeg.full K ι Ω₂ y d hb har) hfin⟩, hFD, fun a => ?_, fun a => ?_⟩
+  refine ⟨
+    ⟨hiy, hFD ℚ, trdeg_eq_of_finrank_fieldRange_pos i d (FnFieldTrdeg.full K ι Ω₂ y d hb har) hfin⟩,
+    hFD,
+    fun a => ?_,
+    fun a => ?_
+  ⟩
   · simp only [num, inum]
     rw [hrank, hpi]
   · simp only [inum, GroundTheory.Heights₂.Heights.HilbertSamuel.genDeg]

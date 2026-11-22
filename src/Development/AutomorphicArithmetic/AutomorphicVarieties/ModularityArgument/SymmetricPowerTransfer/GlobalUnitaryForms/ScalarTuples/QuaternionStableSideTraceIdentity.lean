@@ -14,8 +14,12 @@ namespace UpperTheory.V.Z.Sym.Glob
 
 open NumberField Loc
 
-private theorem aux_statement_10 {F : Type} [Field F] [NumberField F] {Δ : F} (D : Dat Δ) (hD : D.Ok) (t : Dat.Par F)
-    (ht : D.Cone t) (τ : F) (h : D.admitted t τ) : τ ^ 2 - 4 ≠ 0 := by
+private theorem aux_statement_10
+    {F : Type} [Field F] [NumberField F]
+    {Δ : F} (D : Dat Δ) (hD : D.Ok)
+    (t : Dat.Par F) (ht : D.Cone t)
+    (τ : F) (h : D.admitted t τ)
+    : τ ^ 2 - 4 ≠ 0 := by
   intro h0
   obtain ⟨v, hv⟩ := hD.ne
   refine ((hD.sig v hv).reg (t v) (ht v hv) _ (h v hv)).2 ?_
@@ -27,8 +31,8 @@ private theorem aux_statement_10 {F : Type} [Field F] [NumberField F] {Δ : F} (
   · rw [sub_eq_zero.mp h1, map_ofNat]; exact h2
   · rw [eq_neg_of_add_eq_zero_left h1, map_neg, map_ofNat]; exact h2.neg
 
-private theorem sum_sub {α : Type} (p : α → Prop) (f : α → ℂ) (c : ℂ) :
-    ∑ᶠ i : {a // p a}, c * f i.1 = c * ∑ᶠ a, one (p a) * f a := by
+private theorem sum_sub {α : Type} (p : α → Prop) (f : α → ℂ) (c : ℂ)
+    : ∑ᶠ i : {a // p a}, c * f i.1 = c * ∑ᶠ a, one (p a) * f a := by
   classical
   have h1 : ∑ᶠ i : {a // p a}, c * f i.1 = ∑ᶠ (a) (_ : p a), c * f a :=
     finsum_subtype_eq_finsum_cond (f := fun a => c * f a) p
@@ -58,20 +62,24 @@ theorem split_side_identity_unitary : QuaternionStableSideTraceIdentity := by
   · intro V _ _ _ ch B hB t ht
     classical
     have hG : ∀ a, D.Good t a ↔ IsCM a ∧ D.admitted t a := fun a => Iff.rfl
-    have hex : ∀ s : {a // D.Good t a}, ∃ g : DX Δ, HasTr g s.1 :=
-      fun s => (embEx F Δ D hD s.1).1 ((hG _).1 s.2).1
+    have hex : ∀ s : {a // D.Good t a}, ∃ g : DX Δ, HasTr g s.1 := fun s =>
+      (embEx F Δ D hD s.1).1 ((hG _).1 s.2).1
     choose γ hγ using hex
-    have hreg : ∀ s : {a // D.Good t a}, s.1 ^ 2 - 4 ≠ 0 :=
-      fun s => aux_statement_10 D hD t ht s.1 ((hG _).1 s.2).2
-    have hj : ∀ s : {a // D.Good t a}, ∃ j : (Etau F s.1)ˣ →* DX Δ, IsEmb s.1 (γ s) j :=
-      fun s => (embAlg F Δ s.1 hΔ (hreg s) (γ s) (hγ s)).1
+    have hreg : ∀ s : {a // D.Good t a}, s.1 ^ 2 - 4 ≠ 0 := fun s =>
+      aux_statement_10 D hD t ht s.1 ((hG _).1 s.2).2
+    have hj : ∀ s : {a // D.Good t a}, ∃ j : (Etau F s.1)ˣ →* DX Δ, IsEmb s.1 (γ s) j := fun s =>
+      (embAlg F Δ s.1 hΔ (hreg s) (γ s) (hγ s)).1
     choose j hjj using hj
-    rw [hsum V ch B hB t ht {a // D.Good t a} (fun s => s.1) γ j Subtype.val_injective
-      (fun s => ⟨hreg s, hγ s, hjj s⟩) ?_]
-    · have hterm : ∀ s : {a // D.Good t a},
-          ch s.1 * gqOn (ι.comp (j s)) (scalE s.1) D.UZ
-            (fun y => D.FS t ((Quotient.out y)⁻¹ * ι (γ s) * Quotient.out y)) =
-            (∏ v ∈ D.Sg, ((D.S v).cS : ℂ)) * (ch s.1 * ms s.1 * D.nS s.1) := by
+    rw [hsum V ch B hB t ht {a // D.Good t a}
+      (fun s => s.1)
+      γ j Subtype.val_injective
+      (fun s => ⟨hreg s, hγ s, hjj s⟩)
+      ?_]
+    · have hterm
+          : ∀ s : {a // D.Good t a},
+            ch s.1 * gqOn (ι.comp (j s)) (scalE s.1) D.UZ
+                (fun y => D.FS t ((Quotient.out y)⁻¹ * ι (γ s) * Quotient.out y))
+              = (∏ v ∈ D.Sg, ((D.S v).cS : ℂ)) * (ch s.1 * ms s.1 * D.nS s.1) := by
         intro s
         rw [gqS F Δ D hD ι hι t ht s.1 ((hG _).1 s.2).1 (γ s) (j s) (hγ s) (hjj s)]
         have h1 : one (D.admitted t s.1) = 1 := if_pos ((hG _).1 s.2).2

@@ -18,19 +18,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AsymptoticRi
 set_option autoImplicit false
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter Asymptotics
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 namespace GlobalTheory.AmplePos
 
-theorem pos_of_bound {h : ℕ → ℕ} {d C m₀ : ℕ} {a : ℤ} {c : ℝ} (hc : 0 < c)
-    (hf : ∃ᶠ m : ℕ in atTop, c * (m : ℝ) ^ d ≤ h m)
-    (hb : ∀ m : ℕ, m₀ ≤ m → |(d.factorial : ℤ) * (h m : ℤ) - a * (m : ℤ) ^ d| ≤
-      C * ((d : ℤ) * ((m : ℤ) + 1) ^ (d - 1))) : 0 < a := by
+theorem pos_of_bound
+    {h : ℕ → ℕ} {d C m₀ : ℕ} {a : ℤ} {c : ℝ}
+    (hc : 0 < c) (hf : ∃ᶠ m : ℕ in atTop, c * (m : ℝ) ^ d ≤ h m)
+    (hb : ∀ m : ℕ,
+      m₀ ≤ m
+        → |(d.factorial : ℤ) * (h m : ℤ) - a * (m : ℤ) ^ d|
+          ≤ C * ((d : ℤ) * ((m : ℤ) + 1) ^ (d - 1)))
+    : 0 < a := by
   by_contra ha
   rw [not_lt] at ha
-  obtain ⟨m, hm1, hm2⟩ := (hf.and_eventually (eventually_ge_atTop
-    (max m₀ (max 1 (⌈(C : ℝ) * d * 2 ^ (d - 1) / ((d.factorial : ℝ) * c)⌉₊ + 1))))).exists
+  obtain ⟨m, hm1, hm2⟩ :=
+    (hf.and_eventually (eventually_ge_atTop (max m₀
+      (max 1 (⌈(C : ℝ) * d * 2 ^ (d - 1) / ((d.factorial : ℝ) * c)⌉₊ + 1))))).exists
   have hmm₀ : m₀ ≤ m := le_trans (le_max_left _ _) hm2
   have hm1' : 1 ≤ m := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hm2
   have hmK' : ⌈(C : ℝ) * d * 2 ^ (d - 1) / ((d.factorial : ℝ) * c)⌉₊ + 1 ≤ m :=
@@ -54,7 +60,8 @@ theorem pos_of_bound {h : ℕ → ℕ} {d C m₀ : ℕ} {a : ℤ} {c : ℝ} (hc 
   rcases Nat.eq_zero_or_pos d with hd | hd
   · subst hd
     simp only [Nat.factorial_zero, Nat.cast_one, one_mul, Nat.cast_zero, zero_mul, mul_zero,
-      pow_zero, mul_one] at hreal hm1
+        pow_zero, mul_one]
+      at hreal hm1
     linarith
   · obtain ⟨e, rfl⟩ : ∃ e, d = e + 1 := ⟨d - 1, by omega⟩
     simp only [Nat.add_sub_cancel] at hreal hmK
@@ -64,12 +71,14 @@ theorem pos_of_bound {h : ℕ → ℕ} {d C m₀ : ℕ} {a : ℤ} {c : ℝ} (hc 
       exact pow_le_pow_left₀ (by positivity) (by linarith) e
     have hFc : 0 < (((e + 1).factorial : ℕ) : ℝ) * c := mul_pos hF hc
     rw [div_lt_iff₀ hFc] at hmK
-    have h6 : (((e + 1).factorial : ℕ) : ℝ) * (c * (m : ℝ) ^ (e + 1)) ≤
-        (((e + 1).factorial : ℕ) : ℝ) * (h m : ℝ) :=
+    have h6
+        : (((e + 1).factorial : ℕ) : ℝ) * (c * (m : ℝ) ^ (e + 1))
+          ≤ (((e + 1).factorial : ℕ) : ℝ) * (h m : ℝ) :=
       mul_le_mul_of_nonneg_left hm1 hF.le
     have hCpos : (0 : ℝ) ≤ C := by positivity
-    have h7 : (C : ℝ) * (((e + 1 : ℕ) : ℝ) * ((m : ℝ) + 1) ^ e) ≤
-        (C : ℝ) * (((e + 1 : ℕ) : ℝ) * (2 ^ e * (m : ℝ) ^ e)) := by
+    have h7
+        : (C : ℝ) * (((e + 1 : ℕ) : ℝ) * ((m : ℝ) + 1) ^ e)
+          ≤ (C : ℝ) * (((e + 1 : ℕ) : ℝ) * (2 ^ e * (m : ℝ) ^ e)) := by
       apply mul_le_mul_of_nonneg_left _ hCpos
       exact mul_le_mul_of_nonneg_left h5 (by positivity)
     have hme : (0 : ℝ) < (m : ℝ) ^ e := by positivity
@@ -78,9 +87,12 @@ theorem pos_of_bound {h : ℕ → ℕ} {d C m₀ : ℕ} {a : ℤ} {c : ℝ} (hc 
     rw [h9] at h6
     nlinarith [h6, hreal, h7, h8]
 
-theorem topSelf_pos : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [IsIntegral X]
-    [Algebra k Γ(X, ⊤)], IsProjOver (strHom k (X := X)) → ∀ d : ℕ, topologicalKrullDim X = (d : ℕ) →
-    ∀ A : LB X, IsAmpleLB A → 0 < topSelfIntersection k A d := by
+theorem topSelf_pos
+    : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [IsIntegral X] [Algebra k Γ(X, ⊤)],
+      IsProjOver (strHom k (X := X))
+        → ∀ d : ℕ,
+          topologicalKrullDim X = (d : ℕ)
+            → ∀ A : LB X, IsAmpleLB A → 0 < topSelfIntersection k A d := by
   intro k _ _ X _ _ hp d hd A hA
   obtain ⟨D, hD, c, hc, hf⟩ := (IsAmpleLB.isBig k X hp A hA).growth
   have hDd : D = d := by
@@ -91,7 +103,8 @@ theorem topSelf_pos : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [Is
     unfold GlobalTheory.QCoh.suppDim
     rw [← hD]
     exact topologicalKrullDim_subspace_le _ _
-  obtain ⟨C, m₀, hb⟩ := GlobalTheory.T.asymptotic_riemannRoch_ample_coherent k X hp D (structureModule X) hsupp A hA
+  obtain ⟨C, m₀, hb⟩ :=
+    GlobalTheory.T.asymptotic_riemannRoch_ample_coherent k X hp D (structureModule X) hsupp A hA
   rw [topSelf_def]
   exact pos_of_bound hc hf hb
 

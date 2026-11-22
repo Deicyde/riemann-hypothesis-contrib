@@ -12,10 +12,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem ooEx_co (O : Type) [CommRing O] [IsLocalRing O] (K : Type) [Field K] [Algebra O K]
-    (h : Function.Surjective (algebraMap O K)) : IsCO O K := by
+private theorem ooEx_co
+    (O : Type) [CommRing O] [IsLocalRing O]
+    (K : Type) [Field K] [Algebra O K]
+    (h : Function.Surjective (algebraMap O K))
+    : IsCO O K := by
   refine { complete := ?_, isLocalHom := ?_, res_surj := ?_ }
   · rw [IsLocalRing.maximalIdeal_eq_bot]
     infer_instance
@@ -31,9 +35,12 @@ private theorem ooEx_co (O : Type) [CommRing O] [IsLocalRing O] (K : Type) [Fiel
     obtain ⟨a, rfl⟩ := h x
     exact ⟨a, by simp⟩
 
-private theorem ooEx_ker (O : Type) [CommRing O] [IsLocalRing O] (K : Type) [Field K] [Algebra O K]
-    (h : Function.Surjective (algebraMap O K)) (π : O) (hπ : maximalIdeal O = Ideal.span {π}) :
-    RingHom.ker (PowerSeries.map (algebraMap O K)) = Ideal.span {PowerSeries.C π} := by
+private theorem ooEx_ker
+    (O : Type) [CommRing O] [IsLocalRing O]
+    (K : Type) [Field K] [Algebra O K]
+    (h : Function.Surjective (algebraMap O K))
+    (π : O) (hπ : maximalIdeal O = Ideal.span {π})
+    : RingHom.ker (PowerSeries.map (algebraMap O K)) = Ideal.span {PowerSeries.C π} := by
   have hk : RingHom.ker (algebraMap O K) = maximalIdeal O :=
     IsLocalRing.eq_maximalIdeal (RingHom.ker_isMaximal_of_surjective _ h)
   have hπ0 : algebraMap O K π = 0 := by
@@ -60,11 +67,14 @@ private theorem ooEx_ker (O : Type) [CommRing O] [IsLocalRing O] (K : Type) [Fie
   · rintro ⟨y, rfl⟩
     rw [map_mul, PowerSeries.map_C, hπ0, map_zero, zero_mul]
 
-private theorem ooEx_ev (K O B : Type) [Field K] [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+private theorem ooEx_ev
+    (K O B : Type) [Field K] [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
     [IsAdicComplete (maximalIdeal O) O] [Algebra O K] [CommRing B] [Algebra O B] [IsCO O B]
-    (f : B →ₐ[O] PowerSeries K) (s : B) (h : Function.Surjective (algebraMap O K)) (hs : f s = PowerSeries.X) :
-    ∃ F : PowerSeries O →+* B, (∀ c : O, F (PowerSeries.C c) = algebraMap O B c) ∧ F PowerSeries.X = s ∧
-      ∀ x, f (F x) = PowerSeries.map (algebraMap O K) x := by
+    (f : B →ₐ[O] PowerSeries K) (s : B)
+    (h : Function.Surjective (algebraMap O K)) (hs : f s = PowerSeries.X)
+    : ∃ F : PowerSeries O →+* B,
+      (∀ c : O, F (PowerSeries.C c) = algebraMap O B c) ∧ F PowerSeries.X = s
+        ∧ ∀ x, f (F x) = PowerSeries.map (algebraMap O K) x := by
   haveI hOO : IsCO O O :=
     { complete := inferInstance
       isLocalHom := ⟨fun a h => by simpa using h⟩
@@ -84,18 +94,21 @@ private theorem ooEx_ev (K O B : Type) [Field K] [CommRing O] [IsLocalRing O] [I
   · intro c
     exact hGC c
   · exact hGX ()
-  · let M : MvPowerSeries Unit O →ₐ[O] MvPowerSeries Unit K :=
-      { MvPowerSeries.map (algebraMap O K) with
-        commutes' := fun c => by
-          simp only [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
-          exact MvPowerSeries.map_C _ _ }
+  · let M : MvPowerSeries Unit O →ₐ[O] MvPowerSeries Unit K := {
+      MvPowerSeries.map (algebraMap O K) with
+      commutes' := fun c => by
+        simp only [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
+        exact MvPowerSeries.map_C _ _
+    }
     have hXm : MvPowerSeries.X () ∈ maximalIdeal (MvPowerSeries Unit K) := by
       refine (IsLocalRing.mem_maximalIdeal _).mpr ?_
       intro hu
       rw [MvPowerSeries.isUnit_iff_constantCoeff] at hu
       simp at hu
-    obtain ⟨H, -, hU⟩ := co_ev O O (MvPowerSeries Unit K) Unit (Algebra.ofId O _)
-      (fun _ => MvPowerSeries.X ()) (fun _ => hXm)
+    obtain ⟨H, -, hU⟩ :=
+      co_ev O O (MvPowerSeries Unit K) Unit (Algebra.ofId O _)
+        (fun _ => MvPowerSeries.X ())
+        (fun _ => hXm)
     have e1 : (f.comp G : MvPowerSeries Unit O →ₐ[O] MvPowerSeries Unit K) = H := by
       refine hU _ ⟨fun x => ?_, fun u => ?_⟩
       · simp [hGC]
@@ -106,11 +119,24 @@ private theorem ooEx_ev (K O B : Type) [Field K] [CommRing O] [IsLocalRing O] [I
       · simp [M, MvPowerSeries.algebraMap_apply]
       · simp [M]
     intro x
-    have := congrArg (fun φ : MvPowerSeries Unit O →ₐ[O] MvPowerSeries Unit K => φ x) (e1.trans e2.symm)
+    have :=
+      congrArg (fun φ : MvPowerSeries Unit O →ₐ[O] MvPowerSeries Unit K => φ x) (e1.trans e2.symm)
     exact this
 
-theorem UpperTheory.V.Pa.ooEx :
-    ∀ (K O B Bh : Type) [Field K] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [Finite K] [Algebra O K] [CommRing B] [Algebra O B] [IsCO O B] [CommRing Bh] [IsLocalRing Bh] [Algebra B Bh] (f : B →ₐ[O] PowerSeries K) (s : B) (rF : Bh →+* FractionRing (PowerSeries K)), Function.Surjective (algebraMap O K) → f s = PowerSeries.X → IsCplAt B (RingHom.ker f) Bh → (∀ b, rF (algebraMap B Bh b) = algebraMap (PowerSeries K) _ (f b)) → ∃ (OO : Type) (_ : CommRing OO) (_ : IsDomain OO) (_ : IsDiscreteValuationRing OO) (_ : IsAdicComplete (maximalIdeal OO) OO) (_ : Algebra OO Bh) (_ : IsCO OO Bh), (∀ a : PowerSeries K, ∃ (o : OO) (b : B), algebraMap OO Bh o = algebraMap B Bh b ∧ f b = a) ∧ (∀ c : O, ∃ o : OO, algebraMap OO Bh o = algebraMap B Bh (algebraMap O B c)) ∧ (∃ o : OO, algebraMap OO Bh o = algebraMap B Bh s) ∧ Function.Surjective (rF.comp (algebraMap OO Bh)) := by
+theorem UpperTheory.V.Pa.ooEx
+    : ∀ (K O B Bh : Type) [Field K] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [Finite K] [Algebra O K] [CommRing B] [Algebra O B]
+        [IsCO O B] [CommRing Bh] [IsLocalRing Bh] [Algebra B Bh] (f : B →ₐ[O] PowerSeries K) (s : B)
+        (rF : Bh →+* FractionRing (PowerSeries K)),
+      Function.Surjective (algebraMap O K) → f s = PowerSeries.X → IsCplAt B (RingHom.ker f) Bh
+        → (∀ b, rF (algebraMap B Bh b) = algebraMap (PowerSeries K) _ (f b))
+        → ∃ (OO : Type) (_ : CommRing OO) (_ : IsDomain OO) (_ : IsDiscreteValuationRing OO)
+            (_ : IsAdicComplete (maximalIdeal OO) OO) (_ : Algebra OO Bh) (_ : IsCO OO Bh),
+          (∀ a : PowerSeries K, ∃ (o : OO) (b : B),
+              algebraMap OO Bh o = algebraMap B Bh b ∧ f b = a)
+            ∧ (∀ c : O, ∃ o : OO, algebraMap OO Bh o = algebraMap B Bh (algebraMap O B c))
+            ∧ (∃ o : OO, algebraMap OO Bh o = algebraMap B Bh s)
+            ∧ Function.Surjective (rF.comp (algebraMap OO Bh)) := by
   intro K O B Bh _ _ _ _ _ _ _ _ _ _ _ _ _ f s rF hsur hs hcpl hrF
   obtain ⟨π, hπirr⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hπ := hπirr.maximalIdeal_eq
@@ -134,8 +160,8 @@ theorem UpperTheory.V.Pa.ooEx :
     simpa using this
   have hprime : Prime (PowerSeries.C π) := (Ideal.span_singleton_prime hπ0).mp (hp ▸ hpP)
   have hcO : IsCplAt (PowerSeries O) p (CplAt (PowerSeries O) p) := isCplAt_cplAt _ p
-  obtain ⟨hdom, hdvr, -⟩ := IsCplAt.dvr (PowerSeries O) (PowerSeries.C π) hprime
-    (CplAt (PowerSeries O) p) (hp ▸ hcO)
+  obtain ⟨hdom, hdvr, -⟩ :=
+    IsCplAt.dvr (PowerSeries O) (PowerSeries.C π) hprime (CplAt (PowerSeries O) p) (hp ▸ hcO)
   let φ : PowerSeries O →+* Bh := (algebraMap B Bh).comp F
   have hcomapF : Ideal.comap F (RingHom.ker f) = p := by
     rw [← hker]
@@ -144,7 +170,8 @@ theorem UpperTheory.V.Pa.ooEx :
   have hφ : Ideal.comap φ (maximalIdeal Bh) = p := by
     rw [← Ideal.comap_comap, hcpl.comap_eq, hcomapF]
   haveI := hcpl.complete
-  obtain ⟨ψ, hψ, -⟩ := IsCplAt.existsUnique_lift (PowerSeries O) p (CplAt (PowerSeries O) p) hcO Bh φ hφ
+  obtain ⟨ψ, hψ, -⟩ :=
+    IsCplAt.existsUnique_lift (PowerSeries O) p (CplAt (PowerSeries O) p) hcO Bh φ hφ
   letI : Algebra (CplAt (PowerSeries O) p) Bh := ψ.toAlgebra
   letI : Algebra (PowerSeries O) B := F.toAlgebra
   letI : Algebra (PowerSeries O) Bh := φ.toAlgebra
@@ -152,7 +179,8 @@ theorem UpperTheory.V.Pa.ooEx :
   haveI : IsScalarTower (PowerSeries O) (CplAt (PowerSeries O) p) Bh :=
     IsScalarTower.of_algebraMap_eq (fun x => (RingHom.congr_fun hψ x).symm)
   have hCO : IsCO (CplAt (PowerSeries O) p) Bh := by
-    refine IsCplAt.isCO (PowerSeries O) B p (RingHom.ker f) (CplAt (PowerSeries O) p) Bh hcO hcpl ?_ ?_
+    refine IsCplAt.isCO (PowerSeries O) B p (RingHom.ker f) (CplAt (PowerSeries O) p) Bh hcO hcpl ?_
+      ?_
     · exact hcomapF
     · intro x
       obtain ⟨a, ha⟩ := hmapsurj (f x)
@@ -160,15 +188,29 @@ theorem UpperTheory.V.Pa.ooEx :
       rw [RingHom.mem_ker, map_sub]
       show f x - f (F a) = 0
       rw [hfF, ha, sub_self]
-  have hkey : ∀ c, rF (ψ (algebraMap (PowerSeries O) (CplAt (PowerSeries O) p) c)) =
-      algebraMap (PowerSeries K) _ (PowerSeries.map (algebraMap O K) c) := by
+  have hkey
+      : ∀ c,
+        rF (ψ (algebraMap (PowerSeries O) (CplAt (PowerSeries O) p) c))
+          = algebraMap (PowerSeries K) _ (PowerSeries.map (algebraMap O K) c) := by
     intro c
     have h1 := RingHom.congr_fun hψ c
     simp only [RingHom.comp_apply] at h1
     rw [h1]
     show rF (algebraMap B Bh (F c)) = _
     rw [hrF, hfF]
-  refine ⟨CplAt (PowerSeries O) p, inferInstance, hdom, hdvr, hcO.complete, inferInstance, hCO, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    CplAt (PowerSeries O) p,
+    inferInstance,
+    hdom,
+    hdvr,
+    hcO.complete,
+    inferInstance,
+    hCO,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro a
     obtain ⟨c, hc⟩ := hmapsurj a
     exact ⟨algebraMap _ (CplAt (PowerSeries O) p) c, F c, RingHom.congr_fun hψ c, by rw [hfF, hc]⟩

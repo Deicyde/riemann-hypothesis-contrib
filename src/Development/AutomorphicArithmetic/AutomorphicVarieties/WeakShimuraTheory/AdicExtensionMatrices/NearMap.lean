@@ -4,10 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.sxNearMap :
-    ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type} [CommRing Λ] [IsLocalRing Λ] {a : O →+* Λ} {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] {R' : Type} [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] {τ : ℤ × ℤ →+ ℤ} {D : RD Φ R} (f : R →ₐ[Λ] R'), Φ.Near a τ D → Φ.Near a τ (D.map (f : R →+* R')) := by
+theorem UpperTheory.V.Ws.sxNearMap
+    : ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type}
+        [CommRing Λ] [IsLocalRing Λ] {a : O →+* Λ} {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R]
+        {R' : Type} [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] {τ : ℤ × ℤ →+ ℤ} {D : RD Φ R}
+        (f : R →ₐ[Λ] R'),
+      Φ.Near a τ D → Φ.Near a τ (D.map (f : R →+* R')) := by
   intro O Γ _ _ _ Φ Λ _ _ a R _ _ _ R' _ _ _ τ D f hD
   have hr : ∀ g i j, (D.map (f : R →+* R')).r g i j = f (D.r g i j) := by
     intro g i j
@@ -30,8 +35,14 @@ theorem UpperTheory.V.Ws.sxNearMap :
     ext i j
     rw [hr]
     simp
-  refine ⟨⟨fun g => ?_, fun g hg => ?_, ?_⟩, fun i j => ?_, fun v i => ?_, fun g i => ?_,
-    fun g i j hij hτ => ?_, fun v i s => ?_⟩
+  refine ⟨
+    ⟨fun g => ?_, fun g hg => ?_, ?_⟩,
+    fun i j => ?_,
+    fun v i => ?_,
+    fun g i => ?_,
+    fun g i j hij hτ => ?_,
+    fun v i s => ?_
+  ⟩
   · have hX : adj (D.r g) * D.r g = (algebraMap Λ R) (a ↑(Φ.ν g)) • 1 := hD.rep.mult g
     have h := congrArg (f : R →+* R').mapMatrix hX
     rw [map_mul, ← hadj, ← hrm] at h

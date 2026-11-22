@@ -9,45 +9,57 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix Classical ComplexOrder
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 open GlobalTheory.Doubling (absE)
 
 set_option linter.unusedSectionVars false
 
 namespace PositivityTheory.SiegelWeilFormula.Act.C4
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 variable {d : SD σ} (L : LD d)
 
 def emS : Fin L.n ⊕ Fin L.n → Fin d.n ⊕ Fin d.n := Sum.map L.em L.em
 
-def padM (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E)) :
-    Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E) :=
-  fun r c => if h : (∃ a, emS L a = r) ∧ ∃ a, emS L a = c then M h.1.choose h.2.choose
-    else (1 : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E)) r c
+def padM (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E))
+    : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E) := fun r c =>
+  if h : (∃ a, emS L a = r) ∧ ∃ a, emS L a = c then
+    M h.1.choose h.2.choose
+  else
+    (1 : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E)) r c
 
 theorem emS_inj : Function.Injective (emS L) := Sum.map_injective.2 ⟨L.inj, L.inj⟩
 
-theorem padM_emS (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E)) (a a' : Fin L.n ⊕ Fin L.n) :
-    padM L M (emS L a) (emS L a') = M a a' := by
+theorem padM_emS
+    (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E)) (a a' : Fin L.n ⊕ Fin L.n)
+    : padM L M (emS L a) (emS L a') = M a a' := by
   have h : (∃ x, emS L x = emS L a) ∧ ∃ x, emS L x = emS L a' := ⟨⟨a, rfl⟩, ⟨a', rfl⟩⟩
   simp only [padM]
   rw [dite_eq_left h, emS_inj L h.1.choose_spec, emS_inj L h.2.choose_spec]
 
-theorem padM_out_row (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E)) {r : Fin d.n ⊕ Fin d.n}
-    (hr : ¬ ∃ a, emS L a = r) (c : Fin d.n ⊕ Fin d.n) : padM L M r c = (1 : Matrix _ _ (AE F E)) r c := by
+theorem padM_out_row
+    (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E))
+    {r : Fin d.n ⊕ Fin d.n} (hr : ¬ ∃ a, emS L a = r)
+    (c : Fin d.n ⊕ Fin d.n)
+    : padM L M r c = (1 : Matrix _ _ (AE F E)) r c := by
   simp only [padM]
   rw [dite_eq_right (fun h => hr h.1)]
 
-theorem padM_out_col (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E)) (r : Fin d.n ⊕ Fin d.n)
-    {c : Fin d.n ⊕ Fin d.n} (hc : ¬ ∃ a, emS L a = c) : padM L M r c = (1 : Matrix _ _ (AE F E)) r c := by
+theorem padM_out_col
+    (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E)) (r : Fin d.n ⊕ Fin d.n)
+    {c : Fin d.n ⊕ Fin d.n} (hc : ¬ ∃ a, emS L a = c)
+    : padM L M r c = (1 : Matrix _ _ (AE F E)) r c := by
   simp only [padM]
   rw [dite_eq_right (fun h => hc h.2)]
 
-theorem mem_out {r : Fin d.n ⊕ Fin d.n} (h : ¬ ∃ a, emS L a = r) :
-    r ∈ ({Sum.inl L.i₀, Sum.inr L.i₀} : Set (Fin d.n ⊕ Fin d.n)) := by
+theorem mem_out {r : Fin d.n ⊕ Fin d.n} (h : ¬ ∃ a, emS L a = r)
+    : r ∈ ({Sum.inl L.i₀, Sum.inr L.i₀} : Set (Fin d.n ⊕ Fin d.n)) := by
   rcases r with i | i
   · by_cases hi : i = L.i₀
     · simp [hi]
@@ -109,8 +121,9 @@ theorem continuous_prj : Continuous (prj L) := by
   refine Continuous.subtype_mk ?_ _
   exact continuous_subtype_val.matrix_submatrix L.em L.em
 
-theorem pad_matrix_lower_block (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E)) (hM : M.toBlocks₂₁ = 0) :
-    (padM L M).toBlocks₂₁ = 0 := by
+theorem pad_matrix_lower_block
+    (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) (AE F E)) (hM : M.toBlocks₂₁ = 0)
+    : (padM L M).toBlocks₂₁ = 0 := by
   ext i k
   simp only [Matrix.toBlocks₂₁, Matrix.of_apply, Matrix.zero_apply]
   by_cases hi : i = L.i₀
@@ -127,15 +140,20 @@ theorem pad_matrix_lower_block (M : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fi
       have h2 := congrFun (congrFun hM a) a'
       simpa [Matrix.toBlocks₂₁] using h2
 
-theorem upper_block_mul_of_lower_zero {k : ℕ} {P Q : Matrix (Fin k ⊕ Fin k) (Fin k ⊕ Fin k) (AE F E)} (hQ : Q.toBlocks₂₁ = 0)
-    (h : P * Q = 1) : P.toBlocks₁₁ * Q.toBlocks₁₁ = 1 := by
+theorem upper_block_mul_of_lower_zero
+    {k : ℕ} {P Q : Matrix (Fin k ⊕ Fin k) (Fin k ⊕ Fin k) (AE F E)}
+    (hQ : Q.toBlocks₂₁ = 0) (h : P * Q = 1)
+    : P.toBlocks₁₁ * Q.toBlocks₁₁ = 1 := by
   have h1 := congrArg Matrix.toBlocks₁₁ h
-  rw [← Matrix.fromBlocks_toBlocks P, ← Matrix.fromBlocks_toBlocks Q, Matrix.fromBlocks_multiply, hQ] at h1
+  rw [← Matrix.fromBlocks_toBlocks P, ← Matrix.fromBlocks_toBlocks Q, Matrix.fromBlocks_multiply,
+      hQ]
+    at h1
   have h2 : (1 : Matrix (Fin k ⊕ Fin k) (Fin k ⊕ Fin k) (AE F E)).toBlocks₁₁ = 1 := by
     ext i j; simp [Matrix.toBlocks₁₁, Matrix.one_apply]
   simpa [h2] using h1
 
-theorem lower_block_embedded_parabolic {x : G2 σ L.Y} (hx : ∃ t, IsPar x t) : (inFrame d.b (L.j x)).toBlocks₂₁ = 0 := by
+theorem lower_block_embedded_parabolic {x : G2 σ L.Y} (hx : ∃ t, IsPar x t)
+    : (inFrame d.b (L.j x)).toBlocks₂₁ = 0 := by
   obtain ⟨t, ht⟩ := hx
   obtain ⟨-, t₀, ht₀⟩ := L.ok.frame
   rw [inFrame_j]
@@ -149,33 +167,50 @@ theorem j_par {g : G2 σ L.Y} (h : g ∈ par2 σ L.Y) : L.j g ∈ par2 σ d.Y :=
   have hP : P.toBlocks₂₁ = 0 := lower_block_embedded_parabolic L ⟨t, ht⟩
   have hQ : Q.toBlocks₂₁ = 0 := lower_block_embedded_parabolic L ⟨t⁻¹, ht.inv⟩
   have hPQ : P * Q = 1 := by
-    rw [← GlobalTheory.EisBL.DoubledParabolic.inFrame_mul, ← map_mul, mul_inv_cancel, map_one, GlobalTheory.EisBL.DoubledParabolic.inFrame_one]
+    rw [← GlobalTheory.EisBL.DoubledParabolic.inFrame_mul, ← map_mul, mul_inv_cancel, map_one,
+      GlobalTheory.EisBL.DoubledParabolic.inFrame_one]
   have hQP : Q * P = 1 := by
-    rw [← GlobalTheory.EisBL.DoubledParabolic.inFrame_mul, ← map_mul, inv_mul_cancel, map_one, GlobalTheory.EisBL.DoubledParabolic.inFrame_one]
+    rw [← GlobalTheory.EisBL.DoubledParabolic.inFrame_mul, ← map_mul, inv_mul_cancel, map_one,
+      GlobalTheory.EisBL.DoubledParabolic.inFrame_one]
   have e1 := upper_block_mul_of_lower_zero hQ hPQ
   have e2 := upper_block_mul_of_lower_zero hP hQP
   set T0 := incM F t₁.1
   set Ti := incM F (t₁⁻¹).1
   have hT : T0 * Ti = 1 := by
     show incM F t₁.1 * incM F (t₁⁻¹).1 = 1
-    rw [← kunf.incM_mul', Units.mul_inv]; ext i j; simp [incM, Matrix.one_apply]
+    rw [← kunf.incM_mul', Units.mul_inv]
+    ext i j
+    simp [incM, Matrix.one_apply]
   have hT' : Ti * T0 = 1 := by
     show incM F (t₁⁻¹).1 * incM F t₁.1 = 1
-    rw [← kunf.incM_mul', Units.inv_mul]; ext i j; simp [incM, Matrix.one_apply]
-  let t' : GL (Fin d.n) (AE F E) := ⟨T0 * P.toBlocks₁₁ * Ti, T0 * Q.toBlocks₁₁ * Ti, by
-      calc T0 * P.toBlocks₁₁ * Ti * (T0 * Q.toBlocks₁₁ * Ti) = T0 * (P.toBlocks₁₁ * (Ti * T0) * Q.toBlocks₁₁) * Ti := by
-            simp only [Matrix.mul_assoc]
-        _ = 1 := by rw [hT', Matrix.mul_one, e1, Matrix.mul_one, hT], by
-      calc T0 * Q.toBlocks₁₁ * Ti * (T0 * P.toBlocks₁₁ * Ti) = T0 * (Q.toBlocks₁₁ * (Ti * T0) * P.toBlocks₁₁) * Ti := by
-            simp only [Matrix.mul_assoc]
-        _ = 1 := by rw [hT', Matrix.mul_one, e2, Matrix.mul_one, hT]⟩
+    rw [← kunf.incM_mul', Units.inv_mul]
+    ext i j
+    simp [incM, Matrix.one_apply]
+  let t' : GL (Fin d.n) (AE F E) := ⟨
+    T0 * P.toBlocks₁₁ * Ti,
+    T0 * Q.toBlocks₁₁ * Ti,
+    by
+      calc
+        T0 * P.toBlocks₁₁ * Ti * (T0 * Q.toBlocks₁₁ * Ti)
+          = T0 * (P.toBlocks₁₁ * (Ti * T0) * Q.toBlocks₁₁) * Ti := by simp only [Matrix.mul_assoc]
+        _ = 1 := by rw [hT', Matrix.mul_one, e1, Matrix.mul_one, hT],
+    by
+      calc
+        T0 * Q.toBlocks₁₁ * Ti * (T0 * P.toBlocks₁₁ * Ti)
+          = T0 * (Q.toBlocks₁₁ * (Ti * T0) * P.toBlocks₁₁) * Ti := by simp only [Matrix.mul_assoc]
+        _ = 1 := by rw [hT', Matrix.mul_one, e2, Matrix.mul_one, hT]
+  ⟩
   exact mem_parabolic_GL2_iff.2 ⟨t', (kunf.isPar_frame ht₁ (L.j g) t').2 ⟨hP, rfl⟩⟩
 
-def padE (N : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) E) : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) E :=
-  fun r c => if h : (∃ a, emS L a = r) ∧ ∃ a, emS L a = c then N h.1.choose h.2.choose
-    else (1 : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) E) r c
+def padE (N : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) E)
+    : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) E := fun r c =>
+  if h : (∃ a, emS L a = r) ∧ ∃ a, emS L a = c then
+    N h.1.choose h.2.choose
+  else
+    (1 : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) E) r c
 
-theorem padM_incM (N : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) E) : padM L (incM F N) = incM F (padE L N) := by
+theorem padM_incM (N : Matrix (Fin L.n ⊕ Fin L.n) (Fin L.n ⊕ Fin L.n) E)
+    : padM L (incM F N) = incM F (padE L N) := by
   ext r c
   simp only [padM, padE, incM, Matrix.map_apply]
   split_ifs with h

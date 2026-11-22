@@ -10,8 +10,8 @@ universe u v
 
 open TensorProduct
 
-theorem zmod_P (q : ℕ) [NeZero q] (a : ZMod q) :
-    ∃ b : ZMod q, b * a = 0 ∧ ∀ r : ZMod q, r * b = 0 → ∃ c, c * a = r := by
+theorem zmod_P (q : ℕ) [NeZero q] (a : ZMod q)
+    : ∃ b : ZMod q, b * a = 0 ∧ ∀ r : ZMod q, r * b = 0 → ∃ c, c * a = r := by
   have hq : 0 < q := Nat.pos_of_ne_zero (NeZero.ne q)
   set n := a.val with hn
   set g := Nat.gcd n q with hg
@@ -41,33 +41,38 @@ theorem zmod_P (q : ℕ) [NeZero q] (a : ZMod q) :
     rw [hbez]
     ring
 
-theorem ulift_P (q : ℕ) [NeZero q] (a : ULift.{1} (ZMod q)) :
-    ∃ b : ULift.{1} (ZMod q), b * a = 0 ∧ ∀ r : ULift.{1} (ZMod q), r * b = 0 → ∃ c, c * a = r := by
+theorem ulift_P (q : ℕ) [NeZero q] (a : ULift.{1} (ZMod q))
+    : ∃ b : ULift.{1} (ZMod q),
+      b * a = 0 ∧ ∀ r : ULift.{1} (ZMod q), r * b = 0 → ∃ c, c * a = r := by
   obtain ⟨b, hb, h⟩ := zmod_P q a.down
   refine ⟨ULift.up b, ULift.ext hb, fun r hr => ?_⟩
   obtain ⟨c, hc⟩ := h r.down (congrArg ULift.down hr)
   exact ⟨ULift.up c, ULift.ext hc⟩
 
-theorem key {R : Type u} {M : Type v} [CommRing R] [Small.{v} R] [AddCommGroup M] [Module R M] (hM : Module.Injective R M)
+theorem key
+    {R : Type u} {M : Type v} [CommRing R] [Small.{v} R] [AddCommGroup M] [Module R M]
+    (hM : Module.Injective R M)
     (hP : ∀ a : R, ∃ b : R, b * a = 0 ∧ ∀ r : R, r * b = 0 → ∃ c, c * a = r)
-    (a : R) (m : M) (h : a • m = 0) : ∃ (b : R) (m' : M), b * a = 0 ∧ m = b • m' := by
+    (a : R) (m : M) (h : a • m = 0)
+    : ∃ (b : R) (m' : M), b * a = 0 ∧ m = b • m' := by
   obtain ⟨b, hba, hb⟩ := hP a
   have wd : ∀ c c' : R, c * b = c' * b → c • m = c' • m := by
     intro c c' hcc
     obtain ⟨e, he⟩ := hb (c - c') (by rw [sub_mul, hcc, sub_self])
     rw [← sub_eq_zero, ← sub_smul, ← he, mul_smul, h, smul_zero]
-  have hc : ∀ x : Ideal.span {b}, (Ideal.mem_span_singleton'.1 x.2).choose * b = x :=
-    fun x => (Ideal.mem_span_singleton'.1 x.2).choose_spec
-  let g : Ideal.span {b} →ₗ[R] M :=
-    { toFun := fun x => (Ideal.mem_span_singleton'.1 x.2).choose • m
-      map_add' := fun x y => by
-        rw [← add_smul]
-        apply wd
-        rw [add_mul, hc, hc, hc, Submodule.coe_add]
-      map_smul' := fun r x => by
-        rw [RingHom.id_apply, ← mul_smul]
-        apply wd
-        rw [mul_assoc, hc, hc, Submodule.coe_smul, smul_eq_mul] }
+  have hc : ∀ x : Ideal.span {b}, (Ideal.mem_span_singleton'.1 x.2).choose * b = x := fun x =>
+    (Ideal.mem_span_singleton'.1 x.2).choose_spec
+  let g : Ideal.span {b} →ₗ[R] M := {
+    toFun := fun x => (Ideal.mem_span_singleton'.1 x.2).choose • m
+    map_add' := fun x y => by
+      rw [← add_smul]
+      apply wd
+      rw [add_mul, hc, hc, hc, Submodule.coe_add]
+    map_smul' := fun r x => by
+      rw [RingHom.id_apply, ← mul_smul]
+      apply wd
+      rw [mul_assoc, hc, hc, Submodule.coe_smul, smul_eq_mul]
+  }
   obtain ⟨G, hG⟩ := Module.Baer.of_injective hM (Ideal.span {b}) g
   refine ⟨b, G 1, hba, ?_⟩
   have hbm : b ∈ Ideal.span {b} := Ideal.subset_span rfl
@@ -77,9 +82,12 @@ theorem key {R : Type u} {M : Type v} [CommRing R] [Small.{v} R] [AddCommGroup M
   apply wd
   rw [hc ⟨b, hbm⟩, one_mul]
 
-theorem flat_of {R : Type u} {M : Type v} [CommRing R] [Small.{v} R] [IsPrincipalIdealRing R] [AddCommGroup M] [Module R M]
+theorem flat_of
+    {R : Type u} {M : Type v}
+    [CommRing R] [Small.{v} R] [IsPrincipalIdealRing R] [AddCommGroup M] [Module R M]
     (hM : Module.Injective R M)
-    (hP : ∀ a : R, ∃ b : R, b * a = 0 ∧ ∀ r : R, r * b = 0 → ∃ c, c * a = r) : Module.Flat R M := by
+    (hP : ∀ a : R, ∃ b : R, b * a = 0 ∧ ∀ r : R, r * b = 0 → ∃ c, c * a = r)
+    : Module.Flat R M := by
   rw [Module.Flat.iff_lift_lsmul_comp_subtype_injective]
   intro I _
   obtain ⟨a, ha⟩ := Submodule.IsPrincipal.principal I
@@ -101,7 +109,8 @@ theorem flat_of {R : Type u} {M : Type v} [CommRing R] [Small.{v} R] [IsPrincipa
       obtain ⟨mx, rfl⟩ := hx
       obtain ⟨my, rfl⟩ := hy
       exact ⟨mx + my, by rw [tmul_add]⟩
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro t ht
   obtain ⟨m, rfl⟩ := hrep t
   have ham : a • m = 0 := by simpa using ht
@@ -112,11 +121,13 @@ theorem flat_of {R : Type u} {M : Type v} [CommRing R] [Small.{v} R] [IsPrincipa
 
 end LateralTheory.EtaleFoundations.QFFlat
 
-theorem LateralTheory.EtaleFoundations.zmod_injective_module_flat_holds : LateralTheory.EtaleFoundations.ZModInjectiveModuleFlat := by
+theorem LateralTheory.EtaleFoundations.zmod_injective_module_flat_holds
+    : LateralTheory.EtaleFoundations.ZModInjectiveModuleFlat := by
   intro q _ N _ _ hN
   have : IsPrincipalIdealRing (ZMod q) :=
     IsPrincipalIdealRing.of_surjective (Int.castRingHom (ZMod q)) ZMod.intCast_surjective
   have : IsPrincipalIdealRing (ULift.{1} (ZMod q)) :=
     IsPrincipalIdealRing.of_surjective (ULift.ringEquiv (R := ZMod q)).symm
       (ULift.ringEquiv (R := ZMod q)).symm.surjective
-  exact LateralTheory.EtaleFoundations.QFFlat.flat_of hN (LateralTheory.EtaleFoundations.QFFlat.ulift_P q)
+  exact LateralTheory.EtaleFoundations.QFFlat.flat_of hN
+    (LateralTheory.EtaleFoundations.QFFlat.ulift_P q)

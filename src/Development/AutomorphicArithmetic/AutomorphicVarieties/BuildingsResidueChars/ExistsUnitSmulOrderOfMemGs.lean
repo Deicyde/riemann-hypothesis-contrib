@@ -7,8 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Loc.PK
 
-theorem UpperTheory.exists_unit_smul_order_of_mem_gs :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ → τ ^ 2 - 4 ≠ 0 → ∀ (π : O) (n : ℕ) (e : Oˣ) (h : O) (x : Etau K τ), Cond π n e h x → ∀ (t : Kˣ) (S : Set (Etau K τ)), S ∈ PS.Gs O τ t 1 → ∃ (m : ℕ) (r : Kˣ) (u : (Etau K τ)ˣ), u ∈ Gu O τ ∧ S = PS.ml (PS.sc τ r * u) (Ord O (yy π m x)) := by
+theorem UpperTheory.exists_unit_smul_order_of_mem_gs
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ → τ ^ 2 - 4 ≠ 0
+        → ∀ (π : O) (n : ℕ) (e : Oˣ) (h : O) (x : Etau K τ),
+          Cond π n e h x
+            → ∀ (t : Kˣ) (S : Set (Etau K τ)),
+              S ∈ PS.Gs O τ t 1
+                → ∃ (m : ℕ) (r : Kˣ) (u : (Etau K τ)ˣ),
+                  u ∈ Gu O τ ∧ S = PS.ml (PS.sc τ r * u) (Ord O (yy π m x)) := by
   intro O K _ _ _ _ _ Δ τ hL hτ π n e h x hC t S hS
   obtain ⟨hfix, c, hc, hgen⟩ := hS
   rw [one_mul] at hgen
@@ -17,35 +25,43 @@ theorem UpperTheory.exists_unit_smul_order_of_mem_gs :
   subst hs0
   set N : Submodule O (Etau K τ) := Submodule.span O (s0 : Set (Etau K τ)) with hN
   have hcS : (c : Etau K τ) ∈ N := hgen.1
-  have hint : ∀ w ∈ N, ∃ a b : O, ((c⁻¹ : (Etau K τ)ˣ) : Etau K τ) * w
-      = algebraMap O (Etau K τ) a + algebraMap O (Etau K τ) b * x :=
-    fun w hw => (hC.gen.int_iff hL _).1 (hgen.2 w hw)
-  let B : Ideal O :=
-    { carrier := {b | ∃ a : O,
+  have hint
+      : ∀ w ∈ N, ∃ a b : O,
+        ((c⁻¹ : (Etau K τ)ˣ) : Etau K τ) * w
+          = algebraMap O (Etau K τ) a + algebraMap O (Etau K τ) b * x := fun w hw =>
+    (hC.gen.int_iff hL _).1 (hgen.2 w hw)
+  let B : Ideal O := {
+    carrier :=
+      {b | ∃ a : O,
         (c : Etau K τ) * (algebraMap O (Etau K τ) a + algebraMap O (Etau K τ) b * x) ∈ N}
-      add_mem' := by
-        rintro b1 b2 ⟨a1, h1⟩ ⟨a2, h2⟩
-        refine ⟨a1 + a2, ?_⟩
-        have key : (c : Etau K τ) * (algebraMap O (Etau K τ) (a1 + a2) + algebraMap O (Etau K τ) (b1 + b2) * x)
+    add_mem' := by
+      rintro b1 b2 ⟨a1, h1⟩ ⟨a2, h2⟩
+      refine ⟨a1 + a2, ?_⟩
+      have key
+          : (c : Etau K τ)
+              * (algebraMap O (Etau K τ) (a1 + a2) + algebraMap O (Etau K τ) (b1 + b2) * x)
             = (c : Etau K τ) * (algebraMap O (Etau K τ) a1 + algebraMap O (Etau K τ) b1 * x)
               + (c : Etau K τ) * (algebraMap O (Etau K τ) a2 + algebraMap O (Etau K τ) b2 * x) := by
-          simp only [map_add (f := _)]
-          ring
-        rw [key]
-        exact N.add_mem h1 h2
-      zero_mem' := by
-        refine ⟨0, ?_⟩
-        simp only [map_zero, zero_mul, add_zero, mul_zero]
-        exact N.zero_mem
-      smul_mem' := by
-        rintro k b ⟨a, hab⟩
-        refine ⟨k * a, ?_⟩
-        have key : (c : Etau K τ) * (algebraMap O (Etau K τ) (k * a) + algebraMap O (Etau K τ) (k • b) * x)
-            = k • ((c : Etau K τ) * (algebraMap O (Etau K τ) a + algebraMap O (Etau K τ) b * x)) := by
-          rw [smul_eq_mul, Algebra.smul_def, map_mul, map_mul]
-          ring
-        rw [key]
-        exact N.smul_mem k hab }
+        simp only [map_add (f := _)]
+        ring
+      rw [key]
+      exact N.add_mem h1 h2
+    zero_mem' := by
+      refine ⟨0, ?_⟩
+      simp only [map_zero, zero_mul, add_zero, mul_zero]
+      exact N.zero_mem
+    smul_mem' := by
+      rintro k b ⟨a, hab⟩
+      refine ⟨k * a, ?_⟩
+      have key
+          : (c : Etau K τ) * (algebraMap O (Etau K τ) (k * a) + algebraMap O (Etau K τ) (k • b) * x)
+            = k
+              • ((c : Etau K τ) * (algebraMap O (Etau K τ) a + algebraMap O (Etau K τ) b * x)) := by
+        rw [smul_eq_mul, Algebra.smul_def, map_mul, map_mul]
+        ring
+      rw [key]
+      exact N.smul_mem k hab
+  }
   have hB : B ≠ ⊥ := by
     have hωc : ω * (c : Etau K τ) ∈ N := hfix.stab _ hcS
     obtain ⟨a, b, hab⟩ := hint _ hωc
@@ -90,9 +106,10 @@ theorem UpperTheory.exists_unit_smul_order_of_mem_gs :
       exact N.smul_mem a hcS
     · rw [mul_smul_comm]
       apply N.smul_mem
-      have key : (c : Etau K τ) * (algebraMap O (Etau K τ) (π ^ m) * x)
-          = (c : Etau K τ) * (algebraMap O (Etau K τ) a0 + algebraMap O (Etau K τ) (π ^ m) * x)
-            - a0 • (c : Etau K τ) := by
+      have key
+          : (c : Etau K τ) * (algebraMap O (Etau K τ) (π ^ m) * x)
+            = (c : Etau K τ) * (algebraMap O (Etau K τ) a0 + algebraMap O (Etau K τ) (π ^ m) * x)
+              - a0 • (c : Etau K τ) := by
         rw [Algebra.smul_def]
         ring
       rw [key]

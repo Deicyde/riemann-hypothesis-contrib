@@ -19,8 +19,7 @@ open Formalism.G Formalism.LT
 
 variable {K : Type u} [NormedField K] [IsUltrametricDist K]
 
-def Bd {τ : Type w} (C : ℝ) (F : MvPowerSeries τ K) : Prop :=
-  ∀ d, ‖MvPowerSeries.coeff d F‖ ≤ C
+def Bd {τ : Type w} (C : ℝ) (F : MvPowerSeries τ K) : Prop := ∀ d, ‖MvPowerSeries.coeff d F‖ ≤ C
 
 lemma norm_add_le_of {a b : K} {C : ℝ} (ha : ‖a‖ ≤ C) (hb : ‖b‖ ≤ C) : ‖a + b‖ ≤ C :=
   (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha hb)
@@ -84,8 +83,10 @@ theorem main (hC : Formalism.FG.CoeffBoundV.{u, v, v}) : Formalism.FG.FunEqSubst
   have hppos : 0 < ‖(p : K)‖ := norm_pos_iff.mpr hpne
   have hαS : MvPowerSeries.HasSubst α := MvPowerSeries.hasSubst_of_constantCoeff_zero hα0
   obtain ⟨αq, hαq⟩ : ∃ αq : ι → MvPowerSeries τ K, αq = fun i => α i ^ q := ⟨_, rfl⟩
-  obtain ⟨β, hβ⟩ : ∃ β : ι → MvPowerSeries τ K,
-      β = fun i => MvPowerSeries.expand q hq (MvPowerSeries.map σ (α i)) := ⟨_, rfl⟩
+  obtain ⟨β, hβ⟩
+      : ∃ β : ι → MvPowerSeries τ K,
+        β = fun i => MvPowerSeries.expand q hq (MvPowerSeries.map σ (α i)) :=
+    ⟨_, rfl⟩
   have hαqS : MvPowerSeries.HasSubst αq := by
     apply MvPowerSeries.hasSubst_of_constantCoeff_zero
     intro i
@@ -100,26 +101,34 @@ theorem main (hC : Formalism.FG.CoeffBoundV.{u, v, v}) : Formalism.FG.FunEqSubst
     intro i; rw [hαq, hβ]; exact Formalism.LT.FrobCongr_valid K p q hq σ hS τ (α i) (hαI i)
   have hβI : ∀ i, IntegralMv (β i) := by
     intro i d
-    have e : MvPowerSeries.coeff d (β i)
-        = MvPowerSeries.coeff d (αq i) - MvPowerSeries.coeff d (αq i - β i) := by
+    have e
+        : MvPowerSeries.coeff d (β i)
+          = MvPowerSeries.coeff d (αq i) - MvPowerSeries.coeff d (αq i - β i) := by
       rw [map_sub]; ring
     rw [e]
     exact norm_sub_le_of (hαqI i d) ((hdiv i d).trans hp1')
 
-  have e3 : ∀ k, MvPowerSeries.expand q hq (MvPowerSeries.map σ (MvPowerSeries.subst α (f k))) =
-      MvPowerSeries.subst β (MvPowerSeries.map σ (f k)) := by
+  have e3
+      : ∀ k,
+        MvPowerSeries.expand q hq (MvPowerSeries.map σ (MvPowerSeries.subst α (f k)))
+          = MvPowerSeries.subst β (MvPowerSeries.map σ (f k)) := by
     intro k; rw [expand_map_subst q hq σ hαS, hβ]
-  have e2 : ∀ j, MvPowerSeries.subst α (f j - (p : K)⁻¹ •
-      ∑ k, M j k • MvPowerSeries.expand q hq (MvPowerSeries.map σ (f k))) =
-      MvPowerSeries.subst α (f j) - (p : K)⁻¹ •
-        ∑ k, M j k • MvPowerSeries.subst αq (MvPowerSeries.map σ (f k)) := by
+  have e2
+      : ∀ j,
+        MvPowerSeries.subst α
+            (f j - (p : K)⁻¹ • ∑ k, M j k • MvPowerSeries.expand q hq (MvPowerSeries.map σ (f k)))
+          = MvPowerSeries.subst α (f j)
+            - (p : K)⁻¹ • ∑ k, M j k • MvPowerSeries.subst αq (MvPowerSeries.map σ (f k)) := by
     intro j
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← MvPowerSeries.substAlgHom_apply hαS, map_sub, map_smul, map_sum]
     simp only [map_smul, MvPowerSeries.substAlgHom_apply, subst_expand q hq hαS, hαq]
 
-  have hbr : ∀ k, Bd ‖(p : K)‖ (MvPowerSeries.subst αq (MvPowerSeries.map σ (f k)) -
-      MvPowerSeries.subst β (MvPowerSeries.map σ (f k))) := by
+  have hbr
+      : ∀ k,
+        Bd ‖(p : K)‖
+          (MvPowerSeries.subst αq (MvPowerSeries.map σ (f k))
+            - MvPowerSeries.subst β (MvPowerSeries.map σ (f k))) := by
     intro k
     apply bd_subst_sub _ αq β hαqS hβS (norm_nonneg _)
     intro n d
@@ -135,8 +144,8 @@ theorem main (hC : Formalism.FG.CoeffBoundV.{u, v, v}) : Formalism.FG.FunEqSubst
       obtain ⟨m, hm⟩ := hk'dvd i
       have hn : n i = p ^ (h * k') * m := by rw [hm, hqh, ← pow_mul]
       have hdiv1 : DivByMv ((p : K) ^ 1) (αq i - β i) := by simpa using hdiv i
-      have h6 := Formalism.LT.PowCongr_valid K τ p hp (αq i) (β i) (hαqI i) (hβI i) 1 le_rfl hdiv1
-        (h * k') m
+      have h6 :=
+        Formalism.LT.PowCongr_valid K τ p hp (αq i) (β i) (hαqI i) (hβI i) 1 le_rfl hdiv1 (h * k') m
       rw [← hn] at h6
       intro d'
       refine (h6 d').trans ?_
@@ -146,29 +155,36 @@ theorem main (hC : Formalism.FG.CoeffBoundV.{u, v, v}) : Formalism.FG.FunEqSubst
     have hprod : Bd (‖(p : K)‖ ^ k' * ‖(p : K)‖)
         (n.prod (fun s e => αq s ^ e) - n.prod (fun s e => β s ^ e)) := by
       unfold Finsupp.prod
-      exact bd_prod_sub (by positivity) (fun i => αq i ^ n i) (fun i => β i ^ n i) n.support
+      exact bd_prod_sub (by positivity)
+        (fun i => αq i ^ n i)
+        (fun i => β i ^ n i)
+        n.support
         (fun i _ => Formalism.FG.IntegralSubstitution.integral_pow (hαqI i) _)
-        (fun i _ => Formalism.FG.IntegralSubstitution.integral_pow (hβI i) _) (fun i _ => hpow i)
-    calc ‖σ (MvPowerSeries.coeff n (f k))‖ *
-          ‖MvPowerSeries.coeff d (n.prod (fun s e => αq s ^ e) - n.prod (fun s e => β s ^ e))‖
-        ≤ ‖σ (MvPowerSeries.coeff n (f k))‖ * (‖(p : K)‖ ^ k' * ‖(p : K)‖) :=
-          mul_le_mul_of_nonneg_left (hprod d) (norm_nonneg _)
+        (fun i _ => Formalism.FG.IntegralSubstitution.integral_pow (hβI i) _)
+        (fun i _ => hpow i)
+    calc
+      ‖σ (MvPowerSeries.coeff n (f k))‖
+            * ‖MvPowerSeries.coeff d (n.prod (fun s e => αq s ^ e) - n.prod (fun s e => β s ^ e))‖
+          ≤ ‖σ (MvPowerSeries.coeff n (f k))‖ * (‖(p : K)‖ ^ k' * ‖(p : K)‖) :=
+        mul_le_mul_of_nonneg_left (hprod d) (norm_nonneg _)
       _ = (‖σ (MvPowerSeries.coeff n (f k))‖ * ‖(p : K)‖ ^ k') * ‖(p : K)‖ := by ring
       _ ≤ 1 * ‖(p : K)‖ := mul_le_mul_of_nonneg_right hs (norm_nonneg _)
       _ = ‖(p : K)‖ := one_mul _
 
   intro j
   simp only [e3]
-  have hgI : IntegralMv (MvPowerSeries.subst α (f j - (p : K)⁻¹ •
-      ∑ k, M j k • MvPowerSeries.expand q hq (MvPowerSeries.map σ (f k)))) :=
+  have hgI : IntegralMv (MvPowerSeries.subst α
+      (f j - (p : K)⁻¹ • ∑ k, M j k • MvPowerSeries.expand q hq (MvPowerSeries.map σ (f k)))) :=
     Formalism.FG.integral_subst_vector K ι τ _ α (hfT j) hα0 hαI
   rw [e2] at hgI
-  have e : MvPowerSeries.subst α (f j) - (p : K)⁻¹ •
-        ∑ k, M j k • MvPowerSeries.subst β (MvPowerSeries.map σ (f k)) =
-      (MvPowerSeries.subst α (f j) - (p : K)⁻¹ •
-        ∑ k, M j k • MvPowerSeries.subst αq (MvPowerSeries.map σ (f k))) +
-      (p : K)⁻¹ • ∑ k, M j k • (MvPowerSeries.subst αq (MvPowerSeries.map σ (f k)) -
-        MvPowerSeries.subst β (MvPowerSeries.map σ (f k))) := by
+  have e
+      : MvPowerSeries.subst α (f j)
+          - (p : K)⁻¹ • ∑ k, M j k • MvPowerSeries.subst β (MvPowerSeries.map σ (f k))
+        = (MvPowerSeries.subst α (f j)
+            - (p : K)⁻¹ • ∑ k, M j k • MvPowerSeries.subst αq (MvPowerSeries.map σ (f k)))
+          + (p : K)⁻¹
+            • ∑ k, M j k • (MvPowerSeries.subst αq (MvPowerSeries.map σ (f k)) -
+              MvPowerSeries.subst β (MvPowerSeries.map σ (f k))) := by
     simp only [smul_sub, Finset.sum_sub_distrib]; abel
   rw [e]
   intro d
@@ -176,21 +192,24 @@ theorem main (hC : Formalism.FG.CoeffBoundV.{u, v, v}) : Formalism.FG.FunEqSubst
     rw [map_add (f := _), MvPowerSeries.coeff_smul, map_sum]
   refine norm_add_le_of (hgI d) ?_
   rw [norm_mul, norm_inv]
-  have hsum : ‖∑ k, MvPowerSeries.coeff d (M j k • (MvPowerSeries.subst αq
-      (MvPowerSeries.map σ (f k)) - MvPowerSeries.subst β (MvPowerSeries.map σ (f k))))‖ ≤
-      ‖(p : K)‖ := by
+  have hsum
+      : ‖∑ k, MvPowerSeries.coeff d (M j k • (MvPowerSeries.subst αq
+          (MvPowerSeries.map σ (f k)) - MvPowerSeries.subst β (MvPowerSeries.map σ (f k))))‖
+        ≤ ‖(p : K)‖ := by
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) fun k _ => ?_
     rw [MvPowerSeries.coeff_smul, norm_mul]
-    calc _ ≤ 1 * ‖(p : K)‖ := mul_le_mul (hM j k) (hbr k d) (norm_nonneg _) zero_le_one
+    calc
+      _ ≤ 1 * ‖(p : K)‖ := mul_le_mul (hM j k) (hbr k d) (norm_nonneg _) zero_le_one
       _ = ‖(p : K)‖ := one_mul _
-  calc ‖(p : K)‖⁻¹ * _ ≤ ‖(p : K)‖⁻¹ * ‖(p : K)‖ :=
-        mul_le_mul_of_nonneg_left hsum (inv_nonneg.mpr (norm_nonneg _))
+  calc
+    ‖(p : K)‖⁻¹ * _
+      ≤ ‖(p : K)‖⁻¹ * ‖(p : K)‖ := mul_le_mul_of_nonneg_left hsum (inv_nonneg.mpr (norm_nonneg _))
     _ = 1 := inv_mul_cancel₀ hppos.ne'
 
 end Formalism.FG.KeyVAux
 
-theorem Formalism.FG.FunEqSubstV_of (hC : Formalism.FG.CoeffBoundV.{u, v, v}) :
-    Formalism.FG.FunEqSubstV.{u, v, w} :=
+theorem Formalism.FG.FunEqSubstV_of (hC : Formalism.FG.CoeffBoundV.{u, v, v})
+    : Formalism.FG.FunEqSubstV.{u, v, w} :=
   Formalism.FG.KeyVAux.main hC
 
 theorem Formalism.FG.functional_equation_subst_vector : Formalism.FG.FunEqSubstV.{u, v, w} :=

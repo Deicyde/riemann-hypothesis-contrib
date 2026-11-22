@@ -10,11 +10,21 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR.Hyp
 
-theorem coord_structure : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (e : A.L), e * e = e → star e = 1 - e → (∀ p, Hyp.ci A e (Hyp.cc A e p) = p) ∧ (∀ y, Hyp.cc A e (Hyp.ci A e y) = y) ∧ (∀ p, A.NL (Hyp.cc A e p) = p.1 * p.2) ∧ (∀ (ψ : AddChar F ℂ) (x : A.K) (p q : A.K × A.K), A.kerL ψ x (Hyp.cc A e q) (Hyp.cc A e p) = Hyp.kx A ψ x q.1 p.2 * Hyp.kx A ψ x q.2 p.1) ∧ (∀ (s : A.K) p, s • Hyp.cc A e p = Hyp.cc A e (s * p.1, s * p.2)) ∧ ∀ s : A.Kˣ, IsUnit (Hyp.cc A e ((s : A.K), 1)) := by
+theorem coord_structure
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (e : A.L),
+      e * e = e → star e = 1 - e
+        → (∀ p, Hyp.ci A e (Hyp.cc A e p) = p) ∧ (∀ y, Hyp.cc A e (Hyp.ci A e y) = y)
+          ∧ (∀ p, A.NL (Hyp.cc A e p) = p.1 * p.2)
+          ∧ (∀ (ψ : AddChar F ℂ) (x : A.K) (p q : A.K × A.K),
+            A.kerL ψ x (Hyp.cc A e q) (Hyp.cc A e p) = Hyp.kx A ψ x q.1 p.2 * Hyp.kx A ψ x q.2 p.1)
+          ∧ (∀ (s : A.K) p, s • Hyp.cc A e p = Hyp.cc A e (s * p.1, s * p.2))
+          ∧ ∀ s : A.Kˣ, IsUnit (Hyp.cc A e ((s : A.K), 1)) := by
   intro F E _ _ _ _ _ A e hee hse
   obtain ⟨-, hinj, hnorm, htr, -⟩ := Et.quadratic_structure F E A
-  have htrs : ∀ (a : A.K) (f : A.L),
-      Algebra.trace A.K A.L (algebraMap A.K A.L a * f) = a * Algebra.trace A.K A.L f := by
+  have htrs
+      : ∀ (a : A.K) (f : A.L),
+        Algebra.trace A.K A.L (algebraMap A.K A.L a * f) = a * Algebra.trace A.K A.L f := by
     intro a f
     rw [← Algebra.smul_def, LinearMap.map_smul, smul_eq_mul]
   have hone : ∀ f : A.L, star f = 1 - f → Algebra.trace A.K A.L f = 1 := by
@@ -23,10 +33,10 @@ theorem coord_structure : ∀ (F E : Type) [NontriviallyNormedField F] [Nontrivi
     rw [htr, hf, map_one]
     ring
   have hte : Algebra.trace A.K A.L e = 1 := hone e hse
-  have htf : Algebra.trace A.K A.L (1 - e) = 1 :=
-    hone (1 - e) (by rw [star_sub, star_one, hse])
-  have hst : ∀ p : A.K × A.K, star (Hyp.cc A e p) =
-      algebraMap A.K A.L p.1 * (1 - e) + algebraMap A.K A.L p.2 * e := by
+  have htf : Algebra.trace A.K A.L (1 - e) = 1 := hone (1 - e) (by rw [star_sub, star_one, hse])
+  have hst
+      : ∀ p : A.K × A.K,
+        star (Hyp.cc A e p) = algebraMap A.K A.L p.1 * (1 - e) + algebraMap A.K A.L p.2 * e := by
     intro p
     simp only [Hyp.cc, star_add, star_mul, star_sub, star_one, hse, A.star_K]
     ring
@@ -51,15 +61,17 @@ theorem coord_structure : ∀ (F E : Type) [NontriviallyNormedField F] [Nontrivi
     simp only [Hyp.cc]
     linear_combination (-(algebraMap A.K A.L p.1 - algebraMap A.K A.L p.2) ^ 2) * hee
   · intro ψ x p q
-    have hprod : star (Hyp.cc A e q) * Hyp.cc A e p =
-        algebraMap A.K A.L (q.1 * p.2) * (1 - e) + algebraMap A.K A.L (q.2 * p.1) * e := by
+    have hprod
+        : star (Hyp.cc A e q) * Hyp.cc A e p
+          = algebraMap A.K A.L (q.1 * p.2) * (1 - e) + algebraMap A.K A.L (q.2 * p.1) * e := by
       rw [hst]
       simp only [Hyp.cc, map_mul]
       linear_combination
         (algebraMap A.K A.L q.1 * algebraMap A.K A.L p.2 + algebraMap A.K A.L q.2 * algebraMap A.K A.L p.1
           - algebraMap A.K A.L q.1 * algebraMap A.K A.L p.1
           - algebraMap A.K A.L q.2 * algebraMap A.K A.L p.2) * hee
-    have ht : Algebra.trace A.K A.L (star (Hyp.cc A e q) * Hyp.cc A e p) = q.1 * p.2 + q.2 * p.1 := by
+    have ht
+        : Algebra.trace A.K A.L (star (Hyp.cc A e q) * Hyp.cc A e p) = q.1 * p.2 + q.2 * p.1 := by
       rw [hprod, map_add (f := _), htrs, htrs, hte, htf, mul_one, mul_one]
     simp only [Et.kerL, Hyp.kx, Et.psiK]
     rw [ht]

@@ -17,11 +17,15 @@ open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
-variable {X0 : Scheme.{0}} {R : Type} [CommRing R] (x0 : Sp R ⟶ X0) {G : Over X0} [GrpObj G] [IsCommMonObj G]
-  {G' : Over (Sp R)} [GrpObj G'] [IsCommMonObj G'] {Φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G x0 Φ)
+variable
+  {X0 : Scheme.{0}} {R : Type} [CommRing R]
+  (x0 : Sp R ⟶ X0)
+  {G : Over X0} [GrpObj G] [IsCommMonObj G]
+  {G' : Over (Sp R)} [GrpObj G'] [IsCommMonObj G']
+  {Φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G x0 Φ)
 
-theorem epsScaleR_comp_alg (a : R) :
-    (epsScaleR a).comp (algebraMap R (DualNumber R)) = algebraMap R (DualNumber R) := by
+theorem epsScaleR_comp_alg (a : R)
+    : (epsScaleR a).comp (algebraMap R (DualNumber R)) = algebraMap R (DualNumber R) := by
   ext r <;> simp [epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]
 
 def scK (a : R) (p : epsR R ⟶ G') : epsR R ⟶ G' :=
@@ -38,21 +42,28 @@ theorem push_inj : Function.Injective (pushHom h (epsR R)) := by
   apply Over.OverMorphism.ext
   exact h.1.hom_ext e ((Over.w p).trans (Over.w q).symm)
 
-theorem push_surj (V : overAt x0 (DualNumber R) ⟶ G) : ∃ p, pushHom h (epsR R) p = V :=
-  ⟨Over.homMk (h.1.lift V.left (epsR R).hom (Over.w V)) (h.1.lift_snd _ _ _),
-    Over.OverMorphism.ext (h.1.lift_fst _ _ _)⟩
+theorem push_surj (V : overAt x0 (DualNumber R) ⟶ G) : ∃ p, pushHom h (epsR R) p = V := ⟨
+  Over.homMk (h.1.lift V.left (epsR R).hom (Over.w V)) (h.1.lift_snd _ _ _),
+  Over.OverMorphism.ext (h.1.lift_fst _ _ _)
+⟩
 
-theorem push_scK (a : R) (p : epsR R ⟶ G') : pushHom h (epsR R) (scK a p) = smT x0 a (pushHom h (epsR R) p) :=
+theorem push_scK (a : R) (p : epsR R ⟶ G')
+    : pushHom h (epsR R) (scK a p) = smT x0 a (pushHom h (epsR R) p) :=
   Over.OverMorphism.ext (Category.assoc _ _ _)
 
 theorem scK_zero_iff (p : epsR R ⟶ G') : IsTangent p ↔ scK 0 p = 1 := by
-  have e0 : epsScaleR (0 : R) = (algebraMap R (DualNumber R)).comp (TrivSqZeroExt.fstHom R R R).toRingHom := by
+  have e0
+      : epsScaleR (0 : R)
+        = (algebraMap R (DualNumber R)).comp (TrivSqZeroExt.fstHom R R R).toRingHom := by
     ext r <;> simp [epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]
   have e1 : ((1 : epsR R ⟶ G').left) = spMap (algebraMap R (DualNumber R)) ≫ η[G'].left := by
     rw [Hom.one_def]; rfl
-  have e2 : spMap (TrivSqZeroExt.fstHom R R R).toRingHom ≫ spMap (algebraMap R (DualNumber R)) = 𝟙 _ := by
+  have e2
+      : spMap (TrivSqZeroExt.fstHom R R R).toRingHom ≫ spMap (algebraMap R (DualNumber R))
+        = 𝟙 _ := by
     rw [spMap_comp_spMap]
-    have : (TrivSqZeroExt.fstHom R R R).toRingHom.comp (algebraMap R (DualNumber R)) = RingHom.id R := by
+    have : (TrivSqZeroExt.fstHom R R R).toRingHom.comp (algebraMap R (DualNumber R))
+        = RingHom.id R := by
       ext r; simp [TrivSqZeroExt.algebraMap_eq_inl]
     rw [this]
     exact Spec.map_id _
@@ -74,10 +85,11 @@ theorem isTangent_iff (p : epsR R ⟶ G') : IsTangent p ↔ smT x0 0 (pushHom h 
   rw [scK_zero_iff, ← push_scK h, ← map_one (pushHom h (epsR R))]
   exact (push_inj h).eq_iff.symm
 
-theorem isLieComb_iff {m : ℕ} (c : Fin m → R) (v : Fin m → (epsR R ⟶ G')) (w : epsR R ⟶ G') :
-    IsLieComb c v w ↔ pushHom h (epsR R) w = combT x0 (fun i => pushHom h (epsR R) (v i)) c := by
-  have hprod : ∀ u : Fin m → (epsR R ⟶ G'), pushHom h (epsR R) (List.ofFn u).prod =
-      ∏ i, pushHom h (epsR R) (u i) := fun u => by
+theorem isLieComb_iff {m : ℕ} (c : Fin m → R) (v : Fin m → (epsR R ⟶ G')) (w : epsR R ⟶ G')
+    : IsLieComb c v w ↔ pushHom h (epsR R) w = combT x0 (fun i => pushHom h (epsR R) (v i)) c := by
+  have hprod
+      : ∀ u : Fin m → (epsR R ⟶ G'),
+        pushHom h (epsR R) (List.ofFn u).prod = ∏ i, pushHom h (epsR R) (u i) := fun u => by
     rw [map_list_prod, List.map_ofFn, List.prod_ofFn]; rfl
   constructor
   · rintro ⟨u, hu, rfl⟩

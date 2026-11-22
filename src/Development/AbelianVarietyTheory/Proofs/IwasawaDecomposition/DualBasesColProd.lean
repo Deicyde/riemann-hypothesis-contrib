@@ -15,13 +15,19 @@ def fockQRight {σ : Type} (f : MvPolynomial σ ℚ) : MvPolynomial σ ℚ →�
   toFun g := Formalism.GradedWeylDivisibility.fockQ f g
   map_add' g g' := by
     show Formalism.GradedWeylDivisibility.fockQ f (g + g') = Formalism.GradedWeylDivisibility.fockQ f g + Formalism.GradedWeylDivisibility.fockQ f g'
-    rw [(Formalism.GradedWeylDivisibility.fockQPos σ f _).1, (Formalism.GradedWeylDivisibility.fockQBilin σ g g' f 1).1, (Formalism.GradedWeylDivisibility.fockQPos σ g f).1,
+    rw [(Formalism.GradedWeylDivisibility.fockQPos σ f _).1,
+      (Formalism.GradedWeylDivisibility.fockQBilin σ g g' f 1).1,
+      (Formalism.GradedWeylDivisibility.fockQPos σ g f).1,
       (Formalism.GradedWeylDivisibility.fockQPos σ g' f).1]
   map_smul' c g := by
     show Formalism.GradedWeylDivisibility.fockQ f (c • g) = c • Formalism.GradedWeylDivisibility.fockQ f g
-    rw [smul_eq_mul, (Formalism.GradedWeylDivisibility.fockQPos σ f _).1, (Formalism.GradedWeylDivisibility.fockQBilin σ g 0 f c).2, (Formalism.GradedWeylDivisibility.fockQPos σ g f).1]
+    rw [smul_eq_mul, (Formalism.GradedWeylDivisibility.fockQPos σ f _).1,
+      (Formalism.GradedWeylDivisibility.fockQBilin σ g 0 f c).2,
+      (Formalism.GradedWeylDivisibility.fockQPos σ g f).1]
 
-theorem fockQRight_apply {σ : Type} (f g : MvPolynomial σ ℚ) : fockQRight f g = Formalism.GradedWeylDivisibility.fockQ f g := rfl
+theorem fockQRight_apply {σ : Type} (f g : MvPolynomial σ ℚ)
+    : fockQRight f g = Formalism.GradedWeylDivisibility.fockQ f g :=
+  rfl
 
 theorem dual_bases_colProd : (∀ (N : ℕ) (Y : YoungDiagram) (hY : Y.colLen 0 ≤ N) (h : MvPolynomial (Fin N × Fin N) ℚ),
     h ∈ Formalism.GradedWeylDivisibility.dualWeyl ℚ N N (fun r => Y.rowLen r) →

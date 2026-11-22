@@ -11,8 +11,8 @@ open Polynomial WeierstrassCurve WeierstrassCurve.Affine
 
 universe u
 
-variable {F : Type u} [Field F] [DecidableEq F] [IsAlgClosed F] (W : WeierstrassCurve F)
-  [W.IsElliptic]
+variable
+  {F : Type u} [Field F] [DecidableEq F] [IsAlgClosed F] (W : WeierstrassCurve F) [W.IsElliptic]
 
 theorem translate_inj {S S' : W.toAffine.Point} (h : translate W S = translate W S') : S = S' := by
   have e := congrArg (fun ψ => Point.map ψ (genericPoint W)) h

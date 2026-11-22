@@ -9,25 +9,38 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.UnitaryDua
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Th
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Th
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open UpperTheory.GalN.V
 
-private theorem map_zpow_eq_intCast_mul_of_map_mul_eq_add {Γ R : Type} [Group Γ] [Ring R] (f : Γ → R) (hf : ∀ a b, f (a * b) = f a + f b)
-    (g : Γ) (m : ℤ) : f (g ^ m) = (m : R) * f g := by
-  let D : Γ →* Multiplicative R := MonoidHom.mk' (fun x => Multiplicative.ofAdd (f x)) (by
-    intro a b
-    rw [hf]
-    rfl)
+private theorem map_zpow_eq_intCast_mul_of_map_mul_eq_add
+    {Γ R : Type} [Group Γ] [Ring R] (f : Γ → R) (hf : ∀ a b, f (a * b) = f a + f b) (g : Γ) (m : ℤ)
+    : f (g ^ m) = (m : R) * f g := by
+  let D : Γ →* Multiplicative R :=
+    MonoidHom.mk' (fun x => Multiplicative.ofAdd (f x)) (by
+      intro a b
+      rw [hf]
+      rfl)
   have h := congrArg Multiplicative.toAdd (map_zpow D g m)
   simp only [toAdd_zpow] at h
   rw [zsmul_eq_mul] at h
   exact h
 
-private theorem int_zero {Γ : Type} [Group Γ] (d : Γ → ℤ) (L : Γ → ℝ) (hd : ∀ a b, d (a * b) = d a + d b)
-    (hL : ∀ a b, L (a * b) = L a + L b) (φ : Γ) (hφ : d φ = 1) {c : ℝ} (hc : 0 < c) (hw : ∀ g, d g = 1 → |L g| < c)
-    (s : Γ) (hs : d s ≠ 0) (k : ℤ) (hk : L s = k * d s * c) : k = 0 := by
+private theorem int_zero
+    {Γ : Type} [Group Γ]
+    (d : Γ → ℤ)
+    (L : Γ → ℝ)
+    (hd : ∀ a b, d (a * b) = d a + d b) (hL : ∀ a b, L (a * b) = L a + L b)
+    (φ : Γ) (hφ : d φ = 1)
+    {c : ℝ} (hc : 0 < c) (hw : ∀ g, d g = 1 → |L g| < c)
+    (s : Γ) (hs : d s ≠ 0)
+    (k : ℤ) (hk : L s = k * d s * c)
+    : k = 0 := by
   have hD := map_zpow_eq_intCast_mul_of_map_mul_eq_add d hd
   have hLz := map_zpow_eq_intCast_mul_of_map_mul_eq_add L hL
   have key : ∀ m : ℤ, |(m : ℝ) * (d s : ℝ) * (k * c - L φ) + L φ| < c := by
@@ -72,12 +85,16 @@ private theorem int_zero {Γ : Type} [Group Γ] (d : Γ → ℤ) (L : Γ → ℝ
 
 section
 
-variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+variable
+  {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
   {w : HeightOneSpectrum (𝓞 F)} {A : ValuationSubring Ω} {h : IsPlaceOver A w}
 
-private theorem mono0_of_charPol_eq_prod_of_ne_normV_pow_mul {n : ℕ} (x : WD h) (μ : Fin n → Weil h →* ℂˣ) (hμ : ∀ i, GlobalTheory.WeilDeligne.IsSmooth (μ i))
+private theorem mono0_of_charPol_eq_prod_of_ne_normV_pow_mul
+    {n : ℕ}
+    (x : WD h) (μ : Fin n → Weil h →* ℂˣ) (hμ : ∀ i, GlobalTheory.WeilDeligne.IsSmooth (μ i))
     (hx : ∀ s, x.charPol s = ∏ i, (X - C (μ i s : ℂ)))
-    (hne : ∀ i j, ∃ s, (μ i s : ℂ) ≠ ((normV w : ℕ) : ℂ) ^ deg s * μ j s) : x.mono0 := by
+    (hne : ∀ i j, ∃ s, (μ i s : ℂ) ≠ ((normV w : ℕ) : ℂ) ^ deg s * μ j s)
+    : x.mono0 := by
   obtain ⟨na, a, rfl⟩ := x.exists_rep
   rw [WD.monodromyZero_ofWeilDeligneRepClass_iff]
   let b := WDRep.ofChars h μ hμ
@@ -107,7 +124,8 @@ private theorem mono0_of_charPol_eq_prod_of_ne_normV_pow_mul {n : ℕ} (x : WD h
     obtain ⟨σ, hσ⟩ := hne i j
     have h1 := congrFun (hN' σ (Pi.single j 1)) i
     rw [hsingle, LinearMap.map_smul, WDRep.ofChars_ρ, diagEnd_apply, Pi.smul_apply, Pi.smul_apply,
-      smul_eq_mul, smul_eq_mul] at h1
+        smul_eq_mul, smul_eq_mul]
+      at h1
     have h2 : ((μ i σ : ℂ) - ((normV w : ℕ) : ℂ) ^ deg σ * μ j σ) * N' (Pi.single j 1) i = 0 := by
       rw [sub_mul, h1]
       ring
@@ -119,19 +137,28 @@ private theorem mono0_of_charPol_eq_prod_of_ne_normV_pow_mul {n : ℕ} (x : WD h
     intro j
     apply LinearMap.ext_ring
     funext i
-    simp only [LinearMap.comp_apply, LinearMap.coe_single, LinearMap.zero_comp, LinearMap.zero_apply, Pi.zero_apply]
+    simp only [LinearMap.comp_apply, LinearMap.coe_single, LinearMap.zero_comp,
+      LinearMap.zero_apply, Pi.zero_apply]
     exact hM i j
   apply LinearMap.ext
   intro v
   have h4 := LinearMap.congr_fun hN0 (e v)
-  simp only [N', LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply, LinearMap.zero_apply] at h4
+  simp only [N', LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply,
+      LinearMap.zero_apply]
+    at h4
   rw [LinearMap.zero_apply]
   exact (LinearEquiv.map_eq_zero_iff e).mp h4
 
-private theorem ratio_lt {n : ℕ} (x : WD h) (μ : Fin n → Weil h →* ℂˣ) (hμ : ∀ i, GlobalTheory.WeilDeligne.IsSmooth (μ i))
-    (hx : ∀ s, x.charPol s = ∏ i, (X - C (μ i s : ℂ))) (ht : x.mono0 → RatioW x)
-    (hor : (∀ i j, ∃ s, (μ i s : ℂ) ≠ ((normV w : ℕ) : ℂ) ^ deg s * μ j s) ∨ x.mono0) (i j : Fin n) (s : Weil h) (hs : deg s ≠ 0) (k : ℤ)
-    (hk : ‖(μ i s : ℂ)‖ = ((normV w : ℕ) : ℝ) ^ (k * deg s) * ‖(μ j s : ℂ)‖) : k = 0 := by
+private theorem ratio_lt
+    {n : ℕ}
+    (x : WD h) (μ : Fin n → Weil h →* ℂˣ) (hμ : ∀ i, GlobalTheory.WeilDeligne.IsSmooth (μ i))
+    (hx : ∀ s, x.charPol s = ∏ i, (X - C (μ i s : ℂ)))
+    (ht : x.mono0 → RatioW x)
+    (hor : (∀ i j, ∃ s, (μ i s : ℂ) ≠ ((normV w : ℕ) : ℂ) ^ deg s * μ j s) ∨ x.mono0)
+    (i j : Fin n)
+    (s : Weil h) (hs : deg s ≠ 0)
+    (k : ℤ) (hk : ‖(μ i s : ℂ)‖ = ((normV w : ℕ) : ℝ) ^ (k * deg s) * ‖(μ j s : ℂ)‖)
+    : k = 0 := by
   have hm : x.mono0 := by
     rcases hor with h1 | h1
     · exact mono0_of_charPol_eq_prod_of_ne_normV_pow_mul x μ hμ hx h1
@@ -144,11 +171,13 @@ private theorem ratio_lt {n : ℕ} (x : WD h) (μ : Fin n → Weil h →* ℂˣ)
     intro g l
     show (μ l g : ℂ) ∈ (x.charPol g).roots
     rw [hx]
-    have hmon : (∏ k, (X - C (μ k g : ℂ))).Monic := monic_prod_of_monic _ _ (fun k _ => monic_X_sub_C _)
+    have hmon : (∏ k, (X - C (μ k g : ℂ))).Monic :=
+      monic_prod_of_monic _ _ (fun k _ => monic_X_sub_C _)
     rw [mem_roots hmon.ne_zero, IsRoot, eval_prod]
     exact Finset.prod_eq_zero (Finset.mem_univ l) (by simp)
-  refine int_zero (Γ := Weil h) deg (fun g => Real.log ‖(μ i g : ℂ)‖ - Real.log ‖(μ j g : ℂ)‖) deg_mul ?_ (frob h)
-    deg_frob (Real.log_pos hq1) ?_ s hs k ?_
+  refine int_zero (Γ := Weil h) deg
+    (fun g => Real.log ‖(μ i g : ℂ)‖ - Real.log ‖(μ j g : ℂ)‖)
+    deg_mul ?_ (frob h) deg_frob (Real.log_pos hq1) ?_ s hs k ?_
   · intro a b
     simp only [map_mul, Units.val_mul, norm_mul]
     rw [Real.log_mul (hpos i a).ne' (hpos i b).ne', Real.log_mul (hpos j a).ne' (hpos j b).ne']

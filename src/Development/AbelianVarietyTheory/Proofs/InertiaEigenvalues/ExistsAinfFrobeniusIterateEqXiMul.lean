@@ -16,38 +16,40 @@ open Polynomial
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem dvd_of_constantCoeff (x : Per.Ainf l) (h : WittVector.constantCoeff x = 0) :
-    (l : Per.Ainf l) ∣ x := by
+theorem dvd_of_constantCoeff (x : Per.Ainf l) (h : WittVector.constantCoeff x = 0)
+    : (l : Per.Ainf l) ∣ x := by
   have h0 := WittVector.dvd_sub_sum_teichmuller_iterateFrobeniusEquiv_coeff (p := l) x 0
   have hI : (Finset.Iic 0 : Finset ℕ) = {0} := by ext i; simp
   rw [hI, Finset.sum_singleton] at h0
   rw [WittVector.constantCoeff_apply] at h
   simpa [h] using h0
 
-theorem constantCoeff_natCast_mul (x : Per.Ainf l) :
-    WittVector.constantCoeff ((l : Per.Ainf l) * x) = 0 := by
+theorem constantCoeff_natCast_mul (x : Per.Ainf l)
+    : WittVector.constantCoeff ((l : Per.Ainf l) * x) = 0 := by
   rw [map_mul, map_natCast, CharP.cast_eq_zero, zero_mul]
 
-theorem iterate_tm (n : ℕ) (y : Per.Fl l) :
-    (⇑(Per.φA l))^[n] (Per.tm y) = Per.tm (y ^ (l ^ n)) := by
+theorem iterate_tm (n : ℕ) (y : Per.Fl l)
+    : (⇑(Per.φA l))^[n] (Per.tm y) = Per.tm (y ^ (l ^ n)) := by
   induction n with
   | zero => simp
   | succ n ih =>
     rw [Function.iterate_succ_apply', ih]
-    rw [GlobalTheory.RingBasics.φA_apply, WittVector.frobenius_eq_map_frobenius, WittVector.map_teichmuller,
-      frobenius_def, ← pow_mul, ← pow_succ]
+    rw [GlobalTheory.RingBasics.φA_apply, WittVector.frobenius_eq_map_frobenius,
+      WittVector.map_teichmuller, frobenius_def, ← pow_mul, ← pow_succ]
 
-theorem smod_iff (m : ℕ) (x y : Per.Ainf l) :
-    x ≡ y [SMOD ((Ideal.span {(l : Per.Ainf l)}) ^ m • ⊤ : Submodule (Per.Ainf l) (Per.Ainf l))] ↔
-      (l : Per.Ainf l) ^ m ∣ x - y := by
-  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+theorem smod_iff (m : ℕ) (x y : Per.Ainf l)
+    : x ≡ y [SMOD ((Ideal.span {(l : Per.Ainf l)}) ^ m • ⊤ : Submodule (Per.Ainf l) (Per.Ainf l))]
+      ↔ (l : Per.Ainf l) ^ m ∣ x - y := by
+  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+    Ideal.mem_span_singleton]
 
-theorem xi_bar_ne_zero (e : Per.Fl l) (he : GlobalTheory.MemLoc.IsEps e) :
-    WittVector.constantCoeff (GlobalTheory.MemLoc.xi e) ≠ 0 := by
+theorem xi_bar_ne_zero (e : Per.Fl l) (he : GlobalTheory.MemLoc.IsEps e)
+    : WittVector.constantCoeff (GlobalTheory.MemLoc.xi e) ≠ 0 := by
   set e' := (frobeniusEquiv (Per.Fl l) l).symm e with he'
-  have hxi : WittVector.constantCoeff (GlobalTheory.MemLoc.xi e) = ∑ i ∈ Finset.range l, e' ^ i := by
+  have hxi
+      : WittVector.constantCoeff (GlobalTheory.MemLoc.xi e) = ∑ i ∈ Finset.range l, e' ^ i := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [GlobalTheory.MemLoc.xi, map_sum, map_pow, WittVector.constantCoeff_apply,
+    simp [GlobalTheory.MemLoc.xi, map_sum, map_pow, WittVector.constantCoeff_apply,
       WittVector.teichmuller_coeff_zero, he']
   have hpow : e' ^ l = e := by
     have := (frobeniusEquiv (Per.Fl l) l).apply_symm_apply e
@@ -68,9 +70,11 @@ open Polynomial
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem exists_step (e : Per.Fl l) (he : GlobalTheory.MemLoc.IsEps e) (n : ℕ) (hn : 0 < n) (c : Per.Ainf l) :
-    ∃ y : Per.Fl l, (l : Per.Ainf l) ∣
-      c + ((⇑(Per.φA l))^[n] (Per.tm y) - GlobalTheory.MemLoc.xi e * Per.tm y) := by
+theorem exists_step
+    (e : Per.Fl l) (he : GlobalTheory.MemLoc.IsEps e) (n : ℕ) (hn : 0 < n) (c : Per.Ainf l)
+    : ∃ y : Per.Fl l,
+      (l : Per.Ainf l)
+        ∣ c + ((⇑(Per.φA l))^[n] (Per.tm y) - GlobalTheory.MemLoc.xi e * Per.tm y) := by
   have hq : 1 < l ^ n := Nat.one_lt_pow hn.ne' (Fact.out : l.Prime).one_lt
   set a := WittVector.constantCoeff (GlobalTheory.MemLoc.xi e)
   set b := WittVector.constantCoeff c
@@ -91,8 +95,9 @@ theorem exists_step (e : Per.Fl l) (he : GlobalTheory.MemLoc.IsEps e) (n : ℕ) 
   rw [← hy]
   ring
 
-theorem exists_start (e : Per.Fl l) (he : GlobalTheory.MemLoc.IsEps e) (n : ℕ) (hn : 0 < n) :
-    ∃ w₀ : Per.Fl l, w₀ ≠ 0 ∧ w₀ ^ (l ^ n) = WittVector.constantCoeff (GlobalTheory.MemLoc.xi e) * w₀ := by
+theorem exists_start (e : Per.Fl l) (he : GlobalTheory.MemLoc.IsEps e) (n : ℕ) (hn : 0 < n)
+    : ∃ w₀ : Per.Fl l,
+      w₀ ≠ 0 ∧ w₀ ^ (l ^ n) = WittVector.constantCoeff (GlobalTheory.MemLoc.xi e) * w₀ := by
   have hq : 1 < l ^ n := Nat.one_lt_pow hn.ne' (Fact.out : l.Prime).one_lt
   set a := WittVector.constantCoeff (GlobalTheory.MemLoc.xi e)
   have hq1 : l ^ n - 1 ≠ 0 := by omega
@@ -107,20 +112,28 @@ theorem exists_start (e : Per.Fl l) (he : GlobalTheory.MemLoc.IsEps e) (n : ℕ)
     exact xi_bar_ne_zero e he hy.symm
   · rw [← hy, ← pow_succ, Nat.sub_add_cancel hq.le]
 
-theorem period_solution : ∀ (l : ℕ) [Fact l.Prime] (e : Per.Fl l), GlobalTheory.MemLoc.IsEps e →
-    ∀ n : ℕ, 0 < n → ∃ w : Per.Ainf l, GlobalTheory.MemLoc.xi e * w ≠ 0 ∧
-      (⇑(Per.φA l))^[n] w = GlobalTheory.MemLoc.xi e * w := by
+theorem period_solution
+    : ∀ (l : ℕ) [Fact l.Prime] (e : Per.Fl l),
+      GlobalTheory.MemLoc.IsEps e
+        → ∀ n : ℕ,
+          0 < n
+            → ∃ w : Per.Ainf l,
+              GlobalTheory.MemLoc.xi e * w ≠ 0
+                ∧ (⇑(Per.φA l))^[n] w = GlobalTheory.MemLoc.xi e * w := by
   intro l _ e he n hn
   set ξ := GlobalTheory.MemLoc.xi e
   let Φ : Per.Ainf l →+* Per.Ainf l := Per.φA l ^ n
   have hΦ : ∀ x, (⇑(Per.φA l))^[n] x = Φ x := fun x => by simp [Φ, RingHom.coe_pow]
   let F : Per.Ainf l → Per.Ainf l := fun w => Φ w - ξ * w
   have F_sub : ∀ a b, F (a - b) = F a - F b := fun a b => by simp only [F, map_sub]; ring
-  have F_lin : ∀ (m : ℕ) a b, F (a + (l : Per.Ainf l) ^ m * b) = F a + (l : Per.Ainf l) ^ m * F b :=
-    fun m a b => by simp only [F, map_add (f := _), map_mul, map_pow, map_natCast]; ring
-  have step : ∀ (k : ℕ) (w : Per.Ainf l), ∃ w' : Per.Ainf l,
-      (l : Per.Ainf l) ^ (k + 1) ∣ F w →
-        (l : Per.Ainf l) ^ (k + 2) ∣ F w' ∧ (l : Per.Ainf l) ^ (k + 1) ∣ w' - w := by
+  have F_lin
+      : ∀ (m : ℕ) a b,
+        F (a + (l : Per.Ainf l) ^ m * b) = F a + (l : Per.Ainf l) ^ m * F b := fun m a b => by
+    simp only [F, map_add (f := _), map_mul, map_pow, map_natCast]; ring
+  have step
+      : ∀ (k : ℕ) (w : Per.Ainf l), ∃ w' : Per.Ainf l,
+        (l : Per.Ainf l) ^ (k + 1) ∣ F w
+          → (l : Per.Ainf l) ^ (k + 2) ∣ F w' ∧ (l : Per.Ainf l) ^ (k + 1) ∣ w' - w := by
     intro k w
     by_cases hw : (l : Per.Ainf l) ^ (k + 1) ∣ F w
     · obtain ⟨c, hc⟩ := hw
@@ -128,7 +141,8 @@ theorem period_solution : ∀ (l : ℕ) [Fact l.Prime] (e : Per.Fl l), GlobalThe
       refine ⟨w + (l : Per.Ainf l) ^ (k + 1) * Per.tm y, fun _ => ⟨⟨d, ?_⟩, ⟨Per.tm y, by ring⟩⟩⟩
       rw [F_lin, hc, ← mul_add]
       have : F (Per.tm y) = (⇑(Per.φA l))^[n] (Per.tm y) - ξ * Per.tm y := by simp only [F, hΦ]
-      rw [this, hd]; ring
+      rw [this, hd]
+      ring
     · exact ⟨w, fun h => absurd h hw⟩
   choose g hg using step
   obtain ⟨w₀, hw₀, hw₀q⟩ := exists_start e he n hn
@@ -138,8 +152,8 @@ theorem period_solution : ∀ (l : ℕ) [Fact l.Prime] (e : Per.Fl l), GlobalThe
   have hF0 : (l : Per.Ainf l) ^ (0 + 1) ∣ F (seq 0) := by
     rw [zero_add, pow_one, hseq0]
     apply dvd_of_constantCoeff
-    simp only [F, ← hΦ, iterate_tm, map_sub, map_mul, WittVector.constantCoeff_apply (x := Per.tm _),
-      WittVector.teichmuller_coeff_zero, hw₀q]
+    simp only [F, ← hΦ, iterate_tm, map_sub, map_mul,
+      WittVector.constantCoeff_apply (x := Per.tm _), WittVector.teichmuller_coeff_zero, hw₀q]
     exact sub_self _
   have hF : ∀ k, (l : Per.Ainf l) ^ (k + 1) ∣ F (seq k) := by
     intro k
@@ -155,15 +169,18 @@ theorem period_solution : ∀ (l : ℕ) [Fact l.Prime] (e : Per.Fl l), GlobalThe
     | succ d ih =>
       have h2 : (l : Per.Ainf l) ^ m ∣ seq (m + d + 1) - seq (m + d) :=
         (pow_dvd_pow _ (by omega)).trans (hdiff (m + d))
-      have : seq m - seq (m + (d + 1)) = (seq m - seq (m + d)) - (seq (m + d + 1) - seq (m + d)) := by
+      have : seq m - seq (m + (d + 1))
+          = (seq m - seq (m + d)) - (seq (m + d + 1) - seq (m + d)) := by
         rw [← add_assoc]; ring
-      rw [this]; exact dvd_sub ih h2
+      rw [this]
+      exact dvd_sub ih h2
   have hcomp : IsAdicComplete (Ideal.span {(l : Per.Ainf l)}) (Per.Ainf l) :=
     WittVector.isAdicCompleteIdealSpanP
-  obtain ⟨L, hL⟩ := hcomp.toIsPrecomplete.prec (f := seq) (fun {m n} hmn => by
-    rw [smod_iff]
-    obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hmn
-    exact hcau m d)
+  obtain ⟨L, hL⟩ :=
+    hcomp.toIsPrecomplete.prec (f := seq) (fun {m n} hmn => by
+      rw [smod_iff]
+      obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hmn
+      exact hcau m d)
   have hL' : ∀ k, (l : Per.Ainf l) ^ k ∣ seq k - L := fun k => (smod_iff k _ _).1 (hL k)
   have hFL : F L = 0 := by
     refine hcomp.toIsHausdorff.haus (F L) fun k => ?_
@@ -176,8 +193,10 @@ theorem period_solution : ∀ (l : ℕ) [Fact l.Prime] (e : Per.Fl l), GlobalThe
     obtain ⟨c, hc⟩ := hL' 1
     obtain ⟨c', hc'⟩ := hdiff 0
     have e1 : L = Per.tm w₀ + (l : Per.Ainf l) * (c' - c) := by
-      rw [pow_one] at hc; rw [zero_add, pow_one] at hc'
-      rw [mul_sub, ← hc, ← hc', ← hseq0]; ring
+      rw [pow_one] at hc
+      rw [zero_add, pow_one] at hc'
+      rw [mul_sub, ← hc, ← hc', ← hseq0]
+      ring
     rw [e1, map_add (f := _), constantCoeff_natCast_mul, add_zero, WittVector.constantCoeff_apply,
       WittVector.teichmuller_coeff_zero]
   refine ⟨L, fun h0 => ?_, ?_⟩

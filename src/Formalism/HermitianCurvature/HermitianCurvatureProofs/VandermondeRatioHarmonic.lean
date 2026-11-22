@@ -46,22 +46,23 @@ theorem interlacing : Formalism.FourierDecayAlt.Sz.Interlacing := by
     · by_cases h1 : i = 1
       · subst h1
         have : c.u de 1 = c.a := by simp [Cfg.u]
-        rw [this]; nlinarith
+        rw [this]
+        nlinarith
       · have hne : i ≠ c.k := by omega
         have : c.u de i = c.v (i - 1) - 1 / 2 - de (i - 1) * c.Del := by simp [Cfg.u, h1, hne]
         rw [this]
-        have hc1 : ((i - 1 : ℕ) : ℝ) = (i : ℝ) - 1 := by
-          rw [Nat.cast_sub hi1]; simp
-        unfold Cfg.v; rw [hc1]
+        have hc1 : ((i - 1 : ℕ) : ℝ) = (i : ℝ) - 1 := by rw [Nat.cast_sub hi1]; simp
+        unfold Cfg.v
+        rw [hc1]
         rcases hw.1 (i - 1) with h | h <;> rw [h] <;> nlinarith
     · have h1 : i + 1 ≠ 1 := by omega
       by_cases hlast : i + 1 = c.k
-      · have : c.u de (i + 1) = c.ulast := by
-          unfold Cfg.u; rw [if_neg h1, if_pos hlast]
+      · have : c.u de (i + 1) = c.ulast := by unfold Cfg.u; rw [if_neg h1, if_pos hlast]
         rw [this]
         have hiR : (i : ℝ) + 1 = c.k := by exact_mod_cast hlast
         have hvi : c.v i = c.vlast := by unfold Cfg.v; rw [← hiR]; ring
-        rw [hvi]; unfold Cfg.ulast
+        rw [hvi]
+        unfold Cfg.ulast
         by_cases ht : c.top = true
         · have := htop ht; simp [ht]; linarith [this.1]
         · simp [ht]
@@ -69,11 +70,12 @@ theorem interlacing : Formalism.FourierDecayAlt.Sz.Interlacing := by
           unfold Cfg.u; rw [if_neg h1, if_neg hlast]; simp
         rw [this]
         rcases hw.1 i with h | h <;> rw [h] <;> nlinarith
-  · have hl : c.lam c.k = -c.b 1 := by simp [Cfg.lam]
+  · have hl : c.lam c.k = - c.b 1 := by simp [Cfg.lam]
     have hu : c.u de c.k = c.ulast := by
       have : c.k ≠ 1 := by omega
       simp [Cfg.u, this]
-    rw [hl, hu]; unfold Cfg.ulast
+    rw [hl, hu]
+    unfold Cfg.ulast
     by_cases ht : c.top = true
     · have := htop ht; simp [ht]; linarith [this.2]
     · simp [ht]; linarith
@@ -86,9 +88,10 @@ theorem lamStrictAnti : Formalism.FourierDecayAlt.Sz.LamAnti := by
   · have hsk : s < c.k := by omega
     have h1 : c.lam t = c.v t := by simp [Cfg.lam, htk]
     have h2 : c.lam s = c.v s := by simp [Cfg.lam, hsk]
-    rw [h1, h2]; unfold Cfg.v
+    rw [h1, h2]
+    unfold Cfg.v
     nlinarith
-  · have h1 : c.lam t = -c.b (t + 1 - c.k) := by simp [Cfg.lam, htk]
+  · have h1 : c.lam t = - c.b (t + 1 - c.k) := by simp [Cfg.lam, htk]
     rw [h1]
     by_cases hsk : s < c.k
     · have h2 : c.lam s = c.v s := by simp [Cfg.lam, hsk]
@@ -98,7 +101,7 @@ theorem lamStrictAnti : Formalism.FourierDecayAlt.Sz.LamAnti := by
       have hv0 := hc.hv0
       unfold Cfg.v
       nlinarith
-    · have h2 : c.lam s = -c.b (s + 1 - c.k) := by simp [Cfg.lam, hsk]
+    · have h2 : c.lam s = - c.b (s + 1 - c.k) := by simp [Cfg.lam, hsk]
       rw [h2]
       have := Sz3.b_lt c hc (s + 1 - c.k) (by omega) (t + 1 - c.k) (by omega) (by omega)
       linarith

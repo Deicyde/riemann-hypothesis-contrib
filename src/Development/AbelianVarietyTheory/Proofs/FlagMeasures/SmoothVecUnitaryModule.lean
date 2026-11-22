@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.BlockTheory.SiegelWeilLocal.Orbit
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants
 open scoped InnerProductSpace ContDiff Topology
 
 noncomputable section
@@ -99,7 +100,8 @@ lemma hasDerivAt_rdV {f : Matrix (Fin n) (Fin n) ℂ → E} (hf : SmoothOnGV ε 
 end Gen
 
 section Rep
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
 lemma rep_rdV (hσ : IsURepOn (UJset ε) σ) {u : H} (hu : SmoothOnGV ε (fun g => σ g u))
@@ -172,8 +174,10 @@ def smoothVec (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L
   smul_mem' := fun c _ hu => smooth_congr (smooth_comb smooth_zero hu c) (fun g _ => by simp)
 
 def unitAct (hσ : IsURepOn (UJset ε) σ) (a b : Fin n) : Module.End ℂ (smoothVec ε σ) where
-  toFun u := ⟨EabV ε a b (fun x => σ x u) 1,
-    smooth_congr (eabV_smooth u.2 a b) (fun _ hg => rep_eabV hσ u.2 a b hg)⟩
+  toFun u := ⟨
+    EabV ε a b (fun x => σ x u) 1,
+    smooth_congr (eabV_smooth u.2 a b) (fun _ hg => rep_eabV hσ u.2 a b hg)
+  ⟩
   map_add' u v := by
     apply Subtype.ext
     have h := eabV_comb u.2 v.2 1 a b (inUJ_one (ε := ε))
@@ -192,17 +196,34 @@ lemma unitAct_coe (hσ : IsURepOn (UJset ε) σ) (a b : Fin n) (u : smoothVec ε
 
 end Rep
 
-theorem smoothVec_unitary_module : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), IsURepOn (UJset ε) σ → ∃ (Vs : Submodule ℂ H) (E : Fin n → Fin n → Module.End ℂ Vs), (∀ u, u ∈ Vs ↔ SmoothOnGV ε (fun g => σ g u)) ∧ GlRel E ∧ IsUnitary ε E ∧ (∀ X, inG ε X → ∀ u : Vs, HasDerivAt (GlobalTheory.IndefiniteRowSideFullHecke.OrbitDifferenceSpace.orbit σ X u) ((∑ a, ∑ b, X a b • E a b u : Vs) : H) 0) ∧ ∀ a b (u : Vs), ∀ g ∈ UJset ε, σ g (E a b u) = EabV ε a b (fun g => σ g u) g := by
+theorem smoothVec_unitary_module
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+      IsURepOn (UJset ε) σ
+        → ∃ (Vs : Submodule ℂ H) (E : Fin n → Fin n → Module.End ℂ Vs),
+          (∀ u, u ∈ Vs ↔ SmoothOnGV ε (fun g => σ g u)) ∧ GlRel E ∧ IsUnitary ε E
+            ∧ (∀ X,
+              inG ε X
+                → ∀ u : Vs,
+                  HasDerivAt
+                    (GlobalTheory.IndefiniteRowSideFullHecke.OrbitDifferenceSpace.orbit σ X u)
+                    ((∑ a, ∑ b, X a b • E a b u : Vs) : H) 0)
+            ∧ ∀ a b (u : Vs), ∀ g ∈ UJset ε, σ g (E a b u) = EabV ε a b (fun g => σ g u) g := by
   intro n ε H _ _ _ σ hσ
-  have key : ∀ a b (u : smoothVec ε σ), ∀ g ∈ UJset ε,
-      σ g (unitAct hσ a b u) = EabV ε a b (fun g => σ g u) g :=
-    fun a b u g hg => rep_eabV hσ u.2 a b hg
+  have key
+      : ∀ a b (u : smoothVec ε σ), ∀ g ∈ UJset ε,
+        σ g (unitAct hσ a b u) = EabV ε a b (fun g => σ g u) g := fun a b u g hg =>
+    rep_eabV hσ u.2 a b hg
   refine ⟨smoothVec ε σ, unitAct hσ, fun _ => Iff.rfl, ?_, ?_, ?_, key⟩
   · intro a b c d
     ext u
-    have h := eabGlV_of (rdLinV_of vector_right_derivative_extends)
-      (rdBracketV_of vector_right_derivative_extends (rdSmoothV_of vector_right_derivative_extends)) (rdSmoothV_of vector_right_derivative_extends)
-      n ε H (fun g => σ g u) a b c d 1 u.2 inUJ_one
+    have h :=
+      eabGlV_of (rdLinV_of vector_right_derivative_extends)
+        (rdBracketV_of vector_right_derivative_extends
+          (rdSmoothV_of vector_right_derivative_extends))
+        (rdSmoothV_of vector_right_derivative_extends) n ε H
+        (fun g => σ g u)
+        a b c d 1 u.2 inUJ_one
     rw [← eabV_congr (key c d u) a b inUJ_one, ← eabV_congr (key a b u) c d inUJ_one] at h
     simp only [LinearMap.sub_apply, Module.End.mul_apply, Submodule.coe_sub]
     rw [unitAct_coe hσ a b, unitAct_coe hσ c d (unitAct hσ a b u), h]
@@ -210,13 +231,15 @@ theorem smoothVec_unitary_module : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type
   · intro a b x y
     exact rep_unit hσ x.2 y.2 a b
   · intro X hX u
-    have h := ecSumV_of (rdLinV_of vector_right_derivative_extends) n ε H (fun g => σ g u) X 1 u.2 inUJ_one
+    have h :=
+      ecSumV_of (rdLinV_of vector_right_derivative_extends) n ε H (fun g => σ g u) X 1 u.2 inUJ_one
     obtain ⟨c1, c2⟩ := (complex_parts_mem_lie_algebra_holds n ε X).2.2.2 hX
     have h0 : RdV (0 : Matrix (Fin n) (Fin n) ℂ) (fun g => σ g u) 1 = 0 := by simp [RdV]
     unfold EcV at h
     rw [c1, c2, h0, smul_zero, add_zero] at h
-    have e : ((∑ a, ∑ b, X a b • unitAct hσ a b u : smoothVec ε σ) : H) =
-        RdV X (fun g => σ g u) 1 := by
+    have e
+        : ((∑ a, ∑ b, X a b • unitAct hσ a b u : smoothVec ε σ) : H)
+          = RdV X (fun g => σ g u) 1 := by
       rw [h]
       simp [unitAct_coe]
     rw [e]

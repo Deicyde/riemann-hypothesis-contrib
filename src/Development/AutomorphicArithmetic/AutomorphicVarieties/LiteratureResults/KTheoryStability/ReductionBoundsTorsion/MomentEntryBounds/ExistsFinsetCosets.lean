@@ -12,17 +12,22 @@ noncomputable section
 
 set_option linter.unusedSectionVars false
 
-open NumberField NumberField.InfinitePlace Matrix UpperTheory.V.KT UpperTheory.V.KL GroundTheory.Automorphic
+open NumberField NumberField.InfinitePlace Matrix UpperTheory.V.KT UpperTheory.V.KL
+  GroundTheory.Automorphic
 open scoped NumberField.AdeleRing
 
 namespace PositivityTheory.KB.MomentRationality.RedGL
 
 variable {L : Type} [Field L] [NumberField L] {N : ℕ}
 
-theorem exists_bound_omega {ω : Set (AdelicGLn.AdelicGL L N)} (hω : IsCompact ω) :
-    ∃ M0 : ℝ, 0 ≤ M0 ∧ ∀ b ∈ ω, ∀ (w : InfinitePlace L) (i j : Fin N),
-      ‖((Reduction.infAt w b : GL (Fin N) w.Completion) : Matrix (Fin N) (Fin N) w.Completion) i j‖ ≤ M0 ∧
-        ‖((Reduction.infAt w b⁻¹ : GL (Fin N) w.Completion) : Matrix (Fin N) (Fin N) w.Completion) i j‖ ≤ M0 := by
+theorem exists_bound_omega {ω : Set (AdelicGLn.AdelicGL L N)} (hω : IsCompact ω)
+    : ∃ M0 : ℝ,
+      0 ≤ M0
+        ∧ ∀ b ∈ ω, ∀ (w : InfinitePlace L) (i j : Fin N),
+          ‖((Reduction.infAt w b : GL (Fin N) w.Completion) : Matrix (Fin N) (Fin N) w.Completion) i j‖
+              ≤ M0
+            ∧ ‖((Reduction.infAt w b⁻¹ : GL (Fin N) w.Completion) : Matrix (Fin N) (Fin N) w.Completion) i j‖
+              ≤ M0 := by
   classical
   let e : InfinitePlace L → Fin N → Fin N → AdelicGLn.AdelicGL L N → ℝ := fun w i j b =>
     ‖((Reduction.infAt w b : GL (Fin N) w.Completion) : Matrix (Fin N) (Fin N) w.Completion) i j‖
@@ -38,8 +43,8 @@ theorem exists_bound_omega {ω : Set (AdelicGLn.AdelicGL L N)} (hω : IsCompact 
     exact continuous_norm.comp ((continuous_apply j).comp ((continuous_apply i).comp h2))
   let F : AdelicGLn.AdelicGL L N → ℝ := fun b => ∑ w, ∑ i, ∑ j, (e w i j b + e w i j b⁻¹)
   have hF : Continuous F := by
-    refine continuous_finsetSum _ fun w _ => continuous_finsetSum _ fun i _ =>
-      continuous_finsetSum _ fun j _ => ?_
+    refine continuous_finsetSum _ fun w _ =>
+      continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ => ?_
     exact (hc w i j).add ((hc w i j).comp continuous_inv)
   obtain ⟨M, hM⟩ := (hω.image hF).bddAbove
   refine ⟨max M 0, le_max_right _ _, fun b hb w i j => ?_⟩
@@ -47,52 +52,70 @@ theorem exists_bound_omega {ω : Set (AdelicGLn.AdelicGL L N)} (hω : IsCompact 
   have hnn : ∀ w i j, 0 ≤ e w i j b + e w i j b⁻¹ := fun w i j =>
     add_nonneg (norm_nonneg _) (norm_nonneg _)
   have hterm : e w i j b + e w i j b⁻¹ ≤ F b := by
-    calc e w i j b + e w i j b⁻¹ ≤ ∑ j', (e w i j' b + e w i j' b⁻¹) :=
-          Finset.single_le_sum (f := fun j' => e w i j' b + e w i j' b⁻¹)
-            (fun j' _ => hnn w i j') (Finset.mem_univ j)
+    calc
+      e w i j b + e w i j b⁻¹ ≤ ∑ j', (e w i j' b + e w i j' b⁻¹) :=
+        Finset.single_le_sum
+          (f := fun j' => e w i j' b + e w i j' b⁻¹)
+          (fun j' _ => hnn w i j')
+          (Finset.mem_univ j)
       _ ≤ ∑ i', ∑ j', (e w i' j' b + e w i' j' b⁻¹) :=
-          Finset.single_le_sum (f := fun i' => ∑ j', (e w i' j' b + e w i' j' b⁻¹))
-            (fun i' _ => Finset.sum_nonneg fun j' _ => hnn w i' j') (Finset.mem_univ i)
+        Finset.single_le_sum
+          (f := fun i' => ∑ j', (e w i' j' b + e w i' j' b⁻¹))
+          (fun i' _ => Finset.sum_nonneg fun j' _ => hnn w i' j')
+          (Finset.mem_univ i)
       _ ≤ F b :=
-          Finset.single_le_sum (f := fun w' => ∑ i', ∑ j', (e w' i' j' b + e w' i' j' b⁻¹))
-            (fun w' _ => Finset.sum_nonneg fun i' _ => Finset.sum_nonneg fun j' _ => hnn w' i' j')
-            (Finset.mem_univ w)
+        Finset.single_le_sum
+          (f := fun w' => ∑ i', ∑ j', (e w' i' j' b + e w' i' j' b⁻¹))
+          (fun w' _ => Finset.sum_nonneg fun i' _ => Finset.sum_nonneg fun j' _ => hnn w' i' j')
+          (Finset.mem_univ w)
   refine ⟨?_, ?_⟩
   · exact (le_add_of_nonneg_right (norm_nonneg _)).trans (hterm.trans hFb)
   · exact (le_add_of_nonneg_left (norm_nonneg _)).trans (hterm.trans hFb)
 
-theorem exists_gm_of_fin (γ : GL (Fin N) L)
-    (h : (AdelicGLn.prodEquiv L N (AdelicGLn.diagonal L N γ)).2 ∈ AdelicGLn.integralFiniteGL L N) :
-    ∃ δ : Gm L N, toK L N δ = γ := by
-  have hint : ∀ x : L, algebraMap L (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L) x ∈
-      GroundTheory.Global.integralFiniteAdeles (𝓞 L) L → x ∈ (algebraMap (𝓞 L) L).range := by
+theorem exists_gm_of_fin
+    (γ : GL (Fin N) L)
+    (h : (AdelicGLn.prodEquiv L N (AdelicGLn.diagonal L N γ)).2 ∈ AdelicGLn.integralFiniteGL L N)
+    : ∃ δ : Gm L N, toK L N δ = γ := by
+  have hint
+      : ∀ x : L,
+        algebraMap L (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L) x
+            ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 L) L
+          → x ∈ (algebraMap (𝓞 L) L).range := by
     intro x hx
     apply IsDedekindDomain.HeightOneSpectrum.mem_integers_of_valuation_le_one
     intro v
     have h := hx v
     rw [IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers] at h
-    rwa [show (algebraMap L (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L) x) v =
-        (x : v.adicCompletion L) from rfl,
-      IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation'] at h
+    rwa [show (algebraMap L (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L) x) v
+            = (x : v.adicCompletion L) from
+          rfl,
+        IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation']
+      at h
   obtain ⟨⟨P, hP⟩, ⟨Q, hQ⟩⟩ := (Submonoid.mem_units_iff _ _).1 h
   have h1 : ∀ i j, (γ : Matrix (Fin N) (Fin N) L) i j ∈ (algebraMap (𝓞 L) L).range := by
     intro i j
     apply hint
     have := congrFun (congrFun hP i) j
     rw [show algebraMap L (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L)
-        ((γ : Matrix (Fin N) (Fin N) L) i j) =
-        ((AdelicGLn.prodEquiv L N (AdelicGLn.diagonal L N γ)).2 :
-          Matrix (Fin N) (Fin N) (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L)) i j from rfl, ← this]
+            ((γ : Matrix (Fin N) (Fin N) L) i j)
+          = ((AdelicGLn.prodEquiv L N (AdelicGLn.diagonal L N γ)).2
+              : Matrix (Fin N) (Fin N) (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L))
+            i j from
+        rfl,
+      ← this]
     exact (P i j).2
-  have h2 : ∀ i j, ((γ⁻¹ : GL (Fin N) L) : Matrix (Fin N) (Fin N) L) i j ∈
-      (algebraMap (𝓞 L) L).range := by
+  have h2
+      : ∀ i j,
+        ((γ⁻¹ : GL (Fin N) L) : Matrix (Fin N) (Fin N) L) i j ∈ (algebraMap (𝓞 L) L).range := by
     intro i j
     apply hint
     have := congrFun (congrFun hQ i) j
     rw [show algebraMap L (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L)
-        (((γ⁻¹ : GL (Fin N) L) : Matrix (Fin N) (Fin N) L) i j) =
-        ((AdelicGLn.prodEquiv L N (AdelicGLn.diagonal L N γ⁻¹)).2 :
-          Matrix (Fin N) (Fin N) (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L)) i j from rfl,
+            (((γ⁻¹ : GL (Fin N) L) : Matrix (Fin N) (Fin N) L) i j)
+          = ((AdelicGLn.prodEquiv L N (AdelicGLn.diagonal L N γ⁻¹)).2
+              : Matrix (Fin N) (Fin N) (IsDedekindDomain.FiniteAdeleRing (𝓞 L) L))
+            i j from
+        rfl,
       map_inv, map_inv, Prod.snd_inv, ← this]
     exact (Q i j).2
   choose A hA using h1
@@ -101,8 +124,9 @@ theorem exists_gm_of_fin (γ : GL (Fin N) L)
   have hAm : (Matrix.of A).map (algebraMap (𝓞 L) L) = (γ : Matrix (Fin N) (Fin N) L) := by
     ext i j
     exact hA i j
-  have hBm : (Matrix.of B).map (algebraMap (𝓞 L) L) =
-      ((γ⁻¹ : GL (Fin N) L) : Matrix (Fin N) (Fin N) L) := by
+  have hBm
+      : (Matrix.of B).map (algebraMap (𝓞 L) L)
+        = ((γ⁻¹ : GL (Fin N) L) : Matrix (Fin N) (Fin N) L) := by
     ext i j
     exact hB i j
   have hAB : Matrix.of A * Matrix.of B = 1 := by
@@ -117,10 +141,10 @@ theorem exists_gm_of_fin (γ : GL (Fin N) L)
   ext i j
   exact hA i j
 
-theorem exists_finset_cosets {C : Set (AdelicGLn.FiniteAdelicGL L N)} (hC : IsCompact C) :
-    ∃ R : Finset (GL (Fin N) L), ∀ γ : GL (Fin N) L,
-      (AdelicGLn.prodEquiv L N (AdelicGLn.diagonal L N γ)).2 ∈ C →
-        ∃ g ∈ R, ∃ δ : Gm L N, toK L N δ = g⁻¹ * γ := by
+theorem exists_finset_cosets {C : Set (AdelicGLn.FiniteAdelicGL L N)} (hC : IsCompact C)
+    : ∃ R : Finset (GL (Fin N) L), ∀ γ : GL (Fin N) L,
+      (AdelicGLn.prodEquiv L N (AdelicGLn.diagonal L N γ)).2 ∈ C
+        → ∃ g ∈ R, ∃ δ : Gm L N, toK L N δ = g⁻¹ * γ := by
   classical
   set U := AdelicGLn.integralFiniteGL L N with hU
   let p : GL (Fin N) L → AdelicGLn.FiniteAdelicGL L N := fun γ =>
@@ -128,7 +152,8 @@ theorem exists_finset_cosets {C : Set (AdelicGLn.FiniteAdelicGL L N)} (hC : IsCo
   have hp : ∀ a b : GL (Fin N) L, p (a⁻¹ * b) = (p a)⁻¹ * p b := by
     intro a b
     simp only [p, map_mul, map_inv, Prod.snd_mul, Prod.snd_inv]
-  let V : C → Set (AdelicGLn.FiniteAdelicGL L N) := fun c => {x | (c : AdelicGLn.FiniteAdelicGL L N)⁻¹ * x ∈ U}
+  let V : C → Set (AdelicGLn.FiniteAdelicGL L N) := fun c =>
+    {x | (c : AdelicGLn.FiniteAdelicGL L N)⁻¹ * x ∈ U}
   have hV : ∀ c, IsOpen (V c) := fun c =>
     (AdelicGLn.isOpen_integralFiniteGL L N).preimage (continuous_const.mul continuous_id)
   have hcov : C ⊆ ⋃ c, V c := by
@@ -151,8 +176,10 @@ theorem exists_finset_cosets {C : Set (AdelicGLn.FiniteAdelicGL L N)} (hC : IsCo
   apply exists_gm_of_fin
   show p ((g c)⁻¹ * γ) ∈ U
   rw [hp]
-  have h1 : ((c : AdelicGLn.FiniteAdelicGL L N)⁻¹ * p (g c))⁻¹ *
-      ((c : AdelicGLn.FiniteAdelicGL L N)⁻¹ * p γ) ∈ U :=
+  have h1
+      : ((c : AdelicGLn.FiniteAdelicGL L N)⁻¹ * p (g c))⁻¹
+          * ((c : AdelicGLn.FiniteAdelicGL L N)⁻¹ * p γ)
+        ∈ U :=
     U.mul_mem (U.inv_mem hgV) hc
   simpa [mul_assoc] using h1
 

@@ -16,16 +16,17 @@ theorem conjO_conjO (X : Fields) (a : 𝓞 X.E) : X.conjO (X.conjO a) = a := by
   show star (star (a : X.E)) = (a : X.E)
   exact star_star _
 
-theorem conjO_algebraMap (X : Fields) (hX : X.Ok) (x : 𝓞 X.F) :
-    X.conjO (algebraMap (𝓞 X.F) (𝓞 X.E) x) = algebraMap (𝓞 X.F) (𝓞 X.E) x := by
+theorem conjO_algebraMap (X : Fields) (hX : X.Ok) (x : 𝓞 X.F)
+    : X.conjO (algebraMap (𝓞 X.F) (𝓞 X.E) x) = algebraMap (𝓞 X.F) (𝓞 X.E) x := by
   apply RingOfIntegers.ext
   show star ((algebraMap (𝓞 X.F) (𝓞 X.E) x : 𝓞 X.E) : X.E) = ((algebraMap (𝓞 X.F) (𝓞 X.E) x : 𝓞 X.E) : X.E)
   have : ((algebraMap (𝓞 X.F) (𝓞 X.E) x : 𝓞 X.E) : X.E) = algebraMap X.F X.E (x : X.F) := rfl
   rw [this]
   exact hX.star_F _
 
-theorem mem_divs_iff {A : Type} [CommRing A] [IsDedekindDomain A] {a : A} (ha : a ≠ 0) (P : HeightOneSpectrum A) :
-    P ∈ divs a ↔ a ∈ P.asIdeal := by
+theorem mem_divs_iff
+    {A : Type} [CommRing A] [IsDedekindDomain A] {a : A} (ha : a ≠ 0) (P : HeightOneSpectrum A)
+    : P ∈ divs a ↔ a ∈ P.asIdeal := by
   have hfin : {P : HeightOneSpectrum A | a ∈ P.asIdeal}.Finite := by
     have h0 : Ideal.span {a} ≠ ⊥ := by simpa using ha
     refine (Ideal.finite_factors h0).subset fun v hv => ?_
@@ -47,18 +48,23 @@ def conjPrime (X : Fields) (P : HeightOneSpectrum (𝓞 X.E)) : HeightOneSpectru
     apply hx0
     rw [← conjO_conjO X x, h1, map_zero]
 
-theorem mem_conjPrime (X : Fields) (P : HeightOneSpectrum (𝓞 X.E)) (a : 𝓞 X.E) :
-    a ∈ (conjPrime X P).asIdeal ↔ X.conjO a ∈ P.asIdeal := Ideal.mem_comap
+theorem mem_conjPrime (X : Fields) (P : HeightOneSpectrum (𝓞 X.E)) (a : 𝓞 X.E)
+    : a ∈ (conjPrime X P).asIdeal ↔ X.conjO a ∈ P.asIdeal :=
+  Ideal.mem_comap
 
-theorem under_conjPrime (X : Fields) (hX : X.Ok) (P : HeightOneSpectrum (𝓞 X.E)) :
-    (conjPrime X P).under (𝓞 X.F) = P.under (𝓞 X.F) := by
+theorem under_conjPrime (X : Fields) (hX : X.Ok) (P : HeightOneSpectrum (𝓞 X.E))
+    : (conjPrime X P).under (𝓞 X.F) = P.under (𝓞 X.F) := by
   apply HeightOneSpectrum.ext
   ext x
   show algebraMap (𝓞 X.F) (𝓞 X.E) x ∈ (conjPrime X P).asIdeal ↔ algebraMap (𝓞 X.F) (𝓞 X.E) x ∈ P.asIdeal
   rw [mem_conjPrime, conjO_algebraMap X hX]
 
-theorem exists_vG_under : ∀ (X : Fields) (Pr : Primes X), X.Ok → Pr.Ok → ∀ (i : Fin 2) (P : HeightOneSpectrum (𝓞 X.E)),
-    ((Pr.g i : ℕ) : 𝓞 X.E) ∈ P.asIdeal → ∃ P' ∈ Pr.vG i, P'.under (𝓞 X.F) = P.under (𝓞 X.F) := by
+theorem exists_vG_under
+    : ∀ (X : Fields) (Pr : Primes X),
+      X.Ok → Pr.Ok
+        → ∀ (i : Fin 2) (P : HeightOneSpectrum (𝓞 X.E)),
+          ((Pr.g i : ℕ) : 𝓞 X.E) ∈ P.asIdeal
+            → ∃ P' ∈ Pr.vG i, P'.under (𝓞 X.F) = P.under (𝓞 X.F) := by
   intro X Pr hX hPr i P hP
   have hg0 : ((Pr.g i : ℕ) : 𝓞 X.E) ≠ 0 := Nat.cast_ne_zero.2 (hPr.g_prime i).ne_zero
   have hc0 : X.conjO (Pr.piG i) ≠ 0 := by

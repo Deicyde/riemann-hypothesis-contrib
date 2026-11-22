@@ -23,9 +23,9 @@ namespace InterNumEventual
 
 def ind {n : ℕ} (T : Finset (Fin n)) : Fin n → ℕ := fun i => if i ∈ T then 1 else 0
 
-theorem sum_sign_prod_ind {n : ℕ} (e : Fin n → ℕ) :
-    ∑ T : Finset (Fin n), (-1 : ℚ) ^ (n - T.card) * ∏ i, ((ind T i : ℕ) : ℚ) ^ e i =
-      ∏ i, (1 - (0 : ℚ) ^ e i) := by
+theorem sum_sign_prod_ind {n : ℕ} (e : Fin n → ℕ)
+    : ∑ T : Finset (Fin n), (-1 : ℚ) ^ (n - T.card) * ∏ i, ((ind T i : ℕ) : ℚ) ^ e i
+      = ∏ i, (1 - (0 : ℚ) ^ e i) := by
   have h1 : ∏ i, (1 - (0 : ℚ) ^ e i) = ∏ i ∈ Finset.univ, (1 + -(0 : ℚ) ^ e i) := by
     simp only [sub_eq_add_neg]
   rw [h1, Finset.prod_add, Finset.powerset_univ]
@@ -38,10 +38,10 @@ theorem sum_sign_prod_ind {n : ℕ} (e : Fin n → ℕ) :
     rw [Finset.mem_sdiff] at hi
     simp [ind, hi.2]
 
-theorem mixed_eval {n : ℕ} (Q : MvPolynomial (Fin (n + 1)) ℚ) (hQ : Q.totalDegree ≤ n) (c : ℚ) :
-    ∑ T : Finset (Fin n), (-1 : ℚ) ^ (n - T.card) *
-        eval (Fin.snoc (α := fun _ => ℚ) (fun j => ((ind T j : ℕ) : ℚ)) c) Q =
-      ∑ d ∈ Q.support, Q.coeff d * ∏ i : Fin n, (1 - (0 : ℚ) ^ d i.castSucc) := by
+theorem mixed_eval {n : ℕ} (Q : MvPolynomial (Fin (n + 1)) ℚ) (hQ : Q.totalDegree ≤ n) (c : ℚ)
+    : ∑ T : Finset (Fin n), (-1 : ℚ) ^ (n - T.card) *
+          eval (Fin.snoc (α := fun _ => ℚ) (fun j => ((ind T j : ℕ) : ℚ)) c) Q
+      = ∑ d ∈ Q.support, Q.coeff d * ∏ i : Fin n, (1 - (0 : ℚ) ^ d i.castSucc) := by
   simp only [MvPolynomial.eval_eq', Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun d hd => ?_
@@ -60,15 +60,16 @@ theorem mixed_eval {n : ℕ} (Q : MvPolynomial (Fin (n + 1)) ℚ) (hQ : Q.totalD
     have hdeg := (le_totalDegree hd).trans hQ
     rw [Finsupp.sum_fintype _ _ (fun _ => rfl), Fin.sum_univ_castSucc] at hdeg
     have hge : n ≤ ∑ i : Fin n, d i.castSucc := by
-      calc n = ∑ _i : Fin n, 1 := by simp
+      calc
+        n = ∑ _i : Fin n, 1 := by simp
         _ ≤ ∑ i : Fin n, d i.castSucc :=
           Finset.sum_le_sum fun i _ => Nat.one_le_iff_ne_zero.mpr (h0 i)
     rw [show d (Fin.last n) = 0 by omega, pow_zero, mul_one]
 
 variable {k : Type u} [Field k] {Ω : Type w} [Field Ω] [Algebra k Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
-theorem foldl_twist_sub {n : ℕ} (L : Fin n → SubSystem k x Ω) (I : Chart x) :
-    ∀ (l : List (Fin n)) (F : SubSystem k x Ω),
+theorem foldl_twist_sub {n : ℕ} (L : Fin n → SubSystem k x Ω) (I : Chart x)
+    : ∀ (l : List (Fin n)) (F : SubSystem k x Ω),
       (l.foldl (fun F i => F.twist (L i)) F).sub I = F.sub I * (l.map fun i => (L i).sub I).prod
   | [], F => by simp
   | a :: l, F => by
@@ -76,8 +77,8 @@ theorem foldl_twist_sub {n : ℕ} (L : Fin n → SubSystem k x Ω) (I : Chart x)
       List.prod_cons]
     ring
 
-theorem tensorSub_sub {n : ℕ} (L : Fin n → SubSystem k x Ω) (T : Finset (Fin n)) (I : Chart x) :
-    (tensorSub L T).sub I = (twistSys k x 0).sub I * ∏ i, (L i).sub I ^ ind T i := by
+theorem tensorSub_sub {n : ℕ} (L : Fin n → SubSystem k x Ω) (T : Finset (Fin n)) (I : Chart x)
+    : (tensorSub L T).sub I = (twistSys k x 0).sub I * ∏ i, (L i).sub I ^ ind T i := by
   unfold tensorSub
   rw [foldl_twist_sub, Fin.prod_univ_def]
   congr 1
@@ -85,37 +86,41 @@ theorem tensorSub_sub {n : ℕ} (L : Fin n → SubSystem k x Ω) (T : Finset (Fi
   | nil => simp
   | cons a l ih => by_cases ha : a ∈ T <;> simp [ha, ind, ih]
 
-theorem tensorSub_eq_twistPows {n : ℕ} (L : Fin n → SubSystem k x Ω) (T : Finset (Fin n)) :
-    tensorSub L T = (twistSys k x 0).twistPows n L (ind T) :=
+theorem tensorSub_eq_twistPows {n : ℕ} (L : Fin n → SubSystem k x Ω) (T : Finset (Fin n))
+    : tensorSub L T = (twistSys k x 0).twistPows n L (ind T) :=
   SubSystem.ext_sub fun I => by rw [tensorSub_sub, SnapperSections.twistPows_sub]
 
 end InterNumEventual
 
-
 open InterNumEventual in
-theorem InterNumEventual.proof (hH : SnapperHyperplane.Statement.{u, w})
-    (hS : SnapperSection.Statement.{u, w}) : InterNumEventual.Statement.{u, w} := by
+theorem InterNumEventual.proof
+    (hH : SnapperHyperplane.Statement.{u, w}) (hS : SnapperSection.Statement.{u, w})
+    : InterNumEventual.Statement.{u, w} := by
   have hR : RestrLenEuler.Statement.{u, w} := RestrLenEuler.proof
   intro k _ Ω _ _ N x n pp L hW
   have := hW.isPrime
-  obtain ⟨Q, hQ, hev⟩ := pieceChar_isNumPolyLT hH hS SnapperDiffPoly.proof L (n + 1) pp hW.isPrime hW.homog
-    hW.le hW.dim.le 0
+  obtain ⟨Q, hQ, hev⟩ :=
+    pieceChar_isNumPolyLT hH hS SnapperDiffPoly.proof L (n + 1) pp hW.isPrime hW.homog hW.le
+      hW.dim.le 0
   have hQn : Q.totalDegree ≤ n := by
     rcases hQ with h | h
     · rw [h, totalDegree_zero]; exact Nat.zero_le _
     · omega
-  have hall : ∀ᶠ c : ℕ in atTop, ∀ T : Finset (Fin n),
-      restrLen pp ((tensorSub (fun i => (L i).toSubSystem) T).twist (twistSys k x (c : ℤ))) =
-        pieceChar k pp 0 L (ind T) c := by
+  have hall
+      : ∀ᶠ c : ℕ in atTop, ∀ T : Finset (Fin n),
+        restrLen pp ((tensorSub (fun i => (L i).toSubSystem) T).twist (twistSys k x (c : ℤ))) =
+          pieceChar k pp 0 L (ind T) c := by
     refine Filter.eventually_all.mpr fun T => ?_
     filter_upwards [tendsto_natCast_atTop_atTop.eventually (hR k Ω N x pp hW.homog hW.le n L (ind T))] with c hc
     rw [tensorSub_eq_twistPows]
     exact hc
-  have hval : ∀ c : ℕ, (∀ T : Finset (Fin n),
-      restrLen pp ((tensorSub (fun i => (L i).toSubSystem) T).twist (twistSys k x (c : ℤ))) =
-        pieceChar k pp 0 L (ind T) c) →
-      (interSum pp (fun i => (L i).toSubSystem) c : ℚ) =
-        ∑ d ∈ Q.support, Q.coeff d * ∏ i : Fin n, (1 - (0 : ℚ) ^ d i.castSucc) := by
+  have hval
+      : ∀ c : ℕ,
+        (∀ T : Finset (Fin n),
+            restrLen pp ((tensorSub (fun i => (L i).toSubSystem) T).twist (twistSys k x (c : ℤ)))
+              = pieceChar k pp 0 L (ind T) c)
+          → (interSum pp (fun i => (L i).toSubSystem) c : ℚ)
+            = ∑ d ∈ Q.support, Q.coeff d * ∏ i : Fin n, (1 - (0 : ℚ) ^ d i.castSucc) := by
     intro c hc
     rw [← mixed_eval Q hQn (c : ℚ)]
     unfold interSum

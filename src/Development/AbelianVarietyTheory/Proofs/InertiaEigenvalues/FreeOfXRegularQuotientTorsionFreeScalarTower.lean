@@ -8,14 +8,15 @@ namespace GlobalTheory
 
 open PowerSeries
 
-theorem free_of_X_regular_quotient_torsionFree_scalarTower (O M : Type) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [AddCommGroup M] [Module (PowerSeries O) M]
-    [Module.Finite (PowerSeries O) M] [Module O M] [IsScalarTower O (PowerSeries O) M]
+theorem free_of_X_regular_quotient_torsionFree_scalarTower
+    (O M : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup M]
+    [Module (PowerSeries O) M] [Module.Finite (PowerSeries O) M] [Module O M]
+    [IsScalarTower O (PowerSeries O) M]
     (hX : ∀ x : M, (PowerSeries.X : PowerSeries O) • x = 0 → x = 0)
-    (hT : ∀ (c : O) (x : M), c ≠ 0 →
-      (∃ y : M, (PowerSeries.C c : PowerSeries O) • x = (PowerSeries.X : PowerSeries O) • y) →
-      ∃ y : M, x = (PowerSeries.X : PowerSeries O) • y) :
-    Module.Free (PowerSeries O) M := by
+    (hT : ∀ (c : O) (x : M),
+      c ≠ 0 → (∃ y : M, (PowerSeries.C c : PowerSeries O) • x = (PowerSeries.X : PowerSeries O) • y)
+        → ∃ y : M, x = (PowerSeries.X : PowerSeries O) • y)
+    : Module.Free (PowerSeries O) M := by
   classical
   set p : Submodule (PowerSeries O) M :=
     Ideal.span {(PowerSeries.X : PowerSeries O)} • (⊤ : Submodule (PowerSeries O) M) with hp
@@ -32,11 +33,12 @@ theorem free_of_X_regular_quotient_torsionFree_scalarTower (O M : Type) [CommRin
     rw [← IsScalarTower.algebraMap_smul (PowerSeries O) c m, PowerSeries.algebraMap_apply]
     simp
 
-  have hdec : ∀ r : PowerSeries O, ∃ s : PowerSeries O,
-      r = PowerSeries.C (PowerSeries.constantCoeff r) + PowerSeries.X * s := by
+  have hdec
+      : ∀ r : PowerSeries O, ∃ s : PowerSeries O,
+        r = PowerSeries.C (PowerSeries.constantCoeff r) + PowerSeries.X * s := by
     intro r
-    obtain ⟨s, hs⟩ : (PowerSeries.X : PowerSeries O) ∣
-        r - PowerSeries.C (PowerSeries.constantCoeff r) := by
+    obtain ⟨s, hs⟩
+        : (PowerSeries.X : PowerSeries O) ∣ r - PowerSeries.C (PowerSeries.constantCoeff r) := by
       rw [PowerSeries.X_dvd_iff]
       simp
     exact ⟨s, by rw [← hs]; ring⟩
@@ -46,16 +48,17 @@ theorem free_of_X_regular_quotient_torsionFree_scalarTower (O M : Type) [CommRin
     obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective p y
     obtain ⟨s, hs⟩ := hdec r
     rw [← Submodule.Quotient.mk_smul, ← Submodule.Quotient.mk_smul, Submodule.Quotient.eq, memp]
-    have e1 : r • m = (PowerSeries.C (PowerSeries.constantCoeff r) : PowerSeries O) • m
-        + (PowerSeries.X : PowerSeries O) • (s • m) := by
+    have e1
+        : r • m
+          = (PowerSeries.C (PowerSeries.constantCoeff r) : PowerSeries O) • m
+            + (PowerSeries.X : PowerSeries O) • (s • m) := by
       conv_lhs => rw [hs]
       rw [add_smul, mul_smul]
     refine ⟨s • m, ?_⟩
     rw [e1, hsmul]
     abel
   have hfin : Module.Finite O (M ⧸ p) := by
-    obtain ⟨T, hT'⟩ := Module.finite_def.mp
-      (inferInstance : Module.Finite (PowerSeries O) (M ⧸ p))
+    obtain ⟨T, hT'⟩ := Module.finite_def.mp (inferInstance : Module.Finite (PowerSeries O) (M ⧸ p))
     refine ⟨⟨T, ?_⟩⟩
     rw [eq_top_iff]
     rintro y -
@@ -80,7 +83,8 @@ theorem free_of_X_regular_quotient_torsionFree_scalarTower (O M : Type) [CommRin
       exact hT c m hc hcy
   let b := Module.Free.chooseBasis O (M ⧸ p)
   choose e he using fun i => Submodule.Quotient.mk_surjective p (b i)
-  have hspan : (⊤ : Submodule (PowerSeries O) M) ≤ Submodule.span (PowerSeries O) (Set.range e) := by
+  have hspan
+      : (⊤ : Submodule (PowerSeries O) M) ≤ Submodule.span (PowerSeries O) (Set.range e) := by
     refine Submodule.le_of_le_smul_of_le_jacobson_bot (I := Ideal.span {PowerSeries.X})
       (Module.finite_def.mp inferInstance) ?_ ?_
     · rw [Ideal.span_le]
@@ -105,8 +109,9 @@ theorem free_of_X_regular_quotient_torsionFree_scalarTower (O M : Type) [CommRin
   have hli : LinearIndependent (PowerSeries O) e := by
     rw [Fintype.linearIndependent_iff]
 
-    have key : ∀ k : ℕ, ∀ g : Module.Free.ChooseBasisIndex O (M ⧸ p) → PowerSeries O,
-        ∑ i, g i • e i = 0 → ∀ i, (PowerSeries.X : PowerSeries O) ^ k ∣ g i := by
+    have key
+        : ∀ k : ℕ, ∀ g : Module.Free.ChooseBasisIndex O (M ⧸ p) → PowerSeries O,
+          ∑ i, g i • e i = 0 → ∀ i, (PowerSeries.X : PowerSeries O) ^ k ∣ g i := by
       intro k
       induction k with
       | zero =>
@@ -138,17 +143,16 @@ theorem free_of_X_regular_quotient_torsionFree_scalarTower (O M : Type) [CommRin
     simpa using h
   exact Module.Free.of_basis (Module.Basis.mk hli hspan)
 
-theorem free_of_X_regular_of_quotient_torsionFree (O M : Type) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [AddCommGroup M] [Module (PowerSeries O) M]
-    [Module.Finite (PowerSeries O) M]
+theorem free_of_X_regular_of_quotient_torsionFree
+    (O M : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup M]
+    [Module (PowerSeries O) M] [Module.Finite (PowerSeries O) M]
     (hX : ∀ x : M, (PowerSeries.X : PowerSeries O) • x = 0 → x = 0)
-    (hT : ∀ (c : O) (x : M), c ≠ 0 →
-      (∃ y : M, (PowerSeries.C c : PowerSeries O) • x = (PowerSeries.X : PowerSeries O) • y) →
-      ∃ y : M, x = (PowerSeries.X : PowerSeries O) • y) :
-    Module.Free (PowerSeries O) M := by
+    (hT : ∀ (c : O) (x : M),
+      c ≠ 0 → (∃ y : M, (PowerSeries.C c : PowerSeries O) • x = (PowerSeries.X : PowerSeries O) • y)
+        → ∃ y : M, x = (PowerSeries.X : PowerSeries O) • y)
+    : Module.Free (PowerSeries O) M := by
   let _ : Module O M := Module.compHom M (algebraMap O (PowerSeries O))
-  have : IsScalarTower O (PowerSeries O) M :=
-    IsScalarTower.of_algebraMap_smul fun _ _ => rfl
+  have : IsScalarTower O (PowerSeries O) M := IsScalarTower.of_algebraMap_smul fun _ _ => rfl
   exact free_of_X_regular_quotient_torsionFree_scalarTower O M hX hT
 
 end GlobalTheory

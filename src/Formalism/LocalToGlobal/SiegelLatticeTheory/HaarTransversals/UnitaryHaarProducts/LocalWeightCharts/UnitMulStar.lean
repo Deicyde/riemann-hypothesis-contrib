@@ -28,33 +28,38 @@ lemma unit_mul_star {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ Matrix.unitaryG
 lemma unit_inv {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ Matrix.unitaryGroup (Fin n) ℂ) :
     u⁻¹ = uᴴ := Matrix.inv_eq_left_inv (unit_star_mul hu)
 
-private theorem conj_mem_lemma {ε : Fin n → Bool} {a b : Matrix (Fin n) (Fin n) ℂ}
-    (ha : a ∈ UJset ε) (hb : b ∈ UJset ε) : a * b ∈ UJset ε := by
+private theorem conj_mem_lemma
+    {ε : Fin n → Bool} {a b : Matrix (Fin n) (Fin n) ℂ} (ha : a ∈ UJset ε) (hb : b ∈ UJset ε)
+    : a * b ∈ UJset ε := by
   have ha' : aᴴ * Formalism.REAL.Jm ε * a = Formalism.REAL.Jm ε := ha
   have hb' : bᴴ * Formalism.REAL.Jm ε * b = Formalism.REAL.Jm ε := hb
   show (a * b)ᴴ * Formalism.REAL.Jm ε * (a * b) = Formalism.REAL.Jm ε
-  calc (a * b)ᴴ * Formalism.REAL.Jm ε * (a * b) = bᴴ * (aᴴ * Formalism.REAL.Jm ε * a) * b := by
-        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+  calc
+    (a * b)ᴴ * Formalism.REAL.Jm ε * (a * b) = bᴴ * (aᴴ * Formalism.REAL.Jm ε * a) * b := by
+      simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
     _ = Formalism.REAL.Jm ε := by rw [ha', hb']
 
-private theorem mem_UJset_of_mem_Kset_local_weight_charts {ε : Fin n → Bool} {u : Matrix (Fin n) (Fin n) ℂ}
-    (hu : u ∈ Formalism.REAL.Kset ε) : u ∈ UJset ε := by
+private theorem mem_UJset_of_mem_Kset_local_weight_charts
+    {ε : Fin n → Bool} {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ Formalism.REAL.Kset ε)
+    : u ∈ UJset ε := by
   obtain ⟨hU, hc⟩ := hu
   show uᴴ * Formalism.REAL.Jm ε * u = Formalism.REAL.Jm ε
   rw [Matrix.mul_assoc, ← hc, ← Matrix.mul_assoc, unit_star_mul hU, Matrix.one_mul]
 
-private theorem conjTranspose_mem_Kset' {ε : Fin n → Bool} {u : Matrix (Fin n) (Fin n) ℂ}
-    (hu : u ∈ Formalism.REAL.Kset ε) : uᴴ ∈ Formalism.REAL.Kset ε := by
+private theorem conjTranspose_mem_Kset'
+    {ε : Fin n → Bool} {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ Formalism.REAL.Kset ε)
+    : uᴴ ∈ Formalism.REAL.Kset ε := by
   obtain ⟨hU, hc⟩ := hu
   refine ⟨?_, ?_⟩
   · refine Matrix.mem_unitaryGroup_iff.2 ?_
     rw [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_conjTranspose]
     exact unit_star_mul hU
-  · calc uᴴ * Formalism.REAL.Jm ε = uᴴ * (Formalism.REAL.Jm ε * u) * uᴴ := by
-          simp only [Matrix.mul_assoc, unit_mul_star hU, Matrix.mul_one]
+  · calc
+      uᴴ * Formalism.REAL.Jm ε = uᴴ * (Formalism.REAL.Jm ε * u) * uᴴ := by
+        simp only [Matrix.mul_assoc, unit_mul_star hU, Matrix.mul_one]
       _ = uᴴ * (u * Formalism.REAL.Jm ε) * uᴴ := by rw [hc]
       _ = Formalism.REAL.Jm ε * uᴴ := by
-          simp only [← Matrix.mul_assoc, unit_star_mul hU, Matrix.one_mul]
+        simp only [← Matrix.mul_assoc, unit_star_mul hU, Matrix.one_mul]
 
 lemma conj_mem {ε : Fin n → Bool} {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ Formalism.REAL.Kset ε)
     {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε) : uᴴ * g * u ∈ UJset ε := by
@@ -92,8 +97,10 @@ end MatAlg
 
 section KTypes
 
-variable {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  {ε : Fin n → Bool} (σ σ' : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (T : H ≃ₗ[ℂ] H)
+variable
+  {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool}
+  (σ σ' : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (T : H ≃ₗ[ℂ] H)
 
 def Inter : Prop := ∀ g ∈ Formalism.REAL.Kset ε, ∀ v : H, σ' g (T v) = T (σ g v)
 
@@ -155,11 +162,13 @@ end KTypes
 
 section Conj
 
-variable {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {ε : Fin n → Bool} {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem isDS_conj (hσ : IsDS ε lam σ) {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ Formalism.REAL.Kset ε) :
-    IsDS ε lam (fun g => σ (uᴴ * g * u)) := by
+theorem isDS_conj
+    (hσ : IsDS ε lam σ) {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ Formalism.REAL.Kset ε)
+    : IsDS ε lam (fun g => σ (uᴴ * g * u)) := by
   obtain ⟨hc, hnt, ⟨⟨h1, hmul⟩, hnorm, hcont⟩, hirr, hsq, ⟨S0, hS0⟩, hmin⟩ := hσ
   have huJ : u ∈ UJset ε := K_mem_UJ hu
   have husJ : uᴴ ∈ UJset ε := K_mem_UJ (star_mem_K hu)
@@ -180,8 +189,9 @@ theorem isDS_conj (hσ : IsDS ε lam σ) {u : Matrix (Fin n) (Fin n) ℂ} (hu : 
     have h := hmul uᴴ husJ u huJ
     rw [huu, h1] at h
     exact (congrArg (fun L : H →L[ℂ] H => L x) h).symm
-  let T : H ≃ₗ[ℂ] H := LinearEquiv.ofLinear (σ uᴴ : H →ₗ[ℂ] H) (σ u : H →ₗ[ℂ] H)
-    (LinearMap.ext fun x => hinv2 x) (LinearMap.ext fun x => hinv1 x)
+  let T : H ≃ₗ[ℂ] H :=
+    LinearEquiv.ofLinear (σ uᴴ : H →ₗ[ℂ] H) (σ u : H →ₗ[ℂ] H) (LinearMap.ext fun x => hinv2 x)
+      (LinearMap.ext fun x => hinv1 x)
   have hT : ∀ x, T x = σ uᴴ x := fun x => rfl
   have hInter : Inter (ε := ε) σ (fun g => σ (uᴴ * g * u)) T := by
     intro g hg x
@@ -210,14 +220,15 @@ theorem isDS_conj (hσ : IsDS ε lam σ) {u : Matrix (Fin n) (Fin n) ℂ} (hu : 
     rw [Matrix.conjTranspose_conjTranspose] at hm
     have hx' := hst _ hm x hx
     have e : uᴴ * (u * h * uᴴ) * u = h := by
-      rw [show uᴴ * (u * h * uᴴ) * u = (uᴴ * u) * h * (uᴴ * u) by simp only [Matrix.mul_assoc],
-        huu, Matrix.one_mul, Matrix.mul_one]
+      rw [show uᴴ * (u * h * uᴴ) * u = (uᴴ * u) * h * (uᴴ * u) by simp only [Matrix.mul_assoc], huu,
+        Matrix.one_mul, Matrix.mul_one]
     dsimp only at hx'
     rwa [e] at hx'
   · intro v w
     have hsq' := hsq (σ u v) (σ u w)
     let Lu : H →ₗᵢ[ℂ] H := ⟨(σ u : H →ₗ[ℂ] H), fun x => hnorm u huJ x⟩
-    have hfun : coefOn (ε := ε) (fun g => σ (uᴴ * g * u)) v w = coefOn (ε := ε) σ (σ u v) (σ u w) := by
+    have hfun
+        : coefOn (ε := ε) (fun g => σ (uᴴ * g * u)) v w = coefOn (ε := ε) σ (σ u v) (σ u w) := by
       funext g
       have hg : umat g ∈ UJset ε := g.2
       show ⟪w, σ (uᴴ * umat g * u) v⟫_ℂ = ⟪σ u w, σ (umat g) (σ u v)⟫_ℂ
@@ -262,14 +273,17 @@ lemma cayley_K {P P' : Mat k r} (hP : IsCayleyU k r ε P) (hP' : IsCayleyU k r �
       simp only [Matrix.mul_assoc], unit_star_mul hU', Matrix.mul_one]
   rw [e1, e2]
 
-theorem isDS_cayley {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {lam : Fin (2 * r + k + 1) → ℝ}
-    {σ : Mat k r → (H →L[ℂ] H)} {P P' : Mat k r} (hP : IsCayleyU k r ε P) (hP' : IsCayleyU k r ε P')
-    (hσ : IsDS ε lam (fun g => σ (P⁻¹ * g * P))) : IsDS ε lam (fun g => σ (P'⁻¹ * g * P')) := by
+theorem isDS_cayley
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {lam : Fin (2 * r + k + 1) → ℝ} {σ : Mat k r → (H →L[ℂ] H)} {P P' : Mat k r}
+    (hP : IsCayleyU k r ε P) (hP' : IsCayleyU k r ε P') (hσ : IsDS ε lam (fun g => σ (P⁻¹ * g * P)))
+    : IsDS ε lam (fun g => σ (P'⁻¹ * g * P')) := by
   have hK := cayley_K hP hP'
   have hU := hP.2
   have hU' := hP'.2
   have h := isDS_conj hσ hK
-  have hfun : (fun g => σ (P⁻¹ * ((P' * Pᴴ)ᴴ * g * (P' * Pᴴ)) * P)) = (fun g => σ (P'⁻¹ * g * P')) := by
+  have hfun
+      : (fun g => σ (P⁻¹ * ((P' * Pᴴ)ᴴ * g * (P' * Pᴴ)) * P)) = (fun g => σ (P'⁻¹ * g * P')) := by
     funext g
     congr 1
     rw [unit_inv hU, unit_inv hU', Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,

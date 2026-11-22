@@ -10,6 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DegreeEqInte
 namespace GlobalTheory.ChernDegree
 
 theorem chernWeilNumbers_holds : GlobalTheory.Published.ChernWeilNumbers :=
-  GlobalTheory.T.chernWeilNumbers_of_degree_eq_chernIntegral GlobalTheory.T.degree_eq_integral_topChernForm_complex
+  GlobalTheory.T.chernWeilNumbers_of_degree_eq_chernIntegral
+    GlobalTheory.T.degree_eq_integral_topChernForm_complex
 
 end GlobalTheory.ChernDegree

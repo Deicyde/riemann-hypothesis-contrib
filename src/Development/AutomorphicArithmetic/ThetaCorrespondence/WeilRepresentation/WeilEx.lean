@@ -7,6 +7,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Wei
 
 namespace UpperTheory.Lit
 
-theorem weilRepresentationExists_pair : GlobalTheory.Published.WeilRepresentationExists := PositivityTheory.ThKW.S.weilEx
+theorem weilRepresentationExists_pair : GlobalTheory.Published.WeilRepresentationExists :=
+  PositivityTheory.ThKW.S.weilEx
 
 end UpperTheory.Lit

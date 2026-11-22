@@ -13,14 +13,16 @@ open Formalism.BasicNotions Classical
 
 namespace Formalism.MainNotions.N.KUnr
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
 
 section Loc
 
-variable {O : Type} [CommRing O] [IsDomain O] {Γ : Type} [Group Γ] {M : Type} [AddCommGroup M] [Module O M]
+variable
+  {O : Type} [CommRing O] [IsDomain O] {Γ : Type} [Group Γ] {M : Type} [AddCommGroup M] [Module O M]
 
-theorem locRep_triv (g : Γ) (x : KHf.MK (O := O) M) :
-    KHf.locRep (Representation.trivial O Γ M) g x = x := by
+theorem locRep_triv (g : Γ) (x : KHf.MK (O := O) M)
+    : KHf.locRep (Representation.trivial O Γ M) g x = x := by
   induction x using LocalizedModule.induction_on with
   | h m s =>
     show LocalizedModule.map (nonZeroDivisors O) (Representation.trivial O Γ M g) (LocalizedModule.mk m s) =

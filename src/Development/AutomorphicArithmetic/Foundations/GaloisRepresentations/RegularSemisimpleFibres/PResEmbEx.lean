@@ -7,19 +7,27 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem res_algClosed {Ω : Type} [Field Ω] [IsAlgClosed Ω] (A : ValuationSubring Ω) :
-    IsAlgClosed (IsLocalRing.ResidueField A) :=
+private theorem res_algClosed {Ω : Type} [Field Ω] [IsAlgClosed Ω] (A : ValuationSubring Ω)
+    : IsAlgClosed (IsLocalRing.ResidueField A) :=
   _root_.UpperTheory.Reformulated.B.Qk69.res_algClosed A
 
-private theorem res_surj {Ω : Type} [Field Ω] [CharZero Ω] (hΩ : ∀ x : Ω, IsAlgebraic ℤ x) (A : ValuationSubring Ω) {κ : Type} [Field κ]
-    [IsAlgClosed κ] (p : ℕ) [Fact p.Prime] [CharP (IsLocalRing.ResidueField A) p]
-    (e : κ →+* IsLocalRing.ResidueField A) : Function.Surjective e := by
+private theorem res_surj
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (hΩ : ∀ x : Ω, IsAlgebraic ℤ x)
+    (A : ValuationSubring Ω)
+    {κ : Type} [Field κ] [IsAlgClosed κ]
+    (p : ℕ) [Fact p.Prime] [CharP (IsLocalRing.ResidueField A) p]
+    (e : κ →+* IsLocalRing.ResidueField A)
+    : Function.Surjective e := by
   letI := e.toAlgebra
   haveI : Algebra.IsIntegral κ (IsLocalRing.ResidueField A) := ⟨fun z => by
     obtain ⟨z', rfl⟩ := IsLocalRing.residue_surjective z
@@ -52,32 +60,40 @@ private theorem res_surj {Ω : Type} [Field Ω] [CharZero Ω] (hΩ : ∀ x : Ω,
     rw [aeval_def, eval₂_map, Subsingleton.elim ((algebraMap κ (IsLocalRing.ResidueField A)).comp (algebraMap ℤ κ))
       (algebraMap ℤ (IsLocalRing.ResidueField A))]
     exact hR⟩
-  exact (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := κ) (K := IsLocalRing.ResidueField A)).2
+  exact (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := κ)
+    (K := IsLocalRing.ResidueField A)).2
 
-theorem UpperTheory.Gal.InertialTypesAlt.resEmbEx :
-    ResEmbEx := by
+theorem UpperTheory.Gal.InertialTypesAlt.resEmbEx : ResEmbEx := by
   intro E Ω _ _ _ _ _ A v hv
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   haveI := res_algClosed A
-  obtain ⟨e₀, he₀⟩ : ∃ e₀ : 𝓀[v.adicCompletion E] →+* IsLocalRing.ResidueField A,
-      ∀ x, e₀ (DiscreteGroups.sglob.DzType.kappaP v x) = DiscreteGroups.sglob.DzType.kappaQ A x := by
-    refine ⟨RingHom.liftOfSurjective _ (DiscreteGroups.sglob.DzType.kappa_surj_O v) ⟨DiscreteGroups.sglob.DzType.kappaQ A, fun x hx => ?_⟩,
-      fun x => ?_⟩
-    · rw [DiscreteGroups.sglob.DzType.kappa_ker_O, ← DiscreteGroups.sglob.DzType.kappa_ker_A A v hv] at hx
+  obtain ⟨e₀, he₀⟩
+      : ∃ e₀ : 𝓀[v.adicCompletion E] →+* IsLocalRing.ResidueField A, ∀ x,
+        e₀ (DiscreteGroups.sglob.DzType.kappaP v x) = DiscreteGroups.sglob.DzType.kappaQ A x := by
+    refine ⟨
+      RingHom.liftOfSurjective _ (DiscreteGroups.sglob.DzType.kappa_surj_O v)
+        ⟨DiscreteGroups.sglob.DzType.kappaQ A, fun x hx => ?_⟩,
+      fun x => ?_
+    ⟩
+    · rw [DiscreteGroups.sglob.DzType.kappa_ker_O, ← DiscreteGroups.sglob.DzType.kappa_ker_A A v hv]
+        at hx
       exact hx
     · exact RingHom.liftOfRightInverse_comp_apply _ _ _ _ _
   obtain ⟨p, hp⟩ := CharP.exists 𝓀[v.adicCompletion E]
   haveI : Fact p.Prime := ⟨CharP.char_is_prime 𝓀[v.adicCompletion E] p⟩
   haveI : CharP (IsLocalRing.ResidueField A) p := charP_of_injective_ringHom e₀.injective p
   letI := e₀.toAlgebra
-  let e : AlgebraicClosure 𝓀[v.adicCompletion E] →ₐ[𝓀[v.adicCompletion E]] IsLocalRing.ResidueField A := (by
-    refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
-      @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
-  have hres : ResEmb A v (e : AlgebraicClosure 𝓀[v.adicCompletion E] →+* IsLocalRing.ResidueField A) := by
+  let e
+      : AlgebraicClosure 𝓀[v.adicCompletion E] →ₐ[𝓀[v.adicCompletion E]] IsLocalRing.ResidueField A :=
+    (by
+      refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+        @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
+  have hres
+      : ResEmb A v (e : AlgebraicClosure 𝓀[v.adicCompletion E] →+* IsLocalRing.ResidueField A) := by
     intro x y z hy hz
-    have h1 : IsLocalRing.residue 𝒪[v.adicCompletion E] y = DiscreteGroups.sglob.DzType.kappaP v x := by
+    have h1
+        : IsLocalRing.residue 𝒪[v.adicCompletion E] y = DiscreteGroups.sglob.DzType.kappaP v x := by
       rw [DiscreteGroups.sglob.DzType.kappaP, RingHom.comp_apply]
       exact congrArg _ (Subtype.ext hy)
     have h2 : IsLocalRing.residue A z = DiscreteGroups.sglob.DzType.kappaQ A x := by
@@ -90,9 +106,13 @@ theorem UpperTheory.Gal.InertialTypesAlt.resEmbEx :
     haveI : Algebra.IsAlgebraic E Ω := IsAlgClosure.isAlgebraic
     haveI : Algebra.IsAlgebraic ℚ Ω := Algebra.IsAlgebraic.trans ℚ E Ω
     exact fun x => (IsFractionRing.isAlgebraic_iff ℤ ℚ Ω).2 (Algebra.IsAlgebraic.isAlgebraic x)
-  have hs := res_surj hΩ A p (e : AlgebraicClosure 𝓀[v.adicCompletion E] →+* IsLocalRing.ResidueField A)
-  let e' := RingEquiv.ofBijective (e : AlgebraicClosure 𝓀[v.adicCompletion E] →+* IsLocalRing.ResidueField A)
-    ⟨RingHom.injective _, hs⟩
-  obtain ⟨θ, hθ⟩ := GlobalTheory.T.exists_teichmuller_map_algebraicClosure_finiteField 𝓀[v.adicCompletion E]
+  have hs :=
+    res_surj hΩ A p (e : AlgebraicClosure 𝓀[v.adicCompletion E] →+* IsLocalRing.ResidueField A)
+  let e' :=
+    RingEquiv.ofBijective
+      (e : AlgebraicClosure 𝓀[v.adicCompletion E] →+* IsLocalRing.ResidueField A)
+      ⟨RingHom.injective _, hs⟩
+  obtain ⟨θ, hθ⟩ :=
+    GlobalTheory.T.exists_teichmuller_map_algebraicClosure_finiteField 𝓀[v.adicCompletion E]
   refine ⟨⟨_, hres⟩, θ.comp (e'.symm : IsLocalRing.ResidueField A →* _), fun x y hx hy h => ?_⟩
   exact e'.symm.injective (hθ _ _ (by simpa using hx) (by simpa using hy) h)

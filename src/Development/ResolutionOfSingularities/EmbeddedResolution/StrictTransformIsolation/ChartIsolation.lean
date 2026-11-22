@@ -41,73 +41,83 @@ namespace FunctorialResolution.EmbeddedResolution
 
 namespace OpenImmersionRestriction
 
-abbrev principalizationOfEmbedding (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u})
-    (pY : Y ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType pY]
-    [AlgebraicGeometry.QuasiCompact pY] (D : EmbeddingDatum k Y pY) (A : PrincipalizationAlgorithm.{u}) :
-    IdealBlowupSequence D.ambientStruct (AlgebraicGeometry.Scheme.Hom.ker D.emb) [] :=
-  A k D.ambient D.ambientStruct (AlgebraicGeometry.Scheme.Hom.ker D.emb)
-    D.nonzeroOnComponents_ker [] D.sncEmpty
+abbrev principalizationOfEmbedding
+    (k : Type u) [Field k] [CharZero k]
+    (Y : Scheme.{u}) (pY : Y ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.LocallyOfFiniteType pY] [AlgebraicGeometry.QuasiCompact pY]
+    (D : EmbeddingDatum k Y pY) (A : PrincipalizationAlgorithm.{u})
+    : IdealBlowupSequence D.ambientStruct (AlgebraicGeometry.Scheme.Hom.ker D.emb) [] :=
+  A k D.ambient D.ambientStruct (AlgebraicGeometry.Scheme.Hom.ker D.emb) D.nonzeroOnComponents_ker
+    [] D.sncEmpty
 
-structure ChartIsolationHypotheses (V : VanishingAssignment.{u}) (A : PrincipalizationAlgorithm.{u}) : Prop where
-  noetherianSpace_alive : ∀ (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u})
-      [AlgebraicGeometry.IsAffine Y] [AlgebraicGeometry.IsReduced Y]
-      (pY : Y ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType pY]
-      [AlgebraicGeometry.QuasiCompact pY] (D : EmbeddingDatum k Y pY) (i : ℕ),
-      i ≤ (D.toEmbeddedBlowupSequence A).length →
-        TopologicalSpace.NoetherianSpace ↥((D.toEmbeddedBlowupSequence A).strictTransform i)
-  isClosedEmbedding_aliveι : ∀ (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u})
-      [AlgebraicGeometry.IsAffine Y] [AlgebraicGeometry.IsReduced Y]
-      (pY : Y ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType pY]
-      [AlgebraicGeometry.QuasiCompact pY] (D : EmbeddingDatum k Y pY) (i : ℕ),
-      i ≤ (D.toEmbeddedBlowupSequence A).length →
-        Topology.IsClosedEmbedding ⇑((D.toEmbeddedBlowupSequence A).strictTransformι i).base
-  generic_not_mem_member : ∀ (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u})
-      [AlgebraicGeometry.IsAffine Y] [AlgebraicGeometry.IsReduced Y]
-      (pY : Y ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType pY]
-      [AlgebraicGeometry.QuasiCompact pY] (D : EmbeddingDatum k Y pY) (i : ℕ),
-      i ≤ (D.toEmbeddedBlowupSequence A).length →
-      ∀ C ∈ irreducibleComponents ↥((D.toEmbeddedBlowupSequence A).strictTransform i),
-      ∀ ξ : ↥((D.toEmbeddedBlowupSequence A).strictTransform i), IsGenericPoint ξ C →
-      ∀ E ∈ (principalizationOfEmbedding k Y pY D A).boundary i,
-        ((D.toEmbeddedBlowupSequence A).strictTransformι i).base ξ ∉
-          (E.support : Set ↥((principalizationOfEmbedding k Y pY D A).schemeAt i))
-  agreeNear_orderAt_eq_one : ∀ (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u})
-      [AlgebraicGeometry.IsAffine Y] [AlgebraicGeometry.IsReduced Y]
-      (pY : Y ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType pY]
-      [AlgebraicGeometry.QuasiCompact pY] (D : EmbeddingDatum k Y pY) (i : ℕ),
-      i ≤ (D.toEmbeddedBlowupSequence A).length →
-      ∀ C ∈ irreducibleComponents ↥((D.toEmbeddedBlowupSequence A).strictTransform i),
-      ∀ ξ : ↥((D.toEmbeddedBlowupSequence A).strictTransform i), IsGenericPoint ξ C →
-      ∀ hC : IsClosed (⇑((D.toEmbeddedBlowupSequence A).strictTransformι i).base '' C),
-        AgreeNear ((principalizationOfEmbedding k Y pY D A).ideal i)
-            (V ((D.toEmbeddedBlowupSequence A).schemeAt i)
-              ⟨⇑((D.toEmbeddedBlowupSequence A).strictTransformι i).base '' C, hC⟩)
-            (((D.toEmbeddedBlowupSequence A).strictTransformι i).base ξ) ∧
-          orderAt ((principalizationOfEmbedding k Y pY D A).ideal i)
-            (((D.toEmbeddedBlowupSequence A).strictTransformι i).base ξ) = 1
+structure ChartIsolationHypotheses (V : VanishingAssignment.{u}) (A : PrincipalizationAlgorithm.{u})
+    : Prop where
+  noetherianSpace_alive
+    : ∀ (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u}) [AlgebraicGeometry.IsAffine Y]
+        [AlgebraicGeometry.IsReduced Y] (pY : Y ⟶ Spec (CommRingCat.of k))
+        [AlgebraicGeometry.LocallyOfFiniteType pY] [AlgebraicGeometry.QuasiCompact pY]
+        (D : EmbeddingDatum k Y pY) (i : ℕ),
+      i ≤ (D.toEmbeddedBlowupSequence A).length
+        → TopologicalSpace.NoetherianSpace ↥((D.toEmbeddedBlowupSequence A).strictTransform i)
+  isClosedEmbedding_aliveι
+    : ∀ (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u}) [AlgebraicGeometry.IsAffine Y]
+        [AlgebraicGeometry.IsReduced Y] (pY : Y ⟶ Spec (CommRingCat.of k))
+        [AlgebraicGeometry.LocallyOfFiniteType pY] [AlgebraicGeometry.QuasiCompact pY]
+        (D : EmbeddingDatum k Y pY) (i : ℕ),
+      i ≤ (D.toEmbeddedBlowupSequence A).length
+        → Topology.IsClosedEmbedding ⇑((D.toEmbeddedBlowupSequence A).strictTransformι i).base
+  generic_not_mem_member
+    : ∀ (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u}) [AlgebraicGeometry.IsAffine Y]
+        [AlgebraicGeometry.IsReduced Y] (pY : Y ⟶ Spec (CommRingCat.of k))
+        [AlgebraicGeometry.LocallyOfFiniteType pY] [AlgebraicGeometry.QuasiCompact pY]
+        (D : EmbeddingDatum k Y pY) (i : ℕ),
+      i ≤ (D.toEmbeddedBlowupSequence A).length
+        → ∀ C ∈ irreducibleComponents ↥((D.toEmbeddedBlowupSequence A).strictTransform i),
+          ∀ ξ : ↥((D.toEmbeddedBlowupSequence A).strictTransform i),
+            IsGenericPoint ξ C
+              → ∀ E ∈ (principalizationOfEmbedding k Y pY D A).boundary i,
+                ((D.toEmbeddedBlowupSequence A).strictTransformι i).base ξ
+                  ∉ (E.support : Set ↥((principalizationOfEmbedding k Y pY D A).schemeAt i))
+  agreeNear_orderAt_eq_one
+    : ∀ (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u}) [AlgebraicGeometry.IsAffine Y]
+        [AlgebraicGeometry.IsReduced Y] (pY : Y ⟶ Spec (CommRingCat.of k))
+        [AlgebraicGeometry.LocallyOfFiniteType pY] [AlgebraicGeometry.QuasiCompact pY]
+        (D : EmbeddingDatum k Y pY) (i : ℕ),
+      i ≤ (D.toEmbeddedBlowupSequence A).length
+        → ∀ C ∈ irreducibleComponents ↥((D.toEmbeddedBlowupSequence A).strictTransform i),
+          ∀ ξ : ↥((D.toEmbeddedBlowupSequence A).strictTransform i),
+            IsGenericPoint ξ C
+              → ∀ hC : IsClosed (⇑((D.toEmbeddedBlowupSequence A).strictTransformι i).base '' C),
+                AgreeNear ((principalizationOfEmbedding k Y pY D A).ideal i)
+                    (V ((D.toEmbeddedBlowupSequence A).schemeAt i)
+                      ⟨⇑((D.toEmbeddedBlowupSequence A).strictTransformι i).base '' C, hC⟩)
+                    (((D.toEmbeddedBlowupSequence A).strictTransformι i).base ξ)
+                  ∧ orderAt ((principalizationOfEmbedding k Y pY D A).ideal i)
+                      (((D.toEmbeddedBlowupSequence A).strictTransformι i).base ξ)
+                    = 1
 
 theorem disjoint_detachedComponent_of_principalizationCertificate
     {V : VanishingAssignment.{u}} (hV : IdealSheafGeometryHypotheses V)
-    {k : Type u} [Field k] [CharZero k] {Y : Scheme.{u}} [AlgebraicGeometry.IsAffine Y]
+    {k : Type u} [Field k] [CharZero k]
+    {Y : Scheme.{u}} [AlgebraicGeometry.IsAffine Y]
     {pY : Y ⟶ Spec (CommRingCat.of k)} [AlgebraicGeometry.LocallyOfFiniteType pY]
     (S : EmbeddedBlowupSequence k Y pY) (i : ℕ)
     [TopologicalSpace.NoetherianSpace ↥(S.strictTransform i)]
     (I : (S.schemeAt i).IdealSheafData) (Mem : Set ↥(S.schemeAt i))
     (hcl : Topology.IsClosedEmbedding ⇑(S.strictTransformι i).base)
-    (hmem : ∀ C ∈ irreducibleComponents ↥(S.strictTransform i),
-      ∀ ξ : ↥(S.strictTransform i), IsGenericPoint ξ C → ((S.strictTransformι i).base ξ) ∉ Mem)
-    (hagree : ∀ C ∈ irreducibleComponents ↥(S.strictTransform i),
-      ∀ ξ : ↥(S.strictTransform i), IsGenericPoint ξ C →
-      ∀ hC : IsClosed (⇑(S.strictTransformι i).base '' C),
-        AgreeNear I (V (S.schemeAt i) ⟨⇑(S.strictTransformι i).base '' C, hC⟩) ((S.strictTransformι i).base ξ) ∧
-          orderAt I ((S.strictTransformι i).base ξ) = 1)
+    (hmem : ∀ C ∈ irreducibleComponents ↥(S.strictTransform i), ∀ ξ : ↥(S.strictTransform i),
+      IsGenericPoint ξ C → ((S.strictTransformι i).base ξ) ∉ Mem)
+    (hagree : ∀ C ∈ irreducibleComponents ↥(S.strictTransform i), ∀ ξ : ↥(S.strictTransform i),
+      IsGenericPoint ξ C
+        → ∀ hC : IsClosed (⇑(S.strictTransformι i).base '' C),
+          AgreeNear I (V (S.schemeAt i) ⟨⇑(S.strictTransformι i).base '' C, hC⟩)
+              ((S.strictTransformι i).base ξ)
+            ∧ orderAt I ((S.strictTransformι i).base ξ) = 1)
     (hcert : ∃ q : S.schemeAt i ⟶ Spec (CommRingCat.of k),
       PrincipalizationCertificate (S.schemeAt i) q I 1 Mem (S.ambientCenter i))
-    {C₁ C₂ : Set ↥(S.strictTransform i)}
-    (h₁ : C₁ ∈ S.detachedComponents i)
-    (h₂ : C₂ ∈ irreducibleComponents ↥(S.strictTransform i))
-    (h₂' : C₂ ∉ S.detachedComponents i) :
-    Disjoint C₁ C₂ := by
+    {C₁ C₂ : Set ↥(S.strictTransform i)} (h₁ : C₁ ∈ S.detachedComponents i)
+    (h₂ : C₂ ∈ irreducibleComponents ↥(S.strictTransform i)) (h₂' : C₂ ∉ S.detachedComponents i)
+    : Disjoint C₁ C₂ := by
   obtain ⟨q, hq⟩ := hcert
   have hiso := orderOneCentersIsolated_of_principalizationCertificate (V := V) hV hq
   have hC₁comp := ((S.mem_detachedComponents i C₁).1 h₁).1
@@ -128,41 +138,61 @@ theorem disjoint_detachedComponent_of_principalizationCertificate
     isGenericPoint_image_of_isClosedEmbedding hcl hξ₂
   obtain ⟨hag1, hord1⟩ := hagree C₁ hC₁comp ξ₁ hξ₁ him1
   obtain ⟨hag2, hord2⟩ := hagree C₂ h₂ ξ₂ hξ₂ him2
-  have hnotcenter :
-      ((S.strictTransformι i).base ξ₂) ∉ ((S.ambientCenter i).support : Set ↥(S.schemeAt i)) := by
+  have hnotcenter
+      : ((S.strictTransformι i).base ξ₂) ∉ ((S.ambientCenter i).support : Set ↥(S.schemeAt i)) := by
     intro hmem2
     apply h₂'
     rw [S.mem_detachedComponents i C₂]
-    exact ⟨h₂, (hg2.mem_closed_set_iff
-      (hV.isClosed_support (S.schemeAt i) (S.ambientCenter i))).mp hmem2⟩
+    exact ⟨
+      h₂,
+      (hg2.mem_closed_set_iff (hV.isClosed_support (S.schemeAt i) (S.ambientCenter i))).mp hmem2
+    ⟩
   rw [Set.disjoint_left]
   intro x hx1 hx2
   exact hiso
-    ⟨⇑(S.strictTransformι i).base '' C₁, ⇑(S.strictTransformι i).base '' C₂,
-      (S.strictTransformι i).base ξ₁, (S.strictTransformι i).base ξ₂, (S.strictTransformι i).base x,
-      him1, him2, hirr1, hirr2, hg1, hg2, ⟨x, hx1, rfl⟩, ⟨x, hx2, rfl⟩⟩
+    ⟨
+      ⇑(S.strictTransformι i).base '' C₁,
+      ⇑(S.strictTransformι i).base '' C₂,
+      (S.strictTransformι i).base ξ₁,
+      (S.strictTransformι i).base ξ₂,
+      (S.strictTransformι i).base x,
+      him1,
+      him2,
+      hirr1,
+      hirr2,
+      hg1,
+      hg2,
+      ⟨x, hx1, rfl⟩,
+      ⟨x, hx2, rfl⟩
+    ⟩
     rfl hC₁sub hnotcenter (hmem C₁ hC₁comp ξ₁ hξ₁) (hmem C₂ h₂ ξ₂ hξ₂) hag1 hord1
     ((one_le_orderAt_iff_mem_support I ((S.strictTransformι i).base ξ₂)).1 (le_of_eq hord2.symm))
 
 theorem disjoint_detachedComponent_canonicalPrincipalization
     {V : VanishingAssignment.{u}} (hV : IdealSheafGeometryHypotheses V)
-    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u}) (hB : (canonicalAlgorithmRules hres).ReducesInductivelyOnDimension)
+    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u})
+    (hB : (canonicalAlgorithmRules hres).ReducesInductivelyOnDimension)
     (hrad : SmoothSubschemeIdealIsRadical.{u})
     (hind : ChartIsolationHypotheses V (canonicalPrincipalization hres hrad))
-    (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u})
-    [AlgebraicGeometry.IsAffine Y] [AlgebraicGeometry.IsReduced Y]
-    (pY : Y ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType pY]
-    [AlgebraicGeometry.QuasiCompact pY] (D : EmbeddingDatum k Y pY) (i : ℕ)
+    (k : Type u) [Field k] [CharZero k]
+    (Y : Scheme.{u}) [AlgebraicGeometry.IsAffine Y] [AlgebraicGeometry.IsReduced Y]
+    (pY : Y ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.LocallyOfFiniteType pY] [AlgebraicGeometry.QuasiCompact pY]
+    (D : EmbeddingDatum k Y pY) (i : ℕ)
     (hi : i < (D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)).length)
-    {C₁ C₂ : Set ↥((D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)).strictTransform i)}
-    (h₁ : C₁ ∈ (D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)).detachedComponents i)
+    {C₁ C₂
+      : Set ↥((D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)).strictTransform i)}
+    (h₁ : C₁
+      ∈ (D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)).detachedComponents i)
     (h₂ : C₂ ∈ irreducibleComponents
       ↥((D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)).strictTransform i))
-    (h₂' : C₂ ∉ (D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)).detachedComponents i) :
-    Disjoint C₁ C₂ := by
+    (h₂' : C₂
+      ∉ (D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)).detachedComponents i)
+    : Disjoint C₁ C₂ := by
   have := hind.noetherianSpace_alive k Y pY D i (le_of_lt hi)
-  have hspec := (PrincipalizationRules.isMaxOrderReduction_outputLevelData (canonicalAlgorithmRules hres) hB
-      (krullDimSucc D.ambient)).cert
+  have hspec :=
+    (PrincipalizationRules.isMaxOrderReduction_outputLevelData (canonicalAlgorithmRules hres) hB
+        (krullDimSucc D.ambient)).cert
       (markedTripleOrderOne k D.ambient D.ambientStruct (AlgebraicGeometry.Scheme.Hom.ker D.emb) [])
       (markedTripleOrderOne_isAdmissible k D.ambient D.ambientStruct
         (AlgebraicGeometry.Scheme.Hom.ker D.emb) D.nonzeroOnComponents_ker [] D.sncEmpty)
@@ -182,27 +212,31 @@ theorem disjoint_detachedComponent_canonicalPrincipalization
 
 theorem detachedLocusIsOpen_toEmbeddedBlowupSequence
     {V : VanishingAssignment.{u}} (hV : IdealSheafGeometryHypotheses V)
-    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u}) (hB : (canonicalAlgorithmRules hres).ReducesInductivelyOnDimension)
+    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u})
+    (hB : (canonicalAlgorithmRules hres).ReducesInductivelyOnDimension)
     (hrad : SmoothSubschemeIdealIsRadical.{u})
     (hind : ChartIsolationHypotheses V (canonicalPrincipalization hres hrad))
-    (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u})
-    [AlgebraicGeometry.IsAffine Y] [AlgebraicGeometry.IsReduced Y]
-    (pY : Y ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType pY]
-    [AlgebraicGeometry.QuasiCompact pY] (D : EmbeddingDatum k Y pY) :
-    EmbeddedBlowupSequence.DetachedLocusIsOpen (D.toEmbeddedBlowupSequence (canonicalPrincipalization hres hrad)) := by
+    (k : Type u) [Field k] [CharZero k]
+    (Y : Scheme.{u}) [AlgebraicGeometry.IsAffine Y] [AlgebraicGeometry.IsReduced Y]
+    (pY : Y ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.LocallyOfFiniteType pY] [AlgebraicGeometry.QuasiCompact pY]
+    (D : EmbeddingDatum k Y pY)
+    : EmbeddedBlowupSequence.DetachedLocusIsOpen (D.toEmbeddedBlowupSequence
+      (canonicalPrincipalization hres hrad)) := by
   intro i hi
   have := hind.noetherianSpace_alive k Y pY D i (le_of_lt hi)
   rw [EmbeddedBlowupSequence.detachedLocus_eq_sUnion]
-  exact isOpen_sUnion_of_irreducibleComponents _
-    (fun C₁ hC₁ C₂ hC₂ hC₂' =>
-      disjoint_detachedComponent_canonicalPrincipalization hV hres hB hrad hind k Y pY D i hi hC₁ hC₂ hC₂')
+  exact isOpen_sUnion_of_irreducibleComponents _ (fun C₁ hC₁ C₂ hC₂ hC₂' =>
+    disjoint_detachedComponent_canonicalPrincipalization hV hres hB hrad hind k Y pY D i hi hC₁ hC₂
+      hC₂')
 
 theorem detachedLocusIsOpenForEmbeddings_canonicalPrincipalization
     {V : VanishingAssignment.{u}} (hV : IdealSheafGeometryHypotheses V)
-    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u}) (hB : (canonicalAlgorithmRules hres).ReducesInductivelyOnDimension)
+    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u})
+    (hB : (canonicalAlgorithmRules hres).ReducesInductivelyOnDimension)
     (hrad : SmoothSubschemeIdealIsRadical.{u})
-    (hind : ChartIsolationHypotheses V (canonicalPrincipalization hres hrad)) :
-    DetachedLocusIsOpenForEmbeddings (canonicalPrincipalization hres hrad) := by
+    (hind : ChartIsolationHypotheses V (canonicalPrincipalization hres hrad))
+    : DetachedLocusIsOpenForEmbeddings (canonicalPrincipalization hres hrad) := by
   intro k _ _ Y pY _ _ _ _ D
   exact detachedLocusIsOpen_toEmbeddedBlowupSequence hV hres hB hrad hind k Y pY D
 

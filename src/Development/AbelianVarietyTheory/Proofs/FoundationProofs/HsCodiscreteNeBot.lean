@@ -15,22 +15,34 @@ namespace GlobalTheory.KZ.BettiB
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 
-def BtN (X : Tower Ω ε) (N l : ℕ) [Fact l.Prime] (n : ℕ) (b : X.Fn l)
-    (c : Gam N l → MvPolynomial (Fin 2) (ZMod (l ^ n))) : Prop :=
-  ∀ u : Fin 2 → ℤ_[l], ∃ χ : SL(2, ℤ) → ZMod (l ^ n), H3.Kum X l n (b u) χ ∧ ∃ M : ℕ, 0 < M ∧
-    ∀ δ : Gam N l, (δ : SL(2, ℤ)) ∈ CongruenceSubgroup.Gamma M →
-      MvPolynomial.eval (fun i => PadicInt.toZModPow n (u i)) (c δ) = χ δ
+def BtN
+    (X : Tower Ω ε)
+    (N l : ℕ) [Fact l.Prime]
+    (n : ℕ)
+    (b : X.Fn l) (c : Gam N l → MvPolynomial (Fin 2) (ZMod (l ^ n)))
+    : Prop :=
+  ∀ u : Fin 2 → ℤ_[l], ∃ χ : SL(2, ℤ) → ZMod (l ^ n),
+    H3.Kum X l n (b u) χ
+      ∧ ∃ M : ℕ,
+        0 < M
+          ∧ ∀ δ : Gam N l,
+            (δ : SL(2, ℤ)) ∈ CongruenceSubgroup.Gamma M
+              → MvPolynomial.eval (fun i => PadicInt.toZModPow n (u i)) (c δ) = χ δ
 
-def BtZ (X : Tower Ω ε) (N l : ℕ) [Fact l.Prime] (b : X.Fn l) (c : Gam N l → MvPolynomial (Fin 2) ℤ_[l]) : Prop :=
+def BtZ
+    (X : Tower Ω ε) (N l : ℕ) [Fact l.Prime] (b : X.Fn l) (c : Gam N l → MvPolynomial (Fin 2) ℤ_[l])
+    : Prop :=
   ∀ n : ℕ, BtN X N l n b (fun δ => MvPolynomial.map (PadicInt.toZModPow n) (c δ))
 
 def Z1 (N l w : ℕ) [Fact l.Prime] : Submodule ℤ_[l] (Gam N l → MvPolynomial (Fin 2) ℤ_[l]) where
-  carrier := {c | (∀ γ, (c γ).IsHomogeneous w) ∧
-    ∀ γ δ : Gam N l, c (γ * δ) = slP ((δ : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ) (c γ) + c δ}
+  carrier :=
+    {c | (∀ γ, (c γ).IsHomogeneous w) ∧
+      ∀ γ δ : Gam N l, c (γ * δ) = slP ((δ : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ) (c γ) + c δ}
   add_mem' := by
     rintro c c' ⟨h1, h2⟩ ⟨h1', h2'⟩
     refine ⟨fun γ => (h1 γ).add (h1' γ), fun γ δ => ?_⟩
-    simp only [Pi.add_apply, h2, h2', map_add (f := _)]; abel
+    simp only [Pi.add_apply, h2, h2', map_add (f := _)]
+    abel
   zero_mem' := ⟨fun γ => MvPolynomial.isHomogeneous_zero _ _ _, fun γ δ => by simp⟩
   smul_mem' := by
     rintro r c ⟨h1, h2⟩

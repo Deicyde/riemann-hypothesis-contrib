@@ -19,15 +19,15 @@ section GD
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 
-theorem flat_mvPolynomial_rat_complex :
-    Module.Flat (MvPolynomial σ ℚ) (MvPolynomial σ ℂ) :=
+theorem flat_mvPolynomial_rat_complex : Module.Flat (MvPolynomial σ ℚ) (MvPolynomial σ ℂ) :=
   Module.Flat.isBaseChange ℚ (MvPolynomial σ ℚ) ℂ (MvPolynomial σ ℂ)
     (Algebra.IsPushout.out (R := ℚ) (S := MvPolynomial σ ℚ) (R' := ℂ) (S' := MvPolynomial σ ℂ))
 
-theorem comap_of_mem_minimalPrimes_map (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
+theorem comap_of_mem_minimalPrimes_map
+    (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
     (Q : Ideal (MvPolynomial σ ℂ))
-    (hQ : Q ∈ (Ideal.map (MvPolynomial.map (algebraMap ℚ ℂ)) 𝔭).minimalPrimes) :
-    Q.comap (MvPolynomial.map (algebraMap ℚ ℂ)) = 𝔭 := by
+    (hQ : Q ∈ (Ideal.map (MvPolynomial.map (algebraMap ℚ ℂ)) 𝔭).minimalPrimes)
+    : Q.comap (MvPolynomial.map (algebraMap ℚ ℂ)) = 𝔭 := by
   have := flat_mvPolynomial_rat_complex (σ := σ)
   have hQp : Q.IsPrime := hQ.1.1
   have hle : Ideal.map (algebraMap (MvPolynomial σ ℚ) (MvPolynomial σ ℂ)) 𝔭 ≤ Q := hQ.1.2
@@ -44,16 +44,20 @@ theorem comap_of_mem_minimalPrimes_map (𝔭 : Ideal (MvPolynomial σ ℚ)) [�
   subst hPQe
   exact hPl.over.symm
 
-theorem height_eq_of_mem_minimalPrimes_map (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
+theorem height_eq_of_mem_minimalPrimes_map
+    (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
     (Q : Ideal (MvPolynomial σ ℂ))
-    (hQ : Q ∈ (Ideal.map (MvPolynomial.map (algebraMap ℚ ℂ)) 𝔭).minimalPrimes) :
-    Q.height = 𝔭.height := by
+    (hQ : Q ∈ (Ideal.map (MvPolynomial.map (algebraMap ℚ ℂ)) 𝔭).minimalPrimes)
+    : Q.height = 𝔭.height := by
   have := flat_mvPolynomial_rat_complex (σ := σ)
   have : Q.IsPrime := hQ.1.1
   have hc := comap_of_mem_minimalPrimes_map 𝔭 Q hQ
   have : Q.LiesOver 𝔭 := ⟨hc.symm⟩
   rw [Ideal.height_eq_height_add_of_liesOver_of_hasGoingDown 𝔭 Q]
-  have h0 : (Q.map (Ideal.Quotient.mk (𝔭.map (algebraMap (MvPolynomial σ ℚ) (MvPolynomial σ ℂ))))).height = 0 := by
+  have h0
+      : (Q.map (Ideal.Quotient.mk (𝔭.map (algebraMap (MvPolynomial σ ℚ)
+          (MvPolynomial σ ℂ))))).height
+        = 0 := by
     have hQ' : Q ∈ (𝔭.map (algebraMap (MvPolynomial σ ℚ) (MvPolynomial σ ℂ))).minimalPrimes := hQ
     rw [Ideal.minimalPrimes_eq_comap] at hQ'
     obtain ⟨Q', hQ'm, hQ'e⟩ := hQ'
@@ -64,19 +68,21 @@ theorem height_eq_of_mem_minimalPrimes_map (𝔭 : Ideal (MvPolynomial σ ℚ)) 
 
 end GD
 
-theorem height_add_ringKrullDim_quotient_fintype (k : Type) [Field k]
-    (P : Ideal (MvPolynomial σ k)) [P.IsPrime] :
-    (P.height : WithBot ℕ∞) + ringKrullDim (MvPolynomial σ k ⧸ P) = Fintype.card σ := by
+theorem height_add_ringKrullDim_quotient_fintype
+    (k : Type) [Field k] (P : Ideal (MvPolynomial σ k)) [P.IsPrime]
+    : (P.height : WithBot ℕ∞) + ringKrullDim (MvPolynomial σ k ⧸ P) = Fintype.card σ := by
   let e : MvPolynomial σ k ≃+* MvPolynomial (Fin (Fintype.card σ)) k :=
     (MvPolynomial.renameEquiv k (Fintype.equivFin σ)).toRingEquiv
   have : (P.map e).IsPrime := Ideal.map_isPrime_of_equiv e
   have h := ReciprocityTheory.CA.height_add_ringKrullDim_quotient_mvPolynomial_field k _ (P.map e)
-  rw [RingEquiv.height_map,
-    ← ringKrullDim_eq_of_ringEquiv (Ideal.quotientEquiv P (P.map e) e rfl)] at h
+  rw [RingEquiv.height_map, ← ringKrullDim_eq_of_ringEquiv (Ideal.quotientEquiv P (P.map e) e rfl)]
+    at h
   exact h
 
-theorem withBot_enat_cancel {h : ℕ∞} {a b : WithBot ℕ∞} {N : ℕ}
-    (ha : (h : WithBot ℕ∞) + a = N) (hb : (h : WithBot ℕ∞) + b = N) : a = b := by
+theorem withBot_enat_cancel
+    {h : ℕ∞} {a b : WithBot ℕ∞} {N : ℕ}
+    (ha : (h : WithBot ℕ∞) + a = N) (hb : (h : WithBot ℕ∞) + b = N)
+    : a = b := by
   induction a using WithBot.recBotCoe with
   | bot => simp at ha
   | coe a =>
@@ -90,10 +96,11 @@ theorem withBot_enat_cancel {h : ℕ∞} {a b : WithBot ℕ∞} {N : ℕ}
       | top => simp at ha'
       | coe h => exact WithTop.add_left_cancel (ENat.coe_ne_top h) (ha'.trans hb'.symm)
 
-theorem ringKrullDim_of_mem_minimalPrimes_map (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
+theorem ringKrullDim_of_mem_minimalPrimes_map
+    (𝔭 : Ideal (MvPolynomial σ ℚ)) [𝔭.IsPrime]
     (Q : Ideal (MvPolynomial σ ℂ))
-    (hQ : Q ∈ (Ideal.map (MvPolynomial.map (algebraMap ℚ ℂ)) 𝔭).minimalPrimes) :
-    ringKrullDim (MvPolynomial σ ℂ ⧸ Q) = ringKrullDim (MvPolynomial σ ℚ ⧸ 𝔭) := by
+    (hQ : Q ∈ (Ideal.map (MvPolynomial.map (algebraMap ℚ ℂ)) 𝔭).minimalPrimes)
+    : ringKrullDim (MvPolynomial σ ℂ ⧸ Q) = ringKrullDim (MvPolynomial σ ℚ ⧸ 𝔭) := by
   have : Q.IsPrime := hQ.1.1
   have h1 := height_add_ringKrullDim_quotient_fintype ℂ Q
   have h2 := height_add_ringKrullDim_quotient_fintype ℚ 𝔭

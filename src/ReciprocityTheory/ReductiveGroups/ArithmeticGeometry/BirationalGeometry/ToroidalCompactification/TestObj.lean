@@ -8,7 +8,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.Geo.Tor.Test
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
 open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct
 
@@ -29,18 +30,29 @@ def zeroDatum (H : Host E) : Datum H where
   proj := inferInstance
   EF := 0
   alt _ := rfl
-  unimod := ⟨fun _ _ _ => Subsingleton.elim _ _, fun f => ⟨PUnit.unit, LinearMap.ext fun x => by
-    have : x = 0 := Subsingleton.elim _ _
-    subst this
-    exact (map_zero f).symm⟩⟩
+  unimod := ⟨
+    fun _ _ _ => Subsingleton.elim _ _,
+    fun f => ⟨
+      PUnit.unit,
+      LinearMap.ext fun x => by
+        have : x = 0 := Subsingleton.elim _ _
+        subst this
+        exact (map_zero f).symm
+    ⟩
+  ⟩
   adj _ _ _ := rfl
   p := 0
   q := 0
   rank := Module.finrank_zero_of_subsingleton
-  dom := ⟨0, fun _ => Subsingleton.elim _ _, fun _ _ => by simp, fun x hx => absurd (Subsingleton.elim x 0) hx,
+  dom := ⟨
+    0,
+    fun _ => Subsingleton.elim _ _,
+    fun _ _ => by simp,
+    fun x hx => absurd (Subsingleton.elim x 0) hx,
     fun a A t _ ht => by
       have hA : A = 0 := LinearMap.ext fun _ => Subsingleton.elim _ _
       subst hA
-      simp [ht]⟩
+      simp [ht]
+  ⟩
 
 end ReciprocityTheory.ChartRestriction.G.Geo.Tor.Test

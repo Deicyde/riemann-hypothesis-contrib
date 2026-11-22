@@ -13,9 +13,9 @@ open scoped ComplexConjugate nonZeroDivisors
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem norm_mul_discr_ge {x : E} (hx : x ≠ 0)
-    (htr : ∀ β : 𝓞 E, ∃ m : ℤ, Algebra.trace ℚ E (x * β) = m) :
-    1 ≤ |Algebra.norm ℚ x| * |(NumberField.discr E : ℚ)| := by
+theorem norm_mul_discr_ge
+    {x : E} (hx : x ≠ 0) (htr : ∀ β : 𝓞 E, ∃ m : ℤ, Algebra.trace ℚ E (x * β) = m)
+    : 1 ≤ |Algebra.norm ℚ x| * |(NumberField.discr E : ℚ)| := by
   classical
   have h10 : (1 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by
     rw [← FractionalIdeal.coeIdeal_top, Ne, FractionalIdeal.coeIdeal_eq_zero]
@@ -33,19 +33,22 @@ theorem norm_mul_discr_ge {x : E} (hx : x ≠ 0)
   have hsp : FractionalIdeal.spanSingleton (𝓞 E)⁰ x ≤ FractionalIdeal.dual ℤ ℚ 1 :=
     FractionalIdeal.spanSingleton_le_iff_mem.mpr hmem
   have hdiff := coeIdeal_differentIdeal ℤ ℚ E (𝓞 E)
-  have hJ : FractionalIdeal.spanSingleton (𝓞 E)⁰ x *
-      (differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E) ≤ 1 := by
+  have hJ
+      : FractionalIdeal.spanSingleton (𝓞 E)⁰ x * (differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)
+        ≤ 1 := by
     rw [hdiff]
-    calc _ ≤ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E) *
-          (FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E))⁻¹ := by
-            first
-            | exact mul_le_mul' hsp le_rfl
-            | exact mul_right_mono hsp
-            | exact FractionalIdeal.mul_right_mono _ hsp
+    calc
+      _ ≤ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E)
+          * (FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E))⁻¹ := by
+        first
+        | exact mul_le_mul' hsp le_rfl
+        | exact mul_right_mono hsp
+        | exact FractionalIdeal.mul_right_mono _ hsp
       _ = 1 := mul_inv_cancel₀ hD0
   obtain ⟨I, hI⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.mp hJ
-  have hJ0 : FractionalIdeal.spanSingleton (𝓞 E)⁰ x *
-      (differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by
+  have hJ0
+      : FractionalIdeal.spanSingleton (𝓞 E)⁰ x * (differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)
+        ≠ 0 := by
     refine mul_ne_zero (FractionalIdeal.spanSingleton_ne_zero_iff.mpr hx) ?_
     rw [hdiff]
     exact inv_ne_zero hD0
@@ -56,7 +59,8 @@ theorem norm_mul_discr_ge {x : E} (hx : x ≠ 0)
     simp
   have hnorm := congrArg FractionalIdeal.absNorm hI
   rw [FractionalIdeal.coeIdeal_absNorm, map_mul, FractionalIdeal.absNorm_span_singleton,
-    FractionalIdeal.coeIdeal_absNorm, NumberField.absNorm_differentIdeal E (𝓞 E)] at hnorm
+      FractionalIdeal.coeIdeal_absNorm, NumberField.absNorm_differentIdeal E (𝓞 E)]
+    at hnorm
   have h1 : (1 : ℚ) ≤ (Ideal.absNorm I : ℚ) := by
     exact_mod_cast Nat.one_le_iff_ne_zero.mpr (fun h => hI0 (Ideal.absNorm_eq_zero_iff.mp h))
   rw [hnorm] at h1
@@ -67,8 +71,8 @@ theorem norm_mul_discr_ge {x : E} (hx : x ≠ 0)
   rw [h2] at h1
   exact h1
 
-theorem abs_norm_eq_pow {x : E} {a : ℝ} (h : ∀ σ : E →+* ℂ, ‖σ x‖ = a) :
-    |((Algebra.norm ℚ x : ℚ) : ℝ)| = a ^ finrank ℚ E := by
+theorem abs_norm_eq_pow {x : E} {a : ℝ} (h : ∀ σ : E →+* ℂ, ‖σ x‖ = a)
+    : |((Algebra.norm ℚ x : ℚ) : ℝ)| = a ^ finrank ℚ E := by
   have h1 := Algebra.norm_eq_prod_embeddings ℚ ℂ x
   have h2 : ‖algebraMap ℚ ℂ (Algebra.norm ℚ x)‖ = a ^ finrank ℚ E := by
     rw [h1, norm_prod, Finset.prod_congr rfl (fun σ _ => h σ.toRingHom), Finset.prod_const,
@@ -150,21 +154,22 @@ theorem exists_herm_ne (hr : 0 < r) : ∃ x ∈ X.L', ∃ y ∈ X.L', herm X.Gm 
   haveI : Nonempty (Fin r) := ⟨⟨0, hr⟩⟩
   exact X.Gm_det (by rw [hG]; exact Matrix.det_zero)
 
-private theorem herm_smul_left_eq_mul (G : Matrix (Fin r) (Fin r) E) (c : E) (x y : Fin r → E) :
-    herm G (c • x) y = c * herm G x y := by
+private theorem herm_smul_left_eq_mul (G : Matrix (Fin r) (Fin r) E) (c : E) (x y : Fin r → E)
+    : herm G (c • x) y = c * herm G x y := by
   simp only [herm, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
 
-private theorem herm_smul_right_fundamental_domains (G : Matrix (Fin r) (Fin r) E) (c : E) (x y : Fin r → E) :
-    herm G x (c • y) = cc c * herm G x y := by
+private theorem herm_smul_right_fundamental_domains
+    (G : Matrix (Fin r) (Fin r) E) (c : E) (x y : Fin r → E)
+    : herm G x (c • y) = cc c * herm G x y := by
   have hcc_mul : ∀ a b : E, cc (a * b) = cc a * cc b := fun a b => by
     unfold cc
     exact map_mul _ a b
   simp only [herm, Pi.smul_apply, smul_eq_mul, hcc_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
 
-theorem trace_int (hr : 0 < r) (c : 𝓞 E) :
-    ∃ m : ℤ, Algebra.trace ℚ E ((X.NC : E) ^ 2 * X.ξ0 * c) = m := by
+theorem trace_int (hr : 0 < r) (c : 𝓞 E)
+    : ∃ m : ℤ, Algebra.trace ℚ E ((X.NC : E) ^ 2 * X.ξ0 * c) = m := by
   classical
   set gens : Set (𝓞 E) := {c | ∃ x ∈ X.L', ∃ y ∈ X.L', (c : E) = herm X.Gm x y} with hgens
   set J : Ideal (𝓞 E) := Ideal.span gens with hJdef
@@ -182,8 +187,8 @@ theorem trace_int (hr : 0 < r) (c : 𝓞 E) :
   have hJf0 : (J : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by
     rw [Ne, FractionalIdeal.coeIdeal_eq_zero]
     exact hJ0
-  have hmemJf : ∀ c ∈ J, ((c : 𝓞 E) : E) ∈ (J : FractionalIdeal (𝓞 E)⁰ E) :=
-    fun c hc => (FractionalIdeal.mem_coeIdeal _).mpr ⟨c, hc, rfl⟩
+  have hmemJf : ∀ c ∈ J, ((c : 𝓞 E) : E) ∈ (J : FractionalIdeal (𝓞 E)⁰ E) := fun c hc =>
+    (FractionalIdeal.mem_coeIdeal _).mpr ⟨c, hc, rfl⟩
   have hinv : ∀ t ∈ (J : FractionalIdeal (𝓞 E)⁰ E)⁻¹, ∀ x ∈ X.L', t • x ∈ X.L' := by
     intro t ht x hx
     apply X.L'_dual
@@ -194,8 +199,9 @@ theorem trace_int (hr : 0 < r) (c : 𝓞 E) :
     obtain ⟨d, hd⟩ := (FractionalIdeal.mem_one_iff _).mp h1
     rw [← hce, ← hd]
     exact RingOfIntegers.isIntegral_coe d
-  have hmul : ∀ t ∈ (J : FractionalIdeal (𝓞 E)⁰ E)⁻¹, ∀ c ∈ J,
-      t * (c : E) ∈ (J : FractionalIdeal (𝓞 E)⁰ E) := by
+  have hmul
+      : ∀ t ∈ (J : FractionalIdeal (𝓞 E)⁰ E)⁻¹, ∀ c ∈ J,
+        t * (c : E) ∈ (J : FractionalIdeal (𝓞 E)⁰ E) := by
     intro t ht c hc
     induction hc using Submodule.span_induction with
     | mem c hc =>
@@ -215,10 +221,12 @@ theorem trace_int (hr : 0 < r) (c : 𝓞 E) :
       push_cast
       rw [mul_left_comm, ← Algebra.smul_def]
       exact Submodule.smul_mem _ a h
-  have hle : (J : FractionalIdeal (𝓞 E)⁰ E)⁻¹ * (J : FractionalIdeal (𝓞 E)⁰ E) ≤
-      (J : FractionalIdeal (𝓞 E)⁰ E) := FractionalIdeal.mul_le.mpr fun t ht j hj => by
-    obtain ⟨c, hc, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).mp hj
-    exact hmul t ht c hc
+  have hle
+      : (J : FractionalIdeal (𝓞 E)⁰ E)⁻¹ * (J : FractionalIdeal (𝓞 E)⁰ E)
+        ≤ (J : FractionalIdeal (𝓞 E)⁰ E) :=
+    FractionalIdeal.mul_le.mpr fun t ht j hj => by
+      obtain ⟨c, hc, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).mp hj
+      exact hmul t ht c hc
   rw [inv_mul_cancel₀ hJf0] at hle
   have hJtop : J = ⊤ := by
     rw [eq_top_iff]
@@ -227,8 +235,9 @@ theorem trace_int (hr : 0 < r) (c : 𝓞 E) :
   have hccNC : cc (X.NC : E) = X.NC := by
     unfold cc
     exact map_natCast _ _
-  have hP : ∀ c ∈ J, ∀ a : 𝓞 E, ∃ m : ℤ,
-      Algebra.trace ℚ E ((X.NC : E) ^ 2 * X.ξ0 * ((a : E) * (c : E))) = m := by
+  have hP
+      : ∀ c ∈ J, ∀ a : 𝓞 E, ∃ m : ℤ,
+        Algebra.trace ℚ E ((X.NC : E) ^ 2 * X.ξ0 * ((a : E) * (c : E))) = m := by
     intro c hc
     induction hc using Submodule.span_induction with
     | mem c hc =>
@@ -240,9 +249,11 @@ theorem trace_int (hr : 0 < r) (c : 𝓞 E) :
       obtain ⟨k, hk⟩ := X.EF_int _ (X.NC_sub _ hax) _ (X.NC_sub _ hy)
       refine ⟨-k, ?_⟩
       unfold EFf at hk
-      rw [herm_smul_left_eq_mul, herm_smul_right_fundamental_domains, herm_smul_left_eq_mul, hccNC] at hk
-      have h2 : (X.NC : E) ^ 2 * X.ξ0 * ((a : E) * (c : E)) =
-          -(-X.ξ0 * ((X.NC : E) * ((X.NC : E) * ((a : E) * herm X.Gm x y)))) := by
+      rw [herm_smul_left_eq_mul, herm_smul_right_fundamental_domains, herm_smul_left_eq_mul, hccNC]
+        at hk
+      have h2
+          : (X.NC : E) ^ 2 * X.ξ0 * ((a : E) * (c : E))
+            = -(-X.ξ0 * ((X.NC : E) * ((X.NC : E) * ((a : E) * herm X.Gm x y)))) := by
         rw [hce]
         ring
       rw [h2, map_neg, hk]
@@ -276,9 +287,10 @@ theorem two_le_normSq_mul_rootDisc (hr : 0 < r) : 2 ≤ (X.NC : ℝ) ^ 2 * X.k0 
   have hNC : (0 : ℝ) < X.NC := Nat.cast_pos.mpr X.NC_pos
   have hx0 : ((X.NC : E) ^ 2 * X.ξ0) ≠ 0 :=
     mul_ne_zero (pow_ne_zero _ (Nat.cast_ne_zero.mpr X.NC_pos.ne')) X.ξ0_ne
-  have h1 := norm_mul_discr_ge hx0 (fun β => by
-    obtain ⟨m, hm⟩ := trace_int X hr β
-    exact ⟨m, hm⟩)
+  have h1 :=
+    norm_mul_discr_ge hx0 (fun β => by
+      obtain ⟨m, hm⟩ := trace_int X hr β
+      exact ⟨m, hm⟩)
   have habs : ∀ σ : E →+* ℂ, ‖σ ((X.NC : E) ^ 2 * X.ξ0)‖ = (X.NC : ℝ) ^ 2 * (X.k0 / 2) := by
     intro σ
     rw [map_mul, map_pow, map_natCast, norm_mul, norm_pow, Complex.norm_natCast]
@@ -294,8 +306,9 @@ theorem two_le_normSq_mul_rootDisc (hr : 0 < r) : 2 ≤ (X.NC : ℝ) ^ 2 * X.k0 
   have h2 := abs_norm_eq_pow habs
   have h3 : (1 : ℝ) ≤ |((Algebra.norm ℚ ((X.NC : E) ^ 2 * X.ξ0) : ℚ) : ℝ)| * dE E := by
     unfold dE
-    have h1' : ((1 : ℚ) : ℝ) ≤
-        ((|Algebra.norm ℚ ((X.NC : E) ^ 2 * X.ξ0)| * |(NumberField.discr E : ℚ)| : ℚ) : ℝ) := by
+    have h1'
+        : ((1 : ℚ) : ℝ)
+          ≤ ((|Algebra.norm ℚ ((X.NC : E) ^ 2 * X.ξ0)| * |(NumberField.discr E : ℚ)| : ℚ) : ℝ) := by
       exact_mod_cast h1
     push_cast at h1'
     exact h1'
@@ -307,7 +320,8 @@ theorem two_le_normSq_mul_rootDisc (hr : 0 < r) : 2 ≤ (X.NC : ℝ) ^ 2 * X.k0 
   have h4 : 1 ≤ (((X.NC : ℝ) ^ 2 * (X.k0 / 2)) ^ n * dE E) ^ (1 / (n : ℝ)) :=
     Real.one_le_rpow h3 (by positivity)
   rw [Real.mul_rpow (by positivity) hd, ← Real.rpow_natCast, ← Real.rpow_mul ha.le,
-    mul_one_div_cancel (by positivity), Real.rpow_one] at h4
+      mul_one_div_cancel (by positivity), Real.rpow_one]
+    at h4
   unfold rdE
   rw [← hn_def]
   nlinarith [h4]

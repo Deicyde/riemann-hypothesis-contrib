@@ -7,7 +7,9 @@ public import GroundTheory.AutomorphicForms.StrongApproximationSLDense
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct Classical
 
 noncomputable section
@@ -16,39 +18,41 @@ namespace GlobalTheory.EvAdm.CosetSum
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem finAdele_algebraMap_apply (x : F) (v : HeightOneSpectrum (𝓞 F)) :
-    (algebraMap F (FiniteAdeleRing (𝓞 F) F) x) v = algebraMap F (v.adicCompletion F) x := rfl
+theorem finAdele_algebraMap_apply (x : F) (v : HeightOneSpectrum (𝓞 F))
+    : (algebraMap F (FiniteAdeleRing (𝓞 F) F) x) v = algebraMap F (v.adicCompletion F) x :=
+  rfl
 
-theorem algebraMap_mem_iff (v : HeightOneSpectrum (𝓞 F)) (x : F) :
-    algebraMap F (v.adicCompletion F) x ∈ v.adicCompletionIntegers F ↔ v.valuation F x ≤ 1 := by
+theorem algebraMap_mem_iff (v : HeightOneSpectrum (𝓞 F)) (x : F)
+    : algebraMap F (v.adicCompletion F) x ∈ v.adicCompletionIntegers F ↔ v.valuation F x ≤ 1 := by
   rw [HeightOneSpectrum.mem_adicCompletionIntegers]
   exact iff_of_eq (congrArg (· ≤ 1) (HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x))
 
-theorem int_mem (v : HeightOneSpectrum (𝓞 F)) (x : 𝓞 F) :
-    algebraMap F (v.adicCompletion F) (x : F) ∈ v.adicCompletionIntegers F := by
+theorem int_mem (v : HeightOneSpectrum (𝓞 F)) (x : 𝓞 F)
+    : algebraMap F (v.adicCompletion F) (x : F) ∈ v.adicCompletionIntegers F := by
   rw [algebraMap_mem_iff]
   exact v.valuation_le_one x
 
 variable {κ : Type}
 
-theorem mul_int_mem {b : F} (hb : b ≠ 0) (x : κ → 𝓞 F) :
-    (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (b * (x i : F))) ∈ scaledInt F κ b := by
+theorem mul_int_mem {b : F} (hb : b ≠ 0) (x : κ → 𝓞 F)
+    : (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (b * (x i : F))) ∈ scaledInt F κ b := by
   rw [mem_scaledInt]
   intro i v
   rw [finAdele_algebraMap_apply, map_mul, ← mul_assoc,
     inv_mul_cancel₀ ((map_ne_zero (algebraMap F (v.adicCompletion F))).2 hb), one_mul]
   exact int_mem v (x i)
 
-theorem scaledInt_mul_le {a : F} (ha : a ≠ 0) {m : 𝓞 F} (hm : m ≠ 0) :
-    scaledInt F κ (a * m) ≤ scaledInt F κ a := by
+theorem scaledInt_mul_le {a : F} (ha : a ≠ 0) {m : 𝓞 F} (hm : m ≠ 0)
+    : scaledInt F κ (a * m) ≤ scaledInt F κ a := by
   intro z hz
   rw [mem_scaledInt] at hz ⊢
   intro i v
   have hm' : algebraMap F (v.adicCompletion F) (m : F) ≠ 0 :=
     (map_ne_zero _).2 (by exact_mod_cast hm)
-  have e : (algebraMap F (v.adicCompletion F) a)⁻¹ * (z i) v =
-      algebraMap F (v.adicCompletion F) (m : F) *
-        ((algebraMap F (v.adicCompletion F) (a * m))⁻¹ * (z i) v) := by
+  have e
+      : (algebraMap F (v.adicCompletion F) a)⁻¹ * (z i) v
+        = algebraMap F (v.adicCompletion F) (m : F)
+          * ((algebraMap F (v.adicCompletion F) (a * m))⁻¹ * (z i) v) := by
     set A := algebraMap F (v.adicCompletion F) a
     set M := algebraMap F (v.adicCompletion F) (m : F)
     rw [map_mul, mul_inv, ← mul_assoc, ← mul_assoc, mul_comm M A⁻¹, mul_assoc A⁻¹ M M⁻¹,
@@ -56,9 +60,11 @@ theorem scaledInt_mul_le {a : F} (ha : a ≠ 0) {m : 𝓞 F} (hm : m ≠ 0) :
   rw [e]
   exact mul_mem (int_mem v m) (hz i v)
 
-theorem rat_mem {b : F} (hb : b ≠ 0) (ξ : κ → F)
-    (h : (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ scaledInt F κ b) (i : κ) :
-    ∃ x : 𝓞 F, (x : F) = ξ i / b := by
+theorem rat_mem
+    {b : F} (hb : b ≠ 0)
+    (ξ : κ → F) (h : (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ scaledInt F κ b)
+    (i : κ)
+    : ∃ x : 𝓞 F, (x : F) = ξ i / b := by
   rw [mem_scaledInt] at h
   have hv : ∀ v : HeightOneSpectrum (𝓞 F), v.valuation F (ξ i / b) ≤ 1 := fun v => by
     rw [← algebraMap_mem_iff, div_eq_inv_mul, map_mul, map_inv₀]
@@ -66,19 +72,24 @@ theorem rat_mem {b : F} (hb : b ≠ 0) (ξ : κ → F)
   obtain ⟨x, hx⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one F (ξ i / b) hv
   exact ⟨x, hx⟩
 
-theorem indicator_scaledInt_eq_sum : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (a : F), a ≠ 0 →
-    ∀ m : 𝓞 F, m ≠ 0 →
-    ∃ R : Finset (κ → F), (GlobalTheory.EvAdm.scaledInt F κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)).indicator (fun _ => (1 : ℂ)) =
-      ∑ ξ ∈ R, {y | y - (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ GlobalTheory.EvAdm.scaledInt F κ (a * m)}.indicator
-        (fun _ => (1 : ℂ)) := by
+theorem indicator_scaledInt_eq_sum
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (a : F),
+      a ≠ 0
+        → ∀ m : 𝓞 F,
+          m ≠ 0
+            → ∃ R : Finset (κ → F),
+              (GlobalTheory.EvAdm.scaledInt F κ a : Set (κ → FiniteAdeleRing (𝓞 F) F)).indicator
+                  (fun _ => (1 : ℂ))
+                = ∑ ξ ∈ R, {y | y - (fun i => algebraMap F (FiniteAdeleRing (𝓞 F) F) (ξ i)) ∈ GlobalTheory.EvAdm.scaledInt F κ (a * m)}.indicator
+                    (fun _ => (1 : ℂ)) := by
   intro F _ _ κ _ a ha m hm
   set I : Ideal (𝓞 F) := Ideal.span {m} with hIdef
-  have hI : I ≠ ⊥ := by
-    rw [hIdef, Ne, Ideal.span_singleton_eq_bot]; exact hm
+  have hI : I ≠ ⊥ := by rw [hIdef, Ne, Ideal.span_singleton_eq_bot]; exact hm
   haveI : Finite (𝓞 F ⧸ I) := Ideal.finiteQuotientOfFreeOfNeBot I hI
   haveI : Fintype (κ → 𝓞 F ⧸ I) := Fintype.ofFinite _
   let out : 𝓞 F ⧸ I → 𝓞 F := fun q => (Ideal.Quotient.mk_surjective q).choose
-  have hout : ∀ q, Ideal.Quotient.mk I (out q) = q := fun q => (Ideal.Quotient.mk_surjective q).choose_spec
+  have hout : ∀ q, Ideal.Quotient.mk I (out q) = q := fun q =>
+    (Ideal.Quotient.mk_surjective q).choose_spec
   let rep : (κ → 𝓞 F ⧸ I) → (κ → F) := fun c i => a * ((out (c i) : 𝓞 F) : F)
   let ι : (κ → F) → (κ → FiniteAdeleRing (𝓞 F) F) := fun ξ i => algebraMap F _ (ξ i)
   have hrep_inj : Function.Injective rep := by
@@ -92,8 +103,10 @@ theorem indicator_scaledInt_eq_sum : ∀ (F : Type) [Field F] [NumberField F] (�
   have hsub := scaledInt_mul_le (κ := κ) ha hm
   have hm0 : (m : F) ≠ 0 := by exact_mod_cast hm
   have ham : a * (m : F) ≠ 0 := mul_ne_zero ha hm0
-  have huniq : ∀ c c' (y : κ → FiniteAdeleRing (𝓞 F) F), y - ι (rep c) ∈ scaledInt F κ (a * m) →
-      y - ι (rep c') ∈ scaledInt F κ (a * m) → c = c' := by
+  have huniq
+      : ∀ c c' (y : κ → FiniteAdeleRing (𝓞 F) F),
+        y - ι (rep c) ∈ scaledInt F κ (a * m) → y - ι (rep c') ∈ scaledInt F κ (a * m)
+          → c = c' := by
     intro c c' y h h'
     have hd : ι (fun i => rep c' i - rep c i) ∈ scaledInt F κ (a * m) := by
       have := sub_mem h h'
@@ -118,7 +131,8 @@ theorem indicator_scaledInt_eq_sum : ∀ (F : Type) [Field F] [NumberField F] (�
   have hexist : ∀ y ∈ scaledInt F κ a, ∃ c, y - ι (rep c) ∈ scaledInt F κ (a * m) := by
     intro y hy
     have hd : DenseRange ι :=
-      DenseRange.piMap (fun _ => GroundTheory.Automorphic.AdelicGLn.denseRange_algebraMap_finiteAdeleRing F)
+      DenseRange.piMap (fun _ =>
+        GroundTheory.Automorphic.AdelicGLn.denseRange_algebraMap_finiteAdeleRing F)
     have hopen : IsOpen {z | y - z ∈ (scaledInt F κ (a * m) : Set (κ → FiniteAdeleRing (𝓞 F) F))} :=
       (isOpen_scaledInt (a * m)).preimage (continuous_const.sub continuous_id)
     obtain ⟨ξ, hξ⟩ := hd.exists_mem_open hopen ⟨y, by simp [zero_mem]⟩
@@ -132,15 +146,19 @@ theorem indicator_scaledInt_eq_sum : ∀ (F : Type) [Field F] [NumberField F] (�
       exact Ideal.mem_span_singleton'.1 this
     choose t htm using ht
     refine ⟨fun i => Ideal.Quotient.mk I (x i), ?_⟩
-    have hF : ∀ i, rep (fun i => Ideal.Quotient.mk I (x i)) i = ξ i + a * m * (t i : F) := fun i => by
-      have e1 : ((t i * m : 𝓞 F) : F) = ((out (Ideal.Quotient.mk I (x i)) - x i : 𝓞 F) : F) := by rw [htm i]
+    have hF
+        : ∀ i, rep (fun i => Ideal.Quotient.mk I (x i)) i = ξ i + a * m * (t i : F) := fun i => by
+      have e1 : ((t i * m : 𝓞 F) : F) = ((out (Ideal.Quotient.mk I (x i)) - x i : 𝓞 F) : F) := by
+        rw [htm i]
       push_cast at e1
       have e2 : ξ i = a * (x i : F) := by rw [hx i]; field_simp
       simp only [rep]
       rw [e2]
       linear_combination (-a) * e1
     have hw : ι (fun i => a * m * (t i : F)) ∈ scaledInt F κ (a * m) := mul_int_mem ham t
-    have e : y - ι (rep (fun i => Ideal.Quotient.mk I (x i))) = (y - ι ξ) - ι (fun i => a * m * (t i : F)) := by
+    have e
+        : y - ι (rep (fun i => Ideal.Quotient.mk I (x i)))
+          = (y - ι ξ) - ι (fun i => a * m * (t i : F)) := by
       funext i
       simp only [ι, Pi.sub_apply]
       rw [hF i, map_add (f := _)]

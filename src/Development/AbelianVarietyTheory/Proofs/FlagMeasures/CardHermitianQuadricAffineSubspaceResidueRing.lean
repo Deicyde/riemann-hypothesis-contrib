@@ -13,17 +13,17 @@ namespace GlobalTheory.GramCount
 
 variable {B : Type} [CommRing B] [Fintype B]
 
-theorem quad_sum_char_pi (χ : AddChar B ℂ) (hχ : χ.IsPrimitive) {m : ℕ} (w : Fin m → B) :
-    ∑ s : Fin m → B, χ (∑ i, s i * w i) =
-      if w = 0 then (Fintype.card B : ℂ) ^ m else 0 := by
+theorem quad_sum_char_pi (χ : AddChar B ℂ) (hχ : χ.IsPrimitive) {m : ℕ} (w : Fin m → B)
+    : ∑ s : Fin m → B, χ (∑ i, s i * w i) = if w = 0 then (Fintype.card B : ℂ) ^ m else 0 := by
   have h1 : ∀ s : Fin m → B, χ (∑ i, s i * w i) = ∏ i, χ (s i * w i) := by
     intro s
     induction (Finset.univ : Finset (Fin m)) using Finset.induction_on with
     | empty => simp
-    | insert a S ha ih => rw [Finset.sum_insert ha, Finset.prod_insert ha, AddChar.map_add_eq_mul, ih]
+    | insert a S ha ih =>
+      rw [Finset.sum_insert ha, Finset.prod_insert ha, AddChar.map_add_eq_mul, ih]
   simp only [h1]
-  have h2 := Finset.prod_univ_sum (fun _ : Fin m => (Finset.univ : Finset B))
-    (fun i b => χ (b * w i))
+  have h2 :=
+    Finset.prod_univ_sum (fun _ : Fin m => (Finset.univ : Finset B)) (fun i b => χ (b * w i))
   rw [Fintype.piFinset_univ] at h2
   rw [← h2]
   simp only [AddChar.sum_mulShift _ hχ]
@@ -32,11 +32,13 @@ theorem quad_sum_char_pi (χ : AddChar B ℂ) (hχ : χ.IsPrimitive) {m : ℕ} (
   · obtain ⟨i, hi⟩ := Function.ne_iff.1 hw
     exact Finset.prod_eq_zero (Finset.mem_univ i) (by simp [show w i ≠ 0 from hi])
 
-
 omit [Fintype B] in
-theorem quad_char_skew (c : B →+* B) (hc : ∀ u, c (c u) = u) {ω : B} (hω : IsUnit (ω - c ω))
-    (χ : AddChar B ℂ) (hχc : ∀ u, χ (c u) = χ u) {a w : B} (ha : c a = -a) (hw : c w = w) :
-    χ (a * w) = 1 := by
+theorem quad_char_skew
+    (c : B →+* B) (hc : ∀ u, c (c u) = u)
+    {ω : B} (hω : IsUnit (ω - c ω))
+    (χ : AddChar B ℂ) (hχc : ∀ u, χ (c u) = χ u)
+    {a w : B} (ha : c a = -a) (hw : c w = w)
+    : χ (a * w) = 1 := by
   obtain ⟨θ, e, hθ, -, -⟩ := exists_trace_one c hc hω
   have h1 : a * w = θ * (a * w) + c (θ * (-(a * w))) := by
     simp only [map_mul, map_neg, ha, hw]
@@ -44,24 +46,31 @@ theorem quad_char_skew (c : B →+* B) (hc : ∀ u, c (c u) = u) {ω : B} (hω :
   rw [h1, AddChar.map_add_eq_mul, hχc, ← AddChar.map_add_eq_mul]
   simp
 
-theorem quad_count {B : Type} [CommRing B] [Fintype B] (c : B →+* B) (hc : ∀ u, c (c u) = u)
-    (ω : B) (hω : IsUnit (ω - c ω)) (hf : ∀ t, c t = t → t ≠ 0 → IsUnit t) (q : ℕ) (hq : 2 ≤ q)
-    (hB : Fintype.card B = q ^ 2) (χ : AddChar B ℂ) (hχ : χ.IsPrimitive)
-    (hχc : ∀ u, χ (c u) = χ u) (k n : ℕ) (hkn : 2 * k + 1 ≤ 2 * n) (x : Fin k → Fin n → B)
-    (hx : Prim c x) (g : Fin k → B) (t : B) (ht : c t = t) :
-    |(Set.ncard {y : Fin n → B | (∀ i, ip c y (x i) = g i) ∧ ip c y y = t} : ℝ)
-      - (q : ℝ) ^ (2 * n - (2 * k + 1))| ≤ (q : ℝ) ^ n := by
+theorem quad_count
+    {B : Type} [CommRing B] [Fintype B]
+    (c : B →+* B) (hc : ∀ u, c (c u) = u)
+    (ω : B) (hω : IsUnit (ω - c ω))
+    (hf : ∀ t, c t = t → t ≠ 0 → IsUnit t)
+    (q : ℕ) (hq : 2 ≤ q) (hB : Fintype.card B = q ^ 2)
+    (χ : AddChar B ℂ) (hχ : χ.IsPrimitive) (hχc : ∀ u, χ (c u) = χ u)
+    (k n : ℕ) (hkn : 2 * k + 1 ≤ 2 * n) (x : Fin k → Fin n → B) (hx : Prim c x) (g : Fin k → B)
+    (t : B) (ht : c t = t)
+    : |(Set.ncard {y : Fin n → B | (∀ i, ip c y (x i) = g i) ∧ ip c y y = t} : ℝ)
+        - (q : ℝ) ^ (2 * n - (2 * k + 1))|
+      ≤ (q : ℝ) ^ n := by
   set N := Set.ncard {y : Fin n → B | (∀ i, ip c y (x i) = g i) ∧ ip c y y = t} with hN
-  let F : B × (Fin k → B) → ℂ := fun z => ∑ y : Fin n → B,
-    χ (z.1 * (ip c y y - t)) * χ (∑ i, z.2 i * (ip c y (x i) - g i))
-  let G : B × (Fin k → B) → ℂ := fun z =>
-    if c z.1 = -z.1 ∧ z.2 = 0 then (q : ℂ) ^ (2 * n) else 0
+  let F : B × (Fin k → B) → ℂ := fun z =>
+    ∑ y : Fin n → B,
+      χ (z.1 * (ip c y y - t)) * χ (∑ i, z.2 i * (ip c y (x i) - g i))
+  let G : B × (Fin k → B) → ℂ := fun z => if c z.1 = -z.1 ∧ z.2 = 0 then (q : ℂ) ^ (2 * n) else 0
   have hF : ∑ z, F z = (N : ℂ) * (q : ℂ) ^ (2 * k + 2) := by
     simp only [F]
     rw [Finset.sum_comm]
-    have h1 : ∀ y : Fin n → B, ∑ z : B × (Fin k → B),
-        χ (z.1 * (ip c y y - t)) * χ (∑ i, z.2 i * (ip c y (x i) - g i)) =
-        if (∀ i, ip c y (x i) = g i) ∧ ip c y y = t then (q : ℂ) ^ (2 * k + 2) else 0 := by
+    have h1
+        : ∀ y : Fin n → B,
+          ∑ z : B × (Fin k → B),
+              χ (z.1 * (ip c y y - t)) * χ (∑ i, z.2 i * (ip c y (x i) - g i))
+            = if (∀ i, ip c y (x i) = g i) ∧ ip c y y = t then (q : ℂ) ^ (2 * k + 2) else 0 := by
       intro y
       rw [Fintype.sum_prod_type]
       simp only
@@ -78,27 +87,29 @@ theorem quad_count {B : Type} [CommRing B] [Fintype B] (c : B →+* B) (hc : ∀
     ext y
     simp
   have hG : ∑ z, G z = (q : ℂ) ^ (2 * n + 1) := by
-    have h1 := (card_fixed_sq c hc hω (M := B) c.toAddMonoidHom hc
-      (fun a u => by simp)).2
+    have h1 := (card_fixed_sq c hc hω (M := B) c.toAddMonoidHom hc (fun a u => by simp)).2
     rw [Nat.card_eq_fintype_card (α := B), hB] at h1
     have h2 := (Nat.pow_left_injective two_ne_zero) h1
     simp only [Nat.card_eq_fintype_card, Fintype.card_subtype] at h2
     simp only [G]
     rw [Fintype.sum_prod_type]
-    have h3 : ∀ a : B, (∑ s : Fin k → B,
-        if c a = -a ∧ s = 0 then (q : ℂ) ^ (2 * n) else 0) =
-        if c a = -a then (q : ℂ) ^ (2 * n) else 0 := by
+    have h3
+        : ∀ a : B,
+          (∑ s : Fin k → B,
+            if c a = -a ∧ s = 0 then (q : ℂ) ^ (2 * n) else 0)
+            = if c a = -a then (q : ℂ) ^ (2 * n) else 0 := by
       intro a
       by_cases h : c a = -a <;> simp [h]
     simp only [h3]
     rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
-    have h4 : (Finset.univ.filter fun a : B => c a = -a).card = q := by
-      rw [← h2]; congr 1
-    rw [h4]; ring
+    have h4 : (Finset.univ.filter fun a : B => c a = -a).card = q := by rw [← h2]; congr 1
+    rw [h4]
+    ring
   have hFG : ∀ z, ‖F z - G z‖ ≤ (q : ℝ) ^ n := by
     rintro ⟨a, s⟩
-    have hv : ∀ y : Fin n → B, ∑ i, s i * (ip c y (x i) - g i) =
-        ip c y (∑ i, c (s i) • x i) - ∑ i, s i * g i := by
+    have hv
+        : ∀ y : Fin n → B,
+          ∑ i, s i * (ip c y (x i) - g i) = ip c y (∑ i, c (s i) • x i) - ∑ i, s i * g i := by
       intro y
       simp [ip_sum_right, ip_smul_right, hc, mul_sub, Finset.sum_sub_distrib]
     by_cases ha : c a = -a
@@ -127,11 +138,15 @@ theorem quad_count {B : Type} [CommRing B] [Fintype B] (c : B →+* B) (hc : ∀
             simpa only [hc, Pi.zero_apply, map_zero] using this
       rw [h0, sub_self, norm_zero]
       positivity
-    · have hu : IsUnit (a + c a) := hf _ (by rw [map_add (f := _), hc, add_comm])
-        (fun h => ha (by linear_combination h))
-      have h1 := GlobalTheory.T.norm_gauss_sum_hermitian_form_linear_le c hc q hq hB χ hχ hχc n a hu (∑ i, c (s i) • x i)
-      have h2 : F (a, s) = χ (-(a * t + ∑ i, s i * g i)) *
-          ∑ y : Fin n → B, χ (a * ip c y y + ip c y (∑ i, c (s i) • x i)) := by
+    · have hu : IsUnit (a + c a) :=
+        hf _ (by rw [map_add (f := _), hc, add_comm]) (fun h => ha (by linear_combination h))
+      have h1 :=
+        GlobalTheory.T.norm_gauss_sum_hermitian_form_linear_le c hc q hq hB χ hχ hχc n a hu
+          (∑ i, c (s i) • x i)
+      have h2
+          : F (a, s)
+            = χ (-(a * t + ∑ i, s i * g i))
+              * ∑ y : Fin n → B, χ (a * ip c y y + ip c y (∑ i, c (s i) • x i)) := by
         simp only [F, hv, Finset.mul_sum, ← AddChar.map_add_eq_mul]
         refine Finset.sum_congr rfl fun y _ => ?_
         congr 1
@@ -153,8 +168,9 @@ theorem quad_count {B : Type} [CommRing B] [Fintype B] (c : B →+* B) (hc : ∀
     have : (0 : ℝ) < q := by exact_mod_cast (by omega : 0 < q)
     positivity
   have h5 : ‖(q : ℂ) ^ (2 * k + 2)‖ = (q : ℝ) ^ (2 * k + 2) := by simp
-  have h6 : ‖(N : ℂ) - (q : ℂ) ^ (2 * n - (2 * k + 1))‖ =
-      |(N : ℝ) - (q : ℝ) ^ (2 * n - (2 * k + 1))| := by
+  have h6
+      : ‖(N : ℂ) - (q : ℂ) ^ (2 * n - (2 * k + 1))‖
+        = |(N : ℝ) - (q : ℝ) ^ (2 * n - (2 * k + 1))| := by
     rw [← Real.norm_eq_abs, ← Complex.norm_real]
     push_cast
     rfl

@@ -10,7 +10,8 @@ noncomputable section
 
 namespace GlobalTheory.JumpSets
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.AdmissibleParameterJ
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.AdmissibleParameterJ
 
 variable {D : D7}
 
@@ -43,7 +44,8 @@ noncomputable section
 
 namespace GlobalTheory.JumpSets
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.AdmissibleParameterJ
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.AdmissibleParameterJ
 
 variable {D : D7}
 
@@ -51,7 +53,8 @@ section HC
 
 variable {R : Ranks} (P : HCParam R)
 
-theorem hc_u_anti : ∀ (i j : ℕ) (hi : i < R.k) (hj : j < R.k), i < j → P.u ⟨j, hj⟩ < P.u ⟨i, hi⟩ := by
+theorem hc_u_anti
+    : ∀ (i j : ℕ) (hi : i < R.k) (hj : j < R.k), i < j → P.u ⟨j, hj⟩ < P.u ⟨i, hi⟩ := by
   intro i j
   induction j with
   | zero => intro _ _ h; omega
@@ -73,7 +76,8 @@ theorem hc_v_anti (a a' : Fin (R.k - 1)) (h : a.1 < a'.1) : P.v a' < P.v a := by
       exact le_of_eq (congrArg P.u (Fin.ext this))
   exact lt_of_lt_of_le h1 (h3.trans (le_of_lt h2))
 
-theorem hc_b_mono : ∀ (i j : ℕ) (hi : i < R.m) (hj : j < R.m), i < j → P.b ⟨i, hi⟩ < P.b ⟨j, hj⟩ := by
+theorem hc_b_mono
+    : ∀ (i j : ℕ) (hi : i < R.m) (hj : j < R.m), i < j → P.b ⟨i, hi⟩ < P.b ⟨j, hj⟩ := by
   intro i j
   induction j with
   | zero => intro _ _ h; omega
@@ -96,12 +100,14 @@ theorem hc_b_le (i i' : Fin R.m) (h : i.1 ≤ i'.1) : P.b i ≤ P.b i' := by
   · exact le_of_lt (hc_b_mono' P i i' h')
   · exact le_of_eq (congrArg P.b (Fin.ext (by omega)))
 
-theorem hc_low_pos (jj : Fin R.m) (i : Fin R.m) (h : i.1 ≤ jj.1) : ((R.t : ℚ) + 3) / 2 ≤ P.e jj - P.b i := by
+theorem hc_low_pos (jj : Fin R.m) (i : Fin R.m) (h : i.1 ≤ jj.1)
+    : ((R.t : ℚ) + 3) / 2 ≤ P.e jj - P.b i := by
   have := P.gap_be jj
   have := hc_b_le P i jj h
   linarith
 
-theorem hc_low_neg (jj : Fin R.m) (i : Fin R.m) (h : jj.1 < i.1) : ((R.t : ℚ) + 3) / 2 ≤ P.b i - P.e jj := by
+theorem hc_low_neg (jj : Fin R.m) (i : Fin R.m) (h : jj.1 < i.1)
+    : ((R.t : ℚ) + 3) / 2 ≤ P.b i - P.e jj := by
   have h1 := P.gap_eb jj (by omega)
   have h2 := hc_b_le P ⟨jj.1 + 1, by omega⟩ i (by simp; omega)
   linarith
@@ -122,8 +128,7 @@ theorem b'_pos (L : SizeData₂ D) : 0 < L.sc.b' := by
 theorem w''_le_top (L : SizeData₂ D) : L.sc.w'' D.R.n ≤ L.sc.b' + L.sc.b' / L.sc.x := by
   have hx : 0 < L.sc.x := by linarith [L.sc.one_lt_alt]
   have hb := b'_pos L
-  have hn : (1 : ℝ) ≤ D.R.n := by
-    unfold Ranks.n; exact_mod_cast D.R.toFrame.ord_pos
+  have hn : (1 : ℝ) ≤ D.R.n := by unfold Ranks.n; exact_mod_cast D.R.toFrame.ord_pos
   have h1 : L.sc.w'' D.R.n ≤ L.sc.b' / L.sc.x := by
     unfold Scale.w''
     apply div_le_div_of_nonneg_left hb.le hx
@@ -131,11 +136,13 @@ theorem w''_le_top (L : SizeData₂ D) : L.sc.w'' D.R.n ≤ L.sc.b' + L.sc.b' / 
   have h2 : 0 ≤ L.sc.b' / L.sc.x := div_nonneg hb.le hx.le
   linarith
 
-theorem sz_win {L : SizeData₂ D} (hP : AdmPar L) (j : ℕ) (hj1 : 1 ≤ j) (hjm : j ≤ D.R.m) (ρ : D.what₂.Tau) :
-    L.sc.w'' D.R.n ≤ ((sz D j ρ : ℚ) : ℝ) ∧ ((sz D j ρ : ℚ) : ℝ) ≤ L.sc.b + L.etaSz + 1 := by
+theorem sz_win
+    {L : SizeData₂ D} (hP : AdmPar L) (j : ℕ) (hj1 : 1 ≤ j) (hjm : j ≤ D.R.m) (ρ : D.what₂.Tau)
+    : L.sc.w'' D.R.n ≤ ((sz D j ρ : ℚ) : ℝ) ∧ ((sz D j ρ : ℚ) : ℝ) ≤ L.sc.b + L.etaSz + 1 := by
   obtain ⟨h1, h2, h3, h4⟩ := hP
   have hw'' : 0 < L.sc.w'' D.R.n := by
-    have := L.Sc_pos; have := L.etaSz_pos
+    have := L.Sc_pos
+    have := L.etaSz_pos
     have : (0 : ℝ) ≤ D.R.t := by positivity
     linarith
   rw [← wj_eq]
@@ -156,8 +163,9 @@ theorem sz_win {L : SizeData₂ D} (hP : AdmPar L) (j : ℕ) (hj1 : 1 ≤ j) (hj
     have := L.etaSz_pos
     constructor <;> linarith [hw.1, hw.2]
 
-theorem jFacts_of {L : SizeData₂ D} (hP : AdmPar L) (j : ℕ) (hj1 : 1 ≤ j) (hjm : j ≤ D.R.m) (ρ : D.what₂.Tau) :
-    JFacts L j ρ := by
+theorem jFacts_of
+    {L : SizeData₂ D} (hP : AdmPar L) (j : ℕ) (hj1 : 1 ≤ j) (hjm : j ≤ D.R.m) (ρ : D.what₂.Tau)
+    : JFacts L j ρ := by
   have hjj : j - 1 < D.R.m := by omega
   have hs := sz_eq j ρ hjj
   have hwin := sz_win hP j hj1 hjm ρ
@@ -167,25 +175,32 @@ theorem jFacts_of {L : SizeData₂ D} (hP : AdmPar L) (j : ℕ) (hj1 : 1 ≤ j) 
   have ht0 : (0 : ℝ) ≤ D.R.t := by positivity
   have hw'' : 0 < L.sc.w'' D.R.n := by linarith
   have htpos : 1 ≤ D.R.t := D.R.t_odd.pos
-  refine
-    { hj1 := hj1, hjm := hjm, t_pos := htpos, t_odd := D.R.t_odd,
-      k_pos := by have := D.R.m_add_three_le_k; omega,
-      v_nonneg := fun a => by exact_mod_cast (L.cloud_v ρ a).1,
-      v_le := fun a => (L.cloud_v ρ a).2,
-      v_anti := fun a a' h => hc_v_anti (D.hc ρ) a a' h,
-      b_mono := fun i i' h => hc_b_mono' (D.hc ρ) i i' h,
-      low_pos := fun i hi => by
-        rw [hs]; exact hc_low_pos (D.hc ρ) ⟨j - 1, hjj⟩ i (by simp; omega),
-      low_neg := fun i hi => by
-        rw [hs]; have := hc_low_neg (D.hc ρ) ⟨j - 1, hjj⟩ i (by simp; omega); linarith,
-      low_le := fun i => by
-        have := L.be_close ρ i ⟨j - 1, hjj⟩
-        rw [hs, abs_sub_comm]; push_cast at this ⊢; exact this,
-      s_gt := by linarith [hwin.1],
-      s_le := hwin.2,
-      s_thick := fun h => by rw [← wj_eq]; exact (L.win_thick j hj1 hjm ρ h).1,
-      par_b := by linarith,
-      t_le_eta := h4, Sc_pos := hS, eta_pos := he }
+  refine {
+    hj1 := hj1
+    hjm := hjm
+    t_pos := htpos
+    t_odd := D.R.t_odd
+    k_pos := by have := D.R.m_add_three_le_k; omega
+    v_nonneg := fun a => by exact_mod_cast (L.cloud_v ρ a).1
+    v_le := fun a => (L.cloud_v ρ a).2
+    v_anti := fun a a' h => hc_v_anti (D.hc ρ) a a' h
+    b_mono := fun i i' h => hc_b_mono' (D.hc ρ) i i' h
+    low_pos := fun i hi => by rw [hs]; exact hc_low_pos (D.hc ρ) ⟨j - 1, hjj⟩ i (by simp; omega)
+    low_neg := fun i hi => by
+      rw [hs]; have := hc_low_neg (D.hc ρ) ⟨j - 1, hjj⟩ i (by simp; omega); linarith
+    low_le := fun i => by
+      have := L.be_close ρ i ⟨j - 1, hjj⟩
+      rw [hs, abs_sub_comm]
+      push_cast at this ⊢
+      exact this
+    s_gt := by linarith [hwin.1]
+    s_le := hwin.2
+    s_thick := fun h => by rw [← wj_eq]; exact (L.win_thick j hj1 hjm ρ h).1
+    par_b := by linarith
+    t_le_eta := h4
+    Sc_pos := hS
+    eta_pos := he
+  }
 
 end GlobalTheory.JumpSets
 
@@ -195,7 +210,8 @@ noncomputable section
 
 namespace GlobalTheory.JumpSets
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.AdmissibleParameterJ
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.AdmissibleParameterJ
 
 variable {D : D7}
 
@@ -275,34 +291,42 @@ theorem block_mem_iff (a : ℤ) : ((a : ℚ) ∈ blockJ D ↔ 0 ≤ a ∧ a < (D
     have h2 : ((a.toNat : ℕ) : ℤ) = a := Int.toNat_of_nonneg h0
     exact_mod_cast h2.symm
 
-theorem block_not_mem_JW {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ) (up : Bool) (q : ℚ)
-    (hq : q ∈ blockJ D) : q ∉ JW D up j ρ := by
+theorem block_not_mem_JW
+    {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ)
+    (up : Bool)
+    (q : ℚ) (hq : q ∈ blockJ D)
+    : q ∉ JW D up j ρ := by
   have hr := jp_refl_block q hq
   cases up
-  · simp only [JW, cloudT, lowT, Bool.false_eq_true, ↓reduceIte, Set.mem_union, reflS, Set.mem_ofPred_eq]
+  · simp only [JW, cloudT, lowT, Bool.false_eq_true, ↓ reduceIte, Set.mem_union, reflS,
+      Set.mem_ofPred_eq]
     rintro (h | h)
     · exact jp_block_not_cloud hF _ hr h
     · exact jp_block_not_low hF _ hr h
-  · simp only [JW, cloudT, lowT, ↓reduceIte, Set.mem_union]
+  · simp only [JW, cloudT, lowT, ↓ reduceIte, Set.mem_union]
     rintro (h | h)
     · exact jp_block_not_cloud hF _ hq h
     · exact jp_block_not_low hF _ hq h
 
-theorem block_sub_JJ (up : Bool) (j : ℕ) (ρ : D.what₂.Tau) (q : ℚ) (hq : q ∈ blockJ D) : q ∈ JJ D up j ρ := by
+theorem block_sub_JJ (up : Bool) (j : ℕ) (ρ : D.what₂.Tau) (q : ℚ) (hq : q ∈ blockJ D)
+    : q ∈ JJ D up j ρ := by
   cases up
-  · simp only [JJ, Bool.false_eq_true, ↓reduceIte, Jm, reflS, Jp, Set.mem_union, Set.mem_ofPred_eq]
+  · simp only [JJ, Bool.false_eq_true, ↓ reduceIte, Jm, reflS, Jp, Set.mem_union, Set.mem_ofPred_eq]
     exact Or.inr (jp_refl_block q hq)
-  · simp only [JJ, ↓reduceIte, Jp, Set.mem_union]
+  · simp only [JJ, ↓ reduceIte, Jp, Set.mem_union]
     exact Or.inr hq
 
-theorem JJ_iff_JW {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ) (up : Bool) (q : ℚ)
-    (hq : q ∉ blockJ D) : q ∈ JJ D up j ρ ↔ q ∈ JW D up j ρ := by
+theorem JJ_iff_JW
+    {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ)
+    (up : Bool)
+    (q : ℚ) (hq : q ∉ blockJ D)
+    : q ∈ JJ D up j ρ ↔ q ∈ JW D up j ρ := by
   cases up
   · have hr : refl D q ∉ blockJ D := fun h => hq (by simpa [jp_refl_refl] using jp_refl_block _ h)
-    simp only [JJ, JW, cloudT, lowT, Bool.false_eq_true, ↓reduceIte, Jm, reflS, Jp, Set.mem_union,
+    simp only [JJ, JW, cloudT, lowT, Bool.false_eq_true, ↓ reduceIte, Jm, reflS, Jp, Set.mem_union,
       Set.mem_ofPred_eq]
     tauto
-  · simp only [JJ, JW, cloudT, lowT, ↓reduceIte, Jp, Set.mem_union]
+  · simp only [JJ, JW, cloudT, lowT, ↓ reduceIte, Jp, Set.mem_union]
     tauto
 
 lemma jp_nodup {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ) : (PPm D j ρ).Nodup := by
@@ -368,8 +392,8 @@ lemma jp_mem_iff {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts
       linarith
 
 open Classical in
-theorem count_PPm {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ) (q : ℚ) :
-    (PPm D j ρ).count (q - sz D j ρ - c0 D) = if q ∈ Jp D j ρ then 1 else 0 := by
+theorem count_PPm {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ) (q : ℚ)
+    : (PPm D j ρ).count (q - sz D j ρ - c0 D) = if q ∈ Jp D j ρ then 1 else 0 := by
   rw [Multiset.count_eq_of_nodup (jp_nodup hF)]
   by_cases h : q ∈ Jp D j ρ
   · rw [if_pos ((jp_mem_iff hF q).2 h), if_pos h]
@@ -383,7 +407,8 @@ noncomputable section
 
 namespace GlobalTheory.JumpSets
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.AdmissibleParameterJ
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.AdmissibleParameterJ
 
 variable {D : D7}
 
@@ -517,7 +542,9 @@ lemma jb_block_inj : Function.Injective (fun c : Fin D.R.t => ((c : ℕ) : ℚ))
 
 end JB
 
-theorem jumpSetBound_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ) : CloudCentreDistance L := by
+theorem jumpSetBound_of_realPlaceFacts
+    {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ)
+    : CloudCentreDistance L := by
   intro j hj1 hjm ρ
   have F := h j hj1 hjm ρ
   have hcl : (cloudJ D j ρ).ncard = D.R.k - 1 := by
@@ -544,7 +571,8 @@ theorem jumpSetBound_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j �
     have h1 := jb_block hb
     have hc := realPlace_jumpCenter_nonneg F
     apply jb_notin_cl F _ hq
-    simp only [c0] at h1 ⊢; linarith
+    simp only [c0] at h1 ⊢
+    linarith
   refine ⟨fun q hq => ?_, fun q hq => jb_low F hq, fun q hq => jb_block hq, hcl, hlo, ?_⟩
   · obtain ⟨h1, h2⟩ := jb_cloud F hq
     exact ⟨by exact_mod_cast h1, h2⟩
@@ -554,11 +582,13 @@ theorem jumpSetBound_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j �
     unfold Ranks.nV Ranks.r
     omega
 
-theorem jumpSetCloud_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ) : jcCondition L := by
+theorem jumpSetCloud_of_realPlaceFacts
+    {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ)
+    : jcCondition L := by
   intro j hj1 hjm ρ
   have F := h j hj1 hjm ρ
   have hc0 : c0 D = ((D.R.t : ℚ) - 1) / 2 := rfl
-  have ht0 : (0:ℚ) ≤ D.R.t := Nat.cast_nonneg _
+  have ht0 : (0 : ℚ) ≤ D.R.t := Nat.cast_nonneg _
   refine ⟨?_, ?_, ?_, ?_⟩
   · rintro q ⟨a, rfl⟩
     have hl := F.low_le a
@@ -581,11 +611,11 @@ theorem jumpSetCloud_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j �
     have ht : |(D.R.t : ℚ) - c0 D| = ((D.R.t : ℚ) + 1) / 2 := by
       rw [hc0, abs_of_pos (by linarith)]; ring
     cases up
-    · simp only [JJ, Bool.false_eq_true, ↓reduceIte, Jm, reflS, Set.mem_ofPred_eq]
+    · simp only [JJ, Bool.false_eq_true, ↓ reduceIte, Jm, reflS, Set.mem_ofPred_eq]
       constructor
       · apply jb_notin_Jp F; rw [jb_refl_abs]; exact hm1
       · apply jb_notin_Jp F; rw [jb_refl_abs]; exact ht
-    · simp only [JJ, ↓reduceIte]
+    · simp only [JJ, ↓ reduceIte]
       exact ⟨jb_notin_Jp F hm1, jb_notin_Jp F ht⟩
   · intro q hq
     have h1 := (jb_cloud F hq).1
@@ -593,67 +623,76 @@ theorem jumpSetCloud_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j �
     have h3 := realPlace_jumpCenter_nonneg F
     linarith
   · apply jb_notin_cl F
-    rw [zero_sub, abs_neg, abs_of_nonneg (realPlace_jumpCenter_nonneg F), hc0]; linarith
+    rw [zero_sub, abs_neg, abs_of_nonneg (realPlace_jumpCenter_nonneg F), hc0]
+    linarith
 
-theorem jumpSetEta_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ)
-    (hpar : L.etaSz + D.R.t + L.Sc ≤ L.sc.b) (ht : 1 ≤ D.R.t) (hS : 0 < L.Sc) (he : 0 < L.etaSz) :
-    JumpAbsoluteBound L := by
-  have ht' : (1:ℝ) ≤ D.R.t := by exact_mod_cast ht
+theorem jumpSetEta_of_realPlaceFacts
+    {L : SizeData₂ D}
+    (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ) (hpar : L.etaSz + D.R.t + L.Sc ≤ L.sc.b)
+    (ht : 1 ≤ D.R.t) (hS : 0 < L.Sc) (he : 0 < L.etaSz)
+    : JumpAbsoluteBound L := by
+  have ht' : (1 : ℝ) ≤ D.R.t := by exact_mod_cast ht
   have hc0r : ((c0 D : ℚ) : ℝ) = ((D.R.t : ℝ) - 1) / 2 := by simp only [c0]; push_cast; ring
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro j hj1 hjm ρ up q hq
     have F := h j hj1 hjm ρ
     have key : ((|q - c0 D| : ℚ) : ℝ) ≤ L.sc.b + L.Sc + L.etaSz + 1 := by
       cases up
-      · simp only [JJ, Bool.false_eq_true, ↓reduceIte, Jm, reflS, Set.mem_ofPred_eq] at hq
+      · simp only [JJ, Bool.false_eq_true, ↓ reduceIte, Jm, reflS, Set.mem_ofPred_eq] at hq
         have := jb_Jp_bound F hq
         rwa [jb_refl_abs] at this
-      · simp only [JJ, ↓reduceIte] at hq
+      · simp only [JJ, ↓ reduceIte] at hq
         exact jb_Jp_bound F hq
     have c0nn := realPlace_jumpCenter_nonneg F
     have tri : |q| ≤ |q - c0 D| + c0 D := by
       have := abs_sub_abs_le_abs_sub q (c0 D)
-      rw [abs_of_nonneg c0nn] at this; linarith
+      rw [abs_of_nonneg c0nn] at this
+      linarith
     have tri' : ((|q| : ℚ) : ℝ) ≤ ((|q - c0 D| : ℚ) : ℝ) + ((c0 D : ℚ) : ℝ) := by exact_mod_cast tri
     rw [Rat.cast_abs] at tri'
     linarith
   · simp only [hJ]; rw [hc0r]; linarith
-  · simp only [hJ]; have : (0:ℝ) ≤ D.R.t := Nat.cast_nonneg _
+  · simp only [hJ]
+    have : (0 : ℝ) ≤ D.R.t := Nat.cast_nonneg _
     linarith
   · simp only [hJ]; linarith
 
-theorem jumpSetGap_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ) : ThickPlaceCloudSizes L := by
+theorem jumpSetGap_of_realPlaceFacts
+    {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ)
+    : ThickPlaceCloudSizes L := by
   intro j hj1 hjm ρ
   have F := h j hj1 hjm ρ
   have hst := realPlace_t_add_one_lt_size F
-  have ht0 : (0:ℚ) ≤ D.R.t := Nat.cast_nonneg _
-  have htr : (1:ℝ) ≤ D.R.t := by exact_mod_cast F.t_pos
+  have ht0 : (0 : ℚ) ≤ D.R.t := Nat.cast_nonneg _
+  have htr : (1 : ℝ) ≤ D.R.t := by exact_mod_cast F.t_pos
   have hsle := F.s_le
   have he := F.eta_pos
   refine ⟨fun hth up u hu => ?_, fun up u hu => ?_⟩
   · have hsb := F.s_thick hth
     cases up
-    · simp only [cloudT, Bool.false_eq_true, ↓reduceIte, dualS, reflS, Set.mem_ofPred_eq] at hu
+    · simp only [cloudT, Bool.false_eq_true, ↓ reduceIte, dualS, reflS, Set.mem_ofPred_eq] at hu
       obtain ⟨a, ha⟩ := hu
       have h1 := F.v_nonneg a
       have h2 := F.v_le a
-      have h1r : (0:ℝ) ≤ (((D.hc ρ).v a : ℚ) : ℝ) := by exact_mod_cast h1
+      have h1r : (0 : ℝ) ≤ (((D.hc ρ).v a : ℚ) : ℝ) := by exact_mod_cast h1
       have e : u = sz D j ρ + (D.hc ρ).v a - ((D.R.t : ℚ) + 1) / 2 := by
         simp only [AdmissibleParameterJ.refl, c0] at ha; linarith
       have hu' : |u| = sz D j ρ + (D.hc ρ).v a - ((D.R.t : ℚ) + 1) / 2 := by
         rw [abs_of_nonneg (by rw [e]; linarith)]; exact e
-      rw [hu']; push_cast
+      rw [hu']
+      push_cast
       constructor <;> linarith
-    · simp only [cloudT, ↓reduceIte, dualS, Set.mem_ofPred_eq] at hu
+    · simp only [cloudT, ↓ reduceIte, dualS, Set.mem_ofPred_eq] at hu
       obtain ⟨a, ha⟩ := hu
       have h1 := F.v_nonneg a
       have h2 := F.v_le a
-      have h1r : (0:ℝ) ≤ (((D.hc ρ).v a : ℚ) : ℝ) := by exact_mod_cast h1
+      have h1r : (0 : ℝ) ≤ (((D.hc ρ).v a : ℚ) : ℝ) := by exact_mod_cast h1
       have e : u = -(sz D j ρ + (D.hc ρ).v a + ((D.R.t : ℚ) + 1) / 2) := by
         simp only [c0] at ha; linarith
       have hu' : |u| = sz D j ρ + (D.hc ρ).v a + ((D.R.t : ℚ) + 1) / 2 := by
         rw [e, abs_neg, abs_of_nonneg (by linarith)]
-      rw [hu']; push_cast
+      rw [hu']
+      push_cast
       constructor <;> linarith
   · simp only [dualS, Set.mem_ofPred_eq, Set.mem_union] at hu
     have hblock : ∀ x : ℚ, -x - 1 ∈ blockJ D → ((|x| : ℚ) : ℝ) ≤ L.etaSz + D.R.t + 2 := by
@@ -667,7 +706,7 @@ theorem jumpSetGap_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j →
       rw [Rat.cast_natCast] at this
       linarith
     cases up
-    · simp only [lowT, Bool.false_eq_true, ↓reduceIte, reflS, Set.mem_ofPred_eq] at hu
+    · simp only [lowT, Bool.false_eq_true, ↓ reduceIte, reflS, Set.mem_ofPred_eq] at hu
       rcases hu with hu | hu
       · obtain ⟨a, ha⟩ := hu
         have hl := F.low_le a
@@ -675,10 +714,11 @@ theorem jumpSetGap_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j →
         rw [abs_le] at hl
         have e : u = (sz D j ρ - (D.hc ρ).b a) - ((D.R.t : ℚ) + 1) / 2 := by
           simp only [AdmissibleParameterJ.refl, c0] at ha; linarith
-        rw [Rat.cast_abs, e, abs_le]; push_cast
+        rw [Rat.cast_abs, e, abs_le]
+        push_cast
         constructor <;> linarith [hl.1, hl.2]
       · exact hblock u hu
-    · simp only [lowT, ↓reduceIte] at hu
+    · simp only [lowT, ↓ reduceIte] at hu
       rcases hu with hu | hu
       · obtain ⟨a, ha⟩ := hu
         have hl := F.low_le a
@@ -686,7 +726,8 @@ theorem jumpSetGap_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j →
         rw [abs_le] at hl
         have e : u = -(sz D j ρ - (D.hc ρ).b a) - ((D.R.t : ℚ) + 1) / 2 := by
           simp only [c0] at ha; linarith
-        rw [Rat.cast_abs, e, abs_le]; push_cast
+        rw [Rat.cast_abs, e, abs_le]
+        push_cast
         constructor <;> linarith [hl.1, hl.2]
       · exact hblock u hu
 
@@ -698,7 +739,8 @@ noncomputable section
 
 namespace GlobalTheory.JumpSets
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.AdmissibleParameterJ
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.AdmissibleParameterJ
 
 variable {D : D7}
 
@@ -843,23 +885,28 @@ lemma jd_cl_low (F : JFacts L j ρ) (a : Fin (D.R.k - 1)) (a' : Fin D.R.m) :
 
 end Core
 
-theorem jumpSetDistinct_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ) : JumpLowsSignCount D := by
+theorem jumpSetDistinct_of_realPlaceFacts
+    {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ)
+    : JumpLowsSignCount D := by
   intro j hj1 hjm ρ
   have F := h j hj1 hjm ρ
   have ht := one_le_jump_parameter F
   have iL : Function.Injective (fun a : Fin D.R.m => sz D j ρ - (D.hc ρ).b a + c0 D) :=
     jd_inj _ (fun a a' hl e => by
-      have := F.b_mono a a' hl; try dsimp only at e
+      have := F.b_mono a a' hl
+      try dsimp only at e
       linarith)
-  have iR : Function.Injective
-      (fun a : Fin D.R.m => (D.R.t : ℚ) - 1 - (sz D j ρ - (D.hc ρ).b a + c0 D)) :=
+  have iR : Function.Injective (fun a : Fin D.R.m =>
+      (D.R.t : ℚ) - 1 - (sz D j ρ - (D.hc ρ).b a + c0 D)) :=
     jd_inj _ (fun a a' hl e => by
-      have := F.b_mono a a' hl; try dsimp only at e
+      have := F.b_mono a a' hl
+      try dsimp only at e
       linarith)
-  have iC : Function.Injective
-      (fun a : Fin (D.R.k - 1) => (D.R.t : ℚ) - 1 - (sz D j ρ + (D.hc ρ).v a + c0 D)) :=
+  have iC : Function.Injective (fun a : Fin (D.R.k - 1) =>
+      (D.R.t : ℚ) - 1 - (sz D j ρ + (D.hc ρ).v a + c0 D)) :=
     jd_inj _ (fun a a' hl e => by
-      have := F.v_anti a a' hl; try dsimp only at e
+      have := F.v_anti a a' hl
+      try dsimp only at e
       linarith)
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · refine (jd_ncard _ iL (fun a => j ≤ a.1) _ ?_).trans (jd_card_ge hjm)
@@ -868,8 +915,10 @@ theorem jumpSetDistinct_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ 
     constructor
     · rintro ⟨⟨a, rfl⟩, hq⟩
       refine ⟨a, ?_, rfl⟩
-      by_contra hlt; push_neg at hlt
-      have := jd_lpos F a hlt; linarith
+      by_contra hlt
+      push_neg at hlt
+      have := jd_lpos F a hlt
+      linarith
     · rintro ⟨a, ha, rfl⟩
       exact ⟨⟨a, rfl⟩, by have := jd_lneg F a ha; linarith⟩
   · refine (jd_ncard _ iL (fun a => a.1 < j) _ ?_).trans (jd_card_lt hjm)
@@ -878,8 +927,10 @@ theorem jumpSetDistinct_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ 
     constructor
     · rintro ⟨⟨a, rfl⟩, hq⟩
       refine ⟨a, ?_, rfl⟩
-      by_contra hlt; push_neg at hlt
-      have := jd_lneg F a hlt; linarith
+      by_contra hlt
+      push_neg at hlt
+      have := jd_lneg F a hlt
+      linarith
     · rintro ⟨a, ha, rfl⟩
       exact ⟨⟨a, rfl⟩, by have := jd_lpos F a ha; linarith⟩
   · refine (jd_ncard _ iR (fun a => a.1 < j) _ ?_).trans (jd_card_lt hjm)
@@ -888,8 +939,10 @@ theorem jumpSetDistinct_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ 
     constructor
     · rintro ⟨⟨a, ha⟩, hq⟩
       refine ⟨a, ?_, by linarith⟩
-      by_contra hlt; push_neg at hlt
-      have := jd_lneg F a hlt; linarith
+      by_contra hlt
+      push_neg at hlt
+      have := jd_lneg F a hlt
+      linarith
     · rintro ⟨a, ha, rfl⟩
       exact ⟨⟨a, by ring⟩, by have := jd_lpos F a ha; linarith⟩
   · refine (jd_ncard _ iR (fun a => j ≤ a.1) _ ?_).trans (jd_card_ge hjm)
@@ -898,8 +951,10 @@ theorem jumpSetDistinct_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ 
     constructor
     · rintro ⟨⟨a, ha⟩, hq⟩
       refine ⟨a, ?_, by linarith⟩
-      by_contra hlt; push_neg at hlt
-      have := jd_lpos F a hlt; linarith
+      by_contra hlt
+      push_neg at hlt
+      have := jd_lpos F a hlt
+      linarith
     · rintro ⟨a, ha, rfl⟩
       exact ⟨⟨a, by ring⟩, by have := jd_lneg F a ha; linarith⟩
   · refine (jd_ncard _ iL (fun a => j ≤ a.1) _ ?_).trans (jd_card_ge hjm)
@@ -909,53 +964,62 @@ theorem jumpSetDistinct_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ 
     · rintro ⟨(⟨a, rfl⟩ | ⟨a, rfl⟩), hq⟩
       · have := jd_cl F a; linarith
       · refine ⟨a, ?_, rfl⟩
-        by_contra hlt; push_neg at hlt
-        have := jd_lpos F a hlt; linarith
+        by_contra hlt
+        push_neg at hlt
+        have := jd_lpos F a hlt
+        linarith
     · rintro ⟨a, ha, rfl⟩
       exact ⟨Or.inr ⟨a, rfl⟩, by have := jd_lneg F a ha; linarith⟩
-  · refine (jd_ncard_union _ _ iC iR (fun a => a.1 < j) ?_ _ ?_).trans
-      (by rw [jd_card_lt hjm])
+  · refine (jd_ncard_union _ _ iC iR (fun a => a.1 < j) ?_ _ ?_).trans (by rw [jd_card_lt hjm])
     · intro a b e
       try dsimp only at e
-      have := jd_cl_low F a b; linarith
+      have := jd_cl_low F a b
+      linarith
     · intro q
-      simp only [jd_JW_f, reflS, AdmissibleParameterJ.refl, cloudJ, lowJ, Set.mem_union, Set.mem_setOf_eq]
+      simp only [jd_JW_f, reflS, AdmissibleParameterJ.refl, cloudJ, lowJ, Set.mem_union,
+        Set.mem_setOf_eq]
       constructor
       · rintro ⟨(⟨a, ha⟩ | ⟨a, ha⟩), hq⟩
         · exact Or.inl ⟨a, by linarith⟩
         · refine Or.inr ⟨a, ?_, by linarith⟩
-          by_contra hlt; push_neg at hlt
-          have := jd_lneg F a hlt; linarith
+          by_contra hlt
+          push_neg at hlt
+          have := jd_lneg F a hlt
+          linarith
       · rintro (⟨a, rfl⟩ | ⟨a, ha, rfl⟩)
         · exact ⟨Or.inl ⟨a, by ring⟩, by have := jd_cl F a; linarith⟩
         · exact ⟨Or.inr ⟨a, by ring⟩, by have := jd_lpos F a ha; linarith⟩
 
-theorem jumpSetFinal_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ) : DualCloudSizes L := by
+theorem jumpSetFinal_of_realPlaceFacts
+    {L : SizeData₂ D} (h : ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ ρ, JFacts L j ρ)
+    : DualCloudSizes L := by
   intro j hj1 hjm ρ
   have F := h j hj1 hjm ρ
   have ht := one_le_jump_parameter F
   have hs := jumpCount_t_add_one_lt_size F
   have htR : (1 : ℝ) ≤ D.R.t := by exact_mod_cast F.t_pos
   have hc : c0 D = ((D.R.t : ℚ) - 1) / 2 := rfl
-  have iL4 : Function.Injective
-      (fun a : Fin D.R.m => sz D j ρ - (D.hc ρ).b a + c0 D - D.R.t) :=
+  have iL4 : Function.Injective (fun a : Fin D.R.m => sz D j ρ - (D.hc ρ).b a + c0 D - D.R.t) :=
     jd_inj _ (fun a a' hl e => by
-      have := F.b_mono a a' hl; try dsimp only at e
+      have := F.b_mono a a' hl
+      try dsimp only at e
       linarith)
-  have iC5 : Function.Injective
-      (fun a : Fin (D.R.k - 1) => -(sz D j ρ + (D.hc ρ).v a + c0 D) - 1) :=
+  have iC5
+      : Function.Injective (fun a : Fin (D.R.k - 1) => -(sz D j ρ + (D.hc ρ).v a + c0 D) - 1) :=
     jd_inj _ (fun a a' hl e => by
-      have := F.v_anti a a' hl; try dsimp only at e
+      have := F.v_anti a a' hl
+      try dsimp only at e
       linarith)
-  have iL5 : Function.Injective
-      (fun a : Fin D.R.m => -(sz D j ρ - (D.hc ρ).b a + c0 D) - 1) :=
+  have iL5 : Function.Injective (fun a : Fin D.R.m => -(sz D j ρ - (D.hc ρ).b a + c0 D) - 1) :=
     jd_inj _ (fun a a' hl e => by
-      have := F.b_mono a a' hl; try dsimp only at e
+      have := F.b_mono a a' hl
+      try dsimp only at e
       linarith)
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro up u hu
     cases up
-    · simp only [dualS, jd_cloudT_f, reflS, AdmissibleParameterJ.refl, cloudJ, Set.mem_setOf_eq] at hu
+    · simp only [dualS, jd_cloudT_f, reflS, AdmissibleParameterJ.refl, cloudJ, Set.mem_setOf_eq]
+        at hu
       obtain ⟨a, ha⟩ := hu
       have hv := F.v_le a
       have hv0 : (0 : ℝ) ≤ (((D.hc ρ).v a : ℚ) : ℝ) := by exact_mod_cast F.v_nonneg a
@@ -996,7 +1060,8 @@ theorem jumpSetFinal_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j �
   · intro up hu
     cases up
     · simp only [dualS, jd_JW_f, reflS, AdmissibleParameterJ.refl, cloudJ, lowJ, Set.mem_union,
-        Set.mem_setOf_eq] at hu
+          Set.mem_setOf_eq]
+        at hu
       rcases hu with ⟨a, ha⟩ | ⟨a, ha⟩
       · have := jd_cl F a; linarith
       · by_cases hja : j ≤ a.1
@@ -1010,28 +1075,33 @@ theorem jumpSetFinal_of_realPlaceFacts {L : SizeData₂ D} (h : ∀ j, 1 ≤ j �
         · have := jd_lpos F a (by omega); linarith
   · refine (jd_ncard _ iL4 (fun a => j ≤ a.1) _ ?_).trans (jd_card_ge hjm)
     intro u
-    simp only [dualS, jd_JW_f, reflS, AdmissibleParameterJ.refl, cloudJ, lowJ, Set.mem_union, Set.mem_setOf_eq]
+    simp only [dualS, jd_JW_f, reflS, AdmissibleParameterJ.refl, cloudJ, lowJ, Set.mem_union,
+      Set.mem_setOf_eq]
     constructor
     · rintro ⟨(⟨a, ha⟩ | ⟨a, ha⟩), hu⟩
       · have := jd_cl F a; linarith
       · refine ⟨a, ?_, by linarith⟩
-        by_contra hlt; push_neg at hlt
-        have := jd_lpos F a hlt; linarith
+        by_contra hlt
+        push_neg at hlt
+        have := jd_lpos F a hlt
+        linarith
     · rintro ⟨a, ha, rfl⟩
       exact ⟨Or.inr ⟨a, by ring⟩, by have := jd_lneg F a ha; linarith⟩
-  · refine (jd_ncard_union _ _ iC5 iL5 (fun a => a.1 < j) ?_ _ ?_).trans
-      (by rw [jd_card_lt hjm])
+  · refine (jd_ncard_union _ _ iC5 iL5 (fun a => a.1 < j) ?_ _ ?_).trans (by rw [jd_card_lt hjm])
     · intro a b e
       try dsimp only at e
-      have := jd_cl_low F a b; linarith
+      have := jd_cl_low F a b
+      linarith
     · intro u
       simp only [dualS, jumpUnion_true, cloudJ, lowJ, Set.mem_union, Set.mem_setOf_eq]
       constructor
       · rintro ⟨(⟨a, ha⟩ | ⟨a, ha⟩), hu⟩
         · exact Or.inl ⟨a, by linarith⟩
         · refine Or.inr ⟨a, ?_, by linarith⟩
-          by_contra hlt; push_neg at hlt
-          have := jd_lneg F a hlt; linarith
+          by_contra hlt
+          push_neg at hlt
+          have := jd_lneg F a hlt
+          linarith
       · rintro (⟨a, rfl⟩ | ⟨a, ha, rfl⟩)
         · exact ⟨Or.inl ⟨a, by ring⟩, by have := jd_cl F a; linarith⟩
         · exact ⟨Or.inr ⟨a, by ring⟩, by have := jd_lpos F a ha; linarith⟩
@@ -1044,15 +1114,17 @@ noncomputable section
 
 namespace GlobalTheory.JumpSets
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.AdmissibleParameterJ Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Classical
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.AdmissibleParameterJ Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Classical
 
 variable {D : D7}
 
 theorem cc_mul_cc' (φ : Formalism.HC.Frame) : φ.cc * φ.cc = 1 := by
   simp [Formalism.HC.Frame.cc, Formalism.FrobeniusOrbits.c0, Prod.ext_iff]
 
-theorem mul_cc_mem_Psi' {φ : Formalism.HC.Frame} {g : φ.GG} (hg : g ∉ φ.Psi) :
-    g * φ.cc ∈ φ.Psi := by
+theorem mul_cc_mem_Psi' {φ : Formalism.HC.Frame} {g : φ.GG} (hg : g ∉ φ.Psi)
+    : g * φ.cc ∈ φ.Psi := by
   rw [Formalism.HC.Frame.mem_Psi_iff] at hg ⊢
   show g.1.2 * (-1) = 1
   rcases Int.units_eq_one_or g.1.2 with h | h
@@ -1065,11 +1137,15 @@ theorem exists_placeOf (g : D.R.GG) : ∃ ρ : D.what₂.Tau, PlaceOf D ρ g := 
   · refine ⟨D.eTau.symm ⟨g * D.R.cc, mul_cc_mem_Psi' hgP⟩, Or.inr ?_⟩
     simp [mul_assoc, cc_mul_cc']
 
-theorem count_key {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ) (J : Multiset ℤ) (sg : ℚ)
-    (cτ c : ℤ) (up : Bool) (hsU : up = true → sg = 1) (hsD : up = false → sg = -1)
+theorem count_key
+    {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFacts L j ρ)
+    (J : Multiset ℤ)
+    (sg : ℚ)
+    (cτ c : ℤ)
+    (up : Bool) (hsU : up = true → sg = 1) (hsD : up = false → sg = -1)
     (hJ : J.map (fun n : ℤ => (n : ℚ)) = (PPm D j ρ).map (fun p => sg * p + cτ))
-    (hc : (c : ℚ) = sg * (-sz D j ρ) - c0 D + cτ) (a : ℤ) :
-    ((J.count (a + c) : ℕ) : ℤ) = if (a : ℚ) ∈ JJ D up j ρ then 1 else 0 := by
+    (hc : (c : ℚ) = sg * (- sz D j ρ) - c0 D + cτ) (a : ℤ)
+    : ((J.count (a + c) : ℕ) : ℤ) = if (a : ℚ) ∈ JJ D up j ρ then 1 else 0 := by
   have hinj : Function.Injective (fun n : ℤ => (n : ℚ)) := Int.cast_injective
   have hsg2 : sg = 1 ∨ sg = -1 := by cases up <;> simp_all
   have hfinj : Function.Injective (fun p : ℚ => sg * p + cτ) := by
@@ -1095,8 +1171,7 @@ theorem count_key {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : JFact
     · rw [if_neg h, if_neg (fun h' => h (hm.1 h'))]; simp
   · have hs := hsU rfl
     subst hs
-    have : (1 : ℚ) * ((a : ℚ) + c - cτ) = (a : ℚ) - sz D j ρ - c0 D := by
-      rw [hc]; ring
+    have : (1 : ℚ) * ((a : ℚ) + c - cτ) = (a : ℚ) - sz D j ρ - c0 D := by rw [hc]; ring
     rw [this, count_PPm hF]
     simp only [JJ, if_true]
     split_ifs <;> simp
@@ -1115,7 +1190,8 @@ noncomputable section
 
 namespace GlobalTheory.JumpSets
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.AdmissibleParameterJ
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.AdmissibleParameterJ
 
 end GlobalTheory.JumpSets
 

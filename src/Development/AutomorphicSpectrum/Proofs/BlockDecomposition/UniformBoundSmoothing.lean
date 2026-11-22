@@ -7,18 +7,23 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UfamCons
 
 open scoped ENNReal
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology Polynomial
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs GlobalTheory.CompanionTheory.Conc
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.AutomorphicForm
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+  GlobalTheory.CompanionTheory.Conc
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.AutomorphicForm
 
 open scoped Pointwise
 
 namespace GlobalTheory.CompanionTheory.Conc
 
-theorem norm_integral_ker_le {K : Type} [Field K] [NumberField K] {n : ℕ}
-    [MeasurableSpace (archGroup K n)] [BorelSpace (archGroup K n)]
-    (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] {β : archGroup K n → ℝ} (hk : Ker ν β)
-    (g : archGroup K n → ℂ) {M : ℝ} (hg : ∀ y ∈ tsupport β, ‖g y‖ ≤ M) :
-    ‖∫ y, (β y : ℂ) * g y ∂ν‖ ≤ M := by
+theorem norm_integral_ker_le
+    {K : Type} [Field K] [NumberField K]
+    {n : ℕ} [MeasurableSpace (archGroup K n)] [BorelSpace (archGroup K n)]
+    (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+    {β : archGroup K n → ℝ} (hk : Ker ν β)
+    (g : archGroup K n → ℂ)
+    {M : ℝ} (hg : ∀ y ∈ tsupport β, ‖g y‖ ≤ M)
+    : ‖∫ y, (β y : ℂ) * g y ∂ν‖ ≤ M := by
   have hint : Integrable (fun y => β y * M) ν :=
     (hk.cont.integrable_of_hasCompactSupport hk.cpt).mul_const M
   have hpt : ∀ y, ‖(β y : ℂ) * g y‖ ≤ β y * M := by
@@ -31,11 +36,15 @@ theorem norm_integral_ker_le {K : Type} [Field K] [NumberField K] {n : ℕ}
   have h := norm_integral_le_of_norm_le hint (Eventually.of_forall hpt)
   rwa [integral_mul_const, hk.mass, one_mul] at h
 
-theorem uBnd_sm (K : Type) [Field K] [NumberField K] (n : ℕ)
-    [MeasurableSpace (archGroup K n)] [BorelSpace (archGroup K n)]
-    (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] (β : archGroup K n → ℝ) (ι : Type)
-    (f : ι → AdelicGLn.AdelicGL K n → ℂ) (m : ℕ → ℝ) (hk : Ker ν β) (_hf : ∀ i, Continuous (f i))
-    (hb : UBnd f m) : UBnd (fun i => sm ν β (f i)) m := by
+theorem uBnd_sm
+    (K : Type) [Field K] [NumberField K]
+    (n : ℕ) [MeasurableSpace (archGroup K n)] [BorelSpace (archGroup K n)]
+    (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+    (β : archGroup K n → ℝ)
+    (ι : Type) (f : ι → AdelicGLn.AdelicGL K n → ℂ)
+    (m : ℕ → ℝ)
+    (hk : Ker ν β) (_hf : ∀ i, Continuous (f i)) (hb : UBnd f m)
+    : UBnd (fun i => sm ν β (f i)) m := by
   intro ω hω hsub t₀ Q hQ
   have hQ' : IsCompact (Q * infEmb K n '' tsupport β) :=
     hQ.mul (hk.cpt.isCompact.image continuous_infEmb)

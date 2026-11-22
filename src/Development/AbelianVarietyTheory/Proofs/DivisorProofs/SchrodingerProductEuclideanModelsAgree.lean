@@ -9,7 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsEq
 open MeasureTheory Matrix Complex GlobalTheory.RealWeil
 open scoped Real SchwartzMap ComplexConjugate
 
-theorem GlobalTheory.Proof.schrodinger_models_agree : ∀ (l : Type) [Fintype l] [DecidableEq l] (w : (l → ℝ) × (l → ℝ)) (φ : 𝓢(l → ℝ, ℂ)) (f f₁ : Sch l), (∀ x : EuclideanSpace ℝ l, f x = φ x.ofLp) → (∀ x : EuclideanSpace ℝ l, f₁ x = GlobalTheory.Published.Metaplectic.rho w φ x.ofLp) → f₁.toLp 2 = rho (Sum.elim w.1 w.2) (f.toLp 2) := by
+theorem GlobalTheory.Proof.schrodinger_models_agree
+    : ∀ (l : Type) [Fintype l] [DecidableEq l] (w : (l → ℝ) × (l → ℝ)) (φ : 𝓢(l → ℝ, ℂ))
+        (f f₁ : Sch l),
+      (∀ x : EuclideanSpace ℝ l, f x = φ x.ofLp)
+        → (∀ x : EuclideanSpace ℝ l, f₁ x = GlobalTheory.Published.Metaplectic.rho w φ x.ofLp)
+        → f₁.toLp 2 = rho (Sum.elim w.1 w.2) (f.toLp 2) := by
   intro l _ _ w φ f f₁ hf hf₁
   obtain ⟨p, q⟩ := w
   have h : ⇑f₁ = rhoFun (Sum.elim p q) ⇑f := by

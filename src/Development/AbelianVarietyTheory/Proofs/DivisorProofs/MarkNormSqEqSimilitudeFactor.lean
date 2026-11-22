@@ -6,25 +6,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SimilitudePa
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.LKMid
 
-theorem Pair.mark_norm_sq : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (P : Pair G) (μ : ℂ), P.Mark μ →
-    ‖μ‖ ^ 2 = ((P.c : ℚ) : ℝ) := by
+theorem Pair.mark_norm_sq
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (P : Pair G) (μ : ℂ),
+      P.Mark μ → ‖μ‖ ^ 2 = ((P.c : ℚ) : ℝ) := by
   intro p _ G P μ hμ
   obtain ⟨v, _, x, hx, hpos⟩ := hμ
   obtain ⟨_, _, hlaw⟩ := GlobalTheory.T.similitudePair_hermitianForm_invertible_similitude p G P v
   set H := G.gram v * G.psi v ((P.β⁻¹ : G.Cˣ) : G.C) with hH
   set A := G.psi v (P.γ : G.C) with hA
   set q : ℂ := star x ⬝ᵥ (H *ᵥ x) with hq
-  have hq0 : q ≠ 0 := by
-    intro h0; rw [h0] at hpos; simp at hpos
+  have hq0 : q ≠ 0 := by intro h0; rw [h0] at hpos; simp at hpos
   have key : star x ⬝ᵥ ((Aᴴ * H * A) *ᵥ x) = (star μ * μ) * q := by
-    rw [← mulVec_mulVec, ← mulVec_mulVec, hx, dotProduct_mulVec, ← star_mulVec, hx, mulVec_smul, star_smul,
-      smul_dotProduct, dotProduct_smul, hq]
-    simp only [smul_eq_mul]; ring
+    rw [← mulVec_mulVec, ← mulVec_mulVec, hx, dotProduct_mulVec, ← star_mulVec, hx, mulVec_smul,
+      star_smul, smul_dotProduct, dotProduct_smul, hq]
+    simp only [smul_eq_mul]
+    ring
   rw [hlaw, Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul] at key
   have hc : star μ * μ = ((P.c : ℚ) : ℂ) := by
     have := mul_right_cancel₀ hq0 key.symm

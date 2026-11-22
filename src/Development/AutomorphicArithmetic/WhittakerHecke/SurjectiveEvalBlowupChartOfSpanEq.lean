@@ -10,34 +10,38 @@ namespace UpperTheory.ChartGen
 
 variable {R : Type} [CommRing R]
 
-private theorem val_rho (I : Ideal R) (c : ↥I) (r : R) :
-    HomogeneousLocalization.val (chartRingHom I c r) =
-      Localization.mk ((reesDegreeZeroEquiv I r : ↥(reesAlgebra I)))
-        (1 : ↥(Submonoid.powers (reesGenerator I c))) := rfl
+private theorem val_rho (I : Ideal R) (c : ↥I) (r : R)
+    : HomogeneousLocalization.val (chartRingHom I c r)
+      = Localization.mk ((reesDegreeZeroEquiv I r : ↥(reesAlgebra I)))
+        (1 : ↥(Submonoid.powers (reesGenerator I c))) :=
+  rfl
 
-private theorem cancel_rho (I : Ideal R) (c : ↥I) (n : ℕ)
+private theorem cancel_rho
+    (I : Ideal R) (c : ↥I)
+    (n : ℕ)
     {x y : HomogeneousLocalization.Away (reesGrading I) (reesGenerator I c)}
-    (h : x * chartRingHom I c (c : R) ^ n = y * chartRingHom I c (c : R) ^ n) : x = y := by
+    (h : x * chartRingHom I c (c : R) ^ n = y * chartRingHom I c (c : R) ^ n)
+    : x = y := by
   have hn := pow_mem (chartRingHom_mem_nonZeroDivisors I c) n
   have h0 : (x - y) * chartRingHom I c (c : R) ^ n = 0 := by rw [sub_mul, h, sub_self]
   exact sub_eq_zero.mp ((mem_nonZeroDivisors_iff.mp hn).2 _ h0)
 
-private theorem exists_mul_pow_eq (I : Ideal R) (c : ↥I)
-    (z : HomogeneousLocalization.Away (reesGrading I) (reesGenerator I c)) :
-    ∃ (n : ℕ) (r : R), r ∈ I ^ n ∧
-      z * chartRingHom I c (c : R) ^ n = chartRingHom I c r := by
-  obtain ⟨n, x, hx, rfl⟩ := HomogeneousLocalization.Away.mk_surjective (reesGrading I)
-    (reesGenerator_mem_reesGrading I c) z
+private theorem exists_mul_pow_eq
+    (I : Ideal R) (c : ↥I) (z : HomogeneousLocalization.Away (reesGrading I) (reesGenerator I c))
+    : ∃ (n : ℕ) (r : R), r ∈ I ^ n ∧ z * chartRingHom I c (c : R) ^ n = chartRingHom I c r := by
+  obtain ⟨n, x, hx, rfl⟩ :=
+    HomogeneousLocalization.Away.mk_surjective (reesGrading I) (reesGenerator_mem_reesGrading I c) z
   have hx' : x ∈ reesGrading I n := by simpa using hx
   obtain ⟨r, hr, hxr⟩ := (mem_reesGrading_iff_monomial I n x).1 hx'
   refine ⟨n, r, hr, ?_⟩
-  rw [← map_pow, HomogeneousLocalization.ext_iff_val, HomogeneousLocalization.val_mul,
-    val_rho, val_rho, HomogeneousLocalization.Away.val_mk, Localization.mk_mul,
-    Localization.mk_eq_mk_iff, Localization.r_iff_exists]
+  rw [← map_pow, HomogeneousLocalization.ext_iff_val, HomogeneousLocalization.val_mul, val_rho,
+    val_rho, HomogeneousLocalization.Away.val_mk, Localization.mk_mul, Localization.mk_eq_mk_iff,
+    Localization.r_iff_exists]
   refine ⟨1, ?_⟩
   apply Subtype.ext
-  have hpow : ((reesGenerator I c ^ n : ↥(reesAlgebra I)) : Polynomial R) =
-      Polynomial.monomial n ((c : R) ^ n) := by
+  have hpow
+      : ((reesGenerator I c ^ n : ↥(reesAlgebra I)) : Polynomial R)
+        = Polynomial.monomial n ((c : R) ^ n) := by
     rw [SubmonoidClass.coe_pow, reesGenerator_coe, Polynomial.monomial_pow, one_mul]
   push_cast [reesDegreeZeroEquiv_coe_coe, hxr, hpow]
   simp [Polynomial.C_mul_monomial, Polynomial.monomial_mul_C, mul_comm]
@@ -46,15 +50,17 @@ private theorem exists_mul_pow_eq (I : Ideal R) (c : ↥I)
 end UpperTheory.ChartGen
 
 open UpperTheory.ChartGen in
-theorem UpperTheory.surjective_eval_blowupChart_of_span_eq :
-    ∀ {R : Type} [CommRing R] (I : Ideal R) {M : ℕ} (a : Fin (M + 1) → ↥I), Ideal.span (Set.range fun l => (a l : R)) = I → ∀ m : Fin (M + 1), Function.Surjective (MvPolynomial.eval₂Hom (chartRingHom I (a m)) (fun l => chartFraction I (a m) (a l))) := by
+theorem UpperTheory.surjective_eval_blowupChart_of_span_eq
+    : ∀ {R : Type} [CommRing R] (I : Ideal R) {M : ℕ} (a : Fin (M + 1) → ↥I),
+      Ideal.span (Set.range fun l => (a l : R)) = I
+        → ∀ m : Fin (M + 1),
+          Function.Surjective (MvPolynomial.eval₂Hom (chartRingHom I (a m))
+            (fun l => chartFraction I (a m) (a l))) := by
   intro R _ I M a hspan m
   set c := a m with hc
   set φ := MvPolynomial.eval₂Hom (chartRingHom I c) (fun l => chartFraction I c (a l)) with hφ
-  have hC : ∀ r : R, chartRingHom I c r ∈ φ.range := fun r =>
-    ⟨MvPolynomial.C r, by simp [hφ]⟩
-  have hX : ∀ l, chartFraction I c (a l) ∈ φ.range := fun l =>
-    ⟨MvPolynomial.X l, by simp [hφ]⟩
+  have hC : ∀ r : R, chartRingHom I c r ∈ φ.range := fun r => ⟨MvPolynomial.C r, by simp [hφ]⟩
+  have hX : ∀ l, chartFraction I c (a l) ∈ φ.range := fun l => ⟨MvPolynomial.X l, by simp [hφ]⟩
   have hfrac : ∀ b : ↥I, chartFraction I c b ∈ φ.range := by
     intro b
     have hb : (b : R) ∈ Ideal.span (Set.range fun l => (a l : R)) := by rw [hspan]; exact b.2
@@ -69,8 +75,9 @@ theorem UpperTheory.surjective_eval_blowupChart_of_span_eq :
       rw [map_mul, chartRingHom_coe_eq_chartFraction_mul I c (a l), mul_assoc]
     rw [heq]
     exact hw
-  have hpow : ∀ (n : ℕ), ∀ r ∈ I ^ n, ∃ w ∈ φ.range,
-      chartRingHom I c r = w * chartRingHom I c (c : R) ^ n := by
+  have hpow
+      : ∀ (n : ℕ), ∀ r ∈ I ^ n, ∃ w ∈ φ.range,
+        chartRingHom I c r = w * chartRingHom I c (c : R) ^ n := by
     intro n
     induction n with
     | zero => exact fun r _ => ⟨_, hC r, by simp⟩

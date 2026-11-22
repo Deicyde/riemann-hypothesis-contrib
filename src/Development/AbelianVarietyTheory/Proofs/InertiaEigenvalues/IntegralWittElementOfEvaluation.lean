@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilK
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
@@ -16,9 +18,10 @@ noncomputable section
 namespace GlobalTheory.BSP.HeightSInt
 variable {l : ℕ} [hl : Fact l.Prime] {K : FinExt l}
 
-theorem smod_iff {R : Type} [CommRing R] (p x y : R) (n : ℕ) :
-    x ≡ y [SMOD (Ideal.span {p} ^ n • ⊤ : Submodule R R)] ↔ p ^ n ∣ x - y := by
-  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+theorem smod_iff {R : Type} [CommRing R] (p x y : R) (n : ℕ)
+    : x ≡ y [SMOD (Ideal.span {p} ^ n • ⊤ : Submodule R R)] ↔ p ^ n ∣ x - y := by
+  rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+    Ideal.mem_span_singleton]
 
 theorem l_ne_zero_WCb : ((l : ℕ) : WCb l) ≠ 0 := by
   intro h
@@ -30,11 +33,12 @@ theorem l_mul_cancel {x y : WCb l} (h : (l : WCb l) * x = (l : WCb l) * y) : x =
   mul_left_cancel₀ l_ne_zero_WCb h
 
 theorem dvd_iff_coeff {a : ℕ} [NeZero a] (w : Wq l a) : (l : Wq l a) ∣ w ↔ w.coeff 0 = 0 := by
-  rw [← Ideal.mem_span_singleton, ← WittVector.ker_constantCoeff, RingHom.mem_ker, WittVector.constantCoeff_apply]
+  rw [← Ideal.mem_span_singleton, ← WittVector.ker_constantCoeff, RingHom.mem_ker,
+    WittVector.constantCoeff_apply]
 
-theorem dec {a : ℕ} [NeZero a] (s : (Wq l a)⟦X⟧) :
-    (∃ s', s = (l : (Wq l a)⟦X⟧) * s') ∨
-      ∃ (j : ℕ) (t s' : (Wq l a)⟦X⟧), IsUnit t ∧ s = X ^ j * t + (l : (Wq l a)⟦X⟧) * s' := by
+theorem dec {a : ℕ} [NeZero a] (s : (Wq l a)⟦X⟧)
+    : (∃ s', s = (l : (Wq l a)⟦X⟧) * s')
+      ∨ ∃ (j : ℕ) (t s' : (Wq l a)⟦X⟧), IsUnit t ∧ s = X ^ j * t + (l : (Wq l a)⟦X⟧) * s' := by
   classical
   have hl' : ((l : (Wq l a)⟦X⟧)) = C (l : Wq l a) := (map_natCast C l).symm
   by_cases h : ∀ k, (l : Wq l a) ∣ coeff k s
@@ -75,12 +79,16 @@ theorem reduction_X_eq_flat : e0 bk X = bk.flat := by
 theorem reduction_l_mul_eq_zero (s : bk.S) : e0 bk ((l : bk.S) * s) = 0 := by
   rw [map_mul, map_natCast, CharP.cast_eq_zero, zero_mul]
 
-theorem reduction_decomposition (s : bk.S) : (∃ s', s = (l : bk.S) * s') ∨ ∃ (j : ℕ) (t : bk.S), IsUnit (e0 bk t) ∧
-    ∃ s' : bk.S, s = X ^ j * t + (l : bk.S) * s' ∧ e0 bk s = bk.flat ^ j * e0 bk t := by
+theorem reduction_decomposition (s : bk.S)
+    : (∃ s', s = (l : bk.S) * s')
+      ∨ ∃ (j : ℕ) (t : bk.S),
+        IsUnit (e0 bk t)
+          ∧ ∃ s' : bk.S, s = X ^ j * t + (l : bk.S) * s' ∧ e0 bk s = bk.flat ^ j * e0 bk t := by
   rcases dec s with h | ⟨j, t, s', ht, h⟩
   · exact Or.inl h
   · refine Or.inr ⟨j, t, ht.map _, s', h, ?_⟩
-    rw [h, map_add (f := _), reduction_l_mul_eq_zero, add_zero, map_mul, map_pow, reduction_X_eq_flat]
+    rw [h, map_add (f := _), reduction_l_mul_eq_zero, add_zero, map_mul, map_pow,
+      reduction_X_eq_flat]
 
 theorem dvd_of_reduction_eq_zero {s : bk.S} (h : e0 bk s = 0) : ∃ s', s = (l : bk.S) * s' := by
   rcases reduction_decomposition bk s with h' | ⟨j, t, ht, s', -, he⟩
@@ -88,7 +96,8 @@ theorem dvd_of_reduction_eq_zero {s : bk.S} (h : e0 bk s = 0) : ∃ s', s = (l :
   · rw [he] at h
     exact absurd h (mul_ne_zero (pow_ne_zero _ (FlatDisc.flat_ne_zero bk)) ht.ne_zero)
 
-theorem exists_reduction_of_flat_pow {m : ℕ} {x : OCb l} {s : bk.S} (h : bk.flat ^ m * x = e0 bk s) : ∃ s₀ : bk.S, x = e0 bk s₀ := by
+theorem exists_reduction_of_flat_pow {m : ℕ} {x : OCb l} {s : bk.S} (h : bk.flat ^ m * x = e0 bk s)
+    : ∃ s₀ : bk.S, x = e0 bk s₀ := by
   have hf := FlatDisc.flat_ne_zero bk
   rcases reduction_decomposition bk s with ⟨s', rfl⟩ | ⟨j, t, ht, s', -, he⟩
   · rw [reduction_l_mul_eq_zero] at h
@@ -103,14 +112,17 @@ theorem exists_reduction_of_flat_pow {m : ℕ} {x : OCb l} {s : bk.S} (h : bk.fl
       obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_lt (not_le.1 hmj)
       have h2 : bk.flat ^ (k + 1) * x = e0 bk t := by
         refine mul_left_cancel₀ (pow_ne_zero j hf) ?_
-        rw [← h, ← mul_assoc, ← pow_add]; ring_nf
+        rw [← h, ← mul_assoc, ← pow_add]
+        ring_nf
       rw [← h2, pow_succ, mul_assoc, mul_comm, mul_assoc] at ht
       exact FlatDisc.not_isUnit_flat bk (isUnit_of_mul_isUnit_left ht)
 
-theorem cc_evW (s : bk.S) : WittVector.constantCoeff (bk.evW s) = algebraMap (OCb l) (Cb l) (e0 bk s) := by
+theorem cc_evW (s : bk.S)
+    : WittVector.constantCoeff (bk.evW s) = algebraMap (OCb l) (Cb l) (e0 bk s) := by
   simp [BK.evW, e0, inclW, WittVector.constantCoeff_apply, WittVector.map_coeff]
 
-theorem cc_inclW (a : Ainf l) : WittVector.constantCoeff (inclW l a) = algebraMap (OCb l) (Cb l) (a.coeff 0) := by
+theorem cc_inclW (a : Ainf l)
+    : WittVector.constantCoeff (inclW l a) = algebraMap (OCb l) (Cb l) (a.coeff 0) := by
   simp [inclW, WittVector.constantCoeff_apply, WittVector.map_coeff]
 
 theorem cc_l_mul (y : WCb l) : WittVector.constantCoeff ((l : WCb l) * y) = 0 := by
@@ -128,20 +140,23 @@ theorem mem_of_l_mul_mem {v : WCb l} (h : (l : WCb l) * v ∈ bk.OE) : v ∈ bk.
   obtain ⟨m, s, y, hs⟩ := h (n + 1)
   have h0 : e0 bk s = 0 := by
     have := congrArg WittVector.constantCoeff hs
-    rw [map_add (f := _), pow_succ', mul_assoc, cc_l_mul, add_zero, cc_evW, mul_left_comm, cc_l_mul] at this
+    rw [map_add (f := _), pow_succ', mul_assoc, cc_l_mul, add_zero, cc_evW, mul_left_comm, cc_l_mul]
+      at this
     exact (IsFractionRing.injective (OCb l) (Cb l)) (by rw [← this, map_zero])
   obtain ⟨s', rfl⟩ := dvd_of_reduction_eq_zero bk h0
   refine ⟨m, s', y, l_mul_cancel ?_⟩
   rw [map_mul, map_natCast] at hs
-  rw [mul_add, mul_left_comm, hs]; ring
+  rw [mul_add, mul_left_comm, hs]
+  ring
 
-theorem step {a : Ainf l} (h : inclW l a ∈ bk.OE) :
-    ∃ (s₀ : bk.S) (a₁ : Ainf l), a = bk.ev s₀ + (l : Ainf l) * a₁ ∧ inclW l a₁ ∈ bk.OE := by
+theorem step {a : Ainf l} (h : inclW l a ∈ bk.OE)
+    : ∃ (s₀ : bk.S) (a₁ : Ainf l), a = bk.ev s₀ + (l : Ainf l) * a₁ ∧ inclW l a₁ ∈ bk.OE := by
   obtain ⟨m, s, y, hs⟩ := h 1
   have h1 : bk.flat ^ m * a.coeff 0 = e0 bk s := by
     have := congrArg WittVector.constantCoeff hs
-    rw [map_add (f := _), pow_one, cc_l_mul, add_zero, cc_evW, map_mul, map_pow, cc_evW, cc_inclW, reduction_X_eq_flat, ← map_pow,
-      ← map_mul] at this
+    rw [map_add (f := _), pow_one, cc_l_mul, add_zero, cc_evW, map_mul, map_pow, cc_evW, cc_inclW,
+        reduction_X_eq_flat, ← map_pow, ← map_mul]
+      at this
     exact IsFractionRing.injective (OCb l) (Cb l) this
   obtain ⟨s₀, hs₀⟩ := exists_reduction_of_flat_pow bk h1
   have h2 : a - bk.ev s₀ ∈ Ideal.span {(l : Ainf l)} := by
@@ -155,9 +170,9 @@ theorem step {a : Ainf l} (h : inclW l a ∈ bk.OE) :
   rw [this]
   exact sub_mem h (evW_mem bk s₀)
 
-theorem exists_lim {a : ℕ} [NeZero a] (T : ℕ → (Wq l a)⟦X⟧)
-    (hT : ∀ n, (l : (Wq l a)⟦X⟧) ^ n ∣ T (n + 1) - T n) :
-    ∃ s : (Wq l a)⟦X⟧, ∀ n, (l : (Wq l a)⟦X⟧) ^ n ∣ T n - s := by
+theorem exists_lim
+    {a : ℕ} [NeZero a] (T : ℕ → (Wq l a)⟦X⟧) (hT : ∀ n, (l : (Wq l a)⟦X⟧) ^ n ∣ T (n + 1) - T n)
+    : ∃ s : (Wq l a)⟦X⟧, ∀ n, (l : (Wq l a)⟦X⟧) ^ n ∣ T n - s := by
   classical
   have hl' : ∀ n, ((l : (Wq l a)⟦X⟧)) ^ n = C ((l : Wq l a) ^ n) := fun n => by
     rw [map_pow, map_natCast]
@@ -173,13 +188,17 @@ theorem exists_lim {a : ℕ} [NeZero a] (T : ℕ → (Wq l a)⟦X⟧)
   have hc : ∀ i, ∃ L : Wq l a, ∀ n, (l : Wq l a) ^ n ∣ coeff i (T n) - L := by
     intro i
     have hpc : IsPrecomplete (Ideal.span {(l : Wq l a)}) (Wq l a) := inferInstance
-    obtain ⟨L, hL⟩ := hpc.prec (f := fun n => coeff i (T n)) (fun {m n} hmn' => by
-      rw [smod_iff]
-      obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn'
-      obtain ⟨q, hq⟩ := hmn m k
-      refine ⟨-coeff i q, ?_⟩
-      have : T m - T (m + k) = -(T (m + k) - T m) := by ring
-      rw [← map_sub, this, hq, hl', map_neg, coeff_C_mul]; ring)
+    obtain ⟨L, hL⟩ :=
+      hpc.prec
+        (f := fun n => coeff i (T n))
+        (fun {m n} hmn' => by
+          rw [smod_iff]
+          obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn'
+          obtain ⟨q, hq⟩ := hmn m k
+          refine ⟨- coeff i q, ?_⟩
+          have : T m - T (m + k) = -(T (m + k) - T m) := by ring
+          rw [← map_sub, this, hq, hl', map_neg, coeff_C_mul]
+          ring)
     exact ⟨L, fun n => (smod_iff _ _ _ _).1 (hL n)⟩
   choose L hL using hc
   refine ⟨mk L, fun n => ?_⟩
@@ -187,7 +206,8 @@ theorem exists_lim {a : ℕ} [NeZero a] (T : ℕ → (Wq l a)⟦X⟧)
   refine ⟨mk fun i => q i, PowerSeries.ext fun i => ?_⟩
   rw [map_sub, coeff_mk, hl', coeff_C_mul, coeff_mk, hq]
 
-theorem main (w : WCb l) (hw : w ∈ bk.OE) (a : Ainf l) (ha : w = inclW l a) : ∃ s : bk.S, a = bk.ev s := by
+theorem main (w : WCb l) (hw : w ∈ bk.OE) (a : Ainf l) (ha : w = inclW l a)
+    : ∃ s : bk.S, a = bk.ev s := by
   classical
   subst ha
   let P : Type := {a : Ainf l // inclW l a ∈ bk.OE}
@@ -209,7 +229,8 @@ theorem main (w : WCb l) (hw : w ∈ bk.OE) (a : Ainf l) (ha : w = inclW l a) : 
   obtain ⟨s, hs⟩ := exists_lim T (fun n => ⟨σ (A n), by simp [T, Finset.sum_range_succ]⟩)
   refine ⟨s, ?_⟩
   rw [← sub_eq_zero]
-  refine (IsHausdorff.eq_iff_smodEq (I := Ideal.span {(l : Ainf l)})).2 fun n => (smod_iff _ _ _ _).2 ?_
+  refine (IsHausdorff.eq_iff_smodEq (I := Ideal.span {(l : Ainf l)})).2 fun n =>
+    (smod_iff _ _ _ _).2 ?_
   obtain ⟨q, hq⟩ := hs n
   have : T n = s + (l : bk.S) ^ n * q := by rw [← hq]; ring
   refine ⟨bk.ev q + (A n).1, ?_⟩
@@ -220,6 +241,7 @@ theorem main (w : WCb l) (hw : w ∈ bk.OE) (a : Ainf l) (ha : w = inclW l a) : 
 
 end GlobalTheory.BSP.HeightSInt
 
-theorem GlobalTheory.BSP.ainf_inter_OE : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K), ∀ w ∈ bk.OE, ∀ a : Ainf l,
-    w = inclW l a → ∃ s : bk.S, a = bk.ev s :=
-  fun _ _ _ bk w hw a ha => HeightSInt.main bk w hw a ha
+theorem GlobalTheory.BSP.ainf_inter_OE
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K), ∀ w ∈ bk.OE, ∀ a : Ainf l,
+      w = inclW l a → ∃ s : bk.S, a = bk.ev s := fun _ _ _ bk w hw a ha =>
+  HeightSInt.main bk w hw a ha

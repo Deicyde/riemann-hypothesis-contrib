@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LieDeri
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.SmGL GlobalTheory.DiscSpec
 
 open scoped Matrix.Norms.Operator
 
@@ -13,7 +14,8 @@ noncomputable section
 
 namespace GlobalTheory.SmoothIwasawaNear
 
-variable (E : Type) [Field E] [NumberField E] {c N : ℕ} {n : Fin c → ℕ} (e : (Σ i, Fin (n i)) ≃ Fin N)
+variable
+  (E : Type) [Field E] [NumberField E] {c N : ℕ} {n : Fin c → ℕ} (e : (Σ i, Fin (n i)) ≃ Fin N)
 
 def lowPart (X : Matrix (Fin N) (Fin N) (Cinf E)) : Matrix (Fin N) (Fin N) (Cinf E) :=
   Matrix.of fun p q => if blk e q < blk e p then X p q else 0
@@ -22,24 +24,28 @@ def skewLin : Matrix (Fin N) (Fin N) (Cinf E) →ₗ[ℝ] Matrix (Fin N) (Fin N)
   toFun X := lowPart E e X - (lowPart E e X).conjTranspose
   map_add' X Y := by
     refine Matrix.ext fun p q => ?_
-    simp only [lowPart, Matrix.add_apply, Matrix.sub_apply, Matrix.conjTranspose_apply, Matrix.of_apply]
+    simp only [lowPart, Matrix.add_apply, Matrix.sub_apply, Matrix.conjTranspose_apply,
+      Matrix.of_apply]
     split_ifs <;> simp [star_add] <;> abel
   map_smul' r X := by
     refine Matrix.ext fun p q => ?_
-    simp only [lowPart, Matrix.smul_apply, Matrix.sub_apply, Matrix.conjTranspose_apply, Matrix.of_apply,
-      RingHom.id_apply]
+    simp only [lowPart, Matrix.smul_apply, Matrix.sub_apply, Matrix.conjTranspose_apply,
+      Matrix.of_apply, RingHom.id_apply]
     split_ifs <;> simp [star_smul, smul_sub]
 
 def skew : Matrix (Fin N) (Fin N) (Cinf E) →L[ℝ] Matrix (Fin N) (Fin N) (Cinf E) :=
   LinearMap.toContinuousLinearMap (skewLin E e)
 
-theorem skew_apply (X : Matrix (Fin N) (Fin N) (Cinf E)) : skew E e X = lowPart E e X - (lowPart E e X).conjTranspose := rfl
+theorem skew_apply (X : Matrix (Fin N) (Fin N) (Cinf E))
+    : skew E e X = lowPart E e X - (lowPart E e X).conjTranspose :=
+  rfl
 
-theorem skew_conjTranspose (X : Matrix (Fin N) (Fin N) (Cinf E)) : (skew E e X).conjTranspose = -skew E e X := by
+theorem skew_conjTranspose (X : Matrix (Fin N) (Fin N) (Cinf E))
+    : (skew E e X).conjTranspose = - skew E e X := by
   rw [skew_apply, Matrix.conjTranspose_sub, Matrix.conjTranspose_conjTranspose, neg_sub]
 
-theorem blockTriangular_up (X : Matrix (Fin N) (Fin N) (Cinf E)) :
-    (1 + (X - skew E e X)).BlockTriangular (blk e) := by
+theorem blockTriangular_up (X : Matrix (Fin N) (Fin N) (Cinf E))
+    : (1 + (X - skew E e X)).BlockTriangular (blk e) := by
   intro i j h
   have hij : i ≠ j := fun hh => by subst hh; exact lt_irrefl _ h
   simp [skew_apply, lowPart, Matrix.conjTranspose_apply, Matrix.one_apply_ne hij, h, not_lt_of_gt h]
@@ -47,18 +53,22 @@ theorem blockTriangular_up (X : Matrix (Fin N) (Fin N) (Cinf E)) :
 def Fm (X : Matrix (Fin N) (Fin N) (Cinf E)) : Matrix (Fin N) (Fin N) (Cinf E) :=
   (1 + (X - skew E e X)) * NormedSpace.exp (skew E e X)
 
-theorem contDiff_exp' {k : WithTop ℕ∞} :
-    ContDiff ℝ k (NormedSpace.exp : Matrix (Fin N) (Fin N) (Cinf E) → Matrix (Fin N) (Fin N) (Cinf E)) :=
+theorem contDiff_exp' {k : WithTop ℕ∞}
+    : ContDiff ℝ k
+      (NormedSpace.exp : Matrix (Fin N) (Fin N) (Cinf E) → Matrix (Fin N) (Fin N) (Cinf E)) :=
   contDiff_iff_contDiffAt.2 fun x => (NormedSpace.exp_analytic (𝕂 := ℝ) x).contDiffAt
 
 theorem contDiff_Fm {k : WithTop ℕ∞} : ContDiff ℝ k (Fm E e) :=
-  (contDiff_const.add (contDiff_id.sub (skew E e).contDiff)).mul ((contDiff_exp' E).comp (skew E e).contDiff)
+  (contDiff_const.add (contDiff_id.sub (skew E e).contDiff)).mul
+    ((contDiff_exp' E).comp (skew E e).contDiff)
 
 theorem Fm_zero : Fm E e 0 = 1 := by simp [Fm, NormedSpace.exp_zero]
 
-theorem hasFDerivAt_Fm : HasFDerivAt (Fm E e)
-    ((ContinuousLinearEquiv.refl ℝ (Matrix (Fin N) (Fin N) (Cinf E)) : _ →L[ℝ] _)) 0 := by
-  have h1 : HasFDerivAt (fun X : Matrix (Fin N) (Fin N) (Cinf E) => 1 + (X - skew E e X))
+theorem hasFDerivAt_Fm
+    : HasFDerivAt (Fm E e)
+      ((ContinuousLinearEquiv.refl ℝ (Matrix (Fin N) (Fin N) (Cinf E)) : _ →L[ℝ] _)) 0 := by
+  have h1 : HasFDerivAt
+      (fun X : Matrix (Fin N) (Fin N) (Cinf E) => 1 + (X - skew E e X))
       (ContinuousLinearMap.id ℝ _ - skew E e) 0 :=
     ((hasFDerivAt_id 0).sub (skew E e).hasFDerivAt).const_add 1
   have h0 := hasFDerivAt_exp_zero (𝕂 := ℝ) (𝔸 := Matrix (Fin N) (Fin N) (Cinf E))
@@ -71,7 +81,14 @@ theorem hasFDerivAt_Fm : HasFDerivAt (Fm E e)
   rw [hs0, NormedSpace.exp_zero, sub_zero, add_zero, one_mul, mul_one]
   abel
 
-theorem exists_local_iwasawa : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {c N : ℕ} (n : Fin c → ℕ) (e : (Σ i, Fin (n i)) ≃ Fin N), ∃ (p : Lie E N → parab (Cinf E) e) (k : Lie E N → Kinf E N), ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun y => toL (p y).1.val) (oneL E N) ∧ ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun y => toL (k y).1) (oneL E N) ∧ p (oneL E N) = 1 ∧ k (oneL E N) = 1 ∧ ∀ᶠ y in nhds (oneL E N), Matrix.of y = (p y).1.val * (k y).1 := by
+theorem exists_local_iwasawa
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {c N : ℕ}
+        (n : Fin c → ℕ) (e : (Σ i, Fin (n i)) ≃ Fin N),
+      ∃ (p : Lie E N → parab (Cinf E) e) (k : Lie E N → Kinf E N),
+        ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun y => toL (p y).1.val) (oneL E N)
+          ∧ ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun y => toL (k y).1) (oneL E N)
+          ∧ p (oneL E N) = 1 ∧ k (oneL E N) = 1
+          ∧ ∀ᶠ y in nhds (oneL E N), Matrix.of y = (p y).1.val * (k y).1 := by
   intro E _ _ _ c N n e
   classical
   have hn : ((⊤ : ℕ∞) : WithTop ℕ∞) ≠ 0 := by simp
@@ -83,10 +100,12 @@ theorem exists_local_iwasawa : ∀ (E : Type) [Field E] [NumberField E] [_root_.
   have hinv : ∀ᶠ X in nhds (Fm E e 0), Fm E e (G X) = X :=
     (hF.hasStrictFDerivAt' hF' hn).eventually_right_inverse
   rw [Fm_zero] at hG hG1 hinv
-  let T : Lie E N ≃L[ℝ] Matrix (Fin N) (Fin N) (Cinf E) := (Matrix.ofLinearEquiv ℝ).toContinuousLinearEquiv
-  let φ : Matrix (Fin N) (Fin N) (Cinf E) → Matrix (Fin N) (Fin N) (Cinf E) := fun X => 1 + (G X - skew E e (G X))
-  let ψ : Matrix (Fin N) (Fin N) (Cinf E) → Matrix (Fin N) (Fin N) (Cinf E) :=
-    fun X => NormedSpace.exp (skew E e (G X))
+  let T : Lie E N ≃L[ℝ] Matrix (Fin N) (Fin N) (Cinf E) :=
+    (Matrix.ofLinearEquiv ℝ).toContinuousLinearEquiv
+  let φ : Matrix (Fin N) (Fin N) (Cinf E) → Matrix (Fin N) (Fin N) (Cinf E) := fun X =>
+    1 + (G X - skew E e (G X))
+  let ψ : Matrix (Fin N) (Fin N) (Cinf E) → Matrix (Fin N) (Fin N) (Cinf E) := fun X =>
+    NormedSpace.exp (skew E e (G X))
   have hφ : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) φ 1 :=
     contDiffAt_const.add (hG.sub ((skew E e).contDiff.contDiffAt.comp _ hG))
   have hψ : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ψ 1 :=
@@ -98,16 +117,28 @@ theorem exists_local_iwasawa : ∀ (E : Type) [Field E] [NumberField E] [_root_.
   have hTt : Filter.Tendsto (fun y : Lie E N => Matrix.of y) (nhds (oneL E N)) (nhds 1) :=
     T.continuous.tendsto (oneL E N)
   have hunitV : ∀ᶠ y in nhds (oneL E N), IsUnit (φ (Matrix.of y)) := hTt.eventually hunit
-  have hinvV : ∀ᶠ y in nhds (oneL E N), Fm E e (G (Matrix.of y)) = Matrix.of y := hTt.eventually hinv
+  have hinvV : ∀ᶠ y in nhds (oneL E N), Fm E e (G (Matrix.of y)) = Matrix.of y :=
+    hTt.eventually hinv
   have hU : ∀ X, ψ X ∈ Matrix.unitaryGroup (Fin N) (Cinf E) := fun X => by
     show NormedSpace.exp (skew E e (G X)) ∈ _
     rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose, ← Matrix.exp_conjTranspose,
-      skew_conjTranspose, ← Matrix.exp_add_of_commute _ _ (Commute.refl (skew E e (G X))).neg_left, neg_add_cancel,
-      NormedSpace.exp_zero]
+      skew_conjTranspose, ← Matrix.exp_add_of_commute _ _ (Commute.refl (skew E e (G X))).neg_left,
+      neg_add_cancel, NormedSpace.exp_zero]
   have hφT : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) φ (T (oneL E N)) := hφ
   have hψT : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ψ (T (oneL E N)) := hψ
-  refine ⟨fun y => if h : IsUnit (φ (Matrix.of y)) then ⟨h.unit, blockTriangular_up E e (G (Matrix.of y))⟩ else 1,
-    fun y => ⟨ψ (Matrix.of y), hU _⟩, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    fun y =>
+      if h : IsUnit (φ (Matrix.of y)) then
+        ⟨h.unit, blockTriangular_up E e (G (Matrix.of y))⟩
+      else
+        1,
+    fun y => ⟨ψ (Matrix.of y), hU _⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · have hsm : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun y => T.symm (φ (T y))) (oneL E N) :=
       T.symm.contDiff.contDiffAt.comp _ (hφT.comp (oneL E N) T.contDiff.contDiffAt)
     refine hsm.congr_of_eventuallyEq ?_

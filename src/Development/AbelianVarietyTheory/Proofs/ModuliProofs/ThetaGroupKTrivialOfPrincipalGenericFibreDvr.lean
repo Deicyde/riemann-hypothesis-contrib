@@ -20,8 +20,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.FlatK
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.ZM
@@ -29,12 +31,17 @@ open GlobalTheory.ZM
 noncomputable section
 namespace GlobalTheory.KTrivSpread
 
-theorem kTriv_of_finite_flat {V K : Type} [CommRing V] [IsDomain V] [Field K] [Algebra V K] [IsFractionRing V K]
-    {A : Over (Sp V)} [GrpObj A] (hA : IsAbelianScheme A) {L : LB A.left} (hL : L.IsLB) {Z : Over (Sp V)} (i : Z ⟶ A)
-    [IsFinite Z.hom] [Flat Z.hom]
+theorem kTriv_of_finite_flat
+    {V K : Type} [CommRing V] [IsDomain V] [Field K] [Algebra V K] [IsFractionRing V K]
+    {A : Over (Sp V)} [GrpObj A]
+    (hA : IsAbelianScheme A)
+    {L : LB A.left} (hL : L.IsLB)
+    {Z : Over (Sp V)} (i : Z ⟶ A) [IsFinite Z.hom] [Flat Z.hom]
     (hZ : ∀ (T : Over (Sp V)) (x : T ⟶ A), MemKL A L x ↔ ∃ z : T ⟶ Z, z ≫ i = x)
-    {A' : Over (Sp K)} [GrpObj A'] {φ : A'.left ⟶ A.left} (h : IsGrpPullback A' A (spMap (algebraMap V K)) φ)
-    {L' : LB A'.left} (hL' : L'.IsLB) (hw : LBIso L' (L.pull φ)) (hk : KTriv A' L') : KTriv A L := by
+    {A' : Over (Sp K)} [GrpObj A']
+    {φ : A'.left ⟶ A.left} (h : IsGrpPullback A' A (spMap (algebraMap V K)) φ)
+    {L' : LB A'.left} (hL' : L'.IsLB) (hw : LBIso L' (L.pull φ)) (hk : KTriv A' L')
+    : KTriv A L := by
   have := hA.proper
   have := schemeTheoreticallyDominant_fractionField V K
   let Y := pullback Z.hom (spMap (algebraMap V K))
@@ -53,27 +60,36 @@ theorem kTriv_of_finite_flat {V K : Type} [CommRing V] [IsDomain V] [Field K] [A
   have hx : x = 1 := hk _ t x (memKL_of_push h hL hL' hw x ((hZ _ _).2 ⟨z, hz⟩))
   have hx' : pushPt h.1.w x = 1 := (congrArg (pushHom h (Over.mk t)) hx).trans (map_one _)
   have hi : i = toUnit Z ≫ η[A] := by
-    have : IsSchemeTheoreticallyDominant d := by
-      dsimp only [d]; infer_instance
-    refine over_ext_of_schemeTheoreticallyDominant d (congrArg (fun q => q.left)
-      (show z ≫ i = z ≫ toUnit Z ≫ η[A] from ?_))
+    have : IsSchemeTheoreticallyDominant d := by dsimp only [d]; infer_instance
+    refine over_ext_of_schemeTheoreticallyDominant d
+      (congrArg (fun q => q.left) (show z ≫ i = z ≫ toUnit Z ≫ η[A] from ?_))
     rw [hz, hx', ← Category.assoc, comp_toUnit]
     rfl
   intro R _ s y hy
   obtain ⟨u, rfl⟩ := (hZ _ y).1 hy
   rw [hi, ← Category.assoc, comp_toUnit]
 
-theorem kTriv_of_generic_fibre : Laws → ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K] (P : PolAV (Sp K)) (B : Over (Sp V)) [GrpObj B] [IsCommMonObj B] (M : GlobalTheory.UU.CP B) (φ : P.A.left ⟶ B.left), IsAbelianScheme B → IsGrpPullback P.A B (spMap (algebraMap V K)) φ → LBIso P.L (M.L.L.pull φ) → RelAmple B M.L.L → KTriv B M.L.L := by
+theorem kTriv_of_generic_fibre
+    : Laws
+      → ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
+          [IsFractionRing V K] (P : PolAV (Sp K)) (B : Over (Sp V)) [GrpObj B] [IsCommMonObj B]
+          (M : GlobalTheory.UU.CP B) (φ : P.A.left ⟶ B.left),
+        IsAbelianScheme B → IsGrpPullback P.A B (spMap (algebraMap V K)) φ
+          → LBIso P.L (M.L.L.pull φ) → RelAmple B M.L.L
+          → KTriv B M.L.L := by
   intro hL V K _ _ _ _ _ _ P B _ _ M φ hB h hw ha
   have hM := M.L.isLB
   have hP : AbLaw.IsProjBy B.hom :=
-    (AmpleBaseChange.isProjBy_smooth_isProper_geometricallyIntegral _ B M.L.L hB hM ha V (𝟙 _) B.left (𝟙 _) B.hom
-      (IsPullback.of_horiz_isIso ⟨by simp⟩)).1
+    (AmpleBaseChange.isProjBy_smooth_isProper_geometricallyIntegral _ B M.L.L hB hM ha V (𝟙 _)
+      B.left (𝟙 _) B.hom (IsPullback.of_horiz_isIso ⟨by simp⟩)).1
   obtain ⟨hO, hu, hK⟩ := UU.TrivTwist.inK_iff_trivial_twist _ B M.L.L hM
-  obtain ⟨H, j, hj, hH⟩ := GlobalTheory.T.exists_closed_subscheme_translation_kernel hL.globalFns V B hB hP M.L.L _ hM hO
+  obtain ⟨H, j, hj, hH⟩ :=
+    GlobalTheory.T.exists_closed_subscheme_translation_kernel hL.globalFns V B hB hP M.L.L _ hM hO
   have hfin : IsFinite H.hom :=
     AmpleStabFinite.isFinite_of_relAmple hL.globalFns V B hB M.L.L _ hM hO ha H j hj hH
-  have hflat : Flat H.hom := GlobalTheory.T.flat_kernelPolarisation_cosets_over_DVR hL.globalFns V B hB hP M.L M.c _ hO hu H j hj hH hfin
+  have hflat : Flat H.hom :=
+    GlobalTheory.T.flat_kernelPolarisation_cosets_over_DVR hL.globalFns V B hB hP M.L M.c _ hO hu H
+      j hj hH hfin
   exact kTriv_of_finite_flat hB hM j (fun T x => (hK _ rfl T x).trans (hH T x)) h P.isLB hw P.ktriv
 
 end GlobalTheory.KTrivSpread

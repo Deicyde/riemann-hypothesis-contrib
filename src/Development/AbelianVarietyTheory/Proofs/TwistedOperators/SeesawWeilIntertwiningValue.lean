@@ -34,10 +34,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ArchSuppo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct ComplexConjugate
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -48,12 +51,15 @@ namespace GlobalTheory.TripleAssembly
 
 variable {D : D7}
 
-theorem toUX_one (X : HSp D) {k : ℕ} (e : Fin k ≃ Fin X.rank) {J : Matrix (Fin k) (Fin k) D.host.E}
-    (hJ : J = D.host.xi0 • (X.gramᵀ).submatrix e e) : GlobalTheory.TripleRead.toUX X e hJ 1 = 1 := by
-  apply Subtype.ext; apply Units.ext
+theorem toUX_one
+    (X : HSp D)
+    {k : ℕ} (e : Fin k ≃ Fin X.rank)
+    {J : Matrix (Fin k) (Fin k) D.host.E} (hJ : J = D.host.xi0 • (X.gramᵀ).submatrix e e)
+    : GlobalTheory.TripleRead.toUX X e hJ 1 = 1 := by
+  apply Subtype.ext
+  apply Units.ext
   show (GlobalTheory.TripleRead.toUX X e hJ 1).1.1 = 1
   rw [GlobalTheory.TripleRead.toUX_val]
   simp [Formalism.L2.Theta.mt]
-
 
 end GlobalTheory.TripleAssembly

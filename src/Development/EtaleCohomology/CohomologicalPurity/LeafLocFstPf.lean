@@ -21,8 +21,10 @@ theorem LeafLocFst_of (hZ : LeafZ) : LeafLocFst := by
   have := H.hens Γ(P.X, V.1) (P.ι.ker.ideal V)
   have hu : IsUnit (q : H.obj Γ(P.X, V.1) (P.ι.ker.ideal V)) := by
     simpa using hq.map ((eta H P V).comp (P.X.presheaf.map (homOfLE le_top).op).hom)
-  have e : pullback.fst (sch.map (hensTo H P V)) (sch.map P.ι) = hpb'.isoPullback.inv ≫
-      sch.map (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk ((P.ι.ker.ideal V).map (eta H P V))))) :=
+  have e
+      : pullback.fst (sch.map (hensTo H P V)) (sch.map P.ι)
+        = hpb'.isoPullback.inv ≫ sch.map (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk
+          ((P.ι.ker.ideal V).map (eta H P V))))) :=
     hpb'.isoPullback_inv_fst.symm
   rw [e]
   exact eqv_comp (eqv_iso _ _) (hE q _ _ hu i)

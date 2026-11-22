@@ -6,16 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.AbsNormMe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RealGal
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL
+  GlobalTheory.RealGal
 open UpperTheory.V.Af (FrobEig algSat RepIso)
 open UpperTheory.V.Af.Bc (res)
 open UpperTheory.Gal.Int.Core
 
-private theorem exists_intCast_eq_of_card_prime (k : Type) [Ring k] (p : ℕ) (hp : Nat.Prime p) (hk : Nat.card k = p)
-    (y : k) : ∃ n : ℤ, (n : k) = y := by
+private theorem exists_intCast_eq_of_card_prime
+    (k : Type) [Ring k] (p : ℕ) (hp : Nat.Prime p) (hk : Nat.card k = p) (y : k)
+    : ∃ n : ℤ, (n : k) = y := by
   haveI : Finite k := Nat.finite_of_card_ne_zero (by rw [hk]; exact hp.ne_zero)
   haveI : Nontrivial k := by
     rw [← Finite.one_lt_card_iff_nontrivial, hk]; exact hp.one_lt
@@ -34,8 +39,11 @@ private theorem exists_intCast_eq_of_card_prime (k : Type) [Ring k] (p : ℕ) (h
   obtain ⟨n, hn⟩ := AddSubgroup.mem_zmultiples_iff.mp hy
   exact ⟨n, by simpa using hn⟩
 
-private theorem complexConj_eq_neg_of_sq_eq_neg_natCast (E : Type) [Field E] [NumberField E] [IsCMField E] (d : ℕ) (hd0 : 0 < d)
-    (x : E) (hx : x ^ 2 = -(d : E)) : IsCMField.complexConj E x = -x := by
+private theorem complexConj_eq_neg_of_sq_eq_neg_natCast
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (d : ℕ) (hd0 : 0 < d)
+    (x : E) (hx : x ^ 2 = -(d : E))
+    : IsCMField.complexConj E x = -x := by
   obtain ⟨φ⟩ := (inferInstance : Nonempty (E →+* ℂ))
   apply φ.injective
   rw [IsCMField.complexEmbedding_complexConj, map_neg]
@@ -48,12 +56,16 @@ private theorem complexConj_eq_neg_of_sq_eq_neg_natCast (E : Type) [Field E] [Nu
     rcases mul_eq_zero.mp hm with h | h
     · exact h
     · rw [h] at hre2
-      have : (0:ℝ) < d := by exact_mod_cast hd0
+      have : (0 : ℝ) < d := by exact_mod_cast hd0
       nlinarith [sq_nonneg (φ x).re]
   apply Complex.ext <;> simp [hre]
 
-private theorem prime_dvd_of_intCast_mem_of_natCast_mem {R : Type} [CommRing R] (P : Ideal R) [P.IsPrime] (q : ℕ)
-    (hq : Nat.Prime q) (hqP : (q : R) ∈ P) (m : ℤ) (hm : (m : R) ∈ P) : (q : ℤ) ∣ m := by
+private theorem prime_dvd_of_intCast_mem_of_natCast_mem
+    {R : Type} [CommRing R]
+    (P : Ideal R) [P.IsPrime]
+    (q : ℕ) (hq : Nat.Prime q) (hqP : (q : R) ∈ P)
+    (m : ℤ) (hm : (m : R) ∈ P)
+    : (q : ℤ) ∣ m := by
   by_contra h
   have hirr : Irreducible (q : ℤ) := (Nat.prime_iff_prime_int.mp hq).irreducible
   obtain ⟨a, b, hab⟩ := (Irreducible.coprime_iff_not_dvd hirr).mpr h
@@ -63,15 +75,20 @@ private theorem prime_dvd_of_intCast_mem_of_natCast_mem {R : Type} [CommRing R] 
   rw [hab, Int.cast_one] at h1
   exact (Ideal.IsPrime.ne_top inferInstance) ((Ideal.eq_top_iff_one P).mpr h1)
 
-private theorem isSquare_neg_padic_of_dvd_sq_add_of_not_dvd (q : ℕ) [Fact q.Prime] (d n : ℤ) (h1 : (q : ℤ) ∣ n ^ 2 + d)
-    (h2 : ¬ (q : ℤ) ∣ 2 * n) : IsSquare (-(d : ℚ_[q])) := by
-  have hnorm : ‖(Polynomial.X ^ 2 + Polynomial.C d : Polynomial ℤ).aeval (n : ℤ_[q])‖ <
-      ‖(Polynomial.X ^ 2 + Polynomial.C d : Polynomial ℤ).derivative.aeval (n : ℤ_[q])‖ ^ 2 := by
-    have e1 : (Polynomial.X ^ 2 + Polynomial.C d : Polynomial ℤ).aeval (n : ℤ_[q]) =
-        ((n ^ 2 + d : ℤ) : ℤ_[q]) := by
+private theorem isSquare_neg_padic_of_dvd_sq_add_of_not_dvd
+    (q : ℕ) [Fact q.Prime] (d n : ℤ) (h1 : (q : ℤ) ∣ n ^ 2 + d) (h2 : ¬ (q : ℤ) ∣ 2 * n)
+    : IsSquare (-(d : ℚ_[q])) := by
+  have hnorm
+      : ‖(Polynomial.X ^ 2 + Polynomial.C d : Polynomial ℤ).aeval (n : ℤ_[q])‖
+        < ‖(Polynomial.X ^ 2 + Polynomial.C d : Polynomial ℤ).derivative.aeval (n : ℤ_[q])‖
+          ^ 2 := by
+    have e1
+        : (Polynomial.X ^ 2 + Polynomial.C d : Polynomial ℤ).aeval (n : ℤ_[q])
+          = ((n ^ 2 + d : ℤ) : ℤ_[q]) := by
       simp
-    have e2 : (Polynomial.X ^ 2 + Polynomial.C d : Polynomial ℤ).derivative.aeval (n : ℤ_[q]) =
-        ((2 * n : ℤ) : ℤ_[q]) := by
+    have e2
+        : (Polynomial.X ^ 2 + Polynomial.C d : Polynomial ℤ).derivative.aeval (n : ℤ_[q])
+          = ((2 * n : ℤ) : ℤ_[q]) := by
       simp [Polynomial.derivative_X_pow]
       left
       exact map_ofNat _ 2
@@ -79,8 +96,8 @@ private theorem isSquare_neg_padic_of_dvd_sq_add_of_not_dvd (q : ℕ) [Fact q.Pr
     have a1 : ‖((n ^ 2 + d : ℤ) : ℤ_[q])‖ < 1 := (PadicInt.norm_int_lt_one_iff_dvd _).mpr h1
     have a2 : ‖((2 * n : ℤ) : ℤ_[q])‖ = 1 := by
       have hle : ‖((2 * n : ℤ) : ℤ_[q])‖ ≤ 1 := PadicInt.norm_le_one _
-      have hnlt : ¬ ‖((2 * n : ℤ) : ℤ_[q])‖ < 1 :=
-        fun h => h2 ((PadicInt.norm_int_lt_one_iff_dvd _).mp h)
+      have hnlt : ¬ ‖((2 * n : ℤ) : ℤ_[q])‖ < 1 := fun h =>
+        h2 ((PadicInt.norm_int_lt_one_iff_dvd _).mp h)
       linarith [not_lt.mp hnlt]
     rw [a2]
     simpa using a1
@@ -91,8 +108,7 @@ private theorem isSquare_neg_padic_of_dvd_sq_add_of_not_dvd (q : ℕ) [Fact q.Pr
   push_cast at hz''
   linear_combination -hz''
 
-theorem UpperTheory.Gal.Int.Core.oneUs_holds :
-    OneUs := by
+theorem UpperTheory.Gal.Int.Core.oneUs_holds : OneUs := by
   unfold OneUs
   intro E _ _ _ d hd
   obtain ⟨hd0, x, hx⟩ := hd
@@ -100,7 +116,7 @@ theorem UpperTheory.Gal.Int.Core.oneUs_holds :
     apply IsIntegral.of_pow (n := 2) (by norm_num)
     rw [hx]
     apply IsIntegral.neg
-    have := isIntegral_algebraMap (R := ℤ) (A := E) (x := (d:ℤ))
+    have := isIntegral_algebraMap (R := ℤ) (A := E) (x := (d : ℤ))
     simpa using this
   let xo : 𝓞 E := ⟨x, hint⟩
   have hxo : xo ^ 2 = -(d : 𝓞 E) := by
@@ -123,24 +139,24 @@ theorem UpperTheory.Gal.Int.Core.oneUs_holds :
   by_contra h2d
   apply hw
   intro hprime
-  obtain ⟨n, hn⟩ := exists_intCast_eq_of_card_prime (𝓞 E ⧸ w.asIdeal) (normV w) hprime rfl
-    (Ideal.Quotient.mk _ xo)
+  obtain ⟨n, hn⟩ :=
+    exists_intCast_eq_of_card_prime (𝓞 E ⧸ w.asIdeal) (normV w) hprime rfl (Ideal.Quotient.mk _ xo)
   have hxn : xo - n ∈ w.asIdeal := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, ← hn]
     simp
   unfold UsPl
   refine ⟨?_, ?_⟩
   · unfold IsSplitAt
-    let u : HeightOneSpectrum (𝓞 E) :=
-      { asIdeal := w.asIdeal.comap (cO.toRingEquiv : 𝓞 E →+* 𝓞 E)
-        isPrime := Ideal.comap_isPrime _ _
-        ne_bot := by
-          intro h
-          apply w.ne_bot
-          have := Ideal.map_comap_of_surjective (cO.toRingEquiv : 𝓞 E →+* 𝓞 E)
-            cO.surjective w.asIdeal
-          rw [h, Ideal.map_bot] at this
-          exact this.symm }
+    let u : HeightOneSpectrum (𝓞 E) := {
+      asIdeal := w.asIdeal.comap (cO.toRingEquiv : 𝓞 E →+* 𝓞 E)
+      isPrime := Ideal.comap_isPrime _ _
+      ne_bot := by
+        intro h
+        apply w.ne_bot
+        have := Ideal.map_comap_of_surjective (cO.toRingEquiv : 𝓞 E →+* 𝓞 E) cO.surjective w.asIdeal
+        rw [h, Ideal.map_bot] at this
+        exact this.symm
+    }
     refine ⟨u, ?_, ?_⟩
     · intro huw
       have hmem : ∀ a, a ∈ w.asIdeal → cO a ∈ w.asIdeal := by
@@ -161,8 +177,8 @@ theorem UpperTheory.Gal.Int.Core.oneUs_holds :
       ring
     · apply HeightOneSpectrum.ext
       change Ideal.comap (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E))
-          (Ideal.comap (cO.toRingEquiv : 𝓞 E →+* 𝓞 E) w.asIdeal) =
-        Ideal.comap (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) w.asIdeal
+          (Ideal.comap (cO.toRingEquiv : 𝓞 E →+* 𝓞 E) w.asIdeal)
+        = Ideal.comap (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) w.asIdeal
       rw [Ideal.comap_comap]
       congr 1
       ext y

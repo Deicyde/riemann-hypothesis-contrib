@@ -39,37 +39,57 @@ theorem unitaryLimit : UnitaryLimit := by
   set M := Finset.univ.sup m with hMdef
   have hmM : ∀ o, m o ≤ M := fun o => Finset.le_sup (Finset.mem_univ o)
   have key := fun (k : ℕ) (hk : M ≤ k) (o : Orb K.O B.T (B.X x)) =>
-    S2 K B _ (hstab _ (Quot.out o).2).1 (hstab _ (Quot.out o).2).2 a hpos M k hk
-      (hm o M (hmM o)).1 (hm o M (hmM o)).2
-  have hUU : ∀ k, M ≤ k → (B.UU x (algebraMap K.O B.A a ^ k) : ℝ) =
-      ∑ o : Orb K.O B.T (B.X x), (Nat.card {L' : Submodule K.O B.A // (∃ t ∈ B.T, L' = mulLat K.O (t : B.A) (Quot.out o).1) ∧
-        algebraMap K.O B.A a ^ k ∈ L'} : ℝ) := by
+    S2 K B _ (hstab _ (Quot.out o).2).1 (hstab _ (Quot.out o).2).2 a hpos M k hk (hm o M (hmM o)).1
+      (hm o M (hmM o)).2
+  have hUU
+      : ∀ k,
+        M ≤ k
+          → (B.UU x (algebraMap K.O B.A a ^ k) : ℝ)
+            = ∑ o : Orb K.O B.T (B.X x), (Nat.card {L' : Submodule K.O B.A // (∃ t ∈ B.T, L' = mulLat K.O (t : B.A) (Quot.out o).1) ∧
+                algebraMap K.O B.A a ^ k ∈ L'} : ℝ) := by
     intro k hk
     rw [S3 K B x _ hfin (fun o => (key k hk o).1), finsum_eq_sum_of_fintype]
-    push_cast; rfl
-  have hN : (B.N x : ℝ) = ∑ o : Orb K.O B.T (B.X x),
-      (((stabLat K.O (Quot.out o).1 ⊓ B.T).relIndex (intUnits K.O B.A ⊓ B.T) : ℕ) : ℝ) := by
+    push_cast
+    rfl
+  have hN
+      : (B.N x : ℝ)
+        = ∑ o : Orb K.O B.T (B.X x),
+          (((stabLat K.O (Quot.out o).1 ⊓ B.T).relIndex (intUnits K.O B.A ⊓ B.T) : ℕ) : ℝ) := by
     unfold InvAlg.N orbSum
     rw [finsum_eq_sum_of_fintype]
     push_cast
     simp
-  have hlo : ∀ k, M ≤ k → (B.N x : ℝ) * B.rho (algebraMap K.O B.A a ^ (k - M)) ≤ B.UU x (algebraMap K.O B.A a ^ k) := by
+  have hlo
+      : ∀ k,
+        M ≤ k
+          → (B.N x : ℝ) * B.rho (algebraMap K.O B.A a ^ (k - M))
+            ≤ B.UU x (algebraMap K.O B.A a ^ k) := by
     intro k hk
     rw [hUU k hk, hN, Finset.sum_mul]
     refine Finset.sum_le_sum fun o _ => ?_
     exact_mod_cast (key k hk o).2.1
-  have hhi : ∀ k, M ≤ k → (B.UU x (algebraMap K.O B.A a ^ k) : ℝ) ≤ (B.N x : ℝ) * B.rho (algebraMap K.O B.A a ^ (k + M)) := by
+  have hhi
+      : ∀ k,
+        M ≤ k
+          → (B.UU x (algebraMap K.O B.A a ^ k) : ℝ)
+            ≤ (B.N x : ℝ) * B.rho (algebraMap K.O B.A a ^ (k + M)) := by
     intro k hk
     rw [hUU k hk, hN, Finset.sum_mul]
     refine Finset.sum_le_sum fun o _ => ?_
     exact_mod_cast (key k hk o).2.2
   have hposR : ∀ j, (0 : ℝ) < B.rho (algebraMap K.O B.A a ^ j) := fun j => by exact_mod_cast hpos j
-  have hup : Tendsto (fun k : ℕ => (B.N x : ℝ) * B.rho (algebraMap K.O B.A a ^ (k + M)) / B.rho (algebraMap K.O B.A a ^ k)) atTop (𝓝 (B.N x : ℝ)) := by
+  have hup : Tendsto
+      (fun k : ℕ =>
+        (B.N x : ℝ) * B.rho (algebraMap K.O B.A a ^ (k + M)) / B.rho (algebraMap K.O B.A a ^ k))
+      atTop (𝓝 (B.N x : ℝ)) := by
     have := (S6 r c M).const_mul (B.N x : ℝ)
     rw [mul_one] at this
     refine this.congr fun k => ?_
     rw [hrho, hrho, mul_div_assoc]
-  have hdown : Tendsto (fun k : ℕ => (B.N x : ℝ) * B.rho (algebraMap K.O B.A a ^ (k - M)) / B.rho (algebraMap K.O B.A a ^ k)) atTop (𝓝 (B.N x : ℝ)) := by
+  have hdown : Tendsto
+      (fun k : ℕ =>
+        (B.N x : ℝ) * B.rho (algebraMap K.O B.A a ^ (k - M)) / B.rho (algebraMap K.O B.A a ^ k))
+      atTop (𝓝 (B.N x : ℝ)) := by
     have h1 := ((S6 r c M).inv₀ one_ne_zero).comp (tendsto_sub_atTop_nat M)
     have h2 := h1.const_mul (B.N x : ℝ)
     rw [inv_one, mul_one] at h2

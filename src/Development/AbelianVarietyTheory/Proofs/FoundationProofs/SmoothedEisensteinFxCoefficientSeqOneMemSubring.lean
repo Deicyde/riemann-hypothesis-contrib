@@ -9,12 +9,11 @@ open Finset
 
 namespace GlobalTheory.KummerEisensteinGalois
 
-
 open Finset in
-theorem _root_.GlobalTheory.KummerEisensteinGalois.smF_one_mem_subring : ∀ (K : Type) [Field K] [CharZero K]
-    (R : Subring K) (c M : ℕ) (ζ : K) (a b : ℤ),
-    0 < M → Nat.Coprime c M → ¬ (M : ℤ) ∣ a → ζ ^ b ∈ R → ζ ^ (-b) ∈ R →
-    ∀ n : ℕ, _root_.GlobalTheory.KummerEisensteinGalois.smF (c : ℤ) 1 M ζ a b n ∈ R := by
+theorem _root_.GlobalTheory.KummerEisensteinGalois.smF_one_mem_subring
+    : ∀ (K : Type) [Field K] [CharZero K] (R : Subring K) (c M : ℕ) (ζ : K) (a b : ℤ),
+      0 < M → Nat.Coprime c M → ¬ (M : ℤ) ∣ a → ζ ^ b ∈ R → ζ ^ (-b) ∈ R
+        → ∀ n : ℕ, _root_.GlobalTheory.KummerEisensteinGalois.smF (c : ℤ) 1 M ζ a b n ∈ R := by
   intro K _ _ R c M ζ a b hM hcop ha hb hbneg n
   have hca : ¬ (M : ℤ) ∣ (c : ℤ) * a := by
     intro h
@@ -31,14 +30,17 @@ theorem _root_.GlobalTheory.KummerEisensteinGalois.smF_one_mem_subring : ∀ (K 
     intro m
     have h := hpow (c * m)
     rwa [show (c : ℤ) * b * (m : ℤ) = b * ((c * m : ℕ) : ℤ) by push_cast; ring]
-  unfold _root_.GlobalTheory.KummerEisensteinGalois.smF _root_.GlobalTheory.KummerEisensteinGalois.eisF
+  unfold _root_.GlobalTheory.KummerEisensteinGalois.smF
+    _root_.GlobalTheory.KummerEisensteinGalois.eisF
   split_ifs with hn
   · unfold _root_.GlobalTheory.KummerEisensteinGalois.const0
     simp only [if_true, if_neg ha, if_neg hca]
     have hM0 : (M : ℚ) ≠ 0 := by exact_mod_cast hM.ne'
-    have key : (c : ℚ) ^ 2 * (1 / 2 - _root_.GlobalTheory.KummerEisensteinGalois.frc M a) -
-        c * (1 / 2 - _root_.GlobalTheory.KummerEisensteinGalois.frc M (c * a)) =
-        (((c.choose 2 : ℕ) : ℤ) - ((c : ℤ) * ((c : ℤ) * a / M) - (c : ℤ) ^ 2 * (a / M)) : ℤ) := by
+    have key
+        : (c : ℚ) ^ 2 * (1 / 2 - _root_.GlobalTheory.KummerEisensteinGalois.frc M a)
+            - c * (1 / 2 - _root_.GlobalTheory.KummerEisensteinGalois.frc M (c * a))
+          = (((c.choose 2 : ℕ) : ℤ) - ((c : ℤ) * ((c : ℤ) * a / M) - (c : ℤ) ^ 2 * (a / M))
+            : ℤ) := by
       unfold _root_.GlobalTheory.KummerEisensteinGalois.frc
       rw [Int.emod_def, Int.emod_def]
       push_cast

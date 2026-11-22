@@ -8,8 +8,9 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField IsLocalRing
 
-theorem Op_isDVR {K : Type} [Field K] [NumberField K] (D N : ℕ)
-    (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) : IsDiscreteValuationRing (Op D N la) := by
+theorem Op_isDVR
+    {K : Type} [Field K] [NumberField K] (D N : ℕ) (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
+    : IsDiscreteValuationRing (Op D N la) := by
   classical
   set P := laT D N la with hP
   have hp0 : la.asIdeal ≠ ⊥ := la.ne_bot
@@ -54,8 +55,7 @@ theorem Op_isDVR {K : Type} [Field K] [NumberField K] (D N : ℕ)
     IsLocalization.isNoetherianRing P.primeCompl (Op D N la) inferInstance
   let f : 𝓞 K →+* Op D N la := (algebraMap (OT K D N) (Op D N la)).comp MvPolynomial.C
   have hmax : IsLocalRing.maximalIdeal (Op D N la) = Ideal.map f la.asIdeal := by
-    have e : Ideal.map f la.asIdeal =
-        Ideal.map (algebraMap (OT K D N) (Op D N la)) (laT D N la) :=
+    have e : Ideal.map f la.asIdeal = Ideal.map (algebraMap (OT K D N) (Op D N la)) (laT D N la) :=
       (Ideal.map_map (MvPolynomial.C : 𝓞 K →+* OT K D N) (algebraMap (OT K D N) (Op D N la))).symm
     rw [e]
     exact (Localization.AtPrime.map_eq_maximalIdeal).symm
@@ -72,7 +72,9 @@ theorem Op_isDVR {K : Type} [Field K] [NumberField K] (D N : ℕ)
       rw [Ideal.mem_span_singleton']
       refine ⟨↑u⁻¹ * f c, ?_⟩
       have hfm : f t * f a = f π * f c := by rw [← map_mul, ← map_mul, htc]
-      calc ↑u⁻¹ * f c * f π = ↑u⁻¹ * (f π * f c) := by ring
+      calc
+        ↑u⁻¹ * f c * f π
+          = ↑u⁻¹ * (f π * f c) := by ring
         _ = ↑u⁻¹ * (f t * f a) := by rw [hfm]
         _ = f a := by rw [← hu', ← mul_assoc, Units.inv_mul, one_mul]
     · rw [Ideal.span_le, Set.singleton_subset_iff, hmax]
@@ -84,8 +86,8 @@ theorem Op_isDVR {K : Type} [Field K] [NumberField K] (D N : ℕ)
     have hπ0 : π ≠ 0 := fun h => hπ2 (h ▸ zero_mem _)
     have hinj : Function.Injective (algebraMap (OT K D N) (Op D N la)) :=
       IsLocalization.injective (Op D N la) (Ideal.primeCompl_le_nonZeroDivisors P)
-    exact hπ0 (MvPolynomial.C_injective _ _ ((hinj (hb.trans (map_zero _).symm)).trans
-      (map_zero _).symm))
+    exact hπ0 (MvPolynomial.C_injective _ _
+      ((hinj (hb.trans (map_zero _).symm)).trans (map_zero _).symm))
   have hprin : (IsLocalRing.maximalIdeal (Op D N la)).IsPrincipal := ⟨⟨f π, hπm⟩⟩
   exact ((IsDiscreteValuationRing.TFAE (Op D N la) hnf).out 1 5).mpr hprin
 

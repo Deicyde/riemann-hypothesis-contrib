@@ -11,13 +11,19 @@ public import Formalism.LocalToGlobal.Columns.DecorationStabilizerTrivialUnipote
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.HermitianLatticesTheory Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.UG.P Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.HermitianLatticesTheory Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG
+  Formalism.UG.P Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2
+  GlobalTheory.Mem.Col2.TC Matrix
 noncomputable section
 
 namespace GlobalTheory.Mem.PrimesAtLevel
 
-theorem not_both_mem {R : Type} [CommRing R] (P : Ideal R) [P.IsPrime] {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
-    (hne : p ≠ q) (hpP : (p : R) ∈ P) (hqP : (q : R) ∈ P) : False := by
+theorem not_both_mem
+    {R : Type} [CommRing R]
+    (P : Ideal R) [P.IsPrime]
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hne : p ≠ q) (hpP : (p : R) ∈ P) (hqP : (q : R) ∈ P)
+    : False := by
   obtain ⟨a, b, hab⟩ : IsCoprime (p : ℤ) (q : ℤ) :=
     Nat.isCoprime_iff_coprime.mpr ((Nat.coprime_primes hp hq).mpr hne)
   have h1 : ((a * p + b * q : ℤ) : R) = 1 := by rw [hab, Int.cast_one]
@@ -26,7 +32,13 @@ theorem not_both_mem {R : Type} [CommRing R] (P : Ideal R) [P.IsPrime] {p q : �
   rw [Ideal.eq_top_iff_one, ← h1]
   exact P.add_mem (P.mul_mem_left _ hpP) (P.mul_mem_left _ hqP)
 
-theorem primes_atT : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → ∀ (l : I.Laws) (u : B.Word) (a : I.ι) (v : (I.atT l u a).vT), conjPrime₂ v.1 ≠ v.1 ∧ (∀ w ∈ (B.primes X).vGs, ¬ IsOver (v.1.under (𝓞 B.host.F)) w) ∧ (∀ P ∈ I.Q a, ¬ IsOver (v.1.under (𝓞 B.host.F)) P) ∧ Disjoint (B.primes X).vGs (I.Q a) := by
+theorem primes_atT
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok
+        → ∀ (l : I.Laws) (u : B.Word) (a : I.ι) (v : (I.atT l u a).vT),
+          conjPrime₂ v.1 ≠ v.1 ∧ (∀ w ∈ (B.primes X).vGs, ¬ IsOver (v.1.under (𝓞 B.host.F)) w)
+            ∧ (∀ P ∈ I.Q a, ¬ IsOver (v.1.under (𝓞 B.host.F)) P)
+            ∧ Disjoint (B.primes X).vGs (I.Q a) := by
   intro B X I hI l u a v
   obtain ⟨P, hP⟩ := v
   dsimp only at hP ⊢

@@ -6,8 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial ValuativeRel IsLocalRing Filter
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial ValuativeRel
+  IsLocalRing Filter
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.UnitaryBC
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj)
 open UpperTheory.V.HV (Coef)
 open UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
@@ -23,17 +27,23 @@ section Gen
 
 variable {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
 
-private theorem comm_finsum {ι : Type} {T : Module.End A M} {φ : ι → Module.End A M} (h : ∀ i, Commute T (φ i)) :
-    Commute T (∑ᶠ i, φ i) := by
+private theorem comm_finsum
+    {ι : Type} {T : Module.End A M} {φ : ι → Module.End A M} (h : ∀ i, Commute T (φ i))
+    : Commute T (∑ᶠ i, φ i) := by
   by_cases hf : (Function.support φ).Finite
   · rw [finsum_eq_sum _ hf]
     exact Commute.sum_right _ _ _ fun i _ => h i
   · rw [finsum_of_infinite_support hf]
     exact Commute.zero_right _
 
-private theorem iSup_pres {T : Module.End A M} {P : ℕ → Module.End A M} {S : Submodule A M} (hc : ∀ n, Commute T (P n))
-    (hS : ∀ x ∈ S, T x ∈ S) {x : M} (hx : x ∈ ⨆ n, S.comap (P n)) : T x ∈ ⨆ n, S.comap (P n) := by
-  refine Submodule.iSup_induction (fun n => S.comap (P n)) (motive := fun y => T y ∈ ⨆ n, S.comap (P n))
+private theorem iSup_pres
+    {T : Module.End A M} {P : ℕ → Module.End A M} {S : Submodule A M}
+    (hc : ∀ n, Commute T (P n)) (hS : ∀ x ∈ S, T x ∈ S)
+    {x : M} (hx : x ∈ ⨆ n, S.comap (P n))
+    : T x ∈ ⨆ n, S.comap (P n) := by
+  refine Submodule.iSup_induction
+    (fun n => S.comap (P n))
+    (motive := fun y => T y ∈ ⨆ n, S.comap (P n))
     hx ?_ ?_ ?_
   · intro n y hy
     apply Submodule.mem_iSup_of_mem n
@@ -51,8 +61,11 @@ end Gen
 
 section Fr
 
-variable {Γ Ga Gp : Type} [Group Γ] [Group Ga] [Group Gp] (X : Frame Γ Ga Gp) {A : Type} [CommRing A] {m : ℕ}
-
+variable
+  {Γ Ga Gp : Type} [Group Γ] [Group Ga] [Group Gp]
+  (X : Frame Γ Ga Gp)
+  {A : Type} [CommRing A]
+  {m : ℕ}
 
 variable (A m) in
 private abbrev R (g : Ga) : Module.End A (X.Fn A m) := rtr A (Ga × Gp) (Fin m → A) (g, 1)
@@ -67,23 +80,23 @@ private theorem comm_U (g : Ga) (a : Gp) : Commute (R X A m g) (X.U A m a) := by
   unfold Frame.U Iwa.uOp
   exact comm_finsum fun q => comm_rp X g _
 
-private theorem comm_ra (τ : X.Ub →* GL (Fin m) A) {g : Ga} {u : X.Ub} (h : Commute g (u : Ga)) :
-    Commute (R X A m g) (X.ra τ u) := by
+private theorem comm_ra (τ : X.Ub →* GL (Fin m) A) {g : Ga} {u : X.Ub} (h : Commute g (u : Ga))
+    : Commute (R X A m g) (X.ra τ u) := by
   refine LinearMap.ext fun f => funext fun x => ?_
-  have e : ((g, 1) : Ga × Gp) * ((u : Ga), 1) = ((u : Ga), 1) * (g, 1) := by
-    ext <;> simp [h.eq]
+  have e : ((g, 1) : Ga × Gp) * ((u : Ga), 1) = ((u : Ga), 1) * (g, 1) := by ext <;> simp [h.eq]
   simp only [Module.End.mul_apply, Frame.ra_apply, R, rtr, MonoidHom.coe_mk, OneHom.coe_mk,
     LinearMap.funLeft_apply, mul_assoc, e]
 
-private theorem valIn_pres [IsLocalRing A] (g : Ga) (k : ℕ) {f : X.Fn A m} (hf : f ∈ X.valIn A m k) :
-    R X A m g f ∈ X.valIn A m k := by
+private theorem valIn_pres [IsLocalRing A] (g : Ga) (k : ℕ) {f : X.Fn A m} (hf : f ∈ X.valIn A m k)
+    : R X A m g f ∈ X.valIn A m k := by
   simp only [Frame.valIn, Submodule.mem_pi, Set.mem_univ, true_implies] at hf ⊢
   intro x i
   exact hf _ i
 
 variable [IsLocalRing A]
 
-private theorem amb_pres (θ : X.I.T →* Aˣ) (g : Ga) {f : X.Fn A m} (hf : f ∈ X.Amb m θ) : R X A m g f ∈ X.Amb m θ := by
+private theorem amb_pres (θ : X.I.T →* Aˣ) (g : Ga) {f : X.Fn A m} (hf : f ∈ X.Amb m θ)
+    : R X A m g f ∈ X.Amb m θ := by
   obtain ⟨h1, h2, h3, h4⟩ := hf
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro γ x
@@ -102,14 +115,15 @@ private theorem amb_pres (θ : X.I.T →* Aˣ) (g : Ga) {f : X.Fn A m} (hf : f �
     obtain ⟨c, hc⟩ := h4 k
     refine ⟨c, fun y hy x i => ?_⟩
     show f (x * (1, y) * (g, 1)) i - f (x * (g, 1)) i ∈ _
-    have ex : x * (1, y) * (g, 1) = x * (g, 1) * (1, y) := by
-      ext <;> simp [mul_assoc]
+    have ex : x * (1, y) * (g, 1) = x * (g, 1) * (1, y) := by ext <;> simp [mul_assoc]
     rw [ex]
     exact hc y hy _ i
 
-private theorem fix_pres (τ : X.Ub →* GL (Fin m) A) (U : Subgroup X.Ub) {g : Ga}
-    (hU : ∀ u ∈ U, ∃ u' ∈ U, (u' : Ga) = g⁻¹ * u * g ∧ τ u' = τ u) {f : X.Fn A m} (hf : f ∈ fixd (X.ra τ) U) :
-    R X A m g f ∈ fixd (X.ra τ) U := by
+private theorem fix_pres
+    (τ : X.Ub →* GL (Fin m) A) (U : Subgroup X.Ub)
+    {g : Ga} (hU : ∀ u ∈ U, ∃ u' ∈ U, (u' : Ga) = g⁻¹ * u * g ∧ τ u' = τ u)
+    {f : X.Fn A m} (hf : f ∈ fixd (X.ra τ) U)
+    : R X A m g f ∈ fixd (X.ra τ) U := by
   intro u hu
   obtain ⟨u', hu', e1, e2⟩ := hU u hu
   funext x
@@ -120,9 +134,13 @@ private theorem fix_pres (τ : X.Ub →* GL (Fin m) A) (U : Subgroup X.Ub) {g : 
   rw [Frame.ra_apply]
   exact hfx
 
-private theorem ord_pres (τ : X.Ub →* GL (Fin m) A) (θ : X.I.T →* Aˣ) (U : Subgroup X.Ub) {g : Ga}
-    (hU : ∀ u ∈ U, ∃ u' ∈ U, (u' : Ga) = g⁻¹ * u * g ∧ τ u' = τ u) {f : X.Fn A m} (hf : f ∈ X.Ord τ θ U) :
-    R X A m g f ∈ X.Ord τ θ U := by
+private theorem ord_pres
+    (τ : X.Ub →* GL (Fin m) A)
+    (θ : X.I.T →* Aˣ)
+    (U : Subgroup X.Ub)
+    {g : Ga} (hU : ∀ u ∈ U, ∃ u' ∈ U, (u' : Ga) = g⁻¹ * u * g ∧ τ u' = τ u)
+    {f : X.Fn A m} (hf : f ∈ X.Ord τ θ U)
+    : R X A m g f ∈ X.Ord τ θ U := by
   simp only [Frame.Ord, Frame.Sp, Submodule.mem_inf, Submodule.mem_iInf] at hf ⊢
   obtain ⟨⟨h1, h2⟩, h3⟩ := hf
   refine ⟨⟨amb_pres X θ g h1, fix_pres X τ U hU h2⟩, fun k => ?_⟩
@@ -133,8 +151,11 @@ end Fr
 
 section Set
 
-variable {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] {l : ℕ} [Fact l.Prime] {n : ℕ}
-  {c : Coef l} (H : HSet L Ω l n c) (A : Type) [CommRing A] [Algebra c.O A]
+variable
+  {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+  {l : ℕ} [Fact l.Prime]
+  {n : ℕ} {c : Coef l} (H : HSet L Ω l n c)
+  (A : Type) [CommRing A] [Algebra c.O A]
 
 private theorem tr_op {g : H.Ga} (hg : Norm H g) (i : H.Op) : Commute (trA H A g) (H.op A i) := by
   rcases i with x | x
@@ -147,14 +168,20 @@ private theorem tr_op {g : H.Ga} (hg : Norm H g) (i : H.Op) : Commute (trA H A g
 
 variable {A} [IsLocalRing A] (θ : H.X.I.T →* Aˣ)
 
-private theorem tr_Ord {g : H.Ga} (hg : Norm H g) (K : H.Lev) {f : H.X.Fn A H.m} (hf : f ∈ H.X.Ord (H.τA A) θ (H.lev K)) :
-    trA H A g f ∈ H.X.Ord (H.τA A) θ (H.lev K) :=
-  ord_pres H.X (H.τA A) θ (H.lev K) (fun u hu => by
-    obtain ⟨u', h1, h2, h3⟩ := hg.lev K u hu
-    exact ⟨u', h1, h2, congrArg (Matrix.GeneralLinearGroup.map (algebraMap c.O A)) h3⟩) hf
+private theorem tr_Ord
+    {g : H.Ga} (hg : Norm H g)
+    (K : H.Lev)
+    {f : H.X.Fn A H.m} (hf : f ∈ H.X.Ord (H.τA A) θ (H.lev K))
+    : trA H A g f ∈ H.X.Ord (H.τA A) θ (H.lev K) :=
+  ord_pres H.X (H.τA A) θ (H.lev K)
+    (fun u hu => by
+      obtain ⟨u', h1, h2, h3⟩ := hg.lev K u hu
+      exact ⟨u', h1, h2, congrArg (Matrix.GeneralLinearGroup.map (algebraMap c.O A)) h3⟩)
+    hf
 
-private theorem tr_MK {g : H.Ga} (hg : Norm H g) (a : H.Op → c.O) (K : H.Lev) {f : H.X.Fn A H.m} (hf : f ∈ H.MK θ a K) :
-    trA H A g f ∈ H.MK θ a K := by
+private theorem tr_MK
+    {g : H.Ga} (hg : Norm H g) (a : H.Op → c.O) (K : H.Lev) {f : H.X.Fn A H.m} (hf : f ∈ H.MK θ a K)
+    : trA H A g f ∈ H.MK θ a K := by
   unfold HSet.MK locPart at hf ⊢
   rw [Submodule.mem_inf, Submodule.mem_iInf] at hf
   rw [Submodule.mem_inf, Submodule.mem_iInf]
@@ -162,8 +189,9 @@ private theorem tr_MK {g : H.Ga} (hg : Norm H g) (a : H.Op → c.O) (K : H.Lev) 
   refine ⟨tr_Ord H θ hg K h1, fun i => ?_⟩
   refine (Submodule.mem_iInf _).mpr fun k => ?_
   have h2' := (Submodule.mem_iInf _).mp (h2 i) k
-  have hle : ∀ x ∈ maximalIdeal A ^ k • H.X.Ord (H.τA A) θ (H.lev K),
-      trA H A g x ∈ maximalIdeal A ^ k • H.X.Ord (H.τA A) θ (H.lev K) := by
+  have hle
+      : ∀ x ∈ maximalIdeal A ^ k • H.X.Ord (H.τA A) θ (H.lev K),
+        trA H A g x ∈ maximalIdeal A ^ k • H.X.Ord (H.τA A) θ (H.lev K) := by
     intro x hx
     refine Submodule.smul_induction_on hx ?_ ?_
     · intro r hr y hy
@@ -177,8 +205,11 @@ private theorem tr_MK {g : H.Ga} (hg : Norm H g) (a : H.Op → c.O) (K : H.Lev) 
   refine (tr_op H A hg i).sub_right ?_
   exact (Algebra.commutes _ _).symm
 
-private theorem tr_fix {g : H.Ga} (h : ∃ u ∈ H.UQ, (u : H.Ga) = g ∧ H.τ u = 1) (K : H.Lev) {f : H.X.Fn A H.m}
-    (hf : f ∈ H.X.Ord (H.τA A) θ (H.lev K)) : trA H A g f = f := by
+private theorem tr_fix
+    {g : H.Ga} (h : ∃ u ∈ H.UQ, (u : H.Ga) = g ∧ H.τ u = 1)
+    (K : H.Lev)
+    {f : H.X.Fn A H.m} (hf : f ∈ H.X.Ord (H.τA A) θ (H.lev K))
+    : trA H A g f = f := by
   obtain ⟨u, hu, e1, e2⟩ := h
   simp only [Frame.Ord, Frame.Sp, Submodule.mem_inf] at hf
   have hmem : u ∈ H.lev K := by
@@ -187,7 +218,9 @@ private theorem tr_fix {g : H.Ga} (h : ∃ u ∈ H.UQ, (u : H.Ga) = g ∧ H.τ u
   have hfix := hf.1.2 u hmem
   funext x
   have hx := congrFun hfix x
-  change ((H.τA A u : GL (Fin H.m) A) : Matrix (Fin H.m) (Fin H.m) A) *ᵥ f (x * ((u : H.Ga), 1)) = f x at hx
+  change ((H.τA A u : GL (Fin H.m) A) : Matrix (Fin H.m) (Fin H.m) A) *ᵥ f (x * ((u : H.Ga), 1))
+      = f x
+    at hx
   have hτ' : H.τA A u = 1 := by
     show Matrix.GeneralLinearGroup.map (algebraMap c.O A) (H.τ u) = 1
     rw [e2, map_one]
@@ -196,16 +229,17 @@ private theorem tr_fix {g : H.Ga} (h : ∃ u ∈ H.UQ, (u : H.Ga) = g ∧ H.τ u
 
 end Set
 
-private theorem opE_eq {G R W : Type} [Group G] [CommRing R] [AddCommGroup W] [Module R W] (ρ : Representation R G W) (a : G →₀ ℤ)
-    (x : W) : opE ρ a x = ∑ g ∈ a.support, a g • ρ g x := by
+private theorem opE_eq
+    {G R W : Type} [Group G] [CommRing R] [AddCommGroup W] [Module R W]
+    (ρ : Representation R G W) (a : G →₀ ℤ) (x : W)
+    : opE ρ a x = ∑ g ∈ a.support, a g • ρ g x := by
   simp [opE, Finsupp.sum, LinearMap.sum_apply]
 
 end UpperTheory.V.Z.Desc.V0
 
 open UpperTheory.V.Z.Desc.V0
 
-theorem UpperTheory.V.Z.Desc.V0.eEx :
-    EEx := by
+theorem UpperTheory.V.Z.Desc.V0.eEx : EEx := by
   unfold EEx
   intro L Ω _ _ _ _ _ l _ n c H hAx A _ _ _ θ hθ K a₀ _ G _ K₀ K₁ β a N hK hE hN
   let ρ : Representation A G (H.X.Fn A H.m) := (trA H A).comp β
@@ -214,8 +248,8 @@ theorem UpperTheory.V.Z.Desc.V0.eEx :
     intro f hf
     unfold HSet.MK locPart at hf
     exact (Submodule.mem_inf.mp hf).1
-  have hρM : ∀ g ∈ K₀, ∀ f ∈ H.MK θ a₀ K, ρ g f ∈ H.MK θ a₀ K :=
-    fun g hg f hf => tr_MK H θ (hK.norm g hg) a₀ K hf
+  have hρM : ∀ g ∈ K₀, ∀ f ∈ H.MK θ a₀ K, ρ g f ∈ H.MK θ a₀ K := fun g hg f hf =>
+    tr_MK H θ (hK.norm g hg) a₀ K hf
   have hEM : ∀ f ∈ H.MK θ a₀ K, E f ∈ H.MK θ a₀ K := by
     intro f hf
     show opE ρ a f ∈ H.MK θ a₀ K
@@ -225,8 +259,8 @@ theorem UpperTheory.V.Z.Desc.V0.eEx :
   have hfixM : ∀ f ∈ H.MK θ a₀ K, f ∈ fixd ρ K₁ := by
     intro f hf g hg
     exact tr_fix H θ (hK.triv g hg) K (hMOrd f hf)
-  have hsq : ∀ f ∈ H.MK θ a₀ K, E (E f) = N • E f :=
-    fun f hf => hE.sq A (H.X.Fn A H.m) ρ f (hfixM f hf)
+  have hsq : ∀ f ∈ H.MK θ a₀ K, E (E f) = N • E f := fun f hf =>
+    hE.sq A (H.X.Fn A H.m) ρ f (hfixM f hf)
   have hcomm : ∀ i f, E (H.op A i f) = H.op A i (E f) := by
     intro i f
     show opE ρ a (H.op A i f) = H.op A i (opE ρ a f)

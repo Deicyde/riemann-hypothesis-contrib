@@ -16,21 +16,26 @@ section CRT
 
 variable {R : Type*} [CommRing R] [IsDedekindDomain R]
 
-theorem exists_prime_to_le (P : HeightOneSpectrum R) (d : R) (hd : d ≠ 0) :
-    ∃ s : R, s ∉ P.asIdeal ∧ ∀ v : HeightOneSpectrum R, v ≠ P → v.intValuation s ≤ v.intValuation d := by
+theorem exists_prime_to_le (P : HeightOneSpectrum R) (d : R) (hd : d ≠ 0)
+    : ∃ s : R,
+      s ∉ P.asIdeal ∧ ∀ v : HeightOneSpectrum R, v ≠ P → v.intValuation s ≤ v.intValuation d := by
   classical
   have hI : (Ideal.span {d} : Ideal R) ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hd
   let S : Finset (HeightOneSpectrum R) := (Ideal.finite_factors hI).toFinset ∪ {P}
   let n : HeightOneSpectrum R → ℕ := fun v =>
     (Associates.mk v.asIdeal).count (Associates.mk (Ideal.span {d} : Ideal R)).factors
-  obtain ⟨y, hy⟩ := IsDedekindDomain.exists_forall_sub_mem_ideal (s := S) (fun v => v.asIdeal)
-    (fun v => if v = P then 1 else n v) (fun v _ => v.prime)
-    (fun v _ v' _ h h' => h (HeightOneSpectrum.ext h')) (fun v => if v.1 = P then 1 else 0)
+  obtain ⟨y, hy⟩ :=
+    IsDedekindDomain.exists_forall_sub_mem_ideal (s := S)
+      (fun v => v.asIdeal)
+      (fun v => if v = P then 1 else n v)
+      (fun v _ => v.prime)
+      (fun v _ v' _ h h' => h (HeightOneSpectrum.ext h'))
+      (fun v => if v.1 = P then 1 else 0)
   refine ⟨y, ?_, fun v hv => ?_⟩
   · intro hyP
     have h1 := hy P (Finset.mem_union_right _ (Finset.mem_singleton_self P))
-    simp only [↓reduceIte, pow_one] at h1
+    simp only [↓ reduceIte, pow_one] at h1
     have h2 : (1 : R) ∈ P.asIdeal := by
       have := P.asIdeal.sub_mem hyP h1
       simpa using this
@@ -52,14 +57,16 @@ end CRT
 
 variable {D : D7}
 
-theorem exists_den (u : D.what₂.Word) (x : ((D.fm u).lat 0).V) :
-    ∃ d : 𝓞 D.what₂.LL, d ≠ 0 ∧ d • x ∈ ((D.fm u).lat 0).L :=
+theorem exists_den (u : D.what₂.Word) (x : ((D.fm u).lat 0).V)
+    : ∃ d : 𝓞 D.what₂.LL, d ≠ 0 ∧ d • x ∈ ((D.fm u).lat 0).L :=
   _root_.UpperTheory.Reformulated.B.ExistsDenominatorThird.exists_den u x
 
 theorem locWBack_proved (T : ∀ u : D.what₂.Word, Forms0 D u) : LocWBack T := by
   intro u w x hx
-  have key : ∀ (r : 𝓞 D.what₂.LL) (v : ((D.fm u).lat 0).V), r • v = (algebraMap (𝓞 D.what₂.LL) D.what₂.LL r) • v :=
-    fun r v => (algebraMap_smul D.what₂.LL r v).symm
+  have key
+      : ∀ (r : 𝓞 D.what₂.LL) (v : ((D.fm u).lat 0).V),
+        r • v = (algebraMap (𝓞 D.what₂.LL) D.what₂.LL r) • v := fun r v =>
+    (algebraMap_smul D.what₂.LL r v).symm
   obtain ⟨d, hd0, hdL⟩ := exists_den u x
   obtain ⟨s, hsP, hsv⟩ := exists_prime_to_le (D.plEq w) d hd0
   have hs0 : s ≠ 0 := fun h => hsP (h ▸ Submodule.zero_mem _)
@@ -73,23 +80,26 @@ theorem locWBack_proved (T : ∀ u : D.what₂.Word, Forms0 D u) : LocWBack T :=
         rw [val_nonneg_iff, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
         exact (D.plEq w').intValuation_le_one s
       obtain ⟨P, hP, hPx⟩ := hx c B hB
-      refine ⟨D.what₂.embLL (algebraMap (𝓞 D.what₂.LL) D.what₂.LL s) • P, intSpan_smul w' _ _ hsint hP, fun t => ?_⟩
+      refine ⟨
+        D.what₂.embLL (algebraMap (𝓞 D.what₂.LL) D.what₂.LL s) • P,
+        intSpan_smul w' _ _ hsint hP,
+        fun t => ?_
+      ⟩
       rw [key, LinearMap.map_smulₛₗ, LinearMap.map_smul]
       simp only [Pi.smul_apply, smul_eq_mul]
       rw [hPx t]
     · have hne : D.plEq w' ≠ D.plEq w := fun h => hw (D.plEq.injective h)
-      have hdne : algebraMap (𝓞 D.what₂.LL) D.what₂.LL d ≠ 0 := by
-        simpa using hd0
+      have hdne : algebraMap (𝓞 D.what₂.LL) D.what₂.LL d ≠ 0 := by simpa using hd0
       set q : D.what₂.LL := algebraMap (𝓞 D.what₂.LL) D.what₂.LL s / algebraMap (𝓞 D.what₂.LL) D.what₂.LL d with hq
       have hqint : q ∈ intW D.what₂.places w' := by
         show (0 : WithTop ℤ) ≤ D.what₂.places.val w' _
-        rw [val_nonneg_iff, hq, map_div₀, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
+        rw [val_nonneg_iff, hq, map_div₀,
+          IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
           IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
         have hdv : (D.plEq w').intValuation d ≠ 0 := (D.plEq w').intValuation_ne_zero d hd0
         rw [div_le_one₀ (zero_lt_iff.2 hdv)]
         exact hsv _ hne
-      have hsx : s • x = q • (d • x) := by
-        rw [key, key, smul_smul, hq, div_mul_cancel₀ _ hdne]
+      have hsx : s • x = q • (d • x) := by rw [key, key, smul_smul, hq, div_mul_cancel₀ _ hdne]
       obtain ⟨P, hP, hPx⟩ := (((T u).val0).lat (d • x)).1 hdL w' c B hB
       refine ⟨D.what₂.embLL q • P, intSpan_smul w' _ q hqint hP, fun t => ?_⟩
       rw [hsx, LinearMap.map_smulₛₗ, LinearMap.map_smul]
@@ -103,7 +113,8 @@ theorem locWBack_proved (T : ∀ u : D.what₂.Word, Forms0 D u) : LocWBack T :=
   have hsne : algebraMap (𝓞 D.what₂.LL) D.what₂.LL s ≠ 0 := by simpa using hs0
   have htint : (algebraMap (𝓞 D.what₂.LL) D.what₂.LL s)⁻¹ ∈ intW D.what₂.places w := by
     show (0 : WithTop ℤ) ≤ D.what₂.places.val w _
-    rw [val_nonneg_iff, map_inv₀, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap, hsu, inv_one]
+    rw [val_nonneg_iff, map_inv₀, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap, hsu,
+      inv_one]
   have hx' : x = (⟨_, htint⟩ : intW D.what₂.places w) • (s • x) := by
     rw [Subring.smul_def, key, smul_smul, inv_mul_cancel₀ hsne, one_smul]
   rw [hx']

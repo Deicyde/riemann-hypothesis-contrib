@@ -13,8 +13,8 @@ namespace Formalism.InvariantFactorPaths.ColumnFamilies
 
 open Formalism.GradedWeylDivisibility
 
-def qa_P (R : Type*) [CommRing R] {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (I : TIdx mu) :
-    MvPolynomial (Fin n × Fin n) R :=
+def qa_P (R : Type*) [CommRing R] {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (I : TIdx mu)
+    : MvPolynomial (Fin n × Fin n) R :=
   ∏ c : ↥(TCols mu), initMinor R (qa_row I c) (colH_le mu c)
 
 def qa_e {n : ℕ} [NeZero n] (mu : Fin n → ℤ) : Fin (Fintype.card ↥(TCols mu)) ≃ ↥(TCols mu) :=
@@ -32,8 +32,8 @@ lemma qa_exp_eq_bidetExp {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (I : TIdx mu)
   unfold qa_exp bidetExp
   exact (Fintype.sum_equiv (qa_e mu) _ _ (fun _ => rfl)).symm
 
-private theorem lt_colH_iff_le {n : ℕ} {mu : Fin n → ℤ} (hmu : Antitone mu) (c : ℤ) (t : Fin n) :
-    (t : ℕ) < colH mu c ↔ c ≤ mu t := by
+private theorem lt_colH_iff_le {n : ℕ} {mu : Fin n → ℤ} (hmu : Antitone mu) (c : ℤ) (t : Fin n)
+    : (t : ℕ) < colH mu c ↔ c ≤ mu t := by
   unfold colH
   constructor
   · intro h
@@ -47,14 +47,16 @@ private theorem lt_colH_iff_le {n : ℕ} {mu : Fin n → ℤ} (hmu : Antitone mu
       push_neg at hmt
       have := hmu hmt
       omega
-    exact absurd (lt_of_lt_of_le h ((Finset.card_le_card hsub).trans (Fin.card_Iio t).le)) (lt_irrefl _)
+    exact absurd (lt_of_lt_of_le h ((Finset.card_le_card hsub).trans (Fin.card_Iio t).le))
+      (lt_irrefl _)
   · intro h
     have hsub : Finset.Iic t ⊆ (Finset.univ.filter fun m : Fin n => c ≤ mu m) := by
       intro m hm
       rw [Finset.mem_Iic] at hm
       simp only [Finset.mem_filter, Finset.mem_univ, true_and]
       exact h.trans (hmu hm)
-    exact Nat.lt_of_lt_of_le (Nat.lt_succ_self _) ((Fin.card_Iic t).symm.le.trans (Finset.card_le_card hsub))
+    exact Nat.lt_of_lt_of_le (Nat.lt_succ_self _)
+      ((Fin.card_Iic t).symm.le.trans (Finset.card_le_card hsub))
 
 lemma qa_shape {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (hmu : Dominant mu) :
     shapeDeg (n := n) (fun k => colH mu (qa_e mu k)) = qa_nu mu := by
@@ -85,13 +87,15 @@ lemma tableauBideterminant_mem_dualWeyl (R : Type) [CommRing R] {n : ℕ} [NeZer
   rw [tableauBideterminant_eq_bideterminant, ← qa_shape hmu]
   exact bidetMem R n n _ _ _ _
 
-theorem dualWeyl_eq_span_standard_tableauBideterminant (B : Type) [CommRing B] [IsDomain B] {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (hmu : Dominant mu) :
-    dualWeyl B n n (qa_nu mu) =
-      Submodule.span B (Set.range fun I : {I : TIdx mu // StdT I} => qa_P B I.1) := by
+theorem dualWeyl_eq_span_standard_tableauBideterminant
+    (B : Type) [CommRing B] [IsDomain B] {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (hmu : Dominant mu)
+    : dualWeyl B n n (qa_nu mu)
+      = Submodule.span B (Set.range fun I : {I : TIdx mu // StdT I} => qa_P B I.1) := by
   apply le_antisymm
-  · suffices key : ∀ d : (colLex n n).syn, ∀ f ∈ dualWeyl B n n (qa_nu mu),
-        (colLex n n).toSyn ((colLex n n).degree f) = d →
-          f ∈ Submodule.span B (Set.range fun I : {I : TIdx mu // StdT I} => qa_P B I.1) by
+  · suffices key
+        : ∀ d : (colLex n n).syn, ∀ f ∈ dualWeyl B n n (qa_nu mu),
+          (colLex n n).toSyn ((colLex n n).degree f) = d
+            → f ∈ Submodule.span B (Set.range fun I : {I : TIdx mu // StdT I} => qa_P B I.1) by
       intro f hf
       exact key _ f hf rfl
     intro d
@@ -103,24 +107,33 @@ theorem dualWeyl_eq_span_standard_tableauBideterminant (B : Type) [CommRing B] [
       have hint : Interlaced ((colLex n n).degree f) := leadInterlaced B n n _ f hf hf0
       have hcol := colSums B n n _ f hf _ (((colLex n n).degree_mem_support_iff f).mpr hf0)
       obtain ⟨I, hI, he⟩ := qa_exp_surj hmu _ ⟨hint, hcol⟩
-      have hbS : qa_P B I ∈ Submodule.span B (Set.range fun I : {I : TIdx mu // StdT I} => qa_P B I.1) :=
+      have hbS
+          : qa_P B I ∈ Submodule.span B (Set.range fun I : {I : TIdx mu // StdT I} => qa_P B I.1) :=
         Submodule.subset_span ⟨⟨I, hI⟩, rfl⟩
-      have hdecomp : f = (f - (colLex n n).leadingCoeff f • qa_P B I) + (colLex n n).leadingCoeff f • qa_P B I := by
+      have hdecomp
+          : f
+            = (f - (colLex n n).leadingCoeff f • qa_P B I)
+              + (colLex n n).leadingCoeff f • qa_P B I := by
         abel
       rw [hdecomp]
       refine Submodule.add_mem _ ?_ (Submodule.smul_mem _ _ hbS)
       by_cases h0 : f - (colLex n n).leadingCoeff f • qa_P B I = 0
       · rw [h0]; exact Submodule.zero_mem _
-      have hlt := lcassem_sub_lt (colLex n n) (f := f) (g := qa_P B I) ((tableauBideterminant_degree_leadingCoeff B I).1.trans he)
-        (tableauBideterminant_degree_leadingCoeff B I).2 h0
-      exact ih _ (hd ▸ hlt) _ (Submodule.sub_mem _ hf (Submodule.smul_mem _ _ (tableauBideterminant_mem_dualWeyl B hmu I))) rfl
+      have hlt :=
+        lcassem_sub_lt (colLex n n) (f := f) (g := qa_P B I)
+          ((tableauBideterminant_degree_leadingCoeff B I).1.trans he)
+          (tableauBideterminant_degree_leadingCoeff B I).2 h0
+      exact ih _ (hd ▸ hlt) _
+        (Submodule.sub_mem _ hf
+          (Submodule.smul_mem _ _ (tableauBideterminant_mem_dualWeyl B hmu I)))
+        rfl
   · rw [Submodule.span_le]
     rintro _ ⟨I, rfl⟩
     exact tableauBideterminant_mem_dualWeyl B hmu I.1
 
-theorem dualWeyl_eq_span_tableauBideterminant (B : Type) [CommRing B] [IsDomain B] {n : ℕ} [NeZero n] {mu : Fin n → ℤ}
-    (hmu : Dominant mu) :
-    dualWeyl B n n (qa_nu mu) = Submodule.span B (Set.range fun I : TIdx mu => qa_P B I) := by
+theorem dualWeyl_eq_span_tableauBideterminant
+    (B : Type) [CommRing B] [IsDomain B] {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (hmu : Dominant mu)
+    : dualWeyl B n n (qa_nu mu) = Submodule.span B (Set.range fun I : TIdx mu => qa_P B I) := by
   apply le_antisymm
   · rw [dualWeyl_eq_span_standard_tableauBideterminant B hmu]
     apply Submodule.span_mono

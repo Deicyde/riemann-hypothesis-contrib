@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylor
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
 
 open GlobalTheory.CechPic GlobalTheory.BirigUniq in
-theorem UpperTheory.Gal.G3.pPolDesc :
-    PolDesc := by
+theorem UpperTheory.Gal.G3.pPolDesc : PolDesc := by
   intro G₀ R _ _ gb S S' s s' c _ _ _ N₁ N₂ o₁ o₂ o₁' o₂' m₁ m₂ ψ ψ' hψ hcomm e h'
   obtain ⟨h'⟩ := h'
   haveI := hψ
@@ -32,14 +34,16 @@ theorem UpperTheory.Gal.G3.pPolDesc :
   have hQ' : (o₂'.P.pull (Hecke.sq2 ψ')).IsLB := pull_isLB o₂'.isLB _
   refine ⟨(cls_eq_iff hP1 hQ).1 ?_⟩
   rw [← sub_eq_zero]
-  have hfl : Flat m₁.φ := MorphismProperty.of_isPullback (P := @Flat) hpb.flip (inferInstance : Flat c)
+  have hfl : Flat m₁.φ :=
+    MorphismProperty.of_isPullback (P := @Flat) hpb.flip (inferInstance : Flat c)
   have hsu : Surjective m₁.φ :=
     MorphismProperty.of_isPullback (P := @Surjective) hpb.flip (inferInstance : Surjective c)
   have hqc : QuasiCompact m₁.φ :=
     MorphismProperty.of_isPullback (P := @QuasiCompact) hpb.flip (inferInstance : QuasiCompact c)
   refine pic_eq_zero_of_fpqc o₁.A o₁.A Y' o₁.ab cO hfl hsu hqc _ ?_ ?_
-  · have key : (lift (1 : o₁.A ⟶ o₁.A) (𝟙 o₁.A)).left ≫ Hecke.sq2 ψ =
-        ψ.left ≫ (lift (1 : o₂.A ⟶ o₂.A) (𝟙 o₂.A)).left := by
+  · have key
+        : (lift (1 : o₁.A ⟶ o₁.A) (𝟙 o₁.A)).left ≫ Hecke.sq2 ψ
+          = ψ.left ≫ (lift (1 : o₂.A ⟶ o₂.A) (𝟙 o₂.A)).left := by
       unfold Hecke.sq2
       rw [← Over.comp_left, ← Over.comp_left]
       congr 1
@@ -55,7 +59,8 @@ theorem UpperTheory.Gal.G3.pPolDesc :
       have h2 := Over.w (snd o₁.A Y')
       rw [h1, ← h2, Category.assoc, ← hpb.w]
       rfl
-    let u₀ : (o₁.A ⊗ Y').left ⟶ o₁'.A.left := hpb.lift (fst o₁.A Y').left ((snd o₁.A Y').left ≫ o₁'.A.hom) hw
+    let u₀ : (o₁.A ⊗ Y').left ⟶ o₁'.A.left :=
+      hpb.lift (fst o₁.A Y').left ((snd o₁.A Y').left ≫ o₁'.A.hom) hw
     have hu₀ : u₀ ≫ o₁'.A.hom = (snd o₁.A Y').left ≫ o₁'.A.hom := hpb.lift_snd _ _ _
     let g : (o₁.A ⊗ Y').left ⟶ Limits.pullback o₁'.A.hom o₁'.A.hom :=
       Limits.pullback.lift u₀ (snd o₁.A Y').left hu₀
@@ -86,12 +91,15 @@ theorem UpperTheory.Gal.G3.pPolDesc :
       (cls_eq_iff _ _).2 m₁.pol
     have pol2 : cls o₂'.P o₂'.isLB = cls (o₂.P.pull m₂.φ₂) (pull_isLB o₂.isLB _) :=
       (cls_eq_iff _ _).2 m₂.pol
-    have E1 : (pull (lift (fst o₁.A Y') (snd o₁.A Y' ≫ cO)).left) (cls _ hP1) =
-        (pull g) (cls _ hP1') := by
+    have E1
+        : (pull (lift (fst o₁.A Y') (snd o₁.A Y' ≫ cO)).left) (cls _ hP1)
+          = (pull g) (cls _ hP1') := by
       rw [K1, pull_comp, GlobalTheory.BirigidPow.cls_lbPow o₁.isLB e hP1, map_nsmul,
-        ← cls_pull o₁.isLB _ (pull_isLB o₁.isLB _), ← pol1, ← GlobalTheory.BirigidPow.cls_lbPow o₁'.isLB e hP1']
-    have E2 : (pull (lift (fst o₁.A Y') (snd o₁.A Y' ≫ cO)).left) (cls _ hQ) =
-        (pull g) (cls _ hQ') := by
+        ← cls_pull o₁.isLB _ (pull_isLB o₁.isLB _), ← pol1,
+        ← GlobalTheory.BirigidPow.cls_lbPow o₁'.isLB e hP1']
+    have E2
+        : (pull (lift (fst o₁.A Y') (snd o₁.A Y' ≫ cO)).left) (cls _ hQ)
+          = (pull g) (cls _ hQ') := by
       rw [K1, cls_pull o₂.isLB _ hQ, ← pull_comp, Category.assoc, K2, ← Category.assoc, pull_comp,
         pull_comp, ← cls_pull o₂.isLB _ (pull_isLB o₂.isLB _), ← pol2, cls_pull o₂'.isLB _ hQ']
     rw [map_sub, E1, E2, (cls_eq_iff hP1' hQ').2 h', sub_self]

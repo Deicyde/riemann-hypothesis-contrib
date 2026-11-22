@@ -17,8 +17,8 @@ namespace Formalism.FourierDecayAlt.Q.LeftMultiplicationRule
 variable {k r : ℕ}
 
 def SP (k r : ℕ) (l : Fin r) (p q : Fin (2 * r + k + 1)) : Prop :=
-  (p.val = l.val ∧ l.val < q.val ∧ q.val ≤ 2 * r + k - l.val) ∨
-  (q.val = 2 * r + k - l.val ∧ l.val < p.val ∧ p.val < 2 * r + k - l.val)
+  (p.val = l.val ∧ l.val < q.val ∧ q.val ≤ 2 * r + k - l.val)
+    ∨ (q.val = 2 * r + k - l.val ∧ l.val < p.val ∧ p.val < 2 * r + k - l.val)
 
 def InS (k r : ℕ) (l : Fin r) (M : Mx k r) : Prop := ∀ p q, ¬ SP k r l p q → M p q = 0
 

@@ -33,22 +33,24 @@ private lemma exists_pos_pow_mul_pow_eq_pow_of_finite {S : Type} [Monoid S] [Fin
   · exact key i j hlt h
   · exact key j i hlt h.symm
 
-theorem finite_involution_hilbert90 {S : Type} [CommRing S] [Finite S] (c : S →+* S)
-    (hc : ∀ x, c (c x) = x) (ω : S) (hω : IsUnit (ω - c ω)) (y : S) (hy : y * c y = 1) :
-    ∃ x : S, IsUnit x ∧ x = y * c x := by
+theorem finite_involution_hilbert90
+    {S : Type} [CommRing S] [Finite S]
+    (c : S →+* S) (hc : ∀ x, c (c x) = x)
+    (ω : S) (hω : IsUnit (ω - c ω))
+    (y : S) (hy : y * c y = 1)
+    : ∃ x : S, IsUnit x ∧ x = y * c x := by
   have hyu : IsUnit y := ⟨⟨y, c y, hy, by rw [mul_comm]; exact hy⟩, rfl⟩
   obtain ⟨M, hM0, hM⟩ := exists_pos_pow_mul_pow_eq_pow_of_finite ((1 + y) * c (1 + y))
   obtain ⟨e, he⟩ : ∃ e, e = ((1 + y) * c (1 + y)) ^ M := ⟨_, rfl⟩
   rw [← he] at hM
-  have hce : c e = e := by
-    rw [he, map_pow, map_mul, hc, mul_comm]
-  have h1 : y * c (1 + y) = 1 + y := by
-    rw [map_add (f := _), map_one]; linear_combination hy
+  have hce : c e = e := by rw [he, map_pow, map_mul, hc, mul_comm]
+  have h1 : y * c (1 + y) = 1 + y := by rw [map_add (f := _), map_one]; linear_combination hy
   refine ⟨e * (1 + y) + (1 - e) * (ω + y * c ω), ?_, ?_⟩
   · by_contra hx
     obtain ⟨m, hm, hxm⟩ := exists_max_ideal_of_mem_nonunits (mem_nonunits_iff.mpr hx)
     have hp := hm.isPrime
-    have hnot : y * (ω - c ω) ∉ m := fun h => hm.ne_top (Ideal.eq_top_of_isUnit_mem m h (hyu.mul hω))
+    have hnot : y * (ω - c ω) ∉ m := fun h =>
+      hm.ne_top (Ideal.eq_top_of_isUnit_mem m h (hyu.mul hω))
     have hid : ω * (1 + y) - (ω + y * c ω) = y * (ω - c ω) := by ring
     have hex : e ∈ m → 1 + y ∈ m := by
       intro h
@@ -59,9 +61,11 @@ theorem finite_involution_hilbert90 {S : Type} [CommRing S] [Finite S] (c : S �
     by_cases hem : e ∈ m
     · have hx1 : 1 + y ∈ m := hex hem
       have h2 : (1 - e) * (ω + y * c ω) ∈ m := by
-        have hr : (1 - e) * (ω + y * c ω)
-            = (e * (1 + y) + (1 - e) * (ω + y * c ω)) - e * (1 + y) := by ring
-        rw [hr]; exact m.sub_mem hxm (m.mul_mem_right _ hem)
+        have hr
+            : (1 - e) * (ω + y * c ω) = (e * (1 + y) + (1 - e) * (ω + y * c ω)) - e * (1 + y) := by
+          ring
+        rw [hr]
+        exact m.sub_mem hxm (m.mul_mem_right _ hem)
       have h1e : 1 - e ∉ m := by
         intro h
         apply hm.ne_top
@@ -75,11 +79,14 @@ theorem finite_involution_hilbert90 {S : Type} [CommRing S] [Finite S] (c : S �
     · have hee : e * (1 - e) = 0 := by rw [mul_sub, mul_one, hM, sub_self]
       have h1e : 1 - e ∈ m := by
         refine (hp.mem_or_mem ?_).resolve_left hem
-        rw [hee]; exact m.zero_mem
+        rw [hee]
+        exact m.zero_mem
       have h2 : e * (1 + y) ∈ m := by
-        have hr : e * (1 + y)
-            = (e * (1 + y) + (1 - e) * (ω + y * c ω)) - (1 - e) * (ω + y * c ω) := by ring
-        rw [hr]; exact m.sub_mem hxm (m.mul_mem_right _ h1e)
+        have hr
+            : e * (1 + y) = (e * (1 + y) + (1 - e) * (ω + y * c ω)) - (1 - e) * (ω + y * c ω) := by
+          ring
+        rw [hr]
+        exact m.sub_mem hxm (m.mul_mem_right _ h1e)
       have hx1 : 1 + y ∈ m := (hp.mem_or_mem h2).resolve_left hem
       apply hem
       rw [he]
@@ -87,9 +94,10 @@ theorem finite_involution_hilbert90 {S : Type} [CommRing S] [Finite S] (c : S �
   · simp only [map_add (f := _), map_mul, map_sub, map_one, hc, hce]
     linear_combination (-(e + (1 - e) * ω)) * hy
 
-theorem finite_involution_fixed_unit_isNorm :
-    ∀ (S : Type) [CommRing S] [Finite S] (c : S →+* S), (∀ x, c (c x) = x) →
-      (∃ ω, IsUnit (ω - c ω)) → ∀ u, c u = u → IsUnit u → ∃ x, x * c x = u := by
+theorem finite_involution_fixed_unit_isNorm
+    : ∀ (S : Type) [CommRing S] [Finite S] (c : S →+* S),
+      (∀ x, c (c x) = x) → (∃ ω, IsUnit (ω - c ω))
+        → ∀ u, c u = u → IsUnit u → ∃ x, x * c x = u := by
   intro S _ _ c hc hω u hcu hu
   obtain ⟨ω, hω⟩ := hω
   let cu : Sˣ →* Sˣ := Units.map (c : S →* S)

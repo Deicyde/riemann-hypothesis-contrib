@@ -9,23 +9,24 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-
 open NumberField.InfinitePlace NumberField.mixedEmbedding in
-theorem totallyComplex_span_embeddings_and_finrank :
-    ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E],
-      Submodule.span ℝ (Set.range (Pi.ringHom fun w : InfinitePlace E => w.embedding)) = ⊤ ∧
-        Module.finrank ℝ (InfinitePlace E → ℂ) = Module.finrank ℚ E := by
+theorem totallyComplex_span_embeddings_and_finrank
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E],
+      Submodule.span ℝ (Set.range (Pi.ringHom fun w : InfinitePlace E => w.embedding)) = ⊤
+        ∧ Module.finrank ℝ (InfinitePlace E → ℂ) = Module.finrank ℚ E := by
   intro E _ _ _
   constructor
-  ·
-    let f : mixedSpace E →ₗ[ℝ] (InfinitePlace E → ℂ) :=
-      { toFun := fun x w => x.2 ⟨w, IsTotallyComplex.isComplex w⟩
-        map_add' := fun x y => rfl
-        map_smul' := fun c x => rfl }
+  · let f : mixedSpace E →ₗ[ℝ] (InfinitePlace E → ℂ) := {
+      toFun := fun x w => x.2 ⟨w, IsTotallyComplex.isComplex w⟩
+      map_add' := fun x y => rfl
+      map_smul' := fun c x => rfl
+    }
     have hf : Function.Surjective f := by
       intro y
       exact ⟨(0, fun w => y w.1), rfl⟩
-    have hcomp : ∀ x : E, f (mixedEmbedding E x) = Pi.ringHom (fun w : InfinitePlace E => w.embedding) x := by
+    have hcomp
+        : ∀ x : E,
+          f (mixedEmbedding E x) = Pi.ringHom (fun w : InfinitePlace E => w.embedding) x := by
       intro x
       funext w
       simp only [f, LinearMap.coe_mk, AddHom.coe_mk, mixedEmbedding_apply_isComplex]
@@ -36,8 +37,9 @@ theorem totallyComplex_span_embeddings_and_finrank :
       apply Submodule.span_mono
       rintro _ ⟨i, rfl⟩
       exact ⟨_, (latticeBasis_apply E i).symm⟩
-    have himg : f '' Set.range (mixedEmbedding E) =
-        Set.range (Pi.ringHom fun w : InfinitePlace E => w.embedding) := by
+    have himg
+        : f '' Set.range (mixedEmbedding E)
+          = Set.range (Pi.ringHom fun w : InfinitePlace E => w.embedding) := by
       rw [← Set.range_comp]
       exact congrArg Set.range (funext hcomp)
     rw [← himg, ← Submodule.map_span, hspan, Submodule.map_top, LinearMap.range_eq_top]

@@ -16,17 +16,19 @@ variable {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime]
 theorem isIntegral_natCast' (n : ℕ) : IsIntegral ℤ (n : K) := by
   simpa using isIntegral_algebraMap (R := ℤ) (A := K) (x := (n : ℤ))
 
-theorem mem_S_of_pow (y : ℚ_[ℓ] ⊗[ℚ] K) (D : ℕ) (h : ∀ n : ℕ, (ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * y ^ n ∈ S K ℓ) :
-    y ∈ S K ℓ := by
+theorem mem_S_of_pow
+    (y : ℚ_[ℓ] ⊗[ℚ] K) (D : ℕ) (h : ∀ n : ℕ, (ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * y ^ n ∈ S K ℓ)
+    : y ∈ S K ℓ := by
   have hℓ0 : ℓ ≠ 0 := (Fact.out : ℓ.Prime).ne_zero
   have h1 : ∀ i, ‖(ℓ : ℚ_[ℓ]) ^ D * (BA K ℓ).repr y i‖ ≤ 1 := by
     intro i
     have := mem_S.1 (by simpa using h 1) i
     rwa [BA_repr_natPow_mul, PadicInt.mem_subring_iff] at this
-  let wv : Module.Free.ChooseBasisIndex ℤ (𝓞 K) → ℤ_[ℓ] := fun i => ⟨(ℓ : ℚ_[ℓ]) ^ D * (BA K ℓ).repr y i, h1 i⟩
+  let wv : Module.Free.ChooseBasisIndex ℤ (𝓞 K) → ℤ_[ℓ] := fun i =>
+    ⟨(ℓ : ℚ_[ℓ]) ^ D * (BA K ℓ).repr y i, h1 i⟩
   let n : Module.Free.ChooseBasisIndex ℤ (𝓞 K) → ℕ := fun i => PadicInt.appr (wv i) D
-  have hsp : ∀ i, ∃ e : ℤ_[ℓ], e * (ℓ : ℤ_[ℓ]) ^ D = wv i - n i :=
-    fun i => Ideal.mem_span_singleton'.1 (PadicInt.appr_spec D (wv i))
+  have hsp : ∀ i, ∃ e : ℤ_[ℓ], e * (ℓ : ℤ_[ℓ]) ^ D = wv i - n i := fun i =>
+    Ideal.mem_span_singleton'.1 (PadicInt.appr_spec D (wv i))
   choose e he using hsp
   let u : K := ∑ i, (n i : K) * integralBasis K i
   have hu : IsIntegral ℤ u := by
@@ -49,11 +51,16 @@ theorem mem_S_of_pow (y : ℚ_[ℓ] ⊗[ℚ] K) (D : ℕ) (h : ∀ n : ℕ, (ℓ
         ring
       rw [hs', Module.Basis.repr_sum_self]
     rw [hs]
-    have h2 : ((e i * (ℓ : ℤ_[ℓ]) ^ D : ℤ_[ℓ]) : ℚ_[ℓ]) = ((wv i - n i : ℤ_[ℓ]) : ℚ_[ℓ]) := by rw [he i]
-    rw [PadicInt.coe_mul, PadicInt.coe_pow, PadicInt.coe_sub, PadicInt.coe_natCast, PadicInt.coe_natCast] at h2
+    have h2 : ((e i * (ℓ : ℤ_[ℓ]) ^ D : ℤ_[ℓ]) : ℚ_[ℓ]) = ((wv i - n i : ℤ_[ℓ]) : ℚ_[ℓ]) := by
+      rw [he i]
+    rw [PadicInt.coe_mul, PadicInt.coe_pow, PadicInt.coe_sub, PadicInt.coe_natCast,
+        PadicInt.coe_natCast]
+      at h2
     change _ = (ℓ : ℚ_[ℓ]) ^ D * (BA K ℓ).repr y i - _ at h2
     have hℓq : (ℓ : ℚ_[ℓ]) ^ D ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 hℓ0)
-    have hn : (n i : ℚ_[ℓ]) = (ℓ : ℚ_[ℓ]) ^ D * (BA K ℓ).repr y i - (e i : ℚ_[ℓ]) * (ℓ : ℚ_[ℓ]) ^ D := by
+    have hn
+        : (n i : ℚ_[ℓ])
+          = (ℓ : ℚ_[ℓ]) ^ D * (BA K ℓ).repr y i - (e i : ℚ_[ℓ]) * (ℓ : ℚ_[ℓ]) ^ D := by
       linear_combination h2
     have key : (BA K ℓ).repr y i - (((n i : ℚ) / (ℓ : ℚ) ^ D : ℚ) : ℚ_[ℓ]) = (e i : ℚ_[ℓ]) := by
       push_cast
@@ -67,17 +74,23 @@ theorem mem_S_of_pow (y : ℚ_[ℓ] ⊗[ℚ] K) (D : ℕ) (h : ∀ n : ℕ, (ℓ
     have e1 : (1 ⊗ₜ s : ℚ_[ℓ] ⊗[ℚ] K) = y + -(y - 1 ⊗ₜ s) := by ring
     rw [e1, add_pow, Finset.mul_sum]
     refine Subring.sum_mem _ fun j _ => ?_
-    rw [show (ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * (y ^ j * (-(y - 1 ⊗ₜ s)) ^ (k - j) * (k.choose j : ℚ_[ℓ] ⊗[ℚ] K)) =
-      ((ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * y ^ j) * ((-(y - 1 ⊗ₜ s)) ^ (k - j) * (k.choose j : ℚ_[ℓ] ⊗[ℚ] K)) by ring]
+    rw [show (ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D
+          * (y ^ j * (-(y - 1 ⊗ₜ s)) ^ (k - j) * (k.choose j : ℚ_[ℓ] ⊗[ℚ] K))
+        = ((ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * y ^ j)
+          * ((-(y - 1 ⊗ₜ s)) ^ (k - j) * (k.choose j : ℚ_[ℓ] ⊗[ℚ] K)) by
+      ring]
     exact Subring.mul_mem _ (h j)
       (Subring.mul_mem _ (Subring.pow_mem _ (Subring.neg_mem _ hm) _) (natCast_mem _ _))
   have hint : ∀ k : ℕ, IsIntegral ℤ ((ℓ : K) ^ D * s ^ k) := by
     intro k
     apply isIntegral_of_tmul_mem (ℓ := ℓ) _ (D * k)
     · rw [show (ℓ : K) ^ (D * k) * ((ℓ : K) ^ D * s ^ k) = (ℓ : K) ^ D * ((ℓ : K) ^ D * s) ^ k by
-        rw [mul_pow, pow_mul]; ring, hsu]
+          rw [mul_pow, pow_mul]; ring,
+        hsu]
       exact ((isIntegral_natCast' ℓ).pow D).mul (hu.pow k)
-    · have e2 : (1 ⊗ₜ ((ℓ : K) ^ D * s ^ k) : ℚ_[ℓ] ⊗[ℚ] K) = (ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * (1 ⊗ₜ s) ^ k := by
+    · have e2
+          : (1 ⊗ₜ ((ℓ : K) ^ D * s ^ k) : ℚ_[ℓ] ⊗[ℚ] K)
+            = (ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * (1 ⊗ₜ s) ^ k := by
         rw [← Algebra.TensorProduct.includeRight_apply, map_mul, map_pow, map_pow, map_natCast,
           Algebra.TensorProduct.includeRight_apply]
       rw [e2]

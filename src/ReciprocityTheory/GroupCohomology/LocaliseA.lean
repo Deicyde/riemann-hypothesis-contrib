@@ -17,8 +17,8 @@ variable {R : Type u} [CommRing R] {A B : Cx R}
 
 theorem cx_smul_d {n : ℕ} (t : R) (x : B.X n) : B.d n (t • x) = t • B.d n x := map_smul _ _ _
 
-theorem bij_H_of_bij (t : R) (ht : ∀ n, Bijective fun x : B.X n => t • x) (n : ℕ) :
-    Bijective (algebraMap R (Module.End R (B.H n)) t) := by
+theorem bij_H_of_bij (t : R) (ht : ∀ n, Bijective fun x : B.X n => t • x) (n : ℕ)
+    : Bijective (algebraMap R (Module.End R (B.H n)) t) := by
   constructor
   · rw [injective_iff_map_eq_zero]
     intro c hc
@@ -40,15 +40,18 @@ theorem bij_H_of_bij (t : R) (ht : ∀ n, Bijective fun x : B.X n => t • x) (n
     induction c using H_ind with
     | h x hx =>
       obtain ⟨x', rfl⟩ := (ht n).2 x
-      have hx' : B.d n x' = 0 := (ht (n + 1)).1 (by
-        show t • B.d n x' = t • 0
-        rw [← cx_smul_d, smul_zero]; exact hx)
+      have hx' : B.d n x' = 0 :=
+        (ht (n + 1)).1 (by
+          show t • B.d n x' = t • 0
+          rw [← cx_smul_d, smul_zero]
+          exact hx)
       exact ⟨B.cls n x' hx', by rw [Module.algebraMap_end_apply, cls_smul]⟩
 
-theorem isLocalized_of_cx (j : Hom A B) (t : R) (hj : ∀ n, Injective (j.f n))
-    (ht : ∀ n, Bijective fun x : B.X n => t • x)
-    (hc : ∀ n (x : B.X n), ∃ (m : ℕ) (y : A.X n), j.f n y = t ^ m • x) (n : ℕ) :
-    IsLocalizedModule (Submonoid.powers t) (j.H n) := by
+theorem isLocalized_of_cx
+    (j : Hom A B) (t : R)
+    (hj : ∀ n, Injective (j.f n)) (ht : ∀ n, Bijective fun x : B.X n => t • x)
+    (hc : ∀ n (x : B.X n), ∃ (m : ℕ) (y : A.X n), j.f n y = t ^ m • x) (n : ℕ)
+    : IsLocalizedModule (Submonoid.powers t) (j.H n) := by
   constructor
   case map_units =>
     rintro ⟨_, k, rfl⟩
@@ -60,8 +63,8 @@ theorem isLocalized_of_cx (j : Hom A B) (t : R) (hj : ∀ n, Injective (j.f n))
     induction y using H_ind with
     | h x hx =>
       obtain ⟨m, a, ha⟩ := hc n x
-      have ha0 : A.d n a = 0 := (hj (n + 1)) (by
-        rw [j.comm, ha, cx_smul_d, hx, smul_zero, map_zero])
+      have ha0 : A.d n a = 0 :=
+        (hj (n + 1)) (by rw [j.comm, ha, cx_smul_d, hx, smul_zero, map_zero])
       refine ⟨(A.cls n a ha0, ⟨t ^ m, m, rfl⟩), ?_⟩
       show (t ^ m) • B.cls n x hx = j.H n (A.cls n a ha0)
       rw [cls_smul, Hom.H_cls]

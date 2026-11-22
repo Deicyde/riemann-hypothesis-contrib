@@ -144,10 +144,14 @@ lemma mono_rel {N : ℕ} (σ : Equiv.Perm (Fin N)) (t : Fin N → F) (ht : ∀ b
   simpa [Units.val_mul, Matrix.mul_apply, mono_val] using this
 
 def perm {k N : ℕ} (hk : k < N) {d : ℕ → F} (h : Good k d) : Equiv.Perm (Fin N) :=
-  Equiv.ofBijective (fun b => ⟨sg k d b, by
-      by_cases hb : (b : ℕ) < k
-      · have := sg_lt h hb; omega
-      · rw [sg_ge d (not_lt.1 hb)]; exact b.2⟩)
+  Equiv.ofBijective
+    (fun b => ⟨
+      sg k d b,
+      by
+        by_cases hb : (b : ℕ) < k
+        · have := sg_lt h hb; omega
+        · rw [sg_ge d (not_lt.1 hb)]; exact b.2
+    ⟩)
     (Finite.injective_iff_bijective.1 fun a b hab => Fin.ext (sg_inj h (congrArg Fin.val hab)))
 
 lemma perm_val {k N : ℕ} (hk : k < N) {d : ℕ → F} (h : Good k d) (b : Fin N) : (perm hk h b : ℕ) = sg k d b := rfl
@@ -156,7 +160,14 @@ def cell {k N : ℕ} (hk : k < N) {d : ℕ → F} (h : Good k d) : GL (Fin N) F 
   mono (perm hk h) (fun b => d (st d b)) fun b => st_ne h b
 
 def dat (k : ℕ) (p : Fˣ × (Fin (k - 1) → F)) (a : ℕ) : F :=
-  if k ≤ a then 1 else if a = 0 then (p.1 : F) else if h : a - 1 < k - 1 then p.2 ⟨a - 1, h⟩ else 1
+  if k ≤ a then
+    1
+  else if a = 0 then
+    (p.1 : F)
+  else if h : a - 1 < k - 1 then
+    p.2 ⟨a - 1, h⟩
+  else
+    1
 
 lemma dat_good (k : ℕ) (p : Fˣ × (Fin (k - 1) → F)) : Good k (dat k p) := by
   refine ⟨?_, fun a ha => by simp [dat, ha]⟩
@@ -184,9 +195,32 @@ lemma cell_inj {k N : ℕ} (hk : k < N) {d d' : ℕ → F} (h : Good k d) (h' : 
 
 end Comb
 
-theorem relevant_cells : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ), ∀ (L : Lev g N), L.sharp = false → (∀ a, L.co a = 1) → ∀ k : ℕ, 0 < k → k < N → ∃ R : Finset (GG g N), (g - 1) * g ^ (k - 1) ≤ R.card ∧ (∀ w ∈ R, (∀ a b : Fin N, (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (w : GG g N).val a b = if a = b then 1 else 0) ∧ ∃ σ : Equiv.Perm (Fin N), ∀ a b, w.val a b ≠ 0 → a = σ b) ∧ ∀ w ∈ R, ∀ u u' : GG g N, IsUp g N u → IsUp g N u' → (∀ a b : Fin N, (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (u : GG g N).val a b = if a = b then 1 else 0) → (∀ a b : Fin N, (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (u' : GG g N).val a b = if a = b then 1 else 0) → u * w = w * u' → L.chi u = L.chi u' := by
+theorem relevant_cells
+    : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ), ∀ (L : Lev g N),
+      L.sharp = false → (∀ a, L.co a = 1)
+        → ∀ k : ℕ,
+          0 < k → k < N
+            → ∃ R : Finset (GG g N),
+              (g - 1) * g ^ (k - 1) ≤ R.card
+                ∧ (∀ w ∈ R,
+                  (∀ a b : Fin N,
+                      (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (w : GG g N).val a b = if a = b then 1 else 0)
+                    ∧ ∃ σ : Equiv.Perm (Fin N), ∀ a b, w.val a b ≠ 0 → a = σ b)
+                ∧ ∀ w ∈ R, ∀ u u' : GG g N,
+                  IsUp g N u → IsUp g N u'
+                    → (∀ a b : Fin N,
+                      (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (u : GG g N).val a b = if a = b then 1 else 0)
+                    → (∀ a b : Fin N,
+                      (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (u' : GG g N).val a b = if a = b then 1 else 0)
+                    → u * w = w * u'
+                    → L.chi u = L.chi u' := by
   intro g _ N L hs hco k hk0 hk
-  refine ⟨Finset.univ.image fun p : (ZMod g)ˣ × (Fin (k - 1) → ZMod g) => cell hk (dat_good k p), ?_, ?_, ?_⟩
+  refine ⟨
+    Finset.univ.image fun p : (ZMod g)ˣ × (Fin (k - 1) → ZMod g) => cell hk (dat_good k p),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Finset.card_image_of_injective _ fun p q h => dat_inj hk0 (cell_inj hk _ _ h)]
     simp [Nat.totient_prime (Fact.out : g.Prime)]
   · intro w hw
@@ -217,8 +251,9 @@ theorem relevant_cells : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ), ∀ (L : Lev g 
     have tc := st_ne h c
     have hσ : ∀ x : Fin N, (x : ℕ) < k → sg k d x < k := fun x hx => sg_lt h hx
     have hσ' : ∀ x : Fin N, k ≤ (x : ℕ) → sg k d x = x := fun x hx => sg_ge d hx
-    have z : c ≠ b → (k ≤ (b : ℕ) ∨ b < c ∨ sg k d b < sg k d c) →
-        u.val (perm hk h c) (perm hk h b) = 0 ∧ u'.val c b = 0 := by
+    have z
+        : c ≠ b → (k ≤ (b : ℕ) ∨ b < c ∨ sg k d b < sg k d c)
+          → u.val (perm hk h c) (perm hk h b) = 0 ∧ u'.val c b = 0 := by
       intro hne hh
       have e1 : u'.val c b = 0 → u.val (perm hk h c) (perm hk h b) = 0 ∧ u'.val c b = 0 := fun e =>
         ⟨by rw [e, mul_zero] at r; exact (mul_eq_zero.1 r).resolve_right tb, e⟩

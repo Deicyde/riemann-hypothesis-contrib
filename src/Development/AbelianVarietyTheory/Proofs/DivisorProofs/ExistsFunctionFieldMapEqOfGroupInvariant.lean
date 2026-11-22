@@ -5,9 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GapGeSubKapB
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+  GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
 open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW secZ ptF LiesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.CompHt (hodgeWt)
@@ -21,10 +23,13 @@ noncomputable section
 
 namespace GlobalTheory.OrbitSep
 
-theorem functionFieldMap_germToFunctionField {X X' : Scheme.{0}} [IsIntegral X] [IsIntegral X']
-    (f : X ⟶ X') [IsDominant f] (V : X'.Opens) (U : X.Opens) (e : U ≤ f ⁻¹ᵁ V) [Nonempty U]
-    [Nonempty V] (s : Γ(X', V)) :
-    functionFieldMap f (X'.germToFunctionField V s) = X.germToFunctionField U (f.appLE V U e s) := by
+theorem functionFieldMap_germToFunctionField
+    {X X' : Scheme.{0}} [IsIntegral X] [IsIntegral X']
+    (f : X ⟶ X') [IsDominant f]
+    (V : X'.Opens) (U : X.Opens) (e : U ≤ f ⁻¹ᵁ V) [Nonempty U] [Nonempty V]
+    (s : Γ(X', V))
+    : functionFieldMap f (X'.germToFunctionField V s)
+      = X.germToFunctionField U (f.appLE V U e s) := by
   have hx : genericPoint X ∈ U :=
     ((genericPoint_spec X).mem_open_set_iff U.isOpen).mpr (by simpa using ‹Nonempty U›)
   have hfx : f (genericPoint X) ∈ V := e hx
@@ -34,15 +39,19 @@ theorem functionFieldMap_germToFunctionField {X X' : Scheme.{0}} [IsIntegral X] 
   exact (Scheme.Hom.germ_stalkMap_apply f V _ hfx s).trans
     (TopCat.Presheaf.germ_res_apply X.presheaf (homOfLE e) _ hx (f.app V s)).symm
 
-theorem exists_functionFieldMap_eq_of_invariant (X W : Scheme.{0}) [IsIntegral X] [IsIntegral W]
-    (Γ : Type) [Group Γ] [Finite Γ] (ρ : Γ →* Aut X) (q : X ⟶ W) [IsDominant q]
-    (h : IsAffineQuotient ρ q) (u : X.functionFieldˣ) (hu : ∀ γ, fnAct ρ γ u = u) :
-    ∃ b : W.functionFieldˣ, Units.map (functionFieldMap q).toMonoidHom b = u := by
+theorem exists_functionFieldMap_eq_of_invariant
+    (X W : Scheme.{0}) [IsIntegral X] [IsIntegral W]
+    (Γ : Type) [Group Γ] [Finite Γ]
+    (ρ : Γ →* Aut X)
+    (q : X ⟶ W) [IsDominant q]
+    (h : IsAffineQuotient ρ q)
+    (u : X.functionFieldˣ) (hu : ∀ γ, fnAct ρ γ u = u)
+    : ∃ b : W.functionFieldˣ, Units.map (functionFieldMap q).toMonoidHom b = u := by
   classical
   have := Fintype.ofFinite Γ
   have := h.isAffineHom
-  obtain ⟨_, ⟨V, hV, rfl⟩, hyV, -⟩ := W.isBasis_affineOpens.exists_subset_of_mem_open
-    (Set.mem_univ (genericPoint W)) isOpen_univ
+  obtain ⟨_, ⟨V, hV, rfl⟩, hyV, -⟩ :=
+    W.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (genericPoint W)) isOpen_univ
   haveI : Nonempty V := ⟨⟨_, hyV⟩⟩
   have hU : IsAffineOpen (q ⁻¹ᵁ V) := (show IsAffineOpen V from hV).preimage q
   obtain ⟨x, hx⟩ := q.denseRange.exists_mem_open V.isOpen ⟨_, hyV⟩
@@ -51,9 +60,9 @@ theorem exists_functionFieldMap_eq_of_invariant (X W : Scheme.{0}) [IsIntegral X
   haveI (γ : Γ) : IsIso (ρ γ).asIso.hom := Iso.isIso_hom (ρ γ).asIso
   haveI := functionField_isFractionRing_of_isAffineOpen X _ hU
   let σ : Γ → Γ(X, q ⁻¹ᵁ V) →+* Γ(X, q ⁻¹ᵁ V) := fun γ ↦ ((ρ γ).asIso.hom.appLE _ _ (hst γ)).hom
-  have hσ (γ : Γ) (s : Γ(X, q ⁻¹ᵁ V)) :
-      functionFieldMap (ρ γ).asIso.hom (algebraMap Γ(X, q ⁻¹ᵁ V) X.functionField s) =
-        algebraMap Γ(X, q ⁻¹ᵁ V) X.functionField (σ γ s) :=
+  have hσ (γ : Γ) (s : Γ(X, q ⁻¹ᵁ V))
+      : functionFieldMap (ρ γ).asIso.hom (algebraMap Γ(X, q ⁻¹ᵁ V) X.functionField s)
+        = algebraMap Γ(X, q ⁻¹ᵁ V) X.functionField (σ γ s) :=
     functionFieldMap_germToFunctionField _ _ _ (hst γ) s
   have hσ1 (s : Γ(X, q ⁻¹ᵁ V)) : σ 1 s = s := by
     have e1 : (ρ 1).asIso.hom = 𝟙 X := by rw [map_one]; rfl
@@ -62,8 +71,8 @@ theorem exists_functionFieldMap_eq_of_invariant (X W : Scheme.{0}) [IsIntegral X
     exact congr($(X.presheaf.map_id (Opposite.op (q ⁻¹ᵁ V))) s)
   have hσmul (γ δ : Γ) (s : Γ(X, q ⁻¹ᵁ V)) : σ δ (σ γ s) = σ (γ * δ) s := by
     have e2 : (ρ (γ * δ)).asIso.hom = (ρ δ).asIso.hom ≫ (ρ γ).asIso.hom := by rw [map_mul]; rfl
-    change (ρ δ).asIso.hom.appLE _ _ (hst δ) ((ρ γ).asIso.hom.appLE _ _ (hst γ) s) =
-      (ρ (γ * δ)).asIso.hom.appLE _ _ (hst (γ * δ)) s
+    change (ρ δ).asIso.hom.appLE _ _ (hst δ) ((ρ γ).asIso.hom.appLE _ _ (hst γ) s)
+      = (ρ (γ * δ)).asIso.hom.appLE _ _ (hst (γ * δ)) s
     simp only [← CommRingCat.comp_apply, Scheme.Hom.appLE_comp_appLE, e2]
   set e := algebraMap Γ(X, q ⁻¹ᵁ V) X.functionField with he_def
   have einj : Function.Injective e := IsFractionRing.injective _ _
@@ -108,10 +117,12 @@ theorem exists_functionFieldMap_eq_of_invariant (X W : Scheme.{0}) [IsIntegral X
     intro h0
     apply mul_ne_zero u.ne_zero hNe
     rw [← hc, ← hbc, ← hq, h0, map_zero]
-  refine ⟨Units.mk0 (W.germToFunctionField V bc / W.germToFunctionField V bN)
-    (div_ne_zero hbc0 hbN0), Units.ext ?_⟩
-  simp only [Units.coe_map, Units.val_mk0, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
-    map_div₀, hq, hbc, hbN, hc]
+  refine ⟨
+    Units.mk0 (W.germToFunctionField V bc / W.germToFunctionField V bN) (div_ne_zero hbc0 hbN0),
+    Units.ext ?_
+  ⟩
+  simp only [Units.coe_map, Units.val_mk0, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, map_div₀,
+    hq, hbc, hbN, hc]
   field_simp
 
 end GlobalTheory.OrbitSep

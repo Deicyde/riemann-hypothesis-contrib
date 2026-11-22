@@ -15,12 +15,12 @@ noncomputable section
 
 namespace GlobalTheory.Proof.NarrowJetMoments
 
-open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke
+open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke
 
 section Notions
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {a b : ℕ}
-
 
 variable {ST SG SG' : Finset (HeightOneSpectrum (𝓞 E))}
 
@@ -36,15 +36,18 @@ end Closure
 
 section Data
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {a b : ℕ}
-  {N : Submodule (𝓞 E) (Sp E a)} {N' : Submodule (𝓞 E) (Sp E b)}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {a b : ℕ} {N : Submodule (𝓞 E) (Sp E a)} {N' : Submodule (𝓞 E) (Sp E b)}
 
 end Data
 
 section Datum
 
-variable {X : Fields} {a b : ℕ} {SB Sall : Finset (HeightOneSpectrum (𝓞 X.E))} {T cA cB' : ℕ}
-  {N : Submodule (𝓞 X.E) (Sp X.E a)} {N' : Submodule (𝓞 X.E) (Sp X.E b)} {w : HeightOneSpectrum (𝓞 X.K)}
+variable
+  {X : Fields} {a b : ℕ}
+  {SB Sall : Finset (HeightOneSpectrum (𝓞 X.E))} {T cA cB' : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E a)}
+  {N' : Submodule (𝓞 X.E) (Sp X.E b)} {w : HeightOneSpectrum (𝓞 X.K)}
 
 variable (A : Amb X)
 
@@ -52,9 +55,15 @@ end Datum
 
 section Clause
 
-variable {X : Fields} (A : Amb X) (Pr : Primes X) (u : Pr.Word) {p : ℕ} [Fact p.Prime] (w : HeightOneSpectrum (𝓞 X.K))
-  (ι : X.K →+* ℂ_[p]) (uu : X.Tau → ℂ_[p]) {a b : ℕ} (SB Sall : Finset (HeightOneSpectrum (𝓞 X.E)))
-  {SG SG' : Finset (HeightOneSpectrum (𝓞 X.E))} (d : DecoSet (E := X.E) (n := a) (ST := Pr.vT u) (SG := SG)) (d' : DecoSet (E := X.E) (n := b) (ST := Pr.vT u) (SG := SG'))
+variable
+  {X : Fields} (A : Amb X) (Pr : Primes X) (u : Pr.Word)
+  {p : ℕ} [Fact p.Prime]
+  (w : HeightOneSpectrum (𝓞 X.K)) (ι : X.K →+* ℂ_[p]) (uu : X.Tau → ℂ_[p])
+  {a b : ℕ}
+  (SB Sall : Finset (HeightOneSpectrum (𝓞 X.E)))
+  {SG SG' : Finset (HeightOneSpectrum (𝓞 X.E))}
+  (d : DecoSet (E := X.E) (n := a) (ST := Pr.vT u) (SG := SG))
+  (d' : DecoSet (E := X.E) (n := b) (ST := Pr.vT u) (SG := SG'))
 
 end Clause
 
@@ -62,8 +71,9 @@ section Bad
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem notMem_of_coprime {m n : ℕ} (h : Nat.Coprime m n) (P : HeightOneSpectrum (𝓞 E)) (hn : (n : 𝓞 E) ∈ P.asIdeal) :
-    (m : 𝓞 E) ∉ P.asIdeal := by
+theorem notMem_of_coprime
+    {m n : ℕ} (h : Nat.Coprime m n) (P : HeightOneSpectrum (𝓞 E)) (hn : (n : 𝓞 E) ∈ P.asIdeal)
+    : (m : 𝓞 E) ∉ P.asIdeal := by
   intro hm
   obtain ⟨x, y, e⟩ := Nat.isCoprime_iff_coprime.2 h
   have e' : (x : 𝓞 E) * (m : 𝓞 E) + (y : 𝓞 E) * (n : 𝓞 E) = 1 := by
@@ -74,8 +84,11 @@ theorem notMem_of_coprime {m n : ℕ} (h : Nat.Coprime m n) (P : HeightOneSpectr
 
 variable {X : Fields}
 
-theorem conjP_ne_self_of_split (hX : X.Ok) {v : HeightOneSpectrum (𝓞 X.F)} (hs : SplitAt X.E v) {P : HeightOneSpectrum (𝓞 X.E)}
-    (hP : P.asIdeal.under (𝓞 X.F) = v.asIdeal) : conjPrime₂ P ≠ P := by
+theorem conjP_ne_self_of_split
+    (hX : X.Ok)
+    {v : HeightOneSpectrum (𝓞 X.F)} (hs : SplitAt X.E v)
+    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P.asIdeal.under (𝓞 X.F) = v.asIdeal)
+    : conjPrime₂ P ≠ P := by
   intro hc
   have hne : GlobalTheory.MuConj.starAlg hX.star_F ≠ 1 := by
     intro h
@@ -84,14 +97,19 @@ theorem conjP_ne_self_of_split (hX : X.Ok) {v : HeightOneSpectrum (𝓞 X.F)} (h
     have : star x = x := congrArg (fun σ : X.E ≃ₐ[X.F] X.E => σ x) h
     show X.emb τ x = X.emb τ (star x)
     rw [this]
-  have key : ∀ Q : HeightOneSpectrum (𝓞 X.E), Ideal.map (algebraMap (𝓞 X.F) (𝓞 X.E)) v.asIdeal ≤ Q.asIdeal → Q = P := by
+  have key
+      : ∀ Q : HeightOneSpectrum (𝓞 X.E),
+        Ideal.map (algebraMap (𝓞 X.F) (𝓞 X.E)) v.asIdeal ≤ Q.asIdeal → Q = P := by
     intro Q hQ
     have hu : Q.under (𝓞 X.F) = P.under (𝓞 X.F) := by
       refine HeightOneSpectrum.ext ?_
       show Q.asIdeal.under (𝓞 X.F) = P.asIdeal.under (𝓞 X.F)
       rw [hP]
-      exact (v.isMaximal.eq_of_le (Q.under (𝓞 X.F)).isPrime.ne_top (Ideal.map_le_iff_le_comap.1 hQ)).symm
-    rcases (GlobalTheory.Mem.Chr.under_eq_iff_conjPl (GlobalTheory.MuConj.starAlg hX.star_F) hX.rankE hne P Q).1 hu with h | h
+      exact (v.isMaximal.eq_of_le (Q.under (𝓞 X.F)).isPrime.ne_top
+        (Ideal.map_le_iff_le_comap.1 hQ)).symm
+    rcases (GlobalTheory.Mem.Chr.under_eq_iff_conjPl (GlobalTheory.MuConj.starAlg hX.star_F)
+        hX.rankE hne P Q).1 hu
+      with h | h
     · exact h
     · rw [GlobalTheory.Mem.Chr.conjPl_iff_mem] at h
       rw [← hc]
@@ -103,10 +121,11 @@ theorem conjP_ne_self_of_split (hX : X.Ok) {v : HeightOneSpectrum (𝓞 X.F)} (h
 
 variable {Pr : Primes X}
 
-variable {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ} {mu : Tup X.F X.E X.K S}
+variable
+  {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ} {mu : Tup X.F X.E X.K S}
 
-theorem good_of_mem_QE {P : HeightOneSpectrum (𝓞 X.E)} (h : P ∈ QE sel (mu : Chr X.F X.E X.K)) :
-    ∃ v, GoodPl X.E S v ∧ sel v = P := by
+theorem good_of_mem_QE {P : HeightOneSpectrum (𝓞 X.E)} (h : P ∈ QE sel (mu : Chr X.F X.E X.K))
+    : ∃ v, GoodPl X.E S v ∧ sel v = P := by
   classical
   unfold QE at h
   split_ifs at h with h2
@@ -118,8 +137,11 @@ theorem good_of_mem_QE {P : HeightOneSpectrum (𝓞 X.E)} (h : P ∈ QE sel (mu 
     exact hv1 (Subgroup.mem_iInf.1 (Subgroup.mem_iInf.1 h4 v) hn)
   · simp at h
 
-theorem notMem_of_mem_QE (hsel : IsSel X sel) {P : HeightOneSpectrum (𝓞 X.E)} (h : P ∈ QE sel (mu : Chr X.F X.E X.K))
-    {l : ℕ} (hl : l.Prime) (hS : l ∈ S) : (l : 𝓞 X.E) ∉ P.asIdeal := by
+theorem notMem_of_mem_QE
+    (hsel : IsSel X sel)
+    {P : HeightOneSpectrum (𝓞 X.E)} (h : P ∈ QE sel (mu : Chr X.F X.E X.K))
+    {l : ℕ} (hl : l.Prime) (hS : l ∈ S)
+    : (l : 𝓞 X.E) ∉ P.asIdeal := by
   intro hm
   obtain ⟨v, hgood, e⟩ := good_of_mem_QE h
   have h5 : (l : 𝓞 X.F) ∈ v.asIdeal := by
@@ -127,7 +149,8 @@ theorem notMem_of_mem_QE (hsel : IsSel X sel) {P : HeightOneSpectrum (𝓞 X.E)}
     exact hm
   apply hgood.2.2
   have h6 : ringChar (𝓞 X.F ⧸ v.asIdeal) ∣ l := by
-    rw [← ringChar.spec, ← map_natCast (Ideal.Quotient.mk v.asIdeal), Ideal.Quotient.eq_zero_iff_mem]
+    rw [← ringChar.spec, ← map_natCast (Ideal.Quotient.mk v.asIdeal),
+      Ideal.Quotient.eq_zero_iff_mem]
     exact h5
   haveI := v.isPrime
   rcases (Nat.dvd_prime hl).1 h6 with h7 | h7
@@ -141,24 +164,30 @@ theorem mem_vGs_iff {P : HeightOneSpectrum (𝓞 X.E)} : P ∈ Pr.vGs ↔ ∃ i,
   unfold Primes.vGs
   rw [Finset.mem_union, Fin.exists_fin_two]
 
-theorem g_mem (hPr : Pr.Ok) {i : Fin 2} {P : HeightOneSpectrum (𝓞 X.E)} (h : P ∈ Pr.vG i) : (Pr.g i : 𝓞 X.E) ∈ P.asIdeal := by
+theorem g_mem (hPr : Pr.Ok) {i : Fin 2} {P : HeightOneSpectrum (𝓞 X.E)} (h : P ∈ Pr.vG i)
+    : (Pr.g i : 𝓞 X.E) ∈ P.asIdeal := by
   rw [← hPr.piG_norm i]
   exact Ideal.mul_mem_left _ _ (decoFin_mem_of_mem_divs h)
 
-theorem notMem_rowSG (hPr : Pr.Ok) (hsel : IsSel X sel) {l : ℕ} (hl : l.Prime) (hS : l ∈ S) (hg : ∀ i, l ≠ Pr.g i)
-    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ rowSG Pr sel mu) : (l : 𝓞 X.E) ∉ P.asIdeal := by
+theorem notMem_rowSG
+    (hPr : Pr.Ok) (hsel : IsSel X sel)
+    {l : ℕ} (hl : l.Prime) (hS : l ∈ S) (hg : ∀ i, l ≠ Pr.g i)
+    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ rowSG Pr sel mu)
+    : (l : 𝓞 X.E) ∉ P.asIdeal := by
   classical
   rcases Finset.mem_union.1 hP with h | h
   · obtain ⟨i, hi⟩ := mem_vGs_iff.1 h
     exact notMem_of_coprime ((Nat.coprime_primes hl (hPr.g_prime i)).2 (hg i)) P (g_mem hPr hi)
   · exact notMem_of_mem_QE hsel h hl hS
 
-theorem natCast_mem_conjP {P : HeightOneSpectrum (𝓞 X.E)} {n : ℕ} :
-    (n : 𝓞 X.E) ∈ (conjPrime₂ P).asIdeal ↔ (n : 𝓞 X.E) ∈ P.asIdeal := by
+theorem natCast_mem_conjP {P : HeightOneSpectrum (𝓞 X.E)} {n : ℕ}
+    : (n : 𝓞 X.E) ∈ (conjPrime₂ P).asIdeal ↔ (n : 𝓞 X.E) ∈ P.asIdeal := by
   rw [mem_conjP, map_natCast]
 
-theorem conjP_notMem_rowSG (hX : X.Ok) (hPr : Pr.Ok) (hsel : IsSel X sel) (hS : ∀ i, Pr.g i ∈ S)
-    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ rowSG Pr sel mu) : conjPrime₂ P ∉ rowSG Pr sel mu := by
+theorem conjP_notMem_rowSG
+    (hX : X.Ok) (hPr : Pr.Ok) (hsel : IsSel X sel) (hS : ∀ i, Pr.g i ∈ S)
+    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ rowSG Pr sel mu)
+    : conjPrime₂ P ∉ rowSG Pr sel mu := by
   classical
   intro hP'
   rcases Finset.mem_union.1 hP with h | h <;> rcases Finset.mem_union.1 hP' with h' | h'
@@ -187,7 +216,8 @@ theorem conjP_notMem_rowSG (hX : X.Ok) (hPr : Pr.Ok) (hsel : IsSel X sel) (hS : 
     obtain ⟨v', -, e'⟩ := good_of_mem_QE h'
     have hvv : v' = v := by
       ext y
-      rw [← hsel v, ← hsel v', e, e', Ideal.under_def, Ideal.under_def, Ideal.mem_comap, Ideal.mem_comap, mem_conjP]
+      rw [← hsel v, ← hsel v', e, e', Ideal.under_def, Ideal.under_def, Ideal.mem_comap,
+        Ideal.mem_comap, mem_conjP]
       have : cO X.E (algebraMap (𝓞 X.F) (𝓞 X.E) y) = algebraMap (𝓞 X.F) (𝓞 X.E) y :=
         RingOfIntegers.ext (hX.star_F (y : X.F))
       rw [this]
@@ -196,9 +226,11 @@ theorem conjP_notMem_rowSG (hX : X.Ok) (hPr : Pr.Ok) (hsel : IsSel X sel) (hS : 
 
 end Bad
 
-theorem mem_Sall {X : Fields} {Pr : Primes X} (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ}
-    (mu : Tup X.F X.E X.K S) (u : Pr.Word) (P : HeightOneSpectrum (𝓞 X.E)) :
-    P ∈ Sall sel mu u ↔ P ∈ Pr.vT u ∨ P ∈ rowSG Pr sel mu := by
+theorem mem_Sall
+    {X : Fields} {Pr : Primes X} (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+    {S : Set ℕ} (mu : Tup X.F X.E X.K S)
+    (u : Pr.Word) (P : HeightOneSpectrum (𝓞 X.E))
+    : P ∈ Sall sel mu u ↔ P ∈ Pr.vT u ∨ P ∈ rowSG Pr sel mu := by
   classical
   unfold Sall
   rw [Finset.mem_union]

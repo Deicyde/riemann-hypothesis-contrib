@@ -8,7 +8,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.TheoremPInte
 
 @[expose] public section
 
-open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -27,7 +28,8 @@ variable {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDime
 end
 
 section
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 theorem one_mem_UW (z : Fin (2 * r + k + 1) → ℂ) : (1 : B.Mat k r) ∈ UWset k r z := by

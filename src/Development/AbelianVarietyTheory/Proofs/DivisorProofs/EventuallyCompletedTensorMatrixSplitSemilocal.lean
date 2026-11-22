@@ -13,18 +13,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalTensorC
 
 @[expose] public section
 
-open Matrix NumberField IsDedekindDomain GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.OrbFinAf
+open Matrix NumberField IsDedekindDomain GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.OrbFinAf
 open scoped TensorProduct Classical
 
 noncomputable section
 
 namespace GlobalTheory.OrbFinAf
 
-theorem coeff_isIntV_eventually (p : ℕ) [Fact p.Prime] (G : HTGroup p) (f : Polynomial G.F) :
-    ∀ᶠ v in (Filter.cofinite : Filter (AwayP p)),
-      ∀ i, IsIntV G v ((1 : Qv v) ⊗ₜ[ℚ] algebraMap G.F G.C (f.coeff i)) := by
-  have h := Filter.eventually_all.2 fun i : Fin (f.natDegree + 1) =>
-    GlobalTheory.OrbFinAfFixed.isIntV_one_tmul_eventually p G (algebraMap G.F G.C (f.coeff i))
+theorem coeff_isIntV_eventually (p : ℕ) [Fact p.Prime] (G : HTGroup p) (f : Polynomial G.F)
+    : ∀ᶠ v in (Filter.cofinite : Filter (AwayP p)),
+        ∀ i, IsIntV G v ((1 : Qv v) ⊗ₜ[ℚ] algebraMap G.F G.C (f.coeff i)) := by
+  have h :=
+    Filter.eventually_all.2 fun i : Fin (f.natDegree + 1) =>
+      GlobalTheory.OrbFinAfFixed.isIntV_one_tmul_eventually p G (algebraMap G.F G.C (f.coeff i))
   filter_upwards [h] with v hv i
   by_cases hi : i ≤ f.natDegree
   · exact hv ⟨i, Nat.lt_succ_of_le hi⟩

@@ -10,7 +10,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LeftPhaseRule.Re
 @[expose] public section
 
 open Matrix
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.QuantumDeterminants.WeylGroupFacts
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.QuantumDeterminants.WeylGroupFacts
 
 noncomputable section
 

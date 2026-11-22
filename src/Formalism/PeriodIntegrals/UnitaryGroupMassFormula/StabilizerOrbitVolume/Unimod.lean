@@ -15,26 +15,32 @@ open scoped Pointwise ENNReal NNReal
 
 section Gen
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [MeasurableSpace G] [BorelSpace G]
 
 end Gen
 
 section Spec
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW PI.AdicCompletionValuation NumberField
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW
+  PI.AdicCompletionValuation NumberField
 open scoped TensorProduct
 
-theorem um_countable_HFinIn (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) :
-    Countable (HFinIn (AF F) σ J) := by
+theorem um_countable_HFinIn
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
+    : Countable (HFinIn (AF F) σ J) := by
   have : Countable E := Finsupp.Countable.of_moduleFinite (R := ℚ)
   have : Countable (Matrix (Fin M) (Fin M) E) := inferInstanceAs (Countable (Fin M → Fin M → E))
   have : Countable (GL (Fin M) E) :=
-    Function.Injective.countable (f := fun u : GL (Fin M) E => (u : Matrix (Fin M) (Fin M) E))
+    Function.Injective.countable
+      (f := fun u : GL (Fin M) E => (u : Matrix (Fin M) (Fin M) E))
       (fun _ _ h => Units.ext h)
-  have hx : ∀ x : HFinIn (AF F) σ J, ∃ u : GL (Fin M) E,
-      Formalism.UG.bc (inclR (AF F)) u = ((x : HR (AF F) σ J) : GL (Fin M) (AF F ⊗[F] E)) := by
+  have hx
+      : ∀ x : HFinIn (AF F) σ J, ∃ u : GL (Fin M) E,
+        Formalism.UG.bc (inclR (AF F)) u = ((x : HR (AF F) σ J) : GL (Fin M) (AF F ⊗[F] E)) := by
     intro x
     have h : ((x : HR (AF F) σ J) : GL (Fin M) (AF F ⊗[F] E)) ∈ HFin (AF F) σ J :=
       Subgroup.mem_subgroupOf.1 x.2

@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StandardBaseF
 
 noncomputable section
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat IsDedekindDomain
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  IsDedekindDomain
 open PI.UnitaryGroupMassFormula.BetaLUniq.EigA PI.UnitaryGroupMassFormula.BetaLUniq.EigB
 
 namespace PI.UnitaryGroupMassFormula.BetaLUniq
@@ -23,14 +24,17 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E}
 
-theorem eigenOne_gen (Λ : Submodule (𝓞 E) S.V) {g r : ℕ} {T T' : E} {F : LFlag S r T}
-    {F' F'' : LFlag S r T'} (β₁ β₂ : S.V ≃ₗ[E] S.V) (hg : 3 ≤ g)
-    (hCM : ∀ μ : E, star μ * μ = 1 → ∀ φ : E →+* ℂ, ‖φ μ‖ = 1)
-    (hL : Submodule.IsLattice E Λ) (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) (hFC : IsFixedConv Λ g F)
-    (hA' : IsAdmissible Λ g F F') (hA'' : IsAdmissible Λ g F F'')
+theorem eigenOne_gen
+    (Λ : Submodule (𝓞 E) S.V)
+    {g r : ℕ} {T T' : E} {F : LFlag S r T} {F' F'' : LFlag S r T'}
+    (β₁ β₂ : S.V ≃ₗ[E] S.V)
+    (hg : 3 ≤ g) (hCM : ∀ μ : E, star μ * μ = 1 → ∀ φ : E →+* ℂ, ‖φ μ‖ = 1)
+    (hL : Submodule.IsLattice E Λ) (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ)
+    (hFC : IsFixedConv Λ g F) (hA' : IsAdmissible Λ g F F') (hA'' : IsAdmissible Λ g F F'')
     (hP1 : IsPair Λ F F' F'' β₁ g) (hP2 : IsPair Λ F F' F'' β₂ g)
     (v : S.V) (hv : v ∈ orth S (Xplus F')) (hvX : v ∉ Xsp F') (hvv : S.hT v v ≠ 0)
-    (μ : E) (hμ : β₁.symm (β₂ v) - μ • v ∈ Xsp F') : μ = 1 := by
+    (μ : E) (hμ : β₁.symm (β₂ v) - μ • v ∈ Xsp F')
+    : μ = 1 := by
   obtain ⟨ξ', hA'⟩ := hA'
   obtain ⟨ξ'', hA''⟩ := hA''
   set X' := Xsp F' with hX'
@@ -55,8 +59,7 @@ theorem eigenOne_gen (Λ : Submodule (𝓞 E) S.V) {g r : ℕ} {T T' : E} {F : L
     intro x y
     have := hP1.1.1 (β₁.symm x) (β₁.symm y)
     simpa using this.symm
-  have hγiso : ∀ x y, S.hT (γ x) (γ y) = S.hT x y := by
-    intro x y; rw [hγ, hγ, hiso1, hiso2]
+  have hγiso : ∀ x y, S.hT (γ x) (γ y) = S.hT x y := by intro x y; rw [hγ, hγ, hiso1, hiso2]
   have hXXplus : X' ≤ Xplus F' := le_sup_left
   have hvo : v ∈ orth S X' := by
     rw [mem_orth] at hv ⊢
@@ -98,7 +101,8 @@ theorem eigenOne_gen (Λ : Submodule (𝓞 E) S.V) {g r : ℕ} {T T' : E} {F : L
     obtain ⟨a, ha, x, hx, rfl⟩ := Submodule.mem_sup.mp hy
     obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp ha
     have : π (c • v + x) = c := by rw [map_add (f := _), map_smul, hπv, hπX x hx, smul_eq_mul]; ring
-    rw [this]; simpa using hx
+    rw [this]
+    simpa using hx
   have hWeq : ∀ y ∈ W, y = π y • v + (y - π y • v) := fun y _ => by abel
   have hvW : v ∈ W := Submodule.mem_sup_left (Submodule.mem_span_singleton_self v)
   have hXW : X' ≤ W := le_sup_right
@@ -107,12 +111,15 @@ theorem eigenOne_gen (Λ : Submodule (𝓞 E) S.V) {g r : ℕ} {T T' : E} {F : L
     have h1 := hWeq y hy
     have h2 : γ y = (π y * μ) • v + (π y • x₀ + γ (y - π y • v)) := by
       conv_lhs => rw [h1]
-      rw [map_add (f := _), map_smul, hγv, smul_add, smul_smul]; abel
+      rw [map_add (f := _), map_smul, hγv, smul_add, smul_smul]
+      abel
     constructor
     · rw [h2]
       exact W.add_mem (W.smul_mem _ hvW) (hXW (X'.add_mem (X'.smul_mem _ hx₀X) (hγX _ (hdec y hy))))
-    · rw [h2, map_add (f := _), map_smul, hπv, map_add (f := _), map_smul, hπX _ hx₀X, hπX _ (hγX _ (hdec y hy))]
-      simp only [smul_eq_mul]; ring
+    · rw [h2, map_add (f := _), map_smul, hπv, map_add (f := _), map_smul, hπX _ hx₀X,
+        hπX _ (hγX _ (hdec y hy))]
+      simp only [smul_eq_mul]
+      ring
   have hWo : W ≤ orth S X' := by
     apply sup_le
     · rw [Submodule.span_le]; rintro _ rfl; exact hvo
@@ -130,10 +137,10 @@ theorem eigenOne_gen (Λ : Submodule (𝓞 E) S.V) {g r : ℕ} {T T' : E} {F : L
     rw [Submodule.map_comap_subtype] at h1
     exact h1.map _
   have hI0 : I ≠ ⊥ := by
-    have hfull : Submodule.IsFullLattice E Λ :=
-      { toIsLattice := hL
-        span_eq_top := GlobalTheory.LoopC.Base.span_eq_top_of_unimodular
-          S.hT S.herm S.nondeg hL hU }
+    have hfull : Submodule.IsFullLattice E Λ := {
+      toIsLattice := hL
+      span_eq_top := GlobalTheory.LoopC.Base.span_eq_top_of_unimodular S.hT S.herm S.nondeg hL hU
+    }
     obtain ⟨a, ha, haΛ⟩ := exists_smul_mem S Λ hfull v
     intro hbot
     have : π (a • v) ∈ I := (hmemI _).mpr ⟨a • v, haΛ, W.smul_of_tower_mem a hvW, rfl⟩
@@ -151,8 +158,8 @@ theorem eigenOne_gen (Λ : Submodule (𝓞 E) S.V) {g r : ℕ} {T T' : E} {F : L
     by_cases hgP : (g : 𝓞 E) ∈ P
     · let P' : HeightOneSpectrum (𝓞 E) :=
         ⟨P, hPm.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hPm (RingOfIntegers.not_isField E)⟩
-      have hloc : ∀ c ∈ I, ∃ s : 𝓞 E, s ∉ P ∧
-          algebraMap (𝓞 E) E s * ((μ - 1) / (g : E)) * c ∈ I := by
+      have hloc
+          : ∀ c ∈ I, ∃ s : 𝓞 E, s ∉ P ∧ algebraMap (𝓞 E) E s * ((μ - 1) / (g : E)) * c ∈ I := by
         intro c hc
         obtain ⟨y, hyΛ, hyW, rfl⟩ := (hmemI c).mp hc
         obtain ⟨s, hs, hsm⟩ := cong β₁ β₂ hU hFC hA' hA'' hP1 hP2 P' hgP y hyΛ (hWo hyW)
@@ -166,16 +173,19 @@ theorem eigenOne_gen (Λ : Submodule (𝓞 E) S.V) {g r : ℕ} {T T' : E} {F : L
             exact W.sub_mem (W.smul_of_tower_mem s (W.sub_mem (hγW y hyW).1 hyW)) (hXW hw.2)
           have : l = (g : E)⁻¹ • ((g : 𝓞 E) • l) := by
             rw [smulO, map_natCast, smul_smul, inv_mul_cancel₀ hg0, one_smul]
-          rw [this]; exact W.smul_mem _ hgl
+          rw [this]
+          exact W.smul_mem _ hgl
         · have h1 : π ((g : 𝓞 E) • l) = π (s • (γ y - y)) := by
             rw [← hz, map_add (f := _), hπX w hw.2, add_zero]
-          rw [smulO, smulO, map_smul, map_smul, map_sub, (hγW y hyW).2, map_natCast,
-            smul_eq_mul, smul_eq_mul] at h1
+          rw [smulO, smulO, map_smul, map_smul, map_sub, (hγW y hyW).2, map_natCast, smul_eq_mul,
+              smul_eq_mul]
+            at h1
           field_simp
           linear_combination h1
       obtain ⟨s, hs, hsI⟩ := exists_common P I hIfg _ hloc
       refine ⟨s, hs, mem_O_of_stable I hI0 hIfg _ ?_⟩
-      intro c hc; exact hsI c hc
+      intro c hc
+      exact hsI c hc
     · refine ⟨(g : 𝓞 E), hgP, ?_⟩
       obtain ⟨o, ho⟩ := hμO
       refine ⟨o - 1, ?_⟩
@@ -200,10 +210,12 @@ theorem gS_ge_three (D : D7) : 3 ≤ gS D := by
 theorem eigenvalue_one_of_anisotropic (hW : WAniso) : EigenvalueLastLineOne := by
   intro D u u' Λ F F' F'' β₁ β₂ hF hT' hT'' _ _ hP1 hP2 _ _ v hv hvX _ μ hμ
   have hvv : (hS D).hT v v ≠ 0 := fun h => hvX (hW D u' F' v hv h)
-  exact eigenOne_gen Λ β₁ β₂ (gS_ge_three D) (fun μ h φ => cm_norm_eq_one D μ h φ) hF.1 hF.2.1
-    hF.2.2.2 hT'.2.1 hT''.2.1 hP1 hP2 v hv hvX hvv μ hμ
+  exact eigenOne_gen Λ β₁ β₂ (gS_ge_three D)
+    (fun μ h φ => cm_norm_eq_one D μ h φ)
+    hF.1 hF.2.1 hF.2.2.2 hT'.2.1 hT''.2.1 hP1 hP2 v hv hvX hvv μ hμ
 
-theorem eigenvalue_last_line_eq_one : EigenvalueLastLineOne := eigenvalue_one_of_anisotropic weight_space_anisotropic
+theorem eigenvalue_last_line_eq_one : EigenvalueLastLineOne :=
+  eigenvalue_one_of_anisotropic weight_space_anisotropic
 
 end D7
 

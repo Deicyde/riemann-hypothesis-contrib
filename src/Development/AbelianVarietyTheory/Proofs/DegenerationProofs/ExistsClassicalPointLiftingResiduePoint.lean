@@ -11,13 +11,14 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.KbIsAlg
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZJ
 
 namespace GlobalTheory
 
-theorem natCast_self_residueField_padicAlgCl_eq_zero (p : ℕ) [hp : Fact p.Prime] :
-    ((p : ℕ) : kb p) = 0 := by
+theorem natCast_self_residueField_padicAlgCl_eq_zero (p : ℕ) [hp : Fact p.Prime]
+    : ((p : ℕ) : kb p) = 0 := by
   rw [← map_natCast (IsLocalRing.residue (OO p)), IsLocalRing.residue_eq_zero_iff,
     Valuation.mem_maximalIdeal_iff]
   have : (((p : ℕ) : OO p) : PadicAlgCl p) = (p : PadicAlgCl p) := rfl
@@ -26,18 +27,22 @@ theorem natCast_self_residueField_padicAlgCl_eq_zero (p : ℕ) [hp : Fact p.Prim
   rw [div_lt_one (lt_trans zero_lt_one h1)]
   exact h1
 
-theorem ker_isMaximal_of_forall_pow_eq_one {A k : Type*} [CommRing A] [Field k]
-    (hk : ∀ x : k, x ≠ 0 → ∃ n : ℕ, 1 ≤ n ∧ x ^ n = 1) (φ : A →+* k) :
-    (RingHom.ker φ).IsMaximal := by
+theorem ker_isMaximal_of_forall_pow_eq_one
+    {A k : Type*} [CommRing A] [Field k]
+    (hk : ∀ x : k, x ≠ 0 → ∃ n : ℕ, 1 ≤ n ∧ x ^ n = 1) (φ : A →+* k)
+    : (RingHom.ker φ).IsMaximal := by
   refine Ideal.isMaximal_iff.mpr ⟨by simp, fun J a hJ ha haJ => ?_⟩
   obtain ⟨n, hn, h⟩ := hk (φ a) ha
   have h1 : 1 - a ^ n ∈ J := hJ (by simp [RingHom.mem_ker, h])
   have h2 : a ^ n ∈ J := J.pow_mem_of_mem haJ n hn
   simpa using J.add_mem h1 h2
 
-theorem isClosed_image_point_of_forall_pow_eq_one {k : Type} [Field k]
-    (hk : ∀ x : k, x ≠ 0 → ∃ n : ℕ, 1 ≤ n ∧ x ^ n = 1) {X : Scheme.{0}} [JacobsonSpace X]
-    (x : Sp k ⟶ X) (s : Sp k) : IsClosed ({x s} : Set X) := by
+theorem isClosed_image_point_of_forall_pow_eq_one
+    {k : Type} [Field k]
+    (hk : ∀ x : k, x ≠ 0 → ∃ n : ℕ, 1 ≤ n ∧ x ^ n = 1)
+    {X : Scheme.{0}} [JacobsonSpace X]
+    (x : Sp k ⟶ X) (s : Sp k)
+    : IsClosed ({x s} : Set X) := by
   obtain ⟨V, hV, φ, rfl⟩ := exists_affineOpen_factor_of_isLocalRing x
   have h := hV.fromSpec.isOpenEmbedding.preimage_closedPoints
   have hs : Spec.map φ s ∈ closedPoints (Spec Γ(X, V)) := by
@@ -46,34 +51,38 @@ theorem isClosed_image_point_of_forall_pow_eq_one {k : Type} [Field k]
     have e : (s : PrimeSpectrum k).asIdeal = ⊥ := Ideal.eq_bot_of_prime _
     have : (Spec.map φ s : PrimeSpectrum Γ(X, V)).asIdeal = RingHom.ker φ.hom := by
       change Ideal.comap φ.hom (s : PrimeSpectrum k).asIdeal = _
-      rw [e]; rfl
+      rw [e]
+      rfl
     rw [this]
     exact ker_isMaximal_of_forall_pow_eq_one hk φ.hom
   rw [← h] at hs
   rw [Scheme.Hom.comp_apply]
   exact hs
 
-theorem exists_residueField_factor_of_apply_eq {k : Type} [Field k] {X : Scheme.{0}}
-    (x : Sp k ⟶ X) (s : Sp k) (z : X) (hz : x s = z) :
-    ∃ r : X.residueField z ⟶ CommRingCat.of k, Spec.map r ≫ X.fromSpecResidueField z = x := by
+theorem exists_residueField_factor_of_apply_eq
+    {k : Type} [Field k] {X : Scheme.{0}} (x : Sp k ⟶ X) (s : Sp k) (z : X) (hz : x s = z)
+    : ∃ r : X.residueField z ⟶ CommRingCat.of k, Spec.map r ≫ X.fromSpecResidueField z = x := by
   obtain rfl : s = IsLocalRing.closedPoint k := Subsingleton.elim _ _
   subst hz
   exact ⟨_, Scheme.descResidueField_stalkClosedPointTo_fromSpecResidueField k X x⟩
 
-theorem exists_integral_point_lifting_residue_point :
-    ∀ (X : Scheme.{0}) [IsIntegral X] (π : X ⟶ Sp ℤ) [Flat π] [LocallyOfFiniteType π] (U : X.Opens),
-      (U : Set X).Nonempty → ∀ (p : ℕ) [Fact p.Prime],
-        (∀ x : Sp (kb p) ⟶ X, ∃ b : Sp (OO p) ⟶ X, rPt p ≫ b = x ∧ Set.range (gPt p ≫ b) ⊆ U) ∧
-        (∀ (x : Sp (kb p) ⟶ X) (s : Sp (kb p)), IsClosed ({x s} : Set X)) := by
+theorem exists_integral_point_lifting_residue_point
+    : ∀ (X : Scheme.{0}) [IsIntegral X] (π : X ⟶ Sp ℤ) [Flat π] [LocallyOfFiniteType π]
+        (U : X.Opens),
+      (U : Set X).Nonempty
+        → ∀ (p : ℕ) [Fact p.Prime],
+          (∀ x : Sp (kb p) ⟶ X, ∃ b : Sp (OO p) ⟶ X, rPt p ≫ b = x ∧ Set.range (gPt p ≫ b) ⊆ U)
+            ∧ (∀ (x : Sp (kb p) ⟶ X) (s : Sp (kb p)), IsClosed ({x s} : Set X)) := by
   intro X _ π _ _ U hU p hp
   obtain ⟨hJ, hfin, -⟩ := jacobson_closedPoints_tools_int X π
   obtain ⟨-, hord, hgal⟩ := GlobalTheory.T.kb_isAlgClosed_and_conj' p
-  have hcl : ∀ (x : Sp (kb p) ⟶ X) (s : Sp (kb p)), IsClosed ({x s} : Set X) :=
-    fun x s => isClosed_image_point_of_forall_pow_eq_one hord x s
+  have hcl : ∀ (x : Sp (kb p) ⟶ X) (s : Sp (kb p)), IsClosed ({x s} : Set X) := fun x s =>
+    isClosed_image_point_of_forall_pow_eq_one hord x s
   refine ⟨fun x => ?_, hcl⟩
   let s : Sp (kb p) := IsLocalRing.closedPoint (kb p)
-  have hlift : ∃ (q : ℕ) (_ : Fact q.Prime) (y : Sp (OO q) ⟶ X),
-      y (IsLocalRing.closedPoint (OO q)) = x s ∧ Set.range (gPt q ≫ y) ⊆ U := by
+  have hlift
+      : ∃ (q : ℕ) (_ : Fact q.Prime) (y : Sp (OO q) ⟶ X),
+        y (IsLocalRing.closedPoint (OO q)) = x s ∧ Set.range (gPt q ≫ y) ⊆ U := by
     obtain ⟨q, hq, hqz⟩ := exists_prime_residueField_eq_zero π (hcl x s)
     haveI : Fact q.Prime := ⟨hq⟩
     obtain ⟨K, hK, y, hy, hyU, -⟩ := exists_padic_point_scheme π (hcl x s) hqz U hU
@@ -81,8 +90,8 @@ theorem exists_integral_point_lifting_residue_point :
       rw [Valuation.mem_valuationSubring_iff, ← NNReal.coe_le_coe]
       rfl
     let j : integralClosure ℤ_[q] K →+* OO q :=
-      (K.val.toRingHom.comp (integralClosure ℤ_[q] K).val.toRingHom).codRestrict (OO q)
-        fun a => (hmem _).mpr ((mem_integralClosure_padicInt_iff K _).mp a.2)
+      (K.val.toRingHom.comp (integralClosure ℤ_[q] K).val.toRingHom).codRestrict (OO q) fun a =>
+        (hmem _).mpr ((mem_integralClosure_padicInt_iff K _).mp a.2)
     haveI : IsLocalHom j := by
       refine ⟨fun a ha => ?_⟩
       obtain ⟨b, hb⟩ := ha.exists_right_inv
@@ -109,8 +118,7 @@ theorem exists_integral_point_lifting_residue_point :
         intro a ha
         have ha' : ((a : K) : PadicAlgCl q) ∈ (t : PrimeSpectrum (PadicAlgCl q)).asIdeal := ha
         haveI := (t : PrimeSpectrum (PadicAlgCl q)).isPrime
-        rw [Ideal.eq_bot_of_prime (t : PrimeSpectrum (PadicAlgCl q)).asIdeal,
-          Ideal.mem_bot] at ha'
+        rw [Ideal.eq_bot_of_prime (t : PrimeSpectrum (PadicAlgCl q)).asIdeal, Ideal.mem_bot] at ha'
         exact Subtype.ext (Subtype.ext ha')
       rw [Scheme.Hom.comp_apply, key]
       exact hyU
@@ -157,8 +165,8 @@ theorem exists_integral_point_lifting_residue_point :
     have e : (t : PrimeSpectrum (PadicAlgCl p)).asIdeal = ⊥ := Ideal.eq_bot_of_prime _
     apply PrimeSpectrum.ext
     ext a
-    change (a : PadicAlgCl p) ∈ (t : PrimeSpectrum (PadicAlgCl p)).asIdeal ↔
-      ((σ a : OO p) : PadicAlgCl p) ∈ (t : PrimeSpectrum (PadicAlgCl p)).asIdeal
+    change (a : PadicAlgCl p) ∈ (t : PrimeSpectrum (PadicAlgCl p)).asIdeal
+      ↔ ((σ a : OO p) : PadicAlgCl p) ∈ (t : PrimeSpectrum (PadicAlgCl p)).asIdeal
     rw [e]
     simp
 

@@ -6,22 +6,30 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem pt_of_ft {K C : Type} [Field K] [IsAlgClosed K] [CommRing C] [Algebra K C] [Nontrivial C]
-    [Algebra.FiniteType K C] : Nonempty (C →ₐ[K] K) := by
+private theorem pt_of_ft
+    {K C : Type}
+    [Field K] [IsAlgClosed K] [CommRing C] [Algebra K C] [Nontrivial C] [Algebra.FiniteType K C]
+    : Nonempty (C →ₐ[K] K) := by
   obtain ⟨m, hm⟩ := Ideal.exists_maximal C
   letI : Field (C ⧸ m) := Ideal.Quotient.field m
   haveI : Algebra.FiniteType K (C ⧸ m) :=
     Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ K m) (Ideal.Quotient.mkₐ_surjective K m)
   haveI : Module.Finite K (C ⧸ m) := finite_of_finite_type_of_isJacobsonRing K (C ⧸ m)
   haveI : Algebra.IsIntegral K (C ⧸ m) := Algebra.IsIntegral.of_finite K _
-  have hb : Function.Bijective (algebraMap K (C ⧸ m)) := IsAlgClosed.algebraMap_bijective_of_isIntegral
+  have hb : Function.Bijective (algebraMap K (C ⧸ m)) :=
+    IsAlgClosed.algebraMap_bijective_of_isIntegral
   exact ⟨((AlgEquiv.ofBijective (Algebra.ofId K (C ⧸ m)) hb).symm : (C ⧸ m) →ₐ[K] K).comp
     (Ideal.Quotient.mkₐ K m)⟩
 
-private theorem pt_of_lin {A B K : Type} [CommRing A] [CommRing B] [Field K] [IsAlgClosed K] [Algebra A B]
-    [Algebra A K] [Algebra.FiniteType A B] (ρ : B →ₗ[A] K) (h : ρ 1 = 1) : Nonempty (B →ₐ[A] K) := by
+private theorem pt_of_lin
+    {A B K : Type} [CommRing A] [CommRing B] [Field K] [IsAlgClosed K] [Algebra A B] [Algebra A K]
+    [Algebra.FiniteType A B]
+    (ρ : B →ₗ[A] K) (h : ρ 1 = 1)
+    : Nonempty (B →ₐ[A] K) := by
   classical
   let f : TensorProduct A K B →ₗ[A] K := TensorProduct.lift ((LinearMap.mul A K).compl₂ ρ)
   have hf : f 1 = 1 := by
@@ -36,11 +44,13 @@ private theorem pt_of_lin {A B K : Type} [CommRing A] [CommRing B] [Field K] [Is
   obtain ⟨φ⟩ := pt_of_ft (K := K) (C := TensorProduct A K B)
   exact ⟨(φ.restrictScalars A).comp Algebra.TensorProduct.includeRight⟩
 
-private theorem ext_of_proj {O A B K : Type} [CommRing O] [CommRing A] [CommRing B] [Field K] [IsAlgClosed K]
-    [Algebra O A] [Algebra O B] [Algebra O K] (φ : A →ₐ[O] B) (x : A →ₐ[O] K) (hk : ∀ f, φ f = 0 → x f = 0)
+private theorem ext_of_proj
+    {O A B K : Type} [CommRing O] [CommRing A] [CommRing B] [Field K] [IsAlgClosed K] [Algebra O A]
+    [Algebra O B] [Algebra O K]
+    (φ : A →ₐ[O] B) (x : A →ₐ[O] K) (hk : ∀ f, φ f = 0 → x f = 0)
     (P : B →+ B) (hP : ∀ f s, P (φ f * s) = φ f * P s) (hr : ∀ s, ∃ f, φ f = P s) (h1 : P 1 = 1)
-    (s : Set B) (hs : s.Finite) (hg : Algebra.adjoin O (Set.range φ ∪ s) = ⊤) :
-    ∃ ξ : B →ₐ[O] K, ξ.comp φ = x := by
+    (s : Set B) (hs : s.Finite) (hg : Algebra.adjoin O (Set.range φ ∪ s) = ⊤)
+    : ∃ ξ : B →ₐ[O] K, ξ.comp φ = x := by
   classical
   letI : Algebra A B := φ.toRingHom.toAlgebra
   letI : Algebra A K := x.toRingHom.toAlgebra
@@ -51,18 +61,19 @@ private theorem ext_of_proj {O A B K : Type} [CommRing O] [CommRing A] [CommRing
   have hO : ∀ r : O, algebraMap O B r = algebraMap A B (algebraMap O A r) := fun r => by
     show algebraMap O B r = φ (algebraMap O A r)
     rw [AlgHom.commutes]
-  let ρ : B →ₗ[A] K :=
-    { toFun := fun t => x (pre t)
-      map_add' := fun t u => by
-        rw [← map_add (f := _)]
-        apply hwd
-        rw [map_add (f := _), hpre, hpre, hpre, map_add (f := _)]
-      map_smul' := fun a t => by
-        show x (pre (a • t)) = x a * x (pre t)
-        rw [← map_mul]
-        apply hwd
-        rw [hpre, map_mul, hpre, Algebra.smul_def]
-        exact hP a t }
+  let ρ : B →ₗ[A] K := {
+    toFun := fun t => x (pre t)
+    map_add' := fun t u => by
+      rw [← map_add (f := _)]
+      apply hwd
+      rw [map_add (f := _), hpre, hpre, hpre, map_add (f := _)]
+    map_smul' := fun a t => by
+      show x (pre (a • t)) = x a * x (pre t)
+      rw [← map_mul]
+      apply hwd
+      rw [hpre, map_mul, hpre, Algebra.smul_def]
+      exact hP a t
+  }
   have h1' : ρ 1 = 1 := by
     show x (pre 1) = 1
     rw [← map_one x]
@@ -94,10 +105,13 @@ private theorem ext_of_proj {O A B K : Type} [CommRing O] [CommRing A] [CommRing
   · ext f
     exact ψ.commutes f
 
-private theorem exists_proj {O S X : Type} [CommRing O] [AddCommGroup S] [Module O S] (𝒜 : X → Submodule O S)
-    (h : iSupIndep 𝒜) (p : X → Prop) [DecidablePred p] :
-    ∃ P : S → S, P 0 = 0 ∧ (∀ a ∈ ⨆ j, 𝒜 j, ∀ b ∈ ⨆ j, 𝒜 j, P (a + b) = P a + P b) ∧
-      ∀ j, ∀ a ∈ 𝒜 j, P a = if p j then a else 0 := by
+private theorem exists_proj
+    {O S X : Type} [CommRing O] [AddCommGroup S] [Module O S]
+    (𝒜 : X → Submodule O S) (h : iSupIndep 𝒜)
+    (p : X → Prop) [DecidablePred p]
+    : ∃ P : S → S,
+      P 0 = 0 ∧ (∀ a ∈ ⨆ j, 𝒜 j, ∀ b ∈ ⨆ j, 𝒜 j, P (a + b) = P a + P b)
+        ∧ ∀ j, ∀ a ∈ 𝒜 j, P a = if p j then a else 0 := by
   classical
   let L := DFinsupp.lsum ℕ (fun i => (𝒜 i).subtype)
   let Q := DFinsupp.lsum ℕ (fun i => if p i then (𝒜 i).subtype else (0 : 𝒜 i →ₗ[O] S))
@@ -118,15 +132,18 @@ private theorem exists_proj {O S X : Type} [CommRing O] [AddCommGroup S] [Module
     obtain ⟨yb, rfl⟩ := hmem b hb
     rw [← map_add (f := _), hP, hP, hP, map_add (f := _)]
   · intro j a ha
-    have e : L (DFinsupp.single j ⟨a, ha⟩) = a := by
-      simp [L]
+    have e : L (DFinsupp.single j ⟨a, ha⟩) = a := by simp [L]
     conv_lhs => rw [← e]
     rw [hP]
     simp only [Q, DFinsupp.lsum_single]
     split_ifs <;> simp
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLift :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ M : Model D, ∀ x : M.A →ₐ[c.O] PadicAlgCl l, OnS M.eqns.ideal x → ∃ ξ : M.SS →ₐ[c.O] PadicAlgCl l, ξ.comp M.toSS = x := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLift
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ M : Model D, ∀ x : M.A →ₐ[c.O] PadicAlgCl l,
+          OnS M.eqns.ideal x → ∃ ξ : M.SS →ₐ[c.O] PadicAlgCl l, ξ.comp M.toSS = x := by
   intro Ω _ _ _ l _ c D hD M x hx
   obtain ⟨hind, ⟨s, hs1, hs2⟩, -⟩ := sInternal D hD M
   obtain ⟨hk1, hk2, -⟩ := kerA D hD M
@@ -174,9 +191,11 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLift :
         rw [hPj _ _ hgy, hPj _ _ hy]
         simp only [Prod.fst_add, zero_add]
         split_ifs <;> simp
-      | zero => rw [mul_zero, hP0, mul_zero]
+      | zero =>
+        rw [mul_zero, hP0, mul_zero]
       | add a b ha hb iha ihb =>
-        rw [mul_add, hPadd _ (hπm g hg' a ha) _ (hπm g hg' b hb), iha, ihb, hPadd a ha b hb, mul_add]
+        rw [mul_add, hPadd _ (hπm g hg' a ha) _ (hπm g hg' b hb), iha, ihb, hPadd a ha b hb,
+          mul_add]
     | zero =>
       intro y hy
       have e0 : M.π 0 = 0 := M.π.map_zero
@@ -185,10 +204,11 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLift :
       intro y hy
       have e : M.π (g + h) = M.π g + M.π h := M.π.map_add g h
       rw [e, add_mul, hPadd _ (hπm g hg y hy) _ (hπm h hh y hy), ihg y hy, ihh y hy, add_mul]
-  let P' : M.SS →+ M.SS :=
-    { toFun := fun y => ⟨P y.1, (hPS y.1 y.2).1⟩
-      map_zero' := Subtype.ext hP0
-      map_add' := fun a b => Subtype.ext (hPadd _ a.2 _ b.2) }
+  let P' : M.SS →+ M.SS := {
+    toFun := fun y => ⟨P y.1, (hPS y.1 y.2).1⟩
+    map_zero' := Subtype.ext hP0
+    map_add' := fun a b => Subtype.ext (hPadd _ a.2 _ b.2)
+  }
   have h1P : P 1 = 1 := by
     have h1 := hPj 0 1 SetLike.GradedOne.one_mem
     simpa using h1
@@ -198,8 +218,9 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLift :
   have hgen : Algebra.adjoin c.O (Set.range M.toSS ∪ s') = ⊤ := by
     rw [eq_top_iff]
     rintro y -
-    have key : Algebra.adjoin c.O ((M.sPart 0 : Set M.S) ∪ (s : Set M.S)) ≤
-        (Algebra.adjoin c.O (Set.range M.toSS ∪ s')).map M.SS.val := by
+    have key
+        : Algebra.adjoin c.O ((M.sPart 0 : Set M.S) ∪ (s : Set M.S))
+          ≤ (Algebra.adjoin c.O (Set.range M.toSS ∪ s')).map M.SS.val := by
       apply Algebra.adjoin_le
       rintro z (hz | hz)
       · obtain ⟨f, -, hf⟩ := hk2 0 ⟨z, M.sPart_le hz⟩ hz
@@ -213,7 +234,9 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLift :
     have hzy' : z = y := Subtype.ext hzy
     rw [← hzy']
     exact hz
-  exact ext_of_proj M.toSS x (fun f hf => hx f ((hk1 f).1 hf)) P'
+  exact ext_of_proj M.toSS x
+    (fun f hf => hx f ((hk1 f).1 hf))
+    P'
     (fun f y => Subtype.ext (hPmul f.1 f.2 y.1 y.2))
     (fun y => ⟨(hPS y.1 y.2).2.choose, Subtype.ext (hPS y.1 y.2).2.choose_spec⟩)
     (Subtype.ext h1P) s' hs' hgen

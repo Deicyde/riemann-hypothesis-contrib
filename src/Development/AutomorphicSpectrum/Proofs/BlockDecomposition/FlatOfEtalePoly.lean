@@ -13,33 +13,43 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.FlatChartP
 
 open GlobalTheory.CompanionTheory.ChartAlg
 
-theorem flat_of_etale_poly {R D : Type} [CommRing R] [CommRing D] (i : R →+* D) {d : ℕ} (t : Fin d → D)
-    (h : (MvPolynomial.eval₂Hom i t : MvPolynomial (Fin d) R →+* D).Etale) : i.Flat := by
+theorem flat_of_etale_poly
+    {R D : Type} [CommRing R] [CommRing D]
+    (i : R →+* D)
+    {d : ℕ} (t : Fin d → D) (h : (MvPolynomial.eval₂Hom i t : MvPolynomial (Fin d) R →+* D).Etale)
+    : i.Flat := by
   have h1 : (MvPolynomial.eval₂Hom i t : MvPolynomial (Fin d) R →+* D).Flat :=
     (RingHom.Etale.iff_flat_and_formallyUnramified.mp h).1
-  have h2 : (algebraMap R (MvPolynomial (Fin d) R)).Flat := RingHom.flat_algebraMap_iff.2 inferInstance
+  have h2 : (algebraMap R (MvPolynomial (Fin d) R)).Flat :=
+    RingHom.flat_algebraMap_iff.2 inferInstance
   have e : i = (MvPolynomial.eval₂Hom i t).comp (algebraMap R (MvPolynomial (Fin d) R)) := by
     ext x
     simp [MvPolynomial.algebraMap_eq]
   rw [e]
   exact RingHom.Flat.comp h2 h1
 
-theorem rep_lift {O R : Type} [CommRing O] [CommRing R] {I : Ideal R} {X : Scheme.{0}}
-    {q : X ⟶ Spec (CommRingCat.of O)} {κ : O →+* R ⧸ I} {V : X.Opens} {d : ℕ} (hV : IsAffineOpen V)
-    {T : Fin d → Γ(X, V)} (L : CrystallineSemistableComparison.B.Lift (strV q V) T R I κ) (y : PtOver X q κ (L.D ⧸ I.map L.i))
+theorem rep_lift
+    {O R : Type} [CommRing O] [CommRing R]
+    {I : Ideal R} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)} {κ : O →+* R ⧸ I} {V : X.Opens}
+    {d : ℕ} (hV : IsAffineOpen V)
+    {T : Fin d → Γ(X, V)} (L : CrystallineSemistableComparison.B.Lift (strV q V) T R I κ)
+    (y : PtOver X q κ (L.D ⧸ I.map L.i))
     (h1 : ∀ r, y.1.1 (Ideal.Quotient.mk I r) = Ideal.Quotient.mk _ (L.i r))
     (h2 : y.1.2 = Spec.map (CommRingCat.ofHom L.j) ≫ hV.fromSpec)
-    (B : CommRingCat.{0}) (y' : PtOver X q κ B) (hy' : ⊤ ≤ y'.1.2 ⁻¹ᵁ V) :
-    ∃! φ : L.D ⧸ I.map L.i →+* B, (ptFun X q κ).map (CommRingCat.ofHom φ) y = y' := by
+    (B : CommRingCat.{0}) (y' : PtOver X q κ B) (hy' : ⊤ ≤ y'.1.2 ⁻¹ᵁ V)
+    : ∃! φ : L.D ⧸ I.map L.i →+* B, (ptFun X q κ).map (CommRingCat.ofHom φ) y = y' := by
   let e' : Γ(X, V) →+* B := GlobalTheory.Cris.evalAt y'.1.2 V hy'
   let ψ' : R ⧸ I →+* B := y'.1.1
-  have hcomp : ∀ o x, Ideal.Quotient.mk I x = κ o → e' (strV q V o) = (ψ'.comp (Ideal.Quotient.mk I)) x := by
+  have hcomp
+      : ∀ o x,
+        Ideal.Quotient.mk I x = κ o → e' (strV q V o) = (ψ'.comp (Ideal.Quotient.mk I)) x := by
     intro o x hx
     rw [RingHom.comp_apply, hx]
     exact evalAt_base q κ ψ' y'.1.2 y'.2 hy' o
@@ -83,9 +93,12 @@ theorem rep_lift {O R : Type} [CommRing O] [CommRing R] {I : Ideal R} {X : Schem
     rw [hf]
     exact (Ideal.Quotient.lift_mk _ f hJ).symm
 
-theorem exists_flat_chart : ∀ {O R : Type} [CommRing O] [CommRing R] {I : Ideal R} (γ : DividedPowers I) (p : ℕ) (hp : p ≠ 0)
-    (hn : IsNilpotent (p : R)) {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of O)) (κ : O →+* R ⧸ I) {V : X.Opens} {d : ℕ}
-    (c : Coord q V d), ∃ c' : Chart γ p q κ V d, FlatT c'.D ∧ ∀ i, ev c'.D c'.inV (c.t i) = Ideal.Quotient.mk _ (c'.t i) := by
+theorem exists_flat_chart
+    : ∀ {O R : Type} [CommRing O] [CommRing R] {I : Ideal R} (γ : DividedPowers I) (p : ℕ)
+        (hp : p ≠ 0) (hn : IsNilpotent (p : R)) {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of O))
+        (κ : O →+* R ⧸ I) {V : X.Opens} {d : ℕ} (c : Coord q V d),
+      ∃ c' : Chart γ p q κ V d,
+        FlatT c'.D ∧ ∀ i, ev c'.D c'.inV (c.t i) = Ideal.Quotient.mk _ (c'.t i) := by
   intro O R _ _ I γ p hp hn X q κ V d c
   obtain ⟨L⟩ := GlobalTheory.CompanionTheory.EtaleLift.nonempty_lift (strV q V) c.t I κ c.etale
   have hF : L.i.Flat := flat_of_etale_poly L.i L.t L.et
@@ -99,14 +112,20 @@ theorem exists_flat_chart : ∀ {O R : Type} [CommRing O] [CommRing R] {I : Idea
     refine RingHom.ext fun o => ?_
     obtain ⟨x, hx⟩ := Ideal.Quotient.mk_surjective (κ o)
     rw [RingHom.comp_apply, RingHom.comp_apply, L.hj o x hx, ← hx, hψ]
-  let y : PtOver X q κ (L.D ⧸ I.map L.i) :=
-    ⟨(ψ, Spec.map (CommRingCat.ofHom L.j) ≫ c.affine.fromSpec), by
+  let y : PtOver X q κ (L.D ⧸ I.map L.i) := ⟨
+    (ψ, Spec.map (CommRingCat.ofHom L.j) ≫ c.affine.fromSpec),
+    by
       change (Spec.map (CommRingCat.ofHom L.j) ≫ c.affine.fromSpec) ≫ q = _
-      rw [Category.assoc, fromSpec_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp, hκ]⟩
-  let T : Thick (nlFun γ p X q κ) := mkT L.D L.i (I.map L.i) δ
-    ⟨fun _ => by simpa using hn.map L.i, fun h => absurd h hp⟩ hδ y hψ
+      rw [Category.assoc, fromSpec_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp, hκ]
+  ⟩
+  let T : Thick (nlFun γ p X q κ) :=
+    mkT L.D L.i (I.map L.i) δ ⟨fun _ => by simpa using hn.map L.i, fun h => absurd h hp⟩ hδ y hψ
   have hin : InU V T := top_le_specMap c.affine L.j
-  refine ⟨⟨T, L.t, L.et, rfl, hin, fun B y' hy' => rep_lift c.affine L y hψ rfl B y' hy'⟩, hF, fun i => ?_⟩
+  refine ⟨
+    ⟨T, L.t, L.et, rfl, hin, fun B y' hy' => rep_lift c.affine L y hψ rfl B y' hy'⟩,
+    hF,
+    fun i => ?_
+  ⟩
   have e : ev T hin = L.j := evalAt_specMap c.affine L.j _ rfl hin
   change ev T hin (c.t i) = _
   rw [e]

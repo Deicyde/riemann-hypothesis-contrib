@@ -6,8 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.MultiplierOrders
 
-theorem exists_nsmul_mem_span {C : Type} [AddCommGroup C] [Module ℚ C] (S : Set C) (x : C)
-    (hx : x ∈ Submodule.span ℚ S) : ∃ m : ℕ, 0 < m ∧ m • x ∈ Submodule.span ℤ S := by
+theorem exists_nsmul_mem_span
+    {C : Type} [AddCommGroup C] [Module ℚ C] (S : Set C) (x : C) (hx : x ∈ Submodule.span ℚ S)
+    : ∃ m : ℕ, 0 < m ∧ m • x ∈ Submodule.span ℤ S := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_pos, by rw [one_smul]; exact Submodule.subset_span hy⟩
   | zero => exact ⟨1, one_pos, by rw [smul_zero]; exact Submodule.zero_mem _⟩
@@ -35,17 +36,14 @@ theorem exists_nsmul_mem_span {C : Type} [AddCommGroup C] [Module ℚ C] (S : Se
 
 def multipliers {C : Type} [Ring C] (L : Submodule ℤ C) : Subring C where
   carrier := {x | ∀ y ∈ L, x * y ∈ L}
-  mul_mem' := fun {a b} ha hb y hy => by
-    rw [mul_assoc]; exact ha _ (hb y hy)
+  mul_mem' := fun {a b} ha hb y hy => by rw [mul_assoc]; exact ha _ (hb y hy)
   one_mem' := fun y hy => by rw [one_mul]; exact hy
-  add_mem' := fun {a b} ha hb y hy => by
-    rw [add_mul]; exact L.add_mem (ha y hy) (hb y hy)
+  add_mem' := fun {a b} ha hb y hy => by rw [add_mul]; exact L.add_mem (ha y hy) (hb y hy)
   zero_mem' := fun y _ => by rw [zero_mul]; exact L.zero_mem
-  neg_mem' := fun {a} ha y hy => by
-    rw [neg_mul]; exact L.neg_mem (ha y hy)
+  neg_mem' := fun {a} ha y hy => by rw [neg_mul]; exact L.neg_mem (ha y hy)
 
-theorem exists_order (C : Type) [Ring C] [Algebra ℚ C] [FiniteDimensional ℚ C] :
-    ∃ OB : Subring C, Module.Finite ℤ OB ∧ ∀ b : C, ∃ m : ℕ, 0 < m ∧ (m : C) * b ∈ OB := by
+theorem exists_order (C : Type) [Ring C] [Algebra ℚ C] [FiniteDimensional ℚ C]
+    : ∃ OB : Subring C, Module.Finite ℤ OB ∧ ∀ b : C, ∃ m : ℕ, 0 < m ∧ (m : C) * b ∈ OB := by
   classical
   obtain ⟨S, hS⟩ := Module.Finite.fg_top (R := ℚ) (M := C)
   have key : ∀ x : C, ∃ m : ℕ, 0 < m ∧ m • x ∈ Submodule.span ℤ (S : Set C) := fun x =>
@@ -54,15 +52,17 @@ theorem exists_order (C : Type) [Ring C] [Algebra ℚ C] [FiniteDimensional ℚ 
   haveI : Module.Finite ℤ L := Module.Finite.iff_fg.mpr ⟨S, rfl⟩
   refine ⟨multipliers L, ?_, ?_⟩
   · obtain ⟨m, hm, h1⟩ := key 1
-    let f : multipliers L →+ L :=
-      { toFun := fun x => ⟨x.1 * (m • (1 : C)), x.2 _ h1⟩
-        map_zero' := Subtype.ext (by simp)
-        map_add' := fun a b => Subtype.ext (by simp [add_mul]) }
+    let f : multipliers L →+ L := {
+      toFun := fun x => ⟨x.1 * (m • (1 : C)), x.2 _ h1⟩
+      map_zero' := Subtype.ext (by simp)
+      map_add' := fun a b => Subtype.ext (by simp [add_mul])
+    }
     refine Module.Finite.of_injective f.toIntLinearMap ?_
     intro a b hab
     have h : a.1 * (m • (1 : C)) = b.1 * (m • (1 : C)) := congrArg Subtype.val hab
     rw [mul_smul_comm, mul_smul_comm, mul_one, mul_one, ← Nat.cast_smul_eq_nsmul ℚ,
-      ← Nat.cast_smul_eq_nsmul ℚ] at h
+        ← Nat.cast_smul_eq_nsmul ℚ]
+      at h
     have hm' : (m : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr hm.ne'
     exact Subtype.ext (smul_right_injective C hm' h)
   · intro b

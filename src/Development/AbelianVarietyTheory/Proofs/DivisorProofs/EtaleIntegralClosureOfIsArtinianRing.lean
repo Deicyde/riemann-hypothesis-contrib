@@ -11,13 +11,14 @@ open IsLocalRing
 
 namespace GlobalTheory.PurityProd
 
-theorem etale_of_etale_atMaximal {A B : Type} [CommRing A] [IsLocalRing A] [CommRing B] [Algebra A B]
+theorem etale_of_etale_atMaximal
+    {A B : Type} [CommRing A] [IsLocalRing A] [CommRing B] [Algebra A B]
     (h : Algebra.Etale (Localization.AtPrime (maximalIdeal A))
-      (TensorProduct A (Localization.AtPrime (maximalIdeal A)) B)) :
-    Algebra.Etale A B := by
+      (TensorProduct A (Localization.AtPrime (maximalIdeal A)) B))
+    : Algebra.Etale A B := by
   let e : A ≃ₐ[A] Localization.AtPrime (maximalIdeal A) :=
-    IsLocalization.atUnits A (maximalIdeal A).primeCompl (fun x hx => by
-      simpa [IsUnit.mem_submonoid_iff] using IsLocalRing.notMem_maximalIdeal.mp hx)
+    IsLocalization.atUnits A (maximalIdeal A).primeCompl
+      (fun x hx => by simpa [IsUnit.mem_submonoid_iff] using IsLocalRing.notMem_maximalIdeal.mp hx)
   haveI : Algebra.Etale A (Localization.AtPrime (maximalIdeal A)) := Algebra.Etale.of_equiv e
   haveI : Algebra.Etale A (TensorProduct A (Localization.AtPrime (maximalIdeal A)) B) :=
     Algebra.Etale.comp A (Localization.AtPrime (maximalIdeal A)) _
@@ -25,9 +26,12 @@ theorem etale_of_etale_atMaximal {A B : Type} [CommRing A] [IsLocalRing A] [Comm
     (Algebra.TensorProduct.congr e.symm AlgEquiv.refl).trans (Algebra.TensorProduct.lid A B)
   exact Algebra.Etale.of_equiv f
 
-theorem isIntegral_of_forall_apply {O : Type} [CommRing O] {ι : Type} [Finite ι] {R : ι → Type}
-    [∀ i, CommRing (R i)] [∀ i, Algebra O (R i)] (x : ∀ i, R i) (hx : ∀ i, IsIntegral O (x i)) :
-    IsIntegral O x := by
+theorem isIntegral_of_forall_apply
+    {O : Type} [CommRing O]
+    {ι : Type} [Finite ι]
+    {R : ι → Type} [∀ i, CommRing (R i)] [∀ i, Algebra O (R i)]
+    (x : ∀ i, R i) (hx : ∀ i, IsIntegral O (x i))
+    : IsIntegral O x := by
   first
   | exact @_root_.GlobalTheory.IntegralPi.main
   | exact _root_.GlobalTheory.IntegralPi.main
@@ -36,22 +40,29 @@ theorem isIntegral_of_forall_apply {O : Type} [CommRing O] {ι : Type} [Finite �
   | (intros; apply @_root_.GlobalTheory.IntegralPi.main <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.IntegralPi.main ..)
 
-theorem etale_of_etale_pi {R : Type} [CommRing R] [IsNoetherianRing R] {ι : Type} [Finite ι]
+theorem etale_of_etale_pi
+    {R : Type} [CommRing R] [IsNoetherianRing R]
+    {ι : Type} [Finite ι]
     (C : ι → Type) [∀ i, CommRing (C i)] [∀ i, Algebra R (C i)] [∀ i, Module.Finite R (C i)]
-    (h : Algebra.Etale R (∀ i, C i)) (i : ι) : Algebra.Etale R (C i) :=
-  ⟨(Algebra.FormallyEtale.pi_iff C).mp inferInstance i,
-    Algebra.FinitePresentation.of_finiteType.mp inferInstance⟩
+    (h : Algebra.Etale R (∀ i, C i)) (i : ι)
+    : Algebra.Etale R (C i) := ⟨
+  (Algebra.FormallyEtale.pi_iff C).mp inferInstance i,
+  Algebra.FinitePresentation.of_finiteType.mp inferInstance
+⟩
 
 end GlobalTheory.PurityProd
 
 namespace GlobalTheory.PurityProd
 
-theorem etale_integralClosure_of_isArtinianRing : ∀ (A E : Type) [CommRing A] [IsRegularLocalRing A]
-    [CommRing E] [Algebra A E], IsReduced E → IsArtinianRing E → NoZeroSMulDivisors A E →
-    Module.Finite A (integralClosure A E) →
-    (∀ (q : Ideal A) [q.IsPrime], q.height ≤ 1 → Algebra.Etale (Localization.AtPrime q)
-      (TensorProduct A (Localization.AtPrime q) (integralClosure A E))) →
-    Algebra.Etale A (integralClosure A E) := by
+theorem etale_integralClosure_of_isArtinianRing
+    : ∀ (A E : Type) [CommRing A] [IsRegularLocalRing A] [CommRing E] [Algebra A E],
+      IsReduced E → IsArtinianRing E → NoZeroSMulDivisors A E
+        → Module.Finite A (integralClosure A E)
+        → (∀ (q : Ideal A) [q.IsPrime],
+          q.height ≤ 1
+            → Algebra.Etale (Localization.AtPrime q)
+              (TensorProduct A (Localization.AtPrime q) (integralClosure A E)))
+        → Algebra.Etale A (integralClosure A E) := by
   intro A E _ _ _ _ hred hart hnz hfin hq
   classical
   by_cases hm : (maximalIdeal A).height ≤ 1
@@ -63,9 +74,10 @@ theorem etale_integralClosure_of_isArtinianRing : ∀ (A E : Type) [CommRing A] 
   let F : MaximalSpectrum E → Type := fun I => E ⧸ I.asIdeal
   let ψ : E ≃ₐ[A] (∀ I, F I) := (IsArtinianRing.equivPi E).restrictScalars A
   let C : MaximalSpectrum E → Type := fun I => integralClosure A (F I)
-  let Ψ : integralClosure A E →ₐ[A] ∀ I, C I := AlgHom.pi fun I =>
-    ((Pi.evalAlgHom A F I).comp (ψ.toAlgHom.comp (integralClosure A E).val)).codRestrict
-      (integralClosure A (F I)) fun x => x.2.map ((Pi.evalAlgHom A F I).comp ψ.toAlgHom)
+  let Ψ : integralClosure A E →ₐ[A] ∀ I, C I :=
+    AlgHom.pi fun I =>
+      ((Pi.evalAlgHom A F I).comp (ψ.toAlgHom.comp (integralClosure A E).val)).codRestrict
+        (integralClosure A (F I)) fun x => x.2.map ((Pi.evalAlgHom A F I).comp ψ.toAlgHom)
   have hΨ : Function.Bijective Ψ := by
     constructor
     · intro x y hxy
@@ -84,7 +96,8 @@ theorem etale_integralClosure_of_isArtinianRing : ∀ (A E : Type) [CommRing A] 
   let Φ : integralClosure A E ≃ₐ[A] ∀ I, C I := AlgEquiv.ofBijective Ψ hΨ
   have hinjF : ∀ I, Function.Injective (algebraMap A (F I)) := by
     intro I
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     have hne : ψ.symm (Pi.single I 1) ≠ 0 := by
       intro h0

@@ -10,17 +10,20 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 namespace LateralTheory.EtaleTrace.Cov
 
-theorem loc_generic_top (X : Scheme.{0}) [IsIntegral X] (z : X.functionField) : z ∈ loc X (genericPoint X) := by
+theorem loc_generic_top (X : Scheme.{0}) [IsIntegral X] (z : X.functionField)
+    : z ∈ loc X (genericPoint X) := by
   refine ⟨z, ?_⟩
   simp [RingHom.algebraMap_toAlgebra, TopCat.Presheaf.stalkSpecializes_refl]
 
 theorem FSDense_pf : FSDense := by
   intro k _ X _ p d π w cw hind
 
-  have hz : ∀ (n : ℕ) (g : MvPolynomial (Fin (d + 1)) k), g.IsHomogeneous n →
-      g ∈ (π (genericPoint X)).asHomogeneousIdeal → g = 0 := by
+  have hz
+      : ∀ (n : ℕ) (g : MvPolynomial (Fin (d + 1)) k),
+        g.IsHomogeneous n → g ∈ (π (genericPoint X)).asHomogeneousIdeal → g = 0 := by
     intro n g hg hmem
-    have hgX : (g * MvPolynomial.X 0).IsHomogeneous (n + 1) := hg.mul (isHomogeneous_X k (0 : Fin (d + 1)))
+    have hgX : (g * MvPolynomial.X 0).IsHomogeneous (n + 1) :=
+      hg.mul (isHomogeneous_X k (0 : Fin (d + 1)))
     have h1 := (cw.opens (n + 1) (Nat.succ_pos n) (g * MvPolynomial.X 0) hgX (genericPoint X))
     have hnot : genericPoint X ∉ π ⁻¹ᵁ Proj.basicOpen _ (g * MvPolynomial.X 0) := by
       intro h
@@ -43,8 +46,9 @@ theorem FSDense_pf : FSDense := by
     exact (mem_homogeneousSubmodule i _).mp (SetLike.coe_mem _)
   constructor
   intro y
-  have hle : (show ProjectiveSpectrum (homogeneousSubmodule (Fin (d + 1)) k) from π (genericPoint X)) ≤
-      (show ProjectiveSpectrum (homogeneousSubmodule (Fin (d + 1)) k) from y) := by
+  have hle
+      : (show ProjectiveSpectrum (homogeneousSubmodule (Fin (d + 1)) k) from π (genericPoint X))
+        ≤ (show ProjectiveSpectrum (homogeneousSubmodule (Fin (d + 1)) k) from y) := by
     rw [← ProjectiveSpectrum.as_ideal_le_as_ideal]
     intro a ha
     rw [hbot a ha]

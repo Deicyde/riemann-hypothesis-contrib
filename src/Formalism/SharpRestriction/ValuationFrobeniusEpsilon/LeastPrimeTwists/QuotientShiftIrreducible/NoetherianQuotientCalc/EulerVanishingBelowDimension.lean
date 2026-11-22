@@ -83,7 +83,7 @@ def Irr : Ideal R := ∏ i, Ideal.span (𝒜 (e i) : Set R)
 
 structure Std [IsLocalRing B] : Prop where
   noeth : IsNoetherianRing B
-  nonneg : ∀ m, ¬ (0 ≤ m) → 𝒜 m = ⊥
+  nonneg : ∀ m, ¬(0 ≤ m) → 𝒜 m = ⊥
   zero : 𝒜 0 = LinearMap.range (Algebra.linearMap B R)
   fg : ∀ i, (𝒜 (e i)).FG
   gen : ∀ m i, 0 ≤ m → 𝒜 (m + e i) = 𝒜 m * 𝒜 (e i)
@@ -127,43 +127,48 @@ variable {k : ℕ}
 abbrev HidaSetting.Mod (X : HidaSetting k) : Type 1 := GMod X.B X.R k
 
 def RuleGr : Prop :=
-  ∀ (k : ℕ) (X : HidaSetting k) (F : X.Mod), F.IsGr X.𝒜 →
-    (∀ N, F.IsHomSub N → (F.sub N).IsGr X.𝒜 ∧ (F.quo N).IsGr X.𝒜) ∧
-    (∀ d, (F.shift d).IsGr X.𝒜) ∧
-    (∀ d s, s ∈ X.𝒜 d → (F.quot s).IsGr X.𝒜 ∧ (F.ann s d).IsGr X.𝒜)
+  ∀ (k : ℕ) (X : HidaSetting k) (F : X.Mod),
+    F.IsGr X.𝒜
+      → (∀ N, F.IsHomSub N → (F.sub N).IsGr X.𝒜 ∧ (F.quo N).IsGr X.𝒜) ∧ (∀ d, (F.shift d).IsGr X.𝒜)
+        ∧ (∀ d s, s ∈ X.𝒜 d → (F.quot s).IsGr X.𝒜 ∧ (F.ann s d).IsGr X.𝒜)
 
 def RuleFin : Prop :=
-  ∀ (k : ℕ) (X : HidaSetting k) (F : X.Mod), F.IsGr X.𝒜 →
-    (∀ m, Module.Finite X.B (F.gr m)) ∧
-    (admitted X.𝒜 [] F.Ann → ∀ᶠ m in atTop, Module.length X.B (F.gr m) ≠ ⊤)
+  ∀ (k : ℕ) (X : HidaSetting k) (F : X.Mod),
+    F.IsGr X.𝒜
+      → (∀ m, Module.Finite X.B (F.gr m))
+        ∧ (admitted X.𝒜 [] F.Ann → ∀ᶠ m in atTop, Module.length X.B (F.gr m) ≠ ⊤)
 
 def RuleIrr : Prop :=
-  ∀ (k : ℕ) (X : HidaSetting k) (F : X.Mod), F.IsGr X.𝒜 → (∃ N : ℕ, Irr X.𝒜 ^ N ≤ F.Ann) →
-    ∀ᶠ m in atTop, F.gr m = ⊥
+  ∀ (k : ℕ) (X : HidaSetting k) (F : X.Mod),
+    F.IsGr X.𝒜 → (∃ N : ℕ, Irr X.𝒜 ^ N ≤ F.Ann) → ∀ᶠ m in atTop, F.gr m = ⊥
 
 def RuleShift : Prop :=
   ∀ (k : ℕ) (X : HidaSetting k) (ts : List (Deg k × X.R)) (F : X.Mod) (d m : Deg k),
     chi ts (F.shift d) m = chi ts F (m - d)
 
 def RuleIso : Prop :=
-  ∀ (k : ℕ) (X : HidaSetting k) (ts : List (Deg k × X.R)) (F G : X.Mod), GIso F G →
-    ∀ m, chi ts F m = chi ts G m
+  ∀ (k : ℕ) (X : HidaSetting k) (ts : List (Deg k × X.R)) (F G : X.Mod),
+    GIso F G → ∀ m, chi ts F m = chi ts G m
 
 def EulerAdditivityExactSequence : Prop :=
-  ∀ (k : ℕ) (X : HidaSetting k) (ts : List (Deg k × X.R)) (F' F F'' : X.Mod), Valid X.𝒜 ts →
-    F'.IsGr X.𝒜 → F.IsGr X.𝒜 → F''.IsGr X.𝒜 → SES F' F F'' → admitted X.𝒜 ts F.Ann →
-    ∀ᶠ m in atTop, chi ts F m = chi ts F' m + chi ts F'' m
+  ∀ (k : ℕ) (X : HidaSetting k) (ts : List (Deg k × X.R)) (F' F F'' : X.Mod),
+    Valid X.𝒜 ts → F'.IsGr X.𝒜 → F.IsGr X.𝒜 → F''.IsGr X.𝒜 → SES F' F F'' → admitted X.𝒜 ts F.Ann
+      → ∀ᶠ m in atTop, chi ts F m = chi ts F' m + chi ts F'' m
 
 def EulerIndependenceOfOrder : Prop :=
-  ∀ (k : ℕ) (X : HidaSetting k) (ts ts' : List (Deg k × X.R)) (F : X.Mod), Valid X.𝒜 ts →
-    ts.Perm ts' → F.IsGr X.𝒜 → admitted X.𝒜 ts F.Ann → ∀ᶠ m in atTop, chi ts F m = chi ts' F m
+  ∀ (k : ℕ) (X : HidaSetting k) (ts ts' : List (Deg k × X.R)) (F : X.Mod),
+    Valid X.𝒜 ts → ts.Perm ts' → F.IsGr X.𝒜 → admitted X.𝒜 ts F.Ann
+      → ∀ᶠ m in atTop, chi ts F m = chi ts' F m
 
 def RuleDev : Prop :=
-  ∀ (k : ℕ) (X : HidaSetting k) (F : X.Mod), F.IsGr X.𝒜 →
-    ∃ (t : ℕ) (N : ℕ → Submodule X.R F.M) (𝔮 : ℕ → Ideal X.R) (d : ℕ → Deg k),
-      N 0 = ⊥ ∧ N t = ⊤ ∧ (∀ i, F.IsHomSub (N i)) ∧ (∀ i, N i ≤ N (i + 1)) ∧
-      ∀ i < t, (𝔮 i).IsPrime ∧ (𝔮 i).IsHomogeneous X.𝒜 ∧ F.Ann ≤ 𝔮 i ∧
-        Nonempty (SES (F.sub (N i)) (F.sub (N (i + 1))) (((GMod.self X.𝒜).quo (𝔮 i)).shift (d i)))
+  ∀ (k : ℕ) (X : HidaSetting k) (F : X.Mod),
+    F.IsGr X.𝒜
+      → ∃ (t : ℕ) (N : ℕ → Submodule X.R F.M) (𝔮 : ℕ → Ideal X.R) (d : ℕ → Deg k),
+        N 0 = ⊥ ∧ N t = ⊤ ∧ (∀ i, F.IsHomSub (N i)) ∧ (∀ i, N i ≤ N (i + 1))
+          ∧ ∀ i < t,
+            (𝔮 i).IsPrime ∧ (𝔮 i).IsHomogeneous X.𝒜 ∧ F.Ann ≤ 𝔮 i
+              ∧ Nonempty (SES (F.sub (N i)) (F.sub (N (i + 1)))
+                (((GMod.self X.𝒜).quo (𝔮 i)).shift (d i)))
 
 def RuleNzd : Prop :=
   ∀ (k : ℕ) (X : HidaSetting k) (ts : List (Deg k × X.R)) (F : X.Mod) (d : Deg k) (s : X.R),

@@ -18,14 +18,15 @@ theorem sc_mul (n : ℕ) (y z : kˣ) : sc n (y * z) = sc n y * sc n z := map_mul
 
 theorem sc_comm (n : ℕ) (y : kˣ) (g : GL (Fin n) k) : sc n y * g = g * sc n y := by
   apply Units.ext
-  have h : ((sc n y : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) = Matrix.scalar (Fin n) (y : k) := rfl
+  have h : ((sc n y : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) = Matrix.scalar (Fin n) (y : k) :=
+    rfl
   show ((sc n y : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * (g : Matrix (Fin n) (Fin n) k) =
     (g : Matrix (Fin n) (Fin n) k) * ((sc n y : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
   rw [h]
   exact (Matrix.scalar_commute (y : k) (fun r => Commute.all _ _) _).eq
 
-theorem rho_sc_comm {n : ℕ} (A : GRep k n) (y : kˣ) (g : GL (Fin n) k) (v : A.V) :
-    A.ρ (sc n y) (A.ρ g v) = A.ρ g (A.ρ (sc n y) v) := by
+theorem rho_sc_comm {n : ℕ} (A : GRep k n) (y : kˣ) (g : GL (Fin n) k) (v : A.V)
+    : A.ρ (sc n y) (A.ρ g v) = A.ρ g (A.ρ (sc n y) v) := by
   rw [← Module.End.mul_apply, ← map_mul, sc_comm, map_mul, Module.End.mul_apply]
 
 theorem centralSub_gen [TopologicalSpace k] : CentralSub k := by
@@ -33,8 +34,8 @@ theorem centralSub_gen [TopologicalSpace k] : CentralSub k := by
   intro n A _hs hLF x c a ha hxa
   obtain ⟨U, hUf, haU, hUinv⟩ := hLF a
   have := hUf
-  let Good : Submodule ℂ A.V → Prop := fun S => S ≤ U ∧ S ≠ ⊥ ∧
-    (∀ y : kˣ, ∀ s ∈ S, A.ρ (sc n y) s ∈ S) ∧ ∀ s ∈ S, A.ρ (sc n x) s = c • s
+  let Good : Submodule ℂ A.V → Prop := fun S =>
+    S ≤ U ∧ S ≠ ⊥ ∧ (∀ y : kˣ, ∀ s ∈ S, A.ρ (sc n y) s ∈ S) ∧ ∀ s ∈ S, A.ρ (sc n x) s = c • s
   have hex : ∃ d : ℕ, ∃ S : Submodule ℂ A.V, Good S ∧ Module.finrank ℂ S = d := by
     refine ⟨_, U ⊓ LinearMap.ker (A.ρ (sc n x) - c • LinearMap.id), ⟨inf_le_left, ?_, ?_, ?_⟩, rfl⟩
     · intro h
@@ -45,8 +46,7 @@ theorem centralSub_gen [TopologicalSpace k] : CentralSub k := by
       exact (Submodule.mem_bot ℂ).1 hm
     · rintro y s ⟨hsU, hsk⟩
       refine ⟨hUinv y s hsU, ?_⟩
-      have hsk' : A.ρ (sc n x) s = c • s := by
-        simpa [LinearMap.mem_ker, sub_eq_zero] using hsk
+      have hsk' : A.ρ (sc n x) s = c • s := by simpa [LinearMap.mem_ker, sub_eq_zero] using hsk
       show A.ρ (sc n y) s ∈ LinearMap.ker (A.ρ (sc n x) - c • LinearMap.id)
       rw [LinearMap.mem_ker, LinearMap.sub_apply, rho_sc_comm A x (sc n y) s, hsk', map_smul]
       simp
@@ -98,27 +98,31 @@ theorem centralSub_gen [TopologicalSpace k] : CentralSub k := by
     rw [← hlam (y * z) a' ha'S, sc_mul, map_mul, Module.End.mul_apply, hlam z a' ha'S, map_smul,
       hlam y a' ha'S, smul_smul, mul_comm]
   let f : kˣ →* ℂ := { toFun := lam, map_one' := hlam1, map_mul' := hlammul }
-  let Wm : Submodule ℂ A.V :=
-    { carrier := {v | ∀ y : kˣ, A.ρ (sc n y) v = lam y • v}
-      add_mem' := by
-        intro u v hu hv y
-        have hu' : ∀ y : kˣ, A.ρ (sc n y) u = lam y • u := hu
-        have hv' : ∀ y : kˣ, A.ρ (sc n y) v = lam y • v := hv
-        show A.ρ (sc n y) (u + v) = lam y • (u + v)
-        rw [map_add (f := _), hu' y, hv' y, smul_add]
-      zero_mem' := by
-        intro y
-        show A.ρ (sc n y) 0 = lam y • (0 : A.V)
-        rw [map_zero, smul_zero]
-      smul_mem' := by
-        intro r v hv y
-        have hv' : ∀ y : kˣ, A.ρ (sc n y) v = lam y • v := hv
-        show A.ρ (sc n y) (r • v) = lam y • (r • v)
-        rw [map_smul, hv' y, smul_comm] }
-  let W : Subrepresentation A.ρ := ⟨Wm, fun g v hv y => by
-    have hv' : ∀ y : kˣ, A.ρ (sc n y) v = lam y • v := hv
-    show A.ρ (sc n y) (A.ρ g v) = lam y • A.ρ g v
-    rw [rho_sc_comm, hv' y, map_smul]⟩
+  let Wm : Submodule ℂ A.V := {
+    carrier := {v | ∀ y : kˣ, A.ρ (sc n y) v = lam y • v}
+    add_mem' := by
+      intro u v hu hv y
+      have hu' : ∀ y : kˣ, A.ρ (sc n y) u = lam y • u := hu
+      have hv' : ∀ y : kˣ, A.ρ (sc n y) v = lam y • v := hv
+      show A.ρ (sc n y) (u + v) = lam y • (u + v)
+      rw [map_add (f := _), hu' y, hv' y, smul_add]
+    zero_mem' := by
+      intro y
+      show A.ρ (sc n y) 0 = lam y • (0 : A.V)
+      rw [map_zero, smul_zero]
+    smul_mem' := by
+      intro r v hv y
+      have hv' : ∀ y : kˣ, A.ρ (sc n y) v = lam y • v := hv
+      show A.ρ (sc n y) (r • v) = lam y • (r • v)
+      rw [map_smul, hv' y, smul_comm]
+  }
+  let W : Subrepresentation A.ρ := ⟨
+    Wm,
+    fun g v hv y => by
+      have hv' : ∀ y : kˣ, A.ρ (sc n y) v = lam y • v := hv
+      show A.ρ (sc n y) (A.ρ g v) = lam y • A.ρ g v
+      rw [rho_sc_comm, hv' y, map_smul]
+  ⟩
   have ha'W : a' ∈ W.toSubmodule := fun y => hlam y a' ha'S
   refine ⟨W, f.toHomUnits, ?_, ?_, ?_⟩
   · intro h
@@ -135,8 +139,9 @@ theorem centralSub_gen [TopologicalSpace k] : CentralSub k := by
     rw [MonoidHom.coe_toHomUnits]
     exact (key _ _ ((hlam x a' ha'S).symm.trans (hSx a' ha'S))).trans rfl
 
-theorem centralSub (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    CentralSub k :=
+theorem centralSub
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : CentralSub k :=
   centralSub_gen
 
 end PositivityTheory.RgUd.Prod.CS

@@ -13,9 +13,13 @@ set_option synthInstance.maxHeartbeats 200000
 section
 open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp
 open NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx
-open Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
-open Formalism.IndefR.FWT GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Cx
+open Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.L2.Theta
+open Formalism.IndefR.FWT GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies
+  GlobalTheory.SeriesTie
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open scoped TensorProduct
 set_option synthInstance.maxHeartbeats 400000
@@ -25,11 +29,15 @@ set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.BigOn.Exp
 section ScalarGeneric
-variable {O : Type} [CommRing O] [IsDomain O] {M : Type} [AddCommGroup M] [Module (FractionRing O) M] [Module O M]
+variable
+  {O : Type} [CommRing O] [IsDomain O]
+  {M : Type} [AddCommGroup M] [Module (FractionRing O) M] [Module O M]
   [IsScalarTower O (FractionRing O) M] [FiniteDimensional (FractionRing O) M]
-  {L : Type} [Field L] [Algebra O L] {eK : FractionRing O →+* ℂ} {G : Type}
-variable (rd : M →ₛₗ[eK] (G → ℂ)) (eL : L →+* ℂ)
-  (hL : ∀ c : O, eL (algebraMap O L c) = eK (algebraMap O (FractionRing O) c))
+  {L : Type} [Field L] [Algebra O L]
+  {eK : FractionRing O →+* ℂ} {G : Type}
+variable
+  (rd : M →ₛₗ[eK] (G → ℂ))
+  (eL : L →+* ℂ) (hL : ∀ c : O, eL (algebraMap O L c) = eK (algebraMap O (FractionRing O) c))
 end ScalarGeneric
 set_option maxHeartbeats 4000000 in
 theorem scalar_of_reading_alt : _root_.GlobalTheory.BigOn.Exp.CanonicalFits fun Fm x hx i p w j ρ hρ ν _ => ∀ e : FractionRing ((Fm.ex x hx i).nch.Oe w) →+* ℂ, (∀ y, e ((Fm.ex x hx i).nch.embW w y) = (Fm.D x i).what₂.embLL y) → (∀ a : (Fm.D x i).ntw.Ok ((Fm.ex x hx i).nch.twI w) ((Fm.ex x hx i).nch.k' w), e (algebraMap ((Fm.ex x hx i).nch.Oe w) _ (algebraMap _ ((Fm.ex x hx i).nch.Oe w) a)) = ρ.eOk ((Fm.ex x hx i).nch.twI w) ((Fm.ex x hx i).nch.sd w) ((Fm.ex x hx i).nch.k' w) a) →

@@ -6,14 +6,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.G3 (sp)
 open UpperTheory.Gal.FiniteEtaleModels
 
-private theorem conj_congOne {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) {u v : G.GAf} {N : ℕ}
-    (hu : u ∈ L.KN 1) (hv : L.CongOne N v) : L.CongOne N (u * v * u⁻¹) := by
+private theorem conj_congOne
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {G : HTGroup p} (L : Link D G)
+    {u v : G.GAf} {N : ℕ} (hu : u ∈ L.KN 1) (hv : L.CongOne N v)
+    : L.CongOne N (u * v * u⁻¹) := by
   intro z hz
   have hu' : L.CongOne 1 u ∧ L.CongOne 1 u⁻¹ := hu
   obtain ⟨w1, hw1, e1⟩ := hu'.2 z hz
@@ -27,20 +33,26 @@ private theorem conj_congOne {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup
     exact add_mem hw2 hw3
   · have key : L.actG u (L.actG u⁻¹ z) = z := by
       rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
-    rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, e2, map_add (f := _), map_nsmul, key]
+    rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, e2, map_add (f := _),
+      map_nsmul, key]
 
 private theorem inAf_mem' {p : ℕ} [Fact p.Prime] (D : Datum p) (x : D.La) : inAf D x ∈ LaHat D :=
   AddSubgroup.subset_closure ⟨1, x, fun v => by rw [map_one]; exact one_mem _, rfl⟩
 
-private theorem cl_cast {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} {L : Link D G} {E : Type} [Field E] [NumberField E]
-    {gb : GBase D.toG E} {w : HeightOneSpectrum (𝓞 E)} {q : ℕ} [Fact q.Prime] {r : ℤ} {𝔴 𝔫 : Ideal (𝓞 D.F)}
-    (S : Site gb w q r 𝔴 𝔫) {k : ℕ} (T : KS L gb k) (M : Lv p) {c c' : ℕ} {a a' : 𝓞 D.F} (hc : c' = c) (ha : a' = a)
-    (C : S.Cl (T.M M).univ c a) : ∃ C' : S.Cl (T.M M).univ c' a', S.pi T C' = S.pi T C := by
+private theorem cl_cast
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {G : HTGroup p} {L : Link D G} {E : Type} [Field E] [NumberField E]
+    {gb : GBase D.toG E} {w : HeightOneSpectrum (𝓞 E)} {q : ℕ} [Fact q.Prime]
+    {r : ℤ} {𝔴 𝔫 : Ideal (𝓞 D.F)} (S : Site gb w q r 𝔴 𝔫)
+    {k : ℕ} (T : KS L gb k)
+    (M : Lv p)
+    {c c' : ℕ} {a a' : 𝓞 D.F} (hc : c' = c) (ha : a' = a) (C : S.Cl (T.M M).univ c a)
+    : ∃ C' : S.Cl (T.M M).univ c' a', S.pi T C' = S.pi T C := by
   subst hc ha
   exact ⟨C, rfl⟩
 
-theorem UpperTheory.Gal.FiniteEtaleModels.quotOf_holds :
-    PowCart → PiInv → PiFet → PiSep → CongCRT → BaseOnto → QuotOf := by
+theorem UpperTheory.Gal.FiniteEtaleModels.quotOf_holds
+    : PowCart → PiInv → PiFet → PiSep → CongCRT → BaseOnto → QuotOf := by
   intro hPC hPI hPF hPS hCRT hBO p _ D G L hSc E _ _ gb w q _ r 𝔴 𝔫 S k T K₀ hK M c a hNum C
   have hM := hNum.1
   have hGen := hNum.2
@@ -79,19 +91,25 @@ theorem UpperTheory.Gal.FiniteEtaleModels.quotOf_holds :
     rw [hX] at hv ⊢
     refine ⟨conj_congOne L hu1 hv.1, ?_⟩
     have e : (u * v * u⁻¹)⁻¹ = u * v⁻¹ * u⁻¹ := by group
-    rw [e]; exact conj_congOne L hu1 hv.2
+    rw [e]
+    exact conj_congOne L hu1 hv.2
   · intro u hu x y
     obtain ⟨C', hC'⟩ := cl_cast (a' := ((1 : ℕ) : 𝓞 D.F) * a) S T M (_root_.mul_one c) (by simp) C
-    have h := hPI p D G L E gb w q r 𝔴 𝔫 S k T K₀ hK M M 1 c a (_root_.mul_one _).symm hNum C' C u hu x y
+    have h :=
+      hPI p D G L E gb w q r 𝔴 𝔫 S k T K₀ hK M M 1 c a (_root_.mul_one _).symm hNum C' C u hu x y
     rwa [hC'] at h
   · intro Ω _ _ x y h
     exact hPS p D G L E gb w q r 𝔴 𝔫 S k T K₀ hK M c a hNum C Ω x y h
   · intro u hu x y Ω _ _ z hz
-    exact T.X.free _ (T.lev N0) (by rw [hX, hX0]; exact KN_anti hdvd) u (by rw [hX0]; exact hK₀le hu) x y Ω z hz
+    exact T.X.free _ (T.lev N0) (by rw [hX, hX0]; exact KN_anti hdvd) u
+      (by rw [hX0]; exact hK₀le hu) x y Ω z hz
   · intro Ω _ _ y σ hy
-    obtain ⟨x₀, hx₀, -⟩ := hBO p D G L hSc E gb w q r 𝔴 𝔫 S k T M c a hNum C Ω (y ≫ (GlobalTheory.KS.pow S.Y.univ.A k).hom) σ
-      (by simpa using hy)
-    have hpb := (hPC _ _ _ (T.M M).univ.A S.Y.univ.A S.Y.univ.A C.j (𝟙 _) C.m.φ (𝟙 _) C.m.cart.1.w (by simp) k).1 C.m.cart.1
+    obtain ⟨x₀, hx₀, -⟩ :=
+      hBO p D G L hSc E gb w q r 𝔴 𝔫 S k T M c a hNum C Ω
+        (y ≫ (GlobalTheory.KS.pow S.Y.univ.A k).hom) σ (by simpa using hy)
+    have hpb :=
+      (hPC _ _ _ (T.M M).univ.A S.Y.univ.A S.Y.univ.A C.j (𝟙 _) C.m.φ (𝟙 _) C.m.cart.1.w (by simp)
+        k).1 C.m.cart.1
     refine ⟨hpb.lift y x₀ hx₀.symm ≫ (T.e M).inv, ?_⟩
     simp only [Site.pi, Cls.pw, Category.assoc, Iso.inv_hom_id_assoc]
     exact hpb.lift_fst _ _ _

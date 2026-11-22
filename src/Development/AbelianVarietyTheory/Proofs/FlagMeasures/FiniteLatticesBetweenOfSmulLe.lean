@@ -11,10 +11,11 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem finite_lattices_between_of_smul_le :
-    ∀ {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-      [IsScalarTower (𝓞 K) K V] (M : Submodule (𝓞 K) V), M.FG → ∀ N : ℕ, 0 < N →
-      {Λ : Submodule (𝓞 K) V | M ≤ Λ ∧ ∀ x ∈ Λ, (N : K) • x ∈ M}.Finite := by
+theorem finite_lattices_between_of_smul_le
+    : ∀ {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+        [IsScalarTower (𝓞 K) K V] (M : Submodule (𝓞 K) V),
+      M.FG
+        → ∀ N : ℕ, 0 < N → {Λ : Submodule (𝓞 K) V | M ≤ Λ ∧ ∀ x ∈ Λ, (N : K) • x ∈ M}.Finite := by
   intro K V _ _ _ _ _ _ M hM N hN
   have hNK : (N : K) ≠ 0 := by exact_mod_cast hN.ne'
   let f : V →ₗ[𝓞 K] V := (((N : K)⁻¹) • LinearMap.id : V →ₗ[K] V).restrictScalars (𝓞 K)
@@ -27,12 +28,14 @@ theorem finite_lattices_between_of_smul_le :
     exact nsmul_mem hx N
   set D := M.map f with hD
   have hMD : M ≤ D := fun x hx => ⟨(N : K) • x, hsm x hx, hback x⟩
-  have hsub : {Λ : Submodule (𝓞 K) V | M ≤ Λ ∧ ∀ x ∈ Λ, (N : K) • x ∈ M} ⊆
-      {Λ : Submodule (𝓞 K) V | M ≤ Λ ∧ Λ ≤ D} := by
+  have hsub
+      : {Λ : Submodule (𝓞 K) V | M ≤ Λ ∧ ∀ x ∈ Λ, (N : K) • x ∈ M}
+        ⊆ {Λ : Submodule (𝓞 K) V | M ≤ Λ ∧ Λ ≤ D} := by
     rintro Λ ⟨h1, h2⟩
     exact ⟨h1, fun x hx => ⟨(N : K) • x, h2 x hx, hback x⟩⟩
   refine Set.Finite.subset ?_ hsub
-  have h1 := Formalism.HermitianLatticesTheory.final_finIntermediate V M.toAddSubgroup D.toAddSubgroup hMD ?_
+  have h1 :=
+    Formalism.HermitianLatticesTheory.final_finIntermediate V M.toAddSubgroup D.toAddSubgroup hMD ?_
   · refine Set.Finite.of_finite_image (f := Submodule.toAddSubgroup) (h1.subset ?_)
       (Submodule.toAddSubgroup_injective.injOn)
     rintro _ ⟨Λ, ⟨h2, h3⟩, rfl⟩

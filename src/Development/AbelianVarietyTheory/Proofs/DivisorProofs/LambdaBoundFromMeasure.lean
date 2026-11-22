@@ -17,59 +17,78 @@ set_option synthInstance.maxHeartbeats 400000
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV
+  Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
 
 namespace GlobalTheory.CovTop.LamAll
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
 
 theorem totallyComplex_core : IsTotallyComplex p.T.Q.c.F :=
   ⟨fun v => by
-    rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_iff, ComplexEmbedding.isReal_iff]
-    exact fun e => CompHt.conj_comp_ne (c := p.T.Q.c) v.embedding (RingHom.ext fun a => RingHom.congr_fun e a)⟩
+    rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_iff,
+      ComplexEmbedding.isReal_iff]
+    exact fun e =>
+      CompHt.conj_comp_ne (c := p.T.Q.c) v.embedding (RingHom.ext fun a => RingHom.congr_fun e a)⟩
 
-theorem goodOf_conj' {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {l : Level H}
-    (c : Coeff l) (σ : c.F →+* ℂ) : goodOf c ((starRingEnd ℂ).comp σ) = goodOf c σ := by
+theorem goodOf_conj'
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {l : Level H}
+    (c : Coeff l) (σ : c.F →+* ℂ)
+    : goodOf c ((starRingEnd ℂ).comp σ) = goodOf c σ := by
   have e : (starRingEnd ℂ).comp σ = ComplexEmbedding.conjugate σ := by
     ext x; simp [ComplexEmbedding.conjugate_coe_eq]
-  rw [e]; exact goodOf_conj (c := c) σ
+  rw [e]
+  exact goodOf_conj (c := c) σ
 
-theorem nrmK_conj (σ : p.T.Q.c.F →+* ℂ) (x : VK p.fw i) :
-    nrmK p.fw i ((starRingEnd ℂ).comp σ) x = nrmK p.fw i σ x := by
+theorem nrmK_conj (σ : p.T.Q.c.F →+* ℂ) (x : VK p.fw i)
+    : nrmK p.fw i ((starRingEnd ℂ).comp σ) x = nrmK p.fw i σ x := by
   simp only [nrmK, normW, petW]
   rw [goodOf_conj']
 
-theorem slopeMax_all_le (Cm : ℝ) (hG : GramAt p i) (hM : MeasAt p i Cm) :
-    slopeMax_sq (nrmR p.R.toRealDat i) (latAll p.R.toRealDat i) ≤
-      slopeMax_sq (nrmK p.fw i) (latW (p.T.U ((i : ℕ) + 1)) (Gk p i)) + 2 * (Cm * unitE p) := by
+theorem slopeMax_all_le (Cm : ℝ) (hG : GramAt p i) (hM : MeasAt p i Cm)
+    : slopeMax_sq (nrmR p.R.toRealDat i) (latAll p.R.toRealDat i)
+      ≤ slopeMax_sq (nrmK p.fw i) (latW (p.T.U ((i : ℕ) + 1)) (Gk p i)) + 2 * (Cm * unitE p) := by
   haveI := totallyComplex_core p
-  obtain ⟨ι, h1, h2, h3⟩ := GlobalTheory.T.exists_semilinear_emb_supLattice_onto_realisation D _ _ _ _ p.T p.R.toRealDat p.κ p.v₀ p.fw i
+  obtain ⟨ι, h1, h2, h3⟩ :=
+    GlobalTheory.T.exists_semilinear_emb_supLattice_onto_realisation D _ _ _ _ p.T p.R.toRealDat p.κ
+      p.v₀ p.fw i
   choose c hc0 hcB hcE using hM
-  have hAll : latAll p.R.toRealDat i =
-      Submodule.span (𝓞 D.what₂.LL) (ι '' (latW (p.T.U ((i : ℕ) + 1)) (Gk p i) : Set (VK p.fw i))) := by
+  have hAll
+      : latAll p.R.toRealDat i
+        = Submodule.span (𝓞 D.what₂.LL)
+          (ι '' (latW (p.T.U ((i : ℕ) + 1)) (Gk p i) : Set (VK p.fw i))) := by
     unfold latAll; rw [h3]
   have hne : latW (p.T.U ((i : ℕ) + 1)) (Gk p i) ≠ ⊥ := by
     intro h0
     apply hG.2.2.1
-    refine le_bot_iff.1 ((latGood_le _ _ _).trans ((inf_le_left : latType p.R.toRealDat p.F.lv2 i ≤ latAll p.R.toRealDat i).trans ?_))
+    refine le_bot_iff.1 ((latGood_le _ _ _).trans
+      ((inf_le_left : latType p.R.toRealDat p.F.lv2 i ≤ latAll p.R.toRealDat i).trans ?_))
     change latAll p.R.toRealDat i ≤ ⊥
     rw [hAll, h0]
     simp
-  have key := GlobalTheory.T.maxSlope_sq_fieldExtension_le_comparable_norms p.T.Q.c.F D.what₂.LL (VK p.fw i) (Fin (p.R.toRealDat.nW i) → D.what₂.LL) (nrmK p.fw i)
-    (nrmR p.R.toRealDat i) ι (latW (p.T.U ((i : ℕ) + 1)) (Gk p i)) c (Cm * unitE p) hG.2.2.2.1 hG.1 (nrmK_conj p i) h2
-    hG.2.2.2.2.1 hne (fun σ => ⟨hc0 σ, hcB σ⟩) (fun σ x => by
-      obtain ⟨h, e⟩ := h1 x
-      rw [e]
-      exact hcE σ ⟨x, h⟩)
+  have key :=
+    GlobalTheory.T.maxSlope_sq_fieldExtension_le_comparable_norms p.T.Q.c.F D.what₂.LL (VK p.fw i)
+      (Fin (p.R.toRealDat.nW i) → D.what₂.LL) (nrmK p.fw i) (nrmR p.R.toRealDat i) ι
+      (latW (p.T.U ((i : ℕ) + 1)) (Gk p i)) c (Cm * unitE p) hG.2.2.2.1 hG.1 (nrmK_conj p i) h2
+      hG.2.2.2.2.1 hne
+      (fun σ => ⟨hc0 σ, hcB σ⟩)
+      (fun σ x => by
+        obtain ⟨h, e⟩ := h1 x
+        rw [e]
+        exact hcE σ ⟨x, h⟩)
   rw [hAll]
   exact key
 
-theorem unitE_le {PP A M : ℝ} (hH : HostNum D L PP A M) (hW : WtNum p i PP) :
-    unitE p ≤ L.sc.x ^ (A + 1) * L.sc.b := by
+theorem unitE_le {PP A M : ℝ} (hH : HostNum D L PP A M) (hW : WtNum p i PP)
+    : unitE p ≤ L.sc.x ^ (A + 1) * L.sc.b := by
   rw [hW.unit]
   have hX : 10 ≤ L.sc.x := hH.big.2.1.trans hH.big.2.2.1
   have hX0 : 0 < L.sc.x := by linarith
@@ -93,15 +112,18 @@ theorem unitE_le {PP A M : ℝ} (hH : HostNum D L PP A M) (hW : WtNum p i PP) :
     linarith
   have hpoly := hH.poly.2.2
   have hfm0 : 0 ≤ (D.R.f : ℝ) * D.R.m * L.sc.L := by positivity
-  calc (D.R.f : ℝ) * D.R.m * L.sc.b * L.sc.L * Real.log (Real.log L.sc.x)
-        = ((D.R.f : ℝ) * D.R.m * L.sc.L) * (L.sc.b * Real.log (Real.log L.sc.x)) := by ring
+  calc
+    (D.R.f : ℝ) * D.R.m * L.sc.b * L.sc.L * Real.log (Real.log L.sc.x)
+      = ((D.R.f : ℝ) * D.R.m * L.sc.L) * (L.sc.b * Real.log (Real.log L.sc.x)) := by ring
     _ ≤ L.sc.x ^ A * (L.sc.b * L.sc.x) :=
-        mul_le_mul (hfm.trans hpoly) (mul_le_mul_of_nonneg_left hll hb) (by positivity) (by positivity)
+      mul_le_mul (hfm.trans hpoly) (mul_le_mul_of_nonneg_left hll hb) (by positivity)
+        (by positivity)
     _ = L.sc.x ^ (A + 1) * L.sc.b := by rw [Real.rpow_add_one hX0.ne']; ring
 
-theorem le_rpow_of_add {X b A1 A Cm u s : ℝ} (hX : 10 ≤ X) (hb : 0 ≤ b) (hA1 : 0 ≤ A1) (hA : 0 ≤ A) (hCm : 0 ≤ Cm)
-    (hu : u ≤ X ^ (A + 1) * b) (hs : s ≤ X ^ A1 * b + 2 * (Cm * u)) :
-    s ≤ X ^ (A1 + (A + 1) + (⌈2 * Cm⌉₊ : ℝ)) * b := by
+theorem le_rpow_of_add
+    {X b A1 A Cm u s : ℝ} (hX : 10 ≤ X) (hb : 0 ≤ b) (hA1 : 0 ≤ A1) (hA : 0 ≤ A) (hCm : 0 ≤ Cm)
+    (hu : u ≤ X ^ (A + 1) * b) (hs : s ≤ X ^ A1 * b + 2 * (Cm * u))
+    : s ≤ X ^ (A1 + (A + 1) + (⌈2 * Cm⌉₊ : ℝ)) * b := by
   have hX0 : 0 < X := by linarith
   have hP : 1 ≤ X ^ A1 := Real.one_le_rpow (by linarith) hA1
   have hQ : 1 ≤ X ^ (A + 1) := Real.one_le_rpow (by linarith) (by linarith)
@@ -122,12 +144,12 @@ theorem le_rpow_of_add {X b A1 A Cm u s : ℝ} (hX : 10 ≤ X) (hb : 0 ≤ b) (h
     have : P ≤ P * Q := le_mul_of_one_le_right (by linarith) hQ
     exact mul_le_mul_of_nonneg_right this hb
   have e2 : 2 * (Cm * u) ≤ 2 * Cm * (P * Q * b) := by
-    have : u ≤ P * Q * b := hu.trans (by
-      have : Q ≤ P * Q := le_mul_of_one_le_left (by linarith) hP
-      exact mul_le_mul_of_nonneg_right this hb)
+    have : u ≤ P * Q * b :=
+      hu.trans (by
+        have : Q ≤ P * Q := le_mul_of_one_le_left (by linarith) hP
+        exact mul_le_mul_of_nonneg_right this hb)
     nlinarith
-  have e3 : P * Q * b * (1 + 2 * Cm) ≤ P * Q * b * K :=
-    mul_le_mul_of_nonneg_left hK (by positivity)
+  have e3 : P * Q * b * (1 + 2 * Cm) ≤ P * Q * b * K := mul_le_mul_of_nonneg_left hK (by positivity)
   nlinarith
 
 end GlobalTheory.CovTop.LamAll

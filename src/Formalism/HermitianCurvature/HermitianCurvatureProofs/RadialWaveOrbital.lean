@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSE
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
 
 theorem radial_wave_orbital : RDWaveJ := by
   intro k r Wp Wq _ _ _ _ _ _ D s H _ g _

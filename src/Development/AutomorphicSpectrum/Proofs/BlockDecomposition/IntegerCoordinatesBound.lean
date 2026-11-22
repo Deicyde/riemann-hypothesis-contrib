@@ -8,11 +8,14 @@ open NumberField
 
 namespace GlobalTheory.CompanionTheory.NumberFieldCoord
 
-theorem abs_repr_le_of_forall_norm_embedding_le :
-    ∀ {E : Type} [Field E] [NumberField E] {I : Type} [Fintype I] (τ : I → (E →+* ℂ)),
-      Function.Surjective (fun i => InfinitePlace.mk (τ i)) →
-      ∃ K : ℝ, 0 < K ∧ ∀ (e : 𝓞 E) (R : ℝ), (∀ i, ‖τ i (e : E)‖ ≤ R) →
-        ∀ k, |(((RingOfIntegers.basis E).repr e k : ℤ) : ℝ)| ≤ K * R := by
+theorem abs_repr_le_of_forall_norm_embedding_le
+    : ∀ {E : Type} [Field E] [NumberField E] {I : Type} [Fintype I] (τ : I → (E →+* ℂ)),
+      Function.Surjective (fun i => InfinitePlace.mk (τ i))
+        → ∃ K : ℝ,
+          0 < K
+            ∧ ∀ (e : 𝓞 E) (R : ℝ),
+              (∀ i, ‖τ i (e : E)‖ ≤ R)
+                → ∀ k, |(((RingOfIntegers.basis E).repr e k : ℤ) : ℝ)| ≤ K * R := by
   intro E _ _ I _ τ hτ
   classical
   set Lc := LinearMap.toContinuousLinearMap (mixedEmbedding.latticeBasis E).equivFun.toLinearMap
@@ -44,7 +47,9 @@ theorem abs_repr_le_of_forall_norm_embedding_le :
     rw [show (e : E) = algebraMap (𝓞 E) E e from rfl, this]
     simp
   rw [← hval, ← Real.norm_eq_abs]
-  calc ‖Lc (mixedEmbedding E (e : E)) k‖ ≤ ‖Lc (mixedEmbedding E (e : E))‖ := norm_le_pi_norm _ k
+  calc
+    ‖Lc (mixedEmbedding E (e : E)) k‖
+      ≤ ‖Lc (mixedEmbedding E (e : E))‖ := norm_le_pi_norm _ k
     _ ≤ ‖Lc‖ * ‖mixedEmbedding E (e : E)‖ := Lc.le_opNorm _
     _ ≤ ‖Lc‖ * R := by gcongr
     _ ≤ (‖Lc‖ + 1) * R := by nlinarith

@@ -8,11 +8,14 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem summable_nonneg_family_of_differentiableOn {ι : Type} (c : ι → ℝ) (n : ι → ℕ)
-    (R : ℂ → ℂ) (r ε : ℝ) (hc : ∀ i, 0 ≤ c i) (hε : 0 < ε)
-    (hR : DifferentiableOn ℂ R (Metric.ball 0 r))
+theorem summable_nonneg_family_of_differentiableOn
+    {ι : Type} (c : ι → ℝ) (n : ι → ℕ)
+    (R : ℂ → ℂ)
+    (r ε : ℝ)
+    (hc : ∀ i, 0 ≤ c i) (hε : 0 < ε) (hR : DifferentiableOn ℂ R (Metric.ball 0 r))
     (hser : ∀ z : ℂ, 0 < ‖z‖ → ‖z‖ < ε → HasSum (fun i => (c i : ℂ) * z ^ n i) (R z))
-    (x : ℝ) (hx0 : 0 ≤ x) (hxr : x < r) : Summable (fun i => c i * x ^ n i) := by
+    (x : ℝ) (hx0 : 0 ≤ x) (hxr : x < r)
+    : Summable (fun i => c i * x ^ n i) := by
   have hr : 0 < r := lt_of_le_of_lt hx0 hxr
   set t0 : ℝ := ε / 2 with ht0
   have ht0pos : 0 < t0 := by positivity
@@ -59,7 +62,8 @@ theorem summable_nonneg_family_of_differentiableOn {ι : Type} (c : ι → ℝ) 
     rw [hn]
     exact hCt0.le_tsum m (fun j _ => mul_nonneg (hCnn j) (pow_nonneg ht0pos.le _))
   have hradpos : 0 < q.radius :=
-    lt_of_lt_of_le (ENNReal.coe_pos.mpr (NNReal.coe_pos.mp (show (0:ℝ) < (t0n : ℝ) from ht0pos))) hrad
+    lt_of_lt_of_le (ENNReal.coe_pos.mpr (NNReal.coe_pos.mp (show (0 : ℝ) < (t0n : ℝ) from ht0pos)))
+      hrad
   have hqball := q.hasFPowerSeriesOnBall hradpos
   have hRan : AnalyticAt ℂ R 0 := hR.analyticAt (Metric.ball_mem_nhds 0 hr)
   have hfreq : ∃ᶠ z in 𝓝[≠] (0 : ℂ), R z = q.sum z := by
@@ -103,8 +107,10 @@ theorem summable_nonneg_family_of_differentiableOn {ι : Type} (c : ι → ℝ) 
   · refine ((hfib m).mul_right (x ^ m)).congr fun i => ?_
     simp [Equiv.sigmaFiberEquiv, show n i = m from i.2]
   · refine hCx.congr fun m => ?_
-    have e1 : (∑' i : {i // n i = m}, ((fun i => c i * x ^ n i) ∘ (Equiv.sigmaFiberEquiv n))
-        ⟨m, i⟩) = ∑' i : n ⁻¹' {m}, c i * x ^ m :=
+    have e1
+        : (∑' i : {i // n i = m}, ((fun i => c i * x ^ n i) ∘ (Equiv.sigmaFiberEquiv n))
+            ⟨m, i⟩)
+          = ∑' i : n ⁻¹' {m}, c i * x ^ m :=
       tsum_congr fun i => by simp [Equiv.sigmaFiberEquiv, show n i = m from i.2]
     rw [e1, tsum_mul_right]
 

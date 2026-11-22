@@ -15,16 +15,21 @@ public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PTwistIntersect
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology NumberField
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology NumberField
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
-theorem mixedDisc_eq_zero_of_eq_zero {D : ℕ} (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (j : Fin D)
-    (hA : A j = 0) : mixedDisc A = 0 := by
+theorem mixedDisc_eq_zero_of_eq_zero
+    {D : ℕ} (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (j : Fin D) (hA : A j = 0)
+    : mixedDisc A = 0 := by
   classical
-  have pair : ∀ T : Finset (Fin D), j ∉ T →
-      (-1 : ℂ) ^ (D - T.card) * (∑ k ∈ T, A k).det +
-        (-1 : ℂ) ^ (D - (insert j T).card) * (∑ k ∈ insert j T, A k).det = 0 := by
+  have pair
+      : ∀ T : Finset (Fin D),
+        j ∉ T
+          → (-1 : ℂ) ^ (D - T.card) * (∑ k ∈ T, A k).det
+              + (-1 : ℂ) ^ (D - (insert j T).card) * (∑ k ∈ insert j T, A k).det
+            = 0 := by
     intro T hj
     rw [Finset.sum_insert hj, hA, zero_add, Finset.card_insert_of_notMem hj]
     have hlt : T.card < D := by simpa using Finset.card_lt_univ_of_notMem hj
@@ -66,27 +71,31 @@ theorem cxHessian_zero {D : ℕ} (z : Fin D → ℂ) : cxHessian (fun _ => (0 : 
   ext a b
   simp [cxHessian, h]
 
-theorem sheetDensity_update_zero {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (j : Fin e)
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (g : ((Σ k, ι k) → ℂ) → ℝ)
-    (y : Fin e → ℂ) (w : ((k : K) → ι k) → ℂ) :
-    sheetDensity P Ψ (Function.update φ j 0) g y w = 0 := by
+theorem sheetDensity_update_zero
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (P : Ideal (MRing ι))
+    {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (j : Fin e)
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    (g : ((Σ k, ι k) → ℂ) → ℝ) (y : Fin e → ℂ) (w : ((k : K) → ι k) → ℂ)
+    : sheetDensity P Ψ (Function.update φ j 0) g y w = 0 := by
   unfold sheetDensity
   split_ifs with hγ
-  · have hm : mixedDisc (fun k => cxHessian
-        (fun y' => Function.update φ j 0 k (hγ.choose y')) y) = 0 := by
+  · have hm
+        : mixedDisc (fun k => cxHessian (fun y' => Function.update φ j 0 k (hγ.choose y')) y)
+          = 0 := by
       refine mixedDisc_eq_zero_of_eq_zero _ j ?_
       simpa using cxHessian_zero y
     simp [maDensity, hm]
   · rfl
 
-theorem ptsIntegral_eq_zero_of_locConst :
-    ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ)
-      (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (g : ((Σ k, ι k) → ℂ) → ℝ) (j : Fin e),
+theorem ptsIntegral_eq_zero_of_locConst
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ)
+        (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (g : ((Σ k, ι k) → ℂ) → ℝ) (j : Fin e),
       (∀ z ∈ mcPts P, ∃ c : ℝ, φ j =ᶠ[𝓝 z] fun _ => c) → ptsIntegral P φ g = 0 := by
   intro K _ ι _ P e φ g j hj
-  have hshift : ∀ i, ∀ z ∈ mcPts P, ∃ c : ℝ,
-      ∀ᶠ u in 𝓝 z, φ i u = Function.update φ j 0 i u + c := by
+  have hshift
+      : ∀ i, ∀ z ∈ mcPts P, ∃ c : ℝ, ∀ᶠ u in 𝓝 z, φ i u = Function.update φ j 0 i u + c := by
     intro i z hz
     by_cases hi : i = j
     · subst hi
@@ -94,7 +103,8 @@ theorem ptsIntegral_eq_zero_of_locConst :
       refine ⟨c, hc.mono fun u hu => ?_⟩
       simpa using hu
     · exact ⟨0, Eventually.of_forall fun u => by simp [Function.update_of_ne hi]⟩
-  rw [GroundTheory.Heights₂.Heights.HilbertSamuel.TwistIntersection.ptsIntegral_add_locConst P hshift g]
+  rw [GroundTheory.Heights₂.Heights.HilbertSamuel.TwistIntersection.ptsIntegral_add_locConst P
+    hshift g]
   unfold ptsIntegral
   split_ifs
   · simp [ptsIntegralAt, sheetDensity_update_zero]

@@ -12,19 +12,19 @@ open Finset MvPolynomial
 
 namespace UpperTheory.Gal.Schur
 
-private theorem one_mem_eSpan (K : Type) [CommRing K] (n : ℕ) :
-    (1 : MvPolynomial (Fin n) K) ∈ eSpan K n 0 := by
+private theorem one_mem_eSpan (K : Type) [CommRing K] (n : ℕ)
+    : (1 : MvPolynomial (Fin n) K) ∈ eSpan K n 0 := by
   unfold eSpan
   exact Submodule.subset_span ⟨Fin.elim0, by simp⟩
 
-private theorem esymm_mem_eSpan (K : Type) [CommRing K] (n : ℕ) (i : Fin n) :
-    esymm (Fin n) K ((i : ℕ) + 1) ∈ eSpan K n 1 := by
+private theorem esymm_mem_eSpan (K : Type) [CommRing K] (n : ℕ) (i : Fin n)
+    : esymm (Fin n) K ((i : ℕ) + 1) ∈ eSpan K n 1 := by
   unfold eSpan
   exact Submodule.subset_span ⟨fun _ => i.succ, by simp⟩
 
-private theorem exists_mem_eSpan (h : ESpanMul) (K : Type) [CommRing K] (n : ℕ)
-    (q : MvPolynomial (Fin n) K) :
-    ∃ k, aeval (fun i : Fin n => esymm (Fin n) K ((i : ℕ) + 1)) q ∈ eSpan K n k := by
+private theorem exists_mem_eSpan
+    (h : ESpanMul) (K : Type) [CommRing K] (n : ℕ) (q : MvPolynomial (Fin n) K)
+    : ∃ k, aeval (fun i : Fin n => esymm (Fin n) K ((i : ℕ) + 1)) q ∈ eSpan K n k := by
   obtain ⟨hmono, hmul⟩ := h K n
   induction q using MvPolynomial.induction_on with
   | C a =>

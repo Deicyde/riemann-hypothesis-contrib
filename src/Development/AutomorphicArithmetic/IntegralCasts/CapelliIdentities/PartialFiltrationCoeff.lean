@@ -4,13 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.PartialFiltrationCoeff.part_filt_coeff :
-    ∀ {O σ : Type} [inst : CommRing O]
-    [inst_1 : IsLocalRing O] (M : ℕ),
-    ∀ f ∈ IsLocalRing.maximalIdeal (MvPowerSeries σ O) ^ M,
-      ∀ (n : σ →₀ ℕ),
-        (MvPowerSeries.coeff n : MvPowerSeries σ O → O) f ∈
-          IsLocalRing.maximalIdeal O ^ (M - (Finsupp.degree : (σ →₀ ℕ) → ℕ) n) := by
+theorem UpperTheory.Reformulated.B.PartialFiltrationCoeff.part_filt_coeff
+    : ∀ {O σ : Type} [inst : CommRing O] [inst_1 : IsLocalRing O] (M : ℕ),
+      ∀ f ∈ IsLocalRing.maximalIdeal (MvPowerSeries σ O) ^ M, ∀ (n : σ →₀ ℕ),
+        (MvPowerSeries.coeff n : MvPowerSeries σ O → O) f
+          ∈ IsLocalRing.maximalIdeal O ^ (M - (Finsupp.degree : (σ →₀ ℕ) → ℕ) n) := by
   intro O σ _ _ M
   classical
   induction M with

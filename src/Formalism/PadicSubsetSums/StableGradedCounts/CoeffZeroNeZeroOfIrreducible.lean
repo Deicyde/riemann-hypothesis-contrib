@@ -16,19 +16,22 @@ section roots
 
 variable {K L : Type} [Field K] [Fintype K] [Field L] [Algebra K L] [IsAlgClosed L]
 
-theorem root_frob {f : K[X]} (n : ℕ) {x : L} (hx : aeval x f = 0) :
-    aeval (x ^ Fintype.card K ^ n) f = 0 := by
+theorem root_frob {f : K[X]} (n : ℕ) {x : L} (hx : aeval x f = 0)
+    : aeval (x ^ Fintype.card K ^ n) f = 0 := by
   have key : ∀ y : L, aeval y f = 0 → aeval (y ^ Fintype.card K) f = 0 := by
     intro y hy
-    rw [← Polynomial.expand_aeval, FiniteField.expand_card, map_pow, hy, zero_pow Fintype.card_ne_zero]
+    rw [← Polynomial.expand_aeval, FiniteField.expand_card, map_pow, hy,
+      zero_pow Fintype.card_ne_zero]
   induction n with
   | zero => simpa using hx
   | succ n ih =>
     rw [pow_succ, pow_mul]
     exact key _ ih
 
-theorem root_conj {f : K[X]} (hm : f.Monic) (hi : Irreducible f) {x y : L} (hx : aeval x f = 0)
-    (hy : aeval y f = 0) : ∃ n : ℕ, y = x ^ Fintype.card K ^ n := by
+theorem root_conj
+    {f : K[X]} (hm : f.Monic) (hi : Irreducible f)
+    {x y : L} (hx : aeval x f = 0) (hy : aeval y f = 0)
+    : ∃ n : ℕ, y = x ^ Fintype.card K ^ n := by
   classical
   have h := (frobenius_orbit_irreducible K L f hm hi).1.2
   have mem : ∀ z : L, aeval z f = 0 → z ∈ (f.aroots L).toFinset := by
@@ -39,8 +42,8 @@ theorem root_conj {f : K[X]} (hm : f.Monic) (hi : Irreducible f) {x y : L} (hx :
   refine ⟨n, ?_⟩
   rw [← hn, pow_iterate]
 
-theorem root_pow_card {f : K[X]} (hi : Irreducible f) {x : L} (hx : aeval x f = 0) :
-    x ^ Fintype.card K ^ f.natDegree = x := by
+theorem root_pow_card {f : K[X]} (hi : Irreducible f) {x : L} (hx : aeval x f = 0)
+    : x ^ Fintype.card K ^ f.natDegree = x := by
   classical
   have hxi : IsIntegral K x := (show IsAlgebraic K x from ⟨f, hi.ne_zero, hx⟩).isIntegral
   have hass := (minpoly.irreducible hxi).associated_of_dvd hi (minpoly.dvd K x hx)
@@ -52,25 +55,25 @@ theorem root_pow_card {f : K[X]} (hi : Irreducible f) {x : L} (hx : aeval x f = 
   have hcard : Fintype.card (IntermediateField.adjoin K {x}) = Fintype.card K ^ f.natDegree := by
     rw [Module.card_eq_pow_finrank (K := K) (V := IntermediateField.adjoin K {x}),
       IntermediateField.adjoin.finrank hxi, hdeg]
-  have h := FiniteField.pow_card
-    (⟨x, IntermediateField.mem_adjoin_simple_self K x⟩ : IntermediateField.adjoin K {x})
+  have h :=
+    FiniteField.pow_card
+      (⟨x, IntermediateField.mem_adjoin_simple_self K x⟩ : IntermediateField.adjoin K {x})
   rw [hcard] at h
   simpa using congrArg Subtype.val h
 
-theorem root_pow_card_mul {f : K[X]} (hi : Irreducible f) {x : L} (hx : aeval x f = 0) (k : ℕ) :
-    x ^ Fintype.card K ^ (f.natDegree * k) = x := by
+theorem root_pow_card_mul {f : K[X]} (hi : Irreducible f) {x : L} (hx : aeval x f = 0) (k : ℕ)
+    : x ^ Fintype.card K ^ (f.natDegree * k) = x := by
   induction k with
   | zero => simp
-  | succ k ih =>
-    rw [Nat.mul_succ, pow_add, pow_mul, ih, root_pow_card hi hx]
+  | succ k ih => rw [Nat.mul_succ, pow_add, pow_mul, ih, root_pow_card hi hx]
 
 theorem root_ne_zero {f : K[X]} (h0 : f.coeff 0 ≠ 0) {x : L} (hx : aeval x f = 0) : x ≠ 0 := by
   intro h
   rw [h, ← Polynomial.coeff_zero_eq_aeval_zero'] at hx
   exact h0 ((map_eq_zero_iff _ (algebraMap K L).injective).1 hx)
 
-theorem coeff_zero_ne_zero_of_irreducible {f : K[X]} (hi : Irreducible f) (hd : 2 ≤ f.natDegree) :
-    f.coeff 0 ≠ 0 := by
+theorem coeff_zero_ne_zero_of_irreducible {f : K[X]} (hi : Irreducible f) (hd : 2 ≤ f.natDegree)
+    : f.coeff 0 ≠ 0 := by
   intro h0
   have hX : (X : K[X]) ∣ f := Polynomial.X_dvd_iff.2 h0
   have hass := Polynomial.irreducible_X.associated_of_dvd hi hX
@@ -79,8 +82,9 @@ theorem coeff_zero_ne_zero_of_irreducible {f : K[X]} (hi : Irreducible f) (hd : 
   have : f.natDegree = 1 := Polynomial.natDegree_eq_of_degree_eq_some hdeg.symm
   omega
 
-theorem root_pow_sub_one {f : K[X]} (hi : Irreducible f) (h0 : f.coeff 0 ≠ 0) {x : L}
-    (hx : aeval x f = 0) : x ^ (Fintype.card K ^ f.natDegree - 1) = 1 := by
+theorem root_pow_sub_one
+    {f : K[X]} (hi : Irreducible f) (h0 : f.coeff 0 ≠ 0) {x : L} (hx : aeval x f = 0)
+    : x ^ (Fintype.card K ^ f.natDegree - 1) = 1 := by
   have hx0 : x ≠ 0 := root_ne_zero h0 hx
   have h1 := root_pow_card hi hx
   have hpos : 1 ≤ Fintype.card K ^ f.natDegree := Nat.one_le_pow _ _ Fintype.card_pos
@@ -90,33 +94,36 @@ theorem root_pow_sub_one {f : K[X]} (hi : Irreducible f) (h0 : f.coeff 0 ≠ 0) 
   have := mul_right_cancel₀ hx0 (h1.trans (one_mul x).symm)
   exact this
 
-theorem eq_of_common_root {δ : ℕ} {a b : Fin δ → K} (ha : Irreducible (monicOf a))
-    (hb : Irreducible (monicOf b)) {x : L} (hxa : aeval x (monicOf a) = 0)
-    (hxb : aeval x (monicOf b) = 0) : a = b := by
+theorem eq_of_common_root
+    {δ : ℕ} {a b : Fin δ → K} (ha : Irreducible (monicOf a)) (hb : Irreducible (monicOf b))
+    {x : L} (hxa : aeval x (monicOf a) = 0) (hxb : aeval x (monicOf b) = 0)
+    : a = b := by
   apply monicOf_injective
   rw [minpoly.eq_of_irreducible_of_monic ha hxa (monicOf_monic a),
     minpoly.eq_of_irreducible_of_monic hb hxb (monicOf_monic b)]
 
-theorem card_le_of_root_mem {δ : ℕ} (F : Finset (Fin δ → K))
-    (hF : ∀ c ∈ F, Irreducible (monicOf c)) (S : Finset L)
-    (h : ∀ c ∈ F, ∃ x ∈ S, aeval x (monicOf c) = 0) : F.card ≤ S.card := by
+theorem card_le_of_root_mem
+    {δ : ℕ} (F : Finset (Fin δ → K)) (hF : ∀ c ∈ F, Irreducible (monicOf c))
+    (S : Finset L) (h : ∀ c ∈ F, ∃ x ∈ S, aeval x (monicOf c) = 0)
+    : F.card ≤ S.card := by
   classical
   choose! r hrS hr using h
   refine Finset.card_le_card_of_injOn r (fun c hc => hrS c hc) ?_
   intro a ha b hb hab
   exact eq_of_common_root (hF a ha) (hF b hb) (hr a ha) (hab ▸ hr b hb)
 
-theorem mul_card_le_of_roots_mem {δ : ℕ} (F : Finset (Fin δ → K))
-    (hF : ∀ c ∈ F, Irreducible (monicOf c)) (S : Finset L)
-    (h : ∀ c ∈ F, ∀ x : L, aeval x (monicOf c) = 0 → x ∈ S) : δ * F.card ≤ S.card := by
+theorem mul_card_le_of_roots_mem
+    {δ : ℕ} (F : Finset (Fin δ → K)) (hF : ∀ c ∈ F, Irreducible (monicOf c))
+    (S : Finset L) (h : ∀ c ∈ F, ∀ x : L, aeval x (monicOf c) = 0 → x ∈ S)
+    : δ * F.card ≤ S.card := by
   classical
   have hsub : F.biUnion (fun c => ((monicOf c).aroots L).toFinset) ⊆ S := by
     intro x hx
     obtain ⟨c, hc, hxc⟩ := Finset.mem_biUnion.mp hx
     rw [Multiset.mem_toFinset, mem_aroots] at hxc
     exact h c hc x hxc.2
-  have hdisj : (F : Set (Fin δ → K)).PairwiseDisjoint
-      (fun c => ((monicOf c).aroots L).toFinset) := by
+  have hdisj
+      : (F : Set (Fin δ → K)).PairwiseDisjoint (fun c => ((monicOf c).aroots L).toFinset) := by
     intro a ha b hb hab
     rw [Function.onFun, Finset.disjoint_left]
     intro x hxa hxb
@@ -127,23 +134,25 @@ theorem mul_card_le_of_roots_mem {δ : ℕ} (F : Finset (Fin δ → K))
     have := (frobenius_orbit_irreducible K L (monicOf c) (monicOf_monic c) (hF c hc)).2
     rw [monicOf_natDegree] at this
     convert this
-  calc δ * F.card = ∑ c ∈ F, (((monicOf c).aroots L).toFinset).card := by
-        rw [Finset.sum_congr rfl hcard, Finset.sum_const, smul_eq_mul, mul_comm]
+  calc
+    δ * F.card = ∑ c ∈ F, (((monicOf c).aroots L).toFinset).card := by
+      rw [Finset.sum_congr rfl hcard, Finset.sum_const, smul_eq_mul, mul_comm]
     _ = (F.biUnion (fun c => ((monicOf c).aroots L).toFinset)).card :=
-        (Finset.card_biUnion hdisj).symm
+      (Finset.card_biUnion hdisj).symm
     _ ≤ S.card := Finset.card_le_card hsub
 
 theorem card_nthRootsFinset_le (m : ℕ) : (nthRootsFinset m (1 : L)).card ≤ m := by
   classical
-  calc (nthRootsFinset m (1 : L)).card ≤ (nthRoots m (1 : L)).card := by
-        unfold Polynomial.nthRootsFinset
-        convert Multiset.toFinset_card_le (nthRoots m (1 : L))
+  calc
+    (nthRootsFinset m (1 : L)).card ≤ (nthRoots m (1 : L)).card := by
+      unfold Polynomial.nthRootsFinset
+      convert Multiset.toFinset_card_le (nthRoots m (1 : L))
     _ ≤ m := Polynomial.card_nthRoots m 1
 
 end roots
 
-theorem lpow_le_rpow_quarter {l v g d : ℕ} (hBB : l ^ (4 * v) ≤ g ^ d) :
-    ((l ^ v : ℕ) : ℝ) ≤ (g : ℝ) ^ ((d : ℝ) / 4) := by
+theorem lpow_le_rpow_quarter {l v g d : ℕ} (hBB : l ^ (4 * v) ≤ g ^ d)
+    : ((l ^ v : ℕ) : ℝ) ≤ (g : ℝ) ^ ((d : ℝ) / 4) := by
   have hg0 : (0 : ℝ) ≤ g := Nat.cast_nonneg g
   have h1 : ((l ^ v : ℕ) : ℝ) ^ 4 ≤ ((g : ℝ) ^ ((d : ℝ) / 4)) ^ 4 := by
     rw [← Real.rpow_natCast ((g : ℝ) ^ ((d : ℝ) / 4)) 4, ← Real.rpow_mul hg0]
@@ -186,7 +195,9 @@ theorem same_factor_count : SameFactorCount := by
         by_contra hlt
         have : k = 0 ∨ k = 1 := by omega
         rcases this with rfl | rfl <;> omega
-      calc 2 * e = e * 2 := by ring
+      calc
+        2 * e
+          = e * 2 := by ring
         _ ≤ e * k := Nat.mul_le_mul_left e hk2
         _ = δ := hk.symm
     have hc1 : (T e).card ≤ (g ^ e - 1) * l ^ v := card_nthRootsFinset_le _
@@ -200,7 +211,9 @@ theorem same_factor_count : SameFactorCount := by
       have : ((2 * e : ℕ) : ℝ) ≤ (δ : ℝ) := by exact_mod_cast h2e
       push_cast at this
       linarith
-    calc ((T e).card : ℝ) ≤ (((g ^ e - 1) * l ^ v : ℕ) : ℝ) := by exact_mod_cast hc1
+    calc
+      ((T e).card : ℝ)
+        ≤ (((g ^ e - 1) * l ^ v : ℕ) : ℝ) := by exact_mod_cast hc1
       _ = ((g ^ e - 1 : ℕ) : ℝ) * ((l ^ v : ℕ) : ℝ) := by push_cast; ring
       _ ≤ B := mul_le_mul hc2 hlv (by positivity) (by positivity)
   set F := (Finset.univ : Finset (Fin δ → K)).filter (fun c => Irreducible (monicOf c) ∧
@@ -228,8 +241,7 @@ theorem same_factor_count : SameFactorCount := by
       have := (prime_to_part_endomorphism L L l x x (powMonoidHom (g ^ i)) hl hxfin hxfin).2
       simp only [powMonoidHom_apply] at this
       rw [hz, this, ← hi, ← hxy]
-    have hzn : z ^ n = 1 := by
-      rw [hz, primeToPart, ← pow_mul, mul_comm, pow_mul, hxn, one_pow]
+    have hzn : z ^ n = 1 := by rw [hz, primeToPart, ← pow_mul, mul_comm, pow_mul, hxn, one_pow]
     have hz0 : z ≠ 0 := by
       intro h0
       rw [h0, zero_pow hn0] at hzn
@@ -253,13 +265,11 @@ theorem same_factor_count : SameFactorCount := by
       have := root_pow_card_mul hirr hx k
       rw [hdeg, ← hk, ← hi] at this
       exact this.symm
-    have heI : e ∈ I := by
-      simp only [hI, Finset.mem_filter, Finset.mem_range]; exact ⟨helt, heδ⟩
+    have heI : e ∈ I := by simp only [hI, Finset.mem_filter, Finset.mem_range]; exact ⟨helt, heδ⟩
     obtain ⟨_, a, ha⟩ := prime_to_part_spec L l x hl hxfin
     have h1 : (x ^ (g ^ e - 1)) ^ (l ^ a) = 1 := by
       rw [← pow_mul, mul_comm, pow_mul, ha, ← pow_mul, mul_comm, pow_mul, hze, one_pow]
-    have h2 : (x ^ (g ^ e - 1)) ^ n = 1 := by
-      rw [← pow_mul, mul_comm, pow_mul, hxn, one_pow]
+    have h2 : (x ^ (g ^ e - 1)) ^ n = 1 := by rw [← pow_mul, mul_comm, pow_mul, hxn, one_pow]
     have h3 := (lpow_order_iff hl hn0 _ h2).mp ⟨a, h1⟩
     rw [Finset.mem_biUnion]
     refine ⟨e, heI, ?_⟩
@@ -272,8 +282,9 @@ theorem same_factor_count : SameFactorCount := by
     have : I.card ≤ δ := (Finset.card_filter_le _ _).trans (by simp)
     exact_mod_cast this
   have hS : ((I.biUnion T).card : ℝ) ≤ δ * B := by
-    calc ((I.biUnion T).card : ℝ) ≤ ((∑ e ∈ I, (T e).card : ℕ) : ℝ) := by
-          exact_mod_cast Finset.card_biUnion_le
+    calc
+      ((I.biUnion T).card : ℝ)
+        ≤ ((∑ e ∈ I, (T e).card : ℕ) : ℝ) := by exact_mod_cast Finset.card_biUnion_le
       _ = ∑ e ∈ I, ((T e).card : ℝ) := by push_cast; rfl
       _ ≤ ∑ _e ∈ I, B := Finset.sum_le_sum hTe
       _ = (I.card : ℝ) * B := by rw [Finset.sum_const, nsmul_eq_mul]

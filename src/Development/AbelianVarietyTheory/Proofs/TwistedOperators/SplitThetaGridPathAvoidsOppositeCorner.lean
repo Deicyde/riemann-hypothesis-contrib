@@ -12,8 +12,8 @@ def vertexDiff (X : ℕ × ℕ) : ℤ := (X.1 : ℤ) - X.2
 theorem vertexDiff_tgt (e : Edge) : vertexDiff e.tgt = vertexDiff e.src + 1 := by
   cases e <;> simp [vertexDiff, Edge.src, Edge.tgt] <;> omega
 
-theorem IsPath.pairwise_vertexDiff : ∀ {γ : List Edge}, IsPath γ →
-    γ.Pairwise fun a b => vertexDiff a.src < vertexDiff b.src := by
+theorem IsPath.pairwise_vertexDiff
+    : ∀ {γ : List Edge}, IsPath γ → γ.Pairwise fun a b => vertexDiff a.src < vertexDiff b.src := by
   intro γ h
   let r : Edge → Edge → Prop := fun a b => vertexDiff a.src < vertexDiff b.src
   let : Trans r r r := ⟨fun hab hbc => lt_trans hab hbc⟩
@@ -24,12 +24,16 @@ theorem IsPath.pairwise_vertexDiff : ∀ {γ : List Edge}, IsPath γ →
   rw [← hab, vertexDiff_tgt]
   omega
 
-theorem IsPath.eq_of_vertexDiff_eq {γ : List Edge} (hγ : IsPath γ) {a b : Edge} (ha : a ∈ γ) (hb : b ∈ γ)
-    (h : vertexDiff a.src = vertexDiff b.src) : a = b := by
+theorem IsPath.eq_of_vertexDiff_eq
+    {γ : List Edge} (hγ : IsPath γ)
+    {a b : Edge} (ha : a ∈ γ) (hb : b ∈ γ) (h : vertexDiff a.src = vertexDiff b.src)
+    : a = b := by
   by_contra hne
   have hpw := hγ.pairwise_vertexDiff
-  have key : ∀ {l : List Edge}, l.Pairwise (fun a b => vertexDiff a.src < vertexDiff b.src) →
-      ∀ {a b : Edge}, a ∈ l → b ∈ l → a ≠ b → vertexDiff a.src ≠ vertexDiff b.src := by
+  have key
+      : ∀ {l : List Edge},
+        l.Pairwise (fun a b => vertexDiff a.src < vertexDiff b.src)
+          → ∀ {a b : Edge}, a ∈ l → b ∈ l → a ≠ b → vertexDiff a.src ≠ vertexDiff b.src := by
     intro l hl
     induction hl with
     | nil => intro a b ha; simp at ha
@@ -42,8 +46,10 @@ theorem IsPath.eq_of_vertexDiff_eq {γ : List Edge} (hγ : IsPath γ) {a b : Edg
       · exact ih ha' hb' hab
   exact key hpw ha hb hne h
 
-theorem pathAvoid : ∀ {γ : List Edge} {i j : ℕ}, IsPath γ → PassesThrough i j γ →
-    ∀ b ∈ γ, b.src ≠ (i + 1, j + 1) ∧ b.tgt ≠ (i + 1, j + 1) := by
+theorem pathAvoid
+    : ∀ {γ : List Edge} {i j : ℕ},
+      IsPath γ → PassesThrough i j γ
+        → ∀ b ∈ γ, b.src ≠ (i + 1, j + 1) ∧ b.tgt ≠ (i + 1, j + 1) := by
   intro γ i j hγ hp b hb
   have hθ : Edge.theta i j ∈ γ := hp.subset (by simp)
   have hx : Edge.ex i j ∈ γ := hp.subset (by simp)

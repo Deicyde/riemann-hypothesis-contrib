@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing UpperTheory.V.Alg
 
-private theorem compl_of_nil {Q : Type} [CommRing Q] (J : Ideal Q) (N : ℕ) (h : J ^ N = ⊥) : IsAdicComplete J Q := by
+private theorem compl_of_nil {Q : Type} [CommRing Q] (J : Ideal Q) (N : ℕ) (h : J ^ N = ⊥)
+    : IsAdicComplete J Q := by
   have smod : ∀ (K : Ideal Q) (x y : Q), (x ≡ y [SMOD K • (⊤ : Submodule Q Q)]) ↔ x - y ∈ K := by
     intro K x y
     rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
@@ -24,9 +25,13 @@ private theorem compl_of_nil {Q : Type} [CommRing Q] (J : Ideal Q) (N : ℕ) (h 
       rw [h, Ideal.mem_bot, sub_eq_zero] at this
       exact (smod _ _ _).2 (by rw [this, sub_self]; exact Ideal.zero_mem _)
 
-private theorem mem_max {Λ R R' : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing R] [Algebra Λ R] [IsCO Λ R]
-    [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (h : R →ₐ[Λ] R') (n : ℕ) {y : R} (hy : y ∈ maximalIdeal R ^ n) :
-    h y ∈ maximalIdeal R' ^ n := by
+private theorem mem_max
+    {Λ R R' : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing R] [Algebra Λ R] [IsCO Λ R] [CommRing R']
+    [Algebra Λ R'] [IsCO Λ R']
+    (h : R →ₐ[Λ] R')
+    (n : ℕ)
+    {y : R} (hy : y ∈ maximalIdeal R ^ n)
+    : h y ∈ maximalIdeal R' ^ n := by
   have hle : (maximalIdeal R).map h ≤ maximalIdeal R' := by
     rw [Ideal.map_le_iff_le_comap]
     intro z hz
@@ -36,10 +41,14 @@ private theorem mem_max {Λ R R' : Type} [CommRing Λ] [IsLocalRing Λ] [CommRin
   rw [Ideal.map_pow] at this
   exact Ideal.pow_right_mono hle n this
 
-private theorem co_pow {Λ A : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing A] [Algebra Λ A] [IsNoetherianRing A]
-    (x : A →ₐ[Λ] ResidueField Λ) (I : Ideal A) [hI : I.IsMaximal] (hx : ∀ z, z ∈ I ↔ x z = 0) (n : ℕ) :
-    ∃ _ : IsCO Λ (A ⧸ I ^ (n + 1)), maximalIdeal (A ⧸ I ^ (n + 1)) ^ (n + 1) = ⊥ ∧
-      (res Λ (A ⧸ I ^ (n + 1))).comp (Ideal.Quotient.mkₐ Λ (I ^ (n + 1))) = x := by
+private theorem co_pow
+    {Λ A : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing A] [Algebra Λ A] [IsNoetherianRing A]
+    (x : A →ₐ[Λ] ResidueField Λ)
+    (I : Ideal A) [hI : I.IsMaximal]
+    (hx : ∀ z, z ∈ I ↔ x z = 0) (n : ℕ)
+    : ∃ _ : IsCO Λ (A ⧸ I ^ (n + 1)),
+      maximalIdeal (A ⧸ I ^ (n + 1)) ^ (n + 1) = ⊥
+        ∧ (res Λ (A ⧸ I ^ (n + 1))).comp (Ideal.Quotient.mkₐ Λ (I ^ (n + 1))) = x := by
   classical
   have hJle : I ^ (n + 1) ≤ I := Ideal.pow_le_self (Nat.succ_ne_zero n)
   have hunit : ∀ z : A, IsUnit (Ideal.Quotient.mk (I ^ (n + 1)) z) ↔ z ∉ I := by
@@ -59,7 +68,9 @@ private theorem co_pow {Λ A : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing A]
       obtain ⟨w, i, hi, hwi⟩ := hI.exists_inv hz
       have hnil : IsNilpotent (Ideal.Quotient.mk (I ^ (n + 1)) i) :=
         ⟨n + 1, by rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]; exact Ideal.pow_mem_pow hi _⟩
-      have e : Ideal.Quotient.mk (I ^ (n + 1)) z * Ideal.Quotient.mk (I ^ (n + 1)) w = 1 - Ideal.Quotient.mk (I ^ (n + 1)) i := by
+      have e
+          : Ideal.Quotient.mk (I ^ (n + 1)) z * Ideal.Quotient.mk (I ^ (n + 1)) w
+            = 1 - Ideal.Quotient.mk (I ^ (n + 1)) i := by
         rw [← map_mul, ← map_one (Ideal.Quotient.mk (I ^ (n + 1))), ← map_sub]
         congr 1
         linear_combination hwi
@@ -72,7 +83,8 @@ private theorem co_pow {Λ A : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing A]
     exact hI.ne_top (top_le_iff.1 hJle)
   haveI : Nontrivial (A ⧸ I ^ (n + 1)) := ⟨⟨0, 1, fun h01 => hne ((Ideal.eq_top_iff_one _).2
     (Ideal.Quotient.eq_zero_iff_mem.1 ((map_one (Ideal.Quotient.mk (I ^ (n + 1)))).trans h01.symm)))⟩⟩
-  have hnonunit : ∀ y : A ⧸ I ^ (n + 1), ¬IsUnit y ↔ y ∈ I.map (Ideal.Quotient.mk (I ^ (n + 1))) := by
+  have hnonunit
+      : ∀ y : A ⧸ I ^ (n + 1), ¬ IsUnit y ↔ y ∈ I.map (Ideal.Quotient.mk (I ^ (n + 1))) := by
     intro y
     obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective y
     rw [hunit, not_not, Ideal.mem_map_iff_of_surjective _ Ideal.Quotient.mk_surjective]
@@ -99,20 +111,25 @@ private theorem co_pow {Λ A : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing A]
     refine ⟨a, ?_⟩
     rw [hx, map_sub, AlgHom.commutes, ← ha]
     exact sub_eq_zero.2 rfl
-  have halg : ∀ a : Λ, algebraMap Λ (A ⧸ I ^ (n + 1)) a = Ideal.Quotient.mk (I ^ (n + 1)) (algebraMap Λ A a) := by
+  have halg
+      : ∀ a : Λ,
+        algebraMap Λ (A ⧸ I ^ (n + 1)) a = Ideal.Quotient.mk (I ^ (n + 1)) (algebraMap Λ A a) := by
     intro a
     rw [IsScalarTower.algebraMap_apply Λ A (A ⧸ I ^ (n + 1)), Ideal.Quotient.algebraMap_eq]
-  have hcompl : IsAdicComplete (maximalIdeal (A ⧸ I ^ (n + 1))) (A ⧸ I ^ (n + 1)) := compl_of_nil _ (n + 1) hpow
-  have hlh : IsLocalHom (algebraMap Λ (A ⧸ I ^ (n + 1))) := ⟨fun a ha => by
-    by_contra hna
-    have ham : a ∈ maximalIdeal Λ := (IsLocalRing.mem_maximalIdeal a).2 hna
-    have h0 : x (algebraMap Λ A a) = 0 := by
-      rw [AlgHom.commutes]
-      exact (IsLocalRing.residue_eq_zero_iff a).2 ham
-    rw [← hx] at h0
-    rw [halg, hunit] at ha
-    exact ha h0⟩
-  have hrs : ∀ y : A ⧸ I ^ (n + 1), ∃ a : Λ, y - algebraMap Λ _ a ∈ maximalIdeal (A ⧸ I ^ (n + 1)) := by
+  have hcompl : IsAdicComplete (maximalIdeal (A ⧸ I ^ (n + 1))) (A ⧸ I ^ (n + 1)) :=
+    compl_of_nil _ (n + 1) hpow
+  have hlh : IsLocalHom (algebraMap Λ (A ⧸ I ^ (n + 1))) :=
+    ⟨fun a ha => by
+      by_contra hna
+      have ham : a ∈ maximalIdeal Λ := (IsLocalRing.mem_maximalIdeal a).2 hna
+      have h0 : x (algebraMap Λ A a) = 0 := by
+        rw [AlgHom.commutes]
+        exact (IsLocalRing.residue_eq_zero_iff a).2 ham
+      rw [← hx] at h0
+      rw [halg, hunit] at ha
+      exact ha h0⟩
+  have hrs
+      : ∀ y : A ⧸ I ^ (n + 1), ∃ a : Λ, y - algebraMap Λ _ a ∈ maximalIdeal (A ⧸ I ^ (n + 1)) := by
     intro y
     obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective y
     obtain ⟨a, ha⟩ := hres z
@@ -134,11 +151,14 @@ private theorem co_pow {Λ A : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing A]
   rw [e1, e2, ← halg]
   simp only [AlgHom.commutes]
 
-theorem UpperTheory.V.Ws.fibCpl :
-    ∀ {Λ A R : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing A] [Algebra Λ A] [IsNoetherianRing A] [CommRing R] [Algebra Λ R] [IsCO Λ R] [Algebra A R] [IsScalarTower Λ A R],
-          (∀ (R' : Type) [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (g : A →ₐ[Λ] R'), (res Λ R').comp g = (res Λ R).comp (IsScalarTower.toAlgHom Λ A R) →
-            ∃! h : R →ₐ[Λ] R', h.comp (IsScalarTower.toAlgHom Λ A R) = g) →
-          ((maximalIdeal R).comap (algebraMap A R)).IsMaximal ∧ UpperTheory.V.CA.IsCplAt ((maximalIdeal R).comap (algebraMap A R)) R := by
+theorem UpperTheory.V.Ws.fibCpl
+    : ∀ {Λ A R : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing A] [Algebra Λ A] [IsNoetherianRing A]
+        [CommRing R] [Algebra Λ R] [IsCO Λ R] [Algebra A R] [IsScalarTower Λ A R],
+      (∀ (R' : Type) [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (g : A →ₐ[Λ] R'),
+          (res Λ R').comp g = (res Λ R).comp (IsScalarTower.toAlgHom Λ A R)
+            → ∃! h : R →ₐ[Λ] R', h.comp (IsScalarTower.toAlgHom Λ A R) = g)
+        → ((maximalIdeal R).comap (algebraMap A R)).IsMaximal
+          ∧ UpperTheory.V.CA.IsCplAt ((maximalIdeal R).comap (algebraMap A R)) R := by
   intro Λ A R _ _ _ _ _ _ _ _ _ _ H
   obtain ⟨P, hP⟩ : ∃ P, P = (maximalIdeal R).comap (algebraMap A R) := ⟨_, rfl⟩
   rw [← hP]
@@ -158,8 +178,11 @@ theorem UpperTheory.V.Ws.fibCpl :
   haveI hPmax : P.IsMaximal := by
     rw [hPker]
     exact RingHom.ker_isMaximal_of_surjective _ hxsurj
-  have hB : ∀ k : ℕ, ∃ _ : IsCO Λ (A ⧸ P ^ (k + 1)), maximalIdeal (A ⧸ P ^ (k + 1)) ^ (k + 1) = ⊥ ∧
-      (res Λ (A ⧸ P ^ (k + 1))).comp (Ideal.Quotient.mkₐ Λ (P ^ (k + 1))) = x := fun k => co_pow x P hx k
+  have hB
+      : ∀ k : ℕ, ∃ _ : IsCO Λ (A ⧸ P ^ (k + 1)),
+        maximalIdeal (A ⧸ P ^ (k + 1)) ^ (k + 1) = ⊥
+          ∧ (res Λ (A ⧸ P ^ (k + 1))).comp (Ideal.Quotient.mkₐ Λ (P ^ (k + 1))) = x := fun k =>
+    co_pow x P hx k
   have hcp : ∀ n : ℕ, (maximalIdeal R ^ n).comap (algebraMap A R) = P ^ n := by
     intro n
     apply le_antisymm
@@ -187,7 +210,8 @@ theorem UpperTheory.V.Ws.fibCpl :
       obtain ⟨h, hh, -⟩ := H (A ⧸ P ^ (k + 1)) (Ideal.Quotient.mkₐ Λ (P ^ (k + 1))) (by rw [hres])
       have hne : maximalIdeal R ^ (k + 1) ≠ ⊤ := by
         intro ht
-        have hle : maximalIdeal R ^ (k + 1) ≤ maximalIdeal R := Ideal.pow_le_self (Nat.succ_ne_zero k)
+        have hle : maximalIdeal R ^ (k + 1) ≤ maximalIdeal R :=
+          Ideal.pow_le_self (Nat.succ_ne_zero k)
         rw [ht] at hle
         exact (IsLocalRing.maximalIdeal.isMaximal R).ne_top (top_le_iff.1 hle)
       haveI : Nontrivial (R ⧸ maximalIdeal R ^ (k + 1)) := ⟨⟨0, 1, fun h01 => hne ((Ideal.eq_top_iff_one _).2
@@ -195,19 +219,23 @@ theorem UpperTheory.V.Ws.fibCpl :
       haveI hcoQ : IsCO Λ (R ⧸ maximalIdeal R ^ (k + 1)) :=
         co_quot Λ R _ (Ideal.Quotient.mkₐ Λ (maximalIdeal R ^ (k + 1))) (Ideal.Quotient.mkₐ_surjective Λ _)
       let j : (A ⧸ P ^ (k + 1)) →ₐ[Λ] (R ⧸ maximalIdeal R ^ (k + 1)) :=
-        Ideal.quotientMapₐ (maximalIdeal R ^ (k + 1)) (IsScalarTower.toAlgHom Λ A R) (fun z hz => (hcp (k + 1)).ge hz)
-      obtain ⟨u, hu, huniq⟩ := H (R ⧸ maximalIdeal R ^ (k + 1))
-        ((Ideal.Quotient.mkₐ Λ (maximalIdeal R ^ (k + 1))).comp (IsScalarTower.toAlgHom Λ A R)) (by
+        Ideal.quotientMapₐ (maximalIdeal R ^ (k + 1)) (IsScalarTower.toAlgHom Λ A R)
+          (fun z hz => (hcp (k + 1)).ge hz)
+      obtain ⟨u, hu, huniq⟩ :=
+        H (R ⧸ maximalIdeal R ^ (k + 1))
+          ((Ideal.Quotient.mkₐ Λ (maximalIdeal R ^ (k + 1))).comp (IsScalarTower.toAlgHom Λ A R))
+          (by
+            apply AlgHom.ext
+            intro z
+            simp only [AlgHom.comp_apply]
+            exact res_map (Ideal.Quotient.mkₐ Λ (maximalIdeal R ^ (k + 1))) (algebraMap A R z))
+      have e1 : j.comp h = u :=
+        huniq _ (by
+          show (j.comp h).comp (IsScalarTower.toAlgHom Λ A R) = _
+          rw [AlgHom.comp_assoc, hh]
           apply AlgHom.ext
           intro z
-          simp only [AlgHom.comp_apply]
-          exact res_map (Ideal.Quotient.mkₐ Λ (maximalIdeal R ^ (k + 1))) (algebraMap A R z))
-      have e1 : j.comp h = u := huniq _ (by
-        show (j.comp h).comp (IsScalarTower.toAlgHom Λ A R) = _
-        rw [AlgHom.comp_assoc, hh]
-        apply AlgHom.ext
-        intro z
-        rfl)
+          rfl)
       have e2 : Ideal.Quotient.mkₐ Λ (maximalIdeal R ^ (k + 1)) = u := huniq _ rfl
       have e3 : Ideal.Quotient.mkₐ Λ (maximalIdeal R ^ (k + 1)) r = j (h r) := by
         rw [e2, ← e1]
@@ -215,7 +243,10 @@ theorem UpperTheory.V.Ws.fibCpl :
       obtain ⟨z, hz⟩ := Ideal.Quotient.mk_surjective (h r)
       refine ⟨z, ?_⟩
       rw [← hz] at e3
-      have e4 : j (Ideal.Quotient.mk _ z) = Ideal.Quotient.mk (maximalIdeal R ^ (k + 1)) (algebraMap A R z) := rfl
+      have e4
+          : j (Ideal.Quotient.mk _ z)
+            = Ideal.Quotient.mk (maximalIdeal R ^ (k + 1)) (algebraMap A R z) :=
+        rfl
       rw [e4, Ideal.Quotient.mkₐ_eq_mk] at e3
       exact Ideal.Quotient.eq.1 e3
   exact ⟨hPmax, ⟨inferInstance, IsCO.complete (O := Λ), hcp, hdense⟩⟩

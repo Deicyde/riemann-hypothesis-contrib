@@ -9,15 +9,15 @@ namespace UpperTheory.Gal.TP.Sub
 
 open Formalism.BasicNotions
 
-private theorem multiset_map_fin_add_eq_add {n t : ℕ} (f : Fin (n + t) → ℤ) :
-    Multiset.map f Finset.univ.val =
-      Multiset.map (fun k : Fin n => f (Fin.castAdd t k)) Finset.univ.val +
-        Multiset.map (fun i : Fin t => f (Fin.natAdd n i)) Finset.univ.val := by
+private theorem multiset_map_fin_add_eq_add {n t : ℕ} (f : Fin (n + t) → ℤ)
+    : Multiset.map f Finset.univ.val
+      = Multiset.map (fun k : Fin n => f (Fin.castAdd t k)) Finset.univ.val
+        + Multiset.map (fun i : Fin t => f (Fin.natAdd n i)) Finset.univ.val := by
   rw [Fin.univ_val_map, List.ofFn_add, ← Multiset.coe_add, Fin.univ_val_map, Fin.univ_val_map]
   rfl
 
-private theorem multiset_map_fin_rev_eq {n : ℕ} (f : Fin n → ℤ) :
-    Multiset.map f Finset.univ.val = Multiset.map (fun k : Fin n => f k.rev) Finset.univ.val := by
+private theorem multiset_map_fin_rev_eq {n : ℕ} (f : Fin n → ℤ)
+    : Multiset.map f Finset.univ.val = Multiset.map (fun k : Fin n => f k.rev) Finset.univ.val := by
   conv_lhs => rw [← Multiset.map_univ_val_equiv (Fin.revPerm : Equiv.Perm (Fin n)), Multiset.map_map]
   rfl
 
@@ -34,7 +34,7 @@ theorem wtId_holds : WtId := by
       simp only [Fin.coe_castAdd, k.2, dif_pos, Fin.eta] at h1
       simp only [Function.comp_apply, Fin.coe_castAdd]
       omega
-    · rw [multiset_map_fin_rev_eq (fun i : Fin t => -p i)]
+    · rw [multiset_map_fin_rev_eq (fun i : Fin t => - p i)]
       congr 1
       funext i
       have h1 := hL (Fin.natAdd n i)
@@ -45,7 +45,8 @@ theorem wtId_holds : WtId := by
       push_cast at h1
       omega
   · unfold wtJumps
-    rw [multiset_map_fin_rev_eq, multiset_map_fin_rev_eq (fun k : Fin n => ((k : ℕ) : ℤ) - lam.dual.w k)]
+    rw [multiset_map_fin_rev_eq,
+      multiset_map_fin_rev_eq (fun k : Fin n => ((k : ℕ) : ℤ) - lam.dual.w k)]
     simp only [DomWeight.dual, Fin.rev_rev, Fin.val_rev]
     rw [multiset_map_fin_add_eq_add]
     congr 1

@@ -5,58 +5,77 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsFro
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
 namespace UpperTheory.Kd.C7.LangPolynomialRoots
 
 open GlobalTheory.LangWitt
 
-variable {p : ℕ} [hp : Fact p.Prime] {k : Type} [Field k] [CharP k p] [IsAlgClosed k]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {k : Type} [Field k] [CharP k p] [IsAlgClosed k]
   {W : Type} [CommRing W]
 
 end UpperTheory.Kd.C7.LangPolynomialRoots
 
-private theorem exists_pow_char_sub_mul_eq {K : Type} [Field K] [IsAlgClosed K] (p : ℕ) [hp : Fact p.Prime]
-    (lam c : K) : ∃ e : K, e ^ p - lam * e = c := by
+private theorem exists_pow_char_sub_mul_eq
+    {K : Type} [Field K] [IsAlgClosed K] (p : ℕ) [hp : Fact p.Prime] (lam c : K)
+    : ∃ e : K, e ^ p - lam * e = c := by
   have h2 : 2 ≤ p := hp.out.two_le
-  have hdeg : (Polynomial.X ^ p - Polynomial.C lam * Polynomial.X - Polynomial.C c : Polynomial K).natDegree = p := by
+  have hdeg
+      : (Polynomial.X ^ p - Polynomial.C lam * Polynomial.X - Polynomial.C c
+          : Polynomial K).natDegree
+        = p := by
     rw [Polynomial.natDegree_sub_C, Polynomial.natDegree_sub_eq_left_of_natDegree_lt,
       Polynomial.natDegree_X_pow]
     rw [Polynomial.natDegree_X_pow]
-    exact lt_of_le_of_lt ((Polynomial.natDegree_C_mul_le _ _).trans Polynomial.natDegree_X_le) (by omega)
-  obtain ⟨e, he⟩ := IsAlgClosed.exists_root
-    (Polynomial.X ^ p - Polynomial.C lam * Polynomial.X - Polynomial.C c : Polynomial K)
-    (by
-      have hne : (Polynomial.X ^ p - Polynomial.C lam * Polynomial.X - Polynomial.C c : Polynomial K) ≠ 0 := by
-        intro h
-        rw [h, Polynomial.natDegree_zero] at hdeg
-        omega
-      rw [Polynomial.degree_eq_natDegree hne, hdeg]
-      exact_mod_cast hp.out.ne_zero)
+    exact lt_of_le_of_lt ((Polynomial.natDegree_C_mul_le _ _).trans Polynomial.natDegree_X_le)
+      (by omega)
+  obtain ⟨e, he⟩ :=
+    IsAlgClosed.exists_root
+      (Polynomial.X ^ p - Polynomial.C lam * Polynomial.X - Polynomial.C c : Polynomial K)
+      (by
+        have hne
+            : (Polynomial.X ^ p - Polynomial.C lam * Polynomial.X - Polynomial.C c : Polynomial K)
+              ≠ 0 := by
+          intro h
+          rw [h, Polynomial.natDegree_zero] at hdeg
+          omega
+        rw [Polynomial.degree_eq_natDegree hne, hdeg]
+        exact_mod_cast hp.out.ne_zero)
   refine ⟨e, ?_⟩
   simp only [Polynomial.IsRoot, Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X,
-    Polynomial.eval_mul, Polynomial.eval_C] at he
+      Polynomial.eval_mul, Polynomial.eval_C]
+    at he
   exact sub_eq_zero.mp he
 
-private theorem exists_mem_span_fixed_sub_smul_eq {K E : Type} [Field K] [IsAlgClosed K] (p : ℕ) [hp : Fact p.Prime]
-    [AddCommGroup E] [Module K E] (ψ : E →+ E)
-    (hψs : ∀ (c : K) (v : E), ψ (c • v) = c ^ p • ψ v) (lam : K) (u : E)
-    (hu : u ∈ Submodule.span K {v : E | ψ v = v}) :
-    ∃ z ∈ Submodule.span K {v : E | ψ v = v}, ψ z - lam • z = u := by
+private theorem exists_mem_span_fixed_sub_smul_eq
+    {K E : Type} [Field K] [IsAlgClosed K]
+    (p : ℕ) [hp : Fact p.Prime] [AddCommGroup E] [Module K E]
+    (ψ : E →+ E) (hψs : ∀ (c : K) (v : E), ψ (c • v) = c ^ p • ψ v)
+    (lam : K)
+    (u : E) (hu : u ∈ Submodule.span K {v : E | ψ v = v})
+    : ∃ z ∈ Submodule.span K {v : E | ψ v = v}, ψ z - lam • z = u := by
   obtain ⟨n, f, g, rfl⟩ := Submodule.mem_span_set'.mp hu
   choose e he using fun i => exists_pow_char_sub_mul_eq (K := K) p lam (f i)
-  refine ⟨∑ i, e i • (g i : E),
-    Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span (g i).2)), ?_⟩
+  refine ⟨
+    ∑ i, e i • (g i : E),
+    Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span (g i).2)),
+    ?_
+  ⟩
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, Finset.smul_sum, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   have hg : ψ (g i : E) = g i := (g i).2
   rw [hψs, hg, smul_smul, ← sub_smul, he]
 
-private theorem span_fixed_eq_whole_of_semilinear_injective {K E : Type} [Field K] [IsAlgClosed K] (p : ℕ) [hp : Fact p.Prime]
-    [AddCommGroup E] [Module K E] [FiniteDimensional K E] (ψ : E →+ E)
-    (hψs : ∀ (c : K) (v : E), ψ (c • v) = c ^ p • ψ v) (hψi : Function.Injective ψ) :
-    Submodule.span K {v : E | ψ v = v} = ⊤ := by
+private theorem span_fixed_eq_whole_of_semilinear_injective
+    {K E : Type} [Field K] [IsAlgClosed K]
+    (p : ℕ) [hp : Fact p.Prime] [AddCommGroup E] [Module K E] [FiniteDimensional K E]
+    (ψ : E →+ E) (hψs : ∀ (c : K) (v : E), ψ (c • v) = c ^ p • ψ v) (hψi : Function.Injective ψ)
+    : Submodule.span K {v : E | ψ v = v} = ⊤ := by
   classical
   set U := Submodule.span K {v : E | ψ v = v} with hU
   by_contra hne
@@ -108,14 +127,16 @@ private theorem span_fixed_eq_whole_of_semilinear_injective {K E : Type} [Field 
     apply hmin s (by omega)
     have key : ψ (w s) = ψ (u' + ∑ i : Fin s, b i.succ • w i) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hwsucc, ← hsum, map_add (f := _), hu', map_sum, Fin.sum_univ_succ, ha, zero_smul, zero_add]
+        rw [← hwsucc, ← hsum, map_add (f := _), hu', map_sum, Fin.sum_univ_succ, ha, zero_smul,
+          zero_add]
       congr 1
       refine Finset.sum_congr rfl (fun i _ => ?_)
       rw [hψs, hb, ← hwsucc]
       rfl
     rw [hψi key]
-    exact Submodule.add_mem _ (Submodule.mem_sup_left hu'U) (Submodule.mem_sup_right
-      (Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))))
+    exact Submodule.add_mem _ (Submodule.mem_sup_left hu'U)
+      (Submodule.mem_sup_right (Submodule.sum_mem _
+        (fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))))
   set a' : ℕ → K := fun i => if h : i < s + 1 then a ⟨i, h⟩ else 0 with ha'
   have ha'0 : a' 0 = a 0 := by simp [a']
   have hsum' : u + ∑ i ∈ Finset.range (s + 1), a' i • w i = w (s + 1) := by
@@ -123,11 +144,13 @@ private theorem span_fixed_eq_whole_of_semilinear_injective {K E : Type} [Field 
     congr 1
     refine Finset.sum_congr rfl (fun i _ => ?_)
     simp only [ha', dif_pos i.2, Fin.eta]
-  let Xs : ℕ → Polynomial K := fun n => Nat.rec (Polynomial.C (a' 0) * Polynomial.X ^ p)
-    (fun i P => P ^ p + Polynomial.C (a' (i + 1)) * Polynomial.X ^ p) n
+  let Xs : ℕ → Polynomial K := fun n =>
+    Nat.rec (Polynomial.C (a' 0) * Polynomial.X ^ p)
+      (fun i P => P ^ p + Polynomial.C (a' (i + 1)) * Polynomial.X ^ p)
+      n
   have hXs0 : Xs 0 = Polynomial.C (a' 0) * Polynomial.X ^ p := rfl
-  have hXsS : ∀ i, Xs (i + 1) = Xs i ^ p + Polynomial.C (a' (i + 1)) * Polynomial.X ^ p :=
-    fun i => rfl
+  have hXsS : ∀ i, Xs (i + 1) = Xs i ^ p + Polynomial.C (a' (i + 1)) * Polynomial.X ^ p := fun i =>
+    rfl
   have h2p : 2 ≤ p := hp.out.two_le
   have hdvd : ∀ i, Polynomial.X ^ p ∣ Xs i := by
     intro i
@@ -139,17 +162,18 @@ private theorem span_fixed_eq_whole_of_semilinear_injective {K E : Type} [Field 
   have hdeg : ∀ i, (Xs i).natDegree = p ^ (i + 1) := by
     intro i
     induction i with
-    | zero =>
-      rw [hXs0, Polynomial.natDegree_C_mul_X_pow _ _ (by rwa [ha'0]), pow_one]
+    | zero => rw [hXs0, Polynomial.natDegree_C_mul_X_pow _ _ (by rwa [ha'0]), pow_one]
     | succ i ih =>
       have hle : p ≤ p ^ (i + 1) := by
-        calc p = p ^ 1 := (pow_one p).symm
+        calc
+          p = p ^ 1 := (pow_one p).symm
           _ ≤ p ^ (i + 1) := Nat.pow_le_pow_right (by omega) (by omega)
       rw [hXsS, Polynomial.natDegree_add_eq_left_of_natDegree_lt, Polynomial.natDegree_pow, ih,
         ← pow_succ']
       rw [Polynomial.natDegree_pow, ih]
-      calc (Polynomial.C (a' (i + 1)) * Polynomial.X ^ p).natDegree ≤ p :=
-            (Polynomial.natDegree_C_mul_le _ _).trans (Polynomial.natDegree_X_pow_le p)
+      calc
+        (Polynomial.C (a' (i + 1)) * Polynomial.X ^ p).natDegree
+          ≤ p := (Polynomial.natDegree_C_mul_le _ _).trans (Polynomial.natDegree_X_pow_le p)
         _ < p * p ^ (i + 1) := by nlinarith
   obtain ⟨h, hh⟩ : Polynomial.X ^ 2 ∣ Xs s := (pow_dvd_pow _ h2p).trans (hdvd s)
   have hh0 : h ≠ 0 := by
@@ -168,8 +192,7 @@ private theorem span_fixed_eq_whole_of_semilinear_injective {K E : Type} [Field 
     rw [Polynomial.degree_eq_natDegree hgne, hgdeg]
     exact_mod_cast Nat.succ_ne_zero h.natDegree
   obtain ⟨t, ht⟩ := IsAlgClosed.exists_root g hgd
-  have hth : t * h.eval t = 1 := by
-    simpa [g, Polynomial.IsRoot, sub_eq_zero] using ht
+  have hth : t * h.eval t = 1 := by simpa [g, Polynomial.IsRoot, sub_eq_zero] using ht
   have ht0 : t ≠ 0 := by
     rintro rfl
     simp at hth
@@ -201,8 +224,7 @@ private theorem span_fixed_eq_whole_of_semilinear_injective {K E : Type} [Field 
     have hmemS : ∑ i ∈ Finset.range s, x i • w i ∈ W s := by
       apply Submodule.mem_sup_right
       rw [← Fin.sum_univ_eq_sum_range (fun i => x i • w i) s]
-      exact Submodule.sum_mem _
-        (fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
+      exact Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
     have htw : t • w s ∈ W s := by
       have e2 : t • w s = y - ∑ i ∈ Finset.range s, x i • w i := by
         rw [hsplit]
@@ -211,7 +233,8 @@ private theorem span_fixed_eq_whole_of_semilinear_injective {K E : Type} [Field 
       exact Submodule.sub_mem _ (Submodule.mem_sup_left hyU') hmemS
     have h3 := Submodule.smul_mem _ t⁻¹ htw
     rwa [smul_smul, inv_mul_cancel₀ ht0, one_smul] at h3
-  obtain ⟨z, hzU, hz⟩ := exists_mem_span_fixed_sub_smul_eq p ψ hψs 1 (-(t ^ p • u)) (U.neg_mem (U.smul_mem _ hu))
+  obtain ⟨z, hzU, hz⟩ :=
+    exists_mem_span_fixed_sub_smul_eq p ψ hψs 1 (-(t ^ p • u)) (U.neg_mem (U.smul_mem _ hu))
   have hz' : ψ z = z - t ^ p • u := by
     rw [one_smul, sub_eq_iff_eq_add] at hz
     rw [hz]
@@ -224,25 +247,28 @@ private theorem span_fixed_eq_whole_of_semilinear_injective {K E : Type} [Field 
   have h4 := U.sub_mem hyz hzU
   simpa using h4
 
-private theorem exists_matrix_frob_map_eq_mul {K : Type} [Field K] [IsAlgClosed K] (p : ℕ) [Fact p.Prime]
-    [CharP K p] (d : ℕ) (N : Matrix (Fin d) (Fin d) K) (hN : IsUnit N.det) :
-    ∃ V : Matrix (Fin d) (Fin d) K, IsUnit V.det ∧ V.map (fun x => x ^ p) = N * V := by
+private theorem exists_matrix_frob_map_eq_mul
+    {K : Type} [Field K] [IsAlgClosed K]
+    (p : ℕ) [Fact p.Prime] [CharP K p]
+    (d : ℕ) (N : Matrix (Fin d) (Fin d) K) (hN : IsUnit N.det)
+    : ∃ V : Matrix (Fin d) (Fin d) K, IsUnit V.det ∧ V.map (fun x => x ^ p) = N * V := by
   classical
   have hp0 : p ≠ 0 := (Fact.out : p.Prime).ne_zero
   have hNN : N * N⁻¹ = 1 := Matrix.mul_nonsing_inv N hN
-  let ψ : (Fin d → K) →+ (Fin d → K) :=
-    { toFun := fun v => Matrix.mulVec N⁻¹ (fun i => v i ^ p)
-      map_zero' := by
-        have e : (fun i => (0 : Fin d → K) i ^ p) = 0 := by
-          ext i
-          simp [hp0]
-        simp only [e, Matrix.mulVec_zero]
-      map_add' := by
-        intro u v
-        have e : (fun i => (u + v) i ^ p) = (fun i => u i ^ p) + (fun i => v i ^ p) := by
-          ext i
-          simp [add_pow_char]
-        simp only [e, Matrix.mulVec_add] }
+  let ψ : (Fin d → K) →+ (Fin d → K) := {
+    toFun := fun v => Matrix.mulVec N⁻¹ (fun i => v i ^ p)
+    map_zero' := by
+      have e : (fun i => (0 : Fin d → K) i ^ p) = 0 := by
+        ext i
+        simp [hp0]
+      simp only [e, Matrix.mulVec_zero]
+    map_add' := by
+      intro u v
+      have e : (fun i => (u + v) i ^ p) = (fun i => u i ^ p) + (fun i => v i ^ p) := by
+        ext i
+        simp [add_pow_char]
+      simp only [e, Matrix.mulVec_add]
+  }
   have hψ : ∀ v, ψ v = Matrix.mulVec N⁻¹ (fun i => v i ^ p) := fun v => rfl
   have hback : ∀ v, Matrix.mulVec N (ψ v) = fun i => v i ^ p := by
     intro v
@@ -286,8 +312,7 @@ private theorem exists_matrix_frob_map_eq_mul {K : Type} [Field K] [IsAlgClosed 
     rw [← h1]
     simp [Matrix.mulVec, dotProduct]
 
-theorem UpperTheory.Kd.C7.pLangR :
-    UpperTheory.Kd.C7.SLangR := by
+theorem UpperTheory.Kd.C7.pLangR : UpperTheory.Kd.C7.SLangR := by
   intro R _ p hp σ hσ hu hroot d N hN
   obtain ⟨hdom, hprime, hcompl, hfrob, hperf⟩ := hσ
   have hpnu : ¬ IsUnit (p : R) := hprime.not_unit
@@ -312,8 +337,9 @@ theorem UpperTheory.Kd.C7.pLangR :
   have hπσ : ∀ x, π (σ x) = π x ^ p := fun x =>
     (Ideal.Quotient.eq.mpr (hfrob x)).trans (map_pow _ _ _)
   have hp0 : π (p : R) = 0 := Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self _)
-  have hdiv : ∀ (q : R) (M : Matrix (Fin d) (Fin d) R), (∀ i j, M i j ∈ Ideal.span {q}) →
-      ∃ C : Matrix (Fin d) (Fin d) R, M = q • C := by
+  have hdiv
+      : ∀ (q : R) (M : Matrix (Fin d) (Fin d) R),
+        (∀ i j, M i j ∈ Ideal.span {q}) → ∃ C : Matrix (Fin d) (Fin d) R, M = q • C := by
     intro q M hM
     choose C hC using fun i j => Ideal.mem_span_singleton'.mp (hM i j)
     refine ⟨Matrix.of C, ?_⟩
@@ -334,11 +360,14 @@ theorem UpperTheory.Kd.C7.pLangR :
     rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
     exact hN.map π
   obtain ⟨Vb, hVb, hVbeq⟩ := exists_matrix_frob_map_eq_mul p d (N.map π) hNb
-  have step : ∀ (n : ℕ) (V : Matrix (Fin d) (Fin d) R), (V.map π = Vb ∧
-      ∃ C : Matrix (Fin d) (Fin d) R, V.map σ - N * V = ((p : R) ^ (n + 1)) • C) →
-      ∃ X : Matrix (Fin d) (Fin d) R, ((V + ((p : R) ^ (n + 1)) • X).map π = Vb ∧
-        ∃ C : Matrix (Fin d) (Fin d) R, (V + ((p : R) ^ (n + 1)) • X).map σ -
-          N * (V + ((p : R) ^ (n + 1)) • X) = ((p : R) ^ (n + 1 + 1)) • C) := by
+  have step
+      : ∀ (n : ℕ) (V : Matrix (Fin d) (Fin d) R),
+        (V.map π = Vb ∧ ∃ C : Matrix (Fin d) (Fin d) R, V.map σ - N * V = ((p : R) ^ (n + 1)) • C)
+          → ∃ X : Matrix (Fin d) (Fin d) R,
+            ((V + ((p : R) ^ (n + 1)) • X).map π = Vb
+              ∧ ∃ C : Matrix (Fin d) (Fin d) R,
+                (V + ((p : R) ^ (n + 1)) • X).map σ - N * (V + ((p : R) ^ (n + 1)) • X)
+                  = ((p : R) ^ (n + 1 + 1)) • C) := by
     rintro n V ⟨hV, C, hC⟩
     have hdetV : IsUnit (N * V).det := by
       rw [Matrix.det_mul]
@@ -348,17 +377,20 @@ theorem UpperTheory.Kd.C7.pLangR :
       intro c
       have hmon : (Polynomial.X ^ p + (Polynomial.C c - Polynomial.X) : Polynomial R).Monic := by
         apply Polynomial.monic_X_pow_add
-        calc (Polynomial.C c - Polynomial.X : Polynomial R).degree ≤ 1 := by
-              refine (Polynomial.degree_sub_le _ _).trans (max_le ?_ Polynomial.degree_X_le)
-              exact Polynomial.degree_C_le.trans (by norm_num)
+        calc
+          (Polynomial.C c - Polynomial.X : Polynomial R).degree ≤ 1 := by
+            refine (Polynomial.degree_sub_le _ _).trans (max_le ?_ Polynomial.degree_X_le)
+            exact Polynomial.degree_C_le.trans (by norm_num)
           _ < p := by exact_mod_cast hp.out.one_lt
-      have hdeg : 0 < (Polynomial.X ^ p + (Polynomial.C c - Polynomial.X) : Polynomial R).natDegree := by
+      have hdeg
+          : 0 < (Polynomial.X ^ p + (Polynomial.C c - Polynomial.X) : Polynomial R).natDegree := by
         rw [Polynomial.natDegree_add_eq_left_of_degree_lt, Polynomial.natDegree_X_pow]
         · exact hp.out.pos
         · rw [Polynomial.degree_X_pow]
-          calc (Polynomial.C c - Polynomial.X : Polynomial R).degree ≤ 1 := by
-                refine (Polynomial.degree_sub_le _ _).trans (max_le ?_ Polynomial.degree_X_le)
-                exact Polynomial.degree_C_le.trans (by norm_num)
+          calc
+            (Polynomial.C c - Polynomial.X : Polynomial R).degree ≤ 1 := by
+              refine (Polynomial.degree_sub_le _ _).trans (max_le ?_ Polynomial.degree_X_le)
+              exact Polynomial.degree_C_le.trans (by norm_num)
             _ < p := by exact_mod_cast hp.out.one_lt
       obtain ⟨y, hy⟩ := hroot _ hmon hdeg
       have hmem : σ y - y + c ∈ Ideal.span {(p : R)} := by
@@ -371,34 +403,40 @@ theorem UpperTheory.Kd.C7.pLangR :
     choose Yf Ef hYE using fun i j => hAS (((N * V)⁻¹ * C) i j)
     have h2 : (Matrix.of Yf).map σ - Matrix.of Yf + (N * V)⁻¹ * C = (p : R) • Matrix.of Ef := by
       ext i j
-      simp only [Matrix.add_apply, Matrix.sub_apply, Matrix.map_apply, Matrix.of_apply, Matrix.smul_apply,
-        smul_eq_mul]
+      simp only [Matrix.add_apply, Matrix.sub_apply, Matrix.map_apply, Matrix.of_apply,
+        Matrix.smul_apply, smul_eq_mul]
       exact hYE i j
-    have h2' : N * V * (Matrix.of Yf).map σ =
-        N * V * Matrix.of Yf + (p : R) • (N * V * Matrix.of Ef) - C := by
+    have h2'
+        : N * V * (Matrix.of Yf).map σ
+          = N * V * Matrix.of Yf + (p : R) • (N * V * Matrix.of Ef) - C := by
       have h4 := congrArg (fun M => N * V * M) h2
       simp only [Matrix.mul_add, Matrix.mul_sub, Matrix.mul_smul, ← Matrix.mul_assoc, hND,
-        Matrix.one_mul] at h4
+          Matrix.one_mul]
+        at h4
       rw [← h4]
       abel
     have h1 : V.map σ = N * V + ((p : R) ^ (n + 1)) • C := by
       rw [← hC]
       abel
-    refine ⟨V * Matrix.of Yf, ?_, N * V * Matrix.of Ef + ((p : R) ^ n) • (C * (Matrix.of Yf).map σ), ?_⟩
+    refine
+      ⟨V * Matrix.of Yf, ?_, N * V * Matrix.of Ef + ((p : R) ^ n) • (C * (Matrix.of Yf).map σ), ?_⟩
     · rw [Matrix.map_add _ (map_add π), hV]
       convert add_zero Vb
       ext i j
       simp [hp0]
     · rw [Matrix.map_add _ (map_add σ), hσsmul, hσp, Matrix.map_mul, h1]
-      simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, ← Matrix.mul_assoc]
+      simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul,
+        ← Matrix.mul_assoc]
       rw [h2']
       simp only [smul_add, smul_sub, smul_smul, ← pow_add, ← pow_succ']
       have e1 : (p : R) ^ (n + 1 + (n + 1)) = (p : R) ^ (n + 1 + 1 + n) := by ring
       have e2 : (p : R) ^ (n + 1) * (p : R) = (p : R) ^ (n + 1 + 1) := by ring
       rw [e1, e2]
       abel
-  have hV0 : ∃ V0 : Matrix (Fin d) (Fin d) R, V0.map π = Vb ∧
-      ∃ C : Matrix (Fin d) (Fin d) R, V0.map σ - N * V0 = ((p : R) ^ (0 + 1)) • C := by
+  have hV0
+      : ∃ V0 : Matrix (Fin d) (Fin d) R,
+        V0.map π = Vb
+          ∧ ∃ C : Matrix (Fin d) (Fin d) R, V0.map σ - N * V0 = ((p : R) ^ (0 + 1)) • C := by
     set V0 := Vb.map (Function.surjInv (f := π) Ideal.Quotient.mk_surjective) with hV0def
     have hV0π : V0.map π = Vb := by
       ext i j
@@ -412,13 +450,20 @@ theorem UpperTheory.Kd.C7.pLangR :
     exact congrFun (congrFun hm i) j
   obtain ⟨V0, hV0⟩ := hV0
   choose X hX using step
-  let F : (n : ℕ) → {V : Matrix (Fin d) (Fin d) R // V.map π = Vb ∧
-      ∃ C : Matrix (Fin d) (Fin d) R, V.map σ - N * V = ((p : R) ^ (n + 1)) • C} :=
-    fun n => Nat.rec (motive := fun n => {V : Matrix (Fin d) (Fin d) R // V.map π = Vb ∧
-      ∃ C : Matrix (Fin d) (Fin d) R, V.map σ - N * V = ((p : R) ^ (n + 1)) • C}) ⟨V0, hV0⟩
-      (fun n W => ⟨W.1 + ((p : R) ^ (n + 1)) • X n W.1 W.2, hX n W.1 W.2⟩) n
+  let F
+      : (n : ℕ)
+        → {V : Matrix (Fin d) (Fin d) R // V.map π = Vb
+          ∧ ∃ C : Matrix (Fin d) (Fin d) R, V.map σ - N * V = ((p : R) ^ (n + 1)) • C} := fun n =>
+    Nat.rec
+      (motive := fun n =>
+        {V : Matrix (Fin d) (Fin d) R // V.map π = Vb
+          ∧ ∃ C : Matrix (Fin d) (Fin d) R, V.map σ - N * V = ((p : R) ^ (n + 1)) • C})
+      ⟨V0, hV0⟩
+      (fun n W => ⟨W.1 + ((p : R) ^ (n + 1)) • X n W.1 W.2, hX n W.1 W.2⟩)
+      n
   have hF : ∀ n, (F (n + 1)).1 = (F n).1 + ((p : R) ^ (n + 1)) • X n (F n).1 (F n).2 := fun n => rfl
-  have hIpow : ∀ n : ℕ, (Ideal.span {(p : R)} ^ n • ⊤ : Submodule R R) = Ideal.span {(p : R) ^ n} := by
+  have hIpow
+      : ∀ n : ℕ, (Ideal.span {(p : R)} ^ n • ⊤ : Submodule R R) = Ideal.span {(p : R) ^ n} := by
     intro n
     rw [smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow]
   have hcauchy : ∀ m k i j, (F (m + k)).1 i j - (F m).1 i j ∈ Ideal.span {(p : R) ^ m} := by
@@ -431,22 +476,27 @@ theorem UpperTheory.Kd.C7.pLangR :
       exact Dvd.dvd.mul_right (pow_dvd_pow _ (by omega)) _
   have hlim : ∀ i j, ∃ L : R, ∀ n, (F n).1 i j - L ∈ Ideal.span {(p : R) ^ n} := by
     intro i j
-    obtain ⟨L, hL⟩ := hcompl.toIsPrecomplete.prec (f := fun n => (F n).1 i j) (fun {m n} hmn => by
-      rw [SModEq.sub_mem, hIpow]
-      obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
-      rw [← neg_sub]
-      exact neg_mem (hcauchy m k i j))
+    obtain ⟨L, hL⟩ :=
+      hcompl.toIsPrecomplete.prec
+        (f := fun n => (F n).1 i j)
+        (fun {m n} hmn => by
+          rw [SModEq.sub_mem, hIpow]
+          obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
+          rw [← neg_sub]
+          exact neg_mem (hcauchy m k i j))
     refine ⟨L, fun n => ?_⟩
     have h := hL n
     rw [SModEq.sub_mem, hIpow] at h
     exact h
   choose L hL using hlim
-  have hmulmem : ∀ (q : R) (A M : Matrix (Fin d) (Fin d) R), (∀ i j, M i j ∈ Ideal.span {q}) →
-      ∀ i j, (A * M) i j ∈ Ideal.span {q} := by
+  have hmulmem
+      : ∀ (q : R) (A M : Matrix (Fin d) (Fin d) R),
+        (∀ i j, M i j ∈ Ideal.span {q}) → ∀ i j, (A * M) i j ∈ Ideal.span {q} := by
     intro q A M hM i j
     rw [Matrix.mul_apply]
     exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_left _ _ (hM k j)
-  have hσmem : ∀ (q : ℕ) (x : R), x ∈ Ideal.span {(p : R) ^ q} → σ x ∈ Ideal.span {(p : R) ^ q} := by
+  have hσmem
+      : ∀ (q : ℕ) (x : R), x ∈ Ideal.span {(p : R) ^ q} → σ x ∈ Ideal.span {(p : R) ^ q} := by
     intro q x hx
     obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hx
     rw [map_mul, hσp]
@@ -472,8 +522,10 @@ theorem UpperTheory.Kd.C7.pLangR :
       intro a b
       rw [Matrix.sub_apply, Matrix.of_apply, ← neg_sub]
       exact neg_mem (hL a b n)
-    have hsplit : ((Matrix.of L).map σ - N * Matrix.of L) =
-        ((Matrix.of L - (F n).1).map σ - N * (Matrix.of L - (F n).1)) + ((p : R) ^ (n + 1)) • C := by
+    have hsplit
+        : ((Matrix.of L).map σ - N * Matrix.of L)
+          = ((Matrix.of L - (F n).1).map σ - N * (Matrix.of L - (F n).1))
+            + ((p : R) ^ (n + 1)) • C := by
       rw [← hC, Matrix.map_sub _ (map_sub σ), Matrix.mul_sub]
       abel
     rw [hsplit, Matrix.add_apply, Matrix.sub_apply]

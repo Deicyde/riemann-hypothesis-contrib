@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PerCoordExis
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR
 open GlobalTheory.PeriodCoord (realMap realMap_apply realMap_inj colMat)
@@ -27,8 +29,8 @@ theorem perCoordLoc_of : PerCoordLoc := by
     intro b hb x
     rw [hA, hBm]
     exact hαβ _ (hHol.1 b hb) x
-  have hPd : ∀ (x : D.La) (i : Fin g), DifferentiableOn ℂ (fun b => P b x i) B :=
-    fun x i => differentiableOn_pi.1 (hHol.2 x) i
+  have hPd : ∀ (x : D.La) (i : Fin g), DifferentiableOn ℂ (fun b => P b x i) B := fun x i =>
+    differentiableOn_pi.1 (hHol.2 x) i
   have hAd : ∀ i j, DifferentiableOn ℂ (fun b => A b i j) B := by
     intro i j
     simp only [hA, colMat, Matrix.of_apply]
@@ -55,16 +57,19 @@ theorem perCoordLoc_of : PerCoordLoc := by
     refine ⟨hb₀, ?_⟩
     simp [hAB0.1]
   have hnhds : B ∩ (fun b => (A b).det) ⁻¹' {0}ᶜ ∈ 𝓝 b₀ := hSo.mem_nhds hb₀S
-  have hinvd : ∀ i j, DifferentiableOn ℂ (fun b => (A b)⁻¹ i j) (B ∩ (fun b => (A b).det) ⁻¹' {0}ᶜ) :=
-    RiemannRel.differentiableOn_left_inverse A (fun b => (A b)⁻¹)
+  have hinvd
+      : ∀ i j, DifferentiableOn ℂ (fun b => (A b)⁻¹ i j) (B ∩ (fun b => (A b).det) ⁻¹' {0}ᶜ) :=
+    RiemannRel.differentiableOn_left_inverse A
+      (fun b => (A b)⁻¹)
       (fun i j => (hAd i j).mono Set.inter_subset_left)
       (fun b hb => Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr (by simpa using hb.2)))
   obtain ⟨gL, hgL⟩ := LinearMap.exists_leftInverse_of_injective co (LinearMap.ker_eq_bot.mpr hco.1)
   refine ⟨fun b => gL ((A b)⁻¹ * Bm b), ?_, ?_, ?_⟩
   · rw [differentiableAt_pi]
     intro k
-    have e : (fun b => gL ((A b)⁻¹ * Bm b) k) =
-        fun b => ∑ i, ∑ j, ((A b)⁻¹ * Bm b) i j * gL (Matrix.single i j 1) k :=
+    have e
+        : (fun b => gL ((A b)⁻¹ * Bm b) k)
+          = fun b => ∑ i, ∑ j, ((A b)⁻¹ * Bm b) i j * gL (Matrix.single i j 1) k :=
       funext fun b => PerCoordU.coords_sum gL _ k
     rw [e]
     refine DifferentiableAt.fun_sum fun i _ => DifferentiableAt.fun_sum fun j _ => ?_

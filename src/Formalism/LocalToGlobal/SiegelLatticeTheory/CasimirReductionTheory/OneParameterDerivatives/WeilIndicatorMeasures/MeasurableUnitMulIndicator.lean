@@ -11,9 +11,10 @@ namespace Formalism.L2.SG.Pf.Weil
 
 namespace QuotInt
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [LocallyCompactSpace G] [T2Space G] [SecondCountableTopology G] [MeasurableSpace G]
-  [BorelSpace G] {H : Subgroup G}
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+  {H : Subgroup G}
 
 lemma measurable_mulH : Measurable (fun p : G × H => p.1 * (p.2 : G)) := by
   exact measurable_fst.mul (measurable_subtype_coe.comp measurable_snd)
@@ -164,7 +165,8 @@ section Main
 
 variable (μ : Measure G) (ν : Measure H)
 
-variable [SFinite μ] [μ.IsMulRightInvariant] [SFinite ν] [ν.IsMulLeftInvariant]
+variable
+  [SFinite μ] [μ.IsMulRightInvariant] [SFinite ν] [ν.IsMulLeftInvariant]
   {β : G → ℝ≥0∞} (hβ : Measurable β) (hβ1 : ∀ x, ∫⁻ h, β (x * (h : G)⁻¹) ∂ν = 1)
 include hβ hβ1
 

@@ -18,33 +18,45 @@ namespace GlobalTheory.AbTan
 
 variable {R : Type} [CommRing R]
 
-def Lifts {X : Scheme.{0}} (s : X ⟶ Sp R) {B M : Type} [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M]
-    [Module Bᵐᵒᵖ M] [IsCentralScalar B M] (P : Sp B ⟶ X) (z : Sp (TrivSqZeroExt B M) ⟶ X) : Prop :=
-  z ≫ s = spMap ((TrivSqZeroExt.inlHom B M).comp (algebraMap R B)) ∧
-    spMap (TrivSqZeroExt.fstHom B B M).toRingHom ≫ z = P
+def Lifts
+    {X : Scheme.{0}} (s : X ⟶ Sp R)
+    {B M : Type}
+    [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M] [IsCentralScalar B M]
+    (P : Sp B ⟶ X) (z : Sp (TrivSqZeroExt B M) ⟶ X)
+    : Prop :=
+  z ≫ s = spMap ((TrivSqZeroExt.inlHom B M).comp (algebraMap R B))
+    ∧ spMap (TrivSqZeroExt.fstHom B B M).toRingHom ≫ z = P
 
 def unitPt (A : Over (Sp R)) [GrpObj A] (B : Type) [CommRing B] [Algebra R B] : Sp B ⟶ A.left :=
   spMap (algebraMap R B) ≫ (show Sp R ⟶ A.left from η[A].left)
 
-def IsSum {B M B' M' : Type} [CommRing B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M] [IsCentralScalar B M]
-    [CommRing B'] [AddCommGroup M'] [Module B' M'] [Module B'ᵐᵒᵖ M'] [IsCentralScalar B' M']
-    (β : TrivSqZeroExt B M →+* TrivSqZeroExt B' M') (α : B → B') (f : M → M') : Prop :=
-  (∀ b, β (TrivSqZeroExt.inl b) = TrivSqZeroExt.inl (α b)) ∧ ∀ m, β (TrivSqZeroExt.inr m) = TrivSqZeroExt.inr (f m)
+def IsSum
+    {B M B' M' : Type}
+    [CommRing B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M] [IsCentralScalar B M] [CommRing B']
+    [AddCommGroup M'] [Module B' M'] [Module B'ᵐᵒᵖ M'] [IsCentralScalar B' M']
+    (β : TrivSqZeroExt B M →+* TrivSqZeroExt B' M') (α : B → B') (f : M → M')
+    : Prop :=
+  (∀ b, β (TrivSqZeroExt.inl b) = TrivSqZeroExt.inl (α b))
+    ∧ ∀ m, β (TrivSqZeroExt.inr m) = TrivSqZeroExt.inr (f m)
 
 structure TanRep (A : Over (Sp R)) [GrpObj A] (W : Type) [AddCommGroup W] [Module R W] where
-
-  Φ : ∀ {B M : Type} [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M] [IsCentralScalar B M]
-    [Module R M] [IsScalarTower R B M] (_ : Sp (TrivSqZeroExt B M) ⟶ A.left), W →ₗ[R] M
-
-  bij : ∀ {B M : Type} [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M] [IsCentralScalar B M]
-    [Module R M] [IsScalarTower R B M] (l : W →ₗ[R] M),
-    ∃! z : Sp (TrivSqZeroExt B M) ⟶ A.left, Lifts A.hom (unitPt A B) z ∧ Φ z = l
-
-  nat : ∀ {B M : Type} [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M] [IsCentralScalar B M]
-    [Module R M] [IsScalarTower R B M] {B' M' : Type} [CommRing B'] [Algebra R B'] [AddCommGroup M'] [Module B' M']
-    [Module B'ᵐᵒᵖ M'] [IsCentralScalar B' M'] [Module R M'] [IsScalarTower R B' M'] (α : B →ₐ[R] B') (f : M →ₗ[R] M')
-    (β : TrivSqZeroExt B M →+* TrivSqZeroExt B' M'), IsSum β α f →
-    ∀ z : Sp (TrivSqZeroExt B M) ⟶ A.left, Lifts A.hom (unitPt A B) z → Φ (spMap β ≫ z) = f ∘ₗ Φ z
+  Φ : ∀ {B M : Type} [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M]
+      [IsCentralScalar B M] [Module R M] [IsScalarTower R B M]
+      (_ : Sp (TrivSqZeroExt B M) ⟶ A.left),
+    W →ₗ[R] M
+  bij
+    : ∀ {B M : Type} [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M]
+        [IsCentralScalar B M] [Module R M] [IsScalarTower R B M] (l : W →ₗ[R] M),
+      ∃! z : Sp (TrivSqZeroExt B M) ⟶ A.left, Lifts A.hom (unitPt A B) z ∧ Φ z = l
+  nat
+    : ∀ {B M : Type} [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M]
+        [IsCentralScalar B M] [Module R M] [IsScalarTower R B M] {B' M' : Type} [CommRing B']
+        [Algebra R B'] [AddCommGroup M'] [Module B' M'] [Module B'ᵐᵒᵖ M'] [IsCentralScalar B' M']
+        [Module R M'] [IsScalarTower R B' M'] (α : B →ₐ[R] B') (f : M →ₗ[R] M')
+        (β : TrivSqZeroExt B M →+* TrivSqZeroExt B' M'),
+      IsSum β α f
+        → ∀ z : Sp (TrivSqZeroExt B M) ⟶ A.left,
+          Lifts A.hom (unitPt A B) z → Φ (spMap β ≫ z) = f ∘ₗ Φ z
 
 end GlobalTheory.AbTan
 
@@ -61,15 +73,18 @@ abbrev G : Over (Sp R) := (Spec (CommRingCat.of R[T;T⁻¹])).asOver (Spec (Comm
 
 theorem G_hom : (G R).hom = spMap (algebraMap R R[T;T⁻¹]) := rfl
 
-theorem unit_eq (B : Type) [CommRing B] [Algebra R B] :
-    unitPt (G R) B = spMap (algebraMap R B) ≫ spMap (Bialgebra.counitAlgHom R R[T;T⁻¹]).toRingHom := rfl
+theorem unit_eq (B : Type) [CommRing B] [Algebra R B]
+    : unitPt (G R) B
+      = spMap (algebraMap R B) ≫ spMap (Bialgebra.counitAlgHom R R[T;T⁻¹]).toRingHom :=
+  rfl
 
-theorem comp' {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
-    spMap g ≫ spMap f = spMap (g.comp f) := by
+theorem comp' {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap g ≫ spMap f = spMap (g.comp f) := by
   simp only [spMap, ← Spec.map_comp]
   rfl
 
-theorem inj' {A B : Type} [CommRing A] [CommRing B] {p q : A →+* B} (h : spMap p = spMap q) : p = q := by
+theorem inj' {A B : Type} [CommRing A] [CommRing B] {p q : A →+* B} (h : spMap p = spMap q)
+    : p = q := by
   have h' := Spec.map_injective h
   exact congrArg CommRingCat.Hom.hom h'
 
@@ -85,8 +100,11 @@ theorem spMap_pre {C : Type} [CommRing C] (z : Sp C ⟶ (G R).left) : spMap (pre
 theorem pre_spMap {C : Type} [CommRing C] (φ : R[T;T⁻¹] →+* C) : pre (R := R) (spMap φ) = φ := by
   simp only [pre, spMap, Spec.preimage_map, CommRingCat.hom_ofHom]
 
-theorem hom_ext' {C : Type} [CommRing C] {φ ψ : R[T;T⁻¹] →+* C}
-    (h0 : φ.comp (algebraMap R _) = ψ.comp (algebraMap R _)) (h1 : φ (T 1) = ψ (T 1)) : φ = ψ := by
+theorem hom_ext'
+    {C : Type} [CommRing C]
+    {φ ψ : R[T;T⁻¹] →+* C}
+    (h0 : φ.comp (algebraMap R _) = ψ.comp (algebraMap R _)) (h1 : φ (T 1) = ψ (T 1))
+    : φ = ψ := by
   have hC : ∀ a : R, φ (LaurentPolynomial.C a) = ψ (LaurentPolynomial.C a) := fun a => by
     rw [LaurentPolynomial.C_eq_algebraMap]
     exact congrArg (fun f : R →+* C => f a) h0
@@ -94,7 +112,9 @@ theorem hom_ext' {C : Type} [CommRing C] {φ ψ : R[T;T⁻¹] →+* C}
     have e : (T (-1) : R[T;T⁻¹]) * T 1 = 1 := by rw [← T_add]; simp
     have eφ : φ (T (-1)) * φ (T 1) = 1 := by rw [← map_mul, e, map_one]
     have eψ : ψ (T 1) * ψ (T (-1)) = 1 := by rw [← map_mul, mul_comm, e, map_one]
-    calc φ (T (-1)) = φ (T (-1)) * (ψ (T 1) * ψ (T (-1))) := by rw [eψ, _root_.mul_one]
+    calc
+      φ (T (-1))
+        = φ (T (-1)) * (ψ (T 1) * ψ (T (-1))) := by rw [eψ, _root_.mul_one]
       _ = (φ (T (-1)) * φ (T 1)) * ψ (T (-1)) := by rw [h1, _root_.mul_assoc]
       _ = ψ (T (-1)) := by rw [eφ, _root_.one_mul]
   have hT : ∀ n : ℤ, φ (T n) = ψ (T n) := by
@@ -108,21 +128,26 @@ theorem hom_ext' {C : Type} [CommRing C] {φ ψ : R[T;T⁻¹] →+* C}
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq]
   | C_mul_T n a => rw [map_mul, map_mul, hC, hT]
 
-theorem lifts_iff {B M : Type} [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M]
-    [Module Bᵐᵒᵖ M] [IsCentralScalar B M] (φ : R[T;T⁻¹] →+* TrivSqZeroExt B M) :
-    Lifts (G R).hom (unitPt (G R) B) (spMap φ) ↔
-      φ.comp (algebraMap R _) = (TrivSqZeroExt.inlHom B M).comp (algebraMap R B) ∧ (φ (T 1)).fst = 1 := by
+theorem lifts_iff
+    {B M : Type}
+    [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M] [Module Bᵐᵒᵖ M] [IsCentralScalar B M]
+    (φ : R[T;T⁻¹] →+* TrivSqZeroExt B M)
+    : Lifts (G R).hom (unitPt (G R) B) (spMap φ)
+      ↔ φ.comp (algebraMap R _) = (TrivSqZeroExt.inlHom B M).comp (algebraMap R B)
+        ∧ (φ (T 1)).fst = 1 := by
   have hε : Bialgebra.counitAlgHom R R[T;T⁻¹] (T 1) = 1 := by
     rw [Bialgebra.counitAlgHom_apply]
     exact AddMonoidAlgebra.counit_single (1 : ℤ) (1 : R)
   have hεC : ∀ r : R, Bialgebra.counitAlgHom R R[T;T⁻¹] (algebraMap R _ r) = r := fun r =>
     (Bialgebra.counitAlgHom R R[T;T⁻¹]).commutes r
-  have e1 : spMap φ ≫ (G R).hom = spMap (φ.comp (algebraMap R _)) := by
-    rw [G_hom]; exact comp' _ _
-  have e2 : spMap (TrivSqZeroExt.fstHom B B M).toRingHom ≫ spMap φ =
-      spMap ((TrivSqZeroExt.fstHom B B M).toRingHom.comp φ) := comp' _ _
-  have e3 : unitPt (G R) B =
-      spMap ((algebraMap R B).comp (Bialgebra.counitAlgHom R R[T;T⁻¹]).toRingHom) := by
+  have e1 : spMap φ ≫ (G R).hom = spMap (φ.comp (algebraMap R _)) := by rw [G_hom]; exact comp' _ _
+  have e2
+      : spMap (TrivSqZeroExt.fstHom B B M).toRingHom ≫ spMap φ
+        = spMap ((TrivSqZeroExt.fstHom B B M).toRingHom.comp φ) :=
+    comp' _ _
+  have e3
+      : unitPt (G R) B
+        = spMap ((algebraMap R B).comp (Bialgebra.counitAlgHom R R[T;T⁻¹]).toRingHom) := by
     rw [unit_eq]; exact comp' _ _
   unfold Lifts
   constructor
@@ -144,9 +169,12 @@ def tanRep : TanRep (G R) R where
   Φ z := LinearMap.toSpanSingleton R _ (pre z (T 1)).snd
   bij := by
     intro B M _ _ _ _ _ _ _ _ l
-    let u : (TrivSqZeroExt B M)ˣ :=
-      ⟨TrivSqZeroExt.inl 1 + TrivSqZeroExt.inr (l 1), TrivSqZeroExt.inl 1 - TrivSqZeroExt.inr (l 1),
-        by ext <;> simp, by ext <;> simp⟩
+    let u : (TrivSqZeroExt B M)ˣ := ⟨
+      TrivSqZeroExt.inl 1 + TrivSqZeroExt.inr (l 1),
+      TrivSqZeroExt.inl 1 - TrivSqZeroExt.inr (l 1),
+      by ext <;> simp,
+      by ext <;> simp
+    ⟩
     let φ := LaurentPolynomial.eval₂ ((TrivSqZeroExt.inlHom B M).comp (algebraMap R B)) u
     have hT : φ (T 1) = TrivSqZeroExt.inl 1 + TrivSqZeroExt.inr (l 1) := by
       simp [φ, u, LaurentPolynomial.eval₂_T]
@@ -160,7 +188,8 @@ def tanRep : TanRep (G R) R where
       obtain ⟨h1, h2⟩ := (lifts_iff _).1 hz
       refine congrArg _ (hom_ext' (h1.trans hC.symm) ?_)
       have h3 : (pre z (T 1)).snd = l 1 := by rw [← hl]; simp
-      rw [hT]; ext
+      rw [hT]
+      ext
       · simp [h2]
       · simp [h3]
   nat := by
@@ -171,7 +200,8 @@ def tanRep : TanRep (G R) R where
       erw [spMap_pre]
       rfl
     ext
-    simp only [this, LinearMap.toSpanSingleton_apply, one_smul, LinearMap.comp_apply, RingHom.comp_apply]
+    simp only [this, LinearMap.toSpanSingleton_apply, one_smul, LinearMap.comp_apply,
+      RingHom.comp_apply]
     rw [← TrivSqZeroExt.inl_fst_add_inr_snd_eq (pre z (T 1)), map_add (f := _), hβ.1, hβ.2]
     simp
 

@@ -10,25 +10,31 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.FrobeniusPowerSeries
 
-theorem lift_le (l : ℕ) [Fact l.Prime] (hl : 11 ≤ l) (h η H M : ℕ) (h1 : 1 ≤ h) (hη : 20 * η ≤ h)
-    (hH : H ≤ h + η) (hM : M ≤ h) (jumps : Finset ℤ)
-    (hj : ∀ u ∈ jumps, -(M : ℤ) ≤ u ∧ u ≤ h) :
-    let J : Finset ℤ :=
-      ((jumps ×ˢ Finset.Icc (1 : ℤ) M).image (fun p : ℤ × ℤ => p.1 + p.2)).filter (fun j => j ≠ 0) ∪
-        Finset.Icc (1 : ℤ) M
-    let aS : ℕ := M / (l - 1) + 1
-    let eW : ℕ := ⌊(H : ℝ) * l / ((l : ℝ) - 1) ^ 2 + 3 + Real.logb l ((H : ℝ) + 1)⌋₊
-    let eU : ℕ := (∑ j ∈ J, padicValInt l j) + aS + padicValNat l aS.factorial
-    ((2 * eW + eU : ℕ) : ℝ) ≤ 71 / 10 * (h : ℝ) / l + 71 / 10 + 2 * Real.logb l (2 * (h : ℝ)) := by
+theorem lift_le
+    (l : ℕ) [Fact l.Prime]
+    (hl : 11 ≤ l)
+    (h η H M : ℕ) (h1 : 1 ≤ h) (hη : 20 * η ≤ h) (hH : H ≤ h + η) (hM : M ≤ h)
+    (jumps : Finset ℤ) (hj : ∀ u ∈ jumps, -(M : ℤ) ≤ u ∧ u ≤ h)
+    : let J : Finset ℤ :=
+        ((jumps ×ˢ Finset.Icc (1 : ℤ) M).image (fun p : ℤ × ℤ => p.1 + p.2)).filter (fun j => j ≠ 0)
+          ∪ Finset.Icc (1 : ℤ) M
+      let aS : ℕ := M / (l - 1) + 1
+      let eW : ℕ := ⌊(H : ℝ) * l / ((l : ℝ) - 1) ^ 2 + 3 + Real.logb l ((H : ℝ) + 1)⌋₊
+      let eU : ℕ := (∑ j ∈ J, padicValInt l j) + aS + padicValNat l aS.factorial
+      ((2 * eW + eU : ℕ) : ℝ)
+        ≤ 71 / 10 * (h : ℝ) / l + 71 / 10 + 2 * Real.logb l (2 * (h : ℝ)) := by
   intro J aS eW eU
   have hl' : (11 : ℝ) ≤ l := by exact_mod_cast hl
   have hl1 : (1 : ℝ) < l := by linarith
   have hxm : (0 : ℝ) < (l : ℝ) - 1 := by linarith
   have hxi0 : 0 ≤ (l : ℝ)⁻¹ := by positivity
   have hyi0 : 0 ≤ ((l : ℝ) - 1)⁻¹ := inv_nonneg.2 hxm.le
-  have hyi10 : ((l : ℝ) - 1)⁻¹ ≤ 1 / 10 := Formalism.MainNotions.N.FrobeniusPowerSeries.NumericInequalities.p_le hl'
-  have hyix : ((l : ℝ) - 1)⁻¹ ≤ 11 / 10 * (l : ℝ)⁻¹ := Formalism.MainNotions.N.FrobeniusPowerSeries.NumericInequalities.p_le_u hl'
-  have hsq : (l : ℝ) / ((l : ℝ) - 1) ^ 2 ≤ 121 / 100 * (l : ℝ)⁻¹ := Formalism.MainNotions.N.FrobeniusPowerSeries.NumericInequalities.q_le hl'
+  have hyi10 : ((l : ℝ) - 1)⁻¹ ≤ 1 / 10 :=
+    Formalism.MainNotions.N.FrobeniusPowerSeries.NumericInequalities.p_le hl'
+  have hyix : ((l : ℝ) - 1)⁻¹ ≤ 11 / 10 * (l : ℝ)⁻¹ :=
+    Formalism.MainNotions.N.FrobeniusPowerSeries.NumericInequalities.p_le_u hl'
+  have hsq : (l : ℝ) / ((l : ℝ) - 1) ^ 2 ≤ 121 / 100 * (l : ℝ)⁻¹ :=
+    Formalism.MainNotions.N.FrobeniusPowerSeries.NumericInequalities.q_le hl'
   have hsq0 : 0 ≤ (l : ℝ) / ((l : ℝ) - 1) ^ 2 := by positivity
   have hH1 : H + 1 ≤ 2 * h := by omega
   have hHr : (H : ℝ) ≤ h + η := by exact_mod_cast hH
@@ -43,12 +49,14 @@ theorem lift_le (l : ℕ) [Fact l.Prime] (hl : 11 ≤ l) (h η H M : ℕ) (h1 : 
     have h0 : 0 ≤ (H : ℝ) * l / ((l : ℝ) - 1) ^ 2 + 3 + Real.logb l ((H : ℝ) + 1) := by
       have : 0 ≤ (H : ℝ) * l / ((l : ℝ) - 1) ^ 2 := by positivity
       linarith
-    calc (eW : ℝ) ≤ (H : ℝ) * l / ((l : ℝ) - 1) ^ 2 + 3 + Real.logb l ((H : ℝ) + 1) :=
-          Nat.floor_le h0
+    calc
+      (eW : ℝ)
+        ≤ (H : ℝ) * l / ((l : ℝ) - 1) ^ 2 + 3 + Real.logb l ((H : ℝ) + 1) := Nat.floor_le h0
       _ = (H : ℝ) * ((l : ℝ) / ((l : ℝ) - 1) ^ 2) + 3 + Real.logb l ((H : ℝ) + 1) := by ring
   have hHsq : (H : ℝ) * ((l : ℝ) / ((l : ℝ) - 1) ^ 2) ≤ ((h : ℝ) + η) * (121 / 100 * (l : ℝ)⁻¹) :=
     mul_le_mul hHr hsq hsq0 (by positivity)
-  have hηxi : (20 * (η : ℝ)) * (l : ℝ)⁻¹ ≤ (h : ℝ) * (l : ℝ)⁻¹ := mul_le_mul_of_nonneg_right hηr hxi0
+  have hηxi : (20 * (η : ℝ)) * (l : ℝ)⁻¹ ≤ (h : ℝ) * (l : ℝ)⁻¹ :=
+    mul_le_mul_of_nonneg_right hηr hxi0
   have hl1n : ((l - 1 : ℕ) : ℝ) = (l : ℝ) - 1 := by
     rw [Nat.cast_sub (by omega : 1 ≤ l), Nat.cast_one]
   have hA : (aS : ℝ) ≤ (M : ℝ) * ((l : ℝ) - 1)⁻¹ + 1 := by
@@ -72,8 +80,10 @@ theorem lift_le (l : ℕ) [Fact l.Prime] (hl : 11 ≤ l) (h η H M : ℕ) (h1 : 
     mul_le_mul hMr hyix hyi0 (Nat.cast_nonneg h)
   have hhy : (h : ℝ) * ((l : ℝ) - 1)⁻¹ ≤ (h : ℝ) * (11 / 10 * (l : ℝ)⁻¹) :=
     mul_le_mul_of_nonneg_left hyix (Nat.cast_nonneg h)
-  have hJsub : J ⊆ Finset.Ico (-(M : ℤ)) (-(M : ℤ) + (M : ℤ)) ∪
-      Finset.Ico (1 : ℤ) (1 + ((h + M : ℕ) : ℤ)) := by
+  have hJsub
+      : J
+        ⊆ Finset.Ico (-(M : ℤ)) (-(M : ℤ) + (M : ℤ))
+          ∪ Finset.Ico (1 : ℤ) (1 + ((h + M : ℕ) : ℤ)) := by
     intro j hjJ
     rcases Finset.mem_union.1 hjJ with hA' | hB'
     · obtain ⟨hA1, hne⟩ := Finset.mem_filter.1 hA'
@@ -88,35 +98,41 @@ theorem lift_le (l : ℕ) [Fact l.Prime] (hl : 11 ≤ l) (h η H M : ℕ) (h1 : 
       rw [Finset.mem_union, Finset.mem_Ico, Finset.mem_Ico]
       push_cast
       omega
-  have hw1 := sum_padicValInt_window_le l (-(M : ℤ)) M M (by
-    intro i hi
-    rw [Finset.mem_Ico] at hi
-    exact ⟨by omega, abs_le.2 ⟨by omega, by omega⟩⟩)
-  have hw2 := sum_padicValInt_window_le l (1 : ℤ) (h + M) (h + M) (by
-    intro i hi
-    rw [Finset.mem_Ico] at hi
-    push_cast at hi ⊢
-    exact ⟨by omega, abs_le.2 ⟨by omega, by omega⟩⟩)
+  have hw1 :=
+    sum_padicValInt_window_le l (-(M : ℤ)) M M (by
+      intro i hi
+      rw [Finset.mem_Ico] at hi
+      exact ⟨by omega, abs_le.2 ⟨by omega, by omega⟩⟩)
+  have hw2 :=
+    sum_padicValInt_window_le l (1 : ℤ) (h + M) (h + M) (by
+      intro i hi
+      rw [Finset.mem_Ico] at hi
+      push_cast at hi ⊢
+      exact ⟨by omega, abs_le.2 ⟨by omega, by omega⟩⟩)
   have hdisj : Disjoint (Finset.Ico (-(M : ℤ)) (-(M : ℤ) + (M : ℤ)))
       (Finset.Ico (1 : ℤ) (1 + ((h + M : ℕ) : ℤ))) := by
     rw [Finset.disjoint_left]
     intro x hx hy
     rw [Finset.mem_Ico] at hx hy
     omega
-  have hle : ∑ j ∈ J, padicValInt l j ≤
-      ∑ j ∈ Finset.Ico (-(M : ℤ)) (-(M : ℤ) + (M : ℤ)), padicValInt l j +
-        ∑ j ∈ Finset.Ico (1 : ℤ) (1 + ((h + M : ℕ) : ℤ)), padicValInt l j := by
+  have hle
+      : ∑ j ∈ J, padicValInt l j
+        ≤ ∑ j ∈ Finset.Ico (-(M : ℤ)) (-(M : ℤ) + (M : ℤ)), padicValInt l j
+          + ∑ j ∈ Finset.Ico (1 : ℤ) (1 + ((h + M : ℕ) : ℤ)), padicValInt l j := by
     rw [← Finset.sum_union hdisj]
     exact Finset.sum_le_sum_of_subset hJsub
-  have hler : ((∑ j ∈ J, padicValInt l j : ℕ) : ℝ) ≤
-      ((∑ j ∈ Finset.Ico (-(M : ℤ)) (-(M : ℤ) + (M : ℤ)), padicValInt l j : ℕ) : ℝ) +
-        ((∑ j ∈ Finset.Ico (1 : ℤ) (1 + ((h + M : ℕ) : ℤ)), padicValInt l j : ℕ) : ℝ) := by
+  have hler
+      : ((∑ j ∈ J, padicValInt l j : ℕ) : ℝ)
+        ≤ ((∑ j ∈ Finset.Ico (-(M : ℤ)) (-(M : ℤ) + (M : ℤ)), padicValInt l j : ℕ) : ℝ)
+          + ((∑ j ∈ Finset.Ico (1 : ℤ) (1 + ((h + M : ℕ) : ℤ)), padicValInt l j : ℕ) : ℝ) := by
     exact_mod_cast hle
   have hcM : ((h + M : ℕ) : ℝ) = (h : ℝ) + M := Nat.cast_add h M
   rw [hcM, div_eq_mul_inv] at hw2
   rw [div_eq_mul_inv] at hw1
-  have hU : ((2 * eW + eU : ℕ) : ℝ) = 2 * (eW : ℝ) + ((∑ j ∈ J, padicValInt l j : ℕ) : ℝ) +
-      (aS : ℝ) + (padicValNat l aS.factorial : ℝ) := by
+  have hU
+      : ((2 * eW + eU : ℕ) : ℝ)
+        = 2 * (eW : ℝ) + ((∑ j ∈ J, padicValInt l j : ℕ) : ℝ) + (aS : ℝ)
+          + (padicValNat l aS.factorial : ℝ) := by
     show ((2 * eW + ((∑ j ∈ J, padicValInt l j) + aS + padicValNat l aS.factorial) : ℕ) : ℝ) = _
     simp only [Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat]
     ring
@@ -126,10 +142,12 @@ theorem lift_le (l : ℕ) [Fact l.Prime] (hl : 11 ≤ l) (h η H M : ℕ) (h1 : 
   have hhx : 0 ≤ (h : ℝ) * (l : ℝ)⁻¹ := mul_nonneg (Nat.cast_nonneg h) hxi0
   linarith [hW, hHsq, hηxi, hlogH, hler, hw1, hw2, hA, hF, hFA, hMyy, hMy, hhy, hyi10]
 
-theorem step0 (l : ℕ) (hl : 11 ≤ l) (b w S η : ℕ) (hb : 1 ≤ b) (hηb : 20 * η ≤ b) (hSb : 20 * S ≤ b)
-    (hwb : 20 * w ≤ b) (hsm : (b : ℝ) / 4 < 40 * Sg l (b + η + S) w S η) :
-    71 / 10 * ((b + η + S : ℕ) : ℝ) / l + 71 / 10 + 2 * Real.logb l (2 * ((b + η + S : ℕ) : ℝ)) ≤
-      160 * Sg l (b + η + S) w S η := by
+theorem step0
+    (l : ℕ) (hl : 11 ≤ l)
+    (b w S η : ℕ) (hb : 1 ≤ b) (hηb : 20 * η ≤ b) (hSb : 20 * S ≤ b) (hwb : 20 * w ≤ b)
+    (hsm : (b : ℝ) / 4 < 40 * Sg l (b + η + S) w S η)
+    : 71 / 10 * ((b + η + S : ℕ) : ℝ) / l + 71 / 10 + 2 * Real.logb l (2 * ((b + η + S : ℕ) : ℝ))
+      ≤ 160 * Sg l (b + η + S) w S η := by
   have hl' : (11 : ℝ) ≤ l := by exact_mod_cast hl
   have hl1 : (1 : ℝ) < l := by linarith
   have hX : ((b + η + S : ℕ) : ℝ) = (b : ℝ) + η + S := by push_cast; ring

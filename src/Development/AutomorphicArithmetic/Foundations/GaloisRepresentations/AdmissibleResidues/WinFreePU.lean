@@ -26,40 +26,47 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Th
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Th
 open scoped Pointwise
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem place_under {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] {A : ValuationSubring Ω} {p : ℕ}
-    (hp0 : p ≠ 0) (hp : A.valuation (p : Ω) < 1) :
-    ∃ w : HeightOneSpectrum (𝓞 F), IsPlaceOver A w ∧ (p : 𝓞 F) ∈ w.asIdeal := by
-  have hint : A.valuation.Integers A :=
-    { hom_inj := Subtype.coe_injective
-      map_le_one := fun a => A.valuation_le_one a
-      exists_of_le_one := fun r hr => ⟨⟨r, (A.valuation_le_one_iff r).1 hr⟩, rfl⟩ }
+private theorem place_under
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A : ValuationSubring Ω} {p : ℕ} (hp0 : p ≠ 0) (hp : A.valuation (p : Ω) < 1)
+    : ∃ w : HeightOneSpectrum (𝓞 F), IsPlaceOver A w ∧ (p : 𝓞 F) ∈ w.asIdeal := by
+  have hint : A.valuation.Integers A := {
+    hom_inj := Subtype.coe_injective
+    map_le_one := fun a => A.valuation_le_one a
+    exists_of_le_one := fun r hr => ⟨⟨r, (A.valuation_le_one_iff r).1 hr⟩, rfl⟩
+  }
   have hle : ∀ x : 𝓞 F, A.valuation (algebraMap F Ω (x : F)) ≤ 1 := by
     intro x
     have h1 : IsIntegral ℤ (algebraMap F Ω (x : F)) :=
       (RingOfIntegers.isIntegral_coe x).map (IsScalarTower.toAlgHom ℤ F Ω)
     exact hint.mem_of_integral (h1.tower_top (A := A))
-  let I : Ideal (𝓞 F) :=
-    { carrier := {x | A.valuation (algebraMap F Ω (x : F)) < 1}
-      add_mem' := by
-        intro a b ha hb
-        show A.valuation (algebraMap F Ω ((a : F) + (b : F))) < 1
-        rw [map_add (f := _)]
-        exact A.valuation.map_add_lt ha hb
-      zero_mem' := by
-        show A.valuation (algebraMap F Ω (0 : F)) < 1
-        rw [map_zero, map_zero]
-        exact lt_of_le_of_lt zero_le' hp
-      smul_mem' := by
-        intro c a ha
-        show A.valuation (algebraMap F Ω ((c : F) * (a : F))) < 1
-        rw [map_mul, map_mul]
-        exact lt_of_le_of_lt (mul_le_of_le_one_left' (hle c)) ha }
+  let I : Ideal (𝓞 F) := {
+    carrier := {x | A.valuation (algebraMap F Ω (x : F)) < 1}
+    add_mem' := by
+      intro a b ha hb
+      show A.valuation (algebraMap F Ω ((a : F) + (b : F))) < 1
+      rw [map_add (f := _)]
+      exact A.valuation.map_add_lt ha hb
+    zero_mem' := by
+      show A.valuation (algebraMap F Ω (0 : F)) < 1
+      rw [map_zero, map_zero]
+      exact lt_of_le_of_lt zero_le' hp
+    smul_mem' := by
+      intro c a ha
+      show A.valuation (algebraMap F Ω ((c : F) * (a : F))) < 1
+      rw [map_mul, map_mul]
+      exact lt_of_le_of_lt (mul_le_of_le_one_left' (hle c)) ha
+  }
   have hI : I.IsPrime := by
     refine Ideal.isPrime_iff.2 ⟨?_, ?_⟩
     · rw [Ideal.ne_top_iff_one]
@@ -68,7 +75,8 @@ private theorem place_under {F Ω : Type} [Field F] [NumberField F] [Field Ω] [
       exact lt_irrefl _
     · intro a b hab
       show A.valuation (algebraMap F Ω (a : F)) < 1 ∨ A.valuation (algebraMap F Ω (b : F)) < 1
-      have hab' : A.valuation (algebraMap F Ω (a : F)) * A.valuation (algebraMap F Ω (b : F)) < 1 := by
+      have hab'
+          : A.valuation (algebraMap F Ω (a : F)) * A.valuation (algebraMap F Ω (b : F)) < 1 := by
         have h0 : A.valuation (algebraMap F Ω ((a : F) * (b : F))) < 1 := hab
         rwa [map_mul, map_mul] at h0
       by_contra hne
@@ -88,15 +96,17 @@ private theorem place_under {F Ω : Type} [Field F] [NumberField F] [Field Ω] [
     exact hp0 (by exact_mod_cast hpI)
   exact ⟨⟨I, hI, hne⟩, fun x => Iff.rfl, hpI⟩
 
-private theorem pow_eq_one_of_kills {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
-    {M : ℕ} (hM : 1 ≤ M) : ∃ k : ℕ, 0 < k ∧ ∀ (C : Type) [Monoid C] (χ : G F Ω →* C), KillsMu M χ → ∀ s, χ s ^ k = 1 := by
+private theorem pow_eq_one_of_kills
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {M : ℕ} (hM : 1 ≤ M)
+    : ∃ k : ℕ,
+      0 < k ∧ ∀ (C : Type) [Monoid C] (χ : G F Ω →* C), KillsMu M χ → ∀ s, χ s ^ k = 1 := by
   classical
   refine ⟨M.factorial, Nat.factorial_pos M, ?_⟩
   intro C _ χ hχ s
   rw [← map_pow]
   refine hχ _ (fun ζ hζ => ?_)
-  have hmem : ∀ z : Ω, z ∈ Polynomial.nthRootsFinset M (1 : Ω) ↔ z ^ M = 1 :=
-    fun z => Polynomial.mem_nthRootsFinset hM 1
+  have hmem : ∀ z : Ω, z ∈ Polynomial.nthRootsFinset M (1 : Ω) ↔ z ^ M = 1 := fun z =>
+    Polynomial.mem_nthRootsFinset hM 1
   have hcard : (Polynomial.nthRootsFinset M (1 : Ω)).card ≤ M :=
     (Multiset.toFinset_card_le _).trans (Polynomial.card_nthRoots _ _)
   let σ : Equiv.Perm (Polynomial.nthRootsFinset M (1 : Ω)) :=
@@ -108,8 +118,9 @@ private theorem pow_eq_one_of_kills {F Ω : Type} [Field F] [Field Ω] [Algebra 
     rw [Fintype.card_perm, Fintype.card_coe] at h1
     obtain ⟨c, hc⟩ := Nat.factorial_dvd_factorial hcard
     rw [hc, pow_mul, h1, one_pow]
-  have hit : ∀ (m : ℕ) (z : Polynomial.nthRootsFinset M (1 : Ω)),
-      (((σ ^ m) z : Polynomial.nthRootsFinset M (1 : Ω)) : Ω) = (s ^ m) (z : Ω) := by
+  have hit
+      : ∀ (m : ℕ) (z : Polynomial.nthRootsFinset M (1 : Ω)),
+        (((σ ^ m) z : Polynomial.nthRootsFinset M (1 : Ω)) : Ω) = (s ^ m) (z : Ω) := by
     intro m
     induction m with
     | zero =>
@@ -123,9 +134,12 @@ private theorem pow_eq_one_of_kills {F Ω : Type} [Field F] [Field Ω] [Algebra 
   rw [hpow] at h2
   exact h2.symm
 
-private theorem charpoly_of_flag {H k : Type} [Group H] [CommRing k] {n : ℕ} {r : H →* GL (Fin n) k}
-    {κ : Fin n → H →* kˣ} (h : W.HasFlag r κ) (s : H) (b : GL (Fin n) k) :
-    ((b * r s * b⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).charpoly = ∏ i, (X - C ((κ i s : kˣ) : k)) := by
+private theorem charpoly_of_flag
+    {H k : Type} [Group H] [CommRing k]
+    {n : ℕ} {r : H →* GL (Fin n) k} {κ : Fin n → H →* kˣ} (h : W.HasFlag r κ)
+    (s : H) (b : GL (Fin n) k)
+    : ((b * r s * b⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).charpoly
+      = ∏ i, (X - C ((κ i s : kˣ) : k)) := by
   obtain ⟨g, hg⟩ := h
   rw [show b * r s * b⁻¹ = (b * g⁻¹) * (g * r s * g⁻¹) * (b * g⁻¹)⁻¹ by group]
   rw [Units.val_mul, Units.val_mul, Matrix.coe_units_inv, Matrix.charpoly_units_conj,

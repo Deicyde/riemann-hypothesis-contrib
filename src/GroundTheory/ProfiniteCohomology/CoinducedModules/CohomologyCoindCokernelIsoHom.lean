@@ -14,8 +14,9 @@ open CategoryTheory Limits
 
 universe u
 
-variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [CompactSpace G] (A : Rep.{u} k G) [IsDiscreteRep A]
+variable
+  {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+  (A : Rep.{u} k G) [IsDiscreteRep A]
 
 instance isDiscreteRep_coindShortComplex_X₁ : IsDiscreteRep (coindShortComplex A).X₁ :=
   (inferInstance : IsDiscreteRep A)
@@ -37,11 +38,10 @@ instance mono_coindδ_succ (n : ℕ) : Mono (coindδ A (n + 1)) :=
   (cohomology_exact₃ (coindShortComplex_shortExact A) (n + 1) (n + 2) rfl).mono_g
     ((isZero_cohomology_discreteCoind (k := k) (G := G) (X := A) n).eq_of_src _ _)
 
-instance isIso_coindδ_succ (n : ℕ) : IsIso (coindδ A (n + 1)) :=
-  isIso_of_mono_of_epi _
+instance isIso_coindδ_succ (n : ℕ) : IsIso (coindδ A (n + 1)) := isIso_of_mono_of_epi _
 
-noncomputable def cohomologyCoindCokernelIso (n : ℕ) :
-    cohomology (coindCokernel A) (n + 1) ≅ cohomology A (n + 2) :=
+noncomputable def cohomologyCoindCokernelIso (n : ℕ)
+    : cohomology (coindCokernel A) (n + 1) ≅ cohomology A (n + 2) :=
   asIso (coindδ A (n + 1))
 
 end GroundTheory.ProfCoh

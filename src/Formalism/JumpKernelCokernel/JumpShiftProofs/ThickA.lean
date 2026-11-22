@@ -65,7 +65,8 @@ lemma eventually_log (c : ℝ) (hc : 0 < c) :
 end Formalism.KernelCokernelLengths.ThicknessFirstBoundLogLemmas
 
 open Formalism.KernelCokernelLengths.ThicknessFirstBoundLogLemmas in
-theorem Formalism.KernelCokernelLengths.thickness_first_bound : Formalism.KernelCokernelLengths.ThickA := by
+theorem Formalism.KernelCokernelLengths.thickness_first_bound
+    : Formalism.KernelCokernelLengths.ThickA := by
   intro ε hε
   obtain ⟨N, hN⟩ := eventually_log (ε / 2) (by linarith)
   refine ⟨min (1 / 10) (ε / 10), by positivity, max N 4, ?_⟩
@@ -98,20 +99,26 @@ theorem Formalism.KernelCokernelLengths.thickness_first_bound : Formalism.Kernel
   have hlog2H : Real.log (2 * ((h + (η + t + 1) : ℕ) : ℝ)) ≤ Real.log (4 * b) :=
     Real.log_le_log (by linarith) h2H
   have hlogN := hN b hbN
-  have haR : Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ (h + (η + t + 1)) =
-      ((h + (η + t + 1) : ℕ) : ℝ) * ((2 * (ℓ : ℝ) - 1) / ((ℓ : ℝ) - 1) ^ 2) + 3 +
-        (Real.logb (ℓ : ℝ) (2 * ((h + (η + t + 1) : ℕ) : ℝ)) + 1) := by
-    unfold Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.lam
+  have haR
+      : Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ (h + (η + t + 1))
+        = ((h + (η + t + 1) : ℕ) : ℝ) * ((2 * (ℓ : ℝ) - 1) / ((ℓ : ℝ) - 1) ^ 2) + 3
+          + (Real.logb (ℓ : ℝ) (2 * ((h + (η + t + 1) : ℕ) : ℝ)) + 1) := by
+    unfold Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR
+      Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.lam
     rw [mul_div_assoc]
-  have hHc : ((h + (η + t + 1) : ℕ) : ℝ) * ((2 * (ℓ : ℝ) - 1) / ((ℓ : ℝ) - 1) ^ 2) ≤
-      ((h + (η + t + 1) : ℕ) : ℝ) * (21 / 100) :=
+  have hHc
+      : ((h + (η + t + 1) : ℕ) : ℝ) * ((2 * (ℓ : ℝ) - 1) / ((ℓ : ℝ) - 1) ^ 2)
+        ≤ ((h + (η + t + 1) : ℕ) : ℝ) * (21 / 100) :=
     mul_le_mul_of_nonneg_left hcoef (Nat.cast_nonneg _)
-  have haR0 : 0 ≤ Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ (h + (η + t + 1)) := by
+  have haR0
+      : 0 ≤ Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ (h + (η + t + 1)) := by
     rw [haR]
     have := mul_nonneg (Nat.cast_nonneg (h + (η + t + 1))) hcoef0
     linarith
-  have hceil : (⌈Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ (h + (η + t + 1))⌉₊ : ℝ) ≤
-      Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ (h + (η + t + 1)) + 1 := (Nat.ceil_lt_add_one haR0).le
+  have hceil
+      : (⌈Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ (h + (η + t + 1))⌉₊ : ℝ)
+        ≤ Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR ℓ (h + (η + t + 1)) + 1 :=
+    (Nat.ceil_lt_add_one haR0).le
   have hεb : 0 ≤ ε * (b : ℝ) := mul_nonneg hε.le hb0
   push_cast
   push_cast at hHle hHc hceil haR hlogb hlog2H

@@ -17,14 +17,19 @@ public import Development.AutomorphicSpectrum.Proofs.NonGaloisProofs.GrowthGaloi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
 
 namespace PositivityTheory.LocalTateOrthogonality.Bk
 
-theorem card_pow_le {O M Z N : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [AddCommGroup M]
-    [Module O M] [Module.Finite O M] [Finite N] (a : O) (p : Z → M) (hp : Function.Surjective p)
-    (f : Z → N) (hf : ∀ x y, f x = f y → ∃ w, p x - p y = a • w) :
-    Nat.card (O ⧸ Ideal.span {a}) ^ finrank O M ≤ Nat.card N := by
+theorem card_pow_le
+    {O M Z N : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [AddCommGroup M]
+    [Module O M] [Module.Finite O M] [Finite N]
+    (a : O)
+    (p : Z → M) (hp : Function.Surjective p)
+    (f : Z → N) (hf : ∀ x y, f x = f y → ∃ w, p x - p y = a • w)
+    : Nat.card (O ⧸ Ideal.span {a}) ^ finrank O M ≤ Nat.card N := by
   classical
   set I : Ideal O := Ideal.span {a}
   let F := M ⧸ Submodule.torsion O M
@@ -55,31 +60,38 @@ theorem card_pow_le {O M Z N : Type} [CommRing O] [IsDomain O] [IsPrincipalIdeal
     intro t
     obtain ⟨z, hz⟩ := hsurj t
     refine ⟨⟨f z, z, rfl⟩, ?_⟩
-    have hz' : f (Classical.choose (⟨z, rfl⟩ : ∃ y, f y = f z)) = f z := Classical.choose_spec (⟨z, rfl⟩ : ∃ y, f y = f z)
+    have hz' : f (Classical.choose (⟨z, rfl⟩ : ∃ y, f y = f z)) = f z :=
+      Classical.choose_spec (⟨z, rfl⟩ : ∃ y, f y = f z)
     simp only [g]
     rw [hψ _ _ (hf _ _ hz')]
     exact hz
   have h1 := Nat.card_le_card_of_surjective g hg
-  have h2 : Nat.card (Set.range f) ≤ Nat.card N := Nat.card_le_card_of_injective Subtype.val Subtype.val_injective
+  have h2 : Nat.card (Set.range f) ≤ Nat.card N :=
+    Nat.card_le_card_of_injective Subtype.val Subtype.val_injective
   rw [Nat.card_fun, Nat.card_fin, e] at h1
   exact h1.trans h2
 
 section Gen
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Type} [Field Qp] [Field LL]
-  [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp LL O : Type}
+  [Field Qp] [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
   (A : GRep G Qp LL O) (L : Lattice (O := O) A.ρ)
 
-
 open GlobalTheory.CompanionTheory.GrowthOfInvariants in
-theorem redT_mem {ϖ : O} {r : ℕ} (hW : (fun x => ϖ ^ r • x) '' (L.T : Set A.V) ∈ nhds (0 : A.V))
-    (hI : StableSub L (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥L.T)) (c : ↥(latticeCocycles L)) :
-    redT L _ c ∈ quotientCocycles L _ hI := by
+theorem redT_mem
+    {ϖ : O} {r : ℕ} (hW : (fun x => ϖ ^ r • x) '' (L.T : Set A.V) ∈ nhds (0 : A.V))
+    (hI : StableSub L (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥L.T))
+    (c : ↥(latticeCocycles L))
+    : redT L _ c ∈ quotientCocycles L _ hI := by
   obtain ⟨⟨hcont, hcoc⟩, _⟩ := c.2
   refine ⟨?_, ?_⟩
   · rw [IsLocallyConstant.iff_eventually_eq]
     intro g0
-    have hW' : (fun x => ϖ ^ r • x) '' (L.T : Set A.V) ∈ nhds ((c : _ → A.V) g0 + -(c : _ → A.V) g0) := by
+    have hW'
+        : (fun x => ϖ ^ r • x) '' (L.T : Set A.V)
+          ∈ nhds ((c : _ → A.V) g0 + - (c : _ → A.V) g0) := by
       rw [add_neg_cancel]
       exact hW
     filter_upwards [(hcont.tendsto g0).add_const (-(c : _ → A.V) g0) hW'] with g hg
@@ -88,7 +100,7 @@ theorem redT_mem {ϖ : O} {r : ℕ} (hW : (fun x => ϖ ^ r • x) '' (L.T : Set 
     have : (evT L g c - evT L g0 c : ↥L.T) = ϖ ^ r • (⟨x, hx⟩ : ↥L.T) := by
       apply Subtype.ext
       simp only [Submodule.coe_sub, SetLike.val_smul]
-      have hxe' : ϖ ^ r • x = (c : _ → A.V) g + -(c : _ → A.V) g0 := hxe
+      have hxe' : ϖ ^ r • x = (c : _ → A.V) g + - (c : _ → A.V) g0 := hxe
       rw [hxe', sub_eq_add_neg]
       rfl
     rw [this]
@@ -100,21 +112,24 @@ theorem redT_mem {ϖ : O} {r : ℕ} (hW : (fun x => ϖ ^ r • x) '' (L.T : Set 
     apply Subtype.ext
     exact hcoc g h
 
-
 open GlobalTheory.CompanionTheory.GrowthOfInvariants in
-theorem exists_div_class [IsDomain O] [IsFractionRing O LL] {a : O} (ha : a ≠ 0)
-    (hI : StableSub L (Ideal.span {a} • ⊤ : Submodule O ↥L.T)) (c : ↥(latticeCocycles L))
-    (hc : redT L (Ideal.span {a} • ⊤ : Submodule O ↥L.T) c ∈ BQ L _ hI) :
-    ∃ w : LatticeCohomology L, (Submodule.Quotient.mk c : LatticeCohomology L) = a • w := by
+theorem exists_div_class
+    [IsDomain O] [IsFractionRing O LL]
+    {a : O} (ha : a ≠ 0) (hI : StableSub L (Ideal.span {a} • ⊤ : Submodule O ↥L.T))
+    (c : ↥(latticeCocycles L)) (hc : redT L (Ideal.span {a} • ⊤ : Submodule O ↥L.T) c ∈ BQ L _ hI)
+    : ∃ w : LatticeCohomology L, (Submodule.Quotient.mk c : LatticeCohomology L) = a • w := by
   obtain ⟨t, ht⟩ := hc
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ t
   have hd : ∀ g, ∃ y : ↥L.T, a • y = evT L g c - (actT L g x - x) := by
     intro g
     have h1 := congrFun ht g
     simp only [LinearMap.pi_apply, LinearMap.sub_apply, LinearMap.id_apply] at h1
-    change actQ L _ hI g (Submodule.Quotient.mk x) - Submodule.Quotient.mk x = Submodule.Quotient.mk (evT L g c) at h1
+    change actQ L _ hI g (Submodule.Quotient.mk x) - Submodule.Quotient.mk x
+        = Submodule.Quotient.mk (evT L g c)
+      at h1
     rw [actQ, Submodule.mapQ_apply, ← Submodule.Quotient.mk_sub, eq_comm, Submodule.Quotient.eq,
-      Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists] at h1
+        Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists]
+      at h1
     obtain ⟨y, _, hy⟩ := h1
     exact ⟨y, hy⟩
   choose y hy using hd
@@ -130,7 +145,8 @@ theorem exists_div_class [IsDomain O] [IsFractionRing O LL] {a : O} (ha : a ≠ 
     rw [hαdef, algebraMap_smul]
     exact hyV g
   let e : G → A.V := fun g => (y g : A.V)
-  have he_form : e = fun g => α⁻¹ • ((c : G → A.V) g + (-1 : LL) • A.ρ g (x : A.V) + (x : A.V)) := by
+  have he_form
+      : e = fun g => α⁻¹ • ((c : G → A.V) g + (-1 : LL) • A.ρ g (x : A.V) + (x : A.V)) := by
     funext g
     have h2 : (c : G → A.V) g + (-1 : LL) • A.ρ g (x : A.V) + (x : A.V) = α • e g := by
       rw [hyL g, neg_one_smul]
@@ -139,7 +155,8 @@ theorem exists_div_class [IsDomain O] [IsFractionRing O LL] {a : O} (ha : a ≠ 
   have he : e ∈ latticeCocycles L := by
     refine ⟨⟨?_, ?_⟩, ?_⟩
     · rw [he_form]
-      exact ((hcont.add ((A.cont (x : A.V)).const_smul (-1 : LL))).add continuous_const).const_smul α⁻¹
+      exact ((hcont.add ((A.cont (x : A.V)).const_smul (-1 : LL))).add continuous_const).const_smul
+        α⁻¹
     · intro g h
       apply smul_right_injective A.V hα
       simp only [smul_add, e, hyL, ← map_smul, hcoc, map_mul, Module.End.mul_apply, map_sub]

@@ -15,18 +15,22 @@ section Alg
 variable {G : Type} [Group G] [MeasurableSpace G] (Γ : Subgroup G)
 
 def fibreMeasure (q : Quotient (QuotientGroup.rightRel Γ)) : Measure G :=
-  Quotient.lift (fun g : G => Measure.sum fun γ : Γ => Measure.dirac ((γ : G) * g)) (by
-    intro a b hab
-    obtain ⟨δ, hδ, rfl⟩ := (cls_eq_iff Γ a b).1 (Quotient.sound hab)
-    have := Measure.sum_comp_equiv (Equiv.mulRight (⟨δ, hδ⟩ : Γ))
-      (fun γ : Γ => Measure.dirac ((γ : G) * a))
-    rw [← this]
-    congr 1
-    ext1 γ
-    simp [mul_assoc]) q
+  Quotient.lift
+    (fun g : G => Measure.sum fun γ : Γ => Measure.dirac ((γ : G) * g))
+    (by
+      intro a b hab
+      obtain ⟨δ, hδ, rfl⟩ := (cls_eq_iff Γ a b).1 (Quotient.sound hab)
+      have :=
+        Measure.sum_comp_equiv (Equiv.mulRight (⟨δ, hδ⟩ : Γ))
+          (fun γ : Γ => Measure.dirac ((γ : G) * a))
+      rw [← this]
+      congr 1
+      ext1 γ
+      simp [mul_assoc])
+    q
 
-theorem fibreMeasure_apply (g : G) {A : Set G} (hA : MeasurableSet A) :
-    fibreMeasure Γ (cls Γ g) A = ∑' γ : Γ, A.indicator (1 : G → ℝ≥0∞) ((γ : G) * g) := by
+theorem fibreMeasure_apply (g : G) {A : Set G} (hA : MeasurableSet A)
+    : fibreMeasure Γ (cls Γ g) A = ∑' γ : Γ, A.indicator (1 : G → ℝ≥0∞) ((γ : G) * g) := by
   show (Measure.sum fun γ : Γ => Measure.dirac ((γ : G) * g)) A = _
   rw [Measure.sum_apply _ hA]
   simp only [Measure.dirac_apply' _ hA]
@@ -34,16 +38,16 @@ theorem fibreMeasure_apply (g : G) {A : Set G} (hA : MeasurableSet A) :
 theorem measurable_fibreMeasure [MeasurableMul G] [Countable Γ] : Measurable (fibreMeasure Γ) := by
   refine Measure.measurable_of_measurable_coe _ fun A hA => ?_
   refine measurable_from_quotient.2 ?_
-  have : ((fun q => fibreMeasure Γ q A) ∘ Quotient.mk'') =
-      fun g : G => ∑' γ : Γ, A.indicator (1 : G → ℝ≥0∞) ((γ : G) * g) := by
+  have : ((fun q => fibreMeasure Γ q A) ∘ Quotient.mk'')
+      = fun g : G => ∑' γ : Γ, A.indicator (1 : G → ℝ≥0∞) ((γ : G) * g) := by
     ext g; exact fibreMeasure_apply Γ g hA
   rw [this]
-  exact Measurable.tsum fun γ =>
-    (measurable_one.indicator hA).comp (measurable_const_mul _)
+  exact Measurable.tsum fun γ => (measurable_one.indicator hA).comp (measurable_const_mul _)
 
-theorem fibreMeasure_of_injOn {A : Set G} (hA : MeasurableSet A)
-    (h : ∀ γ : Γ, ∀ x ∈ A, (γ : G) * x ∈ A → γ = 1) (q : Quotient (QuotientGroup.rightRel Γ)) :
-    fibreMeasure Γ q A = (cls Γ '' A).indicator 1 q := by
+theorem fibreMeasure_of_injOn
+    {A : Set G} (hA : MeasurableSet A) (h : ∀ γ : Γ, ∀ x ∈ A, (γ : G) * x ∈ A → γ = 1)
+    (q : Quotient (QuotientGroup.rightRel Γ))
+    : fibreMeasure Γ q A = (cls Γ '' A).indicator 1 q := by
   induction q using Quotient.inductionOn with
   | h g =>
     rw [show fibreMeasure Γ (Quotient.mk _ g) A = _ from fibreMeasure_apply Γ g hA]
@@ -61,19 +65,21 @@ theorem fibreMeasure_of_injOn {A : Set G} (hA : MeasurableSet A)
       refine ENNReal.tsum_eq_zero.2 fun γ => Set.indicator_of_notMem (fun hm => hg ?_) _
       exact ⟨_, hm, cls_smul Γ γ g⟩
 
-theorem indicator_le_fibreMeasure {s : Set (Quotient (QuotientGroup.rightRel Γ))} (hs : MeasurableSet s)
-    (q : Quotient (QuotientGroup.rightRel Γ)) :
-    s.indicator 1 q ≤ fibreMeasure Γ q (cls Γ ⁻¹' s) := by
+theorem indicator_le_fibreMeasure
+    {s : Set (Quotient (QuotientGroup.rightRel Γ))} (hs : MeasurableSet s)
+    (q : Quotient (QuotientGroup.rightRel Γ))
+    : s.indicator 1 q ≤ fibreMeasure Γ q (cls Γ ⁻¹' s) := by
   induction q using Quotient.inductionOn with
   | h g =>
-    rw [show fibreMeasure Γ (Quotient.mk _ g) _ = _ from fibreMeasure_apply Γ g (measurable_cls Γ hs)]
+    rw [show fibreMeasure Γ (Quotient.mk _ g) _ = _ from
+      fibreMeasure_apply Γ g (measurable_cls Γ hs)]
     refine le_trans ?_ (ENNReal.le_tsum (1 : Γ))
     by_cases hg : (Quotient.mk _ g) ∈ s
     · rw [Set.indicator_of_mem hg, Set.indicator_of_mem (by simpa using hg)]; simp
     · rw [Set.indicator_of_notMem hg]; exact zero_le
 
-theorem preimage_image_cls (A : Set G) :
-    cls Γ ⁻¹' (cls Γ '' A) = ⋃ γ : Γ, (fun x => (γ : G) * x) ⁻¹' A := by
+theorem preimage_image_cls (A : Set G)
+    : cls Γ ⁻¹' (cls Γ '' A) = ⋃ γ : Γ, (fun x => (γ : G) * x) ⁻¹' A := by
   ext x
   simp only [Set.mem_preimage, Set.mem_image, Set.mem_iUnion]
   constructor
@@ -83,20 +89,25 @@ theorem preimage_image_cls (A : Set G) :
   · rintro ⟨γ, h⟩
     exact ⟨_, h, cls_smul Γ γ x⟩
 
-theorem measurableSet_image_cls [MeasurableMul G] [Countable Γ] {A : Set G} (hA : MeasurableSet A) :
-    MeasurableSet (cls Γ '' A) := by
+theorem measurableSet_image_cls [MeasurableMul G] [Countable Γ] {A : Set G} (hA : MeasurableSet A)
+    : MeasurableSet (cls Γ '' A) := by
   show MeasurableSet (cls Γ ⁻¹' (cls Γ '' A))
   rw [preimage_image_cls]
   exact MeasurableSet.iUnion fun γ => measurable_const_mul _ hA
 
-theorem exists_strict_domain [MeasurableMul G] [Countable Γ] (μ : Measure G) [μ.IsMulLeftInvariant]
-    {F : Set G} (hF : IsFundamentalDomain Γ F μ) :
-    ∃ E : Set G, MeasurableSet E ∧ E =ᵐ[μ] F ∧ (∀ γ : Γ, ∀ x ∈ E, (γ : G) * x ∈ E → γ = 1) ∧
-      μ (cls Γ ⁻¹' (cls Γ '' E)ᶜ) = 0 := by
-  obtain ⟨E, hsub, hE, hae⟩ := hF.fundamentalInterior.nullMeasurableSet.exists_measurable_subset_ae_eq
+theorem exists_strict_domain
+    [MeasurableMul G] [Countable Γ]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    {F : Set G} (hF : IsFundamentalDomain Γ F μ)
+    : ∃ E : Set G,
+      MeasurableSet E ∧ E =ᵐ[μ] F ∧ (∀ γ : Γ, ∀ x ∈ E, (γ : G) * x ∈ E → γ = 1)
+        ∧ μ (cls Γ ⁻¹' (cls Γ '' E)ᶜ) = 0 := by
+  obtain ⟨E, hsub, hE, hae⟩ :=
+    hF.fundamentalInterior.nullMeasurableSet.exists_measurable_subset_ae_eq
   have h2 : fundamentalInterior Γ F =ᵐ[μ] F := by
     rw [← sdiff_fundamentalFrontier]
-    exact diff_ae_eq_self.2 (measure_mono_null Set.inter_subset_right hF.measure_fundamentalFrontier)
+    exact diff_ae_eq_self.2 (measure_mono_null Set.inter_subset_right
+      hF.measure_fundamentalFrontier)
   have h3 := hae.trans h2
   refine ⟨E, hE, h3, ?_, ?_⟩
   · intro γ x hx hγ
@@ -115,17 +126,30 @@ theorem exists_strict_domain [MeasurableMul G] [Countable Γ] (μ : Measure G) [
 
 end Alg
 
-theorem invariant_prob_eq : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (Γ : Subgroup G) [Countable Γ] (μ : Measure G) [μ.IsHaarMeasure] (𝓕 : Set G), IsFundamentalDomain Γ 𝓕 μ → μ 𝓕 ≠ ⊤ → ∀ (ν : Measure (Quotient (QuotientGroup.rightRel Γ))) [IsProbabilityMeasure ν], (∀ (h : G) (ρ : Quotient (QuotientGroup.rightRel Γ) → Quotient (QuotientGroup.rightRel Γ)), (∀ g : G, ρ (Quotient.mk _ g) = Quotient.mk _ (g * h)) → ∀ s, MeasurableSet s → ν (ρ ⁻¹' s) = ν s) → ν = (μ 𝓕)⁻¹ • (μ.restrict 𝓕).map (fun g : G => (Quotient.mk _ g : Quotient (QuotientGroup.rightRel Γ))) := by
+theorem invariant_prob_eq
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (Γ : Subgroup G)
+        [Countable Γ] (μ : Measure G) [μ.IsHaarMeasure] (𝓕 : Set G),
+      IsFundamentalDomain Γ 𝓕 μ → μ 𝓕 ≠ ⊤
+        → ∀ (ν : Measure (Quotient (QuotientGroup.rightRel Γ))) [IsProbabilityMeasure ν],
+          (∀ (h : G)
+                (ρ : Quotient (QuotientGroup.rightRel Γ) → Quotient (QuotientGroup.rightRel Γ)),
+              (∀ g : G, ρ (Quotient.mk _ g) = Quotient.mk _ (g * h))
+                → ∀ s, MeasurableSet s → ν (ρ ⁻¹' s) = ν s)
+            → ν
+              = (μ 𝓕)⁻¹ • (μ.restrict 𝓕).map
+                (fun g : G => (Quotient.mk _ g : Quotient (QuotientGroup.rightRel Γ))) := by
   intro G _ _ _ _ _ _ _ _ Γ _ μ _ F hF hfin ν _ hinv
   have h0 : μ F ≠ 0 := hF.measure_ne_zero (NeZero.ne μ)
   haveI : μ.IsMulRightInvariant := ⟨rightInvariant_of_covolume Γ μ hF h0 hfin⟩
   obtain ⟨E, hE, hEF, hEs, hEn⟩ := exists_strict_domain Γ μ hF
   have hκ := measurable_fibreMeasure Γ
   set L : Measure G := ν.bind (fibreMeasure Γ) with hL
-  have hLa : ∀ A, MeasurableSet A → L A = ∫⁻ q, fibreMeasure Γ q A ∂ν :=
-    fun A hA => Measure.bind_apply hA hκ.aemeasurable
-  have hLi : ∀ A, MeasurableSet A → (∀ γ : Γ, ∀ x ∈ A, (γ : G) * x ∈ A → γ = 1) →
-      L A = ν (cls Γ '' A) := by
+  have hLa : ∀ A, MeasurableSet A → L A = ∫⁻ q, fibreMeasure Γ q A ∂ν := fun A hA =>
+    Measure.bind_apply hA hκ.aemeasurable
+  have hLi
+      : ∀ A,
+        MeasurableSet A → (∀ γ : Γ, ∀ x ∈ A, (γ : G) * x ∈ A → γ = 1) → L A = ν (cls Γ '' A) := by
     intro A hA h
     rw [hLa A hA]
     simp_rw [fibreMeasure_of_injOn Γ hA h]
@@ -186,14 +210,17 @@ theorem invariant_prob_eq : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTop
   have hT := measurableSet_image_cls Γ hE
   have hnull : ν (cls Γ '' E)ᶜ = 0 := by
     refine le_antisymm ?_ zero_le
-    calc ν (cls Γ '' E)ᶜ = ∫⁻ q, (cls Γ '' E)ᶜ.indicator 1 q ∂ν := (lintegral_indicator_one hT.compl).symm
+    calc
+      ν (cls Γ '' E)ᶜ
+        = ∫⁻ q, (cls Γ '' E)ᶜ.indicator 1 q ∂ν := (lintegral_indicator_one hT.compl).symm
       _ ≤ _ := lintegral_mono fun q => indicator_le_fibreMeasure Γ hT.compl q
       _ = L _ := (hLa _ (measurable_cls Γ hT.compl)).symm
       _ = 0 := by rw [e2, Measure.smul_apply, hEn, smul_zero]
   have key : ν = (c : ℝ≥0∞) • (μ.restrict F).map (cls Γ) := by
     ext s hs
-    rw [Measure.smul_apply, Measure.map_apply (measurable_cls Γ) hs, ← Measure.restrict_congr_set hEF,
-      Measure.restrict_apply (measurable_cls Γ hs), ← Measure.smul_apply, ← e2,
+    rw [Measure.smul_apply, Measure.map_apply (measurable_cls Γ) hs,
+      ← Measure.restrict_congr_set hEF, Measure.restrict_apply (measurable_cls Γ hs),
+      ← Measure.smul_apply, ← e2,
       hLi _ ((measurable_cls Γ hs).inter hE) (fun γ x hx hγ => hEs γ x hx.2 hγ.2),
       Set.image_preimage_inter]
     exact (measure_inter_conull hnull).symm

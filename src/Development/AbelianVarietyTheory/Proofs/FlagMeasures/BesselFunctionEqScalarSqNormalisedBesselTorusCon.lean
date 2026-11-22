@@ -34,29 +34,37 @@ private lemma inv_mul_conj_mul_conj_eq_conj_of_commute {n : Type*} [Fintype n] [
   simp only [Matrix.mul_assoc]
   rw [d2, ← Matrix.mul_assoc H⁻¹ a, d1, Matrix.mul_assoc]
 
-theorem besselJ_conj {Wp Wq : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [NormedSpace ℂ Wq] (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (c c' : ℂ)
+theorem besselJ_conj
+    {Wp Wq : Type}
+    [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
+    (c c' : ℂ)
     (π : B.Mat k r → (Wp →L[ℂ] Wp)) (π' : B.Mat k r → (Wq →L[ℂ] Wq))
     (μW μN μW' : Measure (Mt k r)) [SFinite μW] [SFinite μN] [SFinite μW']
     (hW : μW (UWset k r z)ᶜ = 0) (hN : μN (Nset k r)ᶜ = 0) (hW' : μW' (UWset k r z')ᶜ = 0)
-    (a : B.Mat k r) (ha : IsUnit a.det)
-    (hc : ∀ h ∈ UWset k r z, a * h = h * a) (hc' : ∀ h ∈ UWset k r z', a * h = h * a)
+    (a : B.Mat k r) (ha : IsUnit a.det) (hc : ∀ h ∈ UWset k r z, a * h = h * a)
+    (hc' : ∀ h ∈ UWset k r z', a * h = h * a)
     (hp : ∀ n ∈ Nset k r, psi k r z c (a * n * a⁻¹) = psi k r z c' n)
     (hp' : ∀ n ∈ Nset k r, psi k r z' c (a * n * a⁻¹) = psi k r z' c' n)
-    (F : B.Mat k r → (Wq →L[ℂ] Wp)) (g : B.Mat k r) :
-    besselJ k r z z' c π π' μW (μN.map (conjM a)) μW' F g =
-      besselJ k r z z' c' π π' μW μN μW' (fun x => F (a * x * a⁻¹)) (a⁻¹ * g * a) := by
-  have hm : Measurable (conjM (k := k) (r := r) a) := (BesselUnitaryEquiv.conjE (k := k) (r := r) a ha).measurable
+    (F : B.Mat k r → (Wq →L[ℂ] Wp)) (g : B.Mat k r)
+    : besselJ k r z z' c π π' μW (μN.map (conjM a)) μW' F g
+      = besselJ k r z z' c' π π' μW μN μW' (fun x => F (a * x * a⁻¹)) (a⁻¹ * g * a) := by
+  have hm : Measurable (conjM (k := k) (r := r) a) :=
+    (BesselUnitaryEquiv.conjE (k := k) (r := r) a ha).measurable
   let E : Mt k r ≃ᵐ Mt k r := BesselUnitaryEquiv.conjE (k := k) (r := r) a ha
   let Φ : (Mt k r × Mt k r) × (Mt k r × Mt k r) ≃ᵐ (Mt k r × Mt k r) × (Mt k r × Mt k r) :=
-    ((MeasurableEquiv.refl (Mt k r)).prodCongr E).prodCongr ((MeasurableEquiv.refl (Mt k r)).prodCongr E)
-  have hpm : ∀ (ν : Measure (Mt k r)) [SFinite ν],
-      (ν.prod μN).map (Prod.map id (conjM a)) = ν.prod (μN.map (conjM a)) := by
+    ((MeasurableEquiv.refl (Mt k r)).prodCongr E).prodCongr
+      ((MeasurableEquiv.refl (Mt k r)).prodCongr E)
+  have hpm
+      : ∀ (ν : Measure (Mt k r)) [SFinite ν],
+        (ν.prod μN).map (Prod.map id (conjM a)) = ν.prod (μN.map (conjM a)) := by
     intro ν _
     rw [← Measure.map_prod_map _ _ measurable_id hm, Measure.map_id]
-  have hμ : (μW.prod (μN.map (conjM a))).prod (μW'.prod (μN.map (conjM a))) =
-      ((μW.prod μN).prod (μW'.prod μN)).map Φ := by
-    rw [← hpm μW, ← hpm μW', Measure.map_prod_map _ _ (measurable_id.prodMap hm) (measurable_id.prodMap hm)]
+  have hμ
+      : (μW.prod (μN.map (conjM a))).prod (μW'.prod (μN.map (conjM a)))
+        = ((μW.prod μN).prod (μW'.prod μN)).map Φ := by
+    rw [← hpm μW, ← hpm μW',
+      Measure.map_prod_map _ _ (measurable_id.prodMap hm) (measurable_id.prodMap hm)]
     rfl
   have aW : ∀ᵐ x ∂μW, x ∈ UWset k r z := ae_iff.2 hW
   have aN : ∀ᵐ x ∂μN, x ∈ Nset k r := ae_iff.2 hN
@@ -83,22 +91,32 @@ theorem besselJ_conj {Wp Wq : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp]
   rw [hΦ]
   dsimp only
   rw [e2, e4, hp (Matrix.of p.1.2) h2, hp' (Matrix.of p.2.2) h4,
-    inv_mul_conj_mul_conj_eq_conj_of_commute a (Matrix.of p.1.1) (Matrix.of p.1.2) g (Matrix.of p.2.2) (Matrix.of p.2.1) ha
-      (hc (Matrix.of p.1.1) h1) (hc' (Matrix.of p.2.1) h3)]
+    inv_mul_conj_mul_conj_eq_conj_of_commute a (Matrix.of p.1.1) (Matrix.of p.1.2) g
+      (Matrix.of p.2.2) (Matrix.of p.2.1) ha (hc (Matrix.of p.1.1) h1) (hc' (Matrix.of p.2.1) h3)]
 
-theorem besselJ_smul {Wp Wq : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [NormedSpace ℂ Wq] (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (c : ℂ)
-    (π : B.Mat k r → (Wp →L[ℂ] Wp)) (π' : B.Mat k r → (Wq →L[ℂ] Wq))
-    (μW μN μW' : Measure (Mt k r)) [SFinite μW] [SFinite μN] [SFinite μW'] (t : ℝ≥0∞)
-    (F : B.Mat k r → (Wq →L[ℂ] Wp)) (g : B.Mat k r) :
-    besselJ k r z z' c π π' μW (t • μN) μW' F g =
-      ((t.toReal ^ 2 : ℝ) : ℂ) • besselJ k r z z' c π π' μW μN μW' F g := by
+theorem besselJ_smul
+    {Wp Wq : Type}
+    [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
+    (c : ℂ) (π : B.Mat k r → (Wp →L[ℂ] Wp)) (π' : B.Mat k r → (Wq →L[ℂ] Wq))
+    (μW μN μW' : Measure (Mt k r)) [SFinite μW] [SFinite μN] [SFinite μW']
+    (t : ℝ≥0∞) (F : B.Mat k r → (Wq →L[ℂ] Wp)) (g : B.Mat k r)
+    : besselJ k r z z' c π π' μW (t • μN) μW' F g
+      = ((t.toReal ^ 2 : ℝ) : ℂ) • besselJ k r z z' c π π' μW μN μW' F g := by
   unfold besselJ
   rw [Measure.prod_smul_right, Measure.prod_smul_right, Measure.prod_smul_left,
-    Measure.prod_smul_right, smul_smul,
-    integral_smul_measure, ENNReal.toReal_mul, ← pow_two, Complex.coe_smul]
+    Measure.prod_smul_right, smul_smul, integral_smul_measure, ENNReal.toReal_mul, ← pow_two,
+    Complex.coe_smul]
 
-theorem besselJ_changeFrame : ∀ (k r : ℕ) (L : Formalism.MainNotions.S.LocBessel k r) (μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (Bs : B.RealPlaceData k r L.Wp L.Wq) (cN : ℝ) (F : B.Mat k r → (L.Wq →L[ℂ] L.Wp)), IsStdOf L μsec Bs → IsRatioN k r cN → L.c ≠ 0 → L.κN ≠ 0 → L.κN ≠ ⊤ → ∀ g : B.Mat k r, L.J F g = ((lamN L cN ^ 2 : ℝ) : ℂ) • B.JF Bs (conjF (cStd / L.c) F) ((aT k r (cStd / L.c))⁻¹ * g * aT k r (cStd / L.c)) := by
+theorem besselJ_changeFrame
+    : ∀ (k r : ℕ) (L : Formalism.MainNotions.S.LocBessel k r)
+        (μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (Bs : B.RealPlaceData k r L.Wp L.Wq)
+        (cN : ℝ) (F : B.Mat k r → (L.Wq →L[ℂ] L.Wp)),
+      IsStdOf L μsec Bs → IsRatioN k r cN → L.c ≠ 0 → L.κN ≠ 0 → L.κN ≠ ⊤
+        → ∀ g : B.Mat k r,
+          L.J F g
+            = ((lamN L cN ^ 2 : ℝ) : ℂ) • B.JF Bs (conjF (cStd / L.c) F)
+              ((aT k r (cStd / L.c))⁻¹ * g * aT k r (cStd / L.c)) := by
   intro k r L μsec Bs cN F hstd hR hc hκ0 hκT g
   obtain ⟨hz, hz', hπ, hπ', hμW, hμW', hμN, -⟩ := hstd
   have hα : cStd / L.c ≠ 0 := div_ne_zero (by simp [cStd]) hc
@@ -115,9 +133,10 @@ theorem besselJ_changeFrame : ∀ (k r : ℕ) (L : Formalism.MainNotions.S.LocBe
     · exact pow_ne_zero _ hα
     · exact one_ne_zero
     · exact inv_ne_zero (pow_ne_zero _ (star_ne_zero.mpr hα))
-  have hp : ∀ w : Fin (2 * r + k + 1) → ℂ,
-      (∀ n ∈ Nset k r, ell k r w (aT k r α * n * (aT k r α)⁻¹) = α * ell k r w n) →
-      ∀ n ∈ Nset k r, psi k r w L.c (aT k r α * n * (aT k r α)⁻¹) = psi k r w cStd n := by
+  have hp
+      : ∀ w : Fin (2 * r + k + 1) → ℂ,
+        (∀ n ∈ Nset k r, ell k r w (aT k r α * n * (aT k r α)⁻¹) = α * ell k r w n)
+          → ∀ n ∈ Nset k r, psi k r w L.c (aT k r α * n * (aT k r α)⁻¹) = psi k r w cStd n := by
     intro w hw n hn
     simp only [psi, hw n hn, ← mul_assoc, hcα]
   haveI : IsFiniteMeasure L.μW := ⟨by rw [L.hμW.2]; exact ENNReal.one_lt_top⟩
@@ -130,21 +149,27 @@ theorem besselJ_changeFrame : ∀ (k r : ℕ) (L : Formalism.MainNotions.S.LocBe
   have hx : 0 < ‖α‖ ^ B.kap k r := pow_pos (norm_pos_iff.mpr hα) _
   have hone : ENNReal.ofReal (‖α‖ ^ B.kap k r) * ENNReal.ofReal ((‖α‖ ^ B.kap k r)⁻¹) = 1 := by
     rw [← ENNReal.ofReal_mul hx.le, mul_inv_cancel₀ hx.ne', ENNReal.ofReal_one]
-  have hLμN : L.μN = (L.κN * ENNReal.ofReal cN * ENNReal.ofReal (‖α‖ ^ B.kap k r)) •
-      (D.muN k r).map (conjM (aT k r α)) := by
+  have hLμN
+      : L.μN
+        = (L.κN * ENNReal.ofReal cN * ENNReal.ofReal (‖α‖ ^ B.kap k r))
+          • (D.muN k r).map (conjM (aT k r α)) := by
     rw [hmap, smul_smul, mul_assoc (L.κN * ENNReal.ofReal cN), hone, mul_one, mul_smul, ← hR.2]
     simp only [Formalism.MainNotions.S.LocBessel.μN, Formalism.MainNotions.S.haarLie, one_smul]
   have ht : (L.κN * ENNReal.ofReal cN * ENNReal.ofReal (‖α‖ ^ B.kap k r)).toReal = lamN L cN := by
-    rw [ENNReal.toReal_mul, ENNReal.toReal_mul, ENNReal.toReal_ofReal hR.1.le, ENNReal.toReal_ofReal hx.le]
+    rw [ENNReal.toReal_mul, ENNReal.toReal_mul, ENNReal.toReal_ofReal hR.1.le,
+      ENNReal.toReal_ofReal hx.le]
     rfl
-  have step : L.J F g = ((lamN L cN ^ 2 : ℝ) : ℂ) •
-      besselJ k r L.z L.z' L.c L.π L.π' L.μW ((D.muN k r).map (conjM (aT k r α))) L.μW' F g := by
+  have step
+      : L.J F g
+        = ((lamN L cN ^ 2 : ℝ) : ℂ) • besselJ k r L.z L.z' L.c L.π L.π' L.μW
+          ((D.muN k r).map (conjM (aT k r α))) L.μW' F g := by
     rw [← ht]
     show besselJ k r L.z L.z' L.c L.π L.π' L.μW L.μN L.μW' F g = _
     rw [hLμN]
     exact besselJ_smul k r L.z L.z' L.c L.π L.π' L.μW _ L.μW' _ F g
-  rw [step, besselJ_conj k r L.z L.z' L.c cStd L.π L.π' L.μW (D.muN k r) L.μW' hW hNc hW' (aT k r α) ha
-    hcz hcz' (hp L.z fun n hn => (hnz n hn).2.2) (hp L.z' fun n hn => (hnz' n hn).2.2) F g,
+  rw [step,
+    besselJ_conj k r L.z L.z' L.c cStd L.π L.π' L.μW (D.muN k r) L.μW' hW hNc hW' (aT k r α) ha hcz
+      hcz' (hp L.z fun n hn => (hnz n hn).2.2) (hp L.z' fun n hn => (hnz' n hn).2.2) F g,
     Formalism.FourierDecayAlt.B.JF, hz, hz', hπ, hπ', hμW, hμW', hμN]
   rfl
 

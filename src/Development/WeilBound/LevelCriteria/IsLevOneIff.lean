@@ -35,27 +35,27 @@ theorem xd_li : LinearIndependent ℤ xd := by
   rw [linearIndependent_iff']
   intro s g hg i hi
   have := congrArg (fun p : ℚ[X] ↦ p.coeff i) hg
-  simp only [finsetSum_coeff, xd, coeff_zero, AddMonoidAlgebra.coeff_smul_apply, coeff_monomial] at this
+  simp only [finsetSum_coeff, xd, coeff_zero, AddMonoidAlgebra.coeff_smul_apply, coeff_monomial]
+    at this
   rw [Finset.sum_eq_single i (by intro j _ hj; simp [hj]) (by intro h; exact absurd hi h)] at this
   have hm : (i.factorial : ℚ) ≠ 0 := by exact_mod_cast i.factorial_ne_zero
   simpa [hm] using this
 
 def L : Subalgebra ℤ ℚ[X] :=
-  (Submodule.span ℤ (Set.range xd)).toSubalgebra
-    (xd_zero ▸ Submodule.subset_span ⟨0, rfl⟩)
-    (by
-      intro x y hx hy
-      refine Submodule.span_induction₂ (p := fun x y _ _ ↦ x * y ∈ Submodule.span ℤ (Set.range xd))
-        ?_ ?_ ?_ ?_ ?_ ?_ ?_ hx hy
-      · rintro _ _ ⟨m, rfl⟩ ⟨n, rfl⟩
-        rw [xd_mul, ← nsmul_eq_mul]
-        exact Submodule.smul_of_tower_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
-      · intro y _; simp
-      · intro y _; simp
-      · intro x y z _ _ _ h1 h2; rw [add_mul]; exact add_mem h1 h2
-      · intro x y z _ _ _ h1 h2; rw [mul_add]; exact add_mem h1 h2
-      · intro r x y _ _ h; rw [smul_mul_assoc]; exact Submodule.smul_mem _ _ h
-      · intro r x y _ _ h; rw [mul_smul_comm]; exact Submodule.smul_mem _ _ h)
+  (Submodule.span ℤ (Set.range xd)).toSubalgebra (xd_zero ▸ Submodule.subset_span ⟨0, rfl⟩) (by
+    intro x y hx hy
+    refine Submodule.span_induction₂
+      (p := fun x y _ _ ↦ x * y ∈ Submodule.span ℤ (Set.range xd))
+      ?_ ?_ ?_ ?_ ?_ ?_ ?_ hx hy
+    · rintro _ _ ⟨m, rfl⟩ ⟨n, rfl⟩
+      rw [xd_mul, ← nsmul_eq_mul]
+      exact Submodule.smul_of_tower_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
+    · intro y _; simp
+    · intro y _; simp
+    · intro x y z _ _ _ h1 h2; rw [add_mul]; exact add_mem h1 h2
+    · intro x y z _ _ _ h1 h2; rw [mul_add]; exact add_mem h1 h2
+    · intro r x y _ _ h; rw [smul_mul_assoc]; exact Submodule.smul_mem _ _ h
+    · intro r x y _ _ h; rw [mul_smul_comm]; exact Submodule.smul_mem _ _ h)
 
 def bL : Module.Basis ℕ ℤ L := Module.Basis.span xd_li
 
@@ -71,7 +71,8 @@ def pdPoly (B : Type) [CommRing B] : PDPoly B where
   e := Algebra.TensorProduct.basis B bL
   e_zero := by simp [bL_zero, Algebra.TensorProduct.one_def]
   e_mul m n := by
-    simp only [Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul, bL_mul]
+    simp only [Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul,
+      bL_mul]
     rw [← nsmul_eq_mul, ← nsmul_eq_mul, tmul_smul]
 
 variable {B : Type} [CommRing B] {J : Ideal B}

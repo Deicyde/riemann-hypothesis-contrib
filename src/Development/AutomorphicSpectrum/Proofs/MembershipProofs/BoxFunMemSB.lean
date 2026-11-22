@@ -7,15 +7,23 @@ public import Development.AutomorphicSpectrum.Definitions.MembershipCriteria.Goo
 
 noncomputable section
 
-open GlobalTheory.CompanionTheory.VacLoc GlobalTheory.CompanionTheory.FinHeis GlobalTheory.WeilM MeasureTheory Matrix
+open GlobalTheory.CompanionTheory.VacLoc GlobalTheory.CompanionTheory.FinHeis GlobalTheory.WeilM
+  MeasureTheory Matrix
 
 namespace GlobalTheory.CompanionTheory.VacDbl
 
-theorem boxFun_mem_SB {R : Type} [TopologicalSpace R] [T2Space R] {κ κ' : Type} {φ₁ : (κ → R) → ℂ}
-    {φ₂ : (κ' → R) → ℂ} (h₁ : φ₁ ∈ SB (κ → R)) (h₂ : φ₂ ∈ SB (κ' → R)) : boxFun φ₁ φ₂ ∈ SB (κ ⊕ κ' → R) := by
-  refine ⟨(h₁.1.comp_continuous (f := fun x : κ ⊕ κ' → R => x ∘ Sum.inl) (by fun_prop)).mul
-    (h₂.1.comp_continuous (f := fun x : κ ⊕ κ' → R => x ∘ Sum.inr) (by fun_prop)), ?_⟩
-  have hK : IsCompact ((fun p : (κ → R) × (κ' → R) => Sum.elim p.1 p.2) '' (tsupport φ₁ ×ˢ tsupport φ₂)) := by
+theorem boxFun_mem_SB
+    {R : Type} [TopologicalSpace R] [T2Space R]
+    {κ κ' : Type} {φ₁ : (κ → R) → ℂ} {φ₂ : (κ' → R) → ℂ}
+    (h₁ : φ₁ ∈ SB (κ → R)) (h₂ : φ₂ ∈ SB (κ' → R))
+    : boxFun φ₁ φ₂ ∈ SB (κ ⊕ κ' → R) := by
+  refine ⟨
+    (h₁.1.comp_continuous (f := fun x : κ ⊕ κ' → R => x ∘ Sum.inl) (by fun_prop)).mul
+      (h₂.1.comp_continuous (f := fun x : κ ⊕ κ' → R => x ∘ Sum.inr) (by fun_prop)),
+    ?_
+  ⟩
+  have hK : IsCompact
+      ((fun p : (κ → R) × (κ' → R) => Sum.elim p.1 p.2) '' (tsupport φ₁ ×ˢ tsupport φ₂)) := by
     refine (IsCompact.prod h₁.2 h₂.2).image (continuous_pi ?_)
     rintro (i | i)
     · exact (continuous_apply i).comp continuous_fst

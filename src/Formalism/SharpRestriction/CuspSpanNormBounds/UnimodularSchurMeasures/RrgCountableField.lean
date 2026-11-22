@@ -24,7 +24,8 @@ theorem rrg_one_mem (I : AutInst) : (1 : I.GA) ∈ I.GFset := by
   · simp [rrg_P_inv_mul]
   · simp
 
-theorem rrg_mul_mem (I : AutInst) {x y : I.GA} (hx : x ∈ I.GFset) (hy : y ∈ I.GFset) : x * y ∈ I.GFset := by
+theorem rrg_mul_mem (I : AutInst) {x y : I.GA} (hx : x ∈ I.GFset) (hy : y ∈ I.GFset)
+    : x * y ∈ I.GFset := by
   obtain ⟨γ, hγ, hx1, hx2⟩ := hx
   obtain ⟨δ, hδ, hy1, hy2⟩ := hy
   refine ⟨γ * δ, Subgroup.mul_mem _ hγ hδ, fun v => ?_, ?_⟩
@@ -62,15 +63,18 @@ theorem rr_mem_GF (I : AutInst) (x : I.GA) : x ∈ rr_GF I ↔ x ∈ I.GFset := 
 theorem rrg_countable_field (E : Type) [Field E] [NumberField E] : Countable E :=
   (Module.Free.chooseBasis ℚ E).equivFun.injective.countable
 
-theorem rrg_countable_GL (E : Type) [Field E] [NumberField E] (n : ℕ) : Countable (GL (Fin n) E) := by
+theorem rrg_countable_GL (E : Type) [Field E] [NumberField E] (n : ℕ)
+    : Countable (GL (Fin n) E) := by
   haveI := rrg_countable_field E
   haveI : Countable (Matrix (Fin n) (Fin n) E) := inferInstanceAs (Countable (Fin n → Fin n → E))
-  exact Function.Injective.countable (f := fun u : GL (Fin n) E => (u : Matrix (Fin n) (Fin n) E))
+  exact Function.Injective.countable
+    (f := fun u : GL (Fin n) E => (u : Matrix (Fin n) (Fin n) E))
     (fun a b h => Units.ext h)
 
 instance rr_GF_countable (I : AutInst) : Countable (rr_GF I) := by
   have := rrg_countable_GL I.E I.n
-  refine Function.Injective.countable (f := fun x : rr_GF I => (x.2 : (x : I.GA) ∈ I.GFset).choose) ?_
+  refine
+    Function.Injective.countable (f := fun x : rr_GF I => (x.2 : (x : I.GA) ∈ I.GFset).choose) ?_
   intro x y hxy
   have hx := (x.2 : (x : I.GA) ∈ I.GFset).choose_spec
   have hy := (y.2 : (y : I.GA) ∈ I.GFset).choose_spec

@@ -11,7 +11,16 @@ open GlobalTheory.PRep PositivityTheory.SphericalProduct
 
 namespace GlobalTheory.CompanionTheory.Cass
 
-theorem jacquet_projection_surjective : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (D : PositivityTheory.SphericalProduct.CassData G), ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V), IsAdmissible π → ∀ t : D.T, D.IsStrDom t → ∀ U : Module.End ℂ (fixed π D.J), PositivityTheory.Lbc.IsHeckeOpG π D.J (t : G) U → ∀ w ∈ fixed (D.piN π) D.JT, ∃ v : fixed π D.J, D.proj π (v : V) = w := by
+theorem jacquet_projection_surjective
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        (D : PositivityTheory.SphericalProduct.CassData G),
+      ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V),
+        IsAdmissible π
+          → ∀ t : D.T,
+            D.IsStrDom t
+              → ∀ U : Module.End ℂ (fixed π D.J),
+                PositivityTheory.Lbc.IsHeckeOpG π D.J (t : G) U
+                  → ∀ w ∈ fixed (D.piN π) D.JT, ∃ v : fixed π D.J, D.proj π (v : V) = w := by
   intro G _ _ _ D V _ _ π hadm t ht U hU w hw
   have hA2 := GlobalTheory.T.jacquet_projection_hecke_holds G D V π hadm.1 t ht.1 U hU
   obtain ⟨j, v₀, hv₀⟩ := GlobalTheory.T.jacquet_vector_lift_dominant G D V π hadm.1 t ht w hw

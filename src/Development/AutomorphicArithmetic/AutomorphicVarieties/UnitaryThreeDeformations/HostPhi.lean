@@ -5,11 +5,15 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
-private theorem totDisc_quot {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-    [TotallyDisconnectedSpace G] (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G)) :
-    TotallyDisconnectedSpace (G ⧸ N) := by
+private theorem totDisc_quot
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+    [TotallyDisconnectedSpace G]
+    (N : Subgroup G) [N.Normal]
+    (hN : IsClosed (N : Set G))
+    : TotallyDisconnectedSpace (G ⧸ N) := by
   rw [totallyDisconnectedSpace_iff_connectedComponent_one]
   refine Set.eq_singleton_iff_unique_mem.mpr ⟨mem_connectedComponent, ?_⟩
   intro x hx
@@ -18,14 +22,19 @@ private theorem totDisc_quot {G : Type} [Group G] [TopologicalSpace G] [IsTopolo
     by_contra hg
     have hgN : g ∉ N := fun h => hg ((QuotientGroup.eq_one_iff g).mpr h)
     have hcl := ProfiniteGrp.closedSubgroup_eq_sInf_open (G := G) ⟨N, hN⟩
-    have hnot : g ∉ sInf {K : Subgroup G | IsOpen (K : Set G) ∧ ((⟨N, hN⟩ : ClosedSubgroup G) : Subgroup G) ≤ K} := by
-      rw [← hcl]
-      exact hgN
+    have hnot
+        : g ∉ sInf
+          {K : Subgroup G | IsOpen (K : Set G) ∧ ((⟨N, hN⟩ : ClosedSubgroup G) : Subgroup G) ≤ K} :=
+      by
+        rw [← hcl]
+        exact hgN
     rw [Subgroup.mem_sInf] at hnot
     push_neg at hnot
     obtain ⟨K, ⟨hKo, hNK⟩, hgK⟩ := hnot
     have hNK' : N ≤ K := hNK
-    have hpre : (QuotientGroup.mk : G → G ⧸ N) ⁻¹' ((QuotientGroup.mk : G → G ⧸ N) '' (K : Set G)) = K := by
+    have hpre
+        : (QuotientGroup.mk : G → G ⧸ N) ⁻¹' ((QuotientGroup.mk : G → G ⧸ N) '' (K : Set G))
+          = K := by
       ext y
       constructor
       · rintro ⟨k, hk, hky⟩
@@ -42,17 +51,22 @@ private theorem totDisc_quot {G : Type} [Group G] [TopologicalSpace G] [IsTopolo
     have h2 : k⁻¹ * g ∈ N := QuotientGroup.eq.mp hkg
     simpa using K.mul_mem hk (hNK' h2)
 
-private def permR (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ) :
-    Representation R Γ (Γ ⧸ H → R) where
+private def permR (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ)
+    : Representation R Γ (Γ ⧸ H → R) where
   toFun g := LinearMap.funLeft R R fun x => g⁻¹ • x
   map_one' := by ext f x; simp
   map_mul' g h := by ext f x; simp [mul_smul]
 
-private theorem permR_apply (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (f : Γ ⧸ H → R)
-    (x : Γ ⧸ H) : permR R H g f x = f (g⁻¹ • x) := rfl
+private theorem permR_apply
+    (R : Type) [CommRing R]
+    {Γ : Type} [Group Γ]
+    (H : Subgroup Γ)
+    (g : Γ) (f : Γ ⧸ H → R) (x : Γ ⧸ H)
+    : permR R H g f x = f (g⁻¹ • x) :=
+  rfl
 
-private theorem sec_mem {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (x : Γ ⧸ H) :
-    (x.out)⁻¹ * g * (g⁻¹ • x).out ∈ H := by
+private theorem sec_mem {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (x : Γ ⧸ H)
+    : (x.out)⁻¹ * g * (g⁻¹ • x).out ∈ H := by
   have h1 : (QuotientGroup.mk (g⁻¹ * x.out) : Γ ⧸ H) = QuotientGroup.mk ((g⁻¹ • x).out) := by
     rw [QuotientGroup.out_eq']
     conv_rhs => rw [← QuotientGroup.out_eq' x]
@@ -60,10 +74,13 @@ private theorem sec_mem {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (x : �
   have h2 := QuotientGroup.eq.mp h1
   simpa [_root_.mul_inv_rev, mul_assoc] using h2
 
-private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] (n : ℕ)
-    [NeZero n]
-    (h : ∀ (M : Type) [AddCommGroup M] [Module (ZMod n) M] [TopologicalSpace M] [DiscreteTopology M] [Finite M]
-      (ρ : Representation (ZMod n) Γ M), ContAction ρ → Finite (H1 ρ)) : PhiCond Γ n := by
+private theorem phi_condition_of_finite_cohomology
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (n : ℕ) [NeZero n]
+    (h : ∀ (M : Type) [AddCommGroup M] [Module (ZMod n) M] [TopologicalSpace M] [DiscreteTopology M]
+        [Finite M] (ρ : Representation (ZMod n) Γ M),
+      ContAction ρ → Finite (H1 ρ))
+    : PhiCond Γ n := by
   unfold PhiCond
   intro H hH
   haveI : DiscreteTopology (Γ ⧸ H) := by
@@ -91,8 +108,9 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
   haveI := h (Γ ⧸ H → ZMod n) (permR (ZMod n) H) hcont
   let cf : (H →* Multiplicative (ZMod n)) → Γ → Γ ⧸ H → ZMod n := fun φ g x =>
     Multiplicative.toAdd (φ ⟨(x.out)⁻¹ * g * (g⁻¹ • x).out, sec_mem H g x⟩)
-  have hcoc : ∀ (φ : H →* Multiplicative (ZMod n)) (g k : Γ),
-      cf φ (g * k) = cf φ g + permR (ZMod n) H g (cf φ k) := by
+  have hcoc
+      : ∀ (φ : H →* Multiplicative (ZMod n)) (g k : Γ),
+        cf φ (g * k) = cf φ g + permR (ZMod n) H g (cf φ k) := by
     intro φ g k
     funext x
     simp only [cf, permR_apply, Pi.add_apply]
@@ -102,12 +120,15 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
     simp only [Subgroup.coe_mul]
     rw [_root_.mul_inv_rev, mul_smul]
     group
-  have hcont_c : ∀ φ : H →* Multiplicative (ZMod n), IsOpen (φ.ker : Set H) → Continuous (cf φ) := by
+  have hcont_c
+      : ∀ φ : H →* Multiplicative (ZMod n), IsOpen (φ.ker : Set H) → Continuous (cf φ) := by
     intro φ hφ
     have hK : IsOpen (Subtype.val '' (φ.ker : Set H) : Set Γ) := hH.isOpenMap_subtype_val _ hφ
-    let U : Set Γ := ⋂ y : Γ ⧸ H, (fun u => (y.out)⁻¹ * u * y.out) ⁻¹' (Subtype.val '' (φ.ker : Set H))
+    let U : Set Γ :=
+      ⋂ y : Γ ⧸ H, (fun u => (y.out)⁻¹ * u * y.out) ⁻¹' (Subtype.val '' (φ.ker : Set H))
     have hUo : IsOpen U :=
-      isOpen_iInter_of_finite (fun y => hK.preimage ((continuous_const.mul continuous_id).mul continuous_const))
+      isOpen_iInter_of_finite (fun y =>
+        hK.preimage ((continuous_const.mul continuous_id).mul continuous_const))
     have h1U : (1 : Γ) ∈ U := by
       simp only [U, Set.mem_iInter, Set.mem_preimage]
       intro y
@@ -144,8 +165,9 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
     rw [mul_inv_cancel_left, hzero _ hg', map_zero, add_zero] at h2
     exact h2.symm
   let Φ : {φ : H →* Multiplicative (ZMod n) // IsOpen (φ.ker : Set H)} → H1 (permR (ZMod n) H) :=
-    fun φ => Submodule.Quotient.mk
-      (⟨cf φ.1, by unfold Z1; exact ⟨hcont_c φ.1 φ.2, hcoc φ.1⟩⟩ : Z1 (permR (ZMod n) H))
+    fun φ =>
+      Submodule.Quotient.mk
+        (⟨cf φ.1, by unfold Z1; exact ⟨hcont_c φ.1 φ.2, hcoc φ.1⟩⟩ : Z1 (permR (ZMod n) H))
   have hinj : Function.Injective Φ := by
     rintro ⟨φ, hφ⟩ ⟨ψ, hψ⟩ heq
     apply Subtype.ext
@@ -155,7 +177,9 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
     obtain ⟨m, hm⟩ := LinearMap.mem_range.mp heq
     ext k
     have ho : ((QuotientGroup.mk (1 : Γ) : Γ ⧸ H).out) ∈ H := by
-      have h0 : (QuotientGroup.mk ((QuotientGroup.mk (1 : Γ) : Γ ⧸ H).out) : Γ ⧸ H) = QuotientGroup.mk 1 :=
+      have h0
+          : (QuotientGroup.mk ((QuotientGroup.mk (1 : Γ) : Γ ⧸ H).out) : Γ ⧸ H)
+            = QuotientGroup.mk 1 :=
         QuotientGroup.out_eq' _
       have := QuotientGroup.eq.mp h0
       simpa using this
@@ -164,17 +188,23 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
     have hx₀ : (o * (k : Γ) * o⁻¹)⁻¹ • (QuotientGroup.mk (1 : Γ) : Γ ⧸ H) = QuotientGroup.mk 1 := by
       rw [MulAction.Quotient.smul_mk, smul_eq_mul, mul_one, QuotientGroup.eq]
       simpa using hhH
-    have hk' : (⟨((QuotientGroup.mk (1 : Γ) : Γ ⧸ H).out)⁻¹ * (o * (k : Γ) * o⁻¹) *
-        ((o * (k : Γ) * o⁻¹)⁻¹ • (QuotientGroup.mk (1 : Γ) : Γ ⧸ H)).out,
-        sec_mem H _ _⟩ : H) = k := by
+    have hk'
+        : (⟨
+             ((QuotientGroup.mk (1 : Γ) : Γ ⧸ H).out)⁻¹ * (o * (k : Γ) * o⁻¹)
+               * ((o * (k : Γ) * o⁻¹)⁻¹ • (QuotientGroup.mk (1 : Γ) : Γ ⧸ H)).out,
+             sec_mem H _ _
+           ⟩
+            : H)
+          = k := by
       apply Subtype.ext
       simp only
       rw [hx₀, ← ho_def]
       group
     have hev := congrFun (congrFun hm (o * (k : Γ) * o⁻¹)) (QuotientGroup.mk 1)
     unfold ReciprocityTheory.Gal.d0 at hev
-    simp only [LinearMap.pi_apply, LinearMap.sub_apply, LinearMap.id_apply, Pi.sub_apply, permR_apply,
-      Submodule.coe_sub, Submodule.subtype_apply] at hev
+    simp only [LinearMap.pi_apply, LinearMap.sub_apply, LinearMap.id_apply, Pi.sub_apply,
+        permR_apply, Submodule.coe_sub, Submodule.subtype_apply]
+      at hev
     rw [hx₀, sub_self] at hev
     simp only [cf] at hev
     rw [hk'] at hev
@@ -183,10 +213,19 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
     exact Multiplicative.toAdd.injective h4
   exact Finite.of_injective Φ hinj
 
-theorem UpperTheory.V.UnitaryThreeInertia.hostFrame_phi :
-    GlobalFiniteness → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (c : Coef l) {N : ℕ} [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) (o₁ : ℕ), HostData l e ψ o₁ →
-    ∀ (S : Finset Pl) (A : S → ValuationSubring Ω) (F : Frame c.O (Formalism.ConjugateSelfDual.G ℚ Ω) (Gam Ω S) S), IsHostFrame Ω c e ψ S A F →
-    PhiCond (Gam Ω S) l ∧ CompactSpace (Gam Ω S) ∧ T2Space (Gam Ω S) ∧ TotallyDisconnectedSpace (Gam Ω S) ∧ CompactSpace (Formalism.ConjugateSelfDual.G ℚ Ω) ∧ T2Space (Formalism.ConjugateSelfDual.G ℚ Ω) ∧ TotallyDisconnectedSpace (Formalism.ConjugateSelfDual.G ℚ Ω) := by
+theorem UpperTheory.V.UnitaryThreeInertia.hostFrame_phi
+    : GlobalFiniteness
+      → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (c : Coef l)
+          {N : ℕ} [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) (o₁ : ℕ),
+        HostData l e ψ o₁
+          → ∀ (S : Finset Pl) (A : S → ValuationSubring Ω)
+              (F : Frame c.O (Formalism.ConjugateSelfDual.G ℚ Ω) (Gam Ω S) S),
+            IsHostFrame Ω c e ψ S A F
+              → PhiCond (Gam Ω S) l ∧ CompactSpace (Gam Ω S) ∧ T2Space (Gam Ω S)
+                ∧ TotallyDisconnectedSpace (Gam Ω S)
+                ∧ CompactSpace (Formalism.ConjugateSelfDual.G ℚ Ω)
+                ∧ T2Space (Formalism.ConjugateSelfDual.G ℚ Ω)
+                ∧ TotallyDisconnectedSpace (Formalism.ConjugateSelfDual.G ℚ Ω) := by
   intro hGF Ω _ _ _ l _ c N _ e ψ o₁ _hD S A F hF
   haveI : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
   have hT2 : T2Space (Gam Ω S) := by
@@ -200,11 +239,15 @@ theorem UpperTheory.V.UnitaryThreeInertia.hostFrame_phi :
     unfold ReciprocityTheory.Gal.ContainsAbove
     intro v hv
     apply (hF.mem v).mpr
-    simpa [Nat.cast_mul, mul_comm] using Ideal.mul_mem_right (N : NumberField.RingOfIntegers ℚ) v.asIdeal hv
+    simpa [Nat.cast_mul, mul_comm] using
+      Ideal.mul_mem_right (N : NumberField.RingOfIntegers ℚ) v.asIdeal hv
   unfold GlobalFiniteness at hGF
-  have key : ∀ k : ℕ, k = l ^ 1 → ∀ (M : Type) [AddCommGroup M] [Module (ZMod k) M] [TopologicalSpace M]
-      [DiscreteTopology M] [Finite M] (ρ : Representation (ZMod k) (Gam Ω S) M),
-      ReciprocityTheory.Gal.ContAction ρ → Finite (H1 ρ) := by
+  have key
+      : ∀ k : ℕ,
+        k = l ^ 1
+          → ∀ (M : Type) [AddCommGroup M] [Module (ZMod k) M] [TopologicalSpace M]
+              [DiscreteTopology M] [Finite M] (ρ : Representation (ZMod k) (Gam Ω S) M),
+            ReciprocityTheory.Gal.ContAction ρ → Finite (H1 ρ) := by
     intro k hk
     subst hk
     intro M _ _ _ _ _ ρ hρ

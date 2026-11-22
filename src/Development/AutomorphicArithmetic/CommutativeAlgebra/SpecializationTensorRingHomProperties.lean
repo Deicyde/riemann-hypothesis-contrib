@@ -37,8 +37,8 @@ private lemma spz_tmul (R : Subalgebra k L) (φ : R →ₐ[k] k) (r : R) (a : A)
     Spz R φ ((r : L) ⊗ₜ[k] a) (φ r • a) :=
   ⟨r ⊗ₜ[k] a, by simp, by simp⟩
 
-private noncomputable def contr (l : A →ₗ[k] k) (B : Type) [CommRing B] [Algebra k B] :
-    B ⊗[k] A →ₗ[k] B :=
+private noncomputable def contr (l : A →ₗ[k] k) (B : Type) [CommRing B] [Algebra k B]
+    : B ⊗[k] A →ₗ[k] B :=
   (TensorProduct.rid k B).toLinearMap ∘ₗ LinearMap.lTensor B l
 
 private lemma contr_tmul (l : A →ₗ[k] k) (B : Type) [CommRing B] [Algebra k B] (b : B) (a : A) :
@@ -63,8 +63,22 @@ private lemma exists_contr_ne_zero {y : L ⊗[k] A} (hy : y ≠ 0) :
   simpa using hi
 end
 
-theorem UpperTheory.specialization_tensor_ring_hom_properties :
-    ∀ (k L A : Type) [Field k] [Field L] [Algebra k L] [CommRing A] [Algebra k A], (∀ (R : Subalgebra k L) (φ : R →ₐ[k] k), (∀ (y : L ⊗[k] A) (a a' : A), Spz R φ y a → Spz R φ y a' → a = a') ∧ (∀ (y y' : L ⊗[k] A) (a a' : A), Spz R φ y a → Spz R φ y' a' → Spz R φ (y + y') (a + a') ∧ Spz R φ (y * y') (a * a') ∧ Spz R φ (y - y') (a - a')) ∧ (∀ (r : R) (a : A), Spz R φ ((r : L) ⊗ₜ[k] a) (φ r • a)) ∧ ∀ (A' : Type) [CommRing A'] [Algebra k A'] (g : A →ₐ[k] A') (y : L ⊗[k] A) (a : A), Spz R φ y a → Spz R φ (Algebra.TensorProduct.map (AlgHom.id k L) g y) (g a)) ∧ (∀ y : L ⊗[k] A, ∃ s : Finset L, ∀ R : Subalgebra k L, (s : Set L) ⊆ R → ∀ φ : R →ₐ[k] k, ∃ a, Spz R φ y a) ∧ ∀ y : L ⊗[k] A, y ≠ 0 → ∃ s : Finset L, ∀ R : Subalgebra k L, (s : Set L) ⊆ R → ∀ (φ : R →ₐ[k] k) (a : A), Spz R φ y a → a ≠ 0 := by
+theorem UpperTheory.specialization_tensor_ring_hom_properties
+    : ∀ (k L A : Type) [Field k] [Field L] [Algebra k L] [CommRing A] [Algebra k A],
+      (∀ (R : Subalgebra k L) (φ : R →ₐ[k] k),
+          (∀ (y : L ⊗[k] A) (a a' : A), Spz R φ y a → Spz R φ y a' → a = a')
+            ∧ (∀ (y y' : L ⊗[k] A) (a a' : A),
+              Spz R φ y a → Spz R φ y' a'
+                → Spz R φ (y + y') (a + a') ∧ Spz R φ (y * y') (a * a') ∧ Spz R φ (y - y') (a - a'))
+            ∧ (∀ (r : R) (a : A), Spz R φ ((r : L) ⊗ₜ[k] a) (φ r • a))
+            ∧ ∀ (A' : Type) [CommRing A'] [Algebra k A'] (g : A →ₐ[k] A') (y : L ⊗[k] A) (a : A),
+              Spz R φ y a → Spz R φ (Algebra.TensorProduct.map (AlgHom.id k L) g y) (g a))
+        ∧ (∀ y : L ⊗[k] A, ∃ s : Finset L, ∀ R : Subalgebra k L,
+          (s : Set L) ⊆ R → ∀ φ : R →ₐ[k] k, ∃ a, Spz R φ y a)
+        ∧ ∀ y : L ⊗[k] A,
+          y ≠ 0
+            → ∃ s : Finset L, ∀ R : Subalgebra k L,
+              (s : Set L) ⊆ R → ∀ (φ : R →ₐ[k] k) (a : A), Spz R φ y a → a ≠ 0 := by
   intro k L A _ _ _ _ _
   refine ⟨fun R φ => ⟨?_, ?_, spz_tmul R φ, ?_⟩, ?_, ?_⟩
   · rintro y a a' ⟨u, hu, rfl⟩ ⟨v, hv, rfl⟩
@@ -89,8 +103,7 @@ theorem UpperTheory.specialization_tensor_ring_hom_properties :
       | add x y hx hy => simp only [map_add (f := _), hx, hy]
   · intro y
     induction y using TensorProduct.induction_on with
-    | zero =>
-      exact ⟨∅, fun R _ φ => ⟨0, 0, by simp, by simp⟩⟩
+    | zero => exact ⟨∅, fun R _ φ => ⟨0, 0, by simp, by simp⟩⟩
     | tmul l b =>
       classical
       refine ⟨{l}, fun R hs φ => ?_⟩
@@ -112,15 +125,20 @@ theorem UpperTheory.specialization_tensor_ring_hom_properties :
     have hcR : c ∈ R := hs (by simp)
     have hcR' : c⁻¹ ∈ R := hs (by simp)
     obtain ⟨u, hu, hua⟩ := ha
-    have e1 : ∀ z : R ⊗[k] A, ((contr l R z : R) : L) =
-        contr l L (Algebra.TensorProduct.map R.val (AlgHom.id k A) z) := by
+    have e1
+        : ∀ z : R ⊗[k] A,
+          ((contr l R z : R) : L)
+            = contr l L (Algebra.TensorProduct.map R.val (AlgHom.id k A) z) := by
       intro z
       induction z using TensorProduct.induction_on with
       | zero => simp
       | tmul r b => simp [contr_tmul]
       | add x y hx hy => simp only [map_add (f := _), hx, hy, Subalgebra.coe_add]
-    have e2 : ∀ z : R ⊗[k] A, φ (contr l R z) =
-        l (Algebra.TensorProduct.lid k A (Algebra.TensorProduct.map φ (AlgHom.id k A) z)) := by
+    have e2
+        : ∀ z : R ⊗[k] A,
+          φ (contr l R z)
+            = l (Algebra.TensorProduct.lid k A
+              (Algebra.TensorProduct.map φ (AlgHom.id k A) z)) := by
       intro z
       induction z using TensorProduct.induction_on with
       | zero => simp

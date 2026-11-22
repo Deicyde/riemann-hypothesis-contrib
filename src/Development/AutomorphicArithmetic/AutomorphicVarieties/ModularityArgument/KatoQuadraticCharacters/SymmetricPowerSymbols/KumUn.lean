@@ -9,15 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemModula
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-private theorem exists_limit {K L : Type} [Field K] [Field L] [Algebra K L] [Algebra.IsAlgebraic K L]
-    (φ : Finset K → (L →+* L)) (hφ : ∀ T, ∀ t ∈ T, φ T (algebraMap K L t) = algebraMap K L t) :
-    ∃ ψ : L ≃ₐ[K] L, ∀ z, ∃ T, φ T z = ψ z := by
+private theorem exists_limit
+    {K L : Type} [Field K] [Field L] [Algebra K L] [Algebra.IsAlgebraic K L]
+    (φ : Finset K → (L →+* L)) (hφ : ∀ T, ∀ t ∈ T, φ T (algebraMap K L t) = algebraMap K L t)
+    : ∃ ψ : L ≃ₐ[K] L, ∀ z, ∃ T, φ T z = ψ z := by
   classical
   let U : Ultrafilter (Finset K) := Ultrafilter.of Filter.atTop
   have hU : (U : Filter (Finset K)) ≤ Filter.atTop := Ultrafilter.of_le _
-  have ev : ∀ P : Prop, (∀ᶠ _T in (U : Filter (Finset K)), P) → P :=
-    fun P h => h.exists.elim fun _ h => h
-  have hfix : ∀ t : K, ∀ᶠ T in (U : Filter (Finset K)), φ T (algebraMap K L t) = algebraMap K L t := by
+  have ev : ∀ P : Prop, (∀ᶠ _T in (U : Filter (Finset K)), P) → P := fun P h =>
+    h.exists.elim fun _ h => h
+  have hfix
+      : ∀ t : K, ∀ᶠ T in (U : Filter (Finset K)), φ T (algebraMap K L t) = algebraMap K L t := by
     intro t
     filter_upwards [hU (Filter.eventually_ge_atTop {t})] with T hT
     exact hφ T t (hT (Finset.mem_singleton_self t))
@@ -25,8 +27,9 @@ private theorem exists_limit {K L : Type} [Field K] [Field L] [Algebra K L] [Alg
     intro z
     obtain ⟨p, hp0, hpz⟩ := Algebra.IsAlgebraic.isAlgebraic (R := K) z
     let S : Finset K := p.support.image p.coeff
-    have hroot : ∀ᶠ T in (U : Filter (Finset K)),
-        φ T z ∈ ((p.map (algebraMap K L)).roots.toFinset : Set L) := by
+    have hroot
+        : ∀ᶠ T in (U : Filter (Finset K)),
+          φ T z ∈ ((p.map (algebraMap K L)).roots.toFinset : Set L) := by
       filter_upwards [hU (Filter.eventually_ge_atTop S)] with T hT
       have hmap : p.map (algebraMap K L) = p.map ((φ T).comp (algebraMap K L)) := by
         ext n
@@ -40,30 +43,35 @@ private theorem exists_limit {K L : Type} [Field K] [Field L] [Algebra K L] [Alg
       change Polynomial.eval _ _ = 0
       have h0 : Polynomial.eval₂ (algebraMap K L) z p = 0 := hpz
       rw [hmap, Polynomial.eval_map, ← Polynomial.hom_eval₂, h0, map_zero]
-    obtain ⟨w, -, hw⟩ := Ultrafilter.eq_pure_of_finite_mem
-      (f := U.map (fun T => φ T z)) (Finset.finite_toSet _) (Ultrafilter.mem_map.mpr hroot)
+    obtain ⟨w, -, hw⟩ :=
+      Ultrafilter.eq_pure_of_finite_mem (f := U.map (fun T => φ T z)) (Finset.finite_toSet _)
+        (Ultrafilter.mem_map.mpr hroot)
     refine ⟨w, ?_⟩
     have hmem : ({w} : Set L) ∈ U.map (fun T => φ T z) := by
       rw [hw]
       exact Ultrafilter.mem_pure.mpr rfl
     exact Ultrafilter.mem_map.mp hmem
   choose ψ0 hψ0 using key
-  let ψ1 : L →ₐ[K] L :=
-    { toFun := ψ0
-      map_one' := ev _ ((hψ0 1).mono fun T h => by rw [← h, map_one])
-      map_mul' := fun x y => ev _ (((hψ0 x).and ((hψ0 y).and (hψ0 (x * y)))).mono
-        fun T h => by rw [← h.1, ← h.2.1, ← h.2.2, map_mul])
-      map_zero' := ev _ ((hψ0 0).mono fun T h => by rw [← h, map_zero])
-      map_add' := fun x y => ev _ (((hψ0 x).and ((hψ0 y).and (hψ0 (x + y)))).mono
-        fun T h => by rw [← h.1, ← h.2.1, ← h.2.2, map_add (f := _)])
-      commutes' := fun t => ev _ (((hψ0 (algebraMap K L t)).and (hfix t)).mono
-        fun T h => by rw [← h.1, h.2]) }
+  let ψ1 : L →ₐ[K] L := {
+    toFun := ψ0
+    map_one' := ev _ ((hψ0 1).mono fun T h => by rw [← h, map_one])
+    map_mul' := fun x y =>
+      ev _
+        (((hψ0 x).and ((hψ0 y).and (hψ0 (x * y)))).mono fun T h => by
+          rw [← h.1, ← h.2.1, ← h.2.2, map_mul])
+    map_zero' := ev _ ((hψ0 0).mono fun T h => by rw [← h, map_zero])
+    map_add' := fun x y =>
+      ev _
+        (((hψ0 x).and ((hψ0 y).and (hψ0 (x + y)))).mono fun T h => by
+          rw [← h.1, ← h.2.1, ← h.2.2, map_add (f := _)])
+    commutes' := fun t =>
+      ev _ (((hψ0 (algebraMap K L t)).and (hfix t)).mono fun T h => by rw [← h.1, h.2])
+  }
   refine ⟨AlgEquiv.ofBijective ψ1 (Algebra.IsAlgebraic.algHom_bijective ψ1), fun z => ?_⟩
   obtain ⟨T, hT⟩ := (hψ0 z).exists
   exact ⟨T, hT⟩
 
-theorem UpperTheory.V.Z.Kato.Sym.kumUn :
-    UpperTheory.V.Z.Kato.Sym.KumUn := by
+theorem UpperTheory.V.Z.Kato.Sym.kumUn : UpperTheory.V.Z.Kato.Sym.KumUn := by
   unfold UpperTheory.V.Z.Kato.Sym.KumUn
   rintro Ω _ _ _ ε X m hm φ f ⟨θ, hθ, hka⟩ hU
   rw [Tower.Un, Set.mem_setOf_eq]
@@ -78,8 +86,9 @@ theorem UpperTheory.V.Z.Kato.Sym.kumUn :
   letI : Algebra (Polynomial Ω) X.K := P.toRingHom.toAlgebra
   letI : Algebra (RatFunc Ω) X.K := Λ.toRingHom.toAlgebra
   have hΛP : ∀ p : Polynomial Ω, Λ (algebraMap (Polynomial Ω) (RatFunc Ω) p) = P p := fun p => by
-    simpa using RatFunc.liftAlgHom_apply_div P
-      (nonZeroDivisors_le_comap_nonZeroDivisors_of_injective _ hinj) p 1
+    simpa using
+      RatFunc.liftAlgHom_apply_div P (nonZeroDivisors_le_comap_nonZeroDivisors_of_injective _ hinj)
+        p 1
   haveI : IsScalarTower (Polynomial Ω) (RatFunc Ω) X.K :=
     IsScalarTower.of_algebraMap_eq fun p => (hΛP p).symm
   haveI : Algebra.IsAlgebraic (RatFunc Ω) X.K := by
@@ -106,9 +115,11 @@ theorem UpperTheory.V.Z.Kato.Sym.kumUn :
       exact h0
   obtain ⟨B, hB⟩ := UnRoot.exists_comap_eq (io X) W
   have hf0 : (f : X.K) ≠ 0 := f.ne_zero
-  have hTex : ∃ T : Finset X.K, ∀ φ' : Kb X →+* Kb X,
-      (∀ x, B.valuation x ≤ 1 → B.valuation (φ' x - x) < 1) →
-      (∀ t ∈ T, φ' (algebraMap X.K (Kb X) t) = algebraMap X.K (Kb X) t) → φ' θ = θ := by
+  have hTex
+      : ∃ T : Finset X.K, ∀ φ' : Kb X →+* Kb X,
+        (∀ x, B.valuation x ≤ 1 → B.valuation (φ' x - x) < 1)
+          → (∀ t ∈ T, φ' (algebraMap X.K (Kb X) t) = algebraMap X.K (Kb X) t)
+          → φ' θ = θ := by
     by_contra hcon
     push_neg at hcon
     choose φ' hin hfx hne using hcon

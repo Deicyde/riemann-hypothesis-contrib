@@ -8,8 +8,8 @@ namespace ReciprocityTheory.ChartRestriction.G.FD.FrequencyIndexing
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] {n : ℕ} (ω : Module.Basis (Fin n) ℝ (ι → ℝ))
 
-noncomputable def νk (k : Fin n → ℤ) : ι → ℝ :=
-  fun τ => (∑ j, (k j : ℝ) * ω.repr (Pi.single τ 1) j) / 2
+noncomputable def νk (k : Fin n → ℤ) : ι → ℝ := fun τ =>
+  (∑ j, (k j : ℝ) * ω.repr (Pi.single τ 1) j) / 2
 
 lemma pairing (ν : ι → ℝ) (k : Fin n → ℤ) (hk : ∀ j, 2 * ∑ τ, ν τ * ω j τ = k j) (v : ι → ℝ) :
     ∑ τ, ν τ * v τ = (∑ j, (k j : ℝ) * ω.repr v j) / 2 := by

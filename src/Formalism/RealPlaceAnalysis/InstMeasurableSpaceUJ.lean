@@ -36,11 +36,10 @@ def Unimodular : Prop :=
 def InvInvariant : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool), Measure.map (fun x : UJ ε => x⁻¹) (muG ε) = muG ε
 
-def BallFinite : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (R : ℝ), muG ε {g | hsG g ≤ R} < ⊤
+def BallFinite : Prop := ∀ (n : ℕ) (ε : Fin n → Bool) (R : ℝ), muG ε {g | hsG g ≤ R} < ⊤
 
 def VolGrowth : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool), ∃ C : ℝ, ∀ R : ℝ, 1 ≤ R →
-    muG ε {g | hsG g ≤ R ^ 2} ≤ ENNReal.ofReal (C * R ^ (2 * n ^ 2))
+  ∀ (n : ℕ) (ε : Fin n → Bool), ∃ C : ℝ, ∀ R : ℝ,
+    1 ≤ R → muG ε {g | hsG g ≤ R ^ 2} ≤ ENNReal.ofReal (C * R ^ (2 * n ^ 2))
 
 end Formalism.REAL

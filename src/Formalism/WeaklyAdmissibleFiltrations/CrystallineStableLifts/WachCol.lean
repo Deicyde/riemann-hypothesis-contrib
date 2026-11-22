@@ -14,10 +14,12 @@ section Abstract
 
 variable {O X H : Type} [CommRing O] [AddCommGroup X] [Module O X] [AddCommGroup H] [Module O H]
 
-theorem wachCol_len_transfer (N I : Submodule O X) (f : N →ₗ[O] H) (Hf S : Submodule O H)
-    (hr : LinearMap.range f = Hf) (hI : I.comap N.subtype = S.comap f) :
-    Module.length O (↥N ⧸ I.comap N.subtype) = Module.length O (↥Hf ⧸ S.comap Hf.subtype) := by
-  let g : N →ₗ[O] Hf := LinearMap.codRestrict Hf f (fun x => by rw [← hr]; exact LinearMap.mem_range_self f x)
+theorem wachCol_len_transfer
+    (N I : Submodule O X) (f : N →ₗ[O] H)
+    (Hf S : Submodule O H) (hr : LinearMap.range f = Hf) (hI : I.comap N.subtype = S.comap f)
+    : Module.length O (↥N ⧸ I.comap N.subtype) = Module.length O (↥Hf ⧸ S.comap Hf.subtype) := by
+  let g : N →ₗ[O] Hf :=
+    LinearMap.codRestrict Hf f (fun x => by rw [← hr]; exact LinearMap.mem_range_self f x)
   have hg : Function.Surjective g := by
     rintro ⟨y, hy⟩
     rw [← hr] at hy
@@ -31,9 +33,11 @@ theorem wachCol_len_transfer (N I : Submodule O X) (f : N →ₗ[O] H) (Hf S : S
     simp [q, g]
   exact ((Submodule.quotEquivOfEq _ _ hk.symm).trans (q.quotKerEquivOfSurjective hq)).length_eq
 
-theorem wachCol_lift_transfer (N I : Submodule O X) (f : N →ₗ[O] H) (Hf S : Submodule O H)
-    (hr : LinearMap.range f = Hf) (hI : I.comap N.subtype = S.comap f) (a : O) :
-    (∀ m ∈ N, a • m ∈ I) ↔ ∀ x ∈ Hf, a • x ∈ S := by
+theorem wachCol_lift_transfer
+    (N I : Submodule O X) (f : N →ₗ[O] H)
+    (Hf S : Submodule O H) (hr : LinearMap.range f = Hf) (hI : I.comap N.subtype = S.comap f)
+    (a : O)
+    : (∀ m ∈ N, a • m ∈ I) ↔ ∀ x ∈ Hf, a • x ∈ S := by
   have key : ∀ n : N, (a • (n : X) ∈ I ↔ a • f n ∈ S) := by
     intro n
     have h := SetLike.ext_iff.mp hI (a • n)
@@ -52,12 +56,13 @@ section WachSide
 
 open Formalism.CoboundaryTransfers
 
-variable {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {Bw : Base O A} {M : ℕ}
-  {D D' : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
-  [AddCommGroup D'] [Module A D'] [Module O D'] [IsScalarTower O A D']
+variable
+  {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+  {Bw : Base O A} {M : ℕ} {D D' : Type} [AddCommGroup D] [Module A D] [Module O D]
+  [IsScalarTower O A D] [AddCommGroup D'] [Module A D'] [Module O D'] [IsScalarTower O A D']
 
-theorem wachModule_mem_cocycles_iff (W : WachMod Bw M D) (pr : D × D) :
-    pr ∈ W.Z1 ↔ (W.γ pr.1 - pr.1) - (W.φ pr.2 - pr.2) = 0 := by
+theorem wachModule_mem_cocycles_iff (W : WachMod Bw M D) (pr : D × D)
+    : pr ∈ W.Z1 ↔ (W.γ pr.1 - pr.1) - (W.φ pr.2 - pr.2) = 0 := by
   unfold WachMod.Z1
   simp
   rw [← neg_sub (W.φ pr.2) pr.2, ← sub_eq_add_neg]
@@ -72,14 +77,16 @@ theorem wachModule_coboundaries_le_cocycles (W : WachMod Bw M D) : W.B1 ≤ W.Z1
     | (cases W; simp_all)
     | (cases W; simp_all [LinearMap.ext_iff])
     | (cases W; simp_all [LinearMap.ext_iff, eq_comm])
-  simp [key, Function.prod, map_add (f := _), map_sub, map_neg, neg_smul, LinearMap.add_apply] <;> abel
+  simp [key, Function.prod, map_add (f := _), map_sub, map_neg, neg_smul, LinearMap.add_apply]
+    <;> abel
 
 theorem wachModule_finiteCocycles_le_cocycles (W : WachMod Bw M D) : W.Zf ≤ W.Z1 := by
   unfold WachMod.Zf
   exact sup_le (Submodule.span_le.mpr (fun x hx => hx.1)) (wachModule_coboundaries_le_cocycles W)
 
-theorem wachHom_prodMap_mem_cocycles {W : WachMod Bw M D} {W' : WachMod Bw M D'} (Fw : Hom W W') (pr : D × D)
-    (h : pr ∈ W.Z1) : Fw.f2 pr ∈ W'.Z1 := by
+theorem wachHom_prodMap_mem_cocycles
+    {W : WachMod Bw M D} {W' : WachMod Bw M D'} (Fw : Hom W W') (pr : D × D) (h : pr ∈ W.Z1)
+    : Fw.f2 pr ∈ W'.Z1 := by
   rw [wachModule_mem_cocycles_iff] at h ⊢
   have := congrArg Fw.f h
   simp only [map_sub, map_zero, Fw.φ_comm, Fw.γ_comm] at this
@@ -88,13 +95,13 @@ theorem wachHom_prodMap_mem_cocycles {W : WachMod Bw M D} {W' : WachMod Bw M D'}
 end WachSide
 
 theorem cokernelLengthEqWach_holds : WachCol := by
-  intro G _ Qp K₀ K _ _ _ _ _ _ _ B BdR _ _ _ _ _ _ _ _ _ _ _ PD LL _ _ O _ _ V V'
-    _ _ _ _ _ _ _ _ _ _ _ _ ρ ρ' _ _ _ _ _ _ _ L L' F A D D' _ _ _ _ _ _ _ _ _ _
-    Bw M W W' Fw cl cl' hp hW hW' hnat
+  intro G _ Qp K₀ K _ _ _ _ _ _ _ B BdR _ _ _ _ _ _ _ _ _ _ _ PD LL _ _ O _ _ V V' _ _ _ _ _ _ _ _ _
+    _ _ _ ρ ρ' _ _ _ _ _ _ _ L L' F A D D' _ _ _ _ _ _ _ _ _ _ Bw M W W' Fw cl cl' hp hW hW' hnat
   set S : Submodule O (LatticeCohomology L') := (latticeFiniteCohomology PD L).map F.H1map with hS
 
   have hZf_le : latticeFiniteCocycles PD L' ≤ latticeCocycles L' := inf_le_left
-  let ψ : ↥(latticeFiniteCocycles PD L') →ₗ[O] LatticeCohomology L' := (Submodule.mkQ _) ∘ₗ Submodule.inclusion hZf_le
+  let ψ : ↥(latticeFiniteCocycles PD L') →ₗ[O] LatticeCohomology L' :=
+    (Submodule.mkQ _) ∘ₗ Submodule.inclusion hZf_le
   have hψr : LinearMap.range ψ = latticeFiniteCohomology PD L' := by
     rw [LinearMap.range_comp, Submodule.range_inclusion]; rfl
   have hψI : (F.ImF PD).comap (latticeFiniteCocycles PD L').subtype = S.comap ψ := by
@@ -108,7 +115,8 @@ theorem cokernelLengthEqWach_holds : WachCol := by
       refine (Submodule.Quotient.eq _).2 ?_
       change F.post a - c ∈ latticeCoboundaries L'
       have e : F.post a - c = -b := by rw [← hab]; abel
-      rw [e]; exact (latticeCoboundaries L').neg_mem hb
+      rw [e]
+      exact (latticeCoboundaries L').neg_mem hb
     · rintro ⟨κ, ⟨x, hx, rfl⟩, hκ⟩
       simp only [ψ, LinearMap.comp_apply, LatHom.H1map, Submodule.mkQ_apply] at hκ
       have hb := (Submodule.Quotient.eq _).1 hκ
@@ -147,14 +155,19 @@ theorem cokernelLengthEqWach_holds : WachCol := by
         rw [map_sub]; exact sub_eq_zero.2 hκ'.symm
       have hb := (hW'.1.2 _).1 h0
       exact Submodule.mem_sup.2 ⟨Fw.f2 pr, ⟨pr, hpr, rfl⟩, pr' - Fw.f2 pr, hb, by abel⟩
-  have hcolG := wachCol_len_transfer (latticeFiniteCocycles PD L') (F.ImF PD) ψ (latticeFiniteCohomology PD L') S hψr hψI
+  have hcolG :=
+    wachCol_len_transfer (latticeFiniteCocycles PD L') (F.ImF PD) ψ (latticeFiniteCohomology PD L')
+      S hψr hψI
   have hcolW := wachCol_len_transfer W'.Zf Fw.ImF χ (latticeFiniteCohomology PD L') S hχr hχI
   refine ⟨?_, fun e => ?_⟩
   · unfold LatHom.col Formalism.CoboundaryTransfers.Hom.col
     rw [hcolG, hcolW]
-  · have hG := wachCol_lift_transfer (latticeFiniteCocycles PD L') (F.ImF PD) ψ (latticeFiniteCohomology PD L') S hψr hψI
-      ((PD.p : O) ^ e)
-    have hWl := wachCol_lift_transfer W'.Zf Fw.ImF χ (latticeFiniteCohomology PD L') S hχr hχI ((PD.p : O) ^ e)
+  · have hG :=
+      wachCol_lift_transfer (latticeFiniteCocycles PD L') (F.ImF PD) ψ
+        (latticeFiniteCohomology PD L') S hψr hψI ((PD.p : O) ^ e)
+    have hWl :=
+      wachCol_lift_transfer W'.Zf Fw.ImF χ (latticeFiniteCohomology PD L') S hχr hχI
+        ((PD.p : O) ^ e)
     unfold LatHom.LiftF Formalism.CoboundaryTransfers.Hom.LiftF
     rw [hG]
     have hsm : ∀ pr : D' × D', ((Bw.p ^ e : ℕ)) • pr = ((PD.p : O) ^ e) • pr := by

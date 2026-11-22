@@ -12,14 +12,19 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.NFRadRedR
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.QrD
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.QrD
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 def LocLog : Prop :=
-  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), inWb k r z → 0 < Tz k r z →
-    ∃ O : Set (Q.Mx k r), IsOpen O ∧ (1 : Q.Mx k r) ∈ O ∧ ∃ Λ : Q.Mx k r → Q.Mx k r, ContDiffOn ℝ ∞ Λ O ∧
-      ∀ g ∈ O, g ∈ UWset k r z → InLieW k r z (Λ g) ∧ NormedSpace.exp (Λ g) = g
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ),
+    inWb k r z → 0 < Tz k r z
+      → ∃ O : Set (Q.Mx k r),
+        IsOpen O ∧ (1 : Q.Mx k r) ∈ O
+          ∧ ∃ Λ : Q.Mx k r → Q.Mx k r,
+            ContDiffOn ℝ ∞ Λ O
+              ∧ ∀ g ∈ O, g ∈ UWset k r z → InLieW k r z (Λ g) ∧ NormedSpace.exp (Λ g) = g
 
 variable {k r : ℕ}
 
@@ -30,8 +35,10 @@ def lieW (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) : Submodule ℝ (Q.Mx k r
     rintro X Y ⟨⟨hX1, hX2⟩, hX3⟩ ⟨⟨hY1, hY2⟩, hY3⟩
     refine ⟨⟨?_, fun a ha => ⟨?_, ?_⟩⟩, ?_⟩
     · rw [Matrix.conjTranspose_add, Matrix.add_mul, Matrix.mul_add,
-        show Xᴴ * Hpk k r + Yᴴ * Hpk k r + (Hpk k r * X + Hpk k r * Y) =
-          (Xᴴ * Hpk k r + Hpk k r * X) + (Yᴴ * Hpk k r + Hpk k r * Y) by abel, hX1, hY1, add_zero]
+        show Xᴴ * Hpk k r + Yᴴ * Hpk k r + (Hpk k r * X + Hpk k r * Y)
+            = (Xᴴ * Hpk k r + Hpk k r * X) + (Yᴴ * Hpk k r + Hpk k r * Y) by
+          abel,
+        hX1, hY1, add_zero]
     · rw [Matrix.add_mulVec, (hX2 a ha).1, (hY2 a ha).1, add_zero]
     · rw [Matrix.add_mulVec, (hX2 a ha).2, (hY2 a ha).2, add_zero]
     · rw [Matrix.add_mulVec, hX3, hY3, add_zero]
@@ -46,9 +53,10 @@ def lieW (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) : Submodule ℝ (Q.Mx k r
     · rw [Matrix.smul_mulVec, (hX2 a ha).2, smul_zero]
     · rw [Matrix.smul_mulVec, hX3, smul_zero]
 
-def dOpL {Wp : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [FiniteDimensional ℂ Wp]
-    (z : Fin (2 * r + k + 1) → ℂ) (π : Q.Mx k r → (Wp →L[ℂ] Wp)) (hπ : Qr.IsRepW k r z π) :
-    lieW k r z →ₗ[ℝ] (Wp →L[ℂ] Wp) where
+def dOpL
+    {Wp : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+    (z : Fin (2 * r + k + 1) → ℂ) (π : Q.Mx k r → (Wp →L[ℂ] Wp)) (hπ : Qr.IsRepW k r z π)
+    : lieW k r z →ₗ[ℝ] (Wp →L[ℂ] Wp) where
   toFun X := dOp π (X : Q.Mx k r)
   map_add' X Y := (P.differential_operator_linear Wp k r z π hπ X Y X.2 Y.2).1
   map_smul' s X := by
@@ -126,9 +134,11 @@ theorem repSmooth_of (hLL : LocLog) : NFRadRedS.RepSmooth := by
     have h := congrArg Matrix.det (Formalism.QuantumDeterminants.GBasic.Hpk_sq k r)
     rw [Matrix.det_mul, Matrix.det_one] at h
     exact isUnit_iff_exists_inv.mpr ⟨_, h⟩
-  have hdet0 : IsUnit h₀.det := ((Formalism.QuantumDeterminants.uHGroup _ (Hpk k r) hdetH).2.2 h₀ hh₀.1).1
+  have hdet0 : IsUnit h₀.det :=
+    ((Formalism.QuantumDeterminants.uHGroup _ (Hpk k r) hdetH).2.2 h₀ hh₀.1).1
   obtain ⟨q, hq⟩ := Submodule.exists_isCompl (lieW k r z)
-  let T : Q.Mx k r →ₗ[ℝ] (Wp →L[ℂ] Wp) := (dOpL z π hrep).comp (Submodule.linearProjOfIsCompl _ q hq)
+  let T : Q.Mx k r →ₗ[ℝ] (Wp →L[ℂ] Wp) :=
+    (dOpL z π hrep).comp (Submodule.linearProjOfIsCompl _ q hq)
   have hT1 : ∀ Y, InLieW k r z Y → T Y = dOp π Y := by
     intro Y hY
     have hp := Submodule.linearProjOfIsCompl_apply_left hq ⟨Y, hY⟩
@@ -136,36 +146,49 @@ theorem repSmooth_of (hLL : LocLog) : NFRadRedS.RepSmooth := by
     rw [show Submodule.linearProjOfIsCompl _ q hq Y = ⟨Y, hY⟩ from hp]
     rfl
   let Tc := LinearMap.toContinuousLinearMap T
-  let Lm : Q.Mx k r →ₗ[ℝ] Q.Mx k r :=
-    { toFun := fun h => h₀⁻¹ * h
-      map_add' := fun a b => Matrix.mul_add _ _ _
-      map_smul' := fun c a => by simp [Matrix.mul_smul] }
+  let Lm : Q.Mx k r →ₗ[ℝ] Q.Mx k r := {
+    toFun := fun h => h₀⁻¹ * h
+    map_add' := fun a b => Matrix.mul_add _ _ _
+    map_smul' := fun c a => by simp [Matrix.mul_smul]
+  }
   let Lc := LinearMap.toContinuousLinearMap Lm
   have hV : IsOpen {h : Q.Mx k r | h₀⁻¹ * h ∈ O} := hO.preimage Lc.continuous
-  refine ⟨{h : Q.Mx k r | h₀⁻¹ * h ∈ O}, hV, ?_, fun h => π h₀ * NormedSpace.exp (Tc (Λ (h₀⁻¹ * h))), ?_, ?_⟩
+  refine ⟨
+    {h : Q.Mx k r | h₀⁻¹ * h ∈ O},
+    hV,
+    ?_,
+    fun h => π h₀ * NormedSpace.exp (Tc (Λ (h₀⁻¹ * h))),
+    ?_,
+    ?_
+  ⟩
   · show h₀⁻¹ * h₀ ∈ O
     rw [Matrix.nonsing_inv_mul h₀ hdet0]
     exact h1O
   · have h1 : ContDiffOn ℝ ∞ (fun h => Λ (Lc h)) {h : Q.Mx k r | h₀⁻¹ * h ∈ O} :=
       hΛ.comp Lc.contDiff.contDiffOn (fun h hh => hh)
-    exact contDiffOn_const.mul (contDiff_exp_hermitian_curvature.comp_contDiffOn (Tc.contDiff.comp_contDiffOn h1))
+    exact contDiffOn_const.mul (contDiff_exp_hermitian_curvature.comp_contDiffOn
+      (Tc.contDiff.comp_contDiffOn h1))
   · intro h hV' hU
-    have hg : h₀⁻¹ * h ∈ UWset k r z := Formalism.QuantumDeterminants.WeylGroupFacts.uw_mul (Formalism.QuantumDeterminants.WeylGroupFacts.uw_inv hh₀) hU
+    have hg : h₀⁻¹ * h ∈ UWset k r z :=
+      Formalism.QuantumDeterminants.WeylGroupFacts.uw_mul
+        (Formalism.QuantumDeterminants.WeylGroupFacts.uw_inv hh₀) hU
     obtain ⟨hlie, hexp⟩ := hΛe _ hV' hg
     have hpi := rep_exp_smul_eq_exp_dOp hπ hc hlie 1
     simp only [Complex.ofReal_one, one_smul] at hpi
     rw [hexp] at hpi
-    calc π h = π (h₀ * (h₀⁻¹ * h)) := by
-          rw [← Matrix.mul_assoc, Matrix.mul_nonsing_inv h₀ hdet0, Matrix.one_mul]
+    calc
+      π h = π (h₀ * (h₀⁻¹ * h)) := by
+        rw [← Matrix.mul_assoc, Matrix.mul_nonsing_inv h₀ hdet0, Matrix.one_mul]
       _ = (π h₀).comp (π (h₀⁻¹ * h)) := hπ.2 _ hh₀ _ hg
       _ = π h₀ * NormedSpace.exp (Tc (Λ (h₀⁻¹ * h))) := by
-          rw [ContinuousLinearMap.mul_def, hpi,
-            show Tc (Λ (h₀⁻¹ * h)) = dOp π (Λ (h₀⁻¹ * h)) from hT1 _ hlie]
+        rw [ContinuousLinearMap.mul_def, hpi,
+          show Tc (Λ (h₀⁻¹ * h)) = dOp π (Λ (h₀⁻¹ * h)) from hT1 _ hlie]
 
 end Formalism.FourierDecayAlt.P.NFRadRedR
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem representation_smooth_of_log : NFRadRedR.LocLog → NFRadRedS.RepSmooth := fun h => NFRadRedR.repSmooth_of h
+theorem representation_smooth_of_log : NFRadRedR.LocLog → NFRadRedS.RepSmooth := fun h =>
+  NFRadRedR.repSmooth_of h
 
 end Formalism.FourierDecayAlt.P

@@ -10,12 +10,13 @@ noncomputable section
 
 namespace Formalism.E
 
-private theorem mem_hdual_span_iff_forall_pairing_mem_range {S K V ι : Type} [CommRing S] [Field K] [StarRing K]
-    [Algebra S K] [AddCommGroup V] [Module K V] [Module S V] [IsScalarTower S K V]
+private theorem mem_hdual_span_iff_forall_pairing_mem_range
+    {S K V ι : Type} [CommRing S] [Field K] [StarRing K] [Algebra S K] [AddCommGroup V] [Module K V]
+    [Module S V] [IsScalarTower S K V]
     (B : V →ₗ⋆[K] V →ₗ[K] K) (b : ι → V)
-    (hstar : ∀ s : S, star (algebraMap S K s) ∈ Set.range (algebraMap S K)) (x : V) :
-    x ∈ hdual B (Submodule.span S (Set.range b)) ↔
-      ∀ i, B (b i) x ∈ Set.range (algebraMap S K) := by
+    (hstar : ∀ s : S, star (algebraMap S K s) ∈ Set.range (algebraMap S K)) (x : V)
+    : x ∈ hdual B (Submodule.span S (Set.range b))
+      ↔ ∀ i, B (b i) x ∈ Set.range (algebraMap S K) := by
   simp only [hdual, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply,
     Submodule.mem_one, Set.mem_range]
   constructor
@@ -26,7 +27,8 @@ private theorem mem_hdual_span_iff_forall_pairing_mem_range {S K V ι : Type} [C
     | mem y hy =>
       obtain ⟨i, rfl⟩ := hy
       exact h i
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add y z _ _ hy hz =>
       obtain ⟨p, hp⟩ := hy
       obtain ⟨q, hq⟩ := hz
@@ -38,10 +40,11 @@ private theorem mem_hdual_span_iff_forall_pairing_mem_range {S K V ι : Type} [C
       rw [map_mul, ht, hp, ← algebraMap_smul K s y, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
         smul_eq_mul, starRingEnd_apply]
 
-private theorem eq_zero_of_gram_det_ne_zero_of_pairing_basis_eq_zero {K V ι : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    [Fintype ι] [DecidableEq ι] (B : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis ι K V)
-    (hG : (Matrix.of fun i j => B (b i) (b j)).det ≠ 0) (z : V) (hz : ∀ i, B (b i) z = 0) :
-    z = 0 := by
+private theorem eq_zero_of_gram_det_ne_zero_of_pairing_basis_eq_zero
+    {K V ι : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
+    (B : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis ι K V) (hG : (Matrix.of fun i j => B (b i) (b j)).det ≠ 0)
+    (z : V) (hz : ∀ i, B (b i) z = 0)
+    : z = 0 := by
   have hc : (Matrix.of fun i j => B (b i) (b j)) *ᵥ (fun j => b.repr z j) = 0 := by
     funext i
     simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.zero_apply]
@@ -54,8 +57,9 @@ private theorem eq_zero_of_gram_det_ne_zero_of_pairing_basis_eq_zero {K V ι : T
   have hv := Matrix.eq_zero_of_mulVec_eq_zero hG hc
   exact b.forall_coord_eq_zero_iff.1 fun i => by simpa [Basis.coord_apply] using congrFun hv i
 
-private theorem isUnit_algebraNorm_int_iff_isUnit {S : Type} [CommRing S] [Module.Free ℤ S]
-    [Module.Finite ℤ S] (x : S) : IsUnit (Algebra.norm ℤ x) ↔ IsUnit x := by
+private theorem isUnit_algebraNorm_int_iff_isUnit
+    {S : Type} [CommRing S] [Module.Free ℤ S] [Module.Finite ℤ S] (x : S)
+    : IsUnit (Algebra.norm ℤ x) ↔ IsUnit x := by
   rw [Algebra.norm_apply, ← LinearMap.isUnit_iff_isUnit_det]
   constructor
   · intro hu
@@ -67,8 +71,9 @@ private theorem isUnit_algebraNorm_int_iff_isUnit {S : Type} [CommRing S] [Modul
 theorem hermDual_of (h : SubIndexNorm) : HermDual := by
   intro S K V ι _ _ _ _ _ _ _ _ _ _ B b hinj hstar
   have hL := mem_hdual_span_iff_forall_pairing_mem_range B b hstar
-  have part1 : Submodule.span S (Set.range b) ≤ hdual B (Submodule.span S (Set.range b)) ↔
-      ∀ i j, B (b i) (b j) ∈ Set.range (algebraMap S K) := by
+  have part1
+      : Submodule.span S (Set.range b) ≤ hdual B (Submodule.span S (Set.range b))
+        ↔ ∀ i j, B (b i) (b j) ∈ Set.range (algebraMap S K) := by
     constructor
     · intro hle i j
       exact (hL _).1 (hle (Submodule.subset_span ⟨j, rfl⟩)) i
@@ -107,10 +112,9 @@ theorem hermDual_of (h : SubIndexNorm) : HermDual := by
       rw [← e, hd, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, smul_eq_mul, hGij, mul_comm]
-  have hdM : ∀ k, d k ∈ M := fun k => (hmemM _).2 fun i =>
-    ⟨if i = k then 1 else 0, by rw [hBd]; split_ifs <;> simp⟩
-  obtain ⟨dM, hdM'⟩ : ∃ dM : ι → M, ∀ k, (dM k : V) = d k :=
-    ⟨fun k => ⟨d k, hdM k⟩, fun k => rfl⟩
+  have hdM : ∀ k, d k ∈ M := fun k =>
+    (hmemM _).2 fun i => ⟨if i = k then 1 else 0, by rw [hBd]; split_ifs <;> simp⟩
+  obtain ⟨dM, hdM'⟩ : ∃ dM : ι → M, ∀ k, (dM k : V) = d k := ⟨fun k => ⟨d k, hdM k⟩, fun k => rfl⟩
   have hBsum : ∀ (g : ι → S) i, B (b i) (∑ k, g k • d k) = algebraMap S K (g i) := by
     intro g i
     set_option synthInstance.maxHeartbeats 100000 in
@@ -143,8 +147,7 @@ theorem hermDual_of (h : SubIndexNorm) : HermDual := by
   obtain ⟨bD, hbD⟩ : ∃ bD : Basis ι S M, ∀ k, bD k = dM k :=
     ⟨Basis.mk hliD hspD, fun k => Basis.mk_apply _ _ _⟩
   have hbM : ∀ j, b j ∈ M := fun j => (hmemM _).2 fun i => ⟨GS i j, (hGS i j).symm⟩
-  obtain ⟨bM, hbM'⟩ : ∃ bM : ι → M, ∀ j, (bM j : V) = b j :=
-    ⟨fun j => ⟨b j, hbM j⟩, fun j => rfl⟩
+  obtain ⟨bM, hbM'⟩ : ∃ bM : ι → M, ∀ j, (bM j : V) = b j := ⟨fun j => ⟨b j, hbM j⟩, fun j => rfl⟩
   have hliB : LinearIndependent S bM := by
     rw [Fintype.linearIndependent_iff]
     intro g hg j
@@ -163,8 +166,9 @@ theorem hermDual_of (h : SubIndexNorm) : HermDual := by
     rw [Submodule.coe_sum]
     simp only [Submodule.coe_smul, hbD, hdM', hbM']
     refine (sub_eq_zero.1 (hnd _ fun i => ?_))
-    rw [map_sub, hGS, show B (b i) (∑ k, GS k j • d k) = algebraMap S K (GS i j) from
-      hBsum (fun k => GS k j) i, sub_self]
+    rw [map_sub, hGS,
+      show B (b i) (∑ k, GS k j • d k) = algebraMap S K (GS i j) from hBsum (fun k => GS k j) i,
+      sub_self]
   have hdetS : bD.det (fun i => (bN i : M)) = GS.det := by
     rw [Basis.det_apply]
     congr 1
@@ -185,16 +189,17 @@ theorem hermDual_of (h : SubIndexNorm) : HermDual := by
       rwa [← Subtype.ext hyx]
   have hidx : L.toAddSubgroup.relIndex M.toAddSubgroup = (Algebra.norm ℤ GS.det).natAbs := by
     rw [← hdetS, ← key]
-    have hsub : L.toAddSubgroup.addSubgroupOf M.toAddSubgroup =
-        (Submodule.span S (Set.range bM)).toAddSubgroup := by
+    have hsub
+        : L.toAddSubgroup.addSubgroupOf M.toAddSubgroup
+          = (Submodule.span S (Set.range bM)).toAddSubgroup := by
       ext x
       rw [AddSubgroup.mem_addSubgroupOf, Submodule.mem_toAddSubgroup, Submodule.mem_toAddSubgroup,
         hspanN]
     rw [AddSubgroup.relIndex, hsub]
     rfl
   refine ⟨hidx, ?_⟩
-  rw [← isUnit_algebraNorm_int_iff_isUnit, Int.isUnit_iff_natAbs_eq, ← hidx, AddSubgroup.relIndex_eq_one,
-    Submodule.toAddSubgroup_le]
+  rw [← isUnit_algebraNorm_int_iff_isUnit, Int.isUnit_iff_natAbs_eq, ← hidx,
+    AddSubgroup.relIndex_eq_one, Submodule.toAddSubgroup_le]
   exact ⟨fun e => e.le, fun hle => le_antisymm hle hLle⟩
 
 end Formalism.E

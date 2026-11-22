@@ -7,8 +7,11 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.StdUnn Matrix
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -20,8 +23,10 @@ open PositivityTheory.Rg.Sw.Glob.DecH
 theorem decompAway : DecompAway := by
   intro D n θ τ ι hθ hι g
   obtain ⟨-, hιy⟩ := hι
-  have hg : Formalism.UG.cT (sigR (AF D.host.F) D.sp.cm.sig) (mat g) * (Jst D n).map (incA D) * mat g =
-      (Jst D n).map (incA D) := g.2
+  have hg
+      : Formalism.UG.cT (sigR (AF D.host.F) D.sp.cm.sig) (mat g) * (Jst D n).map (incA D) * mat g
+        = (Jst D n).map (incA D) :=
+    g.2
   set Y := compAt θ τ (mat g) with hYdef
   have hY : Yᴴ * reidx (JJ n) * Y = reidx (JJ n) := by
     have := congrArg (compAt θ τ) hg
@@ -32,7 +37,8 @@ theorem decompAway : DecompAway := by
   set M : M2 n := Y.submatrix finSumFinEquiv finSumFinEquiv with hMdef
   have hMY : reidx M = Y := by ext i j; simp [reidx, hMdef]
   have hMG : InG M := by
-    have h2 : JJ n = (reidx (JJ n)).submatrix finSumFinEquiv finSumFinEquiv := by ext i j; simp [reidx]
+    have h2 : JJ n = (reidx (JJ n)).submatrix finSumFinEquiv finSumFinEquiv := by
+      ext i j; simp [reidx]
     unfold InG
     rw [h2, hMdef, conjTranspose_submatrix, submatrix_mul_equiv, submatrix_mul_equiv, hY]
   have hMu : IsUnit M.det := by rw [hMdef, det_submatrix_equiv_self]; exact hYu
@@ -40,11 +46,15 @@ theorem decompAway : DecompAway := by
   have hιY : compAt θ τ (mat (ι y)) = Y := by rw [(hιy y).1, hydef, mR_mkGR, hMY]
   have htriv : compAt θ τ (mat (g * (ι y)⁻¹)) = 1 := by
     have h3 : compAt θ τ (mat (g * (ι y)⁻¹)) * Y = Y := by
-      calc compAt θ τ (mat (g * (ι y)⁻¹)) * Y = compAt θ τ (mat (g * (ι y)⁻¹)) * compAt θ τ (mat (ι y)) := by rw [hιY]
-        _ = compAt θ τ (mat (g * (ι y)⁻¹ * ι y)) := by rw [DA.mat_mul (g * (ι y)⁻¹) (ι y), DA.compAt_mul]
+      calc
+        compAt θ τ (mat (g * (ι y)⁻¹)) * Y
+          = compAt θ τ (mat (g * (ι y)⁻¹)) * compAt θ τ (mat (ι y)) := by rw [hιY]
+        _ = compAt θ τ (mat (g * (ι y)⁻¹ * ι y)) := by
+          rw [DA.mat_mul (g * (ι y)⁻¹) (ι y), DA.compAt_mul]
         _ = Y := by rw [inv_mul_cancel_right]
-    calc compAt θ τ (mat (g * (ι y)⁻¹)) = compAt θ τ (mat (g * (ι y)⁻¹)) * Y * Y⁻¹ := by
-          rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hYu, Matrix.mul_one]
+    calc
+      compAt θ τ (mat (g * (ι y)⁻¹)) = compAt θ τ (mat (g * (ι y)⁻¹)) * Y * Y⁻¹ := by
+        rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hYu, Matrix.mul_one]
       _ = 1 := by rw [h3, Matrix.mul_nonsing_inv _ hYu]
   refine ⟨g * (ι y)⁻¹, y, htriv, by group, ?_⟩
   generalize g * (ι y)⁻¹ = x at htriv ⊢

@@ -12,67 +12,83 @@ open scoped Pointwise ENNReal Classical ComplexConjugate
 
 namespace GlobalTheory.HL.GaussSum
 
-theorem sq_norm_sum_mul_index_le {G : Type*} [AddCommGroup G] [Fintype G] (Q : AddSubgroup G)
-    (f : G → ℂ) (hf : ∀ u, ‖f u‖ = 1)
-    (hQ : ∀ h, h ∉ Q → ∃ (v : G) (c : ℂ), c ≠ 1 ∧
-      ∀ u, f (u + v + h) * conj (f (u + v)) = c * (f (u + h) * conj (f u))) :
-    ‖∑ u, f u‖ ^ 2 * (Q.index : ℝ) ≤ (Fintype.card G : ℝ) ^ 2 := by
+theorem sq_norm_sum_mul_index_le
+    {G : Type*} [AddCommGroup G] [Fintype G]
+    (Q : AddSubgroup G) (f : G → ℂ) (hf : ∀ u, ‖f u‖ = 1)
+    (hQ : ∀ h,
+      h ∉ Q
+        → ∃ (v : G) (c : ℂ),
+          c ≠ 1 ∧ ∀ u, f (u + v + h) * conj (f (u + v)) = c * (f (u + h) * conj (f u)))
+    : ‖∑ u, f u‖ ^ 2 * (Q.index : ℝ) ≤ (Fintype.card G : ℝ) ^ 2 := by
   classical
   have hzero : ∀ h, h ∉ Q → ∑ u, f (u + h) * conj (f u) = 0 := by
     intro h hh
     obtain ⟨v, c, hc, hrel⟩ := hQ h hh
     have h1 : ∑ u, f (u + h) * conj (f u) = c * ∑ u, f (u + h) * conj (f u) := by
       rw [Finset.mul_sum]
-      calc ∑ u, f (u + h) * conj (f u) = ∑ u, f (u + v + h) * conj (f (u + v)) :=
-            (Fintype.sum_equiv (Equiv.addRight v) (fun u => f (u + v + h) * conj (f (u + v)))
-              (fun u => f (u + h) * conj (f u)) (fun u => rfl)).symm
+      calc
+        ∑ u, f (u + h) * conj (f u) = ∑ u, f (u + v + h) * conj (f (u + v)) :=
+          (Fintype.sum_equiv (Equiv.addRight v)
+            (fun u => f (u + v + h) * conj (f (u + v)))
+            (fun u => f (u + h) * conj (f u))
+            (fun u => rfl)).symm
         _ = ∑ u, c * (f (u + h) * conj (f u)) := Finset.sum_congr rfl fun u _ => hrel u
-    have h2 : (1 - c) * ∑ u, f (u + h) * conj (f u) = 0 := by
-      rw [sub_mul, one_mul, ← h1, sub_self]
+    have h2 : (1 - c) * ∑ u, f (u + h) * conj (f u) = 0 := by rw [sub_mul, one_mul, ← h1, sub_self]
     rcases mul_eq_zero.mp h2 with h3 | h3
     · exact absurd (sub_eq_zero.mp h3).symm hc
     · exact h3
   have hexp : (∑ u, f u) * conj (∑ u, f u) = ∑ h, ∑ u, f (u + h) * conj (f u) := by
-    calc (∑ u, f u) * conj (∑ u, f u) = ∑ w, ∑ u, f w * conj (f u) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum, Finset.sum_mul_sum]
+    calc
+      (∑ u, f u) * conj (∑ u, f u) = ∑ w, ∑ u, f w * conj (f u) := by
+        set_option synthInstance.maxHeartbeats 100000 in
+        rw [map_sum, Finset.sum_mul_sum]
       _ = ∑ u, ∑ w, f w * conj (f u) := Finset.sum_comm
-      _ = ∑ u, ∑ h, f (u + h) * conj (f u) := Finset.sum_congr rfl fun u _ =>
-          (Fintype.sum_equiv (Equiv.addLeft u) (fun h => f (u + h) * conj (f u))
-            (fun w => f w * conj (f u)) (fun h => rfl)).symm
+      _ = ∑ u, ∑ h, f (u + h) * conj (f u) :=
+        Finset.sum_congr rfl fun u _ =>
+          (Fintype.sum_equiv (Equiv.addLeft u)
+            (fun h => f (u + h) * conj (f u))
+            (fun w => f w * conj (f u))
+            (fun h => rfl)).symm
       _ = ∑ h, ∑ u, f (u + h) * conj (f u) := Finset.sum_comm
   have hnorm : ‖∑ u, f u‖ ^ 2 ≤ (Fintype.card G : ℝ) * (Nat.card Q : ℝ) := by
-    calc ‖∑ u, f u‖ ^ 2 = ‖(∑ u, f u) * conj (∑ u, f u)‖ := by
-          rw [norm_mul, RCLike.norm_conj, sq]
+    calc
+      ‖∑ u, f u‖ ^ 2
+        = ‖(∑ u, f u) * conj (∑ u, f u)‖ := by rw [norm_mul, RCLike.norm_conj, sq]
       _ = ‖∑ h, ∑ u, f (u + h) * conj (f u)‖ := by rw [hexp]
       _ ≤ ∑ h, ‖∑ u, f (u + h) * conj (f u)‖ := norm_sum_le _ _
       _ ≤ ∑ h, (if h ∈ Q then (Fintype.card G : ℝ) else 0) := by
-          refine Finset.sum_le_sum fun h _ => ?_
-          split_ifs with hh
-          · calc ‖∑ u, f (u + h) * conj (f u)‖ ≤ ∑ u, ‖f (u + h) * conj (f u)‖ :=
-                  norm_sum_le _ _
-              _ = ∑ _u : G, (1 : ℝ) := by simp [hf]
-              _ = Fintype.card G := by simp
-          · rw [hzero h hh, norm_zero]
+        refine Finset.sum_le_sum fun h _ => ?_
+        split_ifs with hh
+        · calc
+            ‖∑ u, f (u + h) * conj (f u)‖
+              ≤ ∑ u, ‖f (u + h) * conj (f u)‖ := norm_sum_le _ _
+            _ = ∑ _u : G, (1 : ℝ) := by simp [hf]
+            _ = Fintype.card G := by simp
+        · rw [hzero h hh, norm_zero]
       _ = (Fintype.card G : ℝ) * (Nat.card Q : ℝ) := by
-          rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul,
-            mul_comm]
-          congr 1
-          rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+        rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul,
+          mul_comm]
+        congr 1
+        rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
   have hci : (Nat.card Q : ℝ) * (Q.index : ℝ) = Fintype.card G := by
     rw [← Nat.card_eq_fintype_card, ← AddSubgroup.card_mul_index (H := Q)]
     push_cast
     ring
-  calc ‖∑ u, f u‖ ^ 2 * (Q.index : ℝ) ≤ (Fintype.card G : ℝ) * Nat.card Q * Q.index :=
-        mul_le_mul_of_nonneg_right hnorm (Nat.cast_nonneg _)
+  calc
+    ‖∑ u, f u‖ ^ 2 * (Q.index : ℝ) ≤ (Fintype.card G : ℝ) * Nat.card Q * Q.index :=
+      mul_le_mul_of_nonneg_right hnorm (Nat.cast_nonneg _)
     _ = (Fintype.card G : ℝ) ^ 2 := by rw [mul_assoc, hci, sq]
 
-theorem sq_norm_sum_reps_mul_index_le {M : Type*} [AddCommGroup M] (P Q : AddSubgroup M)
-    (hPQ : P ≤ Q) (R : Finset M) (hR : ∀ u, ∃! w, w ∈ R ∧ u - w ∈ P)
+theorem sq_norm_sum_reps_mul_index_le
+    {M : Type*} [AddCommGroup M]
+    (P Q : AddSubgroup M) (hPQ : P ≤ Q)
+    (R : Finset M) (hR : ∀ u, ∃! w, w ∈ R ∧ u - w ∈ P)
     (f : M → ℂ) (hf : ∀ u, ‖f u‖ = 1) (hP : ∀ u, ∀ p ∈ P, f (u + p) = f u)
-    (hQ : ∀ h, h ∉ Q → ∃ (v : M) (c : ℂ), c ≠ 1 ∧
-      ∀ u, f (u + v + h) * conj (f (u + v)) = c * (f (u + h) * conj (f u))) :
-    ‖∑ u ∈ R, f u‖ ^ 2 * (Q.index : ℝ) ≤ (R.card : ℝ) ^ 2 := by
+    (hQ : ∀ h,
+      h ∉ Q
+        → ∃ (v : M) (c : ℂ),
+          c ≠ 1 ∧ ∀ u, f (u + v + h) * conj (f (u + v)) = c * (f (u + h) * conj (f u)))
+    : ‖∑ u ∈ R, f u‖ ^ 2 * (Q.index : ℝ) ≤ (R.card : ℝ) ^ 2 := by
   classical
   have hsurj : ∀ x : M ⧸ P, ∃ w ∈ R, (w : M ⧸ P) = x := by
     intro x
@@ -88,9 +104,13 @@ theorem sq_norm_sum_reps_mul_index_le {M : Type*} [AddCommGroup M] (P Q : AddSub
     rw [QuotientAddGroup.eq] at h
     obtain ⟨z, -, hz⟩ := hR w
     have h1 : w = z := hz w ⟨hw, by simp⟩
-    have h2 : w' = z := hz w' ⟨hw', by
-      rw [show w - w' = -(-w + w') by abel]
-      exact P.neg_mem h⟩
+    have h2 : w' = z :=
+      hz w' ⟨
+        hw',
+        by
+          rw [show w - w' = -(-w + w') by abel]
+          exact P.neg_mem h
+      ⟩
     rw [h1, h2]
   have : Finite (M ⧸ P) := by
     apply Finite.of_surjective (fun w : R => ((w : M) : M ⧸ P))
@@ -104,25 +124,29 @@ theorem sq_norm_sum_reps_mul_index_le {M : Type*} [AddCommGroup M] (P Q : AddSub
     have e := hP ((u : M ⧸ P)).out _ h
     rw [add_neg_cancel_left] at e
     exact e.symm
-  have h1 := GlobalTheory.HL.GaussSum.sq_norm_sum_mul_index_le (Q.map (QuotientAddGroup.mk' P))
-    (fun x : M ⧸ P => f x.out) (fun x => hf _) (by
-      intro h' hh'
-      obtain ⟨h, rfl⟩ := QuotientAddGroup.mk_surjective h'
-      have hhQ : h ∉ Q := fun hq => hh' (AddSubgroup.mem_map_of_mem _ hq)
-      obtain ⟨v, c, hc, hrel⟩ := hQ h hhQ
-      refine ⟨(v : M ⧸ P), c, hc, fun x => ?_⟩
-      obtain ⟨u, rfl⟩ := QuotientAddGroup.mk_surjective x
-      simp only [← QuotientAddGroup.mk_add, hf']
-      exact hrel u)
+  have h1 :=
+    GlobalTheory.HL.GaussSum.sq_norm_sum_mul_index_le (Q.map (QuotientAddGroup.mk' P))
+      (fun x : M ⧸ P => f x.out)
+      (fun x => hf _)
+      (by
+        intro h' hh'
+        obtain ⟨h, rfl⟩ := QuotientAddGroup.mk_surjective h'
+        have hhQ : h ∉ Q := fun hq => hh' (AddSubgroup.mem_map_of_mem _ hq)
+        obtain ⟨v, c, hc, hrel⟩ := hQ h hhQ
+        refine ⟨(v : M ⧸ P), c, hc, fun x => ?_⟩
+        obtain ⟨u, rfl⟩ := QuotientAddGroup.mk_surjective x
+        simp only [← QuotientAddGroup.mk_add, hf']
+        exact hrel u)
   have hidx : (Q.map (QuotientAddGroup.mk' P)).index = Q.index :=
     AddSubgroup.index_map_eq (H := Q) (QuotientAddGroup.mk'_surjective P)
       (by rw [QuotientAddGroup.ker_mk']; exact hPQ)
-  have hi1 : ∀ a ∈ R, ((a : M ⧸ P)) ∈ (Finset.univ : Finset (M ⧸ P)) :=
-    fun _ _ => Finset.mem_univ _
+  have hi1 : ∀ a ∈ R, ((a : M ⧸ P)) ∈ (Finset.univ : Finset (M ⧸ P)) := fun _ _ => Finset.mem_univ _
   have hi2 : Set.InjOn (fun a : M => (a : M ⧸ P)) R := by
     intro w hw w' hw' h
     exact hinj w hw w' hw' h
-  have hi3 : Set.SurjOn (fun a : M => (a : M ⧸ P)) R (↑(Finset.univ : Finset (M ⧸ P)) : Set (M ⧸ P)) := by
+  have hi3 : Set.SurjOn
+      (fun a : M => (a : M ⧸ P))
+      R (↑(Finset.univ : Finset (M ⧸ P)) : Set (M ⧸ P)) := by
     intro x _
     obtain ⟨w, hw, rfl⟩ := hsurj x
     exact ⟨w, hw, rfl⟩
@@ -134,8 +158,8 @@ theorem sq_norm_sum_reps_mul_index_le {M : Type*} [AddCommGroup M] (P Q : AddSub
   rw [hsum, hcard, ← hidx]
   exact h1
 
-theorem mul_conj_eq {A : Type*} [AddCommGroup A] (ψ : AddChar A ℂ) (h : ∀ x, ‖ψ x‖ = 1) (x y : A) :
-    ψ x * conj (ψ y) = ψ (x - y) := by
+theorem mul_conj_eq {A : Type*} [AddCommGroup A] (ψ : AddChar A ℂ) (h : ∀ x, ‖ψ x‖ = 1) (x y : A)
+    : ψ x * conj (ψ y) = ψ (x - y) := by
   rw [sub_eq_add_neg, AddChar.map_add_eq_mul, AddChar.map_neg_eq_inv, Complex.inv_def,
     Complex.normSq_eq_norm_sq, h y]
   simp

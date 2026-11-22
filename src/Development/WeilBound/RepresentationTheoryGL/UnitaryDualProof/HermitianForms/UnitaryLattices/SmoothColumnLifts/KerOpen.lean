@@ -8,19 +8,20 @@ namespace PositivityTheory.RgUd.Form.U.Lift2.KerOpen
 
 open Filter Topology
 
-theorem isOpen_ker {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (φ : AddChar k Circle) (hφ : Continuous φ) :
-    IsOpen {x : k | φ x = 1} := by
-
-  let K : AddSubgroup k :=
-    { carrier := {x | φ x = 1}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_ofPred_eq] at ha hb ⊢
-        rw [AddChar.map_add_eq_mul, ha, hb, one_mul]
-      zero_mem' := AddChar.map_zero_eq_one φ
-      neg_mem' := fun {a} ha => by
-        simp only [Set.mem_ofPred_eq] at ha ⊢
-        rw [AddChar.map_neg_eq_inv, ha, inv_one] }
+theorem isOpen_ker
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (φ : AddChar k Circle) (hφ : Continuous φ)
+    : IsOpen {x : k | φ x = 1} := by
+  let K : AddSubgroup k := {
+    carrier := {x | φ x = 1}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_ofPred_eq] at ha hb ⊢
+      rw [AddChar.map_add_eq_mul, ha, hb, one_mul]
+    zero_mem' := AddChar.map_zero_eq_one φ
+    neg_mem' := fun {a} ha => by
+      simp only [Set.mem_ofPred_eq] at ha ⊢
+      rw [AddChar.map_neg_eq_inv, ha, inv_one]
+  }
 
   have h1 : (1 : Circle) ∈ Circle.centeredArc (Real.pi / 2) := by
     rw [Circle.mem_centeredArc (by linarith [Real.pi_pos])]

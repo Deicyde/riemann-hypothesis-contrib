@@ -7,22 +7,25 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscrim
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj MvPowerSeries
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  MvPowerSeries
 open ReciprocityTheory.ChartRestriction.G.Chart
 attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.JetSer
 variable {R : Type} [CommRing R]
 
-theorem rep_jetAug_comp_trunc (κ : Type) (m : ℕ) :
-    (jetAug R κ m).comp (jetTruncR R κ m) = jetAug R κ (m + 1) :=
+theorem rep_jetAug_comp_trunc (κ : Type) (m : ℕ)
+    : (jetAug R κ m).comp (jetTruncR R κ m) = jetAug R κ (m + 1) :=
   jet_ext fun j => (jetAug_zR m j).trans (jetAug_zR (m + 1) j).symm
 
-theorem rep_jetAug_comp_zero (κ : Type) (m : ℕ) :
-    (jetAug R κ 0).comp (jetZeroR R κ m) = jetAug R κ m :=
+theorem rep_jetAug_comp_zero (κ : Type) (m : ℕ)
+    : (jetAug R κ 0).comp (jetZeroR R κ m) = jetAug R κ m :=
   jet_ext fun j => (jetAug_zR 0 j).trans (jetAug_zR m j).symm
 
-theorem isFPt_of_isUnivChart {G : Over (Spec (CommRingCat.of R))} [GrpObj G] {d : ℕ} {x : Fam G (Fin d)}
-    (hx : IsUnivChart G d x) : IsFPt x := by
+theorem isFPt_of_isUnivChart
+    {G : Over (Spec (CommRingCat.of R))} [GrpObj G]
+    {d : ℕ} {x : Fam G (Fin d)} (hx : IsUnivChart G d x)
+    : IsFPt x := by
   refine ⟨hx.1, fun m => ?_⟩
   rw [← rep_jetAug_comp_zero, ← spMap_comp, Category.assoc, hx.2.1 m]
   exact MonObj.comp_one _
@@ -31,9 +34,11 @@ theorem repSt_of_jetAlgSt (hJ : JetAlgSt) : RepSt := by
   intro R _ G _ d x hx κ _
   obtain ⟨hτ, htr, hinj, hsur, hsub⟩ := hJ R κ
   have hxa := (isFPt_of_isUnivChart hx).2
-  have haug : ∀ (a : Fin d → MvPowerSeries κ R), (∀ j, constantCoeff (a j) = 0) → ∀ m
-      (ψ : JetR R (Fin d) m →ₐ[R] JetR R κ m), (∀ j, ψ (zR m j) = toJet m (a j)) →
-      (jetAug R κ m).comp ψ = jetAug R (Fin d) m := by
+  have haug
+      : ∀ (a : Fin d → MvPowerSeries κ R),
+        (∀ j, constantCoeff (a j) = 0)
+          → ∀ m (ψ : JetR R (Fin d) m →ₐ[R] JetR R κ m),
+            (∀ j, ψ (zR m j) = toJet m (a j)) → (jetAug R κ m).comp ψ = jetAug R (Fin d) m := by
     intro a ha m ψ hψ
     refine jet_ext fun j => ?_
     rw [AlgHom.comp_apply, hψ, (htr m _).2, ha, jetAug_zR]

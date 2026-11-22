@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.UnitaryClasses
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.UnitaryClasses
 open scoped Classical TensorProduct ComplexOrder
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -16,28 +18,54 @@ namespace GlobalTheory.NormAssemble
 
 open GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField
 
-theorem cT_aeval {K : Type} [Field K] (σ : K →+* K) {n : ℕ} (M : Matrix (Fin n) (Fin n) K) (p : K[X]) :
-    cT σ (aeval M p) = aeval (cT σ M) (p.map σ) := by
+theorem cT_aeval
+    {K : Type} [Field K] (σ : K →+* K) {n : ℕ} (M : Matrix (Fin n) (Fin n) K) (p : K[X])
+    : cT σ (aeval M p) = aeval (cT σ M) (p.map σ) := by
   induction p using Polynomial.induction_on' with
   | add p q hp hq =>
     rw [map_add (f := _), Polynomial.map_add (f := _), map_add (f := _), ← hp, ← hq]
-    ext i j; simp [cT]
+    ext i j
+    simp [cT]
   | monomial k a =>
     rw [Polynomial.map_monomial, aeval_monomial, aeval_monomial, Algebra.algebraMap_eq_smul_one,
       Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul, smul_mul_assoc, one_mul]
     have hp : ((M ^ k).map σ)ᵀ = ((M.map σ)ᵀ) ^ k := by
       rw [← Matrix.transpose_pow, ← RingHom.mapMatrix_apply, map_pow, RingHom.mapMatrix_apply]
     simp only [cT, Matrix.map_smul', hp]
-    ext i j; simp [Matrix.transpose_smul]
-    left; rw [← hp]; rfl
+    ext i j
+    simp [Matrix.transpose_smul]
+    left
+    rw [← hp]
+    rfl
 
-def toFld {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (Q : SelfRecip E r) : E[X] →+* Fld Q :=
+def toFld {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (Q : SelfRecip E r)
+    : E[X] →+* Fld Q :=
   AdjoinRoot.mk Q.1
 
-def sr {E : Type} [Field E] [NumberField E] [IsCMField E] (Q : E[X]) (h : IsSelfRecip E Q.natDegree Q) :
-    SelfRecip E Q.natDegree := ⟨Q, h⟩
+def sr
+    {E : Type} [Field E] [NumberField E] [IsCMField E] (Q : E[X]) (h : IsSelfRecip E Q.natDegree Q)
+    : SelfRecip E Q.natDegree :=
+  ⟨Q, h⟩
 
-theorem exists_norm_of_factors : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (γ : GL (Fin n) E), γ ∈ UE E n → γ.val.charpoly ∈ Ell E n → (∀ Q : E[X], Q.Monic → Irreducible Q → Q ∣ γ.val.charpoly → GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.IsSelfRecip E Q.natDegree Q) → ∀ m : E[X], (∀ (r : ℕ) (Q : GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.SelfRecip E r), Q.1 ∣ γ.val.charpoly → ∃ y : GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.Fld Q, y * GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.invol Q y = (AdjoinRoot.mk Q.1 m : GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.Fld Q)) → ∃ c : Matrix (Fin n) (Fin n) E, c * γ.val = γ.val * c ∧ cT (IsCMField.complexConj E).toRingEquiv.toRingHom c * c = aeval γ.val m := by
+theorem exists_norm_of_factors
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (γ : GL (Fin n) E),
+      γ ∈ UE E n → γ.val.charpoly ∈ Ell E n
+        → (∀ Q : E[X],
+          Q.Monic → Irreducible Q → Q ∣ γ.val.charpoly
+            → GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.IsSelfRecip E
+              Q.natDegree Q)
+        → ∀ m : E[X],
+          (∀ (r : ℕ)
+                (Q
+                  : GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.SelfRecip E r),
+              Q.1 ∣ γ.val.charpoly
+                → ∃ y : GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.Fld Q,
+                  y * GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.invol Q y
+                    = (AdjoinRoot.mk Q.1 m
+                      : GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.Fld Q))
+            → ∃ c : Matrix (Fin n) (Fin n) E,
+              c * γ.val = γ.val * c
+                ∧ cT (IsCMField.complexConj E).toRingEquiv.toRingHom c * c = aeval γ.val m := by
   intro E _ _ _ n γ hγ hP hself m hy
   set σ : E →+* E := (IsCMField.complexConj E).toRingEquiv.toRingHom with hσ
   set P := γ.val.charpoly with hPdef
@@ -57,7 +85,9 @@ theorem exists_norm_of_factors : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     simpa using this
   have h1 : γ.val * (γ⁻¹).val = 1 := Units.mul_inv γ
   have hcTa : cT σ γ.val = aeval γ.val a := by
-    calc cT σ γ.val = cT σ γ.val * γ.val * (γ⁻¹).val := by rw [Matrix.mul_assoc, h1, Matrix.mul_one]
+    calc
+      cT σ γ.val
+        = cT σ γ.val * γ.val * (γ⁻¹).val := by rw [Matrix.mul_assoc, h1, Matrix.mul_one]
       _ = aeval γ.val a * γ.val * (γ⁻¹).val := by rw [hu, haγ]
       _ = aeval γ.val a := by rw [Matrix.mul_assoc, h1, Matrix.mul_one]
   set S := (UniqueFactorizationMonoid.normalizedFactors P).toFinset with hS
@@ -67,7 +97,8 @@ theorem exists_norm_of_factors : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     have hirr := UniqueFactorizationMonoid.irreducible_of_normalized_factor Q hQ
     refine ⟨?_, hirr, UniqueFactorizationMonoid.dvd_of_mem_normalizedFactors hQ⟩
     have hn := UniqueFactorizationMonoid.normalize_normalized_factor Q hQ
-    rw [← hn]; exact Polynomial.monic_normalize hirr.ne_zero
+    rw [← hn]
+    exact Polynomial.monic_normalize hirr.ne_zero
   have hcopS : (S : Set E[X]).Pairwise (Function.onFun IsCoprime fun Q : E[X] => Q) := by
     intro Q hQ Q' hQ' hne
     simp only [Function.onFun]
@@ -77,8 +108,9 @@ theorem exists_norm_of_factors : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
       ((hmem Q hQ).2.1.associated_of_dvd (hmem Q' hQ').2.1 hd))
   have hsr : ∀ Q : S, IsSelfRecip E Q.1.natDegree Q.1 := fun Q =>
     hself Q.1 (hmem Q.1 Q.2).1 (hmem Q.1 Q.2).2.1 (hmem Q.1 Q.2).2.2
-  have hloc : ∀ Q : S, ∃ fQ : E[X], toFld (sr Q.1 (hsr Q)) fQ *
-      invol (sr Q.1 (hsr Q)) (toFld _ fQ) = toFld _ m := by
+  have hloc
+      : ∀ Q : S, ∃ fQ : E[X],
+        toFld (sr Q.1 (hsr Q)) fQ * invol (sr Q.1 (hsr Q)) (toFld _ fQ) = toFld _ m := by
     intro Q
     obtain ⟨y, hy'⟩ := hy _ (sr Q.1 (hsr Q)) (hmem Q.1 Q.2).2.2
     obtain ⟨fQ, rfl⟩ := AdjoinRoot.mk_surjective y
@@ -89,8 +121,8 @@ theorem exists_norm_of_factors : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     simp only [Function.onFun]
     rw [Ideal.isCoprime_span_singleton_iff]
     exact hcopS Q.2 Q'.2 (fun h => hne (Subtype.ext h))
-  obtain ⟨q, hq⟩ := Ideal.quotientInfToPiQuotient_surj hcop
-    (fun Q => Ideal.Quotient.mk (Ideal.span {Q.1}) (fQ Q))
+  obtain ⟨q, hq⟩ :=
+    Ideal.quotientInfToPiQuotient_surj hcop (fun Q => Ideal.Quotient.mk (Ideal.span {Q.1}) (fQ Q))
   obtain ⟨f, rfl⟩ := Ideal.Quotient.mk_surjective q
   have hf : ∀ Q : S, AdjoinRoot.mk Q.1 f = AdjoinRoot.mk Q.1 (fQ Q) := by
     intro Q
@@ -110,18 +142,21 @@ theorem exists_norm_of_factors : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
       rw [hX, hPz, mul_zero, add_zero] at this
       exact eq_inv_of_mul_eq_one_left this
     have hc : toFld Q' ((f.map σ).comp a) = invol Q' (toFld Q' f) := by
-      change AdjoinRoot.mk Q'.1 ((f.map σ).comp a) = AdjoinRoot.lift _ _ (eval₂_conj_inv_root Q') (AdjoinRoot.mk Q'.1 f)
-      rw [← AdjoinRoot.aeval_eq, aeval_comp, AdjoinRoot.aeval_eq, AdjoinRoot.lift_mk, aeval_def, eval₂_map]
+      change AdjoinRoot.mk Q'.1 ((f.map σ).comp a)
+        = AdjoinRoot.lift _ _ (eval₂_conj_inv_root Q') (AdjoinRoot.mk Q'.1 f)
+      rw [← AdjoinRoot.aeval_eq, aeval_comp, AdjoinRoot.aeval_eq, AdjoinRoot.lift_mk, aeval_def,
+        eval₂_map]
       change eval₂ _ (toFld Q' a) f = _
-      rw [ha]; rfl
+      rw [ha]
+      rfl
     have hfQ' : toFld Q' (fQ ⟨Q, hQ⟩) * invol Q' (toFld Q' (fQ ⟨Q, hQ⟩)) = toFld Q' m := hfQ ⟨Q, hQ⟩
     have hf' : toFld Q' f = toFld Q' (fQ ⟨Q, hQ⟩) := hf ⟨Q, hQ⟩
-    have : toFld Q' g = 0 := by
-      rw [hg, map_sub, map_mul, hc, hf', mul_comm, hfQ', sub_self]
+    have : toFld Q' g = 0 := by rw [hg, map_sub, map_mul, hc, hf', mul_comm, hfQ', sub_self]
     exact AdjoinRoot.mk_eq_zero.1 this
   have hprod : (∏ Q ∈ S, Q) ∣ g := Finset.prod_dvd_of_coprime hcopS hdiv
   have hassoc : Associated (∏ Q ∈ S, Q) P := by
-    have hnd := (UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hP0).1 hPsep.squarefree
+    have hnd :=
+      (UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hP0).1 hPsep.squarefree
     rw [Finset.prod_eq_multiset_prod, hS, Multiset.toFinset_val, hnd.dedup, Multiset.map_id']
     exact UniqueFactorizationMonoid.prod_normalizedFactors hP0
   have hPg : P ∣ g := hassoc.symm.dvd.trans hprod

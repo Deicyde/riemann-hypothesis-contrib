@@ -20,8 +20,10 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.Differentia
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyPow GlobalTheory.KeyKa
@@ -51,14 +53,14 @@ private lemma autFactor_re_eq_aut_of_half_characteristics {g : ℕ} {τ : Matrix
   congr 1
   ring
 
-theorem thetaChar_law {g : ℕ} {τ : Matrix (Fin g) (Fin g) ℂ} {a b : Fin g → ℂ} (hs : τ.IsSymm)
-    (hp : (τ.map Complex.im).PosDef) (hab : charHalf g a b) :
-    Differentiable ℂ (thetaChar τ a b) ∧ thetaChar τ a b ≠ 0 ∧
-      ∀ k n z, thetaChar τ a b (z + lat τ k n) = aut τ a b k n z * thetaChar τ a b z := by
+theorem thetaChar_law
+    {g : ℕ} {τ : Matrix (Fin g) (Fin g) ℂ} {a b : Fin g → ℂ}
+    (hs : τ.IsSymm) (hp : (τ.map Complex.im).PosDef) (hab : charHalf g a b)
+    : Differentiable ℂ (thetaChar τ a b) ∧ thetaChar τ a b ≠ 0
+      ∧ ∀ k n z, thetaChar τ a b (z + lat τ k n) = aut τ a b k n z * thetaChar τ a b z := by
   obtain ⟨ha, hb⟩ := hab
   obtain ⟨hne, hspan, -⟩ := TorusAlg.thetaChar_level hs hp ha hb
-  have hmem : thetaChar τ a b ∈
-      thetaLevelChar (fun i => (a i).re) (fun i => (b i).re) 1 τ := by
+  have hmem : thetaChar τ a b ∈ thetaLevelChar (fun i => (a i).re) (fun i => (b i).re) 1 τ := by
     rw [hspan]
     exact Submodule.mem_span_singleton_self _
   rw [mem_thetaLevelChar_iff_autFactor] at hmem
@@ -67,9 +69,11 @@ theorem thetaChar_law {g : ℕ} {τ : Matrix (Fin g) (Fin g) ℂ} {a b : Fin g �
   rw [pow_one] at hper
   rw [add_lat_eq_add_mulVec_add, hper, autFactor_re_eq_aut_of_half_characteristics ha hb]
 
-theorem eq_zero_of_mul_eq_zero {g : ℕ} {θ D : (Fin g → ℂ) → ℂ} (hθ : Differentiable ℂ θ) (h0 : θ ≠ 0)
+theorem eq_zero_of_mul_eq_zero
+    {g : ℕ} {θ D : (Fin g → ℂ) → ℂ} (hθ : Differentiable ℂ θ) (h0 : θ ≠ 0)
     {S : Set (Fin g → ℂ)} (hS : IsOpen S) (hD : ContinuousOn D S) (h : ∀ w ∈ S, θ w * D w = 0)
-    {z : Fin g → ℂ} (hz : z ∈ S) : D z = 0 := by
+    {z : Fin g → ℂ} (hz : z ∈ S)
+    : D z = 0 := by
   by_contra hDz
   have hθa : AnalyticOnNhd ℂ θ Set.univ :=
     SCV.analyticOnNhd_of_differentiableOn isOpen_univ hθ.differentiableOn
@@ -81,18 +85,23 @@ theorem eq_zero_of_mul_eq_zero {g : ℕ} {θ D : (Fin g → ℂ) → ℂ} (hθ :
     rcases mul_eq_zero.1 (h w hw.1) with h' | h'
     · exact h'
     · exact absurd h' hw.2
-  have hall := hθa.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ
-    (Set.mem_univ z) hθz
+  have hall :=
+    hθa.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ z) hθz
   exact h0 (funext fun w => hall (Set.mem_univ w))
 
-theorem frame_eq_aut_mul : ∀ (g : ℕ) (x : KeyIn ℂ) (h : x.P.g = g) (u : HolUnif x.P.A x.P.L g) (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ), charHalf g a b → Wit x h u τ a b → ∀ (k n : Fin g → ℤ) (i : x.P.L.ι) (z : Fin g → ℂ), ⊤ ≤ (u.ex z).left ⁻¹ᵁ x.P.L.U i → u.fr i z = aut τ a b k n z * u.fr i (z + lat τ k n) := by
+theorem frame_eq_aut_mul
+    : ∀ (g : ℕ) (x : KeyIn ℂ) (h : x.P.g = g) (u : HolUnif x.P.A x.P.L g)
+        (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ),
+      charHalf g a b → Wit x h u τ a b
+        → ∀ (k n : Fin g → ℤ) (i : x.P.L.ι) (z : Fin g → ℂ),
+          ⊤ ≤ (u.ex z).left ⁻¹ᵁ x.P.L.U i
+            → u.fr i z = aut τ a b k n z * u.fr i (z + lat τ k n) := by
   intro g x h u τ a b hab hw k n i z hz
   obtain ⟨hs, hp, hΛ, -, hth, -⟩ := hw
   have hlaw := thetaChar_law hs hp hab
   obtain ⟨ha, hb⟩ := hab
   have hlatΛ : lat τ k n ∈ u.Λ := (hΛ _).2 ⟨k, n, rfl⟩
-  have hex : ∀ w, u.ex (w + lat τ k n) = u.ex w := fun w =>
-    CubeValues.ex_add_period u w _ hlatΛ
+  have hex : ∀ w, u.ex (w + lat τ k n) = u.ex w := fun w => CubeValues.ex_add_period u w _ hlatΛ
   let S : Set (Fin g → ℂ) := {w | ⊤ ≤ (u.ex w).left ⁻¹ᵁ x.P.L.U i}
   have hSo : IsOpen S := (u.hol (x.P.L.U i) 0).1
   have hfr : ContinuousOn (u.fr i) S := (u.fr_hol i).continuousOn

@@ -14,17 +14,22 @@ namespace GlobalTheory
 
 namespace SerreRegular
 
-theorem pd_baseChange {A B : Type} [CommRing A] [IsNoetherianRing A] [CommRing B] [Algebra A B]
+theorem pd_baseChange
+    {A B : Type} [CommRing A] [IsNoetherianRing A] [CommRing B] [Algebra A B]
     (Good : ModuleCat.{0} A → Prop)
-    (hG : ∀ (M : ModuleCat.{0} A) (r : ℕ) (f : (Fin r → A) →ₗ[A] M), Function.Surjective f →
-      Good M → Good (ModuleCat.of A (LinearMap.ker f)) ∧
-        Function.Injective ((LinearMap.ker f).subtype.lTensor B)) (n : ℕ) :
-    ∀ (M : ModuleCat.{0} A) [Module.Finite A M], Good M → HasProjectiveDimensionLE M n →
-      HasProjectiveDimensionLE (ModuleCat.of B (B ⊗[A] M)) n := by
+    (hG : ∀ (M : ModuleCat.{0} A) (r : ℕ) (f : (Fin r → A) →ₗ[A] M),
+      Function.Surjective f → Good M
+        → Good (ModuleCat.of A (LinearMap.ker f))
+          ∧ Function.Injective ((LinearMap.ker f).subtype.lTensor B))
+    (n : ℕ)
+    : ∀ (M : ModuleCat.{0} A) [Module.Finite A M],
+      Good M → HasProjectiveDimensionLE M n
+        → HasProjectiveDimensionLE (ModuleCat.of B (B ⊗[A] M)) n := by
   induction n with
   | zero =>
     intro M _ _ h
-    simp only [HasProjectiveDimensionLE, zero_add, ← projective_iff_hasProjectiveDimensionLT_one] at h ⊢
+    simp only [HasProjectiveDimensionLE, zero_add, ← projective_iff_hasProjectiveDimensionLT_one]
+      at h ⊢
     have : Module.Projective A M := (IsProjective.iff_projective M).mpr h
     exact (IsProjective.iff_projective _).mp inferInstance
   | succ n ih =>
@@ -45,17 +50,28 @@ theorem pd_baseChange {A B : Type} [CommRing A] [IsNoetherianRing A] [CommRing B
       (IsProjective.iff_projective (B ⊗[A] (Fin r → A))).mp inferInstance
     exact (hS'.hasProjectiveDimensionLT_X₃_iff n hP').2 h1
 
-theorem pd_flat {A B : Type} [CommRing A] [IsNoetherianRing A] [CommRing B] [Algebra A B]
-    [Module.Flat A B] (n : ℕ) (M : ModuleCat.{0} A) [Module.Finite A M]
-    (h : HasProjectiveDimensionLE M n) : HasProjectiveDimensionLE (ModuleCat.of B (B ⊗[A] M)) n :=
-  pd_baseChange (fun _ => True) (fun _ _ f _ _ =>
-    ⟨trivial, Module.Flat.lTensor_preserves_injective_linearMap _ (Submodule.injective_subtype _)⟩)
+theorem pd_flat
+    {A B : Type} [CommRing A] [IsNoetherianRing A] [CommRing B] [Algebra A B] [Module.Flat A B]
+    (n : ℕ)
+    (M : ModuleCat.{0} A) [Module.Finite A M]
+    (h : HasProjectiveDimensionLE M n)
+    : HasProjectiveDimensionLE (ModuleCat.of B (B ⊗[A] M)) n :=
+  pd_baseChange
+    (fun _ => True)
+    (fun _ _ f _ _ => ⟨
+      trivial,
+      Module.Flat.lTensor_preserves_injective_linearMap _ (Submodule.injective_subtype _)
+    ⟩)
     n M trivial h
 
-theorem pd_quot {A : Type} [CommRing A] [IsNoetherianRing A] {x : A} (hx : IsSMulRegular A x)
-    (n : ℕ) (M : ModuleCat.{0} A) [Module.Finite A M] (hM : IsSMulRegular M x)
-    (h : HasProjectiveDimensionLE M n) :
-    HasProjectiveDimensionLE (ModuleCat.of (A ⧸ Ideal.span {x}) ((A ⧸ Ideal.span {x}) ⊗[A] M)) n := by
+theorem pd_quot
+    {A : Type} [CommRing A] [IsNoetherianRing A]
+    {x : A} (hx : IsSMulRegular A x)
+    (n : ℕ)
+    (M : ModuleCat.{0} A) [Module.Finite A M]
+    (hM : IsSMulRegular M x) (h : HasProjectiveDimensionLE M n)
+    : HasProjectiveDimensionLE (ModuleCat.of (A ⧸ Ideal.span {x}) ((A ⧸ Ideal.span {x}) ⊗[A] M))
+      n := by
   refine pd_baseChange (fun N => IsSMulRegular N x) ?_ n M hM h
   intro N r f hf hN
   refine ⟨?_, ?_⟩
@@ -66,11 +82,13 @@ theorem pd_quot {A : Type} [CommRing A] [IsNoetherianRing A] {x : A} (hx : IsSMu
   · have e1 : Function.Exact (LinearMap.toSpanSingleton A A x) (Ideal.span {x}).mkQ := by
       intro y
       simp [Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton']
-    refine lTensor_injective_of_exact_of_exact_of_rTensor_injective e1
-      (Submodule.mkQ_surjective _) (LinearMap.exact_subtype_ker_map f) hf ?_
+    refine lTensor_injective_of_exact_of_exact_of_rTensor_injective e1 (Submodule.mkQ_surjective _)
+      (LinearMap.exact_subtype_ker_map f) hf ?_
       (Module.Flat.lTensor_preserves_injective_linearMap _ (Submodule.injective_subtype _))
-    have e2 : ∀ t, TensorProduct.lid A N ((LinearMap.toSpanSingleton A A x).rTensor N t) =
-        x • TensorProduct.lid A N t := by
+    have e2
+        : ∀ t,
+          TensorProduct.lid A N ((LinearMap.toSpanSingleton A A x).rTensor N t)
+            = x • TensorProduct.lid A N t := by
       intro t
       induction t with
       | add a b ha hb => simp only [map_add (f := _), ha, hb, smul_add]
@@ -80,14 +98,17 @@ theorem pd_quot {A : Type} [CommRing A] [IsNoetherianRing A] {x : A} (hx : IsSMu
     apply hN
     simp only [← e2, hab]
 
-theorem projective_of_socle {A : Type} [CommRing A] [IsNoetherianRing A] [IsLocalRing A] {a : A}
-    (ha : a ≠ 0) (hm : ∀ y ∈ maximalIdeal A, a * y = 0) (n : ℕ) :
-    ∀ (M : ModuleCat.{0} A) [Module.Finite A M], HasProjectiveDimensionLE M n →
-      Module.Projective A M := by
+theorem projective_of_socle
+    {A : Type} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
+    {a : A} (ha : a ≠ 0) (hm : ∀ y ∈ maximalIdeal A, a * y = 0)
+    (n : ℕ)
+    : ∀ (M : ModuleCat.{0} A) [Module.Finite A M],
+      HasProjectiveDimensionLE M n → Module.Projective A M := by
   induction n with
   | zero =>
     intro M _ h
-    simp only [HasProjectiveDimensionLE, zero_add, ← projective_iff_hasProjectiveDimensionLT_one] at h
+    simp only [HasProjectiveDimensionLE, zero_add, ← projective_iff_hasProjectiveDimensionLT_one]
+      at h
     exact (IsProjective.iff_projective M).mpr h
   | succ n ih =>
     intro M _ h
@@ -132,34 +153,42 @@ theorem projective_of_socle {A : Type} [CommRing A] [IsNoetherianRing A] [IsLoca
       exact Submodule.subsingleton_iff_eq_bot.mp hsub
     exact Module.Projective.of_equiv' (LinearEquiv.ofBijective f ⟨hinj, hf⟩)
 
-theorem map_maximalIdeal_eq {A B : Type} [CommRing A] [IsLocalRing A] [CommRing B] [IsLocalRing B]
-    (f : A →+* B) (hf : Function.Surjective f) : (maximalIdeal A).map f = maximalIdeal B := by
+theorem map_maximalIdeal_eq
+    {A B : Type} [CommRing A] [IsLocalRing A] [CommRing B] [IsLocalRing B]
+    (f : A →+* B) (hf : Function.Surjective f)
+    : (maximalIdeal A).map f = maximalIdeal B := by
   have := IsLocalHom.of_surjective f hf
   exact IsLocalRing.map_maximalIdeal_of_surjective f hf
 
-theorem regular_of_quotient {A : Type} [CommRing A] [IsNoetherianRing A] [IsLocalRing A] {x : A}
-    (hx : IsSMulRegular A x) (hm : x ∈ maximalIdeal A)
-    [IsRegularLocalRing (A ⧸ Ideal.span {x})] : IsRegularLocalRing A := by
+theorem regular_of_quotient
+    {A : Type} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
+    {x : A} (hx : IsSMulRegular A x) (hm : x ∈ maximalIdeal A)
+    [IsRegularLocalRing (A ⧸ Ideal.span {x})]
+    : IsRegularLocalRing A := by
   classical
   apply IsRegularLocalRing.of_spanFinrank_maximalIdeal_le
   rw [← ringKrullDim_quotient_span_singleton_succ_eq_ringKrullDim hx hm,
     ← IsRegularLocalRing.spanFinrank_maximalIdeal]
-  obtain ⟨s, hs, hsp⟩ := Submodule.FG.exists_span_finset_card_eq_spanFinrank
-    (IsNoetherian.noetherian (maximalIdeal (A ⧸ Ideal.span {x})))
+  obtain ⟨s, hs, hsp⟩ :=
+    Submodule.FG.exists_span_finset_card_eq_spanFinrank (IsNoetherian.noetherian (maximalIdeal
+      (A ⧸ Ideal.span {x})))
   choose g hg using Ideal.Quotient.mk_surjective (I := Ideal.span {x})
   have hmap := map_maximalIdeal_eq (Ideal.Quotient.mk (Ideal.span {x})) Ideal.Quotient.mk_surjective
-  have h1 : Ideal.map (Ideal.Quotient.mk (Ideal.span {x})) (Ideal.span (g '' s)) =
-      maximalIdeal (A ⧸ Ideal.span {x}) := by
+  have h1
+      : Ideal.map (Ideal.Quotient.mk (Ideal.span {x})) (Ideal.span (g '' s))
+        = maximalIdeal (A ⧸ Ideal.span {x}) := by
     rw [Ideal.map_span, Set.image_image]
     simpa [hg] using hsp
   have h2 : maximalIdeal A = Ideal.span ((insert x (s.image g) : Finset A) : Set A) := by
     have h3 := congrArg (Ideal.comap (Ideal.Quotient.mk (Ideal.span {x}))) (hmap.trans h1.symm)
     rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective,
-      Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
-      Ideal.mk_ker, sup_eq_left.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hm)] at h3
+        Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
+        Ideal.mk_ker, sup_eq_left.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hm)]
+      at h3
     rw [h3, Finset.coe_insert, Ideal.span_insert, Finset.coe_image, sup_comm]
-  have h4 := ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.spanFinrank_span_finset_le
-    (insert x (s.image g))
+  have h4 :=
+    ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.spanFinrank_span_finset_le (insert x
+      (s.image g))
   rw [← h2] at h4
   have h5 := Finset.card_insert_le x (s.image g)
   have h6 : (s.image g).card ≤ s.card := Finset.card_image_le
@@ -167,12 +196,16 @@ theorem regular_of_quotient {A : Type} [CommRing A] [IsNoetherianRing A] [IsLoca
     omega
   exact_mod_cast h7
 
-theorem pd_residue_quot {A : Type} [CommRing A] [IsLocalRing A] {x : A}
-    (hm : x ∈ maximalIdeal A) (hm2 : x ∉ maximalIdeal A ^ 2) [IsLocalRing (A ⧸ Ideal.span {x})]
-    (n : ℕ) (h : HasProjectiveDimensionLE
-      (ModuleCat.of (A ⧸ Ideal.span {x}) ((A ⧸ Ideal.span {x}) ⊗[A] maximalIdeal A)) n) :
-    HasProjectiveDimensionLE (ModuleCat.of (A ⧸ Ideal.span {x})
-      ((A ⧸ Ideal.span {x}) ⧸ maximalIdeal (A ⧸ Ideal.span {x}))) n := by
+theorem pd_residue_quot
+    {A : Type} [CommRing A] [IsLocalRing A]
+    {x : A} (hm : x ∈ maximalIdeal A) (hm2 : x ∉ maximalIdeal A ^ 2)
+    [IsLocalRing (A ⧸ Ideal.span {x})]
+    (n : ℕ)
+    (h : HasProjectiveDimensionLE
+      (ModuleCat.of (A ⧸ Ideal.span {x}) ((A ⧸ Ideal.span {x}) ⊗[A] maximalIdeal A)) n)
+    : HasProjectiveDimensionLE
+      (ModuleCat.of (A ⧸ Ideal.span {x}) ((A ⧸ Ideal.span {x}) ⧸ maximalIdeal (A ⧸ Ideal.span {x})))
+      n := by
   have hmap := map_maximalIdeal_eq (Ideal.Quotient.mk (Ideal.span {x})) Ideal.Quotient.mk_surjective
   have hx0 : Ideal.Quotient.mk (Ideal.span {x}) x = 0 :=
     Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self x)
@@ -180,7 +213,8 @@ theorem pd_residue_quot {A : Type} [CommRing A] [IsLocalRing A] {x : A}
   have hv0 : (maximalIdeal A).toCotangent ⟨x, hm⟩ ≠ 0 := by
     rw [Ne, Ideal.toCotangent_eq_zero]
     exact hm2
-  obtain ⟨l, hl⟩ := Module.Projective.exists_dual_eq_one (ResidueField A) (V := CotangentSpace A) hv0
+  obtain ⟨l, hl⟩ :=
+    Module.Projective.exists_dual_eq_one (ResidueField A) (V := CotangentSpace A) hv0
   let j : ResidueField A →ₗ[A] B ⧸ maximalIdeal B :=
     Submodule.liftQ (maximalIdeal A) (Algebra.linearMap A (B ⧸ maximalIdeal B)) (by
       intro a ha
@@ -213,94 +247,103 @@ theorem pd_residue_quot {A : Type} [CommRing A] [IsLocalRing A] {x : A}
     apply LinearMap.ext_ring
     change r (LinearMap.toSpanSingleton B _ ((1 : B) ⊗ₜ[A] (⟨x, hm⟩ : maximalIdeal A)) 1) = 1
     rw [LinearMap.toSpanSingleton_apply, one_smul, LinearMap.liftBaseChange_tmul, hr0, one_smul]
-  let ret : Retract (ModuleCat.of B (B ⧸ maximalIdeal B)) (ModuleCat.of B (B ⊗[A] maximalIdeal A)) :=
-    ⟨ModuleCat.ofHom i, ModuleCat.ofHom r, by
-      rw [← ModuleCat.ofHom_comp, hri]; rfl⟩
+  let ret
+      : Retract (ModuleCat.of B (B ⧸ maximalIdeal B)) (ModuleCat.of B (B ⊗[A] maximalIdeal A)) :=
+    ⟨ModuleCat.ofHom i, ModuleCat.ofHom r, by rw [← ModuleCat.ofHom_comp, hri]; rfl⟩
   exact ret.hasProjectiveDimensionLT _
 
-theorem regular_of_pd (d : ℕ) : ∀ (A : Type) [CommRing A] [IsNoetherianRing A] [IsLocalRing A],
-    (maximalIdeal A).spanFinrank = d →
-    (∃ n, HasProjectiveDimensionLE (ModuleCat.of A (A ⧸ maximalIdeal A)) n) →
-    IsRegularLocalRing A := by
+theorem regular_of_pd (d : ℕ)
+    : ∀ (A : Type) [CommRing A] [IsNoetherianRing A] [IsLocalRing A],
+      (maximalIdeal A).spanFinrank = d
+        → (∃ n, HasProjectiveDimensionLE (ModuleCat.of A (A ⧸ maximalIdeal A)) n)
+        → IsRegularLocalRing A := by
   induction d using Nat.strong_induction_on with
   | _ d ih =>
-  intro A _ _ _ hd ⟨n, hn⟩
-  have hfield : maximalIdeal A = ⊥ → IsRegularLocalRing A := fun h => by
-    let _ := (isField_iff_maximalIdeal_eq.mpr h).toField
-    infer_instance
-  have hS : (maximalIdeal A).mkQ.shortComplexKer.ShortExact :=
-    LinearMap.shortExact_shortComplexKer (Submodule.mkQ_surjective _)
-  have hP : Projective (maximalIdeal A).mkQ.shortComplexKer.X₂ :=
-    (IsProjective.iff_projective A).mp inferInstance
-  have hK : HasProjectiveDimensionLE (ModuleCat.of A (LinearMap.ker (maximalIdeal A).mkQ)) n :=
-    (hS.hasProjectiveDimensionLT_X₃_iff n hP).1
-      (hasProjectiveDimensionLT_of_ge (ModuleCat.of A (A ⧸ maximalIdeal A)) (n + 1) _ (by omega))
-  rw [Submodule.ker_mkQ] at hK
-  by_cases hsq : maximalIdeal A ≤ maximalIdeal A ^ 2
-  · exact hfield (ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.maximalIdeal_eq_bot_of_le_sq A hsq)
-  by_cases hass : ∃ p ∈ associatedPrimes A A, maximalIdeal A ≤ p
-  · obtain ⟨p, hp, hle⟩ := hass
-    obtain ⟨hpp, a, ha⟩ := isAssociatedPrime_iff.mp hp
-    have ha0 : a ≠ 0 := by
-      rintro rfl
-      apply hpp.ne_top
-      rw [ha, Ideal.eq_top_iff_one, Submodule.mem_colon_singleton]
-      simp
-    have hkill : ∀ y ∈ maximalIdeal A, a * y = 0 := by
-      intro y hy
-      have := hle hy
-      rw [ha, Submodule.mem_colon_singleton] at this
-      simpa [mul_comm] using this
-    have hpr : Module.Projective A (maximalIdeal A) := projective_of_socle ha0 hkill n _ hK
-    have hfree : Module.Free A (maximalIdeal A) := Module.free_of_flat_of_isLocalRing
-    apply hfield
-    rw [← Submodule.subsingleton_iff_eq_bot]
-    by_contra hn
-    rw [not_subsingleton_iff_nontrivial] at hn
-    have : a ∈ Module.annihilator A (maximalIdeal A) :=
-      Module.mem_annihilator.mpr fun y => Subtype.ext (hkill _ y.2)
-    rw [Module.annihilator_eq_bot.mpr inferInstance] at this
-    exact ha0 this
-  obtain ⟨x, hx, hx2, hreg⟩ : ∃ x ∈ maximalIdeal A, x ∉ maximalIdeal A ^ 2 ∧ IsSMulRegular A x := by
-    classical
-    by_contra hcon
-    push Not at hcon
-    obtain ⟨t, ht⟩ := (associatedPrimes.finite A A).exists_finset_coe
-    have hsub : (maximalIdeal A : Set A) ⊆
-        ⋃ i ∈ ((insert (maximalIdeal A ^ 2) t : Finset (Ideal A)) : Set (Ideal A)), (i : Set A) := by
-      rw [Finset.coe_insert, Set.biUnion_insert, ht, biUnion_associatedPrimes_eq_compl_regular]
-      intro y hy
-      by_cases h2 : y ∈ maximalIdeal A ^ 2
-      · exact Or.inl h2
-      · exact Or.inr (hcon y hy h2)
-    obtain ⟨i, hi, hle⟩ := (Ideal.subset_union_prime (maximalIdeal A ^ 2) (maximalIdeal A ^ 2)
-      (fun i hi h1 _ => by
-        have : i ∈ associatedPrimes A A := ht ▸ (Finset.mem_insert.mp hi).resolve_left h1
-        exact this.isPrime)).mp hsub
-    rcases Finset.mem_insert.mp hi with rfl | hi
-    · exact hsq hle
-    · exact hass ⟨i, ht ▸ hi, hle⟩
-  have := ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.isLocalRing_quotient_span_singleton hx
-  have hlt := ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.spanFinrank_maximalIdeal_quotient_succ_le A hx hx2
-  rw [← IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace, hd] at hlt
-  have hregm : IsSMulRegular (maximalIdeal A) x := fun a b hab =>
-    Subtype.ext (hreg (congrArg Subtype.val hab))
-  have := ih _ hlt (A ⧸ Ideal.span {x}) rfl
-    ⟨n, pd_residue_quot hx hx2 n (pd_quot hreg n (ModuleCat.of A (maximalIdeal A)) hregm hK)⟩
-  exact regular_of_quotient hreg hx
+    intro A _ _ _ hd ⟨n, hn⟩
+    have hfield : maximalIdeal A = ⊥ → IsRegularLocalRing A := fun h => by
+      let _ := (isField_iff_maximalIdeal_eq.mpr h).toField
+      infer_instance
+    have hS : (maximalIdeal A).mkQ.shortComplexKer.ShortExact :=
+      LinearMap.shortExact_shortComplexKer (Submodule.mkQ_surjective _)
+    have hP : Projective (maximalIdeal A).mkQ.shortComplexKer.X₂ :=
+      (IsProjective.iff_projective A).mp inferInstance
+    have hK : HasProjectiveDimensionLE (ModuleCat.of A (LinearMap.ker (maximalIdeal A).mkQ)) n :=
+      (hS.hasProjectiveDimensionLT_X₃_iff n hP).1
+        (hasProjectiveDimensionLT_of_ge (ModuleCat.of A (A ⧸ maximalIdeal A)) (n + 1) _ (by omega))
+    rw [Submodule.ker_mkQ] at hK
+    by_cases hsq : maximalIdeal A ≤ maximalIdeal A ^ 2
+    · exact hfield (ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.maximalIdeal_eq_bot_of_le_sq A
+        hsq)
+    by_cases hass : ∃ p ∈ associatedPrimes A A, maximalIdeal A ≤ p
+    · obtain ⟨p, hp, hle⟩ := hass
+      obtain ⟨hpp, a, ha⟩ := isAssociatedPrime_iff.mp hp
+      have ha0 : a ≠ 0 := by
+        rintro rfl
+        apply hpp.ne_top
+        rw [ha, Ideal.eq_top_iff_one, Submodule.mem_colon_singleton]
+        simp
+      have hkill : ∀ y ∈ maximalIdeal A, a * y = 0 := by
+        intro y hy
+        have := hle hy
+        rw [ha, Submodule.mem_colon_singleton] at this
+        simpa [mul_comm] using this
+      have hpr : Module.Projective A (maximalIdeal A) := projective_of_socle ha0 hkill n _ hK
+      have hfree : Module.Free A (maximalIdeal A) := Module.free_of_flat_of_isLocalRing
+      apply hfield
+      rw [← Submodule.subsingleton_iff_eq_bot]
+      by_contra hn
+      rw [not_subsingleton_iff_nontrivial] at hn
+      have : a ∈ Module.annihilator A (maximalIdeal A) :=
+        Module.mem_annihilator.mpr fun y => Subtype.ext (hkill _ y.2)
+      rw [Module.annihilator_eq_bot.mpr inferInstance] at this
+      exact ha0 this
+    obtain ⟨x, hx, hx2, hreg⟩
+        : ∃ x ∈ maximalIdeal A, x ∉ maximalIdeal A ^ 2 ∧ IsSMulRegular A x := by
+      classical
+      by_contra hcon
+      push Not at hcon
+      obtain ⟨t, ht⟩ := (associatedPrimes.finite A A).exists_finset_coe
+      have hsub
+          : (maximalIdeal A : Set A)
+            ⊆ ⋃ i ∈ ((insert (maximalIdeal A ^ 2) t : Finset (Ideal A)) : Set (Ideal A)), (i : Set A) :=
+        by
+          rw [Finset.coe_insert, Set.biUnion_insert, ht, biUnion_associatedPrimes_eq_compl_regular]
+          intro y hy
+          by_cases h2 : y ∈ maximalIdeal A ^ 2
+          · exact Or.inl h2
+          · exact Or.inr (hcon y hy h2)
+      obtain ⟨i, hi, hle⟩ :=
+        (Ideal.subset_union_prime (maximalIdeal A ^ 2) (maximalIdeal A ^ 2) (fun i hi h1 _ => by
+          have : i ∈ associatedPrimes A A := ht ▸ (Finset.mem_insert.mp hi).resolve_left h1
+          exact this.isPrime)).mp hsub
+      rcases Finset.mem_insert.mp hi with rfl | hi
+      · exact hsq hle
+      · exact hass ⟨i, ht ▸ hi, hle⟩
+    have := ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.isLocalRing_quotient_span_singleton hx
+    have hlt :=
+      ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.spanFinrank_maximalIdeal_quotient_succ_le A hx
+        hx2
+    rw [← IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace, hd] at hlt
+    have hregm : IsSMulRegular (maximalIdeal A) x := fun a b hab =>
+      Subtype.ext (hreg (congrArg Subtype.val hab))
+    have :=
+      ih _ hlt (A ⧸ Ideal.span {x}) rfl
+        ⟨n, pd_residue_quot hx hx2 n (pd_quot hreg n (ModuleCat.of A (maximalIdeal A)) hregm hK)⟩
+    exact regular_of_quotient hreg hx
 
 end SerreRegular
 
-theorem isRegularLocalRing_of_hasProjectiveDimensionLE_residueField (A : Type) [CommRing A]
-    [IsNoetherianRing A] [IsLocalRing A] (n : ℕ)
-    (h : HasProjectiveDimensionLE (ModuleCat.of A (A ⧸ maximalIdeal A)) n) :
-    IsRegularLocalRing A :=
+theorem isRegularLocalRing_of_hasProjectiveDimensionLE_residueField
+    (A : Type) [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
+    (n : ℕ) (h : HasProjectiveDimensionLE (ModuleCat.of A (A ⧸ maximalIdeal A)) n)
+    : IsRegularLocalRing A :=
   SerreRegular.regular_of_pd _ A rfl ⟨n, h⟩
 
-theorem isRegularLocalRing_of_flat_of_map_eq_maximalIdeal (R S : Type) [CommRing R]
-    [IsRegularLocalRing R] [CommRing S] [IsLocalRing S] [IsNoetherianRing S] [Algebra R S]
-    [Module.Flat R S] (q : Ideal R) (hq : maximalIdeal S = q.map (algebraMap R S)) :
-    IsRegularLocalRing S := by
+theorem isRegularLocalRing_of_flat_of_map_eq_maximalIdeal
+    (R S : Type) [CommRing R] [IsRegularLocalRing R] [CommRing S] [IsLocalRing S]
+    [IsNoetherianRing S] [Algebra R S] [Module.Flat R S]
+    (q : Ideal R) (hq : maximalIdeal S = q.map (algebraMap R S))
+    : IsRegularLocalRing S := by
   obtain ⟨n, hn⟩ := exists_hasProjectiveDimensionLE_of_isRegularLocalRing R (R ⧸ q)
   have h := SerreRegular.pd_flat (B := S) n (ModuleCat.of R (R ⧸ q)) hn
   refine isRegularLocalRing_of_hasProjectiveDimensionLE_residueField S n ?_
@@ -308,8 +351,8 @@ theorem isRegularLocalRing_of_flat_of_map_eq_maximalIdeal (R S : Type) [CommRing
   exact hasProjectiveDimensionLT_of_iso
     (Algebra.TensorProduct.quotIdealMapEquivTensorQuot S q).toLinearEquiv.toModuleIso.symm _
 
-theorem isRegularRing_of_isRegularLocalRing (R : Type) [CommRing R] [IsRegularLocalRing R] :
-    IsRegularRing R := by
+theorem isRegularRing_of_isRegularLocalRing (R : Type) [CommRing R] [IsRegularLocalRing R]
+    : IsRegularRing R := by
   rw [isRegularRing_iff]
   intro p _
   exact isRegularLocalRing_of_flat_of_map_eq_maximalIdeal R _ p

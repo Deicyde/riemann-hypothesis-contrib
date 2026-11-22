@@ -14,9 +14,9 @@ open MeasureTheory
 noncomputable section
 
 def SphereLongitudeCoordinates.Statement : Prop :=
-  sphereMeasure.map (fun n : Sphere2 => (n : E3)) =
-    (ENNReal.ofReal (4 * Real.pi))⁻¹ •
-      (volume.restrict (Set.Icc (-1 : ℝ) 1 ×ˢ Set.Ioc 0 (2 * Real.pi))).map
+  sphereMeasure.map (fun n : Sphere2 => (n : E3))
+    = (ENNReal.ofReal (4 * Real.pi))⁻¹
+      • (volume.restrict (Set.Icc (-1 : ℝ) 1 ×ˢ Set.Ioc 0 (2 * Real.pi))).map
         (fun p : ℝ × ℝ => spherePoint p.1 p.2)
 
 end

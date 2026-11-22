@@ -21,28 +21,31 @@ def parAlg (K : Type) [Field K] (a n : ℕ) : Subalgebra K (Matrix (Fin n) (Fin 
     by_cases hk : (k : ℕ) < a
     · rw [hM i k hk hi, zero_mul]
     · rw [hN k j hj (not_lt.1 hk), mul_zero]
-  add_mem' {M N} hM hN i j hj hi := by
-    rw [Matrix.add_apply, hM i j hj hi, hN i j hj hi, add_zero]
+  add_mem' {M N} hM hN i j hj hi := by rw [Matrix.add_apply, hM i j hj hi, hN i j hj hi, add_zero]
   algebraMap_mem' c i j hj hi := by
     have hij : i ≠ j := fun h => by subst h; omega
     simp [Matrix.algebraMap_matrix_apply, hij]
 
-theorem inPar_iff_mem {K : Type} [Field K] {a n : ℕ} (x : GL (Fin n) K) :
-    InPar a x ↔ (x : Matrix (Fin n) (Fin n) K) ∈ parAlg K a n := Iff.rfl
+theorem inPar_iff_mem {K : Type} [Field K] {a n : ℕ} (x : GL (Fin n) K)
+    : InPar a x ↔ (x : Matrix (Fin n) (Fin n) K) ∈ parAlg K a n :=
+  Iff.rfl
 
 theorem inPar_one {K : Type} [Field K] (a n : ℕ) : InPar a (1 : GL (Fin n) K) := by
   intro i j hj hi
   have hij : i ≠ j := fun h => by subst h; omega
   simp [Matrix.one_apply_ne hij]
 
-theorem inPar_mul {K : Type} [Field K] {a n : ℕ} {x z : GL (Fin n) K} (hx : InPar a x) (hz : InPar a z) :
-    InPar a (x * z) := by
+theorem inPar_mul
+    {K : Type} [Field K] {a n : ℕ} {x z : GL (Fin n) K} (hx : InPar a x) (hz : InPar a z)
+    : InPar a (x * z) := by
   rw [inPar_iff_mem, Units.val_mul]
   exact (parAlg K a n).mul_mem hx hz
 
-theorem inPar_inv {K : Type} [Field K] {a n : ℕ} {x : GL (Fin n) K} (h : InPar a x) : InPar a x⁻¹ := by
-  have hb : (x : Matrix (Fin n) (Fin n) K).BlockTriangular
-      (fun i : Fin n => if a ≤ (i : ℕ) then (1 : ℕ) else 0) := by
+theorem inPar_inv {K : Type} [Field K] {a n : ℕ} {x : GL (Fin n) K} (h : InPar a x)
+    : InPar a x⁻¹ := by
+  have hb
+      : (x : Matrix (Fin n) (Fin n) K).BlockTriangular
+        (fun i : Fin n => if a ≤ (i : ℕ) then (1 : ℕ) else 0) := by
     intro i j hij
     apply h i j
     · by_contra hc
@@ -56,35 +59,42 @@ theorem inPar_inv {K : Type} [Field K] {a n : ℕ} {x : GL (Fin n) K} (h : InPar
   apply Matrix.blockTriangular_inv_of_blockTriangular hb
   simp [hi, not_le.2 hj]
 
-theorem conj_adjoin_mem {K : Type} [Field K] {n : ℕ} (B : Subalgebra K (Matrix (Fin n) (Fin n) K))
-    (u : GL (Fin n) K) (M X : Matrix (Fin n) (Fin n) K) (hX : X ∈ Algebra.adjoin K {M})
-    (hM : ((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * M * u ∈ B) :
-    ((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * X * u ∈ B := by
+theorem conj_adjoin_mem
+    {K : Type} [Field K]
+    {n : ℕ} (B : Subalgebra K (Matrix (Fin n) (Fin n) K)) (u : GL (Fin n) K)
+    (M X : Matrix (Fin n) (Fin n) K) (hX : X ∈ Algebra.adjoin K {M})
+    (hM : ((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * M * u ∈ B)
+    : ((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * X * u ∈ B := by
   induction hX using Algebra.adjoin_induction with
   | mem x hx => rw [Set.mem_singleton_iff.1 hx]; exact hM
   | algebraMap r =>
-      rw [Algebra.algebraMap_eq_smul_one, mul_smul_comm, smul_mul_assoc, mul_one, Units.inv_mul]
-      exact B.smul_mem B.one_mem r
-  | add x y _ _ hx hy => rw [mul_add, add_mul]; exact B.add_mem hx hy
+    rw [Algebra.algebraMap_eq_smul_one, mul_smul_comm, smul_mul_assoc, mul_one, Units.inv_mul]
+    exact B.smul_mem B.one_mem r
+  | add x y _ _ hx hy =>
+    rw [mul_add, add_mul]; exact B.add_mem hx hy
   | mul x y _ _ hx hy =>
-      have e : ((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * (x * y) * u =
-          (((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * x * u) *
-          (((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * y * u) := by
-        simp only [mul_assoc, Units.mul_inv_cancel_left]
-      rw [e]; exact B.mul_mem hx hy
+    have e
+        : ((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * (x * y) * u
+          = (((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * x * u)
+            * (((u⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) * y * u) := by
+      simp only [mul_assoc, Units.mul_inv_cancel_left]
+    rw [e]
+    exact B.mul_mem hx hy
 
 variable {F F' : Type} [Field F] [Field F'] [Algebra F F']
 
-theorem galAct_coe (n : ℕ) (t : F' ≃ₐ[F] F') (x : GL (Fin n) F') (i j : Fin n) :
-    (galAct F F' n t x : Matrix (Fin n) (Fin n) F') i j = t ((x : Matrix (Fin n) (Fin n) F') i j) := by
+theorem galAct_coe (n : ℕ) (t : F' ≃ₐ[F] F') (x : GL (Fin n) F') (i j : Fin n)
+    : (galAct F F' n t x : Matrix (Fin n) (Fin n) F') i j
+      = t ((x : Matrix (Fin n) (Fin n) F') i j) := by
   simp [galAct_apply, gal]
 
-theorem incl_coe (n : ℕ) (x : GL (Fin n) F) (i j : Fin n) :
-    (incl F F' n x : Matrix (Fin n) (Fin n) F') i j = algebraMap F F' ((x : Matrix (Fin n) (Fin n) F) i j) := by
+theorem incl_coe (n : ℕ) (x : GL (Fin n) F) (i j : Fin n)
+    : (incl F F' n x : Matrix (Fin n) (Fin n) F') i j
+      = algebraMap F F' ((x : Matrix (Fin n) (Fin n) F) i j) := by
   simp [incl, gal]
 
-theorem inPar_galAct {a n : ℕ} (t : F' ≃ₐ[F] F') {x : GL (Fin n) F'} (h : InPar a x) :
-    InPar a (galAct F F' n t x) := by
+theorem inPar_galAct {a n : ℕ} (t : F' ≃ₐ[F] F') {x : GL (Fin n) F'} (h : InPar a x)
+    : InPar a (galAct F F' n t x) := by
   intro i j hj hi
   rw [galAct_coe, h i j hj hi, map_zero]
 
@@ -97,7 +107,8 @@ theorem inPar_incl {a n : ℕ} (x : GL (Fin n) F) : InPar a (incl F F' n x) ↔ 
   · intro h i j hj hi
     rw [incl_coe, h i j hj hi, map_zero]
 
-theorem inPar_nrm {a n : ℕ} (s : F' ≃ₐ[F] F') {x : GL (Fin n) F'} (h : InPar a x) : InPar a (nrm s x) := by
+theorem inPar_nrm {a n : ℕ} (s : F' ≃ₐ[F] F') {x : GL (Fin n) F'} (h : InPar a x)
+    : InPar a (nrm s x) := by
   unfold nrm nrmG
   apply List.prod_induction (fun z => InPar a z)
   · intro u v hu hv; exact inPar_mul hu hv
@@ -115,9 +126,19 @@ theorem nrm_one' (s : F' ≃ₐ[F] F') (n : ℕ) : nrm s (1 : GL (Fin n) F') = 1
 
 end GlobalTheory.Shin.FlagDesc
 
-
 open GlobalTheory.Shin.FlagDesc in
-theorem GlobalTheory.Shin.inPar_twistedConj_iff : ∀ (F F' : Type) [Field F] [Field F'] [Algebra F F'] [Finite F'] (s : F' ≃ₐ[F] F'), (∀ t : F' ≃ₐ[F] F', t ∈ Subgroup.zpowers s) → ∀ (a n : ℕ), a ≤ n → ∀ (γ : GL (Fin n) F) (δ y : GL (Fin n) F'), (δ : Matrix (Fin n) (Fin n) F') ∈ Algebra.adjoin F' {((incl F F' n γ : GL (Fin n) F') : Matrix (Fin n) (Fin n) F')} → nrm s δ = incl F F' n γ → (InPar a (y⁻¹ * δ * galAct F F' n s y) ↔ ∃ (y₀ : GL (Fin n) F) (p : GL (Fin n) F'), InPar a p ∧ y = incl F F' n y₀ * p ∧ InPar a (y₀⁻¹ * γ * y₀)) := by
+theorem GlobalTheory.Shin.inPar_twistedConj_iff
+    : ∀ (F F' : Type) [Field F] [Field F'] [Algebra F F'] [Finite F'] (s : F' ≃ₐ[F] F'),
+      (∀ t : F' ≃ₐ[F] F', t ∈ Subgroup.zpowers s)
+        → ∀ (a n : ℕ),
+          a ≤ n
+            → ∀ (γ : GL (Fin n) F) (δ y : GL (Fin n) F'),
+              (δ : Matrix (Fin n) (Fin n) F') ∈ Algebra.adjoin F'
+                  {((incl F F' n γ : GL (Fin n) F') : Matrix (Fin n) (Fin n) F')}
+                → nrm s δ = incl F F' n γ
+                → (InPar a (y⁻¹ * δ * galAct F F' n s y)
+                  ↔ ∃ (y₀ : GL (Fin n) F) (p : GL (Fin n) F'),
+                    InPar a p ∧ y = incl F F' n y₀ * p ∧ InPar a (y₀⁻¹ * γ * y₀)) := by
   intro F F' _ _ _ _ s hs a n _ γ δ y hδ hN
   obtain ⟨hfix, -, hconj, -, -⟩ := GlobalTheory.T.galoisTwistedNormGL_basic_properties F F' s hs n
   have hB : ∀ x ∈ parAlg F' a n, x.map s ∈ parAlg F' a n := by
@@ -126,8 +147,7 @@ theorem GlobalTheory.Shin.inPar_twistedConj_iff : ∀ (F F' : Type) [Field F] [F
     rw [hM i j hj hi, map_zero]
   constructor
   · intro hq
-    have hγP : InPar a (y⁻¹ * incl F F' n γ * y) := by
-      rw [← hN, ← hconj]; exact inPar_nrm s hq
+    have hγP : InPar a (y⁻¹ * incl F F' n γ * y) := by rw [← hN, ← hconj]; exact inPar_nrm s hq
     have hδP : InPar a (y⁻¹ * δ * y) := by
       rw [inPar_iff_mem, Units.val_mul, Units.val_mul]
       apply conj_adjoin_mem _ y _ _ hδ
@@ -135,28 +155,34 @@ theorem GlobalTheory.Shin.inPar_twistedConj_iff : ∀ (F F' : Type) [Field F] [F
       rwa [Units.val_mul, Units.val_mul] at this
     have hεP : InPar a (y⁻¹ * galAct F F' n s y) := by
       have e : y⁻¹ * galAct F F' n s y = (y⁻¹ * δ * y)⁻¹ * (y⁻¹ * δ * galAct F F' n s y) := by group
-      rw [e]; exact inPar_mul (inPar_inv hδP) hq
+      rw [e]
+      exact inPar_mul (inPar_inv hδP) hq
     have hεN : nrm s (y⁻¹ * galAct F F' n s y) = 1 := by
       have := hconj 1 y
       rw [nrm_one', mul_one, inv_mul_cancel] at this
       exact this
-    obtain ⟨x, hxB, hε⟩ := GlobalTheory.T.exists_coboundary_of_norm_one_in_subalgebra F F' s hs n (parAlg F' a n) hB _ hεP hεN
+    obtain ⟨x, hxB, hε⟩ :=
+      GlobalTheory.T.exists_coboundary_of_norm_one_in_subalgebra F F' s hs n (parAlg F' a n) hB _
+        hεP hεN
     have hfx : galAct F F' n s (y * x⁻¹) = y * x⁻¹ := by
       rw [map_mul, map_inv]
-      calc galAct F F' n s y * (galAct F F' n s x)⁻¹
+      calc
+        galAct F F' n s y * (galAct F F' n s x)⁻¹
           = y * (y⁻¹ * galAct F F' n s y) * (galAct F F' n s x)⁻¹ := by group
         _ = y * (x⁻¹ * galAct F F' n s x) * (galAct F F' n s x)⁻¹ := by rw [hε]
         _ = y * x⁻¹ := by group
     obtain ⟨y₀, hy₀⟩ := (hfix _).1 hfx
     refine ⟨y₀, x, hxB, by rw [hy₀]; group, ?_⟩
     rw [← inPar_incl (F' := F'), map_mul, map_mul, map_inv, hy₀]
-    have e : (y * x⁻¹)⁻¹ * incl F F' n γ * (y * x⁻¹) = x * (y⁻¹ * incl F F' n γ * y) * x⁻¹ := by group
+    have e : (y * x⁻¹)⁻¹ * incl F F' n γ * (y * x⁻¹) = x * (y⁻¹ * incl F F' n γ * y) * x⁻¹ := by
+      group
     rw [e]
     exact inPar_mul (inPar_mul hxB hγP) (inPar_inv hxB)
   · rintro ⟨y₀, p, hp, rfl, hγ0⟩
     have hs0 : galAct F F' n s (incl F F' n y₀) = incl F F' n y₀ := (hfix _).2 ⟨y₀, rfl⟩
-    have e : (incl F F' n y₀ * p)⁻¹ * δ * galAct F F' n s (incl F F' n y₀ * p) =
-        p⁻¹ * ((incl F F' n y₀)⁻¹ * δ * incl F F' n y₀) * galAct F F' n s p := by
+    have e
+        : (incl F F' n y₀ * p)⁻¹ * δ * galAct F F' n s (incl F F' n y₀ * p)
+          = p⁻¹ * ((incl F F' n y₀)⁻¹ * δ * incl F F' n y₀) * galAct F F' n s p := by
       rw [map_mul, hs0]; group
     rw [e]
     have hmid : InPar a ((incl F F' n y₀)⁻¹ * δ * incl F F' n y₀) := by

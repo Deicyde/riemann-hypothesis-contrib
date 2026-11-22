@@ -28,8 +28,9 @@ theorem npq_le {n : ℕ} (ε : Fin n → Bool) : (n : ℝ) * (pOf ε : ℝ) * (q
   have h0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   have h3 : (0 : ℝ) ≤ pOf ε := Nat.cast_nonneg _
   have h4 : (0 : ℝ) ≤ qOf ε := Nat.cast_nonneg _
-  calc (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) ≤ n * n * n := by
-        apply mul_le_mul (mul_le_mul_of_nonneg_left h1 h0) h2 h4 (by positivity)
+  calc
+    (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ)
+      ≤ n * n * n := by apply mul_le_mul (mul_le_mul_of_nonneg_left h1 h0) h2 h4 (by positivity)
     _ = (n : ℝ) ^ 3 := by ring
 
 end DiscreteSeriesData
@@ -38,8 +39,7 @@ open DiscreteSeriesData in
 theorem discrete_series_data_holds : DSData := by
   intro n ε H i1 i2 i3 π hU lam h hHC hgap hh hDS
   have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
-  have hlt : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h := by
-    linarith [npq_le ε]
+  have hlt : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h := by linarith [npq_le ε]
   obtain ⟨hCas, -, -, hSm, -⟩ :=
     ReciprocityTheory.ChartRestriction.DS.isDS_props_of_gap n ε lam hHC h hgap hlt H π hDS
   have hD := isDerivedOn_smE (ε := ε) (σ := π) hU
@@ -69,7 +69,8 @@ theorem discrete_series_data_holds : DSData := by
       haveI hV : FiniteDimensional ℂ (V.map (smD ε π).subtype) := by
         rw [hmapV]
         infer_instance
-      exact (Submodule.equivMapOfInjective _ (Submodule.injective_subtype _) V).symm.finiteDimensional
+      exact (Submodule.equivMapOfInjective _ (Submodule.injective_subtype _)
+        V).symm.finiteDimensional
     have hVk : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ u ∈ V, (u : H) = π k v := by
       intro k hk v hv
       refine ⟨⟨π k v, hD.kStable k hk v v.2⟩, ?_, rfl⟩
@@ -97,8 +98,11 @@ theorem discrete_series_data_holds : DSData := by
         rw [h1, hmapV]
     have hstd : ReciprocityTheory.ChartRestriction.DS.G2.StdGap ε lam :=
       ⟨hHC.1, h, hgap, by linarith [pow_nonneg hn0 3]⟩
-    have hTop := ReciprocityTheory.ChartRestriction.DS.G2.data_closGen_eq_top hstd hU hD hirr
-      (fun v _ => part1 v) hVk hDS.2.2.2.1 (fun hb => hw0 ((Submodule.eq_bot_iff V).1 hb w hwV))
+    have hTop :=
+      ReciprocityTheory.ChartRestriction.DS.G2.data_closGen_eq_top hstd hU hD hirr
+        (fun v _ => part1 v)
+        hVk hDS.2.2.2.1
+        (fun hb => hw0 ((Submodule.eq_bot_iff V).1 hb w hwV))
     intro x δ hδ
     have hx : x ∈ closGen (smE ε π) V := by
       rw [hTop]
@@ -108,9 +112,11 @@ theorem discrete_series_data_holds : DSData := by
     obtain ⟨f, hf, rfl⟩ := hy
     refine ⟨f, ?_, ?_⟩
     · rw [SetLike.mem_coe, genSub_eq_iSup_layer hD.glRep hVks,
-        Submodule.mem_iSup_of_directed _ (Monotone.directed_le fun k l hkl => layer_mono hkl)] at hf
+          Submodule.mem_iSup_of_directed _ (Monotone.directed_le fun k l hkl => layer_mono hkl)]
+        at hf
       obtain ⟨k, hk⟩ := hf
-      exact ⟨layer ε (smE ε π) V k, finiteDimensional_layer hVfd k, layer_kStable hD.glRep hVks k, hk⟩
+      exact
+        ⟨layer ε (smE ε π) V k, finiteDimensional_layer hVfd k, layer_kStable hD.glRep hVks k, hk⟩
     · rw [← dist_eq_norm]
       exact hxy
 

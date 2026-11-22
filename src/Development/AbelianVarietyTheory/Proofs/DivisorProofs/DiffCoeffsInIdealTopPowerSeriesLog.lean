@@ -11,11 +11,13 @@ open MvPowerSeries GlobalTheory GlobalTheory.QLog
 
 namespace GlobalTheory.QLog.LogDiff
 
-theorem dIn_log : ∀ (B Q : Type) [CommRing B] [CommRing Q] [Algebra B Q] [Algebra ℚ Q],
-    DIn (⊤ : Ideal B) (PowerSeries.log Q : MvPowerSeries Unit Q) := by
+theorem dIn_log
+    : ∀ (B Q : Type) [CommRing B] [CommRing Q] [Algebra B Q] [Algebra ℚ Q],
+      DIn (⊤ : Ideal B) (PowerSeries.log Q : MvPowerSeries Unit Q) := by
   intro B Q _ _ _ _ α i
-  have hc : MvPowerSeries.coeff α (PowerSeries.log Q : MvPowerSeries Unit Q) =
-      PowerSeries.coeff (α i) (PowerSeries.log Q) := by
+  have hc
+      : MvPowerSeries.coeff α (PowerSeries.log Q : MvPowerSeries Unit Q)
+        = PowerSeries.coeff (α i) (PowerSeries.log Q) := by
     rw [PowerSeries.coeff_def (s := α) (n := α i) rfl]
   rw [hc, PowerSeries.coeff_log]
   by_cases h : α i = 0

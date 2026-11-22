@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.ResidueSpanScale
 
-theorem exists_scale {O K J : Type} [CommRing O] [IsDomain O] [ValuationRing O] [Field K]
-    [Algebra O K] [IsFractionRing O K] [Finite J] (c : J → K) (j : J) (hj : c j ≠ 0) :
-    ∃ (j₀ : J) (d : J → O), c j₀ ≠ 0 ∧ d j₀ = 1 ∧ ∀ i, c i = c j₀ * algebraMap O K (d i) := by
+theorem exists_scale
+    {O K J : Type} [CommRing O] [IsDomain O] [ValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K] [Finite J]
+    (c : J → K) (j : J) (hj : c j ≠ 0)
+    : ∃ (j₀ : J) (d : J → O), c j₀ ≠ 0 ∧ d j₀ = 1 ∧ ∀ i, c i = c j₀ * algebraMap O K (d i) := by
   classical
   haveI : Nonempty J := ⟨j⟩
   obtain ⟨j₀, h₀⟩ := Finite.exists_max (fun i => ValuationRing.valuation O K (c i))
@@ -28,14 +30,15 @@ theorem exists_scale {O K J : Type} [CommRing O] [IsDomain O] [ValuationRing O] 
     rw [hd, div_self hc, map_one]
   · rw [hd]; field_simp
 
-theorem finrank_span_residue_le {O K I A B : Type} [CommRing O] [IsDomain O] [ValuationRing O]
-    [Field K] [Algebra O K] [IsFractionRing O K] [Finite I] (f : I → A → K)
-    (g : I → B → IsLocalRing.ResidueField O)
+theorem finrank_span_residue_le
+    {O K I A B : Type} [CommRing O] [IsDomain O] [ValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K] [Finite I]
+    (f : I → A → K) (g : I → B → IsLocalRing.ResidueField O)
     (h : ∀ b : B, ∃ (a : A) (w : I → O), ∀ i : I,
-      f i a = algebraMap O K (w i) ∧ g i b = IsLocalRing.residue O (w i)) :
-    Module.finrank (IsLocalRing.ResidueField O)
-        (Submodule.span (IsLocalRing.ResidueField O) (Set.range g)) ≤
-      Module.finrank K (Submodule.span K (Set.range f)) := by
+      f i a = algebraMap O K (w i) ∧ g i b = IsLocalRing.residue O (w i))
+    : Module.finrank (IsLocalRing.ResidueField O)
+        (Submodule.span (IsLocalRing.ResidueField O) (Set.range g))
+      ≤ Module.finrank K (Submodule.span K (Set.range f)) := by
   classical
   obtain ⟨κ, e, he, hsp, hli⟩ := exists_linearIndependent' (IsLocalRing.ResidueField O) g
   haveI : Finite κ := Finite.of_injective e he
@@ -51,8 +54,8 @@ theorem finrank_span_residue_le {O K I A B : Type} [CommRing O] [IsDomain O] [Va
       funext b
       obtain ⟨a, w, hw⟩ := h b
       have h1 := congrFun hc a
-      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Function.comp_apply,
-        Pi.zero_apply] at h1 ⊢
+      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Function.comp_apply, Pi.zero_apply]
+        at h1 ⊢
       have h2 : c j₀ * algebraMap O K (∑ i, d i * w (e i)) = 0 := by
         set_option synthInstance.maxHeartbeats 100000 in
           rw [← h1, map_sum, Finset.mul_sum]

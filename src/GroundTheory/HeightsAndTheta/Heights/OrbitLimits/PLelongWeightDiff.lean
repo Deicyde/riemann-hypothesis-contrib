@@ -29,37 +29,48 @@ theorem LelongWeightDiff.proof (hM : ChartMassCompact.Statement) : LelongWeightD
   simp only [varInt, dif_pos hA]
   set A := hA.choose
   have hAf : IsFiniteProjection J A := hA.choose_spec
-  have hfin : ∀ y, (fibre J A y).Finite := fun y => (FibreBound.proof n (d + 1) J A hJ hdim hAf y).2.1
+  have hfin : ∀ y, (fibre J A y).Finite := fun y =>
+    (FibreBound.proof n (d + 1) J A hJ hdim hAf y).2.1
   have hkc : ContinuousOn k (zeroSet J) := by
     obtain ⟨U, -, hU, hkU⟩ := hk; exact hkU.continuousOn.mono hU
   have hlc : Continuous fun x => ‖linEval u x‖ ^ 2 := ((contDiff_linEval u).continuous.norm).pow 2
   set D : ℝ → (Fin n → ℂ) → ℝ := fun ε x => Real.log (‖linEval u x‖ ^ 2 + ε * k x ^ 2) / 2 - logReg u ε x
-  have hWc : ∀ ε : ℝ, 0 < ε →
-      ContinuousOn (fun x => Real.log (‖linEval u x‖ ^ 2 + ε * k x ^ 2) / 2) (zeroSet J) := fun ε hε =>
-    ((hlc.continuousOn.add (continuousOn_const.mul (hkc.pow 2))).log fun x hx => by
-      exact (add_pos_of_nonneg_of_pos (sq_nonneg _) (mul_pos hε (pow_pos (hkpos x hx) 2))).ne').div_const 2
+  have hWc
+      : ∀ ε : ℝ,
+        0 < ε
+          → ContinuousOn (fun x => Real.log (‖linEval u x‖ ^ 2 + ε * k x ^ 2) / 2) (zeroSet J) :=
+    fun ε hε =>
+      ((hlc.continuousOn.add (continuousOn_const.mul (hkc.pow 2))).log fun x hx => by
+        exact (add_pos_of_nonneg_of_pos (sq_nonneg _)
+          (mul_pos hε (pow_pos (hkpos x hx) 2))).ne').div_const 2
   have hLc : ∀ ε : ℝ, 0 < ε → ContinuousOn (logReg u ε) (zeroSet J) := fun ε hε =>
     (contDiff_logReg u hε).continuous.continuousOn
-  have hint : ∀ f, ContinuousOn f (zeroSet J) → Integrable (chartDens J A f (vecCons g φ)) := fun f hf =>
+  have hint
+      : ∀ f, ContinuousOn f (zeroSet J) → Integrable (chartDens J A f (vecCons g φ)) := fun f hf =>
     (hM n (d + 1) J A f _ hJ hdim hAf hf hψ (Or.inr hcs)).mono'
       (LelongWeightDiff.measurable_chartDens hJ hdim hAf hf hψ).aestronglyMeasurable
-      (Eventually.of_forall fun y => by rw [Real.norm_eq_abs]; exact LelongWeightDiff.abs_chartDens_le _ _ (hfin y))
-  have heq : (fun ε : ℝ => ∫ y, chartDens J A (D ε) (vecCons g φ) y) =ᶠ[𝓝[>] 0]
-      fun ε => chartInt J A (fun x => Real.log (‖linEval u x‖ ^ 2 + ε * k x ^ 2) / 2) (vecCons g φ) -
-        chartInt J A (logReg u ε) (vecCons g φ) := by
+      (Eventually.of_forall fun y => by
+        rw [Real.norm_eq_abs]; exact LelongWeightDiff.abs_chartDens_le _ _ (hfin y))
+  have heq
+      : (fun ε : ℝ => ∫ y, chartDens J A (D ε) (vecCons g φ) y) =ᶠ[𝓝[>] 0]
+        fun ε => chartInt J A (fun x => Real.log (‖linEval u x‖ ^ 2 + ε * k x ^ 2) / 2) (vecCons g φ) -
+          chartInt J A (logReg u ε) (vecCons g φ) := by
     filter_upwards [self_mem_nhdsWithin] with ε (hε : 0 < ε)
     rw [chartInt, chartInt, ← integral_sub (hint _ (hWc ε hε)) (hint _ (hLc ε hε))]
     exact integral_congr_ae (Eventually.of_forall fun y =>
       (LelongWeightDiff.chartDens_sub _ _ _ (hfin y)).symm)
   refine Tendsto.congr' heq ?_
   obtain ⟨P, hP0, hPu⟩ := LelongWeightDiff.exists_poly_of_linEval_eq_zero J A hAf u hu
-  have h := tendsto_integral_filter_of_dominated_convergence (μ := volume) (l := 𝓝[>] (0 : ℝ))
-    (F := fun ε => chartDens J A (D ε) (vecCons g φ)) (f := fun _ => (0 : ℝ))
-    (chartAbsDens J A (fun x => Real.log (k x)) (vecCons g φ)) ?_ ?_
-    (hM n (d + 1) J A _ _ hJ hdim hAf (hkc.log fun x hx => (hkpos x hx).ne') hψ (Or.inr hcs)) ?_
+  have h :=
+    tendsto_integral_filter_of_dominated_convergence (μ := volume) (l := 𝓝[>] (0 : ℝ))
+      (F := fun ε => chartDens J A (D ε) (vecCons g φ))
+      (f := fun _ => (0 : ℝ))
+      (chartAbsDens J A (fun x => Real.log (k x)) (vecCons g φ)) ?_ ?_
+      (hM n (d + 1) J A _ _ hJ hdim hAf (hkc.log fun x hx => (hkpos x hx).ne') hψ (Or.inr hcs)) ?_
   · rwa [integral_zero] at h
   · filter_upwards [self_mem_nhdsWithin] with ε (hε : 0 < ε)
-    exact (LelongWeightDiff.measurable_chartDens hJ hdim hAf ((hWc ε hε).sub (hLc ε hε)) hψ).aestronglyMeasurable
+    exact (LelongWeightDiff.measurable_chartDens hJ hdim hAf ((hWc ε hε).sub (hLc ε hε))
+      hψ).aestronglyMeasurable
   · filter_upwards [self_mem_nhdsWithin] with ε (hε : 0 < ε)
     refine Eventually.of_forall fun y => ?_
     rw [Real.norm_eq_abs]
@@ -86,9 +97,11 @@ theorem LelongWeightDiff.proof (hM : ChartMassCompact.Statement) : LelongWeightD
     have hc : ContinuousAt (fun ε : ℝ => D ε x) 0 := by
       simp only [D, logReg]
       refine ((ContinuousAt.log (by fun_prop) ?_).div_const 2).sub
-        ((ContinuousAt.log (by fun_prop) ?_).div_const 2) <;> simp [hux]
+          ((ContinuousAt.log (by fun_prop) ?_).div_const 2)
+        <;> simp [hux]
     have h0 : D 0 x = 0 := by simp [D, logReg]
-    simpa [h0] using ((hc.tendsto.mono_left nhdsWithin_le_nhds).mul_const
-      (ReciprocityTheory.AnForm.maDens (fun i => vecCons g φ i ∘ hs.choose) y))
+    simpa [h0] using
+      ((hc.tendsto.mono_left nhdsWithin_le_nhds).mul_const
+        (ReciprocityTheory.AnForm.maDens (fun i => vecCons g φ i ∘ hs.choose) y))
 
 end GroundTheory.Heights₂.Heights.Targets

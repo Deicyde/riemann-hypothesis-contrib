@@ -25,8 +25,9 @@ theorem SegreDimGe.proof : SegreDimGe.Statement := by
   have hx0 : ∀ k, x k ≠ 0 := fun k h =>
     hi k (Ideal.Quotient.eq_zero_iff_mem.mp (by simpa [x, π, Ideal.Quotient.mkₐ_eq_mk] using h))
 
-  have hkey : ∀ k (j : ι k), (∏ l ∈ Finset.univ.erase k, x l) * π (X ⟨k, j⟩) =
-      φ (X ⟨(), Function.update i k j⟩) := by
+  have hkey
+      : ∀ k (j : ι k),
+        (∏ l ∈ Finset.univ.erase k, x l) * π (X ⟨k, j⟩) = φ (X ⟨(), Function.update i k j⟩) := by
     intro k j
     rw [AlgHom.comp_apply, segreMap_X, map_prod, ← Finset.mul_prod_erase _ _ (Finset.mem_univ k),
       Function.update_self, mul_comm]
@@ -39,12 +40,20 @@ theorem SegreDimGe.proof : SegreDimGe.Statement := by
   have hR'B : ∀ a ∈ R', IsAlgebraic B a := fun a ha =>
     isAlgebraic_algebraMap (⟨a, Subalgebra.algebraMap_mem B (⟨a, ha⟩ : R')⟩ : B)
   have hsB : ∀ l, l ≠ k0 → IsAlgebraic B (x l) := fun l hl =>
-    isAlgebraic_algebraMap (⟨x l, Algebra.subset_adjoin
-      ⟨l, Finset.mem_coe.mpr (Finset.mem_erase.mpr ⟨hl, Finset.mem_univ l⟩), rfl⟩⟩ : B)
-  have hgen : ∀ k, (∀ l, l ≠ k → IsAlgebraic B (x l)) → ∀ j : ι k, IsAlgebraic B (π (X ⟨k, j⟩)) := by
+    isAlgebraic_algebraMap
+      (⟨
+         x l,
+         Algebra.subset_adjoin
+           ⟨l, Finset.mem_coe.mpr (Finset.mem_erase.mpr ⟨hl, Finset.mem_univ l⟩), rfl⟩
+       ⟩
+        : B)
+  have hgen
+      : ∀ k, (∀ l, l ≠ k → IsAlgebraic B (x l)) → ∀ j : ι k, IsAlgebraic B (π (X ⟨k, j⟩)) := by
     intro k hk j
     have hy : IsAlgebraic B (∏ l ∈ Finset.univ.erase k, x l) :=
-      Finset.prod_induction _ _ (fun a b ha hb => ha.mul hb) isAlgebraic_one
+      Finset.prod_induction _ _
+        (fun a b ha hb => ha.mul hb)
+        isAlgebraic_one
         fun l hl => hk l (Finset.ne_of_mem_erase hl)
     refine IsAlgebraic.of_mul (mem_nonZeroDivisors_of_ne_zero ?_) hy ?_
     · exact Finset.prod_ne_zero_iff.mpr fun l _ => hx0 l
@@ -84,10 +93,11 @@ theorem SegreDimGe.proof : SegreDimGe.Statement := by
     rintro ⟨y, p, rfl⟩
     exact ⟨Ideal.Quotient.mk _ p, rfl⟩
   have hR'le := trdeg_le_of_surjective g hg
-  obtain ⟨n, hn, htn⟩ := GroundTheory.Arith.Abelian.Jacobian.exists_ringKrullDim_eq_trdeg
-    (k := F) (A := MRing ι F ⧸ q)
-  obtain ⟨m, hm, htm⟩ := GroundTheory.Arith.Abelian.Jacobian.exists_ringKrullDim_eq_trdeg
-    (k := F) (A := MRing (fun _ : Unit => ∀ k, ι k) F ⧸ segrePrime F q)
+  obtain ⟨n, hn, htn⟩ :=
+    GroundTheory.Arith.Abelian.Jacobian.exists_ringKrullDim_eq_trdeg (k := F) (A := MRing ι F ⧸ q)
+  obtain ⟨m, hm, htm⟩ :=
+    GroundTheory.Arith.Abelian.Jacobian.exists_ringKrullDim_eq_trdeg (k := F)
+      (A := MRing (fun _ : Unit => ∀ k, ι k) F ⧸ segrePrime F q)
   have hne : n = e + Fintype.card K := by
     rw [hn] at hdim
     exact_mod_cast hdim

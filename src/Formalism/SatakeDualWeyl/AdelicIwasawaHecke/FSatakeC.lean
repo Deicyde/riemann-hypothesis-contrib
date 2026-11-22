@@ -14,8 +14,8 @@ variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L
 
 local notation "⟪" x "⟫" => (((x : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
 
-theorem fSatake_borel_of_diag {d : GU σ n} {e : Fin n → L} (hd : ⟪d⟫ = Matrix.diagonal e) :
-    IsBorelU d := by
+theorem fSatake_borel_of_diag {d : GU σ n} {e : Fin n → L} (hd : ⟪d⟫ = Matrix.diagonal e)
+    : IsBorelU d := by
   intro i j hij
   change ⟪d⟫ i j = 0
   rw [hd, Matrix.diagonal_apply_ne _ (ne_of_lt hij).symm]
@@ -25,22 +25,22 @@ theorem fSatake_borel_one : IsBorelU (1 : GU σ n) := by
 
 theorem fSatake_ne_zero_of_borel {b : GU σ n} (hb : IsBorelU b) (i : Fin n) : ⟪b⟫ i i ≠ 0 := by
   intro h
-  have hdet : (⟪b⟫).det = ∏ i, ⟪b⟫ i i :=
-    Matrix.det_of_upperTriangular (fun i j hij => hb i j hij)
+  have hdet : (⟪b⟫).det = ∏ i, ⟪b⟫ i i := Matrix.det_of_upperTriangular (fun i j hij => hb i j hij)
   have hu : IsUnit (⟪b⟫).det := (Matrix.isUnit_iff_isUnit_det _).mp (Units.isUnit _)
   exact hu.ne_zero (by rw [hdet]; exact Finset.prod_eq_zero (Finset.mem_univ i) h)
 
-theorem fSatake_tMat_apply_lt (ϖ : L) {m : ℕ} (a : Fin m → ℤ) (j : Fin m) (hj : (j : ℕ) < n) :
-    tMat ϖ n m a ⟨j, hj⟩ ⟨j, hj⟩ = ϖ ^ (a j) := by
+theorem fSatake_tMat_apply_lt (ϖ : L) {m : ℕ} (a : Fin m → ℤ) (j : Fin m) (hj : (j : ℕ) < n)
+    : tMat ϖ n m a ⟨j, hj⟩ ⟨j, hj⟩ = ϖ ^ (a j) := by
   simp [tMat, j.isLt]
 
-theorem fSatake_borel_tMat {ϖ : L} {m : ℕ} {a : Fin m → ℤ} {t : GU σ n} (ht : ⟪t⟫ = tMat ϖ n m a) :
-    IsBorelU t := by
+theorem fSatake_borel_tMat {ϖ : L} {m : ℕ} {a : Fin m → ℤ} {t : GU σ n} (ht : ⟪t⟫ = tMat ϖ n m a)
+    : IsBorelU t := by
   rw [tMat] at ht
   exact fSatake_borel_of_diag ht
 
-theorem fSatake_tMat_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n)
-    (a : Fin m → ℤ) : ∃ t : GU σ n, ⟪t⟫ = tMat ϖ n m a := by
+theorem fSatake_tMat_exists
+    {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n) (a : Fin m → ℤ)
+    : ∃ t : GU σ n, ⟪t⟫ = tMat ϖ n m a := by
   have hϖ : Valued.v ϖ = ↑(Multiplicative.ofAdd (-1 : ℤ)) := by
     obtain ⟨-, -, -, h, -⟩ := hU
     exact h
@@ -56,10 +56,22 @@ theorem fSatake_tMat_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm :
     split_ifs <;> first
       | omega
       | (simp; done)
-      | (rw [← zpow_add₀ hϖ0]; convert zpow_zero ϖ using 2; rw [add_neg_eq_zero]; congr 1;
-          simp only [Fin.mk.injEq]; omega)
-      | (rw [← zpow_add₀ hϖ0]; convert zpow_zero ϖ using 2; rw [neg_add_eq_zero]; congr 1;
-          simp only [Fin.mk.injEq]; omega)
+      | (
+          rw [← zpow_add₀ hϖ0]
+          convert zpow_zero ϖ using 2
+          rw [add_neg_eq_zero]
+          congr 1
+          simp only [Fin.mk.injEq]
+          omega
+        )
+      | (
+          rw [← zpow_add₀ hϖ0]
+          convert zpow_zero ϖ using 2
+          rw [neg_add_eq_zero]
+          congr 1
+          simp only [Fin.mk.injEq]
+          omega
+        )
   have hne : ∀ i, tMat ϖ n m a i i ≠ 0 := fun i h => by
     have hi := i.isLt
     have h2 := key i ⟨n - 1 - i, by omega⟩ (by show (i : ℕ) + (n - 1 - (i : ℕ)) + 1 = n; omega)
@@ -102,9 +114,10 @@ theorem fSatake_tMat_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm :
     exact key i j h
   · simp
 
-theorem fSatake_diag_mem_K {d : GU σ n} {e : Fin n → L} (hd : ⟪d⟫ = Matrix.diagonal e)
-    (hd' : ⟪d⁻¹⟫ = Matrix.diagonal (fun i => (e i)⁻¹)) (hv : ∀ i, Valued.v (e i) = 1) :
-    d ∈ KU σ n := by
+theorem fSatake_diag_mem_K
+    {d : GU σ n} {e : Fin n → L} (hd : ⟪d⟫ = Matrix.diagonal e)
+    (hd' : ⟪d⁻¹⟫ = Matrix.diagonal (fun i => (e i)⁻¹)) (hv : ∀ i, Valued.v (e i) = 1)
+    : d ∈ KU σ n := by
   have hne : ∀ i, e i ≠ 0 := fun i h => by
     have h1 := hv i
     rw [h, map_zero] at h1
@@ -253,10 +266,11 @@ private lemma withZero_eq_one_of_mul_self_eq_one {x : WithZero (Multiplicative �
   have h2 : Multiplicative.toAdd y = 0 := by omega
   rw [← ofAdd_toAdd y, h2, ofAdd_zero]
 
-theorem fSatake_cell_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n)
-    (hm' : n ≤ 2 * m + 1) {b k : GU σ n} (hb : IsBorelU b) (hk : k ∈ KU σ n) :
-    ∃ a : Fin m → ℤ, ∃ u : GU σ n, IsUnipU u ∧ ∃ k' ∈ KU σ n,
-      ⟪b * k⟫ = tMat ϖ n m a * ⟪u⟫ * ⟪k'⟫ := by
+theorem fSatake_cell_exists
+    {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n) (hm' : n ≤ 2 * m + 1)
+    {b k : GU σ n} (hb : IsBorelU b) (hk : k ∈ KU σ n)
+    : ∃ a : Fin m → ℤ, ∃ u : GU σ n,
+      IsUnipU u ∧ ∃ k' ∈ KU σ n, ⟪b * k⟫ = tMat ϖ n m a * ⟪u⟫ * ⟪k'⟫ := by
   have hϖ : Valued.v ϖ = ↑(Multiplicative.ofAdd (-1 : ℤ)) := by
     obtain ⟨-, -, -, h, -⟩ := hU
     exact h
@@ -270,16 +284,18 @@ theorem fSatake_cell_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm :
     rw [h, map_zero] at hϖ
     exact WithZero.zero_ne_coe hϖ
   have hbne : ∀ i, ⟪b⟫ i i ≠ 0 := fSatake_ne_zero_of_borel hb
-  obtain ⟨a, ha⟩ : ∃ a : Fin m → ℤ, ∀ i : Fin m, ∀ hi : (i : ℕ) < n,
-      a i = ordL (⟪b⟫ ⟨i, hi⟩ ⟨i, hi⟩) :=
-    ⟨fun i => ordL (⟪b⟫ ⟨i, lt_of_lt_of_le i.isLt (by omega)⟩ ⟨i, lt_of_lt_of_le i.isLt (by omega)⟩),
-      fun i hi => rfl⟩
+  obtain ⟨a, ha⟩
+      : ∃ a : Fin m → ℤ, ∀ i : Fin m, ∀ hi : (i : ℕ) < n, a i = ordL (⟪b⟫ ⟨i, hi⟩ ⟨i, hi⟩) := ⟨
+    fun i => ordL (⟪b⟫ ⟨i, lt_of_lt_of_le i.isLt (by omega)⟩ ⟨i, lt_of_lt_of_le i.isLt (by omega)⟩),
+    fun i hi => rfl
+  ⟩
   obtain ⟨t, ht⟩ := fSatake_tMat_exists hU hm a
   have htB : IsBorelU t := fSatake_borel_tMat ht
   have hT0 : ∀ i : Fin n, tMat ϖ n m a i i ≠ 0 := fun i h => by
     have hi := i.isLt
-    have h2 := tMat_diag_mul_opposite_diag hϖ0 hm a i ⟨n - 1 - i, by omega⟩
-      (by show (i : ℕ) + (n - 1 - (i : ℕ)) + 1 = n; omega)
+    have h2 :=
+      tMat_diag_mul_opposite_diag hϖ0 hm a i ⟨n - 1 - i, by omega⟩
+        (by show (i : ℕ) + (n - 1 - (i : ℕ)) + 1 = n; omega)
     rw [h, zero_mul] at h2
     exact zero_ne_one h2
   obtain ⟨e, he⟩ : ∃ e : Fin n → L, ∀ i, e i = ⟪b⟫ i i * (tMat ϖ n m a i i)⁻¹ :=
@@ -292,7 +308,8 @@ theorem fSatake_cell_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm :
     have h1 := isBorelU_sigma_diag_mul_opposite_diag hb i j hij
     have h2 := tMat_diag_mul_opposite_diag hϖ0 hm a i j hij
     rw [he, he, map_mul, map_inv₀, sigma_tMat_diag hσ a i]
-    calc σ (⟪b⟫ i i) * (tMat ϖ n m a i i)⁻¹ * (⟪b⟫ j j * (tMat ϖ n m a j j)⁻¹)
+    calc
+      σ (⟪b⟫ i i) * (tMat ϖ n m a i i)⁻¹ * (⟪b⟫ j j * (tMat ϖ n m a j j)⁻¹)
         = (σ (⟪b⟫ i i) * ⟪b⟫ j j) * (tMat ϖ n m a i i * tMat ϖ n m a j j)⁻¹ := by ring
       _ = 1 := by rw [h1, h2, inv_one, mul_one]
   have hlow : ∀ i : Fin n, (i : ℕ) < m → Valued.v (e i) = 1 := by
@@ -301,7 +318,8 @@ theorem fSatake_cell_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm :
       have h1 := fSatake_tMat_apply_lt ϖ a ⟨i, hi⟩ i.isLt
       rw [ha ⟨i, hi⟩ i.isLt] at h1
       exact h1
-    rw [he, map_mul, map_inv₀, hT, valuation_zpow_uniformizer hϖ, valuation_eq_ofAdd_neg_ordL (hbne i)]
+    rw [he, map_mul, map_inv₀, hT, valuation_zpow_uniformizer hϖ,
+      valuation_eq_ofAdd_neg_ordL (hbne i)]
     exact mul_inv_cancel₀ WithZero.coe_ne_zero
   have hve : ∀ i, Valued.v (e i) = 1 := by
     intro i
@@ -328,7 +346,9 @@ theorem fSatake_cell_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm :
     congr 1
     funext i
     exact inv_mul_cancel₀ (he0 i)
-  have hmemD : (⟨Matrix.diagonal e, Matrix.diagonal (fun i => (e i)⁻¹), hd1, hd2⟩ : GL (Fin n) L) ∈ GU σ n := by
+  have hmemD
+      : (⟨Matrix.diagonal e, Matrix.diagonal (fun i => (e i)⁻¹), hd1, hd2⟩ : GL (Fin n) L)
+        ∈ GU σ n := by
     show cT σ (Matrix.diagonal e) * antiJ L n * Matrix.diagonal e = antiJ L n
     rw [cT, Matrix.diagonal_map (map_zero σ), Matrix.diagonal_transpose]
     ext i j
@@ -364,22 +384,29 @@ theorem fSatake_cell_exists {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm :
   show ⟪t⟫ * ⟪t⁻¹ * b * D0⁻¹⟫ * ⟪D0 * k⟫ = _
   rw [ht]
 
-theorem fSatake_cell_unique {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n)
-    {a a' : Fin m → ℤ} {u u' k k' : GU σ n} (hu : IsUnipU u) (hu' : IsUnipU u')
-    (hk : k ∈ KU σ n) (hk' : k' ∈ KU σ n)
-    (h : tMat ϖ n m a * ⟪u⟫ * ⟪k⟫ = tMat ϖ n m a' * ⟪u'⟫ * ⟪k'⟫) : a = a' := by
+theorem fSatake_cell_unique
+    {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n)
+    {a a' : Fin m → ℤ} {u u' k k' : GU σ n} (hu : IsUnipU u) (hu' : IsUnipU u') (hk : k ∈ KU σ n)
+    (hk' : k' ∈ KU σ n) (h : tMat ϖ n m a * ⟪u⟫ * ⟪k⟫ = tMat ϖ n m a' * ⟪u'⟫ * ⟪k'⟫)
+    : a = a' := by
   have hϖ0 : ϖ ≠ 0 := by
-    intro h; have := hU.2.2.2.1; rw [h, Valuation.map_zero] at this; exact absurd this WithZero.zero_ne_coe
+    intro h
+    have := hU.2.2.2.1
+    rw [h, Valuation.map_zero] at this
+    exact absurd this WithZero.zero_ne_coe
   obtain ⟨t, ht⟩ := fSatake_tMat_exists hU hm a
   obtain ⟨t', ht'⟩ := fSatake_tMat_exists hU hm a'
   have htb := fSatake_borel_tMat ht
   have htb' := fSatake_borel_tMat ht'
   have hx : t * u * k = t' * u' * k' := by
-    apply Subtype.ext; apply Units.ext
+    apply Subtype.ext
+    apply Units.ext
     simp only [Subgroup.coe_mul, Units.val_mul, ht, ht']
     exact h
   have hwk : (t' * u')⁻¹ * (t * u) = k' * k⁻¹ := by
-    calc (t' * u')⁻¹ * (t * u) = (t' * u')⁻¹ * (t * u * k) * k⁻¹ := by group
+    calc
+      (t' * u')⁻¹ * (t * u)
+        = (t' * u')⁻¹ * (t * u * k) * k⁻¹ := by group
       _ = (t' * u')⁻¹ * (t' * u' * k') * k⁻¹ := by rw [hx]
       _ = k' * k⁻¹ := by group
   have hwK : (t' * u')⁻¹ * (t * u) ∈ KU σ n := by rw [hwk]; exact mul_mem hk' (inv_mem hk)
@@ -392,27 +419,31 @@ theorem fSatake_cell_unique {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm :
   have hdiag : ⟪t * u⟫ ⟨j, hj⟩ ⟨j, hj⟩ = ⟪(t' * u') * ((t' * u')⁻¹ * (t * u))⟫ ⟨j, hj⟩ ⟨j, hj⟩ :=
     congrArg (fun z : GU σ n => ⟪z⟫ ⟨j, hj⟩ ⟨j, hj⟩) htu
   rw [fSatake_borel_diag_mul hb2 hwb, fSatake_borel_diag_mul htb hu.1,
-    fSatake_borel_diag_mul htb' hu'.1, hu.2, hu'.2, ht, ht', mul_one, mul_one,
-    fSatake_tMat_apply_lt ϖ a j hj, fSatake_tMat_apply_lt ϖ a' j hj] at hdiag
+      fSatake_borel_diag_mul htb' hu'.1, hu.2, hu'.2, ht, ht', mul_one, mul_one,
+      fSatake_tMat_apply_lt ϖ a j hj, fSatake_tMat_apply_lt ϖ a' j hj]
+    at hdiag
   set w := (t' * u')⁻¹ * (t * u)
   have hw0 : ⟪w⟫ ⟨j, hj⟩ ⟨j, hj⟩ ≠ 0 := fSatake_ne_zero_of_borel hwb _
   have hwr0 := fSatake_ne_zero_of_borel hwb (⟨j, hj⟩ : Fin n).rev
   have hpair := congrArg ordL (fSatake_unit_diag hwb ⟨j, hj⟩)
-  rw [fSatake_ord_mul ((map_ne_zero σ).2 hw0) hwr0, fSatake_ord_of_v (hU.2.1 _),
-    fSatake_ord_one] at hpair
+  rw [fSatake_ord_mul ((map_ne_zero σ).2 hw0) hwr0, fSatake_ord_of_v (hU.2.1 _), fSatake_ord_one]
+    at hpair
   have hn1 := fSatake_ord_nonneg hw0 (fSatake_K_int hwK _ _)
   have hn2 := fSatake_ord_nonneg hwr0 (fSatake_K_int hwK _ _)
   have h3 := congrArg ordL hdiag
   rw [fSatake_ord_mul (zpow_ne_zero _ hϖ0) hw0, fSatake_ord_zpow hU.2.2.2.1,
-    fSatake_ord_zpow hU.2.2.2.1] at h3
+      fSatake_ord_zpow hU.2.2.2.1]
+    at h3
   omega
 
-theorem fSatake_phi_cell {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n)
-    {α : Fin m → ℂ} {φ : GU σ n → ℂ} (hφ : IsSphericalU q α φ) {x u k : GU σ n}
-    {a : Fin m → ℤ} (hu : IsUnipU u) (hk : k ∈ KU σ n)
-    (hx : ⟪x⟫ = tMat ϖ n m a * ⟪u⟫ * ⟪k⟫) :
-    φ x = (∏ i : Fin m, α i ^ (a i) * (q : ℂ) ^ (-(a i) * ((n : ℤ) - 1 - 2 * (i.val : ℤ)))) *
-      φ 1 := by
+theorem fSatake_phi_cell
+    {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n)
+    {α : Fin m → ℂ} {φ : GU σ n → ℂ} (hφ : IsSphericalU q α φ)
+    {x u k : GU σ n} {a : Fin m → ℤ}
+    (hu : IsUnipU u) (hk : k ∈ KU σ n) (hx : ⟪x⟫ = tMat ϖ n m a * ⟪u⟫ * ⟪k⟫)
+    : φ x
+      = (∏ i : Fin m, α i ^ (a i) * (q : ℂ) ^ (-(a i) * ((n : ℤ) - 1 - 2 * (i.val : ℤ))))
+        * φ 1 := by
   obtain ⟨huB, hu1⟩ := hu
   have hϖ : Valued.v ϖ = ↑(Multiplicative.ofAdd (-1 : ℤ)) := by
     obtain ⟨-, -, -, h, -⟩ := hU
@@ -437,21 +468,33 @@ theorem fSatake_phi_cell {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 
     simp [i.isLt]
   rw [dite_eq_left hi, hd, ordL_zpow_uniformizer hϖ]
 
-theorem fSatake_vanish (hSph : SphericalExistsU) [CompleteSpace L] {ϖ : L} {q m : ℕ}
-    (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n) (hm' : n ≤ 2 * m + 1) {α : Fin m → ℂ}
-    (hα : ∀ i, α i ≠ 0) {φ : GU σ n → ℂ} (hφ : IsSphericalU q α φ) (x : GU σ n)
-    (hx : ¬ ∃ b k : GU σ n, IsBorelU b ∧ k ∈ KU σ n ∧ x = b * k) : φ x = 0 := by
+theorem fSatake_vanish
+    (hSph : SphericalExistsU)
+    [CompleteSpace L]
+    {ϖ : L} {q m : ℕ} (hU : IsUnramInv ϖ σ q) (hm : 2 * m ≤ n) (hm' : n ≤ 2 * m + 1)
+    {α : Fin m → ℂ} (hα : ∀ i, α i ≠ 0)
+    {φ : GU σ n → ℂ} (hφ : IsSphericalU q α φ)
+    (x : GU σ n) (hx : ¬ ∃ b k : GU σ n, IsBorelU b ∧ k ∈ KU σ n ∧ x = b * k)
+    : φ x = 0 := by
   classical
   obtain ⟨φ0, -, -, huniq⟩ := hSph L ϖ σ q n m hU hm hm' α hα
-  have hP : ∀ b g k : GU σ n, IsBorelU b → k ∈ KU σ n →
-      ((∃ b' k' : GU σ n, IsBorelU b' ∧ k' ∈ KU σ n ∧ b * g * k = b' * k') ↔
-        (∃ b' k' : GU σ n, IsBorelU b' ∧ k' ∈ KU σ n ∧ g = b' * k')) := by
+  have hP
+      : ∀ b g k : GU σ n,
+        IsBorelU b → k ∈ KU σ n
+          → ((∃ b' k' : GU σ n, IsBorelU b' ∧ k' ∈ KU σ n ∧ b * g * k = b' * k')
+            ↔ (∃ b' k' : GU σ n, IsBorelU b' ∧ k' ∈ KU σ n ∧ g = b' * k')) := by
     intro b g k hb hk
     constructor
     · rintro ⟨b', k', hb', hk', he⟩
-      refine ⟨b⁻¹ * b', k' * k⁻¹, isBorelU_mul (isBorelU_inv hb) hb',
-        (KU σ n).mul_mem hk' ((KU σ n).inv_mem hk), ?_⟩
-      calc g = b⁻¹ * (b * g * k) * k⁻¹ := by group
+      refine ⟨
+        b⁻¹ * b',
+        k' * k⁻¹,
+        isBorelU_mul (isBorelU_inv hb) hb',
+        (KU σ n).mul_mem hk' ((KU σ n).inv_mem hk),
+        ?_
+      ⟩
+      calc
+        g = b⁻¹ * (b * g * k) * k⁻¹ := by group
         _ = b⁻¹ * b' * (k' * k⁻¹) := by rw [he]; group
     · rintro ⟨b', k', hb', hk', he⟩
       refine ⟨b * b', k' * k, isBorelU_mul hb hb', (KU σ n).mul_mem hk' hk, ?_⟩
@@ -465,8 +508,8 @@ theorem fSatake_vanish (hSph : SphericalExistsU) [CompleteSpace L] {ϖ : L} {q m
     · have h1 := (hP b g k hb hk).2 hg
       simp only [ψ, if_pos h1, if_pos hg]
       exact hφ b g k hb hk
-    · have h1 : ¬ ∃ b' k' : GU σ n, IsBorelU b' ∧ k' ∈ KU σ n ∧ b * g * k = b' * k' :=
-        fun h => hg ((hP b g k hb hk).1 h)
+    · have h1 : ¬ ∃ b' k' : GU σ n, IsBorelU b' ∧ k' ∈ KU σ n ∧ b * g * k = b' * k' := fun h =>
+        hg ((hP b g k hb hk).1 h)
       simp only [ψ, if_neg h1, if_neg hg, mul_zero]
   have hψ1 : ψ 1 = φ 1 := by
     simp only [ψ]

@@ -11,9 +11,14 @@ public import Development.WeilBound.CoreStatements.MinimalPrimeDimensions.CdvrPo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
+  GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
 open scoped ENNReal Classical
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Points GlobalTheory.ChartGlue GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Points GlobalTheory.ChartGlue
+  GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 
 namespace ChowFormHeightComparison₂.SmallGenerators
@@ -82,10 +87,13 @@ private lemma exists_trace_zero_generator_of_isCMExt {A K : Type} [CommRing A] [
     exact hu.unit.inv_mul
   · rw [Polynomial.eval₂_mul, Polynomial.eval₂_C, ← invOf_eq_inv, hrev, mul_zero]
 
-theorem exists_val {X : Scheme.{0}} [IsIntegral X] {x : X} (hn : IsIntegrallyClosed (X.presheaf.stalk x))
-    {h : X.functionField} (hh : ¬ RegAt x h) :
-    ∃ O : ValuationSubring X.functionField, (∀ g, RegAt x g → O.valuation g ≤ 1) ∧
-      (∀ g, ZeroAt x g → O.valuation g < 1) ∧ ¬ O.valuation h ≤ 1 := by
+theorem exists_val
+    {X : Scheme.{0}} [IsIntegral X]
+    {x : X} (hn : IsIntegrallyClosed (X.presheaf.stalk x))
+    {h : X.functionField} (hh : ¬ RegAt x h)
+    : ∃ O : ValuationSubring X.functionField,
+      (∀ g, RegAt x g → O.valuation g ≤ 1) ∧ (∀ g, ZeroAt x g → O.valuation g < 1)
+        ∧ ¬ O.valuation h ≤ 1 := by
   have h0 : h ≠ 0 := by
     rintro rfl
     exact hh ⟨0, map_zero _⟩
@@ -93,21 +101,27 @@ theorem exists_val {X : Scheme.{0}} [IsIntegral X] {x : X} (hn : IsIntegrallyClo
     rw [inv_inv]
     intro hi
     exact hh (IsIntegrallyClosed.isIntegral_iff.mp hi)
-  obtain ⟨M, hM, hJM⟩ := Ideal.exists_le_maximal _ (exists_trace_zero_generator_of_isCMExt h⁻¹ (inv_ne_zero h0) hint)
+  obtain ⟨M, hM, hJM⟩ :=
+    Ideal.exists_le_maximal _ (exists_trace_zero_generator_of_isCMExt h⁻¹ (inv_ne_zero h0) hint)
   let M' : Ideal (Algebra.adjoin (X.presheaf.stalk x) {h⁻¹}).toSubring := M
   have : M'.IsMaximal := hM
-  obtain ⟨B, hSB, hMB⟩ := isPair_and_isPair_of_isTriple (Algebra.adjoin (X.presheaf.stalk x) {h⁻¹}).toSubring M'
+  obtain ⟨B, hSB, hMB⟩ :=
+    isPair_and_isPair_of_isTriple (Algebra.adjoin (X.presheaf.stalk x) {h⁻¹}).toSubring M'
   refine ⟨B, ?_, ?_, ?_⟩
   · rintro g ⟨a, rfl⟩
     exact (B.valuation_le_one_iff _).mpr (hSB _ (Subalgebra.algebraMap_mem _ a))
   · rintro g ⟨a, ha, rfl⟩
-    exact hMB (algebraMap (X.presheaf.stalk x) (Algebra.adjoin (X.presheaf.stalk x) {h⁻¹}) a) (hJM (Ideal.mem_sup_left (Ideal.mem_map_of_mem _ ha)))
+    exact hMB (algebraMap (X.presheaf.stalk x) (Algebra.adjoin (X.presheaf.stalk x) {h⁻¹}) a)
+      (hJM (Ideal.mem_sup_left (Ideal.mem_map_of_mem _ ha)))
   · intro hle
-    have hy := hMB ⟨h⁻¹, Algebra.self_mem_adjoin_singleton _ _⟩
-      (hJM (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
+    have hy :=
+      hMB ⟨h⁻¹, Algebra.self_mem_adjoin_singleton _ _⟩
+        (hJM (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
     have hne : B.valuation h ≠ 0 := (Valuation.ne_zero_iff _).mpr h0
     have h1 : (1 : B.ValueGroup) ≤ (B.valuation h)⁻¹ :=
-      calc (1 : B.ValueGroup) = B.valuation h * (B.valuation h)⁻¹ := (mul_inv_cancel₀ hne).symm
+      calc
+        (1 : B.ValueGroup)
+          = B.valuation h * (B.valuation h)⁻¹ := (mul_inv_cancel₀ hne).symm
         _ ≤ 1 * (B.valuation h)⁻¹ := by gcongr
         _ = (B.valuation h)⁻¹ := one_mul _
     rw [map_inv₀] at hy
@@ -120,14 +134,24 @@ private lemma isHecke_div_and_resEtaPow_div {X : Scheme.{0}} [IsIntegral X] (U :
   rw [← CommRingCat.comp_apply, TopCat.Presheaf.germ_stalkSpecializes]
   rfl
 
-theorem zeroAt_const {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ Sp k) (x : X) {a : k}
-    (ha : a ∈ (p x).asIdeal) :
-    ZeroAt x (fnOf ⊤ (TopologicalSpace.Opens.mem_top _) (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a)) := by
-  refine ⟨X.presheaf.germ ⊤ x (TopologicalSpace.Opens.mem_top x) (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a), ?_,
-    isHecke_div_and_resEtaPow_div ⊤ _ _ x _⟩
+theorem zeroAt_const
+    {k : Type} [CommRing k]
+    {X : Scheme.{0}} [IsIntegral X]
+    (p : X ⟶ Sp k) (x : X)
+    {a : k} (ha : a ∈ (p x).asIdeal)
+    : ZeroAt x
+      (fnOf ⊤ (TopologicalSpace.Opens.mem_top _)
+        (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a)) := by
+  refine ⟨
+    X.presheaf.germ ⊤ x (TopologicalSpace.Opens.mem_top x)
+      (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a),
+    ?_,
+    isHecke_div_and_resEtaPow_div ⊤ _ _ x _
+  ⟩
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   intro hu
-  have hx : x ∈ X.basicOpen (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a) := (Scheme.mem_basicOpen ..).mpr hu
+  have hx : x ∈ X.basicOpen (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a) :=
+    (Scheme.mem_basicOpen ..).mpr hu
   unfold ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX at hx
   rw [RingHom.comp_apply] at hx
   have e := Scheme.basicOpen_appLE p ⊤ ⊤ (by simp) ((Scheme.ΓSpecIso (CommRingCat.of k)).inv a)
@@ -135,26 +159,36 @@ theorem zeroAt_const {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral X] (p 
   have hx' := Eq.mp (congrArg (x ∈ ·) e) hx
   exact (PrimeSpectrum.mem_basicOpen _ _).mp hx'.2 ha
 
-theorem reg_of_val {K V Ω : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] [Field Ω] [Algebra K Ω] {Nm : (K →+* ℂ) → V → ℝ} {W : Submodule (𝓞 K) V}
-    {ev : V →ₗ[K] Ω} {d : ℕ} {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp (𝓞 K)} {L : GlobalTheory.HermLB p}
-    {ψ : Ω →+* X.functionField} {s : W → L.B.Sec} (hM : GlobalTheory.ImageModel.IsModelOf Nm W ev d p L ψ s) (b : Ω) (τ : ℕ)
+theorem reg_of_val
+    {K V Ω : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+    [IsScalarTower (𝓞 K) K V] [Field Ω] [Algebra K Ω]
+    {Nm : (K →+* ℂ) → V → ℝ} {W : Submodule (𝓞 K) V} {ev : V →ₗ[K] Ω} {d : ℕ} {X : Scheme.{0}}
+    [IsIntegral X]
+    {p : X ⟶ Sp (𝓞 K)} {L : GlobalTheory.HermLB p} {ψ : Ω →+* X.functionField} {s : W → L.B.Sec}
+    (hM : GlobalTheory.ImageModel.IsModelOf Nm W ev d p L ψ s)
+    (b : Ω) (τ : ℕ)
     (hb : ∀ (la : HeightOneSpectrum (𝓞 K)) (O : ValuationSubring X.functionField),
-      (∀ a : 𝓞 K, O.valuation (ψ (algebraMap K Ω (a : K))) ≤ 1) →
-      (∀ a ∈ la.asIdeal, O.valuation (ψ (algebraMap K Ω (a : K))) < 1) →
-      ∃ l ∈ W, O.valuation (ψ b) ≤ O.valuation (ψ (ev l)) ^ τ)
-    (w : W) (hw : ev w ≠ 0) (k : L.B.ι) (x : X) (hx : x ∈ L.B.U k) (hp : (p x).asIdeal ≠ ⊥) :
-    RegAt x (ψ b * (ψ (ev w))⁻¹ ^ τ * fnOf (L.B.U k) (gen_mem hx) ((s w).f k) ^ τ) := by
+      (∀ a : 𝓞 K, O.valuation (ψ (algebraMap K Ω (a : K))) ≤ 1)
+        → (∀ a ∈ la.asIdeal, O.valuation (ψ (algebraMap K Ω (a : K))) < 1)
+        → ∃ l ∈ W, O.valuation (ψ b) ≤ O.valuation (ψ (ev l)) ^ τ)
+    (w : W) (hw : ev w ≠ 0)
+    (k : L.B.ι) (x : X) (hx : x ∈ L.B.U k) (hp : (p x).asIdeal ≠ ⊥)
+    : RegAt x (ψ b * (ψ (ev w))⁻¹ ^ τ * fnOf (L.B.U k) (gen_mem hx) ((s w).f k) ^ τ) := by
   by_contra hreg
   obtain ⟨O, hO1, hO2, hO3⟩ := exists_val (hM.normal x).2 hreg
-  have hbase : ∀ a : 𝓞 K, ψ (algebraMap K Ω (a : K)) =
-      fnOf ⊤ (TopologicalSpace.Opens.mem_top _) (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a) := hM.base
+  have hbase
+      : ∀ a : 𝓞 K,
+        ψ (algebraMap K Ω (a : K))
+          = fnOf ⊤ (TopologicalSpace.Opens.mem_top _)
+            (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a) :=
+    hM.base
   have h1 : ∀ a : 𝓞 K, O.valuation (ψ (algebraMap K Ω (a : K))) ≤ 1 := fun a => by
     rw [hbase a]
     exact hO1 _ ⟨_, isHecke_div_and_resEtaPow_div ⊤ _ _ x trivial⟩
-  obtain ⟨l, hlW, hl⟩ := hb ⟨(p x).asIdeal, (p x).isPrime, hp⟩ O h1 (fun a ha => by
-    rw [hbase a]
-    exact hO2 _ (zeroAt_const p x ha))
+  obtain ⟨l, hlW, hl⟩ :=
+    hb ⟨(p x).asIdeal, (p x).isPrime, hp⟩ O h1 (fun a ha => by
+      rw [hbase a]
+      exact hO2 _ (zeroAt_const p x ha))
   apply hO3
   have hc : O.valuation (ψ (ev w)) ≠ 0 := by
     rw [Ne, Valuation.zero_iff]
@@ -164,17 +198,18 @@ theorem reg_of_val {K V Ω : Type} [Field K] [NumberField K] [AddCommGroup V] [M
   have hv := congrArg O.valuation (hM.ratio w ⟨l, hlW⟩ k (gen_mem hx))
   rw [map_mul, map_mul] at hv
   rw [map_mul, map_mul, map_pow, map_pow, map_inv₀]
-  calc O.valuation (ψ b) * (O.valuation (ψ (ev w)))⁻¹ ^ τ *
-        O.valuation (fnOf (L.B.U k) (gen_mem hx) ((s w).f k)) ^ τ
-      ≤ O.valuation (ψ (ev l)) ^ τ * (O.valuation (ψ (ev w)))⁻¹ ^ τ *
-        O.valuation (fnOf (L.B.U k) (gen_mem hx) ((s w).f k)) ^ τ := by
-        gcongr
-    _ = (O.valuation (ψ (ev l)) * O.valuation (fnOf (L.B.U k) (gen_mem hx) ((s w).f k)) *
-        (O.valuation (ψ (ev w)))⁻¹) ^ τ := by
-        rw [mul_pow, mul_pow, mul_right_comm]
+  calc
+    O.valuation (ψ b) * (O.valuation (ψ (ev w)))⁻¹ ^ τ
+          * O.valuation (fnOf (L.B.U k) (gen_mem hx) ((s w).f k)) ^ τ
+        ≤ O.valuation (ψ (ev l)) ^ τ * (O.valuation (ψ (ev w)))⁻¹ ^ τ
+          * O.valuation (fnOf (L.B.U k) (gen_mem hx) ((s w).f k)) ^ τ := by
+      gcongr
+    _ = (O.valuation (ψ (ev l)) * O.valuation (fnOf (L.B.U k) (gen_mem hx) ((s w).f k))
+          * (O.valuation (ψ (ev w)))⁻¹)
+        ^ τ := by
+      rw [mul_pow, mul_pow, mul_right_comm]
     _ = O.valuation (fnOf (L.B.U k) (gen_mem hx) ((s ⟨l, hlW⟩).f k)) ^ τ := by
-        rw [← hv, mul_comm (O.valuation (ψ (ev w))), mul_inv_cancel_right₀ hc]
+      rw [← hv, mul_comm (O.valuation (ψ (ev w))), mul_inv_cancel_right₀ hc]
     _ ≤ 1 := pow_le_one' hFl τ
 
 end ChowFormHeightComparison₂.SmallGenerators
-

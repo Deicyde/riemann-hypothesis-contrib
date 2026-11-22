@@ -11,9 +11,9 @@ namespace GlobalTheory.CompanionTheory.SatakeBound
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-theorem exists_integer_psi_mul_ne_one {ψ : AddChar F ℂ} (hψ : PsiOK ψ) {b : F}
-    (hb : b ∉ (valuation F).integer) :
-    ∃ t ∈ (valuation F).integer, ψ (t * b) ≠ 1 := by
+theorem exists_integer_psi_mul_ne_one
+    {ψ : AddChar F ℂ} (hψ : PsiOK ψ) {b : F} (hb : b ∉ (valuation F).integer)
+    : ∃ t ∈ (valuation F).integer, ψ (t * b) ≠ 1 := by
   have hb0 : b ≠ 0 := by
     rintro rfl
     exact hb (zero_mem _)
@@ -24,10 +24,13 @@ theorem exists_integer_psi_mul_ne_one {ψ : AddChar F ℂ} (hψ : PsiOK ψ) {b :
   have hinvO : b⁻¹ ∈ (valuation F).integer := by
     rw [Valuation.mem_integer_iff]
     exact hvinv.le
-  have hynu : (⟨b⁻¹, hinvO⟩ : (valuation F).integer) ∈ IsLocalRing.maximalIdeal (valuation F).integer := by
+  have hynu
+      : (⟨b⁻¹, hinvO⟩ : (valuation F).integer)
+        ∈ IsLocalRing.maximalIdeal (valuation F).integer := by
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
     intro hu
-    exact (ne_of_lt hvinv) ((Valuation.integer.integers (valuation F)).isUnit_iff_valuation_eq_one.mp hu)
+    exact (ne_of_lt hvinv)
+      ((Valuation.integer.integers (valuation F)).isUnit_iff_valuation_eq_one.mp hu)
   have hmax := GroundTheory.Automorphic.GLnLocal.maximalIdeal_pow_eq F 1
   rw [pow_one, pow_one] at hmax
   rw [hmax, Ideal.mem_span_singleton] at hynu
@@ -38,15 +41,16 @@ theorem exists_integer_psi_mul_ne_one {ψ : AddChar F ℂ} (hψ : PsiOK ψ) {b :
     have h := congrArg Subtype.val hu
     simpa using h
   have hx' : (↑(GroundTheory.Automorphic.GLnLocal.uniformizer F) * x) * (u : F) * b = x := by
-    calc (↑(GroundTheory.Automorphic.GLnLocal.uniformizer F) * x) * (u : F) * b
+    calc
+      (↑(GroundTheory.Automorphic.GLnLocal.uniformizer F) * x) * (u : F) * b
         = x * ((GroundTheory.Automorphic.GLnLocal.uniformizer F : F) * u) * b := by ring
       _ = x * b⁻¹ * b := by rw [hu']
       _ = x := by rw [mul_assoc, inv_mul_cancel₀ hb0, mul_one]
   rw [hx']
   exact hψx
 
-theorem mem_lat_zero {m : ℕ} {x : Fin m → F} :
-    x ∈ lat F m 0 ↔ ∀ i, x i ∈ (valuation F).integer := by
+theorem mem_lat_zero {m : ℕ} {x : Fin m → F}
+    : x ∈ lat F m 0 ↔ ∀ i, x i ∈ (valuation F).integer := by
   simp only [lat, Set.mem_ofPred_eq, pow_zero, one_mul]
 
 theorem orthogonality_of_lattice_character : L0 → L1 := by
@@ -86,10 +90,9 @@ theorem orthogonality_of_lattice_character : L0 → L1 := by
       · intro h j
         exact add_mem (hsO j) (h j)
     have hsd : (Pi.single i t : Fin m → F) ⬝ᵥ y = t * y i := by
-      first
-        | exact single_dotProduct t i
-        | simp [dotProduct, Pi.single_apply]
-    have hmp := measurePreserving_add_left (Measure.pi fun _ : Fin m => μ) (Pi.single i t : Fin m → F)
+      first | exact single_dotProduct t i | simp [dotProduct, Pi.single_apply]
+    have hmp :=
+      measurePreserving_add_left (Measure.pi fun _ : Fin m => μ) (Pi.single i t : Fin m → F)
     have hemb := measurableEmbedding_addLeft (Pi.single i t : Fin m → F)
     have hshift := hmp.setIntegral_preimage_emb hemb (fun ξ => ψ (ξ ⬝ᵥ y)) (lat F m 0)
     rw [hinv] at hshift

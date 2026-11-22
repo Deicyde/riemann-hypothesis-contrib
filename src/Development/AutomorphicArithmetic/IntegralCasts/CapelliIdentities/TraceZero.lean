@@ -4,28 +4,29 @@ public import Mathlib
 
 @[expose] public section
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.Qf25.modFun :
-    {O M ι : Type} → [inst : CommRing O] → [inst_1 : AddCommGroup M] → [_root_.Module O M] → _root_.Module O (ι → M) :=
-    fun {O M ι : Type} [CommRing O] [AddCommGroup M] [_root_.Module O M] ↦ Pi.Function.module ι O M
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.Qf25.modFun
+    : {O M ι : Type} → [inst : CommRing O] → [inst_1 : AddCommGroup M] → [_root_.Module O M]
+      → _root_.Module O (ι → M) :=
+  fun {O M ι : Type} [CommRing O] [AddCommGroup M] [_root_.Module O M] ↦ Pi.Function.module ι O M
 attribute [local instance] UpperTheory.Reformulated.B.Qf25.modFun
 
-theorem UpperTheory.Reformulated.B.Qf25.trace_zero :
-    ∀ {k : Type} [inst : Field k] (S T : Matrix (Fin (2 : ℕ)) (Fin (2 : ℕ)) k),
-      T.det ≠ (0 : k) →
-        S.charpoly.Separable →
-          ∀ (v : Fin (2 : ℕ) → k),
-            v ≠ (0 : Fin (2 : ℕ) → k) →
-              T.mulVec v ∉ k ∙ v →
-                ∀ (a b c : k),
-                  S.mulVec v = a • v →
-                    S.mulVec (T.mulVec v) = b • T.mulVec v →
-                      S.mulVec (T.mulVec (T.mulVec v)) = c • T.mulVec (T.mulVec v) → T.trace = (0 : k) := by
+theorem UpperTheory.Reformulated.B.Qf25.trace_zero
+    : ∀ {k : Type} [inst : Field k] (S T : Matrix (Fin (2 : ℕ)) (Fin (2 : ℕ)) k),
+      T.det ≠ (0 : k) → S.charpoly.Separable
+        → ∀ (v : Fin (2 : ℕ) → k),
+          v ≠ (0 : Fin (2 : ℕ) → k) → T.mulVec v ∉ k ∙ v
+            → ∀ (a b c : k),
+              S.mulVec v = a • v → S.mulVec (T.mulVec v) = b • T.mulVec v
+                → S.mulVec (T.mulVec (T.mulVec v)) = c • T.mulVec (T.mulVec v)
+                → T.trace = (0 : k) := by
   intro k _ S T hdet hsep v hv hw a b c ha hb hc
   have hCH : T.mulVec (T.mulVec v) = T.trace • T.mulVec v - T.det • v := by
     ext i
-    fin_cases i <;>
-      simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.trace_fin_two,
-        Matrix.det_fin_two] <;> ring
+    fin_cases i
+      <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.trace_fin_two,
+        Matrix.det_fin_two]
+      <;> ring
   generalize T.mulVec v = w at hw hb hc hCH
   have hD : v 0 * w 1 - v 1 * w 0 ≠ 0 := by
     intro h
@@ -73,8 +74,7 @@ theorem UpperTheory.Reformulated.B.Qf25.trace_zero :
   have a1 := congrFun ha 1
   have b0 := congrFun hb 0
   have b1 := congrFun hb 1
-  simp only [Matrix.mulVec, dotProduct, Fin.sum_univ_two, Pi.smul_apply, smul_eq_mul]
-    at a0 a1 b0 b1
+  simp only [Matrix.mulVec, dotProduct, Fin.sum_univ_two, Pi.smul_apply, smul_eq_mul] at a0 a1 b0 b1
   have s00 : S 0 0 = b := by
     apply mul_right_cancel₀ hD
     linear_combination w 1 * a0 - v 1 * b0

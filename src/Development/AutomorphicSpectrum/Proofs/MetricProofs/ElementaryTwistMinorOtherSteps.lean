@@ -6,14 +6,19 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.MinorIJMap
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
-open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
+open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec
+  GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec.TransvOther
 
-theorem mul_transv_apply {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (t : ℂ) (ca cb r c : Fin N) :
-    (h * (1 + Matrix.single cb ca t)) r c = h r c + if c = ca then t * h r cb else 0 := by
+theorem mul_transv_apply {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (t : ℂ) (ca cb r c : Fin N)
+    : (h * (1 + Matrix.single cb ca t)) r c = h r c + if c = ca then t * h r cb else 0 := by
   rw [Matrix.mul_add, Matrix.mul_one, Matrix.add_apply]
   congr 1
   by_cases hc : c = ca
@@ -46,9 +51,12 @@ private lemma det_submatrix_mul_transvection_eq {N k : ℕ} (h : Matrix (Fin N) 
     have hq : g q ≠ ca := fun hh => hca ⟨q, hh⟩
     simp only [Matrix.submatrix_apply, mul_transv_apply, hq, if_false, add_zero]
 
-theorem minorIJ_transv {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (t : ℂ) (ca cb : Fin N) (hne : ca ≠ cb)
-    (I J : Finset (Fin N)) (hJ : ca ∈ J ↔ cb ∈ J) :
-    minorIJ (h * (1 + Matrix.single cb ca t)) I J = minorIJ h I J := by
+theorem minorIJ_transv
+    {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ)
+    (t : ℂ)
+    (ca cb : Fin N) (hne : ca ≠ cb)
+    (I J : Finset (Fin N)) (hJ : ca ∈ J ↔ cb ∈ J)
+    : minorIJ (h * (1 + Matrix.single cb ca t)) I J = minorIJ h I J := by
   unfold minorIJ
   split_ifs with e
   · apply det_submatrix_mul_transvection_eq h t ca cb hne
@@ -57,7 +65,15 @@ theorem minorIJ_transv {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (t : ℂ) (ca 
       exact hJ
   · rfl
 
-theorem minorIJ_other_step : ∀ (N j : ℕ) (a b ca cb : Fin N), j ≤ N → (b : ℕ) = a + 1 → ((b : ℕ) < j ∨ j ≤ (a : ℕ)) → (ca : ℕ) = lastCol N j a → (cb : ℕ) = ca + 1 → ∀ (h : Matrix (Fin N) (Fin N) ℂ) (t : ℂ) (i : Fin N), i ≠ a → ∀ I, minorIJ (h * (1 + Matrix.single cb ca t)) I (stepCols N j i) = minorIJ h I (stepCols N j i) := by
+theorem minorIJ_other_step
+    : ∀ (N j : ℕ) (a b ca cb : Fin N),
+      j ≤ N → (b : ℕ) = a + 1 → ((b : ℕ) < j ∨ j ≤ (a : ℕ)) → (ca : ℕ) = lastCol N j a
+        → (cb : ℕ) = ca + 1
+        → ∀ (h : Matrix (Fin N) (Fin N) ℂ) (t : ℂ) (i : Fin N),
+          i ≠ a
+            → ∀ I,
+              minorIJ (h * (1 + Matrix.single cb ca t)) I (stepCols N j i)
+                = minorIJ h I (stepCols N j i) := by
   intro N j a b ca cb hjN hb hab hca hcb h t i hi I
   apply minorIJ_transv h t ca cb
   · intro heq

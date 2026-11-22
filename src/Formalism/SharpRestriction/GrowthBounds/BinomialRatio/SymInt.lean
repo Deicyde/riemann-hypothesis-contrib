@@ -10,34 +10,52 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G MvPolynomial
 
-abbrev IntAlg (O : Type) [CommRing O] [IsDomain O] (σ : Type*) : Subalgebra O (MvPolynomial σ (KK O)) :=
-  (MvPolynomial.mapAlgHom (Algebra.ofId O (KK O)) : MvPolynomial σ O →ₐ[O] MvPolynomial σ (KK O)).range
+abbrev IntAlg (O : Type) [CommRing O] [IsDomain O] (σ : Type*)
+    : Subalgebra O (MvPolynomial σ (KK O)) :=
+  (MvPolynomial.mapAlgHom (Algebra.ofId O (KK O))
+    : MvPolynomial σ O →ₐ[O] MvPolynomial σ (KK O)).range
 
-theorem X_mem_intAlg (O : Type) [CommRing O] [IsDomain O] {σ : Type*} (v : σ) : (X v : MvPolynomial σ (KK O)) ∈ IntAlg O σ := by
+theorem X_mem_intAlg (O : Type) [CommRing O] [IsDomain O] {σ : Type*} (v : σ)
+    : (X v : MvPolynomial σ (KK O)) ∈ IntAlg O σ := by
   exact (AlgHom.mem_range _).mpr ⟨MvPolynomial.X v, by simp⟩
 
-theorem intPol_le (O : Type) [CommRing O] [IsDomain O] {σ : Type*} {P : MvPolynomial σ (KK O)} (h : P ∈ IntPol O σ) :
-    P ∈ IntAlg O σ := by
+theorem intPol_le
+    (O : Type) [CommRing O] [IsDomain O]
+    {σ : Type*} {P : MvPolynomial σ (KK O)} (h : P ∈ IntPol O σ)
+    : P ∈ IntAlg O σ := by
   obtain ⟨Q, hQ⟩ := LinearMap.mem_range.mp h
   exact (AlgHom.mem_range _).mpr ⟨Q, hQ⟩
 
-theorem inA_of_mem (O : Type) [CommRing O] [IsDomain O] {σ : Type*} {P : MvPolynomial σ (KK O)} (h : P ∈ IntAlg O σ) :
-    InA (O := O) P := by
+theorem inA_of_mem
+    (O : Type) [CommRing O] [IsDomain O]
+    {σ : Type*} {P : MvPolynomial σ (KK O)} (h : P ∈ IntAlg O σ)
+    : InA (O := O) P := by
   obtain ⟨Q, rfl⟩ := (AlgHom.mem_range _).mp h
   unfold InA
   intro m
   exact ⟨Q.coeff m, by simp [MvPolynomial.mapAlgHom_apply, MvPolynomial.coeff_map]⟩
 
-theorem rename_mem_intAlg (O : Type) [CommRing O] [IsDomain O] {σ τ : Type*} (f : σ → τ) {P : MvPolynomial σ (KK O)}
-    (h : P ∈ IntAlg O σ) : rename f P ∈ IntAlg O τ := by
+theorem rename_mem_intAlg
+    (O : Type) [CommRing O] [IsDomain O]
+    {σ τ : Type*} (f : σ → τ)
+    {P : MvPolynomial σ (KK O)} (h : P ∈ IntAlg O σ)
+    : rename f P ∈ IntAlg O τ := by
   obtain ⟨Q, rfl⟩ := (AlgHom.mem_range _).mp h
-  exact (AlgHom.mem_range _).mpr ⟨rename f Q, by simp [MvPolynomial.mapAlgHom_apply, MvPolynomial.map_rename]⟩
+  exact (AlgHom.mem_range _).mpr
+    ⟨rename f Q, by simp [MvPolynomial.mapAlgHom_apply, MvPolynomial.map_rename]⟩
 
-theorem aeval_mem_intAlg (O : Type) [CommRing O] [IsDomain O] {σ τ : Type*} (f : σ → MvPolynomial τ (KK O))
-    (hf : ∀ v, f v ∈ IntAlg O τ) {P : MvPolynomial σ (KK O)} (h : P ∈ IntAlg O σ) : aeval f P ∈ IntAlg O τ := by
+theorem aeval_mem_intAlg
+    (O : Type) [CommRing O] [IsDomain O]
+    {σ τ : Type*} (f : σ → MvPolynomial τ (KK O)) (hf : ∀ v, f v ∈ IntAlg O τ)
+    {P : MvPolynomial σ (KK O)} (h : P ∈ IntAlg O σ)
+    : aeval f P ∈ IntAlg O τ := by
   obtain ⟨Q, rfl⟩ := (AlgHom.mem_range _).mp h
-  have e : (MvPolynomial.mapAlgHom (Algebra.ofId O (KK O)) : MvPolynomial σ O →ₐ[O] MvPolynomial σ (KK O)) Q =
-      MvPolynomial.map (algebraMap O (KK O)) Q := rfl
+  have e
+      : (MvPolynomial.mapAlgHom (Algebra.ofId O (KK O))
+            : MvPolynomial σ O →ₐ[O] MvPolynomial σ (KK O))
+          Q
+        = MvPolynomial.map (algebraMap O (KK O)) Q :=
+    rfl
   rw [e, MvPolynomial.aeval_map_algebraMap]
   clear h e
   induction Q using MvPolynomial.induction_on with
@@ -45,8 +63,8 @@ theorem aeval_mem_intAlg (O : Type) [CommRing O] [IsDomain O] {σ τ : Type*} (f
   | add p q hp hq => rw [map_add]; exact add_mem hp hq
   | mul_X p v hp => rw [map_mul, MvPolynomial.aeval_X]; exact mul_mem hp (hf v)
 
-theorem ssz_le_intAlg (O : Type) [CommRing O] [IsDomain O] {N r : ℕ} [NeZero r] (D : BlockData N) :
-    ∀ x ∈ D.SSZ O (r := r), x ∈ IntAlg O (BVar N r D.T.t) := by
+theorem ssz_le_intAlg (O : Type) [CommRing O] [IsDomain O] {N r : ℕ} [NeZero r] (D : BlockData N)
+    : ∀ x ∈ D.SSZ O (r := r), x ∈ IntAlg O (BVar N r D.T.t) := by
   intro x hx
   unfold BlockData.SSZ at hx
   refine Submodule.span_induction (p := fun x _ => x ∈ IntAlg O (BVar N r D.T.t)) ?_ ?_ ?_ ?_ hx
@@ -62,10 +80,16 @@ theorem ssz_le_intAlg (O : Type) [CommRing O] [IsDomain O] {N r : ℕ} [NeZero r
       unfold BlockData.Eplus
       exact (IntAlg O _).add_mem ((IntAlg O _).mul_mem (hX _) (hX _))
         ((IntAlg O _).sum_mem fun c _ => (IntAlg O _).mul_mem (hX _) (hX _))
-    refine (IntAlg O _).mul_mem ((IntAlg O _).mul_mem ((IntAlg O _).mul_mem ((IntAlg O _).mul_mem
-      ((IntAlg O _).mul_mem ((IntAlg O _).prod_mem fun i _ => (IntAlg O _).pow_mem (hE i) _)
-        ((IntAlg O _).pow_mem hP _)) ((IntAlg O _).prod_mem fun i _ => (IntAlg O _).pow_mem (hX _) _))
-      ((IntAlg O _).pow_mem (hX _) _)) (rename_mem_intAlg O _ (intPol_le O hy.2))) (intPol_le O hg0.2)
+    refine (IntAlg O _).mul_mem
+      ((IntAlg O _).mul_mem
+        ((IntAlg O _).mul_mem
+          ((IntAlg O _).mul_mem
+            ((IntAlg O _).mul_mem ((IntAlg O _).prod_mem fun i _ => (IntAlg O _).pow_mem (hE i) _)
+              ((IntAlg O _).pow_mem hP _))
+            ((IntAlg O _).prod_mem fun i _ => (IntAlg O _).pow_mem (hX _) _))
+          ((IntAlg O _).pow_mem (hX _) _))
+        (rename_mem_intAlg O _ (intPol_le O hy.2)))
+      (intPol_le O hg0.2)
   · exact (IntAlg O _).zero_mem
   · intro x y _ _ hx hy; exact (IntAlg O _).add_mem hx hy
   · intro a x _ hx; exact (IntAlg O _).smul_mem hx a
@@ -79,8 +103,9 @@ theorem symIntAt (C0 CE1 CE2 : ℝ) : SymIntAt C0 CE1 CE2 := by
   have hX := fun v => X_mem_intAlg O (σ := (X.TT × Bool) × Fin (X.m + 1)) v
   refine (IntAlg O _).mul_mem ((IntAlg O _).mul_mem ?_ ?_) ?_
   · unfold digitMon
-    exact (IntAlg O _).prod_mem fun i _ => (IntAlg O _).prod_mem fun c _ =>
-      (IntAlg O _).mul_mem ((IntAlg O _).pow_mem (hX _) _) ((IntAlg O _).pow_mem (hX _) _)
+    exact (IntAlg O _).prod_mem fun i _ =>
+      (IntAlg O _).prod_mem fun c _ =>
+        (IntAlg O _).mul_mem ((IntAlg O _).pow_mem (hX _) _) ((IntAlg O _).pow_mem (hX _) _)
   · unfold sTopMon
     refine (IntAlg O _).prod_mem fun i _ => ?_
     split_ifs
@@ -88,7 +113,8 @@ theorem symIntAt (C0 CE1 CE2 : ℝ) : SymIntAt C0 CE1 CE2 := by
     · exact (IntAlg O _).one_mem
   · have hsj : s j ∈ IntAlg O (BVar (2 * segS X.TT j + 1) X.m (X.seg C0 CE1 CE2 j).t) :=
       ssz_le_intAlg O (r := X.m)
-        (blockData X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j) mm (β j)) (s j) (hs j)
+        (blockData X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j) mm (β j))
+        (s j) (hs j)
     exact aeval_mem_intAlg O _ (fun v => (IntAlg O _).pow_mem (hX _) _) hsj
 
 end Formalism.MainNotions.ColumnSystems.Pf

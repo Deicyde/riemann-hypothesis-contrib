@@ -19,9 +19,10 @@ variable {K : Type} [Field K] {ι : Type} [Fintype ι] [DecidableEq ι] {a b : �
 def bdiag (e : ι ≃ Fin a ⊕ Fin b) (A : Matrix ι ι K) : Matrix ι ι K :=
   Matrix.of fun i j => if side e i = side e j then A i j else 0
 
-theorem bdiag_mul (e : ι ≃ Fin a ⊕ Fin b) {A B : Matrix ι ι K}
-    (hA : A.BlockTriangular (side e)) (hB : B.BlockTriangular (side e)) :
-    bdiag e (A * B) = bdiag e A * bdiag e B := by
+theorem bdiag_mul
+    (e : ι ≃ Fin a ⊕ Fin b)
+    {A B : Matrix ι ι K} (hA : A.BlockTriangular (side e)) (hB : B.BlockTriangular (side e))
+    : bdiag e (A * B) = bdiag e A * bdiag e B := by
   ext i j
   simp only [bdiag, Matrix.of_apply, Matrix.mul_apply]
   split_ifs with hij
@@ -43,8 +44,8 @@ theorem bdiag_one (e : ι ≃ Fin a ⊕ Fin b) : bdiag e (1 : Matrix ι ι K) = 
   simp only [bdiag, Matrix.of_apply, Matrix.one_apply]
   split_ifs with h1 h2 <;> simp_all
 
-theorem bdiag_of_levi (e : ι ≃ Fin a ⊕ Fin b) {g : GL ι K} (hg : g ∈ blockLevi e) :
-    bdiag e (g : Matrix ι ι K) = g := by
+theorem bdiag_of_levi (e : ι ≃ Fin a ⊕ Fin b) {g : GL ι K} (hg : g ∈ blockLevi e)
+    : bdiag e (g : Matrix ι ι K) = g := by
   ext i j
   simp only [bdiag, Matrix.of_apply]
   split_ifs with h
@@ -55,19 +56,18 @@ theorem bdiag_of_levi (e : ι ≃ Fin a ⊕ Fin b) {g : GL ι K} (hg : g ∈ blo
     · exact (h1 h').symm
     · exact (h2 (show OrderDual.toDual (side e j) < OrderDual.toDual (side e i) from h')).symm
 
-theorem uMat_blockTriangular (e : ι ≃ Fin a ⊕ Fin b) (X : Fin a → Fin b → K) :
-    (uMat e X).BlockTriangular (side e) := by
+theorem uMat_blockTriangular (e : ι ≃ Fin a ⊕ Fin b) (X : Fin a → Fin b → K)
+    : (uMat e X).BlockTriangular (side e) := by
   intro i j hij
   simp only [uMat, Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm]
   simp only [side] at hij
   rcases hi : e i with x | x <;> rcases hj : e j with y | y <;> simp_all
   all_goals exact absurd hij (by decide)
 
-theorem bdiag_uMat (e : ι ≃ Fin a ⊕ Fin b) (X : Fin a → Fin b → K) :
-    bdiag e (uMat e X) = 1 := by
+theorem bdiag_uMat (e : ι ≃ Fin a ⊕ Fin b) (X : Fin a → Fin b → K) : bdiag e (uMat e X) = 1 := by
   ext i j
-  simp only [bdiag, uMat, Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm, Matrix.of_apply,
-    Matrix.one_apply]
+  simp only [bdiag, uMat, Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm,
+    Matrix.of_apply, Matrix.one_apply]
   split_ifs with hs hij hij
   · subst hij
     generalize e i = u
@@ -83,17 +83,23 @@ theorem bdiag_uMat (e : ι ≃ Fin a ⊕ Fin b) (X : Fin a → Fin b → K) :
 
 section Top
 
-variable {K : Type} [Field K] [TopologicalSpace K] [IsTopologicalRing K] {ι : Type} [Fintype ι] [DecidableEq ι]
+variable
+  {K : Type} [Field K] [TopologicalSpace K] [IsTopologicalRing K]
+  {ι : Type} [Fintype ι] [DecidableEq ι]
   {a b : ℕ}
 
 def bdiagHom (e : ι ≃ Fin a ⊕ Fin b) : blockPar (K := K) e →* GL ι K where
-  toFun p := ⟨bdiag e (p : GL ι K), bdiag e (((p : GL ι K)⁻¹ : GL ι K) : Matrix ι ι K),
+  toFun p := ⟨
+    bdiag e (p : GL ι K),
+    bdiag e (((p : GL ι K)⁻¹ : GL ι K) : Matrix ι ι K),
     by rw [← bdiag_mul e p.2 ((blockPar e).inv_mem p.2)]; simp [bdiag_one],
-    by rw [← bdiag_mul e ((blockPar e).inv_mem p.2) p.2]; simp [bdiag_one]⟩
+    by rw [← bdiag_mul e ((blockPar e).inv_mem p.2) p.2]; simp [bdiag_one]
+  ⟩
   map_one' := Units.ext (by simp [bdiag_one])
-  map_mul' p q := Units.ext (by
-    simp only [Subgroup.coe_mul, Units.val_mul]
-    exact bdiag_mul e p.2 q.2)
+  map_mul' p q :=
+    Units.ext (by
+      simp only [Subgroup.coe_mul, Units.val_mul]
+      exact bdiag_mul e p.2 q.2)
 
 theorem continuous_bdiag (e : ι ≃ Fin a ⊕ Fin b) : Continuous (bdiag (K := K) e) :=
   continuous_matrix fun i j => by
@@ -104,26 +110,32 @@ theorem continuous_bdiag (e : ι ≃ Fin a ⊕ Fin b) : Continuous (bdiag (K := 
       exact continuous_const
 
 theorem continuous_bdiagHom (e : ι ≃ Fin a ⊕ Fin b) : Continuous (bdiagHom (K := K) e) := by
-  refine Units.continuous_iff.2 ⟨(continuous_bdiag e).comp (Units.continuous_val.comp continuous_subtype_val), ?_⟩
+  refine Units.continuous_iff.2
+    ⟨(continuous_bdiag e).comp (Units.continuous_val.comp continuous_subtype_val), ?_⟩
   show Continuous fun p : blockPar (K := K) e => bdiag e (((p : GL ι K)⁻¹ : GL ι K) : Matrix ι ι K)
-  exact (continuous_bdiag e).comp (Units.continuous_val.comp (continuous_inv.comp continuous_subtype_val))
+  exact (continuous_bdiag e).comp
+    (Units.continuous_val.comp (continuous_inv.comp continuous_subtype_val))
 
-theorem isClosed_blockPar (e : ι ≃ Fin a ⊕ Fin b) (h0 : IsClosed ({0} : Set K)) :
-    IsClosed (blockPar (K := K) e : Set (GL ι K)) := by
-  have : (blockPar (K := K) e : Set (GL ι K)) = ⋂ i, ⋂ j, ⋂ (_ : side e j < side e i),
-      {g : GL ι K | (g : Matrix ι ι K) i j ∈ ({0} : Set K)} := by
+theorem isClosed_blockPar (e : ι ≃ Fin a ⊕ Fin b) (h0 : IsClosed ({0} : Set K))
+    : IsClosed (blockPar (K := K) e : Set (GL ι K)) := by
+  have : (blockPar (K := K) e : Set (GL ι K))
+      = ⋂ i, ⋂ j, ⋂ (_ : side e j < side e i),
+        {g : GL ι K | (g : Matrix ι ι K) i j ∈ ({0} : Set K)} := by
     ext g
     simp only [Set.mem_iInter, Set.mem_setOf_eq, Set.mem_singleton_iff]
     rfl
   rw [this]
-  exact isClosed_iInter fun i => isClosed_iInter fun j => isClosed_iInter fun _ =>
-    h0.preimage (Units.continuous_val.matrix_elem i j)
+  exact isClosed_iInter fun i =>
+    isClosed_iInter fun j =>
+      isClosed_iInter fun _ => h0.preimage (Units.continuous_val.matrix_elem i j)
 
 end Top
 
-theorem relIndex_ne_zero_of_subset_compact {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [T2Space G] {W S : Subgroup G} (hW : IsOpen (W : Set G)) {Q : Set G} (hQ : IsCompact Q)
-    (hS : (S : Set G) ⊆ Q) : W.relIndex S ≠ 0 := by
+theorem relIndex_ne_zero_of_subset_compact
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+    {W S : Subgroup G} (hW : IsOpen (W : Set G))
+    {Q : Set G} (hQ : IsCompact Q) (hS : (S : Set G) ⊆ Q)
+    : W.relIndex S ≠ 0 := by
   set C := S.topologicalClosure
   have hCQ : (C : Set G) ⊆ Q := by
     rw [Subgroup.topologicalClosure_coe]; exact closure_minimal hS hQ.isClosed
@@ -136,14 +148,20 @@ theorem relIndex_ne_zero_of_subset_compact {G : Type} [Group G] [TopologicalSpac
   intro h
   exact h1 (Subgroup.relIndex_eq_zero_of_le_right S.le_topologicalClosure h)
 
-theorem relIndex_twCent_inf_ne_zero : ∀ (K : Type) [Field K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
-  (ι : Type) [Fintype ι] [DecidableEq ι] (a b : ℕ) (e : ι ≃ Fin a ⊕ Fin b) (γ : GL ι K),
-  GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) γ ≤ GlobalTheory.OrbDesc.blockLevi e →
-  ∀ K' : Subgroup (GL ι K), IsOpen (K' : Set (GL ι K)) → IsCompact (K' : Set (GL ι K)) →
-  ∀ x ∈ GlobalTheory.OrbDesc.blockPar e,
-    (GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) γ ⊓ (GlobalTheory.OrbDesc.blockPar e ⊓ K').map (MulAut.conj x).toMonoidHom).relIndex
-      (GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) γ ⊓
-        ((GlobalTheory.OrbDesc.blockPar e ⊓ K') ⊔ GlobalTheory.OrbDesc.blockUni e).map (MulAut.conj x).toMonoidHom) ≠ 0 := by
+theorem relIndex_twCent_inf_ne_zero
+    : ∀ (K : Type) [Field K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
+        (ι : Type) [Fintype ι] [DecidableEq ι] (a b : ℕ) (e : ι ≃ Fin a ⊕ Fin b) (γ : GL ι K),
+      GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) γ ≤ GlobalTheory.OrbDesc.blockLevi e
+        → ∀ K' : Subgroup (GL ι K),
+          IsOpen (K' : Set (GL ι K)) → IsCompact (K' : Set (GL ι K))
+            → ∀ x ∈ GlobalTheory.OrbDesc.blockPar e,
+              (GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) γ
+                    ⊓ (GlobalTheory.OrbDesc.blockPar e ⊓ K').map
+                      (MulAut.conj x).toMonoidHom).relIndex
+                  (GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) γ
+                    ⊓ ((GlobalTheory.OrbDesc.blockPar e ⊓ K') ⊔ GlobalTheory.OrbDesc.blockUni e).map
+                      (MulAut.conj x).toMonoidHom)
+                ≠ 0 := by
   intro K _ _ _ _ ι _ _ a b e γ hT K' hK'o hK'c x hx
   set T := GlobalTheory.BCT.twCent (MonoidHom.id (GL ι K)) γ
   set P := blockPar (K := K) e
@@ -156,7 +174,8 @@ theorem relIndex_twCent_inf_ne_zero : ∀ (K : Type) [Field K] [TopologicalSpace
     simp only [W, cx]; rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply]
   have hWo : IsOpen (W : Set (GL ι K)) := by
     have : (W : Set (GL ι K)) = (fun g => x⁻¹ * g * x) ⁻¹' (K' : Set (GL ι K)) := Set.ext hWmem
-    rw [this]; exact hK'o.preimage ((continuous_const.mul continuous_id).mul continuous_const)
+    rw [this]
+    exact hK'o.preimage ((continuous_const.mul continuous_id).mul continuous_const)
   have hSWA : W ⊓ S ≤ A := by
     rintro g ⟨hgW, hgT, -⟩
     refine ⟨hgT, Subgroup.mem_map_equiv.2 ?_⟩
@@ -170,7 +189,8 @@ theorem relIndex_twCent_inf_ne_zero : ∀ (K : Type) [Field K] [TopologicalSpace
       set π := bdiagHom (K := K) e
       have hWc : IsCompact (W : Set (GL ι K)) := by
         have : (W : Set (GL ι K)) = (fun g => x * g * x⁻¹) '' (K' : Set (GL ι K)) := rfl
-        rw [this]; exact hK'c.image ((continuous_const.mul continuous_id).mul continuous_const)
+        rw [this]
+        exact hK'c.image ((continuous_const.mul continuous_id).mul continuous_const)
       have hQ : IsCompact (π '' {p : P | (p : GL ι K) ∈ W}) :=
         (hPc.isClosedEmbedding_subtypeVal.isCompact_preimage hWc).image (continuous_bdiagHom e)
       refine relIndex_ne_zero_of_subset_compact hWo hQ ?_
@@ -186,7 +206,8 @@ theorem relIndex_twCent_inf_ne_zero : ∀ (K : Type) [Field K] [TopologicalSpace
           refine ⟨⟨_, hgP⟩, ?_, rfl⟩
           show π ⟨_, hgP⟩ ∈ L'.map π
           have : π ⟨_, hgP⟩ = 1 := Units.ext (bdiag_uMat e X.toAdd)
-          rw [this]; exact (L'.map π).one_mem
+          rw [this]
+          exact (L'.map π).one_mem
       obtain ⟨p, hp, hpy⟩ := hZ hy
       obtain ⟨l, hl, hlp⟩ := Subgroup.mem_map.1 (Subgroup.mem_comap.1 hp)
       set px : P := ⟨x, hx⟩
@@ -214,7 +235,9 @@ theorem relIndex_twCent_inf_ne_zero : ∀ (K : Type) [Field K] [TopologicalSpace
         have h2 : y ∈ (((⊥ : Ideal K).closure : Ideal K) : Set K) := this
         simpa only [Ideal.coe_closure, Submodule.bot_coe] using h2
       have hsp : ∀ c y : K, c ⤳ y := fun c y => by
-        have := (hsp0 (y - c)).map (show Continuous (fun z : K => z + c) from continuous_id.add continuous_const)
+        have :=
+          (hsp0 (y - c)).map
+            (show Continuous (fun z : K => z + c) from continuous_id.add continuous_const)
         simpa using this
       have hspM : ∀ A B : Matrix ι ι K, A ⤳ B := fun A B =>
         specializes_pi.2 fun i => specializes_pi.2 fun j => hsp _ _

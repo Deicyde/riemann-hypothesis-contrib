@@ -20,13 +20,14 @@ variable {J : Type*} {T : J → Scheme.{0}} (a : ∀ i, T i ⟶ X) [∀ i, IsOpe
 
 end Cover
 
-theorem isRepresentable_of_cover (F : Scheme.{0}ᵒᵖ ⥤ Type)
+theorem isRepresentable_of_cover
+    (F : Scheme.{0}ᵒᵖ ⥤ Type)
     (hF : Presieve.IsSheaf Scheme.zariskiTopology F) (p : F ⟶ yoneda.obj X)
-    {J : Type} (W : J → X.Opens) (hW : iSup W = ⊤) (T : J → Scheme.{0})
-    (y : ∀ i, F.obj (op (T i))) (π : ∀ i, T i ⟶ W i)
-    (hπ : ∀ i, p.app _ (y i) = π i ≫ (W i).ι)
-    (h : ∀ i (Z : Scheme.{0}) (x : F.obj (op Z)) (b : Z ⟶ W i), p.app _ x = b ≫ (W i).ι →
-      ∃! c : Z ⟶ T i, F.map c.op (y i) = x) : F.IsRepresentable := by
+    {J : Type} (W : J → X.Opens) (hW : iSup W = ⊤) (T : J → Scheme.{0}) (y : ∀ i, F.obj (op (T i)))
+    (π : ∀ i, T i ⟶ W i) (hπ : ∀ i, p.app _ (y i) = π i ≫ (W i).ι)
+    (h : ∀ i (Z : Scheme.{0}) (x : F.obj (op Z)) (b : Z ⟶ W i),
+      p.app _ x = b ≫ (W i).ι → ∃! c : Z ⟶ T i, F.map c.op (y i) = x)
+    : F.IsRepresentable := by
   let G : Sheaf Scheme.zariskiTopology.{0} Type := ⟨F, (isSheaf_iff_isSheaf_of_type _ _).2 hF⟩
   let f : ∀ i, yoneda.obj (T i) ⟶ G.1 := fun i => yonedaEquiv.symm (y i)
   have hp : ∀ i (Z : Scheme.{0}) (c : Z ⟶ T i), p.app _ (F.map c.op (y i)) = c ≫ π i ≫ (W i).ι := by
@@ -51,20 +52,22 @@ theorem isRepresentable_of_cover (F : Scheme.{0}ᵒᵖ ⥤ Type)
         change c ≫ π i = b
         rw [← cancel_mono (W i).ι, Category.assoc, ← hp, hc]
         exact hb
-    exact (MorphismProperty.relative_isStableUnderBaseChange @IsOpenImmersion).of_isPullback this.flip
-      (MorphismProperty.relative_map (inferInstanceAs (IsOpenImmersion (W i).ι)))
+    exact (MorphismProperty.relative_isStableUnderBaseChange @IsOpenImmersion).of_isPullback
+      this.flip (MorphismProperty.relative_map (inferInstanceAs (IsOpenImmersion (W i).ι)))
   have : Presheaf.IsLocallySurjective Scheme.zariskiTopology (Sigma.desc f) := by
     constructor
     intro Z x
     let q : Z ⟶ X := p.app _ x
-    let 𝒰 := Z.openCoverOfIsOpenCover (fun i => q ⁻¹ᵁ W i) (by
-      rw [IsOpenCover, ← Scheme.Hom.preimage_iSup, hW]; rfl)
+    let 𝒰 :=
+      Z.openCoverOfIsOpenCover (fun i => q ⁻¹ᵁ W i) (by
+        rw [IsOpenCover, ← Scheme.Hom.preimage_iSup, hW]; rfl)
     refine GrothendieckTopology.superset_covering _ ?_ 𝒰.mem_grothendieckTopology
     rw [Sieve.ofArrows, Sieve.generate_le_iff]
     rintro - - ⟨i⟩
-    obtain ⟨c, hc, -⟩ := h i _ (F.map (q ⁻¹ᵁ W i).ι.op x) (q ∣_ W i) (by
-      rw [morphismRestrict_ι]
-      exact ConcreteCategory.congr_hom (p.naturality (q ⁻¹ᵁ W i).ι.op) x)
+    obtain ⟨c, hc, -⟩ :=
+      h i _ (F.map (q ⁻¹ᵁ W i).ι.op x) (q ∣_ W i) (by
+        rw [morphismRestrict_ι]
+        exact ConcreteCategory.congr_hom (p.naturality (q ⁻¹ᵁ W i).ι.op) x)
     refine ⟨(Sigma.ι (fun i => yoneda.obj (T i)) i).app _ c, ?_⟩
     exact (ConcreteCategory.congr_hom (NatTrans.congr_app (Sigma.ι_desc f i) _) c).trans hc
   exact Scheme.LocalRepresentability.isRepresentable hf

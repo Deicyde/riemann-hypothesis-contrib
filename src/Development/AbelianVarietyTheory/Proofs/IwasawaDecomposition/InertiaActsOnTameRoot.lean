@@ -11,12 +11,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemOf
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
 
 namespace GlobalTheory.TameSurj
 
 open Ideal in
-theorem ram_le : ∀ {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] (P : HeightOneSpectrum (𝓞 E)) (Q : Ideal (𝓞 L)) [Q.IsPrime] [Q.LiesOver P.asIdeal] (m : ℕ) (ϖ : 𝓞 E), ϖ ∉ P.asIdeal ^ 2 → ∀ π : 𝓞 L, π ∈ Q → π ^ m = algebraMap (𝓞 E) (𝓞 L) ϖ → m ≤ Q.ramificationIdx (𝓞 E) := by
+theorem ram_le
+    : ∀ {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L]
+        (P : HeightOneSpectrum (𝓞 E)) (Q : Ideal (𝓞 L)) [Q.IsPrime] [Q.LiesOver P.asIdeal] (m : ℕ)
+        (ϖ : 𝓞 E),
+      ϖ ∉ P.asIdeal ^ 2
+        → ∀ π : 𝓞 L, π ∈ Q → π ^ m = algebraMap (𝓞 E) (𝓞 L) ϖ → m ≤ Q.ramificationIdx (𝓞 E) := by
   intro E L _ _ _ _ _ P Q _ _ m ϖ hϖ2 π hπQ hπm
   rcases Nat.eq_zero_or_pos m with rfl | hm
   · exact Nat.zero_le _
@@ -55,16 +61,20 @@ theorem ram_le : ∀ {E L : Type} [Field E] [NumberField E] [Field L] [NumberFie
   have hp : P.asIdeal.map (algebraMap (𝓞 E) (𝓞 L)) ≠ ⊥ := Ideal.map_ne_bot_of_ne_bot P.ne_bot
   rw [Ideal.IsDedekindDomain.ramificationIdx_eq_multiplicity P.asIdeal Q hp]
   apply FiniteMultiplicity.le_multiplicity_of_pow_dvd
-  · exact FiniteMultiplicity.of_not_isUnit (Ideal.isUnit_iff.not.mpr (inferInstance : Q.IsPrime).ne_top) hp
+  · exact FiniteMultiplicity.of_not_isUnit
+      (Ideal.isUnit_iff.not.mpr (inferInstance : Q.IsPrime).ne_top) hp
   · exact Ideal.dvd_iff_le.mpr hle
 
 variable {Ω : Type} [Field Ω]
 
-theorem val_int_le {L : Type} [Field L] [NumberField L] [Algebra L Ω] (A : ValuationSubring Ω) (x : 𝓞 L) :
-    A.valuation (algebraMap L Ω (x : L)) ≤ 1 :=
-  (A.valuation_le_one_iff _).mpr (mem_of_isIntegral_int A (x.isIntegral_coe.map (algebraMap L Ω).toIntAlgHom))
+theorem val_int_le
+    {L : Type} [Field L] [NumberField L] [Algebra L Ω] (A : ValuationSubring Ω) (x : 𝓞 L)
+    : A.valuation (algebraMap L Ω (x : L)) ≤ 1 :=
+  (A.valuation_le_one_iff _).mpr
+    (mem_of_isIntegral_int A (x.isIntegral_coe.map (algebraMap L Ω).toIntAlgHom))
 
-def primeOf {L : Type} [Field L] [NumberField L] [Algebra L Ω] (A : ValuationSubring Ω) : Ideal (𝓞 L) where
+def primeOf {L : Type} [Field L] [NumberField L] [Algebra L Ω] (A : ValuationSubring Ω)
+    : Ideal (𝓞 L) where
   carrier := {x | A.valuation (algebraMap L Ω (x : L)) < 1}
   add_mem' {a b} ha hb := by
     simp only [Set.mem_setOf_eq, map_add (f := _)] at ha hb ⊢
@@ -72,18 +82,25 @@ def primeOf {L : Type} [Field L] [NumberField L] [Algebra L Ω] (A : ValuationSu
   zero_mem' := by simp
   smul_mem' c b hb := by
     simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul, Valuation.map_mul] at hb ⊢
-    calc A.valuation (algebraMap L Ω (c : L)) * A.valuation (algebraMap L Ω (b : L))
+    calc
+      A.valuation (algebraMap L Ω (c : L)) * A.valuation (algebraMap L Ω (b : L))
         ≤ 1 * A.valuation (algebraMap L Ω (b : L)) := mul_le_mul_left (val_int_le A c) _
       _ < 1 := by rw [one_mul]; exact hb
 
-theorem mem_primeOf {L : Type} [Field L] [NumberField L] [Algebra L Ω] {A : ValuationSubring Ω} {x : 𝓞 L} :
-    x ∈ primeOf (L := L) A ↔ A.valuation (algebraMap L Ω (x : L)) < 1 := Iff.rfl
+theorem mem_primeOf
+    {L : Type} [Field L] [NumberField L] [Algebra L Ω] {A : ValuationSubring Ω} {x : 𝓞 L}
+    : x ∈ primeOf (L := L) A ↔ A.valuation (algebraMap L Ω (x : L)) < 1 :=
+  Iff.rfl
 
-theorem den : ∀ {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] (A : ValuationSubring Ω) (x : L), A.valuation (algebraMap L Ω x) ≤ 1 → ∃ s t : 𝓞 L, A.valuation (algebraMap L Ω (s : L)) = 1 ∧ (s : L) * x = t :=
+theorem den
+    : ∀ {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] (A : ValuationSubring Ω)
+        (x : L),
+      A.valuation (algebraMap L Ω x) ≤ 1
+        → ∃ s t : 𝓞 L, A.valuation (algebraMap L Ω (s : L)) = 1 ∧ (s : L) * x = t :=
   _root_.GlobalTheory.DenominatorExists.exists_denominator
 
-instance isPrime_primeOf {L : Type} [Field L] [NumberField L] [Algebra L Ω] (A : ValuationSubring Ω) :
-    (primeOf (L := L) A).IsPrime where
+instance isPrime_primeOf {L : Type} [Field L] [NumberField L] [Algebra L Ω] (A : ValuationSubring Ω)
+    : (primeOf (L := L) A).IsPrime where
   ne_top' h := by
     have : (1 : 𝓞 L) ∈ primeOf (L := L) A := h ▸ Submodule.mem_top
     rw [mem_primeOf] at this
@@ -99,9 +116,11 @@ instance isPrime_primeOf {L : Type} [Field L] [NumberField L] [Algebra L Ω] (A 
     exact lt_irrefl _ hab
 
 open ReciprocityTheory.DiscreteGroups.GlobalClassField in
-theorem inert_val {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] [Algebra L Ω]
-    {A : ValuationSubring Ω} {τ : L ≃ₐ[E] L} (hτ : τ ∈ inertiaGroup E L (primeOf (L := L) A)) (x : 𝓞 L) :
-    A.valuation (algebraMap L Ω (τ x) - algebraMap L Ω x) < 1 := by
+theorem inert_val
+    {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] [Algebra L Ω]
+    {A : ValuationSubring Ω} {τ : L ≃ₐ[E] L} (hτ : τ ∈ inertiaGroup E L (primeOf (L := L) A))
+    (x : 𝓞 L)
+    : A.valuation (algebraMap L Ω (τ x) - algebraMap L Ω x) < 1 := by
   have h := mem_inertiaGroup.mp hτ x
   rw [mem_primeOf] at h
   have e : ((galRestrict (𝓞 E) E L (𝓞 L) τ x - x : 𝓞 L) : L) = τ x - x := by
@@ -111,36 +130,47 @@ theorem inert_val {E L : Type} [Field E] [NumberField E] [Field L] [NumberField 
   exact h
 
 open ReciprocityTheory.DiscreteGroups.GlobalClassField in
-theorem inert_val_of_le {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] [Algebra L Ω]
-    {A : ValuationSubring Ω} {τ : L ≃ₐ[E] L} (hτ : τ ∈ inertiaGroup E L (primeOf (L := L) A)) (x : L)
-    (hx : A.valuation (algebraMap L Ω x) ≤ 1) :
-    A.valuation (algebraMap L Ω (τ x) - algebraMap L Ω x) < 1 := by
+theorem inert_val_of_le
+    {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] [Algebra L Ω]
+    {A : ValuationSubring Ω} {τ : L ≃ₐ[E] L} (hτ : τ ∈ inertiaGroup E L (primeOf (L := L) A))
+    (x : L) (hx : A.valuation (algebraMap L Ω x) ≤ 1)
+    : A.valuation (algebraMap L Ω (τ x) - algebraMap L Ω x) < 1 := by
   obtain ⟨s, t, hs1, e⟩ := den A x hx
   have hs := inert_val hτ s
   have ht := inert_val hτ t
   have hτs : A.valuation (algebraMap L Ω (τ s)) = 1 := by
-    have e2 : algebraMap L Ω (τ s) = algebraMap L Ω s + (algebraMap L Ω (τ s) - algebraMap L Ω s) := by ring
+    have e2
+        : algebraMap L Ω (τ s) = algebraMap L Ω s + (algebraMap L Ω (τ s) - algebraMap L Ω s) := by
+      ring
     rw [e2, Valuation.map_add_eq_of_lt_left, hs1]
-    rw [hs1]; exact hs
+    rw [hs1]
+    exact hs
   have he' : τ s * τ x = τ t := by rw [← map_mul, e]
-  have key : algebraMap L Ω (τ s) * (algebraMap L Ω (τ x) - algebraMap L Ω x) =
-      (algebraMap L Ω (τ t) - algebraMap L Ω t) + algebraMap L Ω x * (algebraMap L Ω s - algebraMap L Ω (τ s)) := by
+  have key
+      : algebraMap L Ω (τ s) * (algebraMap L Ω (τ x) - algebraMap L Ω x)
+        = (algebraMap L Ω (τ t) - algebraMap L Ω t)
+          + algebraMap L Ω x * (algebraMap L Ω s - algebraMap L Ω (τ s)) := by
     rw [← he', ← e]; simp only [map_mul]; ring
   have hv : A.valuation (algebraMap L Ω (τ s) * (algebraMap L Ω (τ x) - algebraMap L Ω x)) < 1 := by
     rw [key]
     refine Valuation.map_add_lt _ ht ?_
     rw [Valuation.map_mul, Valuation.map_sub_swap]
-    calc A.valuation (algebraMap L Ω x) * A.valuation (algebraMap L Ω (τ s) - algebraMap L Ω s)
+    calc
+      A.valuation (algebraMap L Ω x) * A.valuation (algebraMap L Ω (τ s) - algebraMap L Ω s)
         ≤ 1 * A.valuation (algebraMap L Ω (τ s) - algebraMap L Ω s) := mul_le_mul_left hx _
       _ < 1 := by rw [one_mul]; exact hs
   rwa [Valuation.map_mul, hτs, one_mul] at hv
 
 open ReciprocityTheory.DiscreteGroups.GlobalClassField in
-theorem inert_fix_root {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] [Algebra L Ω]
-    {A : ValuationSubring Ω} {τ : L ≃ₐ[E] L} (hτ : τ ∈ inertiaGroup E L (primeOf (L := L) A)) (m : ℕ)
-    (hm : ¬ A.valuation (m : Ω) < 1) {η : L} (hη : η ^ m = 1) : τ η = η := by
+theorem inert_fix_root
+    {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] [Algebra L Ω]
+    {A : ValuationSubring Ω} {τ : L ≃ₐ[E] L} (hτ : τ ∈ inertiaGroup E L (primeOf (L := L) A))
+    (m : ℕ) (hm : ¬ A.valuation (m : Ω) < 1)
+    {η : L} (hη : η ^ m = 1)
+    : τ η = η := by
   have hm0 : m ≠ 0 := by rintro rfl; exact hm (by simp)
-  have hint : IsIntegral ℤ η := IsIntegral.of_pow (Nat.pos_of_ne_zero hm0) (by rw [hη]; exact isIntegral_one)
+  have hint : IsIntegral ℤ η :=
+    IsIntegral.of_pow (Nat.pos_of_ne_zero hm0) (by rw [hη]; exact isIntegral_one)
   have h := inert_val hτ (⟨η, hint⟩ : 𝓞 L)
   apply (algebraMap L Ω).injective
   refine eq_of_pow_eq_one A hm ?_ ?_ h
@@ -148,19 +178,21 @@ theorem inert_fix_root {E L : Type} [Field E] [NumberField E] [Field L] [NumberF
   · rw [← map_pow, hη, map_one]
 
 open ReciprocityTheory.DiscreteGroups.GlobalClassField in
-theorem exists_tau {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] [IsGalois E L]
-    [Algebra L Ω] (A : ValuationSubring Ω) (P : HeightOneSpectrum (𝓞 E))
-    [(primeOf (L := L) A).LiesOver P.asIdeal]
-    (m : ℕ) (hm : ¬ A.valuation (m : Ω) < 1) (ϖ : 𝓞 E) (hϖ2 : ϖ ∉ P.asIdeal ^ 2) (π : L)
-    (hπ : π ^ m = algebraMap E L ϖ) (hπ0 : π ≠ 0) (hπv : A.valuation (algebraMap L Ω π) < 1)
+theorem exists_tau
+    {E L : Type}
+    [Field E] [NumberField E] [Field L] [NumberField L] [Algebra E L] [IsGalois E L] [Algebra L Ω]
+    (A : ValuationSubring Ω) (P : HeightOneSpectrum (𝓞 E)) [(primeOf (L := L) A).LiesOver P.asIdeal]
+    (m : ℕ) (hm : ¬ A.valuation (m : Ω) < 1)
+    (ϖ : 𝓞 E) (hϖ2 : ϖ ∉ P.asIdeal ^ 2)
+    (π : L) (hπ : π ^ m = algebraMap E L ϖ) (hπ0 : π ≠ 0) (hπv : A.valuation (algebraMap L Ω π) < 1)
     (hgen : ∀ τ : L ≃ₐ[E] L, τ π = π → (∀ η : L, η ^ m = 1 → τ η = η) → τ = 1)
-    (ζ : L) (hζ : ζ ^ m = 1) :
-    ∃ τ ∈ inertiaGroup E L (primeOf (L := L) A), τ π = ζ * π := by
+    (ζ : L) (hζ : ζ ^ m = 1)
+    : ∃ τ ∈ inertiaGroup E L (primeOf (L := L) A), τ π = ζ * π := by
   classical
   have hm0 : m ≠ 0 := by rintro rfl; exact hm (by simp)
   have hmpos : 0 < m := Nat.pos_of_ne_zero hm0
-  have hπint : IsIntegral ℤ π := IsIntegral.of_pow hmpos (by
-    rw [hπ]; exact ϖ.isIntegral_coe.map (algebraMap E L).toIntAlgHom)
+  have hπint : IsIntegral ℤ π :=
+    IsIntegral.of_pow hmpos (by rw [hπ]; exact ϖ.isIntegral_coe.map (algebraMap E L).toIntAlgHom)
   let πO : 𝓞 L := ⟨π, hπint⟩
   have hπQ : πO ∈ primeOf (L := L) A := hπv
   have hπm : πO ^ m = algebraMap (𝓞 E) (𝓞 L) ϖ := by
@@ -177,19 +209,24 @@ theorem exists_tau {E L : Type} [Field E] [NumberField E] [Field L] [NumberField
     exact (Multiset.toFinset_card_le _).trans (Polynomial.card_nthRoots m (1 : L))
   have hquot : ∀ τ : L ≃ₐ[E] L, (τ π / π) ^ m = 1 := fun τ => by
     rw [div_pow, ← map_pow, hπ, AlgEquiv.commutes, div_self]
-    rw [← hπ]; exact pow_ne_zero _ hπ0
-  let φ : inertiaGroup E L (primeOf (L := L) A) → S := fun τ => ⟨(τ : L ≃ₐ[E] L) π / π, (hS _).2 (hquot τ)⟩
+    rw [← hπ]
+    exact pow_ne_zero _ hπ0
+  let φ : inertiaGroup E L (primeOf (L := L) A) → S := fun τ =>
+    ⟨(τ : L ≃ₐ[E] L) π / π, (hS _).2 (hquot τ)⟩
   have hinj : Function.Injective φ := by
     intro τ₁ τ₂ h
     have h1 : (τ₁ : L ≃ₐ[E] L) π = (τ₂ : L ≃ₐ[E] L) π := by
       have := congrArg Subtype.val h
       simp only [φ] at this
       exact (div_left_inj' hπ0).mp this
-    have key := hgen ((τ₂ : L ≃ₐ[E] L)⁻¹ * τ₁) (by
-        rw [AlgEquiv.mul_apply, h1]
-        exact (τ₂ : L ≃ₐ[E] L).symm_apply_apply π) (fun η hη => by
-        rw [AlgEquiv.mul_apply, inert_fix_root τ₁.2 m hm hη]
-        exact inert_fix_root (inv_mem τ₂.2) m hm hη)
+    have key :=
+      hgen ((τ₂ : L ≃ₐ[E] L)⁻¹ * τ₁)
+        (by
+          rw [AlgEquiv.mul_apply, h1]
+          exact (τ₂ : L ≃ₐ[E] L).symm_apply_apply π)
+        (fun η hη => by
+          rw [AlgEquiv.mul_apply, inert_fix_root τ₁.2 m hm hη]
+          exact inert_fix_root (inv_mem τ₂.2) m hm hη)
     apply Subtype.ext
     rw [inv_mul_eq_one] at key
     exact key.symm
@@ -201,7 +238,17 @@ theorem exists_tau {E L : Type} [Field E] [NumberField E] [Field L] [NumberField
   rw [← this, div_mul_cancel₀ _ hπ0]
 
 open Polynomial in
-theorem main : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (P : HeightOneSpectrum (𝓞 E)), IsPlaceOver A P → ∀ (m : ℕ), 0 < m → ((m : ℕ) : 𝓞 E) ∉ P.asIdeal → ∀ (ϖ : 𝓞 E), ϖ ∈ P.asIdeal → ϖ ∉ P.asIdeal ^ 2 → ∀ π : Ω, π ^ m = algebraMap E Ω (ϖ : E) → ∀ ζ : Ω, ζ ^ m = 1 → ∃ σ ∈ Ine (F := E) A, σ π = ζ * π := by
+theorem main
+    : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (P : HeightOneSpectrum (𝓞 E)),
+      IsPlaceOver A P
+        → ∀ (m : ℕ),
+          0 < m → ((m : ℕ) : 𝓞 E) ∉ P.asIdeal
+            → ∀ (ϖ : 𝓞 E),
+              ϖ ∈ P.asIdeal → ϖ ∉ P.asIdeal ^ 2
+                → ∀ π : Ω,
+                  π ^ m = algebraMap E Ω (ϖ : E)
+                    → ∀ ζ : Ω, ζ ^ m = 1 → ∃ σ ∈ Ine (F := E) A, σ π = ζ * π := by
   intro E Ω _ _ _ _ _ A P hA m hm hmP ϖ hϖ hϖ2 π hπ ζ hζ
   classical
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
@@ -281,7 +328,8 @@ theorem main : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E
       rw [map_mul, IntermediateField.coe_mul, ihy, ihz]
   have hζM1 : ζM ^ m = 1 := Subtype.ext (by simpa using hζ)
   obtain ⟨τ, hτ, hτπ⟩ := exists_tau (L := M) A P m hmv ϖ hϖ2 πM hπM hπM0 hπv hgen ζM hζM1
-  obtain ⟨σ, hσ, hσx⟩ := GlobalTheory.InertiaLift.exists_mem_Ine_lift A M τ (fun x hx => inert_val_of_le hτ x hx)
+  obtain ⟨σ, hσ, hσx⟩ :=
+    GlobalTheory.InertiaLift.exists_mem_Ine_lift A M τ (fun x hx => inert_val_of_le hτ x hx)
   refine ⟨σ, hσ, ?_⟩
   have := hσx πM
   rw [hτπ] at this

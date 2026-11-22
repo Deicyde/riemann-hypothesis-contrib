@@ -17,30 +17,37 @@ section Matlis
 
 variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-def homQuotEquiv (a : O) :
-    ((O ⧸ Ideal.span ({a} : Set O)) →ₗ[O] KO O) ≃ₗ[O]
-      LinearMap.ker (matQ O (fun _ _ => a : Matrix Unit Unit O)) where
-  toFun φ := ⟨fun _ => φ (Submodule.Quotient.mk 1), by
-    rw [LinearMap.mem_ker]; funext i
-    show ∑ _j : Unit, a • φ (Submodule.Quotient.mk 1) = 0
-    rw [Fintype.sum_unique, ← map_smul, ← Submodule.Quotient.mk_smul, smul_eq_mul, mul_one,
-      (Submodule.Quotient.mk_eq_zero _).mpr (Ideal.mem_span_singleton_self a), map_zero]⟩
+def homQuotEquiv (a : O)
+    : ((O ⧸ Ideal.span ({a} : Set O)) →ₗ[O] KO O) ≃ₗ[O]
+        LinearMap.ker (matQ O (fun _ _ => a : Matrix Unit Unit O)) where
+  toFun φ := ⟨
+    fun _ => φ (Submodule.Quotient.mk 1),
+    by
+      rw [LinearMap.mem_ker]
+      funext i
+      show ∑ _j : Unit, a • φ (Submodule.Quotient.mk 1) = 0
+      rw [Fintype.sum_unique, ← map_smul, ← Submodule.Quotient.mk_smul, smul_eq_mul, mul_one,
+        (Submodule.Quotient.mk_eq_zero _).mpr (Ideal.mem_span_singleton_self a), map_zero]
+  ⟩
   map_add' φ ψ := rfl
   map_smul' c φ := rfl
-  invFun v := (Ideal.span ({a} : Set O)).liftQ (LinearMap.toSpanSingleton O _ (v.1 ())) (by
-    rw [Ideal.span, Submodule.span_le, Set.singleton_subset_iff]
-    show a • v.1 () = 0
-    have h : (∑ j : Unit, a • v.1 j) = 0 := congrFun (LinearMap.mem_ker.mp v.2) ()
-    rwa [Fintype.sum_unique] at h)
+  invFun v :=
+    (Ideal.span ({a} : Set O)).liftQ (LinearMap.toSpanSingleton O _ (v.1 ())) (by
+      rw [Ideal.span, Submodule.span_le, Set.singleton_subset_iff]
+      show a • v.1 () = 0
+      have h : (∑ j : Unit, a • v.1 j) = 0 := congrFun (LinearMap.mem_ker.mp v.2) ()
+      rwa [Fintype.sum_unique] at h)
   left_inv φ := by
-    apply LinearMap.ext; intro x
+    apply LinearMap.ext
+    intro x
     induction x using Submodule.Quotient.induction_on with
     | H x =>
       rw [Submodule.liftQ_apply, LinearMap.toSpanSingleton_apply]
       show x • φ (Submodule.Quotient.mk 1) = φ (Submodule.Quotient.mk x)
       rw [← map_smul, ← Submodule.Quotient.mk_smul, smul_eq_mul, mul_one]
   right_inv v := by
-    apply Subtype.ext; funext i
+    apply Subtype.ext
+    funext i
     show ((Ideal.span ({a} : Set O)).liftQ _ _) (Submodule.Quotient.mk 1) = v.1 i
     rw [Submodule.liftQ_apply, LinearMap.toSpanSingleton_apply, one_smul]
 
@@ -74,8 +81,7 @@ theorem matlis : StatMatlis := by
     IdempotentNormalFormsLenFacts.length_quot_span (p i ^ e i)
   have hlenH : ∀ i, Module.length O (A i →ₗ[O] KO O) = addVal O (p i ^ e i) := fun i =>
     length_hom_quot (p i ^ e i)
-  have hN1 : Module.length O N =
-      Module.length O (Fin n →₀ O) + ∑ i, addVal O (p i ^ e i) := by
+  have hN1 : Module.length O N = Module.length O (Fin n →₀ O) + ∑ i, addVal O (p i ^ e i) := by
     rw [f.length_eq, Module.length_prod, g.length_eq, Module.length_pi_of_fintype]
     simp only [hlenA]
   have hF : Module.length O (Fin n →₀ O) = 0 := by
@@ -99,7 +105,7 @@ theorem matlis : StatMatlis := by
     have := (LinearMap.lsum O A O : (Π i, A i →ₗ[O] KO O) ≃ₗ[O] _).length_eq
     rw [← this, Module.length_pi_of_fintype]
     simp only [hlenH]
-  rw [h1.length_eq, ← (LinearMap.coprodEquiv O).length_eq, Module.length_prod, h2.length_eq,
-    h3, hFH, hN1, hF]
+  rw [h1.length_eq, ← (LinearMap.coprodEquiv O).length_eq, Module.length_prod, h2.length_eq, h3,
+    hFH, hN1, hF]
 
 end Formalism.NG

@@ -36,7 +36,8 @@ lemma res_pullU_eq {X Y : Scheme.{0}} (f : Y ⟶ X) {U W : X.Opens} (h : W ≤ U
 
 section LinComb
 
-variable {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) {K : Type} [Fintype K] (φ : K → (Y ⟶ X)) (ε : K → ℤ)
+variable
+  {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) {K : Type} [Fintype K] (φ : K → (Y ⟶ X)) (ε : K → ℤ)
 
 include hL in
 lemma linComb_g_self (j : K → L.ι) :
@@ -86,7 +87,6 @@ lemma linComb_cover : ⨆ j, (LB.LinComb L φ ε).U j = ⊤ := by
     exact TopologicalSpace.Opens.mem_iSup.mp h1
   choose j hj using hc
   exact TopologicalSpace.Opens.mem_iSup.mpr ⟨j, Set.mem_iInter.mpr hj⟩
-
 
 include hL in
 theorem linComb_isLB : (LB.LinComb L φ ε).IsLB := by

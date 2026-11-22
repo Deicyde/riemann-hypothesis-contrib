@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.Partn
 @[expose] public section
 
 noncomputable section
-open ValuativeRel IsDedekindDomain NumberField ComplexConjugate Formalism.MainNotions.S.Loc Matrix MeasureTheory
+open ValuativeRel IsDedekindDomain NumberField ComplexConjugate Formalism.MainNotions.S.Loc Matrix
+  MeasureTheory
 open scoped Classical
 
 namespace GlobalTheory.SgGlob
@@ -22,7 +23,8 @@ def eps (K : Type) [CommRing K] (r : ℕ) : Matrix (Fin (r + 1)) (Fin (r + 1)) K
 end Rat
 
 namespace ModFam
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {g₁ g₂ : ℕ} (X : ModFam F E sig g₁ g₂)
 
 end ModFam

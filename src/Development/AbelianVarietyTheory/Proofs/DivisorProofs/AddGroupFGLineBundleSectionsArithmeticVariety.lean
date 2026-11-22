@@ -10,18 +10,24 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.LineBundleGl
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 
 namespace GlobalTheory
 
-theorem addGroupFG_sec_of_isArithVar : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X]
-    (p : X ⟶ Sp k) (D : ℕ), IsArithVar p D → ∀ B : LB X, B.IsLB → AddGroup.FG B.Sec := by
+theorem addGroupFG_sec_of_isArithVar
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D → ∀ B : LB X, B.IsLB → AddGroup.FG B.Sec := by
   intro k _ X _ p D h B hB
   letI : Algebra k Γ(X, ⊤) :=
     ((Scheme.Hom.appTop p).hom.comp (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom).toAlgebra
-  have hf : ∀ r : k, algebraMap k Γ(X, ⊤) r =
-      (Scheme.Hom.appTop p) ((Scheme.ΓSpecIso (CommRingCat.of k)).inv r) := fun _ => rfl
+  have hf
+      : ∀ r : k,
+        algebraMap k Γ(X, ⊤) r
+          = (Scheme.Hom.appTop p) ((Scheme.ΓSpecIso (CommRingCat.of k)).inv r) := fun _ =>
+    rfl
   haveI := h.finite
   haveI : IsNoetherianRing k := isNoetherian_of_tower ℤ inferInstance
   have hfin : Module.Finite k (coh (twist (QCoh.structureModule X) B) 0) :=

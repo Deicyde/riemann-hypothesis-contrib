@@ -11,12 +11,14 @@ namespace MassDataIdxLatFree
 open scoped Matrix
 open Module
 
-variable {K : Type} [Field K] (O : ValuationSubring K) [IsPrincipalIdealRing O]
+variable
+  {K : Type} [Field K]
+  (O : ValuationSubring K) [IsPrincipalIdealRing O]
   {n : Type} [Fintype n] [DecidableEq n]
 
-theorem exists_gl (M : Submodule O (n → K)) (hfg : M.FG)
-    (hsp : Submodule.span K (M : Set (n → K)) = ⊤) :
-    ∃ P : GL n K, ∀ y, y ∈ M ↔ ∀ i, (((P⁻¹ : GL n K) : Matrix n n K) *ᵥ y) i ∈ O := by
+theorem exists_gl
+    (M : Submodule O (n → K)) (hfg : M.FG) (hsp : Submodule.span K (M : Set (n → K)) = ⊤)
+    : ∃ P : GL n K, ∀ y, y ∈ M ↔ ∀ i, (((P⁻¹ : GL n K) : Matrix n n K) *ᵥ y) i ∈ O := by
   classical
   haveI : Module.Finite O M := Module.Finite.iff_fg.mpr hfg
   haveI : Module.Free O M := Module.free_of_finite_type_torsion_free'
@@ -54,8 +56,8 @@ theorem exists_gl (M : Submodule O (n → K)) (hfg : M.FG)
       simp [Finset.sum_apply, Pi.single_apply]
     conv_rhs => rw [hy]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply, Pi.smul_apply,
-      smul_eq_mul, Matrix.mulVec, dotProduct, Qm]
+      simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply,
+        Pi.smul_apply, smul_eq_mul, Matrix.mulVec, dotProduct, Qm]
     exact Finset.sum_congr rfl (fun j _ => mul_comm _ _)
   have hQP : Qm * Pm = 1 := by
     ext i k
@@ -91,8 +93,7 @@ theorem exists_gl (M : Submodule O (n → K)) (hfg : M.FG)
       simpa using this
     rw [← bK.sum_repr y]
     refine Submodule.sum_mem _ (fun j _ => ?_)
-    have h5 : bK.repr y j • bK j = (⟨bK.repr y j, hc' j⟩ : O) • (bM j : n → K) := by
-      rw [hsmul, hbK]
+    have h5 : bK.repr y j • bK j = (⟨bK.repr y j, hc' j⟩ : O) • (bM j : n → K) := by rw [hsmul, hbK]
     rw [h5]
     exact M.smul_mem _ (bM j).2
 

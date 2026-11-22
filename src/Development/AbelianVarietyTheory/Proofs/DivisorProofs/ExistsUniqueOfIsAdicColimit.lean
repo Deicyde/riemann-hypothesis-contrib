@@ -15,12 +15,16 @@ open GlobalTheory.AdicColimit
 
 namespace GlobalTheory.FinitePointLimit
 
-theorem existsUnique_of_isAdicColimit {B : Type} [CommRing B] (J : Ideal B)
-    (h : IsAdicColimit J (Over.mk (𝟙 (Sp B)))) (X : Scheme.{0}) (z : ∀ e : ℕ, Sp (B ⧸ J ^ (e + 1)) ⟶ X)
-    (hz : ∀ e : ℕ, Out.thickTrans B J e ≫ z (e + 1) = z e) :
-    ∃! x : Sp B ⟶ X, ∀ e : ℕ, Out.thick B J e ≫ x = z e := by
-  have hι : ∀ e : ℕ, thickι J e (Over.mk (𝟙 (Sp B))) =
-      pullback.snd (Over.mk (𝟙 (Sp B))).hom (Out.thick B J e) ≫ Out.thick B J e := by
+theorem existsUnique_of_isAdicColimit
+    {B : Type} [CommRing B]
+    (J : Ideal B) (h : IsAdicColimit J (Over.mk (𝟙 (Sp B))))
+    (X : Scheme.{0}) (z : ∀ e : ℕ, Sp (B ⧸ J ^ (e + 1)) ⟶ X)
+    (hz : ∀ e : ℕ, Out.thickTrans B J e ≫ z (e + 1) = z e)
+    : ∃! x : Sp B ⟶ X, ∀ e : ℕ, Out.thick B J e ≫ x = z e := by
+  have hι
+      : ∀ e : ℕ,
+        thickι J e (Over.mk (𝟙 (Sp B)))
+          = pullback.snd (Over.mk (𝟙 (Sp B))).hom (Out.thick B J e) ≫ Out.thick B J e := by
     intro e
     have hc := pullback.condition (f := (Over.mk (𝟙 (Sp B))).hom) (g := Out.thick B J e)
     show pullback.fst _ _ = _
@@ -31,14 +35,16 @@ theorem existsUnique_of_isAdicColimit {B : Type} [CommRing B] (J : Ideal B)
       show IsIso (𝟙 _)
       infer_instance
     infer_instance
-  have hmap : ∀ e : ℕ, Out.thickMap B J e (Over.mk (𝟙 (Sp B))) ≫
-      pullback.snd (Over.mk (𝟙 (Sp B))).hom (Out.thick B J (e + 1)) =
-      pullback.snd (Over.mk (𝟙 (Sp B))).hom (Out.thick B J e) ≫ Out.thickTrans B J e := by
+  have hmap
+      : ∀ e : ℕ,
+        Out.thickMap B J e (Over.mk (𝟙 (Sp B)))
+            ≫ pullback.snd (Over.mk (𝟙 (Sp B))).hom (Out.thick B J (e + 1))
+          = pullback.snd (Over.mk (𝟙 (Sp B))).hom (Out.thick B J e) ≫ Out.thickTrans B J e := by
     intro e
-    rw [← cancel_mono (Out.thick B J (e + 1)), Category.assoc, Category.assoc,
-      Out.thickTrans_comp, ← hι, ← hι, thickMap_ι]
-  obtain ⟨g, hg, hu⟩ := h X
-    (fun e => pullback.snd (Over.mk (𝟙 (Sp B))).hom (Out.thick B J e) ≫ z e) (by
+    rw [← cancel_mono (Out.thick B J (e + 1)), Category.assoc, Category.assoc, Out.thickTrans_comp,
+      ← hι, ← hι, thickMap_ι]
+  obtain ⟨g, hg, hu⟩ :=
+    h X (fun e => pullback.snd (Over.mk (𝟙 (Sp B))).hom (Out.thick B J e) ≫ z e) (by
       intro e
       rw [← Category.assoc, hmap, Category.assoc, hz])
   refine ⟨g, fun e => ?_, fun x hx => hu x fun e => ?_⟩

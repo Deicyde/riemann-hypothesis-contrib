@@ -9,11 +9,22 @@ public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
 
 @[expose] public section
 
-open GlobalTheory.TripleGal Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain Polynomial
+open GlobalTheory.TripleGal Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.TripleGal
 
-theorem eps0_unram_frob : ∀ (D : D7) (i : D.ntw.Tw) (v : HeightOneSpectrum (𝓞 D.host.E)), v ∉ placesOver D.host.E (D.ntw.l i) → ∀ A : ValuationSubring D.nd.Om, IsPlaceOver (F := D.host.E) A v → (∀ σ ∈ Ine (F := D.host.E) A, eps0 D.ntw i σ = 1) ∧ ∀ σ : Gen.GE D.nd, IsFrob (F := D.host.E) A (normV v) σ → ((eps0 D.ntw i σ : (D.ntw.O0 i)ˣ) : D.ntw.O0 i) = (normV v : ℕ) := by
+theorem eps0_unram_frob
+    : ∀ (D : D7) (i : D.ntw.Tw) (v : HeightOneSpectrum (𝓞 D.host.E)),
+      v ∉ placesOver D.host.E (D.ntw.l i)
+        → ∀ A : ValuationSubring D.nd.Om,
+          IsPlaceOver (F := D.host.E) A v
+            → (∀ σ ∈ Ine (F := D.host.E) A, eps0 D.ntw i σ = 1)
+              ∧ ∀ σ : Gen.GE D.nd,
+                IsFrob (F := D.host.E) A (normV v) σ
+                  → ((eps0 D.ntw i σ : (D.ntw.O0 i)ˣ) : D.ntw.O0 i) = (normV v : ℕ) := by
   intro D i v hv A hA
   refine ⟨fun σ hσ => ?_, fun σ hσ => ?_⟩
   · have h1 : cycZ D.host.E D.nd.Om (D.ntw.l i) σ = 1 := by

@@ -17,7 +17,8 @@ set_option linter.unusedVariables false
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs
 open PositivityTheory.Rg.BcB.F
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -33,8 +34,9 @@ theorem one_lt_absNorm (w : HeightOneSpectrum (𝓞 E)) : 1 < Ideal.absNorm w.as
     exact w.isPrime.ne_top
   omega
 
-theorem norm_absC_val (x : ℝ) (w : HeightOneSpectrum (𝓞 E)) :
-    ‖(((GlobalTheory.CuspRep.Model.absC E (x : ℂ)).val w : ℂˣ) : ℂ)‖ = ((Ideal.absNorm w.asIdeal : ℕ) : ℝ) ^ (-x) := by
+theorem norm_absC_val (x : ℝ) (w : HeightOneSpectrum (𝓞 E))
+    : ‖(((GlobalTheory.CuspRep.Model.absC E (x : ℂ)).val w : ℂˣ) : ℂ)‖
+      = ((Ideal.absNorm w.asIdeal : ℕ) : ℝ) ^ (-x) := by
   rw [PositivityTheory.Rg.Rs.StrStepB.absC_val]
   have h0 : 0 < (Ideal.absNorm w.asIdeal : ℕ) := by
     have := one_lt_absNorm w

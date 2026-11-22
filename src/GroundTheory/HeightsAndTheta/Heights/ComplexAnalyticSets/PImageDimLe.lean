@@ -21,11 +21,13 @@ theorem ImageDimLe.proof : ImageDimLe.Statement := by
   have : P.IsPrime := hP
   have : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime φ
   obtain ⟨s, hs1, hs2⟩ :=
-    ReciprocityTheory.CA.exists_dim_trdeg_field (K := ℂ) (A := MvPolynomial (Fin m) ℂ ⧸ RingHom.ker φ)
+    ReciprocityTheory.CA.exists_dim_trdeg_field (K := ℂ)
+      (A := MvPolynomial (Fin m) ℂ ⧸ RingHom.ker φ)
   obtain ⟨t, ht1, ht2⟩ :=
     ReciprocityTheory.CA.exists_dim_trdeg_field (K := ℂ) (A := MvPolynomial (Fin n) ℂ ⧸ P)
-  have hle : Algebra.trdeg ℂ (MvPolynomial (Fin m) ℂ ⧸ RingHom.ker φ) ≤
-      Algebra.trdeg ℂ (MvPolynomial (Fin n) ℂ ⧸ P) :=
+  have hle
+      : Algebra.trdeg ℂ (MvPolynomial (Fin m) ℂ ⧸ RingHom.ker φ)
+        ≤ Algebra.trdeg ℂ (MvPolynomial (Fin n) ℂ ⧸ P) :=
     trdeg_le_of_injective (Ideal.kerLiftAlg φ) (Ideal.kerLiftAlg_injective φ)
   rw [hs2, ht2] at hle
   have hst : s ≤ t := by exact_mod_cast hle

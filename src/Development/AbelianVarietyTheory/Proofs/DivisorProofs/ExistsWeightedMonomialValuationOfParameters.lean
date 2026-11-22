@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsResidu
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -23,10 +25,12 @@ noncomputable section
 
 namespace GlobalTheory.MonoVal
 
-theorem isQuasiRegularSeq_of_locModel : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel c Q),
-    letI := hQ.isLocalRing; ∀ (r : ℕ) (z : Fin (r + 1) → Q),
-    IsLocalRing.maximalIdeal Q = Ideal.span (Set.range z) → ringKrullDim Q = r + 1 →
-    IsNoetherianRing Q ∧ IsQuasiRegularSeq Q z := by
+theorem isQuasiRegularSeq_of_locModel
+    : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel c Q),
+      letI := hQ.isLocalRing
+      ∀ (r : ℕ) (z : Fin (r + 1) → Q),
+        IsLocalRing.maximalIdeal Q = Ideal.span (Set.range z) → ringKrullDim Q = r + 1
+          → IsNoetherianRing Q ∧ IsQuasiRegularSeq Q z := by
   intro L _ c Q hQ
   letI := hQ.isLocalRing
   intro r z hm hd
@@ -39,14 +43,17 @@ theorem isQuasiRegularSeq_of_locModel : ∀ {L : Type} [Field L] (c : ℂ →+* 
   · rw [List.length_ofFn, hd]
     norm_cast
 
-def powCoeffMatrix {A : Type} [CommRing A] (n : ℕ) (t : A) (e : Fin n → ℕ) (w : Fin n → A) :
-    Matrix (Fin (n + 1)) (Fin (n + 1)) A :=
-  fun i j => Fin.cases (if j = 0 then 1 else 0)
-    (fun i' => Fin.cases (w i' * ((e i' : A) * t ^ (e i' - 1)))
-      (fun j' => if j' = i' then t ^ e i' else 0) j) i
+def powCoeffMatrix {A : Type} [CommRing A] (n : ℕ) (t : A) (e : Fin n → ℕ) (w : Fin n → A)
+    : Matrix (Fin (n + 1)) (Fin (n + 1)) A := fun i j =>
+  Fin.cases (if j = 0 then 1 else 0)
+    (fun i' =>
+      Fin.cases (w i' * ((e i' : A) * t ^ (e i' - 1)))
+        (fun j' => if j' = i' then t ^ e i' else 0)
+        j)
+    i
 
-theorem powCoeffMatrix_det {A : Type} [CommRing A] (n : ℕ) (t : A) (e : Fin n → ℕ)
-    (w : Fin n → A) : (powCoeffMatrix n t e w).det = t ^ (∑ i, e i) := by
+theorem powCoeffMatrix_det {A : Type} [CommRing A] (n : ℕ) (t : A) (e : Fin n → ℕ) (w : Fin n → A)
+    : (powCoeffMatrix n t e w).det = t ^ (∑ i, e i) := by
   rw [Matrix.det_of_lowerTriangular]
   · rw [Fin.prod_univ_succ]
     simp [powCoeffMatrix, Finset.prod_pow_eq_pow_sum]
@@ -60,14 +67,14 @@ theorem powCoeffMatrix_det {A : Type} [CommRing A] (n : ℕ) (t : A) (e : Fin n 
       induction j using Fin.cases with
       | zero => exact absurd hij (by simp)
       | succ j' =>
-        have : j' ≠ i' := by
-          intro h; subst h; exact lt_irrefl _ hij
+        have : j' ≠ i' := by intro h; subst h; exact lt_irrefl _ hij
         simp [powCoeffMatrix, this]
 
-theorem dForm_cons_pow_mul : ∀ {k A : Type} [CommRing k] [CommRing A] (α : k →+* A) (n : ℕ) (t : A)
-    (e : Fin n → ℕ) (w : Fin n → A),
-    dForm α (Fin.cons t (fun i => t ^ e i * w i) : Fin (n + 1) → A) =
-      t ^ (∑ i, e i) • dForm α (Fin.cons t w : Fin (n + 1) → A) := by
+theorem dForm_cons_pow_mul
+    : ∀ {k A : Type} [CommRing k] [CommRing A] (α : k →+* A) (n : ℕ) (t : A) (e : Fin n → ℕ)
+        (w : Fin n → A),
+      dForm α (Fin.cons t (fun i => t ^ e i * w i) : Fin (n + 1) → A)
+        = t ^ (∑ i, e i) • dForm α (Fin.cons t w : Fin (n + 1) → A) := by
   intro k A _ _ α n t e w
   rw [← powCoeffMatrix_det n t e w]
   apply dForm_eq_det_smul
@@ -84,19 +91,25 @@ theorem dForm_cons_pow_mul : ∀ {k A : Type} [CommRing k] [CommRing A] (α : k 
     congr 1
     rw [mul_smul, mul_smul, ← Nat.cast_smul_eq_nsmul A]
 
-theorem monomial_place : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel c Q), letI := hQ.isLocalRing;
-  ∀ (r N : ℕ) (z : Fin (r + 1) → Q) (wt : Fin (r + 1) → ℕ),
-  IsLocalRing.maximalIdeal Q = Ideal.span (Set.range z) → ringKrullDim Q = r + 1 → wt 0 = 1 → (∀ i, 1 ≤ wt i) →
-  (∃ x : Fin N → L, TrBasis c x) →
-  ∃ V : Place c, V.Contains Q ∧ (∀ q : Q, IsUnit q → V.ord q = 0) ∧ (∀ i, V.ord (z i) = wt i) ∧
-    (∀ (d : ℕ) (q : Q), (q : L) ≠ 0 → q ∈ IsLocalRing.maximalIdeal Q ^ d → (d : ℤ) ≤ V.ord q) ∧
-    ∀ y : Fin N → Q, IsFreeGen Q (dForm (c.codRestrict Q hQ.const_mem) y) →
-      V.formOrd (dForm c (fun i => (y i : L))) + 1 ≤ ∑ i, (wt i : ℤ) := by
+theorem monomial_place
+    : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel c Q),
+      letI := hQ.isLocalRing
+      ∀ (r N : ℕ) (z : Fin (r + 1) → Q) (wt : Fin (r + 1) → ℕ),
+        IsLocalRing.maximalIdeal Q = Ideal.span (Set.range z) → ringKrullDim Q = r + 1 → wt 0 = 1
+          → (∀ i, 1 ≤ wt i) → (∃ x : Fin N → L, TrBasis c x)
+          → ∃ V : Place c,
+            V.Contains Q ∧ (∀ q : Q, IsUnit q → V.ord q = 0) ∧ (∀ i, V.ord (z i) = wt i)
+              ∧ (∀ (d : ℕ) (q : Q),
+                (q : L) ≠ 0 → q ∈ IsLocalRing.maximalIdeal Q ^ d → (d : ℤ) ≤ V.ord q)
+              ∧ ∀ y : Fin N → Q,
+                IsFreeGen Q (dForm (c.codRestrict Q hQ.const_mem) y)
+                  → V.formOrd (dForm c (fun i => (y i : L))) + 1 ≤ ∑ i, (wt i : ℤ) := by
   intro L _ c Q hQ
   letI := hQ.isLocalRing
   intro r N z wt hm hdim hw0 hw1 hx
   obtain ⟨hN, hqr⟩ := isQuasiRegularSeq_of_locModel c Q hQ r z hm hdim
-  obtain ⟨V, hC, u, hu, hirr, hmV, hunit, hloc⟩ := GlobalTheory.T.exists_weightedMonomialPlace_of_isLocModel c Q hQ r z wt hN hm.symm hqr hw0 hw1
+  obtain ⟨V, hC, u, hu, hirr, hmV, hunit, hloc⟩ :=
+    GlobalTheory.T.exists_weightedMonomialPlace_of_isLocModel c Q hQ r z wt hN hm.symm hqr hw0 hw1
   have ht0 : (z 0 : L) ≠ 0 := fun h => hirr.ne_zero (Subtype.ext h)
   have hordt : V.ord (z 0 : L) = 1 := by
     have h := V.ord_irreducible hirr
@@ -104,7 +117,9 @@ theorem monomial_place : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring
   have h1m : (1 : Q) ∉ IsLocalRing.maximalIdeal Q := fun h =>
     (IsLocalRing.maximalIdeal.isMaximal Q).ne_top ((Ideal.eq_top_iff_one _).mpr h)
   have huu : ∀ i, IsUnit (u i) := fun i => by
-    have h := hunit (MvPolynomial.X i) ⟨Finsupp.single i 1, by rw [MvPolynomial.coeff_X, if_pos rfl]; exact h1m⟩
+    have h :=
+      hunit (MvPolynomial.X i)
+        ⟨Finsupp.single i 1, by rw [MvPolynomial.coeff_X, if_pos rfl]; exact h1m⟩
     rw [MvPolynomial.eval₂_X] at h
     exact h
   have hu0 : ∀ i, (u i : L) ≠ 0 := fun i h => (huu i).ne_zero (Subtype.ext h)
@@ -123,7 +138,9 @@ theorem monomial_place : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring
   · have h := V.ord_eq_zero (hq.map φ)
     rwa [hφL] at h
   · intro d q hq0 hq
-    have hmap : Ideal.map φ (IsLocalRing.maximalIdeal Q) ≤ Ideal.span {(⟨z 0, hC _ (z 0).2⟩ : V.ring)} := by
+    have hmap
+        : Ideal.map φ (IsLocalRing.maximalIdeal Q)
+          ≤ Ideal.span {(⟨z 0, hC _ (z 0).2⟩ : V.ring)} := by
       rw [← hirr.maximalIdeal_eq, Ideal.map_le_iff_le_comap]
       intro q hq
       have h := hmV q hq
@@ -146,10 +163,13 @@ theorem monomial_place : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring
 
   · intro y hy
     obtain ⟨xT, hxT⟩ := hx
-    obtain ⟨j, s, hjN, hsu⟩ := GlobalTheory.T.exists_residue_coordinates_of_localModel_below_place c Q hQ N r V hC u ⟨xT, hxT⟩ hmV hunit hloc
+    obtain ⟨j, s, hjN, hsu⟩ :=
+      GlobalTheory.T.exists_residue_coordinates_of_localModel_below_place c Q hQ N r V hC u
+        ⟨xT, hxT⟩ hmV hunit hloc
     subst hjN
-    obtain ⟨w, hw⟩ : ∃ w : Fin (r + j) → V.ring,
-        w = Fin.append u fun i => (⟨s i, hC _ (s i).2⟩ : V.ring) := ⟨_, rfl⟩
+    obtain ⟨w, hw⟩
+        : ∃ w : Fin (r + j) → V.ring, w = Fin.append u fun i => (⟨s i, hC _ (s i).2⟩ : V.ring) :=
+      ⟨_, rfl⟩
     rw [← hw] at hsu
     have hG : IsFreeGen V.ring
         (dForm V.const (Fin.cons ⟨z 0, hC _ (z 0).2⟩ w : Fin (r + j + 1) → V.ring)) := by
@@ -165,39 +185,51 @@ theorem monomial_place : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring
       obtain rfl : r + j = m := by
         have : r + j + 1 = m + 1 := by exact_mod_cast h2
         omega
-      exact isFreeGen_dForm_uniformiser_cons ℂ V.ring V.const (r + j) _ w V.essFiniteType hirr
-        ⟨b⟩ hsu
-    have e1 : dForm c (Fin.cons (z 0 : L) (fun i => (w i : L)) : Fin (r + j + 1) → L) =
-        V.toRat (r + j + 1)
-          (dForm V.const (Fin.cons ⟨z 0, hC _ (z 0).2⟩ w : Fin (r + j + 1) → V.ring)) := by
-      have h := TopForm.formMap_dForm (D := r + j + 1) (α := V.const) (β := c) V.ring.subtype rfl
-        (Fin.cons ⟨z 0, hC _ (z 0).2⟩ w : Fin (r + j + 1) → V.ring)
+      exact isFreeGen_dForm_uniformiser_cons ℂ V.ring V.const (r + j) _ w V.essFiniteType hirr ⟨b⟩
+        hsu
+    have e1
+        : dForm c (Fin.cons (z 0 : L) (fun i => (w i : L)) : Fin (r + j + 1) → L)
+          = V.toRat (r + j + 1)
+            (dForm V.const (Fin.cons ⟨z 0, hC _ (z 0).2⟩ w : Fin (r + j + 1) → V.ring)) := by
+      have h :=
+        TopForm.formMap_dForm (D := r + j + 1) (α := V.const) (β := c) V.ring.subtype rfl
+          (Fin.cons ⟨z 0, hC _ (z 0).2⟩ w : Fin (r + j + 1) → V.ring)
       refine Eq.trans ?_ h.symm
       congr 1
       funext i
       cases i using Fin.cases <;> rfl
     have hθ0 : dForm c (Fin.cons (z 0 : L) (fun i => (w i : L)) : Fin (r + j + 1) → L) ≠ 0 := by
       rw [e1]; exact V.toRat_ne_zero hG
-    have hθ : V.formOrd
-        (dForm c (Fin.cons (z 0 : L) (fun i => (w i : L)) : Fin (r + j + 1) → L)) = 0 := by
+    have hθ
+        : V.formOrd (dForm c (Fin.cons (z 0 : L) (fun i => (w i : L)) : Fin (r + j + 1) → L))
+          = 0 := by
       rw [e1]; exact V.formOrd_toRat hG
-    obtain ⟨a, ha⟩ := hy.2 (dForm (c.codRestrict Q hQ.const_mem)
-      (Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) : Fin (r + j + 1) → Q))
-    have e2 : dForm c (fun i => ((Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) :
-          Fin (r + j + 1) → Q) i : L)) = (a : L) • dForm c (fun i => (y i : L)) := by
-      have h := congrArg (TopForm.formMap (r + j + 1) Q.subtype
-        (α := c.codRestrict Q hQ.const_mem) (β := c) rfl) ha
-      have f1 := TopForm.formMap_dForm (D := r + j + 1) (α := c.codRestrict Q hQ.const_mem) (β := c)
-        Q.subtype rfl y
-      have f2 := TopForm.formMap_dForm (D := r + j + 1) (α := c.codRestrict Q hQ.const_mem) (β := c)
-        Q.subtype rfl (Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) : Fin (r + j + 1) → Q)
+    obtain ⟨a, ha⟩ :=
+      hy.2 (dForm (c.codRestrict Q hQ.const_mem)
+        (Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) : Fin (r + j + 1) → Q))
+    have e2
+        : dForm c (fun i =>
+            ((Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) : Fin (r + j + 1) → Q) i : L))
+          = (a : L) • dForm c (fun i => (y i : L)) := by
+      have h :=
+        congrArg
+          (TopForm.formMap (r + j + 1) Q.subtype (α := c.codRestrict Q hQ.const_mem) (β := c) rfl)
+          ha
+      have f1 :=
+        TopForm.formMap_dForm (D := r + j + 1) (α := c.codRestrict Q hQ.const_mem) (β := c)
+          Q.subtype rfl y
+      have f2 :=
+        TopForm.formMap_dForm (D := r + j + 1) (α := c.codRestrict Q hQ.const_mem) (β := c)
+          Q.subtype rfl (Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) : Fin (r + j + 1) → Q)
       rw [map_smulₛₗ] at h
       exact f2.symm.trans (h.symm.trans (congrArg (Q.subtype a • ·) f1))
-    obtain ⟨e, he⟩ : ∃ e : Fin (r + j) → ℕ,
-        e = Fin.append (fun i => wt i.succ) (fun _ : Fin j => 0) := ⟨_, rfl⟩
-    have e3 : (fun i => ((Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) :
-          Fin (r + j + 1) → Q) i : L)) =
-        (Fin.cons (z 0 : L) (fun i => (z 0 : L) ^ e i * (w i : L)) : Fin (r + j + 1) → L) := by
+    obtain ⟨e, he⟩
+        : ∃ e : Fin (r + j) → ℕ, e = Fin.append (fun i => wt i.succ) (fun _ : Fin j => 0) :=
+      ⟨_, rfl⟩
+    have e3
+        : (fun i =>
+            ((Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) : Fin (r + j + 1) → Q) i : L))
+          = (Fin.cons (z 0 : L) (fun i => (z 0 : L) ^ e i * (w i : L)) : Fin (r + j + 1) → L) := by
       funext i
       refine Fin.cases rfl (fun i => ?_) i
       simp only [Fin.cons_succ]
@@ -208,14 +240,17 @@ theorem monomial_place : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring
     have hsum : ∑ i, e i = ∑ i : Fin r, wt i.succ := by
       rw [he, Fin.sum_univ_add]
       simp
-    have e4 : dForm c (fun i => ((Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) :
-          Fin (r + j + 1) → Q) i : L)) =
-        (z 0 : L) ^ (∑ i : Fin r, wt i.succ) •
-          dForm c (Fin.cons (z 0 : L) (fun i => (w i : L)) : Fin (r + j + 1) → L) := by
+    have e4
+        : dForm c (fun i =>
+            ((Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) : Fin (r + j + 1) → Q) i : L))
+          = (z 0 : L) ^ (∑ i : Fin r, wt i.succ)
+            • dForm c (Fin.cons (z 0 : L) (fun i => (w i : L)) : Fin (r + j + 1) → L) := by
       rw [e3, dForm_cons_pow_mul, hsum]
     have hpow0 : ((z 0 : L) ^ (∑ i : Fin r, wt i.succ)) ≠ 0 := pow_ne_zero _ ht0
-    have hne : dForm c (fun i => ((Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) :
-          Fin (r + j + 1) → Q) i : L)) ≠ 0 := by
+    have hne
+        : dForm c (fun i =>
+            ((Fin.cons (z 0) (Fin.append (fun i => z i.succ) s) : Fin (r + j + 1) → Q) i : L))
+          ≠ 0 := by
       rw [e4]
       exact smul_ne_zero hpow0 hθ0
     have ha0 : (a : L) ≠ 0 := fun h => hne (by rw [e2, h, zero_smul])

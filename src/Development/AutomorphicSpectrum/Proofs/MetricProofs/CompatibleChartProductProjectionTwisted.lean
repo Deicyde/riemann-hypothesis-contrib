@@ -7,17 +7,29 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CompatibleChar
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
-open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
+open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec
+  GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.ChartSwap
 
-theorem chart_swap_keep :
-    ∀ (e n : ℕ) (X Z : Type) [TopologicalSpace X] [TopologicalSpace Z] (A : FinHolAtlas e X) (Ab : FinHolAtlas n Z) (pr : X → Z) (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (kb : Fin Ab.n) (σ : Fin n ↪ Fin e) (ψb : OpenPartialHomeomorph Z (Fin n → ℂ)), IsCompatChart A ψ → IsCompatChart Ab ψb → (∀ x' ∈ ψ.source, pr x' ∈ (Ab.chart kb).source ∧ ∀ i, Ab.chart kb (pr x') i = ψ x' (σ i)) → ∃ ψ' : OpenPartialHomeomorph X (Fin e → ℂ), IsCompatChart A ψ' ∧ ψ'.source = ψ.source ∩ pr ⁻¹' ψb.source ∧ (∀ y ∈ ψ'.source, ∀ i, ψ' y (σ i) = ψb (pr y) i) ∧ ∀ y ∈ ψ'.source, ∀ i, (∀ l, σ l ≠ i) → ψ' y i = ψ y i := by
+theorem chart_swap_keep
+    : ∀ (e n : ℕ) (X Z : Type) [TopologicalSpace X] [TopologicalSpace Z] (A : FinHolAtlas e X)
+        (Ab : FinHolAtlas n Z) (pr : X → Z) (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
+        (kb : Fin Ab.n) (σ : Fin n ↪ Fin e) (ψb : OpenPartialHomeomorph Z (Fin n → ℂ)),
+      IsCompatChart A ψ → IsCompatChart Ab ψb
+        → (∀ x' ∈ ψ.source, pr x' ∈ (Ab.chart kb).source ∧ ∀ i, Ab.chart kb (pr x') i = ψ x' (σ i))
+        → ∃ ψ' : OpenPartialHomeomorph X (Fin e → ℂ),
+          IsCompatChart A ψ' ∧ ψ'.source = ψ.source ∩ pr ⁻¹' ψb.source
+            ∧ (∀ y ∈ ψ'.source, ∀ i, ψ' y (σ i) = ψb (pr y) i)
+            ∧ ∀ y ∈ ψ'.source, ∀ i, (∀ l, σ l ≠ i) → ψ' y i = ψ y i := by
   intro e n X Z _ _ A Ab pr ψ kb σ ψb hψ hb hpr
-  have h₁ : AnalyticOnNhd ℂ ((Ab.chart kb).symm.trans ψb)
-      ((Ab.chart kb).symm.trans ψb).source := by
+  have h₁ : AnalyticOnNhd ℂ ((Ab.chart kb).symm.trans ψb) ((Ab.chart kb).symm.trans ψb).source := by
     intro y hy
     exact (hb kb).1 y hy
   have h₂ : AnalyticOnNhd ℂ ((Ab.chart kb).symm.trans ψb).symm
@@ -27,8 +39,7 @@ theorem chart_swap_keep :
   have hcomp : ∀ y ∈ ψ.source, ψ y ∘ σ = Ab.chart kb (pr y) := fun y hy =>
     funext fun i => ((hpr y hy).2 i).symm
   let T := extendHomeo σ ((Ab.chart kb).symm.trans ψb) h₁ h₂
-  have hTan : ∀ w ∈ T.source, AnalyticAt ℂ T w := fun w hw =>
-    analyticAt_extend_emb σ (h₁ _ hw)
+  have hTan : ∀ w ∈ T.source, AnalyticAt ℂ T w := fun w hw => analyticAt_extend_emb σ (h₁ _ hw)
   have hTsan : ∀ w ∈ T.target, AnalyticAt ℂ T.symm w := fun w hw =>
     analyticAt_extend_emb σ (h₂ _ hw)
   have hsrc : (ψ.trans T).source = ψ.source ∩ pr ⁻¹' ψb.source := by

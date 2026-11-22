@@ -9,7 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FourierTr
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.SeeSaw GlobalTheory.LocMod
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel GlobalTheory.MixModel
+  GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.SeeSaw GlobalTheory.LocMod
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -17,12 +21,17 @@ namespace GlobalTheory.LocFlat.CQLast
 
 open scoped TensorProduct
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   [MeasurableSpace k] [BorelSpace k]
 
-theorem eq_zero_of_hat_eq_zero (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddChar k Circle) (hψ : Continuous ψ)
-    (hne : ψ ≠ 1) {n : Type} [Fintype n] [DecidableEq n] {f : (n → k) → ℂ} (hf : f ∈ SB (n → k))
-    (h0 : ∀ η, GlobalTheory.StepData.hat ψ ν (-1) f η = 0) (a : n → k) : f a = 0 := by
+theorem eq_zero_of_hat_eq_zero
+    (ν : Measure k) [ν.IsAddHaarMeasure]
+    (ψ : AddChar k Circle) (hψ : Continuous ψ) (hne : ψ ≠ 1)
+    {n : Type} [Fintype n] [DecidableEq n]
+    {f : (n → k) → ℂ} (hf : f ∈ SB (n → k)) (h0 : ∀ η, GlobalTheory.StepData.hat ψ ν (-1) f η = 0)
+    (a : n → k)
+    : f a = 0 := by
   classical
   have := GlobalTheory.SplitWeil.secondCountable k
   have := GlobalTheory.SplitWeil.t2Space k
@@ -45,12 +54,14 @@ theorem eq_zero_of_hat_eq_zero (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddC
     rw [← hpsi, neg_add_cancel, AddChar.map_zero_eq_one, Circle.coe_one]
   have hG : ∀ y, ∫ x, g x * (ψ (x ⬝ᵥ y) : ℂ) ∂μ = 0 := by
     intro y
-    have e : ∀ x, g x * (ψ (x ⬝ᵥ y) : ℂ) = (ψ (-(a ⬝ᵥ y)) : ℂ) * (f (x + a) * ψ ((x + a) ⬝ᵥ y)) := by
+    have e
+        : ∀ x, g x * (ψ (x ⬝ᵥ y) : ℂ) = (ψ (-(a ⬝ᵥ y)) : ℂ) * (f (x + a) * ψ ((x + a) ⬝ᵥ y)) := by
       intro x
       rw [add_dotProduct, hpsi, hgdef]
       linear_combination (f (x + a) * (ψ (x ⬝ᵥ y) : ℂ)) * (hpsi' (a ⬝ᵥ y)).symm
     simp_rw [e]
-    rw [integral_const_mul, integral_add_right_eq_self (fun x => f x * (ψ (x ⬝ᵥ y) : ℂ)) a, hF, mul_zero]
+    rw [integral_const_mul, integral_add_right_eq_self (fun x => f x * (ψ (x ⬝ᵥ y) : ℂ)) a, hF,
+      mul_zero]
   obtain ⟨s, hs⟩ := FourierPi.fourier_inversion_pi μ hc hg
   simp only [hG, integral_zero] at hs
   have hpos : ∀ r : kˣ, 0 < μ.real (FourierPi.box n r) := by
@@ -69,8 +80,8 @@ theorem eq_zero_of_hat_eq_zero (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddC
 def withLast {n n' : Type} (x₀ : Matrix n n' k) (y : n → k) : Matrix n (n' ⊕ Unit) k :=
   fromCols x₀ (Matrix.of fun r (_ : Unit) => y r)
 
-theorem withLast_toCols {n n' : Type} (x : Matrix n (n' ⊕ Unit) k) :
-    withLast x.toCols₁ (fun r => x r (Sum.inr ())) = x := by
+theorem withLast_toCols {n n' : Type} (x : Matrix n (n' ⊕ Unit) k)
+    : withLast x.toCols₁ (fun r => x r (Sum.inr ())) = x := by
   ext r (j | u)
   · rfl
   · cases u; rfl
@@ -81,18 +92,24 @@ theorem continuous_withLast {n n' : Type} (x₀ : Matrix n n' k) : Continuous (w
   · simp only [withLast, Matrix.fromCols_apply_inl]; exact continuous_const
   · simp only [withLast, Matrix.fromCols_apply_inr, Matrix.of_apply]; exact continuous_apply i
 
-theorem slice_mem_SB {n n' : Type} [Fintype n] [Fintype n'] {Ψ : Matrix n (n' ⊕ Unit) k → ℂ}
-    (hΨ : Ψ ∈ SB (Matrix n (n' ⊕ Unit) k)) (x₀ : Matrix n n' k) :
-    (fun y : n → k => Ψ (withLast x₀ y)) ∈ SB (n → k) := by
+theorem slice_mem_SB
+    {n n' : Type} [Fintype n] [Fintype n']
+    {Ψ : Matrix n (n' ⊕ Unit) k → ℂ} (hΨ : Ψ ∈ SB (Matrix n (n' ⊕ Unit) k))
+    (x₀ : Matrix n n' k)
+    : (fun y : n → k => Ψ (withLast x₀ y)) ∈ SB (n → k) := by
   have := GlobalTheory.SplitWeil.t2Space k
   have hcl : Topology.IsClosedEmbedding (withLast x₀) :=
-    Function.LeftInverse.isClosedEmbedding (f := fun x : Matrix n (n' ⊕ Unit) k => fun r => x r (Sum.inr ()))
-      (fun y => rfl) (by fun_prop) (continuous_withLast x₀)
+    Function.LeftInverse.isClosedEmbedding
+      (f := fun x : Matrix n (n' ⊕ Unit) k => fun r => x r (Sum.inr ()))
+      (fun y => rfl)
+      (by fun_prop) (continuous_withLast x₀)
   exact ⟨hΨ.1.comp_continuous (continuous_withLast x₀), hΨ.2.comp_isClosedEmbedding hcl⟩
 
-def partialHat (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddChar k Circle) (hψ : Continuous ψ) (n n' : Type)
-    [Fintype n] [Fintype n'] :
-    SB (Matrix n (n' ⊕ Unit) k) →ₗ[ℂ] (Matrix n n' k × (n → k) → ℂ) where
+def partialHat
+    (ν : Measure k) [ν.IsAddHaarMeasure]
+    (ψ : AddChar k Circle) (hψ : Continuous ψ)
+    (n n' : Type) [Fintype n] [Fintype n']
+    : SB (Matrix n (n' ⊕ Unit) k) →ₗ[ℂ] (Matrix n n' k × (n → k) → ℂ) where
   toFun Ψ p := GlobalTheory.StepData.hat ψ ν (-1) (fun y => Ψ.1 (withLast p.1 y)) p.2
   map_add' Ψ Ψ' := by
     funext p
@@ -101,31 +118,41 @@ def partialHat (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddChar k Circle) (h
       (GlobalTheory.StepData.integrable_hat ψ ν (-1) hψ (slice_mem_SB Ψ'.2 p.1) p.2)
   map_smul' a Ψ := by
     funext p
-    simp only [GlobalTheory.StepData.hat, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, mul_assoc]
+    simp only [GlobalTheory.StepData.hat, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul,
+      RingHom.id_apply, mul_assoc]
     exact integral_const_mul a _
 
-theorem partialHat_injective (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddChar k Circle) (hψ : Continuous ψ)
-    (hne : ψ ≠ 1) (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n'] :
-    Function.Injective (partialHat ν ψ hψ n n') := by
+theorem partialHat_injective
+    (ν : Measure k) [ν.IsAddHaarMeasure]
+    (ψ : AddChar k Circle) (hψ : Continuous ψ) (hne : ψ ≠ 1)
+    (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n']
+    : Function.Injective (partialHat ν ψ hψ n n') := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro Ψ h
   ext x
-  have h1 := eq_zero_of_hat_eq_zero ν ψ hψ hne (slice_mem_SB Ψ.2 x.toCols₁)
-    (fun η => congrFun h (x.toCols₁, η)) (fun r => x r (Sum.inr ()))
+  have h1 :=
+    eq_zero_of_hat_eq_zero ν ψ hψ hne (slice_mem_SB Ψ.2 x.toCols₁)
+      (fun η => congrFun h (x.toCols₁, η))
+      (fun r => x r (Sum.inr ()))
   simpa [withLast_toCols] using h1
 
-def coupleBil (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddChar k Circle) (hψ : Continuous ψ) (n n' Z : Type)
-    [Fintype n] [Fintype n'] :
-    SB (Matrix Z n k) →ₗ[ℂ] SB (Matrix n (n' ⊕ Unit) k) →ₗ[ℂ] (Matrix n n' k × Matrix (Z ⊕ Unit) n k → ℂ) :=
-  LinearMap.mk₂ ℂ (fun g Ψ q => g.1 q.2.toRows₁ * partialHat ν ψ hψ n n' Ψ (q.1, q.2 (Sum.inr ())))
+def coupleBil
+    (ν : Measure k) [ν.IsAddHaarMeasure]
+    (ψ : AddChar k Circle) (hψ : Continuous ψ)
+    (n n' Z : Type) [Fintype n] [Fintype n']
+    : SB (Matrix Z n k) →ₗ[ℂ] SB (Matrix n (n' ⊕ Unit) k) →ₗ[ℂ] (Matrix n n' k × Matrix (Z ⊕ Unit) n k → ℂ) :=
+  LinearMap.mk₂ ℂ
+    (fun g Ψ q => g.1 q.2.toRows₁ * partialHat ν ψ hψ n n' Ψ (q.1, q.2 (Sum.inr ())))
     (fun g g' Ψ => by funext q; simp [add_mul])
     (fun a g Ψ => by funext q; simp [mul_assoc])
     (fun g Ψ Ψ' => by funext q; simp [mul_add])
     (fun a g Ψ => by funext q; simp; ring)
 
-theorem coupleBil_injective (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddChar k Circle) (hψ : Continuous ψ)
-    (hne : ψ ≠ 1) (n n' Z : Type) [Fintype n] [DecidableEq n] [Fintype n'] :
-    Function.Injective (TensorProduct.lift (coupleBil ν ψ hψ n n' Z)) := by
+theorem coupleBil_injective
+    (ν : Measure k) [ν.IsAddHaarMeasure]
+    (ψ : AddChar k Circle) (hψ : Continuous ψ) (hne : ψ ≠ 1)
+    (n n' Z : Type) [Fintype n] [DecidableEq n] [Fintype n']
+    : Function.Injective (TensorProduct.lift (coupleBil ν ψ hψ n n' Z)) := by
   classical
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro t ht
@@ -133,8 +160,9 @@ theorem coupleBil_injective (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddChar
   set c := TensorProduct.equivFinsuppOfBasisLeft b t with hc
   have ht' : t = c.sum fun i m => b i ⊗ₜ m := by
     rw [hc, ← TensorProduct.equivFinsuppOfBasisLeft_symm_apply, LinearEquiv.symm_apply_apply]
-  have hm : ∀ (x₀ : Matrix n n' k) (η : n → k) (x : Matrix Z n k),
-      ∑ i ∈ c.support, (b i).1 x * partialHat ν ψ hψ n n' (c i) (x₀, η) = 0 := by
+  have hm
+      : ∀ (x₀ : Matrix n n' k) (η : n → k) (x : Matrix Z n k),
+        ∑ i ∈ c.support, (b i).1 x * partialHat ν ψ hψ n n' (c i) (x₀, η) = 0 := by
     intro x₀ η x
     have hrow : (fromRows x (Matrix.of fun (_ : Unit) r => η r)) (Sum.inr ()) = η := by
       funext r; simp
@@ -148,21 +176,51 @@ theorem coupleBil_injective (ν : Measure k) [ν.IsAddHaarMeasure] (ψ : AddChar
     · have hP : partialHat ν ψ hψ n n' (c i) = partialHat ν ψ hψ n n' 0 := by
         rw [map_zero]
         funext p
-        have hli := (linearIndependent_iff'.mp b.linearIndependent) c.support
-          (fun j => partialHat ν ψ hψ n n' (c j) p)
-          (by
-            ext x
-            simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
-              ZeroMemClass.coe_zero, Pi.zero_apply]
-            rw [← hm p.1 p.2 x]
-            exact Finset.sum_congr rfl (fun j _ => mul_comm _ _)) i hi
+        have hli :=
+          (linearIndependent_iff'.mp b.linearIndependent) c.support
+            (fun j => partialHat ν ψ hψ n n' (c j) p)
+            (by
+              ext x
+              simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply,
+                smul_eq_mul, ZeroMemClass.coe_zero, Pi.zero_apply]
+              rw [← hm p.1 p.2 x]
+              exact Finset.sum_congr rfl (fun j _ => mul_comm _ _))
+            i hi
         simpa using hli
       simpa using partialHat_injective ν ψ hψ hne n n' hP
     · simp [Finsupp.notMem_support_iff.mp hi]
   rw [ht', hzero]
   simp
 
-theorem exists_pair_map : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (ν : Measure k), ν.IsAddHaarMeasure → ∀ (ψk : AddChar k Circle), Continuous ψk → ψk ≠ 1 → ∀ (n n' Z : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'] [Fintype Z] [DecidableEq Z] (M : Type) [AddCommGroup M] [Module ℂ M] (Bl : SB (Matrix Z n k) →ₗ[ℂ] SB (Matrix n (n' ⊕ Unit) k) →ₗ[ℂ] M), ∃ Λ : SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k) →ₗ[ℂ] M, (∀ (Ψ₁ : SB (Matrix n (n' ⊕ Unit) k)) (Ψ₂ : SB (Matrix Z n k)) (Ξ : SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k)), (∀ q, Ξ.1 q = Ψ₂.1 q.2.toRows₁ * GlobalTheory.StepData.hat ψk ν (-1) (fun y => Ψ₁.1 (fromCols q.1 (Matrix.of fun r _ => y r))) (q.2 (Sum.inr ()))) → Λ Ξ = Bl Ψ₂ Ψ₁) ∧ ∀ (Ξ₁ : SB (Matrix n n' k)) (a : SB (Matrix Z n k)) (c : SB (Matrix n Unit k)) (Ψ₁ : SB (Matrix n (n' ⊕ Unit) k)) (Ξ : SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k)), (∀ x, Ψ₁.1 x = Ξ₁.1 x.toCols₁ * c.1 (Matrix.of fun r _ => x r (Sum.inr ()))) → (∀ q, Ξ.1 q = Ξ₁.1 q.1 * (a.1 q.2.toRows₁ * GlobalTheory.StepData.hat ψk ν (-1) (fun y => c.1 (Matrix.of fun r _ => y r)) (q.2 (Sum.inr ())))) → Λ Ξ = Bl a Ψ₁ := by
+theorem exists_pair_map
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (ν : Measure k),
+      ν.IsAddHaarMeasure
+        → ∀ (ψk : AddChar k Circle),
+          Continuous ψk → ψk ≠ 1
+            → ∀ (n n' Z : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
+                [Fintype Z] [DecidableEq Z] (M : Type) [AddCommGroup M] [Module ℂ M]
+                (Bl : SB (Matrix Z n k) →ₗ[ℂ] SB (Matrix n (n' ⊕ Unit) k) →ₗ[ℂ] M),
+              ∃ Λ : SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k) →ₗ[ℂ] M,
+                (∀ (Ψ₁ : SB (Matrix n (n' ⊕ Unit) k)) (Ψ₂ : SB (Matrix Z n k))
+                      (Ξ : SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k)),
+                    (∀ q,
+                        Ξ.1 q
+                          = Ψ₂.1 q.2.toRows₁ * GlobalTheory.StepData.hat ψk ν (-1)
+                            (fun y => Ψ₁.1 (fromCols q.1 (Matrix.of fun r _ => y r)))
+                            (q.2 (Sum.inr ())))
+                      → Λ Ξ = Bl Ψ₂ Ψ₁)
+                  ∧ ∀ (Ξ₁ : SB (Matrix n n' k)) (a : SB (Matrix Z n k)) (c : SB (Matrix n Unit k))
+                      (Ψ₁ : SB (Matrix n (n' ⊕ Unit) k))
+                      (Ξ : SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k)),
+                    (∀ x, Ψ₁.1 x = Ξ₁.1 x.toCols₁ * c.1 (Matrix.of fun r _ => x r (Sum.inr ())))
+                      → (∀ q,
+                        Ξ.1 q
+                          = Ξ₁.1 q.1
+                            * (a.1 q.2.toRows₁ * GlobalTheory.StepData.hat ψk ν (-1)
+                              (fun y => c.1 (Matrix.of fun r _ => y r))
+                              (q.2 (Sum.inr ()))))
+                      → Λ Ξ = Bl a Ψ₁ := by
   intro k _ _ _ _ _ _ ν hν ψk hψ hne n n' Z _ _ _ _ _ _ M _ _ Bl
   classical
   set T := TensorProduct.lift (coupleBil ν ψk hψ n n' Z) with hT
@@ -174,28 +232,38 @@ theorem exists_pair_map : ∀ (k : Type) [Field k] [ValuativeRel k] [Topological
     (SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k)).subtype.restrict (fun x hx => hx)
   let Λ₀ : W →ₗ[ℂ] M := (TensorProduct.lift Bl).comp (eT.symm.toLinearMap.comp res)
   obtain ⟨Λ, hΛ⟩ := LinearMap.exists_extend Λ₀
-  have key : ∀ (Ψ₁ : SB (Matrix n (n' ⊕ Unit) k)) (Ψ₂ : SB (Matrix Z n k))
-      (Ξ : SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k)), Ξ.1 = T (Ψ₂ ⊗ₜ Ψ₁) → Λ Ξ = Bl Ψ₂ Ψ₁ := by
+  have key
+      : ∀ (Ψ₁ : SB (Matrix n (n' ⊕ Unit) k)) (Ψ₂ : SB (Matrix Z n k))
+          (Ξ : SB (Matrix n n' k × Matrix (Z ⊕ Unit) n k)),
+        Ξ.1 = T (Ψ₂ ⊗ₜ Ψ₁) → Λ Ξ = Bl Ψ₂ Ψ₁ := by
     intro Ψ₁ Ψ₂ Ξ hΞ
     have hmem : Ξ ∈ W := ⟨Ψ₂ ⊗ₜ Ψ₁, hΞ.symm⟩
     have h1 := LinearMap.congr_fun hΛ ⟨Ξ, hmem⟩
     simp only [LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype] at h1
     rw [h1]
-    have h2 : res ⟨Ξ, hmem⟩ = eT (Ψ₂ ⊗ₜ Ψ₁) := Subtype.ext (by
-      rw [LinearEquiv.ofInjective_apply]
-      exact hΞ)
-    simp only [Λ₀, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe, h2, LinearEquiv.symm_apply_apply,
-      TensorProduct.lift.tmul]
-  refine ⟨Λ, fun Ψ₁ Ψ₂ Ξ h => key Ψ₁ Ψ₂ Ξ (funext fun q => ?_),
-    fun Ξ₁ a c Ψ₁ Ξ h1 h2 => key Ψ₁ a Ξ (funext fun q => ?_)⟩
+    have h2 : res ⟨Ξ, hmem⟩ = eT (Ψ₂ ⊗ₜ Ψ₁) :=
+      Subtype.ext (by
+        rw [LinearEquiv.ofInjective_apply]
+        exact hΞ)
+    simp only [Λ₀, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe, h2,
+      LinearEquiv.symm_apply_apply, TensorProduct.lift.tmul]
+  refine ⟨
+    Λ,
+    fun Ψ₁ Ψ₂ Ξ h => key Ψ₁ Ψ₂ Ξ (funext fun q => ?_),
+    fun Ξ₁ a c Ψ₁ Ξ h1 h2 => key Ψ₁ a Ξ (funext fun q => ?_)
+  ⟩
   · rw [h q, hT, TensorProduct.lift.tmul]
     rfl
   · rw [h2 q, hT, TensorProduct.lift.tmul]
-    have e : (fun y => Ψ₁.1 (withLast q.1 y)) = fun y => Ξ₁.1 q.1 * c.1 (Matrix.of fun r (_ : Unit) => y r) := by
+    have e
+        : (fun y => Ψ₁.1 (withLast q.1 y))
+          = fun y => Ξ₁.1 q.1 * c.1 (Matrix.of fun r (_ : Unit) => y r) := by
       funext y
       rw [h1]
       rfl
-    change _ = a.1 q.2.toRows₁ * GlobalTheory.StepData.hat ψk ν (-1) (fun y => Ψ₁.1 (withLast q.1 y)) (q.2 (Sum.inr ()))
+    change _
+      = a.1 q.2.toRows₁
+        * GlobalTheory.StepData.hat ψk ν (-1) (fun y => Ψ₁.1 (withLast q.1 y)) (q.2 (Sum.inr ()))
     rw [e]
     simp only [GlobalTheory.StepData.hat, mul_assoc]
     rw [integral_const_mul]

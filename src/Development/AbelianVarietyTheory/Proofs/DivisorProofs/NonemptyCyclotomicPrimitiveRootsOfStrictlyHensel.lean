@@ -5,13 +5,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
-
 open Polynomial in
-theorem prim_of_strictlyHenselian : ∀ (q : ℕ) (A : Type) [CommRing A], SH A → IsUnit (q : A) → Nonempty (Prim q A) := by
+theorem prim_of_strictlyHenselian
+    : ∀ (q : ℕ) (A : Type) [CommRing A], SH A → IsUnit (q : A) → Nonempty (Prim q A) := by
   intro q A _ hSH hq
   obtain ⟨hH, hsep⟩ := hSH
   let k := IsLocalRing.ResidueField A
@@ -24,11 +25,10 @@ theorem prim_of_strictlyHenselian : ∀ (q : ℕ) (A : Type) [CommRing A], SH A 
     · subst h; simp at hqk
     · exact h
   have hsepk : (cyclotomic q k).Separable := separable_cyclotomic q k
-  obtain ⟨a₀, ha₀⟩ := IsSepClosed.exists_root (cyclotomic q k)
-    (degree_cyclotomic_pos q k hq0).ne' hsepk
+  obtain ⟨a₀, ha₀⟩ :=
+    IsSepClosed.exists_root (cyclotomic q k) (degree_cyclotomic_pos q k hq0).ne' hsepk
   have hmap : (cyclotomic q A).map (algebraMap A k) = cyclotomic q k := map_cyclotomic q _
-  have h1 : aeval a₀ (cyclotomic q A) = 0 := by
-    rw [aeval_def, eval₂_eq_eval_map, hmap]; exact ha₀
+  have h1 : aeval a₀ (cyclotomic q A) = 0 := by rw [aeval_def, eval₂_eq_eval_map, hmap]; exact ha₀
   have h2 : aeval a₀ (derivative (cyclotomic q A)) ≠ 0 := by
     rw [aeval_def, eval₂_eq_eval_map, ← derivative_map, hmap]
     have := hsepk.aeval_derivative_ne_zero (x := a₀) (by simpa [aeval_def] using ha₀)

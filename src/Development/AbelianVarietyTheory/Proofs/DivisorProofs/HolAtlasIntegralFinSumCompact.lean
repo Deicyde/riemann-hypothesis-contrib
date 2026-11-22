@@ -37,7 +37,8 @@ set_option autoImplicit false in
 open Set Matrix MeasureTheory in
 open scoped ComplexOrder in
 variable {M : Type} [TopologicalSpace M] {n : ℕ} (A : _root_.GlobalTheory.CxForm.HolAtlas M n) in
-variable [CompactSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] in
+variable
+  [CompactSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] in
 private theorem integral_zero_fld : A.integral 0 = 0 := by
   have h := A.integral_sub_of_isForm 0 0 (isForm_zero' A) (isForm_zero' A)
   simpa using h
@@ -46,9 +47,8 @@ set_option autoImplicit false in
 open Set Matrix MeasureTheory in
 open scoped ComplexOrder in
 variable {M : Type} [TopologicalSpace M] {n : ℕ} (A : _root_.GlobalTheory.CxForm.HolAtlas M n) in
-private theorem isForm_add' {α β : A.Fld}
-    (ha : A.IsForm α) (hb : A.IsForm β) :
-    A.IsForm (α + β) := by
+private theorem isForm_add' {α β : A.Fld} (ha : A.IsForm α) (hb : A.IsForm β)
+    : A.IsForm (α + β) := by
   constructor
   · intro i S
     have h1 := ha.smooth i S
@@ -66,9 +66,8 @@ set_option autoImplicit false in
 open Set Matrix MeasureTheory in
 open scoped ComplexOrder in
 variable {M : Type} [TopologicalSpace M] {n : ℕ} (A : _root_.GlobalTheory.CxForm.HolAtlas M n) in
-private theorem isForm_sub' {α β : A.Fld}
-    (ha : A.IsForm α) (hb : A.IsForm β) :
-    A.IsForm (α - β) := by
+private theorem isForm_sub' {α β : A.Fld} (ha : A.IsForm α) (hb : A.IsForm β)
+    : A.IsForm (α - β) := by
   constructor
   · intro i S
     have h1 := ha.smooth i S
@@ -86,13 +85,11 @@ set_option autoImplicit false in
 open Set Matrix MeasureTheory in
 open scoped ComplexOrder in
 variable {M : Type} [TopologicalSpace M] {n : ℕ} (A : _root_.GlobalTheory.CxForm.HolAtlas M n) in
-variable [CompactSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] in
-private theorem integral_add_of_isForm {α β : A.Fld}
-    (ha : A.IsForm α) (hb : A.IsForm β) :
-    A.integral (α + β) =
-      A.integral α + A.integral β := by
-  have hnb : A.IsForm (0 - β) :=
-    isForm_sub' A (isForm_zero' A) hb
+variable
+  [CompactSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] in
+private theorem integral_add_of_isForm {α β : A.Fld} (ha : A.IsForm α) (hb : A.IsForm β)
+    : A.integral (α + β) = A.integral α + A.integral β := by
+  have hnb : A.IsForm (0 - β) := isForm_sub' A (isForm_zero' A) hb
   have h := A.integral_sub_of_isForm α (0 - β) ha hnb
   have h0 := A.integral_sub_of_isForm 0 β (isForm_zero' A) hb
   rw [integral_zero_fld A] at h0
@@ -104,11 +101,11 @@ set_option autoImplicit false in
 open Set Matrix MeasureTheory in
 open scoped ComplexOrder in
 variable {M : Type} [TopologicalSpace M] {n : ℕ} (A : _root_.GlobalTheory.CxForm.HolAtlas M n) in
-variable [CompactSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] in
-private theorem isForm_and_integral_finset_sum {ι : Type} (s : Finset ι)
-    (α : ι → A.Fld) (hα : ∀ j ∈ s, A.IsForm (α j)) :
-    A.IsForm (∑ j ∈ s, α j) ∧
-      A.integral (∑ j ∈ s, α j) = ∑ j ∈ s, A.integral (α j) := by
+variable
+  [CompactSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] in
+private theorem isForm_and_integral_finset_sum
+    {ι : Type} (s : Finset ι) (α : ι → A.Fld) (hα : ∀ j ∈ s, A.IsForm (α j))
+    : A.IsForm (∑ j ∈ s, α j) ∧ A.integral (∑ j ∈ s, α j) = ∑ j ∈ s, A.integral (α j) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using ⟨isForm_zero' A, integral_zero_fld A⟩
@@ -119,13 +116,12 @@ private theorem isForm_and_integral_finset_sum {ι : Type} (s : Finset ι)
     refine ⟨isForm_add' A hA hs.1, ?_⟩
     rw [integral_add_of_isForm A hA hs.1, hs.2]
 
-
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.CxForm.IntegralSum.integral_sum : ∀ {M : Type} [TopologicalSpace M] [CompactSpace M]
-    [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] {n : ℕ}
-    (A : _root_.GlobalTheory.CxForm.HolAtlas M n) {N : ℕ} (α : Fin N → A.Fld),
-    (∀ j, A.IsForm (α j)) →
-      A.integral (∑ j, α j) = ∑ j, A.integral (α j) := by
+theorem _root_.GlobalTheory.CxForm.IntegralSum.integral_sum
+    : ∀ {M : Type} [TopologicalSpace M] [CompactSpace M] [T2Space M] [SecondCountableTopology M]
+        [MeasurableSpace M] [BorelSpace M] {n : ℕ} (A : _root_.GlobalTheory.CxForm.HolAtlas M n)
+        {N : ℕ} (α : Fin N → A.Fld),
+      (∀ j, A.IsForm (α j)) → A.integral (∑ j, α j) = ∑ j, A.integral (α j) := by
   intro M _ _ _ _ _ _ n A N α hα
   exact (isForm_and_integral_finset_sum A Finset.univ α (fun j _ => hα j)).2
 

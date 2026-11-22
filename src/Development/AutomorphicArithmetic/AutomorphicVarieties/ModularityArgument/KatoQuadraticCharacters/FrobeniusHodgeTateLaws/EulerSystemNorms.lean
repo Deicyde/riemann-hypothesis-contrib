@@ -6,9 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open UpperTheory.V.Z.Kato.Joint Topology Filter
 
-private theorem mem_fixingSubgroup_of_fixes_finite_set (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω]
-    (E : IntermediateField K Ω) [FiniteDimensional K E] :
-    ∃ T : Finset Ω, ∀ g : Ω ≃ₐ[K] Ω, (∀ x ∈ T, g x = x) → g ∈ E.fixingSubgroup := by
+private theorem mem_fixingSubgroup_of_fixes_finite_set
+    (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω]
+    (E : IntermediateField K Ω) [FiniteDimensional K E]
+    : ∃ T : Finset Ω, ∀ g : Ω ≃ₐ[K] Ω, (∀ x ∈ T, g x = x) → g ∈ E.fixingSubgroup := by
   have h1 : (Subalgebra.toSubmodule E.toSubalgebra).FG :=
     Module.Finite.iff_fg.1 (inferInstanceAs (Module.Finite K E))
   obtain ⟨t, ht⟩ := h1
@@ -27,13 +28,17 @@ private theorem mem_fixingSubgroup_of_fixes_finite_set (K Ω : Type) [Field K] [
   rw [AlgHom.mem_equalizer] at hx3
   simpa using hx3
 
-private theorem uniform_continuity_galois_group (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [IsGalois K Ω] {X : Type} [NormedAddCommGroup X]
-    (f : (Ω ≃ₐ[K] Ω) → X) (hf : Continuous f) (δ : ℝ) (hδ : 0 < δ) :
-    ∃ E0 : Finset Ω, ∀ s s' : Ω ≃ₐ[K] Ω, (∀ x ∈ E0, s' x = x) → ‖f (s * s') - f s‖ < δ := by
+private theorem uniform_continuity_galois_group
+    (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [IsGalois K Ω]
+    {X : Type} [NormedAddCommGroup X]
+    (f : (Ω ≃ₐ[K] Ω) → X) (hf : Continuous f)
+    (δ : ℝ) (hδ : 0 < δ)
+    : ∃ E0 : Finset Ω, ∀ s s' : Ω ≃ₐ[K] Ω, (∀ x ∈ E0, s' x = x) → ‖f (s * s') - f s‖ < δ := by
   classical
   have hδ2 : 0 < δ / 2 := half_pos hδ
-  have key : ∀ s : Ω ≃ₐ[K] Ω, ∃ E : IntermediateField K Ω, FiniteDimensional K E ∧
-      ∀ g ∈ E.fixingSubgroup, ‖f (s * g) - f s‖ < δ / 2 := by
+  have key
+      : ∀ s : Ω ≃ₐ[K] Ω, ∃ E : IntermediateField K Ω,
+        FiniteDimensional K E ∧ ∀ g ∈ E.fixingSubgroup, ‖f (s * g) - f s‖ < δ / 2 := by
     intro s
     have hc : Continuous fun g : Ω ≃ₐ[K] Ω => ‖f (s * g) - f s‖ :=
       ((hf.comp (continuous_const.mul continuous_id)).sub continuous_const).norm
@@ -46,7 +51,8 @@ private theorem uniform_continuity_galois_group (K Ω : Type) [Field K] [Field �
   have hUo : ∀ i, IsOpen (U i) := by
     intro i
     haveI := hEf i
-    exact (IntermediateField.fixingSubgroup_isOpen (E i)).preimage (continuous_const.mul continuous_id)
+    exact (IntermediateField.fixingSubgroup_isOpen (E i)).preimage
+      (continuous_const.mul continuous_id)
   have hUc : Set.univ ⊆ ⋃ i, U i := by
     intro h _
     refine Set.mem_iUnion.2 ⟨h, ?_⟩
@@ -54,7 +60,8 @@ private theorem uniform_continuity_galois_group (K Ω : Type) [Field K] [Field �
     rw [inv_mul_cancel]
     exact one_mem _
   obtain ⟨S, hS⟩ := isCompact_univ.elim_finite_subcover U hUo hUc
-  have hT : ∀ i, ∃ T : Finset Ω, ∀ g : Ω ≃ₐ[K] Ω, (∀ x ∈ T, g x = x) → g ∈ (E i).fixingSubgroup := by
+  have hT
+      : ∀ i, ∃ T : Finset Ω, ∀ g : Ω ≃ₐ[K] Ω, (∀ x ∈ T, g x = x) → g ∈ (E i).fixingSubgroup := by
     intro i
     haveI := hEf i
     exact mem_fixingSubgroup_of_fixes_finite_set K Ω (E i)
@@ -73,8 +80,7 @@ private theorem uniform_continuity_galois_group (K Ω : Type) [Field K] [Field �
   have := norm_sub_le (f (s * s') - f i) (f s - f i)
   linarith
 
-theorem UpperTheory.V.Z.Kato.Joint.unif :
-    UpperTheory.V.Z.Kato.Joint.Unif := by
+theorem UpperTheory.V.Z.Kato.Joint.unif : UpperTheory.V.Z.Kato.Joint.Unif := by
   intro l _ Ω _ _ _ f hf δ hδ
   haveI : IsGalois ℚ Ω := inferInstance
   exact uniform_continuity_galois_group ℚ Ω f hf δ hδ

@@ -7,7 +7,11 @@ public import Mathlib
 open scoped NNReal ENNReal
 open MeasureTheory
 
-theorem GlobalTheory.unimodular_of_isFundamentalDomain_finite : ∀ (S : Type) [Group S] [TopologicalSpace S] [IsTopologicalGroup S] [LocallyCompactSpace S] [T2Space S] [SecondCountableTopology S] [MeasurableSpace S] [BorelSpace S] (Γ : Subgroup S) [Countable Γ] (μS : Measure S) (𝓢 : Set S), μS.IsHaarMeasure → IsFundamentalDomain Γ 𝓢 μS → μS 𝓢 ≠ ⊤ → μS.IsMulRightInvariant := by
+theorem GlobalTheory.unimodular_of_isFundamentalDomain_finite
+    : ∀ (S : Type) [Group S] [TopologicalSpace S] [IsTopologicalGroup S] [LocallyCompactSpace S]
+        [T2Space S] [SecondCountableTopology S] [MeasurableSpace S] [BorelSpace S] (Γ : Subgroup S)
+        [Countable Γ] (μS : Measure S) (𝓢 : Set S),
+      μS.IsHaarMeasure → IsFundamentalDomain Γ 𝓢 μS → μS 𝓢 ≠ ⊤ → μS.IsMulRightInvariant := by
   intro S _ _ _ _ _ _ _ _ Γ _ μS 𝓢 hH hF hfin
   haveI : SMulInvariantMeasure Γ S μS :=
     ⟨fun c s _ => by
@@ -25,7 +29,8 @@ theorem GlobalTheory.unimodular_of_isFundamentalDomain_finite : ∀ (S : Type) [
       exact mul_assoc _ _ _
   have heq : μS ((fun x => x * g) ⁻¹' 𝓢) = μS 𝓢 := hF'.measure_eq hF
   have h2 : (Measure.map (fun x => x * g) μS) 𝓢 = μS 𝓢 := by
-    rw [show (fun x : S => x * g) = ⇑(MeasurableEquiv.mulRight g) from rfl, MeasurableEquiv.map_apply]
+    rw [show (fun x : S => x * g) = ⇑(MeasurableEquiv.mulRight g) from rfl,
+      MeasurableEquiv.map_apply]
     exact heq
   rw [hmap] at h2
   rw [Measure.smul_apply] at h2

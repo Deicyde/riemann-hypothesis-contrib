@@ -16,13 +16,16 @@ theorem absSolve : AbsSolve := by
   classical
   let ψ : (J →₀ ℂ) →ₗ[ℂ] (I →₀ ℂ) := Finsupp.linearCombination ℂ L
   let φ : (J →₀ ℂ) →ₗ[ℂ] ℂ := Finsupp.linearCombination ℂ c
-  have hsum : ∀ (b : I → ℂ) (v : I →₀ ℂ),
-      (v.sum fun i x => x * b i) = Finsupp.linearCombination ℂ b v := by
+  have hsum
+      : ∀ (b : I → ℂ) (v : I →₀ ℂ),
+        (v.sum fun i x => x * b i) = Finsupp.linearCombination ℂ b v := by
     intro b v
     rw [Finsupp.linearCombination_apply]
     rfl
-  have hcomp : ∀ (b : I → ℂ), (Finsupp.linearCombination ℂ b) ∘ₗ ψ
-      = Finsupp.linearCombination ℂ (fun j => Finsupp.linearCombination ℂ b (L j)) := by
+  have hcomp
+      : ∀ (b : I → ℂ),
+        (Finsupp.linearCombination ℂ b) ∘ₗ ψ
+          = Finsupp.linearCombination ℂ (fun j => Finsupp.linearCombination ℂ b (L j)) := by
     intro b
     apply Finsupp.lhom_ext
     intro j x
@@ -46,8 +49,8 @@ theorem absSolve : AbsSolve := by
     simp only [h0] at hT
     exact tendsto_nhds_unique hT tendsto_const_nhds
   let f0 : LinearMap.range ψ →ₗ[ℂ] ℂ :=
-    ((LinearMap.ker ψ).liftQ φ hker) ∘ₗ
-      (ψ.quotKerEquivRange.symm : LinearMap.range ψ →ₗ[ℂ] (J →₀ ℂ) ⧸ LinearMap.ker ψ)
+    ((LinearMap.ker ψ).liftQ φ hker)
+      ∘ₗ (ψ.quotKerEquivRange.symm : LinearMap.range ψ →ₗ[ℂ] (J →₀ ℂ) ⧸ LinearMap.ker ψ)
   obtain ⟨g, hg⟩ := LinearMap.exists_extend f0
   have hgψ : ∀ a, g (ψ a) = φ a := by
     intro a

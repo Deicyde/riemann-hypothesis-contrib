@@ -13,16 +13,19 @@ open PowerSeries
 
 theorem unit_coefficient_power_mod : UnitCoefficientPowerMod := by
   intro O _ ℓ ε u y
-  have hsplit : ∃ W : PowerSeries O,
-      (Formalism.WindowSums.p1 ℓ ε u) ^ y = (u * X ^ ℓ) ^ y + C (ℓ : O) * W := by
+  have hsplit
+      : ∃ W : PowerSeries O,
+        (Formalism.WindowSums.p1 ℓ ε u) ^ y = (u * X ^ ℓ) ^ y + C (ℓ : O) * W := by
     obtain ⟨V, hV⟩ := sub_dvd_pow_sub_pow (Formalism.WindowSums.p1 ℓ ε u) (u * X ^ ℓ) y
     refine ⟨ε * V, ?_⟩
-    have : Formalism.WindowSums.p1 ℓ ε u - u * X ^ ℓ = C (ℓ : O) * ε := by unfold Formalism.WindowSums.p1; ring
+    have : Formalism.WindowSums.p1 ℓ ε u - u * X ^ ℓ = C (ℓ : O) * ε := by
+      unfold Formalism.WindowSums.p1; ring
     rw [this] at hV
     linear_combination hV
   obtain ⟨W, hW⟩ := hsplit
-  have hc : coeff (ℓ * y) ((Formalism.WindowSums.p1 ℓ ε u) ^ y) =
-      constantCoeff u ^ y + (ℓ : O) * coeff (ℓ * y) W := by
+  have hc
+      : coeff (ℓ * y) ((Formalism.WindowSums.p1 ℓ ε u) ^ y)
+        = constantCoeff u ^ y + (ℓ : O) * coeff (ℓ * y) W := by
     rw [hW, map_add (f := _), coeff_C_mul, mul_pow, ← pow_mul, mul_comm ℓ y]
     have := coeff_mul_X_pow (u ^ y) (y * ℓ) 0
     rw [zero_add] at this

@@ -8,9 +8,9 @@ namespace GlobalTheory.NonzeroMultipleInSpan
 
 open NumberField
 
-theorem exists_ne_zero_smul_mem_span {LL : Type} [Field LL] [NumberField LL] {n : ℕ}
-    (T : Set (Fin n → LL)) :
-    ∀ x ∈ Submodule.span LL T, ∃ d : 𝓞 LL, d ≠ 0 ∧ d • x ∈ Submodule.span (𝓞 LL) T := by
+theorem exists_ne_zero_smul_mem_span
+    {LL : Type} [Field LL] [NumberField LL] {n : ℕ} (T : Set (Fin n → LL))
+    : ∀ x ∈ Submodule.span LL T, ∃ d : 𝓞 LL, d ≠ 0 ∧ d • x ∈ Submodule.span (𝓞 LL) T := by
   intro x hx
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using Submodule.subset_span hy⟩

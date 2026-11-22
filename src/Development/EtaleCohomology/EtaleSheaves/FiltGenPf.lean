@@ -94,10 +94,10 @@ lemma δ_desc {K L I : CochainComplex C ℤ} (φ : K ⟶ L) {m n n' : ℤ} (h : 
   mappingCone.δ_descCochain φ α β h n' hn'
 
 def V {K L I : CochainComplex C ℤ} (φ : K ⟶ L) (k n : ℤ) (z : Cochain (mappingCone φ) I n) : Prop :=
-  (∀ p q (hpq : p + (n - 1) = q), k < p →
-    ((mappingCone.inl φ).comp z (show -1 + n = n - 1 by omega)).v p q hpq = 0) ∧
-  (∀ p q (hpq : p + n = q), k < p →
-    ((Cochain.ofHom (mappingCone.inr φ)).comp z (zero_add n)).v p q hpq = 0)
+  (∀ p q (hpq : p + (n - 1) = q),
+      k < p → ((mappingCone.inl φ).comp z (show -1 + n = n - 1 by omega)).v p q hpq = 0)
+    ∧ (∀ p q (hpq : p + n = q),
+      k < p → ((Cochain.ofHom (mappingCone.inr φ)).comp z (zero_add n)).v p q hpq = 0)
 
 lemma step {K L I : CochainComplex C ℤ} (φ : K ⟶ L) (k n : ℤ)
     (hk : Subsingleton (CohomologyClass (mappingCone

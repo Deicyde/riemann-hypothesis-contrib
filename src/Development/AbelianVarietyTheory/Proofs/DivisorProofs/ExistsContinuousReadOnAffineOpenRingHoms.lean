@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
 
 set_option autoImplicit false
@@ -21,8 +22,11 @@ namespace GlobalTheory.ContRead
 
 variable {k : Type} [CommRing k] {X : Scheme.{0}} {p : X ⟶ Sp k} {U : X.Opens}
 
-theorem val_eq_of_evHom_eq (hU : IsAffineOpen U) {σ τ : k →+* ℂ} {y : CxPts p σ} {z : CxPts p τ}
-    (hy : y ∈ ptsIn p σ U) (hz : z ∈ ptsIn p τ U) (e : evHom hy = evHom hz) : y.1 = z.1 := by
+theorem val_eq_of_evHom_eq
+    (hU : IsAffineOpen U)
+    {σ τ : k →+* ℂ} {y : CxPts p σ} {z : CxPts p τ}
+    (hy : y ∈ ptsIn p σ U) (hz : z ∈ ptsIn p τ U) (e : evHom hy = evHom hz)
+    : y.1 = z.1 := by
   have e₁ : y.1.appLE U ⊤ hy = z.1.appLE U ⊤ hz := by
     rw [← cancel_mono (Scheme.ΓSpecIso (CommRingCat.of ℂ)).hom]
     exact CommRingCat.hom_ext e
@@ -31,20 +35,38 @@ theorem val_eq_of_evHom_eq (hU : IsAffineOpen U) {σ τ : k →+* ℂ} {y : CxPt
   rw [e₁, a', IsAffineOpen.fromSpec_top] at a
   exact ((cancel_epi _).1 a).symm
 
-theorem eq_of_val_eq (u : ∀ σ : k →+* ℂ, CxPts p σ → ℝ) {σ τ : k →+* ℂ} (e : σ = τ)
-    (y : CxPts p σ) (z : CxPts p τ) (h : y.1 = z.1) : u σ y = u τ z := by
+theorem eq_of_val_eq
+    (u : ∀ σ : k →+* ℂ, CxPts p σ → ℝ)
+    {σ τ : k →+* ℂ} (e : σ = τ) (y : CxPts p σ) (z : CxPts p τ) (h : y.1 = z.1)
+    : u σ y = u τ z := by
   subst e
   rw [Subtype.ext h]
 
-theorem evHom_ofHom (hU : IsAffineOpen U) {σ : k →+* ℂ} (φ : Γ(X, U) →+* ℂ)
-    (h : ∀ a, φ (algX p U a) = σ a) : evHom (ofHom_mem hU φ h) = φ :=
+theorem evHom_ofHom
+    (hU : IsAffineOpen U) {σ : k →+* ℂ} (φ : Γ(X, U) →+* ℂ) (h : ∀ a, φ (algX p U a) = σ a)
+    : evHom (ofHom_mem hU φ h) = φ :=
   RingHom.ext fun f => (ev_eq _ f).symm.trans (ev_ofHom hU φ h f)
 
-theorem evHom_comp_algX {σ : k →+* ℂ} {y : CxPts p σ} (hy : y ∈ ptsIn p σ U) :
-    (evHom hy).comp (algX p U) = σ :=
+theorem evHom_comp_algX {σ : k →+* ℂ} {y : CxPts p σ} (hy : y ∈ ptsIn p σ U)
+    : (evHom hy).comp (algX p U) = σ :=
   RingHom.ext fun a => (ev_eq hy _).symm.trans (ev_algX hy a)
 
-theorem exists_continuous_read : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ), IsArithVar p D → ∀ (U : X.Opens) (hU : IsAffineOpen U) (u : ∀ σ : k →+* ℂ, CxPts p σ → ℝ), (∀ σ, ContinuousOn (u σ) (ptsIn p σ U)) → (letI : TopologicalSpace (Γ(X, U) →+* ℂ) := TopologicalSpace.induced (fun x : Γ(X, U) →+* ℂ => (x : Γ(X, U) → ℂ)) inferInstance; ∃ ψ : (Γ(X, U) →+* ℂ) → ℝ, Continuous ψ ∧ (∀ (σ : k →+* ℂ) (y : CxPts p σ) (hy : y ∈ ptsIn p σ U), ψ (evHom hy) = u σ y) ∧ (∀ x : Γ(X, U) →+* ℂ, ∃ (σ : k →+* ℂ) (y : CxPts p σ) (hy : y ∈ ptsIn p σ U), evHom hy = x) ∧ ∀ (σ : k →+* ℂ) (y : CxPts p σ) (hy : y ∈ ptsIn p σ U) (W : Set (Γ(X, U) →+* ℂ)), W ∈ 𝓝 (evHom hy) → {z : CxPts p σ | ∃ hz : z ∈ ptsIn p σ U, evHom hz ∈ W} ∈ 𝓝 y) := by
+theorem exists_continuous_read
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D
+        → ∀ (U : X.Opens) (hU : IsAffineOpen U) (u : ∀ σ : k →+* ℂ, CxPts p σ → ℝ),
+          (∀ σ, ContinuousOn (u σ) (ptsIn p σ U))
+            → (letI : TopologicalSpace (Γ(X, U) →+* ℂ) :=
+                 TopologicalSpace.induced (fun x : Γ(X, U) →+* ℂ => (x : Γ(X, U) → ℂ)) inferInstance
+               ∃ ψ : (Γ(X, U) →+* ℂ) → ℝ,
+                 Continuous ψ
+                   ∧ (∀ (σ : k →+* ℂ) (y : CxPts p σ) (hy : y ∈ ptsIn p σ U), ψ (evHom hy) = u σ y)
+                   ∧ (∀ x : Γ(X, U) →+* ℂ, ∃ (σ : k →+* ℂ) (y : CxPts p σ) (hy : y ∈ ptsIn p σ U),
+                     evHom hy = x)
+                   ∧ ∀ (σ : k →+* ℂ) (y : CxPts p σ) (hy : y ∈ ptsIn p σ U)
+                       (W : Set (Γ(X, U) →+* ℂ)),
+                     W ∈ 𝓝 (evHom hy)
+                       → {z : CxPts p σ | ∃ hz : z ∈ ptsIn p σ U, evHom hz ∈ W} ∈ 𝓝 y) := by
   intro k _ X _ p D hX U hU u hu
   letI : TopologicalSpace (Γ(X, U) →+* ℂ) :=
     TopologicalSpace.induced (fun x : Γ(X, U) →+* ℂ => (x : Γ(X, U) → ℂ)) inferInstance
@@ -62,8 +84,8 @@ theorem exists_continuous_read : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [I
         push_neg at hc
         exact h (RingHom.ext hc)
       choose! a ha using hex
-      have hopen : ∀ τ : k →+* ℂ,
-          {x : Γ(X, U) →+* ℂ | τ ≠ σ₀ → x (algX p U (a τ)) ≠ τ (a τ)} ∈ 𝓝 x₀ := by
+      have hopen
+          : ∀ τ : k →+* ℂ, {x : Γ(X, U) →+* ℂ | τ ≠ σ₀ → x (algX p U (a τ)) ≠ τ (a τ)} ∈ 𝓝 x₀ := by
         intro τ
         by_cases hτ : τ = σ₀
         · exact Filter.Eventually.of_forall fun x h => (h hτ).elim
@@ -75,8 +97,10 @@ theorem exists_continuous_read : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [I
       by_contra hne
       exact (Set.mem_iInter.1 hx _) hne rfl
     let F : (Γ(X, U) →+* ℂ) → CxPts p σ₀ := fun x =>
-      if h : x.comp (algX p U) = σ₀ then ofHom hU x (fun a => RingHom.congr_fun h a)
-      else ofHom hU x₀ (fun a => RingHom.congr_fun hσ₀ a)
+      if h : x.comp (algX p U) = σ₀ then
+        ofHom hU x (fun a => RingHom.congr_fun h a)
+      else
+        ofHom hU x₀ (fun a => RingHom.congr_fun hσ₀ a)
     have hF0 : F x₀ = ofHom hU x₀ (fun a => RingHom.congr_fun hσ₀ a) := dif_pos hσ₀
     have hFmem : ∀ x, F x ∈ ptsIn p σ₀ U := fun x => by
       by_cases h : x.comp (algX p U) = σ₀
@@ -85,8 +109,8 @@ theorem exists_continuous_read : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [I
     have hF : ContinuousAt F x₀ := by
       refine tendsto_subtype_rng.2 ?_
       rw [hF0]
-      refine GlobalTheory.Points.tendsto_of_isAffineOpen hU (ofHom_mem hU x₀ _) (Filter.Eventually.of_forall hFmem)
-        fun f => ?_
+      refine GlobalTheory.Points.tendsto_of_isAffineOpen hU (ofHom_mem hU x₀ _)
+        (Filter.Eventually.of_forall hFmem) fun f => ?_
       have e : ∀ᶠ x in 𝓝 x₀, x f = valR (F x).1 U f := by
         filter_upwards [hN] with x hx
         simp only [F, dif_pos hx]

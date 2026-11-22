@@ -9,13 +9,17 @@ open IsLocalRing TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem etale_localization_of_cokernel_killed (S : Type) [CommRing S] (A B : Type) [CommRing A]
-    [CommRing B] [Algebra S A] [Algebra S B] (ι : A →ₐ[S] B) (hι : Function.Injective ι)
-    (p : Ideal S) [p.IsPrime] (s : S) (hs : s ∉ p) (hB : ∀ y : B, s • y ∈ ι.range)
-    (hA : Algebra.Etale (Localization.AtPrime p) (TensorProduct S (Localization.AtPrime p) A)) :
-    Algebra.Etale (Localization.AtPrime p) (TensorProduct S (Localization.AtPrime p) B) := by
-  let Φ : TensorProduct S (Localization.AtPrime p) A →ₐ[Localization.AtPrime p]
-      TensorProduct S (Localization.AtPrime p) B :=
+theorem etale_localization_of_cokernel_killed
+    (S : Type) [CommRing S]
+    (A B : Type) [CommRing A] [CommRing B] [Algebra S A] [Algebra S B]
+    (ι : A →ₐ[S] B) (hι : Function.Injective ι)
+    (p : Ideal S) [p.IsPrime]
+    (s : S) (hs : s ∉ p) (hB : ∀ y : B, s • y ∈ ι.range)
+    (hA : Algebra.Etale (Localization.AtPrime p) (TensorProduct S (Localization.AtPrime p) A))
+    : Algebra.Etale (Localization.AtPrime p) (TensorProduct S (Localization.AtPrime p) B) := by
+  let Φ
+      : TensorProduct S (Localization.AtPrime p) A →ₐ[Localization.AtPrime p]
+        TensorProduct S (Localization.AtPrime p) B :=
     Algebra.TensorProduct.map (AlgHom.id (Localization.AtPrime p) (Localization.AtPrime p)) ι
   have inj : Function.Injective Φ :=
     Module.Flat.lTensor_preserves_injective_linearMap (M := Localization.AtPrime p)

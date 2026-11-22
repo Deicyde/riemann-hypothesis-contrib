@@ -11,16 +11,18 @@ noncomputable section
 
 namespace GlobalTheory.JR.EtExist
 
-variable (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
+variable
+  (F E : Type)
+  [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
 
-def conjAlg [h : Unram F E] : E →ₐ[F] E :=
-  { starRingEnd E with commutes' := fun x => h.star_fix x }
+def conjAlg [h : Unram F E] : E →ₐ[F] E := { starRingEnd E with commutes' := fun x => h.star_fix x }
 
 theorem conjAlg_apply [Unram F E] (y : E) : conjAlg F E y = star y := rfl
 
 variable (K : Type) [CommRing K] [Algebra F K]
 
-def conjT [Unram F E] : E ⊗[F] K →ₐ[F] E ⊗[F] K := Algebra.TensorProduct.map (conjAlg F E) (AlgHom.id F K)
+def conjT [Unram F E] : E ⊗[F] K →ₐ[F] E ⊗[F] K :=
+  Algebra.TensorProduct.map (conjAlg F E) (AlgHom.id F K)
 
 theorem conjT_conjT [Unram F E] (z : E ⊗[F] K) : conjT F E K (conjT F E K z) = z := by
   induction z using TensorProduct.induction_on with
@@ -28,7 +30,8 @@ theorem conjT_conjT [Unram F E] (z : E ⊗[F] K) : conjT F E K (conjT F E K z) =
   | tmul a b => simp [conjT, conjAlg_apply]
   | add a b ha hb => simp [ha, hb]
 
-@[reducible] def starT [Unram F E] : StarRing (E ⊗[F] K) where
+@[reducible]
+def starT [Unram F E] : StarRing (E ⊗[F] K) where
   star := conjT F E K
   star_involutive := conjT_conjT F E K
   star_mul a b := by
@@ -36,15 +39,19 @@ theorem conjT_conjT [Unram F E] (z : E ⊗[F] K) : conjT F E K (conjT F E K z) =
     rw [map_mul, mul_comm]
   star_add a b := map_add (conjT F E K) a b
 
-theorem locallyCompact_moduleTopology [LocallyCompactSpace F] [Module.Finite F K] :
-    @LocallyCompactSpace K (moduleTopology F K) := by
+theorem locallyCompact_moduleTopology [LocallyCompactSpace F] [Module.Finite F K]
+    : @LocallyCompactSpace K (moduleTopology F K) := by
   letI : TopologicalSpace K := moduleTopology F K
   haveI : IsModuleTopology F K := ⟨rfl⟩
   let b := (Module.finBasis F K).equivFun
   have h1 : Continuous b := IsModuleTopology.continuous_of_linearMap b.toLinearMap
   haveI : ContinuousAdd K := IsModuleTopology.toContinuousAdd F K
   have h2 : Continuous b.symm := IsModuleTopology.continuous_of_linearMap b.symm.toLinearMap
-  let e : K ≃ₜ (Fin (Module.finrank F K) → F) := { b.toEquiv with continuous_toFun := h1, continuous_invFun := h2 }
+  let e : K ≃ₜ (Fin (Module.finrank F K) → F) := {
+    b.toEquiv with
+    continuous_toFun := h1
+    continuous_invFun := h2
+  }
   exact e.isClosedEmbedding.locallyCompactSpace
 
 def ofAlgebra [h : Unram F E] [Module.Finite F K] [IsReduced K] : Et F E :=
@@ -52,7 +59,8 @@ def ofAlgebra [h : Unram F E] [Module.Finite F K] [IsReduced K] : Et F E :=
   haveI : IsModuleTopology F K := ⟨rfl⟩
   letI : TopologicalSpace (E ⊗[F] K) := moduleTopology F (E ⊗[F] K)
   letI : Algebra K (E ⊗[F] K) := Algebra.TensorProduct.rightAlgebra
-  { K := K
+  {
+    K := K
     L := E ⊗[F] K
     trK := IsModuleTopology.isTopologicalRing F K
     lcK := haveI := h.lcF; locallyCompact_moduleTopology F K
@@ -68,10 +76,12 @@ def ofAlgebra [h : Unram F E] [Module.Finite F K] [IsReduced K] : Et F E :=
       simp [conjT]
     star_E := fun y => by
       change conjT F E K (y ⊗ₜ 1) = star y ⊗ₜ 1
-      simp [conjT, conjAlg_apply] }
+      simp [conjT, conjAlg_apply]
+  }
 
-theorem exists_isGen [Unram F E] (r : ℕ) (p : Fin r → F)
-    (hs : (X ^ r + ∑ i, C (p i) * X ^ (i : ℕ) : F[X]).Separable) : ∃ (A : Et F E) (τ : A.K), A.IsGen τ p := by
+theorem exists_isGen
+    [Unram F E] (r : ℕ) (p : Fin r → F) (hs : (X ^ r + ∑ i, C (p i) * X ^ (i : ℕ) : F[X]).Separable)
+    : ∃ (A : Et F E) (τ : A.K), A.IsGen τ p := by
   set P : F[X] := X ^ r + ∑ i, C (p i) * X ^ (i : ℕ) with hP
   have hlt : (∑ i, C (p i) * X ^ (i : ℕ) : F[X]).degree < r := degree_sum_fin_lt p
   have hm : P.Monic := monic_X_pow_add hlt
@@ -86,14 +96,20 @@ theorem exists_isGen [Unram F E] (r : ℕ) (p : Fin r → F)
       ((isRadical_iff_span_singleton).1 hs.squarefree.isRadical)
   refine ⟨ofAlgebra F E (AdjoinRoot P), AdjoinRoot.root P, ?_, ?_, ?_⟩
   · change LinearIndependent F (fun i : Fin r => AdjoinRoot.root P ^ (i : ℕ))
-    have := pb.basis.linearIndependent.comp (Fin.cast (show r = pb.dim from hd.symm)) (Fin.cast_injective _)
-    have e : (fun i : Fin r => AdjoinRoot.root P ^ (i : ℕ)) = pb.basis ∘ Fin.cast (show r = pb.dim from hd.symm) := by
+    have :=
+      pb.basis.linearIndependent.comp (Fin.cast (show r = pb.dim from hd.symm))
+        (Fin.cast_injective _)
+    have e
+        : (fun i : Fin r => AdjoinRoot.root P ^ (i : ℕ))
+          = pb.basis ∘ Fin.cast (show r = pb.dim from hd.symm) := by
       funext i
       rw [Function.comp_apply, pb.basis_eq_pow]
       rfl
-    rw [e]; exact this
+    rw [e]
+    exact this
   · change Module.finrank F (AdjoinRoot P) = r
-    rw [pb.finrank]; exact hd
+    rw [pb.finrank]
+    exact hd
   · change AdjoinRoot.root P ^ r + ∑ i, p i • AdjoinRoot.root P ^ (i : ℕ) = 0
     have := AdjoinRoot.aeval_eq (f := P) P
     rw [AdjoinRoot.mk_self] at this

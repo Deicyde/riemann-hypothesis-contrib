@@ -5,12 +5,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.Rq.killQ :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ T : Tower D, T.Ok →
-      ∀ (pr : Bool) (g0 : G ℚ Ω) (M : Type) [Monoid M] (r : G ℚ Ω →* M), (∀ g ∈ (frQ D pr g0).N, r g = 1) →
-        ∀ g ∈ (T.fr ∅).N, r (resQ T.F g) = 1 := by
+theorem UpperTheory.V.Ws.Rq.killQ
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ T : Tower D,
+          T.Ok
+            → ∀ (pr : Bool) (g0 : G ℚ Ω) (M : Type) [Monoid M] (r : G ℚ Ω →* M),
+              (∀ g ∈ (frQ D pr g0).N, r g = 1) → ∀ g ∈ (T.fr ∅).N, r (resQ T.F g) = 1 := by
   intro Ω _ _ _ l _ c D hD T hT pr g0 M _ r hr g hg
   obtain ⟨A, hA, hI, hb⟩ := hg
   have hIQ : resQ T.F g ∈ Ine (F := ℚ) A := hI

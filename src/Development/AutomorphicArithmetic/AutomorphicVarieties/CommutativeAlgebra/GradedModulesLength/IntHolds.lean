@@ -8,9 +8,11 @@ public import Mathlib.RingTheory.Valuation.Integral
 
 open IsLocalRing Filter Formalism.MainNotions.V.Pf.V2.Calc UpperTheory.V.Alg UpperTheory.V.Alg.M
 
-theorem UpperTheory.V.Alg.M.int_holds :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (K : Type) [Field K] [Algebra O K] [IsAlgClosed K] [FaithfulSMul O K] (v : K → ℝ), IsNVal O K v → ∀ y : K, IsIntegral O y → y ≠ 0 → 0 ≤ v y := by
+theorem UpperTheory.V.Alg.M.int_holds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (K : Type) [Field K] [Algebra O K]
+        [IsAlgClosed K] [FaithfulSMul O K] (v : K → ℝ),
+      IsNVal O K v → ∀ y : K, IsIntegral O y → y ≠ 0 → 0 ≤ v y := by
   intro O _ _ _ _ _ K _ _ _ _ v hv y hy hy0
   have v1 : v 1 = 0 := by
     have h := hv.mul 1 1 one_ne_zero one_ne_zero
@@ -31,8 +33,9 @@ theorem UpperTheory.V.Alg.M.int_holds :
       rw [pow_succ, hv.mul _ _ (pow_ne_zero _ hy0) hy0, ih]
       push_cast
       ring
-  have vsum : ∀ (s : Finset ℕ) (f : ℕ → K) (c : ℝ), (∀ i ∈ s, f i ≠ 0 → c ≤ v (f i)) →
-      (∑ i ∈ s, f i) ≠ 0 → c ≤ v (∑ i ∈ s, f i) := by
+  have vsum
+      : ∀ (s : Finset ℕ) (f : ℕ → K) (c : ℝ),
+        (∀ i ∈ s, f i ≠ 0 → c ≤ v (f i)) → (∑ i ∈ s, f i) ≠ 0 → c ≤ v (∑ i ∈ s, f i) := by
     intro s f c
     induction s using Finset.induction_on with
     | empty => intro _ h; simp at h
@@ -53,8 +56,10 @@ theorem UpperTheory.V.Alg.M.int_holds :
   push_neg at hneg
   obtain ⟨p, hpm, hp⟩ := hy
   have hsum := hp
-  rw [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, hpm.coeff_natDegree, map_one, one_mul] at hsum
-  have hS : (∑ i ∈ Finset.range p.natDegree, algebraMap O K (p.coeff i) * y ^ i) = -(y ^ p.natDegree) :=
+  rw [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, hpm.coeff_natDegree, map_one, one_mul]
+    at hsum
+  have hS
+      : (∑ i ∈ Finset.range p.natDegree, algebraMap O K (p.coeff i) * y ^ i) = -(y ^ p.natDegree) :=
     eq_neg_of_add_eq_zero_left hsum
   have hyn : y ^ p.natDegree ≠ 0 := pow_ne_zero _ hy0
   have hS0 : (∑ i ∈ Finset.range p.natDegree, algebraMap O K (p.coeff i) * y ^ i) ≠ 0 := by
@@ -66,8 +71,10 @@ theorem UpperTheory.V.Alg.M.int_holds :
       rw [h, Finset.sum_range_zero, pow_zero] at hS
       exact one_ne_zero (neg_eq_zero.mp hS.symm)
     · exact h
-  have hterm : ∀ i ∈ Finset.range p.natDegree, algebraMap O K (p.coeff i) * y ^ i ≠ 0 →
-      ((p.natDegree - 1 : ℕ) : ℝ) * v y ≤ v (algebraMap O K (p.coeff i) * y ^ i) := by
+  have hterm
+      : ∀ i ∈ Finset.range p.natDegree,
+        algebraMap O K (p.coeff i) * y ^ i ≠ 0
+          → ((p.natDegree - 1 : ℕ) : ℝ) * v y ≤ v (algebraMap O K (p.coeff i) * y ^ i) := by
     intro i hi hne
     have hc : p.coeff i ≠ 0 := by
       intro h
@@ -84,10 +91,12 @@ theorem UpperTheory.V.Alg.M.int_holds :
     have hle : ((p.natDegree - 1 : ℕ) : ℝ) * v y ≤ (i : ℝ) * v y := by
       apply mul_le_mul_of_nonpos_right _ hneg.le
       exact_mod_cast hi'
-    have h0 : (0 : ℝ) ≤ ((IsDiscreteValuationRing.addVal O (p.coeff i)).toNat : ℝ) := Nat.cast_nonneg _
+    have h0 : (0 : ℝ) ≤ ((IsDiscreteValuationRing.addVal O (p.coeff i)).toNat : ℝ) :=
+      Nat.cast_nonneg _
     linarith
-  have hbound : ((p.natDegree - 1 : ℕ) : ℝ) * v y ≤
-      v (∑ i ∈ Finset.range p.natDegree, algebraMap O K (p.coeff i) * y ^ i) :=
+  have hbound
+      : ((p.natDegree - 1 : ℕ) : ℝ) * v y
+        ≤ v (∑ i ∈ Finset.range p.natDegree, algebraMap O K (p.coeff i) * y ^ i) :=
     vsum (Finset.range p.natDegree) (fun i => algebraMap O K (p.coeff i) * y ^ i) _ hterm hS0
   rw [hS, vneg _ hyn, vpow, Nat.cast_pred hnpos] at hbound
   linarith

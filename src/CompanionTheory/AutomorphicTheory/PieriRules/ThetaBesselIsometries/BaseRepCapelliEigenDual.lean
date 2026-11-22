@@ -24,13 +24,16 @@ end GlobalTheory
 open GlobalTheory
 
 namespace Gp91
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.CoefZero
 
-theorem continuousOn_of_ckOn {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {m : ℕ∞}
-    {f : B.Mat k r → E} (h : B.CkOn m (B.GV k r) f) : ContinuousOn f (B.GV k r) := by
+theorem continuousOn_of_ckOn
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {m : ℕ∞} {f : B.Mat k r → E} (h : B.CkOn m (B.GV k r) f)
+    : ContinuousOn f (B.GV k r) := by
   letI : NormedAddCommGroup (B.Mat k r) := Matrix.normedAddCommGroup
   letI : NormedSpace ℝ (B.Mat k r) := Matrix.normedSpace
   intro g₀ hg₀

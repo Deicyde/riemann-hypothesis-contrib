@@ -8,7 +8,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -16,8 +18,8 @@ noncomputable section
 
 namespace GlobalTheory.PadicOrderAction
 
-def padicEnd (p : ℕ) [Fact p.Prime] (M : Type) [AddCommGroup M] (hM : ∀ x : M, p • x = 0) :
-    ℤ_[p] →+* AddMonoid.End M where
+def padicEnd (p : ℕ) [Fact p.Prime] (M : Type) [AddCommGroup M] (hM : ∀ x : M, p • x = 0)
+    : ℤ_[p] →+* AddMonoid.End M where
   toFun c := nsmulAddMonoidHom (PadicInt.toZMod c).val
   map_one' := by
     ext x
@@ -33,11 +35,14 @@ def padicEnd (p : ℕ) [Fact p.Prime] (M : Type) [AddCommGroup M] (hM : ∀ x : 
     rw [map_zero, ZMod.val_zero, zero_nsmul]
   map_add' a b := by
     ext x
-    change (PadicInt.toZMod (a + b)).val • x = (PadicInt.toZMod a).val • x + (PadicInt.toZMod b).val • x
+    change (PadicInt.toZMod (a + b)).val • x
+      = (PadicInt.toZMod a).val • x + (PadicInt.toZMod b).val • x
     rw [map_add (f := _), ZMod.val_add, ← nsmul_eq_mod_nsmul _ (hM x), add_nsmul]
 
-def liftInt {A B C : Type} [CommRing A] [CommRing B] [Ring C] (φ : A →+* C) (ψ : B →+* C)
-    (h : ∀ a b, φ a * ψ b = ψ b * φ a) : A ⊗[ℤ] B →+* C :=
+def liftInt
+    {A B C : Type} [CommRing A] [CommRing B] [Ring C]
+    (φ : A →+* C) (ψ : B →+* C) (h : ∀ a b, φ a * ψ b = ψ b * φ a)
+    : A ⊗[ℤ] B →+* C :=
   (Algebra.TensorProduct.lift φ.toIntAlgHom ψ.toIntAlgHom h).toRingHom
 
 lemma liftInt_tmul {A B C : Type} [CommRing A] [CommRing B] [Ring C] (φ : A →+* C) (ψ : B →+* C)
@@ -49,26 +54,41 @@ variable {R₀ : Type} [CommRing R₀]
 lemma pTorsion_nsmul_eq_zero (B : BX R₀) (p : ℕ) (S : LAlg R₀) (x : torP B p S) : p • x = 0 :=
   Subtype.ext ((mem_torP B p _).1 x.2)
 
-def resEnd {B : BX R₀} {O : LAlg R₀} (e : OEnd B O) (p : ℕ) {S : LAlg R₀} (s : LHom O S) :
-    AddMonoid.End (torP B p S) :=
+def resEnd {B : BX R₀} {O : LAlg R₀} (e : OEnd B O) (p : ℕ) {S : LAlg R₀} (s : LHom O S)
+    : AddMonoid.End (torP B p S) :=
   ((e.f s).comp (torP B p S).subtype).codRestrict (torP B p S) fun x => by
     rw [mem_torP, ← map_nsmul, pTorsion_nsmul_eq_zero, map_zero]
 
-def ordEnd {B : BX R₀} {O : LAlg R₀} {O₀ : Type} [CommRing O₀] (f : O₀ → OEnd B O) (p : ℕ)
+def ordEnd
+    {B : BX R₀} {O : LAlg R₀} {O₀ : Type} [CommRing O₀]
+    (f : O₀ → OEnd B O)
+    (p : ℕ)
     {S : LAlg R₀} (s : LHom O S)
-    (h : ∀ x : B.G S, (f 1).f s x = x ∧ ∀ a b, (f (a + b)).f s x = (f a).f s x + (f b).f s x ∧
-      (f (a * b)).f s x = (f a).f s ((f b).f s x)) : O₀ →+* AddMonoid.End (torP B p S) :=
+    (h : ∀ x : B.G S,
+      (f 1).f s x = x
+        ∧ ∀ a b,
+          (f (a + b)).f s x = (f a).f s x + (f b).f s x
+            ∧ (f (a * b)).f s x = (f a).f s ((f b).f s x))
+    : O₀ →+* AddMonoid.End (torP B p S) :=
   RingHom.mk' (α := O₀) (β := AddMonoid.End (torP B p S))
-    { toFun := fun a => resEnd (f a) p s
+    {
+      toFun := fun a => resEnd (f a) p s
       map_one' := AddMonoidHom.ext fun x => Subtype.ext (h x).1
-      map_mul' := fun a b => AddMonoidHom.ext fun x => Subtype.ext ((h x).2 a b).2 }
+      map_mul' := fun a b => AddMonoidHom.ext fun x => Subtype.ext ((h x).2 a b).2
+    }
     fun a b => AddMonoidHom.ext fun x => Subtype.ext ((h x).2 a b).1
 
-def complEnd {B : BX R₀} {O : LAlg R₀} {O₀ : Type} [CommRing O₀] (f : O₀ → OEnd B O) (p : ℕ)
-    [Fact p.Prime] {S : LAlg R₀} (s : LHom O S)
-    (h : ∀ x : B.G S, (f 1).f s x = x ∧ ∀ a b, (f (a + b)).f s x = (f a).f s x + (f b).f s x ∧
-      (f (a * b)).f s x = (f a).f s ((f b).f s x)) :
-    ℤ_[p] ⊗[ℤ] O₀ →+* AddMonoid.End (torP B p S) :=
+def complEnd
+    {B : BX R₀} {O : LAlg R₀} {O₀ : Type} [CommRing O₀]
+    (f : O₀ → OEnd B O)
+    (p : ℕ) [Fact p.Prime]
+    {S : LAlg R₀} (s : LHom O S)
+    (h : ∀ x : B.G S,
+      (f 1).f s x = x
+        ∧ ∀ a b,
+          (f (a + b)).f s x = (f a).f s x + (f b).f s x
+            ∧ (f (a * b)).f s x = (f a).f s ((f b).f s x))
+    : ℤ_[p] ⊗[ℤ] O₀ →+* AddMonoid.End (torP B p S) :=
   liftInt (padicEnd p _ (pTorsion_nsmul_eq_zero B p S)) (ordEnd f p s h) fun c a =>
     AddMonoidHom.ext fun x => (map_nsmul (ordEnd f p s h a) (PadicInt.toZMod c).val x).symm
 
@@ -82,9 +102,12 @@ lemma complEnd_tmul {B : BX R₀} {O : LAlg R₀} {O₀ : Type} [CommRing O₀] 
   rw [e]
   rfl
 
-def complMat {g : ℕ} {O : Type} [CommRing O] {O₀ : Type} [CommRing O₀] (p : ℕ) [Fact p.Prime]
-    [Algebra ℤ_[p] O] (dL : O₀ →+* Matrix (Fin g) (Fin g) O) :
-    ℤ_[p] ⊗[ℤ] O₀ →+* Matrix (Fin g) (Fin g) O :=
+def complMat
+    {g : ℕ} {O : Type} [CommRing O]
+    {O₀ : Type} [CommRing O₀]
+    (p : ℕ) [Fact p.Prime] [Algebra ℤ_[p] O]
+    (dL : O₀ →+* Matrix (Fin g) (Fin g) O)
+    : ℤ_[p] ⊗[ℤ] O₀ →+* Matrix (Fin g) (Fin g) O :=
   liftInt (algebraMap ℤ_[p] (Matrix (Fin g) (Fin g) O)) dL fun c a => Algebra.commutes c (dL a)
 
 lemma complMat_tmul {g : ℕ} {O : Type} [CommRing O] {O₀ : Type} [CommRing O₀] (p : ℕ)
@@ -107,27 +130,37 @@ lemma padic_mul_eq {p : ℕ} [Fact p.Prime] {R : Type} [CommRing R] (t : ℤ_[p]
   conv_lhs => rw [hc]
   rw [map_add (f := _), map_mul, map_natCast, map_natCast, add_mul, _root_.mul_assoc, hi, mul_zero, zero_add]
 
-theorem main :
-  (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} (B : BX R₀) (O : LAlg R₀) (gb : Module.Basis (Fin g) R₀ B.gg) (O₀ : Type) [CommRing O₀] (f : O₀ → OEnd B O) (p : ℕ) [Fact p.Prime] [Algebra ℤ_[p] (O : Type)] (dL : O₀ →+* Matrix (Fin g) (Fin g) (O : Type)),
-    Function.Surjective (algebraMap R₀ (O : Type)) → (∀ {R : LAlg R₀} (s : LHom O R) (x : B.G R), (f 1).f s x = x ∧ ∀ a b, (f (a + b)).f s x = (f a).f s x + (f b).f s x ∧
-      (f (a * b)).f s x = (f a).f s ((f b).f s x)) →
-    (∀ a {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g) (i : π.ker) (m : Fin g → π.ker),
-      (∀ k, (m k : (R : Type)) = s.1 (dL a k l) * i) →
-      (f a).f s (B.tg π hπ (gb l ⊗ₜ[R₀] i)) = B.tg π hπ (∑ k, gb k ⊗ₜ[R₀] m k)) →
-    ∃ (A : OAct B O p (ℤ_[p] ⊗[ℤ] O₀)) (ρL : ℤ_[p] ⊗[ℤ] O₀ →+* Matrix (Fin g) (Fin g) (O : Type)),
-      (∀ c a, ρL (c ⊗ₜ[ℤ] a) = algebraMap ℤ_[p] (O : Type) c • dL a) ∧
-      (∀ a k l, ρL a k l = algebraMap R₀ (O : Type) (gb.repr (A.actL a (gb l)) k)) ∧
-      ∀ c a (S : LAlg R₀) (s : LHom O S) (x : torP B p S), (A.act (c ⊗ₜ[ℤ] a) S s x : B.G S) = (PadicInt.toZMod c).val • (f a).f s x) := by
+theorem main
+    : (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} (B : BX R₀) (O : LAlg R₀)
+        (gb : Module.Basis (Fin g) R₀ B.gg) (O₀ : Type) [CommRing O₀] (f : O₀ → OEnd B O) (p : ℕ)
+        [Fact p.Prime] [Algebra ℤ_[p] (O : Type)] (dL : O₀ →+* Matrix (Fin g) (Fin g) (O : Type)),
+      Function.Surjective (algebraMap R₀ (O : Type))
+        → (∀ {R : LAlg R₀} (s : LHom O R) (x : B.G R),
+          (f 1).f s x = x
+            ∧ ∀ a b,
+              (f (a + b)).f s x = (f a).f s x + (f b).f s x
+                ∧ (f (a * b)).f s x = (f a).f s ((f b).f s x))
+        → (∀ a {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g) (i : π.ker)
+            (m : Fin g → π.ker),
+          (∀ k, (m k : (R : Type)) = s.1 (dL a k l) * i)
+            → (f a).f s (B.tg π hπ (gb l ⊗ₜ[R₀] i)) = B.tg π hπ (∑ k, gb k ⊗ₜ[R₀] m k))
+        → ∃ (A : OAct B O p (ℤ_[p] ⊗[ℤ] O₀))
+            (ρL : ℤ_[p] ⊗[ℤ] O₀ →+* Matrix (Fin g) (Fin g) (O : Type)),
+          (∀ c a, ρL (c ⊗ₜ[ℤ] a) = algebraMap ℤ_[p] (O : Type) c • dL a)
+            ∧ (∀ a k l, ρL a k l = algebraMap R₀ (O : Type) (gb.repr (A.actL a (gb l)) k))
+            ∧ ∀ c a (S : LAlg R₀) (s : LHom O S) (x : torP B p S),
+              (A.act (c ⊗ₜ[ℤ] a) S s x : B.G S) = (PadicInt.toZMod c).val • (f a).f s x) := by
   intro R₀ _ g B O gb O₀ _ f p _ _ dL hs hf htg
   choose pre hpre using hs
   let L : ℤ_[p] ⊗[ℤ] O₀ → B.gg →ₗ[R₀] B.gg := fun a =>
     gb.constr R₀ fun l => ∑ k, pre (complMat p dL a k l) • gb k
   have hL : ∀ a l, L a (gb l) = ∑ k, pre (complMat p dL a k l) • gb k := fun a l =>
     gb.constr_basis R₀ _ l
-  have key : ∀ a {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g)
-      (i : π.ker) (hi : p • i = 0),
-      (complEnd f p s (hf s) a ⟨B.tg π hπ (gb l ⊗ₜ i), tg_torP B p π hπ _ i hi⟩ : B.G R) =
-        B.tg π hπ (∑ k, gb k ⊗ₜ[R₀] kerMul π (s.1 (complMat p dL a k l)) i) := by
+  have key
+      : ∀ a {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g) (i : π.ker)
+          (hi : p • i = 0),
+        (complEnd f p s (hf s) a ⟨B.tg π hπ (gb l ⊗ₜ i), tg_torP B p π hπ _ i hi⟩ : B.G R)
+          = B.tg π hπ (∑ k, gb k ⊗ₜ[R₀] kerMul π (s.1 (complMat p dL a k l)) i) := by
     intro a R S s π hπ l i hi
     induction a using TensorProduct.induction_on with
     | zero =>
@@ -148,22 +181,25 @@ theorem main :
       congr 1
       apply Subtype.ext
       have hi' : p • (i : (R : Type)) = 0 := congrArg Subtype.val hi
-      have h2 := padic_mul_eq (s.1.toRingHom.comp (algebraMap ℤ_[p] (O : Type))) c
-        (s.1 (dL a k l) * i) (by rw [← mul_smul_comm, hi', mul_zero])
+      have h2 :=
+        padic_mul_eq (s.1.toRingHom.comp (algebraMap ℤ_[p] (O : Type))) c (s.1 (dL a k l) * i)
+          (by rw [← mul_smul_comm, hi', mul_zero])
       change (PadicInt.toZMod c).val • (s.1 (dL a k l) * i) = s.1 (complMat p dL (c ⊗ₜ a) k l) * i
       rw [← h2, complMat_tmul, Matrix.smul_apply, smul_eq_mul, map_mul, _root_.mul_assoc]
       rfl
     | add a b ha hb =>
-      have : ∀ k, kerMul π (s.1 (complMat p dL (a + b) k l)) i =
-          kerMul π (s.1 (complMat p dL a k l)) i + kerMul π (s.1 (complMat p dL b k l)) i :=
+      have : ∀ k,
+          kerMul π (s.1 (complMat p dL (a + b) k l)) i
+            = kerMul π (s.1 (complMat p dL a k l)) i + kerMul π (s.1 (complMat p dL b k l)) i :=
         fun k => Subtype.ext (by simp [kerMul, add_mul])
       simp only [this, TensorProduct.tmul_add, Finset.sum_add_distrib]
       rw [map_add (B.tg π hπ), ← ha, ← hb, map_add (f := _)]
       rfl
-  have key2 : ∀ a {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g)
-      (i : π.ker) (hi : p • i = 0),
-      (complEnd f p s (hf s) a ⟨B.tg π hπ (gb l ⊗ₜ i), tg_torP B p π hπ _ i hi⟩ : B.G R) =
-        B.tg π hπ (L a (gb l) ⊗ₜ[R₀] i) := by
+  have key2
+      : ∀ a {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g) (i : π.ker)
+          (hi : p • i = 0),
+        (complEnd f p s (hf s) a ⟨B.tg π hπ (gb l ⊗ₜ i), tg_torP B p π hπ _ i hi⟩ : B.G R)
+          = B.tg π hπ (L a (gb l) ⊗ₜ[R₀] i) := by
     intro a R S s π hπ l i hi
     rw [key a s π hπ l i hi, hL, TensorProduct.sum_tmul]
     congr 1
@@ -173,18 +209,25 @@ theorem main :
     apply Subtype.ext
     change s.1 (complMat p dL a k l) * i = pre (complMat p dL a k l) • (i : (R : Type))
     rw [Algebra.smul_def, ← s.1.commutes, hpre]
-  refine ⟨{ act := fun a S s => complEnd f p s (hf s) a
-            act_one := fun S s x => by rw [map_one]; rfl
-            act_mul := fun a b S s x => by rw [map_mul]; rfl
-            act_add := fun a b S s x => by rw [map_add (f := _)]; rfl
-            act_nat := ?_
-            actL := L
-            act_tg := ?_ }, complMat p dL, complMat_tmul p dL, ?_,
-            fun c a S s x => complEnd_tmul f p s (hf s) c a x⟩
+  refine ⟨
+    {
+      act := fun a S s => complEnd f p s (hf s) a
+      act_one := fun S s x => by rw [map_one]; rfl
+      act_mul := fun a b S s x => by rw [map_mul]; rfl
+      act_add := fun a b S s x => by rw [map_add (f := _)]; rfl
+      act_nat := ?_
+      actL := L
+      act_tg := ?_
+    },
+    complMat p dL,
+    complMat_tmul p dL,
+    ?_,
+    fun c a S s x => complEnd_tmul f p s (hf s) c a x
+  ⟩
   · intro a S S' s s' φ hφ x
     subst hφ
-    change B.map φ (complEnd f p s (hf s) a x : B.G S) =
-      (complEnd f p (φ.comp s) (hf _) a ⟨B.map φ x, map_torP B p φ x⟩ : B.G S')
+    change B.map φ (complEnd f p s (hf s) a x : B.G S)
+      = (complEnd f p (φ.comp s) (hf _) a ⟨B.map φ x, map_torP B p φ x⟩ : B.G S')
     induction a using TensorProduct.induction_on with
     | zero => simp
     | tmul c a => rw [complEnd_tmul, complEnd_tmul, map_nsmul, (f a).nat]
@@ -195,8 +238,9 @@ theorem main :
       rfl
   · intro a R S s π hπ w i hi
     have hr : ∀ l, p • (gb.repr w l • i) = 0 := fun l => by rw [smul_comm, hi, smul_zero]
-    have h1 : (⟨B.tg π hπ (w ⊗ₜ i), tg_torP B p π hπ w i hi⟩ : torP B p R) =
-        ∑ l, ⟨B.tg π hπ (gb l ⊗ₜ (gb.repr w l • i)), tg_torP B p π hπ _ _ (hr l)⟩ := by
+    have h1
+        : (⟨B.tg π hπ (w ⊗ₜ i), tg_torP B p π hπ w i hi⟩ : torP B p R)
+          = ∑ l, ⟨B.tg π hπ (gb l ⊗ₜ (gb.repr w l • i)), tg_torP B p π hπ _ _ (hr l)⟩ := by
       apply Subtype.ext
       rw [AddSubmonoidClass.coe_finsetSum]
       change B.tg π hπ (w ⊗ₜ i) = ∑ l, B.tg π hπ (gb l ⊗ₜ (gb.repr w l • i))
@@ -208,7 +252,7 @@ theorem main :
     change (complEnd f p s (hf s) a ⟨B.tg π hπ (w ⊗ₜ i), tg_torP B p π hπ w i hi⟩ : B.G R) = _
     set_option synthInstance.maxHeartbeats 100000 in
       rw [h1, map_sum, AddSubmonoidClass.coe_finsetSum,
-      Finset.sum_congr rfl fun l _ => key2 a s π hπ l _ (hr l), ← map_sum]
+        Finset.sum_congr rfl fun l _ => key2 a s π hπ l _ (hr l), ← map_sum]
     congr 1
     set_option synthInstance.maxHeartbeats 100000 in
       conv_rhs => rw [← gb.sum_repr w, map_sum, TensorProduct.sum_tmul]

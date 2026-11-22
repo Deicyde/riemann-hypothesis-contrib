@@ -42,16 +42,19 @@ theorem q_ne (g : SplitG M.L) : (g.q : F) ≠ 0 := fun h => g.q_irr.ne_zero (Sub
 
 theorem q_mem_O (g : SplitG M.L) : algebraMap F E (g.q : F) ∈ M.L.O := by
   rw [M.L.O_def]
-  have h1 : algebraMap F E (g.q : F) = algebraMap 𝒪[F] E g.q := (IsScalarTower.algebraMap_apply 𝒪[F] F E g.q).symm
+  have h1 : algebraMap F E (g.q : F) = algebraMap 𝒪[F] E g.q :=
+    (IsScalarTower.algebraMap_apply 𝒪[F] F E g.q).symm
   rw [h1]
   exact isIntegral_algebraMap
 
 theorem cj_q (g : SplitG M.L) : M.L.cj (algebraMap F E (g.q : F)) = algebraMap F E (g.q : F) :=
   M.L.cj.commutes _
 
-theorem gramMM_unit_of_term (t : Term V M r) (hT : H.IsTerm t) : IsUnit (H.gram (H.MMfam t)).det := by
+theorem gramMM_unit_of_term (t : Term V M r) (hT : H.IsTerm t)
+    : IsUnit (H.gram (H.MMfam t)).det := by
   have hF : Formalism.MainNotions.ThinScalesBound.FrameK H t.f t.T := ⟨hT.2.1.2.1, hT.2.1.2.2.1⟩
-  have hF' : Formalism.MainNotions.ThinScalesBound.FrameK H t.f' t.T' := ⟨hT.2.2.1.2.1, hT.2.2.1.2.2.1⟩
+  have hF' : Formalism.MainNotions.ThinScalesBound.FrameK H t.f' t.T' :=
+    ⟨hT.2.2.1.2.1, hT.2.2.1.2.2.1⟩
   have hD : IsUnit (H.Dl t.f t.f' (r + 1)) := hT.2.2.2.1
   have hG : IsUnit (H.Gdet t.f t.f' t.T t.T') := isUnit_Gdet H _ _ _ _ hT.2.2.2.2.1
   obtain ⟨s, hs, hdet⟩ := gram_det H t.f t.f' t.T t.T' hF hF' hD
@@ -74,29 +77,38 @@ theorem gramMM_unit_of_term (t : Term V M r) (hT : H.IsTerm t) : IsUnit (H.gram 
       rw [hsplit]
     let A : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) E :=
       fromBlocks 1 (-(qi • (1 : Matrix (Fin (r + 1)) (Fin (r + 1)) E))) 0 (qi • 1)
-    have hw : Sum.elim t.f (fun a => qi • (t.f' a - t.f a)) = fun j => ∑ i, A i j • Sum.elim t.f t.f' i := by
+    have hw
+        : Sum.elim t.f (fun a => qi • (t.f' a - t.f a))
+          = fun j => ∑ i, A i j • Sum.elim t.f t.f' i := by
       funext j
       rcases j with a | a
       · simp [A, Fintype.sum_sum_type, Matrix.one_apply]
       · simp [A, Fintype.sum_sum_type, Matrix.one_apply, sub_eq_add_neg, add_comm]
     rw [hMM, hw, gram_recomb, det_mul, det_mul, det_transpose]
-    have hA : A.det = qi ^ (r + 1) := by
-      simp [A, det_fromBlocks_zero₂₁]
+    have hA : A.det = qi ^ (r + 1) := by simp [A, det_fromBlocks_zero₂₁]
     have hAm : (A.map M.L.cj).det = M.L.cj A.det := by
-      rw [show A.map M.L.cj = (M.L.cj.toRingEquiv.toRingHom).mapMatrix A from rfl, ← RingHom.map_det]
+      rw [show A.map M.L.cj = (M.L.cj.toRingEquiv.toRingHom).mapMatrix A from rfl,
+        ← RingHom.map_det]
       rfl
     rw [hAm, hA]
     exact ((hqi.pow _).map M.L.cj).mul hgu |>.mul (hqi.pow _)
 
-theorem exists_dual {ι : Type} [Fintype ι] [DecidableEq ι] (v : ι → V) (hG : IsUnit (H.gram v).det)
-    (d : ι → E) : ∃ u ∈ Submodule.span E (Set.range v), ∀ i, H.h u (v i) = d i := by
-  have hsum : ∀ (s : Finset ι) (c : ι → E) (y : V), H.h (∑ j ∈ s, c j • v j) y = ∑ j ∈ s, c j * H.h (v j) y := by
+theorem exists_dual
+    {ι : Type} [Fintype ι] [DecidableEq ι] (v : ι → V) (hG : IsUnit (H.gram v).det) (d : ι → E)
+    : ∃ u ∈ Submodule.span E (Set.range v), ∀ i, H.h u (v i) = d i := by
+  have hsum
+      : ∀ (s : Finset ι) (c : ι → E) (y : V),
+        H.h (∑ j ∈ s, c j • v j) y = ∑ j ∈ s, c j * H.h (v j) y := by
     intro s c y
     induction s using Finset.induction_on with
     | empty => simp [H.h_zero_left]
-    | insert j s hj ih => rw [Finset.sum_insert hj, Finset.sum_insert hj, H.h_add_left, H.h_smul_left, ih]
-  refine ⟨∑ j, ((H.gram v)⁻¹ *ᵥ d) j • v j, Submodule.sum_mem _ fun j _ =>
-    Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩), fun i => ?_⟩
+    | insert j s hj ih =>
+      rw [Finset.sum_insert hj, Finset.sum_insert hj, H.h_add_left, H.h_smul_left, ih]
+  refine ⟨
+    ∑ j, ((H.gram v)⁻¹ *ᵥ d) j • v j,
+    Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩),
+    fun i => ?_
+  ⟩
   rw [hsum]
   have h1 : (H.gram v *ᵥ ((H.gram v)⁻¹ *ᵥ d)) i = d i := by
     rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hG, Matrix.one_mulVec]
@@ -104,8 +116,11 @@ theorem exists_dual {ι : Type} [Fintype ι] [DecidableEq ι] (v : ι → V) (hG
   simp only [Matrix.mulVec, dotProduct, Formalism.MainNotions.S.Loc.HermSp.gram, Matrix.of_apply]
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
-theorem mem_MMsharp_of (t : Term V M r) {u : V} (hu : u ∈ Submodule.span E (Set.range (H.MMfam t)))
-    (hd : ∀ i, H.h u (H.MMfam t i) ∈ M.L.O) : u ∈ MMsharp H t := by
+theorem mem_MMsharp_of
+    (t : Term V M r)
+    {u : V}
+    (hu : u ∈ Submodule.span E (Set.range (H.MMfam t))) (hd : ∀ i, H.h u (H.MMfam t i) ∈ M.L.O)
+    : u ∈ MMsharp H t := by
   have hcj : ∀ c ∈ M.L.O, M.L.cj c ∈ M.L.O := by
     intro c hc
     rw [M.L.O_def] at hc ⊢
@@ -125,24 +140,28 @@ theorem mem_MMsharp_of (t : Term V M r) {u : V} (hu : u ∈ Submodule.span E (Se
     rw [Subring.smul_def, hR_smul]
     exact M.L.O.mul_mem (hcj c c.2) hx
 
-theorem MMfam_G (g : SplitG M.L) (hs : M.split = some g) (t : Term V M r) :
-    H.MMfam t = Sum.elim t.f (fun a => algebraMap F E ((g.q : F)⁻¹) • (t.f' a - t.f a)) := by
+theorem MMfam_G (g : SplitG M.L) (hs : M.split = some g) (t : Term V M r)
+    : H.MMfam t = Sum.elim t.f (fun a => algebraMap F E ((g.q : F)⁻¹) • (t.f' a - t.f a)) := by
   simp only [Formalism.MainNotions.S.Loc.HermSp.MMfam, hs]
 
-theorem f'_eq_G (g : SplitG M.L) (hs : M.split = some g) (t : Term V M r) (a : Fin (r + 1)) :
-    t.f' a = t.f a + algebraMap F E (g.q : F) • H.MMfam t (Sum.inr a) := by
-  rw [MMfam_G H g hs t, Sum.elim_inr, smul_smul, ← map_mul, mul_inv_cancel₀ (q_ne g), map_one, one_smul,
-    add_sub_cancel]
+theorem f'_eq_G (g : SplitG M.L) (hs : M.split = some g) (t : Term V M r) (a : Fin (r + 1))
+    : t.f' a = t.f a + algebraMap F E (g.q : F) • H.MMfam t (Sum.inr a) := by
+  rw [MMfam_G H g hs t, Sum.elim_inr, smul_smul, ← map_mul, mul_inv_cancel₀ (q_ne g), map_one,
+    one_smul, add_sub_cancel]
 
-theorem smul_mem_lat (g : SplitG M.L) (abelian₂ : Submodule M.L.O V) {x : V} (hx : x ∈ abelian₂) :
-    algebraMap F E (g.q : F) • x ∈ abelian₂ := by
+theorem smul_mem_lat (g : SplitG M.L) (abelian₂ : Submodule M.L.O V) {x : V} (hx : x ∈ abelian₂)
+    : algebraMap F E (g.q : F) • x ∈ abelian₂ := by
   have h1 := abelian₂.smul_mem (⟨algebraMap F E (g.q : F), q_mem_O g⟩ : M.L.O) hx
   exact h1
 
-theorem iota_fst_of (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Term V M r) (hg : H.IsGeneric t)
-    (hU : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f'))) (H.W0 t.f t.f')) {x : V} (hx : x ∈ t.abelian₂)
-    (hxp : x ∈ H.perp (H.X t.f)) :
-    ∃ x' ∈ t.abelian₂, x' ∈ H.perp (H.X t.f') ∧ x - x' ∈ H.smulLat (algebraMap F E (g.q : F)) t.abelian₂ := by
+theorem iota_fst_of
+    (hM : M.OK)
+    (g : SplitG M.L) (hs : M.split = some g)
+    (t : Term V M r) (hg : H.IsGeneric t)
+    (hU : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f'))) (H.W0 t.f t.f'))
+    {x : V} (hx : x ∈ t.abelian₂) (hxp : x ∈ H.perp (H.X t.f))
+    : ∃ x' ∈ t.abelian₂,
+      x' ∈ H.perp (H.X t.f') ∧ x - x' ∈ H.smulLat (algebraMap F E (g.q : F)) t.abelian₂ := by
   set c : E := algebraMap F E (g.q : F)
   have hGu := gramMM_unit_of_term H t hg.1
   let d : Fin (r + 1) ⊕ Fin (r + 1) → E := Sum.elim (fun a => H.h x (H.MMfam t (Sum.inr a))) 0
@@ -163,7 +182,8 @@ theorem iota_fst_of (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Te
       rw [MMfam_G H g hs]
       exact Submodule.subset_span ⟨Sum.inl j.castSucc, rfl⟩
     have hwf : H.h (w : V) (t.f j.castSucc) = 0 := hermitian_W0_span_zero H t w.2 hfM
-    have hwy : H.h (w : V) (H.MMfam t (Sum.inr j.castSucc)) = 0 := hermitian_W0_span_zero H t w.2 hyM
+    have hwy : H.h (w : V) (H.MMfam t (Sum.inr j.castSucc)) = 0 :=
+      hermitian_W0_span_zero H t w.2 hyM
     have hu1 : H.h u (t.f j.castSucc) = H.h x (H.MMfam t (Sum.inr j.castSucc)) := by
       have := hud (Sum.inl j.castSucc)
       simp only [d, Sum.elim_inl] at this
@@ -175,10 +195,14 @@ theorem iota_fst_of (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Te
   · rw [sub_sub_cancel]
     exact Submodule.subset_span ⟨_, hw, rfl⟩
 
-theorem iota_snd_of (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Term V M r) (hg : H.IsGeneric t)
-    (hU : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f'))) (H.W0 t.f t.f')) {x' : V} (hx : x' ∈ t.abelian₂)
-    (hxp : x' ∈ H.perp (H.X t.f')) :
-    ∃ x ∈ t.abelian₂, x ∈ H.perp (H.X t.f) ∧ x - x' ∈ H.smulLat (algebraMap F E (g.q : F)) t.abelian₂ := by
+theorem iota_snd_of
+    (hM : M.OK)
+    (g : SplitG M.L) (hs : M.split = some g)
+    (t : Term V M r) (hg : H.IsGeneric t)
+    (hU : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f'))) (H.W0 t.f t.f'))
+    {x' : V} (hx : x' ∈ t.abelian₂) (hxp : x' ∈ H.perp (H.X t.f'))
+    : ∃ x ∈ t.abelian₂,
+      x ∈ H.perp (H.X t.f) ∧ x - x' ∈ H.smulLat (algebraMap F E (g.q : F)) t.abelian₂ := by
   set c : E := algebraMap F E (g.q : F)
   have hGu := gramMM_unit_of_term H t hg.1
   let d : Fin (r + 1) ⊕ Fin (r + 1) → E := Sum.elim (fun a => H.h x' (H.MMfam t (Sum.inr a))) 0
@@ -203,9 +227,10 @@ theorem iota_snd_of (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Te
       have := hud (Sum.inl j.castSucc)
       simp only [d, Sum.elim_inl] at this
       rw [← this, MMfam_G H g hs, Sum.elim_inl]
-    have hxf2 : H.h x' (t.f j.castSucc) = - (c * H.h x' (H.MMfam t (Sum.inr j.castSucc))) := by
+    have hxf2 : H.h x' (t.f j.castSucc) = -(c * H.h x' (H.MMfam t (Sum.inr j.castSucc))) := by
       have e := f'_eq_G H g hs t j.castSucc
-      have : t.f j.castSucc = t.f' j.castSucc - c • H.MMfam t (Sum.inr j.castSucc) := by rw [e]; abel
+      have : t.f j.castSucc = t.f' j.castSucc - c • H.MMfam t (Sum.inr j.castSucc) := by
+        rw [e]; abel
       rw [this, hR_sub, hR_smul, hxf, cj_q]
       ring
     rw [H.h_add_left, H.h_smul_left, H.h_add_left, hxf2, hwf, hu1]
@@ -213,9 +238,12 @@ theorem iota_snd_of (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Te
   · rw [add_sub_cancel_left]
     exact Submodule.subset_span ⟨_, hw, rfl⟩
 
-theorem Lset_eq_snd (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Term V M r) (hg : H.IsGeneric t)
-    (hU : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f'))) (H.W0 t.f t.f')) :
-    H.Lset t.abelian₂ t.f = Prod.snd '' H.iotaGraph g t := by
+theorem Lset_eq_snd
+    (hM : M.OK)
+    (g : SplitG M.L) (hs : M.split = some g)
+    (t : Term V M r) (hg : H.IsGeneric t)
+    (hU : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f'))) (H.W0 t.f t.f'))
+    : H.Lset t.abelian₂ t.f = Prod.snd '' H.iotaGraph g t := by
   apply Set.Subset.antisymm
   · rintro _ ⟨x, hx, rfl⟩
     obtain ⟨x', hx', hx'p, hd⟩ := iota_fst_of H hM g hs t hg hU hx x.2
@@ -223,9 +251,12 @@ theorem Lset_eq_snd (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Te
   · rintro _ ⟨_, ⟨x', x, -, hx, -, rfl⟩, rfl⟩
     exact ⟨x, hx, rfl⟩
 
-theorem Lset_eq_fst (hM : M.OK) (g : SplitG M.L) (hs : M.split = some g) (t : Term V M r) (hg : H.IsGeneric t)
-    (hU : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f'))) (H.W0 t.f t.f')) :
-    H.Lset t.abelian₂ t.f' = Prod.fst '' H.iotaGraph g t := by
+theorem Lset_eq_fst
+    (hM : M.OK)
+    (g : SplitG M.L) (hs : M.split = some g)
+    (t : Term V M r) (hg : H.IsGeneric t)
+    (hU : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f'))) (H.W0 t.f t.f'))
+    : H.Lset t.abelian₂ t.f' = Prod.fst '' H.iotaGraph g t := by
   apply Set.Subset.antisymm
   · rintro _ ⟨x', hx', rfl⟩
     obtain ⟨x, hx, hxp, hd⟩ := iota_snd_of H hM g hs t hg hU hx' x'.2

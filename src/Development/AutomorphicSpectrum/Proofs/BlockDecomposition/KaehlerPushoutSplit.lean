@@ -10,16 +10,18 @@ namespace GlobalTheory.CompanionTheory.KaehlerPushout
 
 open KaehlerDifferential
 
-theorem exists_retraction (K A B R : Type) [CommRing K] [CommRing A] [CommRing B] [CommRing R]
-    [Algebra K A] [Algebra K B] [Algebra K R] [Algebra A R] [Algebra B R]
-    [IsScalarTower K A R] [IsScalarTower K B R] [Algebra.IsPushout K B A R] :
-    ∃ r : Ω[R⁄K] →ₗ[R] R ⊗[A] Ω[A⁄K],
-      (∀ x, r (KaehlerDifferential.mapBaseChange K A R x) = x) ∧
-      (∀ y, r (KaehlerDifferential.mapBaseChange K B R y) = 0) := by
+theorem exists_retraction
+    (K A B R : Type) [CommRing K] [CommRing A] [CommRing B] [CommRing R] [Algebra K A] [Algebra K B]
+    [Algebra K R] [Algebra A R] [Algebra B R] [IsScalarTower K A R] [IsScalarTower K B R]
+    [Algebra.IsPushout K B A R]
+    : ∃ r : Ω[R⁄K] →ₗ[R] R ⊗[A] Ω[A⁄K],
+      (∀ x, r (KaehlerDifferential.mapBaseChange K A R x) = x)
+        ∧ (∀ y, r (KaehlerDifferential.mapBaseChange K B R y) = 0) := by
   let e := KaehlerDifferential.tensorKaehlerEquiv K B A R
   refine ⟨e.symm.toLinearMap ∘ₗ KaehlerDifferential.map K B R R, ?_, ?_⟩
   · intro x
-    have key : KaehlerDifferential.map K B R R (KaehlerDifferential.mapBaseChange K A R x) = e x := by
+    have key
+        : KaehlerDifferential.map K B R R (KaehlerDifferential.mapBaseChange K A R x) = e x := by
       induction x with
       | add x y hx hy => simp only [map_add (f := _), hx, hy]
       | tmul s w =>
@@ -29,8 +31,10 @@ theorem exists_retraction (K A B R : Type) [CommRing K] [CommRing A] [CommRing B
         | mem w hw =>
           obtain ⟨a, rfl⟩ := hw
           simp [e, KaehlerDifferential.mapBaseChange_tmul, KaehlerDifferential.map_D]
-        | zero => simp
-        | add u v _ _ hu hv => simp only [tmul_add, map_add (f := _), hu, hv]
+        | zero =>
+          simp
+        | add u v _ _ hu hv =>
+          simp only [tmul_add, map_add (f := _), hu, hv]
         | smul a u _ hu =>
           rw [← TensorProduct.smul_tmul]
           exact hu _
@@ -45,25 +49,33 @@ theorem exists_retraction (K A B R : Type) [CommRing K] [CommRing A] [CommRing B
       | mem w hw =>
         obtain ⟨b, rfl⟩ := hw
         simp [KaehlerDifferential.mapBaseChange_tmul, KaehlerDifferential.map_D]
-      | zero => simp
-      | add u v _ _ hu hv => simp only [tmul_add, map_add (f := _), hu, hv, add_zero]
+      | zero =>
+        simp
+      | add u v _ _ hu hv =>
+        simp only [tmul_add, map_add (f := _), hu, hv, add_zero]
       | smul b u _ hu =>
         rw [← TensorProduct.smul_tmul]
         exact hu _
 
-theorem range_sup_range (K A B R : Type) [CommRing K] [CommRing A] [CommRing B] [CommRing R]
-    [Algebra K A] [Algebra K B] [Algebra K R] [Algebra A R] [Algebra B R]
-    [IsScalarTower K A R] [IsScalarTower K B R] [h : Algebra.IsPushout K A B R] :
-    LinearMap.range (KaehlerDifferential.mapBaseChange K A R) ⊔
-      LinearMap.range (KaehlerDifferential.mapBaseChange K B R) = ⊤ := by
+theorem range_sup_range
+    (K A B R : Type) [CommRing K] [CommRing A] [CommRing B] [CommRing R] [Algebra K A] [Algebra K B]
+    [Algebra K R] [Algebra A R] [Algebra B R] [IsScalarTower K A R] [IsScalarTower K B R]
+    [h : Algebra.IsPushout K A B R]
+    : LinearMap.range (KaehlerDifferential.mapBaseChange K A R)
+        ⊔ LinearMap.range (KaehlerDifferential.mapBaseChange K B R)
+      = ⊤ := by
   set S := LinearMap.range (KaehlerDifferential.mapBaseChange K A R) ⊔
       LinearMap.range (KaehlerDifferential.mapBaseChange K B R) with hS
   have hA : ∀ a : A, KaehlerDifferential.D K R (algebraMap A R a) ∈ S := fun a =>
-    Submodule.mem_sup_left ⟨1 ⊗ₜ KaehlerDifferential.D K A a, by
-      simp [KaehlerDifferential.mapBaseChange_tmul, KaehlerDifferential.map_D]⟩
+    Submodule.mem_sup_left ⟨
+      1 ⊗ₜ KaehlerDifferential.D K A a,
+      by simp [KaehlerDifferential.mapBaseChange_tmul, KaehlerDifferential.map_D]
+    ⟩
   have hB : ∀ b : B, KaehlerDifferential.D K R (algebraMap B R b) ∈ S := fun b =>
-    Submodule.mem_sup_right ⟨1 ⊗ₜ KaehlerDifferential.D K B b, by
-      simp [KaehlerDifferential.mapBaseChange_tmul, KaehlerDifferential.map_D]⟩
+    Submodule.mem_sup_right ⟨
+      1 ⊗ₜ KaehlerDifferential.D K B b,
+      by simp [KaehlerDifferential.mapBaseChange_tmul, KaehlerDifferential.map_D]
+    ⟩
   have hD : ∀ r : R, KaehlerDifferential.D K R r ∈ S := by
     intro r
     induction r using h.out.inductionOn with
@@ -76,7 +88,18 @@ theorem range_sup_range (K A B R : Type) [CommRing K] [CommRing A] [CommRing B] 
   rintro _ ⟨r, rfl⟩
   exact hD r
 
-theorem kaehler_pushout_split : ∀ (K A B R : Type) [CommRing K] [CommRing A] [CommRing B] [CommRing R] [Algebra K A] [Algebra K B] [Algebra K R] [Algebra A R] [Algebra B R] [IsScalarTower K A R] [IsScalarTower K B R] [Algebra.IsPushout K A B R], ∃ (r : Ω[R⁄K] →ₗ[R] R ⊗[A] Ω[A⁄K]) (π : Ω[R⁄K] →ₗ[R] R ⊗[B] Ω[B⁄K]), (∀ x, r (KaehlerDifferential.mapBaseChange K A R x) = x) ∧ (∀ y, r (KaehlerDifferential.mapBaseChange K B R y) = 0) ∧ (∀ x, π (KaehlerDifferential.mapBaseChange K A R x) = 0) ∧ (∀ y, π (KaehlerDifferential.mapBaseChange K B R y) = y) ∧ LinearMap.range (KaehlerDifferential.mapBaseChange K A R) ⊔ LinearMap.range (KaehlerDifferential.mapBaseChange K B R) = ⊤ := by
+theorem kaehler_pushout_split
+    : ∀ (K A B R : Type) [CommRing K] [CommRing A] [CommRing B] [CommRing R] [Algebra K A]
+        [Algebra K B] [Algebra K R] [Algebra A R] [Algebra B R] [IsScalarTower K A R]
+        [IsScalarTower K B R] [Algebra.IsPushout K A B R],
+      ∃ (r : Ω[R⁄K] →ₗ[R] R ⊗[A] Ω[A⁄K]) (π : Ω[R⁄K] →ₗ[R] R ⊗[B] Ω[B⁄K]),
+        (∀ x, r (KaehlerDifferential.mapBaseChange K A R x) = x)
+          ∧ (∀ y, r (KaehlerDifferential.mapBaseChange K B R y) = 0)
+          ∧ (∀ x, π (KaehlerDifferential.mapBaseChange K A R x) = 0)
+          ∧ (∀ y, π (KaehlerDifferential.mapBaseChange K B R y) = y)
+          ∧ LinearMap.range (KaehlerDifferential.mapBaseChange K A R)
+              ⊔ LinearMap.range (KaehlerDifferential.mapBaseChange K B R)
+            = ⊤ := by
   intro K A B R _ _ _ _ _ _ _ _ _ _ _ h
   haveI hs : Algebra.IsPushout K B A R := h.symm
   obtain ⟨r, hr₁, hr₂⟩ := exists_retraction K A B R

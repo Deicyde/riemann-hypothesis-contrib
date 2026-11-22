@@ -11,19 +11,25 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RiemannianHaa
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.FlagMeas
 
-theorem fundDom_volume_pos_lt_top : VolumeStep → ∀ (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf]
-    [μf.IsHaarMeasure] (fund : Set I.GA), I.IsFundDom (I.muA μf) fund → ∀ p q : ℕ, HasSig I p q → 2 ≤ p →
-    0 < I.muA μf fund ∧ I.muA μf fund < ⊤ := by
+theorem fundDom_volume_pos_lt_top
+    : VolumeStep
+      → ∀ (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsHaarMeasure] (fund : Set I.GA),
+        I.IsFundDom (I.muA μf) fund
+          → ∀ p q : ℕ, HasSig I p q → 2 ≤ p → 0 < I.muA μf fund ∧ I.muA μf fund < ⊤ := by
   intro hstep I μf _ _ fund hfund p q hsig hp
-  obtain ⟨hcov, hpos⟩ := GlobalTheory.T.leftQuotientCovolume_eq_fundamentalDomain_inter I μf fund Set.univ hfund MeasurableSet.univ
-    (fun _ _ _ _ => Set.mem_univ _)
+  obtain ⟨hcov, hpos⟩ :=
+    GlobalTheory.T.leftQuotientCovolume_eq_fundamentalDomain_inter I μf fund Set.univ hfund
+      MeasurableSet.univ (fun _ _ _ _ => Set.mem_univ _)
   rw [Set.univ_inter] at hcov
   refine ⟨hpos, ?_⟩
-  obtain ⟨⟨I₀, hsame, hsig₀⟩, hratio⟩ := GlobalTheory.T.hermVolumeRatioSameKind_of_volumeRatioInduction hstep I p q 2 0 hsig hp (Nat.zero_le _) le_rfl
+  obtain ⟨⟨I₀, hsame, hsig₀⟩, hratio⟩ :=
+    GlobalTheory.T.hermVolumeRatioSameKind_of_volumeRatioInduction hstep I p q 2 0 hsig hp
+      (Nat.zero_le _) le_rfl
   choose c hc using fun v : InfinitePlace I.F => GlobalTheory.T.riemannianHaarGauge_exists_pos_unique I.n (I.ε v)
   choose c₀ hc₀ using fun v : InfinitePlace I₀.F => GlobalTheory.T.riemannianHaarGauge_exists_pos_unique I₀.n (I₀.ε v)
   obtain ⟨-, hlc, hsc, -⟩ := GlobalTheory.CongTop.adelic_topology I₀

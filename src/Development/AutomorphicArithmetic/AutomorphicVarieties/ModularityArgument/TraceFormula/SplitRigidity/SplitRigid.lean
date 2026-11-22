@@ -14,4 +14,5 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open UpperTheory.V.Z.Tf.GOne
 
 theorem UpperTheory.V.Z.Tf.SR.splitRigid : UpperTheory.V.Z.Tf.SR.SplitRigid :=
-  splitRigid_of (shareBd (logTwo extId) (crossUp extId)) (absShare (logTwo extId) (crossUp extId) partCS) antiTw
+  splitRigid_of (shareBd (logTwo extId) (crossUp extId))
+    (absShare (logTwo extId) (crossUp extId) partCS) antiTw

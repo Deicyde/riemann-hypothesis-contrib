@@ -10,26 +10,46 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.VoronoiMeans.
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.CarDim GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.CarDim
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan.QuotientCellRadical
 
-theorem exists_cell_quot_orad_of_inRCone : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O), CMOrd O bar → ∀ (ψ : InvFun O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X], (∀ (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (s : Fin m' ↪ Fin m) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ), IsCell bar ψ γ → IsFaceCut γ s h → IsCell bar ψ (fun i => γ (s i))) → ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → ∀ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X), IsCell bar ψ γ → InRCone γ β → ∃ (m' : ℕ) (δ : Fin m' → LinearMap.BilinForm ℤ (X ⧸ (orad β : Submodule O X))), IsCell bar ψ δ ∧ InRCone (fun i => pull (orad β : Submodule O X).mkQ (δ i)) β ∧ genRank δ ≤ genRank γ := by
+theorem exists_cell_quot_orad_of_inRCone
+    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O),
+      CMOrd O bar
+        → ∀ (ψ : InvFun O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X],
+          (∀ (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (s : Fin m' ↪ Fin m)
+                (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
+              IsCell bar ψ γ → IsFaceCut γ s h → IsCell bar ψ (fun i => γ (s i)))
+            → ∀ β ∈ balForms bar X,
+              (∀ y, 0 ≤ β y y)
+                → ∀ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X),
+                  IsCell bar ψ γ → InRCone γ β
+                    → ∃ (m' : ℕ)
+                        (δ : Fin m' → LinearMap.BilinForm ℤ (X ⧸ (orad β : Submodule O X))),
+                      IsCell bar ψ δ ∧ InRCone (fun i => pull (orad β : Submodule O X).mkQ (δ i)) β
+                        ∧ genRank δ ≤ genRank γ := by
   intro O _ _ _ _ bar _hCM ψ X _ _ _ hface β _hβ _hβpsd m γ hcell hcone
   classical
-  have mem_bal : ∀ {Y : Type} [AddCommGroup Y] [Module O Y] (f : LinearMap.BilinForm ℤ Y),
-      f ∈ GlobalTheory.PolFan.balForms bar Y ↔
-        ((∀ y z, f y z = f z y) ∧ ∀ (a : O) (y z : Y), f (a • y) z = f y (bar a • z)) :=
+  have mem_bal
+      : ∀ {Y : Type} [AddCommGroup Y] [Module O Y] (f : LinearMap.BilinForm ℤ Y),
+        f ∈ GlobalTheory.PolFan.balForms bar Y
+          ↔ ((∀ y z, f y z = f z y) ∧ ∀ (a : O) (y z : Y), f (a • y) z = f y (bar a • z)) :=
     fun _ => Iff.rfl
-  have psd_zero : ∀ f : LinearMap.BilinForm ℤ X, f ∈ GlobalTheory.PolFan.balForms bar X →
-      (∀ y, 0 ≤ f y y) → ∀ x, f x x = 0 → ∀ y, f x y = 0 := by
+  have psd_zero
+      : ∀ f : LinearMap.BilinForm ℤ X,
+        f ∈ GlobalTheory.PolFan.balForms bar X → (∀ y, 0 ≤ f y y)
+          → ∀ x, f x x = 0 → ∀ y, f x y = 0 := by
     intro f hf hfp x hx y
     have hsym : f y x = f x y := ((mem_bal f).1 hf).1 y x
     by_contra hne
-    have expand : ∀ n : ℤ, f (n • x + y) (n • x + y) =
-        n * n * f x x + n * f x y + n * f y x + f y y := by
+    have expand
+        : ∀ n : ℤ, f (n • x + y) (n • x + y) = n * n * f x x + n * f x y + n * f y x + f y y := by
       intro n
-      simp only [map_add (f := _), map_zsmul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul]
+      simp only [map_add (f := _), map_zsmul, LinearMap.add_apply, LinearMap.smul_apply,
+        smul_eq_mul]
       ring
     have key := hfp ((-(f y y + 1) * f x y) • x + y)
     rw [expand, hx, hsym] at key
@@ -71,10 +91,11 @@ theorem exists_cell_quot_orad_of_inRCone : ∀ (O : Type) [CommRing O] [IsDedeki
       · exact h
       · exact absurd (psd_zero (γ j) (hcell.mem j) (hcell.nonneg j) x h.symm y) hxy
   choose w hwK hwpos using hw
-  let h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ :=
-    { toFun := fun f => ∑ j, f (w j) (w j)
-      map_add' := fun f g => by simp [Finset.sum_add_distrib]
-      map_smul' := fun a f => by simp [Finset.mul_sum] }
+  let h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ := {
+    toFun := fun f => ∑ j, f (w j) (w j)
+    map_add' := fun f g => by simp [Finset.sum_add_distrib]
+    map_smul' := fun a f => by simp [Finset.mul_sum]
+  }
   have hh : ∀ f, h f = ∑ j, f (w j) (w j) := fun _ => rfl
   let T : Finset (Fin m) := Finset.univ.filter P
   let s : Fin T.card ↪ Fin m := (T.orderEmbOfFin rfl).toEmbedding
@@ -110,21 +131,24 @@ theorem exists_cell_quot_orad_of_inRCone : ∀ (O : Type) [CommRing O] [IsDedeki
     intro i x y
     rw [← hδ i]
     rfl
-  have heZ : ∀ f : LinearMap.BilinForm ℤ (X ⧸ K),
-      ψ.evalZ (GlobalTheory.PolFan.pull K.mkQ f) = ψ.evalZ f := by
+  have heZ
+      : ∀ f : LinearMap.BilinForm ℤ (X ⧸ K),
+        ψ.evalZ (GlobalTheory.PolFan.pull K.mkQ f) = ψ.evalZ f := by
     intro f
     exact ψ.eval_comp hr (fun a b => ((f a b : ℤ) : ℝ))
-  have hpullbal : ∀ f ∈ GlobalTheory.PolFan.balForms bar (X ⧸ K),
-      GlobalTheory.PolFan.pull K.mkQ f ∈ GlobalTheory.PolFan.balForms bar X := by
+  have hpullbal
+      : ∀ f ∈ GlobalTheory.PolFan.balForms bar (X ⧸ K),
+        GlobalTheory.PolFan.pull K.mkQ f ∈ GlobalTheory.PolFan.balForms bar X := by
     intro f hf
     obtain ⟨hs, hb⟩ := (mem_bal f).1 hf
     refine (mem_bal _).2 ⟨fun y z => hs (K.mkQ y) (K.mkQ z), fun a y z => ?_⟩
     show f (K.mkQ (a • y)) (K.mkQ z) = f (K.mkQ y) (K.mkQ (bar a • z))
     rw [LinearMap.map_smul, LinearMap.map_smul]
     exact hb a (K.mkQ y) (K.mkQ z)
-  have hpullpsd : ∀ f : LinearMap.BilinForm ℤ (X ⧸ K), (∀ q, 0 ≤ f q q) →
-      ∀ y, 0 ≤ GlobalTheory.PolFan.pull K.mkQ f y y :=
-    fun f hf y => hf (K.mkQ y)
+  have hpullpsd
+      : ∀ f : LinearMap.BilinForm ℤ (X ⧸ K),
+        (∀ q, 0 ≤ f q q) → ∀ y, 0 ≤ GlobalTheory.PolFan.pull K.mkQ f y y := fun f hf y =>
+    hf (K.mkQ y)
   have hfun : (fun i => GlobalTheory.PolFan.pull K.mkQ (δ i)) = fun i => γ (s i) := funext hδ
   refine ⟨T.card, δ, ?_, ?_, ?_⟩
   · refine ⟨fun i => ?_, fun i q => ?_, ?_, ?_⟩
@@ -141,15 +165,24 @@ theorem exists_cell_quot_orad_of_inRCone : ∀ (O : Type) [CommRing O] [IsDedeki
       rw [hδap]
       exact hcell.nonneg (s i) y
     · intro c hc
-      have key := hcell'.linear.eval_eq_sum (X₁ := X ⧸ K) hr
-        (B := fun a b => ∑ i, c i * ((δ i a b : ℤ) : ℝ)) hc (fun a b => by simp only [hδap])
+      have key :=
+        hcell'.linear.eval_eq_sum (X₁ := X ⧸ K) hr
+          (B := fun a b => ∑ i, c i * ((δ i a b : ℤ) : ℝ))
+          hc
+          (fun a b => by simp only [hδap])
       rw [key]
       refine Finset.sum_congr rfl fun i _ => ?_
       show c i * ψ.evalZ (γ (s i)) = c i * ψ.evalZ (δ i)
       rw [← hδ i, heZ]
     · obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hcell'.strict
-      refine ⟨N, ℓ.comp (GlobalTheory.PolFan.CarDim.pullLin K.mkQ), hN, fun i => ?_,
-        fun β' hb hp => ?_, fun β' hb hp heq => ?_⟩
+      refine ⟨
+        N,
+        ℓ.comp (GlobalTheory.PolFan.CarDim.pullLin K.mkQ),
+        hN,
+        fun i => ?_,
+        fun β' hb hp => ?_,
+        fun β' hb hp heq => ?_
+      ⟩
       · have h1i : ((ℓ (γ (s i)) : ℤ) : ℝ) = (N : ℝ) * ψ.evalZ (γ (s i)) := h1 i
         rw [LinearMap.comp_apply, GlobalTheory.PolFan.CarDim.pullLin_apply, hδ i, h1i, ← hδ i, heZ]
       · rw [LinearMap.comp_apply, GlobalTheory.PolFan.CarDim.pullLin_apply, ← heZ]
@@ -161,7 +194,7 @@ theorem exists_cell_quot_orad_of_inRCone : ∀ (O : Type) [CommRing O] [IsDedeki
         apply GlobalTheory.PolFan.CarDim.pullLin_injective hr
         set_option synthInstance.maxHeartbeats 100000 in
           simp only [map_nsmul, map_zsmul, LinearMap.map_smul_of_tower, map_sum,
-          GlobalTheory.PolFan.CarDim.pullLin_apply]
+            GlobalTheory.PolFan.CarDim.pullLin_apply]
         rw [hkc']
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [hδ i]
@@ -170,10 +203,12 @@ theorem exists_cell_quot_orad_of_inRCone : ∀ (O : Type) [CommRing O] [IsDedeki
     refine ⟨fun i => c (s i), fun i => hc0 _, ?_⟩
     rw [hcsum]
     have hmap : Finset.univ.map s = T := Finset.map_orderEmbOfFin_univ T rfl
-    have e1 : (∑ i, c (s i) • GlobalTheory.PolFan.toReal (γ (s i))) =
-        ∑ j ∈ T, c j • GlobalTheory.PolFan.toReal (γ j) := by
-      exact (Finset.sum_map Finset.univ s (fun j => c j • GlobalTheory.PolFan.toReal (γ j))).symm.trans
-        (by rw [hmap])
+    have e1
+        : (∑ i, c (s i) • GlobalTheory.PolFan.toReal (γ (s i)))
+          = ∑ j ∈ T, c j • GlobalTheory.PolFan.toReal (γ j) := by
+      exact
+        (Finset.sum_map Finset.univ s (fun j => c j • GlobalTheory.PolFan.toReal (γ j))).symm.trans
+          (by rw [hmap])
     rw [e1]
     symm
     apply Finset.sum_filter_of_ne
@@ -189,7 +224,6 @@ theorem exists_cell_quot_orad_of_inRCone : ∀ (O : Type) [CommRing O] [IsDedeki
     unfold GlobalTheory.PolFan.genRank
     haveI : Module.Finite ℤ (Submodule.span ℤ (Set.range γ)) :=
       Module.Finite.span_of_finite ℤ (Set.finite_range γ)
-    exact Submodule.finrank_mono
-      (Submodule.span_mono (Set.range_comp_subset_range s γ))
+    exact Submodule.finrank_mono (Submodule.span_mono (Set.range_comp_subset_range s γ))
 
 end GlobalTheory.CompanionTheory.Ar.Fan.QuotientCellRadical

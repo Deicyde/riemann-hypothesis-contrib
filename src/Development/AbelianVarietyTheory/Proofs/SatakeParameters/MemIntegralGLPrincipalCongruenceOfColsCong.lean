@@ -8,24 +8,34 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TwistedK1
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col
 
 namespace GlobalTheory.CongOne
 
 open GlobalTheory.TopStep GlobalTheory.BlockDecompositionK1
 
-theorem mem_glint_prinCong_of_cols {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E))
-    {n : ℕ} (D : ℕ) (k : Sp E n ≃ₗ[E] Sp E n) (hD : 1 ≤ D)
-    (h : ∀ s l, IntAt P (((qOf P : E) ^ D)⁻¹ * (k (Pi.single s (1 : E)) l - (Pi.single s (1 : E) : Sp E n) l))) :
-    ∃ hk : k ∈ GLint E n P, (⟨k, hk⟩ : GLint E n P) ∈ GlobalTheory.TopStep.prinCong n P D := by
+theorem mem_glint_prinCong_of_cols
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    (P : HeightOneSpectrum (𝓞 E))
+    {n : ℕ}
+    (D : ℕ) (k : Sp E n ≃ₗ[E] Sp E n) (hD : 1 ≤ D)
+    (h : ∀ s l,
+      IntAt P
+        (((qOf P : E) ^ D)⁻¹ * (k (Pi.single s (1 : E)) l - (Pi.single s (1 : E) : Sp E n) l)))
+    : ∃ hk : k ∈ GLint E n P, (⟨k, hk⟩ : GLint E n P) ∈ GlobalTheory.TopStep.prinCong n P D := by
   classical
   have hq : ((qOf P : ℕ) : E) ≠ 0 := qOf_ne_zero
   have hqD : ((qOf P : E) ^ D) ≠ 0 := pow_ne_zero _ hq
   have hsingle : ∀ s l, IntAt P ((Pi.single s (1 : E) : Sp E n) l) := fun s l =>
     mem_stdAt.1 (single_mem_stdAt (P := P) s) l
   have hent : ∀ l s, IntAt P (k (Pi.single s (1 : E)) l) := fun l s => by
-    have e : k (Pi.single s (1 : E)) l = (qOf P : E) ^ D * (((qOf P : E) ^ D)⁻¹ *
-        (k (Pi.single s (1 : E)) l - (Pi.single s (1 : E) : Sp E n) l)) + (Pi.single s (1 : E) : Sp E n) l := by
+    have e
+        : k (Pi.single s (1 : E)) l
+          = (qOf P : E) ^ D
+              * (((qOf P : E) ^ D)⁻¹
+                * (k (Pi.single s (1 : E)) l - (Pi.single s (1 : E) : Sp E n) l))
+            + (Pi.single s (1 : E) : Sp E n) l := by
       field_simp
       ring
     rw [e]
@@ -61,10 +71,14 @@ theorem mem_glint_prinCong_of_cols {E : Type} [Field E] [NumberField E] [StarRin
   refine mem_stdAt.2 fun l => ?_
   have e1 := apply_eq_sum (k : Sp E n →ₗ[E] Sp E n) x l
   have e2 := apply_eq_sum (LinearMap.id : Sp E n →ₗ[E] Sp E n) x l
-  have e : (((qOf P : E) ^ D)⁻¹ • (k x - x)) l = ∑ s, x s * (((qOf P : E) ^ D)⁻¹ *
-      (k (Pi.single s (1 : E)) l - (Pi.single s (1 : E) : Sp E n) l)) := by
+  have e
+      : (((qOf P : E) ^ D)⁻¹ • (k x - x)) l
+        = ∑ s, x s * (((qOf P : E) ^ D)⁻¹ *
+          (k (Pi.single s (1 : E)) l - (Pi.single s (1 : E) : Sp E n) l)) := by
     rw [Pi.smul_apply, Pi.sub_apply, smul_eq_mul]
-    change ((qOf P : E) ^ D)⁻¹ * ((k : Sp E n →ₗ[E] Sp E n) x l - (LinearMap.id : Sp E n →ₗ[E] Sp E n) x l) = _
+    change ((qOf P : E) ^ D)⁻¹
+        * ((k : Sp E n →ₗ[E] Sp E n) x l - (LinearMap.id : Sp E n →ₗ[E] Sp E n) x l)
+      = _
     rw [e1, e2, ← Finset.sum_sub_distrib, Finset.mul_sum]
     refine Finset.sum_congr rfl fun s _ => ?_
     simp only [LinearMap.id_apply, LinearEquiv.coe_coe]

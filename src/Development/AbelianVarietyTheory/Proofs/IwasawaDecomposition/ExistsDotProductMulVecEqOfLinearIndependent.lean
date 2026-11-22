@@ -8,10 +8,10 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem exists_dotProduct_mulVec_eq_of_linearIndependent :
-    ∀ (r k : ℕ) (Mq : Matrix (Fin r) (Fin r) ℚ) (ε : Fin k → Fin r → ℚ), Mq.det ≠ 0 →
-      LinearIndependent ℚ ε → ∀ t : Fin k → ℚ,
-      ∃ x : Fin r → ℚ, ∀ i, x ⬝ᵥ Mq *ᵥ ε i = t i := by
+theorem exists_dotProduct_mulVec_eq_of_linearIndependent
+    : ∀ (r k : ℕ) (Mq : Matrix (Fin r) (Fin r) ℚ) (ε : Fin k → Fin r → ℚ),
+      Mq.det ≠ 0 → LinearIndependent ℚ ε
+        → ∀ t : Fin k → ℚ, ∃ x : Fin r → ℚ, ∀ i, x ⬝ᵥ Mq *ᵥ ε i = t i := by
   intro r k Mq ε hM hε t
   have hU : IsUnit Mq := (Matrix.isUnit_iff_isUnit_det Mq).2 (Ne.isUnit hM)
   have hinj : Function.Injective Mq.mulVecLin := Matrix.mulVec_injective_iff_isUnit.2 hU

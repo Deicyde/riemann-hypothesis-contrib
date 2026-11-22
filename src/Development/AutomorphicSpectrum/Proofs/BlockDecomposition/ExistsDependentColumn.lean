@@ -12,17 +12,15 @@ namespace GlobalTheory.CompanionTheory.NullFr.Coeff
 
 variable {A : Type} [CommRing A]
 
-theorem mul_eq_zero_of_mem {f : A} (hf : f * f = f) {x : A}
-    (hx : x ∈ Ideal.span ({1 - f} : Set A)) : f * x = 0 := by
+theorem mul_eq_zero_of_mem {f : A} (hf : f * f = f) {x : A} (hx : x ∈ Ideal.span ({1 - f} : Set A))
+    : f * x = 0 := by
   obtain ⟨y, rfl⟩ := Ideal.mem_span_singleton'.1 hx
   linear_combination (-y) * hf
 
-theorem mem_of_mul_eq_zero {f x : A} (hx : f * x = 0) :
-    x ∈ Ideal.span ({1 - f} : Set A) :=
+theorem mem_of_mul_eq_zero {f x : A} (hx : f * x = 0) : x ∈ Ideal.span ({1 - f} : Set A) :=
   Ideal.mem_span_singleton'.2 ⟨x, by linear_combination (-1 : A) * hx⟩
 
-theorem isMaximal_span {f : A} (hf : IsFieldIdem f) :
-    (Ideal.span ({1 - f} : Set A)).IsMaximal := by
+theorem isMaximal_span {f : A} (hf : IsFieldIdem f) : (Ideal.span ({1 - f} : Set A)).IsMaximal := by
   refine Ideal.isMaximal_iff.2 ⟨fun h => hf.ne ?_, fun J x hJ hx hxJ => ?_⟩
   · simpa using mul_eq_zero_of_mem hf.idem h
   · have hne : f * x ≠ 0 := fun h => hx (mem_of_mul_eq_zero h)
@@ -33,18 +31,21 @@ theorem isMaximal_span {f : A} (hf : IsFieldIdem f) :
     rw [this]
     exact J.add_mem h1 h2
 
-theorem alt_of_field {K : Type} [Field K] (π : A →+* K) (hs : Function.Surjective π) {f : A}
-    (hf : f * f = f) (h1 : π f = 1) (h0 : ∀ x, π x = 0 → f * x = 0) {a t : ℕ} (v : Fx A a t) :
-    (∃ M : Fx A t a, f • (M * v) = f • (1 : Fx A t t)) ∨
-      ∃ (i : Fin t) (c : Fin t → A), c i = 0 ∧ (∀ k, f * c k = c k) ∧
-        ∀ p, f * v p i = ∑ k, c k * v p k := by
+theorem alt_of_field
+    {K : Type} [Field K]
+    (π : A →+* K) (hs : Function.Surjective π)
+    {f : A} (hf : f * f = f) (h1 : π f = 1) (h0 : ∀ x, π x = 0 → f * x = 0)
+    {a t : ℕ} (v : Fx A a t)
+    : (∃ M : Fx A t a, f • (M * v) = f • (1 : Fx A t t))
+      ∨ ∃ (i : Fin t) (c : Fin t → A),
+        c i = 0 ∧ (∀ k, f * c k = c k) ∧ ∀ p, f * v p i = ∑ k, c k * v p k := by
   classical
   set w : Matrix (Fin a) (Fin t) K := v.map π with hw
   by_cases hli : LinearIndependent K w.col
   · left
     have hinj : Function.Injective w.mulVecLin := Matrix.mulVec_injective_iff.2 hli
-    obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective w.mulVecLin
-      (LinearMap.ker_eq_bot.2 hinj)
+    obtain ⟨g, hg⟩ :=
+      LinearMap.exists_leftInverse_of_injective w.mulVecLin (LinearMap.ker_eq_bot.2 hinj)
     set N : Matrix (Fin t) (Fin a) K := LinearMap.toMatrix' g with hN
     have hNw : N * w = 1 := by
       have : LinearMap.toMatrix' (g ∘ₗ w.mulVecLin) = N * w := by
@@ -61,9 +62,13 @@ theorem alt_of_field {K : Type} [Field K] (π : A →+* K) (hs : Function.Surjec
       simp [hl]
     ext p q
     have hpq := congrFun (congrFun hmap p) q
-    have hz : π (((Matrix.of fun p q => l (N p q) : Fx A t a) * v) p q - (1 : Fx A t t) p q) = 0 := by
+    have hz
+        : π (((Matrix.of fun p q => l (N p q) : Fx A t a) * v) p q - (1 : Fx A t t) p q) = 0 := by
       rw [map_sub, sub_eq_zero]
-      have hpq' : π (((Matrix.of fun p q => l (N p q) : Fx A t a) * v) p q) = (1 : Matrix (Fin t) (Fin t) K) p q := hpq
+      have hpq'
+          : π (((Matrix.of fun p q => l (N p q) : Fx A t a) * v) p q)
+            = (1 : Matrix (Fin t) (Fin t) K) p q :=
+        hpq
       rw [hpq']
       by_cases h : p = q
       · subst h
@@ -89,8 +94,8 @@ theorem alt_of_field {K : Type} [Field K] (π : A →+* K) (hs : Function.Surjec
           rw [map_sub, map_sum]
         simp only [map_mul, hl, hw']
         have hsum : ∑ k, b k * w p k = w p i := by
-          have hsplit : ∀ k, b k * w p k = -(g i)⁻¹ * (g k * w p k) +
-              (if k = i then w p i else 0) := by
+          have hsplit
+              : ∀ k, b k * w p k = -(g i)⁻¹ * (g k * w p k) + (if k = i then w p i else 0) := by
             intro k
             by_cases h : k = i
             · subst h
@@ -100,8 +105,8 @@ theorem alt_of_field {K : Type} [Field K] (π : A →+* K) (hs : Function.Surjec
             · simp only [hb, if_neg h]
               field_simp
               ring
-          rw [Finset.sum_congr rfl fun k _ => hsplit k, Finset.sum_add_distrib,
-            ← Finset.mul_sum, hrow]
+          rw [Finset.sum_congr rfl fun k _ => hsplit k, Finset.sum_add_distrib, ← Finset.mul_sum,
+            hrow]
           simp
         rw [hsum, sub_self]
       have := h0 _ hz
@@ -109,15 +114,19 @@ theorem alt_of_field {K : Type} [Field K] (π : A →+* K) (hs : Function.Surjec
       rw [this]
       exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem exists_dependent_column {A : Type} [CommRing A] {ι : Type} [Fintype ι] (e : A) (f : ι → A)
-    (hd : IsFieldDec e f) {a t : ℕ} (v : Fx A a t)
-    (hv : ¬ ∃ M : Fx A t a, M * v = e • (1 : Fx A t t)) :
-    ∃ (j : ι) (i : Fin t) (c : Fin t → A), c i = 0 ∧ (∀ k, f j * c k = c k) ∧
-      ∀ p, f j * v p i = ∑ k, c k * v p k := by
+theorem exists_dependent_column
+    {A : Type} [CommRing A]
+    {ι : Type} [Fintype ι]
+    (e : A) (f : ι → A) (hd : IsFieldDec e f)
+    {a t : ℕ} (v : Fx A a t) (hv : ¬ ∃ M : Fx A t a, M * v = e • (1 : Fx A t t))
+    : ∃ (j : ι) (i : Fin t) (c : Fin t → A),
+      c i = 0 ∧ (∀ k, f j * c k = c k) ∧ ∀ p, f j * v p i = ∑ k, c k * v p k := by
   classical
-  have key : ∀ j, (∃ M : Fx A t a, f j • (M * v) = f j • (1 : Fx A t t)) ∨
-      ∃ (i : Fin t) (c : Fin t → A), c i = 0 ∧ (∀ k, f j * c k = c k) ∧
-        ∀ p, f j * v p i = ∑ k, c k * v p k := by
+  have key
+      : ∀ j,
+        (∃ M : Fx A t a, f j • (M * v) = f j • (1 : Fx A t t))
+          ∨ ∃ (i : Fin t) (c : Fin t → A),
+            c i = 0 ∧ (∀ k, f j * c k = c k) ∧ ∀ p, f j * v p i = ∑ k, c k * v p k := by
     intro j
     have hj := hd.field j
     haveI := isMaximal_span hj

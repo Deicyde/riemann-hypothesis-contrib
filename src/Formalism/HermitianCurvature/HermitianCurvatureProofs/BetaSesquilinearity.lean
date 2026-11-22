@@ -263,7 +263,8 @@ open scoped ContDiff
 
 section Frob
 
-attribute [local instance] Matrix.frobeniusSeminormedAddCommGroup Matrix.frobeniusNormedAddCommGroup
+attribute [local instance]
+  Matrix.frobeniusSeminormedAddCommGroup Matrix.frobeniusNormedAddCommGroup
   Matrix.frobeniusNormedSpace Matrix.frobeniusNormedRing
 
 lemma gN_eq_frob {k r : ℕ} (g : Mat k r) : gN g = ‖g‖ := by
@@ -301,7 +302,8 @@ open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+variable
+  {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
   {E' : Type*} [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
 lemma Dx_smul (c : ℂ) (x : Bool × Mat k r) (f : Mat k r → E) :
@@ -382,7 +384,8 @@ lemma Dw_add {w : List (Bool × Mat k r)} (hw : ∀ x ∈ w, inLie k r x.2) {f�
 
 def ap (a : Mat k r → (E →L[ℂ] E')) (Φ : Mat k r → E) : Mat k r → E' := fun g => a g (Φ g)
 
-structure Pr (O UU : Set (Mat k r)) (m : ℕ∞) (a : Mat k r → (E →L[ℂ] E')) (Φ : Mat k r → E) : Prop where
+structure Pr (O UU : Set (Mat k r)) (m : ℕ∞) (a : Mat k r → (E →L[ℂ] E')) (Φ : Mat k r → E)
+    : Prop where
   ha : CkOn m UU a
   hΦ : CkOn m (GV k r) Φ
   hz : ∀ g ∈ GV k r, g ∈ O → Φ g = 0
@@ -601,7 +604,8 @@ open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+variable
+  {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
   {E' : Type*} [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
 lemma gN_pos {g : Mat k r} (hg : g ∈ GV k r) : 0 < gN g := lt_of_lt_of_le one_pos (gN_ge_one hg)
@@ -746,7 +750,8 @@ lemma prodBound {O UU : Set (Mat k r)} (hO : IsOpen O) (hcov : ∀ g ∈ GV k r,
           rw [hpAd]; field_simp
       _ ≤ 2 ^ m * (|C| * |c|) := mul_le_mul_of_nonneg_right hpow hK
 
-def trn (L : E →L[ℂ] E') (a b : Mat k r) (f : Mat k r → E) : Mat k r → E' := fun g => L (f (a * g * b))
+def trn (L : E →L[ℂ] E') (a b : Mat k r) (f : Mat k r → E) : Mat k r → E' := fun g =>
+  L (f (a * g * b))
 
 def abL (a b : Mat k r) : Mat k r →L[ℝ] Mat k r :=
   (mulRightRealCLM b).comp (LinearMap.toContinuousLinearMap (LinearMap.mulLeft ℝ a))
@@ -857,7 +862,8 @@ open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 lemma Sset_sub {z : Fin (2 * r + k + 1) → ℂ} {s : Mat k r} (hs : s ∈ Sset k r z) : s ∈ GV k r := by
@@ -947,7 +953,8 @@ lemma CC_bdd {A : ℝ} (hA : 0 ≤ A) {f : Mat k r → E} {c : ℝ} (hf : CCle A
 
 end gen
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 lemma word_le_order (Θ : DiffOp k r Wp Wq) {T : DTerm k r Wp Wq} (hT : T ∈ Θ) :
@@ -976,7 +983,8 @@ end Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -1007,31 +1015,44 @@ theorem clause_of_regularized_limit : Formalism.FourierDecayAlt.B.StepClause := 
     intro T hT
     obtain ⟨C, hC⟩ := hP T hT
     obtain ⟨c', hc'⟩ := hF'
-    exact ⟨_, prodBound hO hcov (sCkOn_mono le_top (hS T hT).2)
-      (fun u v hu hv hl g hg hgO => (hC u v hu hv hl g hg (not_lt.mp hgO)).2) hc' hz'⟩
-  refine ⟨suppIn_of D hε hsF, suppIn_of D hε hsF', sInCC_mono hAd (by omega) hF, sInCC_mono hAd (by omega) hF',
-    ?_, ?_, ?_⟩
-  ·
-    refine InCC_opsum Θ (fun T => ap T.coef (Rw T.word F)) ?_
+    exact ⟨
+      _,
+      prodBound hO hcov (sCkOn_mono le_top (hS T hT).2)
+        (fun u v hu hv hl g hg hgO => (hC u v hu hv hl g hg (not_lt.mp hgO)).2)
+        hc' hz'
+    ⟩
+  refine ⟨
+    suppIn_of D hε hsF,
+    suppIn_of D hε hsF',
+    sInCC_mono hAd (by omega) hF,
+    sInCC_mono hAd (by omega) hF',
+    ?_,
+    ?_,
+    ?_
+  ⟩
+  · refine InCC_opsum Θ (fun T => ap T.coef (Rw T.word F)) ?_
     intro T hT
     have hlen := word_le_order Θ hT
     obtain ⟨C, hC⟩ := hP T hT
     obtain ⟨c, hc⟩ : InCC (A + d) 5 (Rw T.word F) :=
       InCC_Rw T.word_lie (sInCC_mono le_rfl (by omega) hF)
-    exact ⟨_, prodBound hO hcov (sCkOn_mono le_top (hS T hT).1)
-      (fun u v hu hv hl g hg hgO => (hC u v hu hv (by omega) g hg (not_lt.mp hgO)).1) hc
-      (Rw_vanish hO T.word_lie hz)⟩
-  ·
-    refine InCC_opsum Θ
-      (fun T => fun g => ((-1 : ℂ) ^ T.word.length) • Rw T.word.reverse (ap T.coefAdj F') g) ?_
+    exact ⟨
+      _,
+      prodBound hO hcov (sCkOn_mono le_top (hS T hT).1)
+        (fun u v hu hv hl g hg hgO => (hC u v hu hv (by omega) g hg (not_lt.mp hgO)).1)
+        hc (Rw_vanish hO T.word_lie hz)
+    ⟩
+  · refine InCC_opsum Θ
+      (fun T => fun g => ((-1 : ℂ) ^ T.word.length) • Rw T.word.reverse (ap T.coefAdj F') g)
+      ?_
     intro T hT
     have hlen := word_le_order Θ hT
     obtain ⟨c, hc⟩ : InCC A 5 (Rw T.word.reverse (ap T.coefAdj F')) :=
-      InCC_Rw (fun X hX => T.word_lie X (List.mem_reverse.mp hX))
+      InCC_Rw
+        (fun X hX => T.word_lie X (List.mem_reverse.mp hX))
         (sInCC_mono le_rfl (by simp; omega) (hadj T hT))
     exact ⟨_, CCle_smul _ hc⟩
-  ·
-    intro p hp T hT i j hij hj
+  · intro p hp T hT i j hij hj
     have hlen := word_le_order Θ hT
     set a : Mat k r := (Matrix.of p.1.1)⁻¹ * (Matrix.of p.1.2)⁻¹ with hadef
     set b : Mat k r := Matrix.of p.2.2 * Matrix.of p.2.1 with hbdef
@@ -1039,17 +1060,19 @@ theorem clause_of_regularized_limit : Formalism.FourierDecayAlt.B.StepClause := 
     have hb : b ∈ GV k r := gv_mul hp.2.2.2.1 hp.2.2.1.1
     have hlie1 : ∀ X ∈ (T.word.take i).reverse, inLie k r X := fun X hX =>
       T.word_lie X (List.mem_of_mem_take (List.mem_reverse.mp hX))
-    have hlie2 : ∀ X ∈ T.word.drop j, inLie k r X := fun X hX => T.word_lie X (List.mem_of_mem_drop hX)
+    have hlie2 : ∀ X ∈ T.word.drop j, inLie k r X := fun X hX =>
+      T.word_lie X (List.mem_of_mem_drop hX)
     have hl1 : (T.word.take i).reverse.length ≤ opOrder Θ := by
       simp only [List.length_reverse, List.length_take]; omega
-    have hl2 : (T.word.drop j).length ≤ opOrder Θ := by
-      simp only [List.length_drop]; omega
+    have hl2 : (T.word.drop j).length ≤ opOrder Θ := by simp only [List.length_drop]; omega
     obtain ⟨K₁, hK₁⟩ : InCC A 0 (Rw (T.word.take i).reverse (ap T.coefAdj F')) :=
       InCC_Rw hlie1 (sInCC_mono le_rfl (by omega) (hadj T hT))
     obtain ⟨K₂, hK₂⟩ : InCC (A + d) 0 (Rw ((T.word.drop j).map fun X => b⁻¹ * X * b) F) :=
-      InCC_Rw (fun X hX => by
-        obtain ⟨Y, hY, rfl⟩ := List.mem_map.mp hX
-        exact lie_conj (hlie2 Y hY) hb) (sInCC_mono le_rfl (by simp only [List.length_map]; omega) hF)
+      InCC_Rw
+        (fun X hX => by
+          obtain ⟨Y, hY, rfl⟩ := List.mem_map.mp hX
+          exact lie_conj (hlie2 Y hY) hb)
+        (sInCC_mono le_rfl (by simp only [List.length_map]; omega) hF)
     obtain ⟨cF, hcF⟩ := hF
     have hFk : CkOn ((opOrder Θ + 5 : ℕ) : ℕ∞) (GV k r) F := hcF.1
     set f₁ : Mat k r → (Wq →L[ℂ] Wp) := Rw (T.word.take i).reverse (ap T.coefAdj F') with hf₁
@@ -1065,23 +1088,30 @@ theorem clause_of_regularized_limit : Formalism.FourierDecayAlt.B.StepClause := 
       exact_mod_cast (by omega : (T.word.drop j).length ≤ opOrder Θ + 5)
     have hb₂ : ∀ g ∈ GV k r, ‖f₂ g‖ ≤ ‖Lp D p‖ * K₂ := by
       intro g hg
-      rw [hf₂, rho_eq_trn, Rw_trn _ ha hb _ hlie2
-        (sCkOn_mono (by exact_mod_cast (by omega : (T.word.drop j).length ≤ opOrder Θ + 5)) hFk) g hg]
-      exact ((Lp D p).le_opNorm _).trans (mul_le_mul_of_nonneg_left
-        (CC_bdd hAd0 hK₂ _ (gv_mul (gv_mul ha hg) hb)) (norm_nonneg _))
+      rw [hf₂, rho_eq_trn,
+        Rw_trn _ ha hb _ hlie2
+          (sCkOn_mono (by exact_mod_cast (by omega : (T.word.drop j).length ≤ opOrder Θ + 5)) hFk) g
+          hg]
+      exact ((Lp D p).le_opNorm _).trans
+        (mul_le_mul_of_nonneg_left (CC_bdd hAd0 hK₂ _ (gv_mul (gv_mul ha hg) hb)) (norm_nonneg _))
     set G : Mat k r → (Wq →L[ℂ] Wp) := fun g => ((‖f₂ g‖ : ℝ) : ℂ) • f₁ g with hG
     have hGn : ∀ g, ‖G g‖ = ‖f₁ g‖ * ‖f₂ g‖ := by
       intro g
       simp only [hG, norm_smul, Complex.norm_real, norm_norm]
       ring
-    have hGc : ContinuousOn G (GV k r) := (Complex.continuous_ofReal.comp_continuousOn hc₂.norm).smul hc₁
+    have hGc : ContinuousOn G (GV k r) :=
+      (Complex.continuous_ofReal.comp_continuousOn hc₂.norm).smul hc₁
     have hGm := aesm_of_continuousOn D hGc
-    have hfin := hCC G (‖Lp D p‖ * K₂ * K₁) hGm (by
-      intro g hg
-      have h1 : gN g ^ A * ‖f₁ g‖ ≤ K₁ := hK₁.2 [] [] (by simp) (by simp) (by simp) g hg
-      have h0 : 0 ≤ gN g ^ A * ‖f₁ g‖ := mul_nonneg (Real.rpow_nonneg (gN_pos hg).le _) (norm_nonneg _)
-      calc gN g ^ A * ‖G g‖ = ‖f₂ g‖ * (gN g ^ A * ‖f₁ g‖) := by rw [hGn]; ring
-        _ ≤ ‖Lp D p‖ * K₂ * K₁ := mul_le_mul (hb₂ g hg) h1 h0 ((norm_nonneg _).trans (hb₂ g hg)))
+    have hfin :=
+      hCC G (‖Lp D p‖ * K₂ * K₁) hGm (by
+        intro g hg
+        have h1 : gN g ^ A * ‖f₁ g‖ ≤ K₁ := hK₁.2 [] [] (by simp) (by simp) (by simp) g hg
+        have h0 : 0 ≤ gN g ^ A * ‖f₁ g‖ :=
+          mul_nonneg (Real.rpow_nonneg (gN_pos hg).le _) (norm_nonneg _)
+        calc
+          gN g ^ A * ‖G g‖
+            = ‖f₂ g‖ * (gN g ^ A * ‖f₁ g‖) := by rw [hGn]; ring
+          _ ≤ ‖Lp D p‖ * K₂ * K₁ := mul_le_mul (hb₂ g hg) h1 h0 ((norm_nonneg _).trans (hb₂ g hg)))
     have hint : Integrable (fun g : Mt k r => G (Matrix.of g)) D.μG := ⟨hGm, hfin⟩
     refine hint.norm.congr (Filter.Eventually.of_forall fun g => ?_)
     exact hGn _
@@ -1094,10 +1124,12 @@ open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-def wt (D : RealPlaceData k r Wp Wq) (q : (Fin r → ℂ) × ℂ) : ℝ := bcWeight k r (Tz k r D.z) (Tz k r D.z') q
+def wt (D : RealPlaceData k r Wp Wq) (q : (Fin r → ℂ) × ℂ) : ℝ :=
+  bcWeight k r (Tz k r D.z) (Tz k r D.z') q
 
 lemma wt_nonneg (D : RealPlaceData k r Wp Wq) (q) : 0 ≤ wt D q := by
   unfold wt bcWeight
@@ -1126,8 +1158,9 @@ def μQ (D : RealPlaceData k r Wp Wq) : Measure ((Fin r → ℂ) × ℂ) :=
 
 lemma μQ_ac (D : RealPlaceData k r Wp Wq) : μQ D ≪ volume.restrict (Qset D) := withDensity_absolutelyContinuous _ _
 
-def Jv (D : RealPlaceData k r Wp Wq) (τ : ℝ × ℝ) (F : Mat k r → (Wq →L[ℂ] Wp)) (q : (Fin r → ℂ) × ℂ) :
-    PiLp 2 (fun _ : Fin (Module.finrank ℂ Wq) => Wp) := hsVec (Jtau D τ F (gq D q))
+def Jv (D : RealPlaceData k r Wp Wq) (τ : ℝ × ℝ) (F : Mat k r → (Wq →L[ℂ] Wp)) (q : (Fin r → ℂ) × ℂ)
+    : PiLp 2 (fun _ : Fin (Module.finrank ℂ Wq) => Wp) :=
+  hsVec (Jtau D τ F (gq D q))
 
 lemma lint_μQ (D : RealPlaceData k r Wp Wq) (f : (Fin r → ℂ) × ℂ → ℝ≥0∞) :
     ∫⁻ q, f q ∂μQ D = ∫⁻ q, ENNReal.ofReal (wt D q) * f q := by
@@ -1373,9 +1406,12 @@ lemma InCC_mono {A : ℝ} {m m' : ℕ} (h : m' ≤ m) {F : Mat k r → E} (hF : 
 
 end zero
 
-def CCs (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] (hL : CCLin) (A : ℝ) (m : ℕ) :
-    Submodule ℂ (Mat k r → (Wq →L[ℂ] Wp)) where
+def CCs
+    (k r : ℕ)
+    (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq]
+    (hL : CCLin) (A : ℝ) (m : ℕ)
+    : Submodule ℂ (Mat k r → (Wq →L[ℂ] Wp)) where
   carrier := {F | InCC A m F}
   add_mem' := by
     rintro a b ⟨c, hc⟩ ⟨c', hc'⟩
@@ -1500,13 +1536,15 @@ end Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 theorem assemble_equality_identity : Formalism.FourierDecayAlt.B.AssembleEq := by
   intro hC hAe hFa hL hDC hJ1 k r Wp Wq _ _ _ _ _ _ D A hA hRB hRA hU hJ hDB
   have hDD : DiagDom D A := diagDom hAe hFa hRB hRA hU hJ
   have h11 : ((1, 1) : ℝ × ℝ) ∈ Quad := by simp [Quad]
-  have eJ : ∀ F : Mat k r → (Wq →L[ℂ] Wp), Jtau D (1, 1) F = JF D F := fun F => funext fun g => hJ1 k r Wp Wq D F g
+  have eJ : ∀ F : Mat k r → (Wq →L[ℂ] Wp), Jtau D (1, 1) F = JF D F := fun F =>
+    funext fun g => hJ1 k r Wp Wq D F g
   have eN : ∀ F : Mat k r → (Wq →L[ℂ] Wp), normSq D F = normSqTau D (1, 1) F := fun F => by
     unfold normSq normSqTau; rw [eJ]
   have eB : ∀ F F' : Mat k r → (Wq →L[ℂ] Wp), beta D F F' = betaTau D (1, 1) F F' := fun F F' => by

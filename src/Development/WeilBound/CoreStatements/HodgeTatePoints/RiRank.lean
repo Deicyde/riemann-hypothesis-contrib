@@ -18,11 +18,13 @@ noncomputable section
 namespace PositivityTheory.HtPt.Ri
 
 section
-variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] {v : Valuation C NNReal}
-  {F : Type} [Field F] [Fintype F] [DecidableEq F]
+variable
+  {C : Type} [Field C]
+  {R : Type} [CommRing R] [Algebra R C]
+  {v : Valuation C NNReal} {F : Type} [Field F] [Fintype F] [DecidableEq F]
 
-def wsum (χ : MulChar F R) (g : F → C) : F → C :=
-  fun x => ∑ a : F, algebraMap R C (χ⁻¹ a) * g (a * x)
+def wsum (χ : MulChar F R) (g : F → C) : F → C := fun x =>
+  ∑ a : F, algebraMap R C (χ⁻¹ a) * g (a * x)
 
 omit [DecidableEq F] in
 lemma wsum_mem {M : Submodule R (F → C)} (hM : FStable (F := F) M) (χ : MulChar F R) {g : F → C}
@@ -109,13 +111,34 @@ lemma push_sum (b : F) (u φ : F → C) :
 
 end
 
-theorem r_dual : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (AA : HopfOrder (C := C) R F), FStable (F := F) AA.carrier → ∀ ψ : AddChar F C, ψ ≠ 1 → ∀ AD : HopfOrder (C := C) R F, AD.carrier = (dualLat AA.carrier).map (fourier (R := R) fun h a : F => ψ (h * a)) → FStable (F := F) AD.carrier ∧ ∀ χ : MulChar F R, χ ≠ 1 → ∀ c cD : R, xIdeal AA.carrier χ = Ideal.span {c} → xIdeal AD.carrier χ = Ideal.span {cD} → v (algebraMap R C c) * v (algebraMap R C cD) = v (∑ a, algebraMap R C (χ⁻¹ a) * ψ a) := by
+theorem r_dual
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (AA : HopfOrder (C := C) R F),
+              FStable (F := F) AA.carrier
+                → ∀ ψ : AddChar F C,
+                  ψ ≠ 1
+                    → ∀ AD : HopfOrder (C := C) R F,
+                      AD.carrier
+                          = (dualLat AA.carrier).map (fourier (R := R) fun h a : F => ψ (h * a))
+                        → FStable (F := F) AD.carrier
+                          ∧ ∀ χ : MulChar F R,
+                            χ ≠ 1
+                              → ∀ c cD : R,
+                                xIdeal AA.carrier χ = Ideal.span {c}
+                                  → xIdeal AD.carrier χ = Ideal.span {cD}
+                                  → v (algebraMap R C c) * v (algebraMap R C cD)
+                                    = v (∑ a, algebraMap R C (χ⁻¹ a) * ψ a) := by
   intro p _ C _ _ _ v R _ _ hv hpv F _ _ _ _ f hcard AA hM ψ hψ AD hAD
   refine ⟨?_, ?_⟩
   · intro b g hg
     rw [hAD] at hg ⊢
     obtain ⟨u, hu, rfl⟩ := Submodule.mem_map.mp hg
-    refine Submodule.mem_map.mpr ⟨fun y => ∑ a ∈ Finset.univ.filter (fun a => b * a = y), u a, ?_, ?_⟩
+    refine Submodule.mem_map.mpr
+      ⟨fun y => ∑ a ∈ Finset.univ.filter (fun a => b * a = y), u a, ?_, ?_⟩
     · intro f' hf'
       obtain ⟨r, hr⟩ : ∃ r : R, algebraMap R C r = ∑ a, u a * f' (b • a) := hu _ (hM b f' hf')
       refine ⟨r, ?_⟩
@@ -134,23 +157,30 @@ theorem r_dual : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
       intro h
       have e := wsum_eq χ (fun a => ψ a) (wsum_zero_of_ne hv hχ _) h
       simpa [wsum, G] using e
-    have hFt : ∀ t : C, fourier (R := R) (fun h a : F => ψ (h * a)) (fun a => t * algebraMap R C (χ⁻¹ a)) = fun h => t * G * algebraMap R C (χ h) := by
+    have hFt
+        : ∀ t : C,
+          fourier (R := R) (fun h a : F => ψ (h * a)) (fun a => t * algebraMap R C (χ⁻¹ a))
+            = fun h => t * G * algebraMap R C (χ h) := by
       intro t
       funext h
       show ∑ a, t * algebraMap R C (χ⁻¹ a) * ψ (h * a) = _
-      calc ∑ a, t * algebraMap R C (χ⁻¹ a) * ψ (h * a) = t * ∑ a, algebraMap R C (χ⁻¹ a) * ψ (a * h) := by
-            rw [Finset.mul_sum]
-            refine Finset.sum_congr rfl fun a _ => ?_
-            rw [mul_comm h a]
-            ring
+      calc
+        ∑ a, t * algebraMap R C (χ⁻¹ a) * ψ (h * a)
+            = t * ∑ a, algebraMap R C (χ⁻¹ a) * ψ (a * h) := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl fun a _ => ?_
+          rw [mul_comm h a]
+          ring
         _ = _ := by rw [hW h]; ring
     have hq : v ((Fintype.card F : C) - 1) = 1 := v_card_sub_one p hv hpv
     have hcm : (fun a => algebraMap R C c * algebraMap R C (χ a)) ∈ AA.carrier :=
       (mem_xIdeal _ _ _).mp (by rw [hc]; exact Ideal.mem_span_singleton_self c)
     have hDm : (fun a => algebraMap R C cD * algebraMap R C (χ a)) ∈ AD.carrier :=
       (mem_xIdeal _ _ _).mp (by rw [hcD]; exact Ideal.mem_span_singleton_self cD)
-    have key : ∀ t : C, (∃ s : R, algebraMap R C s = t * algebraMap R C c) →
-        v t * v G ≤ v (algebraMap R C cD) := by
+    have key
+        : ∀ t : C,
+          (∃ s : R, algebraMap R C s = t * algebraMap R C c)
+            → v t * v G ≤ v (algebraMap R C cD) := by
       intro t ⟨s, hs⟩
       have hu : (fun a => t * algebraMap R C (χ⁻¹ a)) ∈ dualLat AA.carrier := by
         intro g hg
@@ -166,7 +196,8 @@ theorem r_dual : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
       have hm : (fun h => t * G * algebraMap R C (χ h)) ∈ AD.carrier := by
         rw [hAD, ← hFt]
         exact Submodule.mem_map_of_mem hu
-      obtain ⟨s', hs'⟩ : ∃ s' : R, algebraMap R C s' = t * G * algebraMap R C (χ 1) := AD.le_int hm 1
+      obtain ⟨s', hs'⟩ : ∃ s' : R, algebraMap R C s' = t * G * algebraMap R C (χ 1) :=
+        AD.le_int hm 1
       rw [map_one, map_one, mul_one] at hs'
       have hx : s' ∈ xIdeal AD.carrier χ := by
         rw [mem_xIdeal, hs']
@@ -174,43 +205,56 @@ theorem r_dual : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
       rw [hcD] at hx
       obtain ⟨k, rfl⟩ := Ideal.mem_span_singleton'.mp hx
       rw [← map_mul, ← hs', map_mul, map_mul]
-      calc v (algebraMap R C k) * v (algebraMap R C cD) ≤ 1 * v (algebraMap R C cD) := by
-            gcongr
-            exact hv.map_le_one k
+      calc
+        v (algebraMap R C k) * v (algebraMap R C cD) ≤ 1 * v (algebraMap R C cD) := by
+          gcongr
+          exact hv.map_le_one k
         _ = _ := one_mul _
     rw [hAD] at hDm
     obtain ⟨u, hu, hFu⟩ := Submodule.mem_map.mp hDm
-    obtain ⟨r, hr⟩ : ∃ r : R, algebraMap R C r = ∑ a, u a * (algebraMap R C c * algebraMap R C (χ a)) := hu _ hcm
-    have hinv : ∑ h, algebraMap R C (χ⁻¹ h) * fourier (R := R) (fun h a : F => ψ (h * a)) u h =
-        G * ∑ a, u a * algebraMap R C (χ a) := by
-      have e1 : ∀ h, fourier (R := R) (fun h a : F => ψ (h * a)) u h = ∑ a, u a * ψ (h * a) := fun h => rfl
+    obtain ⟨r, hr⟩
+        : ∃ r : R, algebraMap R C r = ∑ a, u a * (algebraMap R C c * algebraMap R C (χ a)) :=
+      hu _ hcm
+    have hinv
+        : ∑ h, algebraMap R C (χ⁻¹ h) * fourier (R := R) (fun h a : F => ψ (h * a)) u h
+          = G * ∑ a, u a * algebraMap R C (χ a) := by
+      have e1 : ∀ h, fourier (R := R) (fun h a : F => ψ (h * a)) u h = ∑ a, u a * ψ (h * a) :=
+        fun h => rfl
       simp_rw [e1, Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun a _ => ?_
-      calc ∑ h, algebraMap R C (χ⁻¹ h) * (u a * ψ (h * a)) = u a * ∑ h, algebraMap R C (χ⁻¹ h) * ψ (h * a) := by
-            rw [Finset.mul_sum]
-            refine Finset.sum_congr rfl fun h _ => ?_
-            ring
+      calc
+        ∑ h, algebraMap R C (χ⁻¹ h) * (u a * ψ (h * a))
+            = u a * ∑ h, algebraMap R C (χ⁻¹ h) * ψ (h * a) := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl fun h _ => ?_
+          ring
         _ = _ := by rw [hW a]; ring
-    have hL : ∑ h, algebraMap R C (χ⁻¹ h) * fourier (R := R) (fun h a : F => ψ (h * a)) u h =
-        algebraMap R C cD * ((Fintype.card F : C) - 1) := by
+    have hL
+        : ∑ h, algebraMap R C (χ⁻¹ h) * fourier (R := R) (fun h a : F => ψ (h * a)) u h
+          = algebraMap R C cD * ((Fintype.card F : C) - 1) := by
       rw [hFu, ← sum_inv_mul (C := C) χ, Finset.mul_sum]
       refine Finset.sum_congr rfl fun h _ => ?_
       ring
-    have e2 : ∑ a, u a * (algebraMap R C c * algebraMap R C (χ a)) = algebraMap R C c * ∑ a, u a * algebraMap R C (χ a) := by
+    have e2
+        : ∑ a, u a * (algebraMap R C c * algebraMap R C (χ a))
+          = algebraMap R C c * ∑ a, u a * algebraMap R C (χ a) := by
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
       ring
     rw [e2] at hr
-    have hmain : G * algebraMap R C r = algebraMap R C c * algebraMap R C cD * ((Fintype.card F : C) - 1) := by
+    have hmain
+        : G * algebraMap R C r
+          = algebraMap R C c * algebraMap R C cD * ((Fintype.card F : C) - 1) := by
       linear_combination G * hr - algebraMap R C c * hinv + algebraMap R C c * hL
     have hup : v (algebraMap R C c) * v (algebraMap R C cD) ≤ v G := by
       have h2 := congrArg v hmain
       rw [map_mul, map_mul, map_mul, hq, mul_one] at h2
       rw [← h2]
-      calc v G * v (algebraMap R C r) ≤ v G * 1 := by
-            gcongr
-            exact hv.map_le_one r
+      calc
+        v G * v (algebraMap R C r) ≤ v G * 1 := by
+          gcongr
+          exact hv.map_le_one r
         _ = v G := mul_one _
     refine le_antisymm hup ?_
     by_cases hc0 : algebraMap R C c = 0
@@ -231,9 +275,28 @@ theorem r_dual : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
       have hvc : 0 < v (algebraMap R C c) := pos_iff_ne_zero.mpr ((Valuation.ne_zero_iff v).mpr hc0)
       rwa [inv_mul_le_iff₀ hvc] at h3
 
-theorem r_decomp : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (AA : HopfOrder (C := C) R F), FStable (F := F) AA.carrier → ∀ σ : MulChar F R, IsFund p σ → ∀ c : ℕ → R, (∀ m, xIdeal AA.carrier (σ ^ m) = Ideal.span {c m}) → augIdeal AA.carrier = Submodule.span R ((fun m (a : F) => algebraMap R C (c m * (σ ^ m) a)) '' (Finset.Icc 1 (p ^ f - 1) : Set ℕ)) ∧ AA.carrier = Submodule.span R {(1 : F → C)} ⊔ augIdeal AA.carrier ∧ HasColen R v AA.carrier (∏ m ∈ Finset.Icc 1 (p ^ f - 1), v (algebraMap R C (c m))) := by
+theorem r_decomp
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (AA : HopfOrder (C := C) R F),
+              FStable (F := F) AA.carrier
+                → ∀ σ : MulChar F R,
+                  IsFund p σ
+                    → ∀ c : ℕ → R,
+                      (∀ m, xIdeal AA.carrier (σ ^ m) = Ideal.span {c m})
+                        → augIdeal AA.carrier
+                            = Submodule.span R
+                              ((fun m (a : F) => algebraMap R C (c m * (σ ^ m) a))
+                                '' (Finset.Icc 1 (p ^ f - 1) : Set ℕ))
+                          ∧ AA.carrier = Submodule.span R {(1 : F → C)} ⊔ augIdeal AA.carrier
+                          ∧ HasColen R v AA.carrier
+                            (∏ m ∈ Finset.Icc 1 (p ^ f - 1), v (algebraMap R C (c m))) := by
   intro p _ C _ _ _ v R _ _ hv hpv F _ _ _ _ f hcard AA hM σ hσ c hc
-  obtain ⟨hord, -, -, -, hsep⟩ := GlobalTheory.CompanionTheory.Ar.GR.FundGen.main p C v R hv hpv F f hcard σ hσ
+  obtain ⟨hord, -, -, -, hsep⟩ :=
+    GlobalTheory.CompanionTheory.Ar.GR.FundGen.main p C v R hv hpv F f hcard σ hσ
   set n := p ^ f - 1 with hn
   have hcardn : Fintype.card F = n + 1 := by
     rw [hcard, hn, Nat.sub_add_cancel (Nat.one_le_pow _ _ (Fact.out : p.Prime).pos)]
@@ -248,7 +311,9 @@ theorem r_decomp : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
     intro g
     rw [← Finset.Ico_add_one_right_eq_Icc, Finset.sum_Ico_eq_sum_range]
     simp only [Nat.add_sub_cancel, add_comm 1]
-  have horth : ∀ z : F, ∑ m ∈ Finset.Icc 1 n, algebraMap R C ((σ ^ m) z) = if z = 1 then (n : C) else 0 := by
+  have horth
+      : ∀ z : F,
+        ∑ m ∈ Finset.Icc 1 n, algebraMap R C ((σ ^ m) z) = if z = 1 then (n : C) else 0 := by
     intro z
     by_cases hz1 : z = 1
     · subst hz1
@@ -266,20 +331,27 @@ theorem r_decomp : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
     have hζn : algebraMap R C (σ z) ^ n = 1 := by
       rw [← map_pow, ← hpow n (by omega), hσn, MulChar.one_apply (Ne.isUnit hz0), map_one]
     rw [hIcc]
-    have e : ∀ i, algebraMap R C ((σ ^ (i + 1)) z) = algebraMap R C (σ z) * algebraMap R C (σ z) ^ i := by
+    have e
+        : ∀ i,
+          algebraMap R C ((σ ^ (i + 1)) z) = algebraMap R C (σ z) * algebraMap R C (σ z) ^ i := by
       intro i
       rw [hpow _ (Nat.succ_ne_zero i), map_pow, pow_succ, mul_comm]
     simp_rw [e, ← Finset.mul_sum, geom_sum_eq hζ1, hζn, sub_self, zero_div, mul_zero]
   have hb : ∀ m, (fun a : F => algebraMap R C (c m * (σ ^ m) a)) ∈ AA.carrier := by
     intro m
-    have := (mem_xIdeal AA.carrier (σ ^ m) (c m)).mp (by rw [hc m]; exact Ideal.mem_span_singleton_self _)
+    have :=
+      (mem_xIdeal AA.carrier (σ ^ m) (c m)).mp (by rw [hc m]; exact Ideal.mem_span_singleton_self _)
     simpa only [map_mul] using this
   have hn0 : (n : C) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
   obtain ⟨qi, hqi⟩ : ∃ qi : R, algebraMap R C qi = (n : C)⁻¹ := by
     have h5 := v_card_sub_one (R := R) (F := F) p hv hpv
     rw [hcardn, Nat.cast_succ, add_sub_cancel_right] at h5
     exact hv.exists_of_le_one (by rw [map_inv₀, h5, inv_one])
-  have hI : augIdeal AA.carrier = Submodule.span R ((fun m (a : F) => algebraMap R C (c m * (σ ^ m) a)) '' (Finset.Icc 1 (p ^ f - 1) : Set ℕ)) := by
+  have hI
+      : augIdeal AA.carrier
+        = Submodule.span R
+          ((fun m (a : F) => algebraMap R C (c m * (σ ^ m) a))
+            '' (Finset.Icc 1 (p ^ f - 1) : Set ℕ)) := by
     apply le_antisymm
     · intro g hg
       simp only [augIdeal, Submodule.mem_inf, LinearMap.mem_ker] at hg
@@ -292,35 +364,47 @@ theorem r_decomp : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
         obtain ⟨k, rfl⟩ := Ideal.mem_span_singleton'.mp hr
         exact ⟨k, hr1.symm⟩
       choose k hk using hk
-      have e4 : ∀ a : F, ∑ m ∈ Finset.Icc 1 n, algebraMap R C ((σ ^ m)⁻¹ a) = if a = 1 then (n : C) else 0 := by
+      have e4
+          : ∀ a : F,
+            ∑ m ∈ Finset.Icc 1 n, algebraMap R C ((σ ^ m)⁻¹ a) = if a = 1 then (n : C) else 0 := by
         intro a
         simp_rw [MulChar.inv_apply']
         rw [horth a⁻¹]
         simp [inv_eq_one]
-      have hg_eq : g = ∑ m ∈ Finset.Icc 1 n, (qi * k m) • (fun a : F => algebraMap R C (c m * (σ ^ m) a)) := by
-        funext x
-        rw [Finset.sum_apply]
-        simp only [Pi.smul_apply, Algebra.smul_def, map_mul, hqi]
-        have hw : ∀ m ∈ Finset.Icc 1 n, wsum (σ ^ m) g x = algebraMap R C ((σ ^ m) x) * (algebraMap R C (k m) * algebraMap R C (c m)) := by
-          intro m _
-          rw [wsum_eq (σ ^ m) g (by simp [wsum, hg0]) x, hk m, map_mul]
-        have hsum : ∑ m ∈ Finset.Icc 1 n, wsum (σ ^ m) g x = (n : C) * g x := by
-          simp only [wsum]
-          calc ∑ m ∈ Finset.Icc 1 n, ∑ a, algebraMap R C ((σ ^ m)⁻¹ a) * g (a * x)
-              = ∑ a, (∑ m ∈ Finset.Icc 1 n, algebraMap R C ((σ ^ m)⁻¹ a)) * g (a * x) := by
+      have hg_eq
+          : g
+            = ∑ m ∈ Finset.Icc 1 n, (qi * k m) • (fun a : F => algebraMap R C (c m * (σ ^ m) a)) :=
+        by
+          funext x
+          rw [Finset.sum_apply]
+          simp only [Pi.smul_apply, Algebra.smul_def, map_mul, hqi]
+          have hw
+              : ∀ m ∈ Finset.Icc 1 n,
+                wsum (σ ^ m) g x
+                  = algebraMap R C ((σ ^ m) x) * (algebraMap R C (k m) * algebraMap R C (c m)) := by
+            intro m _
+            rw [wsum_eq (σ ^ m) g (by simp [wsum, hg0]) x, hk m, map_mul]
+          have hsum : ∑ m ∈ Finset.Icc 1 n, wsum (σ ^ m) g x = (n : C) * g x := by
+            simp only [wsum]
+            calc
+              ∑ m ∈ Finset.Icc 1 n, ∑ a, algebraMap R C ((σ ^ m)⁻¹ a) * g (a * x)
+                  = ∑ a, (∑ m ∈ Finset.Icc 1 n, algebraMap R C ((σ ^ m)⁻¹ a)) * g (a * x) := by
                 rw [Finset.sum_comm]
                 simp_rw [Finset.sum_mul]
-            _ = _ := by
+              _ = _ := by
                 simp_rw [e4]
                 simp [ite_mul]
-        rw [Finset.sum_congr rfl hw] at hsum
-        calc g x = (n : C)⁻¹ * ((n : C) * g x) := by field_simp
-          _ = _ := by
-            rw [← hsum, Finset.mul_sum]
-            refine Finset.sum_congr rfl fun m _ => ?_
-            ring
+          rw [Finset.sum_congr rfl hw] at hsum
+          calc
+            g x
+              = (n : C)⁻¹ * ((n : C) * g x) := by field_simp
+            _ = _ := by
+              rw [← hsum, Finset.mul_sum]
+              refine Finset.sum_congr rfl fun m _ => ?_
+              ring
       rw [hg_eq]
-      exact Submodule.sum_mem _ fun m hm => Submodule.smul_mem _ _ (Submodule.subset_span ⟨m, Finset.mem_coe.mpr hm, rfl⟩)
+      exact Submodule.sum_mem _ fun m hm =>
+        Submodule.smul_mem _ _ (Submodule.subset_span ⟨m, Finset.mem_coe.mpr hm, rfl⟩)
     · rw [Submodule.span_le]
       rintro _ ⟨m, hm, rfl⟩
       simp only [augIdeal, SetLike.mem_coe, Submodule.mem_inf, LinearMap.mem_ker]
@@ -344,15 +428,23 @@ theorem r_decomp : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
   let e := Fintype.equivFinOfCardEq hcardn
   have hre : ∀ g : ℕ → C, ∑ j : F, g (e j : ℕ) = g 0 + ∑ m ∈ Finset.Icc 1 n, g m := by
     intro g
-    rw [e.sum_comp (fun k : Fin (n + 1) => g k), Fin.sum_univ_eq_sum_range g (n + 1), Finset.sum_range_succ', hIcc, add_comm]
+    rw [e.sum_comp (fun k : Fin (n + 1) => g k), Fin.sum_univ_eq_sum_range g (n + 1),
+      Finset.sum_range_succ', hIcc, add_comm]
   have hreP : ∀ g : ℕ → NNReal, ∏ j : F, g (e j : ℕ) = g 0 * ∏ m ∈ Finset.Icc 1 n, g m := by
     intro g
-    rw [e.prod_comp (fun k : Fin (n + 1) => g k), Fin.prod_univ_eq_prod_range g (n + 1), Finset.prod_range_succ',
-      ← Finset.Ico_add_one_right_eq_Icc, Finset.prod_Ico_eq_prod_range, mul_comm]
+    rw [e.prod_comp (fun k : Fin (n + 1) => g k), Fin.prod_univ_eq_prod_range g (n + 1),
+      Finset.prod_range_succ', ← Finset.Ico_add_one_right_eq_Icc, Finset.prod_Ico_eq_prod_range,
+      mul_comm]
     simp only [Nat.add_sub_cancel, add_comm 1]
   let TR : Matrix F F R := Matrix.of fun x j => if (e j : ℕ) = 0 then 1 else (σ ^ (e j : ℕ)) x
-  let UR : Matrix F F R := Matrix.of fun j y => if (e j : ℕ) = 0 then (if y = 0 then 1 else 0)
-    else if y = 0 then (if (e j : ℕ) = n then -1 else 0) else qi * (σ ^ (e j : ℕ))⁻¹ y
+  let UR : Matrix F F R :=
+    Matrix.of fun j y =>
+      if (e j : ℕ) = 0 then
+        (if y = 0 then 1 else 0)
+      else if y = 0 then
+        (if (e j : ℕ) = n then -1 else 0)
+      else
+        qi * (σ ^ (e j : ℕ))⁻¹ y
   let d : F → C := fun j => if (e j : ℕ) = 0 then 1 else algebraMap R C (c (e j))
   let T := TR.map (algebraMap R C)
   let U := UR.map (algebraMap R C)
@@ -360,25 +452,38 @@ theorem r_decomp : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
     ext x y
     rw [Matrix.mul_apply]
     simp only [T, U, Matrix.map_apply, Matrix.of_apply, TR, UR]
-    have h6 := hre (fun k => algebraMap R C (if k = 0 then 1 else (σ ^ k) x) *
-      algebraMap R C (if k = 0 then (if y = 0 then 1 else 0) else if y = 0 then (if k = n then -1 else 0) else qi * (σ ^ k)⁻¹ y))
+    have h6 :=
+      hre (fun k =>
+        algebraMap R C (if k = 0 then 1 else (σ ^ k) x) * algebraMap R C
+          (if k = 0 then
+             (if y = 0 then 1 else 0)
+           else if y = 0 then
+             (if k = n then -1 else 0)
+           else
+             qi * (σ ^ k)⁻¹ y))
     simp only at h6
     rw [h6]
-    rw [Finset.sum_congr rfl (g := fun m => algebraMap R C ((σ ^ m) x) * algebraMap R C (if y = 0 then (if m = n then -1 else 0) else qi * (σ ^ m)⁻¹ y))
+    rw [Finset.sum_congr rfl
+      (g := fun m =>
+        algebraMap R C ((σ ^ m) x)
+          * algebraMap R C (if y = 0 then (if m = n then -1 else 0) else qi * (σ ^ m)⁻¹ y))
       (fun m hm => by rw [if_neg (by simp at hm; omega), if_neg (by simp at hm; omega)])]
     by_cases hy : y = 0
     · subst hy
-      simp only [if_true, map_one, one_mul, apply_ite (algebraMap R C), map_neg, map_zero, mul_ite, mul_neg, mul_one, mul_zero]
+      simp only [if_true, map_one, one_mul, apply_ite (algebraMap R C), map_neg, map_zero, mul_ite,
+        mul_neg, mul_one, mul_zero]
       rw [Finset.sum_ite_eq' (Finset.Icc 1 n) n, if_pos (Finset.mem_Icc.mpr ⟨hn1, le_rfl⟩), hσn]
       by_cases hx : x = 0
       · subst hx
-        rw [MulChar.map_nonunit (1 : MulChar F R) (not_isUnit_zero (M₀ := F)), map_zero, neg_zero, add_zero,
-          Matrix.one_apply_eq]
+        rw [MulChar.map_nonunit (1 : MulChar F R) (not_isUnit_zero (M₀ := F)), map_zero, neg_zero,
+          add_zero, Matrix.one_apply_eq]
       · rw [MulChar.one_apply (Ne.isUnit hx), map_one, Matrix.one_apply_ne hx]
         ring
     · simp only [if_neg hy, if_true, map_zero, mul_zero, zero_add, map_mul, hqi]
-      have e5 : ∀ m, algebraMap R C ((σ ^ m) x) * ((n : C)⁻¹ * algebraMap R C ((σ ^ m)⁻¹ y)) =
-          (n : C)⁻¹ * algebraMap R C ((σ ^ m) (x * y⁻¹)) := by
+      have e5
+          : ∀ m,
+            algebraMap R C ((σ ^ m) x) * ((n : C)⁻¹ * algebraMap R C ((σ ^ m)⁻¹ y))
+              = (n : C)⁻¹ * algebraMap R C ((σ ^ m) (x * y⁻¹)) := by
         intro m
         rw [MulChar.inv_apply', map_mul (σ ^ m) x, map_mul]
         ring
@@ -399,11 +504,15 @@ theorem r_decomp : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
       exact hv.map_le_one _
     have hU1 := hv.map_le_one UR.det
     refine le_antisymm hT1 ?_
-    calc (1 : NNReal) = v T.det * v (algebraMap R C UR.det) := h1.symm
+    calc
+      (1 : NNReal)
+        = v T.det * v (algebraMap R C UR.det) := h1.symm
       _ ≤ v T.det * 1 := by gcongr
       _ = v T.det := mul_one _
-  have hcol : ∀ j, (fun x => (T * Matrix.diagonal d) x j) =
-      fun x => if (e j : ℕ) = 0 then 1 else algebraMap R C (c (e j) * (σ ^ (e j : ℕ)) x) := by
+  have hcol
+      : ∀ j,
+        (fun x => (T * Matrix.diagonal d) x j)
+          = fun x => if (e j : ℕ) = 0 then 1 else algebraMap R C (c (e j) * (σ ^ (e j : ℕ)) x) := by
     intro j
     funext x
     rw [Matrix.mul_diagonal]
@@ -440,8 +549,10 @@ theorem r_decomp : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
   · rw [Matrix.det_mul, Matrix.det_diagonal, map_mul, hvT, one_mul, map_prod]
     have h7 := hreP (fun k => v (if k = 0 then 1 else algebraMap R C (c k)))
     simp only at h7
-    rw [show (∏ j, v (d j)) = ∏ j, v (if (e j : ℕ) = 0 then 1 else algebraMap R C (c (e j))) from rfl, h7]
-    simp only [↓reduceIte, if_true, map_one, one_mul]
+    rw [show (∏ j, v (d j)) = ∏ j, v (if (e j : ℕ) = 0 then 1 else algebraMap R C (c (e j))) from
+        rfl,
+      h7]
+    simp only [↓ reduceIte, if_true, map_one, one_mul]
     refine Finset.prod_congr rfl fun m hm => ?_
     rw [if_neg (by simp at hm; omega)]
 

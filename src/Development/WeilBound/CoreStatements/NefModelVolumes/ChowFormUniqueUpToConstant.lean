@@ -9,7 +9,12 @@ open MvPolynomial
 
 namespace ChowFormCompatibility
 
-theorem chow_form_unique_up_to_constant : ∀ (k : Type) [Field k] (N B : ℕ) (I : Ideal (MvPolynomial (Fin N) k)) (f g : MvPolynomial (Fin B × Fin N) k), GroundTheory.Heights₂.Heights.IsChowForm I B f → GroundTheory.Heights₂.Heights.IsChowForm I B g → ∃ c : k, c ≠ 0 ∧ g = C c * f := by
+theorem chow_form_unique_up_to_constant
+    : ∀ (k : Type) [Field k] (N B : ℕ) (I : Ideal (MvPolynomial (Fin N) k))
+        (f g : MvPolynomial (Fin B × Fin N) k),
+      GroundTheory.Heights₂.Heights.IsChowForm I B f
+        → GroundTheory.Heights₂.Heights.IsChowForm I B g
+        → ∃ c : k, c ≠ 0 ∧ g = C c * f := by
   intro k _ N B I f g hf hg
   have hfg : f ∣ g := (hf.2 g).1 ((hg.2 g).2 dvd_rfl)
   have hgf : g ∣ f := (hg.2 f).1 ((hf.2 f).2 dvd_rfl)

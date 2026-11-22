@@ -12,12 +12,14 @@ namespace PositivityTheory.RgUd.T.Desc.SLF
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc
 open PositivityTheory.PfBern.Loc (SC restr restr_surjective pullL mulInd)
-open PositivityTheory.PfBern.Frob (FrobeniusReciprocity IsUnimod eqv eqvF transl translF Fib fibSmul)
+open PositivityTheory.PfBern.Frob
+  (FrobeniusReciprocity IsUnimod eqv eqvF transl translF Fib fibSmul)
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 set_option maxHeartbeats 1000000 in
-theorem sliceVan_of_frob' [CharZero k] (hFr : FrobeniusReciprocity) (hU : Unimod (k := k)) : SliceVan (k := k) := by
+theorem sliceVan_of_frob' [CharZero k] (hFr : FrobeniusReciprocity) (hU : Unimod (k := k))
+    : SliceVan (k := k) := by
   intro n Z hZ s hs hss hV F P hFc hFB hFinv hP ξ hsupp hinv f hf
   have hCR : CR (adj Z s) := CRAdj.cr_adj Z hZ s hs hss
   haveI : T2Space k := t2k
@@ -51,21 +53,24 @@ theorem sliceVan_of_frob' [CharZero k] (hFr : FrobeniusReciprocity) (hU : Unimod
     constructor
     · intro h
       have e1 : g.1.val * s * g.1⁻¹.val = s := congrArg Subtype.val h
-      calc s * g.1.val = g.1.val * s * g.1⁻¹.val * g.1.val := by rw [e1]
+      calc
+        s * g.1.val
+          = g.1.val * s * g.1⁻¹.val * g.1.val := by rw [e1]
         _ = g.1.val * s := by rw [mul_assoc, h1, mul_one]
     · intro h
       apply Subtype.ext
       change g.1.val * s * g.1⁻¹.val = s
       rw [← h, mul_assoc, h2, mul_one]
   have uG : IsUnimod (GzS Z) := hU n Z hZ
-  let φ : H ≃ₜ* GzS (adj Z s) :=
-    { toFun := fun h => ⟨h.1.1, mem_Gz_adj_iff.2 ⟨h.1.2, (memH h.1).1 h.2⟩⟩
-      invFun := fun g => ⟨⟨g.1, (mem_Gz_adj_iff.1 g.2).1⟩, (memH _).2 (mem_Gz_adj_iff.1 g.2).2⟩
-      left_inv := fun h => rfl
-      right_inv := fun g => rfl
-      map_mul' := fun a b => rfl
-      continuous_toFun := Continuous.subtype_mk (continuous_subtype_val.comp continuous_subtype_val) _
-      continuous_invFun := Continuous.subtype_mk (Continuous.subtype_mk continuous_subtype_val _) _ }
+  let φ : H ≃ₜ* GzS (adj Z s) := {
+    toFun := fun h => ⟨h.1.1, mem_Gz_adj_iff.2 ⟨h.1.2, (memH h.1).1 h.2⟩⟩
+    invFun := fun g => ⟨⟨g.1, (mem_Gz_adj_iff.1 g.2).1⟩, (memH _).2 (mem_Gz_adj_iff.1 g.2).2⟩
+    left_inv := fun h => rfl
+    right_inv := fun g => rfl
+    map_mul' := fun a b => rfl
+    continuous_toFun := Continuous.subtype_mk (continuous_subtype_val.comp continuous_subtype_val) _
+    continuous_invFun := Continuous.subtype_mk (Continuous.subtype_mk continuous_subtype_val _) _
+  }
   have uH : IsUnimod H := isUnimod_of_equiv φ (hU n (adj Z s) hCR)
 
   letI B := actX (F := F) hFinv
@@ -74,7 +79,8 @@ theorem sliceVan_of_frob' [CharZero k] (hFr : FrobeniusReciprocity) (hU : Unimod
   haveI : LocallyCompactSpace (Xs F) := hXc.isClosedEmbedding_subtypeVal.locallyCompactSpace
   let σX : Xs F → Tset F P := fun q => ⟨aeval q.1.1 P, P_mem_Tset hP q.2.1⟩
   have hσc : Continuous σX :=
-    Continuous.subtype_mk ((continuous_aevalM P).comp (continuous_fst.comp continuous_subtype_val)) _
+    Continuous.subtype_mk ((continuous_aevalM P).comp (continuous_fst.comp continuous_subtype_val))
+      _
   have hσeq : ∀ (g : GzS Z) (q : Xs F), σX (g • q) = g • σX q := fun g q =>
     Subtype.ext (Asm.aeval_conj g.1 q.1.1 P)
   have he_eq : ∀ (g : GzS Z) (c : GzS Z ⧸ H), e (g • c) = g • e c := by
@@ -101,16 +107,19 @@ theorem sliceVan_of_frob' [CharZero k] (hFr : FrobeniusReciprocity) (hU : Unimod
 
   letI : MeasurableSpace (GzS Z) := borel _
   haveI : BorelSpace (GzS Z) := ⟨rfl⟩
-  obtain ⟨Fr, hFr1, -⟩ := hFr (GzS Z) H hHc uG uH (Xs F) p hpc hp (1 : GzS Z →* ℂˣ)
-    (by simpa using continuous_const) Measure.haar Measure.haar
+  obtain ⟨Fr, hFr1, -⟩ :=
+    hFr (GzS Z) H hHc uG uH (Xs F) p hpc hp (1 : GzS Z →* ℂˣ) (by simpa using continuous_const)
+      Measure.haar Measure.haar
 
   obtain ⟨D, hD⟩ := exists_distr_on ξ hXc hsupp
-  let actH : GL (Fin n) k → Sp k n ≃ₜ Sp k n := fun g =>
-    { toFun := act g, invFun := act g⁻¹
-      left_inv := fun q => by rw [← act_mul, inv_mul_cancel, act_one]
-      right_inv := fun q => by rw [← act_mul, mul_inv_cancel, act_one]
-      continuous_toFun := continuous_act.comp (continuous_const.prodMk continuous_id)
-      continuous_invFun := continuous_act.comp (continuous_const.prodMk continuous_id) }
+  let actH : GL (Fin n) k → Sp k n ≃ₜ Sp k n := fun g => {
+    toFun := act g
+    invFun := act g⁻¹
+    left_inv := fun q => by rw [← act_mul, inv_mul_cancel, act_one]
+    right_inv := fun q => by rw [← act_mul, mul_inv_cancel, act_one]
+    continuous_toFun := continuous_act.comp (continuous_const.prodMk continuous_id)
+    continuous_invFun := continuous_act.comp (continuous_const.prodMk continuous_id)
+  }
   have hDeqv : D ∈ eqv (X := Xs F) (1 : GzS Z →* ℂˣ) := by
     intro g φ0
     obtain ⟨f0, rfl⟩ := restr_surjective hXc φ0
@@ -125,21 +134,25 @@ theorem sliceVan_of_frob' [CharZero k] (hFr : FrobeniusReciprocity) (hU : Unimod
     intro g x hx
     change g.1.val *ᵥ x.1.2 = 0
     rw [show x.1.2 = 0 from hx, Matrix.mulVec_zero]
-  have hSD : PositivityTheory.PfBern.Frob.SupportedIn (D : PositivityTheory.PfBern.Frob.Distr (Xs F)) C := by
+  have hSD : PositivityTheory.PfBern.Frob.SupportedIn
+      (D : PositivityTheory.PfBern.Frob.Distr (Xs F)) C := by
     refine (hFr1 ⟨D, hDeqv⟩ C hCc hCinv).2 ?_
     intro φ0 hφ0
     have hEeqv := (Fr ⟨D, hDeqv⟩).2
     set E : PositivityTheory.PfBern.Frob.Distr (Fib p) := ((Fr ⟨D, hDeqv⟩ : eqvF hp _) : PositivityTheory.PfBern.Frob.Distr (Fib p)) with hEdef
     let Ys : Set (Sp k n) := {q | q.1 ∈ F ∧ aeval q.1 P = s}
-    have hYc : IsClosed Ys := (hFc.preimage continuous_fst).inter
-      (isClosed_eq ((continuous_aevalM P).comp continuous_fst) continuous_const)
-    let hY : Fib p ≃ₜ Ys :=
-      { toFun := fun z => ⟨z.1.1, z.1.2.1, (hfib z.1).1 z.2⟩
-        invFun := fun y => ⟨⟨y.1, y.2.1, trivial⟩, (hfib _).2 y.2.2⟩
-        left_inv := fun z => rfl
-        right_inv := fun y => rfl
-        continuous_toFun := Continuous.subtype_mk (continuous_subtype_val.comp continuous_subtype_val) _
-        continuous_invFun := Continuous.subtype_mk (Continuous.subtype_mk continuous_subtype_val _) _ }
+    have hYc : IsClosed Ys :=
+      (hFc.preimage continuous_fst).inter
+        (isClosed_eq ((continuous_aevalM P).comp continuous_fst) continuous_const)
+    let hY : Fib p ≃ₜ Ys := {
+      toFun := fun z => ⟨z.1.1, z.1.2.1, (hfib z.1).1 z.2⟩
+      invFun := fun y => ⟨⟨y.1, y.2.1, trivial⟩, (hfib _).2 y.2.2⟩
+      left_inv := fun z => rfl
+      right_inv := fun y => rfl
+      continuous_toFun :=
+        Continuous.subtype_mk (continuous_subtype_val.comp continuous_subtype_val) _
+      continuous_invFun := Continuous.subtype_mk (Continuous.subtype_mk continuous_subtype_val _) _
+    }
     let E' : PositivityTheory.PfBern.Loc.Distr Ys := E.comp (pullL hY)
     obtain ⟨η, hη⟩ := exists_functional hYc E'
     have hcommY : ∀ y ∈ Ys, s * y.1 = y.1 * s := by
@@ -149,8 +162,8 @@ theorem sliceVan_of_frob' [CharZero k] (hFr : FrobeniusReciprocity) (hU : Unimod
       exact this.symm
     have hSη : Supp η (Bz (adj Z s) ×ˢ Set.univ) := by
       intro f hf1 hvan
-      have hr : restr hYc ⟨f, hf1.1⟩ = 0 := Subtype.ext (funext fun y =>
-        hvan y.1 ⟨mem_Bz_adj (hFB y.2.1) (hcommY y.1 y.2), trivial⟩)
+      have hr : restr hYc ⟨f, hf1.1⟩ = 0 :=
+        Subtype.ext (funext fun y => hvan y.1 ⟨mem_Bz_adj (hFB y.2.1) (hcommY y.1 y.2), trivial⟩)
       have := hη ⟨f, hf1.1⟩
       rw [hr, map_zero] at this
       exact this

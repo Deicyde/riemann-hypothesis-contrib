@@ -7,7 +7,8 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM.SecondDiff
@@ -50,9 +51,11 @@ lemma zpow_neg_lip (n : ℕ) {z u v : ℂ} (hz : z ≠ 0)
     (by simpa [Metric.mem_closedBall, dist_eq_norm] using hu)
   simpa using key
 
-theorem second_diff_inv_pow : ∀ j : ℕ, ∃ C : ℝ, ∀ z a b : ℂ, z ≠ 0 → 4 * ‖a‖ ≤ ‖z‖ → 4 * ‖b‖ ≤ ‖z‖ →
-    ‖(z ^ j)⁻¹ - ((z + a) ^ j)⁻¹ - ((z + b) ^ j)⁻¹ + ((z + a + b) ^ j)⁻¹‖
-      ≤ C * ‖a‖ * ‖b‖ / ‖z‖ ^ (j + 2) := by
+theorem second_diff_inv_pow
+    : ∀ j : ℕ, ∃ C : ℝ, ∀ z a b : ℂ,
+      z ≠ 0 → 4 * ‖a‖ ≤ ‖z‖ → 4 * ‖b‖ ≤ ‖z‖
+        → ‖(z ^ j)⁻¹ - ((z + a) ^ j)⁻¹ - ((z + b) ^ j)⁻¹ + ((z + a + b) ^ j)⁻¹‖
+          ≤ C * ‖a‖ * ‖b‖ / ‖z‖ ^ (j + 2) := by
   intro j
   refine ⟨j * (j + 1) * 2 ^ (j + 2), ?_⟩
   intro z a b hz ha hb
@@ -62,35 +65,41 @@ theorem second_diff_inv_pow : ∀ j : ℕ, ∃ C : ℝ, ∀ z a b : ℂ, z ≠ 0
     intro w hw
     have h : ‖w - z‖ ≤ ‖z‖ / 4 := by simpa [Metric.mem_closedBall, dist_eq_norm] using hw
     refine ⟨by linarith, ?_⟩
-    calc ‖w + a - z‖ = ‖(w - z) + a‖ := by ring_nf
+    calc
+      ‖w + a - z‖
+        = ‖(w - z) + a‖ := by ring_nf
       _ ≤ ‖w - z‖ + ‖a‖ := norm_add_le _ _
       _ ≤ ‖z‖ / 2 := by linarith
-  have hd : ∀ w ∈ Metric.closedBall z (‖z‖ / 4), HasDerivAt g
-      ((((-(j:ℤ)) : ℤ) : ℂ) * (w ^ (-(j:ℤ) - 1) - (w + a) ^ (-(j:ℤ) - 1))) w := by
+  have hd
+      : ∀ w ∈ Metric.closedBall z (‖z‖ / 4),
+        HasDerivAt g ((((-(j : ℤ)) : ℤ) : ℂ) * (w ^ (-(j : ℤ) - 1) - (w + a) ^ (-(j : ℤ) - 1)))
+          w := by
     intro w hw
     obtain ⟨h1, h2⟩ := hmem w hw
-    have d1 := hasDerivAt_zpow (-(j:ℤ)) w (Or.inl (ne_zero_of_near hz h1))
-    have d2 := (hasDerivAt_zpow (-(j:ℤ)) (w + a) (Or.inl (ne_zero_of_near hz h2))).comp_add_const w a
+    have d1 := hasDerivAt_zpow (-(j : ℤ)) w (Or.inl (ne_zero_of_near hz h1))
+    have d2 :=
+      (hasDerivAt_zpow (-(j : ℤ)) (w + a) (Or.inl (ne_zero_of_near hz h2))).comp_add_const w a
     rw [mul_sub]
     exact d1.sub d2
-  have key := Convex.norm_image_sub_le_of_norm_deriv_le (f := g)
-    (s := Metric.closedBall z (‖z‖ / 4)) (x := z) (y := z + b)
-    (C := j * ((j + 1 : ℕ) * (2 / ‖z‖) ^ ((j + 1 : ℕ) + 1) * ‖a‖))
-    (fun w hw => (hd w hw).differentiableAt)
-    (fun w hw => by
-      rw [(hd w hw).deriv, norm_mul]
-      obtain ⟨h1, h2⟩ := hmem w hw
-      have e1 : ‖(((-(j:ℤ)) : ℤ) : ℂ)‖ = j := by simp
-      have e2 : -(j:ℤ) - 1 = -((j + 1 : ℕ) : ℤ) := by push_cast; ring
-      rw [e1, e2]
-      have L := zpow_neg_lip (j + 1) hz h1 h2
-      have e3 : ‖w - (w + a)‖ = ‖a‖ := by rw [sub_add_cancel_left, norm_neg]
-      rw [e3] at L
-      gcongr)
-    (convex_closedBall z _)
-    (by simp [Metric.mem_closedBall, dist_eq_norm]; positivity)
-    (by simpa [Metric.mem_closedBall, dist_eq_norm] using (by linarith : ‖b‖ ≤ ‖z‖ / 4))
-  have eq : (z ^ j)⁻¹ - ((z + a) ^ j)⁻¹ - ((z + b) ^ j)⁻¹ + ((z + a + b) ^ j)⁻¹ = -(g (z + b) - g z) := by
+  have key :=
+    Convex.norm_image_sub_le_of_norm_deriv_le (f := g) (s := Metric.closedBall z (‖z‖ / 4)) (x := z)
+      (y := z + b) (C := j * ((j + 1 : ℕ) * (2 / ‖z‖) ^ ((j + 1 : ℕ) + 1) * ‖a‖))
+      (fun w hw => (hd w hw).differentiableAt)
+      (fun w hw => by
+        rw [(hd w hw).deriv, norm_mul]
+        obtain ⟨h1, h2⟩ := hmem w hw
+        have e1 : ‖(((-(j:ℤ)) : ℤ) : ℂ)‖ = j := by simp
+        have e2 : -(j : ℤ) - 1 = -((j + 1 : ℕ) : ℤ) := by push_cast; ring
+        rw [e1, e2]
+        have L := zpow_neg_lip (j + 1) hz h1 h2
+        have e3 : ‖w - (w + a)‖ = ‖a‖ := by rw [sub_add_cancel_left, norm_neg]
+        rw [e3] at L
+        gcongr)
+      (convex_closedBall z _) (by simp [Metric.mem_closedBall, dist_eq_norm]; positivity)
+      (by simpa [Metric.mem_closedBall, dist_eq_norm] using (by linarith : ‖b‖ ≤ ‖z‖ / 4))
+  have eq
+      : (z ^ j)⁻¹ - ((z + a) ^ j)⁻¹ - ((z + b) ^ j)⁻¹ + ((z + a + b) ^ j)⁻¹
+        = -(g (z + b) - g z) := by
     simp only [hg, zpow_neg, zpow_natCast]
     rw [show z + b + a = z + a + b by ring]
     ring

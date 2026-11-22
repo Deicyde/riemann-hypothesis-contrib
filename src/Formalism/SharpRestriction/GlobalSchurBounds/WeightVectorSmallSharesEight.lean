@@ -14,8 +14,7 @@ section Family
 
 variable {eps : ℝ} (Fm : FamP eps)
 
-def ChosenWall : Prop :=
-  ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ChW_at (Fm.Gx x i) Fm.GK
+def ChosenWall : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ChW_at (Fm.Gx x i) Fm.GK
 
 theorem chosenWS_of_wall (h : ChosenWall Fm) : ChosenWS Fm := by
   obtain ⟨x0, hx0⟩ := h
@@ -26,7 +25,8 @@ theorem chosenWS_of_wall (h : ChosenWall Fm) : ChosenWS Fm := by
   have hxx : x ≥ x0 := le_of_max_le_left hx
   obtain ⟨i0⟩ := Fm.Ix_win x hW
   obtain ⟨a, b, hwin, hself⟩ := FamCore.coverU_hyp_self Fm.toFamCore x hx1 i0
-  exact ⟨i0, a, b, hwin, ⟨i0, fun t => ⟨(hself t).1.symm, (hself t).2.symm⟩⟩, fun i _ => hx0 x hxx i⟩
+  exact
+    ⟨i0, a, b, hwin, ⟨i0, fun t => ⟨(hself t).1.symm, (hself t).2.symm⟩⟩, fun i _ => hx0 x hxx i⟩
 
 end Family
 

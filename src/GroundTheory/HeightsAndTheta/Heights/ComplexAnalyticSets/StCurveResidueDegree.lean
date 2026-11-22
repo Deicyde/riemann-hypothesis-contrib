@@ -15,8 +15,8 @@ noncomputable section
 
 def CurveResidueDegree.Statement : Prop :=
   ∀ (n : ℕ) (I : Ideal (MvPolynomial (Fin n) ℂ)) (q : Fin n → ℂ),
-    IsRadicalAt I q → ringKrullDim (curveLocalRing I q) = 1 →
-      ∀ P : MaximalSpectrum (curveNormalisation I q),
+    IsRadicalAt I q → ringKrullDim (curveLocalRing I q) = 1
+      → ∀ P : MaximalSpectrum (curveNormalisation I q),
         Module.length (curveLocalRing I q) (curveNormalisation I q ⧸ P.asIdeal) = 1
 
 end

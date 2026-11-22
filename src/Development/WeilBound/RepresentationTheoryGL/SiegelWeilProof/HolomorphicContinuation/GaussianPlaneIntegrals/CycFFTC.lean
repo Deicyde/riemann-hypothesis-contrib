@@ -13,8 +13,15 @@ namespace PositivityTheory.Rg.Sw.FFTSteps.CycF
 variable {m n : ℕ} (ε : Fin m → Bool)
 
 def eqv : Fin m × Fin n × Bool ≃ VV (Rw ε false) n ⊕ VV (Rw ε true) n where
-  toFun k := if h : ε k.1 = true then Sum.inr (if k.2.2 then Sum.inr (⟨k.1, h⟩, k.2.1) else Sum.inl (⟨k.1, h⟩, k.2.1))
-    else Sum.inl (if k.2.2 then Sum.inr (⟨k.1, by simpa using h⟩, k.2.1) else Sum.inl (⟨k.1, by simpa using h⟩, k.2.1))
+  toFun k :=
+    if h : ε k.1 = true then
+      Sum.inr (if k.2.2 then Sum.inr (⟨k.1, h⟩, k.2.1) else Sum.inl (⟨k.1, h⟩, k.2.1))
+    else
+      Sum.inl
+        (if k.2.2 then
+           Sum.inr (⟨k.1, by simpa using h⟩, k.2.1)
+         else
+           Sum.inl (⟨k.1, by simpa using h⟩, k.2.1))
   invFun := Sum.elim (jv ε false) (jv ε true)
   left_inv k := by
     obtain ⟨a, i, t⟩ := k
@@ -32,8 +39,7 @@ theorem th_X (k : Fin m × Fin n × Bool) : Th ε (X k) = sumAlgEquiv ℂ _ _ (X
 
 theorem th_embT (c : PV (Rw ε true) (Fin n) (Fin n)) : Th ε (emb ε true c) = C c := by
   induction c using MvPolynomial.induction_on with
-  | C a =>
-    simp [emb, Th]
+  | C a => simp [emb, Th]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | mul_X p v hp =>
     have e : eqv ε (jv ε true v) = Sum.inr v := (eqv ε).apply_symm_apply (Sum.inr v)
@@ -43,11 +49,10 @@ theorem th_embT (c : PV (Rw ε true) (Fin n) (Fin n)) : Th ε (emb ε true c) = 
       exact sumRingEquiv_X_inr ℂ _ _ v
     rw [map_mul, map_mul, hp, hx, C_mul]
 
-theorem th_embF (t : PV (Rw ε false) (Fin n) (Fin n)) :
-    Th ε (emb ε false t) = map (algebraMap ℂ (PV (Rw ε true) (Fin n) (Fin n))) t := by
+theorem th_embF (t : PV (Rw ε false) (Fin n) (Fin n))
+    : Th ε (emb ε false t) = map (algebraMap ℂ (PV (Rw ε true) (Fin n) (Fin n))) t := by
   induction t using MvPolynomial.induction_on with
-  | C a =>
-    simp [emb, Th]
+  | C a => simp [emb, Th]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | mul_X p v hp =>
     have e : eqv ε (jv ε false v) = Sum.inl v := (eqv ε).apply_symm_apply (Sum.inl v)
@@ -57,20 +62,22 @@ theorem th_embF (t : PV (Rw ε false) (Fin n) (Fin n)) :
       exact sumRingEquiv_X_inl ℂ _ _ v
     rw [map_mul, map_mul, hp, hx, map_mul, map_X]
 
-theorem th_prod (c : PV (Rw ε true) (Fin n) (Fin n)) (μ : VV (Rw ε false) n →₀ ℕ) :
-    Th ε (emb ε true c * emb ε false (monomial μ 1)) = monomial μ c := by
+theorem th_prod (c : PV (Rw ε true) (Fin n) (Fin n)) (μ : VV (Rw ε false) n →₀ ℕ)
+    : Th ε (emb ε true c * emb ε false (monomial μ 1)) = monomial μ c := by
   rw [map_mul, th_embT, th_embF, map_monomial, map_one, C_mul_monomial, mul_one]
 
-theorem decomp (Q : PX m n) :
-    Q = ∑ μ ∈ (Th ε Q).support, emb ε true ((Th ε Q).coeff μ) * emb ε false (monomial μ 1) := by
+theorem decomp (Q : PX m n)
+    : Q = ∑ μ ∈ (Th ε Q).support, emb ε true ((Th ε Q).coeff μ) * emb ε false (monomial μ 1) := by
   apply (Th ε).injective
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   simp_rw [th_prod]
   exact (Th ε Q).as_sum
 
-theorem coeff_sum_monomial {σ R : Type*} [CommSemiring R] [DecidableEq σ] (S : Finset (σ →₀ ℕ)) (f : (σ →₀ ℕ) → R) (μ : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (∑ ν ∈ S, monomial ν (f ν)) μ = if μ ∈ S then f μ else 0 := by
+theorem coeff_sum_monomial
+    {σ R : Type*} [CommSemiring R] [DecidableEq σ]
+    (S : Finset (σ →₀ ℕ)) (f : (σ →₀ ℕ) → R) (μ : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (∑ ν ∈ S, monomial ν (f ν)) μ = if μ ∈ S then f μ else 0 := by
   rw [coeff_sum]
   simp only [coeff_monomial]
   split_ifs with h
@@ -85,8 +92,11 @@ theorem coeff_sum_monomial {σ R : Type*} [CommSemiring R] [DecidableEq σ] (S :
     have : b ≠ μ := fun e => h (e ▸ hb)
     simp [this]
 
-theorem indep {J : Type} [Fintype J] (b : J → PV (Rw ε true) (Fin n) (Fin n)) (hb : LinearIndependent ℂ b)
-    (t : J → PV (Rw ε false) (Fin n) (Fin n)) (h : ∑ j, emb ε true (b j) * emb ε false (t j) = 0) : ∀ j, t j = 0 := by
+theorem indep
+    {J : Type} [Fintype J]
+    (b : J → PV (Rw ε true) (Fin n) (Fin n)) (hb : LinearIndependent ℂ b)
+    (t : J → PV (Rw ε false) (Fin n) (Fin n)) (h : ∑ j, emb ε true (b j) * emb ε false (t j) = 0)
+    : ∀ j, t j = 0 := by
   have h2 := congrArg (Th ε) h
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_zero] at h2

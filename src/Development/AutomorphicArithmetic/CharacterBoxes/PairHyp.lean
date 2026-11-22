@@ -16,8 +16,8 @@ private theorem jac_neg_of_dvd {p d : ℕ} (h : p ∣ d + 1) : jacobiSym (-(d : 
     exact h2
   rw [jacobiSym.mod_left' h1, jacobiSym.one_left]
 
-private theorem jac_neg_recip {n a : ℕ} (hn : n % 4 = 3) (ha : Odd a) :
-    jacobiSym (-(n : ℤ)) a = jacobiSym (a : ℤ) n := by
+private theorem jac_neg_recip {n a : ℕ} (hn : n % 4 = 3) (ha : Odd a)
+    : jacobiSym (-(n : ℤ)) a = jacobiSym (a : ℤ) n := by
   have hno : Odd n := Nat.odd_iff.2 (by omega)
   rw [jacobiSym.neg _ ha]
   rcases Nat.odd_mod_four_iff.1 (Nat.odd_iff.1 ha) with h | h
@@ -25,10 +25,15 @@ private theorem jac_neg_recip {n a : ℕ} (hn : n % 4 = 3) (ha : Odd a) :
   · rw [ZMod.χ₄_nat_three_mod_four h, jacobiSym.quadratic_reciprocity_three_mod_four h hn]
     ring
 
-theorem UpperTheory.Top.pairHyp :
-    ∀ (eps Y : ℝ) (q d : ℕ), WinPair eps Y q d → HostHyp q d ∧
-      (∀ p : ℕ, p.Prime → p ≠ 2 → (p : ℝ) ≤ Y ^ (eps / 5) → jacobiSym (-(d : ℤ)) p = 1) ∧
-      (∀ a : ℕ, Odd a → jacobiSym (-(q : ℤ)) a = jacobiSym (a : ℤ) q ∧ jacobiSym (-(d : ℤ)) a = jacobiSym (a : ℤ) d) := by
+theorem UpperTheory.Top.pairHyp
+    : ∀ (eps Y : ℝ) (q d : ℕ),
+      WinPair eps Y q d
+        → HostHyp q d
+          ∧ (∀ p : ℕ, p.Prime → p ≠ 2 → (p : ℝ) ≤ Y ^ (eps / 5) → jacobiSym (-(d : ℤ)) p = 1)
+          ∧ (∀ a : ℕ,
+            Odd a
+              → jacobiSym (-(q : ℤ)) a = jacobiSym (a : ℤ) q
+                ∧ jacobiSym (-(d : ℤ)) a = jacobiSym (a : ℤ) d) := by
   intro eps Y q d hw
   have hq4 : q % 4 = 3 := by have := hw.q_mod; omega
   have hd4 : d % 4 = 3 := by have := hw.d_mod; omega

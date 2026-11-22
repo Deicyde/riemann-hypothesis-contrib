@@ -90,31 +90,34 @@ theorem cong_symm {f g : MvPowerSeries σ K} (h : Cong R f g) : Cong R g f := by
   rw [← neg_sub]
   exact lg_neg h
 
-theorem cong_trans {f g k : MvPowerSeries σ K} (h1 : Cong R f g) (h2 : Cong R g k) :
-    Cong R f k := by
+theorem cong_trans {f g k : MvPowerSeries σ K} (h1 : Cong R f g) (h2 : Cong R g k)
+    : Cong R f k := by
   unfold Cong at *
   have h3 := lg_add h1 h2
   rwa [sub_add_sub_cancel] at h3
 
-theorem cong_add {f g f' g' : MvPowerSeries σ K} (h1 : Cong R f g) (h2 : Cong R f' g') :
-    Cong R (f + f') (g + g') := by
+theorem cong_add {f g f' g' : MvPowerSeries σ K} (h1 : Cong R f g) (h2 : Cong R f' g')
+    : Cong R (f + f') (g + g') := by
   unfold Cong at *
   rw [add_sub_add_comm]
   exact lg_add h1 h2
 
-theorem cong_sub {f g f' g' : MvPowerSeries σ K} (h1 : Cong R f g) (h2 : Cong R f' g') :
-    Cong R (f - f') (g - g') := by
+theorem cong_sub {f g f' g' : MvPowerSeries σ K} (h1 : Cong R f g) (h2 : Cong R f' g')
+    : Cong R (f - f') (g - g') := by
   unfold Cong at *
   rw [sub_sub_sub_comm]
   have h3 := lg_add h1 (lg_neg h2)
   rwa [← sub_eq_add_neg] at h3
 
-theorem phNorm_pt {l linv ph : PowerSeries K} (h : IsLogPair l linv) {a b : K}
-    (hN : PhNormAt R l linv ph a b) {x : MvPowerSeries σ K} (hx : IsPt R x) :
-    Cong R (PowerSeries.subst (fmul l linv a x) ph) ((a * b) • PowerSeries.subst x ph) := by
+theorem phNorm_pt
+    {l linv ph : PowerSeries K} (h : IsLogPair l linv)
+    {a b : K} (hN : PhNormAt R l linv ph a b)
+    {x : MvPowerSeries σ K} (hx : IsPt R x)
+    : Cong R (PowerSeries.subst (fmul l linv a x) ph) ((a * b) • PowerSeries.subst x ph) := by
   have := lGSubst K R _ hN σ x hx
   rw [PowerSeries.subst_sub (hasSubst hx.1), PowerSeries.subst_smul (hasSubst hx.1),
-    subst_subst (constantCoeff_mulBy h a) hx.1, ← fmul_eq_subst_mulBy h a hx.1] at this
+      subst_subst (constantCoeff_mulBy h a) hx.1, ← fmul_eq_subst_mulBy h a hx.1]
+    at this
   exact this
 
 end CongCalc
@@ -161,17 +164,22 @@ section Construct
 def Ser {K : Type} [Field K] {O : Type} [CommRing O] (_τ : O →+* K) (σ : Type) : Type :=
   MvPowerSeries σ K
 
-instance {K : Type} [Field K] {O : Type} [CommRing O] (τ : O →+* K) (σ : Type) :
-    AddCommGroup (Ser τ σ) := inferInstanceAs (AddCommGroup (MvPowerSeries σ K))
+instance {K : Type} [Field K] {O : Type} [CommRing O] (τ : O →+* K) (σ : Type)
+    : AddCommGroup (Ser τ σ) :=
+  inferInstanceAs (AddCommGroup (MvPowerSeries σ K))
 
-instance {K : Type} [Field K] {O : Type} [CommRing O] (τ : O →+* K) (σ : Type) :
-    Module O (Ser τ σ) := Module.compHom (MvPowerSeries σ K) τ
+instance {K : Type} [Field K] {O : Type} [CommRing O] (τ : O →+* K) (σ : Type)
+    : Module O (Ser τ σ) :=
+  Module.compHom (MvPowerSeries σ K) τ
 
-abbrev ofS {K : Type} [Field K] {O : Type} [CommRing O] {τ : O →+* K} {σ : Type} (g : Ser τ σ) :
-    MvPowerSeries σ K := g
+abbrev ofS {K : Type} [Field K] {O : Type} [CommRing O] {τ : O →+* K} {σ : Type} (g : Ser τ σ)
+    : MvPowerSeries σ K :=
+  g
 
-abbrev toS {K : Type} [Field K] {O : Type} [CommRing O] (τ : O →+* K) {σ : Type}
-    (g : MvPowerSeries σ K) : Ser τ σ := g
+abbrev toS
+    {K : Type} [Field K] {O : Type} [CommRing O] (τ : O →+* K) {σ : Type} (g : MvPowerSeries σ K)
+    : Ser τ σ :=
+  g
 
 def saRing (O : Type) [CommRing O] [StarRing O] : Subring O where
   carrier := {z | star z = z}
@@ -187,15 +195,19 @@ def saRing (O : Type) [CommRing O] [StarRing O] : Subring O where
     show star (-a) = -a
     rw [star_neg, ha]
 
-def nm {O : Type} [CommRing O] [StarRing O] (α : O) : saRing O :=
-  ⟨star α * α, by
+def nm {O : Type} [CommRing O] [StarRing O] (α : O) : saRing O := ⟨
+  star α * α,
+  by
     show star (star α * α) = star α * α
-    rw [star_mul', star_star, mul_comm]⟩
+    rw [star_mul', star_star, mul_comm]
+⟩
 
-def tr {O : Type} [CommRing O] [StarRing O] (α : O) : saRing O :=
-  ⟨star α + α, by
+def tr {O : Type} [CommRing O] [StarRing O] (α : O) : saRing O := ⟨
+  star α + α,
+  by
     show star (star α + α) = star α + α
-    rw [star_add, star_star, add_comm]⟩
+    rw [star_add, star_star, add_comm]
+⟩
 
 variable {K : Type} [Field K] [CharZero K] {O : Type} [CommRing O] [StarRing O]
 
@@ -207,34 +219,40 @@ structure Data (R : Subring K) (l linv : PowerSeries K) (τ : O →+* K) : Prop 
 
 variable {R : Subring K} {l linv : PowerSeries K} {τ : O →+* K}
 
-theorem smul_ser (σ : Type) (α : O) (g : Ser τ σ) :
-    ofS (α • g) = MvPowerSeries.C (τ α) * ofS g := by
+theorem smul_ser (σ : Type) (α : O) (g : Ser τ σ)
+    : ofS (α • g) = MvPowerSeries.C (τ α) * ofS g := by
   show τ α • ofS g = MvPowerSeries.C (τ α) * ofS g
-  first
-    | exact MvPowerSeries.smul_eq_C_mul _ _
-    | (ext n; simp [MvPowerSeries.coeff_C_mul])
+  first | exact MvPowerSeries.smul_eq_C_mul _ _ | (ext n; simp [MvPowerSeries.coeff_C_mul])
 
-theorem linv_add (h : IsLogPair l linv) {σ : Type} {g g' : MvPowerSeries σ K}
-    (hg : MvPowerSeries.constantCoeff g = 0) (hg' : MvPowerSeries.constantCoeff g' = 0) :
-    PowerSeries.subst (g + g') linv =
-      fadd l linv (PowerSeries.subst g linv) (PowerSeries.subst g' linv) := by
+theorem linv_add
+    (h : IsLogPair l linv)
+    {σ : Type} {g g' : MvPowerSeries σ K}
+    (hg : MvPowerSeries.constantCoeff g = 0) (hg' : MvPowerSeries.constantCoeff g' = 0)
+    : PowerSeries.subst (g + g') linv
+      = fadd l linv (PowerSeries.subst g linv) (PowerSeries.subst g' linv) := by
   unfold fadd
   rw [Pts.subst_l_linv h hg, Pts.subst_l_linv h hg']
 
-theorem linv_C_mul (h : IsLogPair l linv) {σ : Type} (a : K) {g : MvPowerSeries σ K}
-    (hg : MvPowerSeries.constantCoeff g = 0) :
-    PowerSeries.subst (MvPowerSeries.C a * g) linv = fmul l linv a (PowerSeries.subst g linv) := by
+theorem linv_C_mul
+    (h : IsLogPair l linv)
+    {σ : Type}
+    (a : K)
+    {g : MvPowerSeries σ K} (hg : MvPowerSeries.constantCoeff g = 0)
+    : PowerSeries.subst (MvPowerSeries.C a * g) linv
+      = fmul l linv a (PowerSeries.subst g linv) := by
   unfold fmul
   rw [Pts.subst_l_linv h hg]
 
 def ptsSub (D : Data R l linv τ) (σ : Type) : Submodule O (Ser τ σ) where
-  carrier := {g | MvPowerSeries.constantCoeff (ofS g) = 0 ∧
-    IntMv R (PowerSeries.subst (ofS g) linv)}
+  carrier :=
+    {g | MvPowerSeries.constantCoeff (ofS g) = 0 ∧
+      IntMv R (PowerSeries.subst (ofS g) linv)}
   add_mem' := by
     rintro g g' ⟨hg, hi⟩ ⟨hg', hi'⟩
     refine ⟨(map_add _ _ _).trans (by rw [hg, hg', add_zero]), ?_⟩
-    have := isPt_fadd D.log D.fg ⟨constantCoeff_subst_linv D.log hg, hi⟩
-      ⟨constantCoeff_subst_linv D.log hg', hi'⟩
+    have :=
+      isPt_fadd D.log D.fg ⟨constantCoeff_subst_linv D.log hg, hi⟩
+        ⟨constantCoeff_subst_linv D.log hg', hi'⟩
     rw [← linv_add D.log hg hg'] at this
     exact this.2
   zero_mem' := by
@@ -267,26 +285,29 @@ theorem isPt_pt (D : Data R l linv τ) {σ : Type} (g : ptsSub D σ) : IsPt R (p
   obtain ⟨hg, hi⟩ := g.2
   exact ⟨constantCoeff_subst_linv D.log hg, hi⟩
 
-def toM (D : Data R l linv τ) {σ : Type} (x : MvPowerSeries σ K) (hx : IsPt R x) : ptsSub D σ :=
-  ⟨toS τ (PowerSeries.subst x l), constantCoeff_subst_l D.log hx.1, by
+def toM (D : Data R l linv τ) {σ : Type} (x : MvPowerSeries σ K) (hx : IsPt R x) : ptsSub D σ := ⟨
+  toS τ (PowerSeries.subst x l),
+  constantCoeff_subst_l D.log hx.1,
+  by
     show IntMv R (PowerSeries.subst (PowerSeries.subst x l) linv)
     rw [subst_linv_l D.log hx.1]
-    exact hx.2⟩
+    exact hx.2
+⟩
 
-theorem pt_toM (D : Data R l linv τ) {σ : Type} (x : MvPowerSeries σ K) (hx : IsPt R x) :
-    pt D (toM D x hx) = x := by
+theorem pt_toM (D : Data R l linv τ) {σ : Type} (x : MvPowerSeries σ K) (hx : IsPt R x)
+    : pt D (toM D x hx) = x := by
   show PowerSeries.subst (PowerSeries.subst x l) linv = x
   exact subst_linv_l D.log hx.1
 
-theorem pt_add (D : Data R l linv τ) {σ : Type} (g g' : ptsSub D σ) :
-    pt D (g + g') = fadd l linv (pt D g) (pt D g') := by
+theorem pt_add (D : Data R l linv τ) {σ : Type} (g g' : ptsSub D σ)
+    : pt D (g + g') = fadd l linv (pt D g) (pt D g') := by
   obtain ⟨hg, -⟩ := g.2
   obtain ⟨hg', -⟩ := g'.2
   have h := linv_add D.log hg hg'
   exact h
 
-theorem pt_smul (D : Data R l linv τ) {σ : Type} (α : O) (g : ptsSub D σ) :
-    pt D (α • g) = fmul l linv (τ α) (pt D g) := by
+theorem pt_smul (D : Data R l linv τ) {σ : Type} (α : O) (g : ptsSub D σ)
+    : pt D (α • g) = fmul l linv (τ α) (pt D g) := by
   obtain ⟨hg, -⟩ := g.2
   show PowerSeries.subst (ofS (α • (g : Ser τ σ))) linv = fmul l linv (τ α) (pt D g)
   rw [smul_ser]
@@ -295,43 +316,45 @@ theorem pt_smul (D : Data R l linv τ) {σ : Type} (α : O) (g : ptsSub D σ) :
 def cls (D : Data R l linv τ) {σ : Type} (f : MvPowerSeries σ K) : Ser τ σ ⧸ lgSub D σ :=
   (lgSub D σ).mkQ (toS τ f)
 
-theorem cls_eq (D : Data R l linv τ) {σ : Type} {f g : MvPowerSeries σ K} :
-    cls D f = cls D g ↔ Cong R f g := by
+theorem cls_eq (D : Data R l linv τ) {σ : Type} {f g : MvPowerSeries σ K}
+    : cls D f = cls D g ↔ Cong R f g := by
   unfold cls
   rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
   exact Iff.rfl
 
-theorem cls_eq_zero (D : Data R l linv τ) {σ : Type} {f : MvPowerSeries σ K} :
-    cls D f = 0 ↔ LG R f := by
+theorem cls_eq_zero (D : Data R l linv τ) {σ : Type} {f : MvPowerSeries σ K}
+    : cls D f = 0 ↔ LG R f := by
   unfold cls
   rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
   exact Iff.rfl
 
-theorem cls_add (D : Data R l linv τ) {σ : Type} (f g : MvPowerSeries σ K) :
-    cls D (f + g) = cls D f + cls D g := by
+theorem cls_add (D : Data R l linv τ) {σ : Type} (f g : MvPowerSeries σ K)
+    : cls D (f + g) = cls D f + cls D g := by
   unfold cls
   exact map_add (lgSub D σ).mkQ (toS τ f) (toS τ g)
 
-theorem cls_sub (D : Data R l linv τ) {σ : Type} (f g : MvPowerSeries σ K) :
-    cls D (f - g) = cls D f - cls D g := by
+theorem cls_sub (D : Data R l linv τ) {σ : Type} (f g : MvPowerSeries σ K)
+    : cls D (f - g) = cls D f - cls D g := by
   unfold cls
   exact map_sub (lgSub D σ).mkQ (toS τ f) (toS τ g)
 
-theorem cls_sum (D : Data R l linv τ) {σ : Type} {n : Type} (s : Finset n)
-    (f : n → MvPowerSeries σ K) : cls D (∑ i ∈ s, f i) = ∑ i ∈ s, cls D (f i) := by
+theorem cls_sum
+    (D : Data R l linv τ) {σ : Type} {n : Type} (s : Finset n) (f : n → MvPowerSeries σ K)
+    : cls D (∑ i ∈ s, f i) = ∑ i ∈ s, cls D (f i) := by
   unfold cls
   exact map_sum (lgSub D σ).mkQ (fun i => toS τ (f i)) s
 
-theorem cls_smul (D : Data R l linv τ) {σ : Type} (z : saRing O) (f : MvPowerSeries σ K) :
-    cls D (τ z • f) = z • cls D f := by
+theorem cls_smul (D : Data R l linv τ) {σ : Type} (z : saRing O) (f : MvPowerSeries σ K)
+    : cls D (τ z • f) = z • cls D f := by
   unfold cls
   exact map_smul (lgSub D σ).mkQ z (toS τ f)
 
-def phi (D : Data R l linv τ) (ph : PowerSeries K) {σ : Type} (g : ptsSub D σ) :
-    Ser τ σ ⧸ lgSub D σ := cls D (PowerSeries.subst (pt D g) ph)
+def phi (D : Data R l linv τ) (ph : PowerSeries K) {σ : Type} (g : ptsSub D σ)
+    : Ser τ σ ⧸ lgSub D σ :=
+  cls D (PowerSeries.subst (pt D g) ph)
 
-theorem cob_phi (D : Data R l linv τ) (ph : PowerSeries K) {σ : Type} (g g' : ptsSub D σ) :
-    cob (phi D ph) g g' = cls D (be0 l linv ph (pt D g) (pt D g')) := by
+theorem cob_phi (D : Data R l linv τ) (ph : PowerSeries K) {σ : Type} (g g' : ptsSub D σ)
+    : cob (phi D ph) g g' = cls D (be0 l linv ph (pt D g) (pt D g')) := by
   unfold cob phi be0
   rw [pt_add, cls_sub, cls_sub]
 
@@ -341,27 +364,35 @@ theorem algebraMap_nm (α : O) : algebraMap (saRing O) O (nm α) = star α * α 
 
 theorem algebraMap_tr (α : O) : algebraMap (saRing O) O (tr α) = star α + α := rfl
 
-theorem cob_add (D : Data R l linv τ) {ph : PowerSeries K} (hF1 : F1 R l linv ph) {σ : Type}
-    (a a' b : ptsSub D σ) :
-    cob (phi D ph) (a + a') b = cob (phi D ph) a b + cob (phi D ph) a' b := by
+theorem cob_add
+    (D : Data R l linv τ)
+    {ph : PowerSeries K} (hF1 : F1 R l linv ph)
+    {σ : Type} (a a' b : ptsSub D σ)
+    : cob (phi D ph) (a + a') b = cob (phi D ph) a b + cob (phi D ph) a' b := by
   rw [cob_phi, cob_phi, cob_phi, pt_add, ← cls_add, cls_eq D]
   exact hF1 σ _ _ _ (isPt_pt D a) (isPt_pt D a') (isPt_pt D b)
 
-theorem cob_adj (D : Data R l linv τ) {ph : PowerSeries K} {α : O}
-    (hA : AdjAt R l linv ph (τ α) (τ (star α))) {σ : Type} (a b : ptsSub D σ) :
-    cob (phi D ph) (α • a) b = cob (phi D ph) a (star α • b) := by
+theorem cob_adj
+    (D : Data R l linv τ)
+    {ph : PowerSeries K} {α : O} (hA : AdjAt R l linv ph (τ α) (τ (star α)))
+    {σ : Type} (a b : ptsSub D σ)
+    : cob (phi D ph) (α • a) b = cob (phi D ph) a (star α • b) := by
   rw [cob_phi, cob_phi, pt_smul, pt_smul, cls_eq D]
   exact hA σ _ _ (isPt_pt D a) (isPt_pt D b)
 
-theorem cob_zlin (D : Data R l linv τ) {ph : PowerSeries K} (z : saRing O)
-    (hZ : ZLinAt R l linv ph (τ z)) {σ : Type} (a b : ptsSub D σ) :
-    cob (phi D ph) a (algebraMap (saRing O) O z • b) = z • cob (phi D ph) a b := by
+theorem cob_zlin
+    (D : Data R l linv τ)
+    {ph : PowerSeries K} (z : saRing O) (hZ : ZLinAt R l linv ph (τ z))
+    {σ : Type} (a b : ptsSub D σ)
+    : cob (phi D ph) a (algebraMap (saRing O) O z • b) = z • cob (phi D ph) a b := by
   rw [cob_phi, cob_phi, pt_smul, ← cls_smul, cls_eq D]
   exact hZ σ _ _ (isPt_pt D a) (isPt_pt D b)
 
-theorem phi_norm (D : Data R l linv τ) {ph : PowerSeries K} {α : O}
-    (hN : PhNormAt R l linv ph (τ α) (τ (star α))) {σ : Type} (u : ptsSub D σ) :
-    phi D ph (α • u) = nm α • phi D ph u := by
+theorem phi_norm
+    (D : Data R l linv τ)
+    {ph : PowerSeries K} {α : O} (hN : PhNormAt R l linv ph (τ α) (τ (star α)))
+    {σ : Type} (u : ptsSub D σ)
+    : phi D ph (α • u) = nm α • phi D ph u := by
   unfold phi
   rw [pt_smul, ← cls_smul, cls_eq D]
   have h := phNorm_pt D.log hN (isPt_pt D u)
@@ -371,9 +402,12 @@ theorem phi_norm (D : Data R l linv τ) {ph : PowerSeries K} {α : O}
   rw [e]
   exact h
 
-theorem pt_sum (D : Data R l linv τ) {σ : Type} {n : Type} [Fintype n] (c : n → O)
-    (u : n → MvPowerSeries σ K) (hu : ∀ j, IsPt R (u j)) :
-    pt D (∑ j, c j • toM D (u j) (hu j)) = flin l linv (fun j => τ (c j)) u := by
+theorem pt_sum
+    (D : Data R l linv τ)
+    {σ : Type} {n : Type} [Fintype n]
+    (c : n → O)
+    (u : n → MvPowerSeries σ K) (hu : ∀ j, IsPt R (u j))
+    : pt D (∑ j, c j • toM D (u j) (hu j)) = flin l linv (fun j => τ (c j)) u := by
   unfold flin pt
   congr 1
   rw [Submodule.coe_sum]
@@ -381,10 +415,13 @@ theorem pt_sum (D : Data R l linv τ) {σ : Type} {n : Type} [Fintype n] (c : n 
   rw [Submodule.coe_smul]
   exact smul_ser σ (c j) _
 
-theorem pt_sum_two (D : Data R l linv τ) {σ : Type} {n : Type} [Fintype n] (c c' : n → O)
-    (t t' : n → MvPowerSeries σ K) (ht : ∀ j, IsPt R (t j)) (ht' : ∀ j, IsPt R (t' j)) :
-    pt D (∑ j, (c j • toM D (t j) (ht j) + c' j • toM D (t' j) (ht' j))) =
-      flin l linv (Sum.elim (fun j => τ (c j)) (fun j => τ (c' j))) (Sum.elim t t') := by
+theorem pt_sum_two
+    (D : Data R l linv τ)
+    {σ : Type} {n : Type} [Fintype n]
+    (c c' : n → O)
+    (t t' : n → MvPowerSeries σ K) (ht : ∀ j, IsPt R (t j)) (ht' : ∀ j, IsPt R (t' j))
+    : pt D (∑ j, (c j • toM D (t j) (ht j) + c' j • toM D (t' j) (ht' j)))
+      = flin l linv (Sum.elim (fun j => τ (c j)) (fun j => τ (c' j))) (Sum.elim t t') := by
   have hs : ∀ k, IsPt R (Sum.elim t t' k) := by
     intro k
     cases k with
@@ -398,13 +435,14 @@ theorem pt_sum_two (D : Data R l linv τ) {σ : Type} {n : Type} [Fintype n] (c 
   rw [← key, Fintype.sum_sum_type, ← Finset.sum_add_distrib]
   try rfl
 
-theorem cls_surj (D : Data R l linv τ) {σ : Type} (x : Ser τ σ ⧸ lgSub D σ) :
-    ∃ f : MvPowerSeries σ K, cls D f = x := by
+theorem cls_surj (D : Data R l linv τ) {σ : Type} (x : Ser τ σ ⧸ lgSub D σ)
+    : ∃ f : MvPowerSeries σ K, cls D f = x := by
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   exact ⟨ofS y, rfl⟩
 
-theorem two_torsion_free (D : Data R l linv τ) (h2 : (2 : K)⁻¹ ∈ R) {σ : Type}
-    (x : Ser τ σ ⧸ lgSub D σ) (hx : x + x = 0) : x = 0 := by
+theorem two_torsion_free
+    (D : Data R l linv τ) (h2 : (2 : K)⁻¹ ∈ R) {σ : Type} (x : Ser τ σ ⧸ lgSub D σ) (hx : x + x = 0)
+    : x = 0 := by
   obtain ⟨f, rfl⟩ := cls_surj D x
   rw [← cls_add, cls_eq_zero] at hx
   rw [cls_eq_zero]
@@ -413,11 +451,7 @@ theorem two_torsion_free (D : Data R l linv τ) (h2 : (2 : K)⁻¹ ∈ R) {σ : 
 theorem nm_two : nm (2 : O) = 4 := by
   apply Subtype.ext
   show star (2 : O) * 2 = ((4 : saRing O) : O)
-  have h4 : ((4 : saRing O) : O) = 4 := by
-    first
-      | rfl
-      | norm_cast
-      | simp
+  have h4 : ((4 : saRing O) : O) = 4 := by first | rfl | norm_cast | simp
   rw [h4, star_ofNat]
   norm_num
 
@@ -442,20 +476,24 @@ theorem norm_adjoint_all_places : NormAdjAll := by
     intro α
     obtain ⟨u, v, rfl⟩ := hsum α
     rw [star_add, map_add (f := _), map_add (f := _)]
-    exact adjoint_additive_alt K R l linv ph _ _ _ _ hFr hF1 (hE _) (hE _) (hE _) (hE _) (hAu u) (hAu v)
+    exact adjoint_additive_alt K R l linv ph _ _ _ _ hFr hF1 (hE _) (hE _) (hE _) (hE _) (hAu u)
+      (hAu v)
   intro α
   refine ⟨?_, hA α⟩
   obtain ⟨u, v, rfl⟩ := hsum α
   obtain ⟨w, hw⟩ := hu2
-  have htwo : phi D ph ((2 : O) • toM D PowerSeries.X isPt_X) =
-      (4 : saRing O) • phi D ph (toM D PowerSeries.X isPt_X) := by
+  have htwo
+      : phi D ph ((2 : O) • toM D PowerSeries.X isPt_X)
+        = (4 : saRing O) • phi D ph (toM D PowerSeries.X isPt_X) := by
     rw [← nm_two, ← hw]
     exact phi_norm D (hNu w) _
-  have key := norm_for_all_alpha (saRing O) O (ptsSub D Unit) (Ser τ Unit ⧸ lgSub D Unit)
-    (phi D ph) nm tr algebraMap_inj algebraMap_nm algebraMap_tr (cob_add D hF1)
-    (fun z a b => cob_zlin D z (hZ z z.2) a b) (fun α a b => cob_adj D (hA α) a b)
-    (two_torsion_free D h2) (u : O) (v : O) (toM D PowerSeries.X isPt_X) htwo
-    (phi_norm D (hNu u) _) (phi_norm D (hNu v) _)
+  have key :=
+    norm_for_all_alpha (saRing O) O (ptsSub D Unit) (Ser τ Unit ⧸ lgSub D Unit) (phi D ph) nm tr
+      algebraMap_inj algebraMap_nm algebraMap_tr (cob_add D hF1)
+      (fun z a b => cob_zlin D z (hZ z z.2) a b)
+      (fun α a b => cob_adj D (hA α) a b)
+      (two_torsion_free D h2) (u : O) (v : O) (toM D PowerSeries.X isPt_X) htwo
+      (phi_norm D (hNu u) _) (phi_norm D (hNu v) _)
   unfold phi at key
   rw [pt_smul, pt_toM, ← cls_smul, cls_eq, ← mulBy_eq_fmul, PowerSeries.X_subst] at key
   have e : τ ((nm ((u : O) + v) : saRing O) : O) = τ ((u : O) + v) * τ (star ((u : O) + v)) := by
@@ -468,10 +506,13 @@ open Pts Calc Formalism.HermitianLattices.IntegralLatticeDensity in
 theorem unitary_inverse_identity : UnitaryInv := by
   intro K _ _ R l linv ph hFr O _ _ τ hE hB hF1 hN hA n _ _ δ hδ σ u hu
   have D : Data R l linv τ := ⟨hFr.1, hFr.2.1, hE, hB⟩
-  have key := unitary_invariance (saRing O) O (ptsSub D σ) (Ser τ σ ⧸ lgSub D σ)
-    (phi D ph) nm algebraMap_inj algebraMap_nm (cob_add D hF1)
-    (fun α a b => cob_adj D (hA α) a b) (fun α u => phi_norm D (hN α) u) n δ hδ
-    (fun j => toM D (u j) (hu j))
+  have key :=
+    unitary_invariance (saRing O) O (ptsSub D σ) (Ser τ σ ⧸ lgSub D σ) (phi D ph) nm algebraMap_inj
+      algebraMap_nm (cob_add D hF1)
+      (fun α a b => cob_adj D (hA α) a b)
+      (fun α u => phi_norm D (hN α) u)
+      n δ hδ
+      (fun j => toM D (u j) (hu j))
   unfold phi at key
   simp only [pt_sum, pt_toM] at key
   rw [← cls_sum, ← cls_sum, cls_eq] at key
@@ -481,10 +522,14 @@ open Pts Calc Formalism.HermitianLattices.IntegralLatticeDensity in
 theorem hyperbolic_sum_identity : HyperbolicSum := by
   intro K _ _ R l linv ph hFr O _ _ τ hE hB hF1 hN hA n ι _ _ _ f f' hf hf' hff σ t t' ht ht'
   have D : Data R l linv τ := ⟨hFr.1, hFr.2.1, hE, hB⟩
-  have key := hyperbolic_plane_split (saRing O) O (ptsSub D σ) (Ser τ σ ⧸ lgSub D σ)
-    (phi D ph) nm algebraMap_inj algebraMap_nm (cob_add D hF1)
-    (fun α a b => cob_adj D (hA α) a b) (fun α u => phi_norm D (hN α) u) n ι f f' hf hf' hff
-    (fun e => toM D (t e) (ht e)) (fun e => toM D (t' e) (ht' e))
+  have key :=
+    hyperbolic_plane_split (saRing O) O (ptsSub D σ) (Ser τ σ ⧸ lgSub D σ) (phi D ph) nm
+      algebraMap_inj algebraMap_nm (cob_add D hF1)
+      (fun α a b => cob_adj D (hA α) a b)
+      (fun α u => phi_norm D (hN α) u)
+      n ι f f' hf hf' hff
+      (fun e => toM D (t e) (ht e))
+      (fun e => toM D (t' e) (ht' e))
   simp only [cob_phi, pt_toM] at key
   unfold phi at key
   simp only [pt_sum_two] at key

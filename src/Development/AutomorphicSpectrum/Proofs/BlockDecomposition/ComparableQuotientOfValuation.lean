@@ -5,11 +5,13 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.ValQuot
 
-theorem valuation_comparable_quotient : ∀ {S : Type} [CommRing S] (π : S), Val π → Val0 (S := S ⧸ Ideal.span {π}) := by
+theorem valuation_comparable_quotient
+    : ∀ {S : Type} [CommRing S] (π : S), Val π → Val0 (S := S ⧸ Ideal.span {π}) := by
   intro S _ π hV f' g'
   obtain ⟨f, rfl⟩ := Ideal.Quotient.mk_surjective f'
   obtain ⟨g, rfl⟩ := Ideal.Quotient.mk_surjective g'
@@ -26,9 +28,15 @@ theorem valuation_comparable_quotient : ∀ {S : Type} [CommRing S] (π : S), Va
   have hu2 : u * u = u := by subst hu; linear_combination (1 - e₂) ^ 2 * he1' + (1 - e₁) * he2'
   have he1u : e₁ * u = 0 := by subst hu; linear_combination (-(1 - e₂)) * he1'
   have huπ : u * π = (1 - e₂) * b1 * f := by subst hu; linear_combination (-(1 - e₂)) * hb1
-  obtain ⟨e₃, he3, h3, h3'⟩ := hV (u * f + (1 - u)) (u * g + (1 - u))
-    ⟨1, Ideal.mem_span_pair.mpr ⟨(1 - e₂) * b1 * u + π * (1 - u), 0, by
-      linear_combination ((1 - e₂) * b1 * f - (1 - e₂) * b1 - π * f + 2 * π) * hu2 - u * huπ⟩⟩
+  obtain ⟨e₃, he3, h3, h3'⟩ :=
+    hV (u * f + (1 - u)) (u * g + (1 - u)) ⟨
+      1,
+      Ideal.mem_span_pair.mpr ⟨
+        (1 - e₂) * b1 * u + π * (1 - u),
+        0,
+        by linear_combination ((1 - e₂) * b1 * f - (1 - e₂) * b1 - π * f + 2 * π) * hu2 - u * huπ
+      ⟩
+    ⟩
   have he3' : e₃ * e₃ = e₃ := he3
   obtain ⟨c3, hc3⟩ := Ideal.mem_span_singleton'.mp h3
   obtain ⟨d3, hd3⟩ := Ideal.mem_span_singleton'.mp h3'
@@ -42,9 +50,12 @@ theorem valuation_comparable_quotient : ∀ {S : Type} [CommRing S] (π : S), Va
     rw [← map_mul, ← map_mul, Ideal.Quotient.eq, Ideal.mem_span_singleton']
     exact ⟨-a1, by linear_combination -ha1 - u * hc3 + (c3 * g - c3 - e₃ * f + e₃) * hu2⟩
   · refine Ideal.mem_span_singleton'.mpr ⟨Ideal.Quotient.mk _ (d3 * u), ?_⟩
-    rw [← map_one (Ideal.Quotient.mk (Ideal.span {π})), ← map_sub, ← map_mul, ← map_mul, Ideal.Quotient.eq,
-      Ideal.mem_span_singleton']
-    exact ⟨-((1 - e₁) * a2), by
-      linear_combination -(1 - e₁) * ha2 - g * hu - u * hd3 + (d3 * f - d3 - (1 - e₃) * g + (1 - e₃)) * hu2⟩
+    rw [← map_one (Ideal.Quotient.mk (Ideal.span {π})), ← map_sub, ← map_mul, ← map_mul,
+      Ideal.Quotient.eq, Ideal.mem_span_singleton']
+    exact ⟨
+      -((1 - e₁) * a2),
+      by
+        linear_combination -(1 - e₁) * ha2 - g * hu - u * hd3 + (d3 * f - d3 - (1 - e₃) * g + (1 - e₃)) * hu2
+    ⟩
 
 end GlobalTheory.CompanionTheory.ValQuot

@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsDomain
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 namespace GlobalTheory.FieldPair
@@ -193,25 +195,22 @@ private lemma isDomain_of_formallyEtale_of_isLocalRing {A B : Type} [CommRing A]
     (IsLocalization.algEquiv q.primeCompl (Localization.AtPrime q') B).toRingEquiv
   exact e'.symm.toMulEquiv.isDomain
 
-
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
 open scoped TensorProduct in
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1600000 in
-theorem _root_.GlobalTheory.FieldPair.IsEtTower.exists_quotient_last :
-    ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K)
-    (T : Subring L) (ι : R →+* T) (ψ : T →+* R) (τ : Fin (r + 1) → T)
-    (hT : _root_.GlobalTheory.FieldPair.IsEtTower cK R cL T ι ψ τ),
-  ∃ (L' : Type) (_ : Field L') (cL' : ℂ →+* L') (T' : Subring L') (π : T →+* T') (ι' : R →+* T')
-    (ψ' : T' →+* R),
-    Function.Surjective π ∧ RingHom.ker π = Ideal.span {τ (Fin.last r)} ∧ τ (Fin.last r) ≠ 0 ∧
-    _root_.GlobalTheory.FieldPair.IsEtTower cK R cL' T' ι' ψ' (fun i => π (τ (Fin.castSucc i))) ∧
-    ψ'.comp π = ψ ∧ π.comp ι = ι' ∧
-    ∀ a, (π ⟨cL a, hT.top.const_mem a⟩ : L') =
-      cL' a := by
+theorem _root_.GlobalTheory.FieldPair.IsEtTower.exists_quotient_last
+    : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K)
+        (T : Subring L) (ι : R →+* T) (ψ : T →+* R) (τ : Fin (r + 1) → T)
+        (hT : _root_.GlobalTheory.FieldPair.IsEtTower cK R cL T ι ψ τ),
+      ∃ (L' : Type) (_ : Field L') (cL' : ℂ →+* L') (T' : Subring L') (π : T →+* T') (ι' : R →+* T')
+          (ψ' : T' →+* R),
+        Function.Surjective π ∧ RingHom.ker π = Ideal.span {τ (Fin.last r)} ∧ τ (Fin.last r) ≠ 0
+          ∧ _root_.GlobalTheory.FieldPair.IsEtTower cK R cL' T' ι' ψ'
+            (fun i => π (τ (Fin.castSucc i)))
+          ∧ ψ'.comp π = ψ ∧ π.comp ι = ι' ∧ ∀ a, (π ⟨cL a, hT.top.const_mem a⟩ : L') = cL' a := by
   intro K L _ _ cK cL r R T ι ψ τ hT
-  have hne : τ (Fin.last r) ≠ 0 :=
-    ne_zero_of_eval₂Hom_formallyEtale ι τ hT.etale _
+  have hne : τ (Fin.last r) ≠ 0 := ne_zero_of_eval₂Hom_formallyEtale ι τ hT.etale _
   set I : Ideal T := Ideal.span {τ (Fin.last r)} with hI
   have hIt : I ≠ ⊤ := by
     rw [Ne, Ideal.eq_top_iff_one, hI, Ideal.mem_span_singleton]
@@ -250,16 +249,30 @@ theorem _root_.GlobalTheory.FieldPair.IsEtTower.exists_quotient_last :
   haveI : IsDomain (T ⧸ I) := isDomain_of_formallyEtale_of_isLocalRing (A := MvPolynomial (Fin r) R)
   set f : (T ⧸ I) →+* FractionRing (T ⧸ I) := algebraMap _ _ with hf_def
   have hf : Function.Injective f := IsFractionRing.injective _ _
-  let e : (T ⧸ I) ≃+* f.range := RingEquiv.ofBijective f.rangeRestrict
-    ⟨fun x y h => hf (by simpa using congrArg Subtype.val h), f.rangeRestrict_surjective⟩
+  let e : (T ⧸ I) ≃+* f.range :=
+    RingEquiv.ofBijective f.rangeRestrict
+      ⟨fun x y h => hf (by simpa using congrArg Subtype.val h), f.rangeRestrict_surjective⟩
   have hψI : I ≤ RingHom.ker ψ := by
     rw [hI, Ideal.span_le, Set.singleton_subset_iff]
     exact hT.zero _
   let ψQ : (T ⧸ I) →+* R := Ideal.Quotient.lift I ψ hψI
   let π : T →+* f.range := (e : (T ⧸ I) →+* f.range).comp (Ideal.Quotient.mk I)
-  refine ⟨FractionRing (T ⧸ I), inferInstance, f.comp ((Ideal.Quotient.mk I).comp
-    (cL.codRestrict T hT.top.const_mem)), f.range, π,
-    π.comp ι, ψQ.comp (e.symm : f.range →+* (T ⧸ I)), ?_, ?_, hne, ?_, ?_, rfl, fun a => rfl⟩
+  refine ⟨
+    FractionRing (T ⧸ I),
+    inferInstance,
+    f.comp ((Ideal.Quotient.mk I).comp (cL.codRestrict T hT.top.const_mem)),
+    f.range,
+    π,
+    π.comp ι,
+    ψQ.comp (e.symm : f.range →+* (T ⧸ I)),
+    ?_,
+    ?_,
+    hne,
+    ?_,
+    ?_,
+    rfl,
+    fun a => rfl
+  ⟩
   · exact e.surjective.comp Ideal.Quotient.mk_surjective
   · ext x
     simp only [RingHom.mem_ker]
@@ -268,9 +281,11 @@ theorem _root_.GlobalTheory.FieldPair.IsEtTower.exists_quotient_last :
   · refine ⟨hT.base, hT.normal, ?_, ?_, ?_, ?_, ?_⟩
     · refine ⟨fun a => ⟨_, rfl⟩, ?_, ?_, ?_⟩
       · exact IsLocalRing.of_surjective' (e : (T ⧸ I) →+* f.range) e.surjective
-      · have h1 : (algebraMap ℂ (T ⧸ I)).EssFiniteType := RingHom.essFiniteType_algebraMap.2 inferInstance
-        have h2 := h1.comp (RingHom.FiniteType.of_surjective (e : (T ⧸ I) →+* f.range)
-          e.surjective).essFiniteType
+      · have h1 : (algebraMap ℂ (T ⧸ I)).EssFiniteType :=
+          RingHom.essFiniteType_algebraMap.2 inferInstance
+        have h2 :=
+          h1.comp (RingHom.FiniteType.of_surjective (e : (T ⧸ I) →+* f.range)
+            e.surjective).essFiniteType
         exact h2
       · intro z
         obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := T ⧸ I) z
@@ -288,13 +303,17 @@ theorem _root_.GlobalTheory.FieldPair.IsEtTower.exists_quotient_last :
       show ψQ (e.symm (e (Ideal.Quotient.mk I (τ (Fin.castSucc i))))) = 0
       rw [RingEquiv.symm_apply_apply]
       exact hT.zero _
-    · have heq : MvPolynomial.eval₂Hom (π.comp ι) (fun i => π (τ (Fin.castSucc i))) =
-          (e : (T ⧸ I) →+* f.range).comp φ' := by
+    · have heq
+          : MvPolynomial.eval₂Hom (π.comp ι) (fun i => π (τ (Fin.castSucc i)))
+            = (e : (T ⧸ I) →+* f.range).comp φ' := by
         apply MvPolynomial.ringHom_ext <;> intro <;> simp [π, φ']
       rw [heq]
       letI := ((e : (T ⧸ I) →+* f.range).comp φ').toAlgebra
-      exact Algebra.FormallyEtale.of_equiv
-        { e with commutes' := fun p => rfl : (T ⧸ I) ≃ₐ[MvPolynomial (Fin r) R] f.range }
+      exact Algebra.FormallyEtale.of_equiv {
+        e with
+        commutes' := fun p => rfl
+        : (T ⧸ I) ≃ₐ[MvPolynomial (Fin r) R] f.range
+      }
   · refine RingHom.ext fun x => ?_
     show ψQ (e.symm (e (Ideal.Quotient.mk I x))) = ψ x
     rw [RingEquiv.symm_apply_apply]

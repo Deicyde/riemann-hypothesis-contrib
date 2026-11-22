@@ -14,6 +14,7 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 namespace UpperTheory.V.Z.J.D
-theorem typePST'_alt : _root_.UpperTheory.V.Z.J.D.PotentiallySemistableType := _root_.UpperTheory.V.Z.J.D.type_pst_of_type_v _root_.UpperTheory.V.Z.J.D.type_v_statement
+theorem typePST'_alt : _root_.UpperTheory.V.Z.J.D.PotentiallySemistableType :=
+  _root_.UpperTheory.V.Z.J.D.type_pst_of_type_v _root_.UpperTheory.V.Z.J.D.type_v_statement
 end UpperTheory.V.Z.J.D
 end

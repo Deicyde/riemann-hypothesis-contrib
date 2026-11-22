@@ -8,8 +8,13 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem jets_mem_subalgebra_of_finiteType : ∀ (k A R : Type) [Field k] [CommRing A] [Algebra k A] [Algebra.FiniteType k A] [CommRing R] [Algebra k R] (N : ℕ) (Δ : ℕ → A →ₗ[k] R), Δ 0 1 = 1 → (∀ l, ∀ u w : A, Δ l (u * w) = ∑ p ∈ Finset.range (l + 1), l.choose p • (Δ p u * Δ (l - p) w)) →
- ∃ T : Finset R, ∀ S : Subalgebra k R, (∀ t ∈ T, t ∈ S) → ∀ l < N, ∀ u, Δ l u ∈ S := by
+theorem jets_mem_subalgebra_of_finiteType
+    : ∀ (k A R : Type) [Field k] [CommRing A] [Algebra k A] [Algebra.FiniteType k A] [CommRing R]
+        [Algebra k R] (N : ℕ) (Δ : ℕ → A →ₗ[k] R),
+      Δ 0 1 = 1
+        → (∀ l, ∀ u w : A,
+          Δ l (u * w) = ∑ p ∈ Finset.range (l + 1), l.choose p • (Δ p u * Δ (l - p) w))
+        → ∃ T : Finset R, ∀ S : Subalgebra k R, (∀ t ∈ T, t ∈ S) → ∀ l < N, ∀ u, Δ l u ∈ S := by
   intro k A R _ _ _ _ _ _ N Δ _ hL
   classical
   obtain ⟨s, hs⟩ := Algebra.FiniteType.out (R := k) (A := A)

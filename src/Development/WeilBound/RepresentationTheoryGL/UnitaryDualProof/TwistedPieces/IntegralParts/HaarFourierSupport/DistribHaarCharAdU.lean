@@ -21,8 +21,9 @@ namespace PositivityTheory.RgUd.TP.Nil.Four
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil PositivityTheory.RgUd.TP
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
-  (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {n : ℕ} (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
 
 structure Hyp : Prop where
   symm : ∀ x ∈ Bz Z, ∀ y ∈ Bz Z, τ (x * y) = τ (y * x)
@@ -31,23 +32,28 @@ structure Hyp : Prop where
 
 abbrev dd : ℕ := Module.finrank k (PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z)
 
-def bas : Module.Basis (Fin (dd Z)) k (PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z) := Module.finBasis k _
+def bas : Module.Basis (Fin (dd Z)) k (PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z) :=
+  Module.finBasis k _
 
-def ee (j : Fin (dd Z)) : Matrix (Fin n) (Fin n) k := (bas Z j : PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z)
+def ee (j : Fin (dd Z)) : Matrix (Fin n) (Fin n) k :=
+  (bas Z j : PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z)
 
-def E (u : Fin (dd Z) → k) : Matrix (Fin n) (Fin n) k := ((bas Z).equivFun.symm u : PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z)
+def E (u : Fin (dd Z) → k) : Matrix (Fin n) (Fin n) k :=
+  ((bas Z).equivFun.symm u : PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z)
 
 def D (x : Matrix (Fin n) (Fin n) k) : Fin (dd Z) → k := fun j => τ (ee Z j * x)
 
 def G : Matrix (Fin (dd Z)) (Fin (dd Z)) k := Matrix.of fun i j => τ (ee Z i * ee Z j)
 
 theorem dd_eq : dd Z = dB Z := by
-  have e : PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z =
-      Subalgebra.toSubmodule (Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))) := by
+  have e
+      : PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL Z
+        = Subalgebra.toSubmodule (Subalgebra.centralizer k
+          (Z : Set (Matrix (Fin n) (Fin n) k))) := by
     ext x
     simp only [PositivityTheory.RgUd.T.Nil.Four.Phi2.BzL, Bz, Submodule.mem_mk, AddSubmonoid.mem_mk,
-      AddSubsemigroup.mem_mk, Set.mem_setOf_eq, Subalgebra.mem_toSubmodule, Subalgebra.mem_centralizer_iff,
-      SetLike.mem_coe]
+      AddSubsemigroup.mem_mk, Set.mem_setOf_eq, Subalgebra.mem_toSubmodule,
+      Subalgebra.mem_centralizer_iff, SetLike.mem_coe]
   unfold dd dB
   rw [e, Subalgebra.finrank_toSubmodule]
 
@@ -64,7 +70,7 @@ theorem E_add (u u' : Fin (dd Z) → k) : E Z (u + u') = E Z u + E Z u' := by
 theorem E_smul (c : k) (u : Fin (dd Z) → k) : E Z (c • u) = c • E Z u := by
   simp only [E, map_smul, Submodule.coe_smul]
 
-theorem E_neg (u : Fin (dd Z) → k) : E Z (-u) = -E Z u := by
+theorem E_neg (u : Fin (dd Z) → k) : E Z (-u) = - E Z u := by
   simp only [E, map_neg, Submodule.coe_neg]
 
 theorem E_injective : Function.Injective (E Z) := fun u u' h =>
@@ -75,14 +81,15 @@ theorem E_zero : E Z 0 = 0 := by simp [E]
 theorem exists_E {w : Matrix (Fin n) (Fin n) k} (hw : w ∈ Bz Z) : ∃ u, E Z u = w :=
   ⟨(bas Z).equivFun ⟨w, hw⟩, by simp [E]⟩
 
-theorem dot_D (u : Fin (dd Z) → k) (x : Matrix (Fin n) (Fin n) k) : u ⬝ᵥ D τ Z x = τ (E Z u * x) := by
+theorem dot_D (u : Fin (dd Z) → k) (x : Matrix (Fin n) (Fin n) k)
+    : u ⬝ᵥ D τ Z x = τ (E Z u * x) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [E_apply, D, dotProduct, Finset.sum_mul, map_sum, smul_mul_assoc]
+  simp [E_apply, D, dotProduct, Finset.sum_mul, map_sum, smul_mul_assoc]
 
 theorem D_E (u : Fin (dd Z) → k) : D τ Z (E Z u) = G τ Z *ᵥ u := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [D, G, E_apply, mulVec, dotProduct, Finset.mul_sum, map_sum, mul_smul_comm, mul_comm]
+  simp [D, G, E_apply, mulVec, dotProduct, Finset.mul_sum, map_sum, mul_smul_comm, mul_comm]
 
 theorem D_add (x y : Matrix (Fin n) (Fin n) k) : D τ Z (x + y) = D τ Z x + D τ Z y := by
   funext j; simp [D, mul_add]
@@ -93,7 +100,8 @@ theorem D_sub (x y : Matrix (Fin n) (Fin n) k) : D τ Z (x - y) = D τ Z x - D �
 theorem D_smul (c : k) (x : Matrix (Fin n) (Fin n) k) : D τ Z (c • x) = c • D τ Z x := by
   funext j; simp [D]
 
-theorem mul_mem_Bz {x y : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z) (hy : y ∈ Bz Z) : x * y ∈ Bz Z := by
+theorem mul_mem_Bz {x y : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z) (hy : y ∈ Bz Z)
+    : x * y ∈ Bz Z := by
   intro a ha
   rw [← mul_assoc, hx a ha, mul_assoc, hy a ha, mul_assoc]
 
@@ -146,13 +154,16 @@ theorem Pr_of_mem (h : Hyp τ Z) {x : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z
   obtain ⟨u, rfl⟩ := exists_E Z hx
   exact Pr_E h u
 
-theorem tau_conj (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z) {y : Matrix (Fin n) (Fin n) k} (hy : y ∈ Bz Z) :
-    τ (g.val * y * g⁻¹.val) = τ y := by
+theorem tau_conj
+    (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z) {y : Matrix (Fin n) (Fin n) k} (hy : y ∈ Bz Z)
+    : τ (g.val * y * g⁻¹.val) = τ y := by
   have hgi : g⁻¹.val ∈ Bz Z := val_mem_Bz Z (PositivityTheory.RgUd.T.Nil.Four.Phi2.inv_mem_Gz hg)
   rw [h.symm _ (mul_mem_Bz Z (val_mem_Bz Z hg) hy) _ hgi, ← mul_assoc, Units.inv_mul, one_mul]
 
 def adL {g : GL (Fin n) k} (hg : g ∈ Gz Z) : (Fin (dd Z) → k) →ₗ[k] (Fin (dd Z) → k) where
-  toFun u := (bas Z).equivFun ⟨g.val * E Z u * g⁻¹.val, PositivityTheory.RgUd.T.Nil.Four.Phi2.conj_mem_Bz hg (E_mem Z u)⟩
+  toFun u :=
+    (bas Z).equivFun
+      ⟨g.val * E Z u * g⁻¹.val, PositivityTheory.RgUd.T.Nil.Four.Phi2.conj_mem_Bz hg (E_mem Z u)⟩
   map_add' u u' := by
     rw [← map_add (f := _)]
     congr 1
@@ -164,32 +175,39 @@ def adL {g : GL (Fin n) k} (hg : g ∈ Gz Z) : (Fin (dd Z) → k) →ₗ[k] (Fin
     ext1
     simp [E_smul]
 
-theorem E_adL {g : GL (Fin n) k} (hg : g ∈ Gz Z) (u : Fin (dd Z) → k) :
-    E Z (adL hg u) = g.val * E Z u * g⁻¹.val := by
+theorem E_adL {g : GL (Fin n) k} (hg : g ∈ Gz Z) (u : Fin (dd Z) → k)
+    : E Z (adL hg u) = g.val * E Z u * g⁻¹.val := by
   simp [adL, E]
 
-theorem conj_mul (g : GL (Fin n) k) (A B : Matrix (Fin n) (Fin n) k) :
-    g.val * A * g⁻¹.val * (g.val * B * g⁻¹.val) = g.val * (A * B) * g⁻¹.val := by
+theorem conj_mul (g : GL (Fin n) k) (A B : Matrix (Fin n) (Fin n) k)
+    : g.val * A * g⁻¹.val * (g.val * B * g⁻¹.val) = g.val * (A * B) * g⁻¹.val := by
   simp only [mul_assoc, Units.inv_mul_cancel_left]
 
-theorem dot_conj (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z) (u : Fin (dd Z) → k)
-    {x : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z) :
-    adL hg u ⬝ᵥ D τ Z (g.val * x * g⁻¹.val) = u ⬝ᵥ D τ Z x := by
+theorem dot_conj
+    (h : Hyp τ Z)
+    {g : GL (Fin n) k} (hg : g ∈ Gz Z)
+    (u : Fin (dd Z) → k)
+    {x : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z)
+    : adL hg u ⬝ᵥ D τ Z (g.val * x * g⁻¹.val) = u ⬝ᵥ D τ Z x := by
   rw [dot_D, dot_D, E_adL, conj_mul, tau_conj h hg (mul_mem_Bz Z (E_mem Z u) hx)]
 
-def adM {g : GL (Fin n) k} (hg : g ∈ Gz Z) : Matrix (Fin (dd Z)) (Fin (dd Z)) k := LinearMap.toMatrix' (adL hg)
+def adM {g : GL (Fin n) k} (hg : g ∈ Gz Z) : Matrix (Fin (dd Z)) (Fin (dd Z)) k :=
+  LinearMap.toMatrix' (adL hg)
 
-theorem adM_mulVec {g : GL (Fin n) k} (hg : g ∈ Gz Z) (u : Fin (dd Z) → k) : adM hg *ᵥ u = adL hg u :=
+theorem adM_mulVec {g : GL (Fin n) k} (hg : g ∈ Gz Z) (u : Fin (dd Z) → k)
+    : adM hg *ᵥ u = adL hg u :=
   LinearMap.toMatrix'_mulVec _ _
 
 theorem dot_G (u u' : Fin (dd Z) → k) : u ⬝ᵥ (G τ Z *ᵥ u') = τ (E Z u * E Z u') := by
   rw [← D_E, dot_D]
 
-theorem gram_adM (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z) : (adM hg)ᵀ * G τ Z * adM hg = G τ Z := by
+theorem gram_adM (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z)
+    : (adM hg)ᵀ * G τ Z * adM hg = G τ Z := by
   have key : ∀ u u', u ⬝ᵥ (((adM hg)ᵀ * G τ Z * adM hg) *ᵥ u') = u ⬝ᵥ (G τ Z *ᵥ u') := by
     intro u u'
-    rw [← mulVec_mulVec, ← mulVec_mulVec, dotProduct_mulVec, vecMul_transpose, adM_mulVec, adM_mulVec, dot_G,
-      dot_G, E_adL, E_adL, conj_mul, tau_conj h hg (mul_mem_Bz Z (E_mem Z u) (E_mem Z u'))]
+    rw [← mulVec_mulVec, ← mulVec_mulVec, dotProduct_mulVec, vecMul_transpose, adM_mulVec,
+      adM_mulVec, dot_G, dot_G, E_adL, E_adL, conj_mul,
+      tau_conj h hg (mul_mem_Bz Z (E_mem Z u) (E_mem Z u'))]
   ext i j
   have := key (Pi.single i 1) (Pi.single j 1)
   simpa [single_dotProduct, mulVec_single_one] using this
@@ -203,17 +221,20 @@ theorem det_adM_sq (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z) : (adM hg
   · exact absurd h3 (G_det h)
 
 def adU (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z) : GL (Fin (dd Z)) k :=
-  Matrix.nonsingInvUnit (adM hg) (Ne.isUnit fun h0 => by
-    have := det_adM_sq h hg
-    rw [h0] at this
-    norm_num at this)
+  Matrix.nonsingInvUnit (adM hg)
+    (Ne.isUnit fun h0 => by
+      have := det_adM_sq h hg
+      rw [h0] at this
+      norm_num at this)
 
-theorem distribHaarChar_adU (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z) :
-    (distribHaarChar k (Matrix.GeneralLinearGroup.det (adU h hg)) : NNReal) = 1 := by
+theorem distribHaarChar_adU (h : Hyp τ Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z)
+    : (distribHaarChar k (Matrix.GeneralLinearGroup.det (adU h hg)) : NNReal) = 1 := by
   set u := Matrix.GeneralLinearGroup.det (adU h hg)
-  have hu : u ^ 2 = 1 := Units.ext (by
-    simp only [Units.val_pow_eq_pow_val, Units.val_one, u, Matrix.GeneralLinearGroup.val_det_apply]
-    exact det_adM_sq h hg)
+  have hu : u ^ 2 = 1 :=
+    Units.ext (by
+      simp only [Units.val_pow_eq_pow_val, Units.val_one, u,
+        Matrix.GeneralLinearGroup.val_det_apply]
+      exact det_adM_sq h hg)
   have h2 : (distribHaarChar k u) ^ 2 = 1 := by rw [← map_pow, hu, map_one]
   exact (pow_eq_one_iff_of_nonneg (by positivity) two_ne_zero).1 h2
 

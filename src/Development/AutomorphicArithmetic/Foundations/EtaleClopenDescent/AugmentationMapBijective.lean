@@ -8,8 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocalPr
 
 open CategoryTheory Limits AlgebraicGeometry Polynomial GlobalTheory.EtC GlobalTheory.EtC.PrimLoc
 
-theorem UpperTheory.Cb.augmentation_map_bijective :
-    LateralTheory.E.AugBijPf.Root := by
+theorem UpperTheory.Cb.augmentation_map_bijective : LateralTheory.E.AugBijPf.Root := by
   intro q U hq
   rcases subsingleton_or_nontrivial Γ(U, ⊤) with hA | hA
   · exact ⟨U, 𝟙 U, inferInstance, fun u => ⟨u, rfl⟩, ⟨⟨0, hq, Subsingleton.elim _ _⟩⟩⟩
@@ -24,5 +23,7 @@ theorem UpperTheory.Cb.augmentation_map_bijective :
   refine ⟨pullback U.toSpecΓ (Spec.map φ), pullback.fst _ _, inferInstance, ?_, ?_⟩
   · intro u
     exact (Surjective.surj (f := pullback.fst U.toSpecΓ (Spec.map φ))) u
-  · exact ⟨Prim.map ((pullback.snd U.toSpecΓ (Spec.map φ)).appTop.hom.comp
-      (Scheme.ΓSpecIso (CommRingCat.of B)).inv.hom) (cyc_root q hq)⟩
+  · exact ⟨Prim.map
+      ((pullback.snd U.toSpecΓ (Spec.map φ)).appTop.hom.comp
+        (Scheme.ΓSpecIso (CommRingCat.of B)).inv.hom)
+      (cyc_root q hq)⟩

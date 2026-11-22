@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 open UpperTheory.V.Cj.A UpperTheory.V.Lit.Geo
 
-theorem UpperTheory.V.Cj.A.zigMap :
-    ZigMap := by
+theorem UpperTheory.V.Cj.A.zigMap : ZigMap := by
   intro Γ V S _ _ _ d G P hd' hi ha q
   induction q with
   | zero =>

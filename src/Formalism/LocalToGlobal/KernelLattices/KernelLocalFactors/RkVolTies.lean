@@ -17,7 +17,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Th1.H Formalism.L
 
 variable {D : Car} {X : Fields}
 
-def Seam.push (s : Seam D X) {a b : ℕ} (F : VCx X.Tau a b → ℂ) : TaylorLogMetric.VC D a b → ℂ := fun z => F fun τ => z (s.iT τ)
+def Seam.push (s : Seam D X) {a b : ℕ} (F : VCx X.Tau a b → ℂ) : TaylorLogMetric.VC D a b → ℂ :=
+  fun z => F fun τ => z (s.iT τ)
 
 variable (s : Seam D X) {a b : ℕ}
 

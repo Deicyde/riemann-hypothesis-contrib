@@ -21,8 +21,10 @@ open Semi
 
 section Geo
 
-variable {S S' : Scheme.{0}} {G' : Over S'} {G : Over S} [GrpObj G'] [IsCommMonObj G'] [GrpObj G]
-  [IsCommMonObj G] (m : CubeMap G' G)
+variable
+  {S S' : Scheme.{0}} {G' : Over S'} {G : Over S}
+  [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G]
+  (m : CubeMap G' G)
 
 lemma pzero_left {S₀ : Scheme.{0}} (H : Over S₀) [GrpObj H] (T : Over S₀) :
     (pzero H T).left = T.hom ≫ eSec H := by
@@ -67,10 +69,9 @@ lemma cubeMap_on_coordinates (i : Fin 3) : (x3 G' i).left ≫ m.F = m.F3 ≫ (x3
 
 theorem m_over : G'.hom ≫ m.e = m.F ≫ G.hom := by
   have key : (x3 G' 0).left ≫ G'.hom ≫ m.e = (x3 G' 0).left ≫ m.F ≫ G.hom := by
-    rw [← Category.assoc, Over.w (x3 G' 0), ← cubeMap_lies_over_base, ← Category.assoc, cubeMap_on_coordinates, Category.assoc,
-      Over.w (x3 G 0)]
-  have hs : (lift (𝟙 G') (lift (𝟙 G') (𝟙 G')) : G' ⟶ G3 G') ≫ x3 G' 0 = 𝟙 G' := by
-    simp [x3]
+    rw [← Category.assoc, Over.w (x3 G' 0), ← cubeMap_lies_over_base, ← Category.assoc,
+      cubeMap_on_coordinates, Category.assoc, Over.w (x3 G 0)]
+  have hs : (lift (𝟙 G') (lift (𝟙 G') (𝟙 G')) : G' ⟶ G3 G') ≫ x3 G' 0 = 𝟙 G' := by simp [x3]
   have hl := congrArg (fun f => f.left) hs
   simp only [Over.comp_left, Over.id_left] at hl
   have h := congrArg (fun f => (lift (𝟙 G') (lift (𝟙 G') (𝟙 G')) : G' ⟶ G3 G').left ≫ f) key
@@ -182,58 +183,70 @@ lemma tb_pzero' {T : Over S'} {T0 : Over S} (L : (Over.map m.e).obj T ⟶ T0) :
     tb m (pzero G' T) = L ≫ pzero G T0 := by
   rw [tb_pzero, comp_pzero']
 
-theorem face_comm (i : Fin 3) :
-    (faceMap G' i).left ≫ m.F3 = pullbackMapSquare m ≫ (faceMap G i).left := by
+theorem face_comm (i : Fin 3)
+    : (faceMap G' i).left ≫ m.F3 = pullbackMapSquare m ≫ (faceMap G i).left := by
   fin_cases i
-  · have h := lift_triple_comm_pullback m (L2 m) (pzero G' (G2 G')) (x2 G' 0) (x2 G' 1) (pzero G (G2 G)) (x2 G 0) (x2 G 1) (tb_pzero' m (L2 m)) (pullback_proj_square m 0) (pullback_proj_square m 1)
+  · have h :=
+      lift_triple_comm_pullback m (L2 m) (pzero G' (G2 G')) (x2 G' 0) (x2 G' 1) (pzero G (G2 G))
+        (x2 G 0) (x2 G 1) (tb_pzero' m (L2 m)) (pullback_proj_square m 0) (pullback_proj_square m 1)
     first
-      | exact h
-      | (simp only [faceMap, pullbackMapSquare]; exact h)
-      | simpa [faceMap, pullbackMapSquare] using h
-  · have h := lift_triple_comm_pullback m (L2 m) (x2 G' 0) (pzero G' (G2 G')) (x2 G' 1) (x2 G 0) (pzero G (G2 G)) (x2 G 1) (pullback_proj_square m 0) (tb_pzero' m (L2 m)) (pullback_proj_square m 1)
+    | exact h
+    | (simp only [faceMap, pullbackMapSquare]; exact h)
+    | simpa [faceMap, pullbackMapSquare] using h
+  · have h :=
+      lift_triple_comm_pullback m (L2 m) (x2 G' 0) (pzero G' (G2 G')) (x2 G' 1) (x2 G 0)
+        (pzero G (G2 G)) (x2 G 1) (pullback_proj_square m 0) (tb_pzero' m (L2 m))
+        (pullback_proj_square m 1)
     first
-      | exact h
-      | (simp only [faceMap, pullbackMapSquare]; exact h)
-      | simpa [faceMap, pullbackMapSquare] using h
-  · have h := lift_triple_comm_pullback m (L2 m) (x2 G' 0) (x2 G' 1) (pzero G' (G2 G')) (x2 G 0) (x2 G 1) (pzero G (G2 G)) (pullback_proj_square m 0) (pullback_proj_square m 1) (tb_pzero' m (L2 m))
+    | exact h
+    | (simp only [faceMap, pullbackMapSquare]; exact h)
+    | simpa [faceMap, pullbackMapSquare] using h
+  · have h :=
+      lift_triple_comm_pullback m (L2 m) (x2 G' 0) (x2 G' 1) (pzero G' (G2 G')) (x2 G 0) (x2 G 1)
+        (pzero G (G2 G)) (pullback_proj_square m 0) (pullback_proj_square m 1) (tb_pzero' m (L2 m))
     first
-      | exact h
-      | (simp only [faceMap, pullbackMapSquare]; exact h)
-      | simpa [faceMap, pullbackMapSquare] using h
+    | exact h
+    | (simp only [faceMap, pullbackMapSquare]; exact h)
+    | simpa [faceMap, pullbackMapSquare] using h
 
-theorem swap_first_two_comm :
-    (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left ≫ m.F3 =
-      m.F3 ≫ (lift (x3 G 1) (lift (x3 G 0) (x3 G 2))).left := by
+theorem swap_first_two_comm
+    : (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left ≫ m.F3
+      = m.F3 ≫ (lift (x3 G 1) (lift (x3 G 0) (x3 G 2))).left := by
   rw [lift_triple_comm_pullback m (L3 m) (x3 G' 1) (x3 G' 0) (x3 G' 2) (x3 G 1) (x3 G 0) (x3 G 2)
-    (pullback_proj_cube m 1) (pullback_proj_cube m 0) (pullback_proj_cube m 2), cubeMapOf_thirdFace_eq_pushPt_lift]
+      (pullback_proj_cube m 1) (pullback_proj_cube m 0) (pullback_proj_cube m 2),
+    cubeMapOf_thirdFace_eq_pushPt_lift]
 
-theorem swap_last_two_comm :
-    (lift (x3 G' 0) (lift (x3 G' 2) (x3 G' 1))).left ≫ m.F3 =
-      m.F3 ≫ (lift (x3 G 0) (lift (x3 G 2) (x3 G 1))).left := by
+theorem swap_last_two_comm
+    : (lift (x3 G' 0) (lift (x3 G' 2) (x3 G' 1))).left ≫ m.F3
+      = m.F3 ≫ (lift (x3 G 0) (lift (x3 G 2) (x3 G 1))).left := by
   rw [lift_triple_comm_pullback m (L3 m) (x3 G' 0) (x3 G' 2) (x3 G' 1) (x3 G 0) (x3 G 2) (x3 G 1)
-    (pullback_proj_cube m 0) (pullback_proj_cube m 2) (pullback_proj_cube m 1), cubeMapOf_thirdFace_eq_pushPt_lift]
+      (pullback_proj_cube m 0) (pullback_proj_cube m 2) (pullback_proj_cube m 1),
+    cubeMapOf_thirdFace_eq_pushPt_lift]
 
-theorem cube_face_comm (a b c : Fin 4) :
-    (lift (x4 G' a) (lift (x4 G' b) (x4 G' c))).left ≫ m.F3 =
-      pullbackMapFourth m ≫ (lift (x4 G a) (lift (x4 G b) (x4 G c))).left := by
+theorem cube_face_comm (a b c : Fin 4)
+    : (lift (x4 G' a) (lift (x4 G' b) (x4 G' c))).left ≫ m.F3
+      = pullbackMapFourth m ≫ (lift (x4 G a) (lift (x4 G b) (x4 G c))).left := by
   rw [show pullbackMapFourth m = (L4 m).left from rfl,
-    lift_triple_comm_pullback m (L4 m) _ _ _ _ _ _ (pullback_proj_fourth m a) (pullback_proj_fourth m b) (pullback_proj_fourth m c)]
+    lift_triple_comm_pullback m (L4 m) _ _ _ _ _ _ (pullback_proj_fourth m a)
+      (pullback_proj_fourth m b) (pullback_proj_fourth m c)]
 
-theorem cube_sum_face_comm (a b c d : Fin 4) :
-    (lift (padd G' (x4 G' a) (x4 G' b)) (lift (x4 G' c) (x4 G' d))).left ≫ m.F3 =
-      pullbackMapFourth m ≫ (lift (padd G (x4 G a) (x4 G b)) (lift (x4 G c) (x4 G d))).left := by
+theorem cube_sum_face_comm (a b c d : Fin 4)
+    : (lift (padd G' (x4 G' a) (x4 G' b)) (lift (x4 G' c) (x4 G' d))).left ≫ m.F3
+      = pullbackMapFourth m ≫ (lift (padd G (x4 G a) (x4 G b)) (lift (x4 G c) (x4 G d))).left := by
   have hp : tb m (padd G' (x4 G' a) (x4 G' b)) = L4 m ≫ padd G (x4 G a) (x4 G b) := by
     rw [tb_padd, pullback_proj_fourth, pullback_proj_fourth, comp_padd']
   rw [show pullbackMapFourth m = (L4 m).left from rfl,
-    lift_triple_comm_pullback m (L4 m) _ _ _ _ _ _ hp (pullback_proj_fourth m c) (pullback_proj_fourth m d)]
+    lift_triple_comm_pullback m (L4 m) _ _ _ _ _ _ hp (pullback_proj_fourth m c)
+      (pullback_proj_fourth m d)]
 
-theorem c4p'_comm (a b c d : Fin 4) :
-    (lift (x4 G' a) (lift (padd G' (x4 G' b) (x4 G' c)) (x4 G' d))).left ≫ m.F3 =
-      pullbackMapFourth m ≫ (lift (x4 G a) (lift (padd G (x4 G b) (x4 G c)) (x4 G d))).left := by
+theorem c4p'_comm (a b c d : Fin 4)
+    : (lift (x4 G' a) (lift (padd G' (x4 G' b) (x4 G' c)) (x4 G' d))).left ≫ m.F3
+      = pullbackMapFourth m ≫ (lift (x4 G a) (lift (padd G (x4 G b) (x4 G c)) (x4 G d))).left := by
   have hq : tb m (padd G' (x4 G' b) (x4 G' c)) = L4 m ≫ padd G (x4 G b) (x4 G c) := by
     rw [tb_padd, pullback_proj_fourth, pullback_proj_fourth, comp_padd']
   rw [show pullbackMapFourth m = (L4 m).left from rfl,
-    lift_triple_comm_pullback m (L4 m) _ _ _ _ _ _ (pullback_proj_fourth m a) hq (pullback_proj_fourth m d)]
+    lift_triple_comm_pullback m (L4 m) _ _ _ _ _ _ (pullback_proj_fourth m a) hq
+      (pullback_proj_fourth m d)]
 
 lemma tb_inv {T : Over S'} (y : T ⟶ G') : tb m (y ≫ ι[G']) = tb m y ≫ ι[G] := by
   have hm : ∀ {T0 : Over S} (a b : T0 ⟶ G), padd G a b = pzero G T0 → b = a ≫ ι[G] := by

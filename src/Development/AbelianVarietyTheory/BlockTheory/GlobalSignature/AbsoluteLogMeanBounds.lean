@@ -11,9 +11,11 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.AbsoluteLogMeanBounds
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric GlobalTheory.Glob.IntegralWittCoefficients Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric
+  GlobalTheory.Glob.IntegralWittCoefficients Classical
 
 def kronBound (D : D7) : ℝ :=
-  (1 / 2) * (Real.log (Real.sqrt (D.host.d : ℝ)) - Real.eulerMascheroniConstant + logDerivativeAtOne D)
+  (1 / 2)
+    * (Real.log (Real.sqrt (D.host.d : ℝ)) - Real.eulerMascheroniConstant + logDerivativeAtOne D)
 
 end GlobalTheory.IndefiniteRowSideFullHecke.AbsoluteLogMeanBounds

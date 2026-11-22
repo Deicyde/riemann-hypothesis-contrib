@@ -6,11 +6,13 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ZetaProdSpher
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.SphereRatio
 
-theorem sphV_succ (i : ℕ) : sphV (i + 1) = sphV i * (2 * Real.pi ^ (i + 1) / (i.factorial : ℝ)) := by
+theorem sphV_succ (i : ℕ)
+    : sphV (i + 1) = sphV i * (2 * Real.pi ^ (i + 1) / (i.factorial : ℝ)) := by
   unfold sphV
   rw [Finset.prod_Icc_succ_top (by omega)]
   simp
@@ -37,13 +39,14 @@ theorem sphV_add_le (m j : ℕ) : sphV (m + j) ≤ sphV m * Real.exp (3.49 * j) 
     have hp := Real.pi_pos
     have hm := sphV_pos m
     rw [← add_assoc, sphV_succ]
-    calc sphV (m + j) * (2 * Real.pi ^ (m + j + 1) / ((m + j).factorial : ℝ))
-        ≤ (sphV m * Real.exp (3.49 * j)) * Real.exp 3.49 :=
-          mul_le_mul ih h2 (by positivity) (by positivity)
+    calc
+      sphV (m + j) * (2 * Real.pi ^ (m + j + 1) / ((m + j).factorial : ℝ))
+          ≤ (sphV m * Real.exp (3.49 * j)) * Real.exp 3.49 :=
+        mul_le_mul ih h2 (by positivity) (by positivity)
       _ = sphV m * Real.exp (3.49 * ((j + 1 : ℕ) : ℝ)) := by
-          rw [mul_assoc, ← Real.exp_add]
-          push_cast
-          ring_nf
+        rw [mul_assoc, ← Real.exp_add]
+        push_cast
+        ring_nf
 
 theorem inv_sphV_le (J : ℕ) : (sphV J)⁻¹ ≤ (J : ℝ) ^ (J * (J - 1) / 2) := by
   induction J with
@@ -60,19 +63,23 @@ theorem inv_sphV_le (J : ℕ) : (sphV J)⁻¹ ≤ (J : ℝ) ^ (J * (J - 1) / 2) 
     have he : (J + 1) * (J + 1 - 1) / 2 = J * (J - 1) / 2 + J := Nat.triangle_succ J
     have hJ := sphV_pos J
     rw [sphV_succ, mul_inv, he]
-    calc (sphV J)⁻¹ * (2 * Real.pi ^ (J + 1) / (J.factorial : ℝ))⁻¹
-        ≤ (J : ℝ) ^ (J * (J - 1) / 2) * (J : ℝ) ^ J :=
-          mul_le_mul ih h2 (by positivity) (by positivity)
+    calc
+      (sphV J)⁻¹ * (2 * Real.pi ^ (J + 1) / (J.factorial : ℝ))⁻¹
+          ≤ (J : ℝ) ^ (J * (J - 1) / 2) * (J : ℝ) ^ J :=
+        mul_le_mul ih h2 (by positivity) (by positivity)
       _ = (J : ℝ) ^ (J * (J - 1) / 2 + J) := by rw [pow_add]
       _ ≤ ((J + 1 : ℕ) : ℝ) ^ (J * (J - 1) / 2 + J) :=
-          pow_le_pow_left₀ (by positivity) (by push_cast; linarith) _
+        pow_le_pow_left₀ (by positivity) (by push_cast; linarith) _
 
 end GlobalTheory.SphereRatio
 
-theorem GlobalTheory.sphV_ratio_and_inv_bounds :
-    (∀ q j : ℕ, j ≤ q → Real.log (sphV q / sphV (q - j)) ≤ 3.49 * j) ∧
-      ∀ J : ℕ, 0 < sphV J ∧ (sphV J)⁻¹ ≤ (J : ℝ) ^ (J * (J - 1) / 2) := by
-  refine ⟨fun q j h => ?_, fun J => ⟨GlobalTheory.SphereRatio.sphV_pos J, GlobalTheory.SphereRatio.inv_sphV_le J⟩⟩
+theorem GlobalTheory.sphV_ratio_and_inv_bounds
+    : (∀ q j : ℕ, j ≤ q → Real.log (sphV q / sphV (q - j)) ≤ 3.49 * j)
+      ∧ ∀ J : ℕ, 0 < sphV J ∧ (sphV J)⁻¹ ≤ (J : ℝ) ^ (J * (J - 1) / 2) := by
+  refine ⟨
+    fun q j h => ?_,
+    fun J => ⟨GlobalTheory.SphereRatio.sphV_pos J, GlobalTheory.SphereRatio.inv_sphV_le J⟩
+  ⟩
   have h1 := GlobalTheory.SphereRatio.sphV_add_le (q - j) j
   rw [Nat.sub_add_cancel h] at h1
   have hq := GlobalTheory.SphereRatio.sphV_pos q

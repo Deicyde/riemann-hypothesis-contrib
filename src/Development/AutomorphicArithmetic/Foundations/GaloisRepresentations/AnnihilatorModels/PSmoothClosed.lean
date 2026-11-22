@@ -8,8 +8,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-private theorem away_closed (O : Type) [CommRing O] [IsDomain O] [IsIntegrallyClosed O] (a : O) (ha : a ≠ 0)
-    (x : Localization.Away a) (hx : IsIntegral O x) : ∃ o : O, algebraMap O _ o = x := by
+private theorem away_closed
+    (O : Type) [CommRing O] [IsDomain O] [IsIntegrallyClosed O]
+    (a : O) (ha : a ≠ 0) (x : Localization.Away a) (hx : IsIntegral O x)
+    : ∃ o : O, algebraMap O _ o = x := by
   classical
   have hunit : ∀ y : Submonoid.powers a, IsUnit (Algebra.ofId O (FractionRing O) y) := by
     rintro ⟨_, n, rfl⟩
@@ -20,8 +22,9 @@ private theorem away_closed (O : Type) [CommRing O] [IsDomain O] [IsIntegrallyCl
   let f : Localization.Away a →ₐ[O] FractionRing O :=
     IsLocalization.liftAlgHom (M := Submonoid.powers a) hunit
   have hinj : Function.Injective f := by
-    have h := (IsLocalization.lift_injective_iff (M := Submonoid.powers a)
-      (S := Localization.Away a) (g := algebraMap O (FractionRing O)) hunit).mpr ?_
+    have h :=
+      (IsLocalization.lift_injective_iff (M := Submonoid.powers a) (S := Localization.Away a)
+        (g := algebraMap O (FractionRing O)) hunit).mpr ?_
     · exact h
     · intro x y
       rw [(IsLocalization.injective (Localization.Away a)
@@ -31,11 +34,11 @@ private theorem away_closed (O : Type) [CommRing O] [IsDomain O] [IsIntegrallyCl
     f.isIntegrallyClosedIn hinj inferInstance
   exact IsIntegrallyClosedIn.algebraMap_eq_of_integral hx
 
-theorem UpperTheory.Gal.crystallineComparison.smoothClosed_of :
-    SmoothClosed := by
+theorem UpperTheory.Gal.crystallineComparison.smoothClosed_of : SmoothClosed := by
   intro l O R _ _ _ _ _ _ hl c hc
   classical
-  have hM : Algebra.algebraMapSubmonoid R (Submonoid.powers (l : O)) = Submonoid.powers (l : R) := by
+  have hM
+      : Algebra.algebraMapSubmonoid R (Submonoid.powers (l : O)) = Submonoid.powers (l : R) := by
     rw [Algebra.algebraMapSubmonoid, Submonoid.map_powers, map_natCast]
   haveI : IsLocalization (Submonoid.powers (l : R)) (R ⊗[O] Localization.Away (l : O)) := by
     rw [← hM]
@@ -43,20 +46,22 @@ theorem UpperTheory.Gal.crystallineComparison.smoothClosed_of :
   let e : (R ⊗[O] Localization.Away (l : O)) ≃ₐ[R] Localization.Away (l : R) :=
     IsLocalization.algEquiv (Submonoid.powers (l : R)) _ _
   have hc' : IsIntegral R (e.symm c) := hc.map e.symm
-  obtain ⟨s, hs⟩ := (TensorProduct.toIntegralClosure_bijective_of_smooth (R := O) (S := R)
-    (B := Localization.Away (l : O))).2 ⟨e.symm c, hc'⟩
-  have key : ∀ s : R ⊗[O] integralClosure O (Localization.Away (l : O)), ∃ r : R,
-      algebraMap R (R ⊗[O] Localization.Away (l : O)) r =
-        (TensorProduct.toIntegralClosure O R (Localization.Away (l : O)) s :
-          R ⊗[O] Localization.Away (l : O)) := by
+  obtain ⟨s, hs⟩ :=
+    (TensorProduct.toIntegralClosure_bijective_of_smooth (R := O) (S := R)
+      (B := Localization.Away (l : O))).2 ⟨e.symm c, hc'⟩
+  have key
+      : ∀ s : R ⊗[O] integralClosure O (Localization.Away (l : O)), ∃ r : R,
+        algebraMap R (R ⊗[O] Localization.Away (l : O)) r
+          = (TensorProduct.toIntegralClosure O R (Localization.Away (l : O)) s
+            : R ⊗[O] Localization.Away (l : O)) := by
     intro s
     induction s with
     | tmul r y =>
       obtain ⟨o, ho⟩ := away_closed O (l : O) hl y.1 y.2
       refine ⟨algebraMap O R o * r, ?_⟩
       show _ = r ⊗ₜ[O] y.1
-      rw [← ho, Algebra.algebraMap_eq_smul_one (A := Localization.Away (l : O)), ← TensorProduct.smul_tmul,
-        Algebra.smul_def]
+      rw [← ho, Algebra.algebraMap_eq_smul_one (A := Localization.Away (l : O)),
+        ← TensorProduct.smul_tmul, Algebra.smul_def]
       rfl
     | add x y hx hy =>
       obtain ⟨r1, h1⟩ := hx

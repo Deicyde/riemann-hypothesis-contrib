@@ -12,9 +12,11 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology
 namespace GlobalTheory.PerronShift
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem half_le_norm_sub_of_re_eq_neg_half_of_LFunction_eq_zero {N : ℕ} [NeZero N]
-    (χ : DirichletCharacter ℂ N) (hχ : χ.IsPrimitive) {s w : ℂ} (hs : s.re = -(1 / 2))
-    (hw : LFunction χ w = 0) : 1 / 2 ≤ ‖s - w‖ := by
+private theorem half_le_norm_sub_of_re_eq_neg_half_of_LFunction_eq_zero
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter ℂ N) (hχ : χ.IsPrimitive)
+    {s w : ℂ} (hs : s.re = -(1 / 2)) (hw : LFunction χ w = 0)
+    : 1 / 2 ≤ ‖s - w‖ := by
   refine le_trans ?_ (Complex.abs_re_le_norm (s - w))
   rw [Complex.sub_re, hs]
   rcases le_or_gt w.re 0 with hre | hre
@@ -23,22 +25,25 @@ private theorem half_le_norm_sub_of_re_eq_neg_half_of_LFunction_eq_zero {N : ℕ
     rcases Nat.eq_zero_or_pos n with rfl | hn
     · norm_num
     · have : (1 : ℝ) ≤ n := by exact_mod_cast hn
-      rw [abs_of_nonneg (by linarith)]; linarith
+      rw [abs_of_nonneg (by linarith)]
+      linarith
   · rw [abs_of_neg (by linarith)]; linarith
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem LFunction_ne_zero_of_re_eq_neg_half {N : ℕ} [NeZero N]
-    (χ : DirichletCharacter ℂ N) (hχ : χ.IsPrimitive) {s : ℂ} (hs : s.re = -(1 / 2)) :
-    LFunction χ s ≠ 0 := by
+private theorem LFunction_ne_zero_of_re_eq_neg_half
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter ℂ N) (hχ : χ.IsPrimitive)
+    {s : ℂ} (hs : s.re = -(1 / 2))
+    : LFunction χ s ≠ 0 := by
   intro h
   have := half_le_norm_sub_of_re_eq_neg_half_of_LFunction_eq_zero χ hχ hs h
   simp at this
   linarith
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem norm_finsum_div_sub_le_two_mul_finsum_of_half_le_dist {S : Set ℂ} (hS : S.Finite) (k : ℂ → ℕ) (s : ℂ)
-    (hd : ∀ w ∈ S, 1 / 2 ≤ ‖s - w‖) :
-    ‖∑ᶠ (w : ℂ) (_ : w ∈ S), (k w : ℂ) / (s - w)‖ ≤ 2 * ∑ᶠ (w : ℂ) (_ : w ∈ S), (k w : ℝ) := by
+private theorem norm_finsum_div_sub_le_two_mul_finsum_of_half_le_dist
+    {S : Set ℂ} (hS : S.Finite) (k : ℂ → ℕ) (s : ℂ) (hd : ∀ w ∈ S, 1 / 2 ≤ ‖s - w‖)
+    : ‖∑ᶠ (w : ℂ) (_ : w ∈ S), (k w : ℂ) / (s - w)‖ ≤ 2 * ∑ᶠ (w : ℂ) (_ : w ∈ S), (k w : ℝ) := by
   rw [finsum_mem_eq_finite_toFinset_sum _ hS, finsum_mem_eq_finite_toFinset_sum _ hS,
     Finset.mul_sum]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun w hw => ?_)
@@ -49,18 +54,22 @@ private theorem norm_finsum_div_sub_le_two_mul_finsum_of_half_le_dist {S : Set �
   nlinarith
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem exists_norm_logDeriv_LFunction_neg_half_le_log_conductor :
-    ∃ C : ℝ, 0 < C ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), χ.IsPrimitive →
-      ∀ t : ℝ, ‖deriv (LFunction χ) (((-(1 / 2) : ℝ) : ℂ) + t * I) /
-        LFunction χ (((-(1 / 2) : ℝ) : ℂ) + t * I)‖ ≤ C * Real.log (N * (|t| + 2)) := by
+private theorem exists_norm_logDeriv_LFunction_neg_half_le_log_conductor
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+          χ.IsPrimitive
+            → ∀ t : ℝ,
+              ‖deriv (LFunction χ) (((-(1 / 2) : ℝ) : ℂ) + t * I) /
+                  LFunction χ (((-(1 / 2) : ℝ) : ℂ) + t * I)‖
+                ≤ C * Real.log (N * (|t| + 2)) := by
   obtain ⟨C₁, hC₁, H₁⟩ := _root_.GlobalTheory.LWide.logDeriv_LFunction_strip
   obtain ⟨C₂, hC₂, H₂⟩ := _root_.GlobalTheory.ZetaWide.main
   refine ⟨3 * C₁ + 3 * C₂ + 1, by positivity, fun N _ χ hχ t => ?_⟩
   set s : ℂ := ((-(1 / 2) : ℝ) : ℂ) + t * I with hs_def
   have hre : s.re = -(1 / 2) := by simp [s]
   have him : s.im = t := by simp [s]
-  have hlog2 : (2 / 3 : ℝ) < Real.log 2 := by
-    have := Real.log_two_gt_d9; linarith
+  have hlog2 : (2 / 3 : ℝ) < Real.log 2 := by have := Real.log_two_gt_d9; linarith
   have ht2 : Real.log 2 ≤ Real.log (|t| + 2) :=
     Real.log_le_log (by norm_num) (by linarith [abs_nonneg t])
   have hN : (1 : ℝ) ≤ N := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne N)
@@ -81,22 +90,30 @@ private theorem exists_norm_logDeriv_LFunction_neg_half_le_log_conductor :
       have := LFunction_ne_zero_of_re_eq_neg_half (1 : DirichletCharacter ℂ 1) hχ hre
       rwa [LFunction_modOne_eq] at this
     obtain ⟨hfin, hcnt, hbd⟩ := H₂ s (by rw [hre]; norm_num) (by rw [hre]; norm_num) hs1 hz
-    have hsum := norm_finsum_div_sub_le_two_mul_finsum_of_half_le_dist hfin (analyticOrderNatAt riemannZeta) s
-      (fun w hw => half_le_norm_sub_of_re_eq_neg_half_of_LFunction_eq_zero (1 : DirichletCharacter ℂ 1) hχ hre
-        (by rw [LFunction_modOne_eq]; exact hw.2.2))
+    have hsum :=
+      norm_finsum_div_sub_le_two_mul_finsum_of_half_le_dist hfin (analyticOrderNatAt riemannZeta) s
+        (fun w hw =>
+          half_le_norm_sub_of_re_eq_neg_half_of_LFunction_eq_zero (1 : DirichletCharacter ℂ 1) hχ
+            hre (by rw [LFunction_modOne_eq]; exact hw.2.2))
     have hinv : ‖1 / (s - 1)‖ ≤ 2 / 3 := by
       have : (3 / 2 : ℝ) ≤ ‖s - 1‖ := by
         refine le_trans ?_ (Complex.abs_re_le_norm _)
-        rw [Complex.sub_re, hre, Complex.one_re]; norm_num
-      rw [norm_div, norm_one, div_le_iff₀ (by linarith)]; linarith
-    have key : ‖deriv riemannZeta s / riemannZeta s‖ ≤ C₂ * Real.log (|s.im| + 2)
-        + 2 * (C₂ * Real.log (|s.im| + 2)) + 2 / 3 := by
-      have e : deriv riemannZeta s / riemannZeta s = (deriv riemannZeta s / riemannZeta s
-          + 1 / (s - 1) - ∑ᶠ (w : ℂ) (_ : w ∈ {w | ‖w - (2 + ↑s.im * I)‖ ≤ 7 / 2 ∧ w ≠ 1 ∧
-            riemannZeta w = 0}), (analyticOrderNatAt riemannZeta w : ℂ) / (s - w))
-          + ∑ᶠ (w : ℂ) (_ : w ∈ {w | ‖w - (2 + ↑s.im * I)‖ ≤ 7 / 2 ∧ w ≠ 1 ∧
-            riemannZeta w = 0}), (analyticOrderNatAt riemannZeta w : ℂ) / (s - w)
-          - 1 / (s - 1) := by ring
+        rw [Complex.sub_re, hre, Complex.one_re]
+        norm_num
+      rw [norm_div, norm_one, div_le_iff₀ (by linarith)]
+      linarith
+    have key
+        : ‖deriv riemannZeta s / riemannZeta s‖
+          ≤ C₂ * Real.log (|s.im| + 2) + 2 * (C₂ * Real.log (|s.im| + 2)) + 2 / 3 := by
+      have e
+          : deriv riemannZeta s / riemannZeta s
+            = (deriv riemannZeta s / riemannZeta s + 1 / (s - 1)
+                - ∑ᶠ (w : ℂ) (_ : w ∈ {w | ‖w - (2 + ↑s.im * I)‖ ≤ 7 / 2 ∧ w ≠ 1 ∧
+                  riemannZeta w = 0}), (analyticOrderNatAt riemannZeta w : ℂ) / (s - w))
+              + ∑ᶠ (w : ℂ) (_ : w ∈ {w | ‖w - (2 + ↑s.im * I)‖ ≤ 7 / 2 ∧ w ≠ 1 ∧
+                riemannZeta w = 0}), (analyticOrderNatAt riemannZeta w : ℂ) / (s - w)
+              - 1 / (s - 1) := by
+        ring
       rw [e]
       refine (norm_sub_le _ _).trans ?_
       refine add_le_add ((norm_add_le _ _).trans (add_le_add hbd ?_)) hinv
@@ -107,58 +124,71 @@ private theorem exists_norm_logDeriv_LFunction_neg_half_le_log_conductor :
   · have hLs := LFunction_ne_zero_of_re_eq_neg_half χ hχ hre
     obtain ⟨hfin, hcnt, hbd⟩ := H₁ N χ h1 s (by rw [hre]; norm_num) (by rw [hre]; norm_num) hLs
     rw [him] at hcnt hbd
-    have hsum := norm_finsum_div_sub_le_two_mul_finsum_of_half_le_dist hfin (analyticOrderNatAt (LFunction χ)) s
-      (fun w hw => half_le_norm_sub_of_re_eq_neg_half_of_LFunction_eq_zero χ hχ hre hw.2)
+    have hsum :=
+      norm_finsum_div_sub_le_two_mul_finsum_of_half_le_dist hfin (analyticOrderNatAt (LFunction χ))
+        s (fun w hw => half_le_norm_sub_of_re_eq_neg_half_of_LFunction_eq_zero χ hχ hre hw.2)
     rw [him] at hsum
-    have e : deriv (LFunction χ) s / LFunction χ s = (deriv (LFunction χ) s / LFunction χ s
-          - ∑ᶠ (w : ℂ) (_ : w ∈ {w | ‖w - (2 + ↑t * I)‖ ≤ 7 / 2 ∧ LFunction χ w = 0}),
-            (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w))
-          + ∑ᶠ (w : ℂ) (_ : w ∈ {w | ‖w - (2 + ↑t * I)‖ ≤ 7 / 2 ∧ LFunction χ w = 0}),
-            (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w) := by ring
+    have e
+        : deriv (LFunction χ) s / LFunction χ s
+          = (deriv (LFunction χ) s / LFunction χ s
+              - ∑ᶠ (w : ℂ) (_ : w ∈ {w | ‖w - (2 + ↑t * I)‖ ≤ 7 / 2 ∧ LFunction χ w = 0}),
+                (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w))
+            + ∑ᶠ (w : ℂ) (_ : w ∈ {w | ‖w - (2 + ↑t * I)‖ ≤ 7 / 2 ∧ LFunction χ w = 0}),
+              (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w) := by
+      ring
     rw [e]
     refine (norm_add_le _ _).trans ?_
     have := add_le_add hbd (hsum.trans (by linarith : _ ≤ 2 * (C₁ * Real.log (N * (|t| + 2)))))
     nlinarith
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem norm_neg_mul_ofReal_cpow_div_eq (a s : ℂ) {u : ℝ} (hu : 0 < u) :
-    ‖-a * (u : ℂ) ^ s / s‖ = ‖a‖ * u ^ s.re / ‖s‖ := by
+private theorem norm_neg_mul_ofReal_cpow_div_eq (a s : ℂ) {u : ℝ} (hu : 0 < u)
+    : ‖-a * (u : ℂ) ^ s / s‖ = ‖a‖ * u ^ s.re / ‖s‖ := by
   rw [norm_div, norm_mul, norm_neg, norm_cpow_eq_rpow_re_of_pos hu]
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem integral_one_div_abs_add_half_eq_two_mul_log (a : ℝ) (ha : 0 ≤ a) :
-    ∫ t in -a..a, 1 / (|t| + 1 / 2) = 2 * Real.log (2 * a + 1) := by
+private theorem integral_one_div_abs_add_half_eq_two_mul_log (a : ℝ) (ha : 0 ≤ a)
+    : ∫ t in -a..a, 1 / (|t| + 1 / 2) = 2 * Real.log (2 * a + 1) := by
   have hc : Continuous fun t : ℝ => 1 / (|t| + 1 / 2) :=
-    continuous_const.div (continuous_abs.add continuous_const) (fun t => by change (|t| + 1 / 2 : ℝ) ≠ 0; positivity)
+    continuous_const.div (continuous_abs.add continuous_const)
+      (fun t => by change (|t| + 1 / 2 : ℝ) ≠ 0; positivity)
   have h0 : ∫ t in (0:ℝ)..a, 1 / (|t| + 1 / 2) = Real.log (2 * a + 1) := by
-    rw [intervalIntegral.integral_congr (g := fun t => 1 / (t + 1 / 2)) (fun t ht => by
-      rw [Set.uIcc_of_le ha] at ht; simp only [abs_of_nonneg ht.1])]
+    rw [intervalIntegral.integral_congr
+      (g := fun t => 1 / (t + 1 / 2))
+      (fun t ht => by rw [Set.uIcc_of_le ha] at ht; simp only [abs_of_nonneg ht.1])]
     rw [intervalIntegral.integral_comp_add_right (fun t => 1 / t),
       integral_one_div_of_pos (by norm_num) (by linarith)]
-    congr 1; field_simp; ring
+    congr 1
+    field_simp
+    ring
   have hneg : ∫ t in -a..0, 1 / (|t| + 1 / 2) = ∫ t in (0:ℝ)..a, 1 / (|t| + 1 / 2) := by
     have := intervalIntegral.integral_comp_neg (a := 0) (b := a) (fun t : ℝ => 1 / (|t| + 1 / 2))
     simp only [abs_neg, neg_zero] at this
     exact this.symm
   rw [← intervalIntegral.integral_add_adjacent_intervals (b := 0) (hc.intervalIntegrable _ _)
-    (hc.intervalIntegrable _ _), hneg, h0]
+      (hc.intervalIntegrable _ _),
+    hneg, h0]
   ring
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem norm_integral_logDeriv_LFunction_mul_cpow_div_neg_half_le :
-    ∃ C : ℝ, 0 < C ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), χ.IsPrimitive →
-      ∀ u T' : ℝ, 1 ≤ u → 0 ≤ T' →
-      ‖∫ t in -T'..T', -(deriv (LFunction χ) (((-(1 / 2) : ℝ) : ℂ) + t * I) /
-        LFunction χ (((-(1 / 2) : ℝ) : ℂ) + t * I)) * (u : ℂ) ^ (((-(1 / 2) : ℝ) : ℂ) + t * I) /
-        (((-(1 / 2) : ℝ) : ℂ) + t * I)‖ ≤
-        C * Real.log (N * (T' + 2)) * Real.log (2 * T' + 1) := by
+private theorem norm_integral_logDeriv_LFunction_mul_cpow_div_neg_half_le
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+          χ.IsPrimitive
+            → ∀ u T' : ℝ,
+              1 ≤ u → 0 ≤ T'
+                → ‖∫ t in -T'..T', -(deriv (LFunction χ) (((-(1 / 2) : ℝ) : ℂ) + t * I) /
+                    LFunction χ (((-(1 / 2) : ℝ) : ℂ) + t * I)) * (u : ℂ) ^ (((-(1 / 2) : ℝ) : ℂ) + t * I) /
+                    (((-(1 / 2) : ℝ) : ℂ) + t * I)‖
+                  ≤ C * Real.log (N * (T' + 2)) * Real.log (2 * T' + 1) := by
   obtain ⟨C₀, hC₀, H⟩ := exists_norm_logDeriv_LFunction_neg_half_le_log_conductor
   refine ⟨4 * C₀, by positivity, fun N _ χ hχ u T' hu hT' => ?_⟩
   have hN : (1 : ℝ) ≤ N := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne N)
   have hL : 0 ≤ Real.log (N * (T' + 2)) := Real.log_nonneg (by nlinarith)
   have hg : Continuous fun t : ℝ => 2 * C₀ * Real.log (N * (T' + 2)) * (1 / (|t| + 1 / 2)) :=
-    continuous_const.mul
-      (continuous_const.div (continuous_abs.add continuous_const) (fun t => by change (|t| + 1 / 2 : ℝ) ≠ 0; positivity))
+    continuous_const.mul (continuous_const.div (continuous_abs.add continuous_const)
+      (fun t => by change (|t| + 1 / 2 : ℝ) ≠ 0; positivity))
   refine (intervalIntegral.norm_integral_le_of_norm_le (by linarith)
     (Filter.Eventually.of_forall fun t ht => ?_) (hg.intervalIntegrable _ _)).trans ?_
   · have ht' : |t| ≤ T' := abs_le.mpr ⟨ht.1.le, ht.2⟩
@@ -169,28 +199,30 @@ private theorem norm_integral_logDeriv_LFunction_mul_cpow_div_neg_half_le :
     have hp : u ^ (-(1 / 2) : ℝ) ≤ 1 := Real.rpow_le_one_of_one_le_of_nonpos hu (by norm_num)
     have hp0 : 0 ≤ u ^ (-(1 / 2) : ℝ) := Real.rpow_nonneg (by linarith) _
     have hA : ‖deriv (LFunction χ) s / LFunction χ s‖ ≤ C₀ * Real.log (N * (T' + 2)) := by
-      refine (H N χ hχ t).trans (mul_le_mul_of_nonneg_left (Real.log_le_log (by positivity)
-        (by nlinarith)) hC₀.le)
+      refine (H N χ hχ t).trans
+        (mul_le_mul_of_nonneg_left (Real.log_le_log (by positivity) (by nlinarith)) hC₀.le)
     have hs1 : |t| ≤ ‖s‖ := by rw [← him]; exact Complex.abs_im_le_norm s
     have hs2 : 1 / 2 ≤ ‖s‖ := by
       have := Complex.abs_re_le_norm s; rw [hre] at this; norm_num at this; linarith
     have hs0 : 0 < ‖s‖ := by linarith
-    calc ‖deriv (LFunction χ) s / LFunction χ s‖ * u ^ (-(1 / 2) : ℝ) / ‖s‖
-        ≤ C₀ * Real.log (N * (T' + 2)) / ‖s‖ := by
-          apply div_le_div_of_nonneg_right _ hs0.le
-          calc _ ≤ ‖deriv (LFunction χ) s / LFunction χ s‖ * 1 :=
-                mul_le_mul_of_nonneg_left hp (norm_nonneg _)
-            _ ≤ _ := by rw [mul_one]; exact hA
+    calc
+      ‖deriv (LFunction χ) s / LFunction χ s‖ * u ^ (-(1 / 2) : ℝ) / ‖s‖
+          ≤ C₀ * Real.log (N * (T' + 2)) / ‖s‖ := by
+        apply div_le_div_of_nonneg_right _ hs0.le
+        calc
+          _ ≤ ‖deriv (LFunction χ) s / LFunction χ s‖ * 1 :=
+            mul_le_mul_of_nonneg_left hp (norm_nonneg _)
+          _ ≤ _ := by rw [mul_one]; exact hA
       _ ≤ C₀ * Real.log (N * (T' + 2)) / ((|t| + 1 / 2) / 2) :=
-          div_le_div_of_nonneg_left (by positivity) (by positivity) (by linarith)
-      _ = 2 * C₀ * Real.log (N * (T' + 2)) * (1 / (|t| + 1 / 2)) := by
-          field_simp
+        div_le_div_of_nonneg_left (by positivity) (by positivity) (by linarith)
+      _ = 2 * C₀ * Real.log (N * (T' + 2)) * (1 / (|t| + 1 / 2)) := by field_simp
   · rw [intervalIntegral.integral_const_mul, integral_one_div_abs_add_half_eq_two_mul_log T' hT']
-    apply le_of_eq; ring
+    apply le_of_eq
+    ring
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem rpow_one_add_inv_log_le_three_mul (u : ℝ) (hu : 1 < u) :
-    u ^ (1 + 1 / Real.log u) ≤ 3 * u := by
+private theorem rpow_one_add_inv_log_le_three_mul (u : ℝ) (hu : 1 < u)
+    : u ^ (1 + 1 / Real.log u) ≤ 3 * u := by
   have hl : 0 < Real.log u := Real.log_pos hu
   rw [Real.rpow_add (by linarith), Real.rpow_one, Real.rpow_def_of_pos (by linarith),
     mul_one_div_cancel hl.ne']
@@ -198,10 +230,10 @@ private theorem rpow_one_add_inv_log_le_three_mul (u : ℝ) (hu : 1 < u) :
   nlinarith
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem inv_two_pi_mul_sub_add_eq_of_contour_identity (H₁ H₂ V W M S E : ℂ)
-    (hid : H₁ - H₂ + I * V - I * W = 2 * (Real.pi : ℂ) * I * (M - S - E)) :
-    (1 / (2 * (Real.pi : ℂ))) * V - M + S =
-      -E + (1 / (2 * (Real.pi : ℂ))) * (W + I * (H₁ - H₂)) := by
+private theorem inv_two_pi_mul_sub_add_eq_of_contour_identity
+    (H₁ H₂ V W M S E : ℂ) (hid : H₁ - H₂ + I * V - I * W = 2 * (Real.pi : ℂ) * I * (M - S - E))
+    : (1 / (2 * (Real.pi : ℂ))) * V - M + S
+      = -E + (1 / (2 * (Real.pi : ℂ))) * (W + I * (H₁ - H₂)) := by
   have hπ : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
   have hk : (1 / (2 * (Real.pi : ℂ))) * (2 * (Real.pi : ℂ)) = 1 := by field_simp
   have hI : I ^ 2 = -1 := Complex.I_sq
@@ -211,8 +243,8 @@ private theorem inv_two_pi_mul_sub_add_eq_of_contour_identity (H₁ H₂ V W M S
     + (M - S - E) * hk
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-private theorem norm_neg_add_inv_two_pi_mul_add_I_mul_sub_le (H₁ H₂ W E : ℂ) :
-    ‖-E + (1 / (2 * (Real.pi : ℂ))) * (W + I * (H₁ - H₂))‖ ≤ ‖E‖ + ‖W‖ + ‖H₁‖ + ‖H₂‖ := by
+private theorem norm_neg_add_inv_two_pi_mul_add_I_mul_sub_le (H₁ H₂ W E : ℂ)
+    : ‖-E + (1 / (2 * (Real.pi : ℂ))) * (W + I * (H₁ - H₂))‖ ≤ ‖E‖ + ‖W‖ + ‖H₁‖ + ‖H₂‖ := by
   have h1 : ‖(1 / (2 * (Real.pi : ℂ)))‖ ≤ 1 := by
     rw [norm_div, norm_one, norm_mul, Complex.norm_ofNat, Complex.norm_real, Real.norm_eq_abs,
       abs_of_pos Real.pi_pos, div_le_one (by positivity)]
@@ -225,7 +257,6 @@ private theorem norm_neg_add_inv_two_pi_mul_add_I_mul_sub_le (H₁ H₂ W E : �
   rw [norm_neg, norm_mul]
   have := mul_le_mul h1 h2 (norm_nonneg _) zero_le_one
   linarith
-
 
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 set_option maxHeartbeats 1000000 in

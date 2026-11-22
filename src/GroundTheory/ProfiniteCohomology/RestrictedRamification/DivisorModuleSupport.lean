@@ -14,12 +14,15 @@ open CategoryTheory
 
 noncomputable section
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-  {I : Type} {H : I → Type} [∀ i, Group (H i)] [∀ i, TopologicalSpace (H i)] [∀ i, IsTopologicalGroup (H i)]
-  (φ : ∀ i, H i →* G) (hφ : ∀ i, Continuous (φ i)) (A : Type) [AddCommGroup A]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+  {I : Type} {H : I → Type}
+  [∀ i, Group (H i)] [∀ i, TopologicalSpace (H i)] [∀ i, IsTopologicalGroup (H i)]
+  (φ : ∀ i, H i →* G) (hφ : ∀ i, Continuous (φ i))
+  (A : Type) [AddCommGroup A]
 
-theorem finite_divFunEval_ne_zero (n : ℕ) (x : cohomology (divFunRep φ A) n) :
-    {i | (cohomologyMapAlong (φ i) (hφ i) (divFunEval φ A i) n).hom x ≠ 0}.Finite := by
+theorem finite_divFunEval_ne_zero (n : ℕ) (x : cohomology (divFunRep φ A) n)
+    : {i | (cohomologyMapAlong (φ i) (hφ i) (divFunEval φ A i) n).hom x ≠ 0}.Finite := by
   obtain ⟨z, rfl⟩ := cohomologyπ_surjective (divFunRep φ A) n x
   set c := cochainOf (A := divFunRep φ A) (cocycleι (A := divFunRep φ A) (p := n) z) with hc
   have hfin : (Set.range c).Finite := (isLocallyConstant_cochainOf _).range_finite
@@ -40,7 +43,8 @@ theorem finite_divFunEval_ne_zero (n : ℕ) (x : cohomology (divFunRep φ A) n) 
     change ((c (⇑(φ i) ∘ h) : divFun φ A) : I → G → A) i 1 = 0
     rw [hmem]
     rfl
-  change (cohomologyMapAlong (φ i) (hφ i) (divFunEval φ A i) n) (cohomologyπ (divFunRep φ A) n z) = 0
+  change (cohomologyMapAlong (φ i) (hφ i) (divFunEval φ A i) n) (cohomologyπ (divFunRep φ A) n z)
+    = 0
   rw [cohomologyMapAlong_cohomologyπ, hz, map_zero]
 
 end

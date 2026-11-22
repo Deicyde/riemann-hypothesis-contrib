@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
 private lemma beta_baseChange {E : Type} [Field E] [NumberField E] {n : ℕ}
@@ -29,12 +30,13 @@ private lemma beta_baseChange {E : Type} [Field E] [NumberField E] {n : ℕ}
     simp only [Pi.smul_apply, hβ]
     simp only [Pi.smul_apply, smul_eq_mul, map_mul, RingOfIntegers.coe_eq_algebraMap, Rat.smul_def, mul_left_comm, Algebra.smul_def]
 
-theorem UpperTheory.Gal.W2.Seed.pRepLaws :
-    RepLaws := by
+theorem UpperTheory.Gal.W2.Seed.pRepLaws : RepLaws := by
   rintro E _ _ _ A n rep ⟨β, hβ, hr⟩
   have hβ1 : ∀ v : Fin n → 𝓞 E, β (1 ⊗ₜ v) = fun i => (v i : E) := fun v => funext (hβ v)
-  have hsc : ∀ c : 𝓞 E, rep (algebraMap E (Matrix (Fin n) (Fin n) E) c)
-      = (DistribSMul.toLinearMap ℤ (Fin n → 𝓞 E) c).baseChange ℚ := by
+  have hsc
+      : ∀ c : 𝓞 E,
+        rep (algebraMap E (Matrix (Fin n) (Fin n) E) c)
+          = (DistribSMul.toLinearMap ℤ (Fin n → 𝓞 E) c).baseChange ℚ := by
     intro c
     refine LinearMap.ext fun z => β.injective ?_
     rw [hr, beta_baseChange β hβ c z, Algebra.algebraMap_eq_smul_one, Matrix.smul_mulVec,
@@ -63,7 +65,8 @@ theorem UpperTheory.Gal.W2.Seed.pRepLaws :
       have hF : ∀ (e : E) w, F0 (e • w) = e • F0 w := by
         intro e w
         obtain ⟨b, d, hd, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 E) e
-        have hd0 : (algebraMap (𝓞 E) E d) ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hd
+        have hd0 : (algebraMap (𝓞 E) E d) ≠ 0 :=
+          IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hd
         apply smul_right_injective (Fin n → E) hd0
         change algebraMap (𝓞 E) E d • F0 _ = algebraMap (𝓞 E) E d • _
         rw [smul_smul, mul_div_cancel₀ _ hd0]
@@ -72,8 +75,11 @@ theorem UpperTheory.Gal.W2.Seed.pRepLaws :
         change F0 (algebraMap (𝓞 E) E d • _) = algebraMap (𝓞 E) E d • _ at h2
         change F0 (algebraMap (𝓞 E) E b • _) = algebraMap (𝓞 E) E b • _ at h3
         rw [← h2, smul_smul, mul_div_cancel₀ _ hd0, h3]
-      let F : (Fin n → E) →ₗ[E] (Fin n → E) :=
-        { toFun := F0, map_add' := F0.map_add, map_smul' := hF }
+      let F : (Fin n → E) →ₗ[E] (Fin n → E) := {
+        toFun := F0
+        map_add' := F0.map_add
+        map_smul' := hF
+      }
       refine ⟨Matrix.toLin'.symm F, ?_⟩
       refine LinearMap.ext fun z => β.injective ?_
       rw [hr]

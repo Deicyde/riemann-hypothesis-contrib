@@ -36,7 +36,8 @@ open Formalism.UG
 
 namespace GlobalTheory.SatakeWeyl
 
-variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L} {ϖ : L} {q n m : ℕ}
+variable
+  {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L} {ϖ : L} {q n m : ℕ}
 
 theorem mem_radU_iff (u : GU σ n) : u ∈ radU σ (Fin.val : Fin n → ℕ) ↔ IsUnipU u := by
   refine ⟨fun h => ⟨fun i j hij => ?_, fun i => ?_⟩, fun h i j hij => ?_⟩
@@ -47,10 +48,12 @@ theorem mem_radU_iff (u : GU σ n) : u ∈ radU σ (Fin.val : Fin n → ℕ) ↔
       exact (h.2 j).trans (Matrix.one_apply_eq j).symm
     · exact (h.1 i j e).trans (Matrix.one_apply_ne (ne_of_gt (show j < i from e))).symm
 
-theorem satU_eq (T : (Fin m → ℤ) → GU σ n) (hT : ∀ a, mat (T a) = tMat ϖ n m a) (h : GU σ n → ℂ) (α : Fin m → ℂ) :
-    SatU ϖ q h α = ∑ᶠ a : Fin m → ℤ, (∏ i, α i ^ a i) *
-      ((q : ℂ) ^ 0 * (∏ i : Fin m, (q : ℂ) ^ (-(a i) * ((n : ℤ) - 1 - 2 * (i.val : ℤ)))) *
-        cellSum (KU σ n) (radU σ Fin.val) h (T a)) := by
+theorem satU_eq
+    (T : (Fin m → ℤ) → GU σ n) (hT : ∀ a, mat (T a) = tMat ϖ n m a) (h : GU σ n → ℂ) (α : Fin m → ℂ)
+    : SatU ϖ q h α
+      = ∑ᶠ a : Fin m → ℤ, (∏ i, α i ^ a i) *
+        ((q : ℂ) ^ 0 * (∏ i : Fin m, (q : ℂ) ^ (-(a i) * ((n : ℤ) - 1 - 2 * (i.val : ℤ)))) *
+          cellSum (KU σ n) (radU σ Fin.val) h (T a)) := by
   unfold SatU cellSum
   refine finsum_congr fun a => ?_
   rw [Finset.prod_mul_distrib, pow_zero, one_mul, mul_assoc]
@@ -66,8 +69,10 @@ theorem satU_eq (T : (Fin m → ℤ) → GU σ n) (hT : ∀ a, mat (T a) = tMat 
     rw [mat_mul, mat_mul, hT] at this
     exact this
 
-theorem sum_perm (S : (Fin m → ℤ) → ℂ) (π : Equiv.Perm (Fin m)) (hS : ∀ a, S (a ∘ π) = S a) (α : Fin m → ℂ) :
-    ∑ᶠ a : Fin m → ℤ, (∏ i, (α ∘ π) i ^ a i) * S a = ∑ᶠ a : Fin m → ℤ, (∏ i, α i ^ a i) * S a := by
+theorem sum_perm
+    (S : (Fin m → ℤ) → ℂ) (π : Equiv.Perm (Fin m)) (hS : ∀ a, S (a ∘ π) = S a) (α : Fin m → ℂ)
+    : ∑ᶠ a : Fin m → ℤ, (∏ i, (α ∘ π) i ^ a i) * S a
+      = ∑ᶠ a : Fin m → ℤ, (∏ i, α i ^ a i) * S a := by
   rw [← finsum_comp_equiv (Equiv.arrowCongr π.symm (Equiv.refl ℤ))]
   refine finsum_congr fun a => ?_
   have e : (Equiv.arrowCongr π.symm (Equiv.refl ℤ)) a = a ∘ π := by ext i; simp
@@ -75,10 +80,13 @@ theorem sum_perm (S : (Fin m → ℤ) → ℂ) (π : Equiv.Perm (Fin m)) (hS : �
   congr 1
   exact Equiv.prod_comp π (fun i => α i ^ a i)
 
-theorem sum_neg (S : (Fin m → ℤ) → ℂ) (j : Fin m) (hS : ∀ a, S (Function.update a j (-a j)) = S a) (α : Fin m → ℂ) :
-    ∑ᶠ a : Fin m → ℤ, (∏ i, Function.update α j (α j)⁻¹ i ^ a i) * S a =
-      ∑ᶠ a : Fin m → ℤ, (∏ i, α i ^ a i) * S a := by
-  have hinv : Function.Involutive fun a : Fin m → ℤ => Function.update a j (-a j) := fun a => by simp
+theorem sum_neg
+    (S : (Fin m → ℤ) → ℂ) (j : Fin m) (hS : ∀ a, S (Function.update a j (- a j)) = S a)
+    (α : Fin m → ℂ)
+    : ∑ᶠ a : Fin m → ℤ, (∏ i, Function.update α j (α j)⁻¹ i ^ a i) * S a
+      = ∑ᶠ a : Fin m → ℤ, (∏ i, α i ^ a i) * S a := by
+  have hinv : Function.Involutive fun a : Fin m → ℤ => Function.update a j (- a j) := fun a => by
+    simp
   rw [← finsum_comp_equiv hinv.toPerm]
   refine finsum_congr fun a => ?_
   rw [Function.Involutive.coe_toPerm, hS]
@@ -89,9 +97,11 @@ theorem sum_neg (S : (Fin m → ℤ) → ℂ) (j : Fin m) (hS : ∀ a, S (Functi
     simp
   · rw [Function.update_of_ne hi, Function.update_of_ne hi]
 
-theorem perm_of_swap (S : (Fin m → ℤ) → ℂ)
-    (hS : ∀ (i j : Fin m), j.val = i.val + 1 → ∀ a, S (a ∘ Equiv.swap i j) = S a) (π : Equiv.Perm (Fin m)) :
-    ∀ a, S (a ∘ π) = S a := by
+theorem perm_of_swap
+    (S : (Fin m → ℤ) → ℂ)
+    (hS : ∀ (i j : Fin m), j.val = i.val + 1 → ∀ a, S (a ∘ Equiv.swap i j) = S a)
+    (π : Equiv.Perm (Fin m))
+    : ∀ a, S (a ∘ π) = S a := by
   cases m with
   | zero => intro a; congr 1; funext i; exact i.elim0
   | succ m =>
@@ -109,9 +119,11 @@ theorem satWeyl_of_coeff (hswap : CoeffSwap) (hneg : CoeffNeg) : SatWeyl := by
     have := hU.2.2.2.2.2.1
     exact_mod_cast (by omega : q ≠ 0)
   have hp : ∀ f : Fin m → ℤ, ∏ i, (q : ℂ) ^ f i = (q : ℂ) ^ ∑ i, f i := fun f =>
-    (map_prod (zpowersHom ℂˣ (Units.mk0 (q : ℂ) hq)) (fun i => Multiplicative.ofAdd (f i)) Finset.univ) |>
-      congrArg (Units.coeHom ℂ) |> fun e => by
-        simpa [map_prod, ← ofAdd_sum] using e.symm
+    (map_prod (zpowersHom ℂˣ (Units.mk0 (q : ℂ) hq))
+        (fun i => Multiplicative.ofAdd (f i))
+        Finset.univ)
+      |> congrArg (Units.coeHom ℂ)
+      |> fun e => by simpa [map_prod, ← ofAdd_sum] using e.symm
   set S : (Fin m → ℤ) → ℂ := fun a => (q : ℂ) ^ 0 *
     (∏ i : Fin m, (q : ℂ) ^ (-(a i) * ((n : ℤ) - 1 - 2 * (i.val : ℤ)))) *
       cellSum (KU σ n) (radU σ Fin.val) h (T a) with hSdef
@@ -119,20 +131,21 @@ theorem satWeyl_of_coeff (hswap : CoeffSwap) (hneg : CoeffNeg) : SatWeyl := by
     refine perm_of_swap S fun i j hij a => ?_
     have hne : i ≠ j := fun e => by rw [e] at hij; omega
     simp only [hSdef]
-    rw [hswap L ϖ σ q n m hU hm hm' h hh a i j hij _ _ (hT a) (hT _), ← mul_assoc, hp, hp, pow_zero, one_mul, one_mul,
-      ← zpow_add₀ hq]
+    rw [hswap L ϖ σ q n m hU hm hm' h hh a i j hij _ _ (hT a) (hT _), ← mul_assoc, hp, hp, pow_zero,
+      one_mul, one_mul, ← zpow_add₀ hq]
     congr 2
-    rw [← sub_eq_iff_eq_add', ← Finset.sum_sub_distrib, Finset.sum_eq_add_of_mem i j (by simp) (by simp) hne]
+    rw [← sub_eq_iff_eq_add', ← Finset.sum_sub_distrib,
+      Finset.sum_eq_add_of_mem i j (by simp) (by simp) hne]
     · simp only [Function.comp, Equiv.swap_apply_left, Equiv.swap_apply_right, hij]
       push_cast
       ring
     · rintro c - ⟨hc, hc'⟩
       simp only [Function.comp, Equiv.swap_apply_of_ne_of_ne hc hc', sub_self]
-  have h2 : ∀ j : Fin m, j.val + 1 = m → ∀ a, S (Function.update a j (-a j)) = S a := by
+  have h2 : ∀ j : Fin m, j.val + 1 = m → ∀ a, S (Function.update a j (- a j)) = S a := by
     intro j hj a
     simp only [hSdef]
-    rw [hneg L ϖ σ q n m hU hm hm' h hh a j hj _ _ (hT a) (hT _), ← mul_assoc, hp, hp, pow_zero, one_mul, one_mul,
-      ← zpow_add₀ hq]
+    rw [hneg L ϖ σ q n m hU hm hm' h hh a j hj _ _ (hT a) (hT _), ← mul_assoc, hp, hp, pow_zero,
+      one_mul, one_mul, ← zpow_add₀ hq]
     congr 2
     rw [← sub_eq_iff_eq_add', ← Finset.sum_sub_distrib, Finset.sum_eq_single j]
     · rw [Function.update_self]
@@ -140,12 +153,12 @@ theorem satWeyl_of_coeff (hswap : CoeffSwap) (hneg : CoeffNeg) : SatWeyl := by
     · intro c _ hc
       rw [Function.update_of_ne hc, sub_self]
     · simp
-  have h3 : ∀ j : Fin m, ∀ a, S (Function.update a j (-a j)) = S a := by
+  have h3 : ∀ j : Fin m, ∀ a, S (Function.update a j (- a j)) = S a := by
     intro j a
     have hj := j.2
     let l : Fin m := ⟨m - 1, by omega⟩
     rw [← h1 (Equiv.swap j l) a, ← h2 l (by show m - 1 + 1 = m; omega) (a ∘ Equiv.swap j l),
-      ← h1 (Equiv.swap j l) (Function.update a j (-a j))]
+      ← h1 (Equiv.swap j l) (Function.update a j (- a j))]
     congr 1
     rw [Function.update_comp_equiv]
     simp
@@ -156,14 +169,33 @@ theorem satWeyl_of_coeff (hswap : CoeffSwap) (hneg : CoeffNeg) : SatWeyl := by
     exact sum_neg S i (h3 i) α
 
 theorem satWeyl : SatWeyl := by
-  have hr : RankOne := GlobalTheory.T.cellSumRankOneReflectionSymmetry_of_steps GlobalTheory.T.cell_sum_two_stage_descent_unipotent GlobalTheory.T.cell_sum_left_right_invariance_normaliser
-    (GlobalTheory.T.contractingAutChainCosetSumScaling_of_unimodularity (GlobalTheory.T.relIndexCosetSumUnimodularity_of_finiteIndex GlobalTheory.T.finite_index_left_right_coset_sums_eq) GlobalTheory.T.contracting_automorphism_subgroup_chain_index)
-  have hl : LeviStep := GlobalTheory.T.unitaryCellSumLeviReduction_of_steps hr GlobalTheory.T.exists_smaller_unitary_group_embedding GlobalTheory.T.smaller_unitary_embedding_preserves_integral_parts GlobalTheory.T.unitary_diagonal_factorization_along_embedding GlobalTheory.T.unitary_levi_normalizes_unipotent_radical
-    (GlobalTheory.T.unitaryUnipotentRadicalSplitting_of_leviPart GlobalTheory.T.unitary_block_triangular_levi_part_unitary) GlobalTheory.T.unitary_dominant_diagonal_conjugation_contracts GlobalTheory.T.unitary_levi_centre_diagonal_conjugation_eq
+  have hr : RankOne :=
+    GlobalTheory.T.cellSumRankOneReflectionSymmetry_of_steps
+      GlobalTheory.T.cell_sum_two_stage_descent_unipotent
+      GlobalTheory.T.cell_sum_left_right_invariance_normaliser
+      (GlobalTheory.T.contractingAutChainCosetSumScaling_of_unimodularity
+        (GlobalTheory.T.relIndexCosetSumUnimodularity_of_finiteIndex
+          GlobalTheory.T.finite_index_left_right_coset_sums_eq)
+        GlobalTheory.T.contracting_automorphism_subgroup_chain_index)
+  have hl : LeviStep :=
+    GlobalTheory.T.unitaryCellSumLeviReduction_of_steps hr
+      GlobalTheory.T.exists_smaller_unitary_group_embedding
+      GlobalTheory.T.smaller_unitary_embedding_preserves_integral_parts
+      GlobalTheory.T.unitary_diagonal_factorization_along_embedding
+      GlobalTheory.T.unitary_levi_normalizes_unipotent_radical
+      (GlobalTheory.T.unitaryUnipotentRadicalSplitting_of_leviPart
+        GlobalTheory.T.unitary_block_triangular_levi_part_unitary)
+      GlobalTheory.T.unitary_dominant_diagonal_conjugation_contracts
+      GlobalTheory.T.unitary_levi_centre_diagonal_conjugation_eq
   have hi : IntIndex := GlobalTheory.T.card_integers_mod_uniformizer_eq_q_sq
   have ht : TraceZeroIndex := GlobalTheory.T.traceZeroIntegersModUniformizerCard_of_cardSq hi
-  exact satWeyl_of_coeff (GlobalTheory.T.unitarySatakeCoeff_adjacentSwap_of_leviReduction hl (GlobalTheory.T.unitaryFourLeviGL2RootIndex_of_cardSq hi) GlobalTheory.T.unitaryFourLeviGL2_cartan_doubleCosets)
-    (GlobalTheory.T.unitarySatakeCoeff_lastSignChange_of_leviReduction hl (GlobalTheory.T.unitaryRankTwoRootIndex_of_traceZeroCard ht) (GlobalTheory.T.unitaryRankThreeRootIndex_of_cards hi ht))
+  exact satWeyl_of_coeff
+    (GlobalTheory.T.unitarySatakeCoeff_adjacentSwap_of_leviReduction hl
+      (GlobalTheory.T.unitaryFourLeviGL2RootIndex_of_cardSq hi)
+      GlobalTheory.T.unitaryFourLeviGL2_cartan_doubleCosets)
+    (GlobalTheory.T.unitarySatakeCoeff_lastSignChange_of_leviReduction hl
+      (GlobalTheory.T.unitaryRankTwoRootIndex_of_traceZeroCard ht)
+      (GlobalTheory.T.unitaryRankThreeRootIndex_of_cards hi ht))
 
 end GlobalTheory.SatakeWeyl
 

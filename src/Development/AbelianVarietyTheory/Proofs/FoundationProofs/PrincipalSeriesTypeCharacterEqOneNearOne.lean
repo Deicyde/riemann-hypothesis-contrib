@@ -27,8 +27,9 @@ theorem continuous_minor' {n : ℕ} (m : Fin n) : Continuous fun g : GL (Fin n) 
   unfold minor
   exact (Units.continuous_val.matrix_submatrix _ _).matrix_det
 
-theorem ev_eventually_one (χ : kˣ →* ℂˣ) (S : Set k) (hS : S ∈ nhds (0 : k)) (hT : ∀ x ∈ S, Triv χ x) :
-    ∀ᶠ x in nhds (1 : k), ev χ x = 1 := by
+theorem ev_eventually_one
+    (χ : kˣ →* ℂˣ) (S : Set k) (hS : S ∈ nhds (0 : k)) (hT : ∀ x ∈ S, Triv χ x)
+    : ∀ᶠ x in nhds (1 : k), ev χ x = 1 := by
   obtain ⟨-, -, -, -, -, -, -, h8, -⟩ := triv_ev_props k
   have hball : {x : k | valuation k (x - 1) < 1} ∈ nhds (1 : k) :=
     (IsValuativeTopology.hasBasis_nhds' (1 : k)).mem_of_mem one_ne_zero
@@ -41,9 +42,11 @@ theorem ev_eventually_one (χ : kˣ →* ℂˣ) (S : Set k) (hS : S ∈ nhds (0 
     exact Valuation.map_one_add_of_lt _ hx
   rw [h8 χ x 1 hv (by simp) (hT _ hxS), ev_one']
 
-theorem theta_one_and_near : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ), (∀ i, IsSmoothChar (ψ i)) →
-    theta ψ 1 = 1 ∧ ∃ U ∈ nhds (1 : GL (Fin n) k), ∀ g ∈ U, theta ψ g = 1 := by
+theorem theta_one_and_near
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ),
+      (∀ i, IsSmoothChar (ψ i))
+        → theta ψ 1 = 1 ∧ ∃ U ∈ nhds (1 : GL (Fin n) k), ∀ g ∈ U, theta ψ g = 1 := by
   intro k _ _ _ _ n ψ hψ
   obtain ⟨-, -, h3, h4, h5, h6, -, -, -⟩ := triv_ev_props k
   have hset : ∀ χ : kˣ →* ℂˣ, IsSmoothChar χ → {x : k | Triv χ x} ∈ nhds (0 : k) := fun χ hχ =>

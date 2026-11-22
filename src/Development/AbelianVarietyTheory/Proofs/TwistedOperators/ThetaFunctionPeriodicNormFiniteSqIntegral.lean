@@ -9,12 +9,23 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.EqZero
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.ThetaSqInt
 
-theorem thetaO_norm_fin : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (S T : HSp D) (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), IsCovolOne (ratL T S) μ 𝓕 → ∀ F : WO S T → ℂ, IsThetaFunO ψ S T F → (∀ γ ∈ ratL T S, ∀ w, ‖F (γ + w)‖ = ‖F w‖) ∧ ∫⁻ x in 𝓕, ‖F x‖ₑ ^ 2 ∂μ ≠ ⊤ ∧ ∫ x in 𝓕, F x * starRingEnd ℂ (F x) ∂μ = (((∫⁻ x in 𝓕, ‖F x‖ₑ ^ 2 ∂μ).toReal : ℝ) : ℂ) := by
+theorem thetaO_norm_fin
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1)
+        → ∀ (S T : HSp D) (μ : Measure (WO S T)) (𝓕 : Set (WO S T)),
+          IsCovolOne (ratL T S) μ 𝓕
+            → ∀ F : WO S T → ℂ,
+              IsThetaFunO ψ S T F
+                → (∀ γ ∈ ratL T S, ∀ w, ‖F (γ + w)‖ = ‖F w‖) ∧ ∫⁻ x in 𝓕, ‖F x‖ₑ ^ 2 ∂μ ≠ ⊤
+                  ∧ ∫ x in 𝓕, F x * starRingEnd ℂ (F x) ∂μ
+                    = (((∫⁻ x in 𝓕, ‖F x‖ₑ ^ 2 ∂μ).toReal : ℝ) : ℂ) := by
   intro D ψ hψ S T μ 𝓕 hC F hF
   haveI hB : BorelSpace (WO S T) := ⟨rfl⟩
   haveI hO : OpensMeasurableSpace (WO S T) := BorelSpace.opensMeasurable

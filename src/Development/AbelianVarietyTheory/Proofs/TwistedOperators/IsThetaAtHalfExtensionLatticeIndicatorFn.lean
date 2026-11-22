@@ -6,9 +6,14 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsSBHalfH
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 noncomputable section
 namespace GlobalTheory.CosetRow
@@ -16,8 +21,8 @@ namespace GlobalTheory.CosetRow
 section ThetaExt
 variable {D : D7} {m n : ℕ}
 
-theorem isHalf_add_right_iff {e : AE D} {t x : Mx D m n} (hx : IsHalf e x) :
-    IsHalf e (t + x) ↔ IsHalf e t := by
+theorem isHalf_add_right_iff {e : AE D} {t x : Mx D m n} (hx : IsHalf e x)
+    : IsHalf e (t + x) ↔ IsHalf e t := by
   constructor
   · intro h i j
     have h1 := h i j
@@ -35,7 +40,8 @@ theorem smul_of_isHalf {e : AE D} {x : Mx D m n} (hx : IsHalf e x) : e • x = x
   simp only [Matrix.smul_apply, smul_eq_mul]
   exact hx i j
 
-theorem smul_eq_zero_of_isHalf {e e' : AE D} (h : e' * e = 0) {x : Mx D m n} (hx : IsHalf e x) : e' • x = 0 := by
+theorem smul_eq_zero_of_isHalf {e e' : AE D} (h : e' * e = 0) {x : Mx D m n} (hx : IsHalf e x)
+    : e' • x = 0 := by
   ext i j
   simp only [Matrix.smul_apply, smul_eq_mul, Matrix.zero_apply]
   rw [← hx i j, ← mul_assoc, h, zero_mul]
@@ -56,32 +62,37 @@ def extLin (e₀ e₁ : AE D) (Λ : AddSubgroup (Mx D m n)) : (Mx D m n → ℂ)
     simp only [extFn, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
     split_ifs <;> ring
 
-theorem extFn_shift {e₀ e₁ : AE D} (h10 : e₁ * e₀ = 0) (Λ : AddSubgroup (Mx D m n)) (Φ : Mx D m n → ℂ)
-    {x : Mx D m n} (hx : IsHalf e₀ x) :
-    extFn e₀ e₁ Λ (fun t => Φ (t + x)) = fun t => extFn e₀ e₁ Λ Φ (t + x) := by
+theorem extFn_shift
+    {e₀ e₁ : AE D} (h10 : e₁ * e₀ = 0)
+    (Λ : AddSubgroup (Mx D m n)) (Φ : Mx D m n → ℂ)
+    {x : Mx D m n} (hx : IsHalf e₀ x)
+    : extFn e₀ e₁ Λ (fun t => Φ (t + x)) = fun t => extFn e₀ e₁ Λ Φ (t + x) := by
   funext t
   have hx' : IsHalf (e₀ + e₁) x := by
     rw [add_comm]; exact GlobalTheory.VecProd.half_add_of_right h10 hx
   simp only [extFn]
-  rw [isHalf_add_right_iff hx', smul_add, smul_add, smul_of_isHalf hx, smul_eq_zero_of_isHalf h10 hx, add_zero]
+  rw [isHalf_add_right_iff hx', smul_add, smul_add, smul_of_isHalf hx,
+    smul_eq_zero_of_isHalf h10 hx, add_zero]
 
-theorem extFn_modul {e₀ e₁ : AE D} (Λ : AddSubgroup (Mx D m n)) (Φ : Mx D m n → ℂ) (g : Mx D m n → ℂ)
-    (hg : ∀ t, IsHalf (e₀ + e₁) t → g t = g (e₀ • t)) :
-    extFn e₀ e₁ Λ (fun t => g t * Φ t) = fun t => g t * extFn e₀ e₁ Λ Φ t := by
+theorem extFn_modul
+    {e₀ e₁ : AE D}
+    (Λ : AddSubgroup (Mx D m n)) (Φ : Mx D m n → ℂ)
+    (g : Mx D m n → ℂ) (hg : ∀ t, IsHalf (e₀ + e₁) t → g t = g (e₀ • t))
+    : extFn e₀ e₁ Λ (fun t => g t * Φ t) = fun t => g t * extFn e₀ e₁ Λ Φ t := by
   funext t
   simp only [extFn]
   split_ifs with h
   · rw [hg t h]; ring
   · ring
 
-theorem extFn_halfInd {e₀ e₁ : AE D} (h00 : e₀ * e₀ = e₀) (h11 : e₁ * e₁ = e₁) {Λ : AddSubgroup (Mx D m n)}
-    (hΛ0 : ∀ u ∈ Λ, e₀ • u ∈ Λ) (hΛ1 : ∀ u ∈ Λ, e₁ • u ∈ Λ) :
-    extFn e₀ e₁ Λ (halfInd e₀ Λ) = halfInd (e₀ + e₁) Λ := by
+theorem extFn_halfInd
+    {e₀ e₁ : AE D} (h00 : e₀ * e₀ = e₀) (h11 : e₁ * e₁ = e₁)
+    {Λ : AddSubgroup (Mx D m n)} (hΛ0 : ∀ u ∈ Λ, e₀ • u ∈ Λ) (hΛ1 : ∀ u ∈ Λ, e₁ • u ∈ Λ)
+    : extFn e₀ e₁ Λ (halfInd e₀ Λ) = halfInd (e₀ + e₁) Λ := by
   funext t
   simp only [extFn, halfInd]
   by_cases ht : IsHalf (e₀ + e₁) t
-  · have hdec : t = e₀ • t + e₁ • t := by
-      rw [← add_smul, smul_of_isHalf ht]
+  · have hdec : t = e₀ • t + e₁ • t := by rw [← add_smul, smul_of_isHalf ht]
     have hiff : (e₀ • t ∈ Λ ∧ e₁ • t ∈ Λ) ↔ t ∈ Λ := by
       constructor
       · rintro ⟨h0, h1⟩; rw [hdec]; exact Λ.add_mem h0 h1
@@ -93,11 +104,19 @@ theorem extFn_halfInd {e₀ e₁ : AE D} (h00 : e₀ * e₀ = e₀) (h11 : e₁ 
     · rw [if_pos ⟨h0, a0⟩, if_pos ⟨h1, a1⟩, if_pos ⟨hiff.1 ⟨h0, h1⟩, ht⟩, one_mul]
     · rw [if_pos ⟨h0, a0⟩, if_neg (fun h => h1 h.1), if_neg (fun h => h1 (hiff.2 h.1).2), mul_zero]
     · rw [if_neg (fun h => h0 h.1), if_pos ⟨h1, a1⟩, if_neg (fun h => h0 (hiff.2 h.1).1), zero_mul]
-    · rw [if_neg (fun h => h0 h.1), if_neg (fun h => h1 h.1), if_neg (fun h => h0 (hiff.2 h.1).1), zero_mul]
+    · rw [if_neg (fun h => h0 h.1), if_neg (fun h => h1 h.1), if_neg (fun h => h0 (hiff.2 h.1).1),
+        zero_mul]
   · simp only [if_neg ht]
     rw [if_neg (fun h => ht h.2)]
 
-theorem isThetaAt_extFn : ∀ {D : D7} {m n : ℕ} {ψ : AddChar (AF D.host.F) ℂ} {B : Mx D m n → Mx D m n → AF D.host.F} {hs : Mx D m n → (Mx D m n → ℂ) → (Mx D m n → ℂ)} {Λ : AddSubgroup (Mx D m n)} {e₀ e₁ : AE D} {f₀ Φ f : Mx D m n → ℂ}, e₀ * e₀ = e₀ → e₁ * e₁ = e₁ → e₀ * e₁ = 0 → (∀ u ∈ Λ, e₀ • u ∈ Λ) → (∀ u ∈ Λ, e₁ • u ∈ Λ) → (∀ t y, IsHalf (e₀ + e₁) t → IsHalf (cA D e₀) y → B t y = B (e₀ • t) y) → (∃ T, IsPlaceModel ψ B hs (e₀ + e₁) Λ 1 f₀ T) → IsThetaAt ψ B hs e₀ Λ 1 f₀ Φ f → IsThetaAt ψ B hs (e₀ + e₁) Λ 1 f₀ (GlobalTheory.CosetRow.extFn e₀ e₁ Λ Φ) f := by
+theorem isThetaAt_extFn
+    : ∀ {D : D7} {m n : ℕ} {ψ : AddChar (AF D.host.F) ℂ} {B : Mx D m n → Mx D m n → AF D.host.F}
+        {hs : Mx D m n → (Mx D m n → ℂ) → (Mx D m n → ℂ)} {Λ : AddSubgroup (Mx D m n)}
+        {e₀ e₁ : AE D} {f₀ Φ f : Mx D m n → ℂ},
+      e₀ * e₀ = e₀ → e₁ * e₁ = e₁ → e₀ * e₁ = 0 → (∀ u ∈ Λ, e₀ • u ∈ Λ) → (∀ u ∈ Λ, e₁ • u ∈ Λ)
+        → (∀ t y, IsHalf (e₀ + e₁) t → IsHalf (cA D e₀) y → B t y = B (e₀ • t) y)
+        → (∃ T, IsPlaceModel ψ B hs (e₀ + e₁) Λ 1 f₀ T) → IsThetaAt ψ B hs e₀ Λ 1 f₀ Φ f
+        → IsThetaAt ψ B hs (e₀ + e₁) Λ 1 f₀ (GlobalTheory.CosetRow.extFn e₀ e₁ Λ Φ) f := by
   intro D m n ψ B hs Λ e₀ e₁ f₀ Φ f h00 h11 h01 hΛ0 hΛ1 hB hex h
   have h10 : e₁ * e₀ = 0 := by rw [mul_comm]; exact h01
   have hsb : ∀ Ψ, IsSBHalf e₀ Λ Ψ → IsSBHalf (e₀ + e₁) Λ (extFn e₀ e₁ Λ Ψ) := fun Ψ hΨ =>

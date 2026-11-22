@@ -10,10 +10,15 @@ open MeasureTheory Set Filter Topology
 
 namespace PositivityTheory.Rg.Sw.AbsSt.TSC
 
-theorem iteratedDeriv_sum_on {ι : Type} (s : Finset ι) {U : Set ℂ} (hU : IsOpen U) (f : ι → ℂ → ℂ)
-    (hf : ∀ i ∈ s, DifferentiableOn ℂ (f i) U) (r : ℕ) :
-    (∀ i ∈ s, DifferentiableOn ℂ (iteratedDeriv r (f i)) U) ∧
-    EqOn (iteratedDeriv r (fun w => ∑ i ∈ s, f i w)) (fun w => ∑ i ∈ s, iteratedDeriv r (f i) w) U := by
+theorem iteratedDeriv_sum_on
+    {ι : Type} (s : Finset ι)
+    {U : Set ℂ} (hU : IsOpen U)
+    (f : ι → ℂ → ℂ) (hf : ∀ i ∈ s, DifferentiableOn ℂ (f i) U)
+    (r : ℕ)
+    : (∀ i ∈ s, DifferentiableOn ℂ (iteratedDeriv r (f i)) U)
+      ∧ EqOn (iteratedDeriv r (fun w => ∑ i ∈ s, f i w))
+        (fun w => ∑ i ∈ s, iteratedDeriv r (f i) w)
+        U := by
   induction r with
   | zero =>
     simp only [iteratedDeriv_zero]
@@ -24,18 +29,22 @@ theorem iteratedDeriv_sum_on {ι : Type} (s : Finset ι) {U : Set ℂ} (hU : IsO
     · rw [iteratedDeriv_succ]
       exact (hd i hi).deriv hU
     · simp only [iteratedDeriv_succ]
-      have hev : iteratedDeriv r (fun w => ∑ i ∈ s, f i w) =ᶠ[𝓝 z]
-          (fun w => ∑ i ∈ s, iteratedDeriv r (f i) w) :=
+      have hev
+          : iteratedDeriv r (fun w => ∑ i ∈ s, f i w) =ᶠ[𝓝 z]
+            (fun w => ∑ i ∈ s, iteratedDeriv r (f i) w) :=
         Filter.eventuallyEq_of_mem (hU.mem_nhds hz) he
       rw [hev.deriv_eq]
       first
-        | exact deriv_fun_sum (fun i hi => (hd i hi).differentiableAt (hU.mem_nhds hz))
-        | exact deriv_sum (fun i hi => (hd i hi).differentiableAt (hU.mem_nhds hz))
+      | exact deriv_fun_sum (fun i hi => (hd i hi).differentiableAt (hU.mem_nhds hz))
+      | exact deriv_sum (fun i hi => (hd i hi).differentiableAt (hU.mem_nhds hz))
 
-theorem exists_int_elem {X : Type} [MeasurableSpace X] (ν : Measure X) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (W : Submodule ℂ V) [FiniteDimensional ℂ W] (φ : X → V) (hφ : ∀ x, φ x ∈ W)
-    (hint : ∀ l : V →ₗ[ℂ] ℂ, Integrable (fun x => l (φ x)) ν) :
-    ∃ Φ ∈ W, ∀ l : V →ₗ[ℂ] ℂ, l Φ = ∫ x, l (φ x) ∂ν := by
+theorem exists_int_elem
+    {X : Type} [MeasurableSpace X]
+    (ν : Measure X)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (W : Submodule ℂ V) [FiniteDimensional ℂ W]
+    (φ : X → V) (hφ : ∀ x, φ x ∈ W) (hint : ∀ l : V →ₗ[ℂ] ℂ, Integrable (fun x => l (φ x)) ν)
+    : ∃ Φ ∈ W, ∀ l : V →ₗ[ℂ] ℂ, l Φ = ∫ x, l (φ x) ∂ν := by
   classical
   let b := Module.finBasis ℂ W
   choose cl hcl using fun j => LinearMap.exists_extend (b.coord j)
@@ -50,13 +59,16 @@ theorem exists_int_elem {X : Type} [MeasurableSpace X] (ν : Measure X) {V : Typ
     simp only [Submodule.coe_sum, Submodule.coe_smul] at h2
     simp only [hc]
     exact h2.symm
-  refine ⟨∑ j, (∫ x, cl j (φ x) ∂ν) • (b j : V), Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (b j).2,
-    fun l => ?_⟩
+  refine ⟨
+    ∑ j, (∫ x, cl j (φ x) ∂ν) • (b j : V),
+    Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (b j).2,
+    fun l => ?_
+  ⟩
   have e1 : ∀ x, l (φ x) = ∑ j, cl j (φ x) * l (b j) := by
     intro x
     conv_lhs => rw [hrepr x]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_smul, smul_eq_mul]
+    simp [map_sum, map_smul, smul_eq_mul]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_smul, smul_eq_mul]
   simp_rw [e1]

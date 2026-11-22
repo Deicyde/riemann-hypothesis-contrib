@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open Module
 universe u v
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pProjTrace_holds :
-    UpperTheory.Gal.CertificateRingHomMap.ProjTrace.{u} := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pProjTrace_holds
+    : UpperTheory.Gal.CertificateRingHomMap.ProjTrace.{u} := by
   intro F _ W _ _ _ U p u hp h
   set q : W →ₗ[F] U := LinearMap.codRestrict U p hp.map_mem with hq
   have h1 : u * p = U.subtype ∘ₗ ((LinearMap.restrict u h) ∘ₗ q) := by

@@ -9,11 +9,12 @@ open scoped InnerProductSpace BigOperators
 
 namespace GlobalTheory
 
-theorem mem_span_indicator_lowerSets :
-    ∀ (X L : Type) [Fintype L] [PartialOrder L] (ρ : X → Option L) (Φ : X → ℂ),
-      (∀ x, ρ x = none → Φ x = 0) → (∀ x x', ρ x = ρ x' → Φ x = Φ x') →
-      Φ ∈ Submodule.span ℂ {Ψ | ∃ l : L, Ψ = Set.indicator {x | ∃ l', ρ x = some l' ∧ l' ≤ l}
-        (fun _ => (1 : ℂ))} := by
+theorem mem_span_indicator_lowerSets
+    : ∀ (X L : Type) [Fintype L] [PartialOrder L] (ρ : X → Option L) (Φ : X → ℂ),
+      (∀ x, ρ x = none → Φ x = 0) → (∀ x x', ρ x = ρ x' → Φ x = Φ x')
+        → Φ ∈ Submodule.span ℂ
+          {Ψ | ∃ l : L, Ψ = Set.indicator {x | ∃ l', ρ x = some l' ∧ l' ≤ l}
+            (fun _ => (1 : ℂ))} := by
   classical
   intro X L _ _ ρ Φ h0 hΦ
   set S := Submodule.span ℂ {Ψ : X → ℂ | ∃ l : L, Ψ = Set.indicator
@@ -22,10 +23,11 @@ theorem mem_span_indicator_lowerSets :
     intro l
     induction l using WellFoundedLT.induction with
     | ind l ih =>
-      have hsum : Set.indicator {x | ρ x = some l} (fun _ => (1 : ℂ)) =
-          Set.indicator {x | ∃ l', ρ x = some l' ∧ l' ≤ l} (fun _ => (1 : ℂ)) -
-            ∑ l' ∈ Finset.univ.filter (· < l),
-              Set.indicator {x | ρ x = some l'} (fun _ => (1 : ℂ)) := by
+      have hsum
+          : Set.indicator {x | ρ x = some l} (fun _ => (1 : ℂ))
+            = Set.indicator {x | ∃ l', ρ x = some l' ∧ l' ≤ l} (fun _ => (1 : ℂ))
+              - ∑ l' ∈ Finset.univ.filter (· < l),
+                  Set.indicator {x | ρ x = some l'} (fun _ => (1 : ℂ)) := by
         funext x
         simp only [Pi.sub_apply, Finset.sum_apply, Set.indicator_apply, Set.mem_setOf_eq]
         cases hx : ρ x with
@@ -48,8 +50,8 @@ theorem mem_span_indicator_lowerSets :
   let c : L → ℂ := fun l => if h : ∃ x, ρ x = some l then Φ h.choose else 0
   have hdecomp : Φ = ∑ l, c l • Set.indicator {x | ρ x = some l} (fun _ => (1 : ℂ)) := by
     funext x
-    simp only [Finset.sum_apply, Pi.smul_apply, Set.indicator_apply, Set.mem_setOf_eq,
-      smul_eq_mul, mul_ite, mul_one, mul_zero]
+    simp only [Finset.sum_apply, Pi.smul_apply, Set.indicator_apply, Set.mem_setOf_eq, smul_eq_mul,
+      mul_ite, mul_one, mul_zero]
     cases hx : ρ x with
     | none => simpa using h0 x hx
     | some m =>

@@ -29,8 +29,8 @@ theorem nbM_inv (c : Matrix (Fin n) (Fin n) ℂ) : (nbM c)⁻¹ = nbM (-c) := by
   rw [Matrix.fromBlocks_multiply]
   simp
 
-theorem nb_eq {c : Matrix (Fin n) (Fin n) ℂ} (hc : cᴴ = c) (hu : IsUnit c.det) :
-    toGR (nbM c) (inG_nbM hc) = mG (-c⁻¹) * nG c * jG n * nG c⁻¹ := by
+theorem nb_eq {c : Matrix (Fin n) (Fin n) ℂ} (hc : cᴴ = c) (hu : IsUnit c.det)
+    : toGR (nbM c) (inG_nbM hc) = mG (-c⁻¹) * nG c * jG n * nG c⁻¹ := by
   have hci : (c⁻¹)ᴴ = c⁻¹ := by rw [Matrix.conjTranspose_nonsing_inv, hc]
   have hnu : IsUnit (-c⁻¹).det := by
     rw [Matrix.det_neg]
@@ -47,7 +47,8 @@ theorem nb_eq {c : Matrix (Fin n) (Fin n) ℂ} (hc : cᴴ = c) (hu : IsUnit c.de
   simp only [Matrix.fromBlocks_multiply]
   simp [h1, h2, Matrix.neg_mul, Matrix.mul_neg]
 
-def dT (i0 : Fin n) (t : ℝ) : Matrix (Fin n) (Fin n) ℂ := Matrix.diagonal fun i => if i = i0 then (t : ℂ) else 1
+def dT (i0 : Fin n) (t : ℝ) : Matrix (Fin n) (Fin n) ℂ :=
+  Matrix.diagonal fun i => if i = i0 then (t : ℂ) else 1
 
 theorem dT_herm (i0 : Fin n) (t : ℝ) : (dT i0 t)ᴴ = dT i0 t := by
   unfold dT
@@ -56,11 +57,10 @@ theorem dT_herm (i0 : Fin n) (t : ℝ) : (dT i0 t)ᴴ = dT i0 t := by
   funext i
   by_cases h : i = i0 <;> simp [h]
 
-theorem dT_det (i0 : Fin n) (t : ℝ) : (dT i0 t).det = t := by
-  simp [dT, Matrix.det_diagonal]
+theorem dT_det (i0 : Fin n) (t : ℝ) : (dT i0 t).det = t := by simp [dT, Matrix.det_diagonal]
 
 def pth (i0 : Fin n) (t : ℝ) : GR n :=
-  toGR (nbM (-dT i0 t)) (inG_nbM (by rw [Matrix.conjTranspose_neg, dT_herm]))
+  toGR (nbM (- dT i0 t)) (inG_nbM (by rw [Matrix.conjTranspose_neg, dT_herm]))
 
 theorem pth_cont (i0 : Fin n) : Continuous (pth i0) := by
   have hdT : Continuous fun t : ℝ => dT i0 t := by
@@ -89,22 +89,32 @@ theorem weight_factor_ne_zero (p q : ℕ) (e : ℤ) (g : GR n) : F0 p q e g ≠ 
   unfold F0 f0
   have h1 : Matrix.det (mR g) ≠ 0 := (det_ne_of_inG (M := mR g) g.2).ne_zero
   exact mul_ne_zero (zpow_ne_zero _ h1)
-    (mul_ne_zero (zpow_ne_zero _ (automorphy_first_det_ne_zero g)) (zpow_ne_zero _ (automorphy_second_det_ne_zero g)))
+    (mul_ne_zero (zpow_ne_zero _ (automorphy_first_det_ne_zero g))
+      (zpow_ne_zero _ (automorphy_second_det_ne_zero g)))
 
 theorem pq_sum (sg : ℤˣ) (m : ℕ) : ((pOf sg m : ℕ) : ℤ) + (qOf sg m : ℕ) = m := by
   unfold pOf qOf
   split_ifs <;> simp
 
-theorem lower_left_block_levi_unipotent (a b : Matrix (Fin n) (Fin n) ℂ) (ha : IsUnit a.det) (hb : bᴴ = b) :
-    (mR (mG a * nG b)).toBlocks₂₁ = 0 := by
+theorem lower_left_block_levi_unipotent
+    (a b : Matrix (Fin n) (Fin n) ℂ) (ha : IsUnit a.det) (hb : bᴴ = b)
+    : (mR (mG a * nG b)).toBlocks₂₁ = 0 := by
   rw [mR_mul, mR_mG ha, mR_nG hb, lower_left_block_mul]
   simp [mLc, nU]
 
-theorem S_law (h : LocHyp sg L) {k : ℤ}
-    (hk : ∀ (y : GR n) (a : Matrix (Fin n) (Fin n) ℂ), IsUnit a.det → mR y = mLc a → ∀ f, IsSw f →
-      L y f = fun u => (a.det / (‖a.det‖ : ℂ)) ^ k * (‖a.det‖ : ℂ) ^ m * f (Matrix.of u * a))
-    (a b : Matrix (Fin n) (Fin n) ℂ) (ha : IsUnit a.det) (hb : bᴴ = b) (g : GR n) :
-    L (mG a * nG b * g) (fP 1) 0 = (a.det / (‖a.det‖ : ℂ)) ^ k * (‖a.det‖ : ℂ) ^ m * L g (fP 1) 0 := by
+theorem S_law
+    (h : LocHyp sg L)
+    {k : ℤ}
+    (hk : ∀ (y : GR n) (a : Matrix (Fin n) (Fin n) ℂ),
+      IsUnit a.det → mR y = mLc a
+        → ∀ f,
+          IsSw f
+            → L y f
+              = fun u => (a.det / (‖a.det‖ : ℂ)) ^ k * (‖a.det‖ : ℂ) ^ m * f (Matrix.of u * a))
+    (a b : Matrix (Fin n) (Fin n) ℂ) (ha : IsUnit a.det) (hb : bᴴ = b)
+    (g : GR n)
+    : L (mG a * nG b * g) (fP 1) 0
+      = (a.det / (‖a.det‖ : ℂ)) ^ k * (‖a.det‖ : ℂ) ^ m * L g (fP 1) 0 := by
   have hf := isSw_fP (1 : PX m n)
   have hz : ∀ F : (Fin m → Fin n → ℂ) → ℂ, F (Matrix.of (0 : Fin m → Fin n → ℂ) * a) = F 0 := by
     intro F
@@ -119,11 +129,14 @@ theorem S_law (h : LocHyp sg L) {k : ℤ}
   show _ * _ * L (nG b * g) (fP 1) (Matrix.of (0 : Fin m → Fin n → ℂ) * a) = _
   rw [e2]
 
-theorem S_cell (h : LocHyp sg L) {C : ℂ}
-    (hJ : ∀ y : GR n, mR y = JJ n → ∀ f, IsSw f → L y f 0 = C * ∫ v, f v)
-    (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) :
-    L (jG n * nG b) (fP (1 : PX m n)) 0 =
-      C * secN (fun _ : Fin m => true) (2 * Real.pi) (2 * Real.pi * ((sg : ℤ) : ℝ)) (1 : PX m n) b := by
+theorem S_cell
+    (h : LocHyp sg L)
+    {C : ℂ} (hJ : ∀ y : GR n, mR y = JJ n → ∀ f, IsSw f → L y f 0 = C * ∫ v, f v)
+    (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b)
+    : L (jG n * nG b) (fP (1 : PX m n)) 0
+      = C * secN
+        (fun _ : Fin m => true)
+        (2 * Real.pi) (2 * Real.pi * ((sg : ℤ) : ℝ)) (1 : PX m n) b := by
   have hf := isSw_fP (1 : PX m n)
   rw [h.mul _ _ _ hf, hJ (jG n) mR_jG _ (h.sw _ _ hf), h.nU (nG b) b hb (mR_nG hb) _ hf]
   unfold secN fP
@@ -131,65 +144,79 @@ theorem S_cell (h : LocHyp sg L) {C : ℂ}
   refine MeasureTheory.integral_congr_ae (Filter.Eventually.of_forall fun v => ?_)
   simp only
   rw [gramX_true]
-  have e : Complex.I * ((2 * Real.pi * (((sg : ℤ) : ℝ)) : ℝ) : ℂ) =
-      2 * (Real.pi : ℂ) * Complex.I * (((sg : ℤ) : ℂ)) := by
+  have e
+      : Complex.I * ((2 * Real.pi * (((sg : ℤ) : ℝ)) : ℝ) : ℂ)
+        = 2 * (Real.pi : ℂ) * Complex.I * (((sg : ℤ) : ℂ)) := by
     push_cast
     ring
   rw [e]
   ring
 
-theorem even_im_hermitian_sub (h : LocHyp sg L) (hn : 0 < n) {k : ℤ}
-    (hk : ∀ (y : GR n) (a : Matrix (Fin n) (Fin n) ℂ), IsUnit a.det → mR y = mLc a → ∀ f, IsSw f →
-      L y f = fun u => (a.det / (‖a.det‖ : ℂ)) ^ k * (‖a.det‖ : ℂ) ^ m * f (Matrix.of u * a)) :
-    Even (k - m) := by
+theorem even_im_hermitian_sub
+    (h : LocHyp sg L) (hn : 0 < n)
+    {k : ℤ}
+    (hk : ∀ (y : GR n) (a : Matrix (Fin n) (Fin n) ℂ),
+      IsUnit a.det → mR y = mLc a
+        → ∀ f,
+          IsSw f
+            → L y f
+              = fun u => (a.det / (‖a.det‖ : ℂ)) ^ k * (‖a.det‖ : ℂ) ^ m * f (Matrix.of u * a))
+    : Even (k - m) := by
   obtain i0 : Fin n := ⟨0, hn⟩
   obtain ⟨C, hC0, hJ⟩ := h.longWeylFunctional
   obtain ⟨κ, hκ0, hκ⟩ := gauss_cell (m := m) (n := n) sg 0
-  have key : ∀ t : ℝ, t ≠ 0 →
-      L (pth i0 t) (fP 1) 0 * κ * star ((t : ℂ)⁻¹) ^ (m : ℤ) =
-        F0 (pOf sg m) (qOf sg m) 0 (pth i0 t) * C *
-          (((t : ℂ)⁻¹ / (‖(t : ℂ)⁻¹‖ : ℂ)) ^ k * (‖(t : ℂ)⁻¹‖ : ℂ) ^ m) := by
+  have key
+      : ∀ t : ℝ,
+        t ≠ 0
+          → L (pth i0 t) (fP 1) 0 * κ * star ((t : ℂ)⁻¹) ^ (m : ℤ)
+            = F0 (pOf sg m) (qOf sg m) 0 (pth i0 t) * C
+              * (((t : ℂ)⁻¹ / (‖(t : ℂ)⁻¹‖ : ℂ)) ^ k * (‖(t : ℂ)⁻¹‖ : ℂ) ^ m) := by
     intro t ht
     have ht' : (t : ℂ) ≠ 0 := by exact_mod_cast ht
-    have hc : (-dT i0 t)ᴴ = -dT i0 t := by rw [Matrix.conjTranspose_neg, dT_herm]
-    have hdc : (-dT i0 t).det = (-1) ^ n * (t : ℂ) := by
+    have hc : (- dT i0 t)ᴴ = - dT i0 t := by rw [Matrix.conjTranspose_neg, dT_herm]
+    have hdc : (- dT i0 t).det = (-1) ^ n * (t : ℂ) := by
       rw [Matrix.det_neg, dT_det, Fintype.card_fin]
-    have hu : IsUnit (-dT i0 t).det := by
+    have hu : IsUnit (- dT i0 t).det := by
       rw [hdc]
       exact isUnit_iff_ne_zero.2 (mul_ne_zero (pow_ne_zero _ (by norm_num)) ht')
-    have hci : ((-dT i0 t)⁻¹)ᴴ = (-dT i0 t)⁻¹ := by
-      rw [Matrix.conjTranspose_nonsing_inv, hc]
-    have hd : (-(-dT i0 t)⁻¹).det = (t : ℂ)⁻¹ := by
+    have hci : ((- dT i0 t)⁻¹)ᴴ = (- dT i0 t)⁻¹ := by rw [Matrix.conjTranspose_nonsing_inv, hc]
+    have hd : (-(- dT i0 t)⁻¹).det = (t : ℂ)⁻¹ := by
       rw [Matrix.det_neg, Matrix.det_nonsing_inv, Ring.inverse_eq_inv', hdc, Fintype.card_fin,
         mul_inv, ← mul_assoc, mul_inv_cancel₀ (pow_ne_zero _ (by norm_num)), one_mul]
-    have hnu : IsUnit (-(-dT i0 t)⁻¹).det := by
+    have hnu : IsUnit (-(- dT i0 t)⁻¹).det := by
       rw [hd]
       exact isUnit_iff_ne_zero.2 (inv_ne_zero ht')
-    have hp : pth i0 t = mG (-(-dT i0 t)⁻¹) * nG (-dT i0 t) * jG n * nG (-dT i0 t)⁻¹ :=
+    have hp : pth i0 t = mG (-(- dT i0 t)⁻¹) * nG (- dT i0 t) * jG n * nG (- dT i0 t)⁻¹ :=
       nb_eq hc hu
     rw [hp, mul_assoc (mG _ * nG _) (jG n) _, S_law h hk _ _ hnu hc, S_cell h hJ _ hci,
-      weight_factor_mul_parabolic _ _ _ _ _ (lower_left_block_levi_unipotent _ _ hnu hc), weight_factor_levi_unipotent _ _ _ _ _ hnu hc, hκ _ hci, hd, pq_sum]
+      weight_factor_mul_parabolic _ _ _ _ _ (lower_left_block_levi_unipotent _ _ hnu hc),
+      weight_factor_levi_unipotent _ _ _ _ _ hnu hc, hκ _ hci, hd, pq_sum]
     simp only [zpow_zero, one_mul, sub_zero]
     ring
-  have hpos : ∀ t : ℝ, 0 < t →
-      L (pth i0 t) (fP 1) 0 * κ = F0 (pOf sg m) (qOf sg m) 0 (pth i0 t) * C := by
+  have hpos
+      : ∀ t : ℝ, 0 < t → L (pth i0 t) (fP 1) 0 * κ = F0 (pOf sg m) (qOf sg m) 0 (pth i0 t) * C := by
     intro t ht
     have e := key t ht.ne'
     have hr : ((t : ℂ))⁻¹ = ((t⁻¹ : ℝ) : ℂ) := by push_cast; rfl
     have hr0 : ((t⁻¹ : ℝ) : ℂ) ≠ 0 := by exact_mod_cast inv_ne_zero ht.ne'
     rw [hr, Complex.star_def, Complex.conj_ofReal, Complex.norm_real,
-      Real.norm_of_nonneg (inv_nonneg.2 ht.le), div_self hr0, one_zpow, one_mul, zpow_natCast] at e
+        Real.norm_of_nonneg (inv_nonneg.2 ht.le), div_self hr0, one_zpow, one_mul, zpow_natCast]
+      at e
     apply mul_right_cancel₀ (pow_ne_zero m hr0)
     rw [e]
-  have hneg : ∀ t : ℝ, t < 0 →
-      L (pth i0 t) (fP 1) 0 * κ = (-1) ^ k * (-1) ^ m * (F0 (pOf sg m) (qOf sg m) 0 (pth i0 t) * C) := by
+  have hneg
+      : ∀ t : ℝ,
+        t < 0
+          → L (pth i0 t) (fP 1) 0 * κ
+            = (-1) ^ k * (-1) ^ m * (F0 (pOf sg m) (qOf sg m) 0 (pth i0 t) * C) := by
     intro t ht
     have e := key t ht.ne
     have hr : ((t : ℂ))⁻¹ = ((t⁻¹ : ℝ) : ℂ) := by push_cast; rfl
     have hr0 : ((t⁻¹ : ℝ) : ℂ) ≠ 0 := by exact_mod_cast inv_ne_zero ht.ne
     rw [hr, Complex.star_def, Complex.conj_ofReal, Complex.norm_real,
-      Real.norm_of_nonpos (inv_nonpos.2 ht.le), Complex.ofReal_neg, div_neg, div_self hr0,
-      neg_pow, zpow_natCast] at e
+        Real.norm_of_nonpos (inv_nonpos.2 ht.le), Complex.ofReal_neg, div_neg, div_self hr0,
+        neg_pow, zpow_natCast]
+      at e
     apply mul_right_cancel₀ (pow_ne_zero m hr0)
     rw [e]
     ring
@@ -208,14 +235,16 @@ theorem even_im_hermitian_sub (h : LocHyp sg L) (hn : 0 < n) {k : ℤ}
     refine tendsto_nhds_unique A ?_
     refine B.congr (fun j => ?_)
     exact (hpos _ (hpos' j)).symm
-  have e2 : L (pth i0 0) (fP 1) 0 * κ =
-      (-1) ^ k * (-1) ^ m * (F0 (pOf sg m) (qOf sg m) 0 (pth i0 0) * C) := by
+  have e2
+      : L (pth i0 0) (fP 1) 0 * κ
+        = (-1) ^ k * (-1) ^ m * (F0 (pOf sg m) (qOf sg m) 0 (pth i0 0) * C) := by
     have A := (hφ.tendsto 0).comp hs'
     have B := ((hψ.tendsto 0).comp hs').const_mul ((-1 : ℂ) ^ k * (-1) ^ m)
     refine tendsto_nhds_unique A ?_
     refine B.congr (fun j => ?_)
     exact (hneg _ (neg_neg_of_pos (hpos' j))).symm
-  have hψ0 : F0 (pOf sg m) (qOf sg m) 0 (pth i0 0) * C ≠ 0 := mul_ne_zero (weight_factor_ne_zero _ _ _ _) hC0
+  have hψ0 : F0 (pOf sg m) (qOf sg m) 0 (pth i0 0) * C ≠ 0 :=
+    mul_ne_zero (weight_factor_ne_zero _ _ _ _) hC0
   have hε : ((-1 : ℂ)) ^ k * (-1) ^ m = 1 := by
     rw [e1] at e2
     have := mul_right_cancel₀ hψ0 (e2.symm.trans (one_mul _).symm)
@@ -235,8 +264,12 @@ theorem even_im_hermitian_sub (h : LocHyp sg L) (hn : 0 < n) {k : ℤ}
     have : (-1 : ℂ) = 1 := by linear_combination hε + h3
     norm_num at this
 
-theorem LocHyp.mM' (h : LocHyp sg L) : ∃ e : ℤ, ∀ (y : GR n) (a : Matrix (Fin n) (Fin n) ℂ), IsUnit a.det →
-    mR y = mLc a → ∀ f, IsSw f → L y f = fun u => a.det ^ e * (star a.det) ^ ((m : ℤ) - e) * f (Matrix.of u * a) := by
+theorem LocHyp.mM' (h : LocHyp sg L)
+    : ∃ e : ℤ, ∀ (y : GR n) (a : Matrix (Fin n) (Fin n) ℂ),
+      IsUnit a.det → mR y = mLc a
+        → ∀ f,
+          IsSw f
+            → L y f = fun u => a.det ^ e * (star a.det) ^ ((m : ℤ) - e) * f (Matrix.of u * a) := by
   obtain ⟨k, hk⟩ := h.mM
   rcases Nat.eq_zero_or_pos n with hn0 | hn
   · subst hn0

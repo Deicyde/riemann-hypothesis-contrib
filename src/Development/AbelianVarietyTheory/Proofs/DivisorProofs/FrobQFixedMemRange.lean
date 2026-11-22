@@ -17,11 +17,12 @@ variable (p : ℕ) [Fact p.Prime]
 noncomputable def frobQEquiv (r : ℕ) (hr : 0 < r) : Qr p r ≃ₐ[ℚ_[p]] Qr p r :=
   haveI : FiniteDimensional ℚ_[p] (Qr p r) := finiteDimensional_Kn p (Q0 p) inferInstance hr
   AlgEquiv.ofBijective (frobQ p r)
-    ((frobQ p r).toLinearMap.injective_iff_surjective.mp (frobQ p r).toRingHom.injective |>
-      fun hs => ⟨(frobQ p r).toRingHom.injective, hs⟩)
+    ((frobQ p r).toLinearMap.injective_iff_surjective.mp (frobQ p r).toRingHom.injective
+      |> fun hs => ⟨(frobQ p r).toRingHom.injective, hs⟩)
 
-theorem frobQEquiv_pow_apply (r : ℕ) (hr : 0 < r) (i : ℕ) (b : Qr p r) :
-    (((frobQEquiv p r hr ^ i) b : Qr p r) : PadicAlgCl p) = (frobK p (Q0 p) ^ i) (b : PadicAlgCl p) := by
+theorem frobQEquiv_pow_apply (r : ℕ) (hr : 0 < r) (i : ℕ) (b : Qr p r)
+    : (((frobQEquiv p r hr ^ i) b : Qr p r) : PadicAlgCl p)
+      = (frobK p (Q0 p) ^ i) (b : PadicAlgCl p) := by
   induction i generalizing b with
   | zero => rfl
   | succ n ih =>

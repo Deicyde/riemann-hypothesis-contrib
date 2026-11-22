@@ -9,17 +9,33 @@ open IsLocalRing GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan Glo
 
 namespace GlobalTheory.Poinc
 
-theorem exists_avg_proj_balForms : ∀ (O : Type) [CommRing O] (bar : O → O) (X : Type) [AddCommGroup X] [Module O X] (n c : ℕ) (b : Fin n → O) (T : Matrix (Fin n) (Fin n) ℤ), 0 < c → (∀ s t, T s t = T t s) → (∀ (a : O) (g : O →ₗ[ℤ] O →ₗ[ℤ] ℤ), ∑ s, ∑ t, T s t * g (b s * a) (b t) = ∑ s, ∑ t, T s t * g (b s) (b t * bar a)) → ∑ s, ∑ t, T s t • (bar (b s) * b t) = (c : O) → (∀ v : Fin n → ℤ, v ≠ 0 → 0 < ∑ s, ∑ t, T s t * v s * v t) → ∃ P : LinearMap.BilinForm ℤ X →ₗ[ℤ] LinearMap.BilinForm ℤ X, (∀ β : LinearMap.BilinForm ℤ X, (∀ x y, β x y = β y x) → P β ∈ GlobalTheory.PolFan.balForms bar X) ∧ (∀ β ∈ GlobalTheory.PolFan.balForms bar X, P β = (c : ℤ) • β) ∧ ∀ l : X →ₗ[ℤ] ℤ, l ≠ 0 → P (GlobalTheory.PolFan.sqForm l) ≠ 0 ∧ ∀ x, 0 ≤ P (GlobalTheory.PolFan.sqForm l) x x := by
+theorem exists_avg_proj_balForms
+    : ∀ (O : Type) [CommRing O] (bar : O → O) (X : Type) [AddCommGroup X] [Module O X] (n c : ℕ)
+        (b : Fin n → O) (T : Matrix (Fin n) (Fin n) ℤ),
+      0 < c → (∀ s t, T s t = T t s)
+        → (∀ (a : O) (g : O →ₗ[ℤ] O →ₗ[ℤ] ℤ),
+          ∑ s, ∑ t, T s t * g (b s * a) (b t) = ∑ s, ∑ t, T s t * g (b s) (b t * bar a))
+        → ∑ s, ∑ t, T s t • (bar (b s) * b t) = (c : O)
+        → (∀ v : Fin n → ℤ, v ≠ 0 → 0 < ∑ s, ∑ t, T s t * v s * v t)
+        → ∃ P : LinearMap.BilinForm ℤ X →ₗ[ℤ] LinearMap.BilinForm ℤ X,
+          (∀ β : LinearMap.BilinForm ℤ X,
+              (∀ x y, β x y = β y x) → P β ∈ GlobalTheory.PolFan.balForms bar X)
+            ∧ (∀ β ∈ GlobalTheory.PolFan.balForms bar X, P β = (c : ℤ) • β)
+            ∧ ∀ l : X →ₗ[ℤ] ℤ,
+              l ≠ 0
+                → P (GlobalTheory.PolFan.sqForm l) ≠ 0
+                  ∧ ∀ x, 0 ≤ P (GlobalTheory.PolFan.sqForm l) x x := by
   intro O _ bar X _ _ n c b T hc hT hint hsum hpos
   let f : Fin n → X →ₗ[ℤ] X := fun s => DistribSMul.toLinearMap ℤ X (b s)
-  let P : LinearMap.BilinForm ℤ X →ₗ[ℤ] LinearMap.BilinForm ℤ X :=
-    { toFun := fun β => ∑ s, ∑ t, T s t • β.compl₁₂ (f s) (f t)
-      map_add' := fun β γ => by
-        ext x y
-        simp [Finset.sum_add_distrib, mul_add]
-      map_smul' := fun m β => by
-        ext x y
-        simp [Finset.mul_sum, mul_left_comm] }
+  let P : LinearMap.BilinForm ℤ X →ₗ[ℤ] LinearMap.BilinForm ℤ X := {
+    toFun := fun β => ∑ s, ∑ t, T s t • β.compl₁₂ (f s) (f t)
+    map_add' := fun β γ => by
+      ext x y
+      simp [Finset.sum_add_distrib, mul_add]
+    map_smul' := fun m β => by
+      ext x y
+      simp [Finset.mul_sum, mul_left_comm]
+  }
   have hP : ∀ β x y, P β x y = ∑ s, ∑ t, T s t * β (b s • x) (b t • y) := by
     intro β x y
     simp [P, f, LinearMap.sum_apply]
@@ -60,7 +76,10 @@ theorem exists_avg_proj_balForms : ∀ (O : Type) [CommRing O] (bar : O → O) (
     rw [hsumL]
     simp [hsp]
   · intro l hl
-    have hQ : ∀ x, P (GlobalTheory.PolFan.sqForm l) x x = ∑ s, ∑ t, T s t * (fun s => l (b s • x)) s * (fun s => l (b s • x)) t := by
+    have hQ
+        : ∀ x,
+          P (GlobalTheory.PolFan.sqForm l) x x
+            = ∑ s, ∑ t, T s t * (fun s => l (b s • x)) s * (fun s => l (b s • x)) t := by
       intro x
       rw [hP]
       simp [GlobalTheory.PolFan.sqForm_apply, mul_assoc]

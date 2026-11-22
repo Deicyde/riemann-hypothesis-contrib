@@ -5,20 +5,23 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Lang
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
 
 namespace GlobalTheory.WeilDeligne
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-  {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
-  {V : Type} [AddCommGroup V] [Module ℂ V]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+  {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w} {V : Type}
+  [AddCommGroup V] [Module ℂ V]
 
-theorem exists_frob_pow_mul_ineIncl_mul (m : ℕ) (hm : 0 < m) (σ : Weil h) :
-    ∃ (r : ℕ) (τ : Ine (F := E) A) (q : ℤ), r < m ∧
-      σ = frob h ^ r * ineIncl h τ * (frob h ^ m) ^ q := by
+theorem exists_frob_pow_mul_ineIncl_mul (m : ℕ) (hm : 0 < m) (σ : Weil h)
+    : ∃ (r : ℕ) (τ : Ine (F := E) A) (q : ℤ),
+      r < m ∧ σ = frob h ^ r * ineIncl h τ * (frob h ^ m) ^ q := by
   have hm' : (m : ℤ) ≠ 0 := by exact_mod_cast hm.ne'
   have hdeg : deg (σ * (frob h ^ m) ^ (-(deg σ / m))) = deg σ % m := by
     rw [deg_mul, deg_zpow, deg_pow, deg_frob, Int.emod_def]
@@ -31,9 +34,10 @@ theorem exists_frob_pow_mul_ineIncl_mul (m : ℕ) (hm : 0 < m) (σ : Weil h) :
     rw [← zpow_natCast, Int.toNat_of_nonneg hr0]
   rw [hz, ← hdeg, ← hτ, mul_assoc, ← _root_.zpow_add, neg_add_cancel, zpow_zero, mul_one]
 
-theorem isSemisimpleRepresentation_of_isSmooth [FiniteDimensional ℂ V]
-    (ρ : Representation ℂ (Weil h) V) (hρ : IsSmooth ρ)
-    (hss : ∀ σ, Module.End.IsSemisimple (ρ σ)) : ρ.IsSemisimpleRepresentation := by
+theorem isSemisimpleRepresentation_of_isSmooth
+    [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ (Weil h) V) (hρ : IsSmooth ρ) (hss : ∀ σ, Module.End.IsSemisimple (ρ σ))
+    : ρ.IsSemisimpleRepresentation := by
   classical
   obtain ⟨m, hm⟩ : ∃ m : ℕ, 0 < m := ⟨1, one_pos⟩
   refine ⟨fun P => ?_⟩
@@ -64,9 +68,11 @@ theorem isSemisimpleRepresentation_of_isSmooth [FiniteDimensional ℂ V]
   have hper : ∀ σ, c (σ * frob h ^ m) = c σ := by
     intro σ
     simp only [c, _root_.mul_inv_rev, map_mul]
-    calc ρ σ * ρ (frob h ^ m) * p * (ρ (frob h ^ m)⁻¹ * ρ σ⁻¹)
+    calc
+      ρ σ * ρ (frob h ^ m) * p * (ρ (frob h ^ m)⁻¹ * ρ σ⁻¹)
         = ρ σ * (ρ (frob h ^ m) * p * ρ (frob h ^ m)⁻¹) * ρ σ⁻¹ := by simp only [mul_assoc]
-      _ = ρ σ * (p * (ρ (frob h ^ m) * ρ (frob h ^ m)⁻¹)) * ρ σ⁻¹ := by rw [hpT]; simp only [mul_assoc]
+      _ = ρ σ * (p * (ρ (frob h ^ m) * ρ (frob h ^ m)⁻¹)) * ρ σ⁻¹ := by
+        rw [hpT]; simp only [mul_assoc]
       _ = ρ σ * p * ρ σ⁻¹ := by rw [hinv, mul_one]
   have hzper : ∀ σ (q : ℤ), c (σ * (frob h ^ m) ^ q) = c σ := by
     intro σ q
@@ -111,24 +117,29 @@ theorem isSemisimpleRepresentation_of_isSmooth [FiniteDimensional ℂ V]
   have hSeq : ∀ g : Weil h, ρ g * S = S * ρ g := by
     intro g
     have h1 : ∑ x ∈ Cf, ρ g * x * ρ g⁻¹ = ∑ x ∈ Cf, x := by
-      refine Finset.sum_nbij' (fun x => ρ g * x * ρ g⁻¹) (fun x => ρ g⁻¹ * x * ρ g)
-        ?_ ?_ ?_ ?_ (fun _ _ => rfl)
+      refine Finset.sum_nbij'
+        (fun x => ρ g * x * ρ g⁻¹)
+        (fun x => ρ g⁻¹ * x * ρ g)
+        ?_ ?_ ?_ ?_
+        (fun _ _ => rfl)
       · intro x hx
         obtain ⟨σ, rfl⟩ := (hCmem x).1 (Finset.mem_coe.1 hx)
-        exact Finset.mem_coe.2 ((hCmem _).2 ⟨g * σ, by simp only [c, _root_.mul_inv_rev, map_mul, mul_assoc]⟩)
+        exact Finset.mem_coe.2 ((hCmem _).2
+          ⟨g * σ, by simp only [c, _root_.mul_inv_rev, map_mul, mul_assoc]⟩)
       · intro x hx
         obtain ⟨σ, rfl⟩ := (hCmem x).1 (Finset.mem_coe.1 hx)
-        exact Finset.mem_coe.2 ((hCmem _).2 ⟨g⁻¹ * σ, by
-          simp only [c, _root_.mul_inv_rev, map_mul, inv_inv, mul_assoc]⟩)
+        exact Finset.mem_coe.2 ((hCmem _).2
+          ⟨g⁻¹ * σ, by simp only [c, _root_.mul_inv_rev, map_mul, inv_inv, mul_assoc]⟩)
       · intro x _
         simp only [← mul_assoc, hinv', one_mul]
         rw [mul_assoc, hinv', mul_one]
       · intro x _
         simp only [← mul_assoc, hinv, one_mul]
         rw [mul_assoc, hinv, mul_one]
-    calc ρ g * S = (∑ x ∈ Cf, ρ g * x * ρ g⁻¹) * ρ g := by
-          rw [Finset.sum_mul]
-          simp only [S, Finset.mul_sum, mul_assoc, hinv', mul_one]
+    calc
+      ρ g * S = (∑ x ∈ Cf, ρ g * x * ρ g⁻¹) * ρ g := by
+        rw [Finset.sum_mul]
+        simp only [S, Finset.mul_sum, mul_assoc, hinv', mul_one]
       _ = S * ρ g := by rw [h1]
   have hqm : ∀ v, qa v ∈ P.toSubmodule := fun v => P.toSubmodule.smul_mem _ (hSm v)
   have hq1 : ∀ v ∈ P.toSubmodule, qa v = v := by
@@ -147,8 +158,7 @@ theorem isSemisimpleRepresentation_of_isSmooth [FiniteDimensional ℂ V]
     apply Subtype.ext
     show qa (ρ g v) = 0
     rw [hqe, h0, map_zero]
-  · rw [isCompl_iff, disjoint_iff, codisjoint_iff,
-      ← Subrepresentation.toSubmodule_injective.eq_iff,
+  · rw [isCompl_iff, disjoint_iff, codisjoint_iff, ← Subrepresentation.toSubmodule_injective.eq_iff,
       ← Subrepresentation.toSubmodule_injective.eq_iff]
     rw [isCompl_iff, disjoint_iff, codisjoint_iff] at hcompl
     exact hcompl
@@ -157,9 +167,11 @@ end GlobalTheory.WeilDeligne
 
 namespace GlobalTheory.WeilDeligne.WDRep
 
-theorem isSemisimpleRepresentation_rho : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω]
-    [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E))
-    (h : IsPlaceOver A w) (n : ℕ) (a : WDRep h (Fin n → ℂ)), a.ρ.IsSemisimpleRepresentation := by
+theorem isSemisimpleRepresentation_rho
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (n : ℕ)
+        (a : WDRep h (Fin n → ℂ)),
+      a.ρ.IsSemisimpleRepresentation := by
   intro E Ω _ _ _ _ _ A w h n a
   exact isSemisimpleRepresentation_of_isSmooth a.ρ a.smooth a.semisimple
 

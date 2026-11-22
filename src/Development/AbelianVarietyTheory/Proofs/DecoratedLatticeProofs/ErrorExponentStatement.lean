@@ -18,31 +18,38 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsClo
 
 @[expose] public section
 
-open Formalism.L2.SG Formalism.L2.SG.PoincareInHH Formalism.BasicNotions Formalism.L2.Theta GlobalTheory.MixPer GlobalTheory.MixModel MeasureTheory
-  GlobalTheory.Core.Mi Formalism.L2.SG.InstExistsPf Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH Matrix
+open Formalism.L2.SG Formalism.L2.SG.PoincareInHH Formalism.BasicNotions Formalism.L2.Theta
+  GlobalTheory.MixPer GlobalTheory.MixModel MeasureTheory GlobalTheory.Core.Mi
+  Formalism.L2.SG.InstExistsPf Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.BasicNotions.TH Matrix
 
 noncomputable section
 
 namespace GlobalTheory.Core.Mi.PerCmp
 
-variable {D : D7} {X : HidaSetting.HidaSetting D} {h : X.B.I = instOf D} {u : D.what₂.Word}
+variable
+  {D : D7} {X : HidaSetting.HidaSetting D} {h : X.B.I = instOf D} {u : D.what₂.Word}
   {V₀ A L : HSp D} {d : HypDec (D.sp.Y 0) V₀ D.R.rS} {o : OrthDec V₀ A L}
   {ζ : Fin L.rank → D.host.E} {lam : D.host.E}
 
-theorem hyp_linIndep {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) :
-    LinearIndependent D.host.E d.e.transpose := by
+theorem hyp_linIndep {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ)
+    : LinearIndependent D.host.E d.e.transpose := by
   have h1 : Function.Injective d.e.mulVec := by
     intro x y hxy
     have := congrArg (fun v => (d.e'.conjTranspose * HSpace.gram S).mulVec v) hxy
     simpa [Matrix.mulVec_mulVec, d.e'e] using this
   exact Matrix.mulVec_injective_iff.mp h1
 
-theorem besPer_domN {S S₀ A L : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (o : OrthDec S₀ A L)
-    (ζ : Fin L.rank → D.host.E) {ψ : AddChar (AF ↥D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
-    (θ : D.host.E) (μ 𝓕) (ν : Measure (flagN d)) (hν : ν.IsHaarMeasure) {𝓝 𝓝' : Set (flagN d)}
+theorem besPer_domN
+    {S S₀ A L : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (o : OrthDec S₀ A L) (ζ : Fin L.rank → D.host.E)
+    {ψ : AddChar (AF ↥D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    (θ : D.host.E) (μ 𝓕)
+    (ν : Measure (flagN d)) (hν : ν.IsHaarMeasure)
+    {𝓝 𝓝' : Set (flagN d)}
     (h𝓝 : IsFundamentalDomain (NFlagQ S d.e) 𝓝 ν) (h𝓝' : IsFundamentalDomain (NFlagQ S d.e) 𝓝' ν)
-    (φ : GA D A → ℂ) (f : GA D S → ℂ) (hf : ∀ γ ∈ GQ S, ∀ g, f (γ * g) = f g) :
-    besPer ψ θ d o ζ μ 𝓕 ν 𝓝 φ f = besPer ψ θ d o ζ μ 𝓕 ν 𝓝' φ f := by
+    (φ : GA D A → ℂ)
+    (f : GA D S → ℂ) (hf : ∀ γ ∈ GQ S, ∀ g, f (γ * g) = f g)
+    : besPer ψ θ d o ζ μ 𝓕 ν 𝓝 φ f = besPer ψ θ d o ζ μ 𝓕 ν 𝓝' φ f := by
   obtain ⟨j1, j2, j3, j4⟩ := GlobalTheory.Mem.TrueRecord.top_NFlag S (isIsoSub_e d)
   haveI : Countable (NFlagQ S d.e) := by
     have hinj : Function.Injective
@@ -58,12 +65,15 @@ theorem besPer_domN {S S₀ A L : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (o : 
   rw [psiBes_mul d ψ θ _ γ.1.2 n.2, GlobalTheory.CharLaws.psiBes_rat ψ d hψ.2.2.1 θ _ hγ, one_mul,
     mul_assoc ((γ : flagN d) : GA D S), hf _ hγ]
 
-theorem besPer_domA {ρ : ℕ} (B : GlobalTheory.Unf.BesLev D ρ) {ψ : AddChar (AF ↥D.host.F) ℂ}
-    (hψ : IsCharAF D.host.F ψ) {𝓕 : Set (GA D B.A)} (h𝓕 : IsFundamentalDomain (GQ B.A) 𝓕 B.vA.μ)
-    (φ : GA D B.A → ℂ) (f : GA D B.V → ℂ) (hφ : ∀ γ ∈ GQ B.A, ∀ g, φ (γ * g) = φ g)
-    (hf : ∀ γ ∈ GQ B.V, ∀ g, f (γ * g) = f g) :
-    besPer ψ 1 B.d B.o B.ζ B.vA.μ 𝓕 B.vN.ν B.vN.𝓝 φ f = B.per ψ φ f := by
-  obtain ⟨i1, i2, i3, i4, i5, i6, i7⟩ := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D B.A
+theorem besPer_domA
+    {ρ : ℕ} (B : GlobalTheory.Unf.BesLev D ρ)
+    {ψ : AddChar (AF ↥D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    {𝓕 : Set (GA D B.A)} (h𝓕 : IsFundamentalDomain (GQ B.A) 𝓕 B.vA.μ)
+    (φ : GA D B.A → ℂ) (f : GA D B.V → ℂ)
+    (hφ : ∀ γ ∈ GQ B.A, ∀ g, φ (γ * g) = φ g) (hf : ∀ γ ∈ GQ B.V, ∀ g, f (γ * g) = f g)
+    : besPer ψ 1 B.d B.o B.ζ B.vA.μ 𝓕 B.vN.ν B.vN.𝓝 φ f = B.per ψ φ f := by
+  obtain ⟨i1, i2, i3, i4, i5, i6, i7⟩ :=
+    GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D B.A
   haveI := B.vA.haar
   exact h𝓕.setIntegral_eq B.vA.fund fun γ x => Shift.inner_left B ψ hψ φ f hφ hf γ.2 x
 

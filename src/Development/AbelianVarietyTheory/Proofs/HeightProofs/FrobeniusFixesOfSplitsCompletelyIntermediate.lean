@@ -14,16 +14,18 @@ open scoped Pointwise
 
 namespace GlobalTheory.SplitCriterion
 
-theorem frob_fix_of_ncard_primes_eq_finrank (K N : Type) [Field K] [NumberField K] [Field N] [NumberField N]
-    [Algebra K N] [IsGalois K N] (M : IntermediateField K N) (𝔭 : HeightOneSpectrum (𝓞 K))
+theorem frob_fix_of_ncard_primes_eq_finrank
+    (K N : Type) [Field K] [NumberField K] [Field N] [NumberField N] [Algebra K N] [IsGalois K N]
+    (M : IntermediateField K N) (𝔭 : HeightOneSpectrum (𝓞 K))
     (h : {Q : HeightOneSpectrum (𝓞 M) | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 M)) = 𝔭.asIdeal}.ncard
-      = Module.finrank K M) (σ : N ≃ₐ[K] N) (hσ : GlobalTheory.NT.IsFrob N 𝔭 σ) : ∀ x ∈ M, σ x = x := by
+      = Module.finrank K M)
+    (σ : N ≃ₐ[K] N) (hσ : GlobalTheory.NT.IsFrob N 𝔭 σ)
+    : ∀ x ∈ M, σ x = x := by
   have := 𝔭.isPrime
   obtain ⟨P, hP, hPo, hx⟩ := hσ
   have hne : P ≠ ⊥ := Ideal.ne_bot_of_liesOver_of_ne_bot 𝔭.ne_bot P
   have hPm : P.IsMaximal := hP.isMaximal hne
-  have hq : Ideal.absNorm 𝔭.asIdeal ≠ 0 := by
-    rw [Ne, Ideal.absNorm_eq_zero_iff]; exact 𝔭.ne_bot
+  have hq : Ideal.absNorm 𝔭.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact 𝔭.ne_bot
   have hfix : σ⁻¹ • P = P := by
     symm
     refine hPm.eq_of_le (Ideal.IsPrime.ne_top inferInstance) fun x hxP => ?_
@@ -53,11 +55,14 @@ theorem frob_fix_of_ncard_primes_eq_finrank (K N : Type) [Field K] [NumberField 
     · rintro ⟨hQ, hQo⟩
       obtain ⟨P', hP', hPo'⟩ := (inferInstance : Nonempty (Q.primesOver (𝓞 N)))
       have : P'.LiesOver 𝔭.asIdeal := Ideal.LiesOver.trans P' Q _
-      obtain ⟨g, hg⟩ := Algebra.IsInvariant.exists_smul_of_under_eq (𝓞 K) (𝓞 N) (N ≃ₐ[K] N) P P'
-        (hPo.over.symm.trans this.over)
+      obtain ⟨g, hg⟩ :=
+        Algebra.IsInvariant.exists_smul_of_under_eq (𝓞 K) (𝓞 N) (N ≃ₐ[K] N) P P'
+          (hPo.over.symm.trans this.over)
       exact ⟨g⁻¹, by simp only [f]; rw [inv_inv, ← hg]; exact hPo'.over.symm⟩
-  have hs : (fun Q : HeightOneSpectrum (𝓞 M) => Q.asIdeal) ''
-      {Q | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 M)) = 𝔭.asIdeal} = 𝔭.asIdeal.primesOver (𝓞 M) := by
+  have hs
+      : (fun Q : HeightOneSpectrum (𝓞 M) => Q.asIdeal)
+          '' {Q | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 M)) = 𝔭.asIdeal}
+        = 𝔭.asIdeal.primesOver (𝓞 M) := by
     ext Q
     constructor
     · rintro ⟨Q, hQ, rfl⟩
@@ -65,10 +70,12 @@ theorem frob_fix_of_ncard_primes_eq_finrank (K N : Type) [Field K] [NumberField 
     · rintro ⟨hQ, hQo⟩
       exact ⟨⟨Q, hQ, Ideal.ne_bot_of_liesOver_of_ne_bot 𝔭.ne_bot Q⟩, hQo.over.symm, rfl⟩
   rw [← Set.ncard_image_of_injective _ (fun _ _ e => HeightOneSpectrum.ext e), hs, ← hr,
-    IntermediateField.finrank_eq_fixingSubgroup_index, Subgroup.index, ← Nat.card_coe_set_eq] at h
+      IntermediateField.finrank_eq_fixingSubgroup_index, Subgroup.index, ← Nat.card_coe_set_eq]
+    at h
   let F : (N ≃ₐ[K] N) ⧸ M.fixingSubgroup → Set.range f :=
-    Quotient.lift (fun g => ⟨f g, g, rfl⟩) fun a b e =>
-      Subtype.ext (hker a b (QuotientGroup.leftRel_apply.1 e))
+    Quotient.lift
+      (fun g => ⟨f g, g, rfl⟩)
+      fun a b e => Subtype.ext (hker a b (QuotientGroup.leftRel_apply.1 e))
   have hF : Function.Surjective F := by
     rintro ⟨_, g, rfl⟩
     exact ⟨QuotientGroup.mk g, rfl⟩

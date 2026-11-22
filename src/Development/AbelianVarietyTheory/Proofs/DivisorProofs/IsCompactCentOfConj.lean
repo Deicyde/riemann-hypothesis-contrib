@@ -16,15 +16,16 @@ open Formalism.REAL (UJ KG toM)
 
 namespace GlobalTheory.PsCo.NonEll
 
-theorem isRegSS_conj {n : ℕ} {ε : Fin n → Bool} (s x : UJ ε) (hs : IsRegSS (ujMat ε s)) :
-    IsRegSS (ujMat ε (x⁻¹ * s * x)) := by
+theorem isRegSS_conj {n : ℕ} {ε : Fin n → Bool} (s x : UJ ε) (hs : IsRegSS (ujMat ε s))
+    : IsRegSS (ujMat ε (x⁻¹ * s * x)) := by
   unfold IsRegSS at hs ⊢
-  rw [map_mul, Matrix.charpoly_mul_comm, ← map_mul, ← mul_assoc, mul_inv_cancel,
-    one_mul]
+  rw [map_mul, Matrix.charpoly_mul_comm, ← map_mul, ← mul_assoc, mul_inv_cancel, one_mul]
   exact hs
 
-theorem isCompact_cent_of_conj {G : Type} [Group G] [TopologicalSpace G] [ContinuousMul G]
-    (s x : G) (h : IsCompact (cent (x⁻¹ * s * x) : Set G)) : IsCompact (cent s : Set G) := by
+theorem isCompact_cent_of_conj
+    {G : Type} [Group G] [TopologicalSpace G] [ContinuousMul G]
+    (s x : G) (h : IsCompact (cent (x⁻¹ * s * x) : Set G))
+    : IsCompact (cent s : Set G) := by
   have hc : Continuous fun y : G => x * y * x⁻¹ := by fun_prop
   have := h.image hc
   convert this using 1
@@ -33,11 +34,15 @@ theorem isCompact_cent_of_conj {G : Type} [Group G] [TopologicalSpace G] [Contin
   constructor
   · intro hy
     refine ⟨x⁻¹ * y * x, ?_, by group⟩
-    calc x⁻¹ * y * x * (x⁻¹ * s * x) = x⁻¹ * (y * s) * x := by group
+    calc
+      x⁻¹ * y * x * (x⁻¹ * s * x)
+        = x⁻¹ * (y * s) * x := by group
       _ = x⁻¹ * (s * y) * x := by rw [hy]
       _ = x⁻¹ * s * x * (x⁻¹ * y * x) := by group
   · rintro ⟨z, hz, rfl⟩
-    calc x * z * x⁻¹ * s = x * (z * (x⁻¹ * s * x)) * x⁻¹ := by group
+    calc
+      x * z * x⁻¹ * s
+        = x * (z * (x⁻¹ * s * x)) * x⁻¹ := by group
       _ = x * ((x⁻¹ * s * x) * z) * x⁻¹ := by rw [hz]
       _ = s * (x * z * x⁻¹) := by group
 
@@ -55,7 +60,8 @@ theorem stNonEll : GlobalTheory.PsCo.Pc1.StNonEll := by
   · have h0 : 0 ≤ r (x₀⁻¹ * s * x₀) := Finset.sum_nonneg fun z _ => by positivity
     refine lt_of_le_of_ne h0 fun h => hnc ?_
     have hk : x₀⁻¹ * s * x₀ ∈ KG ε := (GlobalTheory.offDiag_zero_iff_mem_K n ε _).1 h.symm
-    exact isCompact_cent_of_conj s x₀ (GlobalTheory.isCompact_cent_of_mem_KG n ε _ hk (isRegSS_conj s x₀ hs))
+    exact isCompact_cent_of_conj s x₀
+      (GlobalTheory.isCompact_cent_of_mem_KG n ε _ hk (isRegSS_conj s x₀ hs))
   · change r (x₀⁻¹ * s * x₀) ≤ r (x⁻¹ * s * x)
     by_cases hx : r (x⁻¹ * s * x) ≤ r s
     · exact hmin ⟨hx, x, rfl⟩

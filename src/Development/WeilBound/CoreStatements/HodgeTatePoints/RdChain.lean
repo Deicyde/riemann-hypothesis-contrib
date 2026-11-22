@@ -29,8 +29,8 @@ structure IsChain (n : ℕ) (K : ℕ → Submodule F N) (t : ℕ → N) : Prop w
   succ : ∀ i < n, K (i + 1) = K i ⊔ Submodule.span F {t i}
   notMem : ∀ i < n, t i ∉ K i
 
-theorem IsChain.quot {n : ℕ} {K : ℕ → Submodule F N} {t : ℕ → N} (h : IsChain n K t) (j : ℕ) :
-    IsChain (n - j) (fun i => (K (j + i)).map (K j).mkQ) (fun i => (K j).mkQ (t (j + i))) := by
+theorem IsChain.quot {n : ℕ} {K : ℕ → Submodule F N} {t : ℕ → N} (h : IsChain n K t) (j : ℕ)
+    : IsChain (n - j) (fun i => (K (j + i)).map (K j).mkQ) (fun i => (K j).mkQ (t (j + i))) := by
   exact {
     mono := fun a b hab => Submodule.map_mono (h.mono (by omega))
     zero := by simp
@@ -46,15 +46,17 @@ theorem IsChain.quot {n : ℕ} {K : ℕ → Submodule F N} {t : ℕ → N} (h : 
       rwa [Submodule.comap_map_eq, Submodule.ker_mkQ, sup_eq_left.2 (h.mono (by omega))] at this
   }
 
-theorem IsChain.mem {n : ℕ} {K : ℕ → Submodule F N} {t : ℕ → N} (h : IsChain n K t) {i j : ℕ}
-    (hi : i < min j n) : t i ∈ K j := by
+theorem IsChain.mem
+    {n : ℕ} {K : ℕ → Submodule F N} {t : ℕ → N} (h : IsChain n K t) {i j : ℕ} (hi : i < min j n)
+    : t i ∈ K j := by
   apply h.mono (show i + 1 ≤ j by omega)
   rw [h.succ i (by omega)]
   exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)
 
 open Classical in
-theorem IsChain.sub {n : ℕ} {K : ℕ → Submodule F N} {t : ℕ → N} (h : IsChain n K t) (j : ℕ) :
-    IsChain (min j n) (fun i => (K i).comap (K j).subtype)
+theorem IsChain.sub {n : ℕ} {K : ℕ → Submodule F N} {t : ℕ → N} (h : IsChain n K t) (j : ℕ)
+    : IsChain (min j n)
+      (fun i => (K i).comap (K j).subtype)
       (fun i => if hi : t i ∈ K j then ⟨t i, hi⟩ else 0) := by
   exact {
     mono := fun a b hab => Submodule.comap_mono (h.mono hab)
@@ -77,8 +79,8 @@ theorem IsChain.sub {n : ℕ} {K : ℕ → Submodule F N} {t : ℕ → N} (h : I
       exact hm
   }
 
-theorem isChain_flag {n : ℕ} (b : Module.Basis (Fin n) F N) :
-    IsChain n (flagSub b) (fun i => if h : i < n then b ⟨i, h⟩ else 0) := by
+theorem isChain_flag {n : ℕ} (b : Module.Basis (Fin n) F N)
+    : IsChain n (flagSub b) (fun i => if h : i < n then b ⟨i, h⟩ else 0) := by
   exact {
     mono := fun a c hac => Submodule.span_mono (Set.image_mono fun j hj => lt_of_lt_of_le hj hac)
     zero := by simp [flagSub]
@@ -102,26 +104,37 @@ end
 
 section
 
-variable (hex : type_of% @GlobalTheory.T.teichmuller_character_exists) (hsq : type_of% @GlobalTheory.T.stable_hopf_order_subgroup_restriction)
-  (hsplit : type_of% @GlobalTheory.T.stable_hopf_order_fundamental_ideal) (hos : type_of% @GlobalTheory.T.stable_hopf_order_subgroup_characters)
-  (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
-  (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C] (hv : v.Integers R)
-  (hp : v (p : C) < 1) (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ)
-  (hF : Fintype.card F = p ^ f)
+variable
+  (hex : type_of% @GlobalTheory.T.teichmuller_character_exists)
+  (hsq : type_of% @GlobalTheory.T.stable_hopf_order_subgroup_restriction)
+  (hsplit : type_of% @GlobalTheory.T.stable_hopf_order_fundamental_ideal)
+  (hos : type_of% @GlobalTheory.T.stable_hopf_order_subgroup_characters)
+  (p : ℕ) [Fact p.Prime]
+  (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+  (v : Valuation C NNReal)
+  (R : Type) [CommRing R] [Algebra R C]
+  (hv : v.Integers R) (hp : v (p : C) < 1)
+  (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p]
+  (f : ℕ) (hF : Fintype.card F = p ^ f)
 
 include hex hsq hsplit hos hv hp hF
 
-theorem chain_le (χ : MulChar F R) (n : ℕ) : ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N]
-    [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable F AA.carrier →
-    ∀ (K : ℕ → Submodule F N) (t : ℕ → N), IsChain n K t → ∀ (s : ℕ → NNReal) (r : NNReal),
-    (∀ i < n, HasLen v R (OmType (stepOrder AA.carrier (K i) (t i)) χ) (s i)) →
-    HasLen v R (OmType AA.carrier χ) r → ∏ i ∈ Finset.range n, s i ≤ r := by
+theorem chain_le (χ : MulChar F R) (n : ℕ)
+    : ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+        (AA : HopfOrder (C := C) R N),
+      FStable F AA.carrier
+        → ∀ (K : ℕ → Submodule F N) (t : ℕ → N),
+          IsChain n K t
+            → ∀ (s : ℕ → NNReal) (r : NNReal),
+              (∀ i < n, HasLen v R (OmType (stepOrder AA.carrier (K i) (t i)) χ) (s i))
+                → HasLen v R (OmType AA.carrier χ) r
+                → ∏ i ∈ Finset.range n, s i ≤ r := by
   classical
   induction n with
   | zero =>
     intro N _ _ _ _ AA hst K t h s r hs hr
-    have : Subsingleton N := (Submodule.subsingleton_iff F).1
-      (subsingleton_of_bot_eq_top (h.zero.symm.trans h.top))
+    have : Subsingleton N :=
+      (Submodule.subsingleton_iff F).1 (subsingleton_of_bot_eq_top (h.zero.symm.trans h.top))
     rw [hasLen_trivial hv hr]
     simp
   | succ n ih =>
@@ -132,15 +145,19 @@ theorem chain_le (χ : MulChar F R) (n : ℕ) : ∀ (N : Type) [AddCommGroup N] 
     let _ : Fintype (K 1) := Fintype.ofFinite _
     obtain ⟨-, ⟨AQ, hQ, hQs⟩, -⟩ := hsq p C v R hv hp F f hF N AA hst (K 1)
     obtain ⟨b, -, hb⟩ := (hsplit p C v R hv hp F f hF _ AQ hQs σ hσ).1 χ
-    have h1 := ih _ AQ hQs _ _ (h.quot 1) (fun i => s (1 + i)) b (fun i hi => by
-      rw [hQ, quot_step _ (h.mono (by omega))]
-      exact hs _ (by omega)) hb
+    have h1 :=
+      ih _ AQ hQs _ _ (h.quot 1)
+        (fun i => s (1 + i))
+        b
+        (fun i hi => by
+          rw [hQ, quot_step _ (h.mono (by omega))]
+          exact hs _ (by omega))
+        hb
     have ht : t 0 ≠ 0 := fun h0 => h.notMem 0 (by omega) (h0 ▸ Submodule.zero_mem _)
     have h2 := hs 0 (by omega)
     rw [h.zero] at h2
     have h3 := hasLen_line _ ht h2
-    have hK : Submodule.span F {t 0} = K 1 := by
-      rw [h.succ 0 (by omega), h.zero, bot_sup_eq]
+    have hK : Submodule.span F {t 0} = K 1 := by rw [h.succ 0 (by omega), h.zero, bot_sup_eq]
     rw [hK] at h3
     rw [hQ] at hb
     have h4 := hos p C v R hv hp F f hF N AA hst (K 1) χ _ _ _ h3 hb hr
@@ -149,13 +166,17 @@ theorem chain_le (χ : MulChar F R) (n : ℕ) : ∀ (N : Type) [AddCommGroup N] 
     rw [Finset.prod_range_one]
     exact mul_le_mul_right h1 _
 
-theorem chain_partial (hstep : type_of% @GlobalTheory.T.stable_hopf_order_subgroup_translation) (χ : MulChar F R) (n : ℕ) (N : Type)
-    [AddCommGroup N] [Module F N] [Fintype N]
-    [DecidableEq N] (AA : HopfOrder (C := C) R N) (hst : FStable F AA.carrier)
-    (K : ℕ → Submodule F N) (t : ℕ → N) (h : IsChain n K t) (s : ℕ → NNReal)
-    (hs : ∀ i < n, HasLen v R (OmType (stepOrder AA.carrier (K i) (t i)) χ) (s i))
-    (hr : HasLen v R (OmType AA.carrier χ) (∏ i ∈ Finset.range n, s i)) (j : ℕ) :
-    HasLen v R (OmType (AA.carrier.map (LinearMap.funLeft R C (Subtype.val : K j → N))) χ)
+theorem chain_partial
+    (hstep : type_of% @GlobalTheory.T.stable_hopf_order_subgroup_translation)
+    (χ : MulChar F R)
+    (n : ℕ)
+    (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+    (AA : HopfOrder (C := C) R N) (hst : FStable F AA.carrier)
+    (K : ℕ → Submodule F N) (t : ℕ → N) (h : IsChain n K t)
+    (s : ℕ → NNReal) (hs : ∀ i < n, HasLen v R (OmType (stepOrder AA.carrier (K i) (t i)) χ) (s i))
+    (hr : HasLen v R (OmType AA.carrier χ) (∏ i ∈ Finset.range n, s i))
+    (j : ℕ)
+    : HasLen v R (OmType (AA.carrier.map (LinearMap.funLeft R C (Subtype.val : K j → N))) χ)
       (∏ i ∈ Finset.range (min j n), s i) := by
   classical
   obtain ⟨σ, hσ⟩ := hex p C v R hv hp F f hF
@@ -165,21 +186,28 @@ theorem chain_partial (hstep : type_of% @GlobalTheory.T.stable_hopf_order_subgro
   obtain ⟨⟨AK, hK, hKs⟩, ⟨AQ, hQ, hQs⟩, -⟩ := hsq p C v R hv hp F f hF N AA hst (K j)
   obtain ⟨a, -, ha⟩ := (hsplit p C v R hv hp F f hF _ AK hKs σ hσ).1 χ
   obtain ⟨b, hb0, hb⟩ := (hsplit p C v R hv hp F f hF _ AQ hQs σ hσ).1 χ
-  have h1 := chain_le hex hsq hsplit hos p C v R hv hp F f hF χ _ _ AQ hQs _ _ (h.quot j)
-    (fun i => s (j + i)) b (fun i hi => by
-      rw [hQ, quot_step _ (h.mono (by omega))]
-      exact hs _ (by omega)) hb
-  have h2 := chain_le hex hsq hsplit hos p C v R hv hp F f hF χ _ _ AK hKs _ _ (h.sub j)
-    s a (fun i hi => by
-      rw [(hstep p C v R hv hp F f hF _ AK hKs _ _ ((h.sub j).notMem i hi)).2, hK,
-        sub_stepRes _ (h.mono (by omega)), dite_eq_left (h.mem hi),
-        ← (hstep p C v R hv hp F f hF _ AA hst _ _ (h.notMem i (by omega))).2]
-      exact hs _ (by omega)) ha
+  have h1 :=
+    chain_le hex hsq hsplit hos p C v R hv hp F f hF χ _ _ AQ hQs _ _ (h.quot j)
+      (fun i => s (j + i))
+      b
+      (fun i hi => by
+        rw [hQ, quot_step _ (h.mono (by omega))]
+        exact hs _ (by omega))
+      hb
+  have h2 :=
+    chain_le hex hsq hsplit hos p C v R hv hp F f hF χ _ _ AK hKs _ _ (h.sub j) s a
+      (fun i hi => by
+        rw [(hstep p C v R hv hp F f hF _ AK hKs _ _ ((h.sub j).notMem i hi)).2, hK,
+          sub_stepRes _ (h.mono (by omega)), dite_eq_left (h.mem hi),
+          ← (hstep p C v R hv hp F f hF _ AA hst _ _ (h.notMem i (by omega))).2]
+        exact hs _ (by omega))
+      ha
   rw [hK] at ha
   rw [hQ] at hb
   have h4 := hos p C v R hv hp F f hF N AA hst (K j) χ _ _ _ ha hb hr
-  have h5 : ∏ i ∈ Finset.range n, s i =
-      (∏ i ∈ Finset.range (min j n), s i) * ∏ i ∈ Finset.range (n - j), s (j + i) := by
+  have h5
+      : ∏ i ∈ Finset.range n, s i
+        = (∏ i ∈ Finset.range (min j n), s i) * ∏ i ∈ Finset.range (n - j), s (j + i) := by
     rcases le_total j n with h6 | h6
     · rw [min_eq_left h6, ← Finset.prod_range_add, Nat.add_sub_cancel' h6]
     · rw [min_eq_right h6, Nat.sub_eq_zero_of_le h6, Finset.prod_range_zero, mul_one]

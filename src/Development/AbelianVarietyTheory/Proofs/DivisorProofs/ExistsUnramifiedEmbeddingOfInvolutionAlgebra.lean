@@ -17,20 +17,24 @@ namespace GlobalTheory.UnitLemma.UnrAny
 
 open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Unr Polynomial IsLocalRing
 
-theorem pow_eq_one_eq_of_residue {S : Type*} [CommRing S] [IsLocalRing S] {n : ℕ} (hn : IsUnit (n : S))
-    {y₁ y₂ : S} (h₁ : y₁ ^ n = 1) (h₂ : y₂ ^ n = 1) (h : residue S y₁ = residue S y₂) : y₁ = y₂ := by
+theorem pow_eq_one_eq_of_residue
+    {S : Type*} [CommRing S] [IsLocalRing S]
+    {n : ℕ} (hn : IsUnit (n : S))
+    {y₁ y₂ : S} (h₁ : y₁ ^ n = 1) (h₂ : y₂ ^ n = 1) (h : residue S y₁ = residue S y₂)
+    : y₁ = y₂ := by
   have hn0 : n ≠ 0 := by
     rintro rfl
     simp at hn
   have key : (∑ i ∈ Finset.range n, y₁ ^ i * y₂ ^ (n - 1 - i)) * (y₁ - y₂) = 0 := by
     rw [Commute.geom_sum₂_mul (Commute.all _ _), h₁, h₂, sub_self]
-  have hr : residue S (∑ i ∈ Finset.range n, y₁ ^ i * y₂ ^ (n - 1 - i)) =
-      (n : ResidueField S) * residue S y₂ ^ (n - 1) := by
+  have hr
+      : residue S (∑ i ∈ Finset.range n, y₁ ^ i * y₂ ^ (n - 1 - i))
+        = (n : ResidueField S) * residue S y₂ ^ (n - 1) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp only [map_mul, map_pow, h]
-    rw [Finset.sum_congr rfl (g := fun _ => residue S y₂ ^ (n - 1)), Finset.sum_const, Finset.card_range,
-      nsmul_eq_mul]
+    rw [Finset.sum_congr rfl (g := fun _ => residue S y₂ ^ (n - 1)), Finset.sum_const,
+      Finset.card_range, nsmul_eq_mul]
     intro i hi
     rw [← pow_add]
     congr 1
@@ -47,14 +51,33 @@ theorem pow_eq_one_eq_of_residue {S : Type*} [CommRing S] [IsLocalRing S] {n : �
   have := (hu.mul_right_eq_zero).1 key
   exact sub_eq_zero.1 this
 
-theorem card_sub_one_isUnit (S : Type*) [CommRing S] [IsLocalRing S] [Finite (ResidueField S)] :
-    IsUnit ((Nat.card (ResidueField S) - 1 : ℕ) : S) := by
-  rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_natCast, Nat.cast_sub Nat.card_pos, Nat.cast_one]
+theorem card_sub_one_isUnit (S : Type*) [CommRing S] [IsLocalRing S] [Finite (ResidueField S)]
+    : IsUnit ((Nat.card (ResidueField S) - 1 : ℕ) : S) := by
+  rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_natCast, Nat.cast_sub Nat.card_pos,
+    Nat.cast_one]
   haveI := Fintype.ofFinite (ResidueField S)
   rw [Nat.card_eq_fintype_card, FiniteField.cast_card_eq_zero]
   simp
 
-theorem exists_unr_embedding_any : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g = 1 → B.P.Separable → IsIntegral K.O B.g → ∀ (hl : IsLocalRing (Algebra.adjoin K.O ({B.g} : Set B.A))) (d : ℕ), Nat.card (@IsLocalRing.ResidueField (Algebra.adjoin K.O ({B.g} : Set B.A)) _ hl) = K.q ^ (2 * d) → ∀ (K' : UQ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ → (∃ z : K'.E, IsPrimitiveRoot z (K'.q ^ 2 - 1) ∧ @Algebra.adjoin K.E K'.E _ _ φ.toAlgebra {z} = ⊤) → ∃ (ψ : K'.E →+* B.A) (_ : ∀ e, ψ (φ e) = algebraMap K.E B.A e) (_ : ∀ e, B.σ (ψ e) = ψ (K'.c e)) (hO : ∀ y : K'.O, ψ (algebraMap K'.O K'.E y) ∈ Algebra.adjoin K.O ({B.g} : Set B.A)), ∃ s : K'.Oˣ, algebraMap K'.O K'.E s * K'.c (algebraMap K'.O K'.E s) = 1 ∧ @IsLocalRing.residue _ _ hl ⟨B.g, Algebra.self_mem_adjoin_singleton K.O B.g⟩ = @IsLocalRing.residue _ _ hl ⟨ψ (algebraMap K'.O K'.E s), hO s⟩ := by
+theorem exists_unr_embedding_any
+    : ∀ (K : UQ) (B : InvAlg K),
+      B.g * B.σ B.g = 1 → B.P.Separable → IsIntegral K.O B.g
+        → ∀ (hl : IsLocalRing (Algebra.adjoin K.O ({B.g} : Set B.A))) (d : ℕ),
+          Nat.card (@IsLocalRing.ResidueField (Algebra.adjoin K.O ({B.g} : Set B.A)) _ hl)
+              = K.q ^ (2 * d)
+            → ∀ (K' : UQ) (φ : K.E →+* K'.E),
+              IsUnrExt K K' d φ
+                → (∃ z : K'.E,
+                  IsPrimitiveRoot z (K'.q ^ 2 - 1)
+                    ∧ @Algebra.adjoin K.E K'.E _ _ φ.toAlgebra {z} = ⊤)
+                → ∃ (ψ : K'.E →+* B.A) (_ : ∀ e, ψ (φ e) = algebraMap K.E B.A e)
+                    (_ : ∀ e, B.σ (ψ e) = ψ (K'.c e))
+                    (hO : ∀ y : K'.O,
+                      ψ (algebraMap K'.O K'.E y) ∈ Algebra.adjoin K.O ({B.g} : Set B.A)),
+                  ∃ s : K'.Oˣ,
+                    algebraMap K'.O K'.E s * K'.c (algebraMap K'.O K'.E s) = 1
+                      ∧ @IsLocalRing.residue _ _ hl ⟨B.g, Algebra.self_mem_adjoin_singleton K.O B.g⟩
+                        = @IsLocalRing.residue _ _ hl ⟨ψ (algebraMap K'.O K'.E s), hO s⟩ := by
   intro K B hu _ hi hl d hcard K' φ hU hz
   obtain ⟨z, hzp, hzadj⟩ := hz
   set R := Algebra.adjoin K.O ({B.g} : Set B.A) with hR
@@ -91,13 +114,14 @@ theorem exists_unr_embedding_any : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g =
   have hzint : IsIntegral K.O z :=
     ⟨_, monic_X_pow_sub_C (1 : K.O) hN, by rw [← aeval_def]; simp [hzN]⟩
   have hmdvd : minpoly K.O z ∣ X ^ N - C 1 := minpoly.isIntegrallyClosed_dvd hzint (by simp [hzN])
-  obtain ⟨yR, hyR⟩ := GlobalTheory.T.exists_root_of_monic_dvd_X_pow_card_sub_one R ((minpoly K.O z).map (algebraMap K.O R))
-    ((minpoly.monic hzint).map _)
-    (by rw [(minpoly.monic hzint).natDegree_map]; exact (minpoly.natDegree_pos hzint).ne')
-    (by
-      rw [hcardR]
-      have := Polynomial.map_dvd (algebraMap K.O R) hmdvd
-      simpa using this)
+  obtain ⟨yR, hyR⟩ :=
+    GlobalTheory.T.exists_root_of_monic_dvd_X_pow_card_sub_one R
+      ((minpoly K.O z).map (algebraMap K.O R)) ((minpoly.monic hzint).map _)
+      (by rw [(minpoly.monic hzint).natDegree_map]; exact (minpoly.natDegree_pos hzint).ne')
+      (by
+        rw [hcardR]
+        have := Polynomial.map_dvd (algebraMap K.O R) hmdvd
+        simpa using this)
   have hyN : yR ^ N = 1 := by
     obtain ⟨h, hh⟩ := hmdvd
     have := congrArg (fun p => (p.map (algebraMap K.O R)).eval yR) hh
@@ -135,16 +159,19 @@ theorem exists_unr_embedding_any : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g =
       by_contra hc
       exact hres ((IsLocalRing.mem_maximalIdeal _).2 hc)
     exact (IsLocalRing.mem_maximalIdeal _).1 h2 (hu'.map _)
-  obtain ⟨hfr1, hfr2⟩ := GlobalTheory.T.involution_residue_pow_and_roots_of_unity R K'.q hcardR τR hτ2 ⟨_, hne⟩
+  obtain ⟨hfr1, hfr2⟩ :=
+    GlobalTheory.T.involution_residue_pow_and_roots_of_unity R K'.q hcardR τR hτ2 ⟨_, hne⟩
   choose τ' hτ' using K'.c_int
   have hinj' : Function.Injective (algebraMap K'.O K'.E) := IsFractionRing.injective _ _
-  let cO : K'.O →+* K'.O :=
-    { toFun := τ'
-      map_one' := hinj' (by rw [← hτ']; simp)
-      map_mul' := fun a b => hinj' (by simp [← hτ'])
-      map_zero' := hinj' (by rw [← hτ']; simp)
-      map_add' := fun a b => hinj' (by simp [← hτ']) }
-  have hcO : ∀ x, algebraMap K'.O K'.E (cO x) = K'.c (algebraMap K'.O K'.E x) := fun x => (hτ' x).symm
+  let cO : K'.O →+* K'.O := {
+    toFun := τ'
+    map_one' := hinj' (by rw [← hτ']; simp)
+    map_mul' := fun a b => hinj' (by simp [← hτ'])
+    map_zero' := hinj' (by rw [← hτ']; simp)
+    map_add' := fun a b => hinj' (by simp [← hτ'])
+  }
+  have hcO : ∀ x, algebraMap K'.O K'.E (cO x) = K'.c (algebraMap K'.O K'.E x) := fun x =>
+    (hτ' x).symm
   have hc2 : ∀ x, cO (cO x) = x := fun x => hinj' (by rw [hcO, hcO, K'.c_c])
   obtain ⟨a', b', hab', hres'⟩ := K'.c_res
   have hne' : residue K'.O (cO a') ≠ residue K'.O a' := by
@@ -153,13 +180,13 @@ theorem exists_unr_embedding_any : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g =
     intro h
     apply hres'
     rw [← IsLocalRing.residue_eq_zero_iff, map_sub, h, sub_self]
-  obtain ⟨-, hfc⟩ := GlobalTheory.T.involution_residue_pow_and_roots_of_unity K'.O K'.q K'.card_res cO hc2 ⟨_, hne'⟩
+  obtain ⟨-, hfc⟩ :=
+    GlobalTheory.T.involution_residue_pow_and_roots_of_unity K'.O K'.q K'.card_res cO hc2 ⟨_, hne'⟩
   obtain ⟨zO, hzO⟩ : ∃ zO : K'.O, algebraMap K'.O K'.E zO = z :=
     IsIntegrallyClosed.isIntegral_iff.1
       ⟨_, monic_X_pow_sub_C (1 : K'.O) hN, by rw [← aeval_def]; simp [hzN]⟩
   have hzON : zO ^ N = 1 := hinj' (by rw [map_pow, hzO, hzN, map_one])
-  have hcz : K'.c z = z ^ K'.q := by
-    rw [← hzO, ← hcO, hfc zO hzON, map_pow]
+  have hcz : K'.c z = z ^ K'.q := by rw [← hzO, ← hcO, hfc zO hzON, map_pow]
   have hσz : B.σ (ψ z) = ψ (K'.c z) := by
     rw [hψz, ← hτR, hfr2 yR hyN, hcz, map_pow, hψz]
     rfl
@@ -176,7 +203,9 @@ theorem exists_unr_embedding_any : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g =
 
   have hO : ∀ y : K'.O, ψ (algebraMap K'.O K'.E y) ∈ R := by
     intro y
-    have hadj := GlobalTheory.T.adjoin_primitiveRoot_eq_integers_unramifiedQuadratic K K' d φ hU hd z hzp hzadj _ (GlobalTheory.T.isIntegral_integers_unramifiedInvolutionExt K K' d φ hU hd y)
+    have hadj :=
+      GlobalTheory.T.adjoin_primitiveRoot_eq_integers_unramifiedQuadratic K K' d φ hU hd z hzp hzadj
+        _ (GlobalTheory.T.isIntegral_integers_unramifiedInvolutionExt K K' d φ hU hd y)
     generalize algebraMap K'.O K'.E y = x at hadj ⊢
     induction hadj using Algebra.adjoin_induction with
     | mem x hx => rw [Set.mem_singleton_iff.1 hx, hψz]; exact yR.2
@@ -191,14 +220,17 @@ theorem exists_unr_embedding_any : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g =
   have hcoe : ∀ n : ℕ, ((yR ^ n : R) : B.A) = ψ (z ^ n) := fun n => by rw [map_pow, hψz]; rfl
   have hwp : IsPrimitiveRoot (residue R yR) N := by
     refine ⟨by rw [← map_pow, hyN, map_one], fun l hl => hzp.dvd_of_pow_eq_one l ?_⟩
-    have h1 : yR ^ l = 1 := pow_eq_one_eq_of_residue hNR
-      (by rw [← pow_mul, mul_comm, pow_mul, hyN, one_pow]) (one_pow N) (by rw [map_pow, hl, map_one])
+    have h1 : yR ^ l = 1 :=
+      pow_eq_one_eq_of_residue hNR (by rw [← pow_mul, mul_comm, pow_mul, hyN, one_pow]) (one_pow N)
+        (by rw [map_pow, hl, map_one])
     apply hψi
     rw [← hcoe, h1, map_one]
     rfl
   set gR : R := ⟨B.g, Algebra.self_mem_adjoin_singleton K.O B.g⟩ with hgR
   have hgu : gR * τR gR = 1 := Subtype.ext hu
-  have hg0 : residue R gR ≠ 0 := (IsUnit.map (residue R) (⟨⟨gR, τR gR, hgu, by rw [mul_comm]; exact hgu⟩, rfl⟩ : IsUnit gR)).ne_zero
+  have hg0 : residue R gR ≠ 0 :=
+    (IsUnit.map (residue R)
+      (⟨⟨gR, τR gR, hgu, by rw [mul_comm]; exact hgu⟩, rfl⟩ : IsUnit gR)).ne_zero
   have hgN : residue R gR ^ N = 1 := by
     haveI := Fintype.ofFinite (ResidueField R)
     have := FiniteField.pow_card_sub_one_eq_one _ hg0
@@ -211,8 +243,9 @@ theorem exists_unr_embedding_any : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g =
   · set e := j + j * K'.q with he
     have hres : residue R (yR ^ e) = 1 := by
       rw [map_pow, he, pow_add, pow_mul, hj, ← hfr1 gR, ← map_mul, hgu, map_one]
-    have hye : yR ^ e = 1 := pow_eq_one_eq_of_residue hNR
-      (by rw [← pow_mul, mul_comm, pow_mul, hyN, one_pow]) (one_pow N) (by rw [hres, map_one])
+    have hye : yR ^ e = 1 :=
+      pow_eq_one_eq_of_residue hNR (by rw [← pow_mul, mul_comm, pow_mul, hyN, one_pow]) (one_pow N)
+        (by rw [hres, map_one])
     rw [hs, map_pow, hcz, ← pow_mul, ← pow_add, mul_comm K'.q j, ← he]
     apply hψi
     rw [← hcoe, hye, map_one]

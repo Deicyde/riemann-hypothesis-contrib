@@ -12,8 +12,8 @@ variable {R R' : Type} [CommRing R] [CommRing R']
 
 private theorem adj_mul' (X Y : M4 R) : adj (X * Y) = adj Y * adj X := by
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [adj_apply, sgn, Fin.rev, Matrix.mul_apply, Fin.sum_univ_four] <;> ring
+  fin_cases i <;> fin_cases j
+    <;> simp [adj_apply, sgn, Fin.rev, Matrix.mul_apply, Fin.sum_univ_four] <;> ring
 
 private theorem adj_adj' (X : M4 R) : adj (adj X) = X := by
   ext i j
@@ -40,8 +40,11 @@ private theorem adj_map' (f : R →+* R') (X : M4 R) : f.mapMatrix (adj X) = adj
   ext i j
   simp only [adj_apply, RingHom.mapMatrix_apply, Matrix.map_apply, map_zsmul]
 
-private theorem isUnit_of_res {E B : Type} [Field E] [CommRing B] [Algebra E B] (π : B →ₐ[E] E)
-    (hπ : ∀ a, π a = 0 → IsNilpotent a) (M : M4 B) (h : IsUnit ((π : B →+* E).mapMatrix M)) : IsUnit M := by
+private theorem isUnit_of_res
+    {E B : Type} [Field E] [CommRing B] [Algebra E B]
+    (π : B →ₐ[E] E) (hπ : ∀ a, π a = 0 → IsNilpotent a)
+    (M : M4 B) (h : IsUnit ((π : B →+* E).mapMatrix M))
+    : IsUnit M := by
   rw [Matrix.isUnit_iff_isUnit_det] at h ⊢
   rw [← RingHom.map_det] at h
   have h1 : IsUnit (algebraMap E B (π M.det)) := IsUnit.map (algebraMap E B) h
@@ -51,14 +54,22 @@ private theorem isUnit_of_res {E B : Type} [Field E] [CommRing B] [Algebra E B] 
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.lift_symplectic_similitude_nilpotent :
-    ∀ {E B B' : Type} [Field E] [CharZero E] [CommRing B] [CommRing B'] [Algebra E B] [Algebra E B'] (π : B →ₐ[E] E) (hπ : ∀ a, π a = 0 → IsNilpotent a) (π' : B' →ₐ[E] E) (hπ' : ∀ a, π' a = 0 → IsNilpotent a) (p : B →ₐ[E] B'), Function.Surjective p → π'.comp p = π → ∀ h' : (M4 B')ˣ, IsGSp 1 (h' : M4 B') → (h' : M4 B').map π' = 1 → ∃ h : (M4 B)ˣ, IsGSp 1 (h : M4 B) ∧ (h : M4 B).map π = 1 ∧ (h : M4 B).map p = (h' : M4 B') := by
+theorem UpperTheory.lift_symplectic_similitude_nilpotent
+    : ∀ {E B B' : Type} [Field E] [CharZero E] [CommRing B] [CommRing B'] [Algebra E B]
+        [Algebra E B'] (π : B →ₐ[E] E) (hπ : ∀ a, π a = 0 → IsNilpotent a) (π' : B' →ₐ[E] E)
+        (hπ' : ∀ a, π' a = 0 → IsNilpotent a) (p : B →ₐ[E] B'),
+      Function.Surjective p → π'.comp p = π
+        → ∀ h' : (M4 B')ˣ,
+          IsGSp 1 (h' : M4 B') → (h' : M4 B').map π' = 1
+            → ∃ h : (M4 B)ˣ,
+              IsGSp 1 (h : M4 B) ∧ (h : M4 B).map π = 1 ∧ (h : M4 B).map p = (h' : M4 B') := by
   intro E B B' _ _ _ _ _ _ π hπ π' hπ' p hp hc h' hG hr
   generalize (h' : M4 B') = g at hG hr ⊢
   have hG' : adj g * g = 1 := by simpa [IsGSp] using hG
   have hr' : (π' : B' →+* E).mapMatrix g = 1 := hr
-  have hcomp : ∀ X : M4 B, (π : B →+* E).mapMatrix X =
-      (π' : B' →+* E).mapMatrix ((p : B →+* B').mapMatrix X) := by
+  have hcomp
+      : ∀ X : M4 B,
+        (π : B →+* E).mapMatrix X = (π' : B' →+* E).mapMatrix ((p : B →+* B').mapMatrix X) := by
     intro X
     ext i j
     subst hc
@@ -83,21 +94,30 @@ theorem UpperTheory.lift_symplectic_similitude_nilpotent :
     rw [map_mul, map_sub, map_one, hr', sub_self, hU, hu0.mul_right_eq_zero] at this
     exact this
   have hadj : adj Y' = -Y' := by
-    have hT : IsUnit (adj (U : M4 B')) :=
-      ⟨⟨adj (U : M4 B'), adj (↑U⁻¹ : M4 B'), by rw [← adj_mul', Units.inv_mul, adj_one'],
-        by rw [← adj_mul', Units.mul_inv, adj_one']⟩, rfl⟩
+    have hT : IsUnit (adj (U : M4 B')) := ⟨
+      ⟨
+        adj (U : M4 B'),
+        adj (↑U⁻¹ : M4 B'),
+        by rw [← adj_mul', Units.inv_mul, adj_one'],
+        by rw [← adj_mul', Units.mul_inv, adj_one']
+      ⟩,
+      rfl
+    ⟩
     rw [← add_eq_zero_iff_eq_neg, ← hT.mul_right_eq_zero, ← U.isUnit.mul_left_eq_zero]
-    have : adj (U : M4 B') * (adj Y' + Y') * (U : M4 B') =
-        adj (Y' * (U : M4 B')) * (U : M4 B') + adj (U : M4 B') * (Y' * (U : M4 B')) := by
+    have : adj (U : M4 B') * (adj Y' + Y') * (U : M4 B')
+        = adj (Y' * (U : M4 B')) * (U : M4 B') + adj (U : M4 B') * (Y' * (U : M4 B')) := by
       rw [adj_mul']; noncomm_ring
     rw [this, e2, hU, adj_sub', adj_add', adj_one']
-    have e3 : (adj g - 1) * (1 + g) + (1 + adj g) * (g - 1) =
-        (adj g * g - 1) + (adj g * g - 1) := by noncomm_ring
+    have e3
+        : (adj g - 1) * (1 + g) + (1 + adj g) * (g - 1) = (adj g * g - 1) + (adj g * g - 1) := by
+      noncomm_ring
     rw [e3, hG', sub_self, add_zero]
-  obtain ⟨Z, hZ⟩ : ∃ Z : M4 B, (p : B →+* B').mapMatrix Z = Y' :=
-    ⟨Matrix.of fun i j => (hp (Y' i j)).choose, by
+  obtain ⟨Z, hZ⟩ : ∃ Z : M4 B, (p : B →+* B').mapMatrix Z = Y' := ⟨
+    Matrix.of fun i j => (hp (Y' i j)).choose,
+    by
       ext i j
-      exact (hp (Y' i j)).choose_spec⟩
+      exact (hp (Y' i j)).choose_spec
+  ⟩
   obtain ⟨Y, hY, hYa⟩ : ∃ Y : M4 B, (p : B →+* B').mapMatrix Y = Y' ∧ adj Y = -Y := by
     refine ⟨algebraMap E B 2⁻¹ • (Z - adj Z), ?_, ?_⟩
     · have h1 : (p : B →+* B').mapMatrix (Z - adj Z) = Y' + Y' := by
@@ -110,8 +130,10 @@ theorem UpperTheory.lift_symplectic_similitude_nilpotent :
       rw [map_mul, h2, AlgHom.commutes, ← two_mul, ← mul_assoc, h3, one_mul]
     · rw [adj_smul', adj_sub', adj_adj', ← smul_neg, neg_sub]
   have hY0 : (π : B →+* E).mapMatrix Y = 0 := by rw [hcomp, hY, hY'0]
-  obtain ⟨V, hV⟩ := isUnit_of_res π hπ (1 - Y) (by rw [map_sub, map_one, hY0, sub_zero]; exact isUnit_one)
-  obtain ⟨V', hV'⟩ := isUnit_of_res π hπ (1 + Y) (by rw [map_add (f := _), map_one, hY0, add_zero]; exact isUnit_one)
+  obtain ⟨V, hV⟩ :=
+    isUnit_of_res π hπ (1 - Y) (by rw [map_sub, map_one, hY0, sub_zero]; exact isUnit_one)
+  obtain ⟨V', hV'⟩ :=
+    isUnit_of_res π hπ (1 + Y) (by rw [map_add (f := _), map_one, hY0, add_zero]; exact isUnit_one)
   have e4 : ((V' * V⁻¹ : (M4 B)ˣ) : M4 B) * (1 - Y) = 1 + Y := by
     rw [← hV, ← hV', Units.val_mul, Units.inv_mul_cancel_right]
   refine ⟨V' * V⁻¹, ?_⟩
@@ -130,8 +152,8 @@ theorem UpperTheory.lift_symplectic_similitude_nilpotent :
     have a2 : adj (1 + Y) = 1 - Y := by rw [adj_add', adj_one', hYa, sub_eq_add_neg]
     unfold IsGSp
     rw [one_smul, ← sub_eq_zero, ← hT.mul_right_eq_zero, ← hT'.mul_left_eq_zero]
-    have : (1 + Y) * (adj h * h - 1) * (1 - Y) =
-        adj (h * (1 - Y)) * (h * (1 - Y)) - (1 + Y) * (1 - Y) := by
+    have : (1 + Y) * (adj h * h - 1) * (1 - Y)
+        = adj (h * (1 - Y)) * (h * (1 - Y)) - (1 + Y) * (1 - Y) := by
       rw [adj_mul', a1]
       simp only [mul_sub (1 + Y) (adj h * h), sub_mul _ _ (1 - Y), mul_one, mul_assoc]
     rw [this, e4, a2]

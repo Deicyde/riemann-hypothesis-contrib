@@ -11,10 +11,11 @@ open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Metric
 
-theorem harmonicAt_update_of_levi_eq_zero :
-    ∀ (n : ℕ) (φ : (Fin n → ℂ) → ℝ) (O : Set (Fin n → ℂ)), IsOpen O → ContDiffOn ℝ ∞ φ O →
-      (∀ z ∈ O, ∀ w, levi φ z w = 0) → ∀ z ∈ O, ∀ i,
-        InnerProductSpace.HarmonicAt (fun t : ℂ => φ (Function.update z i t)) (z i) := by
+theorem harmonicAt_update_of_levi_eq_zero
+    : ∀ (n : ℕ) (φ : (Fin n → ℂ) → ℝ) (O : Set (Fin n → ℂ)),
+      IsOpen O → ContDiffOn ℝ ∞ φ O → (∀ z ∈ O, ∀ w, levi φ z w = 0)
+        → ∀ z ∈ O, ∀ i,
+          InnerProductSpace.HarmonicAt (fun t : ℂ => φ (Function.update z i t)) (z i) := by
   intro n φ O hO hφ hl z hz i
   set e : Fin n → ℂ := Pi.single i 1 with he
   let L : ℂ →L[ℝ] (Fin n → ℂ) := ((ContinuousLinearMap.id ℂ ℂ).smulRight e).restrictScalars ℝ
@@ -36,13 +37,16 @@ theorem harmonicAt_update_of_levi_eq_zero :
     rw [← hupd]
     simpa using hz
   have hφ2 : ∀ y ∈ O, ContDiffAt ℝ 2 φ y := fun y hy =>
-    ((hφ y hy).contDiffAt (hO.mem_nhds hy)).of_le (by first | exact WithTop.coe_le_coe.mpr le_top | simp)
-  have hlap : ∀ t ∈ (fun t : ℂ => z0 + t • e) ⁻¹' O,
-      Laplacian.laplacian (fun t : ℂ => φ (z0 + t • e)) t = 0 := by
+    ((hφ y hy).contDiffAt (hO.mem_nhds hy)).of_le
+      (by first | exact WithTop.coe_le_coe.mpr le_top | simp)
+  have hlap
+      : ∀ t ∈ (fun t : ℂ => z0 + t • e) ⁻¹' O,
+        Laplacian.laplacian (fun t : ℂ => φ (z0 + t • e)) t = 0 := by
     intro t ht
     have hy : z0 + t • e ∈ O := ht
-    have h1 : fderiv ℝ (fun w : ℂ => φ (z0 + w • e)) =ᶠ[𝓝 t]
-        fun w : ℂ => (fderiv ℝ φ (z0 + w • e)).comp L := by
+    have h1
+        : fderiv ℝ (fun w : ℂ => φ (z0 + w • e)) =ᶠ[𝓝 t]
+          fun w : ℂ => (fderiv ℝ φ (z0 + w • e)).comp L := by
       filter_upwards [hU.mem_nhds ht] with w hw
       exact (((hφ2 _ hw).differentiableAt (by simp)).hasFDerivAt.comp w (hline w)).fderiv
     have hD : HasFDerivAt (fderiv ℝ φ) (fderiv ℝ (fderiv ℝ φ) (z0 + t • e)) (z0 + t • e) :=

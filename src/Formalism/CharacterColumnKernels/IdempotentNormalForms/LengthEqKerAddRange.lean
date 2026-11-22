@@ -38,7 +38,8 @@ lemma annih_anti {O Cw Cs P : Type*} [CommRing O] [AddCommGroup Cw] [Module O Cw
 
 section Sel
 
-variable {O C ι : Type*} [CommRing O] [AddCommGroup C] [Module O C]
+variable
+  {O C ι : Type*} [CommRing O] [AddCommGroup C] [Module O C]
   {Cw : ι → Type*} [∀ w, AddCommGroup (Cw w)] [∀ w, Module O (Cw w)]
 
 lemma mem_sel (what₂ : Finset ι) (res : ∀ w, C →ₗ[O] Cw w) (G : ∀ w, Submodule O (Cw w))
@@ -46,13 +47,15 @@ lemma mem_sel (what₂ : Finset ι) (res : ∀ w, C →ₗ[O] Cw w) (G : ∀ w, 
     x ∈ Q ⊓ ⨅ w ∈ what₂, (G w).comap (res w) ↔ x ∈ Q ∧ ∀ w ∈ what₂, res w x ∈ G w := by
   simp [Submodule.mem_inf, Submodule.mem_iInf]
 
-def relaxMap (what₂ : Finset ι) (res : ∀ w, C →ₗ[O] Cw w) (F F' : ∀ w, Submodule O (Cw w))
-    (Q : Submodule O C) :
-    ↥(Q ⊓ ⨅ w ∈ what₂, (F' w).comap (res w)) →ₗ[O]
-      ((w : what₂) → (F' w.1 ⧸ (F w.1).comap (F' w.1).subtype)) :=
-  LinearMap.pi fun w => (Submodule.mkQ _) ∘ₗ
-    ((res w.1 ∘ₗ Submodule.subtype _).codRestrict (F' w.1)
-      fun x => ((mem_sel what₂ res F' Q x.1).mp x.2).2 w.1 w.2)
+def relaxMap
+    (what₂ : Finset ι) (res : ∀ w, C →ₗ[O] Cw w) (F F' : ∀ w, Submodule O (Cw w))
+    (Q : Submodule O C)
+    : ↥(Q ⊓ ⨅ w ∈ what₂, (F' w).comap (res w)) →ₗ[O]
+        ((w : what₂) → (F' w.1 ⧸ (F w.1).comap (F' w.1).subtype)) :=
+  LinearMap.pi fun w =>
+    (Submodule.mkQ _)
+      ∘ₗ ((res w.1 ∘ₗ Submodule.subtype _).codRestrict (F' w.1) fun x =>
+        ((mem_sel what₂ res F' Q x.1).mp x.2).2 w.1 w.2)
 
 end Sel
 
@@ -63,11 +66,12 @@ theorem lenChain : StatLenChain := by
   let φ : LinearMap.range Ψ →ₗ[O] C := cl ∘ₗ (LinearMap.range Ψ).subtype
   have h1 := IdempotentNormalFormsRhoFacts.length_eq_ker_add_range Ψ
   have h2 := IdempotentNormalFormsRhoFacts.length_eq_ker_add_range φ
-  have hk : Module.length O (LinearMap.ker φ) ≤
-      Module.length O ↥(LinearMap.range Ψ ⊓ LinearMap.ker cl) := by
+  have hk
+      : Module.length O (LinearMap.ker φ)
+        ≤ Module.length O ↥(LinearMap.range Ψ ⊓ LinearMap.ker cl) := by
     refine Module.length_le_of_injective
-      (((LinearMap.range Ψ).subtype ∘ₗ (LinearMap.ker φ).subtype).codRestrict _
-        fun x => Submodule.mem_inf.mpr ⟨x.1.2, LinearMap.mem_ker.mpr (LinearMap.mem_ker.mp x.2)⟩)
+      (((LinearMap.range Ψ).subtype ∘ₗ (LinearMap.ker φ).subtype).codRestrict _ fun x =>
+        Submodule.mem_inf.mpr ⟨x.1.2, LinearMap.mem_ker.mpr (LinearMap.mem_ker.mp x.2)⟩)
       ?_
     intro x y hxy
     have := congrArg Subtype.val hxy
@@ -85,7 +89,8 @@ namespace IdempotentNormalFormsRhoFacts
 
 section Sel2
 
-variable {O C ι : Type*} [CommRing O] [AddCommGroup C] [Module O C]
+variable
+  {O C ι : Type*} [CommRing O] [AddCommGroup C] [Module O C]
   {Cw : ι → Type*} [∀ w, AddCommGroup (Cw w)] [∀ w, Module O (Cw w)]
   (what₂ : Finset ι) (res : ∀ w, C →ₗ[O] Cw w) (F F' : ∀ w, Submodule O (Cw w)) (Q : Submodule O C)
 
@@ -123,7 +128,9 @@ end IdempotentNormalFormsRhoFacts
 
 theorem selRelax : StatSelRelax := by
   intro O C ι _ _ _ what₂ Cw _ _ res F F' Q _
-  rw [IdempotentNormalFormsRhoFacts.length_eq_ker_add_range (IdempotentNormalFormsRhoFacts.relaxMap what₂ res F F' Q), ← IdempotentNormalFormsRhoFacts.length_pi_rows]
+  rw [IdempotentNormalFormsRhoFacts.length_eq_ker_add_range (IdempotentNormalFormsRhoFacts.relaxMap
+      what₂ res F F' Q),
+    ← IdempotentNormalFormsRhoFacts.length_pi_rows]
   gcongr
   · exact IdempotentNormalFormsRhoFacts.length_ker_relaxMap_le what₂ res F F' Q
   · exact Module.length_le_of_injective (Submodule.subtype _) Subtype.val_injective
@@ -131,12 +138,14 @@ theorem selRelax : StatSelRelax := by
 theorem annColength : StatAnnColength := by
   intro O Cw Cs _ _ _ _ _ _ _ pr Fs Im hle
   let I' : Submodule O Fs := Im.comap Fs.subtype
-  let Φ : annih pr Im →ₗ[O] ((Fs ⧸ I') →ₗ[O] KO O) :=
-    { toFun := fun c => I'.liftQ (pr c.1 ∘ₗ Fs.subtype) (fun x hx => by
+  let Φ : annih pr Im →ₗ[O] ((Fs ⧸ I') →ₗ[O] KO O) := {
+    toFun := fun c =>
+      I'.liftQ (pr c.1 ∘ₗ Fs.subtype) (fun x hx => by
         simp only [LinearMap.mem_ker, LinearMap.comp_apply, Submodule.subtype_apply]
         exact (IdempotentNormalFormsRhoFacts.mem_annih pr Im c.1).1 c.2 x.1 hx)
-      map_add' := fun a b => by ext x; simp
-      map_smul' := fun r a => by ext x; simp }
+    map_add' := fun a b => by ext x; simp
+    map_smul' := fun r a => by ext x; simp
+  }
   have hker : LinearMap.ker Φ ≤ (annih pr Fs).comap (annih pr Im).subtype := by
     intro c hc
     rw [Submodule.mem_comap, Submodule.subtype_apply, IdempotentNormalFormsRhoFacts.mem_annih]
@@ -154,18 +163,20 @@ theorem annColength : StatAnnColength := by
   swap
   · rw [← Module.length_ne_top_iff, ne_eq, not_not] at hfinQ
     exact hfinQ ▸ le_top
-  calc _ ≤ Module.length O ((Fs ⧸ I') →ₗ[O] KO O) := Module.length_le_of_injective _ hinj
+  calc
+    _ ≤ Module.length O ((Fs ⧸ I') →ₗ[O] KO O) := Module.length_le_of_injective _ hinj
     _ = _ := matlis O (Fs ⧸ I') hfinQ
 
 theorem torsLen : StatTorsLen := by
   classical
   intro O _ _ _ d _ δ
-  have hmap : DistribSMul.toLinearMap O (d → KO O) (δ * δ) =
-      matQ O (Matrix.diagonal fun _ : d => δ * δ) := by
+  have hmap
+      : DistribSMul.toLinearMap O (d → KO O) (δ * δ)
+        = matQ O (Matrix.diagonal fun _ : d => δ * δ) := by
     refine LinearMap.ext fun v => funext fun i => ?_
     simp [matQ, relMap, Matrix.diagonal_apply, ite_smul]
-  rw [hmap, lenKer, Matrix.det_diagonal, Finset.prod_const, Finset.card_univ,
-    AddValuation.map_pow, AddValuation.map_mul, two_mul, nsmul_eq_mul]
+  rw [hmap, lenKer, Matrix.det_diagonal, Finset.prod_const, Finset.card_univ, AddValuation.map_pow,
+    AddValuation.map_mul, two_mul, nsmul_eq_mul]
 
 namespace IdempotentNormalFormsRhoFacts
 

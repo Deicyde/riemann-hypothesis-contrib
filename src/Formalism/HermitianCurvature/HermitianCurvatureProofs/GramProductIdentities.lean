@@ -12,8 +12,9 @@ open scoped ComplexOrder MatrixOrder Matrix.Norms.L2Operator
 
 section Rep
 
-variable {A S V : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype S] [DecidableEq S]
-  [AddCommGroup V] [Module ℂ V] [Module A V] [IsScalarTower ℂ A V]
+variable
+  {A S V : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype S] [DecidableEq S] [AddCommGroup V]
+  [Module ℂ V] [Module A V] [IsScalarTower ℂ A V]
 
 end Rep
 
@@ -21,9 +22,22 @@ section CS
 
 variable {M : Type} [AddCommGroup M] [Module ℂ M]
 
-theorem cs_of_pos (Ξ : F7.Sesq M) (h : ∀ m, 0 ≤ (Ξ m m).re ∧ (Ξ m m).im = 0) (x y : M) :
-    ‖Ξ x y‖ ^ 2 ≤ (Ξ x x).re * (Ξ y y).re := by
-  first | exact Bl.HermitianSesquilinear.goal1 .. | (apply Bl.HermitianSesquilinear.goal1 <;> assumption) | (intros; apply Bl.HermitianSesquilinear.goal1 <;> assumption) | (apply @Bl.HermitianSesquilinear.goal1 <;> assumption) | (intros; apply @Bl.HermitianSesquilinear.goal1 <;> assumption) | (apply @Bl.HermitianSesquilinear.goal1 <;> first | assumption | infer_instance) | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› Ξ h x y | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› Ξ h x | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› Ξ h | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› Ξ | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› | exact @Bl.HermitianSesquilinear.goal1 M ‹_› | exact @Bl.HermitianSesquilinear.goal1 M
+theorem cs_of_pos (Ξ : F7.Sesq M) (h : ∀ m, 0 ≤ (Ξ m m).re ∧ (Ξ m m).im = 0) (x y : M)
+    : ‖Ξ x y‖ ^ 2 ≤ (Ξ x x).re * (Ξ y y).re := by
+  first
+  | exact Bl.HermitianSesquilinear.goal1 ..
+  | (apply Bl.HermitianSesquilinear.goal1 <;> assumption)
+  | (intros; apply Bl.HermitianSesquilinear.goal1 <;> assumption)
+  | (apply @Bl.HermitianSesquilinear.goal1 <;> assumption)
+  | (intros; apply @Bl.HermitianSesquilinear.goal1 <;> assumption)
+  | (apply @Bl.HermitianSesquilinear.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› Ξ h x y
+  | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› Ξ h x
+  | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› Ξ h
+  | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_› Ξ
+  | exact @Bl.HermitianSesquilinear.goal1 M ‹_› ‹_›
+  | exact @Bl.HermitianSesquilinear.goal1 M ‹_›
+  | exact @Bl.HermitianSesquilinear.goal1 M
 
 end CS
 
@@ -38,16 +52,19 @@ theorem exp_le_one_add {x : ℝ} (hx : |x| ≤ 1 / 2) : Real.exp (-2 * |x|) ≤ 
     have h1 : 1 + 2 * u ≤ Real.exp (2 * u) := by linarith [Real.add_one_le_exp (2 * u)]
     have h2 : Real.exp (-2 * u) * Real.exp (2 * u) = 1 := by rw [← Real.exp_add]; simp
     have h3 : Real.exp (-2 * u) * (1 + 2 * u) ≤ 1 := by
-      calc Real.exp (-2 * u) * (1 + 2 * u) ≤ Real.exp (-2 * u) * Real.exp (2 * u) :=
-            mul_le_mul_of_nonneg_left h1 (Real.exp_pos _).le
+      calc
+        Real.exp (-2 * u) * (1 + 2 * u)
+          ≤ Real.exp (-2 * u) * Real.exp (2 * u) := mul_le_mul_of_nonneg_left h1 (Real.exp_pos _).le
         _ = 1 := h2
     rw [hu]
     have he := Real.exp_pos (-2 * u)
     nlinarith [mul_nonneg hu0 (by linarith : (0:ℝ) ≤ 1 - 2 * u)]
 
-theorem prod_bounds {ι : Type} (g : ι → ℝ) (ε : ℝ) (hε : ε ≤ 1 / 2) :
-    ∀ w : List ι, (∀ l ∈ w, |g l - 1| ≤ ε) →
-      Real.exp (-2 * ε * w.length) ≤ (w.map g).prod ∧ (w.map g).prod ≤ Real.exp (ε * w.length) := by
+theorem prod_bounds {ι : Type} (g : ι → ℝ) (ε : ℝ) (hε : ε ≤ 1 / 2)
+    : ∀ w : List ι,
+      (∀ l ∈ w, |g l - 1| ≤ ε)
+        → Real.exp (-2 * ε * w.length) ≤ (w.map g).prod
+          ∧ (w.map g).prod ≤ Real.exp (ε * w.length) := by
   intro w
   induction w with
   | nil => intro _; simp
@@ -65,7 +82,9 @@ theorem prod_bounds {ι : Type} (g : ι → ℝ) (ε : ℝ) (hε : ε ≤ 1 / 2)
       have : Real.exp (g l - 1) ≤ Real.exp ε := Real.exp_le_exp.mpr (le_trans (le_abs_self _) hl)
       linarith
     simp only [List.map_cons, List.prod_cons, List.length_cons, Nat.cast_add, Nat.cast_one]
-    have e1 : Real.exp (-2 * ε * (w.length + 1)) = Real.exp (-2 * ε) * Real.exp (-2 * ε * w.length) := by
+    have e1
+        : Real.exp (-2 * ε * (w.length + 1))
+          = Real.exp (-2 * ε) * Real.exp (-2 * ε * w.length) := by
       rw [← Real.exp_add]; ring_nf
     have e2 : Real.exp (ε * (w.length + 1)) = Real.exp ε * Real.exp (ε * w.length) := by
       rw [← Real.exp_add]; ring_nf
@@ -97,7 +116,7 @@ theorem qProduct : QProduct := by
 
 theorem lemmaQ : LemmaQ := by
   intro S _ _ q w N dl Y hN hw hdl hpts hq
-  have hN' : (4:ℝ) ≤ N := by exact_mod_cast hN
+  have hN' : (4 : ℝ) ≤ N := by exact_mod_cast hN
   have hdlpos : 0 < dl := by nlinarith
   set g : Letter ℝ S → ℝ := fun l => if l.plus then 1 + 1 / (Y - l.pt) else 1 + 1 / (l.pt - Y - 1)
     with hg
@@ -146,8 +165,13 @@ theorem dkStep4 : DKStep4 := by
   | cons l L ih =>
     have hl : l.plus = true := hL l (by simp)
     have hL' : ∀ l' ∈ L, l'.plus = true := fun l' h => hL l' (by simp [h])
-    have h1 : (L.map fun l' => if l.plus = l'.plus then (1:ℂ)
-        else 1 - ((l.pt - l'.pt + (if l.plus then 1 else -1)) ^ 2)⁻¹).prod = 1 := by
+    have h1
+        : (L.map fun l' =>
+            if l.plus = l'.plus then
+              (1 : ℂ)
+            else
+              1 - ((l.pt - l'.pt + (if l.plus then 1 else -1)) ^ 2)⁻¹).prod
+          = 1 := by
       apply List.prod_eq_one
       intro x hx
       simp only [List.mem_map] at hx
@@ -160,4 +184,6 @@ theorem dkStep4 : DKStep4 := by
 
 end Formalism.FourierDecayAlt.P.GramProductIdentities
 
-theorem Formalism.FourierDecayAlt.P.lemma_Q_estimate : Formalism.FourierDecayAlt.FormPairingAction.LemmaQ := Formalism.FourierDecayAlt.P.GramProductIdentities.lemmaQ
+theorem Formalism.FourierDecayAlt.P.lemma_Q_estimate
+    : Formalism.FourierDecayAlt.FormPairingAction.LemmaQ :=
+  Formalism.FourierDecayAlt.P.GramProductIdentities.lemmaQ

@@ -297,10 +297,14 @@ lemma LL_good (lf : Measure (A F)) (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) =
   refine ⟨isCompact_Gs g hOc, isOpen_Gs hg hOo, isCompact_Gs _ hPc, isOpen_Gs (det_inv_ne hh) hPo,
     Gs_mono g hPP, mass_one lf hlf h1 hB hg hPo.measurableSet hP⟩
 
-theorem naQuad : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)] [BorelSpace (A F)]
-    (lf : Measure (A F)), lf.IsAddHaarMeasure → lf (Oh F) = 1 →
-    ∀ ψ : AddChar (A F) ℂ, IsStdChar F ψ → ∀ (ι : Type) [Fintype ι] [DecidableEq ι]
-    (B : Matrix ι ι F), B.IsSymm → B.det ≠ 0 → NAQuad ψ (hf F) (Bf B) (muF B lf) := by
+theorem naQuad
+    : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)] [BorelSpace (A F)]
+        (lf : Measure (A F)),
+      lf.IsAddHaarMeasure → lf (Oh F) = 1
+        → ∀ ψ : AddChar (A F) ℂ,
+          IsStdChar F ψ
+            → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι F),
+              B.IsSymm → B.det ≠ 0 → NAQuad ψ (hf F) (Bf B) (muF B lf) := by
   intro F _ _ _ _ lf hlf h1 ψ hψ ι _ _ B hS hB
   obtain ⟨hlc, hsc, ht2, hOc, hOo, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   haveI := hlc
@@ -308,16 +312,19 @@ theorem naQuad : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)
   haveI := ht2
   haveI : SigmaFinite lf := inferInstance
   obtain ⟨hnorm, -, -⟩ := (GlobalTheory.T.standard_adelic_character F).2 ψ hψ
-  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, hL⟩ := GlobalTheory.T.adeles_self_dual F lf hlf h1 ψ hψ
-  have hO : IsCompact (perp (fun x y => ψ (x * y)) (Oh F)) ∧
-      IsOpen (perp (fun x y => ψ (x * y)) (Oh F)) ∧
-      perp (fun x y => ψ (x * y)) (perp (fun x y => ψ (x * y)) (Oh F)) ⊆ Oh F ∧
-      (ENNReal.ofReal (kap F) • lf) (Oh F) *
-        (ENNReal.ofReal (kap F) • lf) (perp (fun x y => ψ (x * y)) (Oh F)) = 1 :=
+  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, hL⟩ :=
+    GlobalTheory.T.adeles_self_dual F lf hlf h1 ψ hψ
+  have hO
+      : IsCompact (perp (fun x y => ψ (x * y)) (Oh F)) ∧ IsOpen (perp (fun x y => ψ (x * y)) (Oh F))
+        ∧ perp (fun x y => ψ (x * y)) (perp (fun x y => ψ (x * y)) (Oh F)) ⊆ Oh F
+        ∧ (ENNReal.ofReal (kap F) • lf) (Oh F)
+            * (ENNReal.ofReal (kap F) • lf) (perp (fun x y => ψ (x * y)) (Oh F))
+          = 1 :=
     hL (OhR F).toAddSubgroup hOc hOo
   obtain ⟨hPc, hPo, hPP, hPm⟩ := hO
-  have hP : ENNReal.ofReal (kap F) *
-      (ENNReal.ofReal (kap F) * lf (perp (fun x y => ψ (x * y)) (Oh F))) = 1 := by
+  have hP
+      : ENNReal.ofReal (kap F) * (ENNReal.ofReal (kap F) * lf (perp (fun x y => ψ (x * y)) (Oh F)))
+        = 1 := by
     simpa [Measure.smul_apply, h1] using hPm
   have good : ∀ {c : F}, c ≠ 0 → _ := fun {c} hc =>
     LL_good (ι := ι) lf hlf h1 ψ hS hB hOc hOo hPc hPo hPP hP hc
@@ -341,13 +348,31 @@ theorem naQuad : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)
     unfold chiB
     have hsB : (Bf B)ᵀ = Bf B := (hS.map (algebraMap F (A F))).eq
     rw [Matrix.dotProduct_mulVec, dotProduct_comm, ← Matrix.mulVec_transpose, hsB]
-  have hadd : ∀ x x' y : ι → A F,
-      chiB ψ (Bf B) (x + x') y = chiB ψ (Bf B) x y * chiB ψ (Bf B) x' y := by
+  have hadd
+      : ∀ x x' y : ι → A F, chiB ψ (Bf B) (x + x') y = chiB ψ (Bf B) x y * chiB ψ (Bf B) x' y := by
     intro x x' y
     unfold chiB
     rw [add_dotProduct, AddChar.map_add_eq_mul]
-  refine ⟨inferInstance, ?_, hψ.1, hnorm, hS.map _, inferInstance, inferInstance, inferInstance,
-    inferInstance, inferInstance, hhaar, ?_, ?_, ?_, ?_, fun _ _ => hnorm _, ?_, ?_⟩
+  refine ⟨
+    inferInstance,
+    ?_,
+    hψ.1,
+    hnorm,
+    hS.map _,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    hhaar,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    fun _ _ => hnorm _,
+    ?_,
+    ?_
+  ⟩
   · rw [hf, ← map_ofNat (algebraMap F (A F)) 2, ← map_mul]
     simp
   · intro U hU
@@ -370,8 +395,9 @@ theorem naQuad : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F)
     obtain ⟨-, h1o, h1c, -, h1p, h1m⟩ := good hN'
     obtain ⟨h2c, -, -, h2o, h2p, h2m⟩ := good hM'
     exact GlobalTheory.T.annihilator_of_annihilator_le (ι → A F) (chiB ψ (Bf B)) (muF B lf) hhaar
-      hsym (fun _ _ => hnorm _) hadd (LL ι (N : F)) L (LL ι ((M : F)⁻¹))
-      hNU hMK h1o h2c h1c h2o h1p h2p h1m h2m
+      hsym
+      (fun _ _ => hnorm _)
+      hadd (LL ι (N : F)) L (LL ι ((M : F)⁻¹)) hNU hMK h1o h2c h1c h2o h1p h2p h1m h2m
 
 end Main
 

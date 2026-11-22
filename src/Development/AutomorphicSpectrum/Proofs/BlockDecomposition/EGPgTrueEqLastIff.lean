@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousLe
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib Topology
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib Topology
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.BZRes
@@ -22,24 +23,31 @@ variable {G : Type} [Group G]
 def dcos (Q P : Subgroup G) (x : G) : Set G := {g | ∃ q ∈ Q, ∃ p ∈ P, g = q * x * p}
 
 def LocSec [TopologicalSpace G] (Q P : Subgroup G) (x : G) : Prop :=
-  ∀ OQ ∈ 𝓝 (1 : G), ∀ OP ∈ 𝓝 (1 : G), ∃ O ∈ 𝓝 (1 : G), ∀ u ∈ O, x * u ∈ dcos Q P x →
-    ∃ s ∈ Q, s ∈ OQ ∧ ∃ p ∈ P, p ∈ OP ∧ x * u = s * x * p
+  ∀ OQ ∈ 𝓝 (1 : G), ∀ OP ∈ 𝓝 (1 : G), ∃ O ∈ 𝓝 (1 : G), ∀ u ∈ O,
+    x * u ∈ dcos Q P x → ∃ s ∈ Q, s ∈ OQ ∧ ∃ p ∈ P, p ∈ OP ∧ x * u = s * x * p
 
-variable [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  [TopologicalSpace G] [IsTopologicalGroup G]
   {W₁ W₂ : Type} [AddCommGroup W₁] [Module ℂ W₁] [AddCommGroup W₂] [Module ℂ W₂]
 
-def resInd {Q P : Subgroup G} {x : G} (σ : Representation ℂ Q W₁) (H : Subgroup P)
-    (hH : ∀ p : P, p ∈ H ↔ x * (p : G) * x⁻¹ ∈ Q) (τ : Representation ℂ H W₂) (E : W₁ ≃ₗ[ℂ] W₂)
-    (hE : ∀ (h : H) (hq : x * ((h : P) : G) * x⁻¹ ∈ Q) (v : W₁), τ h (E v) = E (σ ⟨_, hq⟩ v)) :
-    smoothPart (ind Q σ) →ₗ[ℂ] smoothPart (ind H τ) where
-  toFun f := ⟨⟨fun p => E (f.1.1 (x * (p : G))), by
-      intro h p
-      have hq := (hH h).1 h.2
-      have e : x * (((h * p : P)) : G) = (⟨_, hq⟩ : Q) * (x * (p : G)) := by
-        simp [mul_assoc]
-      show E (f.1.1 (x * (((h : P) * p : P) : G))) = τ h (E (f.1.1 (x * (p : G))))
-      rw [hE h hq, show x * (((h : P) * p : P) : G) = ((⟨_, hq⟩ : Q) : G) * (x * (p : G)) from e]
-      exact congrArg E (f.1.2 _ _)⟩, by
+def resInd
+    {Q P : Subgroup G} {x : G} (σ : Representation ℂ Q W₁) (H : Subgroup P)
+    (hH : ∀ p : P, p ∈ H ↔ x * (p : G) * x⁻¹ ∈ Q) (τ : Representation ℂ H W₂)
+    (E : W₁ ≃ₗ[ℂ] W₂)
+    (hE : ∀ (h : H) (hq : x * ((h : P) : G) * x⁻¹ ∈ Q) (v : W₁), τ h (E v) = E (σ ⟨_, hq⟩ v))
+    : smoothPart (ind Q σ) →ₗ[ℂ] smoothPart (ind H τ) where
+  toFun f := ⟨
+    ⟨
+      fun p => E (f.1.1 (x * (p : G))),
+      by
+        intro h p
+        have hq := (hH h).1 h.2
+        have e : x * (((h * p : P)) : G) = (⟨_, hq⟩ : Q) * (x * (p : G)) := by simp [mul_assoc]
+        show E (f.1.1 (x * (((h : P) * p : P) : G))) = τ h (E (f.1.1 (x * (p : G))))
+        rw [hE h hq, show x * (((h : P) * p : P) : G) = ((⟨_, hq⟩ : Q) : G) * (x * (p : G)) from e]
+        exact congrArg E (f.1.2 _ _)
+    ⟩,
+    by
       have hf : IsOpen {g : G | ind Q σ g f.1 = f.1} := f.2
       have hopen : IsOpen {p : P | ind Q σ (p : G) f.1 = f.1} := hf.preimage continuous_subtype_val
       refine mem_smoothPart_of_nhds ?_
@@ -48,7 +56,8 @@ def resInd {Q P : Subgroup G} {x : G} (σ : Representation ℂ Q W₁) (H : Subg
       have := congrArg (fun F : indSpace Q σ => F.1 (x * (y : G))) hp
       show E (f.1.1 (x * ((y * p : P) : G))) = E (f.1.1 (x * (y : G)))
       rw [show x * ((y * p : P) : G) = x * (y : G) * (p : G) by simp [mul_assoc]]
-      exact congrArg E this⟩
+      exact congrArg E this
+  ⟩
   map_add' a b := by
     refine Subtype.ext (Subtype.ext (funext fun p => ?_))
     exact map_add E _ _
@@ -65,20 +74,22 @@ variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 def eGPg {m j n : ℕ} (h : m + j = n) : (Σ x, Two (Fin m) (Fin (j + 1)) x) ≃ Fin (n + 1) :=
   two (stdSum (by omega))
 
-def HGPg {m j n : ℕ} (h : m + j = n) : Subgroup (Mir k n) := (parab k (eGPg h)).comap (Mir k n).subtype
+def HGPg {m j n : ℕ} (h : m + j = n) : Subgroup (Mir k n) :=
+  (parab k (eGPg h)).comap (Mir k n).subtype
 
 def hgpInclg {m j n : ℕ} (h : m + j = n) : HGPg k h →* parab k (eGPg h) where
   toFun g := ⟨((g : Mir k n) : GL (Fin (n + 1)) k), g.2⟩
   map_one' := rfl
   map_mul' _ _ := rfl
 
-theorem hgpg_block_mem {m j n : ℕ} (h : m + j = n) (g : HGPg k h) :
-    (leviProj k (eGPg h) (hgpInclg k h g) true : GL (Fin (j + 1)) k) ∈ Mir k j := by
+theorem hgpg_block_mem {m j n : ℕ} (h : m + j = n) (g : HGPg k h)
+    : (leviProj k (eGPg h) (hgpInclg k h g) true : GL (Fin (j + 1)) k) ∈ Mir k j := by
   subst h
   exact hgp_block_mem _ _ g
 
 def gpProjg {m j n : ℕ} (h : m + j = n) : HGPg k h →* GL (Fin m) k × Mir k j :=
-  MonoidHom.prod ((Pi.evalMonoidHom (fun x => GL (Two (Fin m) (Fin (j + 1)) x) k) false).comp
+  MonoidHom.prod
+    ((Pi.evalMonoidHom (fun x => GL (Two (Fin m) (Fin (j + 1)) x) k) false).comp
       ((leviProj k (eGPg h)).comp (hgpInclg k h)))
     (((Pi.evalMonoidHom (fun x => GL (Two (Fin m) (Fin (j + 1)) x) k) true).comp
       ((leviProj k (eGPg h)).comp (hgpInclg k h))).codRestrict (Mir k j) (hgpg_block_mem k h))
@@ -100,16 +111,19 @@ end Concrete
 
 section Inducing
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
 
-abbrev sQ {r t N : ℕ} (h : r + t = N) (π₁ : Representation ℂ (GL (Fin r) k) V)
-    (π₂ : Representation ℂ (GL (Fin t) k) W) :
-    Representation ℂ (parab k (two (stdSum h))) (⨂[ℂ] x, TwoT V W x) :=
-  (twist (piTensor (twoRep π₁ π₂)) (deltaHalf k (Two (Fin r) (Fin t)))).comp (leviProj k (two (stdSum h)))
+abbrev sQ
+    {r t N : ℕ} (h : r + t = N) (π₁ : Representation ℂ (GL (Fin r) k) V)
+    (π₂ : Representation ℂ (GL (Fin t) k) W)
+    : Representation ℂ (parab k (two (stdSum h))) (⨂[ℂ] x, TwoT V W x) :=
+  (twist (piTensor (twoRep π₁ π₂)) (deltaHalf k (Two (Fin r) (Fin t)))).comp
+    (leviProj k (two (stdSum h)))
 
-abbrev tE (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] :
-    (⨂[ℂ] x, TwoT V W x) ≃ₗ[ℂ] V ⊗[ℂ] W :=
+abbrev tE (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    : (⨂[ℂ] x, TwoT V W x) ≃ₗ[ℂ] V ⊗[ℂ] W :=
   Exponents.boolTensorEquiv (X := TwoT V W)
 
 end Inducing
@@ -118,20 +132,26 @@ section Row
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem det_updateRow_one {N : ℕ} (a : Fin N) (y : Fin N → k) :
-    ((1 : Matrix (Fin N) (Fin N) k).updateRow a y).det = y a := by
+theorem det_updateRow_one {N : ℕ} (a : Fin N) (y : Fin N → k)
+    : ((1 : Matrix (Fin N) (Fin N) k).updateRow a y).det = y a := by
   have h := Matrix.cramer_apply (1 : Matrix (Fin N) (Fin N) k) y a
   rw [Matrix.cramer_one] at h
-  have e : ((1 : Matrix (Fin N) (Fin N) k).updateCol a y) = ((1 : Matrix (Fin N) (Fin N) k).updateRow a y)ᵀ := by
+  have e
+      : ((1 : Matrix (Fin N) (Fin N) k).updateCol a y)
+        = ((1 : Matrix (Fin N) (Fin N) k).updateRow a y)ᵀ := by
     rw [← Matrix.updateCol_transpose, Matrix.transpose_one]
   rw [e, Matrix.det_transpose] at h
   simpa using h.symm
 
-theorem exists_rowSec {N : ℕ} (a : Fin N) : ∃ b : (Fin N → k) → GL (Fin N) k,
-    ContinuousAt b (Pi.single a 1) ∧ b (Pi.single a 1) = 1 ∧
-      ∀ y : Fin N → k, y a ≠ 0 → (b y : Matrix (Fin N) (Fin N) k) = (1 : Matrix (Fin N) (Fin N) k).updateRow a y := by
+theorem exists_rowSec {N : ℕ} (a : Fin N)
+    : ∃ b : (Fin N → k) → GL (Fin N) k,
+      ContinuousAt b (Pi.single a 1) ∧ b (Pi.single a 1) = 1
+        ∧ ∀ y : Fin N → k,
+          y a ≠ 0
+            → (b y : Matrix (Fin N) (Fin N) k) = (1 : Matrix (Fin N) (Fin N) k).updateRow a y := by
   classical
-  let M : (Fin N → k) → Matrix (Fin N) (Fin N) k := fun y => (1 : Matrix (Fin N) (Fin N) k).updateRow a y
+  let M : (Fin N → k) → Matrix (Fin N) (Fin N) k := fun y =>
+    (1 : Matrix (Fin N) (Fin N) k).updateRow a y
   have hM : Continuous M := by
     refine continuous_matrix fun c d => ?_
     by_cases h : c = a
@@ -151,7 +171,9 @@ theorem exists_rowSec {N : ℕ} (a : Fin N) : ∃ b : (Fin N → k) → GL (Fin 
   · rw [Units.isInducing_embedProduct.continuousAt_iff]
     have h1 : ContinuousAt (fun y => (b y : Matrix (Fin N) (Fin N) k)) (Pi.single a 1) :=
       hM.continuousAt.congr (hne.mono fun y h => (hb y h).symm)
-    have h2 : ContinuousAt (fun y => (((b y)⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)) (Pi.single a 1) := by
+    have h2 : ContinuousAt
+        (fun y => (((b y)⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k))
+        (Pi.single a 1) := by
       have h3 : ContinuousAt (fun y : Fin N → k => (y a)⁻¹ • (M y).adjugate) (Pi.single a 1) :=
         ((continuous_apply a).continuousAt.inv₀ h0).smul hM.matrix_adjugate.continuousAt
       refine h3.congr (hne.mono fun y h => ?_)

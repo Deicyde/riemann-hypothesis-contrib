@@ -12,9 +12,12 @@ namespace GlobalTheory.CompanionTheory.LowKType
 
 open CompanionTheory.D.LK CompanionTheory.D.DSIC Formalism.REAL
 
-theorem orthCyc_cyc_stable {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-    (E : Fin n → Fin n → Module.End ℂ V) (v : V) (a b : Fin n) {x : V} (hx : x ∈ Cyc E v) :
-    E a b x ∈ Cyc E v := by
+theorem orthCyc_cyc_stable
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (E : Fin n → Fin n → Module.End ℂ V) (v : V)
+    (a b : Fin n)
+    {x : V} (hx : x ∈ Cyc E v)
+    : E a b x ∈ Cyc E v := by
   obtain ⟨t, rfl⟩ := hx
   refine ⟨FreeAlgebra.ι ℂ (a, b) * t, ?_⟩
   simp [ev]

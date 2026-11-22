@@ -6,9 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open UpperTheory.V.Alg UpperTheory.V.J UpperTheory.V.Z.Desc.V0
 
-theorem UpperTheory.V.Z.Desc.V0.unrAlgE :
-    UnrAlgW → MuRange → UnrAlgE := by
-  intro hW hR O Λ B K _ _ _ _ _ _ _ _ _ _ _ _ _ _ lam J M _ _ _ h e he x 𝒢 b₀ hb₀ hJ h1 hG δ hδ hδJ hδl
+theorem UpperTheory.V.Z.Desc.V0.unrAlgE : UnrAlgW → MuRange → UnrAlgE := by
+  intro hW hR O Λ B K _ _ _ _ _ _ _ _ _ _ _ _ _ _ lam J M _ _ _ h e he x 𝒢 b₀ hb₀ hJ h1 hG δ hδ hδJ
+    hδl
   obtain ⟨J', M', _, _, _, h', hJJ', hy⟩ := hR O Λ B K lam J M h e he
   have key : ∀ a, (∀ y ∈ 𝒢, y b₀ ≠ 0 → y a = 0) → a * b₀ ∈ J := by
     intro a ha

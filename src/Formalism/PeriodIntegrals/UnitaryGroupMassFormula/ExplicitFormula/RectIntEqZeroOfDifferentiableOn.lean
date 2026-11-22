@@ -11,8 +11,8 @@ namespace PI.EF.Rect
 open Complex MeasureTheory intervalIntegral Set Filter Topology Real
 
 def rectInt (f : ℂ → ℂ) (z w : ℂ) : ℂ :=
-  (∫ x : ℝ in z.re..w.re, f (x + z.im * I)) - (∫ x : ℝ in z.re..w.re, f (x + w.im * I)) +
-    I • (∫ y : ℝ in z.im..w.im, f (w.re + y * I)) - I • ∫ y : ℝ in z.im..w.im, f (z.re + y * I)
+  (∫ x : ℝ in z.re..w.re, f (x + z.im * I)) - (∫ x : ℝ in z.re..w.re, f (x + w.im * I))
+    + I • (∫ y : ℝ in z.im..w.im, f (w.re + y * I)) - I • ∫ y : ℝ in z.im..w.im, f (z.re + y * I)
 
 lemma continuousOn_hseg {f : ℂ → ℂ} {a₁ a₂ b : ℝ}
     (hc : ∀ x ∈ uIcc a₁ a₂, ContinuousAt f (x + b * I)) :
@@ -81,14 +81,23 @@ lemma vseg_mem_bdry_right {z w : ℂ} {y : ℝ} (hy : y ∈ uIcc z.im w.im) :
   simp only [rectBdry, Set.mem_ofPred_eq]
   exact Or.inr ⟨by simpa using hy, Or.inr (by simp)⟩
 
-theorem rectInt_eq_zero_of_primitive {F f : ℂ → ℂ} {z w : ℂ}
-    (h : ∀ s ∈ rectBdry z w, HasDerivAt F (f s) s) (hc : ∀ s ∈ rectBdry z w, ContinuousAt f s) :
-    rectInt f z w = 0 := by
+theorem rectInt_eq_zero_of_primitive
+    {F f : ℂ → ℂ} {z w : ℂ}
+    (h : ∀ s ∈ rectBdry z w, HasDerivAt F (f s) s) (hc : ∀ s ∈ rectBdry z w, ContinuousAt f s)
+    : rectInt f z w = 0 := by
   unfold rectInt
-  rw [hint_of_hasDerivAt (fun x hx => h _ (hseg_mem_bdry_bot hx)) (fun x hx => hc _ (hseg_mem_bdry_bot hx)),
-    hint_of_hasDerivAt (fun x hx => h _ (hseg_mem_bdry_top hx)) (fun x hx => hc _ (hseg_mem_bdry_top hx)),
-    vint_of_hasDerivAt (fun y hy => h _ (vseg_mem_bdry_right hy)) (fun y hy => hc _ (vseg_mem_bdry_right hy)),
-    vint_of_hasDerivAt (fun y hy => h _ (vseg_mem_bdry_left hy)) (fun y hy => hc _ (vseg_mem_bdry_left hy))]
+  rw [hint_of_hasDerivAt
+      (fun x hx => h _ (hseg_mem_bdry_bot hx))
+      (fun x hx => hc _ (hseg_mem_bdry_bot hx)),
+    hint_of_hasDerivAt
+      (fun x hx => h _ (hseg_mem_bdry_top hx))
+      (fun x hx => hc _ (hseg_mem_bdry_top hx)),
+    vint_of_hasDerivAt
+      (fun y hy => h _ (vseg_mem_bdry_right hy))
+      (fun y hy => hc _ (vseg_mem_bdry_right hy)),
+    vint_of_hasDerivAt
+      (fun y hy => h _ (vseg_mem_bdry_left hy))
+      (fun y hy => hc _ (vseg_mem_bdry_left hy))]
   ring
 
 def rectOpen (z w : ℂ) : Set ℂ := {s | z.re < s.re ∧ s.re < w.re ∧ z.im < s.im ∧ s.im < w.im}
@@ -101,8 +110,8 @@ lemma ne_of_mem_bdry_of_mem_open {z w s p : ℂ} (hs : s ∈ rectBdry z w) (hp :
   obtain ⟨h1, h2, h3, h4⟩ := hp
   rcases hs with ⟨-, h | h⟩ | ⟨-, h | h⟩ <;> linarith
 
-theorem rectInt_inv_sub_sq {z w p : ℂ} (hp : p ∈ rectOpen z w) :
-    rectInt (fun s => ((s - p) ^ 2)⁻¹) z w = 0 := by
+theorem rectInt_inv_sub_sq {z w p : ℂ} (hp : p ∈ rectOpen z w)
+    : rectInt (fun s => ((s - p) ^ 2)⁻¹) z w = 0 := by
   apply rectInt_eq_zero_of_primitive (F := fun s => -(s - p)⁻¹)
   · intro s hs
     have hne : s - p ≠ 0 := sub_ne_zero.2 (ne_of_mem_bdry_of_mem_open hs hp)
@@ -125,8 +134,8 @@ lemma log_neg_sub_log_of_im_neg {b : ℂ} (hb : b.im < 0) : Complex.log (-b) - C
   · simp [Complex.log_re]
   · simp [Complex.log_im, h]
 
-theorem rectInt_inv_sub {z w p : ℂ} (hp : p ∈ rectOpen z w) :
-    rectInt (fun s => (s - p)⁻¹) z w = 2 * π * I := by
+theorem rectInt_inv_sub {z w p : ℂ} (hp : p ∈ rectOpen z w)
+    : rectInt (fun s => (s - p)⁻¹) z w = 2 * π * I := by
   obtain ⟨h1, h2, h3, h4⟩ := id hp
   have hcont : ∀ s ∈ rectBdry z w, ContinuousAt (fun s => (s - p)⁻¹) s := fun s hs =>
     ContinuousAt.fun_inv₀ (by fun_prop) (sub_ne_zero.2 (ne_of_mem_bdry_of_mem_open hs hp))
@@ -140,19 +149,27 @@ theorem rectInt_inv_sub {z w p : ℂ} (hp : p ∈ rectOpen z w) :
     rw [neg_div, ← div_neg, neg_sub, one_div]
     rfl
   unfold rectInt
-  rw [hint_of_hasDerivAt (F := fun s => Complex.log (s - p)) (f := fun s => (s - p)⁻¹)
+  rw [hint_of_hasDerivAt
+      (F := fun s => Complex.log (s - p))
+      (f := fun s => (s - p)⁻¹)
       (a₁ := z.re) (a₂ := w.re) (b := z.im)
       (fun x _ => hL _ (mem_slitPlane_iff.2 (Or.inr (by intro h; simp at h; linarith))))
       (fun x hx => hcont _ (hseg_mem_bdry_bot hx)),
-    hint_of_hasDerivAt (F := fun s => Complex.log (s - p)) (f := fun s => (s - p)⁻¹)
+    hint_of_hasDerivAt
+      (F := fun s => Complex.log (s - p))
+      (f := fun s => (s - p)⁻¹)
       (a₁ := z.re) (a₂ := w.re) (b := w.im)
       (fun x _ => hL _ (mem_slitPlane_iff.2 (Or.inr (by intro h; simp at h; linarith))))
       (fun x hx => hcont _ (hseg_mem_bdry_top hx)),
-    vint_of_hasDerivAt (F := fun s => Complex.log (s - p)) (f := fun s => (s - p)⁻¹)
+    vint_of_hasDerivAt
+      (F := fun s => Complex.log (s - p))
+      (f := fun s => (s - p)⁻¹)
       (a := w.re) (b₁ := z.im) (b₂ := w.im)
       (fun y _ => hL _ (mem_slitPlane_iff.2 (Or.inl (by simp; linarith))))
       (fun y hy => hcont _ (vseg_mem_bdry_right hy)),
-    vint_of_hasDerivAt (F := fun s => Complex.log (p - s)) (f := fun s => (s - p)⁻¹)
+    vint_of_hasDerivAt
+      (F := fun s => Complex.log (p - s))
+      (f := fun s => (s - p)⁻¹)
       (a := z.re) (b₁ := z.im) (b₂ := w.im)
       (fun y _ => hM _ (mem_slitPlane_iff.2 (Or.inl (by simp; linarith))))
       (fun y hy => hcont _ (vseg_mem_bdry_left hy))]
@@ -264,9 +281,9 @@ lemma continuousOn_div_sub_sq {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOp
   hh.div ((continuousOn_id.sub continuousOn_const).pow 2) fun s hs =>
     pow_ne_zero 2 (sub_ne_zero.2 (ne_of_mem_bdry_of_mem_open hs hp))
 
-theorem rectInt_div_sub {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOpen z w)
-    (hh : DifferentiableOn ℂ h (rectClosed z w)) :
-    rectInt (fun s => h s / (s - p)) z w = 2 * π * I * h p := by
+theorem rectInt_div_sub
+    {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOpen z w) (hh : DifferentiableOn ℂ h (rectClosed z w))
+    : rectInt (fun s => h s / (s - p)) z w = 2 * π * I * h p := by
   obtain ⟨hre, him⟩ := le_of_mem_rectOpen hp
   have hN := rectClosed_mem_nhds hp
   have hsub := rectBdry_subset hre him
@@ -288,8 +305,8 @@ theorem rectInt_div_sub {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOpen z w
   have hinv : ContinuousOn (fun s => h p * (s - p)⁻¹) (rectBdry z w) :=
     continuousOn_const.mul (ContinuousOn.inv₀ (continuousOn_id.sub continuousOn_const) fun s hs =>
       sub_ne_zero.2 (ne_of_mem_bdry_of_mem_open hs hp))
-  have hcong : EqOn (fun s => h s / (s - p)) (fun s => dslope h p s + h p * (s - p)⁻¹)
-      (rectBdry z w) := by
+  have hcong
+      : EqOn (fun s => h s / (s - p)) (fun s => dslope h p s + h p * (s - p)⁻¹) (rectBdry z w) := by
     intro s hs
     have hne : s - p ≠ 0 := sub_ne_zero.2 (ne_of_mem_bdry_of_mem_open hs hp)
     simp only
@@ -299,9 +316,9 @@ theorem rectInt_div_sub {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOpen z w
     rectInt_inv_sub hp]
   ring
 
-theorem rectInt_div_sub_sq {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOpen z w)
-    (hh : DifferentiableOn ℂ h (rectClosed z w)) :
-    rectInt (fun s => h s / (s - p) ^ 2) z w = 2 * π * I * deriv h p := by
+theorem rectInt_div_sub_sq
+    {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOpen z w) (hh : DifferentiableOn ℂ h (rectClosed z w))
+    : rectInt (fun s => h s / (s - p) ^ 2) z w = 2 * π * I * deriv h p := by
   obtain ⟨hre, him⟩ := le_of_mem_rectOpen hp
   have hN := rectClosed_mem_nhds hp
   have hsub := rectBdry_subset hre him
@@ -310,8 +327,10 @@ theorem rectInt_div_sub_sq {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOpen 
   have hinv : ContinuousOn (fun s => h p * ((s - p) ^ 2)⁻¹) (rectBdry z w) :=
     continuousOn_const.mul (ContinuousOn.inv₀ ((continuousOn_id.sub continuousOn_const).pow 2)
       fun s hs => pow_ne_zero 2 (sub_ne_zero.2 (ne_of_mem_bdry_of_mem_open hs hp)))
-  have hcong : EqOn (fun s => h s / (s - p) ^ 2)
-      (fun s => dslope h p s / (s - p) + h p * ((s - p) ^ 2)⁻¹) (rectBdry z w) := by
+  have hcong : EqOn
+      (fun s => h s / (s - p) ^ 2)
+      (fun s => dslope h p s / (s - p) + h p * ((s - p) ^ 2)⁻¹)
+      (rectBdry z w) := by
     intro s hs
     have hne : s - p ≠ 0 := sub_ne_zero.2 (ne_of_mem_bdry_of_mem_open hs hp)
     simp only
@@ -322,35 +341,45 @@ theorem rectInt_div_sub_sq {h : ℂ → ℂ} {z w p : ℂ} (hp : p ∈ rectOpen 
     rectInt_div_sub hp hd, rectInt_const_mul, rectInt_inv_sub_sq hp, dslope_same]
   ring
 
-theorem rect_residue_gen {z w : ℂ} {H E : ℂ → ℂ} (Z : Finset ℂ) (wt : ℂ → ℂ) (e : ℂ)
-    (h0 : (0 : ℂ) ∈ rectOpen z w) (hH : DifferentiableOn ℂ H (rectClosed z w))
-    (hE : DifferentiableOn ℂ E (rectClosed z w)) (hZ : ∀ ρ ∈ Z, ρ ≠ 0 ∧ ρ ∈ rectOpen z w) :
-    rectInt (fun s => (H s + (∑ ρ ∈ Z, wt ρ / (s - ρ)) + e / s) * (E s / s)) z w =
-      2 * π * I * (H 0 * E 0 + (∑ ρ ∈ Z, wt ρ * ((E ρ - E 0) / ρ)) + e * deriv E 0) := by
+theorem rect_residue_gen
+    {z w : ℂ} {H E : ℂ → ℂ}
+    (Z : Finset ℂ)
+    (wt : ℂ → ℂ) (e : ℂ) (h0 : (0 : ℂ) ∈ rectOpen z w) (hH : DifferentiableOn ℂ H (rectClosed z w))
+    (hE : DifferentiableOn ℂ E (rectClosed z w)) (hZ : ∀ ρ ∈ Z, ρ ≠ 0 ∧ ρ ∈ rectOpen z w)
+    : rectInt (fun s => (H s + (∑ ρ ∈ Z, wt ρ / (s - ρ)) + e / s) * (E s / s)) z w
+      = 2 * π * I * (H 0 * E 0 + (∑ ρ ∈ Z, wt ρ * ((E ρ - E 0) / ρ)) + e * deriv E 0) := by
   obtain ⟨hre, him⟩ := le_of_mem_rectOpen h0
   have hsub := rectBdry_subset hre him
   have hEb : ContinuousOn E (rectBdry z w) := hE.continuousOn.mono hsub
   have hA : ContinuousOn (fun s => H s * E s / (s - 0)) (rectBdry z w) :=
     continuousOn_div_sub h0 ((hH.mul hE).continuousOn.mono hsub)
-  have hT : ∀ ρ ∈ Z, ContinuousOn
-      (fun s => wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0))) (rectBdry z w) :=
-    fun ρ hρ => (continuousOn_const.mul (continuousOn_div_sub (hZ ρ hρ).2 hEb)).add
+  have hT
+      : ∀ ρ ∈ Z,
+        ContinuousOn
+          (fun s => wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0)))
+          (rectBdry z w) := fun ρ hρ =>
+    (continuousOn_const.mul (continuousOn_div_sub (hZ ρ hρ).2 hEb)).add
       (continuousOn_const.mul (continuousOn_div_sub h0 hEb))
   have hB : ContinuousOn
       (fun s => ∑ ρ ∈ Z, (wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0))))
-      (rectBdry z w) := continuousOn_finsetSum _ hT
+      (rectBdry z w) :=
+    continuousOn_finsetSum _ hT
   have hC : ContinuousOn (fun s => e * (E s / (s - 0) ^ 2)) (rectBdry z w) :=
     continuousOn_const.mul (continuousOn_div_sub_sq h0 hEb)
-  have hcong : EqOn (fun s => (H s + (∑ ρ ∈ Z, wt ρ / (s - ρ)) + e / s) * (E s / s))
-      (fun s => H s * E s / (s - 0) +
-        (∑ ρ ∈ Z, (wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0)))) +
-        e * (E s / (s - 0) ^ 2)) (rectBdry z w) := by
+  have hcong : EqOn
+      (fun s => (H s + (∑ ρ ∈ Z, wt ρ / (s - ρ)) + e / s) * (E s / s))
+      (fun s =>
+        H s * E s / (s - 0)
+          + (∑ ρ ∈ Z, (wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0))))
+          + e * (E s / (s - 0) ^ 2))
+      (rectBdry z w) := by
     intro s hs
     have hs0 : s ≠ 0 := ne_of_mem_bdry_of_mem_open hs h0
     simp only [sub_zero]
     rw [add_mul, add_mul, Finset.sum_mul]
-    have hterm : ∀ ρ ∈ Z, wt ρ / (s - ρ) * (E s / s) =
-        wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / s) := by
+    have hterm
+        : ∀ ρ ∈ Z,
+          wt ρ / (s - ρ) * (E s / s) = wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / s) := by
       intro ρ hρ
       have hρ0 := (hZ ρ hρ).1
       have hsρ : s - ρ ≠ 0 := sub_ne_zero.2 (ne_of_mem_bdry_of_mem_open hs (hZ ρ hρ).2)
@@ -360,34 +389,46 @@ theorem rect_residue_gen {z w : ℂ} {H E : ℂ → ℂ} (Z : Finset ℂ) (wt : 
     congr 1
     · rw [mul_div_assoc]
     · rw [div_mul_div_comm, ← sq, mul_div_assoc]
-  have hsum : ∀ ρ ∈ Z, rectInt (fun s => wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0))) z w =
-      2 * π * I * (wt ρ * ((E ρ - E 0) / ρ)) := by
+  have hsum
+      : ∀ ρ ∈ Z,
+        rectInt (fun s => wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0))) z w
+          = 2 * π * I * (wt ρ * ((E ρ - E 0) / ρ)) := by
     intro ρ hρ
-    rw [rectInt_add (f := fun s => wt ρ / ρ * (E s / (s - ρ))) (g := fun s => -(wt ρ / ρ) * (E s / (s - 0)))
-      (continuousOn_const.mul (continuousOn_div_sub (hZ ρ hρ).2 hEb))
-      (continuousOn_const.mul (continuousOn_div_sub h0 hEb)), rectInt_const_mul, rectInt_const_mul,
-      rectInt_div_sub (hZ ρ hρ).2 hE, rectInt_div_sub h0 hE]
+    rw [rectInt_add
+        (f := fun s => wt ρ / ρ * (E s / (s - ρ)))
+        (g := fun s => -(wt ρ / ρ) * (E s / (s - 0)))
+        (continuousOn_const.mul (continuousOn_div_sub (hZ ρ hρ).2 hEb))
+        (continuousOn_const.mul (continuousOn_div_sub h0 hEb)),
+      rectInt_const_mul, rectInt_const_mul, rectInt_div_sub (hZ ρ hρ).2 hE, rectInt_div_sub h0 hE]
     ring
   rw [rectInt_congr hcong,
-    rectInt_add (f := fun s => H s * E s / (s - 0) +
-        ∑ ρ ∈ Z, (wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0))))
-      (g := fun s => e * (E s / (s - 0) ^ 2)) (hA.add hB) hC,
-    rectInt_add (f := fun s => H s * E s / (s - 0))
-      (g := fun s => ∑ ρ ∈ Z, (wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0)))) hA hB, rectInt_finset_sum Z _ hT,
-    rectInt_div_sub (h := fun s => H s * E s) h0 (hH.mul hE), rectInt_const_mul, rectInt_div_sub_sq h0 hE,
-    Finset.sum_congr rfl hsum, ← Finset.mul_sum]
+    rectInt_add
+      (f := fun s =>
+        H s * E s / (s - 0) + ∑ ρ ∈ Z, (wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0))))
+      (g := fun s => e * (E s / (s - 0) ^ 2))
+      (hA.add hB) hC,
+    rectInt_add
+      (f := fun s => H s * E s / (s - 0))
+      (g := fun s => ∑ ρ ∈ Z, (wt ρ / ρ * (E s / (s - ρ)) + -(wt ρ / ρ) * (E s / (s - 0))))
+      hA hB,
+    rectInt_finset_sum Z _ hT, rectInt_div_sub (h := fun s => H s * E s) h0 (hH.mul hE),
+    rectInt_const_mul, rectInt_div_sub_sq h0 hE, Finset.sum_congr rfl hsum, ← Finset.mul_sum]
   ring
 
-theorem rect_residue {z w : ℂ} {H : ℂ → ℂ} (Z : Finset ℂ) (wt : ℂ → ℂ) (e : ℂ) {u : ℝ} (hu : 0 < u)
+theorem rect_residue
+    {z w : ℂ} {H : ℂ → ℂ}
+    (Z : Finset ℂ)
+    (wt : ℂ → ℂ) (e : ℂ)
+    {u : ℝ} (hu : 0 < u)
     (h0 : (0 : ℂ) ∈ rectOpen z w) (hH : DifferentiableOn ℂ H (rectClosed z w))
-    (hZ : ∀ ρ ∈ Z, ρ ≠ 0 ∧ ρ ∈ rectOpen z w) :
-    rectInt (fun s => (H s + (∑ ρ ∈ Z, wt ρ / (s - ρ)) + e / s) * ((u : ℂ) ^ s / s)) z w =
-      2 * π * I * (H 0 + (∑ ρ ∈ Z, wt ρ * (((u : ℂ) ^ ρ - 1) / ρ)) + e * Real.log u) := by
+    (hZ : ∀ ρ ∈ Z, ρ ≠ 0 ∧ ρ ∈ rectOpen z w)
+    : rectInt (fun s => (H s + (∑ ρ ∈ Z, wt ρ / (s - ρ)) + e / s) * ((u : ℂ) ^ s / s)) z w
+      = 2 * π * I * (H 0 + (∑ ρ ∈ Z, wt ρ * (((u : ℂ) ^ ρ - 1) / ρ)) + e * Real.log u) := by
   have hu0 : (u : ℂ) ≠ 0 := ofReal_ne_zero.2 hu.ne'
   have hd : ∀ s : ℂ, HasDerivAt (fun s : ℂ => (u : ℂ) ^ s) ((u : ℂ) ^ s * Complex.log u) s :=
     fun s => (hasStrictDerivAt_const_cpow (Or.inl hu0)).hasDerivAt
-  have hE : DifferentiableOn ℂ (fun s : ℂ => (u : ℂ) ^ s) (rectClosed z w) :=
-    fun s _ => (hd s).differentiableAt.differentiableWithinAt
+  have hE : DifferentiableOn ℂ (fun s : ℂ => (u : ℂ) ^ s) (rectClosed z w) := fun s _ =>
+    (hd s).differentiableAt.differentiableWithinAt
   rw [rect_residue_gen Z wt e h0 hH hE hZ]
   beta_reduce
   rw [(hd 0).deriv, ofReal_log hu.le]

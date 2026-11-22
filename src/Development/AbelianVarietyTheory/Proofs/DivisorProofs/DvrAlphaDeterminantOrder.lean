@@ -24,21 +24,55 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemFiltratio
 
 @[expose] public section
 
-open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv Matrix TensorProduct
+open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv
+  Matrix TensorProduct
 
 namespace GlobalTheory.FrameModel
 
-theorem det_append_eq_mul_det : ∀ (C : Type) [Field C] (w : Valuation C NNReal) (ℓ : C), 0 < w ℓ → w ℓ < 1 → ∀ (S : Type) [Fintype S] [DecidableEq S] (a : S → w.valuationSubring) (p q : ℕ) (Fil : Submodule w.valuationSubring (S → Fin (p + q) → C)) (τ : S), Function.Injective a → GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsFiltration a Fil → ∀ (x : Fin (p + q) → Fin (p + q) → C) (u : Fin p → Fin (p + q) → C) (m : Fin q → Fin (p + q) → C), GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsLatticeBasis w x (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.eigenQuot (W := fun _ => Fin (p + q) → C) (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.freeLattice a (p + q)) τ) → GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsLatticeBasis w (fun i => (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil τ).mkQ (u i)) (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.eigenSub (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.lie (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.freeLattice a (p + q)) Fil) τ) → GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsLatticeBasis w m (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.eigenQuot (W := fun _ => Fin (p + q) → C) Fil τ) → ∃ c : C, w c = ∏ s ∈ Finset.univ.erase τ, w ((a τ : C) - (a s : C)) ^ (p + q - Module.finrank C (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil s)) ∧ (Matrix.of (Fin.append u m)).det = c * (Matrix.of x).det := by
+theorem det_append_eq_mul_det
+    : ∀ (C : Type) [Field C] (w : Valuation C NNReal) (ℓ : C),
+      0 < w ℓ → w ℓ < 1
+        → ∀ (S : Type) [Fintype S] [DecidableEq S] (a : S → w.valuationSubring) (p q : ℕ)
+            (Fil : Submodule w.valuationSubring (S → Fin (p + q) → C)) (τ : S),
+          Function.Injective a
+            → GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsFiltration a Fil
+            → ∀ (x : Fin (p + q) → Fin (p + q) → C) (u : Fin p → Fin (p + q) → C)
+                (m : Fin q → Fin (p + q) → C),
+              GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsLatticeBasis w x
+                  (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.eigenQuot
+                    (W := fun _ => Fin (p + q) → C)
+                    (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.freeLattice a
+                      (p + q))
+                    τ)
+                → GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsLatticeBasis w
+                  (fun i =>
+                    (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil
+                      τ).mkQ (u i))
+                  (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.eigenSub
+                    (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.lie
+                      (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.freeLattice a
+                        (p + q))
+                      Fil)
+                    τ)
+                → GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsLatticeBasis w m
+                  (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.eigenQuot
+                    (W := fun _ => Fin (p + q) → C)
+                    Fil τ)
+                → ∃ c : C,
+                  w c = ∏ s ∈ Finset.univ.erase τ, w ((a τ : C) - (a s : C)) ^ (p + q - Module.finrank C (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil s))
+                    ∧ (Matrix.of (Fin.append u m)).det = c * (Matrix.of x).det := by
   intro C _ w ℓ hℓ0 hℓ1 S _ _ a p q Fil τ ha hFil x u m hx hu hm
   set F := GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil τ with hF
   have hfin : Module.finrank C F = q := by
     have hsp : F = Submodule.span C (Set.range m) := by
-      rw [hF, GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace, ← hm.2, Submodule.span_span_of_tower]
+      rw [hF, GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace, ← hm.2,
+        Submodule.span_span_of_tower]
     rw [hsp, finrank_span_eq_card hm.1, Fintype.card_fin]
   have hd0 : GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.diffGen a τ ≠ 0 := by
     refine Finset.prod_ne_zero_iff.mpr fun s hs => sub_ne_zero.mpr ?_
     exact ha.ne (Finset.ne_of_mem_erase hs).symm
-  have h1 := GlobalTheory.T.latticeDetRelation_herbrand_eigenspace C w ℓ hℓ0 hℓ1 S a p q Fil τ ha hFil hfin
+  have h1 :=
+    GlobalTheory.T.latticeDetRelation_herbrand_eigenspace C w ℓ hℓ0 hℓ1 S a p q Fil τ ha hFil hfin
   rw [GlobalTheory.T.piEigenSublattice_free_eq_differentScaled C w S a (p + q) τ ha] at h1
   have h2 := GlobalTheory.T.latticeDetRelation_of_lsmul_shift C w ℓ hℓ0 hℓ1 p q _ _ _ _ _ _ hd0 h1
   obtain ⟨x', u', m', c, hx', hu', hm', hmF, ⟨hc0, hcv⟩, hdet⟩ := h2
@@ -68,14 +102,23 @@ theorem det_append_eq_mul_det : ∀ (C : Type) [Field C] (w : Valuation C NNReal
       intro s hs
       rw [NNReal.coe_ne_zero, Valuation.ne_zero_iff]
       exact sub_ne_zero.mpr (Subtype.coe_injective.ne (ha.ne (Finset.ne_of_mem_erase hs).symm))
-    have hdiff : ((GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.diffGen a τ : w.valuationSubring) : C)
-        = ∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C)) := by
+    have hdiff
+        : ((GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.diffGen a τ
+              : w.valuationSubring)
+            : C)
+          = ∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C)) := by
       simp [GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.diffGen]
-    have hle : ∀ s, Module.finrank C (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil s) ≤ p + q := fun s =>
+    have hle
+        : ∀ s,
+          Module.finrank C
+              (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil s)
+            ≤ p + q := fun s =>
       (Submodule.finrank_le _).trans_eq (Module.finrank_fin_fun C)
-    have hlogc : Real.log (w c : ℝ) = - ∑ s ∈ Finset.univ.erase τ,
-        ((p + q - Module.finrank C (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil s) : ℕ) : ℝ)
-          * Real.log (w ((a τ : C) - (a s : C)) : ℝ) := by
+    have hlogc
+        : Real.log (w c : ℝ)
+          = - ∑ s ∈ Finset.univ.erase τ,
+            ((p + q - Module.finrank C (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil s) : ℕ) : ℝ)
+              * Real.log (w ((a τ : C) - (a s : C)) : ℝ) := by
       have e := hcv
       simp only [GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.addVal] at e
       rw [hdiff, map_prod, NNReal.coe_prod, Real.log_prod hds, div_eq_iff hlam] at e
@@ -90,8 +133,10 @@ theorem det_append_eq_mul_det : ∀ (C : Type) [Field C] (w : Valuation C NNReal
     apply NNReal.coe_injective
     rw [NNReal.coe_inv, NNReal.coe_prod]
     simp only [NNReal.coe_pow]
-    have hpos2 : 0 < ∏ s ∈ Finset.univ.erase τ, ((w ((a τ : C) - (a s : C)) : NNReal) : ℝ)
-        ^ (p + q - Module.finrank C (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil s)) :=
+    have hpos2
+        : 0
+          < ∏ s ∈ Finset.univ.erase τ, ((w ((a τ : C) - (a s : C)) : NNReal) : ℝ)
+            ^ (p + q - Module.finrank C (GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace Fil s)) :=
       Finset.prod_pos fun s hs => pow_pos (lt_of_le_of_ne (NNReal.coe_nonneg _) (hds s hs).symm) _
     rw [← Real.exp_log (inv_pos.mpr hwc), ← Real.exp_log hpos2, Real.log_inv, hlogc, neg_neg,
       Real.log_prod fun s hs => pow_ne_zero _ (hds s hs)]
@@ -110,4 +155,3 @@ variable {C : Type} [Field C] (v : Valuation C NNReal) {O : Type} [CommRing O] [
 end Small
 
 end GlobalTheory.FrameModel
-

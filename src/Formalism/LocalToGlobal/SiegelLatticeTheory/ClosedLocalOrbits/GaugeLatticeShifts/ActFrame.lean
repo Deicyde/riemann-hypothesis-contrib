@@ -20,8 +20,11 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} {X : Formalism.L2.SG.HidaSetting.HidaSetting D}
 
-theorem frame_mapLF {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT) {T : D.host.E}
-    (F : FlagG (VS D) D.R.rS T) (a : Fin (D.R.rS + 1)) : frame (mapLF γ (lf D F)) a = γ (F.fvec a) := by
+theorem frame_mapLF
+    {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
+    {T : D.host.E} (F : FlagG (VS D) D.R.rS T)
+    (a : Fin (D.R.rS + 1))
+    : frame (mapLF γ (lf D F)) a = γ (F.fvec a) := by
   unfold mapLF
   rw [dite_eq_left hγ]
   refine Fin.lastCases ?_ (fun i => ?_) a

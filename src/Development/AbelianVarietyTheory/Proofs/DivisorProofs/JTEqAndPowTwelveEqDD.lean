@@ -17,12 +17,13 @@ open GlobalTheory.CMVal (latDisc)
 
 namespace GlobalTheory.QFam
 
-theorem jT_eq_latDisc (Λ : PeriodPair) (c : ℂ) (τ : ℍ) (h : IsTauOf Λ c τ) :
-    jT τ = 1728 * Λ.g₂ ^ 3 / latDisc Λ :=
+theorem jT_eq_latDisc (Λ : PeriodPair) (c : ℂ) (τ : ℍ) (h : IsTauOf Λ c τ)
+    : jT τ = 1728 * Λ.g₂ ^ 3 / latDisc Λ :=
   (ReciprocityTheory.ChartRestriction.L1.jInv_eq_jT h).symm
 
-theorem pow_twelve_eq_DD (Λ : PeriodPair) (c : ℂ) (τ : ℍ) (h : IsTauOf Λ c τ) (Ω : ℂ)
-    (hΩ : Ω ^ 12 = latDisc Λ) : (Ω * c / (2 * Real.pi * Complex.I)) ^ 12 = DD τ := by
+theorem pow_twelve_eq_DD
+    (Λ : PeriodPair) (c : ℂ) (τ : ℍ) (h : IsTauOf Λ c τ) (Ω : ℂ) (hΩ : Ω ^ 12 = latDisc Λ)
+    : (Ω * c / (2 * Real.pi * Complex.I)) ^ 12 = DD τ := by
   have hc : c ≠ 0 := h.1
   have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
   have hI : Complex.I ^ 12 = 1 := by
@@ -33,7 +34,11 @@ theorem pow_twelve_eq_DD (Λ : PeriodPair) (c : ℂ) (τ : ℍ) (h : IsTauOf Λ 
   field_simp
   ring
 
-theorem jT_eq_and_pow_twelve_eq_DD : ∀ (Λ : PeriodPair) (c : ℂ) (τ : ℍ), IsTauOf Λ c τ → jT τ = 1728 * Λ.g₂ ^ 3 / latDisc Λ ∧ ∀ Ω : ℂ, Ω ^ 12 = latDisc Λ → (Ω * c / (2 * Real.pi * Complex.I)) ^ 12 = DD τ :=
+theorem jT_eq_and_pow_twelve_eq_DD
+    : ∀ (Λ : PeriodPair) (c : ℂ) (τ : ℍ),
+      IsTauOf Λ c τ
+        → jT τ = 1728 * Λ.g₂ ^ 3 / latDisc Λ
+          ∧ ∀ Ω : ℂ, Ω ^ 12 = latDisc Λ → (Ω * c / (2 * Real.pi * Complex.I)) ^ 12 = DD τ :=
   fun Λ c τ h => ⟨jT_eq_latDisc Λ c τ h, pow_twelve_eq_DD Λ c τ h⟩
 
 end GlobalTheory.QFam

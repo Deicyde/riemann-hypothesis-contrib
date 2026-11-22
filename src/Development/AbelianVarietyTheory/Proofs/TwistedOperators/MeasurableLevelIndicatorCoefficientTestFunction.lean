@@ -7,8 +7,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NatCastSmulM
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.Grow
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.Grow
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.ChainFr GlobalTheory.SepRows GlobalTheory.SepPer Matrix
 open scoped TensorProduct InnerProductSpace nonZeroDivisors
@@ -16,7 +20,13 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.SepPer.CoefMeas
 
-theorem measurable_coef : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀ (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S) (Λ : Lat V) (𝔪 : Ideal (𝓞 D.host.E)), IsSelfDualC V Λ → 𝔪 ≠ ⊥ → ∀ (v a : ∀ τ, M.H τ), Measurable (coef θ M (congLev D.sp.cm V.gram Λ 𝔪) v a) := by
+theorem measurable_coef
+    : ∀ (D : D7) (θ : InfFam D),
+      IsInfFam θ
+        → ∀ (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S) (Λ : Lat V)
+            (𝔪 : Ideal (𝓞 D.host.E)),
+          IsSelfDualC V Λ → 𝔪 ≠ ⊥
+            → ∀ (v a : ∀ τ, M.H τ), Measurable (coef θ M (congLev D.sp.cm V.gram Λ 𝔪) v a) := by
   intro D θ hθ V S M Λ 𝔪 hΛ h𝔪 v a
   classical
   have h1 := GlobalTheory.SepPer.CoefCont.continuous_coefR D θ hθ V S M v a
@@ -26,8 +36,7 @@ theorem measurable_coef : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀ (V :
     obtain ⟨s, hs⟩ := hΛ.1.fg
     apply eq_top_iff.mpr
     intro y _
-    let f : (Fin V.rank → D.host.E) → D.host.E := fun x =>
-      ∑ i, ∑ j, star (x i) * V.gram i j * y j
+    let f : (Fin V.rank → D.host.E) → D.host.E := fun x => ∑ i, ∑ j, star (x i) * V.gram i j * y j
     obtain ⟨a, ha⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 D.host.E)) s f
     have ha0 : (algebraMap (𝓞 D.host.E) D.host.E a) ≠ 0 := by
       exact (FaithfulSMul.algebraMap_injective _ _).ne (mem_nonZeroDivisors_iff_ne_zero.mp a.2)
@@ -43,14 +52,16 @@ theorem measurable_coef : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀ (V :
       smul_mem' := by
         rintro c x ⟨b, hb⟩
         refine ⟨RingOfIntegers.mapRingHom (starRingEnd D.host.E) c * b, ?_⟩
-        simp only [map_mul, hb, f, Pi.smul_apply, Algebra.smul_def, map_mul, RingOfIntegers.mapRingHom_apply, star_mul]
+        simp only [map_mul, hb, f, Pi.smul_apply, Algebra.smul_def, map_mul,
+          RingOfIntegers.mapRingHom_apply, star_mul]
         simp only [Finset.mul_sum]
         apply Finset.sum_congr rfl
         intro i _
         apply Finset.sum_congr rfl
         intro j _
         change star (c : D.host.E) * _ = _
-        ring }
+        ring
+    }
     have hsP : (s : Set (Fin V.rank → D.host.E)) ⊆ P := by
       intro x hx
       obtain ⟨b, hb⟩ := ha x hx
@@ -69,12 +80,15 @@ theorem measurable_coef : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀ (V :
       apply Finset.sum_congr rfl
       intro j _
       ring
-    have hy' : (algebraMap (𝓞 D.host.E) D.host.E a) • y ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
+    have hy'
+        : (algebraMap (𝓞 D.host.E) D.host.E a) • y
+          ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
       Submodule.subset_span hy
-    have := (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
-      (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy' 
-    change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ •
-      ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _ at this
+    have :=
+      (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
+        (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy'
+    change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ • ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _
+      at this
     rw [← smul_assoc, smul_eq_mul, inv_mul_cancel₀ ha0, one_smul] at this
     exact this
   have h2 := (congLev_open_compact V hfull h𝔪).1

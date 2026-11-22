@@ -6,7 +6,9 @@ public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.Admiss
 
 @[expose] public section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.LinRed GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.CompanionTheory.Hypotheses₂ GlobalTheory.CompanionTheory.Hypotheses₂.HCA
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.LinRed
+  GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.CompanionTheory.Hypotheses₂
+  GlobalTheory.CompanionTheory.Hypotheses₂.HCA
 open scoped InnerProductSpace ContDiff
 open MeasureTheory Topology Set Filter CompanionTheory.D.gk.admitted.Gard
 
@@ -18,26 +20,31 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section Op
 
-variable {Γ : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [T2Space Γ] [LocallyCompactSpace Γ]
-  [SecondCountableTopology Γ] [MeasurableSpace Γ] [BorelSpace Γ] (μ : Measure Γ) [μ.IsHaarMeasure]
+variable
+  {Γ : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [T2Space Γ]
+  [LocallyCompactSpace Γ] [SecondCountableTopology Γ] [MeasurableSpace Γ] [BorelSpace Γ]
+  (μ : Measure Γ) [μ.IsHaarMeasure]
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
-theorem exists_avg_op (ρ : Γ → H →L[ℂ] H) (hρ : ∀ u, Continuous fun x => ρ x u) {w : Γ → ℝ}
-    (hw : Continuous w) (hc : HasCompactSupport w) :
-    ∃ T : H →L[ℂ] H, ∀ u, T u = ∫ x, w x • ρ x u ∂μ := by
+theorem exists_avg_op
+    (ρ : Γ → H →L[ℂ] H) (hρ : ∀ u, Continuous fun x => ρ x u)
+    {w : Γ → ℝ} (hw : Continuous w) (hc : HasCompactSupport w)
+    : ∃ T : H →L[ℂ] H, ∀ u, T u = ∫ x, w x • ρ x u ∂μ := by
   obtain ⟨C, hC⟩ : ∃ C, ∀ i : tsupport w, ‖ρ i‖ ≤ C := by
     refine banach_steinhaus (g := fun i : tsupport w => ρ i) fun u => ?_
-    obtain ⟨C, hC⟩ := IsCompact.exists_bound_of_continuousOn (s := tsupport w) hc (hρ u).continuousOn
+    obtain ⟨C, hC⟩ :=
+      IsCompact.exists_bound_of_continuousOn (s := tsupport w) hc (hρ u).continuousOn
     exact ⟨C, fun i => hC i i.2⟩
-  let L : H →ₗ[ℂ] H :=
-    { toFun := fun u => ∫ x, w x • ρ x u ∂μ
-      map_add' := fun u v => by
-        simp only [map_add (f := _), smul_add]
-        exact integral_add (integrable_w μ ρ hρ hw hc u) (integrable_w μ ρ hρ hw hc v)
-      map_smul' := fun c u => by
-        simp only [map_smul, RingHom.id_apply]
-        rw [← integral_smul]
-        simp only [smul_comm c] }
+  let L : H →ₗ[ℂ] H := {
+    toFun := fun u => ∫ x, w x • ρ x u ∂μ
+    map_add' := fun u v => by
+      simp only [map_add (f := _), smul_add]
+      exact integral_add (integrable_w μ ρ hρ hw hc u) (integrable_w μ ρ hρ hw hc v)
+    map_smul' := fun c u => by
+      simp only [map_smul, RingHom.id_apply]
+      rw [← integral_smul]
+      simp only [smul_comm c]
+  }
   have hwi : Integrable (fun x => ‖w x‖) μ := (hw.integrable_of_hasCompactSupport hc).norm
   refine ⟨L.mkContinuous ((∫ x, ‖w x‖ ∂μ) * C) fun u => ?_, fun u => rfl⟩
   have hb : ‖∫ x, w x • ρ x u ∂μ‖ ≤ ∫ x, ‖w x‖ * (C * ‖u‖) ∂μ := by
@@ -46,8 +53,8 @@ theorem exists_avg_op (ρ : Γ → H →L[ℂ] H) (hρ : ∀ u, Continuous fun x
     by_cases hx : w x = 0
     · simp [hx]
     · refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
-      exact ((ρ x).le_opNorm u).trans (mul_le_mul_of_nonneg_right
-        (hC ⟨x, subset_tsupport _ hx⟩) (norm_nonneg _))
+      exact ((ρ x).le_opNorm u).trans
+        (mul_le_mul_of_nonneg_right (hC ⟨x, subset_tsupport _ hx⟩) (norm_nonneg _))
   rw [integral_mul_const] at hb
   rw [mul_assoc]
   exact hb
@@ -72,7 +79,8 @@ instance : One (GT hG hcl) := ⟨⟨1, hG.one_mem⟩⟩
 instance : Inv (GT hG hcl) := ⟨fun x => ⟨x.1⁻¹, hG.inv_mem _ x.2⟩⟩
 
 instance : Group (GT hG hcl) :=
-  Group.ofLeftAxioms (fun x y z => Subtype.ext (Matrix.mul_assoc x.1 y.1 z.1))
+  Group.ofLeftAxioms
+    (fun x y z => Subtype.ext (Matrix.mul_assoc x.1 y.1 z.1))
     (fun x => Subtype.ext (Matrix.one_mul x.1))
     (fun x => Subtype.ext (Matrix.nonsing_inv_mul x.1 (det_unit x)))
 
@@ -104,7 +112,8 @@ instance : IsTopologicalGroup (GT hG hcl) where
   continuous_inv := by
     rw [emb_toM.isInducing.continuous_iff]
     refine continuous_iff_continuousAt.2 fun x => ?_
-    have h1 : ContinuousAt (Inv.inv : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ) (toM x) := by
+    have h1
+        : ContinuousAt (Inv.inv : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ) (toM x) := by
       refine continuousAt_matrix_inv _ ?_
       rw [Ring.inverse_eq_inv']
       exact continuousAt_inv₀ (det_unit x).ne_zero
@@ -114,13 +123,21 @@ instance : MeasurableSpace (GT hG hcl) := borel _
 
 instance : BorelSpace (GT hG hcl) := ⟨rfl⟩
 
-theorem exists_toM {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ G) : ∃ x : GT hG hcl, toM x = g := ⟨⟨g, hg⟩, rfl⟩
+theorem exists_toM {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ G) : ∃ x : GT hG hcl, toM x = g :=
+  ⟨⟨g, hg⟩, rfl⟩
 
-theorem supp_local {f : Matrix (Fin n) (Fin n) ℂ → ℝ} {S : Set (Matrix (Fin n) (Fin n) ℂ)}
-    (hS : IsCompact S) (hd : ∀ B ∈ S, B.det ≠ 0) (hfS : ∀ y, f y ≠ 0 → y ∈ S) (g₀ : Matrix (Fin n) (Fin n) ℂ) :
-    ∃ U ∈ 𝓝 g₀, ∃ C : Set (GT hG hcl), IsCompact C ∧ ∀ g ∈ U, ∀ x ∉ C, f (toM x⁻¹ * g) = 0 := by
-  refine ⟨Metric.closedBall g₀ 1, Metric.closedBall_mem_nhds _ one_pos, _,
-    emb_toM.isCompact_preimage (isCompact_mul_inv (isCompact_closedBall g₀ 1) hS hd), fun g hg x hx => ?_⟩
+theorem supp_local
+    {f : Matrix (Fin n) (Fin n) ℂ → ℝ} {S : Set (Matrix (Fin n) (Fin n) ℂ)}
+    (hS : IsCompact S) (hd : ∀ B ∈ S, B.det ≠ 0) (hfS : ∀ y, f y ≠ 0 → y ∈ S)
+    (g₀ : Matrix (Fin n) (Fin n) ℂ)
+    : ∃ U ∈ 𝓝 g₀, ∃ C : Set (GT hG hcl), IsCompact C ∧ ∀ g ∈ U, ∀ x ∉ C, f (toM x⁻¹ * g) = 0 := by
+  refine ⟨
+    Metric.closedBall g₀ 1,
+    Metric.closedBall_mem_nhds _ one_pos,
+    _,
+    emb_toM.isCompact_preimage (isCompact_mul_inv (isCompact_closedBall g₀ 1) hS hd),
+    fun g hg x hx => ?_
+  ⟩
   by_contra h
   have hB := hfS _ h
   refine hx ⟨(g, toM x⁻¹ * g), ⟨hg, hB⟩, ?_⟩
@@ -128,33 +145,40 @@ theorem supp_local {f : Matrix (Fin n) (Fin n) ℂ → ℝ} {S : Set (Matrix (Fi
   have e : g = toM x * (toM x⁻¹ * g) := by
     rw [← Matrix.mul_assoc, ← toM_mul, mul_inv_cancel, toM_one, Matrix.one_mul]
   show g * (toM x⁻¹ * g)⁻¹ = toM x
-  calc g * (toM x⁻¹ * g)⁻¹ = toM x * (toM x⁻¹ * g) * (toM x⁻¹ * g)⁻¹ := by rw [← e]
+  calc
+    g * (toM x⁻¹ * g)⁻¹
+      = toM x * (toM x⁻¹ * g) * (toM x⁻¹ * g)⁻¹ := by rw [← e]
     _ = toM x := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu, Matrix.mul_one]
 
-theorem contDiff_avg {H : Type*} [NormedAddCommGroup H] [NormedSpace ℝ H] [CompleteSpace H]
+theorem contDiff_avg
+    {H : Type*} [NormedAddCommGroup H] [NormedSpace ℝ H] [CompleteSpace H]
     (μ : Measure (GT hG hcl)) [IsFiniteMeasureOnCompacts μ]
-    (v : GT hG hcl → H) (hv : Continuous v) {f : Matrix (Fin n) (Fin n) ℂ → ℝ}
-    {S : Set (Matrix (Fin n) (Fin n) ℂ)}
-    (hf : ContDiff ℝ ∞ f) (hS : IsCompact S) (hd : ∀ B ∈ S, B.det ≠ 0) (hfS : ∀ y, f y ≠ 0 → y ∈ S) :
-    ContDiff ℝ ∞ fun g : Matrix (Fin n) (Fin n) ℂ => ∫ x : GT hG hcl, f (toM x⁻¹ * g) • v x ∂μ := by
+    (v : GT hG hcl → H) (hv : Continuous v)
+    {f : Matrix (Fin n) (Fin n) ℂ → ℝ} {S : Set (Matrix (Fin n) (Fin n) ℂ)}
+    (hf : ContDiff ℝ ∞ f) (hS : IsCompact S) (hd : ∀ B ∈ S, B.det ≠ 0) (hfS : ∀ y, f y ≠ 0 → y ∈ S)
+    : ContDiff ℝ ∞ fun g : Matrix (Fin n) (Fin n) ℂ =>
+      ∫ x : GT hG hcl, f (toM x⁻¹ * g) • v x ∂μ := by
   have hq : Continuous fun x : GT hG hcl => (toM x⁻¹, v x) :=
     (emb_toM.continuous.comp continuous_inv).prodMk hv
-  have key := contDiff_integral_comp μ _ (contDiff_Phi (H := H) hf) _ hq fun g₀ => by
-    obtain ⟨U, hU, C, hC, h⟩ := supp_local (hG := hG) (hcl := hcl) hS hd hfS g₀
-    refine ⟨U, hU, C, hC, fun g hg x hx => ?_⟩
-    simp only [h g hg x hx, zero_smul]
+  have key :=
+    contDiff_integral_comp μ _ (contDiff_Phi (H := H) hf) _ hq fun g₀ => by
+      obtain ⟨U, hU, C, hC, h⟩ := supp_local (hG := hG) (hcl := hcl) hS hd hfS g₀
+      refine ⟨U, hU, C, hC, fun g hg x hx => ?_⟩
+      simp only [h g hg x hx, zero_smul]
   simpa only using key
 
-theorem toM_inv_of_unitary {k : GT hG hcl} (hk : toM k ∈ Matrix.unitaryGroup (Fin n) ℂ) :
-    toM k⁻¹ = (toM k)ᴴ :=
+theorem toM_inv_of_unitary {k : GT hG hcl} (hk : toM k ∈ Matrix.unitaryGroup (Fin n) ℂ)
+    : toM k⁻¹ = (toM k)ᴴ :=
   Matrix.inv_eq_right_inv (Matrix.mem_unitaryGroup_iff.1 hk)
 
-theorem smooth_of_commutant_stable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hG : IsLinRed G) (hcl : IsClosed G)
-    (hrep : Formalism.QuantumDeterminants.IsCRepOn G π) (hc : ∀ v, ContinuousOn (fun g => π g v) G)
-    (hK : ∀ k ∈ maxCpt G, ∀ v, ‖π k v‖ = ‖v‖) (Y : Submodule ℂ H) [FiniteDimensional ℂ Y]
-    (hY : ∀ T : H →L[ℂ] H, (∀ k ∈ maxCpt G, ∀ u, T (π k u) = π k (T u)) → ∀ y ∈ Y, T y ∈ Y) :
-    ∀ v ∈ Y, IsSmoothVec G π v := by
+theorem smooth_of_commutant_stable
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+    (hG : IsLinRed G) (hcl : IsClosed G) (hrep : Formalism.QuantumDeterminants.IsCRepOn G π)
+    (hc : ∀ v, ContinuousOn (fun g => π g v) G) (hK : ∀ k ∈ maxCpt G, ∀ v, ‖π k v‖ = ‖v‖)
+    (Y : Submodule ℂ H) [FiniteDimensional ℂ Y]
+    (hY : ∀ T : H →L[ℂ] H, (∀ k ∈ maxCpt G, ∀ u, T (π k u) = π k (T u)) → ∀ y ∈ Y, T y ∈ Y)
+    : ∀ v ∈ Y, IsSmoothVec G π v := by
   letI : Inv (Set (GT hG hcl)) := Set.inv
   intro v hv
   let μ : Measure (GT hG hcl) := Measure.haar

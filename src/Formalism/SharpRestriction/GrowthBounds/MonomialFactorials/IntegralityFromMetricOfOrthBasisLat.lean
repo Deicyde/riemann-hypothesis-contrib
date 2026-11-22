@@ -9,14 +9,20 @@ noncomputable section
 
 namespace Formalism.MainNotions.G.SymmetricFormBlocks
 
-open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.MainNotions.G.CountingStatementReduction
+open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
+  Formalism.MainNotions.G.CountingStatementReduction
 
 def RestWinE (D : Formalism.BasicNotions.D7) : Prop :=
-  TransportedAlt fun C0 CYb Cde Ck CD Cb CE1 CE2 Cc => ∀ Ckap Cs CM : ℝ, 1 ≤ CM →
-    ∀ X : flipOneThree.Inst, AdmNoK D C0 CYb Cde Ck CD Cb CE1 CE2 Ckap Cc Cs X →
-      flipOneThree.HI C0 CYb Cde Ck CD Cb Cc X → RestWin C0 CE1 CE2 X CM
+  TransportedAlt fun C0 CYb Cde Ck CD Cb CE1 CE2 Cc =>
+    ∀ Ckap Cs CM : ℝ,
+      1 ≤ CM
+        → ∀ X : flipOneThree.Inst,
+          AdmNoK D C0 CYb Cde Ck CD Cb CE1 CE2 Ckap Cc Cs X
+            → flipOneThree.HI C0 CYb Cde Ck CD Cb Cc X
+            → RestWin C0 CE1 CE2 X CM
 
-theorem symmetric_dims_of_windows (D : Formalism.BasicNotions.D7) (h : RestWinE D) : SymmetryWindowOnAdmissible D := by
+theorem symmetric_dims_of_windows (D : Formalism.BasicNotions.D7) (h : RestWinE D)
+    : SymmetryWindowOnAdmissible D := by
   unfold RestWinE at h
   unfold SymmetryWindowOnAdmissible
   unfold Formalism.MainNotions.flipOneThree.TransportedAlt at h ⊢
@@ -30,8 +36,9 @@ theorem symmetric_dims_of_windows (D : Formalism.BasicNotions.D7) (h : RestWinE 
   intro Ckap Cs CM hCM X hX hHI
   exact ⟨symmCondition C0 CE1 CE2 X, h2 CYb Cde Ck CD Cb ha hb hc hd he Ckap Cs CM hCM X hX hHI⟩
 
-theorem integralityFromMetric_of_orthBasisLat (D : Formalism.BasicNotions.D7) (hB : OrthBasisLat) (hG : GoodLeSmall) (h : RestWinE D) :
-    IntegralityFromMetricForLargeConstants D :=
+theorem integralityFromMetric_of_orthBasisLat
+    (D : Formalism.BasicNotions.D7) (hB : OrthBasisLat) (hG : GoodLeSmall) (h : RestWinE D)
+    : IntegralityFromMetricForLargeConstants D :=
   closed_of_orthogonal_basis D hB hG (symmetric_dims_of_windows D h)
 
 end Formalism.MainNotions.G.SymmetricFormBlocks

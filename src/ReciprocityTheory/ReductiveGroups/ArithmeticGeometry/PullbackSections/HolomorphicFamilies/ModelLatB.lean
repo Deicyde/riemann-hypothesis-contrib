@@ -9,16 +9,20 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.PfModelLatB
 
-open NumberField Formalism.BasicNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.PullbackSections.PfModelLatA FractionalIdeal
+open NumberField Formalism.BasicNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.PullbackSections.PfModelLatA FractionalIdeal
 
 variable {r : ℕ}
 
-theorem norm_embedding_hostFormConstant_eq (D : D7) (τ : D.host.E →+* ℂ) : ‖τ D.host.xi0‖ = xiR D := by
-  have hsq : ∀ σ : D.host.E →+* ℂ, σ D.host.xi0 ^ 2 =
-      1 / (((Ideal.absNorm D.host.ccK : ℕ) : ℂ) ^ 2 * (-(D.host.d : ℂ))) := by
+theorem norm_embedding_hostFormConstant_eq (D : D7) (τ : D.host.E →+* ℂ)
+    : ‖τ D.host.xi0‖ = xiR D := by
+  have hsq
+      : ∀ σ : D.host.E →+* ℂ,
+        σ D.host.xi0 ^ 2 = 1 / (((Ideal.absNorm D.host.ccK : ℕ) : ℂ) ^ 2 * (-(D.host.d : ℂ))) := by
     intro σ
-    have e : D.host.xi0 ^ 2 =
-        1 / (((Ideal.absNorm D.host.ccK : ℕ) : D.host.E) ^ 2 * (-(D.host.d : D.host.E))) := by
+    have e
+        : D.host.xi0 ^ 2
+          = 1 / (((Ideal.absNorm D.host.ccK : ℕ) : D.host.E) ^ 2 * (-(D.host.d : D.host.E))) := by
       simp only [Formalism.BasicNotions.Host.xi0]
       rw [div_pow, mul_pow, D.host.sqrtMinusD_sq]
       ring

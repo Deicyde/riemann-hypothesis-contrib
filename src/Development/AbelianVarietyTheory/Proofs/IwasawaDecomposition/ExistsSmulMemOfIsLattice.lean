@@ -8,10 +8,11 @@ public import Formalism.LocalToGlobal.Columns.LocWLemmas
 
 namespace GlobalTheory.SmulMemOfIsLattice
 
-theorem exists_smul_mem_of_isLattice {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
-    (B : Submodule (NumberField.RingOfIntegers E) (Formalism.L2.Col.Sp E n))
-    (hB : Submodule.IsFullLattice E B) (x : Formalism.L2.Col.Sp E n) :
-    ∃ r ∈ nonZeroDivisors (NumberField.RingOfIntegers E), r • x ∈ B := by
+theorem exists_smul_mem_of_isLattice
+    {E : Type} [inst : Field E] [NumberField E]
+    {n : ℕ} (B : Submodule (NumberField.RingOfIntegers E) (Formalism.L2.Col.Sp E n))
+    (hB : Submodule.IsFullLattice E B) (x : Formalism.L2.Col.Sp E n)
+    : ∃ r ∈ nonZeroDivisors (NumberField.RingOfIntegers E), r • x ∈ B := by
   have hx : x ∈ Submodule.span E (B : Set (Formalism.L2.Col.Sp E n)) := by
     rw [hB.span_eq_top]; exact Submodule.mem_top
   induction hx using Submodule.span_induction with
@@ -31,8 +32,14 @@ theorem exists_smul_mem_of_isLattice {E : Type} [inst : Field E] [NumberField E]
     refine ⟨r * b, mul_mem hr hb, ?_⟩
     have hb0 : algebraMap (NumberField.RingOfIntegers E) E b ≠ 0 :=
       IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hb
-    have h : (r * b) • ((algebraMap (NumberField.RingOfIntegers E) E a / algebraMap (NumberField.RingOfIntegers E) E b) • y) = a • (r • y) := by
-      rw [← algebraMap_smul E (r * b), ← algebraMap_smul E a, ← algebraMap_smul E r y, smul_smul, smul_smul, map_mul]
+    have h
+        : (r * b)
+            • ((algebraMap (NumberField.RingOfIntegers E) E a
+                / algebraMap (NumberField.RingOfIntegers E) E b)
+              • y)
+          = a • (r • y) := by
+      rw [← algebraMap_smul E (r * b), ← algebraMap_smul E a, ← algebraMap_smul E r y, smul_smul,
+        smul_smul, map_mul]
       congr 1
       field_simp
     rw [h]

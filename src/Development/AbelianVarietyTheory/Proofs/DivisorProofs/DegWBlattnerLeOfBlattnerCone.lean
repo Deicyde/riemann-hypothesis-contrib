@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPO
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg MvPolynomial
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg
+  MvPolynomial
 
 namespace GlobalTheory.FlowLemma
 
@@ -57,17 +58,31 @@ private lemma degW_blattner_le_of_sign_lemma {p q : ℕ} (M : _root_.Formalism.B
     _ = ∑ a, |_root_.Formalism.BasicNotions.TH.shiftNu c (fun x => _root_.Formalism.BasicNotions.TH.blattner lam x + Δ x) a| := by
         simp [shiftNu_add_right]
 
-
 open MvPolynomial in
-theorem _root_.GlobalTheory.FlowLemma.degW_blattner_le (p q : ℕ) (M : _root_.Formalism.BasicNotions.TH.GKMod p q) (lam : _root_.Formalism.BasicNotions.TH.Ix p q → ℚ)
+theorem _root_.GlobalTheory.FlowLemma.degW_blattner_le
+    (p q : ℕ) (M : _root_.Formalism.BasicNotions.TH.GKMod p q)
+    (lam : _root_.Formalism.BasicNotions.TH.Ix p q → ℚ)
     (c θ : ℚ)
     (hC : _root_.GlobalTheory.FockAlg.ConeTypes M lam)
-    (hs : ∀ a, (θ < lam a → 0 ≤ _root_.Formalism.BasicNotions.TH.shiftNu c (_root_.Formalism.BasicNotions.TH.blattner lam) a) ∧
-      (lam a ≤ θ → _root_.Formalism.BasicNotions.TH.shiftNu c (_root_.Formalism.BasicNotions.TH.blattner lam) a ≤ 0))
-    (μ : _root_.Formalism.BasicNotions.TH.Ix p q → ℚ) (v : M.V) (hv : _root_.Formalism.BasicNotions.TH.IsHW M.act μ v) :
-    _root_.Formalism.BasicNotions.TH.degW c (_root_.Formalism.BasicNotions.TH.blattner lam) ≤ _root_.Formalism.BasicNotions.TH.degW c μ := by
-  refine degW_blattner_le_of_sign_lemma M lam c hC (fun a => if θ < lam a then 1 else -1)
-    (fun a => ?_) (fun a => ?_) (fun a b hab => ?_) μ v hv
+    (hs : ∀ a,
+      (θ < lam a
+          → 0
+            ≤ _root_.Formalism.BasicNotions.TH.shiftNu c
+              (_root_.Formalism.BasicNotions.TH.blattner lam) a)
+        ∧ (lam a ≤ θ
+          → _root_.Formalism.BasicNotions.TH.shiftNu c
+              (_root_.Formalism.BasicNotions.TH.blattner lam) a
+            ≤ 0))
+    (μ : _root_.Formalism.BasicNotions.TH.Ix p q → ℚ) (v : M.V)
+    (hv : _root_.Formalism.BasicNotions.TH.IsHW M.act μ v)
+    : _root_.Formalism.BasicNotions.TH.degW c (_root_.Formalism.BasicNotions.TH.blattner lam)
+      ≤ _root_.Formalism.BasicNotions.TH.degW c μ := by
+  refine degW_blattner_le_of_sign_lemma M lam c hC
+    (fun a => if θ < lam a then 1 else -1)
+    (fun a => ?_)
+    (fun a => ?_)
+    (fun a b hab => ?_)
+    μ v hv
   · split_ifs <;> simp
   · split_ifs with h
     · simp [abs_of_nonneg ((hs a).1 h)]

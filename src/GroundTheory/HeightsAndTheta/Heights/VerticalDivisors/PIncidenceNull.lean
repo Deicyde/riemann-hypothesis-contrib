@@ -13,20 +13,21 @@ open MvPolynomial
 
 theorem IncidenceNull.proof : IncidenceNull.Statement := by
   intro F _ n k I f hf
-  have hvan : ∀ j : Fin n, rename Sum.inr f * X (Sum.inl j) ∈
-      MvPolynomial.vanishingIdeal F
-        (MvPolynomial.zeroLocus (AlgebraicClosure F) (incIdeal I k)) := by
+  have hvan
+      : ∀ j : Fin n,
+        rename Sum.inr f * X (Sum.inl j) ∈ MvPolynomial.vanishingIdeal F
+          (MvPolynomial.zeroLocus (AlgebraicClosure F) (incIdeal I k)) := by
     intro j z hz
     have hI : ∀ g ∈ I, aeval (z ∘ Sum.inl) g = 0 := by
       intro g hg
-      have hmem : rename Sum.inl g ∈ incIdeal I k :=
-        Ideal.mem_sup_left (Ideal.mem_map_of_mem _ hg)
+      have hmem : rename Sum.inl g ∈ incIdeal I k := Ideal.mem_sup_left (Ideal.mem_map_of_mem _ hg)
       have h := hz _ hmem
       rwa [aeval_rename] at h
     have hlin : ∀ i : Fin k, ∑ j, (z ∘ Sum.inr) (i, j) * (z ∘ Sum.inl) j = 0 := by
       intro i
-      have hmem : (∑ j, X (Sum.inr (i, j)) * X (Sum.inl j) :
-          MvPolynomial (Fin n ⊕ (Fin k × Fin n)) F) ∈ incIdeal I k :=
+      have hmem
+          : (∑ j, X (Sum.inr (i, j)) * X (Sum.inl j) : MvPolynomial (Fin n ⊕ (Fin k × Fin n)) F)
+            ∈ incIdeal I k :=
         Ideal.mem_sup_right (Ideal.subset_span ⟨i, rfl⟩)
       have h := hz _ hmem
       simpa using h
@@ -42,7 +43,9 @@ theorem IncidenceNull.proof : IncidenceNull.Statement := by
     rw [MvPolynomial.vanishingIdeal_zeroLocus_eq_radical] at h
     exact h
   choose m hm using hrad
-  exact ⟨Finset.univ.sup m, fun j =>
-    Ideal.pow_mem_of_pow_mem _ (hm j) (Finset.le_sup (Finset.mem_univ j))⟩
+  exact ⟨
+    Finset.univ.sup m,
+    fun j => Ideal.pow_mem_of_pow_mem _ (hm j) (Finset.le_sup (Finset.mem_univ j))
+  ⟩
 
 end GroundTheory.Heights₂.Heights.Vertical

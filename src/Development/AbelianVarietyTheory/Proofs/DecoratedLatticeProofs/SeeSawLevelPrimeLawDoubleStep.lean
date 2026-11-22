@@ -19,7 +19,11 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Ram
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel IsLocalRing GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.LatPair GlobalTheory.SplitWeil GlobalTheory.SeeSaw GlobalTheory.FinPl
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel
+  IsLocalRing GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.LatPair
+  GlobalTheory.SplitWeil GlobalTheory.SeeSaw GlobalTheory.FinPl
 open GlobalTheory.IndefiniteRowSideFullHecke.AppendedVectorData (lastKer)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -27,18 +31,24 @@ namespace GlobalTheory.LevPrimeMid
 
 variable {D : D7}
 
-theorem mxAt_mul_right (P : Pl D → Prop) {m n r : ℕ} {x : Mx D m n} (hx : MxAt P x) (M : Matrix (Fin n) (Fin r) (AE D)) :
-    MxAt P (x * M) := fun i j => by
+theorem mxAt_mul_right
+    (P : Pl D → Prop) {m n r : ℕ} {x : Mx D m n} (hx : MxAt P x) (M : Matrix (Fin n) (Fin r) (AE D))
+    : MxAt P (x * M) := fun i j => by
   rw [Matrix.mul_apply]
   exact Ideal.sum_mem _ fun l _ => Ideal.mul_mem_right _ _ (hx i l)
 
-theorem mxAt_mul_left (P : Pl D → Prop) {m n r : ℕ} {x : Mx D n r} (hx : MxAt P x) (M : Matrix (Fin m) (Fin n) (AE D)) :
-    MxAt P (M * x) := fun i j => by
+theorem mxAt_mul_left
+    (P : Pl D → Prop) {m n r : ℕ} {x : Mx D n r} (hx : MxAt P x) (M : Matrix (Fin m) (Fin n) (AE D))
+    : MxAt P (M * x) := fun i j => by
   rw [Matrix.mul_apply]
   exact Ideal.sum_mem _ fun l _ => Ideal.mul_mem_left _ _ (hx l j)
 
-theorem combAt_extS (P : Pl D → Prop) {S A L : HSp D} (o : OrthDec S A L) (T : HSp D) {c : WO A T →₀ ℂ}
-    (hc : CombAt P c) : CombAt P (extS o T c) := by
+theorem combAt_extS
+    (P : Pl D → Prop)
+    {S A L : HSp D} (o : OrthDec S A L)
+    (T : HSp D)
+    {c : WO A T →₀ ℂ} (hc : CombAt P c)
+    : CombAt P (extS o T c) := by
   intro u hu
   classical
   obtain ⟨w, hw, rfl⟩ := Finset.mem_image.1 (Finsupp.mapDomain_support hu)
@@ -47,8 +57,12 @@ theorem combAt_extS (P : Pl D → Prop) {S A L : HSp D} (o : OrthDec S A L) (T :
   rw [Matrix.zero_mul, add_zero]
   exact mxAt_mul_right P (hc w hw) _ i j
 
-theorem combAt_extT (P : Pl D → Prop) {T A L : HSp D} (o : OrthDec T A L) (S : HSp D) {c : WO S A →₀ ℂ}
-    (hc : CombAt P c) : CombAt P (extT o S c) := by
+theorem combAt_extT
+    (P : Pl D → Prop)
+    {T A L : HSp D} (o : OrthDec T A L)
+    (S : HSp D)
+    {c : WO S A →₀ ℂ} (hc : CombAt P c)
+    : CombAt P (extT o S c) := by
   intro u hu
   classical
   obtain ⟨w, hw, rfl⟩ := Finset.mem_image.1 (Finsupp.mapDomain_support hu)
@@ -57,38 +71,53 @@ theorem combAt_extT (P : Pl D → Prop) {T A L : HSp D} (o : OrthDec T A L) (S :
   rw [Matrix.mul_zero, add_zero]
   exact mxAt_mul_left P (hc w hw) _ i j
 
-theorem isFinComb_of_combAt (P : Pl D → Prop) {S T : HSp D} {c : WO S T →₀ ℂ} (hc : CombAt P c) : IsFinComb c := by
+theorem isFinComb_of_combAt (P : Pl D → Prop) {S T : HSp D} {c : WO S T →₀ ℂ} (hc : CombAt P c)
+    : IsFinComb c := by
   intro u hu
   ext i j
   exact (RingHom.mem_ker).1 (Ideal.mem_inf.1 (hc u hu i j)).1
 
-theorem places_of_preT {c : Comm D} {v : VCom c} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {ι : Type} {o : TDat c k ι} (H : PreT v o) : Places o.p o.I (· ∈ v.tP) :=
+theorem places_of_preT
+    {c : Comm D} {v : VCom c} {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {ι : Type} {o : TDat c k ι} (H : PreT v o)
+    : Places o.p o.I (· ∈ v.tP) :=
   ⟨H.nodup, H.all, H.inj, fun x => H.tP x, fun i => (H.char i).2⟩
 
-theorem heisO_zero (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (u : WO S T) : heisO ψ S T u (fun _ => 0) = fun _ => 0 := by
+theorem heisO_zero (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (u : WO S T)
+    : heisO ψ S T u (fun _ => 0) = fun _ => 0 := by
   funext w
   simp [heisO]
 
-theorem vac_zero (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (LS : Lat S) (LT : Lat T) (P : Pl D → Prop) :
-    Vac ψ S T LS LT P (fun _ => 0) :=
-  ⟨GlobalTheory.OrientedHeis.theta_zero, fun u _ => heisO_zero ψ S T _, fun _ _ u _ _ => heisO_zero ψ S T u⟩
+theorem vac_zero
+    (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (LS : Lat S) (LT : Lat T) (P : Pl D → Prop)
+    : Vac ψ S T LS LT P (fun _ => 0) := ⟨
+  GlobalTheory.OrientedHeis.theta_zero,
+  fun u _ => heisO_zero ψ S T _,
+  fun _ _ u _ _ => heisO_zero ψ S T u
+⟩
 
-theorem biVacAt_zero (ψ : AddChar (AF D.host.F) ℂ) {A S A' : HSp D} (LA : Lat A) (LS : Lat S) (LA' : Lat A')
-    (P : Pl D → Prop) : BiVacAt ψ LA LS LA' P (fun _ _ => 0) :=
+theorem biVacAt_zero
+    (ψ : AddChar (AF D.host.F) ℂ)
+    {A S A' : HSp D} (LA : Lat A) (LS : Lat S) (LA' : Lat A')
+    (P : Pl D → Prop)
+    : BiVacAt ψ LA LS LA' P (fun _ _ => 0) :=
   ⟨fun _ => vac_zero ψ A S LA LS P, fun _ => vac_zero ψ S A' LS LA' P⟩
 
-theorem comb_zero (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (c : WO S T →₀ ℂ) : comb ψ S T c (fun _ => 0) = fun _ => 0 := by
+theorem comb_zero (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (c : WO S T →₀ ℂ)
+    : comb ψ S T c (fun _ => 0) = fun _ => 0 := by
   funext w
   simp [comb, heisO_zero]
 
-theorem biComb_zero (ψ : AddChar (AF D.host.F) ℂ) (A S A' : HSp D) (c : WO A S →₀ ℂ) (c' : WO S A' →₀ ℂ) :
-    biComb ψ A S A' c c' (fun _ _ => 0) = fun _ _ => 0 := by
+theorem biComb_zero
+    (ψ : AddChar (AF D.host.F) ℂ) (A S A' : HSp D) (c : WO A S →₀ ℂ) (c' : WO S A' →₀ ℂ)
+    : biComb ψ A S A' c c' (fun _ _ => 0) = fun _ _ => 0 := by
   funext u v
   simp only [biComb, comb_zero]
 
-theorem biLift_zero {A S A' : HSp D} (oma : Om A S) (omb : Om S A') (vA : Vol A) (vS : Vol S) (φ : GA D A → ℂ) :
-    biLift oma omb vA vS φ (fun _ _ => 0) = 0 := by
+theorem biLift_zero
+    {A S A' : HSp D} (oma : Om A S) (omb : Om S A') (vA : Vol A) (vS : Vol S) (φ : GA D A → ℂ)
+    : biLift oma omb vA vS φ (fun _ _ => 0) = 0 := by
   funext h₂
   simp only [biLift]
   have e1 : ∀ h₀ h₁, (fun v : WO S A' => oma (h₀, h₁) (fun _ => 0) 0) = 0 := fun h₀ h₁ => by
@@ -101,16 +130,22 @@ namespace GlobalTheory.LevPrimeMid
 
 variable {D : D7}
 
-theorem bl_contr (hCL : ContrLaw D) {c : Comm D} (v : VCom c) (t : Tup c) (hW : WeilOK (t := t) v) {j σ : ℕ}
-    (h : j + 2 * (σ + 1) + 2 = D.R.m) {φ : GA D (c.X j) → ℂ} (hφ : IsContAut (c.X j) φ)
-    {Ξ₁ : WO (c.B j (σ + 1) h).V₀ (c.X (j + 1)) → ℂ} {Ξ₂ : WO (c.X (j + 1)) (c.B (j + 1 + 1) σ (idx_step h)).V₀ → ℂ}
-    (h₁ : IsThetaFunO c.ψ _ _ Ξ₁) (h₂ : IsThetaFunO c.ψ _ _ Ξ₂) :
-    c.bl j (t.kom j) (t.kom (j + 1)) φ (GlobalTheory.Unf.contr (c.lnk j σ h) (c.X (j + 1)) (c.vL j σ h) Ξ₁ Ξ₂) =
-      hand0 (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h) φ Ξ₁ Ξ₂ := by
+theorem bl_contr
+    (hCL : ContrLaw D)
+    {c : Comm D} (v : VCom c) (t : Tup c) (hW : WeilOK (t := t) v)
+    {j σ : ℕ} (h : j + 2 * (σ + 1) + 2 = D.R.m)
+    {φ : GA D (c.X j) → ℂ} (hφ : IsContAut (c.X j) φ)
+    {Ξ₁ : WO (c.B j (σ + 1) h).V₀ (c.X (j + 1)) → ℂ}
+    {Ξ₂ : WO (c.X (j + 1)) (c.B (j + 1 + 1) σ (idx_step h)).V₀ → ℂ}
+    (h₁ : IsThetaFunO c.ψ _ _ Ξ₁) (h₂ : IsThetaFunO c.ψ _ _ Ξ₂)
+    : c.bl j (t.kom j) (t.kom (j + 1)) φ
+        (GlobalTheory.Unf.contr (c.lnk j σ h) (c.X (j + 1)) (c.vL j σ h) Ξ₁ Ξ₂)
+      = hand0 (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h) φ Ξ₁ Ξ₂ := by
   obtain ⟨χA, χA', χz, omz, omz', e1, e2, w1, w2, w3, w4⟩ := hW.mid j σ h
   funext g
-  have := (hCL c.ψ σ _ _ _ (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h) χA χA' χz (t.kom j) omz
-    (t.kom (j + 1)) omz' e1 e2 w1 w2 w3 w4 φ Ξ₁ Ξ₂ hφ h₁ h₂).2.2 g
+  have :=
+    (hCL c.ψ σ _ _ _ (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h) χA χA' χz
+      (t.kom j) omz (t.kom (j + 1)) omz' e1 e2 w1 w2 w3 w4 φ Ξ₁ Ξ₂ hφ h₁ h₂).2.2 g
   rw [hand0, this]
   rfl
 
@@ -120,14 +155,19 @@ namespace GlobalTheory.LevPrimeMid
 
 variable {D : D7}
 
-theorem lastKer_isLattice {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : Type}
-    (q : Unif k) (L : Submodule 𝒪[k] (n → k)) [L.IsLattice k] : (lastKer L).IsLattice k := by
+theorem lastKer_isLattice
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : Type}
+    (q : Unif k)
+    (L : Submodule 𝒪[k] (n → k)) [L.IsLattice k]
+    : (lastKer L).IsLattice k := by
   rw [GlobalTheory.IndefiniteRowSideFullHecke.AppendedVectorData.lastKer_eq q]
   refine Submodule.IsLattice.of_fg k ?_
   refine (((Submodule.IsLattice.fg k L |>.map _).sup (Submodule.fg_span_singleton _)).sup
-      (Submodule.fg_span ?_)).sup (Submodule.fg_span ?_)
+    (Submodule.fg_span ?_)).sup (Submodule.fg_span ?_)
   · exact ((Set.finite_le_nat 1).image (avec k n 1)).subset fun _ ⟨i, _, _, h, e⟩ => ⟨i, h, e.symm⟩
-  · exact ((Set.finite_le_nat 1).image (q.inv • avec k n 1 ·)).subset fun _ ⟨i, _, h, e⟩ => ⟨i, h, e.symm⟩
+  · exact ((Set.finite_le_nat 1).image (q.inv • avec k n 1 ·)).subset fun _ ⟨i, _, h, e⟩ =>
+      ⟨i, h, e.symm⟩
 
 end GlobalTheory.LevPrimeMid
 

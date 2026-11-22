@@ -19,8 +19,8 @@ open GlobalTheory.CuspRep
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem chart_conj (φ : GA E a → ℂ) (g : GA E a) :
-    chart (fun x => starRingEnd ℂ (φ x)) g = Complex.conjCLE ∘ chart φ g := by
+theorem chart_conj (φ : GA E a → ℂ) (g : GA E a)
+    : chart (fun x => starRingEnd ℂ (φ x)) g = Complex.conjCLE ∘ chart φ g := by
   funext x
   simp only [chart, Function.comp_apply]
   split_ifs <;> simp
@@ -42,13 +42,13 @@ def conjEquiv : Sm E a ≃ₗ⋆[ℂ] Sm E a where
   left_inv x := by apply Subtype.ext; funext g; simp [conjMap]
   right_inv x := by apply Subtype.ext; funext g; simp [conjMap]
 
-theorem conjEquiv_act (o : Op E a) (φ : Sm E a) :
-    act o (conjEquiv φ) = conjEquiv (act o φ) := by
+theorem conjEquiv_act (o : Op E a) (φ : Sm E a) : act o (conjEquiv φ) = conjEquiv (act o φ) := by
   cases o with
   | fin k => rfl
   | cpt k => rfl
   | lie X =>
-    apply Subtype.ext; funext g
+    apply Subtype.ext
+    funext g
     show lieD X (fun x => starRingEnd ℂ (φ.1 x)) g = starRingEnd ℂ (lieD X φ.1 g)
     simp only [lieD, chart_conj, ContinuousLinearEquiv.comp_fderiv]
     rfl
@@ -58,9 +58,10 @@ end GlobalTheory.SmoothConj
 namespace GlobalTheory
 open GlobalTheory.CuspRep
 
-theorem smooth_conj_commutes_act : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
-    ∃ C : Sm E a ≃ₗ⋆[ℂ] Sm E a, (∀ φ g, (C φ).1 g = starRingEnd ℂ (φ.1 g)) ∧
-      ∀ o φ, act o (C φ) = C (act o φ) :=
+theorem smooth_conj_commutes_act
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
+      ∃ C : Sm E a ≃ₗ⋆[ℂ] Sm E a,
+        (∀ φ g, (C φ).1 g = starRingEnd ℂ (φ.1 g)) ∧ ∀ o φ, act o (C φ) = C (act o φ) :=
   fun _ _ _ _ _ => ⟨SmoothConj.conjEquiv, fun _ _ => rfl, SmoothConj.conjEquiv_act⟩
 
 end GlobalTheory

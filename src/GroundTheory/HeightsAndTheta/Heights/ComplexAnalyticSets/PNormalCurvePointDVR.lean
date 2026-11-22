@@ -23,7 +23,8 @@ theorem NormalCurvePointDVR.proof : NormalCurvePointDVR.Statement := by
   have hIm : I ≤ m := fun f hf ↦ RingHom.mem_ker.2 (hw f hf)
   let P : Ideal A := m.map (Ideal.Quotient.mk I)
   have hmem : ∀ f, Ideal.Quotient.mk I f ∈ P ↔ f ∈ m := fun f ↦ Ideal.mem_quotient_iff_mem hIm
-  have hP : P.IsPrime := Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rw [Ideal.mk_ker]; exact hIm)
+  have hP : P.IsPrime :=
+    Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rw [Ideal.mk_ker]; exact hIm)
 
   have : Ring.KrullDimLE 1 A := Ring.krullDimLE_iff.2 (by rw [hdim])
   have : Ring.DimensionLEOne A := ⟨fun hp0 hp ↦ hp.isMaximal_of_ne_bot hp0⟩
@@ -35,7 +36,8 @@ theorem NormalCurvePointDVR.proof : NormalCurvePointDVR.Statement := by
       rw [← Ideal.Quotient.eq_zero_iff_mem, ← Ideal.mem_bot, ← h0]
       exact (hmem f).2 hf
     have hmax : m.IsMaximal := RingHom.ker_isMaximal_of_surjective _ (fun z ↦ ⟨C z, by simp⟩)
-    have hfield : IsField A := (Ideal.Quotient.maximal_ideal_iff_isField_quotient I).1 (le_antisymm hIm hmI ▸ hmax)
+    have hfield : IsField A :=
+      (Ideal.Quotient.maximal_ideal_iff_isField_quotient I).1 (le_antisymm hIm hmI ▸ hmax)
     have := ringKrullDim_eq_zero_of_isField hfield
     rw [hdim] at this
     exact_mod_cast this
@@ -53,8 +55,9 @@ theorem NormalCurvePointDVR.proof : NormalCurvePointDVR.Statement := by
     change IsLocalization P.primeCompl T
     rw [← hsub]
     exact hloc
-  have hdom : IsDomain T := IsLocalization.isDomain_of_le_nonZeroDivisors T (M := P.primeCompl)
-    P.primeCompl_le_nonZeroDivisors
+  have hdom : IsDomain T :=
+    IsLocalization.isDomain_of_le_nonZeroDivisors T (M := P.primeCompl)
+      P.primeCompl_le_nonZeroDivisors
   exact ⟨hdom, IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain A hP0 T⟩
 
 end

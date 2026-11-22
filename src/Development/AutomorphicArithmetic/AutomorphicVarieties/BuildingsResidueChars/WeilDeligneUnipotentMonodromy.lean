@@ -13,23 +13,33 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JordanHol
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
 
 set_option maxHeartbeats 800000 in
-theorem UpperTheory.weilDeligne_unipotent_monodromy :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (N : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V)
-    (r s : ℕ) (d : Fin r → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin N) (j : Fin r) (d' : Fin s → ℕ) (e' : (Σ b, Fin (d' b)) ≃ Fin (d j)) (t : ℕ) (c : Fin t → ℕ) (f : (Σ a, Fin (c a)) ≃ Fin N),
-    (∀ p q, blk f p < blk f q → (blk e p < blk e q ∨ ∃ p' q', p = e ⟨j, p'⟩ ∧ q = e ⟨j, q'⟩ ∧ blk e' p' < blk e' q')) →
-    Subsingleton (Jacquet π (unipRad k f)) →
-    Subsingleton (Jacquet ((jac e π).comp (MonoidHom.mulSingle (fun a => GL (Fin (d a)) k) j) :
-      Representation ℂ (GL (Fin (d j)) k) (Jacquet π (unipRad k e))) (unipRad k e')) := by
+theorem UpperTheory.weilDeligne_unipotent_monodromy
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V)
+        (r s : ℕ) (d : Fin r → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin N) (j : Fin r) (d' : Fin s → ℕ)
+        (e' : (Σ b, Fin (d' b)) ≃ Fin (d j)) (t : ℕ) (c : Fin t → ℕ) (f : (Σ a, Fin (c a)) ≃ Fin N),
+      (∀ p q,
+          blk f p < blk f q
+            → (blk e p < blk e q ∨ ∃ p' q', p = e ⟨j, p'⟩ ∧ q = e ⟨j, q'⟩ ∧ blk e' p' < blk e' q'))
+        → Subsingleton (Jacquet π (unipRad k f))
+        → Subsingleton (Jacquet
+          ((jac e π).comp (MonoidHom.mulSingle (fun a => GL (Fin (d a)) k) j)
+            : Representation ℂ (GL (Fin (d j)) k) (Jacquet π (unipRad k e)))
+          (unipRad k e')) := by
   intro k _ _ _ _ N V _ _ π r s d e j d' e' t c f hord hsub
   classical
   have hKf : twKer π (unipRad k f) 1 = ⊤ := Submodule.Quotient.subsingleton_iff.mp hsub
   apply Submodule.Quotient.subsingleton_iff.mpr
-  have hfblk : ∀ (a : Fin t) (i : Fin (c a)), blk f (f ⟨a, i⟩) = a := fun a i => by simp only [blk, Equiv.symm_apply_apply]
-  have heblk : ∀ (a : Fin r) (i : Fin (d a)), blk e (e ⟨a, i⟩) = a := fun a i => by simp only [blk, Equiv.symm_apply_apply]
-  have he'blk : ∀ (b : Fin s) (i : Fin (d' b)), blk e' (e' ⟨b, i⟩) = b := fun b i => by simp only [blk, Equiv.symm_apply_apply]
-  suffices key : twKer π (unipRad k f) 1 ≤
-      (twKer ((jac e π).comp (MonoidHom.mulSingle (fun a => GL (Fin (d a)) k) j))
-        (unipRad k e') 1).comap (twKer π (unipRad k e) 1).mkQ by
+  have hfblk : ∀ (a : Fin t) (i : Fin (c a)), blk f (f ⟨a, i⟩) = a := fun a i => by
+    simp only [blk, Equiv.symm_apply_apply]
+  have heblk : ∀ (a : Fin r) (i : Fin (d a)), blk e (e ⟨a, i⟩) = a := fun a i => by
+    simp only [blk, Equiv.symm_apply_apply]
+  have he'blk : ∀ (b : Fin s) (i : Fin (d' b)), blk e' (e' ⟨b, i⟩) = b := fun b i => by
+    simp only [blk, Equiv.symm_apply_apply]
+  suffices key
+      : twKer π (unipRad k f) 1
+        ≤ (twKer ((jac e π).comp (MonoidHom.mulSingle (fun a => GL (Fin (d a)) k) j)) (unipRad k e')
+          1).comap (twKer π (unipRad k e) 1).mkQ by
     rw [eq_top_iff]
     rintro x -
     obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective _ x
@@ -70,8 +80,10 @@ theorem UpperTheory.weilDeligne_unipotent_monodromy :
     · rw [heblk, heblk] at hlt
       exact lt_irrefl _ hlt
   obtain ⟨u', hu'eq⟩ : ∃ u', leviProj k e ⟨n, hA⟩ j = u' := ⟨_, rfl⟩
-  have hu'e : ∀ i i', (u' : Matrix (Fin (d j)) (Fin (d j)) k) i i' =
-      (n : Matrix (Fin N) (Fin N) k) (e ⟨j, i⟩) (e ⟨j, i'⟩) := by
+  have hu'e
+      : ∀ i i',
+        (u' : Matrix (Fin (d j)) (Fin (d j)) k) i i'
+          = (n : Matrix (Fin N) (Fin N) k) (e ⟨j, i⟩) (e ⟨j, i'⟩) := by
     intro i i'
     rw [← hu'eq, leviProj_apply]
   have hu' : u' ∈ unipRad k e' := by
@@ -98,7 +110,8 @@ theorem UpperTheory.weilDeligne_unipotent_monodromy :
         rw [hdiag, Matrix.one_apply_eq]
       · rw [Matrix.one_apply_ne hxy]
         by_contra h0
-        have hpq : e ⟨j, e' ⟨b, x⟩⟩ ≠ e ⟨j, e' ⟨b, y⟩⟩ := fun h => hxy (by simpa using e.injective h)
+        have hpq : e ⟨j, e' ⟨b, x⟩⟩ ≠ e ⟨j, e' ⟨b, y⟩⟩ := fun h =>
+          hxy (by simpa using e.injective h)
         rcases hord _ _ (hoff _ _ hpq h0) with h | ⟨p', q', h1, h2, h3⟩
         · rw [heblk, heblk] at h
           exact lt_irrefl _ h
@@ -148,7 +161,9 @@ theorem UpperTheory.weilDeligne_unipotent_monodromy :
     rw [MonoidHom.comp_apply, Pi.evalMonoidHom_apply]
     unfold detChar
     rw [MonoidHom.comp_apply]
-    have hdet : Matrix.GeneralLinearGroup.det ((Pi.mulSingle j u' : Levi k (fun a => Fin (d a))) a) = 1 := by
+    have hdet
+        : Matrix.GeneralLinearGroup.det ((Pi.mulSingle j u' : Levi k (fun a => Fin (d a))) a)
+          = 1 := by
       by_cases ha : a = j
       · subst ha
         rw [Pi.mulSingle_eq_same]
@@ -166,7 +181,8 @@ theorem UpperTheory.weilDeligne_unipotent_monodromy :
   · rw [map_sub, Submodule.mkQ_apply, Submodule.mkQ_apply]
     apply Submodule.subset_span
     refine ⟨⟨u', hu'⟩, Submodule.Quotient.mk w, ?_⟩
-    simp only [MonoidHom.one_apply, Units.val_one, one_smul, MonoidHom.comp_apply, MonoidHom.mulSingle_apply]
+    simp only [MonoidHom.one_apply, Units.val_one, one_smul, MonoidHom.comp_apply,
+      MonoidHom.mulSingle_apply]
     rw [show jac e π = twist (jacU e π) (deltaHalf k (fun a => Fin (d a)))⁻¹ from rfl, twist_apply,
       MonoidHom.inv_apply, hdelta, inv_one, Units.val_one, one_smul, ← hLeq]
     rfl

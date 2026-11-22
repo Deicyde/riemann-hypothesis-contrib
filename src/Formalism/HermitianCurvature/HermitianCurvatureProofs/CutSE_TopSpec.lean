@@ -15,7 +15,7 @@ theorem leibniz_class : LeibnizCls := leibnizCls_of_radLoc spectral_radial_local
 theorem density_smooth_class : DensSmoothCls := densSmoothCls_of_radLoc spectral_radial_locality
 
 theorem thmPActualCpt_of_spec (h : RDIdentSpec) : Formalism.FourierDecayAlt.P5.ThmPActualCpt :=
-  thmPActualCpt_of_leaves (one_letter_density_estimate leibniz_class density_smooth_class) density_smooth_class
-    (radDecay_of_spec h)
+  thmPActualCpt_of_leaves (one_letter_density_estimate leibniz_class density_smooth_class)
+    density_smooth_class (radDecay_of_spec h)
 
 end Formalism.FourierDecayAlt.P.CutSE

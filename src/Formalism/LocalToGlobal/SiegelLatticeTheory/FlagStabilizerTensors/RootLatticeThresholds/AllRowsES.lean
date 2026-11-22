@@ -12,8 +12,8 @@ open MonoidAlgebra
 
 namespace Formalism.L2.SG.Pf.AllRowsES
 
-open Formalism.BasicNotions Formalism.MainNotions.ArithmeticCylinders Formalism.L2.SG.AllRowsOf Formalism.L2.SG.Pf.AllRowsGA Formalism.L2.SG.Pf.AllRowsFin
-  Formalism.L2.SG.Pf.AllRowsRhoX
+open Formalism.BasicNotions Formalism.MainNotions.ArithmeticCylinders Formalism.L2.SG.AllRowsOf
+  Formalism.L2.SG.Pf.AllRowsGA Formalism.L2.SG.Pf.AllRowsFin Formalism.L2.SG.Pf.AllRowsRhoX
 
 variable {D : D7}
 
@@ -24,13 +24,15 @@ def Ea (a : CV D) : MonoidAlgebra ℂ (G0g D.nd) :=
   MonoidAlgebra.ofCoeff <| Finsupp.equivFunOnFinite.symm fun γ : G0g D.nd =>
     ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))).coeff (γ kv)
 
-theorem Ea_coeff (a : CV D) (γ : G0g D.nd) :
-    (Ea a).coeff γ = haveI : ∀ k, Fact (D.host.g k).Prime := fun k => ⟨D.host.g_prime k⟩
-      ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))).coeff (γ kv) := by
-  simp [Ea, MonoidAlgebra.coeff_ofCoeff]
+theorem Ea_coeff (a : CV D) (γ : G0g D.nd)
+    : (Ea a).coeff γ
+      = haveI : ∀ k, Fact (D.host.g k).Prime := fun k => ⟨D.host.g_prime k⟩
+        ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))).coeff (γ kv) :=
+  by simp [Ea, MonoidAlgebra.coeff_ofCoeff]
 
 open Classical in
-theorem ES_eq (S : Set (Tup2 D)) : ES S = ∑ a ∈ Finset.univ.filter (fun a : CV D => tupOf a ∈ S), Ea a := by
+theorem ES_eq (S : Set (Tup2 D))
+    : ES S = ∑ a ∈ Finset.univ.filter (fun a : CV D => tupOf a ∈ S), Ea a := by
   apply MonoidAlgebra.ext
   ext γ
   rw [MonoidAlgebra.coeff_sum, Finset.sum_apply', Finset.sum_filter]
@@ -42,10 +44,14 @@ theorem ES_eq (S : Set (Tup2 D)) : ES S = ∑ a ∈ Finset.univ.filter (fun a : 
   · rw [Ea_coeff]
   · rfl
 
-theorem monicOf_inj {g : ℕ} [Fact g.Prime] {N : ℕ} {a b : Fin N → ZMod g}
-    (h : Formalism.CyclotomicNorms.monicOf a = Formalism.CyclotomicNorms.monicOf b) : a = b := by
+theorem monicOf_inj
+    {g : ℕ} [Fact g.Prime]
+    {N : ℕ} {a b : Fin N → ZMod g}
+    (h : Formalism.CyclotomicNorms.monicOf a = Formalism.CyclotomicNorms.monicOf b)
+    : a = b := by
   funext i
-  rw [← Formalism.L2.SG.Pf.RowDictPf.coeff_monicOf a i, ← Formalism.L2.SG.Pf.RowDictPf.coeff_monicOf b i, h]
+  rw [← Formalism.L2.SG.Pf.RowDictPf.coeff_monicOf a i,
+    ← Formalism.L2.SG.Pf.RowDictPf.coeff_monicOf b i, h]
 
 open Classical in
 theorem Ea_mul (a b : CV D) : Ea a * Ea b = if a = b then Ea a else 0 := by
@@ -54,11 +60,12 @@ theorem Ea_mul (a b : CV D) : Ea a * Ea b = if a = b then Ea a else 0 := by
   ext γ
   rw [coeff_mul_fin]
   simp only [Ea_coeff]
-  have key : ∑ δ : G0g D.nd, (∏ kv : (Σ k : Fin 2, D.nd.PlG k),
-        (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))).coeff (δ kv)) *
-      ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (b kv))).coeff ((δ⁻¹ * γ) kv) =
-      ∏ kv : (Σ k : Fin 2, D.nd.PlG k), ((D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))) *
-        (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (b kv)))).coeff (γ kv) := by
+  have key
+      : ∑ δ : G0g D.nd, (∏ kv : (Σ k : Fin 2, D.nd.PlG k),
+            (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))).coeff (δ kv)) *
+          ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (b kv))).coeff ((δ⁻¹ * γ) kv)
+        = ∏ kv : (Σ k : Fin 2, D.nd.PlG k), ((D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))) *
+            (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (b kv)))).coeff (γ kv) := by
     simp only [coeff_mul_fin]
     rw [Fintype.prod_sum]
     refine Finset.sum_congr rfl fun δ _ => ?_
@@ -74,11 +81,13 @@ theorem Ea_mul (a b : CV D) : Ea a * Ea b = if a = b then Ea a else 0 := by
       by_contra h
       push Not at h
       exact hab (funext h)
-    have h0 : (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))) * (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (b kv))) = 0 :=
+    have h0
+        : (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv)))
+            * (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (b kv)))
+          = 0 :=
       D.ntypes.eSer_orth kv.1 _ _ fun h => hkv (monicOf_inj h)
     rw [Finset.prod_eq_zero (Finset.mem_univ kv) (by rw [h0]; simp)]
     simp
-
 
 open Classical in
 theorem ES_idem (S : Set (Tup2 D)) : ES S * ES S = ES S := by

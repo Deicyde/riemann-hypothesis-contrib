@@ -12,12 +12,13 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-theorem exists_isPosDef_of_basis {X : Type} [AddCommGroup X] {n : ℕ} (b : Module.Basis (Fin n) ℤ X) :
-    ∃ B₀ : X →ₗ[ℤ] X →ₗ[ℤ] ℝ, (∀ y z, B₀ y z = B₀ z y) ∧ IsPosDef B₀ := by
+theorem exists_isPosDef_of_basis {X : Type} [AddCommGroup X] {n : ℕ} (b : Module.Basis (Fin n) ℤ X)
+    : ∃ B₀ : X →ₗ[ℤ] X →ₗ[ℤ] ℝ, (∀ y z, B₀ y z = B₀ z y) ∧ IsPosDef B₀ := by
   classical
   let B₀ : X →ₗ[ℤ] X →ₗ[ℤ] ℝ := ∑ k, toReal (GlobalTheory.RedTh.sqForm b (Pi.single k 1))
   have hv : ∀ i j, B₀ (b i) (b j) = if i = j then 1 else 0 := fun i j => by
@@ -32,16 +33,20 @@ theorem exists_isPosDef_of_basis {X : Type} [AddCommGroup X] {n : ℕ} (b : Modu
     obtain ⟨i, hi⟩ := Function.ne_iff.1 hc
     exact Finset.sum_pos' (fun j _ => mul_self_nonneg _) ⟨i, Finset.mem_univ _, mul_self_pos.2 hi⟩
 
-theorem hasRedCover_int : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X], HasRedCover (id : ℤ → ℤ) X := by
+theorem hasRedCover_int
+    : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X],
+      HasRedCover (id : ℤ → ℤ) X := by
   intro X _ _ _
   classical
   obtain ⟨n, hn⟩ : ∃ n, Module.finrank ℤ X = n := ⟨_, rfl⟩
   let b₀ : Module.Basis (Fin n) ℤ X := Module.finBasisOfFinrankEq ℤ X hn
   obtain ⟨B₀, hs₀, hp₀⟩ := exists_isPosDef_of_basis b₀
   obtain ⟨S, hS⟩ := GlobalTheory.SiegelCone.gram_mem_cone n
-  refine GlobalTheory.RedTh.hasRedCover_of_fintype (ι := ↥S) _ (fun l => GlobalTheory.RedTh.sqForm b₀ l.1)
+  refine GlobalTheory.RedTh.hasRedCover_of_fintype (ι := ↥S) _
+    (fun l => GlobalTheory.RedTh.sqForm b₀ l.1)
     (fun l y z => by simp only [GlobalTheory.RedTh.sqForm_apply, mul_comm])
-    (fun l y => by simp only [GlobalTheory.RedTh.sqForm_apply]; exact mul_self_nonneg _) fun B hB => ?_
+    (fun l y => by simp only [GlobalTheory.RedTh.sqForm_apply]; exact mul_self_nonneg _)
+    fun B hB => ?_
   obtain ⟨X₁, _, m₁, hproj, r, B₁, hr, hB₁, hp₁, hBr⟩ := hB
   obtain rfl : m₁ = AddCommGroup.toIntModule X₁ := Subsingleton.elim _ _
   have : Module.Finite ℤ X₁ := Module.Finite.of_surjective r hr
@@ -58,8 +63,8 @@ theorem hasRedCover_int : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] 
   have hl : B (b i) (b j) = ∑ l ∈ S, c l * ((l i : ℝ) * (l j : ℝ)) := by
     rw [hBr, hg, hG]
     simp [Matrix.sum_apply, Matrix.vecMulVec_apply]
-  simp only [pullR_apply, LinearEquiv.coe_coe, he, hl, LinearMap.sum_apply, LinearMap.smul_apply, toReal_apply, smul_eq_mul,
-    GlobalTheory.RedTh.sqForm_basis]
+  simp only [pullR_apply, LinearEquiv.coe_coe, he, hl, LinearMap.sum_apply, LinearMap.smul_apply,
+    toReal_apply, smul_eq_mul, GlobalTheory.RedTh.sqForm_basis]
   rw [← Finset.sum_coe_sort S]
   push_cast
   rfl

@@ -12,8 +12,8 @@ noncomputable section
 namespace Formalism.DivisionValues
 
 theorem divisor_bounds_sum : BoundsSum := by
-  intro Pl J _ S D hD lcvR logκ LG E3 lcvM L E1 E2 l ell vG g I Ic jT F err Jx η hl h0 hvG hLG hL
-    hI hjT hE1 hE2 hE3
+  intro Pl J _ S D hD lcvR logκ LG E3 lcvM L E1 E2 l ell vG g I Ic jT F err Jx η hl h0 hvG hLG hL hI
+    hjT hE1 hE2 hE3
   have hDr : (0 : ℝ) < D := by exact_mod_cast hD
   have h1 : ∑ j, lcvM j ≤ (D : ℝ) * ∑ j, L j := by
     rw [Finset.mul_sum]
@@ -21,22 +21,25 @@ theorem divisor_bounds_sum : BoundsSum := by
       have := (div_le_iff₀ hDr).1 (hL j)
       linarith
   have h2 : ∑ w ∈ S, l w * vG w ≤ (D : ℝ) * LG := by
-    calc ∑ w ∈ S, l w * vG w ≤ ∑ w ∈ S, (D : ℝ) * (l w * g w) :=
-          Finset.sum_le_sum fun w hw => by
-            have := mul_le_mul_of_nonneg_left (hvG w hw) (hl w)
-            linarith
+    calc
+      ∑ w ∈ S, l w * vG w ≤ ∑ w ∈ S, (D : ℝ) * (l w * g w) :=
+        Finset.sum_le_sum fun w hw => by
+          have := mul_le_mul_of_nonneg_left (hvG w hw) (hl w)
+          linarith
       _ = (D : ℝ) * ∑ w ∈ S, l w * g w := by rw [Finset.mul_sum]
       _ ≤ (D : ℝ) * LG := mul_le_mul_of_nonneg_left hLG hDr.le
-  have f1 : ∑ w ∈ S, l w * (vG w + ∑ j, (I w j + Ic w j + jT w j)) =
-      ∑ w ∈ S, l w * vG w + ∑ w ∈ S, l w * ∑ j, (I w j + Ic w j) +
-        ∑ w ∈ S, l w * ∑ j, jT w j := by
+  have f1
+      : ∑ w ∈ S, l w * (vG w + ∑ j, (I w j + Ic w j + jT w j))
+        = ∑ w ∈ S, l w * vG w + ∑ w ∈ S, l w * ∑ j, (I w j + Ic w j)
+          + ∑ w ∈ S, l w * ∑ j, jT w j := by
     rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [Finset.sum_add_distrib]
     ring
-  have f4 : ∑ w ∈ S, l w * ∑ j, (I w j + Ic w j) ≤
-      (D : ℝ) * 2 * ∑ w ∈ S, l w * ∑ j, F w j + (D : ℝ) * ∑ w ∈ S, l w * ∑ j, err w j +
-        (D : ℝ) * ∑ w ∈ S, l w * (2 / ell w ^ 2) := by
+  have f4
+      : ∑ w ∈ S, l w * ∑ j, (I w j + Ic w j)
+        ≤ (D : ℝ) * 2 * ∑ w ∈ S, l w * ∑ j, F w j + (D : ℝ) * ∑ w ∈ S, l w * ∑ j, err w j
+          + (D : ℝ) * ∑ w ∈ S, l w * (2 / ell w ^ 2) := by
     rw [Finset.mul_sum, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib,
       ← Finset.sum_add_distrib]
     refine Finset.sum_le_sum fun w hw => ?_
@@ -45,8 +48,9 @@ theorem divisor_bounds_sum : BoundsSum := by
       rw [Finset.sum_add_distrib, Finset.mul_sum]
     rw [e] at h
     linarith
-  have f6 : ∑ w ∈ S, l w * ∑ j, jT w j ≤
-      (D : ℝ) * ∑ w ∈ S, l w * ∑ j, Jx w j + ∑ w ∈ S, l w * ∑ j, η w j := by
+  have f6
+      : ∑ w ∈ S, l w * ∑ j, jT w j
+        ≤ (D : ℝ) * ∑ w ∈ S, l w * ∑ j, Jx w j + ∑ w ∈ S, l w * ∑ j, η w j := by
     rw [Finset.mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_le_sum fun w hw => ?_
     have h : ∑ j, jT w j ≤ (D : ℝ) * ∑ j, Jx w j + ∑ j, η w j := by

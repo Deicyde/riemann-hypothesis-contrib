@@ -14,16 +14,22 @@ namespace CompactRep
 
 open Module Set RestrictedTensor
 
-variable {K : Type*} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
-  [T2Space K] {X : Type*} [AddCommGroup X] [Module ℂ X] {σ : Representation ℂ K X}
+variable
+  {K : Type*} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K] [T2Space K]
+  {X : Type*} [AddCommGroup X] [Module ℂ X]
+  {σ : Representation ℂ K X}
 
-def kProj (hσ : IsKFinite σ) {c : Submodule (MonoidAlgebra ℂ K) σ.asModule}
-    (hc : c ∈ isotypicComponents (MonoidAlgebra ℂ K) σ.asModule) : End ℂ X :=
+def kProj
+    (hσ : IsKFinite σ)
+    {c : Submodule (MonoidAlgebra ℂ K) σ.asModule}
+    (hc : c ∈ isotypicComponents (MonoidAlgebra ℂ K) σ.asModule)
+    : End ℂ X :=
   haveI := isSemisimpleModule_asModule hσ
-  σ.asModuleEquiv.toLinearMap ∘ₗ (isoProj hc).restrictScalars ℂ ∘ₗ
-    σ.asModuleEquiv.symm.toLinearMap
+  σ.asModuleEquiv.toLinearMap ∘ₗ (isoProj hc).restrictScalars ℂ ∘ₗ σ.asModuleEquiv.symm.toLinearMap
 
-variable (hσ : IsKFinite σ) {c : Submodule (MonoidAlgebra ℂ K) σ.asModule}
+variable
+  (hσ : IsKFinite σ)
+  {c : Submodule (MonoidAlgebra ℂ K) σ.asModule}
   (hc : c ∈ isotypicComponents (MonoidAlgebra ℂ K) σ.asModule)
 
 theorem kProj_apply_eq_self_iff {v : X} : kProj hσ hc v = v ↔ (v : σ.asModule) ∈ c := by
@@ -42,27 +48,30 @@ theorem kProj_mem_component (v : X) : (kProj hσ hc v : σ.asModule) ∈ c := by
 theorem kProj_kProj (v : X) : kProj hσ hc (kProj hσ hc v) = kProj hσ hc v :=
   (kProj_apply_eq_self_iff hσ hc).2 (kProj_mem_component hσ hc v)
 
-theorem kProj_comm {T : End ℂ X} (hT : ∀ k, T * σ k = σ k * T) (v : X) :
-    kProj hσ hc (T v) = T (kProj hσ hc v) := by
+theorem kProj_comm {T : End ℂ X} (hT : ∀ k, T * σ k = σ k * T) (v : X)
+    : kProj hσ hc (T v) = T (kProj hσ hc v) := by
   haveI := isSemisimpleModule_asModule hσ
   let f : Representation.IntertwiningMap σ σ := ⟨T, hT⟩
   exact isoProj_comm hc (Representation.IntertwiningMap.equivLinearMapAsModule σ σ f) v
 
-theorem kProj_mem {Y : Submodule ℂ X} (hY : ∀ k, ∀ y ∈ Y, σ k y ∈ Y) {y : X} (hy : y ∈ Y) :
-    kProj hσ hc y ∈ Y := by
+theorem kProj_mem {Y : Submodule ℂ X} (hY : ∀ k, ∀ y ∈ Y, σ k y ∈ Y) {y : X} (hy : y ∈ Y)
+    : kProj hσ hc y ∈ Y := by
   haveI := isSemisimpleModule_asModule hσ
   let P : Subrepresentation σ := ⟨Y, fun k y hy => hY k y hy⟩
   exact isoProj_mem hc (Subrepresentation.subrepresentationSubmoduleOrderIso P) hy
 
-theorem isWinProj_kProj {M : Type*} [Monoid M] {ρ : Representation ℂ M X}
-    (hsub : ∀ Y : Subrepresentation ρ, ∀ k, ∀ y ∈ Y.toSubmodule, σ k y ∈ Y.toSubmodule) :
-    IsWinProj ρ (kProj hσ hc) :=
+theorem isWinProj_kProj
+    {M : Type*} [Monoid M]
+    {ρ : Representation ℂ M X}
+    (hsub : ∀ Y : Subrepresentation ρ, ∀ k, ∀ y ∈ Y.toSubmodule, σ k y ∈ Y.toSubmodule)
+    : IsWinProj ρ (kProj hσ hc) :=
   ⟨kProj_kProj hσ hc, fun Y _ hy => kProj_mem hσ hc (hsub Y) hy⟩
 
-theorem exists_kProj_eq_self {Y : Submodule ℂ X} (hY : ∀ k, ∀ y ∈ Y, σ k y ∈ Y) (hY0 : Y ≠ ⊥) :
-    ∃ (c : Submodule (MonoidAlgebra ℂ K) σ.asModule)
-      (hc : c ∈ isotypicComponents (MonoidAlgebra ℂ K) σ.asModule),
-      ∃ y ∈ Y, y ≠ 0 ∧ kProj hσ hc y = y := by
+theorem exists_kProj_eq_self {Y : Submodule ℂ X} (hY : ∀ k, ∀ y ∈ Y, σ k y ∈ Y) (hY0 : Y ≠ ⊥)
+    : ∃ (c : Submodule (MonoidAlgebra ℂ K) σ.asModule)
+        (hc : c ∈ isotypicComponents (MonoidAlgebra ℂ K) σ.asModule),
+      ∃ y ∈ Y,
+        y ≠ 0 ∧ kProj hσ hc y = y := by
   haveI := isSemisimpleModule_asModule hσ
   let P : Subrepresentation σ := ⟨Y, fun k y hy => hY k y hy⟩
   set N := Subrepresentation.subrepresentationSubmoduleOrderIso P

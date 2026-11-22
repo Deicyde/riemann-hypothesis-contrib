@@ -6,20 +6,25 @@ public import GroundTheory.LocalFields.PrincipalUnitsRank
 
 open GroundTheory.LocalField ValuativeRel Module Topology
 
-private theorem UpperTheory.exists_continuous_retraction_power {G : Type*} [CommGroup G] [TopologicalSpace G]
-    [IsTopologicalGroup G] (U : Subgroup G) (hU : IsOpen (U : Set G)) (u : G →* G) (m : ℕ)
-    (hfix : ∀ x ∈ U, u x = x) (hm : ∀ y, u y ^ m ∈ U) (s : U →* U) (hs : ∀ x, s x ^ m = x) :
-    ∃ r : G →* U, Continuous r ∧ (∀ x : U, r x = x) ∧ ∀ y, (r y : G) ^ m = u y ^ m := by
-  let r : G →* U :=
-    { toFun := fun y => s ⟨u y ^ m, hm y⟩
-      map_one' := by
-        have h : (⟨u 1 ^ m, hm 1⟩ : U) = 1 := by ext; simp
-        rw [h, map_one]
-      map_mul' := by
-        intro x y
-        have h : (⟨u (x * y) ^ m, hm (x * y)⟩ : U) = ⟨u x ^ m, hm x⟩ * ⟨u y ^ m, hm y⟩ := by
-          ext; simp [mul_pow]
-        rw [h, map_mul] }
+private theorem UpperTheory.exists_continuous_retraction_power
+    {G : Type*} [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (U : Subgroup G) (hU : IsOpen (U : Set G))
+    (u : G →* G)
+    (m : ℕ)
+    (hfix : ∀ x ∈ U, u x = x) (hm : ∀ y, u y ^ m ∈ U)
+    (s : U →* U) (hs : ∀ x, s x ^ m = x)
+    : ∃ r : G →* U, Continuous r ∧ (∀ x : U, r x = x) ∧ ∀ y, (r y : G) ^ m = u y ^ m := by
+  let r : G →* U := {
+    toFun := fun y => s ⟨u y ^ m, hm y⟩
+    map_one' := by
+      have h : (⟨u 1 ^ m, hm 1⟩ : U) = 1 := by ext; simp
+      rw [h, map_one]
+    map_mul' := by
+      intro x y
+      have h : (⟨u (x * y) ^ m, hm (x * y)⟩ : U) = ⟨u x ^ m, hm x⟩ * ⟨u y ^ m, hm y⟩ := by
+        ext; simp [mul_pow]
+      rw [h, map_mul]
+  }
   have hr : ∀ y, r y = s ⟨u y ^ m, hm y⟩ := fun y => rfl
   have hfixr : ∀ x : U, r x = x := by
     intro x
@@ -39,11 +44,19 @@ private theorem UpperTheory.exists_continuous_retraction_power {G : Type*} [Comm
   · intro y
     rw [hr, ← Subgroup.coe_pow, hs]
 
-theorem UpperTheory.exists_principal_units_retraction_localField :
-    ∀ (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] (l : ℕ) [Fact l.Prime] [CharP (IsLocalRing.ResidueField ↥(ValuativeRel.valuation K).integer) l], (∀ y ∈ CommGroup.primaryComponent Kˣ l, y ∈ GroundTheory.LocalField.unitFiltrationUnits K 1) ∧ ∃ r : Kˣ →* ↥(GroundTheory.LocalField.unitFiltrationUnits K 1), Continuous r ∧ (∀ u : ↥(GroundTheory.LocalField.unitFiltrationUnits K 1), r u = u) ∧ ∀ (n : ℕ) (y : Kˣ), (l : ℤ) ^ n ∣ GroundTheory.LocalField.ord (y : K) → (∃ w, r y = w ^ l ^ n) → ∃ z : Kˣ, y = z ^ l ^ n := by
+theorem UpperTheory.exists_principal_units_retraction_localField
+    : ∀ (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+        (l : ℕ) [Fact l.Prime]
+        [CharP (IsLocalRing.ResidueField ↥(ValuativeRel.valuation K).integer) l],
+      (∀ y ∈ CommGroup.primaryComponent Kˣ l, y ∈ GroundTheory.LocalField.unitFiltrationUnits K 1)
+        ∧ ∃ r : Kˣ →* ↥(GroundTheory.LocalField.unitFiltrationUnits K 1),
+          Continuous r ∧ (∀ u : ↥(GroundTheory.LocalField.unitFiltrationUnits K 1), r u = u)
+            ∧ ∀ (n : ℕ) (y : Kˣ),
+              (l : ℤ) ^ n ∣ GroundTheory.LocalField.ord (y : K) → (∃ w, r y = w ^ l ^ n)
+                → ∃ z : Kˣ, y = z ^ l ^ n := by
   intro K _ _ _ _ l _ _
   have hl : l.Prime := Fact.out
-  obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible ↥𝒪[K]
+  obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible ↥ 𝒪[K]
   haveI : Fintype 𝓀[K] := Fintype.ofFinite _
   have hq : l ∣ Nat.card 𝓀[K] := by
     rw [← CharP.cast_eq_zero_iff 𝓀[K] l, Nat.card_eq_fintype_card]
@@ -55,8 +68,9 @@ theorem UpperTheory.exists_principal_units_retraction_localField :
     have h2 := Nat.dvd_sub hq h
     rw [show Nat.card 𝓀[K] - (Nat.card 𝓀[K] - 1) = 1 by omega] at h2
     exact hl.one_lt.ne' (Nat.dvd_one.mp h2)
-  have bez : ∀ {M : Type} [CommGroup M] (t : M) (a b : ℕ), Nat.Coprime a b →
-      ∃ A B : ℤ, t = (t ^ a) ^ A * (t ^ b) ^ B := by
+  have bez
+      : ∀ {M : Type} [CommGroup M] (t : M) (a b : ℕ),
+        Nat.Coprime a b → ∃ A B : ℤ, t = (t ^ a) ^ A * (t ^ b) ^ B := by
     intro M _ t a b h
     refine ⟨Nat.gcdA a b, Nat.gcdB a b, ?_⟩
     have h' : (a : ℤ) * Nat.gcdA a b + b * Nat.gcdB a b = 1 := by
@@ -66,8 +80,9 @@ theorem UpperTheory.exists_principal_units_retraction_localField :
     intro v
     rw [← index_unitFiltration_one]
     exact Subgroup.pow_index_mem _ v
-  have hdecomp : ∀ y : Kˣ,
-      y = uniformizerUnit hϖ ^ ord (y : K) * unitsIncl K ((unitsEquivIntProd hϖ) y).2 := by
+  have hdecomp
+      : ∀ y : Kˣ,
+        y = uniformizerUnit hϖ ^ ord (y : K) * unitsIncl K ((unitsEquivIntProd hϖ) y).2 := by
     intro y
     apply (unitsEquivIntProd hϖ).injective
     rw [map_mul, map_zpow, unitsEquivIntProd_uniformizer, unitsEquivIntProd_unitsIncl]
@@ -114,10 +129,11 @@ theorem UpperTheory.exists_principal_units_retraction_localField :
       exact (hl.coprime_iff_not_dvd.mp hcop.symm) h
     obtain ⟨c, hc⟩ : ∃ c : ℤ_[l], ((Nat.card 𝓀[K] - 1 : ℕ) : ℤ_[l]) * c = 1 :=
       ⟨_, hunit.mul_val_inv⟩
-    let s : unitFiltrationUnits K 1 →* unitFiltrationUnits K 1 :=
-      { toFun := fun x => Additive.toMul (c • Additive.ofMul x)
-        map_one' := by simp
-        map_mul' := by intro x y; simp [smul_add] }
+    let s : unitFiltrationUnits K 1 →* unitFiltrationUnits K 1 := {
+      toFun := fun x => Additive.toMul (c • Additive.ofMul x)
+      map_one' := by simp
+      map_mul' := by intro x y; simp [smul_add]
+    }
     have hs : ∀ x, s x ^ (Nat.card 𝓀[K] - 1) = x := by
       intro x
       show (Additive.toMul (c • Additive.ofMul x)) ^ (Nat.card 𝓀[K] - 1) = x
@@ -131,13 +147,13 @@ theorem UpperTheory.exists_principal_units_retraction_localField :
       intro x hx
       obtain ⟨v, _, rfl⟩ := Subgroup.mem_map.mp hx
       rw [hu, unitsEquivIntProd_unitsIncl]
-    obtain ⟨r, hrc, hrfix, hrpow⟩ := UpperTheory.exists_continuous_retraction_power _ (isOpen_unitFiltrationUnits 1) u
-      (Nat.card 𝓀[K] - 1) hfix hm s hs
+    obtain ⟨r, hrc, hrfix, hrpow⟩ :=
+      UpperTheory.exists_continuous_retraction_power _ (isOpen_unitFiltrationUnits 1) u
+        (Nat.card 𝓀[K] - 1) hfix hm s hs
     refine ⟨r, hrc, hrfix, ?_⟩
     rintro n y ⟨a, ha⟩ ⟨w, hw⟩
     set t := u y * (r y : Kˣ)⁻¹ with htdef
-    have ht : t ^ (Nat.card 𝓀[K] - 1) = 1 := by
-      rw [htdef, mul_pow, inv_pow, hrpow, mul_inv_cancel]
+    have ht : t ^ (Nat.card 𝓀[K] - 1) = 1 := by rw [htdef, mul_pow, inv_pow, hrpow, mul_inv_cancel]
     obtain ⟨A, B, hAB⟩ := bez t (Nat.card 𝓀[K] - 1) (l ^ n) (Nat.Coprime.pow_right n hcop)
     rw [ht, one_zpow, one_mul] at hAB
     have hry : (r y : Kˣ) = (w : Kˣ) ^ (l ^ n) := by rw [hw]; rfl

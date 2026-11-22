@@ -9,14 +9,19 @@ open ValuativeRel
 
 namespace GlobalTheory
 
-
 open GroundTheory.LocalField in
-theorem neg_one_mem_norm_of_valuation_eq : ∀ (F E : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] [Algebra F E] [ValuativeExtension F E] [FiniteDimensional F E], (∀ y : E, ∃ x : F, y ≤ᵥ algebraMap F E x ∧ algebraMap F E x ≤ᵥ y) → ∃ z : E, Algebra.norm F z = -1 := by
+theorem neg_one_mem_norm_of_valuation_eq
+    : ∀ (F E : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] [Algebra F E]
+        [ValuativeExtension F E] [FiniteDimensional F E],
+      (∀ y : E, ∃ x : F, y ≤ᵥ algebraMap F E x ∧ algebraMap F E x ≤ᵥ y)
+        → ∃ z : E, Algebra.norm F z = -1 := by
   intro F E _ _ _ _ _ _ _ _ _ _ _ hval
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[E]
   obtain ⟨x, h1, h2⟩ := hval (ϖ : E)
   have hv : valuation E (ϖ : E) = valuation E (algebraMap F E x) :=
-    le_antisymm ((Valuation.Compatible.vle_iff_le _ _).1 h1) ((Valuation.Compatible.vle_iff_le _ _).1 h2)
+    le_antisymm ((Valuation.Compatible.vle_iff_le _ _).1 h1)
+      ((Valuation.Compatible.vle_iff_le _ _).1 h2)
   have hord : ord (ϖ : E) = ord (algebraMap F E x) := by
     simp only [ord]
     rw [(normalizedValuation_eq_iff (K := E)).2 hv]

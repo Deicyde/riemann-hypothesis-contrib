@@ -10,8 +10,8 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-private theorem apply_mul_le_weight_apply {σ : Type*} (w : σ → (σ →₀ ℕ)) (d : σ →₀ ℕ) (v x : σ) :
-    d v * w v x ≤ Finsupp.weight w d x := by
+private theorem apply_mul_le_weight_apply {σ : Type*} (w : σ → (σ →₀ ℕ)) (d : σ →₀ ℕ) (v x : σ)
+    : d v * w v x ≤ Finsupp.weight w d x := by
   simp only [Finsupp.weight_apply, Finsupp.sum, Finsupp.finsetSum_apply, Finsupp.smul_apply,
     smul_eq_mul]
   by_cases hv : v ∈ d.support
@@ -22,37 +22,44 @@ private theorem apply_mul_le_weight_apply {σ : Type*} (w : σ → (σ →₀ �
     rw [h0, zero_mul]
     exact Nat.zero_le _
 
-theorem lctwo_le_weight {r n : ℕ} {l j : Fin n} (hlj : l ≠ j) (d : Fin r × Fin n →₀ ℕ) (b : Fin r) :
-    d (b, l) ≤ Finsupp.weight (pairW l j) d (b, l) ∧ d (b, j) ≤ Finsupp.weight (pairW l j) d (b, l) := by
-  have hl : pairW (r := r) l j (b, l) = Finsupp.single (b, l) 1 := by
-    simp [pairW, hlj]
-  have hj : pairW (r := r) l j (b, j) = Finsupp.single (b, l) 1 := by
-    simp [pairW]
+theorem lctwo_le_weight {r n : ℕ} {l j : Fin n} (hlj : l ≠ j) (d : Fin r × Fin n →₀ ℕ) (b : Fin r)
+    : d (b, l) ≤ Finsupp.weight (pairW l j) d (b, l)
+      ∧ d (b, j) ≤ Finsupp.weight (pairW l j) d (b, l) := by
+  have hl : pairW (r := r) l j (b, l) = Finsupp.single (b, l) 1 := by simp [pairW, hlj]
+  have hj : pairW (r := r) l j (b, j) = Finsupp.single (b, l) 1 := by simp [pairW]
   constructor
   · have h := apply_mul_le_weight_apply (pairW l j) d (b, l) (b, l)
     rwa [hl, Finsupp.single_eq_same, mul_one] at h
   · have h := apply_mul_le_weight_apply (pairW l j) d (b, j) (b, l)
     rwa [hj, Finsupp.single_eq_same, mul_one] at h
 
-theorem lctwo_le_of_mem {B : Type*} [CommRing B] {r n : ℕ} {l j : Fin n} (hlj : l ≠ j)
+theorem lctwo_le_of_mem
+    {B : Type*} [CommRing B]
+    {r n : ℕ} {l j : Fin n} (hlj : l ≠ j)
     {ω : Fin r × Fin n →₀ ℕ} {p : MvPolynomial (Fin r × Fin n) B}
-    (hp : IsWeightedHomogeneous (pairW l j) p ω) {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ p.support) (b : Fin r) :
-    m (b, l) ≤ ω (b, l) ∧ m (b, j) ≤ ω (b, l) := by
+    (hp : IsWeightedHomogeneous (pairW l j) p ω)
+    {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ p.support)
+    (b : Fin r)
+    : m (b, l) ≤ ω (b, l) ∧ m (b, j) ≤ ω (b, l) := by
   have h := hp (MvPolynomial.mem_support_iff.mp hm)
   rw [← h]
   exact lctwo_le_weight hlj m b
 
-theorem lctwo_sum_ite {r : ℕ} (a : Fin r) (e : ℕ) (f : Fin r → ℕ) (P : Fin r → Prop) [DecidablePred P] :
-    (∑ b : Fin r with P b, ((if a = b then e else 0) + f b)) =
-      (if P a then e else 0) + ∑ b : Fin r with P b, f b := by
+theorem lctwo_sum_ite
+    {r : ℕ} (a : Fin r) (e : ℕ) (f : Fin r → ℕ) (P : Fin r → Prop) [DecidablePred P]
+    : (∑ b : Fin r with P b, ((if a = b then e else 0) + f b))
+      = (if P a then e else 0) + ∑ b : Fin r with P b, f b := by
   rw [Finset.sum_add_distrib]
   simp [Finset.sum_ite_eq]
 
-theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : PeelDegBound)
-    (B : Type) [CommRing B] [IsDomain B] (r n : ℕ) (l j : Fin n) (hlj : l < j) :
-    ∀ (d a0 s : ℕ) (ω : Fin r × Fin n →₀ ℕ) (g : MvPolynomial (Fin r × Fin n) B), r - a0 = d →
-    g ≠ 0 → IsWeightedHomogeneous (pairW l j) g ω → (∀ b : Fin r, b.val < a0 → ω (b, l) = 0) →
-    degreeOf none (colAddGen B l j g) ≤ s → InterlacedAt s l j ((colLex r n).degree g) := by
+theorem lctwo_main
+    (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : PeelDegBound)
+    (B : Type) [CommRing B] [IsDomain B]
+    (r n : ℕ) (l j : Fin n) (hlj : l < j)
+    : ∀ (d a0 s : ℕ) (ω : Fin r × Fin n →₀ ℕ) (g : MvPolynomial (Fin r × Fin n) B),
+      r - a0 = d → g ≠ 0 → IsWeightedHomogeneous (pairW l j) g ω
+        → (∀ b : Fin r, b.val < a0 → ω (b, l) = 0) → degreeOf none (colAddGen B l j g) ≤ s
+        → InterlacedAt s l j ((colLex r n).degree g) := by
   intro d
   induction d with
   | zero =>
@@ -97,9 +104,9 @@ theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : Peel
       push_neg at hne
       exact hg (hdec.trans (Finset.sum_eq_zero fun k hk => by rw [hne k hk, mul_zero]))
     obtain ⟨k0, hk0, hk00⟩ := hex
-    obtain ⟨K, hKT, hKmax⟩ := Finset.exists_max_image
-      ((Finset.range (ω (A0, l) + 1)).filter (fun k => peel l j A0 k g ≠ 0)) id
-      ⟨k0, Finset.mem_filter.mpr ⟨hk0, hk00⟩⟩
+    obtain ⟨K, hKT, hKmax⟩ :=
+      Finset.exists_max_image ((Finset.range (ω (A0, l) + 1)).filter (fun k => peel l j A0 k g ≠ 0))
+        id ⟨k0, Finset.mem_filter.mpr ⟨hk0, hk00⟩⟩
     obtain ⟨hKr, hK0⟩ := Finset.mem_filter.mp hKT
     have hKle : K ≤ ω (A0, l) := by
       have := Finset.mem_range.mp hKr
@@ -111,14 +118,18 @@ theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : Peel
       · have hkK := hKmax k (Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), hne⟩)
         exact absurd (show k ≤ K from hkK) (by omega)
       · exact hne (hvan k (by omega))
-    have hgK : g = ∑ k ∈ Finset.range (K + 1),
-        X (A0, l) ^ k * X (A0, j) ^ (ω (A0, l) - K + (K - k)) * peel l j A0 k g := by
+    have hgK
+        : g
+          = ∑ k ∈ Finset.range (K + 1),
+            X (A0, l) ^ k * X (A0, j) ^ (ω (A0, l) - K + (K - k)) * peel l j A0 k g := by
       have hsub : Finset.range (K + 1) ⊆ Finset.range (ω (A0, l) + 1) := by
         intro x hx
         simp only [Finset.mem_range] at hx ⊢
         omega
-      calc g = ∑ k ∈ Finset.range (ω (A0, l) + 1),
-            X (A0, l) ^ k * X (A0, j) ^ (ω (A0, l) - k) * peel l j A0 k g := hdec
+      calc
+        g = ∑ k ∈ Finset.range (ω (A0, l) + 1),
+            X (A0, l) ^ k * X (A0, j) ^ (ω (A0, l) - k) * peel l j A0 k g :=
+          hdec
         _ = ∑ k ∈ Finset.range (K + 1),
             X (A0, l) ^ k * X (A0, j) ^ (ω (A0, l) - k) * peel l j A0 k g := by
           symm
@@ -131,14 +142,18 @@ theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : Peel
           intro k hk
           have := Finset.mem_range.mp hk
           rw [show ω (A0, l) - K + (K - k) = ω (A0, l) - k by omega]
-    have hdeg' : degreeOf none (colAddGen B l j (∑ k ∈ Finset.range (K + 1),
-        X (A0, l) ^ k * X (A0, j) ^ (ω (A0, l) - K + (K - k)) * peel l j A0 k g)) ≤ s := by
+    have hdeg'
+        : degreeOf none
+            (colAddGen B l j
+              (∑ k ∈ Finset.range (K + 1),
+                X (A0, l) ^ k * X (A0, j) ^ (ω (A0, l) - K + (K - k)) * peel l j A0 k g))
+          ≤ s := by
       rw [← hgK]
       exact hdeg
     have hslice_supp : ∀ k, ∀ m ∈ (peel l j A0 k g).support, m (A0, l) = 0 ∧ m (A0, j) = 0 :=
       fun k => (h2 B r n l j hlj.ne A0 ω k g hω).2
-    obtain ⟨he, hdegK⟩ := h4 B r n l j hlj.ne A0 K (ω (A0, l) - K) s
-      (fun k => peel l j A0 k g) hslice_supp hK0 hdeg'
+    obtain ⟨he, hdegK⟩ :=
+      h4 B r n l j hlj.ne A0 K (ω (A0, l) - K) s (fun k => peel l j A0 k g) hslice_supp hK0 hdeg'
     have hlead := h3 B r n l j hlj A0 ω g K hω hlow hK0 habove
     have hhomK := (h2 B r n l j hlj.ne A0 ω K g hω).1
     have h0' : ∀ b : Fin r, b.val < a0 + 1 → (ω.erase (A0, l)) (b, l) = 0 := by
@@ -150,23 +165,28 @@ theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : Peel
         have hne : b ≠ A0 := fun h => hbA (by rw [h])
         have hne' : b.val ≠ A0.val := fun h => hne (Fin.ext h)
         omega
-    have hIH := ih (a0 + 1) (s - (ω (A0, l) - K) + K) (ω.erase (A0, l)) (peel l j A0 K g)
-      (by omega) hK0 hhomK h0' hdegK
+    have hIH :=
+      ih (a0 + 1) (s - (ω (A0, l) - K) + K) (ω.erase (A0, l)) (peel l j A0 K g) (by omega) hK0 hhomK
+        h0' hdegK
     have hmK := (colLex r n).degree_mem_support hK0
-    have hm'_low : ∀ b : Fin r, b.val < a0 + 1 →
-        (colLex r n).degree (peel l j A0 K g) (b, j) = 0 := by
+    have hm'_low
+        : ∀ b : Fin r, b.val < a0 + 1 → (colLex r n).degree (peel l j A0 K g) (b, j) = 0 := by
       intro b hb
       have hle := (lctwo_le_of_mem hlj.ne hhomK hmK b).2
       rw [h0' b hb] at hle
       omega
-    have hjx : ∀ b : Fin r, (colLex r n).degree g (b, j) =
-        (if A0 = b then ω (A0, l) - K else 0) +
-          (colLex r n).degree (peel l j A0 K g) (b, j) := by
+    have hjx
+        : ∀ b : Fin r,
+          (colLex r n).degree g (b, j)
+            = (if A0 = b then ω (A0, l) - K else 0)
+              + (colLex r n).degree (peel l j A0 K g) (b, j) := by
       intro b
       rw [hlead]
       by_cases hb : A0 = b <;> simp [hlj.ne', hb]
-    have hlx : ∀ b : Fin r, (colLex r n).degree g (b, l) =
-        (if A0 = b then K else 0) + (colLex r n).degree (peel l j A0 K g) (b, l) := by
+    have hlx
+        : ∀ b : Fin r,
+          (colLex r n).degree g (b, l)
+            = (if A0 = b then K else 0) + (colLex r n).degree (peel l j A0 K g) (b, l) := by
       intro b
       rw [hlead]
       by_cases hb : A0 = b <;> simp [hlj.ne, hb]
@@ -181,14 +201,16 @@ theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : Peel
         exact hm_low b (by omega)
       rw [hz]
       exact Nat.zero_le _
-    · have hsj : (∑ b : Fin r with b ≤ a, (colLex r n).degree g (b, j)) =
-          (if A0 ≤ a then ω (A0, l) - K else 0) +
-            ∑ b : Fin r with b ≤ a, (colLex r n).degree (peel l j A0 K g) (b, j) := by
+    · have hsj
+          : (∑ b : Fin r with b ≤ a, (colLex r n).degree g (b, j))
+            = (if A0 ≤ a then ω (A0, l) - K else 0)
+              + ∑ b : Fin r with b ≤ a, (colLex r n).degree (peel l j A0 K g) (b, j) := by
         simp only [hjx]
         exact lctwo_sum_ite A0 (ω (A0, l) - K) _ (fun b => b ≤ a)
-      have hsl : (∑ b : Fin r with b < a, (colLex r n).degree g (b, l)) =
-          (if A0 < a then K else 0) +
-            ∑ b : Fin r with b < a, (colLex r n).degree (peel l j A0 K g) (b, l) := by
+      have hsl
+          : (∑ b : Fin r with b < a, (colLex r n).degree g (b, l))
+            = (if A0 < a then K else 0)
+              + ∑ b : Fin r with b < a, (colLex r n).degree (peel l j A0 K g) (b, l) := by
         simp only [hlx]
         exact lctwo_sum_ite A0 K _ (fun b => b < a)
       have hAa : A0 ≤ a := Fin.le_iff_val_le_val.mpr (by omega)
@@ -197,8 +219,10 @@ theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : Peel
       · have hAa' : ¬ A0 < a := by
           rw [Fin.lt_def]
           omega
-        have hz : (∑ b : Fin r with b ≤ a,
-            (colLex r n).degree (peel l j A0 K g) (b, j)) = 0 := by
+        have hz
+            : (∑ b : Fin r with b ≤ a,
+                (colLex r n).degree (peel l j A0 K g) (b, j))
+              = 0 := by
           apply Finset.sum_eq_zero
           intro b hb
           have hba := Fin.le_iff_val_le_val.mp (Finset.mem_filter.mp hb).2
@@ -211,7 +235,8 @@ theorem lctwo_main (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : Peel
         rw [if_pos hAa']
         omega
 
-theorem twoColumn_of (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : PeelDegBound) : TwoColumn := by
+theorem twoColumn_of (h1 : PeelDecomp) (h2 : PeelHomog) (h3 : PeelLead) (h4 : PeelDegBound)
+    : TwoColumn := by
   unfold TwoColumn
   intro B _ _ r n l j hlj a0 s ω g hg hω h0 hdeg
   exact lctwo_main h1 h2 h3 h4 B r n l j hlj (r - a0) a0 s ω g rfl hg hω h0 hdeg

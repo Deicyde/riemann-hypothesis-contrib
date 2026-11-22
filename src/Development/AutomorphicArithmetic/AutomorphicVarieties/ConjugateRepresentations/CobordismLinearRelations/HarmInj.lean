@@ -10,12 +10,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.LFun
-open UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Cj
+open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh
+  GlobalTheory.LFun
+open UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Geo
+  UpperTheory.V.Lit.Bor UpperTheory.V.Cj
 open scoped TensorProduct
 
-theorem UpperTheory.V.Cj.harmInj :
-    UpperTheory.V.Cj.HarmInj := by
+theorem UpperTheory.V.Cj.harmInj : UpperTheory.V.Cj.HarmInj := by
   intro E _ _ _ a ha π Ξ r n e he hr q ω ⟨⟨U, u1, u2, u3⟩, _, hco, hV⟩ ⟨U', v1, v2, v3⟩
   cases q with
   | zero => exact v3
@@ -30,9 +31,12 @@ theorem UpperTheory.V.Cj.harmInj :
     obtain ⟨χ, hχ⟩ := twEx E a ha r
     obtain ⟨G, hG⟩ := admEx E a Ξ
     have hd : IsData Ξ r χ G e := ⟨hr, hχ, hG, he⟩
-    have hM : Moderate (dCo (smLie Ξ) η) := ⟨0, fun X => by
-      obtain ⟨C, hC⟩ := hR X 0
-      exact ⟨C, fun g => by simpa using hC g⟩⟩
+    have hM : Moderate (dCo (smLie Ξ) η) := ⟨
+      0,
+      fun X => by
+        obtain ⟨C, hC⟩ := hR X 0
+        exact ⟨C, fun g => by simpa using hC g⟩
+    ⟩
     set_option synthInstance.maxHeartbeats 400000 in
     have hP := pairFacts E a ha MeasureTheory.Measure.haar _ ho Ξ r χ G n e hd (q + 1)
     set_option synthInstance.maxHeartbeats 400000 in

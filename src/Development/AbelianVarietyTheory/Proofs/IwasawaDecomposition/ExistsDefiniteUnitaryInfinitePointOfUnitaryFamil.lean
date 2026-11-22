@@ -6,12 +6,13 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Archi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC Formalism.UG Formalism.BasicNotions GlobalTheory.DefU
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC Formalism.UG Formalism.BasicNotions GlobalTheory.DefU
 
 namespace GlobalTheory.InfSurj
 
-theorem list_prod_single {G ι : Type} [Monoid G] [DecidableEq ι] (v : ι) (a : G) :
-    ∀ l : List ι, l.Nodup → v ∈ l → (l.map fun u => if u = v then a else 1).prod = a
+theorem list_prod_single {G ι : Type} [Monoid G] [DecidableEq ι] (v : ι) (a : G)
+    : ∀ l : List ι, l.Nodup → v ∈ l → (l.map fun u => if u = v then a else 1).prod = a
   | [], _, h => absurd h List.not_mem_nil
   | u :: l, hn, h => by
     rw [List.nodup_cons] at hn
@@ -26,12 +27,18 @@ theorem list_prod_single {G ι : Type} [Monoid G] [DecidableEq ι] (v : ι) (a :
 
 end GlobalTheory.InfSurj
 
-theorem GlobalTheory.InfSurj.exists_infU_cAll_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (g : InfinitePlace E → GL (Fin n) ℂ), (∀ v, ((g v : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) ∈ Matrix.unitaryGroup (Fin n) ℂ) → ∃ x ∈ infU E n, cAll x = g := by
+theorem GlobalTheory.InfSurj.exists_infU_cAll_eq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ)
+        (g : InfinitePlace E → GL (Fin n) ℂ),
+      (∀ v, ((g v : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) ∈ Matrix.unitaryGroup (Fin n) ℂ)
+        → ∃ x ∈ infU E n, cAll x = g := by
   intro E _ _ _ n g hg
   classical
-  have he := fun v : InfinitePlace E => GlobalTheory.EmbUnitary.exists_equiv_unitaryGroup E n v.embedding
+  have he := fun v : InfinitePlace E =>
+    GlobalTheory.EmbUnitary.exists_equiv_unitaryGroup E n v.embedding
   choose e he using he
-  let y : InfinitePlace E → UA E n := fun v => ((e v).symm ⟨(g v : Matrix (Fin n) (Fin n) ℂ), hg v⟩ : embU n v.embedding)
+  let y : InfinitePlace E → UA E n := fun v =>
+    ((e v).symm ⟨(g v : Matrix (Fin n) (Fin n) ℂ), hg v⟩ : embU n v.embedding)
   have hy : ∀ v, y v ∈ embU n v.embedding := fun v => ((e v).symm _).2
   have hyv : ∀ v, cEmb v.embedding (y v) = g v := fun v => by
     rw [← he v, ContinuousMulEquiv.apply_symm_apply]
@@ -50,10 +57,12 @@ theorem GlobalTheory.InfSurj.exists_infU_cAll_eq : ∀ (E : Type) [Field E] [Num
   · funext v
     change cEmb v.embedding _ = g v
     rw [map_list_prod, List.map_map]
-    have : (Finset.univ.toList.map (cEmb v.embedding ∘ y)) = Finset.univ.toList.map fun u => if u = v then g v else 1 :=
+    have : (Finset.univ.toList.map (cEmb v.embedding ∘ y))
+        = Finset.univ.toList.map fun u => if u = v then g v else 1 :=
       List.map_congr_left fun u _ => by
         by_cases h : u = v
         · subst h; simp [hyv]
         · simp [h, hyu u v h]
     rw [this]
-    exact GlobalTheory.InfSurj.list_prod_single v (g v) _ (Finset.nodup_toList _) (Finset.mem_toList.2 (Finset.mem_univ v))
+    exact GlobalTheory.InfSurj.list_prod_single v (g v) _ (Finset.nodup_toList _)
+      (Finset.mem_toList.2 (Finset.mem_univ v))

@@ -14,24 +14,30 @@ open PositivityTheory.RgBcC.Real
 
 variable {n : ℕ}
 
-theorem isLev_id (lam : Fin n → ℤ) : IsLev lam fun a => ((a : Fin n) : ℕ) := ⟨fun _ _ h => h, fun _ _ h => congrArg lam (Fin.ext h)⟩
+theorem isLev_id (lam : Fin n → ℤ) : IsLev lam fun a => ((a : Fin n) : ℕ) :=
+  ⟨fun _ _ h => h, fun _ _ h => congrArg lam (Fin.ext h)⟩
 
-theorem mem_harmSet {lam : Fin n → ℤ} {μ : Fin n → ℝ} (h : μ ∈ harmSet lam) :
-    ∃ l : Fin n → Fin n, IsLev lam (fun a => (l a : ℕ)) ∧ μ = muQ lam fun a => (l a : ℕ) := by
+theorem mem_harmSet {lam : Fin n → ℤ} {μ : Fin n → ℝ} (h : μ ∈ harmSet lam)
+    : ∃ l : Fin n → Fin n, IsLev lam (fun a => (l a : ℕ)) ∧ μ = muQ lam fun a => (l a : ℕ) := by
   simp only [harmSet, Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and] at h
   obtain ⟨l, hl, rfl⟩ := h
   exact ⟨l, hl, rfl⟩
 
-theorem muQ_mem_harmSet {lam : Fin n → ℤ} (lev : Fin n → Fin n) (h : IsLev lam fun a => (lev a : ℕ)) :
-    muQ lam (fun a => (lev a : ℕ)) ∈ harmSet lam := by
+theorem muQ_mem_harmSet {lam : Fin n → ℤ} (lev : Fin n → Fin n) (h : IsLev lam fun a => (lev a : ℕ))
+    : muQ lam (fun a => (lev a : ℕ)) ∈ harmSet lam := by
   simp only [harmSet, Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]
   exact ⟨lev, h, rfl⟩
 
 def Compress : Prop :=
-  ∀ (n : ℕ) (lam : Fin n → ℤ) (lev : Fin n → ℕ), IsLev lam lev →
-    ∃ l : Fin n → Fin n, IsLev lam (fun a => (l a : ℕ)) ∧ muQ lam (fun a => (l a : ℕ)) = muQ lam lev
+  ∀ (n : ℕ) (lam : Fin n → ℤ) (lev : Fin n → ℕ),
+    IsLev lam lev
+      → ∃ l : Fin n → Fin n,
+        IsLev lam (fun a => (l a : ℕ)) ∧ muQ lam (fun a => (l a : ℕ)) = muQ lam lev
 
-theorem multG_of (hCp : Compress) (hM : MultFor) (hA : AdmLeast) (h1 : N1) (hC : ConeWeightsNotSecondType) (hE : ModelEx) (h7 : KTypeGenerationHighest) : MultG := by
+theorem multG_of
+    (hCp : Compress) (hM : MultFor) (hA : AdmLeast) (h1 : N1) (hC : ConeWeightsNotSecondType)
+    (hE : ModelEx) (h7 : KTypeGenerationHighest)
+    : MultG := by
   intro n lam hl V _ _ E1 E2 σ A hc
   classical
   have hne_h : (harmSet lam).Nonempty := ⟨_, muQ_mem_harmSet (fun a => a) (isLev_id lam)⟩

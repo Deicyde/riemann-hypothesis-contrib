@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_primden :
-    ∀ (k j : ℕ), j ≤ k → ∃ z : ℤ, (primorial (k + 1) : ℚ) * bernoulli j = z := by
+theorem UpperTheory.V.Bern.b_primden
+    : ∀ (k j : ℕ), j ≤ k → ∃ z : ℤ, (primorial (k + 1) : ℚ) * bernoulli j = z := by
   intro k j hjk
   have hdvd : ∀ p : ℕ, p.Prime → p ≤ k + 1 → p ∣ primorial (k + 1) := by
     intro p hp hpk
@@ -17,9 +17,15 @@ theorem UpperTheory.V.Bern.b_primden :
   · obtain ⟨z0, hz0⟩ := Bernoulli.vonStaudt_clausen m
     have h2 : m + m = 2 * m := by ring
     rw [h2]
-    have hB : bernoulli (2 * m) = (z0 : ℚ) - ∑ p ∈ range (2 * m + 2) with Nat.Prime p ∧ p - 1 ∣ 2 * m, (1 : ℚ) / p := by
+    have hB
+        : bernoulli (2 * m)
+          = (z0 : ℚ) - ∑ p ∈ range (2 * m + 2) with Nat.Prime p ∧ p - 1 ∣ 2 * m, (1 : ℚ) / p := by
       rw [hz0]; ring
-    refine ⟨(primorial (k + 1) : ℤ) * z0 - ∑ p ∈ range (2 * m + 2) with Nat.Prime p ∧ p - 1 ∣ 2 * m, ((primorial (k + 1) / p : ℕ) : ℤ), ?_⟩
+    refine ⟨
+      (primorial (k + 1) : ℤ) * z0
+        - ∑ p ∈ range (2 * m + 2) with Nat.Prime p ∧ p - 1 ∣ 2 * m, ((primorial (k + 1) / p : ℕ) : ℤ),
+      ?_
+    ⟩
     rw [Int.cast_sub, Int.cast_mul, Int.cast_sum]
     simp only [Int.cast_natCast]
     rw [hB, mul_sub, Finset.mul_sum]

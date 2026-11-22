@@ -13,21 +13,26 @@ noncomputable section
 
 namespace GlobalTheory.RayOnto
 
-theorem containsRayField_comp {K L L' : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Field L'] [NumberField L']
-    (φ : K →+* L) (τ : L →+* L') (n : ℕ) (h : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField φ n) :
-    GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (τ.comp φ) n := by
+theorem containsRayField_comp
+    {K L L' : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Field L'] [NumberField L']
+    (φ : K →+* L)
+    (τ : L →+* L')
+    (n : ℕ) (h : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField φ n)
+    : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (τ.comp φ) n := by
   intro P hP
   letI : Algebra L L' := τ.toAlgebra
   let Q : HeightOneSpectrum (𝓞 L) := P.under (𝓞 L)
   have hQ : Q.asIdeal = P.asIdeal.comap (RingOfIntegers.mapRingHom τ) := rfl
   haveI hPo : P.asIdeal.LiesOver Q.asIdeal := ⟨rfl⟩
-  have hn : ((n : ℕ) : 𝓞 L) ∉ Q.asIdeal := fun h' => hP (by
-    rw [hQ, Ideal.mem_comap, map_natCast] at h'
-    exact h')
+  have hn : ((n : ℕ) : 𝓞 L) ∉ Q.asIdeal := fun h' =>
+    hP (by
+      rw [hQ, Ideal.mem_comap, map_natCast] at h'
+      exact h')
   obtain ⟨f, α, h1, h2, h3⟩ := h Q hn
   have hf := Ideal.absNorm_eq_pow_inertiaDeg'_of_liesOver P.asIdeal Q.asIdeal Q.isPrime Q.ne_bot
-  have hcm : P.asIdeal.comap (RingOfIntegers.mapRingHom (τ.comp φ)) =
-      Q.asIdeal.comap (RingOfIntegers.mapRingHom φ) := by
+  have hcm
+      : P.asIdeal.comap (RingOfIntegers.mapRingHom (τ.comp φ))
+        = Q.asIdeal.comap (RingOfIntegers.mapRingHom φ) := by
     ext x
     rfl
   rw [hcm]
@@ -38,10 +43,20 @@ theorem containsRayField_comp {K L L' : Type} [Field K] [NumberField K] [Field L
     rw [one_pow] at this
     exact dvd_trans h3 this
 
-theorem exists_finset_containsRayField : GlobalTheory.NT.RayField → ∀ (P : Pre) (M : ℕ), M ≠ 0 → ∃ S : Finset ℂ, (∀ z ∈ S, IsAlgebraic ℚ z) ∧ ∀ (L : Type) [Field L] [NumberField L] (σ : L →+* ℂ) (φ : P.host.K →+* L), σ.comp φ = P.host.φ₀.comp (algebraMap P.host.K P.host.E) → (∀ z ∈ S, ∃ x, σ x = z) → GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField φ M := by
+theorem exists_finset_containsRayField
+    : GlobalTheory.NT.RayField
+      → ∀ (P : Pre) (M : ℕ),
+        M ≠ 0
+          → ∃ S : Finset ℂ,
+            (∀ z ∈ S, IsAlgebraic ℚ z)
+              ∧ ∀ (L : Type) [Field L] [NumberField L] (σ : L →+* ℂ) (φ : P.host.K →+* L),
+                σ.comp φ = P.host.φ₀.comp (algebraMap P.host.K P.host.E) → (∀ z ∈ S, ∃ x, σ x = z)
+                  → GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField φ M := by
   intro hR P M hM
   let φK : P.host.K →+* ℂ := P.host.φ₀.comp (algebraMap P.host.K P.host.E)
-  obtain ⟨Rf, hRf⟩ := GlobalTheory.Mem.Fld.exists_isRayFieldIn φK hR (GlobalTheory.Mem.Fld.natIdeal_ne_bot (E := P.host.K) hM)
+  obtain ⟨Rf, hRf⟩ :=
+    GlobalTheory.Mem.Fld.exists_isRayFieldIn φK hR
+      (GlobalTheory.Mem.Fld.natIdeal_ne_bot (E := P.host.K) hM)
   haveI : NumberField Rf := hRf.numberField
   let b := Module.finBasis ℚ Rf
   refine ⟨Finset.univ.image (fun i => (b i : ℂ)), ?_, ?_⟩
@@ -54,7 +69,8 @@ theorem exists_finset_containsRayField : GlobalTheory.NT.RayField → ∀ (P : P
     letI := GlobalTheory.Mem.Fld.algOf φK Rf hm
     obtain ⟨hab, hun, -, hart⟩ := hray
     haveI : IsGalois P.host.K Rf := hab.toIsGalois
-    have hc : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (algebraMap P.host.K Rf) M :=
+    have hc : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField
+        (algebraMap P.host.K Rf) M :=
       GlobalTheory.FieldSize.RayNorm.containsRayField_of_ray (K := P.host.K) (L := Rf) M hun
         (fun I hI hc hχ => (hart I hI hc).1 hχ)
     have hle : Rf ≤ σ.toRatAlgHom.fieldRange := by
@@ -67,8 +83,9 @@ theorem exists_finset_containsRayField : GlobalTheory.NT.RayField → ∀ (P : P
       obtain ⟨y, hy⟩ := hS (b i) (Finset.mem_image.2 ⟨i, Finset.mem_univ _, rfl⟩)
       exact ⟨y, hy⟩
     let e : L ≃ₐ[ℚ] σ.toRatAlgHom.fieldRange := AlgEquiv.ofInjectiveField σ.toRatAlgHom
-    let τ : Rf →+* L := (e.symm : σ.toRatAlgHom.fieldRange →+* L).comp
-      (IntermediateField.inclusion hle : Rf →+* σ.toRatAlgHom.fieldRange)
+    let τ : Rf →+* L :=
+      (e.symm : σ.toRatAlgHom.fieldRange →+* L).comp
+        (IntermediateField.inclusion hle : Rf →+* σ.toRatAlgHom.fieldRange)
     have key : ∀ w, σ (e.symm w) = (w : ℂ) := fun w => by
       conv_rhs => rw [← e.apply_symm_apply w]
       rfl

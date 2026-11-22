@@ -18,13 +18,19 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.UnderEq
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto GlobalTheory.ChainTw
-open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (SplitProj IsProjAt IsIdemOf LiftsChar rdA grpCo frCo gAt)
+open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting
+  (SplitProj IsProjAt IsIdemOf LiftsChar rdA grpCo frCo gAt)
 open GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection (Blocks parahoric datum)
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField
 open GlobalTheory.LiftRows (Given)
 open scoped NNReal ENNReal
 
@@ -34,11 +40,15 @@ open scoped Pointwise
 
 namespace GlobalTheory.LevelIndexMeasure
 
-theorem relIndex_mul_measure_preimage {G Q R : Type*} [Group G] [Group Q] [Group R] [MeasurableSpace G] [MeasurableMul G]
-    (μ : Measure G) [μ.IsMulLeftInvariant] (φ : G →* Q) (ψ : G →* R) (N : Subgroup G) (hN : ∀ n ∈ N, ψ n = 1)
-    (H₁ H₀ : Subgroup Q) (h10 : H₁ ≤ H₀) (hsurj : H₀ ≤ N.map φ) (hfi : H₁.relIndex H₀ ≠ 0) (E : Set R)
-    (hS : MeasurableSet (φ ⁻¹' (H₁ : Set Q) ∩ ψ ⁻¹' E)) :
-    (H₁.relIndex H₀ : ℝ≥0∞) * μ (φ ⁻¹' (H₁ : Set Q) ∩ ψ ⁻¹' E) = μ (φ ⁻¹' (H₀ : Set Q) ∩ ψ ⁻¹' E) := by
+theorem relIndex_mul_measure_preimage
+    {G Q R : Type*} [Group G] [Group Q] [Group R] [MeasurableSpace G] [MeasurableMul G]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (φ : G →* Q)
+    (ψ : G →* R) (N : Subgroup G) (hN : ∀ n ∈ N, ψ n = 1)
+    (H₁ H₀ : Subgroup Q) (h10 : H₁ ≤ H₀) (hsurj : H₀ ≤ N.map φ) (hfi : H₁.relIndex H₀ ≠ 0)
+    (E : Set R) (hS : MeasurableSet (φ ⁻¹' (H₁ : Set Q) ∩ ψ ⁻¹' E))
+    : (H₁.relIndex H₀ : ℝ≥0∞) * μ (φ ⁻¹' (H₁ : Set Q) ∩ ψ ⁻¹' E)
+      = μ (φ ⁻¹' (H₀ : Set Q) ∩ ψ ⁻¹' E) := by
   haveI : (H₁.subgroupOf H₀).FiniteIndex := ⟨hfi⟩
   obtain ⟨s, hs, -⟩ := (H₁.subgroupOf H₀).exists_isComplement_left 1
   have hs' : Finite s := hs.finite_left_iff.mpr inferInstance
@@ -47,7 +57,8 @@ theorem relIndex_mul_measure_preimage {G Q R : Type*} [Group G] [Group Q] [Group
   set S₁ := φ ⁻¹' (H₁ : Set Q) ∩ ψ ⁻¹' E
   have hU : (⋃ a : s, lift a • S₁) = φ ⁻¹' (H₀ : Set Q) ∩ ψ ⁻¹' E := by
     ext x
-    simp only [Set.mem_iUnion, Set.mem_smul_set, Set.mem_inter_iff, Set.mem_preimage, SetLike.mem_coe, S₁, smul_eq_mul]
+    simp only [Set.mem_iUnion, Set.mem_smul_set, Set.mem_inter_iff, Set.mem_preimage,
+      SetLike.mem_coe, S₁, smul_eq_mul]
     constructor
     · rintro ⟨a, y, ⟨hy1, hy2⟩, rfl⟩
       refine ⟨?_, ?_⟩
@@ -71,11 +82,13 @@ theorem relIndex_mul_measure_preimage {G Q R : Type*} [Group G] [Group Q] [Group
     have hh1' : (⟨φ y1, h10 hy1⟩ : H₀) ∈ H₁.subgroupOf H₀ := Subgroup.mem_subgroupOf.mpr hy1
     have hh2' : (⟨φ y2, h10 hy2⟩ : H₀) ∈ H₁.subgroupOf H₀ := Subgroup.mem_subgroupOf.mpr hy2
     have e : (a.val : H₀) * ⟨φ y1, h10 hy1⟩ = (b.val : H₀) * ⟨φ y2, h10 hy2⟩ := Subtype.ext he'.symm
-    have := (hs.existsUnique ((a.val : H₀) * ⟨φ y1, h10 hy1⟩)).unique
-      (y₁ := (a, ⟨_, hh1'⟩)) (y₂ := (b, ⟨_, hh2'⟩)) rfl e.symm
+    have :=
+      (hs.existsUnique ((a.val : H₀) * ⟨φ y1, h10 hy1⟩)).unique (y₁ := (a, ⟨_, hh1'⟩))
+        (y₂ := (b, ⟨_, hh2'⟩)) rfl e.symm
     exact congrArg Prod.fst this
-  calc (H₁.relIndex H₀ : ℝ≥0∞) * μ S₁ = ∑' a : s, μ (lift a • S₁) := by
-        simp [measure_smul, hs.encard_left, Subgroup.relIndex]
+  calc
+    (H₁.relIndex H₀ : ℝ≥0∞) * μ S₁
+      = ∑' a : s, μ (lift a • S₁) := by simp [measure_smul, hs.encard_left, Subgroup.relIndex]
     _ = μ (⋃ a : s, lift a • S₁) := (measure_iUnion hdisj fun a => hS.const_smul _).symm
     _ = _ := by rw [hU]
 
@@ -85,14 +98,23 @@ namespace GlobalTheory.LevelIndexMeasure
 
 variable {D : D7}
 
-theorem relIndex_mul_measure_levelSet : ∀ (D : D7) (V : HSp D) (ν : Measure (GA D V)) [ν.IsMulLeftInvariant] (K₁ K₀ : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (E : Set (GinfC V)), K₁ ≤ K₀ → K₀ ≤ UA D.sp.cm V.gram → K₁.relIndex K₀ ≠ 0 → MeasurableSet {g : GA D V | Lev.finE V g ∈ K₁} → MeasurableSet E → (K₁.relIndex K₀ : ℝ≥0∞) * ν ({g : GA D V | Lev.finE V g ∈ K₁} ∩ GlobalTheory.AutMult.toInf V ⁻¹' E) = ν ({g : GA D V | Lev.finE V g ∈ K₀} ∩ GlobalTheory.AutMult.toInf V ⁻¹' E) := by
+theorem relIndex_mul_measure_levelSet
+    : ∀ (D : D7) (V : HSp D) (ν : Measure (GA D V)) [ν.IsMulLeftInvariant]
+        (K₁ K₀ : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (E : Set (GinfC V)),
+      K₁ ≤ K₀ → K₀ ≤ UA D.sp.cm V.gram → K₁.relIndex K₀ ≠ 0
+        → MeasurableSet {g : GA D V | Lev.finE V g ∈ K₁} → MeasurableSet E
+        → (K₁.relIndex K₀ : ℝ≥0∞)
+            * ν ({g : GA D V | Lev.finE V g ∈ K₁} ∩ GlobalTheory.AutMult.toInf V ⁻¹' E)
+          = ν ({g : GA D V | Lev.finE V g ∈ K₀} ∩ GlobalTheory.AutMult.toInf V ⁻¹' E) := by
   intro D V ν _ K₁ K₀ E h10 h0U hfi hK₁ hE
   obtain ⟨i1, -, -, -, i5, -, -, i8⟩ := GlobalTheory.RealMeasOne.ginfC_facts V
-  have hmeas : Measurable (GlobalTheory.AutMult.toInf V) := (GlobalTheory.AutMult.continuous_toInf V).measurable
+  have hmeas : Measurable (GlobalTheory.AutMult.toInf V) :=
+    (GlobalTheory.AutMult.continuous_toInf V).measurable
   have hsurj : K₀ ≤ (GfC V).map (Lev.finE V) := by
     rw [← GlobalTheory.FunObj.map_levA V h0U]
     exact Subgroup.map_mono inf_le_left
   exact relIndex_mul_measure_preimage ν (Lev.finE V) (GlobalTheory.AutMult.toInf V) (GfC V)
-    (fun n hn => (GlobalTheory.ChainOnto.HaarInf.toInf_eq_one_iff V n).2 hn) K₁ K₀ h10 hsurj hfi E (hK₁.inter (hmeas hE))
+    (fun n hn => (GlobalTheory.ChainOnto.HaarInf.toInf_eq_one_iff V n).2 hn)
+    K₁ K₀ h10 hsurj hfi E (hK₁.inter (hmeas hE))
 
 end GlobalTheory.LevelIndexMeasure

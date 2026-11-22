@@ -8,8 +8,9 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem ringOfIntegers_ringHom_injective {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K]
-    (σ : 𝓞 E →+* 𝓞 K) : Function.Injective σ := by
+theorem ringOfIntegers_ringHom_injective
+    {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K] (σ : 𝓞 E →+* 𝓞 K)
+    : Function.Injective σ := by
   rw [RingHom.injective_iff_ker_eq_bot]
   apply Ideal.eq_bot_of_comap_eq_bot (R := ℤ)
   rw [eq_bot_iff]
@@ -17,8 +18,8 @@ theorem ringOfIntegers_ringHom_injective {E K : Type} [Field E] [NumberField E] 
   rw [Ideal.mem_comap, RingHom.mem_ker] at hn
   simpa using hn
 
-theorem sum_log_norm_embeddings {K : Type} [Field K] [NumberField K] (y : K) :
-    ∑ s : K →+* ℂ, Real.log ‖s y‖ = Real.log |((Algebra.norm ℚ y : ℚ) : ℝ)| := by
+theorem sum_log_norm_embeddings {K : Type} [Field K] [NumberField K] (y : K)
+    : ∑ s : K →+* ℂ, Real.log ‖s y‖ = Real.log |((Algebra.norm ℚ y : ℚ) : ℝ)| := by
   by_cases hy : y = 0
   · subst hy
     simp
@@ -29,10 +30,11 @@ theorem sum_log_norm_embeddings {K : Type} [Field K] [NumberField K] (y : K) :
   congr 1
   rw [eq_ratCast, ← Complex.ofReal_ratCast, Complex.norm_real, Real.norm_eq_abs]
 
-theorem mean_log_norm_embeddings_ringHom :
-    ∀ (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] (σ : 𝓞 E →+* 𝓞 K) (x : 𝓞 E),
-  (∑ s : K →+* ℂ, Real.log ‖s (σ x : K)‖) / Module.finrank ℚ K =
-    Real.log |((Algebra.norm ℚ (x : E) : ℚ) : ℝ)| / Module.finrank ℚ E := by
+theorem mean_log_norm_embeddings_ringHom
+    : ∀ (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] (σ : 𝓞 E →+* 𝓞 K)
+        (x : 𝓞 E),
+      (∑ s : K →+* ℂ, Real.log ‖s (σ x : K)‖) / Module.finrank ℚ K
+        = Real.log |((Algebra.norm ℚ (x : E) : ℚ) : ℝ)| / Module.finrank ℚ E := by
   intro E K _ _ _ _ σ x
   have hinj : Function.Injective ((algebraMap (𝓞 K) K).comp σ) :=
     (RingOfIntegers.coe_injective).comp (ringOfIntegers_ringHom_injective σ)

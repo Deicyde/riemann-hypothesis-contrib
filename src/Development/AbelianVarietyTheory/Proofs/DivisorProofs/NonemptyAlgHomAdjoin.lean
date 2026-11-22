@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.AdjoinAlgebraHomNonempty
 
-theorem nonempty_algHom_adjoin (k F Ω : Type) [Field k] [Field F] [Algebra k F] [Field Ω]
-    [Algebra k Ω] (S : Subalgebra k F) (ψ : S →ₐ[k] Ω) (h : S) (hh : ψ h ≠ 0) (T : Set F)
-    (hT : ∀ x ∈ T, (h : F) * x ∈ S) : Nonempty (Algebra.adjoin k T →ₐ[k] Ω) := by
+theorem nonempty_algHom_adjoin
+    (k F Ω : Type) [Field k] [Field F] [Algebra k F] [Field Ω] [Algebra k Ω]
+    (S : Subalgebra k F) (ψ : S →ₐ[k] Ω) (h : S) (hh : ψ h ≠ 0)
+    (T : Set F) (hT : ∀ x ∈ T, (h : F) * x ∈ S)
+    : Nonempty (Algebra.adjoin k T →ₐ[k] Ω) := by
   have h0 : h ≠ 0 := fun e => hh (by rw [e, map_zero])
   have h0F : (h : F) ≠ 0 := fun e => h0 (Subtype.ext e)
   have hu : ∀ y : Submonoid.powers h, IsUnit (S.val y) := by
@@ -24,7 +26,8 @@ theorem nonempty_algHom_adjoin (k F Ω : Type) [Field k] [Field F] [Algebra k F]
   have hf : ∀ s : S, f (algebraMap S (Localization.Away h) s) = (s : F) := fun s => by
     simp [f, IsLocalization.liftAlgHom_apply]
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro z hz
     obtain ⟨⟨a, b⟩, hab⟩ := IsLocalization.surj (Submonoid.powers h) z
     have h1 := congrArg f hab
@@ -34,8 +37,9 @@ theorem nonempty_algHom_adjoin (k F Ω : Type) [Field k] [Field F] [Algebra k F]
     exact (IsLocalization.map_units (Localization.Away h) b).mul_left_eq_zero.mp hab
   have hle : Algebra.adjoin k T ≤ f.range := by
     refine Algebra.adjoin_le fun x hx => ?_
-    obtain ⟨u, hu'⟩ := IsLocalization.map_units (Localization.Away h)
-      (⟨h, Submonoid.mem_powers h⟩ : Submonoid.powers h)
+    obtain ⟨u, hu'⟩ :=
+      IsLocalization.map_units (Localization.Away h)
+        (⟨h, Submonoid.mem_powers h⟩ : Submonoid.powers h)
     refine ⟨(↑u⁻¹ : Localization.Away h) * algebraMap S _ ⟨_, hT x hx⟩, ?_⟩
     apply mul_left_cancel₀ h0F
     have e : f u = (h : F) := by rw [hu']; exact hf h

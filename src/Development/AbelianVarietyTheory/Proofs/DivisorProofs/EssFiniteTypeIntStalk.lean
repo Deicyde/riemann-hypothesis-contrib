@@ -11,9 +11,13 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc GlobalTheory.Poinc.Eq8 Formalism.L2.Pj
 open scoped TensorProduct
@@ -24,8 +28,10 @@ noncomputable section
 
 namespace GlobalTheory.Poinc.CompletedStalk
 
-theorem essFiniteType_int_stalk {o' Ω : Type} [CommRing o'] [Field Ω] [Algebra o' Ω] [hA : ArithBase o' Ω]
-    (M : RatModel o' Ω) (x : M.Z) : Algebra.EssFiniteType ℤ (M.Z.presheaf.stalk x) := by
+theorem essFiniteType_int_stalk
+    {o' Ω : Type} [CommRing o'] [Field Ω] [Algebra o' Ω] [hA : ArithBase o' Ω]
+    (M : RatModel o' Ω) (x : M.Z)
+    : Algebra.EssFiniteType ℤ (M.Z.presheaf.stalk x) := by
   haveI : LocallyOfFiniteType M.s := M.lft
   let y : PrimeSpectrum o' := M.s x
   letI A : Algebra o' ((Sp o').presheaf.stalk (M.s x)) := StructureSheaf.stalkAlgebra _ y
@@ -34,7 +40,8 @@ theorem essFiniteType_int_stalk {o' Ω : Type} [CommRing o'] [Field Ω] [Algebra
   let φ := @algebraMap o' ((Sp o').presheaf.stalk (M.s x)) _ _ A
   have h₁ : (M.s.stalkMap x).hom.EssFiniteType := LocallyOfFiniteType.stalkMap M.s x
   have h₂ : φ.EssFiniteType :=
-    RingHom.essFiniteType_algebraMap.2 (Algebra.EssFiniteType.of_isLocalization _ y.asIdeal.primeCompl)
+    RingHom.essFiniteType_algebraMap.2 (Algebra.EssFiniteType.of_isLocalization _
+      y.asIdeal.primeCompl)
   haveI : Algebra.FiniteType ℤ o' := hA.ft
   have h₀ : (algebraMap ℤ o').EssFiniteType := RingHom.essFiniteType_algebraMap.2 inferInstance
   have h := ((h₀.comp h₂).comp h₁)
@@ -44,7 +51,25 @@ theorem essFiniteType_int_stalk {o' Ω : Type} [CommRing o'] [Field Ω] [Algebra
 
 end GlobalTheory.Poinc.CompletedStalk
 
-theorem GlobalTheory.Poinc.CompletedStalk.exists_completion_unif : ∀ (o' Ω : Type) [CommRing o'] [Field Ω] [Algebra o' Ω] [ArithBase o' Ω] (S : ThetaSys o' Ω) (ρ : S.Real), S.Big → ∀ (M : RatModel o' Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J) (FinalForm : ZHOut ρ M U₀ EE), S.admitted M U₀ → S.IsEE M U₀ EE → ∀ x : M.Z, IsClosed ({x} : Set M.Z) → ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsLocalRing R) (j : M.Z.presheaf.stalk x →+* R) (G : Over (Sp R)) (_ : GrpObj G) (_ : IsCommMonObj G) (gm : G.left ⟶ FinalForm.G.left) (D : DegData R (maximalIdeal R)) (A : PolAV (Sp (FractionRing R))) (U : Unif (maximalIdeal R) D A G), GlobalTheory.Mum.Base R ∧ IsCpl j ∧ IsGrpPullback G FinalForm.G (spMap j ≫ M.Z.fromSpecStalk x) gm ∧ LBIso U.LG.L (FinalForm.L.L.pull gm) ∧ ∀ y, PsiUnitOn D.toPre y ((spMap j ≫ M.Z.fromSpecStalk x) ⁻¹' abLocus FinalForm.G) := by
+theorem GlobalTheory.Poinc.CompletedStalk.exists_completion_unif
+    : ∀ (o' Ω : Type) [CommRing o'] [Field Ω] [Algebra o' Ω] [ArithBase o' Ω] (S : ThetaSys o' Ω)
+        (ρ : S.Real),
+      S.Big
+        → ∀ (M : RatModel o' Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J) (FinalForm : ZHOut ρ M U₀ EE),
+          S.admitted M U₀ → S.IsEE M U₀ EE
+            → ∀ x : M.Z,
+              IsClosed ({x} : Set M.Z)
+                → ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsLocalRing R)
+                    (j : M.Z.presheaf.stalk x →+* R) (G : Over (Sp R)) (_ : GrpObj G)
+                    (_ : IsCommMonObj G) (gm : G.left ⟶ FinalForm.G.left)
+                    (D : DegData R (maximalIdeal R)) (A : PolAV (Sp (FractionRing R)))
+                    (U : Unif (maximalIdeal R) D A G),
+                  GlobalTheory.Mum.Base R ∧ IsCpl j
+                    ∧ IsGrpPullback G FinalForm.G (spMap j ≫ M.Z.fromSpecStalk x) gm
+                    ∧ LBIso U.LG.L (FinalForm.L.L.pull gm)
+                    ∧ ∀ y,
+                      PsiUnitOn D.toPre y
+                        ((spMap j ≫ M.Z.fromSpecStalk x) ⁻¹' abLocus FinalForm.G) := by
   intro o' Ω _ _ _ hA S ρ hB M U₀ EE FinalForm hAdm hEE x hx
   have hinjΩ := M.stalkHom_injective x
   haveI : IsDomain (M.Z.presheaf.stalk x) := hinjΩ.isDomain
@@ -56,7 +81,8 @@ theorem GlobalTheory.Poinc.CompletedStalk.exists_completion_unif : ∀ (o' Ω : 
   have fg : (maximalIdeal (M.Z.presheaf.stalk x)).FG := IsNoetherian.noetherian _
   haveI hloc : IsLocalRing (AdicCompletion (maximalIdeal (M.Z.presheaf.stalk x)) (M.Z.presheaf.stalk x)) :=
     AdicCompletion.isLocalRing_of_fg fg
-  obtain ⟨hRd, hRi⟩ := GlobalTheory.AnalyticNormality.completion_isDomain_and_isIntegrallyClosed (M.Z.presheaf.stalk x)
+  obtain ⟨hRd, hRi⟩ :=
+    GlobalTheory.AnalyticNormality.completion_isDomain_and_isIntegrallyClosed (M.Z.presheaf.stalk x)
   haveI hRn : IsNoetherianRing (AdicCompletion (maximalIdeal (M.Z.presheaf.stalk x)) (M.Z.presheaf.stalk x)) :=
     GlobalTheory.AdicNoeth.isNoetherianRing_adicCompletion _ _
   have hm := AdicCompletion.maximalIdeal_eq_map_of_fg fg
@@ -79,10 +105,11 @@ theorem GlobalTheory.Poinc.CompletedStalk.exists_completion_unif : ∀ (o' Ω : 
       rw [Scheme.range_fromSpecStalk]
       exact genericPoint_specializes x
     obtain ⟨q, hq⟩ := hgen
-    have hpq : p ⤳ q := (PrimeSpectrum.le_iff_specializes p q).1 (by
-      show p.asIdeal ≤ q.asIdeal
-      rw [hp]
-      exact bot_le)
+    have hpq : p ⤳ q :=
+      (PrimeSpectrum.le_iff_specializes p q).1 (by
+        show p.asIdeal ≤ q.asIdeal
+        rw [hp]
+        exact bot_le)
     have hsp : ξ w ⤳ genericPoint M.Z := by
       have := hpq.map (M.Z.fromSpecStalk x).continuous
       rw [hq] at this
@@ -93,6 +120,22 @@ theorem GlobalTheory.Poinc.CompletedStalk.exists_completion_unif : ∀ (o' Ω : 
     exact le_bot_iff.1 ((S.TT_anti M hsp).trans (ThetaSys.TT_genericPoint S M).le)
   haveI : IsCommMonObj ((Over.pullback ξ).obj FinalForm.G) := Functor.isCommMonObj_obj
   obtain ⟨D, A, U, hL, hP⟩ := FinalForm.unif R hRn hRi hcpl ξ hne
-  exact ⟨R, inferInstance, hRd, hloc, φ, (Over.pullback ξ).obj FinalForm.G, inferInstance, inferInstance,
-    pullback.fst _ _, D, A, U, ⟨⟨hRn, hRd, hRi, hcpl⟩, inferInstance⟩, isCpl_self _,
-    isGrpPullback_pullback _ _, hL, hP⟩
+  exact ⟨
+    R,
+    inferInstance,
+    hRd,
+    hloc,
+    φ,
+    (Over.pullback ξ).obj FinalForm.G,
+    inferInstance,
+    inferInstance,
+    pullback.fst _ _,
+    D,
+    A,
+    U,
+    ⟨⟨hRn, hRd, hRi, hcpl⟩, inferInstance⟩,
+    isCpl_self _,
+    isGrpPullback_pullback _ _,
+    hL,
+    hP
+  ⟩

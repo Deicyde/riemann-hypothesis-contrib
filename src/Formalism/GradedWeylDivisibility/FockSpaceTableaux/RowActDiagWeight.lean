@@ -13,7 +13,9 @@ namespace Formalism.GradedWeylDivisibility
 
 theorem row_action_diagonal_weight : RowActDiagWeight := by
   intro R _ k n t μ f hf
-  have hX : (rowAct R (n := n) (Matrix.diagonal t)) = aeval fun v : Fin k × Fin n => C (t v.1) * X v := by
+  have hX
+      : (rowAct R (n := n) (Matrix.diagonal t))
+        = aeval fun v : Fin k × Fin n => C (t v.1) * X v := by
     unfold rowAct
     congr 1
     funext v
@@ -22,7 +24,8 @@ theorem row_action_diagonal_weight : RowActDiagWeight := by
     · intro b _ hb
       simp [Ne.symm hb]
     · simp
-  have hwt : ∀ (d : Fin k × Fin n →₀ ℕ) (a : Fin k), Finsupp.weight (rowW k n) d a = ∑ s, d (a, s) := by
+  have hwt
+      : ∀ (d : Fin k × Fin n →₀ ℕ) (a : Fin k), Finsupp.weight (rowW k n) d a = ∑ s, d (a, s) := by
     intro d a
     rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply,
       Fintype.sum_prod_type]

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace GlobalTheory.Cusp GlobalTheory.Mem.Th
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta MeasureTheory
+  GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace GlobalTheory.Cusp GlobalTheory.Mem.Th
 open scoped InnerProductSpace ContDiff
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.TraceKernelDecomposition
@@ -31,13 +32,18 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7}
 
 def IsCcInf (θ : InfF D) (V : HSp D) (f : GA D V → ℂ) : Prop :=
-  Continuous f ∧ HasCompactSupport f ∧
-    (∃ U : Subgroup (GA D V), IsOpen (U : Set (GA D V)) ∧ ∀ k ∈ U, k ∈ GfC V → ∀ g, f (g * k) = f g) ∧
-    ∀ (k : ℕ) (τs : Fin k → D.what₂.Tau) (Xs : Fin k → Matrix (Fin V.rank) (Fin V.rank) ℂ),
-      (∀ i, Xs i ∈ lieAt V (τs i)) → ∀ g,
-        ContDiff ℝ ∞ fun t : Fin k → ℝ => f (g * (List.ofFn fun i => oneP θ V (τs i) (Xs i) (t i)).prod)
+  Continuous f ∧ HasCompactSupport f
+    ∧ (∃ U : Subgroup (GA D V),
+      IsOpen (U : Set (GA D V)) ∧ ∀ k ∈ U, k ∈ GfC V → ∀ g, f (g * k) = f g)
+    ∧ ∀ (k : ℕ) (τs : Fin k → D.what₂.Tau) (Xs : Fin k → Matrix (Fin V.rank) (Fin V.rank) ℂ),
+      (∀ i, Xs i ∈ lieAt V (τs i))
+        → ∀ g,
+          ContDiff ℝ ∞ fun t : Fin k → ℝ =>
+            f (g * (List.ofFn fun i => oneP θ V (τs i) (Xs i) (t i)).prod)
 
-def MapsIntoCusp (V : HSp D) (μ : Measure (GA D V)) [μ.IsHaarMeasure] [μ.IsMulRightInvariant] (f : GA D V → ℂ) : Prop :=
+def MapsIntoCusp
+    (V : HSp D) (μ : Measure (GA D V)) [μ.IsHaarMeasure] [μ.IsMulRightInvariant] (f : GA D V → ℂ)
+    : Prop :=
   ∀ F : DividedPowerChartLift V μ, RopG V μ f F ∈ L2cusp V μ
 
 end GlobalTheory.IndefiniteRowSideFullHecke.TraceKernelDecomposition

@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-private theorem bernoulli_denominator_bound {N M : ℕ} (k : ℕ) (Φ : ZMod M → ℂ) (hM : 0 < M) (hMN : M ≤ N)
-    (hΦ : ∀ a, ‖Φ a‖ ≤ 1) : ‖(den N k : ℂ) * genB k Φ‖ ≤ bnd N k := by
+private theorem bernoulli_denominator_bound
+    {N M : ℕ} (k : ℕ) (Φ : ZMod M → ℂ) (hM : 0 < M) (hMN : M ≤ N) (hΦ : ∀ a, ‖Φ a‖ ≤ 1)
+    : ‖(den N k : ℂ) * genB k Φ‖ ≤ bnd N k := by
   have hb := b_upper k Φ hM hΦ
   have hp : (primorial (k + 1) : ℝ) ≤ 4 ^ (k + 1) := by exact_mod_cast primorial_le_four_pow (k + 1)
   have h4 : (4 : ℝ) ^ k ≤ (2 * Real.pi) ^ k :=
@@ -18,19 +19,22 @@ private theorem bernoulli_denominator_bound {N M : ℕ} (k : ℕ) (Φ : ZMod M �
   have hMN' : (M : ℝ) ≤ N := by exact_mod_cast hMN
   rw [norm_mul, Complex.norm_natCast, den, bnd]
   push_cast
-  calc (N : ℝ) * (primorial (k + 1) : ℝ) * ‖genB k Φ‖
-      ≤ N * 4 ^ (k + 1) * (4 * (N : ℝ) ^ k * k.factorial / (2 * Real.pi) ^ k) := by
-        gcongr
-        exact hb.trans (by gcongr)
+  calc
+    (N : ℝ) * (primorial (k + 1) : ℝ) * ‖genB k Φ‖
+        ≤ N * 4 ^ (k + 1) * (4 * (N : ℝ) ^ k * k.factorial / (2 * Real.pi) ^ k) := by
+      gcongr
+      exact hb.trans (by gcongr)
     _ = 16 * (N : ℝ) ^ (k + 1) * k.factorial * (4 ^ k / (2 * Real.pi) ^ k) := by ring
     _ ≤ 16 * (N : ℝ) ^ (k + 1) * k.factorial * 1 := by
-        gcongr
-        rw [div_le_one hpi]
-        exact h4
+      gcongr
+      rw [div_le_one hpi]
+      exact h4
     _ = _ := mul_one _
 
-theorem UpperTheory.V.Bern.b_denupper :
-    ∀ {N : ℕ} [NeZero N] (k : ℕ) (χ : DirichletCharacter ℂ N), ‖(den N k : ℂ) * genB k χ‖ ≤ bnd N k ∧ ‖(den N k : ℂ) * Bprim k χ‖ ≤ bnd N k ∧ 1 ≤ bnd N k := by
+theorem UpperTheory.V.Bern.b_denupper
+    : ∀ {N : ℕ} [NeZero N] (k : ℕ) (χ : DirichletCharacter ℂ N),
+      ‖(den N k : ℂ) * genB k χ‖ ≤ bnd N k ∧ ‖(den N k : ℂ) * Bprim k χ‖ ≤ bnd N k
+        ∧ 1 ≤ bnd N k := by
   intro N _ k χ
   have hN : 0 < N := Nat.pos_of_ne_zero (NeZero.ne N)
   refine ⟨bernoulli_denominator_bound k _ hN le_rfl (fun a => χ.norm_le_one a), ?_, ?_⟩

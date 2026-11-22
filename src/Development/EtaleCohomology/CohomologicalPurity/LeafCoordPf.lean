@@ -36,8 +36,9 @@ theorem LeafCoord_of (hR : LeafRank) (hP : LeafPick) (hS : LeafSpan) (hE : LeafE
   haveI : Algebra.IsStandardSmooth R A := h1.isStandardSmooth
   haveI : Algebra.IsStandardSmooth R (A ⧸ I) := h2.isStandardSmooth
   have hfg : I.FG := by
-    have := Algebra.FinitePresentation.ker_fG_of_surjective (Ideal.Quotient.mkₐ R I)
-      (Ideal.Quotient.mkₐ_surjective R I)
+    have :=
+      Algebra.FinitePresentation.ker_fG_of_surjective (Ideal.Quotient.mkₐ R I)
+        (Ideal.Quotient.mkₐ_surjective R I)
     simpa [Ideal.Quotient.mkₐ_ker] using this
   haveI : Module.Finite A I := Module.Finite.iff_fg.mpr hfg
   haveI := hp
@@ -63,18 +64,27 @@ theorem LeafCoord_of (hR : LeafRank) (hP : LeafPick) (hS : LeafSpan) (hE : LeafE
   · haveI : Algebra.IsStandardSmoothOfRelativeDimension 0 A A' :=
       Algebra.IsStandardSmoothOfRelativeDimension.localization_away (f * g)
     have h3 : Algebra.IsStandardSmoothOfRelativeDimension (0 + (e + d)) R A' :=
-      Algebra.IsStandardSmoothOfRelativeDimension.trans (R := R) (S := A) (T := A') (n := e + d) (m := 0)
+      Algebra.IsStandardSmoothOfRelativeDimension.trans (R := R) (S := A) (T := A') (n := e + d)
+        (m := 0)
     rw [zero_add] at h3
     refine hE (e + d) R A' (Fin d ⊕ Fin e) _ (by simp [add_comm]) h3 ?_
     apply kd_span (R := R) (A := A) (f * g)
     intro a
-    have hm := Submodule.mem_map_of_mem (f := KaehlerDifferential.map R R A A')
-      (hy (KaehlerDifferential.D R A a))
+    have hm :=
+      Submodule.mem_map_of_mem (f := KaehlerDifferential.map R R A A')
+        (hy (KaehlerDifferential.D R A a))
     rw [Submodule.map_span, LinearMap.map_smul, KaehlerDifferential.map_D] at hm
-    have hle : Submodule.span A (KaehlerDifferential.map R R A A' ''
-        Set.range fun k => KaehlerDifferential.D R A (Sum.elim x' y k)) ≤
-        (Submodule.span A' (Set.range fun k => KaehlerDifferential.D R A'
-          (Sum.elim (fun j => algebraMap A A' (x' j)) (fun k => algebraMap A A' (y k)) k))).restrictScalars A := by
+    have hle
+        : Submodule.span A
+            (KaehlerDifferential.map R R A A'
+              '' Set.range fun k => KaehlerDifferential.D R A (Sum.elim x' y k))
+          ≤ (Submodule.span A'
+            (Set.range fun k =>
+              KaehlerDifferential.D R A'
+                (Sum.elim
+                  (fun j => algebraMap A A' (x' j))
+                  (fun k => algebraMap A A' (y k))
+                  k))).restrictScalars A := by
       rw [Submodule.span_le]
       rintro _ ⟨_, ⟨k, rfl⟩, rfl⟩
       rw [KaehlerDifferential.map_D]

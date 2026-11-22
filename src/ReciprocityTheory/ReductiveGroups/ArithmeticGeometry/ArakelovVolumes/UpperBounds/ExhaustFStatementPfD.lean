@@ -8,9 +8,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.ExF
 
-open NumberField Complex Matrix Topology Filter ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst
-  ReciprocityTheory.L2DbarEstimates ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Up.ExhA ReciprocityTheory.ChartRestriction.G.AR.Up.ExhB
-  ReciprocityTheory.ChartRestriction.G.AR.Up.ExhC ReciprocityTheory.ChartRestriction.G.AR.Up.ExhD ReciprocityTheory.ChartRestriction.G.AR.Up.ExhE
+open NumberField Complex Matrix Topology Filter ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Up.ExhA
+  ReciprocityTheory.ChartRestriction.G.AR.Up.ExhB ReciprocityTheory.ChartRestriction.G.AR.Up.ExhC
+  ReciprocityTheory.ChartRestriction.G.AR.Up.ExhD ReciprocityTheory.ChartRestriction.G.AR.Up.ExhE
 open scoped ComplexConjugate ComplexOrder ContDiff
 
 noncomputable section
@@ -23,13 +25,14 @@ theorem cd_nM (τ : X.Ψ) (a b : Fin r) : ContDiff ℂ ∞ fun z : V (nd X) => n
   by_cases h : b < a
   · simp only [dif_pos h]
     first
-      | exact (EuclideanSpace.proj (𝕜 := ℂ) _).contDiff
-      | fun_prop
-      | exact ((EuclideanSpace.proj (𝕜 := ℂ) _).contDiff).congr fun z => rfl
+    | exact (EuclideanSpace.proj (𝕜 := ℂ) _).contDiff
+    | fun_prop
+    | exact ((EuclideanSpace.proj (𝕜 := ℂ) _).contDiff).congr fun z => rfl
   · simp only [dif_neg h]
     exact contDiff_const
 
-theorem unipotentFrame_inv_eq_adjugate (z : V (nd X)) (τ : X.Ψ) : (n1 X z τ)⁻¹ = (n1 X z τ).adjugate := by
+theorem unipotentFrame_inv_eq_adjugate (z : V (nd X)) (τ : X.Ψ)
+    : (n1 X z τ)⁻¹ = (n1 X z τ).adjugate := by
   have hdet : (n1 X z τ).det = 1 := by
     rw [Matrix.det_of_lowerTriangular]
     · simp [n1, nM_diag]
@@ -57,10 +60,11 @@ private lemma cd_adj_lemma_2 {𝕜 : Type*} [NontriviallyNormedField 𝕜] [Norm
   · simp only [Matrix.updateRow_apply, hab, if_false]
     exact h a b
 
-theorem cd_Zt (τ : X.Ψ) (a : Fin X.p0) (m : Fin (r - X.p0)) :
-    ContDiff ℂ ∞ fun z : V (nd X) => Zt X z τ a m := by
-  have hfun : (fun z : V (nd X) => Zt X z τ a m) =
-      fun z => ∑ k, Wm X z τ m k * (n1 X z τ).adjugate k a := by
+theorem cd_Zt (τ : X.Ψ) (a : Fin X.p0) (m : Fin (r - X.p0))
+    : ContDiff ℂ ∞ fun z : V (nd X) => Zt X z τ a m := by
+  have hfun
+      : (fun z : V (nd X) => Zt X z τ a m)
+        = fun z => ∑ k, Wm X z τ m k * (n1 X z τ).adjugate k a := by
     funext z
     simp only [Zt, Matrix.transpose_apply, Matrix.mul_apply, unipotentFrame_inv_eq_adjugate]
   rw [hfun]
@@ -71,25 +75,25 @@ theorem cd_Zt (τ : X.Ψ) (a : Fin X.p0) (m : Fin (r - X.p0)) :
     show ContDiff ℂ ∞ fun z : V (nd X) => nM X z τ (Fin.castLE X.p0_le i) (Fin.castLE X.p0_le j)
     exact cd_nM X τ _ _
 
-theorem cd_Am_entry (τ : X.Ψ) (a c : Fin X.p0) :
-    ContDiff ℝ ∞ fun z : V (nd X) => Am X z τ a c := by
-  have hZ : ∀ a m, ContDiff ℝ ∞ fun z : V (nd X) => Zt X z τ a m :=
-    fun a m => (cd_Zt X τ a m).restrict_scalars ℝ
-  have hfun : (fun z : V (nd X) => Am X z τ a c) = fun z =>
-      (1 : Matrix (Fin X.p0) (Fin X.p0) ℂ) a c - ∑ m, Zt X z τ a m * star (Zt X z τ c m) := by
+theorem cd_Am_entry (τ : X.Ψ) (a c : Fin X.p0) : ContDiff ℝ ∞ fun z : V (nd X) => Am X z τ a c := by
+  have hZ : ∀ a m, ContDiff ℝ ∞ fun z : V (nd X) => Zt X z τ a m := fun a m =>
+    (cd_Zt X τ a m).restrict_scalars ℝ
+  have hfun
+      : (fun z : V (nd X) => Am X z τ a c)
+        = fun z =>
+          (1 : Matrix (Fin X.p0) (Fin X.p0) ℂ) a c - ∑ m, Zt X z τ a m * star (Zt X z τ c m) := by
     funext z
     simp only [Am, Matrix.sub_apply, Matrix.mul_apply, Matrix.conjTranspose_apply]
   rw [hfun]
   refine contDiff_const.sub (ContDiff.sum fun m _ => (hZ a m).mul ?_)
-  first
-    | exact (hZ c m).star
-    | exact Complex.conjCLE.contDiff.comp (hZ c m)
+  first | exact (hZ c m).star | exact Complex.conjCLE.contDiff.comp (hZ c m)
 
 theorem cd_detAm (τ : X.Ψ) : ContDiff ℝ ∞ fun z : V (nd X) => (Am X z τ).det := by
   exact cd_det_lemma (M := fun z : V (nd X) => Am X z τ) fun a c => cd_Am_entry X τ a c
 
-theorem rhF_contDiffAt (x0 : Frame X.Ψ r) (ho : IsOrth X x0) {z : V (nd X)} (hz : z ∈ OmF X x0) : ContDiffAt ℝ ∞ (rhF X x0) z := by
-  have hfun : rhF X x0 = fun w => -∑ τ, Real.log ‖(Am X w τ).det‖ := funext (rhF_eq_sum X x0 ho)
+theorem rhF_contDiffAt (x0 : Frame X.Ψ r) (ho : IsOrth X x0) {z : V (nd X)} (hz : z ∈ OmF X x0)
+    : ContDiffAt ℝ ∞ (rhF X x0) z := by
+  have hfun : rhF X x0 = fun w => - ∑ τ, Real.log ‖(Am X w τ).det‖ := funext (rhF_eq_sum X x0 ho)
   have hpd := (mem_OmF_iff X x0 ho z).1 hz
   rw [hfun]
   refine (ContDiffAt.sum fun τ _ => ?_).neg
@@ -102,7 +106,8 @@ theorem rhF_contDiffAt (x0 : Frame X.Ψ r) (ho : IsOrth X x0) {z : V (nd X)} (hz
 theorem T_cd {n : ℕ} : ContDiff ℝ ∞ fun z : V n => Real.log (1 + ‖z‖ ^ 2) := by
   exact (contDiff_const.add (contDiff_norm_sq ℂ)).log fun z => by positivity
 
-theorem eF_contDiffAt (x0 : Frame X.Ψ r) (ho : IsOrth X x0) {z : V (nd X)} (hz : z ∈ OmF X x0) : ContDiffAt ℝ ∞ (eF X x0) z := by
+theorem eF_contDiffAt (x0 : Frame X.Ψ r) (ho : IsOrth X x0) {z : V (nd X)} (hz : z ∈ OmF X x0)
+    : ContDiffAt ℝ ∞ (eF X x0) z := by
   exact (rhF_contDiffAt X x0 ho hz).add (T_cd (n := nd X)).contDiffAt
 
 theorem isOpen_OmF (x0 : Frame X.Ψ r) : IsOpen (OmF X x0) := by
@@ -115,10 +120,11 @@ theorem isOpen_OmF (x0 : Frame X.Ψ r) : IsOpen (OmF X x0) := by
     rw [hfun]
     exact continuous_finsetSum _ fun k _ => continuous_const.mul (cd_nM X τ k b).continuous
   have hmat : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => mat x τ := fun τ =>
-    continuous_pi fun a => continuous_pi fun b =>
-      (continuous_apply b).comp ((continuous_apply a).comp (continuous_apply τ))
-  have hdet : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => (mat x τ).det :=
-    fun τ => (hmat τ).matrix_det
+    continuous_pi fun a =>
+      continuous_pi fun b =>
+        (continuous_apply b).comp ((continuous_apply a).comp (continuous_apply τ))
+  have hdet : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => (mat x τ).det := fun τ =>
+    (hmat τ).matrix_det
   have hdmin : ∀ τ i, Continuous fun x : Frame X.Ψ r => dmin X.Gm x τ i := by
     intro τ i
     unfold dmin lminor
@@ -126,8 +132,10 @@ theorem isOpen_OmF (x0 : Frame X.Ψ r) : IsOpen (OmF X x0) := by
     refine continuous_pi fun a => continuous_pi fun b => ?_
     simp only [Matrix.submatrix_apply, FD.gram, Matrix.of_apply, FD.hermC, FD.col, mat]
     fun_prop
-  have hset : OmF X x0 = ⋂ τ : X.Ψ, ({z | (mat (cpt X x0 z) τ).det ≠ 0} ∩
-      ⋂ i : Fin (r + 1), {z | 0 < psgn X.p0 i * (dmin X.Gm (cpt X x0 z) τ i).re}) := by
+  have hset
+      : OmF X x0
+        = ⋂ τ : X.Ψ, ({z | (mat (cpt X x0 z) τ).det ≠ 0} ∩
+          ⋂ i : Fin (r + 1), {z | 0 < psgn X.p0 i * (dmin X.Gm (cpt X x0 z) τ i).re}) := by
     ext z
     simp only [OmF, Set.mem_setOf_eq, X.mem_dom_iff, Set.mem_iInter, Set.mem_inter_iff]
   rw [hset]

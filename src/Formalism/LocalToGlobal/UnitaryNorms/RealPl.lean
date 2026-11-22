@@ -17,10 +17,10 @@ variable {R : Ranks} (H : Formalism.BasicNotions.Host R)
 theorem emb_mul_cc (g : R.GG) (x : H.E) : H.emb (g * R.cc) x = H.emb g (H.conj x) := by
   show H.φ₀ (H.sigmaOf (g * R.cc) x) = H.φ₀ (H.sigmaOf g (H.conj x))
   have : H.sigmaOf (g * R.cc) = H.sigmaOf g * H.conj := map_mul (H.gal).symm g (R.cc)
-  rw [this]; rfl
+  rw [this]
+  rfl
 
-theorem conj_of_mem_F {x : H.E} (hx : x ∈ H.F) : H.conj x = x :=
-  (H.conjE_mem_hostF_iff x).1 hx
+theorem conj_of_mem_F {x : H.E} (hx : x ∈ H.F) : H.conj x = x := (H.conjE_mem_hostF_iff x).1 hx
 
 theorem mul_cc_mem_Psi {g : R.GG} (hg : g ∉ R.Psi) : g * R.cc ∈ R.Psi := by
   rw [Formalism.HC.Frame.mem_Psi_iff] at hg ⊢
@@ -37,12 +37,15 @@ theorem realPl_surjective : Function.Surjective (realPl H) := by
   have hW : InfinitePlace.mk (H.emb g) = W := by rw [hg]; exact InfinitePlace.mk_embedding W
   by_cases hgP : g ∈ R.Psi
   · refine ⟨⟨g, hgP⟩, ?_⟩
-    rw [← hW]; exact (InfinitePlace.comap_mk _ _).symm
+    rw [← hW]
+    exact (InfinitePlace.comap_mk _ _).symm
   · refine ⟨⟨g * R.cc, mul_cc_mem_Psi hgP⟩, ?_⟩
-    have : (H.emb (g * R.cc)).comp H.F.subtype = (H.emb g).comp H.F.subtype := RingHom.ext fun x => by
-      show H.emb (g * R.cc) (x : H.E) = H.emb g (x : H.E)
-      rw [emb_mul_cc, conj_of_mem_F H x.2]
-    rw [realPl, this, ← hW]; exact (InfinitePlace.comap_mk _ _).symm
+    have : (H.emb (g * R.cc)).comp H.F.subtype = (H.emb g).comp H.F.subtype :=
+      RingHom.ext fun x => by
+        show H.emb (g * R.cc) (x : H.E) = H.emb g (x : H.E)
+        rw [emb_mul_cc, conj_of_mem_F H x.2]
+    rw [realPl, this, ← hW]
+    exact (InfinitePlace.comap_mk _ _).symm
 
 theorem realPlBij : RealPlBij H := by
   refine (realPl_surjective H).bijective_of_nat_card_le ?_

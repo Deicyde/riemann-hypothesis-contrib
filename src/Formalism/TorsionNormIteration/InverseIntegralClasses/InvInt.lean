@@ -25,8 +25,8 @@ def Low (m : ℕ) (x : MvPowerSeries ι K) : Prop :=
 theorem Low.mono {m k : ℕ} {x : MvPowerSeries ι K} (h : Low m x) (hk : k ≤ m) : Low k x := by
   exact fun d hd => h d (lt_of_lt_of_le hd hk)
 
-theorem Low.mul {m k : ℕ} {x y : MvPowerSeries ι K} (hx : Low m x) (hy : Low k y) :
-    Low (m + k) (x * y) := by
+theorem Low.mul {m k : ℕ} {x y : MvPowerSeries ι K} (hx : Low m x) (hy : Low k y)
+    : Low (m + k) (x * y) := by
   classical
   intro d hd
   rw [MvPowerSeries.coeff_mul]
@@ -37,8 +37,8 @@ theorem Low.mul {m k : ℕ} {x y : MvPowerSeries ι K} (hx : Low m x) (hy : Low 
   · rw [hx _ h1, zero_mul]
   · rw [hy _ (by omega), mul_zero]
 
-theorem Low.add {m : ℕ} {x y : MvPowerSeries ι K} (hx : Low m x) (hy : Low m y) :
-    Low m (x + y) := by
+theorem Low.add {m : ℕ} {x y : MvPowerSeries ι K} (hx : Low m x) (hy : Low m y)
+    : Low m (x + y) := by
   intro d hd
   rw [map_add (f := _), hx d hd, hy d hd, add_zero]
 
@@ -58,8 +58,8 @@ section Ultra
 
 variable {K : Type u} [NormedField K] [IsUltrametricDist K] {ι : Type v}
 
-theorem integral_mul {A B : MvPowerSeries ι K} (hA : IntegralMv A) (hB : IntegralMv B) :
-    IntegralMv (A * B) := by
+theorem integral_mul {A B : MvPowerSeries ι K} (hA : IntegralMv A) (hB : IntegralMv B)
+    : IntegralMv (A * B) := by
   classical
   intro d
   rw [MvPowerSeries.coeff_mul]
@@ -73,8 +73,7 @@ theorem integral_one : IntegralMv (1 : MvPowerSeries ι K) := by
   rw [MvPowerSeries.coeff_one]
   split_ifs <;> simp
 
-theorem integral_pow {A : MvPowerSeries ι K} (hA : IntegralMv A) (n : ℕ) :
-    IntegralMv (A ^ n) := by
+theorem integral_pow {A : MvPowerSeries ι K} (hA : IntegralMv A) (n : ℕ) : IntegralMv (A ^ n) := by
   induction n with
   | zero =>
     rw [pow_zero]
@@ -83,12 +82,14 @@ theorem integral_pow {A : MvPowerSeries ι K} (hA : IntegralMv A) (n : ℕ) :
     rw [pow_succ]
     exact integral_mul ih hA
 
-theorem integralSubst (f : PowerSeries K) (P : MvPowerSeries ι K)
-    (hf : IntegralPS f) (hP0 : MvPowerSeries.constantCoeff P = 0) (hP : IntegralMv P) :
-    IntegralMv (f.subst P) := by
+theorem integralSubst
+    (f : PowerSeries K) (P : MvPowerSeries ι K)
+    (hf : IntegralPS f) (hP0 : MvPowerSeries.constantCoeff P = 0) (hP : IntegralMv P)
+    : IntegralMv (f.subst P) := by
   intro e
   rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero hP0)]
-  by_cases hfin : (Function.support fun n : ℕ => PowerSeries.coeff n f • MvPowerSeries.coeff e (P ^ n)).Finite
+  by_cases hfin
+    : (Function.support fun n : ℕ => PowerSeries.coeff n f • MvPowerSeries.coeff e (P ^ n)).Finite
   · rw [finsum_eq_sum _ hfin]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun n _ => ?_
     rw [norm_smul]
@@ -98,11 +99,15 @@ theorem integralSubst (f : PowerSeries K) (P : MvPowerSeries ι K)
 
 end Ultra
 
-theorem coeff_expand_low {K : Type u} [NormedField K] {ι : Type v} (q : ℕ) (hq : q ≠ 0)
-    (hq2 : 2 ≤ q) (σ : K →+* K) (D : MvPowerSeries ι K) (N : ℕ) (hN : 1 ≤ N)
-    (hlow : ∀ d : ι →₀ ℕ, d.degree < N → MvPowerSeries.coeff d D = 0)
-    (d : ι →₀ ℕ) (hd : d.degree = N) :
-    MvPowerSeries.coeff d (MvPowerSeries.expand q hq (MvPowerSeries.map σ D)) = 0 := by
+theorem coeff_expand_low
+    {K : Type u} [NormedField K]
+    {ι : Type v}
+    (q : ℕ) (hq : q ≠ 0) (hq2 : 2 ≤ q)
+    (σ : K →+* K)
+    (D : MvPowerSeries ι K) (N : ℕ)
+    (hN : 1 ≤ N) (hlow : ∀ d : ι →₀ ℕ, d.degree < N → MvPowerSeries.coeff d D = 0)
+    (d : ι →₀ ℕ) (hd : d.degree = N)
+    : MvPowerSeries.coeff d (MvPowerSeries.expand q hq (MvPowerSeries.map σ D)) = 0 := by
   classical
   by_cases hall : ∀ i, q ∣ d i
   · set m : ι →₀ ℕ := Finsupp.mapRange (fun k => k / q) (Nat.zero_div q) d with hm
@@ -120,10 +125,16 @@ theorem coeff_expand_low {K : Type u} [NormedField K] {ι : Type v} (q : ℕ) (h
     obtain ⟨i, hi⟩ := hall
     exact MvPowerSeries.coeff_expand_of_not_dvd q hq _ hi
 
-theorem funEqLowCoeff {K : Type u} [NormedField K] {ι : Type v} (p q : ℕ) (hq : q ≠ 0)
-    (σ : K →+* K) (hq2 : 2 ≤ q) (D : MvPowerSeries ι K) (hD : IsFunEqTypeMv p q hq σ D)
+theorem funEqLowCoeff
+    {K : Type u} [NormedField K]
+    {ι : Type v}
+    (p q : ℕ) (hq : q ≠ 0)
+    (σ : K →+* K)
+    (hq2 : 2 ≤ q)
+    (D : MvPowerSeries ι K) (hD : IsFunEqTypeMv p q hq σ D)
     (N : ℕ) (hN : 1 ≤ N) (hlow : ∀ d : ι →₀ ℕ, d.degree < N → MvPowerSeries.coeff d D = 0)
-    (d : ι →₀ ℕ) (hd : d.degree = N) : ‖MvPowerSeries.coeff d D‖ ≤ 1 := by
+    (d : ι →₀ ℕ) (hd : d.degree = N)
+    : ‖MvPowerSeries.coeff d D‖ ≤ 1 := by
   have h := hD d
   rwa [map_sub, map_smul, coeff_expand_low q hq hq2 σ D N hN hlow d hd, smul_zero, sub_zero] at h
 
@@ -133,36 +144,51 @@ variable {K : Type u} [NormedField K] {ι : Type v}
 
 def tail2 (f : PowerSeries K) : PowerSeries K := PowerSeries.mk fun n => coeff (n + 2) f
 
-theorem decomp (f : PowerSeries K) (h0 : constantCoeff f = 0) (h1 : coeff 1 f = 1) :
-    f = X + X ^ 2 * tail2 f := by
+theorem decomp (f : PowerSeries K) (h0 : constantCoeff f = 0) (h1 : coeff 1 f = 1)
+    : f = X + X ^ 2 * tail2 f := by
   ext n
-  rcases n with _ | _ | n <;>
-    simp [tail2, PowerSeries.coeff_X_pow_mul', PowerSeries.coeff_X, h0, h1]
+  rcases n with _ | _ | n
+    <;> simp [tail2, PowerSeries.coeff_X_pow_mul', PowerSeries.coeff_X, h0, h1]
 
-theorem subst_eq (f : PowerSeries K) (h0 : constantCoeff f = 0) (h1 : coeff 1 f = 1)
-    {a : MvPowerSeries ι K} (ha0 : MvPowerSeries.constantCoeff a = 0) :
-    f.subst a = a + a ^ 2 * (tail2 f).subst a := by
+theorem subst_eq
+    (f : PowerSeries K) (h0 : constantCoeff f = 0) (h1 : coeff 1 f = 1)
+    {a : MvPowerSeries ι K} (ha0 : MvPowerSeries.constantCoeff a = 0)
+    : f.subst a = a + a ^ 2 * (tail2 f).subst a := by
   have ha : PowerSeries.HasSubst a := PowerSeries.HasSubst.of_constantCoeff_zero ha0
   conv_lhs => rw [decomp f h0 h1]
-  rw [PowerSeries.subst_add ha, PowerSeries.subst_mul ha, PowerSeries.subst_pow ha, PowerSeries.subst_X ha]
+  rw [PowerSeries.subst_add ha, PowerSeries.subst_mul ha, PowerSeries.subst_pow ha,
+    PowerSeries.subst_X ha]
 
-theorem agree_psubst [Finite ι] (g : PowerSeries K) {N : ℕ} {a b : MvPowerSeries ι K}
-    (ha0 : MvPowerSeries.constantCoeff a = 0) (hb0 : MvPowerSeries.constantCoeff b = 0)
-    (hab : Agree N a b) : Agree N (g.subst a) (g.subst b) := by
-  exact Agree.subst (f := g) (f' := g) (a := fun _ : Unit => a) (a' := fun _ : Unit => b)
-    (fun _ => ha0) (fun _ => hb0) (fun _ _ => rfl) (fun _ => hab)
+theorem agree_psubst
+    [Finite ι]
+    (g : PowerSeries K)
+    {N : ℕ} {a b : MvPowerSeries ι K} (ha0 : MvPowerSeries.constantCoeff a = 0)
+    (hb0 : MvPowerSeries.constantCoeff b = 0) (hab : Agree N a b)
+    : Agree N (g.subst a) (g.subst b) := by
+  exact Agree.subst (f := g) (f' := g)
+    (a := fun _ : Unit => a)
+    (a' := fun _ : Unit => b)
+    (fun _ => ha0)
+    (fun _ => hb0)
+    (fun _ _ => rfl)
+    (fun _ => hab)
 
 theorem low_of_agree {N : ℕ} {a b : MvPowerSeries ι K} (hab : Agree N a b) : Low N (a - b) := by
   intro d hd
   rw [map_sub, hab d hd, sub_self]
 
-theorem key [Finite ι] (f : PowerSeries K) (h0 : constantCoeff f = 0) (h1 : coeff 1 f = 1)
-    {N : ℕ} {a b : MvPowerSeries ι K}
-    (ha0 : MvPowerSeries.constantCoeff a = 0) (hb0 : MvPowerSeries.constantCoeff b = 0)
-    (hab : Agree N a b) : Low (N + 1) (f.subst a - f.subst b - (a - b)) := by
+theorem key
+    [Finite ι]
+    (f : PowerSeries K) (h0 : constantCoeff f = 0) (h1 : coeff 1 f = 1)
+    {N : ℕ} {a b : MvPowerSeries ι K} (ha0 : MvPowerSeries.constantCoeff a = 0)
+    (hb0 : MvPowerSeries.constantCoeff b = 0) (hab : Agree N a b)
+    : Low (N + 1) (f.subst a - f.subst b - (a - b)) := by
   rw [subst_eq f h0 h1 ha0, subst_eq f h0 h1 hb0]
-  have e : a + a ^ 2 * (tail2 f).subst a - (b + b ^ 2 * (tail2 f).subst b) - (a - b) =
-      (a - b) * (a + b) * (tail2 f).subst a + b ^ 2 * ((tail2 f).subst a - (tail2 f).subst b) := by ring
+  have e
+      : a + a ^ 2 * (tail2 f).subst a - (b + b ^ 2 * (tail2 f).subst b) - (a - b)
+        = (a - b) * (a + b) * (tail2 f).subst a
+          + b ^ 2 * ((tail2 f).subst a - (tail2 f).subst b) := by
+    ring
   rw [e]
   have hd : Low N (a - b) := low_of_agree hab
   have hs : Low 1 (a + b) := low_one (by simp [ha0, hb0])
@@ -177,17 +203,20 @@ theorem key [Finite ι] (f : PowerSeries K) (h0 : constantCoeff f = 0) (h1 : coe
 
 end Inv
 
-theorem invIntegralOfClass (K : Type u) [NormedField K] [IsUltrametricDist K] (ι : Type v)
-    [Finite ι] (C : MvPowerSeries ι K → Prop) (f : PowerSeries K)
-    (h0 : constantCoeff f = 0) (h1 : coeff 1 f = 1)
+theorem invIntegralOfClass
+    (K : Type u) [NormedField K] [IsUltrametricDist K]
+    (ι : Type v) [Finite ι]
+    (C : MvPowerSeries ι K → Prop)
+    (f : PowerSeries K) (h0 : constantCoeff f = 0) (h1 : coeff 1 f = 1)
     (hsub : ∀ a b, C a → C b → C (a - b))
-    (hP : ∀ P : MvPowerSeries ι K, MvPowerSeries.constantCoeff P = 0 → IntegralMv P →
-      C (f.subst P))
-    (hlowC : ∀ D, C D → ∀ N : ℕ, 1 ≤ N →
-      (∀ d : ι →₀ ℕ, d.degree < N → MvPowerSeries.coeff d D = 0) →
-      ∀ d : ι →₀ ℕ, d.degree = N → ‖MvPowerSeries.coeff d D‖ ≤ 1)
-    (h : MvPowerSeries ι K) (hh0 : MvPowerSeries.constantCoeff h = 0) (hCh : C (f.subst h)) :
-    IntegralMv h := by
+    (hP : ∀ P : MvPowerSeries ι K, MvPowerSeries.constantCoeff P = 0 → IntegralMv P → C (f.subst P))
+    (hlowC : ∀ D,
+      C D
+        → ∀ N : ℕ,
+          1 ≤ N → (∀ d : ι →₀ ℕ, d.degree < N → MvPowerSeries.coeff d D = 0)
+            → ∀ d : ι →₀ ℕ, d.degree = N → ‖MvPowerSeries.coeff d D‖ ≤ 1)
+    (h : MvPowerSeries ι K) (hh0 : MvPowerSeries.constantCoeff h = 0) (hCh : C (f.subst h))
+    : IntegralMv h := by
   have main : ∀ N : ℕ, ∀ d : ι →₀ ℕ, d.degree < N → ‖MvPowerSeries.coeff d h‖ ≤ 1 := by
     intro N
     induction N with
@@ -205,7 +234,9 @@ theorem invIntegralOfClass (K : Type u) [NormedField K] [IsUltrametricDist K] (�
           rw [MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hh0, norm_zero]
           exact zero_le_one
         · let T : MvPowerSeries ι K := fun e => if e.degree < N then MvPowerSeries.coeff e h else 0
-          have hTc : ∀ e, MvPowerSeries.coeff e T = if e.degree < N then MvPowerSeries.coeff e h else 0 :=
+          have hTc
+              : ∀ e,
+                MvPowerSeries.coeff e T = if e.degree < N then MvPowerSeries.coeff e h else 0 :=
             fun e => rfl
           have hT0 : MvPowerSeries.constantCoeff T = 0 := by
             rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hTc]

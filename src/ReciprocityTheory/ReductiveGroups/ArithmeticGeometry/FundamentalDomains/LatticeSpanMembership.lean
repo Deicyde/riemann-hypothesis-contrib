@@ -13,8 +13,8 @@ open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {X : Data E r}
 
-theorem span_emb_int (hD3 : IntegerApproximationCount (E := E)) :
-    Submodule.span ℝ (Set.range fun α : 𝓞 E => fun τ : X.Ψ => τ.1 (α : E)) = ⊤ := by
+theorem span_emb_int (hD3 : IntegerApproximationCount (E := E))
+    : Submodule.span ℝ (Set.range fun α : 𝓞 E => fun τ : X.Ψ => τ.1 (α : E)) = ⊤ := by
   by_contra hne
   obtain ⟨f, hf0, hfW⟩ :=
     Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.mpr hne) inferInstance
@@ -30,8 +30,9 @@ theorem span_emb_int (hD3 : IntegerApproximationCount (E := E)) :
   set t : ℝ := (‖g‖ * ρ + 1) / f v with ht
   obtain ⟨α, hα⟩ := (hD3 r X).1 (t • v)
   have hfα : f (fun τ : X.Ψ => τ.1 (α : E)) = 0 := by
-    have hmem : f (fun τ : X.Ψ => τ.1 (α : E)) ∈ Submodule.map f (Submodule.span ℝ
-        (Set.range fun α : 𝓞 E => fun τ : X.Ψ => τ.1 (α : E))) :=
+    have hmem
+        : f (fun τ : X.Ψ => τ.1 (α : E)) ∈ Submodule.map f
+          (Submodule.span ℝ (Set.range fun α : 𝓞 E => fun τ : X.Ψ => τ.1 (α : E))) :=
       Submodule.mem_map_of_mem (Submodule.subset_span ⟨α, rfl⟩)
     rw [hfW] at hmem
     exact hmem
@@ -90,7 +91,8 @@ theorem mem_Λp_iff {ξ μ : Fin r → E} : μ ∈ X.Λp ξ ↔ μ ∈ X.Λ ∧ 
   rw [AddSubgroup.mem_inf, AddMonoidHom.mem_ker]
   rfl
 
-theorem smul_int_mem {α : E} (hα : IsIntegral ℤ α) {v : Fin r → E} (hv : v ∈ X.Λ) : α • v ∈ X.Λ := by
+theorem smul_int_mem {α : E} (hα : IsIntegral ℤ α) {v : Fin r → E} (hv : v ∈ X.Λ)
+    : α • v ∈ X.Λ := by
   obtain ⟨γ, hγ⟩ : ∃ γ : 𝓞 E, (γ : E) = α := ⟨⟨_, hα⟩, rfl⟩
   have h := X.Λ.smul_mem γ hv
   rw [← algebraMap_smul E γ v] at h
@@ -109,21 +111,24 @@ noncomputable def single (a : Fin r) : (X.Ψ → ℂ) →ₗ[ℝ] (X.Ψ → Fin 
       simp
     · simp [Pi.single_eq_of_ne hb]
 
-theorem mem_span_Λ (hD3 : IntegerApproximationCount (E := E)) (v : X.Ψ → Fin r → ℂ) :
-    v ∈ Submodule.span ℝ (X.embV '' (X.Λ : Set (Fin r → E))) := by
+theorem mem_span_Λ (hD3 : IntegerApproximationCount (E := E)) (v : X.Ψ → Fin r → ℂ)
+    : v ∈ Submodule.span ℝ (X.embV '' (X.Λ : Set (Fin r → E))) := by
   classical
-  have hsing : ∀ (a : Fin r) (s : X.Ψ → ℂ),
-      single (X := X) a s ∈ Submodule.span ℝ (X.embV '' (X.Λ : Set (Fin r → E))) := by
+  have hsing
+      : ∀ (a : Fin r) (s : X.Ψ → ℂ),
+        single (X := X) a s ∈ Submodule.span ℝ (X.embV '' (X.Λ : Set (Fin r → E))) := by
     intro a s
     obtain ⟨N, hN, hNmem⟩ := exists_nat_smul_mem (X := X) (Pi.single a 1)
-    have hgen : Submodule.span ℝ (Set.range fun α : 𝓞 E => fun τ : X.Ψ => τ.1 (α : E)) ≤
-        (Submodule.span ℝ (X.embV '' (X.Λ : Set (Fin r → E)))).comap (single (X := X) a) := by
+    have hgen
+        : Submodule.span ℝ (Set.range fun α : 𝓞 E => fun τ : X.Ψ => τ.1 (α : E))
+          ≤ (Submodule.span ℝ (X.embV '' (X.Λ : Set (Fin r → E)))).comap (single (X := X) a) := by
       rw [Submodule.span_le]
       rintro _ ⟨α, rfl⟩
       have hmem : (α : E) • ((N : E) • Pi.single a 1) ∈ X.Λ := smul_int_mem α.isIntegral_coe hNmem
       have hN0 : (N : ℝ) ≠ 0 := by exact_mod_cast hN.ne'
-      have e : single (X := X) a (fun τ : X.Ψ => τ.1 (α : E)) =
-          (N : ℝ)⁻¹ • X.embV ((α : E) • ((N : E) • Pi.single a 1)) := by
+      have e
+          : single (X := X) a (fun τ : X.Ψ => τ.1 (α : E))
+            = (N : ℝ)⁻¹ • X.embV ((α : E) • ((N : E) • Pi.single a 1)) := by
         funext τ b
         simp only [single, LinearMap.coe_mk, AddHom.coe_mk, Pi.smul_apply, Data.embV, Data.emb,
           smul_eq_mul]
@@ -143,32 +148,41 @@ theorem mem_span_Λ (hD3 : IntegerApproximationCount (E := E)) (v : X.Ψ → Fin
     funext τ b
     rw [Finset.sum_apply, Finset.sum_apply]
     simp only [single, LinearMap.coe_mk, AddHom.coe_mk]
-    rw [Finset.sum_eq_single b (fun a _ hab => by rw [Pi.single_apply, if_neg (Ne.symm hab)])
-      (fun h => absurd (Finset.mem_univ b) h), Pi.single_eq_same]
+    rw [Finset.sum_eq_single b
+        (fun a _ hab => by rw [Pi.single_apply, if_neg (Ne.symm hab)])
+        (fun h => absurd (Finset.mem_univ b) h),
+      Pi.single_eq_same]
   rw [hv]
   exact Submodule.sum_mem _ fun a _ => hsing a _
 
-theorem scal_closed (hD3 : IntegerApproximationCount (E := E)) {ξ : Fin r → E} {w : X.Ψ → Fin r → ℂ}
-    (hw : w ∈ Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E)))) (s : X.Ψ → ℂ) :
-    (fun τ => s τ • w τ) ∈ Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))) := by
+theorem scal_closed
+    (hD3 : IntegerApproximationCount (E := E))
+    {ξ : Fin r → E} {w : X.Ψ → Fin r → ℂ}
+    (hw : w ∈ Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))))
+    (s : X.Ψ → ℂ)
+    : (fun τ => s τ • w τ) ∈ Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))) := by
   set W := Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))) with hW
 
   have hα : ∀ (α : 𝓞 E), ∀ v ∈ W, (fun τ : X.Ψ => τ.1 (α : E) • v τ) ∈ W := by
     intro α
-    let M : (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) :=
-      { toFun := fun v τ => τ.1 (α : E) • v τ
-        map_add' := fun v v' => by funext τ; simp [smul_add]
-        map_smul' := fun c v => by
-          funext τ
-          show τ.1 (α : E) • (c • v τ) = c • (τ.1 (α : E) • v τ)
-          exact smul_comm _ _ _ }
+    let M : (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) := {
+      toFun := fun v τ => τ.1 (α : E) • v τ
+      map_add' := fun v v' => by funext τ; simp [smul_add]
+      map_smul' := fun c v => by
+        funext τ
+        show τ.1 (α : E) • (c • v τ) = c • (τ.1 (α : E) • v τ)
+        exact smul_comm _ _ _
+    }
     have hle : W ≤ W.comap M := by
       rw [hW, Submodule.span_le]
       rintro _ ⟨μ, hμ, rfl⟩
       rw [SetLike.mem_coe, mem_Λp_iff] at hμ
       have hαμ : (α : E) • μ ∈ X.Λp ξ := by
         rw [mem_Λp_iff]
-        exact ⟨smul_int_mem α.isIntegral_coe hμ.1, by rw [HermitianTraceFormVanishing.herm_smul_left, hμ.2, mul_zero]⟩
+        exact ⟨
+          smul_int_mem α.isIntegral_coe hμ.1,
+          by rw [HermitianTraceFormVanishing.herm_smul_left, hμ.2, mul_zero]
+        ⟩
       rw [SetLike.mem_coe, Submodule.mem_comap]
       have e : M (X.embV μ) = X.embV ((α : E) • μ) := by
         funext τ b
@@ -177,22 +191,26 @@ theorem scal_closed (hD3 : IntegerApproximationCount (E := E)) {ξ : Fin r → E
       exact Submodule.subset_span ⟨_, hαμ, rfl⟩
     intro v hv
     exact hle hv
-  let T : (X.Ψ → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) :=
-    { toFun := fun s τ => s τ • w τ
-      map_add' := fun s s' => by funext τ; simp [add_smul]
-      map_smul' := fun c s => by
-        funext τ
-        simp only [Pi.smul_apply, RingHom.id_apply, Complex.real_smul]
-        rw [← Complex.coe_smul c (s τ • w τ), smul_smul] }
-  have hle : Submodule.span ℝ (Set.range fun α : 𝓞 E => fun τ : X.Ψ => τ.1 (α : E)) ≤ W.comap T := by
+  let T : (X.Ψ → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) := {
+    toFun := fun s τ => s τ • w τ
+    map_add' := fun s s' => by funext τ; simp [add_smul]
+    map_smul' := fun c s => by
+      funext τ
+      simp only [Pi.smul_apply, RingHom.id_apply, Complex.real_smul]
+      rw [← Complex.coe_smul c (s τ • w τ), smul_smul]
+  }
+  have hle
+      : Submodule.span ℝ (Set.range fun α : 𝓞 E => fun τ : X.Ψ => τ.1 (α : E)) ≤ W.comap T := by
     rw [Submodule.span_le]
     rintro _ ⟨α, rfl⟩
     exact hα α w hw
   exact hle (x := s) (by rw [span_emb_int hD3]; exact Submodule.mem_top)
 
-theorem Iperp_le (hD3 : IntegerApproximationCount (E := E)) {ξ : Fin r → E} (hξ : X.IsIso ξ)
-    {v : X.Ψ → Fin r → ℂ} (hv : v ∈ X.Iperp ξ) :
-    v ∈ Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))) := by
+theorem Iperp_le
+    (hD3 : IntegerApproximationCount (E := E))
+    {ξ : Fin r → E} (hξ : X.IsIso ξ)
+    {v : X.Ψ → Fin r → ℂ} (hv : v ∈ X.Iperp ξ)
+    : v ∈ Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))) := by
   classical
   obtain ⟨hξΛ, -, hξ0⟩ := hξ
   obtain ⟨η, hηΛ, hηξ⟩ : ∃ η ∈ X.Λ, herm X.Gm η ξ ≠ 0 := by
@@ -225,24 +243,26 @@ theorem Iperp_le (hD3 : IntegerApproximationCount (E := E)) {ξ : Fin r → E} (
     apply X.den_ne
     simpa [hd] using h
   set c : E := d * herm X.Gm η ξ with hc
-  let P : (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) :=
-    { toFun := fun v τ => τ.1 c • v τ -
-        (τ.1 d * hermC τ.1 X.Gm (v τ) (Data.emb τ.1 ξ)) • Data.emb τ.1 η
-      map_add' := fun v v' => by
-        funext τ
-        simp only [Pi.add_apply, hermC_add_left, smul_add, mul_add, add_smul]
-        abel
-      map_smul' := fun a v => by
-        funext τ
-        simp only [Pi.smul_apply, RingHom.id_apply]
-        rw [← Complex.coe_smul a (v τ), ← Complex.coe_smul a, hermC_smul_left]
-        module }
+  let P : (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) := {
+    toFun := fun v τ =>
+      τ.1 c • v τ - (τ.1 d * hermC τ.1 X.Gm (v τ) (Data.emb τ.1 ξ)) • Data.emb τ.1 η
+    map_add' := fun v v' => by
+      funext τ
+      simp only [Pi.add_apply, hermC_add_left, smul_add, mul_add, add_smul]
+      abel
+    map_smul' := fun a v => by
+      funext τ
+      simp only [Pi.smul_apply, RingHom.id_apply]
+      rw [← Complex.coe_smul a (v τ), ← Complex.coe_smul a, hermC_smul_left]
+      module
+  }
   have hPΛ : ∀ l ∈ X.Λ, P (X.embV l) ∈ X.embV '' (X.Λp ξ : Set (Fin r → E)) := by
     intro l hl
     refine ⟨c • l - (d * herm X.Gm l ξ) • η, ?_, ?_⟩
     · rw [SetLike.mem_coe, mem_Λp_iff]
       refine ⟨X.Λ.sub_mem (smul_int_mem hcint hl) (smul_int_mem (X.Λ_int l hl ξ hξΛ) hηΛ), ?_⟩
-      rw [HermitianTraceFormVanishing.herm_sub_left, HermitianTraceFormVanishing.herm_smul_left, HermitianTraceFormVanishing.herm_smul_left, hc]
+      rw [HermitianTraceFormVanishing.herm_sub_left, HermitianTraceFormVanishing.herm_smul_left,
+        HermitianTraceFormVanishing.herm_smul_left, hc]
       ring
     · funext τ b
       simp [P, Data.embV, Data.emb, hermC_emb]
@@ -252,8 +272,9 @@ theorem Iperp_le (hD3 : IntegerApproximationCount (E := E)) {ξ : Fin r → E} (
     rw [hv τ, mul_zero, zero_smul, sub_zero]
   have hmem : P v ∈ Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))) := by
     have h1 := mem_span_Λ hD3 v
-    have h2 : Submodule.map P (Submodule.span ℝ (X.embV '' (X.Λ : Set (Fin r → E)))) ≤
-        Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))) := by
+    have h2
+        : Submodule.map P (Submodule.span ℝ (X.embV '' (X.Λ : Set (Fin r → E))))
+          ≤ Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))) := by
       rw [Submodule.map_span, Submodule.span_le]
       rintro _ ⟨_, ⟨l, hl, rfl⟩, rfl⟩
       exact Submodule.subset_span (hPΛ l hl)
@@ -264,29 +285,34 @@ theorem Iperp_le (hD3 : IntegerApproximationCount (E := E)) {ξ : Fin r → E} (
   funext τ
   rw [smul_smul, inv_mul_cancel₀ ((map_ne_zero τ.1).mpr hc0), one_smul]
 
-theorem Uz_le_span (hD3 : IntegerApproximationCount (E := E)) {z : Frame X.Ψ r} {ξ : Fin r → E}
-    (hξ : X.IsIso ξ) {u : X.Ψ → Fin r → ℂ} (hu : u ∈ X.Uz z ξ) :
-    u ∈ Submodule.span ℝ (Set.range fun μ : X.Λp ξ => X.ucomp z ξ (X.embV μ)) := by
-  let Q : (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) :=
-    { toFun := fun v => X.ucomp z ξ v
-      map_add' := fun v v' => by
-        funext τ
-        show (v τ + v' τ) - (X.Hf z τ (v τ + v' τ) (Data.emb τ.1 ξ) /
-          X.Hf z τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ = _
-        rw [UnipotentCoefficientShift.Hf_add_left, add_div, add_smul]
-        show _ = (v τ - _) + (v' τ - _)
-        abel
-      map_smul' := fun a v => by
-        funext τ
-        show a • v τ - (X.Hf z τ (a • v τ) (Data.emb τ.1 ξ) /
-          X.Hf z τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ =
-            a • (v τ - (X.Hf z τ (v τ) (Data.emb τ.1 ξ) /
-              X.Hf z τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ)
-        rw [← Complex.coe_smul a (v τ), UnipotentCoefficientShift.Hf_smul_left, ← Complex.coe_smul a, mul_div_assoc]
-        module }
+theorem Uz_le_span
+    (hD3 : IntegerApproximationCount (E := E))
+    {z : Frame X.Ψ r} {ξ : Fin r → E} (hξ : X.IsIso ξ)
+    {u : X.Ψ → Fin r → ℂ} (hu : u ∈ X.Uz z ξ)
+    : u ∈ Submodule.span ℝ (Set.range fun μ : X.Λp ξ => X.ucomp z ξ (X.embV μ)) := by
+  let Q : (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) := {
+    toFun := fun v => X.ucomp z ξ v
+    map_add' := fun v v' => by
+      funext τ
+      show (v τ + v' τ) - (X.Hf z τ (v τ + v' τ) (Data.emb τ.1 ξ) /
+        X.Hf z τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ = _
+      rw [UnipotentCoefficientShift.Hf_add_left, add_div, add_smul]
+      show _ = (v τ - _) + (v' τ - _)
+      abel
+    map_smul' := fun a v => by
+      funext τ
+      show a • v τ - (X.Hf z τ (a • v τ) (Data.emb τ.1 ξ) /
+        X.Hf z τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ =
+          a • (v τ - (X.Hf z τ (v τ) (Data.emb τ.1 ξ) /
+            X.Hf z τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ)
+      rw [← Complex.coe_smul a (v τ), UnipotentCoefficientShift.Hf_smul_left, ← Complex.coe_smul a,
+        mul_div_assoc]
+      module
+  }
   have h1 := Iperp_le hD3 hξ hu.1
-  have h2 : Submodule.map Q (Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E)))) ≤
-      Submodule.span ℝ (Set.range fun μ : X.Λp ξ => X.ucomp z ξ (X.embV μ)) := by
+  have h2
+      : Submodule.map Q (Submodule.span ℝ (X.embV '' (X.Λp ξ : Set (Fin r → E))))
+        ≤ Submodule.span ℝ (Set.range fun μ : X.Λp ξ => X.ucomp z ξ (X.embV μ)) := by
     rw [Submodule.map_span, Submodule.span_le]
     rintro _ ⟨_, ⟨μ, hμ, rfl⟩, rfl⟩
     exact Submodule.subset_span ⟨⟨μ, hμ⟩, rfl⟩

@@ -14,20 +14,24 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
 
 variable (d : Data K ι Ω WT A)
 
-theorem fsum_le_of {α : Type*} (s : Set α) (f g : α → ℤ) (hf : {x | x ∈ s ∧ f x ≠ 0}.Finite)
-    (hg : {x | x ∈ s ∧ g x ≠ 0}.Finite) (r : ℝ) (hle : ∀ x ∈ s, (f x : ℝ) ≤ r * g x) :
-    ((∑ᶠ x ∈ s, f x : ℤ) : ℝ) ≤ r * ((∑ᶠ x ∈ s, g x : ℤ) : ℝ) := by
+theorem fsum_le_of
+    {α : Type*} (s : Set α) (f g : α → ℤ) (hf : {x | x ∈ s ∧ f x ≠ 0}.Finite)
+    (hg : {x | x ∈ s ∧ g x ≠ 0}.Finite)
+    (r : ℝ) (hle : ∀ x ∈ s, (f x : ℝ) ≤ r * g x)
+    : ((∑ᶠ x ∈ s, f x : ℤ) : ℝ) ≤ r * ((∑ᶠ x ∈ s, g x : ℤ) : ℝ) := by
   classical
   set u : Finset α := (hf.union hg).toFinset with hu
   have hus : ∀ x ∈ u, x ∈ s := by
@@ -59,8 +63,9 @@ theorem wx_mem (hd : d.AxH 𝒜) (x : Fin (d.N + 1) → K) (c : ι) : d.wx x c �
   rw [Pi.smul_apply, ← algebraMap_smul (Ω c) (x j) (d.w j c)]
   exact Submodule.smul_mem _ _ (hd.w_mem j c)
 
-theorem pow_mem_ne (hd : d.AxH 𝒜) {G : WT} {ta : ∀ c, A c} (hta : ∀ c, ta c ∈ 𝒜 c G ∧ ta c ≠ 0)
-    (n : ℕ) : ∀ c, (ta ^ (n + 1)) c ∈ 𝒜 c ((n + 1) • G) ∧ (ta ^ (n + 1)) c ≠ 0 := by
+theorem pow_mem_ne
+    (hd : d.AxH 𝒜) {G : WT} {ta : ∀ c, A c} (hta : ∀ c, ta c ∈ 𝒜 c G ∧ ta c ≠ 0) (n : ℕ)
+    : ∀ c, (ta ^ (n + 1)) c ∈ 𝒜 c ((n + 1) • G) ∧ (ta ^ (n + 1)) c ≠ 0 := by
   intro c
   haveI := hd.graded c
   induction n with
@@ -99,18 +104,22 @@ private lemma nP_pow_succ_eq_succ_mul (hd : d.AxH 𝒜) (h : d.S1) {G : WT} {ta 
     push_cast
     ring
 
-theorem aG_pow (hd : d.AxH 𝒜) (h : d.S1) {G : WT} {ta : ∀ c, A c}
-    (hta : ∀ c, ta c ∈ 𝒜 c G ∧ ta c ≠ 0) (n : ℕ) :
-    d.aG h ((n + 1) • G) (ta ^ (n + 1)) = (n + 1) * d.aG h G ta := by
+theorem aG_pow
+    (hd : d.AxH 𝒜) (h : d.S1) {G : WT} {ta : ∀ c, A c} (hta : ∀ c, ta c ∈ 𝒜 c G ∧ ta c ≠ 0) (n : ℕ)
+    : d.aG h ((n + 1) • G) (ta ^ (n + 1)) = (n + 1) * d.aG h G ta := by
   unfold aG
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
-  rw [← finsum_mem_const_mul _ (fun p => d.nP h c G (ta c) p * (d.dg (d.gen p) : ℤ)) ((n : ℤ) + 1) (by positivity)]
+  rw [← finsum_mem_const_mul _
+    (fun p => d.nP h c G (ta c) p * (d.dg (d.gen p) : ℤ))
+    ((n : ℤ) + 1) (by positivity)]
   refine finsum_mem_congr rfl fun p hp => ?_
   rw [nP_pow_succ_eq_succ_mul d hd h hta c hp n, mul_assoc]
 
-theorem aG_nonneg (hd : d.AxH 𝒜) (h : d.S1) (G : WT) (ta : ∀ c, A c)
-    (hord : ∀ c v, d.admitted c v → 0 ≤ d.ord c v G (ta c)) : 0 ≤ d.aG h G ta := by
+theorem aG_nonneg
+    (hd : d.AxH 𝒜) (h : d.S1)
+    (G : WT) (ta : ∀ c, A c) (hord : ∀ c v, d.admitted c v → 0 ≤ d.ord c v G (ta c))
+    : 0 ≤ d.aG h G ta := by
   unfold aG
   refine Finset.sum_nonneg fun c _ => ?_
   refine finsum_nonneg fun p => finsum_nonneg fun hp => ?_
@@ -137,10 +146,11 @@ theorem thp_ne (hd : d.AxH 𝒜) (c : ι) : ∃ k, d.thp k c ≠ 0 := by
   · intro k _
     rw [hcon, ratio_zero_left (he c).2, map_zero, mul_zero]
 
-theorem aG_sb (hd : d.AxH 𝒜) (h : d.S1) :
-    d.aG h d.wL (fun c => d.w (d.jc c) c) =
-      d.del + ∑ c, ∑ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-        d.Ep h c p * (d.dg (d.gen p) : ℤ) := by
+theorem aG_sb (hd : d.AxH 𝒜) (h : d.S1)
+    : d.aG h d.wL (fun c => d.w (d.jc c) c)
+      = d.del
+        + ∑ c, ∑ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+          d.Ep h c p * (d.dg (d.gen p) : ℤ) := by
   unfold aG del
   push_cast
   rw [← Finset.sum_add_distrib]
@@ -153,9 +163,11 @@ theorem aG_sb (hd : d.AxH 𝒜) (h : d.S1) :
   · exact hf.subset fun p ⟨hp, hs⟩ => ⟨hp, fun h0 => hs (by simp [h0])⟩
   · exact hE.subset fun p ⟨hp, hs⟩ => ⟨hp, fun h0 => hs (by simp [h0])⟩
 
-theorem aG_wx (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N + 1) → K) (hx : ∀ c, d.wx x c ≠ 0) :
-    d.aG h d.wL (d.wx x) = d.aG h d.wL (fun c => d.w (d.jc c) c) :=
-  (d.norm_factorization hd h).2.1 _ _ _ (fun c => ⟨d.wx_mem hd x c, hx c⟩) (fun c => ⟨hd.w_mem _ c, hd.w_base c⟩)
+theorem aG_wx (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N + 1) → K) (hx : ∀ c, d.wx x c ≠ 0)
+    : d.aG h d.wL (d.wx x) = d.aG h d.wL (fun c => d.w (d.jc c) c) :=
+  (d.norm_factorization hd h).2.1 _ _ _
+    (fun c => ⟨d.wx_mem hd x c, hx c⟩)
+    (fun c => ⟨hd.w_mem _ c, hd.w_base c⟩)
 
 end Data
 

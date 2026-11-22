@@ -115,7 +115,13 @@ lemma bd_scale_iff (ι : ℂ ≃+* ℂ_[q]) (ω : ℂ_[q]) {S : ℕ} (hS : Nat.C
   refine (GlobalTheory.MomOne.MulSeries.mulS_laws q).2.2.2.1 _ _ _ ?_
   exact PadicInt.norm_natCast_eq_one_iff.mpr hS.symm
 
-theorem translate_bd : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ : ℂ → ℂ), d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → IsTh d θ → ∀ (a m : ℕ) (c : Fin m → ℂ_[q]) (s : Fin m → ℂ) (t : ℂ) (B : ℝ), (∀ j, PrimeTo d q (s j)) → PrimeTo d q t → ¬ InOK d (t - 1 / 2) → Bd B (∑ j, C (c j) * hat M.ι (C ω * logS) (U1 d (s j) θ) ^ a) → Bd B (∑ j, C (c j) * hat M.ι (C ω * logS) (U1 d t (U1 d (s j) θ)) ^ a) := by
+theorem translate_bd
+    : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ : ℂ → ℂ),
+      d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → IsTh d θ
+        → ∀ (a m : ℕ) (c : Fin m → ℂ_[q]) (s : Fin m → ℂ) (t : ℂ) (B : ℝ),
+          (∀ j, PrimeTo d q (s j)) → PrimeTo d q t → ¬ InOK d (t - 1 / 2)
+            → Bd B (∑ j, C (c j) * hat M.ι (C ω * logS) (U1 d (s j) θ) ^ a)
+            → Bd B (∑ j, C (c j) * hat M.ι (C ω * logS) (U1 d t (U1 d (s j) θ)) ^ a) := by
   intro d q _ M ω θ hd hd16 hsp hL hM hθ a m c s t B hs ht ht2 hB
   obtain ⟨S, hS0, hSq, hSt, hSs⟩ := exists_common s t hs ht
   have hl : constantCoeff (C ω * logS : ℂ_[q]⟦X⟧) = 0 := hM.2.1
@@ -125,8 +131,12 @@ theorem translate_bd : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q])
   have hU : ∀ j, Differentiable ℂ (U1 d (s j) θ) := fun j => differentiable_U1 d _ hθd
   have hUU : ∀ j, Differentiable ℂ (U1 d t (U1 d (s j) θ)) := fun j => differentiable_U1 d _ (hU j)
   have hUt : Differentiable ℂ (U1 d t θ) := differentiable_U1 d _ hθd
-  have E := fun j => GlobalTheory.MomOne.ScaledQuot.scaled_quotient_elliptic d q M ω θ hd hd16 hsp hL hM hθ (s j) S hS0 hSq (hSs j)
-  have Et := (GlobalTheory.MomOne.ScaledQuot.scaled_quotient_elliptic d q M ω θ hd hd16 hsp hL hM hθ t S hS0 hSq hSt).2.2.2.1
+  have E := fun j =>
+    GlobalTheory.MomOne.ScaledQuot.scaled_quotient_elliptic d q M ω θ hd hd16 hsp hL hM hθ (s j) S
+      hS0 hSq (hSs j)
+  have Et :=
+    (GlobalTheory.MomOne.ScaledQuot.scaled_quotient_elliptic d q M ω θ hd hd16 hsp hL hM hθ t S hS0
+      hSq hSt).2.2.2.1
   simp only at E
   set t' : ℂ := t / S with ht'
   have hSt' : (S : ℂ) * t' = t := by rw [ht']; field_simp
@@ -154,42 +164,59 @@ theorem translate_bd : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q])
   have hBφ : Bd B (hat M.ι (C ω * logS) φ) := by
     have hG : Differentiable ℂ (fun z => ∑ j, M.ι.symm (c j) * U1 d (s j) θ z ^ a) := by fun_prop
     rw [← hat_comb M.ι hl _ c _ (fun j => (hU j).analyticAt 0),
-      ← bd_scale_iff M.ι ω hSq (hG.analyticAt 0)] at hB
+        ← bd_scale_iff M.ι ω hSq (hG.analyticAt 0)]
+      at hB
     have hGS : AnalyticAt ℂ (fun z => ∑ j, M.ι.symm (c j) * U1 d (s j) θ ((S : ℂ) * z) ^ a) 0 :=
       (show Differentiable ℂ (fun z => ∑ j, M.ι.symm (c j) * U1 d (s j) θ ((S : ℂ) * z) ^ a) by
         fun_prop).analyticAt 0
     have hpr : AnalyticAt ℂ (fun z => θ ((S : ℂ) * z) ^ a * φ z) 0 := (hθS.fun_pow a).fun_mul hφ0
-    have hev : ∀ᶠ z in 𝓝[≠] (0 : ℂ), (∑ j, M.ι.symm (c j) * U1 d (s j) θ ((S : ℂ) * z) ^ a)
-        = θ ((S : ℂ) * z) ^ a * φ z := by
+    have hev
+        : ∀ᶠ z in 𝓝[≠] (0 : ℂ), (∑ j, M.ι.symm (c j) * U1 d (s j) θ ((S : ℂ) * z) ^ a)
+          = θ ((S : ℂ) * z) ^ a * φ z := by
       refine Filter.Eventually.filter_mono nhdsWithin_le_nhds ?_
       filter_upwards [hθS.continuousAt.eventually_ne h0] with z hz
       rw [hφ, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
-      rw [div_pow]; field_simp
+      rw [div_pow]
+      field_simp
     rw [((GlobalTheory.MomOne.TaylorRead.hat_laws q M.ι _ hl).1 _ _ hGS hpr).2.2.1 hev,
-      hat_mul M.ι hl (hθS.fun_pow a) hφ0, hat_pow M.ι hl hθS] at hB
+        hat_mul M.ι hl (hθS.fun_pow a) hφ0, hat_pow M.ι hl hθS]
+      at hB
     have h1 : Bd 1 (hat M.ι (C ω * logS) (fun z => θ ((S : ℂ) * z))) :=
-      (bd_scale_iff M.ι ω hSq (hθd.analyticAt 0) 1).mpr (GlobalTheory.T.cm_even_theta_series_chart_coeff_integral d q M ω θ hd hd16 hsp hL hM hθ)
-    refine (GlobalTheory.MomOne.sup_norm_laws q).2.2.2.2.2 _ _ 0 B (bd_pow h1 a) ?_ (by rwa [pow_zero, one_mul])
+      (bd_scale_iff M.ι ω hSq (hθd.analyticAt 0) 1).mpr
+        (GlobalTheory.T.cm_even_theta_series_chart_coeff_integral d q M ω θ hd hd16 hsp hL hM hθ)
+    refine (GlobalTheory.MomOne.sup_norm_laws q).2.2.2.2.2 _ _ 0 B (bd_pow h1 a) ?_
+      (by rwa [pow_zero, one_mul])
     rw [map_pow, (GlobalTheory.MomOne.TaylorRead.hat_laws q M.ι _ hl).2.2.2.1]
     simp [hθ.2.1]
 
   have hBφt : Bd B (hat M.ι (C ω * logS) (fun z => φ (z + t'))) := by
     by_cases hsm : M.Small t'
-    · have hpt : PrimeTo d q t' :=
-        ⟨S * S, Nat.mul_pos hS0 hS0, Nat.Coprime.mul_left hSq hSq, by
-          rw [Nat.cast_mul, mul_assoc, hSt']; exact hSt⟩
-      have hin := (hL t').mpr ((GlobalTheory.T.smallTorsion_killed_by_prime_powers d q M ω hd hd16 hsp hL hM).2.2.1 t' hpt hsm)
+    · have hpt : PrimeTo d q t' := ⟨
+        S * S,
+        Nat.mul_pos hS0 hS0,
+        Nat.Coprime.mul_left hSq hSq,
+        by rw [Nat.cast_mul, mul_assoc, hSt']; exact hSt
+      ⟩
+      have hin :=
+        (hL t').mpr
+          ((GlobalTheory.T.smallTorsion_killed_by_prime_powers d q M ω hd hd16 hsp hL hM).2.2.1 t'
+            hpt hsm)
       have : (fun z => φ (z + t')) = φ := funext fun z => hφper t' hin z
       rwa [this]
-    · refine GlobalTheory.T.cpTransportedTaylorSeries_translate_norm_le q M _ φ t' B hM ⟨hφmer, hφper⟩ hφ0 hφt (fun p hp => ?_) hsm ?_ hBφ
+    · refine GlobalTheory.T.cpTransportedTaylorSeries_translate_norm_le q M _ φ t' B hM
+        ⟨hφmer, hφper⟩ hφ0 hφt
+        (fun p hp => ?_)
+        hsm ?_ hBφ
       · refine Et p 0 ⟨1, one_pos, Nat.coprime_one_left q, by simpa using inOK_zero d⟩
           (not_inOK_half hd.pos) ?_
         by_contra hne
         rw [add_zero] at hne
         exact absurd (hφan p hne).meromorphicOrderAt_nonneg (not_le.mpr hp)
-      · refine GlobalTheory.T.cpSeriesCoeffBounded_taylor_elliptic_of_poles q M _ _ hM ⟨fun p => ?_, fun l hl z => ?_⟩ hφt0 (fun p hp => ?_)
-        · exact MeromorphicAt.comp_analyticAt (f := φ) (g := fun z => z + t') (hφmer _) (by fun_prop)
+      · refine GlobalTheory.T.cpSeriesCoeffBounded_taylor_elliptic_of_poles q M _ _ hM
+          ⟨fun p => ?_, fun l hl z => ?_⟩ hφt0 (fun p hp => ?_)
+        · exact
+            MeromorphicAt.comp_analyticAt (f := φ) (g := fun z => z + t') (hφmer _) (by fun_prop)
         · show φ (z + l + t') = φ (z + t')
           rw [add_right_comm, hφper l hl]
         · refine Et p t ht ht2 ?_
@@ -199,32 +226,42 @@ theorem translate_bd : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q])
             AnalyticAt.comp_of_eq h2 (f := fun z => z + t') (by fun_prop) rfl
           exact absurd h3.meromorphicOrderAt_nonneg (not_le.mpr hp)
 
-  have hG : Differentiable ℂ (fun z => ∑ j, M.ι.symm (c j) * U1 d t (U1 d (s j) θ) z ^ a) := by fun_prop
+  have hG : Differentiable ℂ (fun z => ∑ j, M.ι.symm (c j) * U1 d t (U1 d (s j) θ) z ^ a) := by
+    fun_prop
   rw [← hat_comb M.ι hl _ c _ (fun j => (hUU j).analyticAt 0),
     ← bd_scale_iff M.ι ω hSq (hG.analyticAt 0)]
-  have hGS : AnalyticAt ℂ (fun z => ∑ j, M.ι.symm (c j) * U1 d t (U1 d (s j) θ) ((S : ℂ) * z) ^ a) 0 :=
-    (show Differentiable ℂ (fun z => ∑ j, M.ι.symm (c j) * U1 d t (U1 d (s j) θ) ((S : ℂ) * z) ^ a) by
+  have hGS
+      : AnalyticAt ℂ (fun z => ∑ j, M.ι.symm (c j) * U1 d t (U1 d (s j) θ) ((S : ℂ) * z) ^ a) 0 :=
+    (show Differentiable ℂ
+        (fun z => ∑ j, M.ι.symm (c j) * U1 d t (U1 d (s j) θ) ((S : ℂ) * z) ^ a) by
       fun_prop).analyticAt 0
-  have hpr : AnalyticAt ℂ (fun z => U1 d t θ ((S : ℂ) * z) ^ a * φ (z + t')) 0 := (hUtS.fun_pow a).fun_mul hφt0
-  have hev : ∀ᶠ z in 𝓝[≠] (0 : ℂ), (∑ j, M.ι.symm (c j) * U1 d t (U1 d (s j) θ) ((S : ℂ) * z) ^ a)
-      = U1 d t θ ((S : ℂ) * z) ^ a * φ (z + t') := by
+  have hpr : AnalyticAt ℂ (fun z => U1 d t θ ((S : ℂ) * z) ^ a * φ (z + t')) 0 :=
+    (hUtS.fun_pow a).fun_mul hφt0
+  have hev
+      : ∀ᶠ z in 𝓝[≠] (0 : ℂ), (∑ j, M.ι.symm (c j) * U1 d t (U1 d (s j) θ) ((S : ℂ) * z) ^ a)
+        = U1 d t θ ((S : ℂ) * z) ^ a * φ (z + t') := by
     refine Filter.Eventually.filter_mono nhdsWithin_le_nhds ?_
     have hc : ContinuousAt (fun z => θ ((S : ℂ) * z + t)) 0 :=
       (show Differentiable ℂ (fun z => θ ((S : ℂ) * z + t)) by fun_prop).continuous.continuousAt
     filter_upwards [hc.eventually_ne (y := 0) (by simpa using hθt)] with z hz
     rw [hφ, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
-    have key : U1 d t (U1 d (s j) θ) ((S : ℂ) * z) = U1 d t θ ((S : ℂ) * z) *
-        (U1 d (s j) θ ((S : ℂ) * (z + t')) / θ ((S : ℂ) * (z + t'))) := by
+    have key
+        : U1 d t (U1 d (s j) θ) ((S : ℂ) * z)
+          = U1 d t θ ((S : ℂ) * z)
+            * (U1 d (s j) θ ((S : ℂ) * (z + t')) / θ ((S : ℂ) * (z + t'))) := by
       rw [mul_add, hSt']
       generalize U1 d (s j) θ = F
       simp only [U1]
       field_simp
-    rw [key, mul_pow]; ring
+    rw [key, mul_pow]
+    ring
   rw [((GlobalTheory.MomOne.TaylorRead.hat_laws q M.ι _ hl).1 _ _ hGS hpr).2.2.1 hev,
     hat_mul M.ι hl (hUtS.fun_pow a) hφt0, hat_pow M.ι hl hUtS]
   have h1 : Bd 1 (hat M.ι (C ω * logS) (fun z => U1 d t θ ((S : ℂ) * z))) :=
-    (bd_scale_iff M.ι ω hSq (hUt.analyticAt 0) 1).mpr (GlobalTheory.T.cpSeriesBounded_one_torsionTranslate_cmTheta d q M ω θ hd hd16 hsp hL hM hθ t ht ht2)
+    (bd_scale_iff M.ι ω hSq (hUt.analyticAt 0) 1).mpr
+      (GlobalTheory.T.cpSeriesBounded_one_torsionTranslate_cmTheta d q M ω θ hd hd16 hsp hL hM hθ t
+        ht ht2)
   have := ((GlobalTheory.MomOne.sup_norm_laws q).1 _ _ _ _ (bd_pow h1 a) hBφt).2
   rwa [one_mul] at this
 

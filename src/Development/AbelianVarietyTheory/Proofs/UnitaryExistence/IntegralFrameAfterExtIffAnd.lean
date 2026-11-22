@@ -28,10 +28,12 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.F
 
 section Valuations
 
-variable {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
+variable
+  {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
   [IsFractionRing V K']
 
-theorem valV_le_one (v : V) : valV V (algebraMap V K' v) ≤ 1 := HeightOneSpectrum.valuation_le_one _ v
+theorem valV_le_one (v : V) : valV V (algebraMap V K' v) ≤ 1 :=
+  HeightOneSpectrum.valuation_le_one _ v
 
 theorem valV_lt_one_iff (v : V) : valV V (algebraMap V K' v) < 1 ↔ v ∈ maximalIdeal V :=
   HeightOneSpectrum.valuation_lt_one_iff_mem _ v
@@ -44,23 +46,26 @@ theorem vV_pos {v : V} (h0 : v ≠ 0) (h : v ∈ maximalIdeal V) : 0 < vV V (alg
   have h1 : algebraMap V K' v ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective V K')).2 h0
   have := (WithZero.log_lt_log (valV_ne_zero (V := V) h1) one_ne_zero).2 ((valV_lt_one_iff v).2 h)
   simp only [WithZero.log_one] at this
-  simp only [vV]; omega
+  simp only [vV]
+  omega
 
 end Valuations
 
-theorem exists_overLa {K : Type} [Field K] [NumberField K] (T : CDVR) (io : K →+* T.Fr) (hT : T.FinRes) :
-    ∃ (la : HeightOneSpectrum (𝓞 K)) (e : ℕ), OverLa la T.V io e := by
+theorem exists_overLa
+    {K : Type} [Field K] [NumberField K] (T : CDVR) (io : K →+* T.Fr) (hT : T.FinRes)
+    : ∃ (la : HeightOneSpectrum (𝓞 K)) (e : ℕ), OverLa la T.V io e := by
   have hint : ∀ a : 𝓞 K, ∃ v : T.V, algebraMap T.V T.Fr v = io a := fun a =>
     IsIntegrallyClosed.algebraMap_eq_of_integral (R := T.V) (K := T.Fr)
       (IsIntegral.map_of_comp_eq (Int.castRingHom T.V) io (RingHom.ext_int _ _) a.isIntegral_coe)
   choose g0 hg0 using hint
   have hinj := IsFractionRing.injective T.V T.Fr
-  let g : 𝓞 K →+* T.V :=
-    { toFun := g0
-      map_one' := hinj (by simp [hg0])
-      map_mul' := fun a b => hinj (by simp [hg0])
-      map_zero' := hinj (by simp [hg0])
-      map_add' := fun a b => hinj (by simp [hg0]) }
+  let g : 𝓞 K →+* T.V := {
+    toFun := g0
+    map_one' := hinj (by simp [hg0])
+    map_mul' := fun a b => hinj (by simp [hg0])
+    map_zero' := hinj (by simp [hg0])
+    map_add' := fun a b => hinj (by simp [hg0])
+  }
   have hg : ∀ a, algebraMap T.V T.Fr (g a) = io (algebraMap (𝓞 K) K a) := hg0
   have hne : (maximalIdeal T.V).comap g ≠ ⊥ := by
     have : Finite (ResidueField T.V) := hT
@@ -84,9 +89,11 @@ theorem exists_overLa {K : Type} [Field K] [NumberField K] (T : CDVR) (io : K �
   obtain ⟨π, hπ⟩ := la.intValuation_exists_uniformizer
   have hπK : la.valuation K (algebraMap (𝓞 K) K π) = WithZero.exp (-1 : ℤ) := by
     rw [HeightOneSpectrum.valuation_of_algebraMap, hπ]
-  have hπ0 : algebraMap (𝓞 K) K π ≠ 0 := fun h => by simp [h] at hπK; exact WithZero.exp_ne_zero hπK.symm
+  have hπ0 : algebraMap (𝓞 K) K π ≠ 0 := fun h => by
+    simp [h] at hπK; exact WithZero.exp_ne_zero hπK.symm
   have hπm : π ∈ la.asIdeal := by
-    rw [← la.valuation_lt_one_iff_mem (K := K), hπK, ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
+    rw [← la.valuation_lt_one_iff_mem (K := K), hπK, ← WithZero.exp_zero, WithZero.exp_lt_exp]
+    norm_num
   have hpos : 0 < vV T.V (io (algebraMap (𝓞 K) K π)) := by
     rw [← hg]
     refine vV_pos (fun h => ?_) hπm
@@ -98,18 +105,27 @@ theorem exists_overLa {K : Type} [Field K] [NumberField K] (T : CDVR) (io : K �
   by_cases ha : a = 0
   · simp [ha, vV, vLa]
   have hva : la.valuation K a ≠ 0 := (Valuation.ne_zero_iff _).2 ha
-  have h1 := hone (a * (algebraMap (𝓞 K) K π) ^ (-vLa la a)) (by
-    rw [map_mul, map_zpow₀, hπK, ← WithZero.exp_zsmul, ← WithZero.exp_log hva, ← WithZero.exp_add]
-    simp [vLa])
+  have h1 :=
+    hone (a * (algebraMap (𝓞 K) K π) ^ (- vLa la a)) (by
+      rw [map_mul, map_zpow₀, hπK, ← WithZero.exp_zsmul, ← WithZero.exp_log hva, ← WithZero.exp_add]
+      simp [vLa])
   have h2 := congrArg WithZero.log h1
-  rw [map_mul, map_mul, map_zpow₀, map_zpow₀, WithZero.log_mul (valV_ne_zero ((map_ne_zero io).2 ha))
-    (zpow_ne_zero _ (valV_ne_zero ((map_ne_zero io).2 hπ0))), WithZero.log_zpow, WithZero.log_one] at h2
+  rw [map_mul, map_mul, map_zpow₀, map_zpow₀,
+      WithZero.log_mul (valV_ne_zero ((map_ne_zero io).2 ha))
+        (zpow_ne_zero _ (valV_ne_zero ((map_ne_zero io).2 hπ0))),
+      WithZero.log_zpow, WithZero.log_one]
+    at h2
   simp only [vV, smul_eq_mul] at h2 ⊢
   linarith
 
-theorem exists_testRing_factor {K : Type} [Field K] (p : TRing K) {S : Type} [Field S] [Algebra K S]
-    (φ : p.R →ₐ[K] S) {J : Type} [Fintype J] (g : J → S) :
-    ∃ (r : TRing K) (α : p.R →ₐ[K] r.R) (χ : r.R →ₐ[K] S) (gr : J → r.R),
+theorem exists_testRing_factor
+    {K : Type} [Field K]
+    (p : TRing K)
+    {S : Type} [Field S] [Algebra K S]
+    (φ : p.R →ₐ[K] S)
+    {J : Type} [Fintype J]
+    (g : J → S)
+    : ∃ (r : TRing K) (α : p.R →ₐ[K] r.R) (χ : r.R →ₐ[K] S) (gr : J → r.R),
       Function.Injective χ ∧ χ.comp α = φ ∧ ∀ j, χ (gr j) = g j := by
   classical
   let e := Fintype.equivFin J
@@ -117,8 +133,9 @@ theorem exists_testRing_factor {K : Type} [Field K] (p : TRing K) {S : Type} [Fi
     Fin.append (fun i => φ (Ideal.Quotient.mk p.I (MvPolynomial.X i))) (fun k => g (e.symm k))
   let Φ : MvPolynomial (Fin (p.n + Fintype.card J)) K →ₐ[K] S := MvPolynomial.aeval v
   let r : TRing K := ⟨p.n + Fintype.card J, RingHom.ker Φ, (RingHom.ker_isPrime Φ).isRadical⟩
-  have hΦ : Φ.comp (MvPolynomial.rename (Fin.castAdd (Fintype.card J))) =
-      φ.comp (Ideal.Quotient.mkₐ K p.I) := by
+  have hΦ
+      : Φ.comp (MvPolynomial.rename (Fin.castAdd (Fintype.card J)))
+        = φ.comp (Ideal.Quotient.mkₐ K p.I) := by
     apply MvPolynomial.algHom_ext
     intro i
     simp [Φ, v, Fin.append_left]
@@ -128,13 +145,21 @@ theorem exists_testRing_factor {K : Type} [Field K] (p : TRing K) {S : Type} [Fi
     intro a ha
     show Ideal.Quotient.mk _ _ = 0
     rw [Ideal.Quotient.eq_zero_iff_mem, RingHom.mem_ker]
-    have h1 : Φ (MvPolynomial.rename (Fin.castAdd (Fintype.card J)) a) = φ (Ideal.Quotient.mk p.I a) :=
+    have h1
+        : Φ (MvPolynomial.rename (Fin.castAdd (Fintype.card J)) a) = φ (Ideal.Quotient.mk p.I a) :=
       congrArg (fun F => F a) hΦ
     exact h1.trans (by rw [Ideal.Quotient.eq_zero_iff_mem.2 ha, map_zero])
   let α : p.R →ₐ[K] r.R := Ideal.Quotient.liftₐ p.I α₀ hα₀
   let χ : r.R →ₐ[K] S := Ideal.kerLiftAlg Φ
-  refine ⟨r, α, χ, fun j => Ideal.Quotient.mk _ (MvPolynomial.X (Fin.natAdd p.n (e j))),
-    Ideal.kerLiftAlg_injective Φ, ?_, ?_⟩
+  refine ⟨
+    r,
+    α,
+    χ,
+    fun j => Ideal.Quotient.mk _ (MvPolynomial.X (Fin.natAdd p.n (e j))),
+    Ideal.kerLiftAlg_injective Φ,
+    ?_,
+    ?_
+  ⟩
   · apply Ideal.Quotient.algHom_ext
     rw [← hΦ]
     apply MvPolynomial.algHom_ext
@@ -144,24 +169,33 @@ theorem exists_testRing_factor {K : Type} [Field K] (p : TRing K) {S : Type} [Fi
     show Φ _ = g j
     simp [Φ, v, Fin.append_right]
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable {Xo : Moduli Dw l} {c : Coeff l}
 
-theorem exists_baseChange {S T : Type} [CommRing S] [Algebra c.F S] [CommRing T] [Algebra c.F T] (φ : S →ₐ[c.F] T)
-    (y : FrPt Xo c S) : ∃ z : FrPt Xo c T, FrMap φ y z :=
-  FramedBaseChange.exists_frMap GlobalTheory.abelianSchemeLaws_all.1.secBaseChange E H Dw l Xo c S T φ y
+theorem exists_baseChange
+    {S T : Type} [CommRing S] [Algebra c.F S] [CommRing T] [Algebra c.F T]
+    (φ : S →ₐ[c.F] T) (y : FrPt Xo c S)
+    : ∃ z : FrPt Xo c T, FrMap φ y z :=
+  FramedBaseChange.exists_frMap GlobalTheory.abelianSchemeLaws_all.1.secBaseChange E H Dw l Xo c S T
+    φ y
 
-theorem fromTest_of_same_point {S : Type} [Field S] [Algebra c.F S] {y y' : FrPt Xo c S} (hx : y'.x = y.x)
-    (hy : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y) :
-    FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y' := by
+theorem fromTest_of_same_point
+    {S : Type} [Field S] [Algebra c.F S]
+    {y y' : FrPt Xo c S} (hx : y'.x = y.x)
+    (hy : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y)
+    : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y' := by
   classical
   obtain ⟨p, φ, y₀, h₀⟩ := hy
   obtain ⟨g, a, hg, hc⟩ := (frChg_exists_unique E H Dw l Xo c S y y').1 hx
-  obtain ⟨r, α, χ, gr, hχ, hα, hgr⟩ := exists_testRing_factor p φ
-    (J := (Σ τ : E →+* ℂ, Option (Fin (Dw.mult τ) × Fin (Dw.mult τ))) ⊕ Bool)
-    (Sum.elim (fun q => q.2.elim (g q.1).det⁻¹ fun ij => g q.1 ij.1 ij.2) fun b => cond b (a : S) (a⁻¹ : Sˣ))
-  let g₀ : ∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) r.R :=
-    fun τ => Matrix.of fun i j => gr (.inl ⟨τ, some (i, j)⟩)
+  obtain ⟨r, α, χ, gr, hχ, hα, hgr⟩ :=
+    exists_testRing_factor p φ
+      (J := (Σ τ : E →+* ℂ, Option (Fin (Dw.mult τ) × Fin (Dw.mult τ))) ⊕ Bool)
+      (Sum.elim
+        (fun q => q.2.elim (g q.1).det⁻¹ fun ij => g q.1 ij.1 ij.2)
+        fun b => cond b (a : S) (a⁻¹ : Sˣ))
+  let g₀ : ∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) r.R := fun τ =>
+    Matrix.of fun i j => gr (.inl ⟨τ, some (i, j)⟩)
   have hg₀ : ∀ τ, (g₀ τ).map χ = g τ := fun τ => Matrix.ext fun i j => hgr (.inl ⟨τ, some (i, j)⟩)
   have hd : ∀ τ, IsUnit (g₀ τ).det := fun τ => by
     refine IsUnit.of_mul_eq_one (gr (.inl ⟨τ, none⟩)) (hχ ?_)
@@ -179,7 +213,9 @@ theorem fromTest_of_same_point {S : Type} [Field S] [Algebra c.F S] {y y' : FrPt
 
 theorem reFrame : Formalism.L2.PjFree.ReFrame Xo c := by
   refine Formalism.L2.PjFree.reFrame_of
-    (fun S _ x _ v hv _ w A N w' hw hw' => GlobalTheory.TangentLinear.isCombAt_mulVec E H Dw l Xo S x v hv w A N w' hw hw') ?_
+    (fun S _ x _ v hv _ w A N w' hw hw' =>
+      GlobalTheory.TangentLinear.isCombAt_mulVec E H Dw l Xo S x v hv w A N w' hw hw')
+    ?_
   intro T io
   let _ := io.toAlgebra
   intro y0 z hx k hk
@@ -192,11 +228,23 @@ theorem reFrame : Formalism.L2.PjFree.ReFrame Xo c := by
   simp only at hx
   subst hx
   obtain ⟨u0, hu0⟩ := IntRebase.gen_unit' (x := y0.1.x) zs y0.1.s zg y0.1.gen
-  refine ⟨⟨IntRebase.rebase₂ y0.1 _ hK, fromTest_of_same_point (y := y0.1) rfl y0.2.1,
-    IntRebase.integral_reb T io y0.1 y0.2.2 k hk hK⟩, u0, rfl, fun τ i => ?_,
-    𝟙 _, Category.id_comp _, Category.id_comp _, ?_⟩
+  refine ⟨
+    ⟨
+      IntRebase.rebase₂ y0.1 _ hK,
+      fromTest_of_same_point (y := y0.1) rfl y0.2.1,
+      IntRebase.integral_reb T io y0.1 y0.2.2 k hk hK
+    ⟩,
+    u0,
+    rfl,
+    fun τ i => ?_,
+    𝟙 _,
+    Category.id_comp _,
+    Category.id_comp _,
+    ?_
+  ⟩
   · exact (IntRebase.isCombAtG_iff Xo.univ.t y0.1.x
-      (fun j => IntRebase.ovT (t := Xo.univ.t) (y0.1.tan τ j)) _ _).2 rfl
+      (fun j => IntRebase.ovT (t := Xo.univ.t) (y0.1.tan τ j))
+      _ _).2 rfl
   · intro i h
     show ((𝟙 _ : Gx y0.1.x ⟶ Gx y0.1.x).appLE _ _ h).hom (scal y0.1.x (u0 : T.Fr) i * zs.f i) = y0.1.s.f i
     rw [← hu0 i]

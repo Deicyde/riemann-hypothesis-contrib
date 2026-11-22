@@ -8,9 +8,10 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem rat_mem_span_of_real_mem_span (k r : ℕ) (w : Fin k → Fin r → ℚ) (v : Fin r → ℚ)
-    (hv : (fun j => ((v j : ℚ) : ℝ)) ∈ Submodule.span ℝ (Set.range fun i j => ((w i j : ℚ) : ℝ))) :
-    v ∈ Submodule.span ℚ (Set.range w) := by
+theorem rat_mem_span_of_real_mem_span
+    (k r : ℕ) (w : Fin k → Fin r → ℚ) (v : Fin r → ℚ)
+    (hv : (fun j => ((v j : ℚ) : ℝ)) ∈ Submodule.span ℝ (Set.range fun i j => ((w i j : ℚ) : ℝ)))
+    : v ∈ Submodule.span ℚ (Set.range w) := by
   by_contra hnot
   obtain ⟨f, hfv, hfp⟩ := Submodule.exists_dual_map_eq_bot_of_notMem hnot inferInstance
   classical
@@ -28,10 +29,11 @@ theorem rat_mem_span_of_real_mem_span (k r : ℕ) (w : Fin k → Fin r → ℚ) 
       Submodule.mem_map_of_mem (Submodule.subset_span ⟨i, rfl⟩)
     rw [hfp] at this
     exact (Submodule.mem_bot ℚ).mp this
-  let L : (Fin r → ℝ) →ₗ[ℝ] ℝ :=
-    { toFun := fun x => ∑ j, x j * (a j : ℝ)
-      map_add' := by intro x y; simp [add_mul, Finset.sum_add_distrib]
-      map_smul' := by intro c x; simp [Finset.mul_sum, mul_assoc] }
+  let L : (Fin r → ℝ) →ₗ[ℝ] ℝ := {
+    toFun := fun x => ∑ j, x j * (a j : ℝ)
+    map_add' := by intro x y; simp [add_mul, Finset.sum_add_distrib]
+    map_smul' := by intro c x; simp [Finset.mul_sum, mul_assoc]
+  }
   have hle : Submodule.span ℝ (Set.range fun i j => ((w i j : ℚ) : ℝ)) ≤ LinearMap.ker L := by
     rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩

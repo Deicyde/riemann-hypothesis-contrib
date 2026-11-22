@@ -22,14 +22,18 @@ namespace GroundTheory.Heights₂.Heights.Targets
 
 open MvPolynomial Filter Topology
 open scoped ContDiff
-open ReciprocityTheory.ChartRestriction.G.Geo (MRing HermLine IsSmoothHerm IsArithVar IsSectionOn ptsIntegral pot segre mcPts
-  isOpen_blockNonzero)
-open GroundTheory.Heights₂.Heights (segreChartSet segreChartComponents mem_segreChartComponents chartLift
-  contDiff_chartLift chartLift_blockNonzero segre_chartLift chart_coord_eq_one)
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (MRing HermLine IsSmoothHerm IsArithVar IsSectionOn ptsIntegral pot segre mcPts
+    isOpen_blockNonzero)
+open GroundTheory.Heights₂.Heights
+  (segreChartSet segreChartComponents mem_segreChartComponents chartLift contDiff_chartLift
+    chartLift_blockNonzero segre_chartLift chart_coord_eq_one)
 
-theorem LelongChartLimit.proof (hInt : SegreChartIntegral.Statement) (hDim : SegreChartDim.Statement)
+theorem LelongChartLimit.proof
+    (hInt : SegreChartIntegral.Statement) (hDim : SegreChartDim.Statement)
     (hNot : ChartSectionNotMem.Statement) (hLel : LelongPolyLimit.Statement)
-    (hDiv : ChartDivisorCompare.Statement) : LelongChartLimit.Statement := by
+    (hDiv : ChartDivisorCompare.Statement)
+    : LelongChartLimit.Statement := by
   classical
   intro K _ _ ι _ P n L A s g i δ hP hL hA hs hg hδ hsupp
   obtain ⟨a, ha, hsa, -⟩ := id hs
@@ -44,8 +48,10 @@ theorem LelongChartLimit.proof (hInt : SegreChartIntegral.Statement) (hDim : Seg
   have hlam : ContDiff ℝ ∞ lam := contDiff_chartLift σ i
   let Ω := lam ⁻¹' {z | ∀ k, ∃ j, z ⟨k, j⟩ ≠ 0}
   have hΩ : IsOpen Ω := isOpen_blockNonzero.preimage hlam.continuous
-  have hsm : ∀ f : ((Σ k, ι k) → ℂ) → ℝ, ContDiffOn ℝ ∞ f {z | ∀ k, ∃ j, z ⟨k, j⟩ ≠ 0} →
-      ContDiffOn ℝ ∞ (f ∘ lam) Ω := fun f hf => hf.comp hlam.contDiffOn fun _ hx => hx
+  have hsm
+      : ∀ f : ((Σ k, ι k) → ℂ) → ℝ,
+        ContDiffOn ℝ ∞ f {z | ∀ k, ∃ j, z ⟨k, j⟩ ≠ 0} → ContDiffOn ℝ ∞ (f ∘ lam) Ω := fun f hf =>
+    hf.comp hlam.contDiffOn fun _ hx => hx
   have hpot : ∀ j, ContDiffOn ℝ ∞ (pot L j) {z | ∀ k, ∃ j, z ⟨k, j⟩ ≠ 0} := fun j =>
     (hL j).log fun z hz => ((L j).pos z hz).ne'
   have hxΩ : ∀ x ∈ segreChartSet P σ i, x ∈ Ω := by
@@ -60,36 +66,47 @@ theorem LelongChartLimit.proof (hInt : SegreChartIntegral.Statement) (hDim : Seg
     · have hle : ‖fun a => segre z (σ a)‖ ≤ ‖segre z‖ :=
         (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun a => norm_le_pi_norm (segre z) (σ a)
       have hcont : Continuous fun y => segre (lam y) :=
-        continuous_pi fun i' => continuous_finsetProd _ fun k _ =>
-          (continuous_apply (⟨k, i' k⟩ : Σ k, ι k)).comp hlam.continuous
+        continuous_pi fun i' =>
+          continuous_finsetProd _ fun k _ =>
+            (continuous_apply (⟨k, i' k⟩ : Σ k, ι k)).comp hlam.continuous
       have hO : IsOpen {y | ‖segre (lam y) i‖ < δ * ‖segre (lam y)‖} :=
         isOpen_lt ((continuous_apply i).comp hcont).norm (continuous_const.mul hcont.norm)
-      have hx : ‖segre (lam fun a => segre z (σ a)) i‖ < δ * ‖segre (lam fun a => segre z (σ a))‖ := by
+      have hx
+          : ‖segre (lam fun a => segre z (σ a)) i‖ < δ * ‖segre (lam fun a => segre z (σ a))‖ := by
         rw [segre_chartLift σ i z hzi, hzi, norm_one]
         have h1 : 1 / δ < ‖segre z‖ := by linarith
-        calc (1 : ℝ) = δ * (1 / δ) := by field_simp
+        calc
+          (1 : ℝ)
+            = δ * (1 / δ) := by field_simp
           _ < δ * ‖segre z‖ := mul_lt_mul_of_pos_left h1 hδ
       filter_upwards [hO.mem_nhds hx] with y hy
       simp [G, hsupp _ hy]
   have hJ : ∀ J ∈ segreChartComponents P σ i, ComplexSets.zeroSet J ⊆ Ω := fun J hJ x hx =>
     chartLift_blockNonzero σ i (chart_coord_eq_one hJ hx)
 
-  have hlim := tendsto_finsetSum (segreChartComponents P σ i) fun J hJs =>
-    hLel _ n J (chartSection σ i s) G kk Φ (mem_segreChartComponents.1 hJs).1.1
-      (hDim K ι P (n + 1) _ σ i hP J hJs) (hNot K ι P (n + 1) _ σ i A s hP hs J hJs)
-      ⟨Ω, hΩ, hJ J hJs, (χ.contDiff.contDiffOn).mul (hsm g hg.1)⟩ χ.hasCompactSupport.mul_right
-      (fun j => ⟨Ω, hΩ, hJ J hJs, hsm _ (hpot j)⟩) ⟨Ω, hΩ, hJ J hJs, hsm _ hA⟩
-      fun x hx => A.pos _ (hJ J hJs hx)
-  rw [hDiv K ι P n _ σ i L A s g δ G Φ hP hL hs hg hδ hsupp
-    fun x hx => ⟨key x hx, fun j => EventuallyEq.rfl⟩] at hlim
+  have hlim :=
+    tendsto_finsetSum (segreChartComponents P σ i) fun J hJs =>
+      hLel _ n J (chartSection σ i s) G kk Φ (mem_segreChartComponents.1 hJs).1.1
+        (hDim K ι P (n + 1) _ σ i hP J hJs) (hNot K ι P (n + 1) _ σ i A s hP hs J hJs)
+        ⟨Ω, hΩ, hJ J hJs, (χ.contDiff.contDiffOn).mul (hsm g hg.1)⟩ χ.hasCompactSupport.mul_right
+        (fun j => ⟨Ω, hΩ, hJ J hJs, hsm _ (hpot j)⟩)
+        ⟨Ω, hΩ, hJ J hJs, hsm _ hA⟩
+        fun x hx => A.pos _ (hJ J hJs hx)
+  rw [hDiv K ι P n _ σ i L A s g δ G Φ hP hL hs hg hδ hsupp fun x hx =>
+      ⟨key x hx, fun j => EventuallyEq.rfl⟩]
+    at hlim
   refine hlim.congr' (eventually_nhdsWithin_of_forall fun ε (hε : 0 < ε) => ?_)
 
   set M := (regLine A s ε ha hsa).tensor A
-  have hML : ∀ j, IsSmoothHerm ((Fin.cons M L : Fin (n + 1) → HermLine ι) j) :=
-    fun j => Fin.cases ((isSmoothHerm_regLine hA hε ha hsa).mul hA) (fun i => hL i) j
-  have hcongr : ptsIntegral P
-      (Fin.cons (fun z => Real.log (‖eval z (map (Int.castRingHom ℂ) s)‖ ^ 2 + ε * A.h z ^ 2) / 2)
-        (pot L)) g = ptsIntegral P (pot (Fin.cons M L)) g := by
+  have hML : ∀ j, IsSmoothHerm ((Fin.cons M L : Fin (n + 1) → HermLine ι) j) := fun j =>
+    Fin.cases ((isSmoothHerm_regLine hA hε ha hsa).mul hA) (fun i => hL i) j
+  have hcongr
+      : ptsIntegral P
+          (Fin.cons
+            (fun z => Real.log (‖eval z (map (Int.castRingHom ℂ) s)‖ ^ 2 + ε * A.h z ^ 2) / 2)
+            (pot L))
+          g
+        = ptsIntegral P (pot (Fin.cons M L)) g := by
     rw [Inter.PtsAddFirst.pot_cons]
     refine Inter.DiagRAux.ptsIntegral_congr_mcPts P (fun j => ?_) (fun _ _ => rfl)
     refine Fin.cases ?_ (fun i => ?_) j
@@ -100,12 +117,12 @@ theorem LelongChartLimit.proof (hInt : SegreChartIntegral.Statement) (hDim : Seg
       simp only [Fin.cons_succ]
   beta_reduce
   rw [hcongr]
-  refine (hInt K ι P n _ σ i (Fin.cons M L) g δ G (Matrix.vecCons (F ε) Φ) hP hML hg hδ (Or.inl hsupp)
-    fun x hx => ⟨key x hx, fun j => ?_⟩).symm
+  refine (hInt K ι P n _ σ i (Fin.cons M L) g δ G (Matrix.vecCons (F ε) Φ) hP hML hg hδ
+    (Or.inl hsupp) fun x hx => ⟨key x hx, fun j => ?_⟩).symm
   refine Fin.cases ?_ (fun j => EventuallyEq.rfl) j
   filter_upwards [hΩ.mem_nhds (hxΩ x hx)] with y hy
-  simp only [Matrix.cons_val_zero, Function.comp_apply, Inter.PtsAddFirst.pot_cons, Fin.cons_zero, F, kk,
-    eval_chartSection]
+  simp only [Matrix.cons_val_zero, Function.comp_apply, Inter.PtsAddFirst.pot_cons, Fin.cons_zero,
+    F, kk, eval_chartSection]
   exact (log_regLine_tensor A s hε ha hsa (lam y) hy).symm
 
 end GroundTheory.Heights₂.Heights.Targets

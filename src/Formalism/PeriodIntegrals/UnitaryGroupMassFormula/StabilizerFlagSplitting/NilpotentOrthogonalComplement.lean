@@ -5,15 +5,18 @@ public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
 
 @[expose] public section
 
-open Matrix Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C2 Formalism.QuantumDeterminants.GBasic
+open Matrix Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C2
+  Formalism.QuantumDeterminants.GBasic
 
 noncomputable section
 
 namespace PI.StabSplit.UnipW
 
-def perpX (k r : ℕ) (v : Fin (2 * r + k + 1) → ℂ) : Prop := ∀ i : Fin (2 * r + k + 1), r + k < i.val → v i = 0
+def perpX (k r : ℕ) (v : Fin (2 * r + k + 1) → ℂ) : Prop :=
+  ∀ i : Fin (2 * r + k + 1), r + k < i.val → v i = 0
 
-def inX (k r : ℕ) (v : Fin (2 * r + k + 1) → ℂ) : Prop := ∀ i : Fin (2 * r + k + 1), r ≤ i.val → v i = 0
+def inX (k r : ℕ) (v : Fin (2 * r + k + 1) → ℂ) : Prop :=
+  ∀ i : Fin (2 * r + k + 1), r ≤ i.val → v i = 0
 
 def Lk (k r : ℕ) : Fin (2 * r + k + 1) := ⟨r + k, by omega⟩
 
@@ -304,8 +307,10 @@ theorem nilpotent_orthogonal_complement : NPerp := by
     have h4 := hv ⟨2 * r + k - i.val, hir⟩
     rw [herm_coord, Finset.sum_eq_single (eI k r ⟨2 * r + k - i.val, hir⟩)] at h4
     · have hs : sig k r (eI k r ⟨2 * r + k - i.val, hir⟩) = i := by
-        have hc : (eI k r ⟨2 * r + k - i.val, hir⟩).val < r ∨
-            r + k < (eI k r ⟨2 * r + k - i.val, hir⟩).val := Or.inl hir
+        have hc
+            : (eI k r ⟨2 * r + k - i.val, hir⟩).val < r
+              ∨ r + k < (eI k r ⟨2 * r + k - i.val, hir⟩).val :=
+          Or.inl hir
         unfold sig
         rw [if_pos hc]
         apply Fin.ext
@@ -343,8 +348,9 @@ theorem unipotent_nilpotent_radical : UnipN := by
     · rw [hb.2 i i hi, if_pos rfl, one_mul]
     · intro l _ hl; rw [hb.2 i l hi, if_neg (Ne.symm hl), zero_mul]
     · intro h; exact absurd (Finset.mem_univ _) h
-  have xcol : ∀ i j : Fin (2 * r + k + 1), j.val < r → j.val ≤ i.val →
-      (u * m) i j = if i = j then 1 else 0 := by
+  have xcol
+      : ∀ i j : Fin (2 * r + k + 1),
+        j.val < r → j.val ≤ i.val → (u * m) i j = if i = j then 1 else 0 := by
     intro i j hj hij
     by_cases hi : i.val < r ∨ r + k < i.val
     · rw [row_out i j hi]; exact hmc i j (by omega) (Or.inl hij)
@@ -381,7 +387,8 @@ theorem unipotent_nilpotent_radical : UnipN := by
       rw [← mulVec_mulVec]
       have e2 : m *ᵥ z = z + (m *ᵥ z - z) := by abel
       rw [e2, mulVec_add, hu.2.2, u_fix _ hx]
-    rw [e]; exact hx
+    rw [e]
+    exact hx
   have hkey := key hz hT hgU hperp hgz p
   refine (Formalism.QuantumDeterminants.WeylGroupFacts.nset_iff _).2 ⟨hgU, ?_⟩
   intro i j hj hij
@@ -391,10 +398,14 @@ theorem unipotent_nilpotent_radical : UnipN := by
     have hbp : perpX k r (bvec j) := by
       intro l hl
       simp only [bvec, Pi.single_apply]
-      rw [if_neg]; intro h; subst h; omega
+      rw [if_neg]
+      intro h
+      subst h
+      omega
     have h := hkey (bvec j) hbp (by rw [hp, zero_mulVec]) i hir
     rw [Pi.sub_apply, sub_eq_zero, mulVec_bvec] at h
     have h' : (u * m) i j = bvec j i := h
-    rw [h']; simp [bvec, Pi.single_apply]
+    rw [h']
+    simp [bvec, Pi.single_apply]
 
 end PI.StabSplit

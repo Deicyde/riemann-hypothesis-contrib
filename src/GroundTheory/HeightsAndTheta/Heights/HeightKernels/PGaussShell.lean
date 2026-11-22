@@ -15,17 +15,16 @@ noncomputable section
 
 namespace PGaussShell
 
-theorem base_le (m δ : ℝ) (hm : 0 ≤ m) (hδ : 0 < δ) :
-    1 + 2 * (m + 1) / δ ≤ 3 * (m + 1) * (1 + 1 / δ) := by
+theorem base_le (m δ : ℝ) (hm : 0 ≤ m) (hδ : 0 < δ)
+    : 1 + 2 * (m + 1) / δ ≤ 3 * (m + 1) * (1 + 1 / δ) := by
   have h2 : 3 * (m + 1) * (1 + 1 / δ) = 3 * (m + 1) + 3 * (m + 1) / δ := by ring
-  have h1 : 2 * (m + 1) / δ ≤ 3 * (m + 1) / δ :=
-    div_le_div_of_nonneg_right (by linarith) hδ.le
+  have h1 : 2 * (m + 1) / δ ≤ 3 * (m + 1) / δ := div_le_div_of_nonneg_right (by linarith) hδ.le
   linarith
 
 end PGaussShell
 
-theorem GaussShell.proof (hP : GaussPacking.Statement) (hT : GaussTermBound.Statement) :
-    GaussShell.Statement := by
+theorem GaussShell.proof (hP : GaussPacking.Statement) (hT : GaussTermBound.Statement)
+    : GaussShell.Statement := by
   intro n hn Λ δ hδ hmin F m
   set T := F.filter (fun μ : Λ => ⌊‖(μ : EuclideanSpace ℝ (Fin n))‖⌋₊ = m) with hTdef
   have hm0 : (0 : ℝ) ≤ m := Nat.cast_nonneg _
@@ -38,15 +37,16 @@ theorem GaussShell.proof (hP : GaussPacking.Statement) (hT : GaussTermBound.Stat
     have h := Nat.lt_floor_add_one ‖(μ : EuclideanSpace ℝ (Fin n))‖
     rw [(Finset.mem_filter.1 hμ).2] at h
     exact h.le
-  have hterm : ∀ μ ∈ T, Real.exp (-π * ‖(μ : EuclideanSpace ℝ (Fin n))‖ ^ 2) ≤
-      Real.exp (-π * (m : ℝ) ^ 2) := by
+  have hterm
+      : ∀ μ ∈ T,
+        Real.exp (-π * ‖(μ : EuclideanSpace ℝ (Fin n))‖ ^ 2) ≤ Real.exp (-π * (m : ℝ) ^ 2) := by
     intro μ hμ
     apply Real.exp_le_exp.2
-    have : (m : ℝ) ^ 2 ≤ ‖(μ : EuclideanSpace ℝ (Fin n))‖ ^ 2 :=
-      pow_le_pow_left₀ hm0 (hlow μ hμ) 2
+    have : (m : ℝ) ^ 2 ≤ ‖(μ : EuclideanSpace ℝ (Fin n))‖ ^ 2 := pow_le_pow_left₀ hm0 (hlow μ hμ) 2
     nlinarith [Real.pi_pos]
-  have hsum : ∑ μ ∈ T, Real.exp (-π * ‖(μ : EuclideanSpace ℝ (Fin n))‖ ^ 2) ≤
-      (T.card : ℝ) * Real.exp (-π * (m : ℝ) ^ 2) := by
+  have hsum
+      : ∑ μ ∈ T, Real.exp (-π * ‖(μ : EuclideanSpace ℝ (Fin n))‖ ^ 2)
+        ≤ (T.card : ℝ) * Real.exp (-π * (m : ℝ) ^ 2) := by
     have h := Finset.sum_le_sum hterm
     rwa [Finset.sum_const, nsmul_eq_mul] at h
   have hcard : (T.card : ℝ) ≤ (1 + 2 * ((m : ℝ) + 1) / δ) ^ n := by
@@ -66,20 +66,19 @@ theorem GaussShell.proof (hP : GaussPacking.Statement) (hT : GaussTermBound.Stat
   have hb0 : (0 : ℝ) ≤ 1 + 2 * ((m : ℝ) + 1) / δ := by
     have : 0 ≤ 2 * ((m : ℝ) + 1) / δ := div_nonneg (by linarith) hδ.le
     linarith
-  have hpow : (1 + 2 * ((m : ℝ) + 1) / δ) ^ n ≤
-      3 ^ n * ((m : ℝ) + 1) ^ n * (1 + 1 / δ) ^ n := by
+  have hpow : (1 + 2 * ((m : ℝ) + 1) / δ) ^ n ≤ 3 ^ n * ((m : ℝ) + 1) ^ n * (1 + 1 / δ) ^ n := by
     rw [← mul_pow, ← mul_pow]
     exact pow_le_pow_left₀ hb0 (PGaussShell.base_le _ _ hm0 hδ) n
-  calc ∑ μ ∈ T, Real.exp (-π * ‖(μ : EuclideanSpace ℝ (Fin n))‖ ^ 2)
+  calc
+    ∑ μ ∈ T, Real.exp (-π * ‖(μ : EuclideanSpace ℝ (Fin n))‖ ^ 2)
       ≤ (T.card : ℝ) * Real.exp (-π * (m : ℝ) ^ 2) := hsum
     _ ≤ 3 ^ n * ((m : ℝ) + 1) ^ n * (1 + 1 / δ) ^ n * Real.exp (-π * (m : ℝ) ^ 2) :=
-        mul_le_mul_of_nonneg_right (hcard.trans hpow) (Real.exp_pos _).le
+      mul_le_mul_of_nonneg_right (hcard.trans hpow) (Real.exp_pos _).le
     _ = 3 ^ n * (1 + 1 / δ) ^ n * (((m : ℝ) + 1) ^ n * Real.exp (-π * (m : ℝ) ^ 2)) := by ring
-    _ ≤ 3 ^ n * (1 + 1 / δ) ^ n * (√(n : ℝ) ^ n * Real.exp √(n : ℝ) *
-          Real.exp (n / (2 * π)) * Real.exp (-(m : ℝ))) :=
-        mul_le_mul_of_nonneg_left (hT n hn m) (by positivity)
-    _ = gaussShellConst n * (1 + 1 / δ) ^ n * Real.exp (-(m : ℝ)) := by
-        unfold gaussShellConst; ring
+    _ ≤ 3 ^ n * (1 + 1 / δ) ^ n
+        * (√(n : ℝ) ^ n * Real.exp √(n : ℝ) * Real.exp (n / (2 * π)) * Real.exp (-(m : ℝ))) :=
+      mul_le_mul_of_nonneg_left (hT n hn m) (by positivity)
+    _ = gaussShellConst n * (1 + 1 / δ) ^ n * Real.exp (-(m : ℝ)) := by unfold gaussShellConst; ring
 
 end
 

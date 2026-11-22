@@ -12,16 +12,15 @@ namespace Formalism.FourierDecayAlt.P.MajorantIntegrals
 
 open Formalism.FourierDecayAlt.crystallineComparison
 
-theorem radial_eq (K : ℕ) (x : ℝ) (hx : 0 < x) (y : ℝ) (hy : 0 < y) :
-    y ^ (Module.finrank ℝ ℂ - 1) • mfac K x y =
-      if y ≤ x then y else x ^ K * y ^ ((1 : ℝ) - K) := by
+theorem radial_eq (K : ℕ) (x : ℝ) (hx : 0 < x) (y : ℝ) (hy : 0 < y)
+    : y ^ (Module.finrank ℝ ℂ - 1) • mfac K x y
+      = if y ≤ x then y else x ^ K * y ^ ((1 : ℝ) - K) := by
   rw [Complex.finrank_real_complex]
   simp only [mfac, hy.ne', if_false, smul_eq_mul, show 2 - 1 = 1 from rfl, pow_one]
   split_ifs with hxy
   · rw [min_eq_left (one_le_pow₀ ((one_le_div hy).mpr hxy)), mul_one]
   · push Not at hxy
-    have h1 : (x / y) ^ K ≤ 1 :=
-      pow_le_one₀ (div_nonneg hx.le hy.le) ((div_le_one hy).mpr hxy.le)
+    have h1 : (x / y) ^ K ≤ 1 := pow_le_one₀ (div_nonneg hx.le hy.le) ((div_le_one hy).mpr hxy.le)
     rw [min_eq_right h1, Real.rpow_sub hy, Real.rpow_one, Real.rpow_natCast, div_pow]
     field_simp
 
@@ -31,9 +30,11 @@ theorem volC : (volume : Measure ℂ).real (Metric.ball 0 1) = Real.pi := by
 theorem majIntegral_ok : MajIntegral := by
   intro K x hK hx
   have hK' : (2 : ℝ) < K := by exact_mod_cast hK
-  have hcongr : EqOn (fun y : ℝ => y ^ (Module.finrank ℝ ℂ - 1) • mfac K x y)
-      (fun y => if y ≤ x then y else x ^ K * y ^ ((1 : ℝ) - K)) (Ioi 0) :=
-    fun y hy => radial_eq K x hx y hy
+  have hcongr : EqOn
+      (fun y : ℝ => y ^ (Module.finrank ℝ ℂ - 1) • mfac K x y)
+      (fun y => if y ≤ x then y else x ^ K * y ^ ((1 : ℝ) - K))
+      (Ioi 0) := fun y hy =>
+    radial_eq K x hx y hy
   have hIoc : IntegrableOn (fun y : ℝ => y) (Ioc 0 x) :=
     (continuous_id.integrableOn_Icc).mono_set Ioc_subset_Icc_self
   have hIoi : IntegrableOn (fun y : ℝ => x ^ K * y ^ ((1 : ℝ) - K)) (Ioi x) :=
@@ -69,10 +70,17 @@ theorem majIntegral_ok : MajIntegral := by
 theorem majIntegralProd_ok : MajIntegralProd := by
   intro f K x hK hx
   have h1 := fun v => (majIntegral_ok K (x v) hK (hx v))
-  refine ⟨Integrable.fintype_prod (f := fun v (l : ℂ) => mfac K (x v) ‖l‖)
-    (μ := fun _ => volume) (fun v => (h1 v).1), ?_⟩
-  have h2 := integral_fintype_prod_volume_eq_prod (ι := Fin f) (E := fun _ => ℂ)
-    (fun v (l : ℂ) => mfac K (x v) ‖l‖)
+  refine ⟨
+    Integrable.fintype_prod
+      (f := fun v (l : ℂ) => mfac K (x v) ‖l‖)
+      (μ := fun _ => volume)
+      (fun v => (h1 v).1),
+    ?_
+  ⟩
+  have h2 :=
+    integral_fintype_prod_volume_eq_prod (ι := Fin f)
+      (E := fun _ => ℂ)
+      (fun v (l : ℂ) => mfac K (x v) ‖l‖)
   exact h2.trans (Finset.prod_congr rfl (fun v _ => (h1 v).2))
 
 end Formalism.FourierDecayAlt.P.MajorantIntegrals

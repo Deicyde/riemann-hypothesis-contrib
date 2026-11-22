@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.LevelsUsed
 
 @[expose] public section
 
-open Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.UnitaryBoundIntegral Formalism.L2.DIV Formalism.L2.Pj Formalism.BasicNotions GlobalTheory.GoodDepth NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.UnitaryBoundIntegral
+  Formalism.L2.DIV Formalism.L2.Pj Formalism.BasicNotions GlobalTheory.GoodDepth NumberField
+  IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.RowBudgets
 
@@ -17,10 +19,15 @@ lemma level_le (k l : ℕ) (hk : 1 ≤ k) (hl : 5 ≤ l) :
   rw [e]
   linarith
 
-theorem main : ∀ (r f n m nW T l k : ℕ) (b L A : ℝ), 1 ≤ m → m ≤ n → n ≤ r → 2 ≤ f → 1 ≤ T → n + 1 = k → 3 ≤ L → Real.log k ≤ L → 10 * (r : ℝ) * (f + (f : ℝ) ^ 2 * (n : ℝ) ^ 3 * L ^ 2 / m) ≤ nW →
-  8 * r * f ≤ nW ∧ (5 ≤ l → f * (RF.i0 k l * n) + 2 * r * f ≤ nW) ∧
-  (3 ≤ l → 0 ≤ b → m * b / (T * f * (n : ℝ) ^ 3 * L) ≤ l → ∃ s : ℕ, 4 * r * s * f ≤ nW ∧ ∀ x : ℕ, (T : ℝ) * x ≤ 3 * b → x ≤ s * (l - 1)) ∧
-  (0 < l → (l : ℝ) < m * b / (T * f * (n : ℝ) ^ 3 * L) → b ≤ A → T * f * (n : ℝ) ^ 3 * Real.log k ^ 2 ≤ Real.log k * m * A / l) := by
+theorem main
+    : ∀ (r f n m nW T l k : ℕ) (b L A : ℝ),
+      1 ≤ m → m ≤ n → n ≤ r → 2 ≤ f → 1 ≤ T → n + 1 = k → 3 ≤ L → Real.log k ≤ L
+        → 10 * (r : ℝ) * (f + (f : ℝ) ^ 2 * (n : ℝ) ^ 3 * L ^ 2 / m) ≤ nW
+        → 8 * r * f ≤ nW ∧ (5 ≤ l → f * (RF.i0 k l * n) + 2 * r * f ≤ nW)
+          ∧ (3 ≤ l → 0 ≤ b → m * b / (T * f * (n : ℝ) ^ 3 * L) ≤ l
+            → ∃ s : ℕ, 4 * r * s * f ≤ nW ∧ ∀ x : ℕ, (T : ℝ) * x ≤ 3 * b → x ≤ s * (l - 1))
+          ∧ (0 < l → (l : ℝ) < m * b / (T * f * (n : ℝ) ^ 3 * L) → b ≤ A
+            → T * f * (n : ℝ) ^ 3 * Real.log k ^ 2 ≤ Real.log k * m * A / l) := by
   intro r f n m nW T l k b L A hm hmn hnr hf hT hk hL hkL hW
   have hm' : (1 : ℝ) ≤ m := by exact_mod_cast hm
   have hmn' : (m : ℝ) ≤ n := by exact_mod_cast hmn
@@ -36,7 +43,8 @@ theorem main : ∀ (r f n m nW T l k : ℕ) (b L A : ℝ), 1 ≤ m → m ≤ n �
   have hYm : Y * m = f * (n : ℝ) ^ 3 * L := by rw [hY]; field_simp
   have hW' : 10 * ((r : ℝ) * f) + 10 * L * (r * f * Y) ≤ nW := by
     refine le_of_eq_of_le ?_ hW
-    rw [hY]; ring
+    rw [hY]
+    ring
   have hYL : L ≤ Y := by
     rw [hY, le_div_iff₀ (by positivity)]
     have h1 : (m : ℝ) ≤ (n : ℝ) ^ 3 := hmn'.trans (le_self_pow₀ hn' (by norm_num))
@@ -62,7 +70,9 @@ theorem main : ∀ (r f n m nW T l k : ℕ) (b L A : ℝ), 1 ≤ m → m ≤ n �
     rw [div_le_iff₀ hD] at h
     have hbY : b ≤ l * T * Y := by
       refine le_of_mul_le_mul_left (a := (m : ℝ)) ?_ (by linarith)
-      calc (m : ℝ) * b ≤ l * (T * f * (n : ℝ) ^ 3 * L) := h
+      calc
+        (m : ℝ) * b
+          ≤ l * (T * f * (n : ℝ) ^ 3 * L) := h
         _ = l * T * (Y * m) := by rw [hYm]; ring
         _ = _ := by ring
     have hTY : (0 : ℝ) ≤ T * Y := mul_nonneg (by linarith) (by linarith)
@@ -80,8 +90,7 @@ theorem main : ∀ (r f n m nW T l k : ℕ) (b L A : ℝ), 1 ≤ m → m ≤ n �
       have h2 : (x : ℝ) ≤ (⌈3 * b / (T * ((l : ℝ) - 1))⌉₊ : ℝ) * ((l : ℝ) - 1) := by
         refine le_of_mul_le_mul_left (a := (T : ℝ)) ?_ (by linarith)
         linarith
-      have h3 : ((l : ℝ) - 1) = ((l - 1 : ℕ) : ℝ) := by
-        rw [Nat.cast_sub (by omega)]; simp
+      have h3 : ((l : ℝ) - 1) = ((l - 1 : ℕ) : ℝ) := by rw [Nat.cast_sub (by omega)]; simp
       generalize ⌈3 * b / (T * ((l : ℝ) - 1))⌉₊ = s at h2 ⊢
       rw [h3] at h2
       exact_mod_cast h2
@@ -89,8 +98,7 @@ theorem main : ∀ (r f n m nW T l k : ℕ) (b L A : ℝ), 1 ≤ m → m ≤ n �
     rw [lt_div_iff₀ hD] at h
     rw [le_div_iff₀ hl']
     have h1 : (m : ℝ) * b ≤ m * A := mul_le_mul_of_nonneg_left hA (by linarith)
-    have h2 : l * (T * f * (n : ℝ) ^ 3 * Real.log k) ≤ l * (T * f * (n : ℝ) ^ 3 * L) := by
-      gcongr
+    have h2 : l * (T * f * (n : ℝ) ^ 3 * Real.log k) ≤ l * (T * f * (n : ℝ) ^ 3 * L) := by gcongr
     have h3 := mul_le_mul_of_nonneg_left (h2.trans (h.le.trans h1)) hlog
     linarith
 

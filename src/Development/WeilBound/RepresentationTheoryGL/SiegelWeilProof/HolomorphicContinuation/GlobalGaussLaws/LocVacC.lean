@@ -15,7 +15,8 @@ variable {n : ℕ}
 
 theorem inG_JJ : InG (JJ n) := by
   unfold InG
-  rw [JJ_conjTranspose, Matrix.mul_assoc, JJ_sq, Matrix.neg_mul, Matrix.mul_neg, Matrix.mul_one, neg_neg]
+  rw [JJ_conjTranspose, Matrix.mul_assoc, JJ_sq, Matrix.neg_mul, Matrix.mul_neg, Matrix.mul_one,
+    neg_neg]
 
 theorem nU_mul (b c : Matrix (Fin n) (Fin n) ℂ) : nU b * nU c = nU (b + c) := by
   simp [nU, fromBlocks_multiply, add_comm]
@@ -25,10 +26,15 @@ theorem nU_zero : nU (0 : Matrix (Fin n) (Fin n) ℂ) = 1 := by simp [nU, fromBl
 theorem inG_nU {b : Matrix (Fin n) (Fin n) ℂ} (hb : b.IsHermitian) : InG (nU b) := by
   unfold InG; simp [nU, JJ, fromBlocks_conjTranspose, fromBlocks_multiply, hb.eq]
 
-def jjE : GR n := ⟨⟨JJ n, -JJ n, by rw [Matrix.mul_neg, JJ_sq, neg_neg], by rw [Matrix.neg_mul, JJ_sq, neg_neg]⟩, inG_JJ⟩
+def jjE : GR n := ⟨
+  ⟨JJ n, - JJ n, by rw [Matrix.mul_neg, JJ_sq, neg_neg], by rw [Matrix.neg_mul, JJ_sq, neg_neg]⟩,
+  inG_JJ
+⟩
 
-def nuE (b : Matrix (Fin n) (Fin n) ℂ) (hb : b.IsHermitian) : GR n :=
-  ⟨⟨nU b, nU (-b), by rw [nU_mul, add_neg_cancel, nU_zero], by rw [nU_mul, neg_add_cancel, nU_zero]⟩, inG_nU hb⟩
+def nuE (b : Matrix (Fin n) (Fin n) ℂ) (hb : b.IsHermitian) : GR n := ⟨
+  ⟨nU b, nU (-b), by rw [nU_mul, add_neg_cancel, nU_zero], by rw [nU_mul, neg_add_cancel, nU_zero]⟩,
+  inG_nU hb
+⟩
 
 def nbar (s : ℝ) : M2 n := fromBlocks 1 0 ((s : ℂ) • 1) 1
 
@@ -39,10 +45,18 @@ theorem nbar_zero : nbar (n := n) 0 = 1 := by simp [nbar, fromBlocks_one]
 
 theorem inG_nbar (s : ℝ) : InG (nbar (n := n) s) := by
   unfold InG
-  simp [nbar, JJ, fromBlocks_conjTranspose, fromBlocks_multiply, Matrix.conjTranspose_smul, Complex.conj_ofReal]
+  simp [nbar, JJ, fromBlocks_conjTranspose, fromBlocks_multiply, Matrix.conjTranspose_smul,
+    Complex.conj_ofReal]
 
-def nbE (s : ℝ) : GR n :=
-  ⟨⟨nbar s, nbar (-s), by rw [nbar_mul, add_neg_cancel, nbar_zero], by rw [nbar_mul, neg_add_cancel, nbar_zero]⟩, inG_nbar s⟩
+def nbE (s : ℝ) : GR n := ⟨
+  ⟨
+    nbar s,
+    nbar (-s),
+    by rw [nbar_mul, add_neg_cancel, nbar_zero],
+    by rw [nbar_mul, neg_add_cancel, nbar_zero]
+  ⟩,
+  inG_nbar s
+⟩
 
 theorem nbE_zero : nbE (n := n) 0 = 1 := Subtype.ext (Units.ext nbar_zero)
 
@@ -56,15 +70,15 @@ theorem cont_nbE : Continuous (nbE (n := n)) := by
   refine Units.continuous_iff.mpr ⟨cont_nbar, ?_⟩
   exact cont_nbar.comp continuous_neg
 
-theorem lower_left_block_mul_lowering (g : GR n) (s : ℝ) :
-    (mR (g * nbE s)).toBlocks₂₁ = (mR g).toBlocks₂₁ + (s : ℂ) • (mR g).toBlocks₂₂ := by
+theorem lower_left_block_mul_lowering (g : GR n) (s : ℝ)
+    : (mR (g * nbE s)).toBlocks₂₁ = (mR g).toBlocks₂₁ + (s : ℂ) • (mR g).toBlocks₂₂ := by
   rw [mR_mul]
   conv_lhs => rw [← fromBlocks_toBlocks (mR g)]
   show (fromBlocks _ _ _ _ * nbar s).toBlocks₂₁ = _
   simp [nbar, fromBlocks_multiply]
 
-theorem finite_bad (g : GR n) :
-    {s : ℝ | ((mR g).toBlocks₂₁ + (s : ℂ) • (mR g).toBlocks₂₂).det = 0}.Finite := by
+theorem finite_bad (g : GR n)
+    : {s : ℝ | ((mR g).toBlocks₂₁ + (s : ℂ) • (mR g).toBlocks₂₂).det = 0}.Finite := by
   set C := (mR g).toBlocks₂₁
   set D := (mR g).toBlocks₂₂
   set P : Polynomial ℂ := det (C.map Polynomial.C + (Polynomial.X : Polynomial ℂ) • D.map Polynomial.C) with hP
@@ -104,16 +118,18 @@ theorem dense_cell : Dense {g : GR n | ((mR g).toBlocks₂₁).det ≠ 0} := by
   have hfin := finite_bad g
   have hZ : IsClosed ({s : ℝ | ((mR g).toBlocks₂₁ + (s : ℂ) • (mR g).toBlocks₂₂).det = 0} \ {0}) :=
     (hfin.subset Set.sdiff_subset).isClosed
-  have h0 : (0 : ℝ) ∉ ({s : ℝ | ((mR g).toBlocks₂₁ + (s : ℂ) • (mR g).toBlocks₂₂).det = 0} \ {0}) := by simp
+  have h0
+      : (0 : ℝ) ∉ ({s : ℝ | ((mR g).toBlocks₂₁ + (s : ℂ) • (mR g).toBlocks₂₂).det = 0} \ {0}) := by
+    simp
   filter_upwards [mem_nhdsWithin_of_mem_nhds (hZ.isOpen_compl.mem_nhds h0), self_mem_nhdsWithin] with s hs hs0
   show ((mR (g * nbE s)).toBlocks₂₁).det ≠ 0
   rw [lower_left_block_mul_lowering]
   intro hdet
   exact hs ⟨hdet, hs0⟩
 
-theorem bigcell (g : GR n) (hγ : ((mR g).toBlocks₂₁).det ≠ 0) :
-    ∃ (y h : GR n) (b : Matrix (Fin n) (Fin n) ℂ), (mR y).toBlocks₂₁ = 0 ∧ b.IsHermitian ∧ mR h = JJ n * nU b ∧
-      g = y * h := by
+theorem bigcell (g : GR n) (hγ : ((mR g).toBlocks₂₁).det ≠ 0)
+    : ∃ (y h : GR n) (b : Matrix (Fin n) (Fin n) ℂ),
+      (mR y).toBlocks₂₁ = 0 ∧ b.IsHermitian ∧ mR h = JJ n * nU b ∧ g = y * h := by
   set C := (mR g).toBlocks₂₁ with hC
   set D := (mR g).toBlocks₂₂ with hD
   have hu : IsUnit C.det := isUnit_iff_ne_zero.mpr hγ
@@ -123,11 +139,13 @@ theorem bigcell (g : GR n) (hγ : ((mR g).toBlocks₂₁).det ≠ 0) :
   have hb : (C⁻¹ * D).IsHermitian := by
     unfold Matrix.IsHermitian
     rw [conjTranspose_mul, conjTranspose_nonsing_inv]
-    calc Dᴴ * Cᴴ⁻¹ = C⁻¹ * (C * Dᴴ) * Cᴴ⁻¹ := by rw [nonsing_inv_mul_cancel_left C _ hu]
+    calc
+      Dᴴ * Cᴴ⁻¹
+        = C⁻¹ * (C * Dᴴ) * Cᴴ⁻¹ := by rw [nonsing_inv_mul_cancel_left C _ hu]
       _ = C⁻¹ * (D * Cᴴ) * Cᴴ⁻¹ := by rw [hC, hD, lagr g]
       _ = C⁻¹ * D := by rw [← Matrix.mul_assoc, mul_nonsing_inv_cancel_right Cᴴ _ huH]
   refine ⟨g * (jjE * nuE (C⁻¹ * D) hb)⁻¹, jjE * nuE (C⁻¹ * D) hb, C⁻¹ * D, ?_, hb, ?_, by group⟩
-  · have hinv : mR (jjE * nuE (C⁻¹ * D) hb)⁻¹ = nU (-(C⁻¹ * D)) * (-JJ n) := by
+  · have hinv : mR (jjE * nuE (C⁻¹ * D) hb)⁻¹ = nU (-(C⁻¹ * D)) * (- JJ n) := by
       rw [_root_.mul_inv_rev, mR_mul]
       rfl
     rw [mR_mul, hinv]

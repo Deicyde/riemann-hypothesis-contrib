@@ -18,7 +18,9 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.Local
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands
+  GlobalTheory.GLq
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -27,11 +29,13 @@ namespace UpperTheory.Zero.LLC
 
 section Pure
 
-private def eta {I K : Type} [Group I] [Field K] (g n : ℕ) (R : I →* Kˣ) (θ : Kˣ →* ℂˣ) (j : ℤ) : I →* ℂˣ :=
+private def eta {I K : Type} [Group I] [Field K] (g n : ℕ) (R : I →* Kˣ) (θ : Kˣ →* ℂˣ) (j : ℤ)
+    : I →* ℂˣ :=
   (θ ^ g ^ (j % (n : ℤ)).toNat).comp R
 
-private theorem eta_apply {I K : Type} [Group I] [Field K] (g n : ℕ) (R : I →* Kˣ) (θ : Kˣ →* ℂˣ) (j : ℤ) (t : I) :
-    eta g n R θ j t = θ (R t) ^ g ^ (j % (n : ℤ)).toNat := by
+private theorem eta_apply
+    {I K : Type} [Group I] [Field K] (g n : ℕ) (R : I →* Kˣ) (θ : Kˣ →* ℂˣ) (j : ℤ) (t : I)
+    : eta g n R θ j t = θ (R t) ^ g ^ (j % (n : ℤ)).toNat := by
   simp [eta, MonoidHom.pow_apply]
 
 end Pure
@@ -62,8 +66,8 @@ theorem parEx : ParEx := by
   letI : Fintype D.K := Fintype.ofFinite _
   have hcard : Fintype.card D.K = g ^ n := by
     rw [Module.card_eq_pow_finrank (K := ZMod g), ZMod.card, hrank]
-  have hfix : ∀ x : D.Kˣ, x ^ g ^ n = x := fun x => Units.ext (by
-    rw [Units.val_pow_eq_pow_val, ← hcard, FiniteField.pow_card])
+  have hfix : ∀ x : D.Kˣ, x ^ g ^ n = x := fun x =>
+    Units.ext (by rw [Units.val_pow_eq_pow_val, ← hcard, FiniteField.pow_card])
   have hper : ∀ (x : D.Kˣ) (q r : ℕ), x ^ g ^ (n * q + r) = x ^ g ^ r := by
     intro x q r
     induction q with
@@ -95,8 +99,9 @@ theorem parEx : ParEx := by
     intro t ht
     rw [MonoidHom.mem_ker] at ht ⊢
     rw [heta, ht, one_pow, map_one]
-  have hshift : ∀ (j : ℤ) (t t' : ↥(Ine A)), (ineIncl h) t' = φ * (ineIncl h) t * φ⁻¹ →
-      eta g n R θ j t' = eta g n R θ (j + 1) t := by
+  have hshift
+      : ∀ (j : ℤ) (t t' : ↥(Ine A)),
+        (ineIncl h) t' = φ * (ineIncl h) t * φ⁻¹ → eta g n R θ j t' = eta g n R θ (j + 1) t := by
     intro j t t' ht
     rw [heta, heta, hT.frob φ t t' hφ ht, ← pow_mul, ← pow_succ']
     congr 1
@@ -118,8 +123,8 @@ theorem parEx : ParEx := by
     · intro hd
       have h3 : j % (n : ℤ) = j' % n := (Int.modEq_iff_dvd.mpr hd).symm
       simp only [eta, h3]
-  obtain ⟨V, hVirr, hVdim, hVφ, hVine, hVtame⟩ := indEx E Ω A w h φ hφ n hn (eta g n R θ) hopen
-    hshift hinj (ω (a φ) : ℂ) (Units.ne_zero _)
+  obtain ⟨V, hVirr, hVdim, hVφ, hVine, hVtame⟩ :=
+    indEx E Ω A w h φ hφ n hn (eta g n R θ) hopen hshift hinj (ω (a φ) : ℂ) (Units.ne_zero _)
   have hInFor : InFor g n R θ V := by
     intro t
     rw [hVine t]
@@ -144,22 +149,32 @@ theorem parEx : ParEx := by
       intro t
       obtain ⟨u, hu1, hu2⟩ := resBase E Ω A w h a ha g i hi n hn D R hR t
       have key := hψ (GeneralLinearGroup.scalar (Fin n) u) v
-      have hred : GlobalTheory.GLp.red g n (GeneralLinearGroup.scalar (Fin n) u) =
-          GeneralLinearGroup.scalar (Fin n) (Units.map (PadicInt.toZMod : ℤ_[g] →+* ZMod g).toMonoidHom u) := by
+      have hred
+          : GlobalTheory.GLp.red g n (GeneralLinearGroup.scalar (Fin n) u)
+            = GeneralLinearGroup.scalar (Fin n)
+              (Units.map (PadicInt.toZMod : ℤ_[g] →+* ZMod g).toMonoidHom u) := by
         ext p q
-        by_cases hpq : p = q <;> simp [GlobalTheory.GLp.red, GeneralLinearGroup.scalar, Matrix.diagonal_apply, hpq]
+        by_cases hpq : p = q
+          <;> simp [GlobalTheory.GLp.red, GeneralLinearGroup.scalar, Matrix.diagonal_apply, hpq]
       set z : (HeightOneSpectrum.adicCompletion E w)ˣ :=
         Units.map (i.toRingHom.comp PadicInt.Coe.ringHom).toMonoidHom u with hz
-      have hinc : GeneralLinearGroup.map i.toRingHom (GlobalTheory.GLp.inc g n (GeneralLinearGroup.scalar (Fin n) u)) =
-          GeneralLinearGroup.scalar (Fin n) z := by
+      have hinc
+          : GeneralLinearGroup.map i.toRingHom
+              (GlobalTheory.GLp.inc g n (GeneralLinearGroup.scalar (Fin n) u))
+            = GeneralLinearGroup.scalar (Fin n) z := by
         ext p q
-        by_cases hpq : p = q <;> simp [GlobalTheory.GLp.inc, GeneralLinearGroup.scalar, Matrix.diagonal_apply, hpq, z] <;> rfl
+        by_cases hpq : p = q
+          <;> simp [GlobalTheory.GLp.inc, GeneralLinearGroup.scalar, Matrix.diagonal_apply, hpq, z]
+          <;> rfl
       rw [hred, MonoidHom.comp_apply, hinc, hNC, map_smul] at key
       rw [hω z (ψ v)] at key
       have heq := smul_left_injective ℂ hv key
       have hzeq : a (ineIncl h t) = z := Units.ext (by rw [hu1]; simp [z] <;> rfl)
-      have hpeq : ∏ j ∈ Finset.range n, R t ^ g ^ j = Units.map (algebraMap (ZMod g) D.K : ZMod g →* D.K)
-          (Units.map (PadicInt.toZMod : ℤ_[g] →+* ZMod g).toMonoidHom u) := Units.ext (by simp [hu2])
+      have hpeq
+          : ∏ j ∈ Finset.range n, R t ^ g ^ j
+            = Units.map (algebraMap (ZMod g) D.K : ZMod g →* D.K)
+              (Units.map (PadicInt.toZMod : ℤ_[g] →+* ZMod g).toMonoidHom u) :=
+        Units.ext (by simp [hu2])
       rw [hzeq, hpeq]
       exact Units.ext heq
     have hδeq : δ = ω.comp a := by
@@ -170,8 +185,11 @@ theorem parEx : ParEx := by
       · intro t
         apply Units.ext
         rw [← hδ, MonoidHom.comp_apply, ← hcent, map_prod]
-        have hpol : V.inePol ↑t = (Multiset.map (fun z => X - C z)
-            (do let b ← Multiset.map (fun j => θ (R t ^ g ^ j)) (Multiset.range n); pure (b : ℂ))).prod := by
+        have hpol
+            : V.inePol ↑t
+              = (Multiset.map (fun z => X - C z) (do
+                let b ← Multiset.map (fun j => θ (R t ^ g ^ j)) (Multiset.range n)
+                pure (b : ℂ))).prod := by
           rw [hInFor t]
           simp [Finset.prod_eq_multiset_prod, Multiset.map_map]
         rw [(hm t _ hpol).1]
@@ -186,8 +204,7 @@ theorem parEx : ParEx := by
     have hnn : n' = n := congrArg Sigma.fst hσ'
     subst n'
     have hchar := hτu σ' τ τ' (hσ'.trans hcls.symm) hτ hτ' hτi hinfl'
-    have hNτ : Names g n θ' τ := by
-      simpa only [Names, hchar] using hN'
+    have hNτ : Names g n θ' τ := by simpa only [Names, hchar] using hN'
     obtain ⟨e, he⟩ := resIndep E Ω A w h g i hi n hn D D' R R' hR hR'
     obtain ⟨hN2, hr2⟩ := hNtr D'.K e τ θ'
     obtain ⟨j, -, hj⟩ := hNuniq τ θ _ hθr (hr2 hθ'r) hθN (hN2 hNτ)

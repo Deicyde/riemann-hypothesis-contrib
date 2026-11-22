@@ -8,8 +8,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.quotOfEig :
-    ∀ {K Y ι : Type*} [Field K] [AddCommGroup Y] [Module K Y] [FiniteDimensional K Y] (A : ι → Module.End K Y), (∀ i j, Commute (A i) (A j)) → ∀ (x : ι → K) (y : Y), y ≠ 0 → (∀ i, A i y = x i • y) → ∃ φ : Module.Dual K Y, φ ≠ 0 ∧ ∀ i z, φ (A i z) = x i * φ z := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.quotOfEig
+    : ∀ {K Y ι : Type*} [Field K] [AddCommGroup Y] [Module K Y] [FiniteDimensional K Y]
+        (A : ι → Module.End K Y),
+      (∀ i j, Commute (A i) (A j))
+        → ∀ (x : ι → K) (y : Y),
+          y ≠ 0 → (∀ i, A i y = x i • y)
+            → ∃ φ : Module.Dual K Y, φ ≠ 0 ∧ ∀ i z, φ (A i z) = x i * φ z := by
   intro K Y ι _ _ _ _ A hA x y hy hAy
   have hc : ∀ i j, Commute (A i).dualMap (A j).dualMap := by
     intro i j
@@ -25,9 +30,10 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.quotOfEig :
     refine (Module.forall_dual_apply_eq_zero_iff K y).mp ?_
     intro ψ
     exact LinearMap.congr_fun h0 ψ
-  obtain ⟨ψ, hψ, hψA⟩ := eigOfQuot (fun i => (A i).dualMap) hc x (Module.Dual.eval K Y y) hne (by
-    intro i ψ
-    simp [LinearMap.dualMap_apply, hAy])
+  obtain ⟨ψ, hψ, hψA⟩ :=
+    eigOfQuot (fun i => (A i).dualMap) hc x (Module.Dual.eval K Y y) hne (by
+      intro i ψ
+      simp [LinearMap.dualMap_apply, hAy])
   refine ⟨ψ, hψ, fun i z => ?_⟩
   have := LinearMap.congr_fun (hψA i) z
   simpa [LinearMap.dualMap_apply] using this

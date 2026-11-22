@@ -9,7 +9,8 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.RestC
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker
+  Classical
 
 section Pd
 

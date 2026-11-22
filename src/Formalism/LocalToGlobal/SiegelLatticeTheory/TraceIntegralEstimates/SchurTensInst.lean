@@ -21,8 +21,8 @@ section Loc
 
 variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-theorem unitRep_of_URepOn {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hU : IsURepOn (UJset ε) σ) :
-    IsUnitRep (fun g : Formalism.REAL.UJ ε => σ (uMat g)) := by
+theorem unitRep_of_URepOn {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hU : IsURepOn (UJset ε) σ)
+    : IsUnitRep (fun g : Formalism.REAL.UJ ε => σ (uMat g)) := by
   obtain ⟨⟨h1, hmul⟩, hnorm, hcont⟩ := hU
   have hmem : ∀ g : Formalism.REAL.UJ ε, uMat g ∈ UJset ε := fun g => g.2
   refine ⟨?_, ?_, ?_, ?_⟩
@@ -33,20 +33,28 @@ theorem unitRep_of_URepOn {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} 
     rw [show uMat (x * y) = uMat x * uMat y from rfl, hmul _ (hmem x) _ (hmem y)]
     rfl
   · intro x a b
-    let Li : H →ₗᵢ[ℂ] H := { toLinearMap := (σ (uMat x)).toLinearMap, norm_map' := hnorm _ (hmem x) }
+    let Li : H →ₗᵢ[ℂ] H := {
+      toLinearMap := (σ (uMat x)).toLinearMap
+      norm_map' := hnorm _ (hmem x)
+    }
     exact Li.inner_map_map a b
   · intro a
     exact (hcont a).comp_continuous (Units.continuous_val.comp continuous_subtype_val) hmem
 
-theorem isSchur_of_isFdeg {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {d : ℝ}
-    (h : IsFdeg (Formalism.REAL.muG ε) σ d) : IsSchur (Formalism.REAL.muG ε) (fun g : Formalism.REAL.UJ ε => σ (uMat g)) d :=
+theorem isSchur_of_isFdeg
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {d : ℝ} (h : IsFdeg (Formalism.REAL.muG ε) σ d)
+    : IsSchur (Formalism.REAL.muG ε) (fun g : Formalism.REAL.UJ ε => σ (uMat g)) d :=
   ⟨h.1, fun a b a' b' => h.2 a b a' b'⟩
 
-theorem fdegOf_eq' {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {d : ℝ} (h : IsFdeg (Formalism.REAL.muG ε) σ d)
-    {w : H} (hw : w ≠ 0) : fdegOf (Formalism.REAL.muG ε) σ w = d := by
+theorem fdegOf_eq'
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {d : ℝ} (h : IsFdeg (Formalism.REAL.muG ε) σ d)
+    {w : H} (hw : w ≠ 0)
+    : fdegOf (Formalism.REAL.muG ε) σ w = d := by
   obtain ⟨hd, hI⟩ := h
   have h2 := (hI w w w w).2
-  have hc : ∀ g : Formalism.REAL.UJ ε, coefOn σ w w g * star (coefOn σ w w g) = ((‖coefOn σ w w g‖ ^ 2 : ℝ) : ℂ) := fun g => by
+  have hc
+      : ∀ g : Formalism.REAL.UJ ε,
+        coefOn σ w w g * star (coefOn σ w w g) = ((‖coefOn σ w w g‖ ^ 2 : ℝ) : ℂ) := fun g => by
     rw [Complex.star_def]
     rw [RCLike.mul_conj (K := ℂ)]
     norm_cast
@@ -56,7 +64,9 @@ theorem fdegOf_eq' {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {d : �
   simp only [hc] at h2
   rw [integral_complex_ofReal, hin] at h2
   have hr : (∫ g, ‖coefOn σ w w g‖ ^ 2 ∂(Formalism.REAL.muG ε)) = ‖w‖ ^ 4 / d := by
-    have h3 : ((∫ g, ‖coefOn σ w w g‖ ^ 2 ∂(Formalism.REAL.muG ε) : ℝ) : ℂ) = ((‖w‖ ^ 4 / d : ℝ) : ℂ) := by
+    have h3
+        : ((∫ g, ‖coefOn σ w w g‖ ^ 2 ∂(Formalism.REAL.muG ε) : ℝ) : ℂ)
+          = ((‖w‖ ^ 4 / d : ℝ) : ℂ) := by
       rw [h2]
       push_cast
       ring
@@ -85,10 +95,15 @@ theorem stepSchurG_holds : Formalism.L2.SG.RealObj.EnergyInst.StepSchurG := by
     have he : X.dv v = d := fdegOf_eq' hd hw0
     rw [he]
     exact hd
-  have hT : IsTensAbs (fun v (g : Formalism.REAL.UJ (X.B.I.ε v)) => X.B.σ v (uMat g)) X.B.σs X.B.tens :=
+  have hT
+      : IsTensAbs (fun v (g : Formalism.REAL.UJ (X.B.I.ε v)) => X.B.σ v (uMat g)) X.B.σs X.B.tens :=
     X.B.tens_spec
   refine ⟨isUnitRep_tens hU hT, ?_, ?_, ?_⟩
-  · exact isSchur_tens (fun v => Formalism.REAL.muG (X.B.I.ε v)) X.dv hU (fun v => isSchur_of_isFdeg (hF v)) hT
+  · exact isSchur_tens
+      (fun v => Formalism.REAL.muG (X.B.I.ε v))
+      X.dv hU
+      (fun v => isSchur_of_isFdeg (hF v))
+      hT
   · have h1 := X.B.tens_spec.1 X.B.w X.B.w
     have h2 : ∏ v, ⟪X.B.w v, X.B.w v⟫_ℂ = 1 := by
       refine Finset.prod_eq_one fun v _ => ?_
@@ -102,7 +117,8 @@ theorem stepSchurG_holds : Formalism.L2.SG.RealObj.EnergyInst.StepSchurG := by
     have h4 := norm_nonneg (X.B.tens X.B.w)
     nlinarith [h3, h4]
   · intro y
-    simp only [Formalism.L2.SG.ProjRows.phInf, Formalism.L2.SG.ProjRows.mInf, Formalism.L2.SG.RealObj.degX]
+    simp only [Formalism.L2.SG.ProjRows.phInf, Formalism.L2.SG.ProjRows.mInf,
+      Formalism.L2.SG.RealObj.degX]
     rw [X.B.tens_spec.2.1 y, X.B.tens_spec.1]
     rfl
 

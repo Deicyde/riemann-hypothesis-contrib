@@ -8,17 +8,20 @@ public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.Lan
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
 private theorem nat_le_one' {l : ℕ} [Fact l.Prime] (a : ℕ) : ‖(a : Qbar l)‖ ≤ 1 :=
   IsUltrametricDist.norm_natCast_le_one (PadicAlgCl l) a
 
-private theorem dd_mul_eq_dd_mul_add_mul_dd {R : Type} [CommRing R] (f g : PowerSeries R) :
-    dd (f * g) = dd f * g + f * dd g := by
+private theorem dd_mul_eq_dd_mul_add_mul_dd {R : Type} [CommRing R] (f g : PowerSeries R)
+    : dd (f * g) = dd f * g + f * dd g := by
   simp [dd]; ring
 
-private theorem dl_mul_eq_add_of_isUnit {R : Type} [CommRing R] {f g : PowerSeries R}
-    (hf : IsUnit f) (hg : IsUnit g) : dl (f * g) = dl f + dl g := by
+private theorem dl_mul_eq_add_of_isUnit
+    {R : Type} [CommRing R] {f g : PowerSeries R} (hf : IsUnit f) (hg : IsUnit g)
+    : dl (f * g) = dl f + dl g := by
   obtain ⟨u, rfl⟩ := hf
   obtain ⟨v, rfl⟩ := hg
   simp only [dl, ← Units.val_mul, Ring.inverse_unit]
@@ -27,8 +30,7 @@ private theorem dl_mul_eq_add_of_isUnit {R : Type} [CommRing R] {f g : PowerSeri
   have h2 : (v : PowerSeries R) * ↑v⁻¹ = 1 := v.mul_inv
   linear_combination (dd (u : PowerSeries R) * ↑u⁻¹) * h2 + (dd (v : PowerSeries R) * ↑v⁻¹) * h1
 
-theorem UpperTheory.Kd.C7.pRepAdd :
-    UpperTheory.Kd.C7.SRepAdd := by
+theorem UpperTheory.Kd.C7.pRepAdd : UpperTheory.Kd.C7.SRepAdd := by
   intro l _ hl Ω _ _ _ A hA j Φ c β ζ hζ
   have hB := (pBasEx l c).2 β
   have hpv : ∀ (P Q : Polynomial (R0 A)) (z : Ω), pv (P * Q) z = pv P z * pv Q z := by
@@ -43,10 +45,14 @@ theorem UpperTheory.Kd.C7.pRepAdd :
     have hc₂ : m - max c₁ c₂ ≤ m - c₂ := Nat.sub_le_sub_left (le_max_right _ _) m
     obtain ⟨P, hP, hPL⟩ := h₁ m hm₁
     obtain ⟨P', hP', hPL'⟩ := h₂ m hm₂
-    have hQ := pPresMono l hl Ω A hA c β ζ hζ Z Z m (m - c₁) (m - max c₁ c₂) P hc₁
-      (fun s _ => by simp [Cg]) hP
-    have hQ' := pPresMono l hl Ω A hA c β ζ hζ Z' Z' m (m - c₂) (m - max c₁ c₂) P' hc₂
-      (fun s _ => by simp [Cg]) hP'
+    have hQ :=
+      pPresMono l hl Ω A hA c β ζ hζ Z Z m (m - c₁) (m - max c₁ c₂) P hc₁
+        (fun s _ => by simp [Cg])
+        hP
+    have hQ' :=
+      pPresMono l hl Ω A hA c β ζ hζ Z' Z' m (m - c₂) (m - max c₁ c₂) P' hc₂
+        (fun s _ => by simp [Cg])
+        hP'
     unfold UpperTheory.Kd.C7.BPres GlobalTheory.Col.KumPres at hQ hQ'
     obtain ⟨hprim, hnr, hu, ho, hk⟩ := hQ
     obtain ⟨-, -, hu', -, hk'⟩ := hQ'
@@ -67,21 +73,24 @@ theorem UpperTheory.Kd.C7.pRepAdd :
         · dsimp only
           rw [hpv]
           exact (halg _ _ _ _ (hkv i) (hkv' i)).1
-        · have hNz : NeZero (l ^ (m - max c₁ c₂)) :=
-            ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
-          have key : ∀ i, (((k + k') i).val : Qbar l) = (k i).val + (k' i).val
-              - (l : Qbar l) ^ (m - max c₁ c₂)
-                * ((((k i).val + (k' i).val) / l ^ (m - max c₁ c₂) : ℕ) : Qbar l) := by
+        · have hNz : NeZero (l ^ (m - max c₁ c₂)) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
+          have key
+              : ∀ i,
+                (((k + k') i).val : Qbar l)
+                  = (k i).val + (k' i).val
+                    - (l : Qbar l) ^ (m - max c₁ c₂)
+                      * ((((k i).val + (k' i).val) / l ^ (m - max c₁ c₂) : ℕ) : Qbar l) := by
             intro i
             rw [Pi.add_apply, ZMod.val_add, eq_sub_iff_add_eq]
             exact_mod_cast Nat.mod_add_div ((k i).val + (k' i).val) (l ^ (m - max c₁ c₂))
           unfold Cg at hkc hkc' ⊢
           dsimp only
-          have hsplit : Z m s 1 + Z' m s 1 - ∑ i, β.val i * (((k + k') i).val : Qbar l)
-              = (Z m s 1 - ∑ i, β.val i * ((k i).val : Qbar l))
-                + (Z' m s 1 - ∑ i, β.val i * ((k' i).val : Qbar l))
-                + ∑ i, β.val i * ((l : Qbar l) ^ (m - max c₁ c₂)
-                  * ((((k i).val + (k' i).val) / l ^ (m - max c₁ c₂) : ℕ) : Qbar l)) := by
+          have hsplit
+              : Z m s 1 + Z' m s 1 - ∑ i, β.val i * (((k + k') i).val : Qbar l)
+                = (Z m s 1 - ∑ i, β.val i * ((k i).val : Qbar l))
+                  + (Z' m s 1 - ∑ i, β.val i * ((k' i).val : Qbar l))
+                  + ∑ i, β.val i * ((l : Qbar l) ^ (m - max c₁ c₂)
+                    * ((((k i).val + (k' i).val) / l ^ (m - max c₁ c₂) : ℕ) : Qbar l)) := by
             simp only [key, mul_sub, mul_add, Finset.sum_sub_distrib, Finset.sum_add_distrib]
             ring
           rw [hsplit]
@@ -92,8 +101,9 @@ theorem UpperTheory.Kd.C7.pRepAdd :
           rw [norm_mul, norm_mul]
           have h1 := ho i
           have h2 := nat_le_one' (l := l) (((k i).val + (k' i).val) / l ^ (m - max c₁ c₂))
-          calc _ ≤ 1 * (‖(l : Qbar l) ^ (m - max c₁ c₂)‖ * 1) :=
-                mul_le_mul h1 (mul_le_mul_of_nonneg_left h2 hN) (by positivity) zero_le_one
+          calc
+            _ ≤ 1 * (‖(l : Qbar l) ^ (m - max c₁ c₂)‖ * 1) :=
+              mul_le_mul h1 (mul_le_mul_of_nonneg_left h2 hN) (by positivity) zero_le_one
             _ = _ := by ring
     · have hU : IsUnit (Φ.ser (P i)) := (pWD l hl Ω A hA j Φ ζ hζ m hm0 (P i)).2 (hu i)
       have hU' : IsUnit (Φ.ser (P' i)) := (pWD l hl Ω A hA j Φ ζ hζ m hm0 (P' i)).2 (hu' i)
@@ -113,8 +123,13 @@ theorem UpperTheory.Kd.C7.pRepAdd :
   · intro Z hZ
     refine ⟨0, 0, fun m _ => ⟨fun _ => 1, ?_, fun i => ?_⟩⟩
     · unfold UpperTheory.Kd.C7.BPres GlobalTheory.Col.KumPres
-      refine ⟨by simpa using (hζ m).1, by simp, fun i => by simp [pv], fun i => hB.1 i,
-        fun s hs hcyc hsζ => ⟨0, fun i => ?_, ?_⟩⟩
+      refine ⟨
+        by simpa using (hζ m).1,
+        by simp,
+        fun i => by simp [pv],
+        fun i => hB.1 i,
+        fun s hs hcyc hsζ => ⟨0, fun i => ?_, ?_⟩
+      ⟩
       · unfold KumVal
         exact ⟨1, by simp [pv], by simp⟩
       · unfold Cg

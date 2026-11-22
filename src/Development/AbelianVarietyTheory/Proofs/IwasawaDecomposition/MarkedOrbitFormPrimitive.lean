@@ -9,20 +9,24 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan
 
 namespace OrbMark
 
-theorem eq_one_of_smul_eq_of_orbFun_evalZ_eq_one :
-    ∀ {O : Type} [CommRing O] (bar : O → O) (w0 : O) {X₀ : Type} [AddCommGroup X₀] [Module O X₀]
-      (v : LinearMap.BilinForm ℤ X₀) (hv : v ∈ balForms bar X₀), IsPrim bar (⟨v, hv⟩ : balForms bar X₀) →
-      ∀ {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X] (β : LinearMap.BilinForm ℤ X),
-        (OrbMark.orbFun O w0 v).evalZ β = 1 →
-        ∀ (k : ℕ) (β' : LinearMap.BilinForm ℤ X), (k : ℤ) • β' = β → k = 1 := by
+theorem eq_one_of_smul_eq_of_orbFun_evalZ_eq_one
+    : ∀ {O : Type} [CommRing O] (bar : O → O) (w0 : O) {X₀ : Type} [AddCommGroup X₀] [Module O X₀]
+        (v : LinearMap.BilinForm ℤ X₀) (hv : v ∈ balForms bar X₀),
+      IsPrim bar (⟨v, hv⟩ : balForms bar X₀)
+        → ∀ {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+            (β : LinearMap.BilinForm ℤ X),
+          (OrbMark.orbFun O w0 v).evalZ β = 1
+            → ∀ (k : ℕ) (β' : LinearMap.BilinForm ℤ X), (k : ℤ) • β' = β → k = 1 := by
   intro O _ bar w0 X₀ _ _ v hv hp X _ _ _ β hβ k β' hk
-  obtain ⟨τ, f, -, hf, -, H⟩ := GlobalTheory.T.exists_semilinear_pullback_of_markedOrbitIndicator w0 v β hβ
+  obtain ⟨τ, f, -, hf, -, H⟩ :=
+    GlobalTheory.T.exists_semilinear_pullback_of_markedOrbitIndicator w0 v β hβ
   have hval : ∀ (x₀ y₀ : X₀), ∃ x y, v x₀ y₀ = β x y := by
     intro x₀ y₀
     obtain ⟨x, hx⟩ := hf (Submodule.Quotient.mk x₀)
@@ -31,10 +35,11 @@ theorem eq_one_of_smul_eq_of_orbFun_evalZ_eq_one :
   have hβ' : ∀ x y, (k : ℤ) * β' x y = β x y := fun x y => by rw [← hk]; simp
   rcases Nat.eq_zero_or_pos k with rfl | hk0
   · exfalso
-    have hv0 : v = 0 := LinearMap.ext₂ fun x₀ y₀ => by
-      obtain ⟨x, y, e⟩ := hval x₀ y₀
-      rw [e, ← hβ']
-      simp
+    have hv0 : v = 0 :=
+      LinearMap.ext₂ fun x₀ y₀ => by
+        obtain ⟨x, y, e⟩ := hval x₀ y₀
+        rw [e, ← hβ']
+        simp
     exact zero_ne_one (hp 0 0 (Subtype.ext (by simp [hv0])))
   · have hkz : (k : ℤ) ≠ 0 := by exact_mod_cast hk0.ne'
     have hcan : ∀ {a b : ℤ}, (k : ℤ) * a = k * b → a = b := fun h => mul_left_cancel₀ hkz h

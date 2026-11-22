@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardAffi
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma red_art {R : Type} [CommRing R] [IsArtinianRing R] [IsReduced R] (y : R) :
@@ -22,9 +23,11 @@ private lemma red_art {R : Type} [CommRing R] [IsArtinianRing R] [IsReduced R] (
       = y * (1 - y * w) ^ n * (y ^ n * (1 - y * w)) := by ac_rfl
     _ = 0 := by rw [h, mul_zero]
 
-private theorem exists_const_sub_mem_span_tco_of_mem_rA {F L : Type} [Field F] [Field L] [Algebra ℂ F] [Algebra ℂ L] [Algebra F L]
-    [IsScalarTower ℂ F L] (d : ℕ) (x : Fin (d + 1) → Fˣ) (f : F) (hf : f ∈ rA ℂ (xv x) {0}) :
-    ∃ c : ℂ, ∃ hb : algebraMap F L f ∈ rB ℂ L (xv x) {0},
+private theorem exists_const_sub_mem_span_tco_of_mem_rA
+    {F L : Type} [Field F] [Field L] [Algebra ℂ F] [Algebra ℂ L] [Algebra F L] [IsScalarTower ℂ F L]
+    (d : ℕ) (x : Fin (d + 1) → Fˣ)
+    (f : F) (hf : f ∈ rA ℂ (xv x) {0})
+    : ∃ c : ℂ, ∃ hb : algebraMap F L f ∈ rB ℂ L (xv x) {0},
       (⟨_, hb⟩ : rB ℂ L (xv x) {0}) - algebraMap ℂ _ c ∈ Ideal.span (Set.range fun j : Fin d =>
         (⟨_, tco_mem ℂ L (xv x) j⟩ : rB ℂ L (xv x) {0})) := by
   have memB : ∀ g ∈ rA ℂ (xv x) {0}, algebraMap F L g ∈ rB ℂ L (xv x) {0} := by
@@ -108,8 +111,7 @@ private lemma fin_quot {F L : Type} [Field F] [Field L] [Algebra ℂ F] [Algebra
     rw [e, map_mul, Ideal.Quotient.eq.mpr hc', Ideal.Quotient.mk_algebraMap, ← Algebra.smul_def]
     exact Submodule.smul_mem _ c hu
 
-theorem UpperTheory.Gal.productCup_of_system.locMax_of :
-    ValBasic → LocMax := by
+theorem UpperTheory.Gal.productCup_of_system.locMax_of : ValBasic → LocMax := by
   intro _ F L _ _ _ _ _ _ d x hc hred e v hv
   obtain ⟨b, hb, hbv, heb, hev⟩ := hv
   rw [mul_zero] at hev
@@ -119,11 +121,14 @@ theorem UpperTheory.Gal.productCup_of_system.locMax_of :
       (⟨_, tco_mem ℂ L (xv x) j⟩ : rB ℂ L (xv x) {0})))) := IsArtinianRing.of_finite ℂ _
   haveI : IsReduced ((rB ℂ L (xv x) {0}) ⧸ (Ideal.span (Set.range fun j : Fin d =>
       (⟨_, tco_mem ℂ L (xv x) j⟩ : rB ℂ L (xv x) {0})))) := hred
-  obtain ⟨zq, hz⟩ := red_art (Ideal.Quotient.mk (Ideal.span (Set.range fun j : Fin d =>
-      (⟨_, tco_mem ℂ L (xv x) j⟩ : rB ℂ L (xv x) {0}))) ⟨b * v, hbv⟩)
+  obtain ⟨zq, hz⟩ :=
+    red_art (Ideal.Quotient.mk
+      (Ideal.span (Set.range fun j : Fin d => (⟨_, tco_mem ℂ L (xv x) j⟩ : rB ℂ L (xv x) {0})))
+      ⟨b * v, hbv⟩)
   obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective zq
-  have hmem : (⟨b * v, hbv⟩ : rB ℂ L (xv x) {0}) * (1 - ⟨b * v, hbv⟩ * z) ∈
-      Ideal.span (Set.range fun j : Fin d => (⟨_, tco_mem ℂ L (xv x) j⟩ : rB ℂ L (xv x) {0})) := by
+  have hmem
+      : (⟨b * v, hbv⟩ : rB ℂ L (xv x) {0}) * (1 - ⟨b * v, hbv⟩ * z) ∈ Ideal.span (Set.range
+        fun j : Fin d => (⟨_, tco_mem ℂ L (xv x) j⟩ : rB ℂ L (xv x) {0})) := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_mul, map_sub, map_one, map_mul]
     exact hz
   obtain ⟨c, hcsum⟩ := Ideal.mem_span_range_iff_exists_fun.mp hmem
@@ -137,23 +142,30 @@ theorem UpperTheory.Gal.productCup_of_system.locMax_of :
   have hs0 : ((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L) ≠ 0 := by
     intro h
     apply hes
-    rw [show (⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) = 0 from Subtype.ext h, map_zero]
-  have key : ((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L) * v =
-      ∑ l, (c l : L) * tt L x l := by
-    have h1 : (((⟨b * v, hbv⟩ : rB ℂ L (xv x) {0}) * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L) =
-        ∑ l, (c l : L) * tt L x l := by
+    rw [show (⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) = 0 from Subtype.ext h,
+      map_zero]
+  have key
+      : ((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L) * v
+        = ∑ l, (c l : L) * tt L x l := by
+    have h1
+        : (((⟨b * v, hbv⟩ : rB ℂ L (xv x) {0}) * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L)
+          = ∑ l, (c l : L) * tt L x l := by
       rw [← hcsum]
       simp [tt]
     rw [← h1]
     simp only [Subalgebra.coe_mul, Subalgebra.coe_sub, Subalgebra.coe_one]
     ring
-  refine ⟨fun l => (c l : L) * ((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L)⁻¹,
-    fun l => ⟨⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z), hes, ?_⟩, ?_⟩
+  refine ⟨
+    fun l => (c l : L) * ((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L)⁻¹,
+    fun l => ⟨⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z), hes, ?_⟩,
+    ?_
+  ⟩
   · rw [mul_comm, mul_assoc, inv_mul_cancel₀ hs0, mul_one]
     exact (c l).2
-  · calc v = ((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L)⁻¹ *
-          (((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L) * v) := by
-          rw [← mul_assoc, inv_mul_cancel₀ hs0, one_mul]
+  · calc
+      v = ((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L)⁻¹
+          * (((⟨b, hb⟩ * (1 - ⟨b * v, hbv⟩ * z) : rB ℂ L (xv x) {0}) : L) * v) := by
+        rw [← mul_assoc, inv_mul_cancel₀ hs0, one_mul]
       _ = _ := by
-          rw [key, Finset.mul_sum]
-          exact Finset.sum_congr rfl fun l _ => by ring
+        rw [key, Finset.mul_sum]
+        exact Finset.sum_congr rfl fun l _ => by ring

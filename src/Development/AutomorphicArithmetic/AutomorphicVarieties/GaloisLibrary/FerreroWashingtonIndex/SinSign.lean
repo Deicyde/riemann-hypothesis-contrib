@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-theorem UpperTheory.V.FW.sinSign :
-    ∀ x : ℝ, 0 ≤ x → Real.sin (Real.pi * x) ≠ 0 → (Real.sin (Real.pi * x) < 0 ↔ Odd ⌊x⌋₊) := by
+theorem UpperTheory.V.FW.sinSign
+    : ∀ x : ℝ, 0 ≤ x → Real.sin (Real.pi * x) ≠ 0 → (Real.sin (Real.pi * x) < 0 ↔ Odd ⌊x⌋₊) := by
   intro x hx hne
   set n := ⌊x⌋₊ with hn
   have h0 : (0 : ℝ) ≤ x - n := sub_nonneg.mpr (Nat.floor_le hx)
@@ -26,6 +26,7 @@ theorem UpperTheory.V.FW.sinSign :
     lt_of_le_of_ne hs (fun h => hne (by rw [← h, mul_zero]))
   rcases Nat.even_or_odd n with h | h
   · rw [h.neg_one_pow, one_mul]
-    exact ⟨fun hlt => absurd hlt (not_lt.mpr hpos.le), fun ho => absurd ho (Nat.not_odd_iff_even.mpr h)⟩
+    exact
+      ⟨fun hlt => absurd hlt (not_lt.mpr hpos.le), fun ho => absurd ho (Nat.not_odd_iff_even.mpr h)⟩
   · rw [h.neg_one_pow]
     exact ⟨fun _ => h, fun _ => by linarith⟩

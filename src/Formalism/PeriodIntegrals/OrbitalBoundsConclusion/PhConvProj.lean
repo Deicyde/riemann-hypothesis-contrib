@@ -9,4 +9,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ConvolutionProje
 @[expose] public section
 
 theorem convolution_projection : PI.PhConvProj.ConvProj :=
-  PI.UnitaryGroupMassFormula.PhConvProj.Defs.convProj_of PI.UnitaryGroupMassFormula.PhConvProj.SelfAdj.selfAdj PI.UnitaryGroupMassFormula.PhConvProj.Sand.sand
+  PI.UnitaryGroupMassFormula.PhConvProj.Defs.convProj_of
+    PI.UnitaryGroupMassFormula.PhConvProj.SelfAdj.selfAdj
+    PI.UnitaryGroupMassFormula.PhConvProj.Sand.sand

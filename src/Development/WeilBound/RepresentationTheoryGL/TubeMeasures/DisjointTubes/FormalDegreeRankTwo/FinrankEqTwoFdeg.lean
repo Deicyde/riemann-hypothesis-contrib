@@ -4,8 +4,12 @@ public import Development.WeilBound.RepresentationTheoryGL.TubeMeasures.Disjoint
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.StandardLattice Formalism.IndefR.Lev Formalism.IndefR.Datum GlobalTheory.AdelicScalar
+open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls
+  GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Up
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.StandardLattice Formalism.IndefR.Lev Formalism.IndefR.Datum
+  GlobalTheory.AdelicScalar
 open GlobalTheory.CovTop.VolUp
 open scoped ENNReal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -14,8 +18,8 @@ noncomputable section
 
 namespace MainStatements.Tam.Z
 
-theorem finrank_eq_two_fdeg (E : Type) [Field E] [NumberField E] [IsCMField E] :
-    Module.finrank ℚ E = 2 * fdeg E := by
+theorem finrank_eq_two_fdeg (E : Type) [Field E] [NumberField E] [IsCMField E]
+    : Module.finrank ℚ E = 2 * fdeg E := by
   have h := NumberField.IsTotallyComplex.finrank (K := E)
   rw [fdeg, h]
   omega
@@ -26,15 +30,20 @@ theorem one_le_dE (E : Type) [Field E] [NumberField E] : 1 ≤ dE E := by
   have h : (1 : ℤ) ≤ |NumberField.discr E| := Int.one_le_abs h0
   exact_mod_cast h
 
-theorem massLev2_eq (E : Type) [Field E] [NumberField E] (r M : ℕ) :
-    massLev2 E r M = (M : ℝ) ^ (Module.finrank ℚ E * r ^ 2) * 15 ^ (Module.finrank ℚ E * r ^ 2) *
-      (3 * ((Module.finrank ℚ E : ℝ) ^ 2 * (r : ℝ) ^ 4 *
-        (dE E ^ ((1 : ℝ) / (Module.finrank ℚ E : ℝ))) ^ 2)) ^ (3 * Module.finrank ℚ E * r ^ 2) := rfl
+theorem massLev2_eq (E : Type) [Field E] [NumberField E] (r M : ℕ)
+    : massLev2 E r M
+      = (M : ℝ) ^ (Module.finrank ℚ E * r ^ 2) * 15 ^ (Module.finrank ℚ E * r ^ 2)
+        * (3
+            * ((Module.finrank ℚ E : ℝ) ^ 2 * (r : ℝ) ^ 4
+              * (dE E ^ ((1 : ℝ) / (Module.finrank ℚ E : ℝ))) ^ 2))
+          ^ (3 * Module.finrank ℚ E * r ^ 2) :=
+  rfl
 
 theorem log_consts : 2 * Real.log 15 + 6 * (Real.log 3 + 2 * Real.log 2) ≤ 21 := by
   have hx : (0 : ℝ) < 15 ^ 2 * (3 * 2 ^ 2) ^ 6 := by norm_num
-  have heq : 2 * Real.log 15 + 6 * (Real.log 3 + 2 * Real.log 2) =
-      Real.log (15 ^ 2 * (3 * 2 ^ 2) ^ 6) := by
+  have heq
+      : 2 * Real.log 15 + 6 * (Real.log 3 + 2 * Real.log 2)
+        = Real.log (15 ^ 2 * (3 * 2 ^ 2) ^ 6) := by
     rw [Real.log_mul (by norm_num) (by norm_num), Real.log_pow, Real.log_pow,
       Real.log_mul (by norm_num) (by norm_num), Real.log_pow]
     push_cast
@@ -47,7 +56,9 @@ theorem log_consts : 2 * Real.log 15 + 6 * (Real.log 3 + 2 * Real.log 2) ≤ 21 
     rw [← Real.exp_nat_mul]
     norm_num
   rw [← h21]
-  calc (15 : ℝ) ^ 2 * (3 * 2 ^ 2) ^ 6 ≤ 2.7 ^ 21 := by norm_num
+  calc
+    (15 : ℝ) ^ 2 * (3 * 2 ^ 2) ^ 6
+      ≤ 2.7 ^ 21 := by norm_num
     _ ≤ Real.exp 1 ^ 21 := pow_le_pow_left₀ (by norm_num) he 21
 
 end MainStatements.Tam.Z
@@ -115,8 +126,7 @@ theorem MainStatements.Tam.size : SizeSt := by
       Real.log_pow, hlogB]
     have hlogn : Real.log n = Real.log 2 + Real.log f := by
       rw [hnR, Real.log_mul (by norm_num) hfpos.ne']
-    have hlfr : Real.log ((f : ℝ) * r) = Real.log f + Real.log r :=
-      Real.log_mul hfpos.ne' hrpos.ne'
+    have hlfr : Real.log ((f : ℝ) * r) = Real.log f + Real.log r := Real.log_mul hfpos.ne' hrpos.ne'
     rw [hlfr] at hfr
     rw [hlogn]
     push_cast

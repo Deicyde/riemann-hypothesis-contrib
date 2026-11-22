@@ -9,13 +9,15 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem injective_and_saturated_of_injective_mod_regular :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (A B : Type) [CommRing A]
-      [Algebra R A] [Module.Finite R A] [CommRing B] [Algebra R B] (f : R),
-      f ∈ maximalIdeal R → IsSMulRegular B f → ∀ ψ : A →ₐ[R] B,
-      (∀ a : A, ψ a ∈ (Ideal.span {f}).map (algebraMap R B) →
-        a ∈ (Ideal.span {f}).map (algebraMap R A)) →
-      Function.Injective ψ ∧ ∀ b : B, f • b ∈ ψ.range → b ∈ ψ.range := by
+theorem injective_and_saturated_of_injective_mod_regular
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (A B : Type) [CommRing A]
+        [Algebra R A] [Module.Finite R A] [CommRing B] [Algebra R B] (f : R),
+      f ∈ maximalIdeal R → IsSMulRegular B f
+        → ∀ ψ : A →ₐ[R] B,
+          (∀ a : A,
+              ψ a ∈ (Ideal.span {f}).map (algebraMap R B)
+                → a ∈ (Ideal.span {f}).map (algebraMap R A))
+            → Function.Injective ψ ∧ ∀ b : B, f • b ∈ ψ.range → b ∈ ψ.range := by
   intro R _ _ _ A B _ _ _ _ _ f hf hreg ψ hψ
 
   have memA : ∀ a : A, a ∈ (Ideal.span {f}).map (algebraMap R A) → ∃ c : A, a = f • c := by
@@ -27,11 +29,10 @@ theorem injective_and_saturated_of_injective_mod_regular :
     intro b
     rw [Ideal.map_span, Set.image_singleton, Algebra.smul_def]
     exact Ideal.mul_mem_right _ _ (Ideal.subset_span rfl)
-  have key : ∀ a : A, ψ a ∈ (Ideal.span {f}).map (algebraMap R B) → ∃ c : A, a = f • c :=
-    fun a h => memA a (hψ a h)
+  have key : ∀ a : A, ψ a ∈ (Ideal.span {f}).map (algebraMap R B) → ∃ c : A, a = f • c := fun a h =>
+    memA a (hψ a h)
   refine ⟨?_, ?_⟩
-  ·
-    set K : Submodule R A := LinearMap.ker ψ.toLinearMap with hK
+  · set K : Submodule R A := LinearMap.ker ψ.toLinearMap with hK
     have hFG : K.FG := IsNoetherian.noetherian K
     have hle : K ≤ Ideal.span {f} • K := by
       intro a ha
@@ -48,7 +49,8 @@ theorem injective_and_saturated_of_injective_mod_regular :
       rw [Ideal.span_le, Set.singleton_subset_iff]
       exact hf
     have hK0 : K = ⊥ := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot _ K hFG hle hjac
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     have : a ∈ K := ha
     rw [hK0] at this

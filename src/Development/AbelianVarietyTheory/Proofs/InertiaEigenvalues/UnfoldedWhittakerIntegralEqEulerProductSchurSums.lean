@@ -26,20 +26,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CuspFor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW GroundTheory.Global.IdeleGroup Formalism.L2.Host Formalism.UG GlobalTheory.LFun
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW
+  GroundTheory.Global.IdeleGroup Formalism.L2.Host Formalism.UG GlobalTheory.LFun
 open scoped ENNReal nonZeroDivisors
 
 noncomputable section
 
 namespace GlobalTheory.RSCell
 
-theorem exists_isUnifV : ∀ (E : Type) [Field E] [NumberField E], ∃ ϖ : ∀ w : HeightOneSpectrum (𝓞 E), (w.adicCompletion E)ˣ, ∀ w, IsUnifV E w (ϖ w : w.adicCompletion E) := by
+theorem exists_isUnifV
+    : ∀ (E : Type) [Field E] [NumberField E],
+      ∃ ϖ : ∀ w : HeightOneSpectrum (𝓞 E), (w.adicCompletion E)ˣ, ∀ w,
+        IsUnifV E w (ϖ w : w.adicCompletion E) := by
   intro E _ _
   refine ⟨fun w => GroundTheory.Global.uniformizerUnit w, fun w => ?_⟩
   have h := GroundTheory.Global.valued_uniformizerUnit_zpow w 1
   rw [zpow_one] at h
   exact h
-
 
 set_option maxHeartbeats 4000000 in
 theorem lintegral_unfolded_eq : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (π : CG E a), 1 ≤ a → π.IsUnitary →

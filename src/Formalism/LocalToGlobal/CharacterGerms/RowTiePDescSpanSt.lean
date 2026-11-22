@@ -14,14 +14,18 @@ open Classical
 namespace Formalism.L2.FormalSeriesBounds
 
 open Formalism.IncomingBounds Formalism.L2.Pj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 def HaSpanSt : Prop :=
   ∀ (Ty : Type) [Fintype Ty] (r : Ty → ℕ) (n : ℕ) (cc : Ty → Ty) (isX : Ty → Prop) (a : Ty → ℕ → ℕ)
-    (K : Type) [Field K] [CharZero K] (O : Subring K), ∀ P ∈ HaO r n K O cc isX a,
-    ∃ (m : ℕ) (c : Fin m → K) (Z : Fin m → MvPolynomial (Letter Ty r n) ℤ), (∀ i, c i ∈ O) ∧
-      (∀ i (K' : Type) [Field K'] [CharZero K'], MvPolynomial.map (Int.castRingHom K') (Z i) ∈ HHa r n K' cc isX a) ∧
-      P = ∑ i, c i • MvPolynomial.map (Int.castRingHom K) (Z i)
+      (K : Type) [Field K] [CharZero K] (O : Subring K),
+    ∀ P ∈ HaO r n K O cc isX a,
+      ∃ (m : ℕ) (c : Fin m → K) (Z : Fin m → MvPolynomial (Letter Ty r n) ℤ),
+        (∀ i, c i ∈ O)
+          ∧ (∀ i (K' : Type) [Field K'] [CharZero K'],
+            MvPolynomial.map (Int.castRingHom K') (Z i) ∈ HHa r n K' cc isX a)
+          ∧ P = ∑ i, c i • MvPolynomial.map (Int.castRingHom K) (Z i)
 
 section Nab
 
@@ -30,23 +34,27 @@ variable {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing O] [S
 def gofY (Y : FBChart C V O dd) (n : ℕ) : PS C n dd :=
   FB.expS C (((Y.k : ℕ) : C) • ∑ b : Fin n, ev (n := n) ![pt C dd b] (Y.B.hL C Y.h Y.w0))
 
-theorem nab_eq_nabL (Y : FBChart C V O dd) (Ls : LetSys C dd) (n : ℕ) (g : PS C n dd) (P : MvPolynomial (Ls.ι n) C) :
-    Y.nab Ls n g P = DescP.nabL (Y.B.FK C) (Ls.cp n) (Ls.uv n) P (gofY Y n) g :=
+theorem nab_eq_nabL
+    (Y : FBChart C V O dd) (Ls : LetSys C dd) (n : ℕ) (g : PS C n dd) (P : MvPolynomial (Ls.ι n) C)
+    : Y.nab Ls n g P = DescP.nabL (Y.B.FK C) (Ls.cp n) (Ls.uv n) P (gofY Y n) g :=
   rfl
 
 end Nab
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable {Xo : Moduli Dw l} {c : Coeff l} [StarRing (𝓞 E)]
 
 theorem descSpanSt_of (hS : HaSpanSt) : DescSpanSt Xo c := by
   intro T io y C3 C _ _ V ι _hι k Y _hY a n P hP f hf
-  have : CharZero T.Fr := charZero_of_inj_zero fun x hx => by
-    have h1 := congrArg ι hx
-    rwa [map_natCast, map_zero, Nat.cast_eq_zero] at h1
+  have : CharZero T.Fr :=
+    charZero_of_inj_zero fun x hx => by
+      have h1 := congrArg ι hx
+      rwa [map_natCast, map_zero, Nat.cast_eq_zero] at h1
   obtain ⟨m, cc, Z, hc, hZ, hPe⟩ :=
     hS (E →+* ℂ) Dw.mult n ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)) C V.RR P hP
-  let Q : Fin m → MvPolynomial (LtN Dw n) T.Fr := fun i => MvPolynomial.map (Int.castRingHom T.Fr) (Z i)
+  let Q : Fin m → MvPolynomial (LtN Dw n) T.Fr := fun i =>
+    MvPolynomial.map (Int.castRingHom T.Fr) (Z i)
   have hmap : ∀ i, MvPolynomial.map ι (Q i) = MvPolynomial.map (Int.castRingHom C) (Z i) := by
     intro i
     simp only [Q]
@@ -54,20 +62,25 @@ theorem descSpanSt_of (hS : HaSpanSt) : DescSpanSt Xo c := by
   let Ls := chartLetterSystem C3 V ι a
   let tc : (Fin n × Fin (chD C3.ch) →₀ ℕ) → C := fun μ =>
     AddMonoidAlgebra.coeff (MvPowerSeries.trunc' C (DescP.cst P.totalDegree) f) μ
-  have hP2 : ∀ g : PS C n (chD C3.ch),
-      Y.nab Ls n g P = ∑ i, cc i * Y.nab Ls n g (MvPolynomial.map ι (Q i)) := by
+  have hP2
+      : ∀ g : PS C n (chD C3.ch),
+        Y.nab Ls n g P = ∑ i, cc i * Y.nab Ls n g (MvPolynomial.map ι (Q i)) := by
     intro g
-    have hg : ∀ i, Y.nab Ls n g (MvPolynomial.map ι (Q i)) = Y.nab Ls n g (MvPolynomial.map (Int.castRingHom C) (Z i)) :=
-      fun i => congrArg (Y.nab Ls n g) (hmap i)
+    have hg
+        : ∀ i,
+          Y.nab Ls n g (MvPolynomial.map ι (Q i))
+            = Y.nab Ls n g (MvPolynomial.map (Int.castRingHom C) (Z i)) := fun i =>
+      congrArg (Y.nab Ls n g) (hmap i)
     simp only [hg, nab_eq_nabL]
     show MvPowerSeries.constantCoeff (DpolyN (Y.B.FK C) (Ls.cp n) (Ls.uv n) P (g * gofY Y n)) =
       ∑ i, cc i * MvPowerSeries.constantCoeff
         (DpolyN (Y.B.FK C) (Ls.cp n) (Ls.uv n) (MvPolynomial.map (Int.castRingHom C) (Z i)) (g * gofY Y n))
     rw [hPe]
     exact DescP.const_dpolyN_lin (Y.B.FK C) (Ls.cp n) (Ls.uv n) Finset.univ cc _ (g * gofY Y n)
-  have hmono : ∀ μ : Fin n × Fin (chD C3.ch) →₀ ℕ,
-      (MvPowerSeries.monomial μ (1 : C) : PS C n (chD C3.ch)) =
-        MvPowerSeries.map ι (MvPowerSeries.monomial μ (1 : T.Fr)) := by
+  have hmono
+      : ∀ μ : Fin n × Fin (chD C3.ch) →₀ ℕ,
+        (MvPowerSeries.monomial μ (1 : C) : PS C n (chD C3.ch))
+          = MvPowerSeries.map ι (MvPowerSeries.monomial μ (1 : T.Fr)) := by
     intro μ
     rw [MvPowerSeries.map_monomial, ι.map_one]
   let S := (MvPowerSeries.trunc' C (DescP.cst P.totalDegree) f).support
@@ -82,8 +95,16 @@ theorem descSpanSt_of (hS : HaSpanSt) : DescSpanSt Xo c := by
     simp only [g', tc]
     ring
   obtain ⟨N, e, _he, hsum⟩ := DescP.exists_fin_sum (S ×ˢ (Finset.univ : Finset (Fin m))) g'
-  refine ⟨N, fun j => tc (e j).1 * cc (e j).2, fun j => Q (e j).2,
-    fun j => MvPowerSeries.monomial (e j).1 (1 : T.Fr), ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    N,
+    fun j => tc (e j).1 * cc (e j).2,
+    fun j => Q (e j).2,
+    fun j => MvPowerSeries.monomial (e j).1 (1 : T.Fr),
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro j
     have htc : V.Ge 0 (tc (e j).1) := by
       simp only [tc]

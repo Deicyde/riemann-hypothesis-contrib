@@ -9,14 +9,18 @@ noncomputable section
 
 open scoped Classical
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef
 
 namespace PI.UnitaryGroupMassFormula.ScalRelRepFree
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-structure DC (Λ : Submodule (𝓞 E) S.V) {T T' : E} (F : LFlag S r T) (y y' : LFlag S r T')
-    (n m : S.V ≃ₗ[E] S.V) : Prop where
+structure DC
+    (Λ : Submodule (𝓞 E) S.V)
+    {T T' : E} (F : LFlag S r T) (y y' : LFlag S r T')
+    (n m : S.V ≃ₗ[E] S.V)
+    : Prop where
   hF : IsLift Λ F
   hy : IsLift Λ y
   hn : n ∈ NLam Λ F
@@ -30,8 +34,8 @@ theorem X_le_Xplus {T₀ : E} (G : LFlag S r T₀) : Xsp G ≤ Xplus G := by
 
 section Move
 
-variable {Λ : Submodule (𝓞 E) S.V} {T T' : E} {F : LFlag S r T} {y y' : LFlag S r T'}
-  {n m : S.V ≃ₗ[E] S.V}
+variable
+  {Λ : Submodule (𝓞 E) S.V} {T T' : E} {F : LFlag S r T} {y y' : LFlag S r T'} {n m : S.V ≃ₗ[E] S.V}
 
 theorem e_eq (h : DC Λ F y y' n m) (a : Fin r) : y'.fl.e a = n (m (y.fl.e a)) := by
   have := h.hfr a.castSucc
@@ -41,15 +45,16 @@ theorem z_eq (h : DC Λ F y y' n m) : y'.fl.z = n (m y.fl.z) := by
   have := h.hfr (Fin.last r)
   simpa [frame, FlagG.fvec] using this
 
-theorem Xflag_eq (h : DC Λ F y y' n m) (j : ℕ) :
-    Xflag y' j = (Xflag y j).map ((m.trans n : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) := by
+theorem Xflag_eq (h : DC Λ F y y' n m) (j : ℕ)
+    : Xflag y' j = (Xflag y j).map ((m.trans n : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) := by
   have he : y'.fl.e = fun i => ((m.trans n : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) (y.fl.e i) :=
     funext fun i => by rw [e_eq h i]; rfl
   simp only [Xflag, FlagG.Xa]
   rw [Submodule.map_span, Set.image_image, he]
 
 theorem mem_X' (h : DC Λ F y y' n m) {v : S.V} : v ∈ Xsp y' ↔ n.symm v ∈ Xsp y := by
-  rw [← Xa_ge y' le_rfl, Xflag_eq h, Xa_ge y le_rfl, Submodule.mem_map_equiv, LinearEquiv.symm_trans_apply]
+  rw [← Xa_ge y' le_rfl, Xflag_eq h, Xa_ge y le_rfl, Submodule.mem_map_equiv,
+    LinearEquiv.symm_trans_apply]
   exact nl_symm_X_iff h.hm
 
 theorem mem_XLam' (h : DC Λ F y y' n m) {v : S.V} : v ∈ XLam Λ y' ↔ n.symm v ∈ XLam Λ y := by
@@ -118,8 +123,10 @@ theorem mem_Xplus' (h : DC Λ F y y' n m) {v : S.V} : v ∈ Xplus y' ↔ n.symm 
         simp [z_eq h]
       rw [e]
       exact (Xsp y).neg_mem (nl_orth h.hm (z_orth y))
-    have := xplus_map (A := y) (B := y') (n : S.V →ₗ[E] S.V)
-      (fun w hw => (mem_X' h).mpr (by simpa using hw)) hz hv
+    have :=
+      xplus_map (A := y) (B := y') (n : S.V →ₗ[E] S.V)
+        (fun w hw => (mem_X' h).mpr (by simpa using hw))
+        hz hv
     simpa using this
 
 theorem mem_YL (h : DC Λ F y y' n m) (w : S.V) : w ∈ Ylift Λ F y' ↔ n.symm w ∈ Ylift Λ F y := by
@@ -130,25 +137,33 @@ theorem mem_YL' (h : DC Λ F y y' n m) (w : S.V) : w ∈ Ylift' Λ F y' ↔ n.sy
   simp only [Ylift', Submodule.mem_inf]
   rw [mem_UUE' h, orth_transport h.hn.1.1 (fun v => mem_Xplus' h (v := v)) w]
 
-theorem mem_NgX' (h : DC Λ F y y' n m) (g : ℕ) {v : S.V} :
-    v ∈ NgX Λ g F y' ↔ n.symm v ∈ NgX Λ g F y := by
+theorem mem_NgX' (h : DC Λ F y y' n m) (g : ℕ) {v : S.V}
+    : v ∈ NgX Λ g F y' ↔ n.symm v ∈ NgX Λ g F y := by
   unfold NgX
   constructor
   · intro hv
-    exact map_mem_sup_three (n.symm : S.V →ₗ[E] S.V) (fun w hw => gL_map _ (fun u hu => aut_symm_mem h.hn.1 hu) g hw)
-      (fun w hw => nl_symm_XLam h.hn hw) (fun w hw => (mem_XLam' h).mp hw) hv
+    exact map_mem_sup_three (n.symm : S.V →ₗ[E] S.V)
+      (fun w hw => gL_map _ (fun u hu => aut_symm_mem h.hn.1 hu) g hw)
+      (fun w hw => nl_symm_XLam h.hn hw)
+      (fun w hw => (mem_XLam' h).mp hw)
+      hv
   · intro hv
-    have := map_mem_sup_three (n : S.V →ₗ[E] S.V) (fun w hw => gL_map _ (fun u hu => aut_mem h.hn.1 hu) g hw)
-      (fun w hw => nl_XLam h.hn hw) (fun w hw => (mem_XLam' h).mpr (by simpa using hw)) hv
+    have :=
+      map_mem_sup_three (n : S.V →ₗ[E] S.V)
+        (fun w hw => gL_map _ (fun u hu => aut_mem h.hn.1 hu) g hw)
+        (fun w hw => nl_XLam h.hn hw)
+        (fun w hw => (mem_XLam' h).mpr (by simpa using hw))
+        hv
     simpa using this
 
-theorem sg_move (h : DC Λ F y y' n m) (a b : S.V) (al al' : E) :
-    SgRel F y (n.symm a) (n.symm b) al al' ↔ SgRel F y' a b al al' := by
+theorem sg_move (h : DC Λ F y y' n m) (a b : S.V) (al al' : E)
+    : SgRel F y (n.symm a) (n.symm b) al al' ↔ SgRel F y' a b al al' := by
   constructor
   · rintro ⟨u, hu, u', hu', e⟩
     refine ⟨n u + al • (n F.zt - F.zt), ?_, n u' - al' • n (m y.zt - y.zt), ?_, ?_⟩
     · exact add_mem (nl_X_mem h.hn hu) (Submodule.smul_mem _ _ (mem_XLam.mp (nzF_sub h)).2)
-    · refine sub_mem ((mem_X' h).mpr (by simpa using hu')) (Submodule.smul_mem _ _ ((mem_X' h).mpr ?_))
+    · refine sub_mem ((mem_X' h).mpr (by simpa using hu'))
+        (Submodule.smul_mem _ _ ((mem_X' h).mpr ?_))
       simpa using (mem_XLam.mp (mz_sub h)).2
     · have e2 : a - b = n (n.symm a - n.symm b) := by simp
       rw [e2, e, h.hzt]
@@ -165,23 +180,33 @@ theorem sg_move (h : DC Λ F y y' n m) (a b : S.V) (al al' : E) :
 
 end Move
 
-theorem mem_ThP (Λ : Submodule (𝓞 E) S.V) {T T' : E} (F : LFlag S r T) (F' F'' : LFlag S r T')
-    (β : S.V ≃ₗ[E] S.V) (p : S.V × S.V) :
-    p ∈ ThPairs Λ F F' F'' β ↔ p.1 ∈ Hp Λ F F' ∧ p.2 ∈ Hp Λ F F'' ∧ p.1 - p.2 ∈ Xsp F ∧
-      β p.1 - p.2 ∈ Xsp F'' := by
-  simp only [ThPairs, Submodule.mem_inf, Submodule.mem_prod, Submodule.mem_comap, LinearMap.sub_apply,
-    LinearMap.fst_apply, LinearMap.snd_apply, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe]
+theorem mem_ThP
+    (Λ : Submodule (𝓞 E) S.V)
+    {T T' : E} (F : LFlag S r T) (F' F'' : LFlag S r T')
+    (β : S.V ≃ₗ[E] S.V) (p : S.V × S.V)
+    : p ∈ ThPairs Λ F F' F'' β
+      ↔ p.1 ∈ Hp Λ F F' ∧ p.2 ∈ Hp Λ F F'' ∧ p.1 - p.2 ∈ Xsp F ∧ β p.1 - p.2 ∈ Xsp F'' := by
+  simp only [ThPairs, Submodule.mem_inf, Submodule.mem_prod, Submodule.mem_comap,
+    LinearMap.sub_apply, LinearMap.fst_apply, LinearMap.snd_apply, LinearMap.coe_comp,
+    Function.comp_apply, LinearEquiv.coe_coe]
   tauto
 
-theorem orth_beta {T' : E} {β : S.V ≃ₗ[E] S.V} (hβ : β ∈ Formalism.HermitianLatticesTheory.isom S.hT) {x y : LFlag S r T'}
-    (hX : (Xsp x).map (β : S.V →ₗ[E] S.V) = Xsp y) {v : S.V} (hv : v ∈ orth S (Xsp x)) :
-    β v ∈ orth S (Xsp y) :=
+theorem orth_beta
+    {T' : E} {β : S.V ≃ₗ[E] S.V} (hβ : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    {x y : LFlag S r T'} (hX : (Xsp x).map (β : S.V →ₗ[E] S.V) = Xsp y)
+    {v : S.V} (hv : v ∈ orth S (Xsp x))
+    : β v ∈ orth S (Xsp y) :=
   (orth_transport hβ (U := Xsp x) (U' := Xsp y)
-    (fun w => by rw [← hX, Submodule.mem_map_equiv]) (β v)).mpr (by simpa using hv)
+    (fun w => by rw [← hX, Submodule.mem_map_equiv])
+    (β v)).mpr (by simpa using hv)
 
-theorem scalRel_move (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (g k : ℕ) {T T' : E}
-    (F : LFlag S r T) (x y y' : LFlag S r T') (n m : S.V ≃ₗ[E] S.V) (h : DC Λ F y y' n m)
-    (hs : PI.ScalRelRepFree.ScalRel Λ g k F x y) : PI.ScalRelRepFree.ScalRel Λ g k F x y' := by
+theorem scalRel_move
+    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
+    (g k : ℕ)
+    {T T' : E} (F : LFlag S r T) (x y y' : LFlag S r T')
+    (n m : S.V ≃ₗ[E] S.V) (h : DC Λ F y y' n m)
+    (hs : PI.ScalRelRepFree.ScalRel Λ g k F x y)
+    : PI.ScalRelRepFree.ScalRel Λ g k F x y' := by
   obtain ⟨β, ⟨hAut, hfl, hz, hI⟩, hs0, hsc⟩ := hs
   let β' : S.V ≃ₗ[E] S.V := (β.trans m).trans n
   have hb' : ∀ v, β' v = n (m (β v)) := fun v => rfl
@@ -205,24 +230,28 @@ theorem scalRel_move (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattic
       · have e : a - n.symm b = (a - b) - (n.symm b - b) := by abel
         rw [e]
         exact sub_mem hab (nl_symm_sub h.hn (oF b hb))
-      · have e : β a - n.symm b = n.symm (β' a - b) - (m (β a) - β a) := by
-          rw [hb']; simp
+      · have e : β a - n.symm b = n.symm (β' a - b) - (m (β a) - β a) := by rw [hb']; simp
         rw [e]
         exact sub_mem ((mem_X' h).mp hbb) (nl_orth h.hm (hβo a (oX a ha)))
     · rintro ⟨⟨a, b⟩, hp, rfl⟩
       obtain ⟨ha, hb, hab, hbb⟩ := (mem_ThP Λ F x y β _).mp hp
-      refine ⟨(a, n b), (mem_ThP Λ F x y' β' _).mpr ⟨ha, (mem_Hp' h _).mpr (by simpa using hb), ?_, ?_⟩, rfl⟩
+      refine ⟨
+        (a, n b),
+        (mem_ThP Λ F x y' β' _).mpr ⟨ha, (mem_Hp' h _).mpr (by simpa using hb), ?_, ?_⟩,
+        rfl
+      ⟩
       · have e : a - n b = (a - b) - (n b - b) := by abel
         rw [e]
         exact sub_mem hab (nl_orth h.hn (oF' b hb))
       · rw [mem_X' h]
-        have e : n.symm (β' a - n b) = (m (β a) - β a) + (β a - b) := by
-          rw [hb']; simp
+        have e : n.symm (β' a - n b) = (m (β a) - β a) + (β a - b) := by rw [hb']; simp
         rw [e]
         exact add_mem (nl_orth h.hm (hβo a (oX a ha))) hbb
   refine ⟨β', ⟨aut_trans (aut_trans hAut h.hm.1) h.hn.1, ?_, ?_, ?_⟩, ?_, ?_⟩
   · intro j
-    have hc : (β' : S.V →ₗ[E] S.V) = ((m.trans n : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V).comp (β : S.V →ₗ[E] S.V) := by
+    have hc
+        : (β' : S.V →ₗ[E] S.V)
+          = ((m.trans n : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V).comp (β : S.V →ₗ[E] S.V) := by
       ext v; rfl
     rw [hc, Submodule.map_comp, hfl j, Xflag_eq h j]
   · show n (m (β x.fl.z)) = y'.fl.z

@@ -18,8 +18,7 @@ theorem pbD : PbD := by
   have hr : minSmoothness ℝ 2 ≤ ∞ := by
     rw [minSmoothness_of_isRCLikeNormedField]
     exact WithTop.coe_le_coe.2 le_top
-  have hinf : (∞ : WithTop ℕ∞) + 1 ≤ ∞ := by
-    exact_mod_cast le_top
+  have hinf : (∞ : WithTop ℕ∞) + 1 ≤ ∞ := by exact_mod_cast le_top
   refine ⟨?_, extDeriv_pullback (hw.differentiableAt (by simp)) hH hr⟩
   apply altSmooth V' V' F q (pb H w) p
   intro v

@@ -5,6 +5,5 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 @[expose] public section
 
-theorem UpperTheory.V.Af.Nf.smCont :
-    UpperTheory.V.Af.Nf.SmCont :=
+theorem UpperTheory.V.Af.Nf.smCont : UpperTheory.V.Af.Nf.SmCont :=
   UpperTheory.eisenstein_smooth_continuous

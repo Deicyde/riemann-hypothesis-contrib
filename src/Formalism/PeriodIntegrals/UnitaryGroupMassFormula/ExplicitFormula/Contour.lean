@@ -72,7 +72,7 @@ theorem glueContour : GlueContour := by
   have hfs : ∀ g : ℂ → ℂ, (∑ᶠ ρ ∈ ZerosBelow χ T', g ρ) = ∑ ρ ∈ S, g ρ := fun g =>
     finsum_mem_eq_finite_toFinset_sum g hfin
 
-  have hsumZ : ∀ F : ℂ → ℂ → ℂ, ∑ ρ ∈ Z, F (wt ρ) ρ = F (-del1 χ) 1 + ∑ ρ ∈ S, F (mult χ ρ) ρ := by
+  have hsumZ : ∀ F : ℂ → ℂ → ℂ, ∑ ρ ∈ Z, F (wt ρ) ρ = F (- del1 χ) 1 + ∑ ρ ∈ S, F (mult χ ρ) ρ := by
     intro F
     rw [hZdef, Finset.sum_insert h1S]
     congr 1
@@ -81,10 +81,13 @@ theorem glueContour : GlueContour := by
       have : ρ ≠ 1 := fun e => h1S (e ▸ hρ)
       simp [hwt, this]
 
-  have hbd : rectInt (fun s => logDeriv (DirichletCharacter.LFunction χ) s * ((u : ℂ) ^ s / s))
-        (-1 / 2) (cLine u) (-T') T' =
-      rectInt (fun s => (H s + (∑ ρ ∈ Z, wt ρ / (s - ρ)) + eps0 χ / s) * ((u : ℂ) ^ s / s))
-        (-1 / 2) (cLine u) (-T') T' := by
+  have hbd
+      : rectInt
+          (fun s => logDeriv (DirichletCharacter.LFunction χ) s * ((u : ℂ) ^ s / s))
+          (-1 / 2) (cLine u) (-T') T'
+        = rectInt
+          (fun s => (H s + (∑ ρ ∈ Z, wt ρ / (s - ρ)) + eps0 χ / s) * ((u : ℂ) ^ s / s))
+          (-1 / 2) (cLine u) (-T') T' := by
     apply rectInt_congr_sides (by linarith) (by linarith)
     intro s hs hside
     have hs' := mem_rect_iff.1 hs
@@ -111,12 +114,14 @@ theorem glueContour : GlueContour := by
     have := hsumZ (fun w ρ => w / (s - ρ))
     rw [this]
     ring
-  rw [hbd, hR (-1 / 2) (cLine u) (-T') T' H Z wt (eps0 χ) u (by linarith) (by norm_num) (by linarith)
-    (by linarith) (by linarith) hreg.1 ?_]
+  rw [hbd,
+    hR (-1 / 2) (cLine u) (-T') T' H Z wt (eps0 χ) u (by linarith) (by norm_num) (by linarith)
+      (by linarith) (by linarith) hreg.1 ?_]
   · have := hsumZ (fun w ρ => w * (((u : ℂ) ^ ρ - 1) / ρ))
     rw [this, zsum, hfs, hfs, Complex.cpow_one]
-    have e : ∑ ρ ∈ S, (mult χ ρ : ℂ) * (((u : ℂ) ^ ρ - 1) / ρ) =
-        ∑ ρ ∈ S, (mult χ ρ : ℂ) * ((u : ℂ) ^ ρ / ρ) - ∑ ρ ∈ S, (mult χ ρ : ℂ) / ρ := by
+    have e
+        : ∑ ρ ∈ S, (mult χ ρ : ℂ) * (((u : ℂ) ^ ρ - 1) / ρ)
+          = ∑ ρ ∈ S, (mult χ ρ : ℂ) * ((u : ℂ) ^ ρ / ρ) - ∑ ρ ∈ S, (mult χ ρ : ℂ) / ρ := by
       rw [← Finset.sum_sub_distrib]
       exact Finset.sum_congr rfl fun ρ _ => by ring
     rw [e]

@@ -30,10 +30,14 @@ theorem degree_one_split : DegreeOneSplit := by
     exact Nat.mul_pos (Ideal.ramificationIdx_pos (R := 𝓞 F) q.1) (Ideal.inertiaDeg_pos q.1 (𝓞 F))
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (⟨P, hPmem⟩ : p.primesOver (𝓞 E)))] at hsum
   simp only [he, hf1, mul_one] at hsum
-  have hrest : ∑ q ∈ Finset.univ.erase (⟨P, hPmem⟩ : p.primesOver (𝓞 E)),
-      q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F) = 1 := by omega
+  have hrest
+      : ∑ q ∈ Finset.univ.erase (⟨P, hPmem⟩ : p.primesOver (𝓞 E)),
+          q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F)
+        = 1 := by
+    omega
   have hle : (Finset.univ.erase (⟨P, hPmem⟩ : p.primesOver (𝓞 E))).card ≤ 1 := by
-    calc _ = ∑ q ∈ Finset.univ.erase (⟨P, hPmem⟩ : p.primesOver (𝓞 E)), 1 := by simp
+    calc
+      _ = ∑ q ∈ Finset.univ.erase (⟨P, hPmem⟩ : p.primesOver (𝓞 E)), 1 := by simp
       _ ≤ _ := Finset.sum_le_sum fun q _ => hpos q
       _ = 1 := hrest
   have hge : (Finset.univ.erase (⟨P, hPmem⟩ : p.primesOver (𝓞 E))).card ≠ 0 := by
@@ -42,7 +46,7 @@ theorem degree_one_split : DegreeOneSplit := by
     rw [h0] at hrest
     simp at hrest
   rw [Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ] at hle hge
-  have key : Fintype.card { x // x ∈ p.primesOver (𝓞 E) } = 2 := by omega
+  have key : Fintype.card {x // x ∈ p.primesOver (𝓞 E)} = 2 := by omega
   rw [← Nat.card_coe_set_eq, Nat.card_eq_fintype_card]
   exact key
 

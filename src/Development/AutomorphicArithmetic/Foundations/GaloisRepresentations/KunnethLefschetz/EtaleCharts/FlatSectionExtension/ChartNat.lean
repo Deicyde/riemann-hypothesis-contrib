@@ -5,10 +5,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.chartNat :
-    ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α : B.ι) (k : Fin d) {V' V : Scheme.{0}} (s : V' ⟶ V) (y : V ⟶ Y) (h : ⊤ ≤ y ⁻¹ᵁ (B.c α).C k) (h' : ⊤ ≤ (s ≫ y) ⁻¹ᵁ (B.c α).C k), (∀ m, uV B α k (s ≫ y) h' m = s.appTop.hom (uV B α k y h m)) ∧ secOf B α k (s ≫ y) h' = s ≫ secOf B α k y h := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.chartNat
+    : ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
+        {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α : B.ι) (k : Fin d)
+        {V' V : Scheme.{0}} (s : V' ⟶ V) (y : V ⟶ Y) (h : ⊤ ≤ y ⁻¹ᵁ (B.c α).C k)
+        (h' : ⊤ ≤ (s ≫ y) ⁻¹ᵁ (B.c α).C k),
+      (∀ m, uV B α k (s ≫ y) h' m = s.appTop.hom (uV B α k y h m))
+        ∧ secOf B α k (s ≫ y) h' = s ≫ secOf B α k y h := by
   intro K _ W Z Y q i π D d B α k V' V s y h h'
   constructor
   · intro m

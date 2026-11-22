@@ -37,9 +37,11 @@ private lemma span_zero_le {H : Type} [Group H] (K : Subgroup H) :
   simp only [SetLike.mem_coe, Submodule.mem_bot]
   rfl
 
-theorem isBiFinite_subspace : ∀ (H : Type) [Group H] (K : Subgroup H), IsBiFinite K (0 : H → ℂ) ∧
-    (∀ f f' : H → ℂ, IsBiFinite K f → IsBiFinite K f' → IsBiFinite K (f + f')) ∧
-    ∀ (c : ℂ) (f : H → ℂ), IsBiFinite K f → IsBiFinite K (c • f) := by
+theorem isBiFinite_subspace
+    : ∀ (H : Type) [Group H] (K : Subgroup H),
+      IsBiFinite K (0 : H → ℂ)
+        ∧ (∀ f f' : H → ℂ, IsBiFinite K f → IsBiFinite K f' → IsBiFinite K (f + f'))
+        ∧ ∀ (c : ℂ) (f : H → ℂ), IsBiFinite K f → IsBiFinite K (c • f) := by
   intro H _ K
   refine ⟨?_, fun f f' hf hf' => ?_, fun c f hf => ?_⟩
   · unfold IsBiFinite

@@ -14,8 +14,10 @@ noncomputable section
 namespace GlobalTheory.CharDepth
 
 open AlgebraicGeometry CategoryTheory NumberField IsDedekindDomain IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj
-open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -37,20 +39,31 @@ structure ValExt (T : CDVR) (p : ℕ) [Fact p.Prime] : Type 1 where
   ι_local : IsLocalHom ι
   ιF : T.Fr →+* C
   comp : ∀ x : T.V, ιF (algebraMap T.V T.Fr x) = algebraMap O C (ι x)
-  val : ∀ x : T.Fr, x ≠ 0 → (v (ιF x) : ℝ) = (v (p : C) : ℝ) ^ ((vV T.V x : ℝ) / (vV T.V (p : T.Fr) : ℝ))
+  val
+    : ∀ x : T.Fr,
+      x ≠ 0 → (v (ιF x) : ℝ) = (v (p : C) : ℝ) ^ ((vV T.V x : ℝ) / (vV T.V (p : T.Fr) : ℝ))
 
-attribute [instance] ValExt.fld ValExt.closed ValExt.ch0 ValExt.cr ValExt.alg ValExt.nonunit ValExt.cpl ValExt.loc
+attribute [instance]
+  ValExt.fld ValExt.closed ValExt.ch0 ValExt.cr ValExt.alg ValExt.nonunit ValExt.cpl ValExt.loc
   ValExt.zp
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
 
-def IsTypes {T : CDVR} {p : ℕ} [Fact p.Prime] (X : ValExt T p) (io : c.F →+* T.Fr)
-    (τO : (E →+* ℂ) → (𝓞 E →+* X.O)) : Prop :=
+def IsTypes
+    {T : CDVR} {p : ℕ} [Fact p.Prime]
+    (X : ValExt T p)
+    (io : c.F →+* T.Fr) (τO : (E →+* ℂ) → (𝓞 E →+* X.O))
+    : Prop :=
   ∀ τ a, algebraMap X.O X.C (τO τ a) = X.ιF (io (embK c τ a))
 
-structure UnifChart [StarRing (𝓞 E)] {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io}
-    (Ch : IntegralChartA3 Xo c T io y) {p : ℕ} [Fact p.Prime] (X : ValExt T p) : Type 1 where
+structure UnifChart
+    [StarRing (𝓞 E)]
+    {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} (Ch : IntegralChartA3 Xo c T io y)
+    {p : ℕ} [Fact p.Prime]
+    (X : ValExt T p)
+    : Type 1 where
   T' : CDVR
   ι' : T'.V →+* X.O
   ι'_local : IsLocalHom ι'

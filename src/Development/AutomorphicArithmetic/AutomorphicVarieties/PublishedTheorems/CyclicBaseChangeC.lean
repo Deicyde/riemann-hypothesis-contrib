@@ -9,7 +9,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
 open GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Af
 
 namespace UpperTheory.V.Published
@@ -24,12 +25,15 @@ def SelfTw (sat : HeightOneSpectrum (𝓞 F) → Multiset ℂˣ → Prop) (η : 
 variable (E : Type) [Field E] [NumberField E] [Algebra F E]
 
 def IsNormChar (η : HChar F) : Prop :=
-  η ≠ 1 ∧ η ^ Module.finrank F E = 1 ∧ ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∀ f : ℕ,
-    normV w = normV (w.under (𝓞 F)) ^ f → η.val (w.under (𝓞 F)) ^ f = 1
-
+  η ≠ 1 ∧ η ^ Module.finrank F E = 1
+    ∧ ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∀ f : ℕ,
+      normV w = normV (w.under (𝓞 F)) ^ f → η.val (w.under (𝓞 F)) ^ f = 1
 
 variable {E} in
-def WeakBC (sat : HeightOneSpectrum (𝓞 F) → Multiset ℂˣ → Prop) (satE : HeightOneSpectrum (𝓞 E) → Multiset ℂˣ → Prop) : Prop :=
+def WeakBC
+    (sat : HeightOneSpectrum (𝓞 F) → Multiset ℂˣ → Prop)
+    (satE : HeightOneSpectrum (𝓞 E) → Multiset ℂˣ → Prop)
+    : Prop :=
   ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∀ f : ℕ, normV w = normV (w.under (𝓞 F)) ^ f →
     ∃ B, sat (w.under (𝓞 F)) B ∧ satE w (B.map (· ^ f))
 

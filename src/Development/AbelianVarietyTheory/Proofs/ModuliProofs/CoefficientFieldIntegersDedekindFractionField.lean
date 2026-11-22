@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.Auxiliar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
@@ -24,13 +26,18 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 theorem isIntegral_int_zeta {n : ℕ} (hn : 0 < n) : IsIntegral ℤ (zeta n) :=
   (GlobalTheory.HostModel.isPrimitiveRoot_zeta hn).isIntegral hn
 
-theorem mem_of_isIntegral {L : Type} [Field L] (W : ValuationSubring L) {x : L} (hx : IsIntegral ℤ x) : x ∈ W := by
+theorem mem_of_isIntegral
+    {L : Type} [Field L] (W : ValuationSubring L) {x : L} (hx : IsIntegral ℤ x)
+    : x ∈ W := by
   have h : IsIntegral W x := hx.tower_top
   obtain ⟨y, hy⟩ := (IsIntegrallyClosed.isIntegral_iff (R := W) (K := L)).mp h
   exact hy ▸ y.2
 
-theorem isUnit_of_coprime {L : Type} [Field L] (V : ValuationSubring L) {p n : ℕ} (hp : (p : L) ∈ V.nonunits)
-    (h : n.Coprime p) : IsUnit (n : V) := by
+theorem isUnit_of_coprime
+    {L : Type} [Field L]
+    (V : ValuationSubring L)
+    {p n : ℕ} (hp : (p : L) ∈ V.nonunits) (h : n.Coprime p)
+    : IsUnit (n : V) := by
   have hpV : (p : V) ∈ IsLocalRing.maximalIdeal V :=
     ValuationSubring.coe_mem_nonunits_iff.mp (by simpa using hp)
   obtain ⟨a, b, hab⟩ : IsCoprime (n : V) (p : V) := Nat.Coprime.cast h
@@ -40,11 +47,13 @@ theorem isUnit_of_coprime {L : Type} [Field L] (V : ValuationSubring L) {p n : �
     hab ▸ add_mem (Ideal.mul_mem_left _ a hnV) (Ideal.mul_mem_left _ b hpV)
   exact (IsLocalRing.maximalIdeal.isMaximal V).ne_top ((Ideal.eq_top_iff_one _).mpr h1)
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-private theorem isIntegral_one_add_rt0_div_two (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) :
-    IsIntegral ℤ ((1 + H.rt0) / 2) := by
+private theorem isIntegral_one_add_rt0_div_two
+    (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+    : IsIntegral ℤ ((1 + H.rt0) / 2) := by
   have hd : H.d % 16 = 7 := H.2
   obtain ⟨k, hk⟩ : ∃ k : ℕ, 4 * k = H.d + 1 := ⟨(H.d + 1) / 4, by omega⟩
   have hkC : (4 : ℂ) * k = H.d + 1 := by exact_mod_cast hk
@@ -53,25 +62,30 @@ private theorem isIntegral_one_add_rt0_div_two (H : _root_.ReciprocityTheory.Cha
     Polynomial.eval₂_C, Polynomial.eval₂_natCast, eq_intCast, Int.cast_natCast]
   linear_combination (1 / 4 : ℂ) * H.sqrt_neg_disc_sq + (1 / 4 : ℂ) * hkC
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-private theorem exists_isInc_of_le_range {R : Type} [CommRing R] (g : R →+* ℂ)
-    (hg : Function.Injective g) (S : Subring ℂ) (hS : S ≤ g.range) :
-    ∃ b : S →+* R, _root_.GlobalTheory.Models.IsInc S.subtype g b := by
-  let e : R ≃+* g.range := RingEquiv.ofBijective g.rangeRestrict
-    ⟨fun a b h => hg (congrArg Subtype.val h), g.rangeRestrict_surjective⟩
+private theorem exists_isInc_of_le_range
+    {R : Type} [CommRing R]
+    (g : R →+* ℂ) (hg : Function.Injective g)
+    (S : Subring ℂ) (hS : S ≤ g.range)
+    : ∃ b : S →+* R, _root_.GlobalTheory.Models.IsInc S.subtype g b := by
+  let e : R ≃+* g.range :=
+    RingEquiv.ofBijective g.rangeRestrict
+      ⟨fun a b h => hg (congrArg Subtype.val h), g.rangeRestrict_surjective⟩
   refine ⟨e.symm.toRingHom.comp (Subring.inclusion hS), fun x => ?_⟩
   exact congrArg Subtype.val (e.apply_symm_apply ⟨x, hS x.2⟩)
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-private theorem natCast_inv_mem_of_coprime (W : ValuationSubring ℂ) {p n : ℕ}
-    (hpW : (p : ℂ) ∈ W.nonunits) (hn : n.Coprime p) : (n : ℂ)⁻¹ ∈ W := by
+private theorem natCast_inv_mem_of_coprime
+    (W : ValuationSubring ℂ) {p n : ℕ} (hpW : (p : ℂ) ∈ W.nonunits) (hn : n.Coprime p)
+    : (n : ℂ)⁻¹ ∈ W := by
   rw [ValuationSubring.mem_nonunits_iff] at hpW
-  have hle : ∀ m : ℤ, W.valuation (m : ℂ) ≤ 1 := fun m => by
-    simpa using W.valuation_le_one (m : W)
+  have hle : ∀ m : ℤ, W.valuation (m : ℂ) ≤ 1 := fun m => by simpa using W.valuation_le_one (m : W)
   have hn1 : W.valuation (n : ℂ) = 1 := by
     refine le_antisymm (by simpa using hle n) (not_lt.mp fun hlt => ?_)
     obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.mpr hn
@@ -85,24 +99,29 @@ private theorem natCast_inv_mem_of_coprime (W : ValuationSubring ℂ) {p n : ℕ
     exact lt_irrefl _ this
   exact W.mem_of_valuation_le_one _ (by rw [map_inv₀, hn1, inv_one])
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-private theorem mem_valuationSubring_of_isIntegral_moduli {K : Type} [Field K] (V : ValuationSubring K)
-    {x : K} (hx : IsIntegral ℤ x) : x ∈ V := by
+private theorem mem_valuationSubring_of_isIntegral_moduli
+    {K : Type} [Field K] (V : ValuationSubring K) {x : K} (hx : IsIntegral ℤ x)
+    : x ∈ V := by
   have hV : IsIntegral V x := hx.tower_top
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.mp hV
   rw [← hy]
   exact y.2
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-private theorem isDedekindDomain_valuationSubring_of_not_isUnit_natCast {K : Type} [Field K] [NumberField K]
-    (V : ValuationSubring K) (p : ℕ) (hp : p ≠ 0) (hpV : ¬ IsUnit (p : V)) :
-    IsDedekindDomain V := by
-  let f : 𝓞 K →+* V := (algebraMap (𝓞 K) K).codRestrict V.toSubring
-    (fun x => mem_valuationSubring_of_isIntegral_moduli V (RingOfIntegers.isIntegral_coe x))
+private theorem isDedekindDomain_valuationSubring_of_not_isUnit_natCast
+    {K : Type} [Field K] [NumberField K]
+    (V : ValuationSubring K) (p : ℕ) (hp : p ≠ 0) (hpV : ¬ IsUnit (p : V))
+    : IsDedekindDomain V := by
+  let f : 𝓞 K →+* V :=
+    (algebraMap (𝓞 K) K).codRestrict V.toSubring
+      (fun x => mem_valuationSubring_of_isIntegral_moduli V (RingOfIntegers.isIntegral_coe x))
   letI : Algebra (𝓞 K) V := f.toAlgebra
   have hcoe : ∀ x : 𝓞 K, ((algebraMap (𝓞 K) V x : V) : K) = algebraMap (𝓞 K) K x := fun _ => rfl
   let P : Ideal (𝓞 K) := (IsLocalRing.maximalIdeal V).comap (algebraMap (𝓞 K) V)
@@ -176,18 +195,39 @@ private theorem isDedekindDomain_valuationSubring_of_not_isUnit_natCast {K : Typ
         exact ⟨1, by rw [hinj h]⟩ }
   exact IsLocalization.isDedekindDomain (𝓞 K) hM V
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.CoeffRings.coeff_isDedFrac : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H) (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l), _root_.GlobalTheory.Models.IsDedFrac (algebraMap (𝓞 c.F) c.F) ∧ Algebra.FiniteType ℤ (𝓞 c.F) ∧ (∀ A : ℕ, A ∣ l.A → ∃ b : _root_.GlobalTheory.Models.RZ H 1 A →+* 𝓞 c.F, _root_.GlobalTheory.Models.IsInc (_root_.GlobalTheory.Models.RZ H 1 A).subtype (c.F.val.toRingHom.comp (algebraMap (𝓞 c.F) c.F)) b) ∧ ∀ (p : ℕ) (W : ValuationSubring ℂ), p.Prime → (p : ℂ) ∈ W.nonunits → _root_.GlobalTheory.Models.IsDedFrac (c.V W).subtype ∧ (∀ n : ℕ, n.Coprime p → IsUnit (n : c.V W)) ∧ ∀ S A : ℕ, S.Coprime p → 0 < A → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta A ∈ c.F → ∃ b : _root_.GlobalTheory.Models.RZ H S A →+* c.V W, _root_.GlobalTheory.Models.IsInc (_root_.GlobalTheory.Models.RZ H S A).subtype (c.F.val.toRingHom.comp (c.V W).subtype) b := by
+theorem _root_.GlobalTheory.CoeffRings.coeff_isDedFrac
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+        (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H)
+        (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l),
+      _root_.GlobalTheory.Models.IsDedFrac (algebraMap (𝓞 c.F) c.F) ∧ Algebra.FiniteType ℤ (𝓞 c.F)
+        ∧ (∀ A : ℕ,
+          A ∣ l.A
+            → ∃ b : _root_.GlobalTheory.Models.RZ H 1 A →+* 𝓞 c.F,
+              _root_.GlobalTheory.Models.IsInc (_root_.GlobalTheory.Models.RZ H 1 A).subtype
+                (c.F.val.toRingHom.comp (algebraMap (𝓞 c.F) c.F)) b)
+        ∧ ∀ (p : ℕ) (W : ValuationSubring ℂ),
+          p.Prime → (p : ℂ) ∈ W.nonunits
+            → _root_.GlobalTheory.Models.IsDedFrac (c.V W).subtype
+              ∧ (∀ n : ℕ, n.Coprime p → IsUnit (n : c.V W))
+              ∧ ∀ S A : ℕ,
+                S.Coprime p → 0 < A
+                  → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta A ∈ c.F
+                  → ∃ b : _root_.GlobalTheory.Models.RZ H S A →+* c.V W,
+                    _root_.GlobalTheory.Models.IsInc (_root_.GlobalTheory.Models.RZ H S A).subtype
+                      (c.F.val.toRingHom.comp (c.V W).subtype) b := by
   intro E _ _ _ H l c
   haveI : FiniteDimensional ℚ c.F := c.2
   haveI : NumberField c.F := ⟨⟩
   have hw : IsIntegral ℤ ((1 + H.rt0) / 2) := isIntegral_one_add_rt0_div_two H
   have hnatF : ∀ n : ℕ, (n : ℂ) ∈ c.F := fun n => natCast_mem c.F n
   have hwF : (1 + H.rt0) / 2 ∈ c.F :=
-    div_mem (add_mem (one_mem _) (_root_.GlobalTheory.HostModel.sqrtNegDisc_mem_coeffField c)) (by simpa using hnatF 2)
+    div_mem (add_mem (one_mem _) (_root_.GlobalTheory.HostModel.sqrtNegDisc_mem_coeffField c))
+      (by simpa using hnatF 2)
   have hintF : ∀ {x : ℂ} (hx : x ∈ c.F), IsIntegral ℤ x → IsIntegral ℤ (⟨x, hx⟩ : c.F) :=
     fun hx h => (isIntegral_algHom_iff c.F.val.toRingHom.toIntAlgHom Subtype.val_injective).mp h
   refine ⟨?_, inferInstance, ?_, ?_⟩
@@ -200,9 +240,11 @@ theorem _root_.GlobalTheory.CoeffRings.coeff_isDedFrac : ∀ (E : Type) [Field E
       obtain ⟨k, hk⟩ := _root_.GlobalTheory.LevelExist.zeta_eq_pow_of_dvd l.A_pos hA
       rw [hk]
       exact pow_mem (_root_.GlobalTheory.HostModel.zeta_A_mem_coeff c) k
-    have hz : IsIntegral ℤ (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta A) := (_root_.GlobalTheory.HostModel.isPrimitiveRoot_zeta hApos).isIntegral hApos
+    have hz : IsIntegral ℤ (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta A) :=
+      (_root_.GlobalTheory.HostModel.isPrimitiveRoot_zeta hApos).isIntegral hApos
     refine exists_isInc_of_le_range _
-      (fun a b h => RingOfIntegers.coe_injective (Subtype.val_injective h)) _ ?_
+      (fun a b h => RingOfIntegers.coe_injective (Subtype.val_injective h))
+      _ ?_
     unfold _root_.GlobalTheory.Models.RZ
     rw [Subring.closure_le]
     intro x hx
@@ -235,8 +277,7 @@ theorem _root_.GlobalTheory.CoeffRings.coeff_isDedFrac : ∀ (E : Type) [Field E
           have := congrArg (fun y : c.V W => ((y : c.F) : ℂ)) hb
           simpa using this
         rw [ValuationSubring.mem_nonunits_iff] at hpW
-        have hbW : W.valuation ((b : c.F) : ℂ) ≤ 1 :=
-          W.valuation_le_one ⟨_, (memV _).mp b.2⟩
+        have hbW : W.valuation ((b : c.F) : ℂ) ≤ 1 := W.valuation_le_one ⟨_, (memV _).mp b.2⟩
         have := lt_of_le_of_lt (mul_le_of_le_one_right' hbW) hpW
         rw [← map_mul, hbC, map_one] at this
         exact lt_irrefl _ this
@@ -245,10 +286,12 @@ theorem _root_.GlobalTheory.CoeffRings.coeff_isDedFrac : ∀ (E : Type) [Field E
       have h : IsFractionRing (c.V W) c.F := inferInstance
       exact h
     · intro S A hS hA hzF
-      have hz : IsIntegral ℤ (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta A) := (_root_.GlobalTheory.HostModel.isPrimitiveRoot_zeta hA).isIntegral hA
+      have hz : IsIntegral ℤ (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.zeta A) :=
+        (_root_.GlobalTheory.HostModel.isPrimitiveRoot_zeta hA).isIntegral hA
       have hSF : (S : ℂ)⁻¹ ∈ c.F := inv_mem (hnatF S)
       refine exists_isInc_of_le_range _
-        (fun a b h => Subtype.val_injective (Subtype.val_injective h)) _ ?_
+        (fun a b h => Subtype.val_injective (Subtype.val_injective h))
+        _ ?_
       unfold _root_.GlobalTheory.Models.RZ
       rw [Subring.closure_le]
       intro x hx

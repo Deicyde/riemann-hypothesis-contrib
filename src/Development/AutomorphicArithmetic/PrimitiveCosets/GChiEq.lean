@@ -4,11 +4,15 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.CoreAtH
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
-private theorem UpperTheory.Comparison₂.gChi_eq_ramp (f : ℕ → ℂ) (y : ℝ) :
-    Deduction.ramp f y = ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, (An.abelian₂ n : ℂ) * f n * ((max (y / n - 1) 0 : ℝ) : ℂ) := by
+private theorem UpperTheory.Comparison₂.gChi_eq_ramp (f : ℕ → ℂ) (y : ℝ)
+    : Deduction.ramp f y
+      = ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, (An.abelian₂ n : ℂ) * f n * ((max (y / n - 1) 0 : ℝ) : ℂ) := by
   unfold Deduction.ramp
   rw [Finset.range_eq_Ico, Finset.sum_eq_sum_Ico_succ_bot (Nat.succ_pos _), zero_add]
   have e : Finset.Ico 1 ⌊y⌋₊.succ = Finset.Icc 1 ⌊y⌋₊ := by
@@ -17,8 +21,8 @@ private theorem UpperTheory.Comparison₂.gChi_eq_ramp (f : ℕ → ℂ) (y : �
   rw [e]
   simp
 
-theorem UpperTheory.Comparison₂.gChi_eq :
-    ∀ (ψ : PChar) (y : ℝ), An.gChi ψ.χ y = Deduction.Gchi ψ.χ y := by
+theorem UpperTheory.Comparison₂.gChi_eq
+    : ∀ (ψ : PChar) (y : ℝ), An.gChi ψ.χ y = Deduction.Gchi ψ.χ y := by
   intro ψ y
   unfold An.gChi Deduction.Gchi
   rw [UpperTheory.Comparison₂.gChi_eq_ramp]

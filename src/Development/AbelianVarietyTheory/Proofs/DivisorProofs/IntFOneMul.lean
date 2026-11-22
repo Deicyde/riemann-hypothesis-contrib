@@ -17,7 +17,6 @@ namespace GlobalTheory.HeckeExtend
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-
 variable (F) in
 def intF (N : ℕ) : Set (AF F) :=
   {x | ∃ c : Af F, (∀ v, c v ∈ v.adicCompletionIntegers F) ∧ x.2 = N • c}
@@ -30,15 +29,16 @@ theorem intF_one_mul {x y : AF F} (hx : x ∈ intF F 1) (hy : y ∈ intF F 1) : 
   show x.2 * y.2 = c * d
   rw [e, e']
 
-
 variable (F E) in
 def SE : AddSubgroup (AF F ⊗[F] E) :=
-  AddSubgroup.closure {z | ∃ s ∈ intF F 1, ∃ o : 𝓞 E, z = algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E o}
+  AddSubgroup.closure
+    {z | ∃ s ∈ intF F 1, ∃ o : 𝓞 E, z = algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E o}
 
-theorem gen_mul {x y : AF F ⊗[F] E}
+theorem gen_mul
+    {x y : AF F ⊗[F] E}
     (hx : x ∈ {z | ∃ s ∈ intF F 1, ∃ o : 𝓞 E, z = algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E o})
-    (hy : y ∈ {z | ∃ s ∈ intF F 1, ∃ o : 𝓞 E, z = algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E o}) :
-    x * y ∈ SE F E := by
+    (hy : y ∈ {z | ∃ s ∈ intF F 1, ∃ o : 𝓞 E, z = algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E o})
+    : x * y ∈ SE F E := by
   obtain ⟨s, hs, o, rfl⟩ := hx
   obtain ⟨s', hs', o', rfl⟩ := hy
   refine AddSubgroup.subset_closure ⟨s * s', intF_one_mul hs hs', o * o', ?_⟩
@@ -59,17 +59,16 @@ theorem SE_mul {x y : AF F ⊗[F] E} (hx : x ∈ SE F E) (hy : y ∈ SE F E) : x
   | neg a _ ha => rw [neg_mul]; exact neg_mem ha
 
 theorem one_mem_SE : (1 : AF F ⊗[F] E) ∈ SE F E :=
-  AddSubgroup.subset_closure ⟨1, ⟨1, fun v => one_mem _, by rw [one_smul]; rfl⟩, 1, by simp [Algebra.TensorProduct.one_def]⟩
-
+  AddSubgroup.subset_closure
+    ⟨1, ⟨1, fun v => one_mem _, by rw [one_smul]; rfl⟩, 1, by simp [Algebra.TensorProduct.one_def]⟩
 
 variable (F E) in
 def CE (N : ℕ) : AddSubgroup (AF F ⊗[F] E) := (SE F E).map (nsmulAddMonoidHom N)
 
-theorem mem_CE {N : ℕ} {z : AF F ⊗[F] E} : z ∈ CE F E N ↔ ∃ s ∈ SE F E, N • s = z := by
-  simp [CE]
+theorem mem_CE {N : ℕ} {z : AF F ⊗[F] E} : z ∈ CE F E N ↔ ∃ s ∈ SE F E, N • s = z := by simp [CE]
 
-theorem CE_step {N : ℕ} {x y : AF F ⊗[F] E} (hx : x - 1 ∈ CE F E N) (hy : y - 1 ∈ CE F E N) :
-    x * y - 1 ∈ CE F E N := by
+theorem CE_step {N : ℕ} {x y : AF F ⊗[F] E} (hx : x - 1 ∈ CE F E N) (hy : y - 1 ∈ CE F E N)
+    : x * y - 1 ∈ CE F E N := by
   obtain ⟨a, ha, ea⟩ := mem_CE.1 hx
   obtain ⟨b, hb, eb⟩ := mem_CE.1 hy
   refine mem_CE.2 ⟨a + b + N • (a * b), add_mem (add_mem ha hb) (nsmul_mem (SE_mul ha hb) N), ?_⟩
@@ -77,18 +76,20 @@ theorem CE_step {N : ℕ} {x y : AF F ⊗[F] E} (hx : x - 1 ∈ CE F E N) (hy : 
   simp only [nsmul_eq_mul]
   ring
 
-
 variable (F E) in
 def WE (N : ℕ) : Subgroup (AF F ⊗[F] E)ˣ where
-  carrier := {z | (z : AF F ⊗[F] E) - 1 ∈ CE F E N ∧ ((z⁻¹ : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) - 1 ∈ CE F E N}
+  carrier :=
+    {z | (z : AF F ⊗[F] E) - 1 ∈ CE F E N ∧ ((z⁻¹ : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) - 1 ∈ CE F E N}
   one_mem' := by simp
-  mul_mem' := fun {x y} hx hy => ⟨by rw [Units.val_mul]; exact CE_step hx.1 hy.1,
-    by rw [mul_inv_rev, Units.val_mul]; exact CE_step hy.2 hx.2⟩
+  mul_mem' := fun {x y} hx hy => ⟨
+    by rw [Units.val_mul]; exact CE_step hx.1 hy.1,
+    by rw [mul_inv_rev, Units.val_mul]; exact CE_step hy.2 hx.2
+  ⟩
   inv_mem' := fun {x} hx => ⟨hx.2, by rw [inv_inv]; exact hx.1⟩
 
-theorem cA_gen (σ : E →ₐ[F] E) (s : AF F) (o : 𝓞 E) :
-    cA σ (algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E o) =
-      algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E (σ o) := by
+theorem cA_gen (σ : E →ₐ[F] E) (s : AF F) (o : 𝓞 E)
+    : cA σ (algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E o)
+      = algebraMap (AF F) (AF F ⊗[F] E) s * incAF F E (σ o) := by
   rw [map_mul, AlgHom.commutes]
   rfl
 

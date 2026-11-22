@@ -81,12 +81,13 @@ theorem nrm_add_le_max (x y : Ω) : nrm K (x + y) ≤ max (nrm K x) (nrm K y) :=
   change ‖x + y‖ ≤ max ‖x‖ ‖y‖
   exact IsUltrametricDist.norm_add_le_max x y
 
-theorem nrm_add_le_of_le {x y : Ω} {r : ℝ} (hx : nrm K x ≤ r) (hy : nrm K y ≤ r) :
-    nrm K (x + y) ≤ r :=
+theorem nrm_add_le_of_le {x y : Ω} {r : ℝ} (hx : nrm K x ≤ r) (hy : nrm K y ≤ r)
+    : nrm K (x + y) ≤ r :=
   (nrm_add_le_max x y).trans (max_le hx hy)
 
-theorem nrm_sum_le {ι : Type*} {s : Finset ι} {f : ι → Ω} {C : ℝ} (hC : 0 ≤ C)
-    (h : ∀ i ∈ s, nrm K (f i) ≤ C) : nrm K (∑ i ∈ s, f i) ≤ C := by
+theorem nrm_sum_le
+    {ι : Type*} {s : Finset ι} {f : ι → Ω} {C : ℝ} (hC : 0 ≤ C) (h : ∀ i ∈ s, nrm K (f i) ≤ C)
+    : nrm K (∑ i ∈ s, f i) ≤ C := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using hC
@@ -105,14 +106,12 @@ theorem nrm_algEquiv (σ : Ω ≃ₐ[K] Ω) (x : Ω) : nrm K (σ x) = nrm K x :=
   letI := normedField K
   exact (spectralNorm_eq_of_equiv σ x).symm
 
-
 variable [ValuativeRel Ω] [ValuativeExtension K Ω]
 
 theorem nrm_le_nrm_iff (x y : Ω) : nrm K x ≤ nrm K y ↔ x ≤ᵥ y :=
   (vle_iff_spectralNorm_le (K := K) x y).symm
 
 variable [TopologicalSpace Ω] [IsValuativeTopology Ω]
-
 
 end Nrm
 
@@ -127,31 +126,28 @@ end Estimates
 
 section Tower
 
-variable (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  (Ω : Type*) [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] (p : ℕ)
+variable
+  (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  (Ω : Type*) [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω]
+  (p : ℕ)
 
 structure NormTower where
-
   E : ℕ → IntermediateField K Ω
   mono : Monotone E
   finiteDimensional : ∀ n, FiniteDimensional K (E n)
-
   T : ℕ → Finset Gal(Ω/K)
   fix : ∀ n, ∀ σ ∈ T n, ∀ x ∈ E n, σ x = x
   prod_mem : ∀ n, ∀ y ∈ E (n + 1), (∏ σ ∈ T n, σ y) ∈ E n
-
   k : ℕ → ℕ
   card_alt : ∀ n, (T n).card = p ^ k n
   frequently_ne_zero : ∀ n, ∃ m, n ≤ m ∧ k m ≠ 0
-
   c : ℝ
   c_nonneg : 0 ≤ c
   c_lt_one : c < 1
   step : ∀ n, ∀ σ ∈ T n, ∀ x ∈ E (n + 1), nrm K (σ x - x) ≤ c * nrm K x
   prime : p.Prime
   nrm_p_lt_one : nrm K (p : Ω) < 1
-
   value : ℕ → ℝ
   value_pos : ∀ n, 0 < value n
   value_lt_one : ∀ n, value n < 1

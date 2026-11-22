@@ -16,10 +16,17 @@ namespace Formalism.L2.SG.Pf.CarrierTop
 
 open Formalism.L2.SG.RealObj
 
-theorem placeTie_ePl {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (x : InfinitePlace D.host.E) :
-    InfinitePlace.mk ((X.B.I.φ (X.pl.symm ((Formalism.L2.Geo.Rec.StarEmbeddingNorm.ePl D).symm x))).comp X.ιE.symm.toRingHom) = x := by
-  have h : (X.B.I.φ (X.pl.symm ((Formalism.L2.Geo.Rec.StarEmbeddingNorm.ePl D).symm x))).comp X.ιE.symm.toRingHom =
-      Formalism.BasicNotions.DV.tauEmb D ((Formalism.L2.Geo.Rec.StarEmbeddingNorm.ePl D).symm x) := by
+theorem placeTie_ePl
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (x : InfinitePlace D.host.E)
+    : InfinitePlace.mk
+        ((X.B.I.φ (X.pl.symm ((Formalism.L2.Geo.Rec.StarEmbeddingNorm.ePl D).symm x))).comp
+          X.ιE.symm.toRingHom)
+      = x := by
+  have h
+      : (X.B.I.φ (X.pl.symm ((Formalism.L2.Geo.Rec.StarEmbeddingNorm.ePl D).symm x))).comp
+          X.ιE.symm.toRingHom
+        = Formalism.BasicNotions.DV.tauEmb D
+          ((Formalism.L2.Geo.Rec.StarEmbeddingNorm.ePl D).symm x) := by
     ext y
     show X.B.I.φ _ (X.ιE.symm y) = _
     rw [X.φ_eq, Equiv.apply_symm_apply, RingEquiv.apply_symm_apply]
@@ -31,33 +38,39 @@ section Mat
 
 variable {r : ℕ}
 
-theorem dl_diag (a b : Fin (r + 1) → ℂ) (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) {l : ℕ} (hl : l ≤ r + 1) :
-    RealObj.Dl (Matrix.diagonal a * Z * Matrix.diagonal b) l =
-      (∏ i : Fin l, a (Fin.castLE hl i)) * (∏ i : Fin l, b (Fin.castLE hl i)) * RealObj.Dl Z l := by
-  have hsub : (Matrix.diagonal a * Z * Matrix.diagonal b).submatrix (Fin.castLE hl) (Fin.castLE hl) =
-      Matrix.diagonal (fun i => a (Fin.castLE hl i)) * Z.submatrix (Fin.castLE hl) (Fin.castLE hl) *
-        Matrix.diagonal (fun i => b (Fin.castLE hl i)) := by
+theorem dl_diag
+    (a b : Fin (r + 1) → ℂ) (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) {l : ℕ} (hl : l ≤ r + 1)
+    : RealObj.Dl (Matrix.diagonal a * Z * Matrix.diagonal b) l
+      = (∏ i : Fin l, a (Fin.castLE hl i)) * (∏ i : Fin l, b (Fin.castLE hl i))
+        * RealObj.Dl Z l := by
+  have hsub
+      : (Matrix.diagonal a * Z * Matrix.diagonal b).submatrix (Fin.castLE hl) (Fin.castLE hl)
+        = Matrix.diagonal (fun i => a (Fin.castLE hl i))
+          * Z.submatrix (Fin.castLE hl) (Fin.castLE hl)
+          * Matrix.diagonal (fun i => b (Fin.castLE hl i)) := by
     ext i j
     simp [Matrix.mul_diagonal, Matrix.diagonal_mul]
   simp only [RealObj.Dl, dif_pos hl]
   rw [hsub, Matrix.det_mul, Matrix.det_mul, Matrix.det_diagonal, Matrix.det_diagonal]
   ring
 
-theorem prod_castLE_succ (x : Fin (r + 1) → ℂ) (h : r + 1 ≤ r + 1) :
-    ∏ i : Fin (r + 1), x (Fin.castLE h i) = (∏ i : Fin r, x (Fin.castLE (Nat.le_succ r) i)) * x (Fin.last r) := by
+theorem prod_castLE_succ (x : Fin (r + 1) → ℂ) (h : r + 1 ≤ r + 1)
+    : ∏ i : Fin (r + 1), x (Fin.castLE h i)
+      = (∏ i : Fin r, x (Fin.castLE (Nat.le_succ r) i)) * x (Fin.last r) := by
   rw [Fin.prod_univ_castSucc]
   rfl
 
 def sgnV (r : ℕ) : Fin (r + 1) → ℂ := fun b => (-1 : ℂ) ^ (r - b.1)
 
-theorem zhatO_eq_mul (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) :
-    RealObj.ZhatO Z = Matrix.diagonal (fun _ => 1) * Z * Matrix.diagonal (sgnV r) := by
+theorem zhatO_eq_mul (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
+    : RealObj.ZhatO Z = Matrix.diagonal (fun _ => 1) * Z * Matrix.diagonal (sgnV r) := by
   ext a b
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul]
   simp only [RealObj.ZhatO, sgnV]
   ring
 
-theorem zhatO_invol (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) : RealObj.ZhatO (RealObj.ZhatO Z) = Z := by
+theorem zhatO_invol (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
+    : RealObj.ZhatO (RealObj.ZhatO Z) = Z := by
   ext a b
   simp only [RealObj.ZhatO]
   rw [← mul_assoc, ← pow_add, Even.neg_one_pow ⟨r - b.1, rfl⟩, one_mul]
@@ -68,8 +81,8 @@ theorem norm_prod_sgn {l : ℕ} (hl : l ≤ r + 1) : ‖∏ i : Fin l, sgnV r (F
   intro i _
   simp [sgnV]
 
-theorem norm_dl_zhatO (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) {l : ℕ} (hl : l ≤ r + 1) :
-    ‖RealObj.Dl Z l‖ = ‖RealObj.Dl (RealObj.ZhatO Z) l‖ := by
+theorem norm_dl_zhatO (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) {l : ℕ} (hl : l ≤ r + 1)
+    : ‖RealObj.Dl Z l‖ = ‖RealObj.Dl (RealObj.ZhatO Z) l‖ := by
   rw [zhatO_eq_mul, dl_diag _ _ _ hl, norm_mul, norm_mul, norm_prod_sgn hl]
   simp
 
@@ -77,18 +90,24 @@ end Mat
 
 section Pt
 
-theorem ptEntry_app_lt {K : Type*} [Zero K] : ∀ (L0 L1 : List (K × ℕ)) (i j : ℕ),
-    i < (L0.map Prod.snd).sum → j < (L0.map Prod.snd).sum → ptEntry (L0 ++ L1) i j = ptEntry L0 i j
+theorem ptEntry_app_lt {K : Type*} [Zero K]
+    : ∀ (L0 L1 : List (K × ℕ)) (i j : ℕ),
+      i < (L0.map Prod.snd).sum → j < (L0.map Prod.snd).sum
+        → ptEntry (L0 ++ L1) i j = ptEntry L0 i j
   | [], _, _, _, hi, _ => by simp at hi
   | (t, s) :: bs, L1, i, j, hi, hj => by
     simp only [List.map_cons, List.sum_cons] at hi hj
     simp only [List.cons_append, ptEntry]
     split_ifs <;> first | rfl | exact ptEntry_app_lt bs L1 (i - s) (j - s) (by omega) (by omega)
 
-theorem ptEntry_app_ge {K : Type*} [Zero K] : ∀ (L0 L1 : List (K × ℕ)) (i j : ℕ),
-    (L0.map Prod.snd).sum ≤ i →
-    ptEntry (L0 ++ L1) i j =
-      if (L0.map Prod.snd).sum ≤ j then ptEntry L1 (i - (L0.map Prod.snd).sum) (j - (L0.map Prod.snd).sum) else 0
+theorem ptEntry_app_ge {K : Type*} [Zero K]
+    : ∀ (L0 L1 : List (K × ℕ)) (i j : ℕ),
+      (L0.map Prod.snd).sum ≤ i
+        → ptEntry (L0 ++ L1) i j
+          = if (L0.map Prod.snd).sum ≤ j then
+              ptEntry L1 (i - (L0.map Prod.snd).sum) (j - (L0.map Prod.snd).sum)
+            else
+              0
   | [], L1, i, j, _ => by simp
   | (t, s) :: bs, L1, i, j, hi => by
     simp only [List.map_cons, List.sum_cons] at hi ⊢
@@ -103,10 +122,14 @@ theorem ptEntry_app_ge {K : Type*} [Zero K] : ∀ (L0 L1 : List (K × ℕ)) (i j
 
 variable {K : Type} [Field K] {r : ℕ}
 
-theorem dl_pt_last (σ : K →+* ℂ) (w : Point K (r + 1)) (L : List (K × ℕ)) (t : K)
-    (hw : w.1 = L ++ [(t, 1)]) (hs : (L.map Prod.snd).sum = r) :
-    RealObj.Dl ((ptMat w).map σ) (r + 1) = RealObj.Dl ((ptMat w).map σ) r * σ t ∧ RealObj.Dl ((ptMat w).map σ) r ≠ 0 := by
-  have hL : ∀ b ∈ L, b.1 ≠ 0 ∧ 1 ≤ b.2 := fun b hb => w.2.1 b (by rw [hw]; exact List.mem_append_left _ hb)
+theorem dl_pt_last
+    (σ : K →+* ℂ)
+    (w : Point K (r + 1)) (L : List (K × ℕ)) (t : K) (hw : w.1 = L ++ [(t, 1)])
+    (hs : (L.map Prod.snd).sum = r)
+    : RealObj.Dl ((ptMat w).map σ) (r + 1) = RealObj.Dl ((ptMat w).map σ) r * σ t
+      ∧ RealObj.Dl ((ptMat w).map σ) r ≠ 0 := by
+  have hL : ∀ b ∈ L, b.1 ≠ 0 ∧ 1 ≤ b.2 := fun b hb =>
+    w.2.1 b (by rw [hw]; exact List.mem_append_left _ hb)
   let w0 : Point K r := ⟨L, hL, hs⟩
   set M : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ := (ptMat w).map σ with hM
 
@@ -136,8 +159,8 @@ theorem dl_pt_last (σ : K →+* ℂ) (w : Point K (r + 1)) (L : List (K × ℕ)
       rw [if_neg (by omega), if_neg hj, map_zero]
   have hdet : M.det = σ t * ((ptMat w0).map σ).det := by
     rw [Matrix.det_succ_row M (Fin.last r), Finset.sum_eq_single (Fin.last r)]
-    · rw [hrow, if_pos rfl, Fin.succAbove_last, hsub, Fin.val_last, ← two_mul, pow_mul, neg_one_sq, one_pow,
-        one_mul]
+    · rw [hrow, if_pos rfl, Fin.succAbove_last, hsub, Fin.val_last, ← two_mul, pow_mul, neg_one_sq,
+        one_pow, one_mul]
     · intro j _ hj
       rw [hrow, if_neg hj]
       simp
@@ -157,20 +180,23 @@ section Sign
 
 open Formalism.L2.SG.DataInst
 
-theorem signFlip_append {K : Type} [Ring K] (r : ℕ) : ∀ (b : ℕ) (x y : Formalism.FourierDecayAlt.TB.Pt K),
-    signAux r b (x ++ y) = signAux r b x ++ signAux r (b + (x.map Prod.fst).sum) y
+theorem signFlip_append {K : Type} [Ring K] (r : ℕ)
+    : ∀ (b : ℕ) (x y : Formalism.FourierDecayAlt.TB.Pt K),
+      signAux r b (x ++ y) = signAux r b x ++ signAux r (b + (x.map Prod.fst).sum) y
   | b, [], y => by simp [signAux]
   | b, (s, t) :: rest, y => by
     simp only [List.cons_append, signAux, List.map_cons, List.sum_cons, List.cons.injEq, true_and]
     rw [signFlip_append r (b + s) rest y, add_assoc]
 
-theorem signFlip_singleton_last {K : Type} [Ring K] (r : ℕ) (t : K) : signAux r (r + 1) [(1, t)] = [(1, t)] := by
+theorem signFlip_singleton_last {K : Type} [Ring K] (r : ℕ) (t : K)
+    : signAux r (r + 1) [(1, t)] = [(1, t)] := by
   simp [signAux]
 
-theorem pt_last {D : D7} (p : Formalism.FourierDecayAlt.TB.Pt D.host.E) (w : Point D.host.E (D.R.rS + 1))
-    (hp : ptOfL (D := D) (D.R.rS + 1) p = some w) (h1 : p.getLast?.map Prod.fst = some 1) :
-    ∃ (L : List (D.host.E × ℕ)) (t : D.host.E), w.1 = L ++ [(t, 1)] ∧ (L.map Prod.snd).sum = D.R.rS ∧
-      p.getLast? = some (1, t) := by
+theorem pt_last
+    {D : D7} (p : Formalism.FourierDecayAlt.TB.Pt D.host.E) (w : Point D.host.E (D.R.rS + 1))
+    (hp : ptOfL (D := D) (D.R.rS + 1) p = some w) (h1 : p.getLast?.map Prod.fst = some 1)
+    : ∃ (L : List (D.host.E × ℕ)) (t : D.host.E),
+      w.1 = L ++ [(t, 1)] ∧ (L.map Prod.snd).sum = D.R.rS ∧ p.getLast? = some (1, t) := by
   unfold ptOfL ptOfList at hp
   split_ifs at hp with hPt
   obtain rfl := Option.some.inj hp
@@ -193,7 +219,9 @@ theorem pt_last {D : D7} (p : Formalism.FourierDecayAlt.TB.Pt D.host.E) (w : Poi
   subst hq1
   have hs0 : ((p.dropLast).map Prod.fst).sum = D.R.rS := by
     rw [hp'] at hsum
-    simp only [List.map_append, List.sum_append, List.map_cons, List.map_nil, List.sum_cons, List.sum_nil] at hsum
+    simp only [List.map_append, List.sum_append, List.map_cons, List.map_nil, List.sum_cons,
+        List.sum_nil]
+      at hsum
     omega
   refine ⟨(signAux D.R.rS 1 p.dropLast).map Prod.swap, t, ?_, ?_, hq⟩
   · show (signPt D.R.rS p).map Prod.swap = _
@@ -215,34 +243,45 @@ variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 
 def cS (r : ℕ) (sc : ℝ) : Fin (r + 1) → ℂ := fun a => ((sc : ℂ) ^ (r - a.1))⁻¹
 
-theorem zx_sc (u u' : D.what₂.Word) (sc : ℝ) (γ : X.B.I.Ginf) (v : InfinitePlace X.B.I.F) :
-    ZX X u u' sc γ v = Matrix.diagonal (cS D.R.rS sc) * ZX X u u' 1 γ v * Matrix.diagonal (cS D.R.rS sc) := by
+theorem zx_sc (u u' : D.what₂.Word) (sc : ℝ) (γ : X.B.I.Ginf) (v : InfinitePlace X.B.I.F)
+    : ZX X u u' sc γ v
+      = Matrix.diagonal (cS D.R.rS sc) * ZX X u u' 1 γ v * Matrix.diagonal (cS D.R.rS sc) := by
   ext a b
-  simp only [ZX, Zhat, frm, famSc, Formalism.L2.SG.HidaSetting.hJ, Matrix.mul_diagonal, Matrix.diagonal_mul, cS]
-  simp only [Complex.ofReal_one, one_pow, inv_one, one_smul, Matrix.mulVec_smul, star_smul, smul_eq_mul,
-    Complex.star_def, map_inv₀, map_pow, Complex.conj_ofReal]
+  simp only [ZX, Zhat, frm, famSc, Formalism.L2.SG.HidaSetting.hJ, Matrix.mul_diagonal,
+    Matrix.diagonal_mul, cS]
+  simp only [Complex.ofReal_one, one_pow, inv_one, one_smul, Matrix.mulVec_smul, star_smul,
+    smul_eq_mul, Complex.star_def, map_inv₀, map_pow, Complex.conj_ofReal]
   simp only [smul_dotProduct, dotProduct_smul, smul_eq_mul]
   ring
 
-variable {Wp Wq : InfinitePlace D.host.E → Type} [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+variable
+  {Wp Wq : InfinitePlace D.host.E → Type}
+  [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
   [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
 
-theorem topTie_G (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq) (u u' : D.what₂.Word) (τ : Fin S.f ≃ InfinitePlace X.B.I.F)
-    (hemb : ∀ j x, S.emb j (X.ιE x) = X.B.I.φ (τ j) x)
-    (hG : ∀ j q, (S.pd j).G q = Complex.normSq (Formalism.FourierDecayAlt.D.ptLast q).2 - Tw (D := D) u * Tw (D := D) u') :
-    ∀ j (p : Formalism.FourierDecayAlt.TB.Pt D.host.E) (w : Point D.host.E (D.R.rS + 1)),
-      ptOfL (D := D) (D.R.rS + 1) p = some w → (∃ γ, IsPtRep X u u' w γ) →
-        (Formalism.FourierDecayAlt.D.ptLast (Formalism.FourierDecayAlt.C.loc (S.emb j) p)).1 = 1 →
-        (S.pd j).G (Formalism.FourierDecayAlt.C.loc (S.emb j) p) =
-          GX X u u' D.host.rdE (gamW X u u' w) (τ j) /
-            ‖RealObj.Dl (ZX X u u' D.host.rdE (gamW X u u' w) (τ j)) D.R.rS‖ ^ 2 := by
+theorem topTie_G
+    (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq)
+    (u u' : D.what₂.Word)
+    (τ : Fin S.f ≃ InfinitePlace X.B.I.F) (hemb : ∀ j x, S.emb j (X.ιE x) = X.B.I.φ (τ j) x)
+    (hG : ∀ j q,
+      (S.pd j).G q
+        = Complex.normSq (Formalism.FourierDecayAlt.D.ptLast q).2 - Tw (D := D) u * Tw (D := D) u')
+    : ∀ j (p : Formalism.FourierDecayAlt.TB.Pt D.host.E) (w : Point D.host.E (D.R.rS + 1)),
+      ptOfL (D := D) (D.R.rS + 1) p = some w → (∃ γ, IsPtRep X u u' w γ)
+        → (Formalism.FourierDecayAlt.D.ptLast (Formalism.FourierDecayAlt.C.loc (S.emb j) p)).1 = 1
+        → (S.pd j).G (Formalism.FourierDecayAlt.C.loc (S.emb j) p)
+          = GX X u u' D.host.rdE (gamW X u u' w) (τ j)
+            / ‖RealObj.Dl (ZX X u u' D.host.rdE (gamW X u u' w) (τ j)) D.R.rS‖ ^ 2 := by
   intro j p w hp hex h1
   have hrep : IsPtRep X u u' w (gamW X u u' w) := by
     unfold gamW
     rw [dif_pos hex]
     exact hex.choose_spec
 
-  have hloc : ∀ (σ : D.host.E →+* ℂ), (Formalism.FourierDecayAlt.C.loc σ p).getLast? = p.getLast?.map (fun b => (b.1, σ b.2)) := by
+  have hloc
+      : ∀ (σ : D.host.E →+* ℂ),
+        (Formalism.FourierDecayAlt.C.loc σ p).getLast?
+          = p.getLast?.map (fun b => (b.1, σ b.2)) := by
     intro σ
     unfold Formalism.FourierDecayAlt.C.loc
     rw [List.getLast?_map]
@@ -259,7 +298,9 @@ theorem topTie_G (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq) (u
     rw [RingEquiv.apply_symm_apply] at this
     rw [this]
     rfl
-  have hL : Formalism.FourierDecayAlt.D.ptLast (Formalism.FourierDecayAlt.C.loc (S.emb j) p) = (1, σ t) := by
+  have hL
+      : Formalism.FourierDecayAlt.D.ptLast (Formalism.FourierDecayAlt.C.loc (S.emb j) p)
+        = (1, σ t) := by
     unfold Formalism.FourierDecayAlt.D.ptLast
     rw [hloc, hlast]
     simp [hσ]
@@ -271,7 +312,8 @@ theorem topTie_G (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq) (u
     rw [← hP, ← hrep (τ j), zhatO_invol]
   have hrd : 0 < D.host.rdE := by
     unfold Formalism.BasicNotions.Host.rdE
-    exact Real.rpow_pos_of_pos (abs_pos.mpr (by exact_mod_cast NumberField.discr_ne_zero D.host.E)) _
+    exact Real.rpow_pos_of_pos (abs_pos.mpr (by exact_mod_cast NumberField.discr_ne_zero D.host.E))
+      _
   have hc0 : ∀ a, cS D.R.rS D.host.rdE a ≠ 0 := fun a => by
     unfold cS
     exact inv_ne_zero (pow_ne_zero _ (by exact_mod_cast hrd.ne'))
@@ -280,9 +322,10 @@ theorem topTie_G (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq) (u
   set a : ℂ := ∏ i : Fin D.R.rS, cS D.R.rS D.host.rdE (Fin.castLE (Nat.le_succ D.R.rS) i) with ha
   have ha0 : a ≠ 0 := Finset.prod_ne_zero_iff.mpr fun i _ => hc0 _
   have hZ := zx_sc X u u' D.host.rdE (gamW X u u' w) (τ j)
-  have hN : ∀ {l : ℕ} (hl : l ≤ D.R.rS + 1),
-      ‖RealObj.Dl (ZX X u u' D.host.rdE (gamW X u u' w) (τ j)) l‖ =
-        ‖∏ i : Fin l, cS D.R.rS D.host.rdE (Fin.castLE hl i)‖ ^ 2 * ‖RealObj.Dl P l‖ := by
+  have hN
+      : ∀ {l : ℕ} (hl : l ≤ D.R.rS + 1),
+        ‖RealObj.Dl (ZX X u u' D.host.rdE (gamW X u u' w) (τ j)) l‖
+          = ‖∏ i : Fin l, cS D.R.rS D.host.rdE (Fin.castLE hl i)‖ ^ 2 * ‖RealObj.Dl P l‖ := by
     intro l hl
     rw [hZ, dl_diag _ _ _ hl, norm_mul, norm_mul, hZ1, ← norm_dl_zhatO _ hl]
     ring
@@ -296,13 +339,17 @@ theorem topTie_G (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq) (u
   have ha' : ‖a‖ ≠ 0 := norm_ne_zero_iff.mpr ha0
   field_simp
 
-theorem topTie_of (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq) (u u' : D.what₂.Word) (sc : ℝ)
-    (i0 i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k) (FdN FdN' : Set X.B.I.Ginf)
-    (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (τ : Fin S.f ≃ InfinitePlace X.B.I.F)
+theorem topTie_of
+    (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq)
+    (u u' : D.what₂.Word) (sc : ℝ) (i0 i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k)
+    (FdN FdN' : Set X.B.I.Ginf) (νq : X.B.I.Ginf → Measure X.B.I.Ginf)
+    (τ : Fin S.f ≃ InfinitePlace X.B.I.F)
     (hPG : Formalism.FourierDecayAlt.C.PropGram S (VtPt X u u' sc i0 i0' FdN FdN' νq))
     (hemb : ∀ j x, S.emb j (X.ιE x) = X.B.I.φ (τ j) x)
-    (hG : ∀ j q, (S.pd j).G q = Complex.normSq (Formalism.FourierDecayAlt.D.ptLast q).2 - Tw (D := D) u * Tw (D := D) u') :
-    TopTie X S u u' sc i0 i0' FdN FdN' νq τ := by
+    (hG : ∀ j q,
+      (S.pd j).G q
+        = Complex.normSq (Formalism.FourierDecayAlt.D.ptLast q).2 - Tw (D := D) u * Tw (D := D) u')
+    : TopTie X S u u' sc i0 i0' FdN FdN' νq τ := by
   exact ⟨hPG, hemb, topTie_G X S u u' τ hemb hG⟩
 
 end G

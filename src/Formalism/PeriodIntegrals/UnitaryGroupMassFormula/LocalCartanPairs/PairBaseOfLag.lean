@@ -15,11 +15,11 @@ section Lag
 
 variable {R : Type} [CommRing R] [StarRing R]
 
-theorem lag_congr {ι : Type} [Fintype ι] [DecidableEq ι] (A B P e : Matrix ι ι R)
-    (hP : IsUnit P.det) (hPAB : Pᴴ * A * P = B) (he : e * e = e)
-    (heB : eᴴ * B = B * (1 - e)) :
-    (P * e * P⁻¹) * (P * e * P⁻¹) = P * e * P⁻¹ ∧
-      (P * e * P⁻¹)ᴴ * A = A * (1 - P * e * P⁻¹) := by
+theorem lag_congr
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (A B P e : Matrix ι ι R)
+    (hP : IsUnit P.det) (hPAB : Pᴴ * A * P = B) (he : e * e = e) (heB : eᴴ * B = B * (1 - e))
+    : (P * e * P⁻¹) * (P * e * P⁻¹) = P * e * P⁻¹ ∧ (P * e * P⁻¹)ᴴ * A = A * (1 - P * e * P⁻¹) := by
   have h1 : P⁻¹ * P = 1 := nonsing_inv_mul P hP
   have h2 : P * P⁻¹ = 1 := mul_nonsing_inv P hP
   have hPX : ∀ X : Matrix ι ι R, P⁻¹ * (P * X) = X := fun X => by
@@ -35,19 +35,21 @@ theorem lag_congr {ι : Type} [Fintype ι] [DecidableEq ι] (A B P e : Matrix ι
   constructor
   · simp only [Matrix.mul_assoc, hPX]
     rw [← Matrix.mul_assoc e e, he]
-  · calc (P * e * P⁻¹)ᴴ * A = (P⁻¹)ᴴ * (eᴴ * B) * P⁻¹ := by
-          rw [hA]
-          simp only [conjTranspose_mul, Matrix.mul_assoc, hQX]
+  · calc
+      (P * e * P⁻¹)ᴴ * A = (P⁻¹)ᴴ * (eᴴ * B) * P⁻¹ := by
+        rw [hA]
+        simp only [conjTranspose_mul, Matrix.mul_assoc, hQX]
       _ = (P⁻¹)ᴴ * (B * (1 - e)) * P⁻¹ := by rw [heB]
       _ = A * (1 - P * e * P⁻¹) := by
-          rw [hA]
-          simp only [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Matrix.mul_assoc, hPX]
+        rw [hA]
+        simp only [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Matrix.mul_assoc, hPX]
 
-theorem lag_reindex {ι β : Type} [Fintype ι] [DecidableEq ι] [Fintype β] [DecidableEq β]
-    (s : β ≃ ι) (A : Matrix ι ι R) (E : Matrix β β R) (hE : E * E = E)
-    (hEA : Eᴴ * A.submatrix s s = A.submatrix s s * (1 - E)) :
-    E.submatrix s.symm s.symm * E.submatrix s.symm s.symm = E.submatrix s.symm s.symm ∧
-      (E.submatrix s.symm s.symm)ᴴ * A = A * (1 - E.submatrix s.symm s.symm) := by
+theorem lag_reindex
+    {ι β : Type} [Fintype ι] [DecidableEq ι] [Fintype β] [DecidableEq β]
+    (s : β ≃ ι) (A : Matrix ι ι R) (E : Matrix β β R)
+    (hE : E * E = E) (hEA : Eᴴ * A.submatrix s s = A.submatrix s s * (1 - E))
+    : E.submatrix s.symm s.symm * E.submatrix s.symm s.symm = E.submatrix s.symm s.symm
+      ∧ (E.submatrix s.symm s.symm)ᴴ * A = A * (1 - E.submatrix s.symm s.symm) := by
   have hA : A = (A.submatrix s s).submatrix s.symm s.symm := by simp
   constructor
   · rw [submatrix_mul_equiv, hE]
@@ -89,33 +91,41 @@ end Lag
 
 section Main
 
-variable {R : Type} [CommRing R] [StarRing R] {R₀ : Subring R}
-  [HenselianLocalRing R₀] [Finite (ResidueField R₀)]
+variable
+  {R : Type} [CommRing R] [StarRing R]
+  {R₀ : Subring R} [HenselianLocalRing R₀] [Finite (ResidueField R₀)]
 
-theorem lag_exists_sum (hR₀ : ∀ x, x ∈ R₀ ↔ star x = x) {θ : R} (hθ : IsUnit (θ - star θ))
-    (κ : Type) [Fintype κ] [DecidableEq κ] (A : Matrix (κ ⊕ κ) (κ ⊕ κ) R) (hA : Aᴴ = A)
-    (hdet : IsUnit A.det) :
-    ∃ e : Matrix (κ ⊕ κ) (κ ⊕ κ) R, e * e = e ∧ eᴴ * A = A * (1 - e) := by
-  obtain ⟨g, hg, hgA⟩ := Formalism.HermitianLatticesTheory.unimodUnramUnique_main hR₀ hθ _ (κ ⊕ κ) rfl A hA hdet
-  obtain ⟨c, hc, hcJ⟩ := Formalism.HermitianLatticesTheory.unimodUnramUnique_main hR₀ hθ _ (κ ⊕ κ) rfl
-    (hypJ κ) (hypJ_herm κ) (hypJ_det κ)
+theorem lag_exists_sum
+    (hR₀ : ∀ x, x ∈ R₀ ↔ star x = x)
+    {θ : R} (hθ : IsUnit (θ - star θ))
+    (κ : Type) [Fintype κ] [DecidableEq κ]
+    (A : Matrix (κ ⊕ κ) (κ ⊕ κ) R) (hA : Aᴴ = A) (hdet : IsUnit A.det)
+    : ∃ e : Matrix (κ ⊕ κ) (κ ⊕ κ) R, e * e = e ∧ eᴴ * A = A * (1 - e) := by
+  obtain ⟨g, hg, hgA⟩ :=
+    Formalism.HermitianLatticesTheory.unimodUnramUnique_main hR₀ hθ _ (κ ⊕ κ) rfl A hA hdet
+  obtain ⟨c, hc, hcJ⟩ :=
+    Formalism.HermitianLatticesTheory.unimodUnramUnique_main hR₀ hθ _ (κ ⊕ κ) rfl (hypJ κ)
+      (hypJ_herm κ) (hypJ_det κ)
   have hc1 : c * c⁻¹ = 1 := mul_nonsing_inv c hc
   have hc2 : (c⁻¹)ᴴ * cᴴ = 1 := by rw [← conjTranspose_mul, hc1, conjTranspose_one]
   have hcX : ∀ X : Matrix (κ ⊕ κ) (κ ⊕ κ) R, (c⁻¹)ᴴ * (cᴴ * X) = X := fun X => by
     rw [← Matrix.mul_assoc, hc2, Matrix.one_mul]
-  have hP : IsUnit (g * c⁻¹).det := by
-    rw [det_mul]; exact hg.mul (isUnit_nonsing_inv_det c hc)
+  have hP : IsUnit (g * c⁻¹).det := by rw [det_mul]; exact hg.mul (isUnit_nonsing_inv_det c hc)
   have hPA : (g * c⁻¹)ᴴ * A * (g * c⁻¹) = hypJ κ := by
-    calc (g * c⁻¹)ᴴ * A * (g * c⁻¹) = (c⁻¹)ᴴ * (gᴴ * A * g) * c⁻¹ := by
-          simp only [conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      (g * c⁻¹)ᴴ * A * (g * c⁻¹)
+        = (c⁻¹)ᴴ * (gᴴ * A * g) * c⁻¹ := by simp only [conjTranspose_mul, Matrix.mul_assoc]
       _ = (c⁻¹)ᴴ * (cᴴ * hypJ κ * c) * c⁻¹ := by rw [hgA, hcJ]
       _ = hypJ κ := by simp only [Matrix.mul_assoc, hc1, Matrix.mul_one, hcX]
   exact ⟨_, lag_congr A (hypJ κ) (g * c⁻¹) (hypE κ) hP hPA (hypE_idem κ) (hypE_lag κ)⟩
 
-theorem lag_exists (hR₀ : ∀ x, x ∈ R₀ ↔ star x = x) {θ : R} (hθ : IsUnit (θ - star θ))
-    {ι : Type} [Fintype ι] [DecidableEq ι] (hι : Even (Fintype.card ι)) (A : Matrix ι ι R)
-    (hA : Aᴴ = A) (hdet : IsUnit A.det) :
-    ∃ e : Matrix ι ι R, e * e = e ∧ eᴴ * A = A * (1 - e) := by
+theorem lag_exists
+    (hR₀ : ∀ x, x ∈ R₀ ↔ star x = x)
+    {θ : R} (hθ : IsUnit (θ - star θ))
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (hι : Even (Fintype.card ι))
+    (A : Matrix ι ι R) (hA : Aᴴ = A) (hdet : IsUnit A.det)
+    : ∃ e : Matrix ι ι R, e * e = e ∧ eᴴ * A = A * (1 - e) := by
   obtain ⟨m, hm⟩ := hι
   let s : Fin m ⊕ Fin m ≃ ι := Fintype.equivOfCardEq (by simp [hm])
   have hB : (A.submatrix s s)ᴴ = A.submatrix s s := by rw [conjTranspose_submatrix, hA]

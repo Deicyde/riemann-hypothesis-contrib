@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.matchPart_of :
-    SameNormBasic → Matching → PermOfMap → MatchPart := by
+theorem UpperTheory.Gal.crystallineComparison.matchPart_of
+    : SameNormBasic → Matching → PermOfMap → MatchPart := by
   intro hSN hMatch hPerm B _ ϖ hϖ ι _ I I' _ _ N hI hI' u u' hsame e he hdiv hcmp
   obtain ⟨ρ, hρ⟩ : ∃ ρ : B →+* B ⧸ Ideal.span {1 - e}, ρ = Ideal.Quotient.mk _ := ⟨_, rfl⟩
   have hsurj : Function.Surjective ρ := by
@@ -60,15 +60,17 @@ theorem UpperTheory.Gal.crystallineComparison.matchPart_of :
     subst hx
     rw [SetLike.mem_coe, Ideal.mem_comap, map_pow]
     exact Ideal.mem_span_singleton_self _
-  have hsame' : SameNorm
-      (redMod (ρ ϖ ^ (N + 1) ^ N) (Multiset.map (fun i k => ρ (u i k)) Finset.univ.val))
-      (redMod (ρ ϖ ^ (N + 1) ^ N) (Multiset.map (fun i k => ρ (u' i k)) Finset.univ.val)) := by
+  have hsame'
+      : SameNorm (redMod (ρ ϖ ^ (N + 1) ^ N) (Multiset.map (fun i k => ρ (u i k)) Finset.univ.val))
+        (redMod (ρ ϖ ^ (N + 1) ^ N) (Multiset.map (fun i k => ρ (u' i k)) Finset.univ.val)) := by
     have := (hSN (B ⧸ Ideal.span {ϖ ^ (N + 1) ^ N}) ι).1 _ (Ideal.quotientMap _ ρ hle) _ _ hsame
-    convert this using 1 <;>
-      simp [redMod, Multiset.map_map, Function.comp_def, Ideal.quotientMap_mk]
-  have hM := hMatch (B ⧸ Ideal.span {1 - e}) (ρ ϖ) hnzd hu ι N
-    (Multiset.map (fun i k => ρ (u i k)) Finset.univ.val)
-    (Multiset.map (fun i k => ρ (u' i k)) Finset.univ.val) (by simp [hI]) (by simp [hI']) hsame' ?_ ?_
+    convert this using 1
+      <;> simp [redMod, Multiset.map_map, Function.comp_def, Ideal.quotientMap_mk]
+  have hM :=
+    hMatch (B ⧸ Ideal.span {1 - e}) (ρ ϖ) hnzd hu ι N
+      (Multiset.map (fun i k => ρ (u i k)) Finset.univ.val)
+      (Multiset.map (fun i k => ρ (u' i k)) Finset.univ.val) (by simp [hI]) (by simp [hI']) hsame'
+      ?_ ?_
   · simp only [redMod, Multiset.map_map] at hM
     obtain ⟨σ, hσ⟩ := hPerm I I' _ _ _ hM
     refine ⟨σ, fun i k => ?_⟩

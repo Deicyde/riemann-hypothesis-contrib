@@ -14,13 +14,15 @@ open PI.UnitaryGroupMassFormula.AdIndexEq.SplitIso
 
 variable {F E K : Type} [Field F] [Field E] [Algebra F E] [Field K] [Algebra F K]
 
-theorem exists_adapted_first_projection (σ : E →ₐ[F] E) (hσσ : ∀ a, σ (σ a) = a)
-    (hfix : ∀ a, σ a = a → a ∈ (algebraMap F E).range) (h2 : Module.finrank F E = 2)
-    (h2K : (2 : K) ≠ 0) (ε : K ⊗[F] E) (hsum : ε + sigT σ ε = 1) (horth : ε * sigT σ ε = 0) :
-    ∃ p1 : K ⊗[F] E →+* K, (∀ c : K, p1 (algebraMap K (K ⊗[F] E) c) = c) ∧ p1 ε = 1 ∧
-      p1 (sigT σ ε) = 0 ∧
-      ∀ r : K ⊗[F] E, r = algebraMap K (K ⊗[F] E) (p1 r) * ε +
-        algebraMap K (K ⊗[F] E) (p1 (sigT σ r)) * sigT σ ε := by
+theorem exists_adapted_first_projection
+    (σ : E →ₐ[F] E) (hσσ : ∀ a, σ (σ a) = a) (hfix : ∀ a, σ a = a → a ∈ (algebraMap F E).range)
+    (h2 : Module.finrank F E = 2) (h2K : (2 : K) ≠ 0)
+    (ε : K ⊗[F] E) (hsum : ε + sigT σ ε = 1) (horth : ε * sigT σ ε = 0)
+    : ∃ p1 : K ⊗[F] E →+* K,
+      (∀ c : K, p1 (algebraMap K (K ⊗[F] E) c) = c) ∧ p1 ε = 1 ∧ p1 (sigT σ ε) = 0
+        ∧ ∀ r : K ⊗[F] E,
+          r = algebraMap K (K ⊗[F] E) (p1 r) * ε
+            + algebraMap K (K ⊗[F] E) (p1 (sigT σ r)) * sigT σ ε := by
   classical
   have hσT : ∀ x : K ⊗[F] E, sigT σ (sigT σ x) = x := by
     intro x
@@ -32,10 +34,11 @@ theorem exists_adapted_first_projection (σ : E →ₐ[F] E) (hσσ : ∀ a, σ 
     intro c
     simp [sigT, Algebra.TensorProduct.algebraMap_apply]
   have hε2 : ε * ε = ε := by
-    calc ε * ε = ε * (ε + sigT σ ε) - ε * sigT σ ε := by ring
+    calc
+      ε * ε
+        = ε * (ε + sigT σ ε) - ε * sigT σ ε := by ring
       _ = ε := by rw [hsum, horth, mul_one, sub_zero]
-  have hfr : Module.finrank K (K ⊗[F] E) = 2 := by
-    rw [Module.finrank_baseChange, h2]
+  have hfr : Module.finrank K (K ⊗[F] E) = 2 := by rw [Module.finrank_baseChange, h2]
   haveI : Module.Finite F E := Module.finite_of_finrank_pos (by omega)
   haveI : FiniteDimensional K (K ⊗[F] E) := inferInstance
   haveI : Nontrivial (K ⊗[F] E) := Module.nontrivial_of_finrank_pos (R := K) (by omega)
@@ -65,30 +68,37 @@ theorem exists_adapted_first_projection (σ : E →ₐ[F] E) (hσσ : ∀ a, σ 
   have h1 : Module.finrank K (LinearMap.range (LinearMap.mulRight K ε)) = 1 := by omega
   have hex : ∀ r : K ⊗[F] E, ∃ c : K, algebraMap K (K ⊗[F] E) c * ε = r * ε := by
     intro r
-    obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero'
-      (⟨ε, hmemε⟩ : LinearMap.range (LinearMap.mulRight K ε))
-      (fun h => hε0 (congrArg Subtype.val h))).mp h1 ⟨r * ε, ⟨r, rfl⟩⟩
+    obtain ⟨c, hc⟩ :=
+      (finrank_eq_one_iff_of_nonzero' (⟨ε, hmemε⟩ : LinearMap.range (LinearMap.mulRight K ε))
+        (fun h => hε0 (congrArg Subtype.val h))).mp h1 ⟨r * ε, ⟨r, rfl⟩⟩
     refine ⟨c, ?_⟩
     rw [← Algebra.smul_def]
     exact congrArg Subtype.val hc
-  have huniq : ∀ c d : K, algebraMap K (K ⊗[F] E) c * ε = algebraMap K (K ⊗[F] E) d * ε →
-      c = d := by
+  have huniq
+      : ∀ c d : K, algebraMap K (K ⊗[F] E) c * ε = algebraMap K (K ⊗[F] E) d * ε → c = d := by
     intro c d h
     rw [← Algebra.smul_def, ← Algebra.smul_def, ← sub_eq_zero, ← sub_smul] at h
     exact sub_eq_zero.mp ((smul_eq_zero.mp h).resolve_right hε0)
   choose p hp using hex
-  have hpu : ∀ r c, algebraMap K (K ⊗[F] E) c * ε = r * ε → p r = c :=
-    fun r c h => huniq _ _ ((hp r).trans h.symm)
-  let p1 : K ⊗[F] E →+* K :=
-    { toFun := p
-      map_one' := hpu 1 1 (by rw [map_one])
-      map_mul' := fun r s => hpu (r * s) (p r * p s) (by
-        rw [map_mul, mul_assoc, hp s, mul_left_comm, hp r, ← mul_assoc, mul_comm s r])
-      map_zero' := hpu 0 0 (by rw [map_zero])
-      map_add' := fun r s => hpu (r + s) (p r + p s) (by
-        rw [map_add (f := _), add_mul, hp r, hp s, add_mul]) }
-  refine ⟨p1, fun c => hpu _ c rfl, hpu _ 1 (by rw [map_one, one_mul, hε2]),
-    hpu _ 0 (by rw [map_zero, zero_mul, mul_comm, horth]), fun r => ?_⟩
+  have hpu : ∀ r c, algebraMap K (K ⊗[F] E) c * ε = r * ε → p r = c := fun r c h =>
+    huniq _ _ ((hp r).trans h.symm)
+  let p1 : K ⊗[F] E →+* K := {
+    toFun := p
+    map_one' := hpu 1 1 (by rw [map_one])
+    map_mul' := fun r s =>
+      hpu (r * s) (p r * p s)
+        (by rw [map_mul, mul_assoc, hp s, mul_left_comm, hp r, ← mul_assoc, mul_comm s r])
+    map_zero' := hpu 0 0 (by rw [map_zero])
+    map_add' := fun r s =>
+      hpu (r + s) (p r + p s) (by rw [map_add (f := _), add_mul, hp r, hp s, add_mul])
+  }
+  refine ⟨
+    p1,
+    fun c => hpu _ c rfl,
+    hpu _ 1 (by rw [map_one, one_mul, hε2]),
+    hpu _ 0 (by rw [map_zero, zero_mul, mul_comm, horth]),
+    fun r => ?_
+  ⟩
   have h2' : algebraMap K (K ⊗[F] E) (p (sigT σ r)) * sigT σ ε = r * sigT σ ε := by
     have h3 : sigT σ (algebraMap K (K ⊗[F] E) (p (sigT σ r)) * ε) = sigT σ (sigT σ r * ε) := by
       rw [hp (sigT σ r)]

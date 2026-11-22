@@ -27,10 +27,11 @@ section Local
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E)
 
-theorem uniformiser_mem_jacobson (ϖ : 𝒪[F]) (h : Irreducible ϖ) (w : L.O)
-    (hw : (w : E) = algebraMap F E (ϖ : F)) : w ∈ (⊥ : Ideal L.O).jacobson := by
-  let f : 𝒪[F] →+* L.O := (algebraMap 𝒪[F] E).codRestrict L.O
-    (fun x => (L.O_def _).2 isIntegral_algebraMap)
+theorem uniformiser_mem_jacobson
+    (ϖ : 𝒪[F]) (h : Irreducible ϖ) (w : L.O) (hw : (w : E) = algebraMap F E (ϖ : F))
+    : w ∈ (⊥ : Ideal L.O).jacobson := by
+  let f : 𝒪[F] →+* L.O :=
+    (algebraMap 𝒪[F] E).codRestrict L.O (fun x => (L.O_def _).2 isIntegral_algebraMap)
   letI : Algebra 𝒪[F] L.O := f.toAlgebra
   haveI : IsScalarTower 𝒪[F] L.O E := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   haveI : Algebra.IsIntegral 𝒪[F] L.O := by
@@ -52,13 +53,16 @@ theorem uniformiser_mem_jacobson (ϖ : 𝒪[F]) (h : Irreducible ϖ) (w : L.O)
   rw [Ideal.mem_comap, he] at hm
   exact hm
 
-theorem stabilises_of_close {n : ℕ} (Λ : Submodule L.O (Fin n → E)) (hΛ : Λ.FG) (ϖ : 𝒪[F])
-    (h : Irreducible ϖ) (m : (Fin n → E) ≃ₗ[E] (Fin n → E))
-    (hm : ∀ x ∈ Λ, ∃ y ∈ Λ, m x - x = algebraMap F E (ϖ : F) • y) :
-    m ∈ MulAction.stabilizer ((Fin n → E) ≃ₗ[E] (Fin n → E)) Λ := by
-  have hO : algebraMap F E (ϖ : F) ∈ L.O := (L.O_def _).2 (by
-    have : IsIntegral 𝒪[F] (algebraMap 𝒪[F] E ϖ) := isIntegral_algebraMap
-    exact this)
+theorem stabilises_of_close
+    {n : ℕ} (Λ : Submodule L.O (Fin n → E)) (hΛ : Λ.FG)
+    (ϖ : 𝒪[F]) (h : Irreducible ϖ)
+    (m : (Fin n → E) ≃ₗ[E] (Fin n → E))
+    (hm : ∀ x ∈ Λ, ∃ y ∈ Λ, m x - x = algebraMap F E (ϖ : F) • y)
+    : m ∈ MulAction.stabilizer ((Fin n → E) ≃ₗ[E] (Fin n → E)) Λ := by
+  have hO : algebraMap F E (ϖ : F) ∈ L.O :=
+    (L.O_def _).2 (by
+      have : IsIntegral 𝒪[F] (algebraMap 𝒪[F] E ϖ) := isIntegral_algebraMap
+      exact this)
   let w : L.O := ⟨_, hO⟩
   have hw : w ∈ (⊥ : Ideal L.O).jacobson := uniformiser_mem_jacobson L ϖ h w rfl
   have hle : m • Λ ≤ Λ := by
@@ -79,7 +83,8 @@ theorem stabilises_of_close {n : ℕ} (Λ : Submodule L.O (Fin n → E)) (hΛ : 
       have : m x = x + w • y := by
         rw [eq_add_of_sub_eq' e]
         rfl
-      rw [this]; abel
+      rw [this]
+      abel
     rw [hx']
     refine Submodule.sub_mem_sup ?_ ?_
     · exact Submodule.smul_mem_pointwise_smul x m Λ hx
@@ -90,33 +95,38 @@ end Local
 
 section Global
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
 variable (A : Places F E sig) (n : ℕ)
 
-def extMap (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (p : HeightOneSpectrum (𝓞 F)) :
-    (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep) :=
+def extMap (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (p : HeightOneSpectrum (𝓞 F))
+    : (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep) :=
   ((RatExt.rational_extend A n p).2.2.1 g).choose
 
-theorem extMap_spec (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (p : HeightOneSpectrum (𝓞 F)) :
-    A.Ext p g (extMap A n g p) :=
+theorem extMap_spec (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (p : HeightOneSpectrum (𝓞 F))
+    : A.Ext p g (extMap A n g p) :=
   ((RatExt.rational_extend A n p).2.2.1 g).choose_spec.1
 
-theorem extMap_unique {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} {p : HeightOneSpectrum (𝓞 F)}
-    {g' : (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep)} (h : A.Ext p g g') :
-    g' = extMap A n g p :=
+theorem extMap_unique
+    {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} {p : HeightOneSpectrum (𝓞 F)}
+    {g' : (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep)} (h : A.Ext p g g')
+    : g' = extMap A n g p :=
   ((RatExt.rational_extend A n p).2.2.1 g).choose_spec.2 g' h
 
-def extHom : ((Fin n → E) ≃ₗ[E] (Fin n → E)) →*
-    ∀ p, (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep) where
+def extHom
+    : ((Fin n → E) ≃ₗ[E] (Fin n → E))
+      →* ∀ p, (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep) where
   toFun g := extMap A n g
   map_one' := funext fun p => (extMap_unique A n (g := 1) (g' := 1) fun _ => rfl).symm
-  map_mul' a b := funext fun p => (extMap_unique A n (g := a * b)
-    (g' := extMap A n a p * extMap A n b p) (fun x => by
-      change extMap A n a p (extMap A n b p (A.bc p x)) = A.bc p (a (b x))
-      rw [extMap_spec A n b p x, extMap_spec A n a p (b x)])).symm
+  map_mul' a b :=
+    funext fun p =>
+      (extMap_unique A n (g := a * b) (g' := extMap A n a p * extMap A n b p) (fun x => by
+        change extMap A n a p (extMap A n b p (A.bc p x)) = A.bc p (a (b x))
+        rw [extMap_spec A n b p x, extMap_spec A n a p (b x)])).symm
 
-theorem comap_pi (K : ∀ p, Subgroup ((Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep))) :
-    (Subgroup.pi Set.univ K).comap (extHom A n) = A.rat K := by
+theorem comap_pi
+    (K : ∀ p, Subgroup ((Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep)))
+    : (Subgroup.pi Set.univ K).comap (extHom A n) = A.rat K := by
   ext g
   constructor
   · intro h p
@@ -131,16 +141,21 @@ theorem comap_pi (K : ∀ p, Subgroup ((Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p)
 
 end Global
 
-theorem mass_eq_finprod : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {sig : E →ₐ[F] E} (A : Places F E sig), ∀ (r k : ℕ) (G : GFrames A r k), 4 * r + 7 ≤ k →
-    ∀ Λ : G.Lt, Submodule.IsFullLattice E Λ →
-    {p | (G.S p).St ⊓ MulAction.stabilizer (G.S p).GLV (A.lat p Λ) ≠ (G.S p).K0}.Finite ∧
-      G.mu Λ = ∏ᶠ p, (G.S p).mu (A.lat p Λ) := by
+theorem mass_eq_finprod
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : Places F E sig),
+      ∀ (r k : ℕ) (G : GFrames A r k),
+        4 * r + 7 ≤ k
+          → ∀ Λ : G.Lt,
+            Submodule.IsFullLattice E Λ
+              → {p | (G.S p).St ⊓ MulAction.stabilizer (G.S p).GLV (A.lat p Λ) ≠ (G.S p).K0}.Finite
+                ∧ G.mu Λ = ∏ᶠ p, (G.S p).mu (A.lat p Λ) := by
   intro F E _ _ _ _ _ sig A r k G hk Λ hΛ
-  obtain ⟨-, hlat, hcoord⟩ := GlobalTheory.T.numberField_lattice_determined_by_local_lattices A (k + 2 * r + 1) Λ hΛ
+  obtain ⟨-, hlat, hcoord⟩ :=
+    GlobalTheory.T.numberField_lattice_determined_by_local_lattices A (k + 2 * r + 1) Λ hΛ
   have hstd := GlobalTheory.T.coordinateLattice_unique_term_almost_all_places A r k G hk
-  let U : ∀ p, Subgroup (G.S p).GLV :=
-    fun p => (G.S p).St ⊓ MulAction.stabilizer (G.S p).GLV (A.lat p Λ)
+  let U : ∀ p, Subgroup (G.S p).GLV := fun p =>
+    (G.S p).St ⊓ MulAction.stabilizer (G.S p).GLV (A.lat p Λ)
   let K : ∀ p, Subgroup (G.S p).GLV := fun p => (G.S p).K0
   have hfin : {p | U p ≠ K p}.Finite := by
     refine (hstd.union hcoord).subset ?_
@@ -160,8 +175,10 @@ theorem mass_eq_finprod : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [
       haveI := (A.loc p).lf
       Units.mk0 (((G.S p).ϖ : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp)
         (fun h0 => (G.S p).ϖ_irr.ne_zero (Subtype.ext h0))
-    else 1
-  have hc : {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ, ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = c p}.Finite := by
+    else
+      1
+  have hc
+      : {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ, ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = c p}.Finite := by
     refine hfin.subset ?_
     intro p hp
     by_contra hcon
@@ -170,8 +187,10 @@ theorem mass_eq_finprod : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [
     have h1 : c p = 1 := if_neg (not_not.2 hu)
     exact ⟨1, by rw [h1]; simp⟩
   let φ := extHom A (k + 2 * r + 1)
-  have hdense : ∀ g, g ∈ Subgroup.pi Set.univ K ∨ g ∈ Subgroup.pi Set.univ U →
-      ∃ γ, (φ γ)⁻¹ * g ∈ Subgroup.pi Set.univ K ⊓ Subgroup.pi Set.univ U := by
+  have hdense
+      : ∀ g,
+        g ∈ Subgroup.pi Set.univ K ∨ g ∈ Subgroup.pi Set.univ U
+          → ∃ γ, (φ γ)⁻¹ * g ∈ Subgroup.pi Set.univ K ⊓ Subgroup.pi Set.univ U := by
     intro g hg
     have hgSt : ∀ p, g p ∈ (G.S p).St := by
       intro p
@@ -191,8 +210,10 @@ theorem mass_eq_finprod : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [
         exact this
     have happrox := by
       first
-      | exact GlobalTheory.T.exists_mem_St_approximating_local_elements A r k G Λ hΛ c hc g hgSt hgfin
-      | exact GlobalTheory.T.exists_mem_St_approximating_local_elements A r k G Λ hΛ.toIsLattice c hc g hgSt hgfin
+      | exact GlobalTheory.T.exists_mem_St_approximating_local_elements A r k G Λ hΛ c hc g hgSt
+          hgfin
+      | exact GlobalTheory.T.exists_mem_St_approximating_local_elements A r k G Λ hΛ.toIsLattice c
+          hc g hgSt hgfin
     obtain ⟨γ, -, hγ⟩ := happrox
     refine ⟨γ, ?_⟩
     have key : ∀ p, (g p)⁻¹ * φ γ p ∈ K p ⊓ U p := by
@@ -203,9 +224,14 @@ theorem mass_eq_finprod : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [
       · rw [he]; exact h1
       · refine ⟨hKSt p h1, ?_⟩
         haveI := (A.loc p).lf
-        have hcp : ((c p : ((A.loc p).Fp)ˣ) : (A.loc p).Fp) = (((G.S p).ϖ : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) := by
-          have h3 : c p = Units.mk0 (((G.S p).ϖ : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp)
-              (fun h0 => (G.S p).ϖ_irr.ne_zero (Subtype.ext h0)) := if_pos he
+        have hcp
+            : ((c p : ((A.loc p).Fp)ˣ) : (A.loc p).Fp)
+              = (((G.S p).ϖ : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) := by
+          have h3
+              : c p
+                = Units.mk0 (((G.S p).ϖ : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp)
+                  (fun h0 => (G.S p).ϖ_irr.ne_zero (Subtype.ext h0)) :=
+            if_pos he
           rw [h3]
           rfl
         refine stabilises_of_close (A.L p) (A.lat p Λ) (hlat p).1 (G.S p).ϖ (G.S p).ϖ_irr _ ?_
@@ -219,7 +245,9 @@ theorem mass_eq_finprod : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [
       have := (K p ⊓ U p).inv_mem (key p)
       simpa [mul_inv_rev] using this
     exact ⟨(Subgroup.mem_pi _).2 fun p _ => (key2 p).1, (Subgroup.mem_pi _).2 fun p _ => (key2 p).2⟩
-  obtain ⟨hKU, hUK⟩ := GlobalTheory.T.relIndex_comap_pair_of_dense_image φ (Subgroup.pi Set.univ K) (Subgroup.pi Set.univ U) hdense
+  obtain ⟨hKU, hUK⟩ :=
+    GlobalTheory.T.relIndex_comap_pair_of_dense_image φ (Subgroup.pi Set.univ K)
+      (Subgroup.pi Set.univ U) hdense
   have hidx : ∀ p, (K p).relIndex (U p) ≠ 0 ∧ (U p).relIndex (K p) ≠ 0 := by
     intro p
     haveI := (A.loc p).lf

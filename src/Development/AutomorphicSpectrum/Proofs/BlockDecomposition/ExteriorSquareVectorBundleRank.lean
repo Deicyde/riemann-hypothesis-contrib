@@ -10,13 +10,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.WedgeOf
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+  GlobalTheory.CompanionTheory.WedgeOf
 
 namespace GlobalTheory.CompanionTheory.WedgeOf
 
-theorem vb_exteriorPower_two : ∀ (R V : Type) [CommRing R] [AddCommGroup V] [Module R V] (g : ℕ),
-    VB R V g → VB R (⋀[R]^2 V) (g.choose 2) := by
+theorem vb_exteriorPower_two
+    : ∀ (R V : Type) [CommRing R] [AddCommGroup V] [Module R V] (g : ℕ),
+      VB R V g → VB R (⋀[R]^2 V) (g.choose 2) := by
   intro R V _ _ _ g h
   obtain ⟨hf, hp, hr⟩ := h
   have hproj : Module.Projective R (⋀[R]^2 V) := by

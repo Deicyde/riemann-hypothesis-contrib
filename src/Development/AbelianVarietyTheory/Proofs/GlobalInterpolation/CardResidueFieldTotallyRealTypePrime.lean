@@ -13,10 +13,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory.SplitResidueCard
 
-theorem absNorm_eq_of_ncard {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
+theorem absNorm_eq_of_ncard
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime)
     (h : {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal}.ncard = Module.finrank ℚ E)
-    {w : Ideal (𝓞 E)} (hwp : w.IsPrime) (hw : ((p : ℕ) : 𝓞 E) ∈ w) :
-    Ideal.absNorm w = p := by
+    {w : Ideal (𝓞 E)} (hwp : w.IsPrime) (hw : ((p : ℕ) : 𝓞 E) ∈ w)
+    : Ideal.absNorm w = p := by
   classical
   obtain ⟨hc, -⟩ := Formalism.MainNotions.ModuliIntegralCharts.H1.GSplit.split_of_ncard hp h
   set I : Ideal (𝓞 E) := Ideal.span {((p : ℕ) : 𝓞 E)} with hI
@@ -38,28 +40,31 @@ theorem absNorm_eq_of_ncard {E : Type} [Field E] [NumberField E] {p : ℕ} (hp :
     have h1 : Ideal.absNorm P ≠ 1 := by rw [Ne, Ideal.absNorm_eq_one_iff]; exact hPp.ne_top
     rw [hj] at h1 ⊢
     exact Nat.le_self_pow (by rintro rfl; simp at h1) p
-  have hwM : w ∈ M := (Ideal.mem_normalizedFactors_iff hI0).2
-    ⟨hwp, by rw [hI, Ideal.span_singleton_le_iff_mem]; exact hw⟩
+  have hwM : w ∈ M :=
+    (Ideal.mem_normalizedFactors_iff hI0).2
+      ⟨hwp, by rw [hI, Ideal.span_singleton_le_iff_mem]; exact hw⟩
   refine le_antisymm ?_ (hge _ hwM)
   obtain ⟨M', hM'⟩ := Multiset.exists_cons_of_mem hwM
   have h2 : p ^ M'.card ≤ (M'.map Ideal.absNorm).prod := by
-    have := Multiset.pow_card_le_prod (s := M'.map Ideal.absNorm) (a := p) (fun x hx => by
-      obtain ⟨P, hP, rfl⟩ := Multiset.mem_map.1 hx
-      exact hge P (hM' ▸ Multiset.mem_cons_of_mem hP))
+    have :=
+      Multiset.pow_card_le_prod (s := M'.map Ideal.absNorm) (a := p) (fun x hx => by
+        obtain ⟨P, hP, rfl⟩ := Multiset.mem_map.1 hx
+        exact hge P (hM' ▸ Multiset.mem_cons_of_mem hP))
     simpa using this
   have h3 : Ideal.absNorm w * (M'.map Ideal.absNorm).prod = p * p ^ M'.card := by
-    rw [← pow_succ', ← Multiset.card_cons w, ← hM', hc, ← hN, ← hprod, hM', Multiset.prod_cons, map_mul,
-      map_multiset_prod]
+    rw [← pow_succ', ← Multiset.card_cons w, ← hM', hc, ← hN, ← hprod, hM', Multiset.prod_cons,
+      map_mul, map_multiset_prod]
   by_contra hlt
   push Not at hlt
   have hpos : 0 < p ^ M'.card := pow_pos hp.pos _
   nlinarith
 
-theorem card_quotient_of_ncard {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+theorem card_quotient_of_ncard
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     {p : ℕ} (hp : p.Prime)
     (h : {v : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ v.asIdeal}.ncard = Module.finrank ℚ E)
-    (v : HeightOneSpectrum (𝓞 F)) (hv : ((p : ℕ) : 𝓞 F) ∈ v.asIdeal) :
-    Nat.card (𝓞 F ⧸ v.asIdeal) = p := by
+    (v : HeightOneSpectrum (𝓞 F)) (hv : ((p : ℕ) : 𝓞 F) ∈ v.asIdeal)
+    : Nat.card (𝓞 F ⧸ v.asIdeal) = p := by
   have := v.isPrime
   have := v.isMaximal
   obtain ⟨w, hwm, hwo⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) v.asIdeal
@@ -76,7 +81,9 @@ theorem card_quotient_of_ncard {F E : Type} [Field F] [NumberField F] [Field E] 
   have := (Nat.card_eq_one_iff_unique.1 h1).1
   exact not_subsingleton (𝓞 F ⧸ v.asIdeal) this
 
-theorem card_kv : ∀ (D : D7) (i : Fin 2) (v : HeightOneSpectrum (𝓞 D.host.F)), (D.host.g i : 𝓞 D.host.F) ∈ v.asIdeal → Nat.card (kv D.host.F v) = D.host.g i := by
+theorem card_kv
+    : ∀ (D : D7) (i : Fin 2) (v : HeightOneSpectrum (𝓞 D.host.F)),
+      (D.host.g i : 𝓞 D.host.F) ∈ v.asIdeal → Nat.card (kv D.host.F v) = D.host.g i := by
   intro D i v hv
   rw [← card_quotient_of_ncard (D.host.g_prime i) (D.nd.g_split i) v hv]
   have h := Formalism.UG.P.tjcosets_card_residue v

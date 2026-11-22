@@ -12,9 +12,10 @@ open scoped nonZeroDivisors
 
 namespace GlobalTheory.Mem.An.Model
 
-theorem mem_rayI_of_coprime {K : Type} [Field K] [NumberField K] (𝔮 : Ideal (𝓞 K)) (J : Ideal (𝓞 K)) :
-    J ≠ 0 → J ⊔ 𝔮 = ⊤ → ∀ I : (FractionalIdeal (𝓞 K)⁰ K)ˣ,
-      (I : FractionalIdeal (𝓞 K)⁰ K) = (J : FractionalIdeal (𝓞 K)⁰ K) → I ∈ rayI 𝔮 := by
+theorem mem_rayI_of_coprime {K : Type} [Field K] [NumberField K] (𝔮 : Ideal (𝓞 K)) (J : Ideal (𝓞 K))
+    : J ≠ 0 → J ⊔ 𝔮 = ⊤
+      → ∀ I : (FractionalIdeal (𝓞 K)⁰ K)ˣ,
+        (I : FractionalIdeal (𝓞 K)⁰ K) = (J : FractionalIdeal (𝓞 K)⁰ K) → I ∈ rayI 𝔮 := by
   induction J using UniqueFactorizationMonoid.induction_on_prime with
   | h₁ => intro h; exact absurd rfl h
   | h₂ u hu =>
@@ -39,8 +40,9 @@ theorem mem_rayI_of_coprime {K : Type} [Field K] [NumberField K] (𝔮 : Ideal (
       rw [Ne, FractionalIdeal.coeIdeal_eq_zero]; exact hP0
     have haf : (a : FractionalIdeal (𝓞 K)⁰ K) ≠ 0 := by
       rw [Ne, FractionalIdeal.coeIdeal_eq_zero]; exact ha
-    have hI' : I = Units.mk0 _ hPf * Units.mk0 _ haf := Units.ext (by
-      rw [hI, Units.val_mul, Units.val_mk0, Units.val_mk0, FractionalIdeal.coeIdeal_mul])
+    have hI' : I = Units.mk0 _ hPf * Units.mk0 _ haf :=
+      Units.ext (by
+        rw [hI, Units.val_mul, Units.val_mk0, Units.val_mk0, FractionalIdeal.coeIdeal_mul])
     have hu : Units.mk0 _ hPf ∈ rayI 𝔮 :=
       Subgroup.subset_closure ⟨⟨P, Ideal.isPrime_of_prime hP, hP0⟩, hPq, rfl⟩
     rw [hI']

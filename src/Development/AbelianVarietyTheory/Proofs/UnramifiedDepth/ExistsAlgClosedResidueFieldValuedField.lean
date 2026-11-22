@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CubWeilOfI
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (PS ev pt addOf)
 open ReciprocityTheory.PGsh.Be2 (nEval)
 open GlobalTheory.UU (CubWeil)
@@ -55,11 +57,13 @@ theorem mm_isMaximal : (mm V).IsMaximal := by
 theorem integers : (AddValuation.toValuation V.v).Integers V.RR :=
   Valuation.integer.integers (AddValuation.toValuation V.v)
 
-theorem isAlgClosed_of_surjective [IsAlgClosed C] {Ω : Type} [Field Ω] (ρ : V.RR →+* Ω)
-    (hρ : Function.Surjective ρ) : IsAlgClosed Ω := by
+theorem isAlgClosed_of_surjective
+    [IsAlgClosed C] {Ω : Type} [Field Ω] (ρ : V.RR →+* Ω) (hρ : Function.Surjective ρ)
+    : IsAlgClosed Ω := by
   refine IsAlgClosed.of_exists_root Ω fun p hp hirr => ?_
   obtain ⟨q, hqmap, hqdeg, hqmon⟩ :=
-    Polynomial.lifts_and_degree_eq_and_monic ((Polynomial.mem_lifts p).2 (Polynomial.map_surjective ρ hρ p)) hp
+    Polynomial.lifts_and_degree_eq_and_monic
+      ((Polynomial.mem_lifts p).2 (Polynomial.map_surjective ρ hρ p)) hp
   have hdeg : (q.map (algebraMap V.RR C)).degree ≠ 0 := by
     rw [Polynomial.degree_map_eq_of_injective (integers V).hom_inj, hqdeg]
     exact (Polynomial.degree_pos_of_irreducible hirr).ne'
@@ -72,7 +76,12 @@ theorem isAlgClosed_of_surjective [IsAlgClosed C] {Ω : Type} [Field Ω] (ρ : V
   refine ⟨ρ y, ?_⟩
   rw [← hqmap, Polynomial.eval_map, Polynomial.eval₂_at_apply, hy, map_zero]
 
-theorem exists_residueField : ∀ (C : Type) [Field C] (V : VF C), IsAlgClosed C → ∃ (Ω : Type) (_ : Field Ω) (_ : IsAlgClosed Ω) (_ : CharP Ω V.l) (ρ : V.RR →+* Ω), ∀ x : V.RR, ρ x = 0 ↔ V.MM (x : C) := by
+theorem exists_residueField
+    : ∀ (C : Type) [Field C] (V : VF C),
+      IsAlgClosed C
+        → ∃ (Ω : Type) (_ : Field Ω) (_ : IsAlgClosed Ω) (_ : CharP Ω V.l) (ρ : V.RR →+* Ω),
+          ∀ x : V.RR,
+            ρ x = 0 ↔ V.MM (x : C) := by
   intro C _ V _
   have := mm_isMaximal V
   let _ : Field (V.RR ⧸ mm V) := Ideal.Quotient.field (mm V)
@@ -83,7 +92,13 @@ theorem exists_residueField : ∀ (C : Type) [Field C] (V : VF C), IsAlgClosed C
     rw [hc, V.v_l]
     exact zero_lt_one
   have : CharP (V.RR ⧸ mm V) V.l := (CharP.charP_iff_prime_eq_zero V.l_prime).2 hl
-  exact ⟨V.RR ⧸ mm V, inferInstance, isAlgClosed_of_surjective V _ Ideal.Quotient.mk_surjective,
-    inferInstance, Ideal.Quotient.mk (mm V), fun x => Ideal.Quotient.eq_zero_iff_mem⟩
+  exact ⟨
+    V.RR ⧸ mm V,
+    inferInstance,
+    isAlgClosed_of_surjective V _ Ideal.Quotient.mk_surjective,
+    inferInstance,
+    Ideal.Quotient.mk (mm V),
+    fun x => Ideal.Quotient.eq_zero_iff_mem
+  ⟩
 
 end GlobalTheory.AlphaPair.ResField

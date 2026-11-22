@@ -14,12 +14,12 @@ namespace DiscrNeWork
 theorem bern6 : bernoulli 6 = 1 / 42 := by
   have h5 : bernoulli' 5 = 0 := by
     rw [bernoulli'_def]
-    simp only [Finset.sum_range_succ, Finset.sum_range_zero, bernoulli'_zero, bernoulli'_one, bernoulli'_two,
-      bernoulli'_three, bernoulli'_four]
+    simp only [Finset.sum_range_succ, Finset.sum_range_zero, bernoulli'_zero, bernoulli'_one,
+      bernoulli'_two, bernoulli'_three, bernoulli'_four]
     norm_num [Nat.choose]
   rw [bernoulli_eq_bernoulli'_of_ne_one (by norm_num), bernoulli'_def]
-  simp only [Finset.sum_range_succ, Finset.sum_range_zero, bernoulli'_zero, bernoulli'_one, bernoulli'_two,
-    bernoulli'_three, bernoulli'_four, h5]
+  simp only [Finset.sum_range_succ, Finset.sum_range_zero, bernoulli'_zero, bernoulli'_one,
+    bernoulli'_two, bernoulli'_three, bernoulli'_four, h5]
   norm_num [Nat.choose]
 
 theorem zeta6 : riemannZeta 6 = (Real.pi : ℂ) ^ 6 / 945 := by
@@ -91,40 +91,43 @@ private lemma eisG_lat2_eq_inv_pow_mul_tsum (a z : ℂ) (ha : a ≠ 0) (hz : 0 <
   simp only [Equiv.ofBijective_apply, f, EisensteinSeries.eisSummand, UpperHalfPlane.coe_mk, zpow_natCast]
   rw [mul_pow, one_div, mul_inv, zpow_neg, zpow_natCast]
 
-theorem eisenstein_four_lattice_eq (a : ℂ) (ha : a ≠ 0) (τ : ℍ) :
-    PI.eisG (PI.lat2 a (a * τ)) 2 = (a ^ 4)⁻¹ * ((Real.pi : ℂ) ^ 4 / 90 * (2 * E₄ τ)) := by
+theorem eisenstein_four_lattice_eq (a : ℂ) (ha : a ≠ 0) (τ : ℍ)
+    : PI.eisG (PI.lat2 a (a * τ)) 2 = (a ^ 4)⁻¹ * ((Real.pi : ℂ) ^ 4 / 90 * (2 * E₄ τ)) := by
   rw [eisG_lat2_eq_inv_pow_mul_tsum a τ ha τ.2 2 (by norm_num)]
   have h2 := tsum_eisSummand_eq_riemannZeta_mul_eisensteinSeries (k := 4) (by norm_num) τ
   have hE : E₄ τ = 1 / 2 * _root_.eisensteinSeries (N := 1) 0 (4 : ℕ) τ := rfl
-  rw [show ((2 * 2 : ℕ) : ℤ) = ((4 : ℕ) : ℤ) by norm_num, show (⟨(τ : ℂ), τ.2⟩ : UpperHalfPlane) = τ from rfl,
-    h2, hE, show ((4 : ℕ) : ℂ) = 4 by norm_num, riemannZeta_four, show a ^ (2 * 2) = a ^ 4 by norm_num]
+  rw [show ((2 * 2 : ℕ) : ℤ) = ((4 : ℕ) : ℤ) by norm_num,
+    show (⟨(τ : ℂ), τ.2⟩ : UpperHalfPlane) = τ from rfl, h2, hE, show ((4 : ℕ) : ℂ) = 4 by norm_num,
+    riemannZeta_four, show a ^ (2 * 2) = a ^ 4 by norm_num]
   ring
 
-theorem eisenstein_six_lattice_eq (a : ℂ) (ha : a ≠ 0) (τ : ℍ) :
-    PI.eisG (PI.lat2 a (a * τ)) 3 = (a ^ 6)⁻¹ * ((Real.pi : ℂ) ^ 6 / 945 * (2 * E₆ τ)) := by
+theorem eisenstein_six_lattice_eq (a : ℂ) (ha : a ≠ 0) (τ : ℍ)
+    : PI.eisG (PI.lat2 a (a * τ)) 3 = (a ^ 6)⁻¹ * ((Real.pi : ℂ) ^ 6 / 945 * (2 * E₆ τ)) := by
   rw [eisG_lat2_eq_inv_pow_mul_tsum a τ ha τ.2 3 (by norm_num)]
   have h2 := tsum_eisSummand_eq_riemannZeta_mul_eisensteinSeries (k := 6) (by norm_num) τ
   have hE : E₆ τ = 1 / 2 * _root_.eisensteinSeries (N := 1) 0 (6 : ℕ) τ := rfl
-  rw [show ((2 * 3 : ℕ) : ℤ) = ((6 : ℕ) : ℤ) by norm_num, show (⟨(τ : ℂ), τ.2⟩ : UpperHalfPlane) = τ from rfl,
-    h2, hE, show ((6 : ℕ) : ℂ) = 6 by norm_num, zeta6, show a ^ (2 * 3) = a ^ 6 by norm_num]
+  rw [show ((2 * 3 : ℕ) : ℤ) = ((6 : ℕ) : ℤ) by norm_num,
+    show (⟨(τ : ℂ), τ.2⟩ : UpperHalfPlane) = τ from rfl, h2, hE, show ((6 : ℕ) : ℂ) = 6 by norm_num,
+    zeta6, show a ^ (2 * 3) = a ^ 6 by norm_num]
   ring
 
 theorem discr_scaled (a : ℂ) (ha : a ≠ 0) (τ : ℍ) : PI.discr (PI.lat2 a (a * τ)) ≠ 0 := by
   have hΔ := ModularForm.discriminant_ne_zero τ
   rw [discriminant_eq_E₄_cube_sub_E₆_sq] at hΔ
   have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
-  have key : PI.discr (PI.lat2 a (a * τ)) =
-      (a ^ 12)⁻¹ * (64 / 27 * (Real.pi : ℂ) ^ 12) * (E₄ τ ^ 3 - E₆ τ ^ 2) := by
+  have key
+      : PI.discr (PI.lat2 a (a * τ))
+        = (a ^ 12)⁻¹ * (64 / 27 * (Real.pi : ℂ) ^ 12) * (E₄ τ ^ 3 - E₆ τ ^ 2) := by
     rw [PI.discr, PI.g2, PI.g3, eisenstein_four_lattice_eq a ha τ, eisenstein_six_lattice_eq a ha τ]
     ring
   rw [key]
-  have h1 : E₄ τ ^ 3 - E₆ τ ^ 2 ≠ 0 := by
-    intro h; apply hΔ; rw [h]; simp
-  exact mul_ne_zero (mul_ne_zero (inv_ne_zero (pow_ne_zero _ ha))
-    (mul_ne_zero (by norm_num) (pow_ne_zero _ hpi))) h1
+  have h1 : E₄ τ ^ 3 - E₆ τ ^ 2 ≠ 0 := by intro h; apply hΔ; rw [h]; simp
+  exact mul_ne_zero
+    (mul_ne_zero (inv_ne_zero (pow_ne_zero _ ha)) (mul_ne_zero (by norm_num) (pow_ne_zero _ hpi)))
+    h1
 
-theorem discr_ne_of_pos (w₁ w₂ : ℂ) (h : 0 < ((starRingEnd ℂ) w₁ * w₂).im) :
-    PI.discr (PI.lat2 w₁ w₂) ≠ 0 := by
+theorem discr_ne_of_pos (w₁ w₂ : ℂ) (h : 0 < ((starRingEnd ℂ) w₁ * w₂).im)
+    : PI.discr (PI.lat2 w₁ w₂) ≠ 0 := by
   have hw : w₁ ≠ 0 := by
     rintro rfl
     simp at h
@@ -137,8 +140,9 @@ theorem discr_ne_of_pos (w₁ w₂ : ℂ) (h : 0 < ((starRingEnd ℂ) w₁ * w�
     exact div_pos h (Complex.normSq_pos.mpr hw)
   have h3 := discr_scaled w₁ hw ⟨w₂ / w₁, hτ⟩
   rwa [show w₁ * ((⟨w₂ / w₁, hτ⟩ : UpperHalfPlane) : ℂ) = w₂ by
-    rw [UpperHalfPlane.coe_mk]
-    field_simp] at h3
+      rw [UpperHalfPlane.coe_mk]
+      field_simp]
+    at h3
 
 theorem discrNe_all : PI.DiscrNe := by
   intro w₁ w₂ h

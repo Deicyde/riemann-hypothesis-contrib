@@ -16,18 +16,22 @@ noncomputable section
 
 namespace IdealIndexPlaces
 
-theorem genIndex_comap {G G' : Type*} [AddCommGroup G] [AddCommGroup G'] (f : G' →+ G)
-    {A B : AddSubgroup G} (hA : A ≤ f.range) (hB : B ≤ f.range) :
-    genIndex (A.comap f) (B.comap f) = genIndex A B := by
+theorem genIndex_comap
+    {G G' : Type*} [AddCommGroup G] [AddCommGroup G']
+    (f : G' →+ G)
+    {A B : AddSubgroup G} (hA : A ≤ f.range) (hB : B ≤ f.range)
+    : genIndex (A.comap f) (B.comap f) = genIndex A B := by
   unfold genIndex
   rw [AddSubgroup.relIndex_comap, AddSubgroup.relIndex_comap, AddSubgroup.map_comap_eq_self hA,
     AddSubgroup.map_comap_eq_self hB]
 
-theorem absNorm_eq_index {L : Type*} [Field L] [NumberField L] (A : Ideal (𝓞 L)) :
-    A.absNorm = A.toAddSubgroup.index := Ideal.absNorm_eq_index A
+theorem absNorm_eq_index {L : Type*} [Field L] [NumberField L] (A : Ideal (𝓞 L))
+    : A.absNorm = A.toAddSubgroup.index :=
+  Ideal.absNorm_eq_index A
 
-theorem genIndex_ideal {L : Type*} [Field L] [NumberField L] {A B : Ideal (𝓞 L)} (hA : A ≠ ⊥)
-    (hB : B ≠ ⊥) : genIndex A.toAddSubgroup B.toAddSubgroup = (B.absNorm : ℝ) / A.absNorm := by
+theorem genIndex_ideal
+    {L : Type*} [Field L] [NumberField L] {A B : Ideal (𝓞 L)} (hA : A ≠ ⊥) (hB : B ≠ ⊥)
+    : genIndex A.toAddSubgroup B.toAddSubgroup = (B.absNorm : ℝ) / A.absNorm := by
   have hAB : A ⊓ B ≠ ⊥ := fun h ↦ (mul_ne_zero hA hB) (le_bot_iff.mp (h ▸ Ideal.mul_le_inf))
   have hn : (A ⊓ B).absNorm ≠ 0 := Ideal.absNorm_eq_zero_iff.not.mpr hAB
   have hAn : A.absNorm ≠ 0 := Ideal.absNorm_eq_zero_iff.not.mpr hA
@@ -50,7 +54,6 @@ theorem genIndex_ideal {L : Type*} [Field L] [NumberField L] {A B : Ideal (𝓞 
 
 end IdealIndexPlaces
 
-
 open IdealIndexPlaces in
 theorem IdealIndexPlaces.proof : IdealIndexPlaces.Statement := by
   intro L _ _ ι _ y hy
@@ -70,8 +73,7 @@ theorem IdealIndexPlaces.proof : IdealIndexPlaces.Statement := by
   have hcL : (c : L) ≠ 0 := by rw [hcy]; exact mul_ne_zero hbL hi0
   have hc0 : c ≠ 0 := fun h ↦ hcL (by rw [h]; rfl)
   set M := multiplierIdeal y with hMdef
-  let g : 𝓞 L →ₗ[𝓞 L] L :=
-    (LinearMap.mulLeft (𝓞 L) ((c : L)⁻¹)).comp (Algebra.linearMap (𝓞 L) L)
+  let g : 𝓞 L →ₗ[𝓞 L] L := (LinearMap.mulLeft (𝓞 L) ((c : L)⁻¹)).comp (Algebra.linearMap (𝓞 L) L)
   have hg : ∀ t, g t = (c : L)⁻¹ * t := fun t ↦ rfl
   set I : Ideal (𝓞 L) := M.comap g with hIdef
   set J : Ideal (𝓞 L) := Ideal.span (Set.range z) with hJdef
@@ -107,19 +109,20 @@ theorem IdealIndexPlaces.proof : IdealIndexPlaces.Statement := by
     rw [Ne, Ideal.span_singleton_eq_bot]; exact mul_ne_zero hc0 hb0
   have hJ0 : J ≠ ⊥ := fun h ↦ hcb0 (le_bot_iff.mp (h ▸ hcbJ))
   obtain ⟨K, hK⟩ := Ideal.dvd_iff_le.mpr hcbJ
-  have hKI : K ≤ I := fun t ht ↦ (hI t).mpr fun i ↦ by
-    rw [hK, mul_comm t]; exact Ideal.mul_mem_mul (Ideal.subset_span (Set.mem_range_self i)) ht
+  have hKI : K ≤ I := fun t ht ↦
+    (hI t).mpr fun i ↦ by
+      rw [hK, mul_comm t]; exact Ideal.mul_mem_mul (Ideal.subset_span (Set.mem_range_self i)) ht
   have hIK : I ≤ K := by
     have h : J * K ∣ J * I := Ideal.dvd_iff_le.mpr (by rw [mul_comm J I, ← hK]; exact hIJ)
     exact Ideal.le_of_dvd ((mul_dvd_mul_iff_left hJ0).mp h)
   have hIeq : I = K := le_antisymm hIK hKI
-  have hI0 : I ≠ ⊥ := by
-    intro h; rw [hIeq] at h; rw [h, Ideal.mul_bot] at hK; exact hcb0 hK
-  have hnorm : (I.absNorm : ℝ) * J.absNorm =
-      |((Algebra.norm ℤ c : ℤ) : ℝ)| * |((Algebra.norm ℤ b : ℤ) : ℝ)| := by
+  have hI0 : I ≠ ⊥ := by intro h; rw [hIeq] at h; rw [h, Ideal.mul_bot] at hK; exact hcb0 hK
+  have hnorm
+      : (I.absNorm : ℝ) * J.absNorm
+        = |((Algebra.norm ℤ c : ℤ) : ℝ)| * |((Algebra.norm ℤ b : ℤ) : ℝ)| := by
     have h := congrArg (fun A ↦ (Ideal.absNorm A : ℝ)) hK
-    simp only [map_mul, Ideal.absNorm_span_singleton, Int.natAbs_mul, Nat.cast_mul,
-      Nat.cast_natAbs] at h
+    simp only [map_mul, Ideal.absNorm_span_singleton, Int.natAbs_mul, Nat.cast_mul, Nat.cast_natAbs]
+      at h
     rw [hIeq]
     push_cast at h
     linear_combination -1 * h
@@ -157,8 +160,9 @@ theorem IdealIndexPlaces.proof : IdealIndexPlaces.Statement := by
     change (c : L)⁻¹ * ((c : L) * e) = e
     field_simp
   have hC0 : C ≠ ⊥ := by rw [hC, Ne, Ideal.span_singleton_eq_bot]; exact hc0
-  have hgen : genIndex M.toAddSubgroup (1 : Submodule (𝓞 L) L).toAddSubgroup =
-      |((Algebra.norm ℤ c : ℤ) : ℝ)| / I.absNorm := by
+  have hgen
+      : genIndex M.toAddSubgroup (1 : Submodule (𝓞 L) L).toAddSubgroup
+        = |((Algebra.norm ℤ c : ℤ) : ℝ)| / I.absNorm := by
     rw [← genIndex_comap g.toAddMonoidHom hrange1 hrange2]
     have e1 : M.toAddSubgroup.comap g.toAddMonoidHom = I.toAddSubgroup := rfl
     have e2 : (1 : Submodule (𝓞 L) L).toAddSubgroup.comap g.toAddMonoidHom = C.toAddSubgroup := rfl
@@ -174,7 +178,8 @@ theorem IdealIndexPlaces.proof : IdealIndexPlaces.Statement := by
     exact (Real.mul_iSup_of_nonneg (apply_nonneg w _) _).symm
   simp_rw [hsup] at hprodz
   rw [finprod_mul_distrib (FinitePlace.hasFiniteMulSupport hbL) (hasFiniteMulSupport_iSup_place hy),
-    FinitePlace.prod_eq_inv_abs_norm_int hb0] at hprodz
+      FinitePlace.prod_eq_inv_abs_norm_int hb0]
+    at hprodz
   rw [hgen]
   set P := ∏ᶠ w : FinitePlace L, ⨆ i, w (y i) with hPdef
   have hbn : |((Algebra.norm ℤ b : ℤ) : ℝ)| ≠ 0 := by

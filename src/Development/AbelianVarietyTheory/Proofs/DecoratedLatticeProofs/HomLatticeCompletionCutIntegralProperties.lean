@@ -5,38 +5,48 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFr
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.FinPl
 
-theorem pairA_zero_mul_pairA_zero (F : Type) [Field F] [NumberField F] (a b : Af F) :
-    pairA F 0 a * pairA F 0 b = pairA F 0 (a * b) := by
+theorem pairA_zero_mul_pairA_zero (F : Type) [Field F] [NumberField F] (a b : Af F)
+    : pairA F 0 a * pairA F 0 b = pairA F 0 (a * b) := by
   show (((0 : Ainf F), a) * ((0 : Ainf F), b) : Ainf F × Af F) = ((0 : Ainf F), a * b)
   rw [Prod.mk_mul_mk, mul_zero]
 
-theorem pairA_zero_smul_tmul (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] (a b : Af F) (e : E) :
-    pairA F 0 a • (pairA F 0 b ⊗ₜ[F] e : AF F ⊗[F] E) = pairA F 0 (a * b) ⊗ₜ[F] e := by
+theorem pairA_zero_smul_tmul
+    (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] (a b : Af F) (e : E)
+    : pairA F 0 a • (pairA F 0 b ⊗ₜ[F] e : AF F ⊗[F] E) = pairA F 0 (a * b) ⊗ₜ[F] e := by
   rw [TensorProduct.smul_tmul', smul_eq_mul, pairA_zero_mul_pairA_zero]
 
-theorem infPart_pairA_zero_tmul (D : D7) (b : Af D.host.F) (e : D.host.E) :
-    infPart D (pairA D.host.F 0 b ⊗ₜ[D.host.F] e) = 0 := by
+theorem infPart_pairA_zero_tmul (D : D7) (b : Af D.host.F) (e : D.host.E)
+    : infPart D (pairA D.host.F 0 b ⊗ₜ[D.host.F] e) = 0 := by
   show Algebra.TensorProduct.map (fstA D.host.F) (AlgHom.id D.host.F D.host.E)
     (pairA D.host.F 0 b ⊗ₜ[D.host.F] e) = 0
   rw [Algebra.TensorProduct.map_tmul]
   have : fstA D.host.F (pairA D.host.F 0 b) = 0 := rfl
   rw [this, TensorProduct.zero_tmul]
 
-theorem latO_algebra : ∀ (D : D7) (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank → D.host.E)) (P : Pl D → Prop) (u : WO S T), u ∈ latO S T LS LT P → (∀ γ ∈ intAf D.host.F, pairA D.host.F 0 γ • u ∈ latO S T LS LT (fun v => P v ∧ evalV D.host.F v γ ≠ 0)) ∧ pairA D.host.F 0 1 • u = u ∧ u.map (infPart D) = 0 ∧ ((∀ v, ¬ P v) → u = 0) := by
+theorem latO_algebra
+    : ∀ (D : D7) (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank → D.host.E))
+        (P : Pl D → Prop) (u : WO S T),
+      u ∈ latO S T LS LT P
+        → (∀ γ ∈ intAf D.host.F,
+            pairA D.host.F 0 γ • u ∈ latO S T LS LT (fun v => P v ∧ evalV D.host.F v γ ≠ 0))
+          ∧ pairA D.host.F 0 1 • u = u ∧ u.map (infPart D) = 0 ∧ ((∀ v, ¬ P v) → u = 0) := by
   intro D S T LS LT P u hu
   unfold latO at hu
   induction hu using AddSubgroup.closure_induction with
   | mem w hw =>
     obtain ⟨α, hα, hP, a, ha, s, hs, t, ht, rfl⟩ := hw
     refine ⟨fun γ hγ => ?_, ?_, ?_, fun h => ?_⟩
-    · refine AddSubgroup.subset_closure ⟨γ * α, fun v => ?_, fun v hv => ?_, a, ha, s, hs, t, ht, ?_⟩
+    · refine AddSubgroup.subset_closure
+        ⟨γ * α, fun v => ?_, fun v hv => ?_, a, ha, s, hs, t, ht, ?_⟩
       · rw [map_mul]
         exact mul_mem (hγ v) (hα v)
       · rw [map_mul]

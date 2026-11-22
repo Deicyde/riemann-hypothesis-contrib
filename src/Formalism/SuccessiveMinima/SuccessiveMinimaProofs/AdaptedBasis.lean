@@ -10,10 +10,12 @@ noncomputable section
 
 namespace Formalism.FN.AdaptedBasisExistence
 
-theorem exists_nsmul_mem_span {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [FiniteDimensional ℝ E] (L : Submodule ℤ E) [DiscreteTopology L] {ι : Type} [Fintype ι]
-    (B : Basis ι ℝ E) (hB : ∀ i, B i ∈ L) :
-    ∃ N : ℕ, 0 < N ∧ ∀ x ∈ L, N • x ∈ span ℤ (Set.range B) := by
+theorem exists_nsmul_mem_span
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+    (L : Submodule ℤ E) [DiscreteTopology L]
+    {ι : Type} [Fintype ι]
+    (B : Basis ι ℝ E) (hB : ∀ i, B i ∈ L)
+    : ∃ N : ℕ, 0 < N ∧ ∀ x ∈ L, N • x ∈ span ℤ (Set.range B) := by
   classical
   haveI : ProperSpace E := FiniteDimensional.proper_real E
   have hKL : span ℤ (Set.range B) ≤ L := by
@@ -34,10 +36,11 @@ theorem exists_nsmul_mem_span {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ
     refine ⟨ZSpan.fract_mem_fundamentalDomain B _, ?_⟩
     rw [ZSpan.fract_apply]
     exact L.sub_mem (nsmul_mem hx k) (hKL (ZSpan.floor B (k • x)).2)
-  obtain ⟨a, b, hab, heq⟩ := Fintype.exists_ne_map_eq_of_card_lt
-    (fun k : Fin (S.card + 1) => (⟨ZSpan.fract B ((k : ℕ) • x), hmem k⟩ : S)) (by simp)
-  have heq' : ZSpan.fract B ((a : ℕ) • x) = ZSpan.fract B ((b : ℕ) • x) :=
-    congrArg Subtype.val heq
+  obtain ⟨a, b, hab, heq⟩ :=
+    Fintype.exists_ne_map_eq_of_card_lt
+      (fun k : Fin (S.card + 1) => (⟨ZSpan.fract B ((k : ℕ) • x), hmem k⟩ : S))
+      (by simp)
+  have heq' : ZSpan.fract B ((a : ℕ) • x) = ZSpan.fract B ((b : ℕ) • x) := congrArg Subtype.val heq
   rw [ZSpan.fract_eq_fract] at heq'
   have hab' : (a : ℕ) ≠ (b : ℕ) := fun h => hab (Fin.ext h)
   have ha := a.isLt
@@ -67,7 +70,6 @@ end Formalism.FN.AdaptedBasisExistence
 
 namespace Formalism.FN.AdaptedBasisExistence
 
-
 set_option maxHeartbeats 800000 in
 theorem adapted_basis_exists : AdaptedBasis := by
   delta Formalism.FN.AdaptedBasis
@@ -84,8 +86,9 @@ theorem adapted_basis_exists : AdaptedBasis := by
     obtain ⟨z, hz⟩ := (Basis.mem_span_iff_repr_mem ℤ B (N • x)).mp (hNL x hx) k
     have hz' : (z : ℝ) = (N : ℝ) * B.repr x k := by simpa using hz
     exact ⟨z, hz'.symm⟩
-  have hP : ∀ j : Fin (finrank ℝ E), ∃ m : ℕ, 0 < m ∧ ∃ x, (x ∈ L ∧ ∀ k, j < k → B.repr x k = 0) ∧
-      (N : ℝ) * B.repr x j = m := by
+  have hP
+      : ∀ j : Fin (finrank ℝ E), ∃ m : ℕ,
+        0 < m ∧ ∃ x, (x ∈ L ∧ ∀ k, j < k → B.repr x k = 0) ∧ (N : ℝ) * B.repr x j = m := by
     intro j
     refine ⟨N, hN, v j, ⟨hvL j, fun k hk => ?_⟩, ?_⟩
     · rw [← hBv, B.repr_self, Finsupp.single_apply, if_neg (ne_of_lt hk)]
@@ -93,15 +96,17 @@ theorem adapted_basis_exists : AdaptedBasis := by
   have hm := fun j => Nat.find_spec (hP j)
   have hmin := fun j (r : ℕ) (hr : r < Nat.find (hP j)) => Nat.find_min (hP j) hr
   choose b hbG hbj using fun j => (hm j).2
-  have hdiv : ∀ j x, (x ∈ L ∧ ∀ k, j < k → B.repr x k = 0) →
-      ∃ q : ℤ, B.repr x j = q * B.repr (b j) j := by
+  have hdiv
+      : ∀ j x,
+        (x ∈ L ∧ ∀ k, j < k → B.repr x k = 0) → ∃ q : ℤ, B.repr x j = q * B.repr (b j) j := by
     intro j x hx
     obtain ⟨z, hz⟩ := hint x hx.1 j
     have hmpos : 0 < (Nat.find (hP j) : ℤ) := by exact_mod_cast (hm j).1
     have hr0 : 0 ≤ z % (Nat.find (hP j) : ℤ) := Int.emod_nonneg _ hmpos.ne'
     have hrlt : z % (Nat.find (hP j) : ℤ) < Nat.find (hP j) := Int.emod_lt_of_pos _ hmpos
-    have hcast : ((z % (Nat.find (hP j) : ℤ) : ℤ) : ℝ) =
-        (z : ℝ) - ((z / (Nat.find (hP j) : ℤ) : ℤ) : ℝ) * (Nat.find (hP j) : ℝ) := by
+    have hcast
+        : ((z % (Nat.find (hP j) : ℤ) : ℤ) : ℝ)
+          = (z : ℝ) - ((z / (Nat.find (hP j) : ℤ) : ℤ) : ℝ) * (Nat.find (hP j) : ℝ) := by
       have h := congrArg (fun t : ℤ => (t : ℝ)) (Int.ediv_mul_add_emod z (Nat.find (hP j) : ℤ))
       push_cast at h
       linarith
@@ -114,21 +119,29 @@ theorem adapted_basis_exists : AdaptedBasis := by
       linarith
     · exfalso
       have hrpos : 0 < z % (Nat.find (hP j) : ℤ) := lt_of_le_of_ne hr0 (Ne.symm hr)
-      have e : ∀ k, B.repr (x - (z / (Nat.find (hP j) : ℤ)) • b j) k =
-          B.repr x k - ((z / (Nat.find (hP j) : ℤ) : ℤ) : ℝ) * B.repr (b j) k := by
+      have e
+          : ∀ k,
+            B.repr (x - (z / (Nat.find (hP j) : ℤ)) • b j) k
+              = B.repr x k - ((z / (Nat.find (hP j) : ℤ) : ℤ) : ℝ) * B.repr (b j) k := by
         intro k
         simp
-      refine hmin j (z % (Nat.find (hP j) : ℤ)).toNat (by omega)
-        ⟨by omega, x - (z / (Nat.find (hP j) : ℤ)) • b j,
-          ⟨L.sub_mem hx.1 (L.smul_mem _ (hbG j).1), fun k hk => ?_⟩, ?_⟩
+      refine hmin j (z % (Nat.find (hP j) : ℤ)).toNat (by omega) ⟨
+        by omega,
+        x - (z / (Nat.find (hP j) : ℤ)) • b j,
+        ⟨L.sub_mem hx.1 (L.smul_mem _ (hbG j).1), fun k hk => ?_⟩,
+        ?_
+      ⟩
       · rw [e, hx.2 k hk, (hbG j).2 k hk, mul_zero, sub_zero]
       · rw [e, mul_sub, mul_left_comm, hbj, hz]
-        have h2 : (((z % (Nat.find (hP j) : ℤ)).toNat : ℕ) : ℝ) =
-            ((z % (Nat.find (hP j) : ℤ) : ℤ) : ℝ) := by
+        have h2
+            : (((z % (Nat.find (hP j) : ℤ)).toNat : ℕ) : ℝ)
+              = ((z % (Nat.find (hP j) : ℤ) : ℤ) : ℝ) := by
           exact_mod_cast Int.toNat_of_nonneg hr0
         rw [h2, hcast]
-  have hspan : ∀ r : ℕ, ∀ x ∈ L, (∀ k : Fin (finrank ℝ E), r ≤ k.val → B.repr x k = 0) →
-      x ∈ span ℤ (b '' {k | k.val < r}) := by
+  have hspan
+      : ∀ r : ℕ, ∀ x ∈ L,
+        (∀ k : Fin (finrank ℝ E), r ≤ k.val → B.repr x k = 0)
+          → x ∈ span ℤ (b '' {k | k.val < r}) := by
     intro r
     induction r with
     | zero =>
@@ -140,7 +153,8 @@ theorem adapted_basis_exists : AdaptedBasis := by
       intro x hx h
       by_cases hr : r < finrank ℝ E
       · obtain ⟨q, hq⟩ := hdiv ⟨r, hr⟩ x ⟨hx, fun k hk => h k (by rw [Fin.lt_def] at hk; exact hk)⟩
-        have e : ∀ k, B.repr (x - q • b ⟨r, hr⟩) k = B.repr x k - (q : ℝ) * B.repr (b ⟨r, hr⟩) k := by
+        have e
+            : ∀ k, B.repr (x - q • b ⟨r, hr⟩) k = B.repr x k - (q : ℝ) * B.repr (b ⟨r, hr⟩) k := by
           intro k
           simp
         have hy : x - q • b ⟨r, hr⟩ ∈ span ℤ (b '' {k | k.val < r}) := by
@@ -197,11 +211,12 @@ theorem adapted_basis_exists : AdaptedBasis := by
   · rw [span_le]
     rintro _ ⟨i, hi, rfl⟩
     rw [Set.mem_setOf_eq] at hi
-    have hvi := hspan (j.val + 1) (v i) (hvL i) fun k hk => by
-      rw [← hBv, B.repr_self, Finsupp.single_apply, if_neg]
-      intro hik
-      rw [hik, Fin.le_def] at hi
-      omega
+    have hvi :=
+      hspan (j.val + 1) (v i) (hvL i) fun k hk => by
+        rw [← hBv, B.repr_self, Finsupp.single_apply, if_neg]
+        intro hik
+        rw [hik, Fin.le_def] at hi
+        omega
     have hsub : {k : Fin (finrank ℝ E) | k.val < j.val + 1} ⊆ {k | k ≤ j} := by
       intro k hk
       simp only [Set.mem_setOf_eq] at hk ⊢
@@ -211,4 +226,5 @@ theorem adapted_basis_exists : AdaptedBasis := by
 
 end Formalism.FN.AdaptedBasisExistence
 
-theorem Formalism.FN.existsAdaptedBasis : Formalism.FN.AdaptedBasis := Formalism.FN.AdaptedBasisExistence.adapted_basis_exists
+theorem Formalism.FN.existsAdaptedBasis : Formalism.FN.AdaptedBasis :=
+  Formalism.FN.AdaptedBasisExistence.adapted_basis_exists

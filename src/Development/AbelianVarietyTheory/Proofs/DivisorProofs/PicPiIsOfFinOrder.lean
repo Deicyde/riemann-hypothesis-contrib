@@ -12,10 +12,10 @@ namespace PicPi
 
 variable {ι : Type} {R : ι → Type} [∀ i, CommRing (R i)] [DecidableEq ι]
 
-theorem exists_one_tmul (i : ι) (M : Type) [AddCommGroup M] [Module ((j : ι) → R j) M]
-    [Algebra ((j : ι) → R j) (R i)]
-    (hA : algebraMap ((j : ι) → R j) (R i) = Pi.evalRingHom R i)
-    (z : R i ⊗[(j : ι) → R j] M) : ∃ y : M, (1 : R i) ⊗ₜ y = z := by
+theorem exists_one_tmul
+    (i : ι) (M : Type) [AddCommGroup M] [Module ((j : ι) → R j) M] [Algebra ((j : ι) → R j) (R i)]
+    (hA : algebraMap ((j : ι) → R j) (R i) = Pi.evalRingHom R i) (z : R i ⊗[(j : ι) → R j] M)
+    : ∃ y : M, (1 : R i) ⊗ₜ y = z := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨0, by simp⟩
   | tmul r y =>
@@ -29,12 +29,14 @@ theorem exists_one_tmul (i : ι) (M : Type) [AddCommGroup M] [Module ((j : ι) �
     obtain ⟨yb, rfl⟩ := hb
     exact ⟨ya + yb, by rw [TensorProduct.tmul_add]⟩
 
-theorem single_smul_eq_zero (i : ι) (M : Type) [AddCommGroup M] [Module ((j : ι) → R j) M]
-    [Algebra ((j : ι) → R j) (R i)]
-    (hA : algebraMap ((j : ι) → R j) (R i) = Pi.evalRingHom R i) (y : M)
-    (h : (1 : R i) ⊗ₜ[(j : ι) → R j] y = 0) : (Pi.single i 1 : (j : ι) → R j) • y = 0 := by
+theorem single_smul_eq_zero
+    (i : ι) (M : Type) [AddCommGroup M] [Module ((j : ι) → R j) M] [Algebra ((j : ι) → R j) (R i)]
+    (hA : algebraMap ((j : ι) → R j) (R i) = Pi.evalRingHom R i)
+    (y : M) (h : (1 : R i) ⊗ₜ[(j : ι) → R j] y = 0)
+    : (Pi.single i 1 : (j : ι) → R j) • y = 0 := by
   let φ : R i →ₗ[(j : ι) → R j] M →ₗ[(j : ι) → R j] M :=
-    LinearMap.mk₂ _ (fun r y => (Pi.single i r : (j : ι) → R j) • y)
+    LinearMap.mk₂ _
+      (fun r y => (Pi.single i r : (j : ι) → R j) • y)
       (fun r₁ r₂ y => by simp only [Pi.single_add, add_smul])
       (fun s r y => by
         have hs : (Pi.single i (s • r) : (j : ι) → R j) = s * Pi.single i r := by
@@ -50,27 +52,32 @@ theorem single_smul_eq_zero (i : ι) (M : Type) [AddCommGroup M] [Module ((j : �
 
 variable [Fintype ι]
 
-theorem eq_one_of_forall (M : CommRing.Pic ((j : ι) → R j))
-    (h : ∀ i, CommRing.Pic.mapRingHom (Pi.evalRingHom R i) M = 1) : M = 1 := by
+theorem eq_one_of_forall
+    (M : CommRing.Pic ((j : ι) → R j)) (h : ∀ i, CommRing.Pic.mapRingHom (Pi.evalRingHom R i) M = 1)
+    : M = 1 := by
   letI inst : ∀ i, Algebra ((j : ι) → R j) (R i) := fun i => (Pi.evalRingHom R i).toAlgebra
   have hA : ∀ i, algebraMap ((j : ι) → R j) (R i) = Pi.evalRingHom R i := fun i => rfl
   have e : ∀ i, (R i ⊗[(j : ι) → R j] M) ≃ₗ[R i] R i := by
     intro i
     have hi := h i
     rw [← hA i, CommRing.Pic.mapRingHom_algebraMap, CommRing.Pic.mapAlgebra_apply,
-      CommRing.Pic.mk_eq_one_iff] at hi
+        CommRing.Pic.mk_eq_one_iff]
+      at hi
     exact hi.some
   choose m hm using fun i => exists_one_tmul i M (hA i) ((e i).symm 1)
   let m₀ : M := ∑ i, (Pi.single i 1 : (j : ι) → R j) • m i
   have hsurj : Function.Surjective (LinearMap.toSpanSingleton ((j : ι) → R j) M m₀) := by
     intro x
     refine ⟨fun i => e i ((1 : R i) ⊗ₜ x), ?_⟩
-    have key : ∀ i, (Pi.single i 1 : (j : ι) → R j) • x =
-        (Pi.single i (e i ((1 : R i) ⊗ₜ x)) : (j : ι) → R j) • m i := by
+    have key
+        : ∀ i,
+          (Pi.single i 1 : (j : ι) → R j) • x
+            = (Pi.single i (e i ((1 : R i) ⊗ₜ x)) : (j : ι) → R j) • m i := by
       intro i
       set r := e i ((1 : R i) ⊗ₜ x) with hr
-      have h1 : (1 : R i) ⊗ₜ[(j : ι) → R j] x =
-          (1 : R i) ⊗ₜ ((Pi.single i r : (j : ι) → R j) • m i) := by
+      have h1
+          : (1 : R i) ⊗ₜ[(j : ι) → R j] x
+            = (1 : R i) ⊗ₜ ((Pi.single i r : (j : ι) → R j) • m i) := by
         apply (e i).injective
         rw [← TensorProduct.smul_tmul]
         have h0 : (Pi.single i r : (j : ι) → R j) • (1 : R i) = r := by
@@ -85,8 +92,10 @@ theorem eq_one_of_forall (M : CommRing.Pic ((j : ι) → R j))
       rw [smul_sub, sub_eq_zero, smul_smul] at h3
       rw [h3, ← Pi.single_mul, one_mul]
     rw [LinearMap.toSpanSingleton_apply, Finset.smul_sum]
-    have hs : ∀ i, (fun i => e i ((1 : R i) ⊗ₜ x) : (j : ι) → R j) •
-        (Pi.single i 1 : (j : ι) → R j) • m i = (Pi.single i 1 : (j : ι) → R j) • x := by
+    have hs
+        : ∀ i,
+          (fun i => e i ((1 : R i) ⊗ₜ x) : (j : ι) → R j) • (Pi.single i 1 : (j : ι) → R j) • m i
+            = (Pi.single i 1 : (j : ι) → R j) • x := by
       intro i
       rw [key i, smul_smul]
       congr 1
@@ -99,14 +108,15 @@ theorem eq_one_of_forall (M : CommRing.Pic ((j : ι) → R j))
       simpa using Finset.univ_sum_single (1 : (j : ι) → R j)
     rw [h1, one_smul]
   have hbij := Module.Invertible.bijective_of_surjective hsurj
-  exact CommRing.Pic.mk_eq_self.symm.trans
-    (CommRing.Pic.mk_eq_one_iff.mpr ⟨(LinearEquiv.ofBijective _ hbij).symm⟩)
+  exact CommRing.Pic.mk_eq_self.symm.trans (CommRing.Pic.mk_eq_one_iff.mpr ⟨(LinearEquiv.ofBijective
+    _ hbij).symm⟩)
 
 end PicPi
 
-theorem pic_pi_isOfFinOrder : ∀ (ι : Type) [Finite ι] (R : ι → Type) [∀ i, CommRing (R i)],
-    (∀ i (M : CommRing.Pic (R i)), IsOfFinOrder M) →
-      ∀ M : CommRing.Pic ((i : ι) → R i), IsOfFinOrder M := by
+theorem pic_pi_isOfFinOrder
+    : ∀ (ι : Type) [Finite ι] (R : ι → Type) [∀ i, CommRing (R i)],
+      (∀ i (M : CommRing.Pic (R i)), IsOfFinOrder M)
+        → ∀ M : CommRing.Pic ((i : ι) → R i), IsOfFinOrder M := by
   intro ι _ R _ hR M
   classical
   haveI := Fintype.ofFinite ι

@@ -17,7 +17,8 @@ namespace GlobalTheory.CompanionTheory.Ar.Lelong
 open GroundTheory.Heights₂.Heights
 
 theorem lelongLimitAtBranches : LelongLimitAtBranches.Statement :=
-  LelongLimitAtBranches.proof GlobalTheory.CompanionTheory.Ar.branchIntDecompose GlobalTheory.CompanionTheory.Ar.SliceBranch.sliceBranchInt
-    PolydiscLelongLimit.proof GlobalTheory.CompanionTheory.Ar.Branch.branchProperAtPoint
+  LelongLimitAtBranches.proof GlobalTheory.CompanionTheory.Ar.branchIntDecompose
+    GlobalTheory.CompanionTheory.Ar.SliceBranch.sliceBranchInt PolydiscLelongLimit.proof
+    GlobalTheory.CompanionTheory.Ar.Branch.branchProperAtPoint
 
 end GlobalTheory.CompanionTheory.Ar.Lelong

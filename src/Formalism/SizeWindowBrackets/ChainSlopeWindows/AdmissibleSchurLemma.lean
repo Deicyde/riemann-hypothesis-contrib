@@ -15,50 +15,63 @@ open Finset Classical
 
 noncomputable section
 
-theorem ga_eq {ι κ : Type*} (W : Finset ι) (below : ι → ℕ) (l : ι → ℝ) (Ps : Finset ℕ)
-    (J : Finset κ) (gainW : κ → ι → ℝ) (tauW : ι → ℝ) (gain : κ → ℕ → ℝ) (tau : ℕ → ℝ)
-    (h : UnitRule W below l Ps J gainW tauW gain tau) :
-    GaW W J l gainW tauW = ∑ p ∈ Ps, 2 * Real.log p * ((∑ j ∈ J, gain j p) - tau p) := by
+theorem ga_eq
+    {ι κ : Type*} (W : Finset ι) (below : ι → ℕ) (l : ι → ℝ)
+    (Ps : Finset ℕ) (J : Finset κ) (gainW : κ → ι → ℝ) (tauW : ι → ℝ) (gain : κ → ℕ → ℝ)
+    (tau : ℕ → ℝ) (h : UnitRule W below l Ps J gainW tauW gain tau)
+    : GaW W J l gainW tauW = ∑ p ∈ Ps, 2 * Real.log p * ((∑ j ∈ J, gain j p) - tau p) := by
   unfold GaW
   rw [← Finset.sum_filter_add_sum_filter_not W (fun w => below w ∈ Ps)]
-  have hoff : ∑ w ∈ W.filter (fun w => ¬ below w ∈ Ps), l w * ((∑ j ∈ J, gainW j w) - tauW w) = 0 := by
+  have hoff
+      : ∑ w ∈ W.filter (fun w => ¬ below w ∈ Ps), l w * ((∑ j ∈ J, gainW j w) - tauW w) = 0 := by
     apply Finset.sum_eq_zero
     intro w hw
     rw [Finset.mem_filter] at hw
     obtain ⟨hg, ht⟩ := h.offPs w hw.1 hw.2
-    rw [Finset.sum_eq_zero hg, ht]; ring
-  have hon : ∑ w ∈ W.filter (fun w => below w ∈ Ps), l w * ((∑ j ∈ J, gainW j w) - tauW w)
-      = ∑ w ∈ W.filter (fun w => below w ∈ Ps),
-          l w * ((∑ j ∈ J, gain j (below w)) - tau (below w)) := by
+    rw [Finset.sum_eq_zero hg, ht]
+    ring
+  have hon
+      : ∑ w ∈ W.filter (fun w => below w ∈ Ps), l w * ((∑ j ∈ J, gainW j w) - tauW w)
+        = ∑ w ∈ W.filter (fun w => below w ∈ Ps),
+            l w * ((∑ j ∈ J, gain j (below w)) - tau (below w)) := by
     apply Finset.sum_congr rfl
     intro w hw
     rw [Finset.mem_filter] at hw
     obtain ⟨hg, ht⟩ := h.onPs w hw.1 hw.2
     rw [Finset.sum_congr rfl hg, ht]
-  have hfib := Finset.sum_fiberwise_of_maps_to (s := W.filter (fun w => below w ∈ Ps)) (t := Ps)
-      (g := below) (fun w hw => (Finset.mem_filter.1 hw).2)
+  have hfib :=
+    Finset.sum_fiberwise_of_maps_to (s := W.filter (fun w => below w ∈ Ps)) (t := Ps) (g := below)
+      (fun w hw => (Finset.mem_filter.1 hw).2)
       (fun w => l w * ((∑ j ∈ J, gain j (below w)) - tau (below w)))
   rw [hoff, add_zero, hon, ← hfib, Finset.mul_sum]
   apply Finset.sum_congr rfl
   intro p hp
-  have hset : (W.filter (fun w => below w ∈ Ps)).filter (fun w => below w = p) =
-      W.filter (fun w => below w = p) := by
-    ext w; simp only [Finset.mem_filter]; constructor
+  have hset
+      : (W.filter (fun w => below w ∈ Ps)).filter (fun w => below w = p)
+        = W.filter (fun w => below w = p) := by
+    ext w
+    simp only [Finset.mem_filter]
+    constructor
     · rintro ⟨⟨hw, _⟩, he⟩; exact ⟨hw, he⟩
     · rintro ⟨hw, he⟩; exact ⟨⟨hw, he ▸ hp⟩, he⟩
   rw [hset]
-  have hc : ∑ w ∈ W.filter (fun w => below w = p),
-      l w * ((∑ j ∈ J, gain j (below w)) - tau (below w)) =
-      ∑ w ∈ W.filter (fun w => below w = p), l w * ((∑ j ∈ J, gain j p) - tau p) := by
+  have hc
+      : ∑ w ∈ W.filter (fun w => below w = p),
+          l w * ((∑ j ∈ J, gain j (below w)) - tau (below w))
+        = ∑ w ∈ W.filter (fun w => below w = p), l w * ((∑ j ∈ J, gain j p) - tau p) := by
     apply Finset.sum_congr rfl
     intro w hw
     rw [(Finset.mem_filter.1 hw).2]
-  rw [hc, ← Finset.sum_mul, h.unit p hp]; ring
+  rw [hc, ← Finset.sum_mul, h.unit p hp]
+  ring
 
-theorem ask_eq {κ τ : Type*} (Ps : Finset ℕ) (J : Finset κ) (TT : Finset τ)
-    (vonMangoldtClassSum : κ → τ → ℕ → ℝ) (dT : κ → τ → ℝ) :
-    ASK Ps J TT vonMangoldtClassSum dT = (∑ p ∈ Ps, 2 * Real.log p * ∑ j ∈ J, ∑ t ∈ TT, vonMangoldtClassSum j t p) +
-      ∑ j ∈ J, ∑ t ∈ TT, dT j t := by
+theorem ask_eq
+    {κ τ : Type*}
+    (Ps : Finset ℕ) (J : Finset κ) (TT : Finset τ) (vonMangoldtClassSum : κ → τ → ℕ → ℝ)
+    (dT : κ → τ → ℝ)
+    : ASK Ps J TT vonMangoldtClassSum dT
+      = (∑ p ∈ Ps, 2 * Real.log p * ∑ j ∈ J, ∑ t ∈ TT, vonMangoldtClassSum j t p)
+        + ∑ j ∈ J, ∑ t ∈ TT, dT j t := by
   unfold ASK
   simp only [Finset.sum_add_distrib, Finset.mul_sum]
   congr 1
@@ -72,45 +85,68 @@ theorem splitEq_valid : SplitEq := by
   simp only [mul_sub, Finset.sum_sub_distrib]
   ring
 
-theorem deficit_le {κ τ : Type*} (J : Finset κ) (TT : Finset τ) (TTp : ℕ → Finset τ)
-    (vonMangoldtClassSum : κ → τ → ℕ → ℝ) (gain : κ → ℕ → ℝ) (tau lo fl : ℕ → ℝ) (p : ℕ)
-    (h : SizeData₂ J TT TTp vonMangoldtClassSum gain tau lo fl p) :
-    deficit J TT vonMangoldtClassSum gain tau p ≤ servedLoss J TT TTp vonMangoldtClassSum lo fl p := by
+theorem deficit_le
+    {κ τ : Type*} (J : Finset κ) (TT : Finset τ) (TTp : ℕ → Finset τ)
+    (vonMangoldtClassSum : κ → τ → ℕ → ℝ) (gain : κ → ℕ → ℝ)
+    (tau lo fl : ℕ → ℝ) (p : ℕ) (h : SizeData₂ J TT TTp vonMangoldtClassSum gain tau lo fl p)
+    : deficit J TT vonMangoldtClassSum gain tau p
+      ≤ servedLoss J TT TTp vonMangoldtClassSum lo fl p := by
   obtain ⟨hsub, hled⟩ := h
   unfold deficit servedLoss
-  have h1 : ∑ j ∈ J, ∑ t ∈ TT, vonMangoldtClassSum j t p =
-      ∑ j ∈ J, ∑ t ∈ TT \ TTp p, vonMangoldtClassSum j t p + ∑ j ∈ J, ∑ t ∈ TTp p, vonMangoldtClassSum j t p := by
+  have h1
+      : ∑ j ∈ J, ∑ t ∈ TT, vonMangoldtClassSum j t p
+        = ∑ j ∈ J, ∑ t ∈ TT \ TTp p, vonMangoldtClassSum j t p
+          + ∑ j ∈ J, ∑ t ∈ TTp p, vonMangoldtClassSum j t p := by
     rw [← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl (fun j _ => (Finset.sum_sdiff hsub).symm)
-  have h2 : ∑ j ∈ J, ∑ t ∈ TTp p, (vonMangoldtClassSum j t p - lo p) =
-      ∑ j ∈ J, ∑ t ∈ TTp p, vonMangoldtClassSum j t p - (J.card : ℝ) * (TTp p).card * lo p := by
+  have h2
+      : ∑ j ∈ J, ∑ t ∈ TTp p, (vonMangoldtClassSum j t p - lo p)
+        = ∑ j ∈ J, ∑ t ∈ TTp p, vonMangoldtClassSum j t p - (J.card : ℝ) * (TTp p).card * lo p := by
     simp only [Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul]; ring
   rw [h1]
   rw [h2] at hled
   linarith
 
-theorem deficit_dropped {κ τ : Type*} (J : Finset κ) (TT : Finset τ) (vonMangoldtClassSum : κ → τ → ℕ → ℝ)
-    (gain : κ → ℕ → ℝ) (tau : ℕ → ℝ) (p : ℕ) (hg : ∀ j ∈ J, gain j p = 0) (ht : tau p = 0) :
-    deficit J TT vonMangoldtClassSum gain tau p = wholeAsk J TT vonMangoldtClassSum p := by
+theorem deficit_dropped
+    {κ τ : Type*}
+    (J : Finset κ) (TT : Finset τ) (vonMangoldtClassSum : κ → τ → ℕ → ℝ) (gain : κ → ℕ → ℝ)
+    (tau : ℕ → ℝ) (p : ℕ) (hg : ∀ j ∈ J, gain j p = 0) (ht : tau p = 0)
+    : deficit J TT vonMangoldtClassSum gain tau p = wholeAsk J TT vonMangoldtClassSum p := by
   unfold deficit wholeAsk
-  rw [Finset.sum_eq_zero hg, ht]; ring
+  rw [Finset.sum_eq_zero hg, ht]
+  ring
 
 theorem split_classes_count : SplitClasses := by
   intro ι κ τ W below l Ps cl J TT TTp vonMangoldtClassSum dT gainW tauW gain tau lo fl h hled hdrop
   rw [splitEq_valid ι κ τ W below l Ps J TT vonMangoldtClassSum dT gainW tauW gain tau h]
   simp only [Finset.sum_filter]
   rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
-  have key : ∀ p ∈ Ps, 2 * Real.log p * deficit J TT vonMangoldtClassSum gain tau p ≤
-      ((if cl p = PClass.served then 2 * Real.log p * servedLoss J TT TTp vonMangoldtClassSum lo fl p else 0) +
-      (if cl p = PClass.first then 2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p else 0) +
-      (if cl p = PClass.second then 2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p else 0) +
-      (if cl p = PClass.high then 2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p else 0)) := by
+  have key
+      : ∀ p ∈ Ps,
+        2 * Real.log p * deficit J TT vonMangoldtClassSum gain tau p
+          ≤ ((if cl p = PClass.served then
+                2 * Real.log p * servedLoss J TT TTp vonMangoldtClassSum lo fl p
+              else
+                0)
+            + (if cl p = PClass.first then
+                 2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p
+               else
+                 0)
+            + (if cl p = PClass.second then
+                 2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p
+               else
+                 0)
+            + (if cl p = PClass.high then
+                 2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p
+               else
+                 0)) := by
     intro p hp
     have hl : 0 ≤ 2 * Real.log p := by have := Real.log_natCast_nonneg p; linarith
     cases hc : cl p with
     | served =>
       simp only [if_true, if_false, reduceCtorEq, add_zero]
-      exact mul_le_mul_of_nonneg_left (deficit_le J TT TTp vonMangoldtClassSum gain tau lo fl p (hled p hp hc)) hl
+      exact mul_le_mul_of_nonneg_left
+        (deficit_le J TT TTp vonMangoldtClassSum gain tau lo fl p (hled p hp hc)) hl
     | first =>
       obtain ⟨hg, ht⟩ := hdrop p hp (by simp [hc])
       rw [deficit_dropped J TT vonMangoldtClassSum gain tau p hg ht]
@@ -131,25 +167,27 @@ theorem prime_log_sum_bound : PrimeLogSum := by
   have hN : 1 ≤ ⌊Y⌋₊ := (Nat.one_le_floor_iff Y).mpr hY
   have hsub : s ⊆ Nat.primesLE ⌊Y⌋₊ := by
     intro p hp; rw [Nat.mem_primesLE]; exact ⟨Nat.le_floor (hs p hp).2, (hs p hp).1⟩
-  calc ∑ p ∈ s, Real.log p / p ≤ ∑ p ∈ Nat.primesLE ⌊Y⌋₊, Real.log p / p :=
-        Finset.sum_le_sum_of_subset_of_nonneg hsub
-          (fun p _ _ => div_nonneg (Real.log_natCast_nonneg p) (Nat.cast_nonneg p))
+  calc
+    ∑ p ∈ s, Real.log p / p ≤ ∑ p ∈ Nat.primesLE ⌊Y⌋₊, Real.log p / p :=
+      Finset.sum_le_sum_of_subset_of_nonneg hsub
+        (fun p _ _ => div_nonneg (Real.log_natCast_nonneg p) (Nat.cast_nonneg p))
     _ ≤ Real.log ⌊Y⌋₊ + Real.log 4 := Formalism.LogFactorialBounds.sum_primesLE_log_div_le _ hN
     _ ≤ Real.log Y + Real.log 4 := by
-        have : Real.log (⌊Y⌋₊ : ℝ) ≤ Real.log Y :=
-          Real.log_le_log (by exact_mod_cast hN) (Nat.floor_le (by linarith))
-        linarith
+      have : Real.log (⌊Y⌋₊ : ℝ) ≤ Real.log Y :=
+        Real.log_le_log (by exact_mod_cast hN) (Nat.floor_le (by linarith))
+      linarith
 
 theorem theta_finite : ThetaFin := by
   intro Y s hY hs
   have hsub : s ⊆ Nat.primesLE ⌊Y⌋₊ := by
     intro p hp; rw [Nat.mem_primesLE]; exact ⟨Nat.le_floor (hs p hp).2, (hs p hp).1⟩
-  calc ∑ p ∈ s, Real.log p ≤ ∑ p ∈ Nat.primesLE ⌊Y⌋₊, Real.log p :=
-        Finset.sum_le_sum_of_subset_of_nonneg hsub (fun p _ _ => Real.log_natCast_nonneg p)
+  calc
+    ∑ p ∈ s, Real.log p ≤ ∑ p ∈ Nat.primesLE ⌊Y⌋₊, Real.log p :=
+      Finset.sum_le_sum_of_subset_of_nonneg hsub (fun p _ _ => Real.log_natCast_nonneg p)
     _ = Chebyshev.theta (⌊Y⌋₊ : ℝ) := (Chebyshev.theta_eq_sum_primesLE_log _).symm
     _ ≤ Real.log 4 * (⌊Y⌋₊ : ℝ) := Chebyshev.theta_le_log4_mul_x (Nat.cast_nonneg _)
     _ ≤ Real.log 4 * Y :=
-        mul_le_mul_of_nonneg_left (Nat.floor_le hY) (Real.log_nonneg (by norm_num))
+      mul_le_mul_of_nonneg_left (Nat.floor_le hY) (Real.log_nonneg (by norm_num))
 
 def gT (y : ℝ) : ℝ := (Real.log y + 1) / y
 
@@ -212,8 +250,9 @@ theorem tail_square_bound : TailSq := by
     rw [Finset.mem_Ico]
     have : n ≤ s.sup id := Finset.le_sup (f := id) hn
     exact ⟨hs n hn, by omega⟩
-  have h1 : ∑ n ∈ s, Real.log n / (n : ℝ) ^ 2 ≤
-      ∑ n ∈ Finset.Ico p₀ (p₀ + (s.sup id + 1)), Real.log n / (n : ℝ) ^ 2 :=
+  have h1
+      : ∑ n ∈ s, Real.log n / (n : ℝ) ^ 2
+        ≤ ∑ n ∈ Finset.Ico p₀ (p₀ + (s.sup id + 1)), Real.log n / (n : ℝ) ^ 2 :=
     Finset.sum_le_sum_of_subset_of_nonneg hsub
       (fun n _ _ => div_nonneg (Real.log_natCast_nonneg n) (by positivity))
   have h2 := tail_Ico p₀ hp (s.sup id + 1)
@@ -279,8 +318,7 @@ theorem top_term_bound : AskUpperBound := by
   intro I at_ p w hp ha hw hI
   have hp0 : 0 < p := by linarith
   have h1 := askAt_le_geom I at_ p w hp0 ha hw
-  have hq : 1 / p ≤ 1 / 2 := by
-    rw [div_le_div_iff₀ hp0 (by norm_num)]; linarith
+  have hq : 1 / p ≤ 1 / 2 := by rw [div_le_div_iff₀ hp0 (by norm_num)]; linarith
   have h2 := geom_odd I (1 / p) (by positivity) hq hI
   have h3 := mul_le_mul_of_nonneg_left h2 ha
   have e : at_ * (4 / 3 * (1 / p)) = 4 / 3 * at_ / p := by ring
@@ -306,8 +344,7 @@ theorem d_term_bound : DTerm := by
   have hdR : (4 : ℝ) ≤ d := by exact_mod_cast hd
   have hd0 : (0 : ℝ) < d := by linarith
   have h1 := askAt_le_geom I at_ d w hd0 ha hw
-  have hq : 1 / (d : ℝ) < 1 := by
-    rw [div_lt_one hd0]; linarith
+  have hq : 1 / (d : ℝ) < 1 := by rw [div_lt_one hd0]; linarith
   have h2 := geom_pos I (1 / (d : ℝ)) (by positivity) hq hI
   have e1 : 1 / (d : ℝ) / (1 - 1 / (d : ℝ)) = 1 / ((d : ℝ) - 1) := by
     have : (d : ℝ) - 1 ≠ 0 := by linarith
@@ -329,8 +366,8 @@ theorem interval_count : IntervalCount := by
   intro A B s hAB hs
   rcases s.eq_empty_or_nonempty with rfl | hne
   · simp only [Finset.card_empty, Nat.cast_zero]; linarith
-  · have hsub : s ⊆ Finset.Icc (s.min' hne) (s.max' hne) :=
-      fun n hn => Finset.mem_Icc.2 ⟨s.min'_le n hn, s.le_max' n hn⟩
+  · have hsub : s ⊆ Finset.Icc (s.min' hne) (s.max' hne) := fun n hn =>
+      Finset.mem_Icc.2 ⟨s.min'_le n hn, s.le_max' n hn⟩
     have hmM : s.min' hne ≤ s.max' hne := s.min'_le_max' hne
     have hc : (s.card : ℝ) ≤ ((Finset.Icc (s.min' hne) (s.max' hne)).card : ℝ) := by
       exact_mod_cast Finset.card_le_card hsub
@@ -362,9 +399,10 @@ theorem band_sum : BandSum := by
       apply le_min
       · rw [div_le_div_iff₀ hn0 hP0]; nlinarith
       · exact one_div_le_one_div_of_le hp0 h1
-    calc Real.log n / n = Real.log n * (1 / (n : ℝ)) := by ring
-      _ ≤ Real.log (2 * P) * μ :=
-        mul_le_mul hlog hinv (by positivity) hl2P
+    calc
+      Real.log n / n
+        = Real.log n * (1 / (n : ℝ)) := by ring
+      _ ≤ Real.log (2 * P) * μ := mul_le_mul hlog hinv (by positivity) hl2P
   have hsum : ∑ n ∈ s, Real.log n / n ≤ s.card * (Real.log (2 * P) * μ) := by
     have := Finset.sum_le_card_nsmul s _ _ hterm
     rwa [nsmul_eq_mul] at this
@@ -375,15 +413,17 @@ theorem band_sum : BandSum := by
     have h3 : μ ≤ 1 / p₀ := min_le_right _ _
     have e : 2 * c * P * (2 / P) = 4 * c := by field_simp; ring
     nlinarith
-  calc ∑ n ∈ s, Real.log n / n ≤ s.card * (Real.log (2 * P) * μ) := hsum
+  calc
+    ∑ n ∈ s, Real.log n / n
+      ≤ s.card * (Real.log (2 * P) * μ) := hsum
     _ = (s.card * μ) * Real.log (2 * P) := by ring
     _ ≤ (4 * c + 1 / p₀) * Real.log (2 * P) := mul_le_mul_of_nonneg_right hcμ hl2P
 
 theorem band_total : BandTotal := by
   intro I P X' c p₀ s hc0 hc hp₀ hP hs
   have hp0 : 0 < p₀ := by linarith
-  have hterm : ∀ i ∈ Finset.range I, ∑ n ∈ s i, Real.log n / n ≤
-      (4 * c + 1 / p₀) * Real.log (2 * X') := by
+  have hterm
+      : ∀ i ∈ Finset.range I, ∑ n ∈ s i, Real.log n / n ≤ (4 * c + 1 / p₀) * Real.log (2 * X') := by
     intro i hi
     have hi' := Finset.mem_range.1 hi
     have h1 := band_sum (P i) c p₀ (s i) (hP i hi').1 hc0 hc hp₀ (hs i hi')
@@ -399,15 +439,18 @@ theorem high_bucket_bound : HighBucket := by
   have hX0 : 0 < X'' := by linarith
   have hl2X : 0 ≤ Real.log (2 * X'') := Real.log_nonneg (by linarith)
 
-  have hper : ∀ p ∈ s, 2 * Real.log p * ∑ i ∈ I p, max (at_ / (p : ℝ) ^ i - w p i) 0 ≤
-      (if (p : ℝ) < X'' * (1 + th) then 2 * Real.log (2 * X'') * (w'' * th) else 0) := by
+  have hper
+      : ∀ p ∈ s,
+        2 * Real.log p * ∑ i ∈ I p, max (at_ / (p : ℝ) ^ i - w p i) 0
+          ≤ (if (p : ℝ) < X'' * (1 + th) then 2 * Real.log (2 * X'') * (w'' * th) else 0) := by
     intro p hp
     have hpX : X'' < p := hs p hp
     have hp0 : (0 : ℝ) < p := by linarith
     have hlp : 0 ≤ Real.log p := Real.log_natCast_nonneg p
     set bp : ℝ := if (p : ℝ) < X'' * (1 + th) then w'' * th else 0 with hbp
     have hbp0 : 0 ≤ bp := by
-      rw [hbp]; split_ifs
+      rw [hbp]
+      split_ifs
       · positivity
       · exact le_rfl
     have hi : ∀ i ∈ I p, max (at_ / (p : ℝ) ^ i - w p i) 0 ≤ if i = 1 then bp else 0 := by
@@ -425,7 +468,8 @@ theorem high_bucket_bound : HighBucket := by
           linarith [hw p hp 1 hiI]
         · have hge : X'' * (1 + th) ≤ p := not_lt.1 hlt
           have h2 : at_ / (p : ℝ) ≤ w'' := by
-            rw [div_le_iff₀ hp0]; rw [← ha] at hat
+            rw [div_le_iff₀ hp0]
+            rw [← ha] at hat
             nlinarith
           linarith [hw p hp 1 hiI]
       · rw [if_neg h1]
@@ -435,7 +479,8 @@ theorem high_bucket_bound : HighBucket := by
         have hp2 : 2 * X'' ≤ (p : ℝ) ^ 2 := by nlinarith
         have hpi0 : (0 : ℝ) < (p : ℝ) ^ i := by positivity
         have h2 : at_ / (p : ℝ) ^ i ≤ w'' := by
-          rw [div_le_iff₀ hpi0]; rw [← ha] at hat
+          rw [div_le_iff₀ hpi0]
+          rw [← ha] at hat
           have : at_ ≤ w'' * (2 * X'') := by nlinarith
           have h5 : w'' * (2 * X'') ≤ w'' * (p : ℝ) ^ i :=
             mul_le_mul_of_nonneg_left (hp2.trans hpow) hw''.le
@@ -458,31 +503,36 @@ theorem high_bucket_bound : HighBucket := by
     · simp
   refine (Finset.sum_le_sum hper).trans ?_
   rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
-  have hcard := interval_count X'' (X'' * (1 + th))
-    (s.filter (fun p : ℕ => (p : ℝ) < X'' * (1 + th))) (by nlinarith) (by
-      intro n hn
-      rw [Finset.mem_filter] at hn
-      exact ⟨(hs n hn.1).le, hn.2.le⟩)
+  have hcard :=
+    interval_count X'' (X'' * (1 + th)) (s.filter (fun p : ℕ => (p : ℝ) < X'' * (1 + th)))
+      (by nlinarith)
+      (by
+        intro n hn
+        rw [Finset.mem_filter] at hn
+        exact ⟨(hs n hn.1).le, hn.2.le⟩)
   have hnn : 0 ≤ 2 * Real.log (2 * X'') * (w'' * th) := by positivity
   have h7 := mul_le_mul_of_nonneg_right hcard hnn
   refine h7.trans (le_of_eq ?_)
-  rw [← ha]; ring
+  rw [← ha]
+  ring
 
 theorem floor_bucket_bound : FloorBucket := by
   intro C f N a X'' s hC hf ha hs hcard
   have hla : 0 ≤ Real.log a := Real.log_nonneg ha
   have hB0 : 0 ≤ 2 * C * f * (N ^ 2 * Real.log a + 2 * Real.log a ^ 2) := by positivity
   simp only [flF]
-  have hterm : ∀ p ∈ s,
-      2 * Real.log p * (C * f * N ^ 2 * Real.logb p a + C * f * Real.logb p a ^ 2) ≤
-      2 * C * f * (N ^ 2 * Real.log a + 2 * Real.log a ^ 2) := by
+  have hterm
+      : ∀ p ∈ s,
+        2 * Real.log p * (C * f * N ^ 2 * Real.logb p a + C * f * Real.logb p a ^ 2)
+          ≤ 2 * C * f * (N ^ 2 * Real.log a + 2 * Real.log a ^ 2) := by
     intro p hp
     have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hs p hp
     have hl2 : Real.log 2 ≤ Real.log p := Real.log_le_log (by norm_num) hp2
     have hl2' := Real.log_two_gt_d9
     have hlp : 0 < Real.log p := by linarith
-    have e : 2 * Real.log p * (C * f * N ^ 2 * Real.logb p a + C * f * Real.logb p a ^ 2) =
-        2 * C * f * (N ^ 2 * Real.log a + Real.log a ^ 2 / Real.log p) := by
+    have e
+        : 2 * Real.log p * (C * f * N ^ 2 * Real.logb p a + C * f * Real.logb p a ^ 2)
+          = 2 * C * f * (N ^ 2 * Real.log a + Real.log a ^ 2 / Real.log p) := by
       unfold Real.logb; field_simp
     rw [e]
     have h1 : Real.log a ^ 2 / Real.log p ≤ 2 * Real.log a ^ 2 := by
@@ -502,13 +552,16 @@ theorem cp_bucket_bound : CpBucket := by
   have hla : 0 ≤ Real.log (2 * a) := Real.log_nonneg (by linarith)
   have hB0 : 0 ≤ 2 * C * Sk * Real.log (2 * a) * mT := by positivity
   simp only [cpF]
-  have hterm : ∀ p ∈ s, 2 * Real.log p * (mT * (C * Sk * Real.logb p (2 * a))) ≤
-      2 * C * Sk * Real.log (2 * a) * mT := by
+  have hterm
+      : ∀ p ∈ s,
+        2 * Real.log p * (mT * (C * Sk * Real.logb p (2 * a)))
+          ≤ 2 * C * Sk * Real.log (2 * a) * mT := by
     intro p hp
     have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hs p hp
     have hlp : 0 < Real.log p := Real.log_pos (by linarith)
     apply le_of_eq
-    unfold Real.logb; field_simp
+    unfold Real.logb
+    field_simp
   have h1 := Finset.sum_le_card_nsmul s _ _ hterm
   rw [nsmul_eq_mul] at h1
   have h2 := mul_le_mul_of_nonneg_right hcard hB0
@@ -518,8 +571,10 @@ theorem cp_bucket_bound : CpBucket := by
 theorem pr_bucket_bound : PrBucket := by
   intro p₀ X' Q₁ Q₂ s hX' hQ₁ hQ₂ hs
   simp only [prF]
-  have hterm : ∀ p ∈ s, 2 * Real.log p * (if p < p₀ then Q₁ else Q₂) ≤
-      (if p < p₀ then 2 * Q₁ * Real.log p else 0) + 2 * Q₂ * Real.log p := by
+  have hterm
+      : ∀ p ∈ s,
+        2 * Real.log p * (if p < p₀ then Q₁ else Q₂)
+          ≤ (if p < p₀ then 2 * Q₁ * Real.log p else 0) + 2 * Q₂ * Real.log p := by
     intro p _
     have hl : 0 ≤ Real.log p := Real.log_natCast_nonneg p
     split_ifs
@@ -527,10 +582,11 @@ theorem pr_bucket_bound : PrBucket := by
     · linarith
   refine (Finset.sum_le_sum hterm).trans ?_
   rw [Finset.sum_add_distrib, ← Finset.sum_filter, ← Finset.mul_sum, ← Finset.mul_sum]
-  have h1 := theta_finite p₀ (s.filter (fun p : ℕ => p < p₀)) (Nat.cast_nonneg _) (by
-    intro p hp
-    rw [Finset.mem_filter] at hp
-    exact ⟨(hs p hp.1).1, by exact_mod_cast hp.2.le⟩)
+  have h1 :=
+    theta_finite p₀ (s.filter (fun p : ℕ => p < p₀)) (Nat.cast_nonneg _) (by
+      intro p hp
+      rw [Finset.mem_filter] at hp
+      exact ⟨(hs p hp.1).1, by exact_mod_cast hp.2.le⟩)
   have h2 := theta_finite X' s hX' (fun p hp => ⟨(hs p hp).1, (hs p hp).2.le⟩)
   have h3 := mul_le_mul_of_nonneg_left h1 (show 0 ≤ 2 * Q₁ by linarith)
   have h4 := mul_le_mul_of_nonneg_left h2 (show 0 ≤ 2 * Q₂ by linarith)
@@ -539,11 +595,14 @@ theorem pr_bucket_bound : PrBucket := by
 theorem or_bucket_bound : OrBucket := by
   intro C lx La a k K₀ X' L₁ p₀ s hC hlx hLa ha hk hK₀ hX' hp₀ hs hL
   simp only [orF]
-  have hterm : ∀ p ∈ s, 2 * Real.log p * (C * lx * (La * a / (p * k) +
-        (if p < p₀ then a * (p : ℝ) ^ (-(L₁ p)) else a / (p : ℝ) ^ 2))) ≤
-      2 * C * lx * a * (La / k) * (Real.log p / p) +
-      (if p < p₀ then 2 * C * lx * a * (1 / K₀) * (Real.log p / p) else 0) +
-      (if p₀ ≤ p then 2 * C * lx * a * (Real.log p / (p : ℝ) ^ 2) else 0) := by
+  have hterm
+      : ∀ p ∈ s,
+        2 * Real.log p
+            * (C * lx
+              * (La * a / (p * k) + (if p < p₀ then a * (p : ℝ) ^ (-(L₁ p)) else a / (p : ℝ) ^ 2)))
+          ≤ 2 * C * lx * a * (La / k) * (Real.log p / p)
+            + (if p < p₀ then 2 * C * lx * a * (1 / K₀) * (Real.log p / p) else 0)
+            + (if p₀ ≤ p then 2 * C * lx * a * (Real.log p / (p : ℝ) ^ 2) else 0) := by
     intro p hp
     have hpp := (hs p hp).1
     have hp0 : (0 : ℝ) < p := by exact_mod_cast hpp.pos
@@ -557,9 +616,11 @@ theorem or_bucket_bound : OrBucket := by
       have hinv : (p : ℝ) ^ (-(L₁ p)) ≤ 1 / K₀ * (1 / p) := by
         rw [Real.rpow_neg hp0.le, ← one_div, one_div_mul_one_div]
         exact one_div_le_one_div_of_le (by positivity) hK'
-      have h1 : a * (p : ℝ) ^ (-(L₁ p)) ≤ a * (1 / K₀ * (1 / p)) := mul_le_mul_of_nonneg_left hinv ha
-      have h2 : 2 * Real.log p * (C * lx * (La * a / (p * k) + a * (p : ℝ) ^ (-(L₁ p)))) ≤
-          2 * Real.log p * (C * lx * (La * a / (p * k) + a * (1 / K₀ * (1 / p)))) := by
+      have h1 : a * (p : ℝ) ^ (-(L₁ p)) ≤ a * (1 / K₀ * (1 / p)) :=
+        mul_le_mul_of_nonneg_left hinv ha
+      have h2
+          : 2 * Real.log p * (C * lx * (La * a / (p * k) + a * (p : ℝ) ^ (-(L₁ p))))
+            ≤ 2 * Real.log p * (C * lx * (La * a / (p * k) + a * (1 / K₀ * (1 / p)))) := by
         apply mul_le_mul_of_nonneg_left _ (by linarith)
         apply mul_le_mul_of_nonneg_left _ (by positivity)
         linarith
@@ -574,13 +635,15 @@ theorem or_bucket_bound : OrBucket := by
   rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.sum_filter, ← Finset.sum_filter,
     ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum]
   have h1 := prime_log_sum_bound X' s hX' (fun p hp => ⟨(hs p hp).1, (hs p hp).2.le⟩)
-  have h2 := prime_log_sum_bound X' (s.filter (fun p => p < p₀)) hX' (by
-    intro p hp
-    rw [Finset.mem_filter] at hp
-    exact ⟨(hs p hp.1).1, (hs p hp.1).2.le⟩)
-  have h3 := tail_square_bound p₀ (s.filter (fun p => p₀ ≤ p)) hp₀ (by
-    intro p hp
-    exact (Finset.mem_filter.1 hp).2)
+  have h2 :=
+    prime_log_sum_bound X' (s.filter (fun p => p < p₀)) hX' (by
+      intro p hp
+      rw [Finset.mem_filter] at hp
+      exact ⟨(hs p hp.1).1, (hs p hp.1).2.le⟩)
+  have h3 :=
+    tail_square_bound p₀ (s.filter (fun p => p₀ ≤ p)) hp₀ (by
+      intro p hp
+      exact (Finset.mem_filter.1 hp).2)
   have h4 := mul_le_mul_of_nonneg_left h1 (show 0 ≤ 2 * C * lx * a * (La / k) by positivity)
   have h5 := mul_le_mul_of_nonneg_left h2 (show 0 ≤ 2 * C * lx * a * (1 / K₀) by positivity)
   have h6 := mul_le_mul_of_nonneg_left h3 (show 0 ≤ 2 * C * lx * a by positivity)
@@ -600,16 +663,18 @@ lemma dsum_le {κ τ : Type*} (J : Finset κ) (S : Finset τ) (g : κ → τ →
     _ = _ := by ring
 
 theorem loss_bound : SecondKindLoss := by
-  intro ι κ τ W below l Ps cl J TT TTp Iex at_ wz Id wd d gainW tauW gain tau lo fl
-    a th w'' X'' X' C f N Sk Q₁ Q₂ lx La k K₀ L₁ p₀
-    hU hPr hw'' hth0 hth hX'' haX ha1 hX' hp₀ hd hC hf hSk hQ₁ hQ₂ hlx hLa hk hK₀
-    hat hIex hId hserved hhigh hled hdrop hfl hlo hL
-  have h0 := split_classes_count ι κ τ W below l Ps cl J TT TTp
-    (fun j t p => askAt (Iex j t p) (at_ t) p (wz j t p))
-    (fun j t => Real.log d * askAt (Id j t) (at_ t) d (wd j t))
-    gainW tauW gain tau lo fl hU hled hdrop
-  generalize hask : (fun j t p => askAt (Iex j t p) (at_ t) (p : ℝ) (wz j t p) :
-    κ → τ → ℕ → ℝ) = vonMangoldtClassSum at h0 hled ⊢
+  intro ι κ τ W below l Ps cl J TT TTp Iex at_ wz Id wd d gainW tauW gain tau lo fl a th w'' X'' X'
+    C f N Sk Q₁ Q₂ lx La k K₀ L₁ p₀ hU hPr hw'' hth0 hth hX'' haX ha1 hX' hp₀ hd hC hf hSk hQ₁ hQ₂
+    hlx hLa hk hK₀ hat hIex hId hserved hhigh hled hdrop hfl hlo hL
+  have h0 :=
+    split_classes_count ι κ τ W below l Ps cl J TT TTp
+      (fun j t p => askAt (Iex j t p) (at_ t) p (wz j t p))
+      (fun j t => Real.log d * askAt (Id j t) (at_ t) d (wd j t))
+      gainW tauW gain tau lo fl hU hled hdrop
+  generalize hask
+      : (fun j t p => askAt (Iex j t p) (at_ t) (p : ℝ) (wz j t p) : κ → τ → ℕ → ℝ)
+        = vonMangoldtClassSum
+    at h0 hled ⊢
   generalize hdT : (fun j t => Real.log d * askAt (Id j t) (at_ t) d (wd j t) : κ → τ → ℝ) = dT
     at h0 ⊢
   generalize hm : (J.card : ℝ) = m at h0 ⊢
@@ -621,36 +686,45 @@ theorem loss_bound : SecondKindLoss := by
     intro t ht
     have := (hat t ht).2
     nlinarith
-  have hTop : ∀ j ∈ J, ∀ t ∈ TT, ∀ p ∈ Ps,
-      2 * Real.log p * vonMangoldtClassSum j t p ≤ 4 * a * Real.log p / p := by
+  have hTop
+      : ∀ j ∈ J, ∀ t ∈ TT, ∀ p ∈ Ps,
+        2 * Real.log p * vonMangoldtClassSum j t p ≤ 4 * a * Real.log p / p := by
     intro j hj t ht p hp
     rw [← hask]
     exact top_loss_bound (Iex j t p) a (at_ t) p (wz j t p) (hPr p hp).two_le (hat t ht).1
-      (hat32 t ht) (fun i hi => by linarith [(hIex j hj t ht p hp i hi).2])
+      (hat32 t ht)
+      (fun i hi => by linarith [(hIex j hj t ht p hp i hi).2])
       (fun i hi => (hIex j hj t ht p hp i hi).1)
-  have hWhole : ∀ p ∈ Ps,
-      2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p ≤ 4 * m * T * a * (Real.log p / p) := by
+  have hWhole
+      : ∀ p ∈ Ps,
+        2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p
+          ≤ 4 * m * T * a * (Real.log p / p) := by
     intro p hp
     unfold wholeAsk
     simp only [Finset.mul_sum]
     refine (dsum_le J TT _ _ (fun j hj t ht => hTop j hj t ht p hp)).trans (le_of_eq ?_)
-    rw [hm, hT]; ring
-  have hS : ∀ c : PClass,
-      ∑ p ∈ Ps.filter (fun p => cl p = c), 2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p ≤
-      4 * m * T * a * ∑ p ∈ Ps.filter (fun p => cl p = c), Real.log p / p := by
+    rw [hm, hT]
+    ring
+  have hS
+      : ∀ c : PClass,
+        ∑ p ∈ Ps.filter (fun p => cl p = c), 2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p
+          ≤ 4 * m * T * a * ∑ p ∈ Ps.filter (fun p => cl p = c), Real.log p / p := by
     intro c
     rw [Finset.mul_sum]
     exact Finset.sum_le_sum (fun p hp => hWhole p (Finset.mem_filter.1 hp).1)
-  have hHigh : ∑ p ∈ Ps.filter (fun p => cl p = PClass.high),
-      2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p ≤
-      m * T * (2 * Real.log (2 * X'') * (a * th ^ 2 + w'' * th)) := by
+  have hHigh
+      : ∑ p ∈ Ps.filter (fun p => cl p = PClass.high),
+          2 * Real.log p * wholeAsk J TT vonMangoldtClassSum p
+        ≤ m * T * (2 * Real.log (2 * X'') * (a * th ^ 2 + w'' * th)) := by
     unfold wholeAsk
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm, Finset.sum_congr rfl (fun j _ => Finset.sum_comm), ← hm, ← hT]
     apply dsum_le
     intro j hj t ht
     rw [← hask]
-    exact high_bucket_bound a (at_ t) w'' X'' th _ (fun p => Iex j t p) (fun p => wz j t p)
+    exact high_bucket_bound a (at_ t) w'' X'' th _
+      (fun p => Iex j t p)
+      (fun p => wz j t p)
       hw'' hth0 (by linarith) hX'' haX (hat t ht).1 (hat t ht).2
       (fun p hp => hhigh p (Finset.mem_filter.1 hp).1 (Finset.mem_filter.1 hp).2)
       (fun p hp i hi => (hIex j hj t ht p (Finset.mem_filter.1 hp).1 i hi).1.pos)
@@ -661,26 +735,30 @@ theorem loss_bound : SecondKindLoss := by
     intro j hj t ht
     rw [← hdT]
     exact d_term_bound (Id j t) a (at_ t) d (wd j t) hd (hat t ht).1 (hat32 t ht)
-      (fun i hi => (hId j hj t ht i hi).2) (fun i hi => (hId j hj t ht i hi).1)
-  have hServ : ∀ p ∈ Ps.filter (fun p => cl p = PClass.served),
-      2 * Real.log p * servedLoss J TT TTp vonMangoldtClassSum lo fl p ≤
-        4 * m * a * (Real.log p / p) * ((TT \ TTp p).card : ℝ) +
-        2 * Real.log p * (m * T * cpF C Sk a p) +
-        (if (p : ℝ) < X' then m * T * (2 * Real.log p * prF p₀ Q₁ Q₂ p) else 0) +
-        (if (p : ℝ) < X' then m * T * (2 * Real.log p * orF C lx La a k L₁ p₀ p) else 0) +
-        m * (2 * Real.log p * flF C f N a p) := by
+      (fun i hi => (hId j hj t ht i hi).2)
+      (fun i hi => (hId j hj t ht i hi).1)
+  have hServ
+      : ∀ p ∈ Ps.filter (fun p => cl p = PClass.served),
+        2 * Real.log p * servedLoss J TT TTp vonMangoldtClassSum lo fl p
+          ≤ 4 * m * a * (Real.log p / p) * ((TT \ TTp p).card : ℝ)
+            + 2 * Real.log p * (m * T * cpF C Sk a p)
+            + (if (p : ℝ) < X' then m * T * (2 * Real.log p * prF p₀ Q₁ Q₂ p) else 0)
+            + (if (p : ℝ) < X' then m * T * (2 * Real.log p * orF C lx La a k L₁ p₀ p) else 0)
+            + m * (2 * Real.log p * flF C f N a p) := by
     intro p hp
     obtain ⟨hpP, hc⟩ := Finset.mem_filter.1 hp
     have hl : 0 ≤ Real.log p := Real.log_natCast_nonneg p
     have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast (hPr p hpP).two_le
     have hp0 : (0 : ℝ) < p := by linarith
     have hsub := (hled p hpP hc).1
-    have h1 : 2 * Real.log p * ∑ j ∈ J, ∑ t ∈ TT \ TTp p, vonMangoldtClassSum j t p ≤
-        4 * m * a * (Real.log p / p) * ((TT \ TTp p).card : ℝ) := by
+    have h1
+        : 2 * Real.log p * ∑ j ∈ J, ∑ t ∈ TT \ TTp p, vonMangoldtClassSum j t p
+          ≤ 4 * m * a * (Real.log p / p) * ((TT \ TTp p).card : ℝ) := by
       simp only [Finset.mul_sum]
       refine (dsum_le J (TT \ TTp p) _ _
         (fun j hj t ht => hTop j hj t (Finset.mem_sdiff.1 ht).1 p hpP)).trans (le_of_eq ?_)
-      rw [hm]; ring
+      rw [hm]
+      ring
     have hcp0 : 0 ≤ cpF C Sk a p := by
       unfold cpF
       have : 0 ≤ Real.logb p (2 * a) := Real.logb_nonneg (by linarith) (by linarith)
@@ -693,29 +771,33 @@ theorem loss_bound : SecondKindLoss := by
         · exact mul_nonneg ha0 (Real.rpow_nonneg hp0.le _)
         · positivity
       positivity
-    have hloF0 : 0 ≤ loF C Sk a X' Q₁ Q₂ lx La k L₁ p₀ p := by
-      unfold loF; split_ifs <;> linarith
-    have hcard : ((TTp p).card : ℝ) ≤ T := by
-      rw [← hT]; exact_mod_cast Finset.card_le_card hsub
+    have hloF0 : 0 ≤ loF C Sk a X' Q₁ Q₂ lx La k L₁ p₀ p := by unfold loF; split_ifs <;> linarith
+    have hcard : ((TTp p).card : ℝ) ≤ T := by rw [← hT]; exact_mod_cast Finset.card_le_card hsub
     have hcard0 : (0 : ℝ) ≤ ((TTp p).card : ℝ) := Nat.cast_nonneg _
     have h2 : m * (TTp p).card * lo p ≤ m * T * loF C Sk a X' Q₁ Q₂ lx La k L₁ p₀ p := by
-      calc m * (TTp p).card * lo p ≤ m * (TTp p).card * loF C Sk a X' Q₁ Q₂ lx La k L₁ p₀ p :=
-            mul_le_mul_of_nonneg_left (hlo p hpP hc) (by positivity)
+      calc
+        m * (TTp p).card * lo p ≤ m * (TTp p).card * loF C Sk a X' Q₁ Q₂ lx La k L₁ p₀ p :=
+          mul_le_mul_of_nonneg_left (hlo p hpP hc) (by positivity)
         _ ≤ m * T * loF C Sk a X' Q₁ Q₂ lx La k L₁ p₀ p :=
-            mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hcard hm0) hloF0
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hcard hm0) hloF0
     have h3 : m * fl p ≤ m * flF C f N a p := mul_le_mul_of_nonneg_left (hfl p hpP hc) hm0
     unfold servedLoss
     rw [hm]
     have h4 := mul_le_mul_of_nonneg_left (add_le_add h2 h3) (show 0 ≤ 2 * Real.log p by linarith)
-    have e1 : 2 * Real.log p * (∑ j ∈ J, ∑ t ∈ TT \ TTp p, vonMangoldtClassSum j t p + m * (TTp p).card * lo p +
-        m * fl p) = 2 * Real.log p * ∑ j ∈ J, ∑ t ∈ TT \ TTp p, vonMangoldtClassSum j t p +
-        2 * Real.log p * (m * (TTp p).card * lo p + m * fl p) := by ring
+    have e1
+        : 2 * Real.log p
+            * (∑ j ∈ J, ∑ t ∈ TT \ TTp p, vonMangoldtClassSum j t p + m * (TTp p).card * lo p
+              + m * fl p)
+          = 2 * Real.log p * ∑ j ∈ J, ∑ t ∈ TT \ TTp p, vonMangoldtClassSum j t p
+            + 2 * Real.log p * (m * (TTp p).card * lo p + m * fl p) := by
+      ring
     rw [e1]
-    have e2 : 2 * Real.log p * (m * T * loF C Sk a X' Q₁ Q₂ lx La k L₁ p₀ p + m * flF C f N a p) =
-        2 * Real.log p * (m * T * cpF C Sk a p) +
-        (if (p : ℝ) < X' then m * T * (2 * Real.log p * prF p₀ Q₁ Q₂ p) else 0) +
-        (if (p : ℝ) < X' then m * T * (2 * Real.log p * orF C lx La a k L₁ p₀ p) else 0) +
-        m * (2 * Real.log p * flF C f N a p) := by
+    have e2
+        : 2 * Real.log p * (m * T * loF C Sk a X' Q₁ Q₂ lx La k L₁ p₀ p + m * flF C f N a p)
+          = 2 * Real.log p * (m * T * cpF C Sk a p)
+            + (if (p : ℝ) < X' then m * T * (2 * Real.log p * prF p₀ Q₁ Q₂ p) else 0)
+            + (if (p : ℝ) < X' then m * T * (2 * Real.log p * orF C lx La a k L₁ p₀ p) else 0)
+            + m * (2 * Real.log p * flF C f N a p) := by
       unfold loF
       split_ifs <;> ring
     rw [e2] at h4
@@ -723,31 +805,40 @@ theorem loss_bound : SecondKindLoss := by
   have hS1 := Finset.sum_le_sum hServ
   simp only [Finset.sum_add_distrib] at hS1
   rw [← Finset.sum_filter, ← Finset.sum_filter, ← Finset.mul_sum, ← Finset.mul_sum,
-    ← Finset.mul_sum] at hS1
-  have hs2 : ∀ p ∈ Ps.filter (fun p => cl p = PClass.served), 2 ≤ p :=
-    fun p hp => (hPr p (Finset.mem_filter.1 hp).1).two_le
+      ← Finset.mul_sum]
+    at hS1
+  have hs2 : ∀ p ∈ Ps.filter (fun p => cl p = PClass.served), 2 ≤ p := fun p hp =>
+    (hPr p (Finset.mem_filter.1 hp).1).two_le
   have hcardS : ((Ps.filter (fun p => cl p = PClass.served)).card : ℝ) ≤ X'' := by
-    have := interval_count 2 X'' (Ps.filter (fun p => cl p = PClass.served)) hX'' (by
-      intro p hp
-      exact ⟨by exact_mod_cast hs2 p hp,
-        hserved p (Finset.mem_filter.1 hp).1 (Finset.mem_filter.1 hp).2⟩)
+    have :=
+      interval_count 2 X'' (Ps.filter (fun p => cl p = PClass.served)) hX'' (by
+        intro p hp
+        exact ⟨
+          by exact_mod_cast hs2 p hp,
+          hserved p (Finset.mem_filter.1 hp).1 (Finset.mem_filter.1 hp).2
+        ⟩)
     linarith
   have hCp := cp_bucket_bound C Sk a (m * T) X'' _ hC hSk (by linarith) (by positivity) hs2 hcardS
   have hFl := floor_bucket_bound C f N a X'' _ hC hf ha1 hs2 hcardS
-  have hPrB := pr_bucket_bound p₀ X' Q₁ Q₂
-    ((Ps.filter (fun p => cl p = PClass.served)).filter (fun p : ℕ => (p : ℝ) < X'))
-    (by linarith) hQ₁ hQ₂ (by
-      intro p hp
-      obtain ⟨hp1, hp2⟩ := Finset.mem_filter.1 hp
-      exact ⟨hPr p (Finset.mem_filter.1 hp1).1, hp2⟩)
-  have hOrB := or_bucket_bound C lx La a k K₀ X' L₁ p₀
-    ((Ps.filter (fun p => cl p = PClass.served)).filter (fun p : ℕ => (p : ℝ) < X'))
-    hC hlx hLa ha0 hk hK₀ hX' hp₀ (by
-      intro p hp
-      obtain ⟨hp1, hp2⟩ := Finset.mem_filter.1 hp
-      exact ⟨hPr p (Finset.mem_filter.1 hp1).1, hp2⟩) (by
-      intro p hp
-      exact hL p (Finset.mem_filter.1 (Finset.mem_filter.1 hp).1).1)
+  have hPrB :=
+    pr_bucket_bound p₀ X' Q₁ Q₂
+      ((Ps.filter (fun p => cl p = PClass.served)).filter (fun p : ℕ => (p : ℝ) < X')) (by linarith)
+      hQ₁ hQ₂
+      (by
+        intro p hp
+        obtain ⟨hp1, hp2⟩ := Finset.mem_filter.1 hp
+        exact ⟨hPr p (Finset.mem_filter.1 hp1).1, hp2⟩)
+  have hOrB :=
+    or_bucket_bound C lx La a k K₀ X' L₁ p₀
+      ((Ps.filter (fun p => cl p = PClass.served)).filter (fun p : ℕ => (p : ℝ) < X')) hC hlx hLa
+      ha0 hk hK₀ hX' hp₀
+      (by
+        intro p hp
+        obtain ⟨hp1, hp2⟩ := Finset.mem_filter.1 hp
+        exact ⟨hPr p (Finset.mem_filter.1 hp1).1, hp2⟩)
+      (by
+        intro p hp
+        exact hL p (Finset.mem_filter.1 (Finset.mem_filter.1 hp).1).1)
   have hmT : 0 ≤ m * T := by positivity
   have hPr' := mul_le_mul_of_nonneg_left hPrB hmT
   have hOr' := mul_le_mul_of_nonneg_left hOrB hmT
@@ -762,8 +853,7 @@ theorem band_root_bound : BandRoot := by
   have hi0 : i ≠ 0 := by omega
   set R : ℝ := X' ^ ((1 : ℝ) / i) with hR
   have hR0 : 0 < R := Real.rpow_pos_of_pos hX _
-  have hRi : R ^ i = X' := by
-    rw [hR, one_div]; exact Real.rpow_inv_natCast_pow hX.le hi0
+  have hRi : R ^ i = X' := by rw [hR, one_div]; exact Real.rpow_inv_natCast_pow hX.le hi0
   constructor
   · by_contra hcon
     have hlt : p < R * (1 - ρ) := not_le.1 hcon
@@ -785,8 +875,7 @@ theorem band_exponent_bound : BandExponent := by
   have hp8 : (8 : ℝ) ≤ p := by exact_mod_cast hp
   have hp0 : (0 : ℝ) < p := by linarith
   have hpow0 : (0 : ℝ) < (p : ℝ) ^ i := by positivity
-  have h1 : Real.log ((p : ℝ) ^ i) ≤ Real.log (2 * X') :=
-    Real.log_le_log hpow0 (by nlinarith)
+  have h1 : Real.log ((p : ℝ) ^ i) ≤ Real.log (2 * X') := Real.log_le_log hpow0 (by nlinarith)
   rw [Real.log_pow, Real.log_mul (by norm_num) (by linarith)] at h1
   have h2 : Real.log 2 ≤ Real.log X' := Real.log_le_log (by norm_num) hX
   have h8 : Real.log 8 ≤ Real.log p := Real.log_le_log (by norm_num) hp8
@@ -798,20 +887,30 @@ theorem band_exponent_bound : BandExponent := by
   nlinarith
 
 theorem first_kind_bucket_bound : FirstKindBucket := by
-  obtain ⟨C, hC⟩ := Formalism.RankGapBounds.LocalQuadraticParts.ordersSumY_of Formalism.RankGapBounds.LocalQuadraticParts.powTwoPowEqOneIff_holds
+  obtain ⟨C, hC⟩ :=
+    Formalism.RankGapBounds.LocalQuadraticParts.ordersSumY_of
+      Formalism.RankGapBounds.LocalQuadraticParts.powTwoPowEqOneIff_holds
   refine ⟨C, ?_⟩
   intro e J I Y X' c p₀ P s he hJ hY hc0 hc hp₀ hP hs
-  have hf0 : ∀ p : ℕ, 0 ≤ Real.log p / (p : ℝ) :=
-    fun p => div_nonneg (Real.log_natCast_nonneg p) (Nat.cast_nonneg p)
-  have hterm : ∀ p ∈ s, Real.log p / (p : ℝ) ≤
-      (if ((p : ℝ) ≤ Y ∧ ∃ hl : Nat.Coprime p (4 * 2 ^ e),
-          orderOf (Formalism.RankGapBounds.LocalQuadraticParts.hOf e p hl) ≤ J) then Real.log p / (p : ℝ) else 0) +
-      ∑ i ∈ Finset.range I, (if (p₀ ≤ p ∧ P i * (1 - c) ≤ p ∧ (p : ℝ) ≤ P i * (1 + c)) then
-          Real.log p / (p : ℝ) else 0) := by
+  have hf0 : ∀ p : ℕ, 0 ≤ Real.log p / (p : ℝ) := fun p =>
+    div_nonneg (Real.log_natCast_nonneg p) (Nat.cast_nonneg p)
+  have hterm
+      : ∀ p ∈ s,
+        Real.log p / (p : ℝ)
+          ≤ (if ((p : ℝ) ≤ Y
+                 ∧ ∃ hl : Nat.Coprime p (4 * 2 ^ e),
+                   orderOf (Formalism.RankGapBounds.LocalQuadraticParts.hOf e p hl) ≤ J) then
+               Real.log p / (p : ℝ)
+             else
+               0)
+            + ∑ i ∈ Finset.range I, (if (p₀ ≤ p ∧ P i * (1 - c) ≤ p ∧ (p : ℝ) ≤ P i * (1 + c)) then
+                  Real.log p / (p : ℝ) else 0) := by
     intro p hp
-    have hsum0 : 0 ≤ ∑ i ∈ Finset.range I,
-        (if (p₀ ≤ p ∧ P i * (1 - c) ≤ p ∧ (p : ℝ) ≤ P i * (1 + c)) then
-          Real.log p / (p : ℝ) else 0) := by
+    have hsum0
+        : 0
+          ≤ ∑ i ∈ Finset.range I,
+            (if (p₀ ≤ p ∧ P i * (1 - c) ≤ p ∧ (p : ℝ) ≤ P i * (1 + c)) then
+              Real.log p / (p : ℝ) else 0) := by
       apply Finset.sum_nonneg
       intro i _
       split_ifs
@@ -819,16 +918,28 @@ theorem first_kind_bucket_bound : FirstKindBucket := by
       · exact le_rfl
     rcases (hs p hp).2.2 with h | ⟨i, hi, hb⟩
     · rw [if_pos h]; linarith
-    · have h1 := Finset.single_le_sum (f := fun i =>
-          (if (p₀ ≤ p ∧ P i * (1 - c) ≤ p ∧ (p : ℝ) ≤ P i * (1 + c)) then
-            Real.log p / (p : ℝ) else 0)) (s := Finset.range I) (by
-          intro i _
-          split_ifs
-          · exact hf0 p
-          · exact le_rfl) (Finset.mem_range.2 hi)
+    · have h1 :=
+        Finset.single_le_sum
+          (f := fun i =>
+            (if (p₀ ≤ p ∧ P i * (1 - c) ≤ p ∧ (p : ℝ) ≤ P i * (1 + c)) then
+               Real.log p / (p : ℝ)
+             else
+               0))
+          (s := Finset.range I)
+          (by
+            intro i _
+            split_ifs
+            · exact hf0 p
+            · exact le_rfl)
+          (Finset.mem_range.2 hi)
       rw [if_pos hb] at h1
-      have : 0 ≤ (if ((p : ℝ) ≤ Y ∧ ∃ hl : Nat.Coprime p (4 * 2 ^ e),
-          orderOf (Formalism.RankGapBounds.LocalQuadraticParts.hOf e p hl) ≤ J) then Real.log p / (p : ℝ) else 0) := by
+      have : 0
+          ≤ (if ((p : ℝ) ≤ Y
+                 ∧ ∃ hl : Nat.Coprime p (4 * 2 ^ e),
+                   orderOf (Formalism.RankGapBounds.LocalQuadraticParts.hOf e p hl) ≤ J) then
+               Real.log p / (p : ℝ)
+             else
+               0) := by
         split_ifs
         · exact hf0 p
         · exact le_rfl

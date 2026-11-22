@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
 
 noncomputable section
 
@@ -20,10 +21,11 @@ set_option linter.unusedSectionVars false
 
 namespace LiftBirationalNef
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
+variable
+  {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
 
-theorem exists_int_of_rat (f : MRingOver ℚ ι) :
-    ∃ (m : ℕ) (F : MRing ι), 0 < m ∧ MvPolynomial.map (Int.castRingHom ℚ) F = C (m : ℚ) * f := by
+theorem exists_int_of_rat (f : MRingOver ℚ ι)
+    : ∃ (m : ℕ) (F : MRing ι), 0 < m ∧ MvPolynomial.map (Int.castRingHom ℚ) F = C (m : ℚ) * f := by
   induction f using MvPolynomial.induction_on' with
   | monomial u a =>
     refine ⟨a.den, monomial u a.num, a.den_pos, ?_⟩
@@ -38,8 +40,8 @@ theorem exists_int_of_rat (f : MRingOver ℚ ι) :
     simp only [eq_intCast, Int.cast_natCast, Nat.cast_mul, C_mul]
     ring
 
-theorem mConeMapOver_map (y : (Σ k, ι k) → Ω) (F : MRing ι) :
-    KH.mConeMapOver ℚ y (MvPolynomial.map (Int.castRingHom ℚ) F) = mConeMap y F := by
+theorem mConeMapOver_map (y : (Σ k, ι k) → Ω) (F : MRing ι)
+    : KH.mConeMapOver ℚ y (MvPolynomial.map (Int.castRingHom ℚ) F) = mConeMap y F := by
   rw [← algebraMap_int_eq]
   exact MvPolynomial.aeval_map_algebraMap ℚ _ F
 
@@ -61,14 +63,16 @@ theorem genIdeal_eq (y : (Σ k, ι k) → Ω) : KH.genIdeal y = KH.mIdealOver �
     rw [hf']
     exact Ideal.mul_mem_left _ _ hmap
 
-theorem coord_ne_zero_of_not_mem {y : (Σ k, ι k) → Ω} {p : Σ k, ι k}
-    (h : (X p : MRing ι) ∉ mCoordIdeal y) : y p ≠ 0 := by
+theorem coord_ne_zero_of_not_mem
+    {y : (Σ k, ι k) → Ω} {p : Σ k, ι k} (h : (X p : MRing ι) ∉ mCoordIdeal y)
+    : y p ≠ 0 := by
   intro h0
   apply h
   rw [mCoordIdeal, RingHom.mem_ker, mConeMap, aeval_X, h0, C_0, zero_mul]
 
-theorem aeval_scale {y : (Σ k, ι k) → Ω} (lam : K → Ω) {G : MRing ι} {d : K → ℕ} (hG : IsMultiHomog G d) :
-    aeval (fun p => lam p.1 * y p) G = (∏ k, lam k ^ d k) * aeval y G := by
+theorem aeval_scale
+    {y : (Σ k, ι k) → Ω} (lam : K → Ω) {G : MRing ι} {d : K → ℕ} (hG : IsMultiHomog G d)
+    : aeval (fun p => lam p.1 * y p) G = (∏ k, lam k ^ d k) * aeval y G := by
   classical
   conv_lhs => rw [G.as_sum]
   conv_rhs => rw [G.as_sum]
@@ -87,7 +91,6 @@ theorem aeval_scale {y : (Σ k, ι k) → Ω} (lam : K → Ω) {G : MRing ι} {d
   ring
 
 end LiftBirationalNef
-
 
 end
 

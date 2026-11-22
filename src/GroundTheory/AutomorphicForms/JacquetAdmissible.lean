@@ -16,31 +16,36 @@ open Matrix Iwasawa GLnLocal ValuativeRel Topology Filter Set MeasureTheory Meas
 
 section Quotient
 
-variable {G : Type*} [Group G] {U : Type*} [AddCommGroup U] [Module ℂ U]
-  {τ : Representation ℂ G U}
+variable {G : Type*} [Group G] {U : Type*} [AddCommGroup U] [Module ℂ U] {τ : Representation ℂ G U}
 
-def quotientMk (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g)) :
-    Representation.IntertwiningMap τ (Representation.quotient τ Y hY) :=
+def quotientMk (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g))
+    : Representation.IntertwiningMap τ (Representation.quotient τ Y hY) :=
   ⟨Y.mkQ, fun _ => LinearMap.ext fun _ => rfl⟩
 
-theorem quotientMk_apply (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g)) (x : U) :
-    quotientMk Y hY x = Submodule.Quotient.mk x := rfl
+theorem quotientMk_apply (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g)) (x : U)
+    : quotientMk Y hY x = Submodule.Quotient.mk x :=
+  rfl
 
-theorem quotientMk_surjective (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g)) :
-    Function.Surjective (quotientMk Y hY) :=
+theorem quotientMk_surjective (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g))
+    : Function.Surjective (quotientMk Y hY) :=
   Submodule.mkQ_surjective Y
 
-theorem isSmooth_quotient [TopologicalSpace G] [IsTopologicalGroup G] (hτ : IsSmooth τ) (Y : Submodule ℂ U)
-    (hY : ∀ g, Y ≤ Y.comap (τ g)) : IsSmooth (Representation.quotient τ Y hY) := by
+theorem isSmooth_quotient
+    [TopologicalSpace G] [IsTopologicalGroup G]
+    (hτ : IsSmooth τ)
+    (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g))
+    : IsSmooth (Representation.quotient τ Y hY) := by
   intro x
   obtain ⟨u, rfl⟩ := Submodule.mkQ_surjective Y x
   refine Subgroup.isOpen_mono (fun g hg => ?_) (hτ u)
   show Representation.quotient τ Y hY g (Submodule.Quotient.mk u) = Submodule.Quotient.mk u
   rw [Representation.quotient_apply, Submodule.mapQ_apply, mem_stabilizerOf.1 hg]
 
-theorem exists_mem_subset_of_chain {c : Set (Submodule ℂ U)} (hc : IsChain (· ≤ ·) c)
-    {y : Submodule ℂ U} (hy : y ∈ c) (S : Finset U) (hS : ∀ s ∈ S, ∃ Z ∈ c, s ∈ Z) :
-    ∃ Z ∈ c, ∀ s ∈ S, s ∈ Z := by
+theorem exists_mem_subset_of_chain
+    {c : Set (Submodule ℂ U)} (hc : IsChain (· ≤ ·) c)
+    {y : Submodule ℂ U} (hy : y ∈ c)
+    (S : Finset U) (hS : ∀ s ∈ S, ∃ Z ∈ c, s ∈ Z)
+    : ∃ Z ∈ c, ∀ s ∈ S, s ∈ Z := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨y, hy, by simp⟩
@@ -48,18 +53,26 @@ theorem exists_mem_subset_of_chain {c : Set (Submodule ℂ U)} (hc : IsChain (·
     obtain ⟨Z₁, hZ₁, haZ₁⟩ := hS a (Finset.mem_insert_self a S)
     obtain ⟨Z₂, hZ₂, hSZ₂⟩ := ih fun s hs => hS s (Finset.mem_insert_of_mem hs)
     rcases hc.total hZ₁ hZ₂ with h | h
-    · exact ⟨Z₂, hZ₂, fun s hs => by
-        rcases Finset.mem_insert.1 hs with rfl | hs
-        · exact h haZ₁
-        · exact hSZ₂ s hs⟩
-    · exact ⟨Z₁, hZ₁, fun s hs => by
-        rcases Finset.mem_insert.1 hs with rfl | hs
-        · exact haZ₁
-        · exact h (hSZ₂ s hs)⟩
+    · exact ⟨
+        Z₂,
+        hZ₂,
+        fun s hs => by
+          rcases Finset.mem_insert.1 hs with rfl | hs
+          · exact h haZ₁
+          · exact hSZ₂ s hs
+      ⟩
+    · exact ⟨
+        Z₁,
+        hZ₁,
+        fun s hs => by
+          rcases Finset.mem_insert.1 hs with rfl | hs
+          · exact haZ₁
+          · exact h (hSZ₂ s hs)
+      ⟩
 
-theorem exists_irreducible_quotient [Nontrivial U] (S : Finset U)
-    (hS : Submodule.span ℂ {x | ∃ g, ∃ s ∈ S, x = τ g s} = ⊤) :
-    ∃ (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g)),
+theorem exists_irreducible_quotient
+    [Nontrivial U] (S : Finset U) (hS : Submodule.span ℂ {x | ∃ g, ∃ s ∈ S, x = τ g s} = ⊤)
+    : ∃ (Y : Submodule ℂ U) (hY : ∀ g, Y ≤ Y.comap (τ g)),
       (Representation.quotient τ Y hY).IsIrreducible := by
   classical
   let P : Set (Submodule ℂ U) := {Y | (∀ g, Y ≤ Y.comap (τ g)) ∧ ¬ ((S : Set U) ⊆ Y)}
@@ -74,13 +87,17 @@ theorem exists_irreducible_quotient [Nontrivial U] (S : Finset U)
     refine ⟨fun g => bot_le, fun h => ?_⟩
     have := htop ⊥ (fun g => bot_le) h
     exact bot_ne_top this
-  obtain ⟨Y, -, hYmax⟩ := zorn_le_nonempty₀ P (fun c hcP hc y hy => by
-    refine ⟨sSup c, ⟨fun g x hx => ?_, fun hsub => ?_⟩, fun z hz => le_sSup hz⟩
-    · obtain ⟨Z, hZ, hxZ⟩ := (Submodule.mem_sSup_of_directed ⟨y, hy⟩ hc.directedOn).1 hx
-      exact (Submodule.mem_sSup_of_directed ⟨y, hy⟩ hc.directedOn).2 ⟨Z, hZ, (hcP hZ).1 g hxZ⟩
-    · obtain ⟨Z, hZ, hSZ⟩ := exists_mem_subset_of_chain hc hy S fun s hs =>
-        (Submodule.mem_sSup_of_directed ⟨y, hy⟩ hc.directedOn).1 (hsub hs)
-      exact (hcP hZ).2 fun s hs => hSZ s hs) ⊥ hbot
+  obtain ⟨Y, -, hYmax⟩ :=
+    zorn_le_nonempty₀ P
+      (fun c hcP hc y hy => by
+        refine ⟨sSup c, ⟨fun g x hx => ?_, fun hsub => ?_⟩, fun z hz => le_sSup hz⟩
+        · obtain ⟨Z, hZ, hxZ⟩ := (Submodule.mem_sSup_of_directed ⟨y, hy⟩ hc.directedOn).1 hx
+          exact (Submodule.mem_sSup_of_directed ⟨y, hy⟩ hc.directedOn).2 ⟨Z, hZ, (hcP hZ).1 g hxZ⟩
+        · obtain ⟨Z, hZ, hSZ⟩ :=
+            exists_mem_subset_of_chain hc hy S fun s hs =>
+              (Submodule.mem_sSup_of_directed ⟨y, hy⟩ hc.directedOn).1 (hsub hs)
+          exact (hcP hZ).2 fun s hs => hSZ s hs)
+      ⊥ hbot
   obtain ⟨⟨hYs, hYS⟩, hYm⟩ := hYmax
   refine ⟨Y, hYs, ?_⟩
   have hYtop : Y ≠ ⊤ := fun h => hYS (by rw [h]; exact fun _ _ => Submodule.mem_top)
@@ -88,7 +105,9 @@ theorem exists_irreducible_quotient [Nontrivial U] (S : Finset U)
   · have h' := congrArg Subrepresentation.toSubmodule h
     rw [eq_top_iff]
     intro x _
-    have hx : (Submodule.Quotient.mk x : U ⧸ Y) ∈ (⊤ : Subrepresentation (Representation.quotient τ Y hYs)).toSubmodule :=
+    have hx
+        : (Submodule.Quotient.mk x : U ⧸ Y)
+          ∈ (⊤ : Subrepresentation (Representation.quotient τ Y hYs)).toSubmodule :=
       Submodule.mem_top
     rw [← h'] at hx
     exact (Submodule.Quotient.mk_eq_zero Y).1 hx
@@ -125,29 +144,34 @@ theorem exists_irreducible_quotient [Nontrivial U] (S : Finset U)
 
 end Quotient
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ} {α : Type*} [LinearOrder α] {β : Fin n → α}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  {n : ℕ} {α : Type*} [LinearOrder α]
+  {β : Fin n → α}
 
-theorem sqrtModular_leviIncl_of_mem {γ : Fin n → ℕ} (m : levi F n β)
-    (hm : (m : GL (Fin n) F) ∈ unipotentRadical F n γ) :
-    sqrtModular F n β (leviIncl m) = 1 := by
+theorem sqrtModular_leviIncl_of_mem
+    {γ : Fin n → ℕ} (m : levi F n β) (hm : (m : GL (Fin n) F) ∈ unipotentRadical F n γ)
+    : sqrtModular F n β (leviIncl m) = 1 := by
   have key : modularCharacter (leviIncl m) = 1 := by
-    obtain ⟨e, he⟩ := exists_pow_mul_mem_of_isCompact F n
-      (Set.toFinite ({(m : GL (Fin n) F), (m : GL (Fin n) F)⁻¹} : Set _)).isCompact
-    let t : blockUpper F n β :=
-      ⟨rankTorus F n γ e, levi_le_blockUpper (diagGL_mem_levi _)⟩
+    obtain ⟨e, he⟩ :=
+      exists_pow_mul_mem_of_isCompact F n
+        (Set.toFinite ({(m : GL (Fin n) F), (m : GL (Fin n) F)⁻¹} : Set _)).isCompact
+    let t : blockUpper F n β := ⟨rankTorus F n γ e, levi_le_blockUpper (diagGL_mem_levi _)⟩
     have hint : ((t * leviIncl m * t⁻¹ : blockUpper F n β) : GL (Fin n) F) ∈ integralGL F n := by
       show rankTorus F n γ e * (m : GL (Fin n) F) * (rankTorus F n γ e)⁻¹ ∈ integralGL F n
       rw [mem_integralGL_iff]
       refine ⟨rankTorus_conj_apply_mem hm (fun i j => he _ (by simp) i j), fun i j => ?_⟩
-      have : (rankTorus F n γ e * (m : GL (Fin n) F) * (rankTorus F n γ e)⁻¹)⁻¹ =
-          rankTorus F n γ e * (m : GL (Fin n) F)⁻¹ * (rankTorus F n γ e)⁻¹ := by group
+      have : (rankTorus F n γ e * (m : GL (Fin n) F) * (rankTorus F n γ e)⁻¹)⁻¹
+          = rankTorus F n γ e * (m : GL (Fin n) F)⁻¹ * (rankTorus F n γ e)⁻¹ := by
+        group
       rw [this]
       exact rankTorus_conj_apply_mem ((unipotentRadical F n γ).inv_mem hm)
-        (fun i j => he _ (by simp) i j) i j
+        (fun i j => he _ (by simp) i j)
+        i j
     have h1 := Measures.modularCharacter_eq_one_of_mem_integralGL (t * leviIncl m * t⁻¹) hint
     rw [map_mul, map_mul, mul_comm (modularCharacter t), mul_assoc, ← map_mul, mul_inv_cancel,
-      map_one, mul_one] at h1
+        map_one, mul_one]
+      at h1
     exact h1
   show ((NNReal.sqrt (modularCharacter (leviIncl m)) : ℝ) : ℂ) = 1
   rw [key]
@@ -157,10 +181,11 @@ section Transitivity
 
 variable {V : Type*} [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin n) F) V}
 
-theorem subsingleton_coinvariants_jacquetRep {β γ : Fin n → ℕ}
-    (hβγ : ∀ i j, β j < β i → γ j < γ i) (h : Subsingleton (JacquetModule F n γ π)) :
-    Subsingleton (Representation.Coinvariants
-      ((jacquetRep F n β π).comp (leviUnipotent F n β γ).subtype)) := by
+theorem subsingleton_coinvariants_jacquetRep
+    {β γ : Fin n → ℕ}
+    (hβγ : ∀ i j, β j < β i → γ j < γ i) (h : Subsingleton (JacquetModule F n γ π))
+    : Subsingleton (Representation.Coinvariants ((jacquetRep F n β π).comp
+      (leviUnipotent F n β γ).subtype)) := by
   set q' := Representation.Coinvariants.mk
     ((jacquetRep F n β π).comp (leviUnipotent F n β γ).subtype)
   set qβ := Representation.Coinvariants.mk (π.comp (unipotentRadical F n β).subtype)
@@ -172,8 +197,9 @@ theorem subsingleton_coinvariants_jacquetRep {β γ : Fin n → ℕ}
       omega
     · have := hβγ i j hlt
       omega
-  have hker : Representation.Coinvariants.ker (π.comp (unipotentRadical F n γ).subtype) ≤
-      LinearMap.ker (q' ∘ₗ qβ) := by
+  have hker
+      : Representation.Coinvariants.ker (π.comp (unipotentRadical F n γ).subtype)
+        ≤ LinearMap.ker (q' ∘ₗ qβ) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨⟨u, w⟩, rfl⟩
     obtain ⟨huP, hu1⟩ := mem_unipotentRadical.1 u.2
@@ -190,8 +216,10 @@ theorem subsingleton_coinvariants_jacquetRep {β γ : Fin n → ℕ}
       · rw [leviProj_apply, if_pos (hβeq i j hij)]
         exact hu1 i j hij
     have hn' := leviProj_inv_mul_mem p
-    have hu : (u : GL (Fin n) F) = ((m : levi F n β) : GL (Fin n) F) *
-        (((leviIncl m)⁻¹ * p : blockUpper F n β) : GL (Fin n) F) := by
+    have hu
+        : (u : GL (Fin n) F)
+          = ((m : levi F n β) : GL (Fin n) F)
+            * (((leviIncl m)⁻¹ * p : blockUpper F n β) : GL (Fin n) F) := by
       rw [Subgroup.coe_mul, Subgroup.coe_inv, leviIncl_coe, mul_inv_cancel_left]
     simp only [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply,
       MonoidHom.coe_comp, Subgroup.coe_subtype, map_sub]
@@ -218,29 +246,36 @@ section Generators
 
 variable {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module ℂ V]
 
-theorem span_range_eq_top_of_isIrreducible {ρ : Representation ℂ G V} [ρ.IsIrreducible] {v : V}
-    (hv : v ≠ 0) : Submodule.span ℂ (Set.range fun g : G => ρ g v) = ⊤ := by
-  have hstable : ∀ g : G, Submodule.span ℂ (Set.range fun h : G => ρ h v) ≤
-      (Submodule.span ℂ (Set.range fun h : G => ρ h v)).comap (ρ g) := by
+theorem span_range_eq_top_of_isIrreducible
+    {ρ : Representation ℂ G V} [ρ.IsIrreducible] {v : V} (hv : v ≠ 0)
+    : Submodule.span ℂ (Set.range fun g : G => ρ g v) = ⊤ := by
+  have hstable
+      : ∀ g : G,
+        Submodule.span ℂ (Set.range fun h : G => ρ h v)
+          ≤ (Submodule.span ℂ (Set.range fun h : G => ρ h v)).comap (ρ g) := by
     intro g
     refine Submodule.span_le.2 ?_
     rintro _ ⟨h, rfl⟩
     exact Submodule.subset_span ⟨g * h, by simp [map_mul, Module.End.mul_apply]⟩
   let Wsub : Subrepresentation ρ :=
     ⟨Submodule.span ℂ (Set.range fun h : G => ρ h v), fun g _ hx => hstable g hx⟩
-  have hW : Wsub = ⊤ := (eq_bot_or_eq_top Wsub).resolve_left fun h => hv (by
-    have hvW : v ∈ Wsub.toSubmodule := Submodule.subset_span ⟨1, by simp⟩
-    rw [h] at hvW
-    exact (Submodule.mem_bot ℂ).1 hvW)
+  have hW : Wsub = ⊤ :=
+    (eq_bot_or_eq_top Wsub).resolve_left fun h =>
+      hv (by
+        have hvW : v ∈ Wsub.toSubmodule := Submodule.subset_span ⟨1, by simp⟩
+        rw [h] at hvW
+        exact (Submodule.mem_bot ℂ).1 hvW)
   exact congrArg Subrepresentation.toSubmodule hW
 
-theorem subsingleton_coinvariants_of_surjective {W : Type*} [AddCommGroup W] [Module ℂ W]
+theorem subsingleton_coinvariants_of_surjective
+    {W : Type*} [AddCommGroup W] [Module ℂ W]
     {ρ : Representation ℂ G V} {σ : Representation ℂ G W} {H : Subgroup G}
     (f : Representation.IntertwiningMap ρ σ) (hf : Function.Surjective f)
-    (h : Subsingleton (Representation.Coinvariants (ρ.comp H.subtype))) :
-    Subsingleton (Representation.Coinvariants (σ.comp H.subtype)) := by
-  have hker : Representation.Coinvariants.ker (ρ.comp H.subtype) ≤
-      (Representation.Coinvariants.ker (σ.comp H.subtype)).comap f.toLinearMap := by
+    (h : Subsingleton (Representation.Coinvariants (ρ.comp H.subtype)))
+    : Subsingleton (Representation.Coinvariants (σ.comp H.subtype)) := by
+  have hker
+      : Representation.Coinvariants.ker (ρ.comp H.subtype)
+        ≤ (Representation.Coinvariants.ker (σ.comp H.subtype)).comap f.toLinearMap := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨⟨u, x⟩, rfl⟩
     simp only [MonoidHom.coe_comp, Function.comp_apply, Subgroup.coe_subtype, SetLike.mem_coe,
@@ -250,8 +285,8 @@ theorem subsingleton_coinvariants_of_surjective {W : Type*} [AddCommGroup W] [Mo
   have hzero : ∀ y : W, Representation.Coinvariants.mk (σ.comp H.subtype) y = 0 := by
     intro y
     obtain ⟨x, rfl⟩ := hf y
-    exact (Representation.Coinvariants.mk_eq_zero _).2 (hker
-      ((Representation.Coinvariants.mk_eq_zero _).1 (Subsingleton.elim _ _)))
+    exact (Representation.Coinvariants.mk_eq_zero _).2
+      (hker ((Representation.Coinvariants.mk_eq_zero _).1 (Subsingleton.elim _ _)))
   refine ⟨fun a b => ?_⟩
   obtain ⟨a, rfl⟩ := Representation.Coinvariants.mk_surjective _ a
   obtain ⟨b, rfl⟩ := Representation.Coinvariants.mk_surjective _ b
@@ -265,9 +300,9 @@ universe u
 
 variable {V : Type u} [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin n) F) V}
 
-theorem exists_finset_span_jacquetRep (hπ : IsSmooth π) {v : V}
-    (hv : Submodule.span ℂ (Set.range fun g : GL (Fin n) F => π g v) = ⊤) :
-    ∃ S : Finset (JacquetModule F n β π),
+theorem exists_finset_span_jacquetRep
+    (hπ : IsSmooth π) {v : V} (hv : Submodule.span ℂ (Set.range fun g : GL (Fin n) F => π g v) = ⊤)
+    : ∃ S : Finset (JacquetModule F n β π),
       Submodule.span ℂ {x | ∃ m, ∃ s ∈ S, x = jacquetRep F n β π m s} = ⊤ := by
   classical
   obtain ⟨m₀, -, hm₀⟩ := (hasBasis_nhds_one F n).mem_iff.1 ((hπ v).mem_nhds (one_mem _))
@@ -298,13 +333,15 @@ theorem exists_finset_span_jacquetRep (hπ : IsSmooth π) {v : V}
     set p' : blockUpper F n β := ⟨p, hp⟩
     set m := leviProj F n β p'
     have hn' := leviProj_inv_mul_mem p'
-    have hpeq : p = ((m : levi F n β) : GL (Fin n) F) *
-        (((leviIncl m)⁻¹ * p' : blockUpper F n β) : GL (Fin n) F) := by
+    have hpeq
+        : p
+          = ((m : levi F n β) : GL (Fin n) F)
+            * (((leviIncl m)⁻¹ * p' : blockUpper F n β) : GL (Fin n) F) := by
       rw [Subgroup.coe_mul, Subgroup.coe_inv, leviIncl_coe, mul_inv_cancel_left]
     rw [map_mul, Module.End.mul_apply, hrv, hpeq, map_mul, Module.End.mul_apply, mk_apply_levi,
       mk_apply_of_mem π _ hn']
-    exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨m, q (π r v),
-      Finset.mem_image_of_mem _ hr, rfl⟩)
+    exact Submodule.smul_mem _ _
+      (Submodule.subset_span ⟨m, q (π r v), Finset.mem_image_of_mem _ hr, rfl⟩)
   rw [eq_top_iff]
   intro x _
   obtain ⟨y, rfl⟩ := Representation.Coinvariants.mk_surjective _ x
@@ -318,13 +355,15 @@ theorem exists_finset_span_jacquetRep (hπ : IsSmooth π) {v : V}
     exact hclaim g
   exact hmap ⟨y, hy, rfl⟩
 
-theorem nontrivial_jacquetModule_const [Nontrivial V] :
-    Nontrivial (JacquetModule F n (fun _ : Fin n => (0 : ℕ)) π) := by
+theorem nontrivial_jacquetModule_const [Nontrivial V]
+    : Nontrivial (JacquetModule F n (fun _ : Fin n => (0 : ℕ)) π) := by
   obtain ⟨v, hv⟩ := exists_ne (0 : V)
   refine ⟨⟨Representation.Coinvariants.mk _ v, 0, fun h => hv ?_⟩⟩
   have hmem := (Representation.Coinvariants.mk_eq_zero _).1 h
-  have hle : Representation.Coinvariants.ker
-      (π.comp (unipotentRadical F n (fun _ : Fin n => (0 : ℕ))).subtype) ≤ ⊥ := by
+  have hle
+      : Representation.Coinvariants.ker (π.comp (unipotentRadical F n
+          (fun _ : Fin n => (0 : ℕ))).subtype)
+        ≤ ⊥ := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨⟨u, x⟩, rfl⟩
     have hu : (u : GL (Fin n) F) = 1 := by
@@ -334,22 +373,21 @@ theorem nontrivial_jacquetModule_const [Nontrivial V] :
     simp [hu]
   exact (Submodule.mem_bot ℂ).1 (hle hmem)
 
-def refineFun (β γ : Fin n → ℕ) : Fin n → ℕ :=
-  fun i => (Finset.univ.sup γ + 1) * β i + γ i
+def refineFun (β γ : Fin n → ℕ) : Fin n → ℕ := fun i => (Finset.univ.sup γ + 1) * β i + γ i
 
 theorem lt_refineFun_bound (γ : Fin n → ℕ) (i : Fin n) : γ i < Finset.univ.sup γ + 1 :=
   Nat.lt_succ_of_le (Finset.le_sup (Finset.mem_univ i))
 
-theorem refineFun_lt {β γ : Fin n → ℕ} {i j : Fin n} (h : β j < β i) :
-    refineFun β γ j < refineFun β γ i := by
+theorem refineFun_lt {β γ : Fin n → ℕ} {i j : Fin n} (h : β j < β i)
+    : refineFun β γ j < refineFun β γ i := by
   have h1 := lt_refineFun_bound γ j
   simp only [refineFun]
   set B := Finset.univ.sup γ + 1
   have : B * β j + B ≤ B * β i := by nlinarith
   omega
 
-theorem refineFun_eq_iff {β γ : Fin n → ℕ} {i j : Fin n} :
-    refineFun β γ i = refineFun β γ j ↔ β i = β j ∧ γ i = γ j := by
+theorem refineFun_eq_iff {β γ : Fin n → ℕ} {i j : Fin n}
+    : refineFun β γ i = refineFun β γ j ↔ β i = β j ∧ γ i = γ j := by
   constructor
   · intro h
     have hβ : β i = β j := by
@@ -363,15 +401,14 @@ theorem refineFun_eq_iff {β γ : Fin n → ℕ} {i j : Fin n} :
   · rintro ⟨h1, h2⟩
     simp [refineFun, h1, h2]
 
-theorem refineFun_lt_of_eq {β γ : Fin n → ℕ} {i j : Fin n} (hβ : β i = β j) :
-    refineFun β γ j < refineFun β γ i ↔ γ j < γ i := by
+theorem refineFun_lt_of_eq {β γ : Fin n → ℕ} {i j : Fin n} (hβ : β i = β j)
+    : refineFun β γ j < refineFun β γ i ↔ γ j < γ i := by
   simp only [refineFun, hβ]
   omega
 
-
 variable (F) in
-theorem leviUnipotent_refineFun (β γ : Fin n → ℕ) :
-    leviUnipotent F n β γ = leviUnipotent F n β (refineFun β γ) := by
+theorem leviUnipotent_refineFun (β γ : Fin n → ℕ)
+    : leviUnipotent F n β γ = leviUnipotent F n β (refineFun β γ) := by
   ext u
   simp only [leviUnipotent, Subgroup.mem_subgroupOf]
   have hu := mem_levi.1 u.2
@@ -393,8 +430,8 @@ theorem leviUnipotent_refineFun (β γ : Fin n → ℕ) :
       · exact h1 i j (refineFun_eq_iff.2 ⟨hb, hij⟩)
       · rw [hu i j hb, one_apply_ne (fun e => hb (by rw [e]))]
 
-theorem card_image_lt_refineFun {β γ : Fin n → ℕ} (h : ∃ i j, β i = β j ∧ γ i ≠ γ j) :
-    (Finset.univ.image β).card < (Finset.univ.image (refineFun β γ)).card := by
+theorem card_image_lt_refineFun {β γ : Fin n → ℕ} (h : ∃ i j, β i = β j ∧ γ i ≠ γ j)
+    : (Finset.univ.image β).card < (Finset.univ.image (refineFun β γ)).card := by
   classical
   obtain ⟨i, j, hij, hγ⟩ := h
   set B := Finset.univ.sup γ + 1
@@ -410,29 +447,29 @@ theorem card_image_lt_refineFun {β γ : Fin n → ℕ} (h : ∃ i j, β i = β 
   rw [himg]
   refine lt_of_le_of_ne Finset.card_image_le fun hc => ?_
   have hinj := Finset.card_image_iff.1 hc
-  have : refineFun β γ i = refineFun β γ j :=
-    hinj (by simp) (by simp) (by simp only [hdiv, hij])
+  have : refineFun β γ i = refineFun β γ j := hinj (by simp) (by simp) (by simp only [hdiv, hij])
   exact hγ (refineFun_eq_iff.1 this).2
 
-theorem exists_embedding_parabolicInd [π.IsIrreducible] (hπ : IsSmooth π) :
-    ∃ (β : Fin n → ℕ) (W : Type u) (_ : AddCommGroup W) (_ : Module ℂ W)
-      (σ : Representation ℂ (levi F n β) W), σ.IsIrreducible ∧ IsSmooth σ ∧ IsCuspidal σ ∧
-        IsAdmissible σ ∧ ∃ Φ : Representation.IntertwiningMap π (parabolicInd F n β σ),
-          Function.Injective Φ := by
+theorem exists_embedding_parabolicInd [π.IsIrreducible] (hπ : IsSmooth π)
+    : ∃ (β : Fin n → ℕ) (W : Type u) (_ : AddCommGroup W) (_ : Module ℂ W)
+        (σ : Representation ℂ (levi F n β) W),
+      σ.IsIrreducible ∧ IsSmooth σ ∧ IsCuspidal σ ∧ IsAdmissible σ
+        ∧ ∃ Φ : Representation.IntertwiningMap π (parabolicInd F n β σ), Function.Injective Φ := by
   classical
   obtain ⟨v, hv0⟩ := exists_ne_zero_of_isIrreducible (ρ := π)
   have : Nontrivial V := ⟨⟨v, 0, hv0⟩⟩
   have hspan := span_range_eq_top_of_isIrreducible (ρ := π) hv0
 
-  let P : ℕ → Prop := fun k => ∃ β : Fin n → ℕ, (Finset.univ.image β).card = k ∧
-    Nontrivial (JacquetModule F n β π)
+  let P : ℕ → Prop := fun k =>
+    ∃ β : Fin n → ℕ, (Finset.univ.image β).card = k ∧ Nontrivial (JacquetModule F n β π)
   have hbound : ∀ β : Fin n → ℕ, (Finset.univ.image β).card ≤ n := fun β =>
     (Finset.card_image_le).trans (by simp)
   have hP0 : P (Finset.univ.image fun _ : Fin n => (0 : ℕ)).card :=
     ⟨_, rfl, nontrivial_jacquetModule_const⟩
   obtain ⟨β, hβcard, hβnt⟩ := Nat.findGreatest_spec (hbound _) hP0
-  have hfinest : ∀ γ : Fin n → ℕ, (∃ i j, β i = β j ∧ γ i ≠ γ j) →
-      Subsingleton (JacquetModule F n (refineFun β γ) π) := by
+  have hfinest
+      : ∀ γ : Fin n → ℕ,
+        (∃ i j, β i = β j ∧ γ i ≠ γ j) → Subsingleton (JacquetModule F n (refineFun β γ) π) := by
     intro γ hγ
     have hlt := card_image_lt_refineFun hγ
     rw [hβcard] at hlt
@@ -446,8 +483,10 @@ theorem exists_embedding_parabolicInd [π.IsIrreducible] (hπ : IsSmooth π) :
   have hσs : IsSmooth σ := isSmooth_quotient (isSmooth_jacquetRep π hπ) Y hY
   have hσc : IsCuspidal σ := by
     intro γ hγ
-    have h1 := subsingleton_coinvariants_jacquetRep (π := π) (β := β) (γ := refineFun β γ)
-      (fun i j h => refineFun_lt h) (hfinest γ hγ)
+    have h1 :=
+      subsingleton_coinvariants_jacquetRep (π := π) (β := β) (γ := refineFun β γ)
+        (fun i j h => refineFun_lt h)
+        (hfinest γ hγ)
     rw [← leviUnipotent_refineFun] at h1
     exact subsingleton_coinvariants_of_surjective (quotientMk Y hY) (quotientMk_surjective Y hY) h1
   have hσa : IsAdmissible σ := isAdmissible_of_isCuspidal hσs hσc

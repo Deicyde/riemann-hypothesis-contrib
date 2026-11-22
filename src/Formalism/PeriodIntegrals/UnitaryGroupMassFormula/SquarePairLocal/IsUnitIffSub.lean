@@ -17,9 +17,10 @@ theorem isUnit_sub {x : fixSub σ} (hu : IsUnit (x : R)) : IsUnit x := by
   have hx : σ (x : R) = x := (mem_fixSub σ x).1 x.2
   have hinv : (↑u⁻¹ : R) ∈ fixSub σ := by
     rw [mem_fixSub]
-    have h1 : σ (↑u⁻¹ : R) * (x : R) = 1 := by
-      rw [← hx, ← map_mul, ← hu, Units.inv_mul, map_one]
-    calc σ (↑u⁻¹ : R) = σ (↑u⁻¹ : R) * ((x : R) * ↑u⁻¹) := by rw [← hu, Units.mul_inv, mul_one]
+    have h1 : σ (↑u⁻¹ : R) * (x : R) = 1 := by rw [← hx, ← map_mul, ← hu, Units.inv_mul, map_one]
+    calc
+      σ (↑u⁻¹ : R)
+        = σ (↑u⁻¹ : R) * ((x : R) * ↑u⁻¹) := by rw [← hu, Units.mul_inv, mul_one]
       _ = ↑u⁻¹ := by rw [← mul_assoc, h1, one_mul]
   refine isUnit_iff_exists_inv.2 ⟨⟨_, hinv⟩, Subtype.ext ?_⟩
   show (x : R) * ↑u⁻¹ = 1
@@ -28,16 +29,19 @@ theorem isUnit_sub {x : fixSub σ} (hu : IsUnit (x : R)) : IsUnit x := by
 theorem isUnit_iff_sub (x : fixSub σ) : IsUnit x ↔ IsUnit (x : R) :=
   ⟨fun h => h.map (fixSub σ).subtype, isUnit_sub σ⟩
 
-theorem irr_sub {ϖ : R} (hϖ : Irreducible ϖ) (h : ϖ ∈ fixSub σ) :
-    Irreducible (⟨ϖ, h⟩ : fixSub σ) := by
+theorem irr_sub {ϖ : R} (hϖ : Irreducible ϖ) (h : ϖ ∈ fixSub σ)
+    : Irreducible (⟨ϖ, h⟩ : fixSub σ) := by
   refine ⟨fun hu => hϖ.not_isUnit ((isUnit_iff_sub σ _).1 hu), fun a b hab => ?_⟩
   have h' : ϖ = (a : R) * b := congrArg Subtype.val hab
   rcases hϖ.isUnit_or_isUnit h' with ha | hb
   · exact Or.inl (isUnit_sub σ ha)
   · exact Or.inr (isUnit_sub σ hb)
 
-theorem assoc_sub [IsDiscreteValuationRing R] {ϖ : R} (hϖ : Irreducible ϖ) (h : ϖ ∈ fixSub σ)
-    {x : fixSub σ} (hx : x ≠ 0) : ∃ n : ℕ, Associated ((⟨ϖ, h⟩ : fixSub σ) ^ n) x := by
+theorem assoc_sub
+    [IsDiscreteValuationRing R]
+    {ϖ : R} (hϖ : Irreducible ϖ) (h : ϖ ∈ fixSub σ)
+    {x : fixSub σ} (hx : x ≠ 0)
+    : ∃ n : ℕ, Associated ((⟨ϖ, h⟩ : fixSub σ) ^ n) x := by
   have hne : (x : R) ≠ 0 := fun h0 => hx (Subtype.ext h0)
   obtain ⟨n, u, hu⟩ := IsDiscreteValuationRing.associated_pow_irreducible hne hϖ
   refine ⟨n, ?_⟩
@@ -46,7 +50,9 @@ theorem assoc_sub [IsDiscreteValuationRing R] {ϖ : R} (hϖ : Irreducible ϖ) (h
   have hmem : (u : R) ∈ fixSub σ := by
     rw [mem_fixSub]
     have h2 : (x : R) * σ u = (x : R) * u := by
-      calc (x : R) * σ u = σ (x : R) * σ u := by rw [hx']
+      calc
+        (x : R) * σ u
+          = σ (x : R) * σ u := by rw [hx']
         _ = σ ((x : R) * u) := (map_mul σ _ _).symm
         _ = σ (ϖ ^ n) := by rw [hu]
         _ = ϖ ^ n := by rw [map_pow, hϖ']
@@ -57,18 +63,20 @@ theorem assoc_sub [IsDiscreteValuationRing R] {ϖ : R} (hϖ : Irreducible ϖ) (h
   rw [IsUnit.unit_spec]
   simpa using hu
 
-theorem dvr_sub [IsDiscreteValuationRing R] {ϖ : R} (hϖ : Irreducible ϖ) (h : ϖ ∈ fixSub σ) :
-    IsDiscreteValuationRing (fixSub σ) :=
+theorem dvr_sub [IsDiscreteValuationRing R] {ϖ : R} (hϖ : Irreducible ϖ) (h : ϖ ∈ fixSub σ)
+    : IsDiscreteValuationRing (fixSub σ) :=
   IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
     ⟨⟨ϖ, h⟩, irr_sub σ hϖ h, fun hx => assoc_sub σ hϖ h hx⟩
 
-theorem mem_max_sub [IsLocalRing R] [IsLocalRing (fixSub σ)] (x : fixSub σ) :
-    x ∈ maximalIdeal (fixSub σ) ↔ (x : R) ∈ maximalIdeal R := by
+theorem mem_max_sub [IsLocalRing R] [IsLocalRing (fixSub σ)] (x : fixSub σ)
+    : x ∈ maximalIdeal (fixSub σ) ↔ (x : R) ∈ maximalIdeal R := by
   simp only [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_iff_sub]
 
-theorem root_unique [IsLocalRing R] (g : R[X]) (a₀ b c : R) (hb : g.IsRoot b) (hc : g.IsRoot c)
-    (hba : b - a₀ ∈ maximalIdeal R) (hca : c - a₀ ∈ maximalIdeal R)
-    (hd : IsUnit (g.derivative.eval a₀)) : b = c := by
+theorem root_unique
+    [IsLocalRing R]
+    (g : R[X]) (a₀ b c : R) (hb : g.IsRoot b) (hc : g.IsRoot c) (hba : b - a₀ ∈ maximalIdeal R)
+    (hca : c - a₀ ∈ maximalIdeal R) (hd : IsUnit (g.derivative.eval a₀))
+    : b = c := by
   obtain ⟨k, hk⟩ := g.binomExpansion c (b - c)
   have e : c + (b - c) = b := by ring
   rw [e, hb.eq_zero, hc.eq_zero, zero_add] at hk
@@ -93,7 +101,8 @@ theorem root_unique [IsLocalRing R] (g : R[X]) (a₀ b c : R) (hb : g.IsRoot b) 
     ring
   exact sub_eq_zero.1 ((hu.mul_left_eq_zero).1 hfac)
 
-theorem hens_sub [HenselianLocalRing R] [IsLocalRing (fixSub σ)] : HenselianLocalRing (fixSub σ) where
+theorem hens_sub [HenselianLocalRing R] [IsLocalRing (fixSub σ)]
+    : HenselianLocalRing (fixSub σ) where
   is_henselian f hf a₀ h₁ h₂ := by
     set φ : fixSub σ →+* R := (fixSub σ).subtype with hφ
     set g : R[X] := f.map φ with hgdef
@@ -101,18 +110,15 @@ theorem hens_sub [HenselianLocalRing R] [IsLocalRing (fixSub σ)] : HenselianLoc
       rw [hgdef, eval_map]; exact eval₂_at_apply φ a
     have hevd : ∀ a : fixSub σ, g.derivative.eval (a : R) = φ (f.derivative.eval a) := fun a => by
       rw [hgdef, derivative_map, eval_map]; exact eval₂_at_apply φ a
-    have hcomp : (σ : R →+* R).comp φ = φ := by
-      ext x; exact x.2
+    have hcomp : (σ : R →+* R).comp φ = φ := by ext x; exact x.2
     have hσev : ∀ b : R, σ (g.eval b) = g.eval (σ b) := fun b => by
       rw [hgdef, eval_map, eval_map]
       have := hom_eval₂ f φ (σ : R →+* R) b
       rw [hcomp] at this
       exact this
     have hg : g.Monic := hf.map φ
-    have h₁' : g.eval (a₀ : R) ∈ maximalIdeal R := by
-      rw [hev]; exact (mem_max_sub σ _).1 h₁
-    have h₂' : IsUnit (g.derivative.eval (a₀ : R)) := by
-      rw [hevd]; exact h₂.map φ
+    have h₁' : g.eval (a₀ : R) ∈ maximalIdeal R := by rw [hev]; exact (mem_max_sub σ _).1 h₁
+    have h₂' : IsUnit (g.derivative.eval (a₀ : R)) := by rw [hevd]; exact h₂.map φ
     obtain ⟨b, hb, hba⟩ := HenselianLocalRing.is_henselian g hg (a₀ : R) h₁' h₂'
     have hσb : g.IsRoot (σ b) := by
       show g.eval (σ b) = 0
@@ -136,11 +142,10 @@ theorem hens_sub [HenselianLocalRing R] [IsLocalRing (fixSub σ)] : HenselianLoc
     · rw [mem_max_sub]
       exact hba
 
-instance isLocalHom_sub : IsLocalHom (fixSub σ).subtype :=
-  ⟨fun _ hx => isUnit_sub σ hx⟩
+instance isLocalHom_sub : IsLocalHom (fixSub σ).subtype := ⟨fun _ hx => isUnit_sub σ hx⟩
 
-theorem finite_sub [IsLocalRing R] [IsLocalRing (fixSub σ)] [Finite (ResidueField R)] :
-    Finite (ResidueField (fixSub σ)) :=
+theorem finite_sub [IsLocalRing R] [IsLocalRing (fixSub σ)] [Finite (ResidueField R)]
+    : Finite (ResidueField (fixSub σ)) :=
   Finite.of_injective _ (IsLocalRing.ResidueField.map (fixSub σ).subtype).injective
 
 end FixD

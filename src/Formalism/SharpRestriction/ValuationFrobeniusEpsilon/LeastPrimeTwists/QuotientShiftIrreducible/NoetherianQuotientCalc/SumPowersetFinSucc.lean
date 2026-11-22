@@ -13,10 +13,10 @@ open Finset
 
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 
-theorem sum_powerset_fin_succ {n : ℕ} (f : Finset (Fin (n + 1)) → ℤ) :
-    ∑ I ∈ (univ : Finset (Fin (n + 1))).powerset, f I =
-      ∑ J ∈ (univ : Finset (Fin n)).powerset, f (J.image Fin.succ) +
-        ∑ J ∈ (univ : Finset (Fin n)).powerset, f (insert 0 (J.image Fin.succ)) := by
+theorem sum_powerset_fin_succ {n : ℕ} (f : Finset (Fin (n + 1)) → ℤ)
+    : ∑ I ∈ (univ : Finset (Fin (n + 1))).powerset, f I
+      = ∑ J ∈ (univ : Finset (Fin n)).powerset, f (J.image Fin.succ)
+        + ∑ J ∈ (univ : Finset (Fin n)).powerset, f (insert 0 (J.image Fin.succ)) := by
   have hu : (univ : Finset (Fin (n + 1))) = insert 0 ((univ : Finset (Fin n)).image Fin.succ) := by
     ext i
     simp only [mem_univ, mem_insert, mem_image, true_and, true_iff]

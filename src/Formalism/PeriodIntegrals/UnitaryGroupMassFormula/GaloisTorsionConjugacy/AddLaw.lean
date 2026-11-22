@@ -92,7 +92,6 @@ lemma stepB (L : PeriodPair) {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.la
 
 end OriginCoordinatesAdd
 
-
 open OriginCoordinatesAdd in
 theorem addLaw : AddLaw := by
   intro L z w hz hw hm hp
@@ -102,13 +101,16 @@ theorem addLaw : AddLaw := by
   have hne := OriginCoordinatesAdd.wp_ne L hz hw hm hp
   have hF : HasDerivAt (fun z' => L.weierstrassP (z' + w)) (L.derivWeierstrassP (z + w)) z :=
     HasDerivAt.comp_add_const z w (OriginCoordinatesAdd.hasDerivAt_wp L hp)
-  have hG := ((((OriginCoordinatesAdd.hasDerivAt_lam L hz hne).pow 2).div_const 4).sub
-    (OriginCoordinatesAdd.hasDerivAt_wp L hz)).sub_const (L.weierstrassP w)
-  have hEq : (fun z' => L.weierstrassP (z' + w)) =ᶠ[𝓝 z]
-      (fun z' => OriginCoordinatesAdd.lam L w z' ^ 2 / 4 - L.weierstrassP z' - L.weierstrassP w) := by
-    filter_upwards [OriginCoordinatesAdd.ev_adm L hz hm hp] with z' ⟨h1, h2, h3⟩
-    rw [OriginCoordinatesAdd.stepB L h1 hw h2 h3]
-    rfl
+  have hG :=
+    ((((OriginCoordinatesAdd.hasDerivAt_lam L hz hne).pow 2).div_const 4).sub
+      (OriginCoordinatesAdd.hasDerivAt_wp L hz)).sub_const (L.weierstrassP w)
+  have hEq
+      : (fun z' => L.weierstrassP (z' + w)) =ᶠ[𝓝 z]
+        (fun z' => OriginCoordinatesAdd.lam L w z' ^ 2 / 4 - L.weierstrassP z' - L.weierstrassP w) :=
+    by
+      filter_upwards [OriginCoordinatesAdd.ev_adm L hz hm hp] with z' ⟨h1, h2, h3⟩
+      rw [OriginCoordinatesAdd.stepB L h1 hw h2 h3]
+      rfl
   have hD := hF.unique (hG.congr_of_eventuallyEq hEq)
   rw [hD]
   unfold addY

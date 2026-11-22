@@ -9,12 +9,14 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SharpSur
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 
 namespace GlobalTheory.CompanionTheory.Untilt
 
-theorem isUnit_of_isUnit_sharp {l : ℕ} [Fact l.Prime] (A : PAlg l) (a : A.A)
-    (h : IsUnit (A.sharp a)) : IsUnit a := by
+theorem isUnit_of_isUnit_sharp
+    {l : ℕ} [Fact l.Prime] (A : PAlg l) (a : A.A) (h : IsUnit (A.sharp a))
+    : IsUnit a := by
   have hu : IsUnit (A.aToU1 a) := by
     rw [CrystallineSemistableComparison.PAlg.sharpMap_eq]
     exact h.map _

@@ -8,17 +8,19 @@ universe u_1
 
 namespace Bl.general_b_fact_bis_form
 
-theorem goal1 :
-  ∀ {F : Type u_1} [inst : NormedAddCommGroup.{u_1} F] [inst_1 : NormedSpace.{0, u_1} Complex F] {U : Set.{u_1} F},
-  IsOpen.{u_1} U →
-    ∀ {G : F → Complex},
-      DifferentiableOn.{0, u_1, 0} Complex G U →
-        ∀ {y : F} {R C : Real},
-          LT.lt.{0} 0 R →
-            LE.le.{u_1} (Metric.closedBall.{u_1} y R) U →
-              (∀ (z : F),
-                  Membership.mem.{u_1, u_1} (Metric.closedBall.{u_1} y R) z → LE.le.{0} (Norm.norm.{0} (G z)) C) →
-                LE.le.{0} (Norm.norm.{u_1} (fderiv.{0, u_1, 0} Complex G y)) (HDiv.hDiv.{0, 0, 0} C R) := by
+theorem goal1
+    : ∀ {F : Type u_1} [inst : NormedAddCommGroup.{u_1} F] [inst_1 : NormedSpace.{0, u_1} Complex F]
+        {U : Set.{u_1} F},
+      IsOpen.{u_1} U
+        → ∀ {G : F → Complex},
+          DifferentiableOn.{0, u_1, 0} Complex G U
+            → ∀ {y : F} {R C : Real},
+              LT.lt.{0} 0 R → LE.le.{u_1} (Metric.closedBall.{u_1} y R) U
+                → (∀ (z : F),
+                  Membership.mem.{u_1, u_1} (Metric.closedBall.{u_1} y R) z
+                    → LE.le.{0} (Norm.norm.{0} (G z)) C)
+                → LE.le.{0} (Norm.norm.{u_1} (fderiv.{0, u_1, 0} Complex G y))
+                  (HDiv.hDiv.{0, 0, 0} C R) := by
   intro F _ _ U hU G hG y R C hR hsub hC
   have hyU : y ∈ U := hsub (Metric.mem_closedBall_self hR.le)
   have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC y (Metric.mem_closedBall_self hR.le))
@@ -33,7 +35,9 @@ theorem goal1 :
   have key : ∀ t : ℂ, ‖t‖ ≤ r → y + t • v ∈ Metric.closedBall y R := by
     intro t ht
     rw [Metric.mem_closedBall, dist_eq_norm, add_sub_cancel_left, norm_smul]
-    calc ‖t‖ * ‖v‖ ≤ r * ‖v‖ := by gcongr
+    calc
+      ‖t‖ * ‖v‖
+        ≤ r * ‖v‖ := by gcongr
       _ = R := div_mul_cancel₀ R hv'
   set g : ℂ → ℂ := G ∘ (fun t : ℂ => y + t • v) with hg_def
   have hl : ∀ t : ℂ, HasDerivAt (fun s : ℂ => y + s • v) v t := by
@@ -54,10 +58,11 @@ theorem goal1 :
     exact hC _ (key z hz'.le)
   have hest := Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hr hdc hbd
   have hGy : HasFDerivAt G (fderiv ℂ G y) y := (hG.differentiableAt (hU.mem_nhds hyU)).hasFDerivAt
-  have hder : HasDerivAt g (fderiv ℂ G y v) 0 :=
-    hGy.comp_hasDerivAt_of_eq (0 : ℂ) (hl 0) (by simp)
+  have hder : HasDerivAt g (fderiv ℂ G y v) 0 := hGy.comp_hasDerivAt_of_eq (0 : ℂ) (hl 0) (by simp)
   rw [hder.deriv] at hest
-  calc ‖fderiv ℂ G y v‖ ≤ C / r := hest
+  calc
+    ‖fderiv ℂ G y v‖
+      ≤ C / r := hest
     _ = C / R * ‖v‖ := by rw [hr_def, div_div_eq_mul_div, mul_div_right_comm]
 
 end Bl.general_b_fact_bis_form

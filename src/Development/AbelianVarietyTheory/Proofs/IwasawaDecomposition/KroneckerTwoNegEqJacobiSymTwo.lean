@@ -9,21 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.JacobiSym
 
 @[expose] public section
 
-open Finset ArithmeticFunction NumberField IsDedekindDomain Filter Topology GlobalTheory.Mem.An Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+open Finset ArithmeticFunction NumberField IsDedekindDomain Filter Topology GlobalTheory.Mem.An
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
 open scoped nonZeroDivisors
 
 namespace GlobalTheory
 
-theorem kroneckerTwo_neg_eq_jacobiSym_two (q : ℕ) (hq : q % 4 = 3) :
-    GlobalTheoryTheory.kron2 (-(q : ℤ)) = jacobiSym 2 q := by
+theorem kroneckerTwo_neg_eq_jacobiSym_two (q : ℕ) (hq : q % 4 = 3)
+    : GlobalTheoryTheory.kron2 (-(q : ℤ)) = jacobiSym 2 q := by
   have hodd : Odd q := Nat.odd_iff.mpr (by omega)
   rw [jacobiSym.at_two hodd, ZMod.χ₈_nat_eq_if_mod_eight]
   unfold GlobalTheoryTheory.kron2
   split_ifs <;> omega
 
-theorem kronSym_neg_eq_jacobiSym_and_two :
-    (∀ q n : ℕ, q % 4 = 3 → 0 < n → GlobalTheoryTheory.kronSym (-(q : ℤ)) n = jacobiSym (n : ℤ) q) ∧
-      ∀ n : ℕ, Odd n → GlobalTheoryTheory.kronSym 2 n = ZMod.χ₈ (n : ZMod 8) := by
+theorem kronSym_neg_eq_jacobiSym_and_two
+    : (∀ q n : ℕ, q % 4 = 3 → 0 < n → GlobalTheoryTheory.kronSym (-(q : ℤ)) n = jacobiSym (n : ℤ) q)
+      ∧ ∀ n : ℕ, Odd n → GlobalTheoryTheory.kronSym 2 n = ZMod.χ₈ (n : ZMod 8) := by
   refine ⟨fun q n hq hn => ?_, fun n hn => ?_⟩
   · unfold GlobalTheoryTheory.kronSym
     have hodd : Odd (n / 2 ^ n.factorization 2) := by

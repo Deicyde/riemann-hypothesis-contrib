@@ -182,7 +182,11 @@ lemma expo_q {c m : ℕ} (hm : 0 < m) (h : Nat.Coprime c m) {a b : ℤ} (ha : 12
   linear_combination 6 * h1 + (c ^ 2 - 1) * sum_two m + (6 * m * b - 3 * m * (c - 1)) * sum_one m
     + (m ^ 3 - m) * ha + 3 * m ^ 2 * (m - 1) * hb
 
-theorem _root_.GlobalTheory.Sieg.prod_cth_mul_pow : ∀ (c m : ℕ) (Q t : ℂ), 1 < c → Nat.Coprime c 6 → 0 < m → Nat.Coprime c m → ‖Q‖ < 1 → Q ≠ 0 → t ≠ 0 → (∀ n : ℤ, Q ^ n * t ^ c ≠ 1) → ∏ j ∈ Finset.range m, cth c (Q ^ m) (t * Q ^ j) = cth c Q t := by
+theorem _root_.GlobalTheory.Sieg.prod_cth_mul_pow
+    : ∀ (c m : ℕ) (Q t : ℂ),
+      1 < c → Nat.Coprime c 6 → 0 < m → Nat.Coprime c m → ‖Q‖ < 1 → Q ≠ 0 → t ≠ 0
+        → (∀ n : ℤ, Q ^ n * t ^ c ≠ 1)
+        → ∏ j ∈ Finset.range m, cth c (Q ^ m) (t * Q ^ j) = cth c Q t := by
   intro c m Q t hc h6 hm hcm hQ h0 ht hn
   have hqm : ‖Q ^ m‖ < 1 := by rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hQ hm.ne'
   have hs : t ^ c ≠ 0 := pow_ne_zero _ ht
@@ -194,10 +198,10 @@ theorem _root_.GlobalTheory.Sieg.prod_cth_mul_pow : ∀ (c m : ℕ) (Q t : ℂ),
     have h2 : c % 2 = 1 := Nat.odd_iff.mp hodd
     have h3 : ¬ 3 ∣ c := fun hd => by
       have := Nat.dvd_gcd hd (show 3 ∣ 6 by norm_num)
-      rw [h6] at this; omega
+      rw [h6] at this
+      omega
     have : c % 12 = 1 ∨ c % 12 = 5 ∨ c % 12 = 7 ∨ c % 12 = 11 := by omega
-    have h4 : c ^ 2 % 12 = 1 := by
-      rw [Nat.pow_mod]; rcases this with h | h | h | h <;> rw [h]
+    have h4 : c ^ 2 % 12 = 1 := by rw [Nat.pow_mod]; rcases this with h | h | h | h <;> rw [h]
     omega
   obtain ⟨a, ha⟩ := h12
   have ha' : 12 * (a : ℤ) = c ^ 2 - 1 := by
@@ -210,30 +214,42 @@ theorem _root_.GlobalTheory.Sieg.prod_cth_mul_pow : ∀ (c m : ℕ) (Q t : ℂ),
     obtain ⟨d, hd⟩ := hodd
     exact ⟨-(c * d), by rw [hd]; push_cast; ring⟩
   have hbb : ((c : ℤ) - (c : ℤ) ^ 2) / 2 = b := by omega
-  have hL : ∀ j ∈ range m, cth c (Q ^ m) (t * Q ^ j) =
-      (Q ^ m) ^ a * ((-t) ^ b * (Q ^ j) ^ b) * T (Q ^ m) (Q ^ j * t) ^ (c ^ 2) / T (Q ^ m) (Q ^ (c * j) * t ^ c) := by
+  have hL
+      : ∀ j ∈ range m,
+        cth c (Q ^ m) (t * Q ^ j)
+          = (Q ^ m) ^ a * ((-t) ^ b * (Q ^ j) ^ b) * T (Q ^ m) (Q ^ j * t) ^ (c ^ 2)
+            / T (Q ^ m) (Q ^ (c * j) * t ^ c) := by
     intro j _
-    rw [cth_eq hqm c, haa, hbb, ← neg_mul, mul_zpow, mul_pow t, ← pow_mul Q j, mul_comm t, mul_comm (t ^ c),
-      mul_comm j c]
+    rw [cth_eq hqm c, haa, hbb, ← neg_mul, mul_zpow, mul_pow t, ← pow_mul Q j, mul_comm t,
+      mul_comm (t ^ c), mul_comm j c]
     · intro n hh
       apply hn ((m * n + j * c : ℕ) : ℤ)
-      rw [← hh, zpow_natCast]; ring
+      rw [← hh, zpow_natCast]
+      ring
     · intro n hh
       apply hinv ((m * n + m : ℕ) - (j * c : ℕ) : ℤ)
-      rw [← hh, zpow_sub₀ h0, zpow_natCast, zpow_natCast]; field_simp; ring
-  have hD : T Q (t ^ c) = (-t) ^ (c * ∑ j ∈ range m, c * j / m) *
-      Q ^ (∑ j ∈ range m, ((c * j % m) * (c * j / m) + m * (c * j / m).choose 2)) *
-      ∏ j ∈ range m, T (Q ^ m) (Q ^ (c * j) * t ^ c) := by
+      rw [← hh, zpow_sub₀ h0, zpow_natCast, zpow_natCast]
+      field_simp
+      ring
+  have hD
+      : T Q (t ^ c)
+        = (-t) ^ (c * ∑ j ∈ range m, c * j / m)
+          * Q ^ (∑ j ∈ range m, ((c * j % m) * (c * j / m) + m * (c * j / m).choose 2))
+          * ∏ j ∈ range m, T (Q ^ m) (Q ^ (c * j) * t ^ c) := by
     rw [← T_split hQ h0 hm hs, ← prod_mod hm hcm (fun j => T (Q ^ m) (Q ^ j * t ^ c)), mul_sum,
       ← prod_pow_eq_pow_sum, ← prod_pow_eq_pow_sum, ← prod_mul_distrib, ← prod_mul_distrib]
     refine prod_congr rfl fun j _ => ?_
-    rw [T_steps hqm (pow_ne_zero _ h0) (mul_ne_zero (pow_ne_zero _ h0) hs) (c * j / m), ← mul_assoc, ← pow_mul,
-      ← pow_mul, ← pow_add, Nat.div_add_mod, pow_mul (-t), hodd.neg_pow, ← mul_neg, mul_pow, ← pow_mul, pow_add]
+    rw [T_steps hqm (pow_ne_zero _ h0) (mul_ne_zero (pow_ne_zero _ h0) hs) (c * j / m), ← mul_assoc,
+      ← pow_mul, ← pow_mul, ← pow_add, Nat.div_add_mod, pow_mul (-t), hodd.neg_pow, ← mul_neg,
+      mul_pow, ← pow_mul, pow_add]
     ring
-  rw [prod_congr rfl hL, cth_eq hQ c (fun n => by simpa using hn n)
-    (fun n => by rw [← mul_assoc, ← pow_succ, ← zpow_natCast]; exact hinv _), haa, hbb, hD, prod_div_distrib,
-    prod_mul_distrib, prod_mul_distrib, prod_mul_distrib, prod_const, prod_const, prod_pow, T_split hQ h0 hm ht, card_range,
-    prod_zpow, prod_pow_eq_pow_sum]
+  rw [prod_congr rfl hL,
+    cth_eq hQ c
+      (fun n => by simpa using hn n)
+      (fun n => by rw [← mul_assoc, ← pow_succ, ← zpow_natCast]; exact hinv _),
+    haa, hbb, hD, prod_div_distrib, prod_mul_distrib, prod_mul_distrib, prod_mul_distrib,
+    prod_const, prod_const, prod_pow, T_split hQ h0 hm ht, card_range, prod_zpow,
+    prod_pow_eq_pow_sum]
   have e1 := congrArg (fun z : ℤ => (-t) ^ z) (smoothedTheta_distribution_t_exponent_eq hm hcm hb)
   have e2 := congrArg (fun z : ℤ => Q ^ z) (expo_q hm hcm ha' hb)
   have hnt : -t ≠ 0 := neg_ne_zero.mpr ht

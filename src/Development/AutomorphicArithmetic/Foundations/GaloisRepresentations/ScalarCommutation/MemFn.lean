@@ -6,6 +6,4 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-theorem UpperTheory.Gal.Spc.memFn :
-    UpperTheory.Gal.Spc.MemFn :=
-  UpperTheory.Gal.W2.Seed.memFn_holds
+theorem UpperTheory.Gal.Spc.memFn : UpperTheory.Gal.Spc.MemFn := UpperTheory.Gal.W2.Seed.memFn_holds

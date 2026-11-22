@@ -23,9 +23,12 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 section
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
 open GlobalTheory.AllWt (Psi wtOf cuspOn latOn normOn petOn GoodOn GoodW bergOn framesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
@@ -34,7 +37,16 @@ set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.RelAmpleComp
 open GlobalTheory.FlagMod (FlagCover FlagModel)
-theorem exists_weight_isAmple_lineBundle_comp : _root_.GlobalTheory.CovTop.Hypotheses'' → GlobalTheory.Published.NefNumerics → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (TF : TorFlag Xo c) (Z : Comp Xo c), FnAlgClosed (Xo := Xo) (c := c) → ∃ ρ : AllWt.Weight Dw, ∀ A : LB TF.Y.X, A.IsLB → IsAmpleLB A → ∃ n : ℕ, IsAmpleLB (LB.div (lbPow (A.pull (inc₀ TF.X Z ≫ TF.X.π)) n) (L₀ TF.X Z ρ)) := by
+theorem exists_weight_isAmple_lineBundle_comp
+    : _root_.GlobalTheory.CovTop.Hypotheses'' → GlobalTheory.Published.NefNumerics
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+          (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+          (Xo : Moduli Dw l) (c : Coeff l) (TF : TorFlag Xo c) (Z : Comp Xo c),
+        FnAlgClosed (Xo := Xo) (c := c)
+          → ∃ ρ : AllWt.Weight Dw, ∀ A : LB TF.Y.X,
+            A.IsLB → IsAmpleLB A
+              → ∃ n : ℕ,
+                IsAmpleLB (LB.div (lbPow (A.pull (inc₀ TF.X Z ≫ TF.X.π)) n) (L₀ TF.X Z ρ)) := by
   intro _ _ E _ _ _ H Dw l Xo c TF Z hF
   refine ⟨fun _ k => if (k : ℕ) < Dw.p then ((k : ℕ) : ℤ) - Dw.p else ((k : ℕ) : ℤ) - Dw.p + 1, ?_⟩
   intro A hA hAmp
@@ -68,14 +80,18 @@ theorem exists_weight_isAmple_lineBundle_comp : _root_.GlobalTheory.CovTop.Hypot
   simp only [add_zero] at h0
   have h3 : e + AllWt.exOf Dw ρ 0 = 0 := by rw [hex]; exact add_neg_cancel e
   rw [h3] at hsum
-  have hcls : GlobalTheory.CechPic.cls (TF.X.F.LL e) hM = -GlobalTheory.CechPic.cls (TF.X.F.LL (AllWt.exOf Dw ρ 0)) hN := by
+  have hcls
+      : GlobalTheory.CechPic.cls (TF.X.F.LL e) hM
+        = - GlobalTheory.CechPic.cls (TF.X.F.LL (AllWt.exOf Dw ρ 0)) hN := by
     refine eq_neg_of_add_eq_zero_left ?_
     have h4 : GlobalTheory.CechPic.cls (TF.X.F.LL 0) ((commonLL TF.X).isLB 0) = 0 := by
       have := congrArg (· - GlobalTheory.CechPic.cls (TF.X.F.LL 0) ((commonLL TF.X).isLB 0)) h0
       simpa using this.symm
     exact hsum.symm.trans h4
-  obtain ⟨n₀, hn⟩ := GlobalTheory.T.isAmple_pullbackPower_div_of_locally_ample TF.X.π A hAmp (TF.X.F.LL (AllWt.exOf Dw ρ 0)) (TF.X.F.LL e) hN hM hcls
-    (fun z => GlobalTheory.T.borelWeil_flagModel_detInverse_isAmple_local TF.flag z)
+  obtain ⟨n₀, hn⟩ :=
+    GlobalTheory.T.isAmple_pullbackPower_div_of_locally_ample TF.X.π A hAmp
+      (TF.X.F.LL (AllWt.exOf Dw ρ 0)) (TF.X.F.LL e) hN hM hcls
+      (fun z => GlobalTheory.T.borelWeil_flagModel_detInverse_isAmple_local TF.flag z)
   have h := (hn n₀ le_rfl).pull_of_isOpenImmersion (inc₀ TF.X Z)
   have hAπ := LB.isLB_pull hA TF.X.π
   have hAg := LB.isLB_pull hA (inc₀ TF.X Z ≫ TF.X.π)
@@ -84,9 +100,11 @@ theorem exists_weight_isAmple_lineBundle_comp : _root_.GlobalTheory.CovTop.Hypot
   have hD1 := LB.isLB_div hP1 hN
   have hL0 : (L₀ TF.X Z ρ).IsLB := LB.isLB_pull hN _
   have hD2 := LB.isLB_div hP2 hL0
-  refine ⟨n₀, IsAmpleLB.of_lbIso h hD2 ((GlobalTheory.CechPic.cls_eq_iff hD2 (LB.isLB_pull hD1 _)).1 ?_)⟩
-  rw [GlobalTheory.CechPic.cls_div hP2 hL0, GlobalTheory.CechPic.cls_lbPow hAg, GlobalTheory.CechPic.cls_pull hA _ hAg,
-    GlobalTheory.CechPic.cls_pull hD1 _ _, GlobalTheory.CechPic.cls_div hP1 hN hD1, GlobalTheory.CechPic.cls_lbPow hAπ,
+  refine
+    ⟨n₀, IsAmpleLB.of_lbIso h hD2 ((GlobalTheory.CechPic.cls_eq_iff hD2 (LB.isLB_pull hD1 _)).1 ?_)⟩
+  rw [GlobalTheory.CechPic.cls_div hP2 hL0, GlobalTheory.CechPic.cls_lbPow hAg,
+    GlobalTheory.CechPic.cls_pull hA _ hAg, GlobalTheory.CechPic.cls_pull hD1 _ _,
+    GlobalTheory.CechPic.cls_div hP1 hN hD1, GlobalTheory.CechPic.cls_lbPow hAπ,
     GlobalTheory.CechPic.cls_pull hA _ hAπ, GlobalTheory.CechPic.pull_comp, map_sub, map_nsmul]
   congr 1
 end GlobalTheory.RelAmpleComp
@@ -95,14 +113,32 @@ end
 
 section
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
 open GlobalTheory.AllWt (Psi wtOf cuspOn latOn normOn petOn GoodOn GoodW bergOn framesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
 open GlobalTheory.HSApp
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.relativelyAmple_comp_of_exists_weight : _root_.GlobalTheory.CovTop.Hypotheses'' → GlobalTheory.Published.NefNumerics → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (TF : TorFlag Xo c) (Z : Comp Xo c), FnAlgClosed (Xo := Xo) (c := c) → ∃ ρ : AllWt.Weight Dw, ∀ A : LB TF.Y.X, A.IsLB → IsAmpleLB A → ∃ n : ℕ, IsAmpleLB (LB.div (lbPow (A.pull (inc₀ TF.X Z ≫ TF.X.π)) n) (L₀ TF.X Z ρ)) := by
-  first | exact @_root_.GlobalTheory.RelAmpleComp.exists_weight_isAmple_lineBundle_comp | exact _root_.GlobalTheory.RelAmpleComp.exists_weight_isAmple_lineBundle_comp | (intros; apply _root_.GlobalTheory.RelAmpleComp.exists_weight_isAmple_lineBundle_comp <;> assumption)
+theorem _root_.GlobalTheory.T.relativelyAmple_comp_of_exists_weight
+    : _root_.GlobalTheory.CovTop.Hypotheses'' → GlobalTheory.Published.NefNumerics
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+          (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+          (Xo : Moduli Dw l) (c : Coeff l) (TF : TorFlag Xo c) (Z : Comp Xo c),
+        FnAlgClosed (Xo := Xo) (c := c)
+          → ∃ ρ : AllWt.Weight Dw, ∀ A : LB TF.Y.X,
+            A.IsLB → IsAmpleLB A
+              → ∃ n : ℕ,
+                IsAmpleLB (LB.div (lbPow (A.pull (inc₀ TF.X Z ≫ TF.X.π)) n) (L₀ TF.X Z ρ)) := by
+  first
+  | exact @_root_.GlobalTheory.RelAmpleComp.exists_weight_isAmple_lineBundle_comp
+  | exact _root_.GlobalTheory.RelAmpleComp.exists_weight_isAmple_lineBundle_comp
+  | (
+      intros
+      apply _root_.GlobalTheory.RelAmpleComp.exists_weight_isAmple_lineBundle_comp <;> assumption
+    )
 end

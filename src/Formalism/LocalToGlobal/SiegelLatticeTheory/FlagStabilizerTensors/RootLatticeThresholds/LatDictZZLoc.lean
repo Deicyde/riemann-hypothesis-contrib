@@ -11,7 +11,8 @@ open NumberField
 
 namespace Formalism.L2.SG.Pf.LatDictZ.Z3
 
-open ReciprocityTheory.ChartRestriction.L3 ReciprocityTheory.ChartRestriction.L3.WA Formalism.L2.SG.Pf.LatDictZ.Z0
+open ReciprocityTheory.ChartRestriction.L3 ReciprocityTheory.ChartRestriction.L3.WA
+  Formalism.L2.SG.Pf.LatDictZ.Z0
 
 section General
 
@@ -32,8 +33,9 @@ def orth (h : V →ₗ⋆[K] V →ₗ[K] K) (P : Submodule K V) : Submodule K V 
     have hx' : ∀ q ∈ P, h q x = 0 := hx
     simp [hx' q hq]
 
-theorem mem_orth {h : V →ₗ⋆[K] V →ₗ[K] K} {P : Submodule K V} {x : V} :
-    x ∈ orth h P ↔ ∀ q ∈ P, h q x = 0 := Iff.rfl
+theorem mem_orth {h : V →ₗ⋆[K] V →ₗ[K] K} {P : Submodule K V} {x : V}
+    : x ∈ orth h P ↔ ∀ q ∈ P, h q x = 0 :=
+  Iff.rfl
 
 def Splits (h : V →ₗ⋆[K] V →ₗ[K] K) (P : Submodule K V) (M : AddSubgroup V) : Prop :=
   ∀ w ∈ M, ∃ w₁ ∈ M, w₁ ∈ P ∧ w - w₁ ∈ orth h P
@@ -45,14 +47,17 @@ theorem orth_symm (hs : h.IsSymm) {q x : V} (hq : q ∈ P) (hx : x ∈ orth h P)
   rw [mem_orth.mp hx q hq, map_zero] at e
   exact e.symm
 
-theorem mem_res {W : Submodule K V} {M : AddSubgroup V} {x : W} :
-    x ∈ M.comap W.subtype.toAddMonoidHom ↔ (x : V) ∈ M := Iff.rfl
+theorem mem_res {W : Submodule K V} {M : AddSubgroup V} {x : W}
+    : x ∈ M.comap W.subtype.toAddMonoidHom ↔ (x : V) ∈ M :=
+  Iff.rfl
 
 theorem decomp {Q : Submodule K V} (hc : IsCompl P Q) (v : V) : ∃ a ∈ P, ∃ b ∈ Q, a + b = v :=
   Submodule.mem_sup.mp (by rw [hc.sup_eq_top]; trivial)
 
-theorem isCompl_orth (hs : h.IsSymm) (hd : ∀ x, (∀ y, h x y = 0) → x = 0)
-    (hM : IsSelfDualMod S h M) (hsp : Splits h P M) : IsCompl P (orth h P) := by
+theorem isCompl_orth
+    (hs : h.IsSymm) (hd : ∀ x, (∀ y, h x y = 0) → x = 0) (hM : IsSelfDualMod S h M)
+    (hsp : Splits h P M)
+    : IsCompl P (orth h P) := by
   have hdec : ∀ v : V, ∃ a ∈ P, v - a ∈ orth h P := by
     intro v
     obtain ⟨t, ht0, htv⟩ := hM.span v
@@ -79,8 +84,8 @@ theorem isCompl_orth (hs : h.IsSymm) (hd : ∀ x, (∀ y, h x y = 0) → x = 0)
     rw [e]
     exact Submodule.add_mem_sup haP ha
 
-theorem isSelfDualMod_res (hM : IsSelfDualMod S h M) (hsp : Splits h P M) :
-    IsSelfDualMod S (h.domRestrict₁₂ (orth h P) (orth h P))
+theorem isSelfDualMod_res (hM : IsSelfDualMod S h M) (hsp : Splits h P M)
+    : IsSelfDualMod S (h.domRestrict₁₂ (orth h P) (orth h P))
       (M.comap (orth h P).subtype.toAddMonoidHom) := by
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro a ha m hm
@@ -106,9 +111,10 @@ theorem isSelfDualMod_res (hM : IsSelfDualMod S h M) (hsp : Splits h P M) :
     obtain ⟨t, ht0, htx⟩ := hM.span x
     exact ⟨t, ht0, mem_res.mpr (by rw [Submodule.coe_smul]; exact htx)⟩
 
-theorem res_nondeg (hs : h.IsSymm) (hd : ∀ x, (∀ y, h x y = 0) → x = 0)
-    (hM : IsSelfDualMod S h M) (hsp : Splits h P M) :
-    ∀ x : orth h P, (∀ y, h.domRestrict₁₂ (orth h P) (orth h P) x y = 0) → x = 0 := by
+theorem res_nondeg
+    (hs : h.IsSymm) (hd : ∀ x, (∀ y, h x y = 0) → x = 0) (hM : IsSelfDualMod S h M)
+    (hsp : Splits h P M)
+    : ∀ x : orth h P, (∀ y, h.domRestrict₁₂ (orth h P) (orth h P) x y = 0) → x = 0 := by
   intro x hx
   have hc := isCompl_orth hs hd hM hsp
   apply Subtype.ext
@@ -122,10 +128,11 @@ theorem res_nondeg (hs : h.IsSymm) (hd : ∀ x, (∀ y, h x y = 0) → x = 0)
   rw [map_add (f := _), e1, zero_add]
   exact e2
 
-theorem mem_iff_split {Q : Submodule K V} (hc : IsCompl P Q)
-    (hsp : ∀ w ∈ M, ∃ w₁ ∈ M, w₁ ∈ P ∧ w - w₁ ∈ Q) (x : V) :
-    x ∈ M ↔ (((Submodule.prodEquivOfIsCompl P Q hc).symm x).1 : V) ∈ M ∧
-      (((Submodule.prodEquivOfIsCompl P Q hc).symm x).2 : V) ∈ M := by
+theorem mem_iff_split
+    {Q : Submodule K V} (hc : IsCompl P Q) (hsp : ∀ w ∈ M, ∃ w₁ ∈ M, w₁ ∈ P ∧ w - w₁ ∈ Q) (x : V)
+    : x ∈ M
+      ↔ (((Submodule.prodEquivOfIsCompl P Q hc).symm x).1 : V) ∈ M
+        ∧ (((Submodule.prodEquivOfIsCompl P Q hc).symm x).2 : V) ∈ M := by
   constructor
   · intro hx
     obtain ⟨w₁, hw₁M, hw₁P, hw₁⟩ := hsp x hx
@@ -140,12 +147,13 @@ theorem mem_iff_split {Q : Submodule K V} (hc : IsCompl P Q)
     rw [← e]
     exact M.add_mem h1 h2
 
-theorem glue (hs : h.IsSymm) (hc : IsCompl P (orth h P))
-    (hsp₁ : Splits h P M₁) (hsp₂ : Splits h P M₂) (hag : ∀ w ∈ P, w ∈ M₁ ↔ w ∈ M₂)
+theorem glue
+    (hs : h.IsSymm) (hc : IsCompl P (orth h P)) (hsp₁ : Splits h P M₁) (hsp₂ : Splits h P M₂)
+    (hag : ∀ w ∈ P, w ∈ M₁ ↔ w ∈ M₂)
     (g' : orth h P ≃ₗ[K] orth h P) (hg'i : ∀ x y : orth h P, h (g' x) (g' y) = h x y)
-    (hg'M : ∀ x : orth h P, (x : V) ∈ M₁ ↔ (g' x : V) ∈ M₂) :
-    ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, (∀ w ∈ P, g w = w) ∧ (∀ x : orth h P, g x = g' x) ∧
-      ∀ x, x ∈ M₁ ↔ g x ∈ M₂ := by
+    (hg'M : ∀ x : orth h P, (x : V) ∈ M₁ ↔ (g' x : V) ∈ M₂)
+    : ∃ g ∈ Formalism.HermitianLatticesTheory.isom h,
+      (∀ w ∈ P, g w = w) ∧ (∀ x : orth h P, g x = g' x) ∧ ∀ x, x ∈ M₁ ↔ g x ∈ M₂ := by
   set e := Submodule.prodEquivOfIsCompl P (orth h P) hc with he
   let g : V ≃ₗ[K] V := e.symm.trans (((LinearEquiv.refl K P).prodCongr g').trans e)
   have hgs : ∀ x, e.symm (g x) = ((e.symm x).1, g' (e.symm x).2) := by
@@ -170,7 +178,8 @@ theorem glue (hs : h.IsSymm) (hc : IsCompl P (orth h P))
     have z2 : ∀ (c : P) (d : orth h P), h (d : V) (c : V) = 0 := fun c d => orth_symm hs c.2 d.2
     simp only [map_add (f := _), LinearMap.add_apply, z1, z2, hg'i, add_zero, zero_add]
   · intro w hw
-    have e1 : e.symm w = (⟨w, hw⟩, 0) := Submodule.prodEquivOfIsCompl_symm_apply_left P (orth h P) hc ⟨w, hw⟩
+    have e1 : e.symm w = (⟨w, hw⟩, 0) :=
+      Submodule.prodEquivOfIsCompl_symm_apply_left P (orth h P) hc ⟨w, hw⟩
     rw [hgx w, e1]
     simp
   · intro x
@@ -181,8 +190,9 @@ theorem glue (hs : h.IsSymm) (hc : IsCompl P (orth h P))
     rw [mem_iff_split hc hsp₁ x, mem_iff_split hc hsp₂ (g x), hgs x]
     exact and_congr (hag _ (e.symm x).1.2) (hg'M _)
 
-theorem isSelfDualMod_comap (F : V ≃ₗ[K] V) (hF : ∀ x y, h (F x) (F y) = h x y)
-    (hM : IsSelfDualMod S h M) : IsSelfDualMod S h (M.comap F.symm.toLinearMap.toAddMonoidHom) := by
+theorem isSelfDualMod_comap
+    (F : V ≃ₗ[K] V) (hF : ∀ x y, h (F x) (F y) = h x y) (hM : IsSelfDualMod S h M)
+    : IsSelfDualMod S h (M.comap F.symm.toLinearMap.toAddMonoidHom) := by
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro a ha m hm
     change F.symm (a • m) ∈ M
@@ -208,8 +218,8 @@ theorem isSelfDualMod_comap (F : V ≃ₗ[K] V) (hF : ∀ x y, h (F x) (F y) = h
     obtain ⟨t, ht0, htx⟩ := hM.span (F.symm x)
     exact ⟨t, ht0, by change F.symm (t • x) ∈ M; rw [map_smul]; exact htx⟩
 
-theorem orth_pair {z y x : V} (hz : h z x = 0) (hy : h y x = 0) :
-    x ∈ orth h (Submodule.span K {z, y}) := by
+theorem orth_pair {z y x : V} (hz : h z x = 0) (hy : h y x = 0)
+    : x ∈ orth h (Submodule.span K {z, y}) := by
   rw [mem_orth]
   intro q hq
   obtain ⟨c, d, rfl⟩ := Submodule.mem_span_pair.mp hq
@@ -220,9 +230,10 @@ theorem hyz_one (hs : h.IsSymm) {z y : V} (hzy : h z y = 1) : h y z = 1 := by
   rw [hzy, map_one] at e
   exact e.symm
 
-theorem splits_plane (hs : h.IsSymm) (hM : IsSelfDualMod S h M) {z y : V} (hz : z ∈ M) (hy : y ∈ M)
-    (hzy : h z y = 1) (hD : IsUnitIn S (1 - h z z * h y y)) :
-    Splits h (Submodule.span K {z, y}) M := by
+theorem splits_plane
+    (hs : h.IsSymm) (hM : IsSelfDualMod S h M)
+    {z y : V} (hz : z ∈ M) (hy : y ∈ M) (hzy : h z y = 1) (hD : IsUnitIn S (1 - h z z * h y y))
+    : Splits h (Submodule.span K {z, y}) M := by
   intro w hw
   have hyz := hyz_one hs hzy
   have hAS : h z w ∈ S := hM.int _ hz _ hw
@@ -239,8 +250,12 @@ theorem splits_plane (hs : h.IsSymm) (hM : IsSelfDualMod S h M) {z y : V} (hz : 
     exact S.sub_mem hBS (S.mul_mem hβS hb)
   have hβD : β * (1 - h z z * h y y) = h z w - h z z * h y w := by
     rw [hβ, mul_assoc, inv_mul_cancel₀ hD.1, mul_one]
-  refine ⟨α • z + β • y, M.add_mem (hM.smul_mem _ hαS _ hz) (hM.smul_mem _ hβS _ hy),
-    Submodule.mem_span_pair.mpr ⟨α, β, rfl⟩, orth_pair ?_ ?_⟩
+  refine ⟨
+    α • z + β • y,
+    M.add_mem (hM.smul_mem _ hαS _ hz) (hM.smul_mem _ hβS _ hy),
+    Submodule.mem_span_pair.mpr ⟨α, β, rfl⟩,
+    orth_pair ?_ ?_
+  ⟩
   · have e : h z (w - (α • z + β • y)) = h z w - (α * h z z + β) := by
       simp only [map_sub, map_add (f := _), map_smul, smul_eq_mul, hzy, mul_one]
     rw [e, hα]
@@ -250,9 +265,11 @@ theorem splits_plane (hs : h.IsSymm) (hM : IsSelfDualMod S h M) {z y : V} (hz : 
     rw [e, hα]
     ring
 
-theorem mem_plane (hs : h.IsSymm) (hM : IsSelfDualMod S h M) {z y : V} (hz : z ∈ M) (hy : y ∈ M)
-    (hzy : h z y = 1) (hD : IsUnitIn S (1 - h z z * h y y)) (α β : K) :
-    α • z + β • y ∈ M ↔ α ∈ S ∧ β ∈ S := by
+theorem mem_plane
+    (hs : h.IsSymm) (hM : IsSelfDualMod S h M)
+    {z y : V} (hz : z ∈ M) (hy : y ∈ M) (hzy : h z y = 1) (hD : IsUnitIn S (1 - h z z * h y y))
+    (α β : K)
+    : α • z + β • y ∈ M ↔ α ∈ S ∧ β ∈ S := by
   have hyz := hyz_one hs hzy
   constructor
   · intro hw
@@ -283,47 +300,57 @@ end General
 
 section Fix
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [FiniteDimensional K V] {h : V →ₗ⋆[K] V →ₗ[K] K}
+variable
+  {K V : Type}
+  [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+  {h : V →ₗ⋆[K] V →ₗ[K] K}
 
-theorem fix_of (h1 : SemiGenusLoc) (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hs : h.IsSymm)
-    (hd : ∀ x, (∀ y, h x y = 0) → x = 0) {p : Ideal (𝓞 K)} (hp : p.IsMaximal) (P : Submodule K V)
-    {M₁ M₂ : AddSubgroup V} (hM₁ : IsSelfDualMod (locRing p) h M₁)
-    (hM₂ : IsSelfDualMod (locRing p) h M₂)
-    (hsp₁ : Splits h P M₁) (hsp₂ : Splits h P M₂) (hag : ∀ w ∈ P, w ∈ M₁ ↔ w ∈ M₂) :
-    ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, (∀ w ∈ P, g w = w) ∧ ∀ x, x ∈ M₁ ↔ g x ∈ M₂ := by
+theorem fix_of
+    (h1 : SemiGenusLoc) (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hs : h.IsSymm)
+    (hd : ∀ x, (∀ y, h x y = 0) → x = 0)
+    {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+    (P : Submodule K V)
+    {M₁ M₂ : AddSubgroup V}
+    (hM₁ : IsSelfDualMod (locRing p) h M₁) (hM₂ : IsSelfDualMod (locRing p) h M₂)
+    (hsp₁ : Splits h P M₁) (hsp₂ : Splits h P M₂) (hag : ∀ w ∈ P, w ∈ M₁ ↔ w ∈ M₂)
+    : ∃ g ∈ Formalism.HermitianLatticesTheory.isom h,
+      (∀ w ∈ P, g w = w) ∧ ∀ x, x ∈ M₁ ↔ g x ∈ M₂ := by
   have hc := isCompl_orth hs hd hM₁ hsp₁
-  obtain ⟨g', hg'i, hg'M⟩ := h1 K (orth h P) (h.domRestrict₁₂ (orth h P) (orth h P)) hK
-    (hs.domRestrict (orth h P)) (res_nondeg hs hd hM₁ hsp₁) p hp _ _
-    (isSelfDualMod_res hM₁ hsp₁) (isSelfDualMod_res hM₂ hsp₂)
-  obtain ⟨g, hg, hgP, -, hgM⟩ := glue hs hc hsp₁ hsp₂ hag g' (fun x y => hg'i x y)
-    (fun x => hg'M x)
+  obtain ⟨g', hg'i, hg'M⟩ :=
+    h1 K (orth h P) (h.domRestrict₁₂ (orth h P) (orth h P)) hK (hs.domRestrict (orth h P))
+      (res_nondeg hs hd hM₁ hsp₁) p hp _ _ (isSelfDualMod_res hM₁ hsp₁) (isSelfDualMod_res hM₂ hsp₂)
+  obtain ⟨g, hg, hgP, -, hgM⟩ := glue hs hc hsp₁ hsp₂ hag g' (fun x y => hg'i x y) (fun x => hg'M x)
   exact ⟨g, hg, hgP, hgM⟩
 
 end Fix
 
 section Z
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [FiniteDimensional K V] {h : V →ₗ⋆[K] V →ₗ[K] K}
+variable
+  {K V : Type}
+  [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+  {h : V →ₗ⋆[K] V →ₗ[K] K}
 
-theorem isUnitIn_one_sub {p : Ideal (𝓞 K)} (hp : p.IsPrime) {a b : K}
-    (ha : a ∈ locRing p) (has : star a = a) (hna : ¬ IsUnitIn (locRing p) a) (hb : b ∈ locRing p) :
-    IsUnitIn (locRing p) (1 - a * b) := by
+theorem isUnitIn_one_sub
+    {p : Ideal (𝓞 K)} (hp : p.IsPrime)
+    {a b : K}
+    (ha : a ∈ locRing p) (has : star a = a) (hna : ¬ IsUnitIn (locRing p) a) (hb : b ∈ locRing p)
+    : IsUnitIn (locRing p) (1 - a * b) := by
   rw [mem_locRing, mem_locR_iff hp] at ha hb
   obtain ⟨r, s, hs, rfl⟩ := ha
   obtain ⟨r', t, ht, rfl⟩ := hb
   have hs0 := algebraMap_ne_zero_of_mem_hcompl hp hs
   have ht0 := algebraMap_ne_zero_of_mem_hcompl hp ht
-  have hr : ¬ (r ∉ p ∧ conjO K r ∉ p) := by
+  have hr : ¬(r ∉ p ∧ conjO K r ∉ p) := by
     intro hr'
     apply hna
     rw [isUnitIn_div_iff hp r hs, mem_hcompl_iff hp, mem_conjIdeal_iff]
     exact hr'
   have hsc := (mem_hcompl_iff hp s).mp hs
   rw [mem_conjIdeal_iff] at hsc
-  have e : star (algebraMap (𝓞 K) K r) * algebraMap (𝓞 K) K s =
-      algebraMap (𝓞 K) K r * star (algebraMap (𝓞 K) K s) := by
+  have e
+      : star (algebraMap (𝓞 K) K r) * algebraMap (𝓞 K) K s
+        = algebraMap (𝓞 K) K r * star (algebraMap (𝓞 K) K s) := by
     rw [star_div₀, div_eq_div_iff (star_ne_zero.mpr hs0) hs0] at has
     exact has
   have hrel : conjO K r * s = r * conjO K s := by
@@ -368,16 +395,20 @@ theorem isUnitIn_one_sub {p : Ideal (𝓞 K)} (hp : p.IsPrime) {a b : K}
   simp only [map_sub, map_mul]
   field_simp
 
-theorem exists_dual_one (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hs : h.IsSymm)
-    (hd : ∀ x, (∀ y, h x y = 0) → x = 0) {p : Ideal (𝓞 K)} (hp : p.IsMaximal) {z : V}
-    {M₁ : AddSubgroup V} (hM₁ : IsSelfDualMod (locRing p) h M₁) (hz₁ : z ∈ M₁)
-    (hp₁ : ∀ c : K, c • z ∈ M₁ → c ∈ locRing p) (hz0 : z ≠ 0) : ∃ y₁ ∈ M₁, h z y₁ = 1 := by
-  have hstar : ∀ {a : K}, a ∈ locRing p → star a ∈ locRing p :=
-    fun ha => star_mem_locRing hp.isPrime ha
-  let f : V →+ K :=
-    { toFun := fun m => h m z
-      map_zero' := by simp
-      map_add' := fun a b => by simp }
+theorem exists_dual_one
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hs : h.IsSymm)
+    (hd : ∀ x, (∀ y, h x y = 0) → x = 0)
+    {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+    {z : V} {M₁ : AddSubgroup V} (hM₁ : IsSelfDualMod (locRing p) h M₁) (hz₁ : z ∈ M₁)
+    (hp₁ : ∀ c : K, c • z ∈ M₁ → c ∈ locRing p) (hz0 : z ≠ 0)
+    : ∃ y₁ ∈ M₁, h z y₁ = 1 := by
+  have hstar : ∀ {a : K}, a ∈ locRing p → star a ∈ locRing p := fun ha =>
+    star_mem_locRing hp.isPrime ha
+  let f : V →+ K := {
+    toFun := fun m => h m z
+    map_zero' := by simp
+    map_add' := fun a b => by simp
+  }
   have hfA : ∀ a, a ∈ M₁.map f ↔ ∃ m ∈ M₁, h m z = a := fun a => AddSubgroup.mem_map
   have H1 : ∀ s ∈ locRing p, ∀ a ∈ M₁.map f, s * a ∈ M₁.map f := by
     intro s hs' a ha
@@ -416,12 +447,14 @@ theorem exists_dual_one (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hs
     rw [map_smul, smul_eq_mul, ← e]
     exact inv_mul_cancel₀ (star_ne_zero.mpr hα0)
 
-theorem zOnly (h1 : SemiGenusLoc) (h2 : PrimPlaneLoc) (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hs : h.IsSymm)
-    (hd : ∀ x, (∀ y, h x y = 0) → x = 0) {p : Ideal (𝓞 K)} (hp : p.IsMaximal) (z : V)
-    (M₁ M₂ : AddSubgroup V) (hM₁ : IsSelfDualMod (locRing p) h M₁)
+theorem zOnly
+    (h1 : SemiGenusLoc) (h2 : PrimPlaneLoc) (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
+    (hs : h.IsSymm) (hd : ∀ x, (∀ y, h x y = 0) → x = 0)
+    {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+    (z : V) (M₁ M₂ : AddSubgroup V) (hM₁ : IsSelfDualMod (locRing p) h M₁)
     (hM₂ : IsSelfDualMod (locRing p) h M₂) (hz₁ : z ∈ M₁) (hz₂ : z ∈ M₂)
-    (hp₁ : ∀ c : K, c • z ∈ M₁ → c ∈ locRing p) (hp₂ : ∀ c : K, c • z ∈ M₂ → c ∈ locRing p) :
-    ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, g z = z ∧ ∀ x, x ∈ M₁ ↔ g x ∈ M₂ := by
+    (hp₁ : ∀ c : K, c • z ∈ M₁ → c ∈ locRing p) (hp₂ : ∀ c : K, c • z ∈ M₂ → c ∈ locRing p)
+    : ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, g z = z ∧ ∀ x, x ∈ M₁ ↔ g x ∈ M₂ := by
   have hnzS : h z z ∈ locRing p := hM₁.int _ hz₁ _ hz₁
   have hnzs : star (h z z) = h z z := by
     have e := hs.eq z z
@@ -430,24 +463,29 @@ theorem zOnly (h1 : SemiGenusLoc) (h2 : PrimPlaneLoc) (hK : Formalism.HermitianL
   · obtain ⟨g, hg, hgM⟩ := h1 K V h hK hs hd p hp M₁ M₂ hM₁ hM₂
     exact ⟨g, hg, by rw [hz0, map_zero], hgM⟩
   by_cases hu : IsUnitIn (locRing p) (h z z)
-  · have hsp : ∀ {M : AddSubgroup V}, IsSelfDualMod (locRing p) h M → z ∈ M →
-        Splits h (Submodule.span K {z}) M := by
+  · have hsp
+        : ∀ {M : AddSubgroup V},
+          IsSelfDualMod (locRing p) h M → z ∈ M → Splits h (Submodule.span K {z}) M := by
       intro M hM hzM w hw
-      refine ⟨((h z z)⁻¹ * h z w) • z,
+      refine ⟨
+        ((h z z)⁻¹ * h z w) • z,
         hM.smul_mem _ ((locRing p).mul_mem hu.2.2 (hM.int _ hzM _ hw)) _ hzM,
-        Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self z), ?_⟩
+        Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self z),
+        ?_
+      ⟩
       rw [mem_orth]
       intro q hq
       obtain ⟨d, rfl⟩ := Submodule.mem_span_singleton.mp hq
       have e : h z (w - ((h z z)⁻¹ * h z w) • z) = 0 := by
-        rw [map_sub, map_smul, smul_eq_mul, mul_comm ((h z z)⁻¹) _, mul_assoc,
-          inv_mul_cancel₀ hu.1, mul_one, sub_self]
+        rw [map_sub, map_smul, smul_eq_mul, mul_comm ((h z z)⁻¹) _, mul_assoc, inv_mul_cancel₀ hu.1,
+          mul_one, sub_self]
       rw [map_smulₛₗ, LinearMap.smul_apply, e, smul_zero]
-    obtain ⟨g, hg, hgP, hgM⟩ := fix_of h1 hK hs hd hp (Submodule.span K {z}) hM₁ hM₂
-      (hsp hM₁ hz₁) (hsp hM₂ hz₂) (by
+    obtain ⟨g, hg, hgP, hgM⟩ :=
+      fix_of h1 hK hs hd hp (Submodule.span K {z}) hM₁ hM₂ (hsp hM₁ hz₁) (hsp hM₂ hz₂) (by
         intro w hw
         obtain ⟨d, rfl⟩ := Submodule.mem_span_singleton.mp hw
-        exact ⟨fun h' => hM₂.smul_mem _ (hp₁ d h') _ hz₂, fun h' => hM₁.smul_mem _ (hp₂ d h') _ hz₁⟩)
+        exact
+          ⟨fun h' => hM₂.smul_mem _ (hp₁ d h') _ hz₂, fun h' => hM₁.smul_mem _ (hp₂ d h') _ hz₁⟩)
     exact ⟨g, hg, hgP z (Submodule.mem_span_singleton_self z), hgM⟩
   obtain ⟨y₁, hy₁M, hzy₁⟩ := exists_dual_one hK hs hd hp hM₁ hz₁ hp₁ hz0
   have hbS : h y₁ y₁ ∈ locRing p := hM₁.int _ hy₁M _ hy₁M
@@ -490,9 +528,11 @@ theorem zOnly (h1 : SemiGenusLoc) (h2 : PrimPlaneLoc) (hK : Formalism.HermitianL
     intro x y
     rw [← starRingEnd_apply]
     exact hs.eq x y
-  have hiso : ∀ x y : Submodule.span K ({z, y₁} : Set V),
-      h ((T.comp (Submodule.span K ({z, y₁} : Set V)).subtype) x)
-        ((T.comp (Submodule.span K ({z, y₁} : Set V)).subtype) y) = h x y := by
+  have hiso
+      : ∀ x y : Submodule.span K ({z, y₁} : Set V),
+        h ((T.comp (Submodule.span K ({z, y₁} : Set V)).subtype) x)
+            ((T.comp (Submodule.span K ({z, y₁} : Set V)).subtype) y)
+          = h x y := by
     intro x y
     obtain ⟨α, β, hx⟩ := hQ x
     obtain ⟨α', β', hy⟩ := hQ y
@@ -522,8 +562,8 @@ theorem zOnly (h1 : SemiGenusLoc) (h2 : PrimPlaneLoc) (hK : Formalism.HermitianL
   have hTy : T y₁ = y₂ := by simpa using hT 0 1
   have hFz : F z = z := (hFf ⟨z, hzQ⟩).trans hTz
   have hFy : F y₁ = y₂ := (hFf ⟨y₁, hyQ⟩).trans hTy
-  have hmem' : ∀ x, x ∈ M₁.comap F.symm.toLinearMap.toAddMonoidHom ↔ F.symm x ∈ M₁ :=
-    fun x => Iff.rfl
+  have hmem' : ∀ x, x ∈ M₁.comap F.symm.toLinearMap.toAddMonoidHom ↔ F.symm x ∈ M₁ := fun x =>
+    Iff.rfl
   have hM₁' := isSelfDualMod_comap F hFi hM₁
   have hz' : z ∈ M₁.comap F.symm.toLinearMap.toAddMonoidHom := by
     rw [hmem', F.symm_apply_eq.mpr hFz.symm]
@@ -534,11 +574,13 @@ theorem zOnly (h1 : SemiGenusLoc) (h2 : PrimPlaneLoc) (hK : Formalism.HermitianL
   have hD₂ : IsUnitIn (locRing p) (1 - h z z * h y₂ y₂) := by
     rw [hy₂y₂]
     exact hD
-  obtain ⟨g₂, hg₂, hg₂P, hg₂M⟩ := fix_of h1 hK hs hd hp (Submodule.span K {z, y₂}) hM₁' hM₂
-    (splits_plane hs hM₁' hz' hy' hzy₂ hD₂) (splits_plane hs hM₂ hz₂ hy₂M hzy₂ hD₂) (by
-      intro w hw
-      obtain ⟨α, β, rfl⟩ := Submodule.mem_span_pair.mp hw
-      rw [mem_plane hs hM₁' hz' hy' hzy₂ hD₂, mem_plane hs hM₂ hz₂ hy₂M hzy₂ hD₂])
+  obtain ⟨g₂, hg₂, hg₂P, hg₂M⟩ :=
+    fix_of h1 hK hs hd hp (Submodule.span K {z, y₂}) hM₁' hM₂
+      (splits_plane hs hM₁' hz' hy' hzy₂ hD₂) (splits_plane hs hM₂ hz₂ hy₂M hzy₂ hD₂)
+      (by
+        intro w hw
+        obtain ⟨α, β, rfl⟩ := Submodule.mem_span_pair.mp hw
+        rw [mem_plane hs hM₁' hz' hy' hzy₂ hD₂, mem_plane hs hM₂ hz₂ hy₂M hzy₂ hD₂])
   have hg₂' : ∀ x y, h (g₂ x) (g₂ y) = h x y := hg₂
   refine ⟨F.trans g₂, ?_, ?_, ?_⟩
   · intro x y
@@ -565,8 +607,10 @@ theorem semiGenusZLoc_of (h1 : SemiGenusLoc) (h2 : PrimPlaneLoc) : SemiGenusZLoc
     | zero => simp
     | add y y' _ _ ihy ihy' => rw [map_add (f := _), LinearMap.add_apply, ihy, ihy', add_zero]
     | smul c y _ ihy => rw [map_smulₛₗ, LinearMap.smul_apply, ihy, smul_zero]
-  have hspl : ∀ {M : AddSubgroup V}, (∀ w ∈ M, ∃ w₁ ∈ M, w₁ ∈ Submodule.span K (Set.range s) ∧
-      ∀ a, h (s a) (w - w₁) = 0) → Splits h (Submodule.span K (Set.range s)) M := by
+  have hspl
+      : ∀ {M : AddSubgroup V},
+        (∀ w ∈ M, ∃ w₁ ∈ M, w₁ ∈ Submodule.span K (Set.range s) ∧ ∀ a, h (s a) (w - w₁) = 0)
+          → Splits h (Submodule.span K (Set.range s)) M := by
     intro M hM w hw
     obtain ⟨w₁, hw₁M, hw₁U, hw₁⟩ := hM w hw
     exact ⟨w₁, hw₁M, hw₁U, horth _ hw₁⟩
@@ -574,9 +618,12 @@ theorem semiGenusZLoc_of (h1 : SemiGenusLoc) (h2 : PrimPlaneLoc) : SemiGenusZLoc
   have hS₂ := hspl hsp₂
   have hc := isCompl_orth hs hd hM₁ hS₁
   have hzW : z ∈ orth h (Submodule.span K (Set.range s)) := horth z hsz
-  obtain ⟨g', hg'i, hg'z, hg'M⟩ := zOnly h1 h2 hK (hs.domRestrict _) (res_nondeg hs hd hM₁ hS₁) hp
-    (⟨z, hzW⟩ : orth h (Submodule.span K (Set.range s))) _ _ (isSelfDualMod_res hM₁ hS₁)
-    (isSelfDualMod_res hM₂ hS₂) hz₁ hz₂ (fun c hc' => hp₁ c hc') (fun c hc' => hp₂ c hc')
+  obtain ⟨g', hg'i, hg'z, hg'M⟩ :=
+    zOnly h1 h2 hK (hs.domRestrict _) (res_nondeg hs hd hM₁ hS₁) hp
+      (⟨z, hzW⟩ : orth h (Submodule.span K (Set.range s))) _ _ (isSelfDualMod_res hM₁ hS₁)
+      (isSelfDualMod_res hM₂ hS₂) hz₁ hz₂
+      (fun c hc' => hp₁ c hc')
+      (fun c hc' => hp₂ c hc')
   obtain ⟨g, hg, hgU, hgW, hgM⟩ := glue hs hc hS₁ hS₂ hag g' (fun x y => hg'i x y) (fun x => hg'M x)
   refine ⟨g, hg, fun a => hgU _ (Submodule.subset_span ⟨a, rfl⟩), ?_, hgM⟩
   have e := hgW ⟨z, hzW⟩

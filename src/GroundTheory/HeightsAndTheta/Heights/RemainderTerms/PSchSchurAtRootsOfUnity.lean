@@ -14,18 +14,20 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem schurAtRoots_place_lt {r k : ℕ} (nu : Fin r → ℕ) (hanti : Antitone nu)
-    (hsum : ∑ i, nu i = k) (i : Fin r) (hi : 1 ≤ nu i) : (i : ℕ) < k := by
+theorem schurAtRoots_place_lt
+    {r k : ℕ}
+    (nu : Fin r → ℕ) (hanti : Antitone nu) (hsum : ∑ i, nu i = k) (i : Fin r) (hi : 1 ≤ nu i)
+    : (i : ℕ) < k := by
   have h1 : (Iic i).card • 1 ≤ ∑ j ∈ Iic i, nu j :=
     Finset.card_nsmul_le_sum _ _ _ fun j hj => le_trans hi (hanti (Finset.mem_Iic.mp hj))
-  have h2 : ∑ j ∈ Iic i, nu j ≤ ∑ j, nu j :=
-    Finset.sum_le_sum_of_subset (Finset.subset_univ _)
+  have h2 : ∑ j ∈ Iic i, nu j ≤ ∑ j, nu j := Finset.sum_le_sum_of_subset (Finset.subset_univ _)
   rw [Fin.card_Iic, smul_eq_mul, mul_one] at h1
   omega
 
-theorem SchSchurAtRootsOfUnity.proof (h1 : SchSchurRowsToK.Statement)
-    (h2 : SchSchurEvalMatrix.Statement) (h3 : SchJTMatrixDetAtRoots.Statement) :
-    SchSchurAtRootsOfUnity.Statement := by
+theorem SchSchurAtRootsOfUnity.proof
+    (h1 : SchSchurRowsToK.Statement) (h2 : SchSchurEvalMatrix.Statement)
+    (h3 : SchJTMatrixDetAtRoots.Statement)
+    : SchSchurAtRootsOfUnity.Statement := by
   intro N r k nu hk hkN hanti hsum
   set nu' : Fin k → ℕ := fun i => if h : (i : ℕ) < r then nu ⟨i, h⟩ else 0 with hnu'
   have hplace := schurAtRoots_place_lt nu hanti hsum
@@ -41,8 +43,7 @@ theorem SchSchurAtRootsOfUnity.proof (h1 : SchSchurRowsToK.Statement)
 
   have hsum' : ∑ i, nu' i = k := by
     set g : ℕ → ℕ := fun i => if h : i < r then nu ⟨i, h⟩ else 0 with hg
-    have e1 : ∑ i, nu' i = ∑ i ∈ range k, g i := by
-      rw [← Fin.sum_univ_eq_sum_range]
+    have e1 : ∑ i, nu' i = ∑ i ∈ range k, g i := by rw [← Fin.sum_univ_eq_sum_range]
     have e2 : ∑ i, nu i = ∑ i ∈ range r, g i := by
       rw [← Fin.sum_univ_eq_sum_range]
       refine Finset.sum_congr rfl fun i _ => ?_
@@ -53,16 +54,16 @@ theorem SchSchurAtRootsOfUnity.proof (h1 : SchSchurRowsToK.Statement)
       split_ifs with h
       · by_contra hne
         have := hplace ⟨i, h⟩ (Nat.one_le_iff_ne_zero.mpr hne)
-        simp at this; omega
+        simp at this
+        omega
       · rfl
-    have hgr : ∀ i, r ≤ i → g i = 0 := by
-      intro i hi; simp only [hg]; rw [dite_eq_right (by omega)]
+    have hgr : ∀ i, r ≤ i → g i = 0 := by intro i hi; simp only [hg]; rw [dite_eq_right (by omega)]
     have e3 : ∑ i ∈ range k, g i = ∑ i ∈ range (r + k), g i :=
       Finset.sum_subset (Finset.range_mono (by omega)) fun i _ hni =>
-         hgk i (not_lt.mp (fun h => hni (Finset.mem_range.mpr h)))
+        hgk i (not_lt.mp (fun h => hni (Finset.mem_range.mpr h)))
     have e4 : ∑ i ∈ range r, g i = ∑ i ∈ range (r + k), g i :=
       Finset.sum_subset (Finset.range_mono (by omega)) fun i _ hni =>
-         hgr i (not_lt.mp (fun h => hni (Finset.mem_range.mpr h)))
+        hgr i (not_lt.mp (fun h => hni (Finset.mem_range.mpr h)))
     rw [e1, e3, ← e4, ← e2, hsum]
   rw [h1 (Fin N) r k nu hanti hsum, h2 N k k _ hk hkN, h3 k nu' hk hanti' hsum']
 
@@ -81,15 +82,25 @@ theorem SchSchurAtRootsOfUnity.proof (h1 : SchSchurRowsToK.Statement)
       · exact H ⟨i, h⟩ hi0
       · exact Nat.zero_le _
 
-  have hcard : (univ.filter fun i : Fin k => (i : ℕ) ≠ 0 ∧ nu' i = 1).card =
-      (univ.filter fun i : Fin r => (i : ℕ) ≠ 0 ∧ nu i = 1).card := by
+  have hcard
+      : (univ.filter fun i : Fin k => (i : ℕ) ≠ 0 ∧ nu' i = 1).card
+        = (univ.filter fun i : Fin r => (i : ℕ) ≠ 0 ∧ nu i = 1).card := by
     refine Finset.card_bij'
-      (fun i hi => ⟨i, by
-        simp only [Finset.mem_filter, Finset.mem_univ, true_and, hnu'] at hi
-        by_contra h; rw [dite_eq_right h] at hi; omega⟩)
-      (fun i hi => ⟨i, by
-        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hi
-        exact hplace i (by omega)⟩) ?_ ?_ ?_ ?_
+      (fun i hi => ⟨
+        i,
+        by
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and, hnu'] at hi
+          by_contra h
+          rw [dite_eq_right h] at hi
+          omega
+      ⟩)
+      (fun i hi => ⟨
+        i,
+        by
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hi
+          exact hplace i (by omega)
+      ⟩)
+      ?_ ?_ ?_ ?_
     · intro i hi
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, hnu'] at hi ⊢
       obtain ⟨h0, h1⟩ := hi
@@ -98,7 +109,8 @@ theorem SchSchurAtRootsOfUnity.proof (h1 : SchSchurRowsToK.Statement)
     · intro i hi
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, hnu'] at hi ⊢
       refine ⟨hi.1, ?_⟩
-      rw [dif_pos i.isLt]; exact hi.2
+      rw [dif_pos i.isLt]
+      exact hi.2
     · intro i hi; rfl
     · intro i hi; rfl
   simp only [hcond, hcard]

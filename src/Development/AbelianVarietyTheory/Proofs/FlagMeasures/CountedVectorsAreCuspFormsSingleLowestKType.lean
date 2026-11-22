@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsContinu
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 noncomputable section
@@ -28,10 +29,11 @@ private theorem one_mem_Kg_flag_measures (I : AutInst) (g : ℕ) : (1 : I.Gf) �
   · show (1 : I.Gf) ∈ I.Kset
     simp only [AutInst.Kset, Set.mem_ofPred_eq, OneMemClass.coe_one]
     exact one_mem _
-  · simp only [AutInst.fmat, OneMemClass.coe_one, Units.val_one, sub_self, Matrix.zero_mulVec, smul_zero]
+  · simp only [AutInst.fmat, OneMemClass.coe_one, Units.val_one, sub_self, Matrix.zero_mulVec,
+      smul_zero]
 
-theorem level_comp_Re (B : RowsAut) (k : B.I.Gf) (hk : k ∈ B.I.Kg B.g) (hg : 1 ≤ B.g) :
-    (B.R (1, k)).comp B.Re = B.Re := by
+theorem level_comp_Re (B : RowsAut) (k : B.I.Gf) (hk : k ∈ B.I.Kg B.g) (hg : 1 ≤ B.g)
+    : (B.R (1, k)).comp B.Re = B.Re := by
   obtain ⟨h1, hm, hn, -⟩ := GlobalTheory.RightRegFund.rightReg_unitary_continuous B
   set π : B.I.Gf → (B.I.L2 B.μf B.fund →L[ℂ] B.I.L2 B.μf B.fund) := fun g => B.R (1, g) with hπ
   have p1 : π 1 = 1 := h1
@@ -49,44 +51,66 @@ theorem level_comp_Re (B : RowsAut) (k : B.I.Gf) (hk : k ∈ B.I.Kg B.g) (hg : 1
   rw [ContinuousLinearMap.comp_apply]
   change inner ℂ x (π k (B.Re y)) = _
   rw [GlobalTheory.IdemProj.inner_rep π p1 pm pn, B.Re_spec.2, B.Re_spec.2]
-  have key : ∀ g, B.e g * inner ℂ (π k⁻¹ x) (B.R (1, g) y)
-      = (fun g' => B.e g' * inner ℂ x (B.R (1, g') y)) (k * g) := by
+  have key
+      : ∀ g,
+        B.e g * inner ℂ (π k⁻¹ x) (B.R (1, g) y)
+          = (fun g' => B.e g' * inner ℂ x (B.R (1, g') y)) (k * g) := by
     intro g
     have e1 : inner ℂ (π k⁻¹ x) (B.R (1, g) y) = inner ℂ x (π k (π g y)) := by
       rw [GlobalTheory.IdemProj.inner_rep π p1 pm pn k x]
     have e2 : π k (π g y) = B.R (1, k * g) y := by
       show π k (π g y) = π (k * g) y
-      rw [pm]; rfl
+      rw [pm]
+      rfl
     simp only [e1, e2, he]
   simp_rw [key]
   exact MeasureTheory.integral_mul_left_eq_self (fun g' => B.e g' * inner ℂ x (B.R (1, g') y)) k
 
-theorem integrable_ph (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (h : ℝ) (hd : IsDSData B d) (hn : 1 ≤ B.I.n)
-    (hh : ∀ v, 120 * (B.I.n : ℝ) * ((rkR (B.I.ε v) : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h) (hl : LocDec B h) :
-    Integrable (ph B d) (muInf B.I) := by
+theorem integrable_ph
+    (B : RowsAut) (d : InfinitePlace B.I.F → ℝ)
+    (h : ℝ)
+    (hd : IsDSData B d) (hn : 1 ≤ B.I.n)
+    (hh : ∀ v, 120 * (B.I.n : ℝ) * ((rkR (B.I.ε v) : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h) (hl : LocDec B h)
+    : Integrable (ph B d) (muInf B.I) := by
   obtain ⟨hc, hb, hi⟩ := GlobalTheory.Dec.PhMajProof.phMaj B d h hd hl
-  have hcond : ∀ v, rkR (B.I.ε v) = 0 ∨
-      8 * Real.sqrt (rkR (B.I.ε v)) * (0 + 4 * B.I.n * rkR (B.I.ε v)) < h := by
+  have hcond
+      : ∀ v,
+        rkR (B.I.ε v) = 0
+          ∨ 8 * Real.sqrt (rkR (B.I.ε v)) * (0 + 4 * B.I.n * rkR (B.I.ε v)) < h := by
     intro v
     rcases Nat.eq_zero_or_pos (rkR (B.I.ε v)) with h0 | hpos
     · exact Or.inl h0
     · right
       have hq : (0 : ℝ) < (rkR (B.I.ε v) : ℝ) := by exact_mod_cast hpos
       have hnr : (1 : ℝ) ≤ (B.I.n : ℝ) := by exact_mod_cast hn
-      have hpow : ((rkR (B.I.ε v) : ℕ) : ℝ) ^ ((3 : ℝ) / 2)
-          = Real.sqrt (rkR (B.I.ε v)) * (rkR (B.I.ε v) : ℝ) := by
-        rw [Real.sqrt_eq_rpow, show (3 : ℝ) / 2 = 1 / 2 + 1 by norm_num,
-          Real.rpow_add hq, Real.rpow_one]
+      have hpow
+          : ((rkR (B.I.ε v) : ℕ) : ℝ) ^ ((3 : ℝ) / 2)
+            = Real.sqrt (rkR (B.I.ε v)) * (rkR (B.I.ε v) : ℝ) := by
+        rw [Real.sqrt_eq_rpow, show (3 : ℝ) / 2 = 1 / 2 + 1 by norm_num, Real.rpow_add hq,
+          Real.rpow_one]
       have hs : 0 < Real.sqrt (rkR (B.I.ε v)) := Real.sqrt_pos.mpr hq
       have hv := hh v
       rw [hpow] at hv
-      have hpos' : 0 < Real.sqrt (rkR (B.I.ε v)) * (rkR (B.I.ε v) : ℝ) * (B.I.n : ℝ) := by positivity
+      have hpos' : 0 < Real.sqrt (rkR (B.I.ε v)) * (rkR (B.I.ε v) : ℝ) * (B.I.n : ℝ) := by
+        positivity
       nlinarith
   have hI := hi 0 le_rfl hcond
   simp only [zero_mul, Real.exp_zero, mul_one] at hI
   exact hI.mono' hc.aestronglyMeasurable (Filter.Eventually.of_forall hb)
 
-theorem row_isCuspFn : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (h : ℝ), IsDSData B d → (∀ v, Formalism.MainNotions.S.IsKTypeOf (B.I.ε v) (B.σ v) (Formalism.QuantumDeterminants.lowK (B.I.ε v) (B.lam v)) (Formalism.MainNotions.S.lowKSub (B.I.ε v) (B.lam v) (B.σ v))) → 1 ≤ B.g → (∀ v, 120 * (B.I.n : ℝ) * ((rkR (B.I.ε v) : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h) → LocDec B h → HBig B 40 h → ∀ T, B.I.IsRConv B.μf B.fund B.R (phe B d) T → ∀ A ∈ B.I.eHom B.σs B.μf B.fund B.R B.Re, B.I.IsCuspFn (B.I.muA B.μf) (B.I.ext (A (B.tens B.w))) := by
+theorem row_isCuspFn
+    : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (h : ℝ),
+      IsDSData B d
+        → (∀ v,
+          Formalism.MainNotions.S.IsKTypeOf (B.I.ε v) (B.σ v)
+            (Formalism.QuantumDeterminants.lowK (B.I.ε v) (B.lam v))
+            (Formalism.MainNotions.S.lowKSub (B.I.ε v) (B.lam v) (B.σ v)))
+        → 1 ≤ B.g → (∀ v, 120 * (B.I.n : ℝ) * ((rkR (B.I.ε v) : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h)
+        → LocDec B h → HBig B 40 h
+        → ∀ T,
+          B.I.IsRConv B.μf B.fund B.R (phe B d) T
+            → ∀ A ∈ B.I.eHom B.σs B.μf B.fund B.R B.Re,
+              B.I.IsCuspFn (B.I.muA B.μf) (B.I.ext (A (B.tens B.w))) := by
   intro B d h hd hK hg hh hl hbig T hT A hA
   rcases Nat.eq_zero_or_pos B.I.n with hn0 | hnpos
   · intro W hW
@@ -105,14 +129,18 @@ theorem row_isCuspFn : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (h : 
     intro g
     rw [ContinuousLinearMap.comp_assoc, hA₀' g, ← ContinuousLinearMap.comp_assoc, hcomm g,
       ContinuousLinearMap.comp_assoc]
-  have hlev : ∀ k ∈ B.I.Kg B.g, B.R (1, k) ((B.Re.comp A₀) (B.tens B.w)) = (B.Re.comp A₀) (B.tens B.w) := by
+  have hlev
+      : ∀ k ∈ B.I.Kg B.g,
+        B.R (1, k) ((B.Re.comp A₀) (B.tens B.w)) = (B.Re.comp A₀) (B.tens B.w) := by
     intro k hk
     rw [ContinuousLinearMap.comp_apply, ← ContinuousLinearMap.comp_apply (B.R (1, k)) B.Re,
       level_comp_Re B k hk hg]
-  obtain ⟨C, hC⟩ := GlobalTheory.T.exists_continuousRepresentative_bounded_evaluation B d hd hK hn hg
+  obtain ⟨C, hC⟩ :=
+    GlobalTheory.T.exists_continuousRepresentative_bounded_evaluation B d hd hK hn hg
   obtain ⟨f, hf, hfb⟩ := hC _ hhom hlev
   have hvan := GlobalTheory.T.realUnipotent_integral_discreteSeries_vanish B d h hd hK hl hh
-  refine (GlobalTheory.T.cuspidal_of_convolution_fixed_moderate_growth B d h hd hvan hl hbig T hT _ f (C * ‖(B.Re.comp A₀) (B.tens B.w)‖) ?_ hf ?_).2
+  refine (GlobalTheory.T.cuspidal_of_convolution_fixed_moderate_growth B d h hd hvan hl hbig T hT _
+    f (C * ‖(B.Re.comp A₀) (B.tens B.w)‖) ?_ hf ?_).2
   · simpa using hfix
   · intro x
     exact (hfb x).trans_eq (by ring)

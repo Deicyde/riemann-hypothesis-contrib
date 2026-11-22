@@ -16,33 +16,45 @@ namespace Formalism.L2.FormalSeriesBounds
 namespace UpFBr
 
 open Formalism.IncomingBounds CharacteristicFromRanks ValuationFitting
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF IsLocalRing
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 section Inst
 
-variable {C : Type} [Field C] [CharZero C] {V : VF C} {OE : Type} [CommRing OE] [StarRing OE] {dd : ℕ} {d : ℕ} [NeZero d]
+variable
+  {C : Type} [Field C] [CharZero C]
+  {V : VF C} {OE : Type} [CommRing OE] [StarRing OE]
+  {dd : ℕ} {d : ℕ} [NeZero d]
   {I0 : Type} [Fintype I0]
 
-def EigInS {Y : FBChart C V OE dd} (p : SelfData Y d I0) (R : Type) [CommRing R] [Algebra R C]
-    (actR : OE → Fin dd → PS R 1 dd) (emR : ZMod d → OE →+* R) : Prop :=
-  ∃ (r : (OE →+* R) → ℕ) (W : ∀ τ : OE →+* R, Fin (r τ) → Fin dd → R), (∀ τ, IsEigBasis actR τ (W τ)) ∧
-    ∀ a, ∃ e : Fin (r (emR a)) ≃ {x : I0 // p.ty0 x = a},
-      ∀ c i, algebraMap R C (W (emR a) c i) = p.e (e c) i
+def EigInS
+    {Y : FBChart C V OE dd} (p : SelfData Y d I0)
+    (R : Type) [CommRing R] [Algebra R C]
+    (actR : OE → Fin dd → PS R 1 dd) (emR : ZMod d → OE →+* R)
+    : Prop :=
+  ∃ (r : (OE →+* R) → ℕ) (W : ∀ τ : OE →+* R, Fin (r τ) → Fin dd → R),
+    (∀ τ, IsEigBasis actR τ (W τ))
+      ∧ ∀ a, ∃ e : Fin (r (emR a)) ≃ {x : I0 // p.ty0 x = a}, ∀ c i,
+        algebraMap R C (W (emR a) c i) = p.e (e c) i
 
 section Eig
 
 variable {R : Type} [CommRing R] [Algebra R C]
 
-theorem eig_atS {Y : FBChart C V OE dd} (p : SelfData Y d I0) (hinj : Function.Injective (algebraMap R C))
-    (hsurj : ∀ x : C, V.Ge 0 x → ∃ r : R, algebraMap R C r = x) (hR : ∀ x : R, V.Ge 0 (algebraMap R C x))
+theorem eig_atS
+    {Y : FBChart C V OE dd} (p : SelfData Y d I0)
+    (hinj : Function.Injective (algebraMap R C))
+    (hsurj : ∀ x : C, V.Ge 0 x → ∃ r : R, algebraMap R C r = x)
+    (hR : ∀ x : R, V.Ge 0 (algebraMap R C x))
     (actR : OE → Fin dd → PS R 1 dd) (hact : ∀ a i, Y.B.A.act a i = toC (actR a i))
-    (τ : OE →+* R) (a : ZMod d) (hτ : ∀ x, algebraMap R C (τ x) = p.em a x) :
-    ∃ (s : ℕ) (W : Fin s → Fin dd → R) (e : Fin s ≃ {x : I0 // p.ty0 x = a}), IsEigBasis actR τ W ∧
-      ∀ c i, algebraMap R C (W c i) = p.e (e c) i := by
+    (τ : OE →+* R) (a : ZMod d) (hτ : ∀ x, algebraMap R C (τ x) = p.em a x)
+    : ∃ (s : ℕ) (W : Fin s → Fin dd → R) (e : Fin s ≃ {x : I0 // p.ty0 x = a}),
+      IsEigBasis actR τ W ∧ ∀ c i, algebraMap R C (W c i) = p.e (e c) i := by
   choose lift hlift using hsurj
   let S := {x : I0 // p.ty0 x = a}
   let e : Fin (Fintype.card S) ≃ S := (Fintype.equivFin S).symm
@@ -80,8 +92,9 @@ theorem eig_atS {Y : FBChart C V OE dd} (p : SelfData Y d I0) (hinj : Function.I
       intro c
       rw [← hcoef c]
       exact VF.Ge.sum (fun x _ => by rw [hvC x]; exact (hR (v x)).mul_int (hw1 x c))
-    have hsum : ∀ F : I0 → C, (∀ c, p.ty0 c ≠ a → F c = 0) →
-        ∑ c, F c = ∑ k : Fin (Fintype.card S), F (e k) := by
+    have hsum
+        : ∀ F : I0 → C,
+          (∀ c, p.ty0 c ≠ a → F c = 0) → ∑ c, F c = ∑ k : Fin (Fintype.card S), F (e k) := by
       intro F hF
       rw [← Fintype.sum_subtype_add_sum_subtype (fun c => p.ty0 c = a) F]
       rw [Fintype.sum_eq_zero (fun x : {c // ¬ p.ty0 c = a} => F x) (fun x => hF x x.2), add_zero]
@@ -100,7 +113,7 @@ theorem eig_atS {Y : FBChart C V OE dd} (p : SelfData Y d I0) (hinj : Function.I
         intro j
         rw [hvC, ← hc']
         set_option synthInstance.maxHeartbeats 100000 in
-          simp [Finset.sum_apply, map_sum, hu]
+        simp [Finset.sum_apply, map_sum, hu]
       simp_rw [h2, Finset.sum_mul]
       rw [Finset.sum_comm]
       simp_rw [_root_.mul_assoc, ← Finset.mul_sum, hw2]
@@ -113,12 +126,14 @@ theorem eig_atS {Y : FBChart C V OE dd} (p : SelfData Y d I0) (hinj : Function.I
       · intro h
         exact absurd (Finset.mem_univ k) h
 
-theorem eigInS_of_integral_lifts {Y : FBChart C V OE dd} (p : SelfData Y d I0) (vm : Valuation C NNReal)
-    (hv : vm.Integers R) (hsurj : ∀ x : C, V.Ge 0 x → ∃ r : R, algebraMap R C r = x)
+theorem eigInS_of_integral_lifts
+    {Y : FBChart C V OE dd} (p : SelfData Y d I0)
+    (vm : Valuation C NNReal) (hv : vm.Integers R)
+    (hsurj : ∀ x : C, V.Ge 0 x → ∃ r : R, algebraMap R C r = x)
     (hR : ∀ x : R, V.Ge 0 (algebraMap R C x))
     (actR : OE → Fin dd → PS R 1 dd) (hact : ∀ a i, Y.B.A.act a i = toC (actR a i))
-    (emR : ZMod d → OE →+* R) (hem : ∀ a x, algebraMap R C (emR a x) = p.em a x) :
-    EigInS p R actR emR := by
+    (emR : ZMod d → OE →+* R) (hem : ∀ a x, algebraMap R C (emR a x) = p.em a x)
+    : EigInS p R actR emR := by
   have hsep : ∀ a a', emR a = emR a' → a = a' := by
     intro a a' h
     by_contra hne
@@ -126,9 +141,13 @@ theorem eigInS_of_integral_lifts {Y : FBChart C V OE dd} (p : SelfData Y d I0) (
     have h1 : p.em a x = p.em a' x := by rw [← hem, ← hem, h]
     rw [h1, sub_self, AddValuation.map_zero] at hx
     simp at hx
-  have key : ∀ τ : OE →+* R, ∃ (s : ℕ) (W : Fin s → Fin dd → R), IsEigBasis actR τ W ∧
-      ∀ a, emR a = τ → ∃ e : Fin s ≃ {x : I0 // p.ty0 x = a},
-        ∀ c i, algebraMap R C (W c i) = p.e (e c) i := by
+  have key
+      : ∀ τ : OE →+* R, ∃ (s : ℕ) (W : Fin s → Fin dd → R),
+        IsEigBasis actR τ W
+          ∧ ∀ a,
+            emR a = τ
+              → ∃ e : Fin s ≃ {x : I0 // p.ty0 x = a}, ∀ c i,
+                algebraMap R C (W c i) = p.e (e c) i := by
     intro τ
     by_cases h : ∃ a, emR a = τ
     · obtain ⟨a, rfl⟩ := h
@@ -147,24 +166,31 @@ theorem eigInS_of_integral_lifts {Y : FBChart C V OE dd} (p : SelfData Y d I0) (
 
 end Eig
 
-theorem afBoundS_of_upFLaw (Y : FBChart C V OE dd) (p : SelfData Y d I0)
-    (vm : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C] (hv : vm.Integers R)
-    [Fact ¬IsUnit ((V.l : ℕ) : R)] [IsAdicComplete (Ideal.span {((V.l : ℕ) : R)}) R] [IsLocalRing R] [Algebra ℤ_[V.l] R]
+theorem afBoundS_of_upFLaw
+    (Y : FBChart C V OE dd) (p : SelfData Y d I0)
+    (vm : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : vm.Integers R)
+    [Fact ¬ IsUnit ((V.l : ℕ) : R)] [IsAdicComplete (Ideal.span {((V.l : ℕ) : R)}) R]
+    [IsLocalRing R] [Algebra ℤ_[V.l] R]
     (hMM : ∀ x : R, V.MM (algebraMap R C x) → x ∈ maximalIdeal R)
-    (T : Type) [CommRing T] (FT : Fin dd → PS T 2 dd)
-    (actT : OE → Fin dd → PS T 1 dd) (hL : UpFLaw V.l T OE dd FT actT)
+    (T : Type) [CommRing T]
+    (FT : Fin dd → PS T 2 dd) (actT : OE → Fin dd → PS T 1 dd) (hL : UpFLaw V.l T OE dd FT actT)
     (iota : T →+* R) (hloc : IsLocalHom iota)
-    (emR : ZMod d → OE →+* R) (hem : ∀ a x, algebraMap R C (emR a x) = p.em a x)
-    (hPl : PlaceIn V.l OE R d emR)
-    (hEig : EigInS p R (fun a i => MvPowerSeries.map iota (actT a i)) emR) :
-    AFBoundS Y p vm R (fun i => MvPowerSeries.map iota (FT i)) := by
+    (emR : ZMod d → OE →+* R)
+    (hem : ∀ a x, algebraMap R C (emR a x) = p.em a x) (hPl : PlaceIn V.l OE R d emR)
+    (hEig : EigInS p R (fun a i => MvPowerSeries.map iota (actT a i)) emR)
+    : AFBoundS Y p vm R (fun i => MvPowerSeries.map iota (FT i)) := by
   have := Y.algClosed
   intro a
   obtain ⟨w, iN, t, jj, hj1, hjt, hbas⟩ := hPl
   obtain ⟨r, W, hW, hWe⟩ := hEig
   have hinj : Function.Injective (algebraMap R C) := hv.hom_inj
-  have hfrob : ∀ (j : Fin w.n) (x : OE), ((t (j + 1) : Emb (O := R) w.e) : OE →+* R) x -
-      (((t j : Emb (O := R) w.e) : OE →+* R) x) ^ V.l ∈ maximalIdeal R := by
+  have hfrob
+      : ∀ (j : Fin w.n) (x : OE),
+        ((t (j + 1) : Emb (O := R) w.e) : OE →+* R) x
+            - (((t j : Emb (O := R) w.e) : OE →+* R) x) ^ V.l
+          ∈ maximalIdeal R := by
     intro j x
     obtain ⟨a', rfl⟩ := jj.surjective j
     rw [← hj1, hjt, hjt]
@@ -173,7 +199,8 @@ theorem afBoundS_of_upFLaw (Y : FBChart C V OE dd) (p : SelfData Y d I0)
     exact p.em_frob a' x
   obtain ⟨xs, hAF, hle⟩ := hL C vm R hv iota hloc w t hbas hfrob r W hW (jj a)
   obtain ⟨e, he⟩ := hWe a
-  have hconj : ∀ b, (emR b).comp ((starRingAut : RingAut OE) : OE ≃+* OE).toRingHom = emR (b + p.hd) := by
+  have hconj
+      : ∀ b, (emR b).comp ((starRingAut : RingAut OE) : OE ≃+* OE).toRingHom = emR (b + p.hd) := by
     intro b
     ext x
     apply hinj
@@ -189,9 +216,11 @@ theorem afBoundS_of_upFLaw (Y : FBChart C V OE dd) (p : SelfData Y d I0)
   refine ⟨r (emR a), e, W (emR a), xs, he, ?_, ?_⟩
   · rw [hjt a] at hAF
     exact hAF
-  · have hs : S4.frobSum V.l (fun b => rk0 p (b + p.hd)) a = ∑' n : ℕ, ((V.l : ℝ) ^ (-((n : ℝ) + 1))) *
-          (r (((t (jj a + Fin.ofNat w.n (n + 1)) : Emb (O := R) w.e) : OE →+* R).comp
-            ((starRingAut : RingAut OE) : OE ≃+* OE).toRingHom) : ℝ) := by
+  · have hs
+        : S4.frobSum V.l (fun b => rk0 p (b + p.hd)) a
+          = ∑' n : ℕ, ((V.l : ℝ) ^ (-((n : ℝ) + 1))) *
+            (r (((t (jj a + Fin.ofNat w.n (n + 1)) : Emb (O := R) w.e) : OE →+* R).comp
+              ((starRingAut : RingAut OE) : OE ≃+* OE).toRingHom) : ℝ) := by
       unfold S4.frobSum
       refine tsum_congr fun n => ?_
       rw [← jj_add jj hj1 a (n + 1), hjt, hconj, hrk, rpow_neg_succ V.l_prime.pos]
@@ -199,23 +228,27 @@ theorem afBoundS_of_upFLaw (Y : FBChart C V OE dd) (p : SelfData Y d I0)
     rw [map_natCast] at hle
     exact hle
 
-theorem upCharS_of_upFLaw_RR [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE]
+theorem upCharS_of_upFLaw_RR
+    [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE]
     (hPlace : Pl.PlaceCriterionOfIdempotent)
-    (Y : FBChart C V OE dd) (p : SelfData Y d I0) (hr : (Y.rawSelf p).RankHyp)
-    (Hc : ∀ g, (Y.rawSelf p).CartHyp V g)
-    (T : Type) [CommRing T] (FT : Fin dd → PS T 2 dd)
-    (actT : OE → Fin dd → PS T 1 dd) (hL : UpFLaw V.l T OE dd FT actT)
+    (Y : FBChart C V OE dd) (p : SelfData Y d I0)
+    (hr : (Y.rawSelf p).RankHyp) (Hc : ∀ g, (Y.rawSelf p).CartHyp V g)
+    (T : Type) [CommRing T]
+    (FT : Fin dd → PS T 2 dd) (actT : OE → Fin dd → PS T 1 dd) (hL : UpFLaw V.l T OE dd FT actT)
     (i0 : T →+* C) (hint : ∀ t, V.Ge 0 (i0 t)) (hloc : ∀ t, V.v (i0 t) = 0 → IsUnit t)
     (hF : ∀ i, Y.B.G.F i = MvPowerSeries.map i0 (FT i))
     (hact : ∀ a i, Y.B.A.act a i = MvPowerSeries.map i0 (actT a i))
-    (hdisc : ¬ ((V.l : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE))) : UPCharSelfSt Y p Hc := by
+    (hdisc : ¬((V.l : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE)))
+    : UPCharSelfSt Y p Hc := by
   obtain ⟨P⟩ := ringPkSt_holds C V Y.cpl
   let _ := P.loc
   let _ := P.alg
-  have : Fact ¬IsUnit ((V.l : ℕ) : V.RR) := ⟨P.nonunit⟩
+  have : Fact ¬ IsUnit ((V.l : ℕ) : V.RR) := ⟨P.nonunit⟩
   have := P.cpl
   let iota : T →+* V.RR := i0.codRestrict V.RR hint
-  have hcomp : ∀ {n : ℕ} (f : PS T n dd), toC (C := C) (MvPowerSeries.map iota f) = MvPowerSeries.map i0 f := by
+  have hcomp
+      : ∀ {n : ℕ} (f : PS T n dd),
+        toC (C := C) (MvPowerSeries.map iota f) = MvPowerSeries.map i0 f := by
     intro n f
     ext mu
     simp only [MvPowerSeries.coeff_map]
@@ -225,20 +258,30 @@ theorem upCharS_of_upFLaw_RR [IsDedekindDomain OE] [CharZero OE] [Module.Free �
   have hlocI : IsLocalHom iota := ⟨fun t ht => hloc t (v_of_isUnit_RR ht)⟩
   have hlm : ((V.l : ℕ) : V.RR) ∈ maximalIdeal V.RR := (mem_maximalIdeal _).2 P.nonunit
   have hPl : PlaceIn V.l OE V.RR d emR := by
-    refine placeSt_of_X hPlace V.l OE V.RR hlm hdisc d emR (fun a x => P.mm _ ?_) (fun a a' haa => ?_) ?_
+    refine
+      placeSt_of_X hPlace V.l OE V.RR hlm hdisc d emR (fun a x => P.mm _ ?_) (fun a a' haa => ?_) ?_
     · exact p.em_frob a x
     · obtain ⟨x, hx⟩ := p.em_sep a a' haa
       exact ⟨x, fun hm => (mem_maximalIdeal _).1 hm (isUnit_RR hx)⟩
     · obtain ⟨ε, h1, h2, h3⟩ := p.em_unr
       refine ⟨ε, h1, fun a => P.mm _ (h2 a), fun x hx => h3 x fun a => ?_⟩
       have h4 : (0 : WithTop ℝ) ≤ V.v (p.em a x) := p.em_int a x
-      exact lt_of_le_of_ne h4 fun h5 => (mem_maximalIdeal _).1 (hx a) (isUnit_RR (x := emR a x) h5.symm)
+      exact lt_of_le_of_ne h4 fun h5 =>
+        (mem_maximalIdeal _).1 (hx a) (isUnit_RR (x := emR a x) h5.symm)
   have hEig : EigInS p V.RR (fun a i => MvPowerSeries.map iota (actT a i)) emR :=
-    eigInS_of_integral_lifts p P.vm P.int (fun x hx => ⟨⟨x, hx⟩, rfl⟩) (fun x => x.2) _
-      (fun a i => by rw [hcomp]; exact hact a i) emR hem
-  refine upCharS_of_afBound Y p hr Hc P.vm V.RR P.tie P.int P.pos P.lt (fun i => MvPowerSeries.map iota (FT i))
-    (fun i => by rw [hcomp]; exact hF i) ?_
-    (afBoundS_of_upFLaw Y p P.vm V.RR P.int (fun x hx => P.mm x hx) T FT actT hL iota hlocI emR hem hPl hEig)
+    eigInS_of_integral_lifts p P.vm P.int
+      (fun x hx => ⟨⟨x, hx⟩, rfl⟩)
+      (fun x => x.2)
+      _
+      (fun a i => by rw [hcomp]; exact hact a i)
+      emR hem
+  refine upCharS_of_afBound Y p hr Hc P.vm V.RR P.tie P.int P.pos P.lt
+    (fun i => MvPowerSeries.map iota (FT i))
+    (fun i => by rw [hcomp]; exact hF i)
+    ?_
+    (afBoundS_of_upFLaw Y p P.vm V.RR P.int
+      (fun x hx => P.mm x hx)
+      T FT actT hL iota hlocI emR hem hPl hEig)
   intro i
   apply P.int.hom_inj
   have h5 := Y.B.G.const i
@@ -251,19 +294,23 @@ section Chart
 
 open Formalism.L2.Pj NumberField
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)]
 
-
 variable {Xo c} in
-theorem upCharS_at_chartL {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} {C3 : IntChart T io y}
-    {C : Type} [Field C] [CharZero C] {V : VF C} {ie : T.Fr →+* C} (hPlace : Pl.PlaceCriterionOfIdempotent)
-    (hL : UpFLaw V.l T.V (𝓞 E) (chD C3.ch) C3.FT C3.actT)
-    (hie : EmbOK T V ie) (hd : ¬ ((V.l : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ (𝓞 E))))
+theorem upCharS_at_chartL
+    {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} {C3 : IntChart T io y} {C : Type}
+    [Field C] [CharZero C]
+    {V : VF C} {ie : T.Fr →+* C}
+    (hPlace : Pl.PlaceCriterionOfIdempotent) (hL : UpFLaw V.l T.V (𝓞 E) (chD C3.ch) C3.FT C3.actT)
+    (hie : EmbOK T V ie) (hd : ¬((V.l : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ (𝓞 E))))
     {k : ℕ} {Y : FBChart C V (𝓞 E) (chD C3.ch)} (hY : IsBC C3 ie k Y)
-    {Orb : Type} {d : ℕ} [NeZero d] {lab : LabS E C Orb d} (ha : LabSArith V io ie lab) (hg : LabSGeo C3 ie Y lab)
-    (hr : lab.RankOK Dw) (o : Orb) (Hc : ∀ g, (Y.rawSelf (selfOfLab ha hg o)).CartHyp V g) :
-    UPCharSelfSt Y (selfOfLab ha hg o) Hc := by
+    {Orb : Type} {d : ℕ} [NeZero d]
+    {lab : LabS E C Orb d}
+    (ha : LabSArith V io ie lab) (hg : LabSGeo C3 ie Y lab) (hr : lab.RankOK Dw)
+    (o : Orb) (Hc : ∀ g, (Y.rawSelf (selfOfLab ha hg o)).CartHyp V g)
+    : UPCharSelfSt Y (selfOfLab ha hg o) Hc := by
   have h := chart_ties hie hY
   have hrank : (Y.rawSelf (selfOfLab ha hg o)).RankHyp := by
     refine { big_compl := (hr o).1, rk_big := ?_, rk_small := ?_ }
@@ -274,7 +321,8 @@ theorem upCharS_at_chartL {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io}
         exact Finset.filter_congr (fun _ _ => Iff.rfl)
       · intro a hb
         simp only [FBChart.rawSelf, selfOfLab, ite_eq_right (by decide : (1 : Fin 2) ≠ 0)]
-        exact (card_sigma_shift (fun b => Dw.mult (lab.tau o b)) lab.hd a).trans ((hr o).2.2.2.1 a hb)
+        exact (card_sigma_shift (fun b => Dw.mult (lab.tau o b)) lab.hd a).trans
+          ((hr o).2.2.2.1 a hb)
     · refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
       · intro a hb
         simp only [FBChart.rawSelf, selfOfLab]
@@ -282,10 +330,10 @@ theorem upCharS_at_chartL {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io}
         exact Finset.filter_congr (fun _ _ => Iff.rfl)
       · intro a hb
         simp only [FBChart.rawSelf, selfOfLab, ite_eq_right (by decide : (1 : Fin 2) ≠ 0)]
-        exact (card_sigma_shift (fun b => Dw.mult (lab.tau o b)) lab.hd a).trans ((hr o).2.2.2.2 a hb)
+        exact (card_sigma_shift (fun b => Dw.mult (lab.tau o b)) lab.hd a).trans
+          ((hr o).2.2.2.2 a hb)
   exact upCharS_of_upFLaw_RR hPlace Y (selfOfLab ha hg o) hrank Hc T.V C3.FT C3.actT hL
     (ie.comp (algebraMap T.V T.Fr)) h.1 h.2.1 h.2.2.1 h.2.2.2 hd
-
 
 end Chart
 

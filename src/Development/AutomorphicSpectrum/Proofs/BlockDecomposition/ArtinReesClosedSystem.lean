@@ -12,7 +12,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProperIn
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 set_option autoImplicit false
 set_option maxSynthPendingDepth 1
@@ -334,12 +335,32 @@ lemma alg_of (hS : ClosedSys I E S) (hE : E.IsQuasicoherent) (hD : QC D)
 
 end
 
-theorem restrict_alg : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}} [X.Over (Spec (.of A))] [IsSeparated (X ↘ Spec (.of A))] [LocallyOfFiniteType (X ↘ Spec (.of A))] [QuasiCompact (X ↘ Spec (.of A))] {E : X.Modules}, IsCoherent E → ∀ {S : ℕ → Subobject E}, ClosedSys I E S → PropSupp A (S 0) → ∀ (D : Subobject E), (D : X.Modules).IsQuasicoherent → ∀ c : ℕ, (∀ e, S (e + c) ≤ D ⊔ powSub I E (e + 1)) → ∃ c' : ℕ, ClosedSys I (D : X.Modules) (restrictSys I D S c') ∧ PropSupp A (restrictSys I D S c' 0) ∧ (Alg I (D : X.Modules) (restrictSys I D S c') → PropSupp A D → Alg I E S) := by
+theorem restrict_alg
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
+        [X.Over (Spec (.of A))] [IsSeparated (X ↘ Spec (.of A))]
+        [LocallyOfFiniteType (X ↘ Spec (.of A))] [QuasiCompact (X ↘ Spec (.of A))] {E : X.Modules},
+      IsCoherent E
+        → ∀ {S : ℕ → Subobject E},
+          ClosedSys I E S → PropSupp A (S 0)
+            → ∀ (D : Subobject E),
+              (D : X.Modules).IsQuasicoherent
+                → ∀ c : ℕ,
+                  (∀ e, S (e + c) ≤ D ⊔ powSub I E (e + 1))
+                    → ∃ c' : ℕ,
+                      ClosedSys I (D : X.Modules) (restrictSys I D S c')
+                        ∧ PropSupp A (restrictSys I D S c' 0)
+                        ∧ (Alg I (D : X.Modules) (restrictSys I D S c') → PropSupp A D
+                          → Alg I E S) := by
   intro A _ _ I X _ _ _ _ E hE S hS hP D hD c hc
   have : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian (X ↘ Spec (.of A))
   have : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace (X ↘ Spec (.of A))
   obtain ⟨k, ar⟩ := GlobalTheory.T.artin_rees_subobject I hE D hD
-  exact ⟨k, closedSys_restrict hS hE.1 hD hc ar, propSupp_restrict hS hE.1 hD hP k,
-    fun halg hPD => alg_of hS hE.1 hD hc (fun T₁ T₂ => GlobalTheory.T.proper_inf_ideal_sheaves _ T₁ T₂) halg hPD⟩
+  exact ⟨
+    k,
+    closedSys_restrict hS hE.1 hD hc ar,
+    propSupp_restrict hS hE.1 hD hP k,
+    fun halg hPD =>
+      alg_of hS hE.1 hD hc (fun T₁ T₂ => GlobalTheory.T.proper_inf_ideal_sheaves _ T₁ T₂) halg hPD
+  ⟩
 
 end GlobalTheory.CompanionTheory.GE.Comb

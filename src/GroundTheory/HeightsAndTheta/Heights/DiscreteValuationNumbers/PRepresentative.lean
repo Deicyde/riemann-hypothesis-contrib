@@ -21,19 +21,18 @@ variable {K : Type*} [DecidableEq K] {ι : K → Type*} {R : Type*} [CommRing R]
 
 local instance (p : Prop) : Decidable p := Classical.propDecidable p
 
-
 open Classical in
-theorem weightedHomogeneousComponent_mul_form {x y : MRing ι R} {j : K → ℕ}
-    (hy : IsMultiHomog y j) (n : K → ℕ) :
-    weightedHomogeneousComponent (blockWeight ι) n (x * y) =
-      if j ≤ n then weightedHomogeneousComponent (blockWeight ι) (n - j) x * y else 0 := by
+theorem weightedHomogeneousComponent_mul_form
+    {x y : MRing ι R} {j : K → ℕ} (hy : IsMultiHomog y j) (n : K → ℕ)
+    : weightedHomogeneousComponent (blockWeight ι) n (x * y)
+      = if j ≤ n then weightedHomogeneousComponent (blockWeight ι) (n - j) x * y else 0 := by
   let _ := MvPolynomial.weightedGradedAlgebra R (blockWeight ι)
   rw [← weightedDecomposition.decompose'_apply, ← weightedDecomposition.decompose'_apply]
   exact DirectSum.coe_decompose_mul_of_right_mem
     (𝒜 := weightedHomogeneousSubmodule R (blockWeight ι)) n hy
 
-theorem exists_component_not_mem {H : Ideal (MRing ι R)} {x : MRing ι R} (hx : x ∉ H) :
-    ∃ e : K → ℕ, weightedHomogeneousComponent (blockWeight ι) e x ∉ H := by
+theorem exists_component_not_mem {H : Ideal (MRing ι R)} {x : MRing ι R} (hx : x ∉ H)
+    : ∃ e : K → ℕ, weightedHomogeneousComponent (blockWeight ι) e x ∉ H := by
   by_contra h
   simp only [not_exists, not_not] at h
   apply hx
@@ -41,23 +40,36 @@ theorem exists_component_not_mem {H : Ideal (MRing ι R)} {x : MRing ι R} (hx :
     finsum_eq_sum _ (weightedHomogeneousComponent_finsupp x)]
   exact H.sum_mem fun e _ => h e
 
-theorem exists_form_pair {P H : Ideal (MRing ι R)} [hP : P.IsPrime] [hH : H.IsPrime]
-    (hPm : IsMultiHomogIdeal P) (hPH : P ≤ H) {f g u v : MRing ι R} {bf bg : K → ℕ}
-    (hf : IsMultiHomog f bf) (hg : IsMultiHomog g bg) (hfP : f ∉ P) (hgP : g ∉ P) (hu : u ∉ H)
-    (hv : v ∉ H) (h : u * f - v * g ∈ P) :
-    ∃ (u' v' : MRing ι R) (e d : K → ℕ), IsMultiHomog u' e ∧ IsMultiHomog v' d ∧
-      d + bg = e + bf ∧ u' ∉ H ∧ v' ∉ H ∧ u' * f - v' * g ∈ P := by
+theorem exists_form_pair
+    {P H : Ideal (MRing ι R)} [hP : P.IsPrime] [hH : H.IsPrime]
+    (hPm : IsMultiHomogIdeal P) (hPH : P ≤ H)
+    {f g u v : MRing ι R} {bf bg : K → ℕ} (hf : IsMultiHomog f bf) (hg : IsMultiHomog g bg)
+    (hfP : f ∉ P) (hgP : g ∉ P) (hu : u ∉ H) (hv : v ∉ H) (h : u * f - v * g ∈ P)
+    : ∃ (u' v' : MRing ι R) (e d : K → ℕ),
+      IsMultiHomog u' e ∧ IsMultiHomog v' d ∧ d + bg = e + bf ∧ u' ∉ H ∧ v' ∉ H
+        ∧ u' * f - v' * g ∈ P := by
   classical
   obtain ⟨e, he⟩ := exists_component_not_mem hu
   set u' := weightedHomogeneousComponent (blockWeight ι) e u with hu'
   have hc := hPm _ h (e + bf)
   rw [map_sub, weightedHomogeneousComponent_mul_form hf, weightedHomogeneousComponent_mul_form hg,
-    if_pos le_add_self, add_tsub_cancel_right, ← hu'] at hc
+      if_pos le_add_self, add_tsub_cancel_right, ← hu']
+    at hc
   by_cases hle : bg ≤ e + bf
   · rw [if_pos hle] at hc
     set v' := weightedHomogeneousComponent (blockWeight ι) (e + bf - bg) v
-    refine ⟨u', v', e, e + bf - bg, weightedHomogeneousComponent_isWeightedHomogeneous _ _,
-      weightedHomogeneousComponent_isWeightedHomogeneous _ _, tsub_add_cancel_of_le hle, he, ?_, hc⟩
+    refine ⟨
+      u',
+      v',
+      e,
+      e + bf - bg,
+      weightedHomogeneousComponent_isWeightedHomogeneous _ _,
+      weightedHomogeneousComponent_isWeightedHomogeneous _ _,
+      tsub_add_cancel_of_le hle,
+      he,
+      ?_,
+      hc
+    ⟩
     intro hv'
     have h2 : g * (u * v' - u' * v) ∈ P := by
       have e2 : g * (u * v' - u' * v) = u' * (u * f - v * g) - u * (u' * f - v' * g) := by ring
@@ -71,15 +83,17 @@ theorem exists_form_pair {P H : Ideal (MRing ι R)} [hP : P.IsPrime] [hH : H.IsP
   · rw [if_neg hle, sub_zero] at hc
     exact ((hP.mem_or_mem hc).elim (fun h' => he (hPH h')) hfP).elim
 
-theorem exists_form_mem_not_mem {H H' : Ideal (MRing ι R)} (hH' : IsMultiHomogIdeal H')
-    (h : ¬ H' ≤ H) : ∃ (x : MRing ι R) (e : K → ℕ), IsMultiHomog x e ∧ x ∈ H' ∧ x ∉ H := by
+theorem exists_form_mem_not_mem
+    {H H' : Ideal (MRing ι R)} (hH' : IsMultiHomogIdeal H') (h : ¬ H' ≤ H)
+    : ∃ (x : MRing ι R) (e : K → ℕ), IsMultiHomog x e ∧ x ∈ H' ∧ x ∉ H := by
   obtain ⟨y, hy, hyH⟩ := Set.not_subset.mp h
   obtain ⟨e, he⟩ := exists_component_not_mem hyH
   exact ⟨_, e, weightedHomogeneousComponent_isWeightedHomogeneous _ _, hH' y hy e, he⟩
 
-theorem exists_form_separator {H : Ideal (MRing ι R)} [hH : H.IsPrime]
-    (S : Finset (Ideal (MRing ι R))) (hS : ∀ H' ∈ S, IsMultiHomogIdeal H' ∧ ¬ H' ≤ H) :
-    ∃ (a : MRing ι R) (A : K → ℕ), IsMultiHomog a A ∧ a ∉ H ∧ ∀ H' ∈ S, a ∈ H' := by
+theorem exists_form_separator
+    {H : Ideal (MRing ι R)} [hH : H.IsPrime]
+    (S : Finset (Ideal (MRing ι R))) (hS : ∀ H' ∈ S, IsMultiHomogIdeal H' ∧ ¬ H' ≤ H)
+    : ∃ (a : MRing ι R) (A : K → ℕ), IsMultiHomog a A ∧ a ∉ H ∧ ∀ H' ∈ S, a ∈ H' := by
   classical
   induction S using Finset.induction_on with
   | empty =>
@@ -94,13 +108,16 @@ theorem exists_form_separator {H : Ideal (MRing ι R)} [hH : H.IsPrime]
     · exact Ideal.mul_mem_right _ _ hxH₀
     · exact Ideal.mul_mem_left _ _ (haS H' h)
 
-theorem exists_form_not_mem_of_isRelevant [Fintype K] {H : Ideal (MRing ι R)} [hH : H.IsPrime]
-    (hrel : IsRelevant H) (c : K → ℕ) : ∃ m : MRing ι R, IsMultiHomog m c ∧ m ∉ H := by
+theorem exists_form_not_mem_of_isRelevant
+    [Fintype K] {H : Ideal (MRing ι R)} [hH : H.IsPrime] (hrel : IsRelevant H) (c : K → ℕ)
+    : ∃ m : MRing ι R, IsMultiHomog m c ∧ m ∉ H := by
   choose i hi using hrel
   refine ⟨∏ k, X ⟨k, i k⟩ ^ c k, ?_, ?_⟩
-  · have hprod := IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
-      (fun k => (X ⟨k, i k⟩ : MRing ι R) ^ c k) (fun k => c k • blockWeight ι ⟨k, i k⟩)
-      (fun k _ => (isWeightedHomogeneous_X R _ _).pow _)
+  · have hprod :=
+      IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
+        (fun k => (X ⟨k, i k⟩ : MRing ι R) ^ c k)
+        (fun k => c k • blockWeight ι ⟨k, i k⟩)
+        (fun k _ => (isWeightedHomogeneous_X R _ _).pow _)
     have hc : (∑ k, c k • blockWeight ι ⟨k, i k⟩) = c := by
       funext k'
       simp [blockWeight, Finset.sum_apply, Pi.single_apply]
@@ -110,10 +127,9 @@ theorem exists_form_not_mem_of_isRelevant [Fintype K] {H : Ideal (MRing ι R)} [
     obtain ⟨k, -, hk⟩ := Ideal.IsPrime.prod_mem_iff.mp hm
     exact hi k (hH.mem_of_pow_mem _ hk)
 
-
 omit [DecidableEq K] in
-theorem divCycle_eq_of_sub_mem {P : Ideal (MRing ι R)} {x y : MRing ι R} (h : x - y ∈ P) :
-    divCycle P x = divCycle P y := by
+theorem divCycle_eq_of_sub_mem {P : Ideal (MRing ι R)} {x y : MRing ι R} (h : x - y ∈ P)
+    : divCycle P x = divCycle P y := by
   have hI : P ⊔ Ideal.span {x} = P ⊔ Ideal.span {y} := by
     have key : ∀ {x' y' : MRing ι R}, x' - y' ∈ P → P ⊔ Ideal.span {x'} ≤ P ⊔ Ideal.span {y'} := by
       intro x' y' h'
@@ -130,18 +146,19 @@ theorem divCycle_eq_of_sub_mem {P : Ideal (MRing ι R)} {x y : MRing ι R} (h : 
   · have hW' : W ∈ (P ⊔ Ideal.span {y}).minimalPrimes ∧ IsRelevant W := hI ▸ hW
     rw [dite_eq_left hW, dite_eq_left hW']
     simp only [hI]
-  · have hW' : ¬ (W ∈ (P ⊔ Ideal.span {y}).minimalPrimes ∧ IsRelevant W) := hI ▸ hW
+  · have hW' : ¬(W ∈ (P ⊔ Ideal.span {y}).minimalPrimes ∧ IsRelevant W) := hI ▸ hW
     rw [dite_eq_right hW, dite_eq_right hW']
 
-theorem isVerticalDivisorOfUnitOffSpecial [IsDomain R] [IsDiscreteValuationRing R]
-    {P : Ideal (MRing ι R)} {ϖ : R}
-    {b : K → ℤ} {f g : MRing ι R}
-    (degrees : ∃ bf bg : K → ℕ, IsMultiHomog f bf ∧ IsMultiHomog g bg ∧
-      (fun k => (bf k : ℤ) - bg k) = b)
+theorem isVerticalDivisorOfUnitOffSpecial
+    [IsDomain R] [IsDiscreteValuationRing R]
+    {P : Ideal (MRing ι R)} {ϖ : R} {b : K → ℤ} {f g : MRing ι R}
+    (degrees
+      : ∃ bf bg : K → ℕ, IsMultiHomog f bf ∧ IsMultiHomog g bg ∧ (fun k => (bf k : ℤ) - bg k) = b)
     (hf : f ∉ P) (hg : g ∉ P)
-    (hunit : ∀ W : Ideal (MRing ι R), W.IsPrime → P ≤ W → IsRelevant W →
-      (C ϖ : MRing ι R) ∉ W → ∃ u v : MRing ι R, u ∉ W ∧ v ∉ W ∧ u * f - v * g ∈ P) :
-    IsVerticalDivisor P ϖ b f g := by
+    (hunit : ∀ W : Ideal (MRing ι R),
+      W.IsPrime → P ≤ W → IsRelevant W → (C ϖ : MRing ι R) ∉ W
+        → ∃ u v : MRing ι R, u ∉ W ∧ v ∉ W ∧ u * f - v * g ∈ P)
+    : IsVerticalDivisor P ϖ b f g := by
   have hvertical : ∀ W, ratDiv P f g W ≠ 0 → (C ϖ : MRing ι R) ∈ W := by
     intro W hW
     by_contra hϖ
@@ -169,9 +186,10 @@ theorem Representative.proof (h1 : DivCycleMul.Statement.{u}) : Representative.S
   classical
   haveI := hP.isPrime
   obtain ⟨bf, bg, hbf, hbg, hb⟩ := hV.degrees
-  have claim : ∃ f₁ g₁ : MRing ι O, (∃ F E : K → ℕ, IsMultiHomog f₁ F ∧ IsMultiHomog g₁ E ∧
-      (fun k => (F k : ℤ) - E k) = b) ∧ f₁ ∉ P ∧ g₁ ∉ P ∧ f₁ * g - g₁ * f ∈ P ∧
-      ∀ H ∈ T, f₁ ∉ H ∧ g₁ ∉ H := by
+  have claim
+      : ∃ f₁ g₁ : MRing ι O,
+        (∃ F E : K → ℕ, IsMultiHomog f₁ F ∧ IsMultiHomog g₁ E ∧ (fun k => (F k : ℤ) - E k) = b)
+          ∧ f₁ ∉ P ∧ g₁ ∉ P ∧ f₁ * g - g₁ * f ∈ P ∧ ∀ H ∈ T, f₁ ∉ H ∧ g₁ ∉ H := by
     rcases T.eq_empty_or_nonempty with hTe | ⟨H₀, hH₀⟩
     · refine ⟨f, g, ⟨bf, bg, hbf, hbg, hb⟩, hV.num_not_mem, hV.den_not_mem, ?_, by simp [hTe]⟩
       rw [mul_comm, sub_self]
@@ -181,27 +199,51 @@ theorem Representative.proof (h1 : DivCycleMul.Statement.{u}) : Representative.S
     have hmax : ∀ H ∈ T, ∃ H' ∈ T', H ≤ H' := by
       intro H hH
       obtain ⟨H', hle, hm⟩ := T.exists_le_maximal hH
-      exact ⟨H', Finset.mem_filter.mpr ⟨hm.1, fun H'' hH'' hle' => le_antisymm (hm.2 hH'' hle') hle'⟩,
-        hle⟩
+      exact ⟨
+        H',
+        Finset.mem_filter.mpr ⟨hm.1, fun H'' hH'' hle' => le_antisymm (hm.2 hH'' hle') hle'⟩,
+        hle
+      ⟩
     obtain ⟨H₁, hH₁, -⟩ := hmax H₀ hH₀
-    have hdata : ∀ H, ∃ (a u v : MRing ι O) (A e d : K → ℕ), H ∈ T' →
-        (IsMultiHomog a A ∧ a ∉ H ∧ (∀ H' ∈ T', H' ≠ H → a ∈ H') ∧ IsMultiHomog u e ∧
-          IsMultiHomog v d ∧ d + bg = e + bf ∧ u ∉ H ∧ v ∉ H ∧ u * f - v * g ∈ P) := by
+    have hdata
+        : ∀ H, ∃ (a u v : MRing ι O) (A e d : K → ℕ),
+          H ∈ T'
+            → (IsMultiHomog a A ∧ a ∉ H ∧ (∀ H' ∈ T', H' ≠ H → a ∈ H') ∧ IsMultiHomog u e
+              ∧ IsMultiHomog v d ∧ d + bg = e + bf ∧ u ∉ H ∧ v ∉ H ∧ u * f - v * g ∈ P) := by
       intro H
       by_cases hH : H ∈ T'
       · have hHT := (Finset.mem_filter.mp hH).1
         obtain ⟨hH1, hPH, hϖH, -⟩ := hT H hHT
         haveI := hH1.isPrime
-        obtain ⟨u0, v0, hu0, hv0, h0⟩ :=
-          hV.unit_off_special H hH1.isPrime hPH hH1.relevant hϖH
-        obtain ⟨u, v, e, d, hu, hv, hde, huH, hvH, huv⟩ := exists_form_pair hP.multiHomog hPH hbf hbg
-          hV.num_not_mem hV.den_not_mem hu0 hv0 h0
-        obtain ⟨a, A, ha, haH, haS⟩ := exists_form_separator (H := H) (T'.erase H)
-          (fun H' hH' => ⟨(hT H' (Finset.mem_filter.mp (Finset.mem_of_mem_erase hH')).1).1.multiHomog,
-            fun hle => Finset.ne_of_mem_erase hH'
-              ((Finset.mem_filter.mp (Finset.mem_of_mem_erase hH')).2 H hHT hle).symm⟩)
-        exact ⟨a, u, v, A, e, d, fun _ => ⟨ha, haH,
-          fun H' hH' hne => haS H' (Finset.mem_erase.mpr ⟨hne, hH'⟩), hu, hv, hde, huH, hvH, huv⟩⟩
+        obtain ⟨u0, v0, hu0, hv0, h0⟩ := hV.unit_off_special H hH1.isPrime hPH hH1.relevant hϖH
+        obtain ⟨u, v, e, d, hu, hv, hde, huH, hvH, huv⟩ :=
+          exists_form_pair hP.multiHomog hPH hbf hbg hV.num_not_mem hV.den_not_mem hu0 hv0 h0
+        obtain ⟨a, A, ha, haH, haS⟩ :=
+          exists_form_separator (H := H) (T'.erase H) (fun H' hH' => ⟨
+            (hT H' (Finset.mem_filter.mp (Finset.mem_of_mem_erase hH')).1).1.multiHomog,
+            fun hle =>
+              Finset.ne_of_mem_erase hH'
+                ((Finset.mem_filter.mp (Finset.mem_of_mem_erase hH')).2 H hHT hle).symm
+          ⟩)
+        exact ⟨
+          a,
+          u,
+          v,
+          A,
+          e,
+          d,
+          fun _ => ⟨
+            ha,
+            haH,
+            fun H' hH' hne => haS H' (Finset.mem_erase.mpr ⟨hne, hH'⟩),
+            hu,
+            hv,
+            hde,
+            huH,
+            hvH,
+            huv
+          ⟩
+        ⟩
       · exact ⟨0, 0, 0, 0, 0, 0, fun h => absurd h hH⟩
     choose a u v A e d hprop using hdata
     set E : K → ℕ := ∑ H ∈ T', (A H + e H) with hE
@@ -240,18 +282,22 @@ theorem Representative.proof (h1 : DivCycleMul.Statement.{u}) : Representative.S
       have h1k := hle H hH k
       simp only [Pi.add_apply, Pi.sub_apply] at h1k ⊢
       omega
-    have hnot : ∀ H ∈ T', (∑ H' ∈ T', a H' * m H' * v H') ∉ H ∧
-        (∑ H' ∈ T', a H' * m H' * u H') ∉ H := by
+    have hnot
+        : ∀ H ∈ T', (∑ H' ∈ T', a H' * m H' * v H') ∉ H ∧ (∑ H' ∈ T', a H' * m H' * u H') ∉ H := by
       intro H hH
       obtain ⟨hH1, -⟩ := hT H (Finset.mem_filter.mp hH).1
       have hp := hH1.isPrime
       obtain ⟨-, haH, -, -, -, -, huH, hvH, -⟩ := hprop H hH
-      have hrest : ∀ w : Ideal (MRing ι O) → MRing ι O,
-          (∑ H' ∈ T'.erase H, a H' * m H' * w H') ∈ H := fun w =>
-        H.sum_mem fun H' hH' => H.mul_mem_right _ (H.mul_mem_right _
-          ((hprop H' (Finset.mem_of_mem_erase hH')).2.2.1 H hH (Finset.ne_of_mem_erase hH').symm))
-      have hone : ∀ w : Ideal (MRing ι O) → MRing ι O, w H ∉ H →
-          (∑ H' ∈ T', a H' * m H' * w H') ∉ H := by
+      have hrest
+          : ∀ w : Ideal (MRing ι O) → MRing ι O,
+            (∑ H' ∈ T'.erase H, a H' * m H' * w H') ∈ H := fun w =>
+        H.sum_mem fun H' hH' =>
+          H.mul_mem_right _
+            (H.mul_mem_right _
+              ((hprop H' (Finset.mem_of_mem_erase hH')).2.2.1 H hH
+                (Finset.ne_of_mem_erase hH').symm))
+      have hone
+          : ∀ w : Ideal (MRing ι O) → MRing ι O, w H ∉ H → (∑ H' ∈ T', a H' * m H' * w H') ∉ H := by
         intro w hw hmem
         rw [← Finset.add_sum_erase T' _ hH] at hmem
         have h' := (Submodule.add_mem_iff_left _ (hrest w)).mp hmem
@@ -261,9 +307,15 @@ theorem Representative.proof (h1 : DivCycleMul.Statement.{u}) : Representative.S
           · exact (hm H hH).2 h'''
         · exact hw h''
       exact ⟨hone v hvH, hone u huH⟩
-    refine ⟨∑ H ∈ T', a H * m H * v H, ∑ H ∈ T', a H * m H * u H, ⟨F, E, ?_, ?_, ?_⟩,
+    refine ⟨
+      ∑ H ∈ T', a H * m H * v H,
+      ∑ H ∈ T', a H * m H * u H,
+      ⟨F, E, ?_, ?_, ?_⟩,
       fun h' => (hnot H₁ hH₁).1 (((hT H₁ (Finset.mem_filter.mp hH₁).1).2.1) h'),
-      fun h' => (hnot H₁ hH₁).2 (((hT H₁ (Finset.mem_filter.mp hH₁).1).2.1) h'), ?_, ?_⟩
+      fun h' => (hnot H₁ hH₁).2 (((hT H₁ (Finset.mem_filter.mp hH₁).1).2.1) h'),
+      ?_,
+      ?_
+    ⟩
     · refine IsWeightedHomogeneous.sum _ _ _ fun H hH => ?_
       obtain ⟨ha, -, -, -, hv, -⟩ := hprop H hH
       have h' := (ha.mul (hm H hH).1).mul hv
@@ -288,8 +340,10 @@ theorem Representative.proof (h1 : DivCycleMul.Statement.{u}) : Representative.S
       obtain ⟨H', hH', hle'⟩ := hmax H hH
       exact ⟨fun h' => (hnot H' hH').1 (hle' h'), fun h' => (hnot H' hH').2 (hle' h')⟩
   obtain ⟨f₁, g₁, hdeg, hf₁, hg₁, hmem, hT₁⟩ := claim
-  have hunitP : ∀ W : Ideal (MRing ι O), W.IsPrime → P ≤ W → IsRelevant W →
-      (C ϖ : MRing ι O) ∉ W → ∃ u v : MRing ι O, u ∉ W ∧ v ∉ W ∧ u * f₁ - v * g₁ ∈ P := by
+  have hunitP
+      : ∀ W : Ideal (MRing ι O),
+        W.IsPrime → P ≤ W → IsRelevant W → (C ϖ : MRing ι O) ∉ W
+          → ∃ u v : MRing ι O, u ∉ W ∧ v ∉ W ∧ u * f₁ - v * g₁ ∈ P := by
     intro W hW hPW hrel hϖW
     obtain ⟨u, v, hu, hv, h⟩ := hV.unit_off_special W hW hPW hrel hϖW
     refine ⟨u, v, hu, hv, ?_⟩
@@ -308,10 +362,9 @@ theorem Representative.proof (h1 : DivCycleMul.Statement.{u}) : Representative.S
     unfold ratDiv
     linarith
   · obtain ⟨hH1, hPH, -, -⟩ := hT H hH
-    exact isVerticalDivisorOfUnitOffSpecial hdeg (hT₁ H hH).1 (hT₁ H hH).2
-      fun W hW hHW hrel hϖW =>
-        let ⟨u, v, hu, hv, h⟩ := hunitP W hW (hPH.trans hHW) hrel hϖW
-        ⟨u, v, hu, hv, hPH h⟩
+    exact isVerticalDivisorOfUnitOffSpecial hdeg (hT₁ H hH).1 (hT₁ H hH).2 fun W hW hHW hrel hϖW =>
+      let ⟨u, v, hu, hv, h⟩ := hunitP W hW (hPH.trans hHW) hrel hϖW
+      ⟨u, v, hu, hv, hPH h⟩
 
 end Main
 

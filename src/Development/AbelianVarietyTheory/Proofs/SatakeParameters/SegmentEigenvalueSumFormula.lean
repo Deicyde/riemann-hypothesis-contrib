@@ -6,14 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem multiset_mem_list_sum' {α : Type*} (l : List (Multiset α)) (x : α) :
-    x ∈ l.sum ↔ ∃ m ∈ l, x ∈ m := by
+theorem multiset_mem_list_sum' {α : Type*} (l : List (Multiset α)) (x : α)
+    : x ∈ l.sum ↔ ∃ m ∈ l, x ∈ m := by
   induction l with
   | nil => simp
   | cons a l ih => simp [List.sum_cons, Multiset.mem_add, ih]
 
-theorem multiset_le_list_sum' {α : Type*} (l : List (Multiset α)) (m : Multiset α) (h : m ∈ l) :
-    m ≤ l.sum := by
+theorem multiset_le_list_sum' {α : Type*} (l : List (Multiset α)) (m : Multiset α) (h : m ∈ l)
+    : m ≤ l.sum := by
   induction l with
   | nil => simp at h
   | cons a l ih =>
@@ -22,8 +22,8 @@ theorem multiset_le_list_sum' {α : Type*} (l : List (Multiset α)) (m : Multise
     · exact Multiset.le_add_right _ _
     · exact (ih h).trans (Multiset.le_add_left _ _)
 
-theorem norm_natCast_cpow_ofReal {q : ℕ} (hq : 0 < q) (s : ℝ) :
-    ‖(q : ℂ) ^ ((s : ℝ) : ℂ)‖ = (q : ℝ) ^ s := by
+theorem norm_natCast_cpow_ofReal {q : ℕ} (hq : 0 < q) (s : ℝ)
+    : ‖(q : ℂ) ^ ((s : ℝ) : ℂ)‖ = (q : ℝ) ^ s := by
   rw [Complex.norm_natCast_cpow_of_pos hq]
   simp
 

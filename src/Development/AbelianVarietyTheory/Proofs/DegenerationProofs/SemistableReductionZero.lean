@@ -14,11 +14,14 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Semista
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory.SS
 
-theorem semistableReduction_zero : SemistableReductionZero := (GlobalTheory.T.semistable_of_potential_semiAbelian_model GlobalTheory.T.abelianVariety_potential_semiAbelian_model).1
+theorem semistableReduction_zero : SemistableReductionZero :=
+  (GlobalTheory.T.semistable_of_potential_semiAbelian_model
+    GlobalTheory.T.abelianVariety_potential_semiAbelian_model).1
 
 end GlobalTheory.SS

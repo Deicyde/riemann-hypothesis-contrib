@@ -47,8 +47,10 @@ theorem AdjoinIndepRelfinrank.proof : AdjoinIndepRelfinrank.Statement := by
       have h := congrArg (AddMonoidAlgebra.coeff · m) hq0
       rw [hq, MvPolynomial.coeff_sum] at h
       simp only [MvPolynomial.coeff_C_mul, MvPolynomial.coeff_map, AddMonoidAlgebra.coeff_zero,
-        Finsupp.zero_apply] at h
-      have hb := (linearIndependent_iff'.mp b.linearIndependent) s (fun j => AddMonoidAlgebra.coeff (p j) m)
+          Finsupp.zero_apply]
+        at h
+      have hb :=
+        (linearIndependent_iff'.mp b.linearIndependent) s (fun j => AddMonoidAlgebra.coeff (p j) m)
       apply hb
       rw [← h]
       refine Finset.sum_congr rfl fun j _ => ?_
@@ -64,15 +66,17 @@ theorem AdjoinIndepRelfinrank.proof : AdjoinIndepRelfinrank.Statement := by
   have hlow : A.restrictScalars F = L₀ ⊔ adjoin F (Set.range t) := by
     rw [hA, restrictScalars_adjoin_eq_sup]
   have hle' : A ≤ (adjoin L' (A : Set Ω)).restrictScalars L₀ := subset_adjoin L' (A : Set Ω)
-  have hup : ((adjoin L' (A : Set Ω)).restrictScalars L₀).restrictScalars F =
-      L ⊔ adjoin F (Set.range t) := by
+  have hup
+      : ((adjoin L' (A : Set Ω)).restrictScalars L₀).restrictScalars F
+        = L ⊔ adjoin F (Set.range t) := by
     refine (restrictScalars_adjoin_eq_sup F L (A : Set Ω)).trans ?_
     have hAF : adjoin F (A : Set Ω) = L₀ ⊔ adjoin F (Set.range t) := by
       rw [← hlow]
       exact adjoin_self F (A.restrictScalars F)
     rw [hAF, ← sup_assoc, sup_eq_left.mpr hle]
-  have hrel : IntermediateField.relfinrank (L₀ ⊔ adjoin F (Set.range t)) (L ⊔ adjoin F (Set.range t)) =
-      finrank A (extendScalars hle') := by
+  have hrel
+      : IntermediateField.relfinrank (L₀ ⊔ adjoin F (Set.range t)) (L ⊔ adjoin F (Set.range t))
+        = finrank A (extendScalars hle') := by
     rw [← hlow, ← hup]
     exact relfinrank_eq_finrank_of_le hle'
   rw [hrel, relfinrank_eq_finrank_of_le hle]
@@ -86,8 +90,10 @@ theorem AdjoinIndepRelfinrank.proof : AdjoinIndepRelfinrank.Statement := by
     apply finrank_of_not_finite
     intro hfin'
     apply hfin
-    let v : _ → extendScalars hle' := fun j => ⟨algebraMap L' Ω (b j), by
-      exact IntermediateField.algebraMap_mem (adjoin L' (A : Set Ω)) (b j)⟩
+    let v : _ → extendScalars hle' := fun j => ⟨
+      algebraMap L' Ω (b j),
+      by exact IntermediateField.algebraMap_mem (adjoin L' (A : Set Ω)) (b j)
+    ⟩
     have hv : LinearIndependent A v := by
       apply LinearIndependent.of_comp (extendScalars hle').val.toLinearMap
       exact hK

@@ -8,13 +8,14 @@ open Set Filter Topology Metric
 
 namespace GlobalTheory.CompanionTheory.Metric.FamilyInverse
 
-theorem exists_analytic_family_inverse {B V : Type} [NormedAddCommGroup B] [NormedSpace ℂ B]
-    [CompleteSpace B] [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V]
+theorem exists_analytic_family_inverse
+    {B V : Type} [NormedAddCommGroup B] [NormedSpace ℂ B] [CompleteSpace B] [NormedAddCommGroup V]
+    [NormedSpace ℂ V] [CompleteSpace V]
     (b₀ : B) (d : B × V → V) (han : AnalyticAt ℂ d (b₀, 0)) (h0 : d (b₀, 0) = 0)
-    (hd : HasFDerivAt d ((2 : ℂ) • ContinuousLinearMap.snd ℂ B V) (b₀, 0)) :
-    ∃ h : B × V → V, AnalyticAt ℂ h (b₀, 0) ∧ h (b₀, 0) = 0 ∧
-      (∀ᶠ p : B × V in 𝓝 (b₀, 0), d (p.1, h p) = p.2) ∧
-      (∀ᶠ p : B × V in 𝓝 (b₀, 0), h (p.1, d p) = p.2) := by
+    (hd : HasFDerivAt d ((2 : ℂ) • ContinuousLinearMap.snd ℂ B V) (b₀, 0))
+    : ∃ h : B × V → V,
+      AnalyticAt ℂ h (b₀, 0) ∧ h (b₀, 0) = 0 ∧ (∀ᶠ p : B × V in 𝓝 (b₀, 0), d (p.1, h p) = p.2)
+        ∧ (∀ᶠ p : B × V in 𝓝 (b₀, 0), h (p.1, d p) = p.2) := by
   let Φ : B × V → B × V := fun p => (p.1, d p)
   let L : (B × V) →L[ℂ] (B × V) :=
     (ContinuousLinearMap.fst ℂ B V).prod ((2 : ℂ) • ContinuousLinearMap.snd ℂ B V)
@@ -22,7 +23,8 @@ theorem exists_analytic_family_inverse {B V : Type} [NormedAddCommGroup B] [Norm
     (ContinuousLinearMap.fst ℂ B V).prod ((2⁻¹ : ℂ) • ContinuousLinearMap.snd ℂ B V)
   let Le : (B × V) ≃L[ℂ] (B × V) :=
     ContinuousLinearEquiv.equivOfInverse L L'
-      (fun p => by simp [L, L', smul_smul]) (fun p => by simp [L, L', smul_smul])
+      (fun p => by simp [L, L', smul_smul])
+      (fun p => by simp [L, L', smul_smul])
   have hLe : (Le : (B × V) →L[ℂ] (B × V)) = L := rfl
   have hΦan : AnalyticAt ℂ Φ (b₀, 0) := analyticAt_fst.prod han
   have hΦd : HasFDerivAt Φ L (b₀, 0) := hasFDerivAt_fst.prodMk hd
@@ -33,8 +35,8 @@ theorem exists_analytic_family_inverse {B V : Type} [NormedAddCommGroup B] [Norm
   let P := hs.toOpenPartialHomeomorph Φ
   have hPc : (P : B × V → B × V) = Φ := hs.toOpenPartialHomeomorph_coe
   have hPan : AnalyticAt ℂ P.symm (P (b₀, 0)) :=
-    P.analyticAt_symm' (i := Le) hs.mem_toOpenPartialHomeomorph_source
-      (by rw [hPc]; exact hΦan) (by rw [hPc, hΦd.fderiv, hLe])
+    P.analyticAt_symm' (i := Le) hs.mem_toOpenPartialHomeomorph_source (by rw [hPc]; exact hΦan)
+      (by rw [hPc, hΦd.fderiv, hLe])
   have hΨan : AnalyticAt ℂ P.symm (b₀, 0) := by
     have : P (b₀, 0) = (b₀, 0) := by rw [hPc]; exact hfix
     rwa [this] at hPan

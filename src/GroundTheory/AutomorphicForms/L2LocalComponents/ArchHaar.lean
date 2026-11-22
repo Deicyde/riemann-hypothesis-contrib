@@ -16,9 +16,10 @@ noncomputable section
 
 variable (K : Type*) [Field K] [NumberField K] (n : ℕ)
 
-theorem isMulRightInvariant_infinite [MeasurableSpace (AdelicGLn.InfiniteAdelicGL K n)]
-    [BorelSpace (AdelicGLn.InfiniteAdelicGL K n)] (μi : Measure (AdelicGLn.InfiniteAdelicGL K n))
-    [μi.IsHaarMeasure] : μi.IsMulRightInvariant := by
+theorem isMulRightInvariant_infinite
+    [MeasurableSpace (AdelicGLn.InfiniteAdelicGL K n)] [BorelSpace (AdelicGLn.InfiniteAdelicGL K n)]
+    (μi : Measure (AdelicGLn.InfiniteAdelicGL K n)) [μi.IsHaarMeasure]
+    : μi.IsMulRightInvariant := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · have : Subsingleton (AdelicGLn.InfiniteAdelicGL K 0) :=
       ⟨fun x y => Units.ext (Subsingleton.elim _ _)⟩
@@ -44,7 +45,7 @@ theorem isMulRightInvariant_infinite [MeasurableSpace (AdelicGLn.InfiniteAdelicG
   set c := haarScalarFactor (ν.map e) P
   have hc : ν.map e = c • P := by
     set_option synthInstance.maxHeartbeats 200000 in
-      exact isMulLeftInvariant_eq_smul (ν.map e) P
+    exact isMulLeftInvariant_eq_smul (ν.map e) P
   have hc0 : c ≠ 0 := by
     intro h0
     rw [h0, zero_smul] at hc
@@ -72,8 +73,8 @@ theorem isMulRightInvariant_infinite [MeasurableSpace (AdelicGLn.InfiniteAdelicG
 
 variable {K n}
 
-theorem isMulRightInvariant_archGroup (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] :
-    ν.IsMulRightInvariant := by
+theorem isMulRightInvariant_archGroup (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+    : ν.IsMulRightInvariant := by
   let _ : MeasurableSpace (AdelicGLn.InfiniteAdelicGL K n) := _root_.borel _
   have : BorelSpace (AdelicGLn.InfiniteAdelicGL K n) := ⟨rfl⟩
   set φ := archEquiv K n
@@ -94,8 +95,8 @@ theorem isMulRightInvariant_archGroup (ν : Measure (archGroup K n)) [ν.IsHaarM
     simp only [Function.comp_apply, map_mul, ContinuousMulEquiv.apply_symm_apply]
   rw [hcomp, ← Measure.map_map hφ (measurable_mul_const _), map_mul_right_eq_self]
 
-theorem isInvInvariant_archGroup (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] :
-    ν.IsInvInvariant := by
+theorem isInvInvariant_archGroup (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+    : ν.IsInvInvariant := by
   have := isMulRightInvariant_archGroup ν
   have := secondCountableTopology_subgroup_units (archGroup K n)
   have : LocallyCompactSpace (archGroup K n) :=
@@ -119,15 +120,19 @@ theorem isInvInvariant_archGroup (ν : Measure (archGroup K n)) [ν.IsHaarMeasur
   have h5 : c = 1 := (ENNReal.pow_right_strictMono two_ne_zero).injective h4
   rw [hc, h5, one_smul]
 
-theorem integral_inv_archGroup (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] {E : Type*}
-    [NormedAddCommGroup E] [NormedSpace ℝ E] (f : archGroup K n → E) :
-    ∫ a, f a⁻¹ ∂ν = ∫ a, f a ∂ν := by
+theorem integral_inv_archGroup
+    (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (f : archGroup K n → E)
+    : ∫ a, f a⁻¹ ∂ν = ∫ a, f a ∂ν := by
   have := isInvInvariant_archGroup ν
   exact integral_inv_eq_self f ν
 
-theorem integral_conj_archGroup (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] {E : Type*}
-    [NormedAddCommGroup E] [NormedSpace ℝ E] (f : archGroup K n → E) (k : archGroup K n) :
-    ∫ a, f (k * a * k⁻¹) ∂ν = ∫ a, f a ∂ν := by
+theorem integral_conj_archGroup
+    (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (f : archGroup K n → E) (k : archGroup K n)
+    : ∫ a, f (k * a * k⁻¹) ∂ν = ∫ a, f a ∂ν := by
   have := isMulRightInvariant_archGroup ν
   simp_rw [mul_assoc]
   rw [integral_mul_right_eq_self (fun a => f (k * a)) k⁻¹, integral_mul_left_eq_self]

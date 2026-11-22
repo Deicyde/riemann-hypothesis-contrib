@@ -14,10 +14,11 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.PresSobA.SupG
 
-theorem norm_cls_sq_eq {n : ℕ} [MeasurableSpace (G n)] {μ : Measure (G n)} {V : Type}
-    [NormedAddCommGroup V] [InnerProductSpace ℂ V] {K : Mat n → V}
-    (h : MemLp (fun y : G n => K y.val) 2 μ) :
-    ‖cls μ K‖ ^ 2 = ∫ y : G n, ‖K y.val‖ ^ 2 ∂μ := by
+theorem norm_cls_sq_eq
+    {n : ℕ} [MeasurableSpace (G n)]
+    {μ : Measure (G n)} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {K : Mat n → V} (h : MemLp (fun y : G n => K y.val) 2 μ)
+    : ‖cls μ K‖ ^ 2 = ∫ y : G n, ‖K y.val‖ ^ 2 ∂μ := by
   have h0 : 0 ≤ ∫ y : G n, ‖K y.val‖ ^ 2 ∂μ := integral_nonneg fun y => by positivity
   have hc : cls μ K = h.toLp _ := dif_pos h
   rw [hc, Lp.norm_toLp, h.eLpNorm_eq_integral_rpow_norm (by norm_num) (by norm_num)]
@@ -28,14 +29,24 @@ theorem norm_cls_sq_eq {n : ℕ} [MeasurableSpace (G n)] {μ : Measure (G n)} {V
 theorem exists_unit {n : ℕ} {x : Mat n} (hx : x ∈ GLs n) : ∃ g : G n, g.val = x :=
   ⟨((Matrix.isUnit_iff_isUnit_det x).2 (isUnit_iff_ne_zero.2 hx)).unit, rfl⟩
 
-theorem sup_sq_bound : SobG → ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure], ∃ (S : Finset (List (Bool × Fin n × Fin n))) (C : ℝ), 0 ≤ C ∧ ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V] (h : Mat n → V), ContDiffOn ℝ ∞ h (GLs n) → (∀ w, MemLp (fun y : G n => Rw w h y.val) 2 μ) → ∀ x ∈ GLs n, ‖h x‖ ^ 2 ≤ C * ∑ w ∈ S, ‖cls μ (Rw w h)‖ ^ 2 := by
+theorem sup_sq_bound
+    : SobG
+      → ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure],
+        ∃ (S : Finset (List (Bool × Fin n × Fin n))) (C : ℝ),
+          0 ≤ C
+            ∧ ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V]
+                (h : Mat n → V),
+              ContDiffOn ℝ ∞ h (GLs n) → (∀ w, MemLp (fun y : G n => Rw w h y.val) 2 μ)
+                → ∀ x ∈ GLs n, ‖h x‖ ^ 2 ≤ C * ∑ w ∈ S, ‖cls μ (Rw w h)‖ ^ 2 := by
   intro hS n _ _ μ _
   obtain ⟨S, r, C, hC⟩ := hS n μ
   refine ⟨S, max C 0, le_max_right _ _, fun V _ _ _ h hsm hL x hx => ?_⟩
   obtain ⟨g, rfl⟩ := exists_unit hx
   have h0 := hC V h hsm g.val hx
-  have hw : ∀ w ∈ S, ∫ y in {y : G n | lg y.val ≤ r}, ‖Rw w h (g.val * y.val)‖ ^ 2 ∂μ ≤
-      ‖cls μ (Rw w h)‖ ^ 2 := by
+  have hw
+      : ∀ w ∈ S,
+        ∫ y in {y : G n | lg y.val ≤ r}, ‖Rw w h (g.val * y.val)‖ ^ 2 ∂μ
+          ≤ ‖cls μ (Rw w h)‖ ^ 2 := by
     intro w _
     set K := Rw w h with hK
     have hm : MemLp (fun y : G n => K y.val) 2 μ := hL w
@@ -50,7 +61,8 @@ theorem sup_sq_bound : SobG → ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpac
     exact setIntegral_le_integral hψ (Filter.Eventually.of_forall fun y => by positivity)
   have hI : 0 ≤ ∑ w ∈ S, ∫ y in {y : G n | lg y.val ≤ r}, ‖Rw w h (g.val * y.val)‖ ^ 2 ∂μ :=
     Finset.sum_nonneg fun w _ => integral_nonneg fun y => by positivity
-  calc ‖h g.val‖ ^ 2
+  calc
+    ‖h g.val‖ ^ 2
       ≤ C * ∑ w ∈ S, ∫ y in {y : G n | lg y.val ≤ r}, ‖Rw w h (g.val * y.val)‖ ^ 2 ∂μ := h0
     _ ≤ max C 0 * ∑ w ∈ S, ∫ y in {y : G n | lg y.val ≤ r}, ‖Rw w h (g.val * y.val)‖ ^ 2 ∂μ :=
       mul_le_mul_of_nonneg_right (le_max_left _ _) hI

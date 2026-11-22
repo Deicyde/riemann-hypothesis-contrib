@@ -40,7 +40,9 @@ theorem logDerivBoundInRegionOfBounds : LogDerivRegionOf := by
     have h1 := hCR s hσ1
     have hnorm : σ - 1 ≤ ‖s - 1‖ := by
       have : (s - 1).re = σ - 1 := by simp [hσ]
-      calc σ - 1 = (s - 1).re := this.symm
+      calc
+        σ - 1
+          = (s - 1).re := this.symm
         _ ≤ |(s - 1).re| := le_abs_self _
         _ ≤ ‖s - 1‖ := Complex.abs_re_le_norm _
     have hσL : 1 / (σ - 1) ≤ L := by
@@ -51,9 +53,12 @@ theorem logDerivBoundInRegionOfBounds : LogDerivRegionOf := by
       linarith
     have h2 : ‖1 / (s - 1)‖ ≤ L := by
       rw [norm_div, norm_one]
-      calc 1 / ‖s - 1‖ ≤ 1 / (σ - 1) := one_div_le_one_div_of_le (by linarith) hnorm
+      calc
+        1 / ‖s - 1‖
+          ≤ 1 / (σ - 1) := one_div_le_one_div_of_le (by linarith) hnorm
         _ ≤ L := hσL
-    calc ‖deriv riemannZeta s / riemannZeta s + 1 / (s - 1)‖
+    calc
+      ‖deriv riemannZeta s / riemannZeta s + 1 / (s - 1)‖
         ≤ ‖deriv riemannZeta s / riemannZeta s‖ + ‖1 / (s - 1)‖ := norm_add_le _ _
       _ ≤ (1 / (σ - 1) + CR) + L := add_le_add h1 h2
       _ ≤ (4 + 4 * CR) * L ^ 2 := by nlinarith [mul_nonneg hCR0 (sq_nonneg L)]
@@ -68,7 +73,8 @@ theorem logDerivBoundInRegionOfBounds : LogDerivRegionOf := by
         linarith
       have hm := Formalism.ZF.ldr_mid hZ0 hc₀ hG hI hLL (σ := σ) (t := t) hbig hlo hlo' hright
       rw [hs]
-      calc _ ≤ (1441 + 60 / c₀) * L ^ 2 := hm
+      calc
+        _ ≤ (1441 + 60 / c₀) * L ^ 2 := hm
         _ ≤ _ := by nlinarith [mul_nonneg hK3 (sq_nonneg L), mul_nonneg hCR0 (sq_nonneg L)]
     · push_neg at hbig
       have htT : |t| ≤ Real.exp 24 := by
@@ -79,11 +85,11 @@ theorem logDerivBoundInRegionOfBounds : LogDerivRegionOf := by
       have hcL : c / L ≤ cS := by
         rw [div_le_iff₀ hL0]
         nlinarith
-      have hinv : 1 / L ≤ 2 := by
-        rw [div_le_iff₀ hL0]; linarith
+      have hinv : 1 / L ≤ 2 := by rw [div_le_iff₀ hL0]; linarith
       have hσ3 : σ ≤ 3 := by linarith
       have hb := hCS s hs1 htT (by linarith) hσ3
-      calc _ ≤ CS := hb
+      calc
+        _ ≤ CS := hb
         _ ≤ |CS| := le_abs_self _
         _ ≤ 4 * |CS| * L ^ 2 := by nlinarith [abs_nonneg CS]
         _ ≤ _ := by nlinarith [mul_nonneg hK1 (sq_nonneg L), mul_nonneg hCR0 (sq_nonneg L)]

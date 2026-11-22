@@ -8,8 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.NotAllM
 open GlobalTheory.Ex
 noncomputable section
 namespace GlobalTheory.HomCalc
-variable {O O' O'' : Type} [CommRing O] [CommRing O'] [CommRing O''] {f : O →+* O'} {g : O' →+* O''}
-  {N : NumD O} {N' : NumD O'} {N'' : NumD O''}
+variable
+  {O O' O'' : Type} [CommRing O] [CommRing O'] [CommRing O'']
+  {f : O →+* O'} {g : O' →+* O''} {N : NumD O} {N' : NumD O'} {N'' : NumD O''}
 
 def comp (I : NumD.Hom f N N') (I' : NumD.Hom g N' N'') : NumD.Hom (g.comp f) N N'' where
   φ := I'.φ.comp I.φ
@@ -18,37 +19,49 @@ def comp (I : NumD.Hom f N N') (I' : NumD.Hom g N' N'') : NumD.Hom (g.comp f) N 
   θ_eq x y u := by
     have a := congrArg (fun v => Additive.ofMul (Units.map g.toMonoidHom v)) (I.θ_eq x y u)
     have b := congrArg Additive.ofMul (I'.θ_eq (I.φ x) (I.φ y) (I.φ u))
-    have c : Units.map (g.comp f).toMonoidHom (N.θ x y u) =
-      Units.map g.toMonoidHom (Units.map f.toMonoidHom (N.θ x y u)) := rfl
+    have c
+        : Units.map (g.comp f).toMonoidHom (N.θ x y u)
+          = Units.map g.toMonoidHom (Units.map f.toMonoidHom (N.θ x y u)) :=
+      rfl
     apply Additive.ofMul.injective
     simp only [c, map_mul, ofMul_mul, MonoidHom.comp_apply] at a b ⊢
     linear_combination (norm := abel) a + b
   σ_eq x := by
     have a := congrArg (fun v => Additive.ofMul (Units.map g.toMonoidHom v)) (I.σ_eq x)
     have b := congrArg Additive.ofMul (I'.σ_eq (I.φ x))
-    have c : Units.map (g.comp f).toMonoidHom (N.σ x) =
-      Units.map g.toMonoidHom (Units.map f.toMonoidHom (N.σ x)) := rfl
+    have c
+        : Units.map (g.comp f).toMonoidHom (N.σ x)
+          = Units.map g.toMonoidHom (Units.map f.toMonoidHom (N.σ x)) :=
+      rfl
     apply Additive.ofMul.injective
     simp only [c, map_mul, ofMul_mul, MonoidHom.comp_apply, map_inv I.φ] at a b ⊢
     linear_combination (norm := abel) a + b
   lam := I'.lam * Units.map g.toMonoidHom I.lam
   th_eq x := by
     rw [MonoidHom.comp_apply, I'.th_eq, I.th_eq]
-    simp only [map_mul, Units.val_mul, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, RingHom.comp_apply]
+    simp only [map_mul, Units.val_mul, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
+      RingHom.comp_apply]
     ring
   e := I.e.trans I'.e
   c_eq χ := by rw [AddEquiv.trans_apply, I'.c_eq, I.c_eq]; rfl
   ψ_eq χ := by
-    have c : Units.map (g.comp f).toMonoidHom (N.ψ χ) =
-      Units.map g.toMonoidHom (Units.map f.toMonoidHom (N.ψ χ)) := rfl
+    have c
+        : Units.map (g.comp f).toMonoidHom (N.ψ χ)
+          = Units.map g.toMonoidHom (Units.map f.toMonoidHom (N.ψ χ)) :=
+      rfl
     rw [c, ← I.ψ_eq, map_mul, ← I'.ψ_eq, I.c_eq, AddEquiv.trans_apply, mul_assoc]
 
-theorem comp_rel {I : NumD.Hom f N N'} {I' : NumD.Hom g N' N''} {a : N.Gt} {b : N'.Gt} {c : N''.Gt} (h : I.Rel a b)
-    (h' : I'.Rel b c) : (comp I I').Rel a c := by
+theorem comp_rel
+    {I : NumD.Hom f N N'} {I' : NumD.Hom g N' N''} {a : N.Gt} {b : N'.Gt} {c : N''.Gt}
+    (h : I.Rel a b) (h' : I'.Rel b c)
+    : (comp I I').Rel a c := by
   refine ⟨h'.1.trans (congrArg I'.φ h.1), fun χ => ?_⟩
   have u := congrArg (fun v => Additive.ofMul (Units.map g.toMonoidHom v)) (h.2 χ)
   have v := congrArg Additive.ofMul (h'.2 (I.e χ))
-  have w : Units.map (g.comp f).toMonoidHom (a.s χ) = Units.map g.toMonoidHom (Units.map f.toMonoidHom (a.s χ)) := rfl
+  have w
+      : Units.map (g.comp f).toMonoidHom (a.s χ)
+        = Units.map g.toMonoidHom (Units.map f.toMonoidHom (a.s χ)) :=
+    rfl
   rw [I.c_eq, h.1] at v
   show c.s (I'.e (I.e χ)) * (I'.h (I.φ _) * Units.map g.toMonoidHom (I.h _)) =
     _ * (I'.h (I.φ _) * Units.map g.toMonoidHom (I.h _)) * (I'.h (I.φ _) * Units.map g.toMonoidHom (I.h _))
@@ -85,9 +98,11 @@ def inv {M M' : NumD O} (I : NumD.Iso M' M) : NumD.Hom (RingHom.id O) M M' where
   ψ_eq χ := by
     obtain ⟨χ, rfl⟩ := I.e.surjective χ
     show _ = M.ψ _
-    rw [AddEquiv.symm_apply_apply, I.c_eq, MulEquiv.symm_apply_apply, ← I.ψ_eq, mul_inv_cancel_right]
+    rw [AddEquiv.symm_apply_apply, I.c_eq, MulEquiv.symm_apply_apply, ← I.ψ_eq,
+      mul_inv_cancel_right]
 
-theorem inv_rel {M M' : NumD O} {I : NumD.Iso M' M} {a : M'.Gt} {b : M.Gt} (h : I.Rel a b) : (inv I).Rel b a := by
+theorem inv_rel {M M' : NumD O} {I : NumD.Iso M' M} {a : M'.Gt} {b : M.Gt} (h : I.Rel a b)
+    : (inv I).Rel b a := by
   refine ⟨(I.φ.symm_apply_eq.2 h.1).symm, fun χ => ?_⟩
   obtain ⟨χ, rfl⟩ := I.e.surjective χ
   have u := congrArg Additive.ofMul (h.2 χ)

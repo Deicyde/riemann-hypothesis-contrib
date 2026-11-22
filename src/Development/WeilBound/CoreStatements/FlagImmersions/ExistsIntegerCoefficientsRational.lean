@@ -9,12 +9,13 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeome
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 namespace RootFieldNumerics
 
-theorem exists_clear_denominators_bis {J : Type} [Fintype J] (c : J → ℚ) :
-    ∃ (q : ℕ) (n : J → ℤ), 0 < q ∧ ∀ j, (n j : ℚ) = q * c j := by
+theorem exists_clear_denominators_bis {J : Type} [Fintype J] (c : J → ℚ)
+    : ∃ (q : ℕ) (n : J → ℤ), 0 < q ∧ ∀ j, (n j : ℚ) = q * c j := by
   classical
   refine ⟨∏ i, (c i).den, fun j => (c j).num * (((∏ i, (c i).den) / (c j).den : ℕ) : ℤ), ?_, ?_⟩
   · exact Finset.prod_pos (fun i _ => (c i).den_pos)
@@ -28,12 +29,16 @@ theorem exists_clear_denominators_bis {J : Type} [Fintype J] (c : J → ℚ) :
 
 end RootFieldNumerics
 
-theorem RootFieldNumerics.exists_integer_coefficients_rational : ∀ (Ψ : Type) [Fintype Ψ] (N : ℕ) (M : RootModel Ψ N) (lam : Wt Ψ N) (s : ℚ), IsRatWt lam → ∃ (q : ℕ) (n : Option (Ψ × Fin N) → ℤ), 0 < q ∧ ∀ j, (n j : ℝ) = q * M.coef lam s j := by
+theorem RootFieldNumerics.exists_integer_coefficients_rational
+    : ∀ (Ψ : Type) [Fintype Ψ] (N : ℕ) (M : RootModel Ψ N) (lam : Wt Ψ N) (s : ℚ),
+      IsRatWt lam
+        → ∃ (q : ℕ) (n : Option (Ψ × Fin N) → ℤ), 0 < q ∧ ∀ j, (n j : ℝ) = q * M.coef lam s j := by
   intro Ψ _ N M lam s hlam
   classical
   choose f hf using hlam
-  let c : Option (Ψ × Fin N) → ℚ := fun j => match j with
-    | some r => -f r.1 r.2
+  let c : Option (Ψ × Fin N) → ℚ := fun j =>
+    match j with
+    | some r => - f r.1 r.2
     | none => s / M.kA
   obtain ⟨q, n, hq, hn⟩ := RootFieldNumerics.exists_clear_denominators_bis c
   refine ⟨q, n, hq, fun j => ?_⟩

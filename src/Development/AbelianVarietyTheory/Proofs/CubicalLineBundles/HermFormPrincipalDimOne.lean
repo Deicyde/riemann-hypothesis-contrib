@@ -7,21 +7,28 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.PureTyp
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
-
 open PureTypeVector in
-theorem hermForm_principal_dim_one :
-  ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (w : Fin g → ℂ) (L : PeriodPair) (Hm : Matrix (Fin g) (Fin g) ℂ) (Ef : LinearMap.BilinForm ℤ Λ), g = 1 → w ≠ 0 → (∀ z : ℂ, z ∈ L.lattice ↔ z • w ∈ Λ) → Hm.IsHermitian → 0 < (hermForm Hm w w).re → (∀ a b : Λ, (Ef a b : ℝ) = (hermForm Hm a b).im) → Function.Bijective Ef → ∀ z z' : ℂ, hermForm Hm (z • w) (z' • w) = z * starRingEnd ℂ z' / (|(L.ω₁ * starRingEnd ℂ L.ω₂).im| : ℝ) := by
+theorem hermForm_principal_dim_one
+    : ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (w : Fin g → ℂ) (L : PeriodPair)
+        (Hm : Matrix (Fin g) (Fin g) ℂ) (Ef : LinearMap.BilinForm ℤ Λ),
+      g = 1 → w ≠ 0 → (∀ z : ℂ, z ∈ L.lattice ↔ z • w ∈ Λ) → Hm.IsHermitian
+        → 0 < (hermForm Hm w w).re → (∀ a b : Λ, (Ef a b : ℝ) = (hermForm Hm a b).im)
+        → Function.Bijective Ef
+        → ∀ z z' : ℂ,
+          hermForm Hm (z • w) (z' • w)
+            = z * starRingEnd ℂ z' / (|(L.ω₁ * starRingEnd ℂ L.ω₂).im| : ℝ) := by
   intro g Λ w L Hm Ef hg hw hΛ hH hpos hEf hbij z z'
   subst hg
   set H := hermForm Hm w w with hHdef
   have hHim : H.im = 0 := hermForm_self_im hH w
   have hHreal : H = (H.re : ℂ) := Complex.ext (by simp) (by simp [hHim])
-  have hsm : ∀ u v : ℂ, hermForm Hm (u • w) (v • w) = u * starRingEnd ℂ v * H :=
-    fun u v => hermForm_smul_smul Hm u v w w
+  have hsm : ∀ u v : ℂ, hermForm Hm (u • w) (v • w) = u * starRingEnd ℂ v * H := fun u v =>
+    hermForm_smul_smul Hm u v w w
   set D := (L.ω₁ * starRingEnd ℂ L.ω₂).im with hD
   have hw0 : w 0 ≠ 0 := by
     intro h
@@ -38,18 +45,21 @@ theorem hermForm_principal_dim_one :
     have hmem : (x.1 0 / w 0) ∈ L.lattice := (hΛ _).2 (by rw [← hx]; exact x.2)
     obtain ⟨m, n, hmn⟩ := PeriodPair.mem_lattice.1 hmem
     exact ⟨m, n, by rw [hmn]; exact hx⟩
-  have him : ∀ m n m' n' : ℤ,
-      (((m : ℂ) * L.ω₁ + n * L.ω₂) * starRingEnd ℂ ((m' : ℂ) * L.ω₁ + n' * L.ω₂)).im
-        = ((m * n' - n * m' : ℤ) : ℝ) * D := by
+  have him
+      : ∀ m n m' n' : ℤ,
+        (((m : ℂ) * L.ω₁ + n * L.ω₂) * starRingEnd ℂ ((m' : ℂ) * L.ω₁ + n' * L.ω₂)).im
+          = ((m * n' - n * m' : ℤ) : ℝ) * D := by
     intro m n m' n'
-    simp only [hD, map_add (f := _), map_mul, map_intCast, Complex.mul_im, Complex.add_im, Complex.add_re,
-      Complex.mul_re, Complex.conj_re, Complex.conj_im, Complex.intCast_re, Complex.intCast_im]
+    simp only [hD, map_add (f := _), map_mul, map_intCast, Complex.mul_im, Complex.add_im,
+      Complex.add_re, Complex.mul_re, Complex.conj_re, Complex.conj_im, Complex.intCast_re,
+      Complex.intCast_im]
     push_cast
     ring
-  have hEfc : ∀ (x y : Λ) (m n m' n' : ℤ),
-      (x : Fin 1 → ℂ) = ((m : ℂ) * L.ω₁ + n * L.ω₂) • w →
-      (y : Fin 1 → ℂ) = ((m' : ℂ) * L.ω₁ + n' * L.ω₂) • w →
-      (Ef x y : ℝ) = ((m * n' - n * m' : ℤ) : ℝ) * (H.re * D) := by
+  have hEfc
+      : ∀ (x y : Λ) (m n m' n' : ℤ),
+        (x : Fin 1 → ℂ) = ((m : ℂ) * L.ω₁ + n * L.ω₂) • w
+          → (y : Fin 1 → ℂ) = ((m' : ℂ) * L.ω₁ + n' * L.ω₂) • w
+          → (Ef x y : ℝ) = ((m * n' - n * m' : ℤ) : ℝ) * (H.re * D) := by
     intro x y m n m' n' hx hy
     rw [hEf, hx, hy, hsm, Complex.mul_im, hHim, him]
     ring
@@ -96,14 +106,15 @@ theorem hermForm_principal_dim_one :
     rcases smul_eq_zero.1 h0 with h | h
     · exact L.indep.ne_zero 0 (by simpa using h)
     · exact hw h
-  let f : Λ →ₗ[ℤ] ℤ :=
-    { toFun := fun y => Ef y a / k
-      map_add' := fun y y' => by
-        simp only [map_add (f := _), LinearMap.add_apply]
-        exact Int.add_ediv_of_dvd_left (hdvd y a)
-      map_smul' := fun c y => by
-        simp only [map_zsmul, LinearMap.smul_apply, smul_eq_mul, RingHom.id_apply]
-        exact Int.mul_ediv_assoc c (hdvd y a) }
+  let f : Λ →ₗ[ℤ] ℤ := {
+    toFun := fun y => Ef y a / k
+    map_add' := fun y y' => by
+      simp only [map_add (f := _), LinearMap.add_apply]
+      exact Int.add_ediv_of_dvd_left (hdvd y a)
+    map_smul' := fun c y => by
+      simp only [map_zsmul, LinearMap.smul_apply, smul_eq_mul, RingHom.id_apply]
+      exact Int.mul_ediv_assoc c (hdvd y a)
+  }
   obtain ⟨x, hx⟩ := hbij.2 f
   have hxb : Ef x b = -1 := by
     rw [hx]

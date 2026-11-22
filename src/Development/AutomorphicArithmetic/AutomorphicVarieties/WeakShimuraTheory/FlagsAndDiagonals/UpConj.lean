@@ -4,9 +4,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem up_mul {R : Type} [CommRing R] {X Y : M4 R} (hX : IsUp X) (hY : IsUp Y) : IsUp (X * Y) := by
+private theorem up_mul {R : Type} [CommRing R] {X Y : M4 R} (hX : IsUp X) (hY : IsUp Y)
+    : IsUp (X * Y) := by
   intro i j h
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_zero fun k _ => ?_
@@ -14,8 +17,9 @@ private theorem up_mul {R : Type} [CommRing R] {X Y : M4 R} (hX : IsUp X) (hY : 
   · rw [hX i k hk, zero_mul]
   · rw [hY k j (lt_of_lt_of_le h (not_lt.1 hk)), mul_zero]
 
-private theorem up_mul_diag {R : Type} [CommRing R] {X Y : M4 R} (hX : IsUp X) (hY : IsUp Y) (i : Fin 4) :
-    (X * Y : M4 R) i i = X i i * Y i i := by
+private theorem up_mul_diag
+    {R : Type} [CommRing R] {X Y : M4 R} (hX : IsUp X) (hY : IsUp Y) (i : Fin 4)
+    : (X * Y : M4 R) i i = X i i * Y i i := by
   rw [Matrix.mul_apply]
   rw [Finset.sum_eq_single i]
   · intro k _ hk
@@ -28,8 +32,10 @@ private theorem up_adj {R : Type} [CommRing R] {X : M4 R} (hX : IsUp X) : IsUp (
   intro i j h
   rw [adj_apply, hX _ _ (Fin.rev_lt_rev.2 h), smul_zero]
 
-theorem UpperTheory.V.Ws.Lab.upConj :
-    ∀ (R : Type) [CommRing R] (b T : M4 R), IsGSp 1 b → IsUp b → IsUp T → IsUp (b * T * adj b) ∧ ∀ i, (b * T * adj b : M4 R) i i = T i i := by
+theorem UpperTheory.V.Ws.Lab.upConj
+    : ∀ (R : Type) [CommRing R] (b T : M4 R),
+      IsGSp 1 b → IsUp b → IsUp T
+        → IsUp (b * T * adj b) ∧ ∀ i, (b * T * adj b : M4 R) i i = T i i := by
   intro R _ b T hb hbu hT
   have hadj := up_adj hbu
   refine ⟨up_mul (up_mul hbu hT) hadj, fun i => ?_⟩

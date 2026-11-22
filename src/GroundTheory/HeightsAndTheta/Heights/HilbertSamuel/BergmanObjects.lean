@@ -17,21 +17,22 @@ noncomputable section
 variable {D : ℕ} {X : Type} [TopologicalSpace X]
 
 structure HolLineBundle (A : FinHolAtlas D X) where
-
   g : Fin A.n → Fin A.n → X → ℂ
   holo : ∀ j k, A.HoloOn ((A.chart j).source ∩ (A.chart k).source) (g j k)
   ne_zero : ∀ j k, ∀ x ∈ (A.chart j).source ∩ (A.chart k).source, g j k x ≠ 0
-  cocycle : ∀ j k l, ∀ x ∈ (A.chart j).source ∩ (A.chart k).source ∩ (A.chart l).source,
-    g j l x = g j k x * g k l x
+  cocycle
+    : ∀ j k l, ∀ x ∈ (A.chart j).source ∩ (A.chart k).source ∩ (A.chart l).source,
+      g j l x = g j k x * g k l x
 
 namespace HolLineBundle
 
 variable {A : FinHolAtlas D X} (L : HolLineBundle A)
 
 def sections (n : ℕ) : Submodule ℂ (Fin A.n → X → ℂ) where
-  carrier := {f | (∀ j, A.HoloOn (A.chart j).source (f j)) ∧
-    (∀ j k, ∀ x ∈ (A.chart j).source ∩ (A.chart k).source, f j x = L.g j k x ^ n * f k x) ∧
-    ∀ j, ∀ x ∉ (A.chart j).source, f j x = 0}
+  carrier :=
+    {f | (∀ j, A.HoloOn (A.chart j).source (f j)) ∧
+      (∀ j k, ∀ x ∈ (A.chart j).source ∩ (A.chart k).source, f j x = L.g j k x ^ n * f k x) ∧
+      ∀ j, ∀ x ∉ (A.chart j).source, f j x = 0}
   add_mem' := by
     rintro f f' ⟨hf, hc, hz⟩ ⟨hf', hc', hz'⟩
     refine ⟨fun j k => (hf j k).add (hf' j k), fun j k x hx => ?_, fun j x hx => ?_⟩
@@ -49,11 +50,11 @@ def sections (n : ℕ) : Submodule ℂ (Fin A.n → X → ℂ) where
 end HolLineBundle
 
 structure Weight {A : FinHolAtlas D X} (L : HolLineBundle A) where
-
   φ : Fin A.n → X → ℝ
   smooth : ∀ j, A.SmoothOn (A.chart j).source (φ j)
-  compat : ∀ j k, ∀ x ∈ (A.chart j).source ∩ (A.chart k).source,
-    φ j x = φ k x + Real.log (‖L.g j k x‖ ^ 2)
+  compat
+    : ∀ j k, ∀ x ∈ (A.chart j).source ∩ (A.chart k).source,
+      φ j x = φ k x + Real.log (‖L.g j k x‖ ^ 2)
 
 namespace Weight
 
@@ -67,11 +68,10 @@ def lerp (W₀ W₁ : Weight L) (t : ℝ) : Weight L where
   smooth j k := (W₀.smooth j k).add (contDiffOn_const.mul ((W₁.smooth j k).sub (W₀.smooth j k)))
   compat j k x hx := by rw [W₀.compat j k x hx, W₁.compat j k x hx]; ring
 
-def diff (W₁ W₀ : Weight L) (x : X) : ℝ :=
-  W₁.φ (chartIdx A x) x - W₀.φ (chartIdx A x) x
+def diff (W₁ W₀ : Weight L) (x : X) : ℝ := W₁.φ (chartIdx A x) x - W₀.φ (chartIdx A x) x
 
-theorem diff_eq (W₁ W₀ : Weight L) (j : Fin A.n) {x : X} (hx : x ∈ (A.chart j).source) :
-    diff W₁ W₀ x = W₁.φ j x - W₀.φ j x := by
+theorem diff_eq (W₁ W₀ : Weight L) (j : Fin A.n) {x : X} (hx : x ∈ (A.chart j).source)
+    : diff W₁ W₀ x = W₁.φ j x - W₀.φ j x := by
   have hi : x ∈ (A.chart (chartIdx A x)).source := Classical.choose_spec (A.cover x)
   rw [diff, W₁.compat (chartIdx A x) j x ⟨hi, hx⟩, W₀.compat (chartIdx A x) j x ⟨hi, hx⟩]
   ring
@@ -79,16 +79,16 @@ theorem diff_eq (W₁ W₀ : Weight L) (j : Fin A.n) {x : X} (hx : x ∈ (A.char
 end Weight
 
 structure SmoothVolume [MeasurableSpace X] (A : FinHolAtlas D X) where
-
   μ : Measure X
   isProb : IsProbabilityMeasure μ
-
   dens : Fin A.n → (Fin D → ℂ) → ℝ
   smooth : ∀ j, ContDiffOn ℝ ∞ (dens j) (A.chart j).target
   pos : ∀ j, ∀ y ∈ (A.chart j).target, 0 < dens j y
-  chart_lintegral : ∀ j (g : X → ℝ≥0∞), Measurable g →
-    ∫⁻ x in (A.chart j).source, g x ∂μ =
-      ∫⁻ y in (A.chart j).target, g ((A.chart j).symm y) * ENNReal.ofReal (dens j y)
+  chart_lintegral
+    : ∀ j (g : X → ℝ≥0∞),
+      Measurable g
+        → ∫⁻ x in (A.chart j).source, g x ∂μ
+          = ∫⁻ y in (A.chart j).target, g ((A.chart j).symm y) * ENNReal.ofReal (dens j y)
 
 variable {A : FinHolAtlas D X} {L : HolLineBundle A}
 
@@ -100,24 +100,28 @@ variable [MeasurableSpace X]
 def sectionL2NormSq (W : Weight L) (dV : SmoothVolume A) (n : ℕ) (s : Fin A.n → X → ℂ) : ℝ :=
   ∫ x, ptNormSq W n s x ∂dV.μ
 
-def bergman (W : Weight L) (dV : SmoothVolume A) (V : Submodule ℂ (Fin A.n → X → ℂ)) (n : ℕ)
-    (x : X) : ℝ :=
+def bergman (W : Weight L) (dV : SmoothVolume A) (V : Submodule ℂ (Fin A.n → X → ℂ)) (n : ℕ) (x : X)
+    : ℝ :=
   ⨆ s : V, ptNormSq W n (s : Fin A.n → X → ℂ) x / sectionL2NormSq W dV n s
 
 def chernTopDens (W : Weight L) (j : Fin A.n) (y : Fin D → ℂ) : ℝ :=
   (D.factorial : ℝ) * ((((1 / Real.pi : ℝ) : ℂ) • hessC (W.φ j ∘ (A.chart j).symm) y).det).re
 
 def bergmanDens (W : Weight L) (dV : SmoothVolume A) (x : X) : ℝ :=
-  chernTopDens W (chartIdx A x) (A.chart (chartIdx A x) x) /
-    ((D.factorial : ℝ) * dV.dens (chartIdx A x) (A.chart (chartIdx A x) x))
+  chernTopDens W (chartIdx A x) (A.chart (chartIdx A x) x)
+    / ((D.factorial : ℝ) * dV.dens (chartIdx A x) (A.chart (chartIdx A x) x))
 
-def gram (W : Weight L) (dV : SmoothVolume A) (n : ℕ) {ι : Type*} (e : ι → Fin A.n → X → ℂ) :
-    Matrix ι ι ℂ :=
-  Matrix.of fun a b => ∫ x, e a (chartIdx A x) x * conj (e b (chartIdx A x) x) *
-    ((Real.exp (-(n : ℝ) * W.φ (chartIdx A x) x) : ℝ) : ℂ) ∂dV.μ
+def gram (W : Weight L) (dV : SmoothVolume A) (n : ℕ) {ι : Type*} (e : ι → Fin A.n → X → ℂ)
+    : Matrix ι ι ℂ :=
+  Matrix.of fun a b =>
+    ∫ x, e a (chartIdx A x) x * conj (e b (chartIdx A x) x) *
+      ((Real.exp (-(n : ℝ) * W.φ (chartIdx A x) x) : ℝ) : ℂ) ∂dV.μ
 
-def chiGram (W : Weight L) (dV : SmoothVolume A) (n : ℕ) {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (e : ι → Fin A.n → X → ℂ) : ℝ :=
+def chiGram
+    (W : Weight L) (dV : SmoothVolume A) (n : ℕ)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (e : ι → Fin A.n → X → ℂ)
+    : ℝ :=
   -(1 / 2) * Real.log (gram W dV n e).det.re
 
 end

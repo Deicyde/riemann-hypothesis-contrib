@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.GenericE
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.E.t_E2Cut LateralTheory.E.ZLGPf LateralTheory.E.StalkGermPf GlobalTheory.StalkLimit
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.E.t_E2Cut
+  LateralTheory.E.ZLGPf LateralTheory.E.StalkGermPf GlobalTheory.StalkLimit
 
 namespace LateralTheory.E.StalkContPf
 
@@ -14,22 +15,27 @@ set_option backward.isDefEq.respectTransparency false
 
 variable {X S : Scheme.{0}}
 
-theorem diagram_map_eq (p : X ⟶ S) (s : S) {V W : AffNhd s} (i : V ⟶ W) :
-    (diagram s p).map i = resO p i.le := by
+theorem diagram_map_eq (p : X ⟶ S) (s : S) {V W : AffNhd s} (i : V ⟶ W)
+    : (diagram s p).map i = resO p i.le := by
   apply pullback.hom_ext <;> simp [diagram, resO]
 
-theorem cone_app_eq (p : X ⟶ S) (s : S) (V : AffNhd s) :
-    (cone (IsPullback.of_hasPullback p (S.fromSpecStalk s))).π.app V = toO p s V.1 V.2.1 := by
+theorem cone_app_eq (p : X ⟶ S) (s : S) (V : AffNhd s)
+    : (cone (IsPullback.of_hasPullback p (S.fromSpecStalk s))).π.app V = toO p s V.1 V.2.1 := by
   apply pullback.hom_ext <;> simp [cone, toO]
 
-theorem pull_cone {q : ℕ} {n i : ℤ} (p : X ⟶ S) (s : S) (V : AffNhd s) (y : Ht q (sch.obj (overO p V.1)) n i) :
-    pull _ (sch.map ((cone (IsPullback.of_hasPullback p (S.fromSpecStalk s))).π.app V)) (tw q i) n y =
-      pull _ (sch.map (toO p s V.1 V.2.1)) (tw q i) n y := by
+theorem pull_cone
+    {q : ℕ} {n i : ℤ} (p : X ⟶ S) (s : S) (V : AffNhd s) (y : Ht q (sch.obj (overO p V.1)) n i)
+    : pull _ (sch.map ((cone (IsPullback.of_hasPullback p (S.fromSpecStalk s))).π.app V)) (tw q i) n
+        y
+      = pull _ (sch.map (toO p s V.1 V.2.1)) (tw q i) n y := by
   rw [cone_app_eq]; rfl
 
-theorem pull_diag {q : ℕ} {n i : ℤ} (p : X ⟶ S) (s : S) {V W : AffNhd s} (f : V ⟶ W)
-    (y : Ht q (sch.obj (overO p W.1)) n i) :
-    pull _ (sch.map ((diagram s p).map f)) (tw q i) n y = pull _ (sch.map (resO p f.le)) (tw q i) n y := by
+theorem pull_diag
+    {q : ℕ} {n i : ℤ}
+    (p : X ⟶ S) (s : S)
+    {V W : AffNhd s} (f : V ⟶ W) (y : Ht q (sch.obj (overO p W.1)) n i)
+    : pull _ (sch.map ((diagram s p).map f)) (tw q i) n y
+      = pull _ (sch.map (resO p f.le)) (tw q i) n y := by
   rw [diagram_map_eq]; rfl
 
 theorem exists_aff (s : S) (U : S.Opens) (hs : s ∈ U) : ∃ V : AffNhd s, V.1 ≤ U := by
@@ -53,8 +59,10 @@ theorem StalkCont_of : StalkCont := by
   constructor
   · intro U hs x hx
     obtain ⟨V0, hV0⟩ := exists_aff s U hs
-    have h0 : pull _ (sch.map ((cone (IsPullback.of_hasPullback p (S.fromSpecStalk s))).π.app V0)) _ _
-        (pull _ (sch.map (resO p hV0)) _ _ x) = 0 := by
+    have h0
+        : pull _ (sch.map ((cone (IsPullback.of_hasPullback p (S.fromSpecStalk s))).π.app V0)) _ _
+            (pull _ (sch.map (resO p hV0)) _ _ x)
+          = 0 := by
       rw [pull_cone, ← pull_mc, toO_res]; exact hx
     obtain ⟨k, f, hf⟩ := hkill V0 _ h0
     have hkV : k.1 ≤ V0.1 := f.le

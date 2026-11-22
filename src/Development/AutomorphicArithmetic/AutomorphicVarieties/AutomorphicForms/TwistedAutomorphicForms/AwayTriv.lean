@@ -7,8 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Dense
 
 open NumberField IsDedekindDomain Neutral.B1
 
-theorem UpperTheory.V.Af.Tw.awayTriv :
-    UpperTheory.V.Af.Tw.AwayTriv := by
+theorem UpperTheory.V.Af.Tw.awayTriv : UpperTheory.V.Af.Tw.AwayTriv := by
   intro F B _ _ _ _ _ _ N S hN hinf hS b hbS hbin
   classical
   have k1 : (b : AdeleRing (𝓞 F) F).1 * ((b⁻¹ : Ideles F) : AdeleRing (𝓞 F) F).1 = 1 :=
@@ -19,10 +18,18 @@ theorem UpperTheory.V.Af.Tw.awayTriv :
     congrArg Prod.snd (Units.mul_inv b)
   have k4 : ((b⁻¹ : Ideles F) : AdeleRing (𝓞 F) F).2 * (b : AdeleRing (𝓞 F) F).2 = 1 :=
     congrArg Prod.snd (Units.inv_mul b)
-  let binf : Ideles F := ⟨((b : AdeleRing (𝓞 F) F).1, 1), (((b⁻¹ : Ideles F) : AdeleRing (𝓞 F) F).1, 1),
-    Prod.ext k1 (mul_one 1), Prod.ext k2 (mul_one 1)⟩
-  let bfin : Ideles F := ⟨(1, (b : AdeleRing (𝓞 F) F).2), (1, ((b⁻¹ : Ideles F) : AdeleRing (𝓞 F) F).2),
-    Prod.ext (mul_one 1) k3, Prod.ext (mul_one 1) k4⟩
+  let binf : Ideles F := ⟨
+    ((b : AdeleRing (𝓞 F) F).1, 1),
+    (((b⁻¹ : Ideles F) : AdeleRing (𝓞 F) F).1, 1),
+    Prod.ext k1 (mul_one 1),
+    Prod.ext k2 (mul_one 1)
+  ⟩
+  let bfin : Ideles F := ⟨
+    (1, (b : AdeleRing (𝓞 F) F).2),
+    (1, ((b⁻¹ : Ideles F) : AdeleRing (𝓞 F) F).2),
+    Prod.ext (mul_one 1) k3,
+    Prod.ext (mul_one 1) k4
+  ⟩
   have hb : b = binf * bfin := by
     apply Units.ext
     exact Prod.ext (mul_one _).symm (one_mul _).symm

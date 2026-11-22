@@ -10,15 +10,16 @@ open Module
 
 namespace Formalism.L2.SG.Pf.G4
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
 
 variable {K V : Type*} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
 variable {S : Subring K} {π : K} {h : V →ₗ⋆[K] V →ₗ[K] K}
 
-theorem exists_isom_move' (hs : h.IsSymm) {x y : V} (hxy : h x x = h y y)
-    (hb : h x x - h y x ≠ 0) :
-    ∃ τ ∈ Formalism.HermitianLatticesTheory.isom h, τ x = y ∧ (∀ v, h x v = 0 → h y v = 0 → τ v = v) ∧
-      ∀ W : Submodule K V, x ∈ W → y ∈ W → ∀ v, v ∈ W ↔ τ v ∈ W := by
+theorem exists_isom_move' (hs : h.IsSymm) {x y : V} (hxy : h x x = h y y) (hb : h x x - h y x ≠ 0)
+    : ∃ τ ∈ Formalism.HermitianLatticesTheory.isom h,
+      τ x = y ∧ (∀ v, h x v = 0 → h y v = 0 → τ v = v)
+        ∧ ∀ W : Submodule K V, x ∈ W → y ∈ W → ∀ v, v ∈ W ↔ τ v ∈ W := by
   have hsym : ∀ u v, star (h u v) = h v u := fun u v => by
     rw [← starRingEnd_apply]
     exact hs.eq u v
@@ -26,25 +27,23 @@ theorem exists_isom_move' (hs : h.IsSymm) {x y : V} (hxy : h x x = h y y)
   obtain ⟨b, hbd⟩ : ∃ b, b = h x x - h y x := ⟨_, rfl⟩
   have hb0 : b ≠ 0 := hbd ▸ hb
   have hsb0 : star b ≠ 0 := star_ne_zero.2 hb0
-  have hzx : h z x = b := by
-    rw [hz, hbd, map_sub, LinearMap.sub_apply]
-  have hzv : ∀ v, h z v = h x v - h y v := fun v => by
-    rw [hz, map_sub, LinearMap.sub_apply]
+  have hzx : h z x = b := by rw [hz, hbd, map_sub, LinearMap.sub_apply]
+  have hzv : ∀ v, h z v = h x v - h y v := fun v => by rw [hz, map_sub, LinearMap.sub_apply]
   have hzz : h z z = b + star b := by
-    have h1 : star b = h x x - h x y := by
-      rw [hbd, star_sub, hsym, hsym]
+    have h1 : star b = h x x - h x y := by rw [hbd, star_sub, hsym, hsym]
     rw [h1, hbd, hzv, hz, map_sub, map_sub, hxy]
     ring
   let τl : V →ₗ[K] V := LinearMap.id - (b⁻¹ • h z).smulRight z
   let σl : V →ₗ[K] V := LinearMap.id - ((star b)⁻¹ • h z).smulRight z
   have hτ : ∀ v, τl v = v - (b⁻¹ * h z v) • z := fun v => rfl
   have hσ : ∀ v, σl v = v - ((star b)⁻¹ * h z v) • z := fun v => rfl
-  have key : ∀ c d : K, c + d = c * d * h z z → ∀ v : V,
-      (v - (c * h z v) • z) - (d * h z (v - (c * h z v) • z)) • z = v := by
+  have key
+      : ∀ c d : K,
+        c + d = c * d * h z z
+          → ∀ v : V, (v - (c * h z v) • z) - (d * h z (v - (c * h z v) • z)) • z = v := by
     intro c d hcd v
     rw [map_sub, map_smul, smul_eq_mul, sub_sub, ← add_smul]
-    have h0 : c * h z v + d * (h z v - c * h z v * h z z) = 0 := by
-      linear_combination (h z v) * hcd
+    have h0 : c * h z v + d * (h z v - c * h z v * h z z) = 0 := by linear_combination (h z v) * hcd
     rw [h0, zero_smul, sub_zero]
   have hcd : (star b)⁻¹ + b⁻¹ = (star b)⁻¹ * b⁻¹ * h z z := by
     rw [hzz]
@@ -87,9 +86,10 @@ theorem exists_isom_move' (hs : h.IsSymm) {x y : V} (hxy : h x x = h y y)
       have := W.add_mem hv (W.smul_mem (b⁻¹ * h z v) hzW)
       rwa [sub_add_cancel] at this
 
-theorem exists_isom_scale' (hs : h.IsSymm) {z : V} (hz : h z z ≠ 0) {b : K} (hb : star b * b = 1) :
-    ∃ ψ ∈ Formalism.HermitianLatticesTheory.isom h, ψ z = b • z ∧ (∀ v, h z v = 0 → ψ v = v) ∧
-      ∀ W : Submodule K V, z ∈ W → ∀ v, v ∈ W ↔ ψ v ∈ W := by
+theorem exists_isom_scale' (hs : h.IsSymm) {z : V} (hz : h z z ≠ 0) {b : K} (hb : star b * b = 1)
+    : ∃ ψ ∈ Formalism.HermitianLatticesTheory.isom h,
+      ψ z = b • z ∧ (∀ v, h z v = 0 → ψ v = v)
+        ∧ ∀ W : Submodule K V, z ∈ W → ∀ v, v ∈ W ↔ ψ v ∈ W := by
   obtain ⟨ψ, hψ, hψz, hψv⟩ := exists_isom_scale hs hz hb
   refine ⟨ψ, hψ, hψz, hψv, ?_⟩
   intro W hzW v
@@ -110,10 +110,11 @@ theorem exists_isom_scale' (hs : h.IsSymm) {z : V} (hz : h z z ≠ 0) {b : K} (h
     have h2 := W.add_mem h1 (W.smul_mem (h z v * (h z z)⁻¹) hzW)
     rwa [sub_add_cancel] at h2
 
-theorem exists_isom_map_of_eq_norm (hs : h.IsSymm) (h2 : (2 : K) ≠ 0) {x y : V} (hxy : h x x = h y y)
-    (hx0 : h x x ≠ 0) :
-    ∃ τ ∈ Formalism.HermitianLatticesTheory.isom h, τ x = y ∧ (∀ v, h x v = 0 → h y v = 0 → τ v = v) ∧
-      ∀ W : Submodule K V, x ∈ W → y ∈ W → ∀ v, v ∈ W ↔ τ v ∈ W := by
+theorem exists_isom_map_of_eq_norm
+    (hs : h.IsSymm) (h2 : (2 : K) ≠ 0) {x y : V} (hxy : h x x = h y y) (hx0 : h x x ≠ 0)
+    : ∃ τ ∈ Formalism.HermitianLatticesTheory.isom h,
+      τ x = y ∧ (∀ v, h x v = 0 → h y v = 0 → τ v = v)
+        ∧ ∀ W : Submodule K V, x ∈ W → y ∈ W → ∀ v, v ∈ W ↔ τ v ∈ W := by
   by_cases hb : h x x - h y x = 0
   · have hxy' : h x x = h (-y) (-y) := by
       simp only [map_neg, LinearMap.neg_apply, neg_neg]
@@ -125,15 +126,14 @@ theorem exists_isom_map_of_eq_norm (hs : h.IsSymm) (h2 : (2 : K) ≠ 0) {x y : V
       exact mul_ne_zero h2 hx0
     obtain ⟨τ, hτ, hτx, hτv, hτW⟩ := exists_isom_move' hs hxy' hb'
     have hy0 : h y y ≠ 0 := hxy ▸ hx0
-    obtain ⟨ψ, hψ, hψy, hψv, hψW⟩ := exists_isom_scale' hs hy0 (b := -1)
-      (by rw [star_neg, star_one]; norm_num)
+    obtain ⟨ψ, hψ, hψy, hψv, hψW⟩ :=
+      exists_isom_scale' hs hy0 (b := -1) (by rw [star_neg, star_one]; norm_num)
     refine ⟨ψ * τ, mul_mem hψ hτ, ?_, ?_, ?_⟩
     · show ψ (τ x) = y
       rw [hτx, map_neg, hψy, neg_one_smul, neg_neg]
     · intro v hxv hyv
       show ψ (τ v) = v
-      have hyv' : h (-y) v = 0 := by
-        simp only [map_neg, LinearMap.neg_apply, hyv, neg_zero]
+      have hyv' : h (-y) v = 0 := by simp only [map_neg, LinearMap.neg_apply, hyv, neg_zero]
       rw [hτv v hxv hyv', hψv v hyv]
     · intro W hxW hyW v
       show v ∈ W ↔ ψ (τ v) ∈ W
@@ -141,11 +141,14 @@ theorem exists_isom_map_of_eq_norm (hs : h.IsSymm) (h2 : (2 : K) ≠ 0) {x y : V
       exact hψW W hyW (τ v)
   · exact exists_isom_move' hs hxy hb
 
-theorem exists_prep' (hs : h.IsSymm) (h2 : (2 : K) ≠ 0) {W₁ W₂ : Submodule K V}
-    {φ : V ≃ₗ[K] V} (hφ : φ ∈ Formalism.HermitianLatticesTheory.isom h) (hW : ∀ v, v ∈ W₁ ↔ φ v ∈ W₂) {x X : V}
-    (hx : x ∈ W₁) (hX : X ∈ W₂) (hxX : h x x = h X X) (hx0 : h x x ≠ 0) :
-    ∃ φ' ∈ Formalism.HermitianLatticesTheory.isom h, φ' x = X ∧ (∀ v, v ∈ cutW h W₁ x ↔ φ' v ∈ cutW h W₂ X) ∧
-      ∀ v, (∀ w ∈ W₁, h w v = 0) → φ' v = φ v := by
+theorem exists_prep'
+    (hs : h.IsSymm) (h2 : (2 : K) ≠ 0)
+    {W₁ W₂ : Submodule K V} {φ : V ≃ₗ[K] V}
+    (hφ : φ ∈ Formalism.HermitianLatticesTheory.isom h) (hW : ∀ v, v ∈ W₁ ↔ φ v ∈ W₂)
+    {x X : V} (hx : x ∈ W₁) (hX : X ∈ W₂) (hxX : h x x = h X X) (hx0 : h x x ≠ 0)
+    : ∃ φ' ∈ Formalism.HermitianLatticesTheory.isom h,
+      φ' x = X ∧ (∀ v, v ∈ cutW h W₁ x ↔ φ' v ∈ cutW h W₂ X)
+        ∧ ∀ v, (∀ w ∈ W₁, h w v = 0) → φ' v = φ v := by
   have hφ' : ∀ a c, h (φ a) (φ c) = h a c := hφ
   have hφx : φ x ∈ W₂ := (hW x).1 hx
   have hn : h (φ x) (φ x) = h X X := by rw [hφ' x x]; exact hxX
@@ -165,12 +168,14 @@ theorem exists_prep' (hs : h.IsSymm) (h2 : (2 : K) ≠ 0) {W₁ W₂ : Submodule
       rw [hφ' x' v]
       exact hv x' ((hW x').2 hX)
 
-theorem sd_main' [FiniteDimensional K V] (hS : IsHermSemilocal S) (hπ : IsUnif S π)
-    (hs : h.IsSymm) (h2 : (2 : K) ≠ 0) (n : ℕ) :
-    ∀ (W₁ W₂ : Submodule K V) (M N : AddSubgroup V) (φ : V ≃ₗ[K] V), finrank K W₁ ≤ n →
-      NondegOn h W₁ → IsSD S h W₁ M → IsSD S h W₂ N → φ ∈ Formalism.HermitianLatticesTheory.isom h →
-      (∀ v, v ∈ W₁ ↔ φ v ∈ W₂) →
-      ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, (∀ v, (∀ w ∈ W₁, h w v = 0) → g v = φ v) ∧ ∀ v, v ∈ M ↔ g v ∈ N := by
+theorem sd_main'
+    [FiniteDimensional K V]
+    (hS : IsHermSemilocal S) (hπ : IsUnif S π) (hs : h.IsSymm) (h2 : (2 : K) ≠ 0) (n : ℕ)
+    : ∀ (W₁ W₂ : Submodule K V) (M N : AddSubgroup V) (φ : V ≃ₗ[K] V),
+      finrank K W₁ ≤ n → NondegOn h W₁ → IsSD S h W₁ M → IsSD S h W₂ N
+        → φ ∈ Formalism.HermitianLatticesTheory.isom h → (∀ v, v ∈ W₁ ↔ φ v ∈ W₂)
+        → ∃ g ∈ Formalism.HermitianLatticesTheory.isom h,
+          (∀ v, (∀ w ∈ W₁, h w v = 0) → g v = φ v) ∧ ∀ v, v ∈ M ↔ g v ∈ N := by
   have hsym : ∀ u v, star (h u v) = h v u := fun u v => by
     rw [← starRingEnd_apply]
     exact hs.eq u v
@@ -224,22 +229,21 @@ theorem sd_main' [FiniteDimensional K V] (hS : IsHermSemilocal S) (hπ : IsUnif 
           exact hx
         exact hx0 (mem_cutW.1 hxc).2
       omega
-    obtain ⟨g, hg, hgv, hgM⟩ := ih (cutW h W₁ x) (cutW h W₂ X) (cutM h M x) (cutM h N X) φ₁ hr'
-      (nondegOn_cut hnd hx hx0) (hM.cut hxM hxu) (hN.cut hXN hXu) hφ₁ hφ₁W
+    obtain ⟨g, hg, hgv, hgM⟩ :=
+      ih (cutW h W₁ x) (cutW h W₂ X) (cutM h M x) (cutM h N X) φ₁ hr' (nondegOn_cut hnd hx hx0)
+        (hM.cut hxM hxu) (hN.cut hXN hXu) hφ₁ hφ₁W
     have hg' : ∀ a c, h (g a) (g c) = h a c := hg
     have horth : ∀ w ∈ cutW h W₁ x, h w x = 0 := fun w hw => by
       rw [← hsym x w, (mem_cutW.1 hw).2, star_zero]
-    have hgx : g x = X := by
-      rw [hgv x horth, hφ₁x]
-    have hdec : ∀ v : V, v = (v - (h x v * (h x x)⁻¹) • x) + (h x v * (h x x)⁻¹) • x :=
-      fun v => by abel
+    have hgx : g x = X := by rw [hgv x horth, hφ₁x]
+    have hdec : ∀ v : V, v = (v - (h x v * (h x x)⁻¹) • x) + (h x v * (h x x)⁻¹) • x := fun v => by
+      abel
     have hgdec : ∀ v, g v = g (v - (h x v * (h x x)⁻¹) • x) + (h x v * (h x x)⁻¹) • X := fun v => by
       conv_lhs => rw [hdec v]
       rw [map_add (f := _), map_smul, hgx]
     refine ⟨g, hg, fun v hv => ?_, fun v => ?_⟩
     · rw [hgv v (fun w hw => hv w (mem_cutW.1 hw).1), hφ₁v v hv]
-    have hxvX : h X (g v) = h x v := by
-      rw [← hgx, hg']
+    have hxvX : h X (g v) = h x v := by rw [← hgx, hg']
     have hxxinv : (h x x)⁻¹ ∈ S := hxu.2.2
     constructor
     · intro hv

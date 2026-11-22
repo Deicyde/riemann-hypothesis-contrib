@@ -12,7 +12,8 @@ open Formalism.L2.Theta
 
 namespace Formalism.IndefR.Tow.OrbStPf
 
-variable {n : ℕ} {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+variable
+  {n : ℕ} {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
   (ρ : Matrix (Fin n) (Fin n) ℂ → (E →L[ℂ] E)) (Lie U : Set (Matrix (Fin n) (Fin n) ℂ))
 
 section SV
@@ -22,7 +23,8 @@ variable {ρ Lie}
 end SV
 
 variable {ρ Lie U}
-variable (hU1 : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ U) (hUm : ∀ a ∈ U, ∀ b ∈ U, a * b ∈ U)
+variable
+  (hU1 : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ U) (hUm : ∀ a ∈ U, ∀ b ∈ U, a * b ∈ U)
   (hρ : ∀ a ∈ U, ∀ b ∈ U, ρ (a * b) = (ρ a).comp (ρ b))
   (hexp : ∀ Y ∈ Lie, ∀ t : ℝ, NormedSpace.exp (t • Y) ∈ U)
 
@@ -43,7 +45,6 @@ lemma prod_drop_mem {N : ℕ} (Z : Fin N → Matrix (Fin n) (Fin n) ℂ) (hZ : �
   simp only [List.mem_ofFn] at ha'
   obtain ⟨i, rfl⟩ := ha'
   exact hexp _ (hZ i) _
-
 
 include hU1 hUm hρ hexp in
 lemma smoothVec_rep_exp {X : Matrix (Fin n) (Fin n) ℂ} (hX : X ∈ Lie) (s : ℝ) {w : E} (hw : SmoothVec Lie ρ w) :
@@ -72,7 +73,6 @@ lemma smoothVec_rep_exp {X : Matrix (Fin n) (Fin n) ℂ} (hX : X ∈ Lie) (s : �
     exact hexp _ (hXs i) _
   rw [hρ _ hP _ (hexp _ hX _)]
   rfl
-
 
 variable (ρ) in
 def orb {N : ℕ} (Z : Fin N → Matrix (Fin n) (Fin n) ℂ) (u : E) (j : ℕ) (r : Fin N → ℝ) : E :=
@@ -141,12 +141,19 @@ lemma orb_last {k : ℕ} (Z : Fin (k + 1) → Matrix (Fin n) (Fin n) ℂ) (u : E
   rw [List.ofFn_succ', List.concat_eq_append, List.drop_left' (by simp), List.prod_singleton]
 
 include hU1 hUm hρ hexp in
-theorem word_pds {k : ℕ} (l : List (Matrix (Fin n) (Fin n) ℂ)) (hl : l.length = k)
-    (Z : Fin (k + 1) → Matrix (Fin n) (Fin n) ℂ) (hZ : ∀ i, Z i ∈ Lie)
-    (hZl : ∀ (i : Fin (k + 1)) (h : i.val < k), Z i = l[i.val]'(by omega)) :
-    ∀ d j, j + d = k → ∃ L : List (Fin (k + 1)), (∀ i ∈ L, j ≤ i.val ∧ i.val < k) ∧
-      ∀ u, SmoothVec Lie ρ u → ∀ r : Fin (k + 1) → ℝ, (∀ i : Fin (k + 1), j ≤ i.val → i.val < k → r i = 0) →
-        (l.drop j).foldr (dRep ρ) (orb ρ Z u k r) = pds L (orb ρ Z u j) r := by
+theorem word_pds
+    {k : ℕ} (l : List (Matrix (Fin n) (Fin n) ℂ)) (hl : l.length = k)
+    (Z : Fin (k + 1) → Matrix (Fin n) (Fin n) ℂ)
+    (hZ : ∀ i, Z i ∈ Lie) (hZl : ∀ (i : Fin (k + 1)) (h : i.val < k), Z i = l[i.val]'(by omega))
+    : ∀ d j,
+      j + d = k
+        → ∃ L : List (Fin (k + 1)),
+          (∀ i ∈ L, j ≤ i.val ∧ i.val < k)
+            ∧ ∀ u,
+              SmoothVec Lie ρ u
+                → ∀ r : Fin (k + 1) → ℝ,
+                  (∀ i : Fin (k + 1), j ≤ i.val → i.val < k → r i = 0)
+                    → (l.drop j).foldr (dRep ρ) (orb ρ Z u k r) = pds L (orb ρ Z u j) r := by
   intro d
   induction d with
   | zero =>
@@ -180,27 +187,34 @@ theorem word_pds {k : ℕ} (l : List (Matrix (Fin n) (Fin n) ℂ)) (hl : l.lengt
       have hdiff : DifferentiableAt ℝ (pds L' (orb ρ Z u j)) r := hF.differentiable (by simp) r
       rw [pd_eq_deriv _ r hdiff]
       have hZj : Z ⟨j, by omega⟩ = l[j] := hZl ⟨j, by omega⟩ hjk
-      have hfun : (fun t : ℝ => pds L' (orb ρ Z u j) (r + t • Pi.single (⟨j, by omega⟩ : Fin (k + 1)) (1 : ℝ))) =
-          fun t => ρ (NormedSpace.exp (t • Z ⟨j, by omega⟩)) (pds L' (orb ρ Z u (j + 1)) r) := by
+      have hfun
+          : (fun t : ℝ =>
+              pds L' (orb ρ Z u j) (r + t • Pi.single (⟨j, by omega⟩ : Fin (k + 1)) (1 : ℝ)))
+            = fun t =>
+              ρ (NormedSpace.exp (t • Z ⟨j, by omega⟩)) (pds L' (orb ρ Z u (j + 1)) r) := by
         funext t
-        have hup : r + t • Pi.single (⟨j, by omega⟩ : Fin (k + 1)) (1 : ℝ) = Function.update r ⟨j, by omega⟩ t := by
+        have hup
+            : r + t • Pi.single (⟨j, by omega⟩ : Fin (k + 1)) (1 : ℝ)
+              = Function.update r ⟨j, by omega⟩ t := by
           funext i
           by_cases h : i = ⟨j, by omega⟩
           · subst h
             simp [hr ⟨j, by omega⟩ (le_refl j) hjk]
           · simp [h, Pi.single_apply, Function.update_apply]
-        have h1 : pds L' (orb ρ Z u j) (Function.update r ⟨j, by omega⟩ t) =
-            pds L' (fun r' => orb ρ Z u j (Function.update r' ⟨j, by omega⟩ t)) r := by
+        have h1
+            : pds L' (orb ρ Z u j) (Function.update r ⟨j, by omega⟩ t)
+              = pds L' (fun r' => orb ρ Z u j (Function.update r' ⟨j, by omega⟩ t)) r := by
           rw [pds_update L' _ hne t (contDiff_orb Z hZ hu j)]
-        have h2 : (fun r' => orb ρ Z u j (Function.update r' ⟨j, by omega⟩ t)) =
-            fun r' => ((ρ (NormedSpace.exp (t • Z ⟨j, by omega⟩))).restrictScalars ℝ) (orb ρ Z u (j + 1) r') := by
+        have h2
+            : (fun r' => orb ρ Z u j (Function.update r' ⟨j, by omega⟩ t))
+              = fun r' =>
+                ((ρ (NormedSpace.exp (t • Z ⟨j, by omega⟩))).restrictScalars ℝ) (orb ρ Z u (j + 1)
+                  r') := by
           funext r'
           exact orb_update hU1 hUm hρ hexp Z hZ u j (by omega) r' t
         rw [hup, h1, h2, pds_clm L' _ (contDiff_orb Z hZ hu (j + 1))]
         rfl
       (rw [hfun, hZj]) <;> rfl
-
-
 
 include hU1 hUm hρ hexp in
 lemma word_eval (l : List (Matrix (Fin n) (Fin n) ℂ)) (hl : ∀ Y ∈ l, Y ∈ Lie)
@@ -233,8 +247,6 @@ lemma word_eval (l : List (Matrix (Fin n) (Fin n) ℂ)) (hl : ∀ Y ∈ l, Y ∈
   rw [List.drop_zero] at this
   rw [← this, orb_last]
   simp [Z]
-
-
 
 end Formalism.IndefR.Tow.OrbStPf
 

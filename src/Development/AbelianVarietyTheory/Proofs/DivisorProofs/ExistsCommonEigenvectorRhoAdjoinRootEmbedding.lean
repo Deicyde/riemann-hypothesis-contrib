@@ -6,20 +6,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SimilitudePa
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.StabFin
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.StabFin
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.StabFin
 
-theorem rho_jM_common_eigvec : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (P : Pair G) (i : Fin G.m)
-    (τ : FM P →+* PadicAlgCl p), τ.comp (algebraMap G.F (FM P)) = G.emb i →
-    ∃ v : Fin G.n → PadicAlgCl p, v ≠ 0 ∧
-      ∀ a : FM P, (G.rho i (jM P a)).map (fun x => (x : PadicAlgCl p)) *ᵥ v = τ a • v := by
+theorem rho_jM_common_eigvec
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (P : Pair G) (i : Fin G.m)
+        (τ : FM P →+* PadicAlgCl p),
+      τ.comp (algebraMap G.F (FM P)) = G.emb i
+        → ∃ v : Fin G.n → PadicAlgCl p,
+          v ≠ 0
+            ∧ ∀ a : FM P, (G.rho i (jM P a)).map (fun x => (x : PadicAlgCl p)) *ᵥ v = τ a • v := by
   intro p _ G P i τ hτ
   let f : G.Fw i →+* PadicAlgCl p := algebraMap (G.Fw i) (PadicAlgCl p)
   have hf : (fun x : G.Fw i => (x : PadicAlgCl p)) = ⇑f := rfl
-  have hfe : f.comp (G.embW i) = G.emb i := by
-    ext x; rfl
+  have hfe : f.comp (G.embW i) = G.emb i := by ext x; rfl
   let ψ : G.C →+* Matrix (Fin G.n) (Fin G.n) (PadicAlgCl p) := f.mapMatrix.comp (G.rho i)
   have hψ : ∀ x, ψ x = (G.rho i x).map (fun x => (x : PadicAlgCl p)) := fun x => rfl
   set M := ψ (P.γ : G.C) with hM
@@ -40,22 +43,26 @@ theorem rho_jM_common_eigvec : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (P :
   rw [← hψ]
   obtain ⟨g, rfl⟩ := AdjoinRoot.mk_surjective a
   rw [jM_mk]
-  have key : ∀ g : Polynomial G.F, ψ (Polynomial.aeval (P.γ : G.C) g) *ᵥ v =
-      τ (AdjoinRoot.mk P.pol g) • v := by
+  have key
+      : ∀ g : Polynomial G.F,
+        ψ (Polynomial.aeval (P.γ : G.C) g) *ᵥ v = τ (AdjoinRoot.mk P.pol g) • v := by
     intro g
     induction g using Polynomial.induction_on with
     | C c =>
-      rw [Polynomial.aeval_C, AdjoinRoot.mk_C, ← AdjoinRoot.algebraMap_eq, ← RingHom.comp_apply τ, hτ]
+      rw [Polynomial.aeval_C, AdjoinRoot.mk_C, ← AdjoinRoot.algebraMap_eq, ← RingHom.comp_apply τ,
+        hτ]
       show (f.mapMatrix (G.rho i (algebraMap G.F G.C c))) *ᵥ v = _
       rw [G.rho_F]
       ext j
-      simp [Matrix.scalar_apply, Matrix.mulVec_diagonal, RingHom.mapMatrix_apply, Matrix.diagonal_map]
+      simp [Matrix.scalar_apply, Matrix.mulVec_diagonal, RingHom.mapMatrix_apply,
+        Matrix.diagonal_map]
       exact Or.inl rfl
     | add g h hg hh =>
-      rw [map_add (f := _), map_add (f := _), Matrix.add_mulVec, hg, hh, map_add (f := _), map_add (f := _), add_smul]
+      rw [map_add (f := _), map_add (f := _), Matrix.add_mulVec, hg, hh, map_add (f := _),
+        map_add (f := _), add_smul]
     | monomial k c hk =>
-      rw [pow_succ, ← mul_assoc, map_mul, map_mul, ← Matrix.mulVec_mulVec, Polynomial.aeval_X, ← hM, hMv,
-        Matrix.mulVec_smul, hk, smul_smul]
+      rw [pow_succ, ← mul_assoc, map_mul, map_mul, ← Matrix.mulVec_mulVec, Polynomial.aeval_X, ← hM,
+        hMv, Matrix.mulVec_smul, hk, smul_smul]
       congr 1
       rw [map_mul (AdjoinRoot.mk P.pol) _ Polynomial.X, map_mul τ, AdjoinRoot.mk_X, mul_comm]
   exact key g

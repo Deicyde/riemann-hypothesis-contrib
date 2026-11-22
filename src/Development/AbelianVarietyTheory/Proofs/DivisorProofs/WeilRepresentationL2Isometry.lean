@@ -15,10 +15,14 @@ namespace GlobalTheory.WeilL2Isometry
 open MeasureTheory GlobalTheory.WeilAdm.HaarSplit
 open scoped ENNReal Classical
 
-theorem l2A_eq_of_isUnitaryOn : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] {G : Type} [Group G]
-    (om : G →* Module.End ℂ ((κ → AF F) → ℂ)), (∀ p, ∀ φ ∈ schA F κ, om p φ ∈ schA F κ) → IsUnitaryOn (adeleClass F) om →
-    ∃ μ : @MeasureTheory.Measure (κ → FiniteAdeleRing (𝓞 F) F) (borel _), @MeasureTheory.Measure.IsAddHaarMeasure _ _ _ (borel _) μ ∧
-      ∀ p, ∀ Φ ∈ schA F κ, GlobalTheory.WeilL2Words.l2A F μ (om p Φ) = GlobalTheory.WeilL2Words.l2A F μ Φ := by
+theorem l2A_eq_of_isUnitaryOn
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] {G : Type} [Group G]
+        (om : G →* Module.End ℂ ((κ → AF F) → ℂ)),
+      (∀ p, ∀ φ ∈ schA F κ, om p φ ∈ schA F κ) → IsUnitaryOn (adeleClass F) om
+        → ∃ μ : @MeasureTheory.Measure (κ → FiniteAdeleRing (𝓞 F) F) (borel _),
+          @MeasureTheory.Measure.IsAddHaarMeasure _ _ _ (borel _) μ
+            ∧ ∀ p, ∀ Φ ∈ schA F κ,
+              GlobalTheory.WeilL2Words.l2A F μ (om p Φ) = GlobalTheory.WeilL2Words.l2A F μ Φ := by
   intro F _ _ κ _ G _ om hpres hU
   haveI := volume_isAddHaar F κ
   haveI : LocallyCompactSpace (FiniteAdeleRing (𝓞 F) F) := GlobalTheory.AdelicUnitaryTop.locallyCompact_finiteAdele F
@@ -36,21 +40,31 @@ theorem l2A_eq_of_isUnitaryOn : ∀ (F : Type) [Field F] [NumberField F] (κ : T
   haveI hνH : ν.IsAddHaarMeasure := by rw [hν]; infer_instance
   haveI : ((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν).IsAddHaarMeasure :=
     Measure.prod.instIsAddHaarMeasure _ _
-  have hμH : Measure.IsAddHaarMeasure (((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν).map (splitE F κ)) :=
+  have hμH : Measure.IsAddHaarMeasure
+      (((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν).map
+        (splitE F κ)) :=
     (splitE F κ).isAddHaarMeasure_map _ (continuous_splitE F κ) (continuous_splitE_symm F κ)
-  let em : ((κ → mixedEmbedding.mixedSpace F) × (κ → FiniteAdeleRing (𝓞 F) F)) ≃ᵐ (κ → AdeleRing (𝓞 F) F) :=
-    (Homeomorph.mk (splitE F κ).toEquiv (continuous_splitE F κ) (continuous_splitE_symm F κ)).toMeasurableEquiv
-  have hint : ∀ h : (κ → AdeleRing (𝓞 F) F) → ℝ≥0∞,
-      ∫⁻ x, h x ∂(((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν).map (splitE F κ)) = ∫⁻ p, h (splitE F κ p) ∂((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν) :=
+  let em
+      : ((κ → mixedEmbedding.mixedSpace F) × (κ → FiniteAdeleRing (𝓞 F) F))
+        ≃ᵐ (κ → AdeleRing (𝓞 F) F) :=
+    (Homeomorph.mk (splitE F κ).toEquiv (continuous_splitE F κ)
+      (continuous_splitE_symm F κ)).toMeasurableEquiv
+  have hint
+      : ∀ h : (κ → AdeleRing (𝓞 F) F) → ℝ≥0∞,
+        ∫⁻ x, h x ∂(((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν).map (splitE F κ))
+          = ∫⁻ p, h (splitE F κ p) ∂((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν) :=
     fun h => lintegral_map_equiv h em
-  have key : ∀ Ψ ∈ GlobalTheory.WeilM.schA F κ,
-      GlobalTheory.WeilL2Words.l2A F ν Ψ = ∫⁻ x, ‖Ψ x‖ₑ ^ 2 ∂(((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν).map (splitE F κ)) := by
-    intro Ψ hΨ
-    rw [hint]
-    have hHm : Measurable fun p => ‖Ψ (splitE F κ p)‖ₑ ^ 2 :=
-      (continuous_comp_splitE F κ Ψ hΨ).measurable.enorm.pow_const 2
-    rw [lintegral_prod_symm _ hHm.aemeasurable]
-    rfl
+  have key
+      : ∀ Ψ ∈ GlobalTheory.WeilM.schA F κ,
+        GlobalTheory.WeilL2Words.l2A F ν Ψ
+          = ∫⁻ x, ‖Ψ x‖ₑ ^ 2 ∂(((MeasureTheory.MeasureSpace.volume : Measure (κ → mixedEmbedding.mixedSpace F)).prod ν).map (splitE F κ)) :=
+    by
+      intro Ψ hΨ
+      rw [hint]
+      have hHm : Measurable fun p => ‖Ψ (splitE F κ p)‖ₑ ^ 2 :=
+        (continuous_comp_splitE F κ Ψ hΨ).measurable.enorm.pow_const 2
+      rw [lintegral_prod_symm _ hHm.aemeasurable]
+      rfl
   refine ⟨ν, hνH, fun p Φ hΦ => ?_⟩
   rw [key _ (hpres p Φ hΦ), key _ hΦ]
   exact hU _ hμH p Φ hΦ

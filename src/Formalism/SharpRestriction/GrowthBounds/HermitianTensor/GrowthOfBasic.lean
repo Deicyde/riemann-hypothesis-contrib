@@ -10,18 +10,22 @@ namespace Formalism.MainNotions.flipOneThree.Pf
 
 open Submodule
 
-theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+theorem pb_abs
+    {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
     [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
-    (w π : O) (hw : Irreducible w) (hπ : w ^ 2 = π) (N n : ℕ) (b : Fin n → V) (hli : LinearIndependent K b)
+    (w π : O) (hw : Irreducible w) (hπ : w ^ 2 = π)
+    (N n : ℕ) (b : Fin n → V) (hli : LinearIndependent K b)
     (B0 : V →ₗ[K] V →ₗ[K] K)
     (hb : ∀ Q ∈ span K (Set.range b), (∀ P ∈ span K (Set.range b), B0 P Q = 0) → Q = 0)
-    (hc : ∀ Q ∈ span K (Set.range b), (∀ P ∈ span O (Set.range b), B0 P Q ∈ Set.range (algebraMap O K)) →
-      Q ∈ span O (Set.range b))
+    (hc : ∀ Q ∈ span K (Set.range b),
+      (∀ P ∈ span O (Set.range b), B0 P Q ∈ Set.range (algebraMap O K)) → Q ∈ span O (Set.range b))
     (hd : ∀ Q ∈ span O (Set.range b), ∀ P ∈ span O (Set.range b),
-      B0 P ((algebraMap O K π ^ N) • Q) ∈ Set.range (algebraMap O K)) :
-    ∃ (x x' : Fin n → V) (ka : Fin n → ℕ), (∀ i, ka i ≤ N) ∧ (∀ i, x i ∈ span O (Set.range b)) ∧
-      (∀ i, x' i ∈ span O (Set.range b)) ∧
-      ∀ a' i, algebraMap O K π ^ N * B0 (x i) (x' a') = if a' = i then algebraMap O K π ^ ka i else 0 := by
+      B0 P ((algebraMap O K π ^ N) • Q) ∈ Set.range (algebraMap O K))
+    : ∃ (x x' : Fin n → V) (ka : Fin n → ℕ),
+      (∀ i, ka i ≤ N) ∧ (∀ i, x i ∈ span O (Set.range b)) ∧ (∀ i, x' i ∈ span O (Set.range b))
+        ∧ ∀ a' i,
+          algebraMap O K π ^ N * B0 (x i) (x' a')
+            = if a' = i then algebraMap O K π ^ ka i else 0 := by
   classical
   obtain ⟨c, hcdef⟩ : ∃ c : K, c = algebraMap O K π ^ N := ⟨_, rfl⟩
   rw [← hcdef] at hd
@@ -47,7 +51,8 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
   have hvec_single : ∀ k, vec (Pi.single k 1) = b k := by
     intro k
     simp only [vec]
-    rw [Finset.sum_eq_single k (fun l _ hl => by rw [Pi.single_eq_of_ne hl, map_zero, zero_smul])
+    rw [Finset.sum_eq_single k
+      (fun l _ hl => by rw [Pi.single_eq_of_ne hl, map_zero, zero_smul])
       (by simp)]
     rw [Pi.single_eq_same, map_one, one_smul]
   have hvec_zero : ∀ d : Fin n → O, vec d = 0 → d = 0 := by
@@ -55,12 +60,16 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
     have := Fintype.linearIndependent_iff.1 hli (fun k => algebraMap O K (d k)) h
     funext k
     exact hinj (by simp [this k])
-  have hpair : ∀ d e : Fin n → O, c * B0 (vec d) (vec e) = algebraMap O K (Matrix.vecMul d Mat ⬝ᵥ e) := by
+  have hpair
+      : ∀ d e : Fin n → O, c * B0 (vec d) (vec e) = algebraMap O K (Matrix.vecMul d Mat ⬝ᵥ e) := by
     intro d e
-    have lhs : c * B0 (vec d) (vec e) =
-        ∑ k, ∑ l, algebraMap O K (d k) * algebraMap O K (e l) * (c * B0 (b k) (b l)) := by
-      have e1 : ∀ k l, B0 (algebraMap O K (d k) • b k) (algebraMap O K (e l) • b l) =
-          algebraMap O K (d k) * algebraMap O K (e l) * B0 (b k) (b l) := by
+    have lhs
+        : c * B0 (vec d) (vec e)
+          = ∑ k, ∑ l, algebraMap O K (d k) * algebraMap O K (e l) * (c * B0 (b k) (b l)) := by
+      have e1
+          : ∀ k l,
+            B0 (algebraMap O K (d k) • b k) (algebraMap O K (e l) • b l)
+              = algebraMap O K (d k) * algebraMap O K (e l) * B0 (b k) (b l) := by
         intro k l
         rw [LinearMap.map_smul, LinearMap.map_smul, LinearMap.smul_apply, smul_eq_mul, smul_eq_mul]
         ring
@@ -73,13 +82,15 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
       refine Finset.sum_congr rfl fun l _ => ?_
       rw [e1]
       ring
-    have rhs : algebraMap O K (Matrix.vecMul d Mat ⬝ᵥ e) =
-        ∑ k, ∑ l, algebraMap O K (d k) * algebraMap O K (e l) * (c * B0 (b k) (b l)) := by
+    have rhs
+        : algebraMap O K (Matrix.vecMul d Mat ⬝ᵥ e)
+          = ∑ k, ∑ l, algebraMap O K (d k) * algebraMap O K (e l) * (c * B0 (b k) (b l)) := by
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [dotProduct, Matrix.vecMul, map_sum, map_mul, Finset.sum_mul, Mat]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
-      rw [← hMo k l]; ring
+      rw [← hMo k l]
+      ring
     rw [lhs, rhs]
   have hzero : ∀ Q ∈ span K (Set.range b), (∀ k, B0 (b k) Q = 0) → Q = 0 := by
     intro Q hQ h
@@ -89,8 +100,10 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
     | zero => simp
     | add x y _ _ hx hy => simp [hx, hy]
     | smul a x _ hx => simp [hx]
-  have hint : ∀ Q, (∀ k, B0 (b k) Q ∈ Set.range (algebraMap O K)) →
-      ∀ P ∈ span O (Set.range b), B0 P Q ∈ Set.range (algebraMap O K) := by
+  have hint
+      : ∀ Q,
+        (∀ k, B0 (b k) Q ∈ Set.range (algebraMap O K))
+          → ∀ P ∈ span O (Set.range b), B0 P Q ∈ Set.range (algebraMap O K) := by
     intro Q h P hP
     induction hP using Submodule.span_induction with
     | mem x hx => obtain ⟨k, rfl⟩ := hx; exact h k
@@ -112,11 +125,14 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
     intro j r
     rw [LinearMap.pi_apply_eq_sum_univ]
     simp only [dotProduct, smul_eq_mul, dc]
-  have hBy : ∀ d j, c * B0 (vec d) (vec (dc j)) = algebraMap O K (S.bM.coord j (Matrix.vecMul d Mat)) := by
+  have hBy
+      : ∀ d j,
+        c * B0 (vec d) (vec (dc j)) = algebraMap O K (S.bM.coord j (Matrix.vecMul d Mat)) := by
     intro d j
     rw [hpair, hcoord]
-  have hNcoord : ∀ r ∈ Nsub, ∀ j, ∃ s : Fin n' → O,
-      S.bM.coord j r = ∑ i', s i' * S.a i' * (if S.f i' = j then 1 else 0) := by
+  have hNcoord
+      : ∀ r ∈ Nsub, ∀ j, ∃ s : Fin n' → O,
+        S.bM.coord j r = ∑ i', s i' * S.a i' * (if S.f i' = j then 1 else 0) := by
     intro r hr j
     refine ⟨fun i' => S.bN.repr ⟨r, hr⟩ i', ?_⟩
     have h2 : r = ∑ i', S.bN.repr ⟨r, hr⟩ i' • (S.bN i' : Fin n → O) := by
@@ -128,8 +144,8 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Finset.sum_congr rfl fun i' _ => ?_
-    rw [map_smul, S.snf, map_smul, Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_apply,
-      smul_eq_mul, smul_eq_mul]
+    rw [map_smul, S.snf, map_smul, Module.Basis.coord_apply, Module.Basis.repr_self,
+      Finsupp.single_apply, smul_eq_mul, smul_eq_mul]
     ring
   have hsurj : Function.Surjective S.f := by
     intro j
@@ -152,13 +168,16 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
     exact zero_ne_one h1
   let g := Equiv.ofBijective S.f ⟨S.f.injective, hsurj⟩
   have hfg : ∀ i, S.f (g.symm i) = i := fun i => Equiv.ofBijective_apply_symm_apply _ _ i
-  have hpre : ∀ i : Fin n, ∃ d : Fin n → O, Matrix.vecMul d Mat = (S.bN (g.symm i) : Fin n → O) := by
+  have hpre
+      : ∀ i : Fin n, ∃ d : Fin n → O, Matrix.vecMul d Mat = (S.bN (g.symm i) : Fin n → O) := by
     intro i
     obtain ⟨d, hd⟩ := LinearMap.mem_range.1 (S.bN (g.symm i)).2
     exact ⟨d, by rw [← hd, Matrix.vecMulLinear_apply]⟩
   choose dd hdd using hpre
-  have hdiag : ∀ i j, c * B0 (vec (dd i)) (vec (dc j)) =
-      algebraMap O K (if j = i then S.a (g.symm i) else 0) := by
+  have hdiag
+      : ∀ i j,
+        c * B0 (vec (dd i)) (vec (dc j))
+          = algebraMap O K (if j = i then S.a (g.symm i) else 0) := by
     intro i j
     rw [hBy, hdd, S.snf, map_smul, Module.Basis.coord_apply, Module.Basis.repr_self, hfg,
       Finsupp.single_apply, smul_eq_mul]
@@ -191,26 +210,30 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
       intro k
       obtain ⟨t, ht⟩ := hk k
       refine ⟨t, ?_⟩
-      rw [hQdef, LinearMap.map_smul, smul_eq_mul, div_mul_eq_mul_div, ht, map_mul, mul_div_right_comm,
-        div_self haK, one_mul]
+      rw [hQdef, LinearMap.map_smul, smul_eq_mul, div_mul_eq_mul_div, ht, map_mul,
+        mul_div_right_comm, div_self haK, one_mul]
     have hQmem : Q ∈ span O (Set.range b) :=
       hc Q (hQdef ▸ Submodule.smul_mem _ _ (hvec_memK _)) (hint Q hQint)
-    have hQ' : Q = ∑ k, ((c / algebraMap O K (S.a (g.symm i))) * algebraMap O K (dc i k)) • b k := by
+    have hQ'
+        : Q = ∑ k, ((c / algebraMap O K (S.a (g.symm i))) * algebraMap O K (dc i k)) • b k := by
       rw [hQdef]
       simp only [vec, Finset.smul_sum, smul_smul]
     obtain ⟨q, hq⟩ := (Submodule.mem_span_range_iff_exists_fun O).1 hQmem
     have hq' : ∑ k, algebraMap O K (q k) • b k = Q := by
       rw [← hq]
       exact Finset.sum_congr rfl fun k _ => algebraMap_smul K (q k) (b k)
-    have hlin := Fintype.linearIndependent_iff.1 hli
-      (fun k => algebraMap O K (q k) - (c / algebraMap O K (S.a (g.symm i))) * algebraMap O K (dc i k))
-      (by simp only [sub_smul, Finset.sum_sub_distrib]; rw [hq', ← hQ', sub_self])
+    have hlin :=
+      Fintype.linearIndependent_iff.1 hli
+        (fun k =>
+          algebraMap O K (q k) - (c / algebraMap O K (S.a (g.symm i))) * algebraMap O K (dc i k))
+        (by simp only [sub_smul, Finset.sum_sub_distrib]; rw [hq', ← hQ', sub_self])
     have h1 : S.bM.coord i (S.bM i) = 1 := by
       rw [Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_eq_same]
     rw [hcoord] at h1
     have key : c / algebraMap O K (S.a (g.symm i)) = algebraMap O K (∑ k, q k * S.bM i k) := by
-      have e1 : c / algebraMap O K (S.a (g.symm i)) =
-          c / algebraMap O K (S.a (g.symm i)) * algebraMap O K (S.bM i ⬝ᵥ dc i) := by
+      have e1
+          : c / algebraMap O K (S.a (g.symm i))
+            = c / algebraMap O K (S.a (g.symm i)) * algebraMap O K (S.bM i ⬝ᵥ dc i) := by
         rw [h1, map_one, mul_one]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [e1, dotProduct, map_sum, map_sum, Finset.mul_sum]
@@ -228,9 +251,15 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
     rw [hv, Units.mul_left_dvd, ← hπ, ← pow_mul] at h
     exact (pow_dvd_pow_iff hw.ne_zero hw.not_isUnit).1 h
   choose mm uu hmu using hexp
-  refine ⟨fun i => vec (dd i),
+  refine ⟨
+    fun i => vec (dd i),
     fun j => algebraMap O K (↑(uu j)⁻¹ * w ^ (2 * ((mm j + 1) / 2) - mm j)) • vec (dc j),
-    fun i => (mm i + 1) / 2, fun i => ?_, fun i => hvec_mem _, fun j => ?_, fun a' i => ?_⟩
+    fun i => (mm i + 1) / 2,
+    fun i => ?_,
+    fun i => hvec_mem _,
+    fun j => ?_,
+    fun a' i => ?_
+  ⟩
   · have := (hmu i).2
     show (mm i + 1) / 2 ≤ N
     omega
@@ -245,8 +274,10 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
       have hm := (hmu a').2
       obtain ⟨r, hr⟩ : ∃ r, r = 2 * ((mm a' + 1) / 2) - mm a' := ⟨_, rfl⟩
       rw [← hr, ← hπ, ← pow_mul, show 2 * ((mm a' + 1) / 2) = mm a' + r by omega, pow_add]
-      rw [show (↑(uu a')⁻¹ : O) * w ^ r * (↑(uu a') * w ^ mm a') =
-        (↑(uu a')⁻¹ * ↑(uu a')) * (w ^ mm a' * w ^ r) by ring, Units.inv_mul, one_mul]
+      rw [show (↑(uu a')⁻¹ : O) * w ^ r * (↑(uu a') * w ^ mm a')
+            = (↑(uu a')⁻¹ * ↑(uu a')) * (w ^ mm a' * w ^ r) by
+          ring,
+        Units.inv_mul, one_mul]
     · rw [if_neg h, if_neg h, map_zero, mul_zero]
 
 end Formalism.MainNotions.flipOneThree.Pf

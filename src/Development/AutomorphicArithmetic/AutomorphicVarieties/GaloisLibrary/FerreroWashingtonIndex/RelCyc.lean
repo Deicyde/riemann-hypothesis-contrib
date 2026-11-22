@@ -4,13 +4,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-private theorem UpperTheory.V.FW.relCyc_compat {m N : ℕ} [NeZero m] [NeZero N] (h : m ∣ N) (K : Type) [Field K] [NumberField K]
-    [IsCyclotomicExtension {m} ℚ K] (C : Type) [Field C] [NumberField C] [IsCyclotomicExtension {N} ℚ C]
-    (i : K →ₐ[ℚ] C) (a : (ZMod N)ˣ) (x : K) :
-    sg N C a (i x) = i (sg m K (ZMod.unitsMap h a) x) := by
+private theorem UpperTheory.V.FW.relCyc_compat
+    {m N : ℕ} [NeZero m] [NeZero N]
+    (h : m ∣ N)
+    (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {m} ℚ K]
+    (C : Type) [Field C] [NumberField C] [IsCyclotomicExtension {N} ℚ C]
+    (i : K →ₐ[ℚ] C) (a : (ZMod N)ˣ) (x : K)
+    : sg N C a (i x) = i (sg m K (ZMod.unitsMap h a) x) := by
   have hz := IsCyclotomicExtension.zeta_spec m ℚ K
   have key : ((sg N C a : C →ₐ[ℚ] C)).comp i = i.comp (sg m K (ZMod.unitsMap h a) : K →ₐ[ℚ] K) := by
     apply (hz.powerBasis ℚ).algHom_ext
@@ -29,8 +34,17 @@ private theorem UpperTheory.V.FW.relCyc_compat {m N : ℕ} [NeZero m] [NeZero N]
     exact pow_eq_pow_mod _ h2
   exact DFunLike.congr_fun key x
 
-theorem UpperTheory.V.FW.relCyc :
-    ∀ (l f e n : ℕ) [NeZero (f * l ^ n)] (h : f * l ^ e ∣ f * l ^ n) (F : Type) [Field F] [NumberField F] [IsCyclotomicExtension {f * l ^ e} ℚ F] (L : Type) [Field L] [NumberField L] [IsCyclotomicExtension {f * l ^ n} ℚ L], f.Coprime l → ∃ _ : Algebra F L, IsCyclotomicExtension {l ^ n} F L ∧ (∀ σ : Gal(L/F), ∃ t ∈ (ZMod.unitsMap h).ker, σ.toRingEquiv = (sg (f * l ^ n) L t).toRingEquiv) ∧ ∀ t ∈ (ZMod.unitsMap h).ker, ∃ σ : Gal(L/F), σ.toRingEquiv = (sg (f * l ^ n) L t).toRingEquiv := by
+theorem UpperTheory.V.FW.relCyc
+    : ∀ (l f e n : ℕ) [NeZero (f * l ^ n)] (h : f * l ^ e ∣ f * l ^ n) (F : Type) [Field F]
+        [NumberField F] [IsCyclotomicExtension {f * l ^ e} ℚ F] (L : Type) [Field L] [NumberField L]
+        [IsCyclotomicExtension {f * l ^ n} ℚ L],
+      f.Coprime l
+        → ∃ _ : Algebra F L,
+          IsCyclotomicExtension {l ^ n} F L
+            ∧ (∀ σ : Gal(L/F), ∃ t ∈ (ZMod.unitsMap h).ker,
+              σ.toRingEquiv = (sg (f * l ^ n) L t).toRingEquiv)
+            ∧ ∀ t ∈ (ZMod.unitsMap h).ker, ∃ σ : Gal(L/F),
+              σ.toRingEquiv = (sg (f * l ^ n) L t).toRingEquiv := by
   intro l f e n _ h F _ _ _ L _ _ _ hfl
   have hM : 0 < f * l ^ n := NeZero.pos _
   have hM0 : 0 < f * l ^ e := Nat.pos_of_dvd_of_pos h hM
@@ -45,14 +59,16 @@ theorem UpperTheory.V.FW.relCyc :
   obtain ⟨k, hk⟩ := id h
   have hk' : l ^ n = k * l ^ e := by
     apply Nat.eq_of_mul_eq_mul_left hf
-    rw [hk]; ring
+    rw [hk]
+    ring
   obtain ⟨i, hi⟩ : ∃ i : F →ₐ[ℚ] L, i z = ζ ^ k := by
     have hξ : IsPrimitiveRoot (ζ ^ k) (f * l ^ e) := hζ.pow hM (by rw [hk, mul_comm])
     refine ⟨(hz.powerBasis ℚ).lift (ζ ^ k) ?_, ?_⟩
     · rw [IsPrimitiveRoot.powerBasis_gen, ← Polynomial.cyclotomic_eq_minpoly_rat hz hM0,
         Polynomial.cyclotomic_eq_minpoly_rat hξ hM0]
       exact minpoly.aeval ℚ _
-    · exact (congrArg _ (IsPrimitiveRoot.powerBasis_gen ℚ hz).symm).trans ((hz.powerBasis ℚ).lift_gen (ζ ^ k) _)
+    · exact (congrArg _ (IsPrimitiveRoot.powerBasis_gen ℚ hz).symm).trans
+        ((hz.powerBasis ℚ).lift_gen (ζ ^ k) _)
   letI : Algebra F L := i.toRingHom.toAlgebra
   have hal : ∀ x, algebraMap F L x = i x := fun _ => rfl
   refine ⟨this, ?_, ?_, ?_⟩

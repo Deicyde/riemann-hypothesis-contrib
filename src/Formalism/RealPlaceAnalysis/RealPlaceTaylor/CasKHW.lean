@@ -17,7 +17,15 @@ lemma casKHW_two_rhoC {n : ℕ} (ε : Fin n → Bool) (a : Fin n) :
   unfold rhoC; ring
 
 def casKHW_coef {n : ℕ} (ε : Fin n → Bool) (μ : Fin n → ℝ) (a b : Fin n) : ℝ :=
-  if ε a = ε b then (if a = b then μ a ^ 2 else if a < b then μ a - μ b else 0) else 0
+  if ε a = ε b then
+    (if a = b then
+       μ a ^ 2
+     else if a < b then
+       μ a - μ b
+     else
+       0)
+  else
+    0
 
 lemma casKHW_term (V : Type) [AddCommGroup V] [Module ℂ V] (n : ℕ) (ε : Fin n → Bool)
     (E : Fin n → Fin n → Module.End ℂ V) (μ : Fin n → ℝ) (w : V)

@@ -7,8 +7,10 @@ public import Mathlib.RingTheory.AdicCompletion.Functoriality
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-theorem UpperTheory.V.Alg.co_surj :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R'), maximalIdeal R' ≤ (maximalIdeal R).map f ⊔ maximalIdeal R' ^ 2 → Function.Surjective f := by
+theorem UpperTheory.V.Alg.co_surj
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+        (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R'),
+      maximalIdeal R' ≤ (maximalIdeal R).map f ⊔ maximalIdeal R' ^ 2 → Function.Surjective f := by
   intro O _ _ R _ _ _ R' _ _ _ f hf
   have hle : (maximalIdeal R).map f ≤ maximalIdeal R' := by
     rw [Ideal.map_le_iff_le_comap]

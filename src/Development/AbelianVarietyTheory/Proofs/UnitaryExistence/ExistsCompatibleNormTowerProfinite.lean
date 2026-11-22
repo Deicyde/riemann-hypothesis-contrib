@@ -13,29 +13,40 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 
 namespace GlobalTheory.NormTower
 
-theorem exists_eventually_dvd_sub {E : Type} [Field E] [NumberField E] (U : Ultrafilter ℕ) (s : ℕ → 𝓞 E)
-    (n : ℕ) (hn : 0 < n) : ∃ t : 𝓞 E, ∀ᶠ j in (U : Filter ℕ), (n : 𝓞 E) ∣ s j - t := by
+theorem exists_eventually_dvd_sub
+    {E : Type} [Field E] [NumberField E] (U : Ultrafilter ℕ) (s : ℕ → 𝓞 E) (n : ℕ) (hn : 0 < n)
+    : ∃ t : 𝓞 E, ∀ᶠ j in (U : Filter ℕ), (n : 𝓞 E) ∣ s j - t := by
   have hI : Ideal.span {(n : 𝓞 E)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact_mod_cast hn.ne'
   haveI : Finite (𝓞 E ⧸ Ideal.span {(n : 𝓞 E)}) := Ideal.finiteQuotientOfFreeOfNeBot _ hI
-  obtain ⟨c, hc⟩ := Ultrafilter.eq_pure_of_finite
-    (U.map fun j => Ideal.Quotient.mk (Ideal.span {(n : 𝓞 E)}) (s j))
+  obtain ⟨c, hc⟩ :=
+    Ultrafilter.eq_pure_of_finite (U.map fun j => Ideal.Quotient.mk (Ideal.span {(n : 𝓞 E)}) (s j))
   obtain ⟨t, rfl⟩ := Ideal.Quotient.mk_surjective c
   refine ⟨t, ?_⟩
-  have h : {Ideal.Quotient.mk (Ideal.span {(n : 𝓞 E)}) t} ∈
-      U.map fun j => Ideal.Quotient.mk (Ideal.span {(n : 𝓞 E)}) (s j) := by
+  have h
+      : {Ideal.Quotient.mk (Ideal.span {(n : 𝓞 E)}) t}
+        ∈ U.map fun j => Ideal.Quotient.mk (Ideal.span {(n : 𝓞 E)}) (s j) := by
     rw [hc]; exact Ultrafilter.mem_pure.2 rfl
   rw [Ultrafilter.mem_map] at h
   filter_upwards [h] with j hj
   exact Ideal.mem_span_singleton.1 (Ideal.Quotient.eq.1 hj)
 
-theorem exists_norm_tower : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (ν : ℕ → ℤ), (∀ n : ℕ, 0 < n → IsCoprime (ν n) (n : ℤ)) → (∀ n m : ℕ, 0 < n → 0 < m → (n : ℤ) ∣ ν (n * m) - ν n) → ∃ t : ℕ → 𝓞 E, (∀ n : ℕ, 0 < n → (n : 𝓞 E) ∣ t n * H.bar (t n) - (ν n : 𝓞 E)) ∧ (∀ n m : ℕ, 0 < n → 0 < m → (n : 𝓞 E) ∣ t (n * m) - t n) ∧ t l.M - 1 ∈ l.Mb := by
+theorem exists_norm_tower
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (ν : ℕ → ℤ),
+      (∀ n : ℕ, 0 < n → IsCoprime (ν n) (n : ℤ))
+        → (∀ n m : ℕ, 0 < n → 0 < m → (n : ℤ) ∣ ν (n * m) - ν n)
+        → ∃ t : ℕ → 𝓞 E,
+          (∀ n : ℕ, 0 < n → (n : 𝓞 E) ∣ t n * H.bar (t n) - (ν n : 𝓞 E))
+            ∧ (∀ n m : ℕ, 0 < n → 0 < m → (n : 𝓞 E) ∣ t (n * m) - t n) ∧ t l.M - 1 ∈ l.Mb := by
   intro E _ _ _ H l ν hcop hcomp
   have hM : 0 < l.M := lt_of_lt_of_le (by norm_num) l.three_le
-  have hs : ∀ j : ℕ, ∃ t : 𝓞 E, ((j.factorial : ℕ) : 𝓞 E) ∣ t * H.bar t - (ν j.factorial : 𝓞 E) ∧
-      (l.M ∣ j.factorial → t - 1 ∈ l.Mb) := fun j =>
-    GlobalTheory.T.exists_hostNorm_mod_coprime_level_half E H l j.factorial (ν j.factorial) j.factorial_pos (hcop _ j.factorial_pos)
+  have hs
+      : ∀ j : ℕ, ∃ t : 𝓞 E,
+        ((j.factorial : ℕ) : 𝓞 E) ∣ t * H.bar t - (ν j.factorial : 𝓞 E)
+          ∧ (l.M ∣ j.factorial → t - 1 ∈ l.Mb) := fun j =>
+    GlobalTheory.T.exists_hostNorm_mod_coprime_level_half E H l j.factorial (ν j.factorial)
+      j.factorial_pos (hcop _ j.factorial_pos)
   choose s hs1 hs2 using hs
   let U : Ultrafilter ℕ := Filter.hyperfilter ℕ
   have hU : ∀ n : ℕ, 0 < n → ∀ᶠ j in (U : Filter ℕ), n ∣ j.factorial := by
@@ -62,11 +73,15 @@ theorem exists_norm_tower : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     obtain ⟨b, hb⟩ := hs1 j
     obtain ⟨c, hc⟩ := hcomp n m hn hm0
     rw [hm] at hb
-    have hc' : ((ν (n * m) : ℤ) : 𝓞 E) - (ν n : 𝓞 E) = (n : 𝓞 E) * (c : 𝓞 E) := by exact_mod_cast congrArg (Int.cast : ℤ → 𝓞 E) hc
+    have hc' : ((ν (n * m) : ℤ) : 𝓞 E) - (ν n : 𝓞 E) = (n : 𝓞 E) * (c : 𝓞 E) := by
+      exact_mod_cast congrArg (Int.cast : ℤ → 𝓞 E) hc
     have hsj : s j = t n + n * a := by rw [← ha]; ring
     rw [hsj, map_add (f := _), map_mul, map_natCast] at hb
     push_cast at hb
-    exact ⟨m * b + c - (a * H.bar (t n) + t n * H.bar a + n * a * H.bar a), by linear_combination hb + hc'⟩
+    exact ⟨
+      m * b + c - (a * H.bar (t n) + t n * H.bar a + n * a * H.bar a),
+      by linear_combination hb + hc'
+    ⟩
   · intro n m hn hm
     obtain ⟨j, h1, h2⟩ := ((ht n hn).and (ht (n * m) (Nat.mul_pos hn hm))).exists
     have h3 : (n : 𝓞 E) ∣ s j - t (n * m) := dvd_trans ⟨(m : 𝓞 E), by push_cast; rfl⟩ h2

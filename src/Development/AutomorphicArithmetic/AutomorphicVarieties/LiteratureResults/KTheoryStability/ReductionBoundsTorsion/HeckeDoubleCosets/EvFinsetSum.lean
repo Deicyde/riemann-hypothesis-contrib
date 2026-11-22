@@ -12,14 +12,21 @@ namespace PositivityTheory.KB.AffineStabilizerVanishing
 
 open PositivityTheory.KB
 
-theorem ev_finset_sum {G H Y : Type} [Group G] [Group H] [MulAction H Y] (ρ : G →* H) {m : ℕ}
-    (F : (Fin (m + 1) → Y) → ℝ) (y : Y) {ι : Type} (s : Finset ι) (z : ι → Chn G m) :
-    ev ρ F y (∑ i ∈ s, z i) = ∑ i ∈ s, ev ρ F y (z i) := by
+theorem ev_finset_sum
+    {G H Y : Type} [Group G] [Group H] [MulAction H Y]
+    (ρ : G →* H)
+    {m : ℕ} (F : (Fin (m + 1) → Y) → ℝ)
+    (y : Y)
+    {ι : Type} (s : Finset ι) (z : ι → Chn G m)
+    : ev ρ F y (∑ i ∈ s, z i) = ∑ i ∈ s, ev ρ F y (z i) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ev_eq, map_sum]
+  simp only [ev_eq, map_sum]
 
-theorem inv_dC {G H Y : Type} [Group G] [Group H] [MulAction H Y] (ρ : G →* H) {m : ℕ}
-    (E : (Fin (m + 1) → Y) → ℝ) (hE : Inv ρ E) : Inv ρ (dC E) := by
+theorem inv_dC
+    {G H Y : Type} [Group G] [Group H] [MulAction H Y]
+    (ρ : G →* H)
+    {m : ℕ} (E : (Fin (m + 1) → Y) → ℝ) (hE : Inv ρ E)
+    : Inv ρ (dC E) := by
   intro g y
   simp only [dC]
   exact Finset.sum_congr rfl fun i _ => by rw [hE g (fun j => y (i.succAbove j))]
@@ -42,8 +49,8 @@ theorem pEvDC : PEvDC := by
     rw [Fin.sum_univ_succ]
     congr 1
     · simp only [Fin.val_zero, pow_zero, one_mul, Fin.succAbove_zero]
-      have : (fun j : Fin (m + 1) => ρ (Fin.partialProd g j.succ) • y) =
-          fun j => ρ (g 0) • (ρ (Fin.partialProd (fun i : Fin m => g i.succ) j) • y) := by
+      have : (fun j : Fin (m + 1) => ρ (Fin.partialProd g j.succ) • y)
+          = fun j => ρ (g 0) • (ρ (Fin.partialProd (fun i : Fin m => g i.succ) j) • y) := by
         funext j
         rw [Fin.partialProd_succ', map_mul, mul_smul]
         rfl
@@ -56,8 +63,7 @@ theorem pCob : PCob := by
   intro G _ m F hF hz
   let φ : Chn G (m + 1) →ₗ[ℝ] ℝ :=
     Finsupp.linearCombination ℝ (fun g : Fin (m + 1) → G => F fun j => Fin.partialProd g j)
-  have hφ : ∀ z, φ z = ev (MonoidHom.id G) F 1 z := fun z => by
-    rw [ev_eq]; simp [φ]
+  have hφ : ∀ z, φ z = ev (MonoidHom.id G) F 1 z := fun z => by rw [ev_eq]; simp [φ]
   have hker : LinearMap.ker (bd G m) ≤ LinearMap.ker φ := fun z hz' => by
     rw [LinearMap.mem_ker] at hz' ⊢; rw [hφ]; exact hz z hz'
   let ψ₀ : LinearMap.range (bd G m) →ₗ[ℝ] ℝ :=

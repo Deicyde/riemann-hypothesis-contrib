@@ -10,8 +10,11 @@ open Matrix ComplexOrder
 
 namespace PI.SerBridgeGLW
 
-theorem trace_inv_of_monoidHom {G : Type} [Group G] [Fintype G] {n : Type} [Fintype n] [DecidableEq n]
-    (M : G →* Matrix n n ℂ) (x : G) : star (trace (M x)) = trace (M x⁻¹) := by
+theorem trace_inv_of_monoidHom
+    {G : Type} [Group G] [Fintype G]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (M : G →* Matrix n n ℂ) (x : G)
+    : star (trace (M x)) = trace (M x⁻¹) := by
   classical
   set P : Matrix n n ℂ := ∑ g, (M g)ᴴ * M g with hPdef
   have hinv : ∀ y : G, M y * M y⁻¹ = 1 := fun y => by rw [← map_mul, mul_inv_cancel, map_one]
@@ -22,13 +25,14 @@ theorem trace_inv_of_monoidHom {G : Type} [Group G] [Fintype G] {n : Type} [Fint
   have hPpd : P.PosDef := by
     rw [hPdef, ← Finset.add_sum_erase _ _ (Finset.mem_univ (1 : G))]
     simp only [map_one, Matrix.conjTranspose_one, Matrix.mul_one]
-    exact Matrix.PosDef.one.add_posSemidef
-      (Matrix.posSemidef_sum _ fun g _ => Matrix.posSemidef_conjTranspose_mul_self _)
+    exact Matrix.PosDef.one.add_posSemidef (Matrix.posSemidef_sum _ fun g _ =>
+      Matrix.posSemidef_conjTranspose_mul_self _)
   have hPu : IsUnit P := hPpd.isUnit
   have hPP : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv P ((Matrix.isUnit_iff_isUnit_det P).1 hPu)
   have hct : (M x)ᴴ = P * M x⁻¹ * P⁻¹ := by
-    calc (M x)ᴴ = (M x)ᴴ * P * (M x * M x⁻¹) * P⁻¹ := by
-          rw [hinv, Matrix.mul_one, Matrix.mul_assoc, hPP, Matrix.mul_one]
+    calc
+      (M x)ᴴ = (M x)ᴴ * P * (M x * M x⁻¹) * P⁻¹ := by
+        rw [hinv, Matrix.mul_one, Matrix.mul_assoc, hPP, Matrix.mul_one]
       _ = ((M x)ᴴ * P * M x) * M x⁻¹ * P⁻¹ := by simp only [Matrix.mul_assoc]
       _ = P * M x⁻¹ * P⁻¹ := by rw [hP]
   rw [← Matrix.trace_conjTranspose, hct, Matrix.trace_mul_cycle,

@@ -10,29 +10,35 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.L2.Theta
 
 section Sup
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {Comp : Type}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {r : ℕ} {Comp : Type}
   (X : Comp → Data E r) (la : ∀ c, ReciprocityTheory.ChartRestriction.G.FD.Wt (X c).Ψ r)
 
 theorem supE_add_le (P Q : FDSec X) : supE X la (P + Q) ≤ supE X la P + supE X la Q := by
   unfold supE
   refine iSup_le fun p => ?_
-  have h1 : (X p.1).pnorm (la p.1) ((P + Q) p.1) p.2 ≤
-      (X p.1).pnorm (la p.1) (P p.1) p.2 + (X p.1).pnorm (la p.1) (Q p.1) p.2 := by
+  have h1
+      : (X p.1).pnorm (la p.1) ((P + Q) p.1) p.2
+        ≤ (X p.1).pnorm (la p.1) (P p.1) p.2 + (X p.1).pnorm (la p.1) (Q p.1) p.2 := by
     unfold ReciprocityTheory.ChartRestriction.G.FD.Data.pnorm
     rw [← add_mul]
     exact mul_le_mul_of_nonneg_right (norm_add_le _ _) (by positivity)
-  calc ENNReal.ofReal ((X p.1).pnorm (la p.1) ((P + Q) p.1) p.2)
-      ≤ ENNReal.ofReal ((X p.1).pnorm (la p.1) (P p.1) p.2) +
-          ENNReal.ofReal ((X p.1).pnorm (la p.1) (Q p.1) p.2) :=
-        (ENNReal.ofReal_le_ofReal h1).trans ENNReal.ofReal_add_le
-    _ ≤ (⨆ p : FPt X, ENNReal.ofReal ((X p.1).pnorm (la p.1) (P p.1) p.2)) +
-          ⨆ p : FPt X, ENNReal.ofReal ((X p.1).pnorm (la p.1) (Q p.1) p.2) :=
-        add_le_add (le_iSup (fun p : FPt X => ENNReal.ofReal ((X p.1).pnorm (la p.1) (P p.1) p.2)) p)
-          (le_iSup (fun p : FPt X => ENNReal.ofReal ((X p.1).pnorm (la p.1) (Q p.1) p.2)) p)
+  calc
+    ENNReal.ofReal ((X p.1).pnorm (la p.1) ((P + Q) p.1) p.2)
+        ≤ ENNReal.ofReal ((X p.1).pnorm (la p.1) (P p.1) p.2)
+          + ENNReal.ofReal ((X p.1).pnorm (la p.1) (Q p.1) p.2) :=
+      (ENNReal.ofReal_le_ofReal h1).trans ENNReal.ofReal_add_le
+    _ ≤ (⨆ p : FPt X, ENNReal.ofReal ((X p.1).pnorm (la p.1) (P p.1) p.2))
+        + ⨆ p : FPt X, ENNReal.ofReal ((X p.1).pnorm (la p.1) (Q p.1) p.2) :=
+      add_le_add (le_iSup (fun p : FPt X => ENNReal.ofReal ((X p.1).pnorm (la p.1) (P p.1) p.2)) p)
+        (le_iSup (fun p : FPt X => ENNReal.ofReal ((X p.1).pnorm (la p.1) (Q p.1) p.2)) p)
 
 theorem supE_smul (a : ℂ) (P : FDSec X) : supE X la (a • P) = ENNReal.ofReal ‖a‖ * supE X la P := by
   unfold supE
@@ -53,7 +59,9 @@ theorem supE_ne_top [Fintype Comp] {P : FDSec X} (h : P ∈ holSub X la) : supE 
     choose C hC using hb
     refine ne_top_of_le_ne_top (ENNReal.ofReal_ne_top (r := ∑ c, |C c|))
       (iSup_le fun p => ENNReal.ofReal_le_ofReal ?_)
-    calc (X p.1).pnorm (la p.1) (P p.1) p.2 ≤ C p.1 := hC p.1 p.2 p.2.2
+    calc
+      (X p.1).pnorm (la p.1) (P p.1) p.2
+        ≤ C p.1 := hC p.1 p.2 p.2.2
       _ ≤ |C p.1| := le_abs_self _
       _ ≤ ∑ c, |C c| := Finset.single_le_sum (fun c _ => abs_nonneg (C c)) (Finset.mem_univ _)
   | zero =>
@@ -67,9 +75,11 @@ theorem supE_ne_top [Fintype Comp] {P : FDSec X} (h : P ∈ holSub X la) : supE 
 
 end Sup
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} (Xo : Moduli Dw l) (c : Coeff l) {r : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r)
-
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  (Xo : Moduli Dw l) (c : Coeff l)
+  {r : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r)
 
 open Classical in
 def goodOf (σ : c.F →+* ℂ) : c.F →+* ℂ := if GoodEmb c σ then σ else (starRingEnd ℂ).comp σ
@@ -95,8 +105,9 @@ theorem goodEmb_goodOf (σ : c.F →+* ℂ) : GoodEmb c (goodOf c σ) := by
     have hd : (2 : ℝ) ≤ H.d := by exact_mod_cast H.d_prime.two_le
     have h2 := congrArg Complex.re H.sqrt_neg_disc_sq
     have h3 := congrArg Complex.im H.sqrt_neg_disc_sq
-    simp only [sq, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im, Complex.natCast_re,
-      Complex.natCast_im, neg_zero] at h2 h3
+    simp only [sq, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im,
+        Complex.natCast_re, Complex.natCast_im, neg_zero]
+      at h2 h3
     have hre : H.rt0.re = 0 := by
       rcases mul_eq_zero.mp (show H.rt0.re * H.rt0.im = 0 by nlinarith) with h4 | h4
       · exact h4
@@ -107,34 +118,47 @@ theorem goodEmb_goodOf (σ : c.F →+* ℂ) : GoodEmb c (goodOf c σ) := by
     rw [hneg, map_neg]
     apply Complex.ext <;> simp [hre]
 
-theorem IsNormOn.of_goodOf {C : Submodule c.F (Rul Xo c)} {σ : c.F →+* ℂ} {N : Rul Xo c → ℝ}
-    (h : IsNormOn C (goodOf c σ) N) : IsNormOn C σ N := by
+theorem IsNormOn.of_goodOf
+    {C : Submodule c.F (Rul Xo c)} {σ : c.F →+* ℂ} {N : Rul Xo c → ℝ}
+    (h : IsNormOn C (goodOf c σ) N)
+    : IsNormOn C σ N := by
   obtain ⟨h1, h2, h3, h4⟩ := h
-  exact ⟨by simpa only [norm_goodOf] using h1, by simpa only [norm_goodOf] using h2,
-    by simpa only [norm_goodOf] using h3, by simpa only [norm_goodOf] using h4⟩
+  exact ⟨
+    by simpa only [norm_goodOf] using h1,
+    by simpa only [norm_goodOf] using h2,
+    by simpa only [norm_goodOf] using h3,
+    by simpa only [norm_goodOf] using h4
+  ⟩
 
 def lieFac (Dw : Datum H) (x : ℝ) (a : (E →+* ℂ) × ℕ → ℕ) : ℝ :=
-  Real.exp (-((∑ τ : E →+* ℂ, ∑ i : Fin (Dw.mult τ), (a (τ, i) : ℝ)) / 2) * Real.log (2 * Real.pi * x))
+  Real.exp
+    (-((∑ τ : E →+* ℂ, ∑ i : Fin (Dw.mult τ), (a (τ, i) : ℝ)) / 2) * Real.log (2 * Real.pi * x))
 
-theorem lieFac_pos (Dw : Datum H) (x : ℝ) (a : (E →+* ℂ) × ℕ → ℕ) : 0 < lieFac Dw x a := Real.exp_pos _
+theorem lieFac_pos (Dw : Datum H) (x : ℝ) (a : (E →+* ℂ) × ℕ → ℕ) : 0 < lieFac Dw x a :=
+  Real.exp_pos _
 
 def supC (x : ℝ) (σ : c.F →+* ℂ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (f : Rul Xo c) : ℝ :=
   lieFac Dw x a * supN (U σ).X (laU (U σ) a n) (rdU (U σ) f)
 
 def SupDef : Prop :=
-  ∀ a n, Dom a n → ∀ σ, GoodEmb c σ → ∀ f ∈ cusp Xo c U a n, supN (U σ).X (laU (U σ) a n) (rdU (U σ) f) = 0 → f = 0
+  ∀ a n,
+    Dom a n
+      → ∀ σ,
+        GoodEmb c σ → ∀ f ∈ cusp Xo c U a n, supN (U σ).X (laU (U σ) a n) (rdU (U σ) f) = 0 → f = 0
 
 variable {Xo c U}
 
-theorem supE_cusp_ne_top {a n} {σ : c.F →+* ℂ} (hσ : GoodEmb c σ) {f : Rul Xo c} (hf : f ∈ cusp Xo c U a n) :
-    supE (U σ).X (laU (U σ) a n) (rdU (U σ) f) ≠ ⊤ := by
+theorem supE_cusp_ne_top
+    {a n} {σ : c.F →+* ℂ} (hσ : GoodEmb c σ) {f : Rul Xo c} (hf : f ∈ cusp Xo c U a n)
+    : supE (U σ).X (laU (U σ) a n) (rdU (U σ) f) ≠ ⊤ := by
   have h1 := (Submodule.mem_inf.mp hf).2
   have h2 := Submodule.mem_iInf _ |>.mp h1 σ
   have h3 := Submodule.mem_iInf _ |>.mp h2 hσ
   exact supE_ne_top (U σ).X (laU (U σ) a n) (Submodule.mem_comap.mp h3)
 
-theorem isNormOn_supC (x : ℝ) (h : SupDef Xo c U) {a n} (hd : Dom a n) {σ : c.F →+* ℂ} (hσ : GoodEmb c σ) :
-    IsNormOn (cusp Xo c U a n) σ (supC Xo c U x σ a n) := by
+theorem isNormOn_supC
+    (x : ℝ) (h : SupDef Xo c U) {a n} (hd : Dom a n) {σ : c.F →+* ℂ} (hσ : GoodEmb c σ)
+    : IsNormOn (cusp Xo c U a n) σ (supC Xo c U x σ a n) := by
   constructor
   · intro f _
     exact mul_nonneg (lieFac_pos _ _ _).le (supN_nonneg _ _ _)
@@ -146,8 +170,10 @@ theorem isNormOn_supC (x : ℝ) (h : SupDef Xo c U) {a n} (hd : Dom a n) {σ : c
     ring
   · intro f hf g hg
     unfold supC supN
-    rw [← mul_add, map_add (f := _), ← ENNReal.toReal_add (supE_cusp_ne_top hσ hf) (supE_cusp_ne_top hσ hg)]
-    refine mul_le_mul_of_nonneg_left (ENNReal.toReal_mono ?_ (supE_add_le _ _ _ _)) (lieFac_pos _ _ _).le
+    rw [← mul_add, map_add (f := _),
+      ← ENNReal.toReal_add (supE_cusp_ne_top hσ hf) (supE_cusp_ne_top hσ hg)]
+    refine mul_le_mul_of_nonneg_left (ENNReal.toReal_mono ?_ (supE_add_le _ _ _ _))
+      (lieFac_pos _ _ _).le
     exact ENNReal.add_ne_top.mpr ⟨supE_cusp_ne_top hσ hf, supE_cusp_ne_top hσ hg⟩
 
 variable (U)
@@ -158,50 +184,64 @@ attribute [local instance 2000] Submodule.module
 def rdC (σ : c.F →+* ℂ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) : cusp Xo c U a n →ₛₗ[σ] FDSec (U σ).X :=
   (rdU (U σ)).comp (cusp Xo c U a n).subtype
 
-variable {D : D7} (σ : c.F →+* ℂ) (V : HSp D) (dict : GA D V → Σ k, Frame ((U σ).X k).Ψ r) (mu : GA D V → ℂ)
+variable
+  {D : D7}
+  (σ : c.F →+* ℂ) (V : HSp D) (dict : GA D V → Σ k, Frame ((U σ).X k).Ψ r) (mu : GA D V → ℂ)
 
 def CuspL2 : Prop := ∀ a n, Dom a n → JMemL2 V σ (rdC U σ a n) dict mu
 
-
 open Classical in
-def l2C (x : ℝ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (h : JMemL2 V σ (rdC U σ a n) dict mu) (f : Rul Xo c) : ℝ :=
+def l2C
+    (x : ℝ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (h : JMemL2 V σ (rdC U σ a n) dict mu) (f : Rul Xo c)
+    : ℝ :=
   if hf : f ∈ cusp Xo c U a n then
-    lieFac Dw x a * l2NormAlt V σ (rdC U σ a n) dict mu h ⟨f, hf⟩ else 0
+    lieFac Dw x a * l2NormAlt V σ (rdC U σ a n) dict mu h ⟨f, hf⟩
+  else
+    0
 
 def L2DefiniteCuspForms (h : CuspL2 U σ V dict mu) : Prop :=
   ∀ a n (hd : Dom a n), L2Definite V σ (rdC U σ a n) dict mu (h a n hd)
 
 variable {U σ V dict mu}
 
-theorem isNormOn_l2C (x₀ : ℝ) {h : CuspL2 U σ V dict mu} (h1 : L2DefiniteCuspForms U σ V dict mu h) {a n} (hd : Dom a n) :
-    IsNormOn (cusp Xo c U a n) σ (l2C U σ V dict mu x₀ a n (h a n hd)) := by
+theorem isNormOn_l2C
+    (x₀ : ℝ)
+    {h : CuspL2 U σ V dict mu} (h1 : L2DefiniteCuspForms U σ V dict mu h)
+    {a n} (hd : Dom a n)
+    : IsNormOn (cusp Xo c U a n) σ (l2C U σ V dict mu x₀ a n (h a n hd)) := by
   constructor
   · intro f hf
-    rw [l2C, dite_eq_left hf]; exact mul_nonneg (lieFac_pos _ _ _).le (l2Norm_nonneg_bis _ _ _ _ _ _ _)
+    rw [l2C, dite_eq_left hf]
+    exact mul_nonneg (lieFac_pos _ _ _).le (l2Norm_nonneg_bis _ _ _ _ _ _ _)
   · intro f hf h0
     rw [l2C, dite_eq_left hf] at h0
-    exact congrArg Subtype.val (h1 a n hd ⟨f, hf⟩ ((mul_eq_zero.mp h0).resolve_left (lieFac_pos _ _ _).ne'))
+    exact congrArg Subtype.val
+      (h1 a n hd ⟨f, hf⟩ ((mul_eq_zero.mp h0).resolve_left (lieFac_pos _ _ _).ne'))
   · intro x f hf
     rw [l2C, l2C, dite_eq_left hf, dite_eq_left (Submodule.smul_mem _ x hf)]
     have := l2Norm_smul_alt V σ (rdC U σ a n) dict mu (h a n hd) x ⟨f, hf⟩
     exact (congrArg (lieFac Dw x₀ a * ·) this).trans (by ring)
   · intro f hf g hg
-    rw [l2C, l2C, l2C, dite_eq_left hf, dite_eq_left hg, dite_eq_left (Submodule.add_mem _ hf hg), ← mul_add]
-    exact mul_le_mul_of_nonneg_left (L2Norm_add_le V σ (rdC U σ a n) dict mu (h a n hd) ⟨f, hf⟩ ⟨g, hg⟩)
-      (lieFac_pos _ _ _).le
+    rw [l2C, l2C, l2C, dite_eq_left hf, dite_eq_left hg, dite_eq_left (Submodule.add_mem _ hf hg),
+      ← mul_add]
+    exact mul_le_mul_of_nonneg_left
+      (L2Norm_add_le V σ (rdC U σ a n) dict mu (h a n hd) ⟨f, hf⟩ ⟨g, hg⟩) (lieFac_pos _ _ _).le
 
-theorem l2C_le_supC (x : ℝ) (hσ : GoodEmb c σ) {a n} (h : JMemL2 V σ (rdC U σ a n) dict mu)
-    (hd : ∀ g, (dict g).2 ∈ ((U σ).X (dict g).1).dom) (hm : MuUnit V dict mu) :
-    ∀ f ∈ cusp Xo c U a n, l2C U σ V dict mu x a n h f ≤ supC Xo c U x σ a n f := by
+theorem l2C_le_supC
+    (x : ℝ) (hσ : GoodEmb c σ)
+    {a n} (h : JMemL2 V σ (rdC U σ a n) dict mu)
+    (hd : ∀ g, (dict g).2 ∈ ((U σ).X (dict g).1).dom) (hm : MuUnit V dict mu)
+    : ∀ f ∈ cusp Xo c U a n, l2C U σ V dict mu x a n h f ≤ supC Xo c U x σ a n f := by
   intro f hf
   unfold l2C supC
   rw [dite_eq_left hf]
   refine mul_le_mul_of_nonneg_left ?_ (lieFac_pos Dw x a).le
-  exact L2Norm_le_sup_norm (V := V) (la := laU (U σ) a n) (rd := rdC U σ a n) (dict := dict) (mu := mu) (h := h)
-    (hd := hd) (hm := hm) (f := ⟨f, hf⟩) (hfin := supE_cusp_ne_top hσ hf)
+  exact L2Norm_le_sup_norm (V := V) (la := laU (U σ) a n) (rd := rdC U σ a n) (dict := dict)
+    (mu := mu) (h := h) (hd := hd) (hm := hm) (f := ⟨f, hf⟩) (hfin := supE_cusp_ne_top hσ hf)
 
-theorem rdC_continuousOn (hU : IsUnf (U σ)) {a n} (hd : Dom a n) (f : cusp Xo c U a n) (k : (U σ).Comp) :
-    ContinuousOn (rdC U σ a n f k) ((U σ).X k).dom := by
+theorem rdC_continuousOn
+    (hU : IsUnf (U σ)) {a n} (hd : Dom a n) (f : cusp Xo c U a n) (k : (U σ).Comp)
+    : ContinuousOn (rdC U σ a n f k) ((U σ).X k).dom := by
   obtain ⟨-, -, -, -, hsec, -⟩ := hU
   have hf : (f : Rul Xo c) ∈ sec Xo c a n := (Submodule.mem_inf.mp f.2).1
   exact (hsec a n hd f hf k).1.continuousOn

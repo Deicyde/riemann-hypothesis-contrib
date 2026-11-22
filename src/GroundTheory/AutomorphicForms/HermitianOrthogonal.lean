@@ -18,8 +18,7 @@ variable {F E : Type*} [Field F] [Field E] [Algebra F E] [Algebra.IsQuadraticExt
 instance finiteDimensional_of_isQuadraticExtension : FiniteDimensional F E :=
   Module.finite_of_finrank_eq_succ (Algebra.IsQuadraticExtension.finrank_eq_two F E)
 
-theorem conjHom_apply (x : E) : conjHom F E x = conj F E x :=
-  rfl
+theorem conjHom_apply (x : E) : conjHom F E x = conj F E x := rfl
 
 theorem exists_not_mem_range : ∃ ζ : E, ζ ∉ Set.range (algebraMap F E) := by
   by_contra H
@@ -30,8 +29,8 @@ theorem exists_not_mem_range : ∃ ζ : E, ζ ∉ Set.range (algebraMap F E) := 
   rw [Module.finrank_self, Algebra.IsQuadraticExtension.finrank_eq_two] at h1
   exact absurd h1 (by norm_num)
 
-theorem conj_eq_self_iff [Algebra.IsSeparable F E] {x : E} :
-    conj F E x = x ↔ x ∈ Set.range (algebraMap F E) := by
+theorem conj_eq_self_iff [Algebra.IsSeparable F E] {x : E}
+    : conj F E x = x ↔ x ∈ Set.range (algebraMap F E) := by
   refine ⟨fun hx => ?_, fun ⟨c, hc⟩ => hc ▸ conj_algebraMap c⟩
   by_contra hne
   rw [conj_apply] at hx
@@ -58,16 +57,16 @@ theorem conj_eq_self_iff [Algebra.IsSeparable F E] {x : E} :
 end Conj
 
 variable {F E : Type*} [Field F] [Field E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
-variable {V V' V'' : Type*} [AddCommGroup V] [Module E V] [AddCommGroup V'] [Module E V']
-  [AddCommGroup V''] [Module E V'']
+variable
+  {V V' V'' : Type*}
+  [AddCommGroup V] [Module E V] [AddCommGroup V'] [Module E V'] [AddCommGroup V''] [Module E V'']
 
 namespace HermitianForm
 
 def Isometric (h : HermitianForm F E V) (h' : HermitianForm F E V') : Prop :=
   ∃ e : V ≃ₗ[E] V', ∀ x y, h'.toSesq (e x) (e y) = h.toSesq x y
 
-theorem conj_toSesq (h : HermitianForm F E V) (x y : V) :
-    conj F E (h.toSesq x y) = h.toSesq y x :=
+theorem conj_toSesq (h : HermitianForm F E V) (x y : V) : conj F E (h.toSesq x y) = h.toSesq y x :=
   h.isSymm.eq x y
 
 namespace Isometric

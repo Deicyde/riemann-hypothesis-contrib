@@ -11,8 +11,8 @@ open Matrix
 
 variable {E : Type} [Field E]
 
-structure IsHermForm (σ : E →+* E) {V : Type} [AddCommGroup V] [Module E V]
-    (h : V → V → E) : Prop where
+structure IsHermForm (σ : E →+* E) {V : Type} [AddCommGroup V] [Module E V] (h : V → V → E)
+    : Prop where
   add : ∀ x y z, h x (y + z) = h x y + h x z
   smul : ∀ x (a : E) y, h x (a • y) = a * h x y
   herm : ∀ x y, h y x = σ (h x y)
@@ -21,16 +21,16 @@ section Form
 
 variable {σ : E →+* E} {V : Type} [AddCommGroup V] [Module E V] {h : V → V → E}
 
-theorem IsHermForm.add_left (hh : IsHermForm σ h) (x y z : V) :
-    h (x + y) z = h x z + h y z := by
+theorem IsHermForm.add_left (hh : IsHermForm σ h) (x y z : V) : h (x + y) z = h x z + h y z := by
   rw [hh.herm z (x + y), hh.add, map_add (f := _), ← hh.herm z x, ← hh.herm z y]
 
-theorem IsHermForm.smul_left (hh : IsHermForm σ h) (a : E) (x y : V) :
-    h (a • x) y = σ a * h x y := by
+theorem IsHermForm.smul_left (hh : IsHermForm σ h) (a : E) (x y : V)
+    : h (a • x) y = σ a * h x y := by
   rw [hh.herm y (a • x), hh.smul, map_mul, ← hh.herm y x]
 
-theorem IsHermForm.eq_zero_of_diag [CharZero E] (hh : IsHermForm σ h)
-    (hz : ∀ x, h x x = 0) (x y : V) : h x y = 0 := by
+theorem IsHermForm.eq_zero_of_diag
+    [CharZero E] (hh : IsHermForm σ h) (hz : ∀ x, h x x = 0) (x y : V)
+    : h x y = 0 := by
   have hsum : ∀ u v, h u v + h v u = 0 := by
     intro u v
     have e := hz (u + v)
@@ -57,10 +57,12 @@ theorem IsHermForm.eq_zero_of_diag [CharZero E] (hh : IsHermForm σ h)
 
 end Form
 
-theorem exists_orthogonal_family [CharZero E] (σ : E →+* E) :
-    ∀ (k : ℕ) (V : Type) [AddCommGroup V] [Module E V] [FiniteDimensional E V],
-      Module.finrank E V = k → ∀ h : V → V → E, IsHermForm σ h →
-        ∃ v : Fin k → V, LinearIndependent E v ∧ ∀ i j, i ≠ j → h (v i) (v j) = 0 := by
+theorem exists_orthogonal_family [CharZero E] (σ : E →+* E)
+    : ∀ (k : ℕ) (V : Type) [AddCommGroup V] [Module E V] [FiniteDimensional E V],
+      Module.finrank E V = k
+        → ∀ h : V → V → E,
+          IsHermForm σ h
+            → ∃ v : Fin k → V, LinearIndependent E v ∧ ∀ i j, i ≠ j → h (v i) (v j) = 0 := by
   intro k
   induction k with
   | zero =>
@@ -73,12 +75,13 @@ theorem exists_orthogonal_family [CharZero E] (σ : E →+* E) :
       exact ⟨b, b.linearIndependent, fun i j _ => hh.eq_zero_of_diag hzero _ _⟩
     · push_neg at hzero
       obtain ⟨v, hv⟩ := hzero
-      let f : V →ₗ[E] E :=
-        { toFun := h v
-          map_add' := hh.add v
-          map_smul' := fun a y => by
-            simp only [RingHom.id_apply, smul_eq_mul]
-            exact hh.smul v a y }
+      let f : V →ₗ[E] E := {
+        toFun := h v
+        map_add' := hh.add v
+        map_smul' := fun a y => by
+          simp only [RingHom.id_apply, smul_eq_mul]
+          exact hh.smul v a y
+      }
       have hfv : ∀ y, f y = h v y := fun _ => rfl
       have hf : f v ≠ 0 := hv
       have hsurj : Function.Surjective f := by
@@ -89,10 +92,11 @@ theorem exists_orthogonal_family [CharZero E] (σ : E →+* E) :
         have := LinearMap.finrank_range_add_finrank_ker f
         rw [LinearMap.range_eq_top.2 hsurj, finrank_top, Module.finrank_self] at this
         omega
-      obtain ⟨w, hwi, hwo⟩ := ih (LinearMap.ker f) hW (fun x y => h x y)
-        ⟨fun x y z => hh.add _ _ _, fun x a y => hh.smul _ _ _, fun x y => hh.herm _ _⟩
-      have hw0 : ∀ i, h v (w i) = 0 := fun i => by
-        rw [← hfv]; exact LinearMap.mem_ker.1 (w i).2
+      obtain ⟨w, hwi, hwo⟩ :=
+        ih (LinearMap.ker f) hW
+          (fun x y => h x y)
+          ⟨fun x y z => hh.add _ _ _, fun x a y => hh.smul _ _ _, fun x y => hh.herm _ _⟩
+      have hw0 : ∀ i, h v (w i) = 0 := fun i => by rw [← hfv]; exact LinearMap.mem_ker.1 (w i).2
       refine ⟨Fin.cons v (fun i => (w i : V)), ?_, ?_⟩
       · rw [linearIndependent_finCons]
         refine ⟨hwi.map' (LinearMap.ker f).subtype (Submodule.ker_subtype _), ?_⟩

@@ -14,7 +14,8 @@ variable {K : Type} [Field K] [NumberField K]
 
 theorem isInt_O (o : 𝓞 K) : IsIntegral ℤ (algebraMap (𝓞 K) K o) := o.2
 
-theorem O_of_isInt {x : K} (h : IsIntegral ℤ x) : ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = x := ⟨⟨x, h⟩, rfl⟩
+theorem O_of_isInt {x : K} (h : IsIntegral ℤ x) : ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = x :=
+  ⟨⟨x, h⟩, rfl⟩
 
 theorem isInt_intCast (n : ℤ) : IsIntegral ℤ (n : K) := by
   simpa using (isIntegral_algebraMap : IsIntegral ℤ (algebraMap ℤ K n))
@@ -30,8 +31,10 @@ theorem commonDen (s : Finset K) : ∃ d : ℕ, 0 < d ∧ ∀ x ∈ s, IsIntegra
   rw [e1, pow_two, mul_assoc, ← zsmul_eq_mul x y]
   exact (isInt_intCast y).mul (h x hx)
 
-theorem reduceRep (N : ℕ) (hN : 0 < N) : ∃ Rep : Set K, Rep.Finite ∧ (∀ ρ ∈ Rep, IsIntegral ℤ ρ) ∧
-    ∀ o : K, IsIntegral ℤ o → ∃ t ρ : K, IsIntegral ℤ t ∧ ρ ∈ Rep ∧ o = (N : K) * t + ρ := by
+theorem reduceRep (N : ℕ) (hN : 0 < N)
+    : ∃ Rep : Set K,
+      Rep.Finite ∧ (∀ ρ ∈ Rep, IsIntegral ℤ ρ)
+        ∧ ∀ o : K, IsIntegral ℤ o → ∃ t ρ : K, IsIntegral ℤ t ∧ ρ ∈ Rep ∧ o = (N : K) * t + ρ := by
   set I : Ideal (𝓞 K) := Ideal.span {(N : 𝓞 K)} with hI
   have hIne : I ≠ ⊥ := by
     rw [hI, Ne, Ideal.span_singleton_eq_bot]

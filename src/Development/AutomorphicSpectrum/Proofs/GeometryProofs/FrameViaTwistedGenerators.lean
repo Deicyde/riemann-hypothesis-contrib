@@ -11,20 +11,31 @@ namespace GlobalTheory.CompanionTheory.Ar.FlagBun
 
 open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar
 
-theorem regAt_generic_eq_top {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-    (hg : IsCptGen ξ) (a : Ω) : a ∈ regAt ξ ⟨genPt ξ, specializes_rfl⟩ := by
+theorem regAt_generic_eq_top
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} (hg : IsCptGen ξ)
+    (a : Ω)
+    : a ∈ regAt ξ ⟨genPt ξ, specializes_rfl⟩ := by
   obtain ⟨s, hs⟩ := hg.bij.2 a
   refine (RingHom.mem_range).2 ⟨s, ?_⟩
   show (X.presheaf.stalkSpecializes (specializes_refl (genPt ξ)) ≫ Scheme.stalkClosedPointTo ξ).hom s = a
   rw [TopCat.Presheaf.stalkSpecializes_refl]
   exact hs
 
-theorem exists_leftInverse_flagForms (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
-    (E : Type) [AddCommGroup E] [Module Ω E] (κ : Type) (x : κ → Ω) (L : Lat ξ E) (r : ℕ)
-    (V : Submodule Ω E) (m n : ℕ) (φ : Fin n → Module.Dual Ω E) (c : Fin r → E)
-    (hT : CoordTie ℤ ξ x) (hV : L.IsVB r V) (hG : IsTwistGen ξ x L m φ)
-    (hc : LinearIndependent Ω c) (hs : Submodule.span Ω (Set.range c) = V) :
-    ∃ B : Matrix (Fin r) (Fin n) Ω, B * Matrix.of (fun j l => φ j (c l)) = 1 := by
+theorem exists_leftInverse_flagForms
+    (X : Scheme.{0})
+    (Ω : Type) [Field Ω]
+    (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+    (E : Type) [AddCommGroup E] [Module Ω E]
+    (κ : Type) (x : κ → Ω)
+    (L : Lat ξ E)
+    (r : ℕ)
+    (V : Submodule Ω E)
+    (m n : ℕ) (φ : Fin n → Module.Dual Ω E)
+    (c : Fin r → E)
+    (hT : CoordTie ℤ ξ x) (hV : L.IsVB r V) (hG : IsTwistGen ξ x L m φ) (hc : LinearIndependent Ω c)
+    (hs : Submodule.span Ω (Set.range c) = V)
+    : ∃ B : Matrix (Fin r) (Fin n) Ω, B * Matrix.of (fun j l => φ j (c l)) = 1 := by
   let p₀ : Cpt ξ := ⟨genPt ξ, specializes_rfl⟩
   have hreg : ∀ a : Ω, a ∈ regAt ξ p₀ := fun a => regAt_generic_eq_top hT.gen a
   obtain ⟨k, hk⟩ := hT.cover p₀
@@ -45,9 +56,10 @@ theorem exists_leftInverse_flagForms (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ
       simp
     · simp [h, Ne.symm h]
   choose w hw using hw0
-  have hg0 : ∀ i, ∃ g : Fin n → Ω, (∀ j, g j ∈ regAt ξ p₀) ∧
-      ∀ e ∈ L p₀, w i e = ∑ j, g j * (φ j e / x k ^ m) :=
-    fun i => hG2 p₀ k hk (w i) (fun e _ => hreg _)
+  have hg0
+      : ∀ i, ∃ g : Fin n → Ω,
+        (∀ j, g j ∈ regAt ξ p₀) ∧ ∀ e ∈ L p₀, w i e = ∑ j, g j * (φ j e / x k ^ m) := fun i =>
+    hG2 p₀ k hk (w i) (fun e _ => hreg _)
   choose g hgr hg using hg0
   have key : ∀ i, ∀ e ∈ V, w i e = ∑ j, g i j / x k ^ m * φ j e := by
     intro i

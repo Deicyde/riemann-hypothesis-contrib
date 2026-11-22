@@ -10,10 +10,11 @@ open scoped TensorProduct
 namespace GlobalTheory
 
 theorem localization_maximalIdeal_eq_span_of_nilpotent
-    (D : Type) [CommRing D] [IsArtinianRing D] (x : D) (hx : IsNilpotent x)
-    (hred : IsReduced (D ⧸ Ideal.span {x})) (P : Ideal D) [P.IsMaximal] :
-    IsLocalRing.maximalIdeal (Localization.AtPrime P) =
-      Ideal.span {algebraMap D (Localization.AtPrime P) x} := by
+    (D : Type) [CommRing D] [IsArtinianRing D]
+    (x : D) (hx : IsNilpotent x) (hred : IsReduced (D ⧸ Ideal.span {x}))
+    (P : Ideal D) [P.IsMaximal]
+    : IsLocalRing.maximalIdeal (Localization.AtPrime P)
+      = Ideal.span {algebraMap D (Localization.AtPrime P) x} := by
   set L := Localization.AtPrime P
   apply le_antisymm
   · intro a ha
@@ -33,13 +34,12 @@ theorem localization_maximalIdeal_eq_span_of_nilpotent
       refine ⟨n + 1, ?_⟩
       rw [← map_pow, mul_pow, pow_succ d, ← mul_assoc, pow_succ (t : D), mul_assoc _ (t : D), ht]
       simp
-    have hmem : (t : D) * d ∈ Ideal.span {x} :=
-      Ideal.Quotient.eq_zero_iff_mem.mp (hnil.eq_zero)
+    have hmem : (t : D) * d ∈ Ideal.span {x} := Ideal.Quotient.eq_zero_iff_mem.mp (hnil.eq_zero)
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp hmem
     refine Ideal.mem_span_singleton'.mpr ⟨IsLocalization.mk' L c (t * s), ?_⟩
-    rw [IsLocalization.mk'_eq_mul_mk'_one, IsLocalization.mk'_eq_mul_mk'_one d s,
-      mul_right_comm, ← map_mul, hc, ← IsLocalization.mk'_eq_mul_mk'_one,
-      ← IsLocalization.mk'_eq_mul_mk'_one, IsLocalization.mk'_eq_iff_eq]
+    rw [IsLocalization.mk'_eq_mul_mk'_one, IsLocalization.mk'_eq_mul_mk'_one d s, mul_right_comm,
+      ← map_mul, hc, ← IsLocalization.mk'_eq_mul_mk'_one, ← IsLocalization.mk'_eq_mul_mk'_one,
+      IsLocalization.mk'_eq_iff_eq]
     congr 1
     push_cast
     ring

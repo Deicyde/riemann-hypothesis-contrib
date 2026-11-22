@@ -136,10 +136,18 @@ theorem prvB1_of_D7 (D : Formalism.BasicNotions.D7) : RotatedSumBound D := by
   intro N r K _ _ LL B _ nu ka
   constructor
   · rintro ⟨P, hP⟩
-    have hstep : ∀ i : Fin N, ∃ b' b'' : ℕ, b' + b'' = B i ∧
-        (if LL.vec i then HStrip (nu i.castSucc) (nu i.succ) b' else HStrip (nu i.succ) (nu i.castSucc) b') ∧
-        (if LL.vec i then HStrip (ka i.castSucc) (ka i.succ) b'' else HStrip (ka i.succ) (ka i.castSucc) b'') ∧
-        CondC LL nu ka i := by
+    have hstep
+        : ∀ i : Fin N, ∃ b' b'' : ℕ,
+          b' + b'' = B i
+            ∧ (if LL.vec i then
+                 HStrip (nu i.castSucc) (nu i.succ) b'
+               else
+                 HStrip (nu i.succ) (nu i.castSucc) b')
+            ∧ (if LL.vec i then
+                 HStrip (ka i.castSucc) (ka i.succ) b''
+               else
+                 HStrip (ka i.succ) (ka i.castSucc) b'')
+            ∧ CondC LL nu ka i := by
       intro i
       have := P.step i
       rw [hP] at this
@@ -156,7 +164,14 @@ theorem prvB1_of_D7 (D : Formalism.BasicNotions.D7) : RotatedSumBound D := by
       exact antitone_of_append _ _ this
     have hz := P.zero
     rw [hP] at hz
-    refine ⟨b', b'', h1, ⟨⟨nu, ?_, fun i => (hdom i).1, h2⟩, rfl⟩, ⟨⟨ka, ?_, fun i => (hdom i).2, h3⟩, rfl⟩, h4⟩
+    refine ⟨
+      b',
+      b'',
+      h1,
+      ⟨⟨nu, ?_, fun i => (hdom i).1, h2⟩, rfl⟩,
+      ⟨⟨ka, ?_, fun i => (hdom i).2, h3⟩, rfl⟩,
+      h4
+    ⟩
     · funext a
       have := congrFun hz (Fin.castAdd K a)
       simpa [joinPT] using this

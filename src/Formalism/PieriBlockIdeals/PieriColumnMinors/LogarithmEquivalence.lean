@@ -13,9 +13,12 @@ namespace Formalism.CohomologicalDescent
 
 open Classical
 
-theorem eq_of_dvd_of_abs_lt_sq {L : ℝ} (hL : 0 ≤ L) {n : ℤ} (hn : n ≠ 0) (hnL : ((|n| : ℤ) : ℝ) < L ^ 2)
+theorem eq_of_dvd_of_abs_lt_sq
+    {L : ℝ} (hL : 0 ≤ L)
+    {n : ℤ} (hn : n ≠ 0) (hnL : ((|n| : ℤ) : ℝ) < L ^ 2)
     {l l' : ℕ} (hl : l.Prime) (hl' : l'.Prime) (hLl : L < (l : ℝ)) (hLl' : L < (l' : ℝ))
-    (hd : (l : ℤ) ∣ n) (hd' : (l' : ℤ) ∣ n) : l = l' := by
+    (hd : (l : ℤ) ∣ n) (hd' : (l' : ℤ) ∣ n)
+    : l = l' := by
   by_contra hne
   have hcop : IsCoprime (l : ℤ) (l' : ℤ) := by
     rw [Nat.isCoprime_iff_coprime]
@@ -45,8 +48,9 @@ theorem largePrimeDivisorCount_holds : PrimeCount := by
 
 theorem residueIndicatorPrimeSum_holds : ISum := by
   intro h L xm xp mB P hL hhL hmB hmx hxx hxh hP
-  obtain ⟨P', hP'⟩ : ∃ P' : Finset ℕ,
-      P' = P.filter (fun l : ℕ => ∃ y : ℤ, xm ≤ y ∧ y ≤ xp ∧ (l : ℤ) ∣ y - mB) := ⟨_, rfl⟩
+  obtain ⟨P', hP'⟩
+      : ∃ P' : Finset ℕ, P' = P.filter (fun l : ℕ => ∃ y : ℤ, xm ≤ y ∧ y ≤ xp ∧ (l : ℤ) ∣ y - mB) :=
+    ⟨_, rfl⟩
   have hmem : ∀ l, l ∈ P' ↔ l ∈ P ∧ ∃ y : ℤ, xm ≤ y ∧ y ≤ xp ∧ (l : ℤ) ∣ y - mB := by
     intro l
     rw [hP', Finset.mem_filter]
@@ -94,10 +98,12 @@ theorem residueIndicatorPrimeSum_holds : ISum := by
     push_cast
     ring
   have key : ∑ l ∈ P', Real.log (l : ℝ) ≤ (((xp - xm : ℤ) : ℝ) + 1) * Real.log (h : ℝ) := by
-    calc ∑ l ∈ P', Real.log (l : ℝ) ≤ ∑ _l ∈ P', Real.log (h : ℝ) := Finset.sum_le_sum hterm
+    calc
+      ∑ l ∈ P', Real.log (l : ℝ)
+        ≤ ∑ _l ∈ P', Real.log (h : ℝ) := Finset.sum_le_sum hterm
       _ = (P'.card : ℝ) * Real.log (h : ℝ) := by rw [Finset.sum_const, nsmul_eq_mul]
       _ ≤ ((Finset.Icc xm xp).card : ℝ) * Real.log (h : ℝ) :=
-          mul_le_mul_of_nonneg_right (by exact_mod_cast hcard) hlogh
+        mul_le_mul_of_nonneg_right (by exact_mod_cast hcard) hlogh
       _ = (((xp - xm : ℤ) : ℝ) + 1) * Real.log (h : ℝ) := by rw [hcardR]
   refine Eq.trans_le ?_ key
   rw [hP', Finset.sum_filter]

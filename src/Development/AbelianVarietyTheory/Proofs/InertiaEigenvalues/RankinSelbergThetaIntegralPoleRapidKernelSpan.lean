@@ -18,7 +18,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.MeasurableCo
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CuspRep GlobalTheory.UnitaryBC GroundTheory.Global.IdeleGroup Formalism.L2.Host GlobalTheory.Published GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary GlobalTheory.Petersson
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GroundTheory.Global.IdeleGroup Formalism.L2.Host GlobalTheory.Published
+  GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary GlobalTheory.Petersson
 open scoped nonZeroDivisors ComplexConjugate
 
 noncomputable section
@@ -27,19 +29,24 @@ namespace GlobalTheory.RSThetaLimR
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem mspanR_le_bddForms {π : CuspSub E a} {ω : HChar E} (hω : ω.IsUnitary) (hπ : π.HasCentChar ω) :
-    GlobalTheory.JSW.mspanR π ≤ bddForms E a ω := by
+theorem mspanR_le_bddForms {π : CuspSub E a} {ω : HChar E} (hω : ω.IsUnitary) (hπ : π.HasCentChar ω)
+    : GlobalTheory.JSW.mspanR π ≤ bddForms E a ω := by
   rw [← GlobalTheory.JSW.rspan_eq_mspanR]
-  exact GlobalTheory.JSW.rspan_le (fun φ hφ => mem_bddForms_of_cuspSub GlobalTheory.CuspOrth.cuspFormsBounded hω hπ hφ)
-    (fun F hF h => mul_right_mem_bddForms hF h) (fun F hF X _ ν _ k γ hk => GlobalTheory.JSW.kerInf_mem_bddForms hF hk)
+  exact GlobalTheory.JSW.rspan_le
+    (fun φ hφ => mem_bddForms_of_cuspSub GlobalTheory.CuspOrth.cuspFormsBounded hω hπ hφ)
+    (fun F hF h => mul_right_mem_bddForms hF h)
+    (fun F hF X _ ν _ k γ hk => GlobalTheory.JSW.kerInf_mem_bddForms hF hk)
 
-theorem mem_bddForms {π : CuspSub E a} {ω : HChar E} (hω : ω.IsUnitary) (hπ : π.HasCentChar ω) {φ : Sm E a}
-    (hφ : φ ∈ π.V ∨ φ.1 ∈ GlobalTheory.JSW.mspanR π) : φ.1 ∈ bddForms E a ω :=
-  hφ.elim (fun h => mem_bddForms_of_cuspSub GlobalTheory.CuspOrth.cuspFormsBounded hω hπ h)
+theorem mem_bddForms
+    {π : CuspSub E a} {ω : HChar E} (hω : ω.IsUnitary) (hπ : π.HasCentChar ω)
+    {φ : Sm E a} (hφ : φ ∈ π.V ∨ φ.1 ∈ GlobalTheory.JSW.mspanR π)
+    : φ.1 ∈ bddForms E a ω :=
+  hφ.elim
+    (fun h => mem_bddForms_of_cuspSub GlobalTheory.CuspOrth.cuspFormsBounded hω hπ h)
     (fun h => mspanR_le_bddForms hω hπ h)
 
-theorem mem_rsm {π : CuspSub E a} {φ : Sm E a} (hφ : φ ∈ π.V ∨ φ.1 ∈ GlobalTheory.JSW.mspanR π) :
-    φ ∈ GlobalTheory.RSThetaLowM.rsm π := by
+theorem mem_rsm {π : CuspSub E a} {φ : Sm E a} (hφ : φ ∈ π.V ∨ φ.1 ∈ GlobalTheory.JSW.mspanR π)
+    : φ ∈ GlobalTheory.RSThetaLowM.rsm π := by
   change φ.1 ∈ GlobalTheory.JSW.mspanR π
   rcases hφ with h | h
   · rw [← GlobalTheory.JSW.rspan_eq_mspanR]; exact GlobalTheory.JSW.mem_rspan h
@@ -49,38 +56,48 @@ end GlobalTheory.RSThetaLimR
 
 namespace GlobalTheory.RSThetaLimR
 
-open GlobalTheory.RSTheta GlobalTheory.ThetaPoisson GlobalTheory.RSThetaLow GroundTheory.Automorphic.GJMatrix GroundTheory.Global
+open GlobalTheory.RSTheta GlobalTheory.ThetaPoisson GlobalTheory.RSThetaLow
+  GroundTheory.Automorphic.GJMatrix GroundTheory.Global
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem resConst_ne_zero {Φ : (Fin a → Cinf E) → ℂ} (hΦ1 : ContDiff ℝ (⊤ : ℕ∞) Φ) (hΦ2 : HasCompactSupport Φ)
-    (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ) (hpos : ∀ u, 0 ≤ (Φ u).re ∧ (Φ u).im = 0) (hne : Φ ≠ 0) :
-    ((finiteMeasurePi E (latt a J)).toReal : ℂ) * ∫ x, Φ x ∂infMeasure E a ≠ 0 := by
-  have hv : (finiteMeasurePi E (latt a J)).toReal ≠ 0 := ENNReal.toReal_ne_zero.2
-    ⟨((isOpen_latt J).measure_pos _ ⟨0, fun i => (idealFiniteAdeles J).zero_mem⟩).ne',
-      (isCompact_latt J).measure_lt_top.ne⟩
+theorem resConst_ne_zero
+    {Φ : (Fin a → Cinf E) → ℂ} (hΦ1 : ContDiff ℝ (⊤ : ℕ∞) Φ) (hΦ2 : HasCompactSupport Φ)
+    (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ) (hpos : ∀ u, 0 ≤ (Φ u).re ∧ (Φ u).im = 0) (hne : Φ ≠ 0)
+    : ((finiteMeasurePi E (latt a J)).toReal : ℂ) * ∫ x, Φ x ∂infMeasure E a ≠ 0 := by
+  have hv : (finiteMeasurePi E (latt a J)).toReal ≠ 0 :=
+    ENNReal.toReal_ne_zero.2 ⟨
+      ((isOpen_latt J).measure_pos _ ⟨0, fun i => (idealFiniteAdeles J).zero_mem⟩).ne',
+      (isCompact_latt J).measure_lt_top.ne
+    ⟩
   refine mul_ne_zero (Complex.ofReal_ne_zero.2 hv) ?_
-  have e : (fun u => Φ u) = fun u => (((Φ u).re : ℝ) : ℂ) := funext fun u => Complex.ext rfl (by simp [(hpos u).2])
+  have e : (fun u => Φ u) = fun u => (((Φ u).re : ℝ) : ℂ) :=
+    funext fun u => Complex.ext rfl (by simp [(hpos u).2])
   obtain ⟨x, hx⟩ : ∃ x, Φ x ≠ 0 := by
     by_contra h
     push_neg at h
     exact hne (funext h)
   have hre : (Φ x).re ≠ 0 := fun h0 => hx (Complex.ext h0 (hpos x).2)
   have hpos' : 0 < ∫ u, (Φ u).re ∂(volume : Measure (Fin a → Cinf E)) :=
-    Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero (Complex.continuous_re.comp hΦ1.continuous)
-      (hΦ2.comp_left Complex.zero_re) (fun u => (hpos u).1) hre
+    Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero
+      (Complex.continuous_re.comp hΦ1.continuous) (hΦ2.comp_left Complex.zero_re)
+      (fun u => (hpos u).1)
+      hre
   rw [e, integral_complex_ofReal, infMeasure, integral_smul_measure]
   refine Complex.ofReal_ne_zero.2 (smul_ne_zero ?_ hpos'.ne')
   simp
 
-theorem setIntegral_rsHat_zero_of_bdd {ℓ : Fin a} {Φ : (Fin a → Cinf E) → ℂ} (hΦ1 : ContDiff ℝ (⊤ : ℕ∞) Φ)
-    (hΦ2 : HasCompactSupport Φ) (hΦ3 : tsupport Φ ⊆ rowSet E ℓ) (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ)
-    (η : Fin a → Af E) {μ : Measure (GA E a)} [μ.IsHaarMeasure] {𝓕' : Set (GA E a)}
-    (h𝓕 : IsFundamentalDomain (latticeGL E a) 𝓕' μ) {ω : HChar E} (hω : ω.IsUnitary) {φ φ' : Sm E a}
-    (hb : φ.1 ∈ bddForms E a ω) (hb' : φ'.1 ∈ bddForms E a ω) :
-    ∫ g in 𝓕', adelicFourierPi E (rsPsi ℓ φ.1 φ'.1 Φ J η g) 0 ∂μ =
-      (((finiteMeasurePi E (latt a J)).toReal : ℂ) * ∫ x, Φ x ∂infMeasure E a) *
-        ∫ g in 𝓕', φ.1 g * conj (φ'.1 g) ∂μ := by
+theorem setIntegral_rsHat_zero_of_bdd
+    {ℓ : Fin a} {Φ : (Fin a → Cinf E) → ℂ}
+    (hΦ1 : ContDiff ℝ (⊤ : ℕ∞) Φ) (hΦ2 : HasCompactSupport Φ) (hΦ3 : tsupport Φ ⊆ rowSet E ℓ)
+    (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ) (η : Fin a → Af E)
+    {μ : Measure (GA E a)} [μ.IsHaarMeasure]
+    {𝓕' : Set (GA E a)} (h𝓕 : IsFundamentalDomain (latticeGL E a) 𝓕' μ)
+    {ω : HChar E} (hω : ω.IsUnitary)
+    {φ φ' : Sm E a} (hb : φ.1 ∈ bddForms E a ω) (hb' : φ'.1 ∈ bddForms E a ω)
+    : ∫ g in 𝓕', adelicFourierPi E (rsPsi ℓ φ.1 φ'.1 Φ J η g) 0 ∂μ
+      = (((finiteMeasurePi E (latt a J)).toReal : ℂ) * ∫ x, Φ x ∂infMeasure E a)
+        * ∫ g in 𝓕', φ.1 g * conj (φ'.1 g) ∂μ := by
   have hΦ : GlobalTheory.CuspQuot.IsTest (rowSet E ℓ) Φ := ⟨hΦ1, hΦ2, hΦ3⟩
   haveI : DiscreteTopology (latticeGL E a) := GlobalTheory.CuspRep.CuspidalL2GL.discreteTopology_latticeGL
   haveI := GlobalTheory.CovolGL.isFiniteMeasure_quotMeasure E a μ
@@ -92,19 +109,23 @@ theorem setIntegral_rsHat_zero_of_bdd {ℓ : Fin a} {Φ : (Fin a → Cinf E) →
   have hΦi : Integrable Φ (infMeasure E a) := by
     unfold infMeasure
     exact (hΦ1.continuous.integrable_of_hasCompactSupport hΦ2).smul_measure (by simp)
-  have hi : Integrable (fun p : GA E a × (Fin a → Cinf E) => rsInf ℓ φ.1 φ'.1 Φ p.1 p.2)
+  have hi : Integrable
+      (fun p : GA E a × (Fin a → Cinf E) => rsInf ℓ φ.1 φ'.1 Φ p.1 p.2)
       ((μ.restrict 𝓕').prod (infMeasure E a)) := by
     refine ((integrable_const (C * D)).mul_prod hΦi.norm).mono'
       (continuous_rsInf hb.1 hb'.1 hΦ1.continuous hΦ3).aestronglyMeasurable (.of_forall fun p => ?_)
     simp only [rsInf, norm_mul, Complex.norm_conj]
-    exact mul_le_mul_of_nonneg_right (mul_le_mul (hC _) (hD _) (norm_nonneg _) ((norm_nonneg _).trans (hC 1)))
-      (norm_nonneg _)
-  have hx : ∀ x, ∫ g in 𝓕', rsInf ℓ φ.1 φ'.1 Φ g x ∂μ = (∫ g in 𝓕', φ.1 g * conj (φ'.1 g) ∂μ) * Φ x := by
+    exact mul_le_mul_of_nonneg_right
+      (mul_le_mul (hC _) (hD _) (norm_nonneg _) ((norm_nonneg _).trans (hC 1))) (norm_nonneg _)
+  have hx
+      : ∀ x,
+        ∫ g in 𝓕', rsInf ℓ φ.1 φ'.1 Φ g x ∂μ = (∫ g in 𝓕', φ.1 g * conj (φ'.1 g) ∂μ) * Φ x := by
     intro x
     simp only [rsInf]
     rw [integral_mul_const]
     congr 1
-    exact GlobalTheory.RSResidue.setIntegral_mul_right h𝓕 (f := fun g => φ.1 g * conj (φ'.1 g))
+    exact GlobalTheory.RSResidue.setIntegral_mul_right h𝓕
+      (f := fun g => φ.1 g * conj (φ'.1 g))
       (GlobalTheory.Petersson.leftInv_mul_conj hω hb hb') _
   simp only [GlobalTheory.RSResidue.rsHat_zero J η φ φ' hΦ]
   rw [integral_mul_const, integral_integral_swap hi]
@@ -115,7 +136,8 @@ end GlobalTheory.RSThetaLimR
 
 namespace GlobalTheory.RSThetaLimR
 
-open GlobalTheory.RSTheta GlobalTheory.ThetaPoisson GlobalTheory.RSThetaLow GroundTheory.Automorphic.GJMatrix GroundTheory.Global
+open GlobalTheory.RSTheta GlobalTheory.ThetaPoisson GlobalTheory.RSThetaLow
+  GroundTheory.Automorphic.GJMatrix GroundTheory.Global
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 

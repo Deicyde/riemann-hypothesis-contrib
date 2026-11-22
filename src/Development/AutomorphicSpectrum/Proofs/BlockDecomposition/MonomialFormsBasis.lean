@@ -35,9 +35,10 @@ def setEquiv (a : ℕ) : {D : Finset (E n d) // D.card = a} ≃ Set.powersetCard
     ext x
     simp
 
-theorem wedge_basis (bΩ : Module.Basis (E n d) (Lr K n d) Ω[Lr K n d⁄K]) (h : ∀ e, bΩ e = dl e) (a : ℕ) :
-    ∃ c : Module.Basis {D : Finset (E n d) // D.card = a} (Lr K n d) (Om K (Lr K n d) a),
-      ∀ D, c D = wedge (K := K) (enumD D) := by
+theorem wedge_basis
+    (bΩ : Module.Basis (E n d) (Lr K n d) Ω[Lr K n d⁄K]) (h : ∀ e, bΩ e = dl e) (a : ℕ)
+    : ∃ c : Module.Basis {D : Finset (E n d) // D.card = a} (Lr K n d) (Om K (Lr K n d) a), ∀ D,
+      c D = wedge (K := K) (enumD D) := by
   refine ⟨((bΩ.reindex finSumFinEquiv).exteriorPower a).reindex (setEquiv a).symm, fun D => ?_⟩
   rw [Module.Basis.reindex_apply, exteriorPower.basis_apply]
   simp only [Equiv.symm_symm]
@@ -46,9 +47,13 @@ theorem wedge_basis (bΩ : Module.Basis (E n d) (Lr K n d) Ω[Lr K n d⁄K]) (h 
   funext i
   simp [Module.Basis.reindex_apply, h, enumD, setEquiv, Set.powersetCard.ofFinEmbEquiv_symm_apply]
 
-theorem monW_basis : ∀ {K : Type} [Field K] {n d : ℕ} (a : ℕ), ∃ b : Module.Basis (Gam n d × {D : Finset (E n d) // D.card = a}) K (Om K (Lr K n d) a), ∀ p, b p = monW K p.1 p.2 := by
+theorem monW_basis
+    : ∀ {K : Type} [Field K] {n d : ℕ} (a : ℕ),
+      ∃ b : Module.Basis (Gam n d × {D : Finset (E n d) // D.card = a}) K (Om K (Lr K n d) a), ∀ p,
+        b p = monW K p.1 p.2 := by
   intro K _ n d a
-  obtain ⟨bΩ, h⟩ := GlobalTheory.CompanionTheory.SurjectionOntoH4.OmBasis.exists_basis_dl (K := K) (n := n) (d := d)
+  obtain ⟨bΩ, h⟩ :=
+    GlobalTheory.CompanionTheory.SurjectionOntoH4.OmBasis.exists_basis_dl (K := K) (n := n) (d := d)
   obtain ⟨c, hc⟩ := wedge_basis bΩ h a
   refine ⟨lrBasis.smulTower c, fun p => ?_⟩
   rw [Module.Basis.smulTower_apply, lrBasis_apply, hc]

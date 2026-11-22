@@ -34,10 +34,12 @@ public import ReciprocityTheory.AnalyticForms.RegularLocalRings.WMultA
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic GlobalTheory.ChartGlue GlobalTheory.Mix
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic
+  GlobalTheory.ChartGlue GlobalTheory.Mix
 
 set_option autoImplicit false
 
@@ -45,9 +47,9 @@ noncomputable section
 
 namespace GlobalTheory.SncForm
 
-theorem ideal_vanishingIdeal_closure {X : Scheme.{0}} (U : X.affineOpens) {η : X} (hη : η ∈ U.1) :
-    (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {η})).ideal U =
-      (U.2.primeIdealOf ⟨η, hη⟩).asIdeal := by
+theorem ideal_vanishingIdeal_closure {X : Scheme.{0}} (U : X.affineOpens) {η : X} (hη : η ∈ U.1)
+    : (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {η})).ideal U
+      = (U.2.primeIdealOf ⟨η, hη⟩).asIdeal := by
   have hU : IsAffineOpen U.1 := U.2
   have emb := hU.fromSpec.isOpenEmbedding
   have h1 : hU.fromSpec (hU.primeIdealOf ⟨η, hη⟩) = η := hU.fromSpec_primeIdealOf ⟨η, hη⟩
@@ -56,18 +58,23 @@ theorem ideal_vanishingIdeal_closure {X : Scheme.{0}} (U : X.affineOpens) {η : 
     exact ⟨fun h => emb.injective (h.trans h1.symm), fun h => (congrArg _ h).trans h1⟩
   rw [Scheme.IdealSheafData.vanishingIdeal_ideal]
   change PrimeSpectrum.vanishingIdeal (hU.fromSpec ⁻¹' closure ({η} : Set X)) = _
-  have h3 := (emb.isOpenMap.preimage_closure_eq_closure_preimage emb.continuous {η}).trans
-    (congrArg closure h2)
+  have h3 :=
+    (emb.isOpenMap.preimage_closure_eq_closure_preimage emb.continuous {η}).trans
+      (congrArg closure h2)
   exact (congrArg PrimeSpectrum.vanishingIdeal h3).trans
     ((PrimeSpectrum.vanishingIdeal_closure _).trans (PrimeSpectrum.vanishingIdeal_singleton _))
 
-theorem exists_isLocalization_stalk {X : Scheme.{0}} (U : X.affineOpens) {y η : X} (hy : y ∈ U.1)
-    (hη : η ∈ U.1) (hηy : η ⤳ y) (p : Ideal (X.presheaf.stalk y)) [p.IsPrime]
-    (hp : FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {η})) y = p) :
-    ∃ _ : Algebra (X.presheaf.stalk y) (X.presheaf.stalk η),
-      IsLocalization.AtPrime (X.presheaf.stalk η) p ∧ ∀ a : Γ(X, U.1),
-        X.presheaf.germ U.1 η hη a =
-          algebraMap (X.presheaf.stalk y) (X.presheaf.stalk η) (X.presheaf.germ U.1 y hy a) := by
+theorem exists_isLocalization_stalk
+    {X : Scheme.{0}} (U : X.affineOpens)
+    {y η : X} (hy : y ∈ U.1) (hη : η ∈ U.1) (hηy : η ⤳ y) (p : Ideal (X.presheaf.stalk y))
+    [p.IsPrime]
+    (hp : FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {η})) y = p)
+    : ∃ _ : Algebra (X.presheaf.stalk y) (X.presheaf.stalk η),
+      IsLocalization.AtPrime (X.presheaf.stalk η) p
+        ∧ ∀ a : Γ(X, U.1),
+          X.presheaf.germ U.1 η hη a
+            = algebraMap (X.presheaf.stalk y) (X.presheaf.stalk η)
+              (X.presheaf.germ U.1 y hy a) := by
   have hU : IsAffineOpen U.1 := U.2
   let yU : U.1 := ⟨y, hy⟩
   let algY : Algebra Γ(X, U.1) (X.presheaf.stalk y) :=
@@ -89,45 +96,70 @@ theorem exists_isLocalization_stalk {X : Scheme.{0}} (U : X.affineOpens) {y η :
   rw [WMult.stalkId_eq_map_germ _ y U hy, ideal_vanishingIdeal_closure U hη] at hp
   have hPeq : Pη.asIdeal = p.comap (algebraMap Γ(X, U.1) (X.presheaf.stalk y)) := by
     rw [← hp]
-    exact (IsLocalization.under_map_of_isPrime_disjoint Py.asIdeal.primeCompl
-      (X.presheaf.stalk y) Pη.isPrime hdisj).symm
+    exact (IsLocalization.under_map_of_isPrime_disjoint Py.asIdeal.primeCompl (X.presheaf.stalk y)
+      Pη.isPrime hdisj).symm
   let T := Localization.AtPrime p
   have hT : IsLocalization.AtPrime T (p.comap (algebraMap Γ(X, U.1) (X.presheaf.stalk y))) :=
-    IsLocalization.isLocalization_isLocalization_atPrime_isLocalization
-      (M := Py.asIdeal.primeCompl) (S := X.presheaf.stalk y) (T := T) p
+    IsLocalization.isLocalization_isLocalization_atPrime_isLocalization (M := Py.asIdeal.primeCompl)
+      (S := X.presheaf.stalk y) (T := T) p
   have hT' : IsLocalization Pη.asIdeal.primeCompl T := by
-    have hsm : Pη.asIdeal.primeCompl =
-        (Ideal.comap (algebraMap Γ(X, U.1) (X.presheaf.stalk y)) p).primeCompl := by
+    have hsm
+        : Pη.asIdeal.primeCompl
+          = (Ideal.comap (algebraMap Γ(X, U.1) (X.presheaf.stalk y)) p).primeCompl := by
       ext x; rw [Ideal.mem_primeCompl_iff, Ideal.mem_primeCompl_iff, hPeq]
-    rw [hsm]; exact hT
+    rw [hsm]
+    exact hT
   let ηU : U.1 := ⟨η, hη⟩
   let algη : Algebra Γ(X, U.1) (X.presheaf.stalk η) :=
     TopCat.Presheaf.algebra_section_stalk X.presheaf ηU
-  have hlocη : IsLocalization.AtPrime (X.presheaf.stalk η) Pη.asIdeal :=
-    hU.isLocalization_stalk ηU
+  have hlocη : IsLocalization.AtPrime (X.presheaf.stalk η) Pη.asIdeal := hU.isLocalization_stalk ηU
   let φ : X.presheaf.stalk η ≃ₐ[Γ(X, U.1)] T := IsLocalization.algEquiv Pη.asIdeal.primeCompl _ _
   let algYη : Algebra (X.presheaf.stalk y) (X.presheaf.stalk η) :=
     (φ.symm.toRingEquiv.toRingHom.comp (algebraMap (X.presheaf.stalk y) T)).toAlgebra
-  refine ⟨algYη, (IsLocalization.isLocalization_iff_of_ringEquiv (M := p.primeCompl)
-      (S := T) φ.symm.toRingEquiv).mp inferInstance, fun a => ?_⟩
+  refine ⟨
+    algYη,
+    (IsLocalization.isLocalization_iff_of_ringEquiv (M := p.primeCompl) (S := T)
+      φ.symm.toRingEquiv).mp inferInstance,
+    fun a => ?_
+  ⟩
   have h1 := (φ.symm.commutes a).symm
   rw [IsScalarTower.algebraMap_apply Γ(X, U.1) (X.presheaf.stalk y) T] at h1
   exact h1
 
-theorem germ_eq_unit_mul_monomial : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (B : LB X) (hB : B.IsLB) (s : B.Sec) (hs : genericPoint X ∈ nonzeroLocus s) (r : ℕ) (z : Fin r → X), Function.Injective z → (∀ a, Order.coheight (z a) = 1) → ((nonzeroLocus s : Set X)ᶜ = ⋃ a, closure {z a}) → ∀ x : X, FinalTheorems.LSncAt X (fun a => (Closeds.closure {z a})) x → ∀ (i : B.ι) (hi : x ∈ B.U i), ∃ (n : ℕ) (g : Fin n → X.presheaf.stalk x) (e : {a : Fin r // x ∈ (Closeds.closure {z a})} ↪ Fin n) (u : (X.presheaf.stalk x)ˣ) (_ : Fintype {a : Fin r // x ∈ (Closeds.closure {z a})}), FinalTheorems.Rsp (X.presheaf.stalk x) n g ∧ (∀ a, FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {z a.1})) x = Ideal.span {g (e a)}) ∧ X.presheaf.germ _ x hi (s.f i) = u * ∏ a, g (e a) ^ ((divOfSec hB s hs).mult (z a.1)).toNat := by
+theorem germ_eq_unit_mul_monomial
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (B : LB X) (hB : B.IsLB) (s : B.Sec)
+        (hs : genericPoint X ∈ nonzeroLocus s) (r : ℕ) (z : Fin r → X),
+      Function.Injective z → (∀ a, Order.coheight (z a) = 1)
+        → ((nonzeroLocus s : Set X)ᶜ = ⋃ a, closure {z a})
+        → ∀ x : X,
+          FinalTheorems.LSncAt X (fun a => (Closeds.closure {z a})) x
+            → ∀ (i : B.ι) (hi : x ∈ B.U i),
+              ∃ (n : ℕ) (g : Fin n → X.presheaf.stalk x)
+                  (e : {a : Fin r // x ∈ (Closeds.closure {z a})} ↪ Fin n)
+                  (u : (X.presheaf.stalk x)ˣ)
+                  (_ : Fintype {a : Fin r // x ∈ (Closeds.closure {z a})}),
+                FinalTheorems.Rsp (X.presheaf.stalk x) n g
+                  ∧ (∀ a,
+                    FinalTheorems.stalkId
+                        (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {z a.1})) x
+                      = Ideal.span {g (e a)})
+                  ∧ X.presheaf.germ _ x hi (s.f i)
+                    = u * ∏ a, g (e a) ^ ((divOfSec hB s hs).mult (z a.1)).toNat := by
   classical
   intro X _ _ B hB s hs r z _ hz hZ x hx i hi
   obtain ⟨hreg, n, g, e, hg, hI⟩ := hx
-  obtain ⟨_, ⟨V, hV, rfl⟩, hxV, hVi⟩ := X.isBasis_affineOpens.exists_subset_of_mem_open hi (B.U i).isOpen
+  obtain ⟨_, ⟨V, hV, rfl⟩, hxV, hVi⟩ :=
+    X.isBasis_affineOpens.exists_subset_of_mem_open hi (B.U i).isOpen
   let U : X.affineOpens := ⟨V, hV⟩
   have hVi' : V ≤ B.U i := hVi
   let t : Γ(X, V) := X.presheaf.map (homOfLE hVi').op (s.f i)
-  have ht : ∀ (w : X) (hw : w ∈ V), X.presheaf.germ V w hw t =
-      X.presheaf.germ _ w (hVi' hw) (s.f i) := fun w hw =>
-    X.presheaf.germ_res_apply (homOfLE hVi') w hw _
+  have ht
+      : ∀ (w : X) (hw : w ∈ V), X.presheaf.germ V w hw t = X.presheaf.germ _ w (hVi' hw) (s.f i) :=
+    fun w hw => X.presheaf.germ_res_apply (homOfLE hVi') w hw _
   set γ := X.presheaf.germ _ x hi (s.f i) with hγ
-  have hγ0 : γ ≠ 0 := fun h0 => fnOf_sec_ne_zero hs (gen_mem hi)
-    ((algebraMap_germ hi (s.f i)).symm.trans ((congrArg _ h0).trans (map_zero _)))
+  have hγ0 : γ ≠ 0 := fun h0 =>
+    fnOf_sec_ne_zero hs (gen_mem hi)
+      ((algebraMap_germ hi (s.f i)).symm.trans ((congrArg _ h0).trans (map_zero _)))
   let J : Finset (Fin n) := Finset.univ.map e
   have hrad : (∏ j ∈ J, g j) ∈ (Ideal.span {γ}).radical := by
     rw [Ideal.radical_eq_sInf, Ideal.mem_sInf]
@@ -160,8 +192,9 @@ theorem germ_eq_unit_mul_monomial : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocal
       have h3 := ((PrimeSpectrum.le_iff_specializes _ _).1 h2).map hV.fromSpec.continuous
       rwa [h1] at h3
     have hxa : x ∈ Closeds.closure {z a} := hPx.mem_closed isClosed_closure ha
-    have hsup : hV.fromSpec P ∈
-        ((Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {z a})).support : Set X) := by
+    have hsup
+        : hV.fromSpec P
+          ∈ ((Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {z a})).support : Set X) := by
       rw [Scheme.IdealSheafData.coe_support_vanishingIdeal]
       exact ha
     rw [WMult.mem_support_fromSpec_iff _ U hV] at hsup
@@ -179,8 +212,9 @@ theorem germ_eq_unit_mul_monomial : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocal
     have hpr : Prime (g (e a)) := prime_of_regular_params g hg.1 hg.2 _
     have hP : (Ideal.span {g (e a)}).IsPrime := (Ideal.span_singleton_prime hpr.ne_zero).mpr hpr
     obtain ⟨alg, hloc, hgerm⟩ := exists_isLocalization_stalk U hxV hzV hsp _ (hI a)
-    have h := WMult.ord_isLocalization_eq_exponent g hg.1 hg.2 J u m (e a)
-      (Finset.mem_map_of_mem e (Finset.mem_univ _)) (X.presheaf.stalk (z a.1))
+    have h :=
+      WMult.ord_isLocalization_eq_exponent g hg.1 hg.2 J u m (e a)
+        (Finset.mem_map_of_mem e (Finset.mem_univ _)) (X.presheaf.stalk (z a.1))
     rw [← hγu, hγ, ← ht x hxV, ← hgerm t, ht] at h
     rw [mult_divOfSec (hz _) (hVi' hzV), Int.toNat_natCast]
     exact (congrArg ENat.toNat h).trans (ENat.toNat_natCast _)

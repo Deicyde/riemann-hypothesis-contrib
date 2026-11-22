@@ -13,12 +13,12 @@ open MvPolynomial Finset Comb
 
 noncomputable section
 
-theorem symmetricGroupCharacter_eq_cf {m : ℕ} (lam : Fin m → ℕ) (rho : List ℕ) :
-    symmetricGroupCharacter lam rho = cf (fun i => lam i + stair m i) (alternantPsum m rho) :=
+theorem symmetricGroupCharacter_eq_cf {m : ℕ} (lam : Fin m → ℕ) (rho : List ℕ)
+    : symmetricGroupCharacter lam rho = cf (fun i => lam i + stair m i) (alternantPsum m rho) :=
   rfl
 
-theorem CharacterBound.proof (h1 : CombTableEqWords.Statement) (h2 : CombCfBound.Statement) :
-    CharacterBound.Statement := by
+theorem CharacterBound.proof (h1 : CombTableEqWords.Statement) (h2 : CombCfBound.Statement)
+    : CharacterBound.Statement := by
   intro m lam rho hlam hrho
   rw [symmetricGroupCharacter_eq_cf]
   refine (h2 m rho hrho lam hlam).trans ?_

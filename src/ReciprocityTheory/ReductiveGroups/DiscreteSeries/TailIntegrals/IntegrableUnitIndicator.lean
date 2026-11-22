@@ -130,7 +130,12 @@ def Bset (q : ι) : Set (ι → ℂ) := {x | 1 / 2 ≤ tW q x ∧ tW q x ≤ 1 �
 def PsiF (p q : ι) (s : ℝ) (x : ι → ℂ) : ℝ≥0∞ := (‖1 - star (x p) / (tW q x : ℂ)‖₊ : ℝ≥0∞) ^ (-s)
 
 def gF (p q : ι) (β : ℝ) (i : ι) (z : ℂ) : ℝ :=
-  if i = q then one1 z.re * one1 z.im else if i = p then one1 z.re * pw1 β z.im else pw1 β z.re * pw1 β z.im
+  if i = q then
+    one1 z.re * one1 z.im
+  else if i = p then
+    one1 z.re * pw1 β z.im
+  else
+    pw1 β z.re * pw1 β z.im
 
 lemma normSq_le_tW (q : ι) (x : ι → ℂ) (i : ι) (hi : i ≠ q) : Complex.normSq (x i) ≤ tW q x ^ 2 := by
   have hnn : ∀ j ∈ Finset.univ, 0 ≤ (if j = q then 0 else Complex.normSq (x j)) := by

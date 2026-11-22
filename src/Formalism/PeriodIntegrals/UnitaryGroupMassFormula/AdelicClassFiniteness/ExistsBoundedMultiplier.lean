@@ -62,8 +62,15 @@ theorem existsBoundedMultiplier : IdealBoundAll := by
   refine ⟨B, fun I hI => ?_⟩
   obtain ⟨J, hJ0, hJB, hIJ0, hP⟩ := hB I hI
   obtain ⟨c, hcI, hc0, hc⟩ := exists_mem_ne_zero_mul_dvd_of_mul_isPrincipal I J hIJ0 hP
-  exact ⟨c, hcI, hc0, Ideal.absNorm J,
-    Nat.one_le_iff_ne_zero.2 (fun h => hJ0 (Ideal.absNorm_eq_zero_iff.1 h)), hJB, hc _ (Ideal.absNorm_mem J)⟩
+  exact ⟨
+    c,
+    hcI,
+    hc0,
+    Ideal.absNorm J,
+    Nat.one_le_iff_ne_zero.2 (fun h => hJ0 (Ideal.absNorm_eq_zero_iff.1 h)),
+    hJB,
+    hc _ (Ideal.absNorm_mem J)
+  ⟩
 
 end PIW.AdelClassFin
 

@@ -18,8 +18,7 @@ theorem HeightComparison.proof (hV : CurveDivVertical.Statement) : HeightCompari
   intro K _ ι _ I A H hI hA hH hHa
   set m : ℕ := ∑ k, (A.a k).natAbs
   have hm : ∀ k, (A.a k).natAbs ≤ m := fun k ↦
-    Finset.single_le_sum (f := fun k ↦ (A.a k).natAbs) (fun _ _ ↦ Nat.zero_le _)
-      (Finset.mem_univ k)
+    Finset.single_le_sum (f := fun k ↦ (A.a k).natAbs) (fun _ _ ↦ Nat.zero_le _) (Finset.mem_univ k)
   have hHk : ∀ k, H.a k = 1 := fun k ↦ by rw [hHa]; rfl
   set Ep := (powLine H m).tensor (invLine A)
   set Em := (powLine H m).tensor A
@@ -49,22 +48,27 @@ theorem HeightComparison.proof (hV : CurveDivVertical.Statement) : HeightCompari
   rcases Nat.eq_zero_or_pos (degC W) with hdeg | hdeg
   · simp [hdeg, hC]
   obtain ⟨c, hc⟩ := exists_chartMon_notMem hW
-  have hp := inter_nonneg I hV hI hW (isSmoothHerm_tensor hEp (isSmoothHerm_constLine Mp hMp0))
-    (d := dp) (fun k ↦ by show Ep.a k + 0 = _; rw [add_zero, hdp k]) c (hc dp)
-    (fun z hz ↦ by show _ ≤ Ep.h z * Mp; rw [mul_comm]; exact hMp c z hz.1)
-  have hn := inter_nonneg I hV hI hW (isSmoothHerm_tensor hEm (isSmoothHerm_constLine Mm hMm0))
-    (d := dm) (fun k ↦ by show Em.a k + 0 = _; rw [add_zero, hdm k]) c (hc dm)
-    (fun z hz ↦ by show _ ≤ Em.h z * Mm; rw [mul_comm]; exact hMm c z hz.1)
+  have hp :=
+    inter_nonneg I hV hI hW (isSmoothHerm_tensor hEp (isSmoothHerm_constLine Mp hMp0)) (d := dp)
+      (fun k ↦ by show Ep.a k + 0 = _; rw [add_zero, hdp k])
+      c (hc dp)
+      (fun z hz ↦ by show _ ≤ Ep.h z * Mp; rw [mul_comm]; exact hMp c z hz.1)
+  have hn :=
+    inter_nonneg I hV hI hW (isSmoothHerm_tensor hEm (isSmoothHerm_constLine Mm hMm0)) (d := dm)
+      (fun k ↦ by show Em.a k + 0 = _; rw [add_zero, hdm k])
+      c (hc dm)
+      (fun z hz ↦ by show _ ≤ Em.h z * Mm; rw [mul_comm]; exact hMm c z hz.1)
   rw [inter_tensor I hI hW hEp (isSmoothHerm_constLine Mp hMp0),
-    inter_tensor I hI hW hPow (isSmoothHerm_invLine hA), inter_powLine I hI hW hH,
-    inter_invLine I hI hW hA] at hp
+      inter_tensor I hI hW hPow (isSmoothHerm_invLine hA), inter_powLine I hI hW hH,
+      inter_invLine I hI hW hA]
+    at hp
   rw [inter_tensor I hI hW hEm (isSmoothHerm_constLine Mm hMm0), inter_tensor I hI hW hPow hA,
-    inter_powLine I hI hW hH] at hn
+      inter_powLine I hI hW hH]
+    at hn
   have hcp := inter_constLine_le I hI hW hMp0 hMp1 hdeg
   have hcn := inter_constLine_le I hI hW hMm0 hMm1 hdeg
   have hD : (0 : ℝ) < degC W := by exact_mod_cast hdeg
-  have hCp : Real.log Mp * degC W ≤ C * degC W :=
-    mul_le_mul_of_nonneg_right (le_max_left _ _) hD.le
+  have hCp : Real.log Mp * degC W ≤ C * degC W := mul_le_mul_of_nonneg_right (le_max_left _ _) hD.le
   have hCn : Real.log Mm * degC W ≤ C * degC W :=
     mul_le_mul_of_nonneg_right (le_max_right _ _) hD.le
   rw [abs_div, abs_of_pos hD, div_le_iff₀ hD, add_mul, mul_assoc, div_mul_cancel₀ _ hD.ne', abs_le]

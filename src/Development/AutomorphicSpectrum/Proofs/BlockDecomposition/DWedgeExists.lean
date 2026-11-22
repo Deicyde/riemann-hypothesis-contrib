@@ -11,8 +11,11 @@ namespace GlobalTheory.CompanionTheory.Forms
 
 theorem dWedge_exists : CrystallineSemistableComparison.Onto.DWedge := by
   intro K A _ _ _ a f
-  refine ⟨exteriorPower.alternatingMapLinearEquiv
-    ((exteriorPower.ιMulti A (a + 1) (M := Ω[A⁄K])).curryLeft (KaehlerDifferential.D K A f)), ?_⟩
+  refine ⟨
+    exteriorPower.alternatingMapLinearEquiv
+      ((exteriorPower.ιMulti A (a + 1) (M := Ω[A⁄K])).curryLeft (KaehlerDifferential.D K A f)),
+    ?_
+  ⟩
   intro g₀ g
   unfold CrystallineSemistableComparison.Onto.form
   rw [map_smul, exteriorPower.alternatingMapLinearEquiv_apply_ιMulti,

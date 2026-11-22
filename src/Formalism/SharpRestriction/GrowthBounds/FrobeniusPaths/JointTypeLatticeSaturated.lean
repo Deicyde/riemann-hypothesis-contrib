@@ -191,26 +191,33 @@ lemma prod_plTan (R : Type*) [CommRing R] {N r K : ℕ} (nu : Fin (N + 1) → Fi
     psi_eq_prod_superset R ka I'' h2.1 _ (colRange_pl_subset nu ka).2, map_prod, map_prod]
   simp only [joinI_pl, joinI_tan]
 
-theorem joint_type_lower_bound (D : Formalism.BasicNotions.D7) (hB2 : PathWeightComponents D)
-    (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (S : UniformizedDVR p O)
+theorem joint_type_lower_bound
+    (D : Formalism.BasicNotions.D7) (hB2 : PathWeightComponents D)
+    (p : ℕ) [Fact p.Prime]
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (S : UniformizedDVR p O)
     (N r K : ℕ) [NeZero r] [NeZero K]
-    (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ) (hK : N + r ≤ K) (h1 : StrictAnti om) (h2 : ∀ i, 0 < om i)
+    (LL : Letters (Fin N))
+    (B : Fin N → ℕ) (om : Fin N → ℕ)
+    (hK : N + r ≤ K) (h1 : StrictAnti om) (h2 : ∀ i, 0 < om i)
     (nu : Fin (N + 1) → Fin r → ℤ) (ka : Fin (N + 1) → Fin K → ℤ)
     (hP : ∃ P : PPath (r + K) N LL B, P.mu = joinPT nu ka)
-    (I' : ℤ → Finset (Fin r)) (I'' : ℤ → Finset (Fin K)) (hI' : IsSt nu I') (hI'' : IsSt ka I'') :
-    ∃ I : ℤ → Finset (Fin (r + K)),
+    (I' : ℤ → Finset (Fin r)) (I'' : ℤ → Finset (Fin K)) (hI' : IsSt nu I') (hI'' : IsSt ka I'')
+    : ∃ I : ℤ → Finset (Fin (r + K)),
       (∀ m ∈ (Psi O (joinPT nu ka) I).support,
-        (∑ c ∈ colRange (joinPT nu ka), oc om (joinPT nu ka) c) ≤ monWt LL om m) ∧
-      weightedHomogeneousComponent (symWt (r := r) (K := K) LL om)
-          (∑ c ∈ colRange (joinPT nu ka), oc om (joinPT nu ka) c) (Psi O (joinPT nu ka) I) =
-        PsiPl O nu I' * PsiTan O ka I'' := by
+          (∑ c ∈ colRange (joinPT nu ka), oc om (joinPT nu ka) c) ≤ monWt LL om m)
+        ∧ weightedHomogeneousComponent (symWt (r := r) (K := K) LL om)
+            (∑ c ∈ colRange (joinPT nu ka), oc om (joinPT nu ka) c) (Psi O (joinPT nu ka) I)
+          = PsiPl O nu I' * PsiTan O ka I'' := by
   obtain ⟨P, hPmu⟩ := hP
   have hb := fun c J => hB2 p O S N r K LL B om hK h1 h2 P c J
   rw [hPmu] at hb
   refine ⟨joinI I' I'', ?_⟩
-  have := low_prod (symWt (r := r) (K := K) LL om) (colRange (joinPT nu ka))
-    (fun c => Kcol O (joinPT nu ka) c N (joinI I' I'' c)) (fun c => oc om (joinPT nu ka) c)
-    (fun c _ => (hb c _).1)
+  have :=
+    low_prod (symWt (r := r) (K := K) LL om) (colRange (joinPT nu ka))
+      (fun c => Kcol O (joinPT nu ka) c N (joinI I' I'' c))
+      (fun c => oc om (joinPT nu ka) c)
+      (fun c _ => (hb c _).1)
   refine ⟨this.1, ?_⟩
   unfold Psi
   rw [this.2, ← prod_plTan O nu ka I' I'' hI' hI'']
@@ -240,11 +247,14 @@ lemma pol_of_smul {O : Type*} [CommRing O] [IsDomain O] {ι : Type*} {n : ℕ} (
   rwa [MvPolynomial.support_smul_eq ha] at h
 
 abbrev PIdx {N : ℕ} (r K : ℕ) (LL : Letters (Fin N)) (B : Fin N → ℕ) :=
-  {x : ((Fin (N + 1) → Fin r → ℤ) × (ℤ → Finset (Fin r))) × ((Fin (N + 1) → Fin K → ℤ) × (ℤ → Finset (Fin K))) //
-    PairPath LL B x.1.1 x.2.1 ∧ IsSt x.1.1 x.1.2 ∧ IsSt x.2.1 x.2.2}
+  {x : ((Fin (N + 1) → Fin r → ℤ) × (ℤ → Finset (Fin r)))
+      × ((Fin (N + 1) → Fin K → ℤ) × (ℤ → Finset (Fin K)))
+    // PairPath LL B x.1.1 x.2.1 ∧ IsSt x.1.1 x.1.2 ∧ IsSt x.2.1 x.2.2}
 
-def pvec (O : Type) [CommRing O] {N : ℕ} (r K : ℕ) (LL : Letters (Fin N)) (B : Fin N → ℕ) (x : PIdx r K LL B) :
-    MvPolynomial (Fin N × Fin (r + K)) O :=
+def pvec
+    (O : Type) [CommRing O]
+    {N : ℕ} (r K : ℕ) (LL : Letters (Fin N)) (B : Fin N → ℕ) (x : PIdx r K LL B)
+    : MvPolynomial (Fin N × Fin (r + K)) O :=
   PsiPl (K := K) O x.1.1.1 x.1.1.2 * PsiTan (r := r) O x.1.2.1 x.1.2.2
 
 lemma pairPath_of_path (D : Formalism.BasicNotions.D7) {N r K : ℕ} [NeZero r] [NeZero K] (LL : Letters (Fin N)) (B : Fin N → ℕ)
@@ -277,11 +287,17 @@ lemma range_pvec (O : Type) [CommRing O] {N r K : ℕ} (LL : Letters (Fin N)) (B
   · rintro ⟨nu, ka, I', I'', h1, h2, h3, rfl⟩
     exact ⟨⟨((nu, I'), (ka, I'')), h1, h2, h3⟩, rfl⟩
 
-theorem joint_type_lattice_saturated (D : Formalism.BasicNotions.D7) (h16 : PairedPathIndependence D)
-    (p : ℕ) [hp : Fact p.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (S : UniformizedDVR p O)
-    (N r K : ℕ) [NeZero r] [NeZero K] (LL : Letters (Fin N)) (B : Fin N → ℕ) (hK : N + r ≤ K)
+theorem joint_type_lattice_saturated
+    (D : Formalism.BasicNotions.D7) (h16 : PairedPathIndependence D)
+    (p : ℕ) [hp : Fact p.Prime]
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (S : UniformizedDVR p O)
+    (N r K : ℕ) [NeZero r] [NeZero K]
+    (LL : Letters (Fin N)) (B : Fin N → ℕ)
+    (hK : N + r ≤ K)
     (PP : Set ((Fin (N + 1) → Fin r → ℤ) × (Fin (N + 1) → Fin K → ℤ)))
-    (hPP : ∀ q ∈ PP, ∃ P : PPath (r + K) N LL B, P.mu = joinPT q.1 q.2) : Saturated (XXZ O PP) := by
+    (hPP : ∀ q ∈ PP, ∃ P : PPath (r + K) N LL B, P.mu = joinPT q.1 q.2)
+    : Saturated (XXZ O PP) := by
   haveI : CharZero O := Formalism.MainNotions.G.GLWeightTheory.dvr_charZero_of_prime S hp.out
   obtain ⟨⟨hli, hsp⟩, _⟩ := h16 O N r K LL B
   rw [← range_pvec] at hsp
@@ -294,18 +310,24 @@ theorem joint_type_lattice_saturated (D : Formalism.BasicNotions.D7) (h16 : Pair
   exact Submodule.span_mono (Set.image_subset_range _ _) haf
 
 def IntegralJointTypeSum (_D : Formalism.BasicNotions.D7) : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (_S : UniformizedDVR p O)
-    (N r K : ℕ) [NeZero r] [NeZero K]
-    (LL : Letters (Fin N)) (B : Fin N → ℕ), N + r ≤ K →
-    ∀ PP : Set ((Fin (N + 1) → Fin r → ℤ) × (Fin (N + 1) → Fin K → ℤ)),
-      (∀ L : List (PathInequality N),
-        PP = {q | (∃ P : PPath (r + K) N LL B, P.mu = joinPT q.1 q.2) ∧ ∀ e ∈ L, e.Sat q.1 q.2} →
-        (XXZ O PP : Set _) = {f | MvPolynomial.map (algebraMap O (KK O)) f ∈
-          ⨆ q ∈ PP, jointType (KK O) LL q.1 q.2})
+  ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+      (_S : UniformizedDVR p O) (N r K : ℕ) [NeZero r] [NeZero K] (LL : Letters (Fin N))
+      (B : Fin N → ℕ),
+    N + r ≤ K
+      → ∀ PP : Set ((Fin (N + 1) → Fin r → ℤ) × (Fin (N + 1) → Fin K → ℤ)),
+        (∀ L : List (PathInequality N),
+          PP = {q | (∃ P : PPath (r + K) N LL B, P.mu = joinPT q.1 q.2) ∧ ∀ e ∈ L, e.Sat q.1 q.2}
+            → (XXZ O PP : Set _)
+              = {f | MvPolynomial.map (algebraMap O (KK O)) f ∈
+                ⨆ q ∈ PP, jointType (KK O) LL q.1 q.2})
 
-theorem lemma_B3 (D : Formalism.BasicNotions.D7) (h16 : PairedPathIndependence D) (hB2 : PathWeightComponents D) (hc : IntegralJointTypeSum D) : ConclusionB3 D := by
+theorem lemma_B3
+    (D : Formalism.BasicNotions.D7)
+    (h16 : PairedPathIndependence D) (hB2 : PathWeightComponents D) (hc : IntegralJointTypeSum D)
+    : ConclusionB3 D := by
   intro p _ O _ _ _ S N r K _ _ LL B om hK h1 h2 PP hPP
-  refine ⟨joint_type_lattice_saturated D h16 p O S N r K LL B hK PP hPP, ?_, hc p O S N r K LL B hK PP⟩
+  refine
+    ⟨joint_type_lattice_saturated D h16 p O S N r K LL B hK PP hPP, ?_, hc p O S N r K LL B hK PP⟩
   intro q hq I' I'' hI' hI''
   exact joint_type_lower_bound D hB2 p O S N r K LL B om hK h1 h2 q.1 q.2 (hPP q hq) I' I'' hI' hI''
 

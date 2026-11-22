@@ -12,9 +12,12 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
@@ -30,30 +33,34 @@ theorem flat_fromSpecStalk' (X : Scheme.{0}) (x : X) : Flat (X.fromSpecStalk x) 
     exact IsLocalization.flat (X.presheaf.stalk x) (hU.primeIdealOf ⟨x, hx⟩).asIdeal.primeCompl
   infer_instance
 
-theorem injective_of_flat_of_isDomain {A B : Type} [CommRing A] [IsDomain A] [CommRing B]
-    [Nontrivial B] (f : A →+* B) (hf : f.Flat) : Function.Injective f := by
+theorem injective_of_flat_of_isDomain
+    {A B : Type} [CommRing A] [IsDomain A] [CommRing B] [Nontrivial B] (f : A →+* B) (hf : f.Flat)
+    : Function.Injective f := by
   algebraize [f]
   refine (injective_iff_map_eq_zero f).2 fun r hr => ?_
   by_contra h0
-  have hreg : IsSMulRegular B r :=
-    Module.Flat.isSMulRegular_of_isRegular (IsRegular.of_ne_zero h0)
+  have hreg : IsSMulRegular B r := Module.Flat.isSMulRegular_of_isRegular (IsRegular.of_ne_zero h0)
   have h1 : r • (1 : B) = r • (0 : B) := by
     rw [smul_zero, Algebra.smul_def, _root_.mul_one]; exact hr
   exact one_ne_zero (hreg h1)
 
-theorem stalk_of_smooth_over_regular :
-    ∀ (R : Type) [CommRing R] [IsRegularLocalRing R] (X : Scheme.{0}) (p : X ⟶ Sp R), Smooth p →
-      ∀ x : X, IsDomain (X.presheaf.stalk x) ∧ IsNoetherianRing (X.presheaf.stalk x) ∧
-        IsIntegrallyClosed (X.presheaf.stalk x) ∧
-        (Spec.preimage (X.fromSpecStalk x ≫ p)).hom.Flat ∧
-        Function.Injective (Spec.preimage (X.fromSpecStalk x ≫ p)).hom := by
+theorem stalk_of_smooth_over_regular
+    : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R] (X : Scheme.{0}) (p : X ⟶ Sp R),
+      Smooth p
+        → ∀ x : X,
+          IsDomain (X.presheaf.stalk x) ∧ IsNoetherianRing (X.presheaf.stalk x)
+            ∧ IsIntegrallyClosed (X.presheaf.stalk x)
+            ∧ (Spec.preimage (X.fromSpecStalk x ≫ p)).hom.Flat
+            ∧ Function.Injective (Spec.preimage (X.fromSpecStalk x ≫ p)).hom := by
   intro R _ _ X p hp x
   haveI : Smooth p := hp
   haveI : IsRegularRing (CommRingCat.of R) := GlobalTheory.isRegularRing_of_isRegularLocalRing R
   have hreg : IsRegularLocalRing (X.presheaf.stalk x) :=
     GroundTheory.Arith.SchemeCoh.isRegularLocalRing_stalk_of_smooth p x
-  obtain ⟨hdom, hint⟩ := GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing (X.presheaf.stalk x)
-  have hRdom : IsDomain R := (GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing R).1
+  obtain ⟨hdom, hint⟩ :=
+    GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing (X.presheaf.stalk x)
+  have hRdom : IsDomain R :=
+    (GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing R).1
   have hfl : (Spec.preimage (X.fromSpecStalk x ≫ p)).hom.Flat := by
     haveI := flat_fromSpecStalk' X x
     have h : Flat (Spec.map (Spec.preimage (X.fromSpecStalk x ≫ p))) := by

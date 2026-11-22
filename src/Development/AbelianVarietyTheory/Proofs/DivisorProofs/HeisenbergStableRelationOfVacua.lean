@@ -9,58 +9,91 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Schroedinger
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
 open IsDedekindDomain NumberField MeasureTheory Matrix
-open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.VacAny
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames GlobalTheory.BigNZ GlobalTheory.AdelicU GlobalTheory.WeilM
-open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation (spV spW spW₁ spV₁ Num IsTripleOf IsDatumA skewGram mulG colV adjV₁)
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chars Rep IsTriple Acts SInf At latAtV realAd evI)
+open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.VacAny
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StdFrames GlobalTheory.BigNZ GlobalTheory.AdelicU GlobalTheory.WeilM
+open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation
+  (spV spW spW₁ spV₁ Num IsTripleOf IsDatumA skewGram mulG colV adjV₁)
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  (Base Spc Model Chars Rep IsTriple Acts SInf At latAtV realAd evI)
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.BigDat
 
 namespace GlobalTheory.InductLagr
 
-theorem schr_add_mem {K : Type} [CommRing K] [Invertible (2 : K)] (ψ : AddChar K ℂ) {κ : Type} [Fintype κ]
+theorem schr_add_mem
+    {K : Type} [CommRing K] [Invertible (2 : K)]
+    (ψ : AddChar K ℂ)
+    {κ : Type} [Fintype κ]
     (N : Submodule ℂ ((κ → K) → ℂ)) (a b : (κ → K) × (κ → K))
-    (ha : ∀ φ ∈ N, GlobalTheory.WeilM.schr ψ a φ ∈ N) (hb : ∀ φ ∈ N, GlobalTheory.WeilM.schr ψ b φ ∈ N) :
-    ∀ φ ∈ N, GlobalTheory.WeilM.schr ψ (a + b) φ ∈ N := by
+    (ha : ∀ φ ∈ N, GlobalTheory.WeilM.schr ψ a φ ∈ N)
+    (hb : ∀ φ ∈ N, GlobalTheory.WeilM.schr ψ b φ ∈ N)
+    : ∀ φ ∈ N, GlobalTheory.WeilM.schr ψ (a + b) φ ∈ N := by
   intro φ hφ
   set c : K := ⅟(2 : K) * (a.1 ⬝ᵥ b.2 - b.1 ⬝ᵥ a.2) with hc
-  have law : GlobalTheory.WeilM.schr ψ a (GlobalTheory.WeilM.schr ψ b φ) = ψ c • GlobalTheory.WeilM.schr ψ (a + b) φ := by
+  have law
+      : GlobalTheory.WeilM.schr ψ a (GlobalTheory.WeilM.schr ψ b φ)
+        = ψ c • GlobalTheory.WeilM.schr ψ (a + b) φ := by
     funext x
-    have key : (x ⬝ᵥ a.2 + ⅟(2 : K) * (a.1 ⬝ᵥ a.2)) + ((x + a.1) ⬝ᵥ b.2 + ⅟(2 : K) * (b.1 ⬝ᵥ b.2)) =
-        c + (x ⬝ᵥ (a + b).2 + ⅟(2 : K) * ((a + b).1 ⬝ᵥ (a + b).2)) := by
+    have key
+        : (x ⬝ᵥ a.2 + ⅟(2 : K) * (a.1 ⬝ᵥ a.2)) + ((x + a.1) ⬝ᵥ b.2 + ⅟(2 : K) * (b.1 ⬝ᵥ b.2))
+          = c + (x ⬝ᵥ (a + b).2 + ⅟(2 : K) * ((a + b).1 ⬝ᵥ (a + b).2)) := by
       have h2 : ⅟(2 : K) * 2 = 1 := invOf_mul_self 2
       simp only [hc, Prod.fst_add, Prod.snd_add, dotProduct_add, add_dotProduct]
       linear_combination (-(a.1 ⬝ᵥ b.2)) * h2
     show ψ _ * (ψ _ * φ (x + a.1 + b.1)) = ψ c * (ψ _ * φ (x + (a + b).1))
-    rw [← mul_assoc, ← mul_assoc, ← AddChar.map_add_eq_mul, ← AddChar.map_add_eq_mul, key, Prod.fst_add, add_assoc]
+    rw [← mul_assoc, ← mul_assoc, ← AddChar.map_add_eq_mul, ← AddChar.map_add_eq_mul, key,
+      Prod.fst_add, add_assoc]
   have hne : ψ c ≠ 0 := by
     have h1 : ψ c * ψ (-c) = 1 := by
       rw [← AddChar.map_add_eq_mul, add_neg_cancel, AddChar.map_zero_eq_one]
     exact left_ne_zero_of_mul_eq_one h1
-  have e : GlobalTheory.WeilM.schr ψ (a + b) φ = (ψ c)⁻¹ • GlobalTheory.WeilM.schr ψ a (GlobalTheory.WeilM.schr ψ b φ) := by
+  have e
+      : GlobalTheory.WeilM.schr ψ (a + b) φ
+        = (ψ c)⁻¹ • GlobalTheory.WeilM.schr ψ a (GlobalTheory.WeilM.schr ψ b φ) := by
     rw [law, smul_smul, inv_mul_cancel₀ hne, one_smul]
   rw [e]
   exact N.smul_mem _ (ha _ (hb _ hφ))
 
-theorem exists_at_locCo {F : Type} [Field F] [NumberField F] {W : Type} [AddCommGroup W] [Module (AF F) W]
-    {B : W → W → AF F} {κ : Type} [Fintype κ] (co : GlobalTheory.WeilM.Darboux B κ) (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
-    (p : (κ → Fv F v) × (κ → Fv F v)) :
-    ∃ u : W, At (evFin F v) u ∧ GlobalTheory.LatVac.locCo co v u = p := by
-  refine ⟨co.e.symm (fun k => GlobalTheory.LatVac.liftV v (p.1 k), fun k => GlobalTheory.LatVac.liftV v (p.2 k)), ?_, ?_⟩
+theorem exists_at_locCo
+    {F : Type} [Field F] [NumberField F]
+    {W : Type} [AddCommGroup W] [Module (AF F) W]
+    {B : W → W → AF F} {κ : Type} [Fintype κ]
+    (co : GlobalTheory.WeilM.Darboux B κ)
+    (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
+    (p : (κ → Fv F v) × (κ → Fv F v))
+    : ∃ u : W, At (evFin F v) u ∧ GlobalTheory.LatVac.locCo co v u = p := by
+  refine ⟨
+    co.e.symm
+      (fun k => GlobalTheory.LatVac.liftV v (p.1 k), fun k => GlobalTheory.LatVac.liftV v (p.2 k)),
+    ?_,
+    ?_
+  ⟩
   · intro r hr
     rw [← LinearEquiv.map_smul]
-    have h0 : r • ((fun k => GlobalTheory.LatVac.liftV v (p.1 k), fun k => GlobalTheory.LatVac.liftV v (p.2 k)) :
-        (κ → AF F) × (κ → AF F)) = 0 := by
+    have h0
+        : r • ((
+              fun k => GlobalTheory.LatVac.liftV v (p.1 k),
+              fun k => GlobalTheory.LatVac.liftV v (p.2 k)
+            )
+            : (κ → AF F) × (κ → AF F))
+          = 0 := by
       refine Prod.ext (funext fun k => ?_) (funext fun k => ?_)
       · exact GlobalTheory.LatVac.at_liftV v (p.1 k) r hr
       · exact GlobalTheory.LatVac.at_liftV v (p.2 k) r hr
     rw [h0, map_zero]
   · show ((fun k => evFin F v ((co.e _).1 k)), fun k => evFin F v ((co.e _).2 k)) = p
     rw [LinearEquiv.apply_symm_apply]
-    exact Prod.ext (funext fun k => GlobalTheory.LatVac.evFin_liftV v _) (funext fun k => GlobalTheory.LatVac.evFin_liftV v _)
+    exact Prod.ext (funext fun k => GlobalTheory.LatVac.evFin_liftV v _)
+      (funext fun k => GlobalTheory.LatVac.evFin_liftV v _)
 
 end GlobalTheory.InductLagr
 

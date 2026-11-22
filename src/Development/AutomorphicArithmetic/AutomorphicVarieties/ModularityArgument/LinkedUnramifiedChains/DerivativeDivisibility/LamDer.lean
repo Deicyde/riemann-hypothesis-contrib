@@ -13,15 +13,20 @@ open Polynomial IsLocalRing UpperTheory.V.Alg
 
 namespace UpperTheory.V.J
 
-private theorem finite_of_alg {O R : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O]
-    [CommRing R] [IsDomain R] [Algebra O R] [IsCO O R] (hinj : Function.Injective (algebraMap O R))
-    (hal : ∀ a : R, ∃ P : O[X], P ≠ 0 ∧ aeval a P = 0) : Module.Finite O R :=
+private theorem finite_of_alg
+    {O R : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    [IsAdicComplete (maximalIdeal O) O] [CommRing R] [IsDomain R] [Algebra O R] [IsCO O R]
+    (hinj : Function.Injective (algebraMap O R)) (hal : ∀ a : R, ∃ P : O[X], P ≠ 0 ∧ aeval a P = 0)
+    : Module.Finite O R :=
   _root_.UpperTheory.Reformulated.B.Ra2.finite_of_alg hinj hal
 
-private theorem exists_sqz {O Λ A N : Type} [CommRing O] [IsLocalRing O] [CommRing Λ] [Algebra O Λ] [CommRing A] [Algebra O A]
-    [IsCO O A] [AddCommGroup N] [Module A N] [Module O N] [IsScalarTower O A N] [Module.Finite A N] (p : Λ →ₐ[O] A)
-    (d : Λ →ₗ[O] N) (hd : ∀ f g, d (f * g) = p f • d g + p g • d f) :
-    ∃ (T : Type) (_ : CommRing T) (_ : Algebra O T) (_ : IsCO O T) (f₀ f₁ : Λ →ₐ[O] T), ∀ a, f₀ a = f₁ a ↔ d a = 0 := by
+private theorem exists_sqz
+    {O Λ A N : Type}
+    [CommRing O] [IsLocalRing O] [CommRing Λ] [Algebra O Λ] [CommRing A] [Algebra O A] [IsCO O A]
+    [AddCommGroup N] [Module A N] [Module O N] [IsScalarTower O A N] [Module.Finite A N]
+    (p : Λ →ₐ[O] A) (d : Λ →ₗ[O] N) (hd : ∀ f g, d (f * g) = p f • d g + p g • d f)
+    : ∃ (T : Type) (_ : CommRing T) (_ : Algebra O T) (_ : IsCO O T) (f₀ f₁ : Λ →ₐ[O] T), ∀ a,
+      f₀ a = f₁ a ↔ d a = 0 := by
   letI : Module Aᵐᵒᵖ N := Module.compHom N ((RingHom.id A).fromOpposite fun x y => Commute.all x y)
   haveI : IsCentralScalar A N := ⟨fun _ _ => rfl⟩
   haveI : SMulCommClass A Aᵐᵒᵖ N := ⟨fun a b n => smul_comm a (MulOpposite.unop b) n⟩
@@ -33,46 +38,59 @@ private theorem exists_sqz {O Λ A N : Type} [CommRing O] [IsLocalRing O] [CommR
     have := hd 1 1
     simp only [mul_one, map_one, one_smul] at this
     exact left_eq_add.1 this
-  let f₁ : Λ →ₐ[O] TrivSqZeroExt A N :=
-    { toFun := fun a => TrivSqZeroExt.inl (p a) + TrivSqZeroExt.inr (d a)
-      map_one' := TrivSqZeroExt.ext (by simp) (by simp [h1])
-      map_zero' := TrivSqZeroExt.ext (by simp) (by simp)
-      map_add' := fun a b => TrivSqZeroExt.ext (by simp) (by simp)
-      map_mul' := fun a b => by
-        refine TrivSqZeroExt.ext (by simp) ?_
-        rw [TrivSqZeroExt.snd_mul]
-        simp only [TrivSqZeroExt.fst_add, TrivSqZeroExt.fst_inl, TrivSqZeroExt.fst_inr, add_zero, TrivSqZeroExt.snd_add,
-          TrivSqZeroExt.snd_inl, TrivSqZeroExt.snd_inr, zero_add]
-        rw [hd, op_smul_eq_smul]
-      commutes' := fun c => by
-        refine TrivSqZeroExt.ext ?_ ?_
-        · simp only [TrivSqZeroExt.fst_add, TrivSqZeroExt.fst_inl, TrivSqZeroExt.fst_inr, add_zero]
-          exact p.commutes c
-        · simp only [TrivSqZeroExt.snd_add, TrivSqZeroExt.snd_inl, TrivSqZeroExt.snd_inr, zero_add]
-          rw [Algebra.algebraMap_eq_smul_one, map_smul, h1, smul_zero]
-          rfl }
-  refine ⟨TrivSqZeroExt A N, inferInstance, inferInstance, co_sqz O A N fun _ => rfl,
-    (TrivSqZeroExt.inlAlgHom O A N).comp p, f₁, fun a => ⟨fun h => ?_, fun h => ?_⟩⟩
+  let f₁ : Λ →ₐ[O] TrivSqZeroExt A N := {
+    toFun := fun a => TrivSqZeroExt.inl (p a) + TrivSqZeroExt.inr (d a)
+    map_one' := TrivSqZeroExt.ext (by simp) (by simp [h1])
+    map_zero' := TrivSqZeroExt.ext (by simp) (by simp)
+    map_add' := fun a b => TrivSqZeroExt.ext (by simp) (by simp)
+    map_mul' := fun a b => by
+      refine TrivSqZeroExt.ext (by simp) ?_
+      rw [TrivSqZeroExt.snd_mul]
+      simp only [TrivSqZeroExt.fst_add, TrivSqZeroExt.fst_inl, TrivSqZeroExt.fst_inr, add_zero,
+        TrivSqZeroExt.snd_add, TrivSqZeroExt.snd_inl, TrivSqZeroExt.snd_inr, zero_add]
+      rw [hd, op_smul_eq_smul]
+    commutes' := fun c => by
+      refine TrivSqZeroExt.ext ?_ ?_
+      · simp only [TrivSqZeroExt.fst_add, TrivSqZeroExt.fst_inl, TrivSqZeroExt.fst_inr, add_zero]
+        exact p.commutes c
+      · simp only [TrivSqZeroExt.snd_add, TrivSqZeroExt.snd_inl, TrivSqZeroExt.snd_inr, zero_add]
+        rw [Algebra.algebraMap_eq_smul_one, map_smul, h1, smul_zero]
+        rfl
+  }
+  refine ⟨
+    TrivSqZeroExt A N,
+    inferInstance,
+    inferInstance,
+    co_sqz O A N fun _ => rfl,
+    (TrivSqZeroExt.inlAlgHom O A N).comp p,
+    f₁,
+    fun a => ⟨fun h => ?_, fun h => ?_⟩
+  ⟩
   · simpa [f₁] using (congrArg TrivSqZeroExt.snd h).symm
   · exact TrivSqZeroExt.ext (by simp [f₁]) (by simp [f₁, h])
 
-private theorem exists_pair_of_der {O Λ K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [IsAdicComplete (maximalIdeal O) O] [CommRing Λ] [Algebra O Λ] [IsCO O Λ] [Field K] [Algebra O K]
-    (hinj : Function.Injective (algebraMap O K)) (hal : ∀ a : K, ∃ P : O[X], P ≠ 0 ∧ aeval a P = 0) (p : Λ →ₐ[O] K)
-    (d : Λ →ₗ[O] K) (hd : ∀ f g, d (f * g) = p f * d g + p g * d f) :
-    ∃ (T : Type) (_ : CommRing T) (_ : Algebra O T) (_ : IsCO O T) (f₀ f₁ : Λ →ₐ[O] T), ∀ a, f₀ a = f₁ a ↔ d a = 0 := by
+private theorem exists_pair_of_der
+    {O Λ K : Type}
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O]
+    [CommRing Λ] [Algebra O Λ] [IsCO O Λ] [Field K] [Algebra O K]
+    (hinj : Function.Injective (algebraMap O K)) (hal : ∀ a : K, ∃ P : O[X], P ≠ 0 ∧ aeval a P = 0)
+    (p : Λ →ₐ[O] K) (d : Λ →ₗ[O] K) (hd : ∀ f g, d (f * g) = p f * d g + p g * d f)
+    : ∃ (T : Type) (_ : CommRing T) (_ : Algebra O T) (_ : IsCO O T) (f₀ f₁ : Λ →ₐ[O] T), ∀ a,
+      f₀ a = f₁ a ↔ d a = 0 := by
   classical
   have hsurj : Function.Surjective p.rangeRestrict := p.rangeRestrict_surjective
   haveI : IsCO O p.range := co_quot O Λ p.range p.rangeRestrict hsurj
-  have hfin : Module.Finite O p.range := finite_of_alg
-    (fun a b h => hinj (congrArg Subtype.val h))
-    fun a => by
-      obtain ⟨P, hP, h0⟩ := hal a
-      exact ⟨P, hP, Subtype.ext (by rw [← Subalgebra.aeval_coe]; simpa using h0)⟩
+  have hfin : Module.Finite O p.range :=
+    finite_of_alg
+      (fun a b h => hinj (congrArg Subtype.val h))
+      fun a => by
+        obtain ⟨P, hP, h0⟩ := hal a
+        exact ⟨P, hP, Subtype.ext (by rw [← Subalgebra.aeval_coe]; simpa using h0)⟩
   obtain ⟨G, hG⟩ := hfin.fg_top
   choose ℓ hℓ using hsurj
   obtain ⟨Q, hQ⟩ : (RingHom.ker p).FG := IsNoetherian.noetherian _
-  let N : Submodule p.range K := Submodule.span p.range (d '' ((G.image ℓ : Finset Λ) ∪ Q : Finset Λ))
+  let N : Submodule p.range K :=
+    Submodule.span p.range (d '' ((G.image ℓ : Finset Λ) ∪ Q : Finset Λ))
   have hsub : ∀ f ∈ (G.image ℓ : Finset Λ) ∪ Q, d f ∈ N := fun f hf =>
     Submodule.subset_span ⟨f, by exact_mod_cast hf, rfl⟩
   have hq : ∀ z ∈ Submodule.span Λ (Q : Set Λ), p z = 0 ∧ d z ∈ N := fun z hz => by
@@ -81,17 +99,19 @@ private theorem exists_pair_of_der {O Λ K : Type} [CommRing O] [IsDomain O] [Is
       refine ⟨?_, hsub g (Finset.mem_union_right _ hg)⟩
       have : g ∈ RingHom.ker p := hQ ▸ Submodule.subset_span hg
       exact this
-    | zero => exact ⟨map_zero p, by rw [map_zero]; exact zero_mem _⟩
+    | zero =>
+      exact ⟨map_zero p, by rw [map_zero]; exact zero_mem _⟩
     | add x y _ _ hx hy =>
       exact ⟨by rw [map_add, hx.1, hy.1, add_zero], by rw [map_add]; exact add_mem hx.2 hy.2⟩
     | smul b y _ hy =>
       refine ⟨by rw [smul_eq_mul, map_mul, hy.1, mul_zero], ?_⟩
       rw [smul_eq_mul, hd, hy.1, zero_mul, add_zero]
       exact N.smul_mem (p.rangeRestrict b) hy.2
-  have hl : ∀ y ∈ Submodule.span O (G : Set p.range), ∃ g, p.rangeRestrict g = y ∧ d g ∈ N := fun y hy => by
+  have hl
+      : ∀ y ∈ Submodule.span O (G : Set p.range), ∃ g,
+        p.rangeRestrict g = y ∧ d g ∈ N := fun y hy => by
     induction hy using Submodule.span_induction with
-    | mem y hy =>
-      exact ⟨ℓ y, hℓ y, hsub _ (Finset.mem_union_left _ (Finset.mem_image_of_mem _ hy))⟩
+    | mem y hy => exact ⟨ℓ y, hℓ y, hsub _ (Finset.mem_union_left _ (Finset.mem_image_of_mem _ hy))⟩
     | zero => exact ⟨0, map_zero _, by rw [map_zero]; exact zero_mem _⟩
     | add x y _ _ hx hy =>
       obtain ⟨g, rfl, hg⟩ := hx
@@ -113,16 +133,30 @@ private theorem exists_pair_of_der {O Λ K : Type} [CommRing O] [IsDomain O] [Is
       exact this
     have := add_mem hgN (hq _ h1).2
     rwa [← map_add, add_sub_cancel] at this
-  let d' : Λ →ₗ[O] N :=
-    { toFun := fun f => ⟨d f, key f⟩
-      map_add' := fun a b => Subtype.ext (map_add d a b)
-      map_smul' := fun c a => Subtype.ext (map_smul d c a) }
+  let d' : Λ →ₗ[O] N := {
+    toFun := fun f => ⟨d f, key f⟩
+    map_add' := fun a b => Subtype.ext (map_add d a b)
+    map_smul' := fun c a => Subtype.ext (map_smul d c a)
+  }
   haveI : Module.Finite p.range N := Module.Finite.iff_fg.2 (Submodule.fg_span (Set.Finite.image _ (Finset.finite_toSet _)))
-  obtain ⟨T, i1, i2, i3, f₀, f₁, hf⟩ := exists_sqz p.rangeRestrict d' fun f g => Subtype.ext (hd f g)
-  exact ⟨T, i1, i2, i3, f₀, f₁, fun a => (hf a).trans ⟨fun h => congrArg Subtype.val h, fun h => Subtype.ext h⟩⟩
+  obtain ⟨T, i1, i2, i3, f₀, f₁, hf⟩ :=
+    exists_sqz p.rangeRestrict d' fun f g => Subtype.ext (hd f g)
+  exact ⟨
+    T,
+    i1,
+    i2,
+    i3,
+    f₀,
+    f₁,
+    fun a => (hf a).trans ⟨fun h => congrArg Subtype.val h, fun h => Subtype.ext h⟩
+  ⟩
 
-private theorem map_mem_max {O Λ T : Type} [CommRing O] [IsLocalRing O] [CommRing Λ] [Algebra O Λ] [IsCO O Λ] [CommRing T]
-    [Algebra O T] [IsCO O T] (f : Λ →ₐ[O] T) {x : Λ} (hx : x ∈ maximalIdeal Λ) : f x ∈ maximalIdeal T := by
+private theorem map_mem_max
+    {O Λ T : Type} [CommRing O] [IsLocalRing O] [CommRing Λ] [Algebra O Λ] [IsCO O Λ] [CommRing T]
+    [Algebra O T] [IsCO O T]
+    (f : Λ →ₐ[O] T)
+    {x : Λ} (hx : x ∈ maximalIdeal Λ)
+    : f x ∈ maximalIdeal T := by
   by_contra hn
   obtain ⟨b, hb⟩ := IsCO.res_surj (O := O) (f x)
   have hbu : IsUnit (algebraMap O T b) := by
@@ -141,20 +175,28 @@ private theorem map_mem_max {O Λ T : Type} [CommRing O] [IsLocalRing O] [CommRi
   rw [map_sub, f.commutes] at h3
   exact (mem_maximalIdeal _).1 hb h3
 
-private theorem adic_push {O Λ T Γ : Type} [CommRing O] [IsLocalRing O] [CommRing Λ] [Algebra O Λ] [IsCO O Λ] [CommRing T]
-    [Algebra O T] [IsCO O T] [TopologicalSpace Γ] (f : Λ →ₐ[O] T) {u : Γ → Λ} (h : AdicCont (maximalIdeal Λ) u) :
-    AdicCont (maximalIdeal T) fun g => f (u g) := fun N => by
+private theorem adic_push
+    {O Λ T Γ : Type} [CommRing O] [IsLocalRing O] [CommRing Λ] [Algebra O Λ] [IsCO O Λ] [CommRing T]
+    [Algebra O T] [IsCO O T] [TopologicalSpace Γ]
+    (f : Λ →ₐ[O] T)
+    {u : Γ → Λ} (h : AdicCont (maximalIdeal Λ) u)
+    : AdicCont (maximalIdeal T) fun g => f (u g) := fun N => by
   have hm : Ideal.map (f : Λ →+* T) (maximalIdeal Λ ^ N) ≤ maximalIdeal T ^ N := by
     rw [Ideal.map_pow]
-    exact Ideal.pow_right_mono (Ideal.map_le_iff_le_comap.2 fun x hx => Ideal.mem_comap.2 (map_mem_max f hx)) N
+    exact Ideal.pow_right_mono
+      (Ideal.map_le_iff_le_comap.2 fun x hx => Ideal.mem_comap.2 (map_mem_max f hx)) N
   let φ : Λ ⧸ maximalIdeal Λ ^ N →+* T ⧸ maximalIdeal T ^ N :=
     Ideal.Quotient.lift _ ((Ideal.Quotient.mk _).comp (f : Λ →+* T)) fun a ha =>
       Ideal.Quotient.eq_zero_iff_mem.2 (hm (Ideal.mem_map_of_mem _ ha))
   exact (h N).comp φ
 
-private theorem inert_push {l : ℕ} [Fact l.Prime] {F : W.GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
-    {n : ℕ} (r : W.Resid F O n) (Λ : W.LamObj r) {T : Type} [CommRing T] [Algebra O T] [IsCO O T] (f : Λ.Λ →ₐ[O] T) :
-    W.IsInert r fun v i => W.pushCh (f : Λ.Λ →+* T) (Λ.κ v i) := fun v i => by
+private theorem inert_push
+    {l : ℕ} [Fact l.Prime]
+    {F : W.GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+    {n : ℕ} (r : W.Resid F O n) (Λ : W.LamObj r)
+    {T : Type} [CommRing T] [Algebra O T] [IsCO O T]
+    (f : Λ.Λ →ₐ[O] T)
+    : W.IsInert r fun v i => W.pushCh (f : Λ.Λ →+* T) (Λ.κ v i) := fun v i => by
   obtain ⟨ψ, h, hk⟩ := Λ.inert v i
   refine ⟨W.pushCh (f : Λ.Λ →+* T) ψ, ⟨adic_push f h.cont, fun g => ?_, fun g => ?_⟩, ?_⟩
   · exact (res_map f _).trans (h.red g)
@@ -165,22 +207,24 @@ private theorem inert_push {l : ℕ} [Fact l.Prime] {F : W.GFrame l} {O : Type} 
 
 end UpperTheory.V.J
 
-open UpperTheory.V.J UpperTheory.V.W UpperTheory.V.HV Formalism.ConjugateSelfDual ReciprocityTheory.Gal in
-theorem UpperTheory.V.J.lamDer :
-    UpperTheory.V.J.LamDer := by
+open UpperTheory.V.J UpperTheory.V.W UpperTheory.V.HV Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal in
+theorem UpperTheory.V.J.lamDer : UpperTheory.V.J.LamDer := by
   intro l _ L Ω _ _ _ _ _ _ s V c n r B Λ x m _ δ hδ hk a
   haveI : IsAdicComplete (maximalIdeal c.O) c.O := (UpperTheory.V.abelian₂.dvr_finite l c.O).1
   have hinj : Function.Injective (algebraMap c.O (Qbar l)) := Subtype.val_injective
   have hal : ∀ a : Qbar l, ∃ P : c.O[X], P ≠ 0 ∧ aeval a P = 0 := fun a => by
     have h1 : IsAlgebraic ℚ_[l] a := Algebra.IsAlgebraic.isAlgebraic a
     have h2 : IsAlgebraic ℤ_[l] a := (IsFractionRing.isAlgebraic_iff ℤ_[l] ℚ_[l] (Qbar l)).2 h1
-    have h3 : IsAlgebraic c.O a := h2.extendScalars (UpperTheory.V.abelian₂.dvr_finite l c.O).2.2.2.1
+    have h3 : IsAlgebraic c.O a :=
+      h2.extendScalars (UpperTheory.V.abelian₂.dvr_finite l c.O).2.2.2.1
     exact h3
   let t := Λ.toPair B.u
   let d : Λ.Λ →ₗ[c.O] Qbar l := δ.comp t.toLinearMap
-  obtain ⟨T, _, _, _, f₀, f₁, hf⟩ := exists_pair_of_der hinj hal (x.comp t) d fun f g => by
-    have := hδ (t f) (t g)
-    simpa [d, map_mul] using this
+  obtain ⟨T, _, _, _, f₀, f₁, hf⟩ :=
+    exists_pair_of_der hinj hal (x.comp t) d fun f g => by
+      have := hδ (t f) (t g)
+      simpa [d, map_mul] using this
   have hκ : ∀ v i (g : V.frame.Iv v), d ((Λ.κ v i g : Λ.Λˣ) : Λ.Λ) = 0 := fun v i g => by
     have h1 := congrArg Units.val (DFunLike.congr_fun (W.LamObj.toPair_spec r Λ B.u v i) g)
     have h2 : t ((Λ.κ v i g : Λ.Λˣ) : Λ.Λ) = (B.u.ψ v i g : B.Bˣ) := h1

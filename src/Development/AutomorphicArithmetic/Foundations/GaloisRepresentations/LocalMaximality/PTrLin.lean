@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.productCup_of_system.trLin_of :
-    TrLin := by
+theorem UpperTheory.Gal.productCup_of_system.trLin_of : TrLin := by
   intro V _ _ ι _ φ v hv
   have hfin : FiniteDimensional ℂ V := by
     refine Module.Finite.of_surjective (Fintype.linearCombination ℂ v) ?_

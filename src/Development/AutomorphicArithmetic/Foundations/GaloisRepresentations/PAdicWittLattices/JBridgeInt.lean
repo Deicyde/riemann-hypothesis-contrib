@@ -5,15 +5,18 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.PowLtFirs
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain GlobalTheory.EtC GlobalTheory.Et GlobalTheory.GalV UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain GlobalTheory.EtC
+  GlobalTheory.Et GlobalTheory.GalV UpperTheory.Gal.G3
 universe u v
 
-theorem UpperTheory.Gal.G3.jBridgeInt :
-    UpperTheory.Gal.Seam.IntMap → PositivityTheory.AutomorphicGaloisHodgeTate.G8.BridgeInt := by
+theorem UpperTheory.Gal.G3.jBridgeInt
+    : UpperTheory.Gal.Seam.IntMap → PositivityTheory.AutomorphicGaloisHodgeTate.G8.BridgeInt := by
   intro hInt E Ω _ _ _ _ _ l _ w A hA O _ _ _ Bw hB γ x
   obtain ⟨φ, hφ, -⟩ := hInt E Ω l w A hA O Bw hB
-  have h1 : Bw.j (algebraMap E Ω x) =
-      ((algebraMap (CrystallineSemistableComparison.OK l Bw.Kw.1) Bw.Kw.1 (φ x) : Bw.Kw.1) : PadicAlgCl l) := by
+  have h1
+      : Bw.j (algebraMap E Ω x)
+        = ((algebraMap (CrystallineSemistableComparison.OK l Bw.Kw.1) Bw.Kw.1 (φ x) : Bw.Kw.1)
+          : PadicAlgCl l) := by
     rw [hφ x]
     rfl
   have h2 : ‖Bw.j (algebraMap E Ω x)‖ ≤ 1 := by

@@ -5,10 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 
 @[expose] public section
 
-open IsLocalRing Matrix NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th UpperTheory.V.Th.Nm GlobalTheory.GalOfCusp
+open IsLocalRing Matrix NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th
+  UpperTheory.V.Th.Nm GlobalTheory.GalOfCusp
 
-private theorem ordInt_diag {K : Type} [Field K] {n : ℕ} {A B : Matrix (Fin n) (Fin n) K}
-    (hA : A.BlockTriangular id) (hB : B.BlockTriangular id) (i : Fin n) : (A * B) i i = A i i * B i i := by
+private theorem ordInt_diag
+    {K : Type} [Field K]
+    {n : ℕ} {A B : Matrix (Fin n) (Fin n) K}
+    (hA : A.BlockTriangular id) (hB : B.BlockTriangular id) (i : Fin n)
+    : (A * B) i i = A i i * B i i := by
   rw [Matrix.mul_apply, Finset.sum_eq_single i]
   · intro j _ hj
     rcases lt_or_gt_of_ne hj with h | h
@@ -16,10 +21,16 @@ private theorem ordInt_diag {K : Type} [Field K] {n : ℕ} {A B : Matrix (Fin n)
     · rw [hB (show id i < id j from h), mul_zero]
   · simp
 
-private theorem ordInt_conj {K : Type} [Field K] {n : ℕ} (b : GL (Fin n) K) {M : Matrix (Fin n) (Fin n) K}
-    (hb : (b : Matrix (Fin n) (Fin n) K).BlockTriangular id) (hM : M.BlockTriangular id) :
-    ((b : Matrix (Fin n) (Fin n) K) * M * ((b⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)).BlockTriangular id ∧
-      ∀ i, ((b : Matrix (Fin n) (Fin n) K) * M * ((b⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) i i = M i i := by
+private theorem ordInt_conj
+    {K : Type} [Field K]
+    {n : ℕ} (b : GL (Fin n) K)
+    {M : Matrix (Fin n) (Fin n) K}
+    (hb : (b : Matrix (Fin n) (Fin n) K).BlockTriangular id) (hM : M.BlockTriangular id)
+    : ((b : Matrix (Fin n) (Fin n) K) * M
+        * ((b⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)).BlockTriangular id
+      ∧ ∀ i,
+        ((b : Matrix (Fin n) (Fin n) K) * M * ((b⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)) i i
+          = M i i := by
   have hi : ((b⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).BlockTriangular id := by
     rw [Matrix.coe_units_inv]
     letI := b.invertible
@@ -47,12 +58,21 @@ private def ordInt_V (l : ℕ) [Fact l.Prime] : ValuationSubring (Qbar l) where
       rw [norm_inv]
       exact inv_le_one_of_one_le₀ h
 
-theorem UpperTheory.V.Th.Nm.ordInt :
-    ∀ {l : ℕ} [Fact l.Prime] {n : ℕ} (F : GFrame l) (ρ : F.G₀ →* GL (Fin n) (Qbar l)) (v : F.Vl) (ψ : Fin n → F.Gv v →* (Qbar l)ˣ) (z : F.G₀ → Matrix (Fin n) (Fin n) (Qbar l)) (w : GL (Fin n) (Qbar l)) (Y : Matrix (Fin n) (Fin n) (Qbar l)), OrdAt F ρ v ψ z w Y → ∃ w' : GL (Fin n) (Qbar l), IntM (w' : Matrix (Fin n) (Fin n) (Qbar l)) ∧ IntM ((w'⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) ∧ OrdAt F ρ v ψ z w' Y := by
+theorem UpperTheory.V.Th.Nm.ordInt
+    : ∀ {l : ℕ} [Fact l.Prime] {n : ℕ} (F : GFrame l) (ρ : F.G₀ →* GL (Fin n) (Qbar l)) (v : F.Vl)
+        (ψ : Fin n → F.Gv v →* (Qbar l)ˣ) (z : F.G₀ → Matrix (Fin n) (Fin n) (Qbar l))
+        (w : GL (Fin n) (Qbar l)) (Y : Matrix (Fin n) (Fin n) (Qbar l)),
+      OrdAt F ρ v ψ z w Y
+        → ∃ w' : GL (Fin n) (Qbar l),
+          IntM (w' : Matrix (Fin n) (Fin n) (Qbar l))
+            ∧ IntM ((w'⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l))
+            ∧ OrdAt F ρ v ψ z w' Y := by
   intro l _ n F ρ v ψ z w Y h
-  obtain ⟨k, hk⟩ := UpperTheory.V.Pr.T.iwasawaVal (ordInt_V l) n (w : Matrix (Fin n) (Fin n) (Qbar l))
+  obtain ⟨k, hk⟩ :=
+    UpperTheory.V.Pr.T.iwasawaVal (ordInt_V l) n (w : Matrix (Fin n) (Fin n) (Qbar l))
   let k' : GL (Fin n) (Qbar l) := GeneralLinearGroup.map (ordInt_V l).subtype k
-  have hb : ((k' * w : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)).BlockTriangular id := hk
+  have hb : ((k' * w : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)).BlockTriangular id :=
+    hk
   refine ⟨k'⁻¹, fun i j => ?_, fun i j => ?_, fun g => ?_⟩
   · have : k'⁻¹ = GeneralLinearGroup.map (ordInt_V l).subtype k⁻¹ := (map_inv _ _).symm
     rw [this]
@@ -60,18 +80,29 @@ theorem UpperTheory.V.Th.Nm.ordInt :
   · rw [inv_inv]
     exact (k i j).2
   · obtain ⟨h1, h2, h3, h4⟩ := h g
-    have e : ∀ M : Matrix (Fin n) (Fin n) (Qbar l),
-        ((k'⁻¹⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) * M * (k'⁻¹ : GL (Fin n) (Qbar l)) =
-        ((k' * w : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) *
-          (((w⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) * M * (w : Matrix (Fin n) (Fin n) (Qbar l))) *
-          (((k' * w)⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) := by
+    have e
+        : ∀ M : Matrix (Fin n) (Fin n) (Qbar l),
+          ((k'⁻¹⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) * M
+              * (k'⁻¹ : GL (Fin n) (Qbar l))
+            = ((k' * w : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l))
+              * (((w⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) * M
+                * (w : Matrix (Fin n) (Fin n) (Qbar l)))
+              * (((k' * w)⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) := by
       intro M
       rw [inv_inv, _root_.mul_inv_rev, Units.val_mul, Units.val_mul]
       simp only [Matrix.mul_assoc, Units.mul_inv_cancel_left]
-    have c1 := ordInt_conj (k' * w) hb
-      (M := ((w⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) * (ρ (F.φ v g) : Matrix (Fin n) (Fin n) (Qbar l)) *
-        (w : Matrix (Fin n) (Fin n) (Qbar l))) (fun i j hij => h1 i j hij)
+    have c1 :=
+      ordInt_conj (k' * w) hb
+        (M :=
+          ((w⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l))
+            * (ρ (F.φ v g) : Matrix (Fin n) (Fin n) (Qbar l))
+            * (w : Matrix (Fin n) (Fin n) (Qbar l)))
+        (fun i j hij => h1 i j hij)
     have c2 := ordInt_conj (k' * w) hb (fun i j hij => h3 i j hij)
     rw [← e] at c1 c2
-    refine ⟨fun i j hij => c1.1 hij, fun i => (c1.2 i).trans (h2 i), fun i j hij => c2.1 hij,
-      fun hg i => (c2.2 i).trans (h4 hg i)⟩
+    refine ⟨
+      fun i j hij => c1.1 hij,
+      fun i => (c1.2 i).trans (h2 i),
+      fun i j hij => c2.1 hij,
+      fun hg i => (c2.2 i).trans (h4 hg i)
+    ⟩

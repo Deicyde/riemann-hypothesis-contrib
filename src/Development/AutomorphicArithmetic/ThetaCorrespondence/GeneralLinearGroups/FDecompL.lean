@@ -13,14 +13,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JhMultSub
 
 @[expose] public section
 
-open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult UpperTheory.Lit.Cas UpperTheory.Lit.Red
+open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult UpperTheory.Lit.Cas UpperTheory.Lit.Red
 
 section
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-private theorem ind₂_equiv_pair (y z : IrrGL (k := k)) {N : ℕ} (h : y.1 + z.1 = N) (hd : ∑ a, (![y, z] a).1 = N) :
-    Nonempty ((ind₂ (stdSum h) (extTensor y.rep z.rep)).Equiv (prodIrr ![y, z] hd)) := by
+private theorem ind₂_equiv_pair
+    (y z : IrrGL (k := k)) {N : ℕ} (h : y.1 + z.1 = N) (hd : ∑ a, (![y, z] a).1 = N)
+    : Nonempty ((ind₂ (stdSum h) (extTensor y.rep z.rep)).Equiv (prodIrr ![y, z] hd)) := by
   subst h
   exact nonempty_prod₂_equiv_prodIrr_pair y z hd
 
@@ -39,15 +41,20 @@ private theorem emb_deg {x y z : IrrGL (k := k)} (h : Emb x y z) : y.1 + z.1 = x
   obtain ⟨hd, -⟩ := h
   exact (Fin.sum_univ_two _).symm.trans hd
 
-private theorem suppIn_occ {v y ρ : IrrGL (k := k)} {P : Set (IrrGL (k := k))} (h : Occ v y ρ) (hy : SuppIn y P)
-    (hρ : ρ.IsCusp) (hP : ρ ∈ P) : SuppIn v P := by
+private theorem suppIn_occ
+    {v y ρ : IrrGL (k := k)} {P : Set (IrrGL (k := k))}
+    (h : Occ v y ρ) (hy : SuppIn y P) (hρ : ρ.IsCusp) (hP : ρ ∈ P)
+    : SuppIn v P := by
   obtain ⟨hd, hne⟩ := h
   obtain ⟨A, hA, hAP⟩ := hy
-  have hS := GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr (y := ![y, ρ]) (hd := hd) (t := ![A, {ρ}])
-    (fun a => by
-      fin_cases a
-      · exact hA
-      · exact hasSupport_self hρ) v.2.rep.irr (jhMult_ne_zero_iff.1 hne)
+  have hS :=
+    GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr (y := ![y, ρ])
+      (hd := hd) (t := ![A, {ρ}])
+      (fun a => by
+        fin_cases a
+        · exact hA
+        · exact hasSupport_self hρ)
+      v.2.rep.irr (jhMult_ne_zero_iff.1 hne)
   refine ⟨_, hS, fun w hw => ?_⟩
   rw [Fin.sum_univ_two] at hw
   rcases Multiset.mem_add.1 hw with h | h
@@ -57,11 +64,16 @@ private theorem suppIn_occ {v y ρ : IrrGL (k := k)} {P : Set (IrrGL (k := k))} 
 
 end
 
-theorem UpperTheory.Lit.Full.decompL :
-    GlobalTheory.Published.GeometricLemma → GlobalTheory.Published.BernsteinZelevinskyFiniteness → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (x : IrrGL (k := k)) (P : Set (IrrGL (k := k))), ∃ y z, Emb x y z ∧ SuppIn y P ∧ FirstIn z Pᶜ := by
+theorem UpperTheory.Lit.Full.decompL
+    : GlobalTheory.Published.GeometricLemma → GlobalTheory.Published.BernsteinZelevinskyFiniteness
+      → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+          (x : IrrGL (k := k)) (P : Set (IrrGL (k := k))),
+        ∃ y z,
+          Emb x y z ∧ SuppIn y P ∧ FirstIn z Pᶜ := by
   intro hG hBZ k _ _ _ _ x P
-  have key : ∀ (n : ℕ) (y z : IrrGL (k := k)), z.1 = n → Emb x y z → SuppIn y P →
-      ∃ y z, Emb x y z ∧ SuppIn y P ∧ FirstIn z Pᶜ := by
+  have key
+      : ∀ (n : ℕ) (y z : IrrGL (k := k)),
+        z.1 = n → Emb x y z → SuppIn y P → ∃ y z, Emb x y z ∧ SuppIn y P ∧ FirstIn z Pᶜ := by
     intro n
     induction n using Nat.strong_induction_on with
     | _ n ih =>

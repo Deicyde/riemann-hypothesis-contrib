@@ -8,11 +8,11 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open scoped TensorProduct
 
-private theorem length_baseChange_of_isSimpleModule {R S : Type*} [CommRing R] [IsLocalRing R]
-    [CommRing S] [IsLocalRing S] [Algebra R S]
+private theorem length_baseChange_of_isSimpleModule
+    {R S : Type*} [CommRing R] [IsLocalRing R] [CommRing S] [IsLocalRing S] [Algebra R S]
     (hm : Ideal.map (algebraMap R S) (IsLocalRing.maximalIdeal R) = IsLocalRing.maximalIdeal S)
-    (X : Type*) [AddCommGroup X] [Module R X] [hX : IsSimpleModule R X] :
-    Module.length S (S ⊗[R] X) = Module.length R X := by
+    (X : Type*) [AddCommGroup X] [Module R X] [hX : IsSimpleModule R X]
+    : Module.length S (S ⊗[R] X) = Module.length R X := by
   obtain ⟨I, hI, ⟨e⟩⟩ := isSimpleModule_iff_quot_maximal.mp hX
   have hIm : I.map (algebraMap R S) = IsLocalRing.maximalIdeal S := by
     rw [IsLocalRing.eq_maximalIdeal hI, hm]
@@ -25,12 +25,14 @@ private theorem length_baseChange_of_isSimpleModule {R S : Type*} [CommRing R] [
   have : IsSimpleModule S (S ⊗[R] X) := IsSimpleModule.congr e2
   rw [Module.length_eq_one, Module.length_eq_one]
 
-private theorem length_baseChange_of_submodule_simple_quotient {R S : Type*} [CommRing R] [IsLocalRing R]
-    [CommRing S] [IsLocalRing S] [Algebra R S] [Module.Flat R S]
+private theorem length_baseChange_of_submodule_simple_quotient
+    {R S : Type*}
+    [CommRing R] [IsLocalRing R] [CommRing S] [IsLocalRing S] [Algebra R S] [Module.Flat R S]
     (hm : Ideal.map (algebraMap R S) (IsLocalRing.maximalIdeal R) = IsLocalRing.maximalIdeal S)
-    {M : Type*} [AddCommGroup M] [Module R M] (N : Submodule R M) [IsSimpleModule R (M ⧸ N)]
-    (ih : Module.length S (S ⊗[R] N) = Module.length R N) :
-    Module.length S (S ⊗[R] M) = Module.length R M := by
+    {M : Type*} [AddCommGroup M] [Module R M]
+    (N : Submodule R M) [IsSimpleModule R (M ⧸ N)]
+    (ih : Module.length S (S ⊗[R] N) = Module.length R N)
+    : Module.length S (S ⊗[R] M) = Module.length R M := by
   have hinj : Function.Injective (N.subtype.baseChange S) := by
     rw [LinearMap.baseChange_eq_ltensor]
     exact Module.Flat.lTensor_preserves_injective_linearMap _ N.injective_subtype
@@ -45,11 +47,13 @@ private theorem length_baseChange_of_submodule_simple_quotient {R S : Type*} [Co
       (LinearMap.exact_subtype_mkQ N),
     ih, length_baseChange_of_isSimpleModule hm (M ⧸ N)]
 
-private theorem length_baseChange_of_isFiniteLength {R S : Type*} [CommRing R] [IsLocalRing R]
-    [CommRing S] [IsLocalRing S] [Algebra R S] [Module.Flat R S]
+private theorem length_baseChange_of_isFiniteLength
+    {R S : Type*}
+    [CommRing R] [IsLocalRing R] [CommRing S] [IsLocalRing S] [Algebra R S] [Module.Flat R S]
     (hm : Ideal.map (algebraMap R S) (IsLocalRing.maximalIdeal R) = IsLocalRing.maximalIdeal S)
-    {M : Type*} [AddCommGroup M] [Module R M] (h : IsFiniteLength R M) :
-    Module.length S (S ⊗[R] M) = Module.length R M := by
+    {M : Type*} [AddCommGroup M] [Module R M]
+    (h : IsFiniteLength R M)
+    : Module.length S (S ⊗[R] M) = Module.length R M := by
   induction h with
   | @of_subsingleton M' _ _ _ =>
     have : Subsingleton (S ⊗[R] M') := by
@@ -60,21 +64,25 @@ private theorem length_baseChange_of_isFiniteLength {R S : Type*} [CommRing R] [
         | add x y hx hy => rw [hx, hy, add_zero]
       exact ⟨fun a b => by rw [h0 a, h0 b]⟩
     rw [Module.length_eq_zero, Module.length_eq_zero]
-  | of_simple_quotient _ ih =>
-    exact length_baseChange_of_submodule_simple_quotient hm _ ih
+  | of_simple_quotient _ ih => exact length_baseChange_of_submodule_simple_quotient hm _ ih
 
-private theorem length_le_length_baseChange_of_faithfullyFlat {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
-    [Module.FaithfullyFlat R S] (Q : Type*) [AddCommGroup Q] [Module R Q] :
-    Module.length R Q ≤ Module.length S (S ⊗[R] Q) := by
-  have hmono : ∀ N N' : Submodule R Q, N ≤ N' →
-      LinearMap.range (N.subtype.baseChange S) ≤ LinearMap.range (N'.subtype.baseChange S) := by
+private theorem length_le_length_baseChange_of_faithfullyFlat
+    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] [Module.FaithfullyFlat R S]
+    (Q : Type*) [AddCommGroup Q] [Module R Q]
+    : Module.length R Q ≤ Module.length S (S ⊗[R] Q) := by
+  have hmono
+      : ∀ N N' : Submodule R Q,
+        N ≤ N'
+          → LinearMap.range (N.subtype.baseChange S)
+            ≤ LinearMap.range (N'.subtype.baseChange S) := by
     intro N N' h x hx
     obtain ⟨z, rfl⟩ := LinearMap.mem_range.mp hx
     refine LinearMap.mem_range.mpr ⟨(Submodule.inclusion h).baseChange S z, ?_⟩
     rw [← Submodule.subtype_comp_inclusion _ _ h, LinearMap.baseChange_comp, LinearMap.comp_apply]
-  have hrefl : ∀ N N' : Submodule R Q,
-      LinearMap.range (N'.subtype.baseChange S) ≤ LinearMap.range (N.subtype.baseChange S) →
-        N' ≤ N := by
+  have hrefl
+      : ∀ N N' : Submodule R Q,
+        LinearMap.range (N'.subtype.baseChange S) ≤ LinearMap.range (N.subtype.baseChange S)
+          → N' ≤ N := by
     intro N N' h
     have hz : ∀ w : S ⊗[R] N, (N.mkQ.baseChange S) ((N.subtype.baseChange S) w) = 0 := by
       intro w
@@ -92,24 +100,24 @@ private theorem length_le_length_baseChange_of_faithfullyFlat {R S : Type*} [Com
         rw [LinearMap.baseChange_comp, LinearMap.comp_apply, ← hw, hz]
       rw [LinearMap.zero_apply]
       rwa [LinearMap.baseChange_eq_ltensor] at hb
-    have hf : N.mkQ ∘ₗ N'.subtype = 0 :=
-      (Module.FaithfullyFlat.zero_iff_lTensor_zero R S _).mpr h0
+    have hf : N.mkQ ∘ₗ N'.subtype = 0 := (Module.FaithfullyFlat.zero_iff_lTensor_zero R S _).mpr h0
     intro x hx
     have hx0 := LinearMap.congr_fun hf ⟨x, hx⟩
     simpa using hx0
-  have hsm : StrictMono (fun N : Submodule R Q => LinearMap.range (N.subtype.baseChange S)) :=
-    fun N N' hlt => lt_of_le_of_ne (hmono N N' hlt.le)
-      (fun heq => hlt.ne (le_antisymm hlt.le (hrefl N N' heq.ge)))
+  have hsm : StrictMono (fun N : Submodule R Q =>
+      LinearMap.range (N.subtype.baseChange S)) := fun N N' hlt =>
+    lt_of_le_of_ne (hmono N N' hlt.le) (fun heq => hlt.ne (le_antisymm hlt.le (hrefl N N' heq.ge)))
   have h1 : (Module.length R Q : WithBot ℕ∞) ≤ (Module.length S (S ⊗[R] Q) : WithBot ℕ∞) := by
     rw [Module.coe_length, Module.coe_length]
     exact Order.krullDim_le_of_strictMono _ hsm
   exact WithBot.coe_le_coe.mp h1
 
-theorem length_baseChange_eq {R S : Type*} [CommRing R] [IsLocalRing R] [CommRing S]
-    [IsLocalRing S] [Algebra R S] [Module.Flat R S] [IsLocalHom (algebraMap R S)]
+theorem length_baseChange_eq
+    {R S : Type*} [CommRing R] [IsLocalRing R] [CommRing S] [IsLocalRing S] [Algebra R S]
+    [Module.Flat R S] [IsLocalHom (algebraMap R S)]
     (hm : Ideal.map (algebraMap R S) (IsLocalRing.maximalIdeal R) = IsLocalRing.maximalIdeal S)
-    (Q : Type*) [AddCommGroup Q] [Module R Q] :
-    Module.length S (S ⊗[R] Q) = Module.length R Q := by
+    (Q : Type*) [AddCommGroup Q] [Module R Q]
+    : Module.length S (S ⊗[R] Q) = Module.length R Q := by
   have : Module.FaithfullyFlat R S := Module.FaithfullyFlat.of_flat_of_isLocalHom
   have hge := length_le_length_baseChange_of_faithfullyFlat (R := R) (S := S) Q
   by_cases hQ : Module.length R Q = ⊤

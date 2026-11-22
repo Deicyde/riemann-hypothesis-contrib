@@ -26,12 +26,15 @@ def HermLine.ofGeo (N : Geo.HermLine (blockIdx n)) (hN : Geo.IsSmoothHerm N) : H
   metric_smul c z hc _ := N.smul c (flatCone z) hc
   metric_smooth := by
     have hu : ContDiff ℝ ∞ (fun z : Cone n ℂ ↦ flatCone z) :=
-      contDiff_pi.2 fun p ↦ ((ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin (n p.1 + 1) ↦ ℂ) p.2).comp
-        (ContinuousLinearMap.proj (R := ℝ) (φ := fun k ↦ Fin (n k + 1) → ℂ) p.1)).contDiff
+      contDiff_pi.2 fun p ↦
+        ((ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin (n p.1 + 1) ↦ ℂ) p.2).comp
+          (ContinuousLinearMap.proj (R := ℝ) (φ := fun k ↦ Fin (n k + 1) → ℂ) p.1)).contDiff
     exact hN.comp hu.contDiffOn fun z hz ↦ (blockNonzero_unflatCone_iff _).mp hz
 
-theorem HermLine.toGeo_ofGeo_h (N : Geo.HermLine (blockIdx n)) (hN : Geo.IsSmoothHerm N)
-    {w : Coord n → ℂ} (hw : BlockNonzero (unflatCone w)) : (HermLine.ofGeo N hN).toGeo.h w = N.h w :=
+theorem HermLine.toGeo_ofGeo_h
+    (N : Geo.HermLine (blockIdx n)) (hN : Geo.IsSmoothHerm N)
+    {w : Coord n → ℂ} (hw : BlockNonzero (unflatCone w))
+    : (HermLine.ofGeo N hN).toGeo.h w = N.h w :=
   HermLine.toGeo_h_of_blockNonzero _ hw
 
 namespace ArithVariety
@@ -49,15 +52,6 @@ end AddBlockData
 section Examples
 
 variable (n)
-
-
-
-
-
-
-
-
-
 
 end Examples
 

@@ -96,10 +96,7 @@ lemma chC_sq (g : E0 × H) : (chC : AddChar (E0 × H) ℂ) g * chC g = 1 := by
   split_ifs <;> simp
 
 private theorem zero_apply_lemma (g : E0 × H) : (0 : AddChar (E0 × H) ℂ) g = 1 := by
-  first
-  | exact AddChar.zero_apply g
-  | rfl
-  | simp
+  first | exact AddChar.zero_apply g | rfl | simp
 
 lemma chC_mul_self : (chC : AddChar (E0 × H) ℂ) * chC = 0 := by
   ext g
@@ -151,27 +148,32 @@ variable {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
 
 theorem colour_sum : ColourSum (H := H) := by
   intro ψ
-  have hneg : ∀ F : E0 × H → ℂ, ∑ g : E0 × H, F (-g) = ∑ g : E0 × H, F g :=
-    fun F => Fintype.sum_equiv (Equiv.neg _) _ _ (fun _ => rfl)
+  have hneg : ∀ F : E0 × H → ℂ, ∑ g : E0 × H, F (-g) = ∑ g : E0 × H, F g := fun F =>
+    Fintype.sum_equiv (Equiv.neg _) _ _ (fun _ => rfl)
   have hind : ∀ g : E0 × H, (if ¬ InPhi g then (1 : ℂ) else 0) = (1 - chC g) / 2 := by
     intro g
     rw [chC_apply']
     by_cases h : g.1.1 = 0
-    · rw [if_pos h, if_neg (show ¬¬InPhi g from not_not.2 h)]
+    · rw [if_pos h, if_neg (show ¬ ¬ InPhi g from not_not.2 h)]
       ring
-    · rw [if_neg h, if_pos (show ¬InPhi g from h)]
+    · rw [if_neg h, if_pos (show ¬ InPhi g from h)]
       ring
-  have e1 : ∀ g : E0 × H, (if ¬ InPhi g then starRingEnd ℂ (ψ g) else 0)
-      = (starRingEnd ℂ (ψ g) - chC g * starRingEnd ℂ (ψ g)) / 2 := by
+  have e1
+      : ∀ g : E0 × H,
+        (if ¬ InPhi g then starRingEnd ℂ (ψ g) else 0)
+          = (starRingEnd ℂ (ψ g) - chC g * starRingEnd ℂ (ψ g)) / 2 := by
     intro g
     rw [← boole_mul, hind]
     ring
-  have hA : ∑ g : E0 × H, starRingEnd ℂ (ψ g) = if ψ = 0 then (Fintype.card (E0 × H) : ℂ) else 0 := by
+  have hA
+      : ∑ g : E0 × H, starRingEnd ℂ (ψ g) = if ψ = 0 then (Fintype.card (E0 × H) : ℂ) else 0 := by
     simp_rw [conj_eq_neg]
     rw [hneg (⇑ψ), AddChar.sum_eq_ite]
-  have hB : ∑ g : E0 × H, chC g * starRingEnd ℂ (ψ g)
-      = if ψ = chC then (Fintype.card (E0 × H) : ℂ) else 0 := by
-    have h4 : ∀ g : E0 × H, chC g * starRingEnd ℂ (ψ g) = ((ψ * chC : AddChar (E0 × H) ℂ)) (-g) := by
+  have hB
+      : ∑ g : E0 × H, chC g * starRingEnd ℂ (ψ g)
+        = if ψ = chC then (Fintype.card (E0 × H) : ℂ) else 0 := by
+    have h4
+        : ∀ g : E0 × H, chC g * starRingEnd ℂ (ψ g) = ((ψ * chC : AddChar (E0 × H) ℂ)) (-g) := by
       intro g
       rw [AddChar.mul_apply, conj_eq_neg, ← chC_neg, mul_comm]
     simp_rw [h4]
@@ -261,7 +263,8 @@ variable {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
 
 theorem orthogonality_ramified : OrthoRam (H := H) := by
   intro D p i hp hi g
-  have hv : ∀ ψ : AddChar (E0 × H) ℂ, primVal D ψ (p ^ i) = cosetMean (D.inertia p) (i • D.frob p) ψ :=
+  have hv
+      : ∀ ψ : AddChar (E0 × H) ℂ, primVal D ψ (p ^ i) = cosetMean (D.inertia p) (i • D.frob p) ψ :=
     fun ψ => primitive_value_pow D ψ p i hp hi
   simp_rw [hv]
   convert ortho_coset (D.inertia p) (i • D.frob p) g

@@ -6,7 +6,9 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.G3
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  PositivityTheory.Rg.BcB.G3
 open scoped Classical TensorProduct
 
 namespace PositivityTheory.Rg.BcB.G3.SuppP

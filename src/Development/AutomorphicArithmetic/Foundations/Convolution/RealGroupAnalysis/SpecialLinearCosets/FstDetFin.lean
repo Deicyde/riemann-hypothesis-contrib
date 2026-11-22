@@ -6,25 +6,33 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H UpperTheory.ConvolutionTheory.R2.I
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
+  UpperTheory.ConvolutionTheory.R2.I
 open scoped Classical
 
-private theorem fst_detFin {E : Type} [Field E] [NumberField E] (k : GL (Fin 2) (Af E)) :
-    (((Matrix.GeneralLinearGroup.det (finGL E 2 k) : (A E)ˣ) : A E)).1 = 1 := by
+private theorem fst_detFin {E : Type} [Field E] [NumberField E] (k : GL (Fin 2) (Af E))
+    : (((Matrix.GeneralLinearGroup.det (finGL E 2 k) : (A E)ˣ) : A E)).1 = 1 := by
   have h := GlobalTheory.CuspRep.det_map (RingHom.fst (InfiniteAdeleRing E) (Af E)) (finGL E 2 k)
-  have h1 : Matrix.GeneralLinearGroup.map (RingHom.fst (InfiniteAdeleRing E) (Af E)) (finGL E 2 k) = 1 :=
+  have h1
+      : Matrix.GeneralLinearGroup.map (RingHom.fst (InfiniteAdeleRing E) (Af E)) (finGL E 2 k)
+        = 1 :=
     map_cornerGL_of_zero _ _ (fun _ => rfl) k
   rw [h1] at h
   refine h.symm.trans ?_
   simp
 
-private theorem fst_norm {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (D : Dat F E) (z : (A E)ˣ) (hz : (z : A E).1 = 1) :
-    ((GroundTheory.Global.ideleNorm F E z : (A F)ˣ) : A F).1 = 1 := by
+private theorem fst_norm
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (D : Dat F E)
+    (z : (A E)ˣ) (hz : (z : A E).1 = 1)
+    : ((GroundTheory.Global.ideleNorm F E z : (A F)ˣ) : A F).1 = 1 := by
   let e : A F := ((1, 0) : InfiniteAdeleRing F × FiniteAdeleRing (𝓞 F) F)
   have h1 : am E e * (z : A E) = am E e := by
-    have hi1 : (am E e).1 = 1 := map_one (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap (K := F) (L := E))
+    have hi1 : (am E e).1 = 1 :=
+      map_one (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap (K := F) (L := E))
     have hi2 : (am E e).2 = 0 := map_zero (AdeleBaseChange.finiteAdeleMap F E)
     refine Prod.ext ?_ ?_
     · change (am E e).1 * (z : A E).1 = (am E e).1
@@ -48,11 +56,14 @@ private theorem fst_norm {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
   rw [hu1, ht1]
   simp
 
-theorem UpperTheory.ConvolutionTheory.R2.I.locSm :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (π : TR.CuspSub F 2) (v : P F),
-      (∀ f, IsOpen {g | π.locRep v g f = f}) ∧ (∀ x (f : π.V) g, (π.locRep v x f).1.1 g = f.1.1 (g * lc v x)) ∧
-      ∀ (E : Type) [Field E] [NumberField E] [Algebra F E] (_ : Dat F E) (k : GL (Fin 2) (Af E)), ∀ f ∈ π.V,
-        ∃ f' ∈ π.V, f'.1 = fun g => f.1 (g * dM (nu F (finGL E 2 k))) := by
+theorem UpperTheory.ConvolutionTheory.R2.I.locSm
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (π : TR.CuspSub F 2) (v : P F),
+      (∀ f, IsOpen {g | π.locRep v g f = f})
+        ∧ (∀ x (f : π.V) g, (π.locRep v x f).1.1 g = f.1.1 (g * lc v x))
+        ∧ ∀ (E : Type) [Field E] [NumberField E] [Algebra F E] (_ : Dat F E)
+            (k : GL (Fin 2) (Af E)),
+          ∀ f ∈ π.V, ∃ f' ∈ π.V,
+            f'.1 = fun g => f.1 (g * dM (nu F (finGL E 2 k))) := by
   intro F _ _ _ π v
   refine ⟨fun f => ?_, fun x f g => rfl, ?_⟩
   · have e : {g | π.locRep v g f = f} = locGL F 2 v ⁻¹' {k | TR.finRep F 2 k f.1 = f.1} := by

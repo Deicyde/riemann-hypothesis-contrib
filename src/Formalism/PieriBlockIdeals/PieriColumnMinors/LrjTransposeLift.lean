@@ -10,26 +10,37 @@ noncomputable section
 
 namespace Formalism.CohomologicalDescent.LR
 
-open Formalism.GradedWeylDivisibility Formalism.CohomologicalDescent.Symmetrization Formalism.CohomologicalDescent.BinaryFormsExample
+open Formalism.GradedWeylDivisibility Formalism.CohomologicalDescent.Symmetrization
+  Formalism.CohomologicalDescent.BinaryFormsExample
 
-theorem lrj_liftWord_cons (p : ℕ) {q : ℕ} (x : Fin q × Fin q × ℕ) (ω : List (Fin q × Fin q × ℕ)) :
-    liftWord p (x :: ω) = (Fin.natAdd p x.1, Fin.natAdd p x.2.1, x.2.2) :: liftWord p ω := rfl
+theorem lrj_liftWord_cons (p : ℕ) {q : ℕ} (x : Fin q × Fin q × ℕ) (ω : List (Fin q × Fin q × ℕ))
+    : liftWord p (x :: ω) = (Fin.natAdd p x.1, Fin.natAdd p x.2.1, x.2.2) :: liftWord p ω :=
+  rfl
 
-theorem lrj_transpose_lift (p : ℕ) {q : ℕ} (ω : List (Fin q × Fin q × ℕ)) :
-    transposeWord (liftWord p (transposeWord ω)) = liftWord p ω := by
+theorem lrj_transpose_lift (p : ℕ) {q : ℕ} (ω : List (Fin q × Fin q × ℕ))
+    : transposeWord (liftWord p (transposeWord ω)) = liftWord p ω := by
   simp [transposeWord, liftWord, List.map_reverse, List.map_map, Function.comp_def]
 
-theorem levZ_sub (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w)
-    (f : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) (hf : f ∈ LevZ p q w lam2) :
-    ∃ y : (rationalBlockModuleSetting p q w lam2).W, ((y : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) = f := by
+theorem levZ_sub
+    (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w)
+    (f : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) (hf : f ∈ LevZ p q w lam2)
+    : ∃ y : (rationalBlockModuleSetting p q w lam2).W,
+      ((y : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) = f := by
   let M : Submodule ℚ (MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) :=
     (W0 p q w lam2).map (dualWeyl ℚ (p + q) (p + q) (LD.blockWt p q w lam2)).subtype
-  have hM : ∀ (b b' : Fin q) (k : ℕ), ∀ g ∈ M, rowDiv ℚ (Fin.natAdd p b) (Fin.natAdd p b') k g ∈ M := by
+  have hM
+      : ∀ (b b' : Fin q) (k : ℕ), ∀ g ∈ M, rowDiv ℚ (Fin.natAdd p b) (Fin.natAdd p b') k g ∈ M := by
     intro b b' k
     refine closed_of_der _ _ M ?_ k
     rintro g ⟨x, hx, rfl⟩
-    exact ⟨EV p q w lam2 (Sum.inr b) (Sum.inr b') x, w_zero_stable_right_block p q w lam2 b b' x hx, rfl⟩
-  have hgen : ∀ ω : List (Fin q × Fin q × ℕ), applyWord ℚ (liftWord p ω) (hw ℚ le_rfl (LD.blockWt p q w lam2)) ∈ M := by
+    exact ⟨
+      EV p q w lam2 (Sum.inr b) (Sum.inr b') x,
+      w_zero_stable_right_block p q w lam2 b b' x hx,
+      rfl
+    ⟩
+  have hgen
+      : ∀ ω : List (Fin q × Fin q × ℕ),
+        applyWord ℚ (liftWord p ω) (hw ℚ le_rfl (LD.blockWt p q w lam2)) ∈ M := by
     intro ω
     induction ω with
     | nil => exact ⟨hwV p q w lam2 ha hb, hwV_mem p q w lam2 ha hb, rfl⟩
@@ -43,9 +54,10 @@ theorem levZ_sub (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb :
   obtain ⟨x, hx, hxf⟩ := hle hf
   exact ⟨⟨x, hx⟩, hxf⟩
 
-theorem resInj (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w)
-    (z : VQ p q w lam2) (hz : z ∈ W0 p q w lam2)
-    (h0 : res ℚ p q (z : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) = 0) : z = 0 := by
+theorem resInj
+    (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w) (z : VQ p q w lam2)
+    (hz : z ∈ W0 p q w lam2) (h0 : res ℚ p q (z : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) = 0)
+    : z = 0 := by
   let Z : Submodule ℚ (VQ p q w lam2) :=
     W0 p q w lam2 ⊓ LinearMap.ker ((res ℚ p q).toLinearMap.comp
       (dualWeyl ℚ (p + q) (p + q) (LD.blockWt p q w lam2)).subtype)
@@ -70,16 +82,22 @@ theorem resInj (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : �
   rw [res_hw p q w lam2 ha hb] at this
   exact hwNe ℚ q q le_rfl lam2 this
 
-theorem wt_extract (p q w : ℕ) (lam2 : Fin q → ℕ) (u : VQ p q w lam2) (hu : u ≠ 0) (κ : Fin p ⊕ Fin q → ℤ)
-    (hw' : u ∈ (rationalBlockModuleSetting p q w lam2).wt κ) :
-    ∃ μN : Fin (p + q) → ℕ, IsWeightedHomogeneous (rowW (p + q) (p + q))
-      (u : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) μN ∧ κ = fun a => (μN (idx p q a) : ℤ) := by
+theorem wt_extract
+    (p q w : ℕ) (lam2 : Fin q → ℕ) (u : VQ p q w lam2) (hu : u ≠ 0) (κ : Fin p ⊕ Fin q → ℤ)
+    (hw' : u ∈ (rationalBlockModuleSetting p q w lam2).wt κ)
+    : ∃ μN : Fin (p + q) → ℕ,
+      IsWeightedHomogeneous (rowW (p + q) (p + q)) (u : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ)
+          μN
+        ∧ κ = fun a => (μN (idx p q a) : ℤ) := by
   have hu' : (u : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) ≠ 0 := fun h => hu (Subtype.ext h)
   obtain ⟨d, hd⟩ := MvPolynomial.support_nonempty.mpr hu'
   rw [MvPolynomial.mem_support_iff] at hd
   have hκ : κ = fun a => ((Finsupp.weight (rowW (p + q) (p + q)) d (idx p q a) : ℕ) : ℤ) := by
     funext a
-    have h1 := congrArg (fun x : VQ p q w lam2 => AddMonoidAlgebra.coeff (x : MvPolynomial _ ℚ) d) (((mem_wt p q w lam2 u κ).1 hw') a)
+    have h1 :=
+      congrArg
+        (fun x : VQ p q w lam2 => AddMonoidAlgebra.coeff (x : MvPolynomial _ ℚ) d)
+        (((mem_wt p q w lam2 u κ).1 hw') a)
     simp only [EV_coe, coeff_der_diag, Submodule.coe_smul, coeff_smul, smul_eq_mul] at h1
     have h2 := mul_right_cancel₀ hd h1
     exact_mod_cast h2.symm
@@ -87,16 +105,23 @@ theorem wt_extract (p q w : ℕ) (lam2 : Fin q → ℕ) (u : VQ p q w lam2) (hu 
   rw [hκ] at hw'
   exact (real_weight p q w lam2 u _).2 hw'
 
-theorem liftWeyl (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w)
-    (y : MvPolynomial (Fin q × Fin q) ℤ) (hy : y ∈ weyl ℤ q q le_rfl lam2) :
-    ∃ d ∈ LevZ p q w lam2, res ℚ p q d = intQ q q y := by
+theorem liftWeyl
+    (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w)
+    (y : MvPolynomial (Fin q × Fin q) ℤ) (hy : y ∈ weyl ℤ q q le_rfl lam2)
+    : ∃ d ∈ LevZ p q w lam2, res ℚ p q d = intQ q q y := by
   unfold weyl at hy
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨ω, rfl⟩ := hx
-    refine ⟨applyWord ℚ (liftWord p ω) (hw ℚ le_rfl (LD.blockWt p q w lam2)), Submodule.subset_span ⟨ω, rfl⟩, ?_⟩
-    rw [res_applyWord, res_hw p q w lam2 ha hb, lrc_intQ_apply, ← lclosedeq_applyWord_map, lclosedeq_hw_map]
-  | zero => exact ⟨0, Submodule.zero_mem _, by simp⟩
+    refine ⟨
+      applyWord ℚ (liftWord p ω) (hw ℚ le_rfl (LD.blockWt p q w lam2)),
+      Submodule.subset_span ⟨ω, rfl⟩,
+      ?_
+    ⟩
+    rw [res_applyWord, res_hw p q w lam2 ha hb, lrc_intQ_apply, ← lclosedeq_applyWord_map,
+      lclosedeq_hw_map]
+  | zero =>
+    exact ⟨0, Submodule.zero_mem _, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨d1, h1, e1⟩ := hx
     obtain ⟨d2, h2, e2⟩ := hy
@@ -105,9 +130,15 @@ theorem liftWeyl (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb :
     obtain ⟨d1, h1, e1⟩ := hx
     exact ⟨c • d1, Submodule.smul_mem _ c h1, by rw [map_zsmul, map_zsmul, e1]⟩
 
-theorem lrj_hom_of_smul {σ M : Type*} [AddCommMonoid M] (wt : σ → M) (g' : MvPolynomial σ ℤ) (g : MvPolynomial σ ℚ)
-    (m : ℤ) (μ : M) (hg : IsWeightedHomogeneous wt g μ) (h : (m : ℚ) • g = map (Int.castRingHom ℚ) g') :
-    IsWeightedHomogeneous wt g' μ := by
+theorem lrj_hom_of_smul
+    {σ M : Type*} [AddCommMonoid M]
+    (wt : σ → M)
+    (g' : MvPolynomial σ ℤ)
+    (g : MvPolynomial σ ℚ)
+    (m : ℤ)
+    (μ : M) (hg : IsWeightedHomogeneous wt g μ)
+    (h : (m : ℚ) • g = map (Int.castRingHom ℚ) g')
+    : IsWeightedHomogeneous wt g' μ := by
   intro d hd
   apply hg
   intro h0
@@ -117,13 +148,20 @@ theorem lrj_hom_of_smul {σ M : Type*} [AddCommMonoid M] (wt : σ → M) (g' : M
   have h2 : ((AddMonoidAlgebra.coeff g' d : ℤ) : ℚ) = 0 := by simpa using h1.symm
   exact_mod_cast h2
 
-theorem expL_real (hC : CoeffWord) (l : ℕ) (hl : l.Prime) (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2)
-    (hb : ∀ b, lam2 b ≤ w) (ξ : Fin (p + q) → ℤ) (i' : ℤ) (eL : ℕ)
-    (heL : ∀ μ2 : Fin q → ℕ, LD.depth2 ξ (LD.blockWt p q w lam2) (LD.blockWt p q w μ2) ≤ i' →
-      LD.ExpLe l q lam2 μ2 eL) :
-    ∀ κ, xiOf ξ (lamOf p q w lam2 - κ) ≤ i' →
-      ∀ u ∈ NablaL (rationalBlockModuleSetting p q w lam2) (formB p q w lam2) (DelLR l hl p q w lam2),
-      ((u : VQ p q w lam2)) ∈ (rationalBlockModuleSetting p q w lam2).wt κ → ((l : Zl l) ^ eL) • u ∈ DelLR l hl p q w lam2 := by
+theorem expL_real
+    (hC : CoeffWord)
+    (l : ℕ) (hl : l.Prime)
+    (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w) (ξ : Fin (p + q) → ℤ)
+    (i' : ℤ) (eL : ℕ)
+    (heL : ∀ μ2 : Fin q → ℕ,
+      LD.depth2 ξ (LD.blockWt p q w lam2) (LD.blockWt p q w μ2) ≤ i' → LD.ExpLe l q lam2 μ2 eL)
+    : ∀ κ,
+      xiOf ξ (lamOf p q w lam2 - κ) ≤ i'
+        → ∀ u
+            ∈ NablaL (rationalBlockModuleSetting p q w lam2) (formB p q w lam2)
+              (DelLR l hl p q w lam2),
+          ((u : VQ p q w lam2)) ∈ (rationalBlockModuleSetting p q w lam2).wt κ
+            → ((l : Zl l) ^ eL) • u ∈ DelLR l hl p q w lam2 := by
   intro κ hκ u hu hwt
   have hanti := LD.ld_blockWt_anti p q w lam2 ha hb
   by_cases hu0 : u = 0
@@ -146,23 +184,31 @@ theorem expL_real (hC : CoeffWord) (l : ℕ) (hl : l.Prime) (p q w : ℕ) (lam2 
     · rw [LD.blockWt, Fin.append_right]
   have hd : LD.depth2 ξ (LD.blockWt p q w lam2) (LD.blockWt p q w μ2) ≤ i' := by
     rw [hblock]
-    calc LD.depth2 ξ (LD.blockWt p q w lam2) μN = _ := (xiOf_depth2 ξ (LD.blockWt p q w lam2) μN).symm
+    calc
+      LD.depth2 ξ (LD.blockWt p q w lam2) μN
+        = _ := (xiOf_depth2 ξ (LD.blockWt p q w lam2) μN).symm
       _ ≤ i' := hκ
   set f : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ :=
     ((u : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) with hf
   have hfN : f ∈ dualWeyl ℚ (p + q) (p + q) (LD.blockWt p q w lam2) := (u : VQ p q w lam2).2
   have hg := res_mem ℚ p q w lam2 f hfN
-  have hω : ∀ ω : List (Fin q × Fin q × ℕ), eval (idFrame ℚ q q) (applyWord ℚ ω (res ℚ p q f)) ∈ Zl l := by
+  have hω
+      : ∀ ω : List (Fin q × Fin q × ℕ),
+        eval (idFrame ℚ q q) (applyWord ℚ ω (res ℚ p q f)) ∈ Zl l := by
     intro ω
     obtain ⟨y, hy⟩ := levZ_sub p q w lam2 ha hb _ (Submodule.subset_span ⟨transposeWord ω, rfl⟩)
-    have hyD : y ∈ DelLR l hl p q w lam2 := le_locSpan _ _ _ ((mem_MW p q w lam2 y).2 (by
-      rw [hy]; exact Submodule.subset_span ⟨transposeWord ω, rfl⟩))
+    have hyD : y ∈ DelLR l hl p q w lam2 :=
+      le_locSpan _ _ _
+        ((mem_MW p q w lam2 y).2 (by rw [hy]; exact Submodule.subset_span ⟨transposeWord ω, rfl⟩))
     have h1 := hu y hyD
     rw [mem_one_iff] at h1
-    have e1 : (formB p q w lam2).restrict (rationalBlockModuleSetting p q w lam2).W u y =
-        formB p q w lam2 (u : VQ p q w lam2) (y : VQ p q w lam2) := rfl
-    rw [e1, formB_apply, hy, fock_word _ _ hanti _ hfN, lrj_transpose_lift,
-      mul_div_assoc, div_self (ne_of_gt (hw_norm_pos _)), mul_one, ← res_eval_id ℚ p q, res_applyWord] at h1
+    have e1
+        : (formB p q w lam2).restrict (rationalBlockModuleSetting p q w lam2).W u y
+          = formB p q w lam2 (u : VQ p q w lam2) (y : VQ p q w lam2) :=
+      rfl
+    rw [e1, formB_apply, hy, fock_word _ _ hanti _ hfN, lrj_transpose_lift, mul_div_assoc,
+        div_self (ne_of_gt (hw_norm_pos _)), mul_one, ← res_eval_id ℚ p q, res_applyWord]
+      at h1
     exact h1
   obtain ⟨m, hm, g', hg', hmg⟩ := dual_int_loc hC lower_triangular_integral l hl q lam2 _ hg hω
   have hg'h : IsWeightedHomogeneous (rowW q q) g' μ2 :=

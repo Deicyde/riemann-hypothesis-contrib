@@ -28,8 +28,9 @@ private theorem Nm.cancel {D x y : K} (h0 : x ≠ 0) (hx : Nm D x) (hxy : Nm D (
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O K]
 
-private theorem even_im_hermitian_sub {Δ : K} (h : IsLoc O Δ) {p : O} (hp : Irreducible p) {x : K} (hx : x ≠ 0) :
-    EvenVal O x ∨ EvenVal O (x * algebraMap O K p) := by
+private theorem even_im_hermitian_sub
+    {Δ : K} (h : IsLoc O Δ) {p : O} (hp : Irreducible p) {x : K} (hx : x ≠ 0)
+    : EvenVal O x ∨ EvenVal O (x * algebraMap O K p) := by
   haveI := h.frac
   have hp0 : algebraMap O K p ≠ 0 := fun e =>
     hp.ne_zero ((IsFractionRing.injective O K) (e.trans (map_zero _).symm))
@@ -43,28 +44,38 @@ private theorem even_im_hermitian_sub {Δ : K} (h : IsLoc O Δ) {p : O} (hp : Ir
   obtain ⟨n, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible (mul_ne_zero ha0 hb0) hp
   have hu' : algebraMap O K a * algebraMap O K b = algebraMap O K u * algebraMap O K p ^ n := by
     rw [← map_mul, hu, map_mul, map_pow]
-  have e : algebraMap O K a / algebraMap O K b
-      = algebraMap O K u * algebraMap O K p ^ n / algebraMap O K b ^ 2 := by
+  have e
+      : algebraMap O K a / algebraMap O K b
+        = algebraMap O K u * algebraMap O K p ^ n / algebraMap O K b ^ 2 := by
     rw [← hu']; field_simp
   rw [e]
   obtain ⟨k, rfl | rfl⟩ := Nat.even_or_odd' n
-  · exact Or.inl ⟨u, algebraMap O K p ^ k / algebraMap O K b, div_ne_zero (pow_ne_zero _ hp0) hbK, by ring⟩
-  · exact Or.inr ⟨u, algebraMap O K p ^ (k + 1) / algebraMap O K b, div_ne_zero (pow_ne_zero _ hp0) hbK, by ring⟩
+  · exact Or.inl
+      ⟨u, algebraMap O K p ^ k / algebraMap O K b, div_ne_zero (pow_ne_zero _ hp0) hbK, by ring⟩
+  · exact Or.inr ⟨
+      u,
+      algebraMap O K p ^ (k + 1) / algebraMap O K b,
+      div_ne_zero (pow_ne_zero _ hp0) hbK,
+      by ring
+    ⟩
 
-private theorem sq_lift {Δ : K} (h : IsLoc O Δ) (u : Oˣ)
-    (hu : IsSquare (IsLocalRing.residue O (u : O))) : IsSquare (u : O) := by
+private theorem sq_lift
+    {Δ : K} (h : IsLoc O Δ) (u : Oˣ) (hu : IsSquare (IsLocalRing.residue O (u : O)))
+    : IsSquare (u : O) := by
   obtain ⟨r, hr⟩ := hu
   obtain ⟨r₀, rfl⟩ := IsLocalRing.residue_surjective r
   have h0 : IsLocalRing.residue O r₀ ≠ 0 := by
     intro e
     rw [e, mul_zero] at hr
     exact (u.isUnit.map (IsLocalRing.residue O)).ne_zero hr
-  obtain ⟨r, hr', -⟩ := sqrtO O K Δ h u r₀ ((IsLocalRing.residue_ne_zero_iff_isUnit _).1 h0) (by
-    rw [← IsLocalRing.residue_eq_zero_iff, map_sub, map_pow, hr, sq, sub_self])
+  obtain ⟨r, hr', -⟩ :=
+    sqrtO O K Δ h u r₀ ((IsLocalRing.residue_ne_zero_iff_isUnit _).1 h0)
+      (by rw [← IsLocalRing.residue_eq_zero_iff, map_sub, map_pow, hr, sq, sub_self])
   exact ⟨r, by rw [← hr', sq]⟩
 
-private theorem nonsq_mul {Δ : K} (h : IsLoc O Δ) (u v : Oˣ) (hu : ¬ IsSquare (u : O))
-    (hv : ¬ IsSquare (v : O)) : IsSquare ((u * v : Oˣ) : O) := by
+private theorem nonsq_mul
+    {Δ : K} (h : IsLoc O Δ) (u v : Oˣ) (hu : ¬ IsSquare (u : O)) (hv : ¬ IsSquare (v : O))
+    : IsSquare ((u * v : Oˣ) : O) := by
   classical
   haveI := h.fin
   haveI := Fintype.ofFinite (IsLocalRing.ResidueField O)
@@ -79,8 +90,10 @@ private theorem Nm.ofSq (D : K) {u : O} (hu : IsSquare u) : Nm D (algebraMap O K
   obtain ⟨r, rfl⟩ := hu
   exact ⟨algebraMap O K r, 0, by rw [map_mul]; ring⟩
 
-private theorem key {Δ : K} (h : IsLoc O Δ) {D x y : K} (hD : D ≠ 0) (hx : x ≠ 0) (hy : y ≠ 0)
-    (nx : ¬ Nm D x) (ny : ¬ Nm D y) : Nm D (x * y) := by
+private theorem key
+    {Δ : K} (h : IsLoc O Δ)
+    {D x y : K} (hD : D ≠ 0) (hx : x ≠ 0) (hy : y ≠ 0) (nx : ¬ Nm D x) (ny : ¬ Nm D y)
+    : Nm D (x * y) := by
   haveI := h.frac
   obtain ⟨p, hp⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hp0 : algebraMap O K p ≠ 0 := fun e =>
@@ -90,7 +103,8 @@ private theorem key {Δ : K} (h : IsLoc O Δ) {D x y : K} (hD : D ≠ 0) (hx : x
       rintro z ⟨u, t, -, rfl⟩
       obtain ⟨ν, -, hν⟩ := normEx O K D ⟨h.frac, h.compl, h.fin, h.two, hD'⟩ u
       refine Nm.mul ⟨ν.re, ν.im, ?_⟩ (Nm.sq D t)
-      rw [← hν, QuadraticAlgebra.norm_def]; ring
+      rw [← hν, QuadraticAlgebra.norm_def]
+      ring
     obtain ⟨u, s, hs, e1⟩ := (even_im_hermitian_sub h hp hx).resolve_left (fun e => nx (ev _ e))
     obtain ⟨v, t, ht, e2⟩ := (even_im_hermitian_sub h hp hy).resolve_left (fun e => ny (ev _ e))
     refine ev _ ⟨u * v, s * t / algebraMap O K p, div_ne_zero (mul_ne_zero hs ht) hp0, ?_⟩
@@ -112,7 +126,9 @@ private theorem key {Δ : K} (h : IsLoc O Δ) {D x y : K} (hD : D ≠ 0) (hx : x
           - (algebraMap O K u * algebraMap O K ((w⁻¹ : Oˣ) : O) * D * algebraMap O K p) * hs2
     obtain ⟨u, n, hn, rfl⟩ := dec x hx
     obtain ⟨v, m, hm, rfl⟩ := dec y hy
-    have := Nm.ofSq D (nonsq_mul h u v (fun e => nx ((Nm.ofSq D e).mul hn)) (fun e => ny ((Nm.ofSq D e).mul hm)))
+    have :=
+      Nm.ofSq D
+        (nonsq_mul h u v (fun e => nx ((Nm.ofSq D e).mul hn)) (fun e => ny ((Nm.ofSq D e).mul hm)))
     have h2 := (this.mul hn).mul hm
     rw [Units.val_mul, map_mul] at h2
     convert h2 using 1
@@ -124,8 +140,7 @@ private theorem hs_neg {D x : K} (h : ¬ Nm D x) : hs D x = -1 := if_neg h
 end UpperTheory.V.Z.Sym.Loc.admissible_trace_regular
 
 open UpperTheory.V.Z.Sym.Loc.admissible_trace_regular in
-theorem UpperTheory.V.Z.Sym.Loc.hsMul :
-    UpperTheory.V.Z.Sym.Loc.HsMul := by
+theorem UpperTheory.V.Z.Sym.Loc.hsMul : UpperTheory.V.Z.Sym.Loc.HsMul := by
   intro O K _ _ _ _ _ Δ h D x y hD hx hy
   by_cases nx : Nm D x <;> by_cases ny : Nm D y
   · rw [hs_pos nx, hs_pos ny, hs_pos (nx.mul ny), one_mul]

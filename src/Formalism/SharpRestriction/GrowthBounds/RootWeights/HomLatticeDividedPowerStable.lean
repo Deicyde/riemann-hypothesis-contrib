@@ -13,14 +13,18 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
 section lat
-variable {n : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {n : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   {W : Type} [AddCommGroup W] [Module (KK O) W] [Module O W] [IsScalarTower O (KK O) W]
 
-theorem homLattice_binomial_stable [CharZero (KK O)] [FiniteDimensional (KK O) W] (E : GLOps n (KK O) W) (hE : IsGLRep E)
+theorem homLattice_binomial_stable
+    [CharZero (KK O)] [FiniteDimensional (KK O) W]
+    (E : GLOps n (KK O) W) (hE : IsGLRep E)
     (M : Submodule O W) (hM : UZStable (O := O) E M)
-    (L : Submodule (KK O) W) (hL : IsSubrepresentation E L) (a : Fin n) (k : ℕ)
-    (f : L →ₗ[KK O] W) (hf : f ∈ homLattice M L) :
-    binomE (homRepresentation (restrictRepresentation E L hL) E) a k f ∈ homLattice M L := by
+    (L : Submodule (KK O) W) (hL : IsSubrepresentation E L)
+    (a : Fin n) (k : ℕ)
+    (f : L →ₗ[KK O] W) (hf : f ∈ homLattice M L)
+    : binomE (homRepresentation (restrictRepresentation E L hL) E) a k f ∈ homLattice M L := by
   have hres := restrictRepresentation_isRep E hE L hL
   obtain ⟨s, π, h1, h2, h3, h4, h5⟩ := weight_projections_exist (restrictRepresentation E L hL) hres
   obtain ⟨s', π', h1', h2', h3', h4', h5'⟩ := weight_projections_exist E hE
@@ -30,16 +34,20 @@ theorem homLattice_binomial_stable [CharZero (KK O)] [FiniteDimensional (KK O) W
     have : ∀ mu' ∈ s', ∑ mu ∈ s, π' mu' (f (π mu x)) = π' mu' (f x) := by
       intro mu' _
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum, ← map_sum, h5]
+      rw [← map_sum, ← map_sum, h5]
     rw [Finset.sum_congr rfl this, h5']
-  have hwt : ∀ mu' mu, (π' mu' ∘ₗ f ∘ₗ π mu) ∈ weightSp (homRepresentation (restrictRepresentation E L hL) E) (mu' - mu) := by
+  have hwt
+      : ∀ mu' mu,
+        (π' mu' ∘ₗ f ∘ₗ π mu)
+          ∈ weightSp (homRepresentation (restrictRepresentation E L hL) E) (mu' - mu) := by
     intro mu' mu
     rw [mem_weightSp_iff_diagonal_apply]
     intro c
     ext x
     simp only [homRepresentation_apply, LinearMap.comp_apply, LinearMap.smul_apply,
-      (mem_weightSp_iff_diagonal_apply E mu' _).1 (h4' mu' _) c, weightProjection_diagonal_apply_eq_smul _ hres mu (π mu) (h1 mu) c x, map_smul,
-      Pi.sub_apply, Int.cast_sub, sub_smul, LinearMap.sub_apply]
+      (mem_weightSp_iff_diagonal_apply E mu' _).1 (h4' mu' _) c,
+      weightProjection_diagonal_apply_eq_smul _ hres mu (π mu) (h1 mu) c x, map_smul, Pi.sub_apply,
+      Int.cast_sub, sub_smul, LinearMap.sub_apply]
   have hcoe : ∀ mu, L.subtype ∘ₗ π mu = π' mu ∘ₗ L.subtype := by
     intro mu
     refine linearMap_ext_on_weightSpaces _ hres _ _ fun nu y hy => ?_
@@ -65,10 +73,13 @@ theorem homLattice_binomial_stable [CharZero (KK O)] [FiniteDimensional (KK O) W
   rw [binomial_diagonal_apply_weight _ a (mu' - mu) _ (hwt mu' mu) k]
   exact int_smul_mem_lattice _ _ (hmem mu' mu)
 
-theorem mem_homLattice_iff_basis (M : Submodule O W) (L : Submodule (KK O) W) {d : ℕ} (b : Module.Basis (Fin d) (KK O) L)
-    (hbM : ∀ i, ((b i : L) : W) ∈ M)
-    (hbc : ∀ x : L, (x : W) ∈ M → ∀ i, ∃ o : O, b.coord i x = algebraMap O (KK O) o) (f : L →ₗ[KK O] W) :
-    f ∈ homLattice M L ↔ ∀ i, f (b i) ∈ M := by
+theorem mem_homLattice_iff_basis
+    (M : Submodule O W)
+    (L : Submodule (KK O) W)
+    {d : ℕ} (b : Module.Basis (Fin d) (KK O) L) (hbM : ∀ i, ((b i : L) : W) ∈ M)
+    (hbc : ∀ x : L, (x : W) ∈ M → ∀ i, ∃ o : O, b.coord i x = algebraMap O (KK O) o)
+    (f : L →ₗ[KK O] W)
+    : f ∈ homLattice M L ↔ ∀ i, f (b i) ∈ M := by
   constructor
   · intro hf i
     exact hf (b i) (hbM i)
@@ -95,8 +106,9 @@ theorem hom_lattice_dividedPower_stable : HomLatticeDividedPowerStable := by
   · rintro u (⟨a, c, k, hac, rfl⟩ | ⟨a, k, rfl⟩) f hf
     · exact homLattice_dividedPower_stable E M hM.1 L hL a c hac k f hf
     · exact homLattice_binomial_stable E hE M hM.1 L hL a k f hf
-  · have : homLattice M L = (Submodule.pi Set.univ fun _ : Fin d => M).map
-        ((b.constr (KK O)).toLinearMap.restrictScalars O) := by
+  · have : homLattice M L
+        = (Submodule.pi Set.univ fun _ : Fin d => M).map
+          ((b.constr (KK O)).toLinearMap.restrictScalars O) := by
       ext f
       rw [hiff]
       constructor

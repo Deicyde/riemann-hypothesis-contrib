@@ -8,11 +8,13 @@ noncomputable section
 
 namespace CrossDiaZero
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms Formalism.L2.GlobalTheoryTheory Formalism.L2.GlobalTheoryTheory.LocalLatticeBases Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0 Formalism.UG
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.product_first_zeroth_parts
+  Formalism.L2.Forms Formalism.L2.GlobalTheoryTheory
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0 Formalism.UG
 open NumberField IsDedekindDomain Matrix
 
 variable {D : D7} {u : D.what₂.Word}
-
 
 set_option maxHeartbeats 8000000 in
 set_option synthInstance.maxHeartbeats 400000 in

@@ -14,17 +14,18 @@ noncomputable section
 
 set_option linter.unusedSectionVars false
 
-variable {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
-  [MeasurableSpace E] [BorelSpace E]
-  [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F]
+variable
+  {E F : Type*}
+  [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+  [BorelSpace E] [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F]
 
 section Duality
 
 variable {s : ℝ}
 
-theorem bessel_ofSchwartz (φ : 𝓢(E, ℂ)) :
-    SobolevSpace.bessel s (SobolevSpace.ofSchwartz s φ) =
-      (SchwartzMap.fourierMultiplierCLM ℂ (weight s) φ).toLp 2 := by
+theorem bessel_ofSchwartz (φ : 𝓢(E, ℂ))
+    : SobolevSpace.bessel s (SobolevSpace.ofSchwartz s φ)
+      = (SchwartzMap.fourierMultiplierCLM ℂ (weight s) φ).toLp 2 := by
   apply toTemperedDistribution_injective
   simp only
   rw [SobolevSpace.toDistribution_bessel, SobolevSpace.toDistribution_ofSchwartz,

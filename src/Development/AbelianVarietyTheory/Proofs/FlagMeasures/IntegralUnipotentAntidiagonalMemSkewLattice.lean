@@ -9,23 +9,31 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
+  GlobalTheory.SnMass.VolN
 open scoped TensorProduct ENNReal nonZeroDivisors Pointwise
 
 namespace GlobalTheory.SnMass.VolN.IntG
 
-
 open NumberField IsDedekindDomain MeasureTheory Matrix in
 open scoped TensorProduct ENNReal nonZeroDivisors Pointwise in
-theorem _root_.GlobalTheory.SnMass.VolN.IntG.Hpk_mulVec_esI (k r : ℕ) (a : Fin r) (y : Fin (2 * r + k + 1) → ℂ) :
-    (_root_.Formalism.QuantumDeterminants.Hpk k r *ᵥ y) (_root_.Formalism.QuantumDeterminants.esI k r a) = y (_root_.Formalism.QuantumDeterminants.eI k r a) := by
+theorem _root_.GlobalTheory.SnMass.VolN.IntG.Hpk_mulVec_esI
+    (k r : ℕ) (a : Fin r) (y : Fin (2 * r + k + 1) → ℂ)
+    : (_root_.Formalism.QuantumDeterminants.Hpk k r *ᵥ y) (_root_.Formalism.QuantumDeterminants.esI
+        k r a)
+      = y (_root_.Formalism.QuantumDeterminants.eI k r a) := by
   have ha := a.isLt
-  rw [Matrix.mulVec, dotProduct, Finset.sum_eq_single (_root_.Formalism.QuantumDeterminants.eI k r a)]
-  · simp [_root_.Formalism.QuantumDeterminants.Hpk, _root_.Formalism.QuantumDeterminants.eI, _root_.Formalism.QuantumDeterminants.esI]
+  rw [Matrix.mulVec, dotProduct,
+    Finset.sum_eq_single (_root_.Formalism.QuantumDeterminants.eI k r a)]
+  · simp [_root_.Formalism.QuantumDeterminants.Hpk, _root_.Formalism.QuantumDeterminants.eI,
+      _root_.Formalism.QuantumDeterminants.esI]
     omega
   · intro j _ hj
-    have hj' : (j : ℕ) ≠ a := fun h => hj (Fin.ext (by simp [_root_.Formalism.QuantumDeterminants.eI, h]))
-    simp only [_root_.Formalism.QuantumDeterminants.Hpk, _root_.Formalism.QuantumDeterminants.esI, Matrix.of_apply, Fin.val_mk]
+    have hj' : (j : ℕ) ≠ a := fun h =>
+      hj (Fin.ext (by simp [_root_.Formalism.QuantumDeterminants.eI, h]))
+    simp only [_root_.Formalism.QuantumDeterminants.Hpk, _root_.Formalism.QuantumDeterminants.esI,
+      Matrix.of_apply, Fin.val_mk]
     have c1 : ¬(2 * r + k - (a : ℕ) < r ∧ 2 * r + k - (a : ℕ) + (j : ℕ) = 2 * r + k) := by omega
     have c2 : ¬((j : ℕ) < r ∧ 2 * r + k - (a : ℕ) + (j : ℕ) = 2 * r + k) := by omega
     have c3 : ¬(2 * r + k - (a : ℕ) ≤ r + k) := by omega
@@ -102,26 +110,30 @@ private lemma map_mem_differentIdeal_pow_of_involutive {E : Type} [Field E] [Num
       rw [map_add (f := _)]
       exact Submodule.add_mem _ ha hb
 
-
 open NumberField IsDedekindDomain MeasureTheory Matrix in
 open scoped TensorProduct ENNReal nonZeroDivisors Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-theorem _root_.GlobalTheory.SnMass.VolN.IntG.mem_dInv_two_mul (t : E ≃ₐ[ℚ] E) (ht : ∀ x, t (t x) = x) (m : ℕ) (c : E)
+theorem _root_.GlobalTheory.SnMass.VolN.IntG.mem_dInv_two_mul
+    (t : E ≃ₐ[ℚ] E) (ht : ∀ x, t (t x) = x)
+    (m : ℕ) (c : E)
     (h : ∀ x ∈ ((differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)) ^ m,
       ∀ y ∈ ((differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)) ^ m,
-      x * t y * c ∈ (algebraMap (𝓞 E) E).range) :
-    c ∈ _root_.GlobalTheory.SgGlob.dInv E (2 * m) := by
+        x * t y * c ∈ (algebraMap (𝓞 E) E).range)
+    : c ∈ _root_.GlobalTheory.SgGlob.dInv E (2 * m) := by
   unfold _root_.GlobalTheory.SgGlob.dInv
   have hD : ((differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)) ≠ 0 := by
     rw [ne_eq, FractionalIdeal.coeIdeal_eq_zero]
     exact differentIdeal_ne_bot
-  rw [inv_pow, two_mul, pow_add, FractionalIdeal.mem_inv_iff (mul_ne_zero (pow_ne_zero _ hD) (pow_ne_zero _ hD))]
+  rw [inv_pow, two_mul, pow_add,
+    FractionalIdeal.mem_inv_iff (mul_ne_zero (pow_ne_zero _ hD) (pow_ne_zero _ hD))]
   intro z hz
-  refine FractionalIdeal.mul_induction_on (C := fun w => c * w ∈ (1 : FractionalIdeal (𝓞 E)⁰ E)) hz ?_ ?_
+  refine
+    FractionalIdeal.mul_induction_on (C := fun w => c * w ∈ (1 : FractionalIdeal (𝓞 E)⁰ E)) hz ?_ ?_
   · intro i hi j hj
     obtain ⟨u, hu⟩ := h i hi (t j) (map_mem_differentIdeal_pow_of_involutive t ht m hj)
     refine (FractionalIdeal.mem_one_iff _).2 ⟨u, ?_⟩
-    rw [hu, ht]; ring
+    rw [hu, ht]
+    ring
   · intro a b ha hb
     rw [mul_add]
     exact Submodule.add_mem _ ha hb
@@ -179,22 +191,35 @@ private lemma modelEntry_eq_sq_mul_pairing_lemma_6 (σ : E →+* E) {k r : ℕ}
   rw [h1, h2]
   field_simp
 
-
 open NumberField IsDedekindDomain MeasureTheory Matrix in
 open scoped TensorProduct ENNReal nonZeroDivisors Pointwise in
-theorem _root_.GlobalTheory.SnMass.VolN.IntG.antidiag_mem_skewLat (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
-    (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E)) (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E)
-    (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F)
-    (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (s : Fin r → ℝ) :
-    _root_.GlobalTheory.SnMass.VolN.IsVolData σ J Λ P f T A s → ∀ γ ∈ _root_.GlobalTheory.SnMass.VolN.GN (σ : E →+* E) J Λ P, ∀ a : Fin r,
-      (∀ w, (_root_.GlobalTheory.SnMass.VolN.gM A γ w (_root_.Formalism.QuantumDeterminants.eI k r a) (_root_.Formalism.QuantumDeterminants.esI k r a)).re = 0) →
-      (fun w => (_root_.GlobalTheory.SnMass.VolN.gM A γ w (_root_.Formalism.QuantumDeterminants.eI k r a) (_root_.Formalism.QuantumDeterminants.esI k r a)).im) ∈
-        _root_.GlobalTheory.SnMass.VolN.skewLat (σ : E →+* E) (_root_.GlobalTheory.SgGlob.dInv E (2 * (r - a.val))) (s a ^ 2) := by
+theorem _root_.GlobalTheory.SnMass.VolN.IntG.antidiag_mem_skewLat
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
+    (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E))
+    (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E) (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E)
+    (T : F) (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    (s : Fin r → ℝ)
+    : _root_.GlobalTheory.SnMass.VolN.IsVolData σ J Λ P f T A s
+      → ∀ γ ∈ _root_.GlobalTheory.SnMass.VolN.GN (σ : E →+* E) J Λ P, ∀ a : Fin r,
+        (∀ w,
+            (_root_.GlobalTheory.SnMass.VolN.gM A γ w
+                (_root_.Formalism.QuantumDeterminants.eI k r a)
+                (_root_.Formalism.QuantumDeterminants.esI k r a)).re
+              = 0)
+          → (fun w =>
+              (_root_.GlobalTheory.SnMass.VolN.gM A γ w
+                (_root_.Formalism.QuantumDeterminants.eI k r a)
+                (_root_.Formalism.QuantumDeterminants.esI k r a)).im)
+            ∈ _root_.GlobalTheory.SnMass.VolN.skewLat (σ : E →+* E)
+              (_root_.GlobalTheory.SgGlob.dInv E (2 * (r - a.val))) (s a ^ 2) := by
   intro hV γ hγ a hre
   unfold _root_.GlobalTheory.SnMass.VolN.IsVolData at hV
   obtain ⟨hT, -, hJ, hΛ, -, -, hspan, hA, hs, hAd⟩ := hV
-  simp only [_root_.GlobalTheory.SnMass.VolN.GN, Set.mem_setOf_eq, _root_.GlobalTheory.SgGlob.latMap] at hγ
+  simp only [_root_.GlobalTheory.SnMass.VolN.GN, Set.mem_setOf_eq,
+      _root_.GlobalTheory.SgGlob.latMap]
+    at hγ
   obtain ⟨-, hγΛ⟩ := hγ
   have hconj : ∀ (w : InfinitePlace E) (x : E), w.embedding (σ x) = star (w.embedding x) :=
     fun w x => hT.2.2.2 _ x
@@ -207,10 +232,13 @@ theorem _root_.GlobalTheory.SnMass.VolN.IntG.antidiag_mem_skewLat (F E : Type) [
       rw [RingHom.map_det]
       exact hd.symm
     exact hJ.2 ((map_eq_zero_iff _ w.embedding.injective).1 hw)
-  have hentry : ∀ w, _root_.GlobalTheory.SnMass.VolN.gM A γ w (_root_.Formalism.QuantumDeterminants.eI k r a) (_root_.Formalism.QuantumDeterminants.esI k r a) =
-      ((s a : ℂ)) ^ 2 * w.embedding c := fun w =>
-    modelEntry_eq_sq_mul_pairing_lemma_6 (σ : E →+* E) J γ A f s w a (hconj w) (hA w) (hdet w) (hs a).ne'
-      (hAd w a).2
+  have hentry
+      : ∀ w,
+        _root_.GlobalTheory.SnMass.VolN.gM A γ w (_root_.Formalism.QuantumDeterminants.eI k r a)
+            (_root_.Formalism.QuantumDeterminants.esI k r a)
+          = ((s a : ℂ)) ^ 2 * w.embedding c := fun w =>
+    modelEntry_eq_sq_mul_pairing_lemma_6 (σ : E →+* E) J γ A f s w a (hconj w) (hA w) (hdet w)
+      (hs a).ne' (hAd w a).2
   obtain ⟨w₀⟩ : Nonempty (InfinitePlace E) := inferInstance
   have hinvol : ∀ x, σ (σ x) = x := fun x =>
     w₀.embedding.injective (by rw [hconj, hconj, star_star])
@@ -225,8 +253,9 @@ theorem _root_.GlobalTheory.SnMass.VolN.IntG.antidiag_mem_skewLat (F E : Type) [
       exact (mul_eq_zero.1 h0).resolve_left (pow_ne_zero _ (hs a).ne')
     rw [hconj, map_neg]
     apply Complex.ext <;> simp [hre0]
-  have hmemΛ : ∀ z ∈ ((differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)) ^ (r - a.val),
-      (z • fun i => f i a) ∈ Λ := by
+  have hmemΛ
+      : ∀ z ∈ ((differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)) ^ (r - a.val),
+        (z • fun i => f i a) ∈ Λ := by
     intro z hz
     apply hspan
     unfold _root_.GlobalTheory.SnMass.tupLat
@@ -237,26 +266,32 @@ theorem _root_.GlobalTheory.SnMass.VolN.IntG.antidiag_mem_skewLat (F E : Type) [
       exact hz
     · funext i
       simp [_root_.GlobalTheory.SnMass.sideM, Fin.append_right]
-  let t : E ≃ₐ[ℚ] E :=
-    { toFun := σ, invFun := σ, left_inv := hinvol, right_inv := hinvol,
-      map_mul' := map_mul σ, map_add' := map_add σ,
-      commutes' := fun q => by rw [eq_ratCast (algebraMap ℚ E) q]; exact map_ratCast σ q }
+  let t : E ≃ₐ[ℚ] E := {
+    toFun := σ
+    invFun := σ
+    left_inv := hinvol
+    right_inv := hinvol
+    map_mul' := map_mul σ
+    map_add' := map_add σ
+    commutes' := fun q => by rw [eq_ratCast (algebraMap ℚ E) q]; exact map_ratCast σ q
+  }
   have ht : ∀ x, t x = σ x := fun x => rfl
   unfold _root_.GlobalTheory.SnMass.VolN.skewLat
   refine ⟨c, ?_, hsc, fun w => ?_⟩
-  · refine _root_.GlobalTheory.SnMass.VolN.IntG.mem_dInv_two_mul t (fun x => by rw [ht, ht, hinvol])
+  · refine _root_.GlobalTheory.SnMass.VolN.IntG.mem_dInv_two_mul t
+      (fun x => by rw [ht, ht, hinvol])
       (r - a.val) c ?_
     intro x hx y hy
     have hγmem : γ *ᵥ (x • fun i => f i a) ∈ Λ := by
-      have hm := Submodule.mem_map_of_mem
-        (f := (γ.mulVecLin.restrictScalars (𝓞 E))) (hmemΛ x hx)
+      have hm := Submodule.mem_map_of_mem (f := (γ.mulVecLin.restrictScalars (𝓞 E))) (hmemΛ x hx)
       rw [hγΛ] at hm
       exact hm
     have hpair := (hΛ.2 _).1 hγmem _ (hmemΛ y hy)
     convert hpair using 1
     unfold _root_.GlobalTheory.SgAlg.form
-    have e : (fun i => (σ : E →+* E) ((y • fun i => f i a) i)) =
-        σ y • fun i => (σ : E →+* E) (f i a) := by
+    have e
+        : (fun i => (σ : E →+* E) ((y • fun i => f i a) i))
+          = σ y • fun i => (σ : E →+* E) (f i a) := by
       funext i; simp
     rw [Matrix.mulVec_smul, Matrix.mulVec_smul, e, smul_dotProduct, dotProduct_smul, ht]
     change x * σ y * c = σ y * (x * c)

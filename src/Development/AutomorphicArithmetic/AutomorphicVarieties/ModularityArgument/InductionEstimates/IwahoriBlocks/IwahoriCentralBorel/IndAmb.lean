@@ -7,15 +7,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
-private theorem indF_stable {G H Y : Type} [Group G] [Group H] [AddCommGroup Y] [Module ℂ Y] [TopologicalSpace G]
-    [IsTopologicalGroup G] (j : H →* G) (y : Representation ℂ H Y) (X : Submodule ℂ Y) (g : G) (f : G → Y)
-    (hf : f ∈ IndF j y X) : rightReg ℂ G Y g f ∈ IndF j y X := by
+private theorem indF_stable
+    {G H Y : Type}
+    [Group G] [Group H] [AddCommGroup Y] [Module ℂ Y] [TopologicalSpace G] [IsTopologicalGroup G]
+    (j : H →* G) (y : Representation ℂ H Y) (X : Submodule ℂ Y)
+    (g : G)
+    (f : G → Y) (hf : f ∈ IndF j y X)
+    : rightReg ℂ G Y g f ∈ IndF j y X := by
   obtain ⟨⟨h1, h2⟩, h3⟩ := hf
   refine ⟨⟨fun x => h1 (x * g), fun h x => ?_⟩, ?_⟩
   · show f (j h * x * g) = y h (f (x * g))
@@ -40,11 +48,13 @@ private theorem indF_stable {G H Y : Type} [Group G] [Group H] [AddCommGroup Y] 
       change f (x * a * g) = f (x * g)
       simpa [mul_assoc] using this
 
-private theorem simple_of_sub {G H Y : Type} [Group G] [Group H] [AddCommGroup Y] [Module ℂ Y] [TopologicalSpace G]
-    [IsTopologicalGroup G] (j : H →* G) (y : Representation ℂ H Y) (X : Submodule ℂ Y) (y' : Representation ℂ H X)
+private theorem simple_of_sub
+    {G H Y : Type}
+    [Group G] [Group H] [AddCommGroup Y] [Module ℂ Y] [TopologicalSpace G] [IsTopologicalGroup G]
+    (j : H →* G) (y : Representation ℂ H Y) (X : Submodule ℂ Y) (y' : Representation ℂ H X)
     (hy : ∀ h v, (y' h v : Y) = y h v)
-    (H' : ∀ Q ≤ IndF j y' ⊤, (∀ g, ∀ f ∈ Q, rightReg ℂ G X g f ∈ Q) → Q = ⊥ ∨ Q = IndF j y' ⊤) :
-    SimpleIn (rightReg ℂ G Y) (IndF j y X) := by
+    (H' : ∀ Q ≤ IndF j y' ⊤, (∀ g, ∀ f ∈ Q, rightReg ℂ G X g f ∈ Q) → Q = ⊥ ∨ Q = IndF j y' ⊤)
+    : SimpleIn (rightReg ℂ G Y) (IndF j y X) := by
   refine ⟨fun g f hf => indF_stable j y X g f hf, fun Q hQ hst => ?_⟩
   let Φ : (G → X) →ₗ[ℂ] (G → Y) := X.subtype.compLeft G
   have hΦ : ∀ f x, Φ f x = (f x : Y) := fun _ _ => rfl
@@ -92,12 +102,16 @@ private theorem simple_of_sub {G H Y : Type} [Group G] [Group H] [AddCommGroup Y
       exact (hmem f).2 hF
     exact this
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.indAmb :
-    ∀ {r : ℕ} {G : Fin r → Type} [∀ i, Group (G i)] [∀ i, TopologicalSpace (G i)] [∀ i, IsTopologicalGroup (G i)] (P : ∀ i, Subgroup (G i)) {Y : Type} [AddCommGroup Y] [Module ℂ Y]
-      (y : Representation ℂ (∀ i, P i) Y) (X : Submodule ℂ Y), SimpleIn y X → (∀ v ∈ X, IsOpen {p : ∀ i, P i | y p v = v}) →
-      (∀ i, ∃ (V : Type) (_ : AddCommGroup V) (_ : Module ℂ V) (ρ : Representation ℂ (P i) V) (f : V →ₗ[ℂ] Y), LocOk (P i) ρ ∧ f ≠ 0 ∧ (∀ v, f v ∈ X) ∧
-        ∀ p v, f (ρ p v) = y (Pi.mulSingle i p) (f v)) →
-      SimpleIn (rightReg ℂ (∀ i, G i) Y) (IndF (piIncl P) y X) := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.indAmb
+    : ∀ {r : ℕ} {G : Fin r → Type} [∀ i, Group (G i)] [∀ i, TopologicalSpace (G i)]
+        [∀ i, IsTopologicalGroup (G i)] (P : ∀ i, Subgroup (G i)) {Y : Type} [AddCommGroup Y]
+        [Module ℂ Y] (y : Representation ℂ (∀ i, P i) Y) (X : Submodule ℂ Y),
+      SimpleIn y X → (∀ v ∈ X, IsOpen {p : ∀ i, P i | y p v = v})
+        → (∀ i,
+          ∃ (V : Type) (_ : AddCommGroup V) (_ : Module ℂ V) (ρ : Representation ℂ (P i) V)
+              (f : V →ₗ[ℂ] Y),
+            LocOk (P i) ρ ∧ f ≠ 0 ∧ (∀ v, f v ∈ X) ∧ ∀ p v, f (ρ p v) = y (Pi.mulSingle i p) (f v))
+        → SimpleIn (rightReg ℂ (∀ i, G i) Y) (IndF (piIncl P) y X) := by
   intro r G _ _ _ P Y _ _ y X hX hop hloc
   by_cases h0 : X = ⊥
   · refine ⟨fun g f hf => indF_stable _ y X g f hf, fun Q hQ _ => Or.inl ?_⟩
@@ -108,15 +122,17 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.indAmb :
     have := (hQ hF).1.1 x
     rw [h0, Submodule.mem_bot] at this
     exact this
-  let y' : Representation ℂ ((∀ i, P i) × PUnit.{1}) X := (GlobalTheory.PRep.sub y X hX.1).comp (MonoidHom.fst _ _)
+  let y' : Representation ℂ ((∀ i, P i) × PUnit.{1}) X :=
+    (GlobalTheory.PRep.sub y X hX.1).comp (MonoidHom.fst _ _)
   have hy : ∀ a (v : X), (y' a v : Y) = y a.1 v := fun _ _ => rfl
   have hirr : y'.IsIrreducible := by
     have : Nontrivial X := Submodule.nontrivial_iff_ne_bot.2 h0
     refine { exists_pair_ne := ⟨⊥, ⊤, fun h => ?_⟩, eq_bot_or_eq_top := fun S => ?_ }
     · exact bot_ne_top (α := Submodule ℂ X) (congrArg Subrepresentation.toSubmodule h)
     · rcases hX.2 (S.toSubmodule.map X.subtype) (Submodule.map_subtype_le _ _) (by
-        rintro g _ ⟨v, hv, rfl⟩
-        exact ⟨y' (g, 1) v, S.apply_mem_toSubmodule _ hv, rfl⟩) with h | h
+          rintro g _ ⟨v, hv, rfl⟩
+          exact ⟨y' (g, 1) v, S.apply_mem_toSubmodule _ hv, rfl⟩)
+        with h | h
       · left
         apply Subrepresentation.toSubmodule_injective
         apply Submodule.map_injective_of_injective X.injective_subtype
@@ -127,14 +143,28 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.indAmb :
         apply Submodule.map_injective_of_injective X.injective_subtype
         rw [h]
         exact (Submodule.map_subtype_top _).symm
-  have key := indProdG r P y' hirr (fun v => by
-      convert hop v v.2 using 2 with p
-      exact funext fun p => propext Subtype.ext_iff) (fun i => by
-      obtain ⟨V, _, _, ρ, f, h1, h2, h3, h4⟩ := hloc i
-      refine ⟨V, inferInstance, inferInstance, ρ, f.codRestrict X h3, h1, fun h => h2 ?_, fun p v => Subtype.ext (h4 p v)⟩
-      ext v
-      exact congrArg Subtype.val (LinearMap.congr_fun h v))
-  refine simple_of_sub (piIncl P) y X (y'.comp (MonoidHom.inl _ _)) (fun _ _ => rfl) fun Q hQ hst => key Q hQ hst fun c f hf => ?_
+  have key :=
+    indProdG r P y' hirr
+      (fun v => by
+        convert hop v v.2 using 2 with p
+        exact funext fun p => propext Subtype.ext_iff)
+      (fun i => by
+        obtain ⟨V, _, _, ρ, f, h1, h2, h3, h4⟩ := hloc i
+        refine ⟨
+          V,
+          inferInstance,
+          inferInstance,
+          ρ,
+          f.codRestrict X h3,
+          h1,
+          fun h => h2 ?_,
+          fun p v => Subtype.ext (h4 p v)
+        ⟩
+        ext v
+        exact congrArg Subtype.val (LinearMap.congr_fun h v))
+  refine simple_of_sub (piIncl P) y X (y'.comp (MonoidHom.inl _ _))
+    (fun _ _ => rfl)
+    fun Q hQ hst => key Q hQ hst fun c f hf => ?_
   have : (fun x => y' (1, c) (f x)) = f := by
     funext x
     apply Subtype.ext

@@ -14,15 +14,16 @@ namespace GlobalTheory.CompanionTheory.FixedProj
 theorem stProj : StProj := by
   unfold StProj
   intro G H _ _ _ _ σ hiso K
-  let V : Submodule ℂ H :=
-    { carrier := {v | ∀ k ∈ K, σ k v = v}
-      add_mem' := fun {a b} ha hb k hk => by
-        simp only [Set.mem_ofPred_eq] at ha hb ⊢
-        rw [map_add (f := _), ha k hk, hb k hk]
-      zero_mem' := fun k _ => map_zero _
-      smul_mem' := fun c v hv k hk => by
-        simp only [Set.mem_ofPred_eq] at hv ⊢
-        rw [map_smul, hv k hk] }
+  let V : Submodule ℂ H := {
+    carrier := {v | ∀ k ∈ K, σ k v = v}
+    add_mem' := fun {a b} ha hb k hk => by
+      simp only [Set.mem_ofPred_eq] at ha hb ⊢
+      rw [map_add (f := _), ha k hk, hb k hk]
+    zero_mem' := fun k _ => map_zero _
+    smul_mem' := fun c v hv k hk => by
+      simp only [Set.mem_ofPred_eq] at hv ⊢
+      rw [map_smul, hv k hk]
+  }
   have hmem : ∀ v, v ∈ V ↔ ∀ k ∈ K, σ k v = v := fun v => Iff.rfl
   have hVc : IsClosed (V : Set H) := by
     have hV : (V : Set H) = ⋂ k ∈ K, {v | σ k v = v} := by
@@ -32,7 +33,8 @@ theorem stProj : StProj := by
     rw [hV]
     exact isClosed_biInter fun k _ => isClosed_eq (σ k).continuous continuous_id
   haveI : CompleteSpace V := hVc.completeSpace_coe
-  have hin : ∀ g v w, inner ℂ (σ g v) w = inner ℂ v (σ g⁻¹ w) := CompanionTheory.D.gk.admitted.FinOfPIAux.inner_left σ hiso
+  have hin : ∀ g v w, inner ℂ (σ g v) w = inner ℂ v (σ g⁻¹ w) :=
+    CompanionTheory.D.gk.admitted.FinOfPIAux.inner_left σ hiso
   refine ⟨V.starProjection, ?_, ?_, ?_⟩
   · unfold IsAvg
     refine ⟨?_, ?_, ?_⟩
@@ -55,16 +57,14 @@ theorem stProj : StProj := by
   · intro u w
     exact Submodule.inner_starProjection_left_eq_right (K := V) u w
   · intro T hT
-    have hTσ : ∀ g v, T (σ g v) = σ g (T v) := fun g v =>
-      congrArg (fun S : H →L[ℂ] H => S v) (hT g)
-    have hTV : ∀ v ∈ V, T v ∈ V := fun v hv k hk => by
-      rw [← hTσ, (hmem v).1 hv k hk]
+    have hTσ : ∀ g v, T (σ g v) = σ g (T v) := fun g v => congrArg (fun S : H →L[ℂ] H => S v) (hT g)
+    have hTV : ∀ v ∈ V, T v ∈ V := fun v hv k hk => by rw [← hTσ, (hmem v).1 hv k hk]
     have hadj : ∀ w ∈ V, ContinuousLinearMap.adjoint T w ∈ V := by
       intro w hw k hk
       apply ext_inner_right ℂ
       intro z
-      rw [hin, ContinuousLinearMap.adjoint_inner_left, ContinuousLinearMap.adjoint_inner_left, hTσ, ← hin,
-        (hmem w).1 hw k hk]
+      rw [hin, ContinuousLinearMap.adjoint_inner_left, ContinuousLinearMap.adjoint_inner_left, hTσ,
+        ← hin, (hmem w).1 hw k hk]
     ext v
     have h1 : V.starProjection (T (V.starProjection v)) = T (V.starProjection v) :=
       Submodule.starProjection_eq_self_iff.2 (hTV _ (V.starProjection_apply_mem v))

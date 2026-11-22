@@ -9,23 +9,27 @@ noncomputable section
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 theorem residue_class_count : ResidueClassCount := by
   classical
   intro r Q be c ρ hr hQ
   have hQ0 : 0 < Q := by omega
-  have hcore := Formalism.InvariantFactorPaths.BranchingDimensions.residueClassLowerBound r Q be (ρ % Q + (Q - c % Q)) hr hQ
+  have hcore :=
+    Formalism.InvariantFactorPaths.BranchingDimensions.residueClassLowerBound r Q be
+      (ρ % Q + (Q - c % Q)) hr hQ
   refine le_trans hcore ?_
-  have hle : ((Finset.univ : Finset (Fin r → Fin (Q - 2 * be))).filter
-      (fun u => (∑ l, (u l : ℕ)) % Q = (ρ % Q + (Q - c % Q)) % Q)).card ≤
-      ((Fintype.piFinset fun _ : Fin r => Finset.range (Q - 2 * be)).filter
-        fun w => (c + ∑ i, w i) % Q = ρ % Q).card := by
+  have hle
+      : ((Finset.univ : Finset (Fin r → Fin (Q - 2 * be))).filter
+          (fun u => (∑ l, (u l : ℕ)) % Q = (ρ % Q + (Q - c % Q)) % Q)).card
+        ≤ ((Fintype.piFinset fun _ : Fin r => Finset.range (Q - 2 * be)).filter fun w =>
+          (c + ∑ i, w i) % Q = ρ % Q).card := by
     refine Finset.card_le_card_of_injOn (fun u => fun l => (u l : ℕ)) ?_ ?_
     · intro u hu
       have hu' := (Finset.mem_filter.mp (Finset.mem_coe.mp hu)).2
-      refine Finset.mem_coe.mpr (Finset.mem_filter.mpr ⟨Fintype.mem_piFinset.mpr fun l =>
-        Finset.mem_range.mpr (u l).isLt, ?_⟩)
+      refine Finset.mem_coe.mpr (Finset.mem_filter.mpr
+        ⟨Fintype.mem_piFinset.mpr fun l => Finset.mem_range.mpr (u l).isLt, ?_⟩)
       have h1 : (∑ l, (u l : ℕ)) ≡ ρ % Q + (Q - c % Q) [MOD Q] := hu'
       have h2 : c + ∑ l, (u l : ℕ) ≡ c + (ρ % Q + (Q - c % Q)) [MOD Q] := Nat.ModEq.add_left c h1
       have h3 : c + (ρ % Q + (Q - c % Q)) ≡ ρ [MOD Q] := by
@@ -45,9 +49,10 @@ theorem residue_class_count : ResidueClassCount := by
       exact Fin.ext (congrFun huu l)
   exact_mod_cast hle
 
-theorem tele_le : ∀ (n : ℕ) (hn : 0 < n) (f g : Fin n → ℤ),
-    (∀ (a : Fin n) (h : a.val + 1 < n), f ⟨a.val + 1, h⟩ ≤ g a) →
-    ∑ a, (f a - g a) ≤ f ⟨0, hn⟩ - g ⟨n - 1, by omega⟩ := by
+theorem tele_le
+    : ∀ (n : ℕ) (hn : 0 < n) (f g : Fin n → ℤ),
+      (∀ (a : Fin n) (h : a.val + 1 < n), f ⟨a.val + 1, h⟩ ≤ g a)
+        → ∑ a, (f a - g a) ≤ f ⟨0, hn⟩ - g ⟨n - 1, by omega⟩ := by
   intro n hn
   obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hn.ne'
   intro f g h
@@ -64,16 +69,21 @@ section D21
 
 variable {n' r : ℕ} [NeZero n'] [NeZero r] (X : Dat n' r) (p K : ℕ)
 
-theorem dminus_le_beS (hX : X.Hyp p K) (j : ℤ) (b : ℤ → ℕ) (μ : Fin (segN X.F j + 1) → Fin (r + K) → ℤ)
-    (dd : Fin (segN X.F j) → ℕ) (hP : X.IsPATH p K j b μ dd) (s : ℕ) :
-    T.dminus (segLL X.F j) dd s ≤ X.beS p K j b := by
+theorem dminus_le_beS
+    (hX : X.Hyp p K)
+    (j : ℤ) (b : ℤ → ℕ) (μ : Fin (segN X.F j + 1) → Fin (r + K) → ℤ) (dd : Fin (segN X.F j) → ℕ)
+    (hP : X.IsPATH p K j b μ dd)
+    (s : ℕ)
+    : T.dminus (segLL X.F j) dd s ≤ X.beS p K j b := by
   classical
   have hr : 0 < r := NeZero.pos r
   have hV := hX.valid
   have hrN := k_r_le_segN X.F hV hr j
   unfold T.dminus Dat.beS
-  have himg : (X.F.letters j).filter (· < X.F.fr j 0) =
-      (Finset.univ.filter fun l : Fin (segN X.F j) => l.val < segN X.F j - r).image (segE X.F j) := by
+  have himg
+      : (X.F.letters j).filter (· < X.F.fr j 0)
+        = (Finset.univ.filter fun l : Fin (segN X.F j) => l.val < segN X.F j - r).image
+          (segE X.F j) := by
     ext x
     simp only [Finset.mem_filter, Finset.mem_image, Finset.mem_univ, true_and]
     constructor
@@ -82,7 +92,8 @@ theorem dminus_le_beS (hX : X.Hyp p K) (j : ℤ) (b : ℤ → ℕ) (μ : Fin (se
       exact ⟨i, (segE_lt_fr_iff X.F hV hr j i).mp hlt, rfl⟩
     · rintro ⟨i, hi, rfl⟩
       exact ⟨segE_mem X.F j i, (segE_lt_fr_iff X.F hV hr j i).mpr hi⟩
-  rw [himg, Finset.sum_image (fun a _ b _ h => (segE_strictMono X.F j).injective h), Finset.sum_filter]
+  rw [himg, Finset.sum_image (fun a _ b _ h => (segE_strictMono X.F j).injective h),
+    Finset.sum_filter]
   refine Finset.sum_le_sum fun l _ => ?_
   split_ifs with h1 h2 h2
   · rw [hP.degs l ((segE_lt_fr_iff X.F hV hr j l).mpr h2)]
@@ -91,8 +102,7 @@ theorem dminus_le_beS (hX : X.Hyp p K) (j : ℤ) (b : ℤ → ℕ) (μ : Fin (se
     have ht : l.val - (segN X.F j - r) < r := by omega
     have hseg : segE X.F j l = X.F.fr j (l.val - (segN X.F j - r)) :=
       (segE_eq_fr_iff X.F hV j l ht).mpr (by omega)
-    have hvec : (segLL X.F j).vec l = true := by
-      rw [comb_vec, hseg]; exact (hV.2.2.2.2.1 j _ ht).2
+    have hvec : (segLL X.F j).vec l = true := by rw [comb_vec, hseg]; exact (hV.2.2.2.2.1 j _ ht).2
     rw [hvec] at h1
     exact absurd h1.2 (by simp)
   · exact Nat.zero_le _
@@ -114,8 +124,7 @@ theorem tau_degree_on_path_bound : TauDegreeOnPathBound := by
   have ht : i.val - (segN X.F j - r) < r := by omega
   have hseg : segE X.F j i = X.F.fr j (i.val - (segN X.F j - r)) :=
     (segE_eq_fr_iff X.F hV j i ht).mpr (by omega)
-  have hvec : (segLL X.F j).vec i = true := by
-    rw [comb_vec, hseg]; exact (hV.2.2.2.2.1 j _ ht).2
+  have hvec : (segLL X.F j).vec i = true := by rw [comb_vec, hseg]; exact (hV.2.2.2.2.1 j _ ht).2
   have hs := T.step_vec P i hvec
   rw [hPμ] at hs
   have hn : 0 < r + K := by omega

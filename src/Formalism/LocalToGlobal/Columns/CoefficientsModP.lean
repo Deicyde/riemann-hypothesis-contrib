@@ -30,7 +30,8 @@ theorem dualFrLattice : DualFrLattice := dualFrameLattice_holds
 theorem dualFrHdual : DualFrHdual := dualFrameHdual_holds
 theorem tauLatDual : TauLatDual := tauLatticeDual_holds
 theorem roundLat : RoundLat := roundLattice_holds
-theorem weylEqDualNabla : Formalism.GradedWeylDivisibility.WeylEqDualNabla := weyl_eq_dual_nabla_holds
+theorem weylEqDualNabla : Formalism.GradedWeylDivisibility.WeylEqDualNabla :=
+  weyl_eq_dual_nabla_holds
 theorem pairBDualStd : PairBDualStd := pairBDualStd_of weyl_eq_dual_nabla_holds
 theorem pairBDualK : PairBDualK := pairBDualK_of pairBDualStd
 theorem pairBDual : PairBDual := pairBDual_of pairBDualStd

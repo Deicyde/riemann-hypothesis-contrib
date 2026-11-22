@@ -37,23 +37,31 @@ theorem BlowUpChart.proof : BlowUpChart.Statement := by
     | algebraMap r => exact hV r
     | add _ _ _ _ h₁ h₂ => exact add_mem h₁ h₂
     | mul _ _ _ _ h₁ h₂ => exact mul_mem h₁ h₂
-  let φ : blowUpChart K x i →+* V :=
-    { toFun := fun y => ⟨y.1, hle y.1 y.2⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let φ : blowUpChart K x i →+* V := {
+    toFun := fun y => ⟨y.1, hle y.1 y.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   have hφ : ∀ a : A, φ (algebraMap A (blowUpChart K x i) a) = f a := fun _ => rfl
   have hxm : x i ∈ maximalIdeal A := hx ▸ Ideal.subset_span ⟨i, rfl⟩
   have hnu : ¬ IsUnit (f (x i)) := by
     rw [isUnit_map_iff f]
     exact hxm
-  refine ⟨i, hxi, fun hu => hnu (hφ (x i) ▸ hu.map φ), (maximalIdeal V).comap φ,
-    Ideal.comap_isPrime _ _, ?_, ?_⟩
+  refine ⟨
+    i,
+    hxi,
+    fun hu => hnu (hφ (x i) ▸ hu.map φ),
+    (maximalIdeal V).comap φ,
+    Ideal.comap_isPrime _ _,
+    ?_,
+    ?_
+  ⟩
   · rw [Ideal.mem_comap, hφ]
     exact hnu
   · ext a
-    rw [Ideal.mem_comap, Ideal.mem_comap, hφ, mem_maximalIdeal, mem_nonunits_iff,
-      mem_maximalIdeal, mem_nonunits_iff, isUnit_map_iff f]
+    rw [Ideal.mem_comap, Ideal.mem_comap, hφ, mem_maximalIdeal, mem_nonunits_iff, mem_maximalIdeal,
+      mem_nonunits_iff, isUnit_map_iff f]
 
 end GroundTheory.Heights₂.Heights.Model

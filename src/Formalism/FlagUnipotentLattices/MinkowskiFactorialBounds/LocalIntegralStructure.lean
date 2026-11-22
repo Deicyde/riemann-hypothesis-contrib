@@ -12,7 +12,9 @@ set_option linter.all false
 
 namespace Formalism.HermitianLatticeCounting.P
 
-theorem card_range_nsmul_mul_card_le : Formalism.HermitianLatticeCounting.LocalIntegralStructure.TorsionIndex := Formalism.SLP.Final.torsionIndex
+theorem card_range_nsmul_mul_card_le
+    : Formalism.HermitianLatticeCounting.LocalIntegralStructure.TorsionIndex :=
+  Formalism.SLP.Final.torsionIndex
 
 theorem orthogonal_complement_formula : PerpCompl := by
   intro K U _ _ _ _ σ hσ B hR hL r A A' hU hA hA' hsup
@@ -21,12 +23,15 @@ theorem orthogonal_complement_formula : PerpCompl := by
   have lower : ∀ S : Submodule K U, finrank K S = r + 1 → r + 1 ≤ finrank K (perpR B S) := by
     intro S hS
     let bs := Module.finBasisOfFinrankEq K S hS
-    let Φ : U →ₗ[K] (Fin (r + 1) → K) :=
-      { toFun := fun x i => σ (B (bs i : U) x)
-        map_add' := by intro x y; ext i; simp
-        map_smul' := by intro k x; ext i; simp [hσ] }
+    let Φ : U →ₗ[K] (Fin (r + 1) → K) := {
+      toFun := fun x i => σ (B (bs i : U) x)
+      map_add' := by intro x y; ext i; simp
+      map_smul' := by intro k x; ext i; simp [hσ]
+    }
     have hker : LinearMap.ker Φ = perpR B S := by
-      ext x; rw [LinearMap.mem_ker, mem]; constructor
+      ext x
+      rw [LinearMap.mem_ker, mem]
+      constructor
       · intro h a ha
         have hi : ∀ i, B (bs i : U) x = 0 := by
           intro i
@@ -37,16 +42,20 @@ theorem orthogonal_complement_formula : PerpCompl := by
           set_option synthInstance.maxHeartbeats 100000 in
             rw [map_sum] at h4
           simpa only [map_smul, Submodule.subtype_apply] using h4.symm
-        rw [h3]; simp [hi]
-      · intro h; ext i
+        rw [h3]
+        simp [hi]
+      · intro h
+        ext i
         show σ (B (bs i : U) x) = 0
         rw [h _ (bs i).2, map_zero]
     have h1 := LinearMap.finrank_range_add_finrank_ker Φ
     have hr : finrank K (LinearMap.range Φ) ≤ r + 1 := by
       simpa using Submodule.finrank_le (LinearMap.range Φ)
-    rw [hker] at h1; omega
+    rw [hker] at h1
+    omega
   have hinf : perpR B A ⊓ perpR B A' = ⊥ := by
-    rw [eq_bot_iff]; intro x hx
+    rw [eq_bot_iff]
+    intro x hx
     obtain ⟨h1, h2⟩ := hx
     have h1' := (mem A x).mp h1
     have h2' := (mem A' x).mp h2
@@ -169,8 +178,10 @@ lemma det_from_blocks_single (r : ℕ) (W Z : Matrix (Fin (r + 1)) (Fin (r + 1))
 
 theorem gram_determinant_general : GramDetGen := by
   intro R _ r Z W t t'
-  have hdiag : ∀ s : R, (Matrix.diagonal fun i : Fin (r + 1) => if i = Fin.last r then -s else 0) =
-      (-s) • Matrix.single (Fin.last r) (Fin.last r) (1 : R) := by
+  have hdiag
+      : ∀ s : R,
+        (Matrix.diagonal fun i : Fin (r + 1) => if i = Fin.last r then -s else 0)
+          = (-s) • Matrix.single (Fin.last r) (Fin.last r) (1 : R) := by
     intro s
     ext i j
     by_cases hi : i = Fin.last r
@@ -180,11 +191,12 @@ theorem gram_determinant_general : GramDetGen := by
         simp
       · simp [Matrix.diagonal_apply, Matrix.single_apply, Ne.symm hj]
     · simp [Matrix.diagonal_apply, Matrix.single_apply, hi, Ne.symm hi]
-  have hS : Matrix.fromBlocks (Matrix.diagonal fun i : Fin (r + 1) => if i = Fin.last r then -t else 0) W Z
-      (Matrix.diagonal fun i : Fin (r + 1) => if i = Fin.last r then -t' else 0) *
-      Matrix.fromBlocks 0 1 1 0 =
-      Matrix.fromBlocks W ((-t) • Matrix.single (Fin.last r) (Fin.last r) (1 : R))
-        ((-t') • Matrix.single (Fin.last r) (Fin.last r) (1 : R)) Z := by
+  have hS
+      : Matrix.fromBlocks (Matrix.diagonal fun i : Fin (r + 1) => if i = Fin.last r then -t else 0)
+            W Z (Matrix.diagonal fun i : Fin (r + 1) => if i = Fin.last r then -t' else 0)
+          * Matrix.fromBlocks 0 1 1 0
+        = Matrix.fromBlocks W ((-t) • Matrix.single (Fin.last r) (Fin.last r) (1 : R))
+          ((-t') • Matrix.single (Fin.last r) (Fin.last r) (1 : R)) Z := by
     rw [hdiag t, hdiag t', Matrix.fromBlocks_multiply]
     simp
   have hdetS := det_swap_blocks_alt (R := R) (n := Fin (r + 1))
@@ -196,10 +208,17 @@ theorem gram_determinant_general : GramDetGen := by
   have hsq : ((-1 : R) ^ (r + 1)) * ((-1) ^ (r + 1)) = 1 := by
     rw [← mul_pow]
     simp
-  have key : ∀ x : R, x * (-1) ^ (r + 1) = W.det * Z.det - t * t' *
-      (W.submatrix Fin.castSucc Fin.castSucc).det * (Z.submatrix Fin.castSucc Fin.castSucc).det →
-      x = (-1) ^ (r + 1) * (Z.det * W.det - t * t' * (Z.submatrix Fin.castSucc Fin.castSucc).det *
-        (W.submatrix Fin.castSucc Fin.castSucc).det) := by
+  have key
+      : ∀ x : R,
+        x * (-1) ^ (r + 1)
+            = W.det * Z.det
+              - t * t' * (W.submatrix Fin.castSucc Fin.castSucc).det
+                * (Z.submatrix Fin.castSucc Fin.castSucc).det
+          → x
+            = (-1) ^ (r + 1)
+              * (Z.det * W.det
+                - t * t' * (Z.submatrix Fin.castSucc Fin.castSucc).det
+                  * (W.submatrix Fin.castSucc Fin.castSucc).det) := by
     intro x hx
     linear_combination ((-1 : R) ^ (r + 1)) * hx - x * hsq
   exact key _ h1
@@ -266,46 +285,44 @@ theorem L4_arithmetic_square : DetIndexProductInequalitySq := by
   have hc : 0 ≤ (2 / g) ^ (e * f) := pow_nonneg (div_nonneg (by norm_num) hg.le) _
   have ha : 0 ≤ dLa₁ * i₁ ^ 2 := mul_nonneg hL₁ (sq_nonneg _)
   have hb : 0 ≤ dLa₂ * i₂ ^ 2 := mul_nonneg hL₂ (sq_nonneg _)
-  have hab : (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) ≤ G0₁ * G0₂ :=
-    mul_le_mul hG₁ hG₂ hb (ha.trans hG₁)
+  have hab : (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) ≤ G0₁ * G0₂ := mul_le_mul hG₁ hG₂ hb (ha.trans hG₁)
   have hG : 0 ≤ G0₁ * G0₂ := (mul_nonneg ha hb).trans hab
   have hF : 1 ≤ 4 ^ (e * f) * (dPs₁ * dPs₂) / g ^ (2 * f * e) := by
     rw [← mul_assoc]
     first
-      | exact (one_le_div hq).2 hgP
-      | exact (one_le_div₀ hq).2 hgP
-      | exact (le_div_iff₀ hq).2 (by rw [one_mul]; exact hgP)
+    | exact (one_le_div hq).2 hgP
+    | exact (one_le_div₀ hq).2 hgP
+    | exact (le_div_iff₀ hq).2 (by rw [one_mul]; exact hgP)
   have e1 : (detM * i₁ * i₂) ^ 2 = (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) / (dPs₁ * dPs₂) := by
     rw [show (detM * i₁ * i₂) ^ 2 = detM ^ 2 * i₁ ^ 2 * i₂ ^ 2 by ring, hdet]
     ring
   have hsq : (detM * i₁ * i₂) ^ 2 ≤ ((2 / g) ^ (e * f)) ^ 2 * (G0₁ * G0₂) := by
     rw [pow_two_div_sq_identity g e f, e1]
-    have h4 : (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) ≤
-        4 ^ (e * f) / g ^ (2 * f * e) * (G0₁ * G0₂) * (dPs₁ * dPs₂) :=
-      calc (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) ≤ G0₁ * G0₂ := hab
+    have h4
+        : (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2)
+          ≤ 4 ^ (e * f) / g ^ (2 * f * e) * (G0₁ * G0₂) * (dPs₁ * dPs₂) :=
+      calc
+        (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2)
+          ≤ G0₁ * G0₂ := hab
         _ ≤ (G0₁ * G0₂) * (4 ^ (e * f) * (dPs₁ * dPs₂) / g ^ (2 * f * e)) :=
           le_mul_of_one_le_right hG hF
         _ = 4 ^ (e * f) / g ^ (2 * f * e) * (G0₁ * G0₂) * (dPs₁ * dPs₂) := by ring
-    first
-      | exact (div_le_iff₀ hP).2 h4
-      | exact (div_le_iff hP).2 h4
+    first | exact (div_le_iff₀ hP).2 h4 | exact (div_le_iff hP).2 h4
   by_cases h : detM ≤ 0
   · have h0 : detM * i₁ * i₂ ≤ 0 := by
       rw [mul_assoc]
       exact mul_nonpos_iff.2 (Or.inr ⟨h, mul_nonneg hi₁ hi₂⟩)
     exact h0.trans (mul_nonneg hc (Real.sqrt_nonneg _))
   · have hL : 0 ≤ detM * i₁ * i₂ := mul_nonneg (mul_nonneg (not_le.mp h).le hi₁) hi₂
-    have hs : Real.sqrt ((detM * i₁ * i₂) ^ 2) ≤
-        Real.sqrt (((2 / g) ^ (e * f)) ^ 2 * (G0₁ * G0₂)) := by
-      first
-        | exact Real.sqrt_le_sqrt hsq
-        | gcongr
+    have hs
+        : Real.sqrt ((detM * i₁ * i₂) ^ 2) ≤ Real.sqrt (((2 / g) ^ (e * f)) ^ 2 * (G0₁ * G0₂)) := by
+      first | exact Real.sqrt_le_sqrt hsq | gcongr
     rw [Real.sqrt_sq hL, Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq hc] at hs
     exact hs
 
 theorem L5_arithmetic_square : DetIndexProductPlacesInequalitySq := by
-  intro detM dLa₁ dLa₂ dPs₁ dPs₂ P₁ P₂ dQ₁ dQ₂ i₁ i₂ G0₁ G0₂ g NT K₁ K₂ Nr₁ Nr₂ e f
-    hP₁ hP₂ hQ₁ hQ₂ hg hi₁ hi₂ hL₁ hL₂ hNT hK₁ hK₂ hN₁ hN₂ hdet hd₁ hd₂ hG₁ hG₂ hT₁ hT₂ hgQ
+  intro detM dLa₁ dLa₂ dPs₁ dPs₂ P₁ P₂ dQ₁ dQ₂ i₁ i₂ G0₁ G0₂ g NT K₁ K₂ Nr₁ Nr₂ e f hP₁ hP₂ hQ₁ hQ₂
+    hg hi₁ hi₂ hL₁ hL₂ hNT hK₁ hK₂ hN₁ hN₂ hdet hd₁ hd₂ hG₁ hG₂ hT₁ hT₂ hgQ
   have hq : 0 < g ^ (2 * f * e) := pow_pos hg _
   have hc : 0 ≤ (2 / g) ^ (e * f) := pow_nonneg (div_nonneg (by norm_num) hg.le) _
   have ha : 0 ≤ dLa₁ * i₁ ^ 2 := mul_nonneg hL₁ (sq_nonneg _)
@@ -330,60 +347,68 @@ theorem L5_arithmetic_square : DetIndexProductPlacesInequalitySq := by
   have hPP : 0 < P₁ * P₂ := mul_pos hP₁ hP₂
   have hF : 1 ≤ 4 ^ (e * f) * (dQ₁ * dQ₂) / g ^ (2 * f * e) := by
     rw [← mul_assoc]
-    first
-      | exact (one_le_div hq).2 hgQ
-      | exact (one_le_div₀ hq).2 hgQ
+    first | exact (one_le_div hq).2 hgQ | exact (one_le_div₀ hq).2 hgQ
   have hNN : NT * NT ≤ (P₁ * (Nr₂ * K₂ ^ 2)) * (P₂ * (Nr₁ * K₁ ^ 2)) :=
     mul_le_mul hp1 hp2 hNT.le (le_trans hNT.le hp1)
-  have key : (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) * (NT * NT) ≤
-      (G0₁ * G0₂) * (K₁ * K₂) ^ 2 * (P₁ * P₂) * (4 ^ (e * f) * (dQ₁ * dQ₂) / g ^ (2 * f * e)) := by
-    calc (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) * (NT * NT)
-        ≤ (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) * ((P₁ * (Nr₂ * K₂ ^ 2)) * (P₂ * (Nr₁ * K₁ ^ 2))) :=
-          mul_le_mul_of_nonneg_left hNN (mul_nonneg ha hb)
+  have key
+      : (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) * (NT * NT)
+        ≤ (G0₁ * G0₂) * (K₁ * K₂) ^ 2 * (P₁ * P₂)
+          * (4 ^ (e * f) * (dQ₁ * dQ₂) / g ^ (2 * f * e)) := by
+    calc
+      (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) * (NT * NT)
+          ≤ (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) * ((P₁ * (Nr₂ * K₂ ^ 2)) * (P₂ * (Nr₁ * K₁ ^ 2))) :=
+        mul_le_mul_of_nonneg_left hNN (mul_nonneg ha hb)
       _ = ((dLa₁ * i₁ ^ 2 * Nr₁) * (dLa₂ * i₂ ^ 2 * Nr₂)) * ((K₁ * K₂) ^ 2 * (P₁ * P₂)) := by ring
       _ ≤ (G0₁ * G0₂) * ((K₁ * K₂) ^ 2 * (P₁ * P₂)) :=
-          mul_le_mul_of_nonneg_right (mul_le_mul hA hB (mul_nonneg hb hN₂.le) hG1)
-            (mul_nonneg (sq_nonneg _) hPP.le)
+        mul_le_mul_of_nonneg_right (mul_le_mul hA hB (mul_nonneg hb hN₂.le) hG1)
+          (mul_nonneg (sq_nonneg _) hPP.le)
       _ = (G0₁ * G0₂) * (K₁ * K₂) ^ 2 * (P₁ * P₂) * 1 := by ring
       _ ≤ (G0₁ * G0₂) * (K₁ * K₂) ^ 2 * (P₁ * P₂) * (4 ^ (e * f) * (dQ₁ * dQ₂) / g ^ (2 * f * e)) :=
-          mul_le_mul_of_nonneg_left hF (mul_nonneg (mul_nonneg hG (sq_nonneg _)) hPP.le)
-  have hR : ((2 / g) ^ (e * f) * K₁ * K₂ / NT) ^ 2 * (G0₁ * G0₂) =
-      ((G0₁ * G0₂) * (K₁ * K₂) ^ 2 * (P₁ * P₂) * (4 ^ (e * f) * (dQ₁ * dQ₂) / g ^ (2 * f * e))
-        / (NT * NT)) / ((P₁ * dQ₁) * (P₂ * dQ₂)) := by
-    rw [show ((2 / g) ^ (e * f) * K₁ * K₂ / NT) ^ 2 =
-      ((2 / g) ^ (e * f)) ^ 2 * (K₁ * K₂) ^ 2 / (NT * NT) by ring, pow_two_div_sq_identity]
+        mul_le_mul_of_nonneg_left hF (mul_nonneg (mul_nonneg hG (sq_nonneg _)) hPP.le)
+  have hR
+      : ((2 / g) ^ (e * f) * K₁ * K₂ / NT) ^ 2 * (G0₁ * G0₂)
+        = ((G0₁ * G0₂) * (K₁ * K₂) ^ 2 * (P₁ * P₂) * (4 ^ (e * f) * (dQ₁ * dQ₂) / g ^ (2 * f * e))
+            / (NT * NT))
+          / ((P₁ * dQ₁) * (P₂ * dQ₂)) := by
+    rw [show ((2 / g) ^ (e * f) * K₁ * K₂ / NT) ^ 2
+          = ((2 / g) ^ (e * f)) ^ 2 * (K₁ * K₂) ^ 2 / (NT * NT) by
+        ring,
+      pow_two_div_sq_identity]
     field_simp [hP₁.ne', hP₂.ne', hQ₁.ne', hQ₂.ne', hNT.ne', hq.ne'] <;> ring
-  have hL2 : (detM * i₁ * i₂) ^ 2 =
-      (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) / ((P₁ * dQ₁) * (P₂ * dQ₂)) := by
+  have hL2
+      : (detM * i₁ * i₂) ^ 2 = (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) / ((P₁ * dQ₁) * (P₂ * dQ₂)) := by
     rw [show (detM * i₁ * i₂) ^ 2 = detM ^ 2 * i₁ ^ 2 * i₂ ^ 2 by ring, hdet, hd₁, hd₂]
     ring
   have hPQ : 0 < (P₁ * dQ₁) * (P₂ * dQ₂) := mul_pos (mul_pos hP₁ hQ₁) (mul_pos hP₂ hQ₂)
   have hNT2 : 0 < NT * NT := mul_pos hNT hNT
-  have hk : (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2) ≤
-      (G0₁ * G0₂) * (K₁ * K₂) ^ 2 * (P₁ * P₂) * (4 ^ (e * f) * (dQ₁ * dQ₂) / g ^ (2 * f * e))
-        / (NT * NT) := (le_div_iff₀ hNT2).2 key
+  have hk
+      : (dLa₁ * i₁ ^ 2) * (dLa₂ * i₂ ^ 2)
+        ≤ (G0₁ * G0₂) * (K₁ * K₂) ^ 2 * (P₁ * P₂) * (4 ^ (e * f) * (dQ₁ * dQ₂) / g ^ (2 * f * e))
+          / (NT * NT) :=
+    (le_div_iff₀ hNT2).2 key
   have hsq : (detM * i₁ * i₂) ^ 2 ≤ ((2 / g) ^ (e * f) * K₁ * K₂ / NT) ^ 2 * (G0₁ * G0₂) := by
     rw [hL2, hR]
     first
-      | exact div_le_div_of_nonneg_right hk hPQ.le
-      | exact (div_le_div_iff_of_pos_right hPQ).2 hk
-      | exact div_le_div_of_le_right hk hPQ
+    | exact div_le_div_of_nonneg_right hk hPQ.le
+    | exact (div_le_div_iff_of_pos_right hPQ).2 hk
+    | exact div_le_div_of_le_right hk hPQ
   have hRc : 0 ≤ (2 / g) ^ (e * f) * K₁ * K₂ / NT :=
     div_nonneg (mul_nonneg (mul_nonneg hc hK₁.le) hK₂.le) hNT.le
   by_cases h : detM ≤ 0
   · have h0 : detM * i₁ * i₂ ≤ 0 := by
       rw [mul_assoc]
       exact mul_nonpos_iff.2 (Or.inr ⟨h, mul_nonneg hi₁ hi₂⟩)
-    exact h0.trans (div_nonneg (mul_nonneg (mul_nonneg (mul_nonneg hc (Real.sqrt_nonneg _))
-      hK₁.le) hK₂.le) hNT.le)
+    exact h0.trans (div_nonneg
+      (mul_nonneg (mul_nonneg (mul_nonneg hc (Real.sqrt_nonneg _)) hK₁.le) hK₂.le) hNT.le)
   · have hL : 0 ≤ detM * i₁ * i₂ := mul_nonneg (mul_nonneg (not_le.mp h).le hi₁) hi₂
-    have hs : Real.sqrt ((detM * i₁ * i₂) ^ 2) ≤
-        Real.sqrt (((2 / g) ^ (e * f) * K₁ * K₂ / NT) ^ 2 * (G0₁ * G0₂)) := by
-      first
-        | exact Real.sqrt_le_sqrt hsq
-        | gcongr
+    have hs
+        : Real.sqrt ((detM * i₁ * i₂) ^ 2)
+          ≤ Real.sqrt (((2 / g) ^ (e * f) * K₁ * K₂ / NT) ^ 2 * (G0₁ * G0₂)) := by
+      first | exact Real.sqrt_le_sqrt hsq | gcongr
     rw [Real.sqrt_sq hL, Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq hRc] at hs
-    calc detM * i₁ * i₂ ≤ (2 / g) ^ (e * f) * K₁ * K₂ / NT * Real.sqrt (G0₁ * G0₂) := hs
+    calc
+      detM * i₁ * i₂
+        ≤ (2 / g) ^ (e * f) * K₁ * K₂ / NT * Real.sqrt (G0₁ * G0₂) := hs
       _ = (2 / g) ^ (e * f) * Real.sqrt (G0₁ * G0₂) * K₁ * K₂ / NT := by ring
 
 section NF

@@ -15,14 +15,23 @@ open Classical
 
 variable {H : Type} {f : ℕ}
 
-def phiG (Y : Finset H) (κ : H → H → ℂ) (K : Fin f → H × ℂ → H × ℂ → ℂ) (x x' : crystallineComparison.V f) : ℂ :=
+def phiG
+    (Y : Finset H) (κ : H → H → ℂ) (K : Fin f → H × ℂ → H × ℂ → ℂ)
+    (x x' : crystallineComparison.V f)
+    : ℂ :=
   if Good x ∧ Good x' then phi Y κ K x x' else 0
 
-def phiRG (Y : Finset H) (κ : H → H → ℂ) (U P Q : Fin f → H × ℂ → H × ℂ → ℂ) (x x' : crystallineComparison.V f) : ℂ :=
+def phiRG
+    (Y : Finset H) (κ : H → H → ℂ) (U P Q : Fin f → H × ℂ → H × ℂ → ℂ)
+    (x x' : crystallineComparison.V f)
+    : ℂ :=
   if Good x ∧ Good x' then phiR Y κ U P Q x x' else 0
 
-theorem phiG_split (Y : Finset H) (κ : H → H → ℂ) (U P Q : Fin f → H × ℂ → H × ℂ → ℂ) (x x' : crystallineComparison.V f) :
-    phiG Y κ U x x' = phiRG Y κ U P Q x x' + phiG Y κ P x x' + conj (phiG Y κ P x' x) - phiG Y κ Q x x' := by
+theorem phiG_split
+    (Y : Finset H) (κ : H → H → ℂ) (U P Q : Fin f → H × ℂ → H × ℂ → ℂ)
+    (x x' : crystallineComparison.V f)
+    : phiG Y κ U x x'
+      = phiRG Y κ U P Q x x' + phiG Y κ P x x' + conj (phiG Y κ P x' x) - phiG Y κ Q x x' := by
   unfold phiG phiRG phiR
   by_cases hx : Good x
   · by_cases hx' : Good x'
@@ -31,22 +40,30 @@ theorem phiG_split (Y : Finset H) (κ : H → H → ℂ) (U P Q : Fin f → H ×
     · simp [hx, hx']
   · simp [hx]
 
-theorem phiRG_psd (Y : Finset H) (κ : H → H → ℂ) (hκ : TB.PSDOn Y κ) (U P Q : Fin f → H × ℂ → H × ℂ → ℂ)
-    (hblk : ∀ v (Xs : Finset ℂ), (∀ x ∈ Xs, x ≠ 0) → KB.BlockPSD (Y ×ˢ Xs) (Y ×ˢ Xs) (U v) (P v) (Q v))
-    (T : Finset (crystallineComparison.V f)) : TB.PSDOn T (phiRG Y κ U P Q) := by
+theorem phiRG_psd
+    (Y : Finset H) (κ : H → H → ℂ) (hκ : TB.PSDOn Y κ)
+    (U P Q : Fin f → H × ℂ → H × ℂ → ℂ)
+    (hblk
+      : ∀ v (Xs : Finset ℂ), (∀ x ∈ Xs, x ≠ 0) → KB.BlockPSD (Y ×ˢ Xs) (Y ×ˢ Xs) (U v) (P v) (Q v))
+    (T : Finset (crystallineComparison.V f))
+    : TB.PSDOn T (phiRG Y κ U P Q) := by
   classical
   set T' := T.filter (fun x => Good x) with hT'
   have hXs : ∀ v, ∀ z ∈ T'.image (fun x => x v), z ≠ 0 := by
     intro v z hz
     obtain ⟨x, hx, rfl⟩ := Finset.mem_image.mp hz
     exact (Finset.mem_filter.mp hx).2 v
-  let kv : Fin f → (H × ℂ ⊕ H × ℂ) → (H × ℂ ⊕ H × ℂ) → ℂ := fun v a b => match a, b with
+  let kv : Fin f → (H × ℂ ⊕ H × ℂ) → (H × ℂ ⊕ H × ℂ) → ℂ := fun v a b =>
+    match a, b with
     | .inl p, .inl q => U v p q
     | .inl p, .inr q => P v p q
     | .inr q, .inl p => conj (P v p q)
     | .inr p, .inr q => Q v p q
-  have hMv : ∀ v, (Matrix.of fun a b : ((Y ×ˢ T'.image (fun x => x v)).disjSum
-      (Y ×ˢ T'.image (fun x => x v))) => kv v a b).PosSemidef := by
+  have hMv
+      : ∀ v,
+        (Matrix.of
+          fun a b : ((Y ×ˢ T'.image (fun x => x v)).disjSum (Y ×ˢ T'.image (fun x => x v))) =>
+            kv v a b).PosSemidef := by
     intro v
     have h := hblk v _ (hXs v)
     unfold KB.BlockPSD TB.PSDOn at h
@@ -55,7 +72,8 @@ theorem phiRG_psd (Y : Finset H) (κ : H → H → ℂ) (hκ : TB.PSDOn Y κ) (U
     rcases a with ⟨a | a, ha⟩ <;> rcases b with ⟨b | b, hb⟩ <;> rfl
   let pt : Fin f → (T' × Y) × Bool → (H × ℂ ⊕ H × ℂ) := fun v i =>
     if i.2 then Sum.inl (i.1.2.1, i.1.1.1 v) else Sum.inr (i.1.2.1, i.1.1.1 v)
-  have hpt : ∀ v i, pt v i ∈ (Y ×ˢ T'.image (fun x => x v)).disjSum (Y ×ˢ T'.image (fun x => x v)) := by
+  have hpt
+      : ∀ v i, pt v i ∈ (Y ×ˢ T'.image (fun x => x v)).disjSum (Y ×ˢ T'.image (fun x => x v)) := by
     intro v i
     have hm : (i.1.2.1, i.1.1.1 v) ∈ Y ×ˢ T'.image (fun x => x v) :=
       Finset.mem_product.mpr ⟨i.1.2.2, Finset.mem_image_of_mem _ i.1.1.2⟩
@@ -70,26 +88,38 @@ theorem phiRG_psd (Y : Finset H) (κ : H → H → ℂ) (hκ : TB.PSDOn Y κ) (U
       convert this using 1
       ext i j
       simp
-    have hprod : ∀ s : Finset (Fin f), (Matrix.of fun i j : (T' × Y) × Bool =>
-        κ i.1.2.1 j.1.2.1 * ∏ v ∈ s, kv v (pt v i) (pt v j)).PosSemidef := by
+    have hprod
+        : ∀ s : Finset (Fin f),
+          (Matrix.of fun i j : (T' × Y) × Bool =>
+            κ i.1.2.1 j.1.2.1 * ∏ v ∈ s, kv v (pt v i) (pt v j)).PosSemidef := by
       intro s
       induction s using Finset.induction_on with
       | empty => simpa using hk
       | insert a s ha ih =>
-        have hA := (hMv a).submatrix (fun i : (T' × Y) × Bool => (⟨pt a i, hpt a i⟩ :
-          ((Y ×ˢ T'.image (fun x => x a)).disjSum (Y ×ˢ T'.image (fun x => x a)))))
+        have hA :=
+          (hMv a).submatrix (fun i : (T' × Y) × Bool =>
+            (⟨pt a i, hpt a i⟩
+              : ((Y ×ˢ T'.image (fun x => x a)).disjSum (Y ×ˢ T'.image (fun x => x a)))))
         have hh := hA.hadamard ih
-        have key : (Matrix.of fun i j : (T' × Y) × Bool =>
-            κ i.1.2.1 j.1.2.1 * ∏ v ∈ insert a s, kv v (pt v i) (pt v j)) =
-            ((Matrix.of fun a' b' : ((Y ×ˢ T'.image (fun x => x a)).disjSum
-              (Y ×ˢ T'.image (fun x => x a))) => kv a a' b').submatrix
-              (fun i => (⟨pt a i, hpt a i⟩ : ((Y ×ˢ T'.image (fun x => x a)).disjSum
-                (Y ×ˢ T'.image (fun x => x a)))))
-              (fun i => (⟨pt a i, hpt a i⟩ : ((Y ×ˢ T'.image (fun x => x a)).disjSum
-                (Y ×ˢ T'.image (fun x => x a)))))).hadamard
-            (Matrix.of fun i j : (T' × Y) × Bool => κ i.1.2.1 j.1.2.1 * ∏ v ∈ s, kv v (pt v i) (pt v j)) := by
+        have key
+            : (Matrix.of fun i j : (T' × Y) × Bool =>
+                κ i.1.2.1 j.1.2.1 * ∏ v ∈ insert a s, kv v (pt v i) (pt v j))
+              = ((Matrix.of
+                    fun a' b'
+                        : ((Y ×ˢ T'.image (fun x => x a)).disjSum (Y ×ˢ T'.image (fun x => x a))) =>
+                      kv a a' b').submatrix
+                  (fun i =>
+                    (⟨pt a i, hpt a i⟩
+                      : ((Y ×ˢ T'.image (fun x => x a)).disjSum (Y ×ˢ T'.image (fun x => x a)))))
+                  (fun i =>
+                    (⟨pt a i, hpt a i⟩
+                      : ((Y ×ˢ T'.image (fun x => x a)).disjSum
+                        (Y ×ˢ T'.image (fun x => x a)))))).hadamard
+                (Matrix.of fun i j : (T' × Y) × Bool =>
+                  κ i.1.2.1 j.1.2.1 * ∏ v ∈ s, kv v (pt v i) (pt v j)) := by
           ext i j
-          simp only [Matrix.hadamard_apply, Matrix.submatrix_apply, Matrix.of_apply, Finset.prod_insert ha]
+          simp only [Matrix.hadamard_apply, Matrix.submatrix_apply, Matrix.of_apply,
+            Finset.prod_insert ha]
           ring
         rw [key]
         exact hh
@@ -102,9 +132,11 @@ theorem phiRG_psd (Y : Finset H) (κ : H → H → ℂ) (hκ : TB.PSDOn Y κ) (U
       intro he
       exact hx (he ▸ (Finset.mem_filter.mp i.1.1.2).2)
     simp [R, this]
-  have hcol : ∀ x : T, ∀ hx : Good x.1, ∀ g : (T' × Y) × Bool → ℂ,
-      ∑ i, R i x * g i = ∑ h : Y, (g ((⟨x.1, Finset.mem_filter.mpr ⟨x.2, hx⟩⟩, h), true)
-        - g ((⟨x.1, Finset.mem_filter.mpr ⟨x.2, hx⟩⟩, h), false)) := by
+  have hcol
+      : ∀ x : T, ∀ hx : Good x.1, ∀ g : (T' × Y) × Bool → ℂ,
+        ∑ i, R i x * g i
+          = ∑ h : Y, (g ((⟨x.1, Finset.mem_filter.mpr ⟨x.2, hx⟩⟩, h), true)
+            - g ((⟨x.1, Finset.mem_filter.mpr ⟨x.2, hx⟩⟩, h), false)) := by
     intro x hx g
     rw [Fintype.sum_prod_type, Fintype.sum_prod_type]
     rw [Fintype.sum_eq_single (⟨x.1, Finset.mem_filter.mpr ⟨x.2, hx⟩⟩ : T')]
@@ -118,8 +150,9 @@ theorem phiRG_psd (Y : Finset H) (κ : H → H → ℂ) (hκ : TB.PSDOn Y κ) (U
     intro i x
     simp only [R, sg]
     split_ifs <;> simp
-  have hconjP : ∀ x y : crystallineComparison.V f, conj (phi Y κ P y x) =
-      ∑ h ∈ Y, ∑ h' ∈ Y, κ h h' * ∏ v, conj (P v (h', y v) (h, x v)) := by
+  have hconjP
+      : ∀ x y : crystallineComparison.V f,
+        conj (phi Y κ P y x) = ∑ h ∈ Y, ∑ h' ∈ Y, κ h h' * ∏ v, conj (P v (h', y v) (h, x v)) := by
     intro x y
     unfold phi
     set_option synthInstance.maxHeartbeats 100000 in
@@ -151,9 +184,13 @@ theorem phiRG_psd (Y : Finset H) (κ : H → H → ℂ) (hκ : TB.PSDOn Y κ) (U
   · have : ∀ i, R i x = 0 := hR0 x hx
     simp [this, phiRG, hx]
 
-theorem phi_bound (Y : Finset H) (κ : H → H → ℂ) (K : Fin f → H × ℂ → H × ℂ → ℂ) (B : ℝ) (hB : 0 ≤ B)
-    (x x' : crystallineComparison.V f) (hK : ∀ v, ∀ h ∈ Y, ∀ h' ∈ Y, ‖K v (h, x v) (h', x' v)‖ ≤ B) :
-    ‖phi Y κ K x x'‖ ≤ (∑ h ∈ Y, ∑ h' ∈ Y, ‖κ h h'‖) * B ^ f := by
+theorem phi_bound
+    (Y : Finset H)
+    (κ : H → H → ℂ)
+    (K : Fin f → H × ℂ → H × ℂ → ℂ)
+    (B : ℝ) (hB : 0 ≤ B)
+    (x x' : crystallineComparison.V f) (hK : ∀ v, ∀ h ∈ Y, ∀ h' ∈ Y, ‖K v (h, x v) (h', x' v)‖ ≤ B)
+    : ‖phi Y κ K x x'‖ ≤ (∑ h ∈ Y, ∑ h' ∈ Y, ‖κ h h'‖) * B ^ f := by
   unfold phi
   rw [Finset.sum_mul]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun h hh => ?_)
@@ -161,8 +198,9 @@ theorem phi_bound (Y : Finset H) (κ : H → H → ℂ) (K : Fin f → H × ℂ 
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun h' hh' => ?_)
   rw [norm_mul, norm_prod]
   gcongr
-  calc ∏ v, ‖K v (h, x v) (h', x' v)‖ ≤ ∏ _v : Fin f, B :=
-        Finset.prod_le_prod₀ (fun v _ => norm_nonneg _) (fun v _ => hK v h hh h' hh')
+  calc
+    ∏ v, ‖K v (h, x v) (h', x' v)‖ ≤ ∏ _v : Fin f, B :=
+      Finset.prod_le_prod₀ (fun v _ => norm_nonneg _) (fun v _ => hK v h hh h' hh')
     _ = B ^ f := by simp
 
 end

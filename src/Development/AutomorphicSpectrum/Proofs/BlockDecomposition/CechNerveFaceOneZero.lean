@@ -9,8 +9,10 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
 open CategoryTheory.ComposableArrows
 
 namespace GlobalTheory.CompanionTheory.Dict
@@ -43,30 +45,48 @@ theorem L0_bijective_cochain : Function.Bijective (L0 F) := by
   exact congr_fun h X
 
 theorem L1_bijective_cochain : Function.Bijective (L1 F) := by
-  refine ⟨fun f g h => funext fun c => ?_, fun e => ⟨fun c => e (c.obj 0) (c.obj (Fin.last 1))
-    (c.map (homOfLE (Fin.zero_le _))), rfl⟩⟩
+  refine ⟨
+    fun f g h => funext fun c => ?_,
+    fun e => ⟨fun c => e (c.obj 0) (c.obj (Fin.last 1)) (c.map (homOfLE (Fin.zero_le _))), rfl⟩
+  ⟩
   obtain ⟨X₀, X₁, φ, rfl⟩ := ComposableArrows.mk₁_surjective c
   exact congr_fun (congr_fun (congr_fun h X₀) X₁) φ
 
 theorem L2_bijective_cochain : Function.Bijective (L2 F) := by
-  refine ⟨fun f g h => funext fun c => ?_, fun e => ⟨fun c => e (c.obj 0) (c.obj 1) (c.obj (Fin.last 2))
-    (c.map (homOfLE (show (0 : Fin 3) ≤ 1 by decide)))
-    (c.map (homOfLE (show (1 : Fin 3) ≤ Fin.last 2 by decide))), rfl⟩⟩
+  refine ⟨
+    fun f g h => funext fun c => ?_,
+    fun e => ⟨
+      fun c =>
+        e (c.obj 0) (c.obj 1) (c.obj (Fin.last 2))
+          (c.map (homOfLE (show (0 : Fin 3) ≤ 1 by decide)))
+          (c.map (homOfLE (show (1 : Fin 3) ≤ Fin.last 2 by decide))),
+      rfl
+    ⟩
+  ⟩
   obtain ⟨X₀, X₁, X₂, φ, ψ, rfl⟩ := ComposableArrows.mk₂_surjective c
   exact congr_fun (congr_fun (congr_fun (congr_fun (congr_fun h X₀) X₁) X₂) φ) ψ
 
 theorem L3_bijective_cochain : Function.Bijective (L3 F) := by
-  refine ⟨fun f g h => funext fun c => ?_, fun e => ⟨fun c => e (c.obj 0) (c.obj 1) (c.obj 2)
-    (c.obj (Fin.last 3)) (c.map (homOfLE (show (0 : Fin 4) ≤ 1 by decide)))
-    (c.map (homOfLE (show (1 : Fin 4) ≤ 2 by decide)))
-    (c.map (homOfLE (show (2 : Fin 4) ≤ Fin.last 3 by decide))), rfl⟩⟩
+  refine ⟨
+    fun f g h => funext fun c => ?_,
+    fun e => ⟨
+      fun c =>
+        e (c.obj 0) (c.obj 1) (c.obj 2) (c.obj (Fin.last 3))
+          (c.map (homOfLE (show (0 : Fin 4) ≤ 1 by decide)))
+          (c.map (homOfLE (show (1 : Fin 4) ≤ 2 by decide)))
+          (c.map (homOfLE (show (2 : Fin 4) ≤ Fin.last 3 by decide))),
+      rfl
+    ⟩
+  ⟩
   obtain ⟨X₀, X₁, X₂, X₃, φ, ψ, χ, rfl⟩ := ComposableArrows.mk₃_surjective c
-  exact congr_fun (congr_fun (congr_fun (congr_fun (congr_fun (congr_fun (congr_fun h X₀) X₁) X₂) X₃) φ) ψ) χ
+  exact congr_fun
+    (congr_fun (congr_fun (congr_fun (congr_fun (congr_fun (congr_fun h X₀) X₁) X₂) X₃) φ) ψ) χ
 
-theorem cof_eq {n : ℕ} (i : Fin (n + 2)) (c : Fin (n + 2) ⥤ C) (c' : Fin (n + 1) ⥤ C)
-    (h : face i c = c') (u : c'.obj (Fin.last n) ⟶ c.obj (Fin.last (n + 1)))
-    (hu : HEq (c.map (homOfLE (Fin.le_last (i.succAbove (Fin.last n))))) u) (f : Cn F n) :
-    cof F n i f c = mp F u (f c') := by
+theorem cof_eq
+    {n : ℕ} (i : Fin (n + 2)) (c : Fin (n + 2) ⥤ C) (c' : Fin (n + 1) ⥤ C) (h : face i c = c')
+    (u : c'.obj (Fin.last n) ⟶ c.obj (Fin.last (n + 1)))
+    (hu : HEq (c.map (homOfLE (Fin.le_last (i.succAbove (Fin.last n))))) u) (f : Cn F n)
+    : cof F n i f c = mp F u (f c') := by
   subst h
   obtain rfl := eq_of_heq hu
   rfl
@@ -74,12 +94,12 @@ theorem cof_eq {n : ℕ} (i : Fin (n + 2)) (c : Fin (n + 2) ⥤ C) (c' : Fin (n 
 theorem dn0 (f : Cn F 0) (c : Fin 2 ⥤ C) : dn F 0 f c = cof F 0 0 f c - cof F 0 1 f c := by
   simp [dn, Fin.sum_univ_two, sub_eq_add_neg]
 
-theorem dn1 (f : Cn F 1) (c : Fin 3 ⥤ C) :
-    dn F 1 f c = cof F 1 0 f c - cof F 1 1 f c + cof F 1 2 f c := by
+theorem dn1 (f : Cn F 1) (c : Fin 3 ⥤ C)
+    : dn F 1 f c = cof F 1 0 f c - cof F 1 1 f c + cof F 1 2 f c := by
   simp [dn, Fin.sum_univ_three, pow_succ, sub_eq_add_neg]
 
-theorem dn2 (f : Cn F 2) (c : Fin 4 ⥤ C) :
-    dn F 2 f c = cof F 2 0 f c - cof F 2 1 f c + cof F 2 2 f c - cof F 2 3 f c := by
+theorem dn2 (f : Cn F 2) (c : Fin 4 ⥤ C)
+    : dn F 2 f c = cof F 2 0 f c - cof F 2 1 f c + cof F 2 2 f c - cof F 2 3 f c := by
   simp [dn, Fin.sum_univ_four, pow_succ, sub_eq_add_neg]
 
 theorem eq_mk₁ (c : ComposableArrows C 1) (x : c.left ⟶ c.right) (h : c.hom = x) : c = mk₁ x := by
@@ -87,8 +107,10 @@ theorem eq_mk₁ (c : ComposableArrows C 1) (x : c.left ⟶ c.right) (h : c.hom 
   subst h
   rfl
 
-theorem eq_mk₂ (c : ComposableArrows C 2) (x : c.obj' 0 ⟶ c.obj' 1) (y : c.obj' 1 ⟶ c.obj' 2)
-    (hx : map' c 0 1 = x) (hy : map' c 1 2 = y) : c = mk₂ x y := by
+theorem eq_mk₂
+    (c : ComposableArrows C 2) (x : c.obj' 0 ⟶ c.obj' 1) (y : c.obj' 1 ⟶ c.obj' 2)
+    (hx : map' c 0 1 = x) (hy : map' c 1 2 = y)
+    : c = mk₂ x y := by
   obtain ⟨X₀, X₁, X₂, g₀, g₁, rfl⟩ := ComposableArrows.mk₂_surjective c
   subst hx hy
   rfl
@@ -97,10 +119,8 @@ section Faces
 
 variable {T T' T'' T''' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T''')
 
-theorem cech_nerve_face_one_zero : face 0 (mk₁ φ) = mk₀ T' := by
-  exact ComposableArrows.ext₀ rfl
-theorem cech_nerve_face_one_one : face 1 (mk₁ φ) = mk₀ T := by
-  exact ComposableArrows.ext₀ rfl
+theorem cech_nerve_face_one_zero : face 0 (mk₁ φ) = mk₀ T' := by exact ComposableArrows.ext₀ rfl
+theorem cech_nerve_face_one_one : face 1 (mk₁ φ) = mk₀ T := by exact ComposableArrows.ext₀ rfl
 theorem cech_nerve_face_two_zero : face 0 (mk₂ φ ψ) = mk₁ ψ := by
   exact eq_mk₁ (face 0 (mk₂ φ ψ)) ψ rfl
 theorem cech_nerve_face_two_one : face 1 (mk₂ φ ψ) = mk₁ (φ ≫ ψ) := by
@@ -158,10 +178,20 @@ theorem L3_dn_two_eq_d2_L2 (f : Cn F 2) : L3 F (dn F 2 f) = d2 F (L2 F f) := by
 
 theorem dictSt : DictSt := by
   intro R _ C _ F
-  refine ⟨LinearEquiv.ofBijective (L0 F) (L0_bijective_cochain F), LinearEquiv.ofBijective (L1 F) (L1_bijective_cochain F),
-    LinearEquiv.ofBijective (L2 F) (L2_bijective_cochain F), LinearEquiv.ofBijective (L3 F) (L3_bijective_cochain F),
-    fun _ _ => ?_, fun _ _ _ _ => ?_, fun _ _ _ _ _ _ => ?_, fun _ _ _ _ _ _ _ _ => ?_,
-    fun f => ?_, fun f => ?_, fun f => ?_⟩ <;> simp only [LinearEquiv.ofBijective_apply]
+  refine ⟨
+      LinearEquiv.ofBijective (L0 F) (L0_bijective_cochain F),
+      LinearEquiv.ofBijective (L1 F) (L1_bijective_cochain F),
+      LinearEquiv.ofBijective (L2 F) (L2_bijective_cochain F),
+      LinearEquiv.ofBijective (L3 F) (L3_bijective_cochain F),
+      fun _ _ => ?_,
+      fun _ _ _ _ => ?_,
+      fun _ _ _ _ _ _ => ?_,
+      fun _ _ _ _ _ _ _ _ => ?_,
+      fun f => ?_,
+      fun f => ?_,
+      fun f => ?_
+    ⟩
+    <;> simp only [LinearEquiv.ofBijective_apply]
   · rfl
   · rfl
   · rfl

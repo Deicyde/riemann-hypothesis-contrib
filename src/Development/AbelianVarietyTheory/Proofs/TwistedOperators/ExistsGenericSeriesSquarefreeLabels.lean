@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishC
 
 @[expose] public section
 
-open Polynomial Formalism.MainNotions.ArithmeticCylinders GlobalTheory.GLq GlobalTheory.BadShare GlobalTheory.BadShare.Basic
+open Polynomial Formalism.MainNotions.ArithmeticCylinders GlobalTheory.GLq GlobalTheory.BadShare
+  GlobalTheory.BadShare.Basic
 open scoped Classical
 
 namespace GlobalTheory.GLq.SqSeries
@@ -36,15 +37,16 @@ theorem wh_one_zero (ψ : AddChar (ZMod g) ℂ) : wh ψ (fun _ : Gn g 0 => (1 : 
   rw [if_pos (hU 1), hc]
   simp
 
-theorem wh_const_mul (ψ : AddChar (ZMod g) ℂ) {n : ℕ} (c : ℂ) (χ : Gn g n → ℂ) :
-    wh ψ (fun x => c * χ x) = c * wh ψ χ := by
+theorem wh_const_mul (ψ : AddChar (ZMod g) ℂ) {n : ℕ} (c : ℂ) (χ : Gn g n → ℂ)
+    : wh ψ (fun x => c * χ x) = c * wh ψ χ := by
   unfold wh tr
   rw [Finset.mul_sum]
   exact Finset.sum_congr rfl fun x _ => by ring
 
-theorem wh_hcL (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1) (L : List (Pc g))
-    (h : ∀ p ∈ L, IsCusp p.2 ∧ p.2 1 = ∏ i ∈ Finset.Ico 1 p.1, ((g : ℂ) ^ i - 1)) :
-    wh ψ (hcL L (degL L)) = 1 := by
+theorem wh_hcL
+    (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1)
+    (L : List (Pc g)) (h : ∀ p ∈ L, IsCusp p.2 ∧ p.2 1 = ∏ i ∈ Finset.Ico 1 p.1, ((g : ℂ) ^ i - 1))
+    : wh ψ (hcL L (degL L)) = 1 := by
   induction L with
   | nil => exact wh_one_zero ψ
   | cons p L ih =>
@@ -54,14 +56,21 @@ theorem wh_hcL (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1) (L : List (Pc g))
       obtain ⟨V, -, hV⟩ := hq.2.1
       exact ⟨V, hV⟩
     have c1 := isClass_of_isChar (hch p hp.1)
-    have c2 := isClass_of_isChar (GlobalTheory.T.harishChandraProductList_isCharacter_and_perm_invariant g L L _ rfl fun q hq => hch q (hL q hq).1).1
-    rw [hcL_cons, hc, GlobalTheory.T.whittakerDimension_harishChandraInduction_mul g ψ hψ p.1 (degL L) _ (by simp [degL]) _
-      (fun y a b => by simp only [c1 a b]) (fun x a b => by simp only [c2 a b])]
+    have c2 :=
+      isClass_of_isChar (GlobalTheory.T.harishChandraProductList_isCharacter_and_perm_invariant g L
+        L _ rfl fun q hq => hch q (hL q hq).1).1
+    rw [hcL_cons, hc,
+      GlobalTheory.T.whittakerDimension_harishChandraInduction_mul g ψ hψ p.1 (degL L) _
+        (by simp [degL]) _
+        (fun y a b => by simp only [c1 a b])
+        (fun x a b => by simp only [c2 a b])]
     simp only [wh_const_mul, ih hL, mul_one]
     exact GlobalTheory.T.whittakerDimension_cuspidal_greenDegree_eq_one g ψ hψ _ _ hp.1 hp.2
 
-theorem isGeneric_of_wh (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1) {n : ℕ} (hn : 0 < n) (V : FDRep ℂ (GG g n))
-    (h : wh ψ V.character ≠ 0) : IsGeneric V.ρ := by
+theorem isGeneric_of_wh
+    (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1)
+    {n : ℕ} (hn : 0 < n) (V : FDRep ℂ (GG g n)) (h : wh ψ V.character ≠ 0)
+    : IsGeneric V.ρ := by
   have hk : 0 + 0 < n := hn
   refine ⟨levOfChar ψ hψ n false 0 0 hk, rfl, ?_⟩
   have h1 : op V.ρ (levOfChar ψ hψ n false 0 0 hk).e ≠ 0 := by
@@ -80,19 +89,26 @@ theorem isGeneric_of_wh (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1) {n : ℕ} (
     push_neg at hc
     exact h1 (LinearMap.ext hc)
   refine ⟨_, hy, fun u hu => ?_⟩
-  exact (GlobalTheory.BadShare.EpsProj.mem_range_iff V.ρ (mem_one _) (fun _ _ => mem_mul _) (chi_one _) (fun _ _ => chi_mul _) _).1
-    ⟨y, rfl⟩ u ⟨hu, fun hs => absurd hs (by simp [levOfChar])⟩
+  exact (GlobalTheory.BadShare.EpsProj.mem_range_iff V.ρ (mem_one _)
+    (fun _ _ => mem_mul _)
+    (chi_one _)
+    (fun _ _ => chi_mul _)
+    _).1 ⟨y, rfl⟩ u ⟨hu, fun hs => absurd hs (by simp [levOfChar])⟩
 
-theorem deg_hcL (L : List (Pc g)) (n : ℕ) (hn : n = degL L)
-    (h : ∀ p ∈ L, 0 < p.1 ∧ p.2 1 = ∏ i ∈ Finset.Ico 1 p.1, ((g : ℂ) ^ i - 1)) :
-    hcL L n 1 * (L.map fun p => ((g : ℂ) ^ p.1 - 1)).prod = ∏ i ∈ Finset.range n, ((g : ℂ) ^ (i + 1) - 1) := by
+theorem deg_hcL
+    (L : List (Pc g)) (n : ℕ) (hn : n = degL L)
+    (h : ∀ p ∈ L, 0 < p.1 ∧ p.2 1 = ∏ i ∈ Finset.Ico 1 p.1, ((g : ℂ) ^ i - 1))
+    : hcL L n 1 * (L.map fun p => ((g : ℂ) ^ p.1 - 1)).prod
+      = ∏ i ∈ Finset.range n, ((g : ℂ) ^ (i + 1) - 1) := by
   have H := GlobalTheory.T.harishChandraProductList_degree g L n hn
-  have e1 : (L.map fun p => ∏ i ∈ Finset.Icc 1 p.1, ((g : ℂ) ^ i - 1)).prod =
-      (L.map fun p => ((g : ℂ) ^ p.1 - 1)).prod * (L.map fun p => p.2 1).prod := by
+  have e1
+      : (L.map fun p => ∏ i ∈ Finset.Icc 1 p.1, ((g : ℂ) ^ i - 1)).prod
+        = (L.map fun p => ((g : ℂ) ^ p.1 - 1)).prod * (L.map fun p => p.2 1).prod := by
     rw [← List.prod_map_mul]
     congr 1
     refine List.map_congr_left fun p hp => ?_
-    rw [(h p hp).2, ← Finset.Ico_add_one_right_eq_Icc, Finset.prod_Ico_succ_top (h p hp).1, mul_comm]
+    rw [(h p hp).2, ← Finset.Ico_add_one_right_eq_Icc, Finset.prod_Ico_succ_top (h p hp).1,
+      mul_comm]
   have e2 : (L.map fun p => p.2 1).prod ≠ 0 := by
     refine List.prod_ne_zero fun h0 => ?_
     obtain ⟨p, hp, h1⟩ := List.mem_map.1 h0
@@ -107,18 +123,31 @@ theorem deg_hcL (L : List (Pc g)) (n : ℕ) (hn : n = degL L)
   rw [mul_right_cancel₀ e2 H, ← Finset.Ico_add_one_right_eq_Icc, Finset.prod_Ico_eq_prod_range]
   simp [add_comm]
 
-theorem exists_series : GlobalTheory.GLq.Green → ∀ (g : ℕ) [Fact g.Prime] (L : GlobalTheory.GLq.LabelDatum g) (n : ℕ), 5 ≤ g → 0 < n → ∃ τ : (ZMod g)[X] → GlobalTheory.BadShare.GG g n → ℂ, GlobalTheory.BadShare.IsSeries τ ∧ ∀ f ∈ GlobalTheory.BadShare.sqSet g n, ∀ x, (GlobalTheory.GLq.eSerC L n f).coeff x = GlobalTheory.BadShare.zc (τ f) x := by
+theorem exists_series
+    : GlobalTheory.GLq.Green
+      → ∀ (g : ℕ) [Fact g.Prime] (L : GlobalTheory.GLq.LabelDatum g) (n : ℕ),
+        5 ≤ g → 0 < n
+          → ∃ τ : (ZMod g)[X] → GlobalTheory.BadShare.GG g n → ℂ,
+            GlobalTheory.BadShare.IsSeries τ
+              ∧ ∀ f ∈ GlobalTheory.BadShare.sqSet g n, ∀ x,
+                (GlobalTheory.GLq.eSerC L n f).coeff x = GlobalTheory.BadShare.zc (τ f) x := by
   intro hG g _ L n hg hn
   obtain ⟨H1, -, H3⟩ := GlobalTheory.T.harishChandraSeriesLabel_exists_unique_GLn g L hg hG n
   have H4 := fun (f : (ZMod g)[X]) (hf : f ∈ sqSet g n) =>
     H3 f (mem_sqSet.1 hf).1 (mem_sqSet.1 hf).2.1 (mem_sqSet.1 hf).2.2.2 (mem_sqSet.1 hf).2.2.1
   choose! Q Q1 Q2 Q3 Q4 using H4
-  have hmem : ∀ f ∈ sqSet g n, IsIrr (hcL ((Q f).map Prod.snd) n) ∧ HasLabel L (hcL ((Q f).map Prod.snd) n) f := by
+  have hmem
+      : ∀ f ∈ sqSet g n,
+        IsIrr (hcL ((Q f).map Prod.snd) n) ∧ HasLabel L (hcL ((Q f).map Prod.snd) n) f := by
     intro f hf
     have : hcL ((Q f).map Prod.snd) n ∈ {χ : Gn g n → ℂ | IsIrr χ ∧ HasLabel L χ f} := by
       rw [Q4 f hf]; rfl
     exact this
-  refine ⟨fun f => hcL ((Q f).map Prod.snd) n, ⟨fun f hf f' hf' h => ?_, fun f hf => ?_⟩, fun f hf x => ?_⟩
+  refine ⟨
+    fun f => hcL ((Q f).map Prod.snd) n,
+    ⟨fun f hf f' hf' h => ?_, fun f hf => ?_⟩,
+    fun f hf x => ?_
+  ⟩
   · have a := hmem f hf
     have b := (hmem f' hf').2
     have h' : hcL ((Q f).map Prod.snd) n = hcL ((Q f').map Prod.snd) n := h
@@ -126,7 +155,9 @@ theorem exists_series : GlobalTheory.GLq.Green → ∀ (g : ℕ) [Fact g.Prime] 
     exact (H1 _ a.1).unique a.2 b
   · obtain ⟨V, hs, hV⟩ := (hmem f hf).1
     have hV' : V.character = hcL ((Q f).map Prod.snd) n := funext hV
-    have hc : ∀ p ∈ (Q f).map Prod.snd, IsCusp p.2 ∧ p.2 1 = ∏ i ∈ Finset.Ico 1 p.1, ((g : ℂ) ^ i - 1) := by
+    have hc
+        : ∀ p ∈ (Q f).map Prod.snd,
+          IsCusp p.2 ∧ p.2 1 = ∏ i ∈ Finset.Ico 1 p.1, ((g : ℂ) ^ i - 1) := by
       intro p hp
       obtain ⟨q, hq, rfl⟩ := List.mem_map.1 hp
       exact ⟨(Q1 f hf q hq).1.2.1, (Q1 f hf q hq).2⟩
@@ -139,7 +170,8 @@ theorem exists_series : GlobalTheory.GLq.Green → ∀ (g : ℕ) [Fact g.Prime] 
       exact one_ne_zero
     · have h1 := deg_hcL _ n (Q3 f hf).symm fun p hp => ⟨(hc p hp).1.1, (hc p hp).2⟩
       have hpos : ∀ i, 1 ≤ g ^ i := fun i => Nat.one_le_pow _ _ (by omega)
-      have h2 : (torusCard g f : ℂ) = (((Q f).map Prod.snd).map fun p => ((g : ℂ) ^ p.1 - 1)).prod := by
+      have h2
+          : (torusCard g f : ℂ) = (((Q f).map Prod.snd).map fun p => ((g : ℂ) ^ p.1 - 1)).prod := by
         rw [torusCard, degType, ← Q2 f hf]
         simp only [Multiset.map_coe, Multiset.prod_coe, List.map_map, Nat.cast_list_prod]
         congr 1

@@ -8,8 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.nerve_convex :
-    ∀ {I F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] (X : Set F) (A : I → Set F), Convex ℝ X → X.Nonempty → (∀ i, IsClosed (A i)) → (∀ i, Convex ℝ (A i)) → (∀ s : Set F, s.Finite → s ⊆ X → {i | (convexHull ℝ s ∩ A i).Nonempty}.Finite) → (∀ x ∈ X, ∃ i, x ∈ A i) → Acyc (nerve X A) := by
+theorem UpperTheory.V.ConeExtensionAcyclic.nerve_convex
+    : ∀ {I F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] (X : Set F) (A : I → Set F),
+      Convex ℝ X → X.Nonempty → (∀ i, IsClosed (A i)) → (∀ i, Convex ℝ (A i))
+        → (∀ s : Set F, s.Finite → s ⊆ X → {i | (convexHull ℝ s ∩ A i).Nonempty}.Finite)
+        → (∀ x ∈ X, ∃ i, x ∈ A i)
+        → Acyc (nerve X A) := by
   intro I F _ _ X A hX hne hcl hcv hfin hcov
   apply acyc_directed
   intro n s hs

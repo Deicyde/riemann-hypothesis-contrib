@@ -9,7 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -49,6 +50,5 @@ lemma pG_act {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I
     | exact fstG_act I e (ιD.onB.act a)
     | (unfold DegPre.prBe; simp; done)
     | (unfold DegPre.prBe; simp; exact pullback.lift_fst _ _ _)
-
 
 end ReciprocityTheory.ChartRestriction.G.DVR

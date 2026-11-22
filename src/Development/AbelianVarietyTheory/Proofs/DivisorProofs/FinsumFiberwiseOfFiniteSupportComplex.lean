@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem finsum_fiberwise_of_finite_support {A B : Type} (ρ : A → B) (f : A → ℂ)
-    (hf : (Function.support f).Finite) :
-    ∑ᶠ a, f a = ∑ᶠ b, ∑ᶠ a : {a // ρ a = b}, f a.1 := by
+theorem finsum_fiberwise_of_finite_support
+    {A B : Type} (ρ : A → B) (f : A → ℂ) (hf : (Function.support f).Finite)
+    : ∑ᶠ a, f a = ∑ᶠ b, ∑ᶠ a : {a // ρ a = b}, f a.1 := by
   classical
   set S := hf.toFinset with hS
   have hsupp : Function.support f ⊆ (S : Set A) := by simp [hS]
@@ -23,8 +23,7 @@ theorem finsum_fiberwise_of_finite_support {A B : Type} (ρ : A → B) (f : A �
     obtain ⟨_, h⟩ := ha
     exact hsupp h
   simp_rw [hinner]
-  rw [finsum_eq_sum_of_support_subset f hsupp,
-    finsum_eq_sum_of_support_subset _ (s := S.image ρ)]
+  rw [finsum_eq_sum_of_support_subset f hsupp, finsum_eq_sum_of_support_subset _ (s := S.image ρ)]
   · exact (Finset.sum_fiberwise_of_maps_to (fun a ha => Finset.mem_image_of_mem ρ ha) f).symm
   · intro b hb
     rw [Function.mem_support] at hb

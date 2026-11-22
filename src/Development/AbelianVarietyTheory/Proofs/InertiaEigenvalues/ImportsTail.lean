@@ -6,11 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.NonzeroScalarMembership
 
-theorem exists_ne_zero_smul_mem {O LL V : Type} [CommRing O] [IsDomain O] [Field LL]
-    [Algebra O LL] [IsFractionRing O LL] [AddCommGroup V] [Module LL V] [Module O V]
-    [IsScalarTower O LL V] (T : Submodule O V)
-    (hT : Submodule.span LL (↑T : Set V) = ⊤) (x : V) :
-    ∃ d : O, d ≠ 0 ∧ d • x ∈ T := by
+theorem exists_ne_zero_smul_mem
+    {O LL V : Type} [CommRing O] [IsDomain O] [Field LL] [Algebra O LL] [IsFractionRing O LL]
+    [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
+    (T : Submodule O V) (hT : Submodule.span LL (↑T : Set V) = ⊤)
+    (x : V)
+    : ∃ d : O, d ≠ 0 ∧ d • x ∈ T := by
   have hx : x ∈ Submodule.span LL (↑T : Set V) := hT ▸ Submodule.mem_top
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩

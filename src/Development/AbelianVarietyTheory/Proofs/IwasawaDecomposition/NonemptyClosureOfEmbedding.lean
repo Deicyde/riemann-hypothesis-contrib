@@ -17,7 +17,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.DRFlag GlobalTheory.ProjSpace
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.DRFlag GlobalTheory.ProjSpace
 open GlobalTheory.FlagMod (ev ev_spMap le_preimage_comp)
 
 namespace GlobalTheory.SubClosure

@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CmLoca
 
 namespace GlobalTheory.DensityProductClosed
 
-theorem eulerProductOfDensities : GlobalTheory.IndefiniteRowSideFullHecke.LocalAdditiveCharacterDual.EulerProductOfDensities :=
-  GlobalTheory.DensityProductCompare.densityProduct_iff.1 GlobalTheory.T.cm_localDensities_productFormula
+theorem eulerProductOfDensities
+    : GlobalTheory.IndefiniteRowSideFullHecke.LocalAdditiveCharacterDual.EulerProductOfDensities :=
+  GlobalTheory.DensityProductCompare.densityProduct_iff.1
+    GlobalTheory.T.cm_localDensities_productFormula
 
 end GlobalTheory.DensityProductClosed

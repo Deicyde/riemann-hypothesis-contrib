@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IwahoriEi
 
 namespace GlobalTheory.IwahoriEigenObj
 
-theorem iwahoriEigenvalues : GlobalTheory.IndefiniteRowSideFullHecke.IwahoriSubgroup.IwahoriEigenvalues :=
+theorem iwahoriEigenvalues
+    : GlobalTheory.IndefiniteRowSideFullHecke.IwahoriSubgroup.IwahoriEigenvalues :=
   GlobalTheory.IwahoriEigen.iwahoriEigenvalues
 
 end GlobalTheory.IwahoriEigenObj

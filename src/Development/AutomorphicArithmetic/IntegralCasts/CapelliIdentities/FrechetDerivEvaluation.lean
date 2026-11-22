@@ -5,8 +5,10 @@ public import Mathlib
 @[expose] public section
 
 open MvPolynomial in
-private theorem UpperTheory.Reformulated.B.FrechetDerivEvaluation.aux {σ : Type*} [Fintype σ] (g : MvPolynomial σ ℂ) (z : σ → ℂ) :
-    HasFDerivAt (fun x : σ → ℂ => eval x g)
+private theorem UpperTheory.Reformulated.B.FrechetDerivEvaluation.aux
+    {σ : Type*} [Fintype σ] (g : MvPolynomial σ ℂ) (z : σ → ℂ)
+    : HasFDerivAt
+      (fun x : σ → ℂ => eval x g)
       (∑ i : σ, eval z (pderiv i g) • (ContinuousLinearMap.proj i : (σ → ℂ) →L[ℂ] ℂ)) z := by
   classical
   induction g using MvPolynomial.induction_on with
@@ -20,21 +22,30 @@ private theorem UpperTheory.Reformulated.B.FrechetDerivEvaluation.aux {σ : Type
     simp only [map_mul, eval_X]
     refine HasFDerivAt.congr_fderiv h ?_
     ext v
-    simp [Derivation.leibniz, pderiv_X, Pi.single_apply, Finset.mul_sum, mul_add, add_mul, Finset.sum_add_distrib, apply_ite (eval z), mul_assoc, mul_comm, mul_left_comm]
+    simp [Derivation.leibniz, pderiv_X, Pi.single_apply, Finset.mul_sum, mul_add, add_mul,
+      Finset.sum_add_distrib, apply_ite (eval z), mul_assoc, mul_comm, mul_left_comm]
 
-theorem UpperTheory.Reformulated.B.FrechetDerivEvaluation.hasFDerivAt_eval.{u_1} :
-    ∀ {σ : Type u_1} [inst : Fintype σ] (g : @MvPolynomial σ Complex Complex.instCommSemiring) (z : σ → Complex),
-      @HasFDerivAt Complex (@DenselyNormedField.toNontriviallyNormedField Complex Complex.instDenselyNormedField)
-        (σ → Complex) (@Pi.addCommGroup σ (fun (a : σ) ↦ Complex) fun (i : σ) ↦ Complex.addCommGroup)
-        (@Pi.module σ (fun (x : σ) ↦ Complex) Complex Complex.instSemiring (fun (i : σ) ↦ Complex.instAddCommMonoid)
+theorem UpperTheory.Reformulated.B.FrechetDerivEvaluation.hasFDerivAt_eval.{u_1}
+    : ∀ {σ : Type u_1} [inst : Fintype σ] (g : @MvPolynomial σ Complex Complex.instCommSemiring)
+        (z : σ → Complex),
+      @HasFDerivAt Complex
+        (@DenselyNormedField.toNontriviallyNormedField Complex Complex.instDenselyNormedField)
+        (σ → Complex)
+        (@Pi.addCommGroup σ (fun (a : σ) ↦ Complex) fun (i : σ) ↦ Complex.addCommGroup)
+        (@Pi.module σ
+          (fun (x : σ) ↦ Complex)
+          Complex Complex.instSemiring
+          (fun (i : σ) ↦ Complex.instAddCommMonoid)
           fun (i : σ) ↦ @Semiring.toModule Complex Complex.instSemiring)
-        (@Pi.topologicalSpace σ (fun (x : σ) ↦ Complex) fun (i : σ) ↦
-          @UniformSpace.toTopologicalSpace Complex
-            (@PseudoMetricSpace.toUniformSpace Complex
-              (@SeminormedRing.toPseudoMetricSpace Complex
-                (@SeminormedCommRing.toSeminormedRing Complex
-                  (@NormedCommRing.toSeminormedCommRing Complex
-                    (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex))))))
+        (@Pi.topologicalSpace σ
+          (fun (x : σ) ↦ Complex)
+          fun (i : σ) ↦
+            @UniformSpace.toTopologicalSpace Complex
+              (@PseudoMetricSpace.toUniformSpace Complex
+                (@SeminormedRing.toPseudoMetricSpace Complex
+                  (@SeminormedCommRing.toSeminormedRing Complex
+                    (@NormedCommRing.toSeminormedCommRing Complex
+                      (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex))))))
         Complex Complex.addCommGroup (@Semiring.toModule Complex Complex.instSemiring)
         (@UniformSpace.toTopologicalSpace Complex
           (@PseudoMetricSpace.toUniformSpace Complex
@@ -45,17 +56,21 @@ theorem UpperTheory.Reformulated.B.FrechetDerivEvaluation.hasFDerivAt_eval.{u_1}
         (fun (x : σ → Complex) ↦
           @DFunLike.coe
             (@RingHom (@MvPolynomial σ Complex Complex.instCommSemiring) Complex
-              (@AddMonoidAlgebra.nonAssocSemiring Complex (@Finsupp σ Nat (@MulZeroClass.toZero Nat Nat.instMulZeroClass))
+              (@AddMonoidAlgebra.nonAssocSemiring Complex
+                (@Finsupp σ Nat (@MulZeroClass.toZero Nat Nat.instMulZeroClass))
                 (@CommSemiring.toSemiring Complex Complex.instCommSemiring)
                 (@Finsupp.instAddZeroClass σ Nat (@AddMonoid.toAddZeroClass Nat Nat.instAddMonoid)))
-              (@Semiring.toNonAssocSemiring Complex (@CommSemiring.toSemiring Complex Complex.instCommSemiring)))
+              (@Semiring.toNonAssocSemiring Complex
+                (@CommSemiring.toSemiring Complex Complex.instCommSemiring)))
             (@MvPolynomial σ Complex Complex.instCommSemiring)
             (fun (x : @MvPolynomial σ Complex Complex.instCommSemiring) ↦ Complex)
             (@RingHom.instFunLike (@MvPolynomial σ Complex Complex.instCommSemiring) Complex
-              (@AddMonoidAlgebra.nonAssocSemiring Complex (@Finsupp σ Nat (@MulZeroClass.toZero Nat Nat.instMulZeroClass))
+              (@AddMonoidAlgebra.nonAssocSemiring Complex
+                (@Finsupp σ Nat (@MulZeroClass.toZero Nat Nat.instMulZeroClass))
                 (@CommSemiring.toSemiring Complex Complex.instCommSemiring)
                 (@Finsupp.instAddZeroClass σ Nat (@AddMonoid.toAddZeroClass Nat Nat.instAddMonoid)))
-              (@Semiring.toNonAssocSemiring Complex (@CommSemiring.toSemiring Complex Complex.instCommSemiring)))
+              (@Semiring.toNonAssocSemiring Complex
+                (@CommSemiring.toSemiring Complex Complex.instCommSemiring)))
             (@MvPolynomial.eval Complex σ Complex.instCommSemiring x) g)
         (∑ i : σ,
           @HSMul.hSMul Complex

@@ -22,19 +22,21 @@ variable {K : Type} [Field K] (D : TwistData K) (j : Fin D.J)
 def pullL : MvPolynomial (D.ML × Fin D.r) K →ₗ[K] MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K :=
   lsup fun ζ => monomial (D.pullE j ζ) 1
 
-theorem pullL_coefOut (μ : D.EM) (Z : MvPolynomial (D.ML × Fin D.r) K) :
-    D.pullL j (coefOut (D.outSeg j) μ Z) =
-      ∑ α ∈ Z.support, if eOut (D.outSeg j) α = μ then monomial (D.pullE j α) (Z.coeff α) else 0 := by
-  unfold coefOut
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
-  refine Finset.sum_congr rfl fun α _ => ?_
-  split_ifs
-  · rw [pullL, lsup_monomial, pullE_eIn, smul_monomial, smul_eq_mul, mul_one]
-  · rw [map_zero]
+theorem pullL_coefOut (μ : D.EM) (Z : MvPolynomial (D.ML × Fin D.r) K)
+    : D.pullL j (coefOut (D.outSeg j) μ Z)
+      = ∑ α ∈ Z.support, if eOut (D.outSeg j) α = μ then monomial (D.pullE j α) (Z.coeff α) else 0 :=
+  by
+    unfold coefOut
+    set_option synthInstance.maxHeartbeats 100000 in
+      rw [map_sum]
+    refine Finset.sum_congr rfl fun α _ => ?_
+    split_ifs
+    · rw [pullL, lsup_monomial, pullE_eIn, smul_monomial, smul_eq_mul, mul_one]
+    · rw [map_zero]
 
-theorem rename_pullL_coefOut (μ : D.EM) (Z : MvPolynomial (D.ML × Fin D.r) K) :
-    rename (Prod.map (D.e0 j) id) (D.pullL j (coefOut (D.outSeg j) μ Z)) = coefOut (D.outSeg j) μ Z := by
+theorem rename_pullL_coefOut (μ : D.EM) (Z : MvPolynomial (D.ML × Fin D.r) K)
+    : rename (Prod.map (D.e0 j) id) (D.pullL j (coefOut (D.outSeg j) μ Z))
+      = coefOut (D.outSeg j) μ Z := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [pullL_coefOut, map_sum]
   unfold coefOut
@@ -43,15 +45,19 @@ theorem rename_pullL_coefOut (μ : D.EM) (Z : MvPolynomial (D.ML × Fin D.r) K) 
   · rw [rename_monomial, mapDomain_pullE]
   · rw [map_zero]
 
-variable {ι : Type} [Fintype ι]
+variable
+  {ι : Type} [Fintype ι]
   (cc : (Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) → ι → K) (PP : ι → MvPolynomial (D.ML × Fin D.r) K)
 
-theorem Th_eq (Z : MvPolynomial (D.ML × Fin D.r) K) :
-    D.Th j cc PP Z = ∑ μ ∈ Z.support.image (eOut (D.outSeg j)),
-      monomial μ 1 * D.TT j cc PP (D.pullL j (coefOut (D.outSeg j) μ Z)) := by
-  have h : ∀ μ, D.TT j cc PP (D.pullL j (coefOut (D.outSeg j) μ Z)) =
-      ∑ α ∈ Z.support, if eOut (D.outSeg j) α = μ then
-        Z.coeff α • D.TT j cc PP (monomial (D.pullE j α) 1) else 0 := by
+theorem Th_eq (Z : MvPolynomial (D.ML × Fin D.r) K)
+    : D.Th j cc PP Z
+      = ∑ μ ∈ Z.support.image (eOut (D.outSeg j)),
+        monomial μ 1 * D.TT j cc PP (D.pullL j (coefOut (D.outSeg j) μ Z)) := by
+  have h
+      : ∀ μ,
+        D.TT j cc PP (D.pullL j (coefOut (D.outSeg j) μ Z))
+          = ∑ α ∈ Z.support, if eOut (D.outSeg j) α = μ then
+              Z.coeff α • D.TT j cc PP (monomial (D.pullE j α) 1) else 0 := by
     intro μ
     set_option synthInstance.maxHeartbeats 100000 in
       rw [pullL_coefOut, map_sum]
@@ -71,21 +77,25 @@ theorem Th_eq (Z : MvPolynomial (D.ML × Fin D.r) K) :
   · intro h2
     exact absurd (Finset.mem_image_of_mem _ hα) h2
 
-theorem Th_val [NeZero D.r] {v : AddValuation K (WithTop ℚ)}
+theorem Th_val
+    [NeZero D.r]
+    {v : AddValuation K (WithTop ℚ)}
     (Ψ : ι → MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K)
-    (path : ι → Fin (D.nB j + D.r + 1) → Fin D.r → ℤ)
-    (hli : LinearIndependent K Ψ)
+    (path : ι → Fin (D.nB j + D.r + 1) → Fin D.r → ℤ) (hli : LinearIndependent K Ψ)
     (hcc : ∀ lam, (∀ k, ldeg lam k = D.dO (D.eA j k)) → monomial lam (1 : K) = ∑ b, cc lam b • Ψ b)
     (h7 : ∀ (th : Fin (D.nB j + D.r + 1) → ℤ) (F : MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K),
-      (F ∈ PolO v D.r (fun k => D.dO (D.eA j k)) ∧ ∀ i : Fin (D.nB j + D.r + 1),
-        F ∈ Aset (D.msg ∘ D.e0 j) (initSet (D.nB j + D.r) i.val) (th i)) →
-        ∃ c : ι → K, (∀ b, 0 ≤ v (c b)) ∧ (∀ b, c b ≠ 0 → ∀ i, th i ≤ path b i (lastIdx D.r)) ∧
-          F = ∑ b, c b • Ψ b)
-    (hPPval : ∀ b (m : Fin D.r) (i0 : Fin (D.nB j + D.r + 1)), i0.val = D.stg j m →
-      ((path b i0 (lastIdx D.r) : ℤ) : WithTop ℤ) ≤ valS D.msg (D.YPset j m) (PP b))
+      (F ∈ PolO v D.r (fun k => D.dO (D.eA j k))
+          ∧ ∀ i : Fin (D.nB j + D.r + 1),
+            F ∈ Aset (D.msg ∘ D.e0 j) (initSet (D.nB j + D.r) i.val) (th i))
+        → ∃ c : ι → K,
+          (∀ b, 0 ≤ v (c b)) ∧ (∀ b, c b ≠ 0 → ∀ i, th i ≤ path b i (lastIdx D.r))
+            ∧ F = ∑ b, c b • Ψ b)
+    (hPPval : ∀ b (m : Fin D.r) (i0 : Fin (D.nB j + D.r + 1)),
+      i0.val = D.stg j m
+        → ((path b i0 (lastIdx D.r) : ℤ) : WithTop ℤ) ≤ valS D.msg (D.YPset j m) (PP b))
     (Z : MvPolynomial (D.ML × Fin D.r) K) (hZ : Integral v Z) (hpre : ∀ ζ ∈ Z.support, D.PreE j ζ)
-    (m : Fin D.r) (θ : ℝ) (hθ : vala D.msg (D.TLset j m) θ Z) :
-    vala D.msg (D.YPset j m) θ (D.Th j cc PP Z) := by
+    (m : Fin D.r) (θ : ℝ) (hθ : vala D.msg (D.TLset j m) θ Z)
+    : vala D.msg (D.YPset j m) θ (D.Th j cc PP Z) := by
   rw [Th_eq]
   refine vala_sum _ _ fun μ hμ => ?_
   obtain ⟨α0, hα0, rfl⟩ := Finset.mem_image.mp hμ
@@ -98,7 +108,8 @@ theorem Th_val [NeZero D.r] {v : AddValuation K (WithTop ℚ)}
     simp only [YPset, Finset.mem_union, Finset.mem_image] at hi
     rcases hi with ⟨b, hb, rfl⟩ | ⟨m', -, rfl⟩
     · rw [if_neg]
-      exact not_not.mpr ((D.range_first_embedding j _).mpr (Or.inl ⟨b, (Finset.mem_filter.mp hb).2, rfl⟩))
+      exact not_not.mpr ((D.range_first_embedding j _).mpr
+        (Or.inl ⟨b, (Finset.mem_filter.mp hb).2, rfl⟩))
     · split_ifs
       · exact (hpre α0 hα0).2.2 m' a
       · rfl
@@ -119,10 +130,12 @@ theorem Th_val [NeZero D.r] {v : AddValuation K (WithTop ℚ)}
       intro i hi
       simp only [TLset, Finset.mem_union, Finset.mem_image] at hi
       rcases hi with ⟨b, hb, rfl⟩ | ⟨m', -, rfl⟩
-      · exact not_not.mpr ((D.range_first_embedding j _).mpr (Or.inl ⟨b, (Finset.mem_filter.mp hb).2, rfl⟩))
+      · exact not_not.mpr ((D.range_first_embedding j _).mpr
+          (Or.inl ⟨b, (Finset.mem_filter.mp hb).2, rfl⟩))
       · exact not_not.mpr ((D.range_first_embedding j _).mpr (Or.inr ⟨m', rfl⟩))
-    have hQval : ((⌈θ⌉ : ℤ) : WithTop ℤ) ≤
-        valS (D.msg ∘ D.e0 j) (initSet (D.nB j + D.r) (D.stg j m)) Q := by
+    have hQval
+        : ((⌈θ⌉ : ℤ) : WithTop ℤ)
+          ≤ valS (D.msg ∘ D.e0 j) (initSet (D.nB j + D.r) (D.stg j m)) Q := by
       have h1 := valS_rename (D.e0 j) (D.index_embedding_injective j) D.msg (D.TLset j m) Q
       rw [hQdef, rename_pullL_coefOut, TL_preimage, ← hQdef] at h1
       rw [← h1]
@@ -131,8 +144,9 @@ theorem Th_val [NeZero D.r] {v : AddValuation K (WithTop ℚ)}
     let i0 : Fin (D.nB j + D.r + 1) := ⟨D.stg j m, hlt⟩
     let th : Fin (D.nB j + D.r + 1) → ℤ := fun i =>
       if i = i0 then ⌈θ⌉ else (valS (D.msg ∘ D.e0 j) (initSet (D.nB j + D.r) i.val) Q).untopD 0
-    have hmem : ∀ i : Fin (D.nB j + D.r + 1),
-        Q ∈ Aset (D.msg ∘ D.e0 j) (initSet (D.nB j + D.r) i.val) (th i) := by
+    have hmem
+        : ∀ i : Fin (D.nB j + D.r + 1),
+          Q ∈ Aset (D.msg ∘ D.e0 j) (initSet (D.nB j + D.r) i.val) (th i) := by
       intro i
       show ((th i : ℤ) : WithTop ℤ) ≤ _
       by_cases hi : i = i0
@@ -154,20 +168,24 @@ theorem Th_val [NeZero D.r] {v : AddValuation K (WithTop ℚ)}
 
 end TwistData
 
-theorem segStep_of {K : Type} [Field K] [CharZero K] {v : AddValuation K (WithTop ℚ)} {p : ℕ}
-    (hS : SPAN K v p) : SegStep K v p := by
+theorem segStep_of
+    {K : Type} [Field K] [CharZero K] {v : AddValuation K (WithTop ℚ)} {p : ℕ} (hS : SPAN K v p)
+    : SegStep K v p := by
   classical
   intro hD D hr _ j
   haveI : NeZero D.r := ⟨hr.ne'⟩
-  obtain ⟨ι, hι, Ψ, path, ncol, col, cidx, hts, occ, h3, h4, h5, h7, h8, h10, h11,
-    h14, h16, h17⟩ := hS hD (D.nB j + D.r) D.r (D.msg ∘ D.e0 j) (fun k => D.dO (D.eA j k))
-  have hmon : ∀ lam : Fin (D.nB j + D.r) × Fin D.r →₀ ℕ, (∀ k, ldeg lam k = D.dO (D.eA j k)) →
-      monomial lam (1 : K) ∈ PolO v D.r (fun k => D.dO (D.eA j k)) := fun lam h =>
+  obtain ⟨ι, hι, Ψ, path, ncol, col, cidx, hts, occ, h3, h4, h5, h7, h8, h10, h11, h14, h16, h17⟩ :=
+    hS hD (D.nB j + D.r) D.r (D.msg ∘ D.e0 j) (fun k => D.dO (D.eA j k))
+  have hmon
+      : ∀ lam : Fin (D.nB j + D.r) × Fin D.r →₀ ℕ,
+        (∀ k, ldeg lam k = D.dO (D.eA j k))
+          → monomial lam (1 : K) ∈ PolO v D.r (fun k => D.dO (D.eA j k)) := fun lam h =>
     ⟨monomial_mem_PolK_sg _ _ _ h, integral_monomial' _ (by simp)⟩
   let cc : (Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) → ι → K := fun lam =>
     if h : monomial lam (1 : K) ∈ PolO v D.r (fun k => D.dO (D.eA j k)) then (h5 _ h).choose else 0
-  have hcc : ∀ lam, (∀ k, ldeg lam k = D.dO (D.eA j k)) →
-      monomial lam (1 : K) = ∑ b, cc lam b • Ψ b := by
+  have hcc
+      : ∀ lam,
+        (∀ k, ldeg lam k = D.dO (D.eA j k)) → monomial lam (1 : K) = ∑ b, cc lam b • Ψ b := by
     intro lam h
     simp only [cc, dif_pos (hmon lam h)]
     exact (h5 _ (hmon lam h)).choose_spec.2
@@ -182,11 +200,12 @@ theorem segStep_of {K : Type} [Field K] [CharZero K] {v : AddValuation K (WithTo
     intro b
     rw [h8 b]
     exact D.PsiP_ph j p (col b) (occ b)
-  have hPPsupp : ∀ b, ∀ ξ ∈ (PP b).support,
-      D.PostE j ξ ∧ ∀ i, ¬ D.SegL j i → ∀ a, ξ (i, a) = 0 := fun b ξ hξ =>
-    D.PsiP_support j (col b) (occ b) (h10 b) (h11 b) ξ hξ
-  have hPPval : ∀ b (m : Fin D.r) (i0 : Fin (D.nB j + D.r + 1)), i0.val = D.stg j m →
-      ((path b i0 (lastIdx D.r) : ℤ) : WithTop ℤ) ≤ valS D.msg (D.YPset j m) (PP b) := by
+  have hPPsupp : ∀ b, ∀ ξ ∈ (PP b).support, D.PostE j ξ ∧ ∀ i, ¬ D.SegL j i → ∀ a, ξ (i, a) = 0 :=
+    fun b ξ hξ => D.PsiP_support j (col b) (occ b) (h10 b) (h11 b) ξ hξ
+  have hPPval
+      : ∀ b (m : Fin D.r) (i0 : Fin (D.nB j + D.r + 1)),
+        i0.val = D.stg j m
+          → ((path b i0 (lastIdx D.r) : ℤ) : WithTop ℤ) ≤ valS D.msg (D.YPset j m) (PP b) := by
     intro b m i0 hi0
     rw [h17 b i0]
     refine D.PsiP_val j (col b) (occ b) (h10 b) (cidx b) (fun k => hts b k i0) m ?_ ?_

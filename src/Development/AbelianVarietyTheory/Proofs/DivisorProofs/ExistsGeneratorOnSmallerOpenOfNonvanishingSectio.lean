@@ -6,17 +6,24 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.GenRestrict
 
-theorem exists_gen_restrict : ∀ (Z : Scheme.{0}) (L : LB Z), L.IsLB → ∀ (O O' : Z.Opens), O ≤ O' →
-    ∀ u : LB.Sec (L.pull O'.ι), (∀ z : O'.toScheme, O'.ι z ∈ O → z ∈ nonzeroLocus u) →
-    ∃ t : LB.Gen (L.pull O.ι), t.IsGen := by
+theorem exists_gen_restrict
+    : ∀ (Z : Scheme.{0}) (L : LB Z),
+      L.IsLB
+        → ∀ (O O' : Z.Opens),
+          O ≤ O'
+            → ∀ u : LB.Sec (L.pull O'.ι),
+              (∀ z : O'.toScheme, O'.ι z ∈ O → z ∈ nonzeroLocus u)
+                → ∃ t : LB.Gen (L.pull O.ι), t.IsGen := by
   intro Z L _ O O' hle u hu
   have e : ∀ _k : PUnit, Z.homOfLE hle ≫ (fun _ : PUnit => O'.ι) _k = (fun _ : PUnit => O.ι) _k :=
     fun _ => Scheme.homOfLE_ι Z hle

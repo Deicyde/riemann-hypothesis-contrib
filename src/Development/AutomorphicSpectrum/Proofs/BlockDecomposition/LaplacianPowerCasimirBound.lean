@@ -21,7 +21,8 @@ namespace GlobalTheory.CompanionTheory.LapSec
 
 open GlobalTheory.CompanionTheory.FcSmooth (Lap)
 open GlobalTheory.CompanionTheory.SobSecK (Rw_congr Rw_smooth)
-open GlobalTheory.CompanionTheory.SobOpsPf (Rw_add Rw_post sob_congr sob_smul sob_sum sob_bs sob_Om sob_post Om_smooth)
+open GlobalTheory.CompanionTheory.SobOpsPf
+  (Rw_add Rw_post sob_congr sob_smul sob_sum sob_bs sob_Om sob_post Om_smooth)
 
 variable {n : ℕ}
 
@@ -29,41 +30,43 @@ section Words
 
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
-theorem Lap_eq (f : Mat n → V) (g : Mat n) : Lap f g = -∑ p, Rw [p, p] f g := rfl
+theorem Lap_eq (f : Mat n → V) (g : Mat n) : Lap f g = - ∑ p, Rw [p, p] f g := rfl
 
-theorem Lap_smooth {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) : ContDiffOn ℝ ∞ (Lap f) (GLs n) := by
+theorem Lap_smooth {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
+    : ContDiffOn ℝ ∞ (Lap f) (GLs n) := by
   have h : ContDiffOn ℝ ∞ (fun g => ∑ p, Rw [p, p] f g) (GLs n) :=
     ContDiffOn.sum fun p _ => Rw_smooth [p, p] hf
   exact h.neg
 
-theorem Lap_congr {f f' : Mat n → V} (e : Set.EqOn f f' (GLs n)) : Set.EqOn (Lap f) (Lap f') (GLs n) := by
+theorem Lap_congr {f f' : Mat n → V} (e : Set.EqOn f f' (GLs n))
+    : Set.EqOn (Lap f) (Lap f') (GLs n) := by
   intro g hg
   simp only [Lap_eq]
   exact congrArg Neg.neg (Finset.sum_congr rfl fun p _ => Rw_congr [p, p] e hg)
 
-theorem Lap_add {f f' : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) (hf' : ContDiffOn ℝ ∞ f' (GLs n)) :
-    Set.EqOn (Lap (f + f')) (Lap f + Lap f') (GLs n) := by
+theorem Lap_add {f f' : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) (hf' : ContDiffOn ℝ ∞ f' (GLs n))
+    : Set.EqOn (Lap (f + f')) (Lap f + Lap f') (GLs n) := by
   intro g hg
   simp only [Lap_eq, Pi.add_apply]
   rw [← neg_add, ← Finset.sum_add_distrib]
   exact congrArg Neg.neg (Finset.sum_congr rfl fun p _ => Rw_add [p, p] hf hf' hg)
 
-theorem Lap_post (A : V →L[ℂ] V) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) :
-    Set.EqOn (Lap fun y => A (f y)) (fun y => A (Lap f y)) (GLs n) := by
+theorem Lap_post (A : V →L[ℂ] V) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
+    : Set.EqOn (Lap fun y => A (f y)) (fun y => A (Lap f y)) (GLs n) := by
   intro g hg
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Lap_eq, map_neg, map_sum]
   exact congrArg Neg.neg (Finset.sum_congr rfl fun p _ => Rw_post [p, p] A hf hg)
 
-theorem iter_congr (j : ℕ) {f f' : Mat n → V} (e : Set.EqOn f f' (GLs n)) :
-    Set.EqOn (Lap^[j] f) (Lap^[j] f') (GLs n) := by
+theorem iter_congr (j : ℕ) {f f' : Mat n → V} (e : Set.EqOn f f' (GLs n))
+    : Set.EqOn (Lap^[j] f) (Lap^[j] f') (GLs n) := by
   induction j generalizing f f' with
   | zero => exact e
   | succ j ih => exact ih (Lap_congr e)
 
-theorem iter_add (j : ℕ) {f f' : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
-    (hf' : ContDiffOn ℝ ∞ f' (GLs n)) :
-    Set.EqOn (Lap^[j] (f + f')) (Lap^[j] f + Lap^[j] f') (GLs n) := by
+theorem iter_add
+    (j : ℕ) {f f' : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) (hf' : ContDiffOn ℝ ∞ f' (GLs n))
+    : Set.EqOn (Lap^[j] (f + f')) (Lap^[j] f + Lap^[j] f') (GLs n) := by
   induction j generalizing f f' with
   | zero => intro x _; rfl
   | succ j ih =>
@@ -74,21 +77,25 @@ end Words
 
 section Sob
 
-variable [MeasurableSpace (G n)] {μ : Measure (G n)} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  [MeasurableSpace (G n)]
+  {μ : Measure (G n)} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
 theorem sob_Lap {f : Mat n → V} (hf : Sob μ f) : Sob μ (Lap f) :=
   sob_congr (f := (-1 : ℂ) • ∑ p, Rd (bs p) (Rd (bs p) f))
-    (sob_smul _ (sob_sum _ hf fun p => sob_bs p (sob_bs p hf))) fun g _ => by
-      simp [Lap]
+    (sob_smul _ (sob_sum _ hf fun p => sob_bs p (sob_bs p hf))) fun g _ => by simp [Lap]
 
 theorem sob_iter (j : ℕ) {f : Mat n → V} (hf : Sob μ f) : Sob μ (Lap^[j] f) := by
   induction j generalizing f with
   | zero => exact hf
   | succ j ih => exact ih (sob_Lap hf)
 
-theorem cls_add {F F' : Mat n → V} (h : MemLp (fun y : G n => F y.val) 2 μ)
-    (h' : MemLp (fun y : G n => F' y.val) 2 μ) : cls μ (F + F') = cls μ F + cls μ F' := by
-  rw [GlobalTheory.CompanionTheory.SecBd.cls_eq μ h, GlobalTheory.CompanionTheory.SecBd.cls_eq μ h', GlobalTheory.CompanionTheory.SecBd.cls_eq μ (f := F + F') (h.add h')]
+theorem cls_add
+    {F F' : Mat n → V}
+    (h : MemLp (fun y : G n => F y.val) 2 μ) (h' : MemLp (fun y : G n => F' y.val) 2 μ)
+    : cls μ (F + F') = cls μ F + cls μ F' := by
+  rw [GlobalTheory.CompanionTheory.SecBd.cls_eq μ h, GlobalTheory.CompanionTheory.SecBd.cls_eq μ h',
+    GlobalTheory.CompanionTheory.SecBd.cls_eq μ (f := F + F') (h.add h')]
   exact MemLp.toLp_add h h'
 
 end Sob
@@ -99,16 +106,25 @@ theorem om_mem (hR : RCalc) (E : KMod n) {f : Mat n → E.V} (hf : f ∈ CE E) :
   refine ⟨Om_smooth hf.1, fun g hg k => ?_⟩
   simp only [Om, Pi.smul_apply, Pi.add_apply, h1.2 g hg k, h2.2 g hg k, map_add (f := _), map_smul]
 
-theorem strong [MeasurableSpace (G n)] (μ : Measure (G n)) (E : KMod n) (Q : E.V →L[ℂ] E.V) (hR : RCalc)
-    (hL : ∀ f ∈ CE E, ∀ g ∈ GLs n, Lap f g = -Om f g + Q (f g)) (j : ℕ) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ f : Mat n → E.V, Sob μ f → IsSec E f → ∀ B : E.V →L[ℂ] E.V,
-      ‖cls μ (Lap^[j] fun y => B (f y))‖ ≤ C * ‖B‖ * ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f)‖ := by
+theorem strong
+    [MeasurableSpace (G n)]
+    (μ : Measure (G n))
+    (E : KMod n) (Q : E.V →L[ℂ] E.V)
+    (hR : RCalc) (hL : ∀ f ∈ CE E, ∀ g ∈ GLs n, Lap f g = - Om f g + Q (f g)) (j : ℕ)
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ f : Mat n → E.V,
+          Sob μ f → IsSec E f
+            → ∀ B : E.V →L[ℂ] E.V,
+              ‖cls μ (Lap^[j] fun y => B (f y))‖
+                ≤ C * ‖B‖ * ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f)‖ := by
   induction j with
   | zero =>
     refine ⟨1, zero_le_one, fun f hS _ B => ?_⟩
     have hm : MemLp (fun y : G n => B (f y.val)) 2 μ := (sob_post B hS).2 []
-    have h := GlobalTheory.CompanionTheory.SecBd.norm_le_of_ae μ (f := f) (hS.2 []) (cls μ fun y => B (f y)) B
-      (GlobalTheory.CompanionTheory.SecBd.cls_ae μ hm)
+    have h :=
+      GlobalTheory.CompanionTheory.SecBd.norm_le_of_ae μ (f := f) (hS.2 []) (cls μ fun y => B (f y))
+        B (GlobalTheory.CompanionTheory.SecBd.cls_ae μ hm)
     simpa using h
   | succ j ih =>
     obtain ⟨C, hC, ih⟩ := ih
@@ -154,15 +170,21 @@ theorem strong [MeasurableSpace (G n)] (μ : Measure (G n)) (E : KMod n) (Q : E.
       exact mul_le_mul (mul_le_mul_of_nonneg_left hBQ hC) s2
         (Finset.sum_nonneg fun _ _ => norm_nonneg _) (by positivity)
     rw [e3]
-    calc _ ≤ ‖cls μ (Lap^[j] a)‖ + ‖cls μ (Lap^[j] b)‖ := norm_add_le _ _
+    calc
+      _ ≤ ‖cls μ (Lap^[j] a)‖ + ‖cls μ (Lap^[j] b)‖ := norm_add_le _ _
       _ ≤ C * ‖B‖ * S + C * (‖B‖ * ‖Q‖) * S := add_le_add (b1.trans c1) (b2.trans c2)
       _ = C * (1 + ‖Q‖) * ‖B‖ * S := by ring
 
-theorem sectionBound : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (E : KMod n)
-    (Q : E.V →L[ℂ] E.V), LgFacts → Unimod → RCalc → ClsFacts →
-    (∀ f ∈ CE E, ∀ g ∈ GLs n, GlobalTheory.CompanionTheory.FcSmooth.Lap f g = -Om f g + Q (f g)) →
-    ∀ j : ℕ, ∃ C : ℝ, ∀ f : Mat n → E.V, Sob μ f → IsSec E f →
-      ‖cls μ (GlobalTheory.CompanionTheory.FcSmooth.Lap^[j] f)‖ ≤ C * ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f)‖ := by
+theorem sectionBound
+    : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
+        (E : KMod n) (Q : E.V →L[ℂ] E.V),
+      LgFacts → Unimod → RCalc → ClsFacts
+        → (∀ f ∈ CE E, ∀ g ∈ GLs n,
+          GlobalTheory.CompanionTheory.FcSmooth.Lap f g = - Om f g + Q (f g))
+        → ∀ j : ℕ, ∃ C : ℝ, ∀ f : Mat n → E.V,
+          Sob μ f → IsSec E f
+            → ‖cls μ (GlobalTheory.CompanionTheory.FcSmooth.Lap^[j] f)‖
+              ≤ C * ∑ i ∈ range (j + 1), ‖cls μ (Om^[i] f)‖ := by
   intro n _ _ μ _ E Q _ _ hR _ hL j
   obtain ⟨C, -, h⟩ := strong μ E Q hR hL j
   refine ⟨C * ‖(1 : E.V →L[ℂ] E.V)‖, fun f hS hs => ?_⟩

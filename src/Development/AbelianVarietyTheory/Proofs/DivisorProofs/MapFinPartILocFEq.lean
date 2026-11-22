@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.FinitePrimes
 
 open scoped Pointwise
 open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3
 open Formalism.L2.Host (HChar)
 open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum
 open GlobalTheory.Mem.Col2.SplitChar (finIdl)
@@ -16,15 +17,16 @@ noncomputable section
 
 namespace GlobalTheory.AlphaSplit
 
-open Formalism.L2.Host GlobalTheory.Mem.Chr GlobalTheory.Mem.Chr.IdlFact GlobalTheory.Mem.Chr.KDVal GlobalTheory.Mem.Col2.SplitChar
+open Formalism.L2.Host GlobalTheory.Mem.Chr GlobalTheory.Mem.Chr.IdlFact GlobalTheory.Mem.Chr.KDVal
+  GlobalTheory.Mem.Col2.SplitChar
 
 variable {D : D7}
 
-def mulU {N₁ N₂ : ℕ} (N : ℕ) (χ₁ : HeckeU D N₁) (χ₂ : HeckeU D N₂) (hN : Even ((N₁ : ℤ) + N₂ - N)) : HeckeU D N where
+def mulU {N₁ N₂ : ℕ} (N : ℕ) (χ₁ : HeckeU D N₁) (χ₂ : HeckeU D N₂) (hN : Even ((N₁ : ℤ) + N₂ - N))
+    : HeckeU D N where
   f := χ₁.f * χ₂.f
   n := χ₁.n + χ₂.n
-  unitary x := by
-    rw [MonoidHom.mul_apply, Units.val_mul, norm_mul, χ₁.unitary, χ₂.unitary, mul_one]
+  unitary x := by rw [MonoidHom.mul_apply, Units.val_mul, norm_mul, χ₁.unitary, χ₂.unitary, mul_one]
   cont := by
     obtain ⟨m₁, hm₁, h₁⟩ := χ₁.cont
     obtain ⟨m₂, hm₂, h₂⟩ := χ₂.cont
@@ -40,10 +42,12 @@ def mulU {N₁ N₂ : ℕ} (N : ℕ) (χ₁ : HeckeU D N₁) (χ₂ : HeckeU D N
       exact div_ne_zero h (by simpa using h)
     rw [MonoidHom.mul_apply, Units.val_mul]
     simp only [Pi.add_apply, zpow_add₀ (hne _), Finset.prod_mul_distrib]
-    calc _ = (((χ₁.f (Units.map (inc D).toMonoidHom a) : ℂˣ) : ℂ) *
-          ∏ τ, (embT D τ (a : D.host.E) / (‖embT D τ (a : D.host.E)‖ : ℂ)) ^ (χ₁.n τ)) *
-        (((χ₂.f (Units.map (inc D).toMonoidHom a) : ℂˣ) : ℂ) *
-          ∏ τ, (embT D τ (a : D.host.E) / (‖embT D τ (a : D.host.E)‖ : ℂ)) ^ (χ₂.n τ)) := by ring
+    calc
+      _ = (((χ₁.f (Units.map (inc D).toMonoidHom a) : ℂˣ) : ℂ)
+            * ∏ τ, (embT D τ (a : D.host.E) / (‖embT D τ (a : D.host.E)‖ : ℂ)) ^ (χ₁.n τ))
+          * (((χ₂.f (Units.map (inc D).toMonoidHom a) : ℂˣ) : ℂ)
+            * ∏ τ, (embT D τ (a : D.host.E) / (‖embT D τ (a : D.host.E)‖ : ℂ)) ^ (χ₂.n τ)) := by
+        ring
       _ = 1 := by rw [h1, h2, one_mul]
   norm x := by rw [MonoidHom.mul_apply, χ₁.norm, χ₂.norm, one_mul]
   par τ := by
@@ -53,12 +57,18 @@ def mulU {N₁ N₂ : ℕ} (N : ℕ) (χ₁ : HeckeU D N₁) (χ₂ : HeckeU D N
     exact ((χ₁.par τ).add (χ₂.par τ)).add hN
   unr u hu hz := by rw [MonoidHom.mul_apply, χ₁.unr u hu hz, χ₂.unr u hu hz, one_mul]
 
-theorem mulU_f {N₁ N₂ : ℕ} (N : ℕ) (χ₁ : HeckeU D N₁) (χ₂ : HeckeU D N₂) (hN : Even ((N₁ : ℤ) + N₂ - N)) (x : (AE D)ˣ) :
-    (mulU N χ₁ χ₂ hN).f x = χ₁.f x * χ₂.f x := rfl
+theorem mulU_f
+    {N₁ N₂ : ℕ}
+    (N : ℕ)
+    (χ₁ : HeckeU D N₁) (χ₂ : HeckeU D N₂) (hN : Even ((N₁ : ℤ) + N₂ - N)) (x : (AE D)ˣ)
+    : (mulU N χ₁ χ₂ hN).f x = χ₁.f x * χ₂.f x :=
+  rfl
 
-theorem eq_one_of_unr {χ : HChar D.host.E} (hχ : ∀ v, χ.UnrAt v) {u : (AE D)ˣ} (hu : IntU D u) :
-    χ.1 (finIdl D u) = 1 := by
-  refine GlobalTheory.Mem.LocTriv.eq_one_of_local D.host.E χ.1 χ.2.1 (finIdl D u) (finIdl_unit hu) (fun w => ?_) fun v x hx => ?_
+theorem eq_one_of_unr {χ : HChar D.host.E} (hχ : ∀ v, χ.UnrAt v) {u : (AE D)ˣ} (hu : IntU D u)
+    : χ.1 (finIdl D u) = 1 := by
+  refine GlobalTheory.Mem.LocTriv.eq_one_of_local D.host.E χ.1 χ.2.1 (finIdl D u) (finIdl_unit hu)
+    (fun w => ?_)
+    fun v x hx => ?_
   · exact congrFun (finIdl_fst D u) w
   · have hxu : IsUnitAt v x := by
       unfold IsUnitAt
@@ -72,20 +82,24 @@ noncomputable section
 
 namespace GlobalTheory.AlphaSplit
 
-open Neutral.B1 Formalism.L2.Host GlobalTheory.Mem.Chr GlobalTheory.Mem.Chr.IdlFact GlobalTheory.Mem.Chr.KDVal GlobalTheory.Mem.Col2.SplitChar
+open Neutral.B1 Formalism.L2.Host GlobalTheory.Mem.Chr GlobalTheory.Mem.Chr.IdlFact
+  GlobalTheory.Mem.Chr.KDVal GlobalTheory.Mem.Col2.SplitChar
 
 variable {D : D7}
 
-theorem map_finPartI_locF_eq (χ : HChar D.host.E) (v : HeightOneSpectrum (𝓞 D.host.F)) (k : D.host.Fˣ) :
-    χ.1 (finPartI D.host.E (locF (L := D.host.E) D.host.F v k)) = χ.resFin v k := by
+theorem map_finPartI_locF_eq
+    (χ : HChar D.host.E) (v : HeightOneSpectrum (𝓞 D.host.F)) (k : D.host.Fˣ)
+    : χ.1 (finPartI D.host.E (locF (L := D.host.E) D.host.F v k)) = χ.resFin v k := by
   unfold HChar.resFin
   rw [MonoidHom.finsetProd_apply]
   unfold locF
   rw [map_prod, map_prod]
-  exact Finset.prod_congr rfl fun Q _ => congrArg χ.1 (GlobalTheory.Mem.KerDet.finPartI_localIdele Q _)
+  exact Finset.prod_congr rfl fun Q _ =>
+    congrArg χ.1 (GlobalTheory.Mem.KerDet.finPartI_localIdele Q _)
 
-theorem even_log_norm (z : (AE D)ˣ) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hw : ConjPl D.host.conj.toRingEquiv w w) : Even (WithZero.log (valAt w (finIdl D (z * sgU D z)))) := by
+theorem even_log_norm
+    (z : (AE D)ˣ) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : ConjPl D.host.conj.toRingEquiv w w)
+    : Even (WithZero.log (valAt w (finIdl D (z * sgU D z)))) := by
   have e : valAt w (finIdl D (z * sgU D z)) = vl D w (z : AE D) * vl D w (z : AE D) := by
     change vl D w ((z : AE D) * sgA D z) = _
     rw [map_mul, vl_sgA hw]
@@ -93,8 +107,8 @@ theorem even_log_norm (z : (AE D)ˣ) (w : HeightOneSpectrum (𝓞 D.host.E))
   rw [e, WithZero.log_mul h0 h0]
   exact ⟨_, rfl⟩
 
-theorem eta_norm {χ : HChar D.host.E} (hχ : IsEtaT D.host χ) (z : (AE D)ˣ) :
-    χ.1 (finIdl D (z * sgU D z)) = 1 := by
+theorem eta_norm {χ : HChar D.host.E} (hχ : IsEtaT D.host χ) (z : (AE D)ˣ)
+    : χ.1 (finIdl D (z * sgU D z)) = 1 := by
   classical
   obtain ⟨c, hc, hcm, hu, -⟩ := GlobalTheory.Mem.HostCM.host_cm D.R D.host
   have ec : c.toRingEquiv = D.host.conj.toRingEquiv := RingEquiv.ext hc
@@ -103,20 +117,30 @@ theorem eta_norm {χ : HChar D.host.E} (hχ : IsEtaT D.host χ) (z : (AE D)ˣ) :
   let T : Finset (HeightOneSpectrum (𝓞 D.host.F)) :=
     (finite_valAt_ne_one a).toFinset.image fun w => w.under (𝓞 D.host.F)
   let m : HeightOneSpectrum (𝓞 D.host.F) → ℤ := fun v =>
-    if h : ∃ w : HeightOneSpectrum (𝓞 D.host.E), w.under (𝓞 D.host.F) = v then -WithZero.log (valAt h.choose a) else 0
+    if h : ∃ w : HeightOneSpectrum (𝓞 D.host.E), w.under (𝓞 D.host.F) = v then
+      - WithZero.log (valAt h.choose a)
+    else
+      0
   let b : Ideles D.host.E := ∏ v ∈ T, locF (L := D.host.E) D.host.F v (unif v) ^ m v
-  have hm : ∀ w : HeightOneSpectrum (𝓞 D.host.E), m (w.under (𝓞 D.host.F)) = -WithZero.log (valAt w a) := fun w => by
-    have hex : ∃ w' : HeightOneSpectrum (𝓞 D.host.E), w'.under (𝓞 D.host.F) = w.under (𝓞 D.host.F) := ⟨w, rfl⟩
+  have hm
+      : ∀ w : HeightOneSpectrum (𝓞 D.host.E),
+        m (w.under (𝓞 D.host.F)) = - WithZero.log (valAt w a) := fun w => by
+    have hex
+        : ∃ w' : HeightOneSpectrum (𝓞 D.host.E), w'.under (𝓞 D.host.F) = w.under (𝓞 D.host.F) :=
+      ⟨w, rfl⟩
     simp only [m]
     rw [dite_eq_left hex, ha w hex.choose hex.choose_spec]
   have hval : ∀ w, valAt w b = valAt w a := fun w => by
-    have h1 : ∀ v, v ≠ w.under (𝓞 D.host.F) → valAt w (locF (L := D.host.E) D.host.F v (unif v) ^ m v) = 1 :=
-      fun v hv => by rw [map_zpow, valAt_locF, if_neg hv.symm, one_zpow]
+    have h1
+        : ∀ v,
+          v ≠ w.under (𝓞 D.host.F)
+            → valAt w (locF (L := D.host.E) D.host.F v (unif v) ^ m v) = 1 := fun v hv => by
+      rw [map_zpow, valAt_locF, if_neg hv.symm, one_zpow]
     simp only [b]
     rw [map_prod]
     by_cases hw : w.under (𝓞 D.host.F) ∈ T
-    · rw [Finset.prod_eq_single_of_mem _ hw (fun v _ hv => h1 v hv), map_zpow, valAt_locF, if_pos rfl, hu,
-        ordF_unif_self, ← WithZero.exp_zsmul, hm]
+    · rw [Finset.prod_eq_single_of_mem _ hw (fun v _ hv => h1 v hv), map_zpow, valAt_locF,
+        if_pos rfl, hu, ordF_unif_self, ← WithZero.exp_zsmul, hm]
       simp only [smul_eq_mul, mul_neg, neg_neg, mul_one]
       exact WithZero.exp_log (valAt_ne_zero w a)
     · rw [Finset.prod_eq_one (fun v hv => h1 v (fun e => hw (e ▸ hv)))]
@@ -125,7 +149,9 @@ theorem eta_norm {χ : HChar D.host.E} (hχ : IsEtaT D.host χ) (z : (AE D)ˣ) :
   have hunit : b⁻¹ * a ∈ unitIdl D.host.E := fun w => by
     rw [← valAt_apply, map_mul, map_inv, hval]
     exact inv_mul_cancel₀ (valAt_ne_zero w a)
-  have hfac : ∀ v, χ.1 (finPartI D.host.E (locF (L := D.host.E) D.host.F v (unif v) ^ m v)) = 1 := fun v => by
+  have hfac
+      : ∀ v,
+        χ.1 (finPartI D.host.E (locF (L := D.host.E) D.host.F v (unif v) ^ m v)) = 1 := fun v => by
     rw [map_zpow, map_zpow, map_finPartI_locF_eq, hχ.res.1 v, etaFin]
     split_ifs with h1
     · have hev : Even (m v) := by
@@ -151,9 +177,14 @@ theorem eta_norm {χ : HChar D.host.E} (hχ : IsEtaT D.host χ) (z : (AE D)ˣ) :
     rw [map_prod, map_prod]
     exact Finset.prod_eq_one fun v _ => hfac v
   have hr : χ.1 (finPartI D.host.E (b⁻¹ * a)) = 1 := by
-    refine GlobalTheory.Mem.LocTriv.eq_one_of_local D.host.E χ.1 χ.2.1 _ (finPartI_mem_unitIdl.2 hunit) (fun _ => rfl)
+    refine GlobalTheory.Mem.LocTriv.eq_one_of_local D.host.E χ.1 χ.2.1 _
+      (finPartI_mem_unitIdl.2 hunit)
+      (fun _ => rfl)
       fun v x hx => ?_
-    have hx' : (x : v.adicCompletion D.host.E) = ((b⁻¹ * a : Ideles D.host.E) : AdeleRing (𝓞 D.host.E) D.host.E).2 v := hx
+    have hx'
+        : (x : v.adicCompletion D.host.E)
+          = ((b⁻¹ * a : Ideles D.host.E) : AdeleRing (𝓞 D.host.E) D.host.E).2 v :=
+      hx
     have hxu : IsUnitAt v x := by
       unfold IsUnitAt
       rw [hx']
@@ -224,6 +255,8 @@ def etaU {χ : HChar D.host.E} (hχ : IsEtaT D.host χ) : HeckeU D 1 where
   par := fun _ => by simp
   unr := fun _ hu _ => eq_one_of_unr hχ.unr hu
 
-theorem etaU_f {χ : HChar D.host.E} (hχ : IsEtaT D.host χ) (x : (AE D)ˣ) : (etaU hχ).f x = χ.1 (finIdl D x) := rfl
+theorem etaU_f {χ : HChar D.host.E} (hχ : IsEtaT D.host χ) (x : (AE D)ˣ)
+    : (etaU hχ).f x = χ.1 (finIdl D x) :=
+  rfl
 
 end GlobalTheory.AlphaSplit

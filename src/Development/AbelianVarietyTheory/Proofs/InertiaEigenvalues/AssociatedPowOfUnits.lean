@@ -19,8 +19,9 @@ section General
 
 variable {R : Type*} [CommRing R]
 
-theorem irreducible_of_units [IsDomain R] {x : R} (hx0 : x ≠ 0) (hxu : ¬ IsUnit x)
-    (hu : ∀ y : R, ¬ x ∣ y → IsUnit y) : Irreducible x := by
+theorem irreducible_of_units
+    [IsDomain R] {x : R} (hx0 : x ≠ 0) (hxu : ¬ IsUnit x) (hu : ∀ y : R, ¬ x ∣ y → IsUnit y)
+    : Irreducible x := by
   refine ⟨hxu, fun a b hab => ?_⟩
   by_cases ha : x ∣ a
   · right
@@ -30,8 +31,9 @@ theorem irreducible_of_units [IsDomain R] {x : R} (hx0 : x ≠ 0) (hxu : ¬ IsUn
     exact IsUnit.of_mul_eq_one_right c h2.symm
   · exact Or.inl (hu a ha)
 
-theorem associated_pow_of_units {x : R} (hu : ∀ y : R, ¬ x ∣ y → IsUnit y)
-    [IsHausdorff (Ideal.span {x}) R] {y : R} (hy : y ≠ 0) : ∃ n : ℕ, Associated (x ^ n) y := by
+theorem associated_pow_of_units
+    {x : R} (hu : ∀ y : R, ¬ x ∣ y → IsUnit y) [IsHausdorff (Ideal.span {x}) R] {y : R} (hy : y ≠ 0)
+    : ∃ n : ℕ, Associated (x ^ n) y := by
   classical
   have hex : ∃ n : ℕ, ¬ x ^ n ∣ y := by
     by_contra h
@@ -50,9 +52,11 @@ theorem associated_pow_of_units {x : R} (hu : ∀ y : R, ¬ x ∣ y → IsUnit y
     have := Nat.find_min hex (m := m) (by omega)
     exact not_not.1 this
   obtain ⟨c, rfl⟩ := hmin
-  have hc : IsUnit c := hu c fun hxc => hN (by
-    rw [hm, pow_succ]
-    exact mul_dvd_mul_left _ hxc)
+  have hc : IsUnit c :=
+    hu c fun hxc =>
+      hN (by
+        rw [hm, pow_succ]
+        exact mul_dvd_mul_left _ hxc)
   exact ⟨m, hc.unit, rfl⟩
 
 end General
@@ -66,8 +70,7 @@ theorem core_dvr (l : ℕ) [Fact l.Prime] (C : Core l) : C.DVR := by
   have hden' := hden C.ε he
   clear hden
   generalize aDp l (xi C.ε) = x at hfil hreg hcomp hden'
-  have hθ : ∀ y : Per.BdRp l, Per.θD l y = 0 ↔ x ∣ y := fun y => by
-    rw [hker, hfil, pow_one]
+  have hθ : ∀ y : Per.BdRp l, Per.θD l y = 0 ↔ x ∣ y := fun y => by rw [hker, hfil, pow_one]
   have hu : ∀ y : Per.BdRp l, ¬ x ∣ y → IsUnit y := fun y hy => hunit y fun h => hy ((hθ y).1 h)
   have hx0 : x ≠ 0 := fun h => one_ne_zero (hreg 1 (by rw [h, zero_mul]))
   have hxu : ¬ IsUnit x := fun h => (h.map (Per.θD l)).ne_zero ((hθ x).2 dvd_rfl)
@@ -80,9 +83,11 @@ theorem core_dvr (l : ℕ) [Fact l.Prime] (C : Core l) : C.DVR := by
   have hassoc : Associated x (C.j C.t) := by
     obtain ⟨c, hc⟩ := (hfil 1 _).1 ht1
     rw [pow_one] at hc
-    have hcu : IsUnit c := hu c fun hxc => ht2 ((hfil 2 _).2 (by
-      rw [hc, pow_two]
-      exact mul_dvd_mul_left _ hxc))
+    have hcu : IsUnit c :=
+      hu c fun hxc =>
+        ht2 ((hfil 2 _).2 (by
+          rw [hc, pow_two]
+          exact mul_dvd_mul_left _ hxc))
     exact ⟨hcu.unit, hc.symm⟩
   refine ⟨hdom, hdvr, ?_, ?_, ?_, fun n => ?_, ?_⟩
   · rw [hmax]
@@ -101,7 +106,9 @@ theorem core_dvr (l : ℕ) [Fact l.Prime] (C : Core l) : C.DVR := by
       obtain ⟨b, hb⟩ := hfield.mul_inv_cancel hy
       exact IsUnit.of_mul_eq_one b hb
     · obtain ⟨n, y, h⟩ := hden' z
-      exact ⟨(y, ⟨x ^ n, mem_nonZeroDivisors_of_ne_zero (pow_ne_zero n hx0)⟩), by
-        simpa only [map_pow] using h⟩
+      exact ⟨
+        (y, ⟨x ^ n, mem_nonZeroDivisors_of_ne_zero (pow_ne_zero n hx0)⟩),
+        by simpa only [map_pow] using h
+      ⟩
 
 end GlobalTheory.MemLoc.BdRDVR

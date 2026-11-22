@@ -12,29 +12,31 @@ namespace GlobalTheory.StableSubset
 
 open Finset Equiv
 
-theorem mem_iff_of_map_eq {N : ℕ} (σ : Perm (Fin N)) (A : Finset (Fin N))
-    (h : A.map σ.toEmbedding = A) (x : Fin N) : σ x ∈ A ↔ x ∈ A := by
+theorem mem_iff_of_map_eq
+    {N : ℕ} (σ : Perm (Fin N)) (A : Finset (Fin N)) (h : A.map σ.toEmbedding = A) (x : Fin N)
+    : σ x ∈ A ↔ x ∈ A := by
   conv_lhs => rw [← h]
   exact Finset.mem_map' σ.toEmbedding
 
-theorem map_eq_of_mem_iff {N : ℕ} (σ : Perm (Fin N)) (A : Finset (Fin N))
-    (h : ∀ x, x ∈ A → σ x ∈ A) : A.map σ.toEmbedding = A := by
+theorem map_eq_of_mem_iff {N : ℕ} (σ : Perm (Fin N)) (A : Finset (Fin N)) (h : ∀ x, x ∈ A → σ x ∈ A)
+    : A.map σ.toEmbedding = A := by
   apply Finset.eq_of_subset_of_card_le
   · intro y hy
     obtain ⟨x, hx, rfl⟩ := Finset.mem_map.1 hy
     exact h x hx
   · simp
 
-theorem card_stab_le {N : ℕ} (A : Finset (Fin N)) :
-    (univ.filter fun σ : Perm (Fin N) => A.map σ.toEmbedding = A).card ≤
-      A.card.factorial * (N - A.card).factorial := by
-  have hsub : (univ.filter fun σ : Perm (Fin N) => A.map σ.toEmbedding = A) ⊆
-      (univ : Finset (Perm {x // x ∈ A} × Perm {x // x ∉ A})).image
-        (fun p => Perm.subtypeCongr p.1 p.2) := by
+theorem card_stab_le {N : ℕ} (A : Finset (Fin N))
+    : (univ.filter fun σ : Perm (Fin N) => A.map σ.toEmbedding = A).card
+      ≤ A.card.factorial * (N - A.card).factorial := by
+  have hsub
+      : (univ.filter fun σ : Perm (Fin N) => A.map σ.toEmbedding = A)
+        ⊆ (univ : Finset (Perm {x // x ∈ A} × Perm {x // x ∉ A})).image
+          (fun p => Perm.subtypeCongr p.1 p.2) := by
     intro σ hσ
     have h := mem_iff_of_map_eq σ A (Finset.mem_filter.1 hσ).2
-    refine Finset.mem_image.2 ⟨(σ.subtypePerm h, σ.subtypePerm (fun x => not_congr (h x))),
-      Finset.mem_univ _, ?_⟩
+    refine Finset.mem_image.2
+      ⟨(σ.subtypePerm h, σ.subtypePerm (fun x => not_congr (h x))), Finset.mem_univ _, ?_⟩
     ext x
     by_cases hx : x ∈ A
     · simp [Perm.subtypeCongr.left_apply _ _ hx]
@@ -42,14 +44,18 @@ theorem card_stab_le {N : ℕ} (A : Finset (Fin N)) :
   refine (Finset.card_le_card hsub).trans (Finset.card_image_le.trans ?_)
   simp [Fintype.card_perm, Fintype.card_subtype_compl]
 
-theorem card_fix_ge {N : ℕ} (A : Finset (Fin N)) (h0 : 0 < A.card) (hN : A.card < N) :
-    A.card.factorial * (N - A.card).factorial ≤
-      4 * (univ.filter fun σ : Perm (Fin N) => A.map σ.toEmbedding = A ∧
-        (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j).card := by
+theorem card_fix_ge {N : ℕ} (A : Finset (Fin N)) (h0 : 0 < A.card) (hN : A.card < N)
+    : A.card.factorial * (N - A.card).factorial
+      ≤ 4 * (univ.filter fun σ : Perm (Fin N) =>
+        A.map σ.toEmbedding = A ∧ (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j).card := by
   have c1 : Fintype.card {x // x ∈ A} = A.card := by simp
   have c2 : Fintype.card {x // x ∉ A} = N - A.card := by simp [Fintype.card_subtype_compl]
-  have h1 := GlobalTheory.T.factorial_le_two_mul_card_perm_with_fixedPoint {x // x ∈ A} (Fintype.card_pos_iff.1 (by omega))
-  have h2 := GlobalTheory.T.factorial_le_two_mul_card_perm_with_fixedPoint {x // x ∉ A} (Fintype.card_pos_iff.1 (by omega))
+  have h1 :=
+    GlobalTheory.T.factorial_le_two_mul_card_perm_with_fixedPoint {x // x ∈ A}
+      (Fintype.card_pos_iff.1 (by omega))
+  have h2 :=
+    GlobalTheory.T.factorial_le_two_mul_card_perm_with_fixedPoint {x // x ∉ A}
+      (Fintype.card_pos_iff.1 (by omega))
   rw [c1] at h1
   rw [c2] at h2
   refine (Nat.mul_le_mul h1 h2).trans ?_
@@ -58,7 +64,8 @@ theorem card_fix_ge {N : ℕ} (A : Finset (Fin N)) (h0 : 0 < A.card) (hN : A.car
   refine Finset.card_le_card_of_injOn (fun p => Perm.subtypeCongr p.1 p.2) ?_ ?_
   · rintro ⟨e, f⟩ hp
     simp only [Finset.coe_product, Set.mem_prod, Finset.coe_filter, Finset.mem_univ, true_and,
-      Set.mem_setOf_eq] at hp ⊢
+        Set.mem_setOf_eq]
+      at hp ⊢
     obtain ⟨⟨i, hi⟩, ⟨j, hj⟩⟩ := hp
     refine ⟨map_eq_of_mem_iff _ _ ?_, ⟨i, i.2, ?_⟩, ⟨j, j.2, ?_⟩⟩
     · intro x hx
@@ -78,31 +85,37 @@ theorem card_fix_ge {N : ℕ} (A : Finset (Fin N)) (h0 : 0 < A.card) (hN : A.car
 
 noncomputable def wt {N : ℕ} (A : Finset (Fin N)) (σ : Perm (Fin N)) : ℕ :=
   if A.map σ.toEmbedding = A then
-    (if (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j then 4 else 8) else 0
+    (if (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j then 4 else 8)
+  else
+    0
 
-theorem sum_wt_le {N : ℕ} (A : Finset (Fin N)) (h0 : 0 < A.card) (hN : A.card < N) :
-    ∑ σ, wt A σ ≤ 7 * (A.card.factorial * (N - A.card).factorial) := by
+theorem sum_wt_le {N : ℕ} (A : Finset (Fin N)) (h0 : 0 < A.card) (hN : A.card < N)
+    : ∑ σ, wt A σ ≤ 7 * (A.card.factorial * (N - A.card).factorial) := by
   have h1 := card_stab_le A
   have h2 := card_fix_ge A h0 hN
-  have h3 : ∑ σ, wt A σ + 4 * (univ.filter fun σ : Perm (Fin N) => A.map σ.toEmbedding = A ∧
-        (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j).card =
-      8 * (univ.filter fun σ : Perm (Fin N) => A.map σ.toEmbedding = A).card := by
+  have h3
+      : ∑ σ, wt A σ
+          + 4 * (univ.filter fun σ : Perm (Fin N) =>
+            A.map σ.toEmbedding = A ∧ (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j).card
+        = 8 * (univ.filter fun σ : Perm (Fin N) => A.map σ.toEmbedding = A).card := by
     rw [Finset.card_filter, Finset.card_filter, Finset.mul_sum, Finset.mul_sum,
       ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun σ _ => ?_
     unfold wt
-    by_cases ha : A.map σ.toEmbedding = A <;>
-      by_cases hb : (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j <;> simp only [ha, hb] <;> simp
+    by_cases ha : A.map σ.toEmbedding = A <;> by_cases hb : (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j
+      <;> simp only [ha, hb] <;> simp
   omega
 
-theorem four_le_wt {N : ℕ} (A : Finset (Fin N)) (σ : Perm (Fin N))
-    (h : A.map σ.toEmbedding = A) : 4 ≤ wt A σ := by
+theorem four_le_wt {N : ℕ} (A : Finset (Fin N)) (σ : Perm (Fin N)) (h : A.map σ.toEmbedding = A)
+    : 4 ≤ wt A σ := by
   unfold wt
   rw [if_pos h]
   split_ifs <;> omega
 
-theorem eight_le_sum_wt {N a : ℕ} (σ : Perm (Fin N)) (A : Finset (Fin N)) (hA : A.card = a)
-    (h : A.map σ.toEmbedding = A) : 8 ≤ ∑ B ∈ powersetCard a (univ : Finset (Fin N)), wt B σ := by
+theorem eight_le_sum_wt
+    {N a : ℕ}
+    (σ : Perm (Fin N)) (A : Finset (Fin N)) (hA : A.card = a) (h : A.map σ.toEmbedding = A)
+    : 8 ≤ ∑ B ∈ powersetCard a (univ : Finset (Fin N)), wt B σ := by
   have hAm : A ∈ powersetCard a (univ : Finset (Fin N)) := by simp [hA]
   by_cases hb : (∃ i ∈ A, σ i = i) ∧ ∃ j ∉ A, σ j = j
   · obtain ⟨⟨i, hi, hσi⟩, ⟨j, hj, hσj⟩⟩ := hb
@@ -136,28 +149,31 @@ theorem eight_le_sum_wt {N a : ℕ} (σ : Perm (Fin N)) (A : Finset (Fin N)) (hA
     rw [← this]
     exact Finset.single_le_sum (f := fun B => wt B σ) (fun _ _ => Nat.zero_le _) hAm
 
-theorem card_exists_stable_subset_le : ∀ N a : ℕ, 0 < a → a < N →
-    8 * (Finset.univ.filter fun σ : Equiv.Perm (Fin N) =>
-      ∃ A : Finset (Fin N), A.card = a ∧ A.map σ.toEmbedding = A).card ≤ 7 * N.factorial := by
+theorem card_exists_stable_subset_le
+    : ∀ N a : ℕ,
+      0 < a → a < N
+        → 8 * (Finset.univ.filter fun σ : Equiv.Perm (Fin N) =>
+            ∃ A : Finset (Fin N), A.card = a ∧ A.map σ.toEmbedding = A).card
+          ≤ 7 * N.factorial := by
   intro N a h0 hN
-  calc _ ≤ ∑ σ : Perm (Fin N), ∑ B ∈ powersetCard a (univ : Finset (Fin N)), wt B σ := by
-        rw [Finset.card_filter, Finset.mul_sum]
-        refine Finset.sum_le_sum fun σ _ => ?_
-        split_ifs with h
-        · obtain ⟨A, hA, h⟩ := h
-          exact eight_le_sum_wt σ A hA h
-        · simp
-    _ = ∑ B ∈ powersetCard a (univ : Finset (Fin N)), ∑ σ : Perm (Fin N), wt B σ :=
-        Finset.sum_comm
+  calc
+    _ ≤ ∑ σ : Perm (Fin N), ∑ B ∈ powersetCard a (univ : Finset (Fin N)), wt B σ := by
+      rw [Finset.card_filter, Finset.mul_sum]
+      refine Finset.sum_le_sum fun σ _ => ?_
+      split_ifs with h
+      · obtain ⟨A, hA, h⟩ := h
+        exact eight_le_sum_wt σ A hA h
+      · simp
+    _ = ∑ B ∈ powersetCard a (univ : Finset (Fin N)), ∑ σ : Perm (Fin N), wt B σ := Finset.sum_comm
     _ ≤ ∑ B ∈ powersetCard a (univ : Finset (Fin N)),
           7 * (a.factorial * (N - a).factorial) := by
-        refine Finset.sum_le_sum fun B hB => ?_
-        have hB' : B.card = a := (Finset.mem_powersetCard.1 hB).2
-        have := sum_wt_le B (by omega) (by omega)
-        rwa [hB'] at this
+      refine Finset.sum_le_sum fun B hB => ?_
+      have hB' : B.card = a := (Finset.mem_powersetCard.1 hB).2
+      have := sum_wt_le B (by omega) (by omega)
+      rwa [hB'] at this
     _ = 7 * N.factorial := by
-        rw [Finset.sum_const, Finset.card_powersetCard, Finset.card_univ, Fintype.card_fin,
-          smul_eq_mul, ← Nat.choose_mul_factorial_mul_factorial hN.le]
-        ring
+      rw [Finset.sum_const, Finset.card_powersetCard, Finset.card_univ, Fintype.card_fin,
+        smul_eq_mul, ← Nat.choose_mul_factorial_mul_factorial hN.le]
+      ring
 
 end GlobalTheory.StableSubset

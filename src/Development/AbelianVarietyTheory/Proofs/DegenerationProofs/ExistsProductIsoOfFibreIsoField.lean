@@ -5,9 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsI
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex
 open GlobalTheory.Ex.AbPartIso
@@ -15,32 +17,34 @@ open GlobalTheory.Ex.AbPartIso
 noncomputable section
 namespace GlobalTheory.Ex.AbPartIso
 
-theorem exists_prodIso {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} {H : Over S'} {Φ : H.left ⟶ G.left}
-    (h : IsPullback Φ H.hom G.hom f) :
-    ∃ ψ : (Over.mk f ⊗ G).left ≅ H.left, ψ.hom ≫ Φ = (snd (Over.mk f) G).left ∧
-      ψ.hom ≫ H.hom = (fst (Over.mk f) G).left := by
+theorem exists_prodIso
+    {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} {H : Over S'} {Φ : H.left ⟶ G.left}
+    (h : IsPullback Φ H.hom G.hom f)
+    : ∃ ψ : (Over.mk f ⊗ G).left ≅ H.left,
+      ψ.hom ≫ Φ = (snd (Over.mk f) G).left ∧ ψ.hom ≫ H.hom = (fst (Over.mk f) G).left := by
   have p : IsPullback (snd (Over.mk f) G).left (fst (Over.mk f) G).left G.hom f :=
     (IsPullback.of_hasPullback f G.hom).flip
   exact ⟨p.isoIsPullback _ _ h, p.isoIsPullback_hom_fst _ _ h, p.isoIsPullback_hom_snd _ _ h⟩
 
-theorem exists_prodIso_of_common {S S' : Scheme.{0}} {f : S' ⟶ S} {G G' : Over S} {H : Over S'}
-    [GrpObj G] [GrpObj G'] [GrpObj H] {Φ : H.left ⟶ G.left} {Ψ : H.left ⟶ G'.left}
-    (h : IsGrpPullback H G f Φ) (h' : IsGrpPullback H G' f Ψ) :
-    ∃ (φ : Over.mk f ⊗ G ≅ Over.mk f ⊗ G') (ψ : (Over.mk f ⊗ G).left ⟶ H.left),
-      ψ ≫ Φ = (snd (Over.mk f) G).left ∧ ψ ≫ H.hom = (fst (Over.mk f) G).left ∧
-      ψ ≫ Ψ = (φ.hom ≫ snd (Over.mk f) G').left ∧ φ.hom ≫ fst _ _ = fst _ _ ∧
-      ∀ (Z : Over S) (t : Z ⟶ Over.mk f) (x y : Z ⟶ G),
-        lift t (x * y) ≫ φ.hom ≫ snd _ _ = (lift t x ≫ φ.hom ≫ snd _ _) * (lift t y ≫ φ.hom ≫ snd _ _) := by
+theorem exists_prodIso_of_common
+    {S S' : Scheme.{0}} {f : S' ⟶ S} {G G' : Over S} {H : Over S'} [GrpObj G] [GrpObj G'] [GrpObj H]
+    {Φ : H.left ⟶ G.left} {Ψ : H.left ⟶ G'.left}
+    (h : IsGrpPullback H G f Φ) (h' : IsGrpPullback H G' f Ψ)
+    : ∃ (φ : Over.mk f ⊗ G ≅ Over.mk f ⊗ G') (ψ : (Over.mk f ⊗ G).left ⟶ H.left),
+      ψ ≫ Φ = (snd (Over.mk f) G).left ∧ ψ ≫ H.hom = (fst (Over.mk f) G).left
+        ∧ ψ ≫ Ψ = (φ.hom ≫ snd (Over.mk f) G').left ∧ φ.hom ≫ fst _ _ = fst _ _
+        ∧ ∀ (Z : Over S) (t : Z ⟶ Over.mk f) (x y : Z ⟶ G),
+          lift t (x * y) ≫ φ.hom ≫ snd _ _
+            = (lift t x ≫ φ.hom ≫ snd _ _) * (lift t y ≫ φ.hom ≫ snd _ _) := by
   obtain ⟨ψ, e₁, e₂⟩ := exists_prodIso h.1
   obtain ⟨ψ', e₁', e₂'⟩ := exists_prodIso h'.1
   have w : ∀ G₀ : Over S, (fst (Over.mk f) G₀).left ≫ f = (Over.mk f ⊗ G₀).hom := fun G₀ =>
     Over.w (fst (Over.mk f) G₀)
   have k₂ : (ψ ≪≫ ψ'.symm).hom ≫ (fst (Over.mk f) G').left = (fst (Over.mk f) G).left := by
     rw [← e₂', ← e₂]; simp
-  have k₁ : (ψ ≪≫ ψ'.symm).hom ≫ (snd (Over.mk f) G').left = ψ.hom ≫ Ψ := by
-    rw [← e₁']; simp
-  let φ : Over.mk f ⊗ G ≅ Over.mk f ⊗ G' := Over.isoMk (ψ ≪≫ ψ'.symm) (by
-    rw [← w, ← w, ← k₂]; exact (Category.assoc _ _ _).symm)
+  have k₁ : (ψ ≪≫ ψ'.symm).hom ≫ (snd (Over.mk f) G').left = ψ.hom ≫ Ψ := by rw [← e₁']; simp
+  let φ : Over.mk f ⊗ G ≅ Over.mk f ⊗ G' :=
+    Over.isoMk (ψ ≪≫ ψ'.symm) (by rw [← w, ← w, ← k₂]; exact (Category.assoc _ _ _).symm)
   have k : (φ.hom ≫ snd (Over.mk f) G').left = ψ.hom ≫ Ψ := k₁
   refine ⟨φ, ψ.hom, e₁, e₂, k.symm, Over.OverMorphism.ext k₂, fun Z t x y => ?_⟩
   obtain ⟨Zl, ⟨⟨⟩⟩, Zh⟩ := Z
@@ -68,7 +72,19 @@ theorem exists_prodIso_of_common {S S' : Scheme.{0}} {f : S' ⟶ S} {G G' : Over
   rw [hm, ← h'.2 _ (up x) (up y) (pushPt h'.1.w (up x)) (pushPt h'.1.w (up y)) rfl rfl]
   exact mul_left_congr ht _ _ _ _ (hup' x) (hup' y)
 
-theorem exists_iso_of_isFib : ∀ (R : Type) [CommRing R] [IsDomain R] (D D' : DegPre R) (F : Type) [Field F] [Algebra (FractionRing R) F] (Q Q' : PolAV (Sp F)) (Φ : Q.A.left ⟶ D.P.A.left) (Φ' : Q'.A.left ⟶ D'.P.A.left), IsFib D F Q Φ → IsFib D' F Q' Φ' → ∀ σ : Q.A ≅ Q'.A, IsPolIso Q Q' σ → ∃ (φ : TF (R := R) F ⊗ D.P.A ≅ TF (R := R) F ⊗ D'.P.A) (w : BunIso φ), HomF φ ∧ w.IsGen ∧ ∀ (a : TF (R := R) F ⟶ D.P.A) (a' : TF (R := R) F ⟶ D'.P.A), (∀ x : baseOver (Sp F) ⟶ Q.A, a.left = x.left ≫ Φ → a'.left = (x ≫ σ.hom).left ≫ Φ') → lift (𝟙 _) a ≫ φ.hom = lift (𝟙 _) a' := by
+theorem exists_iso_of_isFib
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (D D' : DegPre R) (F : Type) [Field F]
+        [Algebra (FractionRing R) F] (Q Q' : PolAV (Sp F)) (Φ : Q.A.left ⟶ D.P.A.left)
+        (Φ' : Q'.A.left ⟶ D'.P.A.left),
+      IsFib D F Q Φ → IsFib D' F Q' Φ'
+        → ∀ σ : Q.A ≅ Q'.A,
+          IsPolIso Q Q' σ
+            → ∃ (φ : TF (R := R) F ⊗ D.P.A ≅ TF (R := R) F ⊗ D'.P.A) (w : BunIso φ),
+              HomF φ ∧ w.IsGen
+                ∧ ∀ (a : TF (R := R) F ⟶ D.P.A) (a' : TF (R := R) F ⟶ D'.P.A),
+                  (∀ x : baseOver (Sp F) ⟶ Q.A,
+                      a.left = x.left ≫ Φ → a'.left = (x ≫ σ.hom).left ≫ Φ')
+                    → lift (𝟙 _) a ≫ φ.hom = lift (𝟙 _) a' := by
   intro R _ _ D D' F _ _ Q Q' Φ Φ' hΦ hΦ' σ hσ
   have := hσ.1
   have g' : IsGrpPullback Q.A D'.P.A (TF (R := R) F).hom (σ.hom.left ≫ Φ') :=
@@ -76,7 +92,12 @@ theorem exists_iso_of_isFib : ∀ (R : Type) [CommRing R] [IsDomain R] (D D' : D
   obtain ⟨φ, ψ, e₁, e₂, e₃, e₄, e₅⟩ := exists_prodIso_of_common hΦ.1 g'
   have l₁ : LBIso (Q'.L.pull σ.hom.left) (D'.P.L.pull (σ.hom.left ≫ Φ')) :=
     LBIso.chartPull (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull Q'.L _ _ rfl)
-      (chartPullSame D'.P.L (fun _ : PUnit => σ.hom.left ≫ Φ') (fun _ => Φ') _ σ.hom.left fun _ => rfl) hΦ'.2.1
+      (chartPullSame D'.P.L
+        (fun _ : PUnit => σ.hom.left ≫ Φ')
+        (fun _ => Φ')
+        _ σ.hom.left
+        fun _ => rfl)
+      hΦ'.2.1
   have l₂ : LBIso Q.L (D'.P.L.pull (σ.hom.left ≫ Φ')) :=
     LBIso.trans Q.isLB (pull_isLB Q'.isLB _) (pull_isLB D'.P.isLB _) (LBIso.symm hσ.2) l₁
   have l₃ : LBIso (D.P.L.pull Φ) (D'.P.L.pull (σ.hom.left ≫ Φ')) :=
@@ -84,13 +105,22 @@ theorem exists_iso_of_isFib : ∀ (R : Type) [CommRing R] [IsDomain R] (D D' : D
   obtain ⟨w, hw⟩ : LBIso (D.P.L.pull (snd (TF (R := R) F) D.P.A).left)
       (D'.P.L.pull (φ.hom ≫ snd (TF (R := R) F) D'.P.A).left) :=
     LBIso.chartPull
-      (chartPullSame D.P.L (fun _ : PUnit => (snd (TF (R := R) F) D.P.A).left) (fun _ => Φ) _ ψ fun _ => e₁.symm)
-      (chartPullSame D'.P.L (fun _ : PUnit => (φ.hom ≫ snd (TF (R := R) F) D'.P.A).left)
-        (fun _ => σ.hom.left ≫ Φ') _ ψ fun _ => e₃.symm) l₃
+      (chartPullSame D.P.L
+        (fun _ : PUnit => (snd (TF (R := R) F) D.P.A).left)
+        (fun _ => Φ)
+        _ ψ
+        fun _ => e₁.symm)
+      (chartPullSame D'.P.L
+        (fun _ : PUnit => (φ.hom ≫ snd (TF (R := R) F) D'.P.A).left)
+        (fun _ => σ.hom.left ≫ Φ')
+        _ ψ
+        fun _ => e₃.symm)
+      l₃
   refine ⟨φ, w, ⟨e₄, e₅⟩, hw, fun a a' ha => ?_⟩
-  let x : baseOver (Sp F) ⟶ Q.A := Over.homMk ((lift (𝟙 (TF (R := R) F)) a).left ≫ ψ) (by
-    refine (Category.assoc _ _ _).trans ((congrArg (_ ≫ ·) e₂).trans ?_)
-    exact congrArg CommaMorphism.left (lift_fst (𝟙 (TF (R := R) F)) a))
+  let x : baseOver (Sp F) ⟶ Q.A :=
+    Over.homMk ((lift (𝟙 (TF (R := R) F)) a).left ≫ ψ) (by
+      refine (Category.assoc _ _ _).trans ((congrArg (_ ≫ ·) e₂).trans ?_)
+      exact congrArg CommaMorphism.left (lift_fst (𝟙 (TF (R := R) F)) a))
   have hx : a.left = x.left ≫ Φ := by
     refine Eq.symm ((Category.assoc _ _ _).trans ((congrArg (_ ≫ ·) e₁).trans ?_))
     exact congrArg CommaMorphism.left (lift_snd (𝟙 (TF (R := R) F)) a)

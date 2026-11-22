@@ -16,8 +16,9 @@ noncomputable section
 
 universe u w
 
-theorem StepThree.OnW.proof (hL : StepThree.OnW.Lift.Statement.{u, w})
-    (hG : StepThree.OnW.Gen.Statement.{u, w}) : StepThree.OnW.Statement.{u, w} := by
+theorem StepThree.OnW.proof
+    (hL : StepThree.OnW.Lift.Statement.{u, w}) (hG : StepThree.OnW.Gen.Statement.{u, w})
+    : StepThree.OnW.Statement.{u, w} := by
   intro k _ Ω _ _ N x T hK pp hpp
   obtain ⟨c₁, h₁⟩ := hL k Ω N x T hK pp hpp
   obtain ⟨c₂, h₂⟩ := hG k Ω N x T hK pp hpp
@@ -28,7 +29,8 @@ theorem StepThree.OnW.proof (hL : StepThree.OnW.Lift.Statement.{u, w})
   obtain ⟨t, ht, hts⟩ := h₁ b c hb (le_of_max_le_left hc) s hs hcomp
   have he : s I = t - (t - s I) := by abel
   rw [SetLike.mem_coe, he]
-  exact Submodule.sub_mem _ (Submodule.mem_sup_left (Submodule.subset_span (SetLike.mem_coe.mpr ht)))
+  exact Submodule.sub_mem _
+    (Submodule.mem_sup_left (Submodule.subset_span (SetLike.mem_coe.mpr ht)))
     (Submodule.mem_sup_right (hts I))
 
 end

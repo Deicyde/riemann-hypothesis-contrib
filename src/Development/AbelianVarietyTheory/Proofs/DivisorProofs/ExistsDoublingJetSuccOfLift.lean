@@ -35,15 +35,17 @@ private lemma X_pow_dvd_rescale' {k : ℕ} {p : PowerSeries R} (a : R)
 
 end Coeff
 
-theorem exists_jet_succ_of_lift (A B R : Type) [CommRing A] [CommRing B] [CommRing R] [Algebra ℚ R]
+theorem exists_jet_succ_of_lift
+    (A B R : Type) [CommRing A] [CommRing B] [CommRing R] [Algebra ℚ R]
     (π : B →+* A) (ε : A →+* B) (m : A →+* A) (β : B →+* R) (δ : A →+ R)
     (hεπ : ε.comp π = RingHom.id B) (hmπ : m.comp π = π) (hεm : ε.comp m = ε)
     (hm2 : ∀ f ∈ RingHom.ker ε, m f - 2 * f ∈ RingHom.ker ε ^ 2)
     (_hδ : ∀ f g, δ (f * g) = β (ε f) * δ g + β (ε g) * δ f) (_hδπ : ∀ a, δ (π a) = 0)
-    (n : ℕ) (hn : 2 ≤ n) (φ ψ : A → PowerSeries R) (hφ : IsJet π ε m β δ n φ)
-    (hψ : IsRingHomMod π β (n + 1) ψ) (hψφ : ∀ f, (X : PowerSeries R) ^ n ∣ ψ f - φ f) :
-    ∃ ψ' : A → PowerSeries R, IsJet π ε m β δ (n + 1) ψ' ∧
-      ∀ f, (X : PowerSeries R) ^ n ∣ ψ' f - φ f := by
+    (n : ℕ) (hn : 2 ≤ n)
+    (φ ψ : A → PowerSeries R) (hφ : IsJet π ε m β δ n φ) (hψ : IsRingHomMod π β (n + 1) ψ)
+    (hψφ : ∀ f, (X : PowerSeries R) ^ n ∣ ψ f - φ f)
+    : ∃ ψ' : A → PowerSeries R,
+      IsJet π ε m β δ (n + 1) ψ' ∧ ∀ f, (X : PowerSeries R) ^ n ∣ ψ' f - φ f := by
   obtain ⟨-, hφm, hφ0, hφ1⟩ := hφ
   obtain ⟨hψmul, hψadd, hψone, hψπ⟩ := hψ
   have hεmf : ∀ f, ε (m f) = ε f := fun f => by rw [← RingHom.comp_apply, hεm]
@@ -63,16 +65,18 @@ theorem exists_jet_succ_of_lift (A B R : Type) [CommRing A] [CommRing B] [CommRi
     simp only [hD_def]
     rw [← map_add (f := _)]
     apply coeff_eq_of_X_pow_dvd_sub _ (Nat.lt_succ_self n)
-    have e : u (f + g) - (u f + u g) =
-        (ψ (m f + m g) - (ψ (m f) + ψ (m g))) - rescale 2 (ψ (f + g) - (ψ f + ψ g)) := by
+    have e
+        : u (f + g) - (u f + u g)
+          = (ψ (m f + m g) - (ψ (m f) + ψ (m g))) - rescale 2 (ψ (f + g) - (ψ f + ψ g)) := by
       simp only [hu_def, map_add (f := _), map_sub]; ring
     rw [e]
     exact dvd_sub (hψadd _ _) (X_pow_dvd_rescale' _ (hψadd _ _))
   have hDmul : ∀ f g, D (f * g) = β (ε f) * D g + β (ε g) * D f := fun f g => by
-    have e1 : (X : PowerSeries R) ^ (n + 1) ∣
-        u (f * g) - (u f * ψ (m g) + rescale 2 (ψ f) * u g) := by
-      have e : u (f * g) - (u f * ψ (m g) + rescale 2 (ψ f) * u g) =
-          (ψ (m f * m g) - ψ (m f) * ψ (m g)) - rescale 2 (ψ (f * g) - ψ f * ψ g) := by
+    have e1
+        : (X : PowerSeries R) ^ (n + 1) ∣ u (f * g) - (u f * ψ (m g) + rescale 2 (ψ f) * u g) := by
+      have e
+          : u (f * g) - (u f * ψ (m g) + rescale 2 (ψ f) * u g)
+            = (ψ (m f * m g) - ψ (m f) * ψ (m g)) - rescale 2 (ψ (f * g) - ψ f * ψ g) := by
         simp only [hu_def, map_mul, map_sub]; ring
       rw [e]
       exact dvd_sub (hψmul _ _) (X_pow_dvd_rescale' _ (hψmul _ _))
@@ -87,7 +91,9 @@ theorem exists_jet_succ_of_lift (A B R : Type) [CommRing A] [CommRing B] [CommRi
     ring
   obtain ⟨c, hc⟩ : ∃ c : R, c * ((2 : R) ^ n - 2) = 1 := by
     have h4 : (4 : ℚ) ≤ 2 ^ n := by
-      calc (4 : ℚ) = 2 ^ 2 := by norm_num
+      calc
+        (4 : ℚ)
+          = 2 ^ 2 := by norm_num
         _ ≤ 2 ^ n := pow_le_pow_right₀ (by norm_num) hn
     have hne : (2 : ℚ) ^ n - 2 ≠ 0 := by intro h; linarith
     refine ⟨algebraMap ℚ R ((2 : ℚ) ^ n - 2)⁻¹, ?_⟩
@@ -102,9 +108,11 @@ theorem exists_jet_succ_of_lift (A B R : Type) [CommRing A] [CommRing B] [CommRi
   have hEm : ∀ f, E (m f) = 2 * E f := deriv_comp_m π ε m β E hεπ hmπ hm2 hEmul hEπ
   refine ⟨fun f => ψ f + C (E f) * X ^ n, ⟨⟨?_, ?_, ?_, ?_⟩, ?_, ?_, ?_⟩, ?_⟩
   · intro f g
-    have e : ψ (f * g) + C (E (f * g)) * X ^ n - (ψ f + C (E f) * X ^ n) * (ψ g + C (E g) * X ^ n) =
-        (ψ (f * g) - ψ f * ψ g) + X ^ n * (C (E (f * g)) - C (E f) * ψ g - C (E g) * ψ f) -
-          C (E f) * C (E g) * (X ^ n * X ^ n) := by ring
+    have e
+        : ψ (f * g) + C (E (f * g)) * X ^ n - (ψ f + C (E f) * X ^ n) * (ψ g + C (E g) * X ^ n)
+          = (ψ (f * g) - ψ f * ψ g) + X ^ n * (C (E (f * g)) - C (E f) * ψ g - C (E g) * ψ f)
+            - C (E f) * C (E g) * (X ^ n * X ^ n) := by
+      ring
     rw [e]
     refine dvd_sub (dvd_add (hψmul f g) ?_) ?_
     · rw [pow_succ]

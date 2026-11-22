@@ -27,9 +27,12 @@ theorem convergent_reduction_exists : Formalism.L2.SG.Pf.RowDictPf.RConvFExists 
   have hreg := rr_IsReg_of I μf fund R hR
 
   have hemb : Measurable (fun g : I.Gf => ((1, g) : I.GA)) := by fun_prop
-  obtain ⟨T, hT⟩ := wk_exists (μ := μf) (U := fun g => R (1, g))
-    (fun g z => (rr_norm hfd hreg (1, g) z).le)
-    (fun x y => ((rr_weak_meas hfd hreg x y).comp_measurable hemb).aestronglyMeasurable) hf
+  obtain ⟨T, hT⟩ :=
+    wk_exists (μ := μf)
+      (U := fun g => R (1, g))
+      (fun g z => (rr_norm hfd hreg (1, g) z).le)
+      (fun x y => ((rr_weak_meas hfd hreg x y).comp_measurable hemb).aestronglyMeasurable)
+      hf
   exact ⟨T, hf, hT⟩
 
 end Formalism.L2.SG.Pf.RConvFExistsPf

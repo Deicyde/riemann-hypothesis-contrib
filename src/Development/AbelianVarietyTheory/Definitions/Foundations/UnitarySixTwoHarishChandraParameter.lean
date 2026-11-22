@@ -10,14 +10,14 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Finset
 namespace GlobalTheory.SignedHC.Model
 
 theorem nMinus_parD (G : GridData) (i j : ℕ) : nMinus (G.parD i j) = (G.m - j) / 2 := by
-  have : (G.parD i j).filter (fun x => x.2 = false) =
-      (range ((G.m - j) / 2)).image fun a => (-(G.b (j + 2 + 2 * a) : ℚ), false) := by
+  have : (G.parD i j).filter (fun x => x.2 = false)
+      = (range ((G.m - j) / 2)).image fun a => (-(G.b (j + 2 + 2 * a) : ℚ), false) := by
     ext ⟨x, s⟩
     simp only [mem_filter, GridData.mem_parD, mem_image, mem_range, Prod.mk.injEq]
     constructor
     · rintro ⟨h | ⟨l, h1, h2, h3, h4⟩ | ⟨l, -, -, -, h⟩ | ⟨l, -, -, -, h⟩, rfl⟩
       · simp at h
-      · have h5 : ¬ (l ≤ j + 1 ∨ Even (l - j - 1)) := by simpa using h4.symm
+      · have h5 : ¬(l ≤ j + 1 ∨ Even (l - j - 1)) := by simpa using h4.symm
         rw [Nat.even_iff] at h5
         refine ⟨(l - j - 2) / 2, by omega, ?_, rfl⟩
         rw [show j + 2 + 2 * ((l - j - 2) / 2) = l by omega, h3]
@@ -25,7 +25,9 @@ theorem nMinus_parD (G : GridData) (i j : ℕ) : nMinus (G.parD i j) = (G.m - j)
       · simp at h
     · rintro ⟨a, ha, rfl, rfl⟩
       refine ⟨Or.inr (Or.inl ⟨j + 2 + 2 * a, by omega, by omega, rfl, ?_⟩), rfl⟩
-      symm; rw [decide_eq_false_iff_not, Nat.even_iff]; omega
+      symm
+      rw [decide_eq_false_iff_not, Nat.even_iff]
+      omega
   rw [nMinus, this, card_image_of_injOn, card_range]
   intro a ha a' ha' h
   simp only [coe_range, Set.mem_Iio] at ha ha'

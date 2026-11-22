@@ -9,7 +9,12 @@ open PowerSeries GlobalTheory.BK
 
 namespace GlobalTheory.CokerL
 
-theorem isoProj_mem_L : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (P : PhiMod O K l e a ι) (Δ : Descent P) (c : ZMod e) (v : Vec K a ι), v ∈ P.L → GlobalTheory.CokerL.isoProj Δ c v ∈ P.L := by
+theorem isoProj_mem_L
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
+        [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime]
+        [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a]
+        (P : PhiMod O K l e a ι) (Δ : Descent P) (c : ZMod e) (v : Vec K a ι),
+      v ∈ P.L → GlobalTheory.CokerL.isoProj Δ c v ∈ P.L := by
   intro O K _ _ _ _ _ l e a ι _ _ _ _ _ _ _ P Δ c v hv
   letI := Fintype.ofFinite (rootsOfUnity e K)
   have key : ∀ s : ZMod a → K, (∀ τ, ‖s τ‖ ≤ 1) → ∀ w ∈ P.L, diagScale K a ι s w ∈ P.L := by
@@ -30,11 +35,15 @@ theorem isoProj_mem_L : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrame
       exact dvd_pow_self l (NeZero.ne a)
     exact (Fact.out : l.Prime).one_lt.ne' (Nat.dvd_one.1 ((Nat.dvd_add_right h).1 h1))
   have he : ‖(e : K)⁻¹‖ ≤ 1 := by
-    rw [norm_inv, norm_natCast_eq l, Padic.norm_natCast_eq_one_iff.2
-      ((Nat.Prime.coprime_iff_not_dvd Fact.out).2 hnd), inv_one]
-  have hsc : isoProj Δ c v = diagScale K a ι (fun _ => (e : K)⁻¹) (∑ ζ : rootsOfUnity e K,
-      diagScale K a ι (fun τ => ((TameGal.inertia ζ : TameGal K l e a).root τ)⁻¹ ^ c.val)
-        (Δ.act (TameGal.inertia ζ) v)) := by
+    rw [norm_inv, norm_natCast_eq l,
+      Padic.norm_natCast_eq_one_iff.2 ((Nat.Prime.coprime_iff_not_dvd Fact.out).2 hnd), inv_one]
+  have hsc
+      : isoProj Δ c v
+        = diagScale K a ι
+          (fun _ => (e : K)⁻¹)
+          (∑ ζ : rootsOfUnity e K,
+            diagScale K a ι (fun τ => ((TameGal.inertia ζ : TameGal K l e a).root τ)⁻¹ ^ c.val)
+              (Δ.act (TameGal.inertia ζ) v)) := by
     simp only [isoProj, LinearMap.smul_apply, LinearMap.sum_apply, LinearMap.comp_apply]
     rfl
   rw [hsc]

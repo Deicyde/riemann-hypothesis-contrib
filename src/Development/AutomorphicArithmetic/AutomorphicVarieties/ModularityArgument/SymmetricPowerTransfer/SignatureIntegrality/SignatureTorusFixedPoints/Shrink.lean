@@ -6,10 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
-private theorem vo {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (x : kˣ) :
-    valuation k (x : k) = uniformizer k ^ ord k x := by
+private theorem vo
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (x : kˣ)
+    : valuation k (x : k) = uniformizer k ^ ord k x := by
   have h1 := GlAx.val_div_ord x
   have h2 := GlAx.val_zpow (k := k) (ord k x)
   have e : (x : k) = ((x / unif k ^ ord k x : kˣ) : k) * ((unif k ^ ord k x : kˣ) : k) := by
@@ -30,7 +34,7 @@ theorem UpperTheory.V.Z.Sym.Sig.shrink : UpperTheory.V.Z.Sym.Sig.Shrink := by
     rcases hij.lt_or_eq with h | h
     · exact (hlt i j h).le
     · rw [h]
-  have hv' : ∀ i, valuation k ((d⁻¹) i : k) = uniformizer k ^ (-a i) := by
+  have hv' : ∀ i, valuation k ((d⁻¹) i : k) = uniformizer k ^ (- a i) := by
     intro i
     rw [Pi.inv_apply, Units.val_inv_eq_inv_val, map_inv₀, hv, _root_.zpow_neg]
   refine ⟨fun x hx hxm => ?_, fun c y hy hym => ?_⟩
@@ -45,18 +49,20 @@ theorem UpperTheory.V.Z.Sym.Sig.shrink : UpperTheory.V.Z.Sym.Sig.Shrink := by
       have := hlt i j h
       push_cast
       omega
-  · have hy' : y ∈ Subgroup.comap (GlobalTheory.CuspRep.invT n k) (unipB k (Fin n)) ⊓ Kc k n (c + 1) := hy
+  · have hy'
+        : y ∈ Subgroup.comap (GlobalTheory.CuspRep.invT n k) (unipB k (Fin n)) ⊓ Kc k n (c + 1) :=
+      hy
     have e1 : (dg d)⁻¹ = diagT k (Fin n) d⁻¹ := (map_inv _ _).symm
-    have e2 : dg d = (diagT k (Fin n) d⁻¹)⁻¹ := by
-      rw [← map_inv, inv_inv]
+    have e2 : dg d = (diagT k (Fin n) d⁻¹)⁻¹ := by rw [← map_inv, inv_inv]
     rw [e1, e2]
-    refine Subgroup.mem_inf.2 ⟨GlAx.conj_Nm (a := fun i => -a i) hv' (c := c) (c' := c) ?_ hy, ?_⟩
+    refine Subgroup.mem_inf.2 ⟨GlAx.conj_Nm (a := fun i => - a i) hv' (c := c) (c' := c) ?_ hy, ?_⟩
     · intro i j h
       have := hlt j i h
       omega
     · rw [GlAx.mem_Kc] at hym ⊢
       refine GlAx.conj_Kc (c' := ((m + 1 : ℕ) : ℤ)) (Subgroup.mem_inf.1 hy').1 hym d⁻¹
-        (fun i => -a i) hv' ?_
+        (fun i => - a i)
+        hv' ?_
       intro i j
       rcases le_or_gt i j with h | h
       · exact Or.inl fun z hz => GlAx.low_sub_one hz h

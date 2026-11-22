@@ -12,8 +12,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.LamCM Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.LamCM Formalism.L2.Pj
 open scoped ComplexOrder
 open GlobalTheory GlobalTheory.CM GlobalTheory.Frames GlobalTheory.LamT
 
@@ -23,15 +25,18 @@ open ReciprocityTheory.ChartRestriction.G.FD
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem emb_smul' (τ : E →+* ℂ) (a : E) (v : Fin r → E) :
-    FD.Data.emb τ (a • v) = τ a • FD.Data.emb τ v := by
+theorem emb_smul' (τ : E →+* ℂ) (a : E) (v : Fin r → E)
+    : FD.Data.emb τ (a • v) = τ a • FD.Data.emb τ v := by
   funext k
   simp [FD.Data.emb]
 
-theorem inv_mulVec_eq_zero {p : ℕ} (hp : p ≤ r) (M : Matrix (Fin r) (Fin r) ℂ) (hM : M.det ≠ 0)
+theorem inv_mulVec_eq_zero
+    {p : ℕ} (hp : p ≤ r)
+    (M : Matrix (Fin r) (Fin r) ℂ) (hM : M.det ≠ 0)
     {u : Fin r → ℂ}
     (hu : u ∈ Submodule.span ℂ (Set.range fun a : Fin p => FD.col M (Fin.castLE hp a)))
-    (k : Fin r) (hk : p ≤ (k : ℕ)) : (M⁻¹.mulVec u) k = 0 := by
+    (k : Fin r) (hk : p ≤ (k : ℕ))
+    : (M⁻¹.mulVec u) k = 0 := by
   induction hu using Submodule.span_induction with
   | mem u hu =>
     obtain ⟨a, rfl⟩ := hu
@@ -49,7 +54,13 @@ theorem inv_mulVec_eq_zero {p : ℕ} (hp : p ≤ r) (M : Matrix (Fin r) (Fin r) 
   | add a b _ _ ha hb => rw [Matrix.mulVec_add, Pi.add_apply, ha, hb, add_zero]
   | smul c a _ ha => rw [Matrix.mulVec_smul, Pi.smul_apply, ha, smul_zero]
 
-theorem perFr_pure : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : FD.DataX E r) (La : ℝ) (x : FD.Frame X.Ψ r) (lam : Fin r → Fin r → E), x ∈ X.toData.dom → FD.LamBasis X La x lam → ∀ (a : E) (j : Fin r) (τ : E →+* ℂ) (i : ℕ), ((j : ℕ) < X.p0 → τ ∈ X.Ψ → perFr X.toData x (a • lam j) τ i = 0) ∧ (X.p0 ≤ (j : ℕ) → τ ∉ X.Ψ → i < X.p0 → perFr X.toData x (a • lam j) τ i = 0) := by
+theorem perFr_pure
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : FD.DataX E r) (La : ℝ)
+        (x : FD.Frame X.Ψ r) (lam : Fin r → Fin r → E),
+      x ∈ X.toData.dom → FD.LamBasis X La x lam
+        → ∀ (a : E) (j : Fin r) (τ : E →+* ℂ) (i : ℕ),
+          ((j : ℕ) < X.p0 → τ ∈ X.Ψ → perFr X.toData x (a • lam j) τ i = 0)
+            ∧ (X.p0 ≤ (j : ℕ) → τ ∉ X.Ψ → i < X.p0 → perFr X.toData x (a • lam j) τ i = 0) := by
   intro E _ _ _ r X La x lam hx hb a j τ i
   obtain ⟨-, -, ho, -, -, -, hsp⟩ := hb
   refine ⟨fun hj hτ => ?_, fun hj hτ hi => ?_⟩
@@ -63,9 +74,10 @@ theorem perFr_pure : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r :
   · unfold perFr
     rw [dite_eq_right hτ]
     split_ifs with h' h
-    · have hm : FD.col (FD.mat x ⟨conjEmb τ, h'⟩) ⟨X.p0 - 1 - i, h⟩ ∈
-          Submodule.span ℂ (Set.range fun a : Fin X.p0 =>
-            FD.Data.emb (conjEmb τ) (lam (Fin.castLE X.p0_le a))) := by
+    · have hm
+          : FD.col (FD.mat x ⟨conjEmb τ, h'⟩) ⟨X.p0 - 1 - i, h⟩ ∈ Submodule.span ℂ
+            (Set.range fun a : Fin X.p0 =>
+              FD.Data.emb (conjEmb τ) (lam (Fin.castLE X.p0_le a))) := by
         have := hsp ⟨conjEmb τ, h'⟩
         simp only at this
         rw [← this]

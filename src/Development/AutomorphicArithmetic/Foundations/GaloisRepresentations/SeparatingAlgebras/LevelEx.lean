@@ -6,13 +6,14 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.PowValAdd
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
 open UpperTheory.Gal.Gen
 
-theorem UpperTheory.Gal.Gen.levelEx_pf :
-    UpperTheory.Gal.Gen.LevelEx := by
+theorem UpperTheory.Gal.Gen.levelEx_pf : UpperTheory.Gal.Gen.LevelEx := by
   intro E _ _ _ a W f
   obtain ⟨K0, hK0o, hK0c⟩ := UpperTheory.exists_isOpen_isCompact_subgroup_finiteAdelicUnitary E a
   let C : Subgroup (UA E a) := K0.map (finU (E := E) (n := a)).subtype
@@ -34,4 +35,8 @@ theorem UpperTheory.Gal.Gen.levelEx_pf :
         exact hxt
       exact ⟨⟨x, hxf⟩, hx, rfl⟩
   obtain ⟨hc, N, hN, h1, hNC⟩ := GlobalTheory.CongSc.stab_level W f C hCf hCc hCo
-  exact ⟨C ⊓ GlobalTheory.CongSc.stab W f, ⟨inf_le_left.trans hCf, hc, N, hN, h1, hNC⟩, fun k hk v g => hk.2 v g⟩
+  exact ⟨
+    C ⊓ GlobalTheory.CongSc.stab W f,
+    ⟨inf_le_left.trans hCf, hc, N, hN, h1, hNC⟩,
+    fun k hk v g => hk.2 v g
+  ⟩

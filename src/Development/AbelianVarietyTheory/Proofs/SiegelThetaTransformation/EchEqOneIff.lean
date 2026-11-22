@@ -33,8 +33,7 @@ theorem ech_add (s t : ℚ) : ech (s + t) = ech s * ech t := by
   push_cast
   ring
 
-theorem ech_zero : ech 0 = 1 := by
-  simp [ech]
+theorem ech_zero : ech 0 = 1 := by simp [ech]
 
 theorem ech_eq_one_iff (t : ℚ) : ech t = 1 ↔ ∃ m : ℤ, t = m := by
   unfold ech
@@ -64,12 +63,14 @@ theorem conj_ech (t : ℚ) : conj (ech t) = ech (-t) := by
   push_cast
   ring
 
-theorem ech_sum {α : Type} (s : Finset α) (f : α → ℚ) : ech (∑ a ∈ s, f a) = ∏ a ∈ s, ech (f a) := by
+theorem ech_sum {α : Type} (s : Finset α) (f : α → ℚ)
+    : ech (∑ a ∈ s, f a) = ∏ a ∈ s, ech (f a) := by
   unfold ech
   push_cast
   rw [Finset.mul_sum, Complex.exp_sum]
 
-theorem intM_iff [Fintype κ] [Fintype ι] (x : Matrix κ ι ℚ) : IntM x ↔ ∃ m : κ → ι → ℤ, x = zm m := by
+theorem intM_iff [Fintype κ] [Fintype ι] (x : Matrix κ ι ℚ)
+    : IntM x ↔ ∃ m : κ → ι → ℤ, x = zm m := by
   constructor
   · intro h
     choose m hm using fun k i => (IsIntegrallyClosed.isIntegral_iff (R := ℤ) (K := ℚ)).mp (h k i)

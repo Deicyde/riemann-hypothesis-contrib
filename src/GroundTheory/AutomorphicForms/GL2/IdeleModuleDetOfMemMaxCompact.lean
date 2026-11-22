@@ -20,8 +20,7 @@ variable (K : Type*) [Field K] [NumberField K]
 
 def adeleMeasure2 : Measure (Fin 2 → 𝔸[K]) := Measure.pi fun _ => adeleMeasure K
 
-instance : (adeleMeasure2 K).IsAddHaarMeasure := by
-  unfold adeleMeasure2; infer_instance
+instance : (adeleMeasure2 K).IsAddHaarMeasure := by unfold adeleMeasure2; infer_instance
 
 variable {K}
 
@@ -37,19 +36,19 @@ def vecMulHomeomorph (g : GL (Fin 2) 𝔸[K]) : (Fin 2 → 𝔸[K]) ≃ₜ (Fin 
   continuous_toFun := continuous_id.matrix_vecMul continuous_const
   continuous_invFun := continuous_id.matrix_vecMul continuous_const
 
-theorem measurable_vecMul (g : GL (Fin 2) 𝔸[K]) :
-    Measurable fun x : Fin 2 → 𝔸[K] => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K]) :=
+theorem measurable_vecMul (g : GL (Fin 2) 𝔸[K])
+    : Measurable fun x : Fin 2 → 𝔸[K] => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K]) :=
   (vecMulHomeomorph g).continuous.measurable
 
-theorem measurableEmbedding_vecMul (g : GL (Fin 2) 𝔸[K]) :
-    MeasurableEmbedding fun x : Fin 2 → 𝔸[K] => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K]) :=
+theorem measurableEmbedding_vecMul (g : GL (Fin 2) 𝔸[K])
+    : MeasurableEmbedding fun x : Fin 2 → 𝔸[K] => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K]) :=
   (vecMulHomeomorph g).toMeasurableEquiv.measurableEmbedding
 
 def vecMulAddHom (g : GL (Fin 2) 𝔸[K]) : (Fin 2 → 𝔸[K]) →+ (Fin 2 → 𝔸[K]) :=
   AddMonoidHom.mk' (fun x => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K])) fun x y => by rw [add_vecMul]
 
-theorem isAddHaarMeasure_map_vecMul (g : GL (Fin 2) 𝔸[K]) :
-    ((adeleMeasure2 K).map fun x => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K])).IsAddHaarMeasure :=
+theorem isAddHaarMeasure_map_vecMul (g : GL (Fin 2) 𝔸[K])
+    : ((adeleMeasure2 K).map fun x => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K])).IsAddHaarMeasure :=
   isAddHaarMeasure_map (adeleMeasure2 K) (vecMulAddHom g) (vecMulHomeomorph g).continuous
     (vecMulHomeomorph g).surjective (vecMulHomeomorph g).isClosedEmbedding.tendsto_cocompact
 
@@ -57,9 +56,9 @@ def unitBall2 : Set (Fin 2 → 𝔸[K]) :=
   {x | (∀ w : InfinitePlace K, euclidNorm (infComp w x) ≤ 1) ∧
     ∀ v : HeightOneSpectrum (𝓞 K), ‖finComp v x‖ ≤ 1}
 
-theorem forall_norm_finComp_le_one_iff (x : Fin 2 → 𝔸[K]) :
-    (∀ v : HeightOneSpectrum (𝓞 K), ‖finComp v x‖ ≤ 1) ↔
-      ∀ i, (x i).2 ∈ integralFiniteAdeles (𝓞 K) K := by
+theorem forall_norm_finComp_le_one_iff (x : Fin 2 → 𝔸[K])
+    : (∀ v : HeightOneSpectrum (𝓞 K), ‖finComp v x‖ ≤ 1)
+      ↔ ∀ i, (x i).2 ∈ integralFiniteAdeles (𝓞 K) K := by
   simp only [mem_integralFiniteAdeles]
   constructor
   · intro h i v
@@ -70,15 +69,14 @@ theorem forall_norm_finComp_le_one_iff (x : Fin 2 → 𝔸[K]) :
     refine (pi_norm_le_iff_of_nonneg zero_le_one).2 fun i => ?_
     exact norm_le_one_of_mem v (h i v)
 
-theorem unitBall2_eq :
-    (unitBall2 : Set (Fin 2 → 𝔸[K])) =
-      {x | (∀ w : InfinitePlace K, euclidNorm (infComp w x) ≤ 1) ∧
-        ∀ i, (x i).2 ∈ integralFiniteAdeles (𝓞 K) K} := by
+theorem unitBall2_eq
+    : (unitBall2 : Set (Fin 2 → 𝔸[K]))
+      = {x | (∀ w : InfinitePlace K, euclidNorm (infComp w x) ≤ 1) ∧
+          ∀ i, (x i).2 ∈ integralFiniteAdeles (𝓞 K) K} := by
   ext x
   simp only [unitBall2, Set.mem_ofPred_eq, forall_norm_finComp_le_one_iff]
 
-theorem continuous_infComp (w : InfinitePlace K) :
-    Continuous fun x : Fin 2 → 𝔸[K] => infComp w x :=
+theorem continuous_infComp (w : InfinitePlace K) : Continuous fun x : Fin 2 → 𝔸[K] => infComp w x :=
   continuous_pi fun i => (continuous_apply w).comp (continuous_fst.comp (continuous_apply i))
 
 theorem isClosed_unitBall2 : IsClosed (unitBall2 : Set (Fin 2 → 𝔸[K])) := by
@@ -99,12 +97,14 @@ theorem isCompact_unitBall2 : IsCompact (unitBall2 : Set (Fin 2 → 𝔸[K])) :=
         Metric.closedBall (0 : w.Completion) 1) :=
       isCompact_univ_pi fun w => isCompact_closedBall 0 1
     have h := hB.prod (isCompact_integralFiniteAdeles K)
-    have hCeq : C = (Set.univ.pi fun w : InfinitePlace K =>
-        Metric.closedBall (0 : w.Completion) 1) ×ˢ
-          (integralFiniteAdeles (𝓞 K) K : Set (FiniteAdeleRing (𝓞 K) K)) := by
+    have hCeq
+        : C
+          = (Set.univ.pi fun w : InfinitePlace K => Metric.closedBall (0 : w.Completion) 1)
+            ×ˢ (integralFiniteAdeles (𝓞 K) K : Set (FiniteAdeleRing (𝓞 K) K)) := by
       ext a
-      change _ ↔ (a.1 ∈ Set.univ.pi (fun w : InfinitePlace K =>
-        Metric.closedBall (0 : w.Completion) 1) ∧ a.2 ∈ (integralFiniteAdeles (𝓞 K) K : Set _))
+      change _
+        ↔ (a.1 ∈ Set.univ.pi (fun w : InfinitePlace K => Metric.closedBall (0 : w.Completion) 1)
+          ∧ a.2 ∈ (integralFiniteAdeles (𝓞 K) K : Set _))
       constructor
       · rintro ⟨h1, h2⟩
         exact ⟨fun w _ => mem_closedBall_zero_iff.mpr (h1 w), h2⟩
@@ -133,17 +133,22 @@ theorem adeleMeasure2_unitBall2_ne_zero : adeleMeasure2 K unitBall2 ≠ 0 := by
     rw [Set.ofPred_and]
     refine IsOpen.inter ?_ ?_
     · simp only [Set.ofPred_forall]
-      exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun w =>
-        isOpen_lt (continuous_norm.comp ((continuous_apply w).comp
-          (continuous_fst.comp (continuous_apply i)))) continuous_const
+      exact isOpen_iInter_of_finite fun i =>
+        isOpen_iInter_of_finite fun w =>
+          isOpen_lt
+            (continuous_norm.comp ((continuous_apply w).comp
+              (continuous_fst.comp (continuous_apply i))))
+            continuous_const
     · simp only [Set.ofPred_forall]
       exact isOpen_iInter_of_finite fun i =>
         isOpen_integralFiniteAdeles.preimage (continuous_snd.comp (continuous_apply i))
-  have h0 : (0 : Fin 2 → 𝔸[K]) ∈ U :=
-    ⟨fun i w => by
+  have h0 : (0 : Fin 2 → 𝔸[K]) ∈ U := ⟨
+    fun i w => by
       have h0 : ((0 : Fin 2 → 𝔸[K]) i).1 w = 0 := rfl
       rw [h0, norm_zero]
-      norm_num, fun i => zero_mem _⟩
+      norm_num,
+    fun i => zero_mem _
+  ⟩
   have hsub : U ⊆ unitBall2 := by
     intro x hx
     rw [unitBall2_eq]
@@ -152,28 +157,33 @@ theorem adeleMeasure2_unitBall2_ne_zero : adeleMeasure2 K unitBall2 ≠ 0 := by
     refine Real.sqrt_le_one.mpr ?_
     have hle : ∀ i, ‖infComp w x i‖ ^ 2 ≤ (1 / 2) ^ 2 := fun i =>
       pow_le_pow_left₀ (norm_nonneg _) (hx.1 i w).le 2
-    calc ∑ i, ‖infComp w x i‖ ^ 2 ≤ ∑ _i : Fin 2, ((1 : ℝ) / 2) ^ 2 :=
-          Finset.sum_le_sum fun i _ => hle i
+    calc
+      ∑ i, ‖infComp w x i‖ ^ 2
+        ≤ ∑ _i : Fin 2, ((1 : ℝ) / 2) ^ 2 := Finset.sum_le_sum fun i _ => hle i
       _ ≤ 1 := by norm_num
   exact (pos_iff_ne_zero.mp ((hU.measure_pos (adeleMeasure2 K) ⟨0, h0⟩).trans_le
     (measure_mono hsub)))
 
-theorem vecMul_mem_unitBall2_iff {k : GL (Fin 2) 𝔸[K]}
-    (hk : k ∈ (maxCompact : Subgroup (AdelicGLn.AdelicGL K 2))) (x : Fin 2 → 𝔸[K]) :
-    x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K]) ∈ unitBall2 ↔ x ∈ unitBall2 := by
+theorem vecMul_mem_unitBall2_iff
+    {k : GL (Fin 2) 𝔸[K]} (hk : k ∈ (maxCompact : Subgroup (AdelicGLn.AdelicGL K 2)))
+    (x : Fin 2 → 𝔸[K])
+    : x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K]) ∈ unitBall2 ↔ x ∈ unitBall2 := by
   simp only [unitBall2, Set.mem_ofPred_eq]
-  have h1 : ∀ w : InfinitePlace K,
-      euclidNorm (infComp w (x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K]))) =
-        euclidNorm (infComp w x) :=
-    fun w => by rw [infComp_vecMul_GL, hk.1 w]
-  have h2 : ∀ v : HeightOneSpectrum (𝓞 K),
-      ‖finComp v (x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K]))‖ = ‖finComp v x‖ :=
-    fun v => by rw [finComp_vecMul_GL, norm_vecMul_integralGL v (hk.2 v)]
+  have h1
+      : ∀ w : InfinitePlace K,
+        euclidNorm (infComp w (x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K])))
+          = euclidNorm (infComp w x) := fun w => by
+    rw [infComp_vecMul_GL, hk.1 w]
+  have h2
+      : ∀ v : HeightOneSpectrum (𝓞 K),
+        ‖finComp v (x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K]))‖ = ‖finComp v x‖ := fun v => by
+    rw [finComp_vecMul_GL, norm_vecMul_integralGL v (hk.2 v)]
   simp only [h1, h2]
 
-theorem map_vecMul_maxCompact {k : GL (Fin 2) 𝔸[K]}
-    (hk : k ∈ (maxCompact : Subgroup (AdelicGLn.AdelicGL K 2))) :
-    (adeleMeasure2 K).map (fun x => x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K])) = adeleMeasure2 K := by
+theorem map_vecMul_maxCompact
+    {k : GL (Fin 2) 𝔸[K]} (hk : k ∈ (maxCompact : Subgroup (AdelicGLn.AdelicGL K 2)))
+    : (adeleMeasure2 K).map (fun x => x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K]))
+      = adeleMeasure2 K := by
   set ν := (adeleMeasure2 K).map fun x => x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K])
   have : ν.IsAddHaarMeasure := isAddHaarMeasure_map_vecMul k
   have h := isAddLeftInvariant_eq_smul ν (adeleMeasure2 K)
@@ -191,28 +201,31 @@ theorem map_vecMul_maxCompact {k : GL (Fin 2) 𝔸[K]}
   rw [h]
   rw [show c = 1 from by exact_mod_cast hc, one_smul]
 
-theorem ideleModule_det_of_mem_maxCompact {k : GL (Fin 2) 𝔸[K]}
-    (hk : k ∈ (maxCompact : Subgroup (AdelicGLn.AdelicGL K 2))) :
-    IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det k) = 1 :=
+theorem ideleModule_det_of_mem_maxCompact
+    {k : GL (Fin 2) 𝔸[K]} (hk : k ∈ (maxCompact : Subgroup (AdelicGLn.AdelicGL K 2)))
+    : IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det k) = 1 :=
   eq_one_of_isCompact isCompact_maxCompact ((IdeleGroup.ideleModule K).comp (AdelicGLn.det K 2))
-    (continuous_subtype_val.comp
-      (IdeleGroup.continuous_ideleModule.comp (AdelicGLn.continuous_det K 2))) hk
+    (continuous_subtype_val.comp (IdeleGroup.continuous_ideleModule.comp (AdelicGLn.continuous_det K
+      2)))
+    hk
 
-theorem measurePreserving_shear (t : 𝔸[K]) :
-    MeasurePreserving (fun p : 𝔸[K] × 𝔸[K] => (p.1, p.1 * t + p.2))
+theorem measurePreserving_shear (t : 𝔸[K])
+    : MeasurePreserving
+      (fun p : 𝔸[K] × 𝔸[K] => (p.1, p.1 * t + p.2))
       ((adeleMeasure K).prod (adeleMeasure K)) ((adeleMeasure K).prod (adeleMeasure K)) := by
   have hc : Continuous fun p : 𝔸[K] × 𝔸[K] => p.1 * t + p.2 :=
     (continuous_fst.mul continuous_const).add continuous_snd
   exact MeasurePreserving.skew_product (μa := adeleMeasure K) (μb := adeleMeasure K)
-    (μc := adeleMeasure K) (μd := adeleMeasure K) (f := id) (g := fun a b => a * t + b)
+    (μc := adeleMeasure K) (μd := adeleMeasure K) (f := id)
+    (g := fun a b => a * t + b)
     (MeasurePreserving.id _) hc.measurable
     (Filter.Eventually.of_forall fun a => map_add_left_eq_self (adeleMeasure K) (a * t))
 
-theorem map_vecMul_adelicBorel {b : GL (Fin 2) 𝔸[K]}
-    (hb : b ∈ (adelicBorel : Subgroup (AdelicGLn.AdelicGL K 2))) :
-    (adeleMeasure2 K).map (fun x => x ᵥ* (b : Matrix (Fin 2) (Fin 2) 𝔸[K])) =
-      ENNReal.ofReal ((IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det b) : ℝ))⁻¹ •
-        adeleMeasure2 K := by
+theorem map_vecMul_adelicBorel
+    {b : GL (Fin 2) 𝔸[K]} (hb : b ∈ (adelicBorel : Subgroup (AdelicGLn.AdelicGL K 2)))
+    : (adeleMeasure2 K).map (fun x => x ᵥ* (b : Matrix (Fin 2) (Fin 2) 𝔸[K]))
+      = ENNReal.ofReal ((IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det b) : ℝ))⁻¹
+        • adeleMeasure2 K := by
   set M : Matrix (Fin 2) (Fin 2) 𝔸[K] := ↑b
   have h10 : M 1 0 = 0 := hb (show (0 : Fin 2) < 1 by decide)
   set A : IdeleGroup K := (isUnit_apply_self_of_mem_adelicBorel hb 0).unit
@@ -246,34 +259,35 @@ theorem map_vecMul_adelicBorel {b : GL (Fin 2) 𝔸[K]}
     (Homeomorph.smul a).continuous.measurable
   have hdiag : Measurable diag := (hsm A).prodMap (hsm D)
   have hshear : Measurable shear := (measurePreserving_shear t).measurable
-  have hmapdiag : ((adeleMeasure K).prod (adeleMeasure K)).map diag =
-      (ENNReal.ofReal ((IdeleGroup.ideleModule K A : ℝ))⁻¹ *
-        ENNReal.ofReal ((IdeleGroup.ideleModule K D : ℝ))⁻¹) •
-        (adeleMeasure K).prod (adeleMeasure K) := by
+  have hmapdiag
+      : ((adeleMeasure K).prod (adeleMeasure K)).map diag
+        = (ENNReal.ofReal ((IdeleGroup.ideleModule K A : ℝ))⁻¹
+            * ENNReal.ofReal ((IdeleGroup.ideleModule K D : ℝ))⁻¹)
+          • (adeleMeasure K).prod (adeleMeasure K) := by
     rw [← map_prod_map _ _ (hsm A) (hsm D), map_smul_adeleMeasure, map_smul_adeleMeasure,
       prod_smul_left, prod_smul_right, smul_smul]
-  have hconst : ENNReal.ofReal ((IdeleGroup.ideleModule K A : ℝ))⁻¹ *
-      ENNReal.ofReal ((IdeleGroup.ideleModule K D : ℝ))⁻¹ =
-      ENNReal.ofReal ((IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det b) : ℝ))⁻¹ := by
+  have hconst
+      : ENNReal.ofReal ((IdeleGroup.ideleModule K A : ℝ))⁻¹
+          * ENNReal.ofReal ((IdeleGroup.ideleModule K D : ℝ))⁻¹
+        = ENNReal.ofReal ((IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det b) : ℝ))⁻¹ := by
     rw [hdet, map_mul, ← ENNReal.ofReal_mul (inv_nonneg.2 (IdeleGroup.ideleModule K A).2.le),
       ← mul_inv]
     rfl
   rw [hfun, ← map_map e.symm.measurable (hshear.comp (hdiag.comp e.measurable)),
-    ← map_map hshear (hdiag.comp e.measurable), ← map_map hdiag e.measurable, he.map_eq,
-    hmapdiag, Measure.map_smul, (measurePreserving_shear t).map_eq, Measure.map_smul,
-    he.symm.map_eq, hconst]
+    ← map_map hshear (hdiag.comp e.measurable), ← map_map hdiag e.measurable, he.map_eq, hmapdiag,
+    Measure.map_smul, (measurePreserving_shear t).map_eq, Measure.map_smul, he.symm.map_eq, hconst]
   · exact e.symm.measurable.aemeasurable
   · exact hshear.aemeasurable
 
-theorem map_vecMul_adeleMeasure2 (g : GL (Fin 2) 𝔸[K]) :
-    (adeleMeasure2 K).map (fun x => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K])) =
-      ENNReal.ofReal ((IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det g) : ℝ))⁻¹ •
-        adeleMeasure2 K := by
+theorem map_vecMul_adeleMeasure2 (g : GL (Fin 2) 𝔸[K])
+    : (adeleMeasure2 K).map (fun x => x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K]))
+      = ENNReal.ofReal ((IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det g) : ℝ))⁻¹
+        • adeleMeasure2 K := by
   obtain ⟨b, hb, k, hk, rfl⟩ := exists_adelicBorel_mul_maxCompact (K := K) (n := 2) g
-  have hcomp : (fun x : Fin 2 → 𝔸[K] =>
-      x ᵥ* ((b * k : GL (Fin 2) 𝔸[K]) : Matrix (Fin 2) (Fin 2) 𝔸[K])) =
-      (fun x => x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K])) ∘
-        (fun x => x ᵥ* (b : Matrix (Fin 2) (Fin 2) 𝔸[K])) := by
+  have hcomp
+      : (fun x : Fin 2 → 𝔸[K] => x ᵥ* ((b * k : GL (Fin 2) 𝔸[K]) : Matrix (Fin 2) (Fin 2) 𝔸[K]))
+        = (fun x => x ᵥ* (k : Matrix (Fin 2) (Fin 2) 𝔸[K]))
+          ∘ (fun x => x ᵥ* (b : Matrix (Fin 2) (Fin 2) 𝔸[K])) := by
     funext x
     simp only [Function.comp_apply, Units.val_mul, vecMul_vecMul]
   rw [hcomp, ← map_map (measurable_vecMul k) (measurable_vecMul b), map_vecMul_adelicBorel hb,
@@ -281,13 +295,14 @@ theorem map_vecMul_adeleMeasure2 (g : GL (Fin 2) 𝔸[K]) :
     ideleModule_det_of_mem_maxCompact hk, mul_one]
   exact (measurable_vecMul k).aemeasurable
 
-theorem integral_comp_vecMul (g : GL (Fin 2) 𝔸[K]) (f : (Fin 2 → 𝔸[K]) → ℂ) :
-    ∫ x, f (x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K])) ∂adeleMeasure2 K =
-      (((IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det g) : ℝ))⁻¹ : ℂ) *
-        ∫ x, f x ∂adeleMeasure2 K := by
+theorem integral_comp_vecMul (g : GL (Fin 2) 𝔸[K]) (f : (Fin 2 → 𝔸[K]) → ℂ)
+    : ∫ x, f (x ᵥ* (g : Matrix (Fin 2) (Fin 2) 𝔸[K])) ∂adeleMeasure2 K
+      = (((IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det g) : ℝ))⁻¹ : ℂ)
+        * ∫ x, f x ∂adeleMeasure2 K := by
   rw [← (measurableEmbedding_vecMul g).integral_map, map_vecMul_adeleMeasure2,
-    integral_smul_measure, ENNReal.toReal_ofReal
-      (inv_nonneg.2 (IdeleGroup.ideleModule K (Matrix.GeneralLinearGroup.det g)).2.le),
+    integral_smul_measure,
+    ENNReal.toReal_ofReal (inv_nonneg.2 (IdeleGroup.ideleModule K
+      (Matrix.GeneralLinearGroup.det g)).2.le),
     Complex.real_smul, Complex.ofReal_inv]
 
 end

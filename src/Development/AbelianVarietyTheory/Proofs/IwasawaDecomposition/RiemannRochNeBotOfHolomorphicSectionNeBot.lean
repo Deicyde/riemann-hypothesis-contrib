@@ -11,14 +11,19 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam
+  GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor
 open scoped Matrix CategoryTheory.Obj Topology
 
 namespace GlobalTheory.ShFam.Hor
 
-theorem riemannRoch_ne_bot_of_holomorphicSection_ne_bot : ∀ (F : Type) [Field F] (Y : GlobalTheory.ProjVar.Var F) (σ : F →+* ℂ)
-    (R : AnRead Y.str σ Y.dim) (D : Y.Dv), R.holSec (Y.lb D) ≠ ⊥ → Y.H0 D ≠ ⊥ := by
+theorem riemannRoch_ne_bot_of_holomorphicSection_ne_bot
+    : ∀ (F : Type) [Field F] (Y : GlobalTheory.ProjVar.Var F) (σ : F →+* ℂ)
+        (R : AnRead Y.str σ Y.dim) (D : Y.Dv),
+      R.holSec (Y.lb D) ≠ ⊥ → Y.H0 D ≠ ⊥ := by
   intro F _ Y σ R D hR hH
   refine hR ?_
   have P := GlobalTheory.Cartier.presents_toLB D

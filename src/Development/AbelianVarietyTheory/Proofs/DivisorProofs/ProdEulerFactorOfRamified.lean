@@ -16,10 +16,15 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.A
 @[expose] public section
 
 open scoped ComplexConjugate Matrix NNReal
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (ip delta swSec sZero IsKFinVec ThetaClause SectionClause CoefClause)
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling
+  GlobalTheory.Cont
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift
+  (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero
+  (ip delta swSec sZero IsKFinVec ThetaClause SectionClause CoefClause)
 open GlobalTheory.Mem.Th (CptF)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.IP
@@ -46,16 +51,18 @@ section Char
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem loc_inv (ν : HChar E) (w : HeightOneSpectrum (𝓞 E)) (x : (w.adicCompletion E)ˣ) :
-    (ν⁻¹).loc w x = (ν.loc w x)⁻¹ := by
-  rw [← GlobalTheory.CMVal.finPart_single, ← GlobalTheory.CMVal.finPart_single, GlobalTheory.CMVal.finPart_inv]
+theorem loc_inv (ν : HChar E) (w : HeightOneSpectrum (𝓞 E)) (x : (w.adicCompletion E)ˣ)
+    : (ν⁻¹).loc w x = (ν.loc w x)⁻¹ := by
+  rw [← GlobalTheory.CMVal.finPart_single, ← GlobalTheory.CMVal.finPart_single,
+    GlobalTheory.CMVal.finPart_inv]
 
 theorem unrAt_inv (ν : HChar E) (w : HeightOneSpectrum (𝓞 E)) : (ν⁻¹).UnrAt w ↔ ν.UnrAt w := by
   refine forall_congr' fun x => imp_congr_right fun _ => ?_
   rw [loc_inv, inv_eq_one]
 
 theorem val_inv (ν : HChar E) (w : HeightOneSpectrum (𝓞 E)) : (ν⁻¹).val w = (ν.val w)⁻¹ := by
-  rw [← GlobalTheory.CMVal.finPart_unifAt, ← GlobalTheory.CMVal.finPart_unifAt, GlobalTheory.CMVal.finPart_inv]
+  rw [← GlobalTheory.CMVal.finPart_unifAt, ← GlobalTheory.CMVal.finPart_unifAt,
+    GlobalTheory.CMVal.finPart_inv]
 
 end Char
 

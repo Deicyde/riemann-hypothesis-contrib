@@ -10,8 +10,11 @@ open scoped BigOperators
 namespace Formalism.L2.Th1.Top.FrP.UnitaryGroupMassFormula.HermFrame
 open Formalism.L2.Th1.Top.FrP
 
-theorem delta_mem (l : ℕ) [Fact l.Prime] (dK : ℕ) (hd : dK.Prime) (hd4 : dK % 4 = 3) (hld : ¬ l ∣ dK)
-    (ι : ℂ ≃+* ℂ_[l]) : ι (sq dK) ∈ MaximalUnramifiedExtension l := by
+theorem delta_mem
+    (l : ℕ) [Fact l.Prime]
+    (dK : ℕ) (hd : dK.Prime) (hd4 : dK % 4 = 3) (hld : ¬ l ∣ dK)
+    (ι : ℂ ≃+* ℂ_[l])
+    : ι (sq dK) ∈ MaximalUnramifiedExtension l := by
   haveI : Fact dK.Prime := ⟨hd⟩
   have hd2 : ringChar (ZMod dK) ≠ 2 := by rw [ZMod.ringChar_zmod_n]; omega
   have hζ : IsPrimitiveRoot (ι (Complex.exp (2 * ↑Real.pi * Complex.I / ↑dK))) dK :=
@@ -26,7 +29,8 @@ theorem delta_mem (l : ℕ) [Fact l.Prime] (dK : ℕ) (hd : dK.Prime) (hd4 : dK 
     exact_mod_cast h
   have hG : gaussSum χ ψ ^ 2 = -(dK : ℂ_[l]) := by
     rw [gaussSum_sq hχ1 ((quadraticChar_isQuadratic (ZMod dK)).comp _) hψ, ZMod.card, hχ,
-      MulChar.ringHomComp_apply, quadraticChar_neg_one hd2, ZMod.card, ZMod.χ₄_nat_three_mod_four hd4]
+      MulChar.ringHomComp_apply, quadraticChar_neg_one hd2, ZMod.card,
+      ZMod.χ₄_nat_three_mod_four hd4]
     simp
   have hx : ι (sq dK) ^ 2 = -(dK : ℂ_[l]) := by
     rw [← map_pow]

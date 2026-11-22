@@ -11,8 +11,8 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open MvPolynomial Finset
 
-theorem VandermondeOfHomogeneous.sum_card_Ioi (m : ℕ) :
-    (∑ i : Fin m, ∑ _j ∈ Finset.Ioi i, (1 : ℕ)) = m * (m - 1) / 2 := by
+theorem VandermondeOfHomogeneous.sum_card_Ioi (m : ℕ)
+    : (∑ i : Fin m, ∑ _j ∈ Finset.Ioi i, (1 : ℕ)) = m * (m - 1) / 2 := by
   simp only [Finset.sum_const, smul_eq_mul, mul_one, Fin.card_Ioi]
   rw [Fin.sum_univ_eq_sum_range (fun i => m - 1 - i) m]
   have h := Finset.sum_range_reflect (fun i => i) m

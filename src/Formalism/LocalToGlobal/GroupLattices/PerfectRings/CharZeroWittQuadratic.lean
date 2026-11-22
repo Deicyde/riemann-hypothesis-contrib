@@ -29,7 +29,8 @@ instance charZero_witt_quadratic : CharZero (W2 p n) := by
   · subst h
     exact CharP.charP_to_charZero _
 
-instance instCharZeroOO : CharZero (OO p n) := charZero_of_injective_algebraMap (Quad.algebraMap_injective _)
+instance instCharZeroOO : CharZero (OO p n) :=
+  charZero_of_injective_algebraMap (Quad.algebraMap_injective _)
 
 instance instCharZeroKO : CharZero (KO p n) :=
   charZero_of_injective_algebraMap (IsFractionRing.injective (OO p n) (KO p n))
@@ -39,12 +40,14 @@ theorem completeOO : IsAdicComplete (maximalIdeal (OO p n)) (OO p n) :=
 
 section Fin
 
-variable (L : Type) [Field L] [Algebra (KO p n) L] [FiniteDimensional (KO p n) L] [Algebra (OO p n) L]
+variable
+  (L : Type) [Field L] [Algebra (KO p n) L] [FiniteDimensional (KO p n) L] [Algebra (OO p n) L]
   [IsScalarTower (OO p n) (KO p n) L]
 
 abbrev OL : Type := integralClosure (OO p n) L
 
-instance instDvrOL : IsDiscreteValuationRing (OL p n L) := IntCl.isDVR (OO p n) (KO p n) L (completeOO p n)
+instance instDvrOL : IsDiscreteValuationRing (OL p n L) :=
+  IntCl.isDVR (OO p n) (KO p n) L (completeOO p n)
 
 def extOf : ExtOf (OO p n) (KO p n) (OL p n L) L where
   φ := algebraMap _ _
@@ -54,8 +57,8 @@ def extOf : ExtOf (OO p n) (KO p n) (OL p n L) L where
   frac := IntCl.frac (OO p n) (KO p n) L
   complete := IntCl.complete (OO p n) (KO p n) L (completeOO p n)
 
-theorem settingOL (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n) :
-    HidaSetting p n (WQ p n) (QQ p n) (OL p n L) L ((extOf p n L).φK.comp (iota p n)) (sig p n)
+theorem settingOL (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n)
+    : HidaSetting p n (WQ p n) (QQ p n) (OL p n L) L ((extOf p n L).φK.comp (iota p n)) (sig p n)
       ((extOf p n L).φ.comp (jO p n)) ((extOf p n L).φ (wU p n)) :=
   setting_ext (settingStd p n h5 h2 he) (extOf p n L)
 
@@ -70,7 +73,6 @@ variable {p n} {LL : Type} [Field LL] [NumberField LL] (τ : LL →+* Om p n)
 def Lt : IntermediateField (KO p n) (Om p n) := adjoin (KO p n) (Set.range τ)
 
 theorem range_le_simple (θ : LL) (hθ : ℚ⟮θ⟯ = ⊤) (x : LL) : τ x ∈ (KO p n)⟮τ θ⟯ := by
-
   let T : Subfield LL := ((KO p n)⟮τ θ⟯).toSubfield.comap τ
   have hQ : ∀ q : ℚ, algebraMap ℚ LL q ∈ T := fun q => by
     simp [T, Subfield.mem_comap, eq_ratCast, map_ratCast, SubfieldClass.ratCast_mem]
@@ -107,14 +109,15 @@ open NumberField IsDedekindDomain
 
 variable {p n} {LL : Type} [Field LL] [NumberField LL] (τ : LL →+* Om p n)
 
-theorem embL_integral (x : 𝓞 LL) :
-    ((embL τ).comp (algebraMap (𝓞 LL) LL)) x ∈ integralClosure (OO p n) (Lt τ) := by
+theorem embL_integral (x : 𝓞 LL)
+    : ((embL τ).comp (algebraMap (𝓞 LL) LL)) x ∈ integralClosure (OO p n) (Lt τ) := by
   rw [mem_integralClosure_iff]
   have h : IsIntegral ℤ (algebraMap (𝓞 LL) LL x) := RingOfIntegers.isIntegral_coe x
   exact (h.map (((embL τ).comp (RingHom.id LL)).toIntAlgHom)).tower_top
 
 def embO : 𝓞 LL →+* Ot τ :=
-  ((embL τ).comp (algebraMap (𝓞 LL) LL)).codRestrict (integralClosure (OO p n) (Lt τ)) (embL_integral τ)
+  ((embL τ).comp (algebraMap (𝓞 LL) LL)).codRestrict (integralClosure (OO p n) (Lt τ))
+    (embL_integral τ)
 
 theorem embO_val (x : 𝓞 LL) : ((embO τ x : Ot τ) : Lt τ) = embL τ (x : LL) := rfl
 
@@ -135,19 +138,25 @@ theorem wU_mem_max : wU p n ∈ maximalIdeal (OO p n) := by
     exact h0.symm
   rw [Ideal.mem_span_singleton] at h1
   have hpu : IsUnit (p : W2 p n) := isUnit_of_dvd_one h1
-  have h2 : IsUnit ((p : W2 p n).coeff 0) := hpu.map (WittVector.constantCoeff (p := p) (R := F2 p n))
+  have h2 : IsUnit ((p : W2 p n).coeff 0) :=
+    hpu.map (WittVector.constantCoeff (p := p) (R := F2 p n))
   rw [WittVector.coeff_p_zero] at h2
   exact not_isUnit_zero h2
 
-theorem under_max (L : Type) [Field L] [Algebra (KO p n) L] [FiniteDimensional (KO p n) L] [Algebra (OO p n) L]
-    [IsScalarTower (OO p n) (KO p n) L] :
-    (maximalIdeal (OL p n L)).comap (algebraMap (OO p n) (OL p n L)) = maximalIdeal (OO p n) :=
-  IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr (IntCl.finite (OO p n) (KO p n) L))) (maximalIdeal _))
+theorem under_max
+    (L : Type) [Field L] [Algebra (KO p n) L] [FiniteDimensional (KO p n) L] [Algebra (OO p n) L]
+    [IsScalarTower (OO p n) (KO p n) L]
+    : (maximalIdeal (OL p n L)).comap (algebraMap (OO p n) (OL p n L)) = maximalIdeal (OO p n) :=
+  IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _)
+    (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr (IntCl.finite (OO p n) (KO p n)
+      L)))
+    (maximalIdeal _))
 
-theorem p_mem_max (L : Type) [Field L] [Algebra (KO p n) L] [FiniteDimensional (KO p n) L] [Algebra (OO p n) L]
-    [IsScalarTower (OO p n) (KO p n) L] : (p : OL p n L) ∈ maximalIdeal (OL p n L) := by
-  have hw2 : wU p n * wU p n = (p : OO p n) := by
-    ext <;> simp [wU]
+theorem p_mem_max
+    (L : Type) [Field L] [Algebra (KO p n) L] [FiniteDimensional (KO p n) L] [Algebra (OO p n) L]
+    [IsScalarTower (OO p n) (KO p n) L]
+    : (p : OL p n L) ∈ maximalIdeal (OL p n L) := by
+  have hw2 : wU p n * wU p n = (p : OO p n) := by ext <;> simp [wU]
   have h1 : (p : OO p n) ∈ maximalIdeal (OO p n) := hw2 ▸ Ideal.mul_mem_left _ _ wU_mem_max
   rw [← under_max L, Ideal.mem_comap, map_natCast] at h1
   exact h1
@@ -170,14 +179,15 @@ theorem isUnit_embO {d : 𝓞 LL} (hd : d ∉ placeIdeal τ) : IsUnit (embO τ d
   by_contra h
   exact hd ((IsLocalRing.mem_maximalIdeal _).mpr h)
 
-theorem induces (x : LL) :
-    (placeOf τ).valuation LL x ≤ 1 ↔ embL τ x ∈ Set.range (algebraMap (Ot τ) (Lt τ)) := by
+theorem induces (x : LL)
+    : (placeOf τ).valuation LL x ≤ 1 ↔ embL τ x ∈ Set.range (algebraMap (Ot τ) (Lt τ)) := by
   constructor
   · intro hv
     obtain ⟨c, d, h⟩ := (placeOf τ).exists_primeCompl_mul_eq_of_integer x hv
     obtain ⟨u, hu⟩ := isUnit_embO τ (d := d) d.2
     refine ⟨embO τ c * (u⁻¹ : (Ot τ)ˣ), ?_⟩
-    have h1 : embL τ x * embL τ ((d : 𝓞 LL) : LL) = embL τ (c : LL) := by rw [← map_mul]; exact congrArg _ h
+    have h1 : embL τ x * embL τ ((d : 𝓞 LL) : LL) = embL τ (c : LL) := by
+      rw [← map_mul]; exact congrArg _ h
     have h2 : (embL τ ((d : 𝓞 LL) : LL)) * (((u⁻¹ : (Ot τ)ˣ) : Ot τ) : Lt τ) = 1 := by
       rw [← embO_val, ← hu]
       have : ((u : Ot τ) * ((u⁻¹ : (Ot τ)ˣ) : Ot τ)) = 1 := u.mul_inv

@@ -12,14 +12,23 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Local
 
 noncomputable section
 open AlgebraicGeometry CategoryTheory Limits NumberField MonObj
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.LocM GlobalTheory.ShFam.Pad
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory.LocM GlobalTheory.ShFam.Pad
 open Formalism.MainNotions.DIV.Cons (intO SCF)
 attribute [local instance] Over.cartesianMonoidalCategory
 open Formalism.L2.Pj.PointsOfFlagModel GlobalTheory.ShFam.Pad.Pull
 
 namespace GlobalTheory.ModelPt
 
-theorem exists_ptC : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (Xo : ∀ l : Level H, Moduli Dw l) (p : ℕ) (W : ValuationSubring ℂ) (Y : LocalSystem Xo p W) (i₀ : Idx H p), p.Prime → (p : ℂ) ∈ W.nonunits → ∀ (Z : Mdl Y i₀) (C : SCF p) (z : Sp ↥(intO ↥C.S) ⟶ Z.X), Set.range (spMap (intO ↥C.S).subtype ≫ z) ⊆ Z.opn → ∃ P : PointsOfFlagModel.PtC (Y Z.i) C, z ≫ Z.π = P.yt := by
+theorem exists_ptC
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H)
+        (Xo : ∀ l : Level H, Moduli Dw l) (p : ℕ) (W : ValuationSubring ℂ) (Y : LocalSystem Xo p W)
+        (i₀ : Idx H p),
+      p.Prime → (p : ℂ) ∈ W.nonunits
+        → ∀ (Z : Mdl Y i₀) (C : SCF p) (z : Sp ↥(intO ↥C.S) ⟶ Z.X),
+          Set.range (spMap (intO ↥C.S).subtype ≫ z) ⊆ Z.opn
+            → ∃ P : PointsOfFlagModel.PtC (Y Z.i) C, z ≫ Z.π = P.yt := by
   intro E _ _ _ H Dw Xo p W Y i₀ _ _ Z C z hz
   set w : Sp ↥C.S ⟶ Z.X := spMap (intO ↥C.S).subtype ≫ z with hw
   obtain ⟨pt⟩ : Nonempty (Sp ↥C.S) := inferInstance
@@ -27,17 +36,19 @@ theorem exists_ptC : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H :
   rw [← Z.cover] at hpt
   obtain ⟨a, ha⟩ := Set.mem_iUnion.1 hpt
   have hsub : Subsingleton (Sp ↥C.S) := inferInstance
-  obtain ⟨φ, hφ⟩ := exists_fromSpec (Z.U a).2 w (fun q _ => by
-    rw [Subsingleton.elim q pt]; exact ha)
-  have hcomp : ∀ {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (f : A →+* B) (g : B →+* D),
-      spMap (g.comp f) = spMap g ≫ spMap f := fun f g => by
+  obtain ⟨φ, hφ⟩ :=
+    exists_fromSpec (Z.U a).2 w (fun q _ => by rw [Subsingleton.elim q pt]; exact ha)
+  have hcomp
+      : ∀ {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (f : A →+* B) (g : B →+* D),
+        spMap (g.comp f) = spMap g ≫ spMap f := fun f g => by
     rw [← Spec.map_comp]; rfl
   let fK : Z.i.c.F →+* ↥C.S := φ.comp (Z.alg a)
   let alg : ↥(Z.i.c.V W) →+* ↥(intO ↥C.S) := (Spec.preimage (z ≫ Z.π ≫ (Y Z.i).s)).hom
   have halg : spMap alg = z ≫ Z.π ≫ (Y Z.i).s := Spec.map_preimage _
   have hs := affineOpenChart_comp_structure_eq_spMap Z hφ
   have compat : (intO ↥C.S).subtype.comp alg = fK.comp (Z.i.c.V W).subtype := by
-    refine congrArg CommRingCat.Hom.hom (Spec.map_injective (a₁ := CommRingCat.ofHom _) (a₂ := CommRingCat.ofHom _) ?_)
+    refine congrArg CommRingCat.Hom.hom
+      (Spec.map_injective (a₁ := CommRingCat.ofHom _) (a₂ := CommRingCat.ofHom _) ?_)
     change spMap _ = spMap _
     rw [hcomp, hcomp, halg, ← hs, hw, Category.assoc]
   have := (Y Z.i).jQ_open

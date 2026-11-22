@@ -12,10 +12,12 @@ namespace GlobalTheory.CompanionTheory.EisTF
 
 open PositivityTheory.RgEis PositivityTheory.RgEis.TF GroundTheory.Global
 
-theorem val_eq_one_of_mul_eq {F Γ : Type*} [Field F] [LinearOrderedCommGroupWithZero Γ]
-    (w : Valuation F Γ) {a b u u' m mi y : F} (ha : w a ≤ 1) (hb : w b ≤ 1) (hu : w u ≤ 1)
-    (hu' : w u' ≤ 1) (huu : u * u' = 1) (hy : w y ≤ 1) (hm : m * mi = 1) (hmi : 1 < w mi)
-    (h : a * b - u = m * y) : w a = 1 := by
+theorem val_eq_one_of_mul_eq
+    {F Γ : Type*} [Field F] [LinearOrderedCommGroupWithZero Γ]
+    (w : Valuation F Γ)
+    {a b u u' m mi y : F} (ha : w a ≤ 1) (hb : w b ≤ 1) (hu : w u ≤ 1) (hu' : w u' ≤ 1)
+    (huu : u * u' = 1) (hy : w y ≤ 1) (hm : m * mi = 1) (hmi : 1 < w mi) (h : a * b - u = m * y)
+    : w a = 1 := by
   have key : ∀ {p q : Γ}, p ≤ 1 → q ≤ 1 → p * q = 1 → p = 1 := by
     intro p q hp hq hpq
     refine le_antisymm hp (not_lt.mp fun hc => ?_)
@@ -33,17 +35,17 @@ theorem val_eq_one_of_mul_eq {F Γ : Type*} [Field F] [LinearOrderedCommGroupWit
     rw [map_mul, hwu]
     exact lt_of_le_of_lt (mul_le_of_le_one_right' hy) hwm
   have hab : a * b = m * y + u := sub_eq_iff_eq_add.mp h
-  have hprod : w a * w b = 1 := by
-    rw [← map_mul, hab, Valuation.map_add_eq_of_lt_right _ hmy, hwu]
+  have hprod : w a * w b = 1 := by rw [← map_mul, hab, Valuation.map_add_eq_of_lt_right _ hmy, hwu]
   exact key ha hb hprod
 
 theorem liftUnit : LiftUnit := by
   intro k _ _ M hM a ha b hb u hu hab
   obtain ⟨y, hy, hyeq⟩ := hab
   classical
-  have hint : ∀ x : FiniteAdeleRing (𝓞 k) k, x ∈ OH k →
-      ∀ v : HeightOneSpectrum (𝓞 k), Valued.v (x v) ≤ 1 :=
-    fun x hx v => (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 k) k v).mp (hx v)
+  have hint
+      : ∀ x : FiniteAdeleRing (𝓞 k) k,
+        x ∈ OH k → ∀ v : HeightOneSpectrum (𝓞 k), Valued.v (x v) ≤ 1 := fun x hx v =>
+    (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 k) k v).mp (hx v)
   have hM0 : ∀ v : HeightOneSpectrum (𝓞 k), (M : v.adicCompletion k) ≠ 0 := by
     intro v
     rw [← map_natCast (algebraMap k (v.adicCompletion k)) M]
@@ -52,13 +54,16 @@ theorem liftUnit : LiftUnit := by
     (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 k) k v).mp (natCast_mem _ M)
   obtain ⟨huU1, huU2⟩ := Subgroup.mem_comap.mp hu
   have hu1 : (u : FiniteAdeleRing (𝓞 k) k) ∈ OH k := fun v => huU1 v
-  have hu2 : ((u⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) ∈ OH k :=
-    fun v => huU2 v
-  have hunit : ∀ v : HeightOneSpectrum (𝓞 k), Valued.v (M : v.adicCompletion k) < 1 →
-      Valued.v (a v) = 1 := by
+  have hu2 : ((u⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) ∈ OH k := fun v =>
+    huU2 v
+  have hunit
+      : ∀ v : HeightOneSpectrum (𝓞 k),
+        Valued.v (M : v.adicCompletion k) < 1 → Valued.v (a v) = 1 := by
     intro v hv
-    have hmul : (u : FiniteAdeleRing (𝓞 k) k) v *
-        ((u⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) v = 1 :=
+    have hmul
+        : (u : FiniteAdeleRing (𝓞 k) k) v
+            * ((u⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) v
+          = 1 :=
       congrArg (fun z : FiniteAdeleRing (𝓞 k) k => z v) (Units.mul_inv u)
     have hcomp : a v * b v - (u : FiniteAdeleRing (𝓞 k) k) v = (M : v.adicCompletion k) * y v :=
       congrArg (fun z : FiniteAdeleRing (𝓞 k) k => z v) hyeq

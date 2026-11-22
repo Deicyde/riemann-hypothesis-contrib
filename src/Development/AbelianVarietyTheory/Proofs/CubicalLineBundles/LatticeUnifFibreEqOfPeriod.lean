@@ -6,18 +6,34 @@ public import Development.AbelianVarietyTheory.Statements.PrincipalLattices.LogH
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory
 open scoped CategoryTheory.Obj UpperHalfPlane
 
 namespace GlobalTheory
 
-theorem lattice_unif_fibre_eq_of_period : ThetaUnifAV → ∀ (R : Type) [CommRing R] (P : Out.PolAV (Sp R)) (v : epsR R ⟶ P.A) (s : R →+* ℂ) (L : PeriodPair) (c₀ ω : ℂ), P.g = 1 → IsTangent v → (∀ (P' : Out.PolAV (Sp ℂ)) (φ' : P'.A.left ⟶ P.A.left) (v' : epsR ℂ ⟶ P'.A) (u' : HolUnif P'.A P'.L P'.g) (w' : Fin P'.g → ℂ), IsPolFibre s P P' φ' → IsVecOver s φ' v v' → u'.IsDiff w' v' → w' ≠ 0 ∧ ∀ z : ℂ, z ∈ L.lattice ↔ z • w' ∈ u'.Λ) → c₀ ≠ 0 → (∀ z, z ∈ L.lattice ↔ ∃ m n : ℤ, z = c₀ * (m + n * ω)) → ∀ (P' : Out.PolAV (Sp ℂ)) (φ : P'.A.left ⟶ P.A.left), IsPolFibre s P P' φ → ∀ u : HolUnif P'.A P'.L P'.g, ∃ c : ℂ, c ≠ 0 ∧ ∀ z, z ∈ u.Λ ↔ ∃ m n : ℤ, z = fun _ => c * (m + n * ω) := by
+theorem lattice_unif_fibre_eq_of_period
+    : ThetaUnifAV
+      → ∀ (R : Type) [CommRing R] (P : Out.PolAV (Sp R)) (v : epsR R ⟶ P.A) (s : R →+* ℂ)
+          (L : PeriodPair) (c₀ ω : ℂ),
+        P.g = 1 → IsTangent v
+          → (∀ (P' : Out.PolAV (Sp ℂ)) (φ' : P'.A.left ⟶ P.A.left) (v' : epsR ℂ ⟶ P'.A)
+              (u' : HolUnif P'.A P'.L P'.g) (w' : Fin P'.g → ℂ),
+            IsPolFibre s P P' φ' → IsVecOver s φ' v v' → u'.IsDiff w' v'
+              → w' ≠ 0 ∧ ∀ z : ℂ, z ∈ L.lattice ↔ z • w' ∈ u'.Λ)
+          → c₀ ≠ 0 → (∀ z, z ∈ L.lattice ↔ ∃ m n : ℤ, z = c₀ * (m + n * ω))
+          → ∀ (P' : Out.PolAV (Sp ℂ)) (φ : P'.A.left ⟶ P.A.left),
+            IsPolFibre s P P' φ
+              → ∀ u : HolUnif P'.A P'.L P'.g, ∃ c : ℂ,
+                c ≠ 0 ∧ ∀ z, z ∈ u.Λ ↔ ∃ m n : ℤ, z = fun _ => c * (m + n * ω) := by
   intro hU R _ P v s L c₀ ω hg hv H hc hL P' φ hφ u
   obtain ⟨v', hv', -⟩ := existsUnique_isVecOver hφ.2.1.1 v
   have htan : IsTangent v' := IsVecOver.isTangent hφ.2.1 hv' hv
-  obtain ⟨w, hw, -⟩ := (GlobalTheory.T.holomorphicUniformisation_tangent_unimodular_riemannForm hU P' u).1 v' htan
+  obtain ⟨w, hw, -⟩ :=
+    (GlobalTheory.T.holomorphicUniformisation_tangent_unimodular_riemannForm hU P' u).1 v' htan
   obtain ⟨hw0, hwL⟩ := H P' φ v' u w hφ hv' hw
 
   have hg' : P'.g = 1 := hφ.1.trans hg

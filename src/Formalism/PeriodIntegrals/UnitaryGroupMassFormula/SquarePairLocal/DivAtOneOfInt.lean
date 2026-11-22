@@ -20,8 +20,8 @@ variable {Q : Ideal (𝓞 E)} [hQ : Q.IsPrime]
 
 theorem one_nmem : (1 : 𝓞 E) ∉ Q := fun h => hQ.ne_top ((Ideal.eq_top_iff_one Q).mpr h)
 
-theorem mul_nmem {s t : 𝓞 E} (hs : s ∉ Q) (ht : t ∉ Q) : s * t ∉ Q :=
-  fun h => (hQ.mem_or_mem h).elim hs ht
+theorem mul_nmem {s t : 𝓞 E} (hs : s ∉ Q) (ht : t ∉ Q) : s * t ∉ Q := fun h =>
+  (hQ.mem_or_mem h).elim hs ht
 
 theorem intAt_coe (w : 𝓞 E) : IntAt Q (w : E) := by
   unfold IntAt
@@ -47,7 +47,8 @@ theorem divAt_zero {c : 𝓞 E} : DivAt Q c 0 := by
   unfold DivAt
   exact ⟨1, one_nmem, 0, by simp⟩
 
-theorem divAt_add {c : 𝓞 E} {x y : E} (hx : DivAt Q c x) (hy : DivAt Q c y) : DivAt Q c (x + y) := by
+theorem divAt_add {c : 𝓞 E} {x y : E} (hx : DivAt Q c x) (hy : DivAt Q c y)
+    : DivAt Q c (x + y) := by
   unfold DivAt at *
   obtain ⟨s, hs, w, hw⟩ := hx
   obtain ⟨t, ht, v, hv⟩ := hy
@@ -62,11 +63,13 @@ theorem divAt_neg {c : 𝓞 E} {x : E} (hx : DivAt Q c x) : DivAt Q c (-x) := by
   push_cast
   linear_combination -hw
 
-theorem divAt_sub {c : 𝓞 E} {x y : E} (hx : DivAt Q c x) (hy : DivAt Q c y) : DivAt Q c (x - y) := by
+theorem divAt_sub {c : 𝓞 E} {x y : E} (hx : DivAt Q c x) (hy : DivAt Q c y)
+    : DivAt Q c (x - y) := by
   rw [sub_eq_add_neg]
   exact divAt_add hx (divAt_neg hy)
 
-theorem divAt_mul_left {c : 𝓞 E} {a x : E} (ha : IntAt Q a) (hx : DivAt Q c x) : DivAt Q c (a * x) := by
+theorem divAt_mul_left {c : 𝓞 E} {a x : E} (ha : IntAt Q a) (hx : DivAt Q c x)
+    : DivAt Q c (a * x) := by
   unfold IntAt at ha
   unfold DivAt at *
   obtain ⟨s, hs, w, hw⟩ := ha
@@ -75,12 +78,13 @@ theorem divAt_mul_left {c : 𝓞 E} {a x : E} (ha : IntAt Q a) (hx : DivAt Q c x
   push_cast
   linear_combination ((t : E) * x) * hw + (w : E) * hv
 
-theorem divAt_mul_right {c : 𝓞 E} {a x : E} (hx : DivAt Q c x) (ha : IntAt Q a) : DivAt Q c (x * a) := by
+theorem divAt_mul_right {c : 𝓞 E} {a x : E} (hx : DivAt Q c x) (ha : IntAt Q a)
+    : DivAt Q c (x * a) := by
   rw [mul_comm]
   exact divAt_mul_left ha hx
 
-theorem divAt_sum {c : 𝓞 E} {ι : Type} (S : Finset ι) (f : ι → E) (h : ∀ i ∈ S, DivAt Q c (f i)) :
-    DivAt Q c (∑ i ∈ S, f i) :=
+theorem divAt_sum {c : 𝓞 E} {ι : Type} (S : Finset ι) (f : ι → E) (h : ∀ i ∈ S, DivAt Q c (f i))
+    : DivAt Q c (∑ i ∈ S, f i) :=
   Finset.sum_induction f (DivAt Q c) (fun _ _ ha hb => divAt_add ha hb) divAt_zero h
 
 theorem divAt_one_of_int {x : E} (hx : IntAt Q x) : DivAt Q 1 x := by
@@ -89,25 +93,30 @@ theorem divAt_one_of_int {x : E} (hx : IntAt Q x) : DivAt Q 1 x := by
   obtain ⟨s, hs, w, hw⟩ := hx
   exact ⟨s, hs, w, by simp [hw]⟩
 
-theorem intAt_inv_mul {c : 𝓞 E} (hc : (c : E) ≠ 0) {x : E} (hx : DivAt Q c x) :
-    IntAt Q ((c : E)⁻¹ * x) := by
+theorem intAt_inv_mul {c : 𝓞 E} (hc : (c : E) ≠ 0) {x : E} (hx : DivAt Q c x)
+    : IntAt Q ((c : E)⁻¹ * x) := by
   unfold DivAt at hx
   unfold IntAt
   obtain ⟨s, hs, w, hw⟩ := hx
   refine ⟨s, hs, w, ?_⟩
-  calc (s : E) * ((c : E)⁻¹ * x) = (c : E)⁻¹ * ((s : E) * x) := by ring
+  calc
+    (s : E) * ((c : E)⁻¹ * x)
+      = (c : E)⁻¹ * ((s : E) * x) := by ring
     _ = (w : E) := by rw [hw, ← mul_assoc, inv_mul_cancel₀ hc, one_mul]
 
-theorem divAt_of_mem {c : 𝓞 E} {K : ℕ}
-    (hK : ∀ x ∈ Q ^ K, ∃ s : 𝓞 E, s ∉ Q ∧ ∃ w : 𝓞 E, s * x = c * w) {x : 𝓞 E} (hx : x ∈ Q ^ K) :
-    DivAt Q c (x : E) := by
+theorem divAt_of_mem
+    {c : 𝓞 E} {K : ℕ} (hK : ∀ x ∈ Q ^ K, ∃ s : 𝓞 E, s ∉ Q ∧ ∃ w : 𝓞 E, s * x = c * w)
+    {x : 𝓞 E} (hx : x ∈ Q ^ K)
+    : DivAt Q c (x : E) := by
   unfold DivAt
   obtain ⟨s, hs, w, hw⟩ := hK x hx
   exact ⟨s, hs, w, by exact_mod_cast congrArg (fun z : 𝓞 E => (z : E)) hw⟩
 
-theorem divAt_trans {c d : 𝓞 E} {K : ℕ}
-    (hK : ∀ x ∈ Q ^ K, ∃ s : 𝓞 E, s ∉ Q ∧ ∃ w : 𝓞 E, s * x = c * w) (hd : d ∈ Q ^ K) {x : E}
-    (hx : DivAt Q d x) : DivAt Q c x := by
+theorem divAt_trans
+    {c d : 𝓞 E} {K : ℕ}
+    (hK : ∀ x ∈ Q ^ K, ∃ s : 𝓞 E, s ∉ Q ∧ ∃ w : 𝓞 E, s * x = c * w) (hd : d ∈ Q ^ K)
+    {x : E} (hx : DivAt Q d x)
+    : DivAt Q c x := by
   unfold DivAt at *
   obtain ⟨s, hs, w, hw⟩ := hK d hd
   have hsd : (s : E) * (d : E) = (c : E) * (w : E) := by
@@ -123,11 +132,12 @@ section Mat
 
 variable {Q : Ideal (𝓞 E)} [hQ : Q.IsPrime] {N : ℕ}
 
-theorem small_of {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin N) E}
-    (hGG : G * Gᴴ = 1)
+theorem small_of
+    {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin N) E} (hGG : G * Gᴴ = 1)
     (hD : ∀ y : Fin N → E, (∃ s : 𝓞 E, s ∉ Q ∧ s • y ∈ L) ↔ ∀ i, IntAt Q ((Gᴴ *ᵥ y) i))
-    {c : 𝓞 E} (hc : (c : E) ≠ 0) {M : Matrix (Fin N) (Fin N) E}
-    (hM : ∀ i j, DivAt Q c ((Gᴴ * M * G) i j)) : SmallAt Q c L M := by
+    {c : 𝓞 E} (hc : (c : E) ≠ 0)
+    {M : Matrix (Fin N) (Fin N) E} (hM : ∀ i j, DivAt Q c ((Gᴴ * M * G) i j))
+    : SmallAt Q c L M := by
   unfold SmallAt
   intro y hy
   have hz := (hD y).mp ⟨1, one_nmem, by rw [one_smul]; exact hy⟩
@@ -138,9 +148,10 @@ theorem small_of {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin
     rw [hGM]
     show DivAt Q c (∑ j, (Gᴴ * M * G) i j * (Gᴴ *ᵥ y) j)
     exact divAt_sum Finset.univ _ (fun j _ => divAt_mul_right (hM i j) (hz j))
-  obtain ⟨s, hs, hsv⟩ := (hD ((c : E)⁻¹ • (M *ᵥ y))).mpr (fun i => by
-    rw [Matrix.mulVec_smul, Pi.smul_apply, smul_eq_mul]
-    exact intAt_inv_mul hc (hdiv i))
+  obtain ⟨s, hs, hsv⟩ :=
+    (hD ((c : E)⁻¹ • (M *ᵥ y))).mpr (fun i => by
+      rw [Matrix.mulVec_smul, Pi.smul_apply, smul_eq_mul]
+      exact intAt_inv_mul hc (hdiv i))
   refine ⟨s, hs, s • ((c : E)⁻¹ • (M *ᵥ y)), hsv, ?_⟩
   have hcc : (c • (c : E)⁻¹ : E) = 1 := by
     rw [Algebra.smul_def]
@@ -153,11 +164,11 @@ private theorem intAt_of_divAt_one {x : E} (hx : DivAt Q 1 x) : IntAt Q x := by
   obtain ⟨s, hs, w, hw⟩ := hx
   exact ⟨s, hs, w, by simpa using hw⟩
 
-theorem pres_of {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin N) E}
-    (hGG : G * Gᴴ = 1)
+theorem pres_of
+    {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin N) E} (hGG : G * Gᴴ = 1)
     (hD : ∀ y : Fin N → E, (∃ s : 𝓞 E, s ∉ Q ∧ s • y ∈ L) ↔ ∀ i, IntAt Q ((Gᴴ *ᵥ y) i))
-    {M : Matrix (Fin N) (Fin N) E} (hM : ∀ i j, IntAt Q ((Gᴴ * M * G) i j)) :
-    ∀ y ∈ L, ∃ s : 𝓞 E, s ∉ Q ∧ s • (M *ᵥ y) ∈ L := by
+    {M : Matrix (Fin N) (Fin N) E} (hM : ∀ i j, IntAt Q ((Gᴴ * M * G) i j))
+    : ∀ y ∈ L, ∃ s : 𝓞 E, s ∉ Q ∧ s • (M *ᵥ y) ∈ L := by
   intro y hy
   have hz := (hD y).mp ⟨1, one_nmem, by rw [one_smul]; exact hy⟩
   apply (hD (M *ᵥ y)).mpr
@@ -166,18 +177,25 @@ theorem pres_of {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin 
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, mul_assoc (Gᴴ * M) G Gᴴ, hGG, mul_one]
   rw [hGM]
   show IntAt Q (∑ j, (Gᴴ * M * G) i j * (Gᴴ *ᵥ y) j)
-  exact intAt_of_divAt_one
-    (divAt_sum Finset.univ _ (fun j _ => divAt_mul_left (hM i j) (divAt_one_of_int (hz j))))
+  exact intAt_of_divAt_one (divAt_sum Finset.univ _
+    (fun j _ => divAt_mul_left (hM i j) (divAt_one_of_int (hz j))))
 
-theorem clear {L : Submodule (𝓞 E) (Fin N → E)} (hL : L.FG) {M : Matrix (Fin N) (Fin N) E}
-    (h : ∀ y ∈ L, ∃ s : 𝓞 E, s ∉ Q ∧ s • (M *ᵥ y) ∈ L) :
-    ∃ s : 𝓞 E, s ∉ Q ∧ ∀ y ∈ L, s • (M *ᵥ y) ∈ L := by
+theorem clear
+    {L : Submodule (𝓞 E) (Fin N → E)} (hL : L.FG)
+    {M : Matrix (Fin N) (Fin N) E} (h : ∀ y ∈ L, ∃ s : 𝓞 E, s ∉ Q ∧ s • (M *ᵥ y) ∈ L)
+    : ∃ s : 𝓞 E, s ∉ Q ∧ ∀ y ∈ L, s • (M *ᵥ y) ∈ L := by
   classical
   obtain ⟨S, hS⟩ := hL
   choose! t ht using h
   have hSL : ∀ g ∈ S, g ∈ L := fun g hg => hS ▸ Submodule.subset_span (Finset.mem_coe.mpr hg)
-  refine ⟨∏ g ∈ S, t g, Finset.prod_induction t (· ∉ Q) (fun a b ha hb => mul_nmem ha hb) one_nmem
-    (fun g hg => (ht g (hSL g hg)).1), ?_⟩
+  refine ⟨
+    ∏ g ∈ S, t g,
+    Finset.prod_induction t (· ∉ Q)
+      (fun a b ha hb => mul_nmem ha hb)
+      one_nmem
+      (fun g hg => (ht g (hSL g hg)).1),
+    ?_
+  ⟩
   let F : (Fin N → E) →ₗ[𝓞 E] (Fin N → E) :=
     (∏ g ∈ S, t g) • (Matrix.mulVecLin M).restrictScalars (𝓞 E)
   have hle : Submodule.span (𝓞 E) (S : Set (Fin N → E)) ≤ L.comap F := by
@@ -191,26 +209,30 @@ theorem clear {L : Submodule (𝓞 E) (Fin N → E)} (hL : L.FG) {M : Matrix (Fi
   rw [← hS] at hy
   exact hle hy
 
-theorem good_gen {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin N) E}
+theorem good_gen
+    {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin N) E}
     (hG1 : Gᴴ * G = 1) (hGG : G * Gᴴ = 1)
     (hD : ∀ y : Fin N → E, (∃ s : 𝓞 E, s ∉ Q ∧ s • y ∈ L) ↔ ∀ i, IntAt Q ((Gᴴ *ᵥ y) i))
-    {c : 𝓞 E} (hc : (c : E) ≠ 0) {f : Matrix (Fin N) (Fin N) E} (hf : ∀ i j, IntAt Q (f i j))
+    {c : 𝓞 E} (hc : (c : E) ≠ 0)
+    {f : Matrix (Fin N) (Fin N) E} (hf : ∀ i j, IntAt Q (f i j))
     (hf2 : ∀ i j, DivAt Q c ((f * f - f) i j)) (hf3 : ∀ i j, DivAt Q c ((f + fᴴ - 1) i j))
     {t : 𝓞 E} (ht : DivAt Q c ((t : E) - 1)) (ht' : DivAt Q c (star (t : E) - 1))
     (ht'' : IntAt Q (star (t : E)))
-    {e : Matrix (Fin N) (Fin N) E} (he : Gᴴ * e * G = (t : E) • f) :
-    SmallAt Q c L (e * e - e) ∧ SmallAt Q c L (e + eᴴ - 1) := by
+    {e : Matrix (Fin N) (Fin N) E} (he : Gᴴ * e * G = (t : E) • f)
+    : SmallAt Q c L (e * e - e) ∧ SmallAt Q c L (e + eᴴ - 1) := by
   constructor
   · apply small_of hGG hD hc
     intro i j
     have hcs : Gᴴ * (e * e - e) * G = (Gᴴ * e * G) * (Gᴴ * e * G) - Gᴴ * e * G := by
-      calc Gᴴ * (e * e - e) * G = Gᴴ * e * (G * Gᴴ) * e * G - Gᴴ * e * G := by
-            rw [hGG, mul_one, mul_sub, sub_mul]
-            simp only [mul_assoc]
+      calc
+        Gᴴ * (e * e - e) * G = Gᴴ * e * (G * Gᴴ) * e * G - Gᴴ * e * G := by
+          rw [hGG, mul_one, mul_sub, sub_mul]
+          simp only [mul_assoc]
         _ = _ := by simp only [mul_assoc]
     rw [hcs, he]
-    have hm : ((t : E) • f) * ((t : E) • f) - (t : E) • f =
-        ((t : E) * (t : E)) • (f * f - f) + ((t : E) * ((t : E) - 1)) • f := by
+    have hm
+        : ((t : E) • f) * ((t : E) • f) - (t : E) • f
+          = ((t : E) * (t : E)) • (f * f - f) + ((t : E) * ((t : E) - 1)) • f := by
       rw [smul_mul_smul_comm, smul_sub, mul_sub, mul_one, sub_smul]
       abel
     rw [hm]
@@ -224,8 +246,10 @@ theorem good_gen {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin
         mul_sub, mul_add, sub_mul, add_mul, mul_one, hG1]
       simp only [mul_assoc]
     rw [hch, he]
-    have hm : (t : E) • f + ((t : E) • f)ᴴ - 1 = star (t : E) • (f + fᴴ - 1) +
-        ((t : E) - star (t : E)) • f + (star (t : E) - 1) • (1 : Matrix (Fin N) (Fin N) E) := by
+    have hm
+        : (t : E) • f + ((t : E) • f)ᴴ - 1
+          = star (t : E) • (f + fᴴ - 1) + ((t : E) - star (t : E)) • f
+            + (star (t : E) - 1) • (1 : Matrix (Fin N) (Fin N) E) := by
       rw [Matrix.conjTranspose_smul, smul_sub, smul_add, sub_smul, sub_smul, one_smul]
       abel
     rw [hm]
@@ -243,22 +267,22 @@ theorem good_gen {L : Submodule (𝓞 E) (Fin N → E)} {G : Matrix (Fin N) (Fin
 
 end Mat
 
-theorem conj_sq {N : ℕ} (u e : Matrix (Fin N) (Fin N) E) (hu : u * uᴴ = 1) :
-    (uᴴ * e * u) * (uᴴ * e * u) - uᴴ * e * u = uᴴ * (e * e - e) * u := by
-  calc (uᴴ * e * u) * (uᴴ * e * u) - uᴴ * e * u
+theorem conj_sq {N : ℕ} (u e : Matrix (Fin N) (Fin N) E) (hu : u * uᴴ = 1)
+    : (uᴴ * e * u) * (uᴴ * e * u) - uᴴ * e * u = uᴴ * (e * e - e) * u := by
+  calc
+    (uᴴ * e * u) * (uᴴ * e * u) - uᴴ * e * u
       = uᴴ * e * (u * uᴴ) * e * u - uᴴ * e * u := by simp only [mul_assoc]
     _ = uᴴ * (e * e - e) * u := by
       rw [hu, mul_one, mul_sub, sub_mul]
       simp only [mul_assoc]
 
-theorem conj_herm {N : ℕ} (u e : Matrix (Fin N) (Fin N) E) (hu : uᴴ * u = 1) :
-    uᴴ * e * u + (uᴴ * e * u)ᴴ - 1 = uᴴ * (e + eᴴ - 1) * u := by
+theorem conj_herm {N : ℕ} (u e : Matrix (Fin N) (Fin N) E) (hu : uᴴ * u = 1)
+    : uᴴ * e * u + (uᴴ * e * u)ᴴ - 1 = uᴴ * (e + eᴴ - 1) * u := by
   rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
     mul_sub, mul_add, sub_mul, add_mul, mul_one, hu]
   simp only [mul_assoc]
 
-theorem star_coe (t : 𝓞 E) : star (t : E) = ((cj E t : 𝓞 E) : E) := by
-  rfl
+theorem star_coe (t : 𝓞 E) : star (t : E) = ((cj E t : 𝓞 E) : E) := by rfl
 
 theorem inertAsm : InertAsm := by
   unfold InertAsm InertPlace
@@ -290,10 +314,10 @@ theorem inertAsm : InertAsm := by
   have hA'' : G''ᴴ * (G' * e₁ * G'ᴴ) * G'' = (G'ᴴ * G'')ᴴ * e₁ * (G'ᴴ * G'') := by
     rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
     simp only [mul_assoc]
-  obtain ⟨s', hs', hs'L⟩ := clear hFG'
-    (pres_of hG'2 hD' (M := G' * e₁ * G'ᴴ) (fun i j => by rw [hA']; exact h1 i j))
-  obtain ⟨s'', hs'', hs''L⟩ := clear hFG''
-    (pres_of hG''2 hD'' (M := G' * e₁ * G'ᴴ) (fun i j => by rw [hA'']; exact h2 i j))
+  obtain ⟨s', hs', hs'L⟩ :=
+    clear hFG' (pres_of hG'2 hD' (M := G' * e₁ * G'ᴴ) (fun i j => by rw [hA']; exact h1 i j))
+  obtain ⟨s'', hs'', hs''L⟩ :=
+    clear hFG'' (pres_of hG''2 hD'' (M := G' * e₁ * G'ᴴ) (fun i j => by rw [hA'']; exact h2 i j))
   obtain ⟨y, i, hi, hyi⟩ := hQ.exists_inv (mul_nmem hs' hs'')
   obtain ⟨t, ht⟩ : ∃ t : 𝓞 E, t = s' * s'' * (y * ∑ k ∈ Finset.range K, i ^ k) := ⟨_, rfl⟩
   have ht1 : t - 1 = -(i ^ K) := by
@@ -324,38 +348,48 @@ theorem inertAsm : InertAsm := by
     exact intAt_coe _
   have hE' : G'ᴴ * ((t : E) • (G' * e₁ * G'ᴴ)) * G' = (t : E) • e₁ := by
     rw [Matrix.mul_smul, Matrix.smul_mul, hA']
-  have hE'' : G''ᴴ * ((t : E) • (G' * e₁ * G'ᴴ)) * G'' =
-      (t : E) • ((G'ᴴ * G'')ᴴ * e₁ * (G'ᴴ * G'')) := by
+  have hE''
+      : G''ᴴ * ((t : E) • (G' * e₁ * G'ᴴ)) * G'' = (t : E) • ((G'ᴴ * G'')ᴴ * e₁ * (G'ᴴ * G'')) := by
     rw [Matrix.mul_smul, Matrix.smul_mul, hA'']
   have hcE : (c : E) ≠ 0 := by exact_mod_cast hc
-  obtain ⟨a1, a2⟩ := good_gen hG'1 hG'2 hD' hcE h1 (fun i j => tr _ (h3 i j)) (fun i j => tr _ (h5 i j))
-    htc htc' htc'' hE'
-  obtain ⟨b1, b2⟩ := good_gen hG''1 hG''2 hD'' hcE h2
-    (fun i j => by rw [conj_sq (G'ᴴ * G'') e₁ hu2]; exact tr _ (h4 i j))
-    (fun i j => by rw [conj_herm (G'ᴴ * G'') e₁ hu1]; exact tr _ (h6 i j))
-    htc htc' htc'' hE''
+  obtain ⟨a1, a2⟩ :=
+    good_gen hG'1 hG'2 hD' hcE h1
+      (fun i j => tr _ (h3 i j))
+      (fun i j => tr _ (h5 i j))
+      htc htc' htc'' hE'
+  obtain ⟨b1, b2⟩ :=
+    good_gen hG''1 hG''2 hD'' hcE h2
+      (fun i j => by rw [conj_sq (G'ᴴ * G'') e₁ hu2]; exact tr _ (h4 i j))
+      (fun i j => by rw [conj_herm (G'ᴴ * G'') e₁ hu1]; exact tr _ (h6 i j))
+      htc htc' htc'' hE''
   refine ⟨(t : E) • (G' * e₁ * G'ᴴ), ?_, ?_, ?_⟩
   · unfold Pres
     intro z hz
     have hsm : ((t : E) • (G' * e₁ * G'ᴴ)) *ᵥ z = (t : E) • ((G' * e₁ * G'ᴴ) *ᵥ z) := by
       first
-        | exact Matrix.smul_mulVec (t : E) (G' * e₁ * G'ᴴ) z
-        | (ext k; simp [Matrix.mulVec, Finset.mul_sum, mul_assoc])
+      | exact Matrix.smul_mulVec (t : E) (G' * e₁ * G'ᴴ) z
+      | (ext k; simp [Matrix.mulVec, Finset.mul_sum, mul_assoc])
     rw [hsm,
       show (t : E) • ((G' * e₁ * G'ᴴ) *ᵥ z) = t • ((G' * e₁ * G'ᴴ) *ᵥ z) from algebraMap_smul E t _,
-      ht, show s' * s'' * (y * ∑ k ∈ Finset.range K, i ^ k) =
-        (s'' * (y * ∑ k ∈ Finset.range K, i ^ k)) * s' by ring, mul_smul]
+      ht,
+      show s' * s'' * (y * ∑ k ∈ Finset.range K, i ^ k)
+          = (s'' * (y * ∑ k ∈ Finset.range K, i ^ k)) * s' by
+        ring,
+      mul_smul]
     exact L'.smul_mem _ (hs'L z hz)
   · unfold Pres
     intro z hz
     have hsm : ((t : E) • (G' * e₁ * G'ᴴ)) *ᵥ z = (t : E) • ((G' * e₁ * G'ᴴ) *ᵥ z) := by
       first
-        | exact Matrix.smul_mulVec (t : E) (G' * e₁ * G'ᴴ) z
-        | (ext k; simp [Matrix.mulVec, Finset.mul_sum, mul_assoc])
+      | exact Matrix.smul_mulVec (t : E) (G' * e₁ * G'ᴴ) z
+      | (ext k; simp [Matrix.mulVec, Finset.mul_sum, mul_assoc])
     rw [hsm,
       show (t : E) • ((G' * e₁ * G'ᴴ) *ᵥ z) = t • ((G' * e₁ * G'ᴴ) *ᵥ z) from algebraMap_smul E t _,
-      ht, show s' * s'' * (y * ∑ k ∈ Finset.range K, i ^ k) =
-        (s' * (y * ∑ k ∈ Finset.range K, i ^ k)) * s'' by ring, mul_smul]
+      ht,
+      show s' * s'' * (y * ∑ k ∈ Finset.range K, i ^ k)
+          = (s' * (y * ∑ k ∈ Finset.range K, i ^ k)) * s'' by
+        ring,
+      mul_smul]
     exact L''.smul_mem _ (hs''L z hz)
   · unfold Good
     exact ⟨a1, b1, a2, b2⟩

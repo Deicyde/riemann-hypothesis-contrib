@@ -18,7 +18,8 @@ theorem CombTableauRowLattice.proof : CombTableauRowLattice.Statement := by
     intro p hp
     have hp' := p.2
     simp only [youngCells, Finset.mem_filter, Finset.mem_product, Finset.mem_univ, true_and,
-      Finset.mem_range] at hp' ⊢
+        Finset.mem_range]
+      at hp' ⊢
     have h1 : p.1.2 < lam i := by
       rw [hp] at hp'
       exact lt_of_lt_of_le hp'.2 (hlam hij)

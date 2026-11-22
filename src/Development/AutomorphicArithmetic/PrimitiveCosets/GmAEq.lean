@@ -8,17 +8,21 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.GzEq
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
-private theorem UpperTheory.Comparison₂.character_trivial_on_generator_iff (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ) (s : φ.A) :
-    chr φ ψ (φ.tau1 s) = 1 ↔ ψ (0, s) = 1 := by
+private theorem UpperTheory.Comparison₂.character_trivial_on_generator_iff
+    (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ) (s : φ.A)
+    : chr φ ψ (φ.tau1 s) = 1 ↔ ψ (0, s) = 1 := by
   rw [← Units.val_eq_one, (chr_bij φ).2.2.2.2.1 ψ (φ.tau1 s)]
   simp [toE, Frame.tau1, Frame.iotaInv, Frame.iota]
   exact Iff.rfl
 
-private theorem UpperTheory.Comparison₂.gmA_eq_triv (φ : Frame) (θ : φ.Char) (hi : θ φ.iod = 1) :
-    (∀ h : φ.A, θ (φ.tau1 h) = 1) ↔ θ = 1 ∨ θ = φ.psC := by
+private theorem UpperTheory.Comparison₂.gmA_eq_triv (φ : Frame) (θ : φ.Char) (hi : θ φ.iod = 1)
+    : (∀ h : φ.A, θ (φ.tau1 h) = 1) ↔ θ = 1 ∨ θ = φ.psC := by
   constructor
   · intro h
     have hM : ∀ m : φ.MA, θ ((1, 1), m) = 1 := fun m => h (Multiplicative.toAdd m)
@@ -29,8 +33,7 @@ private theorem UpperTheory.Comparison₂.gmA_eq_triv (φ : Frame) (θ : φ.Char
       · exact hi
     have hred : ∀ (a b : ℤˣ) (m : φ.MA), θ ((a, b), m) = θ ((a, 1), 1) := by
       intro a b m
-      have e : (((a, b), m) : φ.GG) = ((a, 1), 1) * ((1, b), 1) * ((1, 1), m) := by
-        ext <;> simp
+      have e : (((a, b), m) : φ.GG) = ((a, 1), 1) * ((1, b), 1) * ((1, 1), m) := by ext <;> simp
       rw [e, map_mul, map_mul, hM, hB, mul_one, mul_one]
     have hsq : (θ φ.sg : ℂ) * (θ φ.sg : ℂ) = 1 := by
       rw [← Units.val_mul, ← map_mul]
@@ -62,10 +65,12 @@ private theorem UpperTheory.Comparison₂.gmA_eq_triv (φ : Frame) (θ : φ.Char
     · apply Units.ext
       simp [Frame.psC, Frame.chQ, Frame.tau1]
 
-theorem UpperTheory.Comparison₂.gmA_eq :
-    ∀ (Λ : Level) (φ : Frame) (H : HostAx φ) (TT : Finset φ.A) (x eps C : ℝ) (ell : AddChar (E0 × φ.A) ℂ → ℂ),
-      EAtH Λ H.toHostRaw TT x eps C → HostAddCharCompatible H.toHostRaw ell → ∀ y,
-        GmA (arith H.toHostRaw) ell (keptA Λ H.toHostRaw) (3 * (Λ.o : ℝ) + 1)⁻¹ y = Λ.Gm y := by
+theorem UpperTheory.Comparison₂.gmA_eq
+    : ∀ (Λ : Level) (φ : Frame) (H : HostAx φ) (TT : Finset φ.A) (x eps C : ℝ)
+        (ell : AddChar (E0 × φ.A) ℂ → ℂ),
+      EAtH Λ H.toHostRaw TT x eps C → HostAddCharCompatible H.toHostRaw ell
+        → ∀ y,
+          GmA (arith H.toHostRaw) ell (keptA Λ H.toHostRaw) (3 * (Λ.o : ℝ) + 1)⁻¹ y = Λ.Gm y := by
   intro Λ φ H TT x eps C ell hE hell y
   classical
   obtain ⟨hbij, -, -, -, -⟩ := chr_bij φ
@@ -93,10 +98,12 @@ theorem UpperTheory.Comparison₂.gmA_eq :
       exact hp
     · rintro ⟨ψ, hψ, rfl⟩
       exact (hmem ψ).1 hψ
-  have hinj : Set.InjOn (fun ψ => H.prim (chr φ ψ)) (keptA Λ H.toHostRaw) :=
-    fun a _ b _ h => hbij.1 (hpinj h)
-  have hw : ∀ ψ ∈ keptA Λ H.toHostRaw, wtA (3 * (Λ.o : ℝ) + 1)⁻¹ ψ =
-      (if H.prim (chr φ ψ) = PChar.one then 1 else Λ.wt (H.prim (chr φ ψ))) := by
+  have hinj : Set.InjOn (fun ψ => H.prim (chr φ ψ)) (keptA Λ H.toHostRaw) := fun a _ b _ h =>
+    hbij.1 (hpinj h)
+  have hw
+      : ∀ ψ ∈ keptA Λ H.toHostRaw,
+        wtA (3 * (Λ.o : ℝ) + 1)⁻¹ ψ
+          = (if H.prim (chr φ ψ) = PChar.one then 1 else Λ.wt (H.prim (chr φ ψ))) := by
     intro ψ hψ
     have hiod : chr φ ψ φ.iod = 1 := (hXp ψ hψ).2
     have htriv : (∀ h : φ.A, ψ (0, h) = 1) ↔ chr φ ψ = 1 ∨ chr φ ψ = φ.psC := by
@@ -133,10 +140,11 @@ theorem UpperTheory.Comparison₂.gmA_eq :
   have hG : ∀ ψ, (GPsi (arith H.toHostRaw) ell ψ y).re = (An.gChi (H.prim (chr φ ψ)).χ y).re := by
     intro ψ
     rw [(prim_read φ H ell hell ψ).2 y]
-  have key : ∑ ψ ∈ keptA Λ H.toHostRaw,
-      (if H.prim (chr φ ψ) = PChar.one then 1 else Λ.wt (H.prim (chr φ ψ))) *
-        (An.gChi (H.prim (chr φ ψ)).χ y).re =
-      ∑ p ∈ Λ.KEPT, (if p = PChar.one then 1 else Λ.wt p) * (An.gChi p.χ y).re := by
+  have key
+      : ∑ ψ ∈ keptA Λ H.toHostRaw,
+          (if H.prim (chr φ ψ) = PChar.one then 1 else Λ.wt (H.prim (chr φ ψ))) *
+            (An.gChi (H.prim (chr φ ψ)).χ y).re
+        = ∑ p ∈ Λ.KEPT, (if p = PChar.one then 1 else Λ.wt p) * (An.gChi p.χ y).re := by
     rw [hKimg, Finset.sum_image hinj]
   have hone : (An.gChi PChar.one.χ y).re = An.G y := by
     have h1 : PChar.one.χ = 1 := rfl

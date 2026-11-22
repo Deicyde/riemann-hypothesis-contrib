@@ -8,18 +8,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RepUniqu
 
 set_option backward.isDefEq.respectTransparency false
 set_option autoImplicit false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistableComparison CrystallineSemistableComparison.Pb GlobalTheory.CompanionTheory.ConeLocal
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb GlobalTheory.CompanionTheory.ConeLocal
 open GlobalTheory.CatH (face toLast)
 
 namespace GlobalTheory.CompanionTheory.ConeLocal.SnocPerm
 
-theorem eq_succAbove_of_snoc_eq_perm {n : ℕ} (I : Fin n → Fin (n + 1)) (k : Fin (n + 1))
-    (π : Equiv.Perm (Fin (n + 1))) (hI : StrictMono I)
-    (h : Fin.snoc (α := fun _ => Fin (n + 1)) I k = ⇑π) : I = k.succAbove := by
-  have hcast : ∀ i : Fin n, π i.castSucc = I i := fun i => by
-    rw [← h]; simp
-  have hlast : π (Fin.last n) = k := by
-    rw [← h]; simp
+theorem eq_succAbove_of_snoc_eq_perm
+    {n : ℕ} (I : Fin n → Fin (n + 1)) (k : Fin (n + 1)) (π : Equiv.Perm (Fin (n + 1)))
+    (hI : StrictMono I) (h : Fin.snoc (α := fun _ => Fin (n + 1)) I k = ⇑π)
+    : I = k.succAbove := by
+  have hcast : ∀ i : Fin n, π i.castSucc = I i := fun i => by rw [← h]; simp
+  have hlast : π (Fin.last n) = k := by rw [← h]; simp
   have hrange : Set.range I = Set.range k.succAbove := by
     rw [Fin.range_succAbove]
     ext y

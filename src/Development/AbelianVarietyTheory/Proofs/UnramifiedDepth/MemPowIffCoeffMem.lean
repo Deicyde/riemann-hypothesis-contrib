@@ -33,11 +33,12 @@ def coeffIdeal (I : Ideal R) (n : ℕ) : Ideal (MvPowerSeries κ R) where
     have : e.degree = p.1.degree + p.2.degree := by rw [← hp, map_add (f := _)]
     omega
 
-theorem mem_coeffIdeal {I : Ideal R} {n : ℕ} {f : MvPowerSeries κ R} :
-    f ∈ coeffIdeal I n ↔ ∀ e : κ →₀ ℕ, coeff e f ∈ I ^ (n - e.degree) := Iff.rfl
+theorem mem_coeffIdeal {I : Ideal R} {n : ℕ} {f : MvPowerSeries κ R}
+    : f ∈ coeffIdeal I n ↔ ∀ e : κ →₀ ℕ, coeff e f ∈ I ^ (n - e.degree) :=
+  Iff.rfl
 
-theorem coeffIdeal_mul_le (I : Ideal R) (a b : ℕ) :
-    coeffIdeal (κ := κ) I a * coeffIdeal I b ≤ coeffIdeal I (a + b) := by
+theorem coeffIdeal_mul_le (I : Ideal R) (a b : ℕ)
+    : coeffIdeal (κ := κ) I a * coeffIdeal I b ≤ coeffIdeal I (a + b) := by
   classical
   rw [Ideal.mul_le]
   intro f hf g hg
@@ -52,8 +53,8 @@ theorem coeffIdeal_mul_le (I : Ideal R) (a b : ℕ) :
   have : e.degree = p.1.degree + p.2.degree := by rw [← hp, map_add (f := _)]
   omega
 
-theorem le_coeffIdeal_one (I : Ideal R) :
-    Ideal.map C I ⊔ Ideal.span (Set.range X) ≤ coeffIdeal (κ := κ) I 1 := by
+theorem le_coeffIdeal_one (I : Ideal R)
+    : Ideal.map C I ⊔ Ideal.span (Set.range X) ≤ coeffIdeal (κ := κ) I 1 := by
   classical
   refine sup_le ?_ ?_
   · rw [Ideal.map_le_iff_le_comap]
@@ -75,8 +76,8 @@ theorem le_coeffIdeal_one (I : Ideal R) :
       simp
     · exact Ideal.zero_mem _
 
-theorem pow_le_coeffIdeal (I : Ideal R) (n : ℕ) :
-    (Ideal.map C I ⊔ Ideal.span (Set.range X)) ^ n ≤ coeffIdeal (κ := κ) I n := by
+theorem pow_le_coeffIdeal (I : Ideal R) (n : ℕ)
+    : (Ideal.map C I ⊔ Ideal.span (Set.range X)) ^ n ≤ coeffIdeal (κ := κ) I n := by
   induction n with
   | zero =>
     intro f _
@@ -87,8 +88,7 @@ theorem pow_le_coeffIdeal (I : Ideal R) (n : ℕ) :
     rw [pow_succ]
     exact (Ideal.mul_mono ih (le_coeffIdeal_one I)).trans (coeffIdeal_mul_le I n 1)
 
-noncomputable def pick (d : κ →₀ ℕ) (k : κ) : κ :=
-  if h : d.support.Nonempty then h.choose else k
+noncomputable def pick (d : κ →₀ ℕ) (k : κ) : κ := if h : d.support.Nonempty then h.choose else k
 
 theorem pick_eq (d : κ →₀ ℕ) (h : d ≠ 0) (k k' : κ) : pick d k = pick d k' := by
   have h' : d.support.Nonempty := Finsupp.support_nonempty_iff.2 h
@@ -102,13 +102,13 @@ theorem pick_mem (d : κ →₀ ℕ) (h : d ≠ 0) (k : κ) : pick d k ∈ d.sup
 noncomputable def cof [DecidableEq κ] (f : MvPowerSeries κ R) (k : κ) : MvPowerSeries κ R :=
   fun e => if pick (e + single k 1) k = k then coeff (e + single k 1) f else 0
 
-theorem coeff_cof [DecidableEq κ] (f : MvPowerSeries κ R) (k : κ) (e : κ →₀ ℕ) :
-    coeff e (cof f k) = if pick (e + single k 1) k = k then coeff (e + single k 1) f else 0 := by
+theorem coeff_cof [DecidableEq κ] (f : MvPowerSeries κ R) (k : κ) (e : κ →₀ ℕ)
+    : coeff e (cof f k) = if pick (e + single k 1) k = k then coeff (e + single k 1) f else 0 := by
   rw [coeff_apply]
   rfl
 
-theorem decomp [Fintype κ] [DecidableEq κ] (f : MvPowerSeries κ R) :
-    f = C (coeff 0 f) + ∑ k, X k * cof f k := by
+theorem decomp [Fintype κ] [DecidableEq κ] (f : MvPowerSeries κ R)
+    : f = C (coeff 0 f) + ∑ k, X k * cof f k := by
   classical
   ext d
   set_option synthInstance.maxHeartbeats 100000 in
@@ -119,9 +119,16 @@ theorem decomp [Fintype κ] [DecidableEq κ] (f : MvPowerSeries κ R) :
     simp [Finsupp.single_le_iff]
   · rw [if_neg hd, zero_add]
     obtain ⟨k0, -⟩ := Finsupp.support_nonempty_iff.2 hd
-    have hterm : ∀ k, (if single k 1 ≤ d then
-        (if pick (d - single k 1 + single k 1) k = k then coeff (d - single k 1 + single k 1) f
-          else 0) else 0) = if pick d k0 = k then coeff d f else 0 := by
+    have hterm
+        : ∀ k,
+          (if single k 1 ≤ d then
+             (if pick (d - single k 1 + single k 1) k = k then
+                coeff (d - single k 1 + single k 1) f
+              else
+                0)
+           else
+             0)
+            = if pick d k0 = k then coeff d f else 0 := by
       intro k
       by_cases hk : single k 1 ≤ d
       · rw [if_pos hk, tsub_add_cancel_of_le hk, pick_eq d hd k k0]
@@ -135,9 +142,11 @@ theorem decomp [Fintype κ] [DecidableEq κ] (f : MvPowerSeries κ R) :
     rw [Finset.sum_congr rfl (fun k _ => hterm k), Finset.sum_ite_eq]
     simp
 
-theorem mem_pow_of_coeff [Finite κ] (I : Ideal R) (n : ℕ) (f : MvPowerSeries κ R)
-    (hf : ∀ e : κ →₀ ℕ, coeff e f ∈ I ^ (n - e.degree)) :
-    f ∈ (Ideal.map C I ⊔ Ideal.span (Set.range X)) ^ n := by
+theorem mem_pow_of_coeff
+    [Finite κ]
+    (I : Ideal R) (n : ℕ) (f : MvPowerSeries κ R)
+    (hf : ∀ e : κ →₀ ℕ, coeff e f ∈ I ^ (n - e.degree))
+    : f ∈ (Ideal.map C I ⊔ Ideal.span (Set.range X)) ^ n := by
   classical
   have := Fintype.ofFinite κ
   induction n generalizing f with
@@ -163,11 +172,15 @@ theorem mem_pow_of_coeff [Finite κ] (I : Ideal R) (n : ℕ) (f : MvPowerSeries 
 
 end SlopeTestRemainingChoices
 
-theorem mem_pow_iff_coeff_mem {R : Type u_1} [CommRing R] (I : Ideal R) {κ : Type u_2} [Finite κ] (n : ℕ)
-    (f : MvPowerSeries κ R) :
-    f ∈ (Ideal.map MvPowerSeries.C I ⊔ Ideal.span (Set.range MvPowerSeries.X)) ^ n ↔
-      ∀ (e : κ →₀ ℕ), (MvPowerSeries.coeff e : MvPowerSeries κ R → R) f ∈
-        I ^ (n - (Finsupp.degree : (κ →₀ ℕ) → ℕ) e) :=
+theorem mem_pow_iff_coeff_mem
+    {R : Type u_1} [CommRing R]
+    (I : Ideal R)
+    {κ : Type u_2} [Finite κ]
+    (n : ℕ) (f : MvPowerSeries κ R)
+    : f ∈ (Ideal.map MvPowerSeries.C I ⊔ Ideal.span (Set.range MvPowerSeries.X)) ^ n
+      ↔ ∀ (e : κ →₀ ℕ),
+        (MvPowerSeries.coeff e : MvPowerSeries κ R → R) f
+          ∈ I ^ (n - (Finsupp.degree : (κ →₀ ℕ) → ℕ) e) :=
   ⟨fun h => mem_coeffIdeal.1 (pow_le_coeffIdeal I n h), mem_pow_of_coeff I n f⟩
 
 end GlobalTheory.IdealPowerCoefficients

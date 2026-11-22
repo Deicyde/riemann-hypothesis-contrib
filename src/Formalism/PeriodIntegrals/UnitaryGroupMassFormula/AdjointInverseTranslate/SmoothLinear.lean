@@ -19,15 +19,15 @@ theorem rd_extension_h : RdExtH := by
   intro n H E _ _ f F U g X hH hU hg hgH hF hfF hX
   unfold RdV
   have hγ := hasDerivAt_mul_exp_smul_zero g X
-  have hγ0 : g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by
-    simp [NormedSpace.exp_zero]
+  have hγ0 : g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by simp [NormedSpace.exp_zero]
   have hFd : DifferentiableAt ℝ F g :=
     (hF.differentiableOn (by simp)).differentiableAt (hU.mem_nhds hg)
-  have hcomp : HasDerivAt (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X)))
-      (fderiv ℝ F g (g * X)) 0 :=
+  have hcomp
+      : HasDerivAt (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) (fderiv ℝ F g (g * X)) 0 :=
     hFd.hasFDerivAt.comp_hasDerivAt_of_eq (0 : ℝ) hγ hγ0.symm
-  have hev : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0]
-      (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) := by
+  have hev
+      : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0]
+        (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) := by
     have hmem : ∀ᶠ t : ℝ in 𝓝 0, g * NormedSpace.exp ((t : ℂ) • X) ∈ U :=
       hγ.continuousAt.preimage_mem_nhds (by rw [hγ0]; exact hU.mem_nhds hg)
     filter_upwards [hmem] with t ht
@@ -63,9 +63,7 @@ theorem smooth_right' : SmoothRight := by
     have h := (LinearMap.mulRight ℝ s).toContinuousLinearMap.contDiff (n := ∞)
     convert h using 1
     funext x
-    first
-    | rfl
-    | simp
+    first | rfl | simp
   intro g₀ hg₀
   obtain ⟨U, F, hU, hgU, hF, hfF⟩ := hf (g₀ * s) (ana_mul hg₀ hs)
   refine ⟨(fun x => x * s) ⁻¹' U, fun x => F (x * s), hU.preimage hL.continuous, hgU, ?_, ?_⟩
@@ -155,7 +153,8 @@ theorem eab_h_linear : EabHLin := by
   unfold EabHLin
   intro n H E _ _ f f' c a b g hH hf hf' hg
   unfold EabH
-  rw [ana_rdLin hH c hf hf' (ana_hpartMem hH _).1 hg, ana_rdLin hH c hf hf' (ana_hpartMem hH _).2.1 hg]
+  rw [ana_rdLin hH c hf hf' (ana_hpartMem hH _).1 hg,
+    ana_rdLin hH c hf hf' (ana_hpartMem hH _).2.1 hg]
   rw [smul_add, smul_add, smul_comm Complex.I c]
   abel
 

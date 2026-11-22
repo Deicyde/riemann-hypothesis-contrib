@@ -16,16 +16,21 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-theorem BlockResolutionMixedBridge.full : GroundTheory.Heights₂.Heights.HilbertSamuel.BlockResolutionMixedBridge.Statement :=
+theorem BlockResolutionMixedBridge.full
+    : GroundTheory.Heights₂.Heights.HilbertSamuel.BlockResolutionMixedBridge.Statement :=
   GroundTheory.Heights₂.Heights.HilbertSamuel.BlockResolutionMixedBridge.proof
 
-theorem ResolutionMixedBridge.full : GroundTheory.Heights₂.Heights.HilbertSamuel.ResolutionMixedBridge.Statement :=
+theorem ResolutionMixedBridge.full
+    : GroundTheory.Heights₂.Heights.HilbertSamuel.ResolutionMixedBridge.Statement :=
   GroundTheory.Heights₂.Heights.HilbertSamuel.ResolutionMixedBridge.proof
 
-theorem Closed.Inter.pullbackPushforward_holds : GroundTheory.Heights₂.Heights.Inter.pullbackPushforward_holds.Statement :=
-  GroundTheory.Heights₂.Heights.Inter.pullbackPushforward_holds.proof Closed.Inter.BlockGenFinite Closed.Inter.FibreIsolFinite
+theorem Closed.Inter.pullbackPushforward_holds
+    : GroundTheory.Heights₂.Heights.Inter.pullbackPushforward_holds.Statement :=
+  GroundTheory.Heights₂.Heights.Inter.pullbackPushforward_holds.proof Closed.Inter.BlockGenFinite
+    Closed.Inter.FibreIsolFinite
 
-theorem Closed.ReciprocityTheory.ChartRestriction.G.Geo.ResBridge : ReciprocityTheory.ChartRestriction.G.Geo.ResBridgeStatement :=
+theorem Closed.ReciprocityTheory.ChartRestriction.G.Geo.ResBridge
+    : ReciprocityTheory.ChartRestriction.G.Geo.ResBridgeStatement :=
   ReciprocityTheory.ChartRestriction.G.Geo.resBridge
 
 end GroundTheory.Heights₂.Heights.HilbertSamuel

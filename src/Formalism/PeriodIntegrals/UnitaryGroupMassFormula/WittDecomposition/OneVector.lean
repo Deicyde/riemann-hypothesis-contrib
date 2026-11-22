@@ -8,11 +8,11 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WittDecompositio
 namespace PI.Witt
 
 section
-variable {K V : Type} [Field K] [StarRing K] [CharZero K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [StarRing K] [CharZero K] [AddCommGroup V] [Module K V]
   (B : V →ₗ⋆[K] V →ₗ[K] K)
 
-def qrefl (v : V) (a : K) : V →ₗ[K] V :=
-  LinearMap.id - (a⁻¹ • (B v)).smulRight v
+def qrefl (v : V) (a : K) : V →ₗ[K] V := LinearMap.id - (a⁻¹ • (B v)).smulRight v
 
 lemma qrefl_apply (v : V) (a : K) (z : V) : qrefl B v a z = z - (a⁻¹ * B v z) • v := by
   simp [qrefl, LinearMap.smulRight_apply, smul_eq_mul]
@@ -42,8 +42,8 @@ lemma qrefl_isometry (hB : ∀ x y, star (B x y) = B y x) (v : V) (a : K) (ha : 
 def qreflEquiv (v : V) (a : K) (ha : a ≠ 0) (hv : B v v = a + star a) : V ≃ₗ[K] V :=
   LinearEquiv.ofLinearMap (qrefl B v a) (qrefl B v (star a))
     (LinearMap.ext fun z => qrefl_qrefl B v a (star a) ha (by simpa using ha) hv z)
-    (LinearMap.ext fun z => qrefl_qrefl B v (star a) a (by simpa using ha) ha
-      (by rw [hv, add_comm]) z)
+    (LinearMap.ext fun z =>
+      qrefl_qrefl B v (star a) a (by simpa using ha) ha (by rw [hv, add_comm]) z)
 
 lemma oneVector_generic (hB : ∀ x y, star (B x y) = B y x) (x y : V) (hxy : B x x = B y y)
     (ha : B (x - y) x ≠ 0) :

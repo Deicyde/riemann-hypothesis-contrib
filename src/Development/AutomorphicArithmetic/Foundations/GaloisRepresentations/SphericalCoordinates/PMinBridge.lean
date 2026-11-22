@@ -4,14 +4,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.minBridge_of :
-    UpperTheory.Gal.W2.MinBridge := by
+theorem UpperTheory.Gal.W2.minBridge_of : UpperTheory.Gal.W2.MinBridge := by
   intro p _ D G L β D' j hP ga c hga
   obtain ⟨hinj, hsmul, hspan, -⟩ := hP
   set f : 𝓞 D.F →+* G.F := (L.e : D.F →+* G.F).comp (algebraMap (𝓞 D.F) D.F) with hf
@@ -22,13 +24,14 @@ theorem UpperTheory.Gal.W2.minBridge_of :
     | succ n ih =>
       intro u
       rw [pow_succ, Module.End.mul_apply, ih, hga, pow_succ, Module.End.mul_apply]
-  have key : ∀ (q : (𝓞 D.F)[X]) (u : D'.La),
-      j (q.sum fun i b => algebraMap (𝓞 D.F) D.O b • (ga ^ i) u) =
-        L.rep (aeval c (q.map f)) (j u) := by
+  have key
+      : ∀ (q : (𝓞 D.F)[X]) (u : D'.La),
+        j (q.sum fun i b => algebraMap (𝓞 D.F) D.O b • (ga ^ i) u)
+          = L.rep (aeval c (q.map f)) (j u) := by
     intro q u
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Polynomial.aeval_def, Polynomial.eval₂_map, Polynomial.eval₂_eq_sum, Polynomial.sum_def,
-      Polynomial.sum_def, map_sum, map_sum, LinearMap.sum_apply]
+        Polynomial.sum_def, map_sum, map_sum, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hsmul, hpow, map_mul, map_pow, Module.End.mul_apply, ← L.rep_F]
     rfl

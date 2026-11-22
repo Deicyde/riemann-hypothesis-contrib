@@ -214,22 +214,66 @@ private lemma isEigenSum_poly_smul {k r : ℕ} {Wp Wq : Type} [NormedAddCommGrou
       Finsupp.prod_mapDomain_index (fun _ => pow_zero _) (fun _ _ _ => pow_add _ _ _)]
     rfl
 
-
 open Finset in
-theorem _root_.GlobalTheory.gfPow_smul_comp_polyOp_eigenSum :
-    ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (Wq' : Type) [NormedAddCommGroup Wq'] [InnerProductSpace ℂ Wq'] [FiniteDimensional ℂ Wq'] (z z' : Fin (2 * r + k + 1) → ℂ) (lam : Fin (2 * r + k + 1) → ℝ) (A₀ : ℝ) (p₀ dA : ℕ) (f : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp)) (Aop : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq' →L[ℂ] Wq)), (∀ s t, s ≠ t → 2 * (((2 * r + 2) * p₀ + dA : ℕ) : ℝ) < |lam s - lam t|) → (_root_.Formalism.FourierDecayAlt.B.CkOn ⊤ (_root_.Formalism.FourierDecayAlt.B.GV k r) (f) ∧ ∀ m : ℕ, _root_.Formalism.FourierDecayAlt.B.InCC (A₀) m (f)) → (∀ Y : ℝ, ∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r, _root_.Formalism.FourierDecayAlt.Q.CV k r (Y : ℂ) (f) g = ((∏ s, (Y + lam s) : ℝ) : ℂ) • (f) g) → (∃ (n₁ : ℕ) (c : Fin n₁ → _root_.Formalism.FourierDecayAlt.B.Mat k r → ℂ) (L : Fin n₁ → (Wq' →L[ℂ] Wq)), (∀ i, _root_.Formalism.FourierDecayAlt.U.IsPolyDeg dA (c i)) ∧ ∀ g, Aop g = ∑ i, c i g • L i) → (∃ (N₀ : ℕ) (Fi : Fin N₀ → _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq' →L[ℂ] Wp)) (ν : Fin N₀ → Fin (2 * r + k + 1) → ℤ), (∀ i s, |ν i s| ≤ (((2 * r + 2) * p₀ + dA : ℕ) : ℤ)) ∧ (∀ i, (_root_.Formalism.FourierDecayAlt.B.CkOn ⊤ (_root_.Formalism.FourierDecayAlt.B.GV k r) (Fi i) ∧ ∀ m : ℕ, _root_.Formalism.FourierDecayAlt.B.InCC (A₀ - (((2 * r + 2) * p₀ + dA : ℕ) : ℝ)) m (Fi i))) ∧ (∀ i, (∀ Y : ℝ, ∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r, _root_.Formalism.FourierDecayAlt.Q.CV k r (Y : ℂ) (Fi i) g = ((∏ s, (Y + lam s + (ν i s : ℝ)) : ℝ) : ℂ) • (Fi i) g)) ∧ ∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r, (fun g => ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) • (f g).comp (Aop g)) g = ∑ i, Fi i g) := by
+theorem _root_.GlobalTheory.gfPow_smul_comp_polyOp_eigenSum
+    : ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+        [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp]
+        [FiniteDimensional ℂ Wq] (Wq' : Type) [NormedAddCommGroup Wq'] [InnerProductSpace ℂ Wq']
+        [FiniteDimensional ℂ Wq'] (z z' : Fin (2 * r + k + 1) → ℂ) (lam : Fin (2 * r + k + 1) → ℝ)
+        (A₀ : ℝ) (p₀ dA : ℕ) (f : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp))
+        (Aop : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq' →L[ℂ] Wq)),
+      (∀ s t, s ≠ t → 2 * (((2 * r + 2) * p₀ + dA : ℕ) : ℝ) < |lam s - lam t|)
+        → (_root_.Formalism.FourierDecayAlt.B.CkOn ⊤ (_root_.Formalism.FourierDecayAlt.B.GV k r) (f)
+          ∧ ∀ m : ℕ, _root_.Formalism.FourierDecayAlt.B.InCC (A₀) m (f))
+        → (∀ Y : ℝ, ∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r,
+          _root_.Formalism.FourierDecayAlt.Q.CV k r (Y : ℂ) (f) g
+            = ((∏ s, (Y + lam s) : ℝ) : ℂ) • (f) g)
+        → (∃ (n₁ : ℕ) (c : Fin n₁ → _root_.Formalism.FourierDecayAlt.B.Mat k r → ℂ)
+            (L : Fin n₁ → (Wq' →L[ℂ] Wq)),
+          (∀ i, _root_.Formalism.FourierDecayAlt.U.IsPolyDeg dA (c i))
+            ∧ ∀ g, Aop g = ∑ i, c i g • L i)
+        → (∃ (N₀ : ℕ) (Fi : Fin N₀ → _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq' →L[ℂ] Wp))
+            (ν : Fin N₀ → Fin (2 * r + k + 1) → ℤ),
+          (∀ i s, |ν i s| ≤ (((2 * r + 2) * p₀ + dA : ℕ) : ℤ))
+            ∧ (∀ i,
+              (_root_.Formalism.FourierDecayAlt.B.CkOn ⊤ (_root_.Formalism.FourierDecayAlt.B.GV k r)
+                  (Fi i)
+                ∧ ∀ m : ℕ,
+                  _root_.Formalism.FourierDecayAlt.B.InCC (A₀ - (((2 * r + 2) * p₀ + dA : ℕ) : ℝ)) m
+                    (Fi i)))
+            ∧ (∀ i,
+              (∀ Y : ℝ, ∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r,
+                _root_.Formalism.FourierDecayAlt.Q.CV k r (Y : ℂ) (Fi i) g
+                  = ((∏ s, (Y + lam s + (ν i s : ℝ)) : ℝ) : ℂ) • (Fi i) g))
+            ∧ ∀ g ∈ _root_.Formalism.FourierDecayAlt.B.GV k r,
+              (fun g =>
+                    ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ)
+                      • (f g).comp (Aop g))
+                  g
+                = ∑ i, Fi i g) := by
   intro k r Wp Wq _ _ _ _ _ _ Wq' _ _ _ z z' lam A₀ p₀ dA f Aop hgap hf heig hA
   obtain ⟨hck, hcc⟩ := hf
   obtain ⟨n₁, c, L, hc, hAop⟩ := hA
   set e := (2 * r + 2) * p₀ + dA with he
-  have hpiece : ∀ i, _root_.GlobalTheory.EigenSumPoly.IsEigenSum (Wp := Wp) (Wq := Wq') lam e (A₀ - e)
-      (fun g => (((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) * c i g) • (f g).comp (L i)) := by
+  have hpiece
+      : ∀ i,
+        _root_.GlobalTheory.EigenSumPoly.IsEigenSum (Wp := Wp) (Wq := Wq') lam e (A₀ - e) (fun g =>
+          (((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) * c i g)
+            • (f g).comp (L i)) := by
     intro i
     let Φ : (Wq →L[ℂ] Wp) →L[ℂ] (Wq' →L[ℂ] Wp) := (ContinuousLinearMap.compL ℂ Wq' Wq Wp).flip (L i)
     have hΦ : ∀ h, Φ h = h.comp (L i) := fun h => rfl
-    have h0 : _root_.GlobalTheory.EigenSumPoly.IsEigenSum (Wp := Wp) (Wq := Wq') lam 0 A₀ (fun g => (f g).comp (L i)) := by
-      refine ⟨1, fun _ g => (f g).comp (L i), fun _ _ => 0, fun _ _ => by simp, fun _ => ⟨?_, fun m => ?_⟩,
-        fun _ Y g hg => ?_, fun g _ => by simp⟩
+    have h0 : _root_.GlobalTheory.EigenSumPoly.IsEigenSum (Wp := Wp) (Wq := Wq') lam 0 A₀
+        (fun g => (f g).comp (L i)) := by
+      refine ⟨
+        1,
+        fun _ g => (f g).comp (L i),
+        fun _ _ => 0,
+        fun _ _ => by simp,
+        fun _ => ⟨?_, fun m => ?_⟩,
+        fun _ Y g hg => ?_,
+        fun g _ => by simp
+      ⟩
       · exact _root_.Formalism.FourierDecayAlt.P.CutBPEq.ckOn_clm Φ hck
       · obtain ⟨b, hb⟩ := hcc m
         exact ⟨_, _root_.Formalism.FourierDecayAlt.P.CutBPEq.ccle_clm Φ hb⟩
@@ -237,20 +281,36 @@ theorem _root_.GlobalTheory.gfPow_smul_comp_polyOp_eigenSum :
         simp only [hΦ] at h1
         rw [h1, heig Y g hg]
         simp
-    have hG := _root_.Formalism.FourierDecayAlt.P.PartialDerivativeAlgebra.pd_prod (Finset.range p₀) (P := fun _ (g : _root_.Formalism.FourierDecayAlt.B.Mat k r) => ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g : ℝ) : ℂ))
-      (fun _ _ => _root_.Formalism.FourierDecayAlt.P.AdmissibleLieWords.gf_pd k r z z')
-    have hfun : (fun g : _root_.Formalism.FourierDecayAlt.B.Mat k r => ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) * c i g) =
-        fun g => (∏ _ ∈ Finset.range p₀, ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g : ℝ) : ℂ)) * c i g := by
+    have hG :=
+      _root_.Formalism.FourierDecayAlt.P.PartialDerivativeAlgebra.pd_prod (Finset.range p₀)
+        (P := fun _ (g : _root_.Formalism.FourierDecayAlt.B.Mat k r) =>
+          ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g : ℝ) : ℂ))
+        (fun _ _ => _root_.Formalism.FourierDecayAlt.P.AdmissibleLieWords.gf_pd k r z z')
+    have hfun
+        : (fun g : _root_.Formalism.FourierDecayAlt.B.Mat k r =>
+            ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) * c i g)
+          = fun g =>
+            (∏ _ ∈ Finset.range p₀, ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g : ℝ) : ℂ))
+              * c i g := by
       funext g
       simp
-    have hpoly : _root_.Formalism.FourierDecayAlt.U.IsPolyDeg e (fun g : _root_.Formalism.FourierDecayAlt.B.Mat k r => ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) * c i g) := by
-      rw [hfun, show e = (Finset.range p₀).card * (2 * r + 2) + dA by rw [he, Finset.card_range]; ring]
+    have hpoly : _root_.Formalism.FourierDecayAlt.U.IsPolyDeg e
+        (fun g : _root_.Formalism.FourierDecayAlt.B.Mat k r =>
+          ((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) * c i g) := by
+      rw [hfun,
+        show e = (Finset.range p₀).card * (2 * r + 2) + dA by rw [he, Finset.card_range]; ring]
       exact _root_.Formalism.FourierDecayAlt.P.PartialDerivativeAlgebra.pd_mul hG (hc i)
-    have h2 := isEigenSum_poly_smul lam 0 e A₀ _ hpoly _ (fun s t h => by rw [zero_add]; exact hgap s t h) h0
+    have h2 :=
+      isEigenSum_poly_smul lam 0 e A₀ _ hpoly _ (fun s t h => by rw [zero_add]; exact hgap s t h) h0
     rw [zero_add] at h2
     exact h2
-  exact _root_.GlobalTheory.capelli_eigenSum_linearCombination k r Wp Wq' lam e (A₀ - e) (Fin n₁) Finset.univ (fun _ => 1)
-    (fun i g => (((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) * c i g) • (f g).comp (L i)) _
+  exact _root_.GlobalTheory.capelli_eigenSum_linearCombination k r Wp Wq' lam e (A₀ - e) (Fin n₁)
+    Finset.univ
+    (fun _ => 1)
+    (fun i g =>
+      (((_root_.Formalism.QuantumDeterminants.Gf k r z z' g ^ p₀ : ℝ) : ℂ) * c i g)
+        • (f g).comp (L i))
+    _
     (fun i _ => ⟨e, A₀ - e, le_rfl, le_rfl, hpiece i⟩)
     (fun g _ => by
       ext v

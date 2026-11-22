@@ -33,8 +33,9 @@ end Op
 
 section Defs
 
-variable (O : Type) [CommRing O] (M : Type) [AddCommGroup M] [Module O M] [Module Oᵐᵒᵖ M]
-  [IsCentralScalar O M]
+variable
+  (O : Type) [CommRing O]
+  (M : Type) [AddCommGroup M] [Module O M] [Module Oᵐᵒᵖ M] [IsCentralScalar O M]
 
 abbrev TM : Over (Sp O) := Over.mk (spMap (algebraMap O (TrivSqZeroExt O M)))
 
@@ -44,8 +45,12 @@ def zeroSec : 𝟙_ (Over (Sp O)) ⟶ TM O M :=
     rw [← Spec.map_comp, ← Spec.map_id]
     congr 1)
 
-theorem isChart : IsChart (TM O M).hom (sec (zeroSec O M)) ⊤ ⊤ :=
-  ⟨isAffineOpen_top (Sp O), isAffineOpen_top (Spec (CommRingCat.of (TrivSqZeroExt O M))), le_top, le_top⟩
+theorem isChart : IsChart (TM O M).hom (sec (zeroSec O M)) ⊤ ⊤ := ⟨
+  isAffineOpen_top (Sp O),
+  isAffineOpen_top (Spec (CommRingCat.of (TrivSqZeroExt O M))),
+  le_top,
+  le_top
+⟩
 
 abbrev topModule : Module Γ(Sp O, ⊤) M :=
   Module.compHom M (Scheme.ΓSpecIso (CommRingCat.of O)).hom.hom
@@ -55,16 +60,18 @@ abbrev toTsze : Γ((TM O M).left, ⊤) →+* TrivSqZeroExt O M :=
 
 abbrev toO : Γ(Sp O, ⊤) →+* O := (Scheme.ΓSpecIso (CommRingCat.of O)).hom.hom
 
-theorem toTsze_base (r : Γ(Sp O, ⊤)) :
-    toTsze O M ((TM O M).hom.appLE ⊤ ⊤ le_top r) = algebraMap O _ (toO O r) := by
+theorem toTsze_base (r : Γ(Sp O, ⊤))
+    : toTsze O M ((TM O M).hom.appLE ⊤ ⊤ le_top r) = algebraMap O _ (toO O r) := by
   rw [appLE_top]
-  exact congr($(Scheme.ΓSpecIso_naturality (CommRingCat.ofHom (algebraMap O (TrivSqZeroExt O M)))) r)
+  exact
+    congr($(Scheme.ΓSpecIso_naturality (CommRingCat.ofHom (algebraMap O (TrivSqZeroExt O M)))) r)
 
-theorem toO_sec (b : Γ((TM O M).left, ⊤)) :
-    toO O ((sec (zeroSec O M)).appLE ⊤ ⊤ le_top b) = (toTsze O M b).fst := by
+theorem toO_sec (b : Γ((TM O M).left, ⊤))
+    : toO O ((sec (zeroSec O M)).appLE ⊤ ⊤ le_top b) = (toTsze O M b).fst := by
   rw [appLE_top]
-  exact congr($(Scheme.ΓSpecIso_naturality
-    (CommRingCat.ofHom (TrivSqZeroExt.fstHom O O M).toRingHom)) b)
+  exact
+    congr($(Scheme.ΓSpecIso_naturality
+      (CommRingCat.ofHom (TrivSqZeroExt.fstHom O O M).toRingHom)) b)
 
 end Defs
 
@@ -74,33 +81,43 @@ namespace GlobalTheory.SqZeroPt
 
 section Kappa
 
-variable (O : Type) [CommRing O] (M : Type) [AddCommGroup M] [Module O M] [Module Oᵐᵒᵖ M]
-  [IsCentralScalar O M]
+variable
+  (O : Type) [CommRing O]
+  (M : Type) [AddCommGroup M] [Module O M] [Module Oᵐᵒᵖ M] [IsCentralScalar O M]
 
-def sndFn : letI := (isChart O M).algebra; letI := topModule O M
-    Γ((TM O M).left, ⊤) →ₗ[Γ(Sp O, ⊤)] M :=
+def sndFn
+    : letI := (isChart O M).algebra
+      letI := topModule O M
+      Γ((TM O M).left, ⊤) →ₗ[Γ(Sp O, ⊤)] M :=
   letI := (isChart O M).algebra
   letI := topModule O M
-  { toFun := fun b => (toTsze O M b).snd
+  {
+    toFun := fun b => (toTsze O M b).snd
     map_add' := fun a b => by simp
     map_smul' := fun r b => by
       change (toTsze O M ((TM O M).hom.appLE ⊤ ⊤ le_top r * b)).snd = toO O r • (toTsze O M b).snd
       rw [map_mul, toTsze_base, TrivSqZeroExt.snd_mul]
-      simp [TrivSqZeroExt.algebraMap_eq_inl] }
+      simp [TrivSqZeroExt.algebraMap_eq_inl]
+  }
 
-theorem sndFn_apply (b : Γ((TM O M).left, ⊤)) :
-    letI := (isChart O M).algebra; letI := topModule O M
-    sndFn O M b = (toTsze O M b).snd := rfl
+theorem sndFn_apply (b : Γ((TM O M).left, ⊤))
+    : letI := (isChart O M).algebra
+      letI := topModule O M
+      sndFn O M b = (toTsze O M b).snd :=
+  rfl
 
-theorem sndFn_der (a b : Γ((TM O M).left, ⊤)) :
-    letI := (isChart O M).algebra; letI := topModule O M
-    sndFn O M (a * b) = (isChart O M).aug (sec_hom _) a • sndFn O M b +
-      (isChart O M).aug (sec_hom _) b • sndFn O M a := by
+theorem sndFn_der (a b : Γ((TM O M).left, ⊤))
+    : letI := (isChart O M).algebra
+      letI := topModule O M
+      sndFn O M (a * b)
+        = (isChart O M).aug (sec_hom _) a • sndFn O M b
+          + (isChart O M).aug (sec_hom _) b • sndFn O M a := by
   letI := (isChart O M).algebra
   letI := topModule O M
   rw [sndFn_apply, sndFn_apply, sndFn_apply, map_mul, TrivSqZeroExt.snd_mul, op_smul_eq_smul]
-  change _ = (toO O ((sec (zeroSec O M)).appLE ⊤ ⊤ le_top a) • (toTsze O M b).snd : M) +
-    toO O ((sec (zeroSec O M)).appLE ⊤ ⊤ le_top b) • (toTsze O M a).snd
+  change _
+    = (toO O ((sec (zeroSec O M)).appLE ⊤ ⊤ le_top a) • (toTsze O M b).snd : M)
+      + toO O ((sec (zeroSec O M)).appLE ⊤ ⊤ le_top b) • (toTsze O M a).snd
   rw [toO_sec, toO_sec]
 
 instance quasiCompact_zeroSec : QuasiCompact (sec (zeroSec O M)) := by
@@ -113,12 +130,13 @@ def kappa : Γ(conormal (sec (zeroSec O M)), ⊤) →+ M :=
   ((AugCot.lift ((isChart O M).aug (sec_hom _)) (sndFn O M) (sndFn_der O M)).toAddMonoidHom).comp
     ((isChart O M).augCotEquiv (sec_hom _)).symm.toLinearMap.toAddMonoidHom
 
-theorem kappa_d (b : Γ((TM O M).left, ⊤)) :
-    kappa O M (d (sec_hom (zeroSec O M)) le_top b) = (toTsze O M b).snd := by
+theorem kappa_d (b : Γ((TM O M).left, ⊤))
+    : kappa O M (d (sec_hom (zeroSec O M)) le_top b) = (toTsze O M b).snd := by
   letI := (isChart O M).algebra
   letI := topModule O M
   change (AugCot.lift ((isChart O M).aug (sec_hom _)) (sndFn O M) (sndFn_der O M))
-    (((isChart O M).augCotEquiv (sec_hom _)).symm (d (sec_hom (zeroSec O M)) le_top b)) = _
+      (((isChart O M).augCotEquiv (sec_hom _)).symm (d (sec_hom (zeroSec O M)) le_top b))
+    = _
   rw [← (isChart O M).augCotEquiv_d (sec_hom _) b, LinearEquiv.symm_apply_apply, AugCot.lift_d]
   rfl
 
@@ -128,24 +146,24 @@ section Phi
 
 variable {O : Type} [CommRing O]
 
-
 variable (A : Over (Sp O)) [GrpObj A] in
 def Wmod : Type := Γ(omega A, ⊤)
 
 instance (A : Over (Sp O)) [GrpObj A] : AddCommGroup (Wmod A) :=
   inferInstanceAs (AddCommGroup Γ(omega A, ⊤))
 
-instance (A : Over (Sp O)) [GrpObj A] : Module O (Wmod A) :=
-  Module.compHom Γ(omega A, ⊤) (cst O)
+instance (A : Over (Sp O)) [GrpObj A] : Module O (Wmod A) := Module.compHom Γ(omega A, ⊤) (cst O)
 
-variable {M : Type} [AddCommGroup M] [Module O M] [Module Oᵐᵒᵖ M] [IsCentralScalar O M]
+variable
+  {M : Type} [AddCommGroup M] [Module O M] [Module Oᵐᵒᵖ M] [IsCentralScalar O M]
   {A : Over (Sp O)} [GrpObj A]
 
 def Phi (z : TM O M ⟶ A) (h : zeroSec O M ≫ z = η[A]) : Wmod A →+ M :=
   (kappa O M).comp (QCoh.appLinear (cotMap z h) ⊤).toAddMonoidHom
 
-theorem Phi_apply (z : TM O M ⟶ A) (h : zeroSec O M ≫ z = η[A]) (w : Wmod A) :
-    Phi z h w = kappa O M ((cotMap z h).app ⊤ w) := rfl
+theorem Phi_apply (z : TM O M ⟶ A) (h : zeroSec O M ≫ z = η[A]) (w : Wmod A)
+    : Phi z h w = kappa O M ((cotMap z h).app ⊤ w) :=
+  rfl
 
 end Phi
 
@@ -157,9 +175,10 @@ section Tower
 
 open GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.DeRham
 
-variable {p : ℕ} {O : Type} [CommRing O] {G : PDivGroup p O} {A : Over (Sp O)} [GrpObj A]
+variable
+  {p : ℕ} {O : Type} [CommRing O]
+  {G : PDivGroup p O} {A : Over (Sp O)} [GrpObj A]
   {M : Type} [AddCommGroup M] [Module O M] [Module Oᵐᵒᵖ M] [IsCentralScalar O M]
-
 
 end Tower
 

@@ -316,15 +316,19 @@ lemma sum_ite_const_le {n Ns : ℕ} (p : ℕ → Prop) [DecidablePred p]
   rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
   exact mul_le_mul_of_nonneg_right (by exact_mod_cast hc) h0
 
-private theorem log_one_add_le_lemma {x A : ℝ} (hx : 0 ≤ x) (h : x ≤ A) :
-    Real.log (1 + x) ≤ Real.log (1 + A) :=
+private theorem log_one_add_le_lemma {x A : ℝ} (hx : 0 ≤ x) (h : x ≤ A)
+    : Real.log (1 + x) ≤ Real.log (1 + A) :=
   Real.log_le_log (by linarith) (by linarith)
 
-private theorem sum_rows_lemma_2 {n Ns : ℕ} (p : ℕ → Prop) [DecidablePred p]
-    (hc : ((range n).filter p).card ≤ Ns) (R B : ℕ → ℝ) {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b)
-    (hR : ∀ i ∈ range n, B i - (if p i then a else 0) ≤ R i ∧ R i ≤ B i + (if p i then b else 0)) :
-    (∑ i ∈ range n, B i) - (Ns : ℝ) * a ≤ ∑ i ∈ range n, R i ∧
-      ∑ i ∈ range n, R i ≤ (∑ i ∈ range n, B i) + (Ns : ℝ) * b := by
+private theorem sum_rows_lemma_2
+    {n Ns : ℕ}
+    (p : ℕ → Prop) [DecidablePred p]
+    (hc : ((range n).filter p).card ≤ Ns)
+    (R B : ℕ → ℝ)
+    {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b)
+    (hR : ∀ i ∈ range n, B i - (if p i then a else 0) ≤ R i ∧ R i ≤ B i + (if p i then b else 0))
+    : (∑ i ∈ range n, B i) - (Ns : ℝ) * a ≤ ∑ i ∈ range n, R i
+      ∧ ∑ i ∈ range n, R i ≤ (∑ i ∈ range n, B i) + (Ns : ℝ) * b := by
   have h1 := sum_ite_const_le (n := n) p hc ha
   have h2 := sum_ite_const_le (n := n) p hc hb
   have l1 : ∑ i ∈ range n, (B i - (if p i then a else 0)) ≤ ∑ i ∈ range n, R i :=
@@ -335,24 +339,27 @@ private theorem sum_rows_lemma_2 {n Ns : ℕ} (p : ℕ → Prop) [DecidablePred 
   rw [Finset.sum_add_distrib] at l2
   constructor <;> linarith
 
-private theorem factor_pos_lemma_3 {n : ℕ} {la : ℕ → ℤ} (hd : Formalism.InvariantFactorPaths.BranchingDimensions.Dom n la) {i j : ℕ} (hij : i < j)
-    (hj : j < n) :
-    0 < (((la i - la j : ℤ) : ℝ) + ((j : ℝ) - (i : ℝ))) / ((j : ℝ) - (i : ℝ)) := by
+private theorem factor_pos_lemma_3
+    {n : ℕ} {la : ℕ → ℤ} (hd : Formalism.InvariantFactorPaths.BranchingDimensions.Dom n la)
+    {i j : ℕ} (hij : i < j) (hj : j < n)
+    : 0 < (((la i - la j : ℤ) : ℝ) + ((j : ℝ) - (i : ℝ))) / ((j : ℝ) - (i : ℝ)) := by
   have h1 : (i : ℝ) < j := by exact_mod_cast hij
   have h0 : (0 : ℤ) ≤ la i - la j := sub_nonneg.mpr (dom_anti hd hij.le hj)
   have h2 : (0 : ℝ) ≤ ((la i - la j : ℤ) : ℝ) := by exact_mod_cast h0
   apply div_pos <;> linarith
 
-private theorem log_weylDim_lemma_4 {n : ℕ} {la : ℕ → ℤ} (hd : Formalism.InvariantFactorPaths.BranchingDimensions.Dom n la) :
-    0 < weylDim n la ∧
-      Real.log (weylDim n la) = ∑ j ∈ range n, ∑ i ∈ range j, G la i j := by
-  have hpos : ∀ j ∈ range n, ∀ i ∈ range j,
-      0 < (((la i - la j : ℤ) : ℝ) + ((j : ℝ) - (i : ℝ))) / ((j : ℝ) - (i : ℝ)) := by
+private theorem log_weylDim_lemma_4
+    {n : ℕ} {la : ℕ → ℤ} (hd : Formalism.InvariantFactorPaths.BranchingDimensions.Dom n la)
+    : 0 < weylDim n la ∧ Real.log (weylDim n la) = ∑ j ∈ range n, ∑ i ∈ range j, G la i j := by
+  have hpos
+      : ∀ j ∈ range n, ∀ i ∈ range j,
+        0 < (((la i - la j : ℤ) : ℝ) + ((j : ℝ) - (i : ℝ))) / ((j : ℝ) - (i : ℝ)) := by
     intro j hj i hi
     rw [Finset.mem_range] at hj hi
     exact factor_pos_lemma_3 hd hi hj
-  have hinner : ∀ j ∈ range n,
-      0 < ∏ i ∈ range j, (((la i - la j : ℤ) : ℝ) + ((j : ℝ) - (i : ℝ))) / ((j : ℝ) - (i : ℝ)) :=
+  have hinner
+      : ∀ j ∈ range n,
+        0 < ∏ i ∈ range j, (((la i - la j : ℤ) : ℝ) + ((j : ℝ) - (i : ℝ))) / ((j : ℝ) - (i : ℝ)) :=
     fun j hj => Finset.prod_pos (hpos j hj)
   unfold weylDim
   refine ⟨Finset.prod_pos hinner, ?_⟩
@@ -426,73 +433,92 @@ lemma sum_pa_le {Ns n : ℕ} {la : ℕ → ℤ} {L : ℝ} (hL0 : 0 ≤ L)
 
 end TDim
 
-
 open TDim in
 theorem logWeylDimensionEstimate : LogWeylDimensionEstimate := by
   unfold LogWeylDimensionEstimate
   intro r K Ns n la A0 h2 hK hn hd hP hM hA0
-  have hA : ∀ x : ℤ, x ≤ max (la 0) 0 + max (-(la (n - 1))) 0 → (x : ℝ) ≤ A0 :=
-    fun x hx => le_trans (Int.cast_le.mpr hx) hA0
+  have hA : ∀ x : ℤ, x ≤ max (la 0) 0 + max (-(la (n - 1))) 0 → (x : ℝ) ≤ A0 := fun x hx =>
+    le_trans (Int.cast_le.mpr hx) hA0
   have hm1 := le_max_left (la 0) 0
   have hm2 := le_max_right (la 0) 0
   have hm3 := le_max_left (-(la (n - 1))) 0
   have hm4 := le_max_right (-(la (n - 1))) 0
-  have htop : ∀ i, i < n → la i ≤ la 0 := fun i hi => Formalism.InvariantFactorPaths.BranchingDimensions.TDim.dom_anti hd (Nat.zero_le i) hi
-  have hbot : ∀ j, j < n → la (n - 1) ≤ la j := fun j hj => Formalism.InvariantFactorPaths.BranchingDimensions.TDim.dom_anti hd (by omega) (by omega)
+  have htop : ∀ i, i < n → la i ≤ la 0 := fun i hi =>
+    Formalism.InvariantFactorPaths.BranchingDimensions.TDim.dom_anti hd (Nat.zero_le i) hi
+  have hbot : ∀ j, j < n → la (n - 1) ≤ la j := fun j hj =>
+    Formalism.InvariantFactorPaths.BranchingDimensions.TDim.dom_anti hd (by omega) (by omega)
   have hA0nn : 0 ≤ A0 := by
     have := hA 0 (by linarith)
     rw [Int.cast_zero] at this
     exact this
   have hL0 : 0 ≤ Real.log (1 + A0) := Real.log_nonneg (by linarith)
-  have hG : ∀ i j, i < j → j < n → Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G la i j ≤ Real.log (1 + A0) := by
+  have hG
+      : ∀ i j,
+        i < j → j < n
+          → Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G la i j
+            ≤ Real.log (1 + A0) := by
     intro i j hij hj
     rw [Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G_eq hij]
-    have h0 : (0 : ℤ) ≤ la i - la j := sub_nonneg.mpr (Formalism.InvariantFactorPaths.BranchingDimensions.TDim.dom_anti hd hij.le hj)
+    have h0 : (0 : ℤ) ≤ la i - la j :=
+      sub_nonneg.mpr (Formalism.InvariantFactorPaths.BranchingDimensions.TDim.dom_anti hd hij.le hj)
     have hnn : (0 : ℝ) ≤ ((la i - la j : ℤ) : ℝ) := by exact_mod_cast h0
-    refine (Formalism.InvariantFactorPaths.BranchingDimensions.TDim.hh_le hnn (by omega)).trans (_root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.log_one_add_le_lemma hnn (hA _ ?_))
+    refine (Formalism.InvariantFactorPaths.BranchingDimensions.TDim.hh_le hnn (by omega)).trans
+      (_root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.log_one_add_le_lemma hnn
+        (hA _ ?_))
     have := htop i (by omega)
     have := hbot j hj
     linarith
-  obtain ⟨hWpos, hlogW⟩ := _root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.log_weylDim_lemma_4 hd
-  have hsplit : ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G la i j =
-      ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pa la i j +
-        ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j +
-        ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j := by
-    rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl
-    intro j hj
-    rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl
-    intro i hi
-    rw [Finset.mem_range] at hi hj
-    exact Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G_split hd hi hj
-  have hB0 : 0 ≤ ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pa la i j := by
-    apply Finset.sum_nonneg
-    intro j hj
-    apply Finset.sum_nonneg
-    intro i hi
-    rw [Finset.mem_range] at hi hj
-    unfold Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pa
-    split_ifs
-    · rw [Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G_eq hi]
-      have h0 : (0 : ℤ) ≤ la i - la j := sub_nonneg.mpr (Formalism.InvariantFactorPaths.BranchingDimensions.TDim.dom_anti hd hi.le hj)
-      have hnn : (0 : ℝ) ≤ ((la i - la j : ℤ) : ℝ) := by exact_mod_cast h0
-      exact Formalism.InvariantFactorPaths.BranchingDimensions.TDim.hh_nonneg hnn (by omega)
-    · exact le_rfl
+  obtain ⟨hWpos, hlogW⟩ :=
+    _root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.log_weylDim_lemma_4 hd
+  have hsplit
+      : ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G la i j
+        = ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pa la i j
+          + ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j
+          + ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j :=
+    by
+      rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro j hj
+      rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro i hi
+      rw [Finset.mem_range] at hi hj
+      exact Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G_split hd hi hj
+  have hB0
+      : 0
+        ≤ ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pa la i j :=
+    by
+      apply Finset.sum_nonneg
+      intro j hj
+      apply Finset.sum_nonneg
+      intro i hi
+      rw [Finset.mem_range] at hi hj
+      unfold Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pa
+      split_ifs
+      · rw [Formalism.InvariantFactorPaths.BranchingDimensions.TDim.G_eq hi]
+        have h0 : (0 : ℤ) ≤ la i - la j :=
+          sub_nonneg.mpr (Formalism.InvariantFactorPaths.BranchingDimensions.TDim.dom_anti hd hi.le
+            hj)
+        have hnn : (0 : ℝ) ≤ ((la i - la j : ℤ) : ℝ) := by exact_mod_cast h0
+        exact Formalism.InvariantFactorPaths.BranchingDimensions.TDim.hh_nonneg hnn (by omega)
+      · exact le_rfl
   have hB1 := Formalism.InvariantFactorPaths.BranchingDimensions.TDim.sum_pa_le hL0 hP hM hG
-  have hswap : ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j =
-      ∑ i ∈ range n, ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j := by
-    apply Finset.sum_comm'
-    intro j i
-    simp only [Finset.mem_range, Finset.mem_Ico]
-    constructor <;> intro h <;> omega
-  have hposR : ∀ i ∈ range n,
-      fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ) -
-          (if 0 < la i then (Ns : ℝ) * Real.log (1 + A0) else 0) ≤
-        ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j ∧
-      ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j ≤
-        fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ) +
-          (if 0 < la i then ((r : ℝ) + 2 * Ns) * Real.log (1 + A0) else 0) := by
+  have hswap
+      : ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j
+        = ∑ i ∈ range n, ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j :=
+    by
+      apply Finset.sum_comm'
+      intro j i
+      simp only [Finset.mem_range, Finset.mem_Ico]
+      constructor <;> intro h <;> omega
+  have hposR
+      : ∀ i ∈ range n,
+        fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ)
+              - (if 0 < la i then (Ns : ℝ) * Real.log (1 + A0) else 0)
+            ≤ ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j
+          ∧ ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j
+            ≤ fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ)
+              + (if 0 < la i then ((r : ℝ) + 2 * Ns) * Real.log (1 + A0) else 0) := by
     intro i hi
     rw [Finset.mem_range] at hi
     unfold Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb
@@ -504,51 +530,67 @@ theorem logWeylDimensionEstimate : LogWeylDimensionEstimate := by
       have hle : la i ≤ max (la 0) 0 + max (-(la (n - 1))) 0 := by
         have := htop i hi
         linarith
-      exact pos_row h2 hK hn hd hP hM hL0 hi hp (_root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.log_one_add_le_lemma hz (hA _ hle))
+      exact pos_row h2 hK hn hd hP hM hL0 hi hp
+        (_root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.log_one_add_le_lemma hz
+          (hA _ hle))
     · rw [if_neg hp, if_neg hp]
       have hm : max (la i) 0 = 0 := max_eq_right (not_lt.mp hp)
       rw [hm]
-      simp [Formalism.InvariantFactorPaths.BranchingDimensions.TDim.hh_zero, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.fT_zero]
-  have hnegR : ∀ j ∈ range n,
-      fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ) -
-          (if la j < 0 then (Ns : ℝ) * Real.log (1 + A0) else 0) ≤
-        ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j ∧
-      ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j ≤
-        fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ) +
-          (if la j < 0 then ((r : ℝ) + 2 * Ns) * Real.log (1 + A0) else 0) := by
+      simp [Formalism.InvariantFactorPaths.BranchingDimensions.TDim.hh_zero,
+        Formalism.InvariantFactorPaths.BranchingDimensions.TDim.fT_zero]
+  have hnegR
+      : ∀ j ∈ range n,
+        fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ)
+              - (if la j < 0 then (Ns : ℝ) * Real.log (1 + A0) else 0)
+            ≤ ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j
+          ∧ ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j
+            ≤ fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ)
+              + (if la j < 0 then ((r : ℝ) + 2 * Ns) * Real.log (1 + A0) else 0) := by
     intro j hj
     rw [Finset.mem_range] at hj
     unfold Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc
     by_cases hp : la j < 0
     · rw [if_pos hp, if_pos hp]
-      have hm : max (-(la j)) 0 = -la j := max_eq_left (by omega)
+      have hm : max (-(la j)) 0 = - la j := max_eq_left (by omega)
       rw [hm]
-      have h0 : (0 : ℤ) ≤ -la j := by omega
-      have hz : (0 : ℝ) ≤ ((-la j : ℤ) : ℝ) := by exact_mod_cast h0
-      have hle : -la j ≤ max (la 0) 0 + max (-(la (n - 1))) 0 := by
+      have h0 : (0 : ℤ) ≤ - la j := by omega
+      have hz : (0 : ℝ) ≤ ((- la j : ℤ) : ℝ) := by exact_mod_cast h0
+      have hle : - la j ≤ max (la 0) 0 + max (-(la (n - 1))) 0 := by
         have := hbot j hj
         linarith
-      exact neg_row h2 hK hn hd hP hM hL0 hj hp (_root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.log_one_add_le_lemma hz (hA _ hle))
+      exact neg_row h2 hK hn hd hP hM hL0 hj hp
+        (_root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.log_one_add_le_lemma hz
+          (hA _ hle))
     · rw [if_neg hp, if_neg hp]
       have hm : max (-(la j)) 0 = 0 := max_eq_right (by omega)
       rw [hm]
-      simp [Formalism.InvariantFactorPaths.BranchingDimensions.TDim.hh_zero, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.fT_zero]
-  have hPos : (∑ i ∈ range n, fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ)) -
-        (Ns : ℝ) * ((Ns : ℝ) * Real.log (1 + A0)) ≤
-        ∑ i ∈ range n, ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j ∧
-      ∑ i ∈ range n, ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j ≤
-        (∑ i ∈ range n, fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ)) +
-          (Ns : ℝ) * (((r : ℝ) + 2 * Ns) * Real.log (1 + A0)) :=
-    _root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.sum_rows_lemma_2 (n := n) (fun m => 0 < la m) hP (fun i => ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j)
+      simp [Formalism.InvariantFactorPaths.BranchingDimensions.TDim.hh_zero,
+        Formalism.InvariantFactorPaths.BranchingDimensions.TDim.fT_zero]
+  have hPos
+      : (∑ i ∈ range n, fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ))
+            - (Ns : ℝ) * ((Ns : ℝ) * Real.log (1 + A0))
+          ≤ ∑ i ∈ range n, ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j
+        ∧ ∑ i ∈ range n, ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j
+          ≤ (∑ i ∈ range n, fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ))
+            + (Ns : ℝ) * (((r : ℝ) + 2 * Ns) * Real.log (1 + A0)) :=
+    _root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.sum_rows_lemma_2 (n := n)
+      (fun m => 0 < la m)
+      hP
+      (fun i =>
+        ∑ j ∈ Ico (i + 1) n, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pb la i j)
       (fun i => fT (K - 2 * Ns) ((max (la i) 0 : ℤ) : ℝ))
       (mul_nonneg (by positivity) hL0) (mul_nonneg (by positivity) hL0) hposR
-  have hNeg : (∑ j ∈ range n, fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ)) -
-        (Ns : ℝ) * ((Ns : ℝ) * Real.log (1 + A0)) ≤
-        ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j ∧
-      ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j ≤
-        (∑ j ∈ range n, fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ)) +
-          (Ns : ℝ) * (((r : ℝ) + 2 * Ns) * Real.log (1 + A0)) :=
-    _root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.sum_rows_lemma_2 (n := n) (fun m => la m < 0) hM (fun j => ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j)
+  have hNeg
+      : (∑ j ∈ range n, fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ))
+            - (Ns : ℝ) * ((Ns : ℝ) * Real.log (1 + A0))
+          ≤ ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j
+        ∧ ∑ j ∈ range n, ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j
+          ≤ (∑ j ∈ range n, fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ))
+            + (Ns : ℝ) * (((r : ℝ) + 2 * Ns) * Real.log (1 + A0)) :=
+    _root_.Formalism.InvariantFactorPaths.BranchingDimensions.TDim.sum_rows_lemma_2 (n := n)
+      (fun m => la m < 0)
+      hM
+      (fun j => ∑ i ∈ range j, Formalism.InvariantFactorPaths.BranchingDimensions.TDim.pc la i j)
       (fun j => fT (K - 2 * Ns) ((max (-(la j)) 0 : ℤ) : ℝ))
       (mul_nonneg (by positivity) hL0) (mul_nonneg (by positivity) hL0) hnegR
   obtain ⟨hP1, hP2⟩ := hPos

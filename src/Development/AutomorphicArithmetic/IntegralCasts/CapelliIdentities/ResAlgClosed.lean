@@ -4,9 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qk69.res_algClosed :
-    ∀ {Ω : Type} [inst : Field Ω] [IsAlgClosed Ω]
-    (A : ValuationSubring Ω), IsAlgClosed (IsLocalRing.ResidueField ↥A) := by
+theorem UpperTheory.Reformulated.B.Qk69.res_algClosed
+    : ∀ {Ω : Type} [inst : Field Ω] [IsAlgClosed Ω] (A : ValuationSubring Ω),
+      IsAlgClosed (IsLocalRing.ResidueField ↥A) := by
   intro Ω _ _ A
   refine IsAlgClosed.of_exists_root _ fun p hp hirr => ?_
   have hsurj : Function.Surjective (IsLocalRing.residue A) := IsLocalRing.residue_surjective
@@ -17,8 +17,7 @@ theorem UpperTheory.Reformulated.B.Qk69.res_algClosed :
     rw [hdeg]
     exact (Polynomial.degree_pos_of_irreducible hirr).ne'
   have hinj : Function.Injective (algebraMap A Ω) := Subtype.val_injective
-  have hd' : (q.map (algebraMap A Ω)).degree ≠ 0 := by
-    rwa [hm.degree_map]
+  have hd' : (q.map (algebraMap A Ω)).degree ≠ 0 := by rwa [hm.degree_map]
   obtain ⟨x, hx⟩ := IsAlgClosed.exists_root _ hd'
   have hx' : Polynomial.eval₂ (algebraMap A Ω) x q = 0 := by
     rw [← Polynomial.eval_map]

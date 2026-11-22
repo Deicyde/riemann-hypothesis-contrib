@@ -22,8 +22,9 @@ open MeasureTheory MvPolynomial
 open ReciprocityTheory.ChartRestriction.G.Geo (MRing HermLine IsSmoothHerm)
 open ComplexSets Matrix
 
-theorem SegreChartAbsIntegrable.proof (h₁ : SliceMassFinite.Statement)
-    (h₂ : SegreChartSheetCompare.Statement) : SegreChartAbsIntegrable.Statement := by
+theorem SegreChartAbsIntegrable.proof
+    (h₁ : SliceMassFinite.Statement) (h₂ : SegreChartSheetCompare.Statement)
+    : SegreChartAbsIntegrable.Statement := by
   intro K _ _ ι _ P e m σ i L g _ hL hg J hJ A hA
   obtain ⟨M, hM⟩ := PtsPosDens.exists_bound hg
   obtain ⟨C, hC⟩ := h₂ K ι P e m σ i L hL
@@ -34,15 +35,19 @@ theorem SegreChartAbsIntegrable.proof (h₁ : SliceMassFinite.Statement)
     rw [segreChartIdeal, MvPolynomial.mem_vanishingIdeal_iff]
     rintro _ ⟨z, -, hzi, rfl⟩
     simp [hzi]
-  have hInt := h₁ m e (HermNorm.std m) J (Pi.single (σ.symm i) 1) A hJmin.1.1 hℓ
-    (VarIntAdd.ringKrullDim_of_isFiniteProjection hA) hA
+  have hInt :=
+    h₁ m e (HermNorm.std m) J (Pi.single (σ.symm i) 1) A hJmin.1.1 hℓ
+      (VarIntAdd.ringKrullDim_of_isFiniteProjection hA) hA
   set c : ℝ := max M 0 * max C 0 with hc
   have hmeas : Measurable (chartAbsDens J A (chartWeight σ i g) (chartPot σ i L)) :=
-    SheetSumMeasurable.measurable_sheetSum hA (fun a b => |a * b|)
+    SheetSumMeasurable.measurable_sheetSum hA
+      (fun a b => |a * b|)
       ((continuous_mul.comp continuous_id).abs.measurable) (measurable_chartWeight σ i hg) _
-  refine (hInt.const_mul c).mono' hmeas.aestronglyMeasurable (Filter.Eventually.of_forall fun y => ?_)
+  refine (hInt.const_mul c).mono' hmeas.aestronglyMeasurable
+    (Filter.Eventually.of_forall fun y => ?_)
   rw [Real.norm_eq_abs, abs_of_nonneg (chartAbsDens_nonneg _ _ _ _ _)]
-  refine sheetSum_le_mul (IndefiniteRowSideFullHecke.ComplexSets.fibre_finite hA y) c _ _ fun x hx s hs => ?_
+  refine sheetSum_le_mul (IndefiniteRowSideFullHecke.ComplexSets.fibre_finite hA y) c _ _
+    fun x hx s hs => ?_
   obtain ⟨hxJ, rfl⟩ := hx
   have hx1 : x (σ.symm i) = 1 := chart_coord_eq_one hJ hxJ
   have hG : |chartWeight σ i g x| ≤ max M 0 := by

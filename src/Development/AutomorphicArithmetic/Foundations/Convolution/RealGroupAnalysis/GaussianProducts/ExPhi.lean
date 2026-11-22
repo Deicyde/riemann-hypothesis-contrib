@@ -10,12 +10,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.G
 open scoped Classical ENNReal nonZeroDivisors
 
-theorem UpperTheory.ConvolutionTheory.R2.G.exPhi :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D) (a : (A F)ˣ), ∀ k ∈ KK F, ∃ φ ∈ Fock D.δ, hat (W.Om (mD a * k) φ).1 ![0, 1, 1, 0] ≠ 0 := by
+theorem UpperTheory.ConvolutionTheory.R2.G.exPhi
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D)
+        (a : (A F)ˣ),
+      ∀ k ∈ KK F, ∃ φ ∈ Fock D.δ,
+        hat (W.Om (mD a * k) φ).1 ![0, 1, 1, 0] ≠ 0 := by
   intro F E _ _ _ _ _ _ _ D W a k hk
   have H := hatSt F E D W
   have K := fockSt F E D W
@@ -29,9 +35,11 @@ theorem UpperTheory.ConvolutionTheory.R2.G.exPhi :
   refine ⟨W.Om k⁻¹ φ₁, hU (hC _ rfl), ?_⟩
   have e : W.Om (mD a * k) (W.Om k⁻¹ φ₁) = W.Om (mD a) φ₁ := by
     rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel_right]
-  have hv : (![a * (![0, 1, 1, 0] : V4 F) 0, ((a⁻¹ : (A F)ˣ) : A F) * (![0, 1, 1, 0] : V4 F) 1,
-      a * (![0, 1, 1, 0] : V4 F) 2, a * (![0, 1, 1, 0] : V4 F) 3] : V4 F) =
-      ![0, ((a⁻¹ : (A F)ˣ) : A F), (a : A F), 0] := by
+  have hv
+      : (![a * (![0, 1, 1, 0] : V4 F) 0, ((a⁻¹ : (A F)ˣ) : A F) * (![0, 1, 1, 0] : V4 F) 1,
+            a * (![0, 1, 1, 0] : V4 F) 2, a * (![0, 1, 1, 0] : V4 F) 3]
+          : V4 F)
+        = ![0, ((a⁻¹ : (A F)ˣ) : A F), (a : A F), 0] := by
     ext1 i
     fin_cases i <;> simp
   rw [e, H.m, hh, hv]

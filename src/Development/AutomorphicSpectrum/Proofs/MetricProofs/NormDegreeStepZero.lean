@@ -7,13 +7,15 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.CentralizerCm
 
 @[expose] public section
 
-open GroundTheory.Heights₂.Heights NumberField TensorProduct ComplexAt GlobalTheory.CompanionTheory.Ar Matrix
+open GroundTheory.Heights₂.Heights NumberField TensorProduct ComplexAt
+  GlobalTheory.CompanionTheory.Ar Matrix
 open scoped BigOperators ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.Ar.Decomp
 
-theorem normDegree_step_zero {K : Type} [Field K] [NumberField K] {E : HermitianBundle.{0} K} {r : ℕ}
-    (A : SatFlag E r) : E.normDegree (A.F 0) = 0 := by
+theorem normDegree_step_zero
+    {K : Type} [Field K] [NumberField K] {E : HermitianBundle.{0} K} {r : ℕ} (A : SatFlag E r)
+    : E.normDegree (A.F 0) = 0 := by
   have h : A.F 0 = ⊥ := (Submodule.finrank_eq_zero (R := 𝓞 K) (S := A.F 0)).mp (A.rank 0)
   rw [HermitianBundle.normDegree, h, HermitianBundle.degree_bot, zero_div]
 

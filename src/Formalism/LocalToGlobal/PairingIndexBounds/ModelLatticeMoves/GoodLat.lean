@@ -22,15 +22,16 @@ def wU (H : Sesq V) (α : V → ℂ) (x : V) : (V → ℂ) →ₗ[ℂ] (V → �
 def cU (H : Sesq V) (A B : AddSubgroup V) (b : B) (a : A) : ℂ :=
   Complex.exp (-(2 * (Real.pi : ℂ)) * Complex.I * (altE H (a : V) (b : V) : ℂ))
 
-def wA (H : Sesq V) (α : V → ℂ) (A : AddSubgroup V) (a : A) : (V → ℂ) →ₗ[ℂ] (V → ℂ) := wU H α (a : V)
+def wA (H : Sesq V) (α : V → ℂ) (A : AddSubgroup V) (a : A) : (V → ℂ) →ₗ[ℂ] (V → ℂ) :=
+  wU H α (a : V)
 
-def wB (H : Sesq V) (α : V → ℂ) (B : AddSubgroup V) (b : B) : (V → ℂ) →ₗ[ℂ] (V → ℂ) := wU H α (b : V)
+def wB (H : Sesq V) (α : V → ℂ) (B : AddSubgroup V) (b : B) : (V → ℂ) →ₗ[ℂ] (V → ℂ) :=
+  wU H α (b : V)
 
 def GoodLat (H : Sesq V) (α : V → ℂ) (A B Λ : AddSubgroup V) : Prop :=
-  IsSemiChar H Λ α ∧ Λ ≤ (Λ ⊓ A) ⊔ (Λ ⊓ B) ∧
-    (∀ a ∈ A, ∀ b ∈ B, a + b ∈ Λ → a ∈ Λ) ∧
-    (∀ a ∈ A, (∀ b ∈ B, b ∈ Λ → ∃ m : ℤ, altE H a b = m) → a ∈ Λ) ∧
-    (∀ b ∈ B, (∀ a ∈ A, a ∈ Λ → ∃ m : ℤ, altE H a b = m) → b ∈ Λ)
+  IsSemiChar H Λ α ∧ Λ ≤ (Λ ⊓ A) ⊔ (Λ ⊓ B) ∧ (∀ a ∈ A, ∀ b ∈ B, a + b ∈ Λ → a ∈ Λ)
+    ∧ (∀ a ∈ A, (∀ b ∈ B, b ∈ Λ → ∃ m : ℤ, altE H a b = m) → a ∈ Λ)
+    ∧ (∀ b ∈ B, (∀ a ∈ A, a ∈ Λ → ∃ m : ℤ, altE H a b = m) → b ∈ Λ)
 
 def volA (A Λ₀ Λ : AddSubgroup V) : ℝ :=
   (((Λ₀ ⊓ A).relIndex (Λ ⊓ A) : ℕ) : ℝ) / (((Λ ⊓ A).relIndex (Λ₀ ⊓ A) : ℕ) : ℝ)

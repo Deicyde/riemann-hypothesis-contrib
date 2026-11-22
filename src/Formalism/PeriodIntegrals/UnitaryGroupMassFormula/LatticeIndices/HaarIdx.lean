@@ -15,7 +15,8 @@ open scoped ENNReal Pointwise
 theorem redIdx : RedIdx := by
   intro K Q _ _ _ ρ hρ A hA
   have h1 : A.index = (A.map ρ).index := by
-    rw [← Subgroup.index_comap_of_surjective (A.map ρ) hρ, Subgroup.comap_map_eq, sup_eq_left.mpr hA]
+    rw [← Subgroup.index_comap_of_surjective (A.map ρ) hρ, Subgroup.comap_map_eq,
+      sup_eq_left.mpr hA]
   rw [h1, Subgroup.index_mul_card]
 
 theorem haarIdx : HaarIdx := by
@@ -25,16 +26,15 @@ theorem haarIdx : HaarIdx := by
   let := Fintype.ofFinite (K ⧸ A.subgroupOf K)
   let r : K ⧸ A.subgroupOf K → G := fun q => ((Quotient.out q : K) : G)
   have hr : ∀ q, r q ∈ K := fun q => (Quotient.out q).2
-  have hmk : ∀ q, (QuotientGroup.mk (Quotient.out q) : K ⧸ A.subgroupOf K) = q :=
-    fun q => QuotientGroup.out_eq' q
+  have hmk : ∀ q, (QuotientGroup.mk (Quotient.out q) : K ⧸ A.subgroupOf K) = q := fun q =>
+    QuotientGroup.out_eq' q
   have hunion : (K : Set G) = ⋃ q, r q • (A : Set G) := by
     ext x
     simp only [Set.mem_iUnion, Set.mem_smul_set, smul_eq_mul, SetLike.mem_coe]
     constructor
     · intro hx
       set q : K ⧸ A.subgroupOf K := QuotientGroup.mk ⟨x, hx⟩
-      have hq : (Quotient.out q)⁻¹ * ⟨x, hx⟩ ∈ A.subgroupOf K := by
-        rw [← QuotientGroup.eq, hmk]
+      have hq : (Quotient.out q)⁻¹ * ⟨x, hx⟩ ∈ A.subgroupOf K := by rw [← QuotientGroup.eq, hmk]
       rw [Subgroup.mem_subgroupOf] at hq
       exact ⟨q, (r q)⁻¹ * x, by simpa [r] using hq, by simp⟩
     · rintro ⟨q, a, ha, rfl⟩
@@ -47,7 +47,9 @@ theorem haarIdx : HaarIdx := by
     rw [← hmk q, ← hmk q', QuotientGroup.eq, Subgroup.mem_subgroupOf]
     simp only [smul_eq_mul] at hab
     have key : (r q)⁻¹ * r q' = a * b⁻¹ := by
-      calc (r q)⁻¹ * r q' = (r q)⁻¹ * (r q' * b) * b⁻¹ := by group
+      calc
+        (r q)⁻¹ * r q'
+          = (r q)⁻¹ * (r q' * b) * b⁻¹ := by group
         _ = (r q)⁻¹ * (r q * a) * b⁻¹ := by rw [hab]
         _ = a * b⁻¹ := by group
     have : (((Quotient.out q)⁻¹ * Quotient.out q' : K) : G) = (r q)⁻¹ * r q' := rfl

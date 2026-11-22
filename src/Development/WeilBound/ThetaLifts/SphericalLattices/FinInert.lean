@@ -10,15 +10,17 @@ noncomputable section
 namespace PositivityTheory.Sph
 
 open scoped Matrix
-open NumberField IsDedekindDomain Topology GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PositivityTheory.ThK
+open NumberField IsDedekindDomain Topology GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PositivityTheory.ThK
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n d : ℕ}
-  {X : Spc F E n} {W : Spc F E d}
-
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {n d : ℕ} {X : Spc F E n} {W : Spc F E d}
 
 open scoped Classical in
-def coef {v : Pl F} (ω : UA σ X.J × UA σ W.J → Module.End ℂ (Fn F n d v)) (l : Fn F n d v →ₗ[ℂ] ℂ) :
-    Fn F n d v →ₗ[ℂ] (UA σ W.J → ℂ) where
+def coef {v : Pl F} (ω : UA σ X.J × UA σ W.J → Module.End ℂ (Fn F n d v)) (l : Fn F n d v →ₗ[ℂ] ℂ)
+    : Fn F n d v →ₗ[ℂ] (UA σ W.J → ℂ) where
   toFun φ h := if h ∈ UAt σ W (evFin F v) then l (ω (1, h) φ) else 0
   map_add' φ φ' := by funext h; by_cases hh : h ∈ UAt σ W (evFin F v) <;> simp [hh]
   map_smul' c φ := by funext h; by_cases hh : h ∈ UAt σ W (evFin F v) <;> simp [hh]
@@ -27,16 +29,20 @@ section Loc
 
 variable {v : Pl F} {ω : UA σ X.J × UA σ W.J → Module.End ℂ (Fn F n d v)} {l : Fn F n d v →ₗ[ℂ] ℂ}
 
-theorem coef_mem {φ : Fn F n d v} {h : UA σ W.J} (hh : h ∈ UAt σ W (evFin F v)) : coef ω l φ h = l (ω (1, h) φ) := by
+theorem coef_mem {φ : Fn F n d v} {h : UA σ W.J} (hh : h ∈ UAt σ W (evFin F v))
+    : coef ω l φ h = l (ω (1, h) φ) := by
   simp [coef, hh]
 
-theorem coef_not_mem {φ : Fn F n d v} {h : UA σ W.J} (hh : h ∉ UAt σ W (evFin F v)) : coef ω l φ h = 0 := by
+theorem coef_not_mem {φ : Fn F n d v} {h : UA σ W.J} (hh : h ∉ UAt σ W (evFin F v))
+    : coef ω l φ h = 0 := by
   simp [coef, hh]
 
-variable {M : Model σ X W} {ψ : AddChar (AF F) ℂ} {om : Rep σ X W} {ρ : Matrix (Fin n) (Fin d) (AE F E) → Module.End ℂ (Fn F n d v)}
+variable
+  {M : Model σ X W} {ψ : AddChar (AF F) ℂ} {om : Rep σ X W}
+  {ρ : Matrix (Fin n) (Fin d) (AE F E) → Module.End ℂ (Fn F n d v)}
 
-theorem aug_stable (L : IsLocRep M ψ om v ω ρ) {h : UA σ W.J} (hh : h ∈ UAt σ W (evFin F v)) :
-    augAt om v ≤ (augAt om v).comap (ω (1, h)) := by
+theorem aug_stable (L : IsLocRep M ψ om v ω ρ) {h : UA σ W.J} (hh : h ∈ UAt σ W (evFin F v))
+    : augAt om v ≤ (augAt om v).comap (ω (1, h)) := by
   have o1 := one_mem_UAt (σ := σ) X v
   have oW := one_mem_UAt (σ := σ) W v
   conv_lhs => unfold augAt
@@ -49,9 +55,11 @@ theorem aug_stable (L : IsLocRep M ψ om v ω ρ) {h : UA σ W.J} (hh : h ∈ UA
     simp
   change ω (1, h) (ω (g, 1) φ - φ) ∈ augAt om v
   rw [map_sub, e1]
-  exact Submodule.subset_span ⟨g, hg, _, hφh, _, L.pres g hg 1 oW _ hφh, (L.acts g hg 1 oW _ hφh _).2 rfl, rfl⟩
+  exact Submodule.subset_span
+    ⟨g, hg, _, hφh, _, L.pres g hg 1 oW _ hφh, (L.acts g hg 1 oW _ hφh _).2 rfl, rfl⟩
 
-theorem coef_aug (L : IsLocRep M ψ om v ω ρ) (hl : augAt om v ≤ LinearMap.ker l) : augAt om v ≤ LinearMap.ker (coef ω l) := by
+theorem coef_aug (L : IsLocRep M ψ om v ω ρ) (hl : augAt om v ≤ LinearMap.ker l)
+    : augAt om v ≤ LinearMap.ker (coef ω l) := by
   intro z hz
   rw [LinearMap.mem_ker]
   funext h
@@ -59,28 +67,35 @@ theorem coef_aug (L : IsLocRep M ψ om v ω ρ) (hl : augAt om v ≤ LinearMap.k
   · rw [coef_mem hh]; exact hl (aug_stable L hh hz)
   · rw [coef_not_mem hh]; rfl
 
-theorem coef_transl (L : IsLocRep M ψ om v ω ρ) {h : UA σ W.J} (hh : h ∈ UAt σ W (evFin F v)) {φ : Fn F n d v}
-    (hφ : φ ∈ SB _) : coef ω l (ω (1, h) φ) = fun x => coef ω l φ (x * h) := by
+theorem coef_transl
+    (L : IsLocRep M ψ om v ω ρ)
+    {h : UA σ W.J} (hh : h ∈ UAt σ W (evFin F v))
+    {φ : Fn F n d v} (hφ : φ ∈ SB _)
+    : coef ω l (ω (1, h) φ) = fun x => coef ω l φ (x * h) := by
   have o1 := one_mem_UAt (σ := σ) X v
   funext x
   by_cases hx : x ∈ UAt σ W (evFin F v)
   · rw [coef_mem hx, coef_mem (mul_mem_UAt hx hh), ← L.mul 1 o1 x hx 1 o1 h hh φ hφ, mul_one]
-  · have hxh : x * h ∉ UAt σ W (evFin F v) := fun h' => hx (by
-      have := mul_mem_UAt h' (inv_mem_UAt hh); rwa [mul_inv_cancel_right] at this)
+  · have hxh : x * h ∉ UAt σ W (evFin F v) := fun h' =>
+      hx (by have := mul_mem_UAt h' (inv_mem_UAt hh); rwa [mul_inv_cancel_right] at this)
     rw [coef_not_mem hx, coef_not_mem hxh]
 
 def transl (Ω : UA σ W.J → ℂ) (v : Pl F) : Submodule ℂ (UA σ W.J → ℂ) :=
   Submodule.span ℂ {f | ∃ h ∈ UAt σ W (evFin F v), f = fun x => Ω (x * h)}
 
-theorem map_coef (L : IsLocRep M ψ om v ω ρ) (V : IsVacSph M om v ω) (hs : M.vac v ∈ SB _) (hl : IsSphForm M om v ω l) :
-    (SB _).map (coef ω l) = transl (coef ω l (M.vac v)) v := by
+theorem map_coef
+    (L : IsLocRep M ψ om v ω ρ) (V : IsVacSph M om v ω) (hs : M.vac v ∈ SB _)
+    (hl : IsSphForm M om v ω l)
+    : (SB _).map (coef ω l) = transl (coef ω l (M.vac v)) v := by
   have o1 := one_mem_UAt (σ := σ) X v
   apply le_antisymm
   · rintro _ ⟨φ, hφ, rfl⟩
     have h1 : augAt om v ≤ (transl (coef ω l (M.vac v)) v).comap (coef ω l) := fun z hz => by
-      rw [Submodule.mem_comap, (LinearMap.mem_ker).1 (coef_aug L hl.aug hz)]; exact Submodule.zero_mem _
-    have h2 : Submodule.span ℂ {z | ∃ h ∈ UAt σ W (evFin F v), z = ω (1, h) (M.vac v)} ≤
-        (transl (coef ω l (M.vac v)) v).comap (coef ω l) := by
+      rw [Submodule.mem_comap, (LinearMap.mem_ker).1 (coef_aug L hl.aug hz)]
+      exact Submodule.zero_mem _
+    have h2
+        : Submodule.span ℂ {z | ∃ h ∈ UAt σ W (evFin F v), z = ω (1, h) (M.vac v)}
+          ≤ (transl (coef ω l (M.vac v)) v).comap (coef ω l) := by
       rw [Submodule.span_le]
       rintro _ ⟨h, hh, rfl⟩
       exact Submodule.subset_span ⟨h, hh, coef_transl L hh hs⟩
@@ -89,21 +104,21 @@ theorem map_coef (L : IsLocRep M ψ om v ω ρ) (V : IsVacSph M om v ω) (hs : M
     rintro _ ⟨h, hh, rfl⟩
     exact ⟨_, L.pres 1 o1 h hh _ hs, coef_transl L hh hs⟩
 
-theorem coef_vac_one (L : IsLocRep M ψ om v ω ρ) (hs : M.vac v ∈ SB _) (hl : IsSphForm M om v ω l) :
-    coef ω l (M.vac v) 1 = 1 := by
+theorem coef_vac_one (L : IsLocRep M ψ om v ω ρ) (hs : M.vac v ∈ SB _) (hl : IsSphForm M om v ω l)
+    : coef ω l (M.vac v) 1 = 1 := by
   rw [coef_mem (one_mem_UAt W v)]
   have : ((1 : UA σ X.J), (1 : UA σ W.J)) = 1 := rfl
   rw [this, L.one _ hs, hl.one]
 
-theorem reach_vac (L : IsLocRep M ψ om v ω ρ) (V : IsVacSph M om v ω) (hl : IsSphForm M om v ω l) {φ : Fn F n d v}
-    (hφ : φ ∈ SB _) (h0 : coef ω l φ ≠ 0) :
-    ∃ h ∈ UAt σ W (evFin F v), ∃ (m : ℕ) (k : Fin (m + 1) → UA σ W.J) (c : ℂ), c ≠ 0 ∧
-      (∀ i, k i ∈ KAt σ W v) ∧ ∑ i, ω (1, k i) (ω (1, h) φ) - c • M.vac v ∈ augAt om v := by
+theorem reach_vac
+    (L : IsLocRep M ψ om v ω ρ) (V : IsVacSph M om v ω) (hl : IsSphForm M om v ω l)
+    {φ : Fn F n d v} (hφ : φ ∈ SB _) (h0 : coef ω l φ ≠ 0)
+    : ∃ h ∈ UAt σ W (evFin F v), ∃ (m : ℕ) (k : Fin (m + 1) → UA σ W.J) (c : ℂ),
+      c ≠ 0 ∧ (∀ i, k i ∈ KAt σ W v) ∧ ∑ i, ω (1, k i) (ω (1, h) φ) - c • M.vac v ∈ augAt om v := by
   have o1 := one_mem_UAt (σ := σ) X v
   obtain ⟨h, hh⟩ : ∃ h, coef ω l φ h ≠ 0 := by
     by_contra hc; exact h0 (funext fun x => by_contra fun hx => hc ⟨x, hx⟩)
-  have hU : h ∈ UAt σ W (evFin F v) := by
-    by_contra hn; exact hh (coef_not_mem hn)
+  have hU : h ∈ UAt σ W (evFin F v) := by by_contra hn; exact hh (coef_not_mem hn)
   rw [coef_mem hU] at hh
   have hψ := L.pres 1 o1 h hU φ hφ
   obtain ⟨m, k, c, hk, hsum⟩ := V.line _ hψ
@@ -120,13 +135,17 @@ theorem reach_vac (L : IsLocRep M ψ om v ω ρ) (V : IsVacSph M om v ω) (hl : 
 
 end Loc
 
-variable {a a' : ℕ} {B : Base F E} {G : Geo σ a a'} {X : Chars F E} {om : Rep σ G.V G.W} {om' : Rep σ G.V' G.W} {v : Pl F}
+variable
+  {a a' : ℕ} {B : Base F E} {G : Geo σ a a'}
+  {X : Chars F E} {om : Rep σ G.V G.W} {om' : Rep σ G.V' G.W} {v : Pl F}
 
-theorem finAt_sph {ω ρ ω' ρ'} (L : IsLocRep G.M B.ψ om v ω ρ) (L' : IsLocRep G.M' B.ψ om' v ω' ρ') (hv : v ∉ X.T)
-    (hs : G.M.vac v ∈ SB _) (hs' : G.M'.vac v ∈ SB _) (V1 : IsVacSph G.M om v ω) (V2 : IsVacSph G.M' om' v ω')
+theorem finAt_sph
+    {ω ρ ω' ρ'} (L : IsLocRep G.M B.ψ om v ω ρ) (L' : IsLocRep G.M' B.ψ om' v ω' ρ')
+    (hv : v ∉ X.T) (hs : G.M.vac v ∈ SB _) (hs' : G.M'.vac v ∈ SB _) (V1 : IsVacSph G.M om v ω)
+    (V2 : IsVacSph G.M' om' v ω')
     {l l'} (hl : IsSphForm G.M om v ω l) (hl' : IsSphForm G.M' om' v ω' l')
-    (hΩ : ∀ h ∈ UAt σ G.W (evFin F v), l (ω (1, h) (G.M.vac v)) = l' (ω' (1, h) (G.M'.vac v))) :
-    ∃ R, IsFinAt B G X om om' R v := by
+    (hΩ : ∀ h ∈ UAt σ G.W (evFin F v), l (ω (1, h) (G.M.vac v)) = l' (ω' (1, h) (G.M'.vac v)))
+    : ∃ R, IsFinAt B G X om om' R v := by
   classical
   have o1 := one_mem_UAt (σ := σ) G.V v
   have o1' := one_mem_UAt (σ := σ) G.V' v
@@ -146,10 +165,11 @@ theorem finAt_sph {ω ρ ω' ρ'} (L : IsLocRep G.M B.ψ om v ω ρ) (L' : IsLoc
   have mc' : ∀ φ ∈ SB _, c' φ ∈ S := fun φ hφ => mS' ▸ Submodule.mem_map_of_mem hφ
   have inj : ∀ x ∈ S, ∀ y ∈ S, π x = π y → x = y := fun x hx y hy h => by
     rw [hπ' x hx, hπ' y hy] at h; exact congrArg Subtype.val h
-  let R : FinMaps F a a' :=
-    { Pi := fun _ => S
-      p := fun u => if h : v = u then h ▸ (π ∘ₗ c) else 0
-      p' := fun u => if h : v = u then h ▸ (π ∘ₗ c') else 0 }
+  let R : FinMaps F a a' := {
+    Pi := fun _ => S
+    p := fun u => if h : v = u then h ▸ (π ∘ₗ c) else 0
+    p' := fun u => if h : v = u then h ▸ (π ∘ₗ c') else 0
+  }
   have e : R.p v = π ∘ₗ c := dif_pos rfl
   have e' : R.p' v = π ∘ₗ c' := dif_pos rfl
   have hx : ∀ x : S, π x.1 = x := fun x => hπ' x.1 x.2
@@ -159,7 +179,8 @@ theorem finAt_sph {ω ρ ω' ρ'} (L : IsLocRep G.M B.ψ om v ω ρ) (L' : IsLoc
   have ΩS : c (G.M.vac v) ∈ S := mc _ hs
   have Ω0 : c (G.M.vac v) ≠ 0 := fun h => by
     have := congrFun h 1; rw [Ω1] at this; exact one_ne_zero this
-  have hne : π (c (G.M.vac v)) ≠ 0 := fun h => Ω0 (inj _ ΩS 0 S.zero_mem (h.trans (map_zero π).symm))
+  have hne : π (c (G.M.vac v)) ≠ 0 := fun h =>
+    Ω0 (inj _ ΩS 0 S.zero_mem (h.trans (map_zero π).symm))
   refine ⟨R, ?_, ?_, ?_, ?_, ?_, ⟨_, _, hne⟩, ?_, fun _ => ?_, fun _ h => absurd h hv⟩
   · rw [e, eq_top_iff]
     intro x _
@@ -189,22 +210,25 @@ theorem finAt_sph {ω ρ ω' ρ'} (L : IsLocRep G.M B.ψ om v ω ρ) (L' : IsLoc
     have hc0 : c φ ≠ 0 := fun h => hy0 (by rw [← hx y, ← hcφ, h, map_zero])
     obtain ⟨h, hU, m, k, cc, hcc, hk, hsum⟩ := reach_vac L V1 hl hφ hc0
     have hψ := L.pres 1 o1 h hU φ hφ
-    have step : ∀ g ∈ UAt σ G.W (evFin F v), ∀ χ ∈ SB _, π (c χ) ∈ N → π (c (ω (1, g) χ)) ∈ N := fun g hg χ hχ hN' =>
-      hN g hg χ hχ _ (L.pres 1 o1 g hg χ hχ) ((L.acts 1 o1 g hg χ hχ _).2 rfl) hN'
+    have step : ∀ g ∈ UAt σ G.W (evFin F v), ∀ χ ∈ SB _, π (c χ) ∈ N → π (c (ω (1, g) χ)) ∈ N :=
+      fun g hg χ hχ hN' =>
+        hN g hg χ hχ _ (L.pres 1 o1 g hg χ hχ) ((L.acts 1 o1 g hg χ hχ _).2 rfl) hN'
     have hyφ : π (c φ) ∈ N := by rw [hcφ, hx]; exact hyN
     have h1 : π (c (ω (1, h) φ)) ∈ N := step h hU φ hφ hyφ
     have h2 : ∀ i, π (c (ω (1, k i) (ω (1, h) φ))) ∈ N := fun i => step _ (hk i).1 _ hψ h1
     have h3 : π (c (∑ i, ω (1, k i) (ω (1, h) φ))) ∈ N := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum]; exact Submodule.sum_mem _ fun i _ => h2 i
+      rw [map_sum, map_sum]; exact Submodule.sum_mem _ fun i _ => h2 i
     have h4 : c (∑ i, ω (1, k i) (ω (1, h) φ)) = cc • c (G.M.vac v) := by
       have := (LinearMap.mem_ker).1 (coef_aug L hl.aug hsum)
       rw [map_sub, sub_eq_zero, map_smul] at this
-      rw [hc]; exact this
+      rw [hc]
+      exact this
     rw [h4, map_smul] at h3
     have hv0 : π (c (G.M.vac v)) ∈ N := by
       have := N.smul_mem cc⁻¹ h3; rwa [smul_smul, inv_mul_cancel₀ hcc, one_smul] at this
-    have hall : ∀ g ∈ UAt σ G.W (evFin F v), π (c (ω (1, g) (G.M.vac v))) ∈ N := fun g hg => step g hg _ hs hv0
+    have hall : ∀ g ∈ UAt σ G.W (evFin F v), π (c (ω (1, g) (G.M.vac v))) ∈ N := fun g hg =>
+      step g hg _ hs hv0
     rw [eq_top_iff]
     intro x _
     have hle : S ≤ N.map S.subtype := by
@@ -224,8 +248,10 @@ theorem finAt_sph {ω ρ ω' ρ'} (L : IsLocRep G.M B.ψ om v ω ρ) (L' : IsLoc
 
 theorem finInert_of (hV : VacInert) (hF : SphFun) (hA : LocRepEx) : FinInert := by
   intro F E _ _ _ _ _ σ B a a' G X om om' hT v ⟨hv, he⟩
-  have P : PairOK B G.V G.W G.M om := ⟨hT.base, ⟨_, _, hT.geo.hV⟩, ⟨_, _, hT.geo.hW⟩, hT.geo.hM, _, _, hT.weil⟩
-  have P' : PairOK B G.V' G.W G.M' om' := ⟨hT.base, ⟨_, _, hT.geo.hV'⟩, ⟨_, _, hT.geo.hW⟩, hT.geo.hM', _, _, hT.weil'⟩
+  have P : PairOK B G.V G.W G.M om :=
+    ⟨hT.base, ⟨_, _, hT.geo.hV⟩, ⟨_, _, hT.geo.hW⟩, hT.geo.hM, _, _, hT.weil⟩
+  have P' : PairOK B G.V' G.W G.M' om' :=
+    ⟨hT.base, ⟨_, _, hT.geo.hV'⟩, ⟨_, _, hT.geo.hW⟩, hT.geo.hM', _, _, hT.weil'⟩
   obtain ⟨ω, ρ, L⟩ := hA F E σ _ _ B _ _ _ _ P v
   obtain ⟨ω', ρ', L'⟩ := hA F E σ _ _ B _ _ _ _ P' v
   obtain ⟨V1, V2⟩ := hV F E σ B a a' G X om om' hT v he

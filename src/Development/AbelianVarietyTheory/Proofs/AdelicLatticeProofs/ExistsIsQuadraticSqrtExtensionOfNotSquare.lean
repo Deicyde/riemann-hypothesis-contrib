@@ -10,28 +10,34 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem exists_isQuad : ∀ (F : Type) [Field F] [NumberField F] (δ : F), ¬ IsSquare δ →
-    ∃ (E : Type) (_ : Field E) (_ : NumberField E) (_ : Algebra F E) (θ : E) (σ : E ≃ₐ[F] E),
-      IsQuad δ θ σ := by
+theorem exists_isQuad
+    : ∀ (F : Type) [Field F] [NumberField F] (δ : F),
+      ¬ IsSquare δ
+        → ∃ (E : Type) (_ : Field E) (_ : NumberField E) (_ : Algebra F E) (θ : E) (σ : E ≃ₐ[F] E),
+          IsQuad δ θ σ := by
   intro F _ _ δ hδ
   have hroot : ∀ b : F, b ^ 2 ≠ δ := fun b hb => hδ ⟨b, by rw [← hb, sq]⟩
   have hirr : Irreducible (Polynomial.X ^ 2 - Polynomial.C δ) :=
     X_pow_sub_C_irreducible_of_prime Nat.prime_two hroot
-  have hmon : (Polynomial.X ^ 2 - Polynomial.C δ).Monic := Polynomial.monic_X_pow_sub_C δ two_ne_zero
-  have hdeg : (Polynomial.X ^ 2 - Polynomial.C δ).natDegree = 2 := Polynomial.natDegree_X_pow_sub_C _
+  have hmon : (Polynomial.X ^ 2 - Polynomial.C δ).Monic :=
+    Polynomial.monic_X_pow_sub_C δ two_ne_zero
+  have hdeg : (Polynomial.X ^ 2 - Polynomial.C δ).natDegree = 2 :=
+    Polynomial.natDegree_X_pow_sub_C _
   have : Fact (Irreducible (Polynomial.X ^ 2 - Polynomial.C δ)) := ⟨hirr⟩
   set p : Polynomial F := Polynomial.X ^ 2 - Polynomial.C δ with hp
   have hsq : AdjoinRoot.root p ^ 2 = AdjoinRoot.of p δ := by
     have h := AdjoinRoot.eval₂_root p
     rw [hp, Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C] at h
     exact sub_eq_zero.mp h
-  have hneg : Polynomial.eval₂ (↑(Algebra.ofId F (AdjoinRoot p)) : F →+* AdjoinRoot p)
-      (-AdjoinRoot.root p) (Polynomial.X ^ 2 - Polynomial.C δ) = 0 := by
+  have hneg
+      : Polynomial.eval₂ (↑(Algebra.ofId F (AdjoinRoot p)) : F →+* AdjoinRoot p)
+          (- AdjoinRoot.root p) (Polynomial.X ^ 2 - Polynomial.C δ)
+        = 0 := by
     rw [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C, neg_sq, hsq, sub_eq_zero]
     rfl
   let τ : AdjoinRoot p →ₐ[F] AdjoinRoot p :=
-    AdjoinRoot.liftAlgHom p (Algebra.ofId F (AdjoinRoot p)) (-AdjoinRoot.root p) hneg
-  have hτ : τ (AdjoinRoot.root p) = -AdjoinRoot.root p := AdjoinRoot.liftAlgHom_root _ _ _ _
+    AdjoinRoot.liftAlgHom p (Algebra.ofId F (AdjoinRoot p)) (- AdjoinRoot.root p) hneg
+  have hτ : τ (AdjoinRoot.root p) = - AdjoinRoot.root p := AdjoinRoot.liftAlgHom_root _ _ _ _
   have hττ : τ.comp τ = AlgHom.id F (AdjoinRoot p) := by
     apply AdjoinRoot.algHom_ext
     simp only [AlgHom.comp_apply, AlgHom.id_apply, hτ, map_neg, neg_neg]
@@ -40,8 +46,15 @@ theorem exists_isQuad : ∀ (F : Type) [Field F] [NumberField F] (δ : F), ¬ Is
   have : CharZero (AdjoinRoot p) :=
     charZero_of_injective_algebraMap (algebraMap F (AdjoinRoot p)).injective
   have : FiniteDimensional ℚ (AdjoinRoot p) := Module.Finite.trans F (AdjoinRoot p)
-  refine ⟨AdjoinRoot p, inferInstance, { }, inferInstance, AdjoinRoot.root p,
-    AlgEquiv.ofAlgHom τ τ hττ hττ, ⟨hδ, ?_, hτ, ?_⟩⟩
+  refine ⟨
+    AdjoinRoot p,
+    inferInstance,
+    {},
+    inferInstance,
+    AdjoinRoot.root p,
+    AlgEquiv.ofAlgHom τ τ hττ hττ,
+    ⟨hδ, ?_, hτ, ?_⟩
+  ⟩
   · rw [AdjoinRoot.algebraMap_eq]; exact hsq
   · intro x
     obtain ⟨g, rfl⟩ := AdjoinRoot.mk_surjective x

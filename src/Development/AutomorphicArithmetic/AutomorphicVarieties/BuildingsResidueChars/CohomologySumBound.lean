@@ -4,9 +4,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-private theorem UpperTheory.V.Af.CohB.cardSum_eq (I : Type) [hI : Fintype I] :
-    ∀ f : I → Cardinal.{0}, Cardinal.sum f = ∑ i, f i := by
-  refine Fintype.induction_empty_option (P := fun I _ => ∀ f : I → Cardinal.{0}, Cardinal.sum f = ∑ i, f i)
+private theorem UpperTheory.V.Af.CohB.cardSum_eq (I : Type) [hI : Fintype I]
+    : ∀ f : I → Cardinal.{0}, Cardinal.sum f = ∑ i, f i := by
+  refine Fintype.induction_empty_option
+    (P := fun I _ => ∀ f : I → Cardinal.{0}, Cardinal.sum f = ∑ i, f i)
     ?_ ?_ ?_ I
   · intro α β _ e h f
     letI : Fintype α := Fintype.ofEquiv β e.symm
@@ -16,25 +17,28 @@ private theorem UpperTheory.V.Af.CohB.cardSum_eq (I : Type) [hI : Fintype I] :
     simp [Cardinal.sum]
   · intro α _ h f
     rw [Fintype.sum_option, ← h]
-    have e0 : (Σ o : Option α, (f o).out) ≃ (f none).out ⊕ (Σ a : α, (f (some a)).out) :=
-      { toFun := fun x => match x with
-          | ⟨none, y⟩ => Sum.inl y
-          | ⟨some a, y⟩ => Sum.inr ⟨a, y⟩
-        invFun := fun x => match x with
-          | Sum.inl y => ⟨none, y⟩
-          | Sum.inr ⟨a, y⟩ => ⟨some a, y⟩
-        left_inv := by rintro ⟨_ | a, y⟩ <;> rfl
-        right_inv := by rintro (y | ⟨a, y⟩) <;> rfl }
+    have e0 : (Σ o : Option α, (f o).out) ≃ (f none).out ⊕ (Σ a : α, (f (some a)).out) := {
+      toFun := fun x =>
+        match x with
+        | ⟨none, y⟩ => Sum.inl y
+        | ⟨some a, y⟩ => Sum.inr ⟨a, y⟩
+      invFun := fun x =>
+        match x with
+        | Sum.inl y => ⟨none, y⟩
+        | Sum.inr ⟨a, y⟩ => ⟨some a, y⟩
+      left_inv := by rintro ⟨_ | a, y⟩ <;> rfl
+      right_inv := by rintro (y | ⟨a, y⟩) <;> rfl
+    }
     have e := Cardinal.mk_congr e0
     rw [Cardinal.mk_sum, Cardinal.lift_id, Cardinal.lift_id, Cardinal.mk_out] at e
     exact e
 
 open CategoryTheory in
-theorem UpperTheory.cohomology_sum_bound :
-    UpperTheory.V.Af.CohB.SumBound := by
+theorem UpperTheory.cohomology_sum_bound : UpperTheory.V.Af.CohB.SumBound := by
   intro Γ I _ _ A B π ι h q
   let F : Rep.{0} ℂ Γ ⥤ ModuleCat.{0} ℂ :=
-    groupCohomology.cochainsFunctor ℂ Γ ⋙ HomologicalComplex.homologyFunctor (ModuleCat.{0} ℂ) (ComplexShape.up ℕ) q
+    groupCohomology.cochainsFunctor ℂ Γ
+      ⋙ HomologicalComplex.homologyFunctor (ModuleCat.{0} ℂ) (ComplexShape.up ℕ) q
   have hF : ∑ i, F.map (π i) ≫ F.map (ι i) = 𝟙 (F.obj A) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← F.map_id, ← h, F.map_sum]
@@ -42,11 +46,13 @@ theorem UpperTheory.cohomology_sum_bound :
   change Module.rank ℂ (F.obj A) ≤ ∑ i, Module.rank ℂ (F.obj (B i))
   let φ : F.obj A →ₗ[ℂ] (∀ i, F.obj (B i)) := LinearMap.pi fun i => (F.map (π i)).hom
   have hφ : Function.Injective φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     have h1 := congrArg (fun f => ModuleCat.Hom.hom f x) hF
     simp only [ModuleCat.hom_sum, ModuleCat.hom_comp, ModuleCat.hom_id, LinearMap.sum_apply,
-      LinearMap.comp_apply, LinearMap.id_apply] at h1
+        LinearMap.comp_apply, LinearMap.id_apply]
+      at h1
     rw [← h1]
     refine Finset.sum_eq_zero fun i _ => ?_
     have h2 : (F.map (π i)).hom x = 0 := congrFun hx i

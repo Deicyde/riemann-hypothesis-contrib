@@ -9,36 +9,46 @@ open Formalism.MainNotions Formalism.MainNotions.N GlobalTheory.SplitField
 
 namespace GlobalTheory.SplitField
 
-theorem isoSub_summand_of_isInternal {Γ L : Type} [Group Γ] [Field L] {a n : ℕ}
+theorem isoSub_summand_of_isInternal
+    {Γ L : Type} [Group Γ] [Field L]
+    {a n : ℕ}
     (τ : Γ →* GL (Fin a) L) (Us : Fin n → Submodule L (Fin a → L)) (hI : DirectSum.IsInternal Us)
-    (hU : ∀ m, IsIrrSub τ (Us m)) (W : Submodule L (Fin a → L)) (hW : IsIrrSub τ W) :
-    ∃ m, IsoSub τ W (Us m) := by
+    (hU : ∀ m, IsIrrSub τ (Us m)) (W : Submodule L (Fin a → L)) (hW : IsIrrSub τ W)
+    : ∃ m, IsoSub τ W (Us m) := by
   classical
   let T : Γ → (Fin a → L) →ₗ[L] (Fin a → L) := fun g =>
     Matrix.mulVecLin ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L)
-  have hTv : ∀ g v, T g v = ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L).mulVec v := fun g v => rfl
+  have hTv : ∀ g v, T g v = ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L).mulVec v := fun g v =>
+    rfl
   let e := LinearEquiv.ofBijective (DirectSum.coeLinearMap Us) hI
   let P : ∀ m, (Fin a → L) →ₗ[L] Us m := fun m =>
     (DirectSum.component L (Fin n) (fun k => Us k) m).comp
       (e.symm : (Fin a → L) →ₗ[L] DirectSum (Fin n) fun k => Us k)
   have hstab : ∀ g k, ∀ v ∈ Us k, T g v ∈ Us k := fun g k v hv => (hU k).2.1 g v hv
   let φ : Γ → ∀ k, Us k →ₗ[L] Us k := fun g k => (T g).restrict (hstab g k)
-  have hcomm : ∀ g (d : DirectSum (Fin n) fun k => Us k),
-      DirectSum.coeLinearMap Us (DFinsupp.mapRange.linearMap (φ g) d) = T g (DirectSum.coeLinearMap Us d) := by
+  have hcomm
+      : ∀ g (d : DirectSum (Fin n) fun k => Us k),
+        DirectSum.coeLinearMap Us (DFinsupp.mapRange.linearMap (φ g) d)
+          = T g (DirectSum.coeLinearMap Us d) := by
     intro g
-    have : (DirectSum.coeLinearMap Us).comp (DFinsupp.mapRange.linearMap (φ g)) =
-        (T g).comp (DirectSum.coeLinearMap Us) := by
+    have : (DirectSum.coeLinearMap Us).comp (DFinsupp.mapRange.linearMap (φ g))
+        = (T g).comp (DirectSum.coeLinearMap Us) := by
       apply DirectSum.linearMap_ext
       intro k
-      apply LinearMap.ext; intro x
+      apply LinearMap.ext
+      intro x
       simp only [LinearMap.comp_apply, DirectSum.lof_eq_of, DFinsupp.mapRange.linearMap_apply]
       rw [show (DirectSum.of (fun i => Us i) k x) = DFinsupp.single k x from rfl]
-      rw [show DFinsupp.mapRange.linearMap (φ g) (DFinsupp.single k x) = DFinsupp.single k (φ g k x) from
+      rw [show DFinsupp.mapRange.linearMap (φ g) (DFinsupp.single k x)
+          = DFinsupp.single k (φ g k x) from
         DFinsupp.mapRange_single (hf := fun i => map_zero _)]
-      rw [show (DFinsupp.single k ((φ g k) x) : DirectSum (Fin n) fun i => Us i) =
-        DirectSum.of (fun i => Us i) k (φ g k x) from rfl]
+      rw [show (DFinsupp.single k ((φ g k) x) : DirectSum (Fin n) fun i => Us i)
+          = DirectSum.of (fun i => Us i) k (φ g k x) from
+        rfl]
       simp [DirectSum.coeLinearMap_of, φ]
-      rw [show (DFinsupp.single k x : DirectSum (Fin n) fun i => Us i) = DirectSum.of (fun i => Us i) k x from rfl,
+      rw [show (DFinsupp.single k x : DirectSum (Fin n) fun i => Us i)
+            = DirectSum.of (fun i => Us i) k x from
+          rfl,
         DirectSum.coeLinearMap_of]
     intro d
     exact LinearMap.congr_fun this d
@@ -52,7 +62,8 @@ theorem isoSub_summand_of_isInternal {Γ L : Type} [Group Γ] [Field L] {a n : �
       congr 1
       exact (e.apply_symm_apply v).symm
     simp only [P, LinearMap.comp_apply, LinearEquiv.coe_coe, h1]
-    simp only [← DirectSum.apply_eq_component, DFinsupp.mapRange.linearMap_apply, DFinsupp.mapRange_apply]
+    simp only [← DirectSum.apply_eq_component, DFinsupp.mapRange.linearMap_apply,
+      DFinsupp.mapRange_apply]
     rfl
   obtain ⟨w, hwW, hw0⟩ := (Submodule.ne_bot_iff W).1 hW.1
   obtain ⟨m, hm⟩ : ∃ m, P m w ≠ 0 := by

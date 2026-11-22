@@ -5,7 +5,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ActualAdjoin
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open MeasureTheory Filter Topology Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
 open scoped ContDiff
 
 noncomputable section
@@ -16,31 +17,36 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section Act
 
-variable {k ρ : ℕ} {z z' : Fin (2 * ρ + k + 1) → ℂ} {Wp Wq : Type} [NormedAddCommGroup Wp]
-  [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] {π : Q.Mx k ρ → (Wp →L[ℂ] Wp)}
-  {π' : Q.Mx k ρ → (Wq →L[ℂ] Wq)}
+variable
+  {k ρ : ℕ} {z z' : Fin (2 * ρ + k + 1) → ℂ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+  {π : Q.Mx k ρ → (Wp →L[ℂ] Wp)} {π' : Q.Mx k ρ → (Wq →L[ℂ] Wq)}
 
-theorem rad_zero (Φ : Q.RadSp k ρ z z' π π') {x : (Fin ρ → ℂ) × Q.Mx k ρ} (hx : x ∉ Q.DomR k ρ z z') :
-    (Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) x.1 x.2 = 0 := Φ.2.1 x hx
+theorem rad_zero (Φ : Q.RadSp k ρ z z' π π') {x : (Fin ρ → ℂ) × Q.Mx k ρ} (hx : x ∉ Q.DomR k ρ z z')
+    : (Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) x.1 x.2 = 0 :=
+  Φ.2.1 x hx
 
 theorem one_mem_OmX : (fun _ => (1 : ℂ)) ∈ OmX ρ := fun _ => one_ne_zero
 
-theorem good_fn (hT : 0 ≤ Tz k ρ z * Tz k ρ z') (X : Q.ActualOps k ρ z z' π π') (j : Fin 6) :
-    Good z z' π π' (X.fn j) := by
+theorem good_fn (hT : 0 ≤ Tz k ρ z * Tz k ρ z') (X : Q.ActualOps k ρ z z' π π') (j : Fin 6)
+    : Good z z' π π' (X.fn j) := by
   intro Par _ _ _ _ _ U₀ hU₀ hUpos Ψ Ψf hR hF
   set Φf : Par → Mt k ρ → (Wq →L[ℂ] Wp) := fun Z y =>
     if 0 < Q.GGl k ρ z z' (Matrix.of y) then Q.fnVal k ρ z z' j (Matrix.of y) • Ψf Z y else 0 with hΦf
 
-  have key : ∀ (Φ : Q.RadSp k ρ z z' π π') (c : Fin ρ → ℂ) (y : Mt k ρ),
-      Matrix.of y ∈ Q.Glev k ρ (Fin.last ρ) → 0 < Q.GGl k ρ z z' (Matrix.of y) →
-      (X.fn j Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c (Matrix.of y) =
-        Q.fnVal k ρ z z' j (Matrix.of y) • (Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c (Matrix.of y) := by
+  have key
+      : ∀ (Φ : Q.RadSp k ρ z z' π π') (c : Fin ρ → ℂ) (y : Mt k ρ),
+        Matrix.of y ∈ Q.Glev k ρ (Fin.last ρ) → 0 < Q.GGl k ρ z z' (Matrix.of y)
+          → (X.fn j Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c (Matrix.of y)
+            = Q.fnVal k ρ z z' j (Matrix.of y) • (Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c (Matrix.of y) := by
     intro Φ c y hG hpos
     by_cases hD : ((c, Matrix.of y) : (Fin ρ → ℂ) × Q.Mx k ρ) ∈ Q.DomR k ρ z z'
     · exact X.fn_apply j Φ (c, Matrix.of y) hD
     · rw [rad_zero (X.fn j Φ) hD, rad_zero Φ hD, smul_zero]
-  have key0 : ∀ (Φ : Q.RadSp k ρ z z' π π') (c : Fin ρ → ℂ) (y : Mt k ρ),
-      ¬ 0 < Q.GGl k ρ z z' (Matrix.of y) → (X.fn j Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c (Matrix.of y) = 0 := by
+  have key0
+      : ∀ (Φ : Q.RadSp k ρ z z' π π') (c : Fin ρ → ℂ) (y : Mt k ρ),
+        ¬ 0 < Q.GGl k ρ z z' (Matrix.of y)
+          → (X.fn j Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c (Matrix.of y) = 0 := by
     intro Φ c y hpos
     exact rad_zero (X.fn j Φ) (x := (c, Matrix.of y)) (fun hD => hpos hD.2.2)
   refine ⟨Φf, fun Z c y hG => ?_, ?_, fun K hK q hq hG hqK => ?_, ?_⟩
@@ -51,12 +57,15 @@ theorem good_fn (hT : 0 ≤ Tz k ρ z * Tz k ρ z') (X : Q.ActualOps k ρ z z' �
       simp only [if_neg hpos]
   · intro q₀ hq hG
     obtain ⟨U, F, hU, hqU, hFs, hfF⟩ := hF q₀ hq hG
-    have hfn := Formalism.FourierDecayAlt.P.Qx5.fnVal_contDiffOn (z := z) (z' := z') (k := k) (r := ρ) hT j
+    have hfn :=
+      Formalism.FourierDecayAlt.P.Qx5.fnVal_contDiffOn (z := z) (z' := z') (k := k) (r := ρ) hT j
     have hm : ContDiff ℝ ∞ fun q : Par × Mt k ρ =>
         (((fun _ => (1 : ℂ)), (Matrix.of q.2 : Q.Mx k ρ)) : (Fin ρ → ℂ) × Q.Mx k ρ) :=
       contDiff_const.prodMk contDiff_snd
-    refine ⟨U ∩ U₀, fun q => Q.fnVal k ρ z z' j (Matrix.of q.2) • F q, hU.inter hU₀, ⟨hqU, hq⟩, ?_, ?_⟩
-    · refine ContDiffOn.smul (hfn.comp hm.contDiffOn (fun q hq' => ?_)) (hFs.mono Set.inter_subset_left)
+    refine
+      ⟨U ∩ U₀, fun q => Q.fnVal k ρ z z' j (Matrix.of q.2) • F q, hU.inter hU₀, ⟨hqU, hq⟩, ?_, ?_⟩
+    · refine ContDiffOn.smul (hfn.comp hm.contDiffOn (fun q hq' => ?_))
+        (hFs.mono Set.inter_subset_left)
       exact ⟨one_mem_OmX, (hUpos hq'.2).2⟩
     · intro q hq' hG'
       have hpos : 0 < Q.GGl k ρ z z' (Matrix.of q.2) := (hUpos hq'.2).2
@@ -81,8 +90,10 @@ theorem good_fn (hT : 0 ≤ Tz k ρ z * Tz k ρ z') (X : Q.ActualOps k ρ z z' �
         simp only [if_neg hpos]
       rw [this, integral_zero]
 
-theorem good_alt_bis (hOm : ∀ c : Fin ρ → ℂ, c ∈ OmX ρ) (hS : ∀ c c' : Fin ρ → ℂ, c = c')
-    (X : Q.ActualOps k ρ z z' π π') (Y : ℂ) (a b : Fin 2) : Good z z' π π' (X.t Y a b) := by
+theorem good_alt_bis
+    (hOm : ∀ c : Fin ρ → ℂ, c ∈ OmX ρ) (hS : ∀ c c' : Fin ρ → ℂ, c = c')
+    (X : Q.ActualOps k ρ z z' π π') (Y : ℂ) (a b : Fin 2)
+    : Good z z' π π' (X.t Y a b) := by
   intro Par _ _ _ _ _ U₀ hU₀ hUpos Ψ Ψf hR hF
   set c₁ : Fin ρ → ℂ := fun _ => 1 with hc₁
   set f : Par → Q.Mx k ρ → (Wq →L[ℂ] Wp) := fun Z => (Ψ Z : Q.Fn k ρ (Wq →L[ℂ] Wp)) c₁ with hfdef
@@ -91,14 +102,17 @@ theorem good_alt_bis (hOm : ∀ c : Fin ρ → ℂ, c ∈ OmX ρ) (hS : ∀ c c'
   obtain ⟨a1, b1, c1⟩ := parOK_tL (E := Wq →L[ℂ] Wp) z z' Y a b Par U₀ hU₀ f hf
   set Φf : Par → Mt k ρ → (Wq →L[ℂ] Wp) := fun Z y =>
     if 0 < Q.GGl k ρ z z' (Matrix.of y) then tL k ρ z z' (Fin.last ρ) Y a b (f Z) (Matrix.of y) else 0 with hΦf
-  have key : ∀ (Φ : Q.RadSp k ρ z z' π π') (y : Mt k ρ),
-      Matrix.of y ∈ Q.Glev k ρ (Fin.last ρ) → 0 < Q.GGl k ρ z z' (Matrix.of y) →
-      (X.t Y a b Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c₁ (Matrix.of y) =
-        tL k ρ z z' (Fin.last ρ) Y a b ((Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c₁) (Matrix.of y) := by
+  have key
+      : ∀ (Φ : Q.RadSp k ρ z z' π π') (y : Mt k ρ),
+        Matrix.of y ∈ Q.Glev k ρ (Fin.last ρ) → 0 < Q.GGl k ρ z z' (Matrix.of y)
+          → (X.t Y a b Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c₁ (Matrix.of y)
+            = tL k ρ z z' (Fin.last ρ) Y a b ((Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c₁) (Matrix.of y) := by
     intro Φ y hG hpos
     exact X.t_apply Y a b Φ (c₁, Matrix.of y) ⟨hOm c₁, hG, hpos⟩
-  have key0 : ∀ (Φ : Q.RadSp k ρ z z' π π') (c : Fin ρ → ℂ) (y : Mt k ρ),
-      ¬ 0 < Q.GGl k ρ z z' (Matrix.of y) → (X.t Y a b Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c (Matrix.of y) = 0 := by
+  have key0
+      : ∀ (Φ : Q.RadSp k ρ z z' π π') (c : Fin ρ → ℂ) (y : Mt k ρ),
+        ¬ 0 < Q.GGl k ρ z z' (Matrix.of y)
+          → (X.t Y a b Φ : Q.Fn k ρ (Wq →L[ℂ] Wp)) c (Matrix.of y) = 0 := by
     intro Φ c y hpos
     exact rad_zero (X.t Y a b Φ) (x := (c, Matrix.of y)) (fun hD => hpos hD.2.2)
   refine ⟨Φf, fun Z c y hG => ?_, ?_, fun K hK q hq hG hqK => ?_, ?_⟩
@@ -109,11 +123,13 @@ theorem good_alt_bis (hOm : ∀ c : Fin ρ → ℂ, c ∈ OmX ρ) (hS : ∀ c c'
       rfl
     · rw [key0 (Ψ Z) c₁ y hpos, hΦf]
       simp only [if_neg hpos]
-  · exact parFam_congr a1 (fun q hq _ => by
-      have hpos : 0 < Q.GGl k ρ z z' (Matrix.of q.2) := (hUpos hq).2
-      show _ = Φf q.1 q.2
-      rw [hΦf]
-      simp only [if_pos hpos]) hU₀
+  · exact parFam_congr a1
+      (fun q hq _ => by
+        have hpos : 0 < Q.GGl k ρ z z' (Matrix.of q.2) := (hUpos hq).2
+        show _ = Φf q.1 q.2
+        rw [hΦf]
+        simp only [if_pos hpos])
+      hU₀
   · have hpos : 0 < Q.GGl k ρ z z' (Matrix.of q.2) := (hUpos hq).2
     rw [hΦf]
     simp only [if_pos hpos]

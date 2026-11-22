@@ -10,10 +10,14 @@ open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 
 namespace GlobalTheory.Reg
 
-
 set_option synthInstance.maxHeartbeats 200000 in
-theorem sec_eq_zero_of_finite_values :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (h : Rul Xo c), h ∈ sec Xo c a n → (∀ (L : Type) [Field L] [Algebra c.F L] [FiniteDimensional c.F L] (y : FrPt Xo c L), evR Xo c h y = 0) → h = 0 := by
+theorem sec_eq_zero_of_finite_values
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (h : Rul Xo c),
+      h ∈ sec Xo c a n
+        → (∀ (L : Type) [Field L] [Algebra c.F L] [FiniteDimensional c.F L] (y : FrPt Xo c L),
+          evR Xo c h y = 0)
+        → h = 0 := by
   intro E _ _ _ H Dw l Xo c a n h hh hv
   obtain ⟨hL, -, -, -⟩ := evLaws_genFr_nonempty_comp E H Dw l Xo c
   funext p y
@@ -29,8 +33,7 @@ theorem sec_eq_zero_of_finite_values :
     rw [hv (p.R ⧸ m) w, Ideal.Quotient.mkₐ_eq_mk] at e
     exact Ideal.Quotient.eq_zero_iff_mem.mp e.symm
 
-  have hj : h p y ∈ (⊥ : Ideal p.R).jacobson :=
-    Ideal.mem_sInf.mpr fun J hJ => key J hJ.2
+  have hj : h p y ∈ (⊥ : Ideal p.R).jacobson := Ideal.mem_sInf.mpr fun J hJ => key J hJ.2
   have hrad : (⊥ : Ideal p.R).IsRadical := by
     intro x hx
     obtain ⟨k, hk⟩ := hx

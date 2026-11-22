@@ -9,9 +9,9 @@ open Formalism.REAL
 
 namespace GlobalTheory.CompanionTheory.Clozel
 
-private theorem neg_one_pow_card_mul_prod_neg_add_conj (u : ℂ) (s : Multiset ℂ) :
-    (-1 : ℂ) ^ Multiset.card s * (s.map fun w => -u + (starRingEnd ℂ) w).prod =
-      (s.map fun w => u - (starRingEnd ℂ) w).prod := by
+private theorem neg_one_pow_card_mul_prod_neg_add_conj (u : ℂ) (s : Multiset ℂ)
+    : (-1 : ℂ) ^ Multiset.card s * (s.map fun w => -u + (starRingEnd ℂ) w).prod
+      = (s.map fun w => u - (starRingEnd ℂ) w).prod := by
   induction s using Multiset.induction_on with
   | empty => simp
   | cons a s ih =>
@@ -19,22 +19,26 @@ private theorem neg_one_pow_card_mul_prod_neg_add_conj (u : ℂ) (s : Multiset �
       Multiset.prod_cons, ← ih, pow_succ]
     ring
 
-theorem multiset_eq_map_neg_conj_of_polyEq :
-    ∀ (n : ℕ) (m m' : Multiset ℂ), Multiset.card m = n → Multiset.card m' = n →
-      (∀ u : ℂ, (m.map (u + ·)).prod =
-        (starRingEnd ℂ) (((-1 : ℂ) ^ n) * (m'.map (-(starRingEnd ℂ) u + ·)).prod)) →
-      m' = m.map fun z => -(starRingEnd ℂ) z := by
+theorem multiset_eq_map_neg_conj_of_polyEq
+    : ∀ (n : ℕ) (m m' : Multiset ℂ),
+      Multiset.card m = n → Multiset.card m' = n
+        → (∀ u : ℂ,
+          (m.map (u + ·)).prod
+            = (starRingEnd ℂ) (((-1 : ℂ) ^ n) * (m'.map (- (starRingEnd ℂ) u + ·)).prod))
+        → m' = m.map fun z => - (starRingEnd ℂ) z := by
   intro n m m' _ hm' h
   have key : ∀ u : ℂ, (m.map (u + ·)).prod = (m'.map fun w => u - (starRingEnd ℂ) w).prod := by
     intro u
-    have hc : ((starRingEnd ℂ) ∘ fun w => -(starRingEnd ℂ) u + w) =
-        fun w => -u + (starRingEnd ℂ) w := by
+    have hc
+        : ((starRingEnd ℂ) ∘ fun w => - (starRingEnd ℂ) u + w)
+          = fun w => -u + (starRingEnd ℂ) w := by
       funext w
       simp
     rw [h u, map_mul, map_pow, map_neg, map_one, map_multiset_prod, Multiset.map_map, hc, ← hm',
       neg_one_pow_card_mul_prod_neg_add_conj]
-  have hpoly : ((m.map fun z => -z).map fun a => Polynomial.X - Polynomial.C a).prod =
-      ((m'.map (starRingEnd ℂ)).map fun a => Polynomial.X - Polynomial.C a).prod := by
+  have hpoly
+      : ((m.map fun z => -z).map fun a => Polynomial.X - Polynomial.C a).prod
+        = ((m'.map (starRingEnd ℂ)).map fun a => Polynomial.X - Polynomial.C a).prod := by
     apply Polynomial.funext
     intro u
     simpa [Polynomial.eval_multiset_prod, Multiset.map_map, Function.comp_def] using key u

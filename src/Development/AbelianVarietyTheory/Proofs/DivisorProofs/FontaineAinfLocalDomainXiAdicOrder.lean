@@ -16,10 +16,10 @@ namespace GlobalTheory.AinfXi
 
 section Tilt
 
-variable {p : ℕ} [hp : Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
+variable {p : ℕ} [hp : Fact p.Prime] {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)]
 
-theorem coeff_pow_pow_zero (x : PreTilt O p) (n : ℕ) :
-    PreTilt.coeff n x ^ p ^ n = PreTilt.coeff 0 x := by
+theorem coeff_pow_pow_zero (x : PreTilt O p) (n : ℕ)
+    : PreTilt.coeff n x ^ p ^ n = PreTilt.coeff 0 x := by
   induction n with
   | zero => simp
   | succ n ih => rw [pow_succ', pow_mul, PreTilt.coeff_pow_p, ih]
@@ -63,9 +63,11 @@ section Main
 
 open GlobalTheory.Sandwich
 
-variable {p : ℕ} [hp : Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-  {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
-  [Fact ¬IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal} {O : Type}
+  [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 theorem isDomain_ainf (hv : v.Integers O) : IsDomain (Ainf p O) := by
   have : IsDomain (PreTilt O p) := PreTilt.isDomain C v O hv p
@@ -146,12 +148,13 @@ theorem eq_zero_of_forall_dvd (x : Ainf p O) (hx : ∀ N, xi ε ^ N ∣ x) : x =
       obtain ⟨w, hw⟩ := ih z fun N => dvd_of_dvd_mul_p hv ε hε N z (hx N)
       exact ⟨w, by rw [hw]; ring⟩
   ext n
-  have h := (mem_span_p_pow_iff_le_coeff_eq_zero x (n + 1)).1
-    (mem_span_singleton.2 (key (n + 1) x hx)) n (Nat.lt_succ_self n)
+  have h :=
+    (mem_span_p_pow_iff_le_coeff_eq_zero x (n + 1)).1 (mem_span_singleton.2 (key (n + 1) x hx)) n
+      (Nat.lt_succ_self n)
   simpa using h
 
-theorem exists_order (x : Ainf p O) (hx : x ≠ 0) :
-    ∃ (N : ℕ) (y : Ainf p O), x = xi ε ^ N * y ∧ fontaineTheta O p y ≠ 0 := by
+theorem exists_order (x : Ainf p O) (hx : x ≠ 0)
+    : ∃ (N : ℕ) (y : Ainf p O), x = xi ε ^ N * y ∧ fontaineTheta O p y ≠ 0 := by
   classical
   have hex : ∃ N, ¬ xi ε ^ N ∣ x := by
     by_contra h
@@ -171,12 +174,32 @@ section Statement
 
 open ReciprocityTheory.PGsh.Up GlobalTheory.Sandwich Matrix
 
-theorem ainf_local_xi_order : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O], v.Integers O → ∀ ε : PreTilt O p, IsPrimitiveRoot (root ε).untilt p → IsDomain (Ainf p O) ∧ IsLocalRing (Ainf p O) ∧ RingHom.ker (WittVector.fontaineTheta O p) = Ideal.span {xi ε} ∧ Function.Surjective (WittVector.fontaineTheta O p) ∧ WittVector.fontaineTheta O p (nu ε) ≠ 0 ∧ xi ε ≠ 0 ∧ (∀ x : Ainf p O, x ≠ 0 → ∃ (N : ℕ) (y : Ainf p O), x = xi ε ^ N * y ∧ WittVector.fontaineTheta O p y ≠ 0) := by
+theorem ainf_local_xi_order
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O],
+      v.Integers O
+        → ∀ ε : PreTilt O p,
+          IsPrimitiveRoot (root ε).untilt p
+            → IsDomain (Ainf p O) ∧ IsLocalRing (Ainf p O)
+              ∧ RingHom.ker (WittVector.fontaineTheta O p) = Ideal.span {xi ε}
+              ∧ Function.Surjective (WittVector.fontaineTheta O p)
+              ∧ WittVector.fontaineTheta O p (nu ε) ≠ 0 ∧ xi ε ≠ 0
+              ∧ (∀ x : Ainf p O,
+                x ≠ 0
+                  → ∃ (N : ℕ) (y : Ainf p O),
+                    x = xi ε ^ N * y ∧ WittVector.fontaineTheta O p y ≠ 0) := by
   intro p _ C _ _ _ v O _ _ _ _ hv ε hε
   haveI := isDomain_ainf (p := p) hv
-  refine ⟨inferInstance, isLocalRing_ainf hv, ker_theta hv ε hε,
-    ReciprocityTheory.PGsh.Ainf.theta_surj p O hv, ReciprocityTheory.PGsh.Ainf.theta_nu p O hv ε hε, fun h => ?_,
-    fun x hx => exists_order hv ε hε x hx⟩
+  refine ⟨
+    inferInstance,
+    isLocalRing_ainf hv,
+    ker_theta hv ε hε,
+    ReciprocityTheory.PGsh.Ainf.theta_surj p O hv,
+    ReciprocityTheory.PGsh.Ainf.theta_nu p O hv ε hε,
+    fun h => ?_,
+    fun x hx => exists_order hv ε hε x hx
+  ⟩
   exact one_ne_zero (xi_nzd hv ε hε 1 (by rw [h, mul_zero]))
 
 end Statement

@@ -23,15 +23,17 @@ theorem le_N_of_mem_gamRanks (R : Ranks) {n : ℕ} (hn : n ∈ gamRanks R) : n �
     omega
   have hm := R.two_le_m
   simp only [gamRanks, Finset.mem_union, Finset.mem_image, Finset.mem_Icc, Finset.mem_insert,
-    Finset.mem_singleton] at hn
+      Finset.mem_singleton]
+    at hn
   rcases hn with ⟨j, hj, rfl⟩ | rfl | rfl | rfl
   · exact Nat.add_le_add_left (Nat.mul_le_mul_right _ hj.2) _
   · exact hY _ le_rfl
   · exact hY _ (Nat.sub_le _ _)
   · simpa [Ranks.rankY, Ranks.nV] using hY 1 (by omega)
 
-theorem DGam_dvd_of_minkMult : ∀ {X : Fields} (R : Ranks), X.Ok →
-    ∀ M, Formalism.MainNotions.MinkMult (2 * X.f * R.N R.m) M → DGam X.E R ∣ M := by
+theorem DGam_dvd_of_minkMult
+    : ∀ {X : Fields} (R : Ranks),
+      X.Ok → ∀ M, Formalism.MainNotions.MinkMult (2 * X.f * R.N R.m) M → DGam X.E R ∣ M := by
   intro X R hX M hM
   have hE : Module.finrank ℚ X.E = 2 * X.f := by
     rw [← Module.finrank_mul_finrank ℚ X.F X.E, hX.rankE, Fields.f, hX.card_Tau, mul_comm]

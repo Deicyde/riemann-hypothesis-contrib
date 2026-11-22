@@ -21,8 +21,7 @@ variable {X : Scheme.{u}}
 abbrev resF (F : X.Modules) {U V : X.Opens} (h : V ≤ U) : Γ(F, U) →+ Γ(F, V) :=
   (F.presheaf.map (homOfLE h).op).hom
 
-abbrev resO {U V : X.Opens} (h : V ≤ U) : Γ(X, U) →+* Γ(X, V) :=
-  (X.presheaf.map (homOfLE h).op).hom
+abbrev resO {U V : X.Opens} (h : V ≤ U) : Γ(X, U) →+* Γ(X, V) := (X.presheaf.map (homOfLE h).op).hom
 
 lemma resF_smul (F : X.Modules) {U V : X.Opens} (h : V ≤ U) (r : Γ(X, U)) (m : Γ(F, U)) :
     resF F h (r • m) = resO h r • resF F h m :=
@@ -93,37 +92,47 @@ lemma isLocalizedModule_restrict [F.IsQuasicoherent] (f : Γ(X, V)) :
 
 end Affine
 
-theorem qcoh_exists_res_eq (F : X.Modules) [F.IsQuasicoherent] {V : X.Opens} (hV : IsAffineOpen V)
-    (f : Γ(X, V)) (m : Γ(F, X.basicOpen f)) :
-    ∃ (e : ℕ) (m' : Γ(F, V)), resF F (X.basicOpen_le f) m' = resO (X.basicOpen_le f) f ^ e • m := by
+theorem qcoh_exists_res_eq
+    (F : X.Modules) [F.IsQuasicoherent]
+    {V : X.Opens} (hV : IsAffineOpen V) (f : Γ(X, V)) (m : Γ(F, X.basicOpen f))
+    : ∃ (e : ℕ) (m' : Γ(F, V)),
+      resF F (X.basicOpen_le f) m' = resO (X.basicOpen_le f) f ^ e • m := by
   have hloc := isLocalizedModule_restrict F hV f
   let D : (Spec Γ(X, V)).Opens := PrimeSpectrum.basicOpen f
   have hD : hV.fromSpec ''ᵁ D = X.basicOpen f := hV.fromSpec_image_basicOpen f
-  obtain ⟨⟨x, ⟨s, hs⟩⟩, hx⟩ := hloc.surj (show (modulesSpecToSheaf.obj
-        (F.restrict hV.fromSpec)).obj.obj (op D) from resF F hD.le m)
+  obtain ⟨⟨x, ⟨s, hs⟩⟩, hx⟩ :=
+    hloc.surj (show (modulesSpecToSheaf.obj (F.restrict hV.fromSpec)).obj.obj (op D) from
+      resF F hD.le m)
   obtain ⟨e, rfl⟩ := hs
   let x' : Γ(F, hV.fromSpec ''ᵁ ⊤) := x
   refine ⟨e, resF F (fromSpec_image_top hV).ge x', ?_⟩
-  have hx' : (show Γ(F, hV.fromSpec ''ᵁ D) from
-      (f ^ e) • (show Γ(F.restrict hV.fromSpec, D) from resF F hD.le m)) =
-      resF F (hV.fromSpec.image_mono le_top) x' := hx
+  have hx'
+      : (show Γ(F, hV.fromSpec ''ᵁ D) from
+          (f ^ e) • (show Γ(F.restrict hV.fromSpec, D) from resF F hD.le m))
+        = resF F (hV.fromSpec.image_mono le_top) x' :=
+    hx
   rw [smul_restrict_fromSpec] at hx'
   have h2 := congrArg (resF F hD.ge) hx'
   rw [resF_smul, resF_resF, resF_resF, resF_self, resO_resO, map_pow] at h2
   rw [resF_resF, ← h2]
 
-theorem qcoh_exists_pow_smul_eq_zero (F : X.Modules) [F.IsQuasicoherent] {V : X.Opens}
-    (hV : IsAffineOpen V) (f : Γ(X, V)) (m : Γ(F, V)) (hm : resF F (X.basicOpen_le f) m = 0) :
-    ∃ e : ℕ, f ^ e • m = 0 := by
+theorem qcoh_exists_pow_smul_eq_zero
+    (F : X.Modules) [F.IsQuasicoherent]
+    {V : X.Opens}
+    (hV : IsAffineOpen V) (f : Γ(X, V)) (m : Γ(F, V)) (hm : resF F (X.basicOpen_le f) m = 0)
+    : ∃ e : ℕ, f ^ e • m = 0 := by
   have hloc := isLocalizing_restrict F hV f
-  have hD : hV.fromSpec ''ᵁ PrimeSpectrum.basicOpen f = X.basicOpen f := hV.fromSpec_image_basicOpen f
+  have hD : hV.fromSpec ''ᵁ PrimeSpectrum.basicOpen f = X.basicOpen f :=
+    hV.fromSpec_image_basicOpen f
   let x : Γ(F.restrict hV.fromSpec, ⊤) := resF F (fromSpec_image_top hV).le m
-  have hx : ((modulesSpecToSheaf.obj (F.restrict hV.fromSpec)).obj.map
-      (PrimeSpectrum.basicOpen f).leTop.op).hom x = 0 := by
+  have hx
+      : ((modulesSpecToSheaf.obj (F.restrict hV.fromSpec)).obj.map
+          (PrimeSpectrum.basicOpen f).leTop.op).hom x
+        = 0 := by
     change resF F (hV.fromSpec.image_mono le_top) (resF F (fromSpec_image_top hV).le m) = 0
     rw [resF_resF, ← resF_self F (le_refl _) (resF F _ m)]
-    have : resF F (hD.le.trans (X.basicOpen_le f)) m =
-        resF F hD.le (resF F (X.basicOpen_le f) m) := (resF_resF F _ _ m).symm
+    have : resF F (hD.le.trans (X.basicOpen_le f)) m = resF F hD.le (resF F (X.basicOpen_le f) m) :=
+      (resF_resF F _ _ m).symm
     rw [resF_self, this, hm, map_zero]
   obtain ⟨⟨_, e, rfl⟩, he⟩ := (IsLocalizedModule.eq_zero_iff (Submonoid.powers f) _).mp hx
   refine ⟨e, ?_⟩
@@ -186,24 +195,29 @@ lemma isLocalizing_restrict_of {V : X.Opens} (hV : IsAffineOpen V)
       exact h2
     exact key
 
-noncomputable def presentationOverOfRestrict (U : X.Opens) (P : (F.restrict U.ι).Presentation) :
-    (F.over U).Presentation :=
+noncomputable def presentationOverOfRestrict (U : X.Opens) (P : (F.restrict U.ι).Presentation)
+    : (F.over U).Presentation :=
   let E := Scheme.Modules.overEquiv U
   let e₁ : E.functor.obj (F.over U) ≅ F.restrict U.ι := (Scheme.Modules.overFunctorEquiv U).app F
-  let G : SheafOfModules.{u} (U : Scheme.{u}).ringCatSheaf ⥤
-      SheafOfModules.{u} (X.ringCatSheaf.over U) := E.inverse
+  let G
+      : SheafOfModules.{u} (U : Scheme.{u}).ringCatSheaf
+        ⥤ SheafOfModules.{u} (X.ringCatSheaf.over U) :=
+    E.inverse
   haveI : PreservesColimitsOfSize.{u, u} G :=
     Adjunction.leftAdjoint_preservesColimits.{u, u} E.symm.toAdjunction
   (P.map G (TopologicalSpace.Opens.sheafOfModulesEquivOverInverseUnit _ _).symm).ofIsIso
     (G.mapIso e₁.symm ≪≫ (E.unitIso.app _).symm).hom
 
-theorem isQuasicoherent_of_restrict {ι : Type u} (U : ι → X.Opens) (hU : iSup U = ⊤)
-    (P : ∀ i, Nonempty (F.restrict (U i).ι).Presentation) : F.IsQuasicoherent :=
-  let q : SheafOfModules.QuasicoherentData (R := X.ringCatSheaf) F :=
-    { I := ι
-      X := U
-      coversTop := (Opens.coversTop_iff (T := X) U).2 hU
-      presentation := fun i => presentationOverOfRestrict F (U i) (P i).some }
+theorem isQuasicoherent_of_restrict
+    {ι : Type u}
+    (U : ι → X.Opens) (hU : iSup U = ⊤) (P : ∀ i, Nonempty (F.restrict (U i).ι).Presentation)
+    : F.IsQuasicoherent :=
+  let q : SheafOfModules.QuasicoherentData (R := X.ringCatSheaf) F := {
+    I := ι
+    X := U
+    coversTop := (Opens.coversTop_iff (T := X) U).2 hU
+    presentation := fun i => presentationOverOfRestrict F (U i) (P i).some
+  }
   q.isQuasicoherent
 
 lemma nonempty_presentation_restrict {V : X.Opens} (hV : IsAffineOpen V)
@@ -329,23 +343,27 @@ lemma finite_of_finite_basicOpen {U : X.Opens} (hU : IsAffineOpen U) (s : Finset
 
 end Finite
 
-theorem isQuasicoherent_of_affineCover (F : X.Modules) {ι : Type u} (V : ι → X.Opens)
-    (hV : ∀ i, IsAffineOpen (V i)) (hcov : iSup V = ⊤)
-    (h₁ : ∀ i (f : Γ(X, V i)) (m : Γ(F, X.basicOpen f)),
-      ∃ (e : ℕ) (m' : Γ(F, V i)), resF F (X.basicOpen_le f) m' = resO (X.basicOpen_le f) f ^ e • m)
-    (h₂ : ∀ i (f : Γ(X, V i)) (m : Γ(F, V i)), resF F (X.basicOpen_le f) m = 0 →
-      ∃ e : ℕ, f ^ e • m = 0) :
-    F.IsQuasicoherent := by
+theorem isQuasicoherent_of_affineCover
+    (F : X.Modules)
+    {ι : Type u} (V : ι → X.Opens) (hV : ∀ i, IsAffineOpen (V i)) (hcov : iSup V = ⊤)
+    (h₁ : ∀ i (f : Γ(X, V i)) (m : Γ(F, X.basicOpen f)), ∃ (e : ℕ) (m' : Γ(F, V i)),
+      resF F (X.basicOpen_le f) m' = resO (X.basicOpen_le f) f ^ e • m)
+    (h₂ : ∀ i (f : Γ(X, V i)) (m : Γ(F, V i)),
+      resF F (X.basicOpen_le f) m = 0 → ∃ e : ℕ, f ^ e • m = 0)
+    : F.IsQuasicoherent := by
   refine isQuasicoherent_of_restrict F V hcov fun i => nonempty_presentation_restrict F (hV i) ?_
   rw [isQuasicoherent_iff_isIso_fromTildeΓ, isIso_fromTildeΓ_iff_isLocalizing]
   exact isLocalizing_restrict_of F (hV i) (h₁ i) (h₂ i)
 
-theorem isCoherent_of_affineCover (F : X.Modules) [F.IsQuasicoherent] {ι : Type u}
-    (V : ι → X.Opens) (hV : ∀ i, IsAffineOpen (V i)) (hcov : iSup V = ⊤)
-    (hfin : ∀ i, Module.Finite Γ(X, V i) Γ(F, V i)) : IsCoherent F := by
+theorem isCoherent_of_affineCover
+    (F : X.Modules) [F.IsQuasicoherent]
+    {ι : Type u} (V : ι → X.Opens) (hV : ∀ i, IsAffineOpen (V i)) (hcov : iSup V = ⊤)
+    (hfin : ∀ i, Module.Finite Γ(X, V i) Γ(F, V i))
+    : IsCoherent F := by
   refine ⟨inferInstance, fun U hU => ?_⟩
-  have key : ∀ x : U, ∃ f : Γ(X, U), x.1 ∈ X.basicOpen f ∧
-      Module.Finite Γ(X, X.basicOpen f) Γ(F, X.basicOpen f) := by
+  have key
+      : ∀ x : U, ∃ f : Γ(X, U),
+        x.1 ∈ X.basicOpen f ∧ Module.Finite Γ(X, X.basicOpen f) Γ(F, X.basicOpen f) := by
     intro x
     have hx : x.1 ∈ iSup V := hcov ▸ trivial
     obtain ⟨i, hi⟩ := Opens.mem_iSup.mp hx
@@ -358,22 +376,24 @@ theorem isCoherent_of_affineCover (F : X.Modules) [F.IsQuasicoherent] {ι : Type
     rw [← hU.self_le_iSup_basicOpen_iff]
     intro x hx
     exact Opens.mem_iSup.mpr ⟨⟨f ⟨x, hx⟩, ⟨x, hx⟩, rfl⟩, hxf ⟨x, hx⟩⟩
-  obtain ⟨s, hs, h1⟩ := Submodule.mem_span_finite_of_mem_span
-    (hspan ▸ Submodule.mem_top : (1 : Γ(X, U)) ∈ Ideal.span (Set.range f))
+  obtain ⟨s, hs, h1⟩ :=
+    Submodule.mem_span_finite_of_mem_span
+      (hspan ▸ Submodule.mem_top : (1 : Γ(X, U)) ∈ Ideal.span (Set.range f))
   refine finite_of_finite_basicOpen F hU s ((Ideal.eq_top_iff_one _).mpr h1) fun g hg => ?_
   obtain ⟨x, rfl⟩ := hs (Finset.mem_coe.mpr hg)
   exact hfinf x
 
 section Kernel
 
-instance toPresheaf_eval_preservesZeroMorphisms (W : X.Opens) :
-    (Scheme.Modules.toPresheaf X ⋙ (evaluation _ AddCommGrpCat.{u}).obj (op W)).PreservesZeroMorphisms :=
+instance toPresheaf_eval_preservesZeroMorphisms (W : X.Opens)
+    : (Scheme.Modules.toPresheaf X
+      ⋙ (evaluation _ AddCommGrpCat.{u}).obj (op W)).PreservesZeroMorphisms :=
   ⟨fun _ _ => rfl⟩
 
 variable {F G : X.Modules} (φ : F ⟶ G)
 
-noncomputable def kernelForkAppIsLimit (W : X.Opens) :
-    IsLimit ((KernelFork.ofι (kernel.ι φ) (kernel.condition φ)).map
+noncomputable def kernelForkAppIsLimit (W : X.Opens)
+    : IsLimit ((KernelFork.ofι (kernel.ι φ) (kernel.condition φ)).map
       (Scheme.Modules.toPresheaf X ⋙ (evaluation _ AddCommGrpCat.{u}).obj (op W))) := by
   haveI : PreservesLimit (parallelPair φ 0) (Scheme.Modules.toPresheaf X) := inferInstance
   haveI : PreservesLimit (parallelPair φ 0 ⋙ Scheme.Modules.toPresheaf X)
@@ -398,10 +418,12 @@ lemma kernel_ι_app_exact (W : X.Opens) (m : Γ(F, W)) (hm : φ.app W m = 0) :
   change (kernel.ι φ).app W (l.hom ⟨1⟩) = (1 : ℤ) • m at this
   rwa [one_smul] at this
 
-instance isQuasicoherent_kernel [F.IsQuasicoherent] [G.IsQuasicoherent] :
-    (kernel φ).IsQuasicoherent := by
+instance isQuasicoherent_kernel [F.IsQuasicoherent] [G.IsQuasicoherent]
+    : (kernel φ).IsQuasicoherent := by
   have hinj := kernel_ι_app_injective φ
-  refine isQuasicoherent_of_affineCover _ (fun U : X.affineOpens => (U : X.Opens)) (fun U => U.2)
+  refine isQuasicoherent_of_affineCover _
+    (fun U : X.affineOpens => (U : X.Opens))
+    (fun U => U.2)
     (iSup_affineOpens_eq_top X) ?_ ?_
   · intro U f k
     obtain ⟨e, m', hm'⟩ := qcoh_exists_res_eq F U.2 f ((kernel.ι φ).app _ k)
@@ -409,37 +431,41 @@ instance isQuasicoherent_kernel [F.IsQuasicoherent] [G.IsQuasicoherent] :
       have := congrArg (φ.app _) hm'
       rw [Scheme.Modules.Hom.app_smul] at this
       rw [show resF G (X.basicOpen_le f) (φ.app U m') = φ.app _ (resF F (X.basicOpen_le f) m') from
-        (NatTrans.naturality_apply φ.mapPresheaf (homOfLE (X.basicOpen_le f)).op m').symm, this]
+          (NatTrans.naturality_apply φ.mapPresheaf (homOfLE (X.basicOpen_le f)).op m').symm,
+        this]
       rw [show φ.app _ ((kernel.ι φ).app _ k) = 0 from
-        congrArg (fun g => g.app (X.basicOpen f) k) (kernel.condition φ) |>.trans rfl, smul_zero]
+          congrArg (fun g => g.app (X.basicOpen f) k) (kernel.condition φ) |>.trans rfl,
+        smul_zero]
     obtain ⟨e', he'⟩ := qcoh_exists_pow_smul_eq_zero G U.2 f _ h0
     rw [← Scheme.Modules.Hom.app_smul] at he'
     obtain ⟨k', hk'⟩ := kernel_ι_app_exact φ _ _ he'
     refine ⟨e' + e, k', hinj _ ?_⟩
-    rw [show (kernel.ι φ).app _ (resF (kernel φ) (X.basicOpen_le f) k') =
-        resF F (X.basicOpen_le f) ((kernel.ι φ).app _ k') from
+    rw [show (kernel.ι φ).app _ (resF (kernel φ) (X.basicOpen_le f) k')
+          = resF F (X.basicOpen_le f) ((kernel.ι φ).app _ k') from
         NatTrans.naturality_apply (kernel.ι φ).mapPresheaf (homOfLE (X.basicOpen_le f)).op k',
       hk', resF_smul, hm', Scheme.Modules.Hom.app_smul, smul_smul, map_pow, ← pow_add]
   · intro U f k hk
     have h0 : resF F (X.basicOpen_le f) ((kernel.ι φ).app _ k) = 0 := by
-      rw [show resF F (X.basicOpen_le f) ((kernel.ι φ).app _ k) =
-          (kernel.ι φ).app _ (resF (kernel φ) (X.basicOpen_le f) k) from
-          (NatTrans.naturality_apply (kernel.ι φ).mapPresheaf (homOfLE (X.basicOpen_le f)).op k).symm,
+      rw [show resF F (X.basicOpen_le f) ((kernel.ι φ).app _ k)
+            = (kernel.ι φ).app _ (resF (kernel φ) (X.basicOpen_le f) k) from
+          (NatTrans.naturality_apply (kernel.ι φ).mapPresheaf (homOfLE (X.basicOpen_le f)).op
+            k).symm,
         hk, map_zero]
     obtain ⟨e, he⟩ := qcoh_exists_pow_smul_eq_zero F U.2 f _ h0
     refine ⟨e, hinj _ ?_⟩
     rw [Scheme.Modules.Hom.app_smul, he, map_zero]
 
-theorem isCoherent_kernel [IsLocallyNoetherian X] (hF : IsCoherent F) [G.IsQuasicoherent] :
-    IsCoherent (kernel φ) := by
+theorem isCoherent_kernel [IsLocallyNoetherian X] (hF : IsCoherent F) [G.IsQuasicoherent]
+    : IsCoherent (kernel φ) := by
   have := hF.1
   refine ⟨isQuasicoherent_kernel φ, fun U hU => ?_⟩
   have := hF.2 U hU
   have : IsNoetherianRing Γ(X, U) := IsLocallyNoetherian.component_noetherian ⟨U, hU⟩
-  let ι' : Γ(kernel φ, U) →ₗ[Γ(X, U)] Γ(F, U) :=
-    { toFun := (kernel.ι φ).app U
-      map_add' := map_add _
-      map_smul' := Scheme.Modules.Hom.app_smul _ }
+  let ι' : Γ(kernel φ, U) →ₗ[Γ(X, U)] Γ(F, U) := {
+    toFun := (kernel.ι φ).app U
+    map_add' := map_add _
+    map_smul' := Scheme.Modules.Hom.app_smul _
+  }
   exact Module.Finite.of_injective ι' (kernel_ι_app_injective φ U)
 
 end Kernel

@@ -8,16 +8,21 @@ public import GroundTheory.AutomorphicForms.GeometricLemma
 
 set_option maxSynthPendingDepth 1
 open GlobalTheory.SmGL
-open GroundTheory.Automorphic.Parabolic (levi parabolicInd jacquetRep JacquetModule sqrtModular leviIncl cellLeviSub normInducing unipotentRadical leviPar normLeviParSqrtModular)
+open GroundTheory.Automorphic.Parabolic
+  (levi parabolicInd jacquetRep JacquetModule sqrtModular leviIncl cellLeviSub normInducing
+    unipotentRadical leviPar normLeviParSqrtModular)
 open GroundTheory.Automorphic.Iwasawa (blockUpper)
 open GroundTheory.Automorphic (permGL indRep)
 open DoubleCoset (doubleCoset)
 
 namespace GlobalTheory.CompanionTheory.RelUnipBridge
 
-theorem one_apply_sigma {k n α : Type} [Zero k] [One k] [DecidableEq n] {m : α → Type}
-    [∀ a, DecidableEq (m a)] (e : (Σ a, m a) ≃ n) (a : α) (r s : m a) :
-    (1 : Matrix n n k) (e ⟨a, r⟩) (e ⟨a, s⟩) = (1 : Matrix (m a) (m a) k) r s := by
+theorem one_apply_sigma
+    {k n α : Type} [Zero k] [One k] [DecidableEq n]
+    {m : α → Type} [∀ a, DecidableEq (m a)]
+    (e : (Σ a, m a) ≃ n)
+    (a : α) (r s : m a)
+    : (1 : Matrix n n k) (e ⟨a, r⟩) (e ⟨a, s⟩) = (1 : Matrix (m a) (m a) k) r s := by
   by_cases h : r = s
   · subst h; simp
   · rw [Matrix.one_apply_ne h, Matrix.one_apply_ne]
@@ -26,7 +31,16 @@ theorem one_apply_sigma {k n α : Type} [Zero k] [One k] [DecidableEq n] {m : α
     simp only [Sigma.mk.injEq, heq_eq_eq, true_and] at this
     exact h this
 
-theorem mem_relUnip_iff_leviEmb_mem : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {α β' : Type} [Fintype α] [LinearOrder α] [Fintype β'] [LinearOrder β'] {N : ℕ} {m : α → Type} [∀ i, Fintype (m i)] [∀ i, DecidableEq (m i)] {c : α → β' → Type} [∀ i j, Fintype (c i j)] [∀ i j, DecidableEq (c i j)] (e : (Σ i, m i) ≃ Fin N) (f : ∀ i, (Σ j, c i j) ≃ m i) (δ : Fin N → ℕ) (hδ : ∀ i j j' (t : c i j) (t' : c i j'), δ (e ⟨i, f i ⟨j, t⟩⟩) < δ (e ⟨i, f i ⟨j', t'⟩⟩) ↔ j < j') (x : Levi k m), x ∈ relUnip k f ↔ leviEmb k e x ∈ unipotentRadical k N δ := by
+theorem mem_relUnip_iff_leviEmb_mem
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {α β' : Type} [Fintype α] [LinearOrder α] [Fintype β'] [LinearOrder β'] {N : ℕ}
+        {m : α → Type} [∀ i, Fintype (m i)] [∀ i, DecidableEq (m i)] {c : α → β' → Type}
+        [∀ i j, Fintype (c i j)] [∀ i j, DecidableEq (c i j)] (e : (Σ i, m i) ≃ Fin N)
+        (f : ∀ i, (Σ j, c i j) ≃ m i) (δ : Fin N → ℕ)
+        (hδ : ∀ i j j' (t : c i j) (t' : c i j'),
+          δ (e ⟨i, f i ⟨j, t⟩⟩) < δ (e ⟨i, f i ⟨j', t'⟩⟩) ↔ j < j')
+        (x : Levi k m),
+      x ∈ relUnip k f ↔ leviEmb k e x ∈ unipotentRadical k N δ := by
   intro k _ _ _ _ α β' _ _ _ _ N m _ _ c _ _ e f δ hδ x
   rw [GroundTheory.Automorphic.Parabolic.mem_unipotentRadical]
   constructor

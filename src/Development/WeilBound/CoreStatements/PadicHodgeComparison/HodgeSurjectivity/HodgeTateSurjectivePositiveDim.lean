@@ -38,21 +38,28 @@ structure Sq (M : Model l K) (d : ℕ) where
   loc : sSup (𝒱D D) = ⊤
   blow : Nonempty (Blow P.q (Model.genMap Δ hΔ) (Model.genMap π hπ) (genD D) d)
 
-def SqEx : Prop := ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K] (M : Model l K)
-  (d : ℕ), M.Sm → SmoothOfRelativeDimension (d + 1) M.p → Nonempty (Sq M (d + 1))
+def SqEx : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K]
+      (M : Model l K) (d : ℕ),
+    M.Sm → SmoothOfRelativeDimension (d + 1) M.p → Nonempty (Sq M (d + 1))
 
 def castT {M : Model l K} {i j : ℕ} (h : i = j) (x : M.T i) : M.T j := h ▸ x
 
-def EtFin : Prop := ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K] (M : Model l K),
-  M.Sm → ∀ n, FiniteDimensional ℚ_[l] (M.V n)
+def EtFin : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K]
+      (M : Model l K),
+    M.Sm → ∀ n, FiniteDimensional ℚ_[l] (M.V n)
 
 def Surj (P : HTPre l K) (M : Model l K) (n : ℕ) : Prop :=
   ∀ {m : ℕ → ℕ} (b : ∀ a, Module.Basis (Fin (m a)) K (Hdg M.q a n)) (z : ∀ a, Fin (m a) → ℂ_[l]),
-    (∀ v : M.V n, ∑ a ∈ Finset.range (n + 1), ∑ s, z a s * P.h M a n v ((b a).coord s) = 0) → ∀ a ≤ n, z a = 0
+    (∀ v : M.V n, ∑ a ∈ Finset.range (n + 1), ∑ s, z a s * P.h M a n v ((b a).coord s) = 0)
+      → ∀ a ≤ n, z a = 0
 
-def HodgeTateDimensionEquality : Prop := ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K]
-  (P : HTPre l K) (M : Model l K) (n : ℕ), M.Sm → FiniteDimensional ℚ_[l] (M.V n) → P.Inj M n → Surj P M n →
-  Module.finrank ℚ_[l] (M.V n) = ∑ a ∈ Finset.range (n + 1), Module.finrank K (Hdg M.q a n)
+def HodgeTateDimensionEquality : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K]
+      (P : HTPre l K) (M : Model l K) (n : ℕ),
+    M.Sm → FiniteDimensional ℚ_[l] (M.V n) → P.Inj M n → Surj P M n
+      → Module.finrank ℚ_[l] (M.V n) = ∑ a ∈ Finset.range (n + 1), Module.finrank K (Hdg M.q a n)
 
 end CrystallineSemistableComparison.Onto
 

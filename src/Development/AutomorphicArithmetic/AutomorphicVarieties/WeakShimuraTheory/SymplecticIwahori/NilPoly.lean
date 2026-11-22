@@ -7,10 +7,13 @@ public import Mathlib.RingTheory.Ideal.GoingUp
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Pp
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Ws.Pp
 
-theorem UpperTheory.V.Ws.Pp.nilPoly :
-    ∀ {B S : Type} [CommRing B] [IsLocalRing B] [CommRing S] [IsLocalRing S] [Algebra B S] [Module.Finite B S] (v : S), v ∈ maximalIdeal S → ∃ p : B[X], Dist (maximalIdeal B) p ∧ aeval v p = 0 := by
+theorem UpperTheory.V.Ws.Pp.nilPoly
+    : ∀ {B S : Type} [CommRing B] [IsLocalRing B] [CommRing S] [IsLocalRing S] [Algebra B S]
+        [Module.Finite B S] (v : S),
+      v ∈ maximalIdeal S → ∃ p : B[X], Dist (maximalIdeal B) p ∧ aeval v p = 0 := by
   intro B S _ _ _ _ _ _ v hv
   have hrad : v ∈ ((maximalIdeal B).map (algebraMap B S)).radical := by
     rw [Ideal.radical_eq_sInf, Ideal.mem_sInf]
@@ -31,14 +34,15 @@ theorem UpperTheory.V.Ws.Pp.nilPoly :
   have hN : v ^ (n + 1) ∈ (maximalIdeal B).map (algebraMap B S) := by
     rw [pow_succ]
     exact Ideal.mul_mem_right _ _ hn
-  have hrange : LinearMap.range (Algebra.lmul B S (v ^ (n + 1))) ≤
-      (maximalIdeal B) • (⊤ : Submodule B S) := by
+  have hrange
+      : LinearMap.range (Algebra.lmul B S (v ^ (n + 1)))
+        ≤ (maximalIdeal B) • (⊤ : Submodule B S) := by
     rintro _ ⟨s, rfl⟩
     rw [Ideal.smul_top_eq_map, Submodule.restrictScalars_mem]
     simpa using Ideal.mul_mem_right s _ hN
   obtain ⟨p, hpm, -, hpc, hpa⟩ :=
-    LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero
-      (R := B) (M := S) (Algebra.lmul B S (v ^ (n + 1))) (maximalIdeal B) hrange
+    LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero (R := B) (M := S)
+      (Algebra.lmul B S (v ^ (n + 1))) (maximalIdeal B) hrange
   refine ⟨expand B (n + 1) p, ⟨hpm.expand (Nat.succ_pos n), ?_⟩, ?_⟩
   · intro k hk
     rw [natDegree_expand] at hk

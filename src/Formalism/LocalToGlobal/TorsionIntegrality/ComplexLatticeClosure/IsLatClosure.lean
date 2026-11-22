@@ -21,8 +21,11 @@ def IsLatClosure : Prop :=
 def IsLatSmul : Prop := ∀ (Λ : AddSubgroup ℂ) (c : ℂ), c ≠ 0 → IsLat Λ → IsLat (c • Λ)
 
 def LatILat : Prop :=
-  ∀ (K : Type) [Field K] [NumberField K] (d : ℕ) [Fact d.Prime], d % 4 = 3 → ∀ x : K, x ^ 2 = -(d : K) →
-    Module.finrank ℚ K = 2 → ∀ (φ : K →+* ℂ) (𝔞 : Ideal (𝓞 K)) (δ : ℂ), 𝔞 ≠ ⊥ → δ ≠ 0 →
-      IsLat (latI φ 𝔞 δ) ∧ HasCM d (latI φ 𝔞 δ)
+  ∀ (K : Type) [Field K] [NumberField K] (d : ℕ) [Fact d.Prime],
+    d % 4 = 3
+      → ∀ x : K,
+        x ^ 2 = -(d : K) → Module.finrank ℚ K = 2
+          → ∀ (φ : K →+* ℂ) (𝔞 : Ideal (𝓞 K)) (δ : ℂ),
+            𝔞 ≠ ⊥ → δ ≠ 0 → IsLat (latI φ 𝔞 δ) ∧ HasCM d (latI φ 𝔞 δ)
 
 end Formalism.L2.Th1.F2

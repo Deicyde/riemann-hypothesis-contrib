@@ -27,14 +27,17 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.ProjectiveBun
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
 
-private theorem isUnit_last_join {N : ℕ} {A : Type} [CommRing A] (x : Um N A × Um 2 A) (h : IsUnit (x.2.1 1)) :
-    IsUnit ((Um.join x).1 (Fin.last N)) := by
+private theorem isUnit_last_join
+    {N : ℕ} {A : Type} [CommRing A] (x : Um N A × Um 2 A) (h : IsUnit (x.2.1 1))
+    : IsUnit ((Um.join x).1 (Fin.last N)) := by
   simpa [Um.join] using h
 
-private theorem closedSubgroup_cutoff_exists {N : ℕ} {A : Type} [CommRing A] (x : Um N A × Um 2 A) (h : IsUnit (x.2.1 0)) :
-    Ideal.span ((Um.join x).1 '' Set.range Fin.castSucc) = ⊤ := by
+private theorem closedSubgroup_cutoff_exists
+    {N : ℕ} {A : Type} [CommRing A] (x : Um N A × Um 2 A) (h : IsUnit (x.2.1 0))
+    : Ideal.span ((Um.join x).1 '' Set.range Fin.castSucc) = ⊤ := by
   obtain ⟨u, hu⟩ := h
   have e : (Um.join x).1 '' Set.range Fin.castSucc = (fun i => (u : A) * x.1.1 i) '' Set.univ := by
     ext y
@@ -46,19 +49,26 @@ private theorem closedSubgroup_cutoff_exists {N : ℕ} {A : Type} [CommRing A] (
   rw [e, span_scale, Set.image_univ]
   exact x.1.2
 
-theorem UpperTheory.two_open_cover_of_map_incl_comap :
-    ∀ (R : Type) [CommRing R] (N : ℕ) (E : Spc),
-        Cover2 R (Sp.map E (incl ((Q1 N).comap (βC N)))) (Sp.map E (incl ((Q2 N).comap (βC N)))) := by
+theorem UpperTheory.two_open_cover_of_map_incl_comap
+    : ∀ (R : Type) [CommRing R] (N : ℕ) (E : Spc),
+      Cover2 R (Sp.map E (incl ((Q1 N).comap (βC N)))) (Sp.map E (incl ((Q2 N).comap (βC N)))) := by
   intro R _ N E
-  refine UpperTheory.mayerVietoris_stackProduct_of_injective_of_locally_covered R E _ _ (fun A => Subtype.val_injective) (fun A => Subtype.val_injective)
-    (fun A => Function.bijective_id) (fun A => Function.bijective_id) ?_
+  refine UpperTheory.mayerVietoris_stackProduct_of_injective_of_locally_covered R E _ _
+    (fun A => Subtype.val_injective)
+    (fun A => Subtype.val_injective)
+    (fun A => Function.bijective_id)
+    (fun A => Function.bijective_id)
+    ?_
   intro T x
-  obtain ⟨S, hS, hP⟩ := UpperTheory.locally_exists_isUnit_of_span_range_eq_top T (show Um N Γ(T, ⊤) × Um 2 Γ(T, ⊤) from x).2.1
-    (show Um N Γ(T, ⊤) × Um 2 Γ(T, ⊤) from x).2.2
+  obtain ⟨S, hS, hP⟩ :=
+    UpperTheory.locally_exists_isUnit_of_span_range_eq_top T
+      (show Um N Γ(T, ⊤) × Um 2 Γ(T, ⊤) from x).2.1 (show Um N Γ(T, ⊤) × Um 2 Γ(T, ⊤) from x).2.2
   refine ⟨S, hS, fun V g hg => ?_⟩
   obtain ⟨i, hi⟩ := hP V g hg
-  have hx : (show Um N Γ(V, ⊤) × Um 2 Γ(V, ⊤) from (BC N).D.map g.appTop x).2.1 i =
-      g.appTop.hom ((show Um N Γ(T, ⊤) × Um 2 Γ(T, ⊤) from x).2.1 i) := rfl
+  have hx
+      : (show Um N Γ(V, ⊤) × Um 2 Γ(V, ⊤) from (BC N).D.map g.appTop x).2.1 i
+        = g.appTop.hom ((show Um N Γ(T, ⊤) × Um 2 Γ(T, ⊤) from x).2.1 i) :=
+    rfl
   rw [← hx] at hi
   fin_cases i
   · exact Or.inr ⟨⟨_, closedSubgroup_cutoff_exists _ hi⟩, rfl⟩

@@ -9,13 +9,13 @@ open Polynomial
 
 namespace GlobalTheory.CyclicVector
 
-theorem exists_linearIndependent_iterates_of_linearIndependent_pow {K : Type} [Field K] {r : ℕ}
-    (g : Matrix (Fin r) (Fin r) K)
-    (hg : LinearIndependent K (fun i : Fin r => g ^ (i : ℕ))) :
-    ∃ v : Fin r → K, LinearIndependent K (fun i : Fin r => (g ^ (i : ℕ)) *ᵥ v) := by
+theorem exists_linearIndependent_iterates_of_linearIndependent_pow
+    {K : Type} [Field K]
+    {r : ℕ} (g : Matrix (Fin r) (Fin r) K) (hg : LinearIndependent K (fun i : Fin r => g ^ (i : ℕ)))
+    : ∃ v : Fin r → K, LinearIndependent K (fun i : Fin r => (g ^ (i : ℕ)) *ᵥ v) := by
   classical
-  obtain ⟨x, hx⟩ := Module.exists_ker_toSpanSingleton_eq_annihilator K[X]
-    (Module.AEval' (Matrix.toLin' g))
+  obtain ⟨x, hx⟩ :=
+    Module.exists_ker_toSpanSingleton_eq_annihilator K[X] (Module.AEval' (Matrix.toLin' g))
   set v := (Module.AEval'.of (Matrix.toLin' g)).symm x with hv
   refine ⟨v, ?_⟩
   rw [Fintype.linearIndependent_iff] at hg ⊢
@@ -23,7 +23,7 @@ theorem exists_linearIndependent_iterates_of_linearIndependent_pow {K : Type} [F
   let q : K[X] := ∑ j : Fin r, monomial (j : ℕ) (c j)
   have haq : aeval g q = ∑ j : Fin r, c j • g ^ (j : ℕ) := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [q, map_sum, aeval_monomial, Algebra.smul_def]
+    simp [q, map_sum, aeval_monomial, Algebra.smul_def]
   have ha : ∀ p : K[X], aeval (Matrix.toLin' g) p = Matrix.toLin' (aeval g p) := fun p =>
     (aeval_algHom_apply (Matrix.toLinAlgEquiv' (R := K) (n := Fin r)) g p)
   have hqv : aeval g q *ᵥ v = 0 := by

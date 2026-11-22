@@ -8,7 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sel
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel IsLocalRing GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.LatPair GlobalTheory.SplitWeil GlobalTheory.SeeSaw GlobalTheory.FinPl
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel
+  IsLocalRing GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.LatPair
+  GlobalTheory.SplitWeil GlobalTheory.SeeSaw GlobalTheory.FinPl
 
 set_option synthInstance.maxHeartbeats 200000
 set_option maxHeartbeats 1000000
@@ -19,8 +23,9 @@ open GlobalTheory.FinPlLoc
 
 variable {D : D7}
 
-theorem mul_eq_zero_of_ne {x w : Pl D} (h : w ≠ x) {a b : AE D} (ha : a ∈ idAt D (· = x)) (hb : b ∈ idAt D (· = w)) :
-    a * b = 0 := by
+theorem mul_eq_zero_of_ne
+    {x w : Pl D} (h : w ≠ x) {a b : AE D} (ha : a ∈ idAt D (· = x)) (hb : b ∈ idAt D (· = w))
+    : a * b = 0 := by
   apply eq_zero_of_comp
   · rw [map_mul, infPart_of_idAt ha, zero_mul]
   · intro v
@@ -29,8 +34,11 @@ theorem mul_eq_zero_of_ne {x w : Pl D} (h : w ≠ x) {a b : AE D} (ha : a ∈ id
     · rw [compAt_of_idAt hb (w := v) (fun h' => h (h'.symm.trans hv)), mul_zero]
     · rw [compAt_of_idAt ha (w := v) hv, zero_mul]
 
-theorem mulVec_eq_of_ne {S : HSp D} {x w : Pl D} (h : w ≠ x) {g : GA D S} (hg : g ∈ grpAt S (· = x))
-    {y : Fin S.rank → AE D} (hy : ∀ i, y i ∈ idAt D (· = w)) : mt S g *ᵥ y = y := by
+theorem mulVec_eq_of_ne
+    {S : HSp D} {x w : Pl D} (h : w ≠ x)
+    {g : GA D S} (hg : g ∈ grpAt S (· = x))
+    {y : Fin S.rank → AE D} (hy : ∀ i, y i ∈ idAt D (· = w))
+    : mt S g *ᵥ y = y := by
   have hg' := (mem_congGrp _ g).1 hg
   have h0 : (mt S g - 1) *ᵥ y = 0 := by
     funext i
@@ -39,8 +47,11 @@ theorem mulVec_eq_of_ne {S : HSp D} {x w : Pl D} (h : w ≠ x) {g : GA D S} (hg 
   rw [Matrix.sub_mulVec, Matrix.one_mulVec, sub_eq_zero] at h0
   exact h0
 
-theorem latV_eq_off {S : HSp D} {x w : Pl D} (h : w ≠ x) {g : GA D S} (hg : g ∈ grpAt S (· = x)) {L M : Lat S}
-    (hm : Moves S g L M (· = w)) : latV S M (· = w) = latV S L (· = w) := by
+theorem latV_eq_off
+    {S : HSp D} {x w : Pl D} (h : w ≠ x)
+    {g : GA D S} (hg : g ∈ grpAt S (· = x))
+    {L M : Lat S} (hm : Moves S g L M (· = w))
+    : latV S M (· = w) = latV S L (· = w) := by
   ext y
   constructor
   · intro hy
@@ -52,8 +63,10 @@ theorem latV_eq_off {S : HSp D} {x w : Pl D} (h : w ≠ x) {g : GA D S} (hg : g 
     have := (hm y hid).1 hy
     rwa [mulVec_eq_of_ne h hg hid] at this
 
-theorem latV_le_of_moves {S : HSp D} {P : Pl D → Prop} {g : GA D S} {L M M' : Lat S} (hm : Moves S g L M P)
-    (hm' : Moves S g L M' P) : latV S M P ≤ latV S M' P := by
+theorem latV_le_of_moves
+    {S : HSp D} {P : Pl D → Prop} {g : GA D S} {L M M' : Lat S}
+    (hm : Moves S g L M P) (hm' : Moves S g L M' P)
+    : latV S M P ≤ latV S M' P := by
   intro y hy
   have hid := latV_idAt hy
   have hz : ∀ i, (mt S g⁻¹ *ᵥ y) i ∈ idAt D P := fun i => by
@@ -65,16 +78,20 @@ theorem latV_le_of_moves {S : HSp D} {P : Pl D → Prop} {g : GA D S} {L M M' : 
   have h2 := (hm' _ hz).1 h1
   rwa [he] at h2
 
-theorem patch : ∀ (D : D7) (S : HSp D) (L L' : Lat S), IsSelfDualC S L → IsSelfDualC S L' → ∀ Z : Finset (Pl D),
-    ∃ M : Lat S, IsSelfDualC S M ∧ (∀ x ∈ Z, latV S M (· = x) = latV S L' (· = x)) ∧
-      ∀ x, x ∉ Z → latV S M (· = x) = latV S L (· = x) := by
+theorem patch
+    : ∀ (D : D7) (S : HSp D) (L L' : Lat S),
+      IsSelfDualC S L → IsSelfDualC S L'
+        → ∀ Z : Finset (Pl D), ∃ M : Lat S,
+          IsSelfDualC S M ∧ (∀ x ∈ Z, latV S M (· = x) = latV S L' (· = x))
+            ∧ ∀ x, x ∉ Z → latV S M (· = x) = latV S L (· = x) := by
   classical
   intro D S L L' hL hL' Z
   induction Z using Finset.induction_on with
   | empty => exact ⟨L, hL, fun x hx => absurd hx (Finset.notMem_empty x), fun _ _ => rfl⟩
   | insert x Z hx ih =>
     obtain ⟨M, hM, h1, h2⟩ := ih
-    obtain ⟨g, hg, hgm⟩ := GlobalTheory.T.selfDualLattices_conjugate_at_finitePlace D S M L' hM hL' x
+    obtain ⟨g, hg, hgm⟩ :=
+      GlobalTheory.T.selfDualLattices_conjugate_at_finitePlace D S M L' hM hL' x
     obtain ⟨M', hM', hmv⟩ := (GlobalTheory.T.selfDual_image_adelicPoint_wittCore D S M hM).1 g
     refine ⟨M', hM', fun w hw => ?_, fun w hw => ?_⟩
     · by_cases hwx : w = x

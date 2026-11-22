@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
 private lemma exists_hom {R Ω : Type} [CommRing R] [Field Ω] (x : gp Ω ⟶ Spec (CommRingCat.of R)) :
     ∃ φ : R →+* Ω, x = Spec.map (CommRingCat.ofHom φ) := by
@@ -30,8 +31,7 @@ private lemma pt_map {R Ω : Type} [CommRing R] [Field Ω] (f : R →+* Ω) :
   show a ∈ (Ideal.comap f (IsLocalRing.closedPoint Ω).asIdeal) ↔ _
   simp [IsLocalRing.closedPoint, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
 
-theorem UpperTheory.Gal.TranscendenceTraces.splitCover_of :
-    SplitField → GalTrans → SplitCover := by
+theorem UpperTheory.Gal.TranscendenceTraces.splitCover_of : SplitField → GalTrans → SplitCover := by
   intro hsf hgt A B _ _ _ _ _ _
   obtain ⟨L, _, _, _, _, _, _, hfin, hsp⟩ := hsf A B
   set C := integralClosure A L
@@ -41,25 +41,37 @@ theorem UpperTheory.Gal.TranscendenceTraces.splitCover_of :
       have := congrArg (fun c : C => (c : L)) hab
       simpa using this
     rw [IsScalarTower.algebraMap_apply A (FractionRing A) L a,
-      IsScalarTower.algebraMap_apply A (FractionRing A) L b] at h1
+        IsScalarTower.algebraMap_apply A (FractionRing A) L b]
+      at h1
     exact IsFractionRing.injective A (FractionRing A) ((algebraMap (FractionRing A) L).injective h1)
-  have key : ∀ {Ω : Type} [Field Ω] (φ : C →+* Ω),
-      RingHom.ker (φ.comp (algebraMap A C)) = ⊥ → RingHom.ker φ = ⊥ := by
+  have key
+      : ∀ {Ω : Type} [Field Ω] (φ : C →+* Ω),
+        RingHom.ker (φ.comp (algebraMap A C)) = ⊥ → RingHom.ker φ = ⊥ := by
     intro Ω _ φ h
     apply Ideal.eq_bot_of_comap_eq_bot (R := A)
     change Ideal.comap (algebraMap A C) (RingHom.ker φ) = ⊥
     rw [RingHom.comap_ker]
     exact h
-  refine ⟨Spec (CommRingCat.of C), Spec.map (CommRingCat.ofHom (algebraMap A C)), (B →ₐ[A] C),
+  refine ⟨
+    Spec (CommRingCat.of C),
+    Spec.map (CommRingCat.ofHom (algebraMap A C)),
+    (B →ₐ[A] C),
     fun j => Spec.map (CommRingCat.ofHom (j : B →+* C)),
     fun j => (⟨RingHom.ker (j : B →+* C), RingHom.ker_isPrime _⟩ : PrimeSpectrum B),
-    ?_, ?_, hfin, ?_, ?_, ?_⟩
+    ?_,
+    ?_,
+    hfin,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact IsIntegralHom.SpecMap_iff.mpr (fun x => Algebra.IsIntegral.isIntegral x)
   · refine ⟨fun p => ?_⟩
     have hp : p.asIdeal.IsPrime := p.isPrime
-    obtain ⟨Q, -, hQ, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := C) p.asIdeal ⊥ (by
-      rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]
-      exact bot_le)
+    obtain ⟨Q, -, hQ, hQc⟩ :=
+      Ideal.exists_ideal_over_prime_of_isIntegral (S := C) p.asIdeal ⊥ (by
+        rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]
+        exact bot_le)
     exact ⟨⟨Q, hQ⟩, PrimeSpectrum.ext hQc⟩
   · intro j
     rw [map_comp']
@@ -70,15 +82,16 @@ theorem UpperTheory.Gal.TranscendenceTraces.splitCover_of :
     obtain ⟨φ', rfl⟩ := exists_hom x'
     simp only [map_comp'] at hxx
     obtain ⟨g, hg⟩ := hgt A L Ω φ φ' (map_inj' hxx)
-    let e : (B →ₐ[A] C) ≃ (B →ₐ[A] C) :=
-      { toFun := fun j => (g.symm : C →ₐ[A] C).comp j
-        invFun := fun j => (g : C →ₐ[A] C).comp j
-        left_inv := fun j => by
-          ext b
-          simp
-        right_inv := fun j => by
-          ext b
-          simp }
+    let e : (B →ₐ[A] C) ≃ (B →ₐ[A] C) := {
+      toFun := fun j => (g.symm : C →ₐ[A] C).comp j
+      invFun := fun j => (g : C →ₐ[A] C).comp j
+      left_inv := fun j => by
+        ext b
+        simp
+      right_inv := fun j => by
+        ext b
+        simp
+    }
     refine ⟨e, fun j => ⟨?_, ?_⟩⟩
     · simp only [map_comp']
       congr 2
@@ -93,9 +106,11 @@ theorem UpperTheory.Gal.TranscendenceTraces.splitCover_of :
     simp only [map_comp'] at hz
     rw [map_comp', pt_map] at hbot
     have hφ : Function.Injective φ := (RingHom.injective_iff_ker_eq_bot φ).mpr (key φ hbot)
-    have hiff : ∀ j : B →ₐ[A] C, Spec.map (CommRingCat.ofHom φ) ≫
-        Spec.map (CommRingCat.ofHom (j : B →+* C)) = Spec.map (CommRingCat.ofHom ζ) ↔
-        φ.comp (j : B →+* C) = ζ := by
+    have hiff
+        : ∀ j : B →ₐ[A] C,
+          Spec.map (CommRingCat.ofHom φ) ≫ Spec.map (CommRingCat.ofHom (j : B →+* C))
+              = Spec.map (CommRingCat.ofHom ζ)
+            ↔ φ.comp (j : B →+* C) = ζ := by
       intro j
       rw [map_comp']
       exact ⟨map_inj', fun h => by rw [h]⟩

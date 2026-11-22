@@ -14,7 +14,8 @@ noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory
 open PositivityTheory.Rg.Rs
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E
+  PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
 
@@ -22,13 +23,14 @@ attribute [local instance] borelH
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-private theorem centre_eq (τ : ℝ) : splitCentre E n τ = (An.tor E (fun _ : Fin n => τ) : GA E n) := by
+private theorem centre_eq (τ : ℝ)
+    : splitCentre E n τ = (An.tor E (fun _ : Fin n => τ) : GA E n) := by
   have h := GlobalTheory.CuspBoundSiegel.diagUnits_posIdele (E := E) n (Real.exp_pos τ)
   rw [Real.log_exp] at h
   rw [← h, DiscreteGroups.T1.G.Dcy.tor_eq]
 
-private theorem logSize_centre (τ : ℝ) :
-    logSize (splitCentre E n τ) ≤ 2 * Module.finrank ℚ E * |τ| := by
+private theorem logSize_centre (τ : ℝ)
+    : logSize (splitCentre E n τ) ≤ 2 * Module.finrank ℚ E * |τ| := by
   rw [centre_eq]
   refine ((torNorm_holds E).2 n _).2.trans ?_
   have h : ‖(fun _ : Fin n => τ)‖ ≤ |τ| :=
@@ -40,8 +42,9 @@ private theorem logSize_inv' (g : GA E n) : logSize (g⁻¹) = logSize g := by
   rw [inv_inv, add_comm]
 
 private theorem deg_top (g : GA E n) : deg g ⊤ = deg (1 : GA E n) ⊤ + logAbs g.val.det := by
-  have e : (((1 : Matrix (Fin n) (Fin n) E)ᵀ : Matrix (Fin n) (Fin n) E) : Fin n → Fin n → E) =
-      ⇑(Pi.basisFun E (Fin n)) := by
+  have e
+      : (((1 : Matrix (Fin n) (Fin n) E)ᵀ : Matrix (Fin n) (Fin n) E) : Fin n → Fin n → E)
+        = ⇑(Pi.basisFun E (Fin n)) := by
     ext i j
     simp [Matrix.one_apply, Pi.single_apply, eq_comm]
   have hli : LinearIndependent E ((1 : Matrix (Fin n) (Fin n) E)ᵀ) := by
@@ -55,8 +58,8 @@ private theorem deg_top (g : GA E n) : deg g ⊤ = deg (1 : GA E n) ⊤ + logAbs
   rw [hsp] at h1 h2
   rw [← h1, ← h2, h3]
 
-private theorem abs_logAbs_le : ∃ C : ℝ, 0 ≤ C ∧ ∀ g : GA E n,
-    |logAbs g.val.det| ≤ C * (1 + logSize g) := by
+private theorem abs_logAbs_le
+    : ∃ C : ℝ, 0 ≤ C ∧ ∀ g : GA E n, |logAbs g.val.det| ≤ C * (1 + logSize g) := by
   obtain ⟨C, hC, h⟩ := degRight E n
   refine ⟨C, hC, fun g => abs_le.2 ⟨?_, ?_⟩⟩
   · have h1 := h g g⁻¹ ⊤
@@ -74,8 +77,7 @@ private theorem sizes' : Sizes := by
   refine ⟨2 + |c₀| + C, hc, fun x => ⟨?_, ?_, DiscreteGroups.T1.G.Dcy.redSize_nonneg _⟩⟩
   · set l := ldet x with hl
     set d : ℝ := (Module.finrank ℚ E : ℝ) with hd
-    have hd0 : 0 < d := by
-      rw [hd]; exact_mod_cast Module.finrank_pos (R := ℚ) (M := E)
+    have hd0 : 0 < d := by rw [hd]; exact_mod_cast Module.finrank_pos (R := ℚ) (M := E)
     have hn0 : (1 : ℝ) ≤ n := by exact_mod_cast hn
     set τ : ℝ := l / (n * d) with hτ
     set y : GA E n := splitCentre E n (-l / (n * d)) * x.1 with hy

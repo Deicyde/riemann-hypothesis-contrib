@@ -45,9 +45,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCommon
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
 open GlobalTheory.AllWt (Psi wtOf cuspOn latOn normOn petOn GoodOn GoodW bergOn framesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
@@ -62,67 +65,90 @@ section Gen
 
 open MeasureTheory ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions.TH
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ} {D : D7}
-
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ} {D : D7}
 
 set_option maxHeartbeats 2000000 in
-theorem exists_semilinear_L2_independent (hS : Out.SecBaseChangeSt) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (σ : c.F →+* ℂ)
-    (hσ : GoodEmb c σ) (hU : IsUnf (U σ)) (V : HSp D)
-    (dict : Formalism.L2.Theta.GA D V → Σ k, Frame ((U σ).X k).Ψ r) (mu : Formalism.L2.Theta.GA D V → ℂ)
-    (hmu1 : ∀ g, ‖mu g‖ = 1) (hm : Formalism.L2.Pj.AdelMeas U σ V dict mu) (hae : Formalism.L2.Pj.AeDom U σ V dict mu)
-    (hd : ∀ g, (dict g).2 ∈ ((U σ).X (dict g).1).dom)
-    (hunit : ∀ g τ i, ‖dmin ((U σ).X (dict g).1).Gm (dict g).2 τ i‖ = 1) (G : WTZ E) (x : ℝ) :
-    ∃ Φ : GlobalTheory.AllWt.cuspW Xo c U G →+ Lp ℂ 2 (muQ1 V), (∀ (a : c.F) f, Φ (a • f) = σ a • Φ f) ∧
-      (∀ f : GlobalTheory.AllWt.cuspW Xo c U G, GlobalTheory.AllWt.petAt (U σ) x V dict (muQ1 V) G (f : Rul Xo c) = ‖Φ f‖) ∧
-      ∀ (n : ℕ) (e : Fin n → GlobalTheory.AllWt.cuspW Xo c U G), LinearIndependent c.F e →
-        LinearIndependent ℂ (fun i => Φ (e i)) := by
-  have hhol : ∀ f : GlobalTheory.AllWt.cuspW Xo c U G,
-      rdU (U σ) (f : Rul Xo c) ∈ holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G) := fun f =>
+theorem exists_semilinear_L2_independent
+    (hS : Out.SecBaseChangeSt)
+    (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (σ : c.F →+* ℂ) (hσ : GoodEmb c σ) (hU : IsUnf (U σ))
+    (V : HSp D) (dict : Formalism.L2.Theta.GA D V → Σ k, Frame ((U σ).X k).Ψ r)
+    (mu : Formalism.L2.Theta.GA D V → ℂ)
+    (hmu1 : ∀ g, ‖mu g‖ = 1) (hm : Formalism.L2.Pj.AdelMeas U σ V dict mu)
+    (hae : Formalism.L2.Pj.AeDom U σ V dict mu) (hd : ∀ g, (dict g).2 ∈ ((U σ).X (dict g).1).dom)
+    (hunit : ∀ g τ i, ‖dmin ((U σ).X (dict g).1).Gm (dict g).2 τ i‖ = 1)
+    (G : WTZ E) (x : ℝ)
+    : ∃ Φ : GlobalTheory.AllWt.cuspW Xo c U G →+ Lp ℂ 2 (muQ1 V),
+      (∀ (a : c.F) f, Φ (a • f) = σ a • Φ f)
+        ∧ (∀ f : GlobalTheory.AllWt.cuspW Xo c U G,
+          GlobalTheory.AllWt.petAt (U σ) x V dict (muQ1 V) G (f : Rul Xo c) = ‖Φ f‖)
+        ∧ ∀ (n : ℕ) (e : Fin n → GlobalTheory.AllWt.cuspW Xo c U G),
+          LinearIndependent c.F e → LinearIndependent ℂ (fun i => Φ (e i)) := by
+  have hhol
+      : ∀ f : GlobalTheory.AllWt.cuspW Xo c U G,
+        rdU (U σ) (f : Rul Xo c) ∈ holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G) := fun f =>
     (GlobalTheory.AllWt.mem_cuspW.1 f.2).2 σ hσ
-  have heq : ∀ P : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G),
-      eLpNorm (onQ V (adel V dict mu P)) 2 (muQ1 V) =
-        GlobalTheory.AllWt.petE V dict (muQ1 V) (GlobalTheory.AllWt.modelWt (U σ) G) P := by
+  have heq
+      : ∀ P : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G),
+        eLpNorm (onQ V (adel V dict mu P)) 2 (muQ1 V)
+          = GlobalTheory.AllWt.petE V dict (muQ1 V) (GlobalTheory.AllWt.modelWt (U σ) G) P := by
     intro P
     unfold GlobalTheory.AllWt.petE
-    have hp : ∀ q : AutQ V, ‖mu q.out * (P : FDSec (U σ).X) (dict q.out).1 (dict q.out).2‖ =
-        GlobalTheory.AllWt.ptN (GlobalTheory.AllWt.modelWt (U σ) G) P (dict q.out) := by
+    have hp
+        : ∀ q : AutQ V,
+          ‖mu q.out * (P : FDSec (U σ).X) (dict q.out).1 (dict q.out).2‖
+            = GlobalTheory.AllWt.ptN (GlobalTheory.AllWt.modelWt (U σ) G) P (dict q.out) := by
       intro q
-      rw [norm_mul, hmu1, one_mul, GlobalTheory.AllWt.ptN,
-        pnorm_eq_of_unit _ _ _ _ (hunit q.out)]
+      rw [norm_mul, hmu1, one_mul, GlobalTheory.AllWt.ptN, pnorm_eq_of_unit _ _ _ _ (hunit q.out)]
     have hf := aesm_of_holSub hm _ P.2
     have hg := hf.norm.congr (Filter.Eventually.of_forall hp)
-    have hh := eLpNorm_congr_norm_ae (p := 2) hf hg (Filter.Eventually.of_forall fun q => by
-      rw [Real.norm_of_nonneg (GlobalTheory.AllWt.ptN_nonneg _ _ _)]
-      exact hp q)
+    have hh :=
+      eLpNorm_congr_norm_ae (p := 2) hf hg
+        (Filter.Eventually.of_forall fun q => by
+          rw [Real.norm_of_nonneg (GlobalTheory.AllWt.ptN_nonneg _ _ _)]
+          exact hp q)
     rw [eLpNorm_eq_eLpNorm' (by norm_num) (by simp) hg] at hh
     simpa using hh
-  have hmem : ∀ P : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G),
-      MemLp (onQ V (adel V dict mu (P : FDSec (U σ).X))) 2 (muQ1 V) := fun P =>
-    by
-      change eLpNorm _ _ _ < ⊤
-      rw [heq P]
-      exact lt_top_iff_ne_top.2 (GlobalTheory.AllWt.petE_ne_top V dict (muQ1 V) prob_le_one hd P.2)
-  let L : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G) →ₗ[ℂ] Lp ℂ 2 (muQ1 V) :=
-    { toFun := fun P => (hmem P).toLp _
-      map_add' := fun P Q => by
-        rw [← MemLp.toLp_add]
-        exact MemLp.toLp_congr _ _ (Filter.EventuallyEq.of_eq (by rw [Submodule.coe_add, map_add (f := _), map_add (f := _)]))
-      map_smul' := fun a P => by
-        rw [RingHom.id_apply, ← MemLp.toLp_const_smul]
-        exact MemLp.toLp_congr _ _ (Filter.EventuallyEq.of_eq (by rw [Submodule.coe_smul, map_smul, map_smul])) }
+  have hmem
+      : ∀ P : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G),
+        MemLp (onQ V (adel V dict mu (P : FDSec (U σ).X))) 2 (muQ1 V) := fun P => by
+    change eLpNorm _ _ _ < ⊤
+    rw [heq P]
+    exact lt_top_iff_ne_top.2 (GlobalTheory.AllWt.petE_ne_top V dict (muQ1 V) prob_le_one hd P.2)
+  let L : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G) →ₗ[ℂ] Lp ℂ 2 (muQ1 V) := {
+    toFun := fun P => (hmem P).toLp _
+    map_add' := fun P Q => by
+      rw [← MemLp.toLp_add]
+      exact MemLp.toLp_congr _ _
+        (Filter.EventuallyEq.of_eq (by rw [Submodule.coe_add, map_add (f := _), map_add (f := _)]))
+    map_smul' := fun a P => by
+      rw [RingHom.id_apply, ← MemLp.toLp_const_smul]
+      exact MemLp.toLp_congr _ _
+        (Filter.EventuallyEq.of_eq (by rw [Submodule.coe_smul, map_smul, map_smul]))
+  }
   have hL : ∀ P, L P = (hmem P).toLp _ := fun _ => rfl
-  let R : GlobalTheory.AllWt.cuspW Xo c U G → holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G) := fun f => ⟨_, hhol f⟩
-  have hRadd : ∀ f g, R (f + g) = R f + R g := fun f g => Subtype.ext (by
-    show rdU (U σ) ((f + g : GlobalTheory.AllWt.cuspW Xo c U G) : Rul Xo c) = rdU (U σ) (f : Rul Xo c) + rdU (U σ) (g : Rul Xo c)
-    rw [Submodule.coe_add, map_add (f := _)])
-  have hRsm : ∀ (a : c.F) f, R (a • f) = σ a • R f := fun a f => Subtype.ext (by
-    show rdU (U σ) ((a • f : GlobalTheory.AllWt.cuspW Xo c U G) : Rul Xo c) = σ a • rdU (U σ) (f : Rul Xo c)
-    rw [Submodule.coe_smul, map_smulₛₗ])
+  let R : GlobalTheory.AllWt.cuspW Xo c U G → holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G) :=
+    fun f => ⟨_, hhol f⟩
+  have hRadd : ∀ f g, R (f + g) = R f + R g := fun f g =>
+    Subtype.ext (by
+      show rdU (U σ) ((f + g : GlobalTheory.AllWt.cuspW Xo c U G) : Rul Xo c) = rdU (U σ) (f : Rul Xo c) + rdU (U σ) (g : Rul Xo c)
+      rw [Submodule.coe_add, map_add (f := _)])
+  have hRsm : ∀ (a : c.F) f, R (a • f) = σ a • R f := fun a f =>
+    Subtype.ext (by
+      show rdU (U σ) ((a • f : GlobalTheory.AllWt.cuspW Xo c U G) : Rul Xo c) = σ a • rdU (U σ) (f : Rul Xo c)
+      rw [Submodule.coe_smul, map_smulₛₗ])
   let cf : ℝ := GlobalTheory.AllWt.lieFacZ Dw x G
   have hcf : 0 < cf := GlobalTheory.AllWt.lieFacZ_pos x G
-  refine ⟨AddMonoidHom.mk' (fun f => (cf : ℂ) • L (R f)) (fun f g => by rw [hRadd, map_add (f := _), smul_add]),
-    fun a f => ?_, fun f => ?_, fun n e he => ?_⟩
+  refine ⟨
+    AddMonoidHom.mk'
+      (fun f => (cf : ℂ) • L (R f))
+      (fun f g => by rw [hRadd, map_add (f := _), smul_add]),
+    fun a f => ?_,
+    fun f => ?_,
+    fun n e he => ?_
+  ⟩
   · show (cf : ℂ) • L (R (a • f)) = σ a • ((cf : ℂ) • L (R f))
     rw [hRsm, map_smul, smul_comm]
   · show _ = ‖(cf : ℂ) • L (R f)‖
@@ -130,8 +156,10 @@ theorem exists_semilinear_L2_independent (hS : Out.SecBaseChangeSt) (U : ∀ σ 
     rfl
   · have hb : LinearIndependent c.F (fun i => (e i : Rul Xo c)) :=
       he.map' (GlobalTheory.AllWt.cuspW Xo c U G).subtype (Submodule.ker_subtype _)
-    have hc := GlobalTheory.reading_linearIndependent_secZ hS (U σ) hU _ n _
-      (fun i => GlobalTheory.AllWt.cuspW_le_secZ G (e i).2) hb
+    have hc :=
+      GlobalTheory.reading_linearIndependent_secZ hS (U σ) hU _ n _
+        (fun i => GlobalTheory.AllWt.cuspW_le_secZ G (e i).2)
+        hb
     rw [Fintype.linearIndependent_iff] at hc ⊢
     intro w hw
     refine hc w ?_
@@ -144,14 +172,17 @@ theorem exists_semilinear_L2_independent (hS : Out.SecBaseChangeSt) (U : ∀ σ 
       exact smul_comm _ _ _
     have h2 : L (∑ i, w i • R (e i)) = 0 :=
       (smul_eq_zero.1 h1).resolve_left (Complex.ofReal_ne_zero.2 hcf.ne')
-    have h3 : onQ V (adel V dict mu ((∑ i, w i • R (e i) : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G)) :
-        FDSec (U σ).X)) =ᵐ[muQ1 V] 0 := by
+    have h3
+        : onQ V (adel V dict mu ((∑ i, w i • R (e i) : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G)) :
+          FDSec (U σ).X)) =ᵐ[muQ1 V] 0 := by
       refine (MemLp.coeFn_toLp (hmem _)).symm.trans ?_
       rw [← hL, h2]
       exact Lp.coeFn_zero _ _ _
     have h4 := hae _ _ (∑ i, w i • R (e i)).2 h3
-    have h5 : ((∑ i, w i • R (e i) : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G)) : FDSec (U σ).X) =
-        ∑ i, w i • rdU (U σ) (e i : Rul Xo c) := by
+    have h5
+        : ((∑ i, w i • R (e i) : holSub (U σ).X (GlobalTheory.AllWt.modelWt (U σ) G))
+            : FDSec (U σ).X)
+          = ∑ i, w i • rdU (U σ) (e i : Rul Xo c) := by
       rw [Submodule.coe_sum]
       rfl
     rw [h5] at h4
@@ -162,30 +193,49 @@ theorem exists_semilinear_L2_independent (hS : Out.SecBaseChangeSt) (U : ∀ σ 
 
 end Gen
 
-
 set_option maxHeartbeats 2000000 in
-theorem hasGram_nrm_of_good (D : D7) (T : Core D) (j : ℕ) (Y : Deep T j) (e : ℕ) (o : ℝ) (hY : Y.Good e o)
-    (G : WTZ D.host.E) : GlobalTheory.AllWt.HasGram (Y.nrm G) := by
+theorem hasGram_nrm_of_good
+    (D : D7) (T : Core D)
+    (j : ℕ) (Y : Deep T j)
+    (e : ℕ) (o : ℝ) (hY : Y.Good e o)
+    (G : WTZ D.host.E)
+    : GlobalTheory.AllWt.HasGram (Y.nrm G) := by
   haveI := GlobalTheory.Deep.finiteDimensional_V_of_good D T j Y e o hY G
   refine GlobalTheory.HSApp.hasGram_of_inner Y.d.c₂.F (Y.V G) (Y.nrm G) fun v => ?_
-  have hσ' : GoodEmb Y.d.c₂ (Formalism.L2.Pj.goodOf Y.d.c₂ v.embedding) := Formalism.L2.Pj.goodEmb_goodOf _ _
-  have hd : ∀ g, (Y.dict (Formalism.L2.Pj.goodOf Y.d.c₂ v.embedding) g).2 ∈
-      ((Y.U (Formalism.L2.Pj.goodOf Y.d.c₂ v.embedding)).X (Y.dict (Formalism.L2.Pj.goodOf Y.d.c₂ v.embedding) g).1).dom :=
-    fun g => ((hY.dictU _ hσ').choose_spec.choose_spec.2).2.2.2.1 g
-  have hex := exists_semilinear_L2_independent GlobalTheory.abelianSchemeLaws_all.1.secBaseChange Y.U _ hσ' (hY.unf _ hσ')
-    (D.sp.W j) (Y.dict _) (fun _ => (1 : ℂ)) (fun _ => norm_one)
-    (GlobalTheory.CovTop.PetRep.adelMeas_one_of_good Y hY _ hσ') (GlobalTheory.PetDef.aeDom_good Y hY _ hσ') hd (hY.unit _ hσ') G (xiR D)
-  refine ⟨_, inferInstance, inferInstance, Classical.choose hex, ?_, fun x => (Classical.choose_spec hex).2.1 x,
-    (Classical.choose_spec hex).2.2⟩
+  have hσ' : GoodEmb Y.d.c₂ (Formalism.L2.Pj.goodOf Y.d.c₂ v.embedding) :=
+    Formalism.L2.Pj.goodEmb_goodOf _ _
+  have hd
+      : ∀ g,
+        (Y.dict (Formalism.L2.Pj.goodOf Y.d.c₂ v.embedding) g).2
+          ∈ ((Y.U (Formalism.L2.Pj.goodOf Y.d.c₂ v.embedding)).X
+            (Y.dict (Formalism.L2.Pj.goodOf Y.d.c₂ v.embedding) g).1).dom := fun g =>
+    ((hY.dictU _ hσ').choose_spec.choose_spec.2).2.2.2.1 g
+  have hex :=
+    exists_semilinear_L2_independent GlobalTheory.abelianSchemeLaws_all.1.secBaseChange Y.U _ hσ'
+      (hY.unf _ hσ') (D.sp.W j) (Y.dict _)
+      (fun _ => (1 : ℂ))
+      (fun _ => norm_one)
+      (GlobalTheory.CovTop.PetRep.adelMeas_one_of_good Y hY _ hσ')
+      (GlobalTheory.PetDef.aeDom_good Y hY _ hσ') hd (hY.unit _ hσ') G (xiR D)
+  refine ⟨
+    _,
+    inferInstance,
+    inferInstance,
+    Classical.choose hex,
+    ?_,
+    fun x => (Classical.choose_spec hex).2.1 x,
+    (Classical.choose_spec hex).2.2
+  ⟩
   by_cases h : GoodEmb Y.d.c₂ v.embedding
   · left
     intro a x
     refine ((Classical.choose_spec hex).1 a x).trans ?_
-    exact congrArg (· • Classical.choose hex x) (congrArg (fun τ : Y.d.c₂.F →+* ℂ => τ a) (if_pos h))
+    exact congrArg (· • Classical.choose hex x)
+      (congrArg (fun τ : Y.d.c₂.F →+* ℂ => τ a) (if_pos h))
   · right
     intro a x
     refine ((Classical.choose_spec hex).1 a x).trans ?_
-    exact congrArg (· • Classical.choose hex x) (congrArg (fun τ : Y.d.c₂.F →+* ℂ => τ a) (if_neg h))
-
+    exact congrArg (· • Classical.choose hex x)
+      (congrArg (fun τ : Y.d.c₂.F →+* ℂ => τ a) (if_neg h))
 
 end GlobalTheory.HSApp

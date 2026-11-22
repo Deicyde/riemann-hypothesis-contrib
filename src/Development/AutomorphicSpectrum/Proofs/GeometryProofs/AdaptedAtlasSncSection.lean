@@ -29,33 +29,38 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.ContDiffMulOfTsupp
 
 @[expose] public section
 
-open GlobalTheory.CompanionTheory.Ar AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam
-open MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.Cmp
+open GlobalTheory.CompanionTheory.Ar AlgebraicGeometry CategoryTheory NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam
+open MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.Cmp
 open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P
 open Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.Adapt
 
-
 open ReciprocityTheory.AnForm.M.PLAux in
-theorem exists_adaptedAtlas : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X) (L : LocPot X)
-    (s : X → X → ℂ) {n : ℕ} (m : Fin n → ℕ) (W : Fin n → Set X), IsPotential A L → IsSection A L s → IsSNC A L s m W →
-    (∀ y, logNormSec L s y ≤ 0) → ∃ B : FinHolAtlas e X, IsAdaptedAtlas A B L s := by
+theorem exists_adaptedAtlas
+    : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
+        (L : LocPot X) (s : X → X → ℂ) {n : ℕ} (m : Fin n → ℕ) (W : Fin n → Set X),
+      IsPotential A L → IsSection A L s → IsSNC A L s m W → (∀ y, logNormSec L s y ≤ 0)
+        → ∃ B : FinHolAtlas e X, IsAdaptedAtlas A B L s := by
   intro e X _ _ _ A L s n m W hL hs hsnc _hle
-  have hgood : ∀ x : X, ∃ φ : OpenPartialHomeomorph X (Fin e → ℂ), IsCompatChart A φ ∧
-      x ∈ φ.source ∧ φ x = 0 ∧ Metric.closedBall (0 : Fin e → ℂ) 2 ⊆ φ.target ∧
-      ∃ (S : Finset (Fin e)) (μ : Fin e → ℕ) (M : ℝ), (∀ i ∈ S, 1 ≤ μ i) ∧
-        (∀ y ∈ φ.target, (φ.symm y ∈ bdry s ↔ ∃ i ∈ S, y i = 0)) ∧
-        ∀ y ∈ Metric.closedBall (0 : Fin e → ℂ) 2, φ.symm y ∉ bdry s →
-          |rW L s (φ.symm y) - rLoc S μ y| ≤ M := by
+  have hgood
+      : ∀ x : X, ∃ φ : OpenPartialHomeomorph X (Fin e → ℂ),
+        IsCompatChart A φ ∧ x ∈ φ.source ∧ φ x = 0 ∧ Metric.closedBall (0 : Fin e → ℂ) 2 ⊆ φ.target
+          ∧ ∃ (S : Finset (Fin e)) (μ : Fin e → ℕ) (M : ℝ),
+            (∀ i ∈ S, 1 ≤ μ i) ∧ (∀ y ∈ φ.target, (φ.symm y ∈ bdry s ↔ ∃ i ∈ S, y i = 0))
+              ∧ ∀ y ∈ Metric.closedBall (0 : Fin e → ℂ) 2,
+                φ.symm y ∉ bdry s → |rW L s (φ.symm y) - rLoc S μ y| ≤ M := by
     intro x
     obtain ⟨φ, S, μ, v, hφc, hxφ, hball, hφx, hsrcU, hμ, hv, hv0, hsv⟩ :=
       GlobalTheory.CompanionTheory.Ar.PB.LocalForm.exists_local_form e X A L s n m W hsnc x
     refine ⟨φ, hφc, hxφ, hφx, hball, S, μ, ?_⟩
 
-    have hnorm : ∀ y ∈ φ.source,
-        ‖s y y‖ * Real.exp (-L.φ y y) = ‖s x y‖ * Real.exp (-L.φ x y) := fun y hy =>
-      (hs.2 x y y ⟨hsrcU hy, L.mem_U y⟩).symm
+    have hnorm : ∀ y ∈ φ.source, ‖s y y‖ * Real.exp (- L.φ y y) = ‖s x y‖ * Real.exp (- L.φ x y) :=
+      fun y hy => (hs.2 x y y ⟨hsrcU hy, L.mem_U y⟩).symm
     have hzero : ∀ y ∈ φ.source, (s y y = 0 ↔ s x y = 0) := by
       intro y hy
       have h := hnorm y hy
@@ -84,7 +89,9 @@ theorem exists_adaptedAtlas : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [Com
       rw [hzero _ hp, hmono _ hp, φ.right_inv hy]
 
     have hK : IsCompact (Metric.closedBall (0 : Fin e → ℂ) 2) := isCompact_closedBall _ _
-    have hF : ContinuousOn (fun z => Real.log ‖v (φ.symm z)‖) (Metric.closedBall (0 : Fin e → ℂ) 2) := by
+    have hF : ContinuousOn
+        (fun z => Real.log ‖v (φ.symm z)‖)
+        (Metric.closedBall (0 : Fin e → ℂ) 2) := by
       intro z hz
       have hzt := hball hz
       have han := analyticAt_compat_fun hφc hv hzt (φ.map_target hzt)
@@ -108,11 +115,11 @@ theorem exists_adaptedAtlas : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [Com
       hsxp ((hmono p hp).2 ⟨i, hi, by rw [hφp]; exact h0⟩)
     have hvp : v p ≠ 0 := hv0 p hp
 
-    have hlogN : logNormSec L s p = Real.log ‖v p‖ + ∑ i ∈ S, (μ i : ℝ) * Real.log ‖y i‖ - L.φ x p := by
+    have hlogN
+        : logNormSec L s p = Real.log ‖v p‖ + ∑ i ∈ S, (μ i : ℝ) * Real.log ‖y i‖ - L.φ x p := by
       unfold logNormSec
       rw [hnorm p hp, Real.log_mul (norm_ne_zero_iff.2 hsxp) (Real.exp_pos _).ne', Real.log_exp,
-        hsv p hp, norm_mul, Real.log_mul (norm_ne_zero_iff.2 hvp), norm_prod,
-        Real.log_prod]
+        hsv p hp, norm_mul, Real.log_mul (norm_ne_zero_iff.2 hvp), norm_prod, Real.log_prod]
       · rw [hφp]
         congr 2
         refine Finset.sum_congr rfl fun i hi => ?_
@@ -124,19 +131,22 @@ theorem exists_adaptedAtlas : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [Com
         intro i hi
         rw [hφp]
         exact pow_ne_zero _ (hyi i hi)
-    have hloc : rLoc S μ y = Real.exp 1 + ∑ i ∈ S, (μ i : ℝ) * (Real.log 4 - 2 * Real.log ‖y i‖) := by
+    have hloc
+        : rLoc S μ y = Real.exp 1 + ∑ i ∈ S, (μ i : ℝ) * (Real.log 4 - 2 * Real.log ‖y i‖) := by
       unfold rLoc
       congr 1
       refine Finset.sum_congr rfl fun i hi => ?_
       rw [Real.log_div (by norm_num) (pow_ne_zero _ (norm_ne_zero_iff.2 (hyi i hi))), Real.log_pow]
       push_cast
       ring
-    have hdiff : rW L s p - rLoc S μ y =
-        -2 * Real.log ‖v p‖ + 2 * L.φ x p - ∑ i ∈ S, (μ i : ℝ) * Real.log 4 := by
+    have hdiff
+        : rW L s p - rLoc S μ y
+          = -2 * Real.log ‖v p‖ + 2 * L.φ x p - ∑ i ∈ S, (μ i : ℝ) * Real.log 4 := by
       unfold rW
       rw [hlogN, hloc]
       simp only [mul_sub, Finset.sum_sub_distrib]
-      rw [show ∑ i ∈ S, (μ i : ℝ) * (2 * Real.log ‖y i‖) = 2 * ∑ i ∈ S, (μ i : ℝ) * Real.log ‖y i‖ by
+      rw [show ∑ i ∈ S, (μ i : ℝ) * (2 * Real.log ‖y i‖)
+          = 2 * ∑ i ∈ S, (μ i : ℝ) * Real.log ‖y i‖ by
         rw [Finset.mul_sum]; refine Finset.sum_congr rfl fun i _ => by ring]
       ring
     rw [hdiff]
@@ -161,10 +171,13 @@ theorem exists_adaptedAtlas : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [Com
     simp only [Set.mem_iUnion] at this
     obtain ⟨y, hy, hx⟩ := this
     exact ⟨y, hy, hx⟩
-  obtain ⟨B, hAB, h1, h2⟩ := ReciprocityTheory.AnForm.M.atlasOfCompat A (fun i => φ (t.equivFin.symm i))
-    (fun i => hφc _) (fun x => by
-      obtain ⟨y, hy, hx⟩ := hcov x
-      exact ⟨t.equivFin ⟨y, hy⟩, by simpa using hx.2⟩)
+  obtain ⟨B, hAB, h1, h2⟩ :=
+    ReciprocityTheory.AnForm.M.atlasOfCompat A
+      (fun i => φ (t.equivFin.symm i))
+      (fun i => hφc _)
+      (fun x => by
+        obtain ⟨y, hy, hx⟩ := hcov x
+        exact ⟨t.equivFin ⟨y, hy⟩, by simpa using hx.2⟩)
   refine ⟨B, hAB, fun j => ?_, fun x => ?_, ∑ y ∈ t, |M y|, fun j => ?_⟩
   · obtain ⟨i, hi⟩ := h2 j
     rw [hi]

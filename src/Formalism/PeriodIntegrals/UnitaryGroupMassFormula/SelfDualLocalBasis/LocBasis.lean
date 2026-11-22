@@ -16,8 +16,10 @@ namespace PI.SelfDualLoc.W.LB
 
 open PI.SelfDualLoc
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {n : ℕ} (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {n : ℕ}
+  (v : HeightOneSpectrum (𝓞 F))
 
 lemma smul_OE (c : 𝓞 E) (w : Fin n → E) : c • w = (c : E) • w := by
   ext j; simp [Algebra.smul_def]
@@ -37,6 +39,9 @@ namespace PI.SelfDualLoc.W
 open PI.SelfDualLoc LB
 
 theorem locBasis : LocBasis := by
-  first | exact Bl.PaddedFamilies.goal1 .. | (apply Bl.PaddedFamilies.goal1 <;> assumption) | (intros; apply Bl.PaddedFamilies.goal1 <;> assumption)
+  first
+  | exact Bl.PaddedFamilies.goal1 ..
+  | (apply Bl.PaddedFamilies.goal1 <;> assumption)
+  | (intros; apply Bl.PaddedFamilies.goal1 <;> assumption)
 
 end PI.SelfDualLoc.W

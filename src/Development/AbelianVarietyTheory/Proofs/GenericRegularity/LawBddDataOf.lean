@@ -14,19 +14,23 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FrameNorm GlobalTheory.Reg
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FrameNorm
+  GlobalTheory.Reg
 
 namespace GlobalTheory.Reg.LawBddPf
 
 section
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l}
   {h : GenFrEx Xo c} {fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ}
   {yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P))}
 
-theorem nrm_add_le (Z : Comp Xo c) (G : WTZ E) (x y : AC Z) (P : Om Z →+* ℂ) :
-    nrmC fn (yP Z) G (x + y) P ≤ nrmC fn (yP Z) G x P + nrmC fn (yP Z) G y P := by
+theorem nrm_add_le (Z : Comp Xo c) (G : WTZ E) (x y : AC Z) (P : Om Z →+* ℂ)
+    : nrmC fn (yP Z) G (x + y) P ≤ nrmC fn (yP Z) G x P + nrmC fn (yP Z) G y P := by
   unfold nrmC
   rw [← add_mul]
   refine mul_le_mul_of_nonneg_right ?_ (Finset.prod_nonneg fun i _ => by positivity)
@@ -34,23 +38,30 @@ theorem nrm_add_le (Z : Comp Xo c) (G : WTZ E) (x y : AC Z) (P : Om Z →+* ℂ)
   rw [hc, map_add (f := _)]
   exact norm_add_le _ _
 
-theorem nrm_smul (Z : Comp Xo c) (G : WTZ E) (a : Om Z) (x : AC Z) (P : Om Z →+* ℂ) :
-    nrmC fn (yP Z) G (a • x) P = ‖P a‖ * nrmC fn (yP Z) G x P := by
+theorem nrm_smul (Z : Comp Xo c) (G : WTZ E) (a : Om Z) (x : AC Z) (P : Om Z →+* ℂ)
+    : nrmC fn (yP Z) G (a • x) P = ‖P a‖ * nrmC fn (yP Z) G x P := by
   unfold nrmC
   have hc : (a • x).coeff G = a * x.coeff G := by rfl
   rw [hc, map_mul, norm_mul, mul_assoc]
 
-theorem bdd_gen [Fintype (Comp Xo c)] (hcx : ValAtCx h yP) {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} {f : Rul Xo c}
-    (hS : f ∈ sec Xo c a n) (hB : SupBdd Xo c fn a n f) (sg : c.F →+* ℂ) :
-    BddAbove (Set.range fun p : (Σ Z : Comp Xo c, ReciprocityTheory.ChartRestriction.G.T0.PT (Ω := Om Z) sg) =>
-      nrmC fn (yP p.1) (wtZ a n) (valC h a n f p.1) p.2) := by
+theorem bdd_gen
+    [Fintype (Comp Xo c)]
+    (hcx : ValAtCx h yP)
+    {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} {f : Rul Xo c}
+    (hS : f ∈ sec Xo c a n) (hB : SupBdd Xo c fn a n f)
+    (sg : c.F →+* ℂ)
+    : BddAbove (Set.range
+      fun p : (Σ Z : Comp Xo c, ReciprocityTheory.ChartRestriction.G.T0.PT (Ω := Om Z) sg) =>
+        nrmC fn (yP p.1) (wtZ a n) (valC h a n f p.1) p.2) := by
   unfold ValAtCx at hcx
   obtain ⟨B, hBd⟩ := hB sg
   refine ⟨B, ?_⟩
   rintro _ ⟨⟨Z, P⟩, rfl⟩
   have hP : (P : Om Z →+* ℂ).comp (algebraMap c.F (Om Z)) = sg := P.2
-  have key : ∀ (σ : c.F →+* ℂ), σ = sg → ∀ y : FrPt Xo c (CAt σ),
-      cabs (evR Xo c f y) * ∏ i, |fn σ y i|⁻¹ ^ ex Dw a n i ≤ B := by
+  have key
+      : ∀ (σ : c.F →+* ℂ),
+        σ = sg
+          → ∀ y : FrPt Xo c (CAt σ), cabs (evR Xo c f y) * ∏ i, |fn σ y i|⁻¹ ^ ex Dw a n i ≤ B := by
     rintro σ rfl y
     exact hBd ⟨y, rfl⟩
   have hex : ∀ i, exZ Dw (wtZ a n) i = (ex Dw a n i : ℤ) := by
@@ -69,13 +80,19 @@ theorem bdd_gen [Fintype (Comp Xo c)] (hcx : ValAtCx h yP) {a : (E →+* ℂ) ×
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [hex i, zpow_neg, zpow_natCast, inv_pow]
 
-theorem bdd_span (G : WTZ E) (sg : c.F →+* ℂ) (S : Set (∀ Z : Comp Xo c, AC Z))
-    (hS : ∀ f ∈ S, BddAbove (Set.range fun p : (Σ Z : Comp Xo c, ReciprocityTheory.ChartRestriction.G.T0.PT (Ω := Om Z) sg) =>
-      nrmC fn (yP p.1) G (f p.1) p.2)) (f : ∀ Z : Comp Xo c, AC Z)
-    (hf : f ∈ (letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
-      Submodule.span (𝓞 c.F) S)) :
-    BddAbove (Set.range fun p : (Σ Z : Comp Xo c, ReciprocityTheory.ChartRestriction.G.T0.PT (Ω := Om Z) sg) =>
-      nrmC fn (yP p.1) G (f p.1) p.2) := by
+theorem bdd_span
+    (G : WTZ E) (sg : c.F →+* ℂ) (S : Set (∀ Z : Comp Xo c, AC Z))
+    (hS : ∀ f ∈ S,
+      BddAbove (Set.range
+        fun p : (Σ Z : Comp Xo c, ReciprocityTheory.ChartRestriction.G.T0.PT (Ω := Om Z) sg) =>
+          nrmC fn (yP p.1) G (f p.1) p.2))
+    (f : ∀ Z : Comp Xo c, AC Z)
+    (hf : f
+      ∈ (letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
+         Submodule.span (𝓞 c.F) S))
+    : BddAbove (Set.range
+      fun p : (Σ Z : Comp Xo c, ReciprocityTheory.ChartRestriction.G.T0.PT (Ω := Om Z) sg) =>
+        nrmC fn (yP p.1) G (f p.1) p.2) := by
   induction hf using Submodule.span_induction with
   | mem x hx => exact hS x hx
   | zero =>
@@ -89,8 +106,7 @@ theorem bdd_span (G : WTZ E) (sg : c.F →+* ℂ) (S : Set (∀ Z : Comp Xo c, A
     obtain ⟨B, hB⟩ := hy
     refine ⟨A + B, ?_⟩
     rintro _ ⟨⟨Z, P⟩, rfl⟩
-    exact (nrm_add_le Z G _ _ _).trans
-      (add_le_add (hA ⟨⟨Z, P⟩, rfl⟩) (hB ⟨⟨Z, P⟩, rfl⟩))
+    exact (nrm_add_le Z G _ _ _).trans (add_le_add (hA ⟨⟨Z, P⟩, rfl⟩) (hB ⟨⟨Z, P⟩, rfl⟩))
   | smul a x _ hx =>
     obtain ⟨A, hA⟩ := hx
     refine ⟨‖sg (a : c.F)‖ * A, ?_⟩

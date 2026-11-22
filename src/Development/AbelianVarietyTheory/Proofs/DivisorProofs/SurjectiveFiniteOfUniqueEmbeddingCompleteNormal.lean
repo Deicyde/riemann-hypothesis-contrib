@@ -9,7 +9,18 @@ open IsLocalRing
 
 namespace GlobalTheory.DegreeOne
 
-theorem surjective_of_unique_injective_localHom : ∀ (B R : Type) [CommRing B] [IsDomain B] [IsLocalRing B] [IsNoetherianRing B] [IsIntegrallyClosed B] [CommRing R] [IsDomain R] [IsLocalRing R] [CharZero R] (ψ : B →+* R), IsAdicComplete (maximalIdeal B) B → Function.Injective ψ → ψ.Finite → (∀ (R' : Type) [CommRing R'] [IsDomain R'] [IsLocalRing R'] [IsNoetherianRing R'] [IsIntegrallyClosed R'] [CharZero R'], IsAdicComplete (maximalIdeal R') R' → ∀ f g : R →+* R', Function.Injective f → Function.Injective g → IsLocalHom f → IsLocalHom g → f.comp ψ = g.comp ψ → f = g) → Function.Surjective ψ := by
+theorem surjective_of_unique_injective_localHom
+    : ∀ (B R : Type) [CommRing B] [IsDomain B] [IsLocalRing B] [IsNoetherianRing B]
+        [IsIntegrallyClosed B] [CommRing R] [IsDomain R] [IsLocalRing R] [CharZero R] (ψ : B →+* R),
+      IsAdicComplete (maximalIdeal B) B → Function.Injective ψ → ψ.Finite
+        → (∀ (R' : Type) [CommRing R'] [IsDomain R'] [IsLocalRing R'] [IsNoetherianRing R']
+            [IsIntegrallyClosed R'] [CharZero R'],
+          IsAdicComplete (maximalIdeal R') R'
+            → ∀ f g : R →+* R',
+              Function.Injective f → Function.Injective g → IsLocalHom f → IsLocalHom g
+                → f.comp ψ = g.comp ψ
+                → f = g)
+        → Function.Surjective ψ := by
   intro B R _ _ _ _ _ _ _ _ _ ψ hB hinj hfin huniq
   haveI := hB
   letI : Algebra B R := ψ.toAlgebra
@@ -39,12 +50,15 @@ theorem surjective_of_unique_injective_localHom : ∀ (B R : Type) [CommRing B] 
   haveI : IsNoetherianRing C := IsNoetherianRing.of_finite B C
   haveI : IsIntegrallyClosed C := integralClosure.isIntegrallyClosedOfFiniteExtension K
   haveI : CharZero C := ⟨fun m n h => Nat.cast_injective (R := L) (by simpa using congrArg Subtype.val h)⟩
-  have hCc : IsAdicComplete (maximalIdeal C) C := CompleteFiniteExtension.isAdicComplete_of_finite_local B C
+  have hCc : IsAdicComplete (maximalIdeal C) C :=
+    CompleteFiniteExtension.isAdicComplete_of_finite_local B C
 
   have hK : ∀ b : B, algebraMap K L (algebraMap B K b) = algebraMap B L b := fun b =>
     (IsScalarTower.algebraMap_apply B K L b).symm
-  have key : ∀ σ : M →ₐ[K] Ω, ∃ f : R →+* C, Function.Injective f ∧ IsLocalHom f ∧ f.comp ψ = algebraMap B C ∧
-      ∀ r, ((f r : L) : Ω) = σ (algebraMap R M r) := by
+  have key
+      : ∀ σ : M →ₐ[K] Ω, ∃ f : R →+* C,
+        Function.Injective f ∧ IsLocalHom f ∧ f.comp ψ = algebraMap B C
+          ∧ ∀ r, ((f r : L) : Ω) = σ (algebraMap R M r) := by
     intro σ
     have hmem : ∀ x, (σ.toRingHom.comp (algebraMap R M)) x ∈ L := fun x =>
       σ.fieldRange_le_normalClosure ⟨_, rfl⟩
@@ -86,10 +100,11 @@ theorem surjective_of_unique_injective_localHom : ∀ (B R : Type) [CommRing B] 
     exact Nat.card_eq_one_iff_unique.2 ⟨inferInstance, ⟨IsAlgClosed.lift⟩⟩
   have hbot : (⊥ : Subalgebra K M) = ⊤ := Subalgebra.bot_eq_top_of_finrank_eq_one hrank
   intro r
-  obtain ⟨k, hk⟩ := Algebra.mem_bot.1 (hbot.symm ▸ Algebra.mem_top : algebraMap R M r ∈ (⊥ : Subalgebra K M))
+  obtain ⟨k, hk⟩ :=
+    Algebra.mem_bot.1 (hbot.symm ▸ Algebra.mem_top : algebraMap R M r ∈ (⊥ : Subalgebra K M))
   have hki : IsIntegral B k := by
-    have h1 : IsIntegral B (algebraMap K M k) := hk ▸
-      (Algebra.IsIntegral.isIntegral (R := B) r).map (IsScalarTower.toAlgHom B R M)
+    have h1 : IsIntegral B (algebraMap K M k) :=
+      hk ▸ (Algebra.IsIntegral.isIntegral (R := B) r).map (IsScalarTower.toAlgHom B R M)
     exact (isIntegral_algHom_iff (IsScalarTower.toAlgHom B K M) (algebraMap K M).injective).1 h1
   obtain ⟨b, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.1 hki
   refine ⟨b, IsFractionRing.injective R M ?_⟩

@@ -9,16 +9,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.indStep :
-    ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] {Γ : Type} [Group Γ] {V : Type} [AddCommGroup V] [Module ℂ V] {Y : Type} [AddCommGroup Y] [Module ℂ Y] (P : Subgroup G) (ρ : Representation ℂ P V) (y : Representation ℂ (P × Γ) Y) (f : V →ₗ[ℂ] Y), LocOk P ρ →
-      y.IsIrreducible → f ≠ 0 → (∀ p v, f (ρ p v) = y (p, 1) (f v)) →
-      SimpleG (IndF P.subtype (y.comp (MonoidHom.inl P Γ)) ⊤) fun c : Γ => y (1, c) := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.indStep
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] {Γ : Type} [Group Γ]
+        {V : Type} [AddCommGroup V] [Module ℂ V] {Y : Type} [AddCommGroup Y] [Module ℂ Y]
+        (P : Subgroup G) (ρ : Representation ℂ P V) (y : Representation ℂ (P × Γ) Y)
+        (f : V →ₗ[ℂ] Y),
+      LocOk P ρ → y.IsIrreducible → f ≠ 0 → (∀ p v, f (ρ p v) = y (p, 1) (f v))
+        → SimpleG (IndF P.subtype (y.comp (MonoidHom.inl P Γ)) ⊤) fun c : Γ => y (1, c) := by
   intro G _ _ _ Γ _ V _ _ Y _ _ P ρ y f hL hy hf hfe
   obtain ⟨B, _, _, m, e, hm, he⟩ := tensIso ρ y f hL.irr hL.schur hy hf hfe
   obtain ⟨K, hK, hPK⟩ := hL.iwa
@@ -42,12 +49,15 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.indStep 
   have hsurj : ∀ z ∈ IndF P.subtype (y.comp (MonoidHom.inl P Γ)) ⊤, ∃ x, L x = z := by
     intro z hz
     have hlaw : ∀ (p : P) g, z (p * g) = y (p, 1) (z g) := hz.1.2
-    have hz' : (fun g => e.symm (z g)) ∈ IndF P.subtype ((extTensor ρ m).comp (MonoidHom.inl P Γ)) ⊤ := by
+    have hz'
+        : (fun g => e.symm (z g))
+          ∈ IndF P.subtype ((extTensor ρ m).comp (MonoidHom.inl P Γ)) ⊤ := by
       refine ⟨⟨fun _ => trivial, fun p g => ?_⟩, ?_⟩
       · apply e.injective
         show e (e.symm (z (p * g))) = e (extTensor ρ m (p, 1) (e.symm (z g)))
         rw [he, e.apply_symm_apply, e.apply_symm_apply, hlaw]
-      · refine GlobalTheory.SmGL.mem_smoothPart_of_nhds (Filter.mem_of_superset (IsOpen.mem_nhds hz.2 (by simp)) fun u hu => ?_)
+      · refine GlobalTheory.SmGL.mem_smoothPart_of_nhds (Filter.mem_of_superset
+          (IsOpen.mem_nhds hz.2 (by simp)) fun u hu => ?_)
         funext x
         have h2 : z (x * u) = z x := congrFun hu x
         show e.symm (z (x * u)) = e.symm (z x)
@@ -56,14 +66,17 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.indStep 
     rw [hLa, E.apply_symm_apply]
     exact e.apply_symm_apply _
   intro Q hQ hG hΓ
-  let Q' : Subrepresentation (extTensor (smInd P ρ) m) :=
-    ⟨Q.comap L, by
+  let Q' : Subrepresentation (extTensor (smInd P ρ) m) := ⟨
+    Q.comap L,
+    by
       rintro ⟨g, c⟩ x hx
       have h1 := hΓ c _ (hG g _ hx)
-      have h2 : L (extTensor (smInd P ρ) m (g, c) x) = fun t => y (1, c) (L x (t * g)) := funext (hact g c x)
+      have h2 : L (extTensor (smInd P ρ) m (g, c) x) = fun t => y (1, c) (L x (t * g)) :=
+        funext (hact g c x)
       show L _ ∈ Q
       rw [h2]
-      exact h1⟩
+      exact h1
+  ⟩
   rcases hirr.eq_bot_or_eq_top Q' with h | h
   · left
     refine (Submodule.eq_bot_iff _).2 fun q hq => ?_

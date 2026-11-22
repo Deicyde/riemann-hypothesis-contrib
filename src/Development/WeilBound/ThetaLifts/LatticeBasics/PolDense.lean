@@ -21,9 +21,10 @@ theorem polDense : PositivityTheory.ThKG.PolDense := by
     by_contra h
     push Not at h
     exact hnd (eq_top_iff.2 fun x _ => h x)
-  obtain ⟨f, u, hfs, hfx⟩ := RCLike.geometric_hahn_banach_closed_point (𝕜 := ℂ)
-    (((M.Pol B.ψ B.emb).topologicalClosure.restrictScalars ℝ).convex)
-    (M.Pol B.ψ B.emb).isClosed_topologicalClosure hx
+  obtain ⟨f, u, hfs, hfx⟩ :=
+    RCLike.geometric_hahn_banach_closed_point (𝕜 := ℂ)
+      (((M.Pol B.ψ B.emb).topologicalClosure.restrictScalars ℝ).convex)
+      (M.Pol B.ψ B.emb).isClosed_topologicalClosure hx
   have hf0 : ∀ a ∈ (M.Pol B.ψ B.emb).topologicalClosure, f a = 0 := by
     intro a ha
     by_contra hne

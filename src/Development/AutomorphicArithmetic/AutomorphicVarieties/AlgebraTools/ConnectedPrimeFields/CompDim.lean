@@ -10,9 +10,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-theorem UpperTheory.V.AlgebraTools.Conn.compDim :
-    ∀ {R : Type} [CommRing R] [IsNoetherianRing R], CohenType R → ∀ (p q : Ideal R) (s : Finset R), p.IsPrime →
-      q ∈ (p ⊔ Ideal.span (s : Set R)).minimalPrimes → ringKrullDim (R ⧸ p) ≤ ringKrullDim (R ⧸ q) + s.card := by
+theorem UpperTheory.V.AlgebraTools.Conn.compDim
+    : ∀ {R : Type} [CommRing R] [IsNoetherianRing R],
+      CohenType R
+        → ∀ (p q : Ideal R) (s : Finset R),
+          p.IsPrime → q ∈ (p ⊔ Ideal.span (s : Set R)).minimalPrimes
+            → ringKrullDim (R ⧸ p) ≤ ringKrullDim (R ⧸ q) + s.card := by
   classical
   intro R _ _ hC p q s hp hq
   have hpq : p ≤ q := le_sup_left.trans hq.1.2
@@ -23,7 +26,8 @@ theorem UpperTheory.V.AlgebraTools.Conn.compDim :
   have hf : Function.Surjective f := Ideal.Quotient.mk_surjective
   have hker : RingHom.ker f ≤ q := by rw [Ideal.mk_ker]; exact hpq
   haveI hQ : (q.map f).IsPrime := Ideal.map_isPrime_of_surjective hf hker
-  have hmin : q.map f ∈ (Ideal.span ((s.image f : Finset (R ⧸ p)) : Set (R ⧸ p))).minimalPrimes := by
+  have hmin
+      : q.map f ∈ (Ideal.span ((s.image f : Finset (R ⧸ p)) : Set (R ⧸ p))).minimalPrimes := by
     rw [Finset.coe_image, ← Ideal.map_span, Ideal.minimalPrimes_map_of_surjective hf]
     refine ⟨q, ?_, rfl⟩
     rw [Ideal.mk_ker, sup_comm]

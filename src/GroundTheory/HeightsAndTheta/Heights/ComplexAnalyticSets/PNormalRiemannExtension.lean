@@ -13,14 +13,17 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology
 
-theorem NormalRiemannExtension.proof (hloc : NormalRiemannExtensionLocal.Statement)
-    (hirr : NormalLocallyIrreducible.Statement) : NormalRiemannExtension.Statement := by
+theorem NormalRiemannExtension.proof
+    (hloc : NormalRiemannExtensionLocal.Statement) (hirr : NormalLocallyIrreducible.Statement)
+    : NormalRiemannExtension.Statement := by
   intro σ _ I h U f hI hIc hh hU hf hb
   classical
-  have hex : ∀ w ∈ zeroSetIn I ∩ U, ∃ V : Set (σ → ℂ), IsOpen V ∧ w ∈ V ∧ V ⊆ U ∧
-      ∃ F : (σ → ℂ) → ℂ, DifferentiableOn ℂ F V ∧
-        Set.EqOn F f ((zeroSetIn I ∩ V) \ {z | eval z h = 0}) := fun w hw =>
-    hloc σ I h w U f hI hIc hh hw.1 (hU.mem_nhds hw.2) hf hb
+  have hex
+      : ∀ w ∈ zeroSetIn I ∩ U, ∃ V : Set (σ → ℂ),
+        IsOpen V ∧ w ∈ V ∧ V ⊆ U
+          ∧ ∃ F : (σ → ℂ) → ℂ,
+            DifferentiableOn ℂ F V ∧ Set.EqOn F f ((zeroSetIn I ∩ V) \ {z | eval z h = 0}) :=
+    fun w hw => hloc σ I h w U f hI hIc hh hw.1 (hU.mem_nhds hw.2) hf hb
   choose! V hVo hwV hVU F hF hFf using hex
 
   have hagree : ∀ w ∈ zeroSetIn I ∩ U, ∀ y ∈ zeroSetIn I ∩ U, y ∈ V w → F y y = F w y := by

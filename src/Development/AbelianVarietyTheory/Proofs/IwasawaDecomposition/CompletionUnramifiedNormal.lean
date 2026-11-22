@@ -14,16 +14,18 @@ open IsLocalRing
 
 namespace GlobalTheory.EtaleCompletionNormal
 
-theorem formallyUnramified_of_map_maximalIdeal {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
-    [IsLocalRing R] [IsLocalRing S] [IsLocalHom (algebraMap R S)] [Algebra.EssFiniteType R S]
+theorem formallyUnramified_of_map_maximalIdeal
+    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] [IsLocalRing R] [IsLocalRing S]
+    [IsLocalHom (algebraMap R S)] [Algebra.EssFiniteType R S]
     [Algebra.FormallyUnramified R (ResidueField S)]
-    (H : (maximalIdeal R).map (algebraMap R S) = maximalIdeal S) :
-    Algebra.FormallyUnramified R S := by
+    (H : (maximalIdeal R).map (algebraMap R S) = maximalIdeal S)
+    : Algebra.FormallyUnramified R S := by
   constructor
   rw [← IsLocalRing.subsingleton_tensorProduct (R := S)]
   refine subsingleton_of_forall_eq 0 fun x ↦ ?_
-  obtain ⟨x, rfl⟩ := (KaehlerDifferential.exact_kerCotangentToTensor_mapBaseChange R S
-    (ResidueField S) Ideal.Quotient.mk_surjective x).mp (Subsingleton.elim _ _)
+  obtain ⟨x, rfl⟩ :=
+    (KaehlerDifferential.exact_kerCotangentToTensor_mapBaseChange R S (ResidueField S)
+      Ideal.Quotient.mk_surjective x).mp (Subsingleton.elim _ _)
   obtain ⟨⟨x, hx⟩, rfl⟩ := Ideal.toCotangent_surjective _ x
   simp only [KaehlerDifferential.kerCotangentToTensor_toCotangent]
   replace hx : x ∈ Ideal.map (algebraMap R S) (maximalIdeal R) := by simpa [H] using hx
@@ -35,10 +37,22 @@ theorem formallyUnramified_of_map_maximalIdeal {R S : Type*} [CommRing R] [CommR
     have : residue S x = 0 := by rwa [residue_eq_zero_iff, ← H]
     simp [*, TensorProduct.tmul_add, TensorProduct.smul_tmul', ← Algebra.algebraMap_eq_smul_one]
 
-theorem isDomain_and_isIntegrallyClosed : ∀ (D E : Type) [CommRing D] [IsDomain D] [IsLocalRing D] [CommRing E] [IsLocalRing E] (h : D →+* E), IsNoetherianRing D → IsDomain (AdicCompletion (IsLocalRing.maximalIdeal D) D) → IsIntegrallyClosed (AdicCompletion (IsLocalRing.maximalIdeal D) D) → IsNoetherianRing E → IsAdicComplete (IsLocalRing.maximalIdeal E) E → IsLocalHom h → GlobalTheory.Toroidal.IsEtaleCompletion h → ((IsLocalRing.residue E).comp h).FormallyUnramified → IsDomain E ∧ IsIntegrallyClosed E := by
+theorem isDomain_and_isIntegrallyClosed
+    : ∀ (D E : Type) [CommRing D] [IsDomain D] [IsLocalRing D] [CommRing E] [IsLocalRing E]
+        (h : D →+* E),
+      IsNoetherianRing D → IsDomain (AdicCompletion (IsLocalRing.maximalIdeal D) D)
+        → IsIntegrallyClosed (AdicCompletion (IsLocalRing.maximalIdeal D) D) → IsNoetherianRing E
+        → IsAdicComplete (IsLocalRing.maximalIdeal E) E → IsLocalHom h
+        → GlobalTheory.Toroidal.IsEtaleCompletion h
+        → ((IsLocalRing.residue E).comp h).FormallyUnramified
+        → IsDomain E ∧ IsIntegrallyClosed E := by
   intro D E _ _ _ _ _ h hD hAd hAi hE hEc _ het hfu
   obtain ⟨hflat, hmap, hfin⟩ := het
-  haveI := hD; haveI := hE; haveI := hEc; haveI := hAd; haveI := hAi
+  haveI := hD
+  haveI := hE
+  haveI := hEc
+  haveI := hAd
+  haveI := hAi
   let A := AdicCompletion (maximalIdeal D) D
   haveI : IsNoetherianRing A := AdicNoeth.isNoetherianRing_adicCompletion D _
   haveI : IsAdicComplete ((maximalIdeal D).map h) E := by rw [hmap]; exact hEc

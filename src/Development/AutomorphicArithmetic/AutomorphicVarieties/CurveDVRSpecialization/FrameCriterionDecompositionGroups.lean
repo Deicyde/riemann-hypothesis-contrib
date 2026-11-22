@@ -7,9 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
 
-private theorem open_toZMod (l : ℕ) [Fact l.Prime] : IsOpen {x : ℤ_[l] | PadicInt.toZMod x = 1} := by
+private theorem open_toZMod (l : ℕ) [Fact l.Prime]
+    : IsOpen {x : ℤ_[l] | PadicInt.toZMod x = 1} := by
   have hS : {x : ℤ_[l] | PadicInt.toZMod x = 1} = {x | ‖x - 1‖ < 1} := by
     ext x
     simp only [Set.mem_setOf_eq]
@@ -18,8 +21,8 @@ private theorem open_toZMod (l : ℕ) [Fact l.Prime] : IsOpen {x : ℤ_[l] | Pad
   rw [hS]
   exact isOpen_lt (continuous_norm.comp (continuous_id.sub continuous_const)) continuous_const
 
-theorem UpperTheory.frame_criterion_decomposition_groups :
-    UpperTheory.V.Pr.ExistsPrimeSplitInKernelWithNontrivialCyclotomic := by
+theorem UpperTheory.frame_criterion_decomposition_groups
+    : UpperTheory.V.Pr.ExistsPrimeSplitInKernelWithNontrivialCyclotomic := by
   unfold UpperTheory.V.Pr.ExistsPrimeSplitInKernelWithNontrivialCyclotomic
   intro Ω _ _ _ l _ O _ _ η Ψ σ g₁ B M L _ _ _ _ _ Φ k hK g hg hc M' hM'
   let ρ : G (W.Lp L) Ω →* Φ.Γ := k.p.comp (toUpl Ω L)
@@ -45,8 +48,9 @@ theorem UpperTheory.frame_criterion_decomposition_groups :
       exact t.commutes x
   have hO1 : IsOpen (U1 : Set (G (W.Lp L) Ω)) := hK.preimage hρ
   have hO2 : IsOpen (U2 : Set (G (W.Lp L) Ω)) := by
-    have hset : (U2 : Set (G (W.Lp L) Ω)) =
-        (fun τ => (cycZ (W.Lp L) Ω l τ : ℤ_[l])) ⁻¹' {x : ℤ_[l] | PadicInt.toZMod x = 1} := by
+    have hset
+        : (U2 : Set (G (W.Lp L) Ω))
+          = (fun τ => (cycZ (W.Lp L) Ω l τ : ℤ_[l])) ⁻¹' {x : ℤ_[l] | PadicInt.toZMod x = 1} := by
       ext τ
       exact hU2 τ
     rw [hset]

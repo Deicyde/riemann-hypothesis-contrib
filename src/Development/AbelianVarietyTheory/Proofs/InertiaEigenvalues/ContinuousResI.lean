@@ -5,16 +5,21 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne Pointwise
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne Pointwise
 
 noncomputable section
 
 namespace GlobalTheory.WeilRes
 
-variable {E E' Ω : Type} [Field E] [NumberField E] [Field E'] [NumberField E'] [Field Ω] [Algebra E E']
-  [Algebra E Ω] [Algebra E' Ω] [IsScalarTower E E' Ω] {A : ValuationSubring Ω}
+variable
+  {E E' Ω : Type} [Field E] [NumberField E] [Field E'] [NumberField E'] [Field Ω] [Algebra E E']
+  [Algebra E Ω] [Algebra E' Ω] [IsScalarTower E E' Ω]
+  {A : ValuationSubring Ω}
 
-variable [IsAlgClosure E Ω] [IsAlgClosure E' Ω] {w : HeightOneSpectrum (𝓞 E)} (h : IsPlaceOver A w)
+variable
+  [IsAlgClosure E Ω] [IsAlgClosure E' Ω]
+  {w : HeightOneSpectrum (𝓞 E)} (h : IsPlaceOver A w)
   {w' : HeightOneSpectrum (𝓞 E')} (h' : IsPlaceOver A w')
 
 theorem continuous_res : Continuous (AlgEquiv.restrictScalarsHom E : G E' Ω →* G E Ω) := by
@@ -27,12 +32,16 @@ theorem continuous_res : Continuous (AlgEquiv.restrictScalarsHom E : G E' Ω →
   have : Finite S := (Set.finite_range _).to_subtype
   have : Algebra.IsAlgebraic E' Ω := IsAlgClosure.isAlgebraic
   rw [Filter.mem_map]
-  refine (krullTopology_mem_nhds_one_iff E' Ω _).mpr ⟨IntermediateField.adjoin E' S,
-    IntermediateField.finiteDimensional_adjoin fun x _ => (Algebra.IsAlgebraic.isAlgebraic x).isIntegral,
-    fun σ hσ => hLU ?_⟩
+  refine (krullTopology_mem_nhds_one_iff E' Ω _).mpr ⟨
+    IntermediateField.adjoin E' S,
+    IntermediateField.finiteDimensional_adjoin fun x _ =>
+      (Algebra.IsAlgebraic.isAlgebraic x).isIntegral,
+    fun σ hσ => hLU ?_
+  ⟩
   have hσ' := (IntermediateField.mem_fixingSubgroup_iff _ σ).mp hσ
   refine (IntermediateField.mem_fixingSubgroup_iff _ _).mpr fun x hx => ?_
-  have hlin : (AlgEquiv.restrictScalarsHom E σ).toLinearMap ∘ₗ L.val.toLinearMap = L.val.toLinearMap :=
+  have hlin
+      : (AlgEquiv.restrictScalarsHom E σ).toLinearMap ∘ₗ L.val.toLinearMap = L.val.toLinearMap :=
     b.ext fun i => hσ' _ (IntermediateField.subset_adjoin E' S ⟨i, rfl⟩)
   exact LinearMap.congr_fun hlin ⟨x, hx⟩
 

@@ -6,14 +6,20 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
 
-private theorem graph_ext {G Y : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [Group Y] [TopologicalSpace Y] [IsTopologicalGroup Y] [CompactSpace Y] [TotallyDisconnectedSpace Y] [T2Space Y]
+private theorem graph_ext
+    {G Y : Type}
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group Y] [TopologicalSpace Y]
+    [IsTopologicalGroup Y] [CompactSpace Y] [TotallyDisconnectedSpace Y] [T2Space Y]
     (I : Subgroup G) (σ : G) (hd : (I ⊔ Subgroup.zpowers σ).topologicalClosure = ⊤)
-    (hU : ∀ n : ℕ, 0 < n → ∃ U : Subgroup G, U.Normal ∧ IsOpen (U : Set G) ∧ I ≤ U ∧
-      ∀ k : ℤ, σ ^ k ∈ U → (n : ℤ) ∣ k) (y : Y) :
-    ∃ f : G →* Y, Continuous f ∧ (∀ g ∈ I, f g = 1) ∧ f σ = y := by
+    (hU : ∀ n : ℕ,
+      0 < n
+        → ∃ U : Subgroup G,
+          U.Normal ∧ IsOpen (U : Set G) ∧ I ≤ U ∧ ∀ k : ℤ, σ ^ k ∈ U → (n : ℤ) ∣ k)
+    (y : Y)
+    : ∃ f : G →* Y, Continuous f ∧ (∀ g ∈ I, f g = 1) ∧ f σ = y := by
   set Δ : Subgroup (G × Y) := I.prod ⊥ ⊔ Subgroup.zpowers (σ, y) with hΔ
   set Γ : Subgroup (G × Y) := Δ.topologicalClosure with hΓ
   have hΓc : IsClosed (Γ : Set (G × Y)) := Δ.isClosed_topologicalClosure
@@ -30,12 +36,15 @@ private theorem graph_ext {G Y : Type} [Group G] [TopologicalSpace G] [IsTopolog
   have hker : ∀ z : Y, ((1 : G), z) ∈ Γ → z = 1 := by
     intro z hz
     by_contra hne
-    obtain ⟨N, hN⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one (G := Y) (U := {z}ᶜ)
-      isOpen_compl_singleton (fun h => hne (Set.mem_singleton_iff.1 h).symm)
+    obtain ⟨N, hN⟩ :=
+      ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one (G := Y) (U := {z}ᶜ)
+        isOpen_compl_singleton (fun h => hne (Set.mem_singleton_iff.1 h).symm)
     haveI : N.toSubgroup.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
-    obtain ⟨U, hUn, hUo, hIU, hUk⟩ := hU N.toSubgroup.index (Nat.pos_of_ne_zero Subgroup.FiniteIndex.index_ne_zero)
+    obtain ⟨U, hUn, hUo, hIU, hUk⟩ :=
+      hU N.toSubgroup.index (Nat.pos_of_ne_zero Subgroup.FiniteIndex.index_ne_zero)
     have hle : Γ ≤ U.prod N.toSubgroup ⊔ Subgroup.zpowers (σ, y) := by
-      refine Subgroup.topologicalClosure_minimal _ (sup_le_sup_right (Subgroup.prod_mono hIU bot_le) _) ?_
+      refine Subgroup.topologicalClosure_minimal _
+        (sup_le_sup_right (Subgroup.prod_mono hIU bot_le) _) ?_
       refine Subgroup.isClosed_of_isOpen _ (Subgroup.isOpen_mono le_sup_left ?_)
       exact hUo.prod N.isOpen
     have h1 := hle hz
@@ -51,18 +60,24 @@ private theorem graph_ext {G Y : Type} [Group G] [TopologicalSpace G] [IsTopolog
       rw [← e2, zpow_mul, zpow_natCast]
       exact N.toSubgroup.mul_mem hw (N.toSubgroup.zpow_mem (N.toSubgroup.pow_index_mem y) c)
     exact hN h3 rfl
-  obtain ⟨f, hf⟩ := Subgroup.exists_eq_graph (G := Γ) (by
-    constructor
-    · rintro ⟨⟨a, b⟩, hab⟩ ⟨⟨a', b'⟩, hab'⟩ h
-      obtain rfl : a = a' := h
-      have := hker (b⁻¹ * b') (by simpa using Γ.mul_mem (Γ.inv_mem hab) hab')
-      obtain rfl : b = b' := inv_mul_eq_one.1 this
-      rfl
-    · intro g
-      obtain ⟨p, hp, rfl⟩ : g ∈ Γ.map (MonoidHom.fst G Y) := by rw [hsurj]; trivial
-      exact ⟨⟨p, hp⟩, rfl⟩)
+  obtain ⟨f, hf⟩ :=
+    Subgroup.exists_eq_graph (G := Γ) (by
+      constructor
+      · rintro ⟨⟨a, b⟩, hab⟩ ⟨⟨a', b'⟩, hab'⟩ h
+        obtain rfl : a = a' := h
+        have := hker (b⁻¹ * b') (by simpa using Γ.mul_mem (Γ.inv_mem hab) hab')
+        obtain rfl : b = b' := inv_mul_eq_one.1 this
+        rfl
+      · intro g
+        obtain ⟨p, hp, rfl⟩ : g ∈ Γ.map (MonoidHom.fst G Y) := by rw [hsurj]; trivial
+        exact ⟨⟨p, hp⟩, rfl⟩)
   have hmem : ∀ a b, (a, b) ∈ Γ ↔ f a = b := fun a b => by rw [hf]; rfl
-  refine ⟨f, continuous_iff_isClosed.2 fun C hC => ?_, fun g hg => (hmem _ _).1 (hIΓ g hg), (hmem _ _).1 hσΓ⟩
+  refine ⟨
+    f,
+    continuous_iff_isClosed.2 fun C hC => ?_,
+    fun g hg => (hmem _ _).1 (hIΓ g hg),
+    (hmem _ _).1 hσΓ
+  ⟩
   have : f ⁻¹' C = Prod.fst '' ((Γ : Set (G × Y)) ∩ Prod.snd ⁻¹' C) := by
     ext g
     constructor
@@ -75,13 +90,17 @@ private theorem graph_ext {G Y : Type} [Group G] [TopologicalSpace G] [IsTopolog
   rw [this]
   exact isClosedMap_fst_of_compactSpace _ (hΓc.inter (hC.preimage continuous_snd))
 
-private theorem root_eq_one {v : ℕ} [Fact v.Prime] {m : ℕ} (hm : ¬ v ∣ m) {η : Om v} (hη : η ^ m = 1)
-    (h : ‖η - 1‖ < 1) : η = 1 :=
+private theorem root_eq_one
+    {v : ℕ} [Fact v.Prime] {m : ℕ} (hm : ¬ v ∣ m) {η : Om v} (hη : η ^ m = 1) (h : ‖η - 1‖ < 1)
+    : η = 1 :=
   _root_.UpperTheory.Reformulated.B.Qe14.root_eq_one hm hη h
 
-private theorem exists_level {v : ℕ} [Fact v.Prime] (σ : GQ v)
-    (hσ : UpperTheory.V.Loc.IsFrob (v := v) σ) (n : ℕ) (hn : 0 < n) :
-    ∃ U : Subgroup (GQ v), U.Normal ∧ IsOpen (U : Set (GQ v)) ∧ Iq v ≤ U ∧ ∀ k : ℤ, σ ^ k ∈ U → (n : ℤ) ∣ k := by
+private theorem exists_level
+    {v : ℕ} [Fact v.Prime]
+    (σ : GQ v) (hσ : UpperTheory.V.Loc.IsFrob (v := v) σ)
+    (n : ℕ) (hn : 0 < n)
+    : ∃ U : Subgroup (GQ v),
+      U.Normal ∧ IsOpen (U : Set (GQ v)) ∧ Iq v ≤ U ∧ ∀ k : ℤ, σ ^ k ∈ U → (n : ℤ) ∣ k := by
   have hv : v.Prime := Fact.out
   have h1 : 1 < v ^ n := Nat.one_lt_pow hn.ne' hv.one_lt
   obtain ⟨m, hm⟩ : ∃ m, m = v ^ n - 1 := ⟨_, rfl⟩
@@ -113,8 +132,13 @@ private theorem exists_level {v : ℕ} [Fact v.Prime] (σ : GQ v)
     induction k with
     | zero => simp
     | succ k ih => rw [pow_succ', AlgEquiv.mul_apply, ih, map_pow, hσζ, ← pow_mul, ← pow_succ']
-  refine ⟨MulAction.stabilizer (GQ v) ζ, ⟨fun g hgζ h => ?_⟩, stabilizer_isOpen_of_isIntegral ζ, fun g hgI => ?_,
-    fun k hk => ?_⟩
+  refine ⟨
+    MulAction.stabilizer (GQ v) ζ,
+    ⟨fun g hgζ h => ?_⟩,
+    stabilizer_isOpen_of_isIntegral ζ,
+    fun g hgI => ?_,
+    fun k hk => ?_
+  ⟩
   · have hgζ' : g ζ = ζ := hgζ
     obtain ⟨i, -, hi⟩ := hζ.eq_pow_of_pow_eq_one (hg h⁻¹)
     show h (g (h⁻¹ ζ)) = ζ
@@ -139,21 +163,28 @@ private theorem exists_level {v : ℕ} [Fact v.Prime] (σ : GQ v)
     have h7 : v ^ n = v ^ n.gcd j := by omega
     exact Nat.gcd_eq_left_iff_dvd.1 (Nat.pow_right_injective hv.two_le h7).symm
 
-theorem UpperTheory.V.Loc.frobFree :
-    ∀ {v : ℕ} [Fact v.Prime] (σ : GQ v), UpperTheory.V.Loc.IsFrob (v := v) σ →
-      ∀ (Y : Type) [Group Y] [TopologicalSpace Y] [IsTopologicalGroup Y] [CompactSpace Y] [TotallyDisconnectedSpace Y] [T2Space Y] (y : Y), ∃ f : GQ v →* Y, Continuous f ∧ (∀ g ∈ Iq v, f g = 1) ∧ f σ = y := by
+theorem UpperTheory.V.Loc.frobFree
+    : ∀ {v : ℕ} [Fact v.Prime] (σ : GQ v),
+      UpperTheory.V.Loc.IsFrob (v := v) σ
+        → ∀ (Y : Type) [Group Y] [TopologicalSpace Y] [IsTopologicalGroup Y] [CompactSpace Y]
+            [TotallyDisconnectedSpace Y] [T2Space Y] (y : Y),
+          ∃ f : GQ v →* Y,
+            Continuous f ∧ (∀ g ∈ Iq v, f g = 1) ∧ f σ = y := by
   intro v _ σ hσ Y _ _ _ _ _ _ y
   have hd : (Iq v ⊔ Subgroup.zpowers σ).topologicalClosure = ⊤ := by
     have hv : v.Prime := Fact.out
-    have level : ∀ {x : Om v}, x ∈ MaximalUnramifiedExtension v →
-        ∃ m : ℕ, ¬ v ∣ m ∧
-          ∀ g h : GQ v, (∀ z : Om v, z ^ m = 1 → g z = h z) → g x = h x := by
+    have level
+        : ∀ {x : Om v},
+          x ∈ MaximalUnramifiedExtension v
+            → ∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ z : Om v, z ^ m = 1 → g z = h z) → g x = h x := by
       intro x hx
-      have combine : ∀ {a b : Om v},
-          (∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ z : Om v, z ^ m = 1 → g z = h z) → g a = h a) →
-          (∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ z : Om v, z ^ m = 1 → g z = h z) → g b = h b) →
-          ∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ z : Om v, z ^ m = 1 → g z = h z) →
-            g a = h a ∧ g b = h b := by
+      have combine
+          : ∀ {a b : Om v},
+            (∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ z : Om v, z ^ m = 1 → g z = h z) → g a = h a)
+              → (∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ z : Om v, z ^ m = 1 → g z = h z) → g b = h b)
+              → ∃ m : ℕ,
+                ¬ v ∣ m
+                  ∧ ∀ g h : GQ v, (∀ z : Om v, z ^ m = 1 → g z = h z) → g a = h a ∧ g b = h b := by
         rintro a b ⟨m, hm, ha⟩ ⟨n, hn, hb⟩
         refine ⟨m * n, fun h => (hv.dvd_mul.mp h).elim hm hn, fun g h hgh => ⟨ha g h ?_, hb g h ?_⟩⟩
         · exact fun z hz => hgh z (by rw [pow_mul, hz, one_pow])

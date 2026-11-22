@@ -9,7 +9,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -112,10 +114,19 @@ private lemma tor_loc (K : Type) [Field K] [NumberField K] (v : H.P K) (ϖ : (H.
     rw [key, ih, hs_succ]
     ring
 
-theorem UpperTheory.eigenform_shintani_formula_at_place :
-    ∀ (K : Type) [Field K] [NumberField K] (v : H.P K) (ϖ : (H.Kv v)ˣ), H.IsU ϖ → ∀ (χ : H.Kv v → ℂ), H.Good χ → ∀ (α β : ℂˣ) (f : GL (Fin 2) (A K) → ℂ),
-          EigAt v {α, β} f → (∀ b h, f (H.lc v (H.nL b) * h) = χ b * f h) → ∀ g, H.KAt v g → ∀ k : ℕ,
-          (H.q v ^ (1 / 2 : ℂ)) ^ k * f (aE (H.idl v ϖ ^ k) * g) = (∑ i ∈ Finset.range (k + 1), ((α : ℂ)) ^ i * ((β : ℂ)) ^ (k - i)) * f g := by
+theorem UpperTheory.eigenform_shintani_formula_at_place
+    : ∀ (K : Type) [Field K] [NumberField K] (v : H.P K) (ϖ : (H.Kv v)ˣ),
+      H.IsU ϖ
+        → ∀ (χ : H.Kv v → ℂ),
+          H.Good χ
+            → ∀ (α β : ℂˣ) (f : GL (Fin 2) (A K) → ℂ),
+              EigAt v {α, β} f → (∀ b h, f (H.lc v (H.nL b) * h) = χ b * f h)
+                → ∀ g,
+                  H.KAt v g
+                    → ∀ k : ℕ,
+                      (H.q v ^ (1 / 2 : ℂ)) ^ k * f (aE (H.idl v ϖ ^ k) * g)
+                        = (∑ i ∈ Finset.range (k + 1), ((α : ℂ)) ^ i * ((β : ℂ)) ^ (k - i))
+                          * f g := by
   intro K _ _ v ϖ hϖ χ hχ α β f hB hn g hg k
   have hE1 : UpperTheory.V.Af.Smo.Eig v {α, β} fun x => f (H.lc v x * g) := by
     have := (H.fixTr K v f g hg).2 _ hB 1

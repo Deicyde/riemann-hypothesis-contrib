@@ -8,11 +8,19 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
 
 namespace GlobalTheory.Cyc
 
-theorem htBasis_of_isDec : ∀ (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicComplex l ≃+* PadicComplex l)) (χ : GQ l →* ℚ_[l]ˣ), IsActC act → IsCyc χ → ∀ (K : FinExt l), ∀ (m d : ℕ) (M U : GQ l → Matrix (Fin d) (Fin d) (PadicComplex l)) (Dm : Matrix (Fin d) (Fin d) (PadicComplex l)) (g : GQ l) (J : Set ℤ), IsDec act χ K m M Dm U g → HTBasis act χ (Gj K m) M J → HTBasis act χ (Gj K m) U J := by
+theorem htBasis_of_isDec
+    : ∀ (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicComplex l ≃+* PadicComplex l))
+        (χ : GQ l →* ℚ_[l]ˣ),
+      IsActC act → IsCyc χ
+        → ∀ (K : FinExt l),
+          ∀ (m d : ℕ) (M U : GQ l → Matrix (Fin d) (Fin d) (PadicComplex l))
+              (Dm : Matrix (Fin d) (Fin d) (PadicComplex l)) (g : GQ l) (J : Set ℤ),
+            IsDec act χ K m M Dm U g → HTBasis act χ (Gj K m) M J → HTBasis act χ (Gj K m) U J := by
   intro l _ act χ _ _ K m d M U Dm g J hD hH
   obtain ⟨hdet, -, -, -, hrel⟩ := hD
   obtain ⟨e, u, hli, hu, hfix⟩ := hH
@@ -32,12 +40,13 @@ theorem htBasis_of_isDec : ∀ (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicC
     exact hli
   · intro σ hσ k
     apply hinj
-    have hmap : (Dm.map (act σ)).mulVec (fun a => act σ (Dm⁻¹.mulVec (e k) a)) =
-        fun a => act σ (e k a) := by
+    have hmap
+        : (Dm.map (act σ)).mulVec (fun a => act σ (Dm⁻¹.mulVec (e k) a))
+          = fun a => act σ (e k a) := by
       funext a
       conv_rhs => rw [← hDe (e k)]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
+      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
     have h1 := hfix σ hσ k
     unfold twAct at h1 ⊢
     rw [Matrix.mulVec_smul, Matrix.mulVec_mulVec, hrel σ hσ, ← Matrix.mulVec_mulVec, hmap, h1, hDe]

@@ -8,14 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.MyTiedNotMeas
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions Formalism.MainNotions.StandardLattice
+open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions
+  Formalism.MainNotions.StandardLattice
 open scoped TensorProduct
 
 namespace GlobalTheory.CongIndex
 
-theorem relIndex_congPre (O K : Type) [CommRing O] [IsLocalRing O] [CommRing K] (ι : O →+* K)
-    (hι : Function.Injective ι) (n : ℕ) (H : Subgroup (GL (Fin n) (O ⧸ IsLocalRing.maximalIdeal O))) :
-    (congPre ι (IsLocalRing.maximalIdeal O) H).relIndex (bc (n := Fin n) ι).range = H.index := by
+theorem relIndex_congPre
+    (O K : Type) [CommRing O] [IsLocalRing O] [CommRing K]
+    (ι : O →+* K) (hι : Function.Injective ι)
+    (n : ℕ) (H : Subgroup (GL (Fin n) (O ⧸ IsLocalRing.maximalIdeal O)))
+    : (congPre ι (IsLocalRing.maximalIdeal O) H).relIndex (bc (n := Fin n) ι).range = H.index := by
   have hinj : Function.Injective (bc (n := Fin n) ι) := by
     intro g h e
     apply Units.ext

@@ -5,7 +5,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix ComplexConjugate
 
 namespace GlobalTheory.UnitaryFrames
@@ -65,8 +67,9 @@ def unitarySubgroup {r : ℕ} (X : Data E r) : Subgroup (X.Ψ → GL (Fin r) ℂ
     exact h1.trans h2
   inv_mem' := by
     intro a ha τ u w
-    have h1 := ha τ ((((a τ)⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) *ᵥ u)
-      ((((a τ)⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) *ᵥ w)
+    have h1 :=
+      ha τ ((((a τ)⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) *ᵥ u)
+        ((((a τ)⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) *ᵥ w)
     simp only [Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec] at h1
     exact h1.symm
 
@@ -102,9 +105,9 @@ lemma isOrth_lmulC {r : ℕ} (X : Data E r) {n : X.Ψ → Matrix (Fin r) (Fin r)
   ext a b
   simp only [gram, Matrix.of_apply, col_mul', hn τ]
 
-noncomputable def toGL {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : IsOrth X x) :
-    X.Ψ → GL (Fin r) ℂ :=
-  fun τ => Matrix.GeneralLinearGroup.mkOfDetNeZero (mat x τ) (det_ne_zero_of_isOrth X hx τ)
+noncomputable def toGL {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : IsOrth X x)
+    : X.Ψ → GL (Fin r) ℂ := fun τ =>
+  Matrix.GeneralLinearGroup.mkOfDetNeZero (mat x τ) (det_ne_zero_of_isOrth X hx τ)
 
 lemma val_toGL {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : IsOrth X x) (τ : X.Ψ) :
     (toGL X hx τ : Matrix (Fin r) (Fin r) ℂ) = mat x τ := rfl
@@ -138,8 +141,32 @@ lemma continuous_toGL {r : ℕ} (X : Data E r) :
   rw [h]
   exact (hc.matrix_det.inv₀ fun x => det_ne_zero_of_isOrth X x.2 τ).smul hc.matrix_adjugate
 
-theorem unitary_group_frames :
-    ((∀ (r : ℕ) (X : Data E r), ∃ H : Subgroup (X.Ψ → GL (Fin r) ℂ), ∀ g, g ∈ H ↔ X.IsUnitaryC fun τ => (g τ : Matrix (Fin r) (Fin r) ℂ)) ∧ (∀ (r : ℕ) (X : Data E r) (H : Subgroup (X.Ψ → GL (Fin r) ℂ)), (∀ g, g ∈ H ↔ X.IsUnitaryC fun τ => (g τ : Matrix (Fin r) (Fin r) ℂ)) → LocallyCompactSpace H ∧ SecondCountableTopology H ∧ ∀ x0, IsOrth X x0 → (∀ g : H, IsOrth X (X.lmulC (fun τ => ((g : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x0)) ∧ ∃ ι : Frame X.Ψ r → H, ContinuousOn ι {x | IsOrth X x} ∧ (∀ x, IsOrth X x → X.lmulC (fun τ => ((ι x : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x0 = x) ∧ ∀ g : H, ι (X.lmulC (fun τ => ((g : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x0) = g)) := by
+theorem unitary_group_frames
+    : ((∀ (r : ℕ) (X : Data E r), ∃ H : Subgroup (X.Ψ → GL (Fin r) ℂ), ∀ g,
+        g ∈ H ↔ X.IsUnitaryC fun τ => (g τ : Matrix (Fin r) (Fin r) ℂ))
+      ∧ (∀ (r : ℕ) (X : Data E r) (H : Subgroup (X.Ψ → GL (Fin r) ℂ)),
+        (∀ g, g ∈ H ↔ X.IsUnitaryC fun τ => (g τ : Matrix (Fin r) (Fin r) ℂ))
+          → LocallyCompactSpace H ∧ SecondCountableTopology H
+            ∧ ∀ x0,
+              IsOrth X x0
+                → (∀ g : H,
+                    IsOrth X
+                      (X.lmulC
+                        (fun τ => ((g : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ))
+                        x0))
+                  ∧ ∃ ι : Frame X.Ψ r → H,
+                    ContinuousOn ι {x | IsOrth X x}
+                      ∧ (∀ x,
+                        IsOrth X x
+                          → X.lmulC
+                              (fun τ => ((ι x : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ))
+                              x0
+                            = x)
+                      ∧ ∀ g : H,
+                        ι (X.lmulC
+                            (fun τ => ((g : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ))
+                            x0)
+                          = g)) := by
   classical
   refine ⟨fun r X => ⟨unitarySubgroup X, fun g => Iff.rfl⟩, fun r X H hH => ?_⟩
   haveI := locallyCompact_GL r
@@ -148,13 +175,26 @@ theorem unitary_group_frames :
     convert isClosed_unitary X using 1
     ext g
     exact hH g
-  refine ⟨hcl.locallyCompactSpace,
-    Topology.IsEmbedding.subtypeVal.secondCountableTopology, fun x0 hx0 => ?_⟩
-  have horth : ∀ g : H, IsOrth X (X.lmulC
-      (fun τ => ((g : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x0) :=
+  refine ⟨
+    hcl.locallyCompactSpace,
+    Topology.IsEmbedding.subtypeVal.secondCountableTopology,
+    fun x0 hx0 => ?_
+  ⟩
+  have horth
+      : ∀ g : H,
+        IsOrth X (X.lmulC (fun τ => ((g : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x0) :=
     fun g => isOrth_lmulC X ((hH _).1 g.2) hx0
-  refine ⟨horth, fun x => if hx : IsOrth X x then
-    ⟨toGL X hx * (toGL X hx0)⁻¹, (hH _).2 (quotient_unitary X hx hx0)⟩ else 1, ?_, ?_, ?_⟩
+  refine ⟨
+    horth,
+    fun x =>
+      if hx : IsOrth X x then
+        ⟨toGL X hx * (toGL X hx0)⁻¹, (hH _).2 (quotient_unitary X hx hx0)⟩
+      else
+        1,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [continuousOn_iff_continuous_restrict]
     refine continuous_induced_rng.2 ?_
     refine ((continuous_toGL X).mul (continuous_const (y := (toGL X hx0)⁻¹))).congr fun x => ?_
@@ -164,8 +204,10 @@ theorem unitary_group_frames :
   · intro x hx
     simp only [dif_pos hx]
     funext τ
-    change (((toGL X hx τ * (toGL X hx0 τ)⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) *
-      (toGL X hx0 τ : Matrix (Fin r) (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) = mat x τ
+    change (((toGL X hx τ * (toGL X hx0 τ)⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ)
+          * (toGL X hx0 τ : Matrix (Fin r) (Fin r) ℂ)
+        : Matrix (Fin r) (Fin r) ℂ)
+      = mat x τ
     rw [← Units.val_mul, inv_mul_cancel_right, val_toGL]
   · intro g
     simp only [dif_pos (horth g)]

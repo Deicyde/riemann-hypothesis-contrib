@@ -18,41 +18,46 @@ namespace FunctorialResolution.EmbeddedResolution
 
 section
 
-variable (k : Type u) [Field k] {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k))
-  [LocallyOfFiniteType p]
+variable
+  (k : Type u) [Field k] {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [LocallyOfFiniteType p]
 
 def IsMaxContactHypersurface (A : X.IdealSheafData) (m : ℕ) (H : X.IdealSheafData) : Prop :=
-  ∀ x : X, ∃ U : X.Opens, IsAffineOpen U ∧ x ∈ U ∧
-    ((Disjoint (orderAtLeastLocus A m) (U : Set ↥X) ∧ restrictIdeal H U = ⊤) ∨
-      (∃ (n : ℕ) (c : EtaleChart p U n) (j : Fin n),
-        restrictIdeal H U = c.coordIdeal {j} ∧ IsMaxContactCoord k p A m c j))
+  ∀ x : X, ∃ U : X.Opens,
+    IsAffineOpen U ∧ x ∈ U
+      ∧ ((Disjoint (orderAtLeastLocus A m) (U : Set ↥X) ∧ restrictIdeal H U = ⊤)
+        ∨ (∃ (n : ℕ) (c : EtaleChart p U n) (j : Fin n),
+          restrictIdeal H U = c.coordIdeal {j} ∧ IsMaxContactCoord k p A m c j))
 
-theorem isMaxContactHypersurface_iff (A : X.IdealSheafData) (m : ℕ) (H : X.IdealSheafData) :
-    IsMaxContactHypersurface k p A m H ↔
-      ∀ x : X, ∃ U : X.Opens, IsAffineOpen U ∧ x ∈ U ∧
-        ((Disjoint (orderAtLeastLocus A m) (U : Set ↥X) ∧ restrictIdeal H U = ⊤) ∨
-          (∃ (n : ℕ) (c : EtaleChart p U n) (j : Fin n),
-            restrictIdeal H U = c.coordIdeal {j} ∧ IsMaxContactCoord k p A m c j)) :=
+theorem isMaxContactHypersurface_iff (A : X.IdealSheafData) (m : ℕ) (H : X.IdealSheafData)
+    : IsMaxContactHypersurface k p A m H
+      ↔ ∀ x : X, ∃ U : X.Opens,
+        IsAffineOpen U ∧ x ∈ U
+          ∧ ((Disjoint (orderAtLeastLocus A m) (U : Set ↥X) ∧ restrictIdeal H U = ⊤)
+            ∨ (∃ (n : ℕ) (c : EtaleChart p U n) (j : Fin n),
+              restrictIdeal H U = c.coordIdeal {j} ∧ IsMaxContactCoord k p A m c j)) :=
   Iff.rfl
 
 end
 
 section
 
-variable {k : Type u} [Field k] [CharZero k] {X : Scheme.{u}}
-  {p : X ⟶ Spec (CommRingCat.of k)} [LocallyOfFiniteType p] [AlgebraicGeometry.Smooth p]
+variable
+  {k : Type u} [Field k] [CharZero k]
+  {X : Scheme.{u}} {p : X ⟶ Spec (CommRingCat.of k)}
+  [LocallyOfFiniteType p] [AlgebraicGeometry.Smooth p]
 
-theorem IsMaxContactHypersurface.orderAtLeastLocus_subset_support {A : X.IdealSheafData} {m : ℕ}
-    {H : X.IdealSheafData} (h : IsMaxContactHypersurface k p A m H) (hm : 1 ≤ m) :
-    orderAtLeastLocus A m ⊆ (H.support : Set ↥X) := by
+theorem IsMaxContactHypersurface.orderAtLeastLocus_subset_support
+    {A : X.IdealSheafData} {m : ℕ} {H : X.IdealSheafData}
+    (h : IsMaxContactHypersurface k p A m H) (hm : 1 ≤ m)
+    : orderAtLeastLocus A m ⊆ (H.support : Set ↥X) := by
   intro x hx
   obtain ⟨U, hU, hxU, hcase⟩ := h x
   rcases hcase with ⟨hdisj, -⟩ | ⟨n, c, j, hH, hmc⟩
   · exact absurd hxU (Set.disjoint_left.mp hdisj hx)
   · have hmem : c.coord j ∈ (maxContactIdeal k p A m).ideal ⟨U, hU⟩ :=
       (isMaxContactCoord_iff_coord_mem k p A m hU c j).mp hmc
-    have hHideal :
-        H.ideal ⟨U, hU⟩ = Ideal.span (c.coord '' (({j} : Finset (Fin n)) : Set (Fin n))) :=
+    have hHideal
+        : H.ideal ⟨U, hU⟩ = Ideal.span (c.coord '' (({j} : Finset (Fin n)) : Set (Fin n))) :=
       c.ideal_eq_span_coord hU H {j} hH
     have hle : H.ideal ⟨U, hU⟩ ≤ (maxContactIdeal k p A m).ideal ⟨U, hU⟩ := by
       rw [hHideal, Finset.coe_singleton, Set.image_singleton, Ideal.span_le,

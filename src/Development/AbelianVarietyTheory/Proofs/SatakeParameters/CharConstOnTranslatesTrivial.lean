@@ -57,11 +57,11 @@ lemma add_ne {θ : ℂ} (hθ : θ.im ≠ 0) (t : ℝ) : (t : ℂ) + θ ≠ 0 := 
 lemma ofReal_ne {ρ : ℝ} (h : 0 < ρ) : (ρ : ℂ) ≠ 0 := by
   exact_mod_cast h.ne'
 
-noncomputable def shift (θ : ι → ℂ) (hθ : ∀ i, (θ i).im ≠ 0) (a : ι → ℝ) : ι → ℂˣ :=
-  fun i => Units.mk0 _ (add_ne (hθ i) (a i))
+noncomputable def shift (θ : ι → ℂ) (hθ : ∀ i, (θ i).im ≠ 0) (a : ι → ℝ) : ι → ℂˣ := fun i =>
+  Units.mk0 _ (add_ne (hθ i) (a i))
 
-noncomputable def realUnits (r : ι → ℝ) (hr : ∀ i, 0 < r i) : ι → ℂˣ :=
-  fun i => Units.mk0 _ (ofReal_ne (hr i))
+noncomputable def realUnits (r : ι → ℝ) (hr : ∀ i, 0 < r i) : ι → ℂˣ := fun i =>
+  Units.mk0 _ (ofReal_ne (hr i))
 
 lemma abs_coord_le {a y : ι → ℝ} {C : ℝ} (h : ‖a - y‖ ≤ C) (i : ι) : |a i - y i| ≤ C := by
   have := norm_le_pi_norm (a - y) i
@@ -246,18 +246,21 @@ lemma char_trivial (e : ℂˣ →* ℂˣ) (he : Continuous e) (θ : ℂ) (hθ : 
 
 end GlobalTheory.ArchChar
 
-theorem GlobalTheory.charConstOnTranslates_trivial : ∀ (ι : Type) [Fintype ι] [DecidableEq ι]
-    (ψ : (ι → ℂˣ) →* ℂˣ) (θ : ι → ℂ) (T : Set (ι → ℝ)) (C : ℝ) (c : ℂˣ), Continuous ψ →
-    (∀ i, (θ i).im ≠ 0) → (∀ y : ι → ℝ, ∃ a ∈ T, ‖a - y‖ ≤ C) →
-    (∀ a ∈ T, ∀ z : ι → ℂˣ, (∀ i, (z i : ℂ) = a i + θ i) → ψ z = c) → ψ = 1 := by
+theorem GlobalTheory.charConstOnTranslates_trivial
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (ψ : (ι → ℂˣ) →* ℂˣ) (θ : ι → ℂ) (T : Set (ι → ℝ))
+        (C : ℝ) (c : ℂˣ),
+      Continuous ψ → (∀ i, (θ i).im ≠ 0) → (∀ y : ι → ℝ, ∃ a ∈ T, ‖a - y‖ ≤ C)
+        → (∀ a ∈ T, ∀ z : ι → ℂˣ, (∀ i, (z i : ℂ) = a i + θ i) → ψ z = c)
+        → ψ = 1 := by
   intro ι _ _ ψ θ T C c hψ hθ hT hc
-  have hc' : ∀ a ∈ T, ψ (GlobalTheory.ArchChar.shift θ hθ a) = c :=
-    fun a ha => hc a ha _ (fun i => rfl)
+  have hc' : ∀ a ∈ T, ψ (GlobalTheory.ArchChar.shift θ hθ a) = c := fun a ha =>
+    hc a ha _ (fun i => rfl)
   have h1 := GlobalTheory.ArchChar.const_eq_one ψ hψ θ hθ T C c hT hc'
   subst h1
   have hcomp : ∀ i, ψ.comp (MonoidHom.mulSingle (fun _ : ι => ℂˣ) i) = 1 := by
     intro i
-    refine GlobalTheory.ArchChar.char_trivial _ (by exact hψ.comp (continuous_mulSingle (A := fun _ : ι => ℂˣ) i)) (θ i) (hθ i) C ?_ ?_
+    refine GlobalTheory.ArchChar.char_trivial _
+      (by exact hψ.comp (continuous_mulSingle (A := fun _ : ι => ℂˣ) i)) (θ i) (hθ i) C ?_ ?_
     · intro ρ hρ
       have hr : ∀ j, 0 < Function.update (fun _ : ι => (1 : ℝ)) i ρ j := by
         intro j
@@ -265,7 +268,9 @@ theorem GlobalTheory.charConstOnTranslates_trivial : ∀ (ι : Type) [Fintype ι
         · subst hj; simpa using hρ
         · simp [Function.update_of_ne hj]
       have h := GlobalTheory.ArchChar.real_trivial ψ hψ θ hθ T C 1 hT hc' _ hr
-      have hu : GlobalTheory.ArchChar.realUnits _ hr = Pi.mulSingle i (Units.mk0 _ (GlobalTheory.ArchChar.ofReal_ne hρ)) := by
+      have hu
+          : GlobalTheory.ArchChar.realUnits _ hr
+            = Pi.mulSingle i (Units.mk0 _ (GlobalTheory.ArchChar.ofReal_ne hρ)) := by
         funext j
         by_cases hj : j = i
         · subst hj; ext; simp [GlobalTheory.ArchChar.realUnits]

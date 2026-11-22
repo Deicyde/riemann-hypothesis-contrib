@@ -15,7 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Localization
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -25,32 +26,75 @@ namespace GlobalTheory.SpreadCurve
 
 open Polynomial
 
-theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)) [GrpObj G], GlobalTheory.SS.SmConn G → ∀ g : ℕ, SmoothOfRelativeDimension g G.hom → ∀ m : ℕ, 1 ≤ m → (m : k) ≠ 0 → ∀ s : Finset (𝟙_ (Over (Sp k)) ⟶ G), (∀ x ∈ s, x ^ m = 1) → ∀ (P : Polynomial k), P ≠ 0 → ∀ (u : Sp (Localization.Away P) ⟶ G.left) (a b : Localization.Away P →ₐ[k] k), u ≫ G.hom = spMap (algebraMap k (Localization.Away P)) → spMap a.toRingHom ≫ u ≠ spMap b.toRingHom ≫ u → ∃ (R : Subring k) (G₁ : Over (Sp R)) (_ : GrpObj G₁), Algebra.FiniteType ℤ R ∧ IsUnit (m : R) ∧ IsCommMonObj G₁ ∧ Smooth G₁.hom ∧ IsSeparated G₁.hom ∧ QuasiCompact G₁.hom ∧ GeometricallyConnected (pullback.snd G₁.hom (spMap R.subtype)) ∧ SmoothOfRelativeDimension g (pullback.snd G₁.hom (spMap R.subtype)) ∧ (∃ s₁ : Finset (𝟙_ (Over (Sp R)) ⟶ G₁), s₁.card = s.card ∧ (∀ x ∈ s₁, x ^ m = 1) ∧ ∀ x ∈ s₁, ∀ y ∈ s₁, x ≠ y → spMap R.subtype ≫ x.left ≠ spMap R.subtype ≫ y.left) ∧ ∃ (P₁ : Polynomial R) (_ : P₁ ≠ 0) (u₁ : Sp (Localization.Away P₁) ⟶ G₁.left) (α β : R) (hα : IsUnit (Polynomial.evalRingHom α P₁)) (hβ : IsUnit (Polynomial.evalRingHom β P₁)), u₁ ≫ G₁.hom = spMap (algebraMap R (Localization.Away P₁)) ∧ spMap R.subtype ≫ spMap (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hα) ≫ u₁ ≠ spMap R.subtype ≫ spMap (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hβ) ≫ u₁ := by
+theorem group_sections_curve_descend
+    : ∀ (k : Type) [Field k] (G : Over (Sp k)) [GrpObj G],
+      GlobalTheory.SS.SmConn G
+        → ∀ g : ℕ,
+          SmoothOfRelativeDimension g G.hom
+            → ∀ m : ℕ,
+              1 ≤ m → (m : k) ≠ 0
+                → ∀ s : Finset (𝟙_ (Over (Sp k)) ⟶ G),
+                  (∀ x ∈ s, x ^ m = 1)
+                    → ∀ (P : Polynomial k),
+                      P ≠ 0
+                        → ∀ (u : Sp (Localization.Away P) ⟶ G.left)
+                            (a b : Localization.Away P →ₐ[k] k),
+                          u ≫ G.hom = spMap (algebraMap k (Localization.Away P))
+                            → spMap a.toRingHom ≫ u ≠ spMap b.toRingHom ≫ u
+                            → ∃ (R : Subring k) (G₁ : Over (Sp R)) (_ : GrpObj G₁),
+                              Algebra.FiniteType ℤ R ∧ IsUnit (m : R) ∧ IsCommMonObj G₁
+                                ∧ Smooth G₁.hom ∧ IsSeparated G₁.hom ∧ QuasiCompact G₁.hom
+                                ∧ GeometricallyConnected (pullback.snd G₁.hom (spMap R.subtype))
+                                ∧ SmoothOfRelativeDimension g
+                                  (pullback.snd G₁.hom (spMap R.subtype))
+                                ∧ (∃ s₁ : Finset (𝟙_ (Over (Sp R)) ⟶ G₁),
+                                  s₁.card = s.card ∧ (∀ x ∈ s₁, x ^ m = 1)
+                                    ∧ ∀ x ∈ s₁, ∀ y ∈ s₁,
+                                      x ≠ y → spMap R.subtype ≫ x.left ≠ spMap R.subtype ≫ y.left)
+                                ∧ ∃ (P₁ : Polynomial R) (_ : P₁ ≠ 0)
+                                    (u₁ : Sp (Localization.Away P₁) ⟶ G₁.left) (α β : R)
+                                    (hα : IsUnit (Polynomial.evalRingHom α P₁))
+                                    (hβ : IsUnit (Polynomial.evalRingHom β P₁)),
+                                  u₁ ≫ G₁.hom = spMap (algebraMap R (Localization.Away P₁))
+                                    ∧ spMap R.subtype
+                                        ≫ spMap (IsLocalization.Away.lift
+                                          (S := Localization.Away P₁) P₁ hα)
+                                        ≫ u₁
+                                      ≠ spMap R.subtype
+                                        ≫ spMap (IsLocalization.Away.lift
+                                          (S := Localization.Away P₁) P₁ hβ)
+                                        ≫ u₁ := by
   intro k _ G _ hG g hg m hm hmk s hs P hP u a b hu hab
   classical
   obtain ⟨hc, h1, h2, h3, h5⟩ := hG
   obtain ⟨R₀, G₀, i₀, ic₀, φ, -, hR₀, s₁, s₂, s₃, hφ⟩ :=
     GlobalTheory.smooth_grpScheme_descends_to_fg_subring k G ∅ h1 h2 h3
 
-  haveI := s₁; haveI := s₂; haveI := s₃
+  haveI := s₁
+  haveI := s₂
+  haveI := s₃
   set L := Localization.Away P with hL
 
   have hu₀ : (u ≫ φ) ≫ G₀.hom = spMap (algebraMap R₀ L) := by
     rw [Category.assoc, hφ.1.w, ← Category.assoc, hu]
-    exact ModelDescent.spMap_comp_eq (RingHom.ext fun r => (IsScalarTower.algebraMap_apply R₀ k L r).symm)
-  obtain ⟨S, yS, hSfg, -, hyS⟩ := Spread.exists_fg_points G₀.hom (fun _ : Unit => u ≫ φ) (fun _ => hu₀) ⊥
-    Subalgebra.fg_bot
+    exact ModelDescent.spMap_comp_eq (RingHom.ext fun r =>
+      (IsScalarTower.algebraMap_apply R₀ k L r).symm)
+  obtain ⟨S, yS, hSfg, -, hyS⟩ :=
+    Spread.exists_fg_points G₀.hom (fun _ : Unit => u ≫ φ) (fun _ => hu₀) ⊥ Subalgebra.fg_bot
   obtain ⟨T, hT⟩ := hSfg
   obtain ⟨Fc, hFc⟩ := GlobalTheory.T.exists_finset_away_lift_descent k P T
 
   set X' : L := algebraMap (Polynomial k) L X with hX'
-  have haev : ∀ (c : L →ₐ[k] k) (q : Polynomial k), c (algebraMap (Polynomial k) L q) = q.eval (c X') := by
+  have haev
+      : ∀ (c : L →ₐ[k] k) (q : Polynomial k),
+        c (algebraMap (Polynomial k) L q) = q.eval (c X') := by
     intro c q
     have : (c : L →+* k).comp (algebraMap (Polynomial k) L) = Polynomial.evalRingHom (c X') := by
       refine Polynomial.ringHom_ext (fun r => ?_) ?_
       · simp only [RingHom.coe_comp, Function.comp_apply, coe_evalRingHom, eval_C]
         have e : algebraMap (Polynomial k) L (C r) = algebraMap k L r := by
-          rw [IsScalarTower.algebraMap_apply k (Polynomial k) L, Polynomial.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
+          rw [IsScalarTower.algebraMap_apply k (Polynomial k) L, Polynomial.algebraMap_apply,
+            Algebra.algebraMap_self, RingHom.id_apply]
         rw [e]
         exact c.commutes r
       · simp [hX']
@@ -66,8 +110,10 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
     intro i
     rw [Category.assoc, hφ.1.w, ← Category.assoc, Over.w i.1]
     exact Category.id_comp _
-  obtain ⟨R, y, hRfg, hR₁R, hy⟩ := Spread.exists_fg_points G₀.hom (fun i : s => i.1.left ≫ φ) hx₀
-    (Algebra.adjoin R₀ (F : Set k)) (Subalgebra.fg_adjoin_finset F)
+  obtain ⟨R, y, hRfg, hR₁R, hy⟩ :=
+    Spread.exists_fg_points G₀.hom
+      (fun i : s => i.1.left ≫ φ)
+      hx₀ (Algebra.adjoin R₀ (F : Set k)) (Subalgebra.fg_adjoin_finset F)
   let R' : Subring k := R.toSubring
   have hFR : (F : Set k) ⊆ R' := fun x hx => hR₁R (Algebra.subset_adjoin hx)
   have hR₀R : R₀ ≤ R' := fun r hr => R.algebraMap_mem ⟨r, hr⟩
@@ -77,11 +123,13 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
   let G₁ : Over (Sp R') := (Over.pullback (spMap jn)).obj G₀
   letI : GrpObj G₁ := Functor.grpObjObj
   have hG₁c : IsCommMonObj G₁ := Functor.isCommMonObj_obj
-  have hψ := ReciprocityTheory.ChartRestriction.G.Chart.isGrpPullback_factor (spMap jn) (spMap R'.subtype)
-    (hφ.congr hjnsp.symm rfl)
+  have hψ :=
+    ReciprocityTheory.ChartRestriction.G.Chart.isGrpPullback_factor (spMap jn) (spMap R'.subtype)
+      (hφ.congr hjnsp.symm rfl)
   set ψ := pullback.lift φ (G.hom ≫ spMap R'.subtype) (by rw [hφ.1.w, Category.assoc, hjnsp]) with hψdef
   have hψ₁ : ψ ≫ pullback.fst G₀.hom (spMap jn) = φ := pullback.lift_fst _ _ _
-  have hψ₂ : ψ ≫ pullback.snd G₀.hom (spMap jn) = G.hom ≫ spMap R'.subtype := pullback.lift_snd _ _ _
+  have hψ₂ : ψ ≫ pullback.snd G₀.hom (spMap jn) = G.hom ≫ spMap R'.subtype :=
+    pullback.lift_snd _ _ _
   have hyR : ∀ i : s, (y i : Sp R' ⟶ G₀.left) ≫ G₀.hom = spMap jn := fun i => (hy i).1
   have hyk : ∀ i : s, spMap R'.subtype ≫ (y i : Sp R' ⟶ G₀.left) = i.1.left ≫ φ := fun i => (hy i).2
 
@@ -98,7 +146,8 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
   let sec : s → (𝟙_ (Over (Sp R')) ⟶ G₁) := fun i =>
     Over.homMk (pullback.lift (y i : Sp R' ⟶ G₀.left) (𝟙 _) (by rw [hyR i, Category.id_comp]))
       (pullback.lift_snd _ _ _)
-  have hsec₁ : ∀ i : s, (sec i).left ≫ pullback.fst G₀.hom (spMap jn) = y i := fun i => pullback.lift_fst _ _ _
+  have hsec₁ : ∀ i : s, (sec i).left ≫ pullback.fst G₀.hom (spMap jn) = y i := fun i =>
+    pullback.lift_fst _ _ _
   have hkey : ∀ i : s, i.1.left ≫ ψ = spMap R'.subtype ≫ (sec i).left := by
     intro i
     apply pullback.hom_ext
@@ -106,7 +155,8 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
     · rw [Category.assoc, hψ₂, ← Category.assoc, Over.w i.1, Category.assoc]
       erw [pullback.lift_snd]
       exact (Category.id_comp _).trans (Category.comp_id _).symm
-  have hdist : ∀ i j : s, spMap R'.subtype ≫ (sec i).left = spMap R'.subtype ≫ (sec j).left → i = j := by
+  have hdist
+      : ∀ i j : s, spMap R'.subtype ≫ (sec i).left = spMap R'.subtype ≫ (sec j).left → i = j := by
     intro i j e
     have e' : i.1.left ≫ φ = j.1.left ≫ φ := by
       rw [← hψ₁, ← Category.assoc, ← Category.assoc, hkey, hkey, e]
@@ -120,7 +170,8 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
     have B := GlobalTheory.FrameMove.pow_comm hψ (hkey i) 0
     rw [hs i.1 i.2] at A
     rw [pow_zero, pow_zero] at B
-    refine Over.OverMorphism.ext (Spread.point_ext R'.subtype Subtype.val_injective G₁.hom ?_ (A.symm.trans B))
+    refine Over.OverMorphism.ext (Spread.point_ext R'.subtype Subtype.val_injective G₁.hom ?_
+      (A.symm.trans B))
     rw [Over.w, Over.w]
 
   have hPl : P ∈ Polynomial.lifts R'.subtype := by
@@ -132,11 +183,13 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
   have hP₁0 : P₁ ≠ 0 := by
     rintro rfl
     exact hP (by rw [← hP₁, Polynomial.map_zero])
-  have hPu : IsUnit (((algebraMap (Polynomial k) L).comp (Polynomial.mapRingHom R'.subtype)) P₁) := by
+  have hPu
+      : IsUnit (((algebraMap (Polynomial k) L).comp (Polynomial.mapRingHom R'.subtype)) P₁) := by
     rw [RingHom.comp_apply, Polynomial.coe_mapRingHom, hP₁]
     exact IsLocalization.Away.algebraMap_isUnit P
   set Lm := IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hPu with hLm
-  have hinj : Function.Injective Lm := GlobalTheory.T.localizationAway_polynomial_subring_lift_injective k P hP R' P₁ hPu hP₁
+  have hinj : Function.Injective Lm :=
+    GlobalTheory.T.localizationAway_polynomial_subring_lift_injective k P hP R' P₁ hPu hP₁
   have hrange : ∀ t ∈ T, t ∈ Lm.range := hFc R' (fun x hx => hFR (by simp [F, hx])) P₁ hPu hP₁
   have hLmC : ∀ r : R', Lm (algebraMap R' (Localization.Away P₁) r) = algebraMap k L r := by
     intro r
@@ -172,9 +225,12 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
   have hu₁f : u₁ ≫ pullback.fst G₀.hom (spMap jn) = u₁' := pullback.lift_fst _ _ _
   have hu₁s : u₁ ≫ G₁.hom = spMap (algebraMap R' (Localization.Away P₁)) := pullback.lift_snd _ _ _
 
-  have hpt : ∀ c : L →ₐ[k] k, c X' ∈ R' → (P.eval (c X'))⁻¹ ∈ R' → ∃ (w0 : R')
-      (hw0 : IsUnit (Polynomial.evalRingHom w0 P₁)),
-      R'.subtype.comp (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hw0) = c.toRingHom.comp Lm := by
+  have hpt
+      : ∀ c : L →ₐ[k] k,
+        c X' ∈ R' → (P.eval (c X'))⁻¹ ∈ R'
+          → ∃ (w0 : R') (hw0 : IsUnit (Polynomial.evalRingHom w0 P₁)),
+            R'.subtype.comp (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hw0)
+              = c.toRingHom.comp Lm := by
     intro c hc hci
     have hev : ((Polynomial.eval (⟨c X', hc⟩ : R') P₁ : R') : k) = P.eval (c X') := by
       refine Eq.trans ?_ (congrArg (Polynomial.eval (c X')) hP₁)
@@ -187,28 +243,35 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
     refine ⟨⟨c X', hc⟩, hw0, IsLocalization.ringHom_ext (Submonoid.powers P₁) ?_⟩
     refine Polynomial.ringHom_ext (fun r => ?_) ?_
     · simp only [RingHom.comp_apply, IsLocalization.Away.lift_eq, hLm, Polynomial.coe_evalRingHom,
-        Polynomial.eval_C, Polynomial.coe_mapRingHom, Polynomial.map_C, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
-        haev]
+        Polynomial.eval_C, Polynomial.coe_mapRingHom, Polynomial.map_C, AlgHom.toRingHom_eq_coe,
+        RingHom.coe_coe, haev]
     · simp only [RingHom.comp_apply, IsLocalization.Away.lift_eq, hLm, Polynomial.coe_evalRingHom,
-        Polynomial.eval_X, Polynomial.coe_mapRingHom, Polynomial.map_X, AlgHom.toRingHom_eq_coe, RingHom.coe_coe]
+        Polynomial.eval_X, Polynomial.coe_mapRingHom, Polynomial.map_X, AlgHom.toRingHom_eq_coe,
+        RingHom.coe_coe]
       rfl
 
   obtain ⟨α, hα, hαe⟩ := hpt a (hFR (by simp [F])) (hFR (by simp [F]))
   obtain ⟨β, hβ, hβe⟩ := hpt b (hFR (by simp [F])) (hFR (by simp [F]))
-  have key : ∀ (c : L →ₐ[k] k) (w0 : R') (hw0 : IsUnit (Polynomial.evalRingHom w0 P₁)),
-      R'.subtype.comp (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hw0) = c.toRingHom.comp Lm →
-      (spMap R'.subtype ≫ spMap (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hw0) ≫ u₁) ≫
-        pullback.fst G₀.hom (spMap jn) = spMap c.toRingHom ≫ u ≫ φ := by
+  have key
+      : ∀ (c : L →ₐ[k] k) (w0 : R') (hw0 : IsUnit (Polynomial.evalRingHom w0 P₁)),
+        R'.subtype.comp (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hw0)
+            = c.toRingHom.comp Lm
+          → (spMap R'.subtype ≫ spMap (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hw0)
+                ≫ u₁)
+              ≫ pullback.fst G₀.hom (spMap jn)
+            = spMap c.toRingHom ≫ u ≫ φ := by
     intro c w0 hw0 hce
     rw [Category.assoc, Category.assoc, hu₁f, ← Category.assoc, ModelDescent.spMap_comp_eq hce,
-      ← ModelDescent.spMap_comp_eq (f := Lm) (g := c.toRingHom) rfl, Category.assoc, ← Category.assoc (spMap Lm),
-      ModelDescent.spMap_comp_eq hgS, (hyS ()).2]
+      ← ModelDescent.spMap_comp_eq (f := Lm) (g := c.toRingHom) rfl, Category.assoc,
+      ← Category.assoc (spMap Lm), ModelDescent.spMap_comp_eq hgS, (hyS ()).2]
   have hcG : ∀ c : L →ₐ[k] k, spMap c.toRingHom ≫ u ≫ G.hom = 𝟙 _ := by
     intro c
     rw [hu, ModelDescent.spMap_comp_eq (h := RingHom.id k) (RingHom.ext c.commutes)]
     simp [spMap]
-  have hdistc : spMap R'.subtype ≫ spMap (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hα) ≫ u₁ ≠
-      spMap R'.subtype ≫ spMap (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hβ) ≫ u₁ := by
+  have hdistc
+      : spMap R'.subtype ≫ spMap (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hα) ≫ u₁
+        ≠ spMap R'.subtype ≫ spMap (IsLocalization.Away.lift (S := Localization.Away P₁) P₁ hβ)
+          ≫ u₁ := by
     intro e
     apply hab
     have ea := key a α hα hαe
@@ -217,9 +280,29 @@ theorem group_sections_curve_descend : ∀ (k : Type) [Field k] (G : Over (Sp k)
     have e2 : spMap a.toRingHom ≫ u ≫ φ = spMap b.toRingHom ≫ u ≫ φ := ea.symm.trans eb
     refine hφ.1.hom_ext (by simpa only [Category.assoc] using e2) ?_
     rw [Category.assoc, hcG, Category.assoc, hcG]
-  refine ⟨R', G₁, inferInstance, SpreadGroup.finiteType_of_fg hR₀ hRfg, hunit, hG₁c,
-    show Smooth (pullback.snd _ _) from inferInstance, hsep₁, show QuasiCompact (pullback.snd _ _) from inferInstance,
-    hgc, hgd, ⟨s.attach.image sec, ?_, ?_, ?_⟩, P₁, hP₁0, u₁, α, β, hα, hβ, hu₁s, hdistc⟩
+  refine ⟨
+    R',
+    G₁,
+    inferInstance,
+    SpreadGroup.finiteType_of_fg hR₀ hRfg,
+    hunit,
+    hG₁c,
+    show Smooth (pullback.snd _ _) from inferInstance,
+    hsep₁,
+    show QuasiCompact (pullback.snd _ _) from inferInstance,
+    hgc,
+    hgd,
+    ⟨s.attach.image sec, ?_, ?_, ?_⟩,
+    P₁,
+    hP₁0,
+    u₁,
+    α,
+    β,
+    hα,
+    hβ,
+    hu₁s,
+    hdistc
+  ⟩
   · rw [Finset.card_image_of_injective _ hsec_inj, Finset.card_attach]
   · intro x hx
     obtain ⟨i, -, rfl⟩ := Finset.mem_image.1 hx

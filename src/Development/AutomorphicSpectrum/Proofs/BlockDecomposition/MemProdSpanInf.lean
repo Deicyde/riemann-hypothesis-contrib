@@ -8,17 +8,21 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FinStabl
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
-open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation GlobalTheory.CompanionTheory.LimV
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
+open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  GlobalTheory.CompanionTheory.LimV
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.LimV.Slices
 
 variable {A B : Type}
 
-theorem span_eval_eq_top (W : Submodule ℂ (B → ℂ)) [FiniteDimensional ℂ W] :
-    Submodule.span ℂ (Set.range fun y : B =>
-      ((LinearMap.proj y : (B → ℂ) →ₗ[ℂ] ℂ) ∘ₗ W.subtype : Module.Dual ℂ W)) = ⊤ := by
+theorem span_eval_eq_top (W : Submodule ℂ (B → ℂ)) [FiniteDimensional ℂ W]
+    : Submodule.span ℂ
+        (Set.range fun y : B =>
+          ((LinearMap.proj y : (B → ℂ) →ₗ[ℂ] ℂ) ∘ₗ W.subtype : Module.Dual ℂ W))
+      = ⊤ := by
   set E := Submodule.span ℂ (Set.range fun y : B =>
       ((LinearMap.proj y : (B → ℂ) →ₗ[ℂ] ℂ) ∘ₗ W.subtype : Module.Dual ℂ W)) with hE
   have hbot : E.dualCoannihilator = ⊥ := by
@@ -34,9 +38,10 @@ theorem span_eval_eq_top (W : Submodule ℂ (B → ℂ)) [FiniteDimensional ℂ 
   rw [← h]
   simp
 
-theorem mem_prodSpan_inf_left (U S : Submodule ℂ (A → ℂ)) (V : Submodule ℂ (B → ℂ))
-    (G : A × B → ℂ) (hG : G ∈ prodSpan U V) (hS : ∀ y, (fun x => G (x, y)) ∈ S) :
-    G ∈ prodSpan (U ⊓ S) V := by
+theorem mem_prodSpan_inf_left
+    (U S : Submodule ℂ (A → ℂ)) (V : Submodule ℂ (B → ℂ)) (G : A × B → ℂ)
+    (hG : G ∈ prodSpan U V) (hS : ∀ y, (fun x => G (x, y)) ∈ S)
+    : G ∈ prodSpan (U ⊓ S) V := by
   obtain ⟨n, f, g, hsum⟩ := Submodule.mem_span_set'.1 hG
   choose a ha b hb hg using fun i => (g i).2
   let W : Submodule ℂ (B → ℂ) := Submodule.span ℂ (Set.range b)
@@ -54,8 +59,10 @@ theorem mem_prodSpan_inf_left (U S : Submodule ℂ (A → ℂ)) (V : Submodule �
     simp [T, bw]
   have hφS : ∀ φ : Module.Dual ℂ W, (fun x => φ (T x)) ∈ S := by
     intro φ
-    have hφ : φ ∈ Submodule.span ℂ (Set.range fun y : B =>
-        ((LinearMap.proj y : (B → ℂ) →ₗ[ℂ] ℂ) ∘ₗ W.subtype : Module.Dual ℂ W)) := by
+    have hφ
+        : φ ∈ Submodule.span ℂ
+          (Set.range fun y : B =>
+            ((LinearMap.proj y : (B → ℂ) →ₗ[ℂ] ℂ) ∘ₗ W.subtype : Module.Dual ℂ W)) := by
       rw [span_eval_eq_top]; trivial
     induction hφ using Submodule.span_induction with
     | mem φ h =>
@@ -78,15 +85,16 @@ theorem mem_prodSpan_inf_left (U S : Submodule ℂ (A → ℂ)) (V : Submodule �
     funext ⟨x, y⟩
     rw [← hT, Finset.sum_apply]
     have h := congrArg (fun w : W => (w : B → ℂ) y) (c.sum_repr (T x))
-    simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply,
-      smul_eq_mul] at h
+    simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+      at h
     simpa [Module.Basis.coord_apply] using h.symm
   rw [hdec]
-  exact Submodule.sum_mem _ fun j _ => Submodule.subset_span
-    ⟨_, ⟨hφU (c.coord j), hφS (c.coord j)⟩, _, hWV (c j).2, rfl⟩
+  exact Submodule.sum_mem _ fun j _ =>
+    Submodule.subset_span ⟨_, ⟨hφU (c.coord j), hφS (c.coord j)⟩, _, hWV (c j).2, rfl⟩
 
-theorem swap_mem_prodSpan (U : Submodule ℂ (A → ℂ)) (V : Submodule ℂ (B → ℂ))
-    (G : A × B → ℂ) (hG : G ∈ prodSpan U V) : (fun p : B × A => G p.swap) ∈ prodSpan V U := by
+theorem swap_mem_prodSpan
+    (U : Submodule ℂ (A → ℂ)) (V : Submodule ℂ (B → ℂ)) (G : A × B → ℂ) (hG : G ∈ prodSpan U V)
+    : (fun p : B × A => G p.swap) ∈ prodSpan V U := by
   induction hG using Submodule.span_induction with
   | mem F h =>
     obtain ⟨a, ha, b, hb, rfl⟩ := h
@@ -95,14 +103,17 @@ theorem swap_mem_prodSpan (U : Submodule ℂ (A → ℂ)) (V : Submodule ℂ (B 
   | add F F' _ _ h₁ h₂ => exact Submodule.add_mem _ h₁ h₂
   | smul r F _ h => exact Submodule.smul_mem _ r h
 
-theorem mem_prodSpan_inf_of_slices : ∀ {A B : Type} (U₁ S₁ : Submodule ℂ (A → ℂ))
-    (U₂ S₂ : Submodule ℂ (B → ℂ)) (G : A × B → ℂ), G ∈ prodSpan U₁ U₂ →
-    (∀ y, (fun x => G (x, y)) ∈ S₁) → (∀ x, (fun y => G (x, y)) ∈ S₂) →
-    G ∈ prodSpan (U₁ ⊓ S₁) (U₂ ⊓ S₂) := by
+theorem mem_prodSpan_inf_of_slices
+    : ∀ {A B : Type} (U₁ S₁ : Submodule ℂ (A → ℂ)) (U₂ S₂ : Submodule ℂ (B → ℂ)) (G : A × B → ℂ),
+      G ∈ prodSpan U₁ U₂ → (∀ y, (fun x => G (x, y)) ∈ S₁) → (∀ x, (fun y => G (x, y)) ∈ S₂)
+        → G ∈ prodSpan (U₁ ⊓ S₁) (U₂ ⊓ S₂) := by
   intro A B U₁ S₁ U₂ S₂ G hG h₁ h₂
   have hL := mem_prodSpan_inf_left U₁ S₁ U₂ G hG h₁
-  have hR := mem_prodSpan_inf_left U₂ S₂ (U₁ ⊓ S₁) (fun p : B × A => G p.swap)
-    (swap_mem_prodSpan _ _ G hL) (fun x => h₂ x)
+  have hR :=
+    mem_prodSpan_inf_left U₂ S₂ (U₁ ⊓ S₁)
+      (fun p : B × A => G p.swap)
+      (swap_mem_prodSpan _ _ G hL)
+      (fun x => h₂ x)
   simpa using swap_mem_prodSpan _ _ _ hR
 
 end GlobalTheory.CompanionTheory.LimV.Slices

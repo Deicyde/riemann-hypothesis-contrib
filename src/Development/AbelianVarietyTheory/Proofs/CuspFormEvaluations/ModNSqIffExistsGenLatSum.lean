@@ -8,21 +8,27 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem exists_dualFamily_of_nsmul_integral {E : Type} [Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (𝓞 E) (Fin n → E)) {N : ℕ} (hN : 0 < N)
-    (hu : ∀ v ∈ L, ∀ b, ∃ u : 𝓞 E, (u : E) = (N : E) * v b) :
-    ∃ (m : ℕ) (w : Fin m → L) (lam : Fin m → (L →ₗ[𝓞 E] 𝓞 E)), ∀ v, ∑ i, lam i v • w i = v := by
+theorem exists_dualFamily_of_nsmul_integral
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E))
+    {N : ℕ} (hN : 0 < N) (hu : ∀ v ∈ L, ∀ b, ∃ u : 𝓞 E, (u : E) = (N : E) * v b)
+    : ∃ (m : ℕ) (w : Fin m → L) (lam : Fin m → (L →ₗ[𝓞 E] 𝓞 E)), ∀ v, ∑ i, lam i v • w i = v := by
   classical
   have hN' : (N : E) ≠ 0 := by exact_mod_cast hN.ne'
   have hfg : L.FG := by
-    have hle : L ≤ Submodule.span (𝓞 E)
-        (Set.range fun b : Fin n => (Pi.single b (N : E)⁻¹ : Fin n → E)) := by
+    have hle
+        : L
+          ≤ Submodule.span (𝓞 E)
+            (Set.range fun b : Fin n => (Pi.single b (N : E)⁻¹ : Fin n → E)) := by
       intro v hv
       choose u hu' using hu v hv
       have : v = ∑ b, u b • (Pi.single b (N : E)⁻¹ : Fin n → E) := by
@@ -31,7 +37,8 @@ theorem exists_dualFamily_of_nsmul_integral {E : Type} [Field E] [NumberField E]
         · simp only [Pi.smul_apply, Pi.single_eq_same]
           rw [Algebra.smul_def]
           change v c = (u c : E) * _
-          rw [hu']; field_simp
+          rw [hu']
+          field_simp
         · intro b _ hb
           simp [Pi.single_eq_of_ne hb.symm]
         · simp
@@ -50,11 +57,23 @@ theorem exists_dualFamily_of_nsmul_integral {E : Type} [Field E] [NumberField E]
   rw [map_smul]
   congr 2
 
-theorem mem_stdLat_iff_integral {E : Type} [Field E] [NumberField E] {n : ℕ} (v : Fin n → E) :
-    v ∈ stdLat E n ↔ ∀ b, ∃ u : 𝓞 E, (u : E) = v b := by
+theorem mem_stdLat_iff_integral {E : Type} [Field E] [NumberField E] {n : ℕ} (v : Fin n → E)
+    : v ∈ stdLat E n ↔ ∀ b, ∃ u : 𝓞 E, (u : E) = v b := by
   simp only [stdLat, Submodule.mem_pi, Set.mem_univ, forall_true_left, Submodule.mem_one]
 
-theorem modN_sq_iff_exists_genLat_sum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (n : ℕ) (Λ : GenLat E n) (N : ℕ), Λ.Unimod → 0 < N → Ideal.span {(N : 𝓞 E)} • stdLat E n ≤ Λ.La → ∀ a : Fin n → Dw.La, (∀ (mu : Matrix (Fin n) (Fin n) E), (∀ v ∈ Λ.La, mu.mulVec v ∈ stdLat E n) → ∀ cm : Fin n → Fin n → 𝓞 E, (∀ i j, (cm i j : E) = (N : E) * mu i j) → ∀ i, Dw.ModN (N ^ 2) (∑ j, cm i j • a j)) ↔ ∃ (m : ℕ) (x : Fin m → Dw.La) (v : Fin m → Fin n → 𝓞 E), (∀ i, ∃ w ∈ Λ.La, ∀ b, (v i b : E) = (N : E) * w b) ∧ ∀ b, a b = ∑ i, v i b • x i := by
+theorem modN_sq_iff_exists_genLat_sum
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (n : ℕ)
+        (Λ : GenLat E n) (N : ℕ),
+      Λ.Unimod → 0 < N → Ideal.span {(N : 𝓞 E)} • stdLat E n ≤ Λ.La
+        → ∀ a : Fin n → Dw.La,
+          (∀ (mu : Matrix (Fin n) (Fin n) E),
+              (∀ v ∈ Λ.La, mu.mulVec v ∈ stdLat E n)
+                → ∀ cm : Fin n → Fin n → 𝓞 E,
+                  (∀ i j, (cm i j : E) = (N : E) * mu i j)
+                    → ∀ i, Dw.ModN (N ^ 2) (∑ j, cm i j • a j))
+            ↔ ∃ (m : ℕ) (x : Fin m → Dw.La) (v : Fin m → Fin n → 𝓞 E),
+              (∀ i, ∃ w ∈ Λ.La, ∀ b, (v i b : E) = (N : E) * w b)
+                ∧ ∀ b, a b = ∑ i, v i b • x i := by
   classical
   intro E _ _ _ H Dw n Λ N hU hN hle a
   have hN' : (N : E) ≠ 0 := by exact_mod_cast hN.ne'
@@ -106,7 +125,9 @@ theorem modN_sq_iff_exists_genLat_sum : ∀ (E : Type) [Field E] [NumberField E]
           rw [Finset.sum_eq_single c]
           · simp only [Pi.single_eq_same, Algebra.smul_def]
             change _ = (u c : E) * _
-            rw [hu']; simp; ring
+            rw [hu']
+            simp
+            ring
           · intro d _ hd
             simp [Pi.single_eq_of_ne hd.symm]
           · simp
@@ -120,9 +141,11 @@ theorem modN_sq_iff_exists_genLat_sum : ∀ (E : Type) [Field E] [NumberField E]
         refine h2.trans (Finset.sum_congr rfl fun j _ => ?_)
         have := hu' j
         change (u j : E) * (lam i (e j) : E) = _
-        rw [this]; field_simp
+        rw [this]
+        field_simp
       · intro _ j
-        simp only [Matrix.of_apply]; field_simp
+        simp only [Matrix.of_apply]
+        field_simp
     choose x hx using hx
     choose v hv using fun i => hu (w i) (w i).2
     refine ⟨m, x, v, fun i => ⟨w i, (w i).2, hv i⟩, fun b => ?_⟩
@@ -132,7 +155,8 @@ theorem modN_sq_iff_exists_genLat_sum : ∀ (E : Type) [Field E] [NumberField E]
       apply inj
       have h1 := congrFun (congrArg Subtype.val (hw (e j))) b
       simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply,
-        Algebra.smul_def] at h1
+          Algebra.smul_def]
+        at h1
       have h2 : (((∑ i, v i b * lam i (e j) : 𝓞 E)) : E) = (N : E) * (e j : Fin n → E) b := by
         rw [← h1, Finset.mul_sum]
         change algebraMap (𝓞 E) E _ = _
@@ -141,7 +165,8 @@ theorem modN_sq_iff_exists_genLat_sum : ∀ (E : Type) [Field E] [NumberField E]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [map_mul]
         change (v i b : E) * _ = _
-        rw [hv]; ring
+        rw [hv]
+        ring
       change (((∑ i, v i b * lam i (e j) : 𝓞 E)) : E) = _
       rw [h2]
       by_cases hj : j = b
@@ -151,15 +176,16 @@ theorem modN_sq_iff_exists_genLat_sum : ∀ (E : Type) [Field E] [NumberField E]
     have hx' : ∀ i, ((N : 𝓞 E) ^ 2) • x i = ∑ j, lam i (e j) • a j := by
       intro i
       rw [hx, ← Nat.cast_smul_eq_nsmul (𝓞 E), Nat.cast_pow]
-    calc ((N : 𝓞 E) ^ 2) • a b = ∑ j, (∑ i, v i b * lam i (e j)) • a j := by
-          simp [hd]
+    calc
+      ((N : 𝓞 E) ^ 2) • a b
+        = ∑ j, (∑ i, v i b * lam i (e j)) • a j := by simp [hd]
       _ = ∑ i, v i b • ∑ j, lam i (e j) • a j := by
-          simp only [Finset.sum_smul, Finset.smul_sum, mul_smul]
-          exact Finset.sum_comm
+        simp only [Finset.sum_smul, Finset.smul_sum, mul_smul]
+        exact Finset.sum_comm
       _ = ((N : 𝓞 E) ^ 2) • ∑ i, v i b • x i := by
-          rw [Finset.smul_sum]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [← hx', smul_comm]
+        rw [Finset.smul_sum]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [← hx', smul_comm]
   · rintro ⟨m, x, v, hv, ha⟩ mu hmu cm hcm i
     choose w hw hvw using hv
     choose y hy using fun k => (mem_stdLat_iff_integral _).1 (hmu (w k) (hw k)) i
@@ -175,13 +201,16 @@ theorem modN_sq_iff_exists_genLat_sum : ∀ (E : Type) [Field E] [NumberField E]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_mul]
       change (cm i j : E) * (v k j : E) = _
-      rw [hcm, hvw]; simp; ring
+      rw [hcm, hvw]
+      simp
+      ring
     refine ⟨∑ k, y k • x k, ?_⟩
-    calc ∑ j, cm i j • a j = ∑ k, (∑ j, cm i j * v k j) • x k := by
-          simp only [ha, Finset.sum_smul, Finset.smul_sum, mul_smul]
-          exact Finset.sum_comm
+    calc
+      ∑ j, cm i j • a j = ∑ k, (∑ j, cm i j * v k j) • x k := by
+        simp only [ha, Finset.sum_smul, Finset.smul_sum, mul_smul]
+        exact Finset.sum_comm
       _ = _ := by
-          rw [← Nat.cast_smul_eq_nsmul (𝓞 E), Nat.cast_pow, Finset.smul_sum]
-          simp only [hd, mul_smul]
+        rw [← Nat.cast_smul_eq_nsmul (𝓞 E), Nat.cast_pow, Finset.smul_sum]
+        simp only [hd, mul_smul]
 
 end GlobalTheory

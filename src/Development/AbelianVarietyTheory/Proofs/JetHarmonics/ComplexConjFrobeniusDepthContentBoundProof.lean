@@ -13,8 +13,8 @@ open scoped BigOperators
 
 namespace GlobalTheory.GoodDepth.ConjPkg
 
-theorem exists_good (l S W : ℕ) (G : Set ℕ) (h : RF.Windows S G) :
-    ∃ y u : ℕ, W = (l + 1) * y + u ∧ y ∈ G ∧ u ≤ (l + 1) * S := by
+theorem exists_good (l S W : ℕ) (G : Set ℕ) (h : RF.Windows S G)
+    : ∃ y u : ℕ, W = (l + 1) * y + u ∧ y ∈ G ∧ u ≤ (l + 1) * S := by
   have hd := Nat.div_add_mod W (l + 1)
   have hm := Nat.mod_lt W (Nat.succ_pos l)
   set q := W / (l + 1)
@@ -43,10 +43,10 @@ theorem logb_le_log (l : ℕ) (hl : 5 ≤ l) (x : ℝ) (hx : 1 ≤ x) : Real.log
   unfold Real.logb
   exact div_le_self h2 h1
 
-theorem place_bound (l n m S y u : ℕ) (hl : 5 ≤ l) (hn : 1 ≤ n) (hu : u ≤ (l + 1) * S) :
-    RF.blockBd l n m 1 y + RF.chBd l n m u ≤
-      Formalism.IncomingBounds.rho l * n * (((l + 1) * y + u : ℕ) : ℝ) + 4 * m * (((l + 1) * y + u : ℕ) : ℝ) / l +
-        (n * (Real.logb l n + 1) + 2 * n * S) := by
+theorem place_bound (l n m S y u : ℕ) (hl : 5 ≤ l) (hn : 1 ≤ n) (hu : u ≤ (l + 1) * S)
+    : RF.blockBd l n m 1 y + RF.chBd l n m u
+      ≤ Formalism.IncomingBounds.rho l * n * (((l + 1) * y + u : ℕ) : ℝ)
+        + 4 * m * (((l + 1) * y + u : ℕ) : ℝ) / l + (n * (Real.logb l n + 1) + 2 * n * S) := by
   have hl' : (5 : ℝ) ≤ l := by exact_mod_cast hl
   have hn' : (1 : ℝ) ≤ n := by exact_mod_cast hn
   have hu' : (u : ℝ) ≤ (l + 1) * S := by exact_mod_cast hu
@@ -58,9 +58,12 @@ theorem place_bound (l n m S y u : ℕ) (hl : 5 ≤ l) (hn : 1 ≤ n) (hu : u �
   have hu0 : (0 : ℝ) ≤ u := Nat.cast_nonneg _
   have hm0 : (0 : ℝ) ≤ m := Nat.cast_nonneg _
   have hS0 : (0 : ℝ) ≤ S := Nat.cast_nonneg _
-  have hrho : 0 ≤ Formalism.IncomingBounds.rho l := by unfold Formalism.IncomingBounds.rho; rw [h3]; positivity
-  have hb : RF.blockBd l n m 1 y ≤ Formalism.IncomingBounds.rho l * n * ((l + 1) * y) + n * (Real.logb l n + 1) +
-      2 * m * ((l + 1) * y) / ((l : ℝ) - 1) := by
+  have hrho : 0 ≤ Formalism.IncomingBounds.rho l := by
+    unfold Formalism.IncomingBounds.rho; rw [h3]; positivity
+  have hb
+      : RF.blockBd l n m 1 y
+        ≤ Formalism.IncomingBounds.rho l * n * ((l + 1) * y) + n * (Real.logb l n + 1)
+          + 2 * m * ((l + 1) * y) / ((l : ℝ) - 1) := by
     unfold RF.blockBd
     split_ifs with h
     · positivity
@@ -72,36 +75,46 @@ theorem place_bound (l n m S y u : ℕ) (hl : 5 ≤ l) (hn : 1 ≤ n) (hu : u �
   have hc : RF.chBd l n m u ≤ 2 * n * S + m * u / ((l : ℝ) - 1) := by
     unfold RF.chBd Formalism.IncomingBounds.gam
     have : (u : ℝ) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1))) ≤ 2 * n * S := by
-      calc (u : ℝ) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1)))
-          ≤ ((l + 1) * S) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1))) := by
-            apply mul_le_mul_of_nonneg_right hu'; rw [h3]; positivity
+      calc
+        (u : ℝ) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1)))
+            ≤ ((l + 1) * S) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1))) := by
+          apply mul_le_mul_of_nonneg_right hu'; rw [h3]; positivity
         _ = n * S * ((l : ℝ) / ((l : ℝ) - 1)) := by rw [h3]; field_simp
         _ ≤ n * S * 2 := by
-            apply mul_le_mul_of_nonneg_left _ (by positivity)
-            rw [div_le_iff₀ h1]; linarith
+          apply mul_le_mul_of_nonneg_left _ (by positivity)
+          rw [div_le_iff₀ h1]
+          linarith
         _ = _ := by ring
-    have e : (u : ℝ) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1)) + m / ((l : ℝ) - 1)) =
-        (u : ℝ) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1))) + m * u / ((l : ℝ) - 1) := by ring
-    rw [e]; linarith
-  have hd : 2 * m * ((l + 1) * y) / ((l : ℝ) - 1) + m * u / ((l : ℝ) - 1) ≤
-      4 * m * ((l + 1) * y + u) / l := by
-    have hi : 1 / ((l : ℝ) - 1) ≤ 2 / l := by
-      rw [div_le_div_iff₀ h1 (by linarith)]; linarith
-    calc 2 * m * ((l + 1) * y) / ((l : ℝ) - 1) + m * u / ((l : ℝ) - 1)
+    have e
+        : (u : ℝ) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1)) + m / ((l : ℝ) - 1))
+          = (u : ℝ) * (n * ((l : ℝ) / ((l : ℝ) ^ 2 - 1))) + m * u / ((l : ℝ) - 1) := by
+      ring
+    rw [e]
+    linarith
+  have hd
+      : 2 * m * ((l + 1) * y) / ((l : ℝ) - 1) + m * u / ((l : ℝ) - 1)
+        ≤ 4 * m * ((l + 1) * y + u) / l := by
+    have hi : 1 / ((l : ℝ) - 1) ≤ 2 / l := by rw [div_le_div_iff₀ h1 (by linarith)]; linarith
+    calc
+      2 * m * ((l + 1) * y) / ((l : ℝ) - 1) + m * u / ((l : ℝ) - 1)
         = (2 * m * ((l + 1) * y) + m * u) * (1 / ((l : ℝ) - 1)) := by ring
       _ ≤ (2 * m * ((l + 1) * y) + 2 * m * u) * (2 / l) := by
-          apply mul_le_mul _ hi (by positivity) (by positivity)
-          nlinarith [mul_nonneg hm0 hu0]
+        apply mul_le_mul _ hi (by positivity) (by positivity)
+        nlinarith [mul_nonneg hm0 hu0]
       _ = _ := by ring
   have he : 0 ≤ Formalism.IncomingBounds.rho l * n * u := by positivity
   push_cast
-  have e2 : Formalism.IncomingBounds.rho l * n * (((l : ℝ) + 1) * y + u) =
-      Formalism.IncomingBounds.rho l * n * ((l + 1) * y) + Formalism.IncomingBounds.rho l * n * u := by ring
+  have e2
+      : Formalism.IncomingBounds.rho l * n * (((l : ℝ) + 1) * y + u)
+        = Formalism.IncomingBounds.rho l * n * ((l + 1) * y)
+          + Formalism.IncomingBounds.rho l * n * u := by
+    ring
   rw [e2]
   linarith
 
-theorem additive_bound (l n : ℕ) (hl : 5 ≤ l) (hn : 3 ≤ n) :
-    (n : ℝ) * (Real.logb l n + 1) + 2 * n * (S0 l 1 n : ℝ) ≤ 900 * ((n : ℝ) ^ 3 * Real.log ((n : ℝ) + 1)) := by
+theorem additive_bound (l n : ℕ) (hl : 5 ≤ l) (hn : 3 ≤ n)
+    : (n : ℝ) * (Real.logb l n + 1) + 2 * n * (S0 l 1 n : ℝ)
+      ≤ 900 * ((n : ℝ) ^ 3 * Real.log ((n : ℝ) + 1)) := by
   have hl' : (5 : ℝ) ≤ l := by exact_mod_cast hl
   have hn' : (3 : ℝ) ≤ n := by exact_mod_cast hn
   have hL : 1 ≤ Real.log ((n : ℝ) + 1) := one_le_log _ (by linarith)
@@ -115,14 +128,20 @@ theorem additive_bound (l n : ℕ) (hl : 5 ≤ l) (hn : 3 ≤ n) :
   have hnL' : L ≤ (n : ℝ) ^ 2 * L := by nlinarith
   have hS : (S0 l 1 n : ℝ) ≤ 449 * ((n : ℝ) ^ 2 * L) := by
     unfold S0
-    have := Nat.ceil_lt_add_one (a := 64 * (n : ℝ) ^ 2 * (((1 : ℕ) : ℝ) + 3 + 3 * Real.logb l ((n : ℝ) + 1)))
-      (by positivity)
-    have h4 : 64 * (n : ℝ) ^ 2 * (((1 : ℕ) : ℝ) + 3 + 3 * Real.logb l ((n : ℝ) + 1)) ≤ 64 * (n : ℝ) ^ 2 * (7 * L) := by
+    have :=
+      Nat.ceil_lt_add_one
+        (a := 64 * (n : ℝ) ^ 2 * (((1 : ℕ) : ℝ) + 3 + 3 * Real.logb l ((n : ℝ) + 1)))
+        (by positivity)
+    have h4
+        : 64 * (n : ℝ) ^ 2 * (((1 : ℕ) : ℝ) + 3 + 3 * Real.logb l ((n : ℝ) + 1))
+          ≤ 64 * (n : ℝ) ^ 2 * (7 * L) := by
       apply mul_le_mul_of_nonneg_left _ (by positivity)
-      push_cast; linarith
+      push_cast
+      linarith
     nlinarith
   have : Real.logb l n + 1 + 2 * (S0 l 1 n : ℝ) ≤ 900 * ((n : ℝ) ^ 2 * L) := by linarith
-  calc _ = (n : ℝ) * (Real.logb l n + 1 + 2 * (S0 l 1 n : ℝ)) := by ring
+  calc
+    _ = (n : ℝ) * (Real.logb l n + 1 + 2 * (S0 l 1 n : ℝ)) := by ring
     _ ≤ n * (900 * ((n : ℝ) ^ 2 * L)) := mul_le_mul_of_nonneg_left this (by linarith)
     _ = _ := by ring
 
@@ -132,30 +151,37 @@ theorem thl_nonneg (k l : ℕ) : 0 ≤ thl k l := by
   rintro t ⟨i, -, -, -, rfl⟩
   positivity
 
-theorem rk_alt {C : Type} [Field C] {V : VF C} {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
-    (X : RowData C V 2 I J) (h : X.Alt) : X.big 0 0 ∧ X.rkF 0 0 = X.n + X.j ∧ X.rkF 0 1 = X.j' := by
+theorem rk_alt
+    {C : Type} [Field C]
+    {V : VF C} {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
+    (X : RowData C V 2 I J) (h : X.Alt)
+    : X.big 0 0 ∧ X.rkF 0 0 = X.n + X.j ∧ X.rkF 0 1 = X.j' := by
   have h0 : X.big 0 0 := (h.2 0).2 (by decide)
   have h1 : ¬ X.big 0 1 := fun hb => absurd ((h.2 1).1 hb) (by decide)
   exact ⟨h0, X.rk_big 0 0 h0, X.rk_small 0 1 h1⟩
 
-def expEven (n x : ℕ) (ga : ZMod 2 → ℕ → ℕ) : ZMod 2 → ℕ → ℕ :=
-  fun a k => if a = 0 then (if k = n then x else ga 0 k) else 0
+def expEven (n x : ℕ) (ga : ZMod 2 → ℕ → ℕ) : ZMod 2 → ℕ → ℕ := fun a k =>
+  if a = 0 then (if k = n then x else ga 0 k) else 0
 
 def expOdd (ga : ZMod 2 → ℕ → ℕ) : ZMod 2 → ℕ → ℕ := fun a k => if a = 1 then ga 1 k else 0
 
 theorem sum_two (f : ZMod 2 → ℝ) : ∑ a, f a = f 0 + f 1 := Fin.sum_univ_two f
 theorem sum_two' (f : ZMod 2 → ℕ) : ∑ a, f a = f 0 + f 1 := Fin.sum_univ_two f
 
-theorem monDeg_le (N N' : ℕ) (e : ℕ → ℕ) : (monDeg N N' e : ℝ) ≤ ∑ k ∈ Finset.Icc 1 N, (k : ℝ) * e k := by
+theorem monDeg_le (N N' : ℕ) (e : ℕ → ℕ)
+    : (monDeg N N' e : ℝ) ≤ ∑ k ∈ Finset.Icc 1 N, (k : ℝ) * e k := by
   unfold monDeg
   push_cast
   exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.Icc_subset_Icc_right (min_le_left _ _))
     (fun _ _ _ => by positivity)
 
-theorem deg_le {C : Type} [Field C] {V : VF C} {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
-    (X : RowData C V 2 I J) (n x r : ℕ) (ga : ZMod 2 → ℕ → ℕ) :
-    (RF.monDegAll X 0 (expEven n x ga) r : ℝ) + RF.monDegAll X 0 (expOdd ga) r ≤
-      (∑ s : ZMod 2, ∑ k ∈ Finset.Icc 1 r, (if s = 0 ∧ k = n then (0 : ℝ) else (k : ℝ) * ga s k)) + (n : ℝ) * x := by
+theorem deg_le
+    {C : Type} [Field C]
+    {V : VF C} {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
+    (X : RowData C V 2 I J) (n x r : ℕ) (ga : ZMod 2 → ℕ → ℕ)
+    : (RF.monDegAll X 0 (expEven n x ga) r : ℝ) + RF.monDegAll X 0 (expOdd ga) r
+      ≤ (∑ s : ZMod 2, ∑ k ∈ Finset.Icc 1 r, (if s = 0 ∧ k = n then (0 : ℝ) else (k : ℝ) * ga s k))
+        + (n : ℝ) * x := by
   have h10 : (1 : ZMod 2) ≠ 0 := by decide
   unfold RF.monDegAll
   rw [sum_two', sum_two', sum_two]
@@ -166,11 +192,14 @@ theorem deg_le {C : Type} [Field C] {V : VF C} {I J : Fin 2 → Type} [∀ g, Fi
   have a4 := monDeg_le r (X.rkF 0 1) (expOdd ga 1)
   have b2 : ∑ k ∈ Finset.Icc 1 r, (k : ℝ) * (expEven n x ga 1 k) = 0 := by simp [expEven, h10]
   have b3 : ∑ k ∈ Finset.Icc 1 r, (k : ℝ) * (expOdd ga 0 k) = 0 := by simp [expOdd, h10.symm]
-  have b4 : ∑ k ∈ Finset.Icc 1 r, (k : ℝ) * (expOdd ga 1 k) =
-      ∑ k ∈ Finset.Icc 1 r, (if (1 : ZMod 2) = 0 ∧ k = n then (0 : ℝ) else (k : ℝ) * ga 1 k) := by
-    simp [expOdd, h10]
-  have b1 : ∑ k ∈ Finset.Icc 1 r, (k : ℝ) * (expEven n x ga 0 k) ≤
-      ∑ k ∈ Finset.Icc 1 r, (if (0 : ZMod 2) = 0 ∧ k = n then (0 : ℝ) else (k : ℝ) * ga 0 k) + (n : ℝ) * x := by
+  have b4
+      : ∑ k ∈ Finset.Icc 1 r, (k : ℝ) * (expOdd ga 1 k)
+        = ∑ k ∈ Finset.Icc 1 r, (if (1 : ZMod 2) = 0 ∧ k = n then (0 : ℝ) else (k : ℝ) * ga 1 k) :=
+    by simp [expOdd, h10]
+  have b1
+      : ∑ k ∈ Finset.Icc 1 r, (k : ℝ) * (expEven n x ga 0 k)
+        ≤ ∑ k ∈ Finset.Icc 1 r, (if (0 : ZMod 2) = 0 ∧ k = n then (0 : ℝ) else (k : ℝ) * ga 0 k)
+          + (n : ℝ) * x := by
     have : ∑ k ∈ Finset.Icc 1 r, (if k = n then (n : ℝ) * x else 0) ≤ (n : ℝ) * x := by
       rw [Finset.sum_ite_eq']
       split_ifs
@@ -182,10 +211,17 @@ theorem deg_le {C : Type} [Field C] {V : VF C} {I J : Fin 2 → Type} [∀ g, Fi
     by_cases hk : k = n <;> simp [expEven, hk]
   linarith
 
-theorem val_le (hC : RF.CHSupply) (hM : RF.MONSupply) (C1 : ℝ) (P : RF.Par) (l : ℕ) (hP : ParOK P) (hl : 5 ≤ l)
+theorem val_le
+    (hC : RF.CHSupply) (hM : RF.MONSupply)
+    (C1 : ℝ)
+    (P : RF.Par) (l : ℕ) (hP : ParOK P) (hl : 5 ≤ l)
     (Pk : RF.PkgPhiC P l C1) (y u : P.Pl → ℕ) (hW : ∀ z, Pk.W z = (l + 1) * y z + u z)
-    (hy : ∀ z, (RF.GlobalTheory.bi 0 0 1 (y z)).Attains (Pk.R.X z) (Pk.R.F z) (RF.blockBd l (P.k - 1) P.m 1 (y z))) :
-    Pk.ν ≤ ∑ z, (RF.blockBd l (P.k - 1) P.m 1 (y z) + RF.chBd l (P.k - 1) P.m (u z)) + Pk.rest / ((l : ℝ) - 1) := by
+    (hy : ∀ z,
+      (RF.GlobalTheory.bi 0 0 1 (y z)).Attains (Pk.R.X z) (Pk.R.F z)
+        (RF.blockBd l (P.k - 1) P.m 1 (y z)))
+    : Pk.ν
+      ≤ ∑ z, (RF.blockBd l (P.k - 1) P.m 1 (y z) + RF.chBd l (P.k - 1) P.m (u z))
+        + Pk.rest / ((l : ℝ) - 1) := by
   obtain ⟨R, alt, gaC, W, nW, T, θ0, rest, ν, hsupp, hmain, hrest, hrows, hD, hval⟩ := Pk
   obtain ⟨C, V, hV, I, J, X, F, hX⟩ := R
   dsimp only at *
@@ -196,13 +232,21 @@ theorem val_le (hC : RF.CHSupply) (hM : RF.MONSupply) (C1 : ℝ) (P : RF.Par) (l
   have hrk := fun z => rk_alt (X z) (alt z)
   have hr : P.r = P.k - 1 + P.m := hP.r_eq
   have hm : ∀ z, (X z).j + (X z).j' = P.m := fun z => (hX z).2
-  have key := hval (fun z =>
-    [(RF.GlobalTheory.bi 0 0 1 (y z), RF.blockBd V.l (P.k - 1) P.m 1 (y z)),
-     (RF.GlobalTheory.ch 0 0 (u z), RF.chBd V.l (X z).n (X z).m (u z)),
-     (RF.GlobalTheory.mon 0 (expEven (P.k - 1) 0 (gaC z)) P.r,
-       (RF.monDegAll (X z) 0 (expEven (P.k - 1) 0 (gaC z)) P.r : ℝ) / ((V.l : ℝ) - 1)),
-     (RF.GlobalTheory.mon 0 (expOdd (gaC z)) P.r,
-       (RF.monDegAll (X z) 0 (expOdd (gaC z)) P.r : ℝ) / ((V.l : ℝ) - 1))]) ?_ ?_ ?_ ?_
+  have key :=
+    hval
+      (fun z => [
+        (RF.GlobalTheory.bi 0 0 1 (y z), RF.blockBd V.l (P.k - 1) P.m 1 (y z)),
+        (RF.GlobalTheory.ch 0 0 (u z), RF.chBd V.l (X z).n (X z).m (u z)),
+        (
+          RF.GlobalTheory.mon 0 (expEven (P.k - 1) 0 (gaC z)) P.r,
+          (RF.monDegAll (X z) 0 (expEven (P.k - 1) 0 (gaC z)) P.r : ℝ) / ((V.l : ℝ) - 1)
+        ),
+        (
+          RF.GlobalTheory.mon 0 (expOdd (gaC z)) P.r,
+          (RF.monDegAll (X z) 0 (expOdd (gaC z)) P.r : ℝ) / ((V.l : ℝ) - 1)
+        )
+      ])
+      ?_ ?_ ?_ ?_
   · refine key.trans ?_
     rw [hrest, Finset.sum_div, ← Finset.sum_add_distrib]
     refine Finset.sum_le_sum fun z _ => ?_
@@ -266,11 +310,16 @@ theorem of_supplies (hB : RF.BiSupply) (hC : RF.CHSupply) (hM : RF.MONSupply) : 
   intro C1 hC1
   refine ⟨900 + 7 * C1, by linarith, fun P l hP hp hl Pk => ?_⟩
   have hk : 4 ≤ P.k := by have := hP.mk_le; have := hP.m_pos; omega
-  have hG : ∀ z, RF.Windows (S0 l 1 (P.k - 1)) {y | (RF.GlobalTheory.bi 0 0 1 y).Attains (Pk.R.X z) (Pk.R.F z)
-      (RF.blockBd l (P.k - 1) P.m 1 y)} := by
+  have hG
+      : ∀ z,
+        RF.Windows (S0 l 1 (P.k - 1))
+          {y | (RF.GlobalTheory.bi 0 0 1 y).Attains (Pk.R.X z) (Pk.R.F z)
+            (RF.blockBd l (P.k - 1) P.m 1 y)} := by
     intro z
-    have := hB Pk.R.C Pk.R.V 2 (Pk.R.I z) (Pk.R.J z) (Pk.R.X z) (Pk.R.F z) (Pk.alt z) (by rw [Pk.R.hVl]; exact hl)
-      (by rw [(Pk.R.hn z).1]; omega) 0 0 (rk_alt _ (Pk.alt z)).1 1 odd_one (by norm_num)
+    have :=
+      hB Pk.R.C Pk.R.V 2 (Pk.R.I z) (Pk.R.J z) (Pk.R.X z) (Pk.R.F z) (Pk.alt z)
+        (by rw [Pk.R.hVl]; exact hl) (by rw [(Pk.R.hn z).1]; omega) 0 0 (rk_alt _ (Pk.alt z)).1 1
+        odd_one (by norm_num)
     rwa [(Pk.R.hn z).1, (Pk.R.hn z).2, Pk.R.hVl] at this
   choose y u hW hy hu using fun z => exists_good l _ (Pk.W z) _ (hG z)
   have h1 := val_le hC hM C1 P l hP hl Pk y u hW hy
@@ -295,12 +344,15 @@ theorem of_supplies (hB : RF.BiSupply) (hC : RF.CHSupply) (hM : RF.MONSupply) : 
     unfold Formalism.IncomingBounds.rho; positivity
   have hrho' : Formalism.IncomingBounds.rho l ≤ 1 / l := by
     unfold Formalism.IncomingBounds.rho
-    apply one_div_le_one_div_of_le (by linarith); nlinarith
+    apply one_div_le_one_div_of_le (by linarith)
+    nlinarith
   set L := Real.log ((n : ℝ) + 1) with hLdef
   have hL : 1 ≤ L := one_le_log _ (by linarith)
-  have h2 : ∀ z, T * (RF.blockBd l n P.m 1 (y z) + RF.chBd l n P.m (u z)) ≤
-      Formalism.IncomingBounds.rho l * (n * P.w z) + 4 * P.m * P.w z / l + 5 * C1 * ((n + 1) * P.SE / l) +
-        T * (900 * ((n : ℝ) ^ 3 * L)) := by
+  have h2
+      : ∀ z,
+        T * (RF.blockBd l n P.m 1 (y z) + RF.chBd l n P.m (u z))
+          ≤ Formalism.IncomingBounds.rho l * (n * P.w z) + 4 * P.m * P.w z / l
+            + 5 * C1 * ((n + 1) * P.SE / l) + T * (900 * ((n : ℝ) ^ 3 * L)) := by
     intro z
     have a1 := place_bound l n P.m _ (y z) (u z) hl (by omega) (hu z)
     rw [← hW z] at a1
@@ -310,27 +362,38 @@ theorem of_supplies (hB : RF.BiSupply) (hC : RF.CHSupply) (hM : RF.MONSupply) : 
     have a5 : Formalism.IncomingBounds.rho l * n + 4 * P.m / l ≤ 5 * (n + 1) / l := by
       have b1 : Formalism.IncomingBounds.rho l * n ≤ 1 / l * (n + 1) := by gcongr; linarith
       have b2 : (4 : ℝ) * P.m / l ≤ 4 * (n + 1) / l := by gcongr; linarith
-      calc _ ≤ 1 / l * (n + 1) + 4 * ((n : ℝ) + 1) / l := add_le_add b1 b2
+      calc
+        _ ≤ 1 / l * (n + 1) + 4 * ((n : ℝ) + 1) / l := add_le_add b1 b2
         _ = _ := by ring
     have a6 := mul_le_mul_of_nonneg_right a5 (mul_nonneg hC1 hSE)
-    calc _ ≤ T * (Formalism.IncomingBounds.rho l * n * (W z : ℝ) + 4 * P.m * (W z : ℝ) / l + 900 * ((n : ℝ) ^ 3 * L)) :=
-          mul_le_mul_of_nonneg_left (by linarith) hT.le
-      _ = (Formalism.IncomingBounds.rho l * n + 4 * P.m / l) * (T * W z) + T * (900 * ((n : ℝ) ^ 3 * L)) := by ring
-      _ ≤ (Formalism.IncomingBounds.rho l * n + 4 * P.m / l) * (P.w z + C1 * P.SE) + T * (900 * ((n : ℝ) ^ 3 * L)) := by
-          gcongr
-      _ = Formalism.IncomingBounds.rho l * (n * P.w z) + 4 * P.m * P.w z / l + (Formalism.IncomingBounds.rho l * n + 4 * P.m / l) * (C1 * P.SE) +
-          T * (900 * ((n : ℝ) ^ 3 * L)) := by ring
-      _ ≤ Formalism.IncomingBounds.rho l * (n * P.w z) + 4 * P.m * P.w z / l + (5 * (n + 1) / l) * (C1 * P.SE) +
-          T * (900 * ((n : ℝ) ^ 3 * L)) := by linarith
+    calc
+      _ ≤ T
+          * (Formalism.IncomingBounds.rho l * n * (W z : ℝ) + 4 * P.m * (W z : ℝ) / l
+            + 900 * ((n : ℝ) ^ 3 * L)) :=
+        mul_le_mul_of_nonneg_left (by linarith) hT.le
+      _ = (Formalism.IncomingBounds.rho l * n + 4 * P.m / l) * (T * W z)
+          + T * (900 * ((n : ℝ) ^ 3 * L)) := by
+        ring
+      _ ≤ (Formalism.IncomingBounds.rho l * n + 4 * P.m / l) * (P.w z + C1 * P.SE)
+          + T * (900 * ((n : ℝ) ^ 3 * L)) := by
+        gcongr
+      _ = Formalism.IncomingBounds.rho l * (n * P.w z) + 4 * P.m * P.w z / l
+          + (Formalism.IncomingBounds.rho l * n + 4 * P.m / l) * (C1 * P.SE)
+          + T * (900 * ((n : ℝ) ^ 3 * L)) := by
+        ring
+      _ ≤ Formalism.IncomingBounds.rho l * (n * P.w z) + 4 * P.m * P.w z / l
+          + (5 * (n + 1) / l) * (C1 * P.SE) + T * (900 * ((n : ℝ) ^ 3 * L)) := by
+        linarith
       _ = _ := by ring
-  have h3 : T * ∑ z, (RF.blockBd l n P.m 1 (y z) + RF.chBd l n P.m (u z)) ≤
-      n * (∑ z, P.w z) / ((l : ℝ) ^ 2 - 1) + 4 * (P.m * (∑ z, P.w z) / l) + 5 * C1 * (P.f * (n + 1) * P.SE / l) +
-        900 * (T * P.f * (n : ℝ) ^ 3 * L) := by
+  have h3
+      : T * ∑ z, (RF.blockBd l n P.m 1 (y z) + RF.chBd l n P.m (u z))
+        ≤ n * (∑ z, P.w z) / ((l : ℝ) ^ 2 - 1) + 4 * (P.m * (∑ z, P.w z) / l)
+          + 5 * C1 * (P.f * (n + 1) * P.SE / l) + 900 * (T * P.f * (n : ℝ) ^ 3 * L) := by
     rw [Finset.mul_sum]
     refine (Finset.sum_le_sum fun z _ => h2 z).trans (le_of_eq ?_)
-    rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_const, Finset.sum_const,
-      Finset.card_univ, hP.card, ← Finset.mul_sum, ← Finset.sum_div, ← Finset.mul_sum, ← Finset.mul_sum,
-      nsmul_eq_mul, nsmul_eq_mul]
+    rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_const,
+      Finset.sum_const, Finset.card_univ, hP.card, ← Finset.mul_sum, ← Finset.sum_div,
+      ← Finset.mul_sum, ← Finset.mul_sum, nsmul_eq_mul, nsmul_eq_mul]
     unfold Formalism.IncomingBounds.rho
     ring
   have hw : 0 ≤ ∑ z, P.w z := Finset.sum_nonneg fun z _ => (hD.w_pos z).le
@@ -338,9 +401,10 @@ theorem of_supplies (hB : RF.BiSupply) (hC : RF.CHSupply) (hM : RF.MONSupply) : 
     have hi : 1 / ((l : ℝ) - 1) ≤ 2 / l := by
       rw [div_le_div_iff₀ (by linarith) (by linarith)]; linarith
     have h1l : 0 ≤ 1 / ((l : ℝ) - 1) := div_nonneg zero_le_one (by linarith)
-    calc T * (rest / ((l : ℝ) - 1)) = T * rest * (1 / ((l : ℝ) - 1)) := by ring
-      _ ≤ C1 * (P.f * P.k * P.SE) * (2 / l) :=
-          mul_le_mul hD.rest_le hi h1l (by positivity)
+    calc
+      T * (rest / ((l : ℝ) - 1))
+        = T * rest * (1 / ((l : ℝ) - 1)) := by ring
+      _ ≤ C1 * (P.f * P.k * P.SE) * (2 / l) := mul_le_mul hD.rest_le hi h1l (by positivity)
       _ = _ := by rw [hkr]; ring
   have h8 := mul_le_mul_of_nonneg_left h1 hT.le
   rw [mul_add] at h8
@@ -363,6 +427,8 @@ theorem of_supplies (hB : RF.BiSupply) (hC : RF.CHSupply) (hM : RF.MONSupply) : 
   have r1 : 0 ≤ C1 * (L * A + Cth + L * D) := mul_nonneg hC1 (by linarith)
   nlinarith
 
-theorem phiCBd : PhiCBd := of_supplies GlobalTheory.T.oddLevelBlock_bound_attained.2 GlobalTheory.CharBlock.chSupply.2 GlobalTheory.T.monomialBlock_supply_both_typings.2
+theorem phiCBd : PhiCBd :=
+  of_supplies GlobalTheory.T.oddLevelBlock_bound_attained.2 GlobalTheory.CharBlock.chSupply.2
+    GlobalTheory.T.monomialBlock_supply_both_typings.2
 
 end GlobalTheory.GoodDepth.ConjPkg

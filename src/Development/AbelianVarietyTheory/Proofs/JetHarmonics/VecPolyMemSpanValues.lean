@@ -6,11 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem vecPoly_mem_span_values (V : Type) [AddCommGroup V] [Module ℂ V] (n : ℕ) (Z : ℂ → V)
-    (X : ℕ → V) (ν : Fin n → ℂ) (hν : Function.Injective ν)
-    (hZ : ∀ s : ℂ, Z s = ∑ j ∈ Finset.range n, s ^ j • X j) :
-    (∀ j, j < n → X j ∈ Submodule.span ℂ (Set.range fun i => Z (ν i))) ∧
-      ∀ s : ℂ, Z s ∈ Submodule.span ℂ (Set.range fun i => Z (ν i)) := by
+theorem vecPoly_mem_span_values
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (n : ℕ)
+    (Z : ℂ → V) (X : ℕ → V)
+    (ν : Fin n → ℂ) (hν : Function.Injective ν)
+    (hZ : ∀ s : ℂ, Z s = ∑ j ∈ Finset.range n, s ^ j • X j)
+    : (∀ j, j < n → X j ∈ Submodule.span ℂ (Set.range fun i => Z (ν i)))
+      ∧ ∀ s : ℂ, Z s ∈ Submodule.span ℂ (Set.range fun i => Z (ν i)) := by
   classical
   set W := Submodule.span ℂ (Set.range fun i => Z (ν i)) with hW
   set M : Matrix (Fin n) (Fin n) ℂ := Matrix.vandermonde ν with hM

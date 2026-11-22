@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 namespace KStar.TotallyRealRoots
 
-noncomputable def eps (l : ℕ) [Fact l.Prime] (E : Type*) [Field E] :
-    Gal(AlgebraicClosure E/E) →* ℤ_[l]ˣ :=
+noncomputable def eps (l : ℕ) [Fact l.Prime] (E : Type*) [Field E]
+    : Gal(AlgebraicClosure E/E) →* ℤ_[l]ˣ :=
   (cyclotomicCharacter (AlgebraicClosure E) l).comp
     (MulSemiringAction.toRingAut Gal(AlgebraicClosure E/E) (AlgebraicClosure E))
 
@@ -18,20 +18,23 @@ noncomputable def nuGal (l : ℕ) [Fact l.Prime] (E : Type*) [Field E] (tr : ℕ
   ⨅ g : Gal(AlgebraicClosure E/E),
     emultiplicity (l : ℤ_[l]) (((eps l E g : ℤ_[l]ˣ) : ℤ_[l]) ^ tr - 1)
 
-theorem nuGal_eq_nu (l : ℕ) [Fact l.Prime] (E : Type*) [Field E] (tr : ℕ) :
-    nuGal l E tr = nu l (galImage l E) tr := by
+theorem nuGal_eq_nu (l : ℕ) [Fact l.Prime] (E : Type*) [Field E] (tr : ℕ)
+    : nuGal l E tr = nu l (galImage l E) tr := by
   unfold nuGal nu nuStar galImage
   rw [iInf, Set.image_image]
   congr 1
   ext x
   simp [MonoidHom.coe_range]
 
-noncomputable def adjoinRoots (E : Type*) [Field E] (m : ℕ) :
-    IntermediateField E (AlgebraicClosure E) :=
+noncomputable def adjoinRoots (E : Type*) [Field E] (m : ℕ)
+    : IntermediateField E (AlgebraicClosure E) :=
   IntermediateField.adjoin E {ζ : AlgebraicClosure E | ζ ^ m = 1}
 
-noncomputable def fieldSubgroup (N : ℕ) [NeZero N] (K : Type*) [Field K] [NumberField K]
-    [IsCyclotomicExtension {N} ℚ K] (E : IntermediateField ℚ K) : Subgroup (ZMod N)ˣ :=
+noncomputable def fieldSubgroup
+    (N : ℕ) [NeZero N]
+    (K : Type*) [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K]
+    (E : IntermediateField ℚ K)
+    : Subgroup (ZMod N)ˣ :=
   E.fixingSubgroup.map (IsCyclotomicExtension.Rat.galEquivZMod N K).toMonoidHom
 
 end KStar.TotallyRealRoots

@@ -23,25 +23,31 @@ def evalOn (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) : (ι × ι → ℤ) →ₗ[ℤ
   map_smul' k n := by simp [Finset.mul_sum, mul_assoc]
 
 def tensorCoord : Y →ₗ[ℤ] Y →ₗ[ℤ] (ι × ι → ℤ) :=
-  LinearMap.mk₂ ℤ (fun x y p => b.repr x p.1 * b.repr y p.2)
-    (fun _ _ _ => by funext p; simp [add_mul]) (fun _ _ _ => by funext p; simp [mul_assoc])
-    (fun _ _ _ => by funext p; simp [mul_add]) (fun _ _ _ => by funext p; simp [mul_left_comm])
+  LinearMap.mk₂ ℤ
+    (fun x y p => b.repr x p.1 * b.repr y p.2)
+    (fun _ _ _ => by funext p; simp [add_mul])
+    (fun _ _ _ => by funext p; simp [mul_assoc])
+    (fun _ _ _ => by funext p; simp [mul_add])
+    (fun _ _ _ => by funext p; simp [mul_left_comm])
 
-theorem evalOn_tensorCoord (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (x y : Y) :
-    evalOn b B (tensorCoord b x y) = B x y := by
+theorem evalOn_tensorCoord (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (x y : Y)
+    : evalOn b B (tensorCoord b x y) = B x y := by
   conv_rhs => rw [← b.sum_repr x, ← b.sum_repr y]
   change ∑ p : ι × ι, ((b.repr x p.1 * b.repr y p.2 : ℤ) : ℝ) * B (b p.1) (b p.2) = _
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply,
-    Fintype.sum_prod_type, Int.cast_mul, zsmul_eq_mul, Finset.mul_sum]
+    simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, Fintype.sum_prod_type,
+      Int.cast_mul, zsmul_eq_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
 end Evaluations
 
-theorem posSemidef_of_int {ι : Type} [Fintype ι] {N : Matrix ι ι ℝ} (hH : N.IsHermitian)
-    (hp : ∀ x : ι → ℤ, 0 ≤ (fun i => (x i : ℝ)) ⬝ᵥ N *ᵥ (fun i => (x i : ℝ))) : N.PosSemidef := by
+theorem posSemidef_of_int
+    {ι : Type} [Fintype ι]
+    {N : Matrix ι ι ℝ}
+    (hH : N.IsHermitian) (hp : ∀ x : ι → ℤ, 0 ≤ (fun i => (x i : ℝ)) ⬝ᵥ N *ᵥ (fun i => (x i : ℝ)))
+    : N.PosSemidef := by
   have hq : ∀ x : ι → ℚ, 0 ≤ (fun i => (x i : ℝ)) ⬝ᵥ N *ᵥ (fun i => (x i : ℝ)) := by
     intro x
     obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors ℤ) x
@@ -52,7 +58,8 @@ theorem posSemidef_of_int {ι : Type} [Fintype ι] {N : Matrix ι ι ℝ} (hH : 
       have := congrArg (fun q : ℚ => (q : ℝ)) (hy i)
       simpa [Submonoid.smul_def] using this
     have h1 := hp y
-    rw [hxy, mulVec_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, ← mul_assoc] at h1
+    rw [hxy, mulVec_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, ← mul_assoc]
+      at h1
     exact nonneg_of_mul_nonneg_right h1 (mul_self_pos.2 hd0)
   refine posSemidef_iff_dotProduct_mulVec.2 ⟨hH, fun x => ?_⟩
   have hd : DenseRange (Pi.map fun (_ : ι) => (Rat.cast : ℚ → ℝ)) :=
@@ -61,16 +68,18 @@ theorem posSemidef_of_int {ι : Type} [Fintype ι] {N : Matrix ι ι ℝ} (hH : 
   · exact isClosed_le continuous_const (by fun_prop)
   · exact hq q
 
-theorem posDef_of_int {ι : Type} [Fintype ι] [DecidableEq ι] (M : Matrix ι ι ℤ) (hs : ∀ i j, M i j = M j i)
-    (hp : ∀ x : ι → ℤ, x ≠ 0 → 0 < x ⬝ᵥ M *ᵥ x) :
-    M.det ≠ 0 ∧ (M.map (Int.cast : ℤ → ℝ)).PosDef := by
+theorem posDef_of_int
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (M : Matrix ι ι ℤ) (hs : ∀ i j, M i j = M j i) (hp : ∀ x : ι → ℤ, x ≠ 0 → 0 < x ⬝ᵥ M *ᵥ x)
+    : M.det ≠ 0 ∧ (M.map (Int.cast : ℤ → ℝ)).PosDef := by
   have hd : M.det ≠ 0 := fun h => by
     obtain ⟨v, hv, h0⟩ := Matrix.exists_mulVec_eq_zero_iff.2 h
     simpa [h0] using hp v hv
   have h1 : (M.map (Int.cast : ℤ → ℝ)).PosSemidef := by
     refine posSemidef_of_int (by ext i j; simp [hs i j]) fun x => ?_
-    have : (fun i => (x i : ℝ)) ⬝ᵥ M.map (Int.cast : ℤ → ℝ) *ᵥ (fun i => (x i : ℝ)) =
-        ((x ⬝ᵥ M *ᵥ x : ℤ) : ℝ) := by simp [dotProduct, mulVec]
+    have : (fun i => (x i : ℝ)) ⬝ᵥ M.map (Int.cast : ℤ → ℝ) *ᵥ (fun i => (x i : ℝ))
+        = ((x ⬝ᵥ M *ᵥ x : ℤ) : ℝ) := by
+      simp [dotProduct, mulVec]
     rw [this]
     by_cases hx : x = 0
     · simp [hx]
@@ -79,30 +88,42 @@ theorem posDef_of_int {ι : Type} [Fintype ι] [DecidableEq ι] (M : Matrix ι �
   rw [← Int.cast_det]
   exact_mod_cast hd
 
-theorem sum_pos_of_tensor_pos : ∀ (Y : Type) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y] (ι : Type) [Fintype ι] (a c : ι → Y), (∀ f g : Y →ₗ[ℤ] ℤ, ∑ i, f (a i) * g (c i) = ∑ i, g (a i) * f (c i)) → (∀ f : Y →ₗ[ℤ] ℤ, f ≠ 0 → 0 < ∑ i, f (a i) * f (c i)) → ∀ γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ, (∀ x y, γ x y = γ y x) → (∀ x, 0 ≤ γ x x) → γ ≠ 0 → 0 < ∑ i, γ (a i) (c i) := by
+theorem sum_pos_of_tensor_pos
+    : ∀ (Y : Type) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y] (ι : Type) [Fintype ι]
+        (a c : ι → Y),
+      (∀ f g : Y →ₗ[ℤ] ℤ, ∑ i, f (a i) * g (c i) = ∑ i, g (a i) * f (c i))
+        → (∀ f : Y →ₗ[ℤ] ℤ, f ≠ 0 → 0 < ∑ i, f (a i) * f (c i))
+        → ∀ γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ,
+          (∀ x y, γ x y = γ y x) → (∀ x, 0 ≤ γ x x) → γ ≠ 0 → 0 < ∑ i, γ (a i) (c i) := by
   intro Y _ _ _ ι _ a c hs hp γ hγ h0 hne
   classical
   let b := Module.finBasis ℤ Y
   let M : Matrix _ _ ℤ := Matrix.of fun p q => ∑ i, b.coord p (a i) * b.coord q (c i)
-  have hM := (posDef_of_int M (fun p q => hs _ _) fun x hx => by
-    have := hp (∑ p, x p • b.coord p) fun h => hx (funext fun q => by
-      simpa [Finsupp.single_apply] using LinearMap.congr_fun h (b q))
-    convert this using 1
-    simp only [dotProduct, mulVec, M, Matrix.of_apply, LinearMap.sum_apply, LinearMap.smul_apply,
-      smul_eq_mul, Finset.mul_sum, Finset.sum_mul]
-    rw [Finset.sum_comm, Finset.sum_comm (s := (Finset.univ : Finset ι))]
-    refine Finset.sum_congr rfl fun p _ => ?_
-    rw [Finset.sum_comm (s := (Finset.univ : Finset ι))]
-    refine Finset.sum_congr rfl fun q _ => Finset.sum_congr rfl fun i _ => ?_
-    ring).2
+  have hM :=
+    (posDef_of_int M
+      (fun p q => hs _ _)
+      fun x hx => by
+        have :=
+          hp (∑ p, x p • b.coord p) fun h =>
+            hx (funext fun q => by simpa [Finsupp.single_apply] using LinearMap.congr_fun h (b q))
+        convert this using 1
+        simp only [dotProduct, mulVec, M, Matrix.of_apply, LinearMap.sum_apply,
+          LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul]
+        rw [Finset.sum_comm, Finset.sum_comm (s := (Finset.univ : Finset ι))]
+        refine Finset.sum_congr rfl fun p _ => ?_
+        rw [Finset.sum_comm (s := (Finset.univ : Finset ι))]
+        refine Finset.sum_congr rfl fun q _ => Finset.sum_congr rfl fun i _ => ?_
+        ring).2
   let G : Matrix _ _ ℝ := Matrix.of fun p q => γ (b p) (b q)
-  have hG : G.PosSemidef := posSemidef_of_int (by ext p q; simp [G, hγ (b p) (b q)]) fun x => by
-    convert h0 (∑ p, x p • b p) using 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, mulVec, G, Matrix.of_apply, map_sum, map_zsmul, LinearMap.sum_apply,
-      LinearMap.smul_apply, zsmul_eq_mul, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
-    rw [hγ (b p) (b q)]; ring
+  have hG : G.PosSemidef :=
+    posSemidef_of_int (by ext p q; simp [G, hγ (b p) (b q)]) fun x => by
+      convert h0 (∑ p, x p • b p) using 1
+      set_option synthInstance.maxHeartbeats 100000 in
+        simp only [dotProduct, mulVec, G, Matrix.of_apply, map_sum, map_zsmul, LinearMap.sum_apply,
+          LinearMap.smul_apply, zsmul_eq_mul, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
+      rw [hγ (b p) (b q)]
+      ring
   have htr : ∑ i, γ (a i) (c i) = (M.map (Int.cast : ℤ → ℝ) * G).trace := by
     simp only [← evalOn_tensorCoord b γ]
     change ∑ i, ∑ p : _ × _, ((b.repr (a i) p.1 * b.repr (c i) p.2 : ℤ) : ℝ) * γ (b p.1) (b p.2) = _
@@ -126,17 +147,24 @@ theorem sum_pos_of_tensor_pos : ∀ (Y : Type) [AddCommGroup Y] [Module.Free ℤ
     rwa [← star_eq_conjTranspose, hu.star.mul_left_eq_zero, hu.mul_right_eq_zero] at h3
   exact b.ext fun p => b.ext fun q => congrFun (congrFun h4 p) q
 
-theorem eq_zero_of_trace_mul (E : Type) [Field E] [NumberField E] {u : 𝓞 E}
-    (h : ∀ α : 𝓞 E, Algebra.trace ℤ (𝓞 E) (α * u) = 0) : u = 0 := by
+theorem eq_zero_of_trace_mul
+    (E : Type) [Field E] [NumberField E]
+    {u : 𝓞 E} (h : ∀ α : 𝓞 E, Algebra.trace ℤ (𝓞 E) (α * u) = 0)
+    : u = 0 := by
   by_contra hu
-  obtain ⟨r, hr, α, hα⟩ := (Algebra.IsAlgebraic.isAlgebraic (R := ℤ) u).exists_nonzero_dvd
-    (mem_nonZeroDivisors_of_ne_zero hu)
+  obtain ⟨r, hr, α, hα⟩ :=
+    (Algebra.IsAlgebraic.isAlgebraic (R := ℤ) u).exists_nonzero_dvd
+      (mem_nonZeroDivisors_of_ne_zero hu)
   have h1 := h α
   rw [mul_comm, ← hα, Algebra.trace_algebraMap, nsmul_eq_mul] at h1
   have hd : 0 < Module.finrank ℤ (𝓞 E) := Module.finrank_pos
   exact mul_ne_zero (by exact_mod_cast hd.ne') hr h1
 
-theorem exists_traceDual : ∀ (E : Type) [Field E] [NumberField E], ∃ (N : ℕ) (ι : Type) (_ : Fintype ι) (ω θ : ι → 𝓞 E), 0 < N ∧ ∑ s, θ s * ω s = (N : 𝓞 E) ∧ ∀ g : 𝓞 E →ₗ[ℤ] ℤ, ∀ α : 𝓞 E, Algebra.trace ℤ (𝓞 E) (α * ∑ s, g (ω s) • θ s) = N * g α := by
+theorem exists_traceDual
+    : ∀ (E : Type) [Field E] [NumberField E], ∃ (N : ℕ) (ι : Type) (_ : Fintype ι) (ω θ : ι → 𝓞 E),
+      0 < N ∧ ∑ s, θ s * ω s = (N : 𝓞 E)
+        ∧ ∀ g : 𝓞 E →ₗ[ℤ] ℤ, ∀ α : 𝓞 E,
+          Algebra.trace ℤ (𝓞 E) (α * ∑ s, g (ω s) • θ s) = N * g α := by
   intro E _ _
   classical
   let ω := RingOfIntegers.basis E
@@ -155,14 +183,15 @@ theorem exists_traceDual : ∀ (E : Type) [Field E] [NumberField E], ∃ (N : �
       ring
     rw [this, map_zsmul, map_zsmul, Module.Basis.trace_traceDual_mul]
     split_ifs <;> simp
-  have h3 : ∀ (g : 𝓞 E →ₗ[ℤ] ℤ) (α : 𝓞 E),
-      Algebra.trace ℤ (𝓞 E) (α * ∑ s, g (ω s) • θ s) = k * k * g α := by
+  have h3
+      : ∀ (g : 𝓞 E →ₗ[ℤ] ℤ) (α : 𝓞 E),
+        Algebra.trace ℤ (𝓞 E) (α * ∑ s, g (ω s) • θ s) = k * k * g α := by
     intro g α
     have : (Algebra.trace ℤ (𝓞 E)) ∘ₗ LinearMap.mulRight ℤ (∑ s, g (ω s) • θ s) = (k * k) • g :=
       ω.ext fun t => by
         set_option synthInstance.maxHeartbeats 100000 in
           simp only [LinearMap.comp_apply, LinearMap.mulRight_apply, Finset.mul_sum, mul_smul_comm,
-          map_sum, map_smul, hθ, LinearMap.smul_apply, smul_eq_mul]
+            map_sum, map_smul, hθ, LinearMap.smul_apply, smul_eq_mul]
         simp [mul_comm]
     exact LinearMap.congr_fun this α
   refine ⟨(k * k).toNat, _, inferInstance, ω, θ, ?_, ?_, fun g α => by rw [hN, h3]⟩
@@ -174,11 +203,13 @@ theorem exists_traceDual : ∀ (E : Type) [Field E] [NumberField E], ∃ (N : �
       intro s
       have := h3 (ω.coord s) (α * ω s)
       simp only [Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_apply, ite_smul,
-        one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true] at this
+          one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+        at this
       rw [← this, mul_comm (θ s), mul_assoc]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [mul_sub, map_sub, Finset.mul_sum, map_sum, mul_comm α (_ : 𝓞 E), ← nsmul_eq_mul, map_nsmul,
-      nsmul_eq_mul, hN, Algebra.trace_eq_matrix_trace ω α]
-    simp only [h4, Matrix.trace, Matrix.diag, Algebra.leftMulMatrix_eq_repr_mul, Finset.mul_sum, sub_self]
+      rw [mul_sub, map_sub, Finset.mul_sum, map_sum, mul_comm α (_ : 𝓞 E), ← nsmul_eq_mul,
+        map_nsmul, nsmul_eq_mul, hN, Algebra.trace_eq_matrix_trace ω α]
+    simp only [h4, Matrix.trace, Matrix.diag, Algebra.leftMulMatrix_eq_repr_mul, Finset.mul_sum,
+      sub_self]
 
 end GlobalTheory.PointStepCompare

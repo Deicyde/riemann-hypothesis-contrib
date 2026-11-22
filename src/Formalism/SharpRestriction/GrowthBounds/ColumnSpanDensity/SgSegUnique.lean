@@ -9,12 +9,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.MainNotions.G.TopChoiceBounds
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
+  Formalism.MainNotions.G.TopChoiceBounds
 
 variable {n' : ℕ}
 
-theorem sg_cdist (a b : Fin n') :
-    cdist a b = if a.val ≤ b.val then b.val - a.val else b.val + n' - a.val := by
+theorem sg_cdist (a b : Fin n')
+    : cdist a b = if a.val ≤ b.val then b.val - a.val else b.val + n' - a.val := by
   have ha := a.isLt
   have hb := b.isLt
   unfold cdist
@@ -31,10 +32,11 @@ private lemma posAdd_cdist_eq_self (x y : Fin n') : posAdd x (cdist x y) = y := 
   rw [Nat.add_mod_mod, show x.val + (y.val + n' - x.val) = y.val + n' by omega, Nat.add_mod_right,
     Nat.mod_eq_of_lt hy]
 
-theorem sg_pos_spec (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (i : Fin (segS TT j)) :
-    segPos TT j i ∈ TT ∧ ¬ Even (segPos TT j i).val ∧
-      cdist (segStart TT j) (segPos TT j i) = (segDists TT j).get i ∧
-      0 < cdist (segStart TT j) (segPos TT j i) ∧ cdist (segStart TT j) (segPos TT j i) < segG TT j := by
+theorem sg_pos_spec (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (i : Fin (segS TT j))
+    : segPos TT j i ∈ TT ∧ ¬ Even (segPos TT j i).val
+      ∧ cdist (segStart TT j) (segPos TT j i) = (segDists TT j).get i
+      ∧ 0 < cdist (segStart TT j) (segPos TT j i)
+      ∧ cdist (segStart TT j) (segPos TT j i) < segG TT j := by
   obtain ⟨s, hs, hsd⟩ := Finset.mem_image.1 ((Finset.mem_sort _).1 (List.get_mem (segDists TT j) i))
   obtain ⟨hsT, hodd, hpos, hlt⟩ := Finset.mem_filter.1 hs
   have hp : segPos TT j i = s := by
@@ -44,14 +46,16 @@ theorem sg_pos_spec (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (i : Fin (segS 
   rw [hp]
   exact ⟨hsT, hodd, hsd, hpos, hlt⟩
 
-theorem sg_next_mem (TT : Finset (Fin n')) (j : Fin (numSeg TT)) :
-    segNext TT j ∈ TT ∧ Even (segNext TT j).val :=
+theorem sg_next_mem (TT : Finset (Fin n')) (j : Fin (numSeg TT))
+    : segNext TT j ∈ TT ∧ Even (segNext TT j).val :=
   (bs_mem TT (segNext TT j)).1 (List.get_mem _ _)
 
-theorem sg_dists_inj (TT : Finset (Fin n')) (j : Fin (numSeg TT)) : Function.Injective (segDists TT j).get :=
+theorem sg_dists_inj (TT : Finset (Fin n')) (j : Fin (numSeg TT))
+    : Function.Injective (segDists TT j).get :=
   List.nodup_iff_injective_get.1 (by unfold segDists; apply Finset.sort_nodup)
 
-theorem sg_pos_inj (TT : Finset (Fin n')) (j : Fin (numSeg TT)) : Function.Injective (segPos TT j) := by
+theorem sg_pos_inj (TT : Finset (Fin n')) (j : Fin (numSeg TT))
+    : Function.Injective (segPos TT j) := by
   intro i i' h
   have e1 := (sg_pos_spec TT j i).2.2.1
   have e2 := (sg_pos_spec TT j i').2.2.1
@@ -62,7 +66,8 @@ def sgTop (TT : Finset (Fin n')) (j : Fin (numSeg TT)) : Option (Fin (segS TT j)
   | none => ⟨segNext TT j, (sg_next_mem TT j).1⟩
   | some i => ⟨segPos TT j i, (sg_pos_spec TT j i).1⟩
 
-theorem sgTop_inj (TT : Finset (Fin n')) (j : Fin (numSeg TT)) : Function.Injective (sgTop TT j) := by
+theorem sgTop_inj (TT : Finset (Fin n')) (j : Fin (numSeg TT))
+    : Function.Injective (sgTop TT j) := by
   rintro (_ | i) (_ | i') h
   · rfl
   · exfalso
@@ -81,8 +86,10 @@ def sgAll (TT : Finset (Fin n')) : (Σ j : Fin (numSeg TT), Option (Fin (segS TT
   | ⟨j, none⟩ => ⟨segStart TT j, (bs_start_mem TT j).1⟩
   | ⟨j, some i⟩ => ⟨segPos TT j i, (sg_pos_spec TT j i).1⟩
 
-theorem sg_seg_unique (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (j j' : Fin (numSeg TT)) (i : Fin (segS TT j))
-    (i' : Fin (segS TT j')) (h : segPos TT j i = segPos TT j' i') : j = j' := by
+theorem sg_seg_unique
+    (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (j j' : Fin (numSeg TT)) (i : Fin (segS TT j))
+    (i' : Fin (segS TT j')) (h : segPos TT j i = segPos TT j' i')
+    : j = j' := by
   by_contra hne
   have hs : segStart TT j ≠ segStart TT j' := fun e => hne ((bs_mono TT).injective e)
   have m1 := bs_min TT h2 j (segStart TT j') (bs_start_mem TT j').1 (bs_start_mem TT j').2 hs.symm
@@ -124,8 +131,8 @@ theorem sgAll_inj (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) : Function.Injec
     obtain rfl := sg_seg_unique TT h2 j j' i i' h'
     rw [sg_pos_inj TT j h']
 
-theorem sg_count (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) :
-    ∑ j : Fin (numSeg TT), (segS TT j + 1) ≤ TT.card := by
+theorem sg_count (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT)
+    : ∑ j : Fin (numSeg TT), (segS TT j + 1) ≤ TT.card := by
   have hc := Fintype.card_le_of_injective _ (sgAll_inj TT h2)
   simpa [Fintype.card_sigma] using hc
 

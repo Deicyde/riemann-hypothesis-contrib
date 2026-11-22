@@ -12,40 +12,48 @@ open MeasureTheory
 
 namespace Formalism.DoubleCosetMeasures.P
 
-theorem mem_preimage_rightRel_mk {G : Type} [Group G] (K : Subgroup G)
-    (q : Quotient (QuotientGroup.rightRel K)) (x : G) :
-    Quotient.mk (QuotientGroup.rightRel K) x = q ↔ x * q.out⁻¹ ∈ K := by
+theorem mem_preimage_rightRel_mk
+    {G : Type} [Group G] (K : Subgroup G) (q : Quotient (QuotientGroup.rightRel K)) (x : G)
+    : Quotient.mk (QuotientGroup.rightRel K) x = q ↔ x * q.out⁻¹ ∈ K := by
   conv_lhs => rw [← Quotient.out_eq q]
   rw [Quotient.eq, QuotientGroup.rightRel_apply, ← K.inv_mem_iff, mul_inv_rev, inv_inv]
 
-theorem mem_preimage_leftQuot_mk {G : Type} [Group G] (K : Subgroup G) (q : G ⧸ K) (y : G) :
-    (y : G ⧸ K) = q ↔ q.out⁻¹ * y ∈ K := by
+theorem mem_preimage_leftQuot_mk {G : Type} [Group G] (K : Subgroup G) (q : G ⧸ K) (y : G)
+    : (y : G ⧸ K) = q ↔ q.out⁻¹ * y ∈ K := by
   conv_lhs => rw [← QuotientGroup.out_eq' q]
   rw [QuotientGroup.eq, ← K.inv_mem_iff, mul_inv_rev, inv_inv]
 
-def box {G₁ G₂ : Type} [Group G₁] [Group G₂] (K₁ : Subgroup G₁) (K₂ : Subgroup G₂)
-    (p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂)) : Set (G₁ × G₂) :=
+def box
+    {G₁ G₂ : Type} [Group G₁] [Group G₂]
+    (K₁ : Subgroup G₁) (K₂ : Subgroup G₂) (p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂))
+    : Set (G₁ × G₂) :=
   ((fun x => x * p.1.out⁻¹) ⁻¹' (K₁ : Set G₁)) ×ˢ ((fun y => p.2.out⁻¹ * y) ⁻¹' (K₂ : Set G₂))
 
-def clsTS {G₁ G₂ : Type} [Group G₁] [Group G₂] (K₁ : Subgroup G₁) (K₂ : Subgroup G₂)
-    (z : G₁ × G₂) : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂) :=
+def clsTS {G₁ G₂ : Type} [Group G₁] [Group G₂] (K₁ : Subgroup G₁) (K₂ : Subgroup G₂) (z : G₁ × G₂)
+    : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂) :=
   (Quotient.mk _ z.1, (z.2 : G₂ ⧸ K₂))
 
-theorem mem_box_iff {G₁ G₂ : Type} [Group G₁] [Group G₂] (K₁ : Subgroup G₁) (K₂ : Subgroup G₂)
-    (p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂)) (z : G₁ × G₂) :
-    z ∈ box K₁ K₂ p ↔ clsTS K₁ K₂ z = p := by
+theorem mem_box_iff
+    {G₁ G₂ : Type} [Group G₁] [Group G₂]
+    (K₁ : Subgroup G₁) (K₂ : Subgroup G₂) (p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂))
+    (z : G₁ × G₂)
+    : z ∈ box K₁ K₂ p ↔ clsTS K₁ K₂ z = p := by
   simp only [box, clsTS, Prod.ext_iff, Set.mem_prod, Set.mem_preimage, SetLike.mem_coe,
     mem_preimage_rightRel_mk, mem_preimage_leftQuot_mk]
 
-theorem cls_out {G₁ G₂ : Type} [Group G₁] [Group G₂] (K₁ : Subgroup G₁) (K₂ : Subgroup G₂)
-    (p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂)) :
-    clsTS K₁ K₂ (p.1.out, p.2.out) = p := by
+theorem cls_out
+    {G₁ G₂ : Type} [Group G₁] [Group G₂]
+    (K₁ : Subgroup G₁) (K₂ : Subgroup G₂) (p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂))
+    : clsTS K₁ K₂ (p.1.out, p.2.out) = p := by
   simp only [clsTS, Quotient.out_eq, QuotientGroup.out_eq']
 
-theorem inv_eq_cls {G₁ G₂ : Type} [Group G₁] [Group G₂] (K₁ : Subgroup G₁) (K₂ : Subgroup G₂)
-    {E : Type} (f : G₁ × G₂ → E)
-    (hf : ∀ a ∈ K₁, ∀ b ∈ K₂, ∀ x : G₁, ∀ y : G₂, f (a * x, y * b) = f (x, y)) (z : G₁ × G₂) :
-    f z = f ((clsTS K₁ K₂ z).1.out, (clsTS K₁ K₂ z).2.out) := by
+theorem inv_eq_cls
+    {G₁ G₂ : Type} [Group G₁] [Group G₂]
+    (K₁ : Subgroup G₁) (K₂ : Subgroup G₂)
+    {E : Type}
+    (f : G₁ × G₂ → E) (hf : ∀ a ∈ K₁, ∀ b ∈ K₂, ∀ x : G₁, ∀ y : G₂, f (a * x, y * b) = f (x, y))
+    (z : G₁ × G₂)
+    : f z = f ((clsTS K₁ K₂ z).1.out, (clsTS K₁ K₂ z).2.out) := by
   have h1 := (mem_preimage_rightRel_mk K₁ (Quotient.mk (QuotientGroup.rightRel K₁) z.1) z.1).1 rfl
   have h2 := (mem_preimage_leftQuot_mk K₂ (z.2 : G₂ ⧸ K₂) z.2).1 rfl
   have h := hf _ h1 _ h2 (Quotient.mk (QuotientGroup.rightRel K₁) z.1).out (z.2 : G₂ ⧸ K₂).out
@@ -63,8 +71,11 @@ theorem intTwoSided : Formalism.DoubleCosetMeasures.IntTwoSided := by
       (hK₂.preimage (continuous_const_mul _)).measurableSet
   have hfg : ∀ z, f z = g (clsTS K₁ K₂ z) := fun z => inv_eq_cls K₁ K₂ f hf z
   have hfin : (Function.support g).Finite := by
-    obtain ⟨t, ht⟩ := hcs.elim_finite_subcover (fun p => box K₁ K₂ p) hopen
-      (fun z _ => Set.mem_iUnion.2 ⟨clsTS K₁ K₂ z, (mem_box_iff K₁ K₂ _ z).2 rfl⟩)
+    obtain ⟨t, ht⟩ :=
+      hcs.elim_finite_subcover
+        (fun p => box K₁ K₂ p)
+        hopen
+        (fun z _ => Set.mem_iUnion.2 ⟨clsTS K₁ K₂ z, (mem_box_iff K₁ K₂ _ z).2 rfl⟩)
     refine t.finite_toSet.subset fun p hp => ?_
     have hz : ((p.1.out, p.2.out) : G₁ × G₂) ∈ tsupport f := subset_tsupport f hp
     obtain ⟨i, hi, hzi⟩ := Set.mem_iUnion₂.1 (ht hz)
@@ -73,12 +84,14 @@ theorem intTwoSided : Formalism.DoubleCosetMeasures.IntTwoSided := by
     rw [hpi]
     exact hi
   refine ⟨hfin, ?_⟩
-  change ∫ p, f p ∂(μ₁.prod μ₂) = ∑ᶠ p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂),
-    ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • g p
+  change ∫ p, f p ∂(μ₁.prod μ₂)
+    = ∑ᶠ p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂),
+      ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • g p
   set S := hfin.toFinset with hS
-  have hsum : ∑ᶠ p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂),
-      ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • g p =
-      ∑ p ∈ S, ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • g p := by
+  have hsum
+      : ∑ᶠ p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂),
+          ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • g p
+        = ∑ p ∈ S, ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • g p := by
     apply finsum_eq_sum_of_support_subset
     intro p hp
     rw [hS, Set.Finite.coe_toFinset]
@@ -88,8 +101,8 @@ theorem intTwoSided : Formalism.DoubleCosetMeasures.IntTwoSided := by
   rw [hsum]
   have hdecomp : f = fun z => ∑ p ∈ S, (box K₁ K₂ p).indicator (fun _ => g p) z := by
     funext z
-    have hind : ∀ p, (box K₁ K₂ p).indicator (fun _ => g p) z =
-        if clsTS K₁ K₂ z = p then g p else 0 := by
+    have hind
+        : ∀ p, (box K₁ K₂ p).indicator (fun _ => g p) z = if clsTS K₁ K₂ z = p then g p else 0 := by
       intro p
       simp only [Set.indicator, mem_box_iff]
     simp only [hind, Finset.sum_ite_eq]
@@ -101,8 +114,10 @@ theorem intTwoSided : Formalism.DoubleCosetMeasures.IntTwoSided := by
   have hbox : ∀ p, (μ₁.prod μ₂) (box K₁ K₂ p) = μ₁ (K₁ : Set G₁) * μ₂ (K₂ : Set G₂) := by
     intro p
     rw [box, Measure.prod_prod, measure_preimage_mul_right, measure_preimage_mul]
-  have hpiece : ∀ p, ∫ z, (box K₁ K₂ p).indicator (fun _ => g p) z ∂(μ₁.prod μ₂) =
-      ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • g p := by
+  have hpiece
+      : ∀ p,
+        ∫ z, (box K₁ K₂ p).indicator (fun _ => g p) z ∂(μ₁.prod μ₂)
+          = ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • g p := by
     intro p
     rw [integral_indicator_const _ (hmeas p), Measure.real, hbox p, ENNReal.toReal_mul]
   by_cases hint : Integrable f (μ₁.prod μ₂)

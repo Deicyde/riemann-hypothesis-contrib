@@ -11,8 +11,11 @@ public import Formalism.LocalToGlobal.Columns.CoefModAt
 
 open NumberField IsDedekindDomain
 open scoped TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.ExpFrame GlobalTheory.ExpTie GlobalTheory.FrameOf
-open Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.LD Formalism.GradedWeylDivisibility MvPolynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.IndefR
+  Formalism.IndefR.Links Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn
+  GlobalTheory.ExpFrame GlobalTheory.ExpTie GlobalTheory.FrameOf
+open Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.LD
+  Formalism.GradedWeylDivisibility MvPolynomial
 open GlobalTheory.FrameRead
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,8 +24,11 @@ namespace GlobalTheory.LocBasisDual
 open Formalism.HermitianLatticesTheory Formalism.UG Formalism.L2.Forms
 open scoped Matrix
 
-theorem natCast_notMem {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) {l s : ℕ}
-    (hl : l.Prime) (hlw : ((l : ℕ) : 𝓞 K) ∈ w.asIdeal) (hs : ¬ l ∣ s) : (s : 𝓞 K) ∉ w.asIdeal := by
+theorem natCast_notMem
+    {K : Type} [Field K] [NumberField K]
+    (w : HeightOneSpectrum (𝓞 K))
+    {l s : ℕ} (hl : l.Prime) (hlw : ((l : ℕ) : 𝓞 K) ∈ w.asIdeal) (hs : ¬ l ∣ s)
+    : (s : 𝓞 K) ∉ w.asIdeal := by
   intro h
   have hcop : Nat.Coprime l s := (hl.coprime_iff_not_dvd).2 hs
   obtain ⟨a, b, e⟩ := (Nat.isCoprime_iff_coprime.2 hcop).map (Int.castRingHom (𝓞 K))
@@ -32,10 +38,13 @@ theorem natCast_notMem {K : Type} [Field K] [NumberField K] (w : HeightOneSpectr
   · simpa using hlw
   · simpa using h
 
-theorem isBasisAt_tauLat {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K] {ι : Type} {n : ℕ}
-    (emb : ι → E →+* K) (τ : ι) (w : HeightOneSpectrum (𝓞 K)) {l : ℕ} (hl : l.Prime)
-    (hlw : ((l : ℕ) : 𝓞 K) ∈ w.asIdeal) (M : Submodule (𝓞 E) (Fin n → E)) (B : GL (Fin n) E)
-    (hB : IsLocBasis l (M : Set (Fin n → E)) B) : IsBasisAt w (tauLat emb τ M) (bc (emb τ) B) := by
+theorem isBasisAt_tauLat
+    {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K]
+    {ι : Type} {n : ℕ} (emb : ι → E →+* K) (τ : ι)
+    (w : HeightOneSpectrum (𝓞 K))
+    {l : ℕ} (hl : l.Prime) (hlw : ((l : ℕ) : 𝓞 K) ∈ w.asIdeal)
+    (M : Submodule (𝓞 E) (Fin n → E)) (B : GL (Fin n) E) (hB : IsLocBasis l (M : Set (Fin n → E)) B)
+    : IsBasisAt w (tauLat emb τ M) (bc (emb τ) B) := by
   have h1 : ¬ l ∣ 1 := fun h => hl.one_lt.ne' (Nat.dvd_one.1 h)
   unfold IsBasisAt
   apply le_antisymm
@@ -59,17 +68,27 @@ theorem isBasisAt_tauLat {E K : Type} [Field E] [NumberField E] [Field K] [Numbe
     unfold colLat
     rw [Submodule.span_le]
     rintro _ ⟨j, rfl⟩
-    obtain ⟨s', hs', hmem⟩ := (hB (fun a => (B : Matrix (Fin n) (Fin n) E) a j)).2 ⟨1, h1, fun a => by
-      have e : (((B⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) *ᵥ fun a => (B : Matrix (Fin n) (Fin n) E) a j) a =
-          (1 : Matrix (Fin n) (Fin n) E) a j := by
-        have h2 : ((B⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) * (B : Matrix (Fin n) (Fin n) E) = 1 := by
-          rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
-        rw [← h2]
-        rfl
-      rw [e, Matrix.one_apply]
-      split_ifs
-      · exact ⟨1, by simp⟩
-      · exact ⟨0, by simp⟩⟩
+    obtain ⟨s', hs', hmem⟩ :=
+      (hB (fun a => (B : Matrix (Fin n) (Fin n) E) a j)).2 ⟨
+        1,
+        h1,
+        fun a => by
+          have e
+              : (((B⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E)
+                    *ᵥ fun a => (B : Matrix (Fin n) (Fin n) E) a j)
+                  a
+                = (1 : Matrix (Fin n) (Fin n) E) a j := by
+            have h2
+                : ((B⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) * (B : Matrix (Fin n) (Fin n) E)
+                  = 1 := by
+              rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
+            rw [← h2]
+            rfl
+          rw [e, Matrix.one_apply]
+          split_ifs
+          · exact ⟨1, by simp⟩
+          · exact ⟨0, by simp⟩
+      ⟩
     refine ⟨(s' : 𝓞 K), natCast_notMem w hl hlw hs', ?_⟩
     refine Submodule.subset_span ⟨_, hmem, ?_⟩
     funext b
@@ -79,11 +98,26 @@ end GlobalTheory.LocBasisDual
 
 namespace GlobalTheory.LocBasisDual
 
-theorem basisAt_dualFr_tauLat : ∀ (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] (ι : Type) [Fintype ι] (n : ℕ) (emb : ι → E →+* K) (τ : ι) (w : HeightOneSpectrum (𝓞 K)) (l : ℕ), l.Prime → ((l : ℕ) : 𝓞 K) ∈ w.asIdeal → ∀ (M : Submodule (𝓞 E) (Fin n → E)), Submodule.IsFullLattice E M → (∃ B, Formalism.L2.Forms.IsLocBasis l (M : Set (Fin n → E)) B) ∧ Submodule.IsLattice K (dualFr (tauLat emb τ M)) ∧ ∀ B : GL (Fin n) E, Formalism.L2.Forms.IsLocBasis l (M : Set (Fin n → E)) B → IsBasisAt w (dualFr (tauLat emb τ M)) (inside₂ K n (Matrix.GeneralLinearGroup.map (emb τ) B)) := by
+theorem basisAt_dualFr_tauLat
+    : ∀ (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] (ι : Type) [Fintype ι]
+        (n : ℕ) (emb : ι → E →+* K) (τ : ι) (w : HeightOneSpectrum (𝓞 K)) (l : ℕ),
+      l.Prime → ((l : ℕ) : 𝓞 K) ∈ w.asIdeal
+        → ∀ (M : Submodule (𝓞 E) (Fin n → E)),
+          Submodule.IsFullLattice E M
+            → (∃ B, Formalism.L2.Forms.IsLocBasis l (M : Set (Fin n → E)) B)
+              ∧ Submodule.IsLattice K (dualFr (tauLat emb τ M))
+              ∧ ∀ B : GL (Fin n) E,
+                Formalism.L2.Forms.IsLocBasis l (M : Set (Fin n → E)) B
+                  → IsBasisAt w (dualFr (tauLat emb τ M))
+                    (inside₂ K n (Matrix.GeneralLinearGroup.map (emb τ) B)) := by
   intro E K _ _ _ _ ι _ n emb τ w l hl hlw M hM
   have : Fact l.Prime := ⟨hl⟩
-  refine ⟨Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.LocB.exists_isLocBasis l E M hM.fg (Submodule.IsFullLattice.span_eq_top (self := hM)),
-    (Formalism.L2.DIV.dualFr_tauLat_isLattice emb τ M hM).toIsLattice, fun B hB => ?_⟩
+  refine ⟨
+    Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.LocB.exists_isLocBasis l E M hM.fg
+      (Submodule.IsFullLattice.span_eq_top (self := hM)),
+    (Formalism.L2.DIV.dualFr_tauLat_isLattice emb τ M hM).toIsLattice,
+    fun B hB => ?_
+  ⟩
   exact pb_isBasisAt_dualFr w _ (tauLatticeLattice_holds E K ι n emb τ M hM).fg _
     (isBasisAt_tauLat emb τ w hl hlw M B hB)
 

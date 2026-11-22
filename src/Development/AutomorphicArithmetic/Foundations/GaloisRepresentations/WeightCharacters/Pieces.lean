@@ -6,16 +6,23 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.Branching
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.Branching
 
 namespace UpperTheory.Gal.Wt
 
-private theorem pev_map {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {a : ℕ}
-    (P' : MvPolynomial (Fin a × Fin a) (Qbar l)) (h : GL (Fin a) ℂ) :
-    ι.symm (pev (MvPolynomial.map ι.toRingHom P') h) =
-      MvPolynomial.eval (fun p : Fin a × Fin a => ι.symm ((h : Matrix (Fin a) (Fin a) ℂ) p.1 p.2)) P' := by
+private theorem pev_map
+    {l : ℕ} [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ)
+    {a : ℕ} (P' : MvPolynomial (Fin a × Fin a) (Qbar l)) (h : GL (Fin a) ℂ)
+    : ι.symm (pev (MvPolynomial.map ι.toRingHom P') h)
+      = MvPolynomial.eval
+        (fun p : Fin a × Fin a => ι.symm ((h : Matrix (Fin a) (Fin a) ℂ) p.1 p.2))
+        P' := by
   induction P' using MvPolynomial.induction_on with
   | C c => simp [pev]
   | add p q hp hq =>
@@ -41,7 +48,8 @@ theorem pieces_of (hS : SepPoly) (hN : NearSub) : Pieces := by
   haveI : Finite (Γ ⧸ K) := Subgroup.quotient_finite_of_isOpen K hKo
   letI : Fintype (Γ ⧸ K) := Fintype.ofFinite _
   let c : Γ ⧸ K → Γ := fun q => q.out
-  let v : Γ → (Fin a × Fin a → Qbar l) := fun g p => ι.symm ((φ g : Matrix (Fin a) (Fin a) ℂ) p.1 p.2)
+  let v : Γ → (Fin a × Fin a → Qbar l) := fun g p =>
+    ι.symm ((φ g : Matrix (Fin a) (Fin a) ℂ) p.1 p.2)
   have hv : Continuous v := continuous_pi fun p => hcont p.1 p.2
   have hKc : IsClosed (K : Set Γ) := Subgroup.isClosed_of_isOpen K hKo
   have hinj : ∀ g g', v g = v g' → g⁻¹ * g' ∈ K := by
@@ -52,9 +60,10 @@ theorem pieces_of (hS : SepPoly) (hN : NearSub) : Pieces := by
     apply Matrix.ext
     intro i j
     exact ι.symm.injective (congrFun hgg (i, j))
-  have hsep : ∀ q : Γ ⧸ K, ∃ P' : MvPolynomial (Fin a × Fin a) (Qbar l),
-      (∀ z ∈ v '' {g | (c q)⁻¹ * g ∈ K}, ‖MvPolynomial.eval z P' - 1‖ ≤ ε) ∧
-      (∀ z ∈ v '' {g | (c q)⁻¹ * g ∉ K}, ‖MvPolynomial.eval z P'‖ ≤ ε) := by
+  have hsep
+      : ∀ q : Γ ⧸ K, ∃ P' : MvPolynomial (Fin a × Fin a) (Qbar l),
+        (∀ z ∈ v '' {g | (c q)⁻¹ * g ∈ K}, ‖MvPolynomial.eval z P' - 1‖ ≤ ε)
+          ∧ (∀ z ∈ v '' {g | (c q)⁻¹ * g ∉ K}, ‖MvPolynomial.eval z P'‖ ≤ ε) := by
     intro q
     have hc1 : IsCompact (v '' {g | (c q)⁻¹ * g ∈ K}) :=
       (hKc.preimage (continuous_const.mul continuous_id)).isCompact.image hv

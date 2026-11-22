@@ -19,18 +19,24 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 variable {F : Type} [Field F] {n : ℕ}
 
-theorem exists_homogeneous_sub_mem_span (ℓ g : MvPolynomial (Fin n) F) (hℓ : ℓ.IsHomogeneous 1) :
-    ∃ (G : MvPolynomial (Fin n) F) (D : ℕ), G.IsHomogeneous D ∧ G - g ∈ Ideal.span {ℓ - 1} := by
+theorem exists_homogeneous_sub_mem_span (ℓ g : MvPolynomial (Fin n) F) (hℓ : ℓ.IsHomogeneous 1)
+    : ∃ (G : MvPolynomial (Fin n) F) (D : ℕ), G.IsHomogeneous D ∧ G - g ∈ Ideal.span {ℓ - 1} := by
   classical
-  refine ⟨∑ d ∈ Finset.range (g.totalDegree + 1), ℓ ^ (g.totalDegree - d) * homogeneousComponent d g,
-    g.totalDegree, ?_, ?_⟩
+  refine ⟨
+    ∑ d ∈ Finset.range (g.totalDegree + 1), ℓ ^ (g.totalDegree - d) * homogeneousComponent d g,
+    g.totalDegree,
+    ?_,
+    ?_
+  ⟩
   · refine IsHomogeneous.sum _ _ _ fun d hd => ?_
     have hdD : d ≤ g.totalDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hd)
     have h := (hℓ.pow (g.totalDegree - d)).mul (homogeneousComponent_isHomogeneous d g)
     rwa [one_mul, Nat.sub_add_cancel hdD] at h
-  · have e : ∑ d ∈ Finset.range (g.totalDegree + 1), ℓ ^ (g.totalDegree - d) * homogeneousComponent d g - g =
-        ∑ d ∈ Finset.range (g.totalDegree + 1), (ℓ ^ (g.totalDegree - d) - 1) * homogeneousComponent d g := by
-      simp only [sub_one_mul, Finset.sum_sub_distrib, sum_homogeneousComponent]
+  · have e
+        : ∑ d ∈ Finset.range (g.totalDegree + 1), ℓ ^ (g.totalDegree - d) * homogeneousComponent d g
+            - g
+          = ∑ d ∈ Finset.range (g.totalDegree + 1), (ℓ ^ (g.totalDegree - d) - 1) * homogeneousComponent d g :=
+      by simp only [sub_one_mul, Finset.sum_sub_distrib, sum_homogeneousComponent]
     rw [e]
     refine Ideal.sum_mem _ fun d _ => Ideal.mul_mem_right _ _ ?_
     rw [Ideal.mem_span_singleton]

@@ -15,8 +15,9 @@ theorem PrimitiveFormWindow.proof : PrimitiveFormWindow.Statement := by
   intro σ _ X w d A hX hiso ℓ N a δ q ha hδ hq hp hsep hrel
   obtain ⟨N₀, k, f, hN₀o, hwN₀, hfa, hXN⟩ := hX
   obtain ⟨W₀, hW₀, hW₀iso⟩ := hiso
-  have hev := (show ∀ᶠ z in 𝓝 w, z ∈ N₀ from hN₀o.mem_nhds hwN₀).and
-    ((show ∀ᶠ z in 𝓝 w, z ∈ W₀ from hW₀).and (hp.and (Filter.eventually_all.2 hrel)))
+  have hev :=
+    (show ∀ᶠ z in 𝓝 w, z ∈ N₀ from hN₀o.mem_nhds hwN₀).and
+      ((show ∀ᶠ z in 𝓝 w, z ∈ W₀ from hW₀).and (hp.and (Filter.eventually_all.2 hrel)))
   obtain ⟨ε, hε, hεs⟩ := Metric.nhds_basis_closedBall.eventually_iff.1 hev
   set K : Set (σ → ℂ) := Metric.sphere w ε ∩ (fun z i => f i z) ⁻¹' {0} with hK
   have hsN : Metric.sphere w ε ⊆ N₀ := fun z hz => (hεs (Metric.sphere_subset_closedBall hz)).1
@@ -46,16 +47,35 @@ theorem PrimitiveFormWindow.proof : PrimitiveFormWindow.Statement := by
     rw [hzeq, Metric.mem_sphere, dist_self] at h1
     exact hε.ne h1
   have hclo : IsClosed (A '' K) := (hKc.image A.continuous).isClosed
-  have hev2 := (show ∀ᶠ y in 𝓝 (A w), y ∈ (A '' K)ᶜ from hclo.isOpen_compl.mem_nhds hAK).and
-    ((Filter.eventually_all.2 fun j => (ha j).eventually_analyticAt).and
-      (hδ.eventually_analyticAt.and
-        ((Filter.eventually_all.2 fun i => Filter.eventually_all.2 fun j =>
-          (hq i j).eventually_analyticAt).and hsep)))
+  have hev2 :=
+    (show ∀ᶠ y in 𝓝 (A w), y ∈ (A '' K)ᶜ from hclo.isOpen_compl.mem_nhds hAK).and
+      ((Filter.eventually_all.2 fun j => (ha j).eventually_analyticAt).and
+        (hδ.eventually_analyticAt.and ((Filter.eventually_all.2 fun i =>
+          Filter.eventually_all.2 fun j => (hq i j).eventually_analyticAt).and hsep)))
   obtain ⟨ρ, hρ, hρs⟩ := Metric.nhds_basis_ball.eventually_iff.1 hev2
-  refine ⟨Metric.ball w ε, Metric.ball (A w) ρ, N₀, k, f, Metric.isOpen_ball, Metric.mem_ball_self hε,
-    Metric.isOpen_ball, convex_ball _ _, Metric.mem_ball_self hρ, hN₀o, ?_, hfa, hXN, ?_, ?_, ?_,
-    fun j y hy => (hρs hy).2.1 j, fun y hy => (hρs hy).2.2.1, fun i j y hy => (hρs hy).2.2.2.1 i j,
-    fun y hy => (hρs hy).2.2.2.2⟩
+  refine ⟨
+    Metric.ball w ε,
+    Metric.ball (A w) ρ,
+    N₀,
+    k,
+    f,
+    Metric.isOpen_ball,
+    Metric.mem_ball_self hε,
+    Metric.isOpen_ball,
+    convex_ball _ _,
+    Metric.mem_ball_self hρ,
+    hN₀o,
+    ?_,
+    hfa,
+    hXN,
+    ?_,
+    ?_,
+    ?_,
+    fun j y hy => (hρs hy).2.1 j,
+    fun y hy => (hρs hy).2.2.1,
+    fun i j y hy => (hρs hy).2.2.2.1 i j,
+    fun y hy => (hρs hy).2.2.2.2
+  ⟩
   · rw [closure_ball w hε.ne']
     exact fun z hz => (hεs hz).1
   · rintro z ⟨hzX, hzc⟩ hzB

@@ -8,7 +8,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Expli
 
 noncomputable section
 
-open MeasureTheory Formalism.BasicNotions Formalism.L2.SG.RowDict Formalism.MainNotions.LeviCoordinates
+open MeasureTheory Formalism.BasicNotions Formalism.L2.SG.RowDict
+  Formalism.MainNotions.LeviCoordinates
 
 namespace Formalism.L2.SG.EvalTOntoRep
 
@@ -17,8 +18,10 @@ variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 def IsContRep (f : L2X X) (φ : X.B.I.GA → ℂ) : Prop :=
   Continuous φ ∧ (∀ γ ∈ X.B.I.GFset, ∀ y, φ (γ * y) = φ y) ∧ ((f : X.B.I.GA → ℂ) =ᵐ[muX X] φ)
 
-theorem eq_zero_of_ae (ψ : X.B.I.GA → ℂ) (hc : Continuous ψ) (hinv : ∀ γ ∈ X.B.I.GFset, ∀ y, ψ (γ * y) = ψ y)
-    (h0 : ψ =ᵐ[muX X] 0) : ψ = 0 := by
+theorem eq_zero_of_ae
+    (ψ : X.B.I.GA → ℂ)
+    (hc : Continuous ψ) (hinv : ∀ γ ∈ X.B.I.GFset, ∀ y, ψ (γ * y) = ψ y) (h0 : ψ =ᵐ[muX X] 0)
+    : ψ = 0 := by
   have := X.B.sf
   have := X.B.haar
   have := Formalism.L2.SG.Count.muA_isHaar X.B.I X.B.μf
@@ -53,27 +56,37 @@ theorem eq_zero_of_ae (ψ : X.B.I.GA → ℂ) (hc : Continuous ψ) (hinv : ∀ �
   rw [h3] at this
   exact this
 
-theorem contRep_unique {f : L2X X} {φ φ' : X.B.I.GA → ℂ} (h : IsContRep X f φ) (h' : IsContRep X f φ') : φ = φ' := by
-  have e := eq_zero_of_ae X (fun y => φ y - φ' y) (h.1.sub h'.1)
-    (fun γ hγ y => by simp only [h.2.1 γ hγ y, h'.2.1 γ hγ y])
-    ((h.2.2.symm.trans h'.2.2).mono fun y hy => by simp [hy])
+theorem contRep_unique
+    {f : L2X X} {φ φ' : X.B.I.GA → ℂ} (h : IsContRep X f φ) (h' : IsContRep X f φ')
+    : φ = φ' := by
+  have e :=
+    eq_zero_of_ae X
+      (fun y => φ y - φ' y)
+      (h.1.sub h'.1)
+      (fun γ hγ y => by simp only [h.2.1 γ hγ y, h'.2.1 γ hγ y])
+      ((h.2.2.symm.trans h'.2.2).mono fun y hy => by simp [hy])
   funext y
   exact sub_eq_zero.1 (congrFun e y)
 
-theorem contRep_add {f g : L2X X} {φ ψ : X.B.I.GA → ℂ} (h : IsContRep X f φ) (h' : IsContRep X g ψ) :
-    IsContRep X (f + g) (φ + ψ) :=
-  ⟨h.1.add h'.1, fun γ hγ y => by simp [h.2.1 γ hγ y, h'.2.1 γ hγ y],
-    (Lp.coeFn_add f g).trans (h.2.2.add h'.2.2)⟩
+theorem contRep_add {f g : L2X X} {φ ψ : X.B.I.GA → ℂ} (h : IsContRep X f φ) (h' : IsContRep X g ψ)
+    : IsContRep X (f + g) (φ + ψ) := ⟨
+  h.1.add h'.1,
+  fun γ hγ y => by simp [h.2.1 γ hγ y, h'.2.1 γ hγ y],
+  (Lp.coeFn_add f g).trans (h.2.2.add h'.2.2)
+⟩
 
-theorem contRep_smul (a : ℂ) {f : L2X X} {φ : X.B.I.GA → ℂ} (h : IsContRep X f φ) :
-    IsContRep X (a • f) (a • φ) :=
-  ⟨h.1.const_smul a, fun γ hγ y => by simp [h.2.1 γ hγ y], (Lp.coeFn_smul a f).trans (h.2.2.const_smul a)⟩
+theorem contRep_smul (a : ℂ) {f : L2X X} {φ : X.B.I.GA → ℂ} (h : IsContRep X f φ)
+    : IsContRep X (a • f) (a • φ) := ⟨
+  h.1.const_smul a,
+  fun γ hγ y => by simp [h.2.1 γ hγ y],
+  (Lp.coeFn_smul a f).trans (h.2.2.const_smul a)
+⟩
 
 theorem contRep_zero : IsContRep X 0 0 :=
   ⟨continuous_const, fun _ _ _ => rfl, Lp.coeFn_zero ℂ 2 (muX X)⟩
 
-theorem contRep_reg {f : L2X X} {φ : X.B.I.GA → ℂ} (h : IsContRep X f φ) (y : X.B.I.GA) :
-    IsContRep X (X.B.R y f) (fun x => φ (x * y)) := by
+theorem contRep_reg {f : L2X X} {φ : X.B.I.GA → ℂ} (h : IsContRep X f φ) (y : X.B.I.GA)
+    : IsContRep X (X.B.R y f) (fun x => φ (x * y)) := by
   have hm : MemLp φ 2 (muX X) := (Lp.memLp f).ae_eq h.2.2
   have ef : f = hm.toLp φ := Lp.ext (h.2.2.trans hm.coeFn_toLp.symm)
   refine ⟨h.1.comp (continuous_mul_const y), fun γ hγ x => by simp only [mul_assoc, h.2.1 γ hγ], ?_⟩

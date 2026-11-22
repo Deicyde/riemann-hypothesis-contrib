@@ -23,15 +23,22 @@ section Local
 
 variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-theorem phLoc_conv {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hU : IsURepOn (UJset ε) σ) (w : H) (d : ℝ)
-    (hF : IsFdeg (Formalism.REAL.muG ε) σ d) (hw : ‖w‖ = 1) (y : Formalism.REAL.UJ ε) :
-    ∫ g, phLoc (ε := ε) σ w d g * phLoc (ε := ε) σ w d (g⁻¹ * y) ∂(Formalism.REAL.muG ε) = phLoc (ε := ε) σ w d y := by
+theorem phLoc_conv
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hU : IsURepOn (UJset ε) σ)
+    (w : H)
+    (d : ℝ) (hF : IsFdeg (Formalism.REAL.muG ε) σ d)
+    (hw : ‖w‖ = 1) (y : Formalism.REAL.UJ ε)
+    : ∫ g, phLoc (ε := ε) σ w d g * phLoc (ε := ε) σ w d (g⁻¹ * y) ∂(Formalism.REAL.muG ε)
+      = phLoc (ε := ε) σ w d y := by
   have hd : (d : ℂ) ≠ 0 := Complex.ofReal_ne_zero.2 hF.1.ne'
   have hww : ⟪w, w⟫_ℂ = 1 := by
     rw [inner_self_eq_norm_sq_to_K, hw]
     simp
-  have hpt : ∀ g : Formalism.REAL.UJ ε, phLoc (ε := ε) σ w d g * phLoc (ε := ε) σ w d (g⁻¹ * y) =
-      ((d : ℂ) * d) * (coefOn (ε := ε) σ w (σ (umat y) w) g * star (coefOn (ε := ε) σ w w g)) := by
+  have hpt
+      : ∀ g : Formalism.REAL.UJ ε,
+        phLoc (ε := ε) σ w d g * phLoc (ε := ε) σ w d (g⁻¹ * y)
+          = ((d : ℂ) * d)
+            * (coefOn (ε := ε) σ w (σ (umat y) w) g * star (coefOn (ε := ε) σ w w g)) := by
     intro g
     have hsplit : σ (umat (g⁻¹ * y)) w = σ (umat g⁻¹) (σ (umat y) w) := by
       rw [show umat (g⁻¹ * y) = umat g⁻¹ * umat y from rfl, hU.1.2 _ (g⁻¹).2 _ y.2,
@@ -57,31 +64,29 @@ theorem phLoc_conv {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hU : I
     (hF.2 w (σ (umat y) w) w w).2, hww, one_mul]
   show (d : ℂ) * d * (⟪σ (umat y) w, w⟫_ℂ / d) = (d : ℂ) * star ⟪w, σ (umat y) w⟫_ℂ
   rw [← inner_conj_symm (σ (umat y) w) w, starRingEnd_apply]
-  first
-  | (field_simp; done)
-  | (field_simp; ring)
+  first | (field_simp; done) | (field_simp; ring)
 
 end Local
 
 section Two
 
-variable {G1 G2 : Type} [Group G1] [Group G2] [MeasurableSpace G1] [MeasurableSpace G2]
+variable
+  {G1 G2 : Type} [Group G1] [Group G2] [MeasurableSpace G1] [MeasurableSpace G2]
   (μ1 : Measure G1) (μ2 : Measure G2) [SFinite μ1] [SFinite μ2]
   {Hp : Type} [NormedAddCommGroup Hp] [InnerProductSpace ℂ Hp] [CompleteSpace Hp]
 
-theorem prod_op_eq (R : G1 × G2 → (Hp →L[ℂ] Hp)) (hmul : ∀ g h, R (g * h) = R g ∘L R h)
-    (hU : ∀ g x, ‖R g x‖ = ‖x‖)
+theorem prod_op_eq
+    (R : G1 × G2 → (Hp →L[ℂ] Hp)) (hmul : ∀ g h, R (g * h) = R g ∘L R h) (hU : ∀ g x, ‖R g x‖ = ‖x‖)
     (hmeas : ∀ x y : Hp, AEStronglyMeasurable (fun g => ⟪x, R g y⟫_ℂ) (μ1.prod μ2))
     (φ1 : G1 → ℂ) (φ2 : G2 → ℂ) (hφ : Integrable (fun p : G1 × G2 => φ1 p.1 * φ2 p.2) (μ1.prod μ2))
-    (P1 P2 : Hp →L[ℂ] Hp)
-    (hP1 : ∀ x y : Hp, ⟪x, P1 y⟫_ℂ = ∫ g, φ1 g * ⟪x, R (g, 1) y⟫_ℂ ∂μ1)
-    (hP2 : ∀ x y : Hp, ⟪x, P2 y⟫_ℂ = ∫ k, φ2 k * ⟪x, R (1, k) y⟫_ℂ ∂μ2) (x y : Hp) :
-    ∫ p, (φ1 p.1 * φ2 p.2) * ⟪x, R p y⟫_ℂ ∂(μ1.prod μ2) = ⟪x, P1 (P2 y)⟫_ℂ ∧
-      ∫ p, (φ1 p.1 * φ2 p.2) * ⟪x, R p y⟫_ℂ ∂(μ1.prod μ2) = ⟪x, P2 (P1 y)⟫_ℂ := by
+    (P1 P2 : Hp →L[ℂ] Hp) (hP1 : ∀ x y : Hp, ⟪x, P1 y⟫_ℂ = ∫ g, φ1 g * ⟪x, R (g, 1) y⟫_ℂ ∂μ1)
+    (hP2 : ∀ x y : Hp, ⟪x, P2 y⟫_ℂ = ∫ k, φ2 k * ⟪x, R (1, k) y⟫_ℂ ∂μ2)
+    (x y : Hp)
+    : ∫ p, (φ1 p.1 * φ2 p.2) * ⟪x, R p y⟫_ℂ ∂(μ1.prod μ2) = ⟪x, P1 (P2 y)⟫_ℂ
+      ∧ ∫ p, (φ1 p.1 * φ2 p.2) * ⟪x, R p y⟫_ℂ ∂(μ1.prod μ2) = ⟪x, P2 (P1 y)⟫_ℂ := by
   have hR1 : ∀ z, R 1 z = z := by
     intro z
-    have h1 : R 1 (R 1 z) = R 1 z := by
-      rw [← ContinuousLinearMap.comp_apply, ← hmul, one_mul]
+    have h1 : R 1 (R 1 z) = R 1 z := by rw [← ContinuousLinearMap.comp_apply, ← hmul, one_mul]
     have h2 : ‖R 1 (R 1 z - z)‖ = ‖R 1 z - z‖ := hU 1 _
     rw [map_sub, h1, sub_self, norm_zero] at h2
     exact sub_eq_zero.1 (norm_eq_zero.1 h2.symm)
@@ -124,39 +129,48 @@ end Two
 
 section Inf
 
-variable (I : AutInst) {H : InfinitePlace I.F → Type} [∀ v, NormedAddCommGroup (H v)]
-  [∀ v, InnerProductSpace ℂ (H v)] {σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v)}
-  {dv : InfinitePlace I.F → ℝ} {w : ∀ v, H v}
+variable
+  (I : AutInst)
+  {H : InfinitePlace I.F → Type} [∀ v, NormedAddCommGroup (H v)] [∀ v, InnerProductSpace ℂ (H v)]
+  {σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v)} {dv : InfinitePlace I.F → ℝ}
+  {w : ∀ v, H v}
 
-theorem phInf_int (hL : ∀ v, Integrable (phLoc (ε := I.ε v) (σ v) (w v) (dv v)) (Formalism.REAL.muG (I.ε v))) :
-    Integrable (phInf I σ w dv) (muInf I) := by
+theorem phInf_int
+    (hL : ∀ v, Integrable (phLoc (ε := I.ε v) (σ v) (w v) (dv v)) (Formalism.REAL.muG (I.ε v)))
+    : Integrable (phInf I σ w dv) (muInf I) := by
   have heq : phInf I σ w dv = fun g => ∏ v, phLoc (ε := I.ε v) (σ v) (w v) (dv v) (g v) := by
     funext g
     show ((∏ v, dv v : ℝ) : ℂ) * star (∏ v, ⟪w v, σ v (umat (g v)) (w v)⟫_ℂ) =
       ∏ v, ((dv v : ℂ) * star ⟪w v, σ v (umat (g v)) (w v)⟫_ℂ)
     rw [Finset.prod_mul_distrib, Complex.ofReal_prod, star_prod]
   rw [heq]
-  exact Integrable.fintype_prod_dep (f := fun v => phLoc (ε := I.ε v) (σ v) (w v) (dv v))
-    (μ := fun v => Formalism.REAL.muG (I.ε v)) hL
+  exact Integrable.fintype_prod_dep
+    (f := fun v => phLoc (ε := I.ε v) (σ v) (w v) (dv v))
+    (μ := fun v => Formalism.REAL.muG (I.ε v))
+    hL
 
-theorem phInf_conv (hU : ∀ v, IsURepOn (UJset (I.ε v)) (σ v)) (hF : ∀ v, IsFdeg (Formalism.REAL.muG (I.ε v)) (σ v) (dv v))
-    (hw : ∀ v, ‖w v‖ = 1) (y : I.Ginf) :
-    ∫ g, phInf I σ w dv g * phInf I σ w dv (g⁻¹ * y) ∂(muInf I) = phInf I σ w dv y := by
+theorem phInf_conv
+    (hU : ∀ v, IsURepOn (UJset (I.ε v)) (σ v))
+    (hF : ∀ v, IsFdeg (Formalism.REAL.muG (I.ε v)) (σ v) (dv v)) (hw : ∀ v, ‖w v‖ = 1) (y : I.Ginf)
+    : ∫ g, phInf I σ w dv g * phInf I σ w dv (g⁻¹ * y) ∂(muInf I) = phInf I σ w dv y := by
   have heq : phInf I σ w dv = fun g => ∏ v, phLoc (ε := I.ε v) (σ v) (w v) (dv v) (g v) := by
     funext g
     show ((∏ v, dv v : ℝ) : ℂ) * star (∏ v, ⟪w v, σ v (umat (g v)) (w v)⟫_ℂ) =
       ∏ v, ((dv v : ℂ) * star ⟪w v, σ v (umat (g v)) (w v)⟫_ℂ)
     rw [Finset.prod_mul_distrib, Complex.ofReal_prod, star_prod]
-  have hpt : ∀ g : I.Ginf, phInf I σ w dv g * phInf I σ w dv (g⁻¹ * y) =
-      ∏ v, (phLoc (ε := I.ε v) (σ v) (w v) (dv v) (g v) *
-        phLoc (ε := I.ε v) (σ v) (w v) (dv v) ((g v)⁻¹ * y v)) := by
+  have hpt
+      : ∀ g : I.Ginf,
+        phInf I σ w dv g * phInf I σ w dv (g⁻¹ * y)
+          = ∏ v, (phLoc (ε := I.ε v) (σ v) (w v) (dv v) (g v) *
+              phLoc (ε := I.ε v) (σ v) (w v) (dv v) ((g v)⁻¹ * y v)) := by
     intro g
     rw [heq]
     simp only [← Finset.prod_mul_distrib, Pi.mul_apply, Pi.inv_apply]
-  have hI := integral_fintype_prod_eq_prod (ι := InfinitePlace I.F)
-    (f := fun v (h : Formalism.REAL.UJ (I.ε v)) => phLoc (ε := I.ε v) (σ v) (w v) (dv v) h *
-      phLoc (ε := I.ε v) (σ v) (w v) (dv v) (h⁻¹ * y v))
-    (μ := fun v => Formalism.REAL.muG (I.ε v))
+  have hI :=
+    integral_fintype_prod_eq_prod (ι := InfinitePlace I.F)
+      (f := fun v (h : Formalism.REAL.UJ (I.ε v)) =>
+        phLoc (ε := I.ε v) (σ v) (w v) (dv v) h * phLoc (ε := I.ε v) (σ v) (w v) (dv v) (h⁻¹ * y v))
+      (μ := fun v => Formalism.REAL.muG (I.ε v))
   rw [integral_congr_ae (Filter.Eventually.of_forall hpt), hI, heq]
   exact Finset.prod_congr rfl fun v _ => phLoc_conv (hU v) (w v) (dv v) (hF v) (hw v) (y v)
 

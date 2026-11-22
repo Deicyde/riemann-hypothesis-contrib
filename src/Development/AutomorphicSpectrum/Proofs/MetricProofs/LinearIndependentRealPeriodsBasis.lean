@@ -9,22 +9,28 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.QuotientLattic
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp
 
-theorem riemLat_basis_periods_linearIndependent : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (R : RiemLat E g Λ) (n : ℕ) (b : Module.Basis (Fin n) ℤ Λ), LinearIndependent ℝ (fun j => R.P (b j)) := by
+theorem riemLat_basis_periods_linearIndependent
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (Λ : Type) [AddCommGroup Λ]
+        [Module (𝓞 E) Λ] (R : RiemLat E g Λ) (n : ℕ) (b : Module.Basis (Fin n) ℤ Λ),
+      LinearIndependent ℝ (fun j => R.P (b j)) := by
   intro E _ _ _ g Λ _ _ R n b
-  have hspan : Submodule.span ℝ (Set.range R.P) = ⊤ := (GlobalTheory.T.riemann_lattice_eigen_projection E g Λ Unit R).2.1
+  have hspan : Submodule.span ℝ (Set.range R.P) = ⊤ :=
+    (GlobalTheory.T.riemann_lattice_eigen_projection E g Λ Unit R).2.1
   have hmem : ∀ x : Λ, R.P x ∈ Submodule.span ℝ (Set.range fun j => R.P (b j)) := by
     intro x
-    have hx : x ∈ Submodule.span ℤ (Set.range b) := by
-      rw [b.span_eq]; trivial
+    have hx : x ∈ Submodule.span ℤ (Set.range b) := by rw [b.span_eq]; trivial
     induction hx using Submodule.span_induction with
     | mem y hy =>
       obtain ⟨j, rfl⟩ := hy
       exact Submodule.subset_span ⟨j, rfl⟩
-    | zero => simp
+    | zero =>
+      simp
     | add y z _ _ hy hz =>
       rw [map_add (f := _)]
       exact Submodule.add_mem _ hy hz

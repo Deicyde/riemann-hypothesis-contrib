@@ -29,7 +29,8 @@ open Classical in
 def prj {dim : (E →+* ℂ) → ℕ} (σ : E →+* ℂ) : Vsp dim →ₗ[ℂ] Vsp dim where
   toFun v := WithLp.toLp 2 fun i => if i.1 = σ then v i else 0
   map_add' v w := by ext i; simp only [PiLp.add_apply]; split_ifs <;> simp
-  map_smul' c v := by ext i; simp only [PiLp.smul_apply, smul_eq_mul, RingHom.id_apply]; split_ifs <;> simp
+  map_smul' c v := by
+    ext i; simp only [PiLp.smul_apply, smul_eq_mul, RingHom.id_apply]; split_ifs <;> simp
 
 open Classical in
 lemma prj_apply {dim : (E →+* ℂ) → ℕ} (σ : E →+* ℂ) (v : Vsp dim) (i : Idx dim) :
@@ -67,10 +68,17 @@ lemma ne_conj [IsCMField E] (σ : E →+* ℂ) : ComplexEmbedding.conjugate σ �
 
 open Classical in
 def Mc {dim : (E →+* ℂ) → ℕ} (σ : E →+* ℂ) (c : ℂ) : Vsp dim →ₗ[ℂ] Vsp dim where
-  toFun v := WithLp.toLp 2 fun i => if i.1 = σ then c * v i else
-    if i.1 = ComplexEmbedding.conjugate σ then (starRingEnd ℂ) c * v i else 0
+  toFun v :=
+    WithLp.toLp 2 fun i =>
+      if i.1 = σ then
+        c * v i
+      else if i.1 = ComplexEmbedding.conjugate σ then
+        (starRingEnd ℂ) c * v i
+      else
+        0
   map_add' v w := by ext i; simp only [PiLp.add_apply]; split_ifs <;> ring
-  map_smul' a v := by ext i; simp only [PiLp.smul_apply, smul_eq_mul, RingHom.id_apply]; split_ifs <;> ring
+  map_smul' a v := by
+    ext i; simp only [PiLp.smul_apply, smul_eq_mul, RingHom.id_apply]; split_ifs <;> ring
 
 open Classical in
 lemma Mc_apply {dim : (E →+* ℂ) → ℕ} (σ : E →+* ℂ) (c : ℂ) (v : Vsp dim) (i : Idx dim) :

@@ -21,18 +21,22 @@ open Topology Filter
 
 variable {n : ℕ}
 
-def muCDtr {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) (ε : Fin n → Bool) : Measure (Formalism.BasicNotions.UpqT P Q) :=
+def muCDtr {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) (ε : Fin n → Bool)
+    : Measure (Formalism.BasicNotions.UpqT P Q) :=
   Measure.comap (β := Fin n → Fin n → ℂ)
-    (fun g : Formalism.BasicNotions.UpqT P Q => Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g))
+    (fun g : Formalism.BasicNotions.UpqT P Q =>
+      Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g))
     (ENNReal.ofReal (cPQ ε) • muPolarMat ε)
 
-theorem tie_volU_pos (N : ℕ) : 0 < volU N :=
-  Finset.prod_pos fun i _ => by positivity
+theorem tie_volU_pos (N : ℕ) : 0 < volU N := Finset.prod_pos fun i _ => by positivity
 
-theorem tie_tendsto {f : ℝ → ENNReal} {x : ℝ} (hx : 0 < x)
-    (h : ∀ η : ℝ, 0 < η → ∀ᶠ r in 𝓝[>] (0 : ℝ),
-      ENNReal.ofReal ((1 - η) * x) ≤ f r ∧ f r ≤ ENNReal.ofReal ((1 + η) * x)) :
-    Tendsto f (𝓝[>] 0) (𝓝 (ENNReal.ofReal x)) := by
+theorem tie_tendsto
+    {f : ℝ → ENNReal} {x : ℝ} (hx : 0 < x)
+    (h : ∀ η : ℝ,
+      0 < η
+        → ∀ᶠ r in 𝓝[>] (0 : ℝ),
+          ENNReal.ofReal ((1 - η) * x) ≤ f r ∧ f r ≤ ENNReal.ofReal ((1 + η) * x))
+    : Tendsto f (𝓝[>] 0) (𝓝 (ENNReal.ofReal x)) := by
   rw [tendsto_order]
   refine ⟨fun a ha => ?_, fun a ha => ?_⟩
   · have hat : a ≠ ⊤ := ne_top_of_lt ha
@@ -43,9 +47,10 @@ theorem tie_tendsto {f : ℝ → ENNReal} {x : ℝ} (hx : 0 < x)
     have hη : 0 < (x - a.toReal) / (2 * x) := div_pos (by linarith) (by linarith)
     filter_upwards [h _ hη] with r hr
     have e1 : (1 - (x - a.toReal) / (2 * x)) * x = (x + a.toReal) / 2 := by field_simp; ring
-    calc a = ENNReal.ofReal a.toReal := (ENNReal.ofReal_toReal hat).symm
+    calc
+      a = ENNReal.ofReal a.toReal := (ENNReal.ofReal_toReal hat).symm
       _ < ENNReal.ofReal ((1 - (x - a.toReal) / (2 * x)) * x) := by
-          rw [e1]; exact (ENNReal.ofReal_lt_ofReal_iff (by linarith)).2 (by linarith)
+        rw [e1]; exact (ENNReal.ofReal_lt_ofReal_iff (by linarith)).2 (by linarith)
       _ ≤ f r := hr.1
   · by_cases hat : a = ⊤
     · filter_upwards [h 1 one_pos] with r hr
@@ -56,19 +61,24 @@ theorem tie_tendsto {f : ℝ → ENNReal} {x : ℝ} (hx : 0 < x)
       have hη : 0 < (a.toReal - x) / (2 * x) := div_pos (by linarith) (by linarith)
       filter_upwards [h _ hη] with r hr
       have e1 : (1 + (a.toReal - x) / (2 * x)) * x = (x + a.toReal) / 2 := by field_simp; ring
-      calc f r ≤ _ := hr.2
+      calc
+        f r
+          ≤ _ := hr.2
         _ < ENNReal.ofReal a.toReal := by
           rw [e1]; exact (ENNReal.ofReal_lt_ofReal_iff (by linarith)).2 (by linarith)
         _ = a := ENNReal.ofReal_toReal hat
 
-theorem tie_cancel {p q : ℝ} {v : ENNReal} (hv0 : v ≠ 0) (hvt : v ≠ ⊤) (hq : 0 ≤ q)
-    (h : ENNReal.ofReal p * v ≤ ENNReal.ofReal q * v) : p ≤ q := by
+theorem tie_cancel
+    {p q : ℝ} {v : ENNReal}
+    (hv0 : v ≠ 0) (hvt : v ≠ ⊤) (hq : 0 ≤ q) (h : ENNReal.ofReal p * v ≤ ENNReal.ofReal q * v)
+    : p ≤ q := by
   have := (ENNReal.mul_le_mul_iff_left hv0 hvt).1 h
   have h2 := (ENNReal.ofReal_le_ofReal_iff hq).1 this
   exact h2
 
-theorem tie_d_eq (ε : Fin n → Bool) (d : ℝ) (hd0 : 0 < d)
-    (hd : DensOn (fun S => muPolar ε (expSet S)) d) : d = 1 / (volU (pOf ε) * volU (qOf ε)) := by
+theorem tie_d_eq
+    (ε : Fin n → Bool) (d : ℝ) (hd0 : 0 < d) (hd : DensOn (fun S => muPolar ε (expSet S)) d)
+    : d = 1 / (volU (pOf ε) * volU (qOf ε)) := by
   haveI := muPolar_isHaar ε
   obtain ⟨hK, hP, hG⟩ := gco_haar ε
   have hpol := haar_pol_density (muPolar ε) d hd
@@ -123,8 +133,7 @@ theorem tie_d_eq (ε : Fin n → Bool) (d : ℝ) (hd0 : 0 < d)
   · exfalso
     set η := (D - d) / (2 * (D + d))
     have hη : 0 < η := div_pos (by linarith) (by linarith)
-    have hη1 : η < 1 := by
-      rw [div_lt_one (by linarith)]; linarith
+    have hη1 : η < 1 := by rw [div_lt_one (by linarith)]; linarith
     have e : η * (2 * (D + d)) = D - d := div_mul_cancel₀ _ (by linarith)
     have := (key η hη hη1).2
     nlinarith
@@ -132,8 +141,7 @@ theorem tie_d_eq (ε : Fin n → Bool) (d : ℝ) (hd0 : 0 < d)
   · exfalso
     set η := (d - D) / (2 * (D + d))
     have hη : 0 < η := div_pos (by linarith) (by linarith)
-    have hη1 : η < 1 := by
-      rw [div_lt_one (by linarith)]; linarith
+    have hη1 : η < 1 := by rw [div_lt_one (by linarith)]; linarith
     have e : η * (2 * (D + d)) = d - D := div_mul_cancel₀ _ (by linarith)
     have := (key η hη hη1).1
     nlinarith
@@ -142,35 +150,42 @@ section
 
 variable {P Q : ℕ}
 
-theorem tie_sum_reindex (e : Fin P ⊕ Fin Q ≃ Fin n) (M : Matrix (Fin n) (Fin n) ℂ) :
-    ∑ i, ∑ j, ‖Matrix.reindex e.symm e.symm M i j‖ = ∑ a, ∑ b, ‖M a b‖ := by
+theorem tie_sum_reindex (e : Fin P ⊕ Fin Q ≃ Fin n) (M : Matrix (Fin n) (Fin n) ℂ)
+    : ∑ i, ∑ j, ‖Matrix.reindex e.symm e.symm M i j‖ = ∑ a, ∑ b, ‖M a b‖ := by
   simp only [Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm]
   rw [← Equiv.sum_comp e (fun a => ∑ b, ‖M a b‖)]
   refine Finset.sum_congr rfl fun i _ => ?_
   exact Equiv.sum_comp e (fun b => ‖M (e i) b‖)
 
-theorem tie_mem_ball (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
-    (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false) (r : ℝ) (s : GCo ε) :
-    gToLie e he1 he2 s ∈ Formalism.BasicNotions.ballU P Q r ↔ ∑ a, ∑ b, ‖gMat s a b‖ < r := by
+theorem tie_mem_ball
+    (e : Fin P ⊕ Fin Q ≃ Fin n)
+    {ε : Fin n → Bool} (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false)
+    (r : ℝ) (s : GCo ε)
+    : gToLie e he1 he2 s ∈ Formalism.BasicNotions.ballU P Q r ↔ ∑ a, ∑ b, ‖gMat s a b‖ < r := by
   show ∑ i, ∑ j, ‖Matrix.reindex e.symm e.symm (gMat s) i j‖ < r ↔ _
   rw [tie_sum_reindex]
 
-theorem tie_gToLie_cont (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
-    (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false) :
-    Continuous (gToLie e he1 he2 : GCo ε → Formalism.BasicNotions.lieU P Q) := by
+theorem tie_gToLie_cont
+    (e : Fin P ⊕ Fin Q ≃ Fin n)
+    {ε : Fin n → Bool} (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false)
+    : Continuous (gToLie e he1 he2 : GCo ε → Formalism.BasicNotions.lieU P Q) := by
   have h1 : Continuous fun s : GCo ε => gToLieMat e s :=
     (LinearMap.continuous_of_finiteDimensional (gMatL ε)).matrix_submatrix _ _
   exact h1.subtype_mk _
 
 theorem tie_ball_open (P Q : ℕ) (r : ℝ) : IsOpen (Formalism.BasicNotions.ballU P Q r) :=
-  isOpen_lt (continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
-    continuous_norm.comp (continuous_subtype_val.matrix_elem i j)) continuous_const
+  isOpen_lt
+    (continuous_finsetSum _ fun i _ =>
+      continuous_finsetSum _ fun j _ =>
+        continuous_norm.comp (continuous_subtype_val.matrix_elem i j))
+    continuous_const
 
 end
 
-theorem omegaDensity_muCDtr {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
-    (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false) :
-    Formalism.BasicNotions.OmegaDensity (muCDtr e ε) (ENNReal.ofReal (cOmega n)) := by
+theorem omegaDensity_muCDtr
+    {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n)
+    {ε : Fin n → Bool} (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false)
+    : Formalism.BasicNotions.OmegaDensity (muCDtr e ε) (ENNReal.ofReal (cOmega n)) := by
   haveI := muPolar_isHaar ε
   haveI := lieU_borel P Q
   obtain ⟨hK, hP, hG⟩ := gco_haar ε
@@ -180,11 +195,16 @@ theorem omegaDensity_muCDtr {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fi
   set κ : ℝ := 2 ^ (n * (n - 1) / 2) with hκ
   have hκ0 : 0 < κ := by positivity
   have hσc : Continuous fun s : GCo ε => ∑ a, ∑ b, ‖gMat s a b‖ :=
-    continuous_finsetSum _ fun a _ => continuous_finsetSum _ fun b _ =>
-      continuous_norm.comp ((LinearMap.continuous_of_finiteDimensional (gMatL ε)).matrix_elem a b)
-  have hnum : ∀ r, muCDtr e ε {g | ∃ X ∈ Formalism.BasicNotions.ballU P Q r, Formalism.BasicNotions.UpqT.mat g =
-      NormedSpace.exp (X : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)} =
-      ENNReal.ofReal (cPQ ε) * muPolar ε (expSet {s : GCo ε | gToLie e he1 he2 s ∈ Formalism.BasicNotions.ballU P Q r}) := by
+    continuous_finsetSum _ fun a _ =>
+      continuous_finsetSum _ fun b _ =>
+        continuous_norm.comp ((LinearMap.continuous_of_finiteDimensional (gMatL ε)).matrix_elem a b)
+  have hnum
+      : ∀ r,
+        muCDtr e ε
+            {g | ∃ X ∈ Formalism.BasicNotions.ballU P Q r, Formalism.BasicNotions.UpqT.mat g =
+              NormedSpace.exp (X : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)}
+          = ENNReal.ofReal (cPQ ε) * muPolar ε
+            (expSet {s : GCo ε | gToLie e he1 he2 s ∈ Formalism.BasicNotions.ballU P Q r}) := by
     intro r
     have hE := measurableEmbedding_upqMat e he1 he2
     show Measure.comap (β := Fin n → Fin n → ℂ) (fun g => upqMat e g) (ENNReal.ofReal (cPQ ε) • muPolarMat ε) _ =
@@ -192,8 +212,12 @@ theorem omegaDensity_muCDtr {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fi
     rw [hE.comap_apply, (measurableEmbedding_toM ε).comap_apply, Measure.smul_apply, smul_eq_mul]
     congr 2
     exact image_expBall e he1 he2 r
-  have hden : ∀ r, (ENNReal.ofReal κ • Measure.map (gToLie e he1 he2) volume) (Formalism.BasicNotions.ballU P Q r) =
-      ENNReal.ofReal κ * volume {s : GCo ε | gToLie e he1 he2 s ∈ Formalism.BasicNotions.ballU P Q r} := by
+  have hden
+      : ∀ r,
+        (ENNReal.ofReal κ • Measure.map (gToLie e he1 he2) volume) (Formalism.BasicNotions.ballU P Q
+            r)
+          = ENNReal.ofReal κ
+            * volume {s : GCo ε | gToLie e he1 he2 s ∈ Formalism.BasicNotions.ballU P Q r} := by
     intro r
     rw [Measure.smul_apply, smul_eq_mul,
       Measure.map_apply (tie_gToLie_cont e he1 he2).measurable (tie_ball_open P Q r).measurableSet]
@@ -221,7 +245,8 @@ theorem omegaDensity_muCDtr {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fi
     exact lt_of_le_of_lt (norm_le_sum_gMat s) (lt_trans hs hr.2)
   have hSball : S ⊆ Metric.ball 0 r := fun s hs => by
     rw [hSe] at hs
-    rw [mem_ball_zero_iff]; exact lt_of_le_of_lt (norm_le_sum_gMat s) hs
+    rw [mem_ball_zero_iff]
+    exact lt_of_le_of_lt (norm_le_sum_gMat s) hs
   have hV0 : volume S ≠ 0 := (hSo.measure_pos volume ⟨0, h0S⟩).ne'
   have hVt : volume S ≠ ⊤ := ((measure_mono hSball).trans_lt measure_ball_lt_top).ne
   obtain ⟨hu, hl⟩ := hdδ S hSo.measurableSet hSb
@@ -231,14 +256,16 @@ theorem omegaDensity_muCDtr {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fi
   have eq2 : (1 + η) * cOmega n * κ = cPQ ε * ((1 + η) * d) := by linear_combination (1 + η) * hc
   constructor
   · rw [ENNReal.le_div_iff_mul_le (Or.inl hden0) (Or.inl hdent)]
-    calc ENNReal.ofReal ((1 - η) * cOmega n) * (ENNReal.ofReal κ * volume S)
-        = ENNReal.ofReal (cPQ ε) * (ENNReal.ofReal ((1 - η) * d) * volume S) := by
-          rw [← mul_assoc, ← ENNReal.ofReal_mul' hκ0.le, eq1, ENNReal.ofReal_mul hcP, mul_assoc]
+    calc
+      ENNReal.ofReal ((1 - η) * cOmega n) * (ENNReal.ofReal κ * volume S)
+          = ENNReal.ofReal (cPQ ε) * (ENNReal.ofReal ((1 - η) * d) * volume S) := by
+        rw [← mul_assoc, ← ENNReal.ofReal_mul' hκ0.le, eq1, ENNReal.ofReal_mul hcP, mul_assoc]
       _ ≤ _ := by gcongr
   · apply ENNReal.div_le_of_le_mul
-    calc ENNReal.ofReal (cPQ ε) * muPolar ε (expSet S)
+    calc
+      ENNReal.ofReal (cPQ ε) * muPolar ε (expSet S)
         ≤ ENNReal.ofReal (cPQ ε) * (ENNReal.ofReal ((1 + η) * d) * volume S) := by gcongr
       _ = ENNReal.ofReal ((1 + η) * cOmega n) * (ENNReal.ofReal κ * volume S) := by
-          rw [← mul_assoc, ← ENNReal.ofReal_mul hcP, ← eq2, ENNReal.ofReal_mul' hκ0.le, mul_assoc]
+        rw [← mul_assoc, ← ENNReal.ofReal_mul hcP, ← eq2, ENNReal.ofReal_mul' hκ0.le, mul_assoc]
 
 end ReciprocityTheory.ChartRestriction.DS

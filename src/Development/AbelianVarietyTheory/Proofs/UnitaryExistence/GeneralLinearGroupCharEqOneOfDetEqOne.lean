@@ -10,13 +10,13 @@ open Matrix
 
 section DetOneChar
 
-variable {R : Type} [CommRing R] {n : Type} [Fintype n] [DecidableEq n]
-  {A : Type} [CommGroup A]
+variable {R : Type} [CommRing R] {n : Type} [Fintype n] [DecidableEq n] {A : Type} [CommGroup A]
 
-theorem ddChar_crt [Finite R] (f : MaximalSpectrum R → R) :
-    ∃ t : R, ∀ m : MaximalSpectrum R, t - f m ∈ m.asIdeal := by
+theorem ddChar_crt [Finite R] (f : MaximalSpectrum R → R)
+    : ∃ t : R, ∀ m : MaximalSpectrum R, t - f m ∈ m.asIdeal := by
   have : Finite (MaximalSpectrum R) :=
-    Finite.of_injective (fun m : MaximalSpectrum R => (m.asIdeal : Set R))
+    Finite.of_injective
+      (fun m : MaximalSpectrum R => (m.asIdeal : Set R))
       (fun a b hab => MaximalSpectrum.ext (SetLike.coe_injective hab))
   refine Ideal.exists_forall_sub_mem_ideal (I := fun m : MaximalSpectrum R => m.asIdeal) ?_ f
   intro a b hab
@@ -29,16 +29,14 @@ theorem ddChar_isUnit {x : R} (h : ∀ m : MaximalSpectrum R, x ∉ m.asIdeal) :
   obtain ⟨M, hM, hxM⟩ := exists_max_ideal_of_mem_nonunits (mem_nonunits_iff.2 hx)
   exact h ⟨M, hM⟩ hxM
 
-theorem ddChar_exists_unit [Finite R]
-    (h : ∀ 𝔪 : Ideal R, 𝔪.IsMaximal → 4 ≤ Nat.card (R ⧸ 𝔪)) :
-    ∃ u : Rˣ, IsUnit ((u : R) - 1) := by
+theorem ddChar_exists_unit [Finite R] (h : ∀ 𝔪 : Ideal R, 𝔪.IsMaximal → 4 ≤ Nat.card (R ⧸ 𝔪))
+    : ∃ u : Rˣ, IsUnit ((u : R) - 1) := by
   have key : ∀ m : MaximalSpectrum R, ∃ c : R, c ∉ m.asIdeal ∧ c - 1 ∉ m.asIdeal := by
     intro m
     have h4 := h m.asIdeal m.isMaximal
     by_contra hno
     push Not at hno
-    have hsurj : Function.Surjective
-        (fun b : Bool => if b then (1 : R ⧸ m.asIdeal) else 0) := by
+    have hsurj : Function.Surjective (fun b : Bool => if b then (1 : R ⧸ m.asIdeal) else 0) := by
       intro y
       obtain ⟨c, rfl⟩ := Ideal.Quotient.mk_surjective y
       by_cases hc : c ∈ m.asIdeal
@@ -54,7 +52,8 @@ theorem ddChar_exists_unit [Finite R]
     omega
   choose f hf using key
   obtain ⟨t, ht⟩ := ddChar_crt f
-  have hnot : ∀ (c : R) (m : MaximalSpectrum R), c - f m ∈ m.asIdeal → f m ∉ m.asIdeal → c ∉ m.asIdeal :=
+  have hnot
+      : ∀ (c : R) (m : MaximalSpectrum R), c - f m ∈ m.asIdeal → f m ∉ m.asIdeal → c ∉ m.asIdeal :=
     fun c m h1 h2 h3 => h2 (by simpa using m.asIdeal.sub_mem h3 h1)
   have htu : IsUnit t := ddChar_isUnit fun m => hnot t m (ht m) (hf m).1
   refine ⟨htu.unit, ddChar_isUnit fun m hm => (hf m).2 ?_⟩
@@ -62,13 +61,13 @@ theorem ddChar_exists_unit [Finite R]
   rw [← this]
   exact m.asIdeal.sub_mem (by simpa using hm) (ht m)
 
-theorem ddChar_stable [Finite R] {v w b : R} (h : w * v + b = 1) :
-    ∃ t : R, IsUnit (v + t * b) := by
+theorem ddChar_stable [Finite R] {v w b : R} (h : w * v + b = 1) : ∃ t : R, IsUnit (v + t * b) := by
   have key : ∀ m : MaximalSpectrum R, ∃ c : R, v + c * b ∉ m.asIdeal := by
     intro m
     by_cases hb : b ∈ m.asIdeal
     · refine ⟨0, fun hv => m.isMaximal.ne_top ((Ideal.eq_top_iff_one _).2 ?_)⟩
-      have : w * v + b ∈ m.asIdeal := m.asIdeal.add_mem (m.asIdeal.mul_mem_left _ (by simpa using hv)) hb
+      have : w * v + b ∈ m.asIdeal :=
+        m.asIdeal.add_mem (m.asIdeal.mul_mem_left _ (by simpa using hv)) hb
       rwa [h] at this
     · obtain ⟨y, i, hi, hyi⟩ := m.isMaximal.exists_inv hb
       refine ⟨(1 - v) * y, fun hmem => m.isMaximal.ne_top ((Ideal.eq_top_iff_one _).2 ?_)⟩
@@ -85,13 +84,15 @@ theorem ddChar_stable [Finite R] {v w b : R} (h : w * v + b = 1) :
 def ddCharUnip (N : Matrix n n R) (hN : N * N = 0) : GL n R :=
   ⟨1 + N, 1 - N, by simp [add_mul, mul_sub, hN], by simp [sub_mul, mul_add, hN]⟩
 
-theorem ddChar_unip_eq_one (ψ : GL n R →* A) (N : Matrix n n R) (hN : N * N = 0) (d : GL n R)
-    (p q : R) (hp : (d : Matrix n n R) * N = p • N) (hq : N * (d : Matrix n n R) = q • N)
-    (hpq : IsUnit (q - p)) : ψ (ddCharUnip N hN) = 1 := by
+theorem ddChar_unip_eq_one
+    (ψ : GL n R →* A)
+    (N : Matrix n n R) (hN : N * N = 0)
+    (d : GL n R) (p q : R) (hp : (d : Matrix n n R) * N = p • N)
+    (hq : N * (d : Matrix n n R) = q • N) (hpq : IsUnit (q - p))
+    : ψ (ddCharUnip N hN) = 1 := by
   obtain ⟨c, hc⟩ := hpq
   set M : Matrix n n R := ((c⁻¹ : Rˣ) : R) • N with hM
-  have hM2 : M * M = 0 := by
-    rw [hM, Matrix.smul_mul, Matrix.mul_smul, hN, smul_zero, smul_zero]
+  have hM2 : M * M = 0 := by rw [hM, Matrix.smul_mul, Matrix.mul_smul, hN, smul_zero, smul_zero]
   have hMM : ∀ a : R, (a • M) * (a • M) = 0 := fun a => by
     rw [Matrix.smul_mul, Matrix.mul_smul, hM2, smul_zero, smul_zero]
   have hdM : (d : Matrix n n R) * M = p • M := by rw [hM, Matrix.mul_smul, hp, smul_comm]
@@ -109,8 +110,8 @@ theorem ddChar_unip_eq_one (ψ : GL n R →* A) (N : Matrix n n R) (hN : N * N =
   have hconj : d * U q = U p * d := by
     apply Units.ext
     show (d : Matrix n n R) * (1 + q • M) = (1 + p • M) * (d : Matrix n n R)
-    rw [mul_add, mul_one, add_mul, one_mul, Matrix.mul_smul, hdM, Matrix.smul_mul, hMd,
-      smul_smul, smul_smul, mul_comm q p]
+    rw [mul_add, mul_one, add_mul, one_mul, Matrix.mul_smul, hdM, Matrix.smul_mul, hMd, smul_smul,
+      smul_smul, mul_comm q p]
   have h1 : ψ (U q) = ψ (U p) := by
     have := congrArg ψ hconj
     rw [map_mul, map_mul, mul_comm (ψ (U p))] at this
@@ -130,11 +131,12 @@ theorem ddChar_unip_eq_one (ψ : GL n R →* A) (N : Matrix n n R) (hN : N * N =
 def ddCharDiag : (n → Rˣ) →* GL n R :=
   (Units.map (diagonalRingHom n R).toMonoidHom).comp MulEquiv.piUnits.symm.toMonoidHom
 
-theorem ddCharDiag_val (d : n → Rˣ) :
-    ((ddCharDiag d : GL n R) : Matrix n n R) = diagonal fun i => (d i : R) := rfl
+theorem ddCharDiag_val (d : n → Rˣ)
+    : ((ddCharDiag d : GL n R) : Matrix n n R) = diagonal fun i => (d i : R) :=
+  rfl
 
-theorem ddChar_diag_single (ψ : GL n R →* A) (i j : n) (u : Rˣ) :
-    ψ (ddCharDiag (Pi.mulSingle i u)) = ψ (ddCharDiag (Pi.mulSingle j u)) := by
+theorem ddChar_diag_single (ψ : GL n R →* A) (i j : n) (u : Rˣ)
+    : ψ (ddCharDiag (Pi.mulSingle i u)) = ψ (ddCharDiag (Pi.mulSingle j u)) := by
   let σ := Equiv.swap i j
   let P : Matrix n n R := σ.toPEquiv.toMatrix
   have hPP : P * P = 1 := by
@@ -157,13 +159,16 @@ theorem ddChar_diag_single (ψ : GL n R →* A) (i j : n) (u : Rˣ) :
     · have : Equiv.swap i j a ≠ Equiv.swap i j b := fun h => hab ((Equiv.swap i j).injective h)
       simp [hab, this]
   have h := congrArg ψ hconj
-  rw [map_mul, map_mul, mul_comm (ψ Pg), mul_assoc, ← map_mul,
-    show Pg * Pg = 1 from Units.ext hPP, map_one, mul_one] at h
+  rw [map_mul, map_mul, mul_comm (ψ Pg), mul_assoc, ← map_mul, show Pg * Pg = 1 from Units.ext hPP,
+      map_one, mul_one]
+    at h
   exact h
 
-theorem ddChar_diag (ψ : GL n R →* A) (g : GL n R)
-    (hg : ∀ i j, i ≠ j → (g : Matrix n n R) i j = 0) (hdet : (g : Matrix n n R).det = 1) :
-    ψ g = 1 := by
+theorem ddChar_diag
+    (ψ : GL n R →* A)
+    (g : GL n R)
+    (hg : ∀ i j, i ≠ j → (g : Matrix n n R) i j = 0) (hdet : (g : Matrix n n R).det = 1)
+    : ψ g = 1 := by
   have hdiag : (g : Matrix n n R) = diagonal fun k => (g : Matrix n n R) k k := by
     ext a b
     by_cases hab : a = b
@@ -194,8 +199,9 @@ theorem ddChar_diag (ψ : GL n R →* A) (g : GL n R)
   · simp [Finset.univ_eq_empty]
   · simp only [hφ]
     rw [Finset.prod_congr rfl fun k _ => ddChar_diag_single ψ k j0 (dv k)]
-    rw [show (∏ k, ψ (ddCharDiag (Pi.mulSingle j0 (dv k) : n → Rˣ))) =
-      φ (∏ k, (Pi.mulSingle j0 (dv k) : n → Rˣ)) from (map_prod φ _ _).symm]
+    rw [show (∏ k, ψ (ddCharDiag (Pi.mulSingle j0 (dv k) : n → Rˣ)))
+        = φ (∏ k, (Pi.mulSingle j0 (dv k) : n → Rˣ)) from
+      (map_prod φ _ _).symm]
     have e2 : ∏ k, (Pi.mulSingle j0 (dv k) : n → Rˣ) = (Pi.mulSingle j0 (∏ k, dv k) : n → Rˣ) := by
       funext i
       rw [Finset.prod_apply]
@@ -205,24 +211,26 @@ theorem ddChar_diag (ψ : GL n R →* A) (g : GL n R)
       · simp [hi]
     rw [e2, hprod, Pi.mulSingle_one, map_one]
 
-theorem ddChar_vecMulVec_sq {x y : n → R} (h : y ⬝ᵥ x = 0) :
-    vecMulVec x y * vecMulVec x y = 0 := by
+theorem ddChar_vecMulVec_sq {x y : n → R} (h : y ⬝ᵥ x = 0) : vecMulVec x y * vecMulVec x y = 0 := by
   ext i j
   have h' : ∑ k, y k * x k = 0 := h
   simp only [Matrix.mul_apply, vecMulVec_apply, Matrix.zero_apply]
-  calc ∑ k, x i * y k * (x k * y j) = x i * y j * ∑ k, y k * x k := by
-        rw [Finset.mul_sum]
-        exact Finset.sum_congr rfl fun k _ => by ring
+  calc
+    ∑ k, x i * y k * (x k * y j) = x i * y j * ∑ k, y k * x k := by
+      rw [Finset.mul_sum]
+      exact Finset.sum_congr rfl fun k _ => by ring
     _ = 0 := by rw [h', mul_zero]
 
-theorem ddChar_det_unip {x y : n → R} (h : y ⬝ᵥ x = 0) :
-    ((ddCharUnip _ (ddChar_vecMulVec_sq h) : GL n R) : Matrix n n R).det = 1 := by
+theorem ddChar_det_unip {x y : n → R} (h : y ⬝ᵥ x = 0)
+    : ((ddCharUnip _ (ddChar_vecMulVec_sq h) : GL n R) : Matrix n n R).det = 1 := by
   show (1 + vecMulVec x y).det = 1
   rw [vecMulVec_eq Unit, det_one_add_replicateCol_mul_replicateRow, h, add_zero]
 
-theorem ddChar_row (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit ((u : R) - 1)) (a : n) (y : n → R)
-    (hy : y a = 0) (h : y ⬝ᵥ Pi.single a 1 = 0) :
-    ψ (ddCharUnip _ (ddChar_vecMulVec_sq h)) = 1 := by
+theorem ddChar_row
+    (ψ : GL n R →* A)
+    (u : Rˣ) (hu : IsUnit ((u : R) - 1))
+    (a : n) (y : n → R) (hy : y a = 0) (h : y ⬝ᵥ Pi.single a 1 = 0)
+    : ψ (ddCharUnip _ (ddChar_vecMulVec_sq h)) = 1 := by
   refine ddChar_unip_eq_one ψ _ _ (ddCharDiag (Pi.mulSingle a u)) (u : R) 1 ?_ ?_ ?_
   · ext i j
     rw [ddCharDiag_val, Matrix.diagonal_mul, Matrix.smul_apply, vecMulVec_apply, smul_eq_mul]
@@ -231,7 +239,8 @@ theorem ddChar_row (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit ((u : R) - 1)) (a
       simp
     · simp [hi]
   · ext i j
-    rw [ddCharDiag_val, Matrix.mul_diagonal, Matrix.smul_apply, vecMulVec_apply, smul_eq_mul, one_mul]
+    rw [ddCharDiag_val, Matrix.mul_diagonal, Matrix.smul_apply, vecMulVec_apply, smul_eq_mul,
+      one_mul]
     by_cases hj : j = a
     · subst hj
       simp [hy]
@@ -239,12 +248,15 @@ theorem ddChar_row (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit ((u : R) - 1)) (a
   · rw [← neg_sub]
     exact hu.neg
 
-theorem ddChar_col (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit ((u : R) - 1)) (a : n) (x : n → R)
-    (hx : x a = 0) (h : Pi.single a 1 ⬝ᵥ x = 0) :
-    ψ (ddCharUnip _ (ddChar_vecMulVec_sq h)) = 1 := by
+theorem ddChar_col
+    (ψ : GL n R →* A)
+    (u : Rˣ) (hu : IsUnit ((u : R) - 1))
+    (a : n) (x : n → R) (hx : x a = 0) (h : Pi.single a 1 ⬝ᵥ x = 0)
+    : ψ (ddCharUnip _ (ddChar_vecMulVec_sq h)) = 1 := by
   refine ddChar_unip_eq_one ψ _ _ (ddCharDiag (Pi.mulSingle a u)) 1 (u : R) ?_ ?_ hu
   · ext i j
-    rw [ddCharDiag_val, Matrix.diagonal_mul, Matrix.smul_apply, vecMulVec_apply, smul_eq_mul, one_mul]
+    rw [ddCharDiag_val, Matrix.diagonal_mul, Matrix.smul_apply, vecMulVec_apply, smul_eq_mul,
+      one_mul]
     by_cases hi : i = a
     · subst hi
       simp [hx]
@@ -256,26 +268,27 @@ theorem ddChar_col (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit ((u : R) - 1)) (a
       simp [mul_comm]
     · simp [hj]
 
-theorem ddChar_unip_mul_apply {x y : n → R} (h : y ⬝ᵥ x = 0) (g : GL n R) (i j : n) :
-    ((ddCharUnip _ (ddChar_vecMulVec_sq h) * g : GL n R) : Matrix n n R) i j
+theorem ddChar_unip_mul_apply {x y : n → R} (h : y ⬝ᵥ x = 0) (g : GL n R) (i j : n)
+    : ((ddCharUnip _ (ddChar_vecMulVec_sq h) * g : GL n R) : Matrix n n R) i j
       = (g : Matrix n n R) i j + x i * ∑ k, y k * (g : Matrix n n R) k j := by
   show ((1 + vecMulVec x y) * (g : Matrix n n R)) i j = _
   rw [add_mul, one_mul, Matrix.add_apply, Matrix.mul_apply, Finset.mul_sum]
   congr 1
   exact Finset.sum_congr rfl fun k _ => by rw [vecMulVec_apply]; ring
 
-theorem ddChar_mul_unip_apply {x y : n → R} (h : y ⬝ᵥ x = 0) (g : GL n R) (i j : n) :
-    ((g * ddCharUnip _ (ddChar_vecMulVec_sq h) : GL n R) : Matrix n n R) i j
+theorem ddChar_mul_unip_apply {x y : n → R} (h : y ⬝ᵥ x = 0) (g : GL n R) (i j : n)
+    : ((g * ddCharUnip _ (ddChar_vecMulVec_sq h) : GL n R) : Matrix n n R) i j
       = (g : Matrix n n R) i j + (∑ k, (g : Matrix n n R) i k * x k) * y j := by
   show ((g : Matrix n n R) * (1 + vecMulVec x y)) i j = _
   rw [mul_add, mul_one, Matrix.add_apply, Matrix.mul_apply, Finset.sum_mul]
   congr 1
   exact Finset.sum_congr rfl fun k _ => by rw [vecMulVec_apply]; ring
 
-theorem ddChar_induction [Finite R] (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit ((u : R) - 1))
-    (s : Finset n) : ∀ g : GL n R,
-      (∀ i j, i ≠ j → (i ∉ s ∨ j ∉ s) → (g : Matrix n n R) i j = 0) →
-      (g : Matrix n n R).det = 1 → ψ g = 1 := by
+theorem ddChar_induction
+    [Finite R] (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit ((u : R) - 1)) (s : Finset n)
+    : ∀ g : GL n R,
+      (∀ i j, i ≠ j → (i ∉ s ∨ j ∉ s) → (g : Matrix n n R) i j = 0) → (g : Matrix n n R).det = 1
+        → ψ g = 1 := by
   induction s using Finset.induction_on with
   | empty =>
     intro g hg hdet
@@ -286,14 +299,18 @@ theorem ddChar_induction [Finite R] (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit 
       have := congrArg (fun M : GL n R => (M : Matrix n n R) a a) (inv_mul_cancel g)
       simp only [Units.val_mul, Units.val_one, Matrix.mul_apply, Matrix.one_apply_eq] at this
       exact this
-    have hz : ∀ k ∈ (Finset.univ : Finset n), k ∉ insert a s →
-        ((g⁻¹ : GL n R) : Matrix n n R) a k * (g : Matrix n n R) k a = 0 := by
+    have hz
+        : ∀ k ∈ (Finset.univ : Finset n),
+          k ∉ insert a s → ((g⁻¹ : GL n R) : Matrix n n R) a k * (g : Matrix n n R) k a = 0 := by
       intro k _ hk
       have hka : k ≠ a := fun e => hk (e ▸ Finset.mem_insert_self a s)
       rw [hg k a hka (Or.inl hk), mul_zero]
-    have hwvb : ((g⁻¹ : GL n R) : Matrix n n R) a a * (g : Matrix n n R) a a +
-        ∑ k ∈ s, ((g⁻¹ : GL n R) : Matrix n n R) a k * (g : Matrix n n R) k a = 1 := by
-      rw [← Finset.sum_insert ha (f := fun k => ((g⁻¹ : GL n R) : Matrix n n R) a k * (g : Matrix n n R) k a),
+    have hwvb
+        : ((g⁻¹ : GL n R) : Matrix n n R) a a * (g : Matrix n n R) a a
+            + ∑ k ∈ s, ((g⁻¹ : GL n R) : Matrix n n R) a k * (g : Matrix n n R) k a
+          = 1 := by
+      rw [← Finset.sum_insert ha
+          (f := fun k => ((g⁻¹ : GL n R) : Matrix n n R) a k * (g : Matrix n n R) k a),
         Finset.sum_subset (Finset.subset_univ _) hz]
       exact hinv
     obtain ⟨t, ht⟩ := ddChar_stable hwvb
@@ -301,11 +318,16 @@ theorem ddChar_induction [Finite R] (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit 
     have hy1a : y1 a = 0 := by simp [y1, ha]
     have h1 : y1 ⬝ᵥ Pi.single a 1 = 0 := by rw [dotProduct_single, hy1a, zero_mul]
     let g1 : GL n R := ddCharUnip _ (ddChar_vecMulVec_sq h1) * g
-    have e1 : ∀ i j, (g1 : Matrix n n R) i j =
-        (g : Matrix n n R) i j + (Pi.single a (1 : R) : n → R) i * ∑ k, y1 k * (g : Matrix n n R) k j :=
-      fun i j => ddChar_unip_mul_apply h1 g i j
-    have hsum1 : ∀ j, ∑ k, y1 k * (g : Matrix n n R) k j =
-        ∑ k ∈ s, t * ((g⁻¹ : GL n R) : Matrix n n R) a k * (g : Matrix n n R) k j := by
+    have e1
+        : ∀ i j,
+          (g1 : Matrix n n R) i j
+            = (g : Matrix n n R) i j
+              + (Pi.single a (1 : R) : n → R) i * ∑ k, y1 k * (g : Matrix n n R) k j := fun i j =>
+      ddChar_unip_mul_apply h1 g i j
+    have hsum1
+        : ∀ j,
+          ∑ k, y1 k * (g : Matrix n n R) k j
+            = ∑ k ∈ s, t * ((g⁻¹ : GL n R) : Matrix n n R) a k * (g : Matrix n n R) k j := by
       intro j
       simp only [y1, ite_mul, zero_mul]
       rw [Finset.sum_ite_mem, Finset.univ_inter]
@@ -340,7 +362,9 @@ theorem ddChar_induction [Finite R] (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit 
     have hx2a : x2 a = 0 := by simp [x2]
     have h2 : Pi.single a 1 ⬝ᵥ x2 = 0 := by rw [single_dotProduct, hx2a, mul_zero]
     let g2 : GL n R := ddCharUnip _ (ddChar_vecMulVec_sq h2) * g1
-    have e2 : ∀ i j, (g2 : Matrix n n R) i j = (g1 : Matrix n n R) i j + x2 i * (g1 : Matrix n n R) a j := by
+    have e2
+        : ∀ i j,
+          (g2 : Matrix n n R) i j = (g1 : Matrix n n R) i j + x2 i * (g1 : Matrix n n R) a j := by
       intro i j
       rw [ddChar_unip_mul_apply h2 g1 i j]
       congr 2
@@ -373,7 +397,9 @@ theorem ddChar_induction [Finite R] (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit 
     have hy3a : y3 a = 0 := by simp [y3]
     have h3 : y3 ⬝ᵥ Pi.single a 1 = 0 := by rw [dotProduct_single, hy3a, zero_mul]
     let g3 : GL n R := g2 * ddCharUnip _ (ddChar_vecMulVec_sq h3)
-    have e3 : ∀ i j, (g3 : Matrix n n R) i j = (g2 : Matrix n n R) i j + (g2 : Matrix n n R) i a * y3 j := by
+    have e3
+        : ∀ i j,
+          (g3 : Matrix n n R) i j = (g2 : Matrix n n R) i j + (g2 : Matrix n n R) i a * y3 j := by
       intro i j
       rw [ddChar_mul_unip_apply h3 g2 i j]
       congr 2
@@ -404,10 +430,10 @@ theorem ddChar_induction [Finite R] (ψ : GL n R →* A) (u : Rˣ) (hu : IsUnit 
 
 end DetOneChar
 
-theorem generalLinearGroup_char_eq_one_of_det_eq_one :
-    ∀ (R : Type) [CommRing R] [Finite R] (r : ℕ) (A : Type) [CommGroup A]
-      (ψ : GL (Fin r) R →* A), (∀ 𝔪 : Ideal R, 𝔪.IsMaximal → 4 ≤ Nat.card (R ⧸ 𝔪)) →
-      ∀ g : GL (Fin r) R, (g : Matrix (Fin r) (Fin r) R).det = 1 → ψ g = 1 := by
+theorem generalLinearGroup_char_eq_one_of_det_eq_one
+    : ∀ (R : Type) [CommRing R] [Finite R] (r : ℕ) (A : Type) [CommGroup A] (ψ : GL (Fin r) R →* A),
+      (∀ 𝔪 : Ideal R, 𝔪.IsMaximal → 4 ≤ Nat.card (R ⧸ 𝔪))
+        → ∀ g : GL (Fin r) R, (g : Matrix (Fin r) (Fin r) R).det = 1 → ψ g = 1 := by
   intro R _ _ r A _ ψ h4 g hdet
   obtain ⟨u, hu⟩ := ddChar_exists_unit h4
   exact ddChar_induction ψ u hu Finset.univ g (fun i j _ hout => by simp at hout) hdet

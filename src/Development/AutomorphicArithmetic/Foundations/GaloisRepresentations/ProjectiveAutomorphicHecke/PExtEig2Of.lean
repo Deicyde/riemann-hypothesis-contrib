@@ -25,15 +25,19 @@ private theorem rop_smul (r : H →₀ ℂ) (a : ℂ) (Φ : H → V) : rop r (a 
   funext g
   simp only [rop, Pi.smul_apply, Finsupp.smul_sum, smul_smul, mul_comm]
 
-private def eigForms (ι : Γ →* H) (K : Subgroup H) (ξ : Representation ℂ Γ V) (r : J → H →₀ ℂ) (θ : J → ℂ) :
-    Submodule ℂ (H → V) where
+private def eigForms
+    (ι : Γ →* H) (K : Subgroup H) (ξ : Representation ℂ Γ V) (r : J → H →₀ ℂ) (θ : J → ℂ)
+    : Submodule ℂ (H → V) where
   carrier := {Φ | Φ ∈ forms ι K ξ ∧ ∀ j, rop (r j) Φ = θ j • Φ}
   add_mem' := by
     rintro a b ⟨ha, ha'⟩ ⟨hb, hb'⟩
     exact ⟨add_mem ha hb, fun j => by rw [rop_add, ha', hb', smul_add]⟩
-  zero_mem' := ⟨zero_mem _, fun j => by
-    have := rop_smul (r j) (0 : ℂ) (0 : H → V)
-    simpa using this⟩
+  zero_mem' := ⟨
+    zero_mem _,
+    fun j => by
+      have := rop_smul (r j) (0 : ℂ) (0 : H → V)
+      simpa using this
+  ⟩
   smul_mem' := by
     rintro a b ⟨hb, hb'⟩
     exact ⟨Submodule.smul_mem _ a hb, fun j => by rw [rop_smul, hb', smul_comm]⟩
@@ -46,8 +50,10 @@ theorem pExtEig2_of : ExtZero → CentralEig2 → ExtEig2 := by
   intro Γ H A Z V _ _ _ _ _ _ ι K ξ c ζ hcen hs φ hφ hφne J r θ hsupp hforms heig
   obtain ⟨s, hs⟩ := hs
   obtain ⟨u₀, hu₀, hφu₀⟩ := hφne
-  have memF : ∀ Ψ : H → V, Ψ ∈ forms ι K ξ ↔
-      ((∀ γ g, Ψ (ι γ * g) = ξ γ (Ψ g)) ∧ ∀ k ∈ K, ∀ g, Ψ (g * k) = Ψ g) := fun Ψ => Iff.rfl
+  have memF
+      : ∀ Ψ : H → V,
+        Ψ ∈ forms ι K ξ ↔ ((∀ γ g, Ψ (ι γ * g) = ξ γ (Ψ g)) ∧ ∀ k ∈ K, ∀ g, Ψ (g * k) = Ψ g) :=
+    fun Ψ => Iff.rfl
   obtain ⟨Φ, hΦ, hext, hsup⟩ := hZ Γ H A V ι K ξ c φ hφ
   obtain ⟨hΦ1, hΦ2⟩ := (memF Φ).1 hΦ
   have hΦne : Φ ≠ 0 := by
@@ -68,8 +74,8 @@ theorem pExtEig2_of : ExtZero → CentralEig2 → ExtEig2 := by
     funext g
     by_cases hg : ∃ γ u k, c u = 1 ∧ k ∈ K ∧ g = ι γ * u * k
     · obtain ⟨γ, u, k, hu', hk, rfl⟩ := hg
-      rw [Pi.smul_apply, mul_assoc, hf1 γ (u * k), hf2 k hk u, hΦ1 γ (u * k), hΦ2 k hk u,
-        hu u hu', map_smul]
+      rw [Pi.smul_apply, mul_assoc, hf1 γ (u * k), hf2 k hk u, hΦ1 γ (u * k), hΦ2 k hk u, hu u hu',
+        map_smul]
     · have h0 : Φ g = 0 := by
         by_contra h
         exact hg (hsup g h)
@@ -84,7 +90,8 @@ theorem pExtEig2_of : ExtZero → CentralEig2 → ExtEig2 := by
         apply hg
         refine ⟨γ, u * (k * v⁻¹ * k⁻¹), k, ?_, hk, ?_⟩
         · simp [map_mul, map_inv, hu', hcv]
-        · calc g = g * v * v⁻¹ := by group
+        · calc
+            g = g * v * v⁻¹ := by group
             _ = ι γ * u * k * v⁻¹ := by rw [he]
             _ = ι γ * (u * (k * v⁻¹ * k⁻¹)) * k := by group
       rw [hz, smul_zero]
@@ -96,8 +103,8 @@ theorem pExtEig2_of : ExtZero → CentralEig2 → ExtEig2 := by
       rw [mul_assoc, h1]
     · show Ψ (g * k * ζ z) = Ψ (g * ζ z)
       rw [mul_assoc, ← hcen z k, ← mul_assoc, h2 k hk]
-  have trRop : ∀ (Ψ : H → V) j z,
-      rop (r j) (fun g => Ψ (g * ζ z)) = fun g => rop (r j) Ψ (g * ζ z) := by
+  have trRop
+      : ∀ (Ψ : H → V) j z, rop (r j) (fun g => Ψ (g * ζ z)) = fun g => rop (r j) Ψ (g * ζ z) := by
     intro Ψ j z
     funext g
     simp only [rop, Finsupp.sum]
@@ -112,8 +119,7 @@ theorem pExtEig2_of : ExtZero → CentralEig2 → ExtEig2 := by
     show Φ (g * ζ (t * z₀ * z₁)) = a • Φ (g * ζ t)
     rw [map_mul, map_mul, ← mul_assoc, ← mul_assoc, ← hcen z₁, hz₁, hΦ1, ha, hΦ2 _ hz₀]
   let M : Submodule ℂ (H → V) := Submodule.span ℂ ((fun t g => Φ (g * ζ t)) '' (s : Set Z))
-  have hfin : FiniteDimensional ℂ M :=
-    FiniteDimensional.span_of_finite ℂ ((s.finite_toSet).image _)
+  have hfin : FiniteDimensional ℂ M := FiniteDimensional.span_of_finite ℂ ((s.finite_toSet).image _)
   have trM : ∀ z, (fun g => Φ (g * ζ z)) ∈ M := by
     intro z
     obtain ⟨t, ht, a, he⟩ := key z
@@ -148,8 +154,7 @@ theorem pExtEig2_of : ExtZero → CentralEig2 → ExtEig2 := by
       simp only [map_mul, ← mul_assoc] at h
       exact h
     exact hL hΨ
-  obtain ⟨Ψ, hΨM, hΨne, ψ, hψ⟩ :=
-    hC Γ H Z V ι K ξ ζ hcen M hfin (fun Ψ h => (hE Ψ h).1) hne hclos
+  obtain ⟨Ψ, hΨM, hΨne, ψ, hψ⟩ := hC Γ H Z V ι K ξ ζ hcen M hfin (fun Ψ h => (hE Ψ h).1) hne hclos
   exact ⟨Ψ, (hE Ψ hΨM).1, hΨne, (hE Ψ hΨM).2, ψ, hψ⟩
 
 end UpperTheory.Gal.CertificateRingHomMap

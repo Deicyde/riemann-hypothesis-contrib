@@ -9,13 +9,24 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Glo
 
 namespace GlobalTheory.PsType
 
-theorem apply_eq_one_of_triv_one_unit {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {χ : kˣ →* ℂˣ} (h : Triv χ 1) (u : kˣ) (hu : valuation k (u : k) = 1) : χ u = 1 := by
+theorem apply_eq_one_of_triv_one_unit
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {χ : kˣ →* ℂˣ} (h : Triv χ 1)
+    (u : kˣ) (hu : valuation k (u : k) = 1)
+    : χ u = 1 := by
   apply h u hu
-  calc valuation k ((u : k) - 1) ≤ max (valuation k (u : k)) (valuation k 1) := Valuation.map_sub _ _ _
+  calc
+    valuation k ((u : k) - 1)
+      ≤ max (valuation k (u : k)) (valuation k 1) := Valuation.map_sub _ _ _
     _ = valuation k 1 := by simp [hu]
 
-theorem cut_or_const : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ), Ordered ψ → (∃ r : ℕ, 0 < r ∧ r < n ∧ Cut ψ r) ∨ ∃ χ : kˣ →* ℂˣ, ((∀ i, IsSmoothChar (ψ i)) → IsSmoothChar χ) ∧ Agree ψ (fun _ => χ) := by
+theorem cut_or_const
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ),
+      Ordered ψ
+        → (∃ r : ℕ, 0 < r ∧ r < n ∧ Cut ψ r)
+          ∨ ∃ χ : kˣ →* ℂˣ,
+            ((∀ i, IsSmoothChar (ψ i)) → IsSmoothChar χ) ∧ Agree ψ (fun _ => χ) := by
   intro k _ _ _ _ n ψ hord
   by_cases hc : ∃ m : ℕ, ∃ h : m + 1 < n, ¬ Triv (ψ ⟨m, by omega⟩ / ψ ⟨m + 1, h⟩) 1
   · obtain ⟨m, hm, hnt⟩ := hc
@@ -33,7 +44,8 @@ theorem cut_or_const : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpa
       show IsOpen ((1 : kˣ →* ℂˣ).ker : Set kˣ)
       simp
     · refine ⟨ψ ⟨0, hn⟩, fun hs => hs _, ?_⟩
-      have key : ∀ m (hm : m < n) (u : kˣ), valuation k (u : k) = 1 → ψ ⟨m, hm⟩ u = ψ ⟨0, hn⟩ u := by
+      have key
+          : ∀ m (hm : m < n) (u : kˣ), valuation k (u : k) = 1 → ψ ⟨m, hm⟩ u = ψ ⟨0, hn⟩ u := by
         intro m
         induction m with
         | zero => intro _ _ _; rfl

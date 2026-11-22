@@ -8,8 +8,8 @@ open Matrix Polynomial
 
 namespace GlobalTheory
 
-theorem norm_multiset_prod_near_one (s : Multiset ℂ) (hs : ∀ μ ∈ s, ‖μ - 1‖ ≤ 1 / 2) :
-    (1 / 2 : ℝ) ^ Multiset.card s ≤ ‖s.prod‖ ∧ ‖s.prod‖ ≤ (3 / 2 : ℝ) ^ Multiset.card s := by
+theorem norm_multiset_prod_near_one (s : Multiset ℂ) (hs : ∀ μ ∈ s, ‖μ - 1‖ ≤ 1 / 2)
+    : (1 / 2 : ℝ) ^ Multiset.card s ≤ ‖s.prod‖ ∧ ‖s.prod‖ ≤ (3 / 2 : ℝ) ^ Multiset.card s := by
   induction s using Multiset.induction_on with
   | empty => simp
   | cons a s ih =>
@@ -30,9 +30,11 @@ theorem norm_multiset_prod_near_one (s : Multiset ℂ) (hs : ∀ μ ∈ s, ‖μ
     · rw [mul_comm ((3 / 2 : ℝ) ^ _)]
       exact mul_le_mul hhi h2 (norm_nonneg _) (by norm_num)
 
-theorem det_near_one_bounds (n : ℕ) (A : Matrix (Fin n) (Fin n) ℂ) (ε : ℝ)
-    (hA : ∀ i j, ‖A i j - (1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ≤ ε) (hn : (n : ℝ) * ε ≤ 1 / 2) :
-    (1 / 2 : ℝ) ^ n ≤ ‖A.det‖ ∧ ‖A.det‖ ≤ 2 ^ n := by
+theorem det_near_one_bounds
+    (n : ℕ) (A : Matrix (Fin n) (Fin n) ℂ)
+    (ε : ℝ)
+    (hA : ∀ i j, ‖A i j - (1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ≤ ε) (hn : (n : ℝ) * ε ≤ 1 / 2)
+    : (1 / 2 : ℝ) ^ n ≤ ‖A.det‖ ∧ ‖A.det‖ ≤ 2 ^ n := by
   have hroot : ∀ μ ∈ A.charpoly.roots, ‖μ - 1‖ ≤ 1 / 2 := by
     intro μ hμ
     have hr : A.charpoly.IsRoot μ := isRoot_of_mem_roots hμ
@@ -47,11 +49,14 @@ theorem det_near_one_bounds (n : ℕ) (A : Matrix (Fin n) (Fin n) ℂ) (ε : ℝ
         intro j hj
         have hjk : k ≠ j := (Finset.ne_of_mem_erase hj).symm
         simpa [Matrix.one_apply_ne hjk] using hA k j
-      calc _ ≤ ∑ _j ∈ Finset.univ.erase k, ε := Finset.sum_le_sum hle
+      calc
+        _ ≤ ∑ _j ∈ Finset.univ.erase k, ε := Finset.sum_le_sum hle
         _ = ((n : ℝ) - 1) * ε := by
           rw [Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ,
             Fintype.card_fin, nsmul_eq_mul, Nat.cast_sub h1n, Nat.cast_one]
-    calc ‖μ - 1‖ = ‖(μ - A k k) + (A k k - 1)‖ := by rw [sub_add_sub_cancel]
+    calc
+      ‖μ - 1‖
+        = ‖(μ - A k k) + (A k k - 1)‖ := by rw [sub_add_sub_cancel]
       _ ≤ ‖μ - A k k‖ + ‖A k k - 1‖ := norm_add_le _ _
       _ ≤ ((n : ℝ) - 1) * ε + ε := add_le_add (hk.trans hoff) hdiag
       _ = n * ε := by ring

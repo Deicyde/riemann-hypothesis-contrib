@@ -93,9 +93,10 @@ private lemma kap_eq {D : Datum p} {G : HTGroup p} (L : Link D G) (ha : D.a = 1)
 
 end UpperTheory.Gal.FixZ
 
-theorem UpperTheory.Gal.FixZ.wtEq_of :
-    UpperTheory.Gal.FixZ.WtEq := by
+theorem UpperTheory.Gal.FixZ.wtEq_of : UpperTheory.Gal.FixZ.WtEq := by
   intro p _ D G L ha i₀ v hv k α y
   funext P μ
-  unfold UpperTheory.Gal.W2.wtFix UpperTheory.Gal.LocalSmoothExtension.cW UpperTheory.Gal.LocalSmoothExtension.endPol
-  rw [UpperTheory.Gal.FixZ.eps_eq, UpperTheory.Gal.FixZ.map_inv, UpperTheory.Gal.FixZ.kap_eq L ha i₀ v hv μ]
+  unfold UpperTheory.Gal.W2.wtFix UpperTheory.Gal.LocalSmoothExtension.cW
+    UpperTheory.Gal.LocalSmoothExtension.endPol
+  rw [UpperTheory.Gal.FixZ.eps_eq, UpperTheory.Gal.FixZ.map_inv,
+    UpperTheory.Gal.FixZ.kap_eq L ha i₀ v hv μ]

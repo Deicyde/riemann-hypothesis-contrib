@@ -5,16 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma wd_zero' {ι E : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E]
     (x : Finset ι → E) (t : Finset ι) : wd (fun _ : ι => (0 : Module.End ℂ E)) x t = 0 := by
   simp [wd]
 
-private theorem uni_inter_map_inrE {β κ : Type} [LinearOrder β] [LinearOrder κ] [Fintype κ]
-    (b : Finset β) (L : Finset κ) :
-    uni b L ∩ Finset.map (inrE (β := β)).toEmbedding Finset.univ = L.map (inrE (β := β)).toEmbedding := by
+private theorem uni_inter_map_inrE
+    {β κ : Type} [LinearOrder β] [LinearOrder κ] [Fintype κ] (b : Finset β) (L : Finset κ)
+    : uni b L ∩ Finset.map (inrE (β := β)).toEmbedding Finset.univ
+      = L.map (inrE (β := β)).toEmbedding := by
   ext x
   simp [GlobalTheory.WH.uni, inrE]
   constructor
@@ -23,8 +25,7 @@ private theorem uni_inter_map_inrE {β κ : Type} [LinearOrder β] [LinearOrder 
   · rintro ⟨a, ha, rfl⟩
     exact ⟨by simpa using ha, a, rfl⟩
 
-theorem UpperTheory.Gal.productCup_of_system.colQEx_of :
-    WdUni → ColQEx := by
+theorem UpperTheory.Gal.productCup_of_system.colQEx_of : WdUni → ColQEx := by
   intro hU β κ E _ _ _ _ _ _ A w d hK n m hm c hc hlev hcz
   set Q := Finset.map (inrE (β := β) (κ := κ)).toEmbedding Finset.univ with hQ
   have hQc : ∀ (b : Finset β) (L : Finset κ), (uni b L ∩ Q).card = L.card := by
@@ -33,17 +34,16 @@ theorem UpperTheory.Gal.productCup_of_system.colQEx_of :
     simp
   have hl : (fun i : β => wOn Q w (inlE i)) = fun _ => 0 := by
     funext i
-    have : inlE (κ := κ) i ∉ Q := by
-      simp [hQ, inlE, inrE]
+    have : inlE (κ := κ) i ∉ Q := by simp [hQ, inlE, inrE]
     simp [wOn, this]
   have hr : (fun l : κ => wOn Q w (inrE l)) = fun l => w (inrE l) := by
     funext l
-    have : inrE (β := β) l ∈ Q := by
-      simp [hQ]
+    have : inrE (β := β) l ∈ Q := by simp [hQ]
     simp [wOn, this]
-  have hdec : ∀ (x : Finset (β ⊕ₗ κ) → E) (b : Finset β) (L : Finset κ),
-      wd (wOn Q w) x (uni b L) =
-        (-1 : ℤ) ^ b.card • wd (fun l => w (inrE l)) (fun L' => x (uni b L')) L := by
+  have hdec
+      : ∀ (x : Finset (β ⊕ₗ κ) → E) (b : Finset β) (L : Finset κ),
+        wd (wOn Q w) x (uni b L)
+          = (-1 : ℤ) ^ b.card • wd (fun l => w (inrE l)) (fun L' => x (uni b L')) L := by
     intro x b L
     rw [(hU β κ E (wOn Q w) x b L).1, hl, hr, wd_zero', zero_add]
   have hmem : ∀ s, c s ∈ (if ((s.card : ℕ) : ℤ) = n then A s else ⊥) := by
@@ -51,8 +51,9 @@ theorem UpperTheory.Gal.productCup_of_system.colQEx_of :
     have := hc
     simp only [acx, Submodule.mem_pi, Set.mem_univ, true_implies] at this
     exact this s
-  have hY : ∀ b : Finset β, ∃ Y ∈ (colA A w b).C (m - 1),
-      wd (fun l => w (inrE l)) Y = fun L => c (uni b L) := by
+  have hY
+      : ∀ b : Finset β, ∃ Y ∈ (colA A w b).C (m - 1),
+        wd (fun l => w (inrE l)) Y = fun L => c (uni b L) := by
     intro b
     have hz : (fun L => c (uni b L)) ∈ (colA A w b).Z m := by
       refine Submodule.mem_inf.2 ⟨?_, ?_⟩
@@ -74,8 +75,7 @@ theorem UpperTheory.Gal.productCup_of_system.colQEx_of :
       · rw [LinearMap.mem_ker]
         change wd (fun l => w (inrE l)) (fun L => c (uni b L)) = 0
         funext L
-        have h1 : (wd (wOn Q w)) c (uni b L) = 0 := by
-          exact congrFun hcz (uni b L)
+        have h1 : (wd (wOn Q w)) c (uni b L) = 0 := by exact congrFun hcz (uni b L)
         rw [hdec] at h1
         simp only [Pi.zero_apply]
         have h2 := congrArg (fun v => (-1 : ℤ) ^ b.card • v) h1
@@ -95,8 +95,14 @@ theorem UpperTheory.Gal.productCup_of_system.colQEx_of :
     have := hQc (lft s) (rgt s)
     rw [hU2 s] at this
     exact this
-  obtain ⟨y, hy⟩ : ∃ y : Finset (β ⊕ₗ κ) → E, ∀ s, y s = if (((lft s).card : ℕ) : ℤ) = n - m then
-      (-1 : ℤ) ^ (lft s).card • Y (lft s) (rgt s) else 0 := ⟨_, fun s => rfl⟩
+  obtain ⟨y, hy⟩
+      : ∃ y : Finset (β ⊕ₗ κ) → E, ∀ s,
+        y s
+          = if (((lft s).card : ℕ) : ℤ) = n - m then
+              (-1 : ℤ) ^ (lft s).card • Y (lft s) (rgt s)
+            else
+              0 :=
+    ⟨_, fun s => rfl⟩
   refine ⟨y, ?_, ?_, ?_⟩
   · rw [acx, Submodule.mem_pi]
     intro s _
@@ -141,11 +147,13 @@ theorem UpperTheory.Gal.productCup_of_system.colQEx_of :
     · rfl
   · funext t
     obtain ⟨b, L, rfl⟩ : ∃ b L, t = uni b L := ⟨lft t, rgt t, (hU2 t).symm⟩
-    refine Eq.trans (b := (-1 : ℤ) ^ b.card • wd (fun l => w (inrE l)) (fun L' => y (uni b L')) L) ?_ ?_
+    refine Eq.trans (b := (-1 : ℤ) ^ b.card • wd (fun l => w (inrE l)) (fun L' => y (uni b L')) L)
+      ?_ ?_
     · convert hdec y b L
     have hb2 := hU β κ E w c b
-    have hfun : (fun L' => y (uni b L')) =
-        if (((b.card : ℕ) : ℤ) = n - m) then (-1 : ℤ) ^ b.card • Y b else 0 := by
+    have hfun
+        : (fun L' => y (uni b L'))
+          = if (((b.card : ℕ) : ℤ) = n - m) then (-1 : ℤ) ^ b.card • Y b else 0 := by
       funext L'
       rw [hy, (hb2 L').2.1, (hb2 L').2.2.1]
       split_ifs <;> rfl

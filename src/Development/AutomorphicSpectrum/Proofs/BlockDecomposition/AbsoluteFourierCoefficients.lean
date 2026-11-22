@@ -14,41 +14,57 @@ namespace GlobalTheory.CompanionTheory.FuncCalc
 
 section Ops
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {M : Submodule ℂ H} {Ω : M →ₗ[ℂ] M} {T : H →L[ℂ] H}
 
-theorem res_val (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
-    (x v : M) (hv : (v : H) = T x) : (v : H) + (Ω (Ω v) : H) = x := by
+theorem res_val
+    (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
+    (x v : M) (hv : (v : H) = T x)
+    : (v : H) + (Ω (Ω v) : H) = x := by
   obtain ⟨v', hv', h⟩ := h3 x
   have : v' = v := Subtype.ext (hv'.trans hv.symm)
   subst this
   exact h
 
-theorem res_symm (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
-    (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x) (x y : H) :
-    ⟪T x, y⟫_ℂ = ⟪x, T y⟫_ℂ := by
+theorem res_symm
+    (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
+    (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x) (x y : H)
+    : ⟪T x, y⟫_ℂ = ⟪x, T y⟫_ℂ := by
   have h0 : ∀ x y : M, ⟪T x, (y : H)⟫_ℂ = ⟪(x : H), T y⟫_ℂ := by
     intro x y
     obtain ⟨v, hv, hx⟩ := h3 x
     obtain ⟨u, hu, hy⟩ := h3 y
     rw [← hv, ← hu, ← hy, ← hx, inner_add_right, inner_add_left, hs (Ω v) u, hs v (Ω u)]
   have h1 : ∀ (x : M) (y : H), ⟪T x, y⟫_ℂ = ⟪(x : H), T y⟫_ℂ := fun x =>
-    congrFun (Continuous.ext_on hd (f := fun y => ⟪T x, y⟫_ℂ) (g := fun y => ⟪(x : H), T y⟫_ℂ)
-      (by fun_prop) (by fun_prop) (fun y hy => h0 x ⟨y, hy⟩))
-  exact congrFun (Continuous.ext_on hd (f := fun x => ⟪T x, y⟫_ℂ) (g := fun x => ⟪x, T y⟫_ℂ)
-      (by fun_prop) (by fun_prop) (fun x hx => h1 ⟨x, hx⟩ y)) x
+    congrFun (Continuous.ext_on hd
+      (f := fun y => ⟪T x, y⟫_ℂ)
+      (g := fun y => ⟪(x : H), T y⟫_ℂ)
+      (by fun_prop) (by fun_prop)
+      (fun y hy => h0 x ⟨y, hy⟩))
+  exact congrFun
+    (Continuous.ext_on hd
+      (f := fun x => ⟪T x, y⟫_ℂ)
+      (g := fun x => ⟪x, T y⟫_ℂ)
+      (by fun_prop) (by fun_prop)
+      (fun x hx => h1 ⟨x, hx⟩ y))
+    x
 
-theorem res_omega (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
-    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x) (w v : M) (hv : (v : H) = T w) :
-    T (Ω w) = Ω v := by
+theorem res_omega
+    (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
+    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x)
+    (w v : M) (hv : (v : H) = T w)
+    : T (Ω w) = Ω v := by
   have hw : w = v + Ω (Ω v) := Subtype.ext (by simpa using (res_val h3 w v hv).symm)
   have := h4 (Ω v)
   rw [hw]
   simpa using this
 
-theorem res_inj (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
+theorem res_inj
+    (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
     (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
-    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x) : Function.Injective T := by
+    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x)
+    : Function.Injective T := by
   refine (injective_iff_map_eq_zero T).2 fun x hx => ?_
   have h : (fun y => ⟪x, y⟫_ℂ) = fun _ => 0 :=
     Continuous.ext_on hd (by fun_prop) (by fun_prop) (fun y hy => by
@@ -59,16 +75,17 @@ theorem res_inj (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_
       exact h2.symm)
   exact inner_self_eq_zero.1 (congrFun h x)
 
-theorem exists_bdd (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
-    (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x) :
-    ∃ Z : H →L[ℂ] H, ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H) := by
-  let T₀ : M →ₗ[ℂ] M := (T.toLinearMap.comp M.subtype).codRestrict M (fun x => by
-    obtain ⟨v, hv, _⟩ := h3 x
-    simpa [← hv] using v.2)
+theorem exists_bdd
+    (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
+    (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
+    : ∃ Z : H →L[ℂ] H, ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H) := by
+  let T₀ : M →ₗ[ℂ] M :=
+    (T.toLinearMap.comp M.subtype).codRestrict M (fun x => by
+      obtain ⟨v, hv, _⟩ := h3 x
+      simpa [← hv] using v.2)
   have hT₀ : ∀ x : M, ((T₀ x : M) : H) = T x := fun x => rfl
   let Z₀ : M →ₗ[ℂ] H := M.subtype ∘ₗ (Ω - I • LinearMap.id) ∘ₗ T₀
-  have hZ₀ : ∀ x : M, Z₀ x = (Ω (T₀ x) : H) - I • ((T₀ x : M) : H) := fun x => by
-    simp [Z₀]
+  have hZ₀ : ∀ x : M, Z₀ x = (Ω (T₀ x) : H) - I • ((T₀ x : M) : H) := fun x => by simp [Z₀]
   have hb : ∀ x : M, ‖Z₀ x‖ ≤ 1 * ‖x‖ := by
     intro x
     set v := T₀ x with hvdef
@@ -101,7 +118,9 @@ theorem exists_bdd (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y�
     nlinarith
   let Z₁ : M →L[ℂ] H := Z₀.mkContinuous 1 hb
   refine ⟨Z₁.extend M.subtypeL, fun x v hv => ?_⟩
-  have h := Z₁.extend_eq (e := M.subtypeL) (by simpa using hd.denseRange_val) isUniformEmbedding_subtype_val.isUniformInducing x
+  have h :=
+    Z₁.extend_eq (e := M.subtypeL) (by simpa using hd.denseRange_val)
+      isUniformEmbedding_subtype_val.isUniformInducing x
   have hv' : T₀ x = v := Subtype.ext hv.symm
   simp only [Submodule.subtypeL_apply] at h
   rw [h]
@@ -111,17 +130,21 @@ end Ops
 
 section Ops2
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {M : Submodule ℂ H} {Ω : M →ₗ[ℂ] M} {T : H →L[ℂ] H}
 
-theorem bdd_adjoint (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
+theorem bdd_adjoint
+    (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
     (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
-    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x) (Z : H →L[ℂ] H)
-    (hZ : ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H)) (x v : M) (hv : (v : H) = T x) :
-    ContinuousLinearMap.adjoint Z x = (Ω v : H) + I • (v : H) := by
+    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x)
+    (Z : H →L[ℂ] H) (hZ : ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H))
+    (x v : M) (hv : (v : H) = T x)
+    : ContinuousLinearMap.adjoint Z x = (Ω v : H) + I • (v : H) := by
   refine ext_inner_left ℂ fun y => ?_
-  have h : (fun y => ⟪y, ContinuousLinearMap.adjoint Z x⟫_ℂ) =
-      fun y => ⟪y, (Ω v : H) + I • (v : H)⟫_ℂ := by
+  have h
+      : (fun y => ⟪y, ContinuousLinearMap.adjoint Z x⟫_ℂ)
+        = fun y => ⟪y, (Ω v : H) + I • (v : H)⟫_ℂ := by
     refine Continuous.ext_on hd (by fun_prop) (by fun_prop) (fun y hy => ?_)
     obtain ⟨u, hu, -⟩ := h3 ⟨y, hy⟩
     have e1 : ⟪(u : H), (x : H)⟫_ℂ = ⟪y, (v : H)⟫_ℂ := by
@@ -135,12 +158,13 @@ theorem bdd_adjoint (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y
     simp
   exact congrFun h y
 
-theorem bdd_mul (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
+theorem bdd_mul
+    (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
     (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
-    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x) (Z : H →L[ℂ] H)
-    (hZ : ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H)) :
-    ContinuousLinearMap.adjoint Z * Z = T ∧ Z * ContinuousLinearMap.adjoint Z = T ∧
-      Z - ContinuousLinearMap.adjoint Z = (-2 * I) • T := by
+    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x)
+    (Z : H →L[ℂ] H) (hZ : ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H))
+    : ContinuousLinearMap.adjoint Z * Z = T ∧ Z * ContinuousLinearMap.adjoint Z = T
+      ∧ Z - ContinuousLinearMap.adjoint Z = (-2 * I) • T := by
   have hA := bdd_adjoint hd hs h3 h4 Z hZ
   have key : ∀ (S : H →L[ℂ] H), (∀ x : M, S x = T x) → S = T := fun S h =>
     ContinuousLinearMap.coeFn_injective (Continuous.ext_on hd S.continuous T.continuous
@@ -176,22 +200,25 @@ theorem bdd_mul (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_
     rw [← hv.trans rfl]
     module
 
-theorem bdd_omega (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
+theorem bdd_omega
+    (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
     (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
-    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x) (Z : H →L[ℂ] H)
-    (hZ : ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H)) (v : M) :
-    Z ((Ω v : H) + I • (v : H)) = v := by
+    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x)
+    (Z : H →L[ℂ] H) (hZ : ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H))
+    (v : M)
+    : Z ((Ω v : H) + I • (v : H)) = v := by
   have hA := bdd_adjoint hd hs h3 h4 Z hZ (v + Ω (Ω v)) v (by simpa using (h4 v).symm)
   have h2 := (bdd_mul hd hs h3 h4 Z hZ).2.1
   rw [← hA, ← ContinuousLinearMap.mul_apply, h2]
   simpa using h4 v
 
-theorem bdd_comm (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
+theorem bdd_comm
+    (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫_ℂ = ⟪(x : H), Ω y⟫_ℂ)
     (h3 : ∀ x : M, ∃ v : M, (v : H) = T x ∧ (v : H) + (Ω (Ω v) : H) = x)
-    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x) (Z : H →L[ℂ] H)
-    (hZ : ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H)) (S : H →L[ℂ] H)
-    (hS : ∀ x : M, ∃ v : M, (v : H) = S x ∧ (Ω v : H) = S (Ω x)) :
-    Commute Z S ∧ Commute (ContinuousLinearMap.adjoint Z) S := by
+    (h4 : ∀ x : M, T ((x : H) + (Ω (Ω x) : H)) = x)
+    (Z : H →L[ℂ] H) (hZ : ∀ x v : M, (v : H) = T x → Z x = (Ω v : H) - I • (v : H))
+    (S : H →L[ℂ] H) (hS : ∀ x : M, ∃ v : M, (v : H) = S x ∧ (Ω v : H) = S (Ω x))
+    : Commute Z S ∧ Commute (ContinuousLinearMap.adjoint Z) S := by
   have hA := bdd_adjoint hd hs h3 h4 Z hZ
   have hST : ∀ (x p v s : M), (p : H) = S x → (v : H) = T x → (s : H) = S v → (s : H) = T p := by
     intro x p v s hp hv hs'
@@ -202,8 +229,7 @@ theorem bdd_comm (hd : Dense (M : Set H)) (hs : ∀ x y : M, ⟪(Ω x : H), y⟫
     have hts : t = Ω s' := Subtype.ext (ht1.trans hs2.symm)
     subst hts
     have hx := res_val h3 x v hv
-    have : (p : H) = (s' : H) + Ω (Ω s') := by
-      rw [hp, ← hx, map_add (f := _), ← hs1, ht2]
+    have : (p : H) = (s' : H) + Ω (Ω s') := by rw [hp, ← hx, map_add (f := _), ← hs1, ht2]
     have h5 := h4 s'
     rw [← this] at h5
     exact h5.symm
@@ -236,8 +262,8 @@ def yOf (z : ℂ) : ℝ := (z⁻¹).re
 
 def lift (g : C₀(ℝ, ℂ)) (z : ℂ) : ℂ := if z = 0 then 0 else g (yOf z)
 
-theorem circ_inv {z : ℂ} (hz : z ≠ 0) (h : z - conj z = (-2 * I) * (conj z * z)) :
-    z⁻¹ = (yOf z : ℂ) + I := by
+theorem circ_inv {z : ℂ} (hz : z ≠ 0) (h : z - conj z = (-2 * I) * (conj z * z))
+    : z⁻¹ = (yOf z : ℂ) + I := by
   have hc : conj z ≠ 0 := (map_ne_zero _).2 hz
   have h1 : z⁻¹ - conj z⁻¹ = 2 * I := by
     rw [map_inv₀]
@@ -251,10 +277,10 @@ theorem circ_inv {z : ℂ} (hz : z ≠ 0) (h : z - conj z = (-2 * I) * (conj z *
   · simp [yOf]
   · simpa using h2
 
-theorem spec_circle (Z : A) (hn : IsStarNormal Z)
-    (hsp : Z - star Z = (-2 * I) • (star Z * Z)) :
-    ∀ z ∈ spectrum ℂ Z, z - conj z = (-2 * I) * (conj z * z) := by
-  have hcj : ContinuousOn (fun z : ℂ => conj z) (spectrum ℂ Z) := Complex.continuous_conj.continuousOn
+theorem spec_circle (Z : A) (hn : IsStarNormal Z) (hsp : Z - star Z = (-2 * I) • (star Z * Z))
+    : ∀ z ∈ spectrum ℂ Z, z - conj z = (-2 * I) * (conj z * z) := by
+  have hcj : ContinuousOn (fun z : ℂ => conj z) (spectrum ℂ Z) :=
+    Complex.continuous_conj.continuousOn
   have h1 : cfc (fun z : ℂ => conj z) Z = star Z := cfc_star_id (R := ℂ) Z
   have h2 : cfc (fun z : ℂ => z) Z = Z := cfc_id' ℂ Z
   have e1 : cfc (fun z : ℂ => z - conj z) Z = Z - star Z := by
@@ -262,13 +288,16 @@ theorem spec_circle (Z : A) (hn : IsStarNormal Z)
   have e2 : cfc (fun z : ℂ => (-2 * I) * (conj z * z)) Z = (-2 * I) • (star Z * Z) := by
     rw [cfc_const_mul (-2 * I) (fun z : ℂ => conj z * z) Z (hcj.mul continuousOn_id),
       cfc_mul (fun z : ℂ => conj z) (fun z : ℂ => z) Z hcj continuousOn_id, h1, h2]
-  have h := (cfc_eq_cfc_iff_eqOn (R := ℂ) (a := Z) (f := fun z : ℂ => z - conj z)
-    (g := fun z : ℂ => (-2 * I) * (conj z * z)) hn (continuousOn_id.sub hcj)
-    (continuousOn_const.mul (hcj.mul continuousOn_id))).1 (by rw [e1, e2, hsp])
+  have h :=
+    (cfc_eq_cfc_iff_eqOn (R := ℂ) (a := Z)
+        (f := fun z : ℂ => z - conj z)
+        (g := fun z : ℂ => (-2 * I) * (conj z * z))
+        hn (continuousOn_id.sub hcj) (continuousOn_const.mul (hcj.mul continuousOn_id))).1
+      (by rw [e1, e2, hsp])
   exact fun z hz => h hz
 
-theorem tendsto_yOf (K : Set ℂ) (hK : ∀ z ∈ K, z - conj z = (-2 * I) * (conj z * z)) :
-    Tendsto yOf (𝓝[K \ {0}] 0) (cocompact ℝ) := by
+theorem tendsto_yOf (K : Set ℂ) (hK : ∀ z ∈ K, z - conj z = (-2 * I) * (conj z * z))
+    : Tendsto yOf (𝓝[K \ {0}] 0) (cocompact ℝ) := by
   rw [← Metric.cobounded_eq_cocompact, ← tendsto_norm_atTop_iff_cobounded]
   have h1 : Tendsto (fun z : ℂ => z⁻¹) (𝓝[K \ {0}] 0) (Bornology.cobounded ℂ) :=
     tendsto_inv₀_nhdsNE_zero.mono_left (nhdsWithin_mono _ fun z hz => hz.2)
@@ -283,8 +312,8 @@ theorem tendsto_yOf (K : Set ℂ) (hK : ∀ z ∈ K, z - conj z = (-2 * I) * (co
     simp
   linarith
 
-theorem lift_cont (K : Set ℂ) (hK : ∀ z ∈ K, z - conj z = (-2 * I) * (conj z * z))
-    (g : C₀(ℝ, ℂ)) : ContinuousOn (lift g) K := by
+theorem lift_cont (K : Set ℂ) (hK : ∀ z ∈ K, z - conj z = (-2 * I) * (conj z * z)) (g : C₀(ℝ, ℂ))
+    : ContinuousOn (lift g) K := by
   intro z0 hz0
   by_cases h0 : z0 = 0
   · subst h0
@@ -301,8 +330,8 @@ theorem lift_cont (K : Set ℂ) (hK : ∀ z ∈ K, z - conj z = (-2 * I) * (conj
       filter_upwards [eventually_ne_nhds h0] with z hz
       simp [lift, hz]
     have h2 : ContinuousAt (fun z => g (yOf z)) z0 :=
-      g.continuous.continuousAt.comp
-        (Complex.continuous_re.continuousAt.comp (continuousAt_inv₀ h0))
+      g.continuous.continuousAt.comp (Complex.continuous_re.continuousAt.comp (continuousAt_inv₀
+        h0))
     exact (h2.congr h1.symm).continuousWithinAt
 
 theorem lift_norm_le (g : C₀(ℝ, ℂ)) (z : ℂ) : ‖lift g z‖ ≤ ‖g‖ := by
@@ -312,29 +341,31 @@ theorem lift_norm_le (g : C₀(ℝ, ℂ)) (z : ℂ) : ‖lift g z‖ ≤ ‖g‖
   · rw [← ZeroAtInftyContinuousMap.norm_toBCF_eq_norm]
     exact g.toBCF.norm_coe_le_norm _
 
-theorem abs_calc (Z : A) (hn : IsStarNormal Z) (hsp : Z - star Z = (-2 * I) • (star Z * Z)) :
-    ∃ Φ : C₀(ℝ, ℂ) →L[ℂ] A, (∀ g h, Φ (g * h) = Φ g * Φ h) ∧ (∀ g, Φ (star g) = star (Φ g)) ∧
-      (∀ g, ‖Φ g‖ ≤ ‖g‖) ∧
-      (∀ g : C₀(ℝ, ℂ), (∀ y, g y = ((1 + y ^ 2)⁻¹ : ℝ)) → Φ g = star Z * Z) ∧
-      (∀ g h : C₀(ℝ, ℂ), (∀ y, h y = y * g y) → Z * (Φ h + I • Φ g) = Φ g) ∧
-      (∀ S : A, Commute Z S → Commute (star Z) S → ∀ g, Commute (Φ g) S) := by
+theorem abs_calc (Z : A) (hn : IsStarNormal Z) (hsp : Z - star Z = (-2 * I) • (star Z * Z))
+    : ∃ Φ : C₀(ℝ, ℂ) →L[ℂ] A,
+      (∀ g h, Φ (g * h) = Φ g * Φ h) ∧ (∀ g, Φ (star g) = star (Φ g)) ∧ (∀ g, ‖Φ g‖ ≤ ‖g‖)
+        ∧ (∀ g : C₀(ℝ, ℂ), (∀ y, g y = ((1 + y ^ 2)⁻¹ : ℝ)) → Φ g = star Z * Z)
+        ∧ (∀ g h : C₀(ℝ, ℂ), (∀ y, h y = y * g y) → Z * (Φ h + I • Φ g) = Φ g)
+        ∧ (∀ S : A, Commute Z S → Commute (star Z) S → ∀ g, Commute (Φ g) S) := by
   have hK := spec_circle Z hn hsp
   have hc : ∀ g, ContinuousOn (lift g) (spectrum ℂ Z) := lift_cont _ hK
-  have hcj : ContinuousOn (fun z : ℂ => conj z) (spectrum ℂ Z) := Complex.continuous_conj.continuousOn
+  have hcj : ContinuousOn (fun z : ℂ => conj z) (spectrum ℂ Z) :=
+    Complex.continuous_conj.continuousOn
   have hb : ∀ g, ‖cfc (lift g) Z‖ ≤ ‖g‖ := fun g =>
     norm_cfc_le (norm_nonneg g) fun z _ => lift_norm_le g z
-  let L : C₀(ℝ, ℂ) →ₗ[ℂ] A :=
-    { toFun := fun g => cfc (lift g) Z
-      map_add' := fun g h => by
-        rw [← cfc_add Z (lift g) (lift h) (hc g) (hc h)]
-        congr 1
-        funext z
-        by_cases hz : z = 0 <;> simp [lift, hz]
-      map_smul' := fun c g => by
-        rw [RingHom.id_apply, ← cfc_smul c (lift g) Z (hc g)]
-        congr 1
-        funext z
-        by_cases hz : z = 0 <;> simp [lift, hz] }
+  let L : C₀(ℝ, ℂ) →ₗ[ℂ] A := {
+    toFun := fun g => cfc (lift g) Z
+    map_add' := fun g h => by
+      rw [← cfc_add Z (lift g) (lift h) (hc g) (hc h)]
+      congr 1
+      funext z
+      by_cases hz : z = 0 <;> simp [lift, hz]
+    map_smul' := fun c g => by
+      rw [RingHom.id_apply, ← cfc_smul c (lift g) Z (hc g)]
+      congr 1
+      funext z
+      by_cases hz : z = 0 <;> simp [lift, hz]
+  }
   have hL : ∀ g, L g = cfc (lift g) Z := fun g => rfl
   refine ⟨L.mkContinuous 1 (fun g => by rw [hL, one_mul]; exact hb g), ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro g h
@@ -376,11 +407,14 @@ theorem abs_calc (Z : A) (hn : IsStarNormal Z) (hsp : Z - star Z = (-2 * I) • 
       field_simp
   · intro g h hh
     simp only [LinearMap.mkContinuous_apply, hL]
-    have h1 : Z * (cfc (lift h) Z + I • cfc (lift g) Z) =
-        cfc (fun z : ℂ => z * (lift h z + I • lift g z)) Z := by
-      rw [cfc_mul (fun z : ℂ => z) (fun z : ℂ => lift h z + I • lift g z) Z continuousOn_id
-        ((hc h).add ((hc g).const_smul I)), cfc_id' ℂ Z,
-        cfc_add Z (lift h) (fun z : ℂ => I • lift g z) (hc h) ((hc g).const_smul I),
+    have h1
+        : Z * (cfc (lift h) Z + I • cfc (lift g) Z)
+          = cfc (fun z : ℂ => z * (lift h z + I • lift g z)) Z := by
+      rw [cfc_mul
+          (fun z : ℂ => z)
+          (fun z : ℂ => lift h z + I • lift g z)
+          Z continuousOn_id ((hc h).add ((hc g).const_smul I)),
+        cfc_id' ℂ Z, cfc_add Z (lift h) (fun z : ℂ => I • lift g z) (hc h) ((hc g).const_smul I),
         cfc_smul I (lift g) Z (hc g)]
     rw [h1]
     refine cfc_congr fun z hz => ?_
@@ -403,20 +437,23 @@ theorem absFC : PositivityTheory.RgBcC.Fc.AbsFC := by
   obtain ⟨Z, hZ⟩ := exists_bdd hd hs h3
   obtain ⟨m1, m2, m3⟩ := bdd_mul hd hs h3 h4 Z hZ
   have hstar : star Z = ContinuousLinearMap.adjoint Z := ContinuousLinearMap.star_eq_adjoint Z
-  have hn : IsStarNormal Z := ⟨by
-    change star Z * Z = Z * star Z
-    rw [hstar, m1, m2]⟩
+  have hn : IsStarNormal Z :=
+    ⟨by
+      change star Z * Z = Z * star Z
+      rw [hstar, m1, m2]⟩
   have hsp : Z - star Z = (-2 * I) • (star Z * Z) := by rw [hstar, m1, m3]
   obtain ⟨Φ, p1, p2, p3, p4, p5, p6⟩ := abs_calc Z hn hsp
-  have hinj : Function.Injective Z := fun x y hxy => res_inj hd hs h3 h4 (by
-    rw [← m1, ContinuousLinearMap.mul_apply, ContinuousLinearMap.mul_apply, hxy])
+  have hinj : Function.Injective Z := fun x y hxy =>
+    res_inj hd hs h3 h4
+      (by rw [← m1, ContinuousLinearMap.mul_apply, ContinuousLinearMap.mul_apply, hxy])
   refine ⟨⟨Φ, p1, fun g => ?_, p3, fun g hg => ?_, ?_, ?_⟩⟩
   · rw [p2, ContinuousLinearMap.star_eq_adjoint]
   · rw [p4 g hg, hstar, m1]
   · intro g h hh x v hv
     have e1 := congrArg (fun A : H →L[ℂ] H => A x) (p5 g h hh)
     simp only [ContinuousLinearMap.mul_apply, ContinuousLinearMap.add_apply,
-      ContinuousLinearMap.smul_apply, ← hv] at e1
+        ContinuousLinearMap.smul_apply, ← hv]
+      at e1
     have e2 := bdd_omega hd hs h3 h4 Z hZ v
     have e3 := hinj (e1.trans e2.symm)
     exact (add_right_cancel e3).symm

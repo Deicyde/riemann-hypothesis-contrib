@@ -10,18 +10,20 @@ open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheo
 
 namespace PositivityTheory.Lit1.GEN.W_devis
 
-theorem ratioOne_of_killed_l (ℓ : ℕ) [Fact ℓ.Prime] (P : FiniteSubfield → Prop) (h : RatioOneKilled ℓ P) :
-    RatioOne ℓ P := by
+theorem ratioOne_of_killed_l
+    (ℓ : ℕ) [Fact ℓ.Prime] (P : FiniteSubfield → Prop) (h : RatioOneKilled ℓ P)
+    : RatioOne ℓ P := by
   intro K S hS hSl hP ιr M _ _ hM
   obtain ⟨r, hr⟩ := hM
   have : Finite S := hS
   induction r generalizing M with
   | zero =>
-    have : Subsingleton M := ⟨fun a b => by
-      have ha := hr a
-      have hb := hr b
-      simp only [pow_zero, one_smul] at ha hb
-      rw [ha, hb]⟩
+    have : Subsingleton M :=
+      ⟨fun a b => by
+        have ha := hr a
+        have hb := hr b
+        simp only [pow_zero, one_smul] at ha hb
+        rw [ha, hb]⟩
     exact gsEulerRatio_eq_one_of_subsingleton S M ιr
   | succ r ih =>
     letI : Module (ULift.{0} ℤ) M := M.hV2
@@ -31,12 +33,16 @@ theorem ratioOne_of_killed_l (ℓ : ℕ) [Fact ℓ.Prime] (P : FiniteSubfield �
     have hD : ∀ g, (⊤ : Submodule _ _) ≤ Submodule.comap (M.ρ g) ⊤ := fun _ => le_top
     have hSE := rangeStepComplex_shortExact T hT ⊤ hD
     have : Finite (Rep.subrepresentation M ⊤ hD) :=
-      Finite.of_injective (fun x : Rep.subrepresentation M ⊤ hD => (x.1 : M)) fun _ _ h => Subtype.ext h
+      Finite.of_injective
+        (fun x : Rep.subrepresentation M ⊤ hD => (x.1 : M))
+        fun _ _ h => Subtype.ext h
     have : Finite (Rep.subrepresentation M _ (inf_ker_le_comap T hT ⊤ hD)) :=
-      Finite.of_injective (fun x : Rep.subrepresentation M _ (inf_ker_le_comap T hT ⊤ hD) => (x.1 : M))
+      Finite.of_injective
+        (fun x : Rep.subrepresentation M _ (inf_ker_le_comap T hT ⊤ hD) => (x.1 : M))
         fun _ _ h => Subtype.ext h
     have : Finite (Rep.subrepresentation M _ (map_le_comap T hT ⊤ hD)) :=
-      Finite.of_injective (fun x : Rep.subrepresentation M _ (map_le_comap T hT ⊤ hD) => (x.1 : M))
+      Finite.of_injective
+        (fun x : Rep.subrepresentation M _ (map_le_comap T hT ⊤ hD) => (x.1 : M))
         fun _ _ h => Subtype.ext h
     have hl : ∃ r : ℕ, ∀ m : (rangeStepComplex T hT ⊤ hD).X₂, (ℓ ^ r) • m = 0 :=
       ⟨r + 1, fun m => Subtype.ext (hr m.1)⟩

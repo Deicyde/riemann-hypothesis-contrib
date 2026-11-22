@@ -9,8 +9,8 @@ noncomputable section
 
 namespace PI.ProdFormulaE.TrIntP
 
-theorem norm_le_one_of_isIntegral {ℓ : ℕ} [Fact ℓ.Prime] {t : ℚ_[ℓ]} (ht : IsIntegral ℤ t) :
-    ‖t‖ ≤ 1 := by
+theorem norm_le_one_of_isIntegral {ℓ : ℕ} [Fact ℓ.Prime] {t : ℚ_[ℓ]} (ht : IsIntegral ℤ t)
+    : ‖t‖ ≤ 1 := by
   have ht' : IsIntegral ℤ_[ℓ] t := ht.tower_top
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.1 ht'
   rw [← hy]

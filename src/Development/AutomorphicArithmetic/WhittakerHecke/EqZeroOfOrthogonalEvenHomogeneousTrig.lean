@@ -33,11 +33,14 @@ private lemma UpperTheory.fourier_vanishing_homogeneous (F : ℝ → ℂ) (hc : 
     Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one, Matrix.head_cons]
   rw [hpow, he]
 
-theorem UpperTheory.eq_zero_of_orthogonal_even_homogeneous_trig :
-    ∀ (F : ℝ → ℂ), Continuous F → (∀ t, F (t + Real.pi) = F t) →
-        (∀ (e : ℕ) (p : MvPolynomial (Fin 2) ℂ), p.IsHomogeneous (2 * e) →
-          ∫ t in (0 : ℝ)..2 * Real.pi, MvPolynomial.eval ![(Real.sin t : ℂ), (Real.cos t : ℂ)] p * F t = 0) →
-        ∀ t, F t = 0 := by
+theorem UpperTheory.eq_zero_of_orthogonal_even_homogeneous_trig
+    : ∀ (F : ℝ → ℂ),
+      Continuous F → (∀ t, F (t + Real.pi) = F t)
+        → (∀ (e : ℕ) (p : MvPolynomial (Fin 2) ℂ),
+          p.IsHomogeneous (2 * e)
+            → ∫ t in (0 : ℝ)..2 * Real.pi, MvPolynomial.eval ![(Real.sin t : ℂ), (Real.cos t : ℂ)] p * F t
+              = 0)
+        → ∀ t, F t = 0 := by
   intro F hc hp h
   haveI : Fact (0 < Real.pi) := ⟨Real.pi_pos⟩
   have hper : Function.Periodic F Real.pi := hp
@@ -49,22 +52,24 @@ theorem UpperTheory.eq_zero_of_orthogonal_even_homogeneous_trig :
     intro n
     have hG : Function.Periodic (fun t : ℝ => cexp ((-(2 * n : ℂ)) * (t * I)) * F t) Real.pi := by
       intro t
-      have h1 : cexp ((-(2 * n : ℂ)) * (((t + Real.pi : ℝ) : ℂ) * I)) =
-          cexp ((-(2 * n : ℂ)) * (t * I)) := by
-        have : (-(2 * n : ℂ)) * (((t + Real.pi : ℝ) : ℂ) * I) =
-            (-(2 * n : ℂ)) * (t * I) + ((-n : ℤ) : ℂ) * (2 * Real.pi * I) := by
+      have h1
+          : cexp ((-(2 * n : ℂ)) * (((t + Real.pi : ℝ) : ℂ) * I))
+            = cexp ((-(2 * n : ℂ)) * (t * I)) := by
+        have : (-(2 * n : ℂ)) * (((t + Real.pi : ℝ) : ℂ) * I)
+            = (-(2 * n : ℂ)) * (t * I) + ((-n : ℤ) : ℂ) * (2 * Real.pi * I) := by
           push_cast; ring
         rw [this, exp_add, exp_int_mul_two_pi_mul_I, mul_one]
       simp only [h1, hp]
-    have hcont : Continuous (fun t : ℝ => cexp ((-(2 * n : ℂ)) * (t * I)) * F t) := by
-      fun_prop
-    have hsplit : ∫ t in (0 : ℝ)..2 * Real.pi, cexp ((-(2 * n : ℂ)) * (t * I)) * F t =
-        2 * ∫ t in (0 : ℝ)..Real.pi, cexp ((-(2 * n : ℂ)) * (t * I)) * F t := by
-      rw [← intervalIntegral.integral_add_adjacent_intervals
-        (hcont.intervalIntegrable 0 Real.pi) (hcont.intervalIntegrable Real.pi (2 * Real.pi))]
+    have hcont : Continuous (fun t : ℝ => cexp ((-(2 * n : ℂ)) * (t * I)) * F t) := by fun_prop
+    have hsplit
+        : ∫ t in (0 : ℝ)..2 * Real.pi, cexp ((-(2 * n : ℂ)) * (t * I)) * F t
+          = 2 * ∫ t in (0 : ℝ)..Real.pi, cexp ((-(2 * n : ℂ)) * (t * I)) * F t := by
+      rw [← intervalIntegral.integral_add_adjacent_intervals (hcont.intervalIntegrable 0 Real.pi)
+        (hcont.intervalIntegrable Real.pi (2 * Real.pi))]
       have := hG.intervalIntegral_add_eq Real.pi 0
       rw [show Real.pi + Real.pi = 2 * Real.pi by ring, zero_add] at this
-      rw [this]; ring
+      rw [this]
+      ring
     have hz : ∫ t in (0 : ℝ)..2 * Real.pi, cexp ((-(2 * n : ℂ)) * (t * I)) * F t = 0 := by
       rcases le_total 0 n with hn | hn
       · have := UpperTheory.fourier_vanishing_homogeneous F hc hp h (-1) (Or.inr rfl) n.toNat
@@ -87,8 +92,10 @@ theorem UpperTheory.eq_zero_of_orthogonal_even_homogeneous_trig :
   have hF : ∀ n : ℤ, fourierCoeff f n = 0 := by
     intro n
     rw [fourierCoeff_eq_intervalIntegral _ n 0, zero_add]
-    have e : ∀ x : ℝ, fourier (-n) (x : AddCircle Real.pi) • f (x : AddCircle Real.pi) =
-        cexp ((-(2 * n : ℂ)) * (x * I)) * F x := by
+    have e
+        : ∀ x : ℝ,
+          fourier (-n) (x : AddCircle Real.pi) • f (x : AddCircle Real.pi)
+            = cexp ((-(2 * n : ℂ)) * (x * I)) * F x := by
       intro x
       have hpi : (Real.pi : ℂ) ≠ 0 := ofReal_ne_zero.2 Real.pi_ne_zero
       rw [fourier_coe_apply, smul_eq_mul, hfx]

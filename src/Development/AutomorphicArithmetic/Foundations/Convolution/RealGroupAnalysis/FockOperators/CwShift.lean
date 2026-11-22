@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Fo
 open scoped Classical
 
@@ -28,9 +30,10 @@ private lemma cw_shift {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
     rw [h1]
     simp [hij]
 
-theorem UpperTheory.ConvolutionTheory.R2.Fo.weyl :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (O : Ops F) w w' i j, O.x w i * O.x w' j = O.x w' j * O.x w i ∧
-    O.d w i * O.x w' j = O.x w' j * O.d w i + if w = w' ∧ i = j then 1 else 0 := by
+theorem UpperTheory.ConvolutionTheory.R2.Fo.weyl
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (O : Ops F) w w' i j,
+      O.x w i * O.x w' j = O.x w' j * O.x w i
+        ∧ O.d w i * O.x w' j = O.x w' j * O.d w i + if w = w' ∧ i = j then 1 else 0 := by
   intro F _ _ _ O w w' i j
   refine ⟨?_, ?_⟩
   · refine LinearMap.ext fun φ => Subtype.ext (funext fun v => ?_)
@@ -41,7 +44,9 @@ theorem UpperTheory.ConvolutionTheory.R2.Fo.weyl :
     have hv : (v + Pi.single i (at1 w 0) : V4 F) = v := by rw [h0]; simp
     set C : Prop := w = w' ∧ i = j with hC
     have hg := O.d_spec w i φ v
-    have hh : HasDerivAt (fun t : ℝ => cw w' (v j) + if C then (t : ℂ) else 0) (if C then 1 else 0) 0 := by
+    have hh : HasDerivAt
+        (fun t : ℝ => cw w' (v j) + if C then (t : ℂ) else 0)
+        (if C then 1 else 0) 0 := by
       by_cases c : C
       · simp only [if_pos c]
         exact (Complex.ofRealCLM.hasDerivAt (x := (0 : ℝ))).const_add _ |>.congr_deriv (by simp)
@@ -49,14 +54,17 @@ theorem UpperTheory.ConvolutionTheory.R2.Fo.weyl :
         exact hasDerivAt_const _ _
     have hm := hh.mul hg
     have hd := O.d_spec w i (O.x w' j φ) v
-    have he : (fun t : ℝ => (O.x w' j φ).1 (v + Pi.single i (at1 w t) : V4 F)) =
-        (fun t : ℝ => cw w' (v j) + if C then (t : ℂ) else 0) * fun t : ℝ => φ.1 (v + Pi.single i (at1 w t) : V4 F) := by
+    have he
+        : (fun t : ℝ => (O.x w' j φ).1 (v + Pi.single i (at1 w t) : V4 F))
+          = (fun t : ℝ => cw w' (v j) + if C then (t : ℂ) else 0)
+            * fun t : ℝ => φ.1 (v + Pi.single i (at1 w t) : V4 F) := by
       funext t
       rw [O.x_apply, cw_shift]
       rfl
     rw [he] at hd
     have hu := hd.unique hm
-    change (O.d w i (O.x w' j φ)).1 v = (O.x w' j (O.d w i φ)).1 v + ((if C then (1 : Module.End ℂ (S4 F)) else 0) φ).1 v
+    change (O.d w i (O.x w' j φ)).1 v
+      = (O.x w' j (O.d w i φ)).1 v + ((if C then (1 : Module.End ℂ (S4 F)) else 0) φ).1 v
     rw [hu, O.x_apply, hv]
     by_cases c : C
     · simp [c]; ring

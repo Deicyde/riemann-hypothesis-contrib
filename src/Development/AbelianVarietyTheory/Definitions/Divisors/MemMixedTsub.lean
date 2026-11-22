@@ -12,8 +12,9 @@ open WittVector Ideal Matrix
 
 namespace GlobalTheory.Sandwich.Model
 
-variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 theorem xi_eq (ε : PreTilt O p) : xi ε = ReciprocityTheory.PGsh.Ainf.xi p O ε := rfl
 
@@ -21,9 +22,11 @@ theorem nu_eq (ε : PreTilt O p) : nu ε = ReciprocityTheory.PGsh.Ainf.nu p O ε
 
 section Field
 
-variable {C : Type} [Field C] [IsAlgClosed C] [CharZero C] {v : Valuation C NNReal} [Algebra O C]
-  (hv : v.Integers O) {ε : PreTilt O p}
-  (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
+variable
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal} [Algebra O C]
+  (hv : v.Integers O)
+  {ε : PreTilt O p} (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
 include hv hε
 
 theorem theta_mu : fontaineTheta O p (mu ε) = 0 := by

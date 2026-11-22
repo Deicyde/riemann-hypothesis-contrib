@@ -6,22 +6,38 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitsPatch
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.Pinch
 
-theorem unit_lift_near_fibre : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z), IsPullback i' p' p i → IsFinite p → IsClosedImmersion i → ∀ (W : X.Opens) (x : X), x ∈ W → ∀ u : Γ(Z', i' ⁻¹ᵁ (p ⁻¹ᵁ W))ˣ, ∃ (W' : X.Opens) (u' : Γ(X', p ⁻¹ᵁ W')ˣ), W' ≤ W ∧ x ∈ W' ∧ ∀ z : Z', p (i' z) ∈ W' → gm i' z (p ⁻¹ᵁ W') u' = gm (𝟙 Z') z (i' ⁻¹ᵁ (p ⁻¹ᵁ W)) u := by
+theorem unit_lift_near_fibre
+    : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z),
+      IsPullback i' p' p i → IsFinite p → IsClosedImmersion i
+        → ∀ (W : X.Opens) (x : X),
+          x ∈ W
+            → ∀ u : Γ(Z', i' ⁻¹ᵁ (p ⁻¹ᵁ W))ˣ, ∃ (W' : X.Opens) (u' : Γ(X', p ⁻¹ᵁ W')ˣ),
+              W' ≤ W ∧ x ∈ W'
+                ∧ ∀ z : Z',
+                  p (i' z) ∈ W' → gm i' z (p ⁻¹ᵁ W') u' = gm (𝟙 Z') z (i' ⁻¹ᵁ (p ⁻¹ᵁ W)) u := by
   intro X X' Z Z' p i i' p' h hp hi W x hx u
   have hi' : IsClosedImmersion i' := MorphismProperty.of_isPullback h.flip hi
   have hw : ∀ z : Z', p (i' z) = i (p' z) := fun z => by
     rw [← Scheme.Hom.comp_apply, h.w, Scheme.Hom.comp_apply]
   by_cases hxr : x ∈ Set.range i
   swap
-  · refine ⟨W ⊓ ⟨(Set.range i)ᶜ, i.isClosedEmbedding.isClosed_range.isOpen_compl⟩, 1, inf_le_left, ⟨hx, hxr⟩,
-      fun z hz => ?_⟩
+  · refine ⟨
+      W ⊓ ⟨(Set.range i)ᶜ, i.isClosedEmbedding.isClosed_range.isOpen_compl⟩,
+      1,
+      inf_le_left,
+      ⟨hx, hxr⟩,
+      fun z hz => ?_
+    ⟩
     exact absurd ⟨p' z, (hw z).symm⟩ hz.2
   obtain ⟨z0, hz0⟩ := hxr
   obtain ⟨W₀, hW₀, hxW₀, hW₀W⟩ := exists_isAffineOpen_mem_and_subset hx
@@ -43,16 +59,19 @@ theorem unit_lift_near_fibre : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : 
     apply hyC
     have hz'W : z' ∈ i' ⁻¹ᵁ (p ⁻¹ᵁ W₀) := by
       show p (i' z') ∈ W₀
-      rw [hz'1, hy]; exact hxW₀
+      rw [hz'1, hy]
+      exact hxW₀
     have : z' ∈ i' ⁻¹ᵁ X'.basicOpen t := by
       rw [Scheme.preimage_basicOpen, ht, Scheme.basicOpen_of_isUnit _ hu0]
       exact hz'W
-    rw [← hz'1]; exact this
+    rw [← hz'1]
+    exact this
   have hle' : p ⁻¹ᵁ W' ≤ p ⁻¹ᵁ W₀ := hsub.trans (X'.basicOpen_le t)
   have hunit : IsUnit ((X'.presheaf.map (homOfLE hle').op).hom t) := by
     have := (X'.toRingedSpace.isUnit_res_basicOpen t).map (X'.presheaf.map (homOfLE hsub).op).hom
     convert this using 1
-    change _ = (X'.presheaf.map (homOfLE (X'.basicOpen_le t)).op ≫ X'.presheaf.map (homOfLE hsub).op).hom t
+    change _
+      = (X'.presheaf.map (homOfLE (X'.basicOpen_le t)).op ≫ X'.presheaf.map (homOfLE hsub).op).hom t
     rw [← Functor.map_comp]
     rfl
   refine ⟨W', hunit.unit, inf_le_left.trans hle0, hx', fun z hz => ?_⟩

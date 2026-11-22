@@ -9,8 +9,9 @@ public import Mathlib.GroupTheory.Sylow
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.phiLe :
-    ∀ (p : ℕ) [Fact p.Prime] (P : Type) [Group P] [Finite P], IsPGroup p P → ∀ K : Subgroup P, IsCoatom K → K.Normal ∧ K.index = p ∧ phi p P ≤ K := by
+theorem UpperTheory.V.CF.phiLe
+    : ∀ (p : ℕ) [Fact p.Prime] (P : Type) [Group P] [Finite P],
+      IsPGroup p P → ∀ K : Subgroup P, IsCoatom K → K.Normal ∧ K.index = p ∧ phi p P ≤ K := by
   intro p _ P _ _ hP K hK
   have hnil : Group.IsNilpotent P := hP.isNilpotent
   have hN : K.Normal :=
@@ -49,10 +50,8 @@ theorem UpperTheory.V.CF.phiLe :
       rw [h] at this
       rw [(QuotientGroup.eq_one_iff g).mpr this, orderOf_one] at hx
       exact (Fact.out : p.Prime).one_lt.ne hx
-  have hcard : Nat.card (P ⧸ K) = p := by
-    rw [← Subgroup.card_top, ← htop, Nat.card_zpowers, hx]
-  have hidx : K.index = p := by
-    rw [Subgroup.index, hcard]
+  have hcard : Nat.card (P ⧸ K) = p := by rw [← Subgroup.card_top, ← htop, Nat.card_zpowers, hx]
+  have hidx : K.index = p := by rw [Subgroup.index, hcard]
   refine ⟨hidx, ?_⟩
   have hcomm : ∀ a b : P ⧸ K, a * b = b * a := by
     intro a b

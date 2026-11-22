@@ -11,12 +11,16 @@ noncomputable section
 
 namespace GlobalTheory.PeriodRowsCompare
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
-theorem isTypeFn_letters (c : Coeff l) (σ : c.F →+* ℂ) (hσ : GoodEmb c σ) {g : ℕ}
-    (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ)) : IsTypeFn H Dw.p Dw.q (fun j => relab c σ (e j).1) := by
+theorem isTypeFn_letters
+    (c : Coeff l) (σ : c.F →+* ℂ) (hσ : GoodEmb c σ)
+    {g : ℕ} (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+    : IsTypeFn H Dw.p Dw.q (fun j => relab c σ (e j).1) := by
   classical
   have hinj : Function.Injective (relab c σ) := by
     intro τ₁ τ₂ h
@@ -36,14 +40,17 @@ theorem isTypeFn_letters (c : Coeff l) (σ : c.F →+* ℂ) (hσ : GoodEmb c σ)
       Equiv.subtypeEquivRight (fun i => hinj.eq_iff)
     have e2 : {i // (e i).1 = τ₀} ≃ {s : Σ τ : E →+* ℂ, Fin (Dw.mult τ) // s.1 = τ₀} :=
       e.subtypeEquiv (fun _ => Iff.rfl)
-    rw [Nat.card_congr (e1.trans (e2.trans (Equiv.sigmaSubtype τ₀))), Nat.card_eq_fintype_card, Fintype.card_fin]
+    rw [Nat.card_congr (e1.trans (e2.trans (Equiv.sigmaSubtype τ₀))), Nat.card_eq_fintype_card,
+      Fintype.card_fin]
   refine ⟨fun h => ?_, fun h => ?_⟩
   · rw [hcard]
     exact if_pos ((hrel τ₀).1 h)
   · rw [hcard]
     exact if_neg (fun h' => h ((hrel τ₀).2 h'))
 
-variable {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {g : ℕ}
-  {e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ)} {F : GlobalTheory.IndefiniteRowSideFullHecke.ModelFamilies.FamAt Xo c σ e} {r : ℕ}
+variable
+  {Xo : Moduli Dw l} {c : Coeff l}
+  {σ : c.F →+* ℂ} {g : ℕ} {e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ)}
+  {F : GlobalTheory.IndefiniteRowSideFullHecke.ModelFamilies.FamAt Xo c σ e} {r : ℕ}
 
 end GlobalTheory.PeriodRowsCompare

@@ -11,10 +11,12 @@ open scoped FourierTransform ContDiff
 
 namespace GlobalTheory.JSW.MirCinf
 
-theorem integral_eq_integral_mulLeft_matrixInf (E : Type) [Field E] [NumberField E] (n : ℕ)
-    (A : GL (Fin n) (Cinf E)) (F : (Fin n → Fin n → Cinf E) → ℂ) :
-    ∫ a, F a = ∫ h : (Fin n → Fin n → Cinf E), ((jacInf (A : Matrix (Fin n) (Fin n) (Cinf E)) : ℝ) : ℂ) *
-      F (fun i j => ((A : Matrix (Fin n) (Fin n) (Cinf E)) * Matrix.of h) i j) := by
+theorem integral_eq_integral_mulLeft_matrixInf
+    (E : Type) [Field E] [NumberField E]
+    (n : ℕ) (A : GL (Fin n) (Cinf E)) (F : (Fin n → Fin n → Cinf E) → ℂ)
+    : ∫ a, F a
+      = ∫ h : (Fin n → Fin n → Cinf E), ((jacInf (A : Matrix (Fin n) (Fin n) (Cinf E)) : ℝ) : ℂ) *
+        F (fun i j => ((A : Matrix (Fin n) (Fin n) (Cinf E)) * Matrix.of h) i j) := by
   set W := InfinitePlace E
   set M : Matrix (Fin n) (Fin n) (Cinf E) := (A : Matrix (Fin n) (Fin n) (Cinf E)) with hM
   set L : (Fin n → Fin n → Cinf E) →ₗ[ℝ] (Fin n → Fin n → Cinf E) :=
@@ -29,19 +31,24 @@ theorem integral_eq_integral_mulLeft_matrixInf (E : Type) [Field E] [NumberField
         rw [Matrix.mul_smul, Matrix.smul_apply] } with hLdef
   have hL : ∀ h, L h = fun i j => (M * Matrix.of h) i j := fun h => rfl
 
-  let e : (Fin n → Fin n → Cinf E) ≃ₗ[ℝ] (W → Fin n → Fin n → ℂ) :=
-    { toFun := fun h w i j => h i j w
-      invFun := fun g i j w => g w i j
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+  let e : (Fin n → Fin n → Cinf E) ≃ₗ[ℝ] (W → Fin n → Fin n → ℂ) := {
+    toFun := fun h w i j => h i j w
+    invFun := fun g i j w => g w i j
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
   let Lw : W → (Fin n → Fin n → ℂ) →ₗ[ℝ] (Fin n → Fin n → ℂ) := fun w =>
     (LinearMap.mulLeft ℂ (M.map (fun z => z w))).restrictScalars ℝ
-  have hconj : (e : _ →ₗ[ℝ] _) ∘ₗ L ∘ₗ (e.symm : _ →ₗ[ℝ] _) =
-      LinearMap.pi (fun w => Lw w ∘ₗ LinearMap.proj w) := by
-    apply LinearMap.ext; intro g; funext w i j
-    change (M * Matrix.of (fun i j w => g w i j)) i j w = (M.map (fun z => z w) * Matrix.of (g w)) i j
+  have hconj
+      : (e : _ →ₗ[ℝ] _) ∘ₗ L ∘ₗ (e.symm : _ →ₗ[ℝ] _)
+        = LinearMap.pi (fun w => Lw w ∘ₗ LinearMap.proj w) := by
+    apply LinearMap.ext
+    intro g
+    funext w i j
+    change (M * Matrix.of (fun i j w => g w i j)) i j w
+      = (M.map (fun z => z w) * Matrix.of (g w)) i j
     simp [Matrix.mul_apply, Finset.sum_apply, Matrix.map_apply]
   have hdetw : ∀ w, LinearMap.det (Lw w) = Complex.normSq (M.det w) ^ n := by
     intro w
@@ -63,8 +70,9 @@ theorem integral_eq_integral_mulLeft_matrixInf (E : Type) [Field E] [NumberField
     have : IsUnit (M.det w) := hu.map (Pi.evalRingHom (fun _ : W => ℂ) w)
     exact this.ne_zero h0
   have hd0 : LinearMap.det L ≠ 0 := by rw [hdet]; exact hpos.ne'
-  have hmap : Measure.map L (volume : Measure (Fin n → Fin n → Cinf E)) =
-      ENNReal.ofReal |(LinearMap.det L)⁻¹| • volume :=
+  have hmap
+      : Measure.map L (volume : Measure (Fin n → Fin n → Cinf E))
+        = ENNReal.ofReal |(LinearMap.det L)⁻¹| • volume :=
     Measure.map_linearMap_addHaar_eq_smul_addHaar volume hd0
   set Le : (Fin n → Fin n → Cinf E) ≃L[ℝ] (Fin n → Fin n → Cinf E) :=
     (LinearMap.equivOfDetNeZero L hd0).toContinuousLinearEquiv
@@ -73,7 +81,8 @@ theorem integral_eq_integral_mulLeft_matrixInf (E : Type) [Field E] [NumberField
     rw [← hLe]; exact Le.toHomeomorph.measurableEmbedding
   simp_rw [← hL]
   rw [integral_const_mul, ← hemb.integral_map, hmap, integral_smul_measure, hdet,
-    abs_of_pos (inv_pos.2 hpos), ENNReal.toReal_ofReal (inv_pos.2 hpos).le, Complex.real_smul, ← mul_assoc]
+    abs_of_pos (inv_pos.2 hpos), ENNReal.toReal_ofReal (inv_pos.2 hpos).le, Complex.real_smul,
+    ← mul_assoc]
   push_cast
   rw [mul_inv_cancel₀ (by exact_mod_cast hpos.ne'), one_mul]
 

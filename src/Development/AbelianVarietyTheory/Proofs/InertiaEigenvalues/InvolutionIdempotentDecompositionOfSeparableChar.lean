@@ -20,22 +20,24 @@ section Generic
 
 variable {R : Type} [CommRing R]
 
-def FieldIdem (f : R) : Prop :=
-  IsIdempotentElem f ∧ f ≠ 0 ∧ ∀ y, f * y ≠ 0 → ∃ z, f * y * z = f
+def FieldIdem (f : R) : Prop := IsIdempotentElem f ∧ f ≠ 0 ∧ ∀ y, f * y ≠ 0 → ∃ z, f * y * z = f
 
-theorem FieldIdem.mul_eq_left {u v : R} (hu : FieldIdem u) (hv : IsIdempotentElem v) (h : u * v ≠ 0) :
-    u * v = u := by
+theorem FieldIdem.mul_eq_left {u v : R} (hu : FieldIdem u) (hv : IsIdempotentElem v) (h : u * v ≠ 0)
+    : u * v = u := by
   obtain ⟨z, hz⟩ := hu.2.2 v h
-  calc u * v = (u * v * z) * v := by rw [hz]
+  calc
+    u * v
+      = (u * v * z) * v := by rw [hz]
     _ = u * v * z * v := rfl
     _ = u * (v * v) * z := by ring
     _ = u := by rw [hv.eq, hz]
 
-theorem FieldIdem.eq_of_mul_ne_zero {u v : R} (hu : FieldIdem u) (hv : FieldIdem v) (h : u * v ≠ 0) :
-    u = v := by
+theorem FieldIdem.eq_of_mul_ne_zero {u v : R} (hu : FieldIdem u) (hv : FieldIdem v) (h : u * v ≠ 0)
+    : u = v := by
   have h1 : u * v = u := hu.mul_eq_left hv.1 h
   have h2 : v * u = v := hv.mul_eq_left hu.1 (by rwa [mul_comm])
-  calc u = u * v := h1.symm
+  calc
+    u = u * v := h1.symm
     _ = v * u := mul_comm _ _
     _ = v := h2
 
@@ -56,9 +58,9 @@ theorem FieldIdem.map {u : R} (hu : FieldIdem u) (σ : R ≃+* R) : FieldIdem (�
     have h1 := congrArg σ hz
     rwa [map_mul, map_mul, RingEquiv.apply_symm_apply] at h1
 
-theorem exists_fieldIdem_family [IsReduced R] [IsArtinianRing R] :
-    ∃ (M : Type) (_ : Fintype M) (f : M → R), CompleteOrthogonalIdempotents f ∧ ∀ m, FieldIdem (f m) := by
-
+theorem exists_fieldIdem_family [IsReduced R] [IsArtinianRing R]
+    : ∃ (M : Type) (_ : Fintype M) (f : M → R),
+      CompleteOrthogonalIdempotents f ∧ ∀ m, FieldIdem (f m) := by
   let φ := IsArtinianRing.equivPi R
   have : Fintype (MaximalSpectrum R) := Fintype.ofFinite _
   have hc : CompleteOrthogonalIdempotents (fun m : MaximalSpectrum R => φ.symm (Pi.single m 1)) :=
@@ -97,8 +99,8 @@ theorem exists_fieldIdem_family [IsReduced R] [IsArtinianRing R] :
 
 end Generic
 
-theorem exists_isPre (K : UQ) (B : InvAlg K) (hP : B.P.Separable) :
-    ∃ (ι : Type) (_ : Fintype ι) (e : ι → B.A) (S : Finset ι), IsPre B e S := by
+theorem exists_isPre (K : UQ) (B : InvAlg K) (hP : B.P.Separable)
+    : ∃ (ι : Type) (_ : Fintype ι) (e : ι → B.A) (S : Finset ι), IsPre B e S := by
   have := InvAlg.isReduced_of_separable_P K B hP
   have : IsArtinianRing B.A := IsArtinianRing.of_finite K.E B.A
   obtain ⟨M, _, f, hf, hF⟩ := exists_fieldIdem_family (R := B.A)
@@ -112,7 +114,9 @@ theorem exists_isPre (K : UQ) (B : InvAlg K) (hP : B.P.Separable) :
       by_contra h
       exact hcon m' (hσ.eq_of_mul_ne_zero (hF m') h)
     apply hσ.2.1
-    calc B.σ (f m) = B.σ (f m) * 1 := (mul_one _).symm
+    calc
+      B.σ (f m)
+        = B.σ (f m) * 1 := (mul_one _).symm
       _ = ∑ m', B.σ (f m) * f m' := by rw [← hf.complete, Finset.mul_sum]
       _ = 0 := Finset.sum_eq_zero (fun m' _ => hzero m')
   choose τ hτ using hex
@@ -120,18 +124,22 @@ theorem exists_isPre (K : UQ) (B : InvAlg K) (hP : B.P.Separable) :
     intro a b hab
     by_contra h
     apply (hF a).2.1
-    calc f a = f a * f a := (hF a).1.eq.symm
+    calc
+      f a
+        = f a * f a := (hF a).1.eq.symm
       _ = f a * f b := congrArg (f a * ·) hab
       _ = 0 := hf.ortho h
   have hττ : ∀ m, τ (τ m) = m := by
     intro m
     apply finj
-    calc f (τ (τ m)) = B.σ (f (τ m)) := (hτ (τ m)).symm
+    calc
+      f (τ (τ m))
+        = B.σ (f (τ m)) := (hτ (τ m)).symm
       _ = B.σ (B.σ (f m)) := by rw [hτ m]
       _ = f m := B.σ_σ _
 
-  obtain ⟨rep, rep_mem, rep_tau⟩ : ∃ rep : M → M, (∀ m, rep m = m ∨ rep m = τ m) ∧
-      ∀ m, rep (τ m) = rep m := by
+  obtain ⟨rep, rep_mem, rep_tau⟩
+      : ∃ rep : M → M, (∀ m, rep m = m ∨ rep m = τ m) ∧ ∀ m, rep (τ m) = rep m := by
     let enc := Fintype.equivFin M
     refine ⟨fun m => if enc m ≤ enc (τ m) then m else τ m, fun m => ?_, fun m => ?_⟩
     · dsimp only
@@ -161,15 +169,18 @@ theorem exists_isPre (K : UQ) (B : InvAlg K) (hP : B.P.Separable) :
       · exact Or.inl (h'.symm.trans h)
       · right
         have h3 : τ m = i.1 := h'.symm.trans h
-        calc m = τ (τ m) := (hττ m).symm
+        calc
+          m = τ (τ m) := (hττ m).symm
           _ = τ i.1 := by rw [h3]
     · rintro (h | h)
       · rw [h]
         exact i.2
       · rw [h, rep_tau]
         exact i.2
-  obtain ⟨e, he⟩ : ∃ e : {m : M // rep m = m} → B.A,
-      ∀ i, e i = ∑ m ∈ Finset.univ.filter (fun m => g m = i), f m := ⟨_, fun _ => rfl⟩
+  obtain ⟨e, he⟩
+      : ∃ e : {m : M // rep m = m} → B.A, ∀ i,
+        e i = ∑ m ∈ Finset.univ.filter (fun m => g m = i), f m :=
+    ⟨_, fun _ => rfl⟩
   have hsum : ∀ i, e i = if τ i.1 = i.1 then f i.1 else f i.1 + f (τ i.1) := by
     intro i
     have hfil : Finset.univ.filter (fun m => g m = i) = {i.1, τ i.1} := by
@@ -181,8 +192,14 @@ theorem exists_isPre (K : UQ) (B : InvAlg K) (hP : B.P.Separable) :
     split_ifs with h
     · simp [h]
     · exact Finset.sum_pair (Ne.symm h)
-  refine ⟨{m : M // rep m = m}, inferInstance, e, Finset.univ.filter (fun i => τ i.1 = i.1),
-    ⟨⟨fun i => ?_, fun i j hij => ?_⟩, ?_⟩, fun i => ?_⟩
+  refine ⟨
+    {m : M // rep m = m},
+    inferInstance,
+    e,
+    Finset.univ.filter (fun i => τ i.1 = i.1),
+    ⟨⟨fun i => ?_, fun i j hij => ?_⟩, ?_⟩,
+    fun i => ?_
+  ⟩
   · rw [he]
     exact hf.1.isIdempotentElem_sum
   · show e i * e j = 0
@@ -202,7 +219,9 @@ theorem exists_isPre (K : UQ) (B : InvAlg K) (hP : B.P.Separable) :
     · have hi' : τ i.1 ≠ i.1 := fun h => hi (Finset.mem_filter.mpr ⟨Finset.mem_univ _, h⟩)
       exact ⟨by rw [hτ]; exact hf.ortho (Ne.symm hi'), by rw [hsum i, if_neg hi', hτ]⟩
 
-theorem isPre_of_separable : ∀ (K : UQ) (B : InvAlg K), B.P.Separable →
-    ∃ (ι : Type) (_ : Fintype ι) (e : ι → B.A) (S : Finset ι), IsPre B e S := fun K B hP => exists_isPre K B hP
+theorem isPre_of_separable
+    : ∀ (K : UQ) (B : InvAlg K),
+      B.P.Separable → ∃ (ι : Type) (_ : Fintype ι) (e : ι → B.A) (S : Finset ι), IsPre B e S :=
+  fun K B hP => exists_isPre K B hP
 
 end GlobalTheory.UnitLemma.Desc

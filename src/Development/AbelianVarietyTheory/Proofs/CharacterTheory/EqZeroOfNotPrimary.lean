@@ -10,9 +10,12 @@ open Polynomial GlobalTheory.CuspGL
 
 namespace GlobalTheory.CuspGL
 
-theorem irreducible_dvd_of_dvd_charpoly_of_aeval_eq_zero {F : Type} [Field F] {V : Type} [AddCommGroup V]
-    [Module F V] [FiniteDimensional F V] (T : Module.End F V) (p q : F[X]) (hp : Irreducible p)
-    (hd : p ∣ LinearMap.charpoly T) (hq : aeval T q = 0) : p ∣ q := by
+theorem irreducible_dvd_of_dvd_charpoly_of_aeval_eq_zero
+    {F : Type} [Field F]
+    {V : Type} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (T : Module.End F V) (p q : F[X])
+    (hp : Irreducible p) (hd : p ∣ LinearMap.charpoly T) (hq : aeval T q = 0)
+    : p ∣ q := by
   have : Fact (Irreducible p) := ⟨hp⟩
   have hroot : (LinearMap.charpoly (T.baseChange (AdjoinRoot p))).IsRoot (AdjoinRoot.root p) := by
     rw [LinearMap.charpoly_baseChange]
@@ -34,10 +37,13 @@ theorem irreducible_dvd_of_dvd_charpoly_of_aeval_eq_zero {F : Type} [Field F] {V
   rw [Polynomial.eval_map_algebraMap, AdjoinRoot.aeval_eq, AdjoinRoot.mk_eq_zero] at hz
   exact hz
 
-theorem eq_zero_of_not_primary : ∀ (F : Type) [Field F] [Finite F] (V : Type) [AddCommGroup V] [Module F V]
-    [FiniteDimensional F V] (φ : Module.End F V → ℂ), IsClassFn φ → IsPrimitive φ → 0 < Module.finrank F V →
-    ∀ g : Module.End F V, (¬ ∃ (f : F[X]) (m : ℕ), f.Monic ∧ Irreducible f ∧ 0 < m ∧
-      LinearMap.charpoly g = f ^ m) → φ g = 0 := by
+theorem eq_zero_of_not_primary
+    : ∀ (F : Type) [Field F] [Finite F] (V : Type) [AddCommGroup V] [Module F V]
+        [FiniteDimensional F V] (φ : Module.End F V → ℂ),
+      IsClassFn φ → IsPrimitive φ → 0 < Module.finrank F V
+        → ∀ g : Module.End F V,
+          (¬ ∃ (f : F[X]) (m : ℕ), f.Monic ∧ Irreducible f ∧ 0 < m ∧ LinearMap.charpoly g = f ^ m)
+            → φ g = 0 := by
   intro F _ _ V _ _ _ φ hcl hpr hdim g hg
   have hmon : (LinearMap.charpoly g).Monic := LinearMap.charpoly_monic g
   have hne0 : LinearMap.charpoly g ≠ 0 := hmon.ne_zero
@@ -69,7 +75,9 @@ theorem eq_zero_of_not_primary : ∀ (F : Type) [Field F] [Finite F] (V : Type) 
     intro x hx
     rw [LinearMap.mem_ker] at hx ⊢
     have hc : aeval g (f ^ m) * g = g * aeval g (f ^ m) := by
-      calc aeval g (f ^ m) * g = aeval g (f ^ m * X) := by rw [map_mul, aeval_X]
+      calc
+        aeval g (f ^ m) * g
+          = aeval g (f ^ m * X) := by rw [map_mul, aeval_X]
         _ = aeval g (X * f ^ m) := by rw [mul_comm]
         _ = g * aeval g (f ^ m) := by rw [map_mul, aeval_X]
     have h := congrArg (fun u : Module.End F V => u x) hc
@@ -86,8 +94,8 @@ theorem eq_zero_of_not_primary : ∀ (F : Type) [Field F] [Finite F] (V : Type) 
     refine LinearMap.ext fun y => ?_
     obtain ⟨x, rfl⟩ := A.mkQ_surjective y
     have h := intertwine_aeval_apply A.mkQ g (A.mapQ A g (fun x hx => hgA x hx)) (fun _ => rfl) Q x
-    rw [← h, LinearMap.zero_apply, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero,
-      hAdef, LinearMap.mem_ker, ← Module.End.mul_apply, hPQ, LinearMap.zero_apply]
+    rw [← h, LinearMap.zero_apply, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, hAdef,
+      LinearMap.mem_ker, ← Module.End.mul_apply, hPQ, LinearMap.zero_apply]
   have hcp : IsCoprime (LinearMap.charpoly (g.restrict hgA))
       (LinearMap.charpoly (A.mapQ A g (fun x hx => hgA x hx))) := by
     refine isCoprime_of_irreducible_dvd (fun h => (LinearMap.charpoly_monic _).ne_zero h.1) ?_

@@ -12,11 +12,11 @@ open Matrix
 namespace UpperTheory.V.Weyl
 
 structure Pre (n : ℕ) where
-
   d : ℕ
-
   mat : Matrix (Fin n) (Fin n) ℂ →* Matrix (Fin d) (Fin d) ℂ
-  poly : ∀ i j, ∃ p : MvPolynomial (Fin n × Fin n) ℂ, ∀ g, mat g i j = MvPolynomial.eval (fun ab => g ab.1 ab.2) p
+  poly
+    : ∀ i j, ∃ p : MvPolynomial (Fin n × Fin n) ℂ, ∀ g,
+      mat g i j = MvPolynomial.eval (fun ab => g ab.1 ab.2) p
 
 variable {n : ℕ}
 
@@ -32,7 +32,9 @@ def Pre.D (Ξ : Pre n) : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Matrix (Fin Ξ.d
 def Pre.E (Ξ : Pre n) (a b : Fin n) : Matrix (Fin Ξ.d) (Fin Ξ.d) ℂ := Ξ.D (Matrix.single a b 1)
 
 def Pre.HasWt (Ξ : Pre n) (ν : Fin n → ℂ) : Prop :=
-  ∀ u : ℂ, Formalism.REAL.qdet Ξ.E u = (∏ k : Fin n, (u - (k : ℂ) + ν k)) • (1 : Matrix (Fin Ξ.d) (Fin Ξ.d) ℂ)
+  ∀ u : ℂ,
+    Formalism.REAL.qdet Ξ.E u
+      = (∏ k : Fin n, (u - (k : ℂ) + ν k)) • (1 : Matrix (Fin Ξ.d) (Fin Ξ.d) ℂ)
 
 def Pre.IsTop (Ξ : Pre n) (ν : Fin n → ℕ) (v : Fin Ξ.d → ℂ) : Prop :=
   ∀ b : Matrix (Fin n) (Fin n) ℂ, (∀ i j, j < i → b i j = 0) → Ξ.mat b *ᵥ v = (∏ k, b k k ^ ν k) • v

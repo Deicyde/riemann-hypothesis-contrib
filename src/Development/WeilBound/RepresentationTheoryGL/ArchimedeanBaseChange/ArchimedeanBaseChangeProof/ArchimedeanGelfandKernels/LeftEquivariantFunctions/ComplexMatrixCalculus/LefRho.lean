@@ -8,7 +8,8 @@ noncomputable section
 
 namespace PositivityTheory.RgBcC
 
-def lefRho (n : ℕ) (lam : Fin n → ℤ) : Matrix.unitaryGroup (Fin n) ℂ →* (EV n lam →L[ℂ] EV n lam) where
+def lefRho (n : ℕ) (lam : Fin n → ℤ)
+    : Matrix.unitaryGroup (Fin n) ℂ →* (EV n lam →L[ℂ] EV n lam) where
   toFun k := lefFr n lam k.1
   map_one' := frOne n lam
   map_mul' k k' := frMulK n lam k k'

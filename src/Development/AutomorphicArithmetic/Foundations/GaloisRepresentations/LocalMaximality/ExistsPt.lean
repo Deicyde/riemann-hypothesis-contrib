@@ -5,13 +5,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system
 
 section IntegralMvPolynomialLemmas
-variable {L V σ : Type} [Field L] [Algebra ℂ L] (B : Subalgebra ℂ L)
+variable
+  {L V σ : Type} [Field L] [Algebra ℂ L]
+  (B : Subalgebra ℂ L)
   [AddCommGroup V] [Module L V] [Module ℂ V] [IsScalarTower ℂ L V]
 
 variable [LinearOrder σ]
@@ -20,9 +23,11 @@ end IntegralMvPolynomialLemmas
 
 end UpperTheory.Gal.productCup_of_system
 
-private theorem lG_of_lemma {L : Type} [Field L] [Algebra ℂ L] (B : Subalgebra ℂ L)
-    [Algebra.FiniteType ℂ B] (I : Ideal B) (hI : I ≠ ⊤) :
-    ∃ e : B →ₐ[ℂ] ℂ, ∀ b ∈ I, e b = 0 := by
+private theorem lG_of_lemma
+    {L : Type} [Field L] [Algebra ℂ L]
+    (B : Subalgebra ℂ L) [Algebra.FiniteType ℂ B]
+    (I : Ideal B) (hI : I ≠ ⊤)
+    : ∃ e : B →ₐ[ℂ] ℂ, ∀ b ∈ I, e b = 0 := by
   obtain ⟨M, hM, hIM⟩ := Ideal.exists_le_maximal I hI
   letI := Ideal.Quotient.field M
   haveI : Module.Finite ℂ (B ⧸ M) := finite_of_finite_type_of_isJacobsonRing ℂ (B ⧸ M)
@@ -34,15 +39,25 @@ private theorem lG_of_lemma {L : Type} [Field L] [Algebra ℂ L] (B : Subalgebra
   have h0 : Ideal.Quotient.mk M b = 0 := Ideal.Quotient.eq_zero_iff_mem.mpr (hIM hb)
   simp [h0]
 
-private theorem lG_of_lemma_2 {L W : Type} [Field L] [Algebra ℂ L] (B : Subalgebra ℂ L)
-    [AddCommGroup W] [Module L W] [Module ℂ W] [IsScalarTower ℂ L W] (N : Submodule ℂ W)
-    (hN : ∀ b : B, ∀ v ∈ N, (b : L) • v ∈ N) (e : B →ₐ[ℂ] ℂ) :
-    ∃ S : Submodule ℂ W, (∀ x ∈ S, ∃ b : B, e b ≠ 0 ∧ (b : L) • x ∈ N) ∧
-      ∀ x, (∃ b : B, e b ≠ 0 ∧ (b : L) • x ∈ N) → x ∈ S := by
-  refine ⟨{ carrier := {x | ∃ b : B, e b ≠ 0 ∧ (b : L) • x ∈ N}
-            add_mem' := ?_
-            zero_mem' := ⟨1, by simp, by simp⟩
-            smul_mem' := ?_ }, fun x hx => hx, fun x hx => hx⟩
+private theorem lG_of_lemma_2
+    {L W : Type} [Field L] [Algebra ℂ L]
+    (B : Subalgebra ℂ L)
+    [AddCommGroup W] [Module L W] [Module ℂ W] [IsScalarTower ℂ L W]
+    (N : Submodule ℂ W) (hN : ∀ b : B, ∀ v ∈ N, (b : L) • v ∈ N)
+    (e : B →ₐ[ℂ] ℂ)
+    : ∃ S : Submodule ℂ W,
+      (∀ x ∈ S, ∃ b : B, e b ≠ 0 ∧ (b : L) • x ∈ N)
+        ∧ ∀ x, (∃ b : B, e b ≠ 0 ∧ (b : L) • x ∈ N) → x ∈ S := by
+  refine ⟨
+    {
+      carrier := {x | ∃ b : B, e b ≠ 0 ∧ (b : L) • x ∈ N}
+      add_mem' := ?_
+      zero_mem' := ⟨1, by simp, by simp⟩
+      smul_mem' := ?_
+    },
+    fun x hx => hx,
+    fun x hx => hx
+  ⟩
   · rintro x y ⟨b1, h1, hx⟩ ⟨b2, h2, hy⟩
     refine ⟨b1 * b2, by simp [h1, h2], ?_⟩
     rw [smul_add]
@@ -54,19 +69,23 @@ private theorem lG_of_lemma_2 {L W : Type} [Field L] [Algebra ℂ L] (B : Subalg
   · rintro c x ⟨b, hb, hx⟩
     exact ⟨b, hb, by rw [smul_comm]; exact N.smul_mem c hx⟩
 
-private theorem lG_of_lemma_3 {L W : Type} [Field L] [Algebra ℂ L] (B : Subalgebra ℂ L)
+private theorem lG_of_lemma_3
+    {L W : Type} [Field L] [Algebra ℂ L]
+    (B : Subalgebra ℂ L)
     [Algebra.FiniteType ℂ B] [AddCommGroup W] [Module L W] [Module ℂ W] [IsScalarTower ℂ L W]
-    (N : Submodule ℂ W) (hN : ∀ b : B, ∀ v ∈ N, (b : L) • v ∈ N) (x : W)
-    (hx : ∀ e : B →ₐ[ℂ] ℂ, ∃ b : B, e b ≠ 0 ∧ (b : L) • x ∈ N) : x ∈ N := by
-  let I : Ideal B :=
-    { carrier := {b | (b : L) • x ∈ N}
-      add_mem' := fun {a c} ha hc => by
-        simp only [Set.mem_setOf_eq, Subalgebra.coe_add, add_smul] at *
-        exact N.add_mem ha hc
-      zero_mem' := by simp
-      smul_mem' := fun c {b} hb => by
-        simp only [Set.mem_setOf_eq, smul_eq_mul, Subalgebra.coe_mul, mul_smul] at *
-        exact hN c _ hb }
+    (N : Submodule ℂ W) (hN : ∀ b : B, ∀ v ∈ N, (b : L) • v ∈ N)
+    (x : W) (hx : ∀ e : B →ₐ[ℂ] ℂ, ∃ b : B, e b ≠ 0 ∧ (b : L) • x ∈ N)
+    : x ∈ N := by
+  let I : Ideal B := {
+    carrier := {b | (b : L) • x ∈ N}
+    add_mem' := fun {a c} ha hc => by
+      simp only [Set.mem_setOf_eq, Subalgebra.coe_add, add_smul] at *
+      exact N.add_mem ha hc
+    zero_mem' := by simp
+    smul_mem' := fun c {b} hb => by
+      simp only [Set.mem_setOf_eq, smul_eq_mul, Subalgebra.coe_mul, mul_smul] at *
+      exact hN c _ hb
+  }
   by_cases hI : I = ⊤
   · have h1 : (1 : B) ∈ I := by rw [hI]; exact Submodule.mem_top
     change ((1 : B) : L) • x ∈ N at h1
@@ -75,13 +94,14 @@ private theorem lG_of_lemma_3 {L W : Type} [Field L] [Algebra ℂ L] (B : Subalg
     obtain ⟨b, hb, hbx⟩ := hx e
     exact absurd (he b hbx) hb
 
-theorem UpperTheory.Gal.productCup_of_system.lG_of :
-    LG := by
+theorem UpperTheory.Gal.productCup_of_system.lG_of : LG := by
   intro L _ _ B _ V σ _ _ _ _ _ _ A w hA
   have hAs : ∀ s, ∀ b : B, ∀ v ∈ A s, (b : L) • v ∈ A s := fun s b v hv => by
     simpa using hA s (b : L) b.2 v hv
-  have hloc : ∀ (e : B →ₐ[ℂ] ℂ) (N : Submodule ℂ V), (∀ b : B, ∀ v ∈ N, (b : L) • v ∈ N) →
-      ∀ v ∈ locM B e N, ∃ b : B, e b ≠ 0 ∧ (b : L) • v ∈ N := by
+  have hloc
+      : ∀ (e : B →ₐ[ℂ] ℂ) (N : Submodule ℂ V),
+        (∀ b : B, ∀ v ∈ N, (b : L) • v ∈ N)
+          → ∀ v ∈ locM B e N, ∃ b : B, e b ≠ 0 ∧ (b : L) • v ∈ N := by
     intro e N hN v hv
     obtain ⟨S, hS1, hS2⟩ := lG_of_lemma_2 B N hN e
     have hle : locM B e N ≤ S := by
@@ -92,25 +112,29 @@ theorem UpperTheory.Gal.productCup_of_system.lG_of :
     exact hS1 v (hle hv)
   constructor
   · intro n c hc
-    have hwd : ∀ (b : L) (x : Finset σ → V),
-        wd (fun i => Algebra.lsmul ℂ ℂ V (w i)) (b • x) =
-          b • wd (fun i => Algebra.lsmul ℂ ℂ V (w i)) x := by
+    have hwd
+        : ∀ (b : L) (x : Finset σ → V),
+          wd (fun i => Algebra.lsmul ℂ ℂ V (w i)) (b • x)
+            = b • wd (fun i => Algebra.lsmul ℂ ℂ V (w i)) x := by
       intro b x
       funext t
       simp [wd, Finset.smul_sum, smul_comm b]
-    have hC : ∀ (A' : Finset σ → Submodule ℂ V) (x : Finset σ → V),
-        x ∈ (acx A' fun i => Algebra.lsmul ℂ ℂ V (w i)).C (n - 1) ↔
-          ∀ s, x s ∈ (if (s.card : ℤ) = n - 1 then A' s else ⊥) := by
+    have hC
+        : ∀ (A' : Finset σ → Submodule ℂ V) (x : Finset σ → V),
+          x ∈ (acx A' fun i => Algebra.lsmul ℂ ℂ V (w i)).C (n - 1)
+            ↔ ∀ s, x s ∈ (if (s.card : ℤ) = n - 1 then A' s else ⊥) := by
       intro A' x
       simp [acx, Submodule.mem_pi]
-    have hB : ∀ (A' : Finset σ → Submodule ℂ V) (c : Finset σ → V),
-        c ∈ (acx A' fun i => Algebra.lsmul ℂ ℂ V (w i)).B n ↔
-          ∃ x ∈ (acx A' fun i => Algebra.lsmul ℂ ℂ V (w i)).C (n - 1),
-            wd (fun i => Algebra.lsmul ℂ ℂ V (w i)) x = c := by
+    have hB
+        : ∀ (A' : Finset σ → Submodule ℂ V) (c : Finset σ → V),
+          c ∈ (acx A' fun i => Algebra.lsmul ℂ ℂ V (w i)).B n
+            ↔ ∃ x ∈ (acx A' fun i => Algebra.lsmul ℂ ℂ V (w i)).C (n - 1),
+              wd (fun i => Algebra.lsmul ℂ ℂ V (w i)) x = c := by
       intro A' c
       simp [Cx.B, acx]
-    have hCstab : ∀ b : B, ∀ x ∈ (acx A fun i => Algebra.lsmul ℂ ℂ V (w i)).C (n - 1),
-        (b : L) • x ∈ (acx A fun i => Algebra.lsmul ℂ ℂ V (w i)).C (n - 1) := by
+    have hCstab
+        : ∀ b : B, ∀ x ∈ (acx A fun i => Algebra.lsmul ℂ ℂ V (w i)).C (n - 1),
+          (b : L) • x ∈ (acx A fun i => Algebra.lsmul ℂ ℂ V (w i)).C (n - 1) := by
       intro b x hx
       rw [hC] at hx ⊢
       intro s
@@ -120,8 +144,9 @@ theorem UpperTheory.Gal.productCup_of_system.lG_of :
       · exact hAs s b _ hxs
       · rw [Submodule.mem_bot] at hxs ⊢
         simp [hxs]
-    have hNstab : ∀ b : B, ∀ c ∈ (acx A fun i => Algebra.lsmul ℂ ℂ V (w i)).B n,
-        (b : L) • c ∈ (acx A fun i => Algebra.lsmul ℂ ℂ V (w i)).B n := by
+    have hNstab
+        : ∀ b : B, ∀ c ∈ (acx A fun i => Algebra.lsmul ℂ ℂ V (w i)).B n,
+          (b : L) • c ∈ (acx A fun i => Algebra.lsmul ℂ ℂ V (w i)).B n := by
       intro b c hc
       rw [hB] at hc ⊢
       obtain ⟨x, hx, rfl⟩ := hc
@@ -149,17 +174,22 @@ theorem UpperTheory.Gal.productCup_of_system.lG_of :
     obtain ⟨b, hb, hbx⟩ := hS1 x hxS
     exact ⟨b, hb, (hB _ _).2 ⟨_, hbx, hwd _ _⟩⟩
   · intro m hm
-    have hmem : ∀ r ∈ Set.range w, ∀ u ∈ A ∅,
-        r • u ∈ sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w) := by
+    have hmem
+        : ∀ r ∈ Set.range w, ∀ u ∈ A ∅, r • u ∈ sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w) := by
       intro r hr u hu
       unfold sm
-      exact (le_iSup₂ (f := fun r (_ : r ∈ Set.range w) =>
-        Submodule.map (Algebra.lsmul ℂ ℂ V r) (A ∅)) r hr) (Submodule.mem_map_of_mem hu)
-    have hstab : ∀ b : B, ∀ v ∈ sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w),
-        (b : L) • v ∈ sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w) := by
+      exact (le_iSup₂
+          (f := fun r (_ : r ∈ Set.range w) => Submodule.map (Algebra.lsmul ℂ ℂ V r) (A ∅))
+          r hr)
+        (Submodule.mem_map_of_mem hu)
+    have hstab
+        : ∀ b : B, ∀ v ∈ sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w),
+          (b : L) • v ∈ sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w) := by
       intro b v hv
-      have hle : sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w) ≤
-          (sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w)).comap (Algebra.lsmul ℂ ℂ V (b : L)) := by
+      have hle
+          : sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w)
+            ≤ (sm (Algebra.lsmul ℂ ℂ V) (A ∅) (Set.range w)).comap
+              (Algebra.lsmul ℂ ℂ V (b : L)) := by
         conv_lhs => unfold sm
         refine iSup₂_le fun r hr => ?_
         rintro _ ⟨u, hu, rfl⟩

@@ -12,8 +12,11 @@ public import Development.AbelianVarietyTheory.Counterexamples.LevelGroupExample
 @[expose] public section
 
 open scoped Matrix NNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.Core.Rk.SWLaw GlobalTheory.Core.Rk.SW GlobalTheory.StdUnn
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.Core.Rk.SWLaw GlobalTheory.Core.Rk.SW GlobalTheory.StdUnn
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (RealMat IsFockVec)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -25,19 +28,21 @@ variable {D : D7}
 set_option synthInstance.maxHeartbeats 200000
 set_option maxHeartbeats 1000000
 
-theorem finPart_cA_eq (z : AE D) :
-    finPart D (cA D z) = Algebra.TensorProduct.map (AlgHom.id D.host.F (Af D.host.F)) D.sp.cm.sig (finPart D z) := by
+theorem finPart_cA_eq (z : AE D)
+    : finPart D (cA D z)
+      = Algebra.TensorProduct.map (AlgHom.id D.host.F (Af D.host.F)) D.sp.cm.sig (finPart D z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul r e => simp [cA, sigR, finPart]
-  | add a b ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _), ha, hb, map_add (f := _)]
-
+  | add a b ha hb =>
+    rw [map_add (f := _), map_add (f := _), map_add (f := _), ha, hb, map_add (f := _)]
 
 open Classical in
-theorem exists_real_point {θ : InfFam D} (hθ : IsInfFam θ) (τ₀ : D.what₂.Tau) (t : ℝ) :
-    ∃ x : Ainf D.host.F, ∀ τ, θ τ (x ⊗ₜ[D.host.F] (1 : D.host.E)) = if τ = τ₀ then (t : ℂ) else 0 := by
-  obtain ⟨w, ⟨hw, hf⟩, -⟩ := exists_unique_of_comp_finPart D θ hθ 1 1
-    (fun τ => fun _ _ => if τ = τ₀ then (t : ℂ) else 0) 0
+theorem exists_real_point {θ : InfFam D} (hθ : IsInfFam θ) (τ₀ : D.what₂.Tau) (t : ℝ)
+    : ∃ x : Ainf D.host.F, ∀ τ,
+      θ τ (x ⊗ₜ[D.host.F] (1 : D.host.E)) = if τ = τ₀ then (t : ℂ) else 0 := by
+  obtain ⟨w, ⟨hw, hf⟩, -⟩ :=
+    exists_unique_of_comp_finPart D θ hθ 1 1 (fun τ => fun _ _ => if τ = τ₀ then (t : ℂ) else 0) 0
   set a : AE D := w 0 0 with ha
   have hcomp : ∀ τ, θ τ (infPart D a) = if τ = τ₀ then (t : ℂ) else 0 := fun τ => by
     have := congrFun (congrFun (hw τ) 0) 0
@@ -61,8 +66,9 @@ theorem exists_real_point {θ : InfFam D} (hθ : IsInfFam θ) (τ₀ : D.what₂
   rw [← hcomp τ, ← hy]
   rfl
 
-theorem realPar_unique : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsInfFam θ →
-    ∀ l l' : D.what₂.Tau → ℝ, HasRealPar ψ θ l → HasRealPar ψ θ l' → l = l' := by
+theorem realPar_unique
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D),
+      IsInfFam θ → ∀ l l' : D.what₂.Tau → ℝ, HasRealPar ψ θ l → HasRealPar ψ θ l' → l = l' := by
   classical
   intro D ψ θ hθ l l' hl hl'
   funext τ₀

@@ -7,14 +7,16 @@ public import Formalism.LocalRingCardinality.Lemmas
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.WeaklyAdmissibleFiltrations
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField
+  IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.WeaklyAdmissibleFiltrations
 
 namespace GlobalTheory.FiniteTwistInvariants
 
 variable {O : Type} [CommRing O] [IsDomain O]
 
-theorem length_quot_ne_top [IsDiscreteValuationRing O] (a : O) (ha : a ≠ 0) :
-    Module.length O (O ⧸ Ideal.span {a}) ≠ ⊤ := by
+theorem length_quot_ne_top [IsDiscreteValuationRing O] (a : O) (ha : a ≠ 0)
+    : Module.length O (O ⧸ Ideal.span {a}) ≠ ⊤ := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha hϖ
   have : Ideal.span {(u : O) * ϖ ^ n} = IsLocalRing.maximalIdeal O ^ n := by
@@ -22,14 +24,16 @@ theorem length_quot_ne_top [IsDiscreteValuationRing O] (a : O) (ha : a ≠ 0) :
   rw [this, IsDiscreteValuationRing.length_quotient_pow_maximalIdeal]
   exact ENat.coe_ne_top n
 
-theorem fix_frac_zero {Γ : Type} {r : ℕ} (M : Γ → Matrix (Fin r) (Fin r) O)
-    (hker : ∀ v : Fin r → O, (∀ g, (M g).mulVec v = v) → v = 0)
-    (x : Fin r → FractionRing O) (hx : ∀ g, ((M g).map (algebraMap O (FractionRing O))).mulVec x = x) :
-    x = 0 := by
+theorem fix_frac_zero
+    {Γ : Type} {r : ℕ} (M : Γ → Matrix (Fin r) (Fin r) O)
+    (hker : ∀ v : Fin r → O, (∀ g, (M g).mulVec v = v) → v = 0) (x : Fin r → FractionRing O)
+    (hx : ∀ g, ((M g).map (algebraMap O (FractionRing O))).mulVec x = x)
+    : x = 0 := by
   obtain ⟨⟨b, hb⟩, hbi⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) x
   choose u hu using hbi
   have hinj := IsFractionRing.injective O (FractionRing O)
-  have hu' : (fun j => algebraMap O (FractionRing O) (u j)) = algebraMap O (FractionRing O) b • x := by
+  have hu'
+      : (fun j => algebraMap O (FractionRing O) (u j)) = algebraMap O (FractionRing O) b • x := by
     funext j; rw [hu j]; simp [Algebra.smul_def]
   have h0 : u = 0 := by
     refine hker u fun g => ?_
@@ -42,17 +46,17 @@ theorem fix_frac_zero {Γ : Type} {r : ℕ} (M : Γ → Matrix (Fin r) (Fin r) O
   have hb0 : algebraMap O (FractionRing O) b ≠ 0 := by
     rw [Ne, ← map_zero (algebraMap O (FractionRing O))]
     exact fun h => nonZeroDivisors.ne_zero hb (hinj h)
-  have : algebraMap O (FractionRing O) b • x = 0 := by
-    rw [← hu', h0]; funext j; simp
+  have : algebraMap O (FractionRing O) b • x = 0 := by rw [← hu', h0]; funext j; simp
   exact (smul_eq_zero.mp this).resolve_left hb0
 
 end GlobalTheory.FiniteTwistInvariants
 
 namespace GlobalTheory.FiniteTwistInvariants
 
-theorem exists_finset_ker {K V Γ : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (f : Γ → V →ₗ[K] V) (h : ∀ x, (∀ g, f g x = 0) → x = 0) :
-    ∃ s : Finset Γ, ∀ x, (∀ g ∈ s, f g x = 0) → x = 0 := by
+theorem exists_finset_ker
+    {K V Γ : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (f : Γ → V →ₗ[K] V) (h : ∀ x, (∀ g, f g x = 0) → x = 0)
+    : ∃ s : Finset Γ, ∀ x, (∀ g ∈ s, f g x = 0) → x = 0 := by
   classical
   let S : Set (Submodule K V) := Set.range fun s : Finset Γ => ⨅ g ∈ s, LinearMap.ker (f g)
   obtain ⟨p, ⟨s, rfl⟩, hmin⟩ := (wellFounded_lt (α := Submodule K V)).has_min S ⟨_, ⟨∅, rfl⟩⟩
@@ -70,11 +74,16 @@ theorem exists_finset_ker {K V Γ : Type} [Field K] [AddCommGroup V] [Module K V
 
 variable {O : Type} [CommRing O] [IsDomain O]
 
-theorem exists_killer {ι : Type} [Fintype ι] {r : ℕ} (A : ι → Matrix (Fin r) (Fin r) O)
-    (h : ∀ x : Fin r → FractionRing O, (∀ q, ((A q).map (algebraMap O (FractionRing O))).mulVec x = 0) → x = 0) :
-    ∃ c : O, c ≠ 0 ∧ ∀ x : Fin r → FractionRing O,
-      (∀ q, ((A q).map (algebraMap O (FractionRing O))).mulVec x ∈ stdG O (FractionRing O) r) →
-        c • x ∈ stdG O (FractionRing O) r := by
+theorem exists_killer
+    {ι : Type} [Fintype ι]
+    {r : ℕ} (A : ι → Matrix (Fin r) (Fin r) O)
+    (h : ∀ x : Fin r → FractionRing O,
+      (∀ q, ((A q).map (algebraMap O (FractionRing O))).mulVec x = 0) → x = 0)
+    : ∃ c : O,
+      c ≠ 0
+        ∧ ∀ x : Fin r → FractionRing O,
+          (∀ q, ((A q).map (algebraMap O (FractionRing O))).mulVec x ∈ stdG O (FractionRing O) r)
+            → c • x ∈ stdG O (FractionRing O) r := by
   classical
   set K := FractionRing O
   have hinj := IsFractionRing.injective O K
@@ -86,13 +95,15 @@ theorem exists_killer {ι : Type} [Fintype ι] {r : ℕ} (A : ι → Matrix (Fin
     rw [LinearMap.mem_ker, Matrix.toLin'_apply] at hx
     refine h x fun q => ?_
     funext i
-    rw [← hB x (q, i), hx]; rfl
+    rw [← hB x (q, i), hx]
+    rfl
   obtain ⟨P, hP⟩ := LinearMap.exists_leftInverse_of_injective _ hker
   set P' := LinearMap.toMatrix' P
   have hPB : P' * B = 1 := by
     rw [← LinearMap.toMatrix'_toLin' B, ← LinearMap.toMatrix'_comp, hP, LinearMap.toMatrix'_id]
-  obtain ⟨⟨b, hb⟩, hbi⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O)
-    (fun p : Fin r × (ι × Fin r) => P' p.1 p.2)
+  obtain ⟨⟨b, hb⟩, hbi⟩ :=
+    IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O)
+      (fun p : Fin r × (ι × Fin r) => P' p.1 p.2)
   choose Q hQ using hbi
   refine ⟨b, nonZeroDivisors.ne_zero hb, fun x hx => ?_⟩
   choose y hy using hx
@@ -119,8 +130,9 @@ namespace GlobalTheory.FiniteTwistInvariants
 
 variable {O : Type} [CommRing O] [IsDomain O]
 
-theorem stdG_eq_span (r : ℕ) :
-    stdG O (FractionRing O) r = Submodule.span O (Set.range fun j : Fin r => (Pi.single j 1 : Fin r → FractionRing O)) := by
+theorem stdG_eq_span (r : ℕ)
+    : stdG O (FractionRing O) r
+      = Submodule.span O (Set.range fun j : Fin r => (Pi.single j 1 : Fin r → FractionRing O)) := by
   ext x
   rw [Submodule.mem_span_range_iff_exists_fun]
   show x ∈ LinearMap.range _ ↔ _
@@ -133,30 +145,41 @@ theorem stdG_eq_span (r : ℕ) :
     refine ⟨u, funext fun k => ?_⟩
     simp [Finset.sum_apply, Pi.single_apply, Algebra.smul_def]
 
-theorem WKG_mk {Γ : Type} [Group Γ] {r : ℕ} (M : Γ →* Matrix (Fin r) (Fin r) O) (g : Γ) (x : Fin r → FractionRing O) :
-    WKG M g (Submodule.Quotient.mk x) =
-      Submodule.Quotient.mk (((M g).map (algebraMap O (FractionRing O))).mulVec x) := rfl
+theorem WKG_mk
+    {Γ : Type} [Group Γ]
+    {r : ℕ} (M : Γ →* Matrix (Fin r) (Fin r) O)
+    (g : Γ) (x : Fin r → FractionRing O)
+    : WKG M g (Submodule.Quotient.mk x)
+      = Submodule.Quotient.mk (((M g).map (algebraMap O (FractionRing O))).mulVec x) :=
+  rfl
 
-theorem length_invariants_lt_top [IsDiscreteValuationRing O] {Γ Γ' : Type} [Group Γ] [Group Γ'] {r : ℕ}
-    (M : Γ →* Matrix (Fin r) (Fin r) O) (f : Γ' →* Γ)
-    (hker : ∀ v : Fin r → O, (∀ g, (M (f g)).mulVec v = v) → v = 0) :
-    Module.length O ↥(Representation.invariants ((WKG M).comp f)) < ⊤ := by
+theorem length_invariants_lt_top
+    [IsDiscreteValuationRing O]
+    {Γ Γ' : Type} [Group Γ] [Group Γ']
+    {r : ℕ} (M : Γ →* Matrix (Fin r) (Fin r) O)
+    (f : Γ' →* Γ) (hker : ∀ v : Fin r → O, (∀ g, (M (f g)).mulVec v = v) → v = 0)
+    : Module.length O ↥(Representation.invariants ((WKG M).comp f)) < ⊤ := by
   classical
   set K := FractionRing O
   let A : Γ' → Matrix (Fin r) (Fin r) O := fun g => M (f g) - 1
   have hAm : ∀ g, (A g).map (algebraMap O K) = (M (f g)).map (algebraMap O K) - 1 := by
     intro g
     show (algebraMap O K).mapMatrix (M (f g) - 1) = _
-    rw [map_sub, map_one]; rfl
+    rw [map_sub, map_one]
+    rfl
   have hK : ∀ x : Fin r → K, (∀ g, ((A g).map (algebraMap O K)).mulVec x = 0) → x = 0 := by
     intro x hx
     refine fix_frac_zero (fun g => M (f g)) hker x fun g => ?_
     have := hx g
     rwa [hAm, Matrix.sub_mulVec, Matrix.one_mulVec, sub_eq_zero] at this
-  obtain ⟨s, hs⟩ := exists_finset_ker (fun g => Matrix.toLin' ((A g).map (algebraMap O K)))
-    (fun x hx => hK x fun g => by simpa [Matrix.toLin'_apply] using hx g)
-  obtain ⟨c, hc0, hc⟩ := exists_killer (fun q : s => A q.1)
-    (fun x hx => hs x fun g hg => by simpa [Matrix.toLin'_apply] using hx ⟨g, hg⟩)
+  obtain ⟨s, hs⟩ :=
+    exists_finset_ker
+      (fun g => Matrix.toLin' ((A g).map (algebraMap O K)))
+      (fun x hx => hK x fun g => by simpa [Matrix.toLin'_apply] using hx g)
+  obtain ⟨c, hc0, hc⟩ :=
+    exists_killer
+      (fun q : s => A q.1)
+      (fun x hx => hs x fun g hg => by simpa [Matrix.toLin'_apply] using hx ⟨g, hg⟩)
   have hinj := IsFractionRing.injective O K
   have ha : algebraMap O K c ≠ 0 := by
     rw [Ne, ← map_zero (algebraMap O K)]
@@ -182,7 +205,13 @@ end GlobalTheory.FiniteTwistInvariants
 
 namespace GlobalTheory.FiniteTwistInvariants
 
-theorem main : ∀ (D : D7) (i : D.nd.Loc) (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i))) (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i), TruncatedSeriesCountingIdentities.admG2 i r ρ π → ∀ w ∈ placesOver D.host.E (D.nd.l i), Module.length (D.nd.O i) ↥(Representation.invariants ((Br.WKO i ρ π).comp (decS D.nd w))) < ⊤ := by
+theorem main
+    : ∀ (D : D7) (i : D.nd.Loc) (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)))
+        (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i),
+      TruncatedSeriesCountingIdentities.admG2 i r ρ π
+        → ∀ w ∈ placesOver D.host.E (D.nd.l i),
+          Module.length (D.nd.O i) ↥(Representation.invariants ((Br.WKO i ρ π).comp (decS D.nd w)))
+            < ⊤ := by
   intro D i r ρ π hG2 w hw
   have hH0 := (hG2 w hw (TruncatedSeriesCountingIdentities.CoefExt.self i w hw)).1.2.2.2.2.2.1
   show Module.length _ ↥(Representation.invariants ((WKG (WpO D.nd i ρ π)).comp (decS D.nd w))) < ⊤
@@ -190,13 +219,20 @@ theorem main : ∀ (D : D7) (i : D.nd.Loc) (r : D.nd.X i → (GE D.nd →* GL (F
   set C := TruncatedSeriesCountingIdentities.CoefExt.self i w hw
   set Bw := D.nbr i w hw
   let φ : D.nd.O i →+* ↥C.LL.1 :=
-    (TruncatedSeriesCountingIdentities.CoefExt.inc C).comp ((algebraMap (Br.Ow Bw) (Br.LLw Bw)).comp Bw.eO.toRingHom)
+    (TruncatedSeriesCountingIdentities.CoefExt.inc C).comp
+      ((algebraMap (Br.Ow Bw) (Br.LLw Bw)).comp Bw.eO.toRingHom)
   have hφ : Function.Injective φ := by
     intro a b hab
     have h1 := (TruncatedSeriesCountingIdentities.CoefExt.inc C).injective hab
     exact Br.toLL_inj Bw h1
-  have hloc : ∀ gK, TruncatedSeriesCountingIdentities.locC C (WpO D.nd i ρ π) gK = (WpO D.nd i ρ π (decS D.nd w (Br.ι Bw gK))).map φ := fun _ => rfl
-  have hmem : (fun j => φ (v j)) ∈ H0V (matRep (TruncatedSeriesCountingIdentities.locC C (WpO D.nd i ρ π))) := by
+  have hloc
+      : ∀ gK,
+        TruncatedSeriesCountingIdentities.locC C (WpO D.nd i ρ π) gK
+          = (WpO D.nd i ρ π (decS D.nd w (Br.ι Bw gK))).map φ := fun _ =>
+    rfl
+  have hmem
+      : (fun j => φ (v j))
+        ∈ H0V (matRep (TruncatedSeriesCountingIdentities.locC C (WpO D.nd i ρ π))) := by
     simp only [H0V, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply]
     intro gK
     rw [sub_eq_zero]

@@ -21,11 +21,14 @@ private theorem ex_norm (n : ℕ) (x : ℝ) : ‖ex n x‖ = 1 := by
 
 private theorem ex_cont (n : ℕ) : Continuous (ex n) := by unfold ex; fun_prop
 
-private theorem ex_orth (m n : ℕ) : ∫ x in (0 : ℝ)..1, conj (ex m x) * ex n x = if m = n then 1 else 0 := by
+private theorem ex_orth (m n : ℕ)
+    : ∫ x in (0 : ℝ)..1, conj (ex m x) * ex n x = if m = n then 1 else 0 := by
   unfold ex
-  have key : ∀ x : ℝ, conj (Complex.exp (2 * Real.pi * Complex.I * m * x)) *
-      Complex.exp (2 * Real.pi * Complex.I * n * x) =
-      Complex.exp ((2 * Real.pi * Complex.I * ((n : ℂ) - m)) * x) := by
+  have key
+      : ∀ x : ℝ,
+        conj (Complex.exp (2 * Real.pi * Complex.I * m * x))
+            * Complex.exp (2 * Real.pi * Complex.I * n * x)
+          = Complex.exp ((2 * Real.pi * Complex.I * ((n : ℂ) - m)) * x) := by
     intro x
     rw [← Complex.exp_conj, ← Complex.exp_add]
     congr 1
@@ -51,9 +54,11 @@ private theorem ex_orth (m n : ℕ) : ∫ x in (0 : ℝ)..1, conj (ex m x) * ex 
     rw [e1]
     simp
 
-private theorem pars_abs (a b : ℕ → ℂ) (ha : Summable a) (hb : Summable b) (F G : ℝ → ℂ)
-    (hF : ∀ x, HasSum (fun n => a n * ex n x) (F x)) (hG : ∀ x, HasSum (fun n => b n * ex n x) (G x)) :
-    HasSum (fun n => conj (b n) * a n) (∫ x in (0 : ℝ)..1, conj (G x) * F x) := by
+private theorem pars_abs
+    (a b : ℕ → ℂ) (ha : Summable a) (hb : Summable b)
+    (F G : ℝ → ℂ) (hF : ∀ x, HasSum (fun n => a n * ex n x) (F x))
+    (hG : ∀ x, HasSum (fun n => b n * ex n x) (G x))
+    : HasSum (fun n => conj (b n) * a n) (∫ x in (0 : ℝ)..1, conj (G x) * F x) := by
   have han : Summable (fun n => ‖a n‖) := summable_norm_iff.mpr ha
   have hbn : Summable (fun n => ‖b n‖) := summable_norm_iff.mpr hb
   have hGc : Continuous G := by
@@ -73,13 +78,14 @@ private theorem pars_abs (a b : ℕ → ℂ) (ha : Summable a) (hb : Summable b)
     · rw [e]
   have hC : ∀ n, ∫ x in (0 : ℝ)..1, conj (G x) * ex n x = conj (b n) := by
     intro n
-    have hs : HasSum (fun m => ∫ x in (0 : ℝ)..1, conj (b m) * (conj (ex m x) * ex n x))
+    have hs : HasSum
+        (fun m => ∫ x in (0 : ℝ)..1, conj (b m) * (conj (ex m x) * ex n x))
         (∫ x in (0 : ℝ)..1, conj (G x) * ex n x) := by
-      refine intervalIntegral.hasSum_integral_of_dominated_convergence (fun m _ => ‖b m‖)
-        ?_ ?_ ?_ ?_ ?_
+      refine
+        intervalIntegral.hasSum_integral_of_dominated_convergence (fun m _ => ‖b m‖) ?_ ?_ ?_ ?_ ?_
       · intro m
-        exact (continuous_const.mul
-          ((Complex.continuous_conj.comp (ex_cont m)).mul (ex_cont n))).aestronglyMeasurable
+        exact (continuous_const.mul ((Complex.continuous_conj.comp (ex_cont m)).mul
+          (ex_cont n))).aestronglyMeasurable
       · intro m
         refine Filter.Eventually.of_forall (fun t _ => ?_)
         rw [norm_mul, norm_mul, Complex.norm_conj, Complex.norm_conj, ex_norm, ex_norm]
@@ -87,16 +93,18 @@ private theorem pars_abs (a b : ℕ → ℂ) (ha : Summable a) (hb : Summable b)
       · exact Filter.Eventually.of_forall (fun t _ => hbn)
       · exact intervalIntegrable_const
       · refine Filter.Eventually.of_forall (fun t _ => ?_)
-        have e : (fun m => conj (b m) * (conj (ex m t) * ex n t)) =
-            fun m => conj (b m * ex m t) * ex n t := by
+        have e
+            : (fun m => conj (b m) * (conj (ex m t) * ex n t))
+              = fun m => conj (b m * ex m t) * ex n t := by
           funext m
           rw [map_mul, mul_assoc]
         rw [e]
         exact (Complex.hasSum_conj'.mpr (hG t)).mul_right (ex n t)
     simp_rw [intervalIntegral.integral_const_mul, ex_orth] at hs
     have h2 : HasSum (fun m => conj (b m) * if m = n then (1 : ℂ) else 0) (conj (b n)) := by
-      have e : (fun m => conj (b m) * if m = n then (1 : ℂ) else 0) =
-          fun m => if m = n then conj (b n) else 0 := by
+      have e
+          : (fun m => conj (b m) * if m = n then (1 : ℂ) else 0)
+            = fun m => if m = n then conj (b n) else 0 := by
         funext m
         split_ifs with h
         · rw [h, mul_one]
@@ -104,13 +112,15 @@ private theorem pars_abs (a b : ℕ → ℂ) (ha : Summable a) (hb : Summable b)
       rw [e]
       exact hasSum_ite_eq n (conj (b n))
     exact hs.unique h2
-  have hB : HasSum (fun n => ∫ x in (0 : ℝ)..1, a n * (conj (G x) * ex n x))
+  have hB : HasSum
+      (fun n => ∫ x in (0 : ℝ)..1, a n * (conj (G x) * ex n x))
       (∫ x in (0 : ℝ)..1, conj (G x) * F x) := by
     refine intervalIntegral.hasSum_integral_of_dominated_convergence
-      (fun n _ => ‖a n‖ * ∑' m, ‖b m‖) ?_ ?_ ?_ ?_ ?_
+      (fun n _ => ‖a n‖ * ∑' m, ‖b m‖)
+      ?_ ?_ ?_ ?_ ?_
     · intro n
-      exact (continuous_const.mul
-        ((Complex.continuous_conj.comp hGc).mul (ex_cont n))).aestronglyMeasurable
+      exact (continuous_const.mul ((Complex.continuous_conj.comp hGc).mul
+        (ex_cont n))).aestronglyMeasurable
     · intro n
       refine Filter.Eventually.of_forall (fun t _ => ?_)
       rw [norm_mul, norm_mul, ex_norm, mul_one, Complex.norm_conj]
@@ -130,9 +140,13 @@ private theorem pars_abs (a b : ℕ → ℂ) (ha : Summable a) (hb : Summable b)
   rw [e]
   exact hB
 
-private theorem line_exp (k L : ℕ) [NeZero L] (f : CuspForm (Gamma1 L) (k : ℤ)) (y : ℝ) (hy : 0 < y) (x : ℝ) :
-    HasSum (fun n : ℕ => coef f n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ) * ex n x) (f (pt x y)) := by
-  have hp : (1 : ℝ) ∈ (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 L)).strictPeriods := by
+private theorem line_exp
+    (k L : ℕ) [NeZero L] (f : CuspForm (Gamma1 L) (k : ℤ)) (y : ℝ) (hy : 0 < y) (x : ℝ)
+    : HasSum
+      (fun n : ℕ => coef f n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ) * ex n x)
+      (f (pt x y)) := by
+  have hp
+      : (1 : ℝ) ∈ (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 L)).strictPeriods := by
     rw [CongruenceSubgroup.strictPeriods_Gamma1]
     exact AddSubgroup.mem_zmultiples 1
   have hs := ModularForm.hasSum_qExpansion f one_pos hp (pt x y)
@@ -140,8 +154,9 @@ private theorem line_exp (k L : ℕ) [NeZero L] (f : CuspForm (Gamma1 L) (k : �
   have hc : ((pt x y : ℍ) : ℂ) = x + y * Complex.I := by
     unfold pt
     rw [UpperHalfPlane.ofComplex_apply_of_im_pos him]
-  have e : (fun n : ℕ => coef f n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ) * ex n x) =
-      fun m => (qExpansion 1 f).coeff m * Function.Periodic.qParam 1 ↑(pt x y) ^ m := by
+  have e
+      : (fun n : ℕ => coef f n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ) * ex n x)
+        = fun m => (qExpansion 1 f).coeff m * Function.Periodic.qParam 1 ↑(pt x y) ^ m := by
     funext n
     rw [hc, mul_assoc]
     unfold coef ex Function.Periodic.qParam
@@ -156,8 +171,7 @@ private theorem line_exp (k L : ℕ) [NeZero L] (f : CuspForm (Gamma1 L) (k : �
 end UpperTheory.V.Af.Rs
 
 open UpperTheory.V.Af.Rs in
-theorem UpperTheory.V.Af.Rs.pars :
-    UpperTheory.V.Af.Rs.Pars := by
+theorem UpperTheory.V.Af.Rs.pars : UpperTheory.V.Af.Rs.Pars := by
   intro k L _ f g y hy
   have hF := line_exp k L f y hy
   have hG := line_exp k L g y hy
@@ -169,9 +183,11 @@ theorem UpperTheory.V.Af.Rs.pars :
   have hb : Summable (fun n : ℕ => coef g n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ)) :=
     (hG 0).summable.congr (fun n => by rw [ex0, mul_one])
   have h := pars_abs _ _ ha hb (fun x => f (pt x y)) (fun x => g (pt x y)) hF hG
-  have e : (fun n : ℕ => conj (coef g n) * coef f n * ((Real.exp (-(4 * Real.pi * n) * y) : ℝ) : ℂ)) =
-      fun n => conj (coef g n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ)) *
-        (coef f n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ)) := by
+  have e
+      : (fun n : ℕ => conj (coef g n) * coef f n * ((Real.exp (-(4 * Real.pi * n) * y) : ℝ) : ℂ))
+        = fun n =>
+          conj (coef g n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ))
+            * (coef f n * (Real.exp (-(2 * Real.pi * n) * y) : ℂ)) := by
     funext n
     rw [map_mul, Complex.conj_ofReal,
       show -(4 * Real.pi * n) * y = (-(2 * Real.pi * n) * y) + (-(2 * Real.pi * n) * y) by ring,

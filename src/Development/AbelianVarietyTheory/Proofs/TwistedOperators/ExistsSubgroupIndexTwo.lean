@@ -15,9 +15,11 @@ open NumberField IsDedekindDomain GlobalTheory.CNorm GlobalTheory.QuadSymbol.Nor
 
 namespace GlobalTheory.QuadraticValuationIndexTwo
 
-theorem exists_mul_conj_iff {B E : Type} [Field B] [CharZero B] [Field E] [Algebra B E] {d : B}
-    {θ : E} {σ : E ≃ₐ[B] E} (h : IsKum 2 (-1 : B) d θ σ) (x : B) :
-    (∃ y : E, y * σ y = algebraMap B E x) ↔ Nm d x := by
+theorem exists_mul_conj_iff
+    {B E : Type} [Field B] [CharZero B] [Field E] [Algebra B E]
+    {d : B} {θ : E} {σ : E ≃ₐ[B] E} (h : IsKum 2 (-1 : B) d θ σ)
+    (x : B)
+    : (∃ y : E, y * σ y = algebraMap B E x) ↔ Nm d x := by
   have kb := GlobalTheory.CNorm.kummer_basic 2 B E (-1) d θ σ h
   have hinv : ∀ z, σ (σ z) = z := fun z => kb.2.2.1 z
   have hfix := kb.2.2.2.1
@@ -33,10 +35,12 @@ theorem exists_mul_conj_iff {B E : Type} [Field B] [CharZero B] [Field E] [Algeb
   constructor
   · rintro ⟨y, hy⟩
 
-    obtain ⟨a, ha⟩ := hfix ((y + σ y) / 2) (by
-      rw [map_div₀, map_add (f := _), hinv, map_ofNat, add_comm])
-    obtain ⟨b, hb⟩ := hfix ((y - σ y) / (2 * θ)) (by
-      rw [map_div₀, map_sub, hinv, map_mul, hconj, map_ofNat, mul_neg, div_neg, ← neg_div, neg_sub])
+    obtain ⟨a, ha⟩ :=
+      hfix ((y + σ y) / 2) (by rw [map_div₀, map_add (f := _), hinv, map_ofNat, add_comm])
+    obtain ⟨b, hb⟩ :=
+      hfix ((y - σ y) / (2 * θ)) (by
+        rw [map_div₀, map_sub, hinv, map_mul, hconj, map_ofNat, mul_neg, div_neg, ← neg_div,
+          neg_sub])
     have hy' : y = algebraMap B E a + algebraMap B E b * θ := by
       rw [← ha, ← hb]
       field_simp
@@ -56,9 +60,8 @@ theorem exists_mul_conj_iff {B E : Type} [Field B] [CharZero B] [Field E] [Algeb
     rw [← hpow]
     ring
 
-theorem exists_valuation_two (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ e : ℕ, v.valuation F ((2 : ℕ) : F) = WithZero.exp (-(e : ℤ)) := by
+theorem exists_valuation_two (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : ∃ e : ℕ, v.valuation F ((2 : ℕ) : F) = WithZero.exp (-(e : ℤ)) := by
   have h0 : v.valuation F ((2 : ℕ) : F) ≠ 0 := (Valuation.ne_zero_iff _).mpr (by norm_num)
   have hle : v.valuation F ((2 : ℕ) : F) ≤ 1 := by
     have := GlobalTheory.QuadSymbol.NormIndex.map_two_le (v.valuation F)
@@ -66,28 +69,33 @@ theorem exists_valuation_two (F : Type) [Field F] [NumberField F]
   have hlog : WithZero.log (v.valuation F ((2 : ℕ) : F)) ≤ 0 := by
     rw [WithZero.log_le_iff_le_exp h0]
     simpa using hle
-  refine ⟨(-WithZero.log (v.valuation F ((2 : ℕ) : F))).toNat, ?_⟩
+  refine ⟨(- WithZero.log (v.valuation F ((2 : ℕ) : F))).toNat, ?_⟩
   rw [Int.toNat_of_nonneg (by omega), neg_neg, WithZero.exp_log h0]
 
-theorem exists_subgroup_index_two (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) (B : Type) [Field B] [Algebra (v.adicCompletion F) B]
-    [FiniteDimensional (v.adicCompletion F) B] (d : B) (hd : ¬ IsSquare d) :
-    ∃ N : Subgroup Bˣ, N.index = 2 ∧ ∀ x : Bˣ, x ∈ N ↔ Nm d (x : B) := by
+theorem exists_subgroup_index_two
+    (F : Type) [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (B : Type)
+    [Field B] [Algebra (v.adicCompletion F) B] [FiniteDimensional (v.adicCompletion F) B]
+    (d : B) (hd : ¬ IsSquare d)
+    : ∃ N : Subgroup Bˣ, N.index = 2 ∧ ∀ x : Bˣ, x ∈ N ↔ Nm d (x : B) := by
   set K := v.adicCompletion F
   have : CharZero K := charZero_of_injective_algebraMap (algebraMap F K).injective
   have : CharZero B := charZero_of_injective_algebraMap (algebraMap K B).injective
   have hnp : ∀ r : B, r ^ 2 ≠ d := fun r hr => hd ⟨r, by rw [← hr, sq]⟩
 
   obtain ⟨E, _, _, θ, σ, hK⟩ :=
-    GlobalTheory.CNorm.exists_isKum 2 B (-1) d Nat.prime_two (IsPrimitiveRoot.neg_one 0 (by norm_num)) hnp
+    GlobalTheory.CNorm.exists_isKum 2 B (-1) d Nat.prime_two
+      (IsPrimitiveRoot.neg_one 0 (by norm_num)) hnp
   have kb := GlobalTheory.CNorm.kummer_basic 2 B E (-1) d θ σ hK
   have : FiniteDimensional B E := kb.1
   let : Algebra K E := ((algebraMap B E).comp (algebraMap K B)).toAlgebra
   have : IsScalarTower K B E := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   have : FiniteDimensional K E := Module.Finite.trans B E
   obtain ⟨e, he⟩ := exists_valuation_two F v
-  have hB := GlobalTheory.CNorm.pIdx_units_finite_extension_adicCompletion 2 F v e B (by norm_num) he
-  have hE := GlobalTheory.CNorm.pIdx_units_finite_extension_adicCompletion 2 F v e E (by norm_num) he
+  have hB :=
+    GlobalTheory.CNorm.pIdx_units_finite_extension_adicCompletion 2 F v e B (by norm_num) he
+  have hE :=
+    GlobalTheory.CNorm.pIdx_units_finite_extension_adicCompletion 2 F v e E (by norm_num) he
   let σ' : Eˣ →* Eˣ := Units.map (σ : E →+* E).toMonoidHom
   let j : Bˣ →* Eˣ := Units.map (algebraMap B E).toMonoidHom
   have hσ' : ∀ y : Eˣ, ((σ' y : Eˣ) : E) = σ (y : E) := fun y => rfl
@@ -134,9 +142,11 @@ theorem exists_subgroup_index_two (F : Type) [Field F] [NumberField F]
     rw [hE.2]
     exact mul_ne_zero (mul_ne_zero two_ne_zero (pow_ne_zero _ (pow_ne_zero _ hq))) hE.1
 
-  obtain ⟨-, -, -, -, heq⟩ := GlobalTheory.CNorm.herbrand_prime_order 2 Eˣ σ' Nat.prime_two hσ'2 hIE hE.1
-  rw [hfix, hR2, GlobalTheory.CNorm.pIdx_range_of_injective 2 j hj, GlobalTheory.CNorm.pTor_range_of_injective 2 j hj,
-    hE.2, hB.2] at heq
+  obtain ⟨-, -, -, -, heq⟩ :=
+    GlobalTheory.CNorm.herbrand_prime_order 2 Eˣ σ' Nat.prime_two hσ'2 hIE hE.1
+  rw [hfix, hR2, GlobalTheory.CNorm.pIdx_range_of_injective 2 j hj,
+      GlobalTheory.CNorm.pTor_range_of_injective 2 j hj, hE.2, hB.2]
+    at heq
   have hrank : Module.finrank K E = Module.finrank K B * 2 := by
     rw [← Module.finrank_mul_finrank K B E, kb.2.1]
   rw [hrank, pow_mul] at heq
@@ -151,7 +161,9 @@ theorem exists_subgroup_index_two (F : Type) [Field F] [NumberField F]
     have h4 : (R * 2) * (Q ^ 2 * TE * TB ^ 2) = 4 * (Q ^ 2 * TE * TB ^ 2) := by
       have e21 : (2 : ℕ) - 1 = 1 := rfl
       rw [e21, pow_one, one_pow, one_mul] at heq
-      calc (R * 2) * (Q ^ 2 * TE * TB ^ 2) = R * (2 * Q ^ 2 * TE) * TB ^ 2 := by ring
+      calc
+        (R * 2) * (Q ^ 2 * TE * TB ^ 2)
+          = R * (2 * Q ^ 2 * TE) * TB ^ 2 := by ring
         _ = TE * (2 * Q * TB) ^ 2 := heq
         _ = 4 * (Q ^ 2 * TE * TB ^ 2) := by ring
     have := Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hX) h4
@@ -174,15 +186,16 @@ theorem exists_subgroup_index_two (F : Type) [Field F] [NumberField F]
       rw [hnrm, hj', Units.val_mk0]
       exact hy
 
-theorem norm_index_two (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) (B : Type) [Field B] [Algebra (v.adicCompletion F) B]
-    [FiniteDimensional (v.adicCompletion F) B] (d : B) (hd : ¬ IsSquare d) :
-    (∃ c : B, c ≠ 0 ∧ ¬ Nm d c) ∧
-      ∀ x y : B, x ≠ 0 → y ≠ 0 → ¬ Nm d x → ¬ Nm d y → Nm d (x * y) := by
+theorem norm_index_two
+    (F : Type) [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (B : Type)
+    [Field B] [Algebra (v.adicCompletion F) B] [FiniteDimensional (v.adicCompletion F) B]
+    (d : B) (hd : ¬ IsSquare d)
+    : (∃ c : B, c ≠ 0 ∧ ¬ Nm d c)
+      ∧ ∀ x y : B, x ≠ 0 → y ≠ 0 → ¬ Nm d x → ¬ Nm d y → Nm d (x * y) := by
   obtain ⟨N, hN, hmem⟩ := exists_subgroup_index_two F v B d hd
   refine ⟨?_, ?_⟩
-  ·
-    have hne : N ≠ ⊤ := by
+  · have hne : N ≠ ⊤ := by
       rintro rfl
       rw [Subgroup.index_top] at hN
       exact absurd hN (by norm_num)

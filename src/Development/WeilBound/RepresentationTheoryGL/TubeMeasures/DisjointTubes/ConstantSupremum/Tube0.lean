@@ -4,4 +4,7 @@ public import Development.WeilBound.RepresentationTheoryGL.TubeMeasures.Disjoint
 
 @[expose] public section
 
-theorem MainStatements.Tam.Plug.tube0 : MainStatements.Tam.VolSt → MainStatements.Tam.StabSt → MainStatements.Tam.IdxSt → MainStatements.Tam.TubeSt := MainStatements.Tam.tube
+theorem MainStatements.Tam.Plug.tube0
+    : MainStatements.Tam.VolSt → MainStatements.Tam.StabSt → MainStatements.Tam.IdxSt
+      → MainStatements.Tam.TubeSt :=
+  MainStatements.Tam.tube

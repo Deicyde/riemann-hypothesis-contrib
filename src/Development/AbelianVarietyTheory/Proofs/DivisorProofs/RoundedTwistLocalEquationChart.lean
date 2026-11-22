@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CechFam
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace GlobalTheory GlobalTheory.DI GlobalTheory.LogDR GlobalTheory.Cartier
+open CategoryTheory AlgebraicGeometry TopologicalSpace GlobalTheory GlobalTheory.DI
+  GlobalTheory.LogDR GlobalTheory.Cartier
 
 set_option autoImplicit false
 
@@ -18,8 +19,9 @@ open GlobalTheory.Cartier.CartierDiv
 
 variable {X : Scheme.{0}} [IsIntegral X]
 
-theorem eff_of_atlas {C : Type} {E : C → CartierDiv X} {n : ℕ} {ι : Type}
-    (𝒜 : SncAtlas E n ι) (c : C) : (E c).Eff := by
+theorem eff_of_atlas
+    {C : Type} {E : C → CartierDiv X} {n : ℕ} {ι : Type} (𝒜 : SncAtlas E n ι) (c : C)
+    : (E c).Eff := by
   intro y
   have hy : y ∈ ⨆ i, 𝒜.U i := by rw [𝒜.cover]; trivial
   obtain ⟨i, hi⟩ := Opens.mem_iSup.1 hy
@@ -35,8 +37,10 @@ theorem Eff.nsmul' {D : CartierDiv X} (h : D.Eff) (m : ℕ) : (m • D).Eff := b
   | zero => rw [zero_nsmul]; exact eff_zero
   | succ m ih => rw [succ_nsmul]; exact ih.add h
 
-theorem isEqn_sum {C : Type} (s : Finset C) (D : C → CartierDiv X) (g : C → X.functionFieldˣ)
-    (y : X) (h : ∀ c ∈ s, (D c).IsEqn y (g c)) : (∑ c ∈ s, D c).IsEqn y (∏ c ∈ s, g c) := by
+theorem isEqn_sum
+    {C : Type} (s : Finset C) (D : C → CartierDiv X) (g : C → X.functionFieldˣ)
+    (y : X) (h : ∀ c ∈ s, (D c).IsEqn y (g c))
+    : (∑ c ∈ s, D c).IsEqn y (∏ c ∈ s, g c) := by
   classical
   induction s using Finset.induction_on with
   | empty => rw [Finset.sum_empty, Finset.prod_empty]; exact isEqn_zero y
@@ -44,13 +48,14 @@ theorem isEqn_sum {C : Type} (s : Finset C) (D : C → CartierDiv X) (g : C → 
     rw [Finset.sum_insert ha, Finset.prod_insert ha]
     exact (h a (Finset.mem_insert_self a s)).add (ih fun c hc => h c (Finset.mem_insert_of_mem hc))
 
-theorem prod_elim_pow {C : Type} [Fintype C] {n : ℕ} {M : Type} [CommMonoid M] (x : Fin n → M)
+theorem prod_elim_pow
+    {C : Type} [Fintype C]
+    {n : ℕ} {M : Type} [CommMonoid M]
+    (x : Fin n → M)
     (J : Finset (Fin n)) (e : C → Option (Fin n)) (hJ : ∀ j, j ∈ J ↔ ∃ c, e c = some j)
-    (r : C → ℕ) :
-    ∏ c, ((e c).elim 1 x) ^ r c =
-      ∏ j ∈ J, x j ^ (∑ c, if e c = some j then r c else 0) := by
-  have step : ∀ c, ((e c).elim 1 x) ^ r c =
-      ∏ j ∈ J, x j ^ (if e c = some j then r c else 0) := by
+    (r : C → ℕ)
+    : ∏ c, ((e c).elim 1 x) ^ r c = ∏ j ∈ J, x j ^ (∑ c, if e c = some j then r c else 0) := by
+  have step : ∀ c, ((e c).elim 1 x) ^ r c = ∏ j ∈ J, x j ^ (if e c = some j then r c else 0) := by
     intro c
     cases h : e c with
     | none => simp
@@ -67,15 +72,24 @@ theorem prod_elim_pow {C : Type} [Fintype C] {n : ℕ} {M : Type} [CommMonoid M]
 
 end GlobalTheory.RoundEqn
 
-
 open GlobalTheory.RoundEqn GlobalTheory.Cartier.CartierDiv in
-theorem GlobalTheory.roundedTwist_isEqn :
-  ∀ (p : ℕ) [Fact p.Prime] {X : Scheme.{0}} [IsIntegral X] [CharP X.functionField p] {C : Type} [Fintype C] {E : C → CartierDiv X} {n : ℕ} {ι : Type} [LinearOrder ι] (𝒜 : SncAtlas E n ι) (G : CartierDiv X) (r : C → ℕ), (∀ c, r c < p) → ((p • G + ∑ c, r c • E c) - p • G).Eff ∧ ∀ (i : ι), ∃ ρ : Fin n → ℕ, (∀ j, ρ j < p) ∧ ∀ y ∈ 𝒜.U i, ∀ t, G.IsEqn y t → (p • G + ∑ c, r c • E c).IsEqn y (t ^ p * ∏ j ∈ 𝒜.J i, 𝒜.x i j ^ ρ j) := by
+theorem GlobalTheory.roundedTwist_isEqn
+    : ∀ (p : ℕ) [Fact p.Prime] {X : Scheme.{0}} [IsIntegral X] [CharP X.functionField p] {C : Type}
+        [Fintype C] {E : C → CartierDiv X} {n : ℕ} {ι : Type} [LinearOrder ι] (𝒜 : SncAtlas E n ι)
+        (G : CartierDiv X) (r : C → ℕ),
+      (∀ c, r c < p)
+        → ((p • G + ∑ c, r c • E c) - p • G).Eff
+          ∧ ∀ (i : ι), ∃ ρ : Fin n → ℕ,
+            (∀ j, ρ j < p)
+              ∧ ∀ y ∈ 𝒜.U i, ∀ t,
+                G.IsEqn y t
+                  → (p • G + ∑ c, r c • E c).IsEqn y (t ^ p * ∏ j ∈ 𝒜.J i, 𝒜.x i j ^ ρ j) := by
   intro p hp X _ _ C _ E n ι _ 𝒜 G r hr
   classical
   refine ⟨?_, fun i => ?_⟩
   · rw [add_sub_cancel_left]
-    refine Finset.sum_induction _ (fun D : CartierDiv X => D.Eff) (fun _ _ h h' => h.add h') eff_zero ?_
+    refine
+      Finset.sum_induction _ (fun D : CartierDiv X => D.Eff) (fun _ _ h h' => h.add h') eff_zero ?_
     intro c _
     exact Eff.nsmul' (eff_of_atlas 𝒜 c) (r c)
   · obtain ⟨e, huniq, hJ, heq⟩ := 𝒜.snc i

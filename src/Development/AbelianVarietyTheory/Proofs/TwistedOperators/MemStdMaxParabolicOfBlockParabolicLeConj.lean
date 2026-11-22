@@ -7,12 +7,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsOfValI
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.StandardMaximalParabolic
+open MeasureTheory ValuativeRel GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.StandardMaximalParabolic
 
 namespace GlobalTheory.ParabConj
 
-theorem stdBlocks_lt {s r : ℕ} (d : Fin s → ℕ) (hd : ∑ i, d i = r) {a b : Fin s} (i : Fin (d a)) (j : Fin (d b))
-    (hba : b < a) : stdBlocks d hd ⟨b, j⟩ < stdBlocks d hd ⟨a, i⟩ := by
+theorem stdBlocks_lt
+    {s r : ℕ} (d : Fin s → ℕ) (hd : ∑ i, d i = r)
+    {a b : Fin s} (i : Fin (d a)) (j : Fin (d b)) (hba : b < a)
+    : stdBlocks d hd ⟨b, j⟩ < stdBlocks d hd ⟨a, i⟩ := by
   let f : ℕ → ℕ := fun n => if h : n < s then d ⟨n, h⟩ else 0
   have key : ∀ c : Fin s, ∑ x : Fin c, d (Fin.castLE c.2.le x) = ∑ x ∈ Finset.range c, f x := by
     intro c
@@ -29,9 +32,11 @@ theorem stdBlocks_lt {s r : ℕ} (d : Fin s → ℕ) (hd : ∑ i, d i = r) {a b 
   have := j.2
   omega
 
-theorem mem_stdMaxParab_of_le_conjBy (F : Type) [Field F] {r a b s : ℕ} (h : a + b = r) (d : Fin s → ℕ)
-    (hd : ∑ i, d i = r) (g : GL (Fin r) F) (H : parab F (stdBlocks d hd) ≤ conjBy g (stdMaxParab F h)) :
-    g ∈ stdMaxParab F h := by
+theorem mem_stdMaxParab_of_le_conjBy
+    (F : Type) [Field F]
+    {r a b s : ℕ} (h : a + b = r) (d : Fin s → ℕ) (hd : ∑ i, d i = r) (g : GL (Fin r) F)
+    (H : parab F (stdBlocks d hd) ≤ conjBy g (stdMaxParab F h))
+    : g ∈ stdMaxParab F h := by
   by_contra hg
   have hg' := hg
   rw [mem_stdMaxParab] at hg'
@@ -39,8 +44,9 @@ theorem mem_stdMaxParab_of_le_conjBy (F : Type) [Field F] {r a b s : ℕ} (h : a
   obtain ⟨q, j, hj, hq, hne⟩ := hg'
   refine hg (inv_mem_iff.1 ((mem_stdMaxParab h).2 fun i p hp hi => ?_))
   have hpq : p < q := by rw [Fin.lt_def]; omega
-  let t : GL (Fin r) F := Matrix.GeneralLinearGroup.mkOfDetNeZero (Matrix.transvection p q (1 : F))
-    (by rw [Matrix.det_transvection_of_ne p q hpq.ne]; exact one_ne_zero)
+  let t : GL (Fin r) F :=
+    Matrix.GeneralLinearGroup.mkOfDetNeZero (Matrix.transvection p q (1 : F))
+      (by rw [Matrix.det_transvection_of_ne p q hpq.ne]; exact one_ne_zero)
   have ht : (t : Matrix (Fin r) (Fin r) F) = 1 + Matrix.single p q 1 := rfl
   have htP : t ∈ parab F (stdBlocks d hd) := by
     refine mem_parab_iff.2 fun x y u v hyx => ?_
@@ -52,13 +58,18 @@ theorem mem_stdMaxParab_of_le_conjBy (F : Type) [Field F] {r a b s : ℕ} (h : a
     exact lt_asymm hlt hpq
   have h0 := (mem_stdMaxParab h).1 (mem_conjBy.1 (H htP)) i j hj hi
   have hij : i ≠ j := by rintro rfl; omega
-  have hmul : ((g⁻¹ * t * g : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) =
-      1 + ((g⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) * Matrix.single p q (1 : F) *
-        (g : Matrix (Fin r) (Fin r) F) := by
+  have hmul
+      : ((g⁻¹ * t * g : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
+        = 1
+          + ((g⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) * Matrix.single p q (1 : F)
+            * (g : Matrix (Fin r) (Fin r) F) := by
     rw [Units.val_mul, Units.val_mul, ht, mul_add, add_mul, mul_one, Units.inv_mul]
   rw [hmul, Matrix.add_apply, Matrix.one_apply_ne hij, zero_add, Matrix.mul_apply,
-    Finset.sum_eq_single q (fun x _ hx => by rw [Matrix.mul_single_apply_of_ne _ _ _ _ _ hx, zero_mul]) (by simp),
-    Matrix.mul_single_apply_same, mul_one] at h0
+      Finset.sum_eq_single q
+        (fun x _ hx => by rw [Matrix.mul_single_apply_of_ne _ _ _ _ _ hx, zero_mul])
+        (by simp),
+      Matrix.mul_single_apply_same, mul_one]
+    at h0
   exact (mul_eq_zero.1 h0).resolve_right hne
 
 end GlobalTheory.ParabConj

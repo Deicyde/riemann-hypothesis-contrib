@@ -11,18 +11,20 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSH
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.P.PBH
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.P.PBH
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 theorem family_orbital_valid : FamJFOK := by
   intro Wp Wq _ _ _ _ _ _ P T j G hG t ht
   obtain ⟨hsm, hcpt⟩ := hG
-  obtain ⟨C, hC, ε, hε, hCε⟩ := hcpt {t} isCompact_singleton (by
-    intro s hs
-    rw [Set.mem_singleton_iff] at hs
-    rw [hs]
-    exact ht)
+  obtain ⟨C, hC, ε, hε, hCε⟩ :=
+    hcpt {t} isCompact_singleton (by
+      intro s hs
+      rw [Set.mem_singleton_iff] at hs
+      rw [hs]
+      exact ht)
   have hzero : ∀ γ, γ ∉ C → G t γ = 0 := by
     intro γ hγ
     by_contra h

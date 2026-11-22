@@ -40,9 +40,10 @@ open ValuativeRel Matrix
 
 namespace GlobalTheory.IwEq
 
-theorem iwahori_eq_glnLocal_iwahori : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (a : ℕ),
-    GlobalTheory.SmGL.iwahori k (Fin a) = GroundTheory.Automorphic.GLnLocal.iwahori k a := by
+theorem iwahori_eq_glnLocal_iwahori
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (a : ℕ),
+      GlobalTheory.SmGL.iwahori k (Fin a) = GroundTheory.Automorphic.GLnLocal.iwahori k a := by
   intro k _ _ _ _ a
   ext g
   constructor

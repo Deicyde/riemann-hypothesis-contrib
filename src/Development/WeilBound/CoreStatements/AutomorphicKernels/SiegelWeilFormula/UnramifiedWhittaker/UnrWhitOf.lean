@@ -8,7 +8,8 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 
 namespace PositivityTheory.SiegelWeilFormula.Gunr
 
-theorem unrWhitX : PositivityTheory.SiegelWeilFormula.Gen.UnrWhitX := unrWhitX_of_parts locC almostGood
+theorem unrWhitX : PositivityTheory.SiegelWeilFormula.Gen.UnrWhitX :=
+  unrWhitX_of_parts locC almostGood
 
 theorem unrWhit : PositivityTheory.SiegelWeilFormula.Gen.UnrWhit := unrWhit_of_parts locC almostGood
 

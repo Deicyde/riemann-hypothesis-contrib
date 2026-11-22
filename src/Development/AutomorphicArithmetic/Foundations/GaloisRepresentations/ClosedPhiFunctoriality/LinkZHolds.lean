@@ -8,12 +8,15 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong GlobalTheory.WeilDeligne Matrix
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal
+  GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim
+  GlobalTheory.Cong GlobalTheory.WeilDeligne Matrix
 open scoped Formalism.Per NNReal
 open UpperTheory.Gal.ClosedPhiFromClosedTrace
 
-theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.linkZ_holds :
-    LinkA → LinkQ → LinkZ := by
+theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.linkZ_holds : LinkA → LinkQ → LinkZ := by
   intro hA hQ l _ K bk τ hτ N M
   obtain ⟨n, hn⟩ := hQ l K bk N M
   refine ⟨max n M, ?_⟩
@@ -25,20 +28,25 @@ theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.linkZ_holds :
     rw [← GlobalTheory.RingBasics.φA_apply, h]
   have hfe : ∀ s : bk.S, fI l (bk.ev s) = fA bk s := fun s => by
     simp only [fI, fA, RingHom.comp_apply, bk.ev_frob]
-  have hlM : ∀ i j, (l : Per.Acris l) ^ M ∣
-      (Pi.map (zC l) * Y₁.map (fI l) - Y.map (fI l) * R.map (fA bk)) i j := by
+  have hlM
+      : ∀ i j,
+        (l : Per.Acris l) ^ M
+          ∣ (Pi.map (zC l) * Y₁.map (fI l) - Y.map (fI l) * R.map (fA bk)) i j := by
     intro i j
     have h := map_dvd (fI l) (h1 i j)
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.sub_apply, Matrix.mul_apply, map_sub, map_sum, map_mul, Matrix.map_apply, hfz, hfe,
-      map_pow, map_natCast] at h ⊢
+      simp only [Matrix.sub_apply, Matrix.mul_apply, map_sub, map_sum, map_mul, Matrix.map_apply,
+          hfz, hfe, map_pow, map_natCast]
+        at h ⊢
     exact (pow_dvd_pow _ (le_max_right _ _)).trans h
-  have h3 := hn k d d' F.A F'.A F'.A' Q Q' Q₁ Q₁' R F'.A_mul hS hS₁
-    (fun i j => (pow_dvd_pow _ (le_max_left _ _)).trans (h2 i j))
+  have h3 :=
+    hn k d d' F.A F'.A F'.A' Q Q' Q₁ Q₁' R F'.A_mul hS hS₁
+      (fun i j => (pow_dvd_pow _ (le_max_left _ _)).trans (h2 i j))
   intro i j
-  have e : Pi.map (zC l) * (Y₁.map (fI l) * Q₁) - (Y.map (fI l) * Q) * R.map (f0 bk) =
-      (Pi.map (zC l) * Y₁.map (fI l) - Y.map (fI l) * R.map (fA bk)) * Q₁ +
-        Y.map (fI l) * (R.map (fA bk) * Q₁ - Q * R.map (f0 bk)) := by
+  have e
+      : Pi.map (zC l) * (Y₁.map (fI l) * Q₁) - (Y.map (fI l) * Q) * R.map (f0 bk)
+        = (Pi.map (zC l) * Y₁.map (fI l) - Y.map (fI l) * R.map (fA bk)) * Q₁
+          + Y.map (fI l) * (R.map (fA bk) * Q₁ - Q * R.map (f0 bk)) := by
     simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_assoc]
     abel
   rw [e, Matrix.add_apply, Matrix.mul_apply, Matrix.mul_apply]

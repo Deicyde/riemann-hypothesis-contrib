@@ -24,15 +24,15 @@ theorem lgN_mono (p : ℕ) {x y : ℕ} (h : x ≤ y) : lgN p x ≤ lgN p y := by
   · omega
   · exact Nat.succ_le_succ (Nat.log_mono_right h)
 
-theorem digits_sum_le_lgN (p m : ℕ) (hp : 1 < p) :
-    (Nat.digits p m).sum ≤ (p - 1) * lgN p m := by
+theorem digits_sum_le_lgN (p m : ℕ) (hp : 1 < p) : (Nat.digits p m).sum ≤ (p - 1) * lgN p m := by
   have hlen : (Nat.digits p m).length = lgN p m := by
     unfold lgN
     split_ifs with h
     · simp [h]
     · exact Nat.length_digits p m hp h
-  have h := List.sum_le_card_nsmul (Nat.digits p m) (p - 1)
-    (fun d hd => Nat.le_sub_one_of_lt (Nat.digits_lt_base hp hd))
+  have h :=
+    List.sum_le_card_nsmul (Nat.digits p m) (p - 1)
+      (fun d hd => Nat.le_sub_one_of_lt (Nat.digits_lt_base hp hd))
   rw [hlen, smul_eq_mul, mul_comm] at h
   exact h
 
@@ -49,16 +49,15 @@ theorem factorialValuationLowerBound : FactorialLg := by
     have : (1 : ℝ) < p := by exact_mod_cast hp.one_lt
     linarith
   have h5 : (m : ℝ) ≤ ((p : ℝ) - 1) * ((padicValNat p m.factorial : ℝ) + lgN p m) := by
-    have h6 : ((p - 1 : ℕ) : ℝ) = (p : ℝ) - 1 := by
-      rw [Nat.cast_sub hp.one_lt.le, Nat.cast_one]
+    have h6 : ((p - 1 : ℕ) : ℝ) = (p : ℝ) - 1 := by rw [Nat.cast_sub hp.one_lt.le, Nat.cast_one]
     rw [← h6]
     exact_mod_cast h4
   rw [sub_le_iff_le_add, div_le_iff₀ hp1]
   linarith
 
-theorem sum_lgN_le (p : ℕ) (hp : 1 < p) (A : ℕ) (f : ℕ → ℕ) (E : Finset ℕ)
-    (h : ∀ e', p ^ (2 * e' + 1) * f e' ≤ A) :
-    ∑ e' ∈ E, lgN p (f e') ≤ lgN p A ^ 2 := by
+theorem sum_lgN_le
+    (p : ℕ) (hp : 1 < p) (A : ℕ) (f : ℕ → ℕ) (E : Finset ℕ) (h : ∀ e', p ^ (2 * e' + 1) * f e' ≤ A)
+    : ∑ e' ∈ E, lgN p (f e') ≤ lgN p A ^ 2 := by
   have hle : ∀ e', f e' ≤ A := fun e' =>
     le_trans (Nat.le_mul_of_pos_left _ (pow_pos (by omega) _)) (h e')
   have hsupp : ∀ e' ∈ E, lgN p (f e') ≠ 0 → e' < lgN p A := by
@@ -76,25 +75,28 @@ theorem sum_lgN_le (p : ℕ) (hp : 1 < p) (A : ℕ) (f : ℕ → ℕ) (E : Finse
     simp only [lgN, hA, if_false]
     omega
   rw [← Finset.sum_filter_of_ne hsupp]
-  calc ∑ e' ∈ E.filter (fun e' => e' < lgN p A), lgN p (f e')
-      ≤ ∑ _e' ∈ E.filter (fun e' => e' < lgN p A), lgN p A :=
-        Finset.sum_le_sum (fun e' _ => lgN_mono p (hle e'))
+  calc
+    ∑ e' ∈ E.filter (fun e' => e' < lgN p A), lgN p (f e')
+        ≤ ∑ _e' ∈ E.filter (fun e' => e' < lgN p A), lgN p A :=
+      Finset.sum_le_sum (fun e' _ => lgN_mono p (hle e'))
     _ = (E.filter (fun e' => e' < lgN p A)).card * lgN p A := by rw [sum_const, smul_eq_mul]
     _ ≤ lgN p A * lgN p A := by
-        apply Nat.mul_le_mul_right
-        calc (E.filter (fun e' => e' < lgN p A)).card ≤ (range (lgN p A)).card :=
-              card_le_card (fun x hx => by
-                simp only [mem_filter, mem_range] at hx ⊢
-                exact hx.2)
-          _ = lgN p A := card_range _
+      apply Nat.mul_le_mul_right
+      calc
+        (E.filter (fun e' => e' < lgN p A)).card ≤ (range (lgN p A)).card :=
+          card_le_card (fun x hx => by
+            simp only [mem_filter, mem_range] at hx ⊢
+            exact hx.2)
+        _ = lgN p A := card_range _
     _ = lgN p A ^ 2 := (sq _).symm
 
-theorem sum_factorial_ge {ι : Type} (p : ℕ) (hp : p.Prime) (T : Finset ι) (f : ι → ℕ) (B : ℕ)
-    (hB : ∀ x ∈ T, f x ≤ B) :
-    ((∑ x ∈ T, f x : ℕ) : ℝ) / ((p : ℝ) - 1) - (T.card : ℝ) * lgN p B ≤
-      ∑ x ∈ T, (padicValNat p (f x).factorial : ℝ) := by
-  have h1 : ∑ x ∈ T, ((f x : ℝ) / ((p : ℝ) - 1) - lgN p B) ≤
-      ∑ x ∈ T, (padicValNat p (f x).factorial : ℝ) := by
+theorem sum_factorial_ge
+    {ι : Type} (p : ℕ) (hp : p.Prime) (T : Finset ι) (f : ι → ℕ) (B : ℕ) (hB : ∀ x ∈ T, f x ≤ B)
+    : ((∑ x ∈ T, f x : ℕ) : ℝ) / ((p : ℝ) - 1) - (T.card : ℝ) * lgN p B
+      ≤ ∑ x ∈ T, (padicValNat p (f x).factorial : ℝ) := by
+  have h1
+      : ∑ x ∈ T, ((f x : ℝ) / ((p : ℝ) - 1) - lgN p B)
+        ≤ ∑ x ∈ T, (padicValNat p (f x).factorial : ℝ) := by
     apply Finset.sum_le_sum
     intro x hx
     have h := factorialValuationLowerBound p (f x) hp
@@ -111,29 +113,37 @@ theorem gainFactorialInequality : StarArith := by
   obtain ⟨-, hgam⟩ := Formalism.GrowthSums.oddPowerInvSumIdentity (p : ℝ) hp1
   set c : ℝ := 1 / ((p : ℝ) - 1) with hc
 
-  have H1 : ∀ s, (al s : ℝ) * c - (r1 : ℝ) * lgN p (al s) ≤
-      ∑ b, (padicValNat p (e s b).factorial : ℝ) := by
+  have H1
+      : ∀ s,
+        (al s : ℝ) * c - (r1 : ℝ) * lgN p (al s) ≤ ∑ b, (padicValNat p (e s b).factorial : ℝ) := by
     intro s
-    have h := sum_factorial_ge p hp univ (e s) (al s)
-      (fun x _ => by rw [← he s]; exact Finset.single_le_sum (fun _ _ => Nat.zero_le _) (mem_univ x))
+    have h :=
+      sum_factorial_ge p hp univ (e s) (al s) (fun x _ => by
+        rw [← he s]; exact Finset.single_le_sum (fun _ _ => Nat.zero_le _) (mem_univ x))
     rw [he s, card_univ, Fintype.card_fin] at h
     rw [hc, mul_one_div]
     exact h
 
-  have H3 : ∀ s, ((∑ x, a s x : ℕ) : ℝ) * c - (r0 : ℝ) * r1 * lgN p (ls s) ≤
-      ∑ x, (padicValNat p (a s x).factorial : ℝ) := by
+  have H3
+      : ∀ s,
+        ((∑ x, a s x : ℕ) : ℝ) * c - (r0 : ℝ) * r1 * lgN p (ls s)
+          ≤ ∑ x, (padicValNat p (a s x).factorial : ℝ) := by
     intro s
-    have h := sum_factorial_ge p hp univ (a s) (ls s)
-      (fun x _ => le_trans (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (mem_univ x)) (ha s))
+    have h :=
+      sum_factorial_ge p hp univ (a s) (ls s)
+        (fun x _ => le_trans (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (mem_univ x)) (ha s))
     rw [card_univ, Fintype.card_prod, Fintype.card_fin, Fintype.card_fin, Nat.cast_mul] at h
     rw [hc, mul_one_div]
     exact h
 
-  have H2 : ∀ s, ((∑ e' ∈ E, i s e' : ℕ) : ℝ) * c - ((lgN p (al s) : ℝ)) ^ 2 ≤
-      ∑ e' ∈ E, (padicValNat p (i s e').factorial : ℝ) := by
+  have H2
+      : ∀ s,
+        ((∑ e' ∈ E, i s e' : ℕ) : ℝ) * c - ((lgN p (al s) : ℝ)) ^ 2
+          ≤ ∑ e' ∈ E, (padicValNat p (i s e').factorial : ℝ) := by
     intro s
-    have h1 : ∑ e' ∈ E, ((i s e' : ℝ) / ((p : ℝ) - 1) - lgN p (i s e')) ≤
-        ∑ e' ∈ E, (padicValNat p (i s e').factorial : ℝ) :=
+    have h1
+        : ∑ e' ∈ E, ((i s e' : ℝ) / ((p : ℝ) - 1) - lgN p (i s e'))
+          ≤ ∑ e' ∈ E, (padicValNat p (i s e').factorial : ℝ) :=
       Finset.sum_le_sum (fun e' _ => factorialValuationLowerBound p (i s e') hp)
     have h2 : ((∑ e' ∈ E, lgN p (i s e') : ℕ) : ℝ) ≤ ((lgN p (al s) : ℝ)) ^ 2 := by
       exact_mod_cast sum_lgN_le p hp.one_lt (al s) (i s) E (hpi s)
@@ -154,8 +164,8 @@ theorem gainFactorialInequality : StarArith := by
   have S2 := Finset.sum_le_sum (fun s (_ : s ∈ (univ : Finset S)) => H2 s)
   have S3 := Finset.sum_le_sum (fun s (_ : s ∈ (univ : Finset S)) => H3 s)
   rw [Finset.sum_sub_distrib, ← Finset.sum_mul] at S1 S2 S3
-  have htotR : (∑ s, ((∑ x, a s x : ℕ) : ℝ)) + ∑ s, ((∑ e' ∈ E, i s e' : ℕ) : ℝ) =
-      ∑ s, (ls s : ℝ) := by
+  have htotR
+      : (∑ s, ((∑ x, a s x : ℕ) : ℝ)) + ∑ s, ((∑ e' ∈ E, i s e' : ℕ) : ℝ) = ∑ s, (ls s : ℝ) := by
     exact_mod_cast htot
   have hiR : ∑ s, ((∑ e' ∈ E, i s e' : ℕ) : ℝ) = ∑ s, ∑ e' ∈ E, (i s e' : ℝ) := by
     push_cast
@@ -198,14 +208,16 @@ theorem excessGainBound : ExcessGainBound := by
   intro n p TT D al cap de v i ch E hp hal hcap hi0 hch0 hE hchD hv hD hnD
   have hp0 : 0 < p := by linarith
   obtain ⟨hgs, -⟩ := Formalism.GrowthSums.oddPowerInvSumIdentity p hp
-  have key : ∀ s ∈ TT, (∑' e : ℕ, (if 2 * e + 1 ∈ D s then 0 else
-      max (al s / p ^ (2 * e + 1) - cap (s + ((2 * e + 1 : ℕ) : ZMod n))) 0)) ≤
-      gamP p * al s - ∑ e ∈ E, ch s e - ∑ e ∈ E, i s e := by
+  have key
+      : ∀ s ∈ TT,
+        (∑' e : ℕ, (if 2 * e + 1 ∈ D s then 0 else
+          max (al s / p ^ (2 * e + 1) - cap (s + ((2 * e + 1 : ℕ) : ZMod n))) 0))
+          ≤ gamP p * al s - ∑ e ∈ E, ch s e - ∑ e ∈ E, i s e := by
     intro s hs
     have hA : HasSum (fun e : ℕ => al s / p ^ (2 * e + 1)) (gamP p * al s) := by
       have h := hgs.mul_right (al s)
-      have hf : (fun e : ℕ => al s / p ^ (2 * e + 1)) =
-          fun e : ℕ => (p ^ (2 * e + 1))⁻¹ * al s := by
+      have hf
+          : (fun e : ℕ => al s / p ^ (2 * e + 1)) = fun e : ℕ => (p ^ (2 * e + 1))⁻¹ * al s := by
         funext e
         rw [div_eq_mul_inv, mul_comm]
       rw [hf]
@@ -215,10 +227,13 @@ theorem excessGainBound : ExcessGainBound := by
     have hI : HasSum (fun e : ℕ => i s e) (∑ e ∈ E, i s e) :=
       hasSum_sum_of_ne_finset_zero (fun e he => (hE s e he).1)
     have hR := (hA.sub hC).sub hI
-    have hpos : ∀ e : ℕ, 0 ≤ al s / p ^ (2 * e + 1) :=
-      fun e => div_nonneg (hal s) (pow_nonneg hp0.le _)
-    have hsum : Summable (fun e : ℕ => (if 2 * e + 1 ∈ D s then (0 : ℝ) else
-        max (al s / p ^ (2 * e + 1) - cap (s + ((2 * e + 1 : ℕ) : ZMod n))) 0)) := by
+    have hpos : ∀ e : ℕ, 0 ≤ al s / p ^ (2 * e + 1) := fun e =>
+      div_nonneg (hal s) (pow_nonneg hp0.le _)
+    have hsum : Summable (fun e : ℕ =>
+        (if 2 * e + 1 ∈ D s then
+           (0 : ℝ)
+         else
+           max (al s / p ^ (2 * e + 1) - cap (s + ((2 * e + 1 : ℕ) : ZMod n))) 0)) := by
       refine Summable.of_nonneg_of_le (fun e => ?_) (fun e => ?_) hA.summable
       · split_ifs
         · exact le_rfl
@@ -244,20 +259,23 @@ theorem excessGainBound : ExcessGainBound := by
 theorem cappedGainBound : BCore := by
   intro n p TT TTodd al cap de v paid i E hp hsub hal hcap hi0 hiE hv hpaid hodd
   have hp0 : 0 < p := by linarith
-  have hsplit : ∑ s ∈ TT, ∑ e ∈ E, i s e =
-      ∑ s ∈ TT \ TTodd, ∑ e ∈ E, i s e + ∑ s ∈ TTodd, ∑ e ∈ E, i s e :=
+  have hsplit
+      : ∑ s ∈ TT, ∑ e ∈ E, i s e = ∑ s ∈ TT \ TTodd, ∑ e ∈ E, i s e + ∑ s ∈ TTodd, ∑ e ∈ E, i s e :=
     (Finset.sum_sdiff hsub).symm
-  have hodd' : ∑ s ∈ TTodd, ∑ e ∈ E, i s e ≤
-      ∑ s ∈ TTodd, ∑' e : ℕ,
-        min (al s / p ^ (2 * e + 1)) (cap (s + ((2 * e + 1 : ℕ) : ZMod n))) := by
+  have hodd'
+      : ∑ s ∈ TTodd, ∑ e ∈ E, i s e
+        ≤ ∑ s ∈ TTodd, ∑' e : ℕ,
+            min (al s / p ^ (2 * e + 1)) (cap (s + ((2 * e + 1 : ℕ) : ZMod n))) := by
     apply Finset.sum_le_sum
     intro s hs
-    have hsum := Formalism.GrowthSums.summable_min_div_pow_two_mul_add_one p hp (al s) (hal s) cap hcap s
-    calc ∑ e ∈ E, i s e
-        ≤ ∑ e ∈ E, min (al s / p ^ (2 * e + 1)) (cap (s + ((2 * e + 1 : ℕ) : ZMod n))) :=
-          Finset.sum_le_sum (fun e _ => hodd s hs e)
-      _ ≤ _ := hsum.sum_le_tsum E
-          (fun e _ => le_min (div_nonneg (hal s) (pow_nonneg hp0.le _)) (hcap _))
+    have hsum :=
+      Formalism.GrowthSums.summable_min_div_pow_two_mul_add_one p hp (al s) (hal s) cap hcap s
+    calc
+      ∑ e ∈ E, i s e
+          ≤ ∑ e ∈ E, min (al s / p ^ (2 * e + 1)) (cap (s + ((2 * e + 1 : ℕ) : ZMod n))) :=
+        Finset.sum_le_sum (fun e _ => hodd s hs e)
+      _ ≤ _ :=
+        hsum.sum_le_tsum E (fun e _ => le_min (div_nonneg (hal s) (pow_nonneg hp0.le _)) (hcap _))
   unfold gainG
   linarith
 

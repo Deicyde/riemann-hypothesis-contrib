@@ -8,10 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Discr
 
 namespace GlobalTheory.IntegralClosureFG
 
-theorem integralClosure_fg (O E A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Field E] [Algebra O E] [IsFractionRing O E] [CommRing A] [Algebra O A] [Algebra E A]
-    [IsScalarTower O E A] [Module.Finite E A] [Algebra.Etale E A] :
-    (Subalgebra.toSubmodule (integralClosure O A)).FG := by
+theorem integralClosure_fg
+    (O E A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field E] [Algebra O E]
+    [IsFractionRing O E] [CommRing A] [Algebra O A] [Algebra E A] [IsScalarTower O E A]
+    [Module.Finite E A] [Algebra.Etale E A]
+    : (Subalgebra.toSubmodule (integralClosure O A)).FG := by
   classical
   let b0 := Module.finBasis E A
   have hex : ∀ i, ∃ d : O, d ≠ 0 ∧ IsIntegral O (d • b0 i) := by
@@ -30,8 +31,9 @@ theorem integralClosure_fg (O E A : Type) [CommRing O] [IsDomain O] [IsDiscreteV
     exact hdi i
   let D : E := (Algebra.traceMatrix E b).det
   have hD : D ≠ 0 := by
-    have h1 := (GlobalTheory.discr_ne_zero_iff_of_etale (K := E) (A := A)
-      (by simp) (b : Fin (Module.finrank E A) → A)).2 b.linearIndependent
+    have h1 :=
+      (GlobalTheory.discr_ne_zero_iff_of_etale (K := E) (A := A) (by simp)
+        (b : Fin (Module.finrank E A) → A)).2 b.linearIndependent
     rwa [Algebra.discr_def] at h1
   have hint : ∀ e : E, IsIntegral O e → ∃ u : O, algebraMap O E u = e := by
     intro e he
@@ -41,11 +43,14 @@ theorem integralClosure_fg (O E A : Type) [CommRing O] [IsDomain O] [IsDiscreteV
   have hle : Subalgebra.toSubmodule (integralClosure O A) ≤ S := by
     intro x hx
     have hx' : IsIntegral O x := hx
-    obtain ⟨v, hv⟩ := GlobalTheory.DiscConductor.det_smul_eq_sum O E A (Fin (Module.finrank E A)) b x
-      (fun i j => hint _ (GlobalTheory.DiscConductor.isIntegral_trace_of_isIntegral O E A _
-        ((hb i).mul (hb j))))
-      (fun i => hint _ (GlobalTheory.DiscConductor.isIntegral_trace_of_isIntegral O E A _
-        (hx'.mul (hb i))))
+    obtain ⟨v, hv⟩ :=
+      GlobalTheory.DiscConductor.det_smul_eq_sum O E A (Fin (Module.finrank E A)) b x
+        (fun i j =>
+          hint _
+            (GlobalTheory.DiscConductor.isIntegral_trace_of_isIntegral O E A _ ((hb i).mul (hb j))))
+        (fun i =>
+          hint _
+            (GlobalTheory.DiscConductor.isIntegral_trace_of_isIntegral O E A _ (hx'.mul (hb i))))
     have hx2 : x = ∑ j, v j • (D⁻¹ • b j) := by
       have : x = D⁻¹ • (D • x) := by rw [smul_smul, inv_mul_cancel₀ hD, one_smul]
       rw [this, hv, Finset.smul_sum]

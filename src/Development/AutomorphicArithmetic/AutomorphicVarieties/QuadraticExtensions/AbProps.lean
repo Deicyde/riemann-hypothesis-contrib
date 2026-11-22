@@ -4,19 +4,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.QuadraticEx
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-theorem UpperTheory.V.Two.abProps :
-    ∀ (A : AbF) (L : Type) [Field L] [NumberField L], IsAbField A L → IsAbelianGalois ℚ L ∧ Module.finrank ℚ L = A.deg ∧ Nonempty (L →ₐ[ℚ] CyclotomicField A.m ℚ) := by
+theorem UpperTheory.V.Two.abProps
+    : ∀ (A : AbF) (L : Type) [Field L] [NumberField L],
+      IsAbField A L
+        → IsAbelianGalois ℚ L ∧ Module.finrank ℚ L = A.deg
+          ∧ Nonempty (L →ₐ[ℚ] CyclotomicField A.m ℚ) := by
   intro A L _ _ hA
   obtain ⟨N, hN, j, ζ, hmN, hζ, h⟩ := hA
   haveI := hN
   haveI hcN : IsCyclotomicExtension {N} ℚ (CyclotomicField N ℚ) := CyclotomicField.isCyclotomicExtension N ℚ
   haveI hab : IsAbelianGalois ℚ (CyclotomicField N ℚ) :=
     IsCyclotomicExtension.isAbelianGalois {N} ℚ (CyclotomicField N ℚ)
-  have hfix : ∀ τ : Gal(CyclotomicField N ℚ/ℚ),
-      τ ∈ j.fieldRange.fixingSubgroup ↔ ∀ y : L, τ (j y) = j y := by
+  have hfix
+      : ∀ τ : Gal(CyclotomicField N ℚ/ℚ),
+        τ ∈ j.fieldRange.fixingSubgroup ↔ ∀ y : L, τ (j y) = j y := by
     intro τ
     rw [IntermediateField.mem_fixingSubgroup_iff]
     constructor
@@ -29,7 +35,9 @@ theorem UpperTheory.V.Two.abProps :
     fun τ => (IsPrimitiveRoot.autToPow_spec ℚ hζ τ).symm
   have hker : ∀ v : (ZMod N)ˣ, A.ker ((v : ZMod N).val) ↔ ZMod.unitsMap hmN v ∈ A.H := by
     intro v
-    have hc : ((ZMod.unitsMap hmN v : (ZMod A.m)ˣ) : ZMod A.m) = (((v : ZMod N).val : ℕ) : ZMod A.m) := by
+    have hc
+        : ((ZMod.unitsMap hmN v : (ZMod A.m)ˣ) : ZMod A.m)
+          = (((v : ZMod N).val : ℕ) : ZMod A.m) := by
       rw [ZMod.natCast_val]
       rfl
     constructor
@@ -48,7 +56,8 @@ theorem UpperTheory.V.Two.abProps :
   · rw [(AlgEquiv.ofInjectiveField j).toLinearEquiv.finrank_eq]
     change Module.finrank ℚ j.fieldRange = _
     rw [IntermediateField.finrank_eq_fixingSubgroup_index]
-    have hS : j.fieldRange.fixingSubgroup = (A.H.comap (ZMod.unitsMap hmN)).comap (hζ.autToPow ℚ) := by
+    have hS
+        : j.fieldRange.fixingSubgroup = (A.H.comap (ZMod.unitsMap hmN)).comap (hζ.autToPow ℚ) := by
       ext τ
       rw [hfix, h τ _ (hpow τ)]
       exact hker _
@@ -84,5 +93,5 @@ theorem UpperTheory.V.Two.abProps :
       rw [Units.val_one, ← Nat.cast_one, ZMod.natCast_eq_natCast_iff]
       exact h2.symm
     exact ⟨(IsCyclotomicExtension.algEquiv {A.m} ℚ (IntermediateField.adjoin ℚ {ζ ^ (N / A.m)})
-      (CyclotomicField A.m ℚ)).toAlgHom.comp
-        ((IntermediateField.inclusion hMC).comp (AlgEquiv.ofInjectiveField j).toAlgHom)⟩
+        (CyclotomicField A.m ℚ)).toAlgHom.comp
+      ((IntermediateField.inclusion hMC).comp (AlgEquiv.ofInjectiveField j).toAlgHom)⟩

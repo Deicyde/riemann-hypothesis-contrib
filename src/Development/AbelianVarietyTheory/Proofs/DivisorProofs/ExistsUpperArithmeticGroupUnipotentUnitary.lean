@@ -8,11 +8,14 @@ public import Development.AbelianVarietyTheory.BlockTheory.PoincareCuspForms.Sma
 
 set_option autoImplicit false
 
-open NumberField Module ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
+open NumberField Module ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
 
 namespace GlobalTheory.UpperArith
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {U C : Type} [Group U] [MulAction U C]
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {U C : Type} [Group U] [MulAction U C]
 
 theorem tr_one_mem (M : TwoLevels E r U C) (c : C) : M.tr 1 c ∈ (M.comp c).Γ := by
   have h := M.tr_mul 1 1 c
@@ -28,8 +31,13 @@ def upperSub (M : TwoLevels E r U C) (c : C) : Subgroup (GL (Fin r) E) where
     rw [hu] at hc
     have hm := M.tr_mul u v c
     rw [hv, mul_smul, hv, hu] at hm
-    refine ⟨u * v, by rw [mul_smul, hv, hu], γ * (M.tr u c * δ * (M.tr u c)⁻¹) *
-      (M.tr (u * v) c * (M.tr u c * M.tr v c)⁻¹)⁻¹, ?_, ?_⟩
+    refine ⟨
+      u * v,
+      by rw [mul_smul, hv, hu],
+      γ * (M.tr u c * δ * (M.tr u c)⁻¹) * (M.tr (u * v) c * (M.tr u c * M.tr v c)⁻¹)⁻¹,
+      ?_,
+      ?_
+    ⟩
     · exact (M.comp c).Γ.mul_mem ((M.comp c).Γ.mul_mem hγ hc) ((M.comp c).Γ.inv_mem hm)
     · group
   inv_mem' := by
@@ -44,12 +52,18 @@ def upperSub (M : TwoLevels E r U C) (c : C) : Subgroup (GL (Fin r) E) where
     have hc : (M.tr u c)⁻¹ * γ⁻¹ * M.tr u c ∈ (M.comp c).Γ := by
       rw [M.tr_conj u c, hu]
       simpa [mul_assoc] using (M.comp c).Γ.inv_mem hγ
-    refine ⟨u⁻¹, hu', (M.tr u c)⁻¹ * γ⁻¹ * M.tr u c * (M.tr u⁻¹ c * M.tr u c)⁻¹,
-      (M.comp c).Γ.mul_mem hc ((M.comp c).Γ.inv_mem hε), ?_⟩
+    refine ⟨
+      u⁻¹,
+      hu',
+      (M.tr u c)⁻¹ * γ⁻¹ * M.tr u c * (M.tr u⁻¹ c * M.tr u c)⁻¹,
+      (M.comp c).Γ.mul_mem hc ((M.comp c).Γ.inv_mem hε),
+      ?_
+    ⟩
     group
 
-theorem prime_and_mem_of_primesOver {g : ℕ} {P : Ideal (𝓞 E)}
-    (hP : P ∈ (Ideal.span {(g : ℤ)}).primesOver (𝓞 E)) : P.IsPrime ∧ (g : 𝓞 E) ∈ P := by
+theorem prime_and_mem_of_primesOver
+    {g : ℕ} {P : Ideal (𝓞 E)} (hP : P ∈ (Ideal.span {(g : ℤ)}).primesOver (𝓞 E))
+    : P.IsPrime ∧ (g : 𝓞 E) ∈ P := by
   obtain ⟨hp, hl⟩ := hP
   refine ⟨hp, ?_⟩
   have hg : (g : ℤ) ∈ P.under ℤ := by
@@ -58,11 +72,19 @@ theorem prime_and_mem_of_primesOver {g : ℕ} {P : Ideal (𝓞 E)}
   rw [Ideal.mem_comap] at hg
   simpa using hg
 
-theorem upper_subgroup (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (U C : Type) [Group U]
-    [MulAction U C] (M : TwoLevels E r U C) (c : C) (g : ℕ) (hU : M.UnipotentOver g) :
-    ∃ Γo : Subgroup (GL (Fin r) E), (∀ γ ∈ Γo, IsUStab (M.comp c).Gm (M.comp c).L' γ) ∧
-      (∀ γ ∈ Γo, GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.IsUnipotentModOver (M.comp c).L' g γ) ∧
-      ∀ u : U, u • c = c → M.tr u c ∈ Γo := by
+theorem upper_subgroup
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r : ℕ)
+    (U C : Type) [Group U] [MulAction U C]
+    (M : TwoLevels E r U C)
+    (c : C)
+    (g : ℕ) (hU : M.UnipotentOver g)
+    : ∃ Γo : Subgroup (GL (Fin r) E),
+      (∀ γ ∈ Γo, IsUStab (M.comp c).Gm (M.comp c).L' γ)
+        ∧ (∀ γ ∈ Γo,
+          GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.IsUnipotentModOver
+            (M.comp c).L' g γ)
+        ∧ ∀ u : U, u • c = c → M.tr u c ∈ Γo := by
   refine ⟨upperSub M c, ?_, ?_, ?_⟩
   · rintro _ ⟨u, hu, δ, hδ, rfl⟩
     have hs := (M.comp c).Γ_stab δ hδ

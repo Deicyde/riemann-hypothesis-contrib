@@ -80,8 +80,8 @@ private lemma generic {ι : Type} [Fintype ι] (s : Finset (ι → ℝ)) :
     Finset.sum_sub_distrib]
   exact sub_eq_zero.2 hvw
 
-theorem UpperTheory.ConvolutionTheory.FX.ev_inj :
-    ∀ (ι : Type) [Fintype ι] (f : EP ι), (∀ Λ : ι → ℂ, ev Λ f = 0) → f = 0 := by
+theorem UpperTheory.ConvolutionTheory.FX.ev_inj
+    : ∀ (ι : Type) [Fintype ι] (f : EP ι), (∀ Λ : ι → ℂ, ev Λ f = 0) → f = 0 := by
   intro ι _ f hf
   obtain ⟨u, hu⟩ := generic f.coeff.support
   rw [← AddMonoidAlgebra.coeff_eq_zero]
@@ -90,17 +90,23 @@ theorem UpperTheory.ConvolutionTheory.FX.ev_inj :
   apply hv
   have hv' : v ∈ f.coeff.support := Finsupp.mem_support_iff.2 hv
   refine MvPolynomial.funext fun Λ => ?_
-  have hev : ∀ (p : MvPolynomial ι ℂ) (t : ℂ),
-      Polynomial.eval t (aeval (fun i => Polynomial.C (Λ i) + Polynomial.C (u i : ℂ) * Polynomial.X) p) =
-        eval (fun i => Λ i + (u i : ℂ) * t) p := by
+  have hev
+      : ∀ (p : MvPolynomial ι ℂ) (t : ℂ),
+        Polynomial.eval t
+            (aeval (fun i => Polynomial.C (Λ i) + Polynomial.C (u i : ℂ) * Polynomial.X) p)
+          = eval (fun i => Λ i + (u i : ℂ) * t) p := by
     intro p t
     induction p using MvPolynomial.induction_on with
     | C a => simp
     | add p q hp hq => simp [hp, hq]
     | mul_X p i hp => simp [hp]
-  have key := one_var _ hu (fun w : f.coeff.support =>
-    Polynomial.C (Complex.exp (∑ i, (w.1 i : ℂ) * Λ i)) *
-      aeval (fun i => Polynomial.C (Λ i) + Polynomial.C (u i : ℂ) * Polynomial.X) (f.coeff w.1)) ?_ ⟨v, hv'⟩
+  have key :=
+    one_var _ hu
+      (fun w : f.coeff.support =>
+        Polynomial.C (Complex.exp (∑ i, (w.1 i : ℂ) * Λ i)) * aeval
+          (fun i => Polynomial.C (Λ i) + Polynomial.C (u i : ℂ) * Polynomial.X)
+          (f.coeff w.1))
+      ?_ ⟨v, hv'⟩
   · rw [Polynomial.eval_mul, hev, Polynomial.eval_C] at key
     simpa using key
   · intro t
@@ -109,8 +115,8 @@ theorem UpperTheory.ConvolutionTheory.FX.ev_inj :
     rw [← this]
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [Polynomial.eval_mul, hev, Polynomial.eval_C]
-    have : ∑ i, (w.1 i : ℂ) * (Λ i + (u i : ℂ) * t) =
-        ∑ i, (w.1 i : ℂ) * Λ i + ((∑ i, w.1 i * u i : ℝ) : ℂ) * t := by
+    have : ∑ i, (w.1 i : ℂ) * (Λ i + (u i : ℂ) * t)
+        = ∑ i, (w.1 i : ℂ) * Λ i + ((∑ i, w.1 i * u i : ℝ) : ℂ) * t := by
       push_cast
       simp only [mul_add, Finset.sum_add_distrib, Finset.sum_mul, mul_assoc]
     rw [this, Complex.exp_add]

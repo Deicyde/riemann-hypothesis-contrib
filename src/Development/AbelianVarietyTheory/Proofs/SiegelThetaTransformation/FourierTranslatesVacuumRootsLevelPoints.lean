@@ -15,17 +15,21 @@ namespace GlobalTheory.Dict.Poisson
 
 section Orbit
 
-open Matrix Complex NumberField GlobalTheory GlobalTheory.SW GlobalTheory.ThFr ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField GlobalTheory GlobalTheory.SW GlobalTheory.ThFr
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open GlobalTheory.SW.TensVac GlobalTheory.SW.TensLat
 open scoped ComplexConjugate Real Classical
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r g n : ℕ} {X : Data E r}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {r g n : ℕ} {X : Data E r}
   {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} {w : E} {A A' : AddSubgroup (Matrix (Fin n) (Fin r) E)}
 
-theorem mem_of_fix (idx : Fin g ≃ X.Ψ × Fin r) (hs : IsSympl X bas) (hn : Even n)
-    (hA : Good X w A) {p : TF n g} (hp : IsSB p) (h0 : p ≠ 0)
-    (hfix : ∀ u ∈ A, epsW X w u • heisG X bas u p = p) {y}
-    (hy : epsW X w y • heisG X bas y p = p) : y ∈ A := by
+theorem mem_of_fix
+    (idx : Fin g ≃ X.Ψ × Fin r) (hs : IsSympl X bas) (hn : Even n) (hA : Good X w A)
+    {p : TF n g} (hp : IsSB p) (h0 : p ≠ 0) (hfix : ∀ u ∈ A, epsW X w u • heisG X bas u p = p)
+    {y} (hy : epsW X w y • heisG X bas y p = p)
+    : y ∈ A := by
   by_contra hyA
   obtain ⟨v, hv, huniq⟩ := GlobalTheory.SW.TensVac.Good.vac hs hA
   obtain ⟨c, rfl⟩ := huniq p hp hfix
@@ -39,14 +43,16 @@ theorem mem_of_fix (idx : Fin g ≃ X.Ψ × Fin r) (hs : IsSympl X bas) (hn : Ev
   rw [hvy, hv.2.1] at h1
   exact one_ne_zero h1
 
-theorem fourier_of_reps (idx : Fin g ≃ X.Ψ × Fin r) (hs : IsSympl X bas) (hn : Even n)
-    (hA : Good X w A) (hA' : Good X w A') {p : TF n g} (hp : IsSB p)
-    (hfix : ∀ u ∈ A, epsW X w u • heisG X bas u p = p) {ι : Type}
+theorem fourier_of_reps
+    (idx : Fin g ≃ X.Ψ × Fin r) (hs : IsSympl X bas) (hn : Even n) (hA : Good X w A)
+    (hA' : Good X w A')
+    {p : TF n g} (hp : IsSB p) (hfix : ∀ u ∈ A, epsW X w u • heisG X bas u p = p)
+    {ι : Type}
     (Y : ι → Matrix (Fin n) (Fin r) E) (hY : ∀ q, Y q ∈ A') (hY1 : ∀ q, epsW X w (Y q) = 1)
     (hinj : ∀ q q', Y q - Y q' ∈ A → q = q') (hsurj : ∀ y ∈ A', ∃ q, y - Y q ∈ A)
-    {u : Matrix (Fin n) (Fin r) E} (hu : u ∈ A) (hu1 : epsW X w u = 1) :
-    ∑ᶠ q, cexp (-(2 * Real.pi * I * ((∑ b, EF X (u b) (Y q b) : ℚ) : ℂ))) • heisG X bas (Y q) p =
-      ((Nat.card ι : ℕ) : ℂ) • heisG X bas u (projA X bas w A' p) := by
+    {u : Matrix (Fin n) (Fin r) E} (hu : u ∈ A) (hu1 : epsW X w u = 1)
+    : ∑ᶠ q, cexp (-(2 * Real.pi * I * ((∑ b, EF X (u b) (Y q b) : ℚ) : ℂ))) • heisG X bas (Y q) p
+      = ((Nat.card ι : ℕ) : ℂ) • heisG X bas u (projA X bas w A' p) := by
   classical
   have hzero : ∀ y : Matrix (Fin n) (Fin r) E, heisG X bas y (0 : TF n g) = 0 := fun y => by
     have h := heisG_smul (X := X) (bas := bas) y (0 : ℂ) (0 : TF n g)
@@ -62,8 +68,9 @@ theorem fourier_of_reps (idx : Fin g ≃ X.Ψ × Fin r) (hs : IsSympl X bas) (hn
     simp [hzero]
   have hF : ∀ q, epsW X w (Y q) • heisG X bas (Y q) p = heisG X bas (Y q) p := fun q => by
     rw [hY1, one_smul]
-  have hrange : (fun y => epsW X w y • heisG X bas y p) '' (A' : Set (Matrix (Fin n) (Fin r) E)) =
-      Set.range (fun q => heisG X bas (Y q) p) := by
+  have hrange
+      : (fun y => epsW X w y • heisG X bas y p) '' (A' : Set (Matrix (Fin n) (Fin r) E))
+        = Set.range (fun q => heisG X bas (Y q) p) := by
     ext ψ
     constructor
     · rintro ⟨y, hy, rfl⟩
@@ -83,15 +90,20 @@ theorem fourier_of_reps (idx : Fin g ≃ X.Ψ × Fin r) (hs : IsSympl X bas) (hn
     have hd : Y q - Y q' ∈ A' := sub_mem (hY q) (hY q')
     have h1 := GlobalTheory.SW.TensVac.Good.rho_rho idx hs hn hA' (hY q') hd hp
     rw [add_sub_cancel, hF, hqq, ← hF q'] at h1
-    have hneg : -Y q' ∈ A' := neg_mem (hY q')
-    have cancel : ∀ φ : TF n g, IsSB φ → epsW X w (-Y q') • heisG X bas (-Y q')
-        (epsW X w (Y q') • heisG X bas (Y q') φ) = φ := fun φ hφ => by
+    have hneg : - Y q' ∈ A' := neg_mem (hY q')
+    have cancel
+        : ∀ φ : TF n g,
+          IsSB φ
+            → epsW X w (- Y q') • heisG X bas (- Y q') (epsW X w (Y q') • heisG X bas (Y q') φ)
+              = φ := fun φ hφ => by
       rw [GlobalTheory.SW.TensVac.Good.rho_rho idx hs hn hA' hneg (hY q') hφ, neg_add_cancel,
         rho_zero idx hs hn hφ]
     have hsb := rho_sb idx hs hn (w := w) (Y q - Y q') hp
-    have h2 : epsW X w (-Y q') • heisG X bas (-Y q') (epsW X w (Y q') • heisG X bas (Y q')
-        (epsW X w (Y q - Y q') • heisG X bas (Y q - Y q') p)) =
-        epsW X w (-Y q') • heisG X bas (-Y q') (epsW X w (Y q') • heisG X bas (Y q') p) := by
+    have h2
+        : epsW X w (- Y q') • heisG X bas (- Y q')
+            (epsW X w (Y q')
+              • heisG X bas (Y q') (epsW X w (Y q - Y q') • heisG X bas (Y q - Y q') p))
+          = epsW X w (- Y q') • heisG X bas (- Y q') (epsW X w (Y q') • heisG X bas (Y q') p) := by
       rw [h1]
     rw [cancel _ hsb, cancel _ hp] at h2
     exact mem_of_fix idx hs hn hA hp hp0 hfix h2
@@ -103,22 +115,24 @@ theorem fourier_of_reps (idx : Fin g ≃ X.Ψ × Fin r) (hs : IsSympl X bas) (hn
       (fun q => (⟨_, q, rfl⟩ : Set.range fun q => heisG X bas (Y q) p))
       (fun a b h => hinjF (congrArg Subtype.val h))
   haveI := Fintype.ofFinite ι
-  have hproj : projA X bas w A' p =
-      ((Nat.card ι : ℕ) : ℂ)⁻¹ • ∑ q, heisG X bas (Y q) p := by
+  have hproj : projA X bas w A' p = ((Nat.card ι : ℕ) : ℂ)⁻¹ • ∑ q, heisG X bas (Y q) p := by
     unfold projA
     rw [hrange, finsum_mem_range hinjF, ← Set.image_univ, Set.ncard_image_of_injective _ hinjF,
       Set.ncard_univ, finsum_eq_sum_of_fintype]
-  have hsum : heisG X bas u (∑ q, heisG X bas (Y q) p) =
-      ∑ q, heisG X bas u (heisG X bas (Y q) p) := by
-    have e : ∑ q, heisG X bas (Y q) p =
-        ∑ φ ∈ Finset.univ.image (fun q => heisG X bas (Y q) p), φ := by
+  have hsum
+      : heisG X bas u (∑ q, heisG X bas (Y q) p) = ∑ q, heisG X bas u (heisG X bas (Y q) p) := by
+    have e
+        : ∑ q, heisG X bas (Y q) p = ∑ φ ∈ Finset.univ.image (fun q => heisG X bas (Y q) p), φ := by
       rw [Finset.sum_image (fun a _ b _ h => hinjF h)]
     rw [e, heisG_sum, Finset.sum_image (fun a _ b _ h => hinjF h)]
   have hup : heisG X bas u p = p := by
     have h := hfix u hu
     rwa [hu1, one_smul] at h
-  have hterm : ∀ q, heisG X bas u (heisG X bas (Y q) p) =
-      cexp (-(2 * Real.pi * I * ((∑ b, EF X (u b) (Y q b) : ℚ) : ℂ))) • heisG X bas (Y q) p := by
+  have hterm
+      : ∀ q,
+        heisG X bas u (heisG X bas (Y q) p)
+          = cexp (-(2 * Real.pi * I * ((∑ b, EF X (u b) (Y q b) : ℚ) : ℂ)))
+            • heisG X bas (Y q) p := by
     intro q
     have l1 := (laws idx hs hn u hp).2.2.1 (Y q)
     have l2 := (laws idx hs hn (Y q) hp).2.2.1 u
@@ -141,21 +155,25 @@ section Ideals
 
 variable {O V : Type} [CommRing O] [AddCommGroup V] [Module O V] {P Q : Ideal O} {M : ℕ}
 
-theorem exists_of_mem_span_smul {B : Submodule O V} {x : V}
-    (hx : x ∈ Ideal.span {(M : O)} • B) : ∃ u ∈ B, x = M • u := by
+theorem exists_of_mem_span_smul {B : Submodule O V} {x : V} (hx : x ∈ Ideal.span {(M : O)} • B)
+    : ∃ u ∈ B, x = M • u := by
   rw [Submodule.ideal_span_singleton_smul] at hx
   obtain ⟨u, hu, rfl⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 hx
   exact ⟨u, hu, Nat.cast_smul_eq_nsmul O M u⟩
 
-theorem exists_of_mem_smul (h : Q * P = Ideal.span {(M : O)}) {B : Submodule O V} {x : V}
-    (hx : x ∈ P • B) {b : O} (hb : b ∈ Q) : ∃ u ∈ B, b • x = M • u := by
-  have hm : b • x ∈ (Q * P) • B := by
-    rw [Submodule.mul_smul]; exact Submodule.smul_mem_smul hb hx
+theorem exists_of_mem_smul
+    (h : Q * P = Ideal.span {(M : O)})
+    {B : Submodule O V} {x : V} (hx : x ∈ P • B)
+    {b : O} (hb : b ∈ Q)
+    : ∃ u ∈ B, b • x = M • u := by
+  have hm : b • x ∈ (Q * P) • B := by rw [Submodule.mul_smul]; exact Submodule.smul_mem_smul hb hx
   rw [h] at hm
   exact exists_of_mem_span_smul hm
 
-theorem exists_of_mem_inter (h : Q * P = Ideal.span {(M : O)}) (hc : Q ⊔ P = ⊤)
-    {B : Submodule O V} {x : V} (hx : x ∈ P • B) (hx' : x ∈ Q • B) : ∃ u ∈ B, x = M • u := by
+theorem exists_of_mem_inter
+    (h : Q * P = Ideal.span {(M : O)}) (hc : Q ⊔ P = ⊤)
+    {B : Submodule O V} {x : V} (hx : x ∈ P • B) (hx' : x ∈ Q • B)
+    : ∃ u ∈ B, x = M • u := by
   have h1 : (1 : O) ∈ Q ⊔ P := by rw [hc]; exact Submodule.mem_top
   obtain ⟨q, hq, p, hp, hqp⟩ := Submodule.mem_sup.1 h1
   have hq' : q • x ∈ Ideal.span {(M : O)} • B := by
@@ -170,22 +188,23 @@ end Ideals
 
 section Lattice
 
-open Matrix Complex NumberField GlobalTheory GlobalTheory.SW GlobalTheory.ThFr ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField GlobalTheory GlobalTheory.SW GlobalTheory.ThFr
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open GlobalTheory.SW.TensVac GlobalTheory.SW.TensLat GlobalTheory.SW.Base
 open scoped ComplexConjugate Real Classical
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r n : ℕ}
 
-theorem ctr_nat (y : Matrix (Fin n) (Fin r) E) (s : ℕ) (v : Fin n → E) :
-    ctr y ((s : E) • v) = (s : E) • ctr y v := by
+theorem ctr_nat (y : Matrix (Fin n) (Fin r) E) (s : ℕ) (v : Fin n → E)
+    : ctr y ((s : E) • v) = (s : E) • ctr y v := by
   unfold ctr
   rw [Finset.smul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Pi.smul_apply, smul_eq_mul, cc, map_mul, map_natCast, mul_smul]
   rfl
 
-theorem ctr_smul (a : E) (y : Matrix (Fin n) (Fin r) E) (v : Fin n → E) :
-    ctr (a • y) v = a • ctr y v := by
+theorem ctr_smul (a : E) (y : Matrix (Fin n) (Fin r) E) (v : Fin n → E)
+    : ctr (a • y) v = a • ctr y v := by
   unfold ctr
   rw [Finset.smul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
@@ -200,8 +219,10 @@ theorem ctr_single (y : Matrix (Fin n) (Fin r) E) (k : Fin n) : ctr y (Pi.single
     simp [hb, cc]
   · simp
 
-theorem ctr_rows {B : Lt E r} {y : Matrix (Fin n) (Fin r) E} (hy : ∀ k, y k ∈ B) {v : Fin n → E}
-    (hv : v ∈ stdL E n) : ctr y v ∈ B := by
+theorem ctr_rows
+    {B : Lt E r} {y : Matrix (Fin n) (Fin r) E} (hy : ∀ k, y k ∈ B)
+    {v : Fin n → E} (hv : v ∈ stdL E n)
+    : ctr y v ∈ B := by
   have hsm : ∀ (a : E) (v : Fin n → E), ctr y (a • v) = cc a • ctr y v := by
     intro a v
     unfold ctr
@@ -220,10 +241,12 @@ theorem ctr_rows {B : Lt E r} {y : Matrix (Fin n) (Fin r) E} (hy : ∀ k, y k �
   induction hv using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨k, rfl⟩ := hx
-    rw [ctr_single]; exact hy k
+    rw [ctr_single]
+    exact hy k
   | zero =>
     have : ctr y (0 : Fin n → E) = 0 := by simp [ctr]
-    rw [this]; exact B.zero_mem
+    rw [this]
+    exact B.zero_mem
   | add x x' _ _ h1 h2 =>
     rw [hadd]; exact B.add_mem h1 h2
   | smul c x _ h =>
@@ -232,14 +255,18 @@ theorem ctr_rows {B : Lt E r} {y : Matrix (Fin n) (Fin r) E} (hy : ∀ k, y k �
 
 variable {M N s : ℕ} {Λ : Lt E n} {L : Lt E r} {P Q : Ideal (𝓞 E)}
 
-theorem row_mem (hΛ : Λ ∈ Vset E n M) (hs : ∀ v ∈ stdL E n, (s : E) • v ∈ Λ) {B : Lt E r}
-    {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ B) (k : Fin n) : (s : E) • y k ∈ B := by
+theorem row_mem
+    (hΛ : Λ ∈ Vset E n M) (hs : ∀ v ∈ stdL E n, (s : E) • v ∈ Λ)
+    {B : Lt E r} {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ B)
+    (k : Fin n)
+    : (s : E) • y k ∈ B := by
   have hk : (s : E) • (Pi.single k 1 : Fin n → E) ∈ Λ := hs _ (Submodule.subset_span ⟨k, rfl⟩)
   have h := (mem_tens_iff hΛ B y).1 hy _ hk
   rwa [ctr_nat, ctr_single] at h
 
-theorem smul_mem_std (hΛ : Λ ∈ Vset E n M) (hN : ∀ v ∈ stdL E n, (N : E) • v ∈ Λ) {v : Fin n → E}
-    (hv : v ∈ Λ) : (N : E) • v ∈ stdL E n := by
+theorem smul_mem_std
+    (hΛ : Λ ∈ Vset E n M) (hN : ∀ v ∈ stdL E n, (N : E) • v ∈ Λ) {v : Fin n → E} (hv : v ∈ Λ)
+    : (N : E) • v ∈ stdL E n := by
   have hint : ∀ k, IsIntegral ℤ ((N : E) * v k) := by
     intro k
     have hk : (N : E) • (Pi.single k 1 : Fin n → E) ∈ Λ := hN _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -256,16 +283,17 @@ theorem smul_mem_std (hΛ : Λ ∈ Vset E n M) (hN : ∀ v ∈ stdL E n, (N : E)
   exact Submodule.sum_mem _ fun k _ => int_smul_mem (hint k) (Submodule.subset_span ⟨k, rfl⟩)
 
 omit [IsCMField E] in
-theorem nat_smul_mem_smul {k : ℕ} (hk : (k : 𝓞 E) ∈ P) {x : Fin r → E} (hx : x ∈ L) :
-    (k : E) • x ∈ P • L := by
+theorem nat_smul_mem_smul {k : ℕ} (hk : (k : 𝓞 E) ∈ P) {x : Fin r → E} (hx : x ∈ L)
+    : (k : E) • x ∈ P • L := by
   have h := Submodule.smul_mem_smul hk hx
   rwa [Nat.cast_smul_eq_nsmul, ← Nat.cast_smul_eq_nsmul E]
 
-
 omit [IsCMField E] in
-theorem mem_of_two (hM : Odd M) (hsM : s.Coprime M) (hMQ : (M : 𝓞 E) ∈ Q) (hc : Q ⊔ P = ⊤) {j : ℕ}
-    {z : Fin r → E} (ha : ∀ t ∈ Q ^ j, t • z ∈ P • L) {b : 𝓞 E}
-    (hb2 : ((2 * s : ℕ) : E) • b • z ∈ L) : b • z ∈ P • L := by
+theorem mem_of_two
+    (hM : Odd M) (hsM : s.Coprime M) (hMQ : (M : 𝓞 E) ∈ Q) (hc : Q ⊔ P = ⊤)
+    {j : ℕ} {z : Fin r → E} (ha : ∀ t ∈ Q ^ j, t • z ∈ P • L)
+    {b : 𝓞 E} (hb2 : ((2 * s : ℕ) : E) • b • z ∈ L)
+    : b • z ∈ P • L := by
   have hQP : Q ^ j ⊔ P = ⊤ := by
     have h := (Ideal.isCoprime_iff_sup_eq.2 hc).pow_left (m := j)
     exact Ideal.isCoprime_iff_sup_eq.1 h
@@ -276,9 +304,12 @@ theorem mem_of_two (hM : Odd M) (hsM : s.Coprime M) (hMQ : (M : 𝓞 E) ∈ Q) (
   have hwP : ((2 * s : ℕ) : E) • b • z ∈ P • L := by
     have h1 : (1 : 𝓞 E) ∈ Q ^ j ⊔ P := by rw [hQP]; exact Submodule.mem_top
     obtain ⟨q, hq, p, hp, hqp⟩ := Submodule.mem_sup.1 h1
-    have e : ((2 * s : ℕ) : E) • b • z = q • (((2 * s : ℕ) : E) • b • z) + p • (((2 * s : ℕ) : E) • b • z) := by
+    have e
+        : ((2 * s : ℕ) : E) • b • z
+          = q • (((2 * s : ℕ) : E) • b • z) + p • (((2 * s : ℕ) : E) • b • z) := by
       rw [← add_smul, hqp, one_smul]
-    rw [e]; exact add_mem (hQw q hq) (Submodule.smul_mem_smul hp hb2)
+    rw [e]
+    exact add_mem (hQw q hq) (Submodule.smul_mem_smul hp hb2)
   have hcop : Nat.Coprime (2 * s) (M ^ j) :=
     Nat.Coprime.pow_right j (Nat.Coprime.mul_left (Nat.coprime_two_left.2 hM) hsM)
   obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.2 hcop
@@ -289,13 +320,15 @@ theorem mem_of_two (hM : Odd M) (hsM : s.Coprime M) (hMQ : (M : 𝓞 E) ∈ Q) (
     have h : (u : E) * ((2 * s : ℕ) : E) + (v : E) * algebraMap (𝓞 E) E ((M : 𝓞 E) ^ j) = 1 := by
       rw [map_pow, map_natCast]; exact_mod_cast huv
     rw [h, one_smul]
-  rw [e]; exact add_mem (zsmul_mem hwP u) (zsmul_mem (hQbz _ hMj) v)
+  rw [e]
+  exact add_mem (zsmul_mem hwP u) (zsmul_mem (hQbz _ hMj) v)
 
-theorem half_away (hΛ : Λ ∈ Vset E n M) (hsM : s.Coprime M)
-    (hs : ∀ v ∈ Λ, (s : E) • v ∈ stdL E n) (hMP : (M : 𝓞 E) ∈ P) (hNP : (N : 𝓞 E) ∈ P)
-    (hN : ∀ v ∈ stdL E n, (N : E) • v ∈ Λ) {Y : Matrix (Fin n) (Fin r) E} {t : 𝓞 E}
-    (h : ∀ k, ∃ u ∈ L, t • Y k = (2 * N) • u) {v : Fin n → E} (hv : v ∈ Λ) :
-    t • ctr ((2 : E)⁻¹ • Y) v ∈ P • L := by
+theorem half_away
+    (hΛ : Λ ∈ Vset E n M) (hsM : s.Coprime M) (hs : ∀ v ∈ Λ, (s : E) • v ∈ stdL E n)
+    (hMP : (M : 𝓞 E) ∈ P) (hNP : (N : 𝓞 E) ∈ P) (hN : ∀ v ∈ stdL E n, (N : E) • v ∈ Λ)
+    {Y : Matrix (Fin n) (Fin r) E} {t : 𝓞 E} (h : ∀ k, ∃ u ∈ L, t • Y k = (2 * N) • u)
+    {v : Fin n → E} (hv : v ∈ Λ)
+    : t • ctr ((2 : E)⁻¹ • Y) v ∈ P • L := by
   choose u hu hYu using h
   have hstd : ∀ x ∈ stdL E n, ∀ k, IsIntegral ℤ (x k) := by
     intro x hx
@@ -306,8 +339,10 @@ theorem half_away (hΛ : Λ ∈ Vset E n M) (hsM : s.Coprime M)
       by_cases hka : k = a
       · subst hka; simpa using isIntegral_one
       · simpa [Pi.single_apply, hka] using isIntegral_zero
-    | zero => intro k; exact isIntegral_zero
-    | add x y _ _ h1 h2 => intro k; exact (h1 k).add (h2 k)
+    | zero =>
+      intro k; exact isIntegral_zero
+    | add x y _ _ h1 h2 =>
+      intro k; exact (h1 k).add (h2 k)
     | smul c x _ h =>
       intro k
       rw [Pi.smul_apply, Algebra.smul_def]
@@ -326,8 +361,10 @@ theorem half_away (hΛ : Λ ∈ Vset E n M) (hsM : s.Coprime M)
   refine Submodule.sum_mem _ fun k _ => ?_
   have c1 : cc ((s : E) * v k) = (s : E) * cc (v k) := by simp [cc]
   have c2 : cc ((N : E) * v k) = (N : E) * cc (v k) := by simp [cc]
-  have e2 : cc (v k) • ((N : E) • u k) = (a : E) • ((N : E) • (cc ((s : E) * v k) • u k)) +
-      (b : E) • ((M : E) • (cc ((N : E) * v k) • u k)) := by
+  have e2
+      : cc (v k) • ((N : E) • u k)
+        = (a : E) • ((N : E) • (cc ((s : E) * v k) • u k))
+          + (b : E) • ((M : E) • (cc ((N : E) * v k) • u k)) := by
     rw [c1, c2]
     simp only [smul_smul, ← add_smul]
     congr 1
@@ -342,23 +379,26 @@ theorem half_away (hΛ : Λ ∈ Vset E n M) (hsM : s.Coprime M)
   · rw [Int.cast_smul_eq_zsmul]
     exact zsmul_mem (nat_smul_mem_smul hMP (int_smul_mem i2 (hu k))) b
 
-theorem half_mem (hΛ : Λ ∈ Vset E n M) (hM : Odd M) (hMP : (M : 𝓞 E) ∈ P) (hMQ : (M : 𝓞 E) ∈ Q)
-    (hc : Q ⊔ P = ⊤) (hMN : M ∣ N) (hN : ∀ v ∈ stdL E n, (N : E) • v ∈ Λ)
+theorem half_mem
+    (hΛ : Λ ∈ Vset E n M) (hM : Odd M) (hMP : (M : 𝓞 E) ∈ P) (hMQ : (M : 𝓞 E) ∈ Q) (hc : Q ⊔ P = ⊤)
+    (hMN : M ∣ N) (hN : ∀ v ∈ stdL E n, (N : E) • v ∈ Λ)
     {Y : Matrix (Fin n) (Fin r) E} (h1 : ∀ k, ∀ b ∈ Q, b • Y k ∈ L)
-    (h2 : ∀ k, ∃ j : ℕ, ∀ t ∈ Q ^ j, ∃ u ∈ L, t • Y k = (2 * N) • u) :
-    (2 : E)⁻¹ • Y ∈ tens Λ (idq P Q L) := by
+    (h2 : ∀ k, ∃ j : ℕ, ∀ t ∈ Q ^ j, ∃ u ∈ L, t • Y k = (2 * N) • u)
+    : (2 : E)⁻¹ • Y ∈ tens Λ (idq P Q L) := by
   obtain ⟨s, -, hsM, hs, -⟩ := hΛ.2.2
   choose j hj using h2
   have hNP : (N : 𝓞 E) ∈ P := by
     obtain ⟨c, rfl⟩ := hMN
-    rw [Nat.cast_mul]; exact Ideal.mul_mem_right _ _ hMP
+    rw [Nat.cast_mul]
+    exact Ideal.mul_mem_right _ _ hMP
   rw [mem_tens_iff hΛ]
   intro v hv b hb
   refine mem_of_two (j := ∑ k, j k) hM hsM hMQ hc ?_ ?_
   · intro t ht
     refine half_away hΛ hsM hs hMP hNP hN (fun k => ?_) hv
-    exact hj k t (Ideal.pow_le_pow_right
-      (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ k)) ht)
+    exact hj k t
+      (Ideal.pow_le_pow_right (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ k))
+        ht)
   · have hrow : ∀ k, ((b : E) • Y) k ∈ L := fun k => by
       have h := h1 k b hb
       rw [← algebraMap_smul E b (Y k)] at h
@@ -373,13 +413,16 @@ theorem half_mem (hΛ : Λ ∈ Vset E n M) (hM : Odd M) (hMP : (M : 𝓞 E) ∈ 
     rw [e]
     exact ctr_rows hrow (hs v hv)
 
-theorem half_mem' (hΛ : Λ ∈ Vset E n M) {u : Matrix (Fin n) (Fin r) E}
-    (hu : u ∈ tens Λ ((Ideal.span {2} * Q) • L)) : (2 : E)⁻¹ • u ∈ tens Λ L := by
+theorem half_mem'
+    (hΛ : Λ ∈ Vset E n M)
+    {u : Matrix (Fin n) (Fin r) E} (hu : u ∈ tens Λ ((Ideal.span {2} * Q) • L))
+    : (2 : E)⁻¹ • u ∈ tens Λ L := by
   rw [mem_tens_iff hΛ] at hu ⊢
   intro w hw
   have h1 : ctr u w ∈ Ideal.span {((2 : ℕ) : 𝓞 E)} • L := by
-    have h := Submodule.smul_mono_left
-      (Ideal.mul_le_left : Ideal.span {(2 : 𝓞 E)} * Q ≤ Ideal.span {(2 : 𝓞 E)}) (hu w hw)
+    have h :=
+      Submodule.smul_mono_left
+        (Ideal.mul_le_left : Ideal.span {(2 : 𝓞 E)} * Q ≤ Ideal.span {(2 : 𝓞 E)}) (hu w hw)
     simpa using h
   obtain ⟨x, hx, hx2⟩ := exists_of_mem_span_smul h1
   rw [ctr_smul, hx2, ← Nat.cast_smul_eq_nsmul E, smul_smul, Nat.cast_ofNat,
@@ -390,8 +433,11 @@ omit [IsCMField E] in
 theorem two_half (y : Matrix (Fin n) (Fin r) E) : 2 • (2 : E)⁻¹ • y = y := by
   rw [two_smul, ← add_smul, ← two_mul, mul_inv_cancel₀ two_ne_zero, one_smul]
 
-theorem rows_of_mem (hΛ : Λ ∈ Vset E n M) {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ L)
-    (k : Fin n) (h : (M : E) • y k ∈ L) : y k ∈ L := by
+theorem rows_of_mem
+    (hΛ : Λ ∈ Vset E n M)
+    {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ L)
+    (k : Fin n) (h : (M : E) • y k ∈ L)
+    : y k ∈ L := by
   obtain ⟨t, -, htM, -, ht⟩ := hΛ.2.2
   have h1 := row_mem hΛ ht hy k
   obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.2 htM
@@ -399,17 +445,21 @@ theorem rows_of_mem (hΛ : Λ ∈ Vset E n M) {y : Matrix (Fin n) (Fin r) E} (hy
     rw [← Int.cast_smul_eq_zsmul E, ← Int.cast_smul_eq_zsmul E, smul_smul, smul_smul, ← add_smul]
     have h2 : ((a : E) * t + b * M) = 1 := by exact_mod_cast hab
     rw [h2, one_smul]
-  rw [e]; exact add_mem (zsmul_mem h1 a) (zsmul_mem h b)
+  rw [e]
+  exact add_mem (zsmul_mem h1 a) (zsmul_mem h b)
 
-theorem exists_rows (hΛ : Λ ∈ Vset E n M) (hM : 1 < M) (hMQ : (M : 𝓞 E) ∈ Q)
-    {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ (idq P Q L)) :
-    ∃ y' : Matrix (Fin n) (Fin r) E, (∀ k, (M : E) • y' k ∈ P • L) ∧
-      ∀ Y ∈ tens Λ (idq P Q L), (∀ k, Y k - y' k ∈ L) → y - Y ∈ tens Λ L := by
+theorem exists_rows
+    (hΛ : Λ ∈ Vset E n M) (hM : 1 < M) (hMQ : (M : 𝓞 E) ∈ Q)
+    {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ (idq P Q L))
+    : ∃ y' : Matrix (Fin n) (Fin r) E,
+      (∀ k, (M : E) • y' k ∈ P • L)
+        ∧ ∀ Y ∈ tens Λ (idq P Q L), (∀ k, Y k - y' k ∈ L) → y - Y ∈ tens Λ L := by
   obtain ⟨s, -, hsM, hs, hs'⟩ := hΛ.2.2
   obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.2 hsM
   have hab' : (a : E) * s + b * M = 1 := by exact_mod_cast hab
-  have hsub : ∀ (A A' : Matrix (Fin n) (Fin r) E) (w : Fin n → E),
-      ctr (A - A') w = ctr A w - ctr A' w := by
+  have hsub
+      : ∀ (A A' : Matrix (Fin n) (Fin r) E) (w : Fin n → E),
+        ctr (A - A') w = ctr A w - ctr A' w := by
     intro A A' w
     unfold ctr
     rw [← Finset.sum_sub_distrib]
@@ -442,7 +492,9 @@ theorem exists_rows (hΛ : Λ ∈ Vset E n M) (hM : 1 < M) (hMQ : (M : 𝓞 E) �
       have e : y - Y = ((b : E) * M) • y - (Y - ((a : E) * s) • y) := by
         have h0 : ((b : E) * M) • y + ((a : E) * s) • y = y := by
           rw [← add_smul, show (b : E) * M + a * s = 1 by linear_combination hab', one_smul]
-        calc y - Y = (((b : E) * M) • y + ((a : E) * s) • y) - Y := by rw [h0]
+        calc
+          y - Y
+            = (((b : E) * M) • y + ((a : E) * s) • y) - Y := by rw [h0]
           _ = _ := by abel
       rw [← ctr_nat, e, hsub, ctr_nat, ctr_smul]
       refine sub_mem ?_ (ctr_rows hD (hs w hw))
@@ -463,8 +515,11 @@ end Lattice
 
 end GlobalTheory.Dict.Poisson
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
 open GlobalTheory.SW hiding Level
 open Formalism.L2.Pj Formalism.L2.PjFree
@@ -478,8 +533,9 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (l : Ge
 
 theorem conjI_Mfr : conjI (Mfr l) = l.Mb := by
   unfold conjI Mfr
-  have hset : {a : 𝓞 E | ∃ b ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E), ((a : 𝓞 E) : E) = cc ((b : 𝓞 E) : E)} =
-      (l.Mb : Set (𝓞 E)) := by
+  have hset
+      : {a : 𝓞 E | ∃ b ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E), ((a : 𝓞 E) : E) = cc ((b : 𝓞 E) : E)}
+        = (l.Mb : Set (𝓞 E)) := by
     ext a
     simp only [Set.mem_setOf_eq, SetLike.mem_coe]
     constructor
@@ -501,8 +557,8 @@ theorem M_mem : (l.M : 𝓞 E) ∈ Mfr l ∧ (l.M : 𝓞 E) ∈ l.Mb := by
   · exact (Ideal.mul_le_right : l.Mb * Mfr l ≤ Mfr l) h
   · exact (Ideal.mul_le_left : l.Mb * Mfr l ≤ l.Mb) h
 
-theorem selfD_shift {r : ℕ} {X : Data E r} {L : Lt E r} (hL : SelfD X L) :
-    SelfD X (idq (Mfr l) (conjI (Mfr l)) L) := by
+theorem selfD_shift {r : ℕ} {X : Data E r} {L : Lt E r} (hL : SelfD X L)
+    : SelfD X (idq (Mfr l) (conjI (Mfr l)) L) := by
   rw [conjI_Mfr]
   have hbar : ∀ a : 𝓞 E, ((H.bar a : 𝓞 E) : E) = cc (a : E) := fun a => H.bar_eq a
   have hbarbar : ∀ a : 𝓞 E, H.bar (H.bar a) = a := fun a => by
@@ -516,8 +572,8 @@ theorem selfD_shift {r : ℕ} {X : Data E r} {L : Lt E r} (hL : SelfD X L) :
     (algebraMap_smul E a v).symm
   have hadd : ∀ u u' v : Fin r → E, EF X (u + u') v = EF X u v + EF X u' v := by
     intro u u' v
-    rw [GlobalTheory.SW.TensLat.EF_eq_bilin, GlobalTheory.SW.TensLat.EF_eq_bilin, GlobalTheory.SW.TensLat.EF_eq_bilin,
-      LinearMap.map_add₂]
+    rw [GlobalTheory.SW.TensLat.EF_eq_bilin, GlobalTheory.SW.TensLat.EF_eq_bilin,
+      GlobalTheory.SW.TensLat.EF_eq_bilin, LinearMap.map_add₂]
   have hsm : ∀ (a : 𝓞 E) (u v : Fin r → E), EF X (a • u) v = EF X u (H.bar a • v) := by
     intro a u v
     rw [hco, hco, GlobalTheory.SW.TensLat.EF_smul, hbar]
@@ -560,9 +616,10 @@ theorem selfD_shift {r : ℕ} {X : Data E r} {L : Lt E r} (hL : SelfD X L) :
   · have step1 : ∀ ν ∈ l.Mb, ν • x ∈ L := by
       intro ν hν
       refine (hL.2 _).2 fun ℓ hℓ => ?_
-      have hyL' : H.bar ν • ℓ ∈ idq (Mfr l) l.Mb L := (hmemL' _).2 fun b hb => by
-        rw [smul_comm]
-        exact Submodule.smul_mem_smul (hmemM ν hν) (L.smul_mem b hℓ)
+      have hyL' : H.bar ν • ℓ ∈ idq (Mfr l) l.Mb L :=
+        (hmemL' _).2 fun b hb => by
+          rw [smul_comm]
+          exact Submodule.smul_mem_smul (hmemM ν hν) (L.smul_mem b hℓ)
       obtain ⟨k, hk⟩ := hx _ hyL'
       exact ⟨k, by rw [hsm, hk]⟩
     have step2 : ∀ ν1 ∈ l.Mb, ∀ ν2 ∈ l.Mb, (ν1 * ν2) • x ∈ Mfr l • L := by
@@ -607,7 +664,25 @@ theorem selfD_shift {r : ℕ} {X : Data E r} {L : Lt E r} (hL : SelfD X L) :
 
 end GlobalTheory.Dict.Poisson
 
-theorem GlobalTheory.Dict.poisson_roots : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (r g : ℕ) (X : Data E r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → ∀ w : E, IsIntegral ℤ w → w + cc w = 1 → ∀ (L : Lt E r) (mk : Dw.La →ₗ[𝓞 E] (Fin r → E)), SelfD X L → IsMark l L mk → ∀ Λ ∈ Vset E n l.M, ∀ N : ℕ, NOK Λ N l.M → ∀ Y : (Fin n → LevQ Dw l) → Matrix (Fin n) (Fin r) E, IsRoots l L mk N Y → ∀ p : TF n g, IsSB p → (∀ u ∈ tens Λ L, epsW X w u • heisG X bas u p = p) → ∀ u ∈ tens Λ ((Ideal.span {2} * conjI (Mfr l)) • L), ∑ᶠ q, cexp (-(2 * Real.pi * I * ((∑ b, EF X (u b) (Y q b) : ℚ) : ℂ))) • heisG X bas (Y q) p = ((Nat.card (Fin n → LevQ Dw l) : ℕ) : ℂ) • heisG X bas u (projA X bas w (tens Λ (idq (Mfr l) (conjI (Mfr l)) L)) p) := by
+theorem GlobalTheory.Dict.poisson_roots
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (r g : ℕ) (X : Data E r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ)
+        (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ),
+      IsSympl X bas → Even n
+        → ∀ w : E,
+          IsIntegral ℤ w → w + cc w = 1
+            → ∀ (L : Lt E r) (mk : Dw.La →ₗ[𝓞 E] (Fin r → E)),
+              SelfD X L → IsMark l L mk
+                → ∀ Λ ∈ Vset E n l.M, ∀ N : ℕ,
+                  NOK Λ N l.M
+                    → ∀ Y : (Fin n → LevQ Dw l) → Matrix (Fin n) (Fin r) E,
+                      IsRoots l L mk N Y
+                        → ∀ p : TF n g,
+                          IsSB p → (∀ u ∈ tens Λ L, epsW X w u • heisG X bas u p = p)
+                            → ∀ u ∈ tens Λ ((Ideal.span {2} * conjI (Mfr l)) • L),
+                              ∑ᶠ q, cexp (-(2 * Real.pi * I * ((∑ b, EF X (u b) (Y q b) : ℚ) : ℂ))) • heisG X bas (Y q) p
+                                = ((Nat.card (Fin n → LevQ Dw l) : ℕ) : ℂ) • heisG X bas u
+                                  (projA X bas w (tens Λ (idq (Mfr l) (conjI (Mfr l)) L)) p) := by
   intro E _ _ _ H Dw l r g X bas idx n hs hn w hw hw1 L mk hL hmk Λ hΛ N hNOK Y hY p hp hfix u hu
   classical
   have hQ : conjI (Mfr l) = l.Mb := GlobalTheory.Dict.Poisson.conjI_Mfr l
@@ -637,18 +712,21 @@ theorem GlobalTheory.Dict.poisson_roots : ∀ (E : Type) [Field E] [NumberField 
     have h3 := (Submodule.mem_inf.1 h2).1
     rwa [Nat.cast_smul_eq_nsmul, ← Nat.cast_smul_eq_nsmul E] at h3
   have hA : GlobalTheory.SW.TensVac.Good X w (tens Λ L) := by
-    have h := GlobalTheory.SW.TensLat.tens_selfDual_semichar_index E r X g bas idx n hs hn w hw hw1 L hL
-      l.M Λ hΛ
+    have h :=
+      GlobalTheory.SW.TensLat.tens_selfDual_semichar_index E r X g bas idx n hs hn w hw hw1 L hL l.M
+        Λ hΛ
     exact ⟨h.1, h.2.1, h.2.2.1⟩
   have hL' := GlobalTheory.Dict.Poisson.selfD_shift l hL
   rw [hQ] at hL'
   have hA' : GlobalTheory.SW.TensVac.Good X w (tens Λ (idq (Mfr l) l.Mb L)) := by
-    have h := GlobalTheory.SW.TensLat.tens_selfDual_semichar_index E r X g bas idx n hs hn w hw hw1 _ hL'
-      l.M Λ hΛ
+    have h :=
+      GlobalTheory.SW.TensLat.tens_selfDual_semichar_index E r X g bas idx n hs hn w hw hw1 _ hL'
+        l.M Λ hΛ
     exact ⟨h.1, h.2.1, h.2.2.1⟩
   have hcoord : ∀ q, (2 : E)⁻¹ • Y q ∈ tens Λ (idq (Mfr l) l.Mb L) := by
     intro q
-    refine GlobalTheory.Dict.Poisson.half_mem hΛ l.odd hMP hMQ hc hMN hN (fun k b hb => ?_)
+    refine GlobalTheory.Dict.Poisson.half_mem hΛ l.odd hMP hMQ hc hMN hN
+      (fun k b hb => ?_)
       (fun k => (hY q k).2)
     obtain ⟨a, ha, -, hya⟩ := (hY q k).1
     obtain ⟨c, -, hc'⟩ := GlobalTheory.Dict.Poisson.exists_of_mem_smul hprod ha hb
@@ -678,8 +756,10 @@ theorem GlobalTheory.Dict.poisson_roots : ∀ (E : Type) [Field E] [NumberField 
     obtain ⟨a, ha, hqa, hya⟩ := (hY q k).1
     obtain ⟨a', ha', hqa', hya'⟩ := (hY q' k).1
     have hML : (l.M : E) • (Y q - Y q') k ∈ L := by
-      have e : (l.M : E) • (Y q k - Y q' k) = (l.M : E) • (Y q k - (l.M : E)⁻¹ • mk a) -
-          (l.M : E) • (Y q' k - (l.M : E)⁻¹ • mk a') + (mk a - mk a') := by
+      have e
+          : (l.M : E) • (Y q k - Y q' k)
+            = (l.M : E) • (Y q k - (l.M : E)⁻¹ • mk a) - (l.M : E) • (Y q' k - (l.M : E)⁻¹ • mk a')
+              + (mk a - mk a') := by
         rw [smul_sub, smul_sub, smul_sub, smul_smul, smul_smul, mul_inv_cancel₀ hM0, one_smul,
           one_smul]
         abel
@@ -687,14 +767,20 @@ theorem GlobalTheory.Dict.poisson_roots : ∀ (E : Type) [Field E] [NumberField 
       exact add_mem (sub_mem (hMs _ hya) (hMs _ hya')) (sub_mem (hmk.mem a) (hmk.mem a'))
     have hrow := GlobalTheory.Dict.Poisson.rows_of_mem hΛ hd k hML
     have hz : (l.M : E)⁻¹ • mk a - (l.M : E)⁻¹ • mk a' ∈ L := by
-      have e : (l.M : E)⁻¹ • mk a - (l.M : E)⁻¹ • mk a' =
-          (Y q k - Y q' k) - (Y q k - (l.M : E)⁻¹ • mk a) + (Y q' k - (l.M : E)⁻¹ • mk a') := by
+      have e
+          : (l.M : E)⁻¹ • mk a - (l.M : E)⁻¹ • mk a'
+            = (Y q k - Y q' k) - (Y q k - (l.M : E)⁻¹ • mk a) + (Y q' k - (l.M : E)⁻¹ • mk a') := by
         abel
       rw [e]
       exact add_mem (sub_mem hrow hya) hya'
-    obtain ⟨b', hb'⟩ := hmk.inj (a - a') (sub_mem ha ha') ⟨_, hz, by
-      rw [map_sub, ← smul_sub, ← Nat.cast_smul_eq_nsmul E, smul_smul, mul_inv_cancel₀ hM0,
-        one_smul]⟩
+    obtain ⟨b', hb'⟩ :=
+      hmk.inj (a - a') (sub_mem ha ha') ⟨
+        _,
+        hz,
+        by
+          rw [map_sub, ← smul_sub, ← Nat.cast_smul_eq_nsmul E, smul_smul, mul_inv_cancel₀ hM0,
+            one_smul]
+      ⟩
     rw [← hqa, ← hqa']
     refine (Submodule.Quotient.eq _).2 ?_
     rw [hb', ← Nat.cast_smul_eq_nsmul (𝓞 E)]
@@ -707,20 +793,24 @@ theorem GlobalTheory.Dict.poisson_roots : ∀ (E : Type) [Field E] [NumberField 
     refine ⟨fun k => Submodule.Quotient.mk (a k), hy'2 _ (hYA' _) fun k => ?_⟩
     obtain ⟨a', ha', hqa', hya'⟩ := (hY (fun k => Submodule.Quotient.mk (a k)) k).1
     have hdiff : a' - a k ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La) := (Submodule.Quotient.eq _).1 hqa'
-    obtain ⟨c, -, hc'⟩ := GlobalTheory.Dict.Poisson.exists_of_mem_inter hprod hc (sub_mem ha' (ha k)) hdiff
+    obtain ⟨c, -, hc'⟩ :=
+      GlobalTheory.Dict.Poisson.exists_of_mem_inter hprod hc (sub_mem ha' (ha k)) hdiff
     have hy'k : y' k = (l.M : E)⁻¹ • mk (a k) + v k := by
       have h : (l.M : E)⁻¹ • ((l.M : E) • y' k) = (l.M : E)⁻¹ • (mk (a k) + l.M • v k) := by
         rw [hav k]
       rw [smul_smul, inv_mul_cancel₀ hM0, one_smul, smul_add, ← Nat.cast_smul_eq_nsmul E, smul_smul,
-        inv_mul_cancel₀ hM0, one_smul] at h
+          inv_mul_cancel₀ hM0, one_smul]
+        at h
       exact h
     have e2 : (l.M : E)⁻¹ • mk a' = (l.M : E)⁻¹ • mk (a k) + mk c := by
       have h2 : a' = a k + l.M • c := by rw [← hc']; abel
       rw [h2, map_add (f := _), map_nsmul, smul_add, ← Nat.cast_smul_eq_nsmul E, smul_smul,
         inv_mul_cancel₀ hM0, one_smul]
-    have e : Y (fun k => Submodule.Quotient.mk (a k)) k - y' k =
-        (Y (fun k => Submodule.Quotient.mk (a k)) k - (l.M : E)⁻¹ • mk a') + mk c - v k := by
+    have e
+        : Y (fun k => Submodule.Quotient.mk (a k)) k - y' k
+          = (Y (fun k => Submodule.Quotient.mk (a k)) k - (l.M : E)⁻¹ • mk a') + mk c - v k := by
       rw [hy'k, e2]; abel
     rw [e]
     exact sub_mem (add_mem hya' (hmk.mem c)) (hv k)
-  exact GlobalTheory.Dict.Poisson.fourier_of_reps idx hs hn hA hA' hp hfix Y hYA' hY1 hinj hsurj huA hu1
+  exact GlobalTheory.Dict.Poisson.fourier_of_reps idx hs hn hA hA' hp hfix Y hYA' hY1 hinj hsurj huA
+    hu1

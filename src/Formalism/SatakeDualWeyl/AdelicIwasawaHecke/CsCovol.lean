@@ -9,28 +9,33 @@ open Module NumberField Matrix
 
 namespace Formalism.UG.P
 
-theorem csCovol_sq_eq_det_gram {N : ℕ} (L : Submodule ℤ (EuclideanSpace ℝ (Fin N)))
-    [DiscreteTopology L] [IsZLattice ℝ L] (b : Basis (Fin N) ℤ L) :
-    ZLattice.covolume L ^ 2 =
-      (Matrix.of fun i j : Fin N => inner ℝ ((b i : EuclideanSpace ℝ (Fin N))) (b j)).det := by
+theorem csCovol_sq_eq_det_gram
+    {N : ℕ} (L : Submodule ℤ (EuclideanSpace ℝ (Fin N))) [DiscreteTopology L] [IsZLattice ℝ L]
+    (b : Basis (Fin N) ℤ L)
+    : ZLattice.covolume L ^ 2
+      = (Matrix.of fun i j : Fin N => inner ℝ ((b i : EuclideanSpace ℝ (Fin N))) (b j)).det := by
   classical
   let b₀ := (EuclideanSpace.basisFun (Fin N) ℝ).toBasis
   have hc := ZLattice.covolume_eq_det_mul_measureReal L MeasureTheory.volume b b₀
   have hvol : MeasureTheory.volume.real (ZSpan.fundamentalDomain b₀) = 1 := by
     rw [MeasureTheory.measureReal_def,
-      MeasureTheory.measure_congr (ZSpan.fundamentalDomain_ae_parallelepiped b₀ MeasureTheory.volume)]
+      MeasureTheory.measure_congr (ZSpan.fundamentalDomain_ae_parallelepiped b₀
+        MeasureTheory.volume)]
     rw [OrthonormalBasis.coe_toBasis, OrthonormalBasis.volume_parallelepiped]
     simp
   rw [hc, hvol, mul_one, sq_abs, Module.Basis.det_apply]
-  have hG : (Matrix.of fun i j : Fin N => inner ℝ ((b i : EuclideanSpace ℝ (Fin N))) (b j)) =
-      (b₀.toMatrix (Subtype.val ∘ b))ᵀ * b₀.toMatrix (Subtype.val ∘ b) := by
+  have hG
+      : (Matrix.of fun i j : Fin N => inner ℝ ((b i : EuclideanSpace ℝ (Fin N))) (b j))
+        = (b₀.toMatrix (Subtype.val ∘ b))ᵀ * b₀.toMatrix (Subtype.val ∘ b) := by
     ext i j
     simp [b₀, Matrix.mul_apply, Module.Basis.toMatrix_apply, PiLp.inner_apply, mul_comm]
   rw [hG, Matrix.det_mul, Matrix.det_transpose, sq]
 
-theorem csCovol_det_le {N : ℕ} (G : Matrix (Fin N) (Fin N) ℚ) (hG : 0 < G.det) (D : ℤ) (hD0 : D ≠ 0)
-    (P : Matrix (Fin N) (Fin N) ℤ) (hP : G * P.map (Int.cast : ℤ → ℚ) = (D : ℚ) • 1) :
-    G.det ≤ (|D| : ℚ) ^ N := by
+theorem csCovol_det_le
+    {N : ℕ} (G : Matrix (Fin N) (Fin N) ℚ) (hG : 0 < G.det)
+    (D : ℤ) (hD0 : D ≠ 0)
+    (P : Matrix (Fin N) (Fin N) ℤ) (hP : G * P.map (Int.cast : ℤ → ℚ) = (D : ℚ) • 1)
+    : G.det ≤ (|D| : ℚ) ^ N := by
   have hdet := congrArg Matrix.det hP
   rw [Matrix.det_mul, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin] at hdet
   have hPd : ((P.det : ℤ) : ℚ) = (P.map (Int.cast : ℤ → ℚ)).det := (Int.castRingHom ℚ).map_det P
@@ -45,13 +50,15 @@ theorem csCovol_det_le {N : ℕ} (G : Matrix (Fin N) (Fin N) ℚ) (hG : 0 < G.de
   have habs := congrArg abs hdet
   rw [abs_mul, abs_of_pos hG, abs_pow] at habs
   have key : G.det ≤ |(D : ℚ)| ^ N :=
-    calc G.det = G.det * 1 := (mul_one _).symm
+    calc
+      G.det
+        = G.det * 1 := (mul_one _).symm
       _ ≤ G.det * |(P.det : ℚ)| := mul_le_mul_of_nonneg_left h1 hG.le
       _ = |(D : ℚ)| ^ N := habs
   simpa using key
 
-theorem csCovol_int_mult {K : Type} [Field K] [NumberField K] (e : 𝓞 K) (he : e ≠ 0) :
-    ∃ n : ℤ, n ≠ 0 ∧ ∃ c : 𝓞 K, (algebraMap ℤ (𝓞 K) n) = c * e := by
+theorem csCovol_int_mult {K : Type} [Field K] [NumberField K] (e : 𝓞 K) (he : e ≠ 0)
+    : ∃ n : ℤ, n ≠ 0 ∧ ∃ c : 𝓞 K, (algebraMap ℤ (𝓞 K) n) = c * e := by
   obtain ⟨c, hc⟩ := Algebra.dvd_algebraMap_intNorm_self ℤ (𝓞 K) e
   refine ⟨Algebra.intNorm ℤ (𝓞 K) e, ?_, c, by rw [hc, mul_comm]⟩
   first
@@ -59,9 +66,10 @@ theorem csCovol_int_mult {K : Type} [Field K] [NumberField K] (e : 𝓞 K) (he :
   | exact (Algebra.intNorm_eq_zero.not).mpr he
   | simpa using he
 
-theorem csCovol_discr_mul {K : Type} [Field K] [NumberField K] (z : K)
-    (hz : ∀ a : 𝓞 K, Algebra.trace ℚ K ((a : K) * z) ∈ Set.range (algebraMap ℤ ℚ)) :
-    ((discr K : ℚ) : K) * z ∈ Set.range (algebraMap (𝓞 K) K) := by
+theorem csCovol_discr_mul
+    {K : Type} [Field K] [NumberField K]
+    (z : K) (hz : ∀ a : 𝓞 K, Algebra.trace ℚ K ((a : K) * z) ∈ Set.range (algebraMap ℤ ℚ))
+    : ((discr K : ℚ) : K) * z ∈ Set.range (algebraMap (𝓞 K) K) := by
   have hmem : z ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 K) K) := by
     rw [Submodule.mem_traceDual]
     intro a ha
@@ -70,67 +78,83 @@ theorem csCovol_discr_mul {K : Type} [Field K] [NumberField K] (z : K)
     obtain ⟨n, hn⟩ := hz a'
     exact ⟨n, hn⟩
   have hone : (1 : K) ∈ (1 : Submodule (𝓞 K) K) := Submodule.mem_one.mpr ⟨1, map_one _⟩
-  have hint := isIntegral_discr_mul_of_mem_traceDual (A := ℤ) (K := ℚ) (L := K) (B := 𝓞 K)
-    (1 : Submodule (𝓞 K) K) (b := NumberField.integralBasis K)
-    (fun i => by
-      rw [NumberField.integralBasis_apply]
-      exact NumberField.RingOfIntegers.isIntegral_coe _) hone hmem
+  have hint :=
+    isIntegral_discr_mul_of_mem_traceDual (A := ℤ) (K := ℚ) (L := K) (B := 𝓞 K)
+      (1 : Submodule (𝓞 K) K) (b := NumberField.integralBasis K)
+      (fun i => by
+        rw [NumberField.integralBasis_apply]
+        exact NumberField.RingOfIntegers.isIntegral_coe _)
+      hone hmem
   rw [← NumberField.coe_discr, Algebra.smul_def, mul_one] at hint
   refine ⟨⟨_, hint⟩, ?_⟩
   simp
 
 section Main
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K) {N : ℕ}
-  (ι : V →+ EuclideanSpace ℝ (Fin N))
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
+  (h : V →ₗ⋆[K] V →ₗ[K] K)
+  {N : ℕ} (ι : V →+ EuclideanSpace ℝ (Fin N))
 
-theorem csCovol_mem_zmap (M : Submodule (𝓞 K) V) (v : EuclideanSpace ℝ (Fin N)) :
-    v ∈ Formalism.HermitianLatticesTheory.zmap ι M ↔ ∃ y ∈ M, ι y = v := by
+theorem csCovol_mem_zmap (M : Submodule (𝓞 K) V) (v : EuclideanSpace ℝ (Fin N))
+    : v ∈ Formalism.HermitianLatticesTheory.zmap ι M ↔ ∃ y ∈ M, ι y = v := by
   first
   | exact Iff.rfl
   | simp [Formalism.HermitianLatticesTheory.zmap, AddSubgroup.mem_map]
-  | (unfold Formalism.HermitianLatticesTheory.zmap; rw [AddSubgroup.mem_toIntSubmodule, AddSubgroup.mem_map]; rfl)
+  | (
+      unfold Formalism.HermitianLatticesTheory.zmap
+      rw [AddSubgroup.mem_toIntSubmodule, AddSubgroup.mem_map]
+      rfl
+    )
 
 theorem csCovol_expand
     (hι : ∀ x y : V, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ))
-    (M : Submodule (𝓞 K) V) (b : Basis (Fin N) ℤ (Formalism.HermitianLatticesTheory.zmap ι M)) (m : Fin N → V)
-    (hm : ∀ i, ι (m i) = b i) (z : V) (hz : z ∈ M) :
-    ∃ a : Fin N → ℤ, (∀ w : V, Algebra.trace ℚ K (h w z) =
-        ∑ j, (a j : ℚ) * Algebra.trace ℚ K (h w (m j))) ∧
-      (∀ w : V, Algebra.trace ℚ K (h z w) = ∑ j, (a j : ℚ) * Algebra.trace ℚ K (h (m j) w)) := by
-  have hz' : ι z ∈ Formalism.HermitianLatticesTheory.zmap ι M := (csCovol_mem_zmap ι M (ι z)).mpr ⟨z, hz, rfl⟩
-  have h1 : (⟨ι z, hz'⟩ : Formalism.HermitianLatticesTheory.zmap ι M) = ∑ j, b.repr ⟨ι z, hz'⟩ j • b j := (b.sum_repr _).symm
+    (M : Submodule (𝓞 K) V) (b : Basis (Fin N) ℤ (Formalism.HermitianLatticesTheory.zmap ι M))
+    (m : Fin N → V) (hm : ∀ i, ι (m i) = b i)
+    (z : V) (hz : z ∈ M)
+    : ∃ a : Fin N → ℤ,
+      (∀ w : V, Algebra.trace ℚ K (h w z) = ∑ j, (a j : ℚ) * Algebra.trace ℚ K (h w (m j)))
+        ∧ (∀ w : V,
+          Algebra.trace ℚ K (h z w) = ∑ j, (a j : ℚ) * Algebra.trace ℚ K (h (m j) w)) := by
+  have hz' : ι z ∈ Formalism.HermitianLatticesTheory.zmap ι M :=
+    (csCovol_mem_zmap ι M (ι z)).mpr ⟨z, hz, rfl⟩
+  have h1
+      : (⟨ι z, hz'⟩ : Formalism.HermitianLatticesTheory.zmap ι M)
+        = ∑ j, b.repr ⟨ι z, hz'⟩ j • b j :=
+    (b.sum_repr _).symm
   have h2 := congrArg Subtype.val h1
   simp only [Submodule.coe_sum, SetLike.val_smul, ← hm] at h2
   refine ⟨fun j => b.repr ⟨ι z, hz'⟩ j, fun w => ?_, fun w => ?_⟩
   · have e1 := hι w z
     rw [h2, inner_sum] at e1
     simp only [← Int.cast_smul_eq_zsmul ℝ, inner_smul_right, hι] at e1
-    have e2 : ((Algebra.trace ℚ K (h w z) : ℚ) : ℝ) =
-        ((∑ j, ((b.repr ⟨ι z, hz'⟩ j : ℤ) : ℚ) * Algebra.trace ℚ K (h w (m j)) : ℚ) : ℝ) := by
+    have e2
+        : ((Algebra.trace ℚ K (h w z) : ℚ) : ℝ)
+          = ((∑ j, ((b.repr ⟨ι z, hz'⟩ j : ℤ) : ℚ) * Algebra.trace ℚ K (h w (m j)) : ℚ) : ℝ) := by
       push_cast
       first | exact e1 | exact e1.symm
     exact_mod_cast e2
   · have e1 := hι z w
     rw [h2, sum_inner] at e1
     simp only [← Int.cast_smul_eq_zsmul ℝ, real_inner_smul_left, hι] at e1
-    have e2 : ((Algebra.trace ℚ K (h z w) : ℚ) : ℝ) =
-        ((∑ j, ((b.repr ⟨ι z, hz'⟩ j : ℤ) : ℚ) * Algebra.trace ℚ K (h (m j) w) : ℚ) : ℝ) := by
+    have e2
+        : ((Algebra.trace ℚ K (h z w) : ℚ) : ℝ)
+          = ((∑ j, ((b.repr ⟨ι z, hz'⟩ j : ℤ) : ℚ) * Algebra.trace ℚ K (h (m j) w) : ℚ) : ℝ) := by
       push_cast
       first | exact e1 | exact e1.symm
     exact_mod_cast e2
 
 theorem csCovol_column
     (hι : ∀ x y : V, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ))
-    (M : Submodule (𝓞 K) V) (b : Basis (Fin N) ℤ (Formalism.HermitianLatticesTheory.zmap ι M)) (m : Fin N → V)
-    (hm : ∀ i, ι (m i) = b i) (e : 𝓞 K)
-    (hdual : ∀ x ∈ Formalism.HermitianLatticesTheory.dual h M, (e : K) • x ∈ M) (n : ℤ) (c : 𝓞 K)
-    (hc : algebraMap ℤ (𝓞 K) n = c * e)
-    (hG : (Matrix.of fun i k => Algebra.trace ℚ K (h (m i) (m k))).det ≠ 0) (j : Fin N) :
-    ∃ a : Fin N → ℤ,
-      (Matrix.of fun i k => Algebra.trace ℚ K (h (m i) (m k))) *ᵥ (fun k => (a k : ℚ)) =
-        ((n * discr K : ℤ) : ℚ) • Pi.single j (1 : ℚ) := by
+    (M : Submodule (𝓞 K) V) (b : Basis (Fin N) ℤ (Formalism.HermitianLatticesTheory.zmap ι M))
+    (m : Fin N → V) (hm : ∀ i, ι (m i) = b i)
+    (e : 𝓞 K) (hdual : ∀ x ∈ Formalism.HermitianLatticesTheory.dual h M, (e : K) • x ∈ M)
+    (n : ℤ) (c : 𝓞 K) (hc : algebraMap ℤ (𝓞 K) n = c * e)
+    (hG : (Matrix.of fun i k => Algebra.trace ℚ K (h (m i) (m k))).det ≠ 0) (j : Fin N)
+    : ∃ a : Fin N → ℤ,
+      (Matrix.of fun i k => Algebra.trace ℚ K (h (m i) (m k))) *ᵥ (fun k => (a k : ℚ))
+        = ((n * discr K : ℤ) : ℚ) • Pi.single j (1 : ℚ) := by
   classical
   set G : Matrix (Fin N) (Fin N) ℚ := Matrix.of fun i k => Algebra.trace ℚ K (h (m i) (m k)) with hGdef
   have htr : ∀ (q : ℚ) (y : K), Algebra.trace ℚ K ((q : K) * y) = q * Algebra.trace ℚ K y := by
@@ -162,13 +186,15 @@ theorem csCovol_column
     have hsmul : a' • w = (star (a : K)) • w := by
       rw [← algebraMap_smul K a' w]
       rfl
-    rw [hsmul, LinearMap.map_smulₛₗ, LinearMap.smul_apply, starRingEnd_apply, star_star, smul_eq_mul] at e1
+    rw [hsmul, LinearMap.map_smulₛₗ, LinearMap.smul_apply, starRingEnd_apply, star_star,
+        smul_eq_mul]
+      at e1
     refine ⟨aa j, ?_⟩
     rw [e1]
     simp [Pi.single_apply]
   have hdx : ((discr K : ℚ) : K) • x ∈ Formalism.HermitianLatticesTheory.dual h M := by
-    simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-      LinearMap.restrictScalars_apply]
+    simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+      Submodule.mem_comap, LinearMap.restrictScalars_apply]
     intro w hw
     rw [map_smul, smul_eq_mul]
     obtain ⟨r, hr⟩ := hloc w hw
@@ -212,8 +238,9 @@ theorem covolume_of_dual_holds : Formalism.UG.CS.CovolOfDual := by
   choose m _ hm using hm'
   set G : Matrix (Fin N) (Fin N) ℚ := Matrix.of fun i k => Algebra.trace ℚ K (h (m i) (m k)) with hGdef
   have hsq := csCovol_sq_eq_det_gram _ b
-  have hGR : (Matrix.of fun i j : Fin N => inner ℝ ((b i : EuclideanSpace ℝ (Fin N))) (b j)) =
-      (Rat.castHom ℝ).mapMatrix G := by
+  have hGR
+      : (Matrix.of fun i j : Fin N => inner ℝ ((b i : EuclideanSpace ℝ (Fin N))) (b j))
+        = (Rat.castHom ℝ).mapMatrix G := by
     ext i k
     simp only [Matrix.of_apply, RingHom.mapMatrix_apply, Matrix.map_apply, hGdef]
     rw [← hm, ← hm, hι]
@@ -223,7 +250,8 @@ theorem covolume_of_dual_holds : Formalism.UG.CS.CovolOfDual := by
     rfl
   clear hsq
   have hsq := hsq'
-  have hcov : 0 < ZLattice.covolume (Formalism.HermitianLatticesTheory.zmap ι M) := ZLattice.covolume_pos _ _
+  have hcov : 0 < ZLattice.covolume (Formalism.HermitianLatticesTheory.zmap ι M) :=
+    ZLattice.covolume_pos _ _
   have hGpos : 0 < G.det := by
     have : (0 : ℝ) < (G.det : ℝ) := by rw [← hsq]; positivity
     exact_mod_cast this
@@ -239,7 +267,8 @@ theorem covolume_of_dual_holds : Formalism.UG.CS.CovolOfDual := by
     rw [this, hD]
     simp [Pi.single_apply, eq_comm]
   have hle := csCovol_det_le G hGpos D hD0 P hP
-  have hleR : ZLattice.covolume (Formalism.HermitianLatticesTheory.zmap ι M) ^ 2 ≤ |(D : ℝ)| ^ N := by
+  have hleR
+      : ZLattice.covolume (Formalism.HermitianLatticesTheory.zmap ι M) ^ 2 ≤ |(D : ℝ)| ^ N := by
     rw [hsq]
     have : ((G.det : ℚ) : ℝ) ≤ (((|D| : ℚ) ^ N : ℚ) : ℝ) := by exact_mod_cast hle
     simpa using this

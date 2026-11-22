@@ -45,7 +45,8 @@ private lemma mk_mul_reduction_eq_mk {a : E} {r s : 𝓞 E} (hs : s ∉ P.asIdea
   rw [hQ, ← hc']
   ring
 
-theorem reduction_mul' {a b : E} (ha : IntAt P a) (hb : IntAt P b) : redP P (a * b) = redP P a * redP P b := by
+theorem reduction_mul' {a b : E} (ha : IntAt P a) (hb : IntAt P b)
+    : redP P (a * b) = redP P a * redP P b := by
   haveI := P.isMaximal
   letI := Ideal.Quotient.field P.asIdeal
   obtain ⟨r, s, hs, h⟩ := ha
@@ -57,8 +58,8 @@ theorem reduction_mul' {a b : E} (ha : IntAt P a) (hb : IntAt P b) : redP P (a *
   have h1 := mk_mul_reduction_eq_mk P hss hab
   have ha' := mk_mul_reduction_eq_mk P hs h
   have hb' := mk_mul_reduction_eq_mk P hs' h'
-  have hss0 : Ideal.Quotient.mk P.asIdeal (s * s') ≠ 0 :=
-    fun h0 => hss (Ideal.Quotient.eq_zero_iff_mem.1 h0)
+  have hss0 : Ideal.Quotient.mk P.asIdeal (s * s') ≠ 0 := fun h0 =>
+    hss (Ideal.Quotient.eq_zero_iff_mem.1 h0)
   apply mul_right_cancel₀ hss0
   rw [h1, map_mul, map_mul, ← ha', ← hb']
   ring
@@ -96,16 +97,26 @@ theorem muNe_of (hN : NTAll) : MuNeP := by
 theorem omStep_of (hJ : JLawP) (hM : MuNeP) : OmStepP := by
   intro E K _ _ _ _ P hp hq sq cq hsq hcq ξ k₀ r c' n' c n kj h1 h2 h3 h4 h5 g₀ h ρ κ hκ
   obtain ⟨lam, hlam, hlaw⟩ := hJ E K P hp hq ξ k₀ r c' n' c n kj h1 h2 h3 h4 h5 κ hκ
-  have hdet : ∀ f : (Fin (n + c) → E) ≃ₗ[E] (Fin (n + c) → E), locChar (qOf P) cq ξ⁻¹ (LinearEquiv.det f : E) ≠ 0 :=
-    fun f => hM E K P hp hq cq ξ⁻¹ hcq _ (Units.ne_zero _)
-  refine ⟨(locChar (qOf P) cq ξ⁻¹ (LinearEquiv.det (ρ * h * κ) : E))⁻¹ * sq ^ (vP P (qOf P) (LinearEquiv.det (ρ * h * κ) : E) * ((n' + c' : ℕ) : ℤ)) * lam /
-      ((locChar (qOf P) cq ξ⁻¹ (LinearEquiv.det h : E))⁻¹ * sq ^ (vP P (qOf P) (LinearEquiv.det h : E) * ((n' + c' : ℕ) : ℤ))), ?_, fun x => ?_⟩
+  have hdet
+      : ∀ f : (Fin (n + c) → E) ≃ₗ[E] (Fin (n + c) → E),
+        locChar (qOf P) cq ξ⁻¹ (LinearEquiv.det f : E) ≠ 0 := fun f =>
+    hM E K P hp hq cq ξ⁻¹ hcq _ (Units.ne_zero _)
+  refine ⟨
+    (locChar (qOf P) cq ξ⁻¹ (LinearEquiv.det (ρ * h * κ) : E))⁻¹
+      * sq ^ (vP P (qOf P) (LinearEquiv.det (ρ * h * κ) : E) * ((n' + c' : ℕ) : ℤ)) * lam
+      / ((locChar (qOf P) cq ξ⁻¹ (LinearEquiv.det h : E))⁻¹
+        * sq ^ (vP P (qOf P) (LinearEquiv.det h : E) * ((n' + c' : ℕ) : ℤ))),
+    ?_,
+    fun x => ?_
+  ⟩
   · have := hdet (ρ * h * κ)
     have := hdet h
     refine div_ne_zero (mul_ne_zero (mul_ne_zero (inv_ne_zero ‹_›) (zpow_ne_zero _ hsq)) hlam)
       (mul_ne_zero (inv_ne_zero ‹_›) (zpow_ne_zero _ hsq))
-  · have ey : (ρ * h * κ).symm.toLinearMap ∘ₗ x ∘ₗ g₀.toLinearMap =
-        κ.symm.toLinearMap ∘ₗ (h.symm.toLinearMap ∘ₗ ((ρ⁻¹).toLinearMap ∘ₗ x) ∘ₗ g₀.toLinearMap) := by
+  · have ey
+        : (ρ * h * κ).symm.toLinearMap ∘ₗ x ∘ₗ g₀.toLinearMap
+          = κ.symm.toLinearMap
+            ∘ₗ (h.symm.toLinearMap ∘ₗ ((ρ⁻¹).toLinearMap ∘ₗ x) ∘ₗ g₀.toLinearMap) := by
       apply LinearMap.ext
       intro v
       simp only [LinearMap.comp_apply, LinearEquiv.coe_coe]
@@ -119,7 +130,8 @@ theorem omStep_of (hJ : JLawP) (hM : MuNeP) : OmStepP := by
     rw [ey, hlaw]
     have a1 := hdet (ρ * h * κ)
     have a0 := hdet h
-    have s0 : sq ^ (vP P (qOf P) (LinearEquiv.det h : E) * ((n' + c' : ℕ) : ℤ)) ≠ 0 := zpow_ne_zero _ hsq
+    have s0 : sq ^ (vP P (qOf P) (LinearEquiv.det h : E) * ((n' + c' : ℕ) : ℤ)) ≠ 0 :=
+      zpow_ne_zero _ hsq
     field_simp
 
 end PI.TwistedEisensteinNonvanishing.W

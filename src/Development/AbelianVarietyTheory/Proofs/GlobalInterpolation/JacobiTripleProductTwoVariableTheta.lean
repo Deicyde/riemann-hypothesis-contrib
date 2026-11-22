@@ -26,14 +26,16 @@ theorem tripleProduct : GlobalTheory.ThetaWeberRoad.TripleProduct := by
   have hs1 : ‖s‖ < 1 := norm_exp_pi_I_lt_one (τ : ℂ) hτ
   have hs0 : s ≠ 0 := exp_ne_zero _
   have hx0 : x ≠ 0 := exp_ne_zero _
-  have ht1 : ‖s ^ 2‖ < 1 := by
-    rw [norm_pow]; nlinarith [norm_nonneg s]
+  have ht1 : ‖s ^ 2‖ < 1 := by rw [norm_pow]; nlinarith [norm_nonneg s]
   obtain ⟨hP, hP0, -⟩ := qPoch_tendsto (s ^ 2) ht1
   have hT := GlobalTheory.T.jacobi_triple_product_limit (τ : ℂ) z hτ
   rw [(multipliable_tpFactor τ z).hasProd_iff_tendsto_nat]
-  have key : ∀ n : ℕ, ∏ k ∈ Finset.range n, GlobalTheory.ThetaWeberRoad.tpFactor τ z k =
-      qPoch (s ^ 2) n * ∑ j ∈ Finset.Icc (-(n : ℤ)) n,
-        finCoeff (cexp (π * I * (τ : ℂ)) ^ 2) n j * jacobiTheta₂_term j z τ := by
+  have key
+      : ∀ n : ℕ,
+        ∏ k ∈ Finset.range n, GlobalTheory.ThetaWeberRoad.tpFactor τ z k
+          = qPoch (s ^ 2) n
+            * ∑ j ∈ Finset.Icc (-(n : ℤ)) n,
+              finCoeff (cexp (π * I * (τ : ℂ)) ^ 2) n j * jacobiTheta₂_term j z τ := by
     intro n
     rw [Finset.prod_congr rfl (fun k _ => tpFactor_eq τ z k), Finset.prod_mul_distrib]
     have hf := GlobalTheory.T.jacobiTriple_finite_product s x hs0 hs1 hx0 n

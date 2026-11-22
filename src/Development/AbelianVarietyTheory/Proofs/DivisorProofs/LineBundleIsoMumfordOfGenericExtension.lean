@@ -14,17 +14,24 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValua
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-
 set_option maxHeartbeats 1000000 in
-theorem lbIso_lam_of_extLam : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R] [IsIntegrallyClosed R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G → ∀ (L' : LB G.left) (N : LB ((Over.pullback (jK R)).obj G).left) (PP : LB (G2 G).left), L'.IsLB → N.IsLB → LBIso N (L'.pull (pullback.fst G.hom (jK R))) → ExtLam G N PP → LBIso (abelian₂ G L') PP := by
+theorem lbIso_lam_of_extLam
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R]
+        [IsIntegrallyClosed R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G],
+      IsSemiAbelian G
+        → ∀ (L' : LB G.left) (N : LB ((Over.pullback (jK R)).obj G).left) (PP : LB (G2 G).left),
+          L'.IsLB → N.IsLB → LBIso N (L'.pull (pullback.fst G.hom (jK R))) → ExtLam G N PP
+            → LBIso (abelian₂ G L') PP := by
   intro R _ _ _ _ _ G _ _ hG L' N PP hL' hN hNL hE
   have hsm : Smooth G.hom := hG.smooth
   have hgc : GeometricallyConnected G.hom := hG.geomConnected
@@ -39,9 +46,12 @@ theorem lbIso_lam_of_extLam : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalR
   have hPP : PP.IsLB := hE.1
 
   have hpb := isGrpPullback_pullback G (jK R)
-  obtain ⟨β₂, hsq, hβ⟩ := GlobalTheory.T.exists_mumfordBundle_pullback_grpPullback _ _ (jK R) G ((Over.pullback (jK R)).obj G) (pullback.fst G.hom (jK R)) hpb
+  obtain ⟨β₂, hsq, hβ⟩ :=
+    GlobalTheory.T.exists_mumfordBundle_pullback_grpPullback _ _ (jK R) G
+      ((Over.pullback (jK R)).obj G) (pullback.fst G.hom (jK R)) hpb
   have h1 : LBIso (abelian₂ G L') ((abelian₂ G L').pull (𝟙 _)) :=
-    LBIso.chartPull (chartPullId _) (Geo.Tor.chartPullPull _ (𝟙 _) (𝟙 _) rfl) (GlobalTheory.PolBaseChange.lbIso_refl hLam)
+    LBIso.chartPull (chartPullId _) (Geo.Tor.chartPullPull _ (𝟙 _) (𝟙 _) rfl)
+      (GlobalTheory.PolBaseChange.lbIso_refl hLam)
   have h2 := hβ L' N _ (abelian₂ G L') (𝟙 _) hL' hN hLam hNL h1
   rw [Category.comp_id] at h2
   have h3 := hE.2 β₂ hsq
@@ -71,8 +81,10 @@ theorem lbIso_lam_of_extLam : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalR
       rw [lift_snd]
       exact hpb.1.lift_fst _ _ _
   have hK : LBIso ((abelian₂ G L').pull p1) (PP.pull p1) :=
-    LBIso.chartPull (chartPullSame (abelian₂ G L') (fun _ => p1) (fun _ => β₂) (fun _ => 1) i (fun _ => hi.symm))
+    LBIso.chartPull
+      (chartPullSame (abelian₂ G L') (fun _ => p1) (fun _ => β₂) (fun _ => 1) i (fun _ => hi.symm))
       (chartPullSame PP (fun _ => p1) (fun _ => β₂) (fun _ => 1) i (fun _ => hi.symm)) hgen
-  exact GlobalTheory.T.lineBundleIso_of_generic_normal_local_base R (G2 G) (lift η[G] η[G]).left (Over.w (lift η[G] η[G])) (abelian₂ G L') PP hLam hPP hK
+  exact GlobalTheory.T.lineBundleIso_of_generic_normal_local_base R (G2 G) (lift η[G] η[G]).left
+    (Over.w (lift η[G] η[G])) (abelian₂ G L') PP hLam hPP hK
 
 end GlobalTheory.Mum

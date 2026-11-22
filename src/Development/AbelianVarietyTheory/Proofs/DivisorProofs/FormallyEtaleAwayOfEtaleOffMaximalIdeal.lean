@@ -9,11 +9,12 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory.EtaleAway
 
-theorem isEtaleAt_of_formallyEtale_baseChange (S B : Type) [CommRing S] [CommRing B] [Algebra S B]
+theorem isEtaleAt_of_formallyEtale_baseChange
+    (S B : Type) [CommRing S] [CommRing B] [Algebra S B]
     (Q : Ideal B) [Q.IsPrime]
     (h : Algebra.FormallyEtale (Localization.AtPrime (Q.under S))
-      (TensorProduct S (Localization.AtPrime (Q.under S)) B)) :
-    Algebra.FormallyEtale S (Localization.AtPrime Q) := by
+      (TensorProduct S (Localization.AtPrime (Q.under S)) B))
+    : Algebra.FormallyEtale S (Localization.AtPrime Q) := by
   set P : Ideal S := Q.under S with hP
   let M : Submonoid B := Algebra.algebraMapSubmonoid B P.primeCompl
   let Bp := Localization M
@@ -44,12 +45,15 @@ end GlobalTheory.EtaleAway
 
 namespace GlobalTheory.EtaleAway
 
-theorem formallyEtale_away : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    (A : Type) [CommRing A] [Algebra R A] [Module.Finite R A],
-    (∀ (p : Ideal R) [p.IsPrime], p ≠ maximalIdeal R →
-      Algebra.Etale (Localization.AtPrime p) (TensorProduct R (Localization.AtPrime p) A)) →
-    ∀ g ∈ maximalIdeal R, Algebra.FormallyEtale (Localization.Away g)
-      (TensorProduct R (Localization.Away g) A) := by
+theorem formallyEtale_away
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (A : Type) [CommRing A]
+        [Algebra R A] [Module.Finite R A],
+      (∀ (p : Ideal R) [p.IsPrime],
+          p ≠ maximalIdeal R
+            → Algebra.Etale (Localization.AtPrime p) (TensorProduct R (Localization.AtPrime p) A))
+        → ∀ g ∈ maximalIdeal R,
+          Algebra.FormallyEtale (Localization.Away g)
+            (TensorProduct R (Localization.Away g) A) := by
   intro R _ _ _ A _ _ _ he g hg
   set S := Localization.Away g
   set B := S ⊗[R] A
@@ -62,17 +66,18 @@ theorem formallyEtale_away : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoet
     intro h
     have hgq : g ∈ q := h ▸ hg
     have : algebraMap R S g ∈ P := hgq
-    exact (Ideal.IsPrime.ne_top inferInstance)
-      (P.eq_top_of_isUnit_mem this (IsLocalization.Away.algebraMap_isUnit g))
+    exact (Ideal.IsPrime.ne_top inferInstance) (P.eq_top_of_isUnit_mem this
+      (IsLocalization.Away.algebraMap_isUnit g))
   haveI := he q hqm
   haveI : P.LiesOver q := ⟨rfl⟩
   letI := Localization.AtPrime.algebraOfLiesOver q P
-  let e : Localization.AtPrime P ⊗[Localization.AtPrime q] (Localization.AtPrime q ⊗[R] A)
-      ≃ₐ[Localization.AtPrime P] Localization.AtPrime P ⊗[S] (S ⊗[R] A) :=
+  let e
+      : Localization.AtPrime P ⊗[Localization.AtPrime q] (Localization.AtPrime q ⊗[R] A)
+        ≃ₐ[Localization.AtPrime P] Localization.AtPrime P ⊗[S] (S ⊗[R] A) :=
     (Algebra.TensorProduct.cancelBaseChange R (Localization.AtPrime q) (Localization.AtPrime P)
-      (Localization.AtPrime P) A).trans
-    (Algebra.TensorProduct.cancelBaseChange R S (Localization.AtPrime P)
-      (Localization.AtPrime P) A).symm
+        (Localization.AtPrime P) A).trans
+      (Algebra.TensorProduct.cancelBaseChange R S (Localization.AtPrime P) (Localization.AtPrime P)
+        A).symm
   haveI : Algebra.Etale (Localization.AtPrime P) (Localization.AtPrime P ⊗[S] (S ⊗[R] A)) :=
     Algebra.Etale.of_equiv e
   infer_instance

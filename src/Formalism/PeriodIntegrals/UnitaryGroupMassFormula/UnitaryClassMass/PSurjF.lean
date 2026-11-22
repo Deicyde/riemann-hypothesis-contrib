@@ -11,56 +11,65 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.UJClassMass
 
-def Floc {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {V : Type}
-    [AddCommGroup V] [Module (𝓞 E) V] (v : HeightOneSpectrum (𝓞 F)) (X : Submodule (𝓞 E) V) : Set V :=
+def Floc
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {V : Type} [AddCommGroup V] [Module (𝓞 E) V]
+    (v : HeightOneSpectrum (𝓞 F)) (X : Submodule (𝓞 E) V)
+    : Set V :=
   {x | ∃ s : 𝓞 F, s ∉ v.asIdeal ∧ algebraMap (𝓞 F) (𝓞 E) s • x ∈ X}
 
 def PatchF : Prop :=
   ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
-    (σ : E →ₐ[F] E) (V : Type) [AddCommGroup V] [Module E V] [Module (𝓞 E) V]
-    [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V]
-    (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (b : Module.Basis (Fin M) E V) (L0 : Submodule (𝓞 E) V),
-    Submodule.IsFullLattice E L0 →
-    (∀ y : Fin M → E, PI.UnitaryGroupMassFormula.UJClassFin.vinc (F := F) y ∈ latHat F E (crdOf b L0) → y ∈ crdOf b L0) →
-    ∀ (γ : UJ (σ : E →+* E) J) (T : Finset (HeightOneSpectrum (𝓞 F))),
-      ∃ g : HA (AF F) σ J, latSet σ J b L0 g =
-        {x | (∀ v ∈ T, x ∈ Floc v (gmap (linOf b (γ : GL (Fin M) E)) L0)) ∧ (∀ v ∉ T, x ∈ Floc v L0)}
+      (σ : E →ₐ[F] E) (V : Type) [AddCommGroup V] [Module E V] [Module (𝓞 E) V]
+      [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V] (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
+      (b : Module.Basis (Fin M) E V) (L0 : Submodule (𝓞 E) V),
+    Submodule.IsFullLattice E L0
+      → (∀ y : Fin M → E,
+        PI.UnitaryGroupMassFormula.UJClassFin.vinc (F := F) y ∈ latHat F E (crdOf b L0)
+          → y ∈ crdOf b L0)
+      → ∀ (γ : UJ (σ : E →+* E) J) (T : Finset (HeightOneSpectrum (𝓞 F))), ∃ g : HA (AF F) σ J,
+        latSet σ J b L0 g
+          = {x | (∀ v ∈ T, x ∈ Floc v (gmap (linOf b (γ : GL (Fin M) E)) L0)) ∧ (∀ v ∉ T, x ∈ Floc v L0)}
 
 def SemiApprox : Prop :=
   ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
-    (σ : E →ₐ[F] E) (V : Type) [AddCommGroup V] [Module E V] [Module (𝓞 E) V]
-    [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V]
-    (h : V →ₗ⋆[E] V →ₗ[E] E) (M : ℕ) (b : Module.Basis (Fin M) E V) (L0 : Submodule (𝓞 E) V),
-    (∀ a, σ a = star a) → (∃ θ : E, σ θ ≠ θ) →
-    h.IsSymm → h.Nondegenerate → Submodule.IsFullLattice E L0 →
-    ∀ N ∈ genus h L0, ∀ T : Finset (HeightOneSpectrum (𝓞 F)),
-      ∃ γ : UJ (σ : E →+* E) (gramOf h b), ∀ v ∈ T,
-        Floc v (gmap (linOf b (γ : GL (Fin M) E)) L0) = Floc v N
+      (σ : E →ₐ[F] E) (V : Type) [AddCommGroup V] [Module E V] [Module (𝓞 E) V]
+      [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V] (h : V →ₗ⋆[E] V →ₗ[E] E) (M : ℕ)
+      (b : Module.Basis (Fin M) E V) (L0 : Submodule (𝓞 E) V),
+    (∀ a, σ a = star a) → (∃ θ : E, σ θ ≠ θ) → h.IsSymm → h.Nondegenerate
+      → Submodule.IsFullLattice E L0
+      → ∀ N ∈ genus h L0, ∀ T : Finset (HeightOneSpectrum (𝓞 F)),
+        ∃ γ : UJ (σ : E →+* E) (gramOf h b), ∀ v ∈ T,
+          Floc v (gmap (linOf b (γ : GL (Fin M) E)) L0) = Floc v N
 
 section Cheap
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {V : Type}
-  [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
 
-theorem mem_Floc_self (v : HeightOneSpectrum (𝓞 F)) (X : Submodule (𝓞 E) V) {x : V} (hx : x ∈ X) :
-    x ∈ Floc v X :=
+theorem mem_Floc_self (v : HeightOneSpectrum (𝓞 F)) (X : Submodule (𝓞 E) V) {x : V} (hx : x ∈ X)
+    : x ∈ Floc v X :=
   ⟨1, fun h => v.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h), by simpa using hx⟩
 
-theorem floc_le (v : HeightOneSpectrum (𝓞 F)) (L N : Submodule (𝓞 E) V) (D : ℤ)
-    (hD : ((D : 𝓞 F)) ∉ v.asIdeal) (hLN : ∀ x ∈ L, (D : 𝓞 E) • x ∈ N) : Floc v L ⊆ Floc v N := by
+theorem floc_le
+    (v : HeightOneSpectrum (𝓞 F)) (L N : Submodule (𝓞 E) V) (D : ℤ)
+    (hD : ((D : 𝓞 F)) ∉ v.asIdeal) (hLN : ∀ x ∈ L, (D : 𝓞 E) • x ∈ N)
+    : Floc v L ⊆ Floc v N := by
   rintro x ⟨s, hs, hsx⟩
   refine ⟨(D : 𝓞 F) * s, fun h => (v.isPrime.mem_or_mem h).elim hD hs, ?_⟩
   rw [map_mul, map_intCast, mul_smul]
   exact hLN _ hsx
 
-theorem flocEq (v : HeightOneSpectrum (𝓞 F)) (L N : Submodule (𝓞 E) V) (D : ℤ)
-    (hD : ((D : 𝓞 F)) ∉ v.asIdeal) (hLN : ∀ x ∈ L, (D : 𝓞 E) • x ∈ N) (hNL : ∀ x ∈ N, (D : 𝓞 E) • x ∈ L) :
-    Floc v L = Floc v N :=
+theorem flocEq
+    (v : HeightOneSpectrum (𝓞 F)) (L N : Submodule (𝓞 E) V) (D : ℤ) (hD : ((D : 𝓞 F)) ∉ v.asIdeal)
+    (hLN : ∀ x ∈ L, (D : 𝓞 E) • x ∈ N) (hNL : ∀ x ∈ N, (D : 𝓞 E) • x ∈ L)
+    : Floc v L = Floc v N :=
   Set.Subset.antisymm (floc_le v L N D hD hLN) (floc_le v N L D hD hNL)
 
 omit [NumberField E] in
-theorem finF (D : ℤ) (hD : D ≠ 0) :
-    {v : HeightOneSpectrum (𝓞 F) | ((D : 𝓞 F)) ∈ v.asIdeal}.Finite := by
+theorem finF (D : ℤ) (hD : D ≠ 0)
+    : {v : HeightOneSpectrum (𝓞 F) | ((D : 𝓞 F)) ∈ v.asIdeal}.Finite := by
   have hI : Ideal.span {((D : 𝓞 F))} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast hD
@@ -70,8 +79,11 @@ theorem finF (D : ℤ) (hD : D ≠ 0) :
   rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
   exact hv
 
-theorem interLocStd [FiniteDimensional E V] (N : Submodule (𝓞 E) V) (hN : Submodule.IsLattice E N) (x : V)
-    (hx : ∀ p : Ideal (𝓞 E), p.IsMaximal → ∃ t : 𝓞 E, t ∉ p ∧ t • x ∈ N) : x ∈ N := by
+theorem interLocStd
+    [FiniteDimensional E V]
+    (N : Submodule (𝓞 E) V) (hN : Submodule.IsLattice E N)
+    (x : V) (hx : ∀ p : Ideal (𝓞 E), p.IsMaximal → ∃ t : 𝓞 E, t ∉ p ∧ t • x ∈ N)
+    : x ∈ N := by
   classical
   by_contra hxN
   have hproper : N.colon {x} ≠ ⊤ := by
@@ -82,8 +94,11 @@ theorem interLocStd [FiniteDimensional E V] (N : Submodule (𝓞 E) V) (hN : Sub
   obtain ⟨t, ht, htx⟩ := hx p hp
   exact ht (hle (Submodule.mem_colon_singleton.2 htx))
 
-theorem interLocF [FiniteDimensional E V] (N : Submodule (𝓞 E) V) (hN : Submodule.IsLattice E N) (x : V)
-    (hx : ∀ v : HeightOneSpectrum (𝓞 F), x ∈ Floc v N) : x ∈ N := by
+theorem interLocF
+    [FiniteDimensional E V]
+    (N : Submodule (𝓞 E) V) (hN : Submodule.IsLattice E N)
+    (x : V) (hx : ∀ v : HeightOneSpectrum (𝓞 F), x ∈ Floc v N)
+    : x ∈ N := by
   apply interLocStd N hN x
   intro p hp
   have hne : p ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hp (RingOfIntegers.not_isField E)
@@ -91,7 +106,8 @@ theorem interLocF [FiniteDimensional E V] (N : Submodule (𝓞 E) V) (hN : Submo
   have hcb : p.comap (algebraMap (𝓞 F) (𝓞 E)) ≠ ⊥ :=
     Ideal.comap_ne_bot_of_integral_mem ha0 ha (Algebra.IsIntegral.isIntegral (R := 𝓞 F) a)
   haveI := hp.isPrime
-  let v : HeightOneSpectrum (𝓞 F) := ⟨p.comap (algebraMap (𝓞 F) (𝓞 E)), Ideal.comap_isPrime _ _, hcb⟩
+  let v : HeightOneSpectrum (𝓞 F) :=
+    ⟨p.comap (algebraMap (𝓞 F) (𝓞 E)), Ideal.comap_isPrime _ _, hcb⟩
   obtain ⟨s, hs, hsx⟩ := hx v
   exact ⟨algebraMap (𝓞 F) (𝓞 E) s, hs, hsx⟩
 
@@ -106,8 +122,10 @@ theorem surjStep_of_F (hP : PatchF) (hS : SemiApprox) (hO : LSOne) : SurjStep :=
     intro v hv hDv
     exact hv ((Set.Finite.mem_toFinset _).2 hDv)
   obtain ⟨γ, hγ⟩ := hS F E σ V h M b L0 hσ hθ hsymm hnd hL N hN T
-  have hsat : ∀ y : Fin M → E, PI.UnitaryGroupMassFormula.UJClassFin.vinc (F := F) y ∈ latHat F E (crdOf b L0) →
-      y ∈ crdOf b L0 := by
+  have hsat
+      : ∀ y : Fin M → E,
+        PI.UnitaryGroupMassFormula.UJClassFin.vinc (F := F) y ∈ latHat F E (crdOf b L0)
+          → y ∈ crdOf b L0 := by
     intro y hy
     rw [← hO F E σ V h M b L0 hσ hθ hτ hsymm hnd hL hsig]
     show (finMat σ (gramOf h b) (1 : HA (AF F) σ (gramOf h b))⁻¹).mulVec (PI.UnitaryGroupMassFormula.UJClassFin.vinc (F := F) y) ∈

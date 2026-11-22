@@ -15,8 +15,10 @@ theorem memBranchRangeOfDefectEq : ConstituentRange := by
   have hmu := h2 i
   have hle : mu i - lam i.succ ≤ d0 lam mu := by
     unfold d0
-    exact Finset.single_le_sum (f := fun j => mu j - lam j.succ)
-      (fun j _ => sub_nonneg.mpr (h2 j).2) (Finset.mem_univ i)
+    exact Finset.single_le_sum
+      (f := fun j => mu j - lam j.succ)
+      (fun j _ => sub_nonneg.mpr (h2 j).2)
+      (Finset.mem_univ i)
   unfold rset
   rw [Finset.mem_Icc]
   refine ⟨hmu.2, le_min hmu.1 ?_⟩

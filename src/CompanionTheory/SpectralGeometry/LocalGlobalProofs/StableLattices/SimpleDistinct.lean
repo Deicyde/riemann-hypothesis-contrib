@@ -8,12 +8,12 @@ namespace GlobalTheory.CompanionTheory.RgExhFin
 
 open CompanionTheory.RgExh
 
-private theorem simplePath_cons_iff {n : ℕ} (χ : Fin n → ℂ) (a : Fin n) (l : List (Fin n)) :
-    SimplePath χ (a :: l) ↔ (∀ r, r ≠ a → χ r ≠ χ a) ∧ SimplePath (χ + Pi.single a 1) l :=
+private theorem simplePath_cons_iff {n : ℕ} (χ : Fin n → ℂ) (a : Fin n) (l : List (Fin n))
+    : SimplePath χ (a :: l) ↔ (∀ r, r ≠ a → χ r ≠ χ a) ∧ SimplePath (χ + Pi.single a 1) l :=
   Iff.rfl
 
-theorem simplePath_ne {n : ℕ} (ss : List (Fin n)) :
-    ∀ χ : Fin n → ℂ, SimplePath χ ss → ∀ r s, r ≠ s → (r ∈ ss ∨ s ∈ ss) → χ r ≠ χ s := by
+theorem simplePath_ne {n : ℕ} (ss : List (Fin n))
+    : ∀ χ : Fin n → ℂ, SimplePath χ ss → ∀ r s, r ≠ s → (r ∈ ss ∨ s ∈ ss) → χ r ≠ χ s := by
   induction ss with
   | nil =>
     intro χ _ r s _ h
@@ -34,8 +34,9 @@ theorem simplePath_ne {n : ℕ} (ss : List (Fin n)) :
     have h3 := ih _ h2 r s hrs hmem'
     simpa [Pi.single_apply, hra, hsa] using h3
 
-theorem simpleDistinct (n : ℕ) (χ : Fin n → ℂ) (ss : List (Fin n))
-    (hp : SimplePath χ ss) (hall : ∀ s, s ∈ ss) : Function.Injective χ := by
+theorem simpleDistinct
+    (n : ℕ) (χ : Fin n → ℂ) (ss : List (Fin n)) (hp : SimplePath χ ss) (hall : ∀ s, s ∈ ss)
+    : Function.Injective χ := by
   intro r s heq
   by_contra hne
   exact simplePath_ne ss χ hp r s hne (Or.inl (hall r)) heq

@@ -16,12 +16,17 @@ namespace Formalism.FourierDecayAlt.P.PTieJ
 
 open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
 
-theorem haar_prop {k r : ℕ} {U : Set (B.Mat k r)} (hU : B2.IsClosedSubgroup U) {μ ν : Measure (Mt k r)}
-    (hμ : B.IsHaarOn U μ) (hν : B.IsHaarOn U ν) : ∃ c : ℝ≥0∞, ν = c • μ := by
-  obtain ⟨c, hc⟩ := Formalism.FourierDecayAlt.P.haar_measure_unique_up_to_scalar k r U μ ν hU hμ hν.conc hν.left hν.finite_compact
+theorem haar_prop
+    {k r : ℕ} {U : Set (B.Mat k r)} (hU : B2.IsClosedSubgroup U)
+    {μ ν : Measure (Mt k r)} (hμ : B.IsHaarOn U μ) (hν : B.IsHaarOn U ν)
+    : ∃ c : ℝ≥0∞, ν = c • μ := by
+  obtain ⟨c, hc⟩ :=
+    Formalism.FourierDecayAlt.P.haar_measure_unique_up_to_scalar k r U μ ν hU hμ hν.conc hν.left
+      hν.finite_compact
   exact ⟨c, by rw [hc, ENNReal.smul_def]⟩
 
-theorem sfinite_of_haar {k r : ℕ} {U : Set (B.Mat k r)} {μ : Measure (Mt k r)} (h : B.IsHaarOn U μ) : SFinite μ := by
+theorem sfinite_of_haar {k r : ℕ} {U : Set (B.Mat k r)} {μ : Measure (Mt k r)} (h : B.IsHaarOn U μ)
+    : SFinite μ := by
   have : IsFiniteMeasureOnCompacts μ := ⟨h.finite_compact⟩
   infer_instance
 
@@ -31,9 +36,12 @@ theorem jfScale : Formalism.FourierDecayAlt.P.PTie.JFScale := by
   have hW' := Bs.haarW'
   rw [hz] at hW
   rw [hz'] at hW'
-  obtain ⟨a, ha⟩ := haar_prop (Formalism.FourierDecayAlt.P.weyl_subgroup_closed k r Bs'.z) Bs'.haarW hW
-  obtain ⟨a', ha'⟩ := haar_prop (Formalism.FourierDecayAlt.P.weyl_subgroup_closed k r Bs'.z') Bs'.haarW' hW'
-  obtain ⟨b, hb⟩ := haar_prop (Formalism.FourierDecayAlt.P.unipotent_radical_closed k r) Bs'.haarN Bs.haarN
+  obtain ⟨a, ha⟩ :=
+    haar_prop (Formalism.FourierDecayAlt.P.weyl_subgroup_closed k r Bs'.z) Bs'.haarW hW
+  obtain ⟨a', ha'⟩ :=
+    haar_prop (Formalism.FourierDecayAlt.P.weyl_subgroup_closed k r Bs'.z') Bs'.haarW' hW'
+  obtain ⟨b, hb⟩ :=
+    haar_prop (Formalism.FourierDecayAlt.P.unipotent_radical_closed k r) Bs'.haarN Bs.haarN
   have := sfinite_of_haar Bs'.haarW
   have := sfinite_of_haar Bs'.haarW'
   have := sfinite_of_haar Bs'.haarN

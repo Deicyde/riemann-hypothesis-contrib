@@ -19,36 +19,39 @@ variable {κ : Type} [Fintype κ] [DecidableEq κ]
 local notation "ι" => algebraMap (𝓞 F) (𝓞 K)
 local notation "jK" => algebraMap (𝓞 K) K
 
-def gramK (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) : Matrix κ κ K := Matrix.of fun i j => h (b i) (b j)
+def gramK (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) : Matrix κ κ K :=
+  Matrix.of fun i j => h (b i) (b j)
 
-theorem form_repr (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) (x y : V) :
-    h x y = star (b.equivFun x) ⬝ᵥ (gramK h b *ᵥ b.equivFun y) := by
-  calc h x y = h (∑ i, b.equivFun x i • b i) (∑ j, b.equivFun y j • b j) := by
-        rw [b.sum_equivFun x, b.sum_equivFun y]
+theorem form_repr (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) (x y : V)
+    : h x y = star (b.equivFun x) ⬝ᵥ (gramK h b *ᵥ b.equivFun y) := by
+  calc
+    h x y = h (∑ i, b.equivFun x i • b i) (∑ j, b.equivFun y j • b j) := by
+      rw [b.sum_equivFun x, b.sum_equivFun y]
     _ = ∑ i, ∑ j, star (b.equivFun x i) * (b.equivFun y j * h (b i) (b j)) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply,
-          smul_eq_mul, starRingEnd_apply, RingHom.id_apply, Finset.mul_sum]
-        rw [Finset.sum_comm]
-        exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
+      set_option synthInstance.maxHeartbeats 100000 in
+        simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
+          starRingEnd_apply, RingHom.id_apply, Finset.mul_sum]
+      rw [Finset.sum_comm]
+      exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
     _ = _ := by
-        simp only [dotProduct, mulVec, Pi.star_apply, gramK, Matrix.of_apply, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
+      simp only [dotProduct, mulVec, Pi.star_apply, gramK, Matrix.of_apply, Finset.mul_sum]
+      exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem gramK_conjTranspose {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (b : Basis κ K V) :
-    (gramK h b)ᴴ = gramK h b := by
+theorem gramK_conjTranspose {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (b : Basis κ K V)
+    : (gramK h b)ᴴ = gramK h b := by
   ext i j
   exact hs.eq (b j) (b i)
 
-theorem smul_basis_mem {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K V) {a : K} (ha : a ∈ SP K 𝔭)
-    (i : κ) : a • b i ∈ locF 𝔭 (spanO b) := by
+theorem smul_basis_mem
+    {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K V) {a : K} (ha : a ∈ SP K 𝔭) (i : κ)
+    : a • b i ∈ locF 𝔭 (spanO b) := by
   obtain ⟨t, ht, z, e⟩ := (mem_SP (𝔭 := 𝔭) (a := a)).mp ha
   refine (mem_locF 𝔭 _ _).2 ⟨t, ht, ?_⟩
   rw [← algebraMap_smul K (ι t), smul_smul, ← e, algebraMap_smul]
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem mem_locF_iff_repr {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K V) (x : V) :
-    x ∈ locF 𝔭 (spanO b) ↔ ∀ i, b.equivFun x i ∈ SP K 𝔭 := by
+theorem mem_locF_iff_repr {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K V) (x : V)
+    : x ∈ locF 𝔭 (spanO b) ↔ ∀ i, b.equivFun x i ∈ SP K 𝔭 := by
   constructor
   · intro hx i
     obtain ⟨t, ht, h1⟩ := (mem_locF 𝔭 _ _).1 hx
@@ -58,15 +61,17 @@ theorem mem_locF_iff_repr {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K
     have h3 := congrArg (fun v => b.equivFun v i) h2
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [← algebraMap_smul K (ι t), map_smul, map_sum, Pi.smul_apply, Finset.sum_apply,
-      Basis.equivFun_self, smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
-      Finset.mem_univ, if_true] at h3
+          Basis.equivFun_self, smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
+          Finset.mem_univ, if_true]
+        at h3
     exact h3.symm
   · intro hx
     rw [← b.sum_equivFun x]
     exact Submodule.sum_mem _ fun i _ => smul_basis_mem b (hx i) i
 
-theorem mem_smul_locF_iff_repr {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K V) (k : ℕ) (x : V) :
-    x ∈ (extP K 𝔭 ^ k • locF 𝔭 (spanO b) : Submodule (𝓞 K) V) ↔ ∀ i, InP 𝔭 k (b.equivFun x i) := by
+theorem mem_smul_locF_iff_repr {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K V) (k : ℕ) (x : V)
+    : x ∈ (extP K 𝔭 ^ k • locF 𝔭 (spanO b) : Submodule (𝓞 K) V)
+      ↔ ∀ i, InP 𝔭 k (b.equivFun x i) := by
   constructor
   · intro hx
     induction hx using Submodule.smul_induction_on' with
@@ -91,8 +96,8 @@ theorem mem_smul_locF_iff_repr {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis
     rw [h2]
     exact Submodule.smul_mem_smul hz (smul_basis_mem b h1 i)
 
-theorem equivFun_toLin (b : Basis κ K V) (G : Matrix κ κ K) (x : V) :
-    b.equivFun (Matrix.toLin b b G x) = G *ᵥ b.equivFun x := by
+theorem equivFun_toLin (b : Basis κ K V) (G : Matrix κ κ K) (x : V)
+    : b.equivFun (Matrix.toLin b b G x) = G *ᵥ b.equivFun x := by
   have := LinearMap.toMatrix_mulVec_repr b b (Matrix.toLin b b G) x
   rw [LinearMap.toMatrix_toLin] at this
   funext i
@@ -103,30 +108,43 @@ def equivOfMatrix (b : Basis κ K V) (G G' : Matrix κ κ K) (hG : G * G' = 1) :
     (by rw [← Matrix.toLin_mul, hG, Matrix.toLin_one])
     (by rw [← Matrix.toLin_mul, mul_eq_one_comm.1 hG, Matrix.toLin_one])
 
-theorem equivFun_equivOfMatrix (b : Basis κ K V) (G G' : Matrix κ κ K) (hG : G * G' = 1) (x : V) :
-    b.equivFun (equivOfMatrix b G G' hG x) = G *ᵥ b.equivFun x := equivFun_toLin b G x
+theorem equivFun_equivOfMatrix (b : Basis κ K V) (G G' : Matrix κ κ K) (hG : G * G' = 1) (x : V)
+    : b.equivFun (equivOfMatrix b G G' hG x) = G *ᵥ b.equivFun x :=
+  equivFun_toLin b G x
 
-theorem equivFun_equivOfMatrix_symm (b : Basis κ K V) (G G' : Matrix κ κ K) (hG : G * G' = 1) (x : V) :
-    b.equivFun ((equivOfMatrix b G G' hG).symm x) = G' *ᵥ b.equivFun x := equivFun_toLin b G' x
+theorem equivFun_equivOfMatrix_symm
+    (b : Basis κ K V) (G G' : Matrix κ κ K) (hG : G * G' = 1) (x : V)
+    : b.equivFun ((equivOfMatrix b G G' hG).symm x) = G' *ᵥ b.equivFun x :=
+  equivFun_toLin b G' x
 
-theorem equivOfMatrix_mem_isom (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) (G G' : Matrix κ κ K)
-    (hG : G * G' = 1) (hU : Gᴴ * gramK h b * G = gramK h b) :
-    equivOfMatrix b G G' hG ∈ Formalism.HermitianLatticesTheory.isom h := by
+theorem equivOfMatrix_mem_isom
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) (G G' : Matrix κ κ K)
+    (hG : G * G' = 1) (hU : Gᴴ * gramK h b * G = gramK h b)
+    : equivOfMatrix b G G' hG ∈ Formalism.HermitianLatticesTheory.isom h := by
   intro x y
-  rw [form_repr h b, form_repr h b x y, equivFun_equivOfMatrix, equivFun_equivOfMatrix, form_mulVec, hU]
+  rw [form_repr h b, form_repr h b x y, equivFun_equivOfMatrix, equivFun_equivOfMatrix, form_mulVec,
+    hU]
 
-theorem mulVec_mem {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] {G : Matrix κ κ K} (hG : Ent (SP K 𝔭) G) {v : κ → K}
-    (hv : ∀ i, v i ∈ SP K 𝔭) (i : κ) : (G *ᵥ v) i ∈ SP K 𝔭 :=
+theorem mulVec_mem
+    {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime]
+    {G : Matrix κ κ K} (hG : Ent (SP K 𝔭) G)
+    {v : κ → K} (hv : ∀ i, v i ∈ SP K 𝔭)
+    (i : κ)
+    : (G *ᵥ v) i ∈ SP K 𝔭 :=
   (SP K 𝔭).sum_mem fun j _ => (SP K 𝔭).mul_mem (hG i j) (hv j)
 
-theorem gmap_equivOfMatrix {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K V) (G G' : Matrix κ κ K)
-    (hG : G * G' = 1) (h1 : Ent (SP K 𝔭) G) (h2 : Ent (SP K 𝔭) G') :
-    Formalism.HermitianLatticesTheory.gmap (equivOfMatrix b G G' hG) (locF 𝔭 (spanO b)) = locF 𝔭 (spanO b) := by
+theorem gmap_equivOfMatrix
+    {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime]
+    (b : Basis κ K V)
+    (G G' : Matrix κ κ K) (hG : G * G' = 1) (h1 : Ent (SP K 𝔭) G) (h2 : Ent (SP K 𝔭) G')
+    : Formalism.HermitianLatticesTheory.gmap (equivOfMatrix b G G' hG) (locF 𝔭 (spanO b))
+      = locF 𝔭 (spanO b) := by
   apply le_antisymm
   · rintro _ ⟨x, hx, rfl⟩
     rw [mem_locF_iff_repr]
     intro i
-    have : b.equivFun (equivOfMatrix b G G' hG x) = G *ᵥ b.equivFun x := equivFun_equivOfMatrix b G G' hG x
+    have : b.equivFun (equivOfMatrix b G G' hG x) = G *ᵥ b.equivFun x :=
+      equivFun_equivOfMatrix b G G' hG x
     show b.equivFun (equivOfMatrix b G G' hG x) i ∈ _
     rw [this]
     exact mulVec_mem h1 ((mem_locF_iff_repr b x).1 hx) i

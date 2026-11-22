@@ -11,9 +11,11 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory
 
-theorem signs_alternate_inert : ∀ {fr : Formalism.HC.Frame} (ε : ℤˣ) (τ φ : fr.GG), φ.1.2 = -1 →
-    Alternates (fun i : ZMod (orderOf φ) => pos ε (letter τ φ i)) ∧
-      Alternates (fun i : ZMod (orderOf φ) => !pos ε (letter τ φ i)) := by
+theorem signs_alternate_inert
+    : ∀ {fr : Formalism.HC.Frame} (ε : ℤˣ) (τ φ : fr.GG),
+      φ.1.2 = -1
+        → Alternates (fun i : ZMod (orderOf φ) => pos ε (letter τ φ i))
+          ∧ Alternates (fun i : ZMod (orderOf φ) => ! pos ε (letter τ φ i)) := by
   intro e ε τ φ hφ
   have hsnd : ∀ k : ℕ, (τ * φ ^ k).1.2 = τ.1.2 * (-1) ^ k := by
     intro k; simp [Prod.snd_mul, Prod.fst_mul, Prod.pow_fst, Prod.pow_snd, hφ]
@@ -34,8 +36,8 @@ theorem signs_alternate_inert : ∀ {fr : Formalism.HC.Frame} (ε : ℤˣ) (τ �
     intro i
     simp only [pos]
     rw [key i]
-    rcases Int.units_eq_one_or (letter τ φ i).1.2 with h | h <;>
-      rcases Int.units_eq_one_or ε with h' | h' <;> simp [h, h'] <;> decide
+    rcases Int.units_eq_one_or (letter τ φ i).1.2 with h | h
+      <;> rcases Int.units_eq_one_or ε with h' | h' <;> simp [h, h'] <;> decide
   refine ⟨hA, fun i => ?_⟩
   have h := hA i
   simp only at h ⊢

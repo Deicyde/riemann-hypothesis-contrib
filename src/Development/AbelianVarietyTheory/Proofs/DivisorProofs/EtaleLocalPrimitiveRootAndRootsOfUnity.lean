@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleAdjoinR
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 noncomputable section
 
@@ -141,10 +142,15 @@ lemma cyc_etale {A : Type} [CommRing A] (q : ℕ) [NeZero q] (hq : IsUnit (q : A
   rw [hd] at hu
   exact isUnit_of_mul_isUnit_left hu
 
-def cyc_root {A : Type} [CommRing A] (q : ℕ) (hq : IsUnit (q : A)) : Prim q (AdjoinRoot (cyclotomic q A)) :=
-  ⟨AdjoinRoot.root _, by simpa using hq.map (algebraMap A (AdjoinRoot (cyclotomic q A))), by
-    rw [PrimBasic.aeval_cyc, ← map_cyclotomic q (AdjoinRoot.of (cyclotomic q A)), Polynomial.eval_map]
-    exact AdjoinRoot.eval₂_root _⟩
+def cyc_root {A : Type} [CommRing A] (q : ℕ) (hq : IsUnit (q : A))
+    : Prim q (AdjoinRoot (cyclotomic q A)) := ⟨
+  AdjoinRoot.root _,
+  by simpa using hq.map (algebraMap A (AdjoinRoot (cyclotomic q A))),
+  by
+    rw [PrimBasic.aeval_cyc, ← map_cyclotomic q (AdjoinRoot.of (cyclotomic q A)),
+      Polynomial.eval_map]
+    exact AdjoinRoot.eval₂_root _
+⟩
 
 lemma kummer_root {A : Type} [CommRing A] (q : ℕ) (hq0 : q ≠ 0) (u : Aˣ) :
     ∃ v : (AdjoinRoot (X ^ q - C (u : A)))ˣ, (v : AdjoinRoot (X ^ q - C (u : A))) ^ q = algebraMap A _ u := by
@@ -166,7 +172,16 @@ end GlobalTheory.EtC.PrimLoc
 namespace GlobalTheory.EtC.PrimLoc
 open Polynomial
 
-theorem prim_loc : ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}), (IsUnit (q : Γ(U, ⊤)) → Loc U fun V _ => Nonempty (Prim q Γ(V, ⊤))) ∧ (∀ ζ ξ : Prim q Γ(U, ⊤), Loc U fun _ g => ∃ a : (ZMod q)ˣ, g.appTop.hom ξ.1 = g.appTop.hom ζ.1 ^ (a : ZMod q).val) ∧ (∀ (ζ : Prim q Γ(U, ⊤)) (x : Γ(U, ⊤)), x ^ q = 1 → Loc U fun _ g => ∃ a : ℕ, g.appTop.hom x = g.appTop.hom ζ.1 ^ a) ∧ (IsUnit (q : Γ(U, ⊤)) → ∀ u : (Γ(U, ⊤))ˣ, Loc U fun V g => ∃ v : (Γ(V, ⊤))ˣ, v ^ q = Units.map g.appTop.hom.toMonoidHom u) := by
+theorem prim_loc
+    : ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}),
+      (IsUnit (q : Γ(U, ⊤)) → Loc U fun V _ => Nonempty (Prim q Γ(V, ⊤)))
+        ∧ (∀ ζ ξ : Prim q Γ(U, ⊤),
+          Loc U fun _ g => ∃ a : (ZMod q)ˣ, g.appTop.hom ξ.1 = g.appTop.hom ζ.1 ^ (a : ZMod q).val)
+        ∧ (∀ (ζ : Prim q Γ(U, ⊤)) (x : Γ(U, ⊤)),
+          x ^ q = 1 → Loc U fun _ g => ∃ a : ℕ, g.appTop.hom x = g.appTop.hom ζ.1 ^ a)
+        ∧ (IsUnit (q : Γ(U, ⊤))
+          → ∀ u : (Γ(U, ⊤))ˣ,
+            Loc U fun V g => ∃ v : (Γ(V, ⊤))ˣ, v ^ q = Units.map g.appTop.hom.toMonoidHom u) := by
   intro q _ U
   obtain ⟨-, -, h3, h4, h5, -⟩ := PrimBasic.prim_basic q Γ(U, ⊤)
   have hmod : ∀ a ∈ Finset.range q, ∀ b ∈ Finset.range q, a ≠ b → ¬ a ≡ b [MOD q] := by
@@ -176,12 +191,18 @@ theorem prim_loc : ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}), (IsUnit (q : Γ(U,
     rwa [Nat.mod_eq_of_lt (Finset.mem_range.1 ha), Nat.mod_eq_of_lt (Finset.mem_range.1 hb)] at h
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro hq
-    refine loc_of_alg (fun V _ => Nonempty (Prim q Γ(V, ⊤))) (fun V W g k ⟨ζ⟩ => ⟨ζ.map k.appTop.hom⟩) ?_
+    refine
+      loc_of_alg (fun V _ => Nonempty (Prim q Γ(V, ⊤))) (fun V W g k ⟨ζ⟩ => ⟨ζ.map k.appTop.hom⟩) ?_
     intro A f hA
-    have hqA : IsUnit (q : A) := by
-      simpa using hq.map (f.appTop ≫ (Scheme.ΓSpecIso A).hom).hom
-    refine ⟨AdjoinRoot (cyclotomic q A), inferInstance, inferInstance, cyc_etale q hqA,
-      adjoinRoot_surj _ (cyclotomic.monic q A) ?_, ⟨(cyc_root q hqA).map (Scheme.ΓSpecIso _).inv.hom⟩⟩
+    have hqA : IsUnit (q : A) := by simpa using hq.map (f.appTop ≫ (Scheme.ΓSpecIso A).hom).hom
+    refine ⟨
+      AdjoinRoot (cyclotomic q A),
+      inferInstance,
+      inferInstance,
+      cyc_etale q hqA,
+      adjoinRoot_surj _ (cyclotomic.monic q A) ?_,
+      ⟨(cyc_root q hqA).map (Scheme.ΓSpecIso _).inv.hom⟩
+    ⟩
     rw [natDegree_cyclotomic]
     exact (Nat.totient_pos.2 (NeZero.pos q)).ne'
   · intro ζ ξ
@@ -189,7 +210,8 @@ theorem prim_loc : ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}), (IsUnit (q : Γ(U,
     · rintro V g ⟨a, ha, h⟩
       obtain ⟨ha1, ha2⟩ := Finset.mem_filter.1 ha
       refine ⟨ZMod.unitOfCoprime a ha2, ?_⟩
-      rw [h, map_pow, ZMod.coe_unitOfCoprime, ZMod.val_natCast, Nat.mod_eq_of_lt (Finset.mem_range.1 ha1)]
+      rw [h, map_pow, ZMod.coe_unitOfCoprime, ZMod.val_natCast,
+        Nat.mod_eq_of_lt (Finset.mem_range.1 ha1)]
     · intro a ha b hb hab
       exact h3 ζ a b (hmod a (Finset.mem_filter.1 ha).1 b (Finset.mem_filter.1 hb).1 hab)
   · intro ζ x hx
@@ -199,26 +221,38 @@ theorem prim_loc : ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}), (IsUnit (q : Γ(U,
     · intro a ha b hb hab
       exact h3 ζ a b (hmod a ha b hb hab)
   · intro hq u
-    refine loc_of_alg (fun V g => ∃ v : (Γ(V, ⊤))ˣ, v ^ q = Units.map g.appTop.hom.toMonoidHom u) ?_ ?_
+    refine
+      loc_of_alg (fun V g => ∃ v : (Γ(V, ⊤))ˣ, v ^ q = Units.map g.appTop.hom.toMonoidHom u) ?_ ?_
     · rintro V W g k ⟨v, hv⟩
       refine ⟨Units.map k.appTop.hom.toMonoidHom v, ?_⟩
       rw [← map_pow, hv]
       ext
       rfl
     intro A f hA
-    have hqA : IsUnit (q : A) := by
-      simpa using hq.map (f.appTop ≫ (Scheme.ΓSpecIso A).hom).hom
-    obtain ⟨uA, huA⟩ : ∃ uA : (A : Type)ˣ, uA = Units.map (f.appTop ≫ (Scheme.ΓSpecIso A).hom).hom.toMonoidHom u :=
+    have hqA : IsUnit (q : A) := by simpa using hq.map (f.appTop ≫ (Scheme.ΓSpecIso A).hom).hom
+    obtain ⟨uA, huA⟩
+        : ∃ uA : (A : Type)ˣ,
+          uA = Units.map (f.appTop ≫ (Scheme.ΓSpecIso A).hom).hom.toMonoidHom u :=
       ⟨_, rfl⟩
     obtain ⟨v, hv⟩ := kummer_root q (NeZero.ne q) uA
-    refine ⟨AdjoinRoot (X ^ q - C (uA : A)), inferInstance, inferInstance,
+    refine ⟨
+      AdjoinRoot (X ^ q - C (uA : A)),
+      inferInstance,
+      inferInstance,
       GlobalTheory.etale_adjoinRoot_X_pow_sub_C A q uA hqA uA.isUnit,
       adjoinRoot_surj _ (monic_X_pow_sub_C _ (NeZero.ne q)) ?_,
-      ⟨Units.map (Scheme.ΓSpecIso (CommRingCat.of (AdjoinRoot (X ^ q - C (uA : A))))).inv.hom.toMonoidHom v, ?_⟩⟩
+      ⟨
+        Units.map
+          (Scheme.ΓSpecIso (CommRingCat.of (AdjoinRoot (X ^ q - C (uA : A))))).inv.hom.toMonoidHom
+          v,
+        ?_
+      ⟩
+    ⟩
     · rw [natDegree_X_pow_sub_C _]
       exact NeZero.ne q
     · ext
-      have hu' : (uA : A) = (Scheme.ΓSpecIso A).hom.hom (f.appTop.hom (u : Γ(U, ⊤))) := by rw [huA]; rfl
+      have hu' : (uA : A) = (Scheme.ΓSpecIso A).hom.hom (f.appTop.hom (u : Γ(U, ⊤))) := by
+        rw [huA]; rfl
       rw [Units.val_pow_eq_pow_val, Units.coe_map, Units.coe_map]
       show (Scheme.ΓSpecIso (CommRingCat.of (AdjoinRoot (X ^ q - C (uA : A))))).inv.hom (v : AdjoinRoot (X ^ q - C (uA : A))) ^ q =
         (Spec.map (CommRingCat.ofHom (algebraMap A (AdjoinRoot (X ^ q - C (uA : A))))) ≫ f).appTop.hom (u : Γ(U, ⊤))

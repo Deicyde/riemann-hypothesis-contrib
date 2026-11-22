@@ -12,8 +12,8 @@ namespace Cong
 
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 
-theorem lsmul_eq (F : GMod B R k) {s s' : R} (h : s - s' ∈ F.Ann) :
-    LinearMap.lsmul R F.M s = LinearMap.lsmul R F.M s' := by
+theorem lsmul_eq (F : GMod B R k) {s s' : R} (h : s - s' ∈ F.Ann)
+    : LinearMap.lsmul R F.M s = LinearMap.lsmul R F.M s' := by
   ext x
   have hx : (s - s') • x = 0 := Module.mem_annihilator.1 h x
   rw [sub_smul, sub_eq_zero] at hx
@@ -23,8 +23,8 @@ theorem quot_eq (F : GMod B R k) {s s' : R} (h : s - s' ∈ F.Ann) : F.quot s = 
   unfold GMod.quot
   rw [lsmul_eq F h]
 
-theorem ann_eq (F : GMod B R k) {s s' : R} (d : Deg k) (h : s - s' ∈ F.Ann) :
-    F.ann s d = F.ann s' d := by
+theorem ann_eq (F : GMod B R k) {s s' : R} (d : Deg k) (h : s - s' ∈ F.Ann)
+    : F.ann s d = F.ann s' d := by
   unfold GMod.ann
   rw [lsmul_eq F h]
 
@@ -42,9 +42,10 @@ theorem ann_le_ann (F : GMod B R k) (s : R) (d : Deg k) : F.Ann ≤ (F.ann s d).
   intro x
   exact Subtype.ext (ha x.1)
 
-theorem chi_cong {ts ts' : List (Deg k × R)} : ∀ (F : GMod B R k),
-    List.Forall₂ (fun p q => p.1 = q.1 ∧ p.2 - q.2 ∈ F.Ann) ts ts' →
-      ∀ m, chi ts F m = chi ts' F m := by
+theorem chi_cong {ts ts' : List (Deg k × R)}
+    : ∀ (F : GMod B R k),
+      List.Forall₂ (fun p q => p.1 = q.1 ∧ p.2 - q.2 ∈ F.Ann) ts ts'
+        → ∀ m, chi ts F m = chi ts' F m := by
   induction ts generalizing ts' with
   | nil =>
     intro F h m

@@ -6,32 +6,37 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module
+  UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.ordinaryIdeal_saturators_conj_invariant :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
-      (D : Dat3 l O) {C : Type} [CommRing C] [Algebra O C]
-      (r : GQ l →* GG (m := 3) (R := C)) (h : GL (Fin 3) C), HasMult D.η r →
-      D.ordIdeal (conjBy h r) = D.ordIdeal r ∧
-        (∀ a, D.dd (conjBy h r) a = D.dd r a) ∧ D.del (conjBy h r) = D.del r := by
+theorem _root_.GlobalTheory.T.ordinaryIdeal_saturators_conj_invariant
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+        (D : Dat3 l O) {C : Type} [CommRing C] [Algebra O C] (r : GQ l →* GG (m := 3) (R := C))
+        (h : GL (Fin 3) C),
+      HasMult D.η r
+        → D.ordIdeal (conjBy h r) = D.ordIdeal r ∧ (∀ a, D.dd (conjBy h r) a = D.dd r a)
+          ∧ D.del (conjBy h r) = D.del r := by
   intro l _ O _ _ _ D C _ _ r h hr
   have hone : ∀ s ∈ D.HL, (r s).right = 1 := by
     intro s hs
     rw [hr s]
     exact MonoidHom.mem_ker.1 (Subgroup.mem_inf.1 hs).1
-  have hmat (s : GQ l) (hs : s ∈ D.HL) :
-      (conjBy h r s).mat =
-        (h : Matrix (Fin 3) (Fin 3) C) * (r s).mat *
-          ((h⁻¹ : GL (Fin 3) C) : Matrix (Fin 3) (Fin 3) C) := by
+  have hmat (s : GQ l) (hs : s ∈ D.HL)
+      : (conjBy h r s).mat
+        = (h : Matrix (Fin 3) (Fin 3) C) * (r s).mat
+          * ((h⁻¹ : GL (Fin 3) C) : Matrix (Fin 3) (Fin 3) C) := by
     have hleft : (conjBy h r s).left = h * (r s).left * h⁻¹ := by
       show (GG.ofGL h * r s * (GG.ofGL h)⁻¹).left = _
       rw [SemidirectProduct.mul_left, SemidirectProduct.mul_left, SemidirectProduct.inv_left]
-      simp only [SemidirectProduct.right_inl, SemidirectProduct.left_inl, SemidirectProduct.mul_right,
-        hone s hs, mul_one, inv_one, map_one, MulAut.one_apply]
+      simp only [SemidirectProduct.right_inl, SemidirectProduct.left_inl,
+        SemidirectProduct.mul_right, hone s hs, mul_one, inv_one, map_one, MulAut.one_apply]
     unfold GG.mat
     rw [hleft, Units.val_mul, Units.val_mul]
-  have hsh : ∀ s ∈ D.HL, ∀ a, D.sh (conjBy h r) a s =
-      (h : Matrix (Fin 3) (Fin 3) C) * D.sh r a s * ((h⁻¹ : GL (Fin 3) C) : Matrix (Fin 3) (Fin 3) C) := by
+  have hsh
+      : ∀ s ∈ D.HL, ∀ a,
+        D.sh (conjBy h r) a s
+          = (h : Matrix (Fin 3) (Fin 3) C) * D.sh r a s
+            * ((h⁻¹ : GL (Fin 3) C) : Matrix (Fin 3) (Fin 3) C) := by
     intro s hs a
     simp only [UpperTheory.V.Loc.Dat3.sh]
     rw [hmat s hs, GlobalTheory.OrdLoc.conj_sub_scalar]
@@ -56,17 +61,15 @@ theorem _root_.GlobalTheory.T.ordinaryIdeal_saturators_conj_invariant :
     obtain ⟨σ, hσ, i₀, hi₀, hpow⟩ := Subgroup.mem_sup_of_normal_right.1 hmN
     let φ := QuotientGroup.mk' (Iq l)
     have hφ : ∀ {x}, φ x = 1 ↔ x ∈ Iq l := fun {x} => QuotientGroup.eq_one_iff x
-    have hφm : φ σ₀ ^ m = φ σ := by
-      rw [← map_pow, ← hpow, map_mul, hφ.2 hi₀, mul_one]
+    have hφm : φ σ₀ ^ m = φ σ := by rw [← map_pow, ← hpow, map_mul, hφ.2 hi₀, mul_one]
     refine ⟨σ, ⟨hσ, ?_⟩, σ₀, m, hσ₀, orderOf_pos q, ?_⟩
     · rw [eq_top_iff]
       intro g _
       rw [← SetLike.mem_coe, Subgroup.topologicalClosure_coe, mem_closure_iff]
       intro U hU hgU
-      have hV : IsOpen (D.HL.subtype '' U) :=
-        hHLopen.isOpenEmbedding_subtypeVal.isOpenMap U hU
-      have hcl : (g : GQ l) ∈ closure ((Iq l ⊔ Subgroup.zpowers σ₀ : Subgroup (GQ l)) :
-          Set (GQ l)) := by
+      have hV : IsOpen (D.HL.subtype '' U) := hHLopen.isOpenEmbedding_subtypeVal.isOpenMap U hU
+      have hcl
+          : (g : GQ l) ∈ closure ((Iq l ⊔ Subgroup.zpowers σ₀ : Subgroup (GQ l)) : Set (GQ l)) := by
         rw [← Subgroup.topologicalClosure_coe, frobDense σ₀ hσ₀]
         trivial
       obtain ⟨x, ⟨u, huU, rfl⟩, hx⟩ := mem_closure_iff.1 hcl _ hV ⟨g, hgU, rfl⟩
@@ -101,14 +104,17 @@ theorem _root_.GlobalTheory.T.ordinaryIdeal_saturators_conj_invariant :
   have htr : ∀ a, D.tr (conjBy h r) a = D.tr r a := by
     intro a
     simp only [UpperTheory.V.Loc.Dat3.tr]
-    rw [hsh _ hs0, hsh _ hs0, hmat _ hfr, GlobalTheory.OrdLoc.conj_mul_three_alt, GlobalTheory.OrdLoc.trace_conj]
+    rw [hsh _ hs0, hsh _ hs0, hmat _ hfr, GlobalTheory.OrdLoc.conj_mul_three_alt,
+      GlobalTheory.OrdLoc.trace_conj]
   have hdd : ∀ a, D.dd (conjBy h r) a = D.dd r a := by
     intro a
     simp only [UpperTheory.V.Loc.Dat3.dd, htr]
-  have hprod : ∀ t : Fin 3 → GQ l, (∀ a, t a ∈ D.HL ⊓ Iq l) →
-      D.sh (conjBy h r) 0 (t 0) * D.sh (conjBy h r) 1 (t 1) * D.sh (conjBy h r) 2 (t 2) =
-        (h : Matrix (Fin 3) (Fin 3) C) * (D.sh r 0 (t 0) * D.sh r 1 (t 1) * D.sh r 2 (t 2)) *
-          ((h⁻¹ : GL (Fin 3) C) : Matrix (Fin 3) (Fin 3) C) := by
+  have hprod
+      : ∀ t : Fin 3 → GQ l,
+        (∀ a, t a ∈ D.HL ⊓ Iq l)
+          → D.sh (conjBy h r) 0 (t 0) * D.sh (conjBy h r) 1 (t 1) * D.sh (conjBy h r) 2 (t 2)
+            = (h : Matrix (Fin 3) (Fin 3) C) * (D.sh r 0 (t 0) * D.sh r 1 (t 1) * D.sh r 2 (t 2))
+              * ((h⁻¹ : GL (Fin 3) C) : Matrix (Fin 3) (Fin 3) C) := by
     intro t ht
     rw [hsh _ (Subgroup.mem_inf.1 (ht 0)).1, hsh _ (Subgroup.mem_inf.1 (ht 1)).1,
       hsh _ (Subgroup.mem_inf.1 (ht 2)).1, GlobalTheory.OrdLoc.conj_mul_three_alt]
@@ -117,17 +123,18 @@ theorem _root_.GlobalTheory.T.ordinaryIdeal_saturators_conj_invariant :
   apply le_antisymm
   · rw [Ideal.span_le]
     rintro x (⟨s, hs, i, rfl⟩ | ⟨t, ht, i, j, rfl⟩)
-    · exact Ideal.subset_span
-        (Or.inl ⟨s, hs, i, by rw [hmat s (Subgroup.mem_inf.1 hs).1, GlobalTheory.OrdLoc.charpoly_conj]⟩)
+    · exact Ideal.subset_span (Or.inl
+        ⟨s, hs, i, by rw [hmat s (Subgroup.mem_inf.1 hs).1, GlobalTheory.OrdLoc.charpoly_conj]⟩)
     · rw [hprod t ht]
       apply GlobalTheory.OrdLoc.ent_mem_mul
       intro a b
       exact Ideal.subset_span (Or.inr ⟨t, ht, a, b, rfl⟩)
   · rw [Ideal.span_le]
     rintro x (⟨s, hs, i, rfl⟩ | ⟨t, ht, i, j, rfl⟩)
-    · exact Ideal.subset_span
-        (Or.inl ⟨s, hs, i, by rw [hmat s (Subgroup.mem_inf.1 hs).1, GlobalTheory.OrdLoc.charpoly_conj]⟩)
-    · rw [GlobalTheory.OrdLoc.unconj h (D.sh r 0 (t 0) * D.sh r 1 (t 1) * D.sh r 2 (t 2)), ← hprod t ht]
+    · exact Ideal.subset_span (Or.inl
+        ⟨s, hs, i, by rw [hmat s (Subgroup.mem_inf.1 hs).1, GlobalTheory.OrdLoc.charpoly_conj]⟩)
+    · rw [GlobalTheory.OrdLoc.unconj h (D.sh r 0 (t 0) * D.sh r 1 (t 1) * D.sh r 2 (t 2)),
+        ← hprod t ht]
       apply GlobalTheory.OrdLoc.ent_mem_mul
       intro a b
       exact Ideal.subset_span (Or.inr ⟨t, ht, a, b, rfl⟩)

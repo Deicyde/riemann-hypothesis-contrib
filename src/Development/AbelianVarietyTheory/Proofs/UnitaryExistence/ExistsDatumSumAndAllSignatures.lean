@@ -11,48 +11,66 @@ public import Development.AbelianVarietyTheory.Definitions.CMLattices.IsCyclotom
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.DatumSum
 
 noncomputable section
 
-def blockEnd {U V W : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W]
-    [Module ℝ W] (e : U ≃ₗ[ℝ] V × W) (f : V →ₗ[ℝ] V) (g : W →ₗ[ℝ] W) : U →ₗ[ℝ] U :=
+def blockEnd
+    {U V W : Type}
+    [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+    (e : U ≃ₗ[ℝ] V × W) (f : V →ₗ[ℝ] V) (g : W →ₗ[ℝ] W)
+    : U →ₗ[ℝ] U :=
   e.symm.toLinearMap ∘ₗ (f.prodMap g) ∘ₗ e.toLinearMap
 
-theorem blockEnd_apply {U V W : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W]
-    [Module ℝ W] (e : U ≃ₗ[ℝ] V × W) (f : V →ₗ[ℝ] V) (g : W →ₗ[ℝ] W) (x : U) :
-    e (blockEnd e f g x) = (f (e x).1, g (e x).2) := by
+theorem blockEnd_apply
+    {U V W : Type}
+    [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+    (e : U ≃ₗ[ℝ] V × W) (f : V →ₗ[ℝ] V) (g : W →ₗ[ℝ] W) (x : U)
+    : e (blockEnd e f g x) = (f (e x).1, g (e x).2) := by
   simp [blockEnd, Prod.map]
 
-theorem blockEnd_comp {U V W : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W]
-    [Module ℝ W] (e : U ≃ₗ[ℝ] V × W) (f f' : V →ₗ[ℝ] V) (g g' : W →ₗ[ℝ] W) :
-    blockEnd e f g ∘ₗ blockEnd e f' g' = blockEnd e (f ∘ₗ f') (g ∘ₗ g') := by
+theorem blockEnd_comp
+    {U V W : Type}
+    [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+    (e : U ≃ₗ[ℝ] V × W) (f f' : V →ₗ[ℝ] V) (g g' : W →ₗ[ℝ] W)
+    : blockEnd e f g ∘ₗ blockEnd e f' g' = blockEnd e (f ∘ₗ f') (g ∘ₗ g') := by
   ext x
   apply e.injective
   simp [blockEnd_apply]
 
-theorem trace_blockEnd {U V W : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W]
-    [Module ℝ W] [Module.Finite ℝ V] [Module.Finite ℝ W] (e : U ≃ₗ[ℝ] V × W) (f : V →ₗ[ℝ] V) (g : W →ₗ[ℝ] W) :
-    LinearMap.trace ℝ U (blockEnd e f g) = LinearMap.trace ℝ V f + LinearMap.trace ℝ W g := by
+theorem trace_blockEnd
+    {U V W : Type} [AddCommGroup U] [Module ℝ U] [AddCommGroup V] [Module ℝ V] [AddCommGroup W]
+    [Module ℝ W] [Module.Finite ℝ V] [Module.Finite ℝ W]
+    (e : U ≃ₗ[ℝ] V × W) (f : V →ₗ[ℝ] V) (g : W →ₗ[ℝ] W)
+    : LinearMap.trace ℝ U (blockEnd e f g) = LinearMap.trace ℝ V f + LinearMap.trace ℝ W g := by
   have h1 : blockEnd e f g = e.symm.conj (f.prodMap g) := by
     ext x; simp [blockEnd, LinearEquiv.conj_apply]
   rw [h1, LinearMap.trace_conj', LinearMap.trace_prodMap']
 
-def sumForm {L M : Type} [AddCommGroup L] [AddCommGroup M] (B : LinearMap.BilinForm ℤ L)
-    (C : LinearMap.BilinForm ℤ M) : LinearMap.BilinForm ℤ (L × M) :=
-  B.compl₁₂ (LinearMap.fst ℤ L M) (LinearMap.fst ℤ L M) + C.compl₁₂ (LinearMap.snd ℤ L M) (LinearMap.snd ℤ L M)
+def sumForm
+    {L M : Type} [AddCommGroup L] [AddCommGroup M]
+    (B : LinearMap.BilinForm ℤ L) (C : LinearMap.BilinForm ℤ M)
+    : LinearMap.BilinForm ℤ (L × M) :=
+  B.compl₁₂ (LinearMap.fst ℤ L M) (LinearMap.fst ℤ L M)
+    + C.compl₁₂ (LinearMap.snd ℤ L M) (LinearMap.snd ℤ L M)
 
-theorem sumForm_apply {L M : Type} [AddCommGroup L] [AddCommGroup M] (B : LinearMap.BilinForm ℤ L)
-    (C : LinearMap.BilinForm ℤ M) (x y : L × M) : sumForm B C x y = B x.1 y.1 + C x.2 y.2 := by
+theorem sumForm_apply
+    {L M : Type} [AddCommGroup L] [AddCommGroup M]
+    (B : LinearMap.BilinForm ℤ L) (C : LinearMap.BilinForm ℤ M) (x y : L × M)
+    : sumForm B C x y = B x.1 y.1 + C x.2 y.2 := by
   simp [sumForm]
 
-theorem sumForm_bijective {L M : Type} [AddCommGroup L] [AddCommGroup M] (B : LinearMap.BilinForm ℤ L)
-    (C : LinearMap.BilinForm ℤ M) (hB : Function.Bijective B) (hC : Function.Bijective C) :
-    Function.Bijective (sumForm B C) := by
+theorem sumForm_bijective
+    {L M : Type} [AddCommGroup L] [AddCommGroup M]
+    (B : LinearMap.BilinForm ℤ L) (C : LinearMap.BilinForm ℤ M)
+    (hB : Function.Bijective B) (hC : Function.Bijective C)
+    : Function.Bijective (sumForm B C) := by
   constructor
   · intro x y h
     refine Prod.ext (hB.1 ?_) (hC.1 ?_)
@@ -69,14 +87,18 @@ theorem sumForm_bijective {L M : Type} [AddCommGroup L] [AddCommGroup M] (B : Li
     rw [sumForm_apply, hx, hy]
     simp [← map_add (f := _)]
 
-theorem sumForm_baseChange {L M : Type} [AddCommGroup L] [AddCommGroup M] (B : LinearMap.BilinForm ℤ L)
-    (C : LinearMap.BilinForm ℤ M) (x y : ℝ ⊗[ℤ] (L × M)) :
-    (sumForm B C).baseChange ℝ x y =
-      B.baseChange ℝ (TensorProduct.prodRight ℤ ℝ ℝ L M x).1 (TensorProduct.prodRight ℤ ℝ ℝ L M y).1 +
-      C.baseChange ℝ (TensorProduct.prodRight ℤ ℝ ℝ L M x).2 (TensorProduct.prodRight ℤ ℝ ℝ L M y).2 := by
+theorem sumForm_baseChange
+    {L M : Type} [AddCommGroup L] [AddCommGroup M]
+    (B : LinearMap.BilinForm ℤ L) (C : LinearMap.BilinForm ℤ M) (x y : ℝ ⊗[ℤ] (L × M))
+    : (sumForm B C).baseChange ℝ x y
+      = B.baseChange ℝ (TensorProduct.prodRight ℤ ℝ ℝ L M x).1
+          (TensorProduct.prodRight ℤ ℝ ℝ L M y).1
+        + C.baseChange ℝ (TensorProduct.prodRight ℤ ℝ ℝ L M x).2
+          (TensorProduct.prodRight ℤ ℝ ℝ L M y).2 := by
   induction x using TensorProduct.induction_on with
   | zero => simp
-  | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, Prod.fst_add, Prod.snd_add, ha, hb]; ring
+  | add a b ha hb =>
+    simp only [map_add (f := _), LinearMap.add_apply, Prod.fst_add, Prod.snd_add, ha, hb]; ring
   | tmul r u =>
     induction y using TensorProduct.induction_on with
     | zero => simp
@@ -149,15 +171,18 @@ def sumDatum (D D' : Datum H) : Datum H where
           apply e.injective
           rw [blockEnd_apply]
           simp [he, A0, A1]
-      have ht' : t = ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
-          ((D.p : ℂ) * τ (a : E) + (D.q : ℂ) * starRingEnd ℂ (τ (a : E))) +
-          ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
-          ((D'.p : ℂ) * τ (a : E) + (D'.q : ℂ) * starRingEnd ℂ (τ (a : E))) := by
+      have ht'
+          : t
+            = ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
+                ((D.p : ℂ) * τ (a : E) + (D.q : ℂ) * starRingEnd ℂ (τ (a : E)))
+              + ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
+                ((D'.p : ℂ) * τ (a : E) + (D'.q : ℂ) * starRingEnd ℂ (τ (a : E))) := by
         rw [ht, ← Finset.sum_add_distrib]
         refine Finset.sum_congr rfl fun τ _ => ?_
-        push_cast; ring
-      rw [hAA, blockEnd_comp, blockEnd_comp, trace_blockEnd, trace_blockEnd, k1, ← k1, k1', ← k1', k2, k3, k2', k3',
-        ht']
+        push_cast
+        ring
+      rw [hAA, blockEnd_comp, blockEnd_comp, trace_blockEnd, trace_blockEnd, k1, ← k1, k1', ← k1',
+        k2, k3, k2', k3', ht']
       refine ⟨rfl, ?_, ?_⟩
       · rw [Complex.add_re]; ring
       · rw [Complex.add_im]; ring

@@ -9,18 +9,21 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra ReciprocityTheory.ChartRestriction.G.TB
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra
+  ReciprocityTheory.ChartRestriction.G.TB
 
 theorem latOfLam : LatOfLamSt := by
   intro D B P j X S ka wL wF large₂ C A hg hs hlam hspan hH2
-  let Nf : NormFam B.KO (B.Cusp j ka) :=
-    { N := B.supN j ka
-      nonneg := B.supN_nonneg j ka
-      eq_zero := fun σ v h => (B.supN_eq_zero j ka σ v).mp h
-      smul := B.supN_smul j ka
-      add := B.supN_add j ka }
+  let Nf : NormFam B.KO (B.Cusp j ka) := {
+    N := B.supN j ka
+    nonneg := B.supN_nonneg j ka
+    eq_zero := fun σ v h => (B.supN_eq_zero j ka σ v).mp h
+    smul := B.supN_smul j ka
+    add := B.supN_add j ka
+  }
   have hPL : ProdLower Nf (B.Mlat j ka)
-      ((Fintype.card (B.KO →+* ℂ) : ℝ) * (WeightFamilies.PP0v D large₂ C A * (1 + Real.log ka.size) * ka.size)) := by
+      ((Fintype.card (B.KO →+* ℂ) : ℝ)
+        * (WeightFamilies.PP0v D large₂ C A * (1 + Real.log ka.size) * ka.size)) := by
     intro f hf hne
     have h1 := hlam f hf hne
     unfold WeightFamilies.meanLogSup at h1

@@ -65,7 +65,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StageKernelI
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset
 open Formalism.DivisionValues (vw)
 open Formalism.L2.Host (HChar)
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
@@ -84,14 +87,17 @@ open MeasureTheory
 
 variable {D : D7} {T : Type} {A A' WW : HSp D}
 
-theorem ker_add_smul (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (t : T)
-    (P Q : PolF D WW.rank A.rank) (c : ℂ) (h : GA D WW) :
-    X.ker ψ θ t (P + c • Q) h = fun g => X.ker ψ θ t P h g + c * X.ker ψ θ t Q h g := by
+theorem ker_add_smul
+    (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (t : T)
+    (P Q : PolF D WW.rank A.rank) (c : ℂ) (h : GA D WW)
+    : X.ker ψ θ t (P + c • Q) h = fun g => X.ker ψ θ t P h g + c * X.ker ψ θ t Q h g := by
   funext g
   simp [Tri.ker, thetaKO, map_add (f := _), map_smul]
 
-def linI (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (t : T)
-    (hint : ∀ P h, IntegrableOn (X.ker ψ θ t P h) X.fd X.m) : PolF D WW.rank A.rank →ₗ[ℂ] (GA D WW → ℂ) where
+def linI
+    (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (t : T)
+    (hint : ∀ P h, IntegrableOn (X.ker ψ θ t P h) X.fd X.m)
+    : PolF D WW.rank A.rank →ₗ[ℂ] (GA D WW → ℂ) where
   toFun P := X.I ψ θ t P
   map_add' P Q := by
     funext h
@@ -107,21 +113,39 @@ def linI (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (t
     simp only [Tri.I, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, e, e0, Pi.zero_apply, zero_add]
     exact integral_const_mul c _
 
-theorem linI_apply (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (t : T)
-    (hint : ∀ P h, IntegrableOn (X.ker ψ θ t P h) X.fd X.m) (P : PolF D WW.rank A.rank) :
-    linI X ψ θ t hint P = X.I ψ θ t P := rfl
+theorem linI_apply
+    (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (t : T)
+    (hint : ∀ P h, IntegrableOn (X.ker ψ θ t P h) X.fd X.m)
+    (P : PolF D WW.rank A.rank)
+    : linI X ψ θ t hint P = X.I ψ θ t P :=
+  rfl
 
-theorem factor_of_parts (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D)
+theorem factor_of_parts
+    (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D)
     (hint : ∀ t P h, IntegrableOn (X.ker ψ θ t P h) X.fd X.m)
     (hker : ∀ t t' P, X.I ψ θ t P = 0 → X.I ψ θ t' P = 0)
-    (lam : T → ℂ) (s : PolF D WW.rank A'.rank →ₗ[ℂ] PolF D WW.rank A.rank) (hlam : ∀ t, lam t ≠ 0)
-    (hs : ∀ t P', (∀ h, IntegrableOn (X.ker' ψ θ t P' h) X.fd' X.m') → X.I ψ θ t (s P') = lam t • X.I' ψ θ t P')
-    (hconv : ∃ P', (∀ t h, IntegrableOn (X.ker' ψ θ t P' h) X.fd' X.m') ∧ ∀ t, X.I' ψ θ t P' ≠ 0) :
-    Factor X ψ θ lam := by
+    (lam : T → ℂ) (s : PolF D WW.rank A'.rank →ₗ[ℂ] PolF D WW.rank A.rank)
+    (hlam : ∀ t, lam t ≠ 0)
+    (hs : ∀ t P',
+      (∀ h, IntegrableOn (X.ker' ψ θ t P' h) X.fd' X.m') → X.I ψ θ t (s P') = lam t • X.I' ψ θ t P')
+    (hconv : ∃ P', (∀ t h, IntegrableOn (X.ker' ψ θ t P' h) X.fd' X.m') ∧ ∀ t, X.I' ψ θ t P' ≠ 0)
+    : Factor X ψ θ lam := by
   rcases isEmpty_or_nonempty T with hT | ⟨⟨t₀⟩⟩
-  · refine ⟨hlam, ModuleCat.of ℂ ℂ, MvPolynomial.lcoeff ℂ 0, MvPolynomial.lcoeff ℂ 0, fun _ => 0,
-      fun z => ⟨MvPolynomial.C z, by simp⟩, fun t => hT.elim t, fun t => hT.elim t, fun t => hT.elim t,
-      fun t => hT.elim t, 1, by simp, fun t => hT.elim t⟩
+  · refine ⟨
+      hlam,
+      ModuleCat.of ℂ ℂ,
+      MvPolynomial.lcoeff ℂ 0,
+      MvPolynomial.lcoeff ℂ 0,
+      fun _ => 0,
+      fun z => ⟨MvPolynomial.C z, by simp⟩,
+      fun t => hT.elim t,
+      fun t => hT.elim t,
+      fun t => hT.elim t,
+      fun t => hT.elim t,
+      1,
+      by simp,
+      fun t => hT.elim t
+    ⟩
   · let K : Submodule ℂ (PolF D WW.rank A.rank) := LinearMap.ker (linI X ψ θ t₀ (hint t₀))
     have hK : ∀ t, LinearMap.ker (linI X ψ θ t (hint t)) = K := fun t => by
       ext P
@@ -132,8 +156,19 @@ theorem factor_of_parts (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ
     have hJb : ∀ t, Function.Injective (Jb t) := fun t => by
       rw [← LinearMap.ker_eq_bot]
       exact Submodule.ker_liftQ_eq_bot _ _ _ (hK t).le
-    refine ⟨hlam, ModuleCat.of ℂ (PolF D WW.rank A.rank ⧸ K), K.mkQ, K.mkQ ∘ₗ s, fun t => (lam t)⁻¹ • Jb t,
-      K.mkQ_surjective, fun t => ?_, hint, fun t P => ?_, fun t P' hP' => ?_, ?_⟩
+    refine ⟨
+      hlam,
+      ModuleCat.of ℂ (PolF D WW.rank A.rank ⧸ K),
+      K.mkQ,
+      K.mkQ ∘ₗ s,
+      fun t => (lam t)⁻¹ • Jb t,
+      K.mkQ_surjective,
+      fun t => ?_,
+      hint,
+      fun t P => ?_,
+      fun t P' hP' => ?_,
+      ?_
+    ⟩
     · intro x y hxy
       exact hJb t (smul_right_injective _ (inv_ne_zero (hlam t)) hxy)
     · show X.I ψ θ t P = lam t • ((lam t)⁻¹ • Jb t (K.mkQ P))

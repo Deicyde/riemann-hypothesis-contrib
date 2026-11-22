@@ -38,8 +38,8 @@ lemma bijective_algebraMap_gradeZero (n : ℕ) :
     · exact (totalDegree_eq_zero_iff_eq_C.1
         (((mem_homogeneousSubmodule _ _).1 hp).totalDegree h0)).symm
 
-instance isIso_SpecMap_gradeZero (n : ℕ) :
-    IsIso (Spec.map (CommRingCat.ofHom (algebraMap A (grading A n 0)))) := by
+instance isIso_SpecMap_gradeZero (n : ℕ)
+    : IsIso (Spec.map (CommRingCat.ofHom (algebraMap A (grading A n 0)))) := by
   have : IsIso (CommRingCat.ofHom (algebraMap A (grading A n 0))) :=
     (ConcreteCategory.isIso_iff_bijective _).2 (bijective_algebraMap_gradeZero A n)
   infer_instance
@@ -50,8 +50,10 @@ instance isProper_toSpecBase (n : ℕ) : IsProper (toSpecBase A n) := by
 
 def multiProj : (k : ℕ) → (Fin (k + 1) → ℕ) → Σ P : Scheme.{u}, P ⟶ Spec (.of A)
   | 0, n => ⟨projectiveSpace A (n 0), toSpecBase A (n 0)⟩
-  | k + 1, n => ⟨pullback (toSpecBase A (n 0)) (multiProj k (Fin.tail n)).2,
-      pullback.fst _ _ ≫ toSpecBase A (n 0)⟩
+  | k + 1, n => ⟨
+    pullback (toSpecBase A (n 0)) (multiProj k (Fin.tail n)).2,
+    pullback.fst _ _ ≫ toSpecBase A (n 0)
+  ⟩
 
 abbrev MP (k : ℕ) (n : Fin (k + 1) → ℕ) : Scheme.{u} := (multiProj A k n).1
 
@@ -64,13 +66,15 @@ instance isProper_mpStr : (k : ℕ) → (n : Fin (k + 1) → ℕ) → IsProper (
     change IsProper (pullback.fst (toSpecBase A (n 0)) (mpStr A k (Fin.tail n)) ≫ _)
     infer_instance
 
-def pr : (k : ℕ) → (n : Fin (k + 1) → ℕ) → (i : Fin (k + 1)) →
-    MP A k n ⟶ projectiveSpace A (n i)
-  | 0, n, i => Fin.cases (motive := fun i => MP A 0 n ⟶ projectiveSpace A (n i)) (𝟙 _)
-      (fun j => j.elim0) i
-  | k + 1, n, i => Fin.cases (motive := fun i => MP A (k + 1) n ⟶ projectiveSpace A (n i))
+def pr : (k : ℕ) → (n : Fin (k + 1) → ℕ) → (i : Fin (k + 1)) → MP A k n ⟶ projectiveSpace A (n i)
+  | 0, n, i =>
+    Fin.cases (motive := fun i => MP A 0 n ⟶ projectiveSpace A (n i)) (𝟙 _) (fun j => j.elim0) i
+  | k + 1, n, i =>
+    Fin.cases
+      (motive := fun i => MP A (k + 1) n ⟶ projectiveSpace A (n i))
       (pullback.fst (toSpecBase A (n 0)) (mpStr A k (Fin.tail n)))
-      (fun j => pullback.snd (toSpecBase A (n 0)) (mpStr A k (Fin.tail n)) ≫ pr k (Fin.tail n) j) i
+      (fun j => pullback.snd (toSpecBase A (n 0)) (mpStr A k (Fin.tail n)) ≫ pr k (Fin.tail n) j)
+      i
 
 lemma pr_toSpecBase : (k : ℕ) → (n : Fin (k + 1) → ℕ) → (i : Fin (k + 1)) →
     pr A k n i ≫ toSpecBase A (n i) = mpStr A k n
@@ -94,19 +98,24 @@ variable {A}
     pr A (k + 1) n j.succ =
       pullback.snd (toSpecBase A (n 0)) (mpStr A k (Fin.tail n)) ≫ pr A k (Fin.tail n) j := rfl
 
-def liftAux : (k : ℕ) → (n : Fin (k + 1) → ℕ) → {T : Scheme.{u}} → (t : T ⟶ Spec (.of A)) →
-    (a : ∀ i, T ⟶ projectiveSpace A (n i)) → (∀ i, a i ≫ toSpecBase A (n i) = t) →
-    {f : T ⟶ MP A k n // f ≫ mpStr A k n = t}
+def liftAux
+    : (k : ℕ) → (n : Fin (k + 1) → ℕ) → {T : Scheme.{u}} → (t : T ⟶ Spec (.of A))
+      → (a : ∀ i, T ⟶ projectiveSpace A (n i)) → (∀ i, a i ≫ toSpecBase A (n i) = t)
+      → {f : T ⟶ MP A k n // f ≫ mpStr A k n = t}
   | 0, _, _, _, a, ha => ⟨a 0, ha 0⟩
-  | k + 1, n, _, t, a, ha =>
-    ⟨pullback.lift (a 0) (liftAux k (Fin.tail n) t (fun j => a j.succ) (fun j => ha j.succ)).1
-      (by rw [ha 0]; exact (liftAux k (Fin.tail n) t _ _).2.symm), by
+  | k + 1, n, _, t, a, ha => ⟨
+    pullback.lift (a 0) (liftAux k (Fin.tail n) t (fun j => a j.succ) (fun j => ha j.succ)).1
+      (by rw [ha 0]; exact (liftAux k (Fin.tail n) t _ _).2.symm),
+    by
       change pullback.lift _ _ _ ≫ pullback.fst _ _ ≫ _ = _
-      rw [pullback.lift_fst_assoc, ha 0]⟩
+      rw [pullback.lift_fst_assoc, ha 0]
+  ⟩
 
-def lift (k : ℕ) (n : Fin (k + 1) → ℕ) {T : Scheme.{u}} (t : T ⟶ Spec (.of A))
-    (a : ∀ i, T ⟶ projectiveSpace A (n i)) (ha : ∀ i, a i ≫ toSpecBase A (n i) = t) :
-    T ⟶ MP A k n :=
+def lift
+    (k : ℕ) (n : Fin (k + 1) → ℕ)
+    {T : Scheme.{u}} (t : T ⟶ Spec (.of A)) (a : ∀ i, T ⟶ projectiveSpace A (n i))
+    (ha : ∀ i, a i ≫ toSpecBase A (n i) = t)
+    : T ⟶ MP A k n :=
   (liftAux k n t a ha).1
 
 lemma lift_mpStr (k : ℕ) (n : Fin (k + 1) → ℕ) {T : Scheme.{u}} (t : T ⟶ Spec (.of A))

@@ -27,9 +27,11 @@ theorem AnalyticRootBranch.proof : AnalyticRootBranch.Statement := by
     intro s
     simp [hp, hF, Polynomial.eval_finsetSum]
 
-  have hpart : fderiv ℂ F (t₀, τ₀) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ =
-      (1 : ℂ →L[ℂ] ℂ).smulRight (p.derivative.eval τ₀) := by
-    have h1 : HasFDerivAt (fun s : ℂ => F (t₀, s))
+  have hpart
+      : fderiv ℂ F (t₀, τ₀) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ
+        = (1 : ℂ →L[ℂ] ℂ).smulRight (p.derivative.eval τ₀) := by
+    have h1 : HasFDerivAt
+        (fun s : ℂ => F (t₀, s))
         (fderiv ℂ F (t₀, τ₀) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ) τ₀ :=
       (hFa.differentiableAt.hasFDerivAt).comp τ₀
         ((hasFDerivAt_const t₀ τ₀).prodMk (hasFDerivAt_id τ₀))
@@ -38,18 +40,21 @@ theorem AnalyticRootBranch.proof : AnalyticRootBranch.Statement := by
     exact h1.unique (p.hasDerivAt τ₀).hasFDerivAt
 
   have hder : p.derivative.eval τ₀ ≠ 0 := by
-    have h := hsep.eval₂_derivative_ne_zero (RingHom.id ℂ) (x := τ₀)
-      (by rw [Polynomial.eval₂_id, hpe]; exact hroot)
+    have h :=
+      hsep.eval₂_derivative_ne_zero (RingHom.id ℂ) (x := τ₀)
+        (by rw [Polynomial.eval₂_id, hpe]; exact hroot)
     rwa [Polynomial.eval₂_id] at h
   have hinv : (fderiv ℂ F (t₀, τ₀) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ).IsInvertible := by
     rw [hpart]
     refine ⟨ContinuousLinearEquiv.unitsEquivAut ℂ (Units.mk0 _ hder), ?_⟩
-    ext; simp
+    ext
+    simp
   set ψ := hcd.implicitFunction one_ne_zero hinv with hψdef
   have hψt : ψ t₀ = τ₀ := hcd.implicitFunction_apply_self one_ne_zero hinv
   have hψcd : ContDiffAt ℂ 1 ψ t₀ := hcd.contDiffAt_implicitFunction one_ne_zero hinv
-  obtain ⟨O, hOsub, hOo, ht₀O⟩ := eventually_nhds_iff.mp
-    ((hcd.eventually_apply_implicitFunction one_ne_zero hinv).and (hψcd.eventually (by simp)))
+  obtain ⟨O, hOsub, hOo, ht₀O⟩ :=
+    eventually_nhds_iff.mp ((hcd.eventually_apply_implicitFunction one_ne_zero hinv).and
+      (hψcd.eventually (by simp)))
   refine ⟨O, ψ, hOo, ht₀O, ?_, hψt, fun t ht => (hOsub t ht).1.trans hroot⟩
   refine RiemannExtensionAnalytic.analyticOnNhd_of_differentiableOn hOo fun t ht => ?_
   exact ((hOsub t ht).2.differentiableAt one_ne_zero).differentiableWithinAt

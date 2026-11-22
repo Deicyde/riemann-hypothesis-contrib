@@ -8,9 +8,15 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.MoveArgsOneT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun GlobalTheory.ChainCol
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+  GlobalTheory.ChainCol
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open Classical
 
 noncomputable section
@@ -21,49 +27,72 @@ open GlobalTheory.FunObj.Comparison₂
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts}
 
-theorem stepFn_congr_red' (G : GridData L sc) {μ₀ : T} (hL : L.Is μ₀) (t : T) {j : ℕ} (hj : j < D.R.m) (w : Pl D.host.E)
+theorem stepFn_congr_red'
+    (G : GridData L sc)
+    {μ₀ : T} (hL : L.Is μ₀)
+    (t : T)
+    {j : ℕ} (hj : j < D.R.m)
+    (w : Pl D.host.E)
     {a b : ℕ} (ha : a = D.R.r + j * D.R.t) (hb : b = D.R.r + (j + 1) * D.R.t)
-    (N N' : Matrix (Fin b) (Fin a) (OA D)) (h : N.map (resS D.host.F w) = N'.map (resS D.host.F w)) :
-    stepFn L t w j ((N.map (cptO w)).submatrix (ixOf G t w hb) (ixOf G t w ha)) =
-      stepFn L t w j ((N'.map (cptO w)).submatrix (ixOf G t w hb) (ixOf G t w ha)) := by
+    (N N' : Matrix (Fin b) (Fin a) (OA D)) (h : N.map (resS D.host.F w) = N'.map (resS D.host.F w))
+    : stepFn L t w j ((N.map (cptO w)).submatrix (ixOf G t w hb) (ixOf G t w ha))
+      = stepFn L t w j ((N'.map (cptO w)).submatrix (ixOf G t w hb) (ixOf G t w ha)) := by
   by_cases hw : w ∈ GlobalTheory.FlipTop.topPl L t
   · exact GlobalTheory.FlipTop.stepFn_congr_red G hL t hj hw ha hb N N' h
   · have hP : w ∉ L.Pg := fun h => hw (Finset.mem_union_left _ h)
     have hQ : w ∉ L.Q t := fun h => hw (Finset.mem_union_right _ h)
-    have hI : ∀ M : Matrix (Fin b) (Fin a) (OA D),
-        GlobalTheory.StepData.IntM ((M.map (cptO w)).submatrix (ixOf G t w hb) (ixOf G t w ha)) := by
+    have hI
+        : ∀ M : Matrix (Fin b) (Fin a) (OA D),
+          GlobalTheory.StepData.IntM ((M.map (cptO w)).submatrix (ixOf G t w hb)
+            (ixOf G t w ha)) := by
       intro M i l
       have h1 := (mem_OA_iff _).1 (M (ixOf G t w hb i) (ixOf G t w ha l)).2 w
       show cptO w (M (ixOf G t w hb i) (ixOf G t w ha l)) ∈ _
       rw [cptO_apply]
       exact (vEq w).le_one_iff_le_one.2 h1
     unfold stepFn
-    simp only [if_neg hP, if_neg hQ, Set.indicator_apply, Set.mem_setOf_eq, if_pos (hI N), if_pos (hI N'), Pi.one_apply]
-
+    simp only [if_neg hP, if_neg hQ, Set.indicator_apply, Set.mem_setOf_eq, if_pos (hI N),
+      if_pos (hI N'), Pi.one_apply]
 
 open Classical in
-def colFn {G : GridData L sc} (B : Frames G) (t : T) (e : AE D) (j : ℕ) (ha : (G.V (.grid 0 j)).rank = D.R.r + j * D.R.t)
+def colFn
+    {G : GridData L sc} (B : Frames G)
+    (t : T) (e : AE D)
+    (j : ℕ) (ha : (G.V (.grid 0 j)).rank = D.R.r + j * D.R.t)
     (hb : (G.V (.grid 0 (j + 1))).rank = D.R.r + (j + 1) * D.R.t)
-    (x : Mx D (G.V (.grid 0 (j + 1))).rank (G.V (.grid 0 j)).rank) : ℂ :=
+    (x : Mx D (G.V (.grid 0 (j + 1))).rank (G.V (.grid 0 j)).rank)
+    : ℂ :=
   if IsHalf e x ∧ IsIntM (fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D))) then
     ∏ w ∈ locPl G t, stepFn L t w j
       (((fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D))).map (cpt (D := D) w)).submatrix (ixOf G t w hb) (ixOf G t w ha))
-  else 0
-
+  else
+    0
 
 set_option maxHeartbeats 1000000 in
-theorem isSBHalf_colFn (G : GridData L sc) (B : Frames G) {μ₀ : T} (hL : L.Is μ₀) (t : T) {e : AE D}
-    (he : IsIdemSum e (locPl G t)) (j : ℕ) (hj : j < D.R.m) :
-    IsSBHalf e (latO (G.pS (.mu t 0 j)) (G.pT (.mu t 0 j)) (G.latS (.mu t 0 j) : Set _) (G.latT (.mu t 0 j) : Set _)
-      fun _ => True) (colFn B t e j (GlobalTheory.FlipTop.rank_col G hj.le) (GlobalTheory.FlipTop.rank_col G hj)) := by
+theorem isSBHalf_colFn
+    (G : GridData L sc) (B : Frames G)
+    {μ₀ : T} (hL : L.Is μ₀)
+    (t : T)
+    {e : AE D} (he : IsIdemSum e (locPl G t))
+    (j : ℕ) (hj : j < D.R.m)
+    : IsSBHalf e
+      (latO (G.pS (.mu t 0 j)) (G.pT (.mu t 0 j)) (G.latS (.mu t 0 j) : Set _)
+        (G.latT (.mu t 0 j) : Set _) fun _ => True)
+      (colFn B t e j (GlobalTheory.FlipTop.rank_col G hj.le)
+        (GlobalTheory.FlipTop.rank_col G hj)) := by
   classical
   have hFS : IsFrame (B.β 0 j) (G.Λ (.grid 0 j)) := B.isFrame_β hL (Nat.zero_le _) hj.le
   have hFT : IsFrame (B.β 0 (j + 1)) (G.Λ (.grid 0 (j + 1))) := B.isFrame_β hL (Nat.zero_le _) hj
-  obtain ⟨a, ha, h1⟩ := WeilOver.exists_hom_le (S := G.V (.grid 0 j)) (T := G.V (.grid 0 (j + 1)))
-    (Formalism.IndefR.Fin.PDA.selfDual_isFullLattice _ _ (node_isV G hL (X := .grid 0 j) ⟨Nat.zero_le _, hj.le⟩).sd)
-    (Formalism.IndefR.Fin.PDA.selfDual_isFullLattice _ _ (node_isV G hL (X := .grid 0 (j + 1)) ⟨Nat.zero_le _, hj⟩).sd)
-  obtain ⟨b, hb, h2⟩ := WeilOver.exists_le_hom (S := G.V (.grid 0 j)) (T := G.V (.grid 0 (j + 1)))
-    (GlobalTheory.DiagLiftFix.isLattice_of_isFrame hFS) (GlobalTheory.DiagLiftFix.isLattice_of_isFrame hFT)
+  obtain ⟨a, ha, h1⟩ :=
+    WeilOver.exists_hom_le (S := G.V (.grid 0 j)) (T := G.V (.grid 0 (j + 1)))
+      (Formalism.IndefR.Fin.PDA.selfDual_isFullLattice _ _
+        (node_isV G hL (X := .grid 0 j) ⟨Nat.zero_le _, hj.le⟩).sd)
+      (Formalism.IndefR.Fin.PDA.selfDual_isFullLattice _ _
+        (node_isV G hL (X := .grid 0 (j + 1)) ⟨Nat.zero_le _, hj⟩).sd)
+  obtain ⟨b, hb, h2⟩ :=
+    WeilOver.exists_le_hom (S := G.V (.grid 0 j)) (T := G.V (.grid 0 (j + 1)))
+      (GlobalTheory.DiagLiftFix.isLattice_of_isFrame hFS)
+      (GlobalTheory.DiagLiftFix.isLattice_of_isFrame hFT)
   obtain ⟨e0, -, -⟩ := cpt_idemSum he
   set 𝔪 : Ideal (𝓞 D.host.E) := ∏ w ∈ locPl G t, w.asIdeal ^ 1 with h𝔪
   have hN : 0 < Ideal.absNorm 𝔪 :=
@@ -78,18 +107,22 @@ theorem isSBHalf_colFn (G : GridData L sc) (B : Frames G) {μ₀ : T} (hL : L.Is
       have := nsmul_mem (CosSB.nsmul_mem_hatMx h2 𝔪 hu) a
       rwa [smul_smul, ← hK] at this
     have hk2 := ((mem_hatMx_iff hFS hFT 𝔪 _).1 hk).2
-    have hXYZ : fr (B.β 0 (j + 1)) (B.β 0 j) ((x + K • u).map (toEAf D)) =
-        fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D)) + fr (B.β 0 (j + 1)) (B.β 0 j) ((K • u).map (toEAf D)) := by
+    have hXYZ
+        : fr (B.β 0 (j + 1)) (B.β 0 j) ((x + K • u).map (toEAf D))
+          = fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D))
+            + fr (B.β 0 (j + 1)) (B.β 0 j) ((K • u).map (toEAf D)) := by
       have hm : (x + K • u).map (toEAf D) = x.map (toEAf D) + (K • u).map (toEAf D) := by
         ext i l
         exact (toEAf D).map_add _ _
       rw [hm, fr_add]
-    have hZ : ∀ i l, fr (B.β 0 (j + 1)) (B.β 0 j) ((K • u).map (toEAf D)) i l ∈ OA D := fun i l => by
+    have hZ
+        : ∀ i l, fr (B.β 0 (j + 1)) (B.β 0 j) ((K • u).map (toEAf D)) i l ∈ OA D := fun i l => by
       obtain ⟨s, -, hs⟩ := hk2 i l
       rw [← hs]
       exact s.2
-    have hint : IsIntM (fr (B.β 0 (j + 1)) (B.β 0 j) ((x + K • u).map (toEAf D))) ↔
-        IsIntM (fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D))) := by
+    have hint
+        : IsIntM (fr (B.β 0 (j + 1)) (B.β 0 j) ((x + K • u).map (toEAf D)))
+          ↔ IsIntM (fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D))) := by
       refine forall₂_congr fun i l => ?_
       rw [hXYZ, Matrix.add_apply]
       exact ⟨fun h => by simpa using sub_mem h (hZ i l), fun h => add_mem h (hZ i l)⟩
@@ -100,9 +133,13 @@ theorem isSBHalf_colFn (G : GridData L sc) (B : Frames G) {μ₀ : T} (hL : L.Is
         fun i l => ⟨_, H1.2 i l⟩
       let NY : Matrix (Fin (G.V (.grid 0 (j + 1))).rank) (Fin (G.V (.grid 0 j)).rank) (OA D) :=
         fun i l => ⟨_, H2.2 i l⟩
-      have eX : (fr (B.β 0 (j + 1)) (B.β 0 j) ((x + K • u).map (toEAf D))).map (cpt (D := D) w) = NX.map (cptO w) :=
+      have eX
+          : (fr (B.β 0 (j + 1)) (B.β 0 j) ((x + K • u).map (toEAf D))).map (cpt (D := D) w)
+            = NX.map (cptO w) :=
         Matrix.ext fun i l => (cptO_apply w (NX i l)).symm
-      have eY : (fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D))).map (cpt (D := D) w) = NY.map (cptO w) :=
+      have eY
+          : (fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D))).map (cpt (D := D) w)
+            = NY.map (cptO w) :=
         Matrix.ext fun i l => (cptO_apply w (NY i l)).symm
       rw [eX, eY]
       refine stepFn_congr_red' G hL t hj w _ _ NX NY (Matrix.ext fun i l => ?_)
@@ -110,8 +147,9 @@ theorem isSBHalf_colFn (G : GridData L sc) (B : Frames G) {μ₀ : T} (hL : L.Is
       obtain ⟨s, hs, hs'⟩ := hk2 i l
       have e3 : ((NX i l - NY i l : OA D) : EAf D) = s.1 := by
         rw [hs', AddSubgroupClass.coe_sub]
-        change fr (B.β 0 (j + 1)) (B.β 0 j) ((x + K • u).map (toEAf D)) i l -
-          fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D)) i l = _
+        change fr (B.β 0 (j + 1)) (B.β 0 j) ((x + K • u).map (toEAf D)) i l
+            - fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D)) i l
+          = _
         rw [hXYZ, Matrix.add_apply, add_sub_cancel_left]
       rw [e3]
       exact (vEq w).lt_one_iff_lt_one.2 ((v_lt_one_iff _).2 (v_le_of_mem_idS (hle w hw) hs))
@@ -121,7 +159,9 @@ theorem isSBHalf_colFn (G : GridData L sc) (B : Frames G) {μ₀ : T} (hL : L.Is
   · obtain ⟨hth, hti⟩ : IsHalf e x ∧ IsIntM (fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D))) := by
       by_contra h
       exact hx (by unfold colFn; rw [if_neg h])
-    have hmem : x ∈ hatMx ((⊤ : Ideal (𝓞 D.host.E)) • homLat (G.Λ (.grid 0 j)) (G.Λ (.grid 0 (j + 1)))) := by
+    have hmem
+        : x ∈ hatMx
+          ((⊤ : Ideal (𝓞 D.host.E)) • homLat (G.Λ (.grid 0 j)) (G.Λ (.grid 0 (j + 1)))) := by
       refine (mem_hatMx_iff hFS hFT ⊤ _).2 ⟨fun i l => ?_, fun i l => ⟨⟨_, hti i l⟩, ?_, rfl⟩⟩
       · rw [← hth i l, map_mul, e0, zero_mul]
       · rw [idS, Ideal.map_top]
@@ -129,24 +169,40 @@ theorem isSBHalf_colFn (G : GridData L sc) (B : Frames G) {μ₀ : T} (hL : L.Is
     have := nsmul_mem (CosSB.nsmul_mem_latO h1 ⊤ hmem) (b * Ideal.absNorm 𝔪)
     rwa [smul_smul, mul_comm (b * Ideal.absNorm 𝔪) a, ← hK] at this
 
-
 open Classical in
-theorem givenFn_down_eq_colFn (G : GridData L sc) (B : Frames G) {μ₀ : T} (hL : L.Is μ₀) (t : T) (j : ℕ) (hj : j < D.R.m)
-    (Φ : G.Datum) {e : AE D} (he : IsIdemSum e (locPl G t)) :
-    GlobalTheory.FlipStart.givenFn B t Φ e (.down t 0 j) = colFn B t e j (GlobalTheory.FlipTop.rank_col G hj.le) (GlobalTheory.FlipTop.rank_col G hj) := by
+theorem givenFn_down_eq_colFn
+    (G : GridData L sc) (B : Frames G)
+    {μ₀ : T} (hL : L.Is μ₀)
+    (t : T)
+    (j : ℕ) (hj : j < D.R.m)
+    (Φ : G.Datum)
+    {e : AE D} (he : IsIdemSum e (locPl G t))
+    : GlobalTheory.FlipStart.givenFn B t Φ e (.down t 0 j)
+      = colFn B t e j (GlobalTheory.FlipTop.rank_col G hj.le)
+        (GlobalTheory.FlipTop.rank_col G hj) := by
   have ha := GlobalTheory.FlipTop.rank_col G hj.le
   have hb := GlobalTheory.FlipTop.rank_col G hj
   obtain ⟨-, c1, c0⟩ := cpt_idemSum he
   funext x
   set N := fr (B.β 0 (j + 1)) (B.β 0 j) (x.map (toEAf D)) with hN
-  have hsubm : ∀ w : Pl D.host.E, GlobalTheory.StepData.IntM ((N.map (cpt (D := D) w)).submatrix (ixOf G t w hb)
-      (ixOf G t w ha)) ↔ GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) := fun w =>
-    ⟨fun h i l => by simpa using h ((ixOf G t w hb).symm i) ((ixOf G t w ha).symm l), fun h i l => h _ _⟩
-  have hR : ∀ w, givenDatum t w B Φ (edgeOf (.down t 0 j)) (locArg B t w (.down t 0 j) x) =
-      stepFn L t w j ((N.map (cpt (D := D) w)).submatrix (ixOf G t w hb) (ixOf G t w ha)) := by
+  have hsubm
+      : ∀ w : Pl D.host.E,
+        GlobalTheory.StepData.IntM ((N.map (cpt (D := D) w)).submatrix (ixOf G t w hb)
+            (ixOf G t w ha))
+          ↔ GlobalTheory.StepData.IntM (N.map (cpt (D := D) w)) := fun w => ⟨
+    fun h i l => by simpa using h ((ixOf G t w hb).symm i) ((ixOf G t w ha).symm l),
+    fun h i l => h _ _
+  ⟩
+  have hR
+      : ∀ w,
+        givenDatum t w B Φ (edgeOf (.down t 0 j)) (locArg B t w (.down t 0 j) x)
+          = stepFn L t w j
+            ((N.map (cpt (D := D) w)).submatrix (ixOf G t w hb) (ixOf G t w ha)) := by
     intro w
-    have hla : locArg B t w (.down t 0 j) x = B.coord t w (X := (0, j + 1)) (Y := (0, j)) ⟨Nat.zero_le _, hj⟩
-        ⟨Nat.zero_le _, hj.le⟩ ((x.map (toEAf D)).map (cpt (D := D) w)) := by
+    have hla
+        : locArg B t w (.down t 0 j) x
+          = B.coord t w (X := (0, j + 1)) (Y := (0, j)) ⟨Nat.zero_le _, hj⟩ ⟨Nat.zero_le _, hj.le⟩
+            ((x.map (toEAf D)).map (cpt (D := D) w)) := by
       rw [Matrix.map_map]
       exact dif_pos ⟨Nat.zero_le _, hj⟩
     rw [hla]
@@ -183,10 +239,18 @@ theorem givenFn_down_eq_colFn (G : GridData L sc) (B : Frames G) {μ₀ : T} (hL
     by_contra h0
     exact hn ((hsubm w).1 (GlobalTheory.FunObj.LocTest.intM_of_stepFn t w j h0))
 
-theorem isSBHalf_givenFn_down : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (B : Frames G) {μ₀ : T},
-    L.Is μ₀ → ∀ (t : T) (j : ℕ), j < D.R.m → ∀ (Φ : G.Datum) (e : AE D), IsIdemSum e (locPl G t) →
-    IsSBHalf e (latO (G.pS (.mu t 0 j)) (G.pT (.mu t 0 j)) (G.latS (.mu t 0 j) : Set _) (G.latT (.mu t 0 j) : Set _)
-      fun _ => True) (GlobalTheory.FlipStart.givenFn B t Φ e (.down t 0 j)) := by
+theorem isSBHalf_givenFn_down
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (B : Frames G)
+        {μ₀ : T},
+      L.Is μ₀
+        → ∀ (t : T) (j : ℕ),
+          j < D.R.m
+            → ∀ (Φ : G.Datum) (e : AE D),
+              IsIdemSum e (locPl G t)
+                → IsSBHalf e
+                  (latO (G.pS (.mu t 0 j)) (G.pT (.mu t 0 j)) (G.latS (.mu t 0 j) : Set _)
+                    (G.latT (.mu t 0 j) : Set _) fun _ => True)
+                  (GlobalTheory.FlipStart.givenFn B t Φ e (.down t 0 j)) := by
   intro D T L sc G B μ₀ hL t j hj Φ e he
   rw [givenFn_down_eq_colFn G B hL t j hj Φ he]
   exact isSBHalf_colFn G B hL t he j hj

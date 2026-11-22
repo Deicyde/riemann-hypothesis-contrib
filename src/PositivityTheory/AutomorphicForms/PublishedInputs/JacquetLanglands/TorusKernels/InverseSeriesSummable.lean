@@ -14,16 +14,19 @@ namespace UpperTheory.Esk.InverseSeriesLemmas
 theorem enorm_smul_nonneg (r : ℝ) (hr : 0 ≤ r) (x : ℂ) : ‖r • x‖ₑ = ENNReal.ofReal r * ‖x‖ₑ := by
   rw [enorm_smul, Real.enorm_eq_ofReal hr]
 
-theorem hasSum_inv {G Y : Type} [Group G] [MeasurableSpace Y] [MulAction G Y] (b : Y → ℝ)
-    (hb : IsCut G b) (y : Y) : HasSum (fun g : G => b (g⁻¹ • y)) 1 := by
+theorem hasSum_inv
+    {G Y : Type} [Group G] [MeasurableSpace Y] [MulAction G Y] (b : Y → ℝ) (hb : IsCut G b) (y : Y)
+    : HasSum (fun g : G => b (g⁻¹ • y)) 1 := by
   have h := (Equiv.inv G).hasSum_iff.mpr (hb.sum y)
   exact h
 
-theorem tsum_ofReal_inv {G Y : Type} [Group G] [MeasurableSpace Y] [MulAction G Y] (b : Y → ℝ)
-    (hb : IsCut G b) (y : Y) : ∑' g : G, ENNReal.ofReal (b (g⁻¹ • y)) = 1 := by
+theorem tsum_ofReal_inv
+    {G Y : Type} [Group G] [MeasurableSpace Y] [MulAction G Y] (b : Y → ℝ) (hb : IsCut G b) (y : Y)
+    : ∑' g : G, ENNReal.ofReal (b (g⁻¹ • y)) = 1 := by
   have hs := UpperTheory.Esk.InverseSeriesLemmas.hasSum_inv b hb y
-  calc ∑' g : G, ENNReal.ofReal (b (g⁻¹ • y)) = ENNReal.ofReal (∑' g : G, b (g⁻¹ • y)) :=
-        (ENNReal.ofReal_tsum_of_nonneg (fun g => hb.nonneg _) hs.summable).symm
+  calc
+    ∑' g : G, ENNReal.ofReal (b (g⁻¹ • y)) = ENNReal.ofReal (∑' g : G, b (g⁻¹ • y)) :=
+      (ENNReal.ofReal_tsum_of_nonneg (fun g => hb.nonneg _) hs.summable).symm
     _ = 1 := by rw [hs.tsum_eq, ENNReal.ofReal_one]
 
 end UpperTheory.Esk.InverseSeriesLemmas
@@ -44,22 +47,27 @@ theorem UpperTheory.Esk.inverse_series_summable : UpperTheory.Esk.C3 := by
     rw [show Ψ g = fun y => b (g⁻¹ • y) • f y from funext (hΨ g)]
     exact (hb.meas.comp (hμ' g⁻¹).measurable).smul hf
   have emb : ∀ g : G, MeasurableEmbedding (fun y : Y => g • y) := fun g =>
-    (MeasurableEquiv.mk (MulAction.toPerm g) (hμ' g).measurable (hμ' g⁻¹).measurable).measurableEmbedding
+    (MeasurableEquiv.mk (MulAction.toPerm g) (hμ' g).measurable
+      (hμ' g⁻¹).measurable).measurableEmbedding
   have hΨl : ∀ g, ∫⁻ z, ‖Ψ g z‖ₑ ∂μ = ∫⁻ z, ENNReal.ofReal (b (g⁻¹ • z)) * ‖f z‖ₑ ∂μ := fun g =>
-    lintegral_congr (fun z => by rw [hΨ, UpperTheory.Esk.InverseSeriesLemmas.enorm_smul_nonneg _ (hb.nonneg _)])
+    lintegral_congr (fun z => by
+      rw [hΨ, UpperTheory.Esk.InverseSeriesLemmas.enorm_smul_nonneg _ (hb.nonneg _)])
   have hΦl : ∀ g, ∫⁻ y, ‖Φ g y‖ₑ ∂μ = ∫⁻ z, ‖Ψ g z‖ₑ ∂μ := by
     intro g
     rw [← (hμ' g).lintegral_comp (hΨm g).enorm]
     exact lintegral_congr (fun y => by rw [hΦ, hΨ, inv_smul_smul])
   have hfin : ∫⁻ z, ‖f z‖ₑ ∂μ < ⊤ := hfi.2
   have hsumΨ : ∑' g, ∫⁻ z, ‖Ψ g z‖ₑ ∂μ = ∫⁻ z, ‖f z‖ₑ ∂μ := by
-    calc ∑' g, ∫⁻ z, ‖Ψ g z‖ₑ ∂μ = ∑' g : G, ∫⁻ z, ENNReal.ofReal (b (g⁻¹ • z)) * ‖f z‖ₑ ∂μ :=
-          tsum_congr hΨl
+    calc
+      ∑' g, ∫⁻ z, ‖Ψ g z‖ₑ ∂μ
+        = ∑' g : G, ∫⁻ z, ENNReal.ofReal (b (g⁻¹ • z)) * ‖f z‖ₑ ∂μ := tsum_congr hΨl
       _ = ∫⁻ z, ∑' g : G, ENNReal.ofReal (b (g⁻¹ • z)) * ‖f z‖ₑ ∂μ :=
-          (lintegral_tsum (fun g =>
-            ((hb.meas.comp (hμ' g⁻¹).measurable).ennreal_ofReal.mul hf.enorm).aemeasurable)).symm
-      _ = ∫⁻ z, ‖f z‖ₑ ∂μ := lintegral_congr (fun z => by
-          rw [ENNReal.tsum_mul_right, UpperTheory.Esk.InverseSeriesLemmas.tsum_ofReal_inv b hb z, one_mul])
+        (lintegral_tsum (fun g =>
+          ((hb.meas.comp (hμ' g⁻¹).measurable).ennreal_ofReal.mul hf.enorm).aemeasurable)).symm
+      _ = ∫⁻ z, ‖f z‖ₑ ∂μ :=
+        lintegral_congr (fun z => by
+          rw [ENNReal.tsum_mul_right, UpperTheory.Esk.InverseSeriesLemmas.tsum_ofReal_inv b hb z,
+            one_mul])
   have hsumΦ' : ∑' g, ∫⁻ y, ‖Φ g y‖ₑ ∂μ = ∫⁻ z, ‖f z‖ₑ ∂μ := (tsum_congr hΦl).trans hsumΨ
   have hsumΦ : ∑' g, ∫⁻ y, ‖Φ g y‖ₑ ∂μ ≠ ⊤ := by rw [hsumΦ']; exact hfin.ne
   have hΦi : ∀ g, ∫ y, Φ g y ∂μ = ∫ z, Ψ g z ∂μ := by
@@ -73,7 +81,8 @@ theorem UpperTheory.Esk.inverse_series_summable : UpperTheory.Esk.C3 := by
   have hΨp : ∀ z, ∑' g, Ψ g z = f z := by
     intro z
     simp only [hΨ]
-    rw [((UpperTheory.Esk.InverseSeriesLemmas.hasSum_inv b hb z).smul_const (f z)).tsum_eq, one_smul]
+    rw [((UpperTheory.Esk.InverseSeriesLemmas.hasSum_inv b hb z).smul_const (f z)).tsum_eq,
+      one_smul]
   have hΦt : ∫ y, ∑' g, Φ g y ∂μ = ∑' g, ∫ y, Φ g y ∂μ :=
     integral_tsum (fun g => (hΦm g).aestronglyMeasurable) hsumΦ
   have hΦp : ∀ y, ∑' g, Φ g y = b y • ∑' g : G, f (g • y) := by

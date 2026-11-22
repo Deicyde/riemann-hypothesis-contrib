@@ -8,7 +8,11 @@ public import ReciprocityTheory.SemistableReduction.SemiContractA
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -17,20 +21,23 @@ namespace GlobalTheory.CompanionTheory.Ar.PB.SchurCalc
 
 variable {N : ℕ}
 
-theorem minorIJ_eq_submatrix {k m : ℕ} (X : Matrix (Fin N) (Fin N) ℂ) (I J : Finset (Fin N))
-    (g g' : Fin k ⊕ Fin m → Fin N) (hI : I.card = k + m) (hJ : J.card = k + m)
-    (hg : ∀ x, g x ∈ I) (hg' : ∀ x, g' x ∈ J)
-    (sg : StrictMono (g ∘ finSumFinEquiv.symm)) (sg' : StrictMono (g' ∘ finSumFinEquiv.symm)) :
-    minorIJ X I J = (X.submatrix g g').det := by
+theorem minorIJ_eq_submatrix
+    {k m : ℕ}
+    (X : Matrix (Fin N) (Fin N) ℂ)
+    (I J : Finset (Fin N)) (g g' : Fin k ⊕ Fin m → Fin N)
+    (hI : I.card = k + m) (hJ : J.card = k + m) (hg : ∀ x, g x ∈ I) (hg' : ∀ x, g' x ∈ J)
+    (sg : StrictMono (g ∘ finSumFinEquiv.symm)) (sg' : StrictMono (g' ∘ finSumFinEquiv.symm))
+    : minorIJ X I J = (X.submatrix g g').det := by
   rw [MinorCalc.minorIJ_eq_det X I J (k + m) hI hJ,
     ← Finset.orderEmbOfFin_unique hI (f := g ∘ finSumFinEquiv.symm) (fun x => hg _) sg,
     ← Finset.orderEmbOfFin_unique hJ (f := g' ∘ finSumFinEquiv.symm) (fun x => hg' _) sg',
     ← Matrix.det_submatrix_equiv_self finSumFinEquiv.symm (X.submatrix g g')]
   rfl
 
-theorem strictMono_elim {k m : ℕ} (e : Fin k → Fin N) (c : Fin m → Fin N) (he : StrictMono e)
-    (hc : StrictMono c) (hec : ∀ x y, e x < c y) :
-    StrictMono (Sum.elim e c ∘ finSumFinEquiv.symm) := by
+theorem strictMono_elim
+    {k m : ℕ} (e : Fin k → Fin N) (c : Fin m → Fin N) (he : StrictMono e) (hc : StrictMono c)
+    (hec : ∀ x y, e x < c y)
+    : StrictMono (Sum.elim e c ∘ finSumFinEquiv.symm) := by
   intro x y hxy
   induction x using Fin.addCases with
   | left x =>
@@ -56,26 +63,28 @@ theorem strictMono_elim {k m : ℕ} (e : Fin k → Fin N) (c : Fin m → Fin N) 
         simp only [Fin.val_natAdd] at h'
         omega))
 
-theorem det_compress {k : ℕ} {m : Type} [Fintype m] [DecidableEq m]
+theorem det_compress
+    {k : ℕ} {m : Type} [Fintype m] [DecidableEq m]
     (A : Matrix (Fin k) (Fin k) ℂ) (hA : IsUnit A.det)
     (B : Matrix (Fin k) (Fin 2) ℂ) (Cc : Matrix (Fin 2) (Fin k) ℂ) (D : Matrix (Fin 2) (Fin 2) ℂ)
-    (w' w : Matrix (Fin 2) m ℂ) :
-    ((fromBlocks (1 : Matrix (Fin k) (Fin k) ℂ) 0 0 w')ᴴ * fromBlocks A B Cc D *
-      fromBlocks (1 : Matrix (Fin k) (Fin k) ℂ) 0 0 w).det =
-      A.det * (w'ᴴ * (D - Cc * A⁻¹ * B) * w).det := by
+    (w' w : Matrix (Fin 2) m ℂ)
+    : ((fromBlocks (1 : Matrix (Fin k) (Fin k) ℂ) 0 0 w')ᴴ * fromBlocks A B Cc D
+        * fromBlocks (1 : Matrix (Fin k) (Fin k) ℂ) 0 0 w).det
+      = A.det * (w'ᴴ * (D - Cc * A⁻¹ * B) * w).det := by
   letI := Matrix.invertibleOfIsUnitDet A hA
   rw [fromBlocks_conjTranspose, fromBlocks_multiply, fromBlocks_multiply]
-  simp only [conjTranspose_one, conjTranspose_zero, Matrix.one_mul, Matrix.zero_mul, Matrix.mul_zero,
-    add_zero, zero_add, Matrix.mul_one]
+  simp only [conjTranspose_one, conjTranspose_zero, Matrix.one_mul, Matrix.zero_mul,
+    Matrix.mul_zero, add_zero, zero_add, Matrix.mul_one]
   rw [det_fromBlocks₁₁, invOf_eq_nonsing_inv]
   congr 2
   simp only [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_assoc]
 
-theorem submatrix_compress {α β : Type} [Fintype β] (H U U' : Matrix (Fin N) (Fin N) ℂ) (g : β → Fin N)
-    (f f' : α → Fin N) (R R' : Matrix β α ℂ)
+theorem submatrix_compress
+    {α β : Type} [Fintype β]
+    (H U U' : Matrix (Fin N) (Fin N) ℂ) (g : β → Fin N) (f f' : α → Fin N) (R R' : Matrix β α ℂ)
     (hU : ∀ y l, U l (f y) = ∑ z, if l = g z then R z y else 0)
-    (hU' : ∀ y l, U' l (f' y) = ∑ z, if l = g z then R' z y else 0) :
-    (Uᴴ * H * U').submatrix f f' = Rᴴ * H.submatrix g g * R' := by
+    (hU' : ∀ y l, U' l (f' y) = ∑ z, if l = g z then R' z y else 0)
+    : (Uᴴ * H * U').submatrix f f' = Rᴴ * H.submatrix g g * R' := by
   let E : Matrix (Fin N) β ℂ := Matrix.of fun l z => if l = g z then 1 else 0
   have h1 : U.submatrix id f = E * R := by
     ext l y
@@ -92,17 +101,23 @@ theorem submatrix_compress {α β : Type} [Fintype β] (H U U' : Matrix (Fin N) 
   rw [h3, h1, h2, conjTranspose_mul, ← h4]
   simp only [Matrix.mul_assoc]
 
-theorem minor_pos {H : Matrix (Fin N) (Fin N) ℂ} (hH : H.PosDef) (I : Finset (Fin N)) : 0 < minorIJ H I I := by
+theorem minor_pos {H : Matrix (Fin N) (Fin N) ℂ} (hH : H.PosDef) (I : Finset (Fin N))
+    : 0 < minorIJ H I I := by
   rw [MinorCalc.minorIJ_eq_det H I I _ rfl rfl]
   exact (hH.submatrix (I.orderEmbOfFin rfl).injective).det_pos
 
-def schurPlane (H : Matrix (Fin N) (Fin N) ℂ) (C : Finset (Fin N)) (ca cb : Fin N) : Matrix (Fin 2) (Fin 2) ℂ :=
-  H.submatrix ![ca, cb] ![ca, cb] -
-    H.submatrix ![ca, cb] (C.orderEmbOfFin rfl) * (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl))⁻¹ *
-      H.submatrix (C.orderEmbOfFin rfl) ![ca, cb]
+def schurPlane (H : Matrix (Fin N) (Fin N) ℂ) (C : Finset (Fin N)) (ca cb : Fin N)
+    : Matrix (Fin 2) (Fin 2) ℂ :=
+  H.submatrix ![ca, cb] ![ca, cb]
+    - H.submatrix ![ca, cb] (C.orderEmbOfFin rfl)
+      * (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl))⁻¹
+      * H.submatrix (C.orderEmbOfFin rfl) ![ca, cb]
 
-theorem schurPlane_posDef {H : Matrix (Fin N) (Fin N) ℂ} (hH : H.PosDef) (C : Finset (Fin N)) {ca cb : Fin N}
-    (hC : ∀ c ∈ C, c < ca) (hab : ca < cb) : (schurPlane H C ca cb).PosDef := by
+theorem schurPlane_posDef
+    {H : Matrix (Fin N) (Fin N) ℂ} (hH : H.PosDef)
+    (C : Finset (Fin N))
+    {ca cb : Fin N} (hC : ∀ c ∈ C, c < ca) (hab : ca < cb)
+    : (schurPlane H C ca cb).PosDef := by
   have hinj : Function.Injective (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb]) := by
     have hc : ∀ x, C.orderEmbOfFin rfl x < ca := fun x => hC _ (Finset.orderEmbOfFin_mem _ _ _)
     rintro (x | x) (y | y) h
@@ -122,112 +137,148 @@ theorem schurPlane_posDef {H : Matrix (Fin N) (Fin N) ℂ} (hH : H.PosDef) (C : 
       · rfl
   have hM := hH.submatrix hinj
   have hA := hH.submatrix (C.orderEmbOfFin rfl).injective
-  have e : H.submatrix (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb]) (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb]) =
-      fromBlocks (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl))
-        (H.submatrix (C.orderEmbOfFin rfl) ![ca, cb]) (H.submatrix (C.orderEmbOfFin rfl) ![ca, cb])ᴴ
-        (H.submatrix ![ca, cb] ![ca, cb]) := by
+  have e
+      : H.submatrix (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb])
+          (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb])
+        = fromBlocks (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl))
+          (H.submatrix (C.orderEmbOfFin rfl) ![ca, cb])
+          (H.submatrix (C.orderEmbOfFin rfl) ![ca, cb])ᴴ (H.submatrix ![ca, cb] ![ca, cb]) := by
     ext (x | x) (y | y)
     · rfl
     · rfl
-    · simp only [submatrix_apply, Sum.elim_inr, Sum.elim_inl, fromBlocks_apply₂₁, conjTranspose_apply]
+    · simp only [submatrix_apply, Sum.elim_inr, Sum.elim_inl, fromBlocks_apply₂₁,
+        conjTranspose_apply]
       exact (hH.1.apply _ _).symm
     · rfl
   rw [e] at hM
   have := ReciprocityTheory.MultiplicativeHeights.sc_schur_posDef _ _ hA hM
-  have e2 : (H.submatrix (C.orderEmbOfFin rfl) ![ca, cb])ᴴ = H.submatrix ![ca, cb] (C.orderEmbOfFin rfl) := by
+  have e2
+      : (H.submatrix (C.orderEmbOfFin rfl) ![ca, cb])ᴴ
+        = H.submatrix ![ca, cb] (C.orderEmbOfFin rfl) := by
     ext x y
     simp only [submatrix_apply, conjTranspose_apply]
     exact hH.1.apply _ _
   rw [e2] at this
   exact this
 
-theorem minor_block (H U U' : Matrix (Fin N) (Fin N) ℂ) (C : Finset (Fin N)) (ca cb : Fin N) {m : ℕ}
+theorem minor_block
+    (H U U' : Matrix (Fin N) (Fin N) ℂ)
+    (C : Finset (Fin N))
+    (ca cb : Fin N)
+    {m : ℕ}
     (hA : IsUnit (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl)).det)
-    (c c' : Fin m → Fin N) (I J : Finset (Fin N)) (hI : I.card = C.card + m) (hJ : J.card = C.card + m)
-    (hCI : ∀ x ∈ C, x ∈ I) (hCJ : ∀ x ∈ C, x ∈ J) (hcI : ∀ y, c y ∈ I) (hcJ : ∀ y, c' y ∈ J)
-    (sc : StrictMono c) (sc' : StrictMono c') (hc : ∀ x ∈ C, ∀ y, x < c y) (hc' : ∀ x ∈ C, ∀ y, x < c' y)
+    (c c' : Fin m → Fin N) (I J : Finset (Fin N))
+    (hI : I.card = C.card + m) (hJ : J.card = C.card + m) (hCI : ∀ x ∈ C, x ∈ I)
+    (hCJ : ∀ x ∈ C, x ∈ J) (hcI : ∀ y, c y ∈ I) (hcJ : ∀ y, c' y ∈ J)
+    (sc : StrictMono c) (sc' : StrictMono c') (hc : ∀ x ∈ C, ∀ y, x < c y)
+    (hc' : ∀ x ∈ C, ∀ y, x < c' y)
     (w w' : Matrix (Fin 2) (Fin m) ℂ)
-    (hUe : ∀ x ∈ C, ∀ l, U l x = if l = x then 1 else 0) (hUe' : ∀ x ∈ C, ∀ l, U' l x = if l = x then 1 else 0)
+    (hUe : ∀ x ∈ C, ∀ l, U l x = if l = x then 1 else 0)
+    (hUe' : ∀ x ∈ C, ∀ l, U' l x = if l = x then 1 else 0)
     (hUc : ∀ y l, U l (c y) = (if l = ca then w 0 y else 0) + if l = cb then w 1 y else 0)
-    (hUc' : ∀ y l, U' l (c' y) = (if l = ca then w' 0 y else 0) + if l = cb then w' 1 y else 0) :
-    minorIJ (Uᴴ * H * U') I J =
-      (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl)).det * (wᴴ * schurPlane H C ca cb * w').det := by
+    (hUc' : ∀ y l, U' l (c' y) = (if l = ca then w' 0 y else 0) + if l = cb then w' 1 y else 0)
+    : minorIJ (Uᴴ * H * U') I J
+      = (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl)).det
+        * (wᴴ * schurPlane H C ca cb * w').det := by
   have mem : ∀ x, C.orderEmbOfFin rfl x ∈ C := fun x => Finset.orderEmbOfFin_mem _ _ _
-  have key : ∀ (V : Matrix (Fin N) (Fin N) ℂ) (d : Fin m → Fin N) (v : Matrix (Fin 2) (Fin m) ℂ),
-      (∀ x ∈ C, ∀ l, V l x = if l = x then 1 else 0) →
-      (∀ y l, V l (d y) = (if l = ca then v 0 y else 0) + if l = cb then v 1 y else 0) →
-      ∀ y l, V l (Sum.elim (C.orderEmbOfFin rfl) d y) =
-        ∑ z, if l = Sum.elim (C.orderEmbOfFin rfl) ![ca, cb] z then
-          (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) z y else 0 := by
+  have key
+      : ∀ (V : Matrix (Fin N) (Fin N) ℂ) (d : Fin m → Fin N) (v : Matrix (Fin 2) (Fin m) ℂ),
+        (∀ x ∈ C, ∀ l, V l x = if l = x then 1 else 0)
+          → (∀ y l, V l (d y) = (if l = ca then v 0 y else 0) + if l = cb then v 1 y else 0)
+          → ∀ y l,
+            V l (Sum.elim (C.orderEmbOfFin rfl) d y)
+              = ∑ z, if l = Sum.elim (C.orderEmbOfFin rfl) ![ca, cb] z then
+                  (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) z y else 0 := by
     intro V d v h1 h2 y l
-    have b11 : ∀ a x, (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) (Sum.inl a) (Sum.inl x) =
-        if a = x then (1 : ℂ) else 0 := fun a x => by rw [fromBlocks_apply₁₁, Matrix.one_apply]
-    have b12 : ∀ a x, (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) (Sum.inl a) (Sum.inr x) =
-        (0 : ℂ) := fun a x => rfl
-    have b21 : ∀ a x, (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) (Sum.inr a) (Sum.inl x) =
-        (0 : ℂ) := fun a x => rfl
-    have b22 : ∀ a x, (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) (Sum.inr a) (Sum.inr x) =
-        v a x := fun a x => rfl
+    have b11
+        : ∀ a x,
+          (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) (Sum.inl a) (Sum.inl x)
+            = if a = x then (1 : ℂ) else 0 := fun a x => by
+      rw [fromBlocks_apply₁₁, Matrix.one_apply]
+    have b12
+        : ∀ a x,
+          (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) (Sum.inl a) (Sum.inr x)
+            = (0 : ℂ) := fun a x =>
+      rfl
+    have b21
+        : ∀ a x,
+          (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) (Sum.inr a) (Sum.inl x)
+            = (0 : ℂ) := fun a x =>
+      rfl
+    have b22
+        : ∀ a x,
+          (fromBlocks (1 : Matrix (Fin C.card) (Fin C.card) ℂ) 0 0 v) (Sum.inr a) (Sum.inr x)
+            = v a x := fun a x =>
+      rfl
     rcases y with x | y
-    · simp only [Sum.elim_inl, Sum.elim_inr, Fintype.sum_sum_type, b11, b21, ite_self, Finset.sum_const_zero,
-        add_zero, Fin.sum_univ_two]
+    · simp only [Sum.elim_inl, Sum.elim_inr, Fintype.sum_sum_type, b11, b21, ite_self,
+        Finset.sum_const_zero, add_zero, Fin.sum_univ_two]
       rw [h1 _ (mem x), Finset.sum_eq_single x]
       · simp
       · intro b _ hb
         simp [hb]
       · simp
-    · simp only [Sum.elim_inr, Sum.elim_inl, Fintype.sum_sum_type, b12, b22, ite_self, Finset.sum_const_zero,
-        zero_add, Fin.sum_univ_two]
+    · simp only [Sum.elim_inr, Sum.elim_inl, Fintype.sum_sum_type, b12, b22, ite_self,
+        Finset.sum_const_zero, zero_add, Fin.sum_univ_two]
       rw [h2]
       rfl
-  rw [minorIJ_eq_submatrix _ I J (Sum.elim (C.orderEmbOfFin rfl) c) (Sum.elim (C.orderEmbOfFin rfl) c') hI hJ
-      (by rintro (x | x); exacts [hCI _ (mem x), hcI x]) (by rintro (x | x); exacts [hCJ _ (mem x), hcJ x])
+  rw [minorIJ_eq_submatrix _ I J (Sum.elim (C.orderEmbOfFin rfl) c)
+      (Sum.elim (C.orderEmbOfFin rfl) c') hI hJ (by rintro (x | x); exacts [hCI _ (mem x), hcI x])
+      (by rintro (x | x); exacts [hCJ _ (mem x), hcJ x])
       (strictMono_elim _ _ (C.orderEmbOfFin rfl).strictMono sc fun x y => hc _ (mem x) y)
       (strictMono_elim _ _ (C.orderEmbOfFin rfl).strictMono sc' fun x y => hc' _ (mem x) y),
     submatrix_compress H U U' (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb]) _ _ _ _ (key U c w hUe hUc)
       (key U' c' w' hUe' hUc')]
-  have e : H.submatrix (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb]) (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb]) =
-      fromBlocks (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl))
-        (H.submatrix (C.orderEmbOfFin rfl) ![ca, cb]) (H.submatrix ![ca, cb] (C.orderEmbOfFin rfl))
-        (H.submatrix ![ca, cb] ![ca, cb]) := by
+  have e
+      : H.submatrix (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb])
+          (Sum.elim (C.orderEmbOfFin rfl) ![ca, cb])
+        = fromBlocks (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl))
+          (H.submatrix (C.orderEmbOfFin rfl) ![ca, cb])
+          (H.submatrix ![ca, cb] (C.orderEmbOfFin rfl)) (H.submatrix ![ca, cb] ![ca, cb]) := by
     ext (x | x) (y | y) <;> rfl
   rw [e]
   exact det_compress _ hA _ _ _ _ _
 
-theorem elem_apply (ca cb : Fin N) (t : ℂ) (l y : Fin N) :
-    (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l y =
-      (if l = y then 1 else 0) + if cb = l ∧ ca = y then t else 0 := by
+theorem elem_apply (ca cb : Fin N) (t : ℂ) (l y : Fin N)
+    : (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l y
+      = (if l = y then 1 else 0) + if cb = l ∧ ca = y then t else 0 := by
   rw [Matrix.add_apply, Matrix.one_apply, Matrix.single_apply]
 
 def selCol (r : Fin 2) : Matrix (Fin 2) (Fin 1) ℂ := Matrix.of fun x _ => if x = r then 1 else 0
 
-theorem det_sel (S : Matrix (Fin 2) (Fin 2) ℂ) (r s : Fin 2) : ((selCol r)ᴴ * S * selCol s).det = S r s := by
+theorem det_sel (S : Matrix (Fin 2) (Fin 2) ℂ) (r s : Fin 2)
+    : ((selCol r)ᴴ * S * selCol s).det = S r s := by
   rw [det_fin_one]
-  fin_cases r <;> fin_cases s <;> simp [Matrix.mul_apply, selCol, Fin.sum_univ_two, conjTranspose_apply]
+  fin_cases r <;> fin_cases s
+    <;> simp [Matrix.mul_apply, selCol, Fin.sum_univ_two, conjTranspose_apply]
 
 def lineCol (t : ℂ) : Matrix (Fin 2) (Fin 1) ℂ := Matrix.of fun x _ => ![1, t] x
 
-theorem det_line (S : Matrix (Fin 2) (Fin 2) ℂ) (t : ℂ) :
-    ((lineCol t)ᴴ * S * lineCol t).det = herm2 S ![1, t] ![1, t] := by
+theorem det_line (S : Matrix (Fin 2) (Fin 2) ℂ) (t : ℂ)
+    : ((lineCol t)ᴴ * S * lineCol t).det = herm2 S ![1, t] ![1, t] := by
   rw [det_fin_one]
   simp [Matrix.mul_apply, lineCol, Fin.sum_univ_two, conjTranspose_apply, herm2, dotProduct, mulVec]
   ring
 
-theorem det_plane (S : Matrix (Fin 2) (Fin 2) ℂ) (t : ℂ) :
-    ((!![1, 0; t, 1] : Matrix (Fin 2) (Fin 2) ℂ)ᴴ * S * !![1, 0; t, 1]).det = S.det := by
+theorem det_plane (S : Matrix (Fin 2) (Fin 2) ℂ) (t : ℂ)
+    : ((!![1, 0; t, 1] : Matrix (Fin 2) (Fin 2) ℂ)ᴴ * S * !![1, 0; t, 1]).det = S.det := by
   rw [det_mul, det_mul, det_conjTranspose, det_fin_two_of]
   simp
 
-theorem core (H : Matrix (Fin N) (Fin N) ℂ) (hH : H.PosDef) (C : Finset (Fin N)) (ca cb : Fin N)
-    (hC : ∀ c ∈ C, c < ca) (hab : ca < cb) :
-    (∀ r s : Fin 2, schurPlane H C ca cb r s = minorIJ H (insert (![ca, cb] r) C) (insert (![ca, cb] s) C) /
-      minorIJ H C C) ∧
-    ∀ t : ℂ,
-      minorIJ ((1 + Matrix.single cb ca t)ᴴ * H * (1 + Matrix.single cb ca t)) C C = minorIJ H C C ∧
-      minorIJ ((1 + Matrix.single cb ca t)ᴴ * H * (1 + Matrix.single cb ca t)) (insert ca C) (insert ca C) =
-        minorIJ H C C * herm2 (schurPlane H C ca cb) ![1, t] ![1, t] ∧
-      minorIJ ((1 + Matrix.single cb ca t)ᴴ * H * (1 + Matrix.single cb ca t)) (insert cb (insert ca C))
-        (insert cb (insert ca C)) = minorIJ H C C * (schurPlane H C ca cb).det := by
+theorem core
+    (H : Matrix (Fin N) (Fin N) ℂ) (hH : H.PosDef)
+    (C : Finset (Fin N)) (ca cb : Fin N) (hC : ∀ c ∈ C, c < ca) (hab : ca < cb)
+    : (∀ r s : Fin 2,
+        schurPlane H C ca cb r s
+          = minorIJ H (insert (![ca, cb] r) C) (insert (![ca, cb] s) C) / minorIJ H C C)
+      ∧ ∀ t : ℂ,
+        minorIJ ((1 + Matrix.single cb ca t)ᴴ * H * (1 + Matrix.single cb ca t)) C C = minorIJ H C C
+          ∧ minorIJ ((1 + Matrix.single cb ca t)ᴴ * H * (1 + Matrix.single cb ca t)) (insert ca C)
+              (insert ca C)
+            = minorIJ H C C * herm2 (schurPlane H C ca cb) ![1, t] ![1, t]
+          ∧ minorIJ ((1 + Matrix.single cb ca t)ᴴ * H * (1 + Matrix.single cb ca t))
+              (insert cb (insert ca C)) (insert cb (insert ca C))
+            = minorIJ H C C * (schurPlane H C ca cb).det := by
   have hpos : 0 < (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl)).det :=
     (hH.submatrix (C.orderEmbOfFin rfl).injective).det_pos
   have hA : IsUnit (H.submatrix (C.orderEmbOfFin rfl) (C.orderEmbOfFin rfl)).det := hpos.ne'.isUnit
@@ -247,42 +298,76 @@ theorem core (H : Matrix (Fin N) (Fin N) ℂ) (hH : H.PosDef) (C : Finset (Fin N
     exact ⟨hab.ne', hnot 1⟩
   constructor
   · intro r s
-    have h := minor_block H 1 1 C ca cb hA (fun _ : Fin 1 => ![ca, cb] r) (fun _ => ![ca, cb] s)
-      (insert (![ca, cb] r) C) (insert (![ca, cb] s) C) (hcard r) (hcard s)
-      (fun x hx => Finset.mem_insert_of_mem hx) (fun x hx => Finset.mem_insert_of_mem hx)
-      (fun _ => Finset.mem_insert_self _ _) (fun _ => Finset.mem_insert_self _ _)
-      (Subsingleton.strictMono _) (Subsingleton.strictMono _) (fun x hx _ => hcr r x hx)
-      (fun x hx _ => hcr s x hx) (selCol r) (selCol s)
-      (fun x _ l => Matrix.one_apply) (fun x _ l => Matrix.one_apply)
-      (fun _ l => by fin_cases r <;> (simp [selCol, Matrix.one_apply] <;> congr))
-      (fun _ l => by fin_cases s <;> (simp [selCol, Matrix.one_apply] <;> congr))
+    have h :=
+      minor_block H 1 1 C ca cb hA
+        (fun _ : Fin 1 => ![ca, cb] r)
+        (fun _ => ![ca, cb] s)
+        (insert (![ca, cb] r) C) (insert (![ca, cb] s) C) (hcard r) (hcard s)
+        (fun x hx => Finset.mem_insert_of_mem hx)
+        (fun x hx => Finset.mem_insert_of_mem hx)
+        (fun _ => Finset.mem_insert_self _ _)
+        (fun _ => Finset.mem_insert_self _ _)
+        (Subsingleton.strictMono _) (Subsingleton.strictMono _)
+        (fun x hx _ => hcr r x hx)
+        (fun x hx _ => hcr s x hx)
+        (selCol r) (selCol s)
+        (fun x _ l => Matrix.one_apply)
+        (fun x _ l => Matrix.one_apply)
+        (fun _ l => by fin_cases r <;> (simp [selCol, Matrix.one_apply] <;> congr))
+        (fun _ l => by fin_cases s <;> (simp [selCol, Matrix.one_apply] <;> congr))
     rw [det_sel] at h
     simp only [conjTranspose_one, Matrix.one_mul, Matrix.mul_one] at h
     rw [h, hmin, mul_div_cancel_left₀ _ hpos.ne']
   · intro t
-    have hE : ∀ x ∈ C, ∀ l, (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l x = if l = x then 1 else 0 :=
-      fun x hx l => by
-        have : ca ≠ x := fun e => hca (e ▸ hx)
-        rw [elem_apply]
-        simp [this]
-    have hc0 : ∀ l, (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l ca =
-        (if l = ca then 1 else 0) + if l = cb then t else 0 := fun l => by
+    have hE
+        : ∀ x ∈ C, ∀ l,
+          (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l x
+            = if l = x then 1 else 0 := fun x hx l => by
+      have : ca ≠ x := fun e => hca (e ▸ hx)
+      rw [elem_apply]
+      simp [this]
+    have hc0
+        : ∀ l,
+          (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l ca
+            = (if l = ca then 1 else 0) + if l = cb then t else 0 := fun l => by
       rw [elem_apply]
       simp [eq_comm]
-    have hc1 : ∀ l, (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l cb = if l = cb then 1 else 0 := fun l => by
+    have hc1
+        : ∀ l,
+          (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l cb
+            = if l = cb then 1 else 0 := fun l => by
       rw [elem_apply]
       simp [hab.ne]
     refine ⟨?_, ?_, ?_⟩
-    · have h := minor_block H _ _ C ca cb hA (m := 0) Fin.elim0 Fin.elim0 C C rfl rfl (fun _ h => h) (fun _ h => h)
-        (fun y => y.elim0) (fun y => y.elim0) (fun y => y.elim0) (fun y => y.elim0)
-        (fun _ _ y => y.elim0) (fun _ _ y => y.elim0) 0 0 hE hE (fun y => y.elim0) (fun y => y.elim0)
+    · have h :=
+        minor_block H _ _ C ca cb hA (m := 0) Fin.elim0 Fin.elim0 C C rfl rfl
+          (fun _ h => h)
+          (fun _ h => h)
+          (fun y => y.elim0)
+          (fun y => y.elim0)
+          (fun y => y.elim0)
+          (fun y => y.elim0)
+          (fun _ _ y => y.elim0)
+          (fun _ _ y => y.elim0)
+          0 0 hE hE
+          (fun y => y.elim0)
+          (fun y => y.elim0)
       rw [h, hmin, Matrix.det_isEmpty (n := Fin 0), mul_one]
-    · have h := minor_block H _ _ C ca cb hA (fun _ : Fin 1 => ca) (fun _ => ca) (insert ca C) (insert ca C)
-        (hcard 0) (hcard 0) (fun x hx => Finset.mem_insert_of_mem hx) (fun x hx => Finset.mem_insert_of_mem hx)
-        (fun _ => Finset.mem_insert_self _ _) (fun _ => Finset.mem_insert_self _ _)
-        (Subsingleton.strictMono _) (Subsingleton.strictMono _) (fun x hx _ => hC x hx) (fun x hx _ => hC x hx)
-        (lineCol t) (lineCol t) hE hE (fun _ l => by rw [hc0]; simp [lineCol])
-        (fun _ l => by rw [hc0]; simp [lineCol])
+    · have h :=
+        minor_block H _ _ C ca cb hA
+          (fun _ : Fin 1 => ca)
+          (fun _ => ca)
+          (insert ca C) (insert ca C) (hcard 0) (hcard 0)
+          (fun x hx => Finset.mem_insert_of_mem hx)
+          (fun x hx => Finset.mem_insert_of_mem hx)
+          (fun _ => Finset.mem_insert_self _ _)
+          (fun _ => Finset.mem_insert_self _ _)
+          (Subsingleton.strictMono _) (Subsingleton.strictMono _)
+          (fun x hx _ => hC x hx)
+          (fun x hx _ => hC x hx)
+          (lineCol t) (lineCol t) hE hE
+          (fun _ l => by rw [hc0]; simp [lineCol])
+          (fun _ l => by rw [hc0]; simp [lineCol])
       rw [h, hmin, det_line]
     · have hcard2 : (insert cb (insert ca C)).card = C.card + 2 := by
         rw [Finset.card_insert_of_notMem hcb', Finset.card_insert_of_notMem hca]
@@ -293,31 +378,41 @@ theorem core (H : Matrix (Fin N) (Fin N) ℂ) (hH : H.PosDef) (C : Finset (Fin N
         · exact hab
         · exact absurd hxy (by decide)
         · exact absurd hxy (lt_irrefl _)
-      have hin : ∀ y, ![ca, cb] y ∈ insert cb (insert ca C) := fun y => by
-        fin_cases y <;> simp
-      have hu : ∀ y l, (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l (![ca, cb] y) =
-          (if l = ca then (!![1, 0; t, 1] : Matrix (Fin 2) (Fin 2) ℂ) 0 y else 0) +
-            if l = cb then (!![1, 0; t, 1] : Matrix (Fin 2) (Fin 2) ℂ) 1 y else 0 := fun y l => by
+      have hin : ∀ y, ![ca, cb] y ∈ insert cb (insert ca C) := fun y => by fin_cases y <;> simp
+      have hu
+          : ∀ y l,
+            (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) ℂ) l (![ca, cb] y)
+              = (if l = ca then (!![1, 0; t, 1] : Matrix (Fin 2) (Fin 2) ℂ) 0 y else 0)
+                + if l = cb then
+                    (!![1, 0; t, 1] : Matrix (Fin 2) (Fin 2) ℂ) 1 y
+                  else
+                    0 := fun y l => by
         fin_cases y
         · simpa using hc0 l
         · simpa using hc1 l
-      have h := minor_block H _ _ C ca cb hA ![ca, cb] ![ca, cb] (insert cb (insert ca C)) (insert cb (insert ca C))
-        hcard2 hcard2 (fun x hx => Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hx))
-        (fun x hx => Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hx)) hin hin hm hm
-        (fun x hx y => hcr y x hx) (fun x hx y => hcr y x hx) !![1, 0; t, 1] !![1, 0; t, 1] hE hE hu hu
+      have h :=
+        minor_block H _ _ C ca cb hA ![ca, cb] ![ca, cb] (insert cb (insert ca C))
+          (insert cb (insert ca C)) hcard2 hcard2
+          (fun x hx => Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hx))
+          (fun x hx => Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hx))
+          hin hin hm hm
+          (fun x hx y => hcr y x hx)
+          (fun x hx y => hcr y x hx)
+          !![1, 0; t, 1] !![1, 0; t, 1] hE hE hu hu
       rw [h, hmin, det_plane]
 
 theorem minor_empty (X : Matrix (Fin N) (Fin N) ℂ) : minorIJ X ∅ ∅ = 1 := by
   rw [MinorCalc.minorIJ_eq_det X ∅ ∅ 0 rfl rfl, Matrix.det_isEmpty]
 
-theorem minor_conjTranspose (h : Matrix (Fin N) (Fin N) ℂ) (I : Finset (Fin N)) :
-    minorIJ hᴴ I I = star (minorIJ h I I) := by
+theorem minor_conjTranspose (h : Matrix (Fin N) (Fin N) ℂ) (I : Finset (Fin N))
+    : minorIJ hᴴ I I = star (minorIJ h I I) := by
   rw [MinorCalc.minorIJ_eq_det hᴴ I I _ rfl rfl, MinorCalc.minorIJ_eq_det h I I _ rfl rfl,
     ← det_conjTranspose, conjTranspose_submatrix]
 
-theorem minor_gram {G h : Matrix (Fin N) (Fin N) ℂ} {I : Finset (Fin N)} (hG : ∀ k c, c ∈ I → k ∉ I → G k c = 0)
-    (hh : ∀ k c, c ∈ I → k ∉ I → h k c = 0) :
-    minorIJ (hᴴ * G * h) I I = star (minorIJ h I I) * minorIJ G I I * minorIJ h I I := by
+theorem minor_gram
+    {G h : Matrix (Fin N) (Fin N) ℂ} {I : Finset (Fin N)}
+    (hG : ∀ k c, c ∈ I → k ∉ I → G k c = 0) (hh : ∀ k c, c ∈ I → k ∉ I → h k c = 0)
+    : minorIJ (hᴴ * G * h) I I = star (minorIJ h I I) * minorIJ G I I * minorIJ h I I := by
   rw [MinorCalc.minorIJ_mul_of_support _ h I I hh, MinorCalc.minorIJ_mul_of_support _ G I I hG,
     minor_conjTranspose]
 
@@ -329,8 +424,8 @@ theorem re_mul_of_pos {z : ℂ} (hz : 0 < z) (w : ℂ) : (z * w).re = z.re * w.r
 
 theorem re_pos {z : ℂ} (hz : 0 < z) : 0 < z.re := (Complex.pos_iff.mp hz).1
 
-theorem log_gram {p m : ℂ} (hp : 0 < p) (hq : 0 < star m * p * m) :
-    (1 / 2) * Real.log p.re + Real.log ‖m‖ = (1 / 2) * Real.log (star m * p * m).re := by
+theorem log_gram {p m : ℂ} (hp : 0 < p) (hq : 0 < star m * p * m)
+    : (1 / 2) * Real.log p.re + Real.log ‖m‖ = (1 / 2) * Real.log (star m * p * m).re := by
   have hm : m ≠ 0 := by
     rintro rfl
     simp at hq
@@ -345,15 +440,22 @@ theorem log_gram {p m : ℂ} (hp : 0 < p) (hq : 0 < star m * p * m) :
   push_cast
   ring
 
-theorem sum_xi (T : Fin N → ℝ) (a b : Fin N) (hb : (b : ℕ) = a + 1) (T0 : ℝ)
-    (h0 : ∀ i : Fin N, (i : ℕ) + 1 = a → T i = T0) (hz : (a : ℕ) = 0 → T0 = 0) :
-    ∑ i : Fin N, (xiCoef () a ((), i) : ℝ) * T i = T0 + T b - 2 * T a := by
-  have e : ∀ i : Fin N, (xiCoef () a ((), i) : ℝ) * T i =
-      (if (i : ℕ) + 1 = a then T0 else 0) + (if i = b then T b else 0) - (if i = a then 2 * T a else 0) := by
+theorem sum_xi
+    (T : Fin N → ℝ)
+    (a b : Fin N) (hb : (b : ℕ) = a + 1)
+    (T0 : ℝ) (h0 : ∀ i : Fin N, (i : ℕ) + 1 = a → T i = T0) (hz : (a : ℕ) = 0 → T0 = 0)
+    : ∑ i : Fin N, (xiCoef () a ((), i) : ℝ) * T i = T0 + T b - 2 * T a := by
+  have e
+      : ∀ i : Fin N,
+        (xiCoef () a ((), i) : ℝ) * T i
+          = (if (i : ℕ) + 1 = a then T0 else 0) + (if i = b then T b else 0)
+            - (if i = a then 2 * T a else 0) := by
     intro i
     have e1 : ((i : ℕ) = a + 1) ↔ i = b := by rw [Fin.ext_iff, hb]
-    have hcoef : (xiCoef () a ((), i) : ℝ) =
-        (if (i : ℕ) + 1 = a then 1 else 0) + (if i = b then 1 else 0) - (if i = a then 2 else 0) := by
+    have hcoef
+        : (xiCoef () a ((), i) : ℝ)
+          = (if (i : ℕ) + 1 = a then 1 else 0) + (if i = b then 1 else 0)
+            - (if i = a then 2 else 0) := by
       simp only [xiCoef, if_true, e1]
       push_cast
       rfl
@@ -380,7 +482,8 @@ theorem sum_xi (T : Fin N → ℝ) (a b : Fin N) (hb : (b : ℕ) = a + 1) (T0 : 
           ring
         · simp only [if_neg c1, if_neg c2, if_neg c3]
           ring
-  simp only [e, Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [e, Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ,
+    if_true]
   congr 2
   by_cases ha : (a : ℕ) = 0
   · rw [hz ha]
@@ -393,12 +496,16 @@ theorem sum_xi (T : Fin N → ℝ) (a b : Fin N) (hb : (b : ℕ) = a + 1) (T0 : 
       exact hi (Fin.ext (by simp; omega))
     · simp
 
-theorem steps {N j : ℕ} {a b ca cb : Fin N} (hj : j ≤ N) (hb : (b : ℕ) = a + 1)
-    (hcase : (b : ℕ) < j ∨ j ≤ (a : ℕ)) (hca : (ca : ℕ) = lastCol N j a) (hcb : (cb : ℕ) = ca + 1) :
-    ∃ lo : ℕ, (∀ c : Fin N, c ∈ stepCols N j a ↔ lo ≤ c ∧ (c : ℕ) ≤ ca) ∧
-      (∀ c : Fin N, c ∈ stepCols N j b ↔ lo ≤ c ∧ (c : ℕ) ≤ cb) ∧
-      (∀ i : Fin N, (i : ℕ) + 1 = a → (i : ℕ) + 1 ≠ j → ∀ c : Fin N, c ∈ stepCols N j i ↔ lo ≤ c ∧ (c : ℕ) < ca) ∧
-      ((a : ℕ) = 0 ∨ (a : ℕ) = j → (ca : ℕ) = lo) ∧ lo ≤ ca := by
+theorem steps
+    {N j : ℕ} {a b ca cb : Fin N} (hj : j ≤ N) (hb : (b : ℕ) = a + 1)
+    (hcase : (b : ℕ) < j ∨ j ≤ (a : ℕ)) (hca : (ca : ℕ) = lastCol N j a) (hcb : (cb : ℕ) = ca + 1)
+    : ∃ lo : ℕ,
+      (∀ c : Fin N, c ∈ stepCols N j a ↔ lo ≤ c ∧ (c : ℕ) ≤ ca)
+        ∧ (∀ c : Fin N, c ∈ stepCols N j b ↔ lo ≤ c ∧ (c : ℕ) ≤ cb)
+        ∧ (∀ i : Fin N,
+          (i : ℕ) + 1 = a → (i : ℕ) + 1 ≠ j
+            → ∀ c : Fin N, c ∈ stepCols N j i ↔ lo ≤ c ∧ (c : ℕ) < ca)
+        ∧ ((a : ℕ) = 0 ∨ (a : ℕ) = j → (ca : ℕ) = lo) ∧ lo ≤ ca := by
   have h1 := a.2
   have h2 := b.2
   have h3 := cb.2
@@ -432,7 +539,6 @@ theorem steps {N j : ℕ} {a b ca cb : Fin N} (hj : j ≤ N) (hb : (b : ℕ) = a
 end GlobalTheory.CompanionTheory.Ar.PB.SchurCalc
 
 namespace GlobalTheory.CompanionTheory.Ar.PB
-
 
 open SchurCalc in
 theorem norm_three_steps : ∀ (N j : ℕ) (a b ca cb : Fin N) (G h : Matrix (Fin N) (Fin N) ℂ), j ≤ N → (b : ℕ) = a + 1 → ((b : ℕ) < j ∨ j ≤ (a : ℕ)) → (ca : ℕ) = lastCol N j a → (cb : ℕ) = ca + 1 → IsBlockDiag j G → G.PosDef → IsBlockDiag j h → h.det ≠ 0 → ∃ G₂ : Matrix (Fin 2) (Fin 2) ℂ, G₂.PosDef ∧ (∀ r s : Fin 2, G₂ r s = minorIJ (hᴴ * G * h) (insert (![ca, cb] r) ((stepCols N j a).erase ca)) (insert (![ca, cb] s) ((stepCols N j a).erase ca)) / minorIJ (hᴴ * G * h) ((stepCols N j a).erase ca) ((stepCols N j a).erase ca)) ∧ ∀ t : ℂ, (∑ i : Fin N, (xiCoef () a ((), i) : ℝ) * (blockPot j i G (h * (1 + Matrix.single cb ca t)) + if IsProperStep N j i then 0 else Real.log ‖if (i : ℕ) + 1 = j then (if (a : ℕ) < j then minorIJ h (wIdx N j) (wIdx N j) else 1) else minorIJ h (omIdx N j) (omIdx N j)‖)) = xiPot G₂ t := by

@@ -23,27 +23,39 @@ open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV F
 
 section Stmt
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m)
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S)
-  (cst : LocCst X (rowSG Pr sel mu))
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks}
+  (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  {S : Set ℕ} (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu))
 
-def TargetEquivarianceAtPrime (i : ℕ) (w : rowSG Pr sel mu) (hal : AutY X R i) (hbe : AutY X R (i + 1)) : Prop :=
+def TargetEquivarianceAtPrime
+    (i : ℕ) (w : rowSG Pr sel mu) (hal : AutY X R i) (hbe : AutY X R (i + 1))
+    : Prop :=
   ∀ r' ∈ Loc.Cbe (Jat (Pr := Pr) cst.sharp (i + 1) w.1) hbe, ∀ c' ∈ GLint X.E (R.N (i + 1)) w.1,
-    (∀ x, r' (Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) x) = Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) (c' x)) →
-    ∀ y : HomE X.E (R.N i) (R.N (i + 1)),
-      rhoT Ch sel mu i w ((LinearEquiv.det c'⁻¹ : X.Eˣ) : X.E) * E1at Ch sel mu cst i w hal hbe (c'.toLinearMap ∘ₗ y) =
-        chiInv Ch sel mu cst (i + 1) w hbe r' * E1at Ch sel mu cst i w hal hbe y
+    (∀ x,
+        r' (Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) x)
+          = Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) (c' x))
+      → ∀ y : HomE X.E (R.N i) (R.N (i + 1)),
+        rhoT Ch sel mu i w ((LinearEquiv.det c'⁻¹ : X.Eˣ) : X.E)
+            * E1at Ch sel mu cst i w hal hbe (c'.toLinearMap ∘ₗ y)
+          = chiInv Ch sel mu cst (i + 1) w hbe r' * E1at Ch sel mu cst i w hal hbe y
 
-def TargetEquivarianceLargeDepths (i : ℕ) (w : rowSG Pr sel mu) (hal : AutY X R i) (hbe : AutY X R (i + 1)) : Prop :=
-  ∃ A₀ B₀ : ℕ, ∀ A' B', A₀ ≤ A' → B₀ ≤ B' → TargetEquivarianceAtPrime Ch sel mu { cst with A := A', B := B' } i w hal hbe
+def TargetEquivarianceLargeDepths
+    (i : ℕ) (w : rowSG Pr sel mu) (hal : AutY X R i) (hbe : AutY X R (i + 1))
+    : Prop :=
+  ∃ A₀ B₀ : ℕ, ∀ A' B',
+    A₀ ≤ A' → B₀ ≤ B'
+      → TargetEquivarianceAtPrime Ch sel mu { cst with A := A', B := B' } i w hal hbe
 
 end Stmt
 
 section Assembly
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
   {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ} {mu : Tup X.F X.E X.K S}
-  {cst : LocCst X (rowSG Pr sel mu)} {L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))} {G : ChGlob X R.m} {m2 : ℕ}
+  {cst : LocCst X (rowSG Pr sel mu)} {L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))}
+  {G : ChGlob X R.m} {m2 : ℕ}
 
 end Assembly
 
@@ -51,7 +63,8 @@ section Res
 
 variable {k : Type} [Field k] {n c : ℕ}
 
-theorem clXQ_eq_inX {v : Fin (n + c) → k} (hv : v ∈ Loc.Ufl k n c 0) : v = Loc.inX k n c (twZrPr v) := by
+theorem clXQ_eq_inX {v : Fin (n + c) → k} (hv : v ∈ Loc.Ufl k n c 0)
+    : v = Loc.inX k n c (twZrPr v) := by
   funext l
   unfold Loc.inX
   by_cases h : l.1 < n
@@ -60,13 +73,17 @@ theorem clXQ_eq_inX {v : Fin (n + c) → k} (hv : v ∈ Loc.Ufl k n c 0) : v = L
   · simp only [LinearMap.pi_apply, dif_neg h, LinearMap.zero_apply]
     exact hv l (by simpa using h)
 
-theorem clXQ_res {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : r ∈ Loc.R1 k n c) :
-    ∃ g : (Fin n → k) ≃ₗ[k] (Fin n → k), ∀ x, r (Loc.inX k n c x) = Loc.inX k n c (g x) := by
-  have h1 : ∀ x, r (Loc.inX k n c x) = Loc.inX k n c (twZrPr (r (Loc.inX k n c x))) :=
-    fun x => clXQ_eq_inX (hr.1.1 0 _ (twZr_inX_mem_Ufl x 0))
-  have h2 : ∀ x, r⁻¹ (Loc.inX k n c x) = Loc.inX k n c (twZrPr (r⁻¹ (Loc.inX k n c x))) :=
-    fun x => clXQ_eq_inX (hr.2.1 0 _ (twZr_inX_mem_Ufl x 0))
-  refine ⟨LinearEquiv.ofLinear (twZrPr ∘ₗ r.toLinearMap ∘ₗ Loc.inX k n c) (twZrPr ∘ₗ (r⁻¹).toLinearMap ∘ₗ Loc.inX k n c) ?_ ?_, h1⟩
+theorem clXQ_res {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : r ∈ Loc.R1 k n c)
+    : ∃ g : (Fin n → k) ≃ₗ[k] (Fin n → k), ∀ x, r (Loc.inX k n c x) = Loc.inX k n c (g x) := by
+  have h1 : ∀ x, r (Loc.inX k n c x) = Loc.inX k n c (twZrPr (r (Loc.inX k n c x))) := fun x =>
+    clXQ_eq_inX (hr.1.1 0 _ (twZr_inX_mem_Ufl x 0))
+  have h2 : ∀ x, r⁻¹ (Loc.inX k n c x) = Loc.inX k n c (twZrPr (r⁻¹ (Loc.inX k n c x))) := fun x =>
+    clXQ_eq_inX (hr.2.1 0 _ (twZr_inX_mem_Ufl x 0))
+  refine ⟨
+    LinearEquiv.ofLinear (twZrPr ∘ₗ r.toLinearMap ∘ₗ Loc.inX k n c)
+      (twZrPr ∘ₗ (r⁻¹).toLinearMap ∘ₗ Loc.inX k n c) ?_ ?_,
+    h1
+  ⟩
   · refine LinearMap.ext fun x => ?_
     show twZrPr (r (Loc.inX k n c (twZrPr (r⁻¹ (Loc.inX k n c x))))) = x
     rw [← h2]
@@ -82,31 +99,45 @@ end Res
 
 section Chr
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
   {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ} {mu : Tup X.F X.E X.K S}
   {cst : LocCst X (rowSG Pr sel mu)}
 
-theorem clXQ_rhoT_ne (i : ℕ) (w : rowSG Pr sel mu) {n : ℕ} {c : Sp X.E n ≃ₗ[X.E] Sp X.E n} (hc : c ∈ GLint X.E n w.1) :
-    rhoT Ch sel mu i w ((LinearEquiv.det c : X.Eˣ) : X.E) ≠ 0 := by
+theorem clXQ_rhoT_ne
+    (i : ℕ) (w : rowSG Pr sel mu) {n : ℕ} {c : Sp X.E n ≃ₗ[X.E] Sp X.E n} (hc : c ∈ GLint X.E n w.1)
+    : rhoT Ch sel mu i w ((LinearEquiv.det c : X.Eˣ) : X.E) ≠ 0 := by
   unfold rhoT
-  exact clX_unitV_ne _ (isUnit_reduction_of_integralAt_inv (intAt_det c hc) (intAt_det_inv c hc) (Units.ne_zero _))
+  exact clX_unitV_ne _
+    (isUnit_reduction_of_integralAt_inv (intAt_det c hc) (intAt_det_inv c hc) (Units.ne_zero _))
 
-theorem clXQ_rhoT_mul (i : ℕ) (w : rowSG Pr sel mu) {n : ℕ} {c c' : Sp X.E n ≃ₗ[X.E] Sp X.E n} (hc' : c' ∈ GLint X.E n w.1) :
-    rhoT Ch sel mu i w ((LinearEquiv.det (c * c') : X.Eˣ) : X.E) =
-      rhoT Ch sel mu i w ((LinearEquiv.det c : X.Eˣ) : X.E) * rhoT Ch sel mu i w ((LinearEquiv.det c' : X.Eˣ) : X.E) := by
+theorem clXQ_rhoT_mul
+    (i : ℕ)
+    (w : rowSG Pr sel mu)
+    {n : ℕ} {c c' : Sp X.E n ≃ₗ[X.E] Sp X.E n} (hc' : c' ∈ GLint X.E n w.1)
+    : rhoT Ch sel mu i w ((LinearEquiv.det (c * c') : X.Eˣ) : X.E)
+      = rhoT Ch sel mu i w ((LinearEquiv.det c : X.Eˣ) : X.E)
+        * rhoT Ch sel mu i w ((LinearEquiv.det c' : X.Eˣ) : X.E) := by
   unfold rhoT
   rw [map_mul, Units.val_mul]
   exact unitV_mul_unit _ (intAt_det c' hc') (intAt_det_inv c' hc') (Units.ne_zero _) _
 
-theorem clXQ_chrOk {i : ℕ} {w : rowSG Pr sel mu} {hal : AutY X R i} {h : AutY X R (i + 1)}
+theorem clXQ_chrOk
+    {i : ℕ} {w : rowSG Pr sel mu} {hal : AutY X R i} {h : AutY X R (i + 1)}
     (hint : prCat (Pr := Pr) cst.sharp (i + 1) w.1 h ≤ GLint X.E (R.N (i + 1)) w.1)
-    (hT : TargetEquivarianceLargeDepths Ch sel mu cst i w hal h) (hne : FiniteSumNonzeroLargeDepth Ch sel mu cst i w hal h) : TwChrOk Ch sel mu cst (i + 1) w h := by
+    (hT : TargetEquivarianceLargeDepths Ch sel mu cst i w hal h)
+    (hne : FiniteSumNonzeroLargeDepth Ch sel mu cst i w hal h)
+    : TwChrOk Ch sel mu cst (i + 1) w h := by
   obtain ⟨A₀, B₀, hT⟩ := hT
   obtain ⟨A₁, B₁, hne⟩ := hne
   have T := hT (max A₀ A₁) (max B₀ B₁) (le_max_left _ _) (le_max_left _ _)
-  obtain ⟨y₀, hy₀⟩ := Function.ne_iff.1 (hne (max A₀ A₁) (max B₀ B₁) (le_max_right _ _) (le_max_right _ _))
-  have hres : ∀ r ∈ Loc.Cbe (Jat (Pr := Pr) cst.sharp (i + 1) w.1) h, ∃ c ∈ GLint X.E (R.N (i + 1)) w.1,
-      ∀ x, r (Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) x) = Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) (c x) := by
+  obtain ⟨y₀, hy₀⟩ :=
+    Function.ne_iff.1 (hne (max A₀ A₁) (max B₀ B₁) (le_max_right _ _) (le_max_right _ _))
+  have hres
+      : ∀ r ∈ Loc.Cbe (Jat (Pr := Pr) cst.sharp (i + 1) w.1) h, ∃ c ∈ GLint X.E (R.N (i + 1)) w.1,
+        ∀ x,
+          r (Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) x)
+            = Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) (c x) := by
     intro r hr
     obtain ⟨c, hc⟩ := clXQ_res (Subgroup.mem_inf.1 hr).1
     exact ⟨c, hint ⟨r, hr, hc⟩, hc⟩
@@ -125,7 +156,10 @@ theorem clXQ_chrOk {i : ℕ} {w : rowSG Pr sel mu} {hal : AutY X R i} {h : AutY 
     · exact hy₀ e
   · obtain ⟨c, hc, hcx⟩ := hres r hr
     obtain ⟨c', hc', hcx'⟩ := hres r' hr'
-    have hcx'' : ∀ x, r'' (Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) x) = Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) ((c * c') x) := by
+    have hcx''
+        : ∀ x,
+          r'' (Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) x)
+            = Loc.inX X.E (R.N (i + 1)) (cOf R (i + 1)) ((c * c') x) := by
       intro x
       rw [hx, hcx', hcx]
       rfl
@@ -133,8 +167,9 @@ theorem clXQ_chrOk {i : ℕ} {w : rowSG Pr sel mu} {hal : AutY X R i} {h : AutY 
     have e := T r hr c hc hcx (c'.toLinearMap ∘ₗ y₀)
     have e' := T r' hr' c' hc' hcx' y₀
     have e3 : (c * c').toLinearMap ∘ₗ y₀ = c.toLinearMap ∘ₗ c'.toLinearMap ∘ₗ y₀ := rfl
-    rw [e3, mul_inv_rev, clXQ_rhoT_mul i w ((GLint X.E (R.N (i + 1)) w.1).inv_mem hc), mul_assoc, e, ← mul_assoc,
-      mul_comm (rhoT Ch sel mu i w _), mul_assoc, e', ← mul_assoc] at e''
+    rw [e3, mul_inv_rev, clXQ_rhoT_mul i w ((GLint X.E (R.N (i + 1)) w.1).inv_mem hc), mul_assoc, e,
+        ← mul_assoc, mul_comm (rhoT Ch sel mu i w _), mul_assoc, e', ← mul_assoc]
+      at e''
     exact (mul_right_cancel₀ hy₀ e'').symm
 
 end Chr

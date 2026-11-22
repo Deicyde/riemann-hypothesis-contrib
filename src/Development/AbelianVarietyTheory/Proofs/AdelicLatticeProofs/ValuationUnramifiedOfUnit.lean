@@ -11,9 +11,12 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem IsQuad.exists_base_value {F E : Type} [Field F] [Field E] [Algebra F E] {δ : F} {θ : E}
-    {σ : E ≃ₐ[F] E} (h : IsQuad δ θ σ) (w : Valuation E ℤᵐ⁰) (h2 : w 2 = 1)
-    (hδ : w (algebraMap F E δ) = 1) (x : E) : ∃ u : F, w x = w (algebraMap F E u) := by
+theorem IsQuad.exists_base_value
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {δ : F} {θ : E} {σ : E ≃ₐ[F] E} (h : IsQuad δ θ σ)
+    (w : Valuation E ℤᵐ⁰) (h2 : w 2 = 1) (hδ : w (algebraMap F E δ) = 1)
+    (x : E)
+    : ∃ u : F, w x = w (algebraMap F E u) := by
   obtain ⟨a, b, hx⟩ := h.span x
   have hθ : w θ = 1 := by
     rw [← h.sq, map_pow] at hδ
@@ -44,7 +47,13 @@ theorem IsQuad.exists_base_value {F E : Type} [Field F] [Field E] [Algebra F E] 
     · exact ⟨b, le_antisymm h5 h3⟩
   · exact ⟨a, by rw [← ha, w.map_add_eq_of_lt_left hgt]⟩
 
-theorem valuation_unramified_of_unit : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (δ : F) (θ : E) (σ : E ≃ₐ[F] E), IsQuad δ θ σ → ∀ w : HeightOneSpectrum (𝓞 E), (w.under (𝓞 F)).valuation F 2 = 1 → (w.under (𝓞 F)).valuation F δ = 1 → ∀ x : F, w.valuation E (algebraMap F E x) = (w.under (𝓞 F)).valuation F x := by
+theorem valuation_unramified_of_unit
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (δ : F)
+        (θ : E) (σ : E ≃ₐ[F] E),
+      IsQuad δ θ σ
+        → ∀ w : HeightOneSpectrum (𝓞 E),
+          (w.under (𝓞 F)).valuation F 2 = 1 → (w.under (𝓞 F)).valuation F δ = 1
+            → ∀ x : F, w.valuation E (algebraMap F E x) = (w.under (𝓞 F)).valuation F x := by
   intro F E _ _ _ _ _ δ θ σ hq w h2 hδ
   obtain ⟨e, he, hw⟩ := (places_over F E).2.2 w
   obtain ⟨π, hπ⟩ := w.valuation_exists_uniformizer E
@@ -58,7 +67,8 @@ theorem valuation_unramified_of_unit : ∀ (F E : Type) [Field F] [NumberField F
     rw [h0, zero_pow he.ne'] at hu
     exact WithZero.exp_ne_zero hu
   rw [← WithZero.exp_log hu0, ← WithZero.exp_nsmul, WithZero.exp_inj, nsmul_eq_mul] at hu
-  have h1 : (e : ℤ) ∣ 1 := ⟨-WithZero.log ((w.under (𝓞 F)).valuation F u), by linear_combination -hu⟩
+  have h1 : (e : ℤ) ∣ 1 :=
+    ⟨- WithZero.log ((w.under (𝓞 F)).valuation F u), by linear_combination -hu⟩
   have h3 : e = 1 := by
     have : e ∣ 1 := by exact_mod_cast h1
     exact Nat.dvd_one.1 this

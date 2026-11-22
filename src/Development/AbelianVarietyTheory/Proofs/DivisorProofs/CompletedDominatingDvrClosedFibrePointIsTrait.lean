@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RangeAlge
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -16,7 +18,25 @@ noncomputable section
 
 namespace GlobalTheory.Mum
 
-theorem trait_at_closed_point : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [CharZero R] (M : Modif R) (G : Over M.S) (Y : Scheme.{0}) (α : Y ⟶ G.left) (t : Y ⟶ Sp (FractionRing R)), α ≫ G.hom = t ≫ M.gp → ∀ (W : G.left.Opens) (hWa : IsAffineOpen W) (x : G.left) (hx : x ∈ W), M.π (G.hom x) = closedPoint R → ∀ (F : Type) [Field F] (β : Γ(Y, α ⁻¹ᵁ W) →+* F) (V : ValuationSubring F), IsDiscreteValuationRing V → ∀ (h1 : ∀ c, β ((α.app W).hom c) ∈ V), (∀ c, (G.left.residue x).hom ((G.left.presheaf.germ W x hx).hom c) = 0 → β ((α.app W).hom c) ∈ V.nonunits) → ∃ (T : Type) (_ : CommRing T) (_ : IsDomain T) (_ : IsLocalRing T) (lam : Γ(G.left, W) →+* T) (g : V →+* T) (φ : R →+* T), GlobalTheory.LN.CDvr T ∧ Function.Injective g ∧ IsLocalHom g ∧ (∀ c, g ⟨β ((α.app W).hom c), h1 c⟩ = lam c) ∧ Function.Injective φ ∧ IsLocalHom φ ∧ (Spec.map (CommRingCat.ofHom lam) ≫ hWa.fromSpec ≫ G.hom) ≫ M.π = spMap φ := by
+theorem trait_at_closed_point
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [CharZero R] (M : Modif R)
+        (G : Over M.S) (Y : Scheme.{0}) (α : Y ⟶ G.left) (t : Y ⟶ Sp (FractionRing R)),
+      α ≫ G.hom = t ≫ M.gp
+        → ∀ (W : G.left.Opens) (hWa : IsAffineOpen W) (x : G.left) (hx : x ∈ W),
+          M.π (G.hom x) = closedPoint R
+            → ∀ (F : Type) [Field F] (β : Γ(Y, α ⁻¹ᵁ W) →+* F) (V : ValuationSubring F),
+              IsDiscreteValuationRing V
+                → ∀ (h1 : ∀ c, β ((α.app W).hom c) ∈ V),
+                  (∀ c,
+                      (G.left.residue x).hom ((G.left.presheaf.germ W x hx).hom c) = 0
+                        → β ((α.app W).hom c) ∈ V.nonunits)
+                    → ∃ (T : Type) (_ : CommRing T) (_ : IsDomain T) (_ : IsLocalRing T)
+                        (lam : Γ(G.left, W) →+* T) (g : V →+* T) (φ : R →+* T),
+                      GlobalTheory.LN.CDvr T ∧ Function.Injective g ∧ IsLocalHom g
+                        ∧ (∀ c, g ⟨β ((α.app W).hom c), h1 c⟩ = lam c) ∧ Function.Injective φ
+                        ∧ IsLocalHom φ
+                        ∧ (Spec.map (CommRingCat.ofHom lam) ≫ hWa.fromSpec ≫ G.hom) ≫ M.π
+                          = spMap φ := by
   intro R _ _ _ _ M G Y α t hαt W hWa x hx hxc F _ β V hV h1 hnu
   haveI := hV
   let T := AdicCompletion (maximalIdeal V) V
@@ -27,34 +47,57 @@ theorem trait_at_closed_point : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLoca
   let lam : Γ(G.left, W) →+* T := g.comp ((β.comp (α.app W).hom).codRestrict V h1)
   let φ : R →+* T := lam.comp ρ
   let ψ : FractionRing R →+* F :=
-    β.comp ((Scheme.ΓSpecIso (CommRingCat.of (FractionRing R))).inv ≫ t.appLE ⊤ (α ⁻¹ᵁ W) le_top).hom
+    β.comp
+      ((Scheme.ΓSpecIso (CommRingCat.of (FractionRing R))).inv ≫ t.appLE ⊤ (α ⁻¹ᵁ W) le_top).hom
   have key : ∀ r, β ((α.app W).hom (ρ r)) = ψ (algebraMap R (FractionRing R) r) := by
     intro r
-    have hc : ∀ {a b : Y ⟶ Sp R} (_ : a = b), a.appLE ⊤ (α ⁻¹ᵁ W) le_top = b.appLE ⊤ (α ⁻¹ᵁ W) le_top := by
+    have hc
+        : ∀ {a b : Y ⟶ Sp R} (_ : a = b),
+          a.appLE ⊤ (α ⁻¹ᵁ W) le_top = b.appLE ⊤ (α ⁻¹ᵁ W) le_top := by
       rintro _ _ rfl; rfl
     have e1 : f.appLE ⊤ W le_top ≫ α.app W = (α ≫ f).appLE ⊤ (α ⁻¹ᵁ W) le_top := by
       rw [Scheme.Hom.app_eq_appLE]; exact Scheme.Hom.appLE_comp_appLE _ _ _ _ _ _ _
-    have e2 : α ≫ f = t ≫ jK R := by
-      simp only [f]; rw [reassoc_of% hαt, M.gp_π]
+    have e2 : α ≫ f = t ≫ jK R := by simp only [f]; rw [reassoc_of% hαt, M.gp_π]
     have e4 : (t ≫ jK R).appLE ⊤ (α ⁻¹ᵁ W) le_top = (jK R).appTop ≫ t.appLE ⊤ (α ⁻¹ᵁ W) le_top :=
       Scheme.Hom.comp_appLE t (jK R) ⊤ (α ⁻¹ᵁ W) le_top
-    have e3 : (Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ f.appLE ⊤ W le_top ≫ α.app W =
-        CommRingCat.ofHom (algebraMap R (FractionRing R)) ≫ (Scheme.ΓSpecIso (CommRingCat.of (FractionRing R))).inv ≫
-          t.appLE ⊤ (α ⁻¹ᵁ W) le_top := by
+    have e3
+        : (Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ f.appLE ⊤ W le_top ≫ α.app W
+          = CommRingCat.ofHom (algebraMap R (FractionRing R))
+            ≫ (Scheme.ΓSpecIso (CommRingCat.of (FractionRing R))).inv
+            ≫ t.appLE ⊤ (α ⁻¹ᵁ W) le_top := by
       rw [e1, hc e2, e4, ← Category.assoc, ← Category.assoc, Scheme.ΓSpecIso_inv_naturality]
-    change β (((Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ f.appLE ⊤ W le_top ≫ α.app W).hom r) =
-      β ((CommRingCat.ofHom (algebraMap R (FractionRing R)) ≫ (Scheme.ΓSpecIso (CommRingCat.of (FractionRing R))).inv ≫
-          t.appLE ⊤ (α ⁻¹ᵁ W) le_top).hom r)
+    change β (((Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ f.appLE ⊤ W le_top ≫ α.app W).hom r)
+      = β
+        ((CommRingCat.ofHom (algebraMap R (FractionRing R))
+          ≫ (Scheme.ΓSpecIso (CommRingCat.of (FractionRing R))).inv
+          ≫ t.appLE ⊤ (α ⁻¹ᵁ W) le_top).hom r)
     rw [e3]
   have hφi : Function.Injective φ := by
     intro a b hab
-    have h2 : ((β.comp (α.app W).hom).codRestrict V h1) (ρ a) = ((β.comp (α.app W).hom).codRestrict V h1) (ρ b) := hg hab
+    have h2
+        : ((β.comp (α.app W).hom).codRestrict V h1) (ρ a)
+          = ((β.comp (α.app W).hom).codRestrict V h1) (ρ b) :=
+      hg hab
     have h3 : β ((α.app W).hom (ρ a)) = β ((α.app W).hom (ρ b)) := congrArg Subtype.val h2
     rw [key, key] at h3
     exact IsFractionRing.injective R (FractionRing R) (ψ.injective h3)
   haveI : CharZero T := charZero_of_injective_ringHom hφi
-  refine ⟨T, inferInstance, inferInstance, inferInstance, lam, g, φ,
-    ⟨inferInstance, inferInstance, inferInstance⟩, hg, inferInstance, fun c => rfl, hφi, ?_, ?_⟩
+  refine ⟨
+    T,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    lam,
+    g,
+    φ,
+    ⟨inferInstance, inferInstance, inferInstance⟩,
+    hg,
+    inferInstance,
+    fun c => rfl,
+    hφi,
+    ?_,
+    ?_
+  ⟩
   · constructor
     intro r hu
     by_contra hr

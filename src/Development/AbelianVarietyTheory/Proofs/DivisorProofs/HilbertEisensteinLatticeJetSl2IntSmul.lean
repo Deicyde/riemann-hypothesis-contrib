@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HilbertEisen
 @[expose] public section
 
 open NumberField UpperHalfPlane GlobalTheory.HilbFam GlobalTheory.QFam
-open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
+open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
+  (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
 open GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates (iterD partialD)
 open scoped Classical MatrixGroups nonZeroDivisors
 
@@ -20,17 +21,18 @@ noncomputable section
 namespace GlobalTheory.HilbFam.JetModular
 
 def rowEquiv (F : Type) [Field F] (γ : SL(2, ℤ)) : (Fin 2 → F) ≃ₗ[F] (Fin 2 → F) :=
-  LinearEquiv.ofLinear
-    (Matrix.vecMulLinear ((γ : Matrix (Fin 2) (Fin 2) ℤ).map (Int.cast : ℤ → F)))
+  LinearEquiv.ofLinear (Matrix.vecMulLinear ((γ : Matrix (Fin 2) (Fin 2) ℤ).map (Int.cast : ℤ → F)))
     (Matrix.vecMulLinear (((γ⁻¹ : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ).map (Int.cast : ℤ → F)))
     (by
       refine LinearMap.ext fun x ↦ ?_
-      simp only [LinearMap.comp_apply, Matrix.vecMulLinear_apply, Matrix.vecMul_vecMul, LinearMap.id_apply]
+      simp only [LinearMap.comp_apply, Matrix.vecMulLinear_apply, Matrix.vecMul_vecMul,
+        LinearMap.id_apply]
       rw [← Matrix.map_mul_intCast, ← Matrix.SpecialLinearGroup.coe_mul, inv_mul_cancel]
       simp)
     (by
       refine LinearMap.ext fun x ↦ ?_
-      simp only [LinearMap.comp_apply, Matrix.vecMulLinear_apply, Matrix.vecMul_vecMul, LinearMap.id_apply]
+      simp only [LinearMap.comp_apply, Matrix.vecMulLinear_apply, Matrix.vecMul_vecMul,
+        LinearMap.id_apply]
       rw [← Matrix.map_mul_intCast, ← Matrix.SpecialLinearGroup.coe_mul, mul_inv_cancel]
       simp)
 
@@ -100,13 +102,33 @@ private lemma card_realEmbeddings_eq_finrank (F : Type) [Field F] [NumberField F
     have hψ : ComplexEmbedding.IsReal ψ := InfinitePlace.isReal_mk_iff.mp (IsTotallyReal.isReal _)
     exact ⟨hψ.embedding, by ext x; simp [hψ.coe_embedding_apply]⟩
 
-
 open NumberField UpperHalfPlane in
 open scoped Classical MatrixGroups nonZeroDivisors in
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.HilbFam.JetModular.jet_smul : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (L : _root_.GlobalTheory.HilbFam.Lat F) (κ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ) (γ : SL(2, ℤ)) (τ : ℍ) (c t : ℂ), Even k → _root_.GlobalTheory.HilbFam.jet k L κ ((γ • τ : ℍ) : ℂ) c t = (((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1) : ℂ) ^ (k * Module.finrank ℚ F) * _root_.GlobalTheory.HilbFam.jet k (_root_.GlobalTheory.HilbFam.mulMat L (γ : Matrix (Fin 2) (Fin 2) ℤ)) κ τ (c - t * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 : ℂ) * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)) (t * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1) ^ 2) := by
+theorem _root_.GlobalTheory.HilbFam.JetModular.jet_smul
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ)
+        (L : _root_.GlobalTheory.HilbFam.Lat F)
+        (κ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ)
+        (γ : SL(2, ℤ)) (τ : ℍ) (c t : ℂ),
+      Even k
+        → _root_.GlobalTheory.HilbFam.jet k L κ ((γ • τ : ℍ) : ℂ) c t
+          = (((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)
+                : ℂ)
+              ^ (k * Module.finrank ℚ F)
+            * _root_.GlobalTheory.HilbFam.jet k
+              (_root_.GlobalTheory.HilbFam.mulMat L (γ : Matrix (Fin 2) (Fin 2) ℤ)) κ τ
+              (c
+                - t * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 : ℂ)
+                  * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ)
+                    + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1))
+              (t
+                * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ)
+                    + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)
+                  ^ 2) := by
   intro F _ _ _ k L κ γ τ c t hk
-  have hj : ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1) ≠ 0 := by
+  have hj
+      : ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)
+        ≠ 0 := by
     have h := denom_ne_zero (γ : GL (Fin 2) ℝ) τ
     rw [denom] at h
     simpa using h
@@ -114,9 +136,12 @@ theorem _root_.GlobalTheory.HilbFam.JetModular.jet_smul : ∀ (F : Type) [Field 
   rw [← iterD_const_mul]
   congr 1
   funext z
-  rw [_root_.GlobalTheory.HilbFam.gval_linear_change F k L (_root_.GlobalTheory.HilbFam.mulMat L (γ : Matrix (Fin 2) (Fin 2) ℤ))
-    (_root_.GlobalTheory.HilbFam.JetModular.rowEquiv F γ) _ _ _ _ (fun _ ↦ ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)⁻¹) hk
-    (mem_iff_sl2_equiv_mem_mulMat F L γ) (fun _ ↦ inv_ne_zero hj)
+  rw [_root_.GlobalTheory.HilbFam.gval_linear_change F k L
+    (_root_.GlobalTheory.HilbFam.mulMat L (γ : Matrix (Fin 2) (Fin 2) ℤ))
+    (_root_.GlobalTheory.HilbFam.JetModular.rowEquiv F γ) _ _ _ _
+    (fun _ ↦ ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)⁻¹)
+    hk (mem_iff_sl2_equiv_mem_mulMat F L γ)
+    (fun _ ↦ inv_ne_zero hj)
     (fun x i ↦ embeddingCoord_sl2_smul_lemma_3 F γ τ c t z x i)]
   rw [Finset.prod_const, Finset.card_univ, card_realEmbeddings_eq_finrank]
   simp only [inv_pow, inv_inv, ← pow_mul, mul_comm (Module.finrank ℚ F) k]

@@ -6,15 +6,22 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqZer
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.TypeSum
+open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.SmoothGlob GlobalTheory.TypeSum
 open scoped InnerProductSpace Topology
 
 noncomputable section
 namespace GlobalTheory.KFinApprox
 
-theorem approx_identity : ∀ (n : ℕ) (ε : Fin n → Bool) (X : Type) [TopologicalSpace X] (F : X → KG ε → ℂ),
-    (Continuous fun p : X × KG ε => F p.1 p.2) → ∀ C : Set X, IsCompact C → ∀ δ : ℝ, 0 < δ →
-    ∃ e : KG ε → ℂ, KFinFun ε e ∧ ∀ x ∈ C, ‖F x 1 - ∫ k, e k * F x k ∂(muK ε)‖ < δ := by
+theorem approx_identity
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (X : Type) [TopologicalSpace X] (F : X → KG ε → ℂ),
+      (Continuous fun p : X × KG ε => F p.1 p.2)
+        → ∀ C : Set X,
+          IsCompact C
+            → ∀ δ : ℝ,
+              0 < δ
+                → ∃ e : KG ε → ℂ,
+                  KFinFun ε e ∧ ∀ x ∈ C, ‖F x 1 - ∫ k, e k * F x k ∂(muK ε)‖ < δ := by
   intro n ε X _ F hF C hC δ hδ
 
   have hFx : ∀ x, Continuous (F x) := fun x =>
@@ -34,19 +41,22 @@ theorem approx_identity : ∀ (n : ℕ) (ε : Fin n → Bool) (X : Type) [Topolo
     exact ht.eventually_lt_const (by positivity)
   obtain ⟨U, hUP, hUo, hU1⟩ := eventually_nhds_iff.1 hev
 
-  obtain ⟨f, hf0, hf1, hf01⟩ := exists_continuous_zero_one_of_isClosed hUo.isClosed_compl
-    (isClosed_singleton (x := (1 : KG ε))) (Set.disjoint_singleton_right.2 (fun h => h hU1))
+  obtain ⟨f, hf0, hf1, hf01⟩ :=
+    exists_continuous_zero_one_of_isClosed hUo.isClosed_compl (isClosed_singleton (x := (1 : KG ε)))
+      (Set.disjoint_singleton_right.2 (fun h => h hU1))
   have hf1' : f 1 = 1 := by simpa using hf1 (Set.mem_singleton (1 : KG ε))
   have hfnn : ∀ k, 0 ≤ f k := fun k => (hf01 k).1
   have hfU : ∀ k, k ∉ U → f k = 0 := fun k hk => by simpa using hf0 hk
   have hIpos : 0 < ∫ k, f k ∂(muK ε) :=
     Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero f.continuous
-      (isClosed_tsupport _).isCompact (fun k => hfnn k) (x := 1) (by rw [hf1']; norm_num)
+      (isClosed_tsupport _).isCompact
+      (fun k => hfnn k)
+      (x := 1) (by rw [hf1']; norm_num)
   obtain ⟨I, hIdef⟩ : ∃ I, ∫ k, f k ∂(muK ε) = I := ⟨_, rfl⟩
   rw [hIdef] at hIpos
 
-  let ψ : C(KG ε, ℂ) := ⟨fun k => ((f k / I : ℝ) : ℂ),
-    Complex.continuous_ofReal.comp (f.continuous.div_const I)⟩
+  let ψ : C(KG ε, ℂ) :=
+    ⟨fun k => ((f k / I : ℝ) : ℂ), Complex.continuous_ofReal.comp (f.continuous.div_const I)⟩
   have hψ : ∀ k, ψ k = ((f k / I : ℝ) : ℂ) := fun k => rfl
   have hψint : ∫ k, ψ k ∂(muK ε) = 1 := by
     simp only [hψ]
@@ -79,12 +89,14 @@ theorem approx_identity : ∀ (n : ℕ) (ε : Fin n → Bool) (X : Type) [Topolo
   have e1 : ∫ k, ψ k * (F x 1 - F x k) ∂(muK ε) = F x 1 - ∫ k, ψ k * F x k ∂(muK ε) := by
     simp_rw [mul_sub]
     rw [integral_sub i1 i2, integral_mul_const, hψint, one_mul]
-  have e2 : ∫ k, (ψ k - p k) * F x k ∂(muK ε) =
-      ∫ k, ψ k * F x k ∂(muK ε) - ∫ k, p k * F x k ∂(muK ε) := by
+  have e2
+      : ∫ k, (ψ k - p k) * F x k ∂(muK ε)
+        = ∫ k, ψ k * F x k ∂(muK ε) - ∫ k, p k * F x k ∂(muK ε) := by
     simp_rw [sub_mul]
     exact integral_sub i2 i3
-  have e3 : F x 1 - ∫ k, p k * F x k ∂(muK ε) =
-      ∫ k, ψ k * (F x 1 - F x k) ∂(muK ε) + ∫ k, (ψ k - p k) * F x k ∂(muK ε) := by
+  have e3
+      : F x 1 - ∫ k, p k * F x k ∂(muK ε)
+        = ∫ k, ψ k * (F x 1 - F x k) ∂(muK ε) + ∫ k, (ψ k - p k) * F x k ∂(muK ε) := by
     rw [e1, e2]; ring
   have b1 : ‖∫ k, ψ k * (F x 1 - F x k) ∂(muK ε)‖ ≤ δ / 3 := by
     have hg : Integrable (fun k => f k / I * (δ / 3)) (muK ε) :=
@@ -102,12 +114,14 @@ theorem approx_identity : ∀ (n : ℕ) (ε : Fin n → Bool) (X : Type) [Topolo
       (Filter.Eventually.of_forall fun k => ?_)).trans ?_
     · rw [norm_mul]
       exact mul_le_mul (hpk k) (hM (x, k) ⟨hx, Set.mem_univ _⟩) (norm_nonneg _) hη.le
-    · calc δ / (3 * A) * M * (muK ε).real Set.univ
+    · calc
+        δ / (3 * A) * M * (muK ε).real Set.univ
           = δ / (3 * A) * (M * (muK ε).real Set.univ) := by ring
         _ ≤ δ / (3 * A) * A := mul_le_mul_of_nonneg_left hMA hη.le
         _ = δ / 3 := by field_simp
   rw [e3]
-  calc ‖∫ k, ψ k * (F x 1 - F x k) ∂(muK ε) + ∫ k, (ψ k - p k) * F x k ∂(muK ε)‖
+  calc
+    ‖∫ k, ψ k * (F x 1 - F x k) ∂(muK ε) + ∫ k, (ψ k - p k) * F x k ∂(muK ε)‖
       ≤ δ / 3 + δ / 3 := (norm_add_le _ _).trans (add_le_add b1 b2)
     _ < δ := by linarith
 

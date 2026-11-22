@@ -34,13 +34,18 @@ theorem CurveResidueDegree.proof : CurveResidueDegree.Statement := by
     exact not_isUnit_zero hu
 
   let evL : Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)) →+* ℂ :=
-    IsLocalization.lift (M := (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)).primeCompl) (g := eval q)
-      (fun s ↦ isUnit_iff_ne_zero.2 fun h ↦ s.2 (RingHom.mem_ker.2 h))
-  have hJ : ∀ a ∈ I.map (algebraMap (MvPolynomial (Fin n) ℂ)
-      (Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)))), evL a = 0 := by
+    IsLocalization.lift (M := (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)).primeCompl)
+      (g := eval q) (fun s ↦ isUnit_iff_ne_zero.2 fun h ↦ s.2 (RingHom.mem_ker.2 h))
+  have hJ
+      : ∀ a
+          ∈ I.map (algebraMap (MvPolynomial (Fin n) ℂ)
+            (Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)))),
+        evL a = 0 := by
     intro a ha
-    have hle : I.map (algebraMap (MvPolynomial (Fin n) ℂ)
-        (Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)))) ≤ RingHom.ker evL := by
+    have hle
+        : I.map (algebraMap (MvPolynomial (Fin n) ℂ)
+            (Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ))))
+          ≤ RingHom.ker evL := by
       rw [Ideal.map_le_iff_le_comap]
       intro g hg
       simp [evL, IsLocalization.lift_eq, hIq g hg]
@@ -53,24 +58,30 @@ theorem CurveResidueDegree.proof : CurveResidueDegree.Statement := by
   have : Algebra.IsIntegral (curveLocalRing I q) (curveNormalisation I q) :=
     inferInstanceAs (Algebra.IsIntegral (curveLocalRing I q)
       ↥(integralClosure (curveLocalRing I q) (FractionRing (curveLocalRing I q))))
-  have hmax : (P.asIdeal.comap (algebraMap (curveLocalRing I q) (curveNormalisation I q))).IsMaximal :=
+  have hmax
+      : (P.asIdeal.comap (algebraMap (curveLocalRing I q) (curveNormalisation I q))).IsMaximal :=
     Ideal.isMaximal_under_of_isIntegral_of_isMaximal P.asIdeal
-  have hmax' := Ideal.comap_isMaximal_of_surjective
-    (Ideal.Quotient.mk (I.map (algebraMap (MvPolynomial (Fin n) ℂ)
-      (Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ))))))
-    Ideal.Quotient.mk_surjective (K := P.asIdeal.comap (algebraMap (curveLocalRing I q) (curveNormalisation I q)))
-    (H := hmax)
+  have hmax' :=
+    Ideal.comap_isMaximal_of_surjective
+      (Ideal.Quotient.mk (I.map (algebraMap (MvPolynomial (Fin n) ℂ)
+        (Localization.AtPrime (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ))))))
+      Ideal.Quotient.mk_surjective
+      (K := P.asIdeal.comap (algebraMap (curveLocalRing I q) (curveNormalisation I q))) (H := hmax)
   have hloc := IsLocalRing.eq_maximalIdeal hmax'
-  have hker : ∀ a ∈ RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ),
-      π (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) a) = 0 := by
+  have hker
+      : ∀ a ∈ RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ),
+        π (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) a) = 0 := by
     intro a ha
-    rw [← Localization.AtPrime.under_maximalIdeal (I := RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)),
-      Ideal.under, Ideal.mem_comap, ← hloc] at ha
+    rw [← Localization.AtPrime.under_maximalIdeal
+          (I := RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)),
+        Ideal.under, Ideal.mem_comap, ← hloc]
+      at ha
     exact Ideal.Quotient.eq_zero_iff_mem.2 ha
 
   have hcomp : π = ι.comp ε := by
     refine Ideal.Quotient.ringHom_ext ?_
-    refine IsLocalization.ringHom_ext (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)).primeCompl ?_
+    refine IsLocalization.ringHom_ext
+      (RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ)).primeCompl ?_
     refine MvPolynomial.ringHom_ext (fun c ↦ ?_) (fun i ↦ ?_)
     · show π (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) (C c)) =
         ι (ε (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) (C c)))

@@ -49,28 +49,35 @@ theorem PlaceResGood_of : PlaceResGood := by
   let _ : Algebra k (S ⧸ Q) := φ.toAlgebra
   have hSm : ∀ s, s ∈ Algebra.adjoin A.toSubring {y} → s ∈ S := fun s hs => by rw [hS]; exact hs
   let y' : S := ⟨y, hSm y (Algebra.subset_adjoin (Set.mem_singleton y))⟩
-  have gen : ∀ s (hs : s ∈ Algebra.adjoin A.toSubring {y}),
-      Ideal.Quotient.mk Q (⟨s, hSm s hs⟩ : S) ∈ Algebra.adjoin k {Ideal.Quotient.mk Q y'} := by
+  have gen
+      : ∀ s (hs : s ∈ Algebra.adjoin A.toSubring {y}),
+        Ideal.Quotient.mk Q (⟨s, hSm s hs⟩ : S) ∈ Algebra.adjoin k {Ideal.Quotient.mk Q y'} := by
     intro s hs
     induction hs using Algebra.adjoin_induction with
     | mem x hx =>
-      rw [Set.mem_singleton_iff] at hx; subst hx
+      rw [Set.mem_singleton_iff] at hx
+      subst hx
       exact Algebra.subset_adjoin (Set.mem_singleton _)
     | algebraMap r =>
       obtain ⟨c, hc⟩ := stepA r.1 r.2
-      have e : Ideal.Quotient.mk Q (⟨algebraMap A.toSubring K r, hSm _ (Subalgebra.algebraMap_mem _ r)⟩ : S)
-          = algebraMap k (S ⧸ Q) c := by
+      have e
+          : Ideal.Quotient.mk Q
+              (⟨algebraMap A.toSubring K r, hSm _ (Subalgebra.algebraMap_mem _ r)⟩ : S)
+            = algebraMap k (S ⧸ Q) c := by
         rw [← sub_eq_zero, ← Ideal.Quotient.mk_eq_mk]
         change Ideal.Quotient.mk Q _ - Ideal.Quotient.mk Q (kS c) = 0
         rw [← map_sub, Ideal.Quotient.eq_zero_iff_mem]
         exact hc
-      rw [e]; exact Subalgebra.algebraMap_mem _ c
+      rw [e]
+      exact Subalgebra.algebraMap_mem _ c
     | add x z hx hz ihx ihz =>
       have : (⟨x + z, hSm _ (add_mem hx hz)⟩ : S) = ⟨x, hSm _ hx⟩ + ⟨z, hSm _ hz⟩ := rfl
-      rw [this, map_add (f := _)]; exact add_mem ihx ihz
+      rw [this, map_add (f := _)]
+      exact add_mem ihx ihz
     | mul x z hx hz ihx ihz =>
       have : (⟨x * z, hSm _ (mul_mem hx hz)⟩ : S) = ⟨x, hSm _ hx⟩ * ⟨z, hSm _ hz⟩ := rfl
-      rw [this, map_mul]; exact mul_mem ihx ihz
+      rw [this, map_mul]
+      exact mul_mem ihx ihz
   have top : Algebra.adjoin k {Ideal.Quotient.mk Q y'} = ⊤ := by
     refine eq_top_iff.mpr fun t _ => ?_
     obtain ⟨⟨s, hs⟩, rfl⟩ := Ideal.Quotient.mk_surjective t
@@ -84,14 +91,16 @@ theorem PlaceResGood_of : PlaceResGood := by
     refine ⟨c, ?_⟩
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub]
     change Ideal.Quotient.mk Q s - φ c = 0
-    rw [← hc]; exact sub_self _
+    rw [← hc]
+    exact sub_self _
 
   set B := LocalSubring.ofPrime S Q
   refine ⟨fun c => LocalSubring.le_ofPrime S Q (hAS (hA.1 c)), ?_⟩
   intro b hb
   let bb : B.toSubring := ⟨b, hb⟩
-  obtain ⟨t, ht⟩ := (IsLocalization.AtPrime.equivQuotMaximalIdeal Q B.toSubring).surjective
-    (Ideal.Quotient.mk (maximalIdeal B.toSubring) bb)
+  obtain ⟨t, ht⟩ :=
+    (IsLocalization.AtPrime.equivQuotMaximalIdeal Q B.toSubring).surjective
+      (Ideal.Quotient.mk (maximalIdeal B.toSubring) bb)
   obtain ⟨s, rfl⟩ := Ideal.Quotient.mk_surjective t
   obtain ⟨c, hc⟩ := stepS s
   refine ⟨c, ?_⟩
@@ -103,7 +112,8 @@ theorem PlaceResGood_of : PlaceResGood := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, ← ht,
       IsLocalization.AtPrime.equivQuotMaximalIdeal_apply_mk, ← map_sub, ← map_sub,
       Ideal.Quotient.eq_zero_iff_mem]
-    exact Ideal.mem_comap.mp (show s - kS c ∈ (maximalIdeal B.toSubring).comap (algebraMap S B.toSubring) by
+    exact Ideal.mem_comap.mp (show s - kS c
+        ∈ (maximalIdeal B.toSubring).comap (algebraMap S B.toSubring) by
       rw [← Ideal.under_def, IsLocalization.AtPrime.under_maximalIdeal B.toSubring Q]; exact hc)
   rw [mem_maximalIdeal, mem_nonunits_iff] at hmem
   apply hmem

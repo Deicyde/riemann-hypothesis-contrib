@@ -11,26 +11,29 @@ open scoped Classical
 
 namespace PI.TermAttrConst.UnitaryGroupMassFormula
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef PI.DCRelEquiv PI.DCRelEquiv.UnitaryGroupMassFormula
-  IsDedekindDomain
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef PI.DCRelEquiv PI.DCRelEquiv.UnitaryGroupMassFormula IsDedekindDomain
 
 section GP2
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
-  {Λ : Submodule (𝓞 E) S.V}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {S : HSpace E} {r : ℕ} {T T' : E} {Λ : Submodule (𝓞 E) S.V}
 
 def gpMfix (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) : Submodule (𝓞 E) S.V :=
   Submodule.span (𝓞 E) ((XLam Λ F : Set S.V) ∪ {F.zt})
 
-def gpGen (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E))
-    (b : Fin (r + 1)) : S.V :=
+def gpGen
+    (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E))
+    (b : Fin (r + 1))
+    : S.V :=
   ((g : E)⁻¹) • (frame F' b - frameAct (frame F) ξ b)
 
 def gpU (F : LFlag S r T) : Submodule E S.V := Xsp F ⊔ Submodule.span E {F.fl.z}
 
-theorem gp_mplus_eq (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T')
-    (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E)) :
-    Mplus Λ g F F' ξ = gpMfix Λ F ⊔ Submodule.span (𝓞 E) (Set.range (gpGen g F F' ξ)) := by
+theorem gp_mplus_eq
+    (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E))
+    : Mplus Λ g F F' ξ = gpMfix Λ F ⊔ Submodule.span (𝓞 E) (Set.range (gpGen g F F' ξ)) := by
   unfold Mplus gpMfix gpGen
   rw [Submodule.span_union]
 
@@ -67,9 +70,12 @@ theorem gp_Mfix_le_U (F : LFlag S r T) (hl : IsLift Λ F) : ∀ w ∈ gpMfix Λ 
       exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)
   exact fun w hw => h hw
 
-theorem gp_sat (p : Ideal (𝓞 E)) [p.IsPrime] (F : LFlag S r T) (hl : IsLift Λ F)
-    (hprim : ∀ c : E, c • F.fl.z ∈ Lsub Λ F → ∃ o : 𝓞 E, (o : E) = c) :
-    ∀ w ∈ Formalism.HermitianLatticesTheory.localization₂ p Λ, w ∈ gpU F → w ∈ Formalism.HermitianLatticesTheory.localization₂ p (gpMfix Λ F) := by
+theorem gp_sat
+    (p : Ideal (𝓞 E)) [p.IsPrime]
+    (F : LFlag S r T)
+    (hl : IsLift Λ F) (hprim : ∀ c : E, c • F.fl.z ∈ Lsub Λ F → ∃ o : 𝓞 E, (o : E) = c)
+    : ∀ w ∈ Formalism.HermitianLatticesTheory.localization₂ p Λ,
+      w ∈ gpU F → w ∈ Formalism.HermitianLatticesTheory.localization₂ p (gpMfix Λ F) := by
   intro w hw hU
   obtain ⟨s, hs, hsw⟩ := (mem_localization_iff p Λ w).1 hw
   obtain ⟨u, hu, v, hv, rfl⟩ := Submodule.mem_sup.1 hU
@@ -77,8 +83,8 @@ theorem gp_sat (p : Ideal (𝓞 E)) [p.IsPrime] (F : LFlag S r T) (hl : IsLift �
   have hzΛ : F.fl.z ∈ Λ := hl.1
   have horth : s • (u + c • F.fl.z) ∈ orth S (Xsp F) := by
     rw [gp_osmul]
-    exact Submodule.smul_mem _ _ (Submodule.add_mem _ (gp_X_iso F u hu)
-      (Submodule.smul_mem _ _ (z_mem_orth F)))
+    exact Submodule.smul_mem _ _
+      (Submodule.add_mem _ (gp_X_iso F u hu) (Submodule.smul_mem _ _ (z_mem_orth F)))
   have hLsub : (algebraMap (𝓞 E) E s * c) • F.fl.z ∈ Lsub Λ F := by
     unfold Lsub Lrep
     rw [Submodule.mem_inf]

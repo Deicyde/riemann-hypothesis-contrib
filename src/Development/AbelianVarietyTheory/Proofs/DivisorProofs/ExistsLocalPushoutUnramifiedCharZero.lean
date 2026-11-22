@@ -11,12 +11,15 @@ namespace GlobalTheory.UnramPushout
 
 open TensorProduct
 
-theorem isReduced_nontrivial_tensor {A k k' : Type} [CommRing A] [Field k] [Field k']
-    [Algebra A k] [Algebra A k'] [CharZero k] (P : Ideal A) [P.IsPrime]
-    (hk : RingHom.ker (algebraMap A k) = P) (hk' : RingHom.ker (algebraMap A k') = P) :
-    IsReduced (k ⊗[A] k') ∧ Nontrivial (k ⊗[A] k') := by
-  have hu : ∀ {L : Type} [Field L] [Algebra A L], RingHom.ker (algebraMap A L) = P →
-      P.primeCompl ≤ (IsUnit.submonoid L).comap (algebraMap A L) := by
+theorem isReduced_nontrivial_tensor
+    {A k k' : Type} [CommRing A] [Field k] [Field k'] [Algebra A k] [Algebra A k'] [CharZero k]
+    (P : Ideal A) [P.IsPrime]
+    (hk : RingHom.ker (algebraMap A k) = P) (hk' : RingHom.ker (algebraMap A k') = P)
+    : IsReduced (k ⊗[A] k') ∧ Nontrivial (k ⊗[A] k') := by
+  have hu
+      : ∀ {L : Type} [Field L] [Algebra A L],
+        RingHom.ker (algebraMap A L) = P
+          → P.primeCompl ≤ (IsUnit.submonoid L).comap (algebraMap A L) := by
     intro L _ _ h s hs
     simp only [Submonoid.mem_comap, IsUnit.mem_submonoid_iff, isUnit_iff_ne_zero]
     intro h0
@@ -52,15 +55,15 @@ theorem isReduced_nontrivial_tensor {A k k' : Type} [CommRing A] [Field k] [Fiel
   have : IsReduced (k ⊗[P.ResidueField] k') := GlobalTheory.ReducedAlg.isReduced_tensor k k'
   exact ⟨isReduced_of_injective e.toRingHom e.injective, e.toEquiv.nontrivial⟩
 
-theorem exists_local_pushout (A V V' : Type) [CommRing A] [CommRing V] [IsLocalRing V]
-    [CommRing V'] [IsLocalRing V'] (f : A →+* V) (f' : A →+* V') (hf' : f'.Flat)
-    (hP : (maximalIdeal V).comap f = (maximalIdeal V').comap f')
+theorem exists_local_pushout
+    (A V V' : Type) [CommRing A] [CommRing V] [IsLocalRing V] [CommRing V'] [IsLocalRing V']
+    (f : A →+* V) (f' : A →+* V')
+    (hf' : f'.Flat) (hP : (maximalIdeal V).comap f = (maximalIdeal V').comap f')
     (hV : ((maximalIdeal V).comap f).map f = maximalIdeal V)
-    (hV' : ((maximalIdeal V').comap f').map f' = maximalIdeal V')
-    (h0 : CharZero (ResidueField V)) :
-    ∃ (B : Type) (_ : CommRing B) (_ : IsLocalRing B) (g : V →+* B) (g' : V' →+* B),
-      g.comp f = g'.comp f' ∧ g.Flat ∧ (maximalIdeal V).map g = maximalIdeal B ∧
-        (maximalIdeal V').map g' = maximalIdeal B := by
+    (hV' : ((maximalIdeal V').comap f').map f' = maximalIdeal V') (h0 : CharZero (ResidueField V))
+    : ∃ (B : Type) (_ : CommRing B) (_ : IsLocalRing B) (g : V →+* B) (g' : V' →+* B),
+      g.comp f = g'.comp f' ∧ g.Flat ∧ (maximalIdeal V).map g = maximalIdeal B
+        ∧ (maximalIdeal V').map g' = maximalIdeal B := by
   letI : Algebra A V := f.toAlgebra
   letI : Algebra A V' := f'.toAlgebra
   haveI : Module.Flat A V' := hf'
@@ -116,12 +119,13 @@ theorem exists_local_pushout (A V V' : Type) [CommRing A] [CommRing V] [IsLocalR
   have hmax : Q.map (algebraMap C B) = maximalIdeal B := by
     have h1 := IsLocalization.AtPrime.radical_map_of_mem_minimalPrimes B q Q hq
     rw [← IsLocalization.map_radical q.primeCompl B, hrad.radical,
-      Localization.AtPrime.map_eq_maximalIdeal] at h1
+        Localization.AtPrime.map_eq_maximalIdeal]
+      at h1
     exact h1
-  let g : V →+* B := (algebraMap C B).comp
-    ((Algebra.TensorProduct.includeLeft : V →ₐ[A] C) : V →+* C)
-  let g' : V' →+* B := (algebraMap C B).comp
-    ((Algebra.TensorProduct.includeRight : V' →ₐ[A] C) : V' →+* C)
+  let g : V →+* B :=
+    (algebraMap C B).comp ((Algebra.TensorProduct.includeLeft : V →ₐ[A] C) : V →+* C)
+  let g' : V' →+* B :=
+    (algebraMap C B).comp ((Algebra.TensorProduct.includeRight : V' →ₐ[A] C) : V' →+* C)
   have hgf : g.comp f = (algebraMap C B).comp (algebraMap A C) := by
     ext a
     exact congrArg (algebraMap C B)

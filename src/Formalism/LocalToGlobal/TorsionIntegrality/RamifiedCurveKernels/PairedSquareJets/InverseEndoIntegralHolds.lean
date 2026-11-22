@@ -19,36 +19,40 @@ section SlopeTestRemainingChoices
 
 variable {K : Type} [Field K]
 
-theorem coeff_one_subst1 (g : PowerSeries K) {a : PowerSeries K}
-    (ha : PowerSeries.constantCoeff a = 0) :
-    PowerSeries.coeff 1 (PowerSeries.subst a g : PowerSeries K) =
-      PowerSeries.coeff 1 g * PowerSeries.coeff 1 a := by
-  have key : ∀ f : PowerSeries K, PowerSeries.coeff 1 f =
-      PowerSeries.constantCoeff (PowerSeries.derivative (R := K) f) := by
+theorem coeff_one_subst1
+    (g : PowerSeries K) {a : PowerSeries K} (ha : PowerSeries.constantCoeff a = 0)
+    : PowerSeries.coeff 1 (PowerSeries.subst a g : PowerSeries K)
+      = PowerSeries.coeff 1 g * PowerSeries.coeff 1 a := by
+  have key
+      : ∀ f : PowerSeries K,
+        PowerSeries.coeff 1 f = PowerSeries.constantCoeff (PowerSeries.derivative (R := K) f) := by
     intro f
     rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_derivative]
     simp
-  rw [key, PowerSeries.derivative_subst (JetSubstitutionLemmas.hs1 ha), map_mul, JetSubstitutionLemmas.cc_subst1 ha, ← key, ← key]
+  rw [key, PowerSeries.derivative_subst (JetSubstitutionLemmas.hs1 ha), map_mul,
+    JetSubstitutionLemmas.cc_subst1 ha, ← key, ← key]
 
-theorem coeff_one_mulBy {l linv : PowerSeries K} (h : IsLogPair l linv) (a : K) :
-    PowerSeries.coeff 1 (mulBy l linv a) = a := by
+theorem coeff_one_mulBy {l linv : PowerSeries K} (h : IsLogPair l linv) (a : K)
+    : PowerSeries.coeff 1 (mulBy l linv a) = a := by
   have h0 : PowerSeries.constantCoeff (PowerSeries.C a * l) = 0 := by rw [map_mul, h.1, mul_zero]
-  rw [mulBy, coeff_one_subst1 linv h0, Pts.coeff_one_linv h, PowerSeries.coeff_C_mul, h.2.1, one_mul,
-    mul_one]
+  rw [mulBy, coeff_one_subst1 linv h0, Pts.coeff_one_linv h, PowerSeries.coeff_C_mul, h.2.1,
+    one_mul, mul_one]
 
-theorem subst_mulBy_mulBy {l linv : PowerSeries K} (h : IsLogPair l linv) (a b : K) :
-    PowerSeries.subst (mulBy l linv a) (mulBy l linv b) = mulBy l linv (b * a) := by
+theorem subst_mulBy_mulBy {l linv : PowerSeries K} (h : IsLogPair l linv) (a b : K)
+    : PowerSeries.subst (mulBy l linv a) (mulBy l linv b) = mulBy l linv (b * a) := by
   rw [← Pts.fmul_eq_subst_mulBy h b (Pts.constantCoeff_mulBy h a), Pts.mulBy_eq_fmul a,
     Pts.fmul_fmul h b a PowerSeries.constantCoeff_X, ← Pts.mulBy_eq_fmul]
 
-theorem mulBy_one {l linv : PowerSeries K} (h : IsLogPair l linv) :
-    mulBy l linv 1 = PowerSeries.X := by
+theorem mulBy_one {l linv : PowerSeries K} (h : IsLogPair l linv)
+    : mulBy l linv 1 = PowerSeries.X := by
   rw [Pts.mulBy_eq_fmul, Pts.fmul_one h PowerSeries.constantCoeff_X]
 
-theorem intPS_of_left_inverse (R : Subring K) {f g : PowerSeries K} (hf : IntPS R f)
-    (hf0 : PowerSeries.constantCoeff f = 0) (hu : (PowerSeries.coeff 1 f)⁻¹ ∈ R)
-    (hne : PowerSeries.coeff 1 f ≠ 0) (hg : PowerSeries.subst f g = PowerSeries.X) : IntPS R g := by
-
+theorem intPS_of_left_inverse
+    (R : Subring K)
+    {f g : PowerSeries K}
+    (hf : IntPS R f) (hf0 : PowerSeries.constantCoeff f = 0) (hu : (PowerSeries.coeff 1 f)⁻¹ ∈ R)
+    (hne : PowerSeries.coeff 1 f ≠ 0) (hg : PowerSeries.subst f g = PowerSeries.X)
+    : IntPS R g := by
   let f' : PowerSeries R := PowerSeries.mk fun n => ⟨PowerSeries.coeff n f, hf n⟩
   have hmap : PowerSeries.map R.subtype f' = f := by
     ext n
@@ -72,8 +76,8 @@ theorem intPS_of_left_inverse (R : Subring K) {f g : PowerSeries K} (hf : IntPS 
     rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, ht, PowerSeries.coeff_map,
       PowerSeries.coeff_zero_eq_constantCoeff_apply, ht'0, map_zero]
   have hft : PowerSeries.subst t f = PowerSeries.X := by
-    have := PowerSeries.map_subst (PowerSeries.HasSubst.substInvOfIsUnit f' hf'1)
-      (h := R.subtype) f'
+    have :=
+      PowerSeries.map_subst (PowerSeries.HasSubst.substInvOfIsUnit f' hf'1) (h := R.subtype) f'
     rw [← ht', hr, hmap] at this
     rw [← PowerSeries.map_X R.subtype]
     exact this.symm
@@ -96,8 +100,8 @@ theorem inverse_endo_integral_holds : InvEndInt := by
 
 theorem adjoint_unit_norm_holds : AdjUnitNorm := by
   intro K _ _ R l linv ph a b N hFr hF1 ha hai hEa hEb hN hPh
-  refine adjFromNorm K R l linv ph a b hFr ha hEa (inverse_endo_integral_holds K R l linv a hFr.1 ha hai hEa) hEb
-    hPh ?_
+  refine adjFromNorm K R l linv ph a b hFr ha hEa
+    (inverse_endo_integral_holds K R l linv a hFr.1 ha hai hEa) hEb hPh ?_
   rw [hN]
   exact zLinInt K R l linv ph hFr hF1 N
 
@@ -140,24 +144,35 @@ theorem ramified_shape_holds : RamifiedShape := by
     have hq0 : PowerSeries.constantCoeff (-(PowerSeries.C c * l ^ 2)) = 0 := by
       rw [map_neg, map_mul, map_pow, hlp.1]
       simp
-    have hq0' : PowerSeries.constantCoeff (-(PowerSeries.C c * PowerSeries.X ^ 2) : PowerSeries K) = 0 := by
+    have hq0'
+        : PowerSeries.constantCoeff (-(PowerSeries.C c * PowerSeries.X ^ 2) : PowerSeries K)
+          = 0 := by
       simp
     have hph0 : PowerSeries.constantCoeff (-ph) = 0 := by rw [map_neg, hFr.2.2, neg_zero]
-    have hsub : PowerSeries.subst linv (-(PowerSeries.C c * l ^ 2)) =
-        (-(PowerSeries.C c * PowerSeries.X ^ 2) : PowerSeries K) := by
-      rw [← PowerSeries.coe_substAlgHom hs, map_neg, map_mul, map_pow, PowerSeries.coe_substAlgHom hs,
-        PowerSeries.subst_C, hlp.2.2.2.2]
+    have hsub
+        : PowerSeries.subst linv (-(PowerSeries.C c * l ^ 2))
+          = (-(PowerSeries.C c * PowerSeries.X ^ 2) : PowerSeries K) := by
+      rw [← PowerSeries.coe_substAlgHom hs, map_neg, map_mul, map_pow,
+        PowerSeries.coe_substAlgHom hs, PowerSeries.subst_C, hlp.2.2.2.2]
       rfl
-    have hid : PowerSeries.subst linv (mvExp (-ph) : PowerSeries K) =
-        (mvExp (-(PowerSeries.C c * PowerSeries.X ^ 2)) : PowerSeries K) * PowerSeries.subst linv H := by
+    have hid
+        : PowerSeries.subst linv (mvExp (-ph) : PowerSeries K)
+          = (mvExp (-(PowerSeries.C c * PowerSeries.X ^ 2)) : PowerSeries K)
+            * PowerSeries.subst linv H := by
       rw [hexp, PowerSeries.subst_mul hs, mvExpSubst K Unit _ linv hq0 hlp.2.2.1, hsub]
-    refine ⟨PowerSeries.subst linv H, (jets_of_dist_jets_holds K (unitBall K) l linv H hlp).1 hH, ?_, hid⟩
+    refine ⟨
+      PowerSeries.subst linv H,
+      (jets_of_dist_jets_holds K (unitBall K) l linv H hlp).1 hH,
+      ?_,
+      hid
+    ⟩
     have hcc := congrArg PowerSeries.constantCoeff hid
     rw [map_mul, JetSubstitutionLemmas.cc_subst1 hlp.2.2.1] at hcc
     have e1 : PowerSeries.constantCoeff (mvExp (-ph) : PowerSeries K) = 1 :=
       (mvExpLaws K Unit).2.1 _ hph0
-    have e2 : PowerSeries.constantCoeff
-        (mvExp (-(PowerSeries.C c * PowerSeries.X ^ 2)) : PowerSeries K) = 1 :=
+    have e2
+        : PowerSeries.constantCoeff (mvExp (-(PowerSeries.C c * PowerSeries.X ^ 2)) : PowerSeries K)
+          = 1 :=
       (mvExpLaws K Unit).2.1 _ hq0'
     rw [e1, e2, one_mul] at hcc
     exact hcc.symm

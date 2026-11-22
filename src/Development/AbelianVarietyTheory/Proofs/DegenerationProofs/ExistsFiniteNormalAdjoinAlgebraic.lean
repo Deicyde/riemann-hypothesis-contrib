@@ -6,14 +6,15 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_extend_of_ringEquiv_of_isAlgebraic {K L M F : Type} [Field K] [Field L] [Field M] [Field F]
-    [IsAlgClosed F] [Algebra L M] [Algebra.IsAlgebraic L M] (φ : K ≃+* L) (g : K →+* F) :
-    ∃ g' : M →+* F, g'.comp ((algebraMap L M).comp φ.toRingHom) = g := by
+theorem exists_extend_of_ringEquiv_of_isAlgebraic
+    {K L M F : Type}
+    [Field K] [Field L] [Field M] [Field F] [IsAlgClosed F] [Algebra L M] [Algebra.IsAlgebraic L M]
+    (φ : K ≃+* L) (g : K →+* F)
+    : ∃ g' : M →+* F, g'.comp ((algebraMap L M).comp φ.toRingHom) = g := by
   letI : Algebra L F := (g.comp φ.symm.toRingHom).toAlgebra
   let g' : M →ₐ[L] F := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨g'.toRingHom, RingHom.ext fun x => ?_⟩
   change g' (algebraMap L _ (φ x)) = g x
@@ -21,17 +22,18 @@ theorem exists_extend_of_ringEquiv_of_isAlgebraic {K L M F : Type} [Field K] [Fi
   change g (φ.symm (φ x)) = g x
   rw [φ.symm_apply_apply]
 
-theorem exists_finite_normal_adjoin_algebraic :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsIntegrallyClosed R] [CharZero R]
-      (s : AlgebraicClosure (FractionRing R)),
+theorem exists_finite_normal_adjoin_algebraic
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsIntegrallyClosed R]
+        [CharZero R] (s : AlgebraicClosure (FractionRing R)),
       ∃ (R₂ : Type) (_ : CommRing R₂) (_ : IsDomain R₂) (h : R →+* R₂)
-        (h' : FractionRing R →+* FractionRing R₂)
-        (e : FractionRing R₂ →+* AlgebraicClosure (FractionRing R)),
-        Function.Injective h ∧ h.Finite ∧ IsIntegrallyClosed R₂ ∧
-        (∀ r, h' (algebraMap R _ r) = algebraMap R₂ _ (h r)) ∧ e.comp h' = algebraMap _ _ ∧
-        (∃ s₂, e s₂ = s) ∧
-        ∀ (F : Type) [Field F] [IsAlgClosed F] (g : FractionRing R₂ →+* F),
-          ∃ g' : AlgebraicClosure (FractionRing R) →+* F, g'.comp e = g := by
+          (h' : FractionRing R →+* FractionRing R₂)
+          (e : FractionRing R₂ →+* AlgebraicClosure (FractionRing R)),
+        Function.Injective h ∧ h.Finite ∧ IsIntegrallyClosed R₂
+          ∧ (∀ r, h' (algebraMap R _ r) = algebraMap R₂ _ (h r)) ∧ e.comp h' = algebraMap _ _
+          ∧ (∃ s₂, e s₂ = s)
+          ∧ ∀ (F : Type) [Field F] [IsAlgClosed F] (g : FractionRing R₂ →+* F),
+            ∃ g' : AlgebraicClosure (FractionRing R) →+* F,
+              g'.comp e = g := by
   intro R _ _ _ _ _ s
   have : CharZero (FractionRing R) := IsFractionRing.charZero_of_isFractionRing R
   let L : IntermediateField (FractionRing R) (AlgebraicClosure (FractionRing R)) :=
@@ -45,18 +47,32 @@ theorem exists_finite_normal_adjoin_algebraic :
     integralClosure.isFractionRing_of_finite_extension (FractionRing R) L
   let φ : FractionRing (integralClosure R L) ≃+* L :=
     (FractionRing.algEquiv (integralClosure R L) L).toRingEquiv
-  have hφ : ∀ x : integralClosure R L,
-      φ (algebraMap (integralClosure R L) _ x) = algebraMap (integralClosure R L) L x :=
-    fun x => (FractionRing.algEquiv (integralClosure R L) L).commutes x
-  refine ⟨integralClosure R L, inferInstance, inferInstance, algebraMap R _,
+  have hφ
+      : ∀ x : integralClosure R L,
+        φ (algebraMap (integralClosure R L) _ x) = algebraMap (integralClosure R L) L x := fun x =>
+    (FractionRing.algEquiv (integralClosure R L) L).commutes x
+  refine ⟨
+    integralClosure R L,
+    inferInstance,
+    inferInstance,
+    algebraMap R _,
     φ.symm.toRingHom.comp (algebraMap (FractionRing R) L),
-    (algebraMap L (AlgebraicClosure (FractionRing R))).comp φ.toRingHom, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    (algebraMap L (AlgebraicClosure (FractionRing R))).comp φ.toRingHom,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro a b hab
     have h1 : algebraMap R L a = algebraMap R L b := by
       rw [IsScalarTower.algebraMap_apply R (integralClosure R L) L,
         IsScalarTower.algebraMap_apply R (integralClosure R L) L b, hab]
     rw [IsScalarTower.algebraMap_apply R (FractionRing R) L,
-      IsScalarTower.algebraMap_apply R (FractionRing R) L b] at h1
+        IsScalarTower.algebraMap_apply R (FractionRing R) L b]
+      at h1
     exact IsFractionRing.injective R (FractionRing R) ((algebraMap (FractionRing R) L).injective h1)
   · exact RingHom.finite_algebraMap.2 hfin
   · exact (isIntegrallyClosed_iff_isIntegrallyClosedIn L).2 inferInstance

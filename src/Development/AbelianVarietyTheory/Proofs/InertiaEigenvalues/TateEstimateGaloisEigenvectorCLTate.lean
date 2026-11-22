@@ -12,7 +12,13 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.InertiaEigenvalues
 
-theorem tate_eigenvector_estimate : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l) (u : ℚ_[l]) (y : ℂ_[l]) (z : Om l) (N : ℕ) (e δ : ℝ), Per.σC γ y = algebraMap ℚ_[l] ℂ_[l] u * y → ‖u‖ = 1 → (γ ^ N) z = z → ‖y - (z : ℂ_[l])‖ ≤ e → ‖∑ i ∈ Finset.range N, (γ ^ i) (γ z - algebraMap ℚ_[l] (Om l) u * z)‖ ≤ δ * ‖γ z - algebraMap ℚ_[l] (Om l) u * z‖ → 0 ≤ δ → ‖u ^ N - 1‖ * ‖y‖ ≤ max (‖u - 1‖ * e) (δ * e) := by
+theorem tate_eigenvector_estimate
+    : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l) (u : ℚ_[l]) (y : ℂ_[l]) (z : Om l) (N : ℕ) (e δ : ℝ),
+      Per.σC γ y = algebraMap ℚ_[l] ℂ_[l] u * y → ‖u‖ = 1 → (γ ^ N) z = z → ‖y - (z : ℂ_[l])‖ ≤ e
+        → ‖∑ i ∈ Finset.range N, (γ ^ i) (γ z - algebraMap ℚ_[l] (Om l) u * z)‖
+          ≤ δ * ‖γ z - algebraMap ℚ_[l] (Om l) u * z‖
+        → 0 ≤ δ
+        → ‖u ^ N - 1‖ * ‖y‖ ≤ max (‖u - 1‖ * e) (δ * e) := by
   intro l _ γ u y z N e δ hy hu hz he hT hδ
   have hca : ∀ c : ℚ_[l], ((algebraMap ℚ_[l] (Om l) c : Om l) : ℂ_[l]) = algebraMap ℚ_[l] ℂ_[l] c :=
     fun _ => rfl
@@ -21,10 +27,11 @@ theorem tate_eigenvector_estimate : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l) (u 
   have he0 : 0 ≤ e := (norm_nonneg _).trans he
   set U : ℂ_[l] := algebraMap ℚ_[l] ℂ_[l] u with hU
   have hv : ‖γ z - algebraMap ℚ_[l] (Om l) u * z‖ ≤ e := by
-    rw [← PadicComplex.norm_extends, UniformSpace.Completion.coe_sub, UniformSpace.Completion.coe_mul,
-      hca, ← GlobalTheory.RingBasics.σC_coe]
-    have h1 : Per.σC γ (z : ℂ_[l]) - U * (z : ℂ_[l])
-        = U * (y - (z : ℂ_[l])) + -Per.σC γ (y - (z : ℂ_[l])) := by
+    rw [← PadicComplex.norm_extends, UniformSpace.Completion.coe_sub,
+      UniformSpace.Completion.coe_mul, hca, ← GlobalTheory.RingBasics.σC_coe]
+    have h1
+        : Per.σC γ (z : ℂ_[l]) - U * (z : ℂ_[l])
+          = U * (y - (z : ℂ_[l])) + - Per.σC γ (y - (z : ℂ_[l])) := by
       rw [map_sub, hy]; ring
     rw [← hU, h1]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
@@ -35,15 +42,17 @@ theorem tate_eigenvector_estimate : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l) (u 
     induction i with
     | zero => simp [GlobalTheory.RingBasics.σC_one]
     | succ i ih =>
-      rw [pow_succ, GlobalTheory.RingBasics.σC_mul, hy, map_mul, hU, TateTwist.σC_algebraMap, ← hU, ih]
+      rw [pow_succ, GlobalTheory.RingBasics.σC_mul, hy, map_mul, hU, TateTwist.σC_algebraMap, ← hU,
+        ih]
       ring
   have htel : ∑ i ∈ Finset.range N, (γ ^ i) (γ z) = ∑ i ∈ Finset.range N, (γ ^ i) z := by
     have h := Finset.sum_range_sub (fun i => (γ ^ i) z) N
     rw [Finset.sum_sub_distrib] at h
     simp only [hz, pow_zero, AlgEquiv.one_apply, sub_self, pow_succ, AlgEquiv.mul_apply] at h
     exact sub_eq_zero.1 h
-  have hTv : ∑ i ∈ Finset.range N, (γ ^ i) (γ z - algebraMap ℚ_[l] (Om l) u * z)
-      = algebraMap ℚ_[l] (Om l) (1 - u) * ∑ i ∈ Finset.range N, (γ ^ i) z := by
+  have hTv
+      : ∑ i ∈ Finset.range N, (γ ^ i) (γ z - algebraMap ℚ_[l] (Om l) u * z)
+        = algebraMap ℚ_[l] (Om l) (1 - u) * ∑ i ∈ Finset.range N, (γ ^ i) z := by
     simp only [map_sub, map_mul, AlgEquiv.commutes, Finset.sum_sub_distrib, htel, map_one,
       ← Finset.mul_sum]
     ring
@@ -59,8 +68,10 @@ theorem tate_eigenvector_estimate : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l) (u 
   have hA : ‖∑ i ∈ Finset.range N, Per.σC (γ ^ i) (y - (z : ℂ_[l]))‖ ≤ e :=
     IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg he0 fun i _ => by
       rw [GlobalTheory.RingBasics.norm_σC]; exact he
-  have hmain : algebraMap ℚ_[l] ℂ_[l] (u ^ N - 1) * y
-      = (U - 1) * (∑ i ∈ Finset.range N, Per.σC (γ ^ i) (y - (z : ℂ_[l]))) + (U - 1) * (S : ℂ_[l]) := by
+  have hmain
+      : algebraMap ℚ_[l] ℂ_[l] (u ^ N - 1) * y
+        = (U - 1) * (∑ i ∈ Finset.range N, Per.σC (γ ^ i) (y - (z : ℂ_[l])))
+          + (U - 1) * (S : ℂ_[l]) := by
     rw [hSc, ← mul_add, ← Finset.sum_add_distrib]
     simp only [map_sub, sub_add_cancel, hpow, map_pow, map_one, ← hU]
     rw [← Finset.sum_mul, ← mul_assoc, mul_geom_sum]

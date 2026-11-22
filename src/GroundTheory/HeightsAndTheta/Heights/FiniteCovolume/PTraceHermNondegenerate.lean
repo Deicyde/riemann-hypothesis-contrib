@@ -9,20 +9,20 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open NumberField GroundTheory.Automorphic Module
 
-variable {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E]
-  [Algebra.IsQuadraticExtension F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι]
 
-
 omit [NumberField E] in
-theorem HermitianForm.eq_zero_of_toSesq_eq_zero (h : HermitianForm F E W) {x : W}
-    (hx : ∀ w, h.toSesq x w = 0) : x = 0 := by
+theorem HermitianForm.eq_zero_of_toSesq_eq_zero
+    (h : HermitianForm F E W) {x : W} (hx : ∀ w, h.toSesq x w = 0)
+    : x = 0 := by
   apply h.nonsingular.1
   rw [map_zero]
   exact LinearMap.ext hx
 
-theorem TraceHermNondegenerate.proof (h : HermitianForm F E W) (v : Basis ι E W) :
-    TraceHermNondegenerate.Statement h v := by
+theorem TraceHermNondegenerate.proof (h : HermitianForm F E W) (v : Basis ι E W)
+    : TraceHermNondegenerate.Statement h v := by
   have hT := (traceForm_nondegenerate ℚ E).1
   constructor
   · intro y hy

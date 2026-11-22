@@ -8,38 +8,43 @@ open Polynomial
 
 namespace UpperTheory.V.J
 
-private theorem cmpPrime_core {Λ B : Type} [CommRing Λ] [IsDomain Λ] [CommRing B] (φ : Λ →+* B)
-    (J : Ideal B) (t : B) {s : ℕ} (g : Fin s → Λ[X])
+private theorem cmpPrime_core
+    {Λ B : Type} [CommRing Λ] [IsDomain Λ] [CommRing B]
+    (φ : Λ →+* B) (J : Ideal B) (t : B)
+    {s : ℕ} (g : Fin s → Λ[X])
     (tf : ∀ c : Λ, c ≠ 0 → ∀ a : B, φ c * a ∈ J → a ∈ J)
     (prim : ∀ a : B, ∃ c : Λ, c ≠ 0 ∧ ∃ P : Λ[X], φ c * a - P.eval₂ φ t ∈ J)
-    (monic : ∀ i, (g i).Monic)
-    (irr : ∀ i, Irreducible ((g i).map (algebraMap Λ (FractionRing Λ))))
-    (inj : Function.Injective g)
-    (kill : (∏ i, g i).eval₂ φ t ∈ J)
-    (min : ∀ q : Λ[X], q.eval₂ φ t ∈ J → ∀ i, g i ∣ q) (i : Fin s) :
-    (J.colon {(∏ j ∈ Finset.univ.erase i, g j).eval₂ φ t}).IsPrime ∧
-    (∀ q : Λ[X], q.eval₂ φ t ∈ J.colon {(∏ j ∈ Finset.univ.erase i, g j).eval₂ φ t} ↔ g i ∣ q) ∧
-    ∀ c : Λ, c ≠ 0 → φ c ∉ J.colon {(∏ j ∈ Finset.univ.erase i, g j).eval₂ φ t} := by
+    (monic : ∀ i, (g i).Monic) (irr : ∀ i, Irreducible ((g i).map (algebraMap Λ (FractionRing Λ))))
+    (inj : Function.Injective g) (kill : (∏ i, g i).eval₂ φ t ∈ J)
+    (min : ∀ q : Λ[X], q.eval₂ φ t ∈ J → ∀ i, g i ∣ q) (i : Fin s)
+    : (J.colon {(∏ j ∈ Finset.univ.erase i, g j).eval₂ φ t}).IsPrime
+      ∧ (∀ q : Λ[X], q.eval₂ φ t ∈ J.colon {(∏ j ∈ Finset.univ.erase i, g j).eval₂ φ t} ↔ g i ∣ q)
+      ∧ ∀ c : Λ, c ≠ 0 → φ c ∉ J.colon {(∏ j ∈ Finset.univ.erase i, g j).eval₂ φ t} := by
   classical
-  have finj : Function.Injective (algebraMap Λ (FractionRing Λ)) := IsFractionRing.injective Λ (FractionRing Λ)
+  have finj : Function.Injective (algebraMap Λ (FractionRing Λ)) :=
+    IsFractionRing.injective Λ (FractionRing Λ)
   set e := (∏ j ∈ Finset.univ.erase i, g j).eval₂ φ t with he
   have memP : ∀ a : B, a ∈ J.colon {e} ↔ a * e ∈ J := by
     intro a
     simp [Submodule.mem_colon]
   have gprime : Prime ((g i).map (algebraMap Λ (FractionRing Λ))) := (irr i).prime
   have mapMonic : ∀ j, ((g j).map (algebraMap Λ (FractionRing Λ))).Monic := fun j => (monic j).map _
-  have desc : ∀ q : Λ[X], g i ∣ q ↔
-      (g i).map (algebraMap Λ (FractionRing Λ)) ∣ q.map (algebraMap Λ (FractionRing Λ)) := fun q =>
-    (Polynomial.map_dvd_map (algebraMap Λ (FractionRing Λ)) finj (monic i)).symm
-  have notdvd : ¬ (g i).map (algebraMap Λ (FractionRing Λ)) ∣
-      (∏ j ∈ Finset.univ.erase i, g j).map (algebraMap Λ (FractionRing Λ)) := by
+  have desc
+      : ∀ q : Λ[X],
+        g i ∣ q
+          ↔ (g i).map (algebraMap Λ (FractionRing Λ)) ∣ q.map (algebraMap Λ (FractionRing Λ)) :=
+    fun q => (Polynomial.map_dvd_map (algebraMap Λ (FractionRing Λ)) finj (monic i)).symm
+  have notdvd : ¬ (g i).map (algebraMap Λ (FractionRing Λ))
+      ∣ (∏ j ∈ Finset.univ.erase i, g j).map (algebraMap Λ (FractionRing Λ)) := by
     rw [Polynomial.map_prod]
     intro h
-    have exists_dvd : ∀ (S : Finset (Fin s)),
-        (g i).map (algebraMap Λ (FractionRing Λ)) ∣
-          ∏ j ∈ S, (g j).map (algebraMap Λ (FractionRing Λ)) →
-        ∃ j ∈ S, (g i).map (algebraMap Λ (FractionRing Λ)) ∣
-          (g j).map (algebraMap Λ (FractionRing Λ)) := by
+    have exists_dvd
+        : ∀ (S : Finset (Fin s)),
+          (g i).map (algebraMap Λ (FractionRing Λ))
+              ∣ ∏ j ∈ S, (g j).map (algebraMap Λ (FractionRing Λ))
+            → ∃ j ∈ S,
+              (g i).map (algebraMap Λ (FractionRing Λ))
+                ∣ (g j).map (algebraMap Λ (FractionRing Λ)) := by
       intro S
       induction S using Finset.induction_on with
       | empty =>
@@ -106,8 +111,9 @@ private theorem cmpPrime_core {Λ B : Type} [CommRing Λ] [IsDomain Λ] [CommRin
     obtain ⟨d, hd, Pb, hb⟩ := prim b
     have hab' : φ (c * d) * (a * b) ∈ J.colon {e} := Ideal.mul_mem_left _ _ hab
     have e1 : φ (c * d) * (a * b) - (Pa * Pb).eval₂ φ t ∈ J := by
-      have hre : φ (c * d) * (a * b) - (Pa * Pb).eval₂ φ t
-          = (φ c * a - Pa.eval₂ φ t) * (φ d * b) + Pa.eval₂ φ t * (φ d * b - Pb.eval₂ φ t) := by
+      have hre
+          : φ (c * d) * (a * b) - (Pa * Pb).eval₂ φ t
+            = (φ c * a - Pa.eval₂ φ t) * (φ d * b) + Pa.eval₂ φ t * (φ d * b - Pb.eval₂ φ t) := by
         rw [Polynomial.eval₂_mul, map_mul]
         ring
       rw [hre]

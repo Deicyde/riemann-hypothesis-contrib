@@ -10,8 +10,9 @@ open scoped Pointwise ENNReal
 namespace GlobalTheory.CompanionTheory.Ar.Cmp
 
 theorem pow_eq_one_of_isIntegral_of_mul_complexConj_eq_one
-    (E : Type) [Field E] [NumberField E] [IsCMField E] (z : E) (hz : IsIntegral ℤ z)
-    (h : z * IsCMField.complexConj E z = 1) : ∃ n : ℕ, 0 < n ∧ z ^ n = 1 := by
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (z : E) (hz : IsIntegral ℤ z) (h : z * IsCMField.complexConj E z = 1)
+    : ∃ n : ℕ, 0 < n ∧ z ^ n = 1 := by
   have hn : ∀ φ : E →+* ℂ, ‖φ z‖ = 1 := by
     intro φ
     have h1 := congrArg φ h

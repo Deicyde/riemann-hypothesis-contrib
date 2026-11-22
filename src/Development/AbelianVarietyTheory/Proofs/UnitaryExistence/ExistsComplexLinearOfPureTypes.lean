@@ -6,19 +6,25 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.UnFree
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.PureType GlobalTheory.CompRat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.PureType
+  GlobalTheory.CompRat
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.CompRat
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj in
-theorem _root_.GlobalTheory.CompRat.exists_real_extension_of_lattice {A V W : Type} [AddCommGroup A] [NormedAddCommGroup V] [NormedSpace ℝ V]
-    [FiniteDimensional ℝ V] [AddCommGroup W] [Module ℝ W] (P : A →+ V) (hi : Function.Injective P)
-    (hd : DiscreteTopology P.range) (hs : Submodule.span ℝ (Set.range P) = ⊤) (Q : A →+ W) :
-    ∃ r : V →ₗ[ℝ] W, ∀ a, r (P a) = Q a := by
+theorem _root_.GlobalTheory.CompRat.exists_real_extension_of_lattice
+    {A V W : Type} [AddCommGroup A] [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    [AddCommGroup W] [Module ℝ W]
+    (P : A →+ V) (hi : Function.Injective P) (hd : DiscreteTopology P.range)
+    (hs : Submodule.span ℝ (Set.range P) = ⊤)
+    (Q : A →+ W)
+    : ∃ r : V →ₗ[ℝ] W, ∀ a, r (P a) = Q a := by
   set L : Submodule ℤ V := P.range.toIntSubmodule with hL
   haveI : DiscreteTopology L := hd
   haveI : IsZLattice ℝ L := ⟨by simpa [hL] using hs⟩
@@ -39,19 +45,35 @@ theorem _root_.GlobalTheory.CompRat.exists_real_extension_of_lattice {A V W : Ty
     rfl
   rw [h, he]
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj in
-theorem _root_.GlobalTheory.CompRat.exists_complex_linear_of_pure_types : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D D' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (P : D.La →+ (Fin g → ℂ)) (P' : D'.La →+ (Fin g → ℂ)) (hP : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsPeriod D ty P) (hP' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsPeriod D' ty P') (Φ : D.La ≃ₗ[𝓞 E] D'.La), _root_.GlobalTheory.CompRat.IsSplit hP → (∀ a ∈ _root_.GlobalTheory.PureType.lat hP H.rt0, Φ a ∈ _root_.GlobalTheory.PureType.lat hP' H.rt0) → (∀ a ∈ _root_.GlobalTheory.PureType.lat hP (-H.rt0), Φ a ∈ _root_.GlobalTheory.PureType.lat hP' (-H.rt0)) → ∃ L : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ), ∀ a, P' (Φ a) = L (P a) := by
+theorem _root_.GlobalTheory.CompRat.exists_complex_linear_of_pure_types
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+        (D D' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (g : ℕ)
+        (ty : Fin g → (E →+* ℂ)) (P : D.La →+ (Fin g → ℂ)) (P' : D'.La →+ (Fin g → ℂ))
+        (hP : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsPeriod D ty P)
+        (hP' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsPeriod D' ty P')
+        (Φ : D.La ≃ₗ[𝓞 E] D'.La),
+      _root_.GlobalTheory.CompRat.IsSplit hP
+        → (∀ a ∈ _root_.GlobalTheory.PureType.lat hP H.rt0,
+          Φ a ∈ _root_.GlobalTheory.PureType.lat hP' H.rt0)
+        → (∀ a ∈ _root_.GlobalTheory.PureType.lat hP (-H.rt0),
+          Φ a ∈ _root_.GlobalTheory.PureType.lat hP' (-H.rt0))
+        → ∃ L : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ), ∀ a, P' (Φ a) = L (P a) := by
   intro E _ _ _ H D D' g ty P P' hP hP' Φ hsplit h₁ h₂
   have hP₀ := hP
   have hP'₀ := hP'
   unfold _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsPeriod at hP₀ hP'₀
   obtain ⟨-, hi, hd, hs, -⟩ := hP₀
   obtain ⟨-, hi', hd', hs', -⟩ := hP'₀
-  obtain ⟨r, hr⟩ := _root_.GlobalTheory.CompRat.exists_real_extension_of_lattice P hi hd hs
-    (P'.comp Φ.toLinearMap.toAddMonoidHom)
-  obtain ⟨r', hr'⟩ := _root_.GlobalTheory.CompRat.exists_real_extension_of_lattice P' hi' hd' hs'
-    (P.comp Φ.symm.toLinearMap.toAddMonoidHom)
+  obtain ⟨r, hr⟩ :=
+    _root_.GlobalTheory.CompRat.exists_real_extension_of_lattice P hi hd hs
+      (P'.comp Φ.toLinearMap.toAddMonoidHom)
+  obtain ⟨r', hr'⟩ :=
+    _root_.GlobalTheory.CompRat.exists_real_extension_of_lattice P' hi' hd' hs'
+      (P.comp Φ.symm.toLinearMap.toAddMonoidHom)
   have hr₁ : ∀ a, r (P a) = P' (Φ a) := hr
   have hr'₁ : ∀ b, r' (P' b) = P (Φ.symm b) := hr'
   have him : H.rt0.im ≠ 0 := by
@@ -61,7 +83,9 @@ theorem _root_.GlobalTheory.CompRat.exists_complex_linear_of_pure_types : ∀ (E
     have h2 : (2 : ℝ) ≤ H.d := by exact_mod_cast H.d_prime.two_le
     simp at hsq
     nlinarith [sq_nonneg H.rt0.re]
-  have hsplit' : _root_.GlobalTheory.PureType.lat hP H.rt0 ⊔ _root_.GlobalTheory.PureType.lat hP (-H.rt0) = ⊤ :=
+  have hsplit'
+      : _root_.GlobalTheory.PureType.lat hP H.rt0 ⊔ _root_.GlobalTheory.PureType.lat hP (-H.rt0)
+        = ⊤ :=
     hsplit
   have hkey : ∀ a, r (H.rt0 • P a) = H.rt0 • r (P a) := by
     intro a
@@ -83,22 +107,23 @@ theorem _root_.GlobalTheory.CompRat.exists_complex_linear_of_pure_types : ∀ (E
     simpa using LinearMap.congr_fun hext v
   have hlin : ∀ (c : ℂ) v, r (c • v) = c • r v := by
     intro c v
-    have hc : c = ((c.re - c.im / H.rt0.im * H.rt0.re : ℝ) : ℂ) +
-        ((c.im / H.rt0.im : ℝ) : ℂ) * H.rt0 := by
+    have hc
+        : c
+          = ((c.re - c.im / H.rt0.im * H.rt0.re : ℝ) : ℂ)
+            + ((c.im / H.rt0.im : ℝ) : ℂ) * H.rt0 := by
       apply Complex.ext <;> simp <;> field_simp <;> ring
-    rw [hc, add_smul, mul_smul, Complex.coe_smul, Complex.coe_smul, map_add (f := _), map_smul, map_smul,
-      hrot, add_smul, mul_smul, Complex.coe_smul, Complex.coe_smul]
+    rw [hc, add_smul, mul_smul, Complex.coe_smul, Complex.coe_smul, map_add (f := _), map_smul,
+      map_smul, hrot, add_smul, mul_smul, Complex.coe_smul, Complex.coe_smul]
   have hl : ∀ v, r' (r v) = v := by
-    have hext : r'.comp r = LinearMap.id :=
-      LinearMap.ext_on_range hs fun a => by simp [hr₁, hr'₁]
+    have hext : r'.comp r = LinearMap.id := LinearMap.ext_on_range hs fun a => by simp [hr₁, hr'₁]
     exact fun v => LinearMap.congr_fun hext v
   have hrr : ∀ w, r (r' w) = w := by
-    have hext : r.comp r' = LinearMap.id :=
-      LinearMap.ext_on_range hs' fun b => by simp [hr₁, hr'₁]
+    have hext : r.comp r' = LinearMap.id := LinearMap.ext_on_range hs' fun b => by simp [hr₁, hr'₁]
     exact fun w => LinearMap.congr_fun hext w
-  let L : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ) :=
-    { toFun := r, map_add' := r.map_add, map_smul' := hlin }
-  exact ⟨LinearEquiv.ofBijective L ⟨Function.LeftInverse.injective (g := r') hl,
-    fun w => ⟨r' w, hrr w⟩⟩, fun a => (hr₁ a).symm⟩
+  let L : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ) := { toFun := r, map_add' := r.map_add, map_smul' := hlin }
+  exact ⟨
+    LinearEquiv.ofBijective L ⟨Function.LeftInverse.injective (g := r') hl, fun w => ⟨r' w, hrr w⟩⟩,
+    fun a => (hr₁ a).symm
+  ⟩
 
 end GlobalTheory.CompRat

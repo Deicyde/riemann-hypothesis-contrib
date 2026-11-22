@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotypicOrtho
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ContDiff
 
 noncomputable section
@@ -34,20 +35,19 @@ theorem re_fixed (B : RowsAut) : ∀ k ∈ B.I.Kg B.g, (B.R (1, k)).comp B.Re = 
   have pm : ∀ a b : B.I.Gf, B.R (1, a * b) = B.R (1, a) * B.R (1, b) := fun a b => by
     have := hm (1, a) (1, b)
     rwa [Prod.mk_mul_mk, mul_one] at this
-  have ir : ∀ (a : B.I.Gf) (x z : B.I.L2 B.μf B.fund), ⟪x, B.R (1, a) z⟫_ℂ = ⟪B.R (1, a⁻¹) x, z⟫_ℂ :=
-    fun a x z => by
-      have hback : B.R (1, a) (B.R (1, a⁻¹) x) = x := by
-        have hident : B.R (1, 1) = 1 := h1
-        have h := congrArg (fun S : B.I.L2 B.μf B.fund →L[ℂ] B.I.L2 B.μf B.fund => S x)
-          (pm a a⁻¹)
-        simpa [hident, mul_apply_eq_comp] using h.symm
-      let U : B.I.L2 B.μf B.fund →ₗᵢ[ℂ] B.I.L2 B.μf B.fund :=
-        ⟨(B.R (1, a)).toLinearMap, hn (1, a)⟩
-      calc
-        ⟪x, B.R (1, a) z⟫_ℂ = ⟪U (B.R (1, a⁻¹) x), U z⟫_ℂ := by
-          change ⟪x, B.R (1, a) z⟫_ℂ = ⟪B.R (1, a) (B.R (1, a⁻¹) x), B.R (1, a) z⟫_ℂ
-          rw [hback]
-        _ = ⟪B.R (1, a⁻¹) x, z⟫_ℂ := U.inner_map_map _ _
+  have ir
+      : ∀ (a : B.I.Gf) (x z : B.I.L2 B.μf B.fund),
+        ⟪x, B.R (1, a) z⟫_ℂ = ⟪B.R (1, a⁻¹) x, z⟫_ℂ := fun a x z => by
+    have hback : B.R (1, a) (B.R (1, a⁻¹) x) = x := by
+      have hident : B.R (1, 1) = 1 := h1
+      have h := congrArg (fun S : B.I.L2 B.μf B.fund →L[ℂ] B.I.L2 B.μf B.fund => S x) (pm a a⁻¹)
+      simpa [hident, mul_apply_eq_comp] using h.symm
+    let U : B.I.L2 B.μf B.fund →ₗᵢ[ℂ] B.I.L2 B.μf B.fund := ⟨(B.R (1, a)).toLinearMap, hn (1, a)⟩
+    calc
+      ⟪x, B.R (1, a) z⟫_ℂ = ⟪U (B.R (1, a⁻¹) x), U z⟫_ℂ := by
+        change ⟪x, B.R (1, a) z⟫_ℂ = ⟪B.R (1, a) (B.R (1, a⁻¹) x), B.R (1, a) z⟫_ℂ
+        rw [hback]
+      _ = ⟪B.R (1, a⁻¹) x, z⟫_ℂ := U.inner_map_map _ _
   have he : ∀ x, B.e (k * x) = B.e x := fun x => by
     have := B.e_adm.2.2.2.2.2.1 x k hk 1 (one_mem_Kg B.I B.g)
     rwa [mul_one] at this

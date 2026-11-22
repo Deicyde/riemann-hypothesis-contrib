@@ -9,21 +9,23 @@ open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.Adelic.StableRangeOne
 
-def elem (R : Type) [CommRing R] (ι : Type) [Fintype ι] [DecidableEq ι] :
-    Submonoid (Matrix ι ι R) :=
-  Submonoid.closure ({T | ∃ i j c, i ≠ j ∧ T = Matrix.transvection i j c} ∪
-    {T | ∃ D : ι → R, (∀ i, IsUnit (D i)) ∧ T = Matrix.diagonal D})
+def elem (R : Type) [CommRing R] (ι : Type) [Fintype ι] [DecidableEq ι]
+    : Submonoid (Matrix ι ι R) :=
+  Submonoid.closure
+    ({T | ∃ i j c, i ≠ j ∧ T = Matrix.transvection i j c}
+      ∪ {T | ∃ D : ι → R, (∀ i, IsUnit (D i)) ∧ T = Matrix.diagonal D})
 
-def rowOp {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
-    (k : ι) (c : ι → R) : Matrix ι ι R :=
+def rowOp {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι] (k : ι) (c : ι → R)
+    : Matrix ι ι R :=
   1 + Matrix.of fun i j => if i = k then c j else 0
 
-def colOp {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
-    (k : ι) (c : ι → R) : Matrix ι ι R :=
+def colOp {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι] (k : ι) (c : ι → R)
+    : Matrix ι ι R :=
   1 + Matrix.of fun i j => if j = k then c i else 0
 
-def Fixed {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
-    (s : Finset ι) (A : Matrix ι ι R) : Prop :=
+def Fixed
+    {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι] (s : Finset ι) (A : Matrix ι ι R)
+    : Prop :=
   ∀ i j, (i ∉ s ∨ j ∉ s) → A i j = (1 : Matrix ι ι R) i j
 
 variable {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
@@ -299,16 +301,16 @@ lemma mem_of_fixed (hR : ∀ a b : R, IsCoprime a b → ∃ t, IsUnit (a + t * b
       exact (isUnit_det_of_mem hm).mul hA
     exact mem_of_mul_left hm (mem_of_unit_pivot ih hdet hwF hk hwu)
 
-theorem matrix_induction :
-    ∀ (R : Type) [CommRing R], (∀ a b : R, IsCoprime a b → ∃ t, IsUnit (a + t * b)) →
-      ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (p : Matrix ι ι R → Prop),
-        (∀ (i j : ι) (c : R), i ≠ j → p (Matrix.transvection i j c)) →
-        (∀ D : ι → R, (∀ i, IsUnit (D i)) → p (Matrix.diagonal D)) →
-        (∀ A B, IsUnit A.det → IsUnit B.det → p A → p B → p (A * B)) →
-        ∀ A : Matrix ι ι R, IsUnit A.det → p A := by
+theorem matrix_induction
+    : ∀ (R : Type) [CommRing R],
+      (∀ a b : R, IsCoprime a b → ∃ t, IsUnit (a + t * b))
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (p : Matrix ι ι R → Prop),
+          (∀ (i j : ι) (c : R), i ≠ j → p (Matrix.transvection i j c))
+            → (∀ D : ι → R, (∀ i, IsUnit (D i)) → p (Matrix.diagonal D))
+            → (∀ A B, IsUnit A.det → IsUnit B.det → p A → p B → p (A * B))
+            → ∀ A : Matrix ι ι R, IsUnit A.det → p A := by
   intro R _ hR ι _ _ p ht hd hm A hA
-  have hmem : A ∈ elem R ι :=
-    mem_of_fixed hR Finset.univ A hA (fun i j h => by simp at h)
+  have hmem : A ∈ elem R ι := mem_of_fixed hR Finset.univ A hA (fun i j h => by simp at h)
   have key : ∀ B ∈ elem R ι, p B := by
     intro B hB
     induction hB using Submonoid.closure_induction with
@@ -319,8 +321,7 @@ theorem matrix_induction :
     | one =>
       have := hd (fun _ => 1) (fun _ => isUnit_one)
       simpa using this
-    | mul x y hx hy px py =>
-      exact hm x y (isUnit_det_of_mem hx) (isUnit_det_of_mem hy) px py
+    | mul x y hx hy px py => exact hm x y (isUnit_det_of_mem hx) (isUnit_det_of_mem hy) px py
   exact key A hmem
 
 end GlobalTheory.CompanionTheory.Adelic.StableRangeOne

@@ -20,9 +20,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CommutatorPa
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 
 noncomputable section
@@ -35,23 +38,44 @@ section GeomAux
 
 variable {S : Scheme.{0}} {A : Over S} [GrpObj A]
 
-theorem liftSq_mul' {T : Over S} (a b a' b' : T ⟶ A) :
-    (lift a b : T ⟶ G2 A) * lift a' b' = lift (a * a') (b * b') := by
+theorem liftSq_mul' {T : Over S} (a b a' b' : T ⟶ A)
+    : (lift a b : T ⟶ G2 A) * lift a' b' = lift (a * a') (b * b') := by
   apply CartesianMonoidalCategory.hom_ext
   · rw [MonObj.mul_comp]; simp
   · rw [MonObj.mul_comp]; simp
 
-theorem liftSq_pow' {T : Over S} (a b : T ⟶ A) (n : ℕ) :
-    (lift a b : T ⟶ G2 A) ^ n = lift (a ^ n) (b ^ n) := by
+theorem liftSq_pow' {T : Over S} (a b : T ⟶ A) (n : ℕ)
+    : (lift a b : T ⟶ G2 A) ^ n = lift (a ^ n) (b ^ n) := by
   apply CartesianMonoidalCategory.hom_ext
   · rw [MonObj.pow_comp]; simp
   · rw [MonObj.pow_comp]; simp
 
 end GeomAux
 
-theorem weilIs_heckeSubA_geom : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (h : ℕ → D.La →+ D.La) (u : ℕ → ℤ) (c k N : ℕ), c.Coprime p → k.Coprime p → 3 ≤ N → N.Coprime p → c ∣ k ^ 2 → (∀ n, 0 < n → n.Coprime p → ∀ (a : D.O) (x : D.La), ∃ z, h n (a • x) = a • h n x + n • z) → (∀ n m, 0 < n → 0 < m → (n * m).Coprime p → (∀ x, ∃ z, h (n * m) x = h n x + n • z) ∧ (n : ℤ) ∣ u (n * m) - u n) → (∀ n, 0 < n → n.Coprime p → IsCoprime (u n) (n : ℤ) ∧ ∀ x y, (n : ℤ) ∣ D.EF (h n x) (h n y) - c * u n * D.EF x y) → (∀ n, 0 < n → n.Coprime p → ∀ x, ∃ y z, h n y = k • x + n • z) → ∀ (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b (N * k) s), ∀ g₁ ∈ GlobalTheory.UPel.HT.HeckeAd.heckeSubA o (h (N * k)) N, ∀ g₂ ∈ GlobalTheory.UPel.HT.HeckeAd.heckeSubA o (h (N * k)) N, ∀ (K : Type) [Field K] [IsAlgClosed K] (x : Sp K ⟶ S) (β : R →+* K), x ≫ s = spMap β → ∀ v : Γ((Over.mk x).left, ⊤)ˣ, Out.WeilIs (G2 o.A) (GlobalTheory.UPel.HT.Hecke.lbPow o.P (k ^ 2 / c)) 1 (toUnit (Over.mk x) ≫ (lift g₁ 1 : 𝟙_ (Over S) ⟶ G2 o.A)) (toUnit (Over.mk x) ≫ (lift 1 g₂ : 𝟙_ (Over S) ⟶ G2 o.A)) v → v = 1 := by
-
-  intro p _ D R _ b h u c k N hc hk hN hNp hck _hlin hcomp hsim _hsurj S s o g₁ hg₁ g₂ hg₂ K _ _ x β hx v hv
+theorem weilIs_heckeSubA_geom
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R)
+        (h : ℕ → D.La →+ D.La) (u : ℕ → ℤ) (c k N : ℕ),
+      c.Coprime p → k.Coprime p → 3 ≤ N → N.Coprime p → c ∣ k ^ 2
+        → (∀ n, 0 < n → n.Coprime p → ∀ (a : D.O) (x : D.La), ∃ z, h n (a • x) = a • h n x + n • z)
+        → (∀ n m,
+          0 < n → 0 < m → (n * m).Coprime p
+            → (∀ x, ∃ z, h (n * m) x = h n x + n • z) ∧ (n : ℤ) ∣ u (n * m) - u n)
+        → (∀ n,
+          0 < n → n.Coprime p
+            → IsCoprime (u n) (n : ℤ) ∧ ∀ x y, (n : ℤ) ∣ D.EF (h n x) (h n y) - c * u n * D.EF x y)
+        → (∀ n, 0 < n → n.Coprime p → ∀ x, ∃ y z, h n y = k • x + n • z)
+        → ∀ (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b (N * k) s),
+          ∀ g₁ ∈ GlobalTheory.UPel.HT.HeckeAd.heckeSubA o (h (N * k)) N,
+            ∀ g₂ ∈ GlobalTheory.UPel.HT.HeckeAd.heckeSubA o (h (N * k)) N,
+              ∀ (K : Type) [Field K] [IsAlgClosed K] (x : Sp K ⟶ S) (β : R →+* K),
+                x ≫ s = spMap β
+                  → ∀ v : Γ((Over.mk x).left, ⊤)ˣ,
+                    Out.WeilIs (G2 o.A) (GlobalTheory.UPel.HT.Hecke.lbPow o.P (k ^ 2 / c)) 1
+                        (toUnit (Over.mk x) ≫ (lift g₁ 1 : 𝟙_ (Over S) ⟶ G2 o.A))
+                        (toUnit (Over.mk x) ≫ (lift 1 g₂ : 𝟙_ (Over S) ⟶ G2 o.A)) v
+                      → v = 1 := by
+  intro p _ D R _ b h u c k N hc hk hN hNp hck _hlin hcomp hsim _hsurj S s o g₁ hg₁ g₂ hg₂ K _ _ x β
+    hx v hv
   have hG : Out.GlobalFnsSt := GlobalTheory.globalFns_holds
   have hA2 : IsAbelianScheme (G2 o.A) := AbelianSchemeGerms.isAbelianScheme_tensor o.A o.A o.ab o.ab
   have hPL : o.P.IsLB := o.isLB
@@ -79,8 +103,7 @@ theorem weilIs_heckeSubA_geom : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : 
   rw [hmove, hmove] at hv
   have hdivE : ((c : ℕ) : ℤ) ∣ D.EF (h (N * k * c) x₁) (h (N * k * c) x₂) := by
     have h1 := (hsim (N * k * c) hn'0 hn'p).2 x₁ x₂
-    have h2 : ((c : ℕ) : ℤ) ∣ ((N * k * c : ℕ) : ℤ) := by
-      exact_mod_cast Dvd.intro_left (N * k) rfl
+    have h2 : ((c : ℕ) : ℤ) ∣ ((N * k * c : ℕ) : ℤ) := by exact_mod_cast Dvd.intro_left (N * k) rfl
     have h3 := h2.trans h1
     have h4 : ((c : ℕ) : ℤ) ∣ (c : ℤ) * u (N * k * c) * D.EF x₁ x₂ :=
       Dvd.dvd.mul_right (Dvd.dvd.mul_right (dvd_refl _) _) _
@@ -96,13 +119,19 @@ theorem weilIs_heckeSubA_geom : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : 
     rcases Nat.eq_zero_or_pos m with h0 | h0
     · rw [h0, zero_mul] at hmc; exact absurd hmc.symm (pow_ne_zero 2 hk0.ne')
     · exact h0
-  obtain ⟨j, hj0, hjp, hjpar⟩ : ∃ j : ℕ, 0 < j ∧ (j * k ^ 2).Coprime p ∧ (Even j ∨ Odd (j * k ^ 2)) := by
+  obtain ⟨j, hj0, hjp, hjpar⟩
+      : ∃ j : ℕ, 0 < j ∧ (j * k ^ 2).Coprime p ∧ (Even j ∨ Odd (j * k ^ 2)) := by
     by_cases h2 : p = 2
     · subst h2
       have hko : Odd k := Nat.coprime_two_right.1 hk
-      exact ⟨1, one_pos, by rw [_root_.one_mul]; exact Nat.Coprime.pow_left 2 hk,
-        Or.inr (by rw [_root_.one_mul]; exact hko.pow)⟩
-    · refine ⟨2, two_pos, Nat.coprime_mul_iff_left.2 ⟨?_, Nat.Coprime.pow_left 2 hk⟩, Or.inl even_two⟩
+      exact ⟨
+        1,
+        one_pos,
+        by rw [_root_.one_mul]; exact Nat.Coprime.pow_left 2 hk,
+        Or.inr (by rw [_root_.one_mul]; exact hko.pow)
+      ⟩
+    · refine
+        ⟨2, two_pos, Nat.coprime_mul_iff_left.2 ⟨?_, Nat.Coprime.pow_left 2 hk⟩, Or.inl even_two⟩
       exact (Nat.coprime_primes Nat.prime_two hpp).2 (Ne.symm h2)
   obtain ⟨n₀, hn₀⟩ : ∃ n₀, n₀ = j * k ^ 2 := ⟨_, rfl⟩
   rw [← hn₀] at hjp hjpar
@@ -123,31 +152,42 @@ theorem weilIs_heckeSubA_geom : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : 
     rw [hI, evs, t1, ← t2, e]
   obtain ⟨w, hw⟩ : ∃ w, w = I.ev n₀ (f x₁) := ⟨_, rfl⟩
   obtain ⟨y, hy⟩ : ∃ y, y = I.ev n₀ (f x₂) := ⟨_, rfl⟩
-  have ha : toUnit (Over.mk x) ≫ (lift (o.eta (N • f x₁)) 1 : 𝟙_ (Over S) ⟶ G2 o.A) =
-      lift (w ^ (j * k)) (1 ^ (j * k)) := by
+  have ha
+      : toUnit (Over.mk x) ≫ (lift (o.eta (N • f x₁)) 1 : 𝟙_ (Over S) ⟶ G2 o.A)
+        = lift (w ^ (j * k)) (1 ^ (j * k)) := by
     rw [comp_lift, hdown, ← hw, one_pow, MonObj.comp_one]
-  have hb : toUnit (Over.mk x) ≫ (lift 1 (o.eta (N • f x₂)) : 𝟙_ (Over S) ⟶ G2 o.A) =
-      lift (1 ^ (j * k)) (y ^ (j * k)) := by
+  have hb
+      : toUnit (Over.mk x) ≫ (lift 1 (o.eta (N • f x₂)) : 𝟙_ (Over S) ⟶ G2 o.A)
+        = lift (1 ^ (j * k)) (y ^ (j * k)) := by
     rw [comp_lift, hdown, ← hy, one_pow, MonObj.comp_one]
   rw [ha, hb] at hv
-  have e1 := GlobalTheory.T.commutatorPairing_pullback_powerMap_level S o.A (o.P.pull (lift (𝟙 o.A) (𝟙 o.A)).left) o.P o.ab (pull_isLB hPL _) o.ample hPL
-    o.rig₁ o.rig₂ m (j * k) (j * k) 1 (Over.mk x) w 1 1 y v hv
+  have e1 :=
+    GlobalTheory.T.commutatorPairing_pullback_powerMap_level S o.A
+      (o.P.pull (lift (𝟙 o.A) (𝟙 o.A)).left) o.P o.ab (pull_isLB hPL _) o.ample hPL o.rig₁ o.rig₂ m
+      (j * k) (j * k) 1 (Over.mk x) w 1 1 y v hv
   have hwn : w ^ n₀ = 1 := (I.onto n₀ hn0 hjp w).2 ⟨f x₁, hw.symm⟩
   have hyn : y ^ n₀ = 1 := (I.onto n₀ hn0 hjp y).2 ⟨f x₂, hy.symm⟩
   have hK : ((n₀ : ℕ) : K) ≠ 0 := by
     have := (b.unit n₀ hjp).map β
     rw [map_natCast] at this
     exact this.ne_zero
-  have tor : ∀ a a' : Over.mk x ⟶ o.A, a ^ n₀ = 1 → a' ^ n₀ = 1 →
-      (lift a a' : Over.mk x ⟶ G2 o.A) ^ n₀ = 1 := fun a a' h1 h1' => by
+  have tor
+      : ∀ a a' : Over.mk x ⟶ o.A,
+        a ^ n₀ = 1 → a' ^ n₀ = 1
+          → (lift a a' : Over.mk x ⟶ G2 o.A) ^ n₀ = 1 := fun a a' h1 h1' => by
     rw [liftSq_pow', h1, h1']
     apply CartesianMonoidalCategory.hom_ext <;> simp
   have one_n : (1 : Over.mk x ⟶ o.A) ^ n₀ = 1 := one_pow _
-  have ex : ∀ X Y : Over.mk x ⟶ G2 o.A, X ^ n₀ = 1 → Y ^ n₀ = 1 →
-      ∃ e : Γ((Over.mk x).left, ⊤)ˣ, Out.WeilIs (G2 o.A) o.P (n₀ : ℤ) X Y e := fun X Y hX hY =>
+  have ex
+      : ∀ X Y : Over.mk x ⟶ G2 o.A,
+        X ^ n₀ = 1 → Y ^ n₀ = 1
+          → ∃ e : Γ((Over.mk x).left, ⊤)ˣ,
+            Out.WeilIs (G2 o.A) o.P (n₀ : ℤ) X Y e := fun X Y hX hY =>
     GlobalTheory.WeilGeomPt.exists_weilIs_geomPt S (G2 o.A) o.P hA2 hPL K x n₀ hn0 hK X Y hX hY
   obtain ⟨F, hF⟩ := ex _ _ (tor w 1 hwn one_n) (tor 1 y one_n hyn)
-  have hFp : ∀ r : ℕ, Out.WeilIs (G2 o.A) o.P (n₀ : ℤ) (lift (w ^ (r + 1)) 1) (lift 1 y) (F ^ (r + 1)) := by
+  have hFp
+      : ∀ r : ℕ,
+        Out.WeilIs (G2 o.A) o.P (n₀ : ℤ) (lift (w ^ (r + 1)) 1) (lift 1 y) (F ^ (r + 1)) := by
     intro r
     induction r with
     | zero => simpa using hF
@@ -158,20 +198,27 @@ theorem weilIs_heckeSubA_geom : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : 
   have hFjm : Out.WeilIs (G2 o.A) o.P (n₀ : ℤ) (lift (w ^ (j * m)) 1) (lift 1 y) (F ^ (j * m)) := by
     rw [hjm]; exact hFp _
   have hl1 : (GlobalTheory.UPel.HT.Hecke.lbPow o.P 1).IsLB := LB.isLB_linComb hPL _ _
-  have iso1 : LBIso (GlobalTheory.UPel.HT.Hecke.lbPow o.P 1) (o.P.pull (Over.Hom.left (𝟙 (G2 o.A)))) := by
-    have c1 := GlobalTheory.CechPic.cls_linComb hPL (fun _ : Fin 1 => 𝟙 (G2 o.A).left) (fun _ => (1 : ℤ)) hl1
+  have iso1
+      : LBIso (GlobalTheory.UPel.HT.Hecke.lbPow o.P 1) (o.P.pull (Over.Hom.left (𝟙 (G2 o.A)))) := by
+    have c1 :=
+      GlobalTheory.CechPic.cls_linComb hPL (fun _ : Fin 1 => 𝟙 (G2 o.A).left) (fun _ => (1 : ℤ)) hl1
     have c2 := GlobalTheory.CechPic.cls_pull hPL (Over.Hom.left (𝟙 (G2 o.A))) (pull_isLB hPL _)
-    refine (GlobalTheory.CechPic.cls_eq_iff hl1 (pull_isLB hPL _)).1 (c1.trans (Eq.trans ?_ c2.symm))
+    refine (GlobalTheory.CechPic.cls_eq_iff hl1 (pull_isLB hPL _)).1
+      (c1.trans (Eq.trans ?_ c2.symm))
     simp
-  have e2' : Out.WeilIs (G2 o.A) (GlobalTheory.UPel.HT.Hecke.lbPow o.P 1) (n₀ : ℤ) (lift (w ^ (j * m)) (1 ^ 1))
-      (lift (1 ^ (j * m)) (y ^ 1)) (F ^ (j * m)) := by
+  have e2' : Out.WeilIs (G2 o.A) (GlobalTheory.UPel.HT.Hecke.lbPow o.P 1) (n₀ : ℤ)
+      (lift (w ^ (j * m)) (1 ^ 1)) (lift (1 ^ (j * m)) (y ^ 1)) (F ^ (j * m)) := by
     rw [one_pow, one_pow, pow_one]
     exact GlobalTheory.PELFamily.weilIs_of_lbIso hG hA2 hl1 hPL iso1 hFjm
-  have e2 := GlobalTheory.T.commutatorPairing_pullback_powerMap_level S o.A (o.P.pull (lift (𝟙 o.A) (𝟙 o.A)).left) o.P o.ab (pull_isLB hPL _) o.ample hPL
-    o.rig₁ o.rig₂ 1 (j * m) 1 (n₀ : ℤ) (Over.mk x) w 1 1 y _ e2'
-  have hlev : (1 : ℤ) * ((m * (j * k) * (j * k) : ℕ) : ℤ) = (n₀ : ℤ) * ((1 * (j * m) * 1 : ℕ) : ℤ) := by
+  have e2 :=
+    GlobalTheory.T.commutatorPairing_pullback_powerMap_level S o.A
+      (o.P.pull (lift (𝟙 o.A) (𝟙 o.A)).left) o.P o.ab (pull_isLB hPL _) o.ample hPL o.rig₁ o.rig₂ 1
+      (j * m) 1 (n₀ : ℤ) (Over.mk x) w 1 1 y _ e2'
+  have hlev
+      : (1 : ℤ) * ((m * (j * k) * (j * k) : ℕ) : ℤ) = (n₀ : ℤ) * ((1 * (j * m) * 1 : ℕ) : ℤ) := by
     rw [hn₀]; push_cast; ring
-  have hv' : v = F ^ (j * m) := GlobalTheory.CommutatorPairing.weilIs_unique hG hA2 hPL e1 (hlev ▸ e2)
+  have hv' : v = F ^ (j * m) :=
+    GlobalTheory.CommutatorPairing.weilIs_unique hG hA2 hPL e1 (hlev ▸ e2)
   have hgeo := I.isom n₀ hn0 hjp (f x₁) (f x₂)
   rw [← hw, ← hy] at hgeo
   obtain ⟨c11, h11⟩ := ex (lift w 1) (lift y 1) (tor w 1 hwn one_n) (tor y 1 hyn one_n)
@@ -180,22 +227,31 @@ theorem weilIs_heckeSubA_geom : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : 
   have hA := GlobalTheory.SiegelTypings.weilIs_mul hA2 hPL h11 h21
   have hB := GlobalTheory.SiegelTypings.weilIs_mul hA2 hPL hF h22
   rw [liftSq_mul', _root_.mul_one, _root_.one_mul] at hA hB
-  have hs := GlobalTheory.CommPairing.weilIs_symm hPL (GlobalTheory.SiegelTypings.weilIs_mul hA2 hPL
-    (GlobalTheory.CommPairing.weilIs_symm hPL hA) (GlobalTheory.CommPairing.weilIs_symm hPL hB))
+  have hs :=
+    GlobalTheory.CommPairing.weilIs_symm hPL
+      (GlobalTheory.SiegelTypings.weilIs_mul hA2 hPL (GlobalTheory.CommPairing.weilIs_symm hPL hA)
+        (GlobalTheory.CommPairing.weilIs_symm hPL hB))
   rw [liftSq_mul', _root_.mul_one, _root_.one_mul] at hs
-  have hd := GlobalTheory.T.weilPairing_diagonal_pullback_eq S o.A o.P o.ab hPL _ (Over.mk x) w y _ _ hs hgeo
-  have e11 := (GlobalTheory.T.weilPairing_birigidified_trivial_on_axes S o.A o.P o.ab hPL o.rig₁ o.rig₂ _ (Over.mk x) w y c11).1 h11
-  have e22 := (GlobalTheory.T.weilPairing_birigidified_trivial_on_axes S o.A o.P o.ab hPL o.rig₁ o.rig₂ _ (Over.mk x) w y c22).2 h22
-  have e21 := GlobalTheory.T.commutatorPairing_swap_eq_of_swap_invariant S o.A o.P o.ab hPL o.symm _ (Over.mk x) w y c21 F h21 hF
+  have hd :=
+    GlobalTheory.T.weilPairing_diagonal_pullback_eq S o.A o.P o.ab hPL _ (Over.mk x) w y _ _ hs hgeo
+  have e11 :=
+    (GlobalTheory.T.weilPairing_birigidified_trivial_on_axes S o.A o.P o.ab hPL o.rig₁ o.rig₂ _
+      (Over.mk x) w y c11).1 h11
+  have e22 :=
+    (GlobalTheory.T.weilPairing_birigidified_trivial_on_axes S o.A o.P o.ab hPL o.rig₁ o.rig₂ _
+      (Over.mk x) w y c22).2 h22
+  have e21 :=
+    GlobalTheory.T.commutatorPairing_swap_eq_of_swap_invariant S o.A o.P o.ab hPL o.symm _
+      (Over.mk x) w y c21 F h21 hF
   rw [e11, e22, e21] at hd
-  have hF2 : F ^ 2 = unitOn (I.ζ n₀ ^ (2 * ((c : ℤ) * e'))) := by
-    rw [← he', ← hd]; group
+  have hF2 : F ^ 2 = unitOn (I.ζ n₀ ^ (2 * ((c : ℤ) * e'))) := by rw [← he', ← hd]; group
   have hζ : I.ζ n₀ ^ n₀ = 1 := (I.ζ_prim n₀ hn0 hjp).pow_eq_one
   have hz : ∀ z : ℤ, I.ζ n₀ ^ ((n₀ : ℤ) * z) = 1 := fun z => by
     rw [zpow_mul, zpow_natCast, hζ, one_zpow]
   have hmcZ : (m : ℤ) * c = (k : ℤ) ^ 2 := by exact_mod_cast hmc
   have hnZ : (n₀ : ℤ) = j * (k : ℤ) ^ 2 := by rw [hn₀]; push_cast; ring
-  have uPow : ∀ (a : Kˣ) (n : ℕ), unitOn (a ^ n) = unitOn a ^ n := fun a n => map_pow (Units.map _) a n
+  have uPow : ∀ (a : Kˣ) (n : ℕ), unitOn (a ^ n) = unitOn a ^ n := fun a n =>
+    map_pow (Units.map _) a n
   have uOne : unitOn (1 : Kˣ) = 1 := map_one (Units.map _)
   have hpw : ∀ t : ℕ, F ^ (2 * t) = unitOn (I.ζ n₀ ^ (2 * ((c : ℤ) * e') * (t : ℤ))) := fun t => by
     rw [pow_mul, hF2, ← uPow, ← zpow_natCast, ← zpow_mul]
@@ -210,7 +266,8 @@ theorem weilIs_heckeSubA_geom : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : 
       have ex' : 2 * ((c : ℤ) * e') * ((j * m : ℕ) : ℤ) = (n₀ : ℤ) * (2 * e') := by
         rw [hnZ, ← hmcZ]; push_cast; ring
       rw [ex', hz, uOne]
-    have hFn : F ^ n₀ = 1 := GlobalTheory.SiegelTypings.weil_pow_eq_one hA2 hPL (tor w 1 hwn one_n) hF
+    have hFn : F ^ n₀ = 1 :=
+      GlobalTheory.SiegelTypings.weil_pow_eq_one hA2 hPL (tor w 1 hwn one_n) hF
     have hn : v ^ n₀ = 1 := by rw [hv', ← pow_mul, Nat.mul_comm, pow_mul, hFn, one_pow]
     have hgcd := pow_gcd_eq_one.2 ⟨h2, hn⟩
     rwa [Nat.Coprime.gcd_eq_one (Nat.coprime_two_left.2 hodd), pow_one] at hgcd

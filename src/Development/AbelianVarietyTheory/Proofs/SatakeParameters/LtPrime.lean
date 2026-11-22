@@ -10,8 +10,9 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.InertPrimeLarge
 
-theorem lt_prime : ∀ {D : D7} (L : SizeData₂ D) (l : ℕ), l.Prime → l ≠ 2 →
-    jacobiSym (-(D.host.d : ℤ)) l ≠ 1 → L.sc.x ^ (L.sc.ez / 5) < l := by
+theorem lt_prime
+    : ∀ {D : D7} (L : SizeData₂ D) (l : ℕ),
+      l.Prime → l ≠ 2 → jacobiSym (-(D.host.d : ℤ)) l ≠ 1 → L.sc.x ^ (L.sc.ez / 5) < l := by
   intro D L l hl h2 hj
   by_contra hlt
   push_neg at hlt

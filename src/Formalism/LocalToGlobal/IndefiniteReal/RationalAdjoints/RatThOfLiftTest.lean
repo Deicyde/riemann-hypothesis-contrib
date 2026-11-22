@@ -12,10 +12,12 @@ noncomputable section
 
 namespace Formalism.IndefR.Rat
 
-open Formalism.DivisionValues Formalism.L2.Indef Formalism.L2.DIV Formalism.IndefR.Cx Formalism.IndefR.Cx.CxData
+open Formalism.DivisionValues Formalism.L2.Indef Formalism.L2.DIV Formalism.IndefR.Cx
+  Formalism.IndefR.Cx.CxData
 
-theorem lin_injective {E : Type} [AddCommGroup E] [Module ℂ E] {n : ℕ} (v : Fin n → E) (hv : LinearIndependent ℂ v) :
-    Function.Injective (lin v) := by
+theorem lin_injective
+    {E : Type} [AddCommGroup E] [Module ℂ E] {n : ℕ} (v : Fin n → E) (hv : LinearIndependent ℂ v)
+    : Function.Injective (lin v) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro x hx
   have h := Fintype.linearIndependent_iff.mp hv x
@@ -42,9 +44,12 @@ theorem ratThOfLiftTest : RatThOfLiftTest := by
     exact hinjW.comp (lin_injective _ (hKF j Bs.v0).1)
   have hmem : X.tC cr b j t (Pi.single k 1) ∈ LinearMap.range (X.w0C b j) := by
     rw [← (hH5 j t).2]; exact LinearMap.mem_range_self _ _
-  have key := coord_rat Bs.v0.embedding ψ hψ (X.w0C b j) hinj (fun i l => hbase i l)
-    (solve (X.w0C b j) (X.tC cr b j t (Pi.single k 1)))
-    (fun i' => by rw [solve_spec _ _ hmem, CxData.tC, lin_single]; exact hr _ _ _) i
+  have key :=
+    coord_rat Bs.v0.embedding ψ hψ (X.w0C b j) hinj
+      (fun i l => hbase i l)
+      (solve (X.w0C b j) (X.tC cr b j t (Pi.single k 1)))
+      (fun i' => by rw [solve_spec _ _ hmem, CxData.tC, lin_single]; exact hr _ _ _)
+      i
   obtain ⟨a, ha⟩ := key
   exact ⟨a, by simpa [CxData.liftMatC, relMat] using ha⟩
 

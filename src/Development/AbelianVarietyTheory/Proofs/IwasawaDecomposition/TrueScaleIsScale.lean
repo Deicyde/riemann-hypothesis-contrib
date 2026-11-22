@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CdScaleIs
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.Mem.Vol
+open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain
+  NumberField Matrix GlobalTheory.Mem.Vol
 open scoped TensorProduct
 
 namespace GlobalTheory.Mem.Vol.ScaleExists

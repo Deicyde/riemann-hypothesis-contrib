@@ -9,16 +9,21 @@ open Module NumberField GlobalTheory.CompanionTheory.Ar.HT
 
 namespace PositivityTheory.HtPt.Gf
 
-theorem minor_mul_upper {B : Type} [CommRing B] {N i : ℕ} (hi : i ≤ N) (g U : Matrix (Fin N) (Fin N) B)
-    (J : Fin i → Fin N) (hU : ∀ a b, b < a → U a b = 0) :
-    ((g * U).submatrix J (Fin.castLE hi)).det =
-      (g.submatrix J (Fin.castLE hi)).det * ∏ l : Fin i, U (Fin.castLE hi l) (Fin.castLE hi l) := by
-  have h : (g * U).submatrix J (Fin.castLE hi) =
-      g.submatrix J (Fin.castLE hi) * U.submatrix (Fin.castLE hi) (Fin.castLE hi) := by
+theorem minor_mul_upper
+    {B : Type} [CommRing B]
+    {N i : ℕ} (hi : i ≤ N) (g U : Matrix (Fin N) (Fin N) B) (J : Fin i → Fin N)
+    (hU : ∀ a b, b < a → U a b = 0)
+    : ((g * U).submatrix J (Fin.castLE hi)).det
+      = (g.submatrix J (Fin.castLE hi)).det
+        * ∏ l : Fin i, U (Fin.castLE hi l) (Fin.castLE hi l) := by
+  have h
+      : (g * U).submatrix J (Fin.castLE hi)
+        = g.submatrix J (Fin.castLE hi) * U.submatrix (Fin.castLE hi) (Fin.castLE hi) := by
     ext a b
     simp only [Matrix.submatrix_apply, Matrix.mul_apply]
     symm
-    rw [← Finset.sum_subset (Finset.subset_univ ((Finset.univ : Finset (Fin i)).map (Fin.castLEEmb hi))) ?_,
+    rw [← Finset.sum_subset
+        (Finset.subset_univ ((Finset.univ : Finset (Fin i)).map (Fin.castLEEmb hi))) ?_,
       Finset.sum_map]
     · rfl
     · intro k _ hk
@@ -39,11 +44,13 @@ theorem minor_mul_upper {B : Type} [CommRing B] {N i : ℕ} (hi : i ≤ N) (g U 
   rw [h, Matrix.det_mul, Matrix.det_of_upperTriangular hT]
   rfl
 
-private theorem cb_lemma {B : Type} [CommRing B] {i N : ℕ} (A : Matrix (Fin i) (Fin N) B)
-    (C : Matrix (Fin N) (Fin i) B) :
-    (A * C).det = ∑ p : Fin i → Fin N, (∏ a, A a (p a)) * (C.submatrix p id).det := by
-  have key : ∀ p : Fin i → Fin N, (C.submatrix p id).det =
-      ∑ σ : Equiv.Perm (Fin i), Equiv.Perm.sign σ • ∏ a, C (p a) (σ a) := by
+private theorem cb_lemma
+    {B : Type} [CommRing B] {i N : ℕ} (A : Matrix (Fin i) (Fin N) B) (C : Matrix (Fin N) (Fin i) B)
+    : (A * C).det = ∑ p : Fin i → Fin N, (∏ a, A a (p a)) * (C.submatrix p id).det := by
+  have key
+      : ∀ p : Fin i → Fin N,
+        (C.submatrix p id).det
+          = ∑ σ : Equiv.Perm (Fin i), Equiv.Perm.sign σ • ∏ a, C (p a) (σ a) := by
     intro p
     rw [← Matrix.det_transpose, Matrix.det_apply]
     rfl
@@ -55,9 +62,10 @@ private theorem cb_lemma {B : Type} [CommRing B] {i N : ℕ} (A : Matrix (Fin i)
   refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun σ _ => ?_
   rw [Finset.prod_mul_distrib, mul_smul_comm]
 
-private theorem matAct_of_span_residue_spans {B : Type} [CommRing B] {N i : ℕ} (hi : i ≤ N) (g : Matrix (Fin N) (Fin N) B)
-    (hg : IsUnit g.det) :
-    Ideal.span (Set.range fun J : Fin i → Fin N => (g.submatrix J (Fin.castLE hi)).det) = ⊤ := by
+private theorem matAct_of_span_residue_spans
+    {B : Type} [CommRing B]
+    {N i : ℕ} (hi : i ≤ N) (g : Matrix (Fin N) (Fin N) B) (hg : IsUnit g.det)
+    : Ideal.span (Set.range fun J : Fin i → Fin N => (g.submatrix J (Fin.castLE hi)).det) = ⊤ := by
   rw [Ideal.eq_top_iff_one]
   have h1 : g⁻¹.submatrix (Fin.castLE hi) id * g.submatrix id (Fin.castLE hi) = 1 := by
     rw [← Matrix.submatrix_mul _ _ _ _ _ Function.bijective_id, Matrix.nonsing_inv_mul g hg]
@@ -67,13 +75,25 @@ private theorem matAct_of_span_residue_spans {B : Type} [CommRing B] {N i : ℕ}
   rw [h2]
   exact Ideal.sum_mem _ fun p _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨p, rfl⟩)
 
-theorem lead_minor : ∀ (B : Type) [CommRing B] (N i : ℕ) (hi : i ≤ N), (∀ (g U : Matrix (Fin N) (Fin N) B) (J : Fin i → Fin N), (∀ a b, b < a → U a b = 0) → ((g * U).submatrix J (Fin.castLE hi)).det = (g.submatrix J (Fin.castLE hi)).det * ∏ l : Fin i, U (Fin.castLE hi l) (Fin.castLE hi l)) ∧ ∀ g : Matrix (Fin N) (Fin N) B, IsUnit g.det → Ideal.span (Set.range fun J : Fin i → Fin N => (g.submatrix J (Fin.castLE hi)).det) = ⊤ := by
+theorem lead_minor
+    : ∀ (B : Type) [CommRing B] (N i : ℕ) (hi : i ≤ N),
+      (∀ (g U : Matrix (Fin N) (Fin N) B) (J : Fin i → Fin N),
+          (∀ a b, b < a → U a b = 0)
+            → ((g * U).submatrix J (Fin.castLE hi)).det
+              = (g.submatrix J (Fin.castLE hi)).det
+                * ∏ l : Fin i, U (Fin.castLE hi l) (Fin.castLE hi l))
+        ∧ ∀ g : Matrix (Fin N) (Fin N) B,
+          IsUnit g.det
+            → Ideal.span (Set.range fun J : Fin i → Fin N => (g.submatrix J (Fin.castLE hi)).det)
+              = ⊤ := by
   intro B _ N i hi
-  exact ⟨fun g U J hU => minor_mul_upper hi g U J hU, fun g hg => matAct_of_span_residue_spans hi g hg⟩
+  exact
+    ⟨fun g U J hU => minor_mul_upper hi g U J hU, fun g hg => matAct_of_span_residue_spans hi g hg⟩
 
-theorem abel_nat (lam x : ℕ → ℝ) (n : ℕ) (hl : ∀ i, i + 1 ≤ n → lam (i + 1) ≤ lam i)
-    (hx : ∀ i, i ≤ n → 0 ≤ ∑ l ∈ Finset.range i, x l) :
-    lam n * ∑ l ∈ Finset.range (n + 1), x l ≤ ∑ l ∈ Finset.range (n + 1), lam l * x l := by
+theorem abel_nat
+    (lam x : ℕ → ℝ) (n : ℕ)
+    (hl : ∀ i, i + 1 ≤ n → lam (i + 1) ≤ lam i) (hx : ∀ i, i ≤ n → 0 ≤ ∑ l ∈ Finset.range i, x l)
+    : lam n * ∑ l ∈ Finset.range (n + 1), x l ≤ ∑ l ∈ Finset.range (n + 1), lam l * x l := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -83,7 +103,12 @@ theorem abel_nat (lam x : ℕ → ℝ) (n : ℕ) (hl : ∀ i, i + 1 ≤ n → la
     rw [Finset.sum_range_succ x (n + 1), Finset.sum_range_succ (fun l => lam l * x l) (n + 1)]
     nlinarith [mul_nonneg (sub_nonneg.2 hln) hs]
 
-theorem abel_sum : ∀ (N : ℕ) (lam x : Fin N → ℝ), (∀ i j, i ≤ j → lam j ≤ lam i) → (∀ i : ℕ, i ≤ N → 0 ≤ ∑ l ∈ Finset.univ.filter (fun l : Fin N => (l : ℕ) < i), x l) → ∑ l, x l = 0 → 0 ≤ ∑ l, lam l * x l := by
+theorem abel_sum
+    : ∀ (N : ℕ) (lam x : Fin N → ℝ),
+      (∀ i j, i ≤ j → lam j ≤ lam i)
+        → (∀ i : ℕ, i ≤ N → 0 ≤ ∑ l ∈ Finset.univ.filter (fun l : Fin N => (l : ℕ) < i), x l)
+        → ∑ l, x l = 0
+        → 0 ≤ ∑ l, lam l * x l := by
   intro N lam x hl hx hsum
   cases N with
   | zero => simp
@@ -92,11 +117,15 @@ theorem abel_sum : ∀ (N : ℕ) (lam x : Fin N → ℝ), (∀ i j, i ≤ j → 
       ⟨fun k => if h : k < n + 1 then x ⟨k, h⟩ else 0, fun l => by simp [l.isLt]⟩
     obtain ⟨lam', hlam'⟩ : ∃ f : ℕ → ℝ, ∀ l : Fin (n + 1), f l = lam l :=
       ⟨fun k => if h : k < n + 1 then lam ⟨k, h⟩ else 0, fun l => by simp [l.isLt]⟩
-    have hsx : ∀ i, i ≤ n + 1 → ∑ l ∈ Finset.range i, x' l =
-        ∑ l ∈ Finset.univ.filter (fun l : Fin (n + 1) => (l : ℕ) < i), x l := by
+    have hsx
+        : ∀ i,
+          i ≤ n + 1
+            → ∑ l ∈ Finset.range i, x' l
+              = ∑ l ∈ Finset.univ.filter (fun l : Fin (n + 1) => (l : ℕ) < i), x l := by
       intro i hi
-      have e : ∀ l : Fin (n + 1), (if (l : ℕ) < i then x l else 0) =
-          (fun k => if k < i then x' k else 0) (l : ℕ) := by
+      have e
+          : ∀ l : Fin (n + 1),
+            (if (l : ℕ) < i then x l else 0) = (fun k => if k < i then x' k else 0) (l : ℕ) := by
         intro l
         simp only [hx']
       rw [Finset.sum_filter, Finset.sum_congr rfl (fun l _ => e l),

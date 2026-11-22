@@ -6,23 +6,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open scoped TensorProduct ComplexOrder
 
-theorem UpperTheory.V.Lit.Bor.oneReal :
-    UpperTheory.V.Lit.Bor.OneReal := by
+theorem UpperTheory.V.Lit.Bor.oneReal : UpperTheory.V.Lit.Bor.OneReal := by
   intro E _ _ _ a Ξ
   obtain ⟨hL, hS⟩ := xiSchur E a Ξ
   obtain ⟨G, hG, hadj⟩ := admEx E a Ξ
   have h1 : oneL E a = toL (1 : Matrix (Fin a) (Fin a) (Cinf E)) := rfl
-  obtain ⟨c, hc⟩ := hS (Ξ.dmat (oneL E a)) fun X => by
-    have h := hL 1 (Matrix.of X)
-    rw [one_mul, mul_one, sub_self] at h
-    have h0 : toL (0 : Matrix (Fin a) (Fin a) (Cinf E)) = 0 := rfl
-    rw [h0, map_zero, sub_eq_zero] at h
-    exact h
+  obtain ⟨c, hc⟩ :=
+    hS (Ξ.dmat (oneL E a)) fun X => by
+      have h := hL 1 (Matrix.of X)
+      rw [one_mul, mul_one, sub_self] at h
+      have h0 : toL (0 : Matrix (Fin a) (Fin a) (Cinf E)) = 0 := rfl
+      rw [h0, map_zero, sub_eq_zero] at h
+      exact h
   have h := hadj 1
-  rw [star_one, ← h1, hc, conjTranspose_smul, conjTranspose_one, smul_mul_assoc, one_mul, mul_smul_comm, mul_one] at h
+  rw [star_one, ← h1, hc, conjTranspose_smul, conjTranspose_one, smul_mul_assoc, one_mul,
+      mul_smul_comm, mul_one]
+    at h
   refine ⟨c.re, ?_⟩
   unfold HasOne
   rw [hc]

@@ -7,13 +7,16 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.DefU Formalism.BasicNotions Formalism.ConjugateSelfDual GlobalTheory.Cong
+open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU Formalism.BasicNotions Formalism.ConjugateSelfDual GlobalTheory.Cong
 
 namespace GlobalTheory
 
-theorem orbit_finite_mem_finite_ext : ∀ (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (J : Type) (z : J → ℂ),
-    (Set.range fun σ : ℂ ≃+* ℂ => fun j => σ (z j)).Finite →
-      ∃ L : IntermediateField ℚ_[l] (Qbar l), FiniteDimensional ℚ_[l] L ∧ ∀ j, ι.symm (z j) ∈ L := by
+theorem orbit_finite_mem_finite_ext
+    : ∀ (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (J : Type) (z : J → ℂ),
+      (Set.range fun σ : ℂ ≃+* ℂ => fun j => σ (z j)).Finite
+        → ∃ L : IntermediateField ℚ_[l] (Qbar l),
+          FiniteDimensional ℚ_[l] L ∧ ∀ j, ι.symm (z j) ∈ L := by
   intro l _ ι J z hfin
   classical
   set O := Set.range fun σ : ℂ ≃+* ℂ => fun j => σ (z j) with hO
@@ -28,17 +31,21 @@ theorem orbit_finite_mem_finite_ext : ∀ (l : ℕ) [Fact l.Prime] (ι : Qbar l 
     intro s
     haveI := hKfin s
     rw [← AlgHom.card ℚ_[l] (K s) (Qbar l), ← Nat.card_eq_fintype_card]
-    let g : (K s →ₐ[ℚ_[l]] Qbar l) → O := fun φ =>
-      ⟨fun j => ι (φ.liftNormal (Qbar l) (w j)),
-        ι.symm.trans ((AlgEquiv.ofBijective (φ.liftNormal (Qbar l))
-          (Algebra.IsAlgebraic.algHom_bijective _)).toRingEquiv.trans ι), rfl⟩
+    let g : (K s →ₐ[ℚ_[l]] Qbar l) → O := fun φ => ⟨
+      fun j => ι (φ.liftNormal (Qbar l) (w j)),
+      ι.symm.trans ((AlgEquiv.ofBijective (φ.liftNormal (Qbar l))
+        (Algebra.IsAlgebraic.algHom_bijective _)).toRingEquiv.trans ι),
+      rfl
+    ⟩
     apply Nat.card_le_card_of_injective g
     intro φ ψ h
     apply IntermediateField.adjoin_algHom_ext
     rintro x ⟨j, hj, rfl⟩
     have h1 := ι.injective (congrFun (congrArg Subtype.val h) j)
-    have e1 := AlgHom.liftNormal_commutes φ (Qbar l) ⟨w j, IntermediateField.subset_adjoin _ _ ⟨j, hj, rfl⟩⟩
-    have e2 := AlgHom.liftNormal_commutes ψ (Qbar l) ⟨w j, IntermediateField.subset_adjoin _ _ ⟨j, hj, rfl⟩⟩
+    have e1 :=
+      AlgHom.liftNormal_commutes φ (Qbar l) ⟨w j, IntermediateField.subset_adjoin _ _ ⟨j, hj, rfl⟩⟩
+    have e2 :=
+      AlgHom.liftNormal_commutes ψ (Qbar l) ⟨w j, IntermediateField.subset_adjoin _ _ ⟨j, hj, rfl⟩⟩
     simp only [Algebra.algebraMap_self, RingHom.id_apply] at e1 e2
     exact e1.symm.trans (h1.trans e2)
   set R := Set.range fun s : Finset J => Module.finrank ℚ_[l] (K s) with hR

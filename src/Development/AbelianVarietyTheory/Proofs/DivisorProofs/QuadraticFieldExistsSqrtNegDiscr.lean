@@ -6,13 +6,18 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.LatVal GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport
+open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.LatVal
+  GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport
 open GlobalTheory.ToricTransport (coordIn)
 open scoped nonZeroDivisors
 
 namespace GlobalTheory
 
-theorem exists_sq_eq_neg_of_discr_eq_neg : ∀ (K : Type) [Field K] [NumberField K] (d : ℕ) (h2 : Module.finrank ℚ K = 2) (hd : discr K = -(d : ℤ)), ∃ δ : K, δ ^ 2 = -(d : K) := by
+theorem exists_sq_eq_neg_of_discr_eq_neg
+    : ∀ (K : Type) [Field K] [NumberField K] (d : ℕ) (h2 : Module.finrank ℚ K = 2)
+        (hd : discr K = -(d : ℤ)),
+      ∃ δ : K,
+        δ ^ 2 = -(d : K) := by
   classical
   intro K _ _ d h2 hd
   haveI : Algebra.IsQuadraticExtension ℚ K := ⟨h2⟩

@@ -12,15 +12,28 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.E
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 namespace GlobalTheory.LogResExist
 
-theorem exists_logRes : GlobalTheory.Published.Principalisation → ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (n : ℕ), IsProjOver p → topologicalKrullDim X = n → ∀ (η : RatForms p n) (m : ℕ) (G : CartierDiv X), η ≠ 0 → ∀ Z : Closeds X, Z ≠ ⊤ → ∃ (Y : Scheme.{0}) (_ : IsIntegral Y) (s : Y ⟶ X) (_ : IsDominant s) (K : CartierDiv Y) (B : Closeds Y), IsLogRes p n η m G s K B ∧ ∀ y, s y ∈ Z → y ∈ B := by
+theorem exists_logRes
+    : GlobalTheory.Published.Principalisation
+      → ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (n : ℕ),
+        IsProjOver p → topologicalKrullDim X = n
+          → ∀ (η : RatForms p n) (m : ℕ) (G : CartierDiv X),
+            η ≠ 0
+              → ∀ Z : Closeds X,
+                Z ≠ ⊤
+                  → ∃ (Y : Scheme.{0}) (_ : IsIntegral Y) (s : Y ⟶ X) (_ : IsDominant s)
+                      (K : CartierDiv Y) (B : Closeds Y),
+                    IsLogRes p n η m G s K B ∧ ∀ y, s y ∈ Z → y ∈ B := by
   intro hP k _ _ X _ p n hp hdim η m G hη Z hZ
-  obtain ⟨Y₀, hY₀, s₀, hs₀, hsm, hproj, hbij⟩ := GlobalTheory.T.exists_smooth_projective_birational_model hP k X p n hp hdim
+  obtain ⟨Y₀, hY₀, s₀, hs₀, hsm, hproj, hbij⟩ :=
+    GlobalTheory.T.exists_smooth_projective_birational_model hP k X p n hp hdim
   let Z₀ : Closeds Y₀ := ⟨s₀.base ⁻¹' (Z : Set X), Z.isClosed.preimage s₀.base.hom.continuous⟩
   have hZ₀ : Z₀ ≠ ⊤ := by
     intro h

@@ -4,8 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.dvd_exponent_of_pow_eq_laurent_monomial :
-    ∀ (q : ℕ) [NeZero q] (O : Type) [CommRing O] [IsLocalRing O] (c : ℕ) (v : (LaurentPolynomial O)ˣ), (v : LaurentPolynomial O) ^ q = LaurentPolynomial.T (c : ℤ) → q ∣ c := by
+theorem UpperTheory.dvd_exponent_of_pow_eq_laurent_monomial
+    : ∀ (q : ℕ) [NeZero q] (O : Type) [CommRing O] [IsLocalRing O] (c : ℕ)
+        (v : (LaurentPolynomial O)ˣ),
+      (v : LaurentPolynomial O) ^ q = LaurentPolynomial.T (c : ℤ) → q ∣ c := by
   intro q _ O _ _ c v hv
   classical
   let φ : LaurentPolynomial O →+* LaurentPolynomial (IsLocalRing.ResidueField O) :=
@@ -15,8 +17,7 @@ theorem UpperTheory.dvd_exponent_of_pow_eq_laurent_monomial :
     show AddMonoidAlgebra.mapRingHom ℤ (IsLocalRing.residue O) (AddMonoidAlgebra.single n 1) =
       AddMonoidAlgebra.single n 1
     rw [AddMonoidAlgebra.mapRingHom_single, map_one]
-  have hw : (φ v) ^ q = LaurentPolynomial.T (c : ℤ) := by
-    rw [← map_pow, hv, hT]
+  have hw : (φ v) ^ q = LaurentPolynomial.T (c : ℤ) := by rw [← map_pow, hv, hT]
   obtain ⟨n, p, hp⟩ := LaurentPolynomial.exists_T_pow (φ v)
   have hpq : p ^ q = Polynomial.X ^ (c + q * n) := by
     apply Polynomial.toLaurent_injective

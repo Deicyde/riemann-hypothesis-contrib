@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.EtaProdEq
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -15,8 +16,8 @@ noncomputable section
 
 namespace GlobalTheory.QuadSymbol.SignCount
 
-theorem card_prod_eq_mul_two {ι : Type} [Fintype ι] [Nonempty ι] (c : ℤˣ) :
-    Nat.card {s : ι → ℤˣ // c * ∏ i, s i = 1} * 2 = 2 ^ Fintype.card ι := by
+theorem card_prod_eq_mul_two {ι : Type} [Fintype ι] [Nonempty ι] (c : ℤˣ)
+    : Nat.card {s : ι → ℤˣ // c * ∏ i, s i = 1} * 2 = 2 ^ Fintype.card ι := by
   classical
   obtain ⟨i₀⟩ := ‹Nonempty ι›
   let m : ι → ℤˣ := Pi.mulSingle i₀ (-1)
@@ -26,19 +27,23 @@ theorem card_prod_eq_mul_two {ι : Type} [Fintype ι] [Nonempty ι] (c : ℤˣ) 
     by_cases h : i = i₀
     · subst h; simp [m]
     · simp [m, Pi.mulSingle_eq_of_ne h]
-  have key : ∀ s : ι → ℤˣ, (c * ∏ i, (s * m) i = 1) ↔ ¬ (c * ∏ i, s i = 1) := by
+  have key : ∀ s : ι → ℤˣ, (c * ∏ i, (s * m) i = 1) ↔ ¬(c * ∏ i, s i = 1) := by
     intro s
     simp only [Pi.mul_apply, Finset.prod_mul_distrib, hm]
     rcases Int.units_eq_one_or (c * ∏ i, s i) with h | h
     · rw [← mul_assoc, h]; decide
     · rw [← mul_assoc, h]; decide
-  let e : {s : ι → ℤˣ // c * ∏ i, s i = 1} ≃ {s : ι → ℤˣ // ¬ (c * ∏ i, s i = 1)} :=
-    { toFun := fun s => ⟨s.1 * m, fun h => (key s.1).1 h s.2⟩
-      invFun := fun s => ⟨s.1 * m, by
+  let e : {s : ι → ℤˣ // c * ∏ i, s i = 1} ≃ {s : ι → ℤˣ // ¬(c * ∏ i, s i = 1)} := {
+    toFun := fun s => ⟨s.1 * m, fun h => (key s.1).1 h s.2⟩
+    invFun := fun s => ⟨
+      s.1 * m,
+      by
         have := (key s.1).2 s.2
-        exact this⟩
-      left_inv := fun s => Subtype.ext (by simp [mul_assoc, hmm])
-      right_inv := fun s => Subtype.ext (by simp [mul_assoc, hmm]) }
+        exact this
+    ⟩
+    left_inv := fun s => Subtype.ext (by simp [mul_assoc, hmm])
+    right_inv := fun s => Subtype.ext (by simp [mul_assoc, hmm])
+  }
   have htot := Fintype.card_subtype_compl (fun s : ι → ℤˣ => c * ∏ i, s i = 1)
   rw [Nat.card_eq_fintype_card, mul_two]
   nth_rewrite 2 [Fintype.card_congr e]
@@ -50,9 +55,12 @@ end GlobalTheory.QuadSymbol.SignCount
 
 namespace GlobalTheory.QuadSymbol.SignCount
 
-theorem neg_one_not_mem_normGroup {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
-    [Algebra K L] [Algebra.IsQuadraticExtension K L] (hL : NumberField.IsTotallyComplex L)
-    {w : InfinitePlace K} (hw : w.IsReal) : (-1 : (w.Completion)ˣ) ∉ normGroup K L w.Completion := by
+theorem neg_one_not_mem_normGroup
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    [Algebra.IsQuadraticExtension K L]
+    (hL : NumberField.IsTotallyComplex L)
+    {w : InfinitePlace K} (hw : w.IsReal)
+    : (-1 : (w.Completion)ˣ) ∉ normGroup K L w.Completion := by
   obtain ⟨δ, b, -, h0, h1⟩ := AlmostNorm.exists_basis_sq K L
   have hneg : InfinitePlace.embedding_of_isReal hw δ < 0 := by
     by_contra hc
@@ -84,38 +92,56 @@ end GlobalTheory.QuadSymbol.SignCount
 
 namespace GlobalTheory.QuadSymbol.SignCount
 
-def infSigns (K L : Type) [Field K] [NumberField K] [Field L] [Algebra K L] (t : Kˣ) :
-    InfinitePlace K → ℤˣ :=
-  fun w => eta K L w.Completion (infDiag K t w)
+def infSigns (K L : Type) [Field K] [NumberField K] [Field L] [Algebra K L] (t : Kˣ)
+    : InfinitePlace K → ℤˣ := fun w =>
+  eta K L w.Completion (infDiag K t w)
 
-theorem infSigns_eq_of_mem {K L : Type} [Field K] [NumberField K] [Field L] [Algebra K L]
-    [FiniteDimensional K L] {t t' : Kˣ} (h : t⁻¹ * t' ∈ globalNorms K L) :
-    infSigns K L t' = infSigns K L t := by
+theorem infSigns_eq_of_mem
+    {K L : Type} [Field K] [NumberField K] [Field L] [Algebra K L] [FiniteDimensional K L]
+    {t t' : Kˣ} (h : t⁻¹ * t' ∈ globalNorms K L)
+    : infSigns K L t' = infSigns K L t := by
   funext w
   refine eta_eq_of_div_mem ?_
   have := toUnits_mem_normGroup (K := K) (L := L) w.Completion h
   rw [← div_eq_inv_mul, _root_.map_div] at this
   exact this
 
-theorem infSigns_out {K L : Type} [Field K] [NumberField K] [Field L] [Algebra K L]
-    [FiniteDimensional K L] (t : Kˣ) :
-    infSigns K L (Quotient.out (QuotientGroup.mk t : Kˣ ⧸ globalNorms K L)) = infSigns K L t :=
+theorem infSigns_out
+    {K L : Type} [Field K] [NumberField K] [Field L] [Algebra K L] [FiniteDimensional K L] (t : Kˣ)
+    : infSigns K L (Quotient.out (QuotientGroup.mk t : Kˣ ⧸ globalNorms K L)) = infSigns K L t :=
   infSigns_eq_of_mem (QuotientGroup.eq.1 (QuotientGroup.out_eq' _).symm)
 
-theorem card_classes_mul_two : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [Algebra.IsQuadraticExtension K L], NumberField.IsTotallyReal K → NumberField.IsTotallyComplex L → ∀ x : GlobalTheory.QuadSymbol.FinFam K, GlobalTheory.QuadSymbol.AlmostNorm K L x → Nat.card {q : Kˣ ⧸ GlobalTheory.QuadSymbol.globalNorms K L // ∃ t : Kˣ, q = QuotientGroup.mk t ∧ ∀ u, x u / GlobalTheory.QuadSymbol.finDiag K t u ∈ GlobalTheory.QuadSymbol.normGroup K L (u.adicCompletion K)} * 2 = 2 ^ Fintype.card (InfinitePlace K) := by
+theorem card_classes_mul_two
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+        [Algebra.IsQuadraticExtension K L],
+      NumberField.IsTotallyReal K → NumberField.IsTotallyComplex L
+        → ∀ x : GlobalTheory.QuadSymbol.FinFam K,
+          GlobalTheory.QuadSymbol.AlmostNorm K L x
+            → Nat.card
+                  {q : Kˣ ⧸ GlobalTheory.QuadSymbol.globalNorms K L // ∃ t : Kˣ,
+                    q = QuotientGroup.mk t
+                      ∧ ∀ u,
+                        x u / GlobalTheory.QuadSymbol.finDiag K t u
+                          ∈ GlobalTheory.QuadSymbol.normGroup K L (u.adicCompletion K)}
+                * 2
+              = 2 ^ Fintype.card (InfinitePlace K) := by
   intro K L _ _ _ _ _ _ hK hL x hx
-  have hfd : FiniteDimensional K L := Module.finite_of_finrank_eq_succ (Algebra.IsQuadraticExtension.finrank_eq_two K L)
+  have hfd : FiniteDimensional K L :=
+    Module.finite_of_finrank_eq_succ (Algebra.IsQuadraticExtension.finrank_eq_two K L)
   obtain ⟨-, hnorm, hseq, -⟩ := exactSequence K L
   obtain ⟨-, hc2⟩ := localCharacters K L
   set c : ℤˣ := ∏ᶠ v : HeightOneSpectrum (𝓞 K), eta K L (v.adicCompletion K) (x v) with hc
   rw [← card_prod_eq_mul_two c]
   congr 1
-  have hprod : ∀ t : Kˣ, (∀ u, x u / finDiag K t u ∈ normGroup K L (u.adicCompletion K)) →
-      c * ∏ w, infSigns K L t w = 1 := by
+  have hprod
+      : ∀ t : Kˣ,
+        (∀ u, x u / finDiag K t u ∈ normGroup K L (u.adicCompletion K))
+          → c * ∏ w, infSigns K L t w = 1 := by
     intro t ht
     have := (hseq x (infDiag K t) hx).1 ⟨t, fun u => ht u, fun w => by simp [one_mem]⟩
     exact this
-  refine Nat.card_congr (Equiv.ofBijective (fun q => ⟨infSigns K L (Quotient.out q.1), ?_⟩) ⟨?_, ?_⟩)
+  refine Nat.card_congr
+    (Equiv.ofBijective (fun q => ⟨infSigns K L (Quotient.out q.1), ?_⟩) ⟨?_, ?_⟩)
   · obtain ⟨t, hq, ht⟩ := q.2
     rw [hq, infSigns_out]
     exact hprod t ht

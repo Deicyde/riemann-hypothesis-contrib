@@ -11,23 +11,28 @@ open scoped ComplexConjugate Real
 
 namespace GlobalTheory.SW.SiegelSum
 
-theorem summable_pi_prod {J A : Type} [Fintype J] (f : J → A → ℝ) (h0 : ∀ j a, 0 ≤ f j a)
-    (hs : ∀ j, Summable (f j)) : Summable fun n : J → A => ∏ j, f j (n j) := by
+theorem summable_pi_prod
+    {J A : Type} [Fintype J] (f : J → A → ℝ) (h0 : ∀ j a, 0 ≤ f j a) (hs : ∀ j, Summable (f j))
+    : Summable fun n : J → A => ∏ j, f j (n j) := by
   first
   | exact @_root_.GlobalTheory.SummableProdPi.summable_prod_pi
   | exact _root_.GlobalTheory.SummableProdPi.summable_prod_pi
   | (apply _root_.GlobalTheory.SummableProdPi.summable_prod_pi <;> assumption)
   | (intros; apply _root_.GlobalTheory.SummableProdPi.summable_prod_pi <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.SummableProdPi.summable_prod_pi <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.SummableProdPi.summable_prod_pi
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.SummableProdPi.summable_prod_pi ..)
 
-theorem exists_mul_dotProduct_le {ι : Type} [Fintype ι] {Y : Matrix ι ι ℝ} (hY : Y.PosDef) :
-    ∃ c > 0, ∀ x : ι → ℝ, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ (Y *ᵥ x) := by
+theorem exists_mul_dotProduct_le {ι : Type} [Fintype ι] {Y : Matrix ι ι ℝ} (hY : Y.PosDef)
+    : ∃ c > 0, ∀ x : ι → ℝ, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ (Y *ᵥ x) := by
   have hc : Continuous fun x : ι → ℝ => x ⬝ᵥ (Y *ᵥ x) := by
     simp only [dotProduct, mulVec]
     fun_prop
-  obtain ⟨c, hc0, hcl⟩ := (isCompact_sphere (0 : ι → ℝ) 1).exists_forall_le'
-    hc.continuousOn (a := 0) (fun q hq => by
+  obtain ⟨c, hc0, hcl⟩ :=
+    (isCompact_sphere (0 : ι → ℝ) 1).exists_forall_le' hc.continuousOn (a := 0) (fun q hq => by
       have hx0 : q ≠ 0 := by
         intro h0
         simp [h0] at hq
@@ -43,21 +48,25 @@ theorem exists_mul_dotProduct_le {ι : Type} [Fintype ι] {Y : Matrix ι ι ℝ}
     refine this.trans_eq ?_
     field_simp
   have h3 : x ⬝ᵥ x ≤ (Fintype.card ι + 1) * ‖x‖ ^ 2 := by
-    have : x ⬝ᵥ x ≤ ∑ _i : ι, ‖x‖ ^ 2 := Finset.sum_le_sum fun i _ => by
-      have := norm_le_pi_norm x i
-      rw [Real.norm_eq_abs] at this
-      rw [← sq, ← sq_abs]
-      gcongr
+    have : x ⬝ᵥ x ≤ ∑ _i : ι, ‖x‖ ^ 2 :=
+      Finset.sum_le_sum fun i _ => by
+        have := norm_le_pi_norm x i
+        rw [Real.norm_eq_abs] at this
+        rw [← sq, ← sq_abs]
+        gcongr
     simp only [Finset.sum_const, Finset.card_univ, nsmul_eq_mul] at this
     nlinarith [sq_nonneg ‖x‖]
-  calc c / (Fintype.card ι + 1) * (x ⬝ᵥ x) ≤ c / (Fintype.card ι + 1) *
-        ((Fintype.card ι + 1) * ‖x‖ ^ 2) := by gcongr
+  calc
+    c / (Fintype.card ι + 1) * (x ⬝ᵥ x)
+      ≤ c / (Fintype.card ι + 1) * ((Fintype.card ι + 1) * ‖x‖ ^ 2) := by gcongr
     _ = c * ‖x‖ ^ 2 := by field_simp
     _ ≤ _ := h2
 
-theorem exists_int_of_intM {κ ι : Type} [Fintype κ] [Fintype ι] {R : ℕ} (hR : 0 < R)
-    {x : Matrix κ ι ℚ} (hx : IntM ((R : ℚ) • x)) :
-    ∃ n : κ → ι → ℤ, x = Matrix.of fun k i => (n k i : ℚ) / R := by
+theorem exists_int_of_intM
+    {κ ι : Type} [Fintype κ] [Fintype ι]
+    {R : ℕ} (hR : 0 < R)
+    {x : Matrix κ ι ℚ} (hx : IntM ((R : ℚ) • x))
+    : ∃ n : κ → ι → ℤ, x = Matrix.of fun k i => (n k i : ℚ) / R := by
   have : ∀ k i, ∃ n : ℤ, (n : ℚ) = R * x k i := fun k i => by
     have := IsIntegrallyClosed.isIntegral_iff.1 (hx k i)
     simpa using this
@@ -68,8 +77,11 @@ theorem exists_int_of_intM {κ ι : Type} [Fintype κ] [Fintype ι] {R : ℕ} (h
   simp only [of_apply, hn]
   field_simp
 
-theorem exists_bound {κ ι : Type} [Fintype κ] [Fintype ι] {R : ℕ} (hR : 0 < R)
-    {φ : Matrix κ ι ℚ → ℂ} (h : HasLevel R φ) : ∃ M, ∀ x, ‖φ x‖ ≤ M := by
+theorem exists_bound
+    {κ ι : Type} [Fintype κ] [Fintype ι]
+    {R : ℕ} (hR : 0 < R)
+    {φ : Matrix κ ι ℚ → ℂ} (h : HasLevel R φ)
+    : ∃ M, ∀ x, ‖φ x‖ ≤ M := by
   classical
   let g : (κ → ι → Fin (R * R)) → ℝ := fun r => ‖φ (Matrix.of fun k i => ((r k i : ℕ) : ℚ) / R)‖
   refine ⟨∑ r, g r, fun x => ?_⟩
@@ -77,15 +89,23 @@ theorem exists_bound {κ ι : Type} [Fintype κ] [Fintype ι] {R : ℕ} (hR : 0 
   · rw [hx, norm_zero]; exact Finset.sum_nonneg fun _ _ => norm_nonneg _
   obtain ⟨n, rfl⟩ := exists_int_of_intM hR (h.1 x hx)
   have hRR : (0 : ℤ) < (R : ℤ) * R := by positivity
-  let r : κ → ι → Fin (R * R) := fun k i => ⟨(n k i % (R * R)).toNat, by
-    have := Int.emod_lt_of_pos (n k i) hRR
-    have := Int.emod_nonneg (n k i) hRR.ne'
-    zify; rw [Int.toNat_of_nonneg this]; assumption⟩
-  have key := h.2 (Matrix.of fun k i => ((r k i : ℕ) : ℚ) / R)
-    (Matrix.of fun k i => ((n k i / (R * R) : ℤ) : ℚ)) (fun k i => isIntegral_algebraMap (x := n k i / (R * R)))
-  have he : (Matrix.of fun k i => (n k i : ℚ) / R) =
-      (Matrix.of fun k i => ((r k i : ℕ) : ℚ) / R) +
-        (R : ℚ) • (Matrix.of fun k i => ((n k i / (R * R) : ℤ) : ℚ)) := by
+  let r : κ → ι → Fin (R * R) := fun k i => ⟨
+    (n k i % (R * R)).toNat,
+    by
+      have := Int.emod_lt_of_pos (n k i) hRR
+      have := Int.emod_nonneg (n k i) hRR.ne'
+      zify
+      rw [Int.toNat_of_nonneg this]
+      assumption
+  ⟩
+  have key :=
+    h.2 (Matrix.of fun k i => ((r k i : ℕ) : ℚ) / R)
+      (Matrix.of fun k i => ((n k i / (R * R) : ℤ) : ℚ))
+      (fun k i => isIntegral_algebraMap (x := n k i / (R * R)))
+  have he
+      : (Matrix.of fun k i => (n k i : ℚ) / R)
+        = (Matrix.of fun k i => ((r k i : ℕ) : ℚ) / R)
+          + (R : ℚ) • (Matrix.of fun k i => ((n k i / (R * R) : ℤ) : ℚ)) := by
     ext k i
     have h1 : (((r k i : ℕ) : ℤ)) = n k i % (R * R) :=
       Int.toNat_of_nonneg (Int.emod_nonneg (n k i) hRR.ne')
@@ -100,13 +120,16 @@ theorem exists_bound {κ ι : Type} [Fintype κ] [Fintype ι] {R : ℕ} (hR : 0 
   rw [he, key]
   exact Finset.single_le_sum (f := g) (fun _ _ => norm_nonneg _) (Finset.mem_univ r)
 
-theorem sum_le_im {ι : Type} [Fintype ι] {τ : Matrix ι ι ℂ} {c S : ℝ}
-    (hc : ∀ x : ι → ℝ, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ (τ.map Complex.im *ᵥ x)) (ζ : ι → ℂ)
-    (hS : ∀ i, |(ζ i).im| ≤ S) (v : ι → ℚ) :
-    ∑ i, (c * (v i : ℝ) ^ 2 - 2 * S * |(v i : ℝ)|) ≤
-      (qv v ⬝ᵥ τ *ᵥ qv v + 2 * (qv v ⬝ᵥ ζ)).im := by
-  have h1 : (qv v ⬝ᵥ τ *ᵥ qv v).im =
-      (fun i => (v i : ℝ)) ⬝ᵥ (τ.map Complex.im *ᵥ fun i => (v i : ℝ)) := by
+theorem sum_le_im
+    {ι : Type} [Fintype ι]
+    {τ : Matrix ι ι ℂ} {c S : ℝ} (hc : ∀ x : ι → ℝ, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ (τ.map Complex.im *ᵥ x))
+    (ζ : ι → ℂ) (hS : ∀ i, |(ζ i).im| ≤ S)
+    (v : ι → ℚ)
+    : ∑ i, (c * (v i : ℝ) ^ 2 - 2 * S * |(v i : ℝ)|)
+      ≤ (qv v ⬝ᵥ τ *ᵥ qv v + 2 * (qv v ⬝ᵥ ζ)).im := by
+  have h1
+      : (qv v ⬝ᵥ τ *ᵥ qv v).im
+        = (fun i => (v i : ℝ)) ⬝ᵥ (τ.map Complex.im *ᵥ fun i => (v i : ℝ)) := by
     simp [dotProduct, mulVec, qv, Complex.im_sum, Complex.re_sum]
   have h2 : (2 * (qv v ⬝ᵥ ζ)).im = ∑ i, 2 * ((v i : ℝ) * (ζ i).im) := by
     simp [dotProduct, qv, Complex.im_sum, Finset.mul_sum]
@@ -117,7 +140,12 @@ theorem sum_le_im {ι : Type} [Fintype ι] {τ : Matrix ι ι ℂ} {c S : ℝ}
     rw [abs_mul] at h3
     nlinarith [hS i, abs_nonneg (v i : ℝ)]
 
-theorem summable_norm_thetaTerm : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι] (φ : Matrix κ ι ℚ → ℂ), IsSB φ → ∀ τ ∈ Siegel ι, ∀ ζ : κ → ι → ℂ, Summable fun x : Matrix κ ι ℚ => ‖φ x * cexp (π * I * ∑ k, (qv (x k) ⬝ᵥ τ *ᵥ qv (x k) + 2 * (qv (x k) ⬝ᵥ ζ k)))‖ := by
+theorem summable_norm_thetaTerm
+    : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι] (φ : Matrix κ ι ℚ → ℂ),
+      IsSB φ
+        → ∀ τ ∈ Siegel ι, ∀ ζ : κ → ι → ℂ,
+          Summable fun x : Matrix κ ι ℚ =>
+            ‖φ x * cexp (π * I * ∑ k, (qv (x k) ⬝ᵥ τ *ᵥ qv (x k) + 2 * (qv (x k) ⬝ᵥ ζ k)))‖ := by
   intro κ ι _ _ _ φ ⟨R, hR, h⟩ τ hτ ζ
   obtain ⟨M, hM⟩ := exists_bound hR h
   obtain ⟨c, hc0, hc⟩ := exists_mul_dotProduct_le hτ.2
@@ -139,10 +167,11 @@ theorem summable_norm_thetaTerm : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [
     simp [this]
   let f : ℤ → ℝ := fun n => Real.exp (-π * (c / R ^ 2 * n ^ 2 - 2 * (‖ζ‖ / R) * |n|))
   have hf : Summable f := by
-    simpa [f] using summable_pow_mul_jacobiTheta₂_term_bound (‖ζ‖ / R)
-      (T := c / R ^ 2) (by positivity) 0
+    simpa [f] using
+      summable_pow_mul_jacobiTheta₂_term_bound (‖ζ‖ / R) (T := c / R ^ 2) (by positivity) 0
   have hs : Summable fun n : κ → ι → ℤ => ∏ k, ∏ i, f (n k i) :=
-    summable_pi_prod (fun (_ : κ) (m : ι → ℤ) => ∏ i, f (m i))
+    summable_pi_prod
+      (fun (_ : κ) (m : ι → ℤ) => ∏ i, f (m i))
       (fun _ _ => Finset.prod_nonneg fun _ _ => (Real.exp_pos _).le)
       fun _ => summable_pi_prod (fun _ => f) (fun _ _ => (Real.exp_pos _).le) fun _ => hf
   refine (hs.mul_left M).of_nonneg_of_le (fun _ => norm_nonneg _) fun n => ?_

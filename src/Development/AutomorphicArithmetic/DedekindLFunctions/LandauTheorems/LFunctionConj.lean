@@ -89,8 +89,9 @@ lemma hurwitz_conj (a : UnitAddCircle) (s : ℂ) :
 
 end LFunctionConjugation
 
-theorem LFunction_conj {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (s : ℂ) :
-    DirichletCharacter.LFunction χ⁻¹ ((starRingEnd ℂ) s) = (starRingEnd ℂ) (DirichletCharacter.LFunction χ s) := by
+theorem LFunction_conj {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (s : ℂ)
+    : DirichletCharacter.LFunction χ⁻¹ ((starRingEnd ℂ) s)
+      = (starRingEnd ℂ) (DirichletCharacter.LFunction χ s) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [DirichletCharacter.LFunction, ZMod.LFunction, map_mul, map_sum]
   congr 1

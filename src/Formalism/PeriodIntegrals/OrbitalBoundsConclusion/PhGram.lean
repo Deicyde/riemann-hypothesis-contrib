@@ -8,4 +8,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GramSubstitution
 @[expose] public section
 
 theorem phase_gram' : PI.FglGram.PhGram :=
-  PI.UnitaryGroupMassFormula.PhGram.phGram_of_steps PI.UnitaryGroupMassFormula.PhGram.gram_bilinear_expansion PI.UnitaryGroupMassFormula.PhGram.gram_sum_first_variable
+  PI.UnitaryGroupMassFormula.PhGram.phGram_of_steps
+    PI.UnitaryGroupMassFormula.PhGram.gram_bilinear_expansion
+    PI.UnitaryGroupMassFormula.PhGram.gram_sum_first_variable

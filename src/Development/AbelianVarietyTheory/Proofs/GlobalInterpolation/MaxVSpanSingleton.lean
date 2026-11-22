@@ -16,9 +16,11 @@ open Formalism.HermitianLatticesTheory Formalism.L2.Col
 variable {E : Type} [Field E] [NumberField E]
 
 def detLat [StarRing E] {n : ℕ} (N : Submodule (𝓞 E) (Sp E n)) : Submodule (𝓞 E) E :=
-  Submodule.span (𝓞 E) {x | ∃ A : Matrix (Fin n) (Fin n) E, (∀ v ∈ stdLat E n, A.mulVec v ∈ N) ∧ x = A.det}
+  Submodule.span (𝓞 E)
+    {x | ∃ A : Matrix (Fin n) (Fin n) E, (∀ v ∈ stdLat E n, A.mulVec v ∈ N) ∧ x = A.det}
 
-def MaxV (P : HeightOneSpectrum (𝓞 E)) (I : Submodule (𝓞 E) E) (γ : WithZero (Multiplicative ℤ)) : Prop :=
+def MaxV (P : HeightOneSpectrum (𝓞 E)) (I : Submodule (𝓞 E) E) (γ : WithZero (Multiplicative ℤ))
+    : Prop :=
   (∀ a ∈ I, P.valuation E a ≤ γ) ∧ ∃ a ∈ I, P.valuation E a = γ
 
 variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)}
@@ -26,9 +28,11 @@ variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : 
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.MaxV.unique (h : _root_.GlobalTheory.CharVal.MaxV P I γ)
-    (h' : _root_.GlobalTheory.CharVal.MaxV P I δ) : γ = δ := by
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.MaxV.unique
+    (h : _root_.GlobalTheory.CharVal.MaxV P I γ) (h' : _root_.GlobalTheory.CharVal.MaxV P I δ)
+    : γ = δ := by
   obtain ⟨a, ha, hγ⟩ := h.2
   obtain ⟨b, hb, hδ⟩ := h'.2
   exact le_antisymm (hγ ▸ h'.1 a ha) (hδ ▸ h.1 b hb)
@@ -36,9 +40,10 @@ theorem _root_.GlobalTheory.CharVal.MaxV.unique (h : _root_.GlobalTheory.CharVal
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.val_le_of_span {S : Set E} (h : ∀ a ∈ S, P.valuation E a ≤ γ) :
-    ∀ a ∈ Submodule.span (𝓞 E) S, P.valuation E a ≤ γ := by
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.val_le_of_span {S : Set E} (h : ∀ a ∈ S, P.valuation E a ≤ γ)
+    : ∀ a ∈ Submodule.span (𝓞 E) S, P.valuation E a ≤ γ := by
   intro a ha
   induction ha using Submodule.span_induction with
   | mem x hx => exact h x hx
@@ -51,17 +56,23 @@ theorem _root_.GlobalTheory.CharVal.val_le_of_span {S : Set E} (h : ∀ a ∈ S,
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.maxV_span_singleton (y : E) :
-    _root_.GlobalTheory.CharVal.MaxV P (Submodule.span (𝓞 E) {y}) (P.valuation E y) :=
-  ⟨_root_.GlobalTheory.CharVal.val_le_of_span fun a ha => by rw [Set.mem_singleton_iff.1 ha],
-    y, Submodule.mem_span_singleton_self y, rfl⟩
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.maxV_span_singleton (y : E)
+    : _root_.GlobalTheory.CharVal.MaxV P (Submodule.span (𝓞 E) {y}) (P.valuation E y) := ⟨
+  _root_.GlobalTheory.CharVal.val_le_of_span fun a ha => by rw [Set.mem_singleton_iff.1 ha],
+  y,
+  Submodule.mem_span_singleton_self y,
+  rfl
+⟩
 
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.maxV_one : _root_.GlobalTheory.CharVal.MaxV P (1 : Submodule (𝓞 E) E) 1 := by
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.maxV_one
+    : _root_.GlobalTheory.CharVal.MaxV P (1 : Submodule (𝓞 E) E) 1 := by
   refine ⟨fun a ha => ?_, 1, Submodule.mem_one.2 ⟨1, map_one _⟩, map_one _⟩
   obtain ⟨r, rfl⟩ := Submodule.mem_one.1 ha
   exact P.valuation_le_one r
@@ -69,9 +80,11 @@ theorem _root_.GlobalTheory.CharVal.maxV_one : _root_.GlobalTheory.CharVal.MaxV 
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.MaxV.mul (h : _root_.GlobalTheory.CharVal.MaxV P I γ)
-    (h' : _root_.GlobalTheory.CharVal.MaxV P J δ) : _root_.GlobalTheory.CharVal.MaxV P (I * J) (γ * δ) := by
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.MaxV.mul
+    (h : _root_.GlobalTheory.CharVal.MaxV P I γ) (h' : _root_.GlobalTheory.CharVal.MaxV P J δ)
+    : _root_.GlobalTheory.CharVal.MaxV P (I * J) (γ * δ) := by
   obtain ⟨a, ha, hγ⟩ := h.2
   obtain ⟨b, hb, hδ⟩ := h'.2
   refine ⟨fun x hx => ?_, a * b, Submodule.mul_mem_mul ha hb, by rw [map_mul, hγ, hδ]⟩
@@ -84,9 +97,10 @@ theorem _root_.GlobalTheory.CharVal.MaxV.mul (h : _root_.GlobalTheory.CharVal.Ma
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.MaxV.pow (h : _root_.GlobalTheory.CharVal.MaxV P I γ) (n : ℕ) :
-    _root_.GlobalTheory.CharVal.MaxV P (I ^ n) (γ ^ n) := by
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.MaxV.pow (h : _root_.GlobalTheory.CharVal.MaxV P I γ) (n : ℕ)
+    : _root_.GlobalTheory.CharVal.MaxV P (I ^ n) (γ ^ n) := by
   induction n with
   | zero => rw [pow_zero, pow_zero]; exact _root_.GlobalTheory.CharVal.maxV_one
   | succ n ih => rw [pow_succ, pow_succ]; exact ih.mul h
@@ -94,7 +108,8 @@ theorem _root_.GlobalTheory.CharVal.MaxV.pow (h : _root_.GlobalTheory.CharVal.Ma
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
 private lemma valuation_lt_one_of_mem_span {S : Set E} (h : ∀ a ∈ S, P.valuation E a < 1) :
     ∀ a ∈ Submodule.span (𝓞 E) S, P.valuation E a < 1 := by
   intro a ha
@@ -109,9 +124,11 @@ private lemma valuation_lt_one_of_mem_span {S : Set E} (h : ∀ a ∈ S, P.valua
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.MaxV.inv (h : _root_.GlobalTheory.CharVal.MaxV P I γ) (h0 : γ ≠ 0)
-    (hIJ : I * J = 1) : _root_.GlobalTheory.CharVal.MaxV P J γ⁻¹ := by
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.MaxV.inv
+    (h : _root_.GlobalTheory.CharVal.MaxV P I γ) (h0 : γ ≠ 0) (hIJ : I * J = 1)
+    : _root_.GlobalTheory.CharVal.MaxV P J γ⁻¹ := by
   obtain ⟨a, ha, hγ⟩ := h.2
   have hle : ∀ b ∈ J, P.valuation E b ≤ γ⁻¹ := by
     intro b hb
@@ -129,8 +146,9 @@ theorem _root_.GlobalTheory.CharVal.MaxV.inv (h : _root_.GlobalTheory.CharVal.Ma
     intro z hz
     obtain ⟨u, hu, w, hw, rfl⟩ := Set.mem_mul.1 hz
     rw [map_mul]
-    calc P.valuation E u * P.valuation E w ≤ γ * P.valuation E w :=
-          mul_le_mul' (h.1 u hu) le_rfl
+    calc
+      P.valuation E u * P.valuation E w
+        ≤ γ * P.valuation E w := mul_le_mul' (h.1 u hu) le_rfl
       _ < γ * γ⁻¹ := mul_lt_mul_of_pos_left (hlt w hw) (zero_lt_iff.2 h0)
       _ = 1 := mul_inv_cancel₀ h0
   have h1 : (1 : E) ∈ I * J := by
@@ -144,7 +162,8 @@ theorem _root_.GlobalTheory.CharVal.MaxV.inv (h : _root_.GlobalTheory.CharVal.Ma
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
 private lemma valuation_algebraMap_eq_one_of_notMem' {s : 𝓞 E} (hs : s ∉ P.asIdeal) :
     P.valuation E (algebraMap (𝓞 E) E s) = 1 :=
   le_antisymm (P.valuation_le_one s) (not_lt.1 fun h => hs ((P.valuation_lt_one_iff_mem s).1 h))
@@ -152,9 +171,10 @@ private lemma valuation_algebraMap_eq_one_of_notMem' {s : 𝓞 E} (hs : s ∉ P.
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.intAt_iff (x : E) :
-    _root_.Formalism.L2.Col.IntAt P x ↔ P.valuation E x ≤ 1 := by
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.intAt_iff (x : E)
+    : _root_.Formalism.L2.Col.IntAt P x ↔ P.valuation E x ≤ 1 := by
   constructor
   · rintro ⟨r, s, hs, hsr⟩
     have h := congrArg (P.valuation E) hsr
@@ -195,18 +215,22 @@ theorem _root_.GlobalTheory.CharVal.intAt_iff (x : E) :
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.mem_locP' (I : Submodule (𝓞 E) E) (x : E) :
-    x ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal I ↔ ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ I :=
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.mem_locP' (I : Submodule (𝓞 E) E) (x : E)
+    : x ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal I
+      ↔ ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ I :=
   Iff.rfl
-
 
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
-theorem _root_.GlobalTheory.CharVal.MaxV.mem_locP (h : _root_.GlobalTheory.CharVal.MaxV P I γ) (h0 : γ ≠ 0) (x : E) :
-    x ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal I ↔ P.valuation E x ≤ γ := by
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+theorem _root_.GlobalTheory.CharVal.MaxV.mem_locP
+    (h : _root_.GlobalTheory.CharVal.MaxV P I γ) (h0 : γ ≠ 0) (x : E)
+    : x ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal I
+      ↔ P.valuation E x ≤ γ := by
   rw [_root_.GlobalTheory.CharVal.mem_locP']
   constructor
   · rintro ⟨s, hs, hsx⟩
@@ -230,14 +254,18 @@ theorem _root_.GlobalTheory.CharVal.MaxV.mem_locP (h : _root_.GlobalTheory.CharV
 open NumberField IsDedekindDomain in
 open scoped Pointwise in
 variable {E : Type} [Field E] [NumberField E] in
-variable {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
+variable
+  {P : HeightOneSpectrum (𝓞 E)} {I J : Submodule (𝓞 E) E} {γ δ : WithZero (Multiplicative ℤ)} in
 theorem _root_.GlobalTheory.CharVal.maxV_of_localization_eq
-    (h : _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal I = _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (1 : Submodule (𝓞 E) E)) :
-    _root_.GlobalTheory.CharVal.MaxV P I 1 := by
+    (h : _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal I
+      = _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (1 : Submodule (𝓞 E) E))
+    : _root_.GlobalTheory.CharVal.MaxV P I 1 := by
   have h1P : (1 : 𝓞 E) ∉ P.asIdeal := P.asIdeal.ne_top_iff_one.1 P.isPrime.ne_top
   constructor
   · intro a ha
-    have hmem : a ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (1 : Submodule (𝓞 E) E) := by
+    have hmem
+        : a ∈ _root_.Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+          (1 : Submodule (𝓞 E) E) := by
       rw [← h]
       exact (_root_.GlobalTheory.CharVal.mem_locP' I a).2 ⟨1, h1P, by rwa [one_smul]⟩
     obtain ⟨s, hs, hsa⟩ := (_root_.GlobalTheory.CharVal.mem_locP' _ a).1 hmem

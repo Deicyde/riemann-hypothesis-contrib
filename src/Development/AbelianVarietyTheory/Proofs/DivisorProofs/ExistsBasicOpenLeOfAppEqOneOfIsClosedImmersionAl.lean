@@ -8,29 +8,35 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Matched
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem exists_basicOpen_le_of_app_eq_one_of_isClosedImmersion :
-    ∀ (X' Z' : Scheme.{0}) (i' : Z' ⟶ X') [IsClosedImmersion i'] (Y' : X'.Opens), IsAffineOpen Y' →
-    ∀ (N : X'.Opens), (∀ z : Z', i' z ∈ Y' → i' z ∈ N) →
-    ∃ b : Γ(X', Y'), (i'.app Y').hom b = 1 ∧ X'.basicOpen b ≤ N := by
+theorem exists_basicOpen_le_of_app_eq_one_of_isClosedImmersion
+    : ∀ (X' Z' : Scheme.{0}) (i' : Z' ⟶ X') [IsClosedImmersion i'] (Y' : X'.Opens),
+      IsAffineOpen Y'
+        → ∀ (N : X'.Opens),
+          (∀ z : Z', i' z ∈ Y' → i' z ∈ N)
+            → ∃ b : Γ(X', Y'), (i'.app Y').hom b = 1 ∧ X'.basicOpen b ≤ N := by
   intro X' Z' i' _ Y' hY N hN
   classical
-  let K : Ideal Γ(X', Y') :=
-    { carrier := {f | X'.basicOpen f ≤ N}
-      add_mem' hf hg := (X'.basicOpen_add_le _ _).trans (sup_le hf hg)
-      zero_mem' := by simp
-      smul_mem' c f hf := by
-        change X'.basicOpen (c * f) ≤ N
-        rw [Scheme.basicOpen_mul]
-        exact inf_le_right.trans hf }
-  have hmem (z : Spec Γ(X', Y')) (f : Γ(X', Y')) :
-      hY.fromSpec z ∈ X'.basicOpen f ↔ f ∉ z.asIdeal := by
+  let K : Ideal Γ(X', Y') := {
+    carrier := {f | X'.basicOpen f ≤ N}
+    add_mem' hf hg := (X'.basicOpen_add_le _ _).trans (sup_le hf hg)
+    zero_mem' := by simp
+    smul_mem' c f hf := by
+      change X'.basicOpen (c * f) ≤ N
+      rw [Scheme.basicOpen_mul]
+      exact inf_le_right.trans hf
+  }
+  have hmem (z : Spec Γ(X', Y')) (f : Γ(X', Y'))
+      : hY.fromSpec z ∈ X'.basicOpen f ↔ f ∉ z.asIdeal := by
     change z ∈ hY.fromSpec ⁻¹ᵁ X'.basicOpen f ↔ _
     rw [hY.fromSpec_preimage_basicOpen]
     rfl
@@ -60,7 +66,9 @@ theorem exists_basicOpen_le_of_app_eq_one_of_isClosedImmersion :
   obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp h1
   refine ⟨b, ?_, hb⟩
   have ha0 : (i'.app Y').hom a = 0 := ha
-  calc (i'.app Y').hom b = (i'.app Y').hom (a + b) := by rw [map_add (f := _), ha0, zero_add]
+  calc
+    (i'.app Y').hom b
+      = (i'.app Y').hom (a + b) := by rw [map_add (f := _), ha0, zero_add]
     _ = 1 := by rw [hab, map_one]
 
 end GlobalTheory

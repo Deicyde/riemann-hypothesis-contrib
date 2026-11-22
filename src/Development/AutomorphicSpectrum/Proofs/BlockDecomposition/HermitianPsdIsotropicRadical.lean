@@ -6,28 +6,33 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.HermitianForm
 
-theorem re_pairing_eq_zero_of_psd {V : Type} [AddCommGroup V] [Module ℂ V]
-    (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hB : ∀ v w, B w v = starRingEnd ℂ (B v w))
-    (hpos : ∀ v, 0 ≤ (B v v).re) (v : V) (hv : B v v = 0) (u : V) : (B v u).re = 0 := by
+theorem re_pairing_eq_zero_of_psd
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ)
+    (hB : ∀ v w, B w v = starRingEnd ℂ (B v w)) (hpos : ∀ v, 0 ≤ (B v v).re)
+    (v : V) (hv : B v v = 0)
+    (u : V)
+    : (B v u).re = 0 := by
   have hb : 0 ≤ (B u u).re := hpos u
   have key : ∀ t : ℝ, 0 ≤ 2 * t * (B v u).re + t ^ 2 * (B u u).re := by
     intro t
     have h := hpos (v + (t : ℂ) • u)
-    have e : B (v + (t : ℂ) • u) (v + (t : ℂ) • u)
-        = B v v + (t : ℂ) * B v u + (t : ℂ) * B u v + (t : ℂ) * (t : ℂ) * B u u := by
+    have e
+        : B (v + (t : ℂ) • u) (v + (t : ℂ) • u)
+          = B v v + (t : ℂ) * B v u + (t : ℂ) * B u v + (t : ℂ) * (t : ℂ) * B u u := by
       simp only [map_add (f := _), LinearMap.add_apply, map_smul, map_smulₛₗ, LinearMap.smul_apply,
         smul_eq_mul, Complex.conj_ofReal]
       ring
     rw [e, hv, hB v u] at h
     simp only [zero_add, Complex.add_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im,
-      Complex.conj_re, Complex.mul_im, zero_mul, sub_zero, add_zero] at h
+        Complex.conj_re, Complex.mul_im, zero_mul, sub_zero, add_zero]
+      at h
     nlinarith [h]
   set a := (B v u).re with ha
   set b := (B u u).re with hb'
   have hb1 : 0 < b + 1 := by linarith
   have h := key (-a / (b + 1))
-  have e2 : 2 * (-a / (b + 1)) * a + (-a / (b + 1)) ^ 2 * b
-      = -(a ^ 2 * (b + 2)) / (b + 1) ^ 2 := by
+  have e2 : 2 * (-a / (b + 1)) * a + (-a / (b + 1)) ^ 2 * b = -(a ^ 2 * (b + 2)) / (b + 1) ^ 2 := by
     field_simp
     ring
   rw [e2] at h
@@ -45,9 +50,10 @@ theorem re_pairing_eq_zero_of_psd {V : Type} [AddCommGroup V] [Module ℂ V]
   have h6 : a ^ 2 = 0 := le_antisymm h5 (sq_nonneg a)
   exact pow_eq_zero_iff (two_ne_zero) |>.mp h6
 
-theorem pairing_eq_zero_of_psd : ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
-    (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ), (∀ v w, B w v = starRingEnd ℂ (B v w)) →
-    (∀ v, 0 ≤ (B v v).re) → ∀ v, B v v = 0 → ∀ w, B v w = 0 := by
+theorem pairing_eq_zero_of_psd
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ),
+      (∀ v w, B w v = starRingEnd ℂ (B v w)) → (∀ v, 0 ≤ (B v v).re)
+        → ∀ v, B v v = 0 → ∀ w, B v w = 0 := by
   intro V _ _ B hB hpos v hv w
   have hre := re_pairing_eq_zero_of_psd B hB hpos v hv w
   have him := re_pairing_eq_zero_of_psd B hB hpos v hv (Complex.I • w)

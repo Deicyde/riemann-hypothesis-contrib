@@ -8,48 +8,58 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 section Local
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {W : LocWach PD LL O v n} {T : LocLat G Qp LL O}
-    (Bs : FramepfBas W T) (π' : LetA O n) (c : ZMod n)
-    (hπ0 : ∀ j, PowerSeries.constantCoeff (π' j) = 0)
-    (hΔπ : ∀ δ ∈ W.DelF, W.γA δ π' = π')
-    (hR2 : ∀ a : LetA O n, a ∈ W.AΔ → ∃! f : ZMod n → PowerSeries O,
-      ∀ j, a j = PowerSeries.subst (π' j) (f j))
-    (γ0 : ∀ δ ∈ W.DelF, PowerSeries.constantCoeff (W.γ₀ δ PowerSeries.X) = 0)
-
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {W : LocWach PD LL O v n} {T : LocLat G Qp LL O}
+  (Bs : FramepfBas W T) (π' : LetA O n) (c : ZMod n)
+  (hπ0 : ∀ j, PowerSeries.constantCoeff (π' j) = 0) (hΔπ : ∀ δ ∈ W.DelF, W.γA δ π' = π')
+  (hR2 : ∀ a : LetA O n,
+    a ∈ W.AΔ
+      → ∃! f : ZMod n → PowerSeries O,
+        ∀ j, a j = PowerSeries.subst (π' j) (f j))
+  (γ0 : ∀ δ ∈ W.DelF, PowerSeries.constantCoeff (W.γ₀ δ PowerSeries.X) = 0)
 
 open Classical in
 def framepf_gco (x : ↥(NcS W T (c - 1))) : Fin Bs.r → PowerSeries O :=
-  if h : ∃ g : Fin Bs.r → PowerSeries O, (x : W.DD T) = ∑ k, framepf_ι π' (c - 1) (g k) • Bs.b k
-  then Classical.choose h else 0
+  if h
+      : ∃ g : Fin Bs.r → PowerSeries O, (x : W.DD T) = ∑ k, framepf_ι π' (c - 1) (g k) • Bs.b k then
+    Classical.choose h
+  else
+    0
 
 include hπ0 hR2 in
-theorem framepf_gco_spec (x : ↥(NcS W T (c - 1))) :
-    (x : W.DD T) = ∑ k, framepf_ι π' (c - 1) (framepf_gco Bs π' c x k) • Bs.b k := by
+theorem framepf_gco_spec (x : ↥(NcS W T (c - 1)))
+    : (x : W.DD T) = ∑ k, framepf_ι π' (c - 1) (framepf_gco Bs π' c x k) • Bs.b k := by
   have h := framepf_coord Bs π' (c - 1) hπ0 hR2 x.2
   unfold framepf_gco
   rw [dite_eq_left h]
   exact Classical.choose_spec h
 
 include hπ0 hΔπ hR2 γ0 in
-theorem framepf_gco_eq (x : ↥(NcS W T (c - 1))) (g : Fin Bs.r → PowerSeries O)
-    (hg : (x : W.DD T) = ∑ k, framepf_ι π' (c - 1) (g k) • Bs.b k) : framepf_gco Bs π' c x = g :=
+theorem framepf_gco_eq
+    (x : ↥(NcS W T (c - 1))) (g : Fin Bs.r → PowerSeries O)
+    (hg : (x : W.DD T) = ∑ k, framepf_ι π' (c - 1) (g k) • Bs.b k)
+    : framepf_gco Bs π' c x = g :=
   framepf_coord_uniq Bs π' (c - 1) hπ0 hΔπ hR2 γ0
     ((framepf_gco_spec Bs π' c hπ0 hR2 x).symm.trans hg)
 
 include hπ0 in
-theorem framepf_ι_C_mul (o : O) (g : PowerSeries O) :
-    framepf_ι π' (c - 1) (PowerSeries.C o * g) = algebraMap O (LetA O n) o * framepf_ι π' (c - 1) g := by
+theorem framepf_ι_C_mul (o : O) (g : PowerSeries O)
+    : framepf_ι π' (c - 1) (PowerSeries.C o * g)
+      = algebraMap O (LetA O n) o * framepf_ι π' (c - 1) g := by
   rw [framepf_ι_mul π' (c - 1) (hπ0 _), framepf_ι_C π' (c - 1) (hπ0 _), mul_comm (letE (c - 1)),
     mul_assoc, framepf_letE_ι π' (c - 1) hπ0]
 
@@ -75,15 +85,16 @@ def framepf_coordL : ↥(NcS W T (c - 1)) →ₗ[O] (Fin Bs.r → O) where
     rw [e, map_mul, PowerSeries.constantCoeff_C]
     rfl
 
-theorem framepf_coordL_apply (x : ↥(NcS W T (c - 1))) (k : Fin Bs.r) :
-    framepf_coordL Bs π' c hπ0 hΔπ hR2 γ0 x k = PowerSeries.constantCoeff (framepf_gco Bs π' c x k) := rfl
+theorem framepf_coordL_apply (x : ↥(NcS W T (c - 1))) (k : Fin Bs.r)
+    : framepf_coordL Bs π' c hπ0 hΔπ hR2 γ0 x k
+      = PowerSeries.constantCoeff (framepf_gco Bs π' c x k) :=
+  rfl
 
 variable (hu : IsUnit (algebraMap (LetA O n) W.EE π'))
 
-
 include hπ0 hΔπ hR2 γ0 hu in
-theorem framepf_coordL_ker (x : ↥(NcS W T (c - 1))) :
-    framepf_coordL Bs π' c hπ0 hΔπ hR2 γ0 x = 0 ↔ (x : W.DD T) ∈ PiNS W T π' 1 := by
+theorem framepf_coordL_ker (x : ↥(NcS W T (c - 1)))
+    : framepf_coordL Bs π' c hπ0 hΔπ hR2 γ0 x = 0 ↔ (x : W.DD T) ∈ PiNS W T π' 1 := by
   have hx := framepf_gco_spec Bs π' c hπ0 hR2 x
   have hxc := (mem_NcS W T (c - 1) x).1 x.2
   constructor
@@ -95,8 +106,14 @@ theorem framepf_coordL_ker (x : ↥(NcS W T (c - 1))) :
       exact PowerSeries.X_dvd_iff.2 this
     choose hk hhk using hX
     rw [mem_PiNS]
-    refine ⟨⟨∑ k, framepf_ι π' (c - 1) (hk k) • Bs.b k,
-      Submodule.sum_mem _ fun k _ => (W.N T).smul_mem _ (Bs.mem k).1, ?_⟩, hxc.2.1⟩
+    refine ⟨
+      ⟨
+        ∑ k, framepf_ι π' (c - 1) (hk k) • Bs.b k,
+        Submodule.sum_mem _ fun k _ => (W.N T).smul_mem _ (Bs.mem k).1,
+        ?_
+      ⟩,
+      hxc.2.1
+    ⟩
     rw [pow_one, hx, Finset.smul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [hhk k, smul_smul, framepf_ι_mul π' (c - 1) (hπ0 _), framepf_ι_X π' (c - 1) (hπ0 _),
@@ -140,14 +157,15 @@ theorem framepf_coordL_surj : Function.Surjective (framepf_coordL Bs π' c hπ0 
 
 def framepf_Lbas : LcQ W T π' c ≃ₗ[O] (Fin Bs.r → O) :=
   (Submodule.quotEquivOfEq _ _ (by
-    ext x
-    rw [Submodule.mem_comap, Submodule.coe_subtype, LinearMap.mem_ker,
-      framepf_coordL_ker Bs π' c hπ0 hΔπ hR2 γ0 hu])).trans
+      ext x
+      rw [Submodule.mem_comap, Submodule.coe_subtype, LinearMap.mem_ker,
+        framepf_coordL_ker Bs π' c hπ0 hΔπ hR2 γ0 hu])).trans
     (LinearMap.quotKerEquivOfSurjective _ (framepf_coordL_surj Bs π' c hπ0 hΔπ hR2 γ0))
 
-theorem framepf_Lbas_mk (x : ↥(NcS W T (c - 1))) :
-    framepf_Lbas Bs π' c hπ0 hΔπ hR2 γ0 hu (Submodule.Quotient.mk x) =
-      framepf_coordL Bs π' c hπ0 hΔπ hR2 γ0 x := rfl
+theorem framepf_Lbas_mk (x : ↥(NcS W T (c - 1)))
+    : framepf_Lbas Bs π' c hπ0 hΔπ hR2 γ0 hu (Submodule.Quotient.mk x)
+      = framepf_coordL Bs π' c hπ0 hΔπ hR2 γ0 x :=
+  rfl
 
 def framepf_hh (H : Matrix (Fin Bs.r) (Fin Bs.r) (PowerSeries O)) : LcQ W T π' c →ₗ[O] W.DD T :=
   (Fintype.linearCombination O (fun k => framepf_vec Bs π' (c - 1) H k)).comp

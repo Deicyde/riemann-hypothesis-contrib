@@ -8,8 +8,9 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem eq_zero_of_mem_minimalPrimes {R : Type} [CommRing R] [IsReduced R] {y : R}
-    (hy : ∀ P ∈ minimalPrimes R, y ∈ P) : y = 0 := by
+theorem eq_zero_of_mem_minimalPrimes
+    {R : Type} [CommRing R] [IsReduced R] {y : R} (hy : ∀ P ∈ minimalPrimes R, y ∈ P)
+    : y = 0 := by
   have : y ∈ nilradical R := by
     rw [nilradical_eq_sInf, Submodule.mem_sInf]
     intro J hJ
@@ -19,8 +20,8 @@ theorem eq_zero_of_mem_minimalPrimes {R : Type} [CommRing R] [IsReduced R] {y : 
   rw [nilradical_eq_zero] at this
   simpa using this
 
-theorem isDomain_of_isIntegrallyClosed_of_isReduced :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsReduced R],
+theorem isDomain_of_isIntegrallyClosed_of_isReduced
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsReduced R],
       IsIntegrallyClosed R → IsDomain R := by
   intro R _ _ _ _ hic
   classical
@@ -31,8 +32,8 @@ theorem isDomain_of_isIntegrallyClosed_of_isReduced :
     exact NoZeroDivisors.to_isDomain R
   have hfin := minimalPrimes.finite_of_isNoetherianRing R
   obtain ⟨P, hP⟩ : ∃ P, P ∈ minimalPrimes R := by
-    obtain ⟨p, hp, -⟩ := Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal R))
-      (J := IsLocalRing.maximalIdeal R) bot_le
+    obtain ⟨p, hp, -⟩ :=
+      Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal R)) (J := IsLocalRing.maximalIdeal R) bot_le
     exact ⟨p, hp⟩
   have hPprime : P.IsPrime := hP.1.1
   have minle : ∀ {A B : Ideal R}, A ∈ minimalPrimes R → B ∈ minimalPrimes R → A ≤ B → A = B :=
@@ -42,15 +43,15 @@ theorem isDomain_of_isIntegrallyClosed_of_isReduced :
   set Q : Ideal R := (T.erase P).inf id with hQ
   have hQle : ∀ P' ∈ T.erase P, Q ≤ P' := fun P' h => Finset.inf_le (f := id) h
   by_cases hone : T.erase P = ∅
-  ·
-    have hPbot : P = ⊥ := by
+  · have hPbot : P = ⊥ := by
       rw [eq_bot_iff]
       intro y hy
-      have : y = 0 := eq_zero_of_mem_minimalPrimes (fun P' hP' => by
-        by_cases h : P' = P
-        · exact h ▸ hy
-        · have : P' ∈ T.erase P := Finset.mem_erase.2 ⟨h, (memT P').2 hP'⟩
-          simp [hone] at this)
+      have : y = 0 :=
+        eq_zero_of_mem_minimalPrimes (fun P' hP' => by
+          by_cases h : P' = P
+          · exact h ▸ hy
+          · have : P' ∈ T.erase P := Finset.mem_erase.2 ⟨h, (memT P').2 hP'⟩
+            simp [hone] at this)
       simp [this]
     exact hPbot ▸ hPprime
   exfalso
@@ -58,8 +59,8 @@ theorem isDomain_of_isIntegrallyClosed_of_isReduced :
 
   have hnot : ¬ ((P ⊔ Q : Ideal R) : Set R) ⊆ ⋃ i ∈ (↑T : Set (Ideal R)), (i : Set R) := by
     intro hsub
-    obtain ⟨P', hP'T, hle⟩ := (Ideal.subset_union_prime (f := id) P P
-      (fun i hi _ _ => ((memT i).1 hi).1.1)).1 hsub
+    obtain ⟨P', hP'T, hle⟩ :=
+      (Ideal.subset_union_prime (f := id) P P (fun i hi _ _ => ((memT i).1 hi).1.1)).1 hsub
     have hle' : P ⊔ Q ≤ P' := hle
     have h1 : P = P' := minle hP ((memT P').1 hP'T) (le_sup_left.trans hle')
     have hQP : Q ≤ P := by
@@ -77,10 +78,11 @@ theorem isDomain_of_isIntegrallyClosed_of_isReduced :
     eq_zero_of_mem_minimalPrimes (fun P' hP' => by
       have : y * s ∈ P' := by simp [hy]
       exact (hP'.1.1.mem_or_mem this).resolve_right (hsnot P' hP'))
-  have hab0 : a * b = 0 := eq_zero_of_mem_minimalPrimes (fun P' hP' => by
-    by_cases h : P' = P
-    · exact h ▸ P.mul_mem_right b ha
-    · exact P'.mul_mem_left a (hQle P' (Finset.mem_erase.2 ⟨h, (memT P').2 hP'⟩) hb))
+  have hab0 : a * b = 0 :=
+    eq_zero_of_mem_minimalPrimes (fun P' hP' => by
+      by_cases h : P' = P
+      · exact h ▸ P.mul_mem_right b ha
+      · exact P'.mul_mem_left a (hQle P' (Finset.mem_erase.2 ⟨h, (memT P').2 hP'⟩) hb))
   have hs : s ∈ nonZeroDivisors R := mem_nonZeroDivisors_iff_right.2 hsnzd
   let K := FractionRing R
   set e : K := IsLocalization.mk' K a ⟨s, hs⟩ with he_def
@@ -89,7 +91,8 @@ theorem isDomain_of_isIntegrallyClosed_of_isReduced :
   have has : a * s = a * a := by rw [← hab, mul_add, hab0, add_zero]
   have hee : e * e = e := by
     refine (ht.mul ht).mul_left_inj.1 ?_
-    calc e * e * (algebraMap R K s * algebraMap R K s)
+    calc
+      e * e * (algebraMap R K s * algebraMap R K s)
         = (e * algebraMap R K s) * (e * algebraMap R K s) := by ring
       _ = algebraMap R K (a * a) := by rw [hspec, map_mul]
       _ = algebraMap R K (a * s) := by rw [has]

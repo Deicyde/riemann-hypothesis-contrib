@@ -10,11 +10,13 @@ open TensorProduct
 noncomputable section
 namespace GlobalTheory.CxPointsSep
 
-theorem eq_zero_of_forall_algHom {k A : Type} [Field k] [IsAlgClosed k] [CommRing A] [Algebra k A]
-    [IsReduced A] [Algebra.FiniteType k A] (a : A) (h : ∀ e : A →ₐ[k] k, e a = 0) : a = 0 := by
+theorem eq_zero_of_forall_algHom
+    {k A : Type}
+    [Field k] [IsAlgClosed k] [CommRing A] [Algebra k A] [IsReduced A] [Algebra.FiniteType k A]
+    (a : A) (h : ∀ e : A →ₐ[k] k, e a = 0)
+    : a = 0 := by
   haveI : IsJacobsonRing A := isJacobsonRing_of_finiteType (A := k)
-  have hrad : (⊥ : Ideal A).IsRadical := by
-    rw [Ideal.isRadical_bot_iff]; infer_instance
+  have hrad : (⊥ : Ideal A).IsRadical := by rw [Ideal.isRadical_bot_iff]; infer_instance
   have hj : (⊥ : Ideal A).jacobson = ⊥ := IsJacobsonRing.out inferInstance hrad
   rw [← Ideal.mem_bot, ← hj, Ideal.jacobson, Ideal.mem_sInf]
   rintro m ⟨-, hm⟩
@@ -27,26 +29,30 @@ theorem eq_zero_of_forall_algHom {k A : Type} [Field k] [IsAlgClosed k] [CommRin
   rw [AlgHom.comp_apply] at this
   have h2 : Ideal.Quotient.mkₐ k m a = 0 := by
     apply i.symm.injective
-    rw [map_zero]; exact this
+    rw [map_zero]
+    exact this
   exact Ideal.Quotient.eq_zero_iff_mem.mp h2
 
-theorem isReduced_complex_tensor (D : Type) [CommRing D] [IsDomain D] [Algebra ℚ D]
-    [Algebra.FiniteType ℚ D] : IsReduced (ℂ ⊗[ℚ] D) := by
+theorem isReduced_complex_tensor
+    (D : Type) [CommRing D] [IsDomain D] [Algebra ℚ D] [Algebra.FiniteType ℚ D]
+    : IsReduced (ℂ ⊗[ℚ] D) := by
   set K := FractionRing D
   have : Algebra.EssFiniteType ℚ K := inferInstanceAs (Algebra.EssFiniteType ℚ (Localization _))
-  have h1 : IsReduced (K ⊗[ℚ] ℂ) := ReciprocityTheory.AnForm.R.BaseChangeC.isReduced_tensor_of_essFiniteType K ℂ
+  have h1 : IsReduced (K ⊗[ℚ] ℂ) :=
+    ReciprocityTheory.AnForm.R.BaseChangeC.isReduced_tensor_of_essFiniteType K ℂ
   have h2 : IsReduced (ℂ ⊗[ℚ] K) :=
     isReduced_of_injective (Algebra.TensorProduct.comm ℚ ℂ K).toRingEquiv.toRingHom
       (Algebra.TensorProduct.comm ℚ ℂ K).injective
   have hinj : Function.Injective (Algebra.TensorProduct.map (AlgHom.id ℚ ℂ)
       (IsScalarTower.toAlgHom ℚ D K)) :=
     Module.Flat.lTensor_preserves_injective_linearMap _ (IsFractionRing.injective _ _)
-  exact isReduced_of_injective (Algebra.TensorProduct.map (AlgHom.id ℚ ℂ)
-      (IsScalarTower.toAlgHom ℚ D K)).toRingHom hinj
+  exact isReduced_of_injective
+    (Algebra.TensorProduct.map (AlgHom.id ℚ ℂ) (IsScalarTower.toAlgHom ℚ D K)).toRingHom hinj
 
-theorem exists_det_ne_zero (B : Type) [CommRing B] [IsDomain B] [CharZero B] [Algebra.FiniteType ℤ B]
-    (r : ℕ) (f : Fin r → B) (hf : LinearIndependent ℤ f) :
-    ∃ x : Fin r → (B →+* ℂ), (Matrix.of fun i j => x i (f j)).det ≠ 0 := by
+theorem exists_det_ne_zero
+    (B : Type) [CommRing B] [IsDomain B] [CharZero B] [Algebra.FiniteType ℤ B]
+    (r : ℕ) (f : Fin r → B) (hf : LinearIndependent ℤ f)
+    : ∃ x : Fin r → (B →+* ℂ), (Matrix.of fun i j => x i (f j)).det ≠ 0 := by
   classical
   let K := FractionRing B
   obtain ⟨s, hs⟩ := (Algebra.FiniteType.out : (⊤ : Subalgebra ℤ B).FG)
@@ -73,14 +79,14 @@ theorem exists_det_ne_zero (B : Type) [CommRing B] [IsDomain B] [CharZero B] [Al
     Module.Flat.linearIndependent_one_tmul hD
   haveI : IsReduced (ℂ ⊗[ℚ] D) := isReduced_complex_tensor D
   let pt : ((ℂ ⊗[ℚ] D) →ₐ[ℂ] ℂ) → (B →+* ℂ) := fun φ =>
-    (φ.toRingHom.comp (Algebra.TensorProduct.includeRight (R := ℚ) (A := ℂ) (B := D)).toRingHom).comp g
+    (φ.toRingHom.comp (Algebra.TensorProduct.includeRight (R := ℚ) (A := ℂ)
+      (B := D)).toRingHom).comp g
   let S : Set (Fin r → ℂ) := Set.range fun x : B →+* ℂ => fun j => x (f j)
   have hspan : Submodule.span ℂ S = ⊤ := by
     by_contra hne
     obtain ⟨ℓ, hℓ, hle⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hne)
     let c : Fin r → ℂ := fun i => ℓ (fun j => if i = j then 1 else 0)
-    have hℓv : ∀ v, ℓ v = ∑ i, v i * c i := fun v => by
-      rw [LinearMap.pi_apply_eq_sum_univ ℓ v]; rfl
+    have hℓv : ∀ v, ℓ v = ∑ i, v i * c i := fun v => by rw [LinearMap.pi_apply_eq_sum_univ ℓ v]; rfl
     have hu : ∑ i, c i • ((1 : ℂ) ⊗ₜ[ℚ] g (f i)) = 0 := by
       apply eq_zero_of_forall_algHom (k := ℂ)
       intro φ
@@ -106,9 +112,12 @@ theorem exists_det_ne_zero (B : Type) [CommRing B] [IsDomain B] [CharZero B] [Al
   choose x hx using hx
   refine ⟨x, ?_⟩
   have hrows : LinearIndependent ℂ (fun i => (Matrix.of fun i j => x i (f j)) i) := by
-    have : (fun i => (Matrix.of fun i j => x i (f j)) i) = (fun v : b => (v : Fin r → ℂ)) ∘ e.symm := by
+    have : (fun i => (Matrix.of fun i j => x i (f j)) i)
+        = (fun v : b => (v : Fin r → ℂ)) ∘ e.symm := by
       funext i; exact hx i
-    rw [this]; exact hli.comp _ e.symm.injective
-  exact ((Matrix.isUnit_iff_isUnit_det _).mp (Matrix.linearIndependent_rows_iff_isUnit.mp hrows)).ne_zero
+    rw [this]
+    exact hli.comp _ e.symm.injective
+  exact ((Matrix.isUnit_iff_isUnit_det _).mp
+    (Matrix.linearIndependent_rows_iff_isUnit.mp hrows)).ne_zero
 
 end GlobalTheory.CxPointsSep

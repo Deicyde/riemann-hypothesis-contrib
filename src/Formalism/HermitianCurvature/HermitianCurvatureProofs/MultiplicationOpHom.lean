@@ -74,6 +74,7 @@ theorem star_generators : Formalism.FourierDecayAlt.M.StarGens := by
     rw [Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose]
     congr 1
     funext π
-    rw [Pi.star_apply, star_add, star_smul, star_mul, e1, e2, e3, e4, Complex.star_def, Complex.conj_ofReal]
+    rw [Pi.star_apply, star_add, star_smul, star_mul, e1, e2, e3, e4, Complex.star_def,
+      Complex.conj_ofReal]
 
 end Formalism.FourierDecayAlt.P

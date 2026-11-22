@@ -68,9 +68,11 @@ theorem expInj : ExpInj := by
   intro E _ _ _ emb m m' s s' h
   classical
   funext w₀
-  let F : (InfinitePlace (maximalRealSubfield E) → ℤ) → ℤ →
-      (InfinitePlace (maximalRealSubfield E) → ℂ) → ℂ :=
-    fun n t y => ∏ w, (y w / ‖y w‖) ^ n w * ((‖y w‖ : ℝ) : ℂ) ^ t
+  let F
+      : (InfinitePlace (maximalRealSubfield E) → ℤ) → ℤ
+        → (InfinitePlace (maximalRealSubfield E) → ℂ)
+        → ℂ := fun n t y =>
+    ∏ w, (y w / ‖y w‖) ^ n w * ((‖y w‖ : ℝ) : ℂ) ^ t
   let U : Set (InfinitePlace (maximalRealSubfield E) → ℂ) := {y | ∀ w, y w ≠ 0}
   have hU : IsOpen U := by
     simp only [U, Set.setOf_forall]
@@ -78,25 +80,31 @@ theorem expInj : ExpInj := by
   have hcont : ∀ n t, ContinuousOn (F n t) U := by
     intro n t
     refine continuousOn_finsetProd _ fun w _ => ?_
-    have h1 : Continuous fun y : InfinitePlace (maximalRealSubfield E) → ℂ => y w := continuous_apply w
+    have h1 : Continuous fun y : InfinitePlace (maximalRealSubfield E) → ℂ => y w :=
+      continuous_apply w
     have h2 : Continuous fun y : InfinitePlace (maximalRealSubfield E) → ℂ => ((‖y w‖ : ℝ) : ℂ) :=
       Complex.continuous_ofReal.comp h1.norm
-    have hne : ∀ y ∈ U, ((‖y w‖ : ℝ) : ℂ) ≠ 0 := fun y hy => by
-      simpa using hy w
-    refine ContinuousOn.mul (ContinuousOn.zpow₀ (h1.continuousOn.div h2.continuousOn hne) _
-      fun y hy => Or.inl (div_ne_zero (hy w) (hne y hy))) (ContinuousOn.zpow₀ h2.continuousOn _
-      fun y hy => Or.inl (hne y hy))
+    have hne : ∀ y ∈ U, ((‖y w‖ : ℝ) : ℂ) ≠ 0 := fun y hy => by simpa using hy w
+    refine ContinuousOn.mul
+      (ContinuousOn.zpow₀ (h1.continuousOn.div h2.continuousOn hne) _ fun y hy =>
+        Or.inl (div_ne_zero (hy w) (hne y hy)))
+      (ContinuousOn.zpow₀ h2.continuousOn _ fun y hy => Or.inl (hne y hy))
   have hEq : ∀ y ∈ U, F m s y = F m' s' y := by
     intro y hy
     by_contra hne
-    have hop := ((hcont m s).sub (hcont m' s')).isOpen_inter_preimage hU
-      (isOpen_compl_singleton (x := (0 : ℂ)))
-    obtain ⟨x, hxU, hx⟩ := (dense_emb emb).exists_mem_open hop
-      ⟨y, hy, fun h0 => hne (sub_eq_zero.1 h0)⟩
+    have hop :=
+      ((hcont m s).sub (hcont m' s')).isOpen_inter_preimage hU
+        (isOpen_compl_singleton (x := (0 : ℂ)))
+    obtain ⟨x, hxU, hx⟩ :=
+      (dense_emb emb).exists_mem_open hop ⟨y, hy, fun h0 => hne (sub_eq_zero.1 h0)⟩
     have hx0 : x ≠ 0 := fun h0 => hxU w₀ (by simp [h0])
     exact hx (sub_eq_zero.2 (h (Units.mk0 x hx0)))
-  have hF : ∀ n t (θ : ℝ), F n t (Function.update (1 : InfinitePlace (maximalRealSubfield E) → ℂ) w₀ (Complex.exp (θ * Complex.I))) =
-      Complex.exp (θ * Complex.I) ^ n w₀ := by
+  have hF
+      : ∀ n t (θ : ℝ),
+        F n t
+            (Function.update (1 : InfinitePlace (maximalRealSubfield E) → ℂ) w₀
+              (Complex.exp (θ * Complex.I)))
+          = Complex.exp (θ * Complex.I) ^ n w₀ := by
     intro n t θ
     simp only [F]
     rw [Finset.prod_eq_single w₀]
@@ -104,14 +112,17 @@ theorem expInj : ExpInj := by
     · intro w _ hw
       simp [Function.update_of_ne hw]
     · simp
-  have hUy : ∀ θ : ℝ, Function.update (1 : InfinitePlace (maximalRealSubfield E) → ℂ) w₀ (Complex.exp (θ * Complex.I)) ∈ U := by
+  have hUy
+      : ∀ θ : ℝ,
+        Function.update (1 : InfinitePlace (maximalRealSubfield E) → ℂ) w₀
+            (Complex.exp (θ * Complex.I))
+          ∈ U := by
     intro θ w
     by_cases hw : w = w₀
     · subst hw; simp [Complex.exp_ne_zero]
     · simp [Function.update_of_ne hw]
   by_contra hne
-  have hd0 : ((m w₀ - m' w₀ : ℤ) : ℝ) ≠ 0 := by
-    exact_mod_cast sub_ne_zero.2 hne
+  have hd0 : ((m w₀ - m' w₀ : ℤ) : ℝ) ≠ 0 := by exact_mod_cast sub_ne_zero.2 hne
   set θ : ℝ := Real.pi / ((m w₀ - m' w₀ : ℤ) : ℝ) with hθ
   have h1 := hEq _ (hUy θ)
   rw [hF, hF] at h1
@@ -120,8 +131,7 @@ theorem expInj : ExpInj := by
   rw [← Complex.exp_int_mul] at h2
   have h3 : ((m w₀ - m' w₀ : ℤ) : ℂ) * (θ * Complex.I) = Real.pi * Complex.I := by
     have : ((m w₀ - m' w₀ : ℤ) : ℂ) * (θ : ℂ) = Real.pi := by
-      have : ((m w₀ - m' w₀ : ℤ) : ℝ) * θ = Real.pi := by
-        rw [hθ]; field_simp
+      have : ((m w₀ - m' w₀ : ℤ) : ℝ) * θ = Real.pi := by rw [hθ]; field_simp
       exact_mod_cast this
     rw [← mul_assoc, this]
   rw [h3, Complex.exp_pi_mul_I] at h2

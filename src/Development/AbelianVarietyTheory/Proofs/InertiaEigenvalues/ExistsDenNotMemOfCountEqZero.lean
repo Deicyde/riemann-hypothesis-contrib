@@ -8,11 +8,12 @@ open IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem exists_den_not_mem_of_count_eq_zero {R K : Type} [CommRing R] [IsDedekindDomain R]
-    [Field K] [Algebra R K] [IsFractionRing R K] (P : IsDedekindDomain.HeightOneSpectrum R)
-    (I : FractionalIdeal (nonZeroDivisors R) K) (hI : FractionalIdeal.count K P I = 0)
-    {a : K} (ha : a ∈ I) :
-    ∃ b c : R, c ∉ P.asIdeal ∧ algebraMap R K c * a = algebraMap R K b := by
+theorem exists_den_not_mem_of_count_eq_zero
+    {R K : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    (P : IsDedekindDomain.HeightOneSpectrum R) (I : FractionalIdeal (nonZeroDivisors R) K)
+    (hI : FractionalIdeal.count K P I = 0)
+    {a : K} (ha : a ∈ I)
+    : ∃ b c : R, c ∉ P.asIdeal ∧ algebraMap R K c * a = algebraMap R K b := by
   classical
   by_cases ha0 : a = 0
   · exact ⟨0, 1, fun h => P.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h), by simp [ha0]⟩
@@ -26,19 +27,25 @@ theorem exists_den_not_mem_of_count_eq_zero {R K : Type} [CommRing R] [IsDedekin
   have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
   have hyK : algebraMap R K y ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hy
   have hx0 : x ≠ 0 := by rintro rfl; simp at ha0
-  have hcoe : ∀ r : R, r ≠ 0 → FractionalIdeal.count K P
-      (FractionalIdeal.spanSingleton (nonZeroDivisors R) (algebraMap R K r)) =
-      ((Associates.mk P.asIdeal).count (Associates.mk (Ideal.span {r} : Ideal R)).factors : ℤ) := by
+  have hcoe
+      : ∀ r : R,
+        r ≠ 0
+          → FractionalIdeal.count K P
+              (FractionalIdeal.spanSingleton (nonZeroDivisors R) (algebraMap R K r))
+            = ((Associates.mk P.asIdeal).count (Associates.mk (Ideal.span {r} : Ideal R)).factors
+              : ℤ) := by
     intro r hr
     rw [← FractionalIdeal.coeIdeal_span_singleton, FractionalIdeal.count_coe K P]
     simpa using hr
-  have hmul : FractionalIdeal.spanSingleton (nonZeroDivisors R) (algebraMap R K x / algebraMap R K y)
-      * FractionalIdeal.spanSingleton (nonZeroDivisors R) (algebraMap R K y) =
-      FractionalIdeal.spanSingleton (nonZeroDivisors R) (algebraMap R K x) := by
+  have hmul
+      : FractionalIdeal.spanSingleton (nonZeroDivisors R) (algebraMap R K x / algebraMap R K y)
+          * FractionalIdeal.spanSingleton (nonZeroDivisors R) (algebraMap R K y)
+        = FractionalIdeal.spanSingleton (nonZeroDivisors R) (algebraMap R K x) := by
     rw [FractionalIdeal.spanSingleton_mul_spanSingleton, div_mul_cancel₀ _ hyK]
   have hcnt := congrArg (FractionalIdeal.count K P) hmul
   rw [FractionalIdeal.count_mul K P hne (FractionalIdeal.spanSingleton_ne_zero_iff.2 hyK),
-    hcoe x hx0, hcoe y hy0] at hcnt
+      hcoe x hx0, hcoe y hy0]
+    at hcnt
   have hval : P.valuation K (algebraMap R K x / algebraMap R K y) ≤ 1 := by
     rw [map_div₀, HeightOneSpectrum.valuation_of_algebraMap,
       HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.intValuation_if_neg _ hx0,
@@ -47,11 +54,12 @@ theorem exists_den_not_mem_of_count_eq_zero {R K : Type} [CommRing R] [IsDedekin
     omega
   have hmem : algebraMap R K x / algebraMap R K y ∈ P.valuationSubringAtPrime K := by
     rw [HeightOneSpectrum.valuationSubringAtPrime_eq_valuationSubring]; exact hval
-  obtain ⟨⟨b, c⟩, hbc⟩ := IsLocalization.surj P.asIdeal.primeCompl
-    (⟨_, hmem⟩ : P.valuationSubringAtPrime K)
+  obtain ⟨⟨b, c⟩, hbc⟩ :=
+    IsLocalization.surj P.asIdeal.primeCompl (⟨_, hmem⟩ : P.valuationSubringAtPrime K)
   refine ⟨b, c, c.2, ?_⟩
   have := congrArg (algebraMap (P.valuationSubringAtPrime K) K) hbc
   rw [map_mul, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply] at this
-  rw [mul_comm]; exact this
+  rw [mul_comm]
+  exact this
 
 end GlobalTheory

@@ -7,17 +7,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PicEqOneOfFo
 
 namespace GlobalTheory
 
-theorem pow_idempotent_combination {R : Type} [CommRing R] {g : R} (hg : IsIdempotentElem g)
-    (a b : R) (n : ℕ) : (g * a + (1 - g) * b) ^ n = g * a ^ n + (1 - g) * b ^ n := by
+theorem pow_idempotent_combination
+    {R : Type} [CommRing R] {g : R} (hg : IsIdempotentElem g) (a b : R) (n : ℕ)
+    : (g * a + (1 - g) * b) ^ n = g * a ^ n + (1 - g) * b ^ n := by
   induction n with
   | zero => ring
   | succ n ih =>
     rw [pow_succ, ih]
     linear_combination (a ^ n * a + b ^ n * b - a ^ n * b - b ^ n * a) * hg.eq
 
-theorem exists_unit_pow_eq_of_krullDimLE_zero : ∀ (R : Type) [CommRing R] [Ring.KrullDimLE 0 R]
-    (q : ℕ), 0 < q → IsUnit (q : R) → ∀ u : Rˣ,
-    (∀ m : Ideal R, m.IsMaximal → ∃ x : R, x ^ q - (u : R) ∈ m) → ∃ v : Rˣ, v ^ q = u := by
+theorem exists_unit_pow_eq_of_krullDimLE_zero
+    : ∀ (R : Type) [CommRing R] [Ring.KrullDimLE 0 R] (q : ℕ),
+      0 < q → IsUnit (q : R)
+        → ∀ u : Rˣ,
+          (∀ m : Ideal R, m.IsMaximal → ∃ x : R, x ^ q - (u : R) ∈ m) → ∃ v : Rˣ, v ^ q = u := by
   intro R _ _ q hq hqu u hloc
   have hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal := fun P hP => hP.isMaximal'
   let S : Set R := {g | IsIdempotentElem g ∧ ∃ x : R, IsNilpotent (g * (x ^ q - u))}
@@ -26,12 +29,14 @@ theorem exists_unit_pow_eq_of_krullDimLE_zero : ∀ (R : Type) [CommRing R] [Rin
     refine ⟨?_, g * x + (1 - g) * z, ?_⟩
     · show (g + h - g * h) * (g + h - g * h) = g + h - g * h
       linear_combination (1 - 2 * h + h ^ 2) * hg.eq + (1 - g) * hh.eq
-    · have key : (g + h - g * h) * ((g * x + (1 - g) * z) ^ q - u)
-          = g * (x ^ q - u) + (1 - g) * (h * (z ^ q - u)) := by
+    · have key
+          : (g + h - g * h) * ((g * x + (1 - g) * z) ^ q - u)
+            = g * (x ^ q - u) + (1 - g) * (h * (z ^ q - u)) := by
         rw [pow_idempotent_combination hg]
         linear_combination (x ^ q - z ^ q - h * x ^ q + h * z ^ q) * hg.eq
       rw [key]
-      exact Commute.isNilpotent_add (Commute.all _ _) hx ((Commute.all _ _).isNilpotent_mul_left (show IsNilpotent (h * (z ^ q - u)) from hz))
+      exact Commute.isNilpotent_add (Commute.all _ _) hx
+        ((Commute.all _ _).isNilpotent_mul_left (show IsNilpotent (h * (z ^ q - u)) from hz))
   have hcover : ∀ m : Ideal R, m.IsMaximal → ∃ g ∈ S, g ∉ m := by
     intro m hm
     obtain ⟨x, hx⟩ := hloc m hm
@@ -44,7 +49,8 @@ theorem exists_unit_pow_eq_of_krullDimLE_zero : ∀ (R : Type) [CommRing R] [Rin
       · have hep' := hep p hp ha
         have h0 : e * (1 - e) ∈ p := by
           have : e * (1 - e) = 0 := by linear_combination -he.eq
-          rw [this]; exact p.zero_mem
+          rw [this]
+          exact p.zero_mem
         rcases hp.mem_or_mem h0 with h | h
         · exact absurd h hep'
         · exact p.mul_mem_right _ h
@@ -78,11 +84,12 @@ theorem exists_unit_pow_eq_of_krullDimLE_zero : ∀ (R : Type) [CommRing R] [Rin
   have h1 : (1 : R) ∈ Ideal.span S := by rw [hspan]; trivial
   obtain ⟨n, f, g, hf⟩ := Submodule.mem_span_set'.mp h1
   classical
-  obtain ⟨G, hG, hGT⟩ := hfin (Finset.univ.image fun i => (g i : R)) (by
-    intro y hy
-    simp only [Finset.coe_image, Finset.coe_univ, Set.image_univ, Set.mem_range] at hy
-    obtain ⟨i, rfl⟩ := hy
-    exact (g i).2)
+  obtain ⟨G, hG, hGT⟩ :=
+    hfin (Finset.univ.image fun i => (g i : R)) (by
+      intro y hy
+      simp only [Finset.coe_image, Finset.coe_univ, Set.image_univ, Set.mem_range] at hy
+      obtain ⟨i, rfl⟩ := hy
+      exact (g i).2)
   have hG1 : G = 1 := by
     have : (∑ i, f i • (g i : R)) * G = ∑ i, f i • (g i : R) := by
       rw [Finset.sum_mul]
@@ -97,12 +104,12 @@ theorem exists_unit_pow_eq_of_krullDimLE_zero : ∀ (R : Type) [CommRing R] [Rin
     simpa using this
   have hxu : IsUnit x := (isUnit_pow_iff hq.ne').mp hxq
   let P : Polynomial R := Polynomial.X ^ q - Polynomial.C (u : R)
-  have hP : ∀ y : R, Polynomial.aeval y P = y ^ q - u := by
-    intro y; simp [P]
+  have hP : ∀ y : R, Polynomial.aeval y P = y ^ q - u := by intro y; simp [P]
   have hdP : Polynomial.aeval x (Polynomial.derivative P) = (q : R) * x ^ (q - 1) := by
     simp [P, Polynomial.derivative_X_pow]
-  obtain ⟨v, ⟨-, hv⟩, -⟩ := Polynomial.existsUnique_nilpotent_sub_and_aeval_eq_zero (P := P) (x := x)
-    (by rw [hP]; exact hx) (by rw [hdP]; exact hqu.mul (hxu.pow _))
+  obtain ⟨v, ⟨-, hv⟩, -⟩ :=
+    Polynomial.existsUnique_nilpotent_sub_and_aeval_eq_zero (P := P) (x := x) (by rw [hP]; exact hx)
+      (by rw [hdP]; exact hqu.mul (hxu.pow _))
   rw [hP, sub_eq_zero] at hv
   have hvu : IsUnit v := (isUnit_pow_iff hq.ne').mp (hv ▸ u.isUnit)
   exact ⟨hvu.unit, Units.ext (by simp [hv])⟩

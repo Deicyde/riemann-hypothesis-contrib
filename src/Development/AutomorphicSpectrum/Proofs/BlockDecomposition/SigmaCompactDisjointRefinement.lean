@@ -11,22 +11,27 @@ open scoped ENNReal ComplexConjugate
 
 namespace GlobalTheory.CompanionTheory.CroftonPartition
 
-theorem isSigmaCompact_of_isOpen_compact {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X]
-    [SecondCountableTopology X] {U : Set X} (hU : IsOpen U) : IsSigmaCompact U := by
+theorem isSigmaCompact_of_isOpen_compact
+    {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] [SecondCountableTopology X]
+    {U : Set X} (hU : IsOpen U)
+    : IsSigmaCompact U := by
   have : LocallyCompactSpace U := hU.locallyCompactSpace
   exact isSigmaCompact_iff_sigmaCompactSpace.2 inferInstance
 
-theorem isSigmaCompact_inter_isClosed {X : Type} [TopologicalSpace X] {s C : Set X}
-    (hs : IsSigmaCompact s) (hC : IsClosed C) : IsSigmaCompact (s ∩ C) := by
+theorem isSigmaCompact_inter_isClosed
+    {X : Type} [TopologicalSpace X] {s C : Set X} (hs : IsSigmaCompact s) (hC : IsClosed C)
+    : IsSigmaCompact (s ∩ C) := by
   obtain ⟨K, hK, hKs⟩ := hs
   refine ⟨fun n => K n ∩ C, fun n => (hK n).inter_right hC, ?_⟩
   rw [← hKs, Set.iUnion_inter]
 
-theorem exists_sigmaCompact_partition : ∀ (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X]
-    [SecondCountableTopology X] (ι : Type) (S : ι → Set X), (∀ i, IsOpen (S i)) →
-    (⋃ i, S i) = Set.univ → ∃ (m : ℕ) (l : Fin m → ι) (A : Fin m → Set X),
-      Pairwise (Function.onFun Disjoint A) ∧ (⋃ t, A t) = Set.univ ∧ (∀ t, A t ⊆ S (l t)) ∧
-      ∀ t, IsSigmaCompact (A t) := by
+theorem exists_sigmaCompact_partition
+    : ∀ (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X] [SecondCountableTopology X]
+        (ι : Type) (S : ι → Set X),
+      (∀ i, IsOpen (S i)) → (⋃ i, S i) = Set.univ
+        → ∃ (m : ℕ) (l : Fin m → ι) (A : Fin m → Set X),
+          Pairwise (Function.onFun Disjoint A) ∧ (⋃ t, A t) = Set.univ ∧ (∀ t, A t ⊆ S (l t))
+            ∧ ∀ t, IsSigmaCompact (A t) := by
   intro X _ _ _ _ ι S hS hcov
   classical
   obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover S hS hcov.ge
@@ -41,8 +46,8 @@ theorem exists_sigmaCompact_partition : ∀ (X : Type) [TopologicalSpace X] [Com
   · refine Set.eq_univ_of_forall fun x => ?_
     obtain ⟨i, hit, hxi⟩ := Set.mem_iUnion₂.1 (ht (Set.mem_univ x))
     have hl : l (e ⟨i, hit⟩) = i := by simp [l]
-    obtain ⟨j, hj, hmin⟩ := wellFounded_lt.has_min {j : Fin t.card | x ∈ S (l j)}
-      ⟨e ⟨i, hit⟩, by simpa [hl] using hxi⟩
+    obtain ⟨j, hj, hmin⟩ :=
+      wellFounded_lt.has_min {j : Fin t.card | x ∈ S (l j)} ⟨e ⟨i, hit⟩, by simpa [hl] using hxi⟩
     refine Set.mem_iUnion.2 ⟨j, hj, fun hx => ?_⟩
     obtain ⟨i', hi', hxi'⟩ := Set.mem_iUnion₂.1 hx
     exact hmin i' hxi' hi'

@@ -20,9 +20,10 @@ open NumberField IsDedekindDomain Formalism.L2.Th1.CM Neutral.HilbertClassField
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem natCard_mem {E Ω : Type*} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] {A : ValuationSubring Ω}
-    {v : HeightOneSpectrum (𝓞 E)} (h : LiesAbove A v) :
-    ((Nat.card (𝓞 E ⧸ v.asIdeal) : ℕ) : Ω) ∈ A.nonunits := by
+theorem natCard_mem
+    {E Ω : Type*} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 E)} (h : LiesAbove A v)
+    : ((Nat.card (𝓞 E ⧸ v.asIdeal) : ℕ) : Ω) ∈ A.nonunits := by
   have hmem : ((Nat.card (𝓞 E ⧸ v.asIdeal) : ℕ) : 𝓞 E) ∈ v.asIdeal := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
     rcases finite_or_infinite (𝓞 E ⧸ v.asIdeal) with hf | hf
@@ -33,11 +34,12 @@ theorem natCard_mem {E Ω : Type*} [Field E] [NumberField E] [Field Ω] [Algebra
   have h2 := (h _).mpr hmem
   simpa using h2
 
-theorem frobCong {d : ℕ} {L : PeriodPair} (hsf : Squarefree d) (hd : d % 4 = 3) (hL : HasCMBy d L)
-    (x : Om d) (hx : (x : ℂ) = jInv L) (A : ValuationSubring (Om d)) (v : HeightOneSpectrum (𝓞 (KQ d)))
+theorem frobCong
+    {d : ℕ} {L : PeriodPair} (hsf : Squarefree d) (hd : d % 4 = 3) (hL : HasCMBy d L) (x : Om d)
+    (hx : (x : ℂ) = jInv L) (A : ValuationSubring (Om d)) (v : HeightOneSpectrum (𝓞 (KQ d)))
     (hA : LiesAbove A v) (hp : (Nat.card (𝓞 (KQ d) ⧸ v.asIdeal)).Prime)
-    (hv : ClassGroup.mk0 ⟨v.asIdeal, mem_nonZeroDivisors_of_ne_zero v.ne_bot⟩ = 1) :
-    x ^ Nat.card (𝓞 (KQ d) ⧸ v.asIdeal) - x ∈ A.nonunits := by
+    (hv : ClassGroup.mk0 ⟨v.asIdeal, mem_nonZeroDivisors_of_ne_zero v.ne_bot⟩ = 1)
+    : x ^ Nat.card (𝓞 (KQ d) ⧸ v.asIdeal) - x ∈ A.nonunits := by
   set N := Nat.card (𝓞 (KQ d) ⧸ v.asIdeal) with hN
   have hd0 : 0 < d := by omega
   obtain ⟨c, τ, hτ⟩ := latTau L

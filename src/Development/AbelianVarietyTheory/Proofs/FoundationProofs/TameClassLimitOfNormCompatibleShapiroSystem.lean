@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.NormIntCa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.KA
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.KA
 open scoped Matrix
 
 namespace GlobalTheory.KA.TameLim
@@ -19,8 +21,9 @@ variable {l : ℕ} [Fact l.Prime]
 theorem norm_le_one_of_mem (c : Coef l) {x : Qbar l} (hx : x ∈ c.O) : ‖x‖ ≤ 1 := by
   haveI : Module.Finite ℤ_[l] c.O := c.fin
   have hi : IsIntegral ℤ_[l] x := by
-    have h := (isIntegral_algHom_iff (c.O.val.restrictScalars ℤ_[l]) Subtype.val_injective).2
-      (Algebra.IsIntegral.isIntegral (⟨x, hx⟩ : c.O))
+    have h :=
+      (isIntegral_algHom_iff (c.O.val.restrictScalars ℤ_[l]) Subtype.val_injective).2
+        (Algebra.IsIntegral.isIntegral (⟨x, hx⟩ : c.O))
     simpa using h
   have hq : IsIntegral ℚ_[l] x := Algebra.IsIntegral.isIntegral x
   change spectralValue (minpoly ℚ_[l] x) ≤ 1
@@ -29,7 +32,8 @@ theorem norm_le_one_of_mem (c : Coef l) {x : Qbar l} (hx : x ∈ c.O) : ‖x‖ 
   rw [minpoly.isIntegrallyClosed_eq_field_fractions' ℚ_[l] hi, Polynomial.coeff_map]
   exact PadicInt.norm_le_one _
 
-theorem inv_pow_mem (c : Coef l) (e k : ℕ) (h : k = 0 ∨ ¬ l ∣ k) : (((k : ℕ) : Qbar l) ^ e)⁻¹ ∈ c.O := by
+theorem inv_pow_mem (c : Coef l) (e k : ℕ) (h : k = 0 ∨ ¬ l ∣ k)
+    : (((k : ℕ) : Qbar l) ^ e)⁻¹ ∈ c.O := by
   rcases h with rfl | h
   · rcases Nat.eq_zero_or_pos e with rfl | he
     · simpa using c.O.one_mem
@@ -45,8 +49,8 @@ theorem inv_pow_mem (c : Coef l) (e k : ℕ) (h : k = 0 ∨ ¬ l ∣ k) : (((k :
     rw [e1]
     exact c.O.algebraMap_mem _
 
-theorem val_unit (r : ℕ) (x : (ZMod (l ^ r))ˣ) :
-    (x : ZMod (l ^ r)).val = 0 ∨ ¬ l ∣ (x : ZMod (l ^ r)).val := by
+theorem val_unit (r : ℕ) (x : (ZMod (l ^ r))ˣ)
+    : (x : ZMod (l ^ r)).val = 0 ∨ ¬ l ∣ (x : ZMod (l ^ r)).val := by
   have hp : l.Prime := Fact.out
   rcases Nat.eq_zero_or_pos r with rfl | hr
   · left
@@ -56,12 +60,15 @@ theorem val_unit (r : ℕ) (x : (ZMod (l ^ r))ˣ) :
   · right
     intro hd
     have hc := ZMod.val_coe_unit_coprime x
-    have h2 : l ∣ Nat.gcd (x : ZMod (l ^ r)).val (l ^ r) := Nat.dvd_gcd hd (dvd_pow_self l (by omega))
+    have h2 : l ∣ Nat.gcd (x : ZMod (l ^ r)).val (l ^ r) :=
+      Nat.dvd_gcd hd (dvd_pow_self l (by omega))
     rw [hc] at h2
     exact hp.one_lt.ne' (Nat.dvd_one.mp h2)
 
-theorem mul_sub_mul_le (a a' u u' : Qbar l) (C : ℝ) (ha' : ‖a'‖ ≤ 1) (hu : ‖u‖ ≤ 1)
-    (h1 : ‖a' - a‖ ≤ C) (h2 : ‖u' - u‖ ≤ C) : ‖a' * u' - a * u‖ ≤ C := by
+theorem mul_sub_mul_le
+    (a a' u u' : Qbar l) (C : ℝ)
+    (ha' : ‖a'‖ ≤ 1) (hu : ‖u‖ ≤ 1) (h1 : ‖a' - a‖ ≤ C) (h2 : ‖u' - u‖ ≤ C)
+    : ‖a' * u' - a * u‖ ≤ C := by
   have e : a' * u' - a * u = a' * (u' - u) + (a' - a) * u := by ring
   rw [e]
   refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
@@ -72,26 +79,39 @@ end GlobalTheory.KA.TameLim
 
 namespace GlobalTheory.KA.TameLim
 
-theorem core (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (W : R2 Ω l) (c : Coef l) (n : ℕ)
-    (η : ∀ r : ℕ, (ZMod (l ^ r))ˣ → Qbar l) (θ : G ℚ Ω →* (Qbar l)ˣ) (ρ : G ℚ Ω → Matrix (Fin 2) (Fin 2) (Qbar l))
-    (ψ : G ℚ Ω →* Multiplicative (ZMod (l ^ n)))
+theorem core
+    (l : ℕ) [Fact l.Prime]
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω]
+    (W : R2 Ω l) (c : Coef l)
+    (n : ℕ)
+    (η : ∀ r : ℕ, (ZMod (l ^ r))ˣ → Qbar l) (θ : G ℚ Ω →* (Qbar l)ˣ)
+    (ρ : G ℚ Ω → Matrix (Fin 2) (Fin 2) (Qbar l)) (ψ : G ℚ Ω →* Multiplicative (ZMod (l ^ n)))
     (Yw : ∀ r : ℕ, G ℚ Ω → Multiplicative (ZMod (l ^ n)) × (ZMod (l ^ r))ˣ → Fin 2 → Qbar l)
     (y : G ℚ Ω → Fin 2 → Qbar l) (P : Qbar l) (b : ℕ → Fin 2 → Qbar l)
     (hWO : ∀ s i j, mat W s i j ∈ c.O) (hWρ : ∀ s, mat W s = (θ s : Qbar l) • ρ s)
     (hρO : ∀ s i j, ρ s i j ∈ c.O) (hηO : ∀ r x, η r x ∈ c.O)
-    (hηc : ∀ r (x : (ZMod (l ^ (r + 1)))ˣ), ‖η (r + 1) x - η r ((Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom) x)‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖)
-    (hηa : ∀ r s x, ‖η r (x * cycMod ℚ Ω l r s) - η r x * (θ s : Qbar l)‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖)
+    (hηc : ∀ r (x : (ZMod (l ^ (r + 1)))ˣ),
+      ‖η (r + 1) x - η r ((Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom) x)‖
+        ≤ ‖((l : ℕ) : Qbar l) ^ r‖)
+    (hηa
+      : ∀ r s x, ‖η r (x * cycMod ℚ Ω l r s) - η r x * (θ s : Qbar l)‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖)
     (hSh : ∀ r, ShCoc ρ (ψ.prod (cycMod ℚ Ω l r)⁻¹) (Yw r))
-    (hcont : ∀ r x i, Continuous fun s => Yw r s x i)
-    (hYO : ∀ r s x i, Yw r s x i ∈ c.O)
-    (hnc : ∀ r s, Yw r s = push (Prod.map id (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom)) (Yw (r + 1)) s)
+    (hcont : ∀ r x i, Continuous fun s => Yw r s x i) (hYO : ∀ r s x i, Yw r s x i ∈ c.O)
+    (hnc : ∀ r s,
+      Yw r s
+        = push
+          (Prod.map id
+            (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom))
+          (Yw (r + 1)) s)
     (hb : ∀ r i, b r i ∈ c.O)
-    (hrel : ∀ r s i, ‖(∑ a, spec (η r) (fun s x => Yw r s (a, x)) s) i - (P • y s + (mat W s *ᵥ b r - b r)) i‖ ≤
-      ‖((l : ℕ) : Qbar l) ^ r‖) :
-    ∃ (Y : G ℚ Ω → Multiplicative (ZMod (l ^ n)) → Fin 2 → Qbar l) (b' : Fin 2 → Qbar l), ShCoc (mat W) ψ Y ∧
-      (∀ x i, Continuous fun s => Y s x i) ∧ (∀ s x i, Y s x i ∈ c.O) ∧ (∀ i, b' i ∈ c.O) ∧
-      (∀ s, ∑ x, Y s x = P • y s + (mat W s *ᵥ b' - b')) ∧
-      ∀ r s x i, ‖Y s x i - spec (η r) (fun s x' => Yw r s (x, x')) s i‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖ := by
+    (hrel : ∀ r s i,
+      ‖(∑ a, spec (η r) (fun s x => Yw r s (a, x)) s) i - (P • y s + (mat W s *ᵥ b r - b r)) i‖
+        ≤ ‖((l : ℕ) : Qbar l) ^ r‖)
+    : ∃ (Y : G ℚ Ω → Multiplicative (ZMod (l ^ n)) → Fin 2 → Qbar l) (b' : Fin 2 → Qbar l),
+      ShCoc (mat W) ψ Y ∧ (∀ x i, Continuous fun s => Y s x i) ∧ (∀ s x i, Y s x i ∈ c.O)
+        ∧ (∀ i, b' i ∈ c.O) ∧ (∀ s, ∑ x, Y s x = P • y s + (mat W s *ᵥ b' - b'))
+        ∧ ∀ r s x i,
+          ‖Y s x i - spec (η r) (fun s x' => Yw r s (x, x')) s i‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖ := by
   have hq := GlobalTheory.norm_natCast_prime_qbar l
   have hC : ∀ r : ℕ, (0 : ℝ) ≤ ‖((l : ℕ) : Qbar l) ^ r‖ := fun r => norm_nonneg _
   have ht0 : Filter.Tendsto (fun r : ℕ => ‖((l : ℕ) : Qbar l) ^ r‖) Filter.atTop (nhds 0) := by
@@ -107,46 +127,76 @@ theorem core (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (W
   have hYr_apply : ∀ r s a i, Yr r s a i = ∑ x, η r x * Yw r s (a, x) i := by
     intro r s a i; simp only [hYr, spec, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
   have hYrO : ∀ r s a i, Yr r s a i ∈ c.O := by
-    intro r s a i; rw [hYr_apply]
+    intro r s a i
+    rw [hYr_apply]
     exact Subalgebra.sum_mem _ fun x _ => Subalgebra.mul_mem _ (hηO r x) (hYO r s (a, x) i)
 
-  have hslice : ∀ a r s, (fun x => Yw r s (a, x)) = push (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom) (fun s x' => Yw (r + 1) s (a, x')) s := by
-    intro a r s; funext x
+  have hslice
+      : ∀ a r s,
+        (fun x => Yw r s (a, x))
+          = push
+            (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom)
+            (fun s x' => Yw (r + 1) s (a, x'))
+            s := by
+    intro a r s
+    funext x
     rw [hnc r s]
     simp only [push]
     refine Finset.sum_nbij' (fun p => p.2) (fun x' => (a, x')) ?_ ?_ ?_ ?_ ?_
-    · intro p hp; simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.map, Prod.mk.injEq] at hp ⊢; exact hp.2
-    · intro x' hx'; simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.map, Prod.mk.injEq, id] at hx' ⊢; first | exact hx' | exact ⟨rfl, hx'⟩
-    · intro p hp; simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.map, Prod.mk.injEq, id] at hp
+    · intro p hp
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.map, Prod.mk.injEq] at hp ⊢
+      exact hp.2
+    · intro x' hx'
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.map, Prod.mk.injEq, id] at hx' ⊢
+      first | exact hx' | exact ⟨rfl, hx'⟩
+    · intro p hp
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.map, Prod.mk.injEq, id] at hp
       exact Prod.ext hp.1.symm rfl
     · intro x' _; rfl
-    · intro p hp; simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.map, Prod.mk.injEq, id] at hp
+    · intro p hp
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.map, Prod.mk.injEq, id] at hp
       rw [← hp.1]
   have hstep : ∀ r s a i, ‖Yr (r + 1) s a i - Yr r s a i‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖ := by
     intro r s a i
-    exact spec_cauchy l (fun r s x => Yw r s (a, x)) η (fun r s x i => n1 (hYO r s (a, x) i))
-      (fun r x => n1 (hηO r x)) (fun r s => hslice a r s) hηc r s i
-  have hlim : ∀ s a i, ∃ v ∈ c.O, ∀ r, ‖v - Yr r s a i‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖ :=
-    fun s a i => GlobalTheory.coef_limit l c (fun r => Yr r s a i) (fun r => hYrO r s a i) (fun r => hstep r s a i)
+    exact spec_cauchy l
+      (fun r s x => Yw r s (a, x))
+      η
+      (fun r s x i => n1 (hYO r s (a, x) i))
+      (fun r x => n1 (hηO r x))
+      (fun r s => hslice a r s)
+      hηc r s i
+  have hlim : ∀ s a i, ∃ v ∈ c.O, ∀ r, ‖v - Yr r s a i‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖ := fun s a i =>
+    GlobalTheory.coef_limit l c
+      (fun r => Yr r s a i)
+      (fun r => hYrO r s a i)
+      (fun r => hstep r s a i)
   choose Y hYO' hYap using hlim
 
-  have happ : ∀ r s t a i, ‖Yr r (s * t) a i - (Yr r s a + mat W s *ᵥ Yr r t (a * ψ s)) i‖ ≤
-      ‖((l : ℕ) : Qbar l) ^ r‖ := by
+  have happ
+      : ∀ r s t a i,
+        ‖Yr r (s * t) a i - (Yr r s a + mat W s *ᵥ Yr r t (a * ψ s)) i‖
+          ≤ ‖((l : ℕ) : Qbar l) ^ r‖ := by
     intro r s t a i
-    have key : Yr r (s * t) a - (Yr r s a + mat W s *ᵥ Yr r t (a * ψ s)) =
-        ρ s *ᵥ ∑ x, (η r (x * cycMod ℚ Ω l r s) - η r x * (θ s : Qbar l)) • Yw r t (a * ψ s, x) := by
-      have h1 : Yr r (s * t) a = Yr r s a +
-          ρ s *ᵥ ∑ x, η r x • Yw r t (a * ψ s, x * (cycMod ℚ Ω l r s)⁻¹) := by
-        simp only [hYr, spec, hSh r s t, smul_add, Finset.sum_add_distrib, Matrix.mulVec_sum, Matrix.mulVec_smul,
-          Prod.mk_mul_mk, MonoidHom.prod_apply, MonoidHom.inv_apply]
-      have hre : ∑ x, η r x • Yw r t (a * ψ s, x * (cycMod ℚ Ω l r s)⁻¹) =
-          ∑ x, η r (x * cycMod ℚ Ω l r s) • Yw r t (a * ψ s, x) :=
-        Fintype.sum_equiv (Equiv.mulRight (cycMod ℚ Ω l r s)⁻¹) _ _ (fun x => by simp)
-      rw [h1, hre, hWρ s]
-      simp only [hYr, spec]
-      rw [Matrix.smul_mulVec, ← Matrix.mulVec_smul, add_sub_add_left_eq_sub, ← Matrix.mulVec_sub]
-      congr 1
-      simp only [Finset.smul_sum, smul_smul, ← Finset.sum_sub_distrib, sub_smul, mul_comm (θ s : Qbar l)]
+    have key
+        : Yr r (s * t) a - (Yr r s a + mat W s *ᵥ Yr r t (a * ψ s))
+          = ρ s
+            *ᵥ ∑ x, (η r (x * cycMod ℚ Ω l r s) - η r x * (θ s : Qbar l)) • Yw r t (a * ψ s, x) :=
+      by
+        have h1
+            : Yr r (s * t) a
+              = Yr r s a + ρ s *ᵥ ∑ x, η r x • Yw r t (a * ψ s, x * (cycMod ℚ Ω l r s)⁻¹) := by
+          simp only [hYr, spec, hSh r s t, smul_add, Finset.sum_add_distrib, Matrix.mulVec_sum,
+            Matrix.mulVec_smul, Prod.mk_mul_mk, MonoidHom.prod_apply, MonoidHom.inv_apply]
+        have hre
+            : ∑ x, η r x • Yw r t (a * ψ s, x * (cycMod ℚ Ω l r s)⁻¹)
+              = ∑ x, η r (x * cycMod ℚ Ω l r s) • Yw r t (a * ψ s, x) :=
+          Fintype.sum_equiv (Equiv.mulRight (cycMod ℚ Ω l r s)⁻¹) _ _ (fun x => by simp)
+        rw [h1, hre, hWρ s]
+        simp only [hYr, spec]
+        rw [Matrix.smul_mulVec, ← Matrix.mulVec_smul, add_sub_add_left_eq_sub, ← Matrix.mulVec_sub]
+        congr 1
+        simp only [Finset.smul_sum, smul_smul, ← Finset.sum_sub_distrib, sub_smul,
+          mul_comm (θ s : Qbar l)]
     rw [← Pi.sub_apply, key]
     simp only [Matrix.mulVec, dotProduct, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (hC r)
@@ -164,9 +214,11 @@ theorem core (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (W
     rw [← sub_eq_zero]
     apply hzero
     intro r
-    have e : Y (s * t) a i - (Y s a + mat W s *ᵥ Y t (a * ψ s)) i =
-        (Y (s * t) a i - Yr r (s * t) a i) + (Yr r (s * t) a i - (Yr r s a + mat W s *ᵥ Yr r t (a * ψ s)) i)
-          + (Yr r s a i - Y s a i) + (mat W s *ᵥ (Yr r t (a * ψ s) - Y t (a * ψ s))) i := by
+    have e
+        : Y (s * t) a i - (Y s a + mat W s *ᵥ Y t (a * ψ s)) i
+          = (Y (s * t) a i - Yr r (s * t) a i)
+            + (Yr r (s * t) a i - (Yr r s a + mat W s *ᵥ Yr r t (a * ψ s)) i)
+            + (Yr r s a i - Y s a i) + (mat W s *ᵥ (Yr r t (a * ψ s) - Y t (a * ψ s))) i := by
       simp only [Pi.add_apply, Matrix.mulVec_sub, Pi.sub_apply]; ring
     rw [e]
     have hM : ‖(mat W s *ᵥ (Yr r t (a * ψ s) - Y t (a * ψ s))) i‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖ := by
@@ -177,8 +229,13 @@ theorem core (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (W
       exact le_trans (mul_le_of_le_one_left (norm_nonneg _) (hMle s i j)) (hYap t (a * ψ s) j r)
     have h3 : ‖Yr r s a i - Y s a i‖ ≤ ‖((l : ℕ) : Qbar l) ^ r‖ := by
       rw [norm_sub_rev]; exact hYap s a i r
-    refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ((IsUltrametricDist.norm_add_le_max _ _).trans
-      (max_le ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hYap _ _ _ r) (happ r s t a i))) h3)) hM)
+    refine (IsUltrametricDist.norm_add_le_max _ _).trans
+      (max_le
+        ((IsUltrametricDist.norm_add_le_max _ _).trans
+          (max_le
+            ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hYap _ _ _ r) (happ r s t a i)))
+            h3))
+        hM)
 
   have hcontY : ∀ x i, Continuous fun s => Y s x i := by
     intro x i
@@ -192,25 +249,30 @@ theorem core (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (W
     simp only [hYr_apply]
     exact continuous_finsetSum _ fun x' _ => continuous_const.mul (hcont r (x, x') i)
 
-  obtain ⟨b', hb'K, φ, hφ, hφt⟩ := (isCompact_univ_pi (fun _ : Fin 2 => GlobalTheory.Coef.isCompact_O l c)).tendsto_subseq
-    (x := b) (fun r => Set.mem_univ_pi.mpr (hb r))
+  obtain ⟨b', hb'K, φ, hφ, hφt⟩ :=
+    (isCompact_univ_pi (fun _ : Fin 2 => GlobalTheory.Coef.isCompact_O l c)).tendsto_subseq (x := b)
+      (fun r => Set.mem_univ_pi.mpr (hb r))
   have hb'O : ∀ i, b' i ∈ c.O := fun i => Set.mem_univ_pi.mp hb'K i
   have hsum : ∀ s, ∑ x, Y s x = P • y s + (mat W s *ᵥ b' - b') := by
-    intro s; funext i
+    intro s
+    funext i
     have hφ0 : Filter.Tendsto (fun k => ‖((l : ℕ) : Qbar l) ^ φ k‖) Filter.atTop (nhds 0) :=
       ht0.comp hφ.tendsto_atTop
-    have h1 : Filter.Tendsto (fun k => (∑ x, Yr (φ k) s x) i) Filter.atTop (nhds ((∑ x, Y s x) i)) := by
+    have h1
+        : Filter.Tendsto (fun k => (∑ x, Yr (φ k) s x) i) Filter.atTop (nhds ((∑ x, Y s x) i)) := by
       simp only [Finset.sum_apply]
       refine tendsto_finsetSum _ fun x _ => ?_
       rw [tendsto_iff_norm_sub_tendsto_zero]
       refine squeeze_zero (fun _ => norm_nonneg _) (fun k => ?_) hφ0
-      rw [norm_sub_rev]; exact hYap s x i (φ k)
-    have hg : Continuous fun v : Fin 2 → Qbar l => (P • y s + (mat W s *ᵥ v - v)) i := by
-      fun_prop
-    have h2 : Filter.Tendsto (fun k => (P • y s + (mat W s *ᵥ b (φ k) - b (φ k))) i) Filter.atTop
-        (nhds ((P • y s + (mat W s *ᵥ b' - b')) i)) :=
+      rw [norm_sub_rev]
+      exact hYap s x i (φ k)
+    have hg : Continuous fun v : Fin 2 → Qbar l => (P • y s + (mat W s *ᵥ v - v)) i := by fun_prop
+    have h2 : Filter.Tendsto
+        (fun k => (P • y s + (mat W s *ᵥ b (φ k) - b (φ k))) i)
+        Filter.atTop (nhds ((P • y s + (mat W s *ᵥ b' - b')) i)) :=
       (hg.tendsto b').comp hφt
-    have h3 : Filter.Tendsto (fun k => (∑ x, Yr (φ k) s x) i - (P • y s + (mat W s *ᵥ b (φ k) - b (φ k))) i)
+    have h3 : Filter.Tendsto
+        (fun k => (∑ x, Yr (φ k) s x) i - (P • y s + (mat W s *ᵥ b (φ k) - b (φ k))) i)
         Filter.atTop (nhds 0) := by
       rw [tendsto_zero_iff_norm_tendsto_zero]
       exact squeeze_zero (fun _ => norm_nonneg _) (fun k => hrel (φ k) s i) hφ0

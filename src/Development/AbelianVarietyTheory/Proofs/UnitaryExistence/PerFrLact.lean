@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.DetOfTria
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Frames GlobalTheory.FrameUnif
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory.PerGam
@@ -39,7 +41,6 @@ lemma perFr_lact (X : Data E r) (γ : GL (Fin r) E)
   · rfl
   · rfl
 
-
 omit [IsCMField E] in
 lemma exists_equiv (Λ : Submodule (𝓞 E) (Fin r → E)) (γ : GL (Fin r) E)
     (hγ : ∀ x, x ∈ Λ ↔ (γ : Matrix (Fin r) (Fin r) E) *ᵥ x ∈ Λ) :
@@ -60,18 +61,38 @@ end GlobalTheory.PerGam
 
 namespace GlobalTheory
 
-theorem per_gam : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (g : ℕ) (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ)) (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) (fun j => relab c σ (e j).1)) (r : ℕ) (M : ModelsOf F r), GoodEmb c σ → ModelBase M → NegXi M → ∀ k Pf, IsPerFr e F M k Pf → ∀ γ ∈ (M.X k).Γ, ∃ gam : (F.Di k).La ≃ₗ[𝓞 E] (F.Di k).La, ((∀ a b, (F.Di k).EF (gam a) (gam b) = (F.Di k).EF a b) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) (F.Di k).La), ∃ v, gam a = a + l.M • v) ∧ (∀ a, ∃ v, gam a = a + l.A • v)) ∧ ∀ x ∈ (M.X k).dom, ∀ a, Pf (lact γ x) (gam a) = Pf x a := by
+theorem per_gam
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (g : ℕ)
+        (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+        (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom)
+          (fun j => relab c σ (e j).1))
+        (r : ℕ) (M : ModelsOf F r),
+      GoodEmb c σ → ModelBase M → NegXi M
+        → ∀ k Pf,
+          IsPerFr e F M k Pf
+            → ∀ γ ∈ (M.X k).Γ, ∃ gam : (F.Di k).La ≃ₗ[𝓞 E] (F.Di k).La,
+              ((∀ a b, (F.Di k).EF (gam a) (gam b) = (F.Di k).EF a b)
+                  ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) (F.Di k).La), ∃ v,
+                    gam a = a + l.M • v)
+                  ∧ (∀ a, ∃ v, gam a = a + l.A • v))
+                ∧ ∀ x ∈ (M.X k).dom, ∀ a, Pf (lact γ x) (gam a) = Pf x a := by
   intro E _ _ _ H Dw l Xo c σ g e F r M _ hB _ k Pf hP γ hγ
   obtain ⟨⟨hU, hS⟩, hM, hA⟩ := (hB.gam k γ).1 hγ
   obtain ⟨f, hf⟩ := PerGam.exists_equiv _ γ hS
   let gam : (F.Di k).La ≃ₗ[𝓞 E] (F.Di k).La := (M.φ k).trans (f.trans (M.φ k).symm)
-  have hg : ∀ a, (M.φ k (gam a) : Fin r → E) = (γ : Matrix (Fin r) (Fin r) E) *ᵥ (M.φ k a : Fin r → E) := by
+  have hg
+      : ∀ a,
+        (M.φ k (gam a) : Fin r → E) = (γ : Matrix (Fin r) (Fin r) E) *ᵥ (M.φ k a : Fin r → E) := by
     intro a
     rw [← hf]
     simp [gam]
-  have key : ∀ (n : ℕ) (a b : (F.Di k).La),
-      (γ : Matrix (Fin r) (Fin r) E) *ᵥ (M.φ k a : Fin r → E) =
-        (M.φ k a : Fin r → E) + n • (M.φ k b : Fin r → E) → gam a = a + n • b := by
+  have key
+      : ∀ (n : ℕ) (a b : (F.Di k).La),
+        (γ : Matrix (Fin r) (Fin r) E) *ᵥ (M.φ k a : Fin r → E)
+            = (M.φ k a : Fin r → E) + n • (M.φ k b : Fin r → E)
+          → gam a = a + n • b := by
     intro n a b h
     apply (M.φ k).injective
     apply Subtype.ext

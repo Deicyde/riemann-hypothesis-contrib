@@ -12,18 +12,19 @@ namespace GlobalTheory.IntBall.ColGramPos
 
 open scoped ComplexOrder
 
-theorem blkW_upper {r : ℕ} (p0 : ℕ) (w : Low r → ℂ) (i j : Fin (r - 1)) (h : i < j) :
-    blkW p0 w i j = 0 := by
+theorem blkW_upper {r : ℕ} (p0 : ℕ) (w : Low r → ℂ) (i j : Fin (r - 1)) (h : i < j)
+    : blkW p0 w i j = 0 := by
   have h' : (i : ℕ) < j := h
   unfold blkW
   split_ifs
   · unfold lowMat
-    rw [dite_eq_right (by rw [Fin.lt_def]; simp only; omega), if_neg (by rw [Fin.ext_iff]; simp only; omega)]
+    rw [dite_eq_right (by rw [Fin.lt_def]; simp only; omega),
+      if_neg (by rw [Fin.ext_iff]; simp only; omega)]
   · unfold lowMat
-    rw [dite_eq_right (by rw [Fin.lt_def]; simp only; omega), if_neg (by rw [Fin.ext_iff]; simp only; omega)]
+    rw [dite_eq_right (by rw [Fin.lt_def]; simp only; omega),
+      if_neg (by rw [Fin.ext_iff]; simp only; omega)]
 
-theorem blkW_diag {r : ℕ} (p0 : ℕ) (w : Low r → ℂ) (i : Fin (r - 1)) :
-    blkW p0 w i i = 1 := by
+theorem blkW_diag {r : ℕ} (p0 : ℕ) (w : Low r → ℂ) (i : Fin (r - 1)) : blkW p0 w i i = 1 := by
   unfold blkW
   split_ifs
   · unfold lowMat
@@ -31,12 +32,14 @@ theorem blkW_diag {r : ℕ} (p0 : ℕ) (w : Low r → ℂ) (i : Fin (r - 1)) :
   · unfold lowMat
     rw [dite_eq_right (lt_irrefl _), if_pos rfl]
 
-theorem lowerTri_det_one {n : ℕ} (T : Matrix (Fin n) (Fin n) ℂ)
-    (hu : ∀ i j, i < j → T i j = 0) (hd : ∀ i, T i i = 1) : T.det = 1 := by
+theorem lowerTri_det_one
+    {n : ℕ} (T : Matrix (Fin n) (Fin n) ℂ) (hu : ∀ i j, i < j → T i j = 0) (hd : ∀ i, T i i = 1)
+    : T.det = 1 := by
   rw [Matrix.det_of_lowerTriangular T (fun i j hij => hu i j hij)]
   simp [hd]
 
-theorem colGram_blkW_pos : ∀ (r p0 : ℕ) (w : Low r → ℂ) (k : Fin (r - 1 + 1)), 0 < colGram (blkW p0 w) k := by
+theorem colGram_blkW_pos
+    : ∀ (r p0 : ℕ) (w : Low r → ℂ) (k : Fin (r - 1 + 1)), 0 < colGram (blkW p0 w) k := by
   intro r p0 w k
   set B := blkW p0 w with hB
   have hk : (k : ℕ) ≤ r - 1 := Nat.le_of_lt_succ k.isLt

@@ -18,24 +18,32 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.EndLoc
 open scoped CategoryTheory.Obj
 
 noncomputable section
 namespace GlobalTheory.EndLoc.HomFixProper
 
-theorem lbIso_pull_eq {X Y : Scheme.{0}} {L : LB X} (hL : L.IsLB) {f g : Y ⟶ X} (h : f = g) :
-    LBIso (L.pull f) (L.pull g) := h ▸ GlobalTheory.PolBaseChange.lbIso_refl (pull_isLB hL f)
+theorem lbIso_pull_eq {X Y : Scheme.{0}} {L : LB X} (hL : L.IsLB) {f g : Y ⟶ X} (h : f = g)
+    : LBIso (L.pull f) (L.pull g) :=
+  h ▸ GlobalTheory.PolBaseChange.lbIso_refl (pull_isLB hL f)
 
-theorem lbIso_pull_pull {X Y : Scheme.{0}} {L L' : LB X} (h : LBIso L L') (f : Y ⟶ X) :
-    LBIso (L.pull f) (L'.pull f) :=
+theorem lbIso_pull_pull {X Y : Scheme.{0}} {L L' : LB X} (h : LBIso L L') (f : Y ⟶ X)
+    : LBIso (L.pull f) (L'.pull f) :=
   LBIso.chartPull (chartPullPull L f) (chartPullPull L' f) h
 
-theorem isProper_of_finiteType : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (A B : Over S) [GrpObj A] [IsCommMonObj A] [GrpObj B] [IsCommMonObj B] (L : LB A.left) (M : LB B.left) (R : HomFixRep A B L M), IsAbelianScheme A → IsAbelianScheme B → L.IsLB → M.IsLB → Out.Rigidified A L → Out.Rigidified B M → QuasiCompact R.π → IsSeparated R.π → LocallyOfFiniteType R.π → IsProper R.π := by
+theorem isProper_of_finiteType
+    : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (A B : Over S) [GrpObj A] [IsCommMonObj A]
+        [GrpObj B] [IsCommMonObj B] (L : LB A.left) (M : LB B.left) (R : HomFixRep A B L M),
+      IsAbelianScheme A → IsAbelianScheme B → L.IsLB → M.IsLB → Out.Rigidified A L
+        → Out.Rigidified B M → QuasiCompact R.π → IsSeparated R.π → LocallyOfFiniteType R.π
+        → IsProper R.π := by
   intro S _ A B _ _ _ _ L M R hA hB hL hM _ _ hqc hsep hlft
   have hex : ValuativeCriterion.Existence R.π := by
-    refine GlobalTheory.T.valuativeExistence_of_dvr_lifts_locallyNoetherian R.π hlft hqc hsep fun V _ _ _ x y hxy => ?_
+    refine GlobalTheory.T.valuativeExistence_of_dvr_lifts_locallyNoetherian R.π hlft hqc hsep
+      fun V _ _ _ x y hxy => ?_
     haveI := R.hom
 
     let AV := (Over.pullback y).obj A
@@ -57,22 +65,28 @@ theorem isProper_of_finiteType : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (A
     have hK1B : IsGrpPullback BK R.BH x pB := isGrpPullback_pullback R.BH x
     have hKB : IsGrpPullback BK B (x ≫ R.π) (pB ≫ R.φB) := hK1B.comp R.pbB
     have hKB' : IsGrpPullback BK B (Out.jK V ≫ y) (pB ≫ R.φB) := hKB.congr hxy rfl
-    let κA : AK.left ⟶ AV.left := hVA.1.lift (pA ≫ R.φA) (AK.hom ≫ Out.jK V)
-      ((Category.assoc _ _ _).symm.trans (hKA'.1.w.trans (Category.assoc _ _ _).symm))
+    let κA : AK.left ⟶ AV.left :=
+      hVA.1.lift (pA ≫ R.φA) (AK.hom ≫ Out.jK V)
+        ((Category.assoc _ _ _).symm.trans (hKA'.1.w.trans (Category.assoc _ _ _).symm))
     have hκA1 : κA ≫ ψA = pA ≫ R.φA := hVA.1.lift_fst _ _ _
     have hκA2 : κA ≫ AV.hom = AK.hom ≫ Out.jK V := hVA.1.lift_snd _ _ _
-    have hκA : IsGrpPullback AK AV (Out.jK V) κA := IsGrpPullback.cancel hVA (hKA'.congr rfl hκA1.symm) hκA2
-    let κB : BK.left ⟶ BV.left := hVB.1.lift (pB ≫ R.φB) (BK.hom ≫ Out.jK V)
-      ((Category.assoc _ _ _).symm.trans (hKB'.1.w.trans (Category.assoc _ _ _).symm))
+    have hκA : IsGrpPullback AK AV (Out.jK V) κA :=
+      IsGrpPullback.cancel hVA (hKA'.congr rfl hκA1.symm) hκA2
+    let κB : BK.left ⟶ BV.left :=
+      hVB.1.lift (pB ≫ R.φB) (BK.hom ≫ Out.jK V)
+        ((Category.assoc _ _ _).symm.trans (hKB'.1.w.trans (Category.assoc _ _ _).symm))
     have hκB1 : κB ≫ ψB = pB ≫ R.φB := hVB.1.lift_fst _ _ _
     have hκB2 : κB ≫ BV.hom = BK.hom ≫ Out.jK V := hVB.1.lift_snd _ _ _
-    have hκB : IsGrpPullback BK BV (Out.jK V) κB := IsGrpPullback.cancel hVB (hKB'.congr rfl hκB1.symm) hκB2
+    have hκB : IsGrpPullback BK BV (Out.jK V) κB :=
+      IsGrpPullback.cancel hVB (hKB'.congr rfl hκB1.symm) hκB2
 
     let ΦK : AK ⟶ BK := (Over.pullback x).map R.Φ
     have hΦK : IsMonHom ΦK := inferInstance
     have hΦK1 : ΦK.left ≫ pB = pA ≫ R.Φ.left := pullback.lift_fst _ _ _
-    obtain ⟨ΦV, hΦV, hΦV1, -⟩ := GlobalTheory.abelianScheme_hom_extends_dedekind_of_isGrpPullback
-      GlobalTheory.homExtension_semiAbelian_dvr V (FractionRing V) AV BV AK BK κA κB hAV hBV hκA hκB ΦK hΦK
+    obtain ⟨ΦV, hΦV, hΦV1, -⟩ :=
+      GlobalTheory.abelianScheme_hom_extends_dedekind_of_isGrpPullback
+        GlobalTheory.homExtension_semiAbelian_dvr V (FractionRing V) AV BV AK BK κA κB hAV hBV hκA
+        hκB ΦK hΦK
 
     have iso : LBIso (L.pull ψA) ((M.pull ψB).pull ΦV.left) := by
       have hS := GlobalTheory.isSemiAbelian_of_isAbelianScheme AV hAV
@@ -85,11 +99,12 @@ theorem isProper_of_finiteType : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (A
       have i0 := lbIso_pull_pull R.iso (u ≫ pA)
       have hm := pull_isLB hM R.φB
       have eqM : ((u ≫ pA) ≫ R.Φ.left) ≫ R.φB = ((u ≫ κA) ≫ ΦV.left) ≫ ψB := by
-        calc ((u ≫ pA) ≫ R.Φ.left) ≫ R.φB = u ≫ (ΦK.left ≫ pB) ≫ R.φB := by
-                rw [hΦK1]; simp only [Category.assoc]
-            _ = u ≫ ΦK.left ≫ κB ≫ ψB := by rw [hκB1]; simp only [Category.assoc]
-            _ = ((u ≫ κA) ≫ ΦV.left) ≫ ψB := by
-                rw [← Category.assoc ΦK.left, hΦV1]; simp only [Category.assoc]
+        calc
+          ((u ≫ pA) ≫ R.Φ.left) ≫ R.φB
+            = u ≫ (ΦK.left ≫ pB) ≫ R.φB := by rw [hΦK1]; simp only [Category.assoc]
+          _ = u ≫ ΦK.left ≫ κB ≫ ψB := by rw [hκB1]; simp only [Category.assoc]
+          _ = ((u ≫ κA) ≫ ΦV.left) ≫ ψB := by
+            rw [← Category.assoc ΦK.left, hΦV1]; simp only [Category.assoc]
       refine LBIso.trans (B := L.pull ((u ≫ κA) ≫ ψA)) ?_ ?_ ?_
         (GlobalTheory.OriginCohom.lbIso_pull_pull_comp hL _ _) ?_
       rotate_left 3
@@ -107,14 +122,24 @@ theorem isProper_of_finiteType : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (A
       refine LBIso.trans (B := M.pull (((u ≫ pA) ≫ R.Φ.left) ≫ R.φB)) ?_ ?_ ?_
         (GlobalTheory.OriginCohom.lbIso_pull_pull_comp hM _ _) ?_
       rotate_left 3
-      refine LBIso.trans (B := M.pull (((u ≫ κA) ≫ ΦV.left) ≫ ψB)) ?_ ?_ ?_
-        (lbIso_pull_eq hM eqM) ?_
+      refine LBIso.trans (B := M.pull (((u ≫ κA) ≫ ΦV.left) ≫ ψB)) ?_ ?_ ?_ (lbIso_pull_eq hM eqM)
+        ?_
       rotate_left 3
       refine LBIso.symm (LBIso.trans (B := (M.pull ψB).pull ((u ≫ κA) ≫ ΦV.left)) ?_ ?_ ?_
         (GlobalTheory.OriginCohom.lbIso_pull_pull_comp (pull_isLB hM _) _ _) ?_)
       rotate_left 3
       exact GlobalTheory.OriginCohom.lbIso_pull_pull_comp hM _ _
-      all_goals (first | assumption | (apply pull_isLB; first | assumption | (apply pull_isLB; first | assumption | (apply pull_isLB; assumption))))
+      all_goals
+        (
+          first
+          | assumption
+          | (
+              apply pull_isLB
+              first
+              | assumption
+              | (apply pull_isLB; first | assumption | (apply pull_isLB; assumption))
+            )
+        )
 
     obtain ⟨g, ⟨hg, χA, χB, hχA, hχB, hχA1, hχB1, hχΦ⟩, -⟩ :=
       R.rep (Sp V) y AV BV ψA ψB ΦV hVA hVB hΦV iso
@@ -136,13 +161,31 @@ theorem isProper_of_finiteType : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (A
         (lbIso_pull_eq hM (by rw [← Category.assoc, hΦK1])) ?_
       rotate_left 3
       exact LBIso.symm (GlobalTheory.OriginCohom.lbIso_pull_pull_comp hM _ _)
-      all_goals (first | assumption | (apply pull_isLB; first | assumption | (apply pull_isLB; first | assumption | (apply pull_isLB; assumption))))
-    obtain ⟨g0, -, huniq⟩ := R.rep (Sp (FractionRing V)) (x ≫ R.π) AK BK (pA ≫ R.φA) (pB ≫ R.φB) ΦK hKA hKB hΦK isoK
+      all_goals
+        (
+          first
+          | assumption
+          | (
+              apply pull_isLB
+              first
+              | assumption
+              | (apply pull_isLB; first | assumption | (apply pull_isLB; assumption))
+            )
+        )
+    obtain ⟨g0, -, huniq⟩ :=
+      R.rep (Sp (FractionRing V)) (x ≫ R.π) AK BK (pA ≫ R.φA) (pB ≫ R.φB) ΦK hKA hKB hΦK isoK
     have e1 : x = g0 := huniq x ⟨rfl, pA, pB, hK1A, hK1B, rfl, rfl, hΦK1⟩
-    have e2 : Out.jK V ≫ g = g0 := huniq _ ⟨by rw [Category.assoc, hg, hxy], κA ≫ χA, κB ≫ χB,
-      hκA.comp hχA, hκB.comp hχB,
-      by rw [Category.assoc, hχA1, hκA1], by rw [Category.assoc, hχB1, hκB1],
-      by rw [← Category.assoc, hΦV1, Category.assoc, hχΦ, Category.assoc]⟩
+    have e2 : Out.jK V ≫ g = g0 :=
+      huniq _ ⟨
+        by rw [Category.assoc, hg, hxy],
+        κA ≫ χA,
+        κB ≫ χB,
+        hκA.comp hχA,
+        hκB.comp hχB,
+        by rw [Category.assoc, hχA1, hκA1],
+        by rw [Category.assoc, hχB1, hκB1],
+        by rw [← Category.assoc, hΦV1, Category.assoc, hχΦ, Category.assoc]
+      ⟩
     exact ⟨g, e2.trans e1.symm, hg⟩
   haveI : UniversallyClosed R.π := UniversallyClosed.of_valuativeCriterion R.π hex
   exact IsProper.mk

@@ -18,21 +18,27 @@ noncomputable section
 namespace GlobalTheory.KeyPow
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.WeierstrassCurve
 
-theorem exists_mem_coordOpen_two {R : Type} [CommRing R] (W : WeierstrassCurve R) (s : Sp R) :
-    ∃ x : scheme W, toSpec W x = s ∧ x ∈ coordOpen W 2 := by
+theorem exists_mem_coordOpen_two {R : Type} [CommRing R] (W : WeierstrassCurve R) (s : Sp R)
+    : ∃ x : scheme W, toSpec W x = s ∧ x ∈ coordOpen W 2 := by
   have : Module.Finite (Polynomial R) W.toAffine.CoordinateRing :=
     .of_basis (WeierstrassCurve.Affine.CoordinateRing.basis W.toAffine)
   have : FaithfulSMul (Polynomial R) W.toAffine.CoordinateRing :=
     ⟨fun {p q} h => by
-      have e := congrArg (fun a => (WeierstrassCurve.Affine.CoordinateRing.basis W.toAffine).repr a 0)
-        (h (WeierstrassCurve.Affine.CoordinateRing.basis W.toAffine 0))
-      simp only [map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_eq_same, smul_eq_mul] at e
+      have e :=
+        congrArg
+          (fun a => (WeierstrassCurve.Affine.CoordinateRing.basis W.toAffine).repr a 0)
+          (h (WeierstrassCurve.Affine.CoordinateRing.basis W.toAffine 0))
+      simp only [map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_eq_same,
+          smul_eq_mul]
+        at e
       exact (mul_one p).symm.trans (e.trans (mul_one q))⟩
-  obtain ⟨y, hy⟩ := Algebra.IsIntegral.comap_surjective (Polynomial R) W.toAffine.CoordinateRing
-    (PrimeSpectrum.comap (Polynomial.evalRingHom 0) s)
+  obtain ⟨y, hy⟩ :=
+    Algebra.IsIntegral.comap_surjective (Polynomial R) W.toAffine.CoordinateRing
+      (PrimeSpectrum.comap (Polynomial.evalRingHom 0) s)
   refine ⟨chartZ W y, ?_, (opensRange_chartZ W).le ⟨y, rfl⟩⟩
   refine (Scheme.Hom.comp_apply (chartZ W) (toSpec W) y).symm.trans ?_
   rw [chartZ_toSpec]

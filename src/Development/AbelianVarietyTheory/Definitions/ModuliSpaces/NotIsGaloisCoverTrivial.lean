@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsGalois
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 noncomputable section
 namespace GlobalTheory.ZM.DwModel
 
@@ -25,17 +26,19 @@ private lemma spMap_inj_lemma_3 {A B : Type} [CommRing A] [CommRing B] {f g : A 
   have h' := Spec.map_injective h
   exact congrArg CommRingCat.Hom.hom h'
 
-theorem isGaloisCover_field (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [IsGalois K L] :
-    IsGaloisCover (L ≃ₐ[K] L) (fun σ => spMap (σ : L →+* L)) (spMap (algebraMap K L)) := by
-  refine
-    { finite := inferInstance
-      one := ?_
-      mul := ?_
-      inv := ?_
-      fin := ?_
-      etale := ?_
-      onto := ?_
-      fibre := ?_ }
+theorem isGaloisCover_field
+    (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [IsGalois K L]
+    : IsGaloisCover (L ≃ₐ[K] L) (fun σ => spMap (σ : L →+* L)) (spMap (algebraMap K L)) := by
+  refine {
+    finite := inferInstance
+    one := ?_
+    mul := ?_
+    inv := ?_
+    fin := ?_
+    etale := ?_
+    onto := ?_
+    fibre := ?_
+  }
   · show Spec.map _ = _
     convert Spec.map_id (CommRingCat.of L)
     rfl
@@ -55,7 +58,10 @@ theorem isGaloisCover_field (K L : Type) [Field K] [Field L] [Algebra K L] [Fini
     rw [HasRingHomProperty.Spec_iff (P := @Etale)]
     show (algebraMap K L).Etale
     rw [RingHom.etale_algebraMap]
-    exact ⟨Algebra.FormallyEtale.of_isSeparable K L, Algebra.FinitePresentation.of_finiteType.mp inferInstance⟩
+    exact ⟨
+      Algebra.FormallyEtale.of_isSeparable K L,
+      Algebra.FinitePresentation.of_finiteType.mp inferInstance
+    ⟩
   · exact ⟨fun x => ⟨default, Subsingleton.elim _ _⟩⟩
   · intro K' _ _ y y' h
     obtain ⟨f, rfl⟩ := spMap_surjective' y
@@ -64,8 +70,7 @@ theorem isGaloisCover_field (K L : Type) [Field K] [Field L] [Algebra K L] [Fini
     have hfa := spMap_inj_lemma_3 h
     let _ : Algebra K K' := (f.comp (algebraMap K L)).toAlgebra
     let φ : L →ₐ[K] K' := { f with commutes' := fun _ => rfl }
-    let φ' : L →ₐ[K] K' :=
-      { f' with commutes' := fun r => (RingHom.congr_fun hfa r).symm }
+    let φ' : L →ₐ[K] K' := { f' with commutes' := fun r => (RingHom.congr_fun hfa r).symm }
     let Φ : (L ≃ₐ[K] L) → (L →ₐ[K] K') := fun a => φ.comp a.toAlgHom
     have hinj : Function.Injective Φ := by
       intro a b hab

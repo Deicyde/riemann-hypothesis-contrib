@@ -10,21 +10,26 @@ open Classical TensorProduct
 
 namespace Formalism.MainNotions.UnusedSlot80.BCF
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.UnusedSlot80.BCW
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.UnusedSlot80.BCW
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem OL_le {LL LL' : FinExt l} (hLL : LL.1 ≤ LL'.1) (x : ↥(OL LL)) :
-    IntermediateField.inclusion hLL (x : ↥LL.1) ∈ OL LL' := by
+theorem OL_le {LL LL' : FinExt l} (hLL : LL.1 ≤ LL'.1) (x : ↥(OL LL))
+    : IntermediateField.inclusion hLL (x : ↥LL.1) ∈ OL LL' := by
   obtain ⟨p, hp, hx⟩ := x.2
-  exact ⟨p, hp, by
-    have := congrArg (IntermediateField.inclusion hLL) hx
-    rw [map_zero] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← this, Polynomial.eval₂_eq_sum_range, Polynomial.eval₂_eq_sum_range, map_sum]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    rw [map_mul, map_pow]
-    rfl⟩
+  exact ⟨
+    p,
+    hp,
+    by
+      have := congrArg (IntermediateField.inclusion hLL) hx
+      rw [map_zero] at this
+      set_option synthInstance.maxHeartbeats 100000 in
+        rw [← this, Polynomial.eval₂_eq_sum_range, Polynomial.eval₂_eq_sum_range, map_sum]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [map_mul, map_pow]
+      rfl
+  ⟩
 
 def jO {LL LL' : FinExt l} (hLL : LL.1 ≤ LL'.1) : ↥(OL LL) →+* ↥(OL LL') where
   toFun x := ⟨IntermediateField.inclusion hLL (x : ↥LL.1), OL_le hLL x⟩

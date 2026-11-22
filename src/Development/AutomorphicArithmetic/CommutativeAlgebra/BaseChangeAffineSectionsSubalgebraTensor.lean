@@ -7,7 +7,8 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProperCohomology.
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField UpperTheory.Et.Sel LateralTheory.E.E4
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField
+  UpperTheory.Et.Sel LateralTheory.E.E4
 open scoped TensorProduct
 
 private lemma scal {k : Type} [Field k] {C : Scheme.{0}} [IsIntegral C] (c : C ⟶ Sp k)
@@ -33,8 +34,26 @@ private lemma scal {k : Type} [Field k] {C : Scheme.{0}} [IsIntegral C] (c : C �
   congr 2
   exact C.presheaf.germ_res (homOfLE le_top) (genericPoint C) _
 
-theorem UpperTheory.baseChange_affine_sections_subalgebra_tensor :
-    ∀ (k L : Type) [Field k] [Field L] [Algebra k L] {C X : Scheme.{0}} [IsIntegral C] (c : C ⟶ Sp k) (u : X ⟶ C) (x : X ⟶ Sp L), IsPullback u x c (Spec.map (CommRingCat.ofHom (algebraMap k L))) → ∀ [Algebra k C.functionField], Spec.map (CommRingCat.ofHom (algebraMap k C.functionField)) = (C.fromSpecStalk (genericPoint C)) ≫ c → ∀ (W : C.Opens) [Nonempty W], IsAffineOpen W → ∀ B : Subalgebra k C.functionField, (B : Set C.functionField) = Set.range (C.germToFunctionField W) → IsAffineOpen (u ⁻¹ᵁ W) ∧ ∃ e : L ⊗[k] B ≃+* Γ(X, u ⁻¹ᵁ W), (∀ (a : Γ(C, W)) (b : B), (b : C.functionField) = C.germToFunctionField W a → e ((1 : L) ⊗ₜ[k] b) = u.app W a) ∧ ∀ l : L, e (l ⊗ₜ[k] (1 : B)) = x.appLE ⊤ (u ⁻¹ᵁ W) le_top ((Scheme.ΓSpecIso (CommRingCat.of L)).inv l) := by
+theorem UpperTheory.baseChange_affine_sections_subalgebra_tensor
+    : ∀ (k L : Type) [Field k] [Field L] [Algebra k L] {C X : Scheme.{0}} [IsIntegral C]
+        (c : C ⟶ Sp k) (u : X ⟶ C) (x : X ⟶ Sp L),
+      IsPullback u x c (Spec.map (CommRingCat.ofHom (algebraMap k L)))
+        → ∀ [Algebra k C.functionField],
+          Spec.map (CommRingCat.ofHom (algebraMap k C.functionField))
+              = (C.fromSpecStalk (genericPoint C)) ≫ c
+            → ∀ (W : C.Opens) [Nonempty W],
+              IsAffineOpen W
+                → ∀ B : Subalgebra k C.functionField,
+                  (B : Set C.functionField) = Set.range (C.germToFunctionField W)
+                    → IsAffineOpen (u ⁻¹ᵁ W)
+                      ∧ ∃ e : L ⊗[k] B ≃+* Γ(X, u ⁻¹ᵁ W),
+                        (∀ (a : Γ(C, W)) (b : B),
+                            (b : C.functionField) = C.germToFunctionField W a
+                              → e ((1 : L) ⊗ₜ[k] b) = u.app W a)
+                          ∧ ∀ l : L,
+                            e (l ⊗ₜ[k] (1 : B))
+                              = x.appLE ⊤ (u ⁻¹ᵁ W) le_top
+                                ((Scheme.ΓSpecIso (CommRingCat.of L)).inv l) := by
   intro k L _ _ _ C X _ c u x H _ hK W _ hW B hB
   have hu : IsAffineHom u := MorphismProperty.of_isPullback (P := @IsAffineHom) H.flip inferInstance
   refine ⟨hW.preimage u, ?_⟩

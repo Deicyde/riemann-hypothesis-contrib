@@ -12,19 +12,25 @@ open GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
 
 namespace UpperTheory.Gal.W2
 
-private theorem tens_inj (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Module.Free ℤ O] :
-    Function.Injective (fun x : O => x ⊗ₜ[ℤ] (1 : ℤ_[p])) := by
+private theorem tens_inj (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Module.Free ℤ O]
+    : Function.Injective (fun x : O => x ⊗ₜ[ℤ] (1 : ℤ_[p])) := by
   have hinj : Function.Injective (Algebra.linearMap ℤ ℤ_[p]) := by
     intro a b h
     exact RingHom.injective_int (algebraMap ℤ ℤ_[p]) h
-  have h1 := Module.Flat.lTensor_preserves_injective_linearMap (M := O) (Algebra.linearMap ℤ ℤ_[p]) hinj
+  have h1 :=
+    Module.Flat.lTensor_preserves_injective_linearMap (M := O) (Algebra.linearMap ℤ ℤ_[p]) hinj
   intro x y hxy
   have h2 : x ⊗ₜ[ℤ] (1 : ℤ) = y ⊗ₜ[ℤ] (1 : ℤ) := h1 (by simpa using hxy)
   have h3 := congrArg (TensorProduct.rid ℤ O) h2
   simpa using h3
 
-private theorem comm_of_split (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Module.Free ℤ O] {R : Type} [CommRing R]
-    {m : ℕ} (hm : m = 1) (f : (O ⊗[ℤ] ℤ_[p]) ≃+* Matrix (Fin m) (Fin m) R) (x y : O) : x * y = y * x := by
+private theorem comm_of_split
+    (p : ℕ) [Fact p.Prime]
+    {O : Type} [Ring O] [Module.Free ℤ O]
+    {R : Type} [CommRing R]
+    {m : ℕ} (hm : m = 1) (f : (O ⊗[ℤ] ℤ_[p]) ≃+* Matrix (Fin m) (Fin m) R)
+    (x y : O)
+    : x * y = y * x := by
   subst hm
   apply tens_inj p
   have hc : ∀ A B : Matrix (Fin 1) (Fin 1) R, A * B = B * A := by
@@ -38,15 +44,19 @@ private theorem comm_of_split (p : ℕ) [Fact p.Prime] {O : Type} [Ring O] [Modu
   have h2 := f.injective this
   simpa using h2
 
-private theorem a_inj {F : Type} [Field F] [NumberField F] {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O]
-    [Module.Free ℤ O] : Function.Injective (algebraMap (𝓞 F) O) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+private theorem a_inj
+    {F : Type} [Field F] [NumberField F]
+    {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O] [Module.Free ℤ O]
+    : Function.Injective (algebraMap (𝓞 F) O) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro c hc
   by_contra h0
-  have hI : RingHom.ker (algebraMap (𝓞 F) O) ≠ ⊥ := fun h => h0 (by
-    have h1 : c ∈ RingHom.ker (algebraMap (𝓞 F) O) := hc
-    rw [h] at h1
-    simpa using h1)
+  have hI : RingHom.ker (algebraMap (𝓞 F) O) ≠ ⊥ := fun h =>
+    h0 (by
+      have h1 : c ∈ RingHom.ker (algebraMap (𝓞 F) O) := hc
+      rw [h] at h1
+      simpa using h1)
   have hN := Ideal.absNorm_mem (RingHom.ker (algebraMap (𝓞 F) O))
   have hN0 : Ideal.absNorm (RingHom.ker (algebraMap (𝓞 F) O)) ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff]
@@ -59,18 +69,19 @@ private theorem a_inj {F : Type} [Field F] [NumberField F] {O : Type} [Ring O] [
   · exact hN0 (by exact_mod_cast h)
   · exact one_ne_zero h
 
-private theorem a_onto {F : Type} [Field F] [NumberField F] {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O]
-    [Module.Free ℤ O] [Module.Finite ℤ O] (hcomm : ∀ x y : O, x * y = y * x)
-    (hc : ∀ x : O, ∃ c : 𝓞 F, ∃ e : ℤ, e ≠ 0 ∧ e • x = algebraMap (𝓞 F) O c) :
-    Function.Surjective (algebraMap (𝓞 F) O) := by
+private theorem a_onto
+    {F : Type} [Field F] [NumberField F]
+    {O : Type} [Ring O] [Algebra (𝓞 F) O] [Nontrivial O] [Module.Free ℤ O] [Module.Finite ℤ O]
+    (hcomm : ∀ x y : O, x * y = y * x)
+    (hc : ∀ x : O, ∃ c : 𝓞 F, ∃ e : ℤ, e ≠ 0 ∧ e • x = algebraMap (𝓞 F) O c)
+    : Function.Surjective (algebraMap (𝓞 F) O) := by
   intro x
   obtain ⟨c, e, he, hx⟩ := hc x
   letI : CommRing O := { (inferInstance : Ring O) with mul_comm := hcomm }
   obtain ⟨P, hP, hPx⟩ : IsIntegral ℤ x := IsIntegral.of_finite ℤ x
   have hQ : Polynomial.eval₂ (algebraMap ℤ O) (algebraMap ℤ O e * x) (P.scaleRoots e) = 0 := by
     rw [Polynomial.scaleRoots_eval₂_mul, hPx, mul_zero]
-  have hex : algebraMap ℤ O e * x = algebraMap (𝓞 F) O c := by
-    rw [← hx]; simp [zsmul_eq_mul]
+  have hex : algebraMap ℤ O e * x = algebraMap (𝓞 F) O c := by rw [← hx]; simp [zsmul_eq_mul]
   have hQ2 : Polynomial.eval₂ (algebraMap ℤ (𝓞 F)) c (P.scaleRoots e) = 0 := by
     apply a_inj (O := O)
     rw [map_zero, Polynomial.hom_eval₂, ← hex, ← hQ]
@@ -99,8 +110,10 @@ private theorem a_onto {F : Type} [Field F] [NumberField F] {O : Type} [Ring O] 
   · exact absurd h he
   · exact sub_eq_zero.mp h
 
-private theorem root_cases (tr nm : ℤ) (hd : tr ^ 2 - 4 * nm < 0) (r z : ℂ) (hr : r ^ 2 - tr * r + nm = 0)
-    (hz : z ^ 2 - tr * z + nm = 0) : (starRingEnd ℂ) r ≠ r ∧ (z = r ∨ z = (starRingEnd ℂ) r) := by
+private theorem root_cases
+    (tr nm : ℤ) (hd : tr ^ 2 - 4 * nm < 0)
+    (r z : ℂ) (hr : r ^ 2 - tr * r + nm = 0) (hz : z ^ 2 - tr * z + nm = 0)
+    : (starRingEnd ℂ) r ≠ r ∧ (z = r ∨ z = (starRingEnd ℂ) r) := by
   have hne : (starRingEnd ℂ) r ≠ r := by
     intro h
     obtain ⟨t, rfl⟩ := Complex.conj_eq_iff_real.mp h
@@ -125,10 +138,14 @@ private theorem root_cases (tr nm : ℤ) (hd : tr ^ 2 - 4 * nm < 0) (r z : ℂ) 
   · exact Or.inl (sub_eq_zero.mp h)
   · exact Or.inr (sub_eq_zero.mp h)
 
-private theorem sum_mult {F : Type} [Field F] [NumberField F] (n : ℕ) (hn : 1 ≤ n) (t₀ : F →+* ℂ)
-    (ε : (F →+* ℂ) → ℕ) (cx : ∀ τ : F →+* ℂ, ComplexEmbedding.conjugate τ ≠ τ)
-    (eps : ∀ τ, τ ≠ t₀ → τ ≠ ComplexEmbedding.conjugate t₀ → ε τ + ε (ComplexEmbedding.conjugate τ) = 1) :
-    2 * ∑ τ : F →+* ℂ, typeMult n t₀ ε τ = n * Module.finrank ℚ F := by
+private theorem sum_mult
+    {F : Type} [Field F] [NumberField F]
+    (n : ℕ) (hn : 1 ≤ n)
+    (t₀ : F →+* ℂ) (ε : (F →+* ℂ) → ℕ)
+    (cx : ∀ τ : F →+* ℂ, ComplexEmbedding.conjugate τ ≠ τ)
+    (eps : ∀ τ,
+      τ ≠ t₀ → τ ≠ ComplexEmbedding.conjugate t₀ → ε τ + ε (ComplexEmbedding.conjugate τ) = 1)
+    : 2 * ∑ τ : F →+* ℂ, typeMult n t₀ ε τ = n * Module.finrank ℚ F := by
   have hinv : ∀ σ : F →+* ℂ, ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ) = σ :=
     ComplexEmbedding.involutive_conjugate F
   have hc0 : ComplexEmbedding.conjugate t₀ ≠ t₀ := cx t₀
@@ -147,10 +164,14 @@ private theorem sum_mult {F : Type} [Field F] [NumberField F] (n : ℕ) (hn : 1 
       h1 ((ComplexEmbedding.involutive_conjugate F).injective h)
     simp only [typeMult, ite_eq_right h1, ite_eq_right h2, ite_eq_right h3, ite_eq_right h4]
     rw [← Nat.mul_add, eps τ h1 h2, Nat.mul_one]
-  have hs : ∑ τ : F →+* ℂ, typeMult n t₀ ε (ComplexEmbedding.conjugate τ) = ∑ τ : F →+* ℂ, typeMult n t₀ ε τ :=
-    Equiv.sum_comp (Function.Involutive.toPerm _ (ComplexEmbedding.involutive_conjugate F)) (typeMult n t₀ ε)
-  have h2 : ∑ τ : F →+* ℂ, (typeMult n t₀ ε τ + typeMult n t₀ ε (ComplexEmbedding.conjugate τ)) =
-      n * Module.finrank ℚ F := by
+  have hs
+      : ∑ τ : F →+* ℂ, typeMult n t₀ ε (ComplexEmbedding.conjugate τ)
+        = ∑ τ : F →+* ℂ, typeMult n t₀ ε τ :=
+    Equiv.sum_comp (Function.Involutive.toPerm _ (ComplexEmbedding.involutive_conjugate F))
+      (typeMult n t₀ ε)
+  have h2
+      : ∑ τ : F →+* ℂ, (typeMult n t₀ ε τ + typeMult n t₀ ε (ComplexEmbedding.conjugate τ))
+        = n * Module.finrank ℚ F := by
     simp only [hw, Finset.sum_const, Finset.card_univ, smul_eq_mul]
     rw [Embeddings.card F ℂ, mul_comm]
   rw [Finset.sum_add_distrib, hs] at h2
@@ -187,8 +208,10 @@ theorem rhoSig_of : RhoSig := by
     intro τ h
     have hc : (InfinitePlace.mk τ).IsComplex := IsTotallyComplex.isComplex _
     exact (InfinitePlace.isComplex_mk_iff.mp hc) (ComplexEmbedding.isReal_iff.mpr h)
-  have heps : ∀ τ, τ ≠ t₀ → τ ≠ ComplexEmbedding.conjugate t₀ →
-      epsD D τ + epsD D (ComplexEmbedding.conjugate τ) = 1 := by
+  have heps
+      : ∀ τ,
+        τ ≠ t₀ → τ ≠ ComplexEmbedding.conjugate t₀
+          → epsD D τ + epsD D (ComplexEmbedding.conjugate τ) = 1 := by
     intro τ _ _
     obtain ⟨hne, hcase⟩ := root_cases D.tr D.nm D.disc_neg D.ρc (τ (D.ω : D.F)) D.ρc_root (hroot τ)
     unfold epsD
@@ -206,7 +229,8 @@ theorem rhoSig_of : RhoSig := by
   let ρ : D.O →+* Matrix (Fin D.g) (Fin D.g) ℂ :=
     (Matrix.diagonalRingHom (Fin D.g) ℂ).comp
       ((RingHom.pi fun i => ((E i).1).comp (algebraMap (𝓞 D.F) D.F)).comp (e.symm : D.O →+* 𝓞 D.F))
-  have hρ : ∀ c : 𝓞 D.F, ρ (algebraMap (𝓞 D.F) D.O c) = Matrix.diagonal fun i => (E i).1 (c : D.F) := by
+  have hρ
+      : ∀ c : 𝓞 D.F, ρ (algebraMap (𝓞 D.F) D.O c) = Matrix.diagonal fun i => (E i).1 (c : D.F) := by
     intro c
     simp only [ρ, RingHom.comp_apply, RingHom.coe_coe, he]
     rfl
@@ -216,7 +240,8 @@ theorem rhoSig_of : RhoSig := by
     rfl
   · rw [D.bar_eq, IsCMField.complexEmbedding_complexConj]
   · rw [hρ, Matrix.trace_diagonal,
-      Equiv.sum_comp E (fun s : (Σ τ : D.F →+* ℂ, Fin (typeMult D.n t₀ (epsD D) τ)) => s.1 (c : D.F)),
+      Equiv.sum_comp E
+        (fun s : (Σ τ : D.F →+* ℂ, Fin (typeMult D.n t₀ (epsD D) τ)) => s.1 (c : D.F)),
       Fintype.sum_sigma]
     simp
 

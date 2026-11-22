@@ -16,11 +16,13 @@ open PowerSeries
 
 namespace PolynomialValuationLemmas
 
-theorem factV {O : Type} [CommRing O] [IsLocalRing O] {ℓ : ℕ} {u x : Oˣ} (hp : ℓ.Prime)
-    (h3 : 3 ≤ ℓ) (hl : ¬ IsUnit (ℓ : O)) (hu : (u : O) = 1 + (ℓ : O) * (x : O)) :
-    FactVval u ℓ := by
-  have key : ∀ r : ℕ, 1 ≤ r →
-      ∃ ε : Oˣ, (u : O) ^ r - 1 = (ε : O) * (ℓ : O) ^ (1 + padicValNat ℓ r) := by
+theorem factV
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {ℓ : ℕ} {u x : Oˣ}
+    (hp : ℓ.Prime) (h3 : 3 ≤ ℓ) (hl : ¬ IsUnit (ℓ : O)) (hu : (u : O) = 1 + (ℓ : O) * (x : O))
+    : FactVval u ℓ := by
+  have key
+      : ∀ r : ℕ, 1 ≤ r → ∃ ε : Oˣ, (u : O) ^ r - 1 = (ε : O) * (ℓ : O) ^ (1 + padicValNat ℓ r) := by
     intro r hr
     rw [hu]
     exact GoodPlacesAlt.one_add_pow_sub_one_valuation hp h3 hl x.isUnit r hr
@@ -48,20 +50,23 @@ theorem factV {O : Type} [CommRing O] [IsLocalRing O] {ℓ : ℕ} {u x : Oˣ} (h
     rw [zpow_neg, zpow_natCast, hv, Units.val_mul]
     linear_combination (((u ^ r)⁻¹ : Oˣ) : O) * hε - hinv
 
-theorem val_mul_pow (ℓ E : ℕ) [Fact ℓ.Prime] {i : ℤ} (hi : i ≠ 0) :
-    padicValInt ℓ (i * ((ℓ ^ E : ℕ) : ℤ)) = E + padicValInt ℓ i := by
+theorem val_mul_pow (ℓ E : ℕ) [Fact ℓ.Prime] {i : ℤ} (hi : i ≠ 0)
+    : padicValInt ℓ (i * ((ℓ ^ E : ℕ) : ℤ)) = E + padicValInt ℓ i := by
   have h2 : ((ℓ ^ E : ℕ) : ℤ) ≠ 0 := by exact_mod_cast pow_ne_zero _ (Fact.out : ℓ.Prime).ne_zero
   rw [padicValInt.mul hi h2, padicValInt.of_nat, padicValNat.prime_pow, add_comm]
 
-theorem ppevalVal {O : Type} [CommRing O] (u : Oˣ) (ℓ E : ℕ) (JS : Finset ℤ) (hp : ℓ.Prime)
-    (hV : FactVval u ℓ) :
-    ∃ ε : Oˣ, (G.PPoly u ℓ E JS).eval 1 = (ε : O) * (ℓ : O) ^ kapExp ℓ E JS := by
+theorem ppevalVal
+    {O : Type} [CommRing O] (u : Oˣ) (ℓ E : ℕ) (JS : Finset ℤ) (hp : ℓ.Prime) (hV : FactVval u ℓ)
+    : ∃ ε : Oˣ, (G.PPoly u ℓ E JS).eval 1 = (ε : O) * (ℓ : O) ^ kapExp ℓ E JS := by
   haveI := Fact.mk hp
-  have hf : ∀ i ∈ JS.erase 0, ∃ ε : Oˣ, (1 : O) - ((u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : Oˣ) : O) =
-      (ε : O) * (ℓ : O) ^ (1 + E + padicValInt ℓ i) := by
+  have hf
+      : ∀ i ∈ JS.erase 0, ∃ ε : Oˣ,
+        (1 : O) - ((u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : Oˣ) : O)
+          = (ε : O) * (ℓ : O) ^ (1 + E + padicValInt ℓ i) := by
     intro i hi
     have hi0 : i ≠ 0 := Finset.ne_of_mem_erase hi
-    have hm : i * ((ℓ ^ E : ℕ) : ℤ) ≠ 0 := mul_ne_zero hi0 (by exact_mod_cast pow_ne_zero _ hp.ne_zero)
+    have hm : i * ((ℓ ^ E : ℕ) : ℤ) ≠ 0 :=
+      mul_ne_zero hi0 (by exact_mod_cast pow_ne_zero _ hp.ne_zero)
     obtain ⟨ε, hε⟩ := hV _ hm
     refine ⟨ε, ?_⟩
     rw [hε, val_mul_pow ℓ E hi0, add_assoc]
@@ -69,16 +74,18 @@ theorem ppevalVal {O : Type} [CommRing O] (u : Oˣ) (ℓ E : ℕ) (JS : Finset �
   refine ⟨∏ i ∈ JS.erase 0, ε i, ?_⟩
   unfold kapExp
   rw [G.PPoly, Polynomial.eval_mul, Polynomial.eval_prod, Polynomial.eval_finsetSum]
-  simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_C, one_pow,
-    Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
+  simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_C,
+    one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
   rw [Finset.prod_congr rfl hε, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, Units.coe_prod]
   push_cast
   rw [pow_add]
   ring
 
-theorem ppval_of_le {O : Type} [CommRing O] (u : Oˣ) (ℓ E kap : ℕ) (JS JS' : Finset ℤ)
-    (hp : ℓ.Prime) (hV : FactVval u ℓ) (hk : kapExp ℓ E JS + kapExp ℓ E JS' ≤ 2 * kap) :
-    PPval ℓ kap (G.PPoly u ℓ E JS) (G.PPoly u ℓ E JS') := by
+theorem ppval_of_le
+    {O : Type} [CommRing O]
+    (u : Oˣ) (ℓ E kap : ℕ) (JS JS' : Finset ℤ)
+    (hp : ℓ.Prime) (hV : FactVval u ℓ) (hk : kapExp ℓ E JS + kapExp ℓ E JS' ≤ 2 * kap)
+    : PPval ℓ kap (G.PPoly u ℓ E JS) (G.PPoly u ℓ E JS') := by
   obtain ⟨ε, h1⟩ := ppevalVal u ℓ E JS hp hV
   obtain ⟨ε', h2⟩ := ppevalVal u ℓ E JS' hp hV
   exact ⟨kapExp ℓ E JS + kapExp ℓ E JS', ε * ε', hk, by rw [h1, h2, Units.val_mul, pow_add]; ring⟩

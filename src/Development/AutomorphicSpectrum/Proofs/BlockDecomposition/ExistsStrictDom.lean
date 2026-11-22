@@ -15,8 +15,8 @@ namespace GlobalTheory.CompanionTheory.KUFactsU
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem iwGL_entries {n : ℕ} {x : GL (Fin n) L} (hx : x ∈ IwGL L n) (i j : Fin n) :
-    (x : Matrix (Fin n) (Fin n) L) i j ∈ intL L := by
+theorem iwGL_entries {n : ℕ} {x : GL (Fin n) L} (hx : x ∈ IwGL L n) (i j : Fin n)
+    : (x : Matrix (Fin n) (Fin n) L) i j ∈ intL L := by
   have hk := (Subgroup.mem_iInf.1 hx) (Fin.last n)
   rw [Subgroup.mem_comap, MulAction.mem_stabilizer_iff] at hk
   have hmem : (Pi.single j 1 : Fin n → L) ∈ latK L n (Fin.last n) := by
@@ -26,8 +26,10 @@ theorem iwGL_entries {n : ℕ} {x : GL (Fin n) L} (hx : x ∈ IwGL L n) (i j : F
     · subst hl
       simp
     · simp [Pi.single_apply, hl]
-  have h2 : (Matrix.GeneralLinearGroup.toLin : GL (Fin n) L ≃* _).toMonoidHom x •
-      (Pi.single j 1 : Fin n → L) ∈ latK L n (Fin.last n) := by
+  have h2
+      : (Matrix.GeneralLinearGroup.toLin : GL (Fin n) L ≃* _).toMonoidHom x
+          • (Pi.single j 1 : Fin n → L)
+        ∈ latK L n (Fin.last n) := by
     rw [← hk]
     exact Set.smul_mem_smul_set hmem
   have h3 := h2 i
@@ -42,15 +44,20 @@ theorem iwU_le_KU (σ : L →+* L) (n : ℕ) : IwU σ n ≤ KU σ n := by
   have hx' : (x : GL (Fin n) L) ∈ IwGL L n := Subgroup.mem_subgroupOf.1 hx
   have hxi : ((x : GL (Fin n) L))⁻¹ ∈ IwGL L n := inv_mem hx'
   have hmem : x ∈ ((KU σ n : Subgroup (GU σ n)) : Set (GU σ n)) := by
-    rw [GlobalTheory.LFun.IntPtsUnitary.coe_KU, Set.mem_preimage, GlobalTheory.LFun.IntPtsUnitary.coe_GLint]
+    rw [GlobalTheory.LFun.IntPtsUnitary.coe_KU, Set.mem_preimage,
+      GlobalTheory.LFun.IntPtsUnitary.coe_GLint]
     exact ⟨fun i j => iwGL_entries hx' i j, fun i j => iwGL_entries hxi i j⟩
   exact hmem
 
-theorem ordL_zpow {ϖ : L}
-    (hϖ : Valued.v ϖ = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
-    (d : ℤ) : ordL (ϖ ^ d) = d := by
-  have h1 : Valued.v (ϖ ^ d) =
-      ((Multiplicative.ofAdd (-d) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+theorem ordL_zpow
+    {ϖ : L}
+    (hϖ : Valued.v ϖ
+      = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
+    (d : ℤ)
+    : ordL (ϖ ^ d) = d := by
+  have h1
+      : Valued.v (ϖ ^ d)
+        = ((Multiplicative.ofAdd (-d) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
     rw [map_zpow₀, hϖ, ← WithZero.coe_zpow, ← ofAdd_zsmul, smul_neg, smul_eq_mul, mul_one]
   have hne : Valued.v (ϖ ^ d) ≠ 0 := by
     rw [h1]
@@ -65,21 +72,26 @@ def expo (n : ℕ) (i : Fin n) : ℤ := (n : ℤ) - 1 - 2 * (i.val : ℤ)
 
 def tGL {ϖ : L} (h0 : ϖ ≠ 0) (n : ℕ) : GL (Fin n) L where
   val := Matrix.diagonal fun i => ϖ ^ expo n i
-  inv := Matrix.diagonal fun i => ϖ ^ (-expo n i)
+  inv := Matrix.diagonal fun i => ϖ ^ (- expo n i)
   val_inv := by
     rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-    congr 1; funext i
-    rw [← zpow_add₀ h0]; simp
+    congr 1
+    funext i
+    rw [← zpow_add₀ h0]
+    simp
   inv_val := by
     rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-    congr 1; funext i
-    rw [← zpow_add₀ h0]; simp
+    congr 1
+    funext i
+    rw [← zpow_add₀ h0]
+    simp
 
 theorem tGL_mem {ϖ : L} (h0 : ϖ ≠ 0) {σ : L →+* L} (hσ : σ ϖ = ϖ) (n : ℕ) : tGL h0 n ∈ GU σ n := by
   show cT σ ((tGL h0 n : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) * antiJ L n *
     ((tGL h0 n : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) = antiJ L n
-  have hc : cT σ ((tGL h0 n : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) =
-      Matrix.diagonal fun i => ϖ ^ expo n i := by
+  have hc
+      : cT σ ((tGL h0 n : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+        = Matrix.diagonal fun i => ϖ ^ expo n i := by
     ext a b
     by_cases hab : a = b
     · subst hab
@@ -95,8 +107,8 @@ theorem tGL_mem {ϖ : L} (h0 : ϖ ≠ 0) {σ : L →+* L} (hσ : σ ϖ = ϖ) (n 
     rw [mul_one, ← zpow_add₀ h0, he, zpow_zero]
   · simp
 
-theorem exists_strictDom {ϖ : L} {σ : L →+* L} {q : ℕ} (h : IsUnramInv ϖ σ q) (n : ℕ) :
-    ∃ t : GU σ n, IsDiagM (t : GL (Fin n) L) ∧ IsStrictDom (t : GL (Fin n) L) := by
+theorem exists_strictDom {ϖ : L} {σ : L →+* L} {q : ℕ} (h : IsUnramInv ϖ σ q) (n : ℕ)
+    : ∃ t : GU σ n, IsDiagM (t : GL (Fin n) L) ∧ IsStrictDom (t : GL (Fin n) L) := by
   obtain ⟨-, -, hσ, hϖ, -⟩ := h
   have h0 : ϖ ≠ 0 := by
     intro h0

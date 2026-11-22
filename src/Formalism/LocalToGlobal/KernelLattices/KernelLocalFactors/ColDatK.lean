@@ -69,7 +69,6 @@ variable (d : ColDat)
 
 variable {d}
 
-
 end OverColDat
 
 namespace Test

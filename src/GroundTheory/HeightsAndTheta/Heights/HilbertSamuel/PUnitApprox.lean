@@ -9,8 +9,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open NumberField NumberField.InfinitePlace NumberField.Units
-  NumberField.Units.dirichletUnitTheorem
+open NumberField NumberField.InfinitePlace NumberField.Units NumberField.Units.dirichletUnitTheorem
 
 theorem UnitApprox.proof : UnitApprox.Statement := by
   intro F _ _ u hconj hsum
@@ -43,14 +42,13 @@ theorem UnitApprox.proof : UnitApprox.Statement := by
   set ε := Additive.toMul x with hε
   have hfr : ‖v - (ZSpan.floor b v : logSpace F)‖ ≤ R := by
     simpa [ZSpan.fract_apply] using ZSpan.norm_fract_le b v
-  let e : InfinitePlace F → ℝ := fun w =>
-    mult w * (Real.log (w ((ε : 𝓞 F) : F)) - n * uw w)
+  let e : InfinitePlace F → ℝ := fun w => mult w * (Real.log (w ((ε : 𝓞 F) : F)) - n * uw w)
   have he_ne : ∀ w (hw : w ≠ w₀), |e w| ≤ R := by
     intro w hw
     have h1 := norm_le_pi_norm (v - (ZSpan.floor b v : logSpace F)) ⟨w, hw⟩
     rw [← hx] at h1
-    have h2 : (logEmbedding F).toIntLinearMap x ⟨w, hw⟩
-        = mult w * Real.log (w ((ε : 𝓞 F) : F)) := rfl
+    have h2 : (logEmbedding F).toIntLinearMap x ⟨w, hw⟩ = mult w * Real.log (w ((ε : 𝓞 F) : F)) :=
+      rfl
     rw [Pi.sub_apply, h2, Real.norm_eq_abs] at h1
     have h3 : e w = -(v ⟨w, hw⟩ - mult w * Real.log (w ((ε : 𝓞 F) : F))) := by
       simp only [e, v]; ring
@@ -59,8 +57,7 @@ theorem UnitApprox.proof : UnitApprox.Statement := by
     linarith
   have he_sum : ∑ w, e w = 0 := by
     have h := sum_mult_mul_log ε
-    have h2 : ∑ w : InfinitePlace F, (mult w : ℝ) * (n * uw w)
-        = n * ∑ w, (mult w : ℝ) * uw w := by
+    have h2 : ∑ w : InfinitePlace F, (mult w : ℝ) * (n * uw w) = n * ∑ w, (mult w : ℝ) * uw w := by
       rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun _ _ => by ring
     simp only [e, mul_sub, Finset.sum_sub_distrib, h2, hsum', mul_zero, sub_zero]
     exact h
@@ -70,12 +67,13 @@ theorem UnitApprox.proof : UnitApprox.Statement := by
     · subst hw
       have h := Finset.add_sum_erase Finset.univ e (Finset.mem_univ w₀)
       rw [he_sum] at h
-      have h3 : e w₀ = -∑ w ∈ Finset.univ.erase w₀, e w := by linarith
+      have h3 : e w₀ = - ∑ w ∈ Finset.univ.erase w₀, e w := by linarith
       rw [h3, abs_neg]
-      calc |∑ w ∈ Finset.univ.erase w₀, e w| ≤ ∑ w ∈ Finset.univ.erase w₀, |e w| :=
-            Finset.abs_sum_le_sum_abs _ _
+      calc
+        |∑ w ∈ Finset.univ.erase w₀, e w|
+          ≤ ∑ w ∈ Finset.univ.erase w₀, |e w| := Finset.abs_sum_le_sum_abs _ _
         _ ≤ ∑ _w ∈ Finset.univ.erase w₀, R :=
-            Finset.sum_le_sum fun w hw => he_ne w (Finset.ne_of_mem_erase hw)
+          Finset.sum_le_sum fun w hw => he_ne w (Finset.ne_of_mem_erase hw)
         _ ≤ _ := by
           rw [Finset.sum_const, nsmul_eq_mul]
           gcongr

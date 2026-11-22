@@ -7,7 +7,11 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.DepthTie
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.RunJoin GlobalTheory.RunIn GlobalTheory.FinalJoin GlobalTheory.FinalJoin2
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps
+  Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.RunJoin GlobalTheory.RunIn
+  GlobalTheory.FinalJoin GlobalTheory.FinalJoin2
 
 namespace GlobalTheory.FinalJoin2
 
@@ -28,14 +32,17 @@ theorem FO_eq_coeff {D : D7} (Q : Par D) (h : Q.PinField) : FO D = Q.c.F := by
       rw [← e]
       exact phiO_mem_FO D _
     obtain ⟨x, y, -, hxy⟩ := IsFractionRing.div_surjective (A := 𝓞 Q.c.F) (⟨z, hz⟩ : Q.c.F)
-    have : z = ((algebraMap (𝓞 Q.c.F) Q.c.F x : Q.c.F) : ℂ) / ((algebraMap (𝓞 Q.c.F) Q.c.F y : Q.c.F) : ℂ) := by
+    have : z
+        = ((algebraMap (𝓞 Q.c.F) Q.c.F x : Q.c.F) : ℂ)
+          / ((algebraMap (𝓞 Q.c.F) Q.c.F y : Q.c.F) : ℂ) := by
       have := congrArg (fun t : Q.c.F => (t : ℂ)) hxy
       simpa using this.symm
     rw [this]
     exact div_mem (hint x) (hint y)
 
-theorem fieldSmall_iff_opo : ∀ (D : D7) (T : Top D) (h : LawsP T) (large₂ : SizeData₂ D),
-    FieldSmall D large₂ ↔ OPO large₂ (recB h.toLawsCore) := by
+theorem fieldSmall_iff_opo
+    : ∀ (D : D7) (T : Top D) (h : LawsP T) (large₂ : SizeData₂ D),
+      FieldSmall D large₂ ↔ OPO large₂ (recB h.toLawsCore) := by
   intro D T h large₂
   have hF : FO D = T.Q.c.F := FO_eq_coeff T.Q h.toLawsCore.pins.2.2.1
   letI : NumberField (FO D) := NumberField.mk

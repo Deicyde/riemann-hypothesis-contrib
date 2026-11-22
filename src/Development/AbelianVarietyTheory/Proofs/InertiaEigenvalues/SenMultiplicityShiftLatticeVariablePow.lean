@@ -11,9 +11,11 @@ namespace GlobalTheory.PhiGam.SenShift
 open GlobalTheory.PhiGam
 open scoped LaurentSeries PowerSeries
 
-theorem mem_iSup_comap_pow {k U : Type} [Field k] [AddCommGroup U] [Module k U] (S : Module.End k U)
-    (Q : Submodule k U) (hQ : ∀ p ∈ Q, S p ∈ Q) (u : U) :
-    u ∈ (⨆ m : ℕ, Q.comap (S ^ m)) ↔ ∃ m : ℕ, (S ^ m) u ∈ Q := by
+theorem mem_iSup_comap_pow
+    {k U : Type} [Field k] [AddCommGroup U] [Module k U]
+    (S : Module.End k U) (Q : Submodule k U) (hQ : ∀ p ∈ Q, S p ∈ Q)
+    (u : U)
+    : u ∈ (⨆ m : ℕ, Q.comap (S ^ m)) ↔ ∃ m : ℕ, (S ^ m) u ∈ Q := by
   have hmono : Monotone fun m : ℕ => Q.comap (S ^ m) := by
     refine monotone_nat_of_le_succ fun m p hp => ?_
     rw [Submodule.mem_comap] at hp ⊢
@@ -21,12 +23,13 @@ theorem mem_iSup_comap_pow {k U : Type} [Field k] [AddCommGroup U] [Module k U] 
     exact hQ _ hp
   exact Submodule.mem_iSup_of_directed _ hmono.directed_le
 
-theorem gmult_transport {k U : Type} [Field k] [AddCommGroup U] [Module k U] (T T' : Module.End k U)
-    (P Q P' Q' : Submodule k U) (e : U ≃ₗ[k] U) (x y : k)
-    (heP : ∀ u, e u ∈ P' ↔ u ∈ P) (heQ : ∀ u, e u ∈ Q' ↔ u ∈ Q)
-    (hP : ∀ p ∈ P, T p ∈ P) (hQ : ∀ p ∈ Q, T p ∈ Q) (hQ' : ∀ p ∈ Q', T' p ∈ Q')
-    (h : ∀ p ∈ P, T' (e p) - x • e p - e (T p - y • p) ∈ Q') :
-    gmult T' P' Q' x = gmult T P Q y := by
+theorem gmult_transport
+    {k U : Type} [Field k] [AddCommGroup U] [Module k U]
+    (T T' : Module.End k U) (P Q P' Q' : Submodule k U) (e : U ≃ₗ[k] U) (x y : k)
+    (heP : ∀ u, e u ∈ P' ↔ u ∈ P) (heQ : ∀ u, e u ∈ Q' ↔ u ∈ Q) (hP : ∀ p ∈ P, T p ∈ P)
+    (hQ : ∀ p ∈ Q, T p ∈ Q) (hQ' : ∀ p ∈ Q', T' p ∈ Q')
+    (h : ∀ p ∈ P, T' (e p) - x • e p - e (T p - y • p) ∈ Q')
+    : gmult T' P' Q' x = gmult T P Q y := by
   unfold gmult
   set S := T - algebraMap k (Module.End k U) y with hSdef
   set S' := T' - algebraMap k (Module.End k U) x with hS'def
@@ -76,7 +79,14 @@ theorem gmult_transport {k U : Type} [Field k] [AddCommGroup U] [Module k U] (T 
   change (z : U) ∈ Q ↔ ((E z : A') : U) ∈ Q'
   rw [hE, heQ]
 
-theorem sen_sh : ∀ {k : Type} [Field k] {l : ℕ} [Fact l.Prime] [CharP k l] (R : RingPG k l) {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [Module k V] [IsScalarTower k⟦X⟧ k⸨X⸩ V] [IsScalarTower k k⸨X⸩ V] [IsScalarTower k k⟦X⟧ V] [FiniteDimensional k⸨X⸩ V] (g : V →ₗ[k] V), Semi R.γ g → ∀ N : Submodule k⟦X⟧ V, IsLat N → CondC g N → ∀ (a : ℤ) (x : k), sen g (sh a N) x = sen g N (x + a) := by
+theorem sen_sh
+    : ∀ {k : Type} [Field k] {l : ℕ} [Fact l.Prime] [CharP k l] (R : RingPG k l) {V : Type}
+        [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [Module k V] [IsScalarTower k⟦X⟧ k⸨X⸩ V]
+        [IsScalarTower k k⸨X⸩ V] [IsScalarTower k k⟦X⟧ V] [FiniteDimensional k⸨X⸩ V]
+        (g : V →ₗ[k] V),
+      Semi R.γ g
+        → ∀ N : Submodule k⟦X⟧ V,
+          IsLat N → CondC g N → ∀ (a : ℤ) (x : k), sen g (sh a N) x = sen g N (x + a) := by
   intro k _ l _ _ R V _ _ _ _ _ _ _ _ g hg N _ hC a x
   have hv : vv k ≠ 0 := vv_ne_zero k
   let e : V ≃ₗ[k] V :=
@@ -86,8 +96,12 @@ theorem sen_sh : ∀ {k : Type} [Field k] {l : ℕ} [Fact l.Prime] [CharP k l] (
     rw [he, mem_sh_iff_smul_mem, smul_smul, ← zpow_add₀ hv, neg_add_cancel, zpow_zero, one_smul]
   have hsh : sh 1 (sh a N) = sh a (sh 1 N) := by rw [sh_sh_eq, sh_sh_eq, add_comm]
   unfold sen qmult
-  refine gmult_transport (nab g) (nab g) _ _ _ _ e x (x + a) (fun u => hmem N u) (fun u => ?_)
-    (fun p hp => Window.nab_mem hC hp) (fun p hp => Window.nab_mem_sh R hg hC 1 hp) (fun p hp => ?_)
+  refine gmult_transport (nab g) (nab g) _ _ _ _ e x (x + a)
+    (fun u => hmem N u)
+    (fun u => ?_)
+    (fun p hp => Window.nab_mem hC hp)
+    (fun p hp => Window.nab_mem_sh R hg hC 1 hp)
+    (fun p hp => ?_)
     (fun p hp => ?_)
   · rw [hsh]; exact hmem _ u
   · rw [sh_sh_eq] at hp ⊢

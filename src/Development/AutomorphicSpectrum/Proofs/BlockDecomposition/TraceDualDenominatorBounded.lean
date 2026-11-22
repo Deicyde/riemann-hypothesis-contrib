@@ -8,10 +8,15 @@ open NumberField
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ
 
-theorem traceDual_clear_by_integer : ∀ (F : Type) [Field F] [NumberField F], ∃ D : ℕ, 0 < D ∧ ∀ f : F,
-    (∀ r : 𝓞 F, ∃ m : ℤ, Algebra.trace ℚ F (f * (r : F)) = m) → ∃ o : 𝓞 F, (o : F) = (D : F) * f := by
+theorem traceDual_clear_by_integer
+    : ∀ (F : Type) [Field F] [NumberField F], ∃ D : ℕ,
+      0 < D
+        ∧ ∀ f : F,
+          (∀ r : 𝓞 F, ∃ m : ℤ, Algebra.trace ℚ F (f * (r : F)) = m)
+            → ∃ o : 𝓞 F, (o : F) = (D : F) * f := by
   intro F _ _
-  obtain ⟨a, ha, hint⟩ := (FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (nonZeroDivisors (𝓞 F)) F)).isFractional
+  obtain ⟨a, ha, hint⟩ :=
+    (FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (nonZeroDivisors (𝓞 F)) F)).isFractional
   have ha0 : a ≠ 0 := nonZeroDivisors.ne_zero ha
   refine ⟨Ideal.absNorm (Ideal.span {a}), ?_, ?_⟩
   · rw [Nat.pos_iff_ne_zero, Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]

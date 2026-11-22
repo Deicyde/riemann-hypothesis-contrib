@@ -4,16 +4,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
 section
-variable {O Γ : Type} [CommRing O] [Group Γ] {Φ : Fr O Γ} {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R'']
+variable
+  {O Γ : Type} [CommRing O] [Group Γ]
+  {Φ : Fr O Γ} {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R'']
 
 private theorem ch_adj (g : R →+* R') (X : M4 R) : adj (X.map g) = (adj X).map g := by
   ext i j
   simp [adj]
 
-private theorem ch_map (D : RD Φ R) (f : R →+* R') (g : R' →+* R'') : (D.map f).map g = D.map (g.comp f) := by
+private theorem ch_map (D : RD Φ R) (f : R →+* R') (g : R' →+* R'')
+    : (D.map f).map g = D.map (g.comp f) := by
   apply RD.ext
   · ext s i j
     rfl
@@ -21,15 +25,15 @@ private theorem ch_map (D : RD Φ R) (f : R →+* R') (g : R' →+* R'') : (D.ma
     ext s
     rfl
 
-private theorem ch_conj (D : RD Φ R) (g : R →+* R') (X : M4 R) (s : Γ) (i j : Fin 4) :
-    (adj (X.map g) * (D.map g).r s * X.map g) i j = g ((adj X * D.r s * X) i j) := by
+private theorem ch_conj (D : RD Φ R) (g : R →+* R') (X : M4 R) (s : Γ) (i j : Fin 4)
+    : (adj (X.map g) * (D.map g).r s * X.map g) i j = g ((adj X * D.r s * X) i j) := by
   rw [ch_adj]
   show ((adj X).map g * (D.r s).map g * X.map g) i j = _
   rw [← Matrix.map_mul, ← Matrix.map_mul]
   rfl
 
-private theorem ch_gsp (g : R →+* R') (X : M4 R) (i j : Fin 4) :
-    (adj (X.map g) * X.map g - 1) i j = g ((adj X * X - 1) i j) := by
+private theorem ch_gsp (g : R →+* R') (X : M4 R) (i j : Fin 4)
+    : (adj (X.map g) * X.map g - 1) i j = g ((adj X * X - 1) i j) := by
   rw [ch_adj, ← Matrix.map_mul, Matrix.sub_apply, Matrix.sub_apply, Matrix.map_apply, map_sub,
     Matrix.one_apply, Matrix.one_apply]
   split_ifs <;> simp
@@ -40,12 +44,17 @@ private def chEq (D : RD Φ R) (n : Φ.ι → M4 R) : Set R :=
     (∃ v i, ∃ s : Φ.Gv v, x = (adj (n v) * D.r s * n v) i i - D.ψ v i s) ∨
     ∃ v i, ∃ s : Φ.Gv v, (s : Γ) ∈ Φ.Mu v ∧ x = D.ψ v i s - 1}
 
-private theorem ch_iff (D : RD Φ R) (n : Φ.ι → M4 R) (g : R →+* R') :
-    (D.map g).Flags (fun v => (n v).map g) ↔ ∀ x ∈ chEq D n, g x = 0 := by
+private theorem ch_iff (D : RD Φ R) (n : Φ.ι → M4 R) (g : R →+* R')
+    : (D.map g).Flags (fun v => (n v).map g) ↔ ∀ x ∈ chEq D n, g x = 0 := by
   constructor
   · rintro ⟨hlow, hflag, hchar, hmu⟩ x hx
-    rcases hx with ⟨v, i, j, rfl⟩ | ⟨v, i, rfl⟩ | ⟨v, i, j, hij, rfl⟩ | ⟨v, s, hs, i, j, hij, rfl⟩ |
-      ⟨v, i, s, rfl⟩ | ⟨v, i, s, hs, rfl⟩
+    rcases hx with
+      ⟨v, i, j, rfl⟩
+        | ⟨v, i, rfl⟩
+        | ⟨v, i, j, hij, rfl⟩
+        | ⟨v, s, hs, i, j, hij, rfl⟩
+        | ⟨v, i, s, rfl⟩
+        | ⟨v, i, s, hs, rfl⟩
     · have hl : IsLow ((n v).map g) := hlow v
       unfold IsLow IsGSp at hl
       rw [← ch_gsp, hl.1]
@@ -88,8 +97,15 @@ private theorem ch_iff (D : RD Φ R) (n : Φ.ι → M4 R) (g : R →+* R') :
 
 end
 
-theorem UpperTheory.V.Ws.sxChart :
-    ∀ {O Γ : Type} [CommRing O] [Group Γ] {Φ : Fr O Γ} {A₀ : Type} [CommRing A₀] (D : RD Φ A₀), ∃ (A : Type) (_ : CommRing A) (_ : Algebra A₀ A) (n : Φ.ι → M4 A), Algebra.FiniteType A₀ A ∧ Algebra.adjoin A₀ (Set.range fun x : Φ.ι × Fin 4 × Fin 4 => n x.1 x.2.1 x.2.2) = ⊤ ∧ (D.map (algebraMap A₀ A)).Flags n ∧ ∀ (R : Type) [CommRing R] (f : A₀ →+* R) (n' : Φ.ι → M4 R), (D.map f).Flags n' → ∃ F : A →+* R, F.comp (algebraMap A₀ A) = f ∧ ∀ v, (n v).map F = n' v := by
+theorem UpperTheory.V.Ws.sxChart
+    : ∀ {O Γ : Type} [CommRing O] [Group Γ] {Φ : Fr O Γ} {A₀ : Type} [CommRing A₀] (D : RD Φ A₀),
+      ∃ (A : Type) (_ : CommRing A) (_ : Algebra A₀ A) (n : Φ.ι → M4 A),
+        Algebra.FiniteType A₀ A
+          ∧ Algebra.adjoin A₀ (Set.range fun x : Φ.ι × Fin 4 × Fin 4 => n x.1 x.2.1 x.2.2) = ⊤
+          ∧ (D.map (algebraMap A₀ A)).Flags n
+          ∧ ∀ (R : Type) [CommRing R] (f : A₀ →+* R) (n' : Φ.ι → M4 R),
+            (D.map f).Flags n'
+              → ∃ F : A →+* R, F.comp (algebraMap A₀ A) = f ∧ ∀ v, (n v).map F = n' v := by
   intro O Γ _ _ Φ A₀ _ D
   classical
   let σ := Φ.ι × Fin 4 × Fin 4
@@ -99,16 +115,19 @@ theorem UpperTheory.V.Ws.sxChart :
   have hfac : algebraMap A₀ (MvPolynomial σ A₀ ⧸ I) = (Ideal.Quotient.mk I).comp MvPolynomial.C :=
     RingHom.ext fun _ => rfl
   refine ⟨MvPolynomial σ A₀ ⧸ I, inferInstance, inferInstance, n, ?_, ?_, ?_, ?_⟩
-  · exact Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ A₀ I) (Ideal.Quotient.mkₐ_surjective A₀ I)
-  · have hset : (Set.range fun x : Φ.ι × Fin 4 × Fin 4 => n x.1 x.2.1 x.2.2) =
-        (Ideal.Quotient.mkₐ A₀ I) '' Set.range (MvPolynomial.X : σ → MvPolynomial σ A₀) := by
+  · exact Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ A₀ I)
+      (Ideal.Quotient.mkₐ_surjective A₀ I)
+  · have hset
+        : (Set.range fun x : Φ.ι × Fin 4 × Fin 4 => n x.1 x.2.1 x.2.2)
+          = (Ideal.Quotient.mkₐ A₀ I) '' Set.range (MvPolynomial.X : σ → MvPolynomial σ A₀) := by
       ext y
       constructor
       · rintro ⟨x, rfl⟩
         exact ⟨MvPolynomial.X x, ⟨x, rfl⟩, rfl⟩
       · rintro ⟨_, ⟨x, rfl⟩, rfl⟩
         exact ⟨x, rfl⟩
-    rw [hset, Algebra.adjoin_image, MvPolynomial.adjoin_range_X, Algebra.map_top, AlgHom.range_eq_top]
+    rw [hset, Algebra.adjoin_image, MvPolynomial.adjoin_range_X, Algebra.map_top,
+      AlgHom.range_eq_top]
     exact Ideal.Quotient.mkₐ_surjective A₀ I
   · rw [hfac, ← ch_map]
     exact (ch_iff _ _ _).2 fun x hx => Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span hx)

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 @[expose] public section
 
-open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open GlobalTheory.SW hiding Level
 open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
@@ -17,22 +18,30 @@ open scoped ComplexConjugate ComplexOrder Real Classical
 
 namespace GlobalTheory.Ker
 
-
 open GlobalTheory.SW.DblZero in
-theorem schur_heisG : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → ∀ A : TF n g → TF n g, (∀ φ, IsSB φ → IsSB (A φ)) → (∀ φ ψ, IsSB φ → IsSB ψ → A (φ + ψ) = A φ + A ψ) → (∀ (a : ℂ) φ, IsSB φ → A (a • φ) = a • A φ) → (∀ (y : Matrix (Fin n) (Fin r) E) φ, IsSB φ → A (heisG X bas y φ) = heisG X bas y (A φ)) → ∃ c : ℂ, ∀ φ, IsSB φ → A φ = c • φ := by
+theorem schur_heisG
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ)
+        (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r)
+        (n : ℕ),
+      IsSympl X bas → Even n
+        → ∀ A : TF n g → TF n g,
+          (∀ φ, IsSB φ → IsSB (A φ)) → (∀ φ ψ, IsSB φ → IsSB ψ → A (φ + ψ) = A φ + A ψ)
+            → (∀ (a : ℂ) φ, IsSB φ → A (a • φ) = a • A φ)
+            → (∀ (y : Matrix (Fin n) (Fin r) E) φ,
+              IsSB φ → A (heisG X bas y φ) = heisG X bas y (A φ))
+            → ∃ c : ℂ, ∀ φ, IsSB φ → A φ = c • φ := by
   intro E _ _ _ r X g q0 hr bas idx n hs _ A hA hadd hsmul hcomm
 
-  obtain ⟨c, hc⟩ := exists_eq_mul_ip (κ := Fin n) (ι := Fin g) (fun φ ψ => ip (A φ) ψ)
-    (fun φ φ' ψ hφ hφ' hψ => by
-      rw [hadd φ φ' hφ hφ', ip_add_left (hA φ hφ) (hA φ' hφ') hψ])
-    (fun φ ψ ψ' hφ hψ hψ' => by
-      exact ip_add_right (hA φ hφ) hψ hψ')
-    (fun a b φ ψ hφ hψ => by
-      rw [hsmul a φ hφ, ip_smul (hA φ hφ) hψ])
-    (fun a b φ ψ hφ hψ => by
-      obtain ⟨y, hy⟩ := exists_heisG (n := n) hs a b
-      rw [← hy φ, hcomm y φ hφ, hy (A φ)]
-      exact ((heisS_laws _ _ a b (A φ) (hA φ hφ)).2.2.2.2) ψ hψ)
+  obtain ⟨c, hc⟩ :=
+    exists_eq_mul_ip (κ := Fin n) (ι := Fin g)
+      (fun φ ψ => ip (A φ) ψ)
+      (fun φ φ' ψ hφ hφ' hψ => by rw [hadd φ φ' hφ hφ', ip_add_left (hA φ hφ) (hA φ' hφ') hψ])
+      (fun φ ψ ψ' hφ hψ hψ' => by exact ip_add_right (hA φ hφ) hψ hψ')
+      (fun a b φ ψ hφ hψ => by rw [hsmul a φ hφ, ip_smul (hA φ hφ) hψ])
+      (fun a b φ ψ hφ hψ => by
+        obtain ⟨y, hy⟩ := exists_heisG (n := n) hs a b
+        rw [← hy φ, hcomm y φ hφ, hy (A φ)]
+        exact ((heisS_laws _ _ a b (A φ) (hA φ hφ)).2.2.2.2) ψ hψ)
   refine ⟨c, fun φ hφ => ?_⟩
 
   have hAφ := hA φ hφ

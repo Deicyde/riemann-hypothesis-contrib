@@ -10,8 +10,11 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F
+  PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf TypeB TypeH)
 open UpperTheory.V.Z.Tf.GlobalTraceComparison
@@ -26,8 +29,9 @@ attribute [local instance] borelG borelF borelA borelH
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-private theorem mem_Kg {S : Set (Pl E)} {L : ∀ w : Pl E, Subgroup (GLw n w)} {g : GL (Fin n) (Af E)} :
-    g ∈ Kg S L ↔ ∀ w ∈ S, Slots.loc n w g ∈ L w ∧ (IsSplitAt w → Slots.loc n w (thF E n g) ∈ L w) := by
+private theorem mem_Kg {S : Set (Pl E)} {L : ∀ w : Pl E, Subgroup (GLw n w)} {g : GL (Fin n) (Af E)}
+    : g ∈ Kg S L
+      ↔ ∀ w ∈ S, Slots.loc n w g ∈ L w ∧ (IsSplitAt w → Slots.loc n w (thF E n g) ∈ L w) := by
   simp only [Kg, Subgroup.mem_iInf, Subgroup.mem_inf]
   refine forall_congr' fun w => forall_congr' fun _ => and_congr_right fun _ => ?_
   by_cases h : IsSplitAt w
@@ -37,23 +41,36 @@ private theorem mem_Kg {S : Set (Pl E)} {L : ∀ w : Pl E, Subgroup (GLw n w)} {
 private theorem continuous_thF' : Continuous (thF E n) :=
   GlobalTheory.ThetaPull.continuous_thetaGL _ (continuous_conjFin _)
 
-private theorem mem_Kf {g : GL (Fin n) (Af E)} : g ∈ Kf E n ↔ ∀ w, Slots.loc n w g ∈ KGL w (n := n) := by
+private theorem mem_Kf {g : GL (Fin n) (Af E)}
+    : g ∈ Kf E n ↔ ∀ w, Slots.loc n w g ∈ KGL w (n := n) := by
   simp only [Kf, Subgroup.mem_iInf, Subgroup.mem_comap]
 
 private theorem thF_mem_Kf {g : GL (Fin n) (Af E)} (hg : g ∈ Kf E n) : thF E n g ∈ Kf E n :=
   mem_Kf.2 fun u => Slots.loc_thF_mem u (mem_Kf.1 hg _)
 
-private theorem isOpen_cut (Z : Finset (Pl E)) (L : ∀ w : Pl E, Subgroup (GLw n w))
-    (hL : ∀ w, IsOpen (L w : Set (GLw n w))) :
-    IsOpen ((Kf E n ⊓ ⨅ w ∈ Z, ((L w).comap (Slots.loc n w) ⊓
-      (L w).comap ((Slots.loc n w).comp (thF E n))) : Subgroup (GL (Fin n) (Af E))) : Set (GL (Fin n) (Af E))) := by
-  have e : ((Kf E n ⊓ ⨅ w ∈ Z, ((L w).comap (Slots.loc n w) ⊓
-      (L w).comap ((Slots.loc n w).comp (thF E n))) : Subgroup (GL (Fin n) (Af E))) : Set (GL (Fin n) (Af E))) =
-      (Kf E n : Set _) ∩ ⋂ w ∈ Z, (Slots.loc n w ⁻¹' (L w : Set _) ∩ (Slots.loc n w ∘ thF E n) ⁻¹' (L w : Set _)) := by
-    ext g
-    simp [Subgroup.mem_iInf, Subgroup.mem_inf, Subgroup.mem_comap]
+private theorem isOpen_cut
+    (Z : Finset (Pl E))
+    (L : ∀ w : Pl E, Subgroup (GLw n w)) (hL : ∀ w, IsOpen (L w : Set (GLw n w)))
+    : IsOpen
+      ((Kf E n
+            ⊓ ⨅ w ∈ Z, ((L w).comap (Slots.loc n w) ⊓
+              (L w).comap ((Slots.loc n w).comp (thF E n)))
+          : Subgroup (GL (Fin n) (Af E)))
+        : Set (GL (Fin n) (Af E))) := by
+  have e
+      : ((Kf E n
+              ⊓ ⨅ w ∈ Z, ((L w).comap (Slots.loc n w) ⊓
+                (L w).comap ((Slots.loc n w).comp (thF E n)))
+            : Subgroup (GL (Fin n) (Af E)))
+          : Set (GL (Fin n) (Af E)))
+        = (Kf E n : Set _)
+          ∩ ⋂ w ∈ Z, (Slots.loc n w ⁻¹' (L w : Set _) ∩ (Slots.loc n w ∘ thF E n) ⁻¹' (L w : Set _)) :=
+    by
+      ext g
+      simp [Subgroup.mem_iInf, Subgroup.mem_inf, Subgroup.mem_comap]
   rw [e]
-  refine (PositivityTheory.Rg.BcB.G8.Fin.kfOC_holds E n).1.inter (isOpen_biInter_finset fun w _ => ?_)
+  refine (PositivityTheory.Rg.BcB.G8.Fin.kfOC_holds E n).1.inter (isOpen_biInter_finset fun w _ =>
+    ?_)
   exact ((hL w).preimage (Slots.continuous_loc n w)).inter
     ((hL w).preimage ((Slots.continuous_loc n w).comp continuous_thF'))
 
@@ -76,7 +93,8 @@ theorem kgFacts : KgFacts := by
     rcases (hsec S hS u).1 with hu | hu
     · exact (hL u).2 (hg' u hu).1
     · by_cases hs : IsSplitAt (cPl u)
-      · have h1 : Slots.loc n (cPl u) (thF E n g) ∈ KGL (cPl u) (n := n) := (hL _).2 ((hg' _ hu).2 hs)
+      · have h1 : Slots.loc n (cPl u) (thF E n g) ∈ KGL (cPl u) (n := n) :=
+          (hL _).2 ((hg' _ hu).2 hs)
         have h2 : Slots.loc n u (thF E n (thF E n g)) ∈ KGL u (n := n) := Slots.loc_thF_mem u h1
         rwa [GlobalTheory.EulerTw.Comm.thF_thF] at h2
       · have e1 : cPl (cPl u) = cPl u := by

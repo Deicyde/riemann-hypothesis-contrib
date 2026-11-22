@@ -10,8 +10,8 @@ open GlobalTheory.PRep GlobalTheory.BCT
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
-private theorem out_mem_iff {G : Type} [Group G] (K : Subgroup G) (q : G ⧸ K) :
-    q.out ∈ K ↔ q = (QuotientGroup.mk 1 : G ⧸ K) := by
+private theorem out_mem_iff {G : Type} [Group G] (K : Subgroup G) (q : G ⧸ K)
+    : q.out ∈ K ↔ q = (QuotientGroup.mk 1 : G ⧸ K) := by
   constructor
   · intro h
     rw [← QuotientGroup.out_eq' q]
@@ -23,9 +23,9 @@ private theorem out_mem_iff {G : Type} [Group G] (K : Subgroup G) (q : G ⧸ K) 
     have h2 := QuotientGroup.eq.1 h1
     simpa using h2
 
-private theorem levOp_unit_eq {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (K : Subgroup G) :
-    levOp ρ K K ((K : Set G).indicator 1) LinearMap.id = ρ (QuotientGroup.mk 1 : G ⧸ K).out := by
+private theorem levOp_unit_eq
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (K : Subgroup G)
+    : levOp ρ K K ((K : Set G).indicator 1) LinearMap.id = ρ (QuotientGroup.mk 1 : G ⧸ K).out := by
   have hone : (QuotientGroup.mk 1 : G ⧸ K).out ∈ K := (out_mem_iff K _).2 rfl
   unfold levOp
   rw [finsum_eq_single _ (QuotientGroup.mk 1 : G ⧸ K)]
@@ -34,9 +34,10 @@ private theorem levOp_unit_eq {G V : Type} [Group G] [AddCommGroup V] [Module �
   · intro q hq
     rw [Set.indicator_of_notMem (fun h => hq ((out_mem_iff K q).1 h)), zero_smul]
 
-private theorem levOp_unit_fixed {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (K : Subgroup G) (v : V) (hv : v ∈ fixed ρ K) :
-    levOp ρ K K ((K : Set G).indicator 1) LinearMap.id v = v := by
+private theorem levOp_unit_fixed
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (K : Subgroup G) (v : V) (hv : v ∈ fixed ρ K)
+    : levOp ρ K K ((K : Set G).indicator 1) LinearMap.id v = v := by
   have hone : (QuotientGroup.mk 1 : G ⧸ K).out ∈ K := (out_mem_iff K _).2 rfl
   rw [levOp_unit_eq]
   simpa using hv ⟨_, hone⟩

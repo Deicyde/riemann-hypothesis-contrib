@@ -11,21 +11,25 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.FrobeniusPowerSeries
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
 variable [FiniteDimensional Qp LL]
 
-theorem charZero_of_prime_ne_zero [IsDomain O] [IsLocalRing O] (W : LocWach PD LL O v n)
-    (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x)) (hl0 : ((PD.p : ℕ) : O) ≠ 0) : CharZero O := by
+theorem charZero_of_prime_ne_zero
+    [IsDomain O] [IsLocalRing O]
+    (W : LocWach PD LL O v n) (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x)) (hl0 : ((PD.p : ℕ) : O) ≠ 0)
+    : CharZero O := by
   obtain ⟨m, hm⟩ := CharP.exists O
   rcases CharP.char_is_prime_or_zero O m with hmp | hm0
   · exfalso
@@ -40,25 +44,36 @@ theorem charZero_of_prime_ne_zero [IsDomain O] [IsLocalRing O] (W : LocWach PD L
   · subst hm0
     exact CharP.charP_to_charZero O
 
-theorem gamma_sub_self_mem_pi0_lattice (W : LocWach PD LL O v n) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
-    (i : ZMod n) (T : LocLat G Qp LL O) (hc : IsCrys PD T.ρ) :
-    ∀ x, Formalism.MainNotions.LiftingTheory.InNΔi W T i x → ∃ y, Formalism.MainNotions.LiftingTheory.InNΔi W T i y ∧ W.γ T x - x = W.π₀ • y := by
+theorem gamma_sub_self_mem_pi0_lattice
+    (W : LocWach PD LL O v n) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (i : ZMod n)
+    (T : LocLat G Qp LL O) (hc : IsCrys PD T.ρ)
+    : ∀ x,
+      Formalism.MainNotions.LiftingTheory.InNΔi W T i x
+        → ∃ y, Formalism.MainNotions.LiftingTheory.InNΔi W T i y ∧ W.γ T x - x = W.π₀ • y := by
   intro x hx
   obtain ⟨y, hy, he⟩ := Formalism.MainNotions.LiftingTheory.coreHgr_of W hP9 hcase T hc i 0 x hx
   refine ⟨y, hy, ?_⟩
   simpa using he
 
-theorem exists_gamma_sub_one_div_pi0 (W : LocWach PD LL O v n) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
-    (T : LocLat G Qp LL O) :
-    ∃ dop : W.DD T →ₗ[O] W.DD T, ∀ y, W.π₀ • dop y = W.γ T y - y := by
+theorem exists_gamma_sub_one_div_pi0
+    (W : LocWach PD LL O v n) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (T : LocLat G Qp LL O)
+    : ∃ dop : W.DD T →ₗ[O] W.DD T, ∀ y, W.π₀ • dop y = W.γ T y - y := by
   have hπ : IsUnit (algebraMap (LetA O n) W.EE W.π₀) :=
     (Formalism.MainNotions.LiftingTheory.lifta_ring_of W
-      (Formalism.MainNotions.LiftingTheory.uniformizer_ring_and_module_clauses W hP9 hcase W.one (Formalism.MainNotions.LiftingTheory.gen_one_crys W)).1).πU
+      (Formalism.MainNotions.LiftingTheory.uniformizer_ring_and_module_clauses W hP9 hcase W.one
+        (Formalism.MainNotions.LiftingTheory.gen_one_crys W)).1).πU
   obtain ⟨c, hc⟩ := hπ.exists_right_inv
-  exact ⟨Formalism.MainNotions.LiftingTheory.lifta_δ W T c, Formalism.MainNotions.LiftingTheory.lifta_δ_spec W T c hc⟩
+  exact ⟨
+    Formalism.MainNotions.LiftingTheory.lifta_δ W T c,
+    Formalism.MainNotions.LiftingTheory.lifta_δ_spec W T c hc
+  ⟩
 
-theorem units_sub_one_dvd_zpow_sub_one {R : Type} [CommRing R] (u : Rˣ) (k : ℤ) :
-    (u : R) - 1 ∣ ((u ^ k : Rˣ) : R) - 1 := by
+theorem units_sub_one_dvd_zpow_sub_one {R : Type} [CommRing R] (u : Rˣ) (k : ℤ)
+    : (u : R) - 1 ∣ ((u ^ k : Rˣ) : R) - 1 := by
   have hN : ∀ j : ℕ, (u : R) - 1 ∣ ((u ^ j : Rˣ) : R) - 1 := fun j => by
     rw [Units.val_pow_eq_pow_val]
     simpa using sub_dvd_pow_sub_pow (u : R) 1 j
@@ -70,9 +85,11 @@ theorem units_sub_one_dvd_zpow_sub_one {R : Type} [CommRing R] (u : Rˣ) (k : �
     have h1 : (((u ^ j)⁻¹ : Rˣ) : R) * ((u ^ j : Rˣ) : R) = 1 := Units.inv_mul _
     linear_combination (-(((u ^ j)⁻¹ : Rˣ) : R)) * hw + h1
 
-theorem exists_cyclotomic_char_quotient (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
-    (hOv : ∀ x : LL, 0 ≤ v x → ∃ y : O, algebraMap O LL y = x) (hinj : Function.Injective (algebraMap O LL)) :
-    ∃ cc : ℤ → O, ∀ m : ℤ, (-((PD.p : ℕ) : O)) * cc m = (((W.χΓ W.gam) ^ (-m) : Oˣ) : O) - 1 := by
+theorem exists_cyclotomic_char_quotient
+    (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (hOv : ∀ x : LL, 0 ≤ v x → ∃ y : O, algebraMap O LL y = x)
+    (hinj : Function.Injective (algebraMap O LL))
+    : ∃ cc : ℤ → O, ∀ m : ℤ, (-((PD.p : ℕ) : O)) * cc m = (((W.χΓ W.gam) ^ (-m) : Oˣ) : O) - 1 := by
   have hl : ∃ c₀ : O, ((W.χΓ W.gam : Oˣ) : O) - 1 = ((PD.p : ℕ) : O) * c₀ := by
     set a : LL := algebraMap O LL (((W.χΓ W.gam : Oˣ) : O) - 1) with ha
     have hva : v a = 1 := by
@@ -104,13 +121,18 @@ theorem exists_cyclotomic_char_quotient (W : LocWach PD LL O v n) (hcase : Forma
   ring
 
 open PowerSeries in
-theorem gamma_q_expansion_of_points [IsDomain O] [IsDiscreteValuationRing O] [CharZero O]
-    [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
-    (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W) (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x))
-    (hOv : ∀ x : LL, 0 ≤ v x → ∃ y : O, algebraMap O LL y = x) (hinj : Function.Injective (algebraMap O LL))
+theorem gamma_q_expansion_of_points
+    [IsDomain O] [IsDiscreteValuationRing O] [CharZero O]
+    [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
+    (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x))
+    (hOv : ∀ x : LL, 0 ≤ v x → ∃ y : O, algebraMap O LL y = x)
+    (hinj : Function.Injective (algebraMap O LL))
     (Pt : ZMod n → LL → (K →ₐ[Qp] LL) → Prop)
-    (hPtEx : ∀ (i : ZMod n) (τ : K →ₐ[Qp] LL), Formalism.MainNotions.LiftingTheory.Over W τ i → ∃ ζ : LL, ζ ^ PD.p = 1 ∧ ζ ≠ 1 ∧ Pt i ζ τ) :
-    ∃ g ∈ W.AΔ, W.γA W.gam (qA W) = ((W.χΓ W.gam : Oˣ) : O) • qA W + qA W ^ 2 * g := by
+    (hPtEx : ∀ (i : ZMod n) (τ : K →ₐ[Qp] LL),
+      Formalism.MainNotions.LiftingTheory.Over W τ i → ∃ ζ : LL, ζ ^ PD.p = 1 ∧ ζ ≠ 1 ∧ Pt i ζ τ)
+    : ∃ g ∈ W.AΔ, W.γA W.gam (qA W) = ((W.χΓ W.gam : Oˣ) : O) • qA W + qA W ^ 2 * g := by
   have hpF : Fact PD.p.Prime := ⟨PD.hp⟩
   set χ : O := ((W.χΓ W.gam : Oˣ) : O) with hχdef
 
@@ -149,7 +171,8 @@ theorem gamma_q_expansion_of_points [IsDomain O] [IsDiscreteValuationRing O] [Ch
       | coe q =>
         have e3 : q + 1 = 1 := by exact_mod_cast h1
         have : q = 0 := by linarith
-        rw [this]; rfl
+        rw [this]
+        rfl
     obtain ⟨y, hy⟩ := hOv _ (le_of_eq hx.symm)
     have hyy : ((PD.p : ℕ) : O) * y = χ - 1 := by
       apply hinj
@@ -179,11 +202,11 @@ theorem gamma_q_expansion_of_points [IsDomain O] [IsDiscreteValuationRing O] [Ch
     | coe q =>
       have h2 : ((PD.p • q : ℚ) : WithTop ℚ) = ((0 : ℚ) : WithTop ℚ) := by
         rw [WithTop.coe_nsmul]; exact h1
-      have h3 : (PD.p : ℚ) * q = 0 := by
-        rw [← nsmul_eq_mul]; exact_mod_cast h2
+      have h3 : (PD.p : ℚ) * q = 0 := by rw [← nsmul_eq_mul]; exact_mod_cast h2
       have hp0 : (PD.p : ℚ) ≠ 0 := by exact_mod_cast PD.hp.ne_zero
       have hq : q = 0 := (mul_eq_zero.1 h3).resolve_left hp0
-      rw [hq]; rfl
+      rw [hq]
+      rfl
   obtain ⟨z, hz⟩ := hOv ζ hvζ
   have hzp : z ^ PD.p = 1 := hinj (by rw [map_pow, hz, hζp, map_one])
   have hz1 : z ≠ 1 := fun h => hζ1 (by rw [← hz, h, map_one])
@@ -211,16 +234,21 @@ theorem gamma_q_expansion_of_points [IsDomain O] [IsDiscreteValuationRing O] [Ch
   have hfr : Module.finrank K₀ K = 1 := by
     have e' : K₀ ≃ₗ[K₀] K := LinearEquiv.ofBijective (Algebra.linearMap K₀ K) hcase.1
     rw [← e'.finrank_eq, Module.finrank_self]
-  have hring := ((hP9 W.one (Formalism.MainNotions.LiftingTheory.gen_one_crys W) hcase.2.1 hcase.2.2).2.2 hfr).1
+  have hring :=
+    ((hP9 W.one (Formalism.MainNotions.LiftingTheory.gen_one_crys W) hcase.2.1 hcase.2.2).2.2 hfr).1
   obtain ⟨-, -, -, -, ⟨w, hw⟩, -⟩ := hring
-  have hE : Formalism.MainNotions.DeltaInvariantLattices.Eat (fun _ : ZMod n => Polynomial.X + Polynomial.C ((PD.p : ℕ) : O)) W.π₀ =
-      qA W := by
+  have hE
+      : Formalism.MainNotions.DeltaInvariantLattices.Eat
+          (fun _ : ZMod n => Polynomial.X + Polynomial.C ((PD.p : ℕ) : O))
+          W.π₀
+        = qA W := by
     funext i
     simp [Formalism.MainNotions.DeltaInvariantLattices.Eat, qA, lA]
   rw [hE] at hw
   have hwi : ∀ i, W.q₀ = (w : LetA O n) i * qA W i := fun i => congrFun hw i
 
-  obtain ⟨κ, hκ, -, hγπ⟩ := Formalism.MainNotions.N.FrobeniusPowerSeries.gamma_pi0_eq_pi0_mul_one_add_unit_mul_q W hcase hP9
+  obtain ⟨κ, hκ, -, hγπ⟩ :=
+    Formalism.MainNotions.N.FrobeniusPowerSeries.gamma_pi0_eq_pi0_mul_one_add_unit_mul_q W hcase hP9
   set θ : LetA O n := 1 + W.π₀ * κ with hθdef
   have hγq : W.γA W.gam (qA W) = qA W * θ := by
     have e1 : W.γA W.gam (qA W) = W.γA W.gam W.π₀ + ((PD.p : ℕ) : LetA O n) := by
@@ -230,25 +258,24 @@ theorem gamma_q_expansion_of_points [IsDomain O] [IsDiscreteValuationRing O] [Ch
     ring
 
   have hchar : CharP (IsLocalRing.ResidueField O) PD.p :=
-    (CharP.charP_iff_prime_eq_zero PD.hp).mpr (by
-      rw [← map_natCast (IsLocalRing.residue O), IsLocalRing.residue_eq_zero_iff]; exact hlm)
+    (CharP.charP_iff_prime_eq_zero PD.hp).mpr
+      (by rw [← map_natCast (IsLocalRing.residue O), IsLocalRing.residue_eq_zero_iff]; exact hlm)
   have hmapQ : W.q₀.map (IsLocalRing.residue O) = X ^ (PD.p - 1) := by
     have h1 := congrArg (PowerSeries.map (IsLocalRing.residue O)) W.q₀_def
     have : CharP (PowerSeries (IsLocalRing.ResidueField O)) PD.p :=
       charP_of_injective_algebraMap
-        (algebraMap (IsLocalRing.ResidueField O) (PowerSeries (IsLocalRing.ResidueField O))).injective PD.p
+        (algebraMap (IsLocalRing.ResidueField O)
+          (PowerSeries (IsLocalRing.ResidueField O))).injective
+        PD.p
     simp only [map_mul, map_X, map_sub, map_pow, map_add (f := _), map_one] at h1
     rw [add_pow_char, one_pow, add_sub_cancel_left] at h1
     have h2 : (X : PowerSeries (IsLocalRing.ResidueField O)) ^ PD.p = X * X ^ (PD.p - 1) := by
       rw [← pow_succ']; congr 1; have := PD.hp.two_le; omega
     rw [h2] at h1
     exact mul_left_cancel₀ X_ne_zero h1
-  have hQne : W.q₀.map (IsLocalRing.residue O) ≠ 0 := by
-    rw [hmapQ]; exact pow_ne_zero _ X_ne_zero
-  have hQ0 : W.q₀ ≠ 0 := by
-    intro h; apply hQne; rw [h, map_zero]
-  have hq0 : ∀ i, qA W i ≠ 0 := by
-    intro i h; apply hQ0; rw [hwi i, h, mul_zero]
+  have hQne : W.q₀.map (IsLocalRing.residue O) ≠ 0 := by rw [hmapQ]; exact pow_ne_zero _ X_ne_zero
+  have hQ0 : W.q₀ ≠ 0 := by intro h; apply hQne; rw [h, map_zero]
+  have hq0 : ∀ i, qA W i ≠ 0 := by intro i h; apply hQ0; rw [hwi i, h, mul_zero]
 
   have hlet : ∀ i : ZMod n, ∃ h : O⟦X⟧, θ i - C χ = qA W i * h := by
     intro i
@@ -265,14 +292,19 @@ theorem gamma_q_expansion_of_points [IsDomain O] [IsDiscreteValuationRing O] [Ch
       exact this
     have hφ₀ : W.φ₀ X = (1 + X) ^ PD.p - 1 := by rw [W.φ₀_X, W.q₀_def]
     have hroot : ∀ j, f ∈ Ideal.span {X - C (xr j)} := fun j =>
-      Formalism.MainNotions.N.FrobeniusPowerSeries.theta_at_root PD.p hlm W.φ₀ (W.γ₀ W.gam) hφ₀ (W.γ₀_comm W.gam) χ
-        (W.γ₀_X W.gam).1 (W.γ₀_X W.gam).2 hχ (xr j) (hxr0 j) (hxrr j) W.q₀ W.q₀_def u hu (θ i) hθi
+      Formalism.MainNotions.N.FrobeniusPowerSeries.theta_at_root PD.p hlm W.φ₀ (W.γ₀ W.gam) hφ₀
+        (W.γ₀_comm W.gam) χ (W.γ₀_X W.gam).1 (W.γ₀_X W.gam).2 hχ (xr j) (hxr0 j) (hxrr j) W.q₀
+        W.q₀_def u hu (θ i) hθi
     have hQroot : ∀ j, W.q₀ ∈ Ideal.span {X - C (xr j)} := by
       intro j
-      have hx : xr j ∈ IsLocalRing.maximalIdeal O := Formalism.MainNotions.N.FrobeniusPowerSeries.LTB.mem_max PD.p hlm (hxrr j)
+      have hx : xr j ∈ IsLocalRing.maximalIdeal O :=
+        Formalism.MainNotions.N.FrobeniusPowerSeries.LTB.mem_max PD.p hlm (hxrr j)
       apply Formalism.MainNotions.N.Ln17.GammaOnLevels.cancel_C hx (hxr0 j)
       have e1 := Formalism.MainNotions.N.FrobeniusPowerSeries.LTB.Fs_mul PD.p (hxrr j) X
-      have e2 : C (xr j) * W.q₀ = (X - C (xr j)) * (Formalism.MainNotions.N.FrobeniusPowerSeries.LTB.Fs PD.p (xr j) X - W.q₀) := by
+      have e2
+          : C (xr j) * W.q₀
+            = (X - C (xr j))
+              * (Formalism.MainNotions.N.FrobeniusPowerSeries.LTB.Fs PD.p (xr j) X - W.q₀) := by
         rw [mul_sub, mul_comm (X - C (xr j)), ← e1, ← W.q₀_def]; ring
       rw [e2]
       exact Ideal.mul_mem_right _ _ (Ideal.subset_span rfl)
@@ -284,7 +316,8 @@ theorem gamma_q_expansion_of_points [IsDomain O] [IsDiscreteValuationRing O] [Ch
       exact this
     have hev : ∀ j, r.eval (xr j) = 0 := by
       intro j
-      have hx : xr j ∈ IsLocalRing.maximalIdeal O := Formalism.MainNotions.N.FrobeniusPowerSeries.LTB.mem_max PD.p hlm (hxrr j)
+      have hx : xr j ∈ IsLocalRing.maximalIdeal O :=
+        Formalism.MainNotions.N.FrobeniusPowerSeries.LTB.mem_max PD.p hlm (hxrr j)
       apply Formalism.MainNotions.N.Ln17.GammaOnLevels.eval_eq_zero hx
       have e : (r : O⟦X⟧) = f - W.q₀ * (f /ʷ W.q₀) := by
         rw [eq_sub_iff_add_eq, add_comm]; exact hdiv.symm
@@ -308,7 +341,8 @@ theorem gamma_q_expansion_of_points [IsDomain O] [IsDiscreteValuationRing O] [Ch
     rfl
 
   have hθmem : θ ∈ W.AΔ :=
-    W.AΔ.add_mem W.AΔ.one_mem (W.AΔ.mul_mem (Formalism.MainNotions.N.FrobeniusPowerSeries.GS.π₀_mem W) hκ)
+    W.AΔ.add_mem W.AΔ.one_mem
+      (W.AΔ.mul_mem (Formalism.MainNotions.N.FrobeniusPowerSeries.GS.π₀_mem W) hκ)
   have hqmem : qA W ∈ W.AΔ := Formalism.MainNotions.N.FrobeniusPowerSeries.GS.qA_mem W
   have hHmem : H ∈ W.AΔ := by
     intro δ hδ

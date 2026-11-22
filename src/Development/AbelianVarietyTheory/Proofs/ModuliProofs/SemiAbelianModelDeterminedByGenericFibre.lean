@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Counterexamples.ModuliSurvey.Prem
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 

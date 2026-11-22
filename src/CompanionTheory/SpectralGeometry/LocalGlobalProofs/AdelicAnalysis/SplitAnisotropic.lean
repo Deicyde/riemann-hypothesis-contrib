@@ -5,21 +5,33 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.AlgSplit
 
-theorem det_blockOne {K : Type} [CommRing K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) :
-    (blockOne t A).det = t * A.det := by
+theorem det_blockOne {K : Type} [CommRing K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K)
+    : (blockOne t A).det = t * A.det := by
   rw [Matrix.det_succ_row_zero, Fin.sum_univ_succ]
   have hz : ∀ j : Fin M, blockOne t A 0 j.succ = 0 := by intro j; simp [blockOne]
   have h00 : blockOne t A 0 0 = t := by simp [blockOne]
-  have h0 : (blockOne t A).submatrix Fin.succ Fin.succ = A := by
-    ext i j; simp [blockOne]
+  have h0 : (blockOne t A).submatrix Fin.succ Fin.succ = A := by ext i j; simp [blockOne]
   simp [hz, h00, h0]
 
-theorem split_anisotropic : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin (M + 1)) (Fin (M + 1)) E), IsHermND σ J → ∀ (t : F) (x : Fin (M + 1) → E), t ≠ 0 → hE σ J x x = algebraMap F E t → ∃ (g : GL (Fin (M + 1)) E) (J₁ : Matrix (Fin M) (Fin M) E), IsHermND σ J₁ ∧ blockOne (algebraMap F E t) J₁ = cT (σ : E →+* E) (g : Matrix (Fin (M + 1)) (Fin (M + 1)) E) * J * g ∧ ∀ i, (g : Matrix (Fin (M + 1)) (Fin (M + 1)) E) i 0 = x i := by
+theorem split_anisotropic
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M : ℕ) (J : Matrix (Fin (M + 1)) (Fin (M + 1)) E),
+          IsHermND σ J
+            → ∀ (t : F) (x : Fin (M + 1) → E),
+              t ≠ 0 → hE σ J x x = algebraMap F E t
+                → ∃ (g : GL (Fin (M + 1)) E) (J₁ : Matrix (Fin M) (Fin M) E),
+                  IsHermND σ J₁
+                    ∧ blockOne (algebraMap F E t) J₁
+                      = cT (σ : E →+* E) (g : Matrix (Fin (M + 1)) (Fin (M + 1)) E) * J * g
+                    ∧ ∀ i, (g : Matrix (Fin (M + 1)) (Fin (M + 1)) E) i 0 = x i := by
   intro F E _ _ _ _ _ σ hCM M J hJ t x ht hx
   obtain ⟨-, -, -, hconj⟩ := hCM
   have hσ : ∀ e : E, σ (σ e) = e := by
@@ -37,16 +49,17 @@ theorem split_anisotropic : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
     ring
   set s : E := algebraMap F E t with hs
   have hs0 : s ≠ 0 := (map_ne_zero _).2 ht
-  let φ : (Fin (M + 1) → E) →ₗ[E] E :=
-    { toFun := fun y => hE σ J x y
-      map_add' := by
-        intro y z
-        simp [hE, hform, mul_add, Finset.sum_add_distrib]
-      map_smul' := by
-        intro c y
-        simp only [hE, hform, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
-        refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-        ring }
+  let φ : (Fin (M + 1) → E) →ₗ[E] E := {
+    toFun := fun y => hE σ J x y
+    map_add' := by
+      intro y z
+      simp [hE, hform, mul_add, Finset.sum_add_distrib]
+    map_smul' := by
+      intro c y
+      simp only [hE, hform, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+      ring
+  }
   have hφ : ∀ y, φ y = hE σ J x y := fun _ => rfl
   have hsurj : Function.Surjective φ := fun e =>
     ⟨(e / s) • x, by rw [map_smul, hφ, hx, smul_eq_mul]; field_simp⟩
@@ -88,16 +101,15 @@ theorem split_anisotropic : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
     apply hv0
     ext i
     refine Fin.cases hv00 hvs i
-  let J₁ : Matrix (Fin M) (Fin M) E := Matrix.of fun k l =>
-    hE σ J (b k : Fin (M + 1) → E) (b l : Fin (M + 1) → E)
+  let J₁ : Matrix (Fin M) (Fin M) E :=
+    Matrix.of fun k l => hE σ J (b k : Fin (M + 1) → E) (b l : Fin (M + 1) → E)
   have hblock : blockOne s J₁ = cT (σ : E →+* E) gm * J * gm := by
     ext i j
     rw [hG]
     refine Fin.cases ?_ (fun k => ?_) i <;> refine Fin.cases ?_ (fun l => ?_) j
     · simp [blockOne, col, hx, hs]
     · simp [blockOne, col, hb]
-    · have h3 : hE σ J (b k : Fin (M + 1) → E) x = 0 := by
-        rw [← hherm, hb, map_zero]
+    · have h3 : hE σ J (b k : Fin (M + 1) → E) x = 0 := by rw [← hherm, hb, map_zero]
       simp [blockOne, col, h3]
     · simp [blockOne, col, J₁]
   refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero gm hdet, J₁, ⟨?_, ?_⟩, hblock, fun i => rfl⟩

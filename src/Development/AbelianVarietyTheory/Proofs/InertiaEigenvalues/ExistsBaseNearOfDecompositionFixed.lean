@@ -10,12 +10,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CrtAppr
 
 noncomputable section
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem exists_base_near_of_dec_fixed : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (z : Ω), (∀ d ∈ Dec (F := E) A, d z = z) → ∀ r : Ω, r ≠ 0 → ∃ e : E, A.valuation (algebraMap E Ω e - z) < A.valuation r := by
+theorem exists_base_near_of_dec_fixed
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (z : Ω),
+      (∀ d ∈ Dec (F := E) A, d z = z)
+        → ∀ r : Ω, r ≠ 0 → ∃ e : E, A.valuation (algebraMap E Ω e - z) < A.valuation r := by
   intro E Ω _ _ _ _ _ A w h z hz r hr
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   have hint : ∀ x : Ω, IsIntegral ℤ x → A.valuation x ≤ 1 := fun x hx =>
@@ -29,8 +34,7 @@ theorem exists_base_near_of_dec_fixed : ∀ (E Ω : Type) [Field E] [NumberField
   obtain ⟨b', hb'0, hb'r⟩ := (halg r⁻¹).exists_integral_multiple
 
   set m : ℕ := Ideal.absNorm w.asIdeal with hm
-  have hm0 : m ≠ 0 := by
-    rw [hm, Ne, Ideal.absNorm_eq_zero_iff]; exact w.ne_bot
+  have hm0 : m ≠ 0 := by rw [hm, Ne, Ideal.absNorm_eq_zero_iff]; exact w.ne_bot
   have hmA : A.valuation (m : Ω) < 1 := by
     have h1 := (h ((m : ℕ) : 𝓞 E)).mpr (Ideal.absNorm_mem w.asIdeal)
     simpa using h1
@@ -43,7 +47,8 @@ theorem exists_base_near_of_dec_fixed : ∀ (E Ω : Type) [Field E] [NumberField
     rwa [mul_assoc, inv_mul_cancel₀ hrv, mul_one, one_mul] at this
   set c : ℕ := b'.natAbs * b.natAbs * m with hc
   have hc0 : c ≠ 0 := by
-    rw [hc]; exact mul_ne_zero (mul_ne_zero (Int.natAbs_ne_zero.mpr hb'0) (Int.natAbs_ne_zero.mpr hb0)) hm0
+    rw [hc]
+    exact mul_ne_zero (mul_ne_zero (Int.natAbs_ne_zero.mpr hb'0) (Int.natAbs_ne_zero.mpr hb0)) hm0
   have hnat : ∀ n : ℤ, A.valuation ((n.natAbs : ℕ) : Ω) = A.valuation (n : Ω) := by
     intro n
     rcases Int.natAbs_eq n with e | e
@@ -58,16 +63,20 @@ theorem exists_base_near_of_dec_fixed : ∀ (E Ω : Type) [Field E] [NumberField
       mul_le_mul_left hb'v _
     have hpos : 0 < A.valuation (b' : Ω) * A.valuation (b : Ω) := by
       rw [zero_lt_iff, ← Valuation.map_mul]; simpa using ⟨hb'0, hb0⟩
-    calc A.valuation (b' : Ω) * A.valuation (b : Ω) * A.valuation (m : Ω)
+    calc
+      A.valuation (b' : Ω) * A.valuation (b : Ω) * A.valuation (m : Ω)
         < A.valuation (b' : Ω) * A.valuation (b : Ω) * 1 := mul_lt_mul_of_pos_left hmA hpos
       _ ≤ A.valuation r * A.valuation (b : Ω) := by rw [mul_one]; exact h1
   have hbz' : IsIntegral ℤ ((b : Ω) * z) := by rwa [zsmul_eq_mul] at hbz
-  have key : ∀ x u : Ω, A.valuation x ≤ A.valuation (c : Ω) → IsIntegral ℤ ((b : Ω) * u) →
-      A.valuation (x * u) < A.valuation r := by
+  have key
+      : ∀ x u : Ω,
+        A.valuation x ≤ A.valuation (c : Ω) → IsIntegral ℤ ((b : Ω) * u)
+          → A.valuation (x * u) < A.valuation r := by
     intro x u hx hu
     refine lt_of_mul_lt_mul_right' (a := A.valuation (b : Ω)) ?_
-    calc A.valuation (x * u) * A.valuation (b : Ω) = A.valuation x * A.valuation ((b : Ω) * u) := by
-          rw [Valuation.map_mul, Valuation.map_mul, mul_assoc, mul_comm (A.valuation u)]
+    calc
+      A.valuation (x * u) * A.valuation (b : Ω) = A.valuation x * A.valuation ((b : Ω) * u) := by
+        rw [Valuation.map_mul, Valuation.map_mul, mul_assoc, mul_comm (A.valuation u)]
       _ ≤ A.valuation (c : Ω) * 1 := mul_le_mul' hx (hint _ hu)
       _ < A.valuation r * A.valuation (b : Ω) := by rw [mul_one]; exact hcv
   set K := IntermediateField.adjoin E ({z} : Set Ω) with hK
@@ -77,25 +86,28 @@ theorem exists_base_near_of_dec_fixed : ∀ (E Ω : Type) [Field E] [NumberField
   have hfix : ∀ σ : G E Ω, σ z = z → ∀ x ∈ K, σ x = x := by
     intro σ hσ x hx
     have e1 : ((σ : Ω →ₐ[E] Ω).comp K.val) = K.val :=
-      IntermediateField.adjoin_algHom_ext E (fun y hy => by
-        rw [Set.mem_singleton_iff] at hy; subst hy; simpa using hσ)
+      IntermediateField.adjoin_algHom_ext E
+        (fun y hy => by rw [Set.mem_singleton_iff] at hy; subst hy; simpa using hσ)
     simpa using congrArg (fun φ : K →ₐ[E] Ω => φ ⟨x, hx⟩) e1
-  have hsame : ∀ σ : G E Ω, (∀ x ∈ K, IsIntegral ℤ x → (A.valuation (σ x) < 1 ↔ A.valuation x < 1)) →
-      σ z = z := by
+  have hsame
+      : ∀ σ : G E Ω,
+        (∀ x ∈ K, IsIntegral ℤ x → (A.valuation (σ x) < 1 ↔ A.valuation x < 1)) → σ z = z := by
     intro σ hall
-    obtain ⟨ρ, hρK, hρ⟩ := GlobalTheory.T.exists_conj_valuationSubring_of_same_below E Ω K A (σ⁻¹ • A) (fun x hx hxi => by
-      rw [smul_valuation_lt_one_iff, inv_inv]; exact (hall x hx hxi).symm)
-    have hD : σ * ρ ∈ Dec (F := E) A := by
-      rw [mem_Dec, mul_smul, hρ, smul_inv_smul]
+    obtain ⟨ρ, hρK, hρ⟩ :=
+      GlobalTheory.T.exists_conj_valuationSubring_of_same_below E Ω K A (σ⁻¹ • A)
+        (fun x hx hxi => by rw [smul_valuation_lt_one_iff, inv_inv]; exact (hall x hx hxi).symm)
+    have hD : σ * ρ ∈ Dec (F := E) A := by rw [mem_Dec, mul_smul, hρ, smul_inv_smul]
     have := hz _ hD
     rw [AlgEquiv.mul_apply, hρK z hzK] at this
     exact this
-  obtain ⟨t, htK, htint, ht1, htσ⟩ := GlobalTheory.T.exists_integral_near_one_small_off_decomposition E Ω K A c hc0
+  obtain ⟨t, htK, htint, ht1, htσ⟩ :=
+    GlobalTheory.T.exists_integral_near_one_small_off_decomposition E Ω K A c hc0
   obtain ⟨e, s, hs, he⟩ := GlobalTheory.T.exists_algebraMap_sub_eq_sum_conjugates' E Ω (t * z)
   refine ⟨e, ?_⟩
   have hyz : A.valuation (t * z - z) < A.valuation r := by
     have : t * z - z = (t - 1) * z := by ring
-    rw [this]; exact key _ _ ht1 hbz'
+    rw [this]
+    exact key _ _ ht1 hbz'
   have hsum : ∀ x ∈ s, A.valuation x < A.valuation r := by
     intro x hx
     obtain ⟨hxy, σ, rfl⟩ := hs x hx

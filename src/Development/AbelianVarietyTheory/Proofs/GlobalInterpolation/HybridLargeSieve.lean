@@ -10,10 +10,11 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory
 
 namespace GlobalTheory.HybridLargeSieve
 
-theorem sum_integral_le {ι : Type*} (s : Finset ι) (μ : Measure ℝ) (f : ι → ℝ → ℝ) (G : ℝ → ℝ)
-    (hm : ∀ i, AEStronglyMeasurable (f i) μ) (h0 : ∀ᵐ x ∂μ, ∀ i, 0 ≤ f i x)
-    (hG : Integrable G μ) (h : ∀ᵐ x ∂μ, ∑ i ∈ s, f i x ≤ G x) :
-    ∑ i ∈ s, ∫ x, f i x ∂μ ≤ ∫ x, G x ∂μ := by
+theorem sum_integral_le
+    {ι : Type*} (s : Finset ι)
+    (μ : Measure ℝ) (f : ι → ℝ → ℝ) (G : ℝ → ℝ) (hm : ∀ i, AEStronglyMeasurable (f i) μ)
+    (h0 : ∀ᵐ x ∂μ, ∀ i, 0 ≤ f i x) (hG : Integrable G μ) (h : ∀ᵐ x ∂μ, ∑ i ∈ s, f i x ≤ G x)
+    : ∑ i ∈ s, ∫ x, f i x ∂μ ≤ ∫ x, G x ∂μ := by
   have hint : ∀ i ∈ s, Integrable (f i) μ := by
     intro i hi
     refine hG.mono' (hm i) ?_
@@ -23,9 +24,9 @@ theorem sum_integral_le {ι : Type*} (s : Finset ι) (μ : Measure ℝ) (f : ι 
   rw [← integral_finsetSum s hint]
   exact integral_mono_ae (integrable_finsetSum s hint) hG h
 
-theorem kernel_eq (n δ x : ℝ) :
-    (if x < n ∧ n ≤ x * Real.exp δ then 1 / x else 0) =
-      (Set.Ico (n / Real.exp δ) n).indicator (fun x => 1 / x) x := by
+theorem kernel_eq (n δ x : ℝ)
+    : (if x < n ∧ n ≤ x * Real.exp δ then 1 / x else 0)
+      = (Set.Ico (n / Real.exp δ) n).indicator (fun x => 1 / x) x := by
   have he := Real.exp_pos δ
   by_cases hx : x < n ∧ n ≤ x * Real.exp δ
   · have hmem : x ∈ Set.Ico (n / Real.exp δ) n := ⟨(div_le_iff₀ he).2 hx.2, hx.1⟩
@@ -33,13 +34,15 @@ theorem kernel_eq (n δ x : ℝ) :
   · have hmem : x ∉ Set.Ico (n / Real.exp δ) n := fun hm => hx ⟨hm.2, (div_le_iff₀ he).1 hm.1⟩
     rw [if_neg hx, Set.indicator_of_notMem hmem]
 
-theorem kernel_integral (n δ : ℝ) (hn : 0 < n) (hδ : 0 ≤ δ) :
-    IntegrableOn (fun x : ℝ => if x < n ∧ n ≤ x * Real.exp δ then 1 / x else 0) (Set.Ioi 0) ∧
-    ∫ x in Set.Ioi (0 : ℝ), (if x < n ∧ n ≤ x * Real.exp δ then 1 / x else 0) = δ := by
+theorem kernel_integral (n δ : ℝ) (hn : 0 < n) (hδ : 0 ≤ δ)
+    : IntegrableOn (fun x : ℝ => if x < n ∧ n ≤ x * Real.exp δ then 1 / x else 0) (Set.Ioi 0)
+      ∧ ∫ x in Set.Ioi (0 : ℝ), (if x < n ∧ n ≤ x * Real.exp δ then 1 / x else 0) = δ := by
   have he := Real.exp_pos δ
   have ha : 0 < n / Real.exp δ := div_pos hn he
-  have hfun : (fun x : ℝ => if x < n ∧ n ≤ x * Real.exp δ then 1 / x else 0) =
-      (Set.Ico (n / Real.exp δ) n).indicator (fun x => 1 / x) := funext (kernel_eq n δ)
+  have hfun
+      : (fun x : ℝ => if x < n ∧ n ≤ x * Real.exp δ then 1 / x else 0)
+        = (Set.Ico (n / Real.exp δ) n).indicator (fun x => 1 / x) :=
+    funext (kernel_eq n δ)
   have hcont : ContinuousOn (fun x : ℝ => 1 / x) (Set.Icc (n / Real.exp δ) n) :=
     continuousOn_const.div continuousOn_id (fun x hx => (ha.trans_le hx.1).ne')
   have hI : IntegrableOn (fun x : ℝ => 1 / x) (Set.Ico (n / Real.exp δ) n) :=
@@ -52,13 +55,13 @@ theorem kernel_integral (n δ : ℝ) (hn : 0 < n) (hδ : 0 ≤ δ) :
     ← intervalIntegral.integral_of_le (div_le_self hn.le (Real.one_le_exp hδ)),
     integral_one_div_of_pos ha hn, div_div_cancel₀ hn.ne', Real.log_exp]
 
-theorem window (Q N : ℕ) (a : ℕ → ℂ) (T x : ℝ) (hQ : 1 ≤ Q) (hT : 1 ≤ T) (hx : 0 < x) :
-    ∑ q ∈ Finset.range Q, ∑ᶠ χ ∈ {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive},
-      ‖∑ n ∈ (Finset.Icc 1 N).filter
-        (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp (1 / T)), a n * χ (n : ZMod (q + 1))‖ ^ 2 ≤
-    ∑ n ∈ (Finset.Icc 1 N).filter
-        (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp (1 / T)),
-      ((Q : ℝ) ^ 2 + 8 * (2 * n / T + 1)) * ‖a n‖ ^ 2 := by
+theorem window (Q N : ℕ) (a : ℕ → ℂ) (T x : ℝ) (hQ : 1 ≤ Q) (hT : 1 ≤ T) (hx : 0 < x)
+    : ∑ q ∈ Finset.range Q, ∑ᶠ χ ∈ {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive},
+        ‖∑ n ∈ (Finset.Icc 1 N).filter
+          (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp (1 / T)), a n * χ (n : ZMod (q + 1))‖ ^ 2
+      ≤ ∑ n ∈ (Finset.Icc 1 N).filter
+            (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp (1 / T)),
+          ((Q : ℝ) ^ 2 + 8 * (2 * n / T + 1)) * ‖a n‖ ^ 2 := by
   set S := (Finset.Icc 1 N).filter (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp (1 / T)) with hS
   have hT0 : 0 < T := by linarith
   have hu0 : 0 ≤ 1 / T := by positivity
@@ -83,16 +86,21 @@ theorem window (Q N : ℕ) (a : ℕ → ℂ) (T x : ℝ) (hQ : 1 ≤ Q) (hT : 1 
     have h5 : x * (2 * (1 / T)) = 2 * x / T := by ring
     nlinarith
   let b : ℕ → ℂ := fun n => if n ∈ S then a n else 0
-  have key := GlobalTheory.T.sum_norm_sq_primitive_char_sum_le Q ⌊x⌋₊ (⌊x * Real.exp (1 / T)⌋₊ - ⌊x⌋₊) b hQ
-  have hinner : ∀ (q : ℕ) (χ : DirichletCharacter ℂ (q + 1)),
-      ∑ n ∈ S, a n * χ (n : ZMod (q + 1)) =
-        ∑ n ∈ Finset.Ioc ⌊x⌋₊ (⌊x⌋₊ + (⌊x * Real.exp (1 / T)⌋₊ - ⌊x⌋₊)), b n * χ (n : ZMod (q + 1)) := by
-    intro q χ
-    calc ∑ n ∈ S, a n * χ (n : ZMod (q + 1)) = ∑ n ∈ S, b n * χ (n : ZMod (q + 1)) :=
+  have key :=
+    GlobalTheory.T.sum_norm_sq_primitive_char_sum_le Q ⌊x⌋₊ (⌊x * Real.exp (1 / T)⌋₊ - ⌊x⌋₊) b hQ
+  have hinner
+      : ∀ (q : ℕ) (χ : DirichletCharacter ℂ (q + 1)),
+        ∑ n ∈ S, a n * χ (n : ZMod (q + 1))
+          = ∑ n ∈ Finset.Ioc ⌊x⌋₊ (⌊x⌋₊ + (⌊x * Real.exp (1 / T)⌋₊ - ⌊x⌋₊)), b n * χ (n : ZMod (q + 1)) :=
+    by
+      intro q χ
+      calc
+        ∑ n ∈ S, a n * χ (n : ZMod (q + 1)) = ∑ n ∈ S, b n * χ (n : ZMod (q + 1)) :=
           Finset.sum_congr rfl (fun n hn => by simp [b, hn])
-      _ = _ := Finset.sum_subset hsub (fun n _ hn => by simp [b, hn])
-  have hR : ∑ n ∈ Finset.Ioc ⌊x⌋₊ (⌊x⌋₊ + (⌊x * Real.exp (1 / T)⌋₊ - ⌊x⌋₊)), ‖b n‖ ^ 2 =
-      ∑ n ∈ S, ‖a n‖ ^ 2 := by
+        _ = _ := Finset.sum_subset hsub (fun n _ hn => by simp [b, hn])
+  have hR
+      : ∑ n ∈ Finset.Ioc ⌊x⌋₊ (⌊x⌋₊ + (⌊x * Real.exp (1 / T)⌋₊ - ⌊x⌋₊)), ‖b n‖ ^ 2
+        = ∑ n ∈ S, ‖a n‖ ^ 2 := by
     rw [← Finset.sum_subset hsub (fun n _ hn => by simp [b, hn])]
     exact Finset.sum_congr rfl (fun n hn => by simp [b, hn])
   simp only [hinner]
@@ -107,20 +115,25 @@ theorem window (Q N : ℕ) (a : ℕ → ℂ) (T x : ℝ) (hQ : 1 ≤ Q) (hT : 1 
   have h6 : ((⌊x * Real.exp (1 / T)⌋₊ - ⌊x⌋₊ : ℕ) : ℝ) ≤ 2 * n / T + 1 := hL.trans h2
   nlinarith
 
-private theorem sum_finsum_primitive_eq_sum_sigma (Q : ℕ) (g : (q : ℕ) → DirichletCharacter ℂ (q + 1) → ℝ) :
-    ∑ q ∈ Finset.range Q, ∑ᶠ χ ∈ {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}, g q χ =
-      ∑ p ∈ (Finset.range Q).sigma
-        (fun q => (Set.toFinite {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}).toFinset),
-        g p.1 p.2 := by
+private theorem sum_finsum_primitive_eq_sum_sigma
+    (Q : ℕ) (g : (q : ℕ) → DirichletCharacter ℂ (q + 1) → ℝ)
+    : ∑ q ∈ Finset.range Q, ∑ᶠ χ ∈ {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}, g q χ
+      = ∑ p ∈ (Finset.range Q).sigma
+          (fun q => (Set.toFinite {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}).toFinset),
+          g p.1 p.2 := by
   rw [Finset.sum_sigma]
   exact Finset.sum_congr rfl (fun q _ => finsum_mem_eq_finite_toFinset_sum _ _)
 
-private theorem measurable_sum_filter_Icc_window (N : ℕ) (c : ℕ → ℂ) (δ : ℝ) :
-    Measurable (fun x : ℝ => ∑ n ∈ (Finset.Icc 1 N).filter
-      (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp δ), c n) := by
-  have e : (fun x : ℝ => ∑ n ∈ (Finset.Icc 1 N).filter
-      (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp δ), c n) =
-      fun x : ℝ => ∑ n ∈ Finset.Icc 1 N, if x < n ∧ (n : ℝ) ≤ x * Real.exp δ then c n else 0 := by
+private theorem measurable_sum_filter_Icc_window (N : ℕ) (c : ℕ → ℂ) (δ : ℝ)
+    : Measurable (fun x : ℝ =>
+      ∑ n ∈ (Finset.Icc 1 N).filter
+        (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp δ), c n) := by
+  have e
+      : (fun x : ℝ =>
+          ∑ n ∈ (Finset.Icc 1 N).filter
+            (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp δ), c n)
+        = fun x : ℝ =>
+          ∑ n ∈ Finset.Icc 1 N, if x < n ∧ (n : ℝ) ≤ x * Real.exp δ then c n else 0 := by
     funext x
     rw [Finset.sum_filter]
   rw [e]
@@ -128,11 +141,15 @@ private theorem measurable_sum_filter_Icc_window (N : ℕ) (c : ℕ → ℂ) (δ
   exact (measurableSet_lt measurable_id measurable_const).inter
     (measurableSet_le measurable_const (measurable_id.mul measurable_const))
 
-theorem hybrid_large_sieve : ∃ C : ℝ, 0 < C ∧ ∀ (Q N : ℕ) (a : ℕ → ℂ) (T : ℝ), 1 ≤ Q → 1 ≤ T →
-    ∑ q ∈ Finset.range Q, ∑ᶠ χ ∈ {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive},
-      (∫ t in (-T)..T, ‖∑ n ∈ Finset.Icc 1 N,
-        a n * χ (n : ZMod (q + 1)) * (n : ℂ) ^ (-(t * I))‖ ^ 2) ≤
-      C * ∑ n ∈ Finset.Icc 1 N, ((Q : ℝ) ^ 2 * T + n) * ‖a n‖ ^ 2 := by
+theorem hybrid_large_sieve
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (Q N : ℕ) (a : ℕ → ℂ) (T : ℝ),
+          1 ≤ Q → 1 ≤ T
+            → ∑ q ∈ Finset.range Q, ∑ᶠ χ ∈ {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive},
+                (∫ t in (-T)..T, ‖∑ n ∈ Finset.Icc 1 N,
+                  a n * χ (n : ZMod (q + 1)) * (n : ℂ) ^ (-(t * I))‖ ^ 2)
+              ≤ C * ∑ n ∈ Finset.Icc 1 N, ((Q : ℝ) ^ 2 * T + n) * ‖a n‖ ^ 2 := by
   obtain ⟨C, hC, hGal⟩ := GlobalTheory.GallagherLemma.gallagher
   refine ⟨16 * C, by positivity, fun Q N a T hQ hT => ?_⟩
   have hT0 : 0 < T := by linarith
@@ -142,53 +159,70 @@ theorem hybrid_large_sieve : ∃ C : ℝ, 0 < C ∧ ∀ (Q N : ℕ) (a : ℕ →
       a n * p.2 (n : ZMod (p.1 + 1))
   let c : ℕ → ℝ := fun n => ((Q : ℝ) ^ 2 + 8 * (2 * n / T + 1)) * ‖a n‖ ^ 2
   let K : ℕ → ℝ → ℝ := fun n x => if x < n ∧ (n : ℝ) ≤ x * Real.exp (1 / T) then 1 / x else 0
-  have hKint : ∀ n ∈ Finset.Icc 1 N,
-      IntegrableOn (K n) (Set.Ioi 0) ∧ ∫ x in Set.Ioi (0 : ℝ), K n x = 1 / T := by
+  have hKint
+      : ∀ n ∈ Finset.Icc 1 N,
+        IntegrableOn (K n) (Set.Ioi 0) ∧ ∫ x in Set.Ioi (0 : ℝ), K n x = 1 / T := by
     intro n hn
     have hn0 : (0 : ℝ) < n := by exact_mod_cast (Finset.mem_Icc.1 hn).1
     exact kernel_integral n (1 / T) hn0 hδ0
-  have hGint : Integrable (fun x => ∑ n ∈ Finset.Icc 1 N, c n * K n x)
+  have hGint : Integrable
+      (fun x => ∑ n ∈ Finset.Icc 1 N, c n * K n x)
       (volume.restrict (Set.Ioi (0 : ℝ))) :=
     integrable_finsetSum _ (fun n hn => (hKint n hn).1.const_mul (c n))
-  have hstep1 : ∑ q ∈ Finset.range Q, ∑ᶠ χ ∈ {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive},
-      (∫ t in (-T)..T, ‖∑ n ∈ Finset.Icc 1 N,
-        a n * χ (n : ZMod (q + 1)) * (n : ℂ) ^ (-(t * I))‖ ^ 2) ≤
-      C * T ^ 2 * ∑ p ∈ (Finset.range Q).sigma
-        (fun q => (Set.toFinite {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}).toFinset),
-        ∫ x in Set.Ioi (0 : ℝ), ‖W p x‖ ^ 2 / x := by
+  have hstep1
+      : ∑ q ∈ Finset.range Q, ∑ᶠ χ ∈ {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive},
+          (∫ t in (-T)..T, ‖∑ n ∈ Finset.Icc 1 N,
+            a n * χ (n : ZMod (q + 1)) * (n : ℂ) ^ (-(t * I))‖ ^ 2)
+        ≤ C * T ^ 2
+          * ∑ p ∈ (Finset.range Q).sigma
+            (fun q => (Set.toFinite {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}).toFinset),
+            ∫ x in Set.Ioi (0 : ℝ), ‖W p x‖ ^ 2 / x := by
     refine (sum_finsum_primitive_eq_sum_sigma Q _).trans_le ?_
     rw [Finset.mul_sum]
     exact Finset.sum_le_sum (fun p _ => hGal N (fun n => a n * p.2 (n : ZMod (p.1 + 1))) T hT)
-  have hstep2 : ∑ p ∈ (Finset.range Q).sigma
-        (fun q => (Set.toFinite {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}).toFinset),
-        ∫ x in Set.Ioi (0 : ℝ), ‖W p x‖ ^ 2 / x ≤
-      ∫ x in Set.Ioi (0 : ℝ), ∑ n ∈ Finset.Icc 1 N, c n * K n x := by
-    refine sum_integral_le _ _ (fun p x => ‖W p x‖ ^ 2 / x) _
-      (fun p => (((measurable_sum_filter_Icc_window N (fun n => a n * p.2 (n : ZMod (p.1 + 1))) (1 / T)).norm.pow_const
-        2).div measurable_id).aestronglyMeasurable) ?_ hGint ?_
+  have hstep2
+      : ∑ p ∈ (Finset.range Q).sigma
+          (fun q => (Set.toFinite {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}).toFinset),
+          ∫ x in Set.Ioi (0 : ℝ), ‖W p x‖ ^ 2 / x
+        ≤ ∫ x in Set.Ioi (0 : ℝ), ∑ n ∈ Finset.Icc 1 N, c n * K n x := by
+    refine sum_integral_le _ _
+      (fun p x => ‖W p x‖ ^ 2 / x)
+      _
+      (fun p =>
+        (((measurable_sum_filter_Icc_window N
+          (fun n => a n * p.2 (n : ZMod (p.1 + 1)))
+          (1 / T)).norm.pow_const 2).div measurable_id).aestronglyMeasurable)
+      ?_ hGint ?_
     · exact (ae_restrict_iff' measurableSet_Ioi).2
         (Filter.Eventually.of_forall (fun x hx p => div_nonneg (by positivity) (le_of_lt hx)))
     · refine (ae_restrict_iff' measurableSet_Ioi).2 (Filter.Eventually.of_forall (fun x hx => ?_))
       have hx0 : 0 < x := hx
-      have e := sum_finsum_primitive_eq_sum_sigma Q (fun q (χ : DirichletCharacter ℂ (q + 1)) =>
-        ‖∑ n ∈ (Finset.Icc 1 N).filter (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp (1 / T)),
-          a n * χ (n : ZMod (q + 1))‖ ^ 2)
-      have e2 : ∑ p ∈ (Finset.range Q).sigma
-          (fun q => (Set.toFinite {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}).toFinset),
-          ‖W p x‖ ^ 2 = _ := e.symm
+      have e :=
+        sum_finsum_primitive_eq_sum_sigma Q (fun q (χ : DirichletCharacter ℂ (q + 1)) =>
+          ‖∑ n ∈ (Finset.Icc 1 N).filter (fun n : ℕ => x < n ∧ (n : ℝ) ≤ x * Real.exp (1 / T)),
+            a n * χ (n : ZMod (q + 1))‖
+            ^ 2)
+      have e2
+          : ∑ p ∈ (Finset.range Q).sigma
+              (fun q => (Set.toFinite {χ : DirichletCharacter ℂ (q + 1) | χ.IsPrimitive}).toFinset),
+              ‖W p x‖ ^ 2
+            = _ :=
+        e.symm
       rw [← Finset.sum_div, e2]
       refine (div_le_div_of_nonneg_right (window Q N a T x hQ hT hx0) hx0.le).trans (le_of_eq ?_)
       rw [Finset.sum_div, Finset.sum_filter]
       refine Finset.sum_congr rfl (fun n _ => ?_)
       simp only [c, K]
       split_ifs <;> ring
-  have hstep3 : ∫ x in Set.Ioi (0 : ℝ), ∑ n ∈ Finset.Icc 1 N, c n * K n x =
-      ∑ n ∈ Finset.Icc 1 N, c n * (1 / T) := by
+  have hstep3
+      : ∫ x in Set.Ioi (0 : ℝ), ∑ n ∈ Finset.Icc 1 N, c n * K n x
+        = ∑ n ∈ Finset.Icc 1 N, c n * (1 / T) := by
     rw [integral_finsetSum _ (fun n hn => (hKint n hn).1.const_mul (c n))]
     refine Finset.sum_congr rfl (fun n hn => ?_)
     rw [integral_const_mul, (hKint n hn).2]
-  have hstep4 : C * T ^ 2 * ∑ n ∈ Finset.Icc 1 N, c n * (1 / T) ≤
-      16 * C * ∑ n ∈ Finset.Icc 1 N, ((Q : ℝ) ^ 2 * T + n) * ‖a n‖ ^ 2 := by
+  have hstep4
+      : C * T ^ 2 * ∑ n ∈ Finset.Icc 1 N, c n * (1 / T)
+        ≤ 16 * C * ∑ n ∈ Finset.Icc 1 N, ((Q : ℝ) ^ 2 * T + n) * ‖a n‖ ^ 2 := by
     rw [Finset.mul_sum, Finset.mul_sum]
     refine Finset.sum_le_sum (fun n _ => ?_)
     have hQ1 : (1 : ℝ) ≤ (Q : ℝ) ^ 2 := one_le_pow₀ (by exact_mod_cast hQ)
@@ -200,9 +234,10 @@ theorem hybrid_large_sieve : ∃ C : ℝ, 0 < C ∧ ∀ (Q N : ℕ) (a : ℕ →
     have h1 : T * (Q : ℝ) ^ 2 + 16 * n + 8 * T ≤ 16 * ((Q : ℝ) ^ 2 * T + n) := by nlinarith
     have h2 := mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right h1 (sq_nonneg ‖a n‖)) hC.le
     linarith
-  calc _ ≤ _ := hstep1
+  calc
+    _ ≤ _ := hstep1
     _ ≤ C * T ^ 2 * ∫ x in Set.Ioi (0 : ℝ), ∑ n ∈ Finset.Icc 1 N, c n * K n x :=
-        mul_le_mul_of_nonneg_left hstep2 (by positivity)
+      mul_le_mul_of_nonneg_left hstep2 (by positivity)
     _ = C * T ^ 2 * ∑ n ∈ Finset.Icc 1 N, c n * (1 / T) := by rw [hstep3]
     _ ≤ _ := hstep4
 

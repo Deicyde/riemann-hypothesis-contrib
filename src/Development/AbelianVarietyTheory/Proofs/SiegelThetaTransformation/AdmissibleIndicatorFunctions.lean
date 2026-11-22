@@ -14,7 +14,6 @@ namespace GlobalTheory.SW
 noncomputable section
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n N : ℕ}
 
-
 theorem mem_stdL {x : Fin n → E} : x ∈ stdL E n ↔ ∀ a, IsIntegral ℤ (x a) := by
   constructor
   · intro hx
@@ -26,8 +25,10 @@ theorem mem_stdL {x : Fin n → E} : x ∈ stdL E n ↔ ∀ a, IsIntegral ℤ (x
       · subst hab
         simpa using isIntegral_one
       · simp [hab, isIntegral_zero]
-    | zero => intro a; exact isIntegral_zero
-    | add y z _ _ hy hz => intro a; exact (hy a).add (hz a)
+    | zero =>
+      intro a; exact isIntegral_zero
+    | add y z _ _ hy hz =>
+      intro a; exact (hy a).add (hz a)
     | smul r y _ hy =>
       intro a
       rw [Pi.smul_apply, Algebra.smul_def]
@@ -35,14 +36,15 @@ theorem mem_stdL {x : Fin n → E} : x ∈ stdL E n ↔ ∀ a, IsIntegral ℤ (x
   · intro hx
     have hsum : x = ∑ a, (⟨x a, hx a⟩ : 𝓞 E) • (Pi.single a 1 : Fin n → E) := by
       ext b
-      simp only [Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_ite, smul_zero, Finset.sum_ite_eq,
-        Finset.mem_univ, if_true]
+      simp only [Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_ite, smul_zero,
+        Finset.sum_ite_eq, Finset.mem_univ, if_true]
       rw [Algebra.smul_def, mul_one]
       rfl
     rw [hsum]
     exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
 
-private theorem cc_zero_siegel_theta_transformation : cc (0 : E) = 0 := map_zero (IsCMField.complexConj E)
+private theorem cc_zero_siegel_theta_transformation : cc (0 : E) = 0 :=
+  map_zero (IsCMField.complexConj E)
 
 private theorem cc_one' : cc (1 : E) = 1 := map_one (IsCMField.complexConj E)
 
@@ -53,8 +55,17 @@ private theorem herm_one_apply (x y : Fin n → E) : herm 1 x y = ∑ a, x a * c
   simp [herm, Matrix.one_apply]
 
 theorem stdL_mem_Vset (M : ℕ) : stdL E n ∈ Vset E n M := by
-  refine ⟨Submodule.fg_span (Set.finite_range _), fun x => ?_,
-    ⟨1, one_pos, Nat.coprime_one_left M, fun v hv => by simpa using hv, fun v hv => by simpa using hv⟩⟩
+  refine ⟨
+    Submodule.fg_span (Set.finite_range _),
+    fun x => ?_,
+    ⟨
+      1,
+      one_pos,
+      Nat.coprime_one_left M,
+      fun v hv => by simpa using hv,
+      fun v hv => by simpa using hv
+    ⟩
+  ⟩
   constructor
   · intro hx y hy
     rw [herm_one_apply]
@@ -64,8 +75,10 @@ theorem stdL_mem_Vset (M : ℕ) : stdL E n ∈ Vset E n M := by
     rw [mem_stdL]
     intro a
     have ha := h (Pi.single a 1) (Submodule.subset_span ⟨a, rfl⟩)
-    rw [herm_one_apply, Finset.sum_eq_single a (fun b _ hb => by simp [hb, cc_zero_siegel_theta_transformation])
-      (by simp)] at ha
+    rw [herm_one_apply,
+        Finset.sum_eq_single a (fun b _ hb => by simp [hb, cc_zero_siegel_theta_transformation]) (by
+          simp)]
+      at ha
     simpa [cc_one'] using ha
 
 end

@@ -8,19 +8,21 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem conjTranspose_mul_mul_eq_of_form_eq {E : Type} [Field E] [StarRing E] {n : ℕ}
-    (J γ : Matrix (Fin n) (Fin n) E)
-    (h : ∀ z w : Fin n → E, star (γ *ᵥ z) ⬝ᵥ (J *ᵥ (γ *ᵥ w)) = star z ⬝ᵥ (J *ᵥ w)) :
-    γᴴ * J * γ = J := by
+theorem conjTranspose_mul_mul_eq_of_form_eq
+    {E : Type} [Field E] [StarRing E]
+    {n : ℕ} (J γ : Matrix (Fin n) (Fin n) E)
+    (h : ∀ z w : Fin n → E, star (γ *ᵥ z) ⬝ᵥ (J *ᵥ (γ *ᵥ w)) = star z ⬝ᵥ (J *ᵥ w))
+    : γᴴ * J * γ = J := by
   have key : ∀ z w : Fin n → E, star z ⬝ᵥ ((γᴴ * J * γ) *ᵥ w) = star z ⬝ᵥ (J *ᵥ w) := by
     intro z w
     rw [← h z w, star_mulVec, ← dotProduct_mulVec, ← mulVec_mulVec, ← mulVec_mulVec]
   ext i j
   simpa [single_dotProduct, mulVec_single_one] using key (star (Pi.single i 1)) (Pi.single j 1)
 
-theorem star_form_eq_of_hermitian {E : Type} [Field E] [StarRing E] {n : ℕ}
-    (J : Matrix (Fin n) (Fin n) E) (hJ : Jᴴ = J) (z w : Fin n → E) :
-    star (star z ⬝ᵥ (J *ᵥ w)) = star w ⬝ᵥ (J *ᵥ z) := by
+theorem star_form_eq_of_hermitian
+    {E : Type} [Field E] [StarRing E]
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (hJ : Jᴴ = J) (z w : Fin n → E)
+    : star (star z ⬝ᵥ (J *ᵥ w)) = star w ⬝ᵥ (J *ᵥ z) := by
   rw [star_dotProduct z (J *ᵥ w), star_star, star_mulVec, ← dotProduct_mulVec, hJ]
 
 private lemma form_sub_smul_left {E : Type} [Field E] [StarRing E] {n : ℕ}
@@ -45,13 +47,15 @@ private lemma form_mulVec_eq_of_transvection {E : Type} [Field E] [StarRing E] {
   linear_combination (c * (star u ⬝ᵥ (J *ᵥ w))) * hzu +
     (-(star (star u ⬝ᵥ (J *ᵥ z))) * (star u ⬝ᵥ (J *ᵥ w))) * hc
 
-theorem exists_quasiReflection_mulVec_eq {E : Type} [Field E] [StarRing E] {n : ℕ}
-    (J : Matrix (Fin n) (Fin n) E) (hJ : Jᴴ = J) (x y : Fin n → E)
-    (hxy : star x ⬝ᵥ (J *ᵥ x) = star y ⬝ᵥ (J *ᵥ y))
-    (h0 : star (x - y) ⬝ᵥ (J *ᵥ x) ≠ 0) :
-    ∃ γ : Matrix (Fin n) (Fin n) E, γᴴ * J * γ = J ∧ γ *ᵥ x = y := by
-  have hγ : ∀ v, (1 - (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹ • vecMulVec (x - y) (star (x - y) ᵥ* J)) *ᵥ v
-      = v - ((star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹ * (star (x - y) ⬝ᵥ (J *ᵥ v))) • (x - y) := by
+theorem exists_quasiReflection_mulVec_eq
+    {E : Type} [Field E] [StarRing E]
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (hJ : Jᴴ = J) (x y : Fin n → E)
+    (hxy : star x ⬝ᵥ (J *ᵥ x) = star y ⬝ᵥ (J *ᵥ y)) (h0 : star (x - y) ⬝ᵥ (J *ᵥ x) ≠ 0)
+    : ∃ γ : Matrix (Fin n) (Fin n) E, γᴴ * J * γ = J ∧ γ *ᵥ x = y := by
+  have hγ
+      : ∀ v,
+        (1 - (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹ • vecMulVec (x - y) (star (x - y) ᵥ* J)) *ᵥ v
+          = v - ((star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹ * (star (x - y) ⬝ᵥ (J *ᵥ v))) • (x - y) := by
     intro v
     rw [sub_mulVec, one_mulVec, smul_mulVec, vecMulVec_mulVec, ← dotProduct_mulVec]
     congr 1
@@ -60,27 +64,33 @@ theorem exists_quasiReflection_mulVec_eq {E : Type} [Field E] [StarRing E] {n : 
     ring
   have hsa : star (star (x - y) ⬝ᵥ (J *ᵥ x)) = star x ⬝ᵥ (J *ᵥ (x - y)) :=
     star_form_eq_of_hermitian J hJ (x - y) x
-  have hsum : star (x - y) ⬝ᵥ (J *ᵥ x) + star (star (x - y) ⬝ᵥ (J *ᵥ x))
-      = star (x - y) ⬝ᵥ (J *ᵥ (x - y)) := by
+  have hsum
+      : star (x - y) ⬝ᵥ (J *ᵥ x) + star (star (x - y) ⬝ᵥ (J *ᵥ x))
+        = star (x - y) ⬝ᵥ (J *ᵥ (x - y)) := by
     rw [hsa]
     simp only [star_sub, sub_dotProduct, mulVec_sub, dotProduct_sub]
     linear_combination hxy
   have hs0 : star (star (x - y) ⬝ᵥ (J *ᵥ x)) ≠ 0 := (star_ne_zero).mpr h0
-  have hc : (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹ + star (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹
-      = star (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹ * (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹
-        * (star (x - y) ⬝ᵥ (J *ᵥ (x - y))) := by
+  have hc
+      : (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹ + star (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹
+        = star (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹ * (star (x - y) ⬝ᵥ (J *ᵥ x))⁻¹
+          * (star (x - y) ⬝ᵥ (J *ᵥ (x - y))) := by
     rw [star_inv₀, ← hsum]
     field_simp
     ring
-  refine ⟨_, conjTranspose_mul_mul_eq_of_form_eq J _
-    (form_mulVec_eq_of_transvection J hJ _ (x - y) _ hγ hc), ?_⟩
+  refine ⟨
+    _,
+    conjTranspose_mul_mul_eq_of_form_eq J _ (form_mulVec_eq_of_transvection J hJ _ (x - y) _ hγ hc),
+    ?_
+  ⟩
   rw [hγ, inv_mul_cancel₀ h0, one_smul, sub_sub_cancel]
 
-theorem exists_unitary_mulVec_eq_of_form_eq :
-    ∀ (E : Type) [Field E] [CharZero E] [StarRing E] (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
-      Jᴴ = J → J.det ≠ 0 → ∀ x y : Fin n → E,
-      star x ⬝ᵥ (J *ᵥ x) = star y ⬝ᵥ (J *ᵥ y) → star x ⬝ᵥ (J *ᵥ x) ≠ 0 →
-      ∃ γ : Matrix (Fin n) (Fin n) E, γᴴ * J * γ = J ∧ γ *ᵥ x = y := by
+theorem exists_unitary_mulVec_eq_of_form_eq
+    : ∀ (E : Type) [Field E] [CharZero E] [StarRing E] (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+      Jᴴ = J → J.det ≠ 0
+        → ∀ x y : Fin n → E,
+          star x ⬝ᵥ (J *ᵥ x) = star y ⬝ᵥ (J *ᵥ y) → star x ⬝ᵥ (J *ᵥ x) ≠ 0
+            → ∃ γ : Matrix (Fin n) (Fin n) E, γᴴ * J * γ = J ∧ γ *ᵥ x = y := by
   intro E _ _ _ n J hJ _ x y hxy hx
   by_cases h0 : star (x - y) ⬝ᵥ (J *ᵥ x) = 0
   · have hneg : star (-y) ⬝ᵥ (J *ᵥ (-y)) = star y ⬝ᵥ (J *ᵥ y) := by

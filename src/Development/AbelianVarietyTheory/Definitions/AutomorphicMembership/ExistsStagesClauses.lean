@@ -17,7 +17,9 @@ noncomputable section
 
 namespace GlobalTheory.Mem.Top.V4.Model
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.FrobeniusOrbits Formalism.L2.Host Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.FrobeniusOrbits Formalism.L2.Host Formalism.L2.GlobalTheoryTheory GlobalTheory.EX
+  GlobalTheory.EX.OB GlobalTheory.Mem NumberField IsDedekindDomain
 
 theorem ev_imp {p q : Ctx → Prop} (hp : Ev p) (h : ∀ K, p K → q K) : Ev q := by
   obtain ⟨ε0, h0, H⟩ := hp
@@ -31,19 +33,18 @@ theorem ev_imp {p q : Ctx → Prop} (hp : Ev p) (h : ∀ K, p K → q K) : Ev q 
   obtain ⟨x0, H⟩ := H ch hch
   exact ⟨x0, fun K d1 d2 d3 d4 d5 => h K (H K d1 d2 d3 d4 d5)⟩
 
-theorem mem_iff {X : Stages} {f : Fr X.B.toPre} {T : TwDat X.B} {Wt : Set X.B.places.Pl} {xi : X.C.Tup → HChar X.B.host.E}
-    (h : MuIsW X f T Wt xi) (w : X.B.places.Pl) : w ∈ Wt ↔ X.W.muAt w ≠ X.C.mu0 := by
+theorem mem_iff
+    {X : Stages} {f : Fr X.B.toPre} {T : TwDat X.B} {Wt : Set X.B.places.Pl}
+    {xi : X.C.Tup → HChar X.B.host.E} (h : MuIsW X f T Wt xi) (w : X.B.places.Pl)
+    : w ∈ Wt ↔ X.W.muAt w ≠ X.C.mu0 := by
   refine ⟨fun hw he => ?_, fun hw => by_contra fun hn => hw (h.off w hn)⟩
   have h1 := h.tw w
   rw [← h.on w hw, he, h.mu0] at h1
   exact (TwFin.tw_fin X.B f T).2.1 w h1.symm
 
-variable (hH : DC.HostExQ) (hLP : LevelPrime) (hSP : SmallPrimeOne) (h2b : StandardLattice.SiegelMassRatioCM)
-
-
-
-
-
+variable
+  (hH : DC.HostExQ) (hLP : LevelPrime) (hSP : SmallPrimeOne)
+  (h2b : StandardLattice.SiegelMassRatioCM)
 
 end GlobalTheory.Mem.Top.V4.Model
 

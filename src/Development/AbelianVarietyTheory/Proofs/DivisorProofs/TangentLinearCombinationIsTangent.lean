@@ -4,9 +4,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoeffTopMonE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.SecJet GlobalTheory.CovTop
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.SecJet
+  GlobalTheory.CovTop
 
 noncomputable section
 
@@ -14,7 +17,8 @@ namespace GlobalTheory.SecJet.TanComb
 
 variable {R : Type} [CommRing R]
 
-theorem zeroPt_w : spMap (TrivSqZeroExt.fstHom R R R).toRingHom ≫ (epsR R).hom = (𝟙_ (Over (Sp R))).hom := by
+theorem zeroPt_w
+    : spMap (TrivSqZeroExt.fstHom R R R).toRingHom ≫ (epsR R).hom = (𝟙_ (Over (Sp R))).hom := by
   show spMap (TrivSqZeroExt.fstHom R R R).toRingHom ≫ spMap (algebraMap R (DualNumber R)) = 𝟙 _
   simp only [spMap, ← Spec.map_comp, ← CommRingCat.ofHom_comp]
   rw [← Spec.map_id]
@@ -45,19 +49,25 @@ theorem zeroPt_epsScale (c : R) : zeroPt ≫ epsScale R c = zeroPt := by
   intro r
   simp [epsScaleR]
 
-theorem zeroPt_prod (l : List (epsR R ⟶ G)) (hl : ∀ x ∈ l, zeroPt ≫ x = 1) : zeroPt ≫ l.prod = 1 := by
+theorem zeroPt_prod (l : List (epsR R ⟶ G)) (hl : ∀ x ∈ l, zeroPt ≫ x = 1)
+    : zeroPt ≫ l.prod = 1 := by
   induction l with
   | nil =>
-    rw [List.prod_nil, Hom.one_def, Hom.one_def, ← Category.assoc, toUnit_unique (zeroPt ≫ toUnit _) (toUnit _)]
+    rw [List.prod_nil, Hom.one_def, Hom.one_def, ← Category.assoc,
+      toUnit_unique (zeroPt ≫ toUnit _) (toUnit _)]
   | cons a l ih =>
-    rw [List.prod_cons, MonObj.comp_mul, hl a (List.mem_cons_self ..), ih (fun x hx => hl x (List.mem_cons_of_mem _ hx)), _root_.mul_one]
+    rw [List.prod_cons, MonObj.comp_mul, hl a (List.mem_cons_self ..),
+      ih (fun x hx => hl x (List.mem_cons_of_mem _ hx)), _root_.mul_one]
 
 end GlobalTheory.SecJet.TanComb
 
 namespace GlobalTheory.SecJet
 
-theorem isTangent_tanComb (R : Type) [CommRing R] (G : Over (Sp R)) [GrpObj G] (m : ℕ) (v : Fin m → (epsR R ⟶ G))
-    (c : Fin m → R) : (∀ i, IsTangent (v i)) → IsTangent (tanComb c v) := by
+theorem isTangent_tanComb
+    (R : Type) [CommRing R]
+    (G : Over (Sp R)) [GrpObj G]
+    (m : ℕ) (v : Fin m → (epsR R ⟶ G)) (c : Fin m → R)
+    : (∀ i, IsTangent (v i)) → IsTangent (tanComb c v) := by
   intro hv
   rw [TanComb.isTangent_iff, tanComb]
   refine TanComb.zeroPt_prod _ fun x hx => ?_

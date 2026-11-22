@@ -6,7 +6,9 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.OpApplyConti
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory GlobalTheory.HatNF Filter Topology
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd
+  Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory
+  GlobalTheory.HatNF Filter Topology
 
 namespace GlobalTheory.HatNF
 
@@ -90,69 +92,119 @@ private lemma continuousOn_opApply_of_polynomial_coeffs_lemma_2 {k r : ℕ} {Wp 
   rw [hfun]
   exact hQc.continuousOn.smul hRw
 
-
 open MeasureTheory Filter Topology in
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace in
-theorem _root_.GlobalTheory.HatNF.vecV_cut_polyOp : ∃ c₃ : ℝ, ∀ (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : _root_.Formalism.FourierDecayAlt.M.Par) (p : _root_.Formalism.FourierDecayAlt.KB.Pl P Wp Wq) (o κ : ℕ) (Θ : _root_.Formalism.FourierDecayAlt.B.DiffOp P.k P.r Wp Wq) (F : _root_.Formalism.FourierDecayAlt.B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (A : ℝ), _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp o κ Θ → _root_.Formalism.FourierDecayAlt.B.CkOn ⊤ (_root_.Formalism.FourierDecayAlt.B.GV P.k P.r) F → _root_.Formalism.FourierDecayAlt.B.InCC A o F → c₃ * ((P.r : ℝ) + 1) ^ 2 * ((P.r : ℝ) * ((2 * P.r + P.k + 1 : ℕ) : ℝ) + 1) ≤ A - 1 - κ → ∀ cut : ℕ → _root_.Formalism.FourierDecayAlt.B.Mat P.k P.r → ℂ, (∀ n g, cut n g = ((Real.smoothTransition ((4 - ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • g) i j)) / 3) : ℝ) : ℂ)) → ∀ γ : _root_.Formalism.FourierDecayAlt.C.LPt, Filter.Tendsto (fun n => p.V (_root_.Formalism.FourierDecayAlt.B.opApply Θ (fun g => cut n g • F g)) γ) Filter.atTop (nhds (p.V (_root_.Formalism.FourierDecayAlt.B.opApply Θ F) γ)) := by
+theorem _root_.GlobalTheory.HatNF.vecV_cut_polyOp
+    : ∃ c₃ : ℝ,
+      ∀ (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+          [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+          (P : _root_.Formalism.FourierDecayAlt.M.Par)
+          (p : _root_.Formalism.FourierDecayAlt.KB.Pl P Wp Wq) (o κ : ℕ)
+          (Θ : _root_.Formalism.FourierDecayAlt.B.DiffOp P.k P.r Wp Wq)
+          (F : _root_.Formalism.FourierDecayAlt.B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (A : ℝ),
+        _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp o κ Θ
+          → _root_.Formalism.FourierDecayAlt.B.CkOn ⊤
+            (_root_.Formalism.FourierDecayAlt.B.GV P.k P.r) F
+          → _root_.Formalism.FourierDecayAlt.B.InCC A o F
+          → c₃ * ((P.r : ℝ) + 1) ^ 2 * ((P.r : ℝ) * ((2 * P.r + P.k + 1 : ℕ) : ℝ) + 1) ≤ A - 1 - κ
+          → ∀ cut : ℕ → _root_.Formalism.FourierDecayAlt.B.Mat P.k P.r → ℂ,
+            (∀ n g,
+                cut n g
+                  = ((Real.smoothTransition
+                        ((4 - ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • g) i j)) / 3)
+                      : ℝ)
+                    : ℂ))
+              → ∀ γ : _root_.Formalism.FourierDecayAlt.C.LPt,
+                Filter.Tendsto
+                  (fun n =>
+                    p.V (_root_.Formalism.FourierDecayAlt.B.opApply Θ (fun g => cut n g • F g)) γ)
+                  Filter.atTop (nhds (p.V (_root_.Formalism.FourierDecayAlt.B.opApply Θ F) γ)) := by
   obtain ⟨c₃, hc₃⟩ := _root_.Formalism.FourierDecayAlt.P.PBE.vecV_tendsto
   refine ⟨c₃, ?_⟩
   intro Wp Wq _ _ _ _ _ _ P p o κ Θ F A hΘ hF hCC hA cut hcut γ
   unfold _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp at hΘ
-  have hΘ' : ∀ T ∈ Θ, T.word.length ≤ o ∧ ∃ Q : _root_.Formalism.FourierDecayAlt.B.Mat P.k P.r → ℂ, _root_.Formalism.FourierDecayAlt.U.IsPolyDeg κ Q ∧
-      ∀ g, T.coef g = Q g • ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp) := by
+  have hΘ'
+      : ∀ T ∈ Θ,
+        T.word.length ≤ o
+          ∧ ∃ Q : _root_.Formalism.FourierDecayAlt.B.Mat P.k P.r → ℂ,
+            _root_.Formalism.FourierDecayAlt.U.IsPolyDeg κ Q
+              ∧ ∀ g, T.coef g = Q g • ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp) := by
     intro T hT
     obtain ⟨hl, Q, hQ, hc, -⟩ := hΘ T hT
     exact ⟨hl, Q, hQ, hc⟩
-  have hcutφ : ∀ n : ℕ, cut n = fun g => _root_.Formalism.FourierDecayAlt.P.JCx2.pdPhi (((n : ℝ) + 1)⁻¹ • g) := by
+  have hcutφ
+      : ∀ n : ℕ,
+        cut n = fun g => _root_.Formalism.FourierDecayAlt.P.JCx2.pdPhi (((n : ℝ) + 1)⁻¹ • g) := by
     intro n
     funext g
     rw [hcut]
     rfl
-  have hψ : ∀ (n : ℕ) g, cut n g = 1 - _root_.Formalism.FourierDecayAlt.P.JCx2.pdPsi ((n : ℝ) + 1) g := by
+  have hψ
+      : ∀ (n : ℕ) g,
+        cut n g = 1 - _root_.Formalism.FourierDecayAlt.P.JCx2.pdPsi ((n : ℝ) + 1) g := by
     intro n g
-    have h : _root_.Formalism.FourierDecayAlt.P.JCx2.pdPsi ((n : ℝ) + 1) g = 1 - _root_.Formalism.FourierDecayAlt.P.JCx2.pdPhi (((n : ℝ) + 1)⁻¹ • g) := rfl
+    have h
+        : _root_.Formalism.FourierDecayAlt.P.JCx2.pdPsi ((n : ℝ) + 1) g
+          = 1 - _root_.Formalism.FourierDecayAlt.P.JCx2.pdPhi (((n : ℝ) + 1)⁻¹ • g) :=
+      rfl
     rw [hcutφ, h]
     ring
   unfold _root_.Formalism.FourierDecayAlt.B.InCC at hCC
   obtain ⟨b, hb⟩ := hCC
   have hb0 : 0 ≤ b := _root_.Formalism.FourierDecayAlt.P.B4.cc_nonneg hb
-  have hb1 : _root_.Formalism.FourierDecayAlt.B.CCle (A - 1) o F b := _root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_mono_A (by linarith) hb
-  obtain ⟨K, hK0, hK⟩ := _root_.Formalism.FourierDecayAlt.P.JCx2.pd_cut_ccle (k := P.k) (r := P.r) (E := Wq →L[ℂ] Wp) o
-  have hGn : ∀ n : ℕ, _root_.Formalism.FourierDecayAlt.B.CCle (A - 1) o (fun g => cut n g • F g) (b + K * b) := by
+  have hb1 : _root_.Formalism.FourierDecayAlt.B.CCle (A - 1) o F b :=
+    _root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_mono_A (by linarith) hb
+  obtain ⟨K, hK0, hK⟩ :=
+    _root_.Formalism.FourierDecayAlt.P.JCx2.pd_cut_ccle (k := P.k) (r := P.r) (E := Wq →L[ℂ] Wp) o
+  have hGn
+      : ∀ n : ℕ,
+        _root_.Formalism.FourierDecayAlt.B.CCle (A - 1) o (fun g => cut n g • F g) (b + K * b) := by
     intro n
     have hR : (0 : ℝ) < (n : ℝ) + 1 := by positivity
-    have h3 := _root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_add hb1 (_root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_smul (-1 : ℂ) (hK ((n : ℝ) + 1) hR A F b hb))
-    refine _root_.Formalism.FourierDecayAlt.P.JCx2.pd_ccle_mono_c (_root_.Formalism.FourierDecayAlt.P.JCx2.mn_ccle_congr ?_ h3) ?_
+    have h3 :=
+      _root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_add hb1
+        (_root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_smul (-1 : ℂ)
+          (hK ((n : ℝ) + 1) hR A F b hb))
+    refine _root_.Formalism.FourierDecayAlt.P.JCx2.pd_ccle_mono_c
+      (_root_.Formalism.FourierDecayAlt.P.JCx2.mn_ccle_congr ?_ h3) ?_
     · intro g _
       rw [hψ n g, sub_smul, one_smul, neg_one_smul, sub_eq_add_neg]
     · rw [norm_neg, norm_one, one_mul]
       linarith [div_le_self (mul_nonneg hK0 hb0) (by linarith : (1 : ℝ) ≤ (n : ℝ) + 1)]
-  have hG0 : _root_.Formalism.FourierDecayAlt.B.CCle (A - 1) o F (b + K * b) := _root_.Formalism.FourierDecayAlt.P.JCx2.pd_ccle_mono_c hb1 (by nlinarith)
+  have hG0 : _root_.Formalism.FourierDecayAlt.B.CCle (A - 1) o F (b + K * b) :=
+    _root_.Formalism.FourierDecayAlt.P.JCx2.pd_ccle_mono_c hb1 (by nlinarith)
   obtain ⟨C, hC0, hC⟩ := norm_opApply_le_of_polynomial_coeffs_lemma o κ (A - 1) Θ hΘ'
   have hexp : (κ : ℝ) - (A - 1) = -(A - 1 - κ) := by ring
-  have hckn : ∀ n : ℕ, _root_.Formalism.FourierDecayAlt.B.CkOn ⊤ (_root_.Formalism.FourierDecayAlt.B.GV P.k P.r) (fun g => cut n g • F g) := by
+  have hckn
+      : ∀ n : ℕ,
+        _root_.Formalism.FourierDecayAlt.B.CkOn ⊤ (_root_.Formalism.FourierDecayAlt.B.GV P.k P.r)
+          (fun g => cut n g • F g) := by
     intro n
-    have h := (_root_.Formalism.FourierDecayAlt.P.JCx2.pd_cut_nice (R := (n : ℝ) + 1) (by positivity) hF).1
+    have h :=
+      (_root_.Formalism.FourierDecayAlt.P.JCx2.pd_cut_nice (R := (n : ℝ) + 1) (by positivity) hF).1
     rw [hcutφ n]
     exact h
   unfold _root_.Formalism.FourierDecayAlt.KB.Pl.V
   refine hc₃ P.k P.r Wp Wq p.T.base p.ν' p.m₀ γ (A - 1 - κ) hA
-    (fun n => _root_.Formalism.FourierDecayAlt.B.opApply Θ (fun g => cut n g • F g)) (_root_.Formalism.FourierDecayAlt.B.opApply Θ F) (C * (b + K * b))
-    (by positivity)
-    (fun n => (continuousOn_opApply_of_polynomial_coeffs_lemma_2 o κ Θ hΘ' (hckn n)).mono
-      (fun g hg => hg.1))
+    (fun n => _root_.Formalism.FourierDecayAlt.B.opApply Θ (fun g => cut n g • F g))
+    (_root_.Formalism.FourierDecayAlt.B.opApply Θ F) (C * (b + K * b)) (by positivity)
+    (fun n =>
+      (continuousOn_opApply_of_polynomial_coeffs_lemma_2 o κ Θ hΘ' (hckn n)).mono
+        (fun g hg => hg.1))
     ((continuousOn_opApply_of_polynomial_coeffs_lemma_2 o κ Θ hΘ' hF).mono (fun g hg => hg.1))
     (fun n g hg => by
       have := hC _ _ (hGn n) g hg.1
       rwa [hexp] at this)
     (fun g hg => by
       have := hC _ _ hG0 g hg.1
-      rwa [hexp] at this) ?_
+      rwa [hexp] at this)
+    ?_
   intro g _
   set S : _root_.Formalism.FourierDecayAlt.B.Mat P.k P.r → ℝ := fun h => ∑ i, ∑ j, Complex.normSq (h i j) with hS
   have hScont : Continuous S :=
-    continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
-      Complex.continuous_normSq.comp ((continuous_apply j).comp (continuous_apply i))
+    continuous_finsetSum _ fun i _ =>
+      continuous_finsetSum _ fun j _ =>
+        Complex.continuous_normSq.comp ((continuous_apply j).comp (continuous_apply i))
   have hO : IsOpen {h | S h < S g + 1} := isOpen_lt hScont continuous_const
   obtain ⟨N, hN⟩ := exists_nat_ge (S g + 1)
   apply tendsto_const_nhds.congr'
@@ -162,14 +214,15 @@ theorem _root_.GlobalTheory.HatNF.vecV_cut_polyOp : ∃ c₃ : ℝ, ∀ (Wp Wq :
   apply _root_.Formalism.FourierDecayAlt.P.JCTx6.Pos.opApply_congr_open Θ hO _ g (by simp)
   intro h hh
   have hSh : S h < S g + 1 := hh
-  have hS0 : 0 ≤ S h := Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ =>
-    Complex.normSq_nonneg _
+  have hS0 : 0 ≤ S h :=
+    Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ => Complex.normSq_nonneg _
   have hnN : (N : ℝ) ≤ n := by exact_mod_cast hn
   have hpos : (0 : ℝ) < (n : ℝ) + 1 := by positivity
-  have hscaled : ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • h) i j) =
-      ((n : ℝ) + 1)⁻¹ * ((n : ℝ) + 1)⁻¹ * S h := by
-    simp only [hS, Matrix.smul_apply, Complex.real_smul, Complex.normSq_mul,
-      Complex.normSq_ofReal, Finset.mul_sum]
+  have hscaled
+      : ∑ i, ∑ j, Complex.normSq ((((n : ℝ) + 1)⁻¹ • h) i j)
+        = ((n : ℝ) + 1)⁻¹ * ((n : ℝ) + 1)⁻¹ * S h := by
+    simp only [hS, Matrix.smul_apply, Complex.real_smul, Complex.normSq_mul, Complex.normSq_ofReal,
+      Finset.mul_sum]
   have hle : ((n : ℝ) + 1)⁻¹ * ((n : ℝ) + 1)⁻¹ * S h ≤ 1 := by
     rw [← mul_inv, inv_mul_le_iff₀ (by positivity)]
     nlinarith

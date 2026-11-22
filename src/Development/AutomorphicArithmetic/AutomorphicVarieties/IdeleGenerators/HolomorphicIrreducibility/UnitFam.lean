@@ -22,8 +22,9 @@ variable {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {N : ℕ} [NeZero N]
 
 private structure Good (k : ℤ) (f : (ZMod N)ˣ → ℍ → ℂ) : Prop where
   mf : ∀ a, ∃ F : ModularForm (Gamma1 N) k, (F : ℍ → ℂ) = f a
-  fam : ∀ (a b : (ZMod N)ˣ) (γ : SL(2, ℤ)), γ ∈ Gamma0 N → (b : ZMod N) = a * ((γ 1 1 : ℤ) : ZMod N) →
-    f a ∣[k] γ = f b
+  fam
+    : ∀ (a b : (ZMod N)ˣ) (γ : SL(2, ℤ)),
+      γ ∈ Gamma0 N → (b : ZMod N) = a * ((γ 1 1 : ℤ) : ZMod N) → f a ∣[k] γ = f b
   int : ∀ a, IntQ ι (f a)
 
 omit [NeZero N] in
@@ -253,15 +254,13 @@ end
 end UpperTheory.V.Sd
 
 open UpperTheory.V.Sd in
-theorem UpperTheory.V.Sd.unitFam :
-    UpperTheory.V.Sd.UnitFam := by
+theorem UpperTheory.V.Sd.unitFam : UpperTheory.V.Sd.UnitFam := by
   intro l _ hl ι N _ hN hlN
   obtain ⟨m, h, -, hg, h0, hu⟩ := killer (ι := ι) hl hN hlN Finset.univ
   refine ⟨10 + m, fun k hk => ?_⟩
   obtain ⟨j, rfl⟩ : ∃ j, k = j + m := ⟨k - m, by omega⟩
   obtain ⟨f, hf, hv, hfu⟩ := base (ι := ι) hl hN hlN j (by omega)
-  have hG : Good ι ((j + m : ℕ) : ℤ) (fun a => f a * h a) := by
-    rw [Nat.cast_add]; exact hf.mul hg
+  have hG : Good ι ((j + m : ℕ) : ℤ) (fun a => f a * h a) := by rw [Nat.cast_add]; exact hf.mul hg
   choose F hF using hG.mf
   refine ⟨F, fun a b γ hγ hab => ?_, fun a => ?_, fun a => ?_, ?_, fun a a1 a2 => ?_⟩
   · rw [hF, hF]; exact hG.fam a b γ hγ hab

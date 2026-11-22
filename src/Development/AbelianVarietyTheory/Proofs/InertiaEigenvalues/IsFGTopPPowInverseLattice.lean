@@ -5,15 +5,17 @@ public import ReciprocityTheory.ReductiveGroups.TraceFormulas.LatDefs
 
 @[expose] public section
 
-open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC ReciprocityTheory.ChartRestriction.T2
+open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC
+  ReciprocityTheory.ChartRestriction.T2
 open Formalism.NG (KO)
 
 namespace GlobalTheory
 
-theorem fractionRing_t2_of_openEmbedding {O : Type} [CommRing O] [IsDomain O]
-    [TopologicalSpace O] [T2Space O] [TopologicalSpace (FractionRing O)]
-    [IsTopologicalAddGroup (FractionRing O)]
-    (he : Topology.IsOpenEmbedding (algebraMap O (FractionRing O))) : T2Space (FractionRing O) := by
+theorem fractionRing_t2_of_openEmbedding
+    {O : Type} [CommRing O] [IsDomain O] [TopologicalSpace O] [T2Space O]
+    [TopologicalSpace (FractionRing O)] [IsTopologicalAddGroup (FractionRing O)]
+    (he : Topology.IsOpenEmbedding (algebraMap O (FractionRing O)))
+    : T2Space (FractionRing O) := by
   apply IsTopologicalAddGroup.t2Space_of_zero_sep
   intro x hx
   set ι := algebraMap O (FractionRing O)
@@ -26,11 +28,14 @@ theorem fractionRing_t2_of_openEmbedding {O : Type} [CommRing O] [IsDomain O]
   · rintro ⟨a, ha, hax⟩
     exact ha hax
 
-theorem isFGTop_comap_lsmul_one : ∀ {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
-    [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)],
-    PadicCoeff p O → FracTop O → ∀ n : ℕ,
-    IsFGTop O ((1 : Submodule O (FractionRing O)).comap (LinearMap.lsmul O _ ((p : O) ^ n))) := by
+theorem isFGTop_comap_lsmul_one
+    : ∀ {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
+        [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)],
+      PadicCoeff p O → FracTop O
+        → ∀ n : ℕ,
+          IsFGTop O
+            ((1 : Submodule O (FractionRing O)).comap (LinearMap.lsmul O _ ((p : O) ^ n))) := by
   intro p O _ _ _ _ _ _ _ hO hF n
   haveI := hO.t2
   haveI := fractionRing_t2_of_openEmbedding hF.emb

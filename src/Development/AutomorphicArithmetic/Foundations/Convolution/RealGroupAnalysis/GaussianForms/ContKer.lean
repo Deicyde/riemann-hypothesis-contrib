@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -43,13 +45,17 @@ private theorem cb (δ : F) : Continuous fun z : (A F × V4 F) × V4 F => ψ (B4
     unfold B4
     fun_prop
   exact cψ.comp h
-private theorem key (δ : F) (φ : S4 F) :
-    Continuous fun p : A F × V4 F => ∫ y, ψ (p.1 * q4 δ y) * φ.1 y * ψ (B4 δ y p.2) ∂(adeleMeasurePi F) :=
+private theorem key (δ : F) (φ : S4 F)
+    : Continuous fun p : A F × V4 F =>
+      ∫ y, ψ (p.1 * q4 δ y) * φ.1 y * ψ (B4 δ y p.2) ∂(adeleMeasurePi F) :=
   cont_param (continuous_of_mem_schwartzBruhatPi φ.2) (integrable_of_mem_schwartzBruhatPi φ.2)
-    (ca δ) (cb δ) (fun _ => nψ _) (fun _ => nψ _)
+    (ca δ) (cb δ)
+    (fun _ => nψ _)
+    (fun _ => nψ _)
 end
 
-theorem UpperTheory.ConvolutionTheory.R2.C.contKer :
-    ∀ (F : Type) [Field F] [NumberField F] (δ : F) (φ : S4 F), Continuous fun p : A F × V4 F => ft4 δ (fun y => ψ (p.1 * q4 δ y) * φ.1 y) p.2 := by
+theorem UpperTheory.ConvolutionTheory.R2.C.contKer
+    : ∀ (F : Type) [Field F] [NumberField F] (δ : F) (φ : S4 F),
+      Continuous fun p : A F × V4 F => ft4 δ (fun y => ψ (p.1 * q4 δ y) * φ.1 y) p.2 := by
   intro F _ _ δ φ
   exact key δ φ

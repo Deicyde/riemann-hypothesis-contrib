@@ -15,8 +15,18 @@ theorem evalDegree : EvalDeg := by
   intro B _ τ _ x y c _ _ _ p
   apply lcdeg_degreeOf_aeval_le
   intro m hm
-  have hf : ∀ v, degreeOf c ((fun v : τ => if v = x then (1 : MvPolynomial τ B)
-      else if v = y then -X c else X v) v) ≤ (if v = y then 1 else 0) + (if v = c then 1 else 0) := by
+  have hf
+      : ∀ v,
+        degreeOf c
+            ((fun v : τ =>
+                if v = x then
+                  (1 : MvPolynomial τ B)
+                else if v = y then
+                  - X c
+                else
+                  X v)
+              v)
+          ≤ (if v = y then 1 else 0) + (if v = c then 1 else 0) := by
     intro v
     by_cases hvx : v = x
     · subst hvx
@@ -32,8 +42,11 @@ theorem evalDegree : EvalDeg := by
         omega
       · simp only [hvx, hvy, if_false, zero_add]
         exact lcdeg_degreeOf_X_le (R := B) c v
-  refine le_trans (Finset.sum_le_sum (g := fun v => m v * (if v = y then 1 else 0) +
-    m v * (if v = c then 1 else 0)) fun v _ => ?_) ?_
+  refine le_trans
+    (Finset.sum_le_sum
+      (g := fun v => m v * (if v = y then 1 else 0) + m v * (if v = c then 1 else 0))
+      fun v _ => ?_)
+    ?_
   · rw [← Nat.mul_add]
     exact Nat.mul_le_mul_left _ (hf v)
   · rw [Finset.sum_add_distrib]

@@ -42,8 +42,8 @@ def holSub (X : Tower Ω ε) : Subring X.K where
     rintro f ⟨φ, h1, h2⟩
     exact ⟨-φ, h1.neg, by rw [map_neg, h2, Filter.Germ.coe_neg]⟩
 
-theorem siegel_hol [IsAlgClosure ℚ Ω] (X : Tower Ω ε) {c : ℕ} {y : Fin 2 → ℚ} (hy : admitted c y) :
-    siegel X c y ∈ holSub X ∧ (siegel X c y)⁻¹ ∈ holSub X := by
+theorem siegel_hol [IsAlgClosure ℚ Ω] (X : Tower Ω ε) {c : ℕ} {y : Fin 2 → ℚ} (hy : admitted c y)
+    : siegel X c y ∈ holSub X ∧ (siegel X c y)⁻¹ ∈ holSub X := by
   have hd : DifferentiableOn ℂ (sgC c y) Hs :=
     UpperHalfPlane.mdifferentiable_iff.1 (GlobalTheory.Sieg.mdifferentiable_sg c y hy)
   have hne : ∀ z, sgC c y z ≠ 0 := fun z => GlobalTheory.Sieg.sg_ne_zero c y _ hy
@@ -59,10 +59,11 @@ theorem siegel_hol [IsAlgClosure ℚ Ω] (X : Tower Ω ε) {c : ℕ} {y : Fin 2 
   rw [← mul_one (X.an _), ← h2, ← mul_assoc, h1, one_mul]
 
 def IsTopUnit (X : Tower Ω ε) (M : ℕ) (f : X.K) : Prop :=
-  f ≠ 0 ∧ f ∈ topF X M ∧ ∃ hf : f ∈ topL X M,
-    letI := algPoly X (CongruenceSubgroup.Gamma M)
-    (⟨f, hf⟩ : topL X M) ∈ FunctionField.ringOfIntegers Ω (topL X M) ∧
-      (⟨f, hf⟩ : topL X M)⁻¹ ∈ FunctionField.ringOfIntegers Ω (topL X M)
+  f ≠ 0 ∧ f ∈ topF X M
+    ∧ ∃ hf : f ∈ topL X M,
+      letI := algPoly X (CongruenceSubgroup.Gamma M)
+      (⟨f, hf⟩ : topL X M) ∈ FunctionField.ringOfIntegers Ω (topL X M)
+        ∧ (⟨f, hf⟩ : topL X M)⁻¹ ∈ FunctionField.ringOfIntegers Ω (topL X M)
 
 end GlobalTheory.K4.TopUnits
 

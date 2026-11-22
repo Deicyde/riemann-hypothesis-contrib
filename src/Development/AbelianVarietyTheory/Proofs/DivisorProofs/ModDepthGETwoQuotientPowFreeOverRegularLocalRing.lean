@@ -13,13 +13,17 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-
 open Pointwise in
-theorem modDepthGE_two_quotient_pow_of_free_of_isRegularLocalRing :
-    ∀ (R : Type) [CommRing R] [IsRegularLocalRing R], 3 ≤ ringKrullDim R → ∀ f ∈ maximalIdeal R,
-      f ≠ 0 → ∀ (B : Type) [CommRing B] [Algebra R B] [Module.Finite R B] [Module.Free R B]
-      [Nontrivial B] (k : ℕ), 1 ≤ k →
-      ReciprocityTheory.CA.ModDepthGE R (B ⧸ (Ideal.span {f}).map (algebraMap R B) ^ k) 2 := by
+theorem modDepthGE_two_quotient_pow_of_free_of_isRegularLocalRing
+    : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R],
+      3 ≤ ringKrullDim R
+        → ∀ f ∈ maximalIdeal R,
+          f ≠ 0
+            → ∀ (B : Type) [CommRing B] [Algebra R B] [Module.Finite R B] [Module.Free R B]
+                [Nontrivial B] (k : ℕ),
+              1 ≤ k
+                → ReciprocityTheory.CA.ModDepthGE R (B ⧸ (Ideal.span {f}).map (algebraMap R B) ^ k)
+                  2 := by
   intro R _ _ hd f hf hf0 B _ _ _ _ _ k hk
   haveI : IsDomain R := GlobalTheory.isDomain_of_isRegularLocalRing R
   have h3 : ReciprocityTheory.CA.ModDepthGE R B 3 :=
@@ -32,11 +36,12 @@ theorem modDepthGE_two_quotient_pow_of_free_of_isRegularLocalRing :
   have hreg : IsSMulRegular B (f ^ k) := smul_right_injective B hfk0
   have h2 : ReciprocityTheory.CA.ModDepthGE R (QuotSMulTop (f ^ k) B) 2 :=
     ReciprocityTheory.CA.ModDepthGE.quotSMulTop hfkm hreg h3
-  have hpow : (Ideal.span {f}).map (algebraMap R B) ^ k =
-      (Ideal.span {f ^ k}).map (algebraMap R B) := by
+  have hpow
+      : (Ideal.span {f}).map (algebraMap R B) ^ k = (Ideal.span {f ^ k}).map (algebraMap R B) := by
     rw [← Ideal.map_pow, Ideal.span_singleton_pow]
-  have heq : ((f ^ k) • (⊤ : Submodule R B)) =
-      ((Ideal.span {f}).map (algebraMap R B) ^ k).restrictScalars R := by
+  have heq
+      : ((f ^ k) • (⊤ : Submodule R B))
+        = ((Ideal.span {f}).map (algebraMap R B) ^ k).restrictScalars R := by
     rw [hpow]
     ext x
     simp [Submodule.mem_smul_pointwise_iff_exists, Ideal.map_span, Ideal.mem_span_singleton',

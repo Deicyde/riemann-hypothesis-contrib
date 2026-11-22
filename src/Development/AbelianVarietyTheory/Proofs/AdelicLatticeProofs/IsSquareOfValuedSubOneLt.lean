@@ -11,22 +11,24 @@ namespace GlobalTheory.LocalQuad
 
 namespace SquareTheorem
 
-
 open NumberField IsDedekindDomain in
 open scoped Matrix WithZero in
-theorem _root_.GlobalTheory.LocalQuad.SquareTheorem.isSquare_of_norm_sub_one_lt {K : Type*} [NormedField K] [CompleteSpace K]
-    [IsUltrametricDist K] (x : K) (h : ‖x - 1‖ < ‖(4 : K)‖) : IsSquare x := by
+theorem _root_.GlobalTheory.LocalQuad.SquareTheorem.isSquare_of_norm_sub_one_lt
+    {K : Type*} [NormedField K] [CompleteSpace K] [IsUltrametricDist K]
+    (x : K) (h : ‖x - 1‖ < ‖(4 : K)‖)
+    : IsSquare x := by
   have h4 : (4 : K) ≠ 0 := norm_pos_iff.1 (lt_of_le_of_lt (norm_nonneg _) h)
   set c : K := (x - 1) / 4 with hc
   have hx : x = 1 + 4 * c := by rw [hc]; field_simp; ring
-  have hc1 : ‖c‖ < 1 := by
-    rw [hc, norm_div, div_lt_one (norm_pos_iff.2 h4)]; exact h
+  have hc1 : ‖c‖ < 1 := by rw [hc, norm_div, div_lt_one (norm_pos_iff.2 h4)]; exact h
   set r : ℝ := ‖c‖ with hr
   have hr0 : 0 ≤ r := norm_nonneg _
   have hsq : ∀ z : K, ‖z‖ ≤ r → ‖z ^ 2‖ ≤ r := by
     intro z hz
     rw [norm_pow]
-    calc ‖z‖ ^ 2 ≤ r ^ 2 := pow_le_pow_left₀ (norm_nonneg _) hz 2
+    calc
+      ‖z‖ ^ 2
+        ≤ r ^ 2 := pow_le_pow_left₀ (norm_nonneg _) hz 2
       _ ≤ r := by nlinarith
   let s := Metric.closedBall (0 : K) r
   haveI : CompleteSpace s := Metric.isClosed_closedBall.completeSpace_coe
@@ -45,8 +47,8 @@ theorem _root_.GlobalTheory.LocalQuad.SquareTheorem.isSquare_of_norm_sub_one_lt 
     have : (c - (a : K) ^ 2) - (c - (b : K) ^ 2) = ((b : K) + a) * ((b : K) - a) := by ring
     simp only [f, this, norm_mul, coe_nnnorm]
     rw [norm_sub_rev (b : K)]
-    exact mul_le_mul_of_nonneg_right
-      ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le hb ha)) (norm_nonneg _)
+    exact mul_le_mul_of_nonneg_right ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le hb ha))
+      (norm_nonneg _)
   haveI : Nonempty s := ⟨⟨0, by simp [s, hr0]⟩⟩
   set z : s := ContractingWith.fixedPoint f hf
   have hz : (z : K) = c - (z : K) ^ 2 := by
@@ -56,12 +58,14 @@ theorem _root_.GlobalTheory.LocalQuad.SquareTheorem.isSquare_of_norm_sub_one_lt 
 
 end SquareTheorem
 
-
 open NumberField IsDedekindDomain in
 open scoped Matrix WithZero in
-theorem _root_.GlobalTheory.LocalQuad.isSquare_of_valued_sub_one_lt (F : Type) [Field F] [NumberField F]
+theorem _root_.GlobalTheory.LocalQuad.isSquare_of_valued_sub_one_lt
+    (F : Type) [Field F] [NumberField F]
     (v : HeightOneSpectrum (𝓞 F)) (x : v.adicCompletion F)
-    (h : Valued.v (x - 1) < Valued.v (4 : v.adicCompletion F)) : IsSquare x :=
-  _root_.GlobalTheory.LocalQuad.SquareTheorem.isSquare_of_norm_sub_one_lt x (Valued.toNormedField.norm_lt_iff.2 h)
+    (h : Valued.v (x - 1) < Valued.v (4 : v.adicCompletion F))
+    : IsSquare x :=
+  _root_.GlobalTheory.LocalQuad.SquareTheorem.isSquare_of_norm_sub_one_lt x
+    (Valued.toNormedField.norm_lt_iff.2 h)
 
 end GlobalTheory.LocalQuad

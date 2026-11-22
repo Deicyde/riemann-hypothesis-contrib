@@ -12,53 +12,65 @@ noncomputable section
 
 namespace GlobalTheory.HTRho.FilDim
 
-variable {k H O C : Type*} [Field k] [AddCommGroup H] [Module k H] [Ring O] [CommRing C] [Algebra C O]
+variable
+  {k H O C : Type*} [Field k] [AddCommGroup H] [Module k H] [Ring O] [CommRing C] [Algebra C O]
 
-theorem mSub_gen (σ : O →+* Module.End k H) (χ : C →+* k) {X : Submodule k H} (c : C) {x : H}
-    (hx : x ∈ X) : σ (algebraMap C O c) x - χ c • x ∈ mSub σ χ X :=
+theorem mSub_gen
+    (σ : O →+* Module.End k H) (χ : C →+* k) {X : Submodule k H} (c : C) {x : H} (hx : x ∈ X)
+    : σ (algebraMap C O c) x - χ c • x ∈ mSub σ χ X :=
   Submodule.subset_span ⟨c, x, hx, rfl⟩
 
-theorem mSub_le_of_stable (σ : O →+* Module.End k H) (χ : C →+* k) (X : Submodule k H)
-    (hX : ∀ a, ∀ x ∈ X, σ a x ∈ X) : mSub σ χ X ≤ X := by
+theorem mSub_le_of_stable
+    (σ : O →+* Module.End k H) (χ : C →+* k) (X : Submodule k H) (hX : ∀ a, ∀ x ∈ X, σ a x ∈ X)
+    : mSub σ χ X ≤ X := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨c, x, hx, rfl⟩
   exact X.sub_mem (hX _ x hx) (X.smul_mem _ hx)
 
-theorem mSub_mono (σ : O →+* Module.End k H) (χ : C →+* k) {X Y : Submodule k H} (h : X ≤ Y) :
-    mSub σ χ X ≤ mSub σ χ Y := by
+theorem mSub_mono (σ : O →+* Module.End k H) (χ : C →+* k) {X Y : Submodule k H} (h : X ≤ Y)
+    : mSub σ χ X ≤ mSub σ χ Y := by
   refine Submodule.span_mono ?_
   rintro _ ⟨c, x, hx, rfl⟩
   exact ⟨c, x, h hx, rfl⟩
 
-theorem jSub_mono {ι : Type*} (σ : O →+* Module.End k H) (χ : ι → C →+* k) {X Y : Submodule k H}
-    (h : X ≤ Y) : jSub σ χ X ≤ jSub σ χ Y := by
+theorem jSub_mono
+    {ι : Type*} (σ : O →+* Module.End k H) (χ : ι → C →+* k) {X Y : Submodule k H} (h : X ≤ Y)
+    : jSub σ χ X ≤ jSub σ χ Y := by
   refine Submodule.span_mono ?_
   rintro _ ⟨r, lam, c, x, hx, hc, rfl⟩
   exact ⟨r, lam, c, x, h hx, hc, rfl⟩
 
-theorem jSub_le_mSub {ι : Type*} (σ : O →+* Module.End k H) (χ : ι → C →+* k) (X : Submodule k H)
-    (i : ι) : jSub σ χ X ≤ mSub σ (χ i) X := by
+theorem jSub_le_mSub
+    {ι : Type*} (σ : O →+* Module.End k H) (χ : ι → C →+* k) (X : Submodule k H) (i : ι)
+    : jSub σ χ X ≤ mSub σ (χ i) X := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨r, lam, c, x, hx, hc, rfl⟩
-  have e : ∑ l, lam l • σ (algebraMap C O (c l)) x
-      = ∑ l, lam l • (σ (algebraMap C O (c l)) x - χ i (c l) • x) + (∑ l, lam l * χ i (c l)) • x := by
+  have e
+      : ∑ l, lam l • σ (algebraMap C O (c l)) x
+        = ∑ l, lam l • (σ (algebraMap C O (c l)) x - χ i (c l) • x)
+          + (∑ l, lam l * χ i (c l)) • x := by
     simp only [smul_sub, Finset.sum_sub_distrib, Finset.sum_smul, smul_smul]
     abel
   rw [e, hc i, zero_smul, add_zero]
   exact Submodule.sum_mem _ fun l _ => Submodule.smul_mem _ _ (mSub_gen σ (χ i) (c l) hx)
 
-theorem jSub_gen {ι β : Type*} [Fintype β] (σ : O →+* Module.End k H) (χ : ι → C →+* k)
-    {X : Submodule k H} (lam : β → k) (c : β → C) {x : H} (hx : x ∈ X)
-    (h : ∀ i, ∑ l, lam l * χ i (c l) = 0) :
-    ∑ l, lam l • σ (algebraMap C O (c l)) x ∈ jSub σ χ X := by
+theorem jSub_gen
+    {ι β : Type*} [Fintype β]
+    (σ : O →+* Module.End k H)
+    (χ : ι → C →+* k)
+    {X : Submodule k H}
+    (lam : β → k) (c : β → C)
+    {x : H} (hx : x ∈ X)
+    (h : ∀ i, ∑ l, lam l * χ i (c l) = 0)
+    : ∑ l, lam l • σ (algebraMap C O (c l)) x ∈ jSub σ χ X := by
   let e := Fintype.equivFin β
   refine Submodule.subset_span ⟨Fintype.card β, lam ∘ e.symm, c ∘ e.symm, x, hx, fun i => ?_, ?_⟩
   · rw [← h i]; exact Fintype.sum_equiv e.symm _ _ (fun _ => rfl)
   · exact (Fintype.sum_equiv e.symm _ _ (fun _ => rfl)).symm
 
-theorem mSub_rAct (σ : O →+* Module.End k H) (χ : C →+* k) (G : Submodule k H)
-    (hG : ∀ a, ∀ x ∈ G, σ a x ∈ G) :
-    (mSub (rAct σ G hG) χ ⊤).map G.subtype = mSub σ χ G := by
+theorem mSub_rAct
+    (σ : O →+* Module.End k H) (χ : C →+* k) (G : Submodule k H) (hG : ∀ a, ∀ x ∈ G, σ a x ∈ G)
+    : (mSub (rAct σ G hG) χ ⊤).map G.subtype = mSub σ χ G := by
   rw [mSub, Submodule.map_span, mSub]
   congr 1
   ext z
@@ -68,9 +80,12 @@ theorem mSub_rAct (σ : O →+* Module.End k H) (χ : C →+* k) (G : Submodule 
   · rintro ⟨c, x, hx, rfl⟩
     exact ⟨_, ⟨c, ⟨x, hx⟩, trivial, rfl⟩, by simp [rAct]⟩
 
-theorem mSub_qAct {V : Type*} [AddCommGroup V] [Module k V] (τ : O →+* Module.End k V) (χ : C →+* k)
-    (X : Submodule k V) (h : ∀ a, ∀ x ∈ X, τ a x ∈ X) :
-    mSub (qAct τ X h) χ ⊤ = (mSub τ χ ⊤).map X.mkQ := by
+theorem mSub_qAct
+    {V : Type*} [AddCommGroup V] [Module k V]
+    (τ : O →+* Module.End k V)
+    (χ : C →+* k)
+    (X : Submodule k V) (h : ∀ a, ∀ x ∈ X, τ a x ∈ X)
+    : mSub (qAct τ X h) χ ⊤ = (mSub τ χ ⊤).map X.mkQ := by
   simp only [mSub]
   rw [Submodule.map_span]
   congr 1
@@ -82,9 +97,11 @@ theorem mSub_qAct {V : Type*} [AddCommGroup V] [Module k V] (τ : O →+* Module
   · rintro ⟨w, ⟨c, x, _, rfl⟩, rfl⟩
     exact ⟨c, X.mkQ x, trivial, by simp; rfl⟩
 
-theorem exists_delta {Idx : Type*} [Fintype Idx] [DecidableEq Idx] (χ : Idx → C →+* k)
-    (hχ : Function.Injective χ) (i : Idx) :
-    ∃ S : Finset C, ∃ lam : C → k, ∀ j, ∑ d ∈ S, lam d * χ j d = if j = i then 1 else 0 := by
+theorem exists_delta
+    {Idx : Type*} [Fintype Idx] [DecidableEq Idx]
+    (χ : Idx → C →+* k) (hχ : Function.Injective χ)
+    (i : Idx)
+    : ∃ S : Finset C, ∃ lam : C → k, ∀ j, ∑ d ∈ S, lam d * χ j d = if j = i then 1 else 0 := by
   let v : C → (Idx → k) := fun d j => χ j d
   have hmem : (Pi.single i 1 : Idx → k) ∈ Submodule.span k (Set.range v) := by
     by_contra hx
@@ -125,34 +142,43 @@ theorem exists_delta {Idx : Type*} [Fintype Idx] [DecidableEq Idx] (χ : Idx →
   simp only [Finsupp.sum, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, v] at this
   rw [this, Pi.single_apply]
 
-theorem mSub_map_le (σ : O →+* Module.End k H) (χ : C →+* k) (T : Module.End k H)
-    (hT : ∀ c z, T (σ (algebraMap C O c) z) = σ (algebraMap C O c) (T z)) :
-    (mSub σ χ ⊤).map T ≤ mSub σ χ (LinearMap.range T) := by
+theorem mSub_map_le
+    (σ : O →+* Module.End k H)
+    (χ : C →+* k)
+    (T : Module.End k H) (hT : ∀ c z, T (σ (algebraMap C O c) z) = σ (algebraMap C O c) (T z))
+    : (mSub σ χ ⊤).map T ≤ mSub σ χ (LinearMap.range T) := by
   rw [mSub, Submodule.map_span]
   refine Submodule.span_le.2 ?_
   rintro _ ⟨_, ⟨c, z, _, rfl⟩, rfl⟩
   refine Submodule.subset_span ⟨c, T z, ⟨z, rfl⟩, ?_⟩
   simp [hT]
 
-theorem inf_le_sup {Idx : Type*} [Fintype Idx] (σ : O →+* Module.End k H) (χ : Idx → C →+* k)
-    (hχ : Function.Injective χ) (G : Submodule k H) (hG : ∀ a, ∀ x ∈ G, σ a x ∈ G) (ω : C) (r₀ r₁ : k)
-    (hr : r₀ ≠ r₁)
-    (hw : (σ (algebraMap C O ω) - r₀ • 1) * (σ (algebraMap C O ω) - r₁ • 1) = 0)
-    (hχω : ∀ i, χ i ω = r₀) (hR : LinearMap.range (σ (algebraMap C O ω) - r₀ • 1) ≤ G) (i : Idx) :
-    G ⊓ mSub σ (χ i) ⊤ ≤
-      jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)) ⊔ mSub σ (χ i) G := by
+theorem inf_le_sup
+    {Idx : Type*} [Fintype Idx]
+    (σ : O →+* Module.End k H)
+    (χ : Idx → C →+* k) (hχ : Function.Injective χ)
+    (G : Submodule k H) (hG : ∀ a, ∀ x ∈ G, σ a x ∈ G)
+    (ω : C) (r₀ r₁ : k)
+    (hr : r₀ ≠ r₁) (hw : (σ (algebraMap C O ω) - r₀ • 1) * (σ (algebraMap C O ω) - r₁ • 1) = 0)
+    (hχω : ∀ i, χ i ω = r₀) (hR : LinearMap.range (σ (algebraMap C O ω) - r₀ • 1) ≤ G)
+    (i : Idx)
+    : G ⊓ mSub σ (χ i) ⊤
+      ≤ jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)) ⊔ mSub σ (χ i) G := by
   classical
   have hA : LinearMap.range (σ (algebraMap C O ω) - r₀ • 1) ≤ mSub σ (χ i) G := by
     rintro y ⟨z, rfl⟩
     have h0 : ((σ (algebraMap C O ω) - r₀ • 1) * (σ (algebraMap C O ω) - r₁ • 1)) z = 0 := by
       rw [hw]; rfl
-    have e1 : σ (algebraMap C O ω) ((σ (algebraMap C O ω) - r₀ • 1) z) - r₀ • (σ (algebraMap C O ω) - r₀ • 1) z
-        = (r₁ - r₀) • (σ (algebraMap C O ω) - r₀ • 1) z := by
-      have : σ (algebraMap C O ω) ((σ (algebraMap C O ω) - r₀ • 1) z) - r₀ • (σ (algebraMap C O ω) - r₀ • 1) z
+    have e1
+        : σ (algebraMap C O ω) ((σ (algebraMap C O ω) - r₀ • 1) z)
+            - r₀ • (σ (algebraMap C O ω) - r₀ • 1) z
+          = (r₁ - r₀) • (σ (algebraMap C O ω) - r₀ • 1) z := by
+      have : σ (algebraMap C O ω) ((σ (algebraMap C O ω) - r₀ • 1) z)
+            - r₀ • (σ (algebraMap C O ω) - r₀ • 1) z
           = ((σ (algebraMap C O ω) - r₀ • 1) * (σ (algebraMap C O ω) - r₁ • 1)) z
             + (r₁ - r₀) • (σ (algebraMap C O ω) - r₀ • 1) z := by
-        simp only [Module.End.mul_apply, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
-          map_sub, map_smul]
+        simp only [Module.End.mul_apply, LinearMap.sub_apply, LinearMap.smul_apply,
+          Module.End.one_apply, map_sub, map_smul]
         module
       rw [this, h0, zero_add]
     have hg := mSub_gen σ (χ i) ω (hR ⟨z, rfl⟩)
@@ -160,8 +186,10 @@ theorem inf_le_sup {Idx : Type*} [Fintype Idx] (σ : O →+* Module.End k H) (χ
     have hne : r₁ - r₀ ≠ 0 := sub_ne_zero.2 (Ne.symm hr)
     have := Submodule.smul_mem _ (r₁ - r₀)⁻¹ hg
     rwa [smul_smul, inv_mul_cancel₀ hne, one_smul] at this
-  have hcomm : ∀ c z, (σ (algebraMap C O ω) - r₁ • 1) (σ (algebraMap C O c) z)
-      = σ (algebraMap C O c) ((σ (algebraMap C O ω) - r₁ • 1) z) := by
+  have hcomm
+      : ∀ c z,
+        (σ (algebraMap C O ω) - r₁ • 1) (σ (algebraMap C O c) z)
+          = σ (algebraMap C O c) ((σ (algebraMap C O ω) - r₁ • 1) z) := by
     intro c z
     simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, map_sub, map_smul]
     congr 1
@@ -169,10 +197,13 @@ theorem inf_le_sup {Idx : Type*} [Fintype Idx] (σ : O →+* Module.End k H) (χ
       rw [← map_mul, mul_comm, map_mul]
     rw [← Module.End.mul_apply, ← map_mul σ, this, map_mul σ, Module.End.mul_apply]
   rintro x ⟨hxG, hxM⟩
-  have hx : x = (r₀ - r₁)⁻¹ • (σ (algebraMap C O ω) - r₁ • 1) x
-      - (r₀ - r₁)⁻¹ • (σ (algebraMap C O ω) - r₀ • 1) x := by
+  have hx
+      : x
+        = (r₀ - r₁)⁻¹ • (σ (algebraMap C O ω) - r₁ • 1) x
+          - (r₀ - r₁)⁻¹ • (σ (algebraMap C O ω) - r₀ • 1) x := by
     have hne : r₀ - r₁ ≠ 0 := sub_ne_zero.2 hr
-    have : (σ (algebraMap C O ω) - r₁ • 1) x - (σ (algebraMap C O ω) - r₀ • 1) x = (r₀ - r₁) • x := by
+    have : (σ (algebraMap C O ω) - r₁ • 1) x - (σ (algebraMap C O ω) - r₀ • 1) x
+        = (r₀ - r₁) • x := by
       simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply]
       module
     rw [← smul_sub, this, smul_smul, inv_mul_cancel₀ hne, one_smul]
@@ -188,31 +219,34 @@ theorem inf_le_sup {Idx : Type*} [Fintype Idx] (σ : O →+* Module.End k H) (χ
   let E : Module.End k H := ∑ d ∈ S, lam d • σ (algebraMap C O d)
   have hEapp : ∀ v, E v = ∑ d ∈ S, lam d • σ (algebraMap C O d) v := by
     intro v; simp [E, LinearMap.sum_apply]
-  have hE : ∀ v ∈ mSub σ (χ i) (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)),
-      E v ∈ jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)) := by
+  have hE
+      : ∀ v ∈ mSub σ (χ i) (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)),
+        E v ∈ jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)) := by
     intro v hv
     induction hv using Submodule.span_induction with
     | mem z hz =>
       obtain ⟨c, y, hy, rfl⟩ := hz
-      have key := jSub_gen σ χ (β := S ⊕ S)
-        (Sum.elim (fun d => lam d) (fun d => -(lam d * χ i c)))
-        (Sum.elim (fun d => (d : C) * c) (fun d => (d : C))) hy (by
-          intro j
-          rw [Fintype.sum_sum_type]
-          simp only [Sum.elim_inl, Sum.elim_inr, map_mul]
-          rw [Finset.sum_coe_sort S (fun d => lam d * (χ j d * χ j c)),
-            Finset.sum_coe_sort S (fun d => -(lam d * χ i c) * χ j d)]
-          have h1 : ∑ d ∈ S, lam d * (χ j d * χ j c) = (∑ d ∈ S, lam d * χ j d) * χ j c := by
-            rw [Finset.sum_mul]; exact Finset.sum_congr rfl fun d _ => by ring
-          have h2 : ∑ d ∈ S, -(lam d * χ i c) * χ j d = -(χ i c) * ∑ d ∈ S, lam d * χ j d := by
-            rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun d _ => by ring
-          rw [h1, h2, hδ j]
-          split_ifs with h
-          · subst h; ring
-          · ring)
+      have key :=
+        jSub_gen σ χ (β := S ⊕ S) (Sum.elim (fun d => lam d) (fun d => -(lam d * χ i c)))
+          (Sum.elim (fun d => (d : C) * c) (fun d => (d : C))) hy
+          (by
+            intro j
+            rw [Fintype.sum_sum_type]
+            simp only [Sum.elim_inl, Sum.elim_inr, map_mul]
+            rw [Finset.sum_coe_sort S (fun d => lam d * (χ j d * χ j c)),
+              Finset.sum_coe_sort S (fun d => -(lam d * χ i c) * χ j d)]
+            have h1 : ∑ d ∈ S, lam d * (χ j d * χ j c) = (∑ d ∈ S, lam d * χ j d) * χ j c := by
+              rw [Finset.sum_mul]; exact Finset.sum_congr rfl fun d _ => by ring
+            have h2 : ∑ d ∈ S, -(lam d * χ i c) * χ j d = -(χ i c) * ∑ d ∈ S, lam d * χ j d := by
+              rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun d _ => by ring
+            rw [h1, h2, hδ j]
+            split_ifs with h
+            · subst h; ring
+            · ring)
       convert key using 1
       rw [hEapp, Fintype.sum_sum_type]
-      simp only [Sum.elim_inl, Sum.elim_inr, map_mul, Module.End.mul_apply, neg_smul, Finset.sum_neg_distrib]
+      simp only [Sum.elim_inl, Sum.elim_inr, map_mul, Module.End.mul_apply, neg_smul,
+        Finset.sum_neg_distrib]
       rw [Finset.sum_coe_sort S (fun d => lam d • σ (algebraMap C O d) (σ (algebraMap C O c) y)),
         Finset.sum_coe_sort S (fun d => (lam d * χ i c) • σ (algebraMap C O d) y)]
       simp only [map_sub, map_smul, smul_sub, Finset.sum_sub_distrib, smul_smul]
@@ -221,7 +255,7 @@ theorem inf_le_sup {Idx : Type*} [Fintype Idx] (σ : O →+* Module.End k H) (χ
     | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
     | smul a x _ hx => rw [map_smul]; exact Submodule.smul_mem _ a hx
   have hpE : p - E p ∈ mSub σ (χ i) G := by
-    have : p - E p = -∑ d ∈ S, lam d • (σ (algebraMap C O d) p - χ i d • p) := by
+    have : p - E p = - ∑ d ∈ S, lam d • (σ (algebraMap C O d) p - χ i d • p) := by
       rw [hEapp]
       simp only [smul_sub, Finset.sum_sub_distrib, smul_smul]
       rw [← Finset.sum_smul, hδ i, if_pos rfl, one_smul]
@@ -240,14 +274,37 @@ end GlobalTheory.HTRho.FilDim
 
 open Module GlobalTheory.HTRho GlobalTheory.UPel.Sm GlobalTheory.UPel.Sm.Model
 
-theorem GlobalTheory.HTRho.FilDim.finrank_fildim : ∀ {k O C Idx H : Type*} [Field k] [AddCommGroup H] [Module k H] [Ring O] [CommRing C] [Algebra C O] [Fintype Idx] [FiniteDimensional k H] (σ : O →+* Module.End k H) (χ : Idx → C →+* k), Function.Injective χ → ∀ (Fil : Submodule k H), (∀ a, ∀ x ∈ Fil, σ a x ∈ Fil) → ∀ (ω : C) (r₀ r₁ : k), r₀ ≠ r₁ → (σ (algebraMap C O ω) - r₀ • 1) * (σ (algebraMap C O ω) - r₁ • 1) = 0 → (∀ i, χ i ω = r₀) → ∀ (hG : ∀ a, ∀ x ∈ Fil ⊔ LinearMap.range (σ (algebraMap C O ω) - r₀ • 1), σ a x ∈ Fil ⊔ LinearMap.range (σ (algebraMap C O ω) - r₀ • 1)) (hZ : ∀ a, ∀ x ∈ jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)), σ a x ∈ jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1))), jSub σ χ ⊤ ≤ Fil ⊔ LinearMap.range (σ (algebraMap C O ω) - r₀ • 1) → ∀ (i : Idx), let G := Fil ⊔ LinearMap.range (σ (algebraMap C O ω) - r₀ • 1); let Z := jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)); let σW := qAct (rAct σ G hG) (Z.comap G.subtype) (fun a x hx => hZ a x hx); finrank k ((G ⧸ Z.comap G.subtype) ⧸ mSub σW (χ i) ⊤) + finrank k (H ⧸ (G ⊔ mSub σ (χ i) ⊤)) = finrank k (H ⧸ mSub σ (χ i) ⊤) := by
+theorem GlobalTheory.HTRho.FilDim.finrank_fildim
+    : ∀ {k O C Idx H : Type*} [Field k] [AddCommGroup H] [Module k H] [Ring O] [CommRing C]
+        [Algebra C O] [Fintype Idx] [FiniteDimensional k H] (σ : O →+* Module.End k H)
+        (χ : Idx → C →+* k),
+      Function.Injective χ
+        → ∀ (Fil : Submodule k H),
+          (∀ a, ∀ x ∈ Fil, σ a x ∈ Fil)
+            → ∀ (ω : C) (r₀ r₁ : k),
+              r₀ ≠ r₁ → (σ (algebraMap C O ω) - r₀ • 1) * (σ (algebraMap C O ω) - r₁ • 1) = 0
+                → (∀ i, χ i ω = r₀)
+                → ∀ (hG : ∀ a, ∀ x ∈ Fil ⊔ LinearMap.range (σ (algebraMap C O ω) - r₀ • 1),
+                    σ a x ∈ Fil ⊔ LinearMap.range (σ (algebraMap C O ω) - r₀ • 1))
+                    (hZ : ∀ a, ∀ x ∈ jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1)),
+                      σ a x ∈ jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1))),
+                  jSub σ χ ⊤ ≤ Fil ⊔ LinearMap.range (σ (algebraMap C O ω) - r₀ • 1)
+                    → ∀ (i : Idx),
+                      let G := Fil ⊔ LinearMap.range (σ (algebraMap C O ω) - r₀ • 1)
+                      let Z := jSub σ χ (LinearMap.range (σ (algebraMap C O ω) - r₁ • 1))
+                      let σW := qAct (rAct σ G hG) (Z.comap G.subtype) (fun a x hx => hZ a x hx)
+                      finrank k ((G ⧸ Z.comap G.subtype) ⧸ mSub σW (χ i) ⊤)
+                          + finrank k (H ⧸ (G ⊔ mSub σ (χ i) ⊤))
+                        = finrank k (H ⧸ mSub σ (χ i) ⊤) := by
   intro k O C Idx H _ _ _ _ _ _ _ _ σ χ hχ Fil hFil ω r₀ r₁ hr hw hχω hG hZ hJ i G Z σW
   classical
   have hZG : Z ≤ G := (GlobalTheory.HTRho.FilDim.jSub_mono σ χ le_top).trans hJ
   have hZM : Z ≤ mSub σ (χ i) ⊤ :=
-    (GlobalTheory.HTRho.FilDim.jSub_le_mSub σ χ _ i).trans (GlobalTheory.HTRho.FilDim.mSub_mono σ (χ i) le_top)
+    (GlobalTheory.HTRho.FilDim.jSub_le_mSub σ χ _ i).trans
+      (GlobalTheory.HTRho.FilDim.mSub_mono σ (χ i) le_top)
   have hmG : mSub σ (χ i) G ≤ G ⊓ mSub σ (χ i) ⊤ :=
-    le_inf (GlobalTheory.HTRho.FilDim.mSub_le_of_stable σ _ G hG) (GlobalTheory.HTRho.FilDim.mSub_mono _ _ le_top)
+    le_inf (GlobalTheory.HTRho.FilDim.mSub_le_of_stable σ _ G hG)
+      (GlobalTheory.HTRho.FilDim.mSub_mono _ _ le_top)
   have heq : Z ⊔ mSub σ (χ i) G = G ⊓ mSub σ (χ i) ⊤ :=
     le_antisymm (sup_le (le_inf hZG hZM) hmG)
       (GlobalTheory.HTRho.FilDim.inf_le_sup σ χ hχ G hG ω r₀ r₁ hr hw hχω le_sup_right i)

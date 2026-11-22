@@ -13,6 +13,7 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 namespace GlobalTheory.ThK.Dbl
-theorem hgtEx_k : _root_.GlobalTheory.ThK.Dbl.HgtEx_k := _root_.GlobalTheory.ThK.Dbl.hgtEx_of_k _root_.GlobalTheory.ThK.Dbl.stab2Cpt_k
+theorem hgtEx_k : _root_.GlobalTheory.ThK.Dbl.HgtEx_k :=
+  _root_.GlobalTheory.ThK.Dbl.hgtEx_of_k _root_.GlobalTheory.ThK.Dbl.stab2Cpt_k
 end GlobalTheory.ThK.Dbl
 end

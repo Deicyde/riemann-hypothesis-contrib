@@ -9,14 +9,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.EndLoc
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.ChartRestriction.G.Out
 
 namespace GlobalTheory
 
-theorem isCommMonObj_of_grpPullback : ∀ (S S' : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (G' : Over S') [GrpObj G'] (f : S' ⟶ S) (φ : G'.left ⟶ G.left), IsGrpPullback G' G f φ → IsCommMonObj G' := by
+theorem isCommMonObj_of_grpPullback
+    : ∀ (S S' : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (G' : Over S') [GrpObj G']
+        (f : S' ⟶ S) (φ : G'.left ⟶ G.left),
+      IsGrpPullback G' G f φ → IsCommMonObj G' := by
   intro S S' G _ _ G' _ f φ h
   rw [isCommMonObj_iff_isMulCommutative]
   intro T

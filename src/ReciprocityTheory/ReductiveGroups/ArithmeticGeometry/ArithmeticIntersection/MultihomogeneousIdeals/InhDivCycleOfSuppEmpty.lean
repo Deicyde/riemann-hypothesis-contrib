@@ -14,20 +14,22 @@ section Len
 
 variable {R : Type*} [CommRing R]
 
-theorem inh_length_locQuot (W : Ideal R) [W.IsPrime] (J : Ideal R) :
-    Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (R ⧸ J)) =
-      Module.length (Localization.AtPrime W)
+theorem inh_length_locQuot (W : Ideal R) [W.IsPrime] (J : Ideal R)
+    : Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (R ⧸ J))
+      = Module.length (Localization.AtPrime W)
         (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) := by
   have := IsLocalization.linearMap_compatibleSMul W.primeCompl
-  let e := (IsLocalizedModule.linearEquiv W.primeCompl
-    ((J : Submodule R R).toLocalizedQuotient' (Localization.AtPrime W) W.primeCompl
-      (Algebra.linearMap R (Localization.AtPrime W)))
-    (LocalizedModule.mkLinearMap W.primeCompl (R ⧸ J))).restrictScalars (Localization.AtPrime W)
+  let e :=
+    (IsLocalizedModule.linearEquiv W.primeCompl
+      ((J : Submodule R R).toLocalizedQuotient' (Localization.AtPrime W) W.primeCompl
+        (Algebra.linearMap R (Localization.AtPrime W)))
+      (LocalizedModule.mkLinearMap W.primeCompl (R ⧸ J))).restrictScalars (Localization.AtPrime W)
   rw [← e.length_eq, Ideal.localized'_eq_map]
 
-theorem inh_length_quot_maximal (W : Ideal R) [W.IsPrime] :
-    Module.length (Localization.AtPrime W)
-      (Localization.AtPrime W ⧸ W.map (algebraMap R (Localization.AtPrime W))) = 1 := by
+theorem inh_length_quot_maximal (W : Ideal R) [W.IsPrime]
+    : Module.length (Localization.AtPrime W)
+        (Localization.AtPrime W ⧸ W.map (algebraMap R (Localization.AtPrime W)))
+      = 1 := by
   rw [Localization.AtPrime.map_eq_maximalIdeal, Module.length_eq_one_iff,
     isSimpleModule_iff_isCoatom]
   exact Ideal.isMaximal_def.mp inferInstance
@@ -53,9 +55,10 @@ theorem inh_minimalPrimes_top : (⊤ : Ideal R).minimalPrimes = ∅ := by
 
 variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {F : Type*} [Field F]
 
-theorem inh_divCycle_of_supp (P : Ideal (MRingOver F ι)) (s : MRingOver F ι) (Q : Ideal (MRingOver F ι))
-    (hsupp : divSupp P s = {Q}) :
-    divCycle P s = Finsupp.single Q (multAt (P ⊔ Ideal.span {s}) Q) := by
+theorem inh_divCycle_of_supp
+    (P : Ideal (MRingOver F ι)) (s : MRingOver F ι) (Q : Ideal (MRingOver F ι))
+    (hsupp : divSupp P s = {Q})
+    : divCycle P s = Finsupp.single Q (multAt (P ⊔ Ideal.span {s}) Q) := by
   classical
   ext W
   rw [divCycle, Finsupp.ofSupportFinite_coe, Finsupp.single_apply, hsupp, Set.mem_singleton_iff]
@@ -63,8 +66,9 @@ theorem inh_divCycle_of_supp (P : Ideal (MRingOver F ι)) (s : MRingOver F ι) (
   · subst h; simp
   · rw [if_neg h, if_neg (Ne.symm h)]
 
-theorem inh_divCycle_of_supp_empty (P : Ideal (MRingOver F ι)) (s : MRingOver F ι)
-    (hsupp : divSupp P s = ∅) : divCycle P s = 0 := by
+theorem inh_divCycle_of_supp_empty
+    (P : Ideal (MRingOver F ι)) (s : MRingOver F ι) (hsupp : divSupp P s = ∅)
+    : divCycle P s = 0 := by
   classical
   ext W
   rw [divCycle, Finsupp.ofSupportFinite_coe, hsupp]
@@ -75,9 +79,11 @@ theorem inh_divCycle_one (P : Ideal (MRingOver F ι)) : divCycle P 1 = 0 := by
   ext W
   simp [divSupp, Ideal.span_singleton_one, inh_minimalPrimes_top]
 
-theorem inh_divCycle_prime (P : Ideal (MRingOver F ι)) (s : MRingOver F ι) (Q : Ideal (MRingOver F ι))
-    [Q.IsPrime] (hQ : P ⊔ Ideal.span {s} = Q) (hrel : IsRelevant Q) :
-    divCycle P s = Finsupp.single Q 1 := by
+theorem inh_divCycle_prime
+    (P : Ideal (MRingOver F ι)) (s : MRingOver F ι)
+    (Q : Ideal (MRingOver F ι)) [Q.IsPrime]
+    (hQ : P ⊔ Ideal.span {s} = Q) (hrel : IsRelevant Q)
+    : divCycle P s = Finsupp.single Q 1 := by
   rw [inh_divCycle_of_supp P s Q, hQ, inh_multAt_self]
   ext W
   simp only [divSupp, hQ, Ideal.minimalPrimes_eq_subsingleton_self, Set.mem_singleton_iff,
@@ -86,8 +92,8 @@ theorem inh_divCycle_prime (P : Ideal (MRingOver F ι)) (s : MRingOver F ι) (Q 
   · exact fun h => h.1
   · rintro rfl; exact ⟨rfl, hrel⟩
 
-theorem inh_cycEval_single (J : Ideal (MRingOver F ι) → ℤ) (W : Ideal (MRingOver F ι)) (m : ℤ) :
-    cycEval J (Finsupp.single W m) = m * J W := by
+theorem inh_cycEval_single (J : Ideal (MRingOver F ι) → ℤ) (W : Ideal (MRingOver F ι)) (m : ℤ)
+    : cycEval J (Finsupp.single W m) = m * J W := by
   rw [cycEval, Finsupp.sum_single_index (zero_mul _)]
 
 end Div
@@ -100,11 +106,11 @@ end Kill
 
 section Homog
 
-variable {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} [∀ k, Fintype (ι k)] {F : Type*}
-  [Field F]
+variable
+  {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} [∀ k, Fintype (ι k)] {F : Type*} [Field F]
 
-theorem inh_homog_X_pow (p : Σ k, ι k) (m : ℕ) :
-    IsMultiHomog (X p ^ m : MRingOver F ι) (Pi.single p.1 m) := by
+theorem inh_homog_X_pow (p : Σ k, ι k) (m : ℕ)
+    : IsMultiHomog (X p ^ m : MRingOver F ι) (Pi.single p.1 m) := by
   classical
   intro n hn k
   rw [support_X_pow, Finset.mem_singleton] at hn
@@ -140,9 +146,10 @@ section Fin1
 
 variable {σ : Type*} {F : Type*} [Field F]
 
-theorem inh_finrank_quot (I : Ideal (MvPolynomial σ F)) (c : σ → F)
-    (hI : I ≤ RingHom.ker (eval c)) (hX : ∀ s, X s - C (c s) ∈ I) :
-    Module.finrank F (MvPolynomial σ F ⧸ I) = 1 := by
+theorem inh_finrank_quot
+    (I : Ideal (MvPolynomial σ F)) (c : σ → F)
+    (hI : I ≤ RingHom.ker (eval c)) (hX : ∀ s, X s - C (c s) ∈ I)
+    : Module.finrank F (MvPolynomial σ F ⧸ I) = 1 := by
   have hne : I ≠ ⊤ := by
     intro h
     have := hI (h ▸ Submodule.mem_top : (1 : MvPolynomial σ F) ∈ I)

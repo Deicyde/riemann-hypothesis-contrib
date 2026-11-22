@@ -17,7 +17,6 @@ public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PHomogeneousCo
 
 open MvPolynomial Filter Topology GlobalTheory.CompanionTheory.Ar.Top
 
-
 open GroundTheory.Heights₂.Heights.RestTerms in
 theorem RootFieldNumerics.coinv_above_top : CoinvAboveTopGeneral.Statement :=
   CoinvAboveTopGeneral.proof (CoinvAboveTop.proof
@@ -25,9 +24,16 @@ theorem RootFieldNumerics.coinv_above_top : CoinvAboveTopGeneral.Statement :=
     (CoinvIdealComponent.proof CoinvIdealRepresentation.proof HomogeneousComponentMul.proof)
     (CoinvStaircaseComponent.proof CoinvStaircaseDegree.proof))
 
-theorem RootFieldNumerics.decomposition_power_sums_top_degree : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (F : RP Ψ N), 2 ≤ N → F.IsHomogeneous (dimFl Ψ N + 1) → ∃ Q : Ψ → ℕ → RP Ψ N, (∀ τ k, 1 ≤ k → k ≤ N → (Q τ k).IsHomogeneous (dimFl Ψ N + 1 - k)) ∧ F = ∑ τ, ∑ k ∈ Finset.Icc 1 N, pk τ k * Q τ k := by
+theorem RootFieldNumerics.decomposition_power_sums_top_degree
+    : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (F : RP Ψ N),
+      2 ≤ N → F.IsHomogeneous (dimFl Ψ N + 1)
+        → ∃ Q : Ψ → ℕ → RP Ψ N,
+          (∀ τ k, 1 ≤ k → k ≤ N → (Q τ k).IsHomogeneous (dimFl Ψ N + 1 - k))
+            ∧ F = ∑ τ, ∑ k ∈ Finset.Icc 1 N, pk τ k * Q τ k := by
   intro Ψ _ _ N F _ hF
-  have hlt : Fintype.card Ψ * (Fintype.card (Fin N) * (Fintype.card (Fin N) - 1) / 2) < dimFl Ψ N + 1 := by
+  have hlt
+      : Fintype.card Ψ * (Fintype.card (Fin N) * (Fintype.card (Fin N) - 1) / 2)
+        < dimFl Ψ N + 1 := by
     simp [dimFl]
   obtain ⟨Q, hQ, hFQ⟩ := RootFieldNumerics.coinv_above_top ℝ Ψ (Fin N) (dimFl Ψ N + 1) F hF hlt
   refine ⟨fun τ k => Q k τ, fun τ k _ _ => hQ k τ, ?_⟩

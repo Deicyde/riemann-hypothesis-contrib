@@ -17,13 +17,15 @@ def ApproxRoot (p : ℕ) (v : Valuation L ℝ≥0) (F : Subfield L) : Prop :=
 
 variable {G : Type*} [Group G] [MulSemiringAction G L]
 
-abbrev Fix (L : Type*) [Field L] {G : Type*} [Group G] [MulSemiringAction G L] (N : Subgroup G) :
-    Subfield L := FixedPoints.subfield N L
+abbrev Fix (L : Type*) [Field L] {G : Type*} [Group G] [MulSemiringAction G L] (N : Subgroup G)
+    : Subfield L :=
+  FixedPoints.subfield N L
 
 def Moves (v : Valuation L ℝ≥0) (F : Subfield L) (σ : G) : Prop :=
   ∀ r : ℝ≥0, r < 1 → ∃ x ∈ F, v x ≤ 1 ∧ r < v (σ • x - x)
 
-structure IsSep (v : Valuation L ℝ≥0) (N : Subgroup G) {n : ℕ} (a b : Fin n → L) (c : L) : Prop where
+structure IsSep (v : Valuation L ℝ≥0) (N : Subgroup G) {n : ℕ} (a b : Fin n → L) (c : L)
+    : Prop where
   a_mem : ∀ i, a i ∈ Fix L N
   b_mem : ∀ i, b i ∈ Fix L N
   c_mem : c ∈ Fix L N

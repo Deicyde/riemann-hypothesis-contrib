@@ -5,14 +5,24 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanP
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+  GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ShFam.Hor.LogCh
 
-theorem exp_lattice_torsion_count : ∀ (Q : Type) [Group Q] (g r N : ℕ) (e : (Fin g → ℂ) → Q) (b : Fin r → Fin g → ℂ) (T : Set Q), 0 < N → (∀ v w, e (v + w) = e v * e w) → Function.Surjective e → IsLatBasis {w | e w = 1} b → (∀ τ ∈ T, τ ^ N = 1) → Nat.card {p : Q // p ^ N = 1} * Nat.card T = N ^ (2 * g) → ∃ S : Set (Fin r → ZMod N), N ^ r * Nat.card S = N ^ (2 * g) ∧ ∀ a : Fin r → ℤ, (fun j => (a j : ZMod N)) ∈ S → e ((N : ℂ)⁻¹ • ∑ j, a j • b j) ∈ T := by
+theorem exp_lattice_torsion_count
+    : ∀ (Q : Type) [Group Q] (g r N : ℕ) (e : (Fin g → ℂ) → Q) (b : Fin r → Fin g → ℂ) (T : Set Q),
+      0 < N → (∀ v w, e (v + w) = e v * e w) → Function.Surjective e → IsLatBasis {w | e w = 1} b
+        → (∀ τ ∈ T, τ ^ N = 1) → Nat.card {p : Q // p ^ N = 1} * Nat.card T = N ^ (2 * g)
+        → ∃ S : Set (Fin r → ZMod N),
+          N ^ r * Nat.card S = N ^ (2 * g)
+            ∧ ∀ a : Fin r → ℤ,
+              (fun j => (a j : ZMod N)) ∈ S → e ((N : ℂ)⁻¹ • ∑ j, a j • b j) ∈ T := by
   intro Q _ g r N e b T hN he _hs hb hT hcard
   haveI : NeZero N := ⟨hN.ne'⟩
   have e0 : e 0 = 1 := by
@@ -30,19 +40,23 @@ theorem exp_lattice_torsion_count : ∀ (Q : Type) [Group Q] (g r N : ℕ) (e : 
     | zero => simp [e0]
     | succ n ih => rw [succ_nsmul, he, ih, pow_succ]
   set ψ : (Fin r → ℤ) → Q := fun a => e ((N : ℂ)⁻¹ • ∑ j, a j • b j) with hψ
-  have hdiff : ∀ a a' : Fin r → ℤ, (N : ℂ)⁻¹ • ∑ j, a j • b j - (N : ℂ)⁻¹ • ∑ j, a' j • b j
-      = (N : ℂ)⁻¹ • ∑ j, (a j - a' j) • b j := by
+  have hdiff
+      : ∀ a a' : Fin r → ℤ,
+        (N : ℂ)⁻¹ • ∑ j, a j • b j - (N : ℂ)⁻¹ • ∑ j, a' j • b j
+          = (N : ℂ)⁻¹ • ∑ j, (a j - a' j) • b j := by
     intro a a'
     rw [← smul_sub, ← Finset.sum_sub_distrib]
     simp [sub_smul]
   have hN0 : (N : ℂ) ≠ 0 := by exact_mod_cast hN.ne'
 
-  have hdvd : ∀ (c m : Fin r → ℤ), (N : ℂ)⁻¹ • ∑ j, c j • b j = ∑ j, m j • b j → ∀ j, c j = N * m j := by
+  have hdvd
+      : ∀ (c m : Fin r → ℤ), (N : ℂ)⁻¹ • ∑ j, c j • b j = ∑ j, m j • b j → ∀ j, c j = N * m j := by
     intro c m h
     have h2 : ∑ j, c j • b j = (N : ℂ) • ∑ j, m j • b j := by
       rw [← h, smul_smul, mul_inv_cancel₀ hN0, one_smul]
     have h3 : ∑ j, ((c j : ℝ) - (N : ℝ) * (m j : ℝ)) • b j = 0 := by
-      simp only [sub_smul, mul_smul, Finset.sum_sub_distrib, ← Finset.smul_sum, Int.cast_smul_eq_zsmul]
+      simp only [sub_smul, mul_smul, Finset.sum_sub_distrib, ← Finset.smul_sum,
+        Int.cast_smul_eq_zsmul]
       rw [h2, Nat.cast_smul_eq_nsmul ℂ, Nat.cast_smul_eq_nsmul ℝ, sub_self]
     have h4 := Fintype.linearIndependent_iff.1 hb.1 _ h3
     intro j
@@ -60,7 +74,7 @@ theorem exp_lattice_torsion_count : ∀ (Q : Type) [Group Q] (g r N : ℕ) (e : 
       have := hdvd (fun j => a j - a' j) m hm
       intro j
       rw [ZMod.intCast_eq_intCast_iff_dvd_sub]
-      exact ⟨-m j, by have := this j; push_cast at this ⊢; linarith⟩
+      exact ⟨- m j, by have := this j; push_cast at this ⊢; linarith⟩
     · intro h
       have hk : ∀ j, ∃ k : ℤ, a j - a' j = N * k := fun j =>
         (ZMod.intCast_eq_intCast_iff_dvd_sub _ _ _).1 (h j).symm |>.imp fun k hk => by linarith

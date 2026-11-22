@@ -35,14 +35,14 @@ theorem muMaxLeMin : MuMaxLeMin := muMaxLeMin_of covolPos shortVector
 theorem orthSum : OrthSum := orthogonal_sum_slope
 
 section
-variable {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+variable
+  {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
   [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
 
-theorem covol_pos (L : Submodule ℤ E) [DiscreteTopology L] : 0 < covol L :=
-  covolPos E L ‹_›
+theorem covol_pos (L : Submodule ℤ E) [DiscreteTopology L] : 0 < covol L := covolPos E L ‹_›
 
-theorem deg_eq_deg_add_deg_quot {L N : Submodule ℤ E} [DiscreteTopology L] (hN : IsSaturated L N) :
-    deg L = deg N + deg (quot L N) :=
+theorem deg_eq_deg_add_deg_quot {L N : Submodule ℤ E} [DiscreteTopology L] (hN : IsSaturated L N)
+    : deg L = deg N + deg (quot L N) :=
   (degQuot E L N ‹_› hN).2.2
 
 end

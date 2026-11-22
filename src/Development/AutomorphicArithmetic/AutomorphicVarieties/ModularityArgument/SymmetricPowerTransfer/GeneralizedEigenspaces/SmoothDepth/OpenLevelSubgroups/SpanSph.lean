@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProductOfLoc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL Formalism.BasicNotions
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  Formalism.BasicNotions
 open UpperTheory.V.W (Plc Lp)
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 
@@ -18,22 +20,33 @@ namespace UpperTheory.V.Z.Sym.Al.SphericalSpanAlt
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-private noncomputable def intPts (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) : Subgroup (finU (E := L) (n := n)) :=
-  (GroundTheory.Automorphic.AdelicGLn.integralFiniteGL L n).comap (GlobalTheory.BCT.GlobLev.finPart L n)
+private noncomputable def intPts (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
+    : Subgroup (finU (E := L) (n := n)) :=
+  (GroundTheory.Automorphic.AdelicGLn.integralFiniteGL L n).comap
+    (GlobalTheory.BCT.GlobLev.finPart L n)
 
 private theorem isOpen_intPts : IsOpen (intPts L n : Set (finU (E := L) (n := n))) :=
-  (GroundTheory.Automorphic.AdelicGLn.isOpen_integralFiniteGL L n).preimage GlobalTheory.BCT.GlobLev.continuous_finPart
+  (GroundTheory.Automorphic.AdelicGLn.isOpen_integralFiniteGL L n).preimage
+    GlobalTheory.BCT.GlobLev.continuous_finPart
 
 private theorem isCompact_intPts : IsCompact (intPts L n : Set (finU (E := L) (n := n))) := by
-  refine IsCompact.of_isClosed_subset (GlobalTheory.BCT.GlobLev.isClosedEmbedding_finU.isCompact_preimage
-    ((GroundTheory.Automorphic.AdelicGLn.isCompact_integralFiniteGL L n).image GlobalTheory.BCT.GlobLev.continuous_finGL_ad))
-    (Subgroup.isClosed_of_isOpen _ isOpen_intPts) fun x hx => ⟨GlobalTheory.BCT.GlobLev.finPart L n x, hx, ?_⟩
+  refine IsCompact.of_isClosed_subset
+    (GlobalTheory.BCT.GlobLev.isClosedEmbedding_finU.isCompact_preimage
+      ((GroundTheory.Automorphic.AdelicGLn.isCompact_integralFiniteGL L n).image
+        GlobalTheory.BCT.GlobLev.continuous_finGL_ad))
+    (Subgroup.isClosed_of_isOpen _ isOpen_intPts)
+    fun x hx => ⟨GlobalTheory.BCT.GlobLev.finPart L n x, hx, ?_⟩
   have h1 : Matrix.GeneralLinearGroup.map (pInf L) ((x : UA L n) : GA L n) = 1 := x.2
   exact ga_ext (by rw [pInf_finGL, h1]) (by rw [pFin_finGL]; rfl)
 
-private theorem mem_intPts {k : finU (E := L) (n := n)} (h : ∀ u, cLoc u (k : UA L n) ∈ GlobalTheory.LFun.KGL u (n := n)) : k ∈ intPts L n := by
-  rw [intPts, Subgroup.mem_comap, GroundTheory.Automorphic.AdelicGLn.mem_integralFiniteGL_iff, ← map_inv]
-  simp only [GlobalTheory.BCT.GlobLev.mem_KGL_iff_val, ← map_inv, GroundTheory.Global.mem_integralFiniteAdeles] at h ⊢
+private theorem mem_intPts
+    {k : finU (E := L) (n := n)} (h : ∀ u, cLoc u (k : UA L n) ∈ GlobalTheory.LFun.KGL u (n := n))
+    : k ∈ intPts L n := by
+  rw [intPts, Subgroup.mem_comap, GroundTheory.Automorphic.AdelicGLn.mem_integralFiniteGL_iff,
+    ← map_inv]
+  simp only [GlobalTheory.BCT.GlobLev.mem_KGL_iff_val, ← map_inv,
+      GroundTheory.Global.mem_integralFiniteAdeles]
+    at h ⊢
   exact ⟨fun i j u => (h u).1 i j, fun i j u => (h u).2 i j⟩
 
 end UpperTheory.V.Z.Sym.Al.SphericalSpanAlt
@@ -42,9 +55,10 @@ namespace UpperTheory.V.Z.Sym.Al.SphericalSpanAlt
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-private theorem finite_quot (w : Plc L) (U : Subgroup (UA L n))
-    (hU : IsOpen {x : finU (E := L) (n := n) | (x : UA L n) ∈ U}) :
-    Finite ((locU n w ⊓ Kall L n : Subgroup (UA L n)) ⧸ U.subgroupOf (locU n w ⊓ Kall L n)) := by
+private theorem finite_quot
+    (w : Plc L)
+    (U : Subgroup (UA L n)) (hU : IsOpen {x : finU (E := L) (n := n) | (x : UA L n) ∈ U})
+    : Finite ((locU n w ⊓ Kall L n : Subgroup (UA L n)) ⧸ U.subgroupOf (locU n w ⊓ Kall L n)) := by
   haveI : CompactSpace (intPts L n) := isCompact_iff_compactSpace.1 isCompact_intPts
   let U' : Subgroup (finU (E := L) (n := n)) := U.subgroupOf (finU (E := L) (n := n))
   have hU' : IsOpen (U' : Set (finU (E := L) (n := n))) := hU
@@ -52,20 +66,24 @@ private theorem finite_quot (w : Plc L) (U : Subgroup (UA L n))
   have hH : IsOpen (H : Set (intPts L n)) := hU'.preimage continuous_subtype_val
   haveI : Finite (intPts L n ⧸ H) := Subgroup.quotient_finite_of_isOpen H hH
   haveI : H.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
-  have hfin : ∀ k : (locU n w ⊓ Kall L n : Subgroup (UA L n)), (k : UA L n) ∈ finU (E := L) (n := n) := fun k =>
-    (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 k.2).2).1
-  have hint : ∀ (k : (locU n w ⊓ Kall L n : Subgroup (UA L n))) (u : Plc L),
-      cLoc u (k : UA L n) ∈ GlobalTheory.LFun.KGL u (n := n) := fun k u =>
+  have hfin
+      : ∀ k : (locU n w ⊓ Kall L n : Subgroup (UA L n)), (k : UA L n) ∈ finU (E := L) (n := n) :=
+    fun k => (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 k.2).2).1
+  have hint
+      : ∀ (k : (locU n w ⊓ Kall L n : Subgroup (UA L n))) (u : Plc L),
+        cLoc u (k : UA L n) ∈ GlobalTheory.LFun.KGL u (n := n) := fun k u =>
     Subgroup.mem_comap.1 (Subgroup.mem_iInf.1 (Subgroup.mem_inf.1 (Subgroup.mem_inf.1 k.2).2).2 u)
-  let f : (locU n w ⊓ Kall L n : Subgroup (UA L n)) →* intPts L n :=
-    { toFun := fun k => ⟨⟨k.1, hfin k⟩, mem_intPts (hint k)⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl }
+  let f : (locU n w ⊓ Kall L n : Subgroup (UA L n)) →* intPts L n := {
+    toFun := fun k => ⟨⟨k.1, hfin k⟩, mem_intPts (hint k)⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
   have e : U.subgroupOf (locU n w ⊓ Kall L n) = H.comap f := by
     ext k
     rfl
   rw [e]
-  refine Finite.of_injective (fun q : _ ⧸ H.comap f => ((f (Quotient.out q) : intPts L n) : intPts L n ⧸ H))
+  refine Finite.of_injective
+    (fun q : _ ⧸ H.comap f => ((f (Quotient.out q) : intPts L n) : intPts L n ⧸ H))
     fun q q' e' => ?_
   have e'' := QuotientGroup.eq.1 e'
   rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q']
@@ -74,12 +92,18 @@ private theorem finite_quot (w : Plc L) (U : Subgroup (UA L n))
   rw [map_mul, map_inv]
   exact e''
 
-private theorem sum_translate {G X : Type} [Group G] [AddCommMonoid X] (K : Subgroup G) (K' : Subgroup K)
-    [Fintype (K ⧸ K')] (F : G → X) (hF : ∀ t, ∀ m ∈ K', F (t * ((m : K) : G)) = F t) (k : G) (hk : k ∈ K) (t : G) :
-    ∑ q : K ⧸ K', F (t * k * ((Quotient.out q : K) : G)) = ∑ q : K ⧸ K', F (t * ((Quotient.out q : K) : G)) := by
+private theorem sum_translate
+    {G X : Type} [Group G] [AddCommMonoid X]
+    (K : Subgroup G) (K' : Subgroup K) [Fintype (K ⧸ K')]
+    (F : G → X) (hF : ∀ t, ∀ m ∈ K', F (t * ((m : K) : G)) = F t)
+    (k : G) (hk : k ∈ K)
+    (t : G)
+    : ∑ q : K ⧸ K', F (t * k * ((Quotient.out q : K) : G))
+      = ∑ q : K ⧸ K', F (t * ((Quotient.out q : K) : G)) := by
   let kk : K := ⟨k, hk⟩
-  have step : ∀ q : K ⧸ K', F (t * k * ((Quotient.out q : K) : G)) =
-      F (t * ((Quotient.out (kk • q) : K) : G)) := by
+  have step
+      : ∀ q : K ⧸ K',
+        F (t * k * ((Quotient.out q : K) : G)) = F (t * ((Quotient.out (kk • q) : K) : G)) := by
     intro q
     have hm : (Quotient.out (kk • q))⁻¹ * (kk * Quotient.out q) ∈ K' := by
       rw [← QuotientGroup.eq, QuotientGroup.out_eq']
@@ -94,9 +118,16 @@ private theorem sum_translate {G X : Type} [Group G] [AddCommMonoid X] (K : Subg
 end UpperTheory.V.Z.Sym.Al.SphericalSpanAlt
 
 open UpperTheory.V.Z.Sym.Al.SphericalSpanAlt in
-theorem UpperTheory.V.Z.Sym.Al.spanSph :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (π : Submodule ℂ (UA L n → ℂ)), IsAutRepU π → ∀ w : Plc L, IsUnramU π w →
-        ∀ φ : UA L n → V, φ ≠ 0 → CoefIn φ π → ∃ φ', φ' ≠ 0 ∧ InSpan w φ φ' ∧ ∀ x ∈ locU n w ⊓ Kall L n, ∀ g, φ' (g * x) = φ' g := by
+theorem UpperTheory.V.Z.Sym.Al.spanSph
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (V : Type) [AddCommGroup V]
+        [Module ℂ V] [FiniteDimensional ℂ V] (π : Submodule ℂ (UA L n → ℂ)),
+      IsAutRepU π
+        → ∀ w : Plc L,
+          IsUnramU π w
+            → ∀ φ : UA L n → V,
+              φ ≠ 0 → CoefIn φ π
+                → ∃ φ',
+                  φ' ≠ 0 ∧ InSpan w φ φ' ∧ ∀ x ∈ locU n w ⊓ Kall L n, ∀ g, φ' (g * x) = φ' g := by
   classical
   intro L _ _ _ n V _ _ _ π hπ w hw φ h0 hc
   obtain ⟨f1, f2, -, -, f5, -⟩ := factor L n w
@@ -108,18 +139,21 @@ theorem UpperTheory.V.Z.Sym.Al.spanSph :
     exact hg0 ((Module.forall_dual_apply_eq_zero_iff ℂ _).1 hcon)
   have hhπ : f ∘ φ ∈ π := hc f
   have hh0 : f ∘ φ ≠ 0 := fun e => hf (congrFun e g0)
-  have rmul : ∀ (a b : UA L n) (F : UA L n → ℂ), RU L n (a * b) F = RU L n a (RU L n b F) :=
-    fun a b F => by rw [map_mul]; rfl
+  have rmul
+      : ∀ (a b : UA L n) (F : UA L n → ℂ),
+        RU L n (a * b) F = RU L n a (RU L n b F) := fun a b F => by
+    rw [map_mul]; rfl
 
   let S := Submodule.span ℂ (Set.range fun g : UA L n => RU L n g (f ∘ φ))
   have hSπ : S ≤ π := Submodule.span_le.2 (by rintro _ ⟨g, rfl⟩; exact hπ.stable g _ hhπ)
   have hSst : ∀ a, ∀ F ∈ S, RU L n a F ∈ S := by
     intro a F hF
-    have hle : S ≤ S.comap (RU L n a) := Submodule.span_le.2 (by
-      rintro _ ⟨g, rfl⟩
-      show RU L n a (RU L n g (f ∘ φ)) ∈ S
-      rw [← rmul]
-      exact Submodule.subset_span ⟨_, rfl⟩)
+    have hle : S ≤ S.comap (RU L n a) :=
+      Submodule.span_le.2 (by
+        rintro _ ⟨g, rfl⟩
+        show RU L n a (RU L n g (f ∘ φ)) ∈ S
+        rw [← rmul]
+        exact Submodule.subset_span ⟨_, rfl⟩)
     exact hle hF
   have hhS : f ∘ φ ∈ S := by
     have h1 : RU L n 1 (f ∘ φ) = f ∘ φ := by rw [map_one]; rfl
@@ -137,7 +171,9 @@ theorem UpperTheory.V.Z.Sym.Al.spanSph :
   choose U hUo hUf using fun g => openLev L n V π hπ (φg g) (hcoef g)
   let U0 : Subgroup (UA L n) := ⨅ g ∈ c.support, U g
   have hU0 : IsOpen {k : finU (E := L) (n := n) | (k : UA L n) ∈ U0} := by
-    have e : {k : finU (E := L) (n := n) | (k : UA L n) ∈ U0} = ⋂ g ∈ c.support, {k : finU (E := L) (n := n) | (k : UA L n) ∈ U g} := by
+    have e
+        : {k : finU (E := L) (n := n) | (k : UA L n) ∈ U0}
+          = ⋂ g ∈ c.support, {k : finU (E := L) (n := n) | (k : UA L n) ∈ U g} := by
       ext k
       simp only [U0, Subgroup.mem_iInf, Set.mem_setOf_eq, Set.mem_iInter]
     rw [e]
@@ -171,9 +207,10 @@ theorem UpperTheory.V.Z.Sym.Al.spanSph :
       f1 _ ((locU n w).mul_mem (hrepl q) (hx g)) _ (hy g)
     show f (φ (t * rep q * g)) = f (φ (t * y g * rep q * x g))
     congr 2
-    calc t * rep q * g = t * ((rep q * x g) * y g) := by
-          conv_lhs => rw [hxy g]
-          simp only [mul_assoc]
+    calc
+      t * rep q * g = t * ((rep q * x g) * y g) := by
+        conv_lhs => rw [hxy g]
+        simp only [mul_assoc]
       _ = t * y g * rep q * x g := by rw [hm]; simp only [mul_assoc]
   by_cases hall : ∀ g ∈ c.support, A g = 0
   · exfalso
@@ -194,5 +231,7 @@ theorem UpperTheory.V.Z.Sym.Al.spanSph :
       exact Submodule.sum_mem _ fun q _ =>
         Submodule.subset_span ⟨_, (locU n w).mul_mem (hrepl q) (hx g), rfl⟩
     · intro k hk t
-      exact sum_translate K K' (φg g) (fun s m hm => hUf g _ (Subgroup.mem_iInf.1
-        (Subgroup.mem_iInf.1 (Subgroup.mem_subgroupOf.1 hm) g) hg) s) k hk t
+      exact sum_translate K K' (φg g)
+        (fun s m hm =>
+          hUf g _ (Subgroup.mem_iInf.1 (Subgroup.mem_iInf.1 (Subgroup.mem_subgroupOf.1 hm) g) hg) s)
+        k hk t

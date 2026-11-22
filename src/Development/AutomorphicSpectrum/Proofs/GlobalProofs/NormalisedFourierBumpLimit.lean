@@ -9,14 +9,32 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector GlobalTheory.CompanionTheory.Hypotheses₂.OneV GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Test
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector
+  GlobalTheory.CompanionTheory.Hypotheses₂.OneV
+  GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Test
 open scoped TensorProduct ENNReal NNReal
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Test.InfLim
 
-theorem tendsto_fouInf_div_integral : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsCharAF F ψ → ∀ laminf : Measure (Ainf F), laminf.IsAddHaarMeasure → ∀ ρ : ℕ → Ainf F → ℝ, (∀ k, Continuous (ρ k) ∧ HasCompactSupport (ρ k) ∧ (∀ y, 0 ≤ ρ k y) ∧ 0 < ∫ y, ρ k y ∂laminf) → Filter.Tendsto (fun k => tsupport (ρ k)) Filter.atTop (nhds (0 : Ainf F)).smallSets → ∀ t : Ainf F, Filter.Tendsto (fun k => fouInf ψ laminf (ρ k) t / ((∫ y, ρ k y ∂laminf : ℝ) : ℂ)) Filter.atTop (nhds 1) := by
+theorem tendsto_fouInf_div_integral
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+      IsCharAF F ψ
+        → ∀ laminf : Measure (Ainf F),
+          laminf.IsAddHaarMeasure
+            → ∀ ρ : ℕ → Ainf F → ℝ,
+              (∀ k,
+                  Continuous (ρ k) ∧ HasCompactSupport (ρ k) ∧ (∀ y, 0 ≤ ρ k y)
+                    ∧ 0 < ∫ y, ρ k y ∂laminf)
+                → Filter.Tendsto
+                  (fun k => tsupport (ρ k))
+                  Filter.atTop (nhds (0 : Ainf F)).smallSets
+                → ∀ t : Ainf F,
+                  Filter.Tendsto
+                    (fun k => fouInf ψ laminf (ρ k) t / ((∫ y, ρ k y ∂laminf : ℝ) : ℂ))
+                    Filter.atTop (nhds 1) := by
   intro F _ _ ψ hψ laminf _ ρ hρ hsupp t
   haveI : BorelSpace (Ainf F) := ⟨rfl⟩
   have hg_cont : Continuous fun x : Ainf F => psiInf F ψ (x * t) := by
@@ -31,7 +49,8 @@ theorem tendsto_fouInf_div_integral : ∀ (F : Type) [Field F] [NumberField F] (
     rw [h0, AddChar.map_zero_eq_one]
   rw [Metric.tendsto_nhds]
   intro ε hε
-  have hU : (fun x : Ainf F => psiInf F ψ (x * t)) ⁻¹' Metric.ball 1 (ε / 2) ∈ nhds (0 : Ainf F) := by
+  have hU
+      : (fun x : Ainf F => psiInf F ψ (x * t)) ⁻¹' Metric.ball 1 (ε / 2) ∈ nhds (0 : Ainf F) := by
     apply hg_cont.continuousAt.preimage_mem_nhds
     rw [hg0]
     exact Metric.ball_mem_nhds _ (half_pos hε)
@@ -44,18 +63,22 @@ theorem tendsto_fouInf_div_integral : ∀ (F : Type) [Field F] [NumberField F] (
   have hi2 : Integrable (fun x => (ρ k x : ℂ) * psiInf F ψ (x * t)) laminf :=
     (hc1.mul hg_cont).integrable_of_hasCompactSupport
       (hcs1.mul_right (f' := fun x => psiInf F ψ (x * t)))
-  have key : fouInf ψ laminf (ρ k) t - ((∫ y, ρ k y ∂laminf : ℝ) : ℂ)
-      = ∫ x, (ρ k x : ℂ) * (psiInf F ψ (x * t) - 1) ∂laminf := by
+  have key
+      : fouInf ψ laminf (ρ k) t - ((∫ y, ρ k y ∂laminf : ℝ) : ℂ)
+        = ∫ x, (ρ k x : ℂ) * (psiInf F ψ (x * t) - 1) ∂laminf := by
     unfold fouInf
     rw [← integral_complex_ofReal, ← integral_sub hi2 hi1]
     congr 1
     ext x
     ring
   have hIc : ((∫ y, ρ k y ∂laminf : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hI.ne'
-  have hsplit : fouInf ψ laminf (ρ k) t / ((∫ y, ρ k y ∂laminf : ℝ) : ℂ) - 1
-      = (fouInf ψ laminf (ρ k) t - ((∫ y, ρ k y ∂laminf : ℝ) : ℂ)) / ((∫ y, ρ k y ∂laminf : ℝ) : ℂ) := by
+  have hsplit
+      : fouInf ψ laminf (ρ k) t / ((∫ y, ρ k y ∂laminf : ℝ) : ℂ) - 1
+        = (fouInf ψ laminf (ρ k) t - ((∫ y, ρ k y ∂laminf : ℝ) : ℂ))
+          / ((∫ y, ρ k y ∂laminf : ℝ) : ℂ) := by
     rw [sub_div, div_self hIc]
-  have hbound : ‖∫ x, (ρ k x : ℂ) * (psiInf F ψ (x * t) - 1) ∂laminf‖ ≤ ∫ x, ρ k x * (ε / 2) ∂laminf := by
+  have hbound
+      : ‖∫ x, (ρ k x : ℂ) * (psiInf F ψ (x * t) - 1) ∂laminf‖ ≤ ∫ x, ρ k x * (ε / 2) ∂laminf := by
     apply norm_integral_le_of_norm_le (hint.mul_const _)
     refine Filter.Eventually.of_forall fun x => ?_
     rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (hnn x)]
@@ -66,7 +89,8 @@ theorem tendsto_fouInf_div_integral : ∀ (F : Type) [Field F] [NumberField F] (
     · rw [image_eq_zero_of_notMem_tsupport hx]
       simp
   rw [integral_mul_const] at hbound
-  rw [dist_eq_norm, hsplit, key, norm_div, Complex.norm_real, Real.norm_of_nonneg hI.le, div_lt_iff₀ hI]
+  rw [dist_eq_norm, hsplit, key, norm_div, Complex.norm_real, Real.norm_of_nonneg hI.le,
+    div_lt_iff₀ hI]
   nlinarith
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Test.InfLim

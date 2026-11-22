@@ -8,15 +8,21 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsPstAtOf
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.GalOfCusp TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
-private theorem nil_of_eq {W : Type} [AddCommGroup W] [Module ℂ W] (M : End ℂ W) {p p' : Polynomial ℂ} (e : p = p')
-    (h : IsNilpotent (Polynomial.aeval M p)) : IsNilpotent (Polynomial.aeval M p') := e ▸ h
+private theorem nil_of_eq
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    (M : End ℂ W)
+    {p p' : Polynomial ℂ} (e : p = p') (h : IsNilpotent (Polynomial.aeval M p))
+    : IsNilpotent (Polynomial.aeval M p') :=
+  e ▸ h
 
-theorem UpperTheory.Gal.crystallineComparison.phiKNil_of :
-    DvdOfNil → NilWeil → NilRho → WdModel → PhiKOfNil := by
+theorem UpperTheory.Gal.crystallineComparison.phiKNil_of
+    : DvdOfNil → NilWeil → NilRho → WdModel → PhiKOfNil := by
   intro hD hW hR hM
   unfold PhiKOfNil
   intro l _ P AI hT ι E Ω _ _ _ _ _ A w h O _ _ _ Bw hj a r LL r' hm hcr Q hN s u hu hQ

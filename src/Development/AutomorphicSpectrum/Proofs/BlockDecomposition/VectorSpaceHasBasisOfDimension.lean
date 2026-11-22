@@ -4,12 +4,19 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Cup1Cobo
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.HopfC
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.HopfC
 
 namespace GlobalTheory.CompanionTheory.HopfC
 
-theorem vb_basis_of_isField {R : Type} [CommRing R] (hR : IsField R) {M : Type} [AddCommGroup M] [Module R M]
-    (g : ℕ) (h : VB R M g) : Nonempty (Module.Basis (Fin g) R M) := by
+theorem vb_basis_of_isField
+    {R : Type} [CommRing R]
+    (hR : IsField R)
+    {M : Type} [AddCommGroup M] [Module R M]
+    (g : ℕ) (h : VB R M g)
+    : Nonempty (Module.Basis (Fin g) R M) := by
   obtain ⟨hfin, -, hrank⟩ := h
   haveI : Module.Free R M := by
     letI := hR.toField

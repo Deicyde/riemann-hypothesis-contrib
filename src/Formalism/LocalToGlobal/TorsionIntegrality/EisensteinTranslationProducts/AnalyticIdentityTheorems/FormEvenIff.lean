@@ -94,7 +94,8 @@ open Cm1 Cm2
 
 theorem cmTheta0_of (h : ThetaZeroBasic) (hE : CmAltE) : CmTheta0 := by
   intro a b c d ha hd hac hodd hd8 m n z
-  have hmem : ∀ p q : ℤ, (p : ℂ) * (a : ℂ) + (q : ℂ) * cmTheta b d ∈ (cmPair a b d ha hd).lattice := by
+  have hmem
+      : ∀ p q : ℤ, (p : ℂ) * (a : ℂ) + (q : ℂ) * cmTheta b d ∈ (cmPair a b d ha hd).lattice := by
     intro p q
     have := (half_mem_iff a b d ha hd (2 * p) (2 * q)).2 ⟨even_two_mul p, even_two_mul q⟩
     convert this using 1
@@ -109,11 +110,14 @@ theorem cmTheta0_of (h : ThetaZeroBasic) (hE : CmAltE) : CmTheta0 := by
   have key := (h (cmPair a b d ha hd) (a : ℂ) ha0 ha2).2.2.2.2 _ (hmem m n) z
   rw [key]
   congr 2
-  have hsc : semiChar (cmPair a b d ha hd) ((m : ℂ) * (a : ℂ) + (n : ℂ) * cmTheta b d)
-      = if Even m ∧ Even n then 1 else -1 := by
+  have hsc
+      : semiChar (cmPair a b d ha hd) ((m : ℂ) * (a : ℂ) + (n : ℂ) * cmTheta b d)
+        = if Even m ∧ Even n then 1 else -1 := by
     unfold semiChar
     simp only [half_mem_iff a b d ha hd m n]
-  have hA : altE (cmPair a b d ha hd) ((m : ℂ) * (a : ℂ) + (n : ℂ) * cmTheta b d) (a : ℂ) = (n : ℝ) := by
+  have hA
+      : altE (cmPair a b d ha hd) ((m : ℂ) * (a : ℂ) + (n : ℂ) * cmTheta b d) (a : ℂ)
+        = (n : ℝ) := by
     have h1 := hE a b d ha hd m n 1 0
     have e : ((1 : ℤ) : ℂ) * (a : ℂ) + ((0 : ℤ) : ℂ) * cmTheta b d = (a : ℂ) := by
       push_cast
@@ -127,7 +131,8 @@ theorem cmTheta0_of (h : ThetaZeroBasic) (hE : CmAltE) : CmTheta0 := by
     obtain ⟨t, ht⟩ := hodd
     exact ⟨t, by rw [ht]; push_cast; ring⟩
   have hpar := form_even_iff a b c m n hao hbo hce
-  have hpow : ((-1 : ℂ)) ^ (cmForm a b c m n).natAbs = if Even (cmForm a b c m n) then 1 else -1 := by
+  have hpow
+      : ((-1 : ℂ)) ^ (cmForm a b c m n).natAbs = if Even (cmForm a b c m n) then 1 else -1 := by
     split_ifs with hk
     · exact (Int.natAbs_even.mpr hk).neg_one_pow
     · exact (Int.natAbs_odd.mpr (Int.not_even_iff_odd.mp hk)).neg_one_pow

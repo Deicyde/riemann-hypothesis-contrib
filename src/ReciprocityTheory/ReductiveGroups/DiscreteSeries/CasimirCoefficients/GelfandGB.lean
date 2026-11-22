@@ -11,26 +11,30 @@ open scoped ContDiff
 
 namespace ReciprocityTheory.ChartRestriction.DS.S7.GelfandGB
 
-variable {H : Type} [NormedAddCommGroup H] [NormedSpace ℂ H] [ProperSpace H] [FiniteDimensional ℂ H]
-  {K : Type} [TopologicalSpace K] [CompactSpace K] [MeasurableSpace K] [OpensMeasurableSpace K]
-  [T2Space K]
+variable
+  {H : Type} [NormedAddCommGroup H] [NormedSpace ℂ H] [ProperSpace H] [FiniteDimensional ℂ H]
+  {K : Type}
+  [TopologicalSpace K] [CompactSpace K] [MeasurableSpace K] [OpensMeasurableSpace K] [T2Space K]
   (ν : Measure K) [IsFiniteMeasure ν]
-  (c : K → H →L[ℂ] H) (hc : Continuous c) {U Ω : Set H} (hU : IsOpen U) (hΩ : IsOpen Ω)
-  (hUΩ : ∀ x ∈ U, ∀ k, c k x ∈ Ω)
+  (c : K → H →L[ℂ] H) (hc : Continuous c)
+  {U Ω : Set H} (hU : IsOpen U) (hΩ : IsOpen Ω) (hUΩ : ∀ x ∈ U, ∀ k, c k x ∈ Ω)
 
-def Mop {E' E : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E'] [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (L : K → E' →L[ℂ] E) (k : K) : (H →L[ℂ] E') →L[ℂ] (H →L[ℂ] E) :=
+def Mop
+    {E' E : Type}
+    [NormedAddCommGroup E'] [NormedSpace ℂ E'] [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (L : K → E' →L[ℂ] E) (k : K)
+    : (H →L[ℂ] E') →L[ℂ] (H →L[ℂ] E) :=
   (ContinuousLinearMap.compL ℂ H E' E (L k)).comp ((ContinuousLinearMap.compL ℂ H H E').flip (c k))
 
-omit [ProperSpace H] [FiniteDimensional ℂ H] [CompactSpace K] [MeasurableSpace K] [OpensMeasurableSpace K]
-  [T2Space K] in
+omit [ProperSpace H] [FiniteDimensional ℂ H] [CompactSpace K] [MeasurableSpace K]
+  [OpensMeasurableSpace K] [T2Space K] in
 lemma mop_apply {E' E : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E'] [NormedAddCommGroup E]
     [NormedSpace ℂ E] (L : K → E' →L[ℂ] E) (k : K) (T : H →L[ℂ] E') :
     Mop c L k T = (L k).comp (T.comp (c k)) := rfl
 
 include hc in
-omit [ProperSpace H] [FiniteDimensional ℂ H] [CompactSpace K] [MeasurableSpace K] [OpensMeasurableSpace K]
-  [T2Space K] in
+omit [ProperSpace H] [FiniteDimensional ℂ H] [CompactSpace K] [MeasurableSpace K]
+  [OpensMeasurableSpace K] [T2Space K] in
 lemma continuous_mop {E' E : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E'] [NormedAddCommGroup E]
     [NormedSpace ℂ E] {L : K → E' →L[ℂ] E} (hL : Continuous L) : Continuous (Mop c L) := by
   have h1 : Continuous fun k => ContinuousLinearMap.compL ℂ H E' E (L k) :=
@@ -83,33 +87,43 @@ lemma hasFDerivAt_param {E' E : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E
     (Filter.Eventually.of_forall fun k x hx => hD k x (hSU (Metric.ball_subset_closedBall hx)))
 
 include hc hU hΩ hUΩ in
-theorem contDiffOn_param_nat (m : ℕ) : ∀ {E' E : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E']
-    [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E] [FiniteDimensional ℂ E] (f : H → E') (L : K → E' →L[ℂ] E),
-    ContDiffOn ℂ ∞ f Ω → Continuous L → ContDiffOn ℂ m (fun x => ∫ k, L k (f (c k x)) ∂ν) U := by
+theorem contDiffOn_param_nat (m : ℕ)
+    : ∀ {E' E : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E'] [NormedAddCommGroup E]
+        [NormedSpace ℂ E] [CompleteSpace E] [FiniteDimensional ℂ E] (f : H → E')
+        (L : K → E' →L[ℂ] E),
+      ContDiffOn ℂ ∞ f Ω → Continuous L → ContDiffOn ℂ m (fun x => ∫ k, L k (f (c k x)) ∂ν) U := by
   induction m with
   | zero =>
     intro E' E _ _ _ _ _ _ f L hf hL
-    have hf1 : ContDiffOn ℂ 1 f Ω := hf.of_le (by first | exact WithTop.coe_le_coe.mpr le_top | simp | decide : (1 : WithTop ℕ∞) ≤ ∞)
+    have hf1 : ContDiffOn ℂ 1 f Ω :=
+      hf.of_le
+        (by first | exact WithTop.coe_le_coe.mpr le_top | simp | decide : (1 : WithTop ℕ∞) ≤ ∞)
     have h0 : ContDiffOn ℂ 0 (fun x => ∫ k, L k (f (c k x)) ∂ν) U :=
       contDiffOn_zero.mpr fun x hx =>
         (hasFDerivAt_param ν c hc hU hΩ hUΩ f L hf1 hL hx).continuousAt.continuousWithinAt
     exact_mod_cast h0
   | succ m ih =>
     intro E' E _ _ _ _ _ _ f L hf hL
-    have hf1 : ContDiffOn ℂ 1 f Ω := hf.of_le (by first | exact WithTop.coe_le_coe.mpr le_top | simp | decide : (1 : WithTop ℕ∞) ≤ ∞)
+    have hf1 : ContDiffOn ℂ 1 f Ω :=
+      hf.of_le
+        (by first | exact WithTop.coe_le_coe.mpr le_top | simp | decide : (1 : WithTop ℕ∞) ≤ ∞)
     have hd := fun x (hx : x ∈ U) => hasFDerivAt_param ν c hc hU hΩ hUΩ f L hf1 hL hx
     have hf' : ContDiffOn ℂ ∞ (fderiv ℂ f) Ω := ((contDiffOn_infty_iff_fderiv_of_isOpen hΩ).mp hf).2
     rw [Nat.cast_succ, contDiffOn_succ_iff_fderiv_of_isOpen hU]
-    refine ⟨fun x hx => (hd x hx).differentiableAt.differentiableWithinAt,
-      fun h => absurd h (by simp), ?_⟩
-    exact (ih (fderiv ℂ f) (fun k => Mop c L k) hf' (continuous_mop c hc hL)).congr
-      fun x hx => (hd x hx).fderiv
+    refine ⟨
+      fun x hx => (hd x hx).differentiableAt.differentiableWithinAt,
+      fun h => absurd h (by simp),
+      ?_
+    ⟩
+    exact (ih (fderiv ℂ f) (fun k => Mop c L k) hf' (continuous_mop c hc hL)).congr fun x hx =>
+      (hd x hx).fderiv
 
 include hc hU hΩ hUΩ in
-theorem contDiffOn_param {E' E : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E']
-    [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E] [FiniteDimensional ℂ E] (f : H → E') (L : K → E' →L[ℂ] E)
-    (hf : ContDiffOn ℂ ∞ f Ω) (hL : Continuous L) :
-    ContDiffOn ℂ ∞ (fun x => ∫ k, L k (f (c k x)) ∂ν) U :=
+theorem contDiffOn_param
+    {E' E : Type} [NormedAddCommGroup E'] [NormedSpace ℂ E'] [NormedAddCommGroup E]
+    [NormedSpace ℂ E] [CompleteSpace E] [FiniteDimensional ℂ E]
+    (f : H → E') (L : K → E' →L[ℂ] E) (hf : ContDiffOn ℂ ∞ f Ω) (hL : Continuous L)
+    : ContDiffOn ℂ ∞ (fun x => ∫ k, L k (f (c k x)) ∂ν) U :=
   contDiffOn_infty.mpr fun m => contDiffOn_param_nat ν c hc hU hΩ hUΩ m f L hf hL
 
 end ReciprocityTheory.ChartRestriction.DS.S7.GelfandGB

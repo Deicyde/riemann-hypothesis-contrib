@@ -9,10 +9,15 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem le_iff {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω] [Normal k Ω] (F : IntermediateField k Ω)
-    (hF : Normal k F) : (∀ a b : F ≃ₐ[k] F, a * b = b * a) ↔ ∀ a b : Ω ≃ₐ[k] Ω, a * b * a⁻¹ * b⁻¹ ∈ F.fixingSubgroup := by
+private theorem le_iff
+    {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω] [Normal k Ω]
+    (F : IntermediateField k Ω) (hF : Normal k F)
+    : (∀ a b : F ≃ₐ[k] F, a * b = b * a)
+      ↔ ∀ a b : Ω ≃ₐ[k] Ω, a * b * a⁻¹ * b⁻¹ ∈ F.fixingSubgroup := by
   haveI := hF
   constructor
   · intro hcomm a b
@@ -36,18 +41,22 @@ private theorem le_iff {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω] [Normal
     rw [mul_inv_eq_one, mul_inv_eq_iff_eq_mul] at key
     exact key
 
-private theorem le_field {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (H : Subgroup (G ℚ Ω))
+private theorem le_field
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (H : Subgroup (G ℚ Ω))
     (ho : IsOpen (H : Set (G ℚ Ω))) (hc : ∀ a b : G ℚ Ω, a * b * a⁻¹ * b⁻¹ ∈ H)
-    (hr : ∀ (φ : Ω →+* ℂ) (σ : G ℚ Ω), ComplexEmbedding.IsConj φ σ → σ ∈ H) :
-    ∃ F : IntermediateField ℚ Ω, F.fixingSubgroup = H ∧ NumberField F ∧ IsTotallyReal F ∧ IsAbelianGalois ℚ F := by
+    (hr : ∀ (φ : Ω →+* ℂ) (σ : G ℚ Ω), ComplexEmbedding.IsConj φ σ → σ ∈ H)
+    : ∃ F : IntermediateField ℚ Ω,
+      F.fixingSubgroup = H ∧ NumberField F ∧ IsTotallyReal F ∧ IsAbelianGalois ℚ F := by
   let Hc : ClosedSubgroup (G ℚ Ω) := ⟨H, Subgroup.isClosed_of_isOpen H ho⟩
   let F := IntermediateField.fixedField H
   have hfix : F.fixingSubgroup = H := InfiniteGalois.fixingSubgroup_fixedField Hc
   have hfd : FiniteDimensional ℚ F :=
     (InfiniteGalois.isOpen_iff_finite F).1 (by rw [hfix]; exact ho)
-  have hnorm : H.Normal := ⟨fun n hn g => by
-    have := H.mul_mem (hc g n) hn
-    simpa using this⟩
+  have hnorm : H.Normal :=
+    ⟨fun n hn g => by
+      have := H.mul_mem (hc g n) hn
+      simpa using this⟩
   have hgal : IsGalois ℚ F := (InfiniteGalois.normal_iff_isGalois F).1 (by rw [hfix]; exact hnorm)
   have hcomm := (le_iff F hgal.to_normal).2 (by rw [hfix]; exact hc)
   refine ⟨F, hfix, @NumberField.mk _ _ inferInstance hfd, ⟨fun v => ?_⟩, ?_⟩
@@ -65,9 +74,10 @@ private theorem le_field {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ 
     let σ : G ℚ Ω := (Complex.conjAe.restrictScalars ℚ).restrictNormal Ω
     have hσ : ∀ x, φ (σ x) = starRingEnd ℂ (φ x) := fun x =>
       AlgEquiv.restrictNormal_commutes (Complex.conjAe.restrictScalars ℚ) Ω x
-    have hconj : NumberField.ComplexEmbedding.IsConj φ σ := RingHom.ext fun x => by
-      rw [NumberField.ComplexEmbedding.conjugate_coe_eq]
-      exact (hσ x).symm
+    have hconj : NumberField.ComplexEmbedding.IsConj φ σ :=
+      RingHom.ext fun x => by
+        rw [NumberField.ComplexEmbedding.conjugate_coe_eq]
+        exact (hσ x).symm
     have hmem : σ ∈ F.fixingSubgroup := by
       rw [hfix]
       exact hr φ σ hconj
@@ -77,8 +87,8 @@ private theorem le_field {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ 
     rw [h1, ← hσ, (IntermediateField.mem_fixingSubgroup_iff F σ).1 hmem y y.2]
   · exact @IsAbelianGalois.mk _ _ _ _ _ hgal ⟨⟨fun a b => hcomm a b⟩⟩
 
-private theorem le_pow {l : ℕ} [hl : Fact l.Prime] (u : ℤ_[l]ˣ) (m : ℕ) :
-    (u ^ (l - 1)) ^ l ^ m ∈ KStar.TotallyRealRoots.princ l (m + 1) := by
+private theorem le_pow {l : ℕ} [hl : Fact l.Prime] (u : ℤ_[l]ˣ) (m : ℕ)
+    : (u ^ (l - 1)) ^ l ^ m ∈ KStar.TotallyRealRoots.princ l (m + 1) := by
   haveI : NeZero (l ^ (m + 1)) := ⟨pow_ne_zero _ hl.out.ne_zero⟩
   show KStar.TotallyRealRoots.redPow l (m + 1) ((u ^ (l - 1)) ^ l ^ m) = 1
   rw [map_pow, map_pow, ← pow_mul, mul_comm]
@@ -87,15 +97,21 @@ private theorem le_pow {l : ℕ} [hl : Fact l.Prime] (u : ℤ_[l]ˣ) (m : ℕ) :
   rw [← ht]
   exact ZMod.pow_totient _
 
-private theorem le_one {l : ℕ} [hl : Fact l.Prime] (u : ℤ_[l]ˣ) (h : ∀ m, u ∈ KStar.TotallyRealRoots.princ l m) : u = 1 := by
-  refine KStar.TotallyRealRoots.mem_of_isClosed (U := ⊥) isClosed_singleton fun b => ⟨1, one_mem _, ?_⟩
+private theorem le_one
+    {l : ℕ} [hl : Fact l.Prime] (u : ℤ_[l]ˣ) (h : ∀ m, u ∈ KStar.TotallyRealRoots.princ l m)
+    : u = 1 := by
+  refine KStar.TotallyRealRoots.mem_of_isClosed (U := ⊥) isClosed_singleton fun b =>
+    ⟨1, one_mem _, ?_⟩
   rw [map_one]
   exact (h b).symm
 
-private theorem le_compact {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    {l : ℕ} [Fact l.Prime] (χ : Γ →* ℤ_[l]ˣ) (hχ : Continuous χ) (H U : Subgroup Γ) (hH : IsClosed (H : Set Γ))
-    (hU : IsOpen (U : Set Γ)) (h : ∀ g ∈ H, χ g = 1 → g ∈ U) :
-    ∃ m, ∀ g ∈ H, χ g ∈ KStar.TotallyRealRoots.princ l m → g ∈ U := by
+private theorem le_compact
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    {l : ℕ} [Fact l.Prime]
+    (χ : Γ →* ℤ_[l]ˣ) (hχ : Continuous χ)
+    (H U : Subgroup Γ)
+    (hH : IsClosed (H : Set Γ)) (hU : IsOpen (U : Set Γ)) (h : ∀ g ∈ H, χ g = 1 → g ∈ U)
+    : ∃ m, ∀ g ∈ H, χ g ∈ KStar.TotallyRealRoots.princ l m → g ∈ U := by
   by_contra hne
   push_neg at hne
   let t : ℕ → Set Γ := fun m =>
@@ -103,19 +119,27 @@ private theorem le_compact {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopol
   have hcl : ∀ m, IsClosed (t m) := fun m =>
     (hH.inter hU.isClosed_compl).inter
       ((Subgroup.isClosed_of_isOpen _ (KStar.TotallyRealRoots.isOpen_princ m)).preimage hχ)
-  obtain ⟨g, hg⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed t
-    (fun m => Set.inter_subset_inter_right _
-      (Set.preimage_mono fun x hx => KStar.TotallyRealRoots.princ_anti (Nat.le_succ m) hx))
-    (fun m => by
-      obtain ⟨g, hgH, hgm, hgU⟩ := hne m
-      exact ⟨g, ⟨hgH, hgU⟩, hgm⟩)
-    (hcl 0).isCompact hcl
+  obtain ⟨g, hg⟩ :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed t
+      (fun m =>
+        Set.inter_subset_inter_right _
+          (Set.preimage_mono fun x hx => KStar.TotallyRealRoots.princ_anti (Nat.le_succ m) hx))
+      (fun m => by
+        obtain ⟨g, hgH, hgm, hgU⟩ := hne m
+        exact ⟨g, ⟨hgH, hgU⟩, hgm⟩)
+      (hcl 0).isCompact hcl
   rw [Set.mem_iInter] at hg
   have h1 : χ g = 1 := le_one _ (fun m => (hg m).2)
   exact (hg 0).1.2 (h g (hg 0).1.1 h1)
 
-theorem UpperTheory.V.Ws.layerEx :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ T : Tower D, T.Fit → TameL l T.F → ∀ n : ℕ, ∃ (T' : Tower D) (m : ℕ), T.Le T' ∧ IsLayer l m T.F T'.F ∧ T'.Deep ∧ n ≤ T'.d := by
+theorem UpperTheory.V.Ws.layerEx
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ T : Tower D,
+          T.Fit → TameL l T.F
+            → ∀ n : ℕ, ∃ (T' : Tower D) (m : ℕ),
+              T.Le T' ∧ IsLayer l m T.F T'.F ∧ T'.Deep ∧ n ≤ T'.d := by
   intro Ω _ _ _ l _ c D hD T hfit htame n
   obtain ⟨ho, -⟩ := hfit
   haveI := T.abF
@@ -140,29 +164,35 @@ theorem UpperTheory.V.Ws.layerEx :
       omega
   have he : l.Coprime ((l - 1) * mk) := Nat.Coprime.mul_right hcop hmk
   let U : Subgroup (G ℚ Ω) := (D.ψ ^ ((l - 1) * mk)).ker
-  have hU : IsOpen (U : Set (G ℚ Ω)) := Subgroup.isOpen_mono (fun g hg => by
-      rw [MonoidHom.mem_ker] at hg ⊢
-      rw [MonoidHom.pow_apply, hg, one_pow]) hD.psi_open
-  have hHc : IsClosed (T.F.fixingSubgroup : Set (G ℚ Ω)) := IntermediateField.fixingSubgroup_isClosed T.F
-  obtain ⟨m0, hm0⟩ := le_compact χ' hχ'c T.F.fixingSubgroup U hHc hU (fun g hg h1 => by
-    let g1 : G T.F Ω := IntermediateField.fixingSubgroupEquiv T.F ⟨g ^ (l - 1), pow_mem hg _⟩
-    have hres : resQ T.F g1 = g ^ (l - 1) := by
-      ext x
-      simp [g1, IntermediateField.fixingSubgroupEquiv]
-    have hcyc : cycZ T.F Ω l g1 = 1 := by
-      show cyclotomicCharacter Ω l (MulSemiringAction.toRingAut (G T.F Ω) Ω g1) = 1
-      have : MulSemiringAction.toRingAut (G T.F Ω) Ω g1 =
-          MulSemiringAction.toRingAut (G ℚ Ω) Ω (g ^ (l - 1)) := RingEquiv.ext fun x => by
-        show g1 x = (g ^ (l - 1)) x
-        rw [← hres]
-        rfl
-      rw [this]
-      show cycZ ℚ Ω l (g ^ (l - 1)) = 1
-      rw [map_pow, ← hχ']
-      exact h1
-    show (D.ψ ^ ((l - 1) * mk)) g = 1
-    rw [MonoidHom.pow_apply, pow_mul, ← map_pow, ← hres]
-    exact hkc g1 hcyc)
+  have hU : IsOpen (U : Set (G ℚ Ω)) :=
+    Subgroup.isOpen_mono
+      (fun g hg => by
+        rw [MonoidHom.mem_ker] at hg ⊢
+        rw [MonoidHom.pow_apply, hg, one_pow])
+      hD.psi_open
+  have hHc : IsClosed (T.F.fixingSubgroup : Set (G ℚ Ω)) :=
+    IntermediateField.fixingSubgroup_isClosed T.F
+  obtain ⟨m0, hm0⟩ :=
+    le_compact χ' hχ'c T.F.fixingSubgroup U hHc hU (fun g hg h1 => by
+      let g1 : G T.F Ω := IntermediateField.fixingSubgroupEquiv T.F ⟨g ^ (l - 1), pow_mem hg _⟩
+      have hres : resQ T.F g1 = g ^ (l - 1) := by
+        ext x
+        simp [g1, IntermediateField.fixingSubgroupEquiv]
+      have hcyc : cycZ T.F Ω l g1 = 1 := by
+        show cyclotomicCharacter Ω l (MulSemiringAction.toRingAut (G T.F Ω) Ω g1) = 1
+        have : MulSemiringAction.toRingAut (G T.F Ω) Ω g1
+            = MulSemiringAction.toRingAut (G ℚ Ω) Ω (g ^ (l - 1)) :=
+          RingEquiv.ext fun x => by
+            show g1 x = (g ^ (l - 1)) x
+            rw [← hres]
+            rfl
+        rw [this]
+        show cycZ ℚ Ω l (g ^ (l - 1)) = 1
+        rw [map_pow, ← hχ']
+        exact h1
+      show (D.ψ ^ ((l - 1) * mk)) g = 1
+      rw [MonoidHom.pow_apply, pow_mul, ← map_pow, ← hres]
+      exact hkc g1 hcyc)
   have hs0 : (D.s0 : G ℚ Ω) ∈ Ine (D.pl l) := hD.decompSigma_mem.1.1
   obtain ⟨k, hk, hsk⟩ := htame (D.pl l) (hD.pl_over l hlp) _ hs0
   obtain ⟨s, hs⟩ : ∃ s : G ℚ Ω, s = (D.s0 : G ℚ Ω) ^ k := ⟨_, rfl⟩
@@ -197,18 +227,25 @@ theorem UpperTheory.V.Ws.layerEx :
     refine KStar.TotallyRealRoots.princ_anti ?_ hmem
     have := Finset.single_le_sum (f := f) (fun i _ => Nat.zero_le _) (Finset.mem_range.2 htn)
     omega
-  let Hm : Subgroup (G ℚ Ω) := T.F.fixingSubgroup ⊓ (KStar.TotallyRealRoots.princ l (m + 1)).comap χ'
-  have hHm : ∀ g, g ∈ Hm ↔ g ∈ T.F.fixingSubgroup ∧ cycZ ℚ Ω l g ^ (l - 1) ∈ KStar.TotallyRealRoots.princ l (m + 1) := by
+  let Hm : Subgroup (G ℚ Ω) :=
+    T.F.fixingSubgroup ⊓ (KStar.TotallyRealRoots.princ l (m + 1)).comap χ'
+  have hHm
+      : ∀ g,
+        g ∈ Hm
+          ↔ g ∈ T.F.fixingSubgroup
+            ∧ cycZ ℚ Ω l g ^ (l - 1) ∈ KStar.TotallyRealRoots.princ l (m + 1) := by
     intro g
     rw [← hχ']
     rfl
   have hopen : IsOpen (Hm : Set (G ℚ Ω)) :=
-    (IntermediateField.fixingSubgroup_isOpen T.F).inter ((KStar.TotallyRealRoots.isOpen_princ (m + 1)).preimage hχ'c)
+    (IntermediateField.fixingSubgroup_isOpen T.F).inter
+      ((KStar.TotallyRealRoots.isOpen_princ (m + 1)).preimage hχ'c)
   have hcomm : ∀ a b : G ℚ Ω, a * b * a⁻¹ * b⁻¹ ∈ Hm := by
     intro a b
     rw [hHm]
     have hN : Normal ℚ T.F := T.abF.toIsGalois.to_normal
-    have hcT : ∀ x y : T.F ≃ₐ[ℚ] T.F, x * y = y * x := fun x y => T.abF.toIsMulCommutative.is_comm.comm x y
+    have hcT : ∀ x y : T.F ≃ₐ[ℚ] T.F, x * y = y * x := fun x y =>
+      T.abF.toIsMulCommutative.is_comm.comm x y
     refine ⟨(le_iff T.F hN).1 hcT a b, ?_⟩
     rw [map_mul, map_mul, map_mul, map_inv, map_inv, mul_right_comm (cycZ ℚ Ω l a), mul_inv_cancel,
       one_mul, mul_inv_cancel, one_pow]
@@ -226,8 +263,9 @@ theorem UpperTheory.V.Ws.layerEx :
       intro x hx
       apply φ.injective
       rw [hφσ]
-      have h1 := NumberField.ComplexEmbedding.isReal_iff.1
-        (NumberField.IsTotallyReal.complexEmbedding_isReal (φ.comp T.F.val.toRingHom))
+      have h1 :=
+        NumberField.ComplexEmbedding.isReal_iff.1 (NumberField.IsTotallyReal.complexEmbedding_isReal
+          (φ.comp T.F.val.toRingHom))
       have h2 := RingHom.congr_fun h1 ⟨x, hx⟩
       rw [NumberField.ComplexEmbedding.conjugate_coe_eq] at h2
       exact h2
@@ -281,8 +319,11 @@ theorem UpperTheory.V.Ws.layerEx :
     haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
     rw [← AlgHom.card ℚ F' Ω]
     let emb : Fin n → (F' →ₐ[ℚ] Ω) := fun t => ((s ^ (t : ℕ) : G ℚ Ω) : Ω →ₐ[ℚ] Ω).comp F'.val
-    have key : ∀ a b : ℕ, a < b → b < n →
-        ((s ^ a : G ℚ Ω) : Ω →ₐ[ℚ] Ω).comp F'.val = ((s ^ b : G ℚ Ω) : Ω →ₐ[ℚ] Ω).comp F'.val → False := by
+    have key
+        : ∀ a b : ℕ,
+          a < b → b < n
+            → ((s ^ a : G ℚ Ω) : Ω →ₐ[ℚ] Ω).comp F'.val = ((s ^ b : G ℚ Ω) : Ω →ₐ[ℚ] Ω).comp F'.val
+            → False := by
       intro a b hab hbn heq
       apply hmt (b - a) (by omega) (by omega)
       have hmem : s ^ (b - a) ∈ F'.fixingSubgroup := by

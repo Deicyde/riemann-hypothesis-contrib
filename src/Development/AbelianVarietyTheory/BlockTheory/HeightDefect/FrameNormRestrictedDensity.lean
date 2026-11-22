@@ -11,7 +11,8 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.FrameNormRestrictedDensity
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 variable {D : D7} {T : Core D}
 

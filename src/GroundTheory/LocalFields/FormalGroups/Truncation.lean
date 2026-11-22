@@ -13,14 +13,15 @@ section Subst
 
 variable {σ τ R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
 
-theorem le_order_subst_sub_subst {a : σ → MvPowerSeries τ S} (ha : HasSubst a)
-    (ha0 : ∀ i, constantCoeff (a i) = 0) {f g : MvPowerSeries σ R} {n : ℕ∞}
-    (h : n ≤ order (f - g)) : n ≤ order (subst a f - subst a g) := by
+theorem le_order_subst_sub_subst
+    {a : σ → MvPowerSeries τ S} (ha : HasSubst a) (ha0 : ∀ i, constantCoeff (a i) = 0)
+    {f g : MvPowerSeries σ R} {n : ℕ∞} (h : n ≤ order (f - g))
+    : n ≤ order (subst a f - subst a g) := by
   rw [← subst_sub ha]
   refine le_trans ?_ (le_order_subst ha (f - g))
-  have h1 : 1 ≤ ⨅ i, (a i).order :=
-    le_iInf fun i => one_le_order_iff_constCoeff_eq_zero.2 (ha0 i)
-  calc n ≤ 1 * order (f - g) := by simpa using h
+  have h1 : 1 ≤ ⨅ i, (a i).order := le_iInf fun i => one_le_order_iff_constCoeff_eq_zero.2 (ha0 i)
+  calc
+    n ≤ 1 * order (f - g) := by simpa using h
     _ ≤ _ := by gcongr
 
 private def Close (n k : ℕ∞) (u v : MvPowerSeries τ S) : Prop :=
@@ -78,17 +79,20 @@ private lemma close_monomial {n : ℕ∞} {a b : σ → MvPowerSeries τ S}
     (v := fun i => b i ^ d i) (fun i _ => close_pow (h i) (d i))
   simpa [Finsupp.prod, Finsupp.degree_apply] using this
 
-theorem add_le_order_subst_sub_subst {a b : σ → MvPowerSeries τ S} (ha : HasSubst a)
-    (hb : HasSubst b) (ha0 : ∀ i, constantCoeff (a i) = 0)
-    (hb0 : ∀ i, constantCoeff (b i) = 0) {n : ℕ∞} (hab : ∀ i, n ≤ order (a i - b i))
-    {f : MvPowerSeries σ R} {m : ℕ∞} (hf : m ≤ order f) :
-    n + m ≤ order (subst a f - subst b f) + 1 := by
-  have hclose : ∀ i, Close n 1 (a i) (b i) := fun i =>
-    ⟨one_le_order_iff_constCoeff_eq_zero.2 (ha0 i),
-      one_le_order_iff_constCoeff_eq_zero.2 (hb0 i), add_le_add (hab i) le_rfl⟩
+theorem add_le_order_subst_sub_subst
+    {a b : σ → MvPowerSeries τ S} (ha : HasSubst a) (hb : HasSubst b)
+    (ha0 : ∀ i, constantCoeff (a i) = 0) (hb0 : ∀ i, constantCoeff (b i) = 0)
+    {n : ℕ∞} (hab : ∀ i, n ≤ order (a i - b i))
+    {f : MvPowerSeries σ R} {m : ℕ∞} (hf : m ≤ order f)
+    : n + m ≤ order (subst a f - subst b f) + 1 := by
+  have hclose : ∀ i, Close n 1 (a i) (b i) := fun i => ⟨
+    one_le_order_iff_constCoeff_eq_zero.2 (ha0 i),
+    one_le_order_iff_constCoeff_eq_zero.2 (hb0 i),
+    add_le_add (hab i) le_rfl
+  ⟩
 
-  have hcoeff : ∀ e : τ →₀ ℕ, (e.degree : ℕ∞) + 1 < n + m →
-      coeff e (subst a f - subst b f) = 0 := by
+  have hcoeff
+      : ∀ e : τ →₀ ℕ, (e.degree : ℕ∞) + 1 < n + m → coeff e (subst a f - subst b f) = 0 := by
     intro e he
     rw [map_sub, coeff_subst ha, coeff_subst hb,
       ← finsum_sub_distrib (coeff_subst_finite ha f e) (coeff_subst_finite hb f e)]
@@ -98,8 +102,8 @@ theorem add_le_order_subst_sub_subst {a b : σ → MvPowerSeries τ S} (ha : Has
     rw [← smul_sub, ← map_sub]
     obtain ⟨-, -, hdc⟩ := close_monomial hclose d
     have hmd : m ≤ (d.degree : ℕ∞) := hf.trans (order_le hd)
-    have : (e.degree : ℕ∞) + 1 < order ((d.prod fun s e => a s ^ e) -
-        (d.prod fun s e => b s ^ e)) + 1 :=
+    have : (e.degree : ℕ∞) + 1
+        < order ((d.prod fun s e => a s ^ e) - (d.prod fun s e => b s ^ e)) + 1 :=
       he.trans_le ((add_le_add le_rfl hmd).trans hdc)
     rw [coeff_of_lt_order ((ENat.add_lt_add_iff_right ENat.one_ne_top).1 this), smul_zero]
   by_contra hlt
@@ -117,10 +121,11 @@ section FixedPoint
 
 variable {σ R : Type*} [CommRing R]
 
-theorem existsUnique_fixedPoint (Φ : MvPowerSeries σ R → MvPowerSeries σ R)
-    (hΦ : ∀ f g : MvPowerSeries σ R, ∀ n : ℕ, (n : ℕ∞) ≤ order (f - g) →
-      ((n + 1 : ℕ) : ℕ∞) ≤ order (Φ f - Φ g)) :
-    ∃! f, Φ f = f :=
+theorem existsUnique_fixedPoint
+    (Φ : MvPowerSeries σ R → MvPowerSeries σ R)
+    (hΦ : ∀ f g : MvPowerSeries σ R, ∀ n : ℕ,
+      (n : ℕ∞) ≤ order (f - g) → ((n + 1 : ℕ) : ℕ∞) ≤ order (Φ f - Φ g))
+    : ∃! f, Φ f = f :=
   _root_.UpperTheory.Reformulated.B.Ydb5.existsUnique_fixedPoint Φ hΦ
 
 end FixedPoint

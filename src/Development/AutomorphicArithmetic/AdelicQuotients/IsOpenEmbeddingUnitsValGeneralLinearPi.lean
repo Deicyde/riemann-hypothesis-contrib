@@ -4,8 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.isOpenEmbedding_units_val_generalLinearPi :
-    ∀ (W : Type) [Finite W] (K : W → Type) [∀ w, NontriviallyNormedField (K w)] (n : ℕ), Topology.IsOpenEmbedding (Units.val : GL (Fin n) (∀ w, K w) → Matrix (Fin n) (Fin n) (∀ w, K w)) := by
+theorem UpperTheory.isOpenEmbedding_units_val_generalLinearPi
+    : ∀ (W : Type) [Finite W] (K : W → Type) [∀ w, NontriviallyNormedField (K w)] (n : ℕ),
+      Topology.IsOpenEmbedding
+        (Units.val : GL (Fin n) (∀ w, K w) → Matrix (Fin n) (Fin n) (∀ w, K w)) := by
   intro W _ K _ n
   have hdet : Continuous (fun M : Matrix (Fin n) (Fin n) (∀ w, K w) => M.det) :=
     continuous_id.matrix_det
@@ -18,9 +20,11 @@ theorem UpperTheory.isOpenEmbedding_units_val_generalLinearPi :
   refine ⟨?_, ?_⟩
   · refine Units.isEmbedding_val_mk'
       (f := fun M : Matrix (Fin n) (Fin n) (∀ w, K w) =>
-        (fun w => (M.det w)⁻¹ : ∀ w, K w) • M.adjugate) ?_ ?_
-    · have h1 : ContinuousOn (fun M : Matrix (Fin n) (Fin n) (∀ w, K w) =>
-          (fun w => (M.det w)⁻¹ : ∀ w, K w)) {x | IsUnit x} := by
+        (fun w => (M.det w)⁻¹ : ∀ w, K w) • M.adjugate)
+      ?_ ?_
+    · have h1 : ContinuousOn
+          (fun M : Matrix (Fin n) (Fin n) (∀ w, K w) => (fun w => (M.det w)⁻¹ : ∀ w, K w))
+          {x | IsUnit x} := by
         refine continuousOn_pi.2 fun w => ?_
         exact (((continuous_apply w).comp hdet).continuousOn).inv₀ fun M hM => (hU M).1 hM w
       refine continuousOn_pi.2 fun i => continuousOn_pi.2 fun j => ?_

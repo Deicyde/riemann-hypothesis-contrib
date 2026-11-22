@@ -29,8 +29,9 @@ private lemma split_of_units {A : Type} [CommRing A] [Nontrivial A] (q : ℕ) (�
   simp only [natDegree_X_sub_C, Finset.sum_const, Finset.card_range, smul_eq_mul, mul_one]
   rw [← map_one C, natDegree_X_pow_sub_C _]
 
-theorem UpperTheory.exists_goodRoot_of_henselian_sepClosed_residue :
-    ∀ (A : Type) [CommRing A] [HenselianLocalRing A] [IsSepClosed (ResidueField A)] (q : ℕ), IsUnit (q : A) → ∃ ζ : A, GoodRoot q ζ := by
+theorem UpperTheory.exists_goodRoot_of_henselian_sepClosed_residue
+    : ∀ (A : Type) [CommRing A] [HenselianLocalRing A] [IsSepClosed (ResidueField A)] (q : ℕ),
+      IsUnit (q : A) → ∃ ζ : A, GoodRoot q ζ := by
   intro A _ _ _ q hqu
   have hqk : ((q : ResidueField A)) ≠ 0 := by
     rw [← map_natCast (residue A)]
@@ -46,18 +47,20 @@ theorem UpperTheory.exists_goodRoot_of_henselian_sepClosed_residue :
   have hmon : (Polynomial.X ^ q - 1 : Polynomial A).Monic := by
     have h := Polynomial.monic_X_pow_sub_C (1 : A) hq0
     rwa [map_one] at h
-  obtain ⟨ζ, hroot, hζ⟩ := HenselianLocalRing.is_henselian (Polynomial.X ^ q - 1 : Polynomial A) hmon a0
-    (by
-      rw [← residue_eq_zero_iff]
-      simp [hz.pow_eq_one])
-    (by
-      simp only [Polynomial.derivative_sub, Polynomial.derivative_one, sub_zero,
-        Polynomial.derivative_X_pow, Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_natCast,
-        Polynomial.eval_pow, Polynomial.eval_X]
-      exact hqu.mul (ha0.pow _))
+  obtain ⟨ζ, hroot, hζ⟩ :=
+    HenselianLocalRing.is_henselian (Polynomial.X ^ q - 1 : Polynomial A) hmon a0
+      (by
+        rw [← residue_eq_zero_iff]
+        simp [hz.pow_eq_one])
+      (by
+        simp only [Polynomial.derivative_sub, Polynomial.derivative_one, sub_zero,
+          Polynomial.derivative_X_pow, Polynomial.eval_mul, Polynomial.eval_C,
+          Polynomial.eval_natCast, Polynomial.eval_pow, Polynomial.eval_X]
+        exact hqu.mul (ha0.pow _))
   have hζq : ζ ^ q = 1 := by
     have h := hroot.eq_zero
-    simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_one] at h
+    simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_one]
+      at h
     exact sub_eq_zero.1 h
   have hres : residue A ζ = residue A a0 := by
     rw [← sub_eq_zero, ← map_sub, residue_eq_zero_iff]
@@ -71,8 +74,9 @@ theorem UpperTheory.exists_goodRoot_of_henselian_sepClosed_residue :
   · intro a b hab
     exact hunits a.val (ZMod.val_lt a) b.val (ZMod.val_lt b) (fun h => hab (ZMod.val_injective q h))
   · intro S' _ φ x
-    have key := split_of_units q ζ hq0 hζq
-      (fun i hi j hj hij => hunits i (Finset.mem_range.1 hi) j (Finset.mem_range.1 hj) hij)
+    have key :=
+      split_of_units q ζ hq0 hζq
+        (fun i hi j hj hij => hunits i (Finset.mem_range.1 hi) j (Finset.mem_range.1 hj) hij)
     have h := congrArg (Polynomial.eval₂ φ x) key
     simpa [Polynomial.eval₂_finsetProd, Polynomial.eval₂_pow, Polynomial.eval₂_C] using h
 

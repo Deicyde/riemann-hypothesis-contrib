@@ -13,22 +13,27 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsM
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.TateOrthV
 
-theorem exists_unitLattice {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (LL : Type)
-    [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL]
-    (hO : GoodO (Qp := ℚ_[l]) LL O) :
-    ∃ L1 : Lattice (O := O) (charRep (cycLL (P.PD K) LL)),
+theorem exists_unitLattice
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l) (K : FinExt l)
+    (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+    (O : Type) [CommRing O] [Algebra O LL]
+    (hO : GoodO (Qp := ℚ_[l]) LL O)
+    : ∃ L1 : Lattice (O := O) (charRep (cycLL (P.PD K) LL)),
       L1.T = LinearMap.range (Algebra.linearMap O LL) := by
   have hχ : ∀ g, ∃ b : O, ((cycLL (P.PD K) LL g : LLˣ) : LL) = algebraMap O LL b := by
     intro g
     refine Formalism.MainNotions.BlochKatoDuality.Br.zl_int hO _ ?_
     rw [P.PD_χ K g]
     obtain ⟨a, ha, _⟩ := P.χQ_cyc (g : GQ l) 0 1 (one_pow _)
-    have h1 : ((P.χQ (g : GQ l) : ℚ_[l]ˣ) : ℚ_[l]) =
-        (((P.χQ (g : GQ l) : ℚ_[l]ˣ) : ℚ_[l]) - (a : ℚ_[l])) + (a : ℚ_[l]) := by
+    have h1
+        : ((P.χQ (g : GQ l) : ℚ_[l]ˣ) : ℚ_[l])
+          = (((P.χQ (g : GQ l) : ℚ_[l]ˣ) : ℚ_[l]) - (a : ℚ_[l])) + (a : ℚ_[l]) := by
       ring
     rw [h1]
     refine (Padic.nonarchimedean _ _).trans (max_le ?_ ?_)
@@ -43,29 +48,45 @@ theorem exists_unitLattice {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K : FinExt
     rw [map_mul, hb, smul_eq_mul]
   · rw [← Submodule.map_top]
     exact Submodule.FG.map _ Module.Finite.fg_top
-  · exact Module.Free.of_equiv
-      (LinearEquiv.ofInjective (Algebra.linearMap O LL) (IsFractionRing.injective O LL))
+  · exact Module.Free.of_equiv (LinearEquiv.ofInjective (Algebra.linearMap O LL)
+      (IsFractionRing.injective O LL))
   · rw [eq_top_iff]
     intro x _
-    have h1 : (1 : LL) ∈ Submodule.span LL
-        ((LinearMap.range (Algebra.linearMap O LL) : Submodule O LL) : Set LL) :=
+    have h1
+        : (1 : LL) ∈ Submodule.span LL
+          ((LinearMap.range (Algebra.linearMap O LL) : Submodule O LL) : Set LL) :=
       Submodule.subset_span ⟨1, by simp⟩
     simpa using Submodule.smul_mem _ x h1
 
-theorem cocycle_mem_coboundaries_of_tate_orthogonal' : Formalism.GaloisCohomology.LocalTateDualityK → ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ (A A' : GRep ↥(GK K) ℚ_[l] LL O) (m : A.V →ₗ[LL] A'.V →ₗ[LL] LL), IsDual1 (P.PD K) A.ρ A'.ρ m → ∀ b ∈ continuousCocycles A'.ρ, (∀ a ∈ continuousCocycles A.ρ, CobL (P.PD K) (cupL A'.ρ m a b)) → b ∈ B1 A'.ρ := by
+theorem cocycle_mem_coboundaries_of_tate_orthogonal'
+    : Formalism.GaloisCohomology.LocalTateDualityK
+      → ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (LL : Type) [Field LL]
+          [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL],
+        GoodO (Qp := ℚ_[l]) LL O
+          → ∀ (A A' : GRep ↥(GK K) ℚ_[l] LL O) (m : A.V →ₗ[LL] A'.V →ₗ[LL] LL),
+            IsDual1 (P.PD K) A.ρ A'.ρ m
+              → ∀ b ∈ continuousCocycles A'.ρ,
+                (∀ a ∈ continuousCocycles A.ρ, CobL (P.PD K) (cupL A'.ρ m a b)) → b ∈ B1 A'.ρ := by
   intro hT l _ P K LL _ _ _ O _ _ hO A A' m hm b hb horth
   obtain ⟨⟨hDom, hDVR, hFrac⟩, hfd, hmt, htr, hopen⟩ := id hO
-  haveI := hDom; haveI := hDVR; haveI := hFrac; haveI := htr
+  haveI := hDom
+  haveI := hDVR
+  haveI := hFrac
+  haveI := htr
   haveI : IsTopologicalAddGroup A'.V := IsModuleTopology.topologicalAddGroup LL A'.V
   obtain ⟨L1, hL1⟩ := exists_unitLattice P K LL O hO
-  obtain ⟨LA, LA', hLL', -⟩ := GlobalTheory.T.exists_mutuallyDual_stable_lattices l P K LL O hO A A' m hm
-  have hT'open : IsOpen (LA'.T : Set A'.V) := Formalism.MainNotions.BlochKatoDuality.Br.lat_open hopen LA'.T LA'.fg LA'.span
+  obtain ⟨LA, LA', hLL', -⟩ :=
+    GlobalTheory.T.exists_mutuallyDual_stable_lattices l P K LL O hO A A' m hm
+  have hT'open : IsOpen (LA'.T : Set A'.V) :=
+    Formalism.MainNotions.BlochKatoDuality.Br.lat_open hopen LA'.T LA'.fg LA'.span
   have hL1open : IsOpen (L1.T : Set LL) := by
     rw [hL1]
-    have e : ((LinearMap.range (Algebra.linearMap O LL) : Submodule O LL) : Set LL) =
-        Set.range (algebraMap O LL) := by
+    have e
+        : ((LinearMap.range (Algebra.linearMap O LL) : Submodule O LL) : Set LL)
+          = Set.range (algebraMap O LL) := by
       ext y; simp [Algebra.linearMap_apply]
-    rw [e]; exact hopen
+    rw [e]
+    exact hopen
   have hp : ((l : ℕ) : LL) ≠ 0 := by
     rw [← map_natCast (algebraMap ℚ_[l] LL)]
     exact (map_ne_zero _).2 (by exact_mod_cast (Fact.out : l.Prime).ne_zero)
@@ -81,7 +102,10 @@ theorem cocycle_mem_coboundaries_of_tate_orthogonal' : Formalism.GaloisCohomolog
     set s : LL := (((l : ℕ) : LL) ^ n)⁻¹ with hs
     let c : ↥(GK K) → A'.V ⧸ LA'.T := fun g => Submodule.Quotient.mk (s • b g)
     have hcZ : c ∈ divisibleCocycles LA' := by
-      refine ⟨Formalism.MainNotions.BlochKatoDuality.Br.locConst_mk LA'.T hT'open _ (hb.1.const_smul s), fun g h => ?_⟩
+      refine ⟨
+        Formalism.MainNotions.BlochKatoDuality.Br.locConst_mk LA'.T hT'open _ (hb.1.const_smul s),
+        fun g h => ?_
+      ⟩
       show Submodule.Quotient.mk (s • b (g * h)) = Submodule.Quotient.mk (s • b g) +
         actD LA' g (Submodule.Quotient.mk (s • b h))
       rw [hb.2 g h, smul_add, Submodule.Quotient.mk_add]
@@ -91,12 +115,19 @@ theorem cocycle_mem_coboundaries_of_tate_orthogonal' : Formalism.GaloisCohomolog
     have hcorth : ∀ d ∈ latticeCocycles LA, CobO (P.PD K) L1 (cupLD LA' m d c) := by
       intro d hd
       obtain ⟨f, hfc, hf⟩ := horth d hd.1
-      refine ⟨fun g => (Submodule.Quotient.mk (s • f g) : LL ⧸ L1.T),
-        ⟨Formalism.MainNotions.BlochKatoDuality.Br.locConst_mk L1.T hL1open _ (hfc.const_smul s), fun _ => Submodule.mem_top⟩, ?_⟩
+      refine ⟨
+        fun g => (Submodule.Quotient.mk (s • f g) : LL ⧸ L1.T),
+        ⟨
+          Formalism.MainNotions.BlochKatoDuality.Br.locConst_mk L1.T hL1open _ (hfc.const_smul s),
+          fun _ => Submodule.mem_top
+        ⟩,
+        ?_
+      ⟩
       funext x
       obtain ⟨g, h⟩ := x
-      have hf' : ((cycLL (P.PD K) LL g : LLˣ) : LL) • f h - f (g * h) + f g =
-          m (d g) (A'.ρ g (b h)) := congrFun hf (g, h)
+      have hf'
+          : ((cycLL (P.PD K) LL g : LLˣ) : LL) • f h - f (g * h) + f g = m (d g) (A'.ρ g (b h)) :=
+        congrFun hf (g, h)
       have hlift : liftD LA' (c h) - s • b h ∈ LA'.T :=
         (Submodule.Quotient.eq _).1 (Submodule.Quotient.mk_surjective LA'.T (c h)).choose_spec
       obtain ⟨e, he⟩ := (hLL'.2 _).1 (LA'.stable g _ hlift) (d g) (hd.2 g (Set.mem_univ g))
@@ -104,24 +135,35 @@ theorem cocycle_mem_coboundaries_of_tate_orthogonal' : Formalism.GaloisCohomolog
           Submodule.Quotient.mk (s • f (g * h)) + Submodule.Quotient.mk (s • f g) =
           Submodule.Quotient.mk (m (d g) (A'.ρ g (liftD LA' (c h))))
       rw [← Submodule.Quotient.mk_sub, ← Submodule.Quotient.mk_add, Submodule.Quotient.eq, hL1]
-      have e1 : ((cycLL (P.PD K) LL g : LLˣ) : LL) • (s • f h) - s • f (g * h) + s • f g =
-          s • m (d g) (A'.ρ g (b h)) := by
+      have e1
+          : ((cycLL (P.PD K) LL g : LLˣ) : LL) • (s • f h) - s • f (g * h) + s • f g
+            = s • m (d g) (A'.ρ g (b h)) := by
         rw [← hf']; simp only [smul_eq_mul]; ring
-      have e2 : m (d g) (A'.ρ g (liftD LA' (c h))) =
-          s • m (d g) (A'.ρ g (b h)) + m (d g) (A'.ρ g (liftD LA' (c h) - s • b h)) := by
+      have e2
+          : m (d g) (A'.ρ g (liftD LA' (c h)))
+            = s • m (d g) (A'.ρ g (b h)) + m (d g) (A'.ρ g (liftD LA' (c h) - s • b h)) := by
         simp only [map_sub, map_smul, add_sub_cancel]
       rw [e1, e2]
       refine ⟨-e, ?_⟩
       show algebraMap O LL (-e) = _
       rw [map_neg, ← he]
       abel
-    obtain ⟨xbar, hx⟩ := GlobalTheory.TateOrth.mem_BD_of_orthogonal hT l P K LL O hO L1 hL1 A A' LA LA' m
-      hLL' c hcZ hcorth
+    obtain ⟨xbar, hx⟩ :=
+      GlobalTheory.TateOrth.mem_BD_of_orthogonal hT l P K LL O hO L1 hL1 A A' LA LA' m hLL' c hcZ
+        hcorth
     obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective LA'.T xbar
-    refine ⟨fun g => s • b g - (A'.ρ g x - x), ⟨(continuousCocycles A'.ρ).sub_mem ((continuousCocycles A'.ρ).smul_mem s hb) (hcobZ x),
-      fun g _ => ?_⟩, ?_⟩
-    · have hg : Submodule.Quotient.mk (A'.ρ g x) - Submodule.Quotient.mk x =
-          (Submodule.Quotient.mk (s • b g) : A'.V ⧸ LA'.T) := congrFun hx g
+    refine ⟨
+      fun g => s • b g - (A'.ρ g x - x),
+      ⟨
+        (continuousCocycles A'.ρ).sub_mem ((continuousCocycles A'.ρ).smul_mem s hb) (hcobZ x),
+        fun g _ => ?_
+      ⟩,
+      ?_
+    ⟩
+    · have hg
+          : Submodule.Quotient.mk (A'.ρ g x) - Submodule.Quotient.mk x
+            = (Submodule.Quotient.mk (s • b g) : A'.V ⧸ LA'.T) :=
+        congrFun hx g
       rw [← Submodule.Quotient.mk_sub] at hg
       exact (Submodule.Quotient.eq _).1 hg.symm
     · refine ⟨(((l : ℕ) : LL) ^ n) • x, ?_⟩
@@ -149,7 +191,8 @@ theorem cocycle_mem_coboundaries_of_tate_orthogonal' : Formalism.GaloisCohomolog
     exact hmem (Ideal.span_singleton_eq_top.1 htop)
   haveI hfinH : Module.Finite O (LatticeCohomology LA') :=
     GlobalTheory.TateFiniteH1.tate_finH1 hT l P K LL O hO A' LA'
-  let S : Submodule O ↥(latticeCocycles LA') := ((B1 A'.ρ).restrictScalars O).comap (latticeCocycles LA').subtype
+  let S : Submodule O ↥(latticeCocycles LA') :=
+    ((B1 A'.ρ).restrictScalars O).comap (latticeCocycles LA').subtype
   have hBS : (latticeCoboundaries LA').comap (latticeCocycles LA').subtype ≤ S := by
     rintro z ⟨y, -, hy⟩
     exact ⟨y, hy⟩
@@ -165,8 +208,9 @@ theorem cocycle_mem_coboundaries_of_tate_orthogonal' : Formalism.GaloisCohomolog
     rw [← Submodule.mem_bot O, ← hK, Submodule.mem_iInf]
     intro i
     obtain ⟨β, hβ, hbβ⟩ := key i
-    have heq : (Submodule.Quotient.mk ⟨β0, hβ0⟩ : ↥(latticeCocycles LA') ⧸ S) =
-        (((l : ℕ) : O) ^ i) • Submodule.Quotient.mk ⟨β, hβ⟩ := by
+    have heq
+        : (Submodule.Quotient.mk ⟨β0, hβ0⟩ : ↥(latticeCocycles LA') ⧸ S)
+          = (((l : ℕ) : O) ^ i) • Submodule.Quotient.mk ⟨β, hβ⟩ := by
       rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.eq]
       show β0 - (((l : ℕ) : O) ^ i) • β ∈ B1 A'.ρ
       have h1 : β0 - (((l : ℕ) : O) ^ i) • β = (b - ((l : LL) ^ i) • β) - (b - β0) := by

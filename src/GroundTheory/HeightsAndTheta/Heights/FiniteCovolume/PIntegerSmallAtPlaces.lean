@@ -9,8 +9,8 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open NumberField
 
-theorem IntegerSmallAtPlaces.proof (E : Type*) [Field E] [NumberField E] :
-    IntegerSmallAtPlaces.Statement E := by
+theorem IntegerSmallAtPlaces.proof (E : Type*) [Field E] [NumberField E]
+    : IntegerSmallAtPlaces.Statement E := by
   intro a ha hlt
   by_contra hne
   let b : 𝓞 E := ⟨a, ha⟩

@@ -7,13 +7,14 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGerm
 
 namespace Formalism.FourierDecayAlt.P.CutBP
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Filter Topology MeasureTheory
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Filter Topology
+  MeasureTheory
 open scoped ComplexConjugate
 
 noncomputable section
 
-theorem good_positioned_of_cut {P : M.Par} {l0 : ℕ} {w : List C.Letter} (hw : KB.CutWord P l0 w) :
-    Wd.Good (D.positionted w) := by
+theorem good_positioned_of_cut {P : M.Par} {l0 : ℕ} {w : List C.Letter} (hw : KB.CutWord P l0 w)
+    : Wd.Good (D.positionted w) := by
   refine ⟨?_, ?_, ?_⟩
   · simp only [D.positionted, List.map_ofFn]
     exact List.nodup_ofFn.mpr (fun a b h => h)
@@ -46,11 +47,13 @@ section betaR
 
 open Formalism.FourierDecayAlt.B
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem beta_congr_right (Bs : RealPlaceData k r Wp Wq) {F G G₂ : Mat k r → (Wq →L[ℂ] Wp)}
-    (h : ∀ g ∈ GV k r, G g = G₂ g) : beta Bs F G = beta Bs F G₂ := by
+theorem beta_congr_right
+    (Bs : RealPlaceData k r Wp Wq) {F G G₂ : Mat k r → (Wq →L[ℂ] Wp)} (h : ∀ g ∈ GV k r, G g = G₂ g)
+    : beta Bs F G = beta Bs F G₂ := by
   unfold B.beta betaBig
   refine integral_congr_ae ?_
   filter_upwards [ae_imp_of_ae_restrict (Formalism.FourierDecayAlt.P.big_cell_orbit_set k r Wp Wq Bs)] with q hq
@@ -69,10 +72,14 @@ theorem beta_congr_right (Bs : RealPlaceData k r Wp Wq) {F G G₂ : Mat k r → 
 
 end betaR
 
-theorem cutF_eq_on_gv {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] (Bs : B.RealPlaceData k r Wp Wq) {χ : ℝ → ℝ} (hχ : C6.IsCut0 χ)
-    {F : B.Mat k r → (Wq →L[ℂ] Wp)} {δ : ℝ} (hG : ∀ g ∈ B.GV k r, F g ≠ 0 → δ ≤ Gf k r Bs.z Bs.z' g) {ε : ℝ}
-    (hε : 0 < ε) (hεδ : ε ≤ δ) : ∀ g ∈ B.GV k r, D.cutF Bs χ F ε g = F g := by
+theorem cutF_eq_on_gv
+    {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+    (Bs : B.RealPlaceData k r Wp Wq)
+    {χ : ℝ → ℝ} (hχ : C6.IsCut0 χ)
+    {F : B.Mat k r → (Wq →L[ℂ] Wp)} {δ : ℝ} (hG : ∀ g ∈ B.GV k r, F g ≠ 0 → δ ≤ Gf k r Bs.z Bs.z' g)
+    {ε : ℝ} (hε : 0 < ε) (hεδ : ε ≤ δ)
+    : ∀ g ∈ B.GV k r, D.cutF Bs χ F ε g = F g := by
   intro g hg
   simp only [D.cutF]
   by_cases hF : F g = 0
@@ -85,15 +92,19 @@ theorem cutF_eq_on_gv {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerP
 
 section place
 
-variable {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+variable
+  {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
 def LimPos (p : KB.Pl P Wp Wq) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (Y : Finset ℝ) (N : ℕ) : Prop :=
   ∀ w, TBB.AdmW P p.l0 Y w → w.length ≤ N → 0 ≤ (p.RR F 0 w [] []).re
 
-def LimBd (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (Y : Finset ℝ) (N : ℕ) : Prop :=
-  ∀ w, TBB.AdmW P p.l0 Y w → w.length ≤ N →
-    (p.RR F 0 w [] []).re ≤ TBB.normC nn w * (B.beta p.T.base F F).re
+def LimBd
+    (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (Y : Finset ℝ) (N : ℕ)
+    : Prop :=
+  ∀ w,
+    TBB.AdmW P p.l0 Y w → w.length ≤ N
+      → (p.RR F 0 w [] []).re ≤ TBB.normC nn w * (B.beta p.T.base F F).re
 
 end place
 

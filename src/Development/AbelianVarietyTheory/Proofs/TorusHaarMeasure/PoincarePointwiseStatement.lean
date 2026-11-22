@@ -15,10 +15,13 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.FirstMini
 
 namespace GlobalTheory.PoincareSeriesCompare
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates
 open MeasureTheory Topology
-open GlobalTheory.IndefiniteRowSideFullHecke.FundamentalSetFrames (GapsNonneg pairing IsInvWeight wsq normSq ATilde fundSq IsExt idFrame flagBall
-  ballSup term PoincareStatement CuspidalStatement PoincareCuspidalStatement)
+open GlobalTheory.IndefiniteRowSideFullHecke.FundamentalSetFrames
+  (GapsNonneg pairing IsInvWeight wsq normSq ATilde fundSq IsExt idFrame flagBall ballSup term
+    PoincareStatement CuspidalStatement PoincareCuspidalStatement)
 open scoped ENNReal NNReal Matrix
 
 noncomputable section
@@ -33,8 +36,8 @@ theorem nonempty_type (X : Data E r) : Nonempty X.Ψ := by
 
 theorem isOrth_x0F (X : Data E r) : IsOrth X (x0F X) := fun τ => (X.signature τ).choose_spec.2
 
-theorem not_isIso_of_definite (X : Data E r) (h : X.p0 = 0 ∨ X.p0 = r) (ξ : Fin r → E) :
-    ¬ X.IsIso ξ := by
+theorem not_isIso_of_definite (X : Data E r) (h : X.p0 = 0 ∨ X.p0 = r) (ξ : Fin r → E)
+    : ¬ X.IsIso ξ := by
   rintro ⟨-, h0, hne⟩
   obtain ⟨τ⟩ := nonempty_type X
   have hx : X.IsOrtho (x0F X) := isOrth_x0F X
@@ -53,8 +56,9 @@ theorem not_isIso_of_definite (X : Data E r) (h : X.p0 = 0 ∨ X.p0 = r) (ξ : F
       linarith
   have hall : ∀ c, hermC τ.1 X.Gm y (col (mat (x0F X) τ) c) = 0 := by
     intro c
-    have := (Finset.sum_eq_zero_iff_of_nonneg (fun c _ =>
-      sq_nonneg ‖hermC τ.1 X.Gm y (col (mat (x0F X) τ) c)‖)).mp hsq c (Finset.mem_univ c)
+    have :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun c _ =>
+        sq_nonneg ‖hermC τ.1 X.Gm y (col (mat (x0F X) τ) c)‖)).mp hsq c (Finset.mem_univ c)
     simpa using this
   have hy0 : y = 0 := by
     rw [PositiveSpanMatrices.expand X hx τ hdet y]

@@ -13,19 +13,23 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.UU
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SymVeryAmple
 
-
 open GlobalTheory.CechPic in
-theorem exists_of_involution {R : Type} [CommRing R] {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of R))
-    (σ : X ⟶ X) (hσ : σ ≫ σ = 𝟙 X) (h : IsProjBy f) :
-    ∃ (H : LB X) (n : ℕ) (s : Fin (n + 1) → LB.Sec H), H.IsLB ∧ VeryAmpleBy f H s ∧
-      Triv (LB.LinComb H (K := Fin 2) ![σ, 𝟙 X] ![1, -1]) := by
+theorem exists_of_involution
+    {R : Type} [CommRing R]
+    {X : Scheme.{0}}
+    (f : X ⟶ Spec (CommRingCat.of R)) (σ : X ⟶ X) (hσ : σ ≫ σ = 𝟙 X) (h : IsProjBy f)
+    : ∃ (H : LB X) (n : ℕ) (s : Fin (n + 1) → LB.Sec H),
+      H.IsLB ∧ VeryAmpleBy f H s ∧ Triv (LB.LinComb H (K := Fin 2) ![σ, 𝟙 X] ![1, -1]) := by
   obtain ⟨L, hL, m, s, hs⟩ := h
   have : IsProper f := isProper_of_veryAmpleBy hs
   have : IsIso σ := ⟨σ, hσ, hσ⟩
@@ -40,10 +44,16 @@ theorem exists_of_involution {R : Type} [CommRing R] {X : Scheme.{0}} (f : X ⟶
   have hH := isLB_lbPow hN n
   refine ⟨_, M, t, hH, ht, (cls_eq_zero_iff (LB.isLB_linComb hH _ _)).1 ?_⟩
   rw [cls_linComb hH, Fin.sum_univ_two, cls_lbPow hN, cls_tens hL hP.isLB, cls_pull hL]
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, pull_id, map_nsmul, map_add (f := _), ← pull_comp, hσ]
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, pull_id, map_nsmul, map_add (f := _),
+    ← pull_comp, hσ]
   rw [add_comm (pull σ (cls L hL)), one_zsmul, neg_one_zsmul, Category.id_comp, add_neg_cancel]
 
-theorem exists_symmetric_veryAmpleBy : ∀ (R : Type) [CommRing R] (B : Over (Spec (CommRingCat.of R))) [GrpObj B] [IsCommMonObj B], IsAbelianScheme B → IsProjBy B.hom → ∃ (H : LB B.left) (n : ℕ) (s : Fin (n + 1) → LB.Sec H), H.IsLB ∧ VeryAmpleBy B.hom H s ∧ Triv (LB.LinComb H (K := Fin 2) ![(ι[B]).left, 𝟙 B.left] ![1, -1]) := by
+theorem exists_symmetric_veryAmpleBy
+    : ∀ (R : Type) [CommRing R] (B : Over (Spec (CommRingCat.of R))) [GrpObj B] [IsCommMonObj B],
+      IsAbelianScheme B → IsProjBy B.hom
+        → ∃ (H : LB B.left) (n : ℕ) (s : Fin (n + 1) → LB.Sec H),
+          H.IsLB ∧ VeryAmpleBy B.hom H s
+            ∧ Triv (LB.LinComb H (K := Fin 2) ![(ι[B]).left, 𝟙 B.left] ![1, -1]) := by
   intro R _ B _ _ _ h
   refine exists_of_involution B.hom _ ?_ h
   rw [← Over.comp_left, GrpObj.inv_comp_inv, Over.id_left]

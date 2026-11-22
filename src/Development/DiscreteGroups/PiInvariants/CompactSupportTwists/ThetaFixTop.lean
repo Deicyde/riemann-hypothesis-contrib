@@ -14,6 +14,7 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.SmoothVecto
 
 namespace DiscreteGroups.T1.G
 
-theorem thetaFixOf : PositivityTheory.Rg.BcB.Desc.ThetaFixOf := thetaFixOf_of_mult PositivityTheory.jumpWindows.cuspidalMultiplicityOne
+theorem thetaFixOf : PositivityTheory.Rg.BcB.Desc.ThetaFixOf :=
+  thetaFixOf_of_mult PositivityTheory.jumpWindows.cuspidalMultiplicityOne
 
 end DiscreteGroups.T1.G

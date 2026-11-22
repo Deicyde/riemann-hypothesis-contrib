@@ -10,10 +10,11 @@ open GlobalTheory.DualWeyl MvPolynomial NumberField Formalism.GradedWeylDivisibi
 
 namespace GlobalTheory.DualWeyl
 
-theorem rowDeg_dominated_of_mem_nabla {K : Type} [Field K] {N : ℕ} (la : Fin N → ℕ) (f : Pol N K)
-    (hf : f ∈ nabla la K) : ∀ m ∈ f.support,
-      (∀ k : ℕ, (∑ a : Fin N with a.val < k, rowDeg m a) ≤ ∑ t : Fin N with t.val < k, la t) ∧
-      ∑ a : Fin N, rowDeg m a = ∑ t : Fin N, la t := by
+theorem rowDeg_dominated_of_mem_nabla
+    {K : Type} [Field K] {N : ℕ} (la : Fin N → ℕ) (f : Pol N K) (hf : f ∈ nabla la K)
+    : ∀ m ∈ f.support,
+      (∀ k : ℕ, (∑ a : Fin N with a.val < k, rowDeg m a) ≤ ∑ t : Fin N with t.val < k, la t)
+        ∧ ∑ a : Fin N, rowDeg m a = ∑ t : Fin N, la t := by
   classical
   unfold nabla at hf
   rw [standardMonomialSpanDomain K N N la] at hf
@@ -36,9 +37,11 @@ theorem rowDeg_dominated_of_mem_nabla {K : Type} [Field K] {N : ℕ} (la : Fin N
     intro m hm
     exact hx m (support_smul hm)
 
-theorem eq_evalAt_one_smul_extremal_of_rowWeight (K : Type) [Field K] [Infinite K] (N : ℕ) (la : Fin N → ℕ)
-    (hla : Antitone la) (f : Pol N K) (hf : f ∈ nabla la K)
-    (hw' : IsWeightedHomogeneous (Formalism.GradedWeylDivisibility.rowW N N) f la) : f = evalAt 1 f • extremal la K := by
+theorem eq_evalAt_one_smul_extremal_of_rowWeight
+    (K : Type) [Field K] [Infinite K]
+    (N : ℕ) (la : Fin N → ℕ) (hla : Antitone la) (f : Pol N K) (hf : f ∈ nabla la K)
+    (hw' : IsWeightedHomogeneous (Formalism.GradedWeylDivisibility.rowW N N) f la)
+    : f = evalAt 1 f • extremal la K := by
   obtain ⟨c, hc⟩ : ∃ c : K, f = c • extremal la K := by
     apply hwLine K N N le_rfl la hla f hf
     intro a b hab k hk
@@ -59,8 +62,7 @@ theorem eq_evalAt_one_smul_extremal_of_rowWeight (K : Type) [Field K] [Infinite 
       omega
     have hk' : (1 : ℤ) ≤ k := by exact_mod_cast hk
     nlinarith
-  have h1 : evalAt 1 f = c := by
-    rw [hc, map_smul, evalAt_one_extremal, smul_eq_mul, mul_one]
+  have h1 : evalAt 1 f = c := by rw [hc, map_smul, evalAt_one_extremal, smul_eq_mul, mul_one]
   rw [h1]
   exact hc
 

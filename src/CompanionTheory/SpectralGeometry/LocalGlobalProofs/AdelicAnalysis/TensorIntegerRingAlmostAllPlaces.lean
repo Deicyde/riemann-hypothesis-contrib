@@ -9,14 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.L
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.GoodRing
 
-theorem exists_good_nat {k : Type} [Field k] (h2 : (2 : k) ≠ 0) (h3 : (3 : k) ≠ 0) (D A B C : k)
-    (hne : A ≠ 0 ∨ B ≠ 0 ∨ C ≠ 0) :
-    ∃ a : ℕ, 1 - D * (a : k) ^ 2 ≠ 0 ∧ A + B * (a : k) + C * (a : k) ^ 2 ≠ 0 := by
+theorem exists_good_nat
+    {k : Type} [Field k]
+    (h2 : (2 : k) ≠ 0) (h3 : (3 : k) ≠ 0)
+    (D A B C : k) (hne : A ≠ 0 ∨ B ≠ 0 ∨ C ≠ 0)
+    : ∃ a : ℕ, 1 - D * (a : k) ^ 2 ≠ 0 ∧ A + B * (a : k) + C * (a : k) ^ 2 ≠ 0 := by
   by_contra hcon
   push_neg at hcon
   have hc : ∀ n : ℕ, 0 < n → n < 5 → (n : k) ≠ 0 := by
@@ -26,7 +29,8 @@ theorem exists_good_nat {k : Type} [Field k] (h2 : (2 : k) ≠ 0) (h3 : (3 : k) 
     · simpa using h2
     · simpa using h3
     · have : ((4 : ℕ) : k) = 2 * 2 := by norm_num
-      rw [this]; exact mul_ne_zero h2 h2
+      rw [this]
+      exact mul_ne_zero h2 h2
   have hinj : Function.Injective (fun i : Fin 5 => ((i : ℕ) : k)) := by
     have key : ∀ i j : ℕ, i < j → j < 5 → (i : k) ≠ j := by
       intro i j hij hj h
@@ -75,10 +79,9 @@ section Quad
 
 variable {R O : Type} [CommRing R] [CommRing O] (ι : R →+* O) (τ : O →+* O) (δ : O) (D : R)
 
-
 include ι in
-theorem finite_maxSpec [IsLocalRing R] (hsp : ∀ y : O, ∃ p q : R, y = ι p + ι q * δ) :
-    Finite (MaximalSpectrum O) := by
+theorem finite_maxSpec [IsLocalRing R] (hsp : ∀ y : O, ∃ p q : R, y = ι p + ι q * δ)
+    : Finite (MaximalSpectrum O) := by
   classical
   letI : Algebra R O := ι.toAlgebra
   haveI : Module.Finite R O := by
@@ -96,39 +99,44 @@ theorem finite_maxSpec [IsLocalRing R] (hsp : ∀ y : O, ∃ p q : R, y = ι p +
       (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
   exact finite_maximalSpectrum_of_finite R O
 
-theorem norm_eq (hδ : δ * δ = ι D) (hτι : ∀ r, τ (ι r) = ι r) (hτδ : τ δ = -δ) (p q : R) :
-    (ι p + ι q * δ) * τ (ι p + ι q * δ) = ι (p ^ 2 - D * q ^ 2) := by
+theorem norm_eq (hδ : δ * δ = ι D) (hτι : ∀ r, τ (ι r) = ι r) (hτδ : τ δ = -δ) (p q : R)
+    : (ι p + ι q * δ) * τ (ι p + ι q * δ) = ι (p ^ 2 - D * q ^ 2) := by
   simp only [map_add (f := _), map_mul, hτι, hτδ, map_sub, map_pow]
   linear_combination (-(ι q) ^ 2) * hδ
 
-theorem fixed_unit (hτι : ∀ r, τ (ι r) = ι r) (hτδ : τ δ = -δ)
-    (hsp : ∀ y : O, ∃ p q : R, y = ι p + ι q * δ)
+theorem fixed_unit
+    (hτι : ∀ r, τ (ι r) = ι r) (hτδ : τ δ = -δ) (hsp : ∀ y : O, ∃ p q : R, y = ι p + ι q * δ)
     (hinj : ∀ p q : R, ι p + ι q * δ = 0 → p = 0 ∧ q = 0) (h2 : IsUnit (2 : R))
-    (β : O) (hβ : IsUnit β) (hτβ : τ β = β) : ∃ b : R, IsUnit b ∧ β = ι b := by
+    (β : O) (hβ : IsUnit β) (hτβ : τ β = β)
+    : ∃ b : R, IsUnit b ∧ β = ι b := by
   obtain ⟨p, q, rfl⟩ := hsp β
   have hq : q = 0 := by
-    have h := hinj 0 (2 * q) (by
-      have := hτβ
-      simp only [map_add (f := _), map_mul, hτι, hτδ] at this
-      simp only [map_zero, map_mul, map_ofNat]
-      linear_combination -this)
+    have h :=
+      hinj 0 (2 * q) (by
+        have := hτβ
+        simp only [map_add (f := _), map_mul, hτι, hτδ] at this
+        simp only [map_zero, map_mul, map_ofNat]
+        linear_combination -this)
     exact (h2.mul_right_eq_zero).1 h.2
   subst hq
   simp only [map_zero, zero_mul, add_zero] at hβ ⊢
   refine ⟨p, ?_, rfl⟩
   obtain ⟨w, hw⟩ := hβ.exists_right_inv
   obtain ⟨c, e, rfl⟩ := hsp w
-  have h := hinj (p * c - 1) (p * e) (by
-    simp only [map_sub, map_mul, map_one]
-    linear_combination hw)
+  have h :=
+    hinj (p * c - 1) (p * e) (by
+      simp only [map_sub, map_mul, map_one]
+      linear_combination hw)
   exact IsUnit.of_mul_eq_one c (sub_eq_zero.1 h.1)
 
-theorem exists_eps [IsLocalRing R] (hδ : δ * δ = ι D) (hτι : ∀ r, τ (ι r) = ι r) (hτδ : τ δ = -δ)
+theorem exists_eps
+    [IsLocalRing R]
+    (hδ : δ * δ = ι D) (hτι : ∀ r, τ (ι r) = ι r) (hτδ : τ δ = -δ)
     (hsp : ∀ y : O, ∃ p q : R, y = ι p + ι q * δ)
-    (hinj : ∀ p q : R, ι p + ι q * δ = 0 → p = 0 ∧ q = 0)
-    (hD : IsUnit D) (h2 : IsUnit (2 : R)) (h3 : IsUnit (3 : R))
-    (s β : O) (hβ : IsUnit β) (hτβ : τ β = β) :
-    ∃ ε z : O, ε * τ ε = 1 ∧ (β - τ ε * s) * z = 1 := by
+    (hinj : ∀ p q : R, ι p + ι q * δ = 0 → p = 0 ∧ q = 0) (hD : IsUnit D) (h2 : IsUnit (2 : R))
+    (h3 : IsUnit (3 : R))
+    (s β : O) (hβ : IsUnit β) (hτβ : τ β = β)
+    : ∃ ε z : O, ε * τ ε = 1 ∧ (β - τ ε * s) * z = 1 := by
   obtain ⟨b, hb, rfl⟩ := fixed_unit ι τ δ hτι hτδ hsp hinj h2 β hβ hτβ
   obtain ⟨s0, s1, rfl⟩ := hsp s
   let φ := IsLocalRing.residue R
@@ -144,39 +152,46 @@ theorem exists_eps [IsLocalRing R] (hδ : δ * δ = ι D) (hτι : ∀ r, τ (ι
     rwa [map_ofNat] at this
   have hDk := nz hD
   have hbk := nz hb
-  obtain ⟨a, ha1, ha2⟩ := exists_good_nat h2k h3k (φ D) ((φ b - φ s0) ^ 2 - φ D * φ s1 ^ 2)
-    (4 * φ D * φ b * φ s1) (φ D ^ 2 * φ s1 ^ 2 - φ D * (φ b + φ s0) ^ 2) (by
-      by_contra hcon
-      push_neg at hcon
-      obtain ⟨hA, hB, hC⟩ := hcon
-      have h4 : (4 : IsLocalRing.ResidueField R) ≠ 0 := by
-        have : (4 : IsLocalRing.ResidueField R) = 2 * 2 := by norm_num
-        rw [this]; exact mul_ne_zero h2k h2k
-      have hs1 : φ s1 = 0 := by
-        have := mul_ne_zero (mul_ne_zero h4 hDk) hbk
-        exact (mul_eq_zero.1 hB).resolve_left this
-      rw [hs1] at hA hC
-      have e1 : φ b - φ s0 = 0 := by
-        have : (φ b - φ s0) ^ 2 = 0 := by simpa using hA
-        exact pow_eq_zero_iff (two_ne_zero) |>.1 this
-      have e2 : φ b + φ s0 = 0 := by
-        have : φ D * (φ b + φ s0) ^ 2 = 0 := by simpa using hC
-        exact pow_eq_zero_iff (two_ne_zero) |>.1 ((mul_eq_zero.1 this).resolve_left hDk)
-      have : 2 * φ b = 0 := by linear_combination e1 + e2
-      exact (mul_ne_zero h2k hbk) this)
+  obtain ⟨a, ha1, ha2⟩ :=
+    exists_good_nat h2k h3k (φ D) ((φ b - φ s0) ^ 2 - φ D * φ s1 ^ 2) (4 * φ D * φ b * φ s1)
+      (φ D ^ 2 * φ s1 ^ 2 - φ D * (φ b + φ s0) ^ 2)
+      (by
+        by_contra hcon
+        push_neg at hcon
+        obtain ⟨hA, hB, hC⟩ := hcon
+        have h4 : (4 : IsLocalRing.ResidueField R) ≠ 0 := by
+          have : (4 : IsLocalRing.ResidueField R) = 2 * 2 := by norm_num
+          rw [this]
+          exact mul_ne_zero h2k h2k
+        have hs1 : φ s1 = 0 := by
+          have := mul_ne_zero (mul_ne_zero h4 hDk) hbk
+          exact (mul_eq_zero.1 hB).resolve_left this
+        rw [hs1] at hA hC
+        have e1 : φ b - φ s0 = 0 := by
+          have : (φ b - φ s0) ^ 2 = 0 := by simpa using hA
+          exact pow_eq_zero_iff (two_ne_zero) |>.1 this
+        have e2 : φ b + φ s0 = 0 := by
+          have : φ D * (φ b + φ s0) ^ 2 = 0 := by simpa using hC
+          exact pow_eq_zero_iff (two_ne_zero) |>.1 ((mul_eq_zero.1 this).resolve_left hDk)
+        have : 2 * φ b = 0 := by linear_combination e1 + e2
+        exact (mul_ne_zero h2k hbk) this)
   set c : R := (a : R) with hc
   have hφc : φ c = (a : IsLocalRing.ResidueField R) := by simp [hc]
   let P : R := b - s0 + c * s1 * D
   let Q : R := b * c - s1 + c * s0
-  have hn1 : IsUnit (1 - D * c ^ 2) := un (by
-    simp only [map_sub, map_one, map_mul, map_pow, hφc]; exact ha1)
-  have hn2 : IsUnit (P ^ 2 - D * Q ^ 2) := un (by
-    have : φ (P ^ 2 - D * Q ^ 2) = (φ b - φ s0) ^ 2 - φ D * φ s1 ^ 2 +
-        4 * φ D * φ b * φ s1 * (a : IsLocalRing.ResidueField R) +
-        (φ D ^ 2 * φ s1 ^ 2 - φ D * (φ b + φ s0) ^ 2) * (a : IsLocalRing.ResidueField R) ^ 2 := by
-      simp only [P, Q, map_sub, map_add (f := _), map_mul, map_pow, hφc]
-      ring
-    rw [this]; exact ha2)
+  have hn1 : IsUnit (1 - D * c ^ 2) :=
+    un (by simp only [map_sub, map_one, map_mul, map_pow, hφc]; exact ha1)
+  have hn2 : IsUnit (P ^ 2 - D * Q ^ 2) :=
+    un (by
+      have : φ (P ^ 2 - D * Q ^ 2)
+          = (φ b - φ s0) ^ 2 - φ D * φ s1 ^ 2
+            + 4 * φ D * φ b * φ s1 * (a : IsLocalRing.ResidueField R)
+            + (φ D ^ 2 * φ s1 ^ 2 - φ D * (φ b + φ s0) ^ 2)
+              * (a : IsLocalRing.ResidueField R) ^ 2 := by
+        simp only [P, Q, map_sub, map_add (f := _), map_mul, map_pow, hφc]
+        ring
+      rw [this]
+      exact ha2)
   obtain ⟨e1, he1⟩ := hn1.exists_right_inv
   obtain ⟨e2, he2⟩ := hn2.exists_right_inv
   have he1' : ι (1 - D * c ^ 2) * ι e1 = 1 := by rw [← map_mul, he1, map_one]
@@ -195,13 +210,18 @@ theorem exists_eps [IsLocalRing R] (hδ : δ * δ = ι D) (hτι : ∀ r, τ (ι
     linear_combination (ι c * ι s1) * hδ
   refine ⟨u * u * ι e1, u * τ t * ι e2, ?_, ?_⟩
   · simp only [map_mul, hτι]
-    calc u * u * ι e1 * (τ u * τ u * ι e1) = (u * τ u * ι e1) ^ 2 := by ring
+    calc
+      u * u * ι e1 * (τ u * τ u * ι e1)
+        = (u * τ u * ι e1) ^ 2 := by ring
       _ = 1 := by rw [huu, he1', one_pow]
   · have hτε : τ (u * u * ι e1) * u = τ u := by
       simp only [map_mul, hτι]
-      calc τ u * τ u * ι e1 * u = τ u * (u * τ u * ι e1) := by ring
+      calc
+        τ u * τ u * ι e1 * u
+          = τ u * (u * τ u * ι e1) := by ring
         _ = τ u := by rw [huu, he1', mul_one]
-    calc (ι b - τ (u * u * ι e1) * (ι s0 + ι s1 * δ)) * (u * τ t * ι e2)
+    calc
+      (ι b - τ (u * u * ι e1) * (ι s0 + ι s1 * δ)) * (u * τ t * ι e2)
         = (ι b * u - (τ (u * u * ι e1) * u) * (ι s0 + ι s1 * δ)) * τ t * ι e2 := by ring
       _ = t * τ t * ι e2 := by rw [hτε, ht]
       _ = 1 := by rw [htt, he2']
@@ -212,70 +232,81 @@ section Lattice
 
 variable {K A : Type} [Field K] [CommRing A] [Algebra K A] (R : Subring K)
 
-theorem coord_mem {ι₁ ι₂ : Type} [Fintype ι₁] (P : Module.Basis ι₁ K A) (Q : Module.Basis ι₂ K A)
-    (hPQ : ∀ i l, Q.repr (P i) l ∈ R) (y : A) (hy : ∀ i, P.repr y i ∈ R) (l : ι₂) :
-    Q.repr y l ∈ R := by
+theorem coord_mem
+    {ι₁ ι₂ : Type} [Fintype ι₁]
+    (P : Module.Basis ι₁ K A) (Q : Module.Basis ι₂ K A) (hPQ : ∀ i l, Q.repr (P i) l ∈ R)
+    (y : A) (hy : ∀ i, P.repr y i ∈ R)
+    (l : ι₂)
+    : Q.repr y l ∈ R := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← P.sum_repr y, map_sum, Finsupp.finsetSum_apply]
   refine R.sum_mem fun i _ => ?_
   rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
   exact R.mul_mem (hy i) (hPQ i l)
 
-theorem coord_two (B : Module.Basis (Fin 2) K A) (hB0 : B 0 = 1) (p q : K) :
-    B.repr (algebraMap K A p + algebraMap K A q * B 1) 0 = p ∧
-      B.repr (algebraMap K A p + algebraMap K A q * B 1) 1 = q := by
+theorem coord_two (B : Module.Basis (Fin 2) K A) (hB0 : B 0 = 1) (p q : K)
+    : B.repr (algebraMap K A p + algebraMap K A q * B 1) 0 = p
+      ∧ B.repr (algebraMap K A p + algebraMap K A q * B 1) 1 = q := by
   have e : algebraMap K A p + algebraMap K A q * B 1 = p • B 0 + q • B 1 := by
     rw [hB0, Algebra.smul_def, Algebra.smul_def, mul_one]
   rw [e]
   simp
 
-theorem eq_coord (B : Module.Basis (Fin 2) K A) (hB0 : B 0 = 1) (y : A) :
-    y = algebraMap K A (B.repr y 0) + algebraMap K A (B.repr y 1) * B 1 := by
+theorem eq_coord (B : Module.Basis (Fin 2) K A) (hB0 : B 0 = 1) (y : A)
+    : y = algebraMap K A (B.repr y 0) + algebraMap K A (B.repr y 1) * B 1 := by
   conv_lhs => rw [← B.sum_repr y]
   rw [Fin.sum_univ_two, hB0, Algebra.smul_def, Algebra.smul_def, mul_one]
 
-theorem exists_subring {d : ℕ} (B : Module.Basis (Fin 2) K A) (C : Module.Basis (Fin d) K A)
-    (D : K) (hB0 : B 0 = 1) (hD : B 1 * B 1 = algebraMap K A D) (hDR : D ∈ R)
-    (hBC : ∀ k j, B.repr (C k) j ∈ R) (hCB : ∀ j k, C.repr (B j) k ∈ R) :
-    ∃ O : Subring A, (∀ y, y ∈ O ↔ ∀ k, C.repr y k ∈ R) ∧ (∀ y, y ∈ O ↔ ∀ j, B.repr y j ∈ R) := by
-  let O : Subring A :=
-    { carrier := {y | ∀ j, B.repr y j ∈ R}
-      zero_mem' := by intro j; simp [R.zero_mem]
-      one_mem' := by
-        have h := coord_two B hB0 1 0
-        simp only [map_one, map_zero, zero_mul, add_zero] at h
-        show ∀ j, B.repr 1 j ∈ R
-        refine Fin.forall_fin_two.2 ⟨?_, ?_⟩
-        · rw [h.1]; exact R.one_mem
-        · rw [h.2]; exact R.zero_mem
-      add_mem' := by
-        intro a b ha hb j
-        rw [map_add (f := _), Finsupp.add_apply]
-        exact R.add_mem (ha j) (hb j)
-      neg_mem' := by
-        intro a ha j
-        rw [map_neg, Finsupp.neg_apply]
-        exact R.neg_mem (ha j)
-      mul_mem' := by
-        intro a b ha hb j
-        have e : a * b = algebraMap K A (B.repr a 0 * B.repr b 0 + B.repr a 1 * B.repr b 1 * D) +
-            algebraMap K A (B.repr a 0 * B.repr b 1 + B.repr a 1 * B.repr b 0) * B 1 := by
-          conv_lhs => rw [eq_coord B hB0 a, eq_coord B hB0 b]
-          simp only [map_add (f := _), map_mul]
-          linear_combination (algebraMap K A (B.repr a 1) * algebraMap K A (B.repr b 1)) * hD
-        have h := coord_two B hB0
-          (B.repr a 0 * B.repr b 0 + B.repr a 1 * B.repr b 1 * D)
+theorem exists_subring
+    {d : ℕ}
+    (B : Module.Basis (Fin 2) K A) (C : Module.Basis (Fin d) K A) (D : K)
+    (hB0 : B 0 = 1) (hD : B 1 * B 1 = algebraMap K A D) (hDR : D ∈ R)
+    (hBC : ∀ k j, B.repr (C k) j ∈ R) (hCB : ∀ j k, C.repr (B j) k ∈ R)
+    : ∃ O : Subring A, (∀ y, y ∈ O ↔ ∀ k, C.repr y k ∈ R) ∧ (∀ y, y ∈ O ↔ ∀ j, B.repr y j ∈ R) := by
+  let O : Subring A := {
+    carrier := {y | ∀ j, B.repr y j ∈ R}
+    zero_mem' := by intro j; simp [R.zero_mem]
+    one_mem' := by
+      have h := coord_two B hB0 1 0
+      simp only [map_one, map_zero, zero_mul, add_zero] at h
+      show ∀ j, B.repr 1 j ∈ R
+      refine Fin.forall_fin_two.2 ⟨?_, ?_⟩
+      · rw [h.1]; exact R.one_mem
+      · rw [h.2]; exact R.zero_mem
+    add_mem' := by
+      intro a b ha hb j
+      rw [map_add (f := _), Finsupp.add_apply]
+      exact R.add_mem (ha j) (hb j)
+    neg_mem' := by
+      intro a ha j
+      rw [map_neg, Finsupp.neg_apply]
+      exact R.neg_mem (ha j)
+    mul_mem' := by
+      intro a b ha hb j
+      have e
+          : a * b
+            = algebraMap K A (B.repr a 0 * B.repr b 0 + B.repr a 1 * B.repr b 1 * D)
+              + algebraMap K A (B.repr a 0 * B.repr b 1 + B.repr a 1 * B.repr b 0) * B 1 := by
+        conv_lhs => rw [eq_coord B hB0 a, eq_coord B hB0 b]
+        simp only [map_add (f := _), map_mul]
+        linear_combination (algebraMap K A (B.repr a 1) * algebraMap K A (B.repr b 1)) * hD
+      have h :=
+        coord_two B hB0 (B.repr a 0 * B.repr b 0 + B.repr a 1 * B.repr b 1 * D)
           (B.repr a 0 * B.repr b 1 + B.repr a 1 * B.repr b 0)
-        rw [← e] at h
-        fin_cases j
-        · show B.repr (a * b) 0 ∈ R
-          rw [h.1]
-          exact R.add_mem (R.mul_mem (ha 0) (hb 0)) (R.mul_mem (R.mul_mem (ha 1) (hb 1)) hDR)
-        · show B.repr (a * b) 1 ∈ R
-          rw [h.2]
-          exact R.add_mem (R.mul_mem (ha 0) (hb 1)) (R.mul_mem (ha 1) (hb 0)) }
-  refine ⟨O, fun y => ⟨fun hy k => coord_mem R B C hCB y hy k,
-    fun hy j => coord_mem R C B hBC y hy j⟩, fun y => Iff.rfl⟩
+      rw [← e] at h
+      fin_cases j
+      · show B.repr (a * b) 0 ∈ R
+        rw [h.1]
+        exact R.add_mem (R.mul_mem (ha 0) (hb 0)) (R.mul_mem (R.mul_mem (ha 1) (hb 1)) hDR)
+      · show B.repr (a * b) 1 ∈ R
+        rw [h.2]
+        exact R.add_mem (R.mul_mem (ha 0) (hb 1)) (R.mul_mem (ha 1) (hb 0))
+  }
+  refine ⟨
+    O,
+    fun y => ⟨fun hy k => coord_mem R B C hCB y hy k, fun hy j => coord_mem R C B hBC y hy j⟩,
+    fun y => Iff.rfl
+  ⟩
 
 end Lattice
 
@@ -283,54 +314,61 @@ section Place
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
 
-theorem sigR_algebraMap (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (c : Fv F v) :
-    sigR (Fv F v) σ (algebraMap (Fv F v) (Fv F v ⊗[F] E) c) =
-      algebraMap (Fv F v) (Fv F v ⊗[F] E) c := by
+theorem sigR_algebraMap (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) (c : Fv F v)
+    : sigR (Fv F v) σ (algebraMap (Fv F v) (Fv F v ⊗[F] E) c)
+      = algebraMap (Fv F v) (Fv F v ⊗[F] E) c := by
   simp [sigR, Algebra.TensorProduct.algebraMap_apply]
 
-theorem good_at (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E)
-    (b₂ : Module.Basis (Fin 2) F E) (D : F) (hb0 : b₂ 0 = 1) (hσ1 : σ (b₂ 1) = -b₂ 1)
-    (hD : b₂ 1 * b₂ 1 = algebraMap F E D) (v : HeightOneSpectrum (𝓞 F))
-    (hD1 : Valued.v (algebraMap F (Fv F v) D) = 1)
-    (h21 : Valued.v (algebraMap F (Fv F v) 2) = 1)
-    (h31 : Valued.v (algebraMap F (Fv F v) 3) = 1)
-    (hBC : ∀ k j, (Algebra.TensorProduct.basis (Fv F v) b₂).repr (inclR (Fv F v) (b k)) j ∈
-      v.adicCompletionIntegers F)
-    (hCB : ∀ j k, (Algebra.TensorProduct.basis (Fv F v) b).repr (inclR (Fv F v) (b₂ j)) k ∈
-      v.adicCompletionIntegers F) :
-    ∃ O : Subring (Fv F v ⊗[F] E),
-      (∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
-        v.adicCompletionIntegers F) ∧
-      (∀ y ∈ O, sigR (Fv F v) σ y ∈ O) ∧ Finite (MaximalSpectrum O) ∧ IsUnit (2 : O) ∧
-      (∃ δ : O, IsUnit δ ∧ sigR (Fv F v) σ δ = -δ) ∧
-      (∀ s β : O, IsUnit β → sigR (Fv F v) σ β = β → ∃ ε z : O,
-        (ε : Fv F v ⊗[F] E) * sigR (Fv F v) σ ε = 1 ∧
-        ((β : Fv F v ⊗[F] E) - sigR (Fv F v) σ ε * s) * z = 1) ∧
-      ∀ β : O, IsUnit β → sigR (Fv F v) σ β = β →
-        ∃ a : O, (a : Fv F v ⊗[F] E) * sigR (Fv F v) σ a = β := by
+theorem good_at
+    (σ : E →ₐ[F] E)
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (b₂ : Module.Basis (Fin 2) F E) (D : F)
+    (hb0 : b₂ 0 = 1) (hσ1 : σ (b₂ 1) = - b₂ 1) (hD : b₂ 1 * b₂ 1 = algebraMap F E D)
+    (v : HeightOneSpectrum (𝓞 F)) (hD1 : Valued.v (algebraMap F (Fv F v) D) = 1)
+    (h21 : Valued.v (algebraMap F (Fv F v) 2) = 1) (h31 : Valued.v (algebraMap F (Fv F v) 3) = 1)
+    (hBC : ∀ k j,
+      (Algebra.TensorProduct.basis (Fv F v) b₂).repr (inclR (Fv F v) (b k)) j
+        ∈ v.adicCompletionIntegers F)
+    (hCB : ∀ j k,
+      (Algebra.TensorProduct.basis (Fv F v) b).repr (inclR (Fv F v) (b₂ j)) k
+        ∈ v.adicCompletionIntegers F)
+    : ∃ O : Subring (Fv F v ⊗[F] E),
+      (∀ y,
+          y ∈ O
+            ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+        ∧ (∀ y ∈ O, sigR (Fv F v) σ y ∈ O) ∧ Finite (MaximalSpectrum O) ∧ IsUnit (2 : O)
+        ∧ (∃ δ : O, IsUnit δ ∧ sigR (Fv F v) σ δ = -δ)
+        ∧ (∀ s β : O,
+          IsUnit β → sigR (Fv F v) σ β = β
+            → ∃ ε z : O,
+              (ε : Fv F v ⊗[F] E) * sigR (Fv F v) σ ε = 1
+                ∧ ((β : Fv F v ⊗[F] E) - sigR (Fv F v) σ ε * s) * z = 1)
+        ∧ ∀ β : O,
+          IsUnit β → sigR (Fv F v) σ β = β
+            → ∃ a : O, (a : Fv F v ⊗[F] E) * sigR (Fv F v) σ a = β := by
   set K := Fv F v with hK
   set B := Algebra.TensorProduct.basis K b₂ with hB
   set C := Algebra.TensorProduct.basis K b with hC
   let Rs : Subring K := (v.adicCompletionIntegers F).toSubring
-  have hB0 : B 0 = 1 := by
-    rw [hB, Algebra.TensorProduct.basis_apply, hb0]; rfl
-  have hB1 : B 1 = inclR K (b₂ 1) := by
-    rw [hB, Algebra.TensorProduct.basis_apply]; rfl
+  have hB0 : B 0 = 1 := by rw [hB, Algebra.TensorProduct.basis_apply, hb0]; rfl
+  have hB1 : B 1 = inclR K (b₂ 1) := by rw [hB, Algebra.TensorProduct.basis_apply]; rfl
   have hBD : B 1 * B 1 = algebraMap K (K ⊗[F] E) (algebraMap F K D) := by
     rw [hB1, ← map_mul, hD]
     show (1 : Fv F v) ⊗ₜ[F] algebraMap F E D = (algebraMap F (Fv F v) D) ⊗ₜ[F] (1 : E)
     rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul,
       TensorProduct.smul_tmul']
   have hDR : algebraMap F K D ∈ Rs := hD1.le
-  obtain ⟨O, hOC, hOB⟩ := exists_subring Rs B C (algebraMap F K D) hB0 hBD hDR
-    (fun k j => by
-      have := hBC k j
-      rwa [show inclR K (b k) = C k by rw [hC, Algebra.TensorProduct.basis_apply]; rfl] at this)
-    (fun j k => by
-      have := hCB j k
-      rwa [show inclR K (b₂ j) = B j by rw [hB, Algebra.TensorProduct.basis_apply]; rfl] at this)
-  have hpq : ∀ p q : K, p ∈ Rs → q ∈ Rs →
-      algebraMap K (K ⊗[F] E) p + algebraMap K (K ⊗[F] E) q * B 1 ∈ O := by
+  obtain ⟨O, hOC, hOB⟩ :=
+    exists_subring Rs B C (algebraMap F K D) hB0 hBD hDR
+      (fun k j => by
+        have := hBC k j
+        rwa [show inclR K (b k) = C k by rw [hC, Algebra.TensorProduct.basis_apply]; rfl] at this)
+      (fun j k => by
+        have := hCB j k
+        rwa [show inclR K (b₂ j) = B j by rw [hB, Algebra.TensorProduct.basis_apply]; rfl] at this)
+  have hpq
+      : ∀ p q : K,
+        p ∈ Rs → q ∈ Rs → algebraMap K (K ⊗[F] E) p + algebraMap K (K ⊗[F] E) q * B 1 ∈ O := by
     intro p q hp hq
     have h := coord_two B hB0 p q
     refine (hOB _).2 (Fin.forall_fin_two.2 ⟨?_, ?_⟩)
@@ -346,7 +384,7 @@ theorem good_at (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E)
     ((algebraMap K (K ⊗[F] E)).comp (v.adicCompletionIntegers F).subtype).codRestrict O
       (fun x => hRmem x x.2)
   let δ : O := ⟨B 1, hδO⟩
-  have hσB : sigR K σ (B 1) = -B 1 := by
+  have hσB : sigR K σ (B 1) = - B 1 := by
     rw [hB1]
     show (1 : Fv F v) ⊗ₜ[F] σ (b₂ 1) = -((1 : Fv F v) ⊗ₜ[F] b₂ 1)
     rw [hσ1, TensorProduct.tmul_neg]
@@ -377,14 +415,16 @@ theorem good_at (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E)
   have hv2 : Valued.v (2 : K) = 1 := by simpa [map_ofNat] using h21
   have hv3 : Valued.v (3 : K) = 1 := by simpa [map_ofNat] using h31
   have hDu : IsUnit D' := (hunit D').2 hD1
-  have h2u : IsUnit (2 : v.adicCompletionIntegers F) := (hunit 2).2 (by
-    rw [show ((2 : v.adicCompletionIntegers F) : K) = 2 from
-      map_ofNat (v.adicCompletionIntegers F).subtype 2]
-    exact hv2)
-  have h3u : IsUnit (3 : v.adicCompletionIntegers F) := (hunit 3).2 (by
-    rw [show ((3 : v.adicCompletionIntegers F) : K) = 3 from
-      map_ofNat (v.adicCompletionIntegers F).subtype 3]
-    exact hv3)
+  have h2u : IsUnit (2 : v.adicCompletionIntegers F) :=
+    (hunit 2).2 (by
+      rw [show ((2 : v.adicCompletionIntegers F) : K) = 2 from
+        map_ofNat (v.adicCompletionIntegers F).subtype 2]
+      exact hv2)
+  have h3u : IsUnit (3 : v.adicCompletionIntegers F) :=
+    (hunit 3).2 (by
+      rw [show ((3 : v.adicCompletionIntegers F) : K) = 3 from
+        map_ofNat (v.adicCompletionIntegers F).subtype 3]
+      exact hv3)
   refine ⟨O, hOC, hstab, finite_maxSpec ι δ hsp, ?_, ?_, ?_, ?_⟩
   · have := h2u.map ι
     rwa [map_ofNat] at this
@@ -392,13 +432,14 @@ theorem good_at (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E)
     have h : IsUnit (δ * δ) := by rw [hδ]; exact hDu.map ι
     exact isUnit_of_mul_isUnit_left h
   · intro s β hβ hτβ
-    obtain ⟨ε, z, h1, h2⟩ := exists_eps ι τ δ D' hδ hτι hτδ hsp hinj hDu h2u h3u s β hβ
-      (Subtype.ext hτβ)
+    obtain ⟨ε, z, h1, h2⟩ :=
+      exists_eps ι τ δ D' hδ hτι hτδ hsp hinj hDu h2u h3u s β hβ (Subtype.ext hτβ)
     exact ⟨ε, z, congrArg Subtype.val h1, congrArg Subtype.val h2⟩
   · intro β hβ hτβ
     obtain ⟨c, hc, rfl⟩ := fixed_unit ι τ δ hτι hτδ hsp hinj h2u β hβ (Subtype.ext hτβ)
-    obtain ⟨x, hx, y, hy, e⟩ := GlobalTheory.QNorm.exists_integral_sq_sub_mul_sq_of_unit F v
-      (algebraMap F K D) (c : K) hv2 hD1 ((hunit c).1 hc)
+    obtain ⟨x, hx, y, hy, e⟩ :=
+      GlobalTheory.QNorm.exists_integral_sq_sub_mul_sq_of_unit F v (algebraMap F K D) (c : K) hv2
+        hD1 ((hunit c).1 hc)
     refine ⟨ι ⟨x, hx⟩ + ι ⟨y, hy⟩ * δ, ?_⟩
     have h := norm_eq ι τ δ D' hδ hτι hτδ ⟨x, hx⟩ ⟨y, hy⟩
     have e' : (⟨x, hx⟩ : v.adicCompletionIntegers F) ^ 2 - D' * ⟨y, hy⟩ ^ 2 = c :=

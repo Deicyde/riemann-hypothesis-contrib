@@ -10,7 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4 MvPolynomial GenericFibreModelTransport
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4
+  MvPolynomial GenericFibreModelTransport
 
 theorem GenFibreModelTransport.proof : GenFibreModelTransport.Statement := by
   intro K _ ι _ K' _ ι' _ v P' G Ω _ z hz Φ₀ _ _ hΦ₀ τ w q
@@ -21,7 +22,8 @@ theorem GenFibreModelTransport.proof : GenFibreModelTransport.Statement := by
   have hψ : ∀ a ∈ P', ψ a = 0 := fun a ha => RingHom.mem_ker.1 (hz.symm ▸ ha)
   let α : FractionRing (MRing ι' ⧸ P') →+* G.Φ' :=
     IsFractionRing.lift (quotient_lift_injective φ P' G.genericFibre_ker_target hφ)
-  let β : FractionRing (MRing ι' ⧸ P') →+* Ω := IsFractionRing.lift (quotient_lift_injective ψ P' hz hψ)
+  let β : FractionRing (MRing ι' ⧸ P') →+* Ω :=
+    IsFractionRing.lift (quotient_lift_injective ψ P' hz hψ)
   let ξ : (Σ k', ι' k') → FractionRing (MRing ι' ⧸ P') := fun p =>
     algebraMap _ _ (Ideal.Quotient.mk P' (X p))
   have hα : α ∘ ξ = G.x' := funext fun p => by simp [α, ξ, φ]
@@ -32,7 +34,9 @@ theorem GenFibreModelTransport.proof : GenFibreModelTransport.Statement := by
     refine le_antisymm ?_ (Subfield.closure_le.2 ?_)
     · rintro _ ⟨c, rfl⟩
       obtain ⟨f, g, -, rfl⟩ := G.gen c
-      have key : ∀ f : MRing ι, algebraMap G.Φ G.Φ' (aeval G.x f) ∈ Subfield.closure (Set.range (G.x' ∘ v)) := by
+      have key
+          : ∀ f : MRing ι,
+            algebraMap G.Φ G.Φ' (aeval G.x f) ∈ Subfield.closure (Set.range (G.x' ∘ v)) := by
         intro f
         rw [aeval_def, eval₂_comp_left]
         convert eval₂_mem_closure _ (G.x' ∘ v) f using 2
@@ -46,8 +50,9 @@ theorem GenFibreModelTransport.proof : GenFibreModelTransport.Statement := by
   obtain ⟨e₁, he₁⟩ := subfield_equiv k α (algebraMap G.Φ G.Φ') h₁
   obtain ⟨e₂, he₂⟩ := subfield_equiv k β (algebraMap Φ₀ Ω) h₂
   let s : Set (FractionRing (MRing ι' ⧸ P')) := Set.range fun t => ξ (w t) / ξ q
-  have hs : ∀ (F : Type) [Field F] (γ : FractionRing (MRing ι' ⧸ P') →+* F) (y : (Σ k', ι' k') → F),
-      γ ∘ ξ = y → γ '' s = Set.range fun t => y (w t) / y q := by
+  have hs
+      : ∀ (F : Type) [Field F] (γ : FractionRing (MRing ι' ⧸ P') →+* F) (y : (Σ k', ι' k') → F),
+        γ ∘ ξ = y → γ '' s = Set.range fun t => y (w t) / y q := by
     rintro F _ γ y rfl
     rw [← Set.range_comp]
     exact congrArg Set.range (funext fun t => map_div₀ γ _ _)

@@ -8,10 +8,13 @@ namespace GlobalTheory.SpanInfEq
 
 open NumberField
 
-theorem exists_smul_mem {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V]
-    [Module K V] [Module (RingOfIntegers K) V] [IsScalarTower (RingOfIntegers K) K V]
-    (L : Submodule (RingOfIntegers K) V) (hL : Submodule.IsFullLattice K L) (v : V) :
-    ∃ d : RingOfIntegers K, d ≠ 0 ∧ d • v ∈ L := by
+theorem exists_smul_mem
+    {K : Type} [Field K] [NumberField K]
+    {V : Type} [AddCommGroup V] [Module K V] [Module (RingOfIntegers K) V]
+    [IsScalarTower (RingOfIntegers K) K V]
+    (L : Submodule (RingOfIntegers K) V) (hL : Submodule.IsFullLattice K L)
+    (v : V)
+    : ∃ d : RingOfIntegers K, d ≠ 0 ∧ d • v ∈ L := by
   have hv : v ∈ Submodule.span K (L : Set V) := by rw [hL.span_eq_top]; trivial
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
@@ -39,10 +42,13 @@ theorem exists_smul_mem {K : Type} [Field K] [NumberField K] {V : Type} [AddComm
     rw [this]
     exact L.smul_mem _ h
 
-theorem span_inf_eq {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V]
-    [Module K V] [Module (RingOfIntegers K) V] [IsScalarTower (RingOfIntegers K) K V]
-    (L : Submodule (RingOfIntegers K) V) (hL : Submodule.IsFullLattice K L) (T : Submodule K V) :
-    Submodule.span K (↑(L ⊓ Submodule.restrictScalars (RingOfIntegers K) T) : Set V) = T := by
+theorem span_inf_eq
+    {K : Type} [Field K] [NumberField K]
+    {V : Type} [AddCommGroup V] [Module K V] [Module (RingOfIntegers K) V]
+    [IsScalarTower (RingOfIntegers K) K V]
+    (L : Submodule (RingOfIntegers K) V) (hL : Submodule.IsFullLattice K L)
+    (T : Submodule K V)
+    : Submodule.span K (↑(L ⊓ Submodule.restrictScalars (RingOfIntegers K) T) : Set V) = T := by
   apply le_antisymm
   · rw [Submodule.span_le]
     intro x hx
@@ -62,12 +68,16 @@ theorem span_inf_eq {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGrou
     rw [this]
     exact Submodule.smul_mem _ _ (Submodule.subset_span hmem)
 
-theorem main : ∀ {K : Type} [inst : Field K] [NumberField K] {V : Type} [inst_2 : AddCommGroup V]
-    [inst_3 : Module K V] [inst_4 : Module (NumberField.RingOfIntegers K) V]
-    [inst_5 : IsScalarTower (NumberField.RingOfIntegers K) K V]
-    (L : Submodule (NumberField.RingOfIntegers K) V), Submodule.IsFullLattice K L →
-    ∀ (T : Submodule K V),
-    Submodule.span K (↑(L ⊓ Submodule.restrictScalars (NumberField.RingOfIntegers K) T) : Set V) = T :=
-  fun L hL T => span_inf_eq L hL T
+theorem main
+    : ∀ {K : Type} [inst : Field K] [NumberField K] {V : Type} [inst_2 : AddCommGroup V]
+        [inst_3 : Module K V] [inst_4 : Module (NumberField.RingOfIntegers K) V]
+        [inst_5 : IsScalarTower (NumberField.RingOfIntegers K) K V]
+        (L : Submodule (NumberField.RingOfIntegers K) V),
+      Submodule.IsFullLattice K L
+        → ∀ (T : Submodule K V),
+          Submodule.span K
+              (↑(L ⊓ Submodule.restrictScalars (NumberField.RingOfIntegers K) T) : Set V)
+            = T := fun L hL T =>
+  span_inf_eq L hL T
 
 end GlobalTheory.SpanInfEq

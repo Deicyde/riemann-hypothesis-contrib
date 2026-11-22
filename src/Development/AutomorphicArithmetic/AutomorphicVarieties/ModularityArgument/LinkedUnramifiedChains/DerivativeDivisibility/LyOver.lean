@@ -6,9 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open Polynomial
 
-private theorem ext_injective {R S K : Type} [CommRing R] [IsDomain R] [CommRing S] [IsDomain S] [Field K]
-    [IsAlgClosed K] (f : R →+* S) (hi : Function.Injective f) (hf : f.IsIntegral) (φ : R →+* K)
-    (hφ : Function.Injective φ) : ∃ ψ : S →+* K, ψ.comp f = φ := by
+private theorem ext_injective
+    {R S K : Type} [CommRing R] [IsDomain R] [CommRing S] [IsDomain S] [Field K] [IsAlgClosed K]
+    (f : R →+* S) (hi : Function.Injective f) (hf : f.IsIntegral)
+    (φ : R →+* K) (hφ : Function.Injective φ)
+    : ∃ ψ : S →+* K, ψ.comp f = φ := by
   letI : Algebra R S := f.toAlgebra
   letI : Algebra R K := φ.toAlgebra
   haveI : Module.IsTorsionFree R S := Module.isTorsionFree_iff_algebraMap_injective.2 hi
@@ -17,42 +19,46 @@ private theorem ext_injective {R S K : Type} [CommRing R] [IsDomain R] [CommRing
   haveI : Algebra.IsAlgebraic R S := Algebra.IsIntegral.isAlgebraic
   let e : S →ₐ[R] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   exact ⟨e.toRingHom, RingHom.ext fun r => e.commutes r⟩
 
-private theorem ext_integral {R S K : Type} [CommRing R] [CommRing S] [Field K] [IsAlgClosed K]
-    (f : R →+* S) (hf : f.IsIntegral) (φ : R →+* K) (h : RingHom.ker f ≤ RingHom.ker φ) :
-    ∃ ψ : S →+* K, ψ.comp f = φ := by
+private theorem ext_integral
+    {R S K : Type} [CommRing R] [CommRing S] [Field K] [IsAlgClosed K]
+    (f : R →+* S) (hf : f.IsIntegral)
+    (φ : R →+* K) (h : RingHom.ker f ≤ RingHom.ker φ)
+    : ∃ ψ : S →+* K, ψ.comp f = φ := by
   letI : Algebra R S := f.toAlgebra
   haveI : Algebra.IsIntegral R S := ⟨hf⟩
   haveI : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime φ
-  obtain ⟨Q, -, hQ, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (RingHom.ker φ) ⊥ (by
-    intro r hr
-    apply h
-    rw [RingHom.mem_ker]
-    exact Ideal.mem_bot.1 (Ideal.mem_comap.1 hr))
+  obtain ⟨Q, -, hQ, hQc⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (RingHom.ker φ) ⊥ (by
+      intro r hr
+      apply h
+      rw [RingHom.mem_ker]
+      exact Ideal.mem_bot.1 (Ideal.mem_comap.1 hr))
   have hQc' : Q.comap f = RingHom.ker φ := hQc
-  let φ' : R ⧸ Q.comap f →+* K := Ideal.Quotient.lift _ φ (fun a ha => by
-    rw [hQc'] at ha
-    exact ha)
+  let φ' : R ⧸ Q.comap f →+* K :=
+    Ideal.Quotient.lift _ φ (fun a ha => by
+      rw [hQc'] at ha
+      exact ha)
   have hφ' : Function.Injective φ' := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
     rw [Ideal.Quotient.eq_zero_iff_mem, hQc']
     exact hx
-  obtain ⟨ψ, hψ⟩ := ext_injective (Ideal.quotientMap Q f le_rfl) Ideal.quotientMap_injective
-    (RingHom.IsIntegral.quotient f hf) φ' hφ'
+  obtain ⟨ψ, hψ⟩ :=
+    ext_injective (Ideal.quotientMap Q f le_rfl) Ideal.quotientMap_injective
+      (RingHom.IsIntegral.quotient f hf) φ' hφ'
   refine ⟨ψ.comp (Ideal.Quotient.mk Q), ?_⟩
   ext r
   have := congrArg (fun g => g (Ideal.Quotient.mk _ r)) hψ
   simp only [RingHom.comp_apply, Ideal.quotientMap_mk] at this ⊢
   exact this.trans (Ideal.Quotient.lift_mk _ _ _)
 
-theorem UpperTheory.V.J.lyOver :
-    UpperTheory.V.J.LyOver := by
+theorem UpperTheory.V.J.lyOver : UpperTheory.V.J.LyOver := by
   intro O Λ B K _ _ _ _ _ _ _ _ _ lam J t s g hC p z i hz
   obtain ⟨hprime, hdiv, hnot⟩ := UpperTheory.V.J.cmpPrime O Λ B lam J t s g hC i
   set Q := UpperTheory.V.J.cmp lam J t g i with hQdef

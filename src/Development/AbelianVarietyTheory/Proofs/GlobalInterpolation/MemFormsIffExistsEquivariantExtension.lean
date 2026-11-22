@@ -6,23 +6,25 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.FormsS
 @[expose] public section
 
 open Formalism.BasicNotions Classical NumberField GlobalTheory.LvT
-open Formalism.MainNotions.product_first_zeroth_parts (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
+open Formalism.MainNotions.product_first_zeroth_parts
+  (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
 
 namespace GlobalTheory.LvT
 
-theorem PtModel.mem_Fi_iff_exists_isExt : ∀ (D : D7) (u : D.what₂.Word) (X : Ch D u) (i : ℕ) (M : PtModel X i)
-    (φ : Fn X i), φ ∈ X.fm.Fi i ↔ ∃ Φ, M.IsExt φ Φ := by
+theorem PtModel.mem_Fi_iff_exists_isExt
+    : ∀ (D : D7) (u : D.what₂.Word) (X : Ch D u) (i : ℕ) (M : PtModel X i) (φ : Fn X i),
+      φ ∈ X.fm.Fi i ↔ ∃ Φ, M.IsExt φ Φ := by
   intro D u X i M φ
   rw [M.mem_Fi]
   constructor
   · intro h
     choose y hy hfix using h
     choose cl gp hp using M.rep_surj
-    have key : ∀ (c c' : X.C.cls i) (g g' : M.G), g • M.rep c = g' • M.rep c' →
-        M.act g (y c) = M.act g' (y c') := by
+    have key
+        : ∀ (c c' : X.C.cls i) (g g' : M.G),
+          g • M.rep c = g' • M.rep c' → M.act g (y c) = M.act g' (y c') := by
       intro c c' g g' hgg
-      have h1 : (g'⁻¹ * g) • M.rep c = M.rep c' := by
-        rw [mul_smul, hgg, inv_smul_smul]
+      have h1 : (g'⁻¹ * g) • M.rep c = M.rep c' := by rw [mul_smul, hgg, inv_smul_smul]
       have hc := M.rep_inj c c' _ h1
       subst hc
       have h2 := hfix c _ h1

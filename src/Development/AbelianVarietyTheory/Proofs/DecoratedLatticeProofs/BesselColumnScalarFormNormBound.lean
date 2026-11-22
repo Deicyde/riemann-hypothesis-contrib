@@ -12,7 +12,14 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Core.Rk GlobalTheory.Core.Mi
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
+  NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict
+  Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
+  GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -20,7 +27,13 @@ noncomputable section
 
 namespace GlobalTheory.Core.Mi.ColBound
 
-theorem colForm_bound : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (u : D.what₂.Word) (ψ : AddChar (AF D.host.F) ℂ) (A : HSp D) (B : SBes X h u ψ A) (hK : X.LevelSubgroupCharacter) (T : Cu X u hK), ∃ C : ℝ, ∀ (ξ : X.Vpi u) (a : GA D A), ‖B.colForm T.1 ξ a‖ ≤ C * ‖ξ‖ := by
+theorem colForm_bound
+    : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+        (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (u : D.what₂.Word)
+        (ψ : AddChar (AF D.host.F) ℂ) (A : HSp D) (B : SBes X h u ψ A)
+        (hK : X.LevelSubgroupCharacter) (T : Cu X u hK),
+      ∃ C : ℝ, ∀ (ξ : X.Vpi u) (a : GA D A),
+        ‖B.colForm T.1 ξ a‖ ≤ C * ‖ξ‖ := by
   intro D X h u ψ A B hK T
   have hca := (GlobalTheory.Core.Mi.PhCol.ph_colForm D X h u ψ A B hK T).1
   obtain ⟨K, hKc, hKg⟩ := B.cpt
@@ -48,8 +61,9 @@ theorem colForm_bound : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSettin
   rw [hlin, Finset.sum_mul]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => ?_)
   rw [norm_mul]
-  calc ‖L i ξ‖ * ‖B.colForm T.1 (b i) a‖ ≤ (‖L i‖ * ‖ξ‖) * c i :=
-        mul_le_mul ((L i).le_opNorm ξ) (hc i a) (norm_nonneg _) (by positivity)
+  calc
+    ‖L i ξ‖ * ‖B.colForm T.1 (b i) a‖ ≤ (‖L i‖ * ‖ξ‖) * c i :=
+      mul_le_mul ((L i).le_opNorm ξ) (hc i a) (norm_nonneg _) (by positivity)
     _ = ‖L i‖ * c i * ‖ξ‖ := by ring
 
 end GlobalTheory.Core.Mi.ColBound

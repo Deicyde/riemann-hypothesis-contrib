@@ -246,7 +246,8 @@ theorem proposition_size_bound : GrowthSizeBound := by
   have hx1 : 1 ≤ x := by linarith
   have hnR : (0 : ℝ) < n := by exact_mod_cast hn
   have pos : ∀ u : ℝ, 0 < x ^ u := fun u => Real.rpow_pos_of_pos hx0 u
-  have mono : ∀ u v : ℝ, u ≤ v → x ^ u ≤ x ^ v := fun u v h => Real.rpow_le_rpow_of_exponent_le hx1 h
+  have mono : ∀ u v : ℝ, u ≤ v → x ^ u ≤ x ^ v := fun u v h =>
+    Real.rpow_le_rpow_of_exponent_le hx1 h
   have hP1 : 1 ≤ x ^ (C * ε) := Real.one_le_rpow hx1 (by positivity)
   have hY1 : 1 ≤ x ^ ((1 : ℝ) / 2 + 13 * ε / 8) := Real.one_le_rpow hx1 (by linarith)
   have hXY : x ^ ((1 : ℝ) / 2 + ε) ≤ x ^ ((1 : ℝ) / 2 + 13 * ε / 8) := mono _ _ (by linarith)
@@ -255,29 +256,37 @@ theorem proposition_size_bound : GrowthSizeBound := by
   have hk0 : 0 < k := lt_of_lt_of_le (by positivity) hk1
   have hQ : 0 < (nT : ℝ) * m * b := by positivity
   have hxX : x ≤ x ^ ((1 : ℝ) / 2 + ε) * m := by
-    have e : x ^ ((1 : ℝ) / 2 + ε) * x ^ ((1 : ℝ) / 2 - ε) = x := by
-      rw [← SZ.rp hx0]; norm_num
-    calc x = x ^ ((1 : ℝ) / 2 + ε) * x ^ ((1 : ℝ) / 2 - ε) := e.symm
+    have e : x ^ ((1 : ℝ) / 2 + ε) * x ^ ((1 : ℝ) / 2 - ε) = x := by rw [← SZ.rp hx0]; norm_num
+    calc
+      x = x ^ ((1 : ℝ) / 2 + ε) * x ^ ((1 : ℝ) / 2 - ε) := e.symm
       _ ≤ x ^ ((1 : ℝ) / 2 + ε) * m := mul_le_mul_of_nonneg_left hm1 (pos _).le
   have h1 := SZ.T1 hxX hXY hnT0.le hm0.le hb.le haE
   have h2 := SZ.T2 hx0 hY1 hnT0.le hm0.le hb.le hk0 hk1 haE
   have h3 := SZ.T3 (ε := ε) (n := (n : ℝ)) hx0 hm0.le hb.le rfl hm2 hnT hnR.le
-  have h4 := SZ.T4 (nT2 := (nT2 : ℝ)) hx0 hx1 hm0.le hb.le hε rfl hnT hnR (by exact_mod_cast hnT2) hk0.le hk2
+  have h4 :=
+    SZ.T4 (nT2 := (nT2 : ℝ)) hx0 hx1 hm0.le hb.le hε rfl hnT hnR (by exact_mod_cast hnT2) hk0.le hk2
   have hErr' : Err ≤ 10 * x ^ (C * ε) * x ^ ((1 : ℝ) / 2 + 13 * ε / 8) * ((nT : ℝ) * m * b) := by
     refine le_trans hErr ?_
-    have hsum : (nT : ℝ) * aE * (1 + (m : ℝ) ^ 2 / k)
-        + m * ((2 * n) * m * b * x ^ ε + nT2 * k * b * x ^ ε / (n * (n * x ^ (-ε))))
-        ≤ 10 * x ^ ((1 : ℝ) / 2 + 13 * ε / 8) * ((nT : ℝ) * m * b) := by
-      have e : (nT : ℝ) * aE * (1 + (m : ℝ) ^ 2 / k)
-          + m * ((2 * n) * m * b * x ^ ε + nT2 * k * b * x ^ ε / (n * (n * x ^ (-ε))))
-          = (nT : ℝ) * aE + (nT : ℝ) * aE * ((m : ℝ) ^ 2 / k) + (m : ℝ) * ((2 * n) * m * b * x ^ ε)
-            + (m : ℝ) * ((nT2 : ℝ) * k * b * x ^ ε / (n * (n * x ^ (-ε)))) := by ring
-      rw [e]; linarith
+    have hsum
+        : (nT : ℝ) * aE * (1 + (m : ℝ) ^ 2 / k)
+            + m * ((2 * n) * m * b * x ^ ε + nT2 * k * b * x ^ ε / (n * (n * x ^ (-ε))))
+          ≤ 10 * x ^ ((1 : ℝ) / 2 + 13 * ε / 8) * ((nT : ℝ) * m * b) := by
+      have e
+          : (nT : ℝ) * aE * (1 + (m : ℝ) ^ 2 / k)
+              + m * ((2 * n) * m * b * x ^ ε + nT2 * k * b * x ^ ε / (n * (n * x ^ (-ε))))
+            = (nT : ℝ) * aE + (nT : ℝ) * aE * ((m : ℝ) ^ 2 / k)
+              + (m : ℝ) * ((2 * n) * m * b * x ^ ε)
+              + (m : ℝ) * ((nT2 : ℝ) * k * b * x ^ ε / (n * (n * x ^ (-ε)))) := by
+        ring
+      rw [e]
+      linarith
     have hP0 : 0 ≤ x ^ (C * ε) := (pos _).le
-    calc x ^ (C * ε) * ((nT : ℝ) * aE * (1 + (m : ℝ) ^ 2 / k)
-        + m * ((2 * n) * m * b * x ^ ε + nT2 * k * b * x ^ ε / (n * (n * x ^ (-ε)))))
-        ≤ x ^ (C * ε) * (10 * x ^ ((1 : ℝ) / 2 + 13 * ε / 8) * ((nT : ℝ) * m * b)) :=
-          mul_le_mul_of_nonneg_left hsum hP0
+    calc
+      x ^ (C * ε)
+            * ((nT : ℝ) * aE * (1 + (m : ℝ) ^ 2 / k)
+              + m * ((2 * n) * m * b * x ^ ε + nT2 * k * b * x ^ ε / (n * (n * x ^ (-ε)))))
+          ≤ x ^ (C * ε) * (10 * x ^ ((1 : ℝ) / 2 + 13 * ε / 8) * ((nT : ℝ) * m * b)) :=
+        mul_le_mul_of_nonneg_left hsum hP0
       _ = 10 * x ^ (C * ε) * x ^ ((1 : ℝ) / 2 + 13 * ε / 8) * ((nT : ℝ) * m * b) := by ring
   generalize hPd : x ^ (C * ε) = P at hErr' hP1
   generalize hYd : x ^ ((1 : ℝ) / 2 + 13 * ε / 8) = Y at hErr' hY1 hXY
@@ -297,18 +306,23 @@ theorem proposition_size_bound : GrowthSizeBound := by
     have h1 : Q * (δ / 2 * (Gx - 4 * X)) ≤ Q * (10 * P * Y + 2 / x) := by
       have e1 : Q * (δ / 2 * (Gx - 4 * X)) = Q * (δ / 2) * (Gx - 4 * X) := by ring
       have e2 : Q * (10 * P * Y + 2 / x) = 10 * P * Y * Q + 2 * Q / x := by ring
-      rw [e1, e2]; linarith
+      rw [e1, e2]
+      linarith
     have h2 := le_of_mul_le_mul_left h1 hQ
     have e3 : δ * (Gx - 4 * X) = 2 * (δ / 2 * (Gx - 4 * X)) := by ring
     have e4 : 10 * P * Y = 10 * (P * Y) := by ring
-    rw [e3]; rw [e4] at h2; linarith
+    rw [e3]
+    rw [e4] at h2
+    linarith
   have hG : Gx - 4 * X ≤ 22 * (P * Y) * x ^ ε := by
     by_cases hc : Gx - 4 * X ≤ 0
     · have : 0 ≤ 22 * (P * Y) * x ^ ε := by have := pos ε; positivity
       linarith
     · have hc' : 0 < Gx - 4 * X := lt_of_not_ge hc
       have hxe := pos ε
-      calc Gx - 4 * X ≤ (x ^ ε * δ) * (Gx - 4 * X) := le_mul_of_one_le_left hc'.le hxδ
+      calc
+        Gx - 4 * X
+          ≤ (x ^ ε * δ) * (Gx - 4 * X) := le_mul_of_one_le_left hc'.le hxδ
         _ = x ^ ε * (δ * (Gx - 4 * X)) := by ring
         _ ≤ x ^ ε * (22 * (P * Y)) := mul_le_mul_of_nonneg_left hmain hxe.le
         _ = 22 * (P * Y) * x ^ ε := by ring
@@ -316,15 +330,20 @@ theorem proposition_size_bound : GrowthSizeBound := by
     rw [← hPd, ← hYd, ← SZ.rp hx0, ← SZ.rp hx0]; ring_nf
   have hXZ : X ≤ x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε) := by
     rw [← hXd]; exact mono _ _ (by have := mul_nonneg hC hε.le; linarith)
-  have hfin : x ^ (3 * ε / 8) * x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε) = x ^ ((1 : ℝ) / 2 + (C + 3) * ε) := by
+  have hfin
+      : x ^ (3 * ε / 8) * x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε)
+        = x ^ ((1 : ℝ) / 2 + (C + 3) * ε) := by
     rw [← SZ.rp hx0]; ring_nf
   have hZ0 := pos ((1 : ℝ) / 2 + (C + 21 / 8) * ε)
   have hG26 : Gx ≤ 26 * x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε) := by
     have : 22 * (P * Y) * x ^ ε = 22 * x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε) := by rw [mul_assoc, hZ]
     linarith
   rw [← hfin]
-  calc Gx ≤ 26 * x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε) := hG26
-    _ ≤ x ^ (3 * ε / 8) * x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε) := mul_le_mul_of_nonneg_right hbig hZ0.le
+  calc
+    Gx
+      ≤ 26 * x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε) := hG26
+    _ ≤ x ^ (3 * ε / 8) * x ^ ((1 : ℝ) / 2 + (C + 21 / 8) * ε) :=
+      mul_le_mul_of_nonneg_right hbig hZ0.le
 
 namespace AN
 
@@ -622,7 +641,8 @@ theorem lipschitz_weight_all : LipWAll := by
   by_cases hψ : ψ = 0
   · subst hψ
     have e : ∀ y : ℝ, GPsi D ell 0 y = ((Gz y : ℝ) : ℂ) := fun y => by simp [GPsi]
-    rw [e, e, ← Complex.ofReal_mul, ← Complex.ofReal_mul, ← Complex.ofReal_sub, Complex.norm_real, Real.norm_eq_abs]
+    rw [e, e, ← Complex.ofReal_mul, ← Complex.ofReal_mul, ← Complex.ofReal_sub, Complex.norm_real,
+      Real.norm_eq_abs]
     exact AN.lip_triv A w w' hA hw hw'
   · exact AN.lip_char D ell ψ hψ A w w' hA hw hw'
 

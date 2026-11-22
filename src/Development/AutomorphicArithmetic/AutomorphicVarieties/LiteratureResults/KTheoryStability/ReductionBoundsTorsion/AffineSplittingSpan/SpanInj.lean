@@ -34,8 +34,10 @@ theorem WData.pr_mul (g : P) (hg : g ∈ Set.range W.ι) (z : P) : W.pr (g * z) 
   obtain ⟨g', rfl⟩ := hg
   simp [WData.pr, W.ρι]
 
-theorem WData.inv_univ {n : ℕ} (F : (Fin n → P) → ℝ) (hS : InvS (Set.range W.ι) F)
-    (ht : ∀ y, F (fun i => W.t * y i) = F y) : InvS Set.univ F := by
+theorem WData.inv_univ
+    {n : ℕ}
+    (F : (Fin n → P) → ℝ) (hS : InvS (Set.range W.ι) F) (ht : ∀ y, F (fun i => W.t * y i) = F y)
+    : InvS Set.univ F := by
   have hk : ∀ k : ℤ, ∀ y, F (fun i => W.t ^ k * y i) = F y := by
     intro k
     induction k using Int.induction_on with
@@ -43,36 +45,43 @@ theorem WData.inv_univ {n : ℕ} (F : (Fin n → P) → ℝ) (hS : InvS (Set.ran
     | succ k ih =>
       intro y
       rw [← ih y, ← ht (fun i => W.t ^ (k : ℤ) * y i)]
-      congr 1; funext i
+      congr 1
+      funext i
       rw [← mul_assoc, ← zpow_one_add, add_comm]
     | pred k ih =>
       intro y
       rw [← ih y, ← ht (fun i => W.t ^ (-(k : ℤ) - 1) * y i)]
-      congr 1; funext i
-      rw [← mul_assoc, ← zpow_one_add]; congr 2; ring
+      congr 1
+      funext i
+      rw [← mul_assoc, ← zpow_one_add]
+      congr 2
+      ring
   intro p _ y
   have : (fun i => p * y i) = fun i => W.ι (W.ρ p) * (W.t ^ (W.ℓ (Additive.ofMul p)) * y i) := by
     funext i; rw [← mul_assoc, ← W.dec p]
   rw [this, hS _ ⟨_, rfl⟩, hk]
 
-theorem WData.vanish_range {n : ℕ} (F : (Fin n → P) → ℝ) (hF : ∀ g : Fin n → G, F (fun i => W.ι (g i)) = 0)
-    (z : Fin n → P) (hz : ∀ i, z i ∈ Set.range W.ι) : F z = 0 := by
+theorem WData.vanish_range
+    {n : ℕ} (F : (Fin n → P) → ℝ) (hF : ∀ g : Fin n → G, F (fun i => W.ι (g i)) = 0) (z : Fin n → P)
+    (hz : ∀ i, z i ∈ Set.range W.ι)
+    : F z = 0 := by
   choose g hg using hz
   have : z = fun i => W.ι (g i) := by funext i; exact (hg i).symm
   rw [this, hF]
 
-theorem dc_one {Y : Type} (F : (Fin 1 → Y) → ℝ) (a : Y) (y : Fin 1 → Y) :
-    dc F (Fin.cons a y) = F y - F (fun _ => a) := by
+theorem dc_one {Y : Type} (F : (Fin 1 → Y) → ℝ) (a : Y) (y : Fin 1 → Y)
+    : dc F (Fin.cons a y) = F y - F (fun _ => a) := by
   simp [dc, Fin.sum_univ_succ]
   have h1 : (fun j : Fin 1 => (Fin.cons a y : Fin 2 → Y) (Fin.succAbove 1 j)) = fun _ => a := by
     funext j; fin_cases j; rfl
   rw [h1]
   ring
 
-theorem WData.inj (m : ℕ) (c : (Fin (m + 2) → P) → ℝ) (hc : InvS Set.univ c) (hdc : dc c = 0)
+theorem WData.inj
+    (m : ℕ) (c : (Fin (m + 2) → P) → ℝ) (hc : InvS Set.univ c) (hdc : dc c = 0)
     (hres : ∀ g : Fin (m + 2) → G, c (fun i => W.ι (g i)) = 0)
-    (hsl : ∀ g : Fin (m + 1) → G, prism W.ps c (fun i => W.ι (g i)) = 0) :
-    ∃ e : (Fin (m + 1) → P) → ℝ, InvS Set.univ e ∧ c = dc e := by
+    (hsl : ∀ g : Fin (m + 1) → G, prism W.ps c (fun i => W.ι (g i)) = 0)
+    : ∃ e : (Fin (m + 1) → P) → ℝ, InvS Set.univ e ∧ c = dc e := by
   set S := Set.range W.ι with hSdef
   have hcS : InvS S c := fun g _ y => hc g trivial y
   have hprS : ∀ z ∈ S, W.pr z ∈ S := fun z _ => ⟨_, rfl⟩
@@ -99,11 +108,13 @@ theorem WData.inj (m : ℕ) (c : (Fin (m + 2) → P) → ℝ) (hc : InvS Set.uni
   have hv0 : ∀ g : Fin (m + 1) → G, x (fun i => W.t * W.ι (g i)) - x (fun i => W.ι (g i)) = 0 := by
     intro g; rw [hxt, hx0, sub_zero]
   have hdv : dc ((fun y => x (fun i => W.t * y i)) - x) = 0 := by
-    rw [dc_sub]; funext z
+    rw [dc_sub]
+    funext z
     simp only [Pi.sub_apply, Pi.zero_apply]
     rw [dc_comp x (fun p => W.t * p) z, hdx]
     simp only [Pi.neg_apply]
-    rw [hc _ trivial z]; ring
+    rw [hc _ trivial z]
+    ring
   have hvS : InvS S ((fun y => x (fun i => W.t * y i)) - x) := by
     intro g hg y
     simp only [Pi.sub_apply]
@@ -121,7 +132,9 @@ theorem WData.inj (m : ℕ) (c : (Fin (m + 2) → P) → ℝ) (hc : InvS Set.uni
       linarith
     refine ⟨-x, ?_, ?_⟩
     · have hx := W.inv_univ x hxS hvz
-      intro g hg y; simp only [Pi.neg_apply]; rw [hx g hg y]
+      intro g hg y
+      simp only [Pi.neg_apply]
+      rw [hx g hg y]
     · rw [dc_neg, hdx, neg_neg]
   | succ m' =>
     set v := (fun y => x (fun i => W.t * y i)) - x with hvdef

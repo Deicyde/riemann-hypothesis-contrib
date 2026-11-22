@@ -12,7 +12,20 @@ namespace GlobalTheory.UnitLemma.Unr
 
 open GlobalTheory.UnitLemma Polynomial
 
-theorem residue_generates : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ → ∀ (B : InvAlg K) (ψ : K'.E →+* B.A), (∀ e, ψ (φ e) = algebraMap K.E B.A e) → Nontrivial B.A → (∀ y : K'.O, ψ (algebraMap K'.O K'.E y) ∈ Algebra.adjoin K.O ({B.g} : Set B.A)) → ∀ (s : K'.O) (Q : K'.O[X]), Q.Monic → Q.eval₂ (ψ.comp (algebraMap K'.O K'.E)) B.g = 0 → Q.map (IsLocalRing.residue K'.O) = (X - C (IsLocalRing.residue K'.O s)) ^ Q.natDegree → ∀ y : K'.O, ∃ f : K.O[X], ∃ z ∈ IsLocalRing.maximalIdeal K'.O, algebraMap K'.O K'.E y = f.eval₂ (φ.comp (algebraMap K.O K.E)) (algebraMap K'.O K'.E s) + algebraMap K'.O K'.E z := by
+theorem residue_generates
+    : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E),
+      IsUnrExt K K' d φ
+        → ∀ (B : InvAlg K) (ψ : K'.E →+* B.A),
+          (∀ e, ψ (φ e) = algebraMap K.E B.A e) → Nontrivial B.A
+            → (∀ y : K'.O, ψ (algebraMap K'.O K'.E y) ∈ Algebra.adjoin K.O ({B.g} : Set B.A))
+            → ∀ (s : K'.O) (Q : K'.O[X]),
+              Q.Monic → Q.eval₂ (ψ.comp (algebraMap K'.O K'.E)) B.g = 0
+                → Q.map (IsLocalRing.residue K'.O)
+                  = (X - C (IsLocalRing.residue K'.O s)) ^ Q.natDegree
+                → ∀ y : K'.O, ∃ f : K.O[X], ∃ z ∈ IsLocalRing.maximalIdeal K'.O,
+                  algebraMap K'.O K'.E y
+                    = f.eval₂ (φ.comp (algebraMap K.O K.E)) (algebraMap K'.O K'.E s)
+                      + algebraMap K'.O K'.E z := by
   intro K K' d φ hU B ψ hψ hnt hO s Q hQm hQg hQr y
   set Ψ : K'.O →+* B.A := ψ.comp (algebraMap K'.O K'.E) with hΨdef
   have hΨφ : ∀ a : K.O, Ψ (intMap hU a) = algebraMap K.O B.A a := by
@@ -39,7 +52,8 @@ theorem residue_generates : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsU
   have hΨz : Ψ z = aeval B.g f - aeval (Ψ s) f := by
     rw [hzdef, map_sub, hf, Polynomial.hom_eval₂]
     have : Ψ.comp (intMap hU) = algebraMap K.O B.A := by ext a; exact hΨφ a
-    rw [this]; rfl
+    rw [this]
+    rfl
   let g' : R := ⟨B.g, Algebra.self_mem_adjoin_singleton K.O B.g⟩
   let x' : R := ⟨Ψ s, hO s⟩
   obtain ⟨h, hh⟩ := Polynomial.sub_dvd_eval_sub g' x' (f.map (algebraMap K.O R))
@@ -47,7 +61,8 @@ theorem residue_generates : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsU
     rw [hΨz]
     have := congrArg Subtype.val hh
     simp only [Polynomial.eval_map_algebraMap, Subalgebra.coe_sub, Subalgebra.coe_mul,
-      Polynomial.aeval_subalgebra_coe] at this
+        Polynomial.aeval_subalgebra_coe]
+      at this
     exact this
 
   obtain ⟨zu, hzu'⟩ := hzu
@@ -64,29 +79,33 @@ theorem residue_generates : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsU
   have hdvd : C (intMap hU ϖ) ∣ Q - (X - C s) ^ Q.natDegree := by
     rw [Polynomial.C_dvd_iff_dvd_coeff]
     intro i
-    rw [← Ideal.mem_span_singleton, ← hmax, ← IsLocalRing.residue_eq_zero_iff, ← Polynomial.coeff_map,
-      Polynomial.map_sub, hQr]
+    rw [← Ideal.mem_span_singleton, ← hmax, ← IsLocalRing.residue_eq_zero_iff,
+      ← Polynomial.coeff_map, Polynomial.map_sub, hQr]
     simp
   obtain ⟨R', hR'⟩ := hdvd
   have hev := congrArg (Polynomial.eval₂ Ψ B.g) hR'
   rw [Polynomial.eval₂_sub, hQg, Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_pow,
-    Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_C, hΨφ] at hev
+      Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_C, hΨφ]
+    at hev
   have hRmem : ∀ P : K'.O[X], P.eval₂ Ψ B.g ∈ R := by
     intro P
     rw [Polynomial.eval₂_eq_sum_range]
     exact Subalgebra.sum_mem _ fun i _ =>
-      Subalgebra.mul_mem _ (hO _) (Subalgebra.pow_mem _ (Algebra.self_mem_adjoin_singleton K.O B.g) _)
+      Subalgebra.mul_mem _ (hO _)
+        (Subalgebra.pow_mem _ (Algebra.self_mem_adjoin_singleton K.O B.g) _)
   let r : R := ⟨R'.eval₂ Ψ B.g, hRmem R'⟩
   have hpow : (g' - x') ^ Q.natDegree = -(algebraMap K.O R ϖ * r) := by
     apply Subtype.ext
     simp only [Subalgebra.coe_pow, Subalgebra.coe_sub, Subalgebra.coe_neg, Subalgebra.coe_mul,
       Subalgebra.coe_algebraMap, g', x', r]
-    rw [← hev]; ring
+    rw [← hev]
+    ring
   set u := h * zi
   have hinv : algebraMap K.O R ϖ * (-(r * u ^ Q.natDegree)) = 1 := by
     have : ((g' - x') * u) ^ Q.natDegree = 1 := by rw [hunit, one_pow]
     rw [mul_pow, hpow] at this
-    rw [← this]; ring
+    rw [← this]
+    ring
 
   letI : Algebra K'.O B.A := Ψ.toAlgebra
   have hgint : IsIntegral K'.O B.g := ⟨Q, hQm, hQg⟩
@@ -94,8 +113,7 @@ theorem residue_generates : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsU
     intro w hw
     induction hw using Algebra.adjoin_induction with
     | mem x hx => rw [Set.mem_singleton_iff.1 hx]; exact hgint
-    | algebraMap a =>
-      rw [← hΨφ a]; exact isIntegral_algebraMap (R := K'.O) (x := intMap hU a)
+    | algebraMap a => rw [← hΨφ a]; exact isIntegral_algebraMap (R := K'.O) (x := intMap hU a)
     | add x y _ _ hx hy => exact hx.add hy
     | mul x y _ _ hx hy => exact hx.mul hy
   set v : R := -(r * u ^ Q.natDegree)
@@ -110,13 +128,16 @@ theorem residue_generates : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsU
   have hψt : ψ t = v := by
     have h1 : Ψ (intMap hU ϖ) * ψ t = 1 := by
       rw [hΨdef, RingHom.comp_apply, ← map_mul, mul_inv_cancel₀ hπ0, map_one]
-    calc ψ t = ((v : B.A) * Ψ (intMap hU ϖ)) * ψ t := by rw [mul_comm (v : B.A), hv1, one_mul]
+    calc
+      ψ t
+        = ((v : B.A) * Ψ (intMap hU ϖ)) * ψ t := by rw [mul_comm (v : B.A), hv1, one_mul]
       _ = v := by rw [mul_assoc, h1, mul_one]
   let ψA : K'.E →ₐ[K'.O] B.A := { toRingHom := ψ, commutes' := fun _ => rfl }
   have htint : IsIntegral K'.O t := by
     rw [← isIntegral_algHom_iff ψA ψ.injective]
     show IsIntegral K'.O (ψ t)
-    rw [hψt]; exact hvint
+    rw [hψt]
+    exact hvint
   obtain ⟨b, hb⟩ := IsIntegrallyClosed.isIntegral_iff.1 htint
   have hb1 : intMap hU ϖ * b = 1 := by
     apply IsFractionRing.injective K'.O K'.E

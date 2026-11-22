@@ -15,8 +15,11 @@ open ReciprocityTheory.AnForm.R.FinalTheorems (stalkId)
 
 namespace GlobalTheory.VanStalk
 
-theorem eq_of_forall_prime {R : Type*} [CommRing R] {A B : Ideal R} (hA : A.IsRadical) (hB : B.IsRadical)
-    (h : ∀ q : PrimeSpectrum R, A ≤ q.asIdeal ↔ B ≤ q.asIdeal) : A = B := by
+theorem eq_of_forall_prime
+    {R : Type*} [CommRing R]
+    {A B : Ideal R}
+    (hA : A.IsRadical) (hB : B.IsRadical) (h : ∀ q : PrimeSpectrum R, A ≤ q.asIdeal ↔ B ≤ q.asIdeal)
+    : A = B := by
   rw [← hA.radical, ← hB.radical, Ideal.radical_eq_sInf, Ideal.radical_eq_sInf]
   congr 1
   ext J
@@ -24,10 +27,11 @@ theorem eq_of_forall_prime {R : Type*} [CommRing R] {A B : Ideal R} (hA : A.IsRa
 
 variable {X X' : Scheme.{0}}
 
-theorem van_spec (Z : Closeds X) (x : X) :
-    (stalkId (Scheme.IdealSheafData.vanishingIdeal Z) x).IsRadical ∧
-    ∀ q : PrimeSpectrum (X.presheaf.stalk x),
-      X.fromSpecStalk x q ∈ Z ↔ stalkId (Scheme.IdealSheafData.vanishingIdeal Z) x ≤ q.asIdeal := by
+theorem van_spec (Z : Closeds X) (x : X)
+    : (stalkId (Scheme.IdealSheafData.vanishingIdeal Z) x).IsRadical
+      ∧ ∀ q : PrimeSpectrum (X.presheaf.stalk x),
+        X.fromSpecStalk x q ∈ Z
+          ↔ stalkId (Scheme.IdealSheafData.vanishingIdeal Z) x ≤ q.asIdeal := by
   obtain ⟨_, ⟨W, hW, rfl⟩, hx, -⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
   rw [ds_stalkId_eq_map _ ⟨W, hW⟩ x hx, Scheme.IdealSheafData.vanishingIdeal_ideal]
@@ -45,12 +49,15 @@ theorem van_spec (Z : Closeds X) (x : X) :
   refine ⟨?_, fun q => ?_⟩
   · rw [← hr, IsLocalization.map_radical (hW.primeIdealOf ⟨x, hx⟩).asIdeal.primeCompl]
     exact Ideal.radical_isRadical _
-  · have e : X.fromSpecStalk x q =
-        hW.fromSpec (PrimeSpectrum.comap (algebraMap Γ(X, W) (X.presheaf.stalk x)) q) := by
+  · have e
+        : X.fromSpecStalk x q
+          = hW.fromSpec (PrimeSpectrum.comap (algebraMap Γ(X, W) (X.presheaf.stalk x)) q) := by
       rw [← hW.fromSpecStalk_eq_fromSpecStalk hx]
       rfl
     rw [e, Ideal.map_le_iff_le_comap]
-    change PrimeSpectrum.comap (algebraMap Γ(X, W) (X.presheaf.stalk x)) q ∈ hW.fromSpec ⁻¹' (Z : Set X) ↔ _
+    change PrimeSpectrum.comap (algebraMap Γ(X, W) (X.presheaf.stalk x)) q
+        ∈ hW.fromSpec ⁻¹' (Z : Set X)
+      ↔ _
     rw [← hz]
     exact (PrimeSpectrum.mem_zeroLocus _ _).trans SetLike.coe_subset_coe
 
@@ -60,28 +67,36 @@ namespace GlobalTheory.VanStalk
 
 variable {X X' : Scheme.{0}}
 
-theorem stalkId_comap_of_affine {T : Scheme.{0}} [IsAffine T] (J : X.IdealSheafData) (χ : T ⟶ X)
-    (U : X.affineOpens) (hle : ⊤ ≤ χ ⁻¹ᵁ U.1) (z : T) :
-    stalkId (J.comap χ) z = (stalkId J (χ z)).map (χ.stalkMap z).hom := by
-  have key : ∀ z : T, stalkId (Scheme.IdealSheafData.ofIdealTop ((J.ideal U).map (χ.appLE U.1 ⊤ hle).hom)) z =
-      (stalkId J (χ z)).map (χ.stalkMap z).hom := by
+theorem stalkId_comap_of_affine
+    {T : Scheme.{0}} [IsAffine T]
+    (J : X.IdealSheafData)
+    (χ : T ⟶ X) (U : X.affineOpens) (hle : ⊤ ≤ χ ⁻¹ᵁ U.1)
+    (z : T)
+    : stalkId (J.comap χ) z = (stalkId J (χ z)).map (χ.stalkMap z).hom := by
+  have key
+      : ∀ z : T,
+        stalkId (Scheme.IdealSheafData.ofIdealTop ((J.ideal U).map (χ.appLE U.1 ⊤ hle).hom)) z
+          = (stalkId J (χ z)).map (χ.stalkMap z).hom := by
     intro z
     have hz : χ z ∈ U.1 := hle trivial
-    rw [GlobalTheory.LocM.stalkId_ofIdealTop, ds_stalkId_eq_map J U _ hz, Ideal.map_map, Ideal.map_map,
-      ← CommRingCat.hom_comp, ← CommRingCat.hom_comp, Scheme.Hom.germ_stalkMap, Scheme.Hom.appLE,
-      Category.assoc]
+    rw [GlobalTheory.LocM.stalkId_ofIdealTop, ds_stalkId_eq_map J U _ hz, Ideal.map_map,
+      Ideal.map_map, ← CommRingCat.hom_comp, ← CommRingCat.hom_comp, Scheme.Hom.germ_stalkMap,
+      Scheme.Hom.appLE, Category.assoc]
     congr 3
     exact T.presheaf.germ_res (homOfLE hle) z (by trivial)
   rw [← GlobalTheory.Vanishing.eq_comap_of_stalk key, key]
 
-theorem map_le_stalkId_comap (π : X' ⟶ X) (J : X.IdealSheafData) (x' : X') :
-    (stalkId J (π x')).map (π.stalkMap x').hom ≤ stalkId (J.comap π) x' := by
+theorem map_le_stalkId_comap (π : X' ⟶ X) (J : X.IdealSheafData) (x' : X')
+    : (stalkId J (π x')).map (π.stalkMap x').hom ≤ stalkId (J.comap π) x' := by
   by_cases hx : x' ∈ (J.comap π).support
   · obtain ⟨z, rfl⟩ := GlobalTheory.Vanishing.exists_ι_eq hx
-    have h : stalkId J (π ((J.comap π).subschemeι z)) ≤ RingHom.ker
-        (((J.comap π).subschemeι.stalkMap z).hom.comp (π.stalkMap ((J.comap π).subschemeι z)).hom) := by
-      have h0 := (GlobalTheory.Vanishing.le_ker_iff_stalk ((J.comap π).subschemeι ≫ π)).1
-        (Scheme.IdealSheafData.le_map_comap J π) z
+    have h
+        : stalkId J (π ((J.comap π).subschemeι z))
+          ≤ RingHom.ker (((J.comap π).subschemeι.stalkMap z).hom.comp
+            (π.stalkMap ((J.comap π).subschemeι z)).hom) := by
+      have h0 :=
+        (GlobalTheory.Vanishing.le_ker_iff_stalk ((J.comap π).subschemeι ≫ π)).1
+          (Scheme.IdealSheafData.le_map_comap J π) z
       rw [Scheme.Hom.stalkMap_comp] at h0
       exact h0
     rw [← RingHom.comap_ker, GlobalTheory.Vanishing.ker_stalkMap] at h
@@ -89,21 +104,22 @@ theorem map_le_stalkId_comap (π : X' ⟶ X) (J : X.IdealSheafData) (x' : X') :
   · rw [GlobalTheory.Vanishing.stalkId_eq_top _ hx]
     exact le_top
 
-theorem stalkId_comap (π : X' ⟶ X) (J : X.IdealSheafData) (x' : X') :
-    stalkId (J.comap π) x' = (stalkId J (π x')).map (π.stalkMap x').hom := by
+theorem stalkId_comap (π : X' ⟶ X) (J : X.IdealSheafData) (x' : X')
+    : stalkId (J.comap π) x' = (stalkId J (π x')).map (π.stalkMap x').hom := by
   refine le_antisymm ?_ (map_le_stalkId_comap π J x')
-  obtain ⟨U, hU, hxU, -⟩ := Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens
-    (show π x' ∈ (⊤ : X.Opens) from trivial)
-  obtain ⟨V₀, hV, hxV, hVU⟩ := Opens.isBasis_iff_nbhd.1 X'.isBasis_affineOpens
-    (show x' ∈ π ⁻¹ᵁ U from hxU)
+  obtain ⟨U, hU, hxU, -⟩ :=
+    Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens (show π x' ∈ (⊤ : X.Opens) from trivial)
+  obtain ⟨V₀, hV, hxV, hVU⟩ :=
+    Opens.isBasis_iff_nbhd.1 X'.isBasis_affineOpens (show x' ∈ π ⁻¹ᵁ U from hxU)
   let V : X'.Opens := V₀
   haveI : IsAffine V.toScheme := hV
   obtain ⟨z, rfl⟩ : ∃ z : V.toScheme, V.ι z = x' := ⟨⟨x', hxV⟩, rfl⟩
   have hle : ⊤ ≤ (V.ι ≫ π) ⁻¹ᵁ U := fun w _ => hVU w.2
   have h1 := stalkId_comap_of_affine J (V.ι ≫ π) ⟨U, hU⟩ hle z
   rw [Scheme.IdealSheafData.comap_comp] at h1
-  have h2 : (stalkId (J.comap π) (V.ι z)).map (V.ι.stalkMap z).hom ≤
-      ((stalkId J (π (V.ι z))).map (π.stalkMap (V.ι z)).hom).map (V.ι.stalkMap z).hom := by
+  have h2
+      : (stalkId (J.comap π) (V.ι z)).map (V.ι.stalkMap z).hom
+        ≤ ((stalkId J (π (V.ι z))).map (π.stalkMap (V.ι z)).hom).map (V.ι.stalkMap z).hom := by
     have h0 := map_le_stalkId_comap V.ι (J.comap π) z
     rw [h1, Scheme.Hom.stalkMap_comp] at h0
     rw [Ideal.map_map]

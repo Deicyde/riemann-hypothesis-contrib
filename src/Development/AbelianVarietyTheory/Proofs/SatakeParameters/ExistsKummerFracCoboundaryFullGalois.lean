@@ -5,14 +5,22 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LMulBeta
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Polynomial GlobalTheory.Pst GlobalTheory.MemLoc GlobalTheory.Pst.StLat GlobalTheory.Pst.NoLog
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Polynomial GlobalTheory.Pst GlobalTheory.MemLoc
+  GlobalTheory.Pst.StLat GlobalTheory.Pst.NoLog
 open scoped Formalism.Per
 
 namespace GlobalTheory.Pst.NoLog
 
-theorem exists_full_frac : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) [IsDomain P.R.B] (K : FinExt l) (b b' : P.R.B), b ≠ 0 →
-    (∀ g ∈ GK K, b * P.actQ g b' - P.actQ g b * b' = b * P.actQ g b * ((kummer P g : ℚ_[l]) • P.tB)) →
-    ∃ x y : P.R.B, x ≠ 0 ∧ ∀ g : GQ l, x * P.actQ g y - P.actQ g x * y = x * P.actQ g x * ((kummer P g : ℚ_[l]) • P.tB) := by
+theorem exists_full_frac
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) [IsDomain P.R.B] (K : FinExt l) (b b' : P.R.B),
+      b ≠ 0
+        → (∀ g ∈ GK K,
+          b * P.actQ g b' - P.actQ g b * b' = b * P.actQ g b * ((kummer P g : ℚ_[l]) • P.tB))
+        → ∃ x y : P.R.B,
+          x ≠ 0
+            ∧ ∀ g : GQ l,
+              x * P.actQ g y - P.actQ g x * y = x * P.actQ g x * ((kummer P g : ℚ_[l]) • P.tB) := by
   intro l _ P _ K b b' hb h
   haveI := K.2
   haveI : Finite (GQ l ⧸ GK K) := Subgroup.quotient_finite_of_isOpen _ K.1.fixingSubgroup_isOpen
@@ -37,8 +45,10 @@ theorem exists_full_frac : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) [IsDoma
   let T : GQ l → FractionRing P.R.B := fun g => ι ((kummer P g : ℚ_[l]) • P.tB)
   have hT : ∀ s g, e s (T g) = T (s * g) - T s := by
     intro s g
-    simp only [T, he, map_smul, localPrime_galoisAction_periodT, kummer_mul, smul_smul, add_smul, map_add (f := _)]
-    rw [mul_comm]; abel
+    simp only [T, he, map_smul, localPrime_galoisAction_periodT, kummer_mul, smul_smul, add_smul,
+      map_add (f := _)]
+    rw [mul_comm]
+    abel
   let f : FractionRing P.R.B := ι b' / ι b
   have hb0 : ι b ≠ 0 := (map_ne_zero_iff ι hι).2 hb
   have hf : ∀ g ∈ GK K, e g f - f = T g := by
@@ -71,7 +81,8 @@ theorem exists_full_frac : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) [IsDoma
       (Nat.cast_ne_zero.2 Fintype.card_ne_zero)
   have hn : ((Fintype.card (GQ l ⧸ GK K) : ℕ) : FractionRing P.R.B) ≠ 0 := by
     rw [← map_natCast ι]; exact (map_ne_zero_iff ι hι).2 hnB
-  let fa : FractionRing P.R.B := ((Fintype.card (GQ l ⧸ GK K) : ℕ) : FractionRing P.R.B)⁻¹ * ∑ q : GQ l ⧸ GK K, Fn q.out
+  let fa : FractionRing P.R.B :=
+    ((Fintype.card (GQ l ⧸ GK K) : ℕ) : FractionRing P.R.B)⁻¹ * ∑ q : GQ l ⧸ GK K, Fn q.out
   have hfa : ∀ s, e s fa - fa = T s := by
     intro s
     have h4 : ∑ q : GQ l ⧸ GK K, Fn (s * q.out) = ∑ q : GQ l ⧸ GK K, Fn q.out :=

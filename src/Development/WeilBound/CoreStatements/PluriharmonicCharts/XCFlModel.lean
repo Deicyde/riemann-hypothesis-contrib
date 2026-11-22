@@ -7,7 +7,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalM
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -16,8 +20,9 @@ namespace PositivityTheory.Xgp.c_fl_model
 
 section Point
 
-theorem an0 {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (f : (Fin 0 → ℂ) → E) (U : Set (Fin 0 → ℂ)) :
-    AnalyticOnNhd ℂ f U := by
+theorem an0
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (f : (Fin 0 → ℂ) → E) (U : Set (Fin 0 → ℂ))
+    : AnalyticOnNhd ℂ f U := by
   intro x _
   have e : f = fun _ => f x := funext fun y => congrArg f (Subsingleton.elim y x)
   rw [e]
@@ -33,13 +38,25 @@ def ptA : FinHolAtlas 0 (Fin 0 → ℂ) where
   cover _ := ⟨0, trivial⟩
   holo _ _ := an0 _ _
 
-theorem snc0 (L : LocPot (Fin 0 → ℂ)) (s : (Fin 0 → ℂ) → (Fin 0 → ℂ) → ℂ) (hs : ∀ x y, s x y ≠ 0) :
-    IsSNC ptA L s (Fin.elim0 : Fin 0 → ℕ) Fin.elim0 := fun x =>
-  ⟨OpenPartialHomeomorph.refl _, fun _ => ⟨an0 _ _, an0 _ _⟩, trivial,
-    fun y _ => by rw [Subsingleton.elim y x]; exact L.mem_U x, Fin.elim0, fun k => k.elim0, fun k => k.elim0,
-    s x, fun _ => an0 _ _, fun y _ => hs x y, fun y _ => by simp⟩
+theorem snc0 (L : LocPot (Fin 0 → ℂ)) (s : (Fin 0 → ℂ) → (Fin 0 → ℂ) → ℂ) (hs : ∀ x y, s x y ≠ 0)
+    : IsSNC ptA L s (Fin.elim0 : Fin 0 → ℕ) Fin.elim0 := fun x => ⟨
+  OpenPartialHomeomorph.refl _,
+  fun _ => ⟨an0 _ _, an0 _ _⟩,
+  trivial,
+  fun y _ => by rw [Subsingleton.elim y x]; exact L.mem_U x,
+  Fin.elim0,
+  fun k => k.elim0,
+  fun k => k.elim0,
+  s x,
+  fun _ => an0 _ _,
+  fun y _ => hs x y,
+  fun y _ => by simp
+⟩
 
-variable {K : Type} [Fintype K] [IsEmpty K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
+variable
+  {K : Type} [Fintype K] [IsEmpty K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Ω : Type} [Field Ω] [CharZero Ω]
 
 instance : IsEmpty (Σ k, ι k) := ⟨fun q => isEmptyElim q.1⟩
 
@@ -56,13 +73,23 @@ theorem not_mem_top (z : (Σ k, ι k) → ℂ) : z ∉ mcPts (⊤ : Ideal (MRing
 
 theorem homog (f : MRing ι) (d : K → ℕ) : IsMultiHomog f d := fun _ _ k => isEmptyElim k
 
-theorem orbit (z z' : (Σ k, ι k) → ℂ) : SameOrbit z z' := ⟨fun _ => 1, fun _ => one_ne_zero, funext fun p => isEmptyElim p⟩
+theorem orbit (z z' : (Σ k, ι k) → ℂ) : SameOrbit z z' :=
+  ⟨fun _ => 1, fun _ => one_ne_zero, funext fun p => isEmptyElim p⟩
 
-theorem regAt_int (x : (Σ k, ι k) → Ω) {Q : Ideal (MRing ι)} (hQ : Q.IsPrime) (n : ℤ) : RegAt x Q (n : Ω) :=
-  ⟨fun _ => 0, C n, 1, homog _ _, homog _ _, fun h => hQ.ne_top ((Ideal.eq_top_iff_one _).2 h), by simp⟩
+theorem regAt_int (x : (Σ k, ι k) → Ω) {Q : Ideal (MRing ι)} (hQ : Q.IsPrime) (n : ℤ)
+    : RegAt x Q (n : Ω) := ⟨
+  fun _ => 0,
+  C n,
+  1,
+  homog _ _,
+  homog _ _,
+  fun h => hQ.ne_top ((Ideal.eq_top_iff_one _).2 h),
+  by simp
+⟩
 
 theorem valAt_int (x : (Σ k, ι k) → Ω) (z : (Σ k, ι k) → ℂ) (n : ℤ) : valAt x (n : Ω) z = n :=
-  valAt_eq (mem_pts x z) ⟨fun _ => 0, C n, 1, homog _ _, homog _ _, by simp, by simp, by simp, by simp⟩
+  valAt_eq (mem_pts x z)
+    ⟨fun _ => 0, C n, 1, homog _ _, homog _ _, by simp, by simp, by simp, by simp⟩
 
 def ptRes (x : (Σ k, ι k) → Ω) : AnLogRes (mCoordIdeal x) ⊤ 0 where
   homog := ⟨{1}, fun f _ => ⟨fun _ => 0, homog _ _⟩, by simp⟩
@@ -88,30 +115,35 @@ section Minors
 
 variable {R : Type} [CommRing R] {N : ℕ}
 
-theorem minorIJ_eq (h : Matrix (Fin N) (Fin N) R) {I J : Finset (Fin N)} {s : ℕ} (hI : I.card = s) (hJ : J.card = s) :
-    minorIJ h I J = (h.submatrix (I.orderEmbOfFin hI) (J.orderEmbOfFin hJ)).det := by
+theorem minorIJ_eq
+    (h : Matrix (Fin N) (Fin N) R)
+    {I J : Finset (Fin N)} {s : ℕ} (hI : I.card = s) (hJ : J.card = s)
+    : minorIJ h I J = (h.submatrix (I.orderEmbOfFin hI) (J.orderEmbOfFin hJ)).det := by
   subst hJ
   exact dif_pos hI
 
 theorem minorIJ_one (I : Finset (Fin N)) : minorIJ (1 : Matrix (Fin N) (Fin N) R) I I = 1 := by
   unfold minorIJ
   rw [dif_pos rfl]
-  have : (1 : Matrix (Fin N) (Fin N) R).submatrix ⇑(I.orderEmbOfFin rfl) ⇑(I.orderEmbOfFin rfl) = 1 :=
+  have : (1 : Matrix (Fin N) (Fin N) R).submatrix ⇑(I.orderEmbOfFin rfl) ⇑(I.orderEmbOfFin rfl)
+      = 1 :=
     Matrix.submatrix_one_embedding (I.orderEmbOfFin rfl).toEmbedding
   rw [this, Matrix.det_one]
 
 theorem detFac_one (j : ℕ) (i : Fin N) : detFac j i (1 : Matrix (Fin N) (Fin N) R) = 1 := by
   simp [detFac, minorIJ_one]
 
-private theorem det_submatrix_orderEmbOfFin_congr {a b : ℕ} (hab : a = b) (M : Matrix (Fin N) (Fin N) ℂ) (I J : Finset (Fin N))
-    (p1 : J.card = a) (p2 : I.card = a) (p3 : J.card = b) (p4 : I.card = b) :
-    (M.submatrix (J.orderEmbOfFin p1) (I.orderEmbOfFin p2)).det =
-      (M.submatrix (J.orderEmbOfFin p3) (I.orderEmbOfFin p4)).det := by
+private theorem det_submatrix_orderEmbOfFin_congr
+    {a b : ℕ} (hab : a = b)
+    (M : Matrix (Fin N) (Fin N) ℂ)
+    (I J : Finset (Fin N)) (p1 : J.card = a) (p2 : I.card = a) (p3 : J.card = b) (p4 : I.card = b)
+    : (M.submatrix (J.orderEmbOfFin p1) (I.orderEmbOfFin p2)).det
+      = (M.submatrix (J.orderEmbOfFin p3) (I.orderEmbOfFin p4)).det := by
   subst hab
   rfl
 
-theorem minorIJ_conj (h : Matrix (Fin N) (Fin N) ℂ) (I J : Finset (Fin N)) :
-    minorIJ hᴴ J I = star (minorIJ h I J) := by
+theorem minorIJ_conj (h : Matrix (Fin N) (Fin N) ℂ) (I J : Finset (Fin N))
+    : minorIJ hᴴ J I = star (minorIJ h I J) := by
   unfold minorIJ
   by_cases e : I.card = J.card
   · rw [dif_pos e.symm, dif_pos e, ← Matrix.det_conjTranspose, Matrix.conjTranspose_submatrix]
@@ -123,7 +155,8 @@ def im {s : ℕ} (A : PlueckerData.Incr s N) : Finset (Fin N) := Finset.univ.ima
 theorem card_im {s : ℕ} (A : PlueckerData.Incr s N) : (im A).card = s := by
   simp [im, Finset.card_image_of_injective _ A.2.injective]
 
-theorem emb_im {s : ℕ} (A : PlueckerData.Incr s N) : ⇑((im A).orderEmbOfFin (card_im A)) = A.1 := (Finset.orderEmbOfFin_unique (card_im A) (fun x => by simp [im]) A.2).symm
+theorem emb_im {s : ℕ} (A : PlueckerData.Incr s N) : ⇑((im A).orderEmbOfFin (card_im A)) = A.1 :=
+  (Finset.orderEmbOfFin_unique (card_im A) (fun x => by simp [im]) A.2).symm
 
 theorem im_inj {s : ℕ} : Function.Injective (im : PlueckerData.Incr s N → _) := by
   intro A B h
@@ -131,17 +164,19 @@ theorem im_inj {s : ℕ} : Function.Injective (im : PlueckerData.Incr s N → _)
   rw [← emb_im A]
   exact (Finset.orderEmbOfFin_unique (card_im A) (fun x => by rw [h]; simp [im]) B.2).symm
 
-theorem exists_im {s : ℕ} (I : Finset (Fin N)) (h : I.card = s) : ∃ A : PlueckerData.Incr s N, im A = I := by
+theorem exists_im {s : ℕ} (I : Finset (Fin N)) (h : I.card = s)
+    : ∃ A : PlueckerData.Incr s N, im A = I := by
   refine ⟨⟨I.orderEmbOfFin h, (I.orderEmbOfFin h).strictMono⟩, ?_⟩
   ext a
   simp only [im, Finset.mem_image, Finset.mem_univ, true_and]
   rw [← Set.mem_range, Finset.range_orderEmbOfFin]
   rfl
 
-theorem cols_eq (i : Fin N) (hi : (i : ℕ) + 1 ≤ N) :
-    stepCols N N i = im ⟨Fin.castLE hi, Fin.strictMono_castLE _⟩ := by
+theorem cols_eq (i : Fin N) (hi : (i : ℕ) + 1 ≤ N)
+    : stepCols N N i = im ⟨Fin.castLE hi, Fin.strictMono_castLE _⟩ := by
   ext a
-  simp only [stepCols, im, Finset.mem_filter, Finset.mem_univ, true_and, if_pos hi, Finset.mem_image]
+  simp only [stepCols, im, Finset.mem_filter, Finset.mem_univ, true_and, if_pos hi,
+    Finset.mem_image]
   constructor
   · rintro ⟨-, h⟩
     exact ⟨⟨a, by omega⟩, Fin.ext (by simp)⟩
@@ -152,27 +187,33 @@ theorem cols_eq (i : Fin N) (hi : (i : ℕ) + 1 ≤ N) :
 theorem card_cols (i : Fin N) : (stepCols N N i).card = i + 1 := by
   rw [cols_eq i (by omega), card_im]
 
-theorem minor_im (h : Matrix (Fin N) (Fin N) R) (i : Fin N) (hi : (i : ℕ) + 1 ≤ N)
-    (A : PlueckerData.Incr (i + 1) N) :
-    minorIJ h (im A) (stepCols N N i) = (h.submatrix A.1 (Fin.castLE hi)).det := by
+theorem minor_im
+    (h : Matrix (Fin N) (Fin N) R)
+    (i : Fin N) (hi : (i : ℕ) + 1 ≤ N) (A : PlueckerData.Incr (i + 1) N)
+    : minorIJ h (im A) (stepCols N N i) = (h.submatrix A.1 (Fin.castLE hi)).det := by
   rw [minorIJ_eq h (card_im A) (card_cols i), emb_im]
   congr 2
-  exact (Finset.orderEmbOfFin_unique (card_cols i) (fun x => by rw [cols_eq i hi]; exact Finset.mem_image_of_mem _ (Finset.mem_univ x)) (Fin.strictMono_castLE hi)).symm
+  exact (Finset.orderEmbOfFin_unique (card_cols i)
+    (fun x => by rw [cols_eq i hi]; exact Finset.mem_image_of_mem _ (Finset.mem_univ x))
+    (Fin.strictMono_castLE hi)).symm
 
-theorem gram (h : Matrix (Fin N) (Fin N) ℂ) (i : Fin N) [Fintype (PlueckerData.Incr (i + 1) N)] :
-    (minorIJ (hᴴ * 1 * h) (stepCols N N i) (stepCols N N i)).re =
-      ∑ A : PlueckerData.Incr (i + 1) N, ‖minorIJ h (im A) (stepCols N N i)‖ ^ 2 := by
+theorem gram (h : Matrix (Fin N) (Fin N) ℂ) (i : Fin N) [Fintype (PlueckerData.Incr (i + 1) N)]
+    : (minorIJ (hᴴ * 1 * h) (stepCols N N i) (stepCols N N i)).re
+      = ∑ A : PlueckerData.Incr (i + 1) N, ‖minorIJ h (im A) (stepCols N N i)‖ ^ 2 := by
   have hS := card_cols (N := N) i
   rw [mul_one, MinorCalc.minorIJ_mul]
   simp only [minorIJ_conj]
   rw [Complex.re_sum]
-  have hterm : ∀ I' : Finset (Fin N),
-      (star (minorIJ h I' (stepCols N N i)) * minorIJ h I' (stepCols N N i)).re =
-        ‖minorIJ h I' (stepCols N N i)‖ ^ 2 := by
+  have hterm
+      : ∀ I' : Finset (Fin N),
+        (star (minorIJ h I' (stepCols N N i)) * minorIJ h I' (stepCols N N i)).re
+          = ‖minorIJ h I' (stepCols N N i)‖ ^ 2 := by
     intro I'
-    rw [Complex.star_def, ← Complex.normSq_eq_conj_mul_self, Complex.ofReal_re, Complex.normSq_eq_norm_sq]
+    rw [Complex.star_def, ← Complex.normSq_eq_conj_mul_self, Complex.ofReal_re,
+      Complex.normSq_eq_norm_sq]
   simp only [hterm]
-  rw [← Finset.sum_image (f := fun I => ‖minorIJ h I (stepCols N N i)‖ ^ 2)
+  rw [← Finset.sum_image
+    (f := fun I => ‖minorIJ h I (stepCols N N i)‖ ^ 2)
     (fun A _ B _ e => im_inj e)]
   symm
   apply Finset.sum_subset (Finset.subset_univ _)
@@ -235,11 +276,14 @@ def frame : FrameData (FlIdx Ψ N) Ψ N ℚ (blk Ψ N) where
   u' I q := coef q I
   υ _ := 1
 
-theorem good (x : (Σ k, baseIdx (FlIdx Ψ N) (blk Ψ N) k) → ℚ) (Q : Ideal (MRing (baseIdx (FlIdx Ψ N) (blk Ψ N))))
-    (hQ : Q.IsPrime) :
-    (∀ k, (X ⟨k, (frame Ψ N).c k⟩ : MRing (baseIdx (FlIdx Ψ N) (blk Ψ N))) ∉ Q) ∧
-      (∀ q I, RegAt x Q ((frame Ψ N).u q I) ∧ RegAt x Q ((frame Ψ N).u' I q)) ∧
-        ∀ p, blk Ψ N p = none → (frame Ψ N).υ p ≠ 0 ∧ RegAt x Q ((frame Ψ N).υ p) ∧ RegAt x Q ((frame Ψ N).υ p)⁻¹ := by
+theorem good
+    (x : (Σ k, baseIdx (FlIdx Ψ N) (blk Ψ N) k) → ℚ)
+    (Q : Ideal (MRing (baseIdx (FlIdx Ψ N) (blk Ψ N)))) (hQ : Q.IsPrime)
+    : (∀ k, (X ⟨k, (frame Ψ N).c k⟩ : MRing (baseIdx (FlIdx Ψ N) (blk Ψ N))) ∉ Q)
+      ∧ (∀ q I, RegAt x Q ((frame Ψ N).u q I) ∧ RegAt x Q ((frame Ψ N).u' I q))
+      ∧ ∀ p,
+        blk Ψ N p = none
+          → (frame Ψ N).υ p ≠ 0 ∧ RegAt x Q ((frame Ψ N).υ p) ∧ RegAt x Q ((frame Ψ N).υ p)⁻¹ := by
   have r1 : RegAt x Q (1 : ℚ) := by simpa using regAt_int x hQ 1
   have r0 : RegAt x Q (0 : ℚ) := by simpa using regAt_int x hQ 0
   refine ⟨fun k => isEmptyElim k, fun q I => ?_, fun p _ => ⟨one_ne_zero, ?_, ?_⟩⟩
@@ -251,9 +295,10 @@ theorem good (x : (Σ k, baseIdx (FlIdx Ψ N) (blk Ψ N) k) → ℚ) (Q : Ideal 
   · simpa [frame] using r1
   · simpa [frame] using r1
 
-theorem left_inv (p : Ψ × Fin N) (k : FlBlock Ψ N) (hp : blk Ψ N p = some k) (I I' : Finset (Fin N))
-    (hI : IsStepRows N N p.2 I) :
-    ∑ m : FlIdx Ψ N k, coef ⟨k, m⟩ I * coef ⟨k, m⟩ I' = if I = I' then 1 else 0 := by
+theorem left_inv
+    (p : Ψ × Fin N) (k : FlBlock Ψ N) (hp : blk Ψ N p = some k)
+    (I I' : Finset (Fin N)) (hI : IsStepRows N N p.2 I)
+    : ∑ m : FlIdx Ψ N k, coef ⟨k, m⟩ I * coef ⟨k, m⟩ I' = if I = I' then 1 else 0 := by
   obtain rfl := blk_some.1 hp
   have hc : I.card = (k.2 : ℕ) + 1 := by
     rw [hI.1, card_cols]
@@ -279,15 +324,19 @@ def model : FlagModel (yFl Ψ N) Ψ N N where
   x _ := 0
   x_ne k := isEmptyElim k
   y_base q := isEmptyElim q
-  g τ := Matrix.of fun a b => algebraMap (MvPolynomial (Ψ × Fin N × Fin N) ℚ) (ΩFl Ψ N) (X (τ, b, a))
+  g τ :=
+    Matrix.of fun a b => algebraMap (MvPolynomial (Ψ × Fin N × Fin N) ℚ) (ΩFl Ψ N) (X (τ, b, a))
   g_block _ := blockDiag _
   g_indep := by
     refine IsGenericFlag.of_indep (fun _ => blockDiag _) ?_
-    refine AlgebraicIndependent.map' (x := fun q : inertBlockIndex Ψ N N =>
-      (X (q.1.1, q.1.2.2, q.1.2.1) : MvPolynomial (Ψ × Fin N × Fin N) ℚ))
+    refine AlgebraicIndependent.map'
+      (x := fun q : inertBlockIndex Ψ N N =>
+        (X (q.1.1, q.1.2.2, q.1.2.1) : MvPolynomial (Ψ × Fin N × Fin N) ℚ))
       (f := (algebraMap (MvPolynomial (Ψ × Fin N × Fin N) ℚ) (ΩFl Ψ N)).toRatAlgHom) ?_
       (IsFractionRing.injective _ _)
-    refine (algebraicIndependent_X _ ℚ).comp (fun q : inertBlockIndex Ψ N N => (q.1.1, q.1.2.2, q.1.2.1)) ?_
+    refine (algebraicIndependent_X _ ℚ).comp
+      (fun q : inertBlockIndex Ψ N N => (q.1.1, q.1.2.2, q.1.2.1))
+      ?_
     rintro ⟨⟨a, b, c⟩, _⟩ ⟨⟨a', b', c'⟩, _⟩ h
     simp only [Prod.mk.injEq] at h
     obtain ⟨rfl, rfl, rfl⟩ := h
@@ -302,24 +351,37 @@ def model : FlagModel (yFl Ψ N) Ψ N N where
     rfl
   b _ _ := 0
   lam _ := 1
-  frames Q hQ _ _ := ⟨frame Ψ N, ⟨fun _ => ⟨blockDiag _, by simp [frame]⟩, fun p k _ m h _ => by
-    simp [frame, detFac_one], fun p k hp I I' hI _ => left_inv Ψ N p k hp I I' hI,
-    fun p _ => by simp [frame, detFac_one]⟩, good Ψ N _ Q hQ⟩
+  frames Q hQ _ _ := ⟨
+    frame Ψ N,
+    ⟨
+      fun _ => ⟨blockDiag _, by simp [frame]⟩,
+      fun p k _ m h _ => by simp [frame, detFac_one],
+      fun p k hp I I' hI _ => left_inv Ψ N p k hp I I' hI,
+      fun p _ => by simp [frame, detFac_one]
+    ⟩,
+    good Ψ N _ Q hQ
+  ⟩
 
-instance : IsEmpty (NonPluckerBlocks (model Ψ N).blk) := inferInstanceAs (IsEmpty (NonPluckerBlocks (blk Ψ N)))
+instance : IsEmpty (NonPluckerBlocks (model Ψ N).blk) :=
+  inferInstanceAs (IsEmpty (NonPluckerBlocks (blk Ψ N)))
 
-theorem isFrame : (model Ψ N).IsFrame (frame Ψ N) :=
-  ⟨fun _ => ⟨blockDiag _, show (1 : Matrix (Fin N) (Fin N) ℚ).det ≠ 0 by simp⟩,
-    fun p k _ m (h : Matrix (Fin N) (Fin N) ℚ) _ =>
-      show detFac N p.2 (1 : Matrix (Fin N) (Fin N) ℚ) *
-        ∑ I, coef ⟨k, m⟩ I * minorIJ (1 * h) I (stepCols N N p.2) =
-        (∏ _k' : NonPluckerBlocks (blk Ψ N), (0 : ℚ) ^ (0 : ℤ)) * ∑ I, coef ⟨k, m⟩ I * minorIJ h I (stepCols N N p.2) by
+theorem isFrame : (model Ψ N).IsFrame (frame Ψ N) := ⟨
+  fun _ => ⟨blockDiag _, show (1 : Matrix (Fin N) (Fin N) ℚ).det ≠ 0 by simp⟩,
+  fun p k _ m (h : Matrix (Fin N) (Fin N) ℚ) _ =>
+    show detFac N p.2 (1 : Matrix (Fin N) (Fin N) ℚ)
+          * ∑ I, coef ⟨k, m⟩ I * minorIJ (1 * h) I (stepCols N N p.2)
+        = (∏ _k' : NonPluckerBlocks (blk Ψ N), (0 : ℚ) ^ (0 : ℤ))
+          * ∑ I, coef ⟨k, m⟩ I * minorIJ h I (stepCols N N p.2) by
       simp [detFac_one],
-    fun p k hp I I' hI _ => left_inv Ψ N p k hp I I' hI,
-    fun p _ => show detFac N p.2 (1 : Matrix (Fin N) (Fin N) ℚ) * 1 =
-      (∏ _k' : NonPluckerBlocks (blk Ψ N), (0 : ℚ) ^ (0 : ℤ)) * 1 by simp [detFac_one]⟩
+  fun p k hp I I' hI _ => left_inv Ψ N p k hp I I' hI,
+  fun p _ =>
+    show detFac N p.2 (1 : Matrix (Fin N) (Fin N) ℚ) * 1
+        = (∏ _k' : NonPluckerBlocks (blk Ψ N), (0 : ℚ) ^ (0 : ℤ)) * 1 by
+      simp [detFac_one]
+⟩
 
-theorem dy_eq (p : Ψ × Fin N) : (model Ψ N).dy p = fun q => if q.1 = p.1 ∧ (q.2 : ℕ) = p.2 then 1 else 0 := by
+theorem dy_eq (p : Ψ × Fin N)
+    : (model Ψ N).dy p = fun q => if q.1 = p.1 ∧ (q.2 : ℕ) = p.2 then 1 else 0 := by
   funext q
   unfold FlagModel.dy
   rw [dite_eq_right (fun h => h (stp q) (blk_some.2 rfl))]
@@ -351,7 +413,8 @@ theorem periodGram : IsPeriodGram N (1 : Matrix (Fin N) (Fin N) ℂ) 1 := by
       simp [sigForm, Matrix.diagonal_apply, Matrix.one_apply]
     simp only [gramHead, gramOf, hs, one_mul, mul_one, Matrix.conjTranspose_one]
 
-theorem induced (zb) (p : Ψ × Fin N) : (model Ψ N).IsInducedAt (frame Ψ N) zb p 1 (yLineFl Ψ N p) := by
+theorem induced (zb) (p : Ψ × Fin N)
+    : (model Ψ N).IsInducedAt (frame Ψ N) zb p 1 (yLineFl Ψ N p) := by
   intro z _ _ _ h _ _
   have v1 : valAt (model Ψ N).x (1 : ℚ) (basePart (model Ψ N).blk z) = 1 := by
     have h1 := valAt_int (model Ψ N).x (basePart (model Ψ N).blk z) 1
@@ -381,14 +444,15 @@ theorem induced (zb) (p : Ψ × Fin N) : (model Ψ N).IsInducedAt (frame Ψ N) z
       rw [Finset.prod_eq_single k]
       · simp [stp]
       · intro q _ hq
-        have : ¬ (q.1 = (stp k).1 ∧ (q.2 : ℕ) = (stp k).2) := by
+        have : ¬(q.1 = (stp k).1 ∧ (q.2 : ℕ) = (stp k).2) := by
           rintro ⟨e1, e2⟩
           exact hq (Prod.ext e1 (Fin.ext e2))
         simp [this]
       · simp
     have hg := gram h (stp k).2
-    have hX : (∑ m : FlIdx Ψ N k, ‖z ⟨k, m⟩‖ ^ 2) =
-        (minorIJ (hᴴ * 1 * h) (stepCols N N (stp k).2) (stepCols N N (stp k).2)).re := by
+    have hX
+        : (∑ m : FlIdx Ψ N k, ‖z ⟨k, m⟩‖ ^ 2)
+          = (minorIJ (hᴴ * 1 * h) (stepCols N N (stp k).2) (stepCols N N (stp k).2)).re := by
       simp only [hz']
       exact hg.symm
     have hnn : 0 ≤ (minorIJ (hᴴ * 1 * h) (stepCols N N (stp k).2) (stepCols N N (stp k).2)).re := by
@@ -402,7 +466,7 @@ theorem induced (zb) (p : Ψ × Fin N) : (model Ψ N).IsInducedAt (frame Ψ N) z
       simp
   · intro hp
     have hnp : ¬ IsProperStep N N p.2 := blk_none.1 hp
-    have hp2 : ¬ ((p.2 : ℕ) + 1 < N) := by
+    have hp2 : ¬((p.2 : ℕ) + 1 < N) := by
       intro h'
       exact hnp ⟨by omega, by omega⟩
     have hv : valAt (model Ψ N).x ((frame Ψ N).υ p) (basePart (model Ψ N).blk z) = 1 := v1
@@ -411,7 +475,7 @@ theorem induced (zb) (p : Ψ × Fin N) : (model Ψ N).IsInducedAt (frame Ψ N) z
       unfold refNorm
       apply Finset.prod_eq_one
       intro q _
-      have : ¬ (q.1 = p.1 ∧ (q.2 : ℕ) = p.2) := by
+      have : ¬(q.1 = p.1 ∧ (q.2 : ℕ) = p.2) := by
         rintro ⟨-, e⟩
         have := q.2.2
         have := p.2.2
@@ -432,10 +496,19 @@ def metric : BaseMetric (model Ψ N) 0 where
   snc := snc0 _ _ fun _ _ => one_ne_zero
   norm_le x := by simp [logNormSec, LocPot.ofFun]
   Bat := ptA
-  adapted := ⟨⟨fun _ _ => an0 _ _, fun _ _ => an0 _ _⟩, fun _ => Set.subset_univ _,
+  adapted := ⟨
+    ⟨fun _ _ => an0 _ _, fun _ _ => an0 _ _⟩,
+    fun _ => Set.subset_univ _,
     fun x => ⟨(0 : Fin 1), trivial, ball0 _⟩,
-    0, fun _ => ⟨∅, Fin.elim0, by simp, by simp [bdry], fun _ _ _ => by
-      simp [rW, rLoc, logNormSec, LocPot.ofFun]⟩⟩
+    0,
+    fun _ => ⟨
+      ∅,
+      Fin.elim0,
+      by simp,
+      by simp [bdry],
+      fun _ _ _ => by simp [rW, rLoc, logNormSec, LocPot.ofFun]
+    ⟩
+  ⟩
   q := 1
   O _ := Set.univ
   O_open _ := isOpen_univ
@@ -449,9 +522,24 @@ def metric : BaseMetric (model Ψ N) 0 where
   Cst := 0
   size _ _ _ _ := by simp [Matrix.PosSemidef.zero]
   grad _ _ _ _ _ _ _ _ := by simp
-  period _ _ _ := ⟨Set.univ, fun _ _ => 1, trivial, isOpen_univ, fun _ _ _ _ => an0 _ _, fun _ _ _ => periodGram N⟩
-  immersion := ⟨0, (0 : Fin 0 → ℂ), ⟨trivial, fun h => one_ne_zero (α := ℂ) h⟩, Set.univ, fun _ _ => 1, trivial,
-    ⟨isOpen_univ, fun _ _ _ _ => an0 _ _, fun _ _ _ => periodGram N⟩, fun _ _ _ _ => Subsingleton.elim _ _⟩
+  period _ _ _ := ⟨
+    Set.univ,
+    fun _ _ => 1,
+    trivial,
+    isOpen_univ,
+    fun _ _ _ _ => an0 _ _,
+    fun _ _ _ => periodGram N
+  ⟩
+  immersion := ⟨
+    0,
+    (0 : Fin 0 → ℂ),
+    ⟨trivial, fun h => one_ne_zero (α := ℂ) h⟩,
+    Set.univ,
+    fun _ _ => 1,
+    trivial,
+    ⟨isOpen_univ, fun _ _ _ _ => an0 _ _, fun _ _ _ => periodGram N⟩,
+    fun _ _ _ _ => Subsingleton.elim _ _
+  ⟩
   hom := yLineFl Ψ N
   hom_deg p := (dy_eq Ψ N p).symm
   induced _ _ _ p := induced Ψ N _ p
@@ -460,9 +548,20 @@ end PositivityTheory.Xgp.c_fl_model
 
 end
 
-theorem PositivityTheory.Xgp.t_c_fl_model : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] [Nonempty Ψ] (N : ℕ), 2 ≤ N → ∃ (M : FlagModel (yFl Ψ N) Ψ N N) (BM : BaseMetric M 0), (∀ p, BM.hom p = yLineFl Ψ N p) ∧ (∀ p, fsHerm (FlIdx Ψ N) (M.dy p) = yLineFl Ψ N p) ∧ bdry BM.s = ∅ := by
+theorem PositivityTheory.Xgp.t_c_fl_model
+    : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] [Nonempty Ψ] (N : ℕ),
+      2 ≤ N
+        → ∃ (M : FlagModel (yFl Ψ N) Ψ N N) (BM : BaseMetric M 0),
+          (∀ p, BM.hom p = yLineFl Ψ N p) ∧ (∀ p, fsHerm (FlIdx Ψ N) (M.dy p) = yLineFl Ψ N p)
+            ∧ bdry BM.s = ∅ := by
   intro Ψ _ _ _ N _
-  refine ⟨PositivityTheory.Xgp.c_fl_model.model Ψ N, PositivityTheory.Xgp.c_fl_model.metric Ψ N, fun _ => rfl, fun p => ?_, ?_⟩
+  refine ⟨
+    PositivityTheory.Xgp.c_fl_model.model Ψ N,
+    PositivityTheory.Xgp.c_fl_model.metric Ψ N,
+    fun _ => rfl,
+    fun p => ?_,
+    ?_
+  ⟩
   · rw [PositivityTheory.Xgp.c_fl_model.dy_eq]
     rfl
   · exact Set.eq_empty_of_forall_notMem fun _ h => one_ne_zero (α := ℂ) h

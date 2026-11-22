@@ -11,9 +11,12 @@ noncomputable section
 
 namespace GlobalTheory.ThetaMean
 
-theorem mean_image {ι κ : Type} [Fintype ι] [Fintype κ] (L : (ι → ℝ) ≃L[ℝ] (κ → ℂ))
-    {s : Set (ι → ℝ)} (hs : volume s = 1) (f : (κ → ℂ) → ℝ) :
-    (∫ z in L '' s, f z) / (volume (L '' s)).toReal = ∫ p in s, f (L p) := by
+theorem mean_image
+    {ι κ : Type} [Fintype ι] [Fintype κ]
+    (L : (ι → ℝ) ≃L[ℝ] (κ → ℂ))
+    {s : Set (ι → ℝ)} (hs : volume s = 1)
+    (f : (κ → ℂ) → ℝ)
+    : (∫ z in L '' s, f z) / (volume (L '' s)).toReal = ∫ p in s, f (L p) := by
   have hL : MeasurableEmbedding L := L.toHomeomorph.measurableEmbedding
   have : (Measure.map L (volume : Measure (ι → ℝ))).IsAddHaarMeasure := L.isAddHaarMeasure_map _
   set c := Measure.addHaarScalarFactor (volume : Measure (κ → ℂ)) (Measure.map L volume) with hc_def
@@ -41,16 +44,17 @@ def periodMap {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) : (Fin g ⊕ Fin g →
     simp [mulVec, dotProduct, mul_add, Finset.mul_sum]
     exact Finset.sum_congr rfl fun j _ => by ring
 
-theorem periodMap_apply {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) (p : Fin g ⊕ Fin g → ℝ) :
-    periodMap τ p = (fun i => (p (.inl i) : ℂ)) + τ *ᵥ (fun i => (p (.inr i) : ℂ)) := rfl
+theorem periodMap_apply {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) (p : Fin g ⊕ Fin g → ℝ)
+    : periodMap τ p = (fun i => (p (.inl i) : ℂ)) + τ *ᵥ (fun i => (p (.inr i) : ℂ)) :=
+  rfl
 
-theorem im_periodMap {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) (p : Fin g ⊕ Fin g → ℝ) :
-    (fun i => (periodMap τ p i).im) = τ.map Complex.im *ᵥ fun i => p (.inr i) := by
+theorem im_periodMap {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) (p : Fin g ⊕ Fin g → ℝ)
+    : (fun i => (periodMap τ p i).im) = τ.map Complex.im *ᵥ fun i => p (.inr i) := by
   funext i
   simp [periodMap_apply, mulVec, dotProduct, Complex.im_sum]
 
-theorem periodMap_bijective {g : ℕ} {τ : Matrix (Fin g) (Fin g) ℂ}
-    (hp : (τ.map Complex.im).PosDef) : Function.Bijective (periodMap τ) := by
+theorem periodMap_bijective {g : ℕ} {τ : Matrix (Fin g) (Fin g) ℂ} (hp : (τ.map Complex.im).PosDef)
+    : Function.Bijective (periodMap τ) := by
   have hinj : Function.Injective (periodMap τ) := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro p hp0
@@ -77,17 +81,18 @@ theorem periodMap_bijective {g : ℕ} {τ : Matrix (Fin g) (Fin g) ℂ}
     ring
   exact ⟨hinj, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hrank).mp hinj⟩
 
-theorem exists_fundamentalDomain_mean_norm_sq_thetaChar :
-    ∀ (g : ℕ) (τ h : Matrix (Fin g) (Fin g) ℂ) (c₁ c₂ : Fin g → ℂ)
-      (Λ : AddSubgroup (Fin g → ℂ)), τ.IsSymm → (τ.map Complex.im).PosDef → IsUnit h.det →
-      (∀ i, c₁ i = 0 ∨ c₁ i = 1 / 2) → (∀ i, c₂ i = 0 ∨ c₂ i = 1 / 2) →
-      (∀ lam, lam ∈ Λ ↔ ∃ m n : Fin g → ℤ,
-        h *ᵥ lam = (fun i => (m i : ℂ)) + τ *ᵥ (fun i => (n i : ℂ))) →
-      ∃ Fd : Set (Fin g → ℂ), MeasureTheory.IsAddFundamentalDomain Λ Fd MeasureTheory.volume ∧
-        (∫ z in Fd, ‖thetaChar τ c₁ c₂ (h *ᵥ z)‖ ^ 2 * Real.exp (-2 * Real.pi *
-          ((fun i => ((h *ᵥ z) i).im) ⬝ᵥ (((τ.map Complex.im)⁻¹) *ᵥ fun i => ((h *ᵥ z) i).im)))) /
-          (MeasureTheory.volume Fd).toReal =
-          (Real.sqrt (2 ^ g * (τ.map Complex.im).det))⁻¹ := by
+theorem exists_fundamentalDomain_mean_norm_sq_thetaChar
+    : ∀ (g : ℕ) (τ h : Matrix (Fin g) (Fin g) ℂ) (c₁ c₂ : Fin g → ℂ) (Λ : AddSubgroup (Fin g → ℂ)),
+      τ.IsSymm → (τ.map Complex.im).PosDef → IsUnit h.det → (∀ i, c₁ i = 0 ∨ c₁ i = 1 / 2)
+        → (∀ i, c₂ i = 0 ∨ c₂ i = 1 / 2)
+        → (∀ lam,
+          lam ∈ Λ ↔ ∃ m n : Fin g → ℤ, h *ᵥ lam = (fun i => (m i : ℂ)) + τ *ᵥ (fun i => (n i : ℂ)))
+        → ∃ Fd : Set (Fin g → ℂ),
+          MeasureTheory.IsAddFundamentalDomain Λ Fd MeasureTheory.volume
+            ∧ (∫ z in Fd, ‖thetaChar τ c₁ c₂ (h *ᵥ z)‖ ^ 2 * Real.exp (-2 * Real.pi *
+                ((fun i => ((h *ᵥ z) i).im) ⬝ᵥ (((τ.map Complex.im)⁻¹) *ᵥ fun i => ((h *ᵥ z) i).im))))
+                / (MeasureTheory.volume Fd).toReal
+              = (Real.sqrt (2 ^ g * (τ.map Complex.im).det))⁻¹ := by
   intro g τ h c₁ c₂ Λ hsym hY hh hc₁ hc₂ hΛ
   obtain ⟨a, rfl⟩ : ∃ a : Fin g → ℝ, (fun i => (a i : ℂ)) = c₁ := by
     refine ⟨fun i => (c₁ i).re, funext fun i => ?_⟩
@@ -123,8 +128,9 @@ theorem exists_fundamentalDomain_mean_norm_sq_thetaChar :
     simp only [hrepr, Set.mem_range, algebraMap_int_eq, eq_intCast]
     constructor
     · rintro ⟨m, n, hmn⟩ i
-      have hPq : periodMap τ (Sum.elim (fun i => (m i : ℝ)) (fun i => (n i : ℝ))) =
-          (fun i => (m i : ℂ)) + τ *ᵥ (fun i => (n i : ℂ)) := by
+      have hPq
+          : periodMap τ (Sum.elim (fun i => (m i : ℝ)) (fun i => (n i : ℝ)))
+            = (fun i => (m i : ℂ)) + τ *ᵥ (fun i => (n i : ℂ)) := by
         rw [periodMap_apply]
         simp
       have hΦq : Φ (Sum.elim (fun i => (m i : ℝ)) (fun i => (n i : ℝ))) = lam := by

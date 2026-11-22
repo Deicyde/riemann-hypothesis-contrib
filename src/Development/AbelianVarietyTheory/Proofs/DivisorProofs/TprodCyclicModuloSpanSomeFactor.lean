@@ -11,15 +11,26 @@ noncomputable section
 
 namespace GlobalTheory.HoweR
 
-theorem tprod_cyclic_top : ∀ (T : Type) [Fintype T] [DecidableEq T] (V : T → Type) [∀ w, AddCommGroup (V w)] [∀ w, Module ℂ (V w)], ∀ (R S : T → ℕ) (a : ∀ w, Mat (R w) (S w) →ₗ[ℂ] Module.End ℂ (V w)) (C : ∀ w, Submodule ℂ (V w)) (v : ∀ w, V w), (∀ w, genSub (a w) {v w} ⊔ C w = ⊤) → ∀ N : Submodule ℂ (PiTensorProduct ℂ V), (∀ w, Stab (actAt w (a w)) N) → tensAny C ≤ N → PiTensorProduct.tprod ℂ v ∈ N → N = ⊤ := by
+theorem tprod_cyclic_top
+    : ∀ (T : Type) [Fintype T] [DecidableEq T] (V : T → Type) [∀ w, AddCommGroup (V w)]
+        [∀ w, Module ℂ (V w)],
+      ∀ (R S : T → ℕ) (a : ∀ w, Mat (R w) (S w) →ₗ[ℂ] Module.End ℂ (V w))
+          (C : ∀ w, Submodule ℂ (V w)) (v : ∀ w, V w),
+        (∀ w, genSub (a w) {v w} ⊔ C w = ⊤)
+          → ∀ N : Submodule ℂ (PiTensorProduct ℂ V),
+            (∀ w, Stab (actAt w (a w)) N) → tensAny C ≤ N → PiTensorProduct.tprod ℂ v ∈ N
+              → N = ⊤ := by
   intro T _ _ V _ _ R S a C v hgen N hN hC hv
-  have key : ∀ s : Finset T, ∀ f : ∀ w, V w, (∀ w, w ∉ s → f w = v w) → PiTensorProduct.tprod ℂ f ∈ N := by
+  have key
+      : ∀ s : Finset T, ∀ f : ∀ w, V w,
+        (∀ w, w ∉ s → f w = v w) → PiTensorProduct.tprod ℂ f ∈ N := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
       intro f hf
       have : f = v := funext fun w => hf w (Finset.notMem_empty w)
-      rw [this]; exact hv
+      rw [this]
+      exact hv
     | insert w s hws ih =>
       intro f hf
       let K : Submodule ℂ (V w) :=
@@ -60,8 +71,8 @@ theorem tprod_cyclic_top : ∀ (T : Type) [Fintype T] [DecidableEq T] (V : T →
       have : f w ∈ K := by rw [htop]; trivial
       rw [hmem, Function.update_eq_self] at this
       exact this
-  have hall : ∀ f : ∀ w, V w, PiTensorProduct.tprod ℂ f ∈ N :=
-    fun f => key Finset.univ f (fun w hw => absurd (Finset.mem_univ w) hw)
+  have hall : ∀ f : ∀ w, V w, PiTensorProduct.tprod ℂ f ∈ N := fun f =>
+    key Finset.univ f (fun w hw => absurd (Finset.mem_univ w) hw)
   rw [eq_top_iff, ← PiTensorProduct.span_tprod_eq_top, Submodule.span_le]
   rintro _ ⟨f, rfl⟩
   exact hall f

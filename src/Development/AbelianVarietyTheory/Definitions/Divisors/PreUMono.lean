@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR
 
 namespace GlobalTheory.AbCoh
 
@@ -36,9 +37,11 @@ variable {φ} {s : X ⟶ Sp R} {s' : X' ⟶ Sp R'} {σ : R →+* R'}
 def preCoef (h : φ ≫ s = s' ≫ spMap σ) : CoefMap σ (OAff s) (OPre φ s') where
   G := 𝟭 _
   α U := preα φ s s' U
-  naturality {p q} a b := (pairPull h).naturality
-    (homOfLE (show prePair φ q.unop ≤ prePair φ p.unop from
-      ⟨preU_mono φ (leOfHom a.unop), leOfHom a.unop⟩)).op b
+  naturality {p q} a b :=
+    (pairPull h).naturality
+      (homOfLE (show prePair φ q.unop ≤ prePair φ p.unop from
+        ⟨preU_mono φ (leOfHom a.unop), leOfHom a.unop⟩)).op
+      b
   smul U := semiHom_secPull h (prePair φ U.unop)
 
 end GlobalTheory.AbCoh

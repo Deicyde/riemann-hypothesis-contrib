@@ -4,7 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
@@ -39,7 +40,15 @@ lemma exists_common_denominator {A Ω : Type} [CommRing A] [Field Ω] (φ : A �
         rw [map_mul, hd, map_mul]
         ring
 
-theorem no_common_zero_spreads : ∀ (A : Type) [CommRing A] (τ J : Type) [Finite τ] (F : J → MvPolynomial τ A) (Ω : Type) [Field Ω] [IsAlgClosed Ω] (φ : A →+* Ω), (¬ ∃ z : τ → Ω, ∀ j, MvPolynomial.eval₂ φ z (F j) = 0) → ∃ (a : A) (I : Finset A), φ a ≠ 0 ∧ (∀ c ∈ I, φ c = 0) ∧ ∀ (k : Type) [Field k] (ψ : A →+* k), ψ a ≠ 0 → (∀ c ∈ I, ψ c = 0) → ¬ ∃ z : τ → k, ∀ j, MvPolynomial.eval₂ ψ z (F j) = 0 := by
+theorem no_common_zero_spreads
+    : ∀ (A : Type) [CommRing A] (τ J : Type) [Finite τ] (F : J → MvPolynomial τ A) (Ω : Type)
+        [Field Ω] [IsAlgClosed Ω] (φ : A →+* Ω),
+      (¬ ∃ z : τ → Ω, ∀ j, MvPolynomial.eval₂ φ z (F j) = 0)
+        → ∃ (a : A) (I : Finset A),
+          φ a ≠ 0 ∧ (∀ c ∈ I, φ c = 0)
+            ∧ ∀ (k : Type) [Field k] (ψ : A →+* k),
+              ψ a ≠ 0 → (∀ c ∈ I, ψ c = 0)
+                → ¬ ∃ z : τ → k, ∀ j, MvPolynomial.eval₂ ψ z (F j) = 0 := by
   intro A _ τ J _ F Ω _ _ φ hno
   classical
   let G : J → MvPolynomial τ Ω := fun j => MvPolynomial.map φ (F j)
@@ -55,14 +64,15 @@ theorem no_common_zero_spreads : ∀ (A : Type) [CommRing A] (τ J : Type) [Fini
       simpa [G, MvPolynomial.coe_aeval_eq_eval, MvPolynomial.eval_map] using this
     have := MvPolynomial.vanishingIdeal_zeroLocus_eq_radical (K := Ω) (Ideal.span (Set.range G))
     rw [hz, MvPolynomial.vanishingIdeal_empty, eq_comm, Ideal.radical_eq_top] at this
-    rw [this]; exact Submodule.mem_top
+    rw [this]
+    exact Submodule.mem_top
   obtain ⟨c, hc⟩ := (Finsupp.mem_span_range_iff_exists_finsupp).1 h1
 
   let K : Subfield Ω := Subfield.closure (φ.range : Set Ω)
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap K Ω)
-    (LinearMap.ker_eq_bot.2 (algebraMap K Ω).injective)
-  have hg1 : ∀ y : K, g (y : Ω) = y := fun y => by
-    exact LinearMap.congr_fun hg y
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Algebra.linearMap K Ω)
+      (LinearMap.ker_eq_bot.2 (algebraMap K Ω).injective)
+  have hg1 : ∀ y : K, g (y : Ω) = y := fun y => by exact LinearMap.congr_fun hg y
   have hgK : ∀ (x : Ω) (y : K), ((g (x * y) : K) : Ω) = (g x : Ω) * y := by
     intro x y
     have : x * (y : Ω) = y • x := by rw [mul_comm]; rfl
@@ -86,7 +96,8 @@ theorem no_common_zero_spreads : ∀ (A : Type) [CommRing A] (τ J : Type) [Fini
     · have := hg1 1; simpa using this
     · simp
   have hPmul : ∀ h j, P (h * G j) = P h * G j := by
-    intro h j; ext n
+    intro h j
+    ext n
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hPc, MvPolynomial.coeff_mul, MvPolynomial.coeff_mul, map_sum]
     refine (map_sum K.subtype _ _).trans (Finset.sum_congr rfl fun x _ => ?_)
@@ -107,13 +118,14 @@ theorem no_common_zero_spreads : ∀ (A : Type) [CommRing A] (τ J : Type) [Fini
     exact (hPmul _ _).symm
 
   let S : Finset Ω := c.support.biUnion (fun j => (P (c j)).coeffs)
-  obtain ⟨b, hb, hbS⟩ := exists_common_denominator φ S (by
-    intro x hx
-    obtain ⟨j, -, hj⟩ := Finset.mem_biUnion.1 hx
-    obtain ⟨n, -, rfl⟩ := MvPolynomial.mem_coeffs_iff.1 hj
-    rw [hPc]; exact (g _).2)
-  have hQ : ∀ j, ∃ q : MvPolynomial τ A,
-      MvPolynomial.map φ q = MvPolynomial.C (φ b) * P (c j) := by
+  obtain ⟨b, hb, hbS⟩ :=
+    exists_common_denominator φ S (by
+      intro x hx
+      obtain ⟨j, -, hj⟩ := Finset.mem_biUnion.1 hx
+      obtain ⟨n, -, rfl⟩ := MvPolynomial.mem_coeffs_iff.1 hj
+      rw [hPc]
+      exact (g _).2)
+  have hQ : ∀ j, ∃ q : MvPolynomial τ A, MvPolynomial.map φ q = MvPolynomial.C (φ b) * P (c j) := by
     intro j
     have : MvPolynomial.C (φ b) * P (c j) ∈ Set.range (MvPolynomial.map (σ := τ) φ) := by
       rw [MvPolynomial.mem_range_map_iff_coeffs_subset]
@@ -124,9 +136,13 @@ theorem no_common_zero_spreads : ∀ (A : Type) [CommRing A] (τ J : Type) [Fini
       · rw [hn, mul_zero]; exact ⟨0, map_zero φ⟩
       · have hj : j ∈ c.support := by
           rw [Finsupp.mem_support_iff]
-          intro h0; apply hn; rw [hPc, h0]; simp
-        exact hbS _ (Finset.mem_biUnion.2 ⟨j, hj,
-          MvPolynomial.mem_coeffs_iff.2 ⟨n, MvPolynomial.mem_support_iff.2 hn, rfl⟩⟩)
+          intro h0
+          apply hn
+          rw [hPc, h0]
+          simp
+        exact hbS _
+          (Finset.mem_biUnion.2
+            ⟨j, hj, MvPolynomial.mem_coeffs_iff.2 ⟨n, MvPolynomial.mem_support_iff.2 hn, rfl⟩⟩)
     exact this
   choose q hq using hQ
   let E : MvPolynomial τ A := MvPolynomial.C b - ∑ j ∈ c.support, q j * F j
@@ -148,8 +164,7 @@ theorem no_common_zero_spreads : ∀ (A : Type) [CommRing A] (τ J : Type) [Fini
       · exact hψI _ (MvPolynomial.mem_coeffs_iff.2 ⟨n, hn, rfl⟩)
       · rw [MvPolynomial.notMem_support_iff.1 hn, map_zero]
         rfl
-    have h2 : MvPolynomial.eval₂ ψ z E = 0 := by
-      rw [MvPolynomial.eval₂_eq_eval_map, h0, map_zero]
+    have h2 : MvPolynomial.eval₂ ψ z E = 0 := by rw [MvPolynomial.eval₂_eq_eval_map, h0, map_zero]
     have h3 : MvPolynomial.eval₂ ψ z E = ψ b := by
       simp [E, MvPolynomial.eval₂_sub, MvPolynomial.eval₂_C, MvPolynomial.eval₂_sum,
         MvPolynomial.eval₂_mul, hz]

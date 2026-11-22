@@ -15,25 +15,32 @@ section Surj
 
 variable {X : Scheme.{0}}
 
-theorem germ_closedPoint_eq_appLE {R : CommRingCat.{0}} [IsLocalRing R] (f : Spec R ⟶ X) (U : X.Opens)
-    (hU : f (IsLocalRing.closedPoint R) ∈ U) :
-    X.presheaf.germ U _ hU ≫ Scheme.stalkClosedPointTo f =
-      f.appLE U ⊤ (Scheme.preimage_eq_top_of_closedPoint_mem f hU).ge ≫ (Scheme.ΓSpecIso R).hom := by
+theorem germ_closedPoint_eq_appLE
+    {R : CommRingCat.{0}} [IsLocalRing R]
+    (f : Spec R ⟶ X) (U : X.Opens) (hU : f (IsLocalRing.closedPoint R) ∈ U)
+    : X.presheaf.germ U _ hU ≫ Scheme.stalkClosedPointTo f
+      = f.appLE U ⊤ (Scheme.preimage_eq_top_of_closedPoint_mem f hU).ge
+        ≫ (Scheme.ΓSpecIso R).hom := by
   rw [Scheme.germ_stalkClosedPointTo]
   simp only [Scheme.Hom.appLE]
   rfl
 
-theorem val_comp_spec {R S : CommRingCat.{0}} [IsLocalRing R] [IsLocalRing S] (φ : R ⟶ S) (z : Spec R ⟶ X)
-    (w : Spec S ⟶ X) (hw : Spec.map φ ≫ z = w) (U : X.Opens)
-    (h1 : z (IsLocalRing.closedPoint R) ∈ U) (h2 : w (IsLocalRing.closedPoint S) ∈ U) (t : Γ(X, U)) :
-    φ.hom ((Scheme.stalkClosedPointTo z).hom ((X.presheaf.germ U _ h1).hom t)) =
-      (Scheme.stalkClosedPointTo w).hom ((X.presheaf.germ U _ h2).hom t) := by
+theorem val_comp_spec
+    {R S : CommRingCat.{0}} [IsLocalRing R] [IsLocalRing S]
+    (φ : R ⟶ S) (z : Spec R ⟶ X) (w : Spec S ⟶ X) (hw : Spec.map φ ≫ z = w)
+    (U : X.Opens)
+    (h1 : z (IsLocalRing.closedPoint R) ∈ U) (h2 : w (IsLocalRing.closedPoint S) ∈ U) (t : Γ(X, U))
+    : φ.hom ((Scheme.stalkClosedPointTo z).hom ((X.presheaf.germ U _ h1).hom t))
+      = (Scheme.stalkClosedPointTo w).hom ((X.presheaf.germ U _ h2).hom t) := by
   subst hw
-  have key : (Spec.map φ ≫ z).appLE U ⊤ (Scheme.preimage_eq_top_of_closedPoint_mem _ h2).ge ≫
-      (Scheme.ΓSpecIso S).hom =
-      z.appLE U ⊤ (Scheme.preimage_eq_top_of_closedPoint_mem z h1).ge ≫ (Scheme.ΓSpecIso R).hom ≫ φ := by
+  have key
+      : (Spec.map φ ≫ z).appLE U ⊤ (Scheme.preimage_eq_top_of_closedPoint_mem _ h2).ge
+          ≫ (Scheme.ΓSpecIso S).hom
+        = z.appLE U ⊤ (Scheme.preimage_eq_top_of_closedPoint_mem z h1).ge ≫ (Scheme.ΓSpecIso R).hom
+          ≫ φ := by
     have e₂ : (⊤ : (Spec S).Opens) ≤ (Spec.map φ) ⁻¹ᵁ ⊤ := by simp
-    rw [← Scheme.Hom.appLE_comp_appLE (Spec.map φ) z U ⊤ ⊤ (Scheme.preimage_eq_top_of_closedPoint_mem z h1).ge e₂,
+    rw [← Scheme.Hom.appLE_comp_appLE (Spec.map φ) z U ⊤ ⊤
+        (Scheme.preimage_eq_top_of_closedPoint_mem z h1).ge e₂,
       Category.assoc, ← Scheme.ΓSpecIso_naturality, Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
     rfl
   have e1 := congrArg (fun g => (g ≫ φ).hom t) (germ_closedPoint_eq_appLE z U h1)
@@ -44,11 +51,14 @@ theorem val_comp_spec {R S : CommRingCat.{0}} [IsLocalRing R] [IsLocalRing S] (�
 
 variable {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {Ω' : Type} [Field Ω']
 
-def DomAt (ξ : Spec (CommRingCat.of Ω) ⟶ X) (i : Ω →+* Ω') (A : ValuationSubring Ω') (p : Cpt ξ) : Prop :=
+def DomAt (ξ : Spec (CommRingCat.of Ω) ⟶ X) (i : Ω →+* Ω') (A : ValuationSubring Ω') (p : Cpt ξ)
+    : Prop :=
   ∃ ν : X.presheaf.stalk p.1 →+* A, IsLocalHom ν ∧ ∀ s, (ν s : Ω') = i (genMap ξ p s)
 
-theorem DomAt.inv_mem {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p : Cpt ξ} (h : DomAt ξ i A p) {a : Ω}
-    (h0 : a ≠ 0) (ha : a ∈ regAt ξ p) (hi : i a⁻¹ ∈ A) : a⁻¹ ∈ regAt ξ p := by
+theorem DomAt.inv_mem
+    {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p : Cpt ξ} (h : DomAt ξ i A p)
+    {a : Ω} (h0 : a ≠ 0) (ha : a ∈ regAt ξ p) (hi : i a⁻¹ ∈ A)
+    : a⁻¹ ∈ regAt ξ p := by
   obtain ⟨ν, hloc, hν⟩ := h
   obtain ⟨s, rfl⟩ := RingHom.mem_range.mp ha
   have hu : IsUnit (ν s) := by
@@ -60,16 +70,20 @@ theorem DomAt.inv_mem {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p : Cpt ξ}
   refine RingHom.mem_range.mpr ⟨↑hs.unit⁻¹, ?_⟩
   rw [map_units_inv, IsUnit.unit_spec]
 
-theorem genMap_germ (r : Cpt ξ) {U : X.Opens} (hr : r.1 ∈ U) (t : Γ(X, U)) :
-    genMap ξ r ((X.presheaf.germ U r.1 hr).hom t) =
-      (Scheme.stalkClosedPointTo ξ).hom ((X.presheaf.germ U (genPt ξ) (r.2.mem_open U.isOpen hr)).hom t) := by
+theorem genMap_germ (r : Cpt ξ) {U : X.Opens} (hr : r.1 ∈ U) (t : Γ(X, U))
+    : genMap ξ r ((X.presheaf.germ U r.1 hr).hom t)
+      = (Scheme.stalkClosedPointTo ξ).hom
+        ((X.presheaf.germ U (genPt ξ) (r.2.mem_open U.isOpen hr)).hom t) := by
   have e := congrArg (fun g => g.hom t) (X.presheaf.germ_stalkSpecializes hr r.2)
   simp only [CommRingCat.hom_comp, RingHom.comp_apply] at e
   show (Scheme.stalkClosedPointTo ξ).hom ((X.presheaf.stalkSpecializes r.2).hom ((X.presheaf.germ U r.1 hr).hom t)) = _
   rw [e]
 
-theorem DomAt.eq_of_mem_affine {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p p' : Cpt ξ} (h : DomAt ξ i A p)
-    (h' : DomAt ξ i A p') {U : X.Opens} (hU : IsAffineOpen U) (hp : p.1 ∈ U) (hp' : p'.1 ∈ U) : p.1 = p'.1 := by
+theorem DomAt.eq_of_mem_affine
+    {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p p' : Cpt ξ}
+    (h : DomAt ξ i A p) (h' : DomAt ξ i A p')
+    {U : X.Opens} (hU : IsAffineOpen U) (hp : p.1 ∈ U) (hp' : p'.1 ∈ U)
+    : p.1 = p'.1 := by
   obtain ⟨ν, hν1, hν⟩ := h
   obtain ⟨ν', hν1', hν'⟩ := h'
   have key : ∀ b : Γ(X, U), p.1 ∈ X.basicOpen b ↔ p'.1 ∈ X.basicOpen b := by
@@ -77,8 +91,11 @@ theorem DomAt.eq_of_mem_affine {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p 
     have e : ν ((X.presheaf.germ U p.1 hp).hom b) = ν' ((X.presheaf.germ U p'.1 hp').hom b) := by
       apply Subtype.ext
       simp only [hν, hν', genMap_germ]
-    rw [X.mem_basicOpen b p.1 hp, X.mem_basicOpen b p'.1 hp', ← isUnit_map_iff ν, ← isUnit_map_iff ν', e]
-  have sp : ∀ {a c : X}, a ∈ U → c ∈ U → (∀ b : Γ(X, U), a ∈ X.basicOpen b → c ∈ X.basicOpen b) → c ⤳ a := by
+    rw [X.mem_basicOpen b p.1 hp, X.mem_basicOpen b p'.1 hp', ← isUnit_map_iff ν,
+      ← isUnit_map_iff ν', e]
+  have sp
+      : ∀ {a c : X},
+        a ∈ U → c ∈ U → (∀ b : Γ(X, U), a ∈ X.basicOpen b → c ∈ X.basicOpen b) → c ⤳ a := by
     intro a c ha hc hab
     rw [specializes_iff_forall_open]
     intro s hs has
@@ -86,10 +103,11 @@ theorem DomAt.eq_of_mem_affine {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p 
     exact hb (hab b hab')
   exact ((sp hp' hp (fun b => (key b).2)).antisymm (sp hp hp' (fun b => (key b).1))).eq
 
-theorem domAt_of_spec {i : Ω →+* Ω'} {A : ValuationSubring Ω'} (z : Spec (CommRingCat.of A) ⟶ X)
+theorem domAt_of_spec
+    {i : Ω →+* Ω'} {A : ValuationSubring Ω'} (z : Spec (CommRingCat.of A) ⟶ X)
     (hz : Spec.map (CommRingCat.ofHom (algebraMap A Ω')) ≫ z = Spec.map (CommRingCat.ofHom i) ≫ ξ)
-    (h : genPt ξ ⤳ z (IsLocalRing.closedPoint A)) :
-    DomAt ξ i A ⟨z (IsLocalRing.closedPoint A), h⟩ := by
+    (h : genPt ξ ⤳ z (IsLocalRing.closedPoint A))
+    : DomAt ξ i A ⟨z (IsLocalRing.closedPoint A), h⟩ := by
   refine ⟨(Scheme.stalkClosedPointTo z).hom, inferInstance, fun s => ?_⟩
   obtain ⟨U, hU, t, rfl⟩ := X.presheaf.exists_germ_eq s
   have hg : genPt ξ ∈ U := h.mem_open U.isOpen hU
@@ -101,8 +119,9 @@ theorem domAt_of_spec {i : Ω →+* Ω'} {A : ValuationSubring Ω'} (z : Spec (C
   have e3 := congrArg i (genMap_germ (ξ := ξ) ⟨z (IsLocalRing.closedPoint A), h⟩ hU t)
   exact e1.trans (e2.symm.trans e3.symm)
 
-private theorem exists_domAt_of_injective_genMap (i : Ω →+* Ω') (p : Cpt ξ) (hinj : Function.Injective (genMap ξ p)) :
-    ∃ A : ValuationSubring Ω', DomAt ξ i A p := by
+private theorem exists_domAt_of_injective_genMap
+    (i : Ω →+* Ω') (p : Cpt ξ) (hinj : Function.Injective (genMap ξ p))
+    : ∃ A : ValuationSubring Ω', DomAt ξ i A p := by
   let g : X.presheaf.stalk p.1 →+* Ω' := i.comp (genMap ξ p)
   have hg : Function.Injective g := i.injective.comp hinj
   obtain ⟨A, hA⟩ := LocalSubring.exists_le_valuationSubring (LocalSubring.range g)
@@ -123,9 +142,11 @@ private theorem exists_domAt_of_injective_genMap (i : Ω →+* Ω') (p : Cpt ξ)
   rw [map_mul, map_one, hs']
   exact congrArg Subtype.val hw
 
-private theorem inChart_of_domAt_of_div_mem {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p : Cpt ξ} (h : DomAt ξ i A p)
-    {κ : Type} {x : κ → Ω} {c : κ} (hxc : x c ≠ 0) (hA : ∀ c', i (x c' / x c) ∈ A) {c'' : κ}
-    (h'' : InChart ξ x c'' p) : InChart ξ x c p := by
+private theorem inChart_of_domAt_of_div_mem
+    {i : Ω →+* Ω'} {A : ValuationSubring Ω'} {p : Cpt ξ} (h : DomAt ξ i A p)
+    {κ : Type} {x : κ → Ω} {c : κ} (hxc : x c ≠ 0) (hA : ∀ c', i (x c' / x c) ∈ A)
+    {c'' : κ} (h'' : InChart ξ x c'' p)
+    : InChart ξ x c p := by
   refine ⟨hxc, fun c' => ?_⟩
   have hc'' : x c'' ≠ 0 := h''.1
   have h1 : x c / x c'' ∈ regAt ξ p := h''.2 c
@@ -136,26 +157,44 @@ private theorem inChart_of_domAt_of_div_mem {i : Ω →+* Ω'} {A : ValuationSub
   rw [e]
   exact mul_mem (h''.2 c') h2
 
-private theorem div_mem_of_valuation_le {K : Type} [Field K] (A : ValuationSubring K) {a b : K} (hb : b ≠ 0)
-    (h : A.valuation a ≤ A.valuation b) : a / b ∈ A := by
+private theorem div_mem_of_valuation_le
+    {K : Type} [Field K]
+    (A : ValuationSubring K)
+    {a b : K} (hb : b ≠ 0) (h : A.valuation a ≤ A.valuation b)
+    : a / b ∈ A := by
   rw [← A.valuation_le_one_iff, map_div₀]
   have hb' : A.valuation b ≠ 0 := (Valuation.ne_zero_iff _).2 hb
   exact div_le_one_of_le₀ h zero_le'
 
-theorem surjective_of_dominates (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (κ : Type)
-    [Finite κ] (x : κ → Ω) (X' : Scheme.{0}) (Ω' : Type) [Field Ω'] (ξ' : Spec (CommRingCat.of Ω') ⟶ X')
-    (s' : X' ⟶ Spec (CommRingCat.of ℤ)) (f : X' ⟶ X) (i : Ω →+* Ω') (hc : CoordTie ℤ ξ x)
-    (hg : ∀ q : X, genPt ξ ⤳ q) (hp : IsProper s') (hd : Dominates ξ' ξ f i) : Function.Surjective f := by
+theorem surjective_of_dominates
+    (X : Scheme.{0})
+    (Ω : Type) [Field Ω]
+    (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+    (κ : Type) [Finite κ]
+    (x : κ → Ω)
+    (X' : Scheme.{0})
+    (Ω' : Type) [Field Ω']
+    (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (s' : X' ⟶ Spec (CommRingCat.of ℤ)) (f : X' ⟶ X)
+    (i : Ω →+* Ω')
+    (hc : CoordTie ℤ ξ x) (hg : ∀ q : X, genPt ξ ⤳ q) (hp : IsProper s') (hd : Dominates ξ' ξ f i)
+    : Function.Surjective f := by
   intro q
   obtain ⟨A, hdom⟩ := exists_domAt_of_injective_genMap i ⟨q, hg q⟩ (hc.gen.inj ⟨q, hg q⟩)
   have hex : (ValuativeCriterion.Existence ⊓ @QuasiCompact) s' := by
     rw [← UniversallyClosed.eq_valuativeCriterion]
     infer_instance
-  let S : ValuativeCommSq s' :=
-    { R := A, K := Ω', i₁ := ξ', i₂ := specZIsTerminal.from _, commSq := ⟨specZIsTerminal.hom_ext _ _⟩ }
+  let S : ValuativeCommSq s' := {
+    R := A
+    K := Ω'
+    i₁ := ξ'
+    i₂ := specZIsTerminal.from _
+    commSq := ⟨specZIsTerminal.hom_ext _ _⟩
+  }
   obtain ⟨⟨l, hl1, -⟩⟩ := (hex.1 S).exists_lift
   have hl : Spec.map (CommRingCat.ofHom (algebraMap A Ω')) ≫ l = ξ' := hl1
-  have hz : Spec.map (CommRingCat.ofHom (algebraMap A Ω')) ≫ (l ≫ f) = Spec.map (CommRingCat.ofHom i) ≫ ξ := by
+  have hz
+      : Spec.map (CommRingCat.ofHom (algebraMap A Ω')) ≫ (l ≫ f)
+        = Spec.map (CommRingCat.ofHom i) ≫ ξ := by
     rw [← Category.assoc, hl]
     exact hd
   have hdom' := domAt_of_spec (i := i) (A := A) (l ≫ f) hz (hg _)

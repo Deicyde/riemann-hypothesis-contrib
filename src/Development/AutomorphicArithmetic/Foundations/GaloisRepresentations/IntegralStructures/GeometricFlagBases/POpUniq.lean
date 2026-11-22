@@ -5,22 +5,25 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
-private theorem l_unit (l : ℕ) {k : Type} [Field k] (hl : (l : k) ≠ 0) (Ω : Type) [Field Ω] [Algebra k Ω] :
-    IsUnit (l : Γ(G3.sp Ω, ⊤)) := by
+private theorem l_unit
+    (l : ℕ) {k : Type} [Field k] (hl : (l : k) ≠ 0) (Ω : Type) [Field Ω] [Algebra k Ω]
+    : IsUnit (l : Γ(G3.sp Ω, ⊤)) := by
   have h1 : (l : Ω) ≠ 0 := by
     rw [← map_natCast (algebraMap k Ω)]
     exact (_root_.map_ne_zero _).mpr hl
   have h3 := h1.isUnit.map (Scheme.ΓSpecIso (CommRingCat.of Ω)).inv.hom
   simpa [map_natCast] using h3
 
-theorem UpperTheory.Gal.Int.Geo.opUniq_of :
-    G3.HopSpec → G3.OpEx.{1} → G3.OpEt → G3.EtGood → G3.BcSplits → OpUniq := by
+theorem UpperTheory.Gal.Int.Geo.opUniq_of
+    : G3.HopSpec → G3.OpEx.{1} → G3.OpEt → G3.EtGood → G3.BcSplits → OpUniq := by
   intro hHop hEx hEt hGood hBc l _ k _ hl H Ω _ _ g d hd T hT
   obtain ⟨hhop, -⟩ := hHop l hl H Ω g d hd
   have hsplit : G3.GalSplit (H.sΩ Ω g) := by
@@ -31,8 +34,11 @@ theorem UpperTheory.Gal.Int.Geo.opUniq_of :
   have hgood := hGood l (G3.sp Ω) (l_unit l hl Ω)
   haveI : IsFinite (H.s g) := hd.1
   haveI : Etale (H.s g) := hd.2.1
-  have hbc := hBc (Spec.map (CommRingCat.ofHom (algebraMap k Ω))) H.q (H.s g ≫ H.q) H.q (H.s g) rfl
-    (𝟙 _) (Category.id_comp _) Empty (fun e => e.elim) (fun e => e.elim)
+  have hbc :=
+    hBc (Spec.map (CommRingCat.ofHom (algebraMap k Ω))) H.q (H.s g ≫ H.q) H.q (H.s g) rfl (𝟙 _)
+      (Category.id_comp _) Empty
+      (fun e => e.elim)
+      (fun e => e.elim)
   haveI : IsFinite (H.sΩ Ω g) := hbc.1
   haveI : Etale (H.sΩ Ω g) := hbc.2.1
   let p : H.geomZ Ω ⟶ G3.sp Ω := pullback.snd H.q (Spec.map (CommRingCat.ofHom (algebraMap k Ω)))

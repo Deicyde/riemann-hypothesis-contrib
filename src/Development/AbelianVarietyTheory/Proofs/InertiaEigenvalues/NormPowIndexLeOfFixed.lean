@@ -11,7 +11,10 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.Per
 
-theorem norm_pow_index_le_of_fixed : ∀ (l : ℕ) [Fact l.Prime] (H : Subgroup (GQ l)), H.index ≠ 0 → ∀ x : Om l, (∀ g ∈ H, g x = x) → ‖x‖ < 1 → ‖x‖ ^ H.index ≤ ‖((l : ℕ) : Om l)‖ := by
+theorem norm_pow_index_le_of_fixed
+    : ∀ (l : ℕ) [Fact l.Prime] (H : Subgroup (GQ l)),
+      H.index ≠ 0
+        → ∀ x : Om l, (∀ g ∈ H, g x = x) → ‖x‖ < 1 → ‖x‖ ^ H.index ≤ ‖((l : ℕ) : Om l)‖ := by
   intro l _ H hidx x hx hx1
   have hfin : Fintype (GQ l ⧸ H) := Subgroup.fintypeOfIndexNeZero hidx
   have fout : ∀ g : GQ l, (g : GQ l ⧸ H).out x = g x := fun g => by
@@ -26,7 +29,9 @@ theorem norm_pow_index_le_of_fixed : ∀ (l : ℕ) [Fact l.Prime] (H : Subgroup 
   obtain ⟨c, hc⟩ := (InfiniteGalois.mem_range_algebraMap_iff_fixed _).2 hfix
   have hn : ‖c‖ = ‖x‖ ^ H.index := by
     rw [← norm_algebraMap' (Om l) c, hc, norm_prod]
-    refine (Finset.prod_congr rfl fun q _ => GlobalTheory.RingBasics.norm_gal (Quotient.out q) x).trans ?_
+    refine
+      (Finset.prod_congr rfl fun q _ => GlobalTheory.RingBasics.norm_gal (Quotient.out q) x).trans
+        ?_
     rw [Finset.prod_const, Finset.card_univ, Subgroup.index, Nat.card_eq_fintype_card]
     rfl
   have hc1 : ‖c‖ < 1 := hn ▸ pow_lt_one₀ (norm_nonneg x) hx1 hidx

@@ -54,22 +54,33 @@ set_option synthInstance.maxHeartbeats 200000
 section
 section
 open CategoryTheory AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
-open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp GlobalTheory.DegVal GlobalTheory.DegCmp
-open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
+open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp
+  GlobalTheory.DegVal GlobalTheory.DegCmp
+open GlobalTheory.AllWt
+  (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
 open GlobalTheory.CompHt (hodgeWt)
 open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pull KeepsCusp)
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.BadCount
 open scoped TensorProduct
 namespace GlobalTheory.CovTop
-theorem covering_bad_locus_of_descent_steps_alt : GlobalTheory.CovTop.HypothesesX → _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → GlobalTheory.Published.GrothendieckDeformation → GlobalTheory.HSCore.Quoted → GlobalTheory.Published.SiegelToroidalIntegral →
-    GlobalTheory.Published.ToroidalForFanKS → GlobalTheory.Published.SemiAbelianLieSeminegative → GlobalTheory.Published.GreenCuspidal →
-    _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.DeepExistence → _root_.GlobalTheory.CovTop.DeepGoodness → _root_.GlobalTheory.CovTop.SizeCondition →
-    _root_.GlobalTheory.CovTop.FlatDegreeCondition → _root_.GlobalTheory.CovTop.CoverDegree → _root_.GlobalTheory.CovTop.ShareCondition → _root_.GlobalTheory.CovTop.LiftBadSet := by
+theorem covering_bad_locus_of_descent_steps_alt
+    : GlobalTheory.CovTop.HypothesesX → _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems
+      → GlobalTheory.Published.GrothendieckDeformation → GlobalTheory.HSCore.Quoted
+      → GlobalTheory.Published.SiegelToroidalIntegral → GlobalTheory.Published.ToroidalForFanKS
+      → GlobalTheory.Published.SemiAbelianLieSeminegative → GlobalTheory.Published.GreenCuspidal
+      → _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.DeepExistence
+      → _root_.GlobalTheory.CovTop.DeepGoodness → _root_.GlobalTheory.CovTop.SizeCondition
+      → _root_.GlobalTheory.CovTop.FlatDegreeCondition → _root_.GlobalTheory.CovTop.CoverDegree
+      → _root_.GlobalTheory.CovTop.ShareCondition
+      → _root_.GlobalTheory.CovTop.LiftBadSet := by
   intro hX hP hGD hQ hST hTF hSA hGC hGr hEx hDG hS hF hD hSh
   have h1 := _root_.GlobalTheory.T.lifts_badAt_last_of_green_cuspidal hP hGC hGr
-  have h2 := _root_.GlobalTheory.T.covers_badAt_of_deep_good_size_flat_degree hX hP hGD hQ hST hTF hSA hGC hGr hDG hS hF hD hSh
+  have h2 :=
+    _root_.GlobalTheory.T.covers_badAt_of_deep_good_size_flat_degree hX hP hGD hQ hST hTF hSA hGC
+      hGr hDG hS hF hD hSh
   unfold _root_.GlobalTheory.CovTop.LiftBadSet _root_.GlobalTheory.CovTop.LiftsCondition
   unfold _root_.GlobalTheory.CovTop.CoversCondition _root_.GlobalTheory.CovTop.LiftsCondition at h2
   unfold _root_.GlobalTheory.CovTop.LiftsCondition at h1
@@ -87,16 +98,34 @@ end GlobalTheory.CovTop
 end
 section
 open CategoryTheory AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
-open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp GlobalTheory.DegVal GlobalTheory.DegCmp
-open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
+open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp
+  GlobalTheory.DegVal GlobalTheory.DegCmp
+open GlobalTheory.AllWt
+  (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
 open GlobalTheory.CompHt (hodgeWt)
 open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pull KeepsCusp)
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.BadCount
 open scoped TensorProduct
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.liftBadSet_of_deep_size_flatDeg_share : GlobalTheory.CovTop.HypothesesX → _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → GlobalTheory.Published.GrothendieckDeformation → GlobalTheory.HSCore.Quoted → GlobalTheory.Published.SiegelToroidalIntegral → GlobalTheory.Published.ToroidalForFanKS → GlobalTheory.Published.SemiAbelianLieSeminegative → GlobalTheory.Published.GreenCuspidal → _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.DeepExistence → _root_.GlobalTheory.CovTop.DeepGoodness → _root_.GlobalTheory.CovTop.SizeCondition → _root_.GlobalTheory.CovTop.FlatDegreeCondition → _root_.GlobalTheory.CovTop.CoverDegree → _root_.GlobalTheory.CovTop.ShareCondition → _root_.GlobalTheory.CovTop.LiftBadSet := by
-  first | exact @_root_.GlobalTheory.CovTop.covering_bad_locus_of_descent_steps_alt | exact _root_.GlobalTheory.CovTop.covering_bad_locus_of_descent_steps_alt | (intros; apply _root_.GlobalTheory.CovTop.covering_bad_locus_of_descent_steps_alt <;> assumption)
+theorem _root_.GlobalTheory.T.liftBadSet_of_deep_size_flatDeg_share
+    : GlobalTheory.CovTop.HypothesesX → _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems
+      → GlobalTheory.Published.GrothendieckDeformation → GlobalTheory.HSCore.Quoted
+      → GlobalTheory.Published.SiegelToroidalIntegral → GlobalTheory.Published.ToroidalForFanKS
+      → GlobalTheory.Published.SemiAbelianLieSeminegative → GlobalTheory.Published.GreenCuspidal
+      → _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.DeepExistence
+      → _root_.GlobalTheory.CovTop.DeepGoodness → _root_.GlobalTheory.CovTop.SizeCondition
+      → _root_.GlobalTheory.CovTop.FlatDegreeCondition → _root_.GlobalTheory.CovTop.CoverDegree
+      → _root_.GlobalTheory.CovTop.ShareCondition
+      → _root_.GlobalTheory.CovTop.LiftBadSet := by
+  first
+  | exact @_root_.GlobalTheory.CovTop.covering_bad_locus_of_descent_steps_alt
+  | exact _root_.GlobalTheory.CovTop.covering_bad_locus_of_descent_steps_alt
+  | (
+      intros
+      apply _root_.GlobalTheory.CovTop.covering_bad_locus_of_descent_steps_alt <;> assumption
+    )
 end
 end

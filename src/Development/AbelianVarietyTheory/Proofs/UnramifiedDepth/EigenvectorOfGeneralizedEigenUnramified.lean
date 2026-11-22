@@ -10,8 +10,12 @@ open Formalism.L2.FormalSeriesBounds
 
 namespace GlobalTheory.GenEigen
 
-theorem mem_of_add_nil {B : Type*} [CommRing B] (J : Ideal B) (u N y : B)
-    (hu : ∀ b, u * b ∈ J → b ∈ J) (k : ℕ) (hN : N ^ k ∈ J) (h : (u + N) * y ∈ J) : y ∈ J := by
+theorem mem_of_add_nil
+    {B : Type*} [CommRing B]
+    (J : Ideal B) (u N y : B) (hu : ∀ b, u * b ∈ J → b ∈ J)
+    (k : ℕ) (hN : N ^ k ∈ J)
+    (h : (u + N) * y ∈ J)
+    : y ∈ J := by
   have hpow : ∀ (j : ℕ) b, u ^ j * b ∈ J → b ∈ J := by
     intro j
     induction j with
@@ -25,18 +29,20 @@ theorem mem_of_add_nil {B : Type*} [CommRing B] (J : Ideal B) (u N y : B)
   apply hpow k
   have e : u ^ k * y = c * ((u + N) * y) + ((-1) ^ k * y) * N ^ k := by
     have : u ^ k = (u - -N) * c + (-N) ^ k := by rw [← hc]; ring
-    rw [this, neg_pow N]; ring
+    rw [this, neg_pow N]
+    ring
   rw [e]
   exact J.add_mem (J.mul_mem_left _ h) (J.mul_mem_left _ hN)
 
-theorem step {O B : Type*} [CommRing O] [CommRing B] (a p : O →+* B) (J : Ideal B)
-    (l d : ℕ) (hl : 0 < l) (hd : 0 < d) (ε : O)
-    (h1 : ∃ y, ε * ε - ε = (l : O) * y)
-    (h2 : ∀ x : O, ∃ y, ε * (x ^ (l ^ d) - x) = (l : O) * y)
-    (hS : ∀ y, (l : B) * (a y - p y) ∈ J)
-    (hreg : ∀ (e : O) b, p (1 + l * e) * b ∈ J → b ∈ J)
-    (hnil : ∀ x, ∃ k : ℕ, (a x - p x) ^ k ∈ J)
-    (hlim : ∃ n : ℕ, 1 - a (ε ^ (l ^ n)) ∈ J) (x : O) : a x - p x ∈ J := by
+theorem step
+    {O B : Type*} [CommRing O] [CommRing B]
+    (a p : O →+* B) (J : Ideal B)
+    (l d : ℕ) (hl : 0 < l) (hd : 0 < d)
+    (ε : O)
+    (h1 : ∃ y, ε * ε - ε = (l : O) * y) (h2 : ∀ x : O, ∃ y, ε * (x ^ (l ^ d) - x) = (l : O) * y)
+    (hS : ∀ y, (l : B) * (a y - p y) ∈ J) (hreg : ∀ (e : O) b, p (1 + l * e) * b ∈ J → b ∈ J)
+    (hnil : ∀ x, ∃ k : ℕ, (a x - p x) ^ k ∈ J) (hlim : ∃ n : ℕ, 1 - a (ε ^ (l ^ n)) ∈ J) (x : O)
+    : a x - p x ∈ J := by
   have hε : a ε - p ε ∈ J := by
     obtain ⟨y, hy⟩ := h1
     obtain ⟨k, hk⟩ := hnil ε
@@ -62,8 +68,7 @@ theorem step {O B : Type*} [CommRing O] [CommRing B] (a p : O →+* B) (J : Idea
     set s := a x ^ (l ^ d) - a x
     set t := p x ^ (l ^ d) - p x
     have h3 : a ε * (s - t) ∈ J := by
-      have : a ε * (s - t) = l * (a y - p y) - t * (a ε - p ε) := by
-        linear_combination ha - hp
+      have : a ε * (s - t) = l * (a y - p y) - t * (a ε - p ε) := by linear_combination ha - hp
       rw [this]
       exact J.sub_mem (hS y) (J.mul_mem_left _ hε)
     obtain ⟨j, hj⟩ : ∃ j, l ^ n = j + 1 := ⟨l ^ n - 1, by have := pow_pos hl n; omega⟩
@@ -78,8 +83,8 @@ theorem step {O B : Type*} [CommRing O] [CommRing B] (a p : O →+* B) (J : Idea
     (H * (a x - p x)) _ ?_ k ?_ ?_
   · intro b hb
     apply hreg (-((l : O) ^ d' * x ^ (l ^ (d' + 1) - 1)))
-    have : p (1 + l * (-((l : O) ^ d' * x ^ (l ^ (d' + 1) - 1)))) * b =
-        -((((l ^ (d' + 1) : ℕ) : B) * p x ^ (l ^ (d' + 1) - 1) - 1) * b) := by
+    have : p (1 + l * (-((l : O) ^ d' * x ^ (l ^ (d' + 1) - 1)))) * b
+        = -((((l ^ (d' + 1) : ℕ) : B) * p x ^ (l ^ (d' + 1) - 1) - 1) * b) := by
       simp only [map_add (f := _), map_mul, map_one, map_natCast, map_neg, map_pow, Nat.cast_pow]
       ring
     rw [this]
@@ -95,8 +100,8 @@ theorem step {O B : Type*} [CommRing O] [CommRing B] (a p : O →+* B) (J : Idea
 
 variable {C : Type} [Field C] {V : VF C}
 
-theorem ge_of_one_add_mul {e z : C} {m : ℝ} (he : V.Ge 1 e) (h : V.Ge m ((1 + e) * z)) :
-    V.Ge m z := by
+theorem ge_of_one_add_mul {e z : C} {m : ℝ} (he : V.Ge 1 e) (h : V.Ge m ((1 + e) * z))
+    : V.Ge m z := by
   have h0 : V.v (1 + e) = 0 := by
     have : V.v 1 < V.v e := by
       rw [V.v.map_one]
@@ -126,12 +131,20 @@ theorem eq_zero_of_forall_ge {z : C} (m : ℝ) (h : ∀ k : ℕ, V.Ge (m + k) z)
   have : m + k ≤ t := by exact_mod_cast this
   linarith
 
-theorem ge_mulVec {κ : Type} [Fintype κ] {M : Matrix κ κ C} (hM : ∀ i j, V.Ge 0 (M i j))
-    {z : κ → C} {m : ℝ} (hz : ∀ i, V.Ge m (z i)) (i : κ) : V.Ge m (M.mulVec z i) :=
+theorem ge_mulVec
+    {κ : Type} [Fintype κ]
+    {M : Matrix κ κ C} (hM : ∀ i j, V.Ge 0 (M i j))
+    {z : κ → C} {m : ℝ} (hz : ∀ i, V.Ge m (z i))
+    (i : κ)
+    : V.Ge m (M.mulVec z i) :=
   VF.Ge.sum fun j _ => (hM i j).mul_int (hz j)
 
-def levelIdeal {κ : Type} [Fintype κ] [DecidableEq κ] {B : Type} [CommRing B]
-    (Φ : B →+* Matrix κ κ C) (hΦ : ∀ b i j, V.Ge 0 (Φ b i j)) (w : κ → C) (m : ℝ) : Ideal B where
+def levelIdeal
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    {B : Type} [CommRing B]
+    (Φ : B →+* Matrix κ κ C) (hΦ : ∀ b i j, V.Ge 0 (Φ b i j))
+    (w : κ → C) (m : ℝ)
+    : Ideal B where
   carrier := {b | ∀ i, V.Ge m ((Φ b).mulVec w i)}
   add_mem' := by
     intro a b ha hb i
@@ -146,14 +159,20 @@ def levelIdeal {κ : Type} [Fintype κ] [DecidableEq κ] {B : Type} [CommRing B]
     rw [smul_eq_mul, map_mul, ← Matrix.mulVec_mulVec]
     exact ge_mulVec (hΦ c) hb i
 
-theorem eigen_of_gen_eigen (C : Type) [Field C] (V : VF C) (O : Type) [CommRing O] (κ : Type)
-    [Fintype κ] [DecidableEq κ] (L : O →+* Matrix κ κ C) (hL : ∀ x i j, V.Ge 0 (L x i j))
-    (d : ℕ) (hd : 0 < d) (ε : O) (h1 : ∃ y, ε * ε - ε = (V.l : O) * y)
-    (h2 : ∀ x : O, ∃ y, ε * (x ^ (V.l ^ d) - x) = (V.l : O) * y) (ψ : O →+* C) (w : κ → C)
+theorem eigen_of_gen_eigen
+    (C : Type) [Field C]
+    (V : VF C)
+    (O : Type) [CommRing O]
+    (κ : Type) [Fintype κ] [DecidableEq κ]
+    (L : O →+* Matrix κ κ C) (hL : ∀ x i j, V.Ge 0 (L x i j))
+    (d : ℕ) (hd : 0 < d)
+    (ε : O) (h1 : ∃ y, ε * ε - ε = (V.l : O) * y)
+    (h2 : ∀ x : O, ∃ y, ε * (x ^ (V.l ^ d) - x) = (V.l : O) * y)
+    (ψ : O →+* C) (w : κ → C)
     (hψ : ∀ x, V.Ge 0 (ψ x))
     (hnil : ∀ x, ∃ k : ℕ, ((L x - ψ x • (1 : Matrix κ κ C)) ^ k).mulVec w = 0)
-    (hlim : ∀ (N : ℕ) i, ∃ n0 : ℕ, ∀ n ≥ n0, V.Ge N (w i - (L (ε ^ (V.l ^ n))).mulVec w i))
-    (x : O) : (L x).mulVec w = ψ x • w := by
+    (hlim : ∀ (N : ℕ) i, ∃ n0 : ℕ, ∀ n ≥ n0, V.Ge N (w i - (L (ε ^ (V.l ^ n))).mulVec w i)) (x : O)
+    : (L x).mulVec w = ψ x • w := by
   let P : O →+* Matrix κ κ C := (algebraMap C (Matrix κ κ C)).comp ψ
   have hP : ∀ x, P x = ψ x • (1 : Matrix κ κ C) := fun x => Algebra.algebraMap_eq_smul_one (ψ x)
   let Φ : O ⊗[ℤ] O →+* Matrix κ κ C :=
@@ -177,8 +196,7 @@ theorem eigen_of_gen_eigen (C : Type) [Field C] (V : VF C) (O : Type) [CommRing 
   have hp : ∀ x, Φ (p x) = ψ x • (1 : Matrix κ κ C) := fun x => by
     change Φ (1 ⊗ₜ x) = _
     rw [hΦt, map_one]
-  have mem : ∀ m b, b ∈ levelIdeal Φ hΦ w m ↔ ∀ i, V.Ge m ((Φ b).mulVec w i) :=
-    fun _ _ => Iff.rfl
+  have mem : ∀ m b, b ∈ levelIdeal Φ hΦ w m ↔ ∀ i, V.Ge m ((Φ b).mulVec w i) := fun _ _ => Iff.rfl
   obtain ⟨m0, hm0⟩ : ∃ m0 : ℝ, ∀ i, V.Ge m0 (w i) := by
     choose f hf using fun i => exists_ge (V := V) (w i)
     obtain ⟨m0, hm0⟩ := (Set.finite_range f).bddBelow
@@ -204,7 +222,8 @@ theorem eigen_of_gen_eigen (C : Type) [Field C] (V : VF C) (O : Type) [CommRing 
         intro i
         have := hb i
         rw [map_mul, hp, Matrix.smul_mul, one_mul, Matrix.smul_mulVec, Pi.smul_apply, smul_eq_mul,
-          map_add, map_one, map_mul, map_natCast] at this
+            map_add, map_one, map_mul, map_natCast]
+          at this
         exact ge_of_one_add_mul (by simpa using (hψ e).l_mul) this
       · intro y
         obtain ⟨j, hj⟩ := hnil y
@@ -219,8 +238,8 @@ theorem eigen_of_gen_eigen (C : Type) [Field C] (V : VF C) (O : Type) [CommRing 
         exact (hf i n (hn ⟨i, rfl⟩)).mono hN
   funext i
   have := eq_zero_of_forall_ge (V := V) m0 fun k => (mem _ _).1 (key k x) i
-  rw [map_sub, ha, hp, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec,
-    Pi.sub_apply] at this
+  rw [map_sub, ha, hp, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, Pi.sub_apply]
+    at this
   exact sub_eq_zero.mp this
 
 end GlobalTheory.GenEigen

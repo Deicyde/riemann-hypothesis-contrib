@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.HermFor
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames CategoryTheory.MonObj GlobalTheory.AbelianLetters
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames
+  CategoryTheory.MonObj GlobalTheory.AbelianLetters
 open scoped LaurentSeries
 
 noncomputable section
@@ -52,45 +55,79 @@ lemma val_ne_zero (w : LB.Iso L' (L.pull φ)) (j : L.ι) (i : L'.ι)
 
 end Val
 
-theorem exists_entire_unit_automorphy :
-    ∀ (A' : Over (Sp ℂ)) [GrpObj A'] (X : Scheme.{0}) (L : LB X) (L' : LB A'.left), L.IsLB → L'.IsLB → ∀ (φ : A'.left ⟶ X) (w : LB.Iso L' (L.pull φ)), w.IsGen → ∀ (g g' : ℕ) (u : HolUnif A' L' g') (Hm : Matrix (Fin g') (Fin g') ℂ) (χ : u.Λ → ℂ), u.IsAH Hm χ → ∀ (e : (Fin g → ℂ) → (Sp ℂ ⟶ X)) (F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)), (∀ z, (u.ex (F z)).left ≫ φ = e z) → ∀ (fr : L.ι → (Fin g → ℂ) → ℂ) (th : L.Sec) (θ : (Fin g → ℂ) → ℂ), (∀ j, DifferentiableOn ℂ (fr j) {z | ⊤ ≤ e z ⁻¹ᵁ L.U j}) → (∀ j z, ⊤ ≤ e z ⁻¹ᵁ L.U j → fr j z ≠ 0) → (∀ j j' z, ⊤ ≤ e z ⁻¹ᵁ (L.U j ⊓ L.U j') → fr j z = valAt' (e z) (L.U j ⊓ L.U j') (L.g j j').val * fr j' z) → (∀ j z, ⊤ ≤ e z ⁻¹ᵁ L.U j → valAt' (e z) (L.U j) (th.f j) = θ z * fr j z) → ∃ ρ : (Fin g → ℂ) → ℂ, Differentiable ℂ ρ ∧ (∀ z, ρ z ≠ 0) ∧ ∀ (la : Fin g → ℂ) (l : u.Λ), F la = l → ∀ z, θ (z + la) * ρ (z + la) = χ l * Complex.exp (Real.pi * hermForm Hm (F z) l + Real.pi / 2 * hermForm Hm l l) * (θ z * ρ z) := by
+theorem exists_entire_unit_automorphy
+    : ∀ (A' : Over (Sp ℂ)) [GrpObj A'] (X : Scheme.{0}) (L : LB X) (L' : LB A'.left),
+      L.IsLB → L'.IsLB
+        → ∀ (φ : A'.left ⟶ X) (w : LB.Iso L' (L.pull φ)),
+          w.IsGen
+            → ∀ (g g' : ℕ) (u : HolUnif A' L' g') (Hm : Matrix (Fin g') (Fin g') ℂ) (χ : u.Λ → ℂ),
+              u.IsAH Hm χ
+                → ∀ (e : (Fin g → ℂ) → (Sp ℂ ⟶ X)) (F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)),
+                  (∀ z, (u.ex (F z)).left ≫ φ = e z)
+                    → ∀ (fr : L.ι → (Fin g → ℂ) → ℂ) (th : L.Sec) (θ : (Fin g → ℂ) → ℂ),
+                      (∀ j, DifferentiableOn ℂ (fr j) {z | ⊤ ≤ e z ⁻¹ᵁ L.U j})
+                        → (∀ j z, ⊤ ≤ e z ⁻¹ᵁ L.U j → fr j z ≠ 0)
+                        → (∀ j j' z,
+                          ⊤ ≤ e z ⁻¹ᵁ (L.U j ⊓ L.U j')
+                            → fr j z = valAt' (e z) (L.U j ⊓ L.U j') (L.g j j').val * fr j' z)
+                        → (∀ j z, ⊤ ≤ e z ⁻¹ᵁ L.U j → valAt' (e z) (L.U j) (th.f j) = θ z * fr j z)
+                        → ∃ ρ : (Fin g → ℂ) → ℂ,
+                          Differentiable ℂ ρ ∧ (∀ z, ρ z ≠ 0)
+                            ∧ ∀ (la : Fin g → ℂ) (l : u.Λ),
+                              F la = l
+                                → ∀ z,
+                                  θ (z + la) * ρ (z + la)
+                                    = χ l
+                                      * Complex.exp
+                                        (Real.pi * hermForm Hm (F z) l
+                                          + Real.pi / 2 * hermForm Hm l l)
+                                      * (θ z * ρ z) := by
   intro A' _ X L L' hL hL' φ w hw g g' u Hm χ hu e F he fr th θ hd hne hc hθ
   obtain rfl : e = fun z => (u.ex (F z)).left ≫ φ := funext fun z => (he z).symm
   have hFd : Differentiable ℂ F := (LinearMap.toContinuousLinearMap F).differentiable
-  obtain ⟨r, hr, hrφ⟩ := exists_glue
-    (fun p : L.ι × L'.ι => F ⁻¹' ({z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ L.U p.1)} ∩
-      {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L'.U p.2}))
-    (fun p => ((u.hol _ 0).1.inter (u.hol _ 0).1).preimage hFd.continuous)
-    (fun z => by
-      obtain ⟨j, hj⟩ := exists_chart ((u.ex (F z)).left ≫ φ) hL
-      obtain ⟨i, hi⟩ := exists_chart (u.ex (F z)).left hL'
-      exact ⟨(j, i), hj, hi⟩)
-    (fun p z => fr p.1 z / (valAt' (u.ex (F z)).left _ (w.s (ix φ p.1 p.2)).val * u.fr p.2 (F z)))
-    (fun p => by
-      have d1 := (u.hol _ (w.s (ix φ p.1 p.2)).val).2.comp
-        (s := F ⁻¹' ({z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ L.U p.1)} ∩
-          {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L'.U p.2})) hFd.differentiableOn
-        fun z hz => ix_chart _ φ _ _ hz.1 hz.2
-      have d2 := (u.fr_hol p.2).comp
-        (s := F ⁻¹' ({z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ L.U p.1)} ∩
-          {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L'.U p.2}))
-        hFd.differentiableOn fun z hz => hz.2
-      have d3 := (hd p.1).mono
-        (s := F ⁻¹' ({z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ L.U p.1)} ∩
-          {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L'.U p.2})) fun z hz => hz.1
-      simp only [div_eq_mul_inv]
-      exact d3.mul ((d1.mul d2).inv fun z hz =>
-        mul_ne_zero (val_ne_zero _ φ w _ _ hz.1 hz.2) (u.fr_ne p.2 _ hz.2)))
-    (fun p q z hp hq => by
-      have h := val_iso_pull (u.ex (F z)).left φ w hw p.1 q.1 p.2 q.2 hp.1 hq.1 hp.2 hq.2
-      have h1 := hc p.1 q.1 z (inf_of _ hp.1 hq.1)
-      have h2 := u.fr_compat p.2 q.2 (F z) (inf_of _ hp.2 hq.2)
-      rw [div_eq_div_iff (mul_ne_zero (val_ne_zero _ φ w _ _ hp.1 hp.2) (u.fr_ne _ _ hp.2))
-        (mul_ne_zero (val_ne_zero _ φ w _ _ hq.1 hq.2) (u.fr_ne _ _ hq.2)),
-        h1, h2, ← _root_.mul_assoc (valAt' _ _ (w.s (ix φ p.1 p.2)).val), h]
-      ring)
-  have hchart : ∀ z, ∃ j i, ⊤ ≤ ((u.ex (F z)).left ≫ φ) ⁻¹ᵁ L.U j ∧
-      ⊤ ≤ (u.ex (F z)).left ⁻¹ᵁ L'.U i := fun z => by
+  obtain ⟨r, hr, hrφ⟩ :=
+    exists_glue
+      (fun p : L.ι × L'.ι =>
+        F ⁻¹' ({z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ L.U p.1)} ∩ {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L'.U p.2}))
+      (fun p => ((u.hol _ 0).1.inter (u.hol _ 0).1).preimage hFd.continuous)
+      (fun z => by
+        obtain ⟨j, hj⟩ := exists_chart ((u.ex (F z)).left ≫ φ) hL
+        obtain ⟨i, hi⟩ := exists_chart (u.ex (F z)).left hL'
+        exact ⟨(j, i), hj, hi⟩)
+      (fun p z => fr p.1 z / (valAt' (u.ex (F z)).left _ (w.s (ix φ p.1 p.2)).val * u.fr p.2 (F z)))
+      (fun p => by
+        have d1 :=
+          (u.hol _ (w.s (ix φ p.1 p.2)).val).2.comp
+            (s :=
+              F ⁻¹' ({z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ L.U p.1)}
+                ∩ {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L'.U p.2}))
+            hFd.differentiableOn fun z hz => ix_chart _ φ _ _ hz.1 hz.2
+        have d2 :=
+          (u.fr_hol p.2).comp
+            (s :=
+              F ⁻¹' ({z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ L.U p.1)}
+                ∩ {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L'.U p.2}))
+            hFd.differentiableOn fun z hz => hz.2
+        have d3 :=
+          (hd p.1).mono
+            (s :=
+              F ⁻¹' ({z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ L.U p.1)}
+                ∩ {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L'.U p.2}))
+            fun z hz => hz.1
+        simp only [div_eq_mul_inv]
+        exact d3.mul ((d1.mul d2).inv fun z hz =>
+          mul_ne_zero (val_ne_zero _ φ w _ _ hz.1 hz.2) (u.fr_ne p.2 _ hz.2)))
+      (fun p q z hp hq => by
+        have h := val_iso_pull (u.ex (F z)).left φ w hw p.1 q.1 p.2 q.2 hp.1 hq.1 hp.2 hq.2
+        have h1 := hc p.1 q.1 z (inf_of _ hp.1 hq.1)
+        have h2 := u.fr_compat p.2 q.2 (F z) (inf_of _ hp.2 hq.2)
+        rw [div_eq_div_iff (mul_ne_zero (val_ne_zero _ φ w _ _ hp.1 hp.2) (u.fr_ne _ _ hp.2))
+            (mul_ne_zero (val_ne_zero _ φ w _ _ hq.1 hq.2) (u.fr_ne _ _ hq.2)),
+          h1, h2, ← _root_.mul_assoc (valAt' _ _ (w.s (ix φ p.1 p.2)).val), h]
+        ring)
+  have hchart
+      : ∀ z, ∃ j i,
+        ⊤ ≤ ((u.ex (F z)).left ≫ φ) ⁻¹ᵁ L.U j ∧ ⊤ ≤ (u.ex (F z)).left ⁻¹ᵁ L'.U i := fun z => by
     obtain ⟨j, hj⟩ := exists_chart ((u.ex (F z)).left ≫ φ) hL
     obtain ⟨i, hi⟩ := exists_chart (u.ex (F z)).left hL'
     exact ⟨j, i, hj, hi⟩

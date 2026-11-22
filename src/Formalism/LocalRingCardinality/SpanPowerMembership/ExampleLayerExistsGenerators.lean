@@ -28,8 +28,7 @@ theorem card_Psi (φ : Formalism.HC.Frame) : Fintype.card ↥(φ.Psi) = 2 * φ.o
   rw [← Nat.card_eq_fintype_card]
   exact natCard_Psi φ
 
-theorem card_examplePsi_eq : Fintype.card ↥(R0.Psi) = R0.f := by
-  rw [card_Psi]; rfl
+theorem card_examplePsi_eq : Fintype.card ↥(R0.Psi) = R0.f := by rw [card_Psi]; rfl
 
 section Generic
 
@@ -41,29 +40,27 @@ instance instIsGalois : IsGalois ℚ H.E := H.hostE_isGalois
 
 instance instTotallyComplex : IsTotallyComplex H.E := inferInstance
 
-theorem cmStar_apply (x : H.E) :
-    (letI := H.cmStar; star x) = IsCMField.complexConj H.E x := rfl
+theorem cmStar_apply (x : H.E) : (letI := H.cmStar; star x) = IsCMField.complexConj H.E x := rfl
 
-theorem emb_star (φ : H.E →+* ℂ) (x : H.E) :
-    φ (letI := H.cmStar; star x) = starRingEnd ℂ (φ x) := by
+theorem emb_star (φ : H.E →+* ℂ) (x : H.E)
+    : φ (letI := H.cmStar; star x) = starRingEnd ℂ (φ x) := by
   rw [cmStar_apply]
   exact IsCMField.complexEmbedding_complexConj H.E φ x
 
-theorem emb_conj (φ : H.E →+* ℂ) (x : H.E) : φ (H.conj x) = starRingEnd ℂ (φ x) :=
-  H.conjE_apply φ x
+theorem emb_conj (φ : H.E →+* ℂ) (x : H.E) : φ (H.conj x) = starRingEnd ℂ (φ x) := H.conjE_apply φ x
 
 theorem star_eq_conj (x : H.E) : (letI := H.cmStar; star x) = H.conj x := by
   apply H.φ₀.injective
   rw [emb_star, emb_conj]
 
-theorem conj_aE : H.conj (H.sqq) = - H.sqq := by
+theorem conj_aE : H.conj (H.sqq) = -H.sqq := by
   rw [H.gal_sqq]
   simp [Formalism.HC.HostRaw.conj, Formalism.HC.Frame.cc]
   have hc : ((c0.1 : ℤˣ) : ℤ) = -1 := rfl
   rw [hc]
   simp
 
-theorem conj_bE : H.conj (H.sqd) = - H.sqd := by
+theorem conj_bE : H.conj (H.sqd) = -H.sqd := by
   rw [H.gal_sqd]
   simp [Formalism.HC.HostRaw.conj, Formalism.HC.Frame.cc]
   have hc : ((c0.2 : ℤˣ) : ℤ) = -1 := rfl
@@ -78,11 +75,12 @@ theorem conj_eq_self_iff (x : H.E) : H.conj x = x ↔ x ∈ H.F := by
   rw [← star_eq_conj, cmStar_apply]
   exact IsCMField.complexConj_eq_self_iff H.E x
 
-def conjF : H.E →ₐ[H.F] H.E :=
-  { (H.conj : H.E →+* H.E) with
-    commutes' := fun x => by
-      show H.conj (x : H.E) = (x : H.E)
-      exact (conj_eq_self_iff H x).2 x.2 }
+def conjF : H.E →ₐ[H.F] H.E := {
+  (H.conj : H.E →+* H.E) with
+  commutes' := fun x => by
+    show H.conj (x : H.E) = (x : H.E)
+    exact (conj_eq_self_iff H x).2 x.2
+}
 
 theorem conjF_apply (x : H.E) : conjF H x = H.conj x := rfl
 
@@ -92,8 +90,9 @@ section CM
 
 open Polynomial
 
-theorem isIntegral_half {K : Type} [Field K] [CharZero K] (x : K) (k : ℕ)
-    (hx : x ^ 2 = -(4 * (k : K) + 3)) : IsIntegral ℤ ((1 + x) / 2) := by
+theorem isIntegral_half
+    {K : Type} [Field K] [CharZero K] (x : K) (k : ℕ) (hx : x ^ 2 = -(4 * (k : K) + 3))
+    : IsIntegral ℤ ((1 + x) / 2) := by
   refine ⟨X ^ 2 - X + C ((k : ℤ) + 1), by monicity!, ?_⟩
   simp only [eval₂_add, eval₂_sub, eval₂_X_pow, eval₂_X, eval₂_C]
   simp only [algebraMap_int_eq, eq_intCast, Int.cast_add, Int.cast_natCast, Int.cast_one]
@@ -111,9 +110,11 @@ theorem isIntegral_halfB : IsIntegral ℤ ((1 + H.sqd) / 2) := by
 theorem conj_half (x : H.E) : H.conj ((1 + x) / 2) = (1 + H.conj x) / 2 := by
   rw [map_div₀, map_add (f := _), map_one, map_ofNat]
 
-theorem unram_at (P : Ideal (𝓞 H.E)) (hP : P.IsMaximal) :
-    ∃ θ t : 𝓞 H.E, algebraMap (𝓞 H.E) H.E t = H.conj (algebraMap (𝓞 H.E) H.E θ) ∧ θ - t ∉ P := by
-  have h := H.der.unramEF P hP.isPrime (Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField H.E))
+theorem unram_at (P : Ideal (𝓞 H.E)) (hP : P.IsMaximal)
+    : ∃ θ t : 𝓞 H.E, algebraMap (𝓞 H.E) H.E t = H.conj (algebraMap (𝓞 H.E) H.E θ) ∧ θ - t ∉ P := by
+  have h :=
+    H.der.unramEF P hP.isPrime
+      (Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField H.E))
   push Not at h
   obtain ⟨x, hx⟩ := h
   refine ⟨x, H.conj • x, rfl, fun h1 => hx ?_⟩
@@ -122,20 +123,26 @@ theorem unram_at (P : Ideal (𝓞 H.E)) (hP : P.IsMaximal) :
 
 theorem cmData : @CMData H.F H.E _ _ _ _ H.cmStar _ := by
   let _ := H.cmStar
-  exact
-  { cmUnram := ⟨inferInstance, emb_star H, fun P hP => by
-      obtain ⟨θ, t, h1, h2⟩ := unram_at H P hP
-      exact ⟨θ, t, by rw [h1, star_eq_conj], h2⟩⟩
+  exact {
+    cmUnram := ⟨
+      inferInstance,
+      emb_star H,
+      fun P hP => by
+        obtain ⟨θ, t, h1, h2⟩ := unram_at H P hP
+        exact ⟨θ, t, by rw [h1, star_eq_conj], h2⟩
+    ⟩
     totReal := inferInstance
     deg2 := Algebra.IsQuadraticExtension.finrank_eq_two _ _
     fixed := fun a => by
       rw [star_eq_conj, conj_eq_self_iff]
-      exact ⟨fun h => ⟨⟨a, h⟩, rfl⟩, fun ⟨y, hy⟩ => hy ▸ y.2⟩ }
+      exact ⟨fun h => ⟨⟨a, h⟩, rfl⟩, fun ⟨y, hy⟩ => hy ▸ y.2⟩
+  }
 
 end CM
 
-theorem layer0_ex : ∃ (L : Type) (_ : Field L) (_ : NumberField L) (ζ a b : L),
-    IsLayer 4 571 599 ζ a b := Formalism.TwoAdicCyclotomicDecomposition.layerExists 4 571 599
+theorem layer0_ex
+    : ∃ (L : Type) (_ : Field L) (_ : NumberField L) (ζ a b : L), IsLayer 4 571 599 ζ a b :=
+  Formalism.TwoAdicCyclotomicDecomposition.layerExists 4 571 599
 
 def L0 : Type := Classical.choose layer0_ex
 
@@ -151,9 +158,11 @@ theorem exampleLayer_exists_generators : ∃ (ζ a b : L0), IsLayer 4 571 599 ζ
   exact h
 
 def ζ0 : L0 := Classical.choose exampleLayer_exists_generators
-theorem exampleLayer_exists_second : ∃ (a b : L0), IsLayer 4 571 599 ζ0 a b := Classical.choose_spec exampleLayer_exists_generators
+theorem exampleLayer_exists_second : ∃ (a b : L0), IsLayer 4 571 599 ζ0 a b :=
+  Classical.choose_spec exampleLayer_exists_generators
 def a0 : L0 := Classical.choose exampleLayer_exists_second
-theorem exampleLayer_exists_third : ∃ b : L0, IsLayer 4 571 599 ζ0 a0 b := Classical.choose_spec exampleLayer_exists_second
+theorem exampleLayer_exists_third : ∃ b : L0, IsLayer 4 571 599 ζ0 a0 b :=
+  Classical.choose_spec exampleLayer_exists_second
 def b0 : L0 := Classical.choose exampleLayer_exists_third
 theorem layer0 : IsLayer 4 571 599 ζ0 a0 b0 := Classical.choose_spec exampleLayer_exists_third
 
@@ -166,8 +175,8 @@ theorem exampleCMType_nonempty : (cmType ζ0 a0 b0 599).Nonempty := by
   rw [(Formalism.FrobeniusOrbits.Final.cmType 2 571 599 hostHyp0.toHypOdd L0 ζ0 a0 b0 layer0).2.1]
   positivity
 
-theorem top_primitive {K : Type} [Field K] [NumberField K] (m : ℕ) (hm : 1 < m) :
-    ¬ (⊤ : Ideal (𝓞 K)) ≤ Ideal.span {(m : 𝓞 K)} := by
+theorem top_primitive {K : Type} [Field K] [NumberField K] (m : ℕ) (hm : 1 < m)
+    : ¬ (⊤ : Ideal (𝓞 K)) ≤ Ideal.span {(m : 𝓞 K)} := by
   intro h
   have h1 : (1 : 𝓞 K) ∈ Ideal.span {(m : 𝓞 K)} := h Submodule.mem_top
   rw [Ideal.mem_span_singleton] at h1
@@ -182,8 +191,7 @@ theorem top_primitive {K : Type} [Field K] [NumberField K] (m : ℕ) (hm : 1 < m
 def hostAx0 : Formalism.HC.HostAx R0.toFrame :=
   Formalism.HC.D7.hostAx R0.toFrame exampleRanks_h_injective hostHyp0 (le_refl 2) layer0
 
-theorem hostAx0_cm_nonempty : hostAx0.cmType.Nonempty := by
-  exact exampleCMType_nonempty
+theorem hostAx0_cm_nonempty : hostAx0.cmType.Nonempty := by exact exampleCMType_nonempty
 
 def H0 : Host R0 where
   toHostAx := hostAx0
@@ -201,14 +209,17 @@ def H0 : Host R0 where
   splitBound := 2
   split_small := fun p hp h2 hle => absurd (le_antisymm hle hp.two_le) h2
   small_le := fun l hl h2 hd =>
-    absurd ((Nat.prime_dvd_prime_iff_eq hl Nat.prime_two).mp
-      (hl.dvd_of_dvd_pow (show l ∣ 2 ^ (2 + 2) from hd))) h2
+    absurd
+      ((Nat.prime_dvd_prime_iff_eq hl Nat.prime_two).mp
+        (hl.dvd_of_dvd_pow (show l ∣ 2 ^ (2 + 2) from hd)))
+      h2
   φ₀ := hostAx0_cm_nonempty.some
   φ₀_mem := hostAx0_cm_nonempty.some_mem
   𝔟 := hostAx0.der.principal.choose
   𝔟_spec := ⟨hostAx0.der.principal.choose_spec.1, hostAx0.der.principal.choose_spec.2.1⟩
   𝔟_stable := hostAx0.der.principal.choose_spec.2.2
-  levelPrimes := {751, 991, 413718278401, 603339156001, 65794571027774832745588537266486439382601586586498771901135640963549130131839564588689999034983373394040350895271937}
+  levelPrimes :=
+    {751, 991, 413718278401, 603339156001, 65794571027774832745588537266486439382601586586498771901135640963549130131839564588689999034983373394040350895271937}
   g := ![413718278401, 603339156001]
   g_prime := by intro i; fin_cases i; exacts [gA_prime, gB_prime]
   g_ne := by norm_num
@@ -244,16 +255,18 @@ def H0 : Host R0 where
     exact absurd (h₁.trans h₂.symm) h12
   CT2 := 0
 
-def T0 : ℕ := 65794571027774832745588537266486439382601586586498771901135640963549130131839564588689999034983373394040350895271937
+def T0 : ℕ :=
+  65794571027774832745588537266486439382601586586498771901135640963549130131839564588689999034983373394040350895271937
 
 theorem examplePrime_prime : T0.Prime := prime_large
 
-theorem examplePrime_mem_levelPrimes : T0 ∈ H0.levelPrimes := by
-  simp [H0, T0]
+theorem examplePrime_mem_levelPrimes : T0 ∈ H0.levelPrimes := by simp [H0, T0]
 
 def e0 : ℕ := 331422217405443852448534754346203940024043203756279465408
 
-theorem modulus0 : (H0.QS * H0.q * H0.d * (H0.g 0 * H0.g 1) ^ 2 : ℕ) = 340969359470621247375035755500209814839550621148435664 := by
+theorem modulus0
+    : (H0.QS * H0.q * H0.d * (H0.g 0 * H0.g 1) ^ 2 : ℕ)
+      = 340969359470621247375035755500209814839550621148435664 := by
   rfl
 
 theorem exampleSqrt_sq : H0.sqd ^ 2 = -599 := by
@@ -292,8 +305,8 @@ def π0O : 𝓞 H0.E := ⟨π0, π0_integral⟩
 
 def exampleSqrtInteger : 𝓞 H0.E := ⟨H0.sqd, exampleSqrt_isIntegral⟩
 
-theorem π0_cong : π0O - 1 ∈ Ideal.span
-    {((H0.QS * H0.q * H0.d * (H0.g 0 * H0.g 1) ^ 2 : ℕ) : 𝓞 H0.E)} := by
+theorem π0_cong
+    : π0O - 1 ∈ Ideal.span {((H0.QS * H0.q * H0.d * (H0.g 0 * H0.g 1) ^ 2 : ℕ) : 𝓞 H0.E)} := by
   rw [modulus0, Ideal.mem_span_singleton]
   refine ⟨972 * exampleSqrtInteger, ?_⟩
   apply RingOfIntegers.ext

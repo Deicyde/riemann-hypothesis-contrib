@@ -10,6 +10,7 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ExistsPrimeMem
 
 namespace GlobalTheory.Laid
 
-theorem locfin_holds : ReciprocityTheory.Gal.LocalFiniteness := GlobalTheory.CompanionTheory.Hypotheses₂.localFiniteness
+theorem locfin_holds : ReciprocityTheory.Gal.LocalFiniteness :=
+  GlobalTheory.CompanionTheory.Hypotheses₂.localFiniteness
 
 end GlobalTheory.Laid

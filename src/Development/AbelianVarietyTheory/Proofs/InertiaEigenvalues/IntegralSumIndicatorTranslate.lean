@@ -9,11 +9,13 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.CosetIntegral
 
-theorem integral_sum_indicator_translate {G ι : Type} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G] (m : Measure G)
-    [m.IsMulRightInvariant] (H : Set G) (hH : IsOpen H) (hm : m H = 1) (T : Finset ι)
-    (r : ι → G) (c : ι → ℂ) :
-    ∫ x, ∑ q ∈ T, ((fun y => y * (r q)⁻¹) ⁻¹' H).indicator (fun _ => c q) x ∂m
+theorem integral_sum_indicator_translate
+    {G ι : Type}
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+    (m : Measure G) [m.IsMulRightInvariant]
+    (H : Set G) (hH : IsOpen H) (hm : m H = 1)
+    (T : Finset ι) (r : ι → G) (c : ι → ℂ)
+    : ∫ x, ∑ q ∈ T, ((fun y => y * (r q)⁻¹) ⁻¹' H).indicator (fun _ => c q) x ∂m
       = ∑ q ∈ T, c q := by
   have hmeas : ∀ q, MeasurableSet ((fun y => y * (r q)⁻¹) ⁻¹' H) := fun q =>
     (hH.preimage (continuous_mul_const _)).measurableSet
@@ -30,14 +32,14 @@ theorem integral_eq_of_coset_support
     (R S : Type) [Group R] [TopologicalSpace R] [IsTopologicalGroup R] [LocallyCompactSpace R]
     [T2Space R] [SecondCountableTopology R] [MeasurableSpace R] [BorelSpace R] [Group S]
     [TopologicalSpace S] [IsTopologicalGroup S] [MeasurableSpace S] [BorelSpace S]
-    (i : S →* R) (hi : Topology.IsClosedEmbedding i) (μ : Measure R) (ν : Measure S)
+    (i : S →* R) (hi : Topology.IsClosedEmbedding i)
+    (μ : Measure R) (ν : Measure S)
     [μ.IsHaarMeasure] [μ.IsMulRightInvariant] [ν.IsHaarMeasure] [ν.IsMulRightInvariant]
-    (R₀ : Subgroup R) (hR₀o : IsOpen (R₀ : Set R)) (_hR₀c : IsCompact (R₀ : Set R))
-    (hμ : μ R₀ = 1) (hν : ν (i ⁻¹' R₀) = 1) (h : R → ℂ)
-    (hinv : ∀ k ∈ R₀, ∀ g, h (k * g) = h g)
-    (hsupp : ∀ g, h g ≠ 0 → ∃ k ∈ R₀, ∃ s, g = k * i s)
-    (hcs : HasCompactSupport (fun s => h (i s))) :
-    ∫ g, h g ∂μ = ∫ s, h (i s) ∂ν := by
+    (R₀ : Subgroup R) (hR₀o : IsOpen (R₀ : Set R)) (_hR₀c : IsCompact (R₀ : Set R)) (hμ : μ R₀ = 1)
+    (hν : ν (i ⁻¹' R₀) = 1)
+    (h : R → ℂ) (hinv : ∀ k ∈ R₀, ∀ g, h (k * g) = h g)
+    (hsupp : ∀ g, h g ≠ 0 → ∃ k ∈ R₀, ∃ s, g = k * i s) (hcs : HasCompactSupport (fun s => h (i s)))
+    : ∫ g, h g ∂μ = ∫ s, h (i s) ∂ν := by
   classical
   let S₀ : Subgroup S := R₀.comap i
   have hS₀o : IsOpen (i ⁻¹' (R₀ : Set R)) := hR₀o.preimage hi.continuous
@@ -47,13 +49,14 @@ theorem integral_eq_of_coset_support
     simpa using this.symm
   let U : S → Set S := fun s => (fun x => x * s⁻¹) ⁻¹' (i ⁻¹' (R₀ : Set R))
   have hUo : ∀ s, IsOpen (U s) := fun s => hS₀o.preimage (continuous_mul_const _)
-  obtain ⟨t, ht⟩ := hcs.isCompact.elim_finite_subcover U hUo
-    (fun x _ => Set.mem_iUnion.2 ⟨x, by simp [U, R₀.one_mem]⟩)
+  obtain ⟨t, ht⟩ :=
+    hcs.isCompact.elim_finite_subcover U hUo
+      (fun x _ => Set.mem_iUnion.2 ⟨x, by simp [U, R₀.one_mem]⟩)
   let mk : S → Quotient (QuotientGroup.rightRel S₀) := fun s => Quotient.mk _ s
   let T := t.image mk
   have hrel : ∀ a b : S, mk a = mk b ↔ i b * (i a)⁻¹ ∈ R₀ := fun a b => by
-    simp only [mk, Quotient.eq, QuotientGroup.rightRel_apply, S₀, Subgroup.mem_comap,
-      map_mul, map_inv]
+    simp only [mk, Quotient.eq, QuotientGroup.rightRel_apply, S₀, Subgroup.mem_comap, map_mul,
+      map_inv]
   have hout : ∀ q, mk q.out = q := fun q => Quotient.out_eq q
   have hsuppT : ∀ x, h (i x) ≠ 0 → mk x ∈ T := by
     intro x hx
@@ -66,8 +69,11 @@ theorem integral_eq_of_coset_support
     apply hconst
     exact (hrel _ x).1 (hout _)
 
-  have hR : (fun g => h g) = fun g => ∑ q ∈ T,
-      ((fun y => y * (i q.out)⁻¹) ⁻¹' (R₀ : Set R)).indicator (fun _ => h (i q.out)) g := by
+  have hR
+      : (fun g => h g)
+        = fun g =>
+          ∑ q ∈ T,
+            ((fun y => y * (i q.out)⁻¹) ⁻¹' (R₀ : Set R)).indicator (fun _ => h (i q.out)) g := by
     funext g
     by_cases hg : h g = 0
     · rw [hg]
@@ -85,19 +91,23 @@ theorem integral_eq_of_coset_support
         simp only [Set.mem_preimage, SetLike.mem_coe, mul_assoc]
         exact Subgroup.mul_mem_cancel_left R₀ hk
       simp only [Set.indicator, hmem, Finset.sum_ite_eq, if_pos (hsuppT s hs), hrep, hinv k hk]
-  have hS : (fun x => h (i x)) = fun x => ∑ q ∈ T,
-      ((fun y => y * q.out⁻¹) ⁻¹' (i ⁻¹' (R₀ : Set R))).indicator (fun _ => h (i q.out)) x := by
-    funext x
-    have hmem : ∀ q, x ∈ ((fun y => y * q.out⁻¹) ⁻¹' (i ⁻¹' (R₀ : Set R))) ↔ mk x = q := by
-      intro q
-      have e : mk x = q ↔ i x * (i q.out)⁻¹ ∈ R₀ := by rw [← hrel q.out x, hout q, eq_comm]
-      rw [e]
-      simp
-    simp only [Set.indicator, hmem, Finset.sum_ite_eq]
-    split_ifs with hx
-    · rw [hrep]
-    · by_contra hne
-      exact hx (hsuppT x hne)
+  have hS
+      : (fun x => h (i x))
+        = fun x =>
+          ∑ q ∈ T,
+            ((fun y => y * q.out⁻¹) ⁻¹' (i ⁻¹' (R₀ : Set R))).indicator (fun _ => h (i q.out)) x :=
+    by
+      funext x
+      have hmem : ∀ q, x ∈ ((fun y => y * q.out⁻¹) ⁻¹' (i ⁻¹' (R₀ : Set R))) ↔ mk x = q := by
+        intro q
+        have e : mk x = q ↔ i x * (i q.out)⁻¹ ∈ R₀ := by rw [← hrel q.out x, hout q, eq_comm]
+        rw [e]
+        simp
+      simp only [Set.indicator, hmem, Finset.sum_ite_eq]
+      split_ifs with hx
+      · rw [hrep]
+      · by_contra hne
+        exact hx (hsuppT x hne)
   rw [hR, hS, integral_sum_indicator_translate μ _ hR₀o hμ,
     integral_sum_indicator_translate ν _ hS₀o hν]
 

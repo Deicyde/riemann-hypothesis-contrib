@@ -9,12 +9,26 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodge
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.HcptPull
 
-theorem dual_pull : ∀ (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω') (R : Subring Ω) (R' : Subring Ω') (V V' : Type) [AddCommGroup V] [Module Ω V] [AddCommGroup V'] [Module Ω' V'] (j : V →+ V') (jd : Module.Dual Ω V →+ Module.Dual Ω' V') (W : Submodule Ω V) (W' : Submodule Ω' V') (ω : Submodule R (Module.Dual Ω V)) (ω' : Submodule R' (Module.Dual Ω' V')) (r : ℕ) (b : Fin r → Module.Dual Ω W), IsExtOver i j → (∀ a ∈ R, i a ∈ R') → (∀ w e, jd w (j e) = i (w e)) → W' = Submodule.span Ω' (j '' (W : Set V)) → (0 < r → ω' = Submodule.span R' (jd '' (ω : Set (Module.Dual Ω V)))) → LinearIndependent Ω b → Submodule.span Ω (Set.range b) = ⊤ → ω.map (W.dualRestrict.restrictScalars R) = Submodule.span R (Set.range b) → Submodule.span R' {e | e ∈ W' ∧ ∀ w ∈ ω', w e ∈ R'} = Submodule.span R' (j '' (Submodule.span R {e | e ∈ W ∧ ∀ w ∈ ω, w e ∈ R} : Set V)) := by
+theorem dual_pull
+    : ∀ (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω') (R : Subring Ω) (R' : Subring Ω')
+        (V V' : Type) [AddCommGroup V] [Module Ω V] [AddCommGroup V'] [Module Ω' V'] (j : V →+ V')
+        (jd : Module.Dual Ω V →+ Module.Dual Ω' V') (W : Submodule Ω V) (W' : Submodule Ω' V')
+        (ω : Submodule R (Module.Dual Ω V)) (ω' : Submodule R' (Module.Dual Ω' V')) (r : ℕ)
+        (b : Fin r → Module.Dual Ω W),
+      IsExtOver i j → (∀ a ∈ R, i a ∈ R') → (∀ w e, jd w (j e) = i (w e))
+        → W' = Submodule.span Ω' (j '' (W : Set V))
+        → (0 < r → ω' = Submodule.span R' (jd '' (ω : Set (Module.Dual Ω V))))
+        → LinearIndependent Ω b → Submodule.span Ω (Set.range b) = ⊤
+        → ω.map (W.dualRestrict.restrictScalars R) = Submodule.span R (Set.range b)
+        → Submodule.span R' {e | e ∈ W' ∧ ∀ w ∈ ω', w e ∈ R'}
+          = Submodule.span R' (j '' (Submodule.span R {e | e ∈ W ∧ ∀ w ∈ ω, w e ∈ R} : Set V)) := by
   intro Ω Ω' _ _ i R R' V V' _ _ _ _ j jd W W' ω ω' r b hj hR hjd hW' hω' hli hsp hmap
   classical
   rcases Nat.eq_zero_or_pos r with rfl | hr
@@ -49,8 +63,7 @@ theorem dual_pull : ∀ (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω'
   let c : Module.Basis (Fin r) Ω W := hb.dualBasis.map (Module.evalEquiv Ω W).symm
   have hbc : ∀ l k, b l (c k) = if l = k then 1 else 0 := by
     intro l k
-    have h1 : c k = (Module.evalEquiv Ω W).symm (hb.dualBasis k) := by
-      simp [c]
+    have h1 : c k = (Module.evalEquiv Ω W).symm (hb.dualBasis k) := by simp [c]
     rw [h1, Module.apply_evalEquiv_symm_apply, ← hbb, Module.Basis.dualBasis_apply_self]
 
   have hexp : ∀ e : W, e = ∑ k, b k e • c k := by
@@ -59,7 +72,9 @@ theorem dual_pull : ∀ (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω'
     refine Finset.sum_congr rfl fun k _ => ?_
     congr 1
     have : b k e = ∑ m, c.repr e m * b k (c m) := by
-      calc b k e = b k (∑ m, c.repr e m • c m) := by rw [c.sum_repr]
+      calc
+        b k e
+          = b k (∑ m, c.repr e m • c m) := by rw [c.sum_repr]
         _ = _ := by simp only [map_sum, map_smul, smul_eq_mul]
     rw [this]
     simp [hbc]
@@ -79,8 +94,10 @@ theorem dual_pull : ∀ (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω'
         split_ifs
         · exact R.one_mem
         · exact R.zero_mem
-      | zero => simpa using R.zero_mem
-      | add x y _ _ hx hy => simpa using R.add_mem hx hy
+      | zero =>
+        simpa using R.zero_mem
+      | add x y _ _ hx hy =>
+        simpa using R.add_mem hx hy
       | smul a x _ hx =>
         have : (a • x) (c k) = (a : Ω) * x (c k) := rfl
         rw [this]
@@ -116,9 +133,10 @@ theorem dual_pull : ∀ (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω'
     obtain ⟨a, rfl⟩ := hspan e' he'
     have hal : ∀ l, a l ∈ R' := by
       intro l
-      have h1 := hint (jd (wl l)) (by
-        rw [hω'']
-        exact Submodule.subset_span ⟨wl l, hwl l, rfl⟩)
+      have h1 :=
+        hint (jd (wl l)) (by
+          rw [hω'']
+          exact Submodule.subset_span ⟨wl l, hwl l, rfl⟩)
       have h2 : jd (wl l) (∑ k, a k • j (c k : V)) = a l := by
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sum]
@@ -134,8 +152,8 @@ theorem dual_pull : ∀ (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω'
     refine sum_mem fun k _ => ?_
     have : a k • j (c k : V) = (⟨a k, hal k⟩ : R') • j (c k : V) := rfl
     rw [this]
-    exact Submodule.smul_mem _ _ (Submodule.subset_span
-      ⟨(c k : V), Submodule.subset_span (hcS k), rfl⟩)
+    exact Submodule.smul_mem _ _
+      (Submodule.subset_span ⟨(c k : V), Submodule.subset_span (hcS k), rfl⟩)
   · refine Submodule.span_le.2 ?_
     rintro _ ⟨x, hx, rfl⟩
     rw [SetLike.mem_coe] at hx ⊢
@@ -150,14 +168,18 @@ theorem dual_pull : ∀ (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω'
           obtain ⟨u, hu, rfl⟩ := hf
           rw [hjd]
           exact hR _ (hx.2 u hu)
-        | zero => simpa using R'.zero_mem
-        | add f g _ _ hf hg => simpa using R'.add_mem hf hg
+        | zero =>
+          simpa using R'.zero_mem
+        | add f g _ _ hf hg =>
+          simpa using R'.add_mem hf hg
         | smul a f _ hf =>
           have : (a • f) (j x) = (a : Ω') * f (j x) := rfl
           rw [this]
           exact R'.mul_mem a.2 hf
-    | zero => simp
-    | add x y _ _ hx hy => simpa using add_mem hx hy
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      simpa using add_mem hx hy
     | smul a x _ hx =>
       have : j (a • x) = (⟨i a, hR a a.2⟩ : R') • j x := hj.1 (a : Ω) x
       rw [this]

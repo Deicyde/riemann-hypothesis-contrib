@@ -14,10 +14,12 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.RgExh
 
-theorem suppIn_deg_cre_prod : ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (P : Pos n → Prop) (l : List (Pos n)) (x : Cn n V) (j : ℕ),
-    (∀ i ∈ l, P i) → SuppIn P x → Deg j x →
-      SuppIn P (((l.map cre).prod : Module.End ℂ (Cn n V)) x) ∧
-        Deg (j + l.length) (((l.map cre).prod : Module.End ℂ (Cn n V)) x) := by
+theorem suppIn_deg_cre_prod
+    : ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (P : Pos n → Prop) (l : List (Pos n))
+        (x : Cn n V) (j : ℕ),
+      (∀ i ∈ l, P i) → SuppIn P x → Deg j x
+        → SuppIn P (((l.map cre).prod : Module.End ℂ (Cn n V)) x)
+          ∧ Deg (j + l.length) (((l.map cre).prod : Module.End ℂ (Cn n V)) x) := by
   intro n V _ _ P l x j hl hx hd
   induction l with
   | nil => simpa using And.intro hx hd

@@ -9,14 +9,16 @@ public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.H
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.HodgeCoh GlobalTheory.CechDR KaehlerDifferential GlobalTheory.W1
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+  GlobalTheory.HodgeCoh GlobalTheory.CechDR KaehlerDifferential GlobalTheory.W1
 
 namespace UpperTheory.Cb.TraceBlocks
 
-private theorem algTrace_algEquiv {B B' C' : Type} [CommRing B] [CommRing B'] [CommRing C']
-    [Algebra B B'] [Algebra B C'] [Module.Finite B B'] [Module.Projective B B']
-    [Module.Finite B C'] [Module.Projective B C'] (e : B' ≃ₐ[B] C') (b : B') :
-    algTrace B C' (e b) = algTrace B B' b := by
+private theorem algTrace_algEquiv
+    {B B' C' : Type} [CommRing B] [CommRing B'] [CommRing C'] [Algebra B B'] [Algebra B C']
+    [Module.Finite B B'] [Module.Projective B B'] [Module.Finite B C'] [Module.Projective B C']
+    (e : B' ≃ₐ[B] C') (b : B')
+    : algTrace B C' (e b) = algTrace B B' b := by
   letI : Algebra B' C' := (e : B' →+* C').toAlgebra
   haveI : IsScalarTower B B' C' := .of_algebraMap_eq fun r ↦ (e.commutes r).symm
   haveI : Algebra.IsPushout B B B' C' :=
@@ -25,14 +27,15 @@ private theorem algTrace_algEquiv {B B' C' : Type} [CommRing B] [CommRing B'] [C
       exact this⟩
   exact algTrace_of_isPushout (B := B) (B' := B') (C := B) (C' := C') b
 
-variable {k : Type} [CommRing k] {A B Z : Scheme.{0}} {sZ : Z ⟶ Sp k} {sA : A ⟶ Sp k}
-  {sB : B ⟶ Sp k}
+variable
+  {k : Type} [CommRing k] {A B Z : Scheme.{0}} {sZ : Z ⟶ Sp k} {sA : A ⟶ Sp k} {sB : B ⟶ Sp k}
 
-private theorem secTrace_iso (e : A ⟶ B) [IsIso e] (g : B ⟶ Z) [IsFinite g] [Etale g]
-    [IsFinite (e ≫ g)] [Etale (e ≫ g)] {U : Z.Opens} (hU : IsAffineOpen U)
-    (b : Sec sB (g ⁻¹ᵁ U)) :
-    secTrace (f := e ≫ g) sZ sA hU (appSec sB sA e (g ⁻¹ᵁ U) b) =
-      secTrace (f := g) sZ sB hU b := by
+private theorem secTrace_iso
+    (e : A ⟶ B) [IsIso e]
+    (g : B ⟶ Z) [IsFinite g] [Etale g] [IsFinite (e ≫ g)] [Etale (e ≫ g)]
+    {U : Z.Opens} (hU : IsAffineOpen U) (b : Sec sB (g ⁻¹ᵁ U))
+    : secTrace (f := e ≫ g) sZ sA hU (appSec sB sA e (g ⁻¹ᵁ U) b)
+      = secTrace (f := g) sZ sB hU b := by
   letI := secAlg sZ sB g U
   letI := secAlg sZ sA (e ≫ g) U
   haveI := sec_finite (s := sZ) (s' := sB) (f := g) hU
@@ -45,52 +48,69 @@ private theorem secTrace_iso (e : A ⟶ B) [IsIso e] (g : B ⟶ Z) [IsFinite g] 
     ConcreteCategory.bijective_of_isIso (e.app (g ⁻¹ᵁ U))
   let E : Sec sB (g ⁻¹ᵁ U) ≃ₐ[Sec sZ U] Sec sA ((e ≫ g) ⁻¹ᵁ U) :=
     AlgEquiv.ofBijective
-      { (appSec sB sA e (g ⁻¹ᵁ U)) with
+      {
+        (appSec sB sA e (g ⁻¹ᵁ U)) with
         commutes' := fun u ↦ by
           change (g.app U ≫ e.app (g ⁻¹ᵁ U)).hom u = ((e ≫ g).app U).hom u
           rw [Scheme.Hom.comp_app]
-          rfl } hbij
+          rfl
+      }
+      hbij
   exact algTrace_algEquiv E b
 
-private theorem omegaTrace_iso (e : A ⟶ B) [IsIso e] (g : B ⟶ Z) [IsFinite g] [Etale g]
-    [IsFinite (e ≫ g)] [Etale (e ≫ g)] (he : e ≫ sB = sA) (hg : g ≫ sZ = sB)
-    (hga : (e ≫ g) ≫ sZ = sA) (j : ℕ) :
-    (Scheme.Modules.pushforward g).map (omegaPull he j) ≫
-        (Scheme.Modules.pushforwardComp e g).hom.app _ ≫ omegaTrace hga j = omegaTrace hg j := by
+private theorem omegaTrace_iso
+    (e : A ⟶ B) [IsIso e]
+    (g : B ⟶ Z) [IsFinite g] [Etale g] [IsFinite (e ≫ g)] [Etale (e ≫ g)]
+    (he : e ≫ sB = sA) (hg : g ≫ sZ = sB) (hga : (e ≫ g) ≫ sZ = sA) (j : ℕ)
+    : (Scheme.Modules.pushforward g).map (omegaPull he j)
+        ≫ (Scheme.Modules.pushforwardComp e g).hom.app _ ≫ omegaTrace hga j
+      = omegaTrace hg j := by
   refine omegaTrace_ext hg j _ fun U hU b' x ↦ ?_
-  change (omegaTrace hga j).app U ((omegaPull he j).val.app (Opposite.op (g ⁻¹ᵁ U))
-    ((toOmega sB j).app (Opposite.op (g ⁻¹ᵁ U)) (b' • formPull hg U j x))) = _
+  change (omegaTrace hga j).app U
+      ((omegaPull he j).val.app (Opposite.op (g ⁻¹ᵁ U))
+        ((toOmega sB j).app (Opposite.op (g ⁻¹ᵁ U)) (b' • formPull hg U j x)))
+    = _
   rw [omegaPull_toOmega, formPull_smul, formPull_formPull hg he hga]
   refine (omegaTrace_toOm_smul_formPull hga j hU (appSec sB sA e (g ⁻¹ᵁ U) b') x).trans ?_
   rw [secTrace_iso e g hU b']
 
-private theorem hodgeTrace_iso (e : A ⟶ B) [IsIso e] (g : B ⟶ Z) [IsFinite g] [Etale g]
-    (g' : A ⟶ Z) [IsFinite g'] [Etale g'] (hgg : g' = e ≫ g) (he : e ≫ sB = sA)
-    (hg : g ≫ sZ = sB) (hga : g' ≫ sZ = sA) (j q : ℕ) (x : hodgeH sB j q) :
-    hodgeTrace hga j q (hodgePull he j q x) = hodgeTrace hg j q x := by
+private theorem hodgeTrace_iso
+    (e : A ⟶ B) [IsIso e]
+    (g : B ⟶ Z) [IsFinite g] [Etale g]
+    (g' : A ⟶ Z) [IsFinite g'] [Etale g']
+    (hgg : g' = e ≫ g) (he : e ≫ sB = sA) (hg : g ≫ sZ = sB) (hga : g' ≫ sZ = sA)
+    (j q : ℕ) (x : hodgeH sB j q)
+    : hodgeTrace hga j q (hodgePull he j q x) = hodgeTrace hg j q x := by
   subst hgg
-  letI := algΓ sZ; letI := algΓ sA; letI := algΓ sB
+  letI := algΓ sZ
+  letI := algΓ sA
+  letI := algΓ sB
   obtain ⟨y, rfl⟩ := (coh.pushforwardEquiv k (appTop_algebraMap hg) (Omega sB j) q).surjective x
-  have e1 : hodgeTrace hg j q (coh.pushforwardEquiv k (appTop_algebraMap hg) (Omega sB j) q y) =
-      cohOn.map k (omegaTrace hg j) ⊤ q y :=
+  have e1
+      : hodgeTrace hg j q (coh.pushforwardEquiv k (appTop_algebraMap hg) (Omega sB j) q y)
+        = cohOn.map k (omegaTrace hg j) ⊤ q y :=
     congrArg (cohOn.map k (omegaTrace hg j) ⊤ q)
       ((coh.pushforwardEquiv k (appTop_algebraMap hg) (Omega sB j) q).symm_apply_apply y)
-  let ψ := (Scheme.Modules.pushforward g).map (omegaPull he j) ≫
-    (Scheme.Modules.pushforwardComp e g).hom.app (Omega sA j)
-  have e2 : hodgePull he j q (coh.pushforwardEquiv k (appTop_algebraMap hg) (Omega sB j) q y) =
-      coh.pushforwardEquiv k (appTop_algebraMap hga) (Omega sA j) q (cohOn.map k ψ ⊤ q y) := by
+  let ψ :=
+    (Scheme.Modules.pushforward g).map (omegaPull he j)
+      ≫ (Scheme.Modules.pushforwardComp e g).hom.app (Omega sA j)
+  have e2
+      : hodgePull he j q (coh.pushforwardEquiv k (appTop_algebraMap hg) (Omega sB j) q y)
+        = coh.pushforwardEquiv k (appTop_algebraMap hga) (Omega sA j) q (cohOn.map k ψ ⊤ q y) := by
     refine Eq.trans ?_ (cohOn.pushforwardEquiv_apply k (appTop_algebraMap hga) _ ⊤ q _).symm
-    have s2 := cohOn_pull_pull (appTop_algebraMap hg) (appTop_algebraMap he)
-      (appTop_algebraMap hga) (𝟙 _) (omegaPull he j) (le_refl (g ⁻¹ᵁ ⊤)) (le_refl _) (le_refl _) q y
+    have s2 :=
+      cohOn_pull_pull (appTop_algebraMap hg) (appTop_algebraMap he) (appTop_algebraMap hga) (𝟙 _)
+        (omegaPull he j) (le_refl (g ⁻¹ᵁ ⊤)) (le_refl _) (le_refl _) q y
     rw [cohOn.pull_map, Category.comp_id]
     refine Eq.trans ?_ (s2.trans ?_)
     · rfl
     · rw [Category.id_comp]
       rfl
   rw [e2, e1]
-  have e3 : hodgeTrace hga j q
-      (coh.pushforwardEquiv k (appTop_algebraMap hga) (Omega sA j) q (cohOn.map k ψ ⊤ q y)) =
-      cohOn.map k (omegaTrace hga j) ⊤ q (cohOn.map k ψ ⊤ q y) :=
+  have e3
+      : hodgeTrace hga j q
+          (coh.pushforwardEquiv k (appTop_algebraMap hga) (Omega sA j) q (cohOn.map k ψ ⊤ q y))
+        = cohOn.map k (omegaTrace hga j) ⊤ q (cohOn.map k ψ ⊤ q y) :=
     congrArg (cohOn.map k (omegaTrace hga j) ⊤ q)
       ((coh.pushforwardEquiv k (appTop_algebraMap hga) (Omega sA j) q).symm_apply_apply _)
   have hT : ψ ≫ omegaTrace hga j = omegaTrace hg j :=
@@ -104,28 +124,33 @@ end UpperTheory.Cb.TraceBlocks
 
 namespace UpperTheory.Cb.TraceBlocks
 
-private theorem exists_iso_open {Y : Scheme.{0}} (T A : Y.Opens) (hA : A ≤ T) :
-    ∃ e : (T.ι ⁻¹ᵁ A).toScheme ⟶ A.toScheme, IsIso e ∧ e ≫ A.ι = (T.ι ⁻¹ᵁ A).ι ≫ T.ι := by
+private theorem exists_iso_open {Y : Scheme.{0}} (T A : Y.Opens) (hA : A ≤ T)
+    : ∃ e : (T.ι ⁻¹ᵁ A).toScheme ⟶ A.toScheme, IsIso e ∧ e ≫ A.ι = (T.ι ⁻¹ᵁ A).ι ≫ T.ι := by
   have hEq : T.ι ''ᵁ (T.ι ⁻¹ᵁ A) = A := by
     rw [Scheme.Hom.image_preimage_eq_opensRange_inf, Scheme.Opens.opensRange_ι]
     exact inf_eq_right.2 hA
   refine ⟨(T.ι.isoImage (T.ι ⁻¹ᵁ A)).hom ≫ (Y.isoOfEq hEq).hom, inferInstance, ?_⟩
   rw [Category.assoc, Scheme.isoOfEq_hom_ι, Scheme.Hom.isoImage_hom_ι]
 
-private theorem preimage_disjoint {Y : Scheme.{0}} (T : Y.Opens) {M : Type} (W : M → Y.Opens)
-    (hd : ∀ i j, i ≠ j → W i ⊓ W j = ⊥) (i j : M) (hij : i ≠ j) :
-    T.ι ⁻¹ᵁ W i ⊓ T.ι ⁻¹ᵁ W j = ⊥ := by
+private theorem preimage_disjoint
+    {Y : Scheme.{0}} (T : Y.Opens)
+    {M : Type} (W : M → Y.Opens) (hd : ∀ i j, i ≠ j → W i ⊓ W j = ⊥) (i j : M) (hij : i ≠ j)
+    : T.ι ⁻¹ᵁ W i ⊓ T.ι ⁻¹ᵁ W j = ⊥ := by
   have h2 : T.ι ⁻¹ᵁ (W i ⊓ W j) = T.ι ⁻¹ᵁ W i ⊓ T.ι ⁻¹ᵁ W j := rfl
   rw [← h2, hd i j hij]
   rfl
 
-private theorem preimage_iSup_top {Y : Scheme.{0}} (T : Y.Opens) {M : Type} (W : M → Y.Opens)
-    (hW : iSup W = T) : iSup (fun m ↦ T.ι ⁻¹ᵁ W m) = ⊤ := by
+private theorem preimage_iSup_top
+    {Y : Scheme.{0}} (T : Y.Opens) {M : Type} (W : M → Y.Opens) (hW : iSup W = T)
+    : iSup (fun m ↦ T.ι ⁻¹ᵁ W m) = ⊤ := by
   rw [← Scheme.Hom.preimage_iSup, hW, Scheme.Opens.ι_preimage_self]
 
-private theorem hodgePull_congr {k : Type} [CommRing k] {X X' : Scheme.{0}} {s : X ⟶ Sp k}
-    {s' : X' ⟶ Sp k} {f₁ f₂ : X' ⟶ X} (e : f₁ = f₂) (h₁ : f₁ ≫ s = s') (h₂ : f₂ ≫ s = s')
-    (j q : ℕ) (x : hodgeH s j q) : hodgePull h₁ j q x = hodgePull h₂ j q x := by
+private theorem hodgePull_congr
+    {k : Type} [CommRing k]
+    {X X' : Scheme.{0}} {s : X ⟶ Sp k} {s' : X' ⟶ Sp k} {f₁ f₂ : X' ⟶ X}
+    (e : f₁ = f₂) (h₁ : f₁ ≫ s = s') (h₂ : f₂ ≫ s = s')
+    (j q : ℕ) (x : hodgeH s j q)
+    : hodgePull h₁ j q x = hodgePull h₂ j q x := by
   subst e
   rfl
 

@@ -43,8 +43,10 @@ lemma idem_basis {S : Type} [CommRing S] [IsLocalRing S] {ι : Type} [Fintype ι
   · rw [hBw, LinearMap.ker_eq_bot]
     exact M.injective_subtype.comp b.equivFun.symm.injective
 
-theorem wdetDegree_of_smith_restrict (hS : EigenQuotientSmithStatement) (hR : RestrictedHopfOrderStatement) (hC : RestrictedHopfOrderApproximationStatement) :
-    WdetDegStatement := by
+theorem wdetDegree_of_smith_restrict
+    (hS : EigenQuotientSmithStatement) (hR : RestrictedHopfOrderStatement)
+    (hC : RestrictedHopfOrderApproximationStatement)
+    : WdetDegStatement := by
   intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hSet H m e π horth hσ hsT hPT hsL hPL w hw d X hd hX
   classical
   have hv := hSet.integers
@@ -54,8 +56,9 @@ theorem wdetDegree_of_smith_restrict (hS : EigenQuotientSmithStatement) (hR : Re
   obtain ⟨Λ, dj, hΛ, hdjspan, hdjv, hXeq⟩ :=
     hS p g C v R O σ cp hSet H m e π horth hσ hsT hPT hsL hPL w hw r Bw hrange hker X hX
   obtain ⟨AW, hAWc, hOm⟩ := hR p g C v R O σ cp hSet H (e w) hidem r Bw hrange hker d hd
-  have hcl := fun j => hC p g C v R O σ cp hSet H m e π horth hσ hsT hPT hsL hPL w hw r Bw hrange
-    hker (Λ j) (dj j) (hdjspan j) (hdjv j)
+  have hcl := fun j =>
+    hC p g C v R O σ cp hSet H m e π horth hσ hsT hPT hsL hPL w hw r Bw hrange hker (Λ j) (dj j)
+      (hdjspan j) (hdjv j)
   choose x hxmem hxapp using hcl
   have hp2 : 2 ≤ p := (Fact.out : p.Prime).two_le
   have hcp0 : v (algebraMap R C cp) ≠ 0 := by
@@ -80,16 +83,21 @@ theorem wdetDegree_of_smith_restrict (hS : EigenQuotientSmithStatement) (hR : Re
     have h1 := hxapp j (fun i => (((y i).val : ℕ) : ℤ_[p]))
     rw [hred y] at h1
     simp only [map_natCast] at h1
-    have e1 : u j y - algebraMap R C (∑ i, Λ j i * ((y i).val : R)) =
-        (x j y - algebraMap R C (dj j * ∑ i, Λ j i * ((y i).val : R))) / algebraMap R C (dj j) := by
+    have e1
+        : u j y - algebraMap R C (∑ i, Λ j i * ((y i).val : R))
+          = (x j y - algebraMap R C (dj j * ∑ i, Λ j i * ((y i).val : R)))
+            / algebraMap R C (dj j) := by
       simp only [hudef, map_mul]
       field_simp [hdj0 j]
     rw [e1, map_div₀]
     exact (div_lt_one (pos_iff_ne_zero.2 ((Valuation.ne_zero_iff v).2 (hdj0 j)))).2 h1
   have hU1 : ∀ j y, v (u j y) ≤ 1 := by
     intro j y
-    have e1 : u j y = (u j y - algebraMap R C (∑ i, Λ j i * ((y i).val : R))) +
-        algebraMap R C (∑ i, Λ j i * ((y i).val : R)) := by ring
+    have e1
+        : u j y
+          = (u j y - algebraMap R C (∑ i, Λ j i * ((y i).val : R)))
+            + algebraMap R C (∑ i, Λ j i * ((y i).val : R)) := by
+      ring
     rw [e1]
     exact (Valuation.map_add v _ _).trans (max_le (hU2 j y).le (hv.map_le_one _))
   have h5 := (u5 p C v R hv hpC (Fin r) Λ u hΛ hU1 hU2).2 (fun j => algebraMap R C (dj j))
@@ -116,15 +124,17 @@ theorem wdetDegree_of_smith_restrict (hS : EigenQuotientSmithStatement) (hR : Re
     funext y
     simp [Finset.prod_apply]
   obtain ⟨B, hBu, hBc⟩ := AW.lat
-  have hcol : ∀ α : Fin r → ZMod p, ∃ c : (Fin r → ZMod p) → R,
-      ∑ j', c j' • (fun y => B y j') = fun y => ∏ j, x j y ^ (α j).val := by
+  have hcol
+      : ∀ α : Fin r → ZMod p, ∃ c : (Fin r → ZMod p) → R,
+        ∑ j', c j' • (fun y => B y j') = fun y => ∏ j, x j y ^ (α j).val := by
     intro α
     have h1 := hmon α
     rw [hBc] at h1
     exact (Submodule.mem_span_range_iff_exists_fun R).1 h1
   choose c hc using hcol
-  have hMon : (Matrix.of fun (y α : Fin r → ZMod p) => ∏ j, x j y ^ (α j).val) =
-      B * Matrix.of fun j' α => algebraMap R C (c α j') := by
+  have hMon
+      : (Matrix.of fun (y α : Fin r → ZMod p) => ∏ j, x j y ^ (α j).val)
+        = B * Matrix.of fun j' α => algebraMap R C (c α j') := by
     ext y α
     have e := congrFun (hc α) y
     simp only [Finset.sum_apply, Pi.smul_apply] at e
@@ -132,10 +142,12 @@ theorem wdetDegree_of_smith_restrict (hS : EigenQuotientSmithStatement) (hR : Re
     refine Finset.sum_congr rfl fun j' _ => ?_
     simp only [Matrix.of_apply, Algebra.smul_def]
     ring
-  have hvMon : v (Matrix.of fun (y α : Fin r → ZMod p) => ∏ j, x j y ^ (α j).val).det ≤ v B.det := by
+  have hvMon
+      : v (Matrix.of fun (y α : Fin r → ZMod p) => ∏ j, x j y ^ (α j).val).det ≤ v B.det := by
     rw [hMon, Matrix.det_mul, map_mul]
-    calc v B.det * v (Matrix.of fun j' α => algebraMap R C (c α j')).det ≤ v B.det * 1 :=
-          mul_le_mul' le_rfl (IsIntegralMat.det_le_one (v := v) fun j' α => hv.map_le_one _)
+    calc
+      v B.det * v (Matrix.of fun j' α => algebraMap R C (c α j')).det ≤ v B.det * 1 :=
+        mul_le_mul' le_rfl (IsIntegralMat.det_le_one (v := v) fun j' α => hv.map_le_one _)
       _ = v B.det := mul_one _
   have hColen : HasColen R v AW.carrier (v B.det) := ⟨B, hBc, rfl⟩
   have hN : ∀ y : Fin r → ZMod p, p • y = 0 := by
@@ -151,7 +163,9 @@ theorem wdetDegree_of_smith_restrict (hS : EigenQuotientSmithStatement) (hR : Re
     rw [hYdef, ← Finset.prod_pow]
     exact h5 ▸ hvMon
   have hchain : Y ^ (2 * K) ≤ (v (algebraMap R C cp) ^ d) ^ (p ^ r * (p - 1)) := by
-    calc Y ^ (2 * K) = (Y ^ K) ^ 2 := by rw [← pow_mul, mul_comm]
+    calc
+      Y ^ (2 * K)
+        = (Y ^ K) ^ 2 := by rw [← pow_mul, mul_comm]
       _ ≤ v B.det ^ 2 := by gcongr
       _ ≤ (v (algebraMap R C (p : R)) ^ d) ^ p ^ r := h4
       _ = (v (algebraMap R C cp) ^ d) ^ (p ^ r * (p - 1)) := by
@@ -183,6 +197,7 @@ theorem wdetDegree_of_smith_restrict (hS : EigenQuotientSmithStatement) (hR : Re
       have : p ^ (r - 1) * p = p ^ r := by rw [← pow_succ]; congr 1; omega
       rw [← mul_assoc, this]
     rw [h2K] at hchain
-    exact (pow_le_pow_iff_left₀ zero_le' zero_le' (Nat.mul_ne_zero (pow_ne_zero _ (by omega)) (by omega))).1 hchain
+    exact (pow_le_pow_iff_left₀ zero_le' zero_le'
+      (Nat.mul_ne_zero (pow_ne_zero _ (by omega)) (by omega))).1 hchain
 
 end ReciprocityTheory.PGsh.Up

@@ -10,7 +10,8 @@ public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.AprimeArit
 namespace Formalism.ExponentWindows
 
 theorem exists_cuts_exponent_bounds : AprimeCuts := by
-  obtain ⟨C, hC, hA⟩ := Formalism.TruncatedSeriesCounting.WachCoordinates.exists_constant_exponent_inequalities
+  obtain ⟨C, hC, hA⟩ :=
+    Formalism.TruncatedSeriesCounting.WachCoordinates.exists_constant_exponent_inequalities
   refine ⟨C, hC, ?_⟩
   intro ℓ hℓ n j _ size b w S η rr hj hjn _hsize hCb hsep hrr
 

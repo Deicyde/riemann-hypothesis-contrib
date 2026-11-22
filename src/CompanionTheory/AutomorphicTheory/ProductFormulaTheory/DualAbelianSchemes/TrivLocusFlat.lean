@@ -34,9 +34,12 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -50,14 +53,19 @@ theorem fewEquations : FewEquations := fewEquations_pf h1Le
 
 theorem ciFlat : CIFlat := GlobalTheory.T.CechFlatComplex
 
-theorem trivLocusFlat : TrivLocusFlat := @GlobalTheory.CompanionTheory.TrivFlat.trivLocusFlat fewEquations ciFlat
+theorem trivLocusFlat : TrivLocusFlat :=
+  @GlobalTheory.CompanionTheory.TrivFlat.trivLocusFlat fewEquations ciFlat
 
 theorem pointSurj : PointSurj := pointSurj_pf addAcyclic_pf
 
-theorem finDual : FinDual := @GlobalTheory.CompanionTheory.DualAb.finDual_of_univNoeth (@GlobalTheory.CompanionTheory.DualUniv.univNoeth trivLocus trivLocusFlat pointSurj)
+theorem finDual : FinDual :=
+  @GlobalTheory.CompanionTheory.DualAb.finDual_of_univNoeth
+    (@GlobalTheory.CompanionTheory.DualUniv.univNoeth trivLocus trivLocusFlat pointSurj)
 
-theorem kTrivModel : KTrivModel := @GlobalTheory.CompanionTheory.KTrivSpread.kTrivModel_of_trivLocus trivLocus
+theorem kTrivModel : KTrivModel :=
+  @GlobalTheory.CompanionTheory.KTrivSpread.kTrivModel_of_trivLocus trivLocus
 
-theorem kTrivDual : KTrivDual := @GlobalTheory.CompanionTheory.DualScheme.ktrivDual kTrivModel finDual
+theorem kTrivDual : KTrivDual :=
+  @GlobalTheory.CompanionTheory.DualScheme.ktrivDual kTrivModel finDual
 
 end CompanionTheory.PfDual

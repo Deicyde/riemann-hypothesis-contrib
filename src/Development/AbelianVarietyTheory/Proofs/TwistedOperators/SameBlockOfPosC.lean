@@ -13,18 +13,17 @@ def sgnIx {p q : ℕ} : Ix p q → ℂ
   | .inl _ => 1
   | .inr _ => -1
 
-theorem sgnIx_mul_self {p q : ℕ} (a : Ix p q) : sgnIx a * sgnIx a = 1 := by
-  cases a <;> simp [sgnIx]
+theorem sgnIx_mul_self {p q : ℕ} (a : Ix p q) : sgnIx a * sgnIx a = 1 := by cases a <;> simp [sgnIx]
 
-theorem star_sgnIx {p q : ℕ} (a : Ix p q) : star (sgnIx a) = sgnIx a := by
-  cases a <;> simp [sgnIx]
+theorem star_sgnIx {p q : ℕ} (a : Ix p q) : star (sgnIx a) = sgnIx a := by cases a <;> simp [sgnIx]
 
 theorem Jm_eq_diagonal (p q : ℕ) : Jm p q = Matrix.diagonal sgnIx := by
   unfold Jm Formalism.UG.Jpq
-  ext (i | i) (j | j) <;> simp [sgnIx, Matrix.diagonal_apply, Matrix.one_apply] <;> split_ifs <;> simp
+  ext (i | i) (j | j) <;> simp [sgnIx, Matrix.diagonal_apply, Matrix.one_apply] <;> split_ifs
+    <;> simp
 
-theorem adjZ_apply {p q : ℕ} (Z : Mat p q) (a b : Ix p q) :
-    adjZ Z a b = sgnIx a * sgnIx b * star (Z b a) := by
+theorem adjZ_apply {p q : ℕ} (Z : Mat p q) (a b : Ix p q)
+    : adjZ Z a b = sgnIx a * sgnIx b * star (Z b a) := by
   unfold adjZ
   rw [Jm_eq_diagonal, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply]
   ring
@@ -54,7 +53,7 @@ theorem adjZ_Eab {p q : ℕ} (a b : Ix p q) : adjZ (Eab a b) = (sgnIx a * sgnIx 
   · obtain ⟨rfl, rfl⟩ := h
     rw [if_pos ⟨rfl, rfl⟩, if_pos ⟨rfl, rfl⟩, star_one]
     ring
-  · have h' : ¬ (b = i ∧ a = j) := fun h'' => h ⟨h''.2, h''.1⟩
+  · have h' : ¬(b = i ∧ a = j) := fun h'' => h ⟨h''.2, h''.1⟩
     rw [if_neg h, if_neg h', star_zero]
     ring
 
@@ -78,7 +77,8 @@ theorem mem_upq_iff {p q : ℕ} (Z : Mat p q) : Z ∈ upq p q ↔ adjZ Z = -Z :=
     rw [h2]
     abel
 
-private theorem sameBlock_symm_twisted_operators {p q : ℕ} {a b : Ix p q} (h : sameBlock a b) : sameBlock b a := by
+private theorem sameBlock_symm_twisted_operators {p q : ℕ} {a b : Ix p q} (h : sameBlock a b)
+    : sameBlock b a := by
   cases a <;> cases b <;> exact h
 
 theorem isKC_adjZ {p q : ℕ} {Z : Mat p q} (h : IsKC Z) : IsKC (adjZ Z) := by
@@ -94,16 +94,20 @@ theorem isKC_Eab {p q : ℕ} {a b : Ix p q} (h : sameBlock a b) : IsKC (Eab a b)
   rintro ⟨rfl, rfl⟩
   exact hij h
 
-theorem sameBlock_self {p q : ℕ} (a : Ix p q) : sameBlock a a := by
-  cases a <;> trivial
+theorem sameBlock_self {p q : ℕ} (a : Ix p q) : sameBlock a a := by cases a <;> trivial
 
 theorem sameBlock_of_posC {p q : ℕ} {a b : Ix p q} (h : posC a b) : sameBlock a b := by
   cases a <;> cases b <;> trivial
 
-theorem exists_upq_add {p q : ℕ} (Z : Mat p q) :
-    ∃ X ∈ upq p q, ∃ Y ∈ upq p q, Z = X + Complex.I • Y := by
-  refine ⟨(1 / 2 : ℂ) • Z + (-1 / 2 : ℂ) • adjZ Z, ?_,
-    (-Complex.I / 2) • Z + (-Complex.I / 2) • adjZ Z, ?_, ?_⟩
+theorem exists_upq_add {p q : ℕ} (Z : Mat p q)
+    : ∃ X ∈ upq p q, ∃ Y ∈ upq p q, Z = X + Complex.I • Y := by
+  refine ⟨
+    (1 / 2 : ℂ) • Z + (-1 / 2 : ℂ) • adjZ Z,
+    ?_,
+    (-Complex.I / 2) • Z + (-Complex.I / 2) • adjZ Z,
+    ?_,
+    ?_
+  ⟩
   · rw [mem_upq_iff, adjZ_add, adjZ_smul, adjZ_smul, adjZ_adjZ]
     have h1 : star (1 / 2 : ℂ) = 1 / 2 := by simp
     have h2 : star (-1 / 2 : ℂ) = -1 / 2 := by simp
@@ -121,11 +125,13 @@ theorem exists_upq_add {p q : ℕ} (Z : Mat p q) :
     rw [h4]
     module
 
-theorem hasDerivAt_orbit {p q : ℕ} {T : GrpData p q} (πU : URep T) {Y : Mat p q} (hY : Y ∈ upq p q)
-    {x y : πU.H} (h : HasDerivAt (fun t : ℝ => πU.π (T.expt (t • Y)) x) y 0) (t : ℝ) :
-    HasDerivAt (fun t : ℝ => πU.π (T.expt (t • Y)) x) (πU.π (T.expt (t • Y)) y) t := by
-  have h0 : HasDerivAt (fun t : ℝ => πU.π (T.expt (t • Y)) x) y (t - t) := by
-    rwa [sub_self]
+theorem hasDerivAt_orbit
+    {p q : ℕ} {T : GrpData p q} (πU : URep T)
+    {Y : Mat p q} (hY : Y ∈ upq p q)
+    {x y : πU.H} (h : HasDerivAt (fun t : ℝ => πU.π (T.expt (t • Y)) x) y 0)
+    (t : ℝ)
+    : HasDerivAt (fun t : ℝ => πU.π (T.expt (t • Y)) x) (πU.π (T.expt (t • Y)) y) t := by
+  have h0 : HasDerivAt (fun t : ℝ => πU.π (T.expt (t • Y)) x) y (t - t) := by rwa [sub_self]
   have h1 := HasDerivAt.comp_sub_const t t h0
   have h2 := ((πU.π (T.expt (t • Y))).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt t h1
   simp only [ContinuousLinearMap.coe_restrictScalars'] at h2
@@ -137,13 +143,13 @@ theorem hasDerivAt_orbit {p q : ℕ} {T : GrpData p q} (πU : URep T) {Y : Mat p
   simp only [Function.comp, e, map_mul]
   rfl
 
-theorem inner_pi_pi {p q : ℕ} {T : GrpData p q} (πU : URep T) (g : T.G) (x y : πU.H) :
-    inner ℂ (πU.π g x) (πU.π g y) = inner ℂ x y := by
+theorem inner_pi_pi {p q : ℕ} {T : GrpData p q} (πU : URep T) (g : T.G) (x y : πU.H)
+    : inner ℂ (πU.π g x) (πU.π g y) = inner ℂ x y := by
   let e : πU.H →ₗᵢ[ℂ] πU.H := ⟨(πU.π g : πU.H →ₗ[ℂ] πU.H), πU.isom g⟩
   exact e.inner_map_map x y
 
-theorem inner_pi_left {p q : ℕ} {T : GrpData p q} (πU : URep T) (g : T.G) (x y : πU.H) :
-    inner ℂ (πU.π g x) y = inner ℂ x (πU.π g⁻¹ y) := by
+theorem inner_pi_left {p q : ℕ} {T : GrpData p q} (πU : URep T) (g : T.G) (x y : πU.H)
+    : inner ℂ (πU.π g x) y = inner ℂ x (πU.π g⁻¹ y) := by
   have e : πU.π g (πU.π g⁻¹ y) = y := by
     show (πU.π g * πU.π g⁻¹) y = y
     rw [← map_mul]

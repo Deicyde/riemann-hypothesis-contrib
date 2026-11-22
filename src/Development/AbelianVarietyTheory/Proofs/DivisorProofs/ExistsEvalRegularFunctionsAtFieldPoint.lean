@@ -5,26 +5,34 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsDominantOf
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZH GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.FlagPush
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZH GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.FlagPush
 open Classical
 
 namespace GlobalTheory.FlagPush
 
-theorem exists_eval_regular_at_fieldPoint :
-    ∀ (F : Type) [Field F] (Y : Var F) (Z : Scheme.{0}) [IsIntegral Z] (k : Type) [Field k] (w : Sp k ⟶ Z),
-      ∃ ev : (algebraMap (Z.presheaf.stalk (w (IsLocalRing.closedPoint k))) Z.functionField).range →+* k,
-        (∀ u, ev u ≠ 0 ↔ UnitAt (w (IsLocalRing.closedPoint k)) (u : Z.functionField)) ∧
-        ∀ (q : Z ⟶ Y.X) [IsDominant q] (u : Y.Fn), RegAt (q (w (IsLocalRing.closedPoint k))) u →
-          ∃ h, ev ⟨functionFieldMap q u, h⟩ = (ratOf Y).val (w ≫ q) u := by
+theorem exists_eval_regular_at_fieldPoint
+    : ∀ (F : Type) [Field F] (Y : Var F) (Z : Scheme.{0}) [IsIntegral Z] (k : Type) [Field k]
+        (w : Sp k ⟶ Z),
+      ∃ ev : (algebraMap (Z.presheaf.stalk (w (IsLocalRing.closedPoint k))) Z.functionField).range
+          →+* k,
+        (∀ u, ev u ≠ 0 ↔ UnitAt (w (IsLocalRing.closedPoint k)) (u : Z.functionField))
+          ∧ ∀ (q : Z ⟶ Y.X) [IsDominant q] (u : Y.Fn),
+            RegAt (q (w (IsLocalRing.closedPoint k))) u
+              → ∃ h, ev ⟨functionFieldMap q u, h⟩ = (ratOf Y).val (w ≫ q) u := by
   intro F _ Y Z _ k _ w
   set z := w (IsLocalRing.closedPoint k) with hz
   let ι := algebraMap (Z.presheaf.stalk z) Z.functionField
   have hι : Function.Injective ι := FaithfulSMul.algebraMap_injective _ _
-  let e : Z.presheaf.stalk z ≃+* ι.range := RingEquiv.ofBijective ι.rangeRestrict
-    ⟨fun a b hab => hι (congrArg Subtype.val hab), fun u => by
-      obtain ⟨a, ha⟩ := u.2
-      exact ⟨a, Subtype.ext ha⟩⟩
+  let e : Z.presheaf.stalk z ≃+* ι.range :=
+    RingEquiv.ofBijective ι.rangeRestrict ⟨
+      fun a b hab => hι (congrArg Subtype.val hab),
+      fun u => by
+        obtain ⟨a, ha⟩ := u.2
+        exact ⟨a, Subtype.ext ha⟩
+    ⟩
   let s : Z.presheaf.stalk z →+* k := (Scheme.stalkClosedPointTo (R := .of k) w).hom
   haveI : IsLocalHom s := Scheme.isLocalHom_stalkClosedPointTo' w
   have he : ∀ a, e.symm ⟨ι a, ⟨a, rfl⟩⟩ = a := fun a => e.symm_apply_eq.2 rfl
@@ -42,8 +50,10 @@ theorem exists_eval_regular_at_fieldPoint :
     subst ha
     have hm := functionFieldMap_algebraMap q z a
     refine ⟨⟨_, hm.symm⟩, ?_⟩
-    have h1 : (⟨functionFieldMap q (algebraMap _ Y.X.functionField a), ⟨_, hm.symm⟩⟩ : ι.range) =
-        ⟨ι ((q.stalkMap z).hom a), ⟨_, rfl⟩⟩ := Subtype.ext hm
+    have h1
+        : (⟨functionFieldMap q (algebraMap _ Y.X.functionField a), ⟨_, hm.symm⟩⟩ : ι.range)
+          = ⟨ι ((q.stalkMap z).hom a), ⟨_, rfl⟩⟩ :=
+      Subtype.ext hm
     change s (e.symm _) = _
     rw [h1, he]
     have hw : w ≫ q = spMap (s.comp (q.stalkMap z).hom) ≫ Y.X.fromSpecStalk (q z) := by
@@ -53,6 +63,7 @@ theorem exists_eval_regular_at_fieldPoint :
       rw [spMap, spMap, ← Spec.map_comp]
       rfl
     have hv := val_ratOf (Y := Y) (s.comp (q.stalkMap z).hom) a
-    exact hv.symm.trans (congrArg (fun p => (ratOf Y).val p (algebraMap _ Y.X.functionField a)) hw.symm)
+    exact hv.symm.trans
+      (congrArg (fun p => (ratOf Y).val p (algebraMap _ Y.X.functionField a)) hw.symm)
 
 end GlobalTheory.FlagPush

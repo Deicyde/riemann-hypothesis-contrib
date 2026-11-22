@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.Columns.DecoFin
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Forms GlobalTheory.Mem.Col2
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV
+  Formalism.L2.Forms GlobalTheory.Mem.Col2
 
 noncomputable section
 
@@ -14,14 +15,16 @@ namespace GlobalTheory.Mem.Col2.LevLaws
 
 section Gen
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
-  {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
-
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
 
 omit [StarRing E] in
-theorem exists_mul_mem_span (P : HeightOneSpectrum (𝓞 E)) {q : 𝓞 E} (hq : q ∈ P.asIdeal)
-    (hq2 : q ∉ P.asIdeal ^ 2) : ∃ s ∉ P.asIdeal, ∀ r ∈ P.asIdeal, ∃ t, s * r = q * t := by
-  have h1 : P.asIdeal ∣ Ideal.span {q} := Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hq)
+theorem exists_mul_mem_span
+    (P : HeightOneSpectrum (𝓞 E)) {q : 𝓞 E} (hq : q ∈ P.asIdeal) (hq2 : q ∉ P.asIdeal ^ 2)
+    : ∃ s ∉ P.asIdeal, ∀ r ∈ P.asIdeal, ∃ t, s * r = q * t := by
+  have h1 : P.asIdeal ∣ Ideal.span {q} :=
+    Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hq)
   obtain ⟨J, hJ⟩ := h1
   have h2 : ¬ J ≤ P.asIdeal := by
     intro h

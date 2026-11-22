@@ -4,15 +4,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-theorem UpperTheory.V.ML.isCrys_isDR_prod :
-    ∀ (l F r : ℕ) (L : List ℕ), AdmL l F r L → admitted l F r L.prod ∧ L.prod ≠ 0 ∧ (∀ q, AdmL l F r (q :: L) → q.Coprime L.prod) ∧ ∀ q, AdmL l F r (q :: L) → AdmL l F r L := by
+theorem UpperTheory.V.ML.isCrys_isDR_prod
+    : ∀ (l F r : ℕ) (L : List ℕ),
+      AdmL l F r L
+        → admitted l F r L.prod ∧ L.prod ≠ 0 ∧ (∀ q, AdmL l F r (q :: L) → q.Coprime L.prod)
+          ∧ ∀ q, AdmL l F r (q :: L) → AdmL l F r L := by
   intro l F r L hL
   induction L with
   | nil =>
-    refine ⟨⟨squarefree_one, fun q hq hd => absurd (Nat.eq_one_of_dvd_one hd) hq.ne_one⟩, by simp, fun q _ => by simp, fun q _ => ⟨List.nodup_nil, by simp⟩⟩
+    refine ⟨
+      ⟨squarefree_one, fun q hq hd => absurd (Nat.eq_one_of_dvd_one hd) hq.ne_one⟩,
+      by simp,
+      fun q _ => by simp,
+      fun q _ => ⟨List.nodup_nil, by simp⟩
+    ⟩
   | cons a L ih =>
     have tail : ∀ (b : ℕ) (M : List ℕ), AdmL l F r (b :: M) → AdmL l F r M := fun b M h =>
       ⟨(List.nodup_cons.mp h.1).2, fun q hq => h.2 q (List.mem_cons_of_mem b hq)⟩
@@ -31,10 +41,14 @@ theorem UpperTheory.V.ML.isCrys_isDR_prod :
     · intro q hq
       have hqa : q ≠ a := fun h => (List.nodup_cons.mp hq.1).1 (h ▸ List.mem_cons_self)
       have hqP : q.Prime := (hq.2 q List.mem_cons_self).1
-      have hqL : AdmL l F r (q :: L) :=
-        ⟨List.nodup_cons.mpr ⟨fun h => (List.nodup_cons.mp hq.1).1 (List.mem_cons_of_mem a h), (List.nodup_cons.mp (List.nodup_cons.mp hq.1).2).2⟩,
-          fun p hp => by
-            rcases List.mem_cons.mp hp with h | h
-            · exact h ▸ hq.2 q List.mem_cons_self
-            · exact hq.2 p (List.mem_cons_of_mem q (List.mem_cons_of_mem a h))⟩
+      have hqL : AdmL l F r (q :: L) := ⟨
+        List.nodup_cons.mpr ⟨
+          fun h => (List.nodup_cons.mp hq.1).1 (List.mem_cons_of_mem a h),
+          (List.nodup_cons.mp (List.nodup_cons.mp hq.1).2).2
+        ⟩,
+        fun p hp => by
+          rcases List.mem_cons.mp hp with h | h
+          · exact h ▸ hq.2 q List.mem_cons_self
+          · exact hq.2 p (List.mem_cons_of_mem q (List.mem_cons_of_mem a h))
+      ⟩
       exact Nat.Coprime.mul_right ((Nat.coprime_primes hqP ha).mpr hqa) (hcop q hqL)

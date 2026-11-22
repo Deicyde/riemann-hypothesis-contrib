@@ -18,7 +18,6 @@ def scalarGL (R : Type) [CommRing R] (n : ℕ) : Rˣ →* GL (Fin n) R :=
 def charRep {H R : Type} [Group H] [CommRing R] (χ : H →* Rˣ) : H →* GL (Fin 1) R :=
   (scalarGL R 1).comp χ
 
-
 variable {V}
 
 end Formalism.MainNotions.V

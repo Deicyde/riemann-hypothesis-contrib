@@ -14,24 +14,35 @@ noncomputable section
 
 namespace GlobalTheory.KumIdeal
 
-theorem exists_mul_modEq_ppow {p : ℕ} (hp : p.Prime) {n a : ℕ} (hn : 1 ≤ n) (ha : ¬ p ^ n ∣ a) :
-    ∃ k, k * a ≡ p ^ (n - 1) [MOD p ^ n] := by
+theorem exists_mul_modEq_ppow {p : ℕ} (hp : p.Prime) {n a : ℕ} (hn : 1 ≤ n) (ha : ¬ p ^ n ∣ a)
+    : ∃ k, k * a ≡ p ^ (n - 1) [MOD p ^ n] := by
   have hd : Nat.gcd a (p ^ n) ∣ p ^ n := Nat.gcd_dvd_right _ _
   obtain ⟨v, hv, hv'⟩ := (Nat.dvd_prime_pow hp).1 hd
-  have hvn : v ≠ n := by
-    intro h; apply ha; rw [← h, ← hv']; exact Nat.gcd_dvd_left _ _
+  have hvn : v ≠ n := by intro h; apply ha; rw [← h, ← hv']; exact Nat.gcd_dvd_left _ _
   have hlt : Nat.gcd a (p ^ n) < p ^ n := by
     rw [hv']; exact Nat.pow_lt_pow_right hp.one_lt (lt_of_le_of_ne hv hvn)
   obtain ⟨m, -, hm⟩ := Nat.exists_mul_mod_eq_gcd hlt
   refine ⟨m * p ^ (n - 1 - v), ?_⟩
   have e : p ^ (n - 1) = p ^ v * p ^ (n - 1 - v) := by rw [← pow_add]; congr 1; omega
   rw [e, ← hv', ← hm]
-  calc m * p ^ (n - 1 - v) * a = (a * m) * p ^ (n - 1 - v) := by ring
+  calc
+    m * p ^ (n - 1 - v) * a
+      = (a * m) * p ^ (n - 1 - v) := by ring
     _ ≡ (a * m % p ^ n) * p ^ (n - 1 - v) [MOD p ^ n] := (Nat.mod_modEq _ _).symm.mul_right _
 
-theorem zeta_sub_one_mem_span : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω → ∀ (T : Tower p Ω) (n : ℕ) (r : Ω), IsInt (p := p) r → (∀ h ∈ Hinf T, ∃ i : ℕ, h r = T.ζ n ^ i * r) →
-  ∀ j : ℕ, 1 ≤ j → ∀ g ∈ Hinf T, g r ≠ r →
-  T.ζ j - 1 ∈ Submodule.span (FixI (Hfix T r)) {y : Ω | ∃ x ∈ FixI (Hfix T r), y = g x - x} := by
+theorem zeta_sub_one_mem_span
+    : ∀ (p : ℕ) [Fact p.Prime],
+      p ≠ 2
+        → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+          IsClo p Ω
+            → ∀ (T : Tower p Ω) (n : ℕ) (r : Ω),
+              IsInt (p := p) r → (∀ h ∈ Hinf T, ∃ i : ℕ, h r = T.ζ n ^ i * r)
+                → ∀ j : ℕ,
+                  1 ≤ j
+                    → ∀ g ∈ Hinf T,
+                      g r ≠ r
+                        → T.ζ j - 1 ∈ Submodule.span (FixI (Hfix T r))
+                          {y : Ω | ∃ x ∈ FixI (Hfix T r), y = g x - x} := by
   intro p _ hp2 Ω _ _ hΩ T n r hr hK j hj g hg hgr
   classical
   have hp : p.Prime := Fact.out
@@ -39,7 +50,8 @@ theorem zeta_sub_one_mem_span : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (�
   set I := Submodule.span C {y : Ω | ∃ x ∈ C, y = g x - x} with hI
   have hr0 : r ≠ 0 := by rintro rfl; exact hgr (map_zero g)
   obtain ⟨y, E, hy, hE, huniq, hsum⟩ :=
-    GlobalTheory.T.exists_integral_sum_conj_eq_zeta_sub_one p hp2 Ω hΩ T {r} (by simpa using hr) j hj
+    GlobalTheory.T.exists_integral_sum_conj_eq_zeta_sub_one p hp2 Ω hΩ T {r} (by simpa using hr) j
+      hj
   have hE' : ∀ e ∈ E, e ∈ Hinf T := hE
   have huniq' : ∀ h ∈ Hinf T, ∃! e, e ∈ E ∧ h y = e y ∧ h r = e r := by
     intro h hh; simpa using huniq h hh
@@ -146,20 +158,21 @@ theorem zeta_sub_one_mem_span : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (�
       have h2 : ∑ x ∈ Finset.range d, Z (t * d + x) - W ∈ I := by
         rw [hW, ← Finset.sum_sub_distrib]
         refine Submodule.sum_mem _ fun x _ => ?_
-        rw [add_comm]; exact iter d hZd t x
+        rw [add_comm]
+        exact iter d hZd t x
       have := I.add_mem ih h2
       convert this using 1
-      push_cast; ring
-  have hNd : p * d = p ^ n := by
-    rw [hd, ← pow_succ']; congr 1; omega
+      push_cast
+      ring
+  have hNd : p * d = p ^ n := by rw [hd, ← pow_succ']; congr 1; omega
   have hsumZ : ∑ i ∈ Finset.range (p ^ n), Z i = T.ζ j - 1 := by
     rw [← hsum]
     have hinj : Set.InjOn (fun i => T.ζ n ^ i * r) (Finset.range (p ^ n) : Set ℕ) := by
       intro i hi i' hi' h
       simp only [Finset.coe_range, Set.mem_Iio] at hi hi'
       exact hzn.pow_inj hi hi' (mul_right_cancel₀ hr0 h)
-    rw [← Finset.sum_fiberwise_of_maps_to (t := (Finset.range (p ^ n)).image (fun i => T.ζ n ^ i * r))
-      (g := fun e : Gal p Ω => e r)]
+    rw [← Finset.sum_fiberwise_of_maps_to
+      (t := (Finset.range (p ^ n)).image (fun i => T.ζ n ^ i * r)) (g := fun e : Gal p Ω => e r)]
     · rw [Finset.sum_image hinj]
     · intro e he
       obtain ⟨i, hi⟩ := hK e (hE' e he)
@@ -170,7 +183,8 @@ theorem zeta_sub_one_mem_span : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (�
     rwa [hNd, hsumZ] at this
   have hτ0 : T.ζ j - 1 ≠ 0 :=
     sub_ne_zero.2 ((T.prim j).ne_one (Nat.one_lt_pow (by omega) hp.one_lt))
-  obtain ⟨hu0, huint⟩ := GlobalTheory.T.one_sub_prime_div_zeta_sub_one_mul_isUnit p hp2 Ω hΩ T j hj W hWC.1
+  obtain ⟨hu0, huint⟩ :=
+    GlobalTheory.T.one_sub_prime_div_zeta_sub_one_mul_isUnit p hp2 Ω hΩ T j hj W hWC.1
   have huC : (1 - (p : Ω) / (T.ζ j - 1) * W)⁻¹ ∈ C := by
     refine ⟨huint, fun h hh => ?_⟩
     rw [mem_Hfix] at hh

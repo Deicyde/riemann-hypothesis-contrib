@@ -11,9 +11,12 @@ namespace GlobalTheory.FrobIdealDeg
 
 open PowerSeries
 
-variable {O : Type} [CommRing O] (l : ℕ) (hl : 2 ≤ l) (φ : O⟦X⟧ →ₐ[O] O⟦X⟧)
-  (hφ : ∀ (f : O⟦X⟧) (m : ℕ), PowerSeries.coeff m (φ f) =
-    if l ∣ m then PowerSeries.coeff (m / l) f else 0)
+variable
+  {O : Type} [CommRing O]
+  (l : ℕ) (hl : 2 ≤ l)
+  (φ : O⟦X⟧ →ₐ[O] O⟦X⟧)
+  (hφ : ∀ (f : O⟦X⟧) (m : ℕ),
+    PowerSeries.coeff m (φ f) = if l ∣ m then PowerSeries.coeff (m / l) f else 0)
 
 noncomputable def comps (f : O⟦X⟧) : Fin l → O⟦X⟧ :=
   (GlobalTheory.T.powerSeries_existsUnique_decomp_over_frobeniusLike_endo l hl φ hφ f).exists.choose
@@ -127,44 +130,55 @@ end GlobalTheory.FrobIdealDeg
 
 namespace GlobalTheory
 
-
 open GlobalTheory.FrobIdealDeg in
-theorem frobenius_ideal_degree_bound : ∀ {O : Type} [CommRing O] (l : ℕ), 2 ≤ l →
-    ∀ (φ : O⟦X⟧ →ₐ[O] O⟦X⟧), (∀ (f : O⟦X⟧) (m : ℕ), PowerSeries.coeff m (φ f) =
-      if l ∣ m then PowerSeries.coeff (m / l) f else 0) →
-    ∀ (a e h b : ℕ) [NeZero a] (I : ZMod a → Ideal O⟦X⟧), 1 ≤ b → h + b ≤ l →
-    (∀ τ, ∃ s : ℕ, PowerSeries.X ^ s ∈ I τ ⊔ Ideal.span {(l : O⟦X⟧) ^ b}) →
-    (∀ τ, ∀ x ∈ I τ, (PowerSeries.X ^ e + (l : O⟦X⟧)) ^ h * x ∈ (I (τ - 1)).map φ) →
-    ∀ τ, (PowerSeries.X : O⟦X⟧) ^ (e * (h + b)) ∈ (I τ).map φ ⊔ Ideal.span {(l : O⟦X⟧) ^ b} := by
+theorem frobenius_ideal_degree_bound
+    : ∀ {O : Type} [CommRing O] (l : ℕ),
+      2 ≤ l
+        → ∀ (φ : O⟦X⟧ →ₐ[O] O⟦X⟧),
+          (∀ (f : O⟦X⟧) (m : ℕ),
+              PowerSeries.coeff m (φ f) = if l ∣ m then PowerSeries.coeff (m / l) f else 0)
+            → ∀ (a e h b : ℕ) [NeZero a] (I : ZMod a → Ideal O⟦X⟧),
+              1 ≤ b → h + b ≤ l
+                → (∀ τ, ∃ s : ℕ, PowerSeries.X ^ s ∈ I τ ⊔ Ideal.span {(l : O⟦X⟧) ^ b})
+                → (∀ τ, ∀ x ∈ I τ, (PowerSeries.X ^ e + (l : O⟦X⟧)) ^ h * x ∈ (I (τ - 1)).map φ)
+                → ∀ τ,
+                  (PowerSeries.X : O⟦X⟧) ^ (e * (h + b))
+                    ∈ (I τ).map φ ⊔ Ideal.span {(l : O⟦X⟧) ^ b} := by
   intro O _ l hl φ hφ a e h b _ I hb hhb hs hI
   classical
-  have step : ∀ τ t, (PowerSeries.X : O⟦X⟧) ^ t ∈ I τ ⊔ Ideal.span {(l : O⟦X⟧) ^ b} →
-      (PowerSeries.X : O⟦X⟧) ^ (t + e * (h + b - 1)) ∈
-        (I (τ - 1)).map φ ⊔ Ideal.span {(l : O⟦X⟧) ^ b} := by
+  have step
+      : ∀ τ t,
+        (PowerSeries.X : O⟦X⟧) ^ t ∈ I τ ⊔ Ideal.span {(l : O⟦X⟧) ^ b}
+          → (PowerSeries.X : O⟦X⟧) ^ (t + e * (h + b - 1))
+            ∈ (I (τ - 1)).map φ ⊔ Ideal.span {(l : O⟦X⟧) ^ b} := by
     intro τ t ht
     have hK := pow_mem_binom (O := O) l e h b hb
     obtain ⟨r1, hr1, r2, hr2, hr⟩ := Submodule.mem_sup.mp hK
     obtain ⟨x, hx, y, hy, hxy⟩ := Submodule.mem_sup.mp ht
     obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hr1
     rw [pow_add, ← hxy, ← hr]
-    have hring : (x + y) * (c * (PowerSeries.X ^ e + (l : O⟦X⟧)) ^ h + r2) =
-        c * ((PowerSeries.X ^ e + (l : O⟦X⟧)) ^ h * x) +
-          (y * (c * (PowerSeries.X ^ e + (l : O⟦X⟧)) ^ h + r2) + x * r2) := by ring
+    have hring
+        : (x + y) * (c * (PowerSeries.X ^ e + (l : O⟦X⟧)) ^ h + r2)
+          = c * ((PowerSeries.X ^ e + (l : O⟦X⟧)) ^ h * x)
+            + (y * (c * (PowerSeries.X ^ e + (l : O⟦X⟧)) ^ h + r2) + x * r2) := by
+      ring
     rw [hring]
     exact Submodule.add_mem_sup (Ideal.mul_mem_left _ _ (hI τ x hx))
       (Ideal.add_mem _ (Ideal.mul_mem_right _ _ hy) (Ideal.mul_mem_left _ _ hr2))
   let s : ZMod a → ℕ := fun τ => Nat.find (hs τ)
-  have hspec : ∀ τ, (PowerSeries.X : O⟦X⟧) ^ s τ ∈ I τ ⊔ Ideal.span {(l : O⟦X⟧) ^ b} :=
-    fun τ => Nat.find_spec (hs τ)
+  have hspec : ∀ τ, (PowerSeries.X : O⟦X⟧) ^ s τ ∈ I τ ⊔ Ideal.span {(l : O⟦X⟧) ^ b} := fun τ =>
+    Nat.find_spec (hs τ)
   have down : ∀ τ, l * s τ ≤ s (τ + 1) + e * (h + b - 1) := by
     intro τ
     have h1 := step (τ + 1) (s (τ + 1)) (hspec (τ + 1))
     rw [add_sub_cancel_right] at h1
-    have h2 := descend l hl φ hφ (I τ) b _ h1 ⟨(s (τ + 1) + e * (h + b - 1)) % l,
-      Nat.mod_lt _ (by omega)⟩
+    have h2 :=
+      descend l hl φ hφ (I τ) b _ h1 ⟨(s (τ + 1) + e * (h + b - 1)) % l, Nat.mod_lt _ (by omega)⟩
     rw [comps_X_pow] at h2
     have h3 : s τ ≤ (s (τ + 1) + e * (h + b - 1)) / l := Nat.find_min' _ h2
-    calc l * s τ ≤ l * ((s (τ + 1) + e * (h + b - 1)) / l) := Nat.mul_le_mul_left _ h3
+    calc
+      l * s τ
+        ≤ l * ((s (τ + 1) + e * (h + b - 1)) / l) := Nat.mul_le_mul_left _ h3
       _ ≤ s (τ + 1) + e * (h + b - 1) := Nat.mul_div_le _ _
   obtain ⟨τ0, -, hmax⟩ := Finset.exists_max_image Finset.univ s Finset.univ_nonempty
   obtain ⟨n, hn⟩ : ∃ n, h + b - 1 = n := ⟨_, rfl⟩
@@ -181,8 +195,7 @@ theorem frobenius_ideal_degree_bound : ∀ {O : Type} [CommRing O] (l : ℕ), 2 
   rw [add_sub_cancel_right] at h1
   refine Ideal.pow_mem_of_pow_mem _ h1 ?_
   have m := hmax (τ + 1) (Finset.mem_univ _)
-  have : e * (h + b) = e * (h + b - 1) + e := by
-    rw [← Nat.mul_add_one]; congr 1; omega
+  have : e * (h + b) = e * (h + b - 1) + e := by rw [← Nat.mul_add_one]; congr 1; omega
   omega
 
 end GlobalTheory

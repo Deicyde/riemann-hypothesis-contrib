@@ -10,8 +10,7 @@ open DirichletCharacter
 
 variable {N : ℕ}
 
-noncomputable def condExp (l : ℕ) (ψ : DirichletCharacter ℂ N) : ℕ :=
-  ψ.conductor.factorization l
+noncomputable def condExp (l : ℕ) (ψ : DirichletCharacter ℂ N) : ℕ := ψ.conductor.factorization l
 
 noncomputable def avgCondExp (l : ℕ) (X : Subgroup (DirichletCharacter ℂ N)) : ℚ :=
   (∑ᶠ ψ : X, (condExp l (ψ : DirichletCharacter ℂ N) : ℚ)) / (Nat.card X : ℚ)
@@ -25,8 +24,7 @@ noncomputable def fieldCond [NeZero N] (X : Subgroup (DirichletCharacter ℂ N))
 noncomputable def logRootDiscChar (X : Subgroup (DirichletCharacter ℂ N)) : ℝ :=
   (∑ᶠ ψ : X, Real.log (ψ : DirichletCharacter ℂ N).conductor) / (Nat.card X : ℝ)
 
-def inertiaUnits (N l : ℕ) : Subgroup (ZMod N)ˣ :=
-  (ZMod.unitsMap (Nat.ordCompl_dvd N l)).ker
+def inertiaUnits (N l : ℕ) : Subgroup (ZMod N)ˣ := (ZMod.unitsMap (Nat.ordCompl_dvd N l)).ker
 
 def decompUnits (N l : ℕ) [NeZero N] [hl : Fact l.Prime] : Subgroup (ZMod N)ˣ :=
   (Subgroup.zpowers (ZMod.unitOfCoprime l (Nat.coprime_ordCompl hl.out (NeZero.ne N)))).comap
@@ -35,24 +33,23 @@ def decompUnits (N l : ℕ) [NeZero N] [hl : Fact l.Prime] : Subgroup (ZMod N)ˣ
 def higherUnits (N l t : ℕ) : Subgroup (ZMod N)ˣ :=
   (ZMod.unitsMap (Nat.gcd_dvd_left N (ordCompl[l] N * l ^ t))).ker
 
-noncomputable def crtEquiv (N l : ℕ) [NeZero N] [hl : Fact l.Prime] :
-    ZMod N ≃+* ZMod (ordProj[l] N) × ZMod (ordCompl[l] N) :=
+noncomputable def crtEquiv (N l : ℕ) [NeZero N] [hl : Fact l.Prime]
+    : ZMod N ≃+* ZMod (ordProj[l] N) × ZMod (ordCompl[l] N) :=
   (ZMod.ringEquivCongr (Nat.ordProj_mul_ordCompl_eq_self N l).symm).trans
-    (ZMod.chineseRemainder
-      (Nat.Coprime.pow_left _ (Nat.coprime_ordCompl hl.out (NeZero.ne N))))
+    (ZMod.chineseRemainder (Nat.Coprime.pow_left _ (Nat.coprime_ordCompl hl.out (NeZero.ne N))))
 
-noncomputable def localUnits (N l : ℕ) [NeZero N] [Fact l.Prime] :
-    (ZMod (ordProj[l] N))ˣ →* (ZMod N)ˣ :=
+noncomputable def localUnits (N l : ℕ) [NeZero N] [Fact l.Prime]
+    : (ZMod (ordProj[l] N))ˣ →* (ZMod N)ˣ :=
   Units.map ((crtEquiv N l).symm.toRingHom.toMonoidHom.comp (MonoidHom.inl _ _))
 
-noncomputable def localPart (N l : ℕ) [NeZero N] [Fact l.Prime] :
-    DirichletCharacter ℂ N →* DirichletCharacter ℂ (ordProj[l] N) where
+noncomputable def localPart (N l : ℕ) [NeZero N] [Fact l.Prime]
+    : DirichletCharacter ℂ N →* DirichletCharacter ℂ (ordProj[l] N) where
   toFun ψ := MulChar.ofUnitHom ((MulChar.toUnitHom ψ).comp (localUnits N l))
   map_one' := by ext u; simp
   map_mul' ψ χ := by ext u; simp
 
-noncomputable def ramIdx [NeZero N] (l : ℕ) [Fact l.Prime]
-    (X : Subgroup (DirichletCharacter ℂ N)) : ℕ :=
+noncomputable def ramIdx [NeZero N] (l : ℕ) [Fact l.Prime] (X : Subgroup (DirichletCharacter ℂ N))
+    : ℕ :=
   Nat.card (X.map (localPart N l))
 
 def vdFormula (l a e : ℕ) : ℚ :=

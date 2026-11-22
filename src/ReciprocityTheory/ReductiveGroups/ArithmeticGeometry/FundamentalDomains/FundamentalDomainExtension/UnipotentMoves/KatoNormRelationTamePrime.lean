@@ -18,7 +18,7 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 theorem sEmb : SEmb E := by
   intro r τ G x y
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [hermC, herm, Data.emb, map_sum, map_mul, emb_cc]
+  simp [hermC, herm, Data.emb, map_sum, map_mul, emb_cc]
 
 theorem sMajFlag : SMajFlag E := by
   intro r X x x' hx hx' h
@@ -32,17 +32,20 @@ theorem sCmp_of (hm : SMajXZ E) : SCmp E := by
 
 theorem sFlagMap : SFlagMap E := by
   intro r X x y n h τ
-  have hcol : ∀ (z : Frame X.Ψ r) (a : Fin r),
-      col (mat (X.lmulC n z) τ) a = (n τ).mulVec (col (mat z τ) a) := by
+  have hcol
+      : ∀ (z : Frame X.Ψ r) (a : Fin r),
+        col (mat (X.lmulC n z) τ) a = (n τ).mulVec (col (mat z τ) a) := by
     intro z a
     funext k
     simp [col, mat, Data.lmulC, Matrix.of_apply, Matrix.mul_apply, Matrix.mulVec, dotProduct]
     rfl
   simp only [hcol]
-  have hr : ∀ z : Frame X.Ψ r, (Set.range fun a : Fin X.p0 =>
-      (n τ).mulVec (col (mat z τ) (Fin.castLE X.p0_le a))) =
-      (Matrix.mulVecLin (n τ)) '' Set.range (fun a : Fin X.p0 => col (mat z τ) (Fin.castLE X.p0_le a)) :=
-    fun z => by rw [← Set.range_comp]; rfl
+  have hr
+      : ∀ z : Frame X.Ψ r,
+        (Set.range fun a : Fin X.p0 => (n τ).mulVec (col (mat z τ) (Fin.castLE X.p0_le a)))
+          = (Matrix.mulVecLin (n τ))
+            '' Set.range (fun a : Fin X.p0 => col (mat z τ) (Fin.castLE X.p0_le a)) := fun z => by
+    rw [← Set.range_comp]; rfl
   rw [hr, hr, Submodule.span_image, Submodule.span_image, h τ]
 
 theorem radius_pos_le_tenth : RadiusPosLeTenth := by
@@ -57,16 +60,19 @@ theorem kato_norm_relation_tame_prime : KatoClassHeckeEulerFactorRelation := by
   intro r f d rd NA NC ep t hd hrd hNA hep ht ht1
   unfold frameIndexBound
   have hP0 : 0 ≤ (f : ℝ) * ((2 * f * (r - 2) : ℕ) : ℝ) ^ 3 * d * NA :=
-    mul_nonneg (mul_nonneg (mul_nonneg (Nat.cast_nonneg _) (pow_nonneg (Nat.cast_nonneg _) 3)) hd) hNA
+    mul_nonneg (mul_nonneg (mul_nonneg (Nat.cast_nonneg _) (pow_nonneg (Nat.cast_nonneg _) 3)) hd)
+      hNA
   have hS : Real.sqrt (NC ^ 2 * rd / (t * ep)) = Real.sqrt (NC ^ 2 * rd / ep) / Real.sqrt t := by
     rw [← Real.sqrt_div' _ ht.le, div_div, mul_comm ep t]
   have htt : t ≤ Real.sqrt t := by
-    calc t = Real.sqrt (t ^ 2) := (Real.sqrt_sq ht.le).symm
+    calc
+      t = Real.sqrt (t ^ 2) := (Real.sqrt_sq ht.le).symm
       _ ≤ Real.sqrt t := Real.sqrt_le_sqrt (by nlinarith)
   refine ⟨?_, mul_nonneg hP0 (Real.sqrt_nonneg _)⟩
   rw [hS]
-  exact le_trans (mul_le_mul_of_nonneg_left
-    (div_le_div_of_nonneg_left (Real.sqrt_nonneg _) ht htt) hP0) (le_of_eq (mul_div_assoc _ _ _).symm)
+  exact le_trans
+    (mul_le_mul_of_nonneg_left (div_le_div_of_nonneg_left (Real.sqrt_nonneg _) ht htt) hP0)
+    (le_of_eq (mul_div_assoc _ _ _).symm)
 
 theorem final_numerical_inequalities : UnipotentMoveNumericalInequalities := by
   intro ρ κ hρ hρ1 hκ0 hκ
@@ -84,8 +90,7 @@ theorem final_numerical_inequalities : UnipotentMoveNumericalInequalities := by
     rw [div_mul_eq_mul_div, div_le_div_iff₀ hq0 (by norm_num)]
     nlinarith [mul_le_mul_of_nonneg_right hκ' (by linarith : (0 : ℝ) ≤ 1 + s),
       mul_le_mul_of_nonneg_left hq hρ.le]
-  have ha0 : 0 ≤ 3 * κ / q * (1 + s) :=
-    mul_nonneg (div_nonneg (by linarith) hq0.le) (by linarith)
+  have ha0 : 0 ≤ 3 * κ / q * (1 + s) := mul_nonneg (div_nonneg (by linarith) hq0.le) (by linarith)
   have ha1 : 3 * κ / q * (1 + s) ≤ 1 / 3000 := by linarith
   refine ⟨by linarith, by linarith, ?_⟩
   rw [div_lt_iff₀ (by linarith)]
@@ -114,7 +119,8 @@ theorem epsilonZero_pos : EpsilonZeroPos E := by
   dsimp only [flowEpsilonBound]
   refine lt_min one_pos (div_pos (pow_pos (by linarith) 2) ?_)
   refine mul_pos (mul_pos (mul_pos (pow_pos (mul_pos hg (pow_pos hd 2)) 2) (pow_pos hNC 2)) hc1) ?_
-  exact add_log_add_pos_of_one_le w _ _ hw hf (le_add_of_nonneg_right (mul_nonneg (by positivity) (by linarith)))
+  exact add_log_add_pos_of_one_le w _ _ hw hf
+    (le_add_of_nonneg_right (mul_nonneg (by positivity) (by linarith)))
 
 end
 

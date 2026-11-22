@@ -94,8 +94,8 @@ lemma tb_contDiffOn_lWord (μ : Fin n → ℤ) (D : List (Matrix (Fin n) (Fin n)
   | nil => exact tb_contDiffOn_phiM μ
   | cons Z D ih => exact tb_contDiffOn_lhol isOpen_omega ih Z
 
-theorem tb_hWord_phiP (μ : Fin n → ℤ) (D : List (Matrix (Fin n) (Fin n) ℂ)) :
-    ∀ x ∈ OmegaP n, hWord D (PhiP μ) x = lWord (D.map Neg.neg) (PhiM μ) x⁻¹ := by
+theorem tb_hWord_phiP (μ : Fin n → ℤ) (D : List (Matrix (Fin n) (Fin n) ℂ))
+    : ∀ x ∈ OmegaP n, hWord D (PhiP μ) x = lWord (D.map Neg.neg) (PhiM μ) x⁻¹ := by
   induction D with
   | nil => intro x _; rfl
   | cons Z D ih =>
@@ -110,8 +110,10 @@ theorem tb_hWord_phiP (μ : Fin n → ℤ) (D : List (Matrix (Fin n) (Fin n) ℂ
         (fderiv ℂ (lWord (D.map Neg.neg) (PhiM μ)) x⁻¹) x⁻¹ :=
       (((tb_contDiffOn_lWord μ _).differentiableOn (by simp)).differentiableAt
         (isOpen_omega.mem_nhds hx)).hasFDerivAt
-    have hcomp : HasFDerivAt (fun z => lWord (D.map Neg.neg) (PhiM μ) z⁻¹)
-        ((fderiv ℂ (lWord (D.map Neg.neg) (PhiM μ)) x⁻¹).comp L) x := hG.comp x hL
+    have hcomp : HasFDerivAt
+        (fun z => lWord (D.map Neg.neg) (PhiM μ) z⁻¹)
+        ((fderiv ℂ (lWord (D.map Neg.neg) (PhiM μ)) x⁻¹).comp L) x :=
+      hG.comp x hL
     show fderiv ℂ (hWord D (PhiP μ)) x (x * Z) = fderiv ℂ (lWord (D.map Neg.neg) (PhiM μ)) x⁻¹ (-Z * x⁻¹)
     rw [hev.fderiv_eq, hcomp.fderiv, ContinuousLinearMap.comp_apply, hLv]
     congr 1

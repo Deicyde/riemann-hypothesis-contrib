@@ -15,16 +15,17 @@ theorem aprimeInf_iff : Formalism.L2.SG.Pf.NcReal.AprimeInf ↔ AprimeInfS := If
 theorem aprimeInf_of (hV : AinfValue) (hG : GinfTest) : Formalism.L2.SG.Pf.NcReal.AprimeInf :=
   aprimeInf_iff.2 (aprimeInfS_of hV hG)
 
-theorem aprimeInf_of_steps (hE : ExInf) (hP : PushInf) (hW : WeilInf) (hH : HtotInf) (hG : GinfTest) :
-    Formalism.L2.SG.Pf.NcReal.AprimeInf :=
+theorem aprimeInf_of_steps (hE : ExInf) (hP : PushInf) (hW : WeilInf) (hH : HtotInf) (hG : GinfTest)
+    : Formalism.L2.SG.Pf.NcReal.AprimeInf :=
   aprimeInf_of (ainfValue_of hE hP hW hH) hG
 
-theorem aprimeInf_of_open (hE : ExInf) (hP : PushInf) (hW : WeilInf) (hF : HinfFin) :
-    Formalism.L2.SG.Pf.NcReal.AprimeInf :=
+theorem aprimeInf_of_open (hE : ExInf) (hP : PushInf) (hW : WeilInf) (hF : HinfFin)
+    : Formalism.L2.SG.Pf.NcReal.AprimeInf :=
   aprimeInf_of_steps hE hP hW (htotInf_of hF) ginfTest_holds
 
-theorem aprimeInf_of_leaves (hE : ExInf) (hP : PushInf) (hW : WeilInf) (hC : MassDataMassesW.HinfCompact) :
-    Formalism.L2.SG.Pf.NcReal.AprimeInf :=
+theorem aprimeInf_of_leaves
+    (hE : ExInf) (hP : PushInf) (hW : WeilInf) (hC : MassDataMassesW.HinfCompact)
+    : Formalism.L2.SG.Pf.NcReal.AprimeInf :=
   aprimeInf_of_open hE hP hW (hinfFin_of hC)
 
 end PI.AprimeInfW

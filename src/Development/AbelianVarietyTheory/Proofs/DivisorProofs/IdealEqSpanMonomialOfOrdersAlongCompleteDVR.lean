@@ -13,11 +13,15 @@ open IsLocalRing GlobalTheory.Toroidal
 
 namespace GlobalTheory.MonoVal
 
-theorem eq_span_monomial_of_forall_cdvr (k : Type) [Field k] [CharZero k] (m e : ℕ) (I : Ideal (ChartRing k m e))
-    (a : Fin m → ℕ)
-    (h : ∀ (W : Type) [CommRing W] [IsDomain W] [IsLocalRing W], GlobalTheory.LN.CDvr W → ∀ ψ : ChartRing k m e →+* W,
-      Function.Injective ψ → IsLocalHom ψ → I.map ψ = Ideal.span {ψ (∏ i, bdParam k m e i ^ a i)}) :
-    I = Ideal.span {∏ i, bdParam k m e i ^ a i} := by
+theorem eq_span_monomial_of_forall_cdvr
+    (k : Type) [Field k] [CharZero k]
+    (m e : ℕ) (I : Ideal (ChartRing k m e)) (a : Fin m → ℕ)
+    (h : ∀ (W : Type) [CommRing W] [IsDomain W] [IsLocalRing W],
+      GlobalTheory.LN.CDvr W
+        → ∀ ψ : ChartRing k m e →+* W,
+          Function.Injective ψ → IsLocalHom ψ
+            → I.map ψ = Ideal.span {ψ (∏ i, bdParam k m e i ^ a i)})
+    : I = Ideal.span {∏ i, bdParam k m e i ^ a i} := by
   set q : ChartRing k m e := ∏ i, bdParam k m e i ^ a i with hqdef
   haveI : CharZero (ChartRing k m e) := (MvPowerSeries.constantCoeff : ChartRing k m e →+* k).charZero
   obtain ⟨hN, hIC, -, -⟩ := GlobalTheory.ChartCone.isCN_chartRing k m e
@@ -28,8 +32,9 @@ theorem eq_span_monomial_of_forall_cdvr (k : Type) [Field k] [CharZero k] (m e :
     have := congrArg (MvPowerSeries.coeff (Finsupp.single j 1)) hj
     simp [MvPowerSeries.coeff_X] at this
   have hq0 : q ≠ 0 := Finset.prod_ne_zero_iff.2 fun i _ => pow_ne_zero _ (hX _)
-  have loc_of : ∀ {V : Type} [CommRing V] [IsLocalRing V] (φ : ChartRing k m e →+* V),
-      (maximalIdeal V).comap φ = maximalIdeal (ChartRing k m e) → IsLocalHom φ := by
+  have loc_of
+      : ∀ {V : Type} [CommRing V] [IsLocalRing V] (φ : ChartRing k m e →+* V),
+        (maximalIdeal V).comap φ = maximalIdeal (ChartRing k m e) → IsLocalHom φ := by
     intro V _ _ φ hφ
     refine ⟨fun x hx => ?_⟩
     by_contra hnu
@@ -49,8 +54,9 @@ theorem eq_span_monomial_of_forall_cdvr (k : Type) [Field k] [CharZero k] (m e :
   by_contra hqI
   let I' : Ideal (ChartRing k m e) := Submodule.comap (LinearMap.mulLeft (ChartRing k m e) q) I
   have hmemI' : ∀ g, g ∈ I' ↔ q * g ∈ I := fun g => Iff.rfl
-  have key : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V] (ψ : ChartRing k m e →+* V),
-      GlobalTheory.LN.CDvr V → Function.Injective ψ → IsLocalHom ψ → False := by
+  have key
+      : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V] (ψ : ChartRing k m e →+* V),
+        GlobalTheory.LN.CDvr V → Function.Injective ψ → IsLocalHom ψ → False := by
     intro V _ _ _ ψ hV hinj hψ
     have hmap := h V hV ψ hinj hψ
     have hI : I = Ideal.span {q} * I' := by
@@ -82,9 +88,9 @@ theorem eq_span_monomial_of_forall_cdvr (k : Type) [Field k] [CharZero k] (m e :
       exact fun hu => hx' (isUnit_of_map_unit ψ x hu)
     exact (IsLocalRing.maximalIdeal.isMaximal V).ne_top (top_le_iff.1 (htop ▸ hle'))
   rcases isEmpty_or_nonempty (Fin m ⊕ Fin e) with hσ | hne
-  ·
-    let ψ0 : ChartRing k m e →+* PowerSeries k :=
-      (PowerSeries.C : k →+* PowerSeries k).comp (MvPowerSeries.constantCoeff : ChartRing k m e →+* k)
+  · let ψ0 : ChartRing k m e →+* PowerSeries k :=
+      (PowerSeries.C : k →+* PowerSeries k).comp
+        (MvPowerSeries.constantCoeff : ChartRing k m e →+* k)
     have hc : ∀ f : ChartRing k m e, f = MvPowerSeries.C (MvPowerSeries.constantCoeff f) := by
       intro f
       ext n

@@ -27,24 +27,26 @@ def listOp : List 𝔤 → E → E
   | [], v => v
   | X :: L, v => h.derivOp π X (listOp L v)
 
-@[simp] theorem listOp_nil (v : E) : h.listOp π [] v = v := rfl
+@[simp]
+theorem listOp_nil (v : E) : h.listOp π [] v = v := rfl
 
-theorem listOp_cons (X : 𝔤) (L : List 𝔤) (v : E) :
-    h.listOp π (X :: L) v = h.derivOp π X (h.listOp π L v) := rfl
+theorem listOp_cons (X : 𝔤) (L : List 𝔤) (v : E)
+    : h.listOp π (X :: L) v = h.derivOp π X (h.listOp π L v) :=
+  rfl
 
-theorem listOp_append (L₁ L₂ : List 𝔤) (v : E) :
-    h.listOp π (L₁ ++ L₂) v = h.listOp π L₁ (h.listOp π L₂ v) := by
+theorem listOp_append (L₁ L₂ : List 𝔤) (v : E)
+    : h.listOp π (L₁ ++ L₂) v = h.listOp π L₁ (h.listOp π L₂ v) := by
   induction L₁ with
   | nil => rfl
   | cons X L ih => rw [List.cons_append, listOp_cons, listOp_cons, ih]
 
-theorem isSmoothVector_listOp {v : E} (hv : h.IsSmoothVector π v) :
-    ∀ L : List 𝔤, h.IsSmoothVector π (h.listOp π L v)
+theorem isSmoothVector_listOp {v : E} (hv : h.IsSmoothVector π v)
+    : ∀ L : List 𝔤, h.IsSmoothVector π (h.listOp π L v)
   | [] => hv
   | X :: L => h.isSmoothVector_derivOp π (isSmoothVector_listOp hv L) X
 
-theorem listOp_eq_wordOp (L : List 𝔤) (v : E) :
-    h.listOp π L v = h.wordOp π (fun i : Fin L.length => L[i]) v := by
+theorem listOp_eq_wordOp (L : List 𝔤) (v : E)
+    : h.listOp π L v = h.wordOp π (fun i : Fin L.length => L[i]) v := by
   induction L with
   | nil => rfl
   | cons X L ih =>

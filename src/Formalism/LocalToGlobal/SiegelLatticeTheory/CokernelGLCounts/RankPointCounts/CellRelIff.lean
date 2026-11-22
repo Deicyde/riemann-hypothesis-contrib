@@ -29,9 +29,9 @@ theorem πk_id (hD : Data W S N' K π) (a : Ak S K) : πk W S N' K π hD a = a :
 
 def Hk : Subgroup K := (Hs W K g).subgroupOf K
 
-theorem cellRel_iff (hD : Data W S N' K π) (k₁ k₂ : K) :
-    (cellRel W N' K g).r (toCell W S N' K π g hD k₁) (toCell W S N' K π g hD k₂) ↔
-      ∃ n ∈ (πk W S N' K π hD).ker, ∃ h ∈ Hk W K g, k₂ = n * k₁ * h := by
+theorem cellRel_iff (hD : Data W S N' K π) (k₁ k₂ : K)
+    : (cellRel W N' K g).r (toCell W S N' K π g hD k₁) (toCell W S N' K π g hD k₂)
+      ↔ ∃ n ∈ (πk W S N' K π hD).ker, ∃ h ∈ Hk W K g, k₂ = n * k₁ * h := by
   show cell π ((k₂ : G) * g) * (cell π ((k₁ : G) * g))⁻¹ ∈ K ⊓ N' ↔ _
   constructor
   · rintro ⟨hK, hN⟩
@@ -46,13 +46,15 @@ theorem cellRel_iff (hD : Data W S N' K π) (k₁ k₂ : K) :
       rw [MulAction.mem_stabilizer_iff]
       have e2 := cell_smul W S N' K π hD ((k₂ : G) * g)
       have e1 := cell_smul W S N' K π hD ((k₁ : G) * g)
-      calc ((k₁⁻¹ * ⟨x, hK⟩⁻¹ * k₂ : K) : G) • g • W
-          = ((k₁ : G)⁻¹ * cell π ((k₁ : G) * g)) • ((cell π ((k₂ : G) * g))⁻¹ • (((k₂ : G) * g) • W)) := by
-            rw [← mul_smul, ← mul_smul, ← mul_smul]
-            congr 1
-            push_cast
-            rw [hx]
-            group
+      calc
+        ((k₁⁻¹ * ⟨x, hK⟩⁻¹ * k₂ : K) : G) • g • W
+            = ((k₁ : G)⁻¹ * cell π ((k₁ : G) * g))
+              • ((cell π ((k₂ : G) * g))⁻¹ • (((k₂ : G) * g) • W)) := by
+          rw [← mul_smul, ← mul_smul, ← mul_smul]
+          congr 1
+          push_cast
+          rw [hx]
+          group
         _ = ((k₁ : G)⁻¹ * cell π ((k₁ : G) * g)) • W := by rw [← e2, inv_smul_smul]
         _ = g • W := by rw [mul_smul, e1, ← mul_smul]; simp
     · ext

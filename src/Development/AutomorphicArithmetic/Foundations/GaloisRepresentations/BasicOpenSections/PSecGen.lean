@@ -10,8 +10,7 @@ open UpperTheory.Gal.TranscendenceTraces (gp pt Wt fib IsWt nwt LocNml)
 open UpperTheory.Gal.crystallineComparison (resPt twist PtId)
 open UpperTheory.Gal UpperTheory.Gal.Mod
 
-theorem UpperTheory.Gal.Mod.secGen :
-    SecGen := by
+theorem UpperTheory.Gal.Mod.secGen : SecGen := by
   intro Z Y g _ V _ _ _ y
   have hP : IsProper g := inferInstance
   have hV : ValuativeCriterion g := by
@@ -27,11 +26,9 @@ theorem UpperTheory.Gal.Mod.secGen :
     have h₁ : z₁ ≫ g = y := hz₁
     have h₂ : z₂ ≫ g = y := hz₂
     have h' : e ≫ z₁ = e ≫ z₂ := h
-    let S : ValuativeCommSq g :=
-      ⟨V, FractionRing V, e ≫ z₁, y, ⟨by rw [Category.assoc, h₁]⟩⟩
+    let S : ValuativeCommSq g := ⟨V, FractionRing V, e ≫ z₁, y, ⟨by rw [Category.assoc, h₁]⟩⟩
     have hu := ValuativeCriterion.uniqueness hV S
-    have := @Subsingleton.elim _ hu
-      ⟨z₁, rfl, h₁⟩ ⟨z₂, h'.symm, h₂⟩
+    have := @Subsingleton.elim _ hu ⟨z₁, rfl, h₁⟩ ⟨z₂, h'.symm, h₂⟩
     exact congrArg CommSq.LiftStruct.l this
   · intro x hx
     have hx' : x ≫ g = e ≫ y := hx

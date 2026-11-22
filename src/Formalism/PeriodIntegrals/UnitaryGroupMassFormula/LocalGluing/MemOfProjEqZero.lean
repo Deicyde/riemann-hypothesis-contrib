@@ -13,9 +13,11 @@ namespace PI.LocHerm.Glue
 
 section Basic
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V)
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  (H : HermSp M V)
 
 theorem h_add_right (x y y' : V) : H.h x (y + y') = H.h x y + H.h x y' := by
   rw [H.h_herm (y + y') x, H.h_add_left, map_add (f := _), ← H.h_herm, ← H.h_herm]
@@ -38,13 +40,14 @@ section Proj
 
 variable {E : Type} [CommRing E] {V : Type} [AddCommGroup V] [Module E V]
 
-theorem sub_proj_mem {A B : Submodule E V} (hAB : IsCompl A B) (x : V) :
-    x - (A.projectionOnto B hAB x : V) ∈ B := by
+theorem sub_proj_mem {A B : Submodule E V} (hAB : IsCompl A B) (x : V)
+    : x - (A.projectionOnto B hAB x : V) ∈ B := by
   rw [← Submodule.projectionOnto_apply_eq_zero_iff hAB, map_sub,
     Submodule.projectionOnto_apply_left, sub_self]
 
-theorem mem_of_proj_eq_zero {A B : Submodule E V} (hAB : IsCompl A B) {x : V}
-    (h : (A.projectionOnto B hAB x : V) = 0) : x ∈ B := by
+theorem mem_of_proj_eq_zero
+    {A B : Submodule E V} (hAB : IsCompl A B) {x : V} (h : (A.projectionOnto B hAB x : V) = 0)
+    : x ∈ B := by
   exact (Submodule.projectionOnto_apply_eq_zero_iff hAB).1 (Subtype.ext h)
 
 end Proj
@@ -115,8 +118,8 @@ theorem pair_of (hR : Riesz) (hS : Scale) (hO : PI.LocHerm.LocOProj) : Pair := b
     have hpA'd : ∀ l : abelian₂, (pA' l : V) = d l := by
       intro l
       have : (l : V) = d l + (s (π l) : V) := by simp [d]
-      rw [this, map_add (f := _), Submodule.projectionOnto_apply_of_mem_right hcompl (hsW _), add_zero,
-        Submodule.projectionOnto_apply_of_mem_left hcompl (hdA l)]
+      rw [this, map_add (f := _), Submodule.projectionOnto_apply_of_mem_right hcompl (hsW _),
+        add_zero, Submodule.projectionOnto_apply_of_mem_left hcompl (hdA l)]
     let f : V →ₗ[E] E := hlin H u ∘ₗ A.subtype ∘ₗ pA'
     have hfA : ∀ y ∈ A, f y = H.h y u := by
       intro y hy
@@ -139,7 +142,8 @@ theorem pair_of (hR : Riesz) (hS : Scale) (hO : PI.LocHerm.LocOProj) : Pair := b
       intro a ha
       have hxB := sub_proj_mem hAB x
       have e1 : H.h a x = H.h a (A.projectionOnto B hAB x : V) := by
-        have e2 := h_add_right H a (A.projectionOnto B hAB x : V) (x - (A.projectionOnto B hAB x : V))
+        have e2 :=
+          h_add_right H a (A.projectionOnto B hAB x : V) (x - (A.projectionOnto B hAB x : V))
         rw [add_sub_cancel, (orth a ha _ hxB).1, add_zero] at e2
         exact e2
       rw [hz, h_sub_right, ← e1, hx a, hfA a ha, sub_self]

@@ -18,8 +18,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.SemistableReduc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models GlobalTheory.ZM
 
@@ -27,7 +29,8 @@ namespace GlobalTheory.EpsAct
 
 theorem subsingleton_sp_dualNumber (k : Type) [Field k] : Subsingleton (Sp (DualNumber k)) := by
   change Subsingleton (PrimeSpectrum (DualNumber k))
-  have key : ∀ (p : PrimeSpectrum (DualNumber k)) (x : DualNumber k), x ∈ p.asIdeal ↔ x.fst = 0 := by
+  have key
+      : ∀ (p : PrimeSpectrum (DualNumber k)) (x : DualNumber k), x ∈ p.asIdeal ↔ x.fst = 0 := by
     intro p x
     constructor
     · intro hx
@@ -41,11 +44,16 @@ theorem subsingleton_sp_dualNumber (k : Type) [Field k] : Subsingleton (Sp (Dual
       simp
   exact ⟨fun p q => PrimeSpectrum.ext (Ideal.ext fun x => (key p x).trans (key q x).symm)⟩
 
-theorem rigidity (hL : Out.Laws) (k : Type) [Field k] {Z : Scheme.{0}} (c₀ : Z ⟶ Sp k)
-    (A' G' : Over (Sp (DualNumber k))) [GrpObj A'] [GrpObj G'] (j : Z ⟶ A'.left) (a b : A' ⟶ G')
+theorem rigidity
+    (hL : Out.Laws)
+    (k : Type) [Field k]
+    {Z : Scheme.{0}} (c₀ : Z ⟶ Sp k)
+    (A' G' : Over (Sp (DualNumber k))) [GrpObj A'] [GrpObj G']
+    (j : Z ⟶ A'.left) (a b : A' ⟶ G')
     (hA : IsAbelianScheme A')
     (hj : IsPullback j c₀ A'.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom))
-    (hab : j ≫ a.left = j ≫ b.left) (hη : η[A'] ≫ a = η[A'] ≫ b) : a = b := by
+    (hab : j ≫ a.left = j ≫ b.left) (hη : η[A'] ≫ a = η[A'] ≫ b)
+    : a = b := by
   classical
   have hsurj : Function.Surjective A'.hom.appTop.hom := (hL.globalFns _ A' hA).2
   set d : A' ⟶ G' := a * b⁻¹ with hd
@@ -63,8 +71,10 @@ theorem rigidity (hL : Out.Laws) (k : Type) [Field k] {Z : Scheme.{0}} (c₀ : Z
     intro W u h
     rw [MonObj.comp_mul, GrpObj.comp_inv, h, mul_inv_cancel]
   have hjd : j ≫ d.left = (toUnit (Over.mk (j ≫ A'.hom))).left ≫ η[G'].left := by
-    have h1 := congrArg (fun f => Over.Hom.left f)
-      (key (Over.homMk j rfl : Over.mk (j ≫ A'.hom) ⟶ A') (by ext; exact hab))
+    have h1 :=
+      congrArg
+        (fun f => Over.Hom.left f)
+        (key (Over.homMk j rfl : Over.mk (j ≫ A'.hom) ⟶ A') (by ext; exact hab))
     simpa [Hom.one_def] using h1
   obtain ⟨pt⟩ : Nonempty ((𝟙_ (Over (Sp (DualNumber k)))).left) := by
     obtain ⟨q⟩ : Nonempty (Sp k) := by
@@ -79,8 +89,8 @@ theorem rigidity (hL : Out.Laws) (k : Type) [Field k] {Z : Scheme.{0}} (c₀ : Z
     simp only [Scheme.Hom.comp_apply] at h2
     rw [h2]
     exact congrArg _ (Subsingleton.elim _ _)
-  have hfac := GlobalTheory.DualRigidity.eq_comp_section_of_const A'.hom η[A'].left d.left
-    (by simp) hsurj _ hy
+  have hfac :=
+    GlobalTheory.DualRigidity.eq_comp_section_of_const A'.hom η[A'].left d.left (by simp) hsurj _ hy
   have hη' : η[A'] ≫ d = 1 := key _ hη
   have hd2 : d = toUnit A' ≫ η[A'] ≫ d := by
     ext
@@ -90,13 +100,25 @@ theorem rigidity (hL : Out.Laws) (k : Type) [Field k] {Z : Scheme.{0}} (c₀ : Z
     simp
   exact mul_inv_eq_one.1 hd1
 
-theorem main : Out.Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (k : Type) [Field k] (T : Scheme.{0}) (t : SAB H T) (x : Sp (DualNumber k) ⟶ T) (t' : SAB H (Sp (DualNumber k))) (ν : SABMap t' t x) (φ : t'.G.left ⟶ t.G.left), IsProper t.G.hom → IsGrpPullback t'.G t.G (constPt x) φ → (∀ (Z : Scheme.{0}) (j : Z ⟶ t'.G.left) (c : Z ⟶ Sp k), j ≫ t'.G.hom = c ≫ spMap (TrivSqZeroExt.fstHom k k k).toRingHom → j ≫ φ = j ≫ ν.φ) → ∀ a, (t'.act.act a).left ≫ φ = φ ≫ (t.act.act a).left := by
+theorem main
+    : Out.Laws
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (k : Type) [Field k]
+          (T : Scheme.{0}) (t : SAB H T) (x : Sp (DualNumber k) ⟶ T)
+          (t' : SAB H (Sp (DualNumber k))) (ν : SABMap t' t x) (φ : t'.G.left ⟶ t.G.left),
+        IsProper t.G.hom → IsGrpPullback t'.G t.G (constPt x) φ
+          → (∀ (Z : Scheme.{0}) (j : Z ⟶ t'.G.left) (c : Z ⟶ Sp k),
+            j ≫ t'.G.hom = c ≫ spMap (TrivSqZeroExt.fstHom k k k).toRingHom → j ≫ φ = j ≫ ν.φ)
+          → ∀ a, (t'.act.act a).left ≫ φ = φ ≫ (t.act.act a).left := by
   intro hL E _ _ _ H k _ T t x t' ν φ hP hpb hag a
   have hsq := hpb.1
   have hprop : IsProper t'.G.hom := MorphismProperty.of_isPullback (P := @IsProper) hsq hP
   have hs := t'.semi
-  have hA : IsAbelianScheme t'.G :=
-    { comm := hs.comm, smooth := hs.smooth, proper := hprop, geomConnected := hs.geomConnected }
+  have hA : IsAbelianScheme t'.G := {
+    comm := hs.comm
+    smooth := hs.smooth
+    proper := hprop
+    geomConnected := hs.geomConnected
+  }
   have hα : ((t'.act.act a).left ≫ φ) ≫ t.G.hom = t'.G.hom ≫ constPt x := by
     rw [Category.assoc, hsq.w, ← Category.assoc, Over.w]
   have hβ : (φ ≫ (t.act.act a).left) ≫ t.G.hom = t'.G.hom ≫ constPt x := by
@@ -105,12 +127,20 @@ theorem main : Out.Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   let B : t'.G ⟶ t'.G := Over.homMk (hsq.lift _ _ hβ) (hsq.lift_snd _ _ _)
   have e3 : (t'.act.act a).left ≫ ν.φ = ν.φ ≫ (t.act.act a).left := ν.act a
   have hj := IsPullback.of_hasPullback t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)
-  have hab : pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) ≫ A.left = pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) ≫ B.left := by
+  have hab
+      : pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) ≫ A.left
+        = pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) ≫ B.left := by
     apply hsq.hom_ext
     · simp only [A, B, Over.homMk_left, Category.assoc, IsPullback.lift_fst]
-      have e1 := hag _ (pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)) (pullback.snd t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)) hj.w
-      have e2 := hag _ (pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) ≫ (t'.act.act a).left) (pullback.snd t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom))
-        (by rw [Category.assoc, Over.w]; exact hj.w)
+      have e1 :=
+        hag _ (pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom))
+          (pullback.snd t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)) hj.w
+      have e2 :=
+        hag _
+          (pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)
+            ≫ (t'.act.act a).left)
+          (pullback.snd t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom))
+          (by rw [Category.assoc, Over.w]; exact hj.w)
       rw [← Category.assoc, e2, Category.assoc, e3, ← Category.assoc, ← e1, Category.assoc]
     · simp only [A, B, Over.homMk_left, Category.assoc, IsPullback.lift_snd]
   let e : Over.mk ((𝟙_ (Over (Sp (DualNumber k)))).hom ≫ constPt x) ⟶ t.G :=
@@ -140,10 +170,14 @@ theorem main : Out.Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
       simp only [e, Over.comp_left, Over.homMk_left, Category.assoc] at he3 hm2
       rw [← Category.assoc, hm2, he3]
     · simp only [A, B, Over.homMk_left, Category.assoc, IsPullback.lift_snd]
-  have hAB := rigidity hL k (pullback.snd t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)) t'.G t'.G (pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)) A B hA hj hab hη
+  have hAB :=
+    rigidity hL k (pullback.snd t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)) t'.G t'.G
+      (pullback.fst t'.G.hom (spMap (TrivSqZeroExt.fstHom k k k).toRingHom)) A B hA hj hab hη
   have hL' := congrArg Over.Hom.left hAB
   simp only [A, B, Over.homMk_left] at hL'
-  calc (t'.act.act a).left ≫ φ = hsq.lift _ _ hα ≫ φ := (hsq.lift_fst _ _ _).symm
+  calc
+    (t'.act.act a).left ≫ φ
+      = hsq.lift _ _ hα ≫ φ := (hsq.lift_fst _ _ _).symm
     _ = hsq.lift _ _ hβ ≫ φ := by rw [hL']
     _ = φ ≫ (t.act.act a).left := hsq.lift_fst _ _ _
 

@@ -20,10 +20,10 @@ abbrev JetLoc (S : Type) [CommRing S] (κ : Type) (m : ℕ) (𝔭 : Ideal S) [�
 
 def JetGlueSt : Prop :=
   ∀ (S : Type) [CommRing S] (κ : Type) [Finite κ] (m : ℕ) (X : Scheme.{0})
-    (f g : Spec (CommRingCat.of (JetRing S κ m)) ⟶ X),
+      (f g : Spec (CommRingCat.of (JetRing S κ m)) ⟶ X),
     (∀ (𝔭 : Ideal S) [𝔭.IsPrime],
-      Spec.map (CommRingCat.ofHom (algebraMap (JetRing S κ m) (JetLoc S κ m 𝔭))) ≫ f =
-        Spec.map (CommRingCat.ofHom (algebraMap (JetRing S κ m) (JetLoc S κ m 𝔭))) ≫ g) →
-    f = g
+        Spec.map (CommRingCat.ofHom (algebraMap (JetRing S κ m) (JetLoc S κ m 𝔭))) ≫ f
+          = Spec.map (CommRingCat.ofHom (algebraMap (JetRing S κ m) (JetLoc S κ m 𝔭))) ≫ g)
+      → f = g
 
 end ReciprocityTheory.ChartRestriction.G.TB

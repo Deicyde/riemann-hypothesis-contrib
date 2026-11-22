@@ -14,18 +14,19 @@ open scoped Classical
 
 namespace PI.NRCW
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef PI.PairValDefs Matrix IsDedekindDomain
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef PI.PairValDefs Matrix IsDedekindDomain
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem normRepMove_of_steps (D : D7) (u u' : D.what₂.Word) (hE : TermEqIff D u u')
-    (h1 : StepExp D) (h2 : StepGram D) (h3 : StepGlob D) (h4 : StepLoc D) (h5 : StepTr D) :
-    PI.NormRepChange.NormRepMove D u u' := by
+theorem normRepMove_of_steps
+    (D : D7) (u u' : D.what₂.Word) (hE : TermEqIff D u u') (h1 : StepExp D) (h2 : StepGram D)
+    (h3 : StepGlob D) (h4 : StepLoc D) (h5 : StepTr D)
+    : PI.NormRepChange.NormRepMove D u u' := by
   intro F0 Λ hΛ t _hrel F₁ F₂ hR1 hA1 hR2 hA2 w _hw
   obtain ⟨p1, e1⟩ := hR1
   obtain ⟨p2, e2⟩ := hR2
-  have hDC : DCRel Λ (lf D F0) F₁ F₂ :=
-    ((hE F0 Λ hΛ) ⟨F₁, p1⟩ ⟨F₂, p2⟩).mp (e1.trans e2.symm)
+  have hDC : DCRel Λ (lf D F0) F₁ F₂ := ((hE F0 Λ hΛ) ⟨F₁, p1⟩ ⟨F₂, p2⟩).mp (e1.trans e2.symm)
   obtain ⟨n, hn, m, hm, hfr, -⟩ := hDC
   obtain ⟨hNu, hNe⟩ := h1 Λ (lf D F0) n hn
   obtain ⟨hMu, hMe⟩ := h1 Λ F₁ m hm
@@ -35,8 +36,9 @@ theorem normRepMove_of_steps (D : D7) (u u' : D.what₂.Word) (hE : TermEqIff D 
   rw [hs]
   obtain ⟨_, ⟨_, _, hLift0, hConv0⟩, hXS0⟩ := hΛ
   obtain ⟨hLift1, _, hConv1, hXS1⟩ := p1
-  have hglob : ∀ δ ∈ ddS D, ∃ o : 𝓞 D.host.E,
-      (o : D.host.E) = (sgUp (fmat D (lf D F0) n) + sgUp (fmat D F₁ m)) * δ := by
+  have hglob
+      : ∀ δ ∈ ddS D, ∃ o : 𝓞 D.host.E,
+        (o : D.host.E) = (sgUp (fmat D (lf D F0) n) + sgUp (fmat D F₁ m)) * δ := by
     intro δ hδ
     obtain ⟨o1, ho1⟩ := h3 Λ (lf D F0) n hn hXS0 hLift0.1 δ hδ
     obtain ⟨o2, ho2⟩ := h3 Λ F₁ m hm hXS1 hLift1.1 δ hδ

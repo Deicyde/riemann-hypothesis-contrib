@@ -16,22 +16,26 @@ namespace GlobalTheory.PDiv
 
 open GlobalTheory.PDivGroup
 
-theorem pow_sub_counit_mem_frobKerIdeal {p : ℕ} [Fact p.Prime] {R H : Type} [CommRing R]
-    [CommRing H] [Bialgebra R H] (h : (p : R) = 0) (a : H) :
-    a ^ p - algebraMap R H (counit (R := R) (a ^ p)) ∈ frobKerIdeal p R H := by
+theorem pow_sub_counit_mem_frobKerIdeal
+    {p : ℕ} [Fact p.Prime]
+    {R H : Type} [CommRing R] [CommRing H] [Bialgebra R H]
+    (h : (p : R) = 0) (a : H)
+    : a ^ p - algebraMap R H (counit (R := R) (a ^ p)) ∈ frobKerIdeal p R H := by
   have h0 := natCast_eq_zero_of_algebra h H
-  have e : a ^ p - algebraMap R H (counit (R := R) (a ^ p)) =
-      (a - algebraMap R H (counit (R := R) a)) ^ p := by
+  have e
+      : a ^ p - algebraMap R H (counit (R := R) (a ^ p))
+        = (a - algebraMap R H (counit (R := R) a)) ^ p := by
     rw [← frobRing_apply h0 (a - _), map_sub, frobRing_apply, frobRing_apply, counit_pow, map_pow]
   rw [e]
   exact pow_mem_frobKerIdeal (by simp [RingHom.mem_ker])
 
-theorem kerIdeal_relFrob_le_frobKerIdeal (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R]
-    (h : (p : R) = 0) (G : PDivGroup p R) (n : ℕ) :
-    kerIdeal ((relFrob h G).app n) ≤ frobKerIdeal p R (G.A n) := by
-  have key : ∀ x : (frobTwist h G).A n, (relFrob h G).app n x -
-      algebraMap R (G.A n) (counit (R := R) ((relFrob h G).app n x)) ∈
-        frobKerIdeal p R (G.A n) := by
+theorem kerIdeal_relFrob_le_frobKerIdeal
+    (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (h : (p : R) = 0) (G : PDivGroup p R) (n : ℕ)
+    : kerIdeal ((relFrob h G).app n) ≤ frobKerIdeal p R (G.A n) := by
+  have key
+      : ∀ x : (frobTwist h G).A n,
+        (relFrob h G).app n x - algebraMap R (G.A n) (counit (R := R) ((relFrob h G).app n x))
+          ∈ frobKerIdeal p R (G.A n) := by
     intro x
     induction x using frobTwist_induction h n with
     | h0 => simp

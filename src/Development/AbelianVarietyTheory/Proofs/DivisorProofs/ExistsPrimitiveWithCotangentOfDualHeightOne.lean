@@ -8,22 +8,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartierDualH
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory.PDiv
 
-theorem exists_primitive_dUnit_eq : ∀ (p : ℕ) [Fact p.Prime] (K H : Type) [Field K] [CharP K p]
-    [CommRing H] [HopfAlgebra K H] [IsCocomm K H] [Module.Finite K H],
-    (∀ φ ∈ augIdeal K (CartierDual K H), φ ^ p = 0) →
-    ∀ w : Cot K H, ∃ b : H, cobOne K H b = 0 ∧ dUnit (R := K) b = w := by
+theorem exists_primitive_dUnit_eq
+    : ∀ (p : ℕ) [Fact p.Prime] (K H : Type) [Field K] [CharP K p] [CommRing H] [HopfAlgebra K H]
+        [IsCocomm K H] [Module.Finite K H],
+      (∀ φ ∈ augIdeal K (CartierDual K H), φ ^ p = 0)
+        → ∀ w : Cot K H, ∃ b : H, cobOne K H b = 0 ∧ dUnit (R := K) b = w := by
   intro p _ K H _ _ _ _ _ _ hnil w
-  have hgen := GlobalTheory.T.cartierDual_height_one_adjoin_primitive_eq_top p K (CartierDual K H) hnil
+  have hgen :=
+    GlobalTheory.T.cartierDual_height_one_adjoin_primitive_eq_top p K (CartierDual K H) hnil
   set e := CartierDual.bidual K H
   have hH : Algebra.adjoin K {b : H | cobOne K H b = 0} = ⊤ := by
     let f : CartierDual K (CartierDual K H) →ₐ[K] H :=
-      ((e.symm : CartierDual K (CartierDual K H) →ₐc[K] H) : CartierDual K (CartierDual K H) →ₐ[K] H)
-    have himg : f '' {φ | cobOne K (CartierDual K (CartierDual K H)) φ = 0} ⊆
-        {b : H | cobOne K H b = 0} := by
+      ((e.symm : CartierDual K (CartierDual K H) →ₐc[K] H)
+        : CartierDual K (CartierDual K H) →ₐ[K] H)
+    have himg
+        : f '' {φ | cobOne K (CartierDual K (CartierDual K H)) φ = 0}
+          ⊆ {b : H | cobOne K H b = 0} := by
       rintro _ ⟨φ, hφ, rfl⟩
       simp only [Set.mem_setOf_eq] at hφ ⊢
       show cobOne K H ((e.symm : CartierDual K (CartierDual K H) →ₐc[K] H) φ) = 0

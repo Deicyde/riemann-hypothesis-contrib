@@ -12,20 +12,28 @@ open Matrix Module ValuativeRel MeasureTheory
 
 namespace PositivityTheory.RgUd.T.Nil.Orb.BModbound
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-theorem ratio (V : Submodule k (Matrix (Fin n) (Fin n) k)) (γ : ValueGroupWithZero k) (hγ : γ ≠ 0)
+theorem ratio
+    (V : Submodule k (Matrix (Fin n) (Fin n) k))
+    (γ : ValueGroupWithZero k) (hγ : γ ≠ 0)
     (φ : V ≃ₗ[k] V) (X Y : AddSubgroup (Matrix (Fin n) (Fin n) k))
     (hX : ∀ y, y ∈ X ↔ y ∈ V ∧ ∀ i j, valuation k (y i j) ≤ γ)
-    (hY : ∀ y, y ∈ Y ↔ ∃ x : V, (x : Matrix (Fin n) (Fin n) k) ∈ X ∧ ((φ x : V) : Matrix (Fin n) (Fin n) k) = y) :
-    (X ⊓ Y).relIndex X ≠ 0 ∧ (X ⊓ Y).relIndex Y ≠ 0 ∧
-      ((X ⊓ Y).relIndex Y : ℝ) / ((X ⊓ Y).relIndex X : ℝ) = (distribHaarChar k (LinearEquiv.det φ) : ℝ) := by
+    (hY : ∀ y,
+      y ∈ Y
+        ↔ ∃ x : V, (x : Matrix (Fin n) (Fin n) k) ∈ X ∧ ((φ x : V) : Matrix (Fin n) (Fin n) k) = y)
+    : (X ⊓ Y).relIndex X ≠ 0 ∧ (X ⊓ Y).relIndex Y ≠ 0
+      ∧ ((X ⊓ Y).relIndex Y : ℝ) / ((X ⊓ Y).relIndex X : ℝ)
+        = (distribHaarChar k (LinearEquiv.det φ) : ℝ) := by
   classical
   let e : V ≃ₗ[k] (Fin (Module.finrank k V) → k) := (Module.finBasis k V).equivFun
-  let ι : (Fin (Module.finrank k V) → k) →ₗ[k] Matrix (Fin n) (Fin n) k := V.subtype ∘ₗ e.symm.toLinearMap
+  let ι : (Fin (Module.finrank k V) → k) →ₗ[k] Matrix (Fin n) (Fin n) k :=
+    V.subtype ∘ₗ e.symm.toLinearMap
   have hι : ∀ c, ι c = ((e.symm c : V) : Matrix (Fin n) (Fin n) k) := fun c => rfl
   have hιinj : Function.Injective ι := fun a b h => e.symm.injective (Subtype.ext h)
-  let L : (Fin (Module.finrank k V) → k) ≃ₗ[k] (Fin (Module.finrank k V) → k) := (e.symm.trans φ).trans e
+  let L : (Fin (Module.finrank k V) → k) ≃ₗ[k] (Fin (Module.finrank k V) → k) :=
+    (e.symm.trans φ).trans e
   have hdet : LinearEquiv.det L = LinearEquiv.det φ := LinearEquiv.det_conj φ e
   let X' := X.comap ι.toAddMonoidHom
   let Y' := Y.comap ι.toAddMonoidHom
@@ -34,8 +42,9 @@ theorem ratio (V : Submodule k (Matrix (Fin n) (Fin n) k)) (γ : ValueGroupWithZ
     intro y hy
     obtain ⟨x, -, rfl⟩ := (hY y).1 hy
     exact (φ x).2
-  have hmap : ∀ W : AddSubgroup (Matrix (Fin n) (Fin n) k), (∀ y ∈ W, y ∈ V) →
-      (W.comap ι.toAddMonoidHom).map ι.toAddMonoidHom = W := by
+  have hmap
+      : ∀ W : AddSubgroup (Matrix (Fin n) (Fin n) k),
+        (∀ y ∈ W, y ∈ V) → (W.comap ι.toAddMonoidHom).map ι.toAddMonoidHom = W := by
     intro W hW
     ext y
     constructor
@@ -62,28 +71,38 @@ theorem ratio (V : Submodule k (Matrix (Fin n) (Fin n) k)) (γ : ValueGroupWithZ
     rw [hX]
     exact ⟨fun h => h.2, fun h => ⟨by rw [hι]; exact (e.symm c).2, h⟩⟩
   have hBo : IsOpen B := by
-    have : B = ⋂ i, ⋂ j, (fun M : Matrix (Fin n) (Fin n) k => M i j) ⁻¹' {x : k | valuation k x ≤ γ} := by
-      ext M; simp [B]
+    have : B
+        = ⋂ i, ⋂ j, (fun M : Matrix (Fin n) (Fin n) k => M i j) ⁻¹' {x : k | valuation k x ≤ γ} :=
+      by ext M; simp [B]
     rw [this]
-    exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-      (GroundTheory.Automorphic.GLnLocal.isOpen_valuation_le k hγ).preimage (continuous_id.matrix_elem i j)
+    exact isOpen_iInter_of_finite fun i =>
+      isOpen_iInter_of_finite fun j =>
+        (GroundTheory.Automorphic.GLnLocal.isOpen_valuation_le k hγ).preimage
+          (continuous_id.matrix_elem i j)
   have hBc : IsCompact B := by
-    have h : IsCompact (Set.univ.pi fun _ : Fin n => Set.univ.pi fun _ : Fin n => {x : k | valuation k x ≤ γ}) :=
-      isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => IsNonarchimedeanLocalField.isCompact_closedBall k γ
-    have hs : B = (Set.univ.pi fun _ : Fin n => Set.univ.pi fun _ : Fin n => {x : k | valuation k x ≤ γ}) := by
+    have h : IsCompact (Set.univ.pi fun _ : Fin n =>
+        Set.univ.pi fun _ : Fin n => {x : k | valuation k x ≤ γ}) :=
+      isCompact_univ_pi fun _ =>
+        isCompact_univ_pi fun _ => IsNonarchimedeanLocalField.isCompact_closedBall k γ
+    have hs
+        : B
+          = (Set.univ.pi fun _ : Fin n =>
+            Set.univ.pi fun _ : Fin n => {x : k | valuation k x ≤ γ}) := by
       ext M
       constructor
       · intro h i _ j _
         exact h i j
       · intro h i j
         exact h i (Set.mem_univ _) j (Set.mem_univ _)
-    rw [hs]; exact h
+    rw [hs]
+    exact h
   have hXo : IsOpen (X' : Set (Fin (Module.finrank k V) → k)) := hXset ▸ hBo.preimage hιc
   obtain ⟨ρ, hρ⟩ := ι.exists_leftInverse_of_injective (LinearMap.ker_eq_bot.mpr hιinj)
-  let cl : (Fin n × Fin n → k) →ₗ[k] Matrix (Fin n) (Fin n) k :=
-    { toFun := fun f => Matrix.of fun i j => f (i, j)
-      map_add' := fun f g => by ext; simp
-      map_smul' := fun c f => by ext; simp }
+  let cl : (Fin n × Fin n → k) →ₗ[k] Matrix (Fin n) (Fin n) k := {
+    toFun := fun f => Matrix.of fun i j => f (i, j)
+    map_add' := fun f g => by ext; simp
+    map_smul' := fun c f => by ext; simp
+  }
   have hρc : Continuous ρ := by
     have h1 : (ρ : Matrix (Fin n) (Fin n) k → _) = (ρ ∘ₗ cl) ∘ (fun M p => M p.1 p.2) := by
       funext M
@@ -105,7 +124,8 @@ theorem ratio (V : Submodule k (Matrix (Fin n) (Fin n) k)) (γ : ValueGroupWithZ
     · rintro ⟨x, hx, hxc⟩
       refine ⟨e x, ?_, ?_⟩
       · show ι (e x) ∈ X
-        rw [hι, LinearEquiv.symm_apply_apply]; exact hx
+        rw [hι, LinearEquiv.symm_apply_apply]
+        exact hx
       · have h1 : φ x = e.symm c := Subtype.ext (by rw [hxc, hι])
         show e (φ (e.symm (e x))) = c
         rw [LinearEquiv.symm_apply_apply, h1, LinearEquiv.apply_symm_apply]

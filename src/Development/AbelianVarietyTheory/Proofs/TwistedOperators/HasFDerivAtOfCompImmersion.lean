@@ -6,11 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Continuou
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix MeasureTheory
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix
+  MeasureTheory
 
 namespace GlobalTheory
 
-theorem hasFDerivAt_of_comp_immersion : ∀ (E F : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F] [FiniteDimensional ℝ F] (Φ : E → F) (ψ : E → E) (x : E) (A D : E →L[ℝ] F), HasStrictFDerivAt Φ A (ψ x) → Function.Injective A → ContinuousAt ψ x → HasFDerivAt (fun y => Φ (ψ y)) D x → ∃ P : E →L[ℝ] E, HasFDerivAt ψ P x ∧ A.comp P = D := by
+theorem hasFDerivAt_of_comp_immersion
+    : ∀ (E F : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+        [NormedAddCommGroup F] [NormedSpace ℝ F] [FiniteDimensional ℝ F] (Φ : E → F) (ψ : E → E)
+        (x : E) (A D : E →L[ℝ] F),
+      HasStrictFDerivAt Φ A (ψ x) → Function.Injective A → ContinuousAt ψ x
+        → HasFDerivAt (fun y => Φ (ψ y)) D x
+        → ∃ P : E →L[ℝ] E, HasFDerivAt ψ P x ∧ A.comp P = D := by
   intro E F _ _ _ _ _ _ Φ ψ x A D hA hinj hψ hD
 
   obtain ⟨g, hg⟩ := (A : E →ₗ[ℝ] F).exists_leftInverse_of_injective (LinearMap.ker_eq_bot.mpr hinj)
@@ -19,21 +26,21 @@ theorem hasFDerivAt_of_comp_immersion : ∀ (E F : Type) [NormedAddCommGroup E] 
     have h := LinearMap.congr_fun hg v
     simp only [LinearMap.comp_apply, LinearMap.id_apply, ContinuousLinearMap.coe_coe] at h
     first
-      | exact h
-      | simpa [L] using h
-      | (rw [show (L : F → E) = g from LinearMap.coe_toContinuousLinearMap' g]; exact h)
+    | exact h
+    | simpa [L] using h
+    | (rw [show (L : F → E) = g from LinearMap.coe_toContinuousLinearMap' g]; exact h)
 
   have hr : (fun y => Φ (ψ y) - Φ (ψ x) - A (ψ y - ψ x)) =o[nhds x] (fun y => ψ y - ψ x) :=
     hA.hasFDerivAt.isLittleO.comp_tendsto hψ
-  have hs : (fun y => Φ (ψ y) - Φ (ψ x) - D (y - x)) =o[nhds x] (fun y => y - x) :=
-    hD.isLittleO
+  have hs : (fun y => Φ (ψ y) - Φ (ψ x) - D (y - x)) =o[nhds x] (fun y => y - x) := hD.isLittleO
   have hLr : (fun y => L (Φ (ψ y) - Φ (ψ x) - A (ψ y - ψ x))) =o[nhds x] (fun y => ψ y - ψ x) :=
     (L.isBigO_comp _ _).trans_isLittleO hr
 
   have hu : (fun y => ψ y - ψ x) =O[nhds x] (fun y => y - x) := by
     have h1 := hLr.right_isBigO_add
-    have hsum : (fun y => L (Φ (ψ y) - Φ (ψ x) - A (ψ y - ψ x)) + (ψ y - ψ x))
-        = fun y => L (Φ (ψ y) - Φ (ψ x)) := by
+    have hsum
+        : (fun y => L (Φ (ψ y) - Φ (ψ x) - A (ψ y - ψ x)) + (ψ y - ψ x))
+          = fun y => L (Φ (ψ y) - Φ (ψ x)) := by
       funext y
       simp only [map_sub, hLA]
       abel
@@ -42,8 +49,9 @@ theorem hasFDerivAt_of_comp_immersion : ∀ (E F : Type) [NormedAddCommGroup E] 
 
   have hP : HasFDerivAt ψ (L.comp D) x := by
     rw [hasFDerivAt_iff_isLittleO]
-    have hdiff : (fun y => L (Φ (ψ y) - Φ (ψ x) - D (y - x)) - L (Φ (ψ y) - Φ (ψ x) - A (ψ y - ψ x)))
-        = fun y => ψ y - ψ x - (L.comp D) (y - x) := by
+    have hdiff
+        : (fun y => L (Φ (ψ y) - Φ (ψ x) - D (y - x)) - L (Φ (ψ y) - Φ (ψ x) - A (ψ y - ψ x)))
+          = fun y => ψ y - ψ x - (L.comp D) (y - x) := by
       funext y
       simp only [map_sub, hLA, ContinuousLinearMap.comp_apply]
       abel

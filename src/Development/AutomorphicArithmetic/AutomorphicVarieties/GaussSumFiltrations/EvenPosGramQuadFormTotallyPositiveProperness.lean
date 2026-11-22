@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaussSumFil
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 
 noncomputable section
@@ -14,8 +16,8 @@ namespace GlobalTheory.TPos
 
 variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
 
-theorem reAt_eq (v : InfinitePlace F) (x : F) :
-    reAt v x = InfinitePlace.embedding_of_isReal (IsTotallyReal.isReal v) x := by
+theorem reAt_eq (v : InfinitePlace F) (x : F)
+    : reAt v x = InfinitePlace.embedding_of_isReal (IsTotallyReal.isReal v) x := by
   unfold reAt
   have h := InfinitePlace.embedding_of_isReal_apply (IsTotallyReal.isReal v) x
   rw [← h, Complex.ofReal_re]
@@ -23,9 +25,9 @@ theorem reAt_eq (v : InfinitePlace F) (x : F) :
 theorem abs_reAt (v : InfinitePlace F) (x : F) : |reAt v x| = v x := by
   rw [reAt_eq, ← InfinitePlace.norm_embedding_of_isReal (IsTotallyReal.isReal v), Real.norm_eq_abs]
 
-theorem reAt_QF {κ : Type} [Fintype κ] (G : Matrix κ κ ℤ) (x : κ → F) (v : InfinitePlace F) :
-    reAt v (QF G x) =
-      (fun i => reAt v (x i)) ⬝ᵥ (G.map (Int.cast : ℤ → ℝ)) *ᵥ (fun i => reAt v (x i)) / 2 := by
+theorem reAt_QF {κ : Type} [Fintype κ] (G : Matrix κ κ ℤ) (x : κ → F) (v : InfinitePlace F)
+    : reAt v (QF G x)
+      = (fun i => reAt v (x i)) ⬝ᵥ (G.map (Int.cast : ℤ → ℝ)) *ᵥ (fun i => reAt v (x i)) / 2 := by
   set φ := InfinitePlace.embedding_of_isReal (IsTotallyReal.isReal v) with hφ
   have hx : (fun i => reAt v (x i)) = φ ∘ x := by
     funext i
@@ -40,8 +42,8 @@ theorem reAt_QF {κ : Type} [Fintype κ] (G : Matrix κ κ ℤ) (x : κ → F) (
   funext i
   exact RingHom.map_mulVec φ _ x i
 
-theorem posDef_lower {κ : Type} [Fintype κ] (M : Matrix κ κ ℝ) (hM : M.PosDef) :
-    ∃ c : ℝ, 0 < c ∧ ∀ y : κ → ℝ, c * ∑ i, y i ^ 2 ≤ y ⬝ᵥ M *ᵥ y := by
+theorem posDef_lower {κ : Type} [Fintype κ] (M : Matrix κ κ ℝ) (hM : M.PosDef)
+    : ∃ c : ℝ, 0 < c ∧ ∀ y : κ → ℝ, c * ∑ i, y i ^ 2 ≤ y ⬝ᵥ M *ᵥ y := by
   classical
   rcases isEmpty_or_nonempty κ with hκ | ⟨⟨i0⟩⟩
   · refine ⟨1, one_pos, fun y => ?_⟩
@@ -102,12 +104,14 @@ theorem posDef_lower {κ : Type} [Fintype κ] (M : Matrix κ κ ℝ) (hM : M.Pos
 
 end GlobalTheory.TPos
 
-
 open GlobalTheory.TPos in
-theorem GlobalTheory.HilbertThetaSeries.qf_totPos_proper : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (κ : Type) [Fintype κ] [DecidableEq κ]
-    (G : Matrix κ κ ℤ), EvenPos G → (∀ x : κ → F, x ≠ 0 → TP (QF G x)) ∧
-      (∃ c : ℝ, 0 < c ∧ ∀ (x : κ → F) v, c * ∑ i, reAt v (x i) ^ 2 ≤ reAt v (QF G x)) ∧
-      ∀ (a ξ : F), {x : κ → F | x ∈ aL κ a ∧ QF G x = ξ}.Finite := by
+theorem GlobalTheory.HilbertThetaSeries.qf_totPos_proper
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (κ : Type) [Fintype κ]
+        [DecidableEq κ] (G : Matrix κ κ ℤ),
+      EvenPos G
+        → (∀ x : κ → F, x ≠ 0 → TP (QF G x))
+          ∧ (∃ c : ℝ, 0 < c ∧ ∀ (x : κ → F) v, c * ∑ i, reAt v (x i) ^ 2 ≤ reAt v (QF G x))
+          ∧ ∀ (a ξ : F), {x : κ → F | x ∈ aL κ a ∧ QF G x = ξ}.Finite := by
   intro F _ _ _ κ _ _ G hG
   have hM : (G.map (Int.cast : ℤ → ℝ)).PosDef := hG.1
   obtain ⟨c, hc, hcb⟩ := posDef_lower _ hM
@@ -125,7 +129,10 @@ theorem GlobalTheory.HilbertThetaSeries.qf_totPos_proper : ∀ (F : Type) [Field
     obtain ⟨i, hi⟩ := Function.ne_iff.mp hx
     have hyi : reAt v (x i) ≠ 0 := fun h => hi (hinj v _ h)
     have h1 : reAt v (x i) ^ 2 ≤ ∑ j, reAt v (x j) ^ 2 :=
-      Finset.single_le_sum (f := fun j => reAt v (x j) ^ 2) (fun j _ => sq_nonneg _) (Finset.mem_univ i)
+      Finset.single_le_sum
+        (f := fun j => reAt v (x j) ^ 2)
+        (fun j _ => sq_nonneg _)
+        (Finset.mem_univ i)
     have h2 : 0 < reAt v (x i) ^ 2 := by positivity
     have h3 := mul_pos (half_pos hc) (lt_of_lt_of_le h2 h1)
     have := key x v
@@ -154,10 +161,13 @@ theorem GlobalTheory.HilbertThetaSeries.qf_totPos_proper : ∀ (F : Type) [Field
     have hwa : 0 < w a := (InfinitePlace.pos_iff).mpr ha
     have hk := key (DistribSMul.toAddMonoidHom (κ → F) a z) w
     rw [hxξ] at hk
-    have h1 : reAt w ((DistribSMul.toAddMonoidHom (κ → F) a z) i) ^ 2 ≤
-        ∑ j, reAt w ((DistribSMul.toAddMonoidHom (κ → F) a z) j) ^ 2 :=
-      Finset.single_le_sum (f := fun j => reAt w ((DistribSMul.toAddMonoidHom (κ → F) a z) j) ^ 2)
-        (fun j _ => sq_nonneg _) (Finset.mem_univ i)
+    have h1
+        : reAt w ((DistribSMul.toAddMonoidHom (κ → F) a z) i) ^ 2
+          ≤ ∑ j, reAt w ((DistribSMul.toAddMonoidHom (κ → F) a z) j) ^ 2 :=
+      Finset.single_le_sum
+        (f := fun j => reAt w ((DistribSMul.toAddMonoidHom (κ → F) a z) j) ^ 2)
+        (fun j _ => sq_nonneg _)
+        (Finset.mem_univ i)
     have h2 : reAt w ((DistribSMul.toAddMonoidHom (κ → F) a z) i) ^ 2 ≤ reAt w ξ / (c / 2) := by
       rw [le_div_iff₀ (half_pos hc)]
       nlinarith
@@ -167,11 +177,24 @@ theorem GlobalTheory.HilbertThetaSeries.qf_totPos_proper : ∀ (F : Type) [Field
       rw [le_div_iff₀ hwa]
       linarith [mul_comm (w a) (w (z i))]
     refine h4.trans ?_
-    exact Finset.single_le_sum (f := fun v : InfinitePlace F => Real.sqrt (reAt v ξ / (c / 2)) / v a)
-      (fun v _ => div_nonneg (Real.sqrt_nonneg _) (apply_nonneg v a)) (Finset.mem_univ w)
+    exact Finset.single_le_sum
+      (f := fun v : InfinitePlace F => Real.sqrt (reAt v ξ / (c / 2)) / v a)
+      (fun v _ => div_nonneg (Real.sqrt_nonneg _) (apply_nonneg v a))
+      (Finset.mem_univ w)
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.evenPosGram_quadForm_totallyPositive_properness : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (κ : Type) [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℤ), EvenPos G → (∀ x : κ → F, x ≠ 0 → TP (QF G x)) ∧ (∃ c : ℝ, 0 < c ∧ ∀ (x : κ → F) v, c * ∑ i, reAt v (x i) ^ 2 ≤ reAt v (QF G x)) ∧ ∀ (a ξ : F), {x : κ → F | x ∈ aL κ a ∧ QF G x = ξ}.Finite := by
-  first | exact @GlobalTheory.HilbertThetaSeries.qf_totPos_proper | exact GlobalTheory.HilbertThetaSeries.qf_totPos_proper | (intros; apply GlobalTheory.HilbertThetaSeries.qf_totPos_proper <;> assumption)
+theorem _root_.GlobalTheory.T.evenPosGram_quadForm_totallyPositive_properness
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (κ : Type) [Fintype κ]
+        [DecidableEq κ] (G : Matrix κ κ ℤ),
+      EvenPos G
+        → (∀ x : κ → F, x ≠ 0 → TP (QF G x))
+          ∧ (∃ c : ℝ, 0 < c ∧ ∀ (x : κ → F) v, c * ∑ i, reAt v (x i) ^ 2 ≤ reAt v (QF G x))
+          ∧ ∀ (a ξ : F), {x : κ → F | x ∈ aL κ a ∧ QF G x = ξ}.Finite := by
+  first
+  | exact @GlobalTheory.HilbertThetaSeries.qf_totPos_proper
+  | exact GlobalTheory.HilbertThetaSeries.qf_totPos_proper
+  | (intros; apply GlobalTheory.HilbertThetaSeries.qf_totPos_proper <;> assumption)

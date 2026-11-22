@@ -25,16 +25,16 @@ def resI (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) : Formalism.L2.Herm.intAf F E →
 
 variable {F}
 
-theorem resI_oToS (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) (a : 𝓞 E) :
-    resI F I hI (oToS F E a) = Ideal.Quotient.mk I a := by
+theorem resI_oToS (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) (a : 𝓞 E)
+    : resI F I hI (oToS F E a) = Ideal.Quotient.mk I a := by
   unfold resI
   rw [RingHom.comp_apply]
   show (RingEquiv.ofBijective (cmpS F I) _).symm _ = _
   rw [RingEquiv.symm_apply_eq]
   rfl
 
-theorem resI_eq_zero_iff (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) (s : Formalism.L2.Herm.intAf F E) :
-    resI F I hI s = 0 ↔ s ∈ idS F I := by
+theorem resI_eq_zero_iff (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) (s : Formalism.L2.Herm.intAf F E)
+    : resI F I hI s = 0 ↔ s ∈ idS F I := by
   unfold resI
   rw [RingHom.comp_apply]
   show (RingEquiv.ofBijective (cmpS F I) _).symm _ = _ ↔ _

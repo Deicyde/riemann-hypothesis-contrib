@@ -9,7 +9,10 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.CxCoh GlobalTheory.PDA GlobalTheory.PDForm GlobalTheory.SmoothLift
+open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.CxCoh GlobalTheory.PDA
+  GlobalTheory.PDForm GlobalTheory.SmoothLift
 
 namespace GlobalTheory.CxCoh.CxMap
 
@@ -24,16 +27,16 @@ def pre (m : CxMap K K') {G : C' ⥤ C} (θ : G ⟶ m.G) : CxMap K K' where
   a2 T := (m.a2 T).comp (K.M2.map (θ.app T))
   a3 T := (m.a3 T).comp (K.M3.map (θ.app T))
   compDegreeZero_natural {T T'} φ x := by
-    change m.a0 T' (K.M0.map (θ.app T') (K.M0.map (G.map φ) x)) =
-      K'.M0.map φ (m.a0 T (K.M0.map (θ.app T) x))
+    change m.a0 T' (K.M0.map (θ.app T') (K.M0.map (G.map φ) x))
+      = K'.M0.map φ (m.a0 T (K.M0.map (θ.app T) x))
     rw [← K.M0.map_comp, θ.naturality, K.M0.map_comp, m.compDegreeZero_natural]
   compDegreeOne_natural {T T'} φ x := by
-    change m.a1 T' (K.M1.map (θ.app T') (K.M1.map (G.map φ) x)) =
-      K'.M1.map φ (m.a1 T (K.M1.map (θ.app T) x))
+    change m.a1 T' (K.M1.map (θ.app T') (K.M1.map (G.map φ) x))
+      = K'.M1.map φ (m.a1 T (K.M1.map (θ.app T) x))
     rw [← K.M1.map_comp, θ.naturality, K.M1.map_comp, m.compDegreeOne_natural]
   compDegreeTwo_natural {T T'} φ x := by
-    change m.a2 T' (K.M2.map (θ.app T') (K.M2.map (G.map φ) x)) =
-      K'.M2.map φ (m.a2 T (K.M2.map (θ.app T) x))
+    change m.a2 T' (K.M2.map (θ.app T') (K.M2.map (G.map φ) x))
+      = K'.M2.map φ (m.a2 T (K.M2.map (θ.app T) x))
     rw [← K.M2.map_comp, θ.naturality, K.M2.map_comp, m.compDegreeTwo_natural]
   comp_commutes_diffZero T x := by
     change m.a1 T (K.M1.map (θ.app T) (K.d0 _ x)) = K'.d0 T (m.a0 T (K.M0.map (θ.app T) x))
@@ -52,8 +55,12 @@ end GlobalTheory.CxCoh.CxMap
 
 namespace GlobalTheory.PDForm
 
-def pairB {D D' : Data} (Λ' : Lift D') {σ : D.R →+* D'.R} (φ : D'.X ⟶ D.X) {φ₀ : D'.X₀ ⟶ D.X₀}
-    (m : IsMor D.κ D.t D'.κ D'.t σ φ₀) : CxMap (KK D.κ D.t) ((KK D'.κ D'.t).res (pairFst φ ⋙ Λ'.L)) :=
+def pairB
+    {D D' : Data} (Λ' : Lift D')
+    {σ : D.R →+* D'.R}
+    (φ : D'.X ⟶ D.X)
+    {φ₀ : D'.X₀ ⟶ D.X₀} (m : IsMor D.κ D.t D'.κ D'.t σ φ₀)
+    : CxMap (KK D.κ D.t) ((KK D'.κ D'.t).res (pairFst φ ⋙ Λ'.L)) :=
   (morMap m).comp ((KK D'.κ D'.t).resMap (pairFst φ ⋙ Λ'.L))
 
 end GlobalTheory.PDForm

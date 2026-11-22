@@ -9,8 +9,12 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan
 
-theorem isPartOfBasis_of_injective {L L' : Type} [AddCommGroup L] [AddCommGroup L'] {m : ℕ} (f : L →ₗ[ℤ] L')
-    (hf : Function.Injective f) {v : Fin m → L} (h : IsPartOfBasis fun i => f (v i)) : IsPartOfBasis v := by
+theorem isPartOfBasis_of_injective
+    {L L' : Type} [AddCommGroup L] [AddCommGroup L']
+    {m : ℕ}
+    (f : L →ₗ[ℤ] L') (hf : Function.Injective f)
+    {v : Fin m → L} (h : IsPartOfBasis fun i => f (v i))
+    : IsPartOfBasis v := by
   classical
   obtain ⟨ψ, hψ⟩ := h.exists_dual
   obtain ⟨n', b, -⟩ := h
@@ -20,7 +24,7 @@ theorem isPartOfBasis_of_injective {L L' : Type} [AddCommGroup L] [AddCommGroup 
   have hπ : ∀ c, π (s c) = c := fun c => by
     ext j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [π, hs, map_sum, hψ]
+    simp [π, hs, map_sum, hψ]
   let K := LinearMap.ker π
   obtain ⟨n, bK'⟩ := Submodule.basisOfPid b (K.map f)
   let bK := bK'.map (Submodule.equivMapOfInjective f hf K).symm
@@ -42,10 +46,11 @@ theorem isPartOfBasis_of_injective {L L' : Type} [AddCommGroup L] [AddCommGroup 
     simp [hs, Pi.single_apply]
   simpa using h1
 
-theorem isCone_of_pull : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X X₁ : Type) [AddCommGroup X] [Module O X]
-    [Module.Finite O X] [AddCommGroup X₁] [Module O X₁] [Module.Finite O X₁] (r : X →ₗ[O] X₁) (m : ℕ)
-    (γ : Fin m → LinearMap.BilinForm ℤ X₁), Function.Surjective r → IsCone bar φ (fun i => pull r (γ i)) →
-    IsCone bar φ γ := by
+theorem isCone_of_pull
+    : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X X₁ : Type) [AddCommGroup X]
+        [Module O X] [Module.Finite O X] [AddCommGroup X₁] [Module O X₁] [Module.Finite O X₁]
+        (r : X →ₗ[O] X₁) (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X₁),
+      Function.Surjective r → IsCone bar φ (fun i => pull r (γ i)) → IsCone bar φ γ := by
   intro O _ bar φ X X₁ _ _ _ _ _ _ r m γ hr h
   have hmem : ∀ i, γ i ∈ balForms bar X₁ := fun i => by
     refine ⟨fun y z => ?_, fun a y z => ?_⟩
@@ -60,8 +65,13 @@ theorem isCone_of_pull : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFu
       obtain ⟨a, rfl⟩ := hr a
       obtain ⟨b, rfl⟩ := hr b
       exact LinearMap.congr_fun₂ (congrArg Subtype.val e) a b)
-  refine ⟨hmem, fun i y => ?_, isPartOfBasis_of_injective (pullBal bar r) hinj h.basis,
-    (linearOn_pull_iff hr).1 h.linear, IsStrict.of_pull hr h.strict⟩
+  refine ⟨
+    hmem,
+    fun i y => ?_,
+    isPartOfBasis_of_injective (pullBal bar r) hinj h.basis,
+    (linearOn_pull_iff hr).1 h.linear,
+    IsStrict.of_pull hr h.strict
+  ⟩
   obtain ⟨y, rfl⟩ := hr y
   exact h.nonneg i y
 

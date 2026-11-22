@@ -15,16 +15,17 @@ namespace Formalism.CohomologicalDescent.UnitNormBounds
 
 open Formalism.CohomologicalDescent Formalism.CohomologicalDescent.LD
 
-theorem rowStart_rev_eq (k j t w M : ℕ) (lam : Fin (k + j) → ℕ) (hb : ∀ a, w ≤ lam a ∧ lam a ≤ M)
-    (b : Fin (k + j)) :
-    U k j t lam (Fin.rev b) = (M : ℤ) - (dual M lam b : ℤ) + (t : ℤ) + (b.val : ℤ) := by
+theorem rowStart_rev_eq
+    (k j t w M : ℕ) (lam : Fin (k + j) → ℕ) (hb : ∀ a, w ≤ lam a ∧ lam a ≤ M) (b : Fin (k + j))
+    : U k j t lam (Fin.rev b) = (M : ℤ) - (dual M lam b : ℤ) + (t : ℤ) + (b.val : ℤ) := by
   have h1 := Fin.val_rev b
   have h2 := hb (Fin.rev b)
   have h3 := b.isLt
   unfold U dual
   omega
 
-theorem content_label_eq (t w M : ℕ) (hwM : w ≤ M) (ct : ℤ) : cont t w M ct = (M : ℤ) - ct + (t : ℤ) - 1 := by
+theorem content_label_eq (t w M : ℕ) (hwM : w ≤ M) (ct : ℤ)
+    : cont t w M ct = (M : ℤ) - ct + (t : ℤ) - 1 := by
   unfold cont maxB
   omega
 
@@ -38,9 +39,10 @@ theorem good_labels_holds : GoodLabels := by
   · by_contra hcon
     unfold boxesOfContent at hbox
     rw [Finset.card_eq_zero] at hbox
-    have hmem : b ∈ Finset.univ.filter fun a : Fin (k + j) =>
-        (dual M lam a : ℤ) ≤ ((M - w : ℕ) : ℤ) + (a.val : ℤ) ∧
-          ((M - w : ℕ) : ℤ) + (a.val : ℤ) < (tau a : ℤ) := by
+    have hmem
+        : b ∈ Finset.univ.filter fun a : Fin (k + j) =>
+          (dual M lam a : ℤ) ≤ ((M - w : ℕ) : ℤ) + (a.val : ℤ)
+            ∧ ((M - w : ℕ) : ℤ) + (a.val : ℤ) < (tau a : ℤ) := by
       refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_, ?_⟩
       · omega
       · unfold label maxB at hcon
@@ -50,46 +52,58 @@ theorem good_labels_holds : GoodLabels := by
   · unfold label
     omega
 
-theorem card_filter_rev_lt_le (k j : ℕ) (p : Fin (k + j) → Prop) [DecidablePred p] :
-    (Finset.univ.filter fun b : Fin (k + j) => (Fin.rev b).val < k ∧ p b).card ≤ k := by
-  have h := Finset.card_le_card_of_injOn (s := Finset.univ.filter fun b : Fin (k + j) => (Fin.rev b).val < k ∧ p b)
-    (t := Finset.range k) (fun b => (Fin.rev b).val)
-    (by
-      intro b hb
-      have := (Finset.mem_filter.mp (Finset.mem_coe.mp hb)).2.1
-      exact Finset.mem_coe.mpr (Finset.mem_range.mpr this))
-    (by
-      intro a _ b _ hab
-      exact Fin.rev_injective (Fin.ext hab))
+theorem card_filter_rev_lt_le (k j : ℕ) (p : Fin (k + j) → Prop) [DecidablePred p]
+    : (Finset.univ.filter fun b : Fin (k + j) => (Fin.rev b).val < k ∧ p b).card ≤ k := by
+  have h :=
+    Finset.card_le_card_of_injOn
+      (s := Finset.univ.filter fun b : Fin (k + j) => (Fin.rev b).val < k ∧ p b)
+      (t := Finset.range k)
+      (fun b => (Fin.rev b).val)
+      (by
+        intro b hb
+        have := (Finset.mem_filter.mp (Finset.mem_coe.mp hb)).2.1
+        exact Finset.mem_coe.mpr (Finset.mem_range.mpr this))
+      (by
+        intro a _ b _ hab
+        exact Fin.rev_injective (Fin.ext hab))
   simpa using h
 
-theorem card_filter_not_rev_lt_le (k j : ℕ) (p : Fin (k + j) → Prop) [DecidablePred p] :
-    (Finset.univ.filter fun b : Fin (k + j) => ¬ (Fin.rev b).val < k ∧ p b).card ≤ j := by
-  have h := Finset.card_le_card_of_injOn (s := Finset.univ.filter fun b : Fin (k + j) => ¬ (Fin.rev b).val < k ∧ p b)
-    (t := Finset.range j) (fun b => b.val)
-    (by
-      intro b hb
-      have h1 := (Finset.mem_filter.mp (Finset.mem_coe.mp hb)).2.1
-      have h2 := Fin.val_rev b
-      have h3 := b.isLt
-      exact Finset.mem_coe.mpr (Finset.mem_range.mpr (by show b.val < j; omega)))
-    (by
-      intro a _ b _ hab
-      exact Fin.ext hab)
+theorem card_filter_not_rev_lt_le (k j : ℕ) (p : Fin (k + j) → Prop) [DecidablePred p]
+    : (Finset.univ.filter fun b : Fin (k + j) => ¬ (Fin.rev b).val < k ∧ p b).card ≤ j := by
+  have h :=
+    Finset.card_le_card_of_injOn
+      (s := Finset.univ.filter fun b : Fin (k + j) => ¬ (Fin.rev b).val < k ∧ p b)
+      (t := Finset.range j)
+      (fun b => b.val)
+      (by
+        intro b hb
+        have h1 := (Finset.mem_filter.mp (Finset.mem_coe.mp hb)).2.1
+        have h2 := Fin.val_rev b
+        have h3 := b.isLt
+        exact Finset.mem_coe.mpr (Finset.mem_range.mpr (by show b.val < j; omega)))
+      (by
+        intro a _ b _ hab
+        exact Fin.ext hab)
   simpa using h
 
 theorem counts_rows_holds : CountsRows := by
   intro k j t w M i lam xm xp hR tau _ ct
   have hb : ∀ a, w ≤ lam a ∧ lam a ≤ M := fun a => ⟨hR.low a, hR.high a⟩
   unfold boxesOfLabel boxesOfContent cloudBoxes
-  rw [← Finset.card_filter_add_card_filter_not (s := Finset.univ.filter fun a : Fin (k + j) =>
-      (dual M lam a : ℤ) ≤ cont t w M ct + (a.val : ℤ) ∧ cont t w M ct + (a.val : ℤ) < (tau a : ℤ))
-      (fun b : Fin (k + j) => (Fin.rev b).val < k), add_comm]
+  rw [← Finset.card_filter_add_card_filter_not
+      (s :=
+        Finset.univ.filter fun a : Fin (k + j) =>
+          (dual M lam a : ℤ) ≤ cont t w M ct + (a.val : ℤ)
+            ∧ cont t w M ct + (a.val : ℤ) < (tau a : ℤ))
+      (fun b : Fin (k + j) => (Fin.rev b).val < k),
+    add_comm]
   rw [Finset.filter_filter, Finset.filter_filter]
   refine Nat.add_le_add ?_ (le_of_eq ?_)
   · split_ifs with hct
-    · refine le_trans (le_of_eq ?_) (card_filter_not_rev_lt_le k j (fun a : Fin (k + j) =>
-        (dual M lam a : ℤ) ≤ cont t w M ct + (a.val : ℤ) ∧ cont t w M ct + (a.val : ℤ) < (tau a : ℤ)))
+    · refine le_trans (le_of_eq ?_)
+        (card_filter_not_rev_lt_le k j (fun a : Fin (k + j) =>
+          (dual M lam a : ℤ) ≤ cont t w M ct + (a.val : ℤ)
+            ∧ cont t w M ct + (a.val : ℤ) < (tau a : ℤ)))
       congr 1
       ext b
       simp only [Finset.mem_filter, Finset.mem_univ, true_and]
@@ -119,7 +133,8 @@ theorem counts_deep_holds : CountsDeep := by
   intro k j t w M i lam xm xp hR tau htau ct hct
   have hb : ∀ a, w ≤ lam a ∧ lam a ≤ M := fun a => ⟨hR.low a, hR.high a⟩
   obtain ⟨hpi, _, hsum, _, _⟩ := Finset.mem_filter.mp htau
-  have hle : ∀ b, dual M lam b ≤ tau b := fun b => (Finset.mem_Icc.mp ((Fintype.mem_piFinset.mp hpi) b)).1
+  have hle : ∀ b, dual M lam b ≤ tau b := fun b =>
+    (Finset.mem_Icc.mp ((Fintype.mem_piFinset.mp hpi) b)).1
   have htot : ∑ b : Fin (k + j), ((tau b : ℤ) - (dual M lam b : ℤ)) = (i : ℤ) := by
     rw [Finset.sum_sub_distrib]
     have : ((∑ a, tau a : ℕ) : ℤ) = ((∑ a, dual M lam a + i : ℕ) : ℤ) := by rw [hsum]
@@ -127,7 +142,8 @@ theorem counts_deep_holds : CountsDeep := by
     linarith
   unfold cloudBoxes
   rw [← htot, ← nsmul_eq_mul, ← Finset.sum_const]
-  refine le_trans (Finset.sum_le_sum ?_) (Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) ?_)
+  refine le_trans (Finset.sum_le_sum ?_)
+    (Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) ?_)
   · intro b hbm
     obtain ⟨_, h1, h2, h3⟩ := Finset.mem_filter.mp hbm
     have hU := rowStart_rev_eq k j t w M lam hb b
@@ -138,11 +154,14 @@ theorem counts_deep_holds : CountsDeep := by
     have := hle b
     omega
 
-theorem boxesOfLabel_le_bound (k j t w M i : ℕ) (lam : Fin (k + j) → ℕ) (xm xp : ℤ) (hR : Rows k j t w M lam xm xp)
-    (tau : Fin (k + j) → ℕ) (htau : tau ∈ shapes t (M - w) i (dual M lam)) (ct : ℤ) :
-    (boxesOfLabel t w M lam tau ct : ℝ) ≤
-      (if ct < xm then (j : ℝ) else 0) +
-        min (min (k : ℝ) (t : ℝ)) (if ct < xm then (i : ℝ) / ((xm - ct : ℤ) : ℝ) else (k : ℝ)) := by
+theorem boxesOfLabel_le_bound
+    (k j t w M i : ℕ) (lam : Fin (k + j) → ℕ)
+    (xm xp : ℤ) (hR : Rows k j t w M lam xm xp)
+    (tau : Fin (k + j) → ℕ) (htau : tau ∈ shapes t (M - w) i (dual M lam))
+    (ct : ℤ)
+    : (boxesOfLabel t w M lam tau ct : ℝ)
+      ≤ (if ct < xm then (j : ℝ) else 0) + min (min (k : ℝ) (t : ℝ))
+        (if ct < xm then (i : ℝ) / ((xm - ct : ℤ) : ℝ) else (k : ℝ)) := by
   have h1 := counts_rows_holds k j t w M i lam xm xp hR tau htau ct
   have h2 := counts_cloud_holds k j t w M i lam tau htau ct
   have hk : (cloudBoxes k j t w M lam tau ct : ℝ) ≤ k := by exact_mod_cast h2.1
@@ -150,17 +169,23 @@ theorem boxesOfLabel_le_bound (k j t w M i : ℕ) (lam : Fin (k + j) → ℕ) (x
   by_cases hct : ct < xm
   · rw [if_pos hct] at h1
     rw [if_pos hct, if_pos hct]
-    have h1' : (boxesOfLabel t w M lam tau ct : ℝ) ≤ (j : ℝ) + (cloudBoxes k j t w M lam tau ct : ℝ) := by
+    have h1'
+        : (boxesOfLabel t w M lam tau ct : ℝ)
+          ≤ (j : ℝ) + (cloudBoxes k j t w M lam tau ct : ℝ) := by
       exact_mod_cast h1
     have h3 := counts_deep_holds k j t w M i lam xm xp hR tau htau ct hct
-    have h3' : (cloudBoxes k j t w M lam tau ct : ℝ) * ((xm - ct : ℤ) : ℝ) ≤ (i : ℝ) := by exact_mod_cast h3
+    have h3' : (cloudBoxes k j t w M lam tau ct : ℝ) * ((xm - ct : ℤ) : ℝ) ≤ (i : ℝ) := by
+      exact_mod_cast h3
     have hpos : (0 : ℝ) < ((xm - ct : ℤ) : ℝ) := by exact_mod_cast (by omega : (0 : ℤ) < xm - ct)
-    have h4 : (cloudBoxes k j t w M lam tau ct : ℝ) ≤ (i : ℝ) / ((xm - ct : ℤ) : ℝ) := (le_div_iff₀ hpos).mpr h3'
+    have h4 : (cloudBoxes k j t w M lam tau ct : ℝ) ≤ (i : ℝ) / ((xm - ct : ℤ) : ℝ) :=
+      (le_div_iff₀ hpos).mpr h3'
     have h5 := le_min (le_min hk ht) h4
     linarith
   · rw [if_neg hct] at h1
     rw [if_neg hct, if_neg hct]
-    have h1' : (boxesOfLabel t w M lam tau ct : ℝ) ≤ (0 : ℝ) + (cloudBoxes k j t w M lam tau ct : ℝ) := by
+    have h1'
+        : (boxesOfLabel t w M lam tau ct : ℝ)
+          ≤ (0 : ℝ) + (cloudBoxes k j t w M lam tau ct : ℝ) := by
       exact_mod_cast h1
     have h5 := le_min (le_min hk ht) hk
     linarith
@@ -169,20 +194,24 @@ theorem multiplicity_bound_holds : MuBound := by
   intro k j t w M i lam xm xp hR ct
   unfold mu
   by_cases hne : (shapes t (M - w) i (dual M lam)).Nonempty
-  · obtain ⟨tau, htau, heq⟩ := Finset.exists_mem_eq_sup _ hne
-      (fun tau => boxesOfContent (dual M lam) tau (cont t w M ct))
+  · obtain ⟨tau, htau, heq⟩ :=
+      Finset.exists_mem_eq_sup _ hne (fun tau => boxesOfContent (dual M lam) tau (cont t w M ct))
     rw [heq]
     exact boxesOfLabel_le_bound k j t w M i lam xm xp hR tau htau ct
   · rw [Finset.not_nonempty_iff_eq_empty.mp hne, Finset.sup_empty]
     have h0 : (((⊥ : ℕ) : ℕ) : ℝ) = 0 := by simp
     rw [h0]
-    refine add_nonneg (by split_ifs <;> positivity) (le_min (le_min (Nat.cast_nonneg _) (Nat.cast_nonneg _)) ?_)
+    refine add_nonneg (by split_ifs <;> positivity)
+      (le_min (le_min (Nat.cast_nonneg _) (Nat.cast_nonneg _)) ?_)
     split_ifs with hct
     · exact div_nonneg (Nat.cast_nonneg _) (by exact_mod_cast (by omega : (0 : ℤ) ≤ xm - ct))
     · exact Nat.cast_nonneg _
 
-theorem mem_label_interval_of_mu_ne_zero (k j t w M i : ℕ) (lam : Fin (k + j) → ℕ) (xm xp : ℤ) (hR : Rows k j t w M lam xm xp)
-    (ct : ℤ) (hmu : mu t (M - w) i (dual M lam) (cont t w M ct) ≠ 0) : maxB t w < ct ∧ ct < xp := by
+theorem mem_label_interval_of_mu_ne_zero
+    (k j t w M i : ℕ) (lam : Fin (k + j) → ℕ)
+    (xm xp : ℤ) (hR : Rows k j t w M lam xm xp)
+    (ct : ℤ) (hmu : mu t (M - w) i (dual M lam) (cont t w M ct) ≠ 0)
+    : maxB t w < ct ∧ ct < xp := by
   have hb : ∀ a, w ≤ lam a ∧ lam a ≤ M := fun a => ⟨hR.low a, hR.high a⟩
   unfold mu at hmu
   obtain ⟨tau, htau, hbx⟩ := (Finset.lt_sup_iff).mp (Nat.pos_of_ne_zero hmu)
@@ -204,8 +233,9 @@ theorem mem_label_interval_of_mu_ne_zero (k j t w M i : ℕ) (lam : Fin (k + j) 
       have := hR.le
       omega
 
-theorem padicValInt_prod_eq_sum (l : ℕ) [Fact l.Prime] (s : Finset ℕ) (g : ℕ → ℤ) (hg : ∀ x ∈ s, g x ≠ 0) :
-    padicValInt l (∏ x ∈ s, g x) = ∑ x ∈ s, padicValInt l (g x) := by
+theorem padicValInt_prod_eq_sum
+    (l : ℕ) [Fact l.Prime] (s : Finset ℕ) (g : ℕ → ℤ) (hg : ∀ x ∈ s, g x ≠ 0)
+    : padicValInt l (∏ x ∈ s, g x) = ∑ x ∈ s, padicValInt l (g x) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -215,8 +245,8 @@ theorem padicValInt_prod_eq_sum (l : ℕ) [Fact l.Prime] (s : Finset ℕ) (g : �
         (Finset.prod_ne_zero_iff.mpr fun x hx => hg x (Finset.mem_insert_of_mem hx)),
       ih (fun x hx => hg x (Finset.mem_insert_of_mem hx))]
 
-theorem padicValInt_pow_eq_mul (l : ℕ) [Fact l.Prime] (x : ℤ) (_hx : x ≠ 0) (m : ℕ) :
-    padicValInt l (x ^ m) = m * padicValInt l x := by
+theorem padicValInt_pow_eq_mul (l : ℕ) [Fact l.Prime] (x : ℤ) (_hx : x ≠ 0) (m : ℕ)
+    : padicValInt l (x ^ m) = m * padicValInt l x := by
   unfold padicValInt
   rw [Int.natAbs_pow, padicValNat.pow]
 
@@ -233,20 +263,24 @@ theorem depth_valuation_sum_holds : DnValSum := by
     unfold cont
     ring
   unfold Dn
-  have hne : ∀ x ∈ Finset.range (k + j + (M - w) + i),
-      (((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ))) ^
-        mu t (M - w) i (dual M lam) ((x : ℤ) - ((k + j : ℕ) : ℤ)) ≠ 0 := by
+  have hne
+      : ∀ x ∈ Finset.range (k + j + (M - w) + i),
+        (((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ)))
+            ^ mu t (M - w) i (dual M lam) ((x : ℤ) - ((k + j : ℕ) : ℤ))
+          ≠ 0 := by
     intro x _
     by_cases h : (((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ))) = 0
     · have hc : ((x : ℤ) - ((k + j : ℕ) : ℤ)) = ((M - w : ℕ) : ℤ) := by omega
       rw [hc, ld_mu_w]
       simp
     · exact pow_ne_zero _ h
-  have hterm : ∀ x ∈ Finset.range (k + j + (M - w) + i),
-      padicValInt l ((((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ))) ^
-        mu t (M - w) i (dual M lam) ((x : ℤ) - ((k + j : ℕ) : ℤ))) =
-      mu t (M - w) i (dual M lam) ((x : ℤ) - ((k + j : ℕ) : ℤ)) *
-        vl l (((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ))) := by
+  have hterm
+      : ∀ x ∈ Finset.range (k + j + (M - w) + i),
+        padicValInt l
+            ((((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ)))
+              ^ mu t (M - w) i (dual M lam) ((x : ℤ) - ((k + j : ℕ) : ℤ)))
+          = mu t (M - w) i (dual M lam) ((x : ℤ) - ((k + j : ℕ) : ℤ))
+            * vl l (((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ))) := by
     intro x _
     by_cases h : (((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ))) = 0
     · have hc : ((x : ℤ) - ((k + j : ℕ) : ℤ)) = ((M - w : ℕ) : ℤ) := by omega
@@ -256,9 +290,11 @@ theorem depth_valuation_sum_holds : DnValSum := by
       exact padicValInt_pow_eq_mul l _ h _
   rw [padicValInt_prod_eq_sum l _ _ hne, Finset.sum_congr rfl hterm]
   refine Finset.sum_bij_ne_zero
-    (fun x _ _ => maxB t w + (((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ)))) ?_ ?_ ?_ ?_
+    (fun x _ _ => maxB t w + (((M - w : ℕ) : ℤ) - ((x : ℤ) - ((k + j : ℕ) : ℤ))))
+    ?_ ?_ ?_ ?_
   · intro a _ h2
-    have hmu : mu t (M - w) i (dual M lam) ((a : ℤ) - ((k + j : ℕ) : ℤ)) ≠ 0 := left_ne_zero_of_mul h2
+    have hmu : mu t (M - w) i (dual M lam) ((a : ℤ) - ((k + j : ℕ) : ℤ)) ≠ 0 :=
+      left_ne_zero_of_mul h2
     rw [← hcont ((a : ℤ) - ((k + j : ℕ) : ℤ))] at hmu
     exact Finset.mem_Ioo.mpr (mem_label_interval_of_mu_ne_zero k j t w M i lam xm xp hR _ hmu)
   · intro a1 _ _ a2 _ _ h
@@ -266,12 +302,15 @@ theorem depth_valuation_sum_holds : DnValSum := by
   · intro ct _ h2
     have hmu : mu t (M - w) i (dual M lam) (cont t w M ct) ≠ 0 := left_ne_zero_of_mul h2
     obtain ⟨h3, h4⟩ := muSupport t (M - w) i (k + j) (dual M lam) _ hdw hmu
-    have ha : (((cont t w M ct + ((k + j : ℕ) : ℤ)).toNat : ℕ) : ℤ) = cont t w M ct + ((k + j : ℕ) : ℤ) :=
+    have ha
+        : (((cont t w M ct + ((k + j : ℕ) : ℤ)).toNat : ℕ) : ℤ)
+          = cont t w M ct + ((k + j : ℕ) : ℤ) :=
       Int.toNat_of_nonneg (by omega)
-    have hx : (((cont t w M ct + ((k + j : ℕ) : ℤ)).toNat : ℕ) : ℤ) - ((k + j : ℕ) : ℤ) = cont t w M ct := by
+    have hx
+        : (((cont t w M ct + ((k + j : ℕ) : ℤ)).toNat : ℕ) : ℤ) - ((k + j : ℕ) : ℤ)
+          = cont t w M ct := by
       rw [ha]; ring
-    have hv : ((M - w : ℕ) : ℤ) - cont t w M ct = ct - maxB t w := by
-      unfold cont; ring
+    have hv : ((M - w : ℕ) : ℤ) - cont t w M ct = ct - maxB t w := by unfold cont; ring
     refine ⟨(cont t w M ct + ((k + j : ℕ) : ℤ)).toNat, Finset.mem_range.mpr (by omega), ?_, ?_⟩
     · rw [hx, hv]
       exact h2
@@ -282,8 +321,8 @@ theorem depth_valuation_sum_holds : DnValSum := by
     congr 2
     ring
 
-theorem sum_padicVal_shift_eq_factorial (l : ℕ) [Fact l.Prime] (mB : ℤ) (n : ℕ) :
-    ∑ ct ∈ Finset.Ioo mB (mB + 1 + (n : ℤ)), vl l (ct - mB) = padicValNat l n.factorial := by
+theorem sum_padicVal_shift_eq_factorial (l : ℕ) [Fact l.Prime] (mB : ℤ) (n : ℕ)
+    : ∑ ct ∈ Finset.Ioo mB (mB + 1 + (n : ℤ)), vl l (ct - mB) = padicValNat l n.factorial := by
   induction n with
   | zero =>
     have : Finset.Ioo mB (mB + 1 + ((0 : ℕ) : ℤ)) = ∅ := by
@@ -293,15 +332,20 @@ theorem sum_padicVal_shift_eq_factorial (l : ℕ) [Fact l.Prime] (mB : ℤ) (n :
     rw [this]
     simp [Nat.padicValNat_def]
   | succ n ih =>
-    have hins : Finset.Ioo mB (mB + 1 + ((n + 1 : ℕ) : ℤ)) =
-        insert (mB + 1 + (n : ℤ)) (Finset.Ioo mB (mB + 1 + (n : ℤ))) := by
+    have hins
+        : Finset.Ioo mB (mB + 1 + ((n + 1 : ℕ) : ℤ))
+          = insert (mB + 1 + (n : ℤ)) (Finset.Ioo mB (mB + 1 + (n : ℤ))) := by
       ext x
       simp only [Finset.mem_Ioo, Finset.mem_insert]
       omega
-    have hnot : (mB + 1 + (n : ℤ)) ∉ Finset.Ioo mB (mB + 1 + (n : ℤ)) := by
-      simp
+    have hnot : (mB + 1 + (n : ℤ)) ∉ Finset.Ioo mB (mB + 1 + (n : ℤ)) := by simp
     rw [hins, Finset.sum_insert hnot, ih, Nat.factorial_succ,
-      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (Nat.succ_ne_zero n) (Nat.factorial_ne_zero n)]
+      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        (Nat.succ_ne_zero n) (Nat.factorial_ne_zero n)]
     congr 1
     unfold vl
     have : mB + 1 + (n : ℤ) - mB = ((n + 1 : ℕ) : ℤ) := by push_cast; ring
@@ -325,10 +369,11 @@ theorem first_bound_holds : FactorialValuationSum := by
       have : (2 : ℝ) ≤ (l : ℝ) := by exact_mod_cast hl2
       linarith
     rw [le_div_iff₀ hl1]
-    have h5 : (((l - 1 : ℕ) : ℝ)) * (padicValNat l ((xm - mB - 1).toNat).factorial : ℝ) ≤
-        (((xm - mB - 1).toNat : ℕ) : ℝ) := by exact_mod_cast h4
-    have h6 : (((l - 1 : ℕ) : ℝ)) = (l : ℝ) - 1 := by
-      rw [Nat.cast_sub (by omega)]; simp
+    have h5
+        : (((l - 1 : ℕ) : ℝ)) * (padicValNat l ((xm - mB - 1).toNat).factorial : ℝ)
+          ≤ (((xm - mB - 1).toNat : ℕ) : ℝ) := by
+      exact_mod_cast h4
+    have h6 : (((l - 1 : ℕ) : ℝ)) = (l : ℝ) - 1 := by rw [Nat.cast_sub (by omega)]; simp
     have h7 : (((xm - mB - 1).toNat : ℕ) : ℝ) = ((xm - mB : ℤ) : ℝ) - 1 := by
       have : ((((xm - mB - 1).toNat : ℕ) : ℤ) : ℝ) = ((xm - mB - 1 : ℤ) : ℝ) := by rw [hn]
       push_cast at this ⊢
@@ -355,8 +400,8 @@ theorem harmonic_positive_log_holds : HarmPosLog := by
       exact_mod_cast h2
     rw [Real.posLog_eq_log (by rw [abs_of_nonneg (by linarith)]; exact hx)]
 
-theorem labelLHS_shift_to_zero (l k t : ℕ) (i : ℝ) (xm xp mB : ℤ) :
-    labelLHS l k t i xm xp mB = labelLHS l k t i (xm - mB) (xp - mB) 0 := by
+theorem labelLHS_shift_to_zero (l k t : ℕ) (i : ℝ) (xm xp mB : ℤ)
+    : labelLHS l k t i xm xp mB = labelLHS l k t i (xm - mB) (xp - mB) 0 := by
   unfold labelLHS
   congr 1
   · refine Finset.sum_nbij' (fun ct => ct - mB) (fun ct => ct + mB) ?_ ?_ ?_ ?_ ?_
@@ -387,10 +432,12 @@ theorem labelLHS_shift_to_zero (l k t : ℕ) (i : ℝ) (xm xp mB : ℤ) :
       have e1 : xm - mB - (ct - mB) = xm - ct := by ring
       rw [e1, sub_zero]
 
-theorem indexIntegral_shift (l : ℕ) (xm xp mB : ℤ) : IlInd l (xm - mB) (xp - mB) 0 = IlInd l xm xp mB := by
+theorem indexIntegral_shift (l : ℕ) (xm xp mB : ℤ)
+    : IlInd l (xm - mB) (xp - mB) 0 = IlInd l xm xp mB := by
   unfold IlInd
-  have h : (∃ y : ℤ, xm - mB ≤ y ∧ y ≤ xp - mB ∧ (l : ℤ) ∣ y - 0) ↔
-      (∃ y : ℤ, xm ≤ y ∧ y ≤ xp ∧ (l : ℤ) ∣ y - mB) := by
+  have h
+      : (∃ y : ℤ, xm - mB ≤ y ∧ y ≤ xp - mB ∧ (l : ℤ) ∣ y - 0)
+        ↔ (∃ y : ℤ, xm ≤ y ∧ y ≤ xp ∧ (l : ℤ) ∣ y - mB) := by
     constructor
     · rintro ⟨y, h1, h2, h3⟩
       exact ⟨y + mB, by omega, by omega, by simpa using h3⟩
@@ -404,10 +451,11 @@ theorem indexIntegral_nonneg (l : ℕ) (xm xp mB : ℤ) : 0 ≤ IlInd l xm xp mB
   unfold IlInd
   split_ifs <;> norm_num
 
-theorem gated_min_nonneg (l k t : ℕ) (i : ℝ) (hi : 0 ≤ i) (D : ℤ) :
-    0 ≤ (if ((d0 l D : ℕ) : ℤ) < D then min (min (k : ℝ) (t : ℝ)) (i / (d0 l D : ℝ)) else 0) := by
+theorem gated_min_nonneg (l k t : ℕ) (i : ℝ) (hi : 0 ≤ i) (D : ℤ)
+    : 0 ≤ (if ((d0 l D : ℕ) : ℤ) < D then min (min (k : ℝ) (t : ℝ)) (i / (d0 l D : ℝ)) else 0) := by
   split_ifs
-  · exact le_min (le_min (Nat.cast_nonneg _) (Nat.cast_nonneg _)) (div_nonneg hi (Nat.cast_nonneg _))
+  · exact le_min (le_min (Nat.cast_nonneg _) (Nat.cast_nonneg _))
+      (div_nonneg hi (Nat.cast_nonneg _))
   · exact le_rfl
 
 theorem label_sum_plus_holds : LabelSumPlus := by
@@ -421,18 +469,21 @@ theorem label_sum_plus_holds : LabelSumPlus := by
     have hL : labelLHS l k t i xm xp mB = 0 := by
       unfold labelLHS
       rw [Finset.sum_eq_zero (fun ct hct => by
-            rw [hz ct (by have := Finset.mem_Icc.mp hct; omega) (Finset.mem_Icc.mp hct).2, mul_zero]),
-          Finset.sum_eq_zero (fun ct hct => by
-            rw [hz ct (Finset.mem_Ioo.mp hct).1 (by have := Finset.mem_Ioo.mp hct; omega), mul_zero]),
-          add_zero]
+          rw [hz ct (by have := Finset.mem_Icc.mp hct; omega) (Finset.mem_Icc.mp hct).2, mul_zero]),
+        Finset.sum_eq_zero (fun ct hct => by
+          rw [hz ct (Finset.mem_Ioo.mp hct).1 (by have := Finset.mem_Ioo.mp hct; omega), mul_zero]),
+        add_zero]
     rw [hL]
     unfold labelSumBoundPos harm
     rw [if_pos hlh, add_zero]
-    refine add_nonneg (mul_nonneg (Nat.cast_nonneg _) (add_nonneg (div_nonneg ?_ (Nat.cast_nonneg _))
-      (indexIntegral_nonneg _ _ _ _))) (gated_min_nonneg l k t i hi _)
+    refine add_nonneg
+      (mul_nonneg (Nat.cast_nonneg _)
+        (add_nonneg (div_nonneg ?_ (Nat.cast_nonneg _)) (indexIntegral_nonneg _ _ _ _)))
+      (gated_min_nonneg l k t i hi _)
     exact_mod_cast (by omega : (0 : ℤ) ≤ xp - xm)
-  · have h1 := labelSumLe_holds l k t h i (xm - mB) (xp - mB) 0 hl hi le_rfl (by omega) (by omega) (by omega) hh
-      (by omega)
+  · have h1 :=
+      labelSumLe_holds l k t h i (xm - mB) (xp - mB) 0 hl hi le_rfl (by omega) (by omega) (by omega)
+        hh (by omega)
     rw [← labelLHS_shift_to_zero] at h1
     unfold labelSumBound at h1
     unfold labelSumBoundPos harm
@@ -454,17 +505,18 @@ theorem harmonic_monotone (l h : ℕ) : Monotone (harm l h) := by
         refine Real.log_nonneg ?_
         rw [le_div_iff₀ hl0, one_mul]
         exact_mod_cast (by omega : l ≤ h)
-    exact mul_le_mul_of_nonneg_right (div_le_div_of_nonneg_right hab (Nat.cast_nonneg _)) (by linarith)
+    exact mul_le_mul_of_nonneg_right (div_le_div_of_nonneg_right hab (Nat.cast_nonneg _))
+      (by linarith)
 
-theorem gated_min_monotone (l k t : ℕ) (D : ℤ) {a b : ℝ} (hab : a ≤ b) :
-    (if ((d0 l D : ℕ) : ℤ) < D then min (min (k : ℝ) (t : ℝ)) (a / (d0 l D : ℝ)) else 0) ≤
-      (if ((d0 l D : ℕ) : ℤ) < D then min (min (k : ℝ) (t : ℝ)) (b / (d0 l D : ℝ)) else 0) := by
+theorem gated_min_monotone (l k t : ℕ) (D : ℤ) {a b : ℝ} (hab : a ≤ b)
+    : (if ((d0 l D : ℕ) : ℤ) < D then min (min (k : ℝ) (t : ℝ)) (a / (d0 l D : ℝ)) else 0)
+      ≤ (if ((d0 l D : ℕ) : ℤ) < D then min (min (k : ℝ) (t : ℝ)) (b / (d0 l D : ℝ)) else 0) := by
   split_ifs
   · exact min_le_min_left _ (div_le_div_of_nonneg_right hab (Nat.cast_nonneg _))
   · exact le_rfl
 
-theorem labelRHSPlus_monotone (l k t h : ℕ) (xm xp mB : ℤ) {a b : ℝ} (hab : a ≤ b) :
-    labelSumBoundPos l k t h a xm xp mB ≤ labelSumBoundPos l k t h b xm xp mB := by
+theorem labelRHSPlus_monotone (l k t h : ℕ) (xm xp mB : ℤ) {a b : ℝ} (hab : a ≤ b)
+    : labelSumBoundPos l k t h a xm xp mB ≤ labelSumBoundPos l k t h b xm xp mB := by
   unfold labelSumBoundPos
   have h1 := gated_min_monotone l k t (xm - mB) hab
   have h2 := harmonic_monotone l h hab
@@ -474,7 +526,9 @@ theorem second_valuation_holds : Step2Val := by
   intro l k j t w M h i lam xm xp hl hR hxp hh
   have hsum := depth_valuation_sum_holds l k j t w M i lam xm xp hl hR
   have hA1 := first_bound_holds l xm (maxB t w) hl hR.above
-  have hLS := label_sum_plus_holds l k t h (i : ℝ) xm xp (maxB t w) hl (Nat.cast_nonneg _) hR.above hR.le hxp hh
+  have hLS :=
+    label_sum_plus_holds l k t h (i : ℝ) xm xp (maxB t w) hl (Nat.cast_nonneg _) hR.above hR.le hxp
+      hh
   rw [hsum, Nat.cast_sum]
   simp only [Nat.cast_mul]
   have hdisj : Disjoint (Finset.Ioo (maxB t w) xm) (Finset.Ico xm xp) := by
@@ -490,24 +544,29 @@ theorem second_valuation_holds : Step2Val := by
     have := hR.le
     omega
   rw [hun, Finset.sum_union hdisj]
-  have h1 : ∑ ct ∈ Finset.Ioo (maxB t w) xm,
-        (mu t (M - w) i (dual M lam) (cont t w M ct) : ℝ) * (vl l (ct - maxB t w) : ℝ) ≤
-      (j : ℝ) * ∑ ct ∈ Finset.Ioo (maxB t w) xm, (vl l (ct - maxB t w) : ℝ) +
-        ∑ ct ∈ Finset.Ioo (maxB t w) xm,
-          min (min (k : ℝ) (t : ℝ)) ((i : ℝ) / ((xm - ct : ℤ) : ℝ)) * (vl l (ct - maxB t w) : ℝ) := by
-    rw [Finset.mul_sum, ← Finset.sum_add_distrib]
-    refine Finset.sum_le_sum ?_
-    intro ct hct
-    have hlt := (Finset.mem_Ioo.mp hct).2
-    have hm := multiplicity_bound_holds k j t w M i lam xm xp hR ct
-    rw [if_pos hlt, if_pos hlt] at hm
-    calc (mu t (M - w) i (dual M lam) (cont t w M ct) : ℝ) * (vl l (ct - maxB t w) : ℝ)
-        ≤ ((j : ℝ) + min (min (k : ℝ) (t : ℝ)) ((i : ℝ) / ((xm - ct : ℤ) : ℝ))) * (vl l (ct - maxB t w) : ℝ) :=
+  have h1
+      : ∑ ct ∈ Finset.Ioo (maxB t w) xm,
+          (mu t (M - w) i (dual M lam) (cont t w M ct) : ℝ) * (vl l (ct - maxB t w) : ℝ)
+        ≤ (j : ℝ) * ∑ ct ∈ Finset.Ioo (maxB t w) xm, (vl l (ct - maxB t w) : ℝ)
+          + ∑ ct ∈ Finset.Ioo (maxB t w) xm,
+              min (min (k : ℝ) (t : ℝ)) ((i : ℝ) / ((xm - ct : ℤ) : ℝ)) * (vl l (ct - maxB t w) : ℝ) :=
+    by
+      rw [Finset.mul_sum, ← Finset.sum_add_distrib]
+      refine Finset.sum_le_sum ?_
+      intro ct hct
+      have hlt := (Finset.mem_Ioo.mp hct).2
+      have hm := multiplicity_bound_holds k j t w M i lam xm xp hR ct
+      rw [if_pos hlt, if_pos hlt] at hm
+      calc
+        (mu t (M - w) i (dual M lam) (cont t w M ct) : ℝ) * (vl l (ct - maxB t w) : ℝ)
+            ≤ ((j : ℝ) + min (min (k : ℝ) (t : ℝ)) ((i : ℝ) / ((xm - ct : ℤ) : ℝ)))
+              * (vl l (ct - maxB t w) : ℝ) :=
           mul_le_mul_of_nonneg_right hm (Nat.cast_nonneg _)
-      _ = _ := by ring
-  have h2 : ∑ ct ∈ Finset.Ico xm xp,
-        (mu t (M - w) i (dual M lam) (cont t w M ct) : ℝ) * (vl l (ct - maxB t w) : ℝ) ≤
-      ∑ ct ∈ Finset.Icc xm xp, (k : ℝ) * (vl l (ct - maxB t w) : ℝ) := by
+        _ = _ := by ring
+  have h2
+      : ∑ ct ∈ Finset.Ico xm xp,
+          (mu t (M - w) i (dual M lam) (cont t w M ct) : ℝ) * (vl l (ct - maxB t w) : ℝ)
+        ≤ ∑ ct ∈ Finset.Icc xm xp, (k : ℝ) * (vl l (ct - maxB t w) : ℝ) := by
     refine le_trans (Finset.sum_le_sum ?_)
       (Finset.sum_le_sum_of_subset_of_nonneg Finset.Ico_subset_Icc_self ?_)
     · intro ct hct
@@ -517,8 +576,9 @@ theorem second_valuation_holds : Step2Val := by
       exact mul_le_mul_of_nonneg_right (le_trans hm (min_le_right _ _)) (Nat.cast_nonneg _)
     · intro ct _ _
       exact mul_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _)
-  have hA : ∑ ct ∈ Finset.Ioo (maxB t w) xm, (vl l (ct - maxB t w) : ℝ) ≤
-      (((xm - maxB t w : ℤ) : ℝ) - 1) / ((l : ℝ) - 1) := by
+  have hA
+      : ∑ ct ∈ Finset.Ioo (maxB t w) xm, (vl l (ct - maxB t w) : ℝ)
+        ≤ (((xm - maxB t w : ℤ) : ℝ) - 1) / ((l : ℝ) - 1) := by
     have h3 := hA1.2
     rw [← hA1.1, Nat.cast_sum] at h3
     exact h3
@@ -541,8 +601,9 @@ theorem second_valuation_up_to_holds : Step2ValUpTo := by
   have h4 := mul_le_mul_of_nonneg_left h3 (Nat.cast_nonneg j : (0 : ℝ) ≤ (j : ℝ))
   linarith
 
-theorem labelRHSPlus_shift_invariant (l k t h : ℕ) (I : ℝ) (xm xp mB c : ℤ) :
-    labelSumBoundPos l k t h I (xm + c) (xp + c) (mB + c) = labelSumBoundPos l k t h I xm xp mB := by
+theorem labelRHSPlus_shift_invariant (l k t h : ℕ) (I : ℝ) (xm xp mB c : ℤ)
+    : labelSumBoundPos l k t h I (xm + c) (xp + c) (mB + c)
+      = labelSumBoundPos l k t h I xm xp mB := by
   unfold labelSumBoundPos
   have e1 : xp + c - (xm + c) = xp - xm := by ring
   have e2 : xm + c - (mB + c) = xm - mB := by ring

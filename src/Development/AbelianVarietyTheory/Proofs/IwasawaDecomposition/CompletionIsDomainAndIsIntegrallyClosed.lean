@@ -15,10 +15,11 @@ namespace GlobalTheory.AnalyticNormality
 
 open IsLocalRing
 
-theorem completion_isDomain_and_isIntegrallyClosed :
-    ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsIntegrallyClosed A] [CharZero A]
-      [Algebra.EssFiniteType ℤ A], IsDomain (AdicCompletion (maximalIdeal A) A) ∧
-        IsIntegrallyClosed (AdicCompletion (maximalIdeal A) A) := by
+theorem completion_isDomain_and_isIntegrallyClosed
+    : ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsIntegrallyClosed A] [CharZero A]
+        [Algebra.EssFiniteType ℤ A],
+      IsDomain (AdicCompletion (maximalIdeal A) A)
+        ∧ IsIntegrallyClosed (AdicCompletion (maximalIdeal A) A) := by
   have hnoeth := GlobalTheory.T.isNoetherianRing_adicCompletion_of_noetherian
   have hquot := GlobalTheory.T.nonempty_adicCompletion_quotient_ringEquiv
   have hengine := GlobalTheory.T.associated_prime_localization_dvr
@@ -58,8 +59,7 @@ theorem completion_isDomain_and_isIntegrallyClosed :
       rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
       intro hu
       obtain ⟨b, hb⟩ := Ideal.Quotient.mk_surjective (hu.unit⁻¹ : (A ⧸ q)ˣ).1
-      have h1 : Ideal.Quotient.mk q (a * b) = 1 := by
-        rw [map_mul, hb]; exact hu.mul_val_inv
+      have h1 : Ideal.Quotient.mk q (a * b) = 1 := by rw [map_mul, hb]; exact hu.mul_val_inv
       have h2 : a * b - 1 ∈ q := by
         rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, h1, map_one, sub_self]
       have h3 : a * b - 1 ∈ m := IsLocalRing.le_maximalIdeal hq.ne_top h2

@@ -25,9 +25,14 @@ private lemma UpperTheory.isPullback_whisker_fst {S : Scheme.{0}} {T T' G : Over
         rw [← h1, Category.assoc, whiskerRight_snd]
   exact h.map (Over.forget S)
 
-theorem UpperTheory.clopProj_finrank_pullback :
-    ∀ {S : Scheme.{0}} {T T' G : Over S} (y : T' ⟶ T) (V : (T ⊗ G).left.Opens), IsFinite G.hom → Etale G.hom → IsClosed (V : Set (T ⊗ G).left) → ∀ t : T'.left, (UpperTheory.RepresentationRank.proj ((y ▷ G).left ⁻¹ᵁ V)).finrank t = (UpperTheory.RepresentationRank.proj V).finrank (y.left t) := by
+theorem UpperTheory.clopProj_finrank_pullback
+    : ∀ {S : Scheme.{0}} {T T' G : Over S} (y : T' ⟶ T) (V : (T ⊗ G).left.Opens),
+      IsFinite G.hom → Etale G.hom → IsClosed (V : Set (T ⊗ G).left)
+        → ∀ t : T'.left,
+          (UpperTheory.RepresentationRank.proj ((y ▷ G).left ⁻¹ᵁ V)).finrank t
+            = (UpperTheory.RepresentationRank.proj V).finrank (y.left t) := by
   intro S T T' G y V hfin het hcl t
   obtain ⟨hF, hE⟩ := UpperTheory.clopProj_finite_etale_of_isClosed V hfin het hcl
-  have hsq := (isPullback_morphismRestrict (y ▷ G).left V).paste_vert (UpperTheory.isPullback_whisker_fst y)
+  have hsq :=
+    (isPullback_morphismRestrict (y ▷ G).left V).paste_vert (UpperTheory.isPullback_whisker_fst y)
   exact Scheme.Hom.finrank_of_isPullback _ _ _ _ hsq t

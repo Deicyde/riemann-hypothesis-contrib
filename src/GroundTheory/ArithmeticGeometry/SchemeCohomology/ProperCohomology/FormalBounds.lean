@@ -18,10 +18,15 @@ noncomputable section
 
 attribute [local instance] algebraOfOver reesCechModule
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{u}}
-  [X.Over (Spec (.of A))] {F : X.Modules} [F.IsQuasicoherent] (hF : IsCoherent F)
-  {ι : Type u} (𝔘 : ι → X.Opens)
-  (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a))) [Finite ι] (p : ℕ)
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
+  {F : X.Modules} [F.IsQuasicoherent]
+  (hF : IsCoherent F)
+  {ι : Type u} (𝔘 : ι → X.Opens) (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a)))
+  [Finite ι]
+  (p : ℕ)
 
 def reesBound (x : cechH (reesPre I F) 𝔘 p) : ℕ :=
   Classical.choose (reesCoefFam_eq_zero_of_lt I hF 𝔘 hU p x)
@@ -30,20 +35,22 @@ lemma reesCoefFam_eq_zero_of_bound_lt (x : cechH (reesPre I F) 𝔘 p) {n : ℕ}
     (hn : reesBound I hF 𝔘 hU p x < n) : (reesCoefFam I hF 𝔘 hU n).cechH p x = 0 :=
   Classical.choose_spec (reesCoefFam_eq_zero_of_lt I hF 𝔘 hU p x) n hn
 
-def reesCoefPoly (x : cechH (reesPre I F) 𝔘 p) :
-    PolynomialModule A (cechH (modulesAb F).obj 𝔘 p) :=
-  PolynomialModule.ofCoeff A (Finsupp.onFinset (Finset.range (reesBound I hF 𝔘 hU p x + 1))
-    (fun n => (reesCoefFam I hF 𝔘 hU n).cechH p x) (fun n hn => by
-      rw [Finset.mem_range]
-      by_contra h
-      exact hn (reesCoefFam_eq_zero_of_bound_lt I hF 𝔘 hU p x (by omega))))
+def reesCoefPoly (x : cechH (reesPre I F) 𝔘 p) : PolynomialModule A (cechH (modulesAb F).obj 𝔘 p) :=
+  PolynomialModule.ofCoeff A
+    (Finsupp.onFinset (Finset.range (reesBound I hF 𝔘 hU p x + 1))
+      (fun n => (reesCoefFam I hF 𝔘 hU n).cechH p x)
+      (fun n hn => by
+        rw [Finset.mem_range]
+        by_contra h
+        exact hn (reesCoefFam_eq_zero_of_bound_lt I hF 𝔘 hU p x (by omega))))
 
 lemma reesCoefPoly_coeff (x : cechH (reesPre I F) 𝔘 p) (n : ℕ) :
     (reesCoefPoly I hF 𝔘 hU p x).coeff n = (reesCoefFam I hF 𝔘 hU n).cechH p x :=
   rfl
 
-def reesΦ : cechH (reesPre I F) 𝔘 p →ₗ[reesAlgebra I]
-    PolynomialModule A (cechH (modulesAb F).obj 𝔘 p) where
+def reesΦ
+    : cechH (reesPre I F) 𝔘 p →ₗ[reesAlgebra I]
+      PolynomialModule A (cechH (modulesAb F).obj 𝔘 p) where
   toFun := reesCoefPoly I hF 𝔘 hU p
   map_add' x y := by
     apply PolynomialModule.ext
@@ -53,8 +60,8 @@ def reesΦ : cechH (reesPre I F) 𝔘 p →ₗ[reesAlgebra I]
     apply PolynomialModule.ext
     ext N
     rw [reesCoefPoly_coeff, RingHom.id_apply]
-    change (reesCoefFam I hF 𝔘 hU N).cechH p (cechHMap 𝔘 (modulesAbMap (reesMul I F r)).hom p x) =
-      ((r : Polynomial A) • reesCoefPoly I hF 𝔘 hU p x).coeff N
+    change (reesCoefFam I hF 𝔘 hU N).cechH p (cechHMap 𝔘 (modulesAbMap (reesMul I F r)).hom p x)
+      = ((r : Polynomial A) • reesCoefPoly I hF 𝔘 hU p x).coeff N
     rw [reesCoefFam_reesMul, PolynomialModule.smul_apply]
     refine Finset.sum_congr rfl fun ij _ => ?_
     rw [reesCoefPoly_coeff]
@@ -105,10 +112,9 @@ lemma range_reesΦ :
     · exact hy k
     · exact (Finsupp.notMem_support_iff.1 hk).symm
 
-
 include hF hU in
-theorem exists_cechK_eq_pow_smul [IsProper (X ↘ Spec (.of A))] (hUtop : iSup 𝔘 = ⊤) :
-    ∃ c, ∀ n, cechK I 𝔘 p (F := F) (n + c) = I ^ n • cechK I 𝔘 p c := by
+theorem exists_cechK_eq_pow_smul [IsProper (X ↘ Spec (.of A))] (hUtop : iSup 𝔘 = ⊤)
+    : ∃ c, ∀ n, cechK I 𝔘 p (F := F) (n + c) = I ^ n • cechK I 𝔘 p c := by
   refine exists_eq_pow_smul_of_fg I (smul_cechK_le I 𝔘 p) ?_
   rw [← range_reesΦ I hF 𝔘 hU p]
   have := finite_reesCech I 𝔘 p hF hUtop hU

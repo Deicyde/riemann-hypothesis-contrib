@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EmbUnitary
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published GlobalTheory.QSA GlobalTheory.PlaneSU
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.Published GlobalTheory.QSA GlobalTheory.PlaneSU
 open scoped TensorProduct Quaternion
 
 noncomputable section
@@ -16,34 +17,52 @@ section Form
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E] {R : Type} [CommRing R] [Algebra F R]
 
-theorem tensor_decomp (b : Module.Basis (Fin 2) F E) (hb0 : b 0 = 1) (z : R ⊗[F] E) :
-    ∃ r₀ r₁ : R, z = algebraMap R (R ⊗[F] E) r₀ + algebraMap R (R ⊗[F] E) r₁ * ((1 : R) ⊗ₜ[F] b 1) := by
+theorem tensor_decomp (b : Module.Basis (Fin 2) F E) (hb0 : b 0 = 1) (z : R ⊗[F] E)
+    : ∃ r₀ r₁ : R,
+      z = algebraMap R (R ⊗[F] E) r₀ + algebraMap R (R ⊗[F] E) r₁ * ((1 : R) ⊗ₜ[F] b 1) := by
   let B := Algebra.TensorProduct.basis R b
   have hB : ∀ i, B i = 1 ⊗ₜ[F] b i := fun i => Algebra.TensorProduct.basis_apply b i
   have hz := B.sum_repr z
-  rw [Fin.sum_univ_two, hB, hB, hb0, Algebra.smul_def, Algebra.smul_def, ← Algebra.TensorProduct.one_def,
-    mul_one] at hz
+  rw [Fin.sum_univ_two, hB, hB, hb0, Algebra.smul_def, Algebra.smul_def,
+      ← Algebra.TensorProduct.one_def, mul_one]
+    at hz
   exact ⟨B.repr z 0, B.repr z 1, hz.symm⟩
 
-theorem sigR_algebraMap (σ : E →ₐ[F] E) (r : R) :
-    sigR R σ (algebraMap R (R ⊗[F] E) r) = algebraMap R (R ⊗[F] E) r := by
+theorem sigR_algebraMap (σ : E →ₐ[F] E) (r : R)
+    : sigR R σ (algebraMap R (R ⊗[F] E) r) = algebraMap R (R ⊗[F] E) r := by
   show sigR R σ (r ⊗ₜ[F] 1) = r ⊗ₜ[F] 1
   simp [sigR]
 
-theorem sigR_theta (σ : E →ₐ[F] E) (e : E) (he : σ e = -e) :
-    sigR R σ ((1 : R) ⊗ₜ[F] e) = -((1 : R) ⊗ₜ[F] e) := by
+theorem sigR_theta (σ : E →ₐ[F] E) (e : E) (he : σ e = -e)
+    : sigR R σ ((1 : R) ⊗ₜ[F] e) = -((1 : R) ⊗ₜ[F] e) := by
   simp [sigR, he, TensorProduct.tmul_neg]
 
-theorem cT_mul_eq_mul_adjugate {A : Type} [CommRing A] (c : A →+* A) (H X : Matrix (Fin 2) (Fin 2) A)
-    (hX : Formalism.UG.cT c X * H * X = H) (hd : X.det = 1) : Formalism.UG.cT c X * H = H * X.adjugate := by
-  calc Formalism.UG.cT c X * H = Formalism.UG.cT c X * H * (X * X.adjugate) := by
-        rw [Matrix.mul_adjugate, hd, one_smul, Matrix.mul_one]
+theorem cT_mul_eq_mul_adjugate
+    {A : Type} [CommRing A]
+    (c : A →+* A) (H X : Matrix (Fin 2) (Fin 2) A)
+    (hX : Formalism.UG.cT c X * H * X = H) (hd : X.det = 1)
+    : Formalism.UG.cT c X * H = H * X.adjugate := by
+  calc
+    Formalism.UG.cT c X * H = Formalism.UG.cT c X * H * (X * X.adjugate) := by
+      rw [Matrix.mul_adjugate, hd, one_smul, Matrix.mul_one]
     _ = H * X.adjugate := by rw [← Matrix.mul_assoc, hX]
 
 end Form
 end GlobalTheory.PlaneSU
 
-theorem GlobalTheory.PlaneSU.exists_qm_eq_of_unitary : ∀ (F E : Type) [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) (δ : F) (b : Module.Basis (Fin 2) F E), b 0 = 1 → σ (b 1) = -b 1 → b 1 * b 1 = algebraMap F E δ → ∀ f₁ f₂ : F, f₁ ≠ 0 → f₂ ≠ 0 → ∀ (R : Type) [CommRing R] [Algebra F R] (X : Matrix (Fin 2) (Fin 2) (R ⊗[F] E)), Formalism.UG.cT (sigR R σ) X * Matrix.diagonal ![algebraMap F (R ⊗[F] E) f₁, algebraMap F (R ⊗[F] E) f₂] * X = Matrix.diagonal ![algebraMap F (R ⊗[F] E) f₁, algebraMap F (R ⊗[F] E) f₂] → X.det = 1 → ∃ x : ℍ[R, algebraMap F R δ, algebraMap F R (-(f₂ / f₁))], qm (algebraMap R (R ⊗[F] E)) ((1 : R) ⊗ₜ[F] b 1) x = X := by
+theorem GlobalTheory.PlaneSU.exists_qm_eq_of_unitary
+    : ∀ (F E : Type) [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) (δ : F)
+        (b : Module.Basis (Fin 2) F E),
+      b 0 = 1 → σ (b 1) = - b 1 → b 1 * b 1 = algebraMap F E δ
+        → ∀ f₁ f₂ : F,
+          f₁ ≠ 0 → f₂ ≠ 0
+            → ∀ (R : Type) [CommRing R] [Algebra F R] (X : Matrix (Fin 2) (Fin 2) (R ⊗[F] E)),
+              Formalism.UG.cT (sigR R σ) X
+                    * Matrix.diagonal ![algebraMap F (R ⊗[F] E) f₁, algebraMap F (R ⊗[F] E) f₂] * X
+                  = Matrix.diagonal ![algebraMap F (R ⊗[F] E) f₁, algebraMap F (R ⊗[F] E) f₂]
+                → X.det = 1
+                → ∃ x : ℍ[R, algebraMap F R δ, algebraMap F R (-(f₂ / f₁))],
+                  qm (algebraMap R (R ⊗[F] E)) ((1 : R) ⊗ₜ[F] b 1) x = X := by
   intro F E _ _ _ σ δ b hb0 hσ _ f₁ f₂ hf₁ _ R _ _ X hX hd
   set ι := algebraMap R (R ⊗[F] E) with hιdef
   set θ : R ⊗[F] E := (1 : R) ⊗ₜ[F] b 1 with hθdef
@@ -60,14 +79,15 @@ theorem GlobalTheory.PlaneSU.exists_qm_eq_of_unitary : ∀ (F E : Type) [Field F
     simpa [Formalism.UG.cT, Matrix.adjugate_fin_two, Matrix.mul_apply, Fin.sum_univ_two] using this
   have hcθ : c θ = -θ := GlobalTheory.PlaneSU.sigR_theta σ (b 1) hσ
   have hcι : ∀ r, c (ι r) = ι r := GlobalTheory.PlaneSU.sigR_algebraMap σ
-  have hu : h₁ * u = 1 := by
-    rw [hh₁, hudef, ← map_mul, mul_inv_cancel₀ hf₁, map_one]
+  have hu : h₁ * u = 1 := by rw [hh₁, hudef, ← map_mul, mul_inv_cancel₀ hf₁, map_one]
   have hb : ι (algebraMap F R (-(f₂ / f₁))) = -(h₂ * u) := by
     rw [hιdef, ← IsScalarTower.algebraMap_apply, div_eq_mul_inv, map_neg, map_mul]
   obtain ⟨r₀, r₁, hα⟩ := GlobalTheory.PlaneSU.tensor_decomp (R := R) b hb0 (X 0 0)
   obtain ⟨s₀, s₁, hβ⟩ := GlobalTheory.PlaneSU.tensor_decomp (R := R) b hb0 (X 1 0)
-  have hcα : c (X 0 0) = ι r₀ - ι r₁ * θ := by rw [hα, map_add (f := _), map_mul, hcι, hcι, hcθ]; ring
-  have hcβ : c (X 1 0) = ι s₀ - ι s₁ * θ := by rw [hβ, map_add (f := _), map_mul, hcι, hcι, hcθ]; ring
+  have hcα : c (X 0 0) = ι r₀ - ι r₁ * θ := by
+    rw [hα, map_add (f := _), map_mul, hcι, hcι, hcθ]; ring
+  have hcβ : c (X 1 0) = ι s₀ - ι s₁ * θ := by
+    rw [hβ, map_add (f := _), map_mul, hcι, hcι, hcθ]; ring
   have e00 : ι r₀ + ι r₁ * θ = X 0 0 := hα.symm
   have e10 : ι s₀ - ι (-s₁) * θ = X 1 0 := by rw [hβ, map_neg]; ring
   have e11 : ι r₀ - ι r₁ * θ = X 1 1 := by

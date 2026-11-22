@@ -5,7 +5,9 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BigZe
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
 open scoped ENNReal InnerProductSpace
 open scoped ComplexOrder
 open GlobalTheory.CompanionTheory.Ar.Cusp.Univ
@@ -16,27 +18,35 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp.Univ.PeriodCoord
 
 variable {I : Type} [Fintype I] [DecidableEq I]
 
-theorem im_terms_separate (P Q R S : Matrix I I ℂ)
-    (h : ∀ z w : I → ℂ, (z ⬝ᵥ P *ᵥ star w + z ⬝ᵥ Q *ᵥ w + star z ⬝ᵥ R *ᵥ star w
-      + star z ⬝ᵥ S *ᵥ w).im = 0) :
-    P = S.map star ∧ Q = R.map star := by
+theorem im_terms_separate
+    (P Q R S : Matrix I I ℂ)
+    (h : ∀ z w : I → ℂ,
+      (z ⬝ᵥ P *ᵥ star w + z ⬝ᵥ Q *ᵥ w + star z ⬝ᵥ R *ᵥ star w + star z ⬝ᵥ S *ᵥ w).im = 0)
+    : P = S.map star ∧ Q = R.map star := by
   have hs : ∀ (c : I) (γ : ℂ), star (Pi.single c γ : I → ℂ) = Pi.single c (star γ) := by
-    intro c γ; ext i; by_cases hi : i = c
+    intro c γ
+    ext i
+    by_cases hi : i = c
     · subst hi; simp
     · simp [Pi.single_apply, hi]
-  have he : ∀ (T : Matrix I I ℂ) (a b : I) (α β : ℂ),
-      (Pi.single a α : I → ℂ) ⬝ᵥ T *ᵥ (Pi.single b β : I → ℂ) = α * β * T a b := by
+  have he
+      : ∀ (T : Matrix I I ℂ) (a b : I) (α β : ℂ),
+        (Pi.single a α : I → ℂ) ⬝ᵥ T *ᵥ (Pi.single b β : I → ℂ) = α * β * T a b := by
     intro T a b α β
     simp [single_dotProduct, mulVec, dotProduct_single]
     ring
-  have key : ∀ (a b : I) (α β : ℂ), (α * star β * P a b + α * β * Q a b
-      + star α * star β * R a b + star α * β * S a b).im = 0 := by
+  have key
+      : ∀ (a b : I) (α β : ℂ),
+        (α * star β * P a b + α * β * Q a b + star α * star β * R a b + star α * β * S a b).im
+          = 0 := by
     intro a b α β
     have := h (Pi.single a α) (Pi.single b β)
     rw [hs, hs, he, he, he, he] at this
     exact this
-  have h4 : ∀ a b, (P a b).re = (S a b).re ∧ (P a b).im = -(S a b).im ∧
-      (Q a b).re = (R a b).re ∧ (Q a b).im = -(R a b).im := by
+  have h4
+      : ∀ a b,
+        (P a b).re = (S a b).re ∧ (P a b).im = -(S a b).im ∧ (Q a b).re = (R a b).re
+          ∧ (Q a b).im = -(R a b).im := by
     intro a b
     have h1 := key a b 1 1
     have h2 := key a b Complex.I 1
@@ -54,42 +64,50 @@ theorem im_terms_separate (P Q R S : Matrix I I ℂ)
     · simpa using (h4 a b).2.2.1
     · simpa using (h4 a b).2.2.2
 
-theorem exists_linear_antilinear (L : (I → ℂ) →ₗ[ℝ] (I → ℂ)) :
-    ∃ M D : Matrix I I ℂ, ∀ z, L z = M *ᵥ z + D *ᵥ star z := by
-  refine ⟨Matrix.of fun i j => (L (Pi.single j 1) i - Complex.I * L (Pi.single j Complex.I) i) / 2,
-    Matrix.of fun i j => (L (Pi.single j 1) i + Complex.I * L (Pi.single j Complex.I) i) / 2, ?_⟩
+theorem exists_linear_antilinear (L : (I → ℂ) →ₗ[ℝ] (I → ℂ))
+    : ∃ M D : Matrix I I ℂ, ∀ z, L z = M *ᵥ z + D *ᵥ star z := by
+  refine ⟨
+    Matrix.of fun i j => (L (Pi.single j 1) i - Complex.I * L (Pi.single j Complex.I) i) / 2,
+    Matrix.of fun i j => (L (Pi.single j 1) i + Complex.I * L (Pi.single j Complex.I) i) / 2,
+    ?_
+  ⟩
   intro z
-  have hz : z = ∑ j, ((z j).re • (Pi.single j 1 : I → ℂ) + (z j).im • (Pi.single j Complex.I : I → ℂ)) := by
-    ext i
-    simp [Finset.sum_apply, Pi.single_apply, Finset.sum_add_distrib]
+  have hz
+      : z
+        = ∑ j, ((z j).re • (Pi.single j 1 : I → ℂ) + (z j).im • (Pi.single j Complex.I : I → ℂ)) :=
+    by
+      ext i
+      simp [Finset.sum_apply, Pi.single_apply, Finset.sum_add_distrib]
   have hL : L z = ∑ j, ((z j).re • L (Pi.single j 1) + (z j).im • L (Pi.single j Complex.I)) := by
     conv_lhs => rw [hz]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_add (f := _), map_smul]
+    simp [map_sum, map_add (f := _), map_smul]
   rw [hL]
   ext i
   simp only [Finset.sum_apply, Pi.add_apply, Pi.smul_apply, mulVec, dotProduct, Matrix.of_apply,
     Pi.star_apply, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun j _ => ?_
-  have aux : ∀ (a b : ℂ) (x y : ℝ), (x : ℂ) * a + y * b =
-      (a - Complex.I * b) / 2 * (x + y * Complex.I) + (a + Complex.I * b) / 2 * (x - y * Complex.I) := by
+  have aux
+      : ∀ (a b : ℂ) (x y : ℝ),
+        (x : ℂ) * a + y * b
+          = (a - Complex.I * b) / 2 * (x + y * Complex.I)
+            + (a + Complex.I * b) / 2 * (x - y * Complex.I) := by
     intro a b x y
     have hI := Complex.I_mul_I
     linear_combination ((y : ℂ) * b) * hI
-  have hc : star (z j) = (z j).re - (z j).im * Complex.I := by
-    apply Complex.ext <;> simp
+  have hc : star (z j) = (z j).re - (z j).im * Complex.I := by apply Complex.ext <;> simp
   have hz' : z j = (z j).re + (z j).im * Complex.I := (Complex.re_add_im _).symm
   simp only [Complex.real_smul]
   rw [aux, hc, ← hz']
 
-theorem star_mulVec_star (Z : Matrix I I ℂ) (w : I → ℂ) :
-    star (Z *ᵥ star w) = Z.map star *ᵥ w := by
+theorem star_mulVec_star (Z : Matrix I I ℂ) (w : I → ℂ) : star (Z *ᵥ star w) = Z.map star *ᵥ w := by
   ext i
   simp [mulVec, dotProduct]
 
-theorem form_tz (G Z : Matrix I I ℂ) (z w : I → ℂ) :
-    tz Z z ⬝ᵥ G *ᵥ star (tz Z w) = z ⬝ᵥ G *ᵥ star w + z ⬝ᵥ (-(G * Z.map star)) *ᵥ w
-      + star z ⬝ᵥ (-(Zᵀ * G)) *ᵥ star w + star z ⬝ᵥ (Zᵀ * G * Z.map star) *ᵥ w := by
+theorem form_tz (G Z : Matrix I I ℂ) (z w : I → ℂ)
+    : tz Z z ⬝ᵥ G *ᵥ star (tz Z w)
+      = z ⬝ᵥ G *ᵥ star w + z ⬝ᵥ (-(G * Z.map star)) *ᵥ w + star z ⬝ᵥ (-(Zᵀ * G)) *ᵥ star w
+        + star z ⬝ᵥ (Zᵀ * G * Z.map star) *ᵥ w := by
   have hv : ∀ (y v : I → ℂ), (Z *ᵥ y) ⬝ᵥ v = y ⬝ᵥ Zᵀ *ᵥ v := by
     intro y v
     rw [dotProduct_mulVec, vecMul_transpose]
@@ -97,8 +115,8 @@ theorem form_tz (G Z : Matrix I I ℂ) (z w : I → ℂ) :
     mulVec_mulVec, neg_mulVec, dotProduct_neg, Matrix.mul_assoc]
   ring
 
-theorem form_pullback (H M : Matrix I I ℂ) (a b : I → ℂ) :
-    (M *ᵥ a) ⬝ᵥ H *ᵥ star (M *ᵥ b) = a ⬝ᵥ (Mᵀ * H * M.map star) *ᵥ star b := by
+theorem form_pullback (H M : Matrix I I ℂ) (a b : I → ℂ)
+    : (M *ᵥ a) ⬝ᵥ H *ᵥ star (M *ᵥ b) = a ⬝ᵥ (Mᵀ * H * M.map star) *ᵥ star b := by
   have h1 : star (M *ᵥ b) = M.map star *ᵥ star b := by
     have := star_mulVec_star M (star b)
     rwa [star_star] at this
@@ -107,18 +125,19 @@ theorem form_pullback (H M : Matrix I I ℂ) (a b : I → ℂ) :
     rw [dotProduct_mulVec, vecMul_transpose]
   rw [h1, hv, mulVec_mulVec, mulVec_mulVec, Matrix.mul_assoc]
 
-theorem posDef_of_form (G : Matrix I I ℂ) (hG : G.IsHermitian)
-    (hp : ∀ z : I → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ G *ᵥ star z).re) : G.PosDef := by
+theorem posDef_of_form
+    (G : Matrix I I ℂ) (hG : G.IsHermitian) (hp : ∀ z : I → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ G *ᵥ star z).re)
+    : G.PosDef := by
   refine Matrix.PosDef.of_dotProduct_mulVec_pos hG fun x hx => ?_
   have h := hp (star x) (by simpa using hx)
   rw [star_star] at h
   rw [Complex.lt_def]
   exact ⟨by simpa using h, by simpa using (hG.im_star_dotProduct_mulVec_self x).symm⟩
 
-theorem symm_posDef_of_relations (G Z : Matrix I I ℂ) (hG : G.PosDef)
-    (e1 : G - 1 = (Zᵀ * G * Z.map star).map star)
-    (e2 : -(G * Z.map star) = (-(Zᵀ * G)).map star) :
-    Zᵀ = Z ∧ (1 - Zᴴ * Z).PosDef := by
+theorem symm_posDef_of_relations
+    (G Z : Matrix I I ℂ) (hG : G.PosDef) (e1 : G - 1 = (Zᵀ * G * Z.map star).map star)
+    (e2 : -(G * Z.map star) = (-(Zᵀ * G)).map star)
+    : Zᵀ = Z ∧ (1 - Zᴴ * Z).PosDef := by
   set Zc := Z.map star with hZc
   set Gc := G.map star with hGc
   have hcc : Zc.map star = Z := by ext; simp [hZc]
@@ -130,8 +149,7 @@ theorem symm_posDef_of_relations (G Z : Matrix I I ℂ) (hG : G.PosDef)
     ext i j; by_cases h : i = j <;> simp [Matrix.one_apply, h]
   have mapsub : ∀ A B : Matrix I I ℂ, (A - B).map star = A.map star - B.map star := by
     intro A B; ext i j; simp
-  have mapneg : ∀ A : Matrix I I ℂ, (-A).map star = -A.map star := by
-    intro A; ext i j; simp
+  have mapneg : ∀ A : Matrix I I ℂ, (-A).map star = - A.map star := by intro A; ext i j; simp
   have maptr : Zᵀ.map star = Zᴴ := by ext; simp [conjTranspose_apply]
 
   have r1 : G - 1 = Zᴴ * Gc * Z := by rw [e1, mapmul, mapmul, maptr, hcc]
@@ -152,14 +170,18 @@ theorem symm_posDef_of_relations (G Z : Matrix I I ℂ) (hG : G.PosDef)
   have hcomm : (1 - Zc * Z) * Zc = Zc * (1 - Z * Zc) := by
     simp only [sub_mul, mul_sub, one_mul, mul_one, mul_assoc]
   have h3 : G * Zc = Zc * Gc := by
-    calc G * Zc = G * Zc * ((1 - Z * Zc) * Gc) := by rw [hV', mul_one]
+    calc
+      G * Zc
+        = G * Zc * ((1 - Z * Zc) * Gc) := by rw [hV', mul_one]
       _ = G * (Zc * (1 - Z * Zc)) * Gc := by simp only [mul_assoc]
       _ = G * ((1 - Zc * Z) * Zc) * Gc := by rw [hcomm]
       _ = (G * (1 - Zc * Z)) * Zc * Gc := by simp only [mul_assoc]
       _ = Zc * Gc := by rw [hU, one_mul]
   have h4 : Zc = Zᴴ := by
     have : Zc * Gc = Zᴴ * Gc := by rw [← h3, r2]
-    calc Zc = Zc * (Gc * (1 - Z * Zc)) := by rw [hV, mul_one]
+    calc
+      Zc
+        = Zc * (Gc * (1 - Z * Zc)) := by rw [hV, mul_one]
       _ = (Zc * Gc) * (1 - Z * Zc) := by rw [mul_assoc]
       _ = (Zᴴ * Gc) * (1 - Z * Zc) := by rw [this]
       _ = Zᴴ * (Gc * (1 - Z * Zc)) := by rw [mul_assoc]
@@ -175,28 +197,27 @@ theorem symm_posDef_of_relations (G Z : Matrix I I ℂ) (hG : G.PosDef)
     rw [hinv]
     exact hG.inv
 
-theorem linear_part_injective (L : (I → ℂ) →ₗ[ℝ] (I → ℂ)) (H M D : Matrix I I ℂ)
+theorem linear_part_injective
+    (L : (I → ℂ) →ₗ[ℝ] (I → ℂ)) (H M D : Matrix I I ℂ)
     (hpos : ∀ z : I → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ H *ᵥ star z).re)
     (hform : ∀ z w : I → ℂ, (L z ⬝ᵥ H *ᵥ star (L w)).im = (z ⬝ᵥ star w).im)
-    (hL : ∀ z, L z = M *ᵥ z + D *ᵥ star z) : Function.Injective M.mulVec := by
+    (hL : ∀ z, L z = M *ᵥ z + D *ᵥ star z)
+    : Function.Injective M.mulVec := by
   have hker : ∀ x : I → ℂ, M *ᵥ x = 0 → x = 0 := by
     intro x hx
     by_contra hne
     have h1 : L x = D *ᵥ star x := by rw [hL, hx, zero_add]
-    have hsI : ∀ y : I → ℂ, star (Complex.I • y) = (-Complex.I) • star y := by
-      intro y; ext i; simp
+    have hsI : ∀ y : I → ℂ, star (Complex.I • y) = (-Complex.I) • star y := by intro y; ext i; simp
     have h2 : L (Complex.I • x) = (-Complex.I) • L x := by
       rw [hL, hsI, mulVec_smul, mulVec_smul, hx, smul_zero, zero_add, h1]
-    have hsI' : star ((-Complex.I) • L x) = Complex.I • star (L x) := by
-      ext i; simp
+    have hsI' : star ((-Complex.I) • L x) = Complex.I • star (L x) := by ext i; simp
     have h3 := hform x (Complex.I • x)
     rw [h2, hsI', hsI, mulVec_smul, dotProduct_smul, dotProduct_smul] at h3
     have h4 : 0 ≤ (L x ⬝ᵥ H *ᵥ star (L x)).re := by
       by_cases h0 : L x = 0
       · simp [h0]
       · exact (hpos _ h0).le
-    have h5 : 0 < x ⬝ᵥ star x := by
-      rw [dotProduct_comm]; exact dotProduct_star_self_pos_iff.mpr hne
+    have h5 : 0 < x ⬝ᵥ star x := by rw [dotProduct_comm]; exact dotProduct_star_self_pos_iff.mpr hne
     rw [Complex.lt_def] at h5
     simp at h3 h5
     linarith [h5.1]
@@ -204,12 +225,13 @@ theorem linear_part_injective (L : (I → ℂ) →ₗ[ℝ] (I → ℂ)) (H M D :
   have : M *ᵥ (x - y) = 0 := by rw [mulVec_sub, hxy, sub_self]
   exact sub_eq_zero.mp (hker _ this)
 
-theorem exists_linearEquiv_tz {I : Type} [Fintype I] [DecidableEq I]
-    (L : (I → ℂ) →ₗ[ℝ] (I → ℂ)) (H : Matrix I I ℂ) (hH : H.IsHermitian)
-    (hpos : ∀ z : I → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ H *ᵥ star z).re)
-    (hform : ∀ z w : I → ℂ, (L z ⬝ᵥ H *ᵥ star (L w)).im = (z ⬝ᵥ star w).im) :
-    ∃ (A : (I → ℂ) ≃ₗ[ℂ] (I → ℂ)) (Z : Matrix I I ℂ), Zᵀ = Z ∧ (1 - Zᴴ * Z).PosDef ∧
-      ∀ z, L z = A (tz Z z) := by
+theorem exists_linearEquiv_tz
+    {I : Type} [Fintype I] [DecidableEq I]
+    (L : (I → ℂ) →ₗ[ℝ] (I → ℂ)) (H : Matrix I I ℂ)
+    (hH : H.IsHermitian) (hpos : ∀ z : I → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ H *ᵥ star z).re)
+    (hform : ∀ z w : I → ℂ, (L z ⬝ᵥ H *ᵥ star (L w)).im = (z ⬝ᵥ star w).im)
+    : ∃ (A : (I → ℂ) ≃ₗ[ℂ] (I → ℂ)) (Z : Matrix I I ℂ),
+      Zᵀ = Z ∧ (1 - Zᴴ * Z).PosDef ∧ ∀ z, L z = A (tz Z z) := by
   obtain ⟨M, D, hL⟩ := exists_linear_antilinear L
   have hinj := linear_part_injective L H M D hpos hform hL
   have hU : IsUnit M := mulVec_injective_iff_isUnit.mp hinj
@@ -229,8 +251,11 @@ theorem exists_linearEquiv_tz {I : Type} [Fintype I] [DecidableEq I]
     rw [hGdef, ← form_pullback]
     refine hpos _ fun h0 => hz (hinj ?_)
     rw [h0, mulVec_zero]
-  have hrel : ∀ z w : I → ℂ, (z ⬝ᵥ (G - 1) *ᵥ star w + z ⬝ᵥ (-(G * Z.map star)) *ᵥ w
-      + star z ⬝ᵥ (-(Zᵀ * G)) *ᵥ star w + star z ⬝ᵥ (Zᵀ * G * Z.map star) *ᵥ w).im = 0 := by
+  have hrel
+      : ∀ z w : I → ℂ,
+        (z ⬝ᵥ (G - 1) *ᵥ star w + z ⬝ᵥ (-(G * Z.map star)) *ᵥ w + star z ⬝ᵥ (-(Zᵀ * G)) *ᵥ star w
+            + star z ⬝ᵥ (Zᵀ * G * Z.map star) *ᵥ w).im
+          = 0 := by
     intro z w
     have h := hform z w
     rw [hLZ, hLZ, form_pullback, form_tz] at h

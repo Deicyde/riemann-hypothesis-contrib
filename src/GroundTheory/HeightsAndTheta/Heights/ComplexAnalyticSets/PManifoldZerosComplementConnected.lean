@@ -11,18 +11,22 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Filter Set
 
-theorem ManifoldZerosComplementConnected.isPreconnected_of_local {α : Type*} [TopologicalSpace α]
+theorem ManifoldZerosComplementConnected.isPreconnected_of_local
+    {α : Type*} [TopologicalSpace α]
     {X S : Set α} (hX : IsPreconnected X) (hSX : S ⊆ X) (hdense : ∀ x ∈ X, x ∈ closure S)
-    (hloc : ∀ x ∈ X, ∃ W, IsOpen W ∧ x ∈ W ∧ IsPreconnected (W ∩ S)) : IsPreconnected S := by
+    (hloc : ∀ x ∈ X, ∃ W, IsOpen W ∧ x ∈ W ∧ IsPreconnected (W ∩ S))
+    : IsPreconnected S := by
   intro u v hu hv hSuv ⟨a, haS, hau⟩ ⟨b, hbS, hbv⟩
   by_contra hne
   have hne' : ∀ y ∈ S, y ∈ u → y ∈ v → False := fun y hy hyu hyv => hne ⟨y, hy, hyu, hyv⟩
   let P : Set α := {x | ∃ W, IsOpen W ∧ x ∈ W ∧ W ∩ S ⊆ u}
   let Q : Set α := {x | ∃ W, IsOpen W ∧ x ∈ W ∧ W ∩ S ⊆ v}
-  have hP : IsOpen P := isOpen_iff_forall_mem_open.mpr fun x ⟨W, hW, hxW, hWS⟩ =>
-    ⟨W, fun y hy => ⟨W, hW, hy, hWS⟩, hW, hxW⟩
-  have hQ : IsOpen Q := isOpen_iff_forall_mem_open.mpr fun x ⟨W, hW, hxW, hWS⟩ =>
-    ⟨W, fun y hy => ⟨W, hW, hy, hWS⟩, hW, hxW⟩
+  have hP : IsOpen P :=
+    isOpen_iff_forall_mem_open.mpr fun x ⟨W, hW, hxW, hWS⟩ =>
+      ⟨W, fun y hy => ⟨W, hW, hy, hWS⟩, hW, hxW⟩
+  have hQ : IsOpen Q :=
+    isOpen_iff_forall_mem_open.mpr fun x ⟨W, hW, hxW, hWS⟩ =>
+      ⟨W, fun y hy => ⟨W, hW, hy, hWS⟩, hW, hxW⟩
   have hcov : X ⊆ P ∪ Q := by
     intro x hx
     obtain ⟨W, hW, hxW, hWc⟩ := hloc x hx
@@ -44,13 +48,17 @@ theorem ManifoldZerosComplementConnected.isPreconnected_of_local {α : Type*} [T
   obtain ⟨y, ⟨hy₁, hy₂⟩, hyS⟩ := mem_closure_iff.mp (hdense x hxX) _ (hW₁.inter hW₂) ⟨hxW₁, hxW₂⟩
   exact hne' y hyS (hW₁u ⟨hy₁, hyS⟩) (hW₂v ⟨hy₂, hyS⟩)
 
-theorem ManifoldZerosComplementConnected.isPreconnected_ball_diff_countable {E : Type*}
-    [NormedAddCommGroup E] [NormedSpace ℝ E] (hE : 1 < Module.rank ℝ E) (c : E) {r : ℝ} (hr : 0 < r)
-    {s : Set E} (hs : s.Countable) : IsPreconnected (Metric.ball c r \ s) := by
+theorem ManifoldZerosComplementConnected.isPreconnected_ball_diff_countable
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (hE : 1 < Module.rank ℝ E) (c : E)
+    {r : ℝ} (hr : 0 < r)
+    {s : Set E} (hs : s.Countable)
+    : IsPreconnected (Metric.ball c r \ s) := by
   let e : OpenPartialHomeomorph E E := OpenPartialHomeomorph.univBall c r
   have hsrc : e.source = univ := OpenPartialHomeomorph.univBall_source c r
   have htgt : e.target = Metric.ball c r := OpenPartialHomeomorph.univBall_target c hr
-  have hc : (e ⁻¹' s).Countable := hs.preimage_of_injOn (e.injOn.mono (by rw [hsrc]; exact subset_univ _))
+  have hc : (e ⁻¹' s).Countable :=
+    hs.preimage_of_injOn (e.injOn.mono (by rw [hsrc]; exact subset_univ _))
   have hcont : ContinuousOn e univ := hsrc ▸ e.continuousOn
   have heq : e '' (e ⁻¹' s)ᶜ = Metric.ball c r \ s := by
     ext w
@@ -59,13 +67,16 @@ theorem ManifoldZerosComplementConnected.isPreconnected_ball_diff_countable {E :
       exact ⟨htgt ▸ e.map_source (hsrc ▸ mem_univ v), hv⟩
     · rintro ⟨hw, hws⟩
       rw [← htgt] at hw
-      exact ⟨e.symm w, by simpa [mem_compl_iff, mem_preimage, e.right_inv hw] using hws, e.right_inv hw⟩
+      exact
+        ⟨e.symm w, by simpa [mem_compl_iff, mem_preimage, e.right_inv hw] using hws, e.right_inv hw⟩
   rw [← heq]
   exact (hc.isConnected_compl_of_one_lt_rank hE).isPreconnected.image e (hcont.mono (subset_univ _))
 
-theorem ManifoldZerosComplementConnected.isPreconnected_inter_ne_zero_of_complex {V : Set ℂ}
-    (hVo : IsOpen V) (hV : IsPreconnected V) {φ : ℂ → ℂ} (hφ : AnalyticOnNhd ℂ φ V) {z₀ : ℂ}
-    (hz₀ : z₀ ∈ V) (hφz₀ : φ z₀ ≠ 0) : IsPreconnected (V ∩ {z | φ z ≠ 0}) := by
+theorem ManifoldZerosComplementConnected.isPreconnected_inter_ne_zero_of_complex
+    {V : Set ℂ} (hVo : IsOpen V) (hV : IsPreconnected V)
+    {φ : ℂ → ℂ} (hφ : AnalyticOnNhd ℂ φ V)
+    {z₀ : ℂ} (hz₀ : z₀ ∈ V) (hφz₀ : φ z₀ ≠ 0)
+    : IsPreconnected (V ∩ {z | φ z ≠ 0}) := by
   have hev : ∀ z ∈ V, ∀ᶠ w in 𝓝[≠] z, φ w ≠ 0 := by
     intro z hz
     rcases (hφ z hz).eventually_eq_zero_or_eventually_ne_zero with h | h
@@ -78,11 +89,13 @@ theorem ManifoldZerosComplementConnected.isPreconnected_inter_ne_zero_of_complex
     exact mem_closure_iff_frequently.mpr (h1.frequently.filter_mono nhdsWithin_le_nhds)
   · intro z hz
     obtain ⟨r, hr, hrV⟩ := Metric.isOpen_iff.mp hVo z hz
-    obtain ⟨r', hr', hr'φ⟩ := Metric.eventually_nhds_iff_ball.mp (eventually_nhdsWithin_iff.mp (hev z hz))
+    obtain ⟨r', hr', hr'φ⟩ :=
+      Metric.eventually_nhds_iff_ball.mp (eventually_nhdsWithin_iff.mp (hev z hz))
     have hρ : 0 < min r r' := lt_min hr hr'
     refine ⟨Metric.ball z (min r r'), Metric.isOpen_ball, Metric.mem_ball_self hρ, ?_⟩
-    have heq : Metric.ball z (min r r') ∩ (V ∩ {w | φ w ≠ 0}) =
-        Metric.ball z (min r r') \ ({z} \ {w | φ w ≠ 0}) := by
+    have heq
+        : Metric.ball z (min r r') ∩ (V ∩ {w | φ w ≠ 0})
+          = Metric.ball z (min r r') \ ({z} \ {w | φ w ≠ 0}) := by
       ext w
       simp only [mem_inter_iff, Set.mem_sdiff, mem_singleton_iff, mem_ofPred_eq]
       constructor
@@ -96,11 +109,14 @@ theorem ManifoldZerosComplementConnected.isPreconnected_inter_ne_zero_of_complex
         · exact hr'φ w (Metric.ball_subset_ball (min_le_right _ _) hb) hwz
     rw [heq]
     exact ManifoldZerosComplementConnected.isPreconnected_ball_diff_countable
-      (by rw [Complex.rank_real_complex]; exact_mod_cast (by norm_num : (1 : ℕ) < 2)) z hρ ((countable_singleton z).mono sdiff_subset)
+      (by rw [Complex.rank_real_complex]; exact_mod_cast (by norm_num : (1 : ℕ) < 2)) z hρ
+      ((countable_singleton z).mono sdiff_subset)
 
-theorem ManifoldZerosComplementConnected.isPreconnected_convex_inter_ne_zero {E : Type*}
-    [NormedAddCommGroup E] [NormedSpace ℂ E] {U : Set E} (hUo : IsOpen U) (hUc : Convex ℝ U)
-    {f : E → ℂ} (hf : AnalyticOnNhd ℂ f U) : IsPreconnected (U ∩ {z | f z ≠ 0}) := by
+theorem ManifoldZerosComplementConnected.isPreconnected_convex_inter_ne_zero
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {U : Set E} (hUo : IsOpen U) (hUc : Convex ℝ U)
+    {f : E → ℂ} (hf : AnalyticOnNhd ℂ f U)
+    : IsPreconnected (U ∩ {z | f z ≠ 0}) := by
   refine isPreconnected_of_forall_pair ?_
   rintro p ⟨hpU, hp⟩ q ⟨hqU, hq⟩
   let ℓ : ℂ → E := fun t => p + t • (q - p)
@@ -119,19 +135,27 @@ theorem ManifoldZerosComplementConnected.isPreconnected_convex_inter_ne_zero {E 
     module
   have h0 : (0 : ℂ) ∈ ℓ ⁻¹' U := by simpa [ℓ] using hpU
   have h1 : (1 : ℂ) ∈ ℓ ⁻¹' U := by simpa [ℓ] using hqU
-  refine ⟨ℓ '' (ℓ ⁻¹' U ∩ {t | f (ℓ t) ≠ 0}), ?_, ⟨0, ⟨h0, by simpa [ℓ] using hp⟩, by simp [ℓ]⟩,
-    ⟨1, ⟨h1, by simpa [ℓ] using hq⟩, by simp [ℓ]⟩, ?_⟩
+  refine ⟨
+    ℓ '' (ℓ ⁻¹' U ∩ {t | f (ℓ t) ≠ 0}),
+    ?_,
+    ⟨0, ⟨h0, by simpa [ℓ] using hp⟩, by simp [ℓ]⟩,
+    ⟨1, ⟨h1, by simpa [ℓ] using hq⟩, by simp [ℓ]⟩,
+    ?_
+  ⟩
   · rintro _ ⟨t, ⟨htV, ht⟩, rfl⟩
     exact ⟨htV, ht⟩
   · exact (ManifoldZerosComplementConnected.isPreconnected_inter_ne_zero_of_complex hVo
-      hVc.isPreconnected (φ := fun t => f (ℓ t)) (fun t ht => (hf (ℓ t) ht).comp (hℓa t)) h0
-      (by simpa [ℓ] using hp)).image ℓ hℓc.continuousOn
+      hVc.isPreconnected
+      (φ := fun t => f (ℓ t))
+      (fun t ht => (hf (ℓ t) ht).comp (hℓa t))
+      h0 (by simpa [ℓ] using hp)).image ℓ hℓc.continuousOn
 
 theorem ManifoldZerosComplementConnected.proof : ManifoldZerosComplementConnected.Statement := by
   intro σ _ R h hR hreg hh ⟨x₀, hx₀R, hx₀⟩
 
-  have chart : ∀ x ∈ R, ∃ (d : ℕ) (B : Set (Fin d → ℂ)) (W : Set (σ → ℂ)) (g : (Fin d → ℂ) → σ → ℂ),
-      IsOpen B ∧ Convex ℝ B ∧ IsOpen W ∧ x ∈ W ∧ AnalyticOnNhd ℂ g B ∧ R ∩ W = g '' B := by
+  have chart
+      : ∀ x ∈ R, ∃ (d : ℕ) (B : Set (Fin d → ℂ)) (W : Set (σ → ℂ)) (g : (Fin d → ℂ) → σ → ℂ),
+        IsOpen B ∧ Convex ℝ B ∧ IsOpen W ∧ x ∈ W ∧ AnalyticOnNhd ℂ g B ∧ R ∩ W = g '' B := by
     intro x hx
     obtain ⟨-, d, A, O, V, g, hO, hV, hxV, hg, hAg, hRV⟩ := hreg x hx
     have hxO : A x ∈ O := by
@@ -139,9 +163,18 @@ theorem ManifoldZerosComplementConnected.proof : ManifoldZerosComplementConnecte
       rw [← hgy, hAg y hy]
       exact hy
     obtain ⟨ε, hε, hεO⟩ := Metric.isOpen_iff.mp hO (A x) hxO
-    refine ⟨d, Metric.ball (A x) ε, V ∩ A ⁻¹' Metric.ball (A x) ε, g, Metric.isOpen_ball,
-      convex_ball _ _, hV.inter (Metric.isOpen_ball.preimage A.continuous),
-      ⟨hxV, Set.mem_preimage.mpr (Metric.mem_ball_self hε)⟩, hg.mono hεO, ?_⟩
+    refine ⟨
+      d,
+      Metric.ball (A x) ε,
+      V ∩ A ⁻¹' Metric.ball (A x) ε,
+      g,
+      Metric.isOpen_ball,
+      convex_ball _ _,
+      hV.inter (Metric.isOpen_ball.preimage A.continuous),
+      ⟨hxV, Set.mem_preimage.mpr (Metric.mem_ball_self hε)⟩,
+      hg.mono hεO,
+      ?_
+    ⟩
     ext z
     constructor
     · rintro ⟨hzR, hzV, hzB⟩
@@ -155,8 +188,9 @@ theorem ManifoldZerosComplementConnected.proof : ManifoldZerosComplementConnecte
       show A (g y) ∈ Metric.ball (A x) ε
       rw [hAg y (hεO hy)]
       exact hy
-  have chartR : ∀ {d : ℕ} {B : Set (Fin d → ℂ)} {W : Set (σ → ℂ)} {g : (Fin d → ℂ) → σ → ℂ},
-      R ∩ W = g '' B → ∀ y ∈ B, g y ∈ R := by
+  have chartR
+      : ∀ {d : ℕ} {B : Set (Fin d → ℂ)} {W : Set (σ → ℂ)} {g : (Fin d → ℂ) → σ → ℂ},
+        R ∩ W = g '' B → ∀ y ∈ B, g y ∈ R := by
     intro d B W g hRW y hy
     have : g y ∈ R ∩ W := by rw [hRW]; exact ⟨y, hy, rfl⟩
     exact this.1
@@ -164,8 +198,9 @@ theorem ManifoldZerosComplementConnected.proof : ManifoldZerosComplementConnecte
   let T : Set (σ → ℂ) := {x | ∀ᶠ z in 𝓝 x, z ∈ R → h z = 0}
   have hTo : IsOpen T := isOpen_setOfPred_eventually_nhds
   let T₂ : Set (σ → ℂ) := {x | ∃ W, IsOpen W ∧ x ∈ W ∧ ∀ z ∈ W ∩ R, z ∉ T}
-  have hT₂o : IsOpen T₂ := isOpen_iff_forall_mem_open.mpr fun x ⟨W, hW, hxW, hWT⟩ =>
-    ⟨W, fun y hy => ⟨W, hW, hy, hWT⟩, hW, hxW⟩
+  have hT₂o : IsOpen T₂ :=
+    isOpen_iff_forall_mem_open.mpr fun x ⟨W, hW, hxW, hWT⟩ =>
+      ⟨W, fun y hy => ⟨W, hW, hy, hWT⟩, hW, hxW⟩
   have hcov : R ⊆ T ∪ T₂ := by
     intro x hx
     obtain ⟨d, B, W, g, hBo, hBc, hWo, hxW, hg, hRW⟩ := chart x hx

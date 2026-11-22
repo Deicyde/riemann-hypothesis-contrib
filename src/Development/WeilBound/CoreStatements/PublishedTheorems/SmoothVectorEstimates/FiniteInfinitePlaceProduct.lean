@@ -13,7 +13,9 @@ public import GroundTheory.GlobalFields.Adele.WeakApproxUnits
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter BoundedContinuousFunction
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.LFun Formalism.UG Formalism.L2.Host
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
+  GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.LFun
+  Formalism.UG Formalism.L2.Host
 
 namespace PositivityTheory.jumpWindows
 
@@ -23,8 +25,10 @@ open Neutral.B1
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem loc_eq_one_of_val {ν : HChar L} {v : HeightOneSpectrum (𝓞 L)} (hu : ν.UnrAt v) (hv : ν.val v = 1)
-    (x : (v.adicCompletion L)ˣ) : ν.loc v x = 1 := by
+theorem loc_eq_one_of_val
+    {ν : HChar L} {v : HeightOneSpectrum (𝓞 L)}
+    (hu : ν.UnrAt v) (hv : ν.val v = 1) (x : (v.adicCompletion L)ˣ)
+    : ν.loc v x = 1 := by
   set π := atFin v (unif v) with hπ
   have hπv : Valued.v (π : v.adicCompletion L) = WithZero.exp (-1) := unif_spec v
   have hπ1 : ν.loc v π = 1 := by rw [HChar.val_eq ν hu π (unif_spec v)]; exact hv
@@ -40,19 +44,19 @@ theorem loc_eq_one_of_val {ν : HChar L} {v : HeightOneSpectrum (𝓞 L)} (hu : 
   rw [map_mul, map_zpow, hπ1, _root_.one_zpow, mul_one] at h2
   exact h2
 
-theorem inf_eq_prod (ν : HChar L) (k : Lˣ) :
-    ν.inf k = ∏ w ∈ (Finset.univ : Finset (InfinitePlace L)), ν.locInf w (atInf w k) := by
+theorem inf_eq_prod (ν : HChar L) (k : Lˣ)
+    : ν.inf k = ∏ w ∈ (Finset.univ : Finset (InfinitePlace L)), ν.locInf w (atInf w k) := by
   classical
   simp only [HChar.inf, HChar.locInf, infDiag, MonoidHom.comp_apply]
-  have hp : ∀ (s : Finset (InfinitePlace L)) (f : InfinitePlace L → Lˣ →* Ideles L),
-      (∏ w ∈ s, f w) k = ∏ w ∈ s, f w k := by
+  have hp
+      : ∀ (s : Finset (InfinitePlace L)) (f : InfinitePlace L → Lˣ →* Ideles L),
+        (∏ w ∈ s, f w) k = ∏ w ∈ s, f w k := by
     intro s f
     induction s using Finset.induction_on with
     | empty => simp
     | insert a s ha ih => simp [ha, ih, MonoidHom.mul_apply]
   rw [hp, map_prod]
   rfl
-
 
 set_option maxHeartbeats 400000 in
 theorem eq_one (ν : HChar L) (h : ∀ᶠ w in cofinite, ν.val w = 1) : ν = 1 := by
@@ -67,10 +71,16 @@ theorem eq_one (ν : HChar L) (h : ∀ᶠ w in cofinite, ν.val w = 1) : ν = 1 
     loc_eq_one_of_val (hS v hv).1 (hS v hv).2 x
   have hprod : ∀ k : Lˣ, ν.inf k * ∏ v ∈ S, ν.locK v k = 1 := by
     intro k
-    have h0 : (ν.inf k * ∏ v ∈ S, ν.locK v k) *
-        ∏ᶠ (v : HeightOneSpectrum (𝓞 L)) (_ : v ∉ S), ν.val v ^ GlobalTheory.Mem.Chr.ordF v k = 1 :=
-      GlobalTheory.Mem.Chr.CharModel.productRule (ν : GlobalTheory.Mem.Chr.HChar L) S (fun v hv => (hS v hv).1) k
-    have hf : ∏ᶠ (v : HeightOneSpectrum (𝓞 L)) (_ : v ∉ S), ν.val v ^ GlobalTheory.Mem.Chr.ordF v k = 1 := by
+    have h0
+        : (ν.inf k * ∏ v ∈ S, ν.locK v k)
+            * ∏ᶠ (v : HeightOneSpectrum (𝓞 L)) (_ : v ∉ S), ν.val v ^ GlobalTheory.Mem.Chr.ordF v k
+          = 1 :=
+      GlobalTheory.Mem.Chr.CharModel.productRule (ν : GlobalTheory.Mem.Chr.HChar L) S
+        (fun v hv => (hS v hv).1)
+        k
+    have hf
+        : ∏ᶠ (v : HeightOneSpectrum (𝓞 L)) (_ : v ∉ S), ν.val v ^ GlobalTheory.Mem.Chr.ordF v k
+          = 1 := by
       apply finprod_eq_one_of_forall_eq_one
       intro v
       rw [finprod_eq_if]
@@ -79,14 +89,19 @@ theorem eq_one (ν : HChar L) (h : ∀ᶠ w in cofinite, ν.val w = 1) : ν = 1 
       · rw [if_pos hv, (hS v hv).2, _root_.one_zpow]
     rw [hf, mul_one] at h0
     exact h0
-  have key : ∀ p : ((v : S) → (v.1.adicCompletion L)ˣ) ×
-      ((w : (Finset.univ : Finset (InfinitePlace L))) → (w.1.Completion)ˣ),
-      (∏ v : S, ν.loc v.1 (p.1 v)) *
-        ∏ w : (Finset.univ : Finset (InfinitePlace L)), ν.locInf w.1 (p.2 w) = 1 := by
-    have hc : Continuous fun p : ((v : S) → (v.1.adicCompletion L)ˣ) ×
-        ((w : (Finset.univ : Finset (InfinitePlace L))) → (w.1.Completion)ˣ) =>
-        (∏ v : S, ν.loc v.1 (p.1 v)) *
-          ∏ w : (Finset.univ : Finset (InfinitePlace L)), ν.locInf w.1 (p.2 w) := by
+  have key
+      : ∀ p
+          : ((v : S) → (v.1.adicCompletion L)ˣ)
+            × ((w : (Finset.univ : Finset (InfinitePlace L))) → (w.1.Completion)ˣ),
+        (∏ v : S, ν.loc v.1 (p.1 v))
+            * ∏ w : (Finset.univ : Finset (InfinitePlace L)), ν.locInf w.1 (p.2 w)
+          = 1 := by
+    have hc : Continuous
+        fun p
+            : ((v : S) → (v.1.adicCompletion L)ˣ)
+              × ((w : (Finset.univ : Finset (InfinitePlace L))) → (w.1.Completion)ˣ) =>
+          (∏ v : S, ν.loc v.1 (p.1 v))
+            * ∏ w : (Finset.univ : Finset (InfinitePlace L)), ν.locInf w.1 (p.2 w) := by
       apply Continuous.mul
       · apply continuous_finsetProd
         intro v _
@@ -96,14 +111,19 @@ theorem eq_one (ν : HChar L) (h : ∀ᶠ w in cofinite, ν.val w = 1) : ν = 1 
         intro w _
         exact (hνc.comp (GlobalTheory.InfTypeLocal.continuous_infIdele L w.1)).comp
           ((continuous_apply w).comp continuous_snd)
-    have hd := GroundTheory.Global.denseRange_units_prod_pi S (Finset.univ : Finset (InfinitePlace L))
+    have hd :=
+      GroundTheory.Global.denseRange_units_prod_pi S (Finset.univ : Finset (InfinitePlace L))
     intro p
     refine hd.induction_on p (isClosed_eq hc continuous_const) (fun k => ?_)
     beta_reduce
-    have e1 : (∏ v : S, ν.loc v.1 (Units.map ↑(algebraMap L (v.1.adicCompletion L)) k)) =
-        ∏ v ∈ S, ν.locK v k := Finset.prod_coe_sort S (fun v => ν.locK v k)
-    have e2 : (∏ w : (Finset.univ : Finset (InfinitePlace L)),
-        ν.locInf w.1 (Units.map ↑(algebraMap L w.1.Completion) k)) = ν.inf k := by
+    have e1
+        : (∏ v : S, ν.loc v.1 (Units.map ↑(algebraMap L (v.1.adicCompletion L)) k))
+          = ∏ v ∈ S, ν.locK v k :=
+      Finset.prod_coe_sort S (fun v => ν.locK v k)
+    have e2
+        : (∏ w : (Finset.univ : Finset (InfinitePlace L)),
+            ν.locInf w.1 (Units.map ↑(algebraMap L w.1.Completion) k))
+          = ν.inf k := by
       rw [inf_eq_prod]
       exact Finset.prod_coe_sort _ (fun w => ν.locInf w (atInf w k))
     exact (congrArg₂ (· * ·) e1 e2).trans (by rw [mul_comm]; exact hprod k)
@@ -112,32 +132,37 @@ theorem eq_one (ν : HChar L) (h : ∀ᶠ w in cofinite, ν.val w = 1) : ν = 1 
     have h0 := key (Pi.mulSingle ⟨v, hv⟩ x, 1)
     dsimp only at h0
     rw [Fintype.prod_eq_single ⟨v, hv⟩ (fun v' hne => by rw [Pi.mulSingle_eq_of_ne hne, map_one]),
-      Pi.mulSingle_eq_same] at h0
+        Pi.mulSingle_eq_same]
+      at h0
     simpa using h0
   have hinf : ∀ w x, ν.locInf w x = 1 := by
     intro w x
     have h0 := key (1, Pi.mulSingle ⟨w, Finset.mem_univ w⟩ x)
     dsimp only at h0
     rw [Fintype.prod_eq_single (⟨w, Finset.mem_univ w⟩ : (Finset.univ : Finset (InfinitePlace L)))
-      (fun w' hne => by rw [Pi.mulSingle_eq_of_ne hne, map_one]), Pi.mulSingle_eq_same] at h0
+          (fun w' hne => by rw [Pi.mulSingle_eq_of_ne hne, map_one]),
+        Pi.mulSingle_eq_same]
+      at h0
     simpa using h0
-  have hall := GlobalTheory.Mem.Chr.Determ.eq_one_of_components (ψ := (ν : Ideles L →* ℂˣ)) hνc
-    (fun v k => by
-      by_cases hv : v ∈ S
-      · exact hlocS v hv _
-      · exact hgood v hv _)
-    (fun k => by
-      have h0 := inf_eq_prod ν k
-      rw [Finset.prod_eq_one (fun w _ => hinf w _)] at h0
-      exact h0)
+  have hall :=
+    GlobalTheory.Mem.Chr.Determ.eq_one_of_components (ψ := (ν : Ideles L →* ℂˣ)) hνc
+      (fun v k => by
+        by_cases hv : v ∈ S
+        · exact hlocS v hv _
+        · exact hgood v hv _)
+      (fun k => by
+        have h0 := inf_eq_prod ν k
+        rw [Finset.prod_eq_one (fun w _ => hinf w _)] at h0
+        exact h0)
   exact Subtype.ext (MonoidHom.ext fun a => by rw [hall a]; rfl)
 
 end FiniteInfinitePlaceProduct
 
 theorem finite_infinite_product_eq_one : HeckeCharacterRigidity := by
   intro E _ _ _ ω ω' h
-  have h1 := FiniteInfinitePlaceProduct.eq_one (ω * ω'⁻¹) (h.mono fun w hw => by
-    rw [HChar.val_mul, HChar.val_inv, hw, mul_inv_cancel])
+  have h1 :=
+    FiniteInfinitePlaceProduct.eq_one (ω * ω'⁻¹)
+      (h.mono fun w hw => by rw [HChar.val_mul, HChar.val_inv, hw, mul_inv_cancel])
   exact mul_inv_eq_one.1 h1
 
 end PositivityTheory.jumpWindows

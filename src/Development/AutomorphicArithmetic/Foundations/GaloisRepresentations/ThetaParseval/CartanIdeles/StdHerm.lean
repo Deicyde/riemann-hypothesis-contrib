@@ -8,7 +8,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 noncomputable section
 
 open scoped nonZeroDivisors Matrix ComplexOrder
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 namespace UpperTheory.Gal.TP.Skew
 

@@ -6,32 +6,33 @@ public import Mathlib
 
 namespace GlobalTheory.GramLinearMap
 
-theorem gram_comb {P : Type} [AddCommGroup P] [Module ℂ P] {B : P →ₗ⋆[ℂ] P →ₗ[ℂ] ℂ}
-    {P' : Type} [AddCommGroup P'] [Module ℂ P'] {B' : P' →ₗ⋆[ℂ] P' →ₗ[ℂ] ℂ} {U : Type}
-    (f : U → P) (f' : U → P') {c d : ℂ}
-    (h : ∀ u v : U, B (f u) (f v) * c = d * B' (f' u) (f' v)) (x y : U →₀ ℂ) :
-    B (Finsupp.linearCombination ℂ f x) (Finsupp.linearCombination ℂ f y) * c =
-      d * B' (Finsupp.linearCombination ℂ f' x) (Finsupp.linearCombination ℂ f' y) := by
+theorem gram_comb
+    {P : Type} [AddCommGroup P] [Module ℂ P]
+    {B : P →ₗ⋆[ℂ] P →ₗ[ℂ] ℂ} {P' : Type} [AddCommGroup P'] [Module ℂ P']
+    {B' : P' →ₗ⋆[ℂ] P' →ₗ[ℂ] ℂ} {U : Type} (f : U → P) (f' : U → P')
+    {c d : ℂ} (h : ∀ u v : U, B (f u) (f v) * c = d * B' (f' u) (f' v))
+    (x y : U →₀ ℂ)
+    : B (Finsupp.linearCombination ℂ f x) (Finsupp.linearCombination ℂ f y) * c
+      = d * B' (Finsupp.linearCombination ℂ f' x) (Finsupp.linearCombination ℂ f' y) := by
   induction x using Finsupp.induction_linear with
   | zero => simp
-  | add x₁ x₂ h₁ h₂ =>
-    simp only [map_add (f := _), LinearMap.add_apply, add_mul, mul_add, h₁, h₂]
+  | add x₁ x₂ h₁ h₂ => simp only [map_add (f := _), LinearMap.add_apply, add_mul, mul_add, h₁, h₂]
   | single u a =>
     induction y using Finsupp.induction_linear with
     | zero => simp
-    | add y₁ y₂ h₁ h₂ =>
-      simp only [map_add (f := _), add_mul, mul_add, h₁, h₂]
+    | add y₁ y₂ h₁ h₂ => simp only [map_add (f := _), add_mul, mul_add, h₁, h₂]
     | single v b =>
       simp only [Finsupp.linearCombination_single, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
         smul_eq_mul, RingHom.id_apply]
       linear_combination (b * (starRingEnd ℂ) a) * h u v
 
-theorem exists_linearMap_of_gram {P : Type} [AddCommGroup P] [Module ℂ P]
-    {B : P →ₗ⋆[ℂ] P →ₗ[ℂ] ℂ}
-    {P' : Type} [AddCommGroup P'] [Module ℂ P'] {B' : P' →ₗ⋆[ℂ] P' →ₗ[ℂ] ℂ} {U : Type}
-    (f : U → P) (f' : U → P') (hB : ∀ y : P, B y y = 0 → y = 0) {c d : ℂ} (hc : c ≠ 0)
-    (h : ∀ u v : U, B (f u) (f v) * c = d * B' (f' u) (f' v)) :
-    ∃ ψ : P' →ₗ[ℂ] P, ∀ u : U, ψ (f' u) = f u := by
+theorem exists_linearMap_of_gram
+    {P : Type} [AddCommGroup P] [Module ℂ P]
+    {B : P →ₗ⋆[ℂ] P →ₗ[ℂ] ℂ} {P' : Type} [AddCommGroup P'] [Module ℂ P']
+    {B' : P' →ₗ⋆[ℂ] P' →ₗ[ℂ] ℂ} {U : Type} (f : U → P) (f' : U → P')
+    (hB : ∀ y : P, B y y = 0 → y = 0)
+    {c d : ℂ} (hc : c ≠ 0) (h : ∀ u v : U, B (f u) (f v) * c = d * B' (f' u) (f' v))
+    : ∃ ψ : P' →ₗ[ℂ] P, ∀ u : U, ψ (f' u) = f u := by
   set T := Finsupp.linearCombination ℂ f with hT
   set T' := Finsupp.linearCombination ℂ f' with hT'
   have hker : ∀ x, T' x = 0 → T x = 0 := by

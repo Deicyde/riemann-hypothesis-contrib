@@ -9,9 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CotangentIma
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 open scoped TensorProduct
 
@@ -21,9 +23,11 @@ noncomputable section
 
 namespace GlobalTheory.ParamFrame
 
-theorem linearIndependent_toCotangent {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    {m : ℕ} (r : Fin m → R) (hrsp : FinalTheorems.Rsp R m r) (hr : ∀ i, r i ∈ IsLocalRing.maximalIdeal R) :
-    LinearIndependent (IsLocalRing.ResidueField R) (fun i =>
+theorem linearIndependent_toCotangent
+    {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    {m : ℕ}
+    (r : Fin m → R) (hrsp : FinalTheorems.Rsp R m r) (hr : ∀ i, r i ∈ IsLocalRing.maximalIdeal R)
+    : LinearIndependent (IsLocalRing.ResidueField R) (fun i =>
       ((IsLocalRing.maximalIdeal R).toCotangent ⟨r i, hr i⟩ : IsLocalRing.CotangentSpace R)) := by
   classical
   haveI : IsRegularLocalRing R := by
@@ -39,7 +43,8 @@ theorem linearIndependent_toCotangent {R : Type} [CommRing R] [IsLocalRing R] [I
     rw [← hrsp.2] at this
     exact_mod_cast this
   refine linearIndependent_of_top_le_span_of_card_eq_finrank ?_ (by simp [hfr])
-  have hsp : Submodule.span R (Set.range fun i => (⟨r i, hr i⟩ : IsLocalRing.maximalIdeal R)) = ⊤ := by
+  have hsp
+      : Submodule.span R (Set.range fun i => (⟨r i, hr i⟩ : IsLocalRing.maximalIdeal R)) = ⊤ := by
     apply Submodule.map_injective_of_injective (IsLocalRing.maximalIdeal R).injective_subtype
     rw [Submodule.map_span, Submodule.map_subtype_top, ← Set.range_comp]
     exact hrsp.1
@@ -47,20 +52,24 @@ theorem linearIndependent_toCotangent {R : Type} [CommRing R] [IsLocalRing R] [I
   rw [← Set.range_comp] at hsp
   exact hsp.ge
 
-
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX) in
 open GlobalTheory.AdaptedFrame in
-theorem exists_frame_of_rsp : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (q : Y ⟶ Sp k) (n : ℕ) [SmoothOfRelativeDimension n q] (y : Y) (U : Y.affineOpens) (hy : y ∈ U.1) (c : ℕ) (a : Fin c → Γ(Y, U.1)), FinalTheorems.Rsp (Y.presheaf.stalk y) c (fun i => Y.presheaf.germ U.1 y hy (a i)) → ∃ (V : Y.Opens) (hV : V ≤ U.1) (_ : y ∈ V) (z : Fin n → Γ(Y, V)) (e : Fin c ↪ Fin n), (∀ j, z (e j) = resG Y hV (a j)) ∧ IsFrame (dOn q z) := by
+theorem exists_frame_of_rsp
+    : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y]
+        (q : Y ⟶ Sp k) (n : ℕ) [SmoothOfRelativeDimension n q] (y : Y) (U : Y.affineOpens)
+        (hy : y ∈ U.1) (c : ℕ) (a : Fin c → Γ(Y, U.1)),
+      FinalTheorems.Rsp (Y.presheaf.stalk y) c (fun i => Y.presheaf.germ U.1 y hy (a i))
+        → ∃ (V : Y.Opens) (hV : V ≤ U.1) (_ : y ∈ V) (z : Fin n → Γ(Y, V)) (e : Fin c ↪ Fin n),
+          (∀ j, z (e j) = resG Y hV (a j)) ∧ IsFrame (dOn q z) := by
   classical
   intro k _ _ X _ _ p n _ y O hyO m s hrsp
   let f : Fin m → X.presheaf.stalk y := fun i => X.presheaf.germ O.1 y hyO (s i)
-  have hf : ∀ i, f i ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk y) :=
-    fun i => hrsp.1 ▸ Ideal.subset_span ⟨i, rfl⟩
+  have hf : ∀ i, f i ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk y) := fun i =>
+    hrsp.1 ▸ Ideal.subset_span ⟨i, rfl⟩
   have hli := linearIndependent_toCotangent f hrsp hf
   obtain ⟨U, x, b, hUO, hyU, hU, hb⟩ := exists_basis_dFun p n hyO
   let z₀ : Fin m → Γ(X, U) := fun j => resG X hUO (s j)
-  have hz₀ (j : Fin m) : (X.presheaf.germ U y hyU).hom (z₀ j) = f j := by
-    rw [germ_resG]
+  have hz₀ (j : Fin m) : (X.presheaf.germ U y hyU).hom (z₀ j) = f j := by rw [germ_resG]
 
   let a : Fin m → Fin n → Γ(X, U) := fun j l => b.repr (dFun (algX p U) (z₀ j)) l
   have ha (j : Fin m) : dFun (algX p U) (z₀ j) = ∑ l, a j l • dFun (algX p U) (x l) := by
@@ -78,27 +87,36 @@ theorem exists_frame_of_rsp : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.
     (IsLocalRing.residue (X.presheaf.stalk y)).comp (X.presheaf.germ U y hyU).hom
   let ab : Fin m → Fin n → IsLocalRing.ResidueField (X.presheaf.stalk y) := fun j l => ρ (a j l)
   have hab : LinearIndependent (IsLocalRing.ResidueField (X.presheaf.stalk y)) ab := by
-    let wx : Fin n → IsLocalRing.ResidueField (X.presheaf.stalk y) ⊗[X.presheaf.stalk y]
-        Ω[(X.presheaf.stalk y)⁄k] :=
-      fun l => 1 ⊗ₜ KaehlerDifferential.D k (X.presheaf.stalk y) ((X.presheaf.germ U y hyU).hom (x l))
+    let wx
+        : Fin n
+          → IsLocalRing.ResidueField (X.presheaf.stalk y) ⊗[X.presheaf.stalk y]
+            Ω[(X.presheaf.stalk y)⁄k] := fun l =>
+      1 ⊗ₜ KaehlerDifferential.D k (X.presheaf.stalk y) ((X.presheaf.germ U y hyU).hom (x l))
     refine LinearIndependent.of_comp (Fintype.linearCombination _ wx) ?_
-    have key : ⇑(Fintype.linearCombination (IsLocalRing.ResidueField (X.presheaf.stalk y)) wx) ∘ ab =
-        fun j => (1 : IsLocalRing.ResidueField (X.presheaf.stalk y)) ⊗ₜ[X.presheaf.stalk y]
-          KaehlerDifferential.D k (X.presheaf.stalk y) (f j) := by
+    have key
+        : ⇑(Fintype.linearCombination (IsLocalRing.ResidueField (X.presheaf.stalk y)) wx) ∘ ab
+          = fun j =>
+            (1 : IsLocalRing.ResidueField (X.presheaf.stalk y)) ⊗ₜ[X.presheaf.stalk y]
+              KaehlerDifferential.D k (X.presheaf.stalk y) (f j) := by
       funext j
       rw [Function.comp_apply, Fintype.linearCombination_apply, ← hz₀ j]
       have e1 := congrArg (KaehlerDifferential.map k k Γ(X, U) (X.presheaf.stalk y)) (ha j)
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum] at e1
       change KaehlerDifferential.map k k Γ(X, U) (X.presheaf.stalk y)
-        (KaehlerDifferential.D k Γ(X, U) (z₀ j)) = _ at e1
+            (KaehlerDifferential.D k Γ(X, U) (z₀ j))
+          = _
+        at e1
       rw [KaehlerDifferential.map_D] at e1
-      change KaehlerDifferential.D k (X.presheaf.stalk y) ((X.presheaf.germ U y hyU).hom (z₀ j)) = _ at e1
+      change KaehlerDifferential.D k (X.presheaf.stalk y) ((X.presheaf.germ U y hyU).hom (z₀ j)) = _
+        at e1
       rw [e1, TensorProduct.tmul_sum]
       refine Finset.sum_congr rfl fun l _ => ?_
       rw [map_smul]
-      change _ = 1 ⊗ₜ (a j l • KaehlerDifferential.map k k Γ(X, U) (X.presheaf.stalk y)
-        (KaehlerDifferential.D k Γ(X, U) (x l)))
+      change _
+        = 1
+          ⊗ₜ (a j l • KaehlerDifferential.map k k Γ(X, U) (X.presheaf.stalk y)
+            (KaehlerDifferential.D k Γ(X, U) (x l)))
       rw [KaehlerDifferential.map_D, ← algebraMap_smul (X.presheaf.stalk y) (a j l),
         TensorProduct.tmul_smul, ← algebraMap_smul (IsLocalRing.ResidueField (X.presheaf.stalk y))]
       rfl
@@ -118,8 +136,10 @@ theorem exists_frame_of_rsp : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.
       simp [Pi.single_apply]
   have hform : dOn p z = c.det • dOn p x := dForm_eq_det_smul z x c hdz
   have hρ : ρ c.det ≠ 0 := by
-    have hm : c.map ρ = Matrix.of (Function.extend e ab
-        (fun i => Pi.single i (1 : IsLocalRing.ResidueField (X.presheaf.stalk y)))) := by
+    have hm
+        : c.map ρ
+          = Matrix.of (Function.extend e ab
+            (fun i => Pi.single i (1 : IsLocalRing.ResidueField (X.presheaf.stalk y)))) := by
       ext i l
       by_cases hi : ∃ j, e j = i
       · obtain ⟨j, rfl⟩ := hi
@@ -135,7 +155,8 @@ theorem exists_frame_of_rsp : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.
     (IsLocalRing.residue_ne_zero_iff_isUnit _).1 hρ
   have hyW : y ∈ X.basicOpen c.det := (X.mem_basicOpen c.det y hyU).2 hunit
   have hWU : X.basicOpen c.det ≤ U := X.basicOpen_le _
-  refine ⟨X.basicOpen c.det, hWU.trans hUO, hyW, fun i => resG X hWU (z i), ⟨e, he⟩, fun j => ?_, ?_⟩
+  refine
+    ⟨X.basicOpen c.det, hWU.trans hUO, hyW, fun i => resG X hWU (z i), ⟨e, he⟩, fun j => ?_, ?_⟩
   · simp only [z, z₀, Function.Embedding.coeFn_mk, he.extend_apply]
     exact resG_resG _ _ _
   · have hx : IsFrame (dOn p x) := ⟨hU, isFreeGen_dForm x b hb⟩

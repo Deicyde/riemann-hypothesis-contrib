@@ -249,16 +249,20 @@ lemma sq_aug_fg (hv : v.Integers R) {N : Type} [AddCommGroup N]
 
 end Gen
 
-private theorem exists_smul_delta_mem_of_isLat {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
-    {v : Valuation C NNReal} (hv : v.Integers R) {N : Type} [Fintype N] [DecidableEq N]
-    (M : Submodule R (N → C)) (hM : IsLat R M) :
-    ∃ d : R, d ≠ 0 ∧ ∀ x : N, (fun y => if y = x then algebraMap R C d else 0) ∈ M := by
+private theorem exists_smul_delta_mem_of_isLat
+    {C : Type} [Field C]
+    {R : Type} [CommRing R] [Algebra R C]
+    {v : Valuation C NNReal} (hv : v.Integers R)
+    {N : Type} [Fintype N] [DecidableEq N]
+    (M : Submodule R (N → C)) (hM : IsLat R M)
+    : ∃ d : R, d ≠ 0 ∧ ∀ x : N, (fun y => if y = x then algebraMap R C d else 0) ∈ M := by
   classical
   haveI := hv.hom_inj.isDomain
   haveI := hv.isFractionRing
   obtain ⟨B, hB, rfl⟩ := hM
-  obtain ⟨⟨d, hd⟩, hint⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors R)
-    (Finset.univ.image (fun q : N × N => B⁻¹ q.1 q.2))
+  obtain ⟨⟨d, hd⟩, hint⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors R)
+      (Finset.univ.image (fun q : N × N => B⁻¹ q.1 q.2))
   refine ⟨d, nonZeroDivisors.ne_zero hd, fun x => ?_⟩
   have hx : ∀ j, ∃ a : R, algebraMap R C a = d • B⁻¹ j x := fun j =>
     (RingHom.mem_rangeS).1 (hint _ (Finset.mem_image.2 ⟨(j, x), Finset.mem_univ _, rfl⟩))
@@ -279,10 +283,13 @@ private theorem exists_smul_delta_mem_of_isLat {C : Type} [Field C] {R : Type} [
   rw [heq]
   exact Submodule.sum_mem _ (fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩))
 
-private theorem exists_smul_augIdeal_mem_sqIdeal_of_isLat {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
-    {v : Valuation C NNReal} (hv : v.Integers R) {N : Type} [AddCommGroup N] [Fintype N]
-    [DecidableEq N] (M : Submodule R (N → C)) (hM : IsLat R M) (hint : M ≤ intFun R N) :
-    ∃ r : R, r ≠ 0 ∧ ∀ f ∈ augIdeal M, r • f ∈ sqIdeal (augIdeal M) := by
+private theorem exists_smul_augIdeal_mem_sqIdeal_of_isLat
+    {C : Type} [Field C]
+    {R : Type} [CommRing R] [Algebra R C]
+    {v : Valuation C NNReal} (hv : v.Integers R)
+    {N : Type} [AddCommGroup N] [Fintype N] [DecidableEq N]
+    (M : Submodule R (N → C)) (hM : IsLat R M) (hint : M ≤ intFun R N)
+    : ∃ r : R, r ≠ 0 ∧ ∀ f ∈ augIdeal M, r • f ∈ sqIdeal (augIdeal M) := by
   classical
   haveI := hv.hom_inj.isDomain
   obtain ⟨d, hd, hδ⟩ := exists_smul_delta_mem_of_isLat hv M hM
@@ -315,10 +322,20 @@ private theorem exists_smul_augIdeal_mem_sqIdeal_of_isLat {C : Type} [Field C] {
       · intro h
         exact absurd (Finset.mem_erase.2 ⟨hy, Finset.mem_univ y⟩) h
   rw [heq]
-  exact Submodule.sum_mem _ (fun x hx => Submodule.smul_mem _ _ (Submodule.subset_span
-    ⟨δ x, hδaug x (Finset.ne_of_mem_erase hx), δ x, hδaug x (Finset.ne_of_mem_erase hx), rfl⟩))
+  exact Submodule.sum_mem _ (fun x hx =>
+    Submodule.smul_mem _ _
+      (Submodule.subset_span
+        ⟨δ x, hδaug x (Finset.ne_of_mem_erase hx), δ x, hδaug x (Finset.ne_of_mem_erase hx), rfl⟩))
 
-theorem lens : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N], (∀ x : N, p • x = 0) → ∀ AA : HopfOrder (C := C) R N, ∃ cA cN cO : NNReal, cA ≠ 0 ∧ cN ≠ 0 ∧ cO ≠ 0 ∧ HasLen v R (AFQuot p AA.carrier) cA ∧ HasColen R v AA.carrier cN ∧ HasLen v R (OmAA AA.carrier) cO := by
+theorem lens
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N],
+          (∀ x : N, p • x = 0)
+            → ∀ AA : HopfOrder (C := C) R N, ∃ cA cN cO : NNReal,
+              cA ≠ 0 ∧ cN ≠ 0 ∧ cO ≠ 0 ∧ HasLen v R (AFQuot p AA.carrier) cA
+                ∧ HasColen R v AA.carrier cN ∧ HasLen v R (OmAA AA.carrier) cO := by
   intro p _ C _ _ _ v R _ _ hv hp N _ _ _ hN AA
   classical
   haveI := hv.hom_inj.isDomain

@@ -11,13 +11,14 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IntegralP
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.MixParseval
-
 
 set_option maxHeartbeats 400000 in
 set_option synthInstance.maxHeartbeats 200000 in

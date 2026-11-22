@@ -9,8 +9,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj
 
@@ -18,13 +20,14 @@ noncomputable section
 
 namespace GlobalTheory.AbelianMulFin
 
-theorem affine_finite_projective_rankAtStalk {X Y : Scheme.{0}} (f : X ⟶ Y) [IsFinite f] [Flat f]
-    [LocallyOfFinitePresentation f] (r : ℕ) (hr : ∀ y, f.finrank y = r) (V : Y.Opens)
-    (hV : IsAffineOpen V) :
-    letI := (f.app V).hom.toAlgebra
-    Module.Finite Γ(Y, V) Γ(X, f ⁻¹ᵁ V) ∧ Module.Flat Γ(Y, V) Γ(X, f ⁻¹ᵁ V) ∧
-      Module.Projective Γ(Y, V) Γ(X, f ⁻¹ᵁ V) ∧
-      ∀ p : PrimeSpectrum Γ(Y, V), Module.rankAtStalk Γ(X, f ⁻¹ᵁ V) p = r := by
+theorem affine_finite_projective_rankAtStalk
+    {X Y : Scheme.{0}} (f : X ⟶ Y) [IsFinite f] [Flat f] [LocallyOfFinitePresentation f]
+    (r : ℕ) (hr : ∀ y, f.finrank y = r)
+    (V : Y.Opens) (hV : IsAffineOpen V)
+    : letI := (f.app V).hom.toAlgebra
+      Module.Finite Γ(Y, V) Γ(X, f ⁻¹ᵁ V) ∧ Module.Flat Γ(Y, V) Γ(X, f ⁻¹ᵁ V)
+        ∧ Module.Projective Γ(Y, V) Γ(X, f ⁻¹ᵁ V)
+        ∧ ∀ p : PrimeSpectrum Γ(Y, V), Module.rankAtStalk Γ(X, f ⁻¹ᵁ V) p = r := by
   letI := (f.app V).hom.toAlgebra
   have hU : IsAffineOpen (f ⁻¹ᵁ V) := hV.preimage f
   have h1 : Module.Finite Γ(Y, V) Γ(X, f ⁻¹ᵁ V) := f.finite_app V hV
@@ -38,12 +41,13 @@ theorem affine_finite_projective_rankAtStalk {X Y : Scheme.{0}} (f : X ⟶ Y) [I
     exact this
   have h4 := Module.FinitePresentation.of_finite_of_finitePresentation Γ(Y, V) Γ(X, f ⁻¹ᵁ V)
   refine ⟨h1, h2, Module.Flat.projective_of_finitePresentation, fun p => ?_⟩
-  have e := Scheme.Hom.finrank_of_isPullback _ _ _ _ (GlobalTheory.isPullback_fromSpec_app f hV hU) p
+  have e :=
+    Scheme.Hom.finrank_of_isPullback _ _ _ _ (GlobalTheory.isPullback_fromSpec_app f hV hU) p
   rw [hr] at e
   exact (Scheme.Hom.finrank_SpecMap_algebraMap Γ(Y, V) Γ(X, f ⁻¹ᵁ V) p).symm.trans e
 
-theorem isUnit_natCast_Sp {K : Type} [Field K] {n : ℕ} (hn : (n : K) ≠ 0) :
-    IsUnit (n : Γ(Spec (CommRingCat.of K), ⊤)) := by
+theorem isUnit_natCast_Sp {K : Type} [Field K] {n : ℕ} (hn : (n : K) ≠ 0)
+    : IsUnit (n : Γ(Spec (CommRingCat.of K), ⊤)) := by
   have := (Ne.isUnit hn).map (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom
   rwa [map_natCast] at this
 
@@ -51,8 +55,11 @@ end GlobalTheory.AbelianMulFin
 
 namespace GlobalTheory.AbelianMulFin
 
-theorem natCast_card_torsion_ne_zero {K : Type} [Field K] {G : Type} [CommGroup G] {n r : ℕ}
-    (hn : (n : K) ≠ 0) (hr1 : 1 ≤ r) (hr : r = Nat.card {y : G // y ^ n = 1}) : (r : K) ≠ 0 := by
+theorem natCast_card_torsion_ne_zero
+    {K : Type} [Field K]
+    {G : Type} [CommGroup G]
+    {n r : ℕ} (hn : (n : K) ≠ 0) (hr1 : 1 ≤ r) (hr : r = Nat.card {y : G // y ^ n = 1})
+    : (r : K) ≠ 0 := by
   intro hr0
   rcases CharP.char_is_prime_or_zero K (ringChar K) with hp | hp
   · haveI := Fact.mk hp
@@ -72,22 +79,26 @@ theorem natCast_card_torsion_ne_zero {K : Type} [Field K] {G : Type} [CommGroup 
     haveI := CharP.charP_to_charZero K
     exact (Nat.cast_ne_zero.2 (by omega)) hr0
 
-theorem mulA_finite_locallyFree (K : Type) [Field K] [IsAlgClosed K]
-    (A : Over (Spec (CommRingCat.of K))) [GrpObj A] [hA : IsAbelianScheme A] (n : ℕ)
-    (hn : (n : K) ≠ 0) :
-    IsFinite (mulA A n).left ∧ Flat (mulA A n).left ∧ Etale (mulA A n).left ∧
-      ∃ r : ℕ, (r : K) ≠ 0 ∧ 1 ≤ r ∧ (∀ a : A.left, (mulA A n).left.finrank a = r) ∧
-        ∀ V : A.left.Opens, IsAffineOpen V →
-          letI := ((mulA A n).left.app V).hom.toAlgebra
-          Module.Finite Γ(A.left, V) Γ(A.left, (mulA A n).left ⁻¹ᵁ V) ∧
-          Module.Flat Γ(A.left, V) Γ(A.left, (mulA A n).left ⁻¹ᵁ V) ∧
-          Module.Projective Γ(A.left, V) Γ(A.left, (mulA A n).left ⁻¹ᵁ V) ∧
-          ∀ p : PrimeSpectrum Γ(A.left, V),
-            Module.rankAtStalk Γ(A.left, (mulA A n).left ⁻¹ᵁ V) p = r := by
+theorem mulA_finite_locallyFree
+    (K : Type) [Field K] [IsAlgClosed K]
+    (A : Over (Spec (CommRingCat.of K))) [GrpObj A] [hA : IsAbelianScheme A]
+    (n : ℕ) (hn : (n : K) ≠ 0)
+    : IsFinite (mulA A n).left ∧ Flat (mulA A n).left ∧ Etale (mulA A n).left
+      ∧ ∃ r : ℕ,
+        (r : K) ≠ 0 ∧ 1 ≤ r ∧ (∀ a : A.left, (mulA A n).left.finrank a = r)
+          ∧ ∀ V : A.left.Opens,
+            IsAffineOpen V
+              → letI := ((mulA A n).left.app V).hom.toAlgebra
+                Module.Finite Γ(A.left, V) Γ(A.left, (mulA A n).left ⁻¹ᵁ V)
+                  ∧ Module.Flat Γ(A.left, V) Γ(A.left, (mulA A n).left ⁻¹ᵁ V)
+                  ∧ Module.Projective Γ(A.left, V) Γ(A.left, (mulA A n).left ⁻¹ᵁ V)
+                  ∧ ∀ p : PrimeSpectrum Γ(A.left, V),
+                    Module.rankAtStalk Γ(A.left, (mulA A n).left ⁻¹ᵁ V) p = r := by
   haveI := hA.comm
   haveI := hA.smooth
   haveI := hA.geomConnected
-  obtain ⟨⟨hfin, het⟩, -⟩ := GlobalTheory.GrpTangent.finiteEtale_mulN_torsion A (isUnit_natCast_Sp hn)
+  obtain ⟨⟨hfin, het⟩, -⟩ :=
+    GlobalTheory.GrpTangent.finiteEtale_mulN_torsion A (isUnit_natCast_Sp hn)
   rw [← GlobalTheory.MulLawsCompare.mulN_eq_mulA]
   haveI := hfin
   haveI := het
@@ -112,7 +123,15 @@ theorem mulA_finite_locallyFree (K : Type) [Field K] [IsAlgClosed K]
       show 1 ≤ (mulN A n).left.finrank a
       rw [hall a]; exact hr1
   have hcard := GlobalTheory.MulLawsCompare.finrank_mulN_eq_card A n (η[A].left) z₀
-  refine ⟨hfin, inferInstance, het, r, natCast_card_torsion_ne_zero hn hr1 hcard, hr1, hall,
-    fun V hV => affine_finite_projective_rankAtStalk _ r hall V hV⟩
+  refine ⟨
+    hfin,
+    inferInstance,
+    het,
+    r,
+    natCast_card_torsion_ne_zero hn hr1 hcard,
+    hr1,
+    hall,
+    fun V hV => affine_finite_projective_rankAtStalk _ r hall V hV
+  ⟩
 
 end GlobalTheory.AbelianMulFin

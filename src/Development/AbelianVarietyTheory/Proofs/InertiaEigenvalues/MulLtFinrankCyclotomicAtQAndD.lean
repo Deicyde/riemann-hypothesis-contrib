@@ -11,24 +11,29 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal NumberField IsDedekindDomain
 
 noncomputable section
 
 namespace GlobalTheory.CycDegRam
 
-open Formalism Formalism.BasicNotions NumberField IsDedekindDomain Polynomial UniqueFactorizationMonoid
+open Formalism Formalism.BasicNotions NumberField IsDedekindDomain Polynomial
+  UniqueFactorizationMonoid
 
-theorem sub_one_le_two_mul_finrank (E : Type) [Field E] [NumberField E] (l : ℕ) (hl : l.Prime)
-    (hram : ∀ v ∈ placesOver E l, v.asIdeal.ramificationIdx ℤ = 2) :
-    l - 1 ≤ 2 * Module.finrank E (CyclotomicField l E) := by
+theorem sub_one_le_two_mul_finrank
+    (E : Type) [Field E] [NumberField E]
+    (l : ℕ) (hl : l.Prime) (hram : ∀ v ∈ placesOver E l, v.asIdeal.ramificationIdx ℤ = 2)
+    : l - 1 ≤ 2 * Module.finrank E (CyclotomicField l E) := by
   classical
   haveI : Fact l.Prime := ⟨hl⟩
   haveI : NeZero l := ⟨hl.ne_zero⟩
   set L := CyclotomicField l E
   set k := Module.finrank E L with hk
   have hkpos : 0 < k := Module.finrank_pos
-  have hζ : IsPrimitiveRoot (IsCyclotomicExtension.zeta l E L) l := IsCyclotomicExtension.zeta_spec l E L
+  have hζ : IsPrimitiveRoot (IsCyclotomicExtension.zeta l E L) l :=
+    IsCyclotomicExtension.zeta_spec l E L
   let z : 𝓞 L := ⟨IsCyclotomicExtension.zeta l E L, hζ.isIntegral hl.pos⟩
   have hz : IsPrimitiveRoot z l :=
     IsPrimitiveRoot.of_map_of_injective (f := algebraMap (𝓞 L) L) hζ RingOfIntegers.coe_injective
@@ -54,7 +59,8 @@ theorem sub_one_le_two_mul_finrank (E : Type) [Field E] [NumberField E] (l : ℕ
     rw [map_pow] at this
     have hl' : (l : 𝓞 L) = algebraMap (𝓞 E) (𝓞 L) (l : 𝓞 E) := (map_natCast _ _).symm
     rw [hl'] at this
-    have hn : NumberField.RingOfIntegers.norm E (algebraMap (𝓞 E) (𝓞 L) (l : 𝓞 E)) = (l : 𝓞 E) ^ k := by
+    have hn
+        : NumberField.RingOfIntegers.norm E (algebraMap (𝓞 E) (𝓞 L) (l : 𝓞 E)) = (l : 𝓞 E) ^ k := by
       simpa only [hk] using (NumberField.RingOfIntegers.norm_algebraMap (L := L) E (l : 𝓞 E))
     rw [hn] at this
     exact this
@@ -73,7 +79,8 @@ theorem sub_one_le_two_mul_finrank (E : Type) [Field E] [NumberField E] (l : ℕ
     rintro rfl
     have h1 : (l : ℤ) ∈ Ideal.comap (algebraMap ℤ (𝓞 E)) (⊥ : Ideal (𝓞 E)) := by
       change (l : ℤ) ∈ Ideal.under ℤ _
-      rw [hQ]; exact Ideal.mem_span_singleton_self _
+      rw [hQ]
+      exact Ideal.mem_span_singleton_self _
     rw [Ideal.mem_comap, Ideal.mem_bot, map_natCast] at h1
     exact hl.ne_zero (by exact_mod_cast h1)
   let v : HeightOneSpectrum (𝓞 E) := ⟨Q, hQmax.isPrime, hQ0⟩
@@ -81,7 +88,8 @@ theorem sub_one_le_two_mul_finrank (E : Type) [Field E] [NumberField E] (l : ℕ
     show (l : 𝓞 E) ∈ Q
     have h1 : (l : ℤ) ∈ Ideal.comap (algebraMap ℤ (𝓞 E)) Q := by
       change (l : ℤ) ∈ Ideal.under ℤ _
-      rw [hQ]; exact Ideal.mem_span_singleton_self _
+      rw [hQ]
+      exact Ideal.mem_span_singleton_self _
     rwa [Ideal.mem_comap, map_natCast] at h1
   have hram2 : Q.ramificationIdx ℤ = 2 := hram v hv
   haveI : Q.LiesOver (Ideal.span {(l : ℤ)}) := ⟨hQ.symm⟩
@@ -89,28 +97,32 @@ theorem sub_one_le_two_mul_finrank (E : Type) [Field E] [NumberField E] (l : ℕ
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
   have hne : Ideal.span {(l : 𝓞 E)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]; exact_mod_cast hl.ne_zero
-  have hc := Ideal.IsDedekindDomain.ramificationIdx_eq_normalizedFactors_count
-    (Ideal.span {(l : ℤ)}) Q (by rw [hmap]; exact hne)
+  have hc :=
+    Ideal.IsDedekindDomain.ramificationIdx_eq_normalizedFactors_count (Ideal.span {(l : ℤ)}) Q
+      (by rw [hmap]; exact hne)
   rw [hram2, hmap] at hc
   have h1 := congrArg (fun I => Multiset.count Q (normalizedFactors I)) hI
   simp only [normalizedFactors_pow, Multiset.count_nsmul] at h1
   rw [← hc] at h1
   rcases Nat.eq_zero_or_pos (Multiset.count Q (normalizedFactors (Ideal.span {n}))) with h0 | hpos
   · rw [h0] at h1; omega
-  · calc l - 1 ≤ (l - 1) * Multiset.count Q (normalizedFactors (Ideal.span {n})) :=
-          Nat.le_mul_of_pos_right _ hpos
+  · calc
+      l - 1 ≤ (l - 1) * Multiset.count Q (normalizedFactors (Ideal.span {n})) :=
+        Nat.le_mul_of_pos_right _ hpos
       _ = 2 * k := by rw [h1, mul_comm]
 
 end GlobalTheory.CycDegRam
 
 namespace GlobalTheory.CycDegRam
 
-theorem tr_lt_finrank_cyclotomic : ∀ (D : D7), EmbeddingTypeJumps.Conclusion1 D → ∀ i : D.nd.Loc,
-    (D.nd.l i = D.host.q ∨ D.nd.l i = D.host.d) →
-    D.R.t * D.R.r < Module.finrank D.host.E (CyclotomicField (D.nd.l i) D.host.E) := by
+theorem tr_lt_finrank_cyclotomic
+    : ∀ (D : D7),
+      EmbeddingTypeJumps.Conclusion1 D
+        → ∀ i : D.nd.Loc,
+          (D.nd.l i = D.host.q ∨ D.nd.l i = D.host.d)
+            → D.R.t * D.R.r < Module.finrank D.host.E (CyclotomicField (D.nd.l i) D.host.E) := by
   intro D h1 i hi
-  have hmem : D.nd.l i ∈ ({D.host.q, D.host.d} : Finset ℕ) := by
-    rcases hi with h | h <;> simp [h]
+  have hmem : D.nd.l i ∈ ({D.host.q, D.host.d} : Finset ℕ) := by rcases hi with h | h <;> simp [h]
   have hprime : (D.nd.l i).Prime := by
     rcases hi with h | h <;> rw [h]
     · exact D.host.hyp.1
@@ -119,8 +131,8 @@ theorem tr_lt_finrank_cyclotomic : ∀ (D : D7), EmbeddingTypeJumps.Conclusion1 
     rcases hi with h | h <;> rw [h]
     · exact D.host.qd_big.1
     · exact D.host.qd_big.2
-  have key := sub_one_le_two_mul_finrank D.host.E (D.nd.l i) hprime
-    (fun v hv => ((h1 _ hmem).2 v hv).1)
+  have key :=
+    sub_one_le_two_mul_finrank D.host.E (D.nd.l i) hprime (fun v hv => ((h1 _ hmem).2 v hv).1)
   have h4 : 4 * D.R.t * D.R.r = 4 * (D.R.t * D.R.r) := by ring
   omega
 

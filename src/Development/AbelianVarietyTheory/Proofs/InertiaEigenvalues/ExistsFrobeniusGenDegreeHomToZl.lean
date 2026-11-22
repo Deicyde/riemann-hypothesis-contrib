@@ -15,12 +15,14 @@ open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.Basi
 
 namespace GlobalTheory.UnramGen
 
-theorem exists_normalised {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] (I : Subgroup G) (F : G)
-    (hF : (Subgroup.zpowers F ⊔ I).topologicalClosure = ⊤) (z : G → ℤ_[l]) (hc : Continuous z)
-    (hadd : ∀ σ τ, z (σ * τ) = z σ + z τ) (hI : ∀ σ ∈ I, z σ = 0) (h0 : ∃ σ, z σ ≠ 0) :
-    ∃ ν : G →* Multiplicative ℤ_[l], Continuous ν ∧ (∀ σ ∈ I, ν σ = 1) ∧
-      ν F = Multiplicative.ofAdd 1 := by
+theorem exists_normalised
+    {l : ℕ} [Fact l.Prime]
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (I : Subgroup G) (F : G) (hF : (Subgroup.zpowers F ⊔ I).topologicalClosure = ⊤)
+    (z : G → ℤ_[l]) (hc : Continuous z) (hadd : ∀ σ τ, z (σ * τ) = z σ + z τ)
+    (hI : ∀ σ ∈ I, z σ = 0) (h0 : ∃ σ, z σ ≠ 0)
+    : ∃ ν : G →* Multiplicative ℤ_[l],
+      Continuous ν ∧ (∀ σ ∈ I, ν σ = 1) ∧ ν F = Multiplicative.ofAdd 1 := by
   have h1 : z 1 = 0 := by simpa using hadd 1 1
   have hinv : ∀ σ, z σ⁻¹ = - z σ := by
     intro σ
@@ -28,20 +30,21 @@ theorem exists_normalised {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [Topolog
     rw [mul_inv_cancel, h1] at h
     linear_combination -h
 
-  let H : Subgroup G :=
-    { carrier := {σ | ‖z σ‖ ≤ ‖z F‖}
-      mul_mem' := fun {a b} ha hb => by
-        show ‖z (a * b)‖ ≤ ‖z F‖
-        rw [hadd]
-        exact (PadicInt.nonarchimedean _ _).trans (max_le ha hb)
-      one_mem' := by
-        show ‖z 1‖ ≤ ‖z F‖
-        rw [h1, norm_zero]
-        exact norm_nonneg _
-      inv_mem' := fun {a} ha => by
-        show ‖z a⁻¹‖ ≤ ‖z F‖
-        rw [hinv, norm_neg]
-        exact ha }
+  let H : Subgroup G := {
+    carrier := {σ | ‖z σ‖ ≤ ‖z F‖}
+    mul_mem' := fun {a b} ha hb => by
+      show ‖z (a * b)‖ ≤ ‖z F‖
+      rw [hadd]
+      exact (PadicInt.nonarchimedean _ _).trans (max_le ha hb)
+    one_mem' := by
+      show ‖z 1‖ ≤ ‖z F‖
+      rw [h1, norm_zero]
+      exact norm_nonneg _
+    inv_mem' := fun {a} ha => by
+      show ‖z a⁻¹‖ ≤ ‖z F‖
+      rw [hinv, norm_neg]
+      exact ha
+  }
   have hHc : IsClosed (H : Set G) := isClosed_le (continuous_norm.comp hc) continuous_const
   have hsup : Subgroup.zpowers F ⊔ I ≤ H := by
     refine sup_le ((Subgroup.zpowers_le (H := H)).2 (show ‖z F‖ ≤ ‖z F‖ from le_rfl)) ?_
@@ -63,22 +66,26 @@ theorem exists_normalised {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [Topolog
     exact norm_le_zero_iff.mp this
   have hF0' : (z F : ℚ_[l]) ≠ 0 := fun h => hF0 (Subtype.ext (h.trans PadicInt.coe_zero.symm))
 
-  let w : G → ℤ_[l] := fun σ => ⟨(z σ : ℚ_[l]) / (z F : ℚ_[l]), by
-    rw [PadicInt.mem_subring_iff, norm_div, PadicInt.norm_coe, PadicInt.norm_coe,
-      div_le_one (norm_pos_iff.mpr hF0)]
-    exact hbound σ⟩
+  let w : G → ℤ_[l] := fun σ => ⟨
+    (z σ : ℚ_[l]) / (z F : ℚ_[l]),
+    by
+      rw [PadicInt.mem_subring_iff, norm_div, PadicInt.norm_coe, PadicInt.norm_coe,
+        div_le_one (norm_pos_iff.mpr hF0)]
+      exact hbound σ
+  ⟩
   have hw : ∀ σ, (w σ : ℚ_[l]) = (z σ : ℚ_[l]) / (z F : ℚ_[l]) := fun _ => rfl
   have hwadd : ∀ σ τ, w (σ * τ) = w σ + w τ := by
     intro σ τ
     apply Subtype.ext
     show (w (σ * τ) : ℚ_[l]) = ((w σ + w τ : ℤ_[l]) : ℚ_[l])
     rw [PadicInt.coe_add, hw, hw, hw, hadd, PadicInt.coe_add, add_div]
-  have hwc : Continuous w :=
-    Continuous.subtype_mk ((continuous_subtype_val.comp hc).div_const _) _
+  have hwc : Continuous w := Continuous.subtype_mk ((continuous_subtype_val.comp hc).div_const _) _
   let ν : G →* Multiplicative ℤ_[l] :=
-    MonoidHom.mk' (fun σ => Multiplicative.ofAdd (w σ)) (fun σ τ => by
-      rw [hwadd]
-      rfl)
+    MonoidHom.mk'
+      (fun σ => Multiplicative.ofAdd (w σ))
+      (fun σ τ => by
+        rw [hwadd]
+        rfl)
   refine ⟨ν, continuous_ofAdd.comp hwc, ?_, ?_⟩
   · intro σ hσ
     show Multiplicative.ofAdd (w σ) = 1
@@ -98,18 +105,23 @@ private theorem norm_prime_lt_one_algClosure {l : ℕ} [Fact l.Prime] : ‖(l : 
   rw [h, PadicAlgCl.norm_extends]
   exact Padic.norm_p_lt_one
 
-private theorem norm_pow_sub_pow_le_norm_sub {E : Type} [NormedField E] [IsUltrametricDist E] {x y : E}
-    (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (i : ℕ) : ‖y ^ i - x ^ i‖ ≤ ‖y - x‖ := by
+private theorem norm_pow_sub_pow_le_norm_sub
+    {E : Type} [NormedField E] [IsUltrametricDist E] {x y : E} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (i : ℕ)
+    : ‖y ^ i - x ^ i‖ ≤ ‖y - x‖ := by
   rw [← geom_sum₂_mul, norm_mul]
   refine mul_le_of_le_one_left (norm_nonneg _) ?_
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one ?_
   intro j _
   rw [norm_mul, norm_pow, norm_pow]
-  exact mul_le_one₀ (pow_le_one₀ (norm_nonneg _) hy) (by positivity) (pow_le_one₀ (norm_nonneg _) hx)
+  exact mul_le_one₀ (pow_le_one₀ (norm_nonneg _) hy) (by positivity)
+    (pow_le_one₀ (norm_nonneg _) hx)
 
-private theorem fixes_root_of_unity_of_inertia_like {l : ℕ} [Fact l.Prime] (σ : GQ l)
-    (hσ : ∀ x : Om l, ‖x‖ ≤ 1 → ‖σ x - x‖ < 1) (n : ℕ) (hn : 0 < n) (x : Om l)
-    (hx : x ^ l ^ n = x) : σ x = x := by
+private theorem fixes_root_of_unity_of_inertia_like
+    {l : ℕ} [Fact l.Prime]
+    (σ : GQ l) (hσ : ∀ x : Om l, ‖x‖ ≤ 1 → ‖σ x - x‖ < 1)
+    (n : ℕ) (hn : 0 < n)
+    (x : Om l) (hx : x ^ l ^ n = x)
+    : σ x = x := by
   have hl1 : 1 < l := (Fact.out : l.Prime).one_lt
   have hq : 1 < l ^ n := Nat.one_lt_pow hn.ne' hl1
   by_cases hx0 : x = 0
@@ -137,8 +149,7 @@ private theorem fixes_root_of_unity_of_inertia_like {l : ℕ} [Fact l.Prime] (σ
     rw [hy, hx] at h
     exact mul_right_cancel₀ hne' (h.trans (one_mul _).symm)
 
-  have hterm : ∀ i ∈ Finset.range (l ^ n),
-      ‖σ x ^ i * x ^ (l ^ n - 1 - i) - 1‖ ≤ ‖σ x - x‖ := by
+  have hterm : ∀ i ∈ Finset.range (l ^ n), ‖σ x ^ i * x ^ (l ^ n - 1 - i) - 1‖ ≤ ‖σ x - x‖ := by
     intro i hi
     have hi' : i ≤ l ^ n - 1 := by
       have := Finset.mem_range.mp hi
@@ -155,27 +166,31 @@ private theorem fixes_root_of_unity_of_inertia_like {l : ℕ} [Fact l.Prime] (σ
     rw [Nat.cast_pow, norm_pow]
     exact pow_lt_one₀ (norm_nonneg _) norm_prime_lt_one_algClosure hn.ne'
   have hq1 : ‖((l ^ n : ℕ) : Om l) - 1‖ = 1 := by
-    rw [sub_eq_add_neg, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm
-      (by rw [norm_neg, norm_one]; exact hlq.ne), norm_neg, norm_one]
+    rw [sub_eq_add_neg,
+      IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [norm_neg, norm_one]; exact hlq.ne),
+      norm_neg, norm_one]
     exact max_eq_right hlq.le
   have key : ‖S - 1‖ = 1 := by
     have e : S - 1 = (((l ^ n : ℕ) : Om l) - 1) + (S - ((l ^ n : ℕ) : Om l)) := by ring
-    rw [e, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm
-      (by rw [hq1]; exact (hsum.trans_lt hε).ne'), hq1]
+    rw [e,
+      IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hq1]; exact (hsum.trans_lt hε).ne'),
+      hq1]
     exact max_eq_left (hsum.trans hε.le)
   rw [hS, sub_self, norm_zero] at key
   exact zero_ne_one key
 
-theorem exists_gen_degree : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l),
-    ∃ (F : ↥(GK K)) (ν : ↥(GK K) →* Multiplicative ℤ_[l]), Continuous ν ∧ (∀ σ ∈ IK K, ν σ = 1) ∧
-      ν F = Multiplicative.ofAdd 1 ∧
-      (Subgroup.closure (insert F (IK K : Set ↥(GK K)))).topologicalClosure = ⊤ := by
+theorem exists_gen_degree
+    : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l),
+      ∃ (F : ↥(GK K)) (ν : ↥(GK K) →* Multiplicative ℤ_[l]),
+        Continuous ν ∧ (∀ σ ∈ IK K, ν σ = 1) ∧ ν F = Multiplicative.ofAdd 1
+          ∧ (Subgroup.closure (insert F (IK K : Set ↥(GK K)))).topologicalClosure = ⊤ := by
   intro l _ K
 
   obtain ⟨φ, hφ⟩ := (GlobalTheory.Cyc.exists_frobenius_and_exponent_modEq l).1
-  obtain ⟨z, hzc, hzadd, hzval⟩ := GlobalTheory.UnramifiedDegree.exists_degree l
-    (fun n hn σ => GlobalTheory.InertiaEigenvalues.FrobPow.exists_gal_eq_pow l n hn σ)
-    (GlobalTheory.Cyc.exists_frobenius_and_exponent_modEq l).2
+  obtain ⟨z, hzc, hzadd, hzval⟩ :=
+    GlobalTheory.UnramifiedDegree.exists_degree l
+      (fun n hn σ => GlobalTheory.InertiaEigenvalues.FrobPow.exists_gal_eq_pow l n hn σ)
+      (GlobalTheory.Cyc.exists_frobenius_and_exponent_modEq l).2
   have hz1 : z 1 = 0 := by simpa using hzadd 1 1
   have hzφ : z φ = 1 := by
     have h := hzval φ 1 (fun n hn x hx => by rw [pow_one]; exact hφ n hn x hx)
@@ -191,9 +206,10 @@ theorem exists_gen_degree : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l),
 
   have hfix : ∀ σ : GQ l, (∀ x : Om l, ‖x‖ ≤ 1 → ‖σ x - x‖ < 1) → z σ = 0 := by
     intro σ hσ
-    have h := hzval σ 0 (fun n hn x hx => by
-      rw [pow_zero, pow_one]
-      exact fixes_root_of_unity_of_inertia_like σ hσ n hn x hx)
+    have h :=
+      hzval σ 0 (fun n hn x hx => by
+        rw [pow_zero, pow_one]
+        exact fixes_root_of_unity_of_inertia_like σ hσ n hn x hx)
     simpa using h
 
   obtain ⟨N, hN, hmem⟩ : ∃ N : ℕ, 0 < N ∧ φ ^ N ∈ GK K := by
@@ -206,8 +222,7 @@ theorem exists_gen_degree : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l),
       rw [IntermediateField.mem_fixingSubgroup_iff]
       intro x hx
       have h1 : (φ ^ i) x = (φ ^ j) x := DFunLike.congr_fun hg ⟨x, hx⟩
-      have h2 : φ ^ j = φ ^ i * φ ^ (j - i) := by
-        rw [← pow_add, Nat.add_sub_cancel' hij.le]
+      have h2 : φ ^ j = φ ^ i * φ ^ (j - i) := by rw [← pow_add, Nat.add_sub_cancel' hij.le]
       rw [h2, AlgEquiv.mul_apply] at h1
       exact ((φ ^ i).injective h1).symm
     obtain ⟨i, j, hij, hg⟩ := Finite.exists_ne_map_eq_of_infinite g
@@ -233,10 +248,13 @@ theorem exists_gen_degree : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l),
     rw [MonoidHom.mem_ker] at h
     change Multiplicative.ofAdd (z' σ) = 1 at h
     exact ofAdd_eq_one.mp h
-  have h0 : ∃ σ, z' σ ≠ 0 := ⟨⟨φ ^ N, hmem⟩, by
-    show z (φ ^ N) ≠ 0
-    rw [hzpow]
-    exact Nat.cast_ne_zero.mpr hN.ne'⟩
+  have h0 : ∃ σ, z' σ ≠ 0 := ⟨
+    ⟨φ ^ N, hmem⟩,
+    by
+      show z (φ ^ N) ≠ 0
+      rw [hzpow]
+      exact Nat.cast_ne_zero.mpr hN.ne'
+  ⟩
   obtain ⟨F, hF⟩ := GlobalTheory.exists_topologicalClosure_zpowers_sup_inertia l K
   obtain ⟨ν, hνc, hνI, hνF⟩ := exists_normalised (IK K) F hF z' hz'c hz'add hz'I h0
   refine ⟨F, ν, hνc, hνI, hνF, ?_⟩

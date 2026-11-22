@@ -17,12 +17,12 @@ namespace Formalism.HN
 
 section
 
-variable {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E]
-    [InnerProductSpace ℝ E] (ρ : V →+ E)
+variable
+  {R V E : Type*}
+  [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+  (ρ : V →+ E)
 
-theorem hnSum_mem_zl (N : Submodule R V) (y : E) :
-    y ∈ zl ρ N ↔ ∃ x ∈ N, ρ x = y :=
-  Iff.rfl
+theorem hnSum_mem_zl (N : Submodule R V) (y : E) : y ∈ zl ρ N ↔ ∃ x ∈ N, ρ x = y := Iff.rfl
 
 theorem hnSum_zl_mono {A B : Submodule R V} (h : A ≤ B) : zl ρ A ≤ zl ρ B := by
   intro y hy
@@ -52,14 +52,16 @@ theorem hnSum_isLat_mono {L N : Submodule R V} (hL : IsLat ρ L) (h : N ≤ L) :
       simp only [Subtype.mk.injEq] at hab
       exact Subtype.ext hab)
 
-theorem hnSum_orth_zero {A : Submodule R V} (hA : IsLat ρ A) {x : V} (hx : x ∈ A)
-    (h : inner ℝ (ρ x) (ρ x) = 0) : x = 0 := by
+theorem hnSum_orth_zero
+    {A : Submodule R V} (hA : IsLat ρ A) {x : V} (hx : x ∈ A) (h : inner ℝ (ρ x) (ρ x) = 0)
+    : x = 0 := by
   have h0 : ρ x = 0 := inner_self_eq_zero.1 h
   exact hA.1 hx A.zero_mem (by rw [h0, map_zero])
 
-theorem hnSum_orth {A B : Submodule R V} (hA : IsLat ρ A) (hB : IsLat ρ B)
-    (h : ∀ x ∈ A, ∀ y ∈ B, inner ℝ (ρ x) (ρ y) = 0) :
-    IsLat ρ (A ⊔ B) ∧ A ⊓ B = ⊥ ∧ deg ρ (A ⊔ B) = deg ρ A + deg ρ B := by
+theorem hnSum_orth
+    {A B : Submodule R V}
+    (hA : IsLat ρ A) (hB : IsLat ρ B) (h : ∀ x ∈ A, ∀ y ∈ B, inner ℝ (ρ x) (ρ y) = 0)
+    : IsLat ρ (A ⊔ B) ∧ A ⊓ B = ⊥ ∧ deg ρ (A ⊔ B) = deg ρ A + deg ρ B := by
   have horth : ∀ x ∈ zl ρ A, ∀ y ∈ zl ρ B, inner ℝ x y = 0 := by
     intro x hx y hy
     obtain ⟨a, ha, rfl⟩ := (hnSum_mem_zl ρ A x).1 hx
@@ -98,8 +100,10 @@ universe u v w x
 
 section
 
-variable {R : Type u} {V : Type v} {E : Type w} [Ring R] [AddCommGroup V] [Module R V]
-    [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] (ρ : V →+ E)
+variable
+  {R : Type u} {V : Type v} {E : Type w} [Ring R] [AddCommGroup V] [Module R V]
+  [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+  (ρ : V →+ E)
 
 theorem hnSum_rk_bot : rk ρ (⊥ : Submodule R V) = 0 := by
   have e : zl ρ (⊥ : Submodule R V) = ⊥ := by
@@ -109,23 +113,26 @@ theorem hnSum_rk_bot : rk ρ (⊥ : Submodule R V) = 0 := by
   rw [e]
   simp
 
-theorem hnSum_orth_rk (h1 : DegSupermod.{u, v, w}) {A B : Submodule R V} (hA : IsLat ρ A)
-    (hB : IsLat ρ B) (h : ∀ x ∈ A, ∀ y ∈ B, inner ℝ (ρ x) (ρ y) = 0) :
-    rk ρ (A ⊔ B) = rk ρ A + rk ρ B := by
+theorem hnSum_orth_rk
+    (h1 : DegSupermod.{u, v, w})
+    {A B : Submodule R V}
+    (hA : IsLat ρ A) (hB : IsLat ρ B) (h : ∀ x ∈ A, ∀ y ∈ B, inner ℝ (ρ x) (ρ y) = 0)
+    : rk ρ (A ⊔ B) = rk ρ A + rk ρ B := by
   obtain ⟨hL, hinf, -⟩ := hnSum_orth ρ hA hB h
   have e := (h1 R V E ρ (A ⊔ B) A B hL le_sup_left le_sup_right).1
   rw [hinf, hnSum_rk_bot] at e
   simpa using e
 
-theorem hnSum_split (h1 : DegSupermod.{u, v, w}) {A B : Submodule R V} (hA : IsLat ρ A)
-    (hB : IsLat ρ B) (h : ∀ x ∈ A, ∀ y ∈ B, inner ℝ (ρ x) (ρ y) = 0) {N : Submodule R V}
-    (hN : N ≤ A ⊔ B) :
-    deg ρ N ≤ deg ρ (N ⊓ A) + deg ρ (B ⊓ (N ⊔ A)) ∧
-      rk ρ N = rk ρ (N ⊓ A) + rk ρ (B ⊓ (N ⊔ A)) := by
+theorem hnSum_split
+    (h1 : DegSupermod.{u, v, w})
+    {A B : Submodule R V}
+    (hA : IsLat ρ A) (hB : IsLat ρ B) (h : ∀ x ∈ A, ∀ y ∈ B, inner ℝ (ρ x) (ρ y) = 0)
+    {N : Submodule R V} (hN : N ≤ A ⊔ B)
+    : deg ρ N ≤ deg ρ (N ⊓ A) + deg ρ (B ⊓ (N ⊔ A))
+      ∧ rk ρ N = rk ρ (N ⊓ A) + rk ρ (B ⊓ (N ⊔ A)) := by
   obtain ⟨hL, -, -⟩ := hnSum_orth ρ hA hB h
   have hQ : IsLat ρ (B ⊓ (N ⊔ A)) := hnSum_isLat_mono ρ hB inf_le_left
-  have hAQ : ∀ x ∈ A, ∀ y ∈ B ⊓ (N ⊔ A), inner ℝ (ρ x) (ρ y) = 0 :=
-    fun x hx y hy => h x hx y hy.1
+  have hAQ : ∀ x ∈ A, ∀ y ∈ B ⊓ (N ⊔ A), inner ℝ (ρ x) (ρ y) = 0 := fun x hx y hy => h x hx y hy.1
   have hNA : N ⊔ A = A ⊔ B ⊓ (N ⊔ A) := by
     rw [← sup_inf_assoc_of_le B (le_sup_right : A ≤ N ⊔ A)]
     exact (inf_eq_right.2 (sup_le hN le_sup_left)).symm
@@ -138,12 +145,14 @@ theorem hnSum_split (h1 : DegSupermod.{u, v, w}) {A B : Submodule R V} (hA : IsL
 
 end
 
-private theorem le_muMin_sup_of_le_muMin {R : Type u} {V : Type v} {E : Type w} [Ring R]
-    [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (ρ : V →+ E)
-    {L A B : Submodule R V} (hL : IsLat ρ L) (hA : A ≤ L) (hB : B ≤ L) (hA0 : A ≠ ⊥)
-    (hB0 : B ≠ ⊥) {θ : ℝ} (hθA : θ ≤ muMin ρ A) (hθB : θ ≤ muMin ρ B) :
-    θ ≤ muMin ρ (A ⊔ B) := by
+private theorem le_muMin_sup_of_le_muMin
+    {R : Type u} {V : Type v} {E : Type w} [Ring R] [AddCommGroup V] [Module R V]
+    [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w})
+    (ρ : V →+ E)
+    {L A B : Submodule R V} (hL : IsLat ρ L) (hA : A ≤ L) (hB : B ≤ L) (hA0 : A ≠ ⊥) (hB0 : B ≠ ⊥)
+    {θ : ℝ} (hθA : θ ≤ muMin ρ A) (hθB : θ ≤ muMin ρ B)
+    : θ ≤ muMin ρ (A ⊔ B) := by
   have hAl : IsLat ρ A := hnSum_isLat_mono ρ hL hA
   have hBl : IsLat ρ B := hnSum_isLat_mono ρ hL hB
   have hM : A ⊔ B ≤ L := sup_le hA hB
@@ -163,22 +172,24 @@ private theorem le_muMin_sup_of_le_muMin {R : Type u} {V : Type v} {E : Type w} 
   obtain ⟨r1, d1⟩ := s1
   obtain ⟨r2, d2⟩ := s2
   have r1' : (rk ρ (N ⊔ A) : ℝ) + rk ρ (N ⊓ A) = rk ρ N + rk ρ A := by exact_mod_cast r1
-  have r2' : (rk ρ (A ⊔ B) : ℝ) + rk ρ (B ⊓ (N ⊔ A)) = rk ρ B + rk ρ (N ⊔ A) := by
-    exact_mod_cast r2
-  have key : θ * ((rk ρ (A ⊔ B) : ℝ) - rk ρ N) =
-      θ * ((rk ρ B : ℝ) - rk ρ (B ⊓ (N ⊔ A))) + θ * ((rk ρ A : ℝ) - rk ρ (N ⊓ A)) := by
+  have r2' : (rk ρ (A ⊔ B) : ℝ) + rk ρ (B ⊓ (N ⊔ A)) = rk ρ B + rk ρ (N ⊔ A) := by exact_mod_cast r2
+  have key
+      : θ * ((rk ρ (A ⊔ B) : ℝ) - rk ρ N)
+        = θ * ((rk ρ B : ℝ) - rk ρ (B ⊓ (N ⊔ A))) + θ * ((rk ρ A : ℝ) - rk ρ (N ⊓ A)) := by
     rw [← mul_add]
     congr 1
     linarith
   rw [key]
   linarith
 
-private theorem muMin_sup_le_muMin_of_orthogonal {R : Type u} {V : Type v} {E : Type w} [Ring R]
-    [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (ρ : V →+ E)
-    {A B : Submodule R V} (hA : IsLat ρ A) (hB : IsLat ρ B)
-    (h : ∀ x ∈ A, ∀ y ∈ B, inner ℝ (ρ x) (ρ y) = 0) (hA0 : A ≠ ⊥) :
-    muMin ρ (A ⊔ B) ≤ muMin ρ A := by
+private theorem muMin_sup_le_muMin_of_orthogonal
+    {R : Type u} {V : Type v} {E : Type w} [Ring R] [AddCommGroup V] [Module R V]
+    [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w})
+    (ρ : V →+ E)
+    {A B : Submodule R V}
+    (hA : IsLat ρ A) (hB : IsLat ρ B) (h : ∀ x ∈ A, ∀ y ∈ B, inner ℝ (ρ x) (ρ y) = 0) (hA0 : A ≠ ⊥)
+    : muMin ρ (A ⊔ B) ≤ muMin ρ A := by
   have hM0 : A ⊔ B ≠ ⊥ := fun e => hA0 (eq_bot_iff.2 ((le_sup_left : A ≤ A ⊔ B).trans e.le))
   obtain ⟨hL, -, dAB⟩ := hnSum_orth ρ hA hB h
   have rAB := hnSum_orth_rk ρ h1 hA hB h
@@ -188,16 +199,16 @@ private theorem muMin_sup_le_muMin_of_orthogonal {R : Type u} {V : Type v} {E : 
   have hNl : IsLat ρ N := hnSum_isLat_mono ρ hA hN
   obtain ⟨-, -, dNB⟩ := hnSum_orth ρ hNl hB hNB
   have rNB := hnSum_orth_rk ρ h1 hNl hB hNB
-  have key := ((h2 R V E ρ (A ⊔ B) hL hM0).2.1 (muMin ρ (A ⊔ B))).1 le_rfl (N ⊔ B)
-    (sup_le_sup_right hN B)
+  have key :=
+    ((h2 R V E ρ (A ⊔ B) hL hM0).2.1 (muMin ρ (A ⊔ B))).1 le_rfl (N ⊔ B) (sup_le_sup_right hN B)
   rw [rNB, rAB, dNB, dAB] at key
   push_cast at key
   have e : (rk ρ A : ℝ) - rk ρ N = ((rk ρ A : ℝ) + rk ρ B) - ((rk ρ N : ℝ) + rk ρ B) := by ring
   rw [e]
   linarith
 
-theorem hnSum_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : SatBasic.{u, v, w}) :
-    HNSum.{u, v, w, x} := by
+theorem hnSum_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : SatBasic.{u, v, w})
+    : HNSum.{u, v, w, x} := by
   classical
   intro R V E _ _ _ _ _ _ ρ
   refine ⟨?_, ?_⟩
@@ -208,22 +219,22 @@ theorem hnSum_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : SatB
       rw [Finset.iSup_insert]
       have ha' := hA a (Finset.mem_insert_self a s)
       by_cases hs' : s.Nonempty
-      · have hrest : ∀ i ∈ s, A i ≤ L ∧ A i ≠ ⊥ ∧ θ ≤ muMin ρ (A i) :=
-          fun i hi => hA i (Finset.mem_insert_of_mem hi)
+      · have hrest : ∀ i ∈ s, A i ≤ L ∧ A i ≠ ⊥ ∧ θ ≤ muMin ρ (A i) := fun i hi =>
+          hA i (Finset.mem_insert_of_mem hi)
         have hle : (⨆ i ∈ s, A i) ≤ L := iSup₂_le fun i hi => (hrest i hi).1
         have hne : (⨆ i ∈ s, A i) ≠ ⊥ := by
           obtain ⟨j, hj⟩ := hs'
           intro hb
           apply (hrest j hj).2.1
-          exact eq_bot_iff.2 ((le_iSup₂_of_le (f := fun i (_ : i ∈ s) => A i) j hj le_rfl).trans hb.le)
+          exact eq_bot_iff.2 ((le_iSup₂_of_le (f := fun i (_ : i ∈ s) => A i) j hj le_rfl).trans
+            hb.le)
         exact le_muMin_sup_of_le_muMin h1 h2 ρ hL ha'.1 hle ha'.2.1 hne ha'.2.2 (ih hs' hrest)
       · rw [Finset.not_nonempty_iff_eq_empty.1 hs']
         simpa using ha'.2.2
   · intro A B hA hB h
     obtain ⟨hL, -, hdeg⟩ := hnSum_orth ρ hA hB h
     refine ⟨hL, hdeg, fun hA0 hB0 => ⟨?_, ?_⟩⟩
-    · have hM0 : A ⊔ B ≠ ⊥ :=
-        fun e => hA0 (eq_bot_iff.2 ((le_sup_left : A ≤ A ⊔ B).trans e.le))
+    · have hM0 : A ⊔ B ≠ ⊥ := fun e => hA0 (eq_bot_iff.2 ((le_sup_left : A ≤ A ⊔ B).trans e.le))
       have mA := (h2 R V E ρ A hA hA0).1
       have mB := (h2 R V E ρ B hB hB0).1
       have mM := (h2 R V E ρ (A ⊔ B) hL hM0).1
@@ -235,8 +246,9 @@ theorem hnSum_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : SatB
         have eB := ((mB (muMax ρ B)).1 le_rfl) (B ⊓ (N ⊔ A)) inf_le_left
         have fA : muMax ρ A * (rk ρ (N ⊓ A) : ℝ) ≤ max (muMax ρ A) (muMax ρ B) * rk ρ (N ⊓ A) :=
           mul_le_mul_of_nonneg_right (le_max_left _ _) (Nat.cast_nonneg _)
-        have fB : muMax ρ B * (rk ρ (B ⊓ (N ⊔ A)) : ℝ) ≤
-            max (muMax ρ A) (muMax ρ B) * rk ρ (B ⊓ (N ⊔ A)) :=
+        have fB
+            : muMax ρ B * (rk ρ (B ⊓ (N ⊔ A)) : ℝ)
+              ≤ max (muMax ρ A) (muMax ρ B) * rk ρ (B ⊓ (N ⊔ A)) :=
           mul_le_mul_of_nonneg_right (le_max_right _ _) (Nat.cast_nonneg _)
         rw [hr]
         push_cast
@@ -256,8 +268,8 @@ theorem hnSum_of (h1 : DegSupermod.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : SatB
           exact h x hx y hy
         have := muMin_sup_le_muMin_of_orthogonal h1 h2 ρ hB hA h' hB0
         rwa [sup_comm] at this
-      · exact le_muMin_sup_of_le_muMin h1 h2 ρ hL le_sup_left le_sup_right hA0 hB0
-          (min_le_left _ _) (min_le_right _ _)
+      · exact le_muMin_sup_of_le_muMin h1 h2 ρ hL le_sup_left le_sup_right hA0 hB0 (min_le_left _ _)
+          (min_le_right _ _)
 
 theorem polygon_slope_sum : HNSum :=
   hnSum_of degree_supermodular slope_characterization saturation_basic_properties

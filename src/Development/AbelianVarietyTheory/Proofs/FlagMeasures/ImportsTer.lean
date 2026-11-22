@@ -8,10 +8,11 @@ namespace GlobalTheory.FiniteSumFlagMeasures
 
 open NumberField
 
-theorem main {K : Type} [Field K] [NumberField K] {b : ℕ}
-    (B : Submodule (NumberField.RingOfIntegers K) (Fin b → K))
-    (hB : Submodule.span K (↑B : Set (Fin b → K)) = ⊤) (v : Fin b → K) :
-    ∃ (d : NumberField.RingOfIntegers K), d ≠ (0 : NumberField.RingOfIntegers K) ∧ d • v ∈ B := by
+theorem main
+    {K : Type} [Field K] [NumberField K]
+    {b : ℕ} (B : Submodule (NumberField.RingOfIntegers K) (Fin b → K))
+    (hB : Submodule.span K (↑B : Set (Fin b → K)) = ⊤) (v : Fin b → K)
+    : ∃ (d : NumberField.RingOfIntegers K), d ≠ (0 : NumberField.RingOfIntegers K) ∧ d • v ∈ B := by
   have hv : v ∈ Submodule.span K (↑B : Set (Fin b → K)) := by rw [hB]; trivial
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
@@ -33,6 +34,7 @@ theorem main {K : Type} [Field K] [NumberField K] {b : ℕ}
       rw [← algebraMap_smul K ((m : 𝓞 K) * d), ← algebraMap_smul K n, ← algebraMap_smul K d,
         smul_smul, smul_smul, map_mul, ← hnm]
       ring_nf
-    rw [key]; exact B.smul_mem _ h
+    rw [key]
+    exact B.smul_mem _ h
 
 end GlobalTheory.FiniteSumFlagMeasures

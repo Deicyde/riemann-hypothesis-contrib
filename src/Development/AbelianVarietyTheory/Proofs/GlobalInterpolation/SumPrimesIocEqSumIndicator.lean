@@ -10,13 +10,13 @@ open scoped Classical
 
 namespace GlobalTheory.Lin
 
-theorem mem_primesIoc_bounds {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) {p : ℕ} (hp : p ∈ primesIoc x y) :
-    x < p ∧ (p : ℝ) ≤ y := by
+theorem mem_primesIoc_bounds {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) {p : ℕ} (hp : p ∈ primesIoc x y)
+    : x < p ∧ (p : ℝ) ≤ y := by
   simp only [primesIoc, Finset.mem_filter, Finset.mem_Ioc] at hp
   exact ⟨(Nat.floor_lt hx).mp hp.1.1, (Nat.le_floor_iff (hx.trans hxy)).mp hp.1.2⟩
 
-theorem sum_primesIoc_eq_sum_indicator (a : ℕ → ℂ) {x y t : ℝ} (ht : 0 ≤ t) (hty : t ≤ y) :
-    ∑ p ∈ primesIoc x t, a p
+theorem sum_primesIoc_eq_sum_indicator (a : ℕ → ℂ) {x y t : ℝ} (ht : 0 ≤ t) (hty : t ≤ y)
+    : ∑ p ∈ primesIoc x t, a p
       = ∑ p ∈ primesIoc x y, (Set.Ici (p : ℝ)).indicator (fun _ => a p) t := by
   have hs : primesIoc x t = (primesIoc x y).filter (fun p : ℕ => (p : ℝ) ≤ t) := by
     ext p
@@ -58,24 +58,33 @@ private lemma integral_indicator_Ici_deriv_eq_sub_of_hasDerivAt {J J' : ℝ → 
   exact intervalIntegral.integral_eq_sub_of_hasDerivAt (fun t ht => (hJ t (hsub ht)).ofReal_comp)
     ((hc'.mono hsub).intervalIntegrable)
 
-theorem abel_primesIoc_weight (a : ℕ → ℂ) (J J' : ℝ → ℝ) (x y r : ℝ) (hx : 1 ≤ x) (hxy : x ≤ y)
-    (hJ : ∀ t ∈ Set.Icc x y, HasDerivAt J (J' t) t) (hc : ContinuousOn J' (Set.Icc x y))
-    (hb : ∀ t ∈ Set.Icc x y, |J' t| ≤ r / t) :
-    ‖∑ p ∈ primesIoc x y, a p * ((J p - J y : ℝ) : ℂ)‖
+theorem abel_primesIoc_weight
+    (a : ℕ → ℂ)
+    (J J' : ℝ → ℝ) (x y r : ℝ)
+    (hx : 1 ≤ x) (hxy : x ≤ y) (hJ : ∀ t ∈ Set.Icc x y, HasDerivAt J (J' t) t)
+    (hc : ContinuousOn J' (Set.Icc x y)) (hb : ∀ t ∈ Set.Icc x y, |J' t| ≤ r / t)
+    : ‖∑ p ∈ primesIoc x y, a p * ((J p - J y : ℝ) : ℂ)‖
       ≤ r * ∫ t in x..y, ‖∑ p ∈ primesIoc x t, a p‖ / t := by
   have hx0 : (0 : ℝ) ≤ x := zero_le_one.trans hx
-  obtain ⟨S, hS⟩ : ∃ S : ℝ → ℂ, S = fun t => ∑ p ∈ primesIoc x y, (Set.Ici (p : ℝ)).indicator (fun _ => a p) t :=
+  obtain ⟨S, hS⟩
+      : ∃ S : ℝ → ℂ,
+        S = fun t => ∑ p ∈ primesIoc x y, (Set.Ici (p : ℝ)).indicator (fun _ => a p) t :=
     ⟨_, rfl⟩
   have hIcc : Set.uIcc x y = Set.Icc x y := Set.uIcc_of_le hxy
   have hc' : ContinuousOn (fun t => (J' t : ℂ)) (Set.Icc x y) :=
     Complex.continuous_ofReal.comp_continuousOn hc
   have hJi : IntervalIntegrable (fun t => (J' t : ℂ)) MeasureTheory.volume x y :=
     (hc'.mono hIcc.subset).intervalIntegrable
-  have hterm : ∀ p ∈ primesIoc x y, IntervalIntegrable
-      (fun t => a p * (Set.Ici (p : ℝ)).indicator (fun t => (J' t : ℂ)) t) MeasureTheory.volume x y :=
-    fun p _ => (intervalIntegrable_indicator_Ici_of_intervalIntegrable hJi).const_mul (a p)
-  have hpt : ∀ t, (J' t : ℂ) * S t
-      = ∑ p ∈ primesIoc x y, a p * (Set.Ici (p : ℝ)).indicator (fun t => (J' t : ℂ)) t := by
+  have hterm
+      : ∀ p ∈ primesIoc x y,
+        IntervalIntegrable
+          (fun t => a p * (Set.Ici (p : ℝ)).indicator (fun t => (J' t : ℂ)) t)
+          MeasureTheory.volume x y := fun p _ =>
+    (intervalIntegrable_indicator_Ici_of_intervalIntegrable hJi).const_mul (a p)
+  have hpt
+      : ∀ t,
+        (J' t : ℂ) * S t
+          = ∑ p ∈ primesIoc x y, a p * (Set.Ici (p : ℝ)).indicator (fun t => (J' t : ℂ)) t := by
     intro t
     rw [hS, Finset.mul_sum]
     refine Finset.sum_congr rfl (fun p _ => ?_)
@@ -83,12 +92,13 @@ theorem abel_primesIoc_weight (a : ℕ → ℂ) (J J' : ℝ → ℝ) (x y r : �
     · simp only [Set.indicator_of_mem h]
       ring
     · simp [Set.indicator_of_notMem h]
-  have hL : ∑ p ∈ primesIoc x y, a p * ((J p - J y : ℝ) : ℂ) = -∫ t in x..y, (J' t : ℂ) * S t := by
+  have hL : ∑ p ∈ primesIoc x y, a p * ((J p - J y : ℝ) : ℂ) = - ∫ t in x..y, (J' t : ℂ) * S t := by
     simp_rw [hpt]
     rw [intervalIntegral.integral_finsetSum hterm, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl (fun p hp => ?_)
     have hb := mem_primesIoc_bounds hx0 hxy hp
-    rw [intervalIntegral.integral_const_mul, integral_indicator_Ici_deriv_eq_sub_of_hasDerivAt hb.1 hb.2 hJ hc]
+    rw [intervalIntegral.integral_const_mul,
+      integral_indicator_Ici_deriv_eq_sub_of_hasDerivAt hb.1 hb.2 hJ hc]
     push_cast
     ring
   have hSi : IntervalIntegrable S MeasureTheory.volume x y := by
@@ -97,7 +107,8 @@ theorem abel_primesIoc_weight (a : ℕ → ℂ) (J J' : ℝ → ℝ) (x y r : �
       funext t
       simp [Finset.sum_apply]
     rw [hS']
-    exact IntervalIntegrable.sum _ (fun p _ => intervalIntegrable_indicator_Ici_of_intervalIntegrable intervalIntegrable_const)
+    exact IntervalIntegrable.sum _
+      (fun p _ => intervalIntegrable_indicator_Ici_of_intervalIntegrable intervalIntegrable_const)
   have hinv : ContinuousOn (fun t : ℝ => t⁻¹) (Set.uIcc x y) := by
     apply ContinuousOn.inv₀ continuousOn_id
     intro t ht
@@ -108,10 +119,12 @@ theorem abel_primesIoc_weight (a : ℕ → ℂ) (J J' : ℝ → ℝ) (x y r : �
     simpa [div_eq_mul_inv] using this
   have hf : IntervalIntegrable (fun t => ‖(J' t : ℂ) * S t‖) MeasureTheory.volume x y := by
     have hsum := IntervalIntegrable.sum _ hterm
-    have he : (fun t => (J' t : ℂ) * S t)
-        = ∑ p ∈ primesIoc x y, (fun t => a p * (Set.Ici (p : ℝ)).indicator (fun t => (J' t : ℂ)) t) := by
-      funext t
-      rw [hpt, Finset.sum_apply]
+    have he
+        : (fun t => (J' t : ℂ) * S t)
+          = ∑ p ∈ primesIoc x y, (fun t => a p * (Set.Ici (p : ℝ)).indicator (fun t => (J' t : ℂ)) t) :=
+      by
+        funext t
+        rw [hpt, Finset.sum_apply]
     rw [← he] at hsum
     exact hsum.norm
   have hA : ∀ t ∈ Set.uIcc x y, ‖∑ p ∈ primesIoc x t, a p‖ / t = ‖S t‖ / t := by
@@ -123,7 +136,9 @@ theorem abel_primesIoc_weight (a : ℕ → ℂ) (J J' : ℝ → ℝ) (x y r : �
   refine intervalIntegral.integral_mono_on hxy hf hg (fun t ht => ?_)
   have ht0 : 0 < t := lt_of_lt_of_le zero_lt_one (hx.trans ht.1)
   rw [norm_mul, Complex.norm_real, Real.norm_eq_abs]
-  calc |J' t| * ‖S t‖ ≤ r / t * ‖S t‖ := mul_le_mul_of_nonneg_right (hb t ht) (norm_nonneg _)
+  calc
+    |J' t| * ‖S t‖
+      ≤ r / t * ‖S t‖ := mul_le_mul_of_nonneg_right (hb t ht) (norm_nonneg _)
     _ = r * (‖S t‖ / t) := by ring
 
 end GlobalTheory.Lin

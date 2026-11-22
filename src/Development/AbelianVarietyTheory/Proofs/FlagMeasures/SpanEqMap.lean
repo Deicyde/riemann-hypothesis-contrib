@@ -19,9 +19,10 @@ namespace GlobalTheory.MatrixIndex
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem exists_basis [IsNonarchimedeanLocalField F] [CharZero F] (L : LocE F E) :
-    ∃ b : Module.Basis (Fin 2) F E, (∀ x, x ∈ L.O ↔ ∀ i, b.repr x i ∈ 𝒪[F]) ∧
-      ∀ x, algebraMap F E (Algebra.norm F x) = x * L.cj x := by
+theorem exists_basis [IsNonarchimedeanLocalField F] [CharZero F] (L : LocE F E)
+    : ∃ b : Module.Basis (Fin 2) F E,
+      (∀ x, x ∈ L.O ↔ ∀ i, b.repr x i ∈ 𝒪[F])
+        ∧ ∀ x, algebraMap F E (Algebra.norm F x) = x * L.cj x := by
   obtain ⟨ω, hω, e, he, hωe⟩ := GlobalTheory.UnramOrder.exists_sub_cj_mul_eq_one L
   have hint : ∀ a : F, a ∈ 𝒪[F] → algebraMap F E a ∈ L.O := fun a h =>
     (GlobalTheory.UnramOrder.algebraMap_mem_iff L a).2 h
@@ -33,13 +34,13 @@ theorem exists_basis [IsNonarchimedeanLocalField F] [CharZero F] (L : LocE F E) 
     simp only [Algebra.smul_def, mul_one] at h
     have h' := congrArg L.cj h
     simp only [map_add (f := _), map_mul, AlgEquiv.commutes, map_zero] at h'
-    have ht : algebraMap F E t = 0 := by
-      linear_combination e * h - e * h' - algebraMap F E t * hωe
+    have ht : algebraMap F E t = 0 := by linear_combination e * h - e * h' - algebraMap F E t * hωe
     have hs : algebraMap F E s = 0 := by rw [ht] at h; simpa using h
-    exact ⟨GlobalTheory.UnramOrder.algebraMap_inj L (by simpa using hs),
-      GlobalTheory.UnramOrder.algebraMap_inj L (by simpa using ht)⟩
-  let b : Module.Basis (Fin 2) F E :=
-    basisOfLinearIndependentOfCardEqFinrank hli (by simp [L.rank])
+    exact ⟨
+      GlobalTheory.UnramOrder.algebraMap_inj L (by simpa using hs),
+      GlobalTheory.UnramOrder.algebraMap_inj L (by simpa using ht)
+    ⟩
+  let b : Module.Basis (Fin 2) F E := basisOfLinearIndependentOfCardEqFinrank hli (by simp [L.rank])
   have hb0 : b 0 = 1 := by simp [b]
   have hb1 : b 1 = ω := by simp [b]
   have hx : ∀ x, x = algebraMap F E (b.repr x 0) + algebraMap F E (b.repr x 1) * ω := by
@@ -82,9 +83,9 @@ theorem exists_basis [IsNonarchimedeanLocalField F] [CharZero F] (L : LocE F E) 
       linear_combination (-(L.cj x)) * h3 + x * h4 + (a' + c' * L.cj ω) * h1 - (a' + c' * ω) * h2
     linear_combination e * key - (a * c' - a' * c - x * L.cj x) * hωe
 
-theorem span_eq_map (L : LocE F E) {n m : ℕ} (y : Fin m → Fin n → E) :
-    (Submodule.span L.O (Set.range y)).toAddSubgroup =
-      (AddSubgroup.pi Set.univ fun _ : Fin m => L.O.toAddSubgroup).map
+theorem span_eq_map (L : LocE F E) {n m : ℕ} (y : Fin m → Fin n → E)
+    : (Submodule.span L.O (Set.range y)).toAddSubgroup
+      = (AddSubgroup.pi Set.univ fun _ : Fin m => L.O.toAddSubgroup).map
         (Fintype.linearCombination E y).toAddMonoidHom := by
   ext x
   simp only [Submodule.mem_toAddSubgroup, Submodule.mem_span_range_iff_exists_fun,
@@ -96,7 +97,19 @@ theorem span_eq_map (L : LocE F E) {n m : ℕ} (y : Fin m → Fin n → E) :
   · rintro ⟨c, hc, rfl⟩
     exact ⟨fun i => ⟨c i, hc i⟩, rfl⟩
 
-theorem index_rmul : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (ϖ : 𝒪[F]), Irreducible ϖ → ∀ {n m : ℕ} (y : Fin m → Fin n → E), LinearIndependent E y → ∀ A : Matrix (Fin m) (Fin m) E, IsIntM L A → IsUnit A.det → 0 ≤ vE L ϖ (A.det * L.cj A.det) ∧ (Submodule.span L.O (Set.range (rmul y A))).toAddSubgroup.relIndex (Submodule.span L.O (Set.range y)).toAddSubgroup = resQ ϖ ^ (vE L ϖ (A.det * L.cj A.det)).toNat := by
+theorem index_rmul
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (ϖ : 𝒪[F]),
+        Irreducible ϖ
+          → ∀ {n m : ℕ} (y : Fin m → Fin n → E),
+            LinearIndependent E y
+              → ∀ A : Matrix (Fin m) (Fin m) E,
+                IsIntM L A → IsUnit A.det
+                  → 0 ≤ vE L ϖ (A.det * L.cj A.det)
+                    ∧ (Submodule.span L.O (Set.range (rmul y A))).toAddSubgroup.relIndex
+                        (Submodule.span L.O (Set.range y)).toAddSubgroup
+                      = resQ ϖ ^ (vE L ϖ (A.det * L.cj A.det)).toNat := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ n m y hy A hA hu
   obtain ⟨b, hbO, hnorm⟩ := exists_basis L
   have := L.free
@@ -123,11 +136,10 @@ theorem index_rmul : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
       ext1 v; exact LinearMap.ext fun w => hφ _
     rw [this, LinearMap.det_restrictScalars, LinearMap.det_toLin']
   set W0 := (AddSubgroup.pi Set.univ fun _ : Fin m => L.O.toAddSubgroup) with hW0
-  have hmem : ∀ x, x ∈ W0 ↔ ∀ i, x i ∈ L.O := fun x => by
-    simp [hW0, AddSubgroup.mem_pi]
-  obtain ⟨h1, -, h3⟩ := GlobalTheory.T.relative_lattice_volume_of_det_valuation ϖ hϖ (Pi.basis fun _ : Fin m => b) φ a u (hdet.trans hu') W0
-    (fun x => by
-      simp only [hmem, hbO, Pi.basis_repr, Sigma.forall])
+  have hmem : ∀ x, x ∈ W0 ↔ ∀ i, x i ∈ L.O := fun x => by simp [hW0, AddSubgroup.mem_pi]
+  obtain ⟨h1, -, h3⟩ :=
+    GlobalTheory.T.relative_lattice_volume_of_det_valuation ϖ hϖ (Pi.basis fun _ : Fin m => b) φ a u
+      (hdet.trans hu') W0 (fun x => by simp only [hmem, hbO, Pi.basis_repr, Sigma.forall])
   have hle : W0.map φ.toAddEquiv.toAddMonoidHom ≤ W0 := by
     rintro _ ⟨v, hv, rfl⟩
     rw [hmem]
@@ -135,8 +147,9 @@ theorem index_rmul : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
     change φ v i ∈ _
     rw [hφ, Matrix.mulVec, dotProduct]
     exact L.O.sum_mem fun j _ => L.O.mul_mem (hA _ _) ((hmem v).1 hv j)
-  have hcomp : (Fintype.linearCombination E (rmul y A)).toAddMonoidHom =
-      (Fintype.linearCombination E y).toAddMonoidHom.comp φ.toAddEquiv.toAddMonoidHom := by
+  have hcomp
+      : (Fintype.linearCombination E (rmul y A)).toAddMonoidHom
+        = (Fintype.linearCombination E y).toAddMonoidHom.comp φ.toAddEquiv.toAddMonoidHom := by
     refine AddMonoidHom.ext fun v => ?_
     change Fintype.linearCombination E (rmul y A) v = Fintype.linearCombination E y (φ v)
     rw [hφ]
@@ -145,12 +158,12 @@ theorem index_rmul : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
     rw [Finset.sum_comm]
     simp only [mul_comm]
   have hinj : Function.Injective (Fintype.linearCombination E y).toAddMonoidHom := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v hv
     exact funext (Fintype.linearIndependent_iff.1 hy v hv)
   rw [span_eq_map, span_eq_map, ← hW0, hcomp, ← AddSubgroup.map_map,
-    AddSubgroup.relIndex_map_map_of_injective _ _
-      hinj]
+    AddSubgroup.relIndex_map_map_of_injective _ _ hinj]
   rw [relVol, AddSubgroup.relIndex_eq_one.2 hle] at h3
   lift a to ℕ using ha
   rw [zpow_neg, zpow_natCast, Nat.cast_one, one_div, inv_inj] at h3
