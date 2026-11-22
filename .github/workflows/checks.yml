@@ -1,19 +1,19 @@
 name: checks
 
-# Challenge build and formal-conjectures rehearsal on hosted runners; full builds use the
-# external runner pool.
-# The original-submission provenance comparison is available by manual dispatch.
+# The formal-conjectures rehearsal runs on hosted runners; full builds use the external runner
+# pool. The original-submission provenance comparison is available by manual dispatch.
+# Whether a pull request changes a Comparator challenge file is checked in challenge-files.yml.
 
-# The two challenge jobs read only the files listed under `paths`, so they run when one of those
-# changes: on pull requests, on main, and by manual dispatch. Other changes cannot alter their
-# result. Keep the two lists the same.
+# The rehearsal reads only the files listed under `paths`, so it runs when one of those changes:
+# on pull requests, on main, and by manual dispatch. Other changes cannot alter its result. Keep
+# the two lists the same. GitHub looks at the first 3,000 changed files only, so a larger pull
+# request that changes one of these may need a manual dispatch.
 on:
   push:
     branches: [main]
     paths:
       - comparator/**
       - src/Statements.lean
-      - lakefile.toml
       - lake-manifest.json
       - lean-toolchain
       - .github/workflows/checks.yml
@@ -21,7 +21,6 @@ on:
     paths:
       - comparator/**
       - src/Statements.lean
-      - lakefile.toml
       - lake-manifest.json
       - lean-toolchain
       - .github/workflows/checks.yml
@@ -66,46 +65,6 @@ jobs:
           n=$(wc -c < "$T/lean/lakefile.toml")
           head -c "$n" "$T/lakefile-without-cache.toml" | cmp - "$T/lean/lakefile.toml"
           tail -c +"$((n + 1))" "$T/lakefile-without-cache.toml"
-
-  challenge:
-    name: Challenge compiles against Mathlib alone
-    runs-on: ubuntu-latest
-    env:
-      LEAN_ABORT_ON_PANIC: "1"   # as Comparator sets it for builds and exports
-      MATHLIB_CACHE_GET_URL: https://cache.mathlib.org/mathlib4   # Mathlib's current cache server
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install elan
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
-          sh "$RUNNER_TEMP/elan-init.sh" -y --default-toolchain none
-          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Fetch Mathlib's official build cache
-        run: lake exe mathlib/cache get
-      # Step 1 of the README. The challenge is in no Lake library; it is compiled directly.
-      - name: Compile only the challenge
-        run: |
-          mkdir -p .lake/comparator
-          lake env lean --root=comparator -o .lake/comparator/Challenge.olean comparator/Challenge.lean
-      - name: Build the exporter (lean4export v4.33.0 with this project's Lean)
-        run: |
-          git clone --quiet --depth 1 --branch v4.33.0 https://github.com/leanprover/lean4export "$RUNNER_TEMP/lean4export"
-          cp lean-toolchain "$RUNNER_TEMP/lean4export/lean-toolchain"
-          cd "$RUNNER_TEMP/lean4export" && git rev-parse HEAD && lake build lean4export
-      - name: Export the challenge
-        run: |
-          LEAN_PATH="$PWD/.lake/comparator" lake env "$RUNNER_TEMP/lean4export/.lake/build/bin/lean4export" Challenge \
-            -- $(cat comparator/main-export-targets.txt) > "$RUNNER_TEMP/challenge.export"
-          cd "$RUNNER_TEMP"
-          sha256sum challenge.export | tee challenge.export.sha256
-          {
-            echo "### Challenge export"
-            echo "- sha256: \`$(cut -d' ' -f1 challenge.export.sha256)\`"
-            echo "- size: $(wc -c < challenge.export) bytes, $(wc -l < challenge.export) lines"
-            echo "- commit: \`$GITHUB_SHA\`"
-          } >> "$GITHUB_STEP_SUMMARY"
-          # The README quotes this checksum; fail if the export ever changes.
-          echo "bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9  challenge.export" | sha256sum -c
 
   # The second Comparator setup, comparator/formal-conjectures.json. See the README and the notes.
   formal-conjectures:

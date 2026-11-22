@@ -93,9 +93,10 @@ What to know before running it:
   `v4.36.0`. The exporter is [lean4export](https://github.com/leanprover/lean4export) at tag
   `v4.33.0`, built with Lean `v4.33.1`.
 - **Challenge first.** Compiling the submission runs its code, so the challenge is exported
-  where none of that code has been compiled. CI does step 1 whenever a file it reads changes,
-  and checks that the export has sha256
-  `bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9`.
+  where none of that code has been compiled. With Lean `v4.33.1` and Mathlib `0df444a3` the
+  export has sha256 `bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9`.
+- **Frozen challenge.** A pull request may not change `Challenge.lean`, a config or a list of
+  export targets in `comparator/`: CI fails one that does. So CI does not rebuild the challenge.
 - **Not `lake exe cache get`.** In this repository that command also downloads prebuilt files
   for the submission itself, and `lake build Main` then compiles nothing. Steps 1 and 2 use
   `lake exe mathlib/cache get`, which fetches Mathlib only.

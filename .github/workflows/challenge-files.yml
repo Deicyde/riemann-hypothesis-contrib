@@ -1,0 +1,70 @@
+name: challenge files
+
+# The Comparator challenge files say what the proof is judged against, so a pull request may not
+# change them. This runs the base branch's copy of the workflow and nothing from the pull
+# request: it reads file hashes through the API. A pull request cannot switch it off, and it
+# needs no approval to run on a pull request from a fork.
+
+on:
+  pull_request_target:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request to check
+        type: number
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  frozen:
+    name: Comparator challenge files are unchanged
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compare the files where the pull request branched off and at its head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          frozen="Challenge.lean main.json main-export-targets.txt formal-conjectures.json formal-conjectures-export-targets.txt"
+
+          base=$(gh api "repos/$REPO/pulls/$PR" --jq .base.sha)
+          head=$(gh api "repos/$REPO/pulls/$PR" --jq .head.sha)
+          fork=$(gh api "repos/$REPO/compare/$base...$head?per_page=1" --jq .merge_base_commit.sha)
+          echo "pull request $PR: branched off at $fork, head $head"
+
+          # Name and blob hash of each file in comparator/ at a commit; nothing if the folder is
+          # not there yet. Any other API failure stops the job.
+          listing() {
+            local out
+            if out=$(gh api "repos/$REPO/contents/comparator?ref=$1" --jq '.[] | "\(.name) \(.sha)"' 2>&1); then
+              printf '%s\n' "$out"
+            elif ! grep -q 'HTTP 404' <<<"$out"; then
+              printf '%s\n' "$out" >&2
+              return 1
+            fi
+          }
+          before=$(listing "$fork")
+          after=$(listing "$head")
+
+          status=0
+          for name in $frozen; do
+            old=$(awk -v n="$name" '$1 == n { print $2 }' <<<"$before")
+            new=$(awk -v n="$name" '$1 == n { print $2 }' <<<"$after")
+            # A file that was not there before is being added, not changed.
+            if [ -n "$old" ] && [ "$old" != "$new" ]; then
+              echo "::error file=comparator/$name::This pull request changes comparator/$name, a Comparator challenge file."
+              status=1
+            else
+              echo "unchanged: comparator/$name"
+            fi
+          done
+          if [ "$status" != 0 ]; then
+            echo "These files say what the proof is judged against, and pull requests may not change them."
+            echo "A maintainer who means to change one has to make the challenge export again and update"
+            echo "its sha256 in the README."
+          fi
+          exit "$status"
