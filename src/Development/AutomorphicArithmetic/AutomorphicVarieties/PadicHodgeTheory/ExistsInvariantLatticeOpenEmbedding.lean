@@ -125,9 +125,9 @@ theorem UpperTheory.exists_invariant_lattice_openEmbedding :
   let b : Basis (Fin (finrank ℚ_[l] V)) ℚ_[l] V := bL.extendOfIsFullLattice ℚ_[l]
   let j : (Fin (finrank ℚ_[l] V) → ℤ_[l]) →ₗ[ℤ_[l]] V := L.subtype ∘ₗ bL.equivFun.symm.toLinearMap
   have hj : ∀ x, j x = b.equivFun.symm (fun i => (x i : ℚ_[l])) := fun x => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [j, b, LinearMap.comp_apply, LinearEquiv.coe_coe, Basis.equivFun_symm_apply, map_sum, map_smul,
-      Submodule.subtype_apply, Basis.extendOfIsFullLattice_apply]
+
+    simp only [j, b, LinearMap.comp_apply, LinearEquiv.coe_coe, Basis.equivFun_symm_apply, map_sum, map_smul,
+    Submodule.subtype_apply, Basis.extendOfIsFullLattice_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     exact (algebraMap_smul ℚ_[l] (x i) _).symm
   let e : (Fin (finrank ℚ_[l] V) → ℚ_[l]) ≃ₜ V :=

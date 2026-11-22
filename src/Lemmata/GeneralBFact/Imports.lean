@@ -21,8 +21,8 @@ theorem goal1 {R : Type*} [CommRing R] {i N : ℕ} (A : Matrix (Fin i) (Fin N) R
         (fun a => ∑ k, A a k • B k) := by
     rw [Matrix.det, h1]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h2, MultilinearMap.map_sum]
+
+  rw [h2, MultilinearMap.map_sum]
   refine Finset.sum_congr rfl fun f _ => ?_
   rw [MultilinearMap.map_smul_univ, smul_eq_mul]
   rfl

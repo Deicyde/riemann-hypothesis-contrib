@@ -276,8 +276,8 @@ private theorem coeffDiag_lemma_5 {σ : Type} (s : σ → S) (h : MvPolynomial �
     AddMonoidAlgebra.coeff (aeval (fun p => C (s p) * X p) h) e = (e.prod fun p k => s p ^ k) * AddMonoidAlgebra.coeff h e := by
   classical
   conv_lhs => rw [h.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, coeff_sum]
+
+  rw [map_sum, coeff_sum]
   simp only [monoDiag_lemma_4, coeff_monomial]
   rw [Finset.sum_eq_single e]
   · rw [if_pos rfl]

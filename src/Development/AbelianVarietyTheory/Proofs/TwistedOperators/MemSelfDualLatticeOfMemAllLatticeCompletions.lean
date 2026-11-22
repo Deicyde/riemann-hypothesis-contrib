@@ -21,8 +21,8 @@ open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK Mo
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.FinPl.LocGlob
 
@@ -108,8 +108,8 @@ theorem mem_of_local {S : HSp D} {L : GlobalTheory.FinPl.Lat S} (hL : IsSelfDual
   set β : Af D.host.F := 1 - ∑ v ∈ T, GlobalTheory.FinPl.LatMem.indP D.host.F (· = v) with hβ
   have hβv : ∀ w, evalV D.host.F w β = if w ∈ T then 0 else 1 := by
     intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hβ, map_sub, map_one, map_sum]
+
+    rw [hβ, map_sub, map_one, map_sum]
     simp only [GlobalTheory.FinPl.LatMem.evalV_indP]
     rw [Finset.sum_ite_eq]
     split_ifs <;> simp

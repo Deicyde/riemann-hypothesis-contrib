@@ -47,7 +47,7 @@ private theorem UpperTheory.V.AlgebraTools.Conn.core_krull {R : Type} [CommRing 
   exact IsLocalization.injective (Localization.AtPrime P) (Ideal.primeCompl_le_nonZeroDivisors P)
     (h0.trans (map_zero _).symm)
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.AlgebraTools.Conn.core :
     ∀ {A R : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A] [CommRing R] [IsDomain R] [Algebra A R] [Module.Finite A R]
       [FaithfulSMul A R] (I : Ideal A) [IsAdicComplete I A] (J : ℕ → Ideal A) (u v : A) (b c P Q : Ideal R) (y z : A),

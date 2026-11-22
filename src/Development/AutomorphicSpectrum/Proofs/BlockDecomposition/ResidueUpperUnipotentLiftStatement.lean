@@ -7,7 +7,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JpUnif
 @[expose] public section
 
 open Matrix GlobalTheory.CompanionTheory.Jp
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.residue_upper_unipotent_lift : ∀ (O L : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field L] [Algebra O L] [IsFractionRing O L]
     (n : ℕ) (ϖ : O), Irreducible ϖ → ∀ w : Lˣ, (w : L) = algebraMap O L ϖ →
     ∀ x : GL (Ix n) (IsLocalRing.ResidueField O), x.1.toBlocks₁₂ = 0 →

@@ -52,8 +52,8 @@ theorem cc_dh (Y : FBChart C V O dd) (i : Fin dd) : constantCoeff (pderiv ((1 : 
 
 theorem cc_sgP (Y : FBChart C V O dd) (w : Fin dd → C) : constantCoeff (Y.sgP w) = 0 := by
   unfold FBChart.sgP
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_neg, map_sum, map_mul, constantCoeff_ev constant_zero_first_zero, cc_dh, mul_zero, Finset.sum_const_zero, neg_zero]
+
+  simp only [map_neg, map_sum, map_mul, constantCoeff_ev constant_zero_first_zero, cc_dh, mul_zero, Finset.sum_const_zero, neg_zero]
 
 def actCv (Y : FBChart C V O dd) (β : O) (γ : Fin dd → PowerSeries C) : Fin dd → PowerSeries C :=
   fun j => alongCv γ (un1 (Y.B.A.act β j))
@@ -95,8 +95,8 @@ theorem actCv_lg (i : Fin dd) :
   have e : alongCv γ (∑ j, MvPowerSeries.C (linM (Y.B.A.act β) i j) * un1 (Y.lg j)) =
       ∑ j, alongCv γ (MvPowerSeries.C (linM (Y.B.A.act β) i j) * un1 (Y.lg j)) := by
     unfold alongCv
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← coe_substAlgHom hSγ, map_sum]
+
+    rw [← coe_substAlgHom hSγ, map_sum]
   rw [e]
   exact Finset.sum_congr rfl fun j _ => along_Cmul hγ _ _
 
@@ -150,8 +150,8 @@ theorem oActSelf_holds : OActSelfSt := by
     intro δ hδ f
     have hS := hasSubst_of_constantCoeff_zero fun z => (hδ z).1
     unfold alongCv
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← MvPowerSeries.coe_substAlgHom hS, map_sum, MvPowerSeries.coe_substAlgHom hS]
+
+    rw [← MvPowerSeries.coe_substAlgHom hS, map_sum, MvPowerSeries.coe_substAlgHom hS]
     exact Finset.sum_congr rfl fun c _ => along δ hδ c (f c)
 
   have he_col : ∀ (q : I0) (col : Fin 2), linAct (Y.B.A.act (star β)) (fun i => (Y.rawSelf p).u (1 - g) q (col, i)) =
@@ -177,15 +177,15 @@ theorem oActSelf_holds : OActSelfSt := by
     refine ⟨?_, fun n => ?_⟩
     · rw [hlam'def]
       simp only
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, map_add (f := _), PowerSeries.coeff_smul,
-        PowerSeries.coeff_zero_eq_constantCoeff_apply, (hlam q).1, map_sum]
+
+      rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, map_add (f := _), PowerSeries.coeff_smul,
+      PowerSeries.coeff_zero_eq_constantCoeff_apply, (hlam q).1, map_sum]
       simp only [PowerSeries.coeff_zero_eq_constantCoeff_apply, hΔ0, Finset.sum_const_zero, smul_eq_mul, mul_zero,
         add_zero]
     · rw [hlam'def]
       simp only
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), PowerSeries.coeff_smul, smul_eq_mul, map_sum]
+
+      rw [map_add (f := _), PowerSeries.coeff_smul, smul_eq_mul, map_sum]
       exact ((p.em_int _ α).mul_int ((hlam q).2 n)).add (VF.Ge.sum fun col _ => hΔi q col n)
   refine ⟨γ', lam', hγ'cv, hlam'cv, fun z => ?_, fun q => ?_⟩
   ·

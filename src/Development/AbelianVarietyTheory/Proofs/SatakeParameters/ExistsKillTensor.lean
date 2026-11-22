@@ -67,8 +67,8 @@ theorem exists_kill [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
     obtain ⟨x, rfl⟩ := (hO w).1 hw
     exact (hO _).2 ⟨g * x, by rw [map_mul, Module.End.mul_apply]⟩
   have hinv : ∀ g, π g (∑ w ∈ O, w) = ∑ w ∈ O, w := fun g => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_nbij' (fun w => π g w) (fun w => π g⁻¹ w) (hmem g) (hmem g⁻¹)
       (fun w _ => ?_) (fun w _ => ?_) (fun _ _ => rfl)
     · rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]

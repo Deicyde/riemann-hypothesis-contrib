@@ -49,7 +49,7 @@ theorem ker_productMap_le_span {κ κ' : Type} [Field κ] [Field κ'] [Algebra �
   rwa [RingHom.mem_ker.1 hx, TensorProduct.tmul_zero, sub_zero] at h
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem jets_mem_pow_sup : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'] [Algebra ℂ K] [Algebra ℂ κ] [Algebra ℂ κ']
     (R : Subring K) (π : R →+* κ) (ρ : κ →ₐ[ℂ] κ') (E : Place (algebraMap ℂ K))
     (𝔭 : Ideal (tens (κ' := κ') (placeAlg E))) [𝔭.IsPrime] (t : E.ring),
@@ -159,8 +159,8 @@ theorem jets_mem_pow_sup : ∀ {K κ κ' : Type} [Field K] [Field κ] [Field κ'
       rw [hw]
       simp only [AddSubmonoidClass.coe_finsetSum, Subalgebra.coe_mul, hjL, hjR, hι,
         Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ew, map_sum, map_sum]
+
+    rw [ew, map_sum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hθt, hθ₀, map_mul]
 

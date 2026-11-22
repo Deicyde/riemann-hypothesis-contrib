@@ -104,8 +104,8 @@ theorem eq_mvExp_of_additive : ∀ (C : Type) [Field C] [CharZero C] (κ : Type)
     · intro w
       ext m
       have hL : pderiv w (∑ x, (coeff (Finsupp.single x 1) U) • (X x : MvPowerSeries κ C)) = MvPowerSeries.C ((coeff (Finsupp.single w 1) U)) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, Finset.sum_eq_single w]
+
+        rw [map_sum, Finset.sum_eq_single w]
         · simp [smul_eq_C_mul]
         · intro b _ hb; simp [pderiv_X_of_ne hb]
         · simp

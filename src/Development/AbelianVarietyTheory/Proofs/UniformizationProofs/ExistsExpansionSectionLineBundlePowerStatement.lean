@@ -15,6 +15,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_expansion_section_lineBundle_power : Laws → Laws2 → (AllPre fun U => ∀ k, 1 ≤ k → ∀ σ, ∃ f, U.ExpT (𝟙_ _) k σ f) := by
   first | exact @GlobalTheory.BaseExpansionExists.main | exact GlobalTheory.BaseExpansionExists.main | (intros; apply GlobalTheory.BaseExpansionExists.main <;> assumption)

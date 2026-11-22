@@ -46,8 +46,8 @@ theorem exists_unit_one_add_generator (D : D7) (hCen : GlobalTheory.Pass.Central
       (D.what₂.restRowsFiniteGroupCard : ℂ) • D.ntypes.e0 := by
     rw [e0_eq, eGood, Finset.smul_sum, AddSubmonoidClass.coe_finsetSum]
     show MonoidAlgebra.mapRingHom _ (iotaO D.nd D.naut i) _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun p _ => ?_
     split_ifs with hg
     · exact hp p
@@ -105,8 +105,8 @@ theorem exists_tuple (D : D7) (μ : D.what₂.Tup) (j : ℕ) (F : D.what₂.Mt �
       D.ntypes.onMt μ j (c : MonoidAlgebra ℂ (G0g D.nd)) = D.ntypes.cenMt μ j c := by
     unfold NTypes.onMt
     rw [dite_eq_left c.2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [he, onMt_coe, map_sum, LinearMap.sum_apply]
+
+  rw [he, onMt_coe, map_sum, LinearMap.sum_apply]
   refine Finset.sum_eq_zero fun p _ => ?_
   split_ifs with hg
   · by_contra hc

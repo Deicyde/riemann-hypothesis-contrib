@@ -92,8 +92,8 @@ theorem core {R S : Type} [CommRing R] [CommRing S] (ι : R →+* S) (s : S →+
   have hE1 : ∑ i, ι (e i) = 1 := by rw [← map_sum, hsum1, map_one]
   have hsl : s (∑ i, ι (e i) * (ι (p i) + ι (q i) * Θ)) =
       ∑ i, ι (e i) * (ι (p i) - ι (q i) * Θ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, map_add (f := _), map_mul, hsι, hsι, hsι, hsΘ]
     ring
@@ -115,15 +115,15 @@ theorem core {R S : Type} [CommRing R] [CommRing S] (ι : R →+* S) (s : S →+
     rw [hz]
     have hsz : s (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w)) =
         ∑ i, ι (e i) * (ι Bt - (ι (p i) + ι (q i) * Θ) * (ι a - ι b * Θ)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       simp only [hw, map_mul, map_sub, map_add (f := _), hsι, hsΘ]
       ring
     have hprod : (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w)) *
         s (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w)) = ι (∑ i, e i * f i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hsz, glue_mul _ hidS horS, map_sum]
+
+      rw [hsz, glue_mul _ hidS horS, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hw, norm_id _ _ _ _ _ _ _ hΘ, hf i, map_mul]
       simp only [map_sub, map_add (f := _), map_mul, map_pow]

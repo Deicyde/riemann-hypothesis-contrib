@@ -62,8 +62,8 @@ theorem eq_one_of_idem (hcm : IsCMExt F E σ) (hs : ∀ e, IsSplitIdemF σ e →
     (h1 : e * e = e) (h2 : {v | e v ≠ 0}.Finite) (h3 : ∀ v, e v ≠ 0 → SplitPl c v) (g : GAF σ J)
     (hg : fj E e • (mtF σ J g - 1) = mtF σ J g - 1) : ν g = 1 := by
   refine eq_one_of_finset hcm hs h2.toFinset (fun v hv => h3 v (h2.mem_toFinset.1 hv)) g ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← idem_eq_sum e h1 h2.toFinset (fun v => h2.mem_toFinset), hg]
+
+  rw [← map_sum, ← idem_eq_sum e h1 h2.toFinset (fun v => h2.mem_toFinset), hg]
 
 end Char
 
@@ -226,7 +226,7 @@ open scoped TensorProduct Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
-set_option maxHeartbeats 1000000 in
+
 theorem PositivityTheory.ThKW.character_trivial_of_rational_split : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
     B.IsGood σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J →
       ∀ ν : Formalism.IndefR.DatumF.GAF σ J →* Circle, Continuous ν → (∀ γ ∈ Formalism.IndefR.DatumF.GQF σ J, ν γ = 1) →

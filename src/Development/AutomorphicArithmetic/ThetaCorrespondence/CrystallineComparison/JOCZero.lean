@@ -14,7 +14,7 @@ open GroundTheory.PAdicHodge
 
 variable (l : ℕ) [Fact l.Prime]
 
-set_option maxHeartbeats 200000 in
+
 theorem jOC_zero (a : Reformulated.AutPerF.AcrisZero l (Cmp6.OC l)) :
     jOC l (algebraMap _ (Reformulated.AutPerF.Acris l (Cmp6.OC l)) a) =
       algebraMap (Reformulated.AutPerF.AinfInv l (Cmp6.OC l)) _ (a : Reformulated.AutPerF.AinfInv l (Cmp6.OC l)) := by

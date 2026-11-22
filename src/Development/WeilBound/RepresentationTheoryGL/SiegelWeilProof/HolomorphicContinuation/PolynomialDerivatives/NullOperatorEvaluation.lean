@@ -65,9 +65,9 @@ theorem hasFDerivAt_pg (c : ℝ) (P : PX m n) (x : Fin m → Fin n → ℂ) :
 theorem fderiv_pg (c : ℝ) (P : PX m n) (x v : Fin m → Fin n → ℂ) :
     fderiv ℝ (fun y => evX P y * gs c y) x v = evX (Qv c P v) x * gs c x := by
   rw [(hasFDerivAt_pg c P x).fderiv]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, dP,
-    ContinuousLinearMap.sum_apply, smul_eq_mul, Qv, evX, map_sum, map_add, map_mul, eval_C]
+
+  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, dP,
+  ContinuousLinearMap.sum_apply, smul_eq_mul, Qv, evX, map_sum, map_add, map_mul, eval_C]
   rw [Finset.mul_sum, Finset.mul_sum, Finset.mul_sum, Finset.sum_mul, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl (fun k _ => ?_)
   ring

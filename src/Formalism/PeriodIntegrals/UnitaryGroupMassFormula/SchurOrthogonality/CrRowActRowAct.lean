@@ -52,11 +52,11 @@ theorem cr_rowAct_rowAct {N : ℕ} (g h : Matrix (Fin N) (Fin N) ℂ) (s : MvPol
       (Formalism.GradedWeylDivisibility.rowAct ℂ (h * g) : MvPolynomial (Fin N × Fin N) ℂ →ₐ[ℂ] MvPolynomial (Fin N × Fin N) ℂ) := by
     apply MvPolynomial.algHom_ext
     intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [AlgHom.comp_apply, cr_rowAct_X, map_sum, cr_rowAct_X]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_mul, cr_rowAct_C, cr_rowAct_X, Matrix.mul_apply, map_sum, Finset.mul_sum, Finset.sum_mul,
-      mul_assoc]
+
+    rw [AlgHom.comp_apply, cr_rowAct_X, map_sum, cr_rowAct_X]
+
+    simp only [map_mul, cr_rowAct_C, cr_rowAct_X, Matrix.mul_apply, map_sum, Finset.mul_sum, Finset.sum_mul,
+    mul_assoc]
     exact Finset.sum_comm
   rw [← hc, AlgHom.comp_apply]
 
@@ -78,9 +78,9 @@ theorem cr_polyFun {N : ℕ} (s : MvPolynomial (Fin N × Fin N) ℂ) :
       simp only [map_add (f := _), hp, hq]
     next p w hp =>
       simp only [map_mul, hp, cr_rowAct_X]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Φ, MvPolynomial.aeval_X, map_sum, map_mul, MvPolynomial.map_C, MvPolynomial.map_X,
-        MvPolynomial.eval_X]
+
+      simp only [Φ, MvPolynomial.aeval_X, map_sum, map_mul, MvPolynomial.map_C, MvPolynomial.map_X,
+      MvPolynomial.eval_X]
   have hmono : ∀ (m : Fin N × Fin N →₀ ℕ) (a : ℂ), L (monomial m a) = a * L (monomial m 1) := by
     intro m a
     calc L (monomial m a) = L (a • monomial m (1 : ℂ)) := by rw [smul_monomial, smul_eq_mul, mul_one]
@@ -88,8 +88,8 @@ theorem cr_polyFun {N : ℕ} (s : MvPolynomial (Fin N × Fin N) ℂ) :
   refine ⟨∑ m ∈ (Φ s).support, (Φ s).coeff m * C (L (monomial m 1)), fun g => ?_⟩
   rw [← hmap g]
   conv_lhs => rw [(Φ s).as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, MvPolynomial.map_monomial, evalM, map_mul, MvPolynomial.eval_C]
+
+  simp only [map_sum, MvPolynomial.map_monomial, evalM, map_mul, MvPolynomial.eval_C]
   exact Finset.sum_congr rfl fun m _ => hmono m _
 
 end PI.WSF

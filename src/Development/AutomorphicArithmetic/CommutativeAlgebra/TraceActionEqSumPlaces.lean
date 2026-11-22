@@ -65,8 +65,8 @@ private theorem sum_psiE {p : ℕ} [Fact p.Prime] (G : HTGroup p) (c : G.C) :
     rw [InfinitePlace.mk_conjugate_eq, InfinitePlace.mk_embedding, if_neg hne.symm]
   rw [h1, h2, RingHom.comp_apply]
   have h3 : Matrix.trace (((starRingEnd ℂ).mapMatrix) (G.psi v c)) = (starRingEnd ℂ) (Matrix.trace (G.psi v c)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.trace, map_sum]
+
+    simp [Matrix.trace, map_sum]
   rw [h3, Complex.add_conj]
 
 private theorem trace_rep {p : ℕ} [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G) (c : G.C) :

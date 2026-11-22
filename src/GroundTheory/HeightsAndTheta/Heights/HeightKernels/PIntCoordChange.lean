@@ -44,8 +44,8 @@ theorem subst_subst {A : Matrix T T₂ ℤ} {B : Matrix T₂ T ℤ} (hAB : A * B
     congr 1
     obtain ⟨⟨⟩, t⟩ := p
     have hC : ∀ a : ℤ, (C a : MRing (dualBlocks T)) = (a : MRing (dualBlocks T)) := fun a => map_intCast C a
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [intCoordSubst, aeval_X, map_sum, map_mul, eq_intCast, hC, map_intCast, Finset.mul_sum]
+
+    simp only [intCoordSubst, aeval_X, map_sum, map_mul, eq_intCast, hC, map_intCast, Finset.mul_sum]
     rw [Finset.sum_comm]
     simp_rw [← mul_assoc, ← Int.cast_mul, ← Finset.sum_mul, ← Int.cast_sum]
     have h1 : ∀ x : T, ∑ s, B s t * A x s = (A * B) x t := by
@@ -127,8 +127,8 @@ theorem isRelevant_comap {A : Matrix T T₂ ℤ} {B : Matrix T₂ T ℤ} (hAB : 
     rw [← subst_subst hAB (X ⟨(), t⟩)]
     have e : intCoordSubst B (X ⟨(), t⟩ : MRing (dualBlocks T)) = ∑ s, C (B s t) * X ⟨(), s⟩ := by
       simp only [intCoordSubst, aeval_X]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e, map_sum]
+
+    rw [e, map_sum]
     refine Ideal.sum_mem _ fun s _ => ?_
     rw [map_mul]
     exact Ideal.mul_mem_left _ _ (hall s)

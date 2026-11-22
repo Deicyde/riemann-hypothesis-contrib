@@ -69,8 +69,8 @@ theorem prod_X_letter (T : Choice bs) :
 theorem toMultiset_letters (T : Choice bs) :
     Finsupp.toMultiset (∑ t : Slot bs, Finsupp.single (letter bs T t) 1) =
       Multiset.map (letter bs T) Finset.univ.val := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [Finsupp.toMultiset_single, one_nsmul]
   rw [Finset.sum_eq_multiset_sum]
   have h : ∀ (s : Multiset (Slot bs)),

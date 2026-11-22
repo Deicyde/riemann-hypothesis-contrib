@@ -111,8 +111,8 @@ theorem Cong.hn (hs : ∀ x, s (s x) = x) {n : ℕ} {J K : Matrix (Fin n) (Fin n
   obtain ⟨P, hP, rfl⟩ := h
   refine ⟨fun i j => ?_, ?_⟩
   · rw [gram_apply, gram_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hform, map_sum, map_mul, hs, hJ.1]
+
+    simp only [hform, map_sum, map_mul, hs, hJ.1]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   · simp [det_cT, hP, hJ.2]
@@ -538,8 +538,8 @@ theorem gram_consCol (hs : ∀ x, σ (σ x) = x) {n : ℕ} {J : Matrix (Fin (n +
     · exact h2 _
     · rename_i i
       have := congrArg σ (h2 i)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hE, hform, map_sum, map_mul, RingHom.coe_coe, hs, hJ.1, map_zero] at this
+
+      simp only [hE, hform, map_sum, map_mul, RingHom.coe_coe, hs, hJ.1, map_zero] at this
       rw [Finset.sum_comm] at this
       rw [cornerScalarBlockMatrix_apply_succ_zero, ← this]
       exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by

@@ -18,8 +18,8 @@ open GlobalTheory.LevPull (CongMod)
 open scoped TensorProduct Matrix
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 noncomputable section
 

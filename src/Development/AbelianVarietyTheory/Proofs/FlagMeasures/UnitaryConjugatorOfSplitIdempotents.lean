@@ -23,8 +23,8 @@ theorem unitary_conjugator_of_split_idempotents :
       (fun h => absurd (Finset.mem_univ j) h), hidem]
   have hjse : ∀ j, ε j * σ e = 0 := by
     intro j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [he, map_sum, Finset.mul_sum]
+
+    rw [he, map_sum, Finset.mul_sum]
     refine Finset.sum_eq_zero (fun k _ => ?_)
     by_cases hk : j = k
     · subst hk; exact hself j

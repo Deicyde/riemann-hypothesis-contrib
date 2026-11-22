@@ -182,10 +182,10 @@ theorem hermFlag_pairing_cramer_of_leadingCoeffs (F F' : FlagD H r) (Λ : Submod
   have hD : Dl F F' l (hl.trans (Nat.le_succ r)) = Z.det := rfl
   have key : ∀ (ξ : Fin l → K) (b : Fin l), H.B (∑ a, ξ a • e a) (∑ c, B b c • e' c) = (ξ ᵥ* (Z * Bᴴ)) b := by
     intro ξ b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul,
-      vecMul, dotProduct, Matrix.mul_apply, hZ, Matrix.of_apply, conjTranspose_apply, starRingEnd_apply,
-      Finset.mul_sum]
+
+    simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul,
+    vecMul, dotProduct, Matrix.mul_apply, hZ, Matrix.of_apply, conjTranspose_apply, starRingEnd_apply,
+    Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   have hQ : ∀ a b, ∃ q : 𝓞 K, algebraMap (𝓞 K) K q = (A * (Z * Bᴴ)) a b := by
@@ -315,8 +315,8 @@ theorem monomial {ι : Type} [Fintype ι] (v : ι → V) (n : ι → ℤ) {𝔡 
     have h3 : ξ i * H.B (v i) (v k) ∈ ipow 𝔡 (-n k) := by
       refine mem_of_forall h (neg_add_cancel _) fun β hβ => ?_
       have := hy.2 _ (hle k _ (star_mem h hs hβ))
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, LinearMap.sum_apply, Finset.sum_eq_single i (fun b _ hb => by simp [hk' b hb]) (by simp)] at this
+
+      rw [map_sum, LinearMap.sum_apply, Finset.sum_eq_single i (fun b _ hb => by simp [hk' b hb]) (by simp)] at this
       convert this using 1
       rw [B_smul, star_star]; ring
     refine mem_of_forall h (add_neg_cancel _) fun δ hδ => ?_

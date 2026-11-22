@@ -28,7 +28,7 @@ lemma omega_fin {E : Type} [Field E] [NumberField E] [IsCMField E] :
   let e : Fin (Module.finrank ℚ E) ≃ κ := (Fintype.equivFinOfCardEq hcard).symm
   exact ⟨fun j => ω (a (e j)), hli.comp e e.injective, fun j τ => hωB _ τ⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem char_main (hx : Ext.All) : CharStatement := by
   intro E _ _ _ X DF P I hI σ ρ hρ
   classical

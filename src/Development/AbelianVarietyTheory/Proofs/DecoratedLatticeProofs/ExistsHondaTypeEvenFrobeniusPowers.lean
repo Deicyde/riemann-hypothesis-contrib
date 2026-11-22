@@ -66,8 +66,8 @@ theorem subst_comb {A : MvPowerSeries ι K} (hA : MvPowerSeries.constantCoeff A 
     (C a * f - ∑ k ∈ s, C (c k) * g k).subst A =
       MvPowerSeries.C a * f.subst A - ∑ k ∈ s, MvPowerSeries.C (c k) * (g k).subst A := by
   have hs := Pts.hasSubst hA
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [subst_sub hs, subst_mul hs, subst_C, ← coe_substAlgHom hs, map_sum]
+
+  rw [subst_sub hs, subst_mul hs, subst_C, ← coe_substAlgHom hs, map_sum]
   simp only [coe_substAlgHom hs, subst_mul hs, subst_C]
 
 end Order
@@ -213,8 +213,8 @@ theorem cob_even_sum : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [Cha
     rw [subst_comb (Pts.constantCoeff_fadd hp h0 h1), subst_comb h0, subst_comb h1, Pts.l_fadd hp h0 h1]
     simp only [mul_sub, Finset.sum_sub_distrib]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, map_neg, norm_neg, map_sum]
+
+  rw [this, map_neg, norm_neg, map_sum]
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) fun k hk => ?_
   rw [MvPowerSeries.coeff_C_mul, norm_mul]
   exact (mul_le_of_le_one_left (norm_nonneg _) (hc k hk)).trans
@@ -243,8 +243,8 @@ theorem eig_even_sum : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [Cha
     rw [hcomb, hl]
     simp only [hσ2, mul_sub, Finset.sum_sub_distrib, Finset.mul_sum, mul_left_comm (C w)]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, map_neg, norm_neg, map_sum]
+
+  rw [this, map_neg, norm_neg, map_sum]
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) fun k hk => ?_
   rw [coeff_C_mul, norm_mul]
   exact (mul_le_of_le_one_left (norm_nonneg _) (hc k hk)).trans
@@ -303,8 +303,8 @@ theorem exists_even_type : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] 
   have hHc : ∀ n m, coeff m (H n) =
       (l : K) * coeff m f - ∑ k ∈ Finset.range n, d n k * coeff m (Φ k) := by
     intro n m
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hH, hΦ, map_sub, map_sum, coeff_C_mul]
+
+    simp only [hH, hΦ, map_sub, map_sum, coeff_C_mul]
   have hlow : ∀ n m, m ≤ n → (∀ k, N k = n → m < n) → coeff m (H n) = coeff m G := by
     intro n m hmn hk'
     rw [hHc, hGc, Finset.sum_subset (Finset.range_mono hmn) (f := fun j => c j * coeff m (Φ j)) ?_]

@@ -35,7 +35,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RowEx MeasureTheory
 
 open scoped Topology
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

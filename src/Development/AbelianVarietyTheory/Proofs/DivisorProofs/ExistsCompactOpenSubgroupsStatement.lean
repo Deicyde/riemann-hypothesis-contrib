@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 @[expose] public section
 
 open NumberField IsDedekindDomain Filter Topology
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_compact_open_subgroups : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (V : Set (κ → FiniteAdeleRing (𝓞 F) F)),
     V ∈ 𝓝 (0 : κ → FiniteAdeleRing (𝓞 F) F) →
     ∃ N : ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F), AddSubgroup (v.adicCompletion F),

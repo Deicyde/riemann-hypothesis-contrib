@@ -224,8 +224,8 @@ private theorem scalar_on_fixed_isot {hF : D.host.F = maximalRealSubfield D.host
       apply Subtype.ext
       rw [Submodule.coe_sum]
       simpa [principalLevelFrame.Hecke₃, principalLevelFrame.heckeG, LinearMap.sum_apply, piRep_coe] using h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hOn, ← map_smul, ← h2, map_sum]
+
+    rw [hOn, ← map_smul, ← h2, map_sum]
     exact Finset.sum_congr rfl fun γ _ => (hE _ x).symm
   let W : Submodule ℂ (MMap M) := Submodule.span ℂ {T | ∃ Φ : π.S →ₗ[ℂ] MMap M, principalLevelFrame.IsEqvA (principalLevelFrame.actM Q M) π Φ ∧ ∃ x : π.S,
       (∀ κ, Q.ψ κ ∈ hyp V Pr → Formalism.L2.NG.rt D.host.E n κ (x : Formalism.AUTREP.GAf D.host.E n → ℂ) = x) ∧ T = Φ x}

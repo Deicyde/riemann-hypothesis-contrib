@@ -20,9 +20,9 @@ private theorem map_finite {K L : Type} [Field K] [Field L] [Finite L] (f : K �
   have key : φ = ∑ i, (PowerSeries.mk fun n => b.repr (PowerSeries.coeff n φ) i) •
       PowerSeries.C (b i) := by
     ext n
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Algebra.smul_def, RingHom.algebraMap_toAlgebra, map_sum, PowerSeries.coeff_mul_C,
-      PowerSeries.coeff_map, PowerSeries.coeff_mk]
+
+    simp only [Algebra.smul_def, RingHom.algebraMap_toAlgebra, map_sum, PowerSeries.coeff_mul_C,
+    PowerSeries.coeff_map, PowerSeries.coeff_mk]
     exact (b.sum_repr _).symm.trans (Finset.sum_congr rfl fun i _ => Algebra.smul_def _ _)
   rw [key]
   refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ?_)

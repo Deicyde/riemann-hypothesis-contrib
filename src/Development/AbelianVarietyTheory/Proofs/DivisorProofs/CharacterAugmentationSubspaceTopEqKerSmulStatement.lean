@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.QActMSubAlge
 
 open scoped TensorProduct
 universe u
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.characterAugmentationSubspace_top_eq_ker_smul :
     ∀ (k : Type) [Field k] (C : Type) [CommRing C] (H : Type u) [AddCommGroup H]
       [Module k H] (σ : C →+* Module.End k H) (χ : C →+* k),

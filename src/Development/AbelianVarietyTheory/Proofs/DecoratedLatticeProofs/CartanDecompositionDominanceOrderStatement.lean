@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsCoTyp
 
 open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition GlobalTheory.SatakeBound GlobalTheory.ParHecke
 open GlobalTheory.ZonalInduct (pot pot_lt pot_nonneg pos_iff_lt psum nonneg_of_dom) in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.cartan_decomposition_dominance_order :
     ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
       (N : ℕ) (ϖ : kˣ) (c : ℕ → ℂ), c N ≠ 0 →

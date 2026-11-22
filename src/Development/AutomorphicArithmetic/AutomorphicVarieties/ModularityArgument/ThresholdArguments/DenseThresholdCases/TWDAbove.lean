@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Module
@@ -29,7 +29,7 @@ private theorem transport_rho {F Ω : Type} [Field F] [NumberField F] [Field Ω]
   change b.equivFun (a.ρ σ (b.equivFun.symm (b.equivFun x))) = _
   rw [LinearEquiv.symm_apply_apply, Matrix.toLin'_apply, ← hX]
   exact (LinearMap.toMatrix_mulVec_repr b b (a.ρ σ) x).symm
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Af.weil_deligne_above_of_printed_results :
     _root_.UpperTheory.V.Af.Hypotheses' → UpperTheory.V.Af.WDAbove := by
   rintro - F Ω _ _ _ _ _ l _ - ι n M hM m r hr w A h O _ _ _ Bw hj κ ⟨χ, hχ, hfl, hI⟩ hp hor

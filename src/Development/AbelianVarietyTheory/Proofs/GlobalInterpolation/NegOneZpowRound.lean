@@ -90,8 +90,8 @@ theorem neg_one_zpow_round (q : ℝ)
 
 theorem isHerm_HV {ι : Type} [Fintype ι] {a b : ℕ} (sc : ℝ) : IsHerm (HV (ι := ι) (a := a) (b := b) sc) := by
   intro x y
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Formalism.L2.Ker.HV, map_sum, mul_comm]
+
+  simp [Formalism.L2.Ker.HV, map_sum, mul_comm]
 
 theorem embH_inj {E : Type} [Field E] [NumberField E] [StarRing E] {ι : Type} [Fintype ι] [Nonempty ι] {a b : ℕ}
     (emb : ι → E →+* ℂ) {δ : ℂ} (hδ : δ ≠ 0) : Function.Injective (embH (a := a) (b := b) emb δ) := by

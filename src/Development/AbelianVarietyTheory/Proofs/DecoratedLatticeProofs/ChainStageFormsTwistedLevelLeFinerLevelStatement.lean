@@ -22,6 +22,6 @@ open GlobalTheory.ChainOnto GlobalTheory.ChainTw
 open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (SplitProj IsProjAt IsIdemOf LiftsChar rdA grpCo frCo gAt)
 open GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection (Blocks parahoric datum)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.chain_stage_forms_twisted_level_le_finer_level : ∀ D : D7, FlatLe D := by
   first | exact @GlobalTheory.FlatLevel.flatLe | exact GlobalTheory.FlatLevel.flatLe | (intros; apply GlobalTheory.FlatLevel.flatLe <;> assumption)

@@ -32,9 +32,9 @@ theorem plusPart_add (U D : Module.End ℂ (MvPolynomial σ ℂ))
       homogeneousComponent_of_mem (hD d _ hm), if_pos rfl, if_neg (by omega), add_zero]
   unfold plusPart
   simp only [h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [finsum_eq_sum_of_support_subset (s := Finset.range (P.totalDegree + 1)), ← map_sum,
-    sum_homogeneousComponent]
+
+  rw [finsum_eq_sum_of_support_subset (s := Finset.range (P.totalDegree + 1)), ← map_sum,
+  sum_homogeneousComponent]
   intro d hd
   by_contra hc
   apply hd
@@ -60,11 +60,11 @@ theorem minusPart_add (U D : Module.End ℂ (MvPolynomial σ ℂ))
         homogeneousComponent_eq_zero _ _ (by omega), homogeneousComponent_eq_zero _ _ (by omega)]
       simp
     conv_rhs => rw [← h2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_range_succ' _ (P.totalDegree + 1 + 1), Finset.sum_range_succ' _ (P.totalDegree + 1),
-      map_add, map_add, map_sum,
-      hD0 _ _ (by omega) (homogeneousComponent_mem 0 P),
-      hD0 _ _ (by omega) (homogeneousComponent_mem (0 + 1) P), add_zero, add_zero]
+
+    rw [Finset.sum_range_succ' _ (P.totalDegree + 1 + 1), Finset.sum_range_succ' _ (P.totalDegree + 1),
+    map_add, map_add, map_sum,
+    hD0 _ _ (by omega) (homogeneousComponent_mem 0 P),
+    hD0 _ _ (by omega) (homogeneousComponent_mem (0 + 1) P), add_zero, add_zero]
   · intro d hd
     by_contra hc
     apply hd
@@ -255,9 +255,9 @@ theorem inner_plusPart_omAct {H : Type} [NormedAddCommGroup H] [InnerProductSpac
   have hM' : ∀ l l', linePos l = linePos l' → Mᴴ l l' = 0 := by
     intro l l' h; simp [hM l' l h.symm]
   rw [plusPart_omAct hM, minusPart_omAct hM', upOp_apply, downOp_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, sum_inner, inner_sum, inner_smul_left, inner_smul_right,
-    ← Finset.sum_neg_distrib]
+
+  simp only [map_sum, map_smul, sum_inner, inner_sum, inner_smul_left, inner_smul_right,
+  ← Finset.sum_neg_distrib]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun l' _ => Finset.sum_congr rfl fun l _ => ?_
   rw [mul_assoc, inner_X_mul hι]

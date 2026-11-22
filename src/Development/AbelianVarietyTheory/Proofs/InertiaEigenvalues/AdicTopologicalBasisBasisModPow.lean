@@ -40,13 +40,13 @@ theorem TopBasis.basis_mod_pow : ∀ (S A : Type) [CommRing S] [CommRing A] (s :
     intro F g hg j hj
     choose h hh using fun i => Ideal.Quotient.mk_surjective (I := I ^ m) (g i)
     have hsum : (∑ i ∈ F, s (h i) * tb.b i) ∈ (I ^ m).map s := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum, ← hg]
+
+      rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum, ← hg]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [← hh i, hsmul]
     have hc := tb.c_mem_of_mem_map_pow m j hsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_single j] at hc
+
+    rw [map_sum, Finset.sum_eq_single j] at hc
     · rw [tb.c_mul, tb.c_self, mul_one] at hc
       rw [← hh j]
       exact Ideal.Quotient.eq_zero_iff_mem.mpr hc
@@ -62,8 +62,8 @@ theorem TopBasis.basis_mod_pow : ∀ (S A : Type) [CommRing S] [CommRing A] (s :
     have hx := tb.approx y m (tb.fin y m).toFinset hF
     have : Ideal.Quotient.mk ((I ^ m).map s) y = ∑ i ∈ (tb.fin y m).toFinset,
         (Ideal.Quotient.mk (I ^ m) (tb.c i y)) • Ideal.Quotient.mk ((I ^ m).map s) (tb.b i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp_rw [hsmul, ← map_sum]
+
+      simp_rw [hsmul, ← map_sum]
       exact Ideal.Quotient.eq.mpr hx
     rw [this]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)

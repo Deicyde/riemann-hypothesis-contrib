@@ -261,8 +261,8 @@ theorem flZero_main : Inputs → ∀ (II : IntersectionSystem), IsFullIntersecti
     simp only [xLine]
     rw [← h1, ← h2, FlLines.deg_abel_smul]
   rw [hpoly, eval_toWt_gap]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [formPoly, map_sum, map_mul, map_prod, eval_C, eval_X]
+
+  simp only [formPoly, map_sum, map_mul, map_prod, eval_C, eval_X]
   apply Finset.sum_eq_zero
   intro w _
   by_cases hw : ∃ j, w j = p

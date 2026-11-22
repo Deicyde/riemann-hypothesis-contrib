@@ -81,7 +81,7 @@ theorem nzx_sh_inj (M : Maps D hn) {z z' : hermA D ρ} {x x' y y' : Mx D ρ p}
   obtain ⟨h5, rfl, -, -⟩ := blockMatrix_inj hn h4
   exact ⟨Subtype.ext (sub_left_injective h5), rfl, rfl⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem gl_levi (M : Maps D hn) (g : G D p) (a : GL (Fin p) (AE D)) (hg : mat g = blk4 a.1 0 0 (adj (a⁻¹).1))
     (z : hermA D ρ) (x y : Mx D ρ p) :
     M.emb g * (M.nzx z x * M.sh y) = M.nzx z (x ⬝ adj a.1) * M.sh (y ⬝ (a⁻¹).1) * M.emb g := by
@@ -110,7 +110,7 @@ def zU (z : hermA D ρ) (y : Mx D ρ p) (b : Mx D p p) (hb : adj b = b) : hermA 
     show adj _ = _
     rw [adj_sub', adj_mul, adj_mul, adj_adj, hb, z.2, Matrix.mul_assoc]⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem gl_unip (M : Maps D hn) (g : G D p) (b : Mx D p p) (hb : adj b = b) (hg : mat g = blk4 1 b 0 1)
     (z : hermA D ρ) (x y : Mx D ρ p) :
     M.emb g * (M.nzx z x * M.sh y) = M.nzx (zU z y b hb) (x - y ⬝ b) * M.sh y * M.emb g := by
@@ -131,7 +131,7 @@ def zW (z : hermA D ρ) (x y : Mx D ρ p) : hermA D ρ :=
     rw [adj_sub', adj_sub', adj_mul, adj_mul, adj_adj, adj_adj, z.2]
     abel⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem gl_weyl (M : Maps D hn) (g : G D p) (hg : mat g = blk4 0 1 (-1) 0)
     (z : hermA D ρ) (x y : Mx D ρ p) :
     M.emb g * (M.nzx z x * M.sh y) = M.nzx (zW z x y) (-y) * M.sh x * M.emb g := by

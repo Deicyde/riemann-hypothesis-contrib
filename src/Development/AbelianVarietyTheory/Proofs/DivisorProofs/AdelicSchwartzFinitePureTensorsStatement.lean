@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqOfComponen
 
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
 open scoped Classical
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.adelic_schwartz_finite_pure_tensors : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (Ψ : (κ → AF F) → ℂ), Ψ ∈ schA F κ →
     ∃ (T : Finset (Pl (F := F))) (m : ℕ) (f : Fin m → SInf F κ) (φ : Fin m → ∀ v : Pl (F := F), (κ → Fv F v) → ℂ),
       (∀ i v, φ i v ∈ SB (κ → Fv F v)) ∧

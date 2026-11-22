@@ -23,8 +23,8 @@ theorem word_col {K A : Type} [Field K] [AddCommGroup A] [Module K A] {N n t : �
     intro i; funext k; simp [Matrix.col, Finset.sum_apply, Pi.single_apply]
   rw [hΦ]
   simp_rw [hcol]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [MultilinearMap.map_sum]
+
+  rw [MultilinearMap.map_sum]
   refine Finset.sum_congr rfl fun e _ => ?_
   rw [MultilinearMap.map_smul_univ, hΦ]
   rfl
@@ -44,8 +44,8 @@ theorem linSubst_coordP {K A : Type} [Field K] [AddCommGroup A] [Module K A] {N 
     simp_rw [Fintype.prod_sum, Finset.mul_sum, ← Finset.prod_mul_distrib]
     exact Finset.sum_comm
   · refine Finset.sum_congr rfl fun g _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [word_col, LinearMap.sum_apply, map_sum, map_sum, Finset.sum_mul]
+
+    rw [word_col, LinearMap.sum_apply, map_sum, map_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun e _ => ?_
     rw [LinearMap.smul_apply, map_smul, smul_eq_mul, ← map_prod, map_mul]
     ring

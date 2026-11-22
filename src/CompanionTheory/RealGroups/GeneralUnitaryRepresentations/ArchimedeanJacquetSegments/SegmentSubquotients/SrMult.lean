@@ -67,8 +67,8 @@ end SrMult
 
 
 open SrMult in
-set_option maxHeartbeats 800000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem jhMult_jac_multiProd (hG : GeometricLemma) {d l : ℕ} (hd : 0 < d) (hl : 0 < l)
     (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ) :
     jhMult (piTensor (segTerm σ.ρ l))

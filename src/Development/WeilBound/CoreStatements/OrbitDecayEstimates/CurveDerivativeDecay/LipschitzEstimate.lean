@@ -59,7 +59,7 @@ theorem deriv_conj (X : Matrix (Fin n) (Fin n) ℂ) (a b : Matrix (Fin (n + 1)) 
   simp only [emb_eq (e := e) (NormedSpace.exp ((t : ℂ) • X))]
   rfl
 
-set_option maxHeartbeats 1600000 in
+
 theorem lipschitz_estimate : Lip := by
   intro n ε lam ε' B e A _ _ _ π ν hν hF hn hl hDS hB hg v hv hv1 g₀ Y δ hY hδ hδ1 X hX
   have hπ : IsURepOn (UJset ε) π := hDS.2.2.1

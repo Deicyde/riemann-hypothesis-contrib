@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_framedMatrices_of_etaleRealisation : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d : ℕ) (S : Strat bk d) (M : FCrys l ↥(OL K)) (e : Module.Basis (Fin d) bk.prism.A (M.M bk.prism)), Framed S M e → ∀ (T : Type) [AddCommGroup T] [Module ℤ_[l] T] (ρ : ↥(GK K) → (T →ₗ[ℤ_[l]] T)) (j : M.M (ainfObj K) →ₛₗ[(inclW l).comp (ainfId K).toRingHom] (WCb l ⊗[ℤ_[l]] T)), Realises K M (ainfObj K) (ainfId K) T ρ j → ∃ (b : Module.Basis (Fin d) ℤ_[l] T) (U : Matrix (Fin d) (Fin d) (WCb l)), MReal S (fun g => LinearMap.toMatrix b b (ρ g)) U ∧ ∀ k, j (M.tr bk.ι (e k)) = ∑ i, U i k ⊗ₜ[ℤ_[l]] b i := by
   intro l _ K bk d S M e hF T _ _ ρ j H
   have h : ∃ (b : Module.Basis (Fin d) ℤ_[l] T) (U : Matrix (Fin d) (Fin d) (WCb l)),
@@ -61,8 +61,8 @@ theorem _root_.GlobalTheory.T.exists_framedMatrices_of_etaleRealisation : ∀ (l
           map_pow _ _ _
         have hsum2 : j (∑ i, (S.A.map (BK.hf bk.ι)).mulVec (Pi.single k 1) i • M.tr bk.ι (e i)) =
             ∑ i, bk.evW (S.A i k) • c i := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
+
+          rw [map_sum]
           refine Finset.sum_congr rfl fun i _ => ?_
           rw [LinearMap.map_smulₛₗ, ← hcj, Matrix.mulVec_single_one]
           rfl
@@ -80,11 +80,11 @@ theorem _root_.GlobalTheory.T.exists_framedMatrices_of_etaleRealisation : ∀ (l
       have hev : ∀ x, bk.evW x = inclW l (bk.ev x) := fun _ => rfl
       refine Matrix.ext fun i k => ?_
       have h := congrArg (fun y => (b.baseChange (WCb l)).repr y i) (key k)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_smul, map_sum, Finsupp.smul_apply, Finsupp.coe_finsetSum, Finset.sum_apply,
-        repr_map_baseChange, LinearMap.toMatrix_id, Matrix.one_apply, smul_eq_mul, apply_ite (algebraMap ℤ_[l] (WCb l)),
-        map_one, map_zero, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, ite_true,
-        AlgHom.toLinearMap_apply] at h
+
+      simp only [map_smul, map_sum, Finsupp.smul_apply, Finsupp.coe_finsetSum, Finset.sum_apply,
+      repr_map_baseChange, LinearMap.toMatrix_id, Matrix.one_apply, smul_eq_mul, apply_ite (algebraMap ℤ_[l] (WCb l)),
+      map_one, map_zero, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, ite_true,
+      AlgHom.toLinearMap_apply] at h
       simp only [Matrix.smul_apply, Matrix.map_apply, Matrix.mul_apply, smul_eq_mul, hev, U,
         Module.Basis.toMatrix_apply]
       rw [h]
@@ -93,17 +93,17 @@ theorem _root_.GlobalTheory.T.exists_framedMatrices_of_etaleRealisation : ∀ (l
       have keyg : ∀ k, TensorProduct.map (galW l (g : GQ l)).toLinearMap (ρ g) (c k) =
           ∑ i, inclW l (S.ε bk.ι ((ainfHom K g).comp bk.ι) i k) • c i := by
         intro k
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hcj, ← H.j_act_of g (ainfHom K g) (fun _ => rfl), ← M.tr_comp, hF.tr bk.ι ((ainfHom K g).comp bk.ι) k,
-          map_sum]
+
+        rw [hcj, ← H.j_act_of g (ainfHom K g) (fun _ => rfl), ← M.tr_comp, hF.tr bk.ι ((ainfHom K g).comp bk.ι) k,
+        map_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [LinearMap.map_smulₛₗ, ← hcj]
         rfl
       refine Matrix.ext fun i k => ?_
       have h := congrArg (fun y => (b.baseChange (WCb l)).repr y i) (keyg k)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_smul, map_sum, Finsupp.smul_apply, Finsupp.coe_finsetSum, Finset.sum_apply,
-        repr_map_baseChange, smul_eq_mul, AlgEquiv.toLinearMap_apply] at h
+
+      simp only [map_smul, map_sum, Finsupp.smul_apply, Finsupp.coe_finsetSum, Finset.sum_apply,
+      repr_map_baseChange, smul_eq_mul, AlgEquiv.toLinearMap_apply] at h
       simp only [Matrix.mul_apply, Matrix.map_apply, U, Module.Basis.toMatrix_apply, zW]
       rw [h]
       exact Finset.sum_congr rfl fun x _ => mul_comm _ _

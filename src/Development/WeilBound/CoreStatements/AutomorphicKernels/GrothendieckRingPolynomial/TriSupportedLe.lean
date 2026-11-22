@@ -205,16 +205,16 @@ theorem uni_exists {M I C : Type*} (L : M ≃ I) (c : M → C) (w : M → ℕ) (
           exact Finsupp.mem_support_iff.mp hm1 hz
         obtain ⟨i, hi, hmi⟩ := hex'
         exact hg1 i hi m (Finsupp.support_smul hmi)
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_add (f := _), map_sum, Finsupp.linearCombination_single, one_smul]
-        rw [Finset.sum_congr rfl (fun i hi => by rw [map_smul, hg2 i hi])]
-        have hsum : ∑ i ∈ v.support, v i • Finsupp.single i (1 : ℤ) = v := by
-          conv_rhs => rw [← Finsupp.sum_single v]
-          rw [Finsupp.sum]
-          refine Finset.sum_congr rfl (fun i _ => ?_)
-          rw [Finsupp.smul_single, smul_eq_mul, mul_one]
-        rw [hsum, hv]
-        abel
+
+    · rw [map_add (f := _), map_sum, Finsupp.linearCombination_single, one_smul]
+      rw [Finset.sum_congr rfl (fun i hi => by rw [map_smul, hg2 i hi])]
+      have hsum : ∑ i ∈ v.support, v i • Finsupp.single i (1 : ℤ) = v := by
+        conv_rhs => rw [← Finsupp.sum_single v]
+        rw [Finsupp.sum]
+        refine Finset.sum_congr rfl (fun i _ => ?_)
+        rw [Finsupp.smul_single, smul_eq_mul, mul_one]
+      rw [hsum, hv]
+      abel
 
 theorem uni_bij {M I C : Type*} (L : M ≃ I) (c : M → C) (w : M → ℕ) (b : C → ℕ) (f : M → I →₀ ℤ)
     (hb : ∀ m, w m ≤ b (c m)) (h1 : ∀ m, f m (L m) = 1)

@@ -40,8 +40,8 @@ theorem exists_frob_mat (hm : ∀ m : Ideal W.EE, m.IsMaximal → m.map E.ioE.to
   choose U hU using fun a => (Submodule.mem_span_range_iff_exists_fun W.EE).1
     ((exists_frob_inv E hm hφ T e).ge (Submodule.mem_top (x := e a)))
   refine ⟨U, fun a => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [← hU a, map_sum]
+
+  conv_lhs => rw [← hU a, map_sum]
   exact Finset.sum_congr rfl fun b _ => by rw [E.jD_smul, E.jD_φ]
 
 end GlobalTheory.WachTensor

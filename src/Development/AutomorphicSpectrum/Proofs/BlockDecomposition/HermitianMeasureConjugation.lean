@@ -112,7 +112,7 @@ theorem hermPart_split {d e : AE D} (he : cA D e = -e) (hde : d * e = 1) (x : Mx
   exact (add_add_sub_cancel _ _ _).trans (half_smul_add x)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 def mulCE (d e : AE D) (hde : d * e = 1) : Mx D n n ≃ₜ+ Mx D n n where
   toFun x := d • x
   invFun x := e • x
@@ -128,7 +128,7 @@ def mulCE (d e : AE D) (hde : d * e = 1) : Mx D n n ≃ₜ+ Mx D n n where
 
 def hermPartHom (D : D7) (n : ℕ) : Mx D n n →+ Mx D n n := AddMonoidHom.mk' (hermPart D n) hermPart_add
 
-set_option maxHeartbeats 400000 in
+
 theorem val_det_ad_inv (a : GL (Fin n) (AE D)) :
     ((Matrix.GeneralLinearGroup.det ((ad a)⁻¹ : GL (Fin n) (AE D)) : (AE D)ˣ) : AE D) = cA D (Matrix.GeneralLinearGroup.det a : (AE D)ˣ) := by
   change (adj a.1 : Mx D n n).det = cA D a.1.det
@@ -162,8 +162,8 @@ theorem lr_smul (a : GL (Fin n) (AE D)) (d e : AE D) (hde : d * e = 1) (x : Mx D
   change a.1 * (d • x) * ((ad a)⁻¹ : GL (Fin n) (AE D)).1 = d • (a.1 * x * ((ad a)⁻¹ : GL (Fin n) (AE D)).1)
   rw [Matrix.mul_smul, Matrix.smul_mul]
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem integral_cg : ∀ (D : D7) (n : ℕ) (lam : Measure (hermA D n)), lam.IsAddHaarMeasure → ∀ (a : GL (Fin n) (AE D)) (f : hermA D n → ℂ), ∫ c, f (GlobalTheory.CompanionTheory.IwaAd.cg a c) ∂lam = npow (absA D (Matrix.GeneralLinearGroup.det a)) (-(n : ℂ)) * ∫ c, f c ∂lam := by
   intro D n lam hlam a f
   obtain ⟨i1, i2, i3, i4, -, -⟩ := lattice_Mx D n n

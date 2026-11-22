@@ -29,8 +29,8 @@ theorem ccd_F (F : MvPowerSeries (Fin 2) K) {x y : MvPowerSeries (Fin 2) K}
     (i : Fin 2) :
     ccd i (F.subst ![x, y]) = ccd 0 F * ccd i x + ccd 1 F * ccd i y := by
   unfold ccd
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [pderiv_subst (hv hx hy), map_sum, Fin.sum_univ_two]
+
+  rw [pderiv_subst (hv hx hy), map_sum, Fin.sum_univ_two]
   simp only [map_mul, Formalism.G.LogP.constantCoeff_subst_of_zero _ (hv hx hy), Matrix.cons_val_zero,
     Matrix.cons_val_one, Matrix.head_cons]
 

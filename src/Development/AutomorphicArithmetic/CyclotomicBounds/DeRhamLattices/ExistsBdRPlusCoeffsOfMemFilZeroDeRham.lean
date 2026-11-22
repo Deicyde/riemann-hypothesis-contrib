@@ -9,8 +9,8 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.DeRhamLattices.
 
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
-set_option maxHeartbeats 2000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 private theorem span_abs {Q Z O D B V κ : Type} [CommRing Q] [CommRing Z] [CommRing O] [CommRing D]
     [CommRing B] [Algebra Z O] [Algebra Z D] [Algebra Q B] [AddCommGroup V] [Module Q V] [Module O V]
@@ -38,8 +38,8 @@ private theorem span_abs {Q Z O D B V κ : Type} [CommRing Q] [CommRing Z] [Comm
     refine ⟨fun k => b.repr t k ⊗ₜ[Z] y1, ?_⟩
     have h1 : (t : V) = ∑ k, b.repr t k • ((b k : T) : V) := by
       have h2 := congrArg T.subtype (b.sum_repr t).symm
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at h2
+
+      rw [map_sum] at h2
       simpa only [map_smul, Submodule.subtype_apply] using h2
     rw [hf, hy0, hy, ← TensorProduct.smul_tmul, ← ht, h1, TensorProduct.sum_tmul]
     refine Finset.sum_congr rfl fun k _ => ?_

@@ -44,8 +44,8 @@ theorem symV_realLine_eq_zero : ∀ (F : Type) [Field F] [NumberField F] (N : �
     funext w
     apply (InfinitePlace.Completion.extensionEmbeddingOfIsReal (hF.isReal w)).injective
     have h : φ w (symV (M t) (M s)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [symV, dotProduct, map_sub, map_sum, map_mul]
+
+      simp only [symV, dotProduct, map_sub, map_sum, map_mul]
       rw [← Finset.sum_sub_distrib]
       refine Finset.sum_eq_zero fun l _ => ?_
       rw [k1 l w t, k1 l w s, k2 l w t, k2 l w s]
@@ -54,9 +54,9 @@ theorem symV_realLine_eq_zero : ∀ (F : Type) [Field F] [NumberField F] (N : �
   have h0 : ∀ r l, sndA F ((M r).1 l) = 0 ∧ sndA F ((M r).2 l) = 0 := fun r l =>
     ⟨congrFun (hM.2 r).1 l, congrFun (hM.2 r).2 l⟩
   have hsnd : sndA F (symV (M t) (M s)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [symV, dotProduct, map_sub, map_sum, map_mul, (h0 _ _).1, (h0 _ _).2, zero_mul,
-      Finset.sum_const_zero, sub_zero]
+
+    simp only [symV, dotProduct, map_sub, map_sum, map_mul, (h0 _ _).1, (h0 _ _).2, zero_mul,
+    Finset.sum_const_zero, sub_zero]
   exact Prod.ext hfst hsnd
 
 end GlobalTheory.ThetaTransform

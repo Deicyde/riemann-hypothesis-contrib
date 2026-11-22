@@ -60,7 +60,7 @@ theorem psiEven_desc (hG : GlobalFnsSt) (hφ : Function.Injective φ) (hD : IsPu
   simp only [ofMul_mul, ofMul_inv]
   abel
 
-set_option maxHeartbeats 1000000 in
+
 theorem tauBimult_desc (hG : GlobalFnsSt) (hφ : Function.Injective φ) (hD : IsPullDeg φ D D') (h : D'.TauBimult) :
     D.TauBimult := by
   intro χ χ' ν

@@ -19,9 +19,9 @@ theorem coord_hT (D : D7) [IsCMField D.host.E] (hst : ∀ z : D.host.E, star z =
     (V : HSp D) (x y : Fin V.rank → D.host.E) :
     V.hT (V.frame.equivFun.symm y) (V.frame.equivFun.symm x) =
       ReciprocityTheory.ChartRestriction.G.FD.herm (V.gram)ᵀ x y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Module.Basis.equivFun_symm_apply, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
-    LinearMap.smul_apply, smul_eq_mul, RingHom.id_apply]
+
+  simp only [Module.Basis.equivFun_symm_apply, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
+  LinearMap.smul_apply, smul_eq_mul, RingHom.id_apply]
   simp only [ReciprocityTheory.ChartRestriction.G.FD.herm, Matrix.transpose_apply, HSpace.gram, ReciprocityTheory.ChartRestriction.G.FD.cc, Finset.mul_sum]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   rw [starRingEnd_apply, hst]

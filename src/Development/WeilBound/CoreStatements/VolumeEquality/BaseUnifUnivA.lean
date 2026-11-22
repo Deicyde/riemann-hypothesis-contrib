@@ -47,8 +47,8 @@ theorem exists_realExt {E : Type} [Field E] [NumberField E] [IsCMField E] {g : �
   let v : Fin (2 * g) → Fin g → ℂ := fun k => R.P (b k)
   have hsum : ∀ (Q : Λ →+ (Fin g → ℂ)) (x : Λ), Q x = ∑ k, (b.repr x k : ℝ) • Q (b k) := by
     intro Q x
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [← b.sum_repr x, map_sum]
+
+    conv_lhs => rw [← b.sum_repr x, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_zsmul, Int.cast_smul_eq_zsmul]
   have hv : (⊤ : Submodule ℝ (Fin g → ℂ)) ≤ Submodule.span ℝ (Set.range v) := by
@@ -68,8 +68,8 @@ theorem exists_realExt {E : Type} [Field E] [NumberField E] [IsCMField E] {g : �
     exact c.constr_basis ℝ _ k
   have hL : ∀ x, L (R.P x) = R'.P x := by
     intro x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum R.P x, hsum R'.P x, map_sum]
+
+    rw [hsum R.P x, hsum R'.P x, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, hLb]
   have hall : ∀ z : Fin g → ℂ, z ∈ Submodule.span ℝ (Set.range R.P) := fun z => hspan ▸ Submodule.mem_top

@@ -7,7 +7,7 @@ public import Formalism.LocalToGlobal.IndefiniteReal.DoubleCosetOperators.RatDat
 @[expose] public section
 
 open NumberField Formalism.IndefR.NX
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.isKsForm_of_algebraicFormsIso : ∀ {LL Ks Ks' WL WL' G G' : Type} [Field LL] [NumberField LL] [Field Ks] [NumberField Ks]
     [Algebra Ks LL] [Field Ks'] [NumberField Ks'] [Algebra Ks' LL] [AddCommGroup WL] [Module LL WL] [Module Ks WL]
     [IsScalarTower Ks LL WL] [Module (𝓞 Ks) WL] [IsScalarTower (𝓞 Ks) Ks WL] [AddCommGroup WL'] [Module LL WL']

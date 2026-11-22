@@ -15,8 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HostIma
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 open NumberField IsDedekindDomain Formalism.BasicNotions GlobalTheory.SeriesTie GlobalTheory.FieldSize
 open Formalism.L2.Host (embLL0)

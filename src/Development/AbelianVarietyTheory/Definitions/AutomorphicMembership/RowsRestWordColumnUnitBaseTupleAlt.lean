@@ -159,7 +159,7 @@ def levP (F : Face D A) : Bool → Σ P : Subgroup G, P →* D.what₂.LLˣ
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 2000000 in
+
 structure ChT {R : RealDat D A Ks} (y : Hd R) (F : Face D A) (b : Bool) {Φ : Type} (rep : Φ → Formalism.L2.NG.FinTyp D.host.E D.R.r)
     {Top : D.what₂.Tup → Hs} (jA : ∀ t, (Fin (rDim D A (levP F b).1 (levP F b).2 t) → D.what₂.LL) → (Top (y.tup t)).T)
     (c : ChD D.what₂.Tup Φ D.R.m Top) : Type where
@@ -192,7 +192,7 @@ structure ChT {R : RealDat D A Ks} (y : Hd R) (F : Face D A) (b : Bool) {Φ : Ty
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 2000000 in
+
 structure LfT {R : RealDat D A Ks} (y : Hd R) (F : Face D A) {Φ : Type} (rep : Φ → Formalism.L2.NG.FinTyp D.host.E D.R.r)
     {Mt : D.what₂.Tup → ℕ → Hs}
     (jL : ∀ (i : Fin D.R.m) t, (Fin (lDim D A F.P0 F.ψ0 i t) → D.what₂.LL) → (Mt (y.tup t) ((i : ℕ) + 1)).T)
@@ -258,7 +258,7 @@ abbrev PkD (D : D7) (G : Type) [Group G] : Type 1 :=
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 2000000 in
+
 structure PkT {R : RealDat3 D A3 Ks} (F : Face3 D A3) (y : Hd R.toRealDat) (mA : Bool → D.what₂.Tup → Mat1 D.what₂.LL G)
     (p : PkD D G) : Type where
   rep : p.Φ → Formalism.L2.NG.FinTyp D.host.E D.R.r
@@ -284,7 +284,7 @@ def etaOf (R : RealDat3 D A3 Ks) (F : Face3 D A3) (j : ℕ) (w : D.what₂.place
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 4000000 in
+
 structure RationalReadingWithoutCongruence (R : RealDat3 D A3 Ks) (F : Face3 D A3) (X0 : BaseLevelRowSide D) (Y : Read (A3 := A3) R.toRealDat F.lv2 X0) : Type where
   eRR : (Fin ((R.toCx3 F).data F.cr true).D → D.what₂.LL) ≃ₗ[D.what₂.LL] D.div.RR.V
   eRR0 : (Fin ((R.toCx3 F).data F.cr false).D → D.what₂.LL) ≃ₗ[D.what₂.LL] X0.s.RR.V

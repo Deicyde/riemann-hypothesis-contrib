@@ -92,11 +92,11 @@ theorem kap_idem_algebraic {LL : FinExt l} {f : ℕ} (o : Module.Basis (Fin f) �
   choose y hy using hy
   refine ⟨∑ j, y j * M⁻¹ j k, ?_⟩
   have hinv : M * M⁻¹ = 1 := Matrix.mul_nonsing_inv M (Ne.isUnit hτ)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, hy, Finset.sum_mul, mul_assoc]
+
+  simp only [map_sum, map_mul, hy, Finset.sum_mul, mul_assoc]
   rw [Finset.sum_comm]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← Finset.mul_sum, ← map_mul, ← map_sum, ← Matrix.mul_apply, hinv, Matrix.one_apply]
+
+  simp only [← Finset.mul_sum, ← map_mul, ← map_sum, ← Matrix.mul_apply, hinv, Matrix.one_apply]
   simp [apply_ite (algebraMap (Om l) (PadicComplex l))]
 
 theorem kap_idem_mem_inC (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicComplex l ≃+* PadicComplex l))

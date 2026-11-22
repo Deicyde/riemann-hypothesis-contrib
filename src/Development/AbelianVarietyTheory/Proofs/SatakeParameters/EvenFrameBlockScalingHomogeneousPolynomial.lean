@@ -51,8 +51,8 @@ theorem GlobalTheory.FrameB.evenFrameBlock_scaling_homogeneous_polynomial : ∀ 
   unfold GlobalTheory.FrameB.tau0
   conv_lhs => rw [R.as_sum]
   conv_rhs => rw [R.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, Finset.smul_sum, MvPolynomial.aeval_monomial]
+
+  simp only [map_sum, Finset.smul_sum, MvPolynomial.aeval_monomial]
   refine Finset.sum_congr rfl fun m hmR => ?_
   rw [← hm m hmR]
   simp only [hf]

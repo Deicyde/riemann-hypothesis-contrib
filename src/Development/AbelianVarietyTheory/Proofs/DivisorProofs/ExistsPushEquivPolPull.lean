@@ -210,13 +210,13 @@ theorem det_ne_zero_of_inverse {E : Type} [Field E] [NumberField E] [StarRing (�
   obtain ⟨s, s', hs⟩ := h1 y
   refine (smul_eq_zero_iff_right hN.ne').1 ?_
   rw [← map_nsmul, ← hs]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, LinearMap.sum_apply, hφ, hφ', Finset.sum_const_zero, add_zero]
+
+  simp only [map_add (f := _), map_sum, LinearMap.sum_apply, hφ, hφ', Finset.sum_const_zero, add_zero]
   refine Finset.sum_eq_zero fun b _ => ?_
   have e : ∑ k, g k b * w k = 0 := by simpa [Matrix.vecMul, dotProduct, mul_comm] using congrFun hwg b
   simp only [← Module.End.mul_apply, ← map_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← LinearMap.sum_apply, ← map_sum, ← LinearMap.sum_apply, ← map_sum, e]
+
+  rw [← LinearMap.sum_apply, ← map_sum, ← LinearMap.sum_apply, ← map_sum, e]
   simp
 
 theorem star_gram {E : Type} [Field E] [NumberField E] [StarRing (𝓞 E)] {A B : Point p v O (𝓞 E)}

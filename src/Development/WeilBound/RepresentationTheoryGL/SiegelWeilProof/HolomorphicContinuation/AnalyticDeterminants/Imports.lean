@@ -111,8 +111,8 @@ theorem span_top (W : Submodule ℂ (M2 n))
     · subst h; simp [Matrix.single_apply]
     · simp [Matrix.single_apply, Matrix.one_apply, h]
   have hST : ∑ a, ιA (Matrix.single a a 1) + ∑ k, ιD (Matrix.single k k 1) ∈ W := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, ← map_sum, one_sum]
+
+    rw [← map_sum, ← map_sum, one_sum]
     have : ιA 1 + ιD 1 = (1 : M2 n) := by simp [ιA, ιD, fromBlocks_add, ← fromBlocks_one]
     rw [this]; exact h1
   have hTS : ∑ k, ιD (Matrix.single k k 1) - ∑ a, ιA (Matrix.single a a 1) ∈ W := by
@@ -150,11 +150,11 @@ theorem span_top (W : Submodule ℂ (M2 n))
     simpa using this
   have allA : ∀ A : Matrix (Fin n) (Fin n) ℂ, ιA A ∈ W := by
     intro A
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.matrix_eq_sum_single A, map_sum]
+
+    rw [Matrix.matrix_eq_sum_single A, map_sum]
     refine W.sum_mem fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine W.sum_mem fun j _ => ?_
     rw [sgl, map_smul]
     refine W.smul_mem _ ?_
@@ -163,11 +163,11 @@ theorem span_top (W : Submodule ℂ (M2 n))
     · exact offA i j hij
   have allD : ∀ D : Matrix (Fin n) (Fin n) ℂ, ιD D ∈ W := by
     intro D
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.matrix_eq_sum_single D, map_sum]
+
+    rw [Matrix.matrix_eq_sum_single D, map_sum]
     refine W.sum_mem fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine W.sum_mem fun j _ => ?_
     rw [sgl, map_smul]
     refine W.smul_mem _ ?_

@@ -5388,8 +5388,8 @@ private theorem UpperTheory.Reformulated.B.Qi13.key {l : ℕ} [Fact l.Prime] {K 
     rfl
   have hred : ∑ i, PadicInt.toZMod (c i) • r (x i) = 0 := by
     have h2 := congrArg r hsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at h2
+
+    rw [map_sum, map_zero] at h2
     rw [← h2]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, hφ, Algebra.smul_def]

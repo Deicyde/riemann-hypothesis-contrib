@@ -32,7 +32,7 @@ theorem tmul_mul_incA {D : D7} (y : AF D.host.F) (t e : D.host.E) :
   rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem mem_idV_of_mem {D : D7} {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : GlobalTheory.ChiGrid.HermitianOrthogonalExtensionData A B c ε) (hε : ε ≠ 0)
     (Λ : Submodule (𝓞 D.host.E) (Fin A.rank → D.host.E)) (𝔟 : Fin c → GlobalTheory.SeeSaw.FI D) (v : GlobalTheory.FinPl.Pl D)
     (q : Fin c) (b : AE D)
@@ -121,12 +121,12 @@ theorem mem_idV_of_mem {D : D7} {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : Glo
     show ∑ k, incA D (π k) * (b * incA D (d.a k q)) = b
     have : ∀ k, incA D (π k) * (b * incA D (d.a k q)) = b * incA D (π k * d.a k q) := fun k => by
       rw [map_mul (incA D) (π k) (d.a k q)]; ring
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl (fun k _ => this k), ← Finset.mul_sum, ← map_sum, hπa q, ite_eq_left rfl, map_one, mul_one]
+
+    rw [Finset.sum_congr rfl (fun k _ => this k), ← Finset.mul_sum, ← map_sum, hπa q, ite_eq_left rfl, map_one, mul_one]
   rwa [e] at key
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem mem_of_mem_idV {D : D7} {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : GlobalTheory.ChiGrid.HermitianOrthogonalExtensionData A B c ε)
     (Λ : Submodule (𝓞 D.host.E) (Fin A.rank → D.host.E)) (𝔟 : Fin c → GlobalTheory.SeeSaw.FI D) (v : GlobalTheory.FinPl.Pl D)
     (q : Fin c) (b : AE D)

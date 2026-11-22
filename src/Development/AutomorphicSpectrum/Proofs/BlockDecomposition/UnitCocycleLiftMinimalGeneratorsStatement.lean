@@ -12,7 +12,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TrMulTrI
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.FewEq
 open GlobalTheory.AbLaw (rs)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.unit_cocycle_lift_minimal_generators : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Scheme.{0}) (s : X ⟶ Sp R) (I : Ideal R) (r : ℕ) (t : Fin r → R),
     Ideal.span (Set.range t) = I → I ≤ IsLocalRing.maximalIdeal R →
     (∀ x : Fin r → R, ∑ i, x i * t i ∈ IsLocalRing.maximalIdeal R * I → ∀ i, x i ∈ IsLocalRing.maximalIdeal R) →

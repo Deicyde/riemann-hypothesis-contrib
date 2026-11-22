@@ -58,8 +58,8 @@ theorem int_coords_ev : ∀ᶠ w in Filter.cofinite, ∀ z ∈ intAE D, ∀ i,
       conv_lhs => rw [← B.sum_repr o]
       push_cast
       rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ho, map_sum, Finset.sum_apply', map_sum]
+
+    rw [ho, map_sum, Finset.sum_apply', map_sum]
     refine sum_mem fun j _ => ?_
     rw [map_zsmul, Finsupp.smul_apply, map_zsmul]
     exact zsmul_mem (hw i j) _

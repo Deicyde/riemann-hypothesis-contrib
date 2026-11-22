@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.Transvect
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 set_option linter.unusedSectionVars false
 
 noncomputable section

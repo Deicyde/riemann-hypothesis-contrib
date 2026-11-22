@@ -25,8 +25,8 @@ theorem kernel_eq_of_maximal {k d r : ℕ} (A : (Fin k → ℂ) →L[ℂ] (Fin d
   by_cases hs : A x ∈ Submodule.span ℂ (Set.range fun j => A (v j))
   · obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 hs
     have h0 : ∑ j, c j • Λ (A (v j)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hx, ← hc, map_sum]
+
+      rw [← hx, ← hc, map_sum]
       simp only [map_smul]
     have hc0 := Fintype.linearIndependent_iff.1 hind c h0
     rw [← hc]
@@ -106,8 +106,8 @@ theorem proof : HolomorphicFibreInfinite.Statement := by
     simp [A']
   have hLA : ∀ p : ℂ × (Fin r → ℂ), Λ (fderiv ℂ f s (A' p)) = p.2 := by
     intro p
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hA', map_add (f := _), map_add (f := _), map_smul, map_smul, hw', smul_zero, zero_add, map_sum, map_sum]
+
+    rw [hA', map_add (f := _), map_add (f := _), map_smul, map_smul, hw', smul_zero, zero_add, map_sum, map_sum]
     simp only [map_smul, hΛv]
     ext i
     simp [Finset.sum_apply, Pi.single_apply]

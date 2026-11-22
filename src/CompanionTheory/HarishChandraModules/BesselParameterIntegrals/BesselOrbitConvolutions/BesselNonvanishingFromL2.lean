@@ -9,7 +9,7 @@ open MeasureTheory Matrix
 open scoped InnerProductSpace ENNReal ComplexConjugate
 
 noncomputable section
-set_option maxHeartbeats 1600000
+
 
 namespace Formalism.FourierDecayAlt.P.MatrixMultiplicationContinuity
 open Formalism.FourierDecayAlt.ThreeDimData

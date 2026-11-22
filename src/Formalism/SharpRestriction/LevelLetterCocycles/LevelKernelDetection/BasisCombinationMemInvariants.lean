@@ -55,8 +55,8 @@ theorem basis_repr_gamma (x : W.DD T) (δ : W.Gam) (hδ : δ ∈ W.DelF) (j : Fi
     B.repr (W.γD T δ x) j = W.γE δ (B.repr x j) := by
   have h1 : W.γD T δ x = ∑ j, W.γE δ (B.repr x j) • B j := by
     conv_lhs => rw [← B.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [W.γD_smul, hB _ δ hδ]
   rw [h1, Module.Basis.repr_sum_self]
 
@@ -113,8 +113,8 @@ theorem letterRing_mul_idempotent (i : ZMod n) (r : k17R W i) : letterRingVal W 
 theorem letterRing_sum_mul {i : ZMod n} {ι : Type} [Fintype ι] (a : ι → k17R W i)
     (C : ι → Fin r → k17R W i) (l : Fin r) :
     ∑ t, letterRingVal W i (a t) * letterRingVal W i (C t l) = letterRingVal W i ((∑ t, a t • C t) l) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_apply, map_sum]
+
+  rw [Finset.sum_apply, map_sum]
   simp only [Pi.smul_apply, smul_eq_mul, letterRing_val_mul]
 
 

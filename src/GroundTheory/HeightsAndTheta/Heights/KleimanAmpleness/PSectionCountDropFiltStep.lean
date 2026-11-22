@@ -58,9 +58,9 @@ theorem idealMod_sup_span_le {J₁ : Ideal (Poly S N)}
   rw [SetLike.mem_coe, hf', map_add (f := _), add_div]
   refine Submodule.add_mem_sup (Submodule.subset_span ⟨_, s, d, hJ j hj d, hs,
     homogeneousComponent_isHomogeneous d j, hsd, rfl⟩) ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show c * g = ∑ k ∈ Finset.range (c.totalDegree + 1), homogeneousComponent k c * g by
-    rw [← Finset.sum_mul, sum_homogeneousComponent], map_sum, map_sum, Finset.sum_div]
+
+  rw [show c * g = ∑ k ∈ Finset.range (c.totalDegree + 1), homogeneousComponent k c * g by
+  rw [← Finset.sum_mul, sum_homogeneousComponent], map_sum, map_sum, Finset.sum_div]
   refine Submodule.sum_mem _ fun k _ ↦ ?_
   rw [homogeneousComponent_of_mem ((mem_homogeneousSubmodule _ _).mpr
     ((homogeneousComponent_isHomogeneous k c).mul hg))]

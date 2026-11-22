@@ -19,9 +19,9 @@ theorem hT_expand' (S : Formalism.BasicNotions.HSpace E) (x y : S.V) :
   have hx := S.frame.sum_repr x
   have hy := S.frame.sum_repr y
   conv_lhs => rw [← hx, ← hy]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
-    LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, Finset.mul_sum, Formalism.BasicNotions.HSpace.gram]
+
+  simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
+  LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, Finset.mul_sum, Formalism.BasicNotions.HSpace.gram]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   rw [RingHom.id_apply]
@@ -30,11 +30,11 @@ theorem hT_expand' (S : Formalism.BasicNotions.HSpace E) (x y : S.V) :
 theorem hT_map (S : Formalism.BasicNotions.HSpace E) (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a))
     (x y : S.V) :
     τ (S.hT x y) = ∑ a, ∑ b, star (τ (S.frame.repr x a)) * (S.gram.map τ) a b * τ (S.frame.repr y b) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hT_expand', map_sum]
+
+  rw [hT_expand', map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [map_mul, map_mul, hτ, Matrix.map_apply, starRingEnd_apply]
 

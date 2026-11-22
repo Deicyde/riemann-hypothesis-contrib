@@ -91,10 +91,10 @@ theorem poly_eq (n : ℕ) (a : ℕ → Module.End ℂ M) (ha : a n = 1) (σ : Mu
   set g : ℂ[X] := ∑ i : Fin n, C (f (a i y) - f y * P.coeff i) * X ^ (i : ℕ) with hg
   have hge : ∀ w : ℂ, g.eval w = f ((∑ k ∈ Finset.range (n + 1), w ^ k • a k) y) - f y * P.eval w := by
     intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hPsum, hg, eval_finsetSum, Finset.sum_range_succ, Finset.sum_range_succ, hPn, ha,
-      LinearMap.add_apply, map_add, LinearMap.sum_apply, map_sum, ← Fin.sum_univ_eq_sum_range (fun k => f ((w ^ k • a k) y)),
-      ← Fin.sum_univ_eq_sum_range (fun k => P.coeff k * w ^ k)]
+
+    rw [hPsum, hg, eval_finsetSum, Finset.sum_range_succ, Finset.sum_range_succ, hPn, ha,
+    LinearMap.add_apply, map_add, LinearMap.sum_apply, map_sum, ← Fin.sum_univ_eq_sum_range (fun k => f ((w ^ k • a k) y)),
+    ← Fin.sum_univ_eq_sum_range (fun k => P.coeff k * w ^ k)]
     simp only [eval_mul, eval_C, eval_pow, eval_X, LinearMap.smul_apply, map_smul, smul_eq_mul, Module.End.one_apply,
       mul_add, Finset.mul_sum]
     simp only [sub_mul, Finset.sum_sub_distrib, one_mul]
@@ -472,18 +472,18 @@ theorem decomp {V : Type} [AddCommGroup V] [Module ℂ V] {ι : Type} [Fintype �
     obtain ⟨χ₀, hχ₀, rfl⟩ := Finset.mem_image.1 hσ
     obtain ⟨h1, h2, -⟩ := hsig χ₀ (Finset.mem_filter.1 hχ₀).2 i
     refine ⟨h1, h2, fun u => ⟨?_, ?_⟩⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sum, Finset.smul_sum]
-        refine Finset.sum_congr rfl fun χ hχ => ?_
-        obtain ⟨hχF, hχe⟩ := Finset.mem_filter.1 hχ
-        rw [← hχe]
-        exact ((hsig χ (Finset.mem_filter.1 hχF).2 i).2.2 u).1
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sum, Finset.smul_sum]
-        refine Finset.sum_congr rfl fun χ hχ => ?_
-        obtain ⟨hχF, hχe⟩ := Finset.mem_filter.1 hχ
-        rw [← hχe]
-        exact ((hsig χ (Finset.mem_filter.1 hχF).2 i).2.2 u).2
+
+    · rw [map_sum, Finset.smul_sum]
+      refine Finset.sum_congr rfl fun χ hχ => ?_
+      obtain ⟨hχF, hχe⟩ := Finset.mem_filter.1 hχ
+      rw [← hχe]
+      exact ((hsig χ (Finset.mem_filter.1 hχF).2 i).2.2 u).1
+
+    · rw [map_sum, Finset.smul_sum]
+      refine Finset.sum_congr rfl fun χ hχ => ?_
+      obtain ⟨hχF, hχe⟩ := Finset.mem_filter.1 hχ
+      rw [← hχe]
+      exact ((hsig χ (Finset.mem_filter.1 hχF).2 i).2.2 u).2
 
 end Main
 

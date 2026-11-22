@@ -22,6 +22,6 @@ open GlobalTheory.ChainOnto GlobalTheory.ChainTw
 open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (SplitProj IsProjAt IsIdemOf LiftsChar rdA grpCo frCo gAt)
 open GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection (Blocks parahoric datum)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.chainTwistEulerFactorsRestore_proof : ∀ D : D7, Restore D := by
   first | exact @GlobalTheory.ChainTw.restore_holds | exact GlobalTheory.ChainTw.restore_holds | (intros; apply GlobalTheory.ChainTw.restore_holds <;> assumption)

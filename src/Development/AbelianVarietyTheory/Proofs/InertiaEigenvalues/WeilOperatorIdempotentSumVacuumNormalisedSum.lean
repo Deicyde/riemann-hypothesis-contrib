@@ -263,8 +263,8 @@ theorem om_eq_smul_sum_iso {χS χT : (AE D)ˣ →* Circle} {om : GA D S × GA D
   obtain ⟨v₀, ⟨hv₀, hv₀Λ⟩, hv₀u⟩ := hRu 0 h0 (isHalf_zero e)
   have hv₀' : v₀ ∈ Λ := by rwa [zero_sub, neg_mem_iff] at hv₀Λ
   have hsum : ℓ (∑ u ∈ R, heisO ψ S T u f) = ℓ f := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_single_of_mem v₀ hv₀, hf1 v₀ hv₀' (hR _ hv₀).2]
+
+    rw [map_sum, Finset.sum_eq_single_of_mem v₀ hv₀, hf1 v₀ hv₀' (hR _ hv₀).2]
     intro u hu hne
     have huΛ : u ∉ Λ := fun huΛ => hne (hv₀u u ⟨hu, by rwa [zero_sub, neg_mem_iff]⟩)
     obtain ⟨l, hl, hlh, hlne⟩ := hd u (hR u hu).2 huΛ
@@ -424,7 +424,7 @@ theorem isHalf_add_left {m n : ℕ} {a b : AE D} (hab : a * b = 0) {u : Mx D m n
     IsHalf (a + b) u := fun i j => by
   rw [add_mul, hu i j, ← hu i j, ← mul_assoc, mul_comm b, hab, zero_mul, add_zero]
 
-set_option maxHeartbeats 1600000 in
+
 theorem splitLaw_add (hW : IsWeilDatumO ψ S T χS χT om) {a b : AE D} (ha : a * a = a) (hb : b * b = b)
     (hac : a * cA D a = 0) (hbc : b * cA D b = 0) (hab : a * b = 0) (habc : a * cA D b = 0)
     (la : SplitLaw ψ χS χT om a) (lb : SplitLaw ψ χS χT om b) : SplitLaw ψ χS χT om (a + b) := by

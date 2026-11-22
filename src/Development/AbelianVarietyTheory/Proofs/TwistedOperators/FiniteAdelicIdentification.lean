@@ -88,7 +88,7 @@ theorem levelVL_conj {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   exact h1
 
 open GlobalTheory.HeckeTrans in
-set_option maxHeartbeats 800000 in
+
 theorem link_of_isLatIsom {V V' : HSp D} (h : V.rank = V'.rank)
     {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} {Λ' : Submodule (𝓞 D.host.E) (Fin V'.rank → D.host.E)}
     {β : GL (Fin V.rank) (EAf D)} {β' : GL (Fin V'.rank) (EAf D)} {N N' : ℕ}
@@ -105,8 +105,8 @@ theorem link_of_isLatIsom {V V' : HSp D} (h : V.rank = V'.rank)
       (fun a => swapAE D (f * ((j.map (unswap D)).mulVec y) a)) = j.mulVec (fun b => swapAE D (f * y b)) := by
     intro f y
     funext a
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Finset.mul_sum, map_sum, map_mul, swap_unswap]
+
+    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Finset.mul_sum, map_sum, map_mul, swap_unswap]
     exact Finset.sum_congr rfl fun b _ => by ring
   have gN : ∀ f, Good (D := D) (N * N') f → Good (N ^ c) f := fun f hf => hf.pow c
   have gN' : ∀ f, Good (D := D) (N * N') f → Good (N' ^ c') f := by
@@ -161,7 +161,7 @@ private theorem finE_mem_UPts (V : HSp D) (g : GA D V) :
   ext a b
   simp only [Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply, GlobalTheory.FinIsoGrp.qFin_sig]
 
-set_option maxHeartbeats 1600000 in
+
 theorem inducedIso (D : D7) : InducedIso D := by
   intro V V' h Λ Λ' β β' N N' hβ hβ' T j hj hm
   obtain ⟨j', h1, h2⟩ := exists_inv hj.1.1

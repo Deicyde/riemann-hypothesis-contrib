@@ -66,12 +66,12 @@ theorem comb_inj (d : BesselDatum A B ι) : Function.Injective (comb d) := by
   have h6 : ∀ l, B.hT (d.e l) (ι a) = 0 := fun l => hD_swap_zero (d.eA l a)
   have hs : s = 0 := by
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, h1, h2, h5] using congrArg (B.hT (dual d i)) h
+
+    simpa [map_sum, h1, h2, h5] using congrArg (B.hT (dual d i)) h
   have hr : r = 0 := by
     funext l
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, h3, h4, h6] using congrArg (B.hT (d.e l)) h
+
+    simpa [map_sum, h3, h4, h6] using congrArg (B.hT (d.e l)) h
   subst hs hr
   have ha : ι a = 0 := by simpa using h
   have : a = 0 := by
@@ -97,8 +97,8 @@ theorem vecA_sum {n : ℕ} (c : Fin n → D.host.E) (v : Fin n → B.V) :
 
 theorem vecA_iota (a : A.V) : vecA B (ι a) = iA ι (vecA A a) := by
   rw [iA, GlobalTheory.BesselCompare.frameMat_eq, GlobalTheory.BesselCompare.eMat_mulVec]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [← A.frame.sum_repr a, map_sum]
+
+  conv_lhs => rw [← A.frame.sum_repr a, map_sum]
   simp only [map_smul]
   rw [vecA_sum]
   rfl

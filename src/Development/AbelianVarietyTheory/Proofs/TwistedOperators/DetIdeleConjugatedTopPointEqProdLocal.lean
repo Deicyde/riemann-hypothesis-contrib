@@ -31,8 +31,8 @@ theorem det_kapAt_val {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : Gri
   rfl
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem detAt_conjPt_eq_prod {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil}
     {U : Set T} (S : GridChoice W U) {t : T} (_ht : t ∈ U) (j : ℕ) (hj : j + 1 < D.R.m) (k : FinPt G (.top (j + 1)))
     (e : AE D) (hI : IsIdemSum e (locPl G t)) :
@@ -44,8 +44,8 @@ theorem detAt_conjPt_eq_prod {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {
   have hcomp : ∀ Q, GlobalTheory.StdFrames.cpt (D := D) Q (toEAf D e) = if Q ∈ locPl G t then 1 else 0 := by
     intro Q
     obtain ⟨⟨es, hes, hsum⟩, -⟩ := hI
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum (toEAf D), map_sum (GlobalTheory.StdFrames.cpt (D := D) Q)]
+
+    rw [hsum, map_sum (toEAf D), map_sum (GlobalTheory.StdFrames.cpt (D := D) Q)]
     split_ifs with hQ
     · rw [Finset.sum_eq_single Q (fun P hP hPQ => (GlobalTheory.StdFrames.cpt_of_isIdemAt (hes P hP)).2 Q (Ne.symm hPQ))
         (fun h => absurd hQ h)]

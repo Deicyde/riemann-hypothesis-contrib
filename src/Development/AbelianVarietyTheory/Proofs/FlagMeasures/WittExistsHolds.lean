@@ -75,9 +75,9 @@ theorem indep_of_dual {ι : Type} [Fintype ι] [DecidableEq ι] (v d : ι → (V
   rw [Fintype.linearIndependent_iff]
   intro g hg j
   have h := congrArg ((VS D).hT (d j)) hg
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, map_zero, hd, smul_eq_mul, mul_ite, mul_zero, Finset.sum_ite_eq',
-    Finset.mem_univ, if_true] at h
+
+  simp only [map_sum, map_smul, map_zero, hd, smul_eq_mul, mul_ite, mul_zero, Finset.sum_ite_eq',
+  Finset.mem_univ, if_true] at h
   exact (mul_eq_zero.1 h).resolve_right (hc j)
 
 theorem indep_mkFr (e f : Fin D.R.rS → (VS D).V) (z : (VS D).V) (T : D.host.E) (hT : T ≠ 0)

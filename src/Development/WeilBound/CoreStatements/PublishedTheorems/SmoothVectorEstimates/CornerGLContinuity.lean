@@ -26,9 +26,9 @@ theorem cornerGL_blkU {R S : Type} [CommRing R] [CommRing S] (s : R →ₙ+* S) 
   ext i j
   change (1 : Matrix (Fin a) (Fin a) S) i j - s ((1 : Matrix (Fin a) (Fin a) R) i j) +
     s ((1 + posM Subtype.val y) i j) = (1 + posM Subtype.val fun t => s (y t)) i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [posM, Matrix.add_apply, Matrix.sum_apply, map_add (f := _), map_sum, Matrix.single_apply,
-    apply_ite s, map_zero]
+
+  simp only [posM, Matrix.add_apply, Matrix.sum_apply, map_add (f := _), map_sum, Matrix.single_apply,
+  apply_ite s, map_zero]
   abel
 
 theorem cLoc_eq (w : Pl E) (x : GA E a) :

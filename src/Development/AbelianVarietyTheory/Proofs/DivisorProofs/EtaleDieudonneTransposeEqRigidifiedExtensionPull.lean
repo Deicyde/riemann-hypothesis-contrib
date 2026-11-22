@@ -36,7 +36,7 @@ theorem linearMap_eq_of_liftSemi_surjective {R R' M N : Type} [CommRing R] [Comm
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
   | tmul r m => rw [liftSemi_tmul, map_smul, map_smul, h]
 
-set_option maxHeartbeats 2000000 in
+
 theorem red_of_isTr (p : ℕ) [Fact p.Prime] (B : Base p (fun _ _ G => G.IsConn)) (k k' : Type)
     [Field k] [CharP k p] [PerfectRing k p] [Field k'] [CharP k' p] [PerfectRing k' p]
     (σ : k →+* k') (G' : PDivGroup p k') (G : PDivGroup p k) (h' : G'.IsEt) (h : G.IsEt)

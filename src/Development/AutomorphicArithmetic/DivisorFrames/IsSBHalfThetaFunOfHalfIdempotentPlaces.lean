@@ -63,9 +63,9 @@ private theorem halfEl_of_at {P : Finset (HeightOneSpectrum (𝓞 F))} (t : ∀ 
 private theorem eq_sum_of_halfEl {P : Finset (HeightOneSpectrum (𝓞 F))} {t : ∀ v : P, E →ₐ[F] Fv F v}
     {z : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)} (hz : HalfEl P t z) : z = ∑ v : P, liftV v.1 (1 : Fv F v) • z := by
   have h := hz.1 (1 - ∑ v : P, liftV v.1 (1 : Fv F v)) fun w hw => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_one, map_sum, Finset.sum_eq_single (⟨w, hw⟩ : P) (fun v _ hv => evFin_liftV_ne
-      (fun e => hv (Subtype.ext e.symm)) 1) (fun h => absurd (Finset.mem_univ _) h), evFin_liftV, sub_self]
+
+    rw [map_sub, map_one, map_sum, Finset.sum_eq_single (⟨w, hw⟩ : P) (fun v _ hv => evFin_liftV_ne
+    (fun e => hv (Subtype.ext e.symm)) 1) (fun h => absurd (Finset.mem_univ _) h), evFin_liftV, sub_self]
   rw [sub_smul, one_smul, sub_eq_zero, Finset.sum_smul] at h
   exact h
 
@@ -118,8 +118,8 @@ private theorem infPart_liftV_smul (v : HeightOneSpectrum (𝓞 D.host.F)) (z : 
 
 private theorem infPart_halfEl {P : Finset (HeightOneSpectrum (𝓞 D.host.F))} {t : ∀ v : P, D.host.E →ₐ[D.host.F] Fv D.host.F v}
     {z : AE D} (hz : HalfEl P t z) : infPart D z = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [eq_sum_of_halfEl hz, map_sum]
+
+  rw [eq_sum_of_halfEl hz, map_sum]
   exact Finset.sum_eq_zero fun v _ => infPart_liftV_smul _ _
 
 private theorem ptO_smul {m k d : ℕ} (G : Matrix (Fin m) (Fin m) D.host.E) (e : Fin k ≃ Fin d) (a : AE D)
@@ -174,7 +174,7 @@ end Host
 end UpperTheory.FmPlace
 
 open UpperTheory.FmPlace GlobalTheory.BigDat.GraphHeis in
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.isSBHalf_thetaFun_of_halfIdempotent_places :
     ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (ε : Bool) (S X : HSp D) (d : ℕ) (e : Fin d ≃ Fin X.rank)
         (Bs : Base D.host.F D.host.E) (Vs : Spc D.host.F D.host.E S.rank) (Ws : Spc D.host.F D.host.E d)

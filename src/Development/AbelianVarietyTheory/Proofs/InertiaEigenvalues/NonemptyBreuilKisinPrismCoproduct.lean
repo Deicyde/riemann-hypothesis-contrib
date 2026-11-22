@@ -182,7 +182,7 @@ def lift (hI : B.I = Ideal.span {d}) {C : Obj l ↥(OL K)} (f : Hom B C) (h0 : E
   f_str := str_of En hI f h0 h0a (I_of En hI f h0 h0a)
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem univ (hF : IsFrame bk B d p) (g0 : Hom bk.prism (obj hF.1 En))
     (hg0 : BK.hf g0 X = En.i p + En.i d * En.w) (C : Obj l ↥(OL K)) (f : Hom B C)
     (g : Hom bk.prism C) : ∃! h : Hom (obj hF.1 En) C, h.comp (inl hF.1 En) = f ∧ h.comp g0 = g := by

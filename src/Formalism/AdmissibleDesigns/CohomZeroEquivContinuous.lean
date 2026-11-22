@@ -465,7 +465,7 @@ private theorem iota_bijective_col (l : K.Col i dc) :
   (D.nbr i _ (col_over i dc l)).e.symm.bijective
 
 
-set_option maxHeartbeats 800000 in
+
 theorem dimLx_of (rX : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i))) (x' : X') (l : K.Col i dc)
     (hBK : TruncatedSeriesCountingIdentities.admBK i) (hG2 : TruncatedSeriesCountingIdentities.admG2 i rX ρ π)
     (hc : ContX i dc r χ x' l) (hcr : CrysX i dc r χ x' l) (hneg : NegX i dc r χ ρ π x' l)

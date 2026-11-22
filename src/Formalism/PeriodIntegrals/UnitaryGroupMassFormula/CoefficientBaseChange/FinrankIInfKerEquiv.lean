@@ -54,8 +54,8 @@ theorem coefEquiv_tmul (c : LL') (v : Fin k → LL) (b : BB) :
 theorem mulVec_map_smul (A : Matrix (Fin k) (Fin k) LL) (v : Fin k → LL) (c : LL') :
     (A.map (algebraMap LL LL')).mulVec (fun i => v i • c) = fun i => (A.mulVec v) i • c := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Algebra.smul_def, map_sum, map_mul, Finset.sum_mul]
+
+  simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Algebra.smul_def, map_sum, map_mul, Finset.sum_mul]
   refine Finset.sum_congr rfl fun j _ => ?_
   ring
 

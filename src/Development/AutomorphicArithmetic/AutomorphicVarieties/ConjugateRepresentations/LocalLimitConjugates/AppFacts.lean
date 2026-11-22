@@ -14,8 +14,8 @@ private theorem rT_map_on {W : Type} [AddCommGroup W] [Module ℂ W] {d : ℕ} (
     (B : Module.End ℂ (Fin d → ℂ)) (h : ∀ φ ∈ N, A (T φ) = T (A φ)) (m : W ⊗[ℂ] (Fin d → ℂ)) (hm : ∀ i, cmp i m ∈ N) :
     T.rTensor _ (TensorProduct.map A B m) = TensorProduct.map A B (T.rTensor _ m) := by
   rw [← sum_cmp m]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.rTensor_tmul, TensorProduct.map_tmul]
+
+  simp only [map_sum, LinearMap.rTensor_tmul, TensorProduct.map_tmul]
   exact Finset.sum_congr rfl fun i _ => by rw [h _ (hm i)]
 
 private theorem rT_smLie {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ} (Ξ : AlgRep E a)
@@ -51,7 +51,7 @@ theorem UpperTheory.V.Cj.H.appFacts :
     exact Submodule.subset_span (hsq X i)
   · refine AlternatingMap.ext fun X => ?_
     rw [app_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dCo, AlternatingMap.alternatizeUncurryFin_apply, map_sum, map_zsmul]
+
+    simp only [dCo, AlternatingMap.alternatizeUncurryFin_apply, map_sum, map_zsmul]
     refine Finset.sum_congr rfl fun i _ => congrArg _ ?_
     exact rT_smLie Ξ N T hT _ _ (hv _)

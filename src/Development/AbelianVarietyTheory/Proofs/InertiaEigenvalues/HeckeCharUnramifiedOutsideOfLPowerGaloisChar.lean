@@ -22,7 +22,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.UnramPull
 
-set_option maxHeartbeats 800000 in
+
 theorem unramOutside_of_corr : ∀ (D : D7) (N : NData D.R D.host D.what₂) (art : Neutral.B1.Ideles D.host.E →* GlobalTheory.HeckeGal.Gab D.host.E N.Om), GlobalTheory.HeckeGal.IsGlobalArtin art → ∀ (r : G D.host.E N.Om →* ℂˣ) (l n : ℕ), l.Prime → (∀ σ, r σ ^ (l ^ n) = 1) → ∀ (c : (AE D)ˣ →* Circle) (χ : Formalism.L2.Host.HChar D.host.E), ChrEq c χ → GlobalTheory.ToricDistribution.Corr art r χ → ∀ Q : Finset (Pl D.host.E), SplitSet Q → (∀ P ∈ Q, ((l : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal) → (∀ v : Pl D.host.E, v ∉ Q → (∀ P ∈ Q, ¬ Formalism.BasicNotions.IsConjPl D.host P v) → ∀ B : ValuationSubring N.Om, IsPlaceOver B v → ∀ σ ∈ Ine (F := D.host.E) B, r σ = 1) → GlobalTheory.ExportSeries.UnramOutside c Q := by
   intro D N art hart r l n hl hp c χ hc hcorr Q hQ hlQ hine
   intro x hx1 hx2 hx3 hxQ
@@ -40,8 +40,8 @@ theorem unramOutside_of_corr : ∀ (D : D7) (N : NData D.R D.host D.what₂) (ar
     have k1 : idemAt P * idem Q = idemAt P :=
       GlobalTheory.PlaceModelSum.mul_sum_orth (fun a ha => (hQ.isIdemAt ha).1) (fun a ha b hb hab => hQ.mul_eq_zero ha hb hab) hP
     have k2 : idemAt P * cA D (idem Q) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [idem, map_sum, Finset.mul_sum]
+
+      rw [idem, map_sum, Finset.mul_sum]
       exact Finset.sum_eq_zero fun j hj => hQ.mul_conj hP hj
     rw [hf, mul_add, k1, k2, add_zero]
   have hdelta : ∀ P e', GlobalTheory.IdemSupport.IsDelta Φ P e' → e P = e' := fun P e' h' =>

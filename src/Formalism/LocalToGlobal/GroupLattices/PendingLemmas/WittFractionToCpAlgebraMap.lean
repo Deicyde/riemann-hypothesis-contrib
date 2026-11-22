@@ -229,8 +229,8 @@ theorem exists_approx (x : WW p) (N : ℕ) : ∃ z, Approx p N x z := by
   set S := ∑ i ∈ Finset.Iic N, (WittVector.teichmuller p
         (((_root_.frobeniusEquiv (kb p) p).symm ^ i) (x.coeff i)) * (p : WW p) ^ i) with hS
   have hmem : algebraMap (WW p) (K0 p) S ∈ Kalg p := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hS, map_sum]
+
+    rw [hS, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_mul, map_pow, map_natCast]
     exact mul_mem (teich_mem p _) (pow_mem (natCast_mem _ p) i)

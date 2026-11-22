@@ -14,8 +14,8 @@ open Formalism.IndefR.Links
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SeriesTie
 
@@ -50,8 +50,8 @@ theorem mem_range_realRd_iff {ν : ℂ} (hν : ν ≠ 0) (g : GA D (Wc D j) → 
     rw [smul_inv_smul₀ hν, e]
   · rintro ⟨n, a, x, e⟩
     refine ⟨∑ k, (YS.eF i _ b (Nat.le_add_left _ _) j.2).symm (a k ⊗ₜ[S.Ks] x k), ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [realRd_tmul, mul_smul]
     rw [← Finset.smul_sum, ← e, inv_smul_smul₀ hν]
 

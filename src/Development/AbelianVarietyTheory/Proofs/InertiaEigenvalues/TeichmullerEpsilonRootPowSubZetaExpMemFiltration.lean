@@ -147,8 +147,8 @@ theorem epsT_pow_taylor : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : Lo
   have hs : ∀ c : ℕ → ℚ_[l], ∑ j ∈ Finset.range M, algebraMap ℚ_[l] _ (c j) * π t ^ j =
       π (∑ j ∈ Finset.range M, algebraMap ℚ_[l] _ (c j) * t ^ j) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, map_pow, AlgHom.commutes]
+
+    simp only [map_sum, map_mul, map_pow, AlgHom.commutes]
   have hc : ∀ c : ℕ → ℚ_[l],
       ((∑ j ∈ Finset.range M, algebraMap ℚ_[l] _ (c j) * t ^ j : ↥(filZero P)) : P.R.BdR) =
       ∑ j ∈ Finset.range M, qB P (c j) * tD P ^ j := by

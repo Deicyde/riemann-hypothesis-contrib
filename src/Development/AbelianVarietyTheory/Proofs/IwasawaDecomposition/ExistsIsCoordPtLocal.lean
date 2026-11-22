@@ -80,7 +80,7 @@ open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj Alg
 open scoped CategoryTheory.Obj BigOperators
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LocM GlobalTheory.Toroidal GlobalTheory.Ex
 attribute [local instance] Over.cartesianMonoidalCategory
-set_option maxHeartbeats 1000000
+
 
 noncomputable section
 namespace GlobalTheory.CoordReduce

@@ -52,8 +52,8 @@ theorem UpperTheory.V.KT.gramq :
       _ = _ := Finset.sum_comm
   · intro c
     funext w a
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [realVec, toR, intVec, map_sum, zsmul_eq_mul]
+
+    simp [realVec, toR, intVec, map_sum, zsmul_eq_mul]
   · let E : (Fin N × BI L → ℤ) ≃ Lat L N :=
       (Equiv.curry _ _ _).trans
         (Equiv.piCongrRight fun _ => (RingOfIntegers.basis L).equivFun.symm.toEquiv)

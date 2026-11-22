@@ -99,9 +99,9 @@ theorem exists_homog_chart (V : Ideal (MRingOver F ι)) (j : ∀ k, ι k) (b : M
       omega
     rwa [hsum] at h3
   ·
-    set_option synthInstance.maxHeartbeats 100000 in rw [map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [MvPolynomial.as_sum b, map_sum]
+    rw [map_sum]
+
+    conv_rhs => rw [MvPolynomial.as_sum b, map_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [map_mul, map_prod]
     simp only [map_pow, hX1, one_pow, Finset.prod_const_one, mul_one]
@@ -146,8 +146,8 @@ private theorem aeval_mul_const_of_isMultiHomog {A : Type*} [CommRing A] [Algebr
   classical
   conv_lhs => rw [MvPolynomial.as_sum f]
   conv_rhs => rw [MvPolynomial.as_sum f]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, Finset.mul_sum]
+
+  rw [map_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
   have hw := (mem_weightedHomogeneousSubmodule _ _ _ _).mp (mem_weighted_of_isMultiHomog hf)
     (MvPolynomial.mem_support_iff.mp hm)

@@ -17,8 +17,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.HeckeDetChar
 
@@ -58,8 +58,8 @@ theorem idem_mul_eq_zero {Q : Finset (Pl D.host.E)} (hS : SplitSet Q) {P : Pl D.
     (hoff : Bridge.SplitOff P (Q : Set (Pl D.host.E))) {e : AE D} (he : IsIdemAt e P) :
     (idem Q + cA D (idem Q)) * e = 0 := by
   have hc : IsIdemAt (cA D e) (conjPl P) := GlobalTheory.MovedIdem.isIdemAt_conj he fun _ => Iff.rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [idem, map_sum, ← Finset.sum_add_distrib, Finset.sum_mul]
+
+  rw [idem, map_sum, ← Finset.sum_add_distrib, Finset.sum_mul]
   refine Finset.sum_eq_zero fun Q' hQ' => ?_
   have he' := hS.isIdemAt hQ'
   rw [add_mul]

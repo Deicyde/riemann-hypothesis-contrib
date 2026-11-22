@@ -21,7 +21,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelA
 open GlobalTheory.OrbitSep
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace GlobalTheory.SecRingNonZeroDiv
 

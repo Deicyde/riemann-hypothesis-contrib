@@ -53,7 +53,7 @@ theorem exists_latInd (q : GlobalTheory.FinPl.SplitPt D k) (hU : q.UnitAA) (FS :
     rw [← hM]
     funext i
     simp only [Matrix.mulVec, dotProduct, GlobalTheory.FinPl.HalfInd.wr_apply]
-    set_option synthInstance.maxHeartbeats 100000 in rw [map_sum]
+    rw [map_sum]
     exact Finset.sum_congr rfl fun j _ => (GlobalTheory.FinPl.LatIndHalf.sec_mul q _ _).symm
   have key : GlobalTheory.FinPl.HalfInd.wr α β x ∈ latO S T (M : Set _) (M' : Set _) (· = q.v) ↔
       ∀ z ∈ ΛS, x *ᵥ z ∈ ΛT := by

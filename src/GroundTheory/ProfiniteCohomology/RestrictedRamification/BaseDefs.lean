@@ -212,8 +212,8 @@ theorem sumPlaceInv_eq_sum_of_placeInv (T : Finset (Place K.1)) (y : ⨁ w : Pla
     (hT : ∀ w ∉ T, placeInv w (y w) = 0) : sumPlaceInv K y = ∑ w ∈ T, placeInv w (y w) := by
   classical
   conv_lhs => rw [← DirectSum.sum_support_of y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp_rw [sumPlaceInv_of]
   calc ∑ w ∈ DFinsupp.support y, placeInv w (y w)
       = ∑ w ∈ DFinsupp.support y ∪ T, placeInv w (y w) :=
@@ -316,7 +316,7 @@ noncomputable def gsCompactInv (hn : Odd n ∨ IsTotallyComplex K.1) (h3 : Subsi
     (localToCompact_two_surjective S ιs n h3) (gsSumInvRoots S ιs n) (ker_localToCompact_le S ιs n hn)
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem gsCompactInv_localToCompact (hn : Odd n ∨ IsTotallyComplex K.1)
     (h3 : Subsingleton (cohomology (gsRoots S n) 3))
     (ξ : ∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2) :

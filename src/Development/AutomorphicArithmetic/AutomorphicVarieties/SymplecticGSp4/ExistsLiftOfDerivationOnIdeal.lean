@@ -179,7 +179,7 @@ private theorem exists_lift_of_derivation_on_ideal {Ω : Type} [Field Ω] [CharZ
   exact ⟨Ξ, fun n f hf => ⟨(congrArg TrivSqZeroExt.fst (hΞ n f (hgr n f hf))).trans (hX f).1,
     (congrArg TrivSqZeroExt.snd (hΞ n f (hgr n f hf))).trans (hX f).2⟩⟩
 
-set_option maxHeartbeats 800000 in
+
 private theorem derivation_kills_ideal_lifts {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
     (D : Raw Ω c) (hD : D.Good) (M : Model D) [GradedAlgebra M.gr] (hL : Loc.LocalPublishedTheorems) (hS : SoV Ω l) (hF : D.Fin0)
     (hN : D.NoEnd) (hR : D.AllIrr D.RigidAt) (x : M.A →ₐ[c.O] PadicAlgCl l) (hx : OnS M.eqns.ideal x)

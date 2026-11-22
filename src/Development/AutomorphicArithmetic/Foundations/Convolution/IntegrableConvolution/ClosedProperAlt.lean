@@ -56,9 +56,9 @@ def glue (D : Split ι s m) (n : ℕ) (g : Fin (m + 1) → GL (Fin n) R) : GL (F
     apply D.e.injective
     funext i
     have h := congrFun (congrFun (g i).val_inv a) b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.of_apply, map_sum, map_mul, RingEquiv.apply_symm_apply, Finset.sum_apply,
-      Pi.mul_apply] at h ⊢
+
+    simp only [Matrix.mul_apply, Matrix.of_apply, map_sum, map_mul, RingEquiv.apply_symm_apply, Finset.sum_apply,
+    Pi.mul_apply] at h ⊢
     rw [show ((g i)⁻¹ : GL (Fin n) R).val = (g i).inv from rfl, h]
     by_cases hab : a = b <;> simp [Matrix.one_apply, hab]
   inv_val := by
@@ -66,9 +66,9 @@ def glue (D : Split ι s m) (n : ℕ) (g : Fin (m + 1) → GL (Fin n) R) : GL (F
     apply D.e.injective
     funext i
     have h := congrFun (congrFun (g i).inv_val a) b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.of_apply, map_sum, map_mul, RingEquiv.apply_symm_apply, Finset.sum_apply,
-      Pi.mul_apply] at h ⊢
+
+    simp only [Matrix.mul_apply, Matrix.of_apply, map_sum, map_mul, RingEquiv.apply_symm_apply, Finset.sum_apply,
+    Pi.mul_apply] at h ⊢
     rw [show ((g i)⁻¹ : GL (Fin n) R).val = (g i).inv from rfl, h]
     by_cases hab : a = b <;> simp [Matrix.one_apply, hab]
 

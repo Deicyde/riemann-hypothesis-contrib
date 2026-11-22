@@ -11,7 +11,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 theorem UpperTheory.under_chosen_place_and_isSplitAt_of_decomp_le :
     ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω), (∀ v, (s.w v).under (𝓞 (Lp L)) = v) ∧ ∀ w : Plc L, Dec (F := Lp L) (s.A (w.under (𝓞 (Lp L)))) ≤ (W.resP L Ω).range → IsSplitAt w := by

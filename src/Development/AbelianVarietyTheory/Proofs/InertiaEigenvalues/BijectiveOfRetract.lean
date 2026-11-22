@@ -213,20 +213,20 @@ theorem bijective_of_retract (M : Type) [AddCommGroup M] [Module O M] [Topologic
         map_H2_comp (twist ε M) (twist ε (N' i)) (twist ε M) (p' i) (hp' i) (twist_equiv ε _) (s' i)
           (hs' i) (twist_equiv ε _)]
       rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sum, map_sum, Finset.sum_congr rfl (fun j _ => k1 j),
-      Finset.sum_congr rfl (fun i _ => k2 i), ← LinearMap.sum_apply, ← LinearMap.sum_apply,
-      ← map_H2_sum (twist ε M) (twist ε M) _ _ _ _ (cont_sum _ _ fun j => (hs j).comp (hp j))
-        (twist_equiv ε _),
-      ← map_H2_sum (twist ε M) (twist ε M) _ _ _ _ (cont_sum _ _ fun i => (hs' i).comp (hp' i))
-        (twist_equiv ε _),
-      ← LinearMap.add_apply,
-      ← map_H2_add (twist ε M) (twist ε M) _ _ _ _ _ _
-        ((cont_sum _ _ fun j => (hs j).comp (hp j)).add
-          (cont_sum _ _ fun i => (hs' i).comp (hp' i))) (twist_equiv ε _),
-      map_H2_congr (twist ε M) (twist ε M)
-        (LinearMap.ext fun m => by simpa using hid m : (∑ j, s j ∘ₗ p j) + ∑ i, s' i ∘ₗ p' i =
-          LinearMap.id) _ _ continuous_id (fun _ _ => rfl), map_H2_id]
+
+    rw [map_add (f := _), map_sum, map_sum, Finset.sum_congr rfl (fun j _ => k1 j),
+    Finset.sum_congr rfl (fun i _ => k2 i), ← LinearMap.sum_apply, ← LinearMap.sum_apply,
+    ← map_H2_sum (twist ε M) (twist ε M) _ _ _ _ (cont_sum _ _ fun j => (hs j).comp (hp j))
+      (twist_equiv ε _),
+    ← map_H2_sum (twist ε M) (twist ε M) _ _ _ _ (cont_sum _ _ fun i => (hs' i).comp (hp' i))
+      (twist_equiv ε _),
+    ← LinearMap.add_apply,
+    ← map_H2_add (twist ε M) (twist ε M) _ _ _ _ _ _
+      ((cont_sum _ _ fun j => (hs j).comp (hp j)).add
+        (cont_sum _ _ fun i => (hs' i).comp (hp' i))) (twist_equiv ε _),
+    map_H2_congr (twist ε M) (twist ε M)
+      (LinearMap.ext fun m => by simpa using hid m : (∑ j, s j ∘ₗ p j) + ∑ i, s' i ∘ₗ p' i =
+        LinearMap.id) _ _ continuous_id (fun _ _ => rfl), map_H2_id]
     rfl
 
 end Retract

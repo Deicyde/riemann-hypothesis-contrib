@@ -202,10 +202,10 @@ private theorem mConeMap_eq_C_mul_prod_of_isMultiHomog {g : MRing J} {d : K → 
     ∃ a : Ω, mConeMap y g = MvPolynomial.C a * ∏ k, MvPolynomial.X k ^ d k := by
   classical
   refine ⟨∑ m ∈ g.support, ((g.coeff m : ℤ) : Ω) * ∏ p, y p ^ m p, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show mConeMap y g = MvPolynomial.aeval
-      (fun p : (Σ k, J k) => MvPolynomial.C (y p) * MvPolynomial.X p.1) g from rfl,
-    MvPolynomial.aeval_def, MvPolynomial.eval₂_eq', map_sum, Finset.sum_mul]
+
+  rw [show mConeMap y g = MvPolynomial.aeval
+    (fun p : (Σ k, J k) => MvPolynomial.C (y p) * MvPolynomial.X p.1) g from rfl,
+  MvPolynomial.aeval_def, MvPolynomial.eval₂_eq', map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl (fun m hm => ?_)
   have hd := hg m hm
   simp only [mul_pow, Finset.prod_mul_distrib, ← map_pow, ← map_prod, map_mul]

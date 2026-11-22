@@ -32,8 +32,8 @@ theorem gram_ge {K K' V V' ι κ : Type} [Field K] [NumberField K] [StarRing K] 
   have h1 : ∀ x : Fin j → K, N σ (∑ k, x k • e k) =
       1 * Formalism.HermitianLatticesTheory.cnorm (cols b' X' w (fun k => φ (e k)) *ᵥ fun k => σ (x k)) := fun x => by
     have h := ht w.embedding (∑ k, x k • e k)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← (hG' w).2, map_sum] at h
+
+    rw [← (hG' w).2, map_sum] at h
     simp only [map_smulₛₗ] at h
     rw [normAt_sum] at h
     rw [one_mul]

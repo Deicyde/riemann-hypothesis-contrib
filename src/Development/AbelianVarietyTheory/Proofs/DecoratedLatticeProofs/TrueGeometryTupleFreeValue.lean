@@ -298,7 +298,7 @@ theorem locHom_std (q : GlobalTheory.FinPl.SplitPt D k) (S : HSp D) {Y : Type} [
   rw [GlobalTheory.Fam.MovedJoin.mul_frameγ_std F e hF, GlobalTheory.Fam.MovedJoin.frameβ_mul_std F e hF] at h
   exact h.symm
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem prV_comm (v : GlobalTheory.FinPl.Pl D) (z : Af ↥D.host.F ⊗[↥D.host.F] D.host.E) :
     Formalism.UG.prV (E := D.host.E) v ((Algebra.TensorProduct.comm (↥D.host.F) (Af ↥D.host.F) D.host.E) z) =
       (Algebra.TensorProduct.comm _ _ _) (GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter.compFin D v z) := by
@@ -313,7 +313,7 @@ theorem prV_comm (v : GlobalTheory.FinPl.Pl D) (z : Af ↥D.host.F ⊗[↥D.host
     simp only [map_add (f := _)]
     exact congrArg₂ (· + ·) ha hb
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem prV_toEAf_eq_zero (v : GlobalTheory.FinPl.Pl D) (y : AE D) (h : GlobalTheory.FinPl.compAt D v y = 0) :
     Formalism.UG.prV (E := D.host.E) v (toEAf D y) = 0 := by
   unfold GlobalTheory.FinPl.compAt at h
@@ -324,7 +324,7 @@ theorem prV_toEAf_eq_zero (v : GlobalTheory.FinPl.Pl D) (y : AE D) (h : GlobalTh
   rw [h, map_zero]
 
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem bc_prV_eq_one (S : HSp D) {P : GlobalTheory.FinPl.Pl D → Prop} {g : GA D S} (hg : g ∈ GlobalTheory.FinPl.grpAt S P) {m : ℕ} (hm : S.rank = m)
     (x : GL (Fin m) (EF D)) (hx : x.1 = finM S hm g) (v : GlobalTheory.FinPl.Pl D) (hv : ¬ P v) :
     Formalism.UG.bc (Formalism.UG.prV (E := D.host.E) v) x = 1 := by
@@ -361,7 +361,7 @@ theorem bc_prV_eq_one (S : HSp D) {P : GlobalTheory.FinPl.Pl D → Prop} {g : GA
 end Split
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem uloc_iff {B : GlobalTheory.Mem.Base} {X : PreX B.toPre} {I : TC B X} {l : I.Laws} {Z : TC.Later B (I.cols l)} {u : B.Word} {a : I.ι}
     {Ch₀ : ℕ → Type} (hOk : I.Ok) (hP : TC.Pins B X) (A : TwDat I l Z u a Ch₀) (hA : A.Is) (P : BadPr I a)
     {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]

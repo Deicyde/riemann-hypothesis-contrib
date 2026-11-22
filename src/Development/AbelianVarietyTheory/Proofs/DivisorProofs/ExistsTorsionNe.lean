@@ -112,7 +112,7 @@ theorem exists_sec_fibre {K : Type} [Field K] (ev : V₁ →+* K) (θ : LB.Sec (
   exact (sval_of θ₁ _ z J _ (fun _ => by rw [Category.comp_id]; rfl)).symm
 
 
-set_option maxHeartbeats 400000 in
+
 theorem exists_torsion_ne {K : Type} [Field K] [IsAlgClosed K] (ev : V₁ →+* K)
     (θ : FieldBaseChange.SecOver D.P.A.hom (LB.LinComb D.P.L (D.famφB 0) (DegPre.famε 1)))
     (hθ : ∃ j, (ThetaOne.pullTo D ev θ).f j ≠ 0) (N : ℕ) (hN : 2 ≤ N) (hNK : (N : K) ≠ 0) :

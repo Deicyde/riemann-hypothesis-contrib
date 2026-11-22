@@ -100,13 +100,13 @@ theorem crd_apply (s : Pt F κ →ₗ[AF F] Pt F κ) (w : Pt F κ) (i : κ ⊕ �
     crd F κ (s w) i = ∑ j, crd F κ w j * crd F κ (s ((crd F κ).symm (Pi.single j 1))) i := by
   have : w = ∑ j, crd F κ w j • (crd F κ).symm (Pi.single j 1) := by
     apply (crd F κ).injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearEquiv.apply_symm_apply]
+
+    simp only [map_sum, map_smul, LinearEquiv.apply_symm_apply]
     funext k
     simp [Finset.sum_apply, Pi.single_apply]
   conv_lhs => rw [this]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+
+  simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
 
 theorem bd_of_sz {s : Pt F κ →ₗ[AF F] Pt F κ} {m : ℕ} {c : ℝ} (hc : 0 ≤ c)
     (h : ∀ i j, Sz m c (crd F κ (s ((crd F κ).symm (Pi.single j 1))) i)) : Bd s m (Fintype.card (κ ⊕ κ) * c) := by
@@ -209,11 +209,11 @@ theorem bilin {R A ι : Type} [CommRing R] [CommRing A] [Algebra R A] [Fintype �
       β.repr (M p.1.1 p.1.2.1) p.1.2.2 * β.repr (N p.2.1 p.2.2.1) p.2.2.2 *
         l (Matrix.single p.1.1 p.1.2.1 (β p.1.2.2) * u * (Matrix.single p.2.1 p.2.2.1 (β p.2.2.2))ᵀ) := by
   refine (congrArg₂ (fun A B => l (A * u * Bᵀ)) (expand β M) (expand β N)).trans ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Fintype.sum_prod_type (α₁ := Fin n × Fin n × ι) (α₂ := Fin d × Fin d × ι), Matrix.sum_mul, Matrix.sum_mul, map_sum]
+
+  rw [Fintype.sum_prod_type (α₁ := Fin n × Fin n × ι) (α₂ := Fin d × Fin d × ι), Matrix.sum_mul, Matrix.sum_mul, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.transpose_sum, Matrix.mul_sum, map_sum]
+
+  rw [Matrix.transpose_sum, Matrix.mul_sum, map_sum]
   refine Finset.sum_congr rfl fun q _ => ?_
   rw [Matrix.transpose_smul, Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_mul, map_smul, map_smul, smul_eq_mul, smul_eq_mul]
   ring

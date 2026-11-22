@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.For
 @[expose] public section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out PositivityTheory.FormalThickening
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.formal_morphism_uniqueness : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R), IsAdicComplete I R →
   ∀ (X Z : Over (Spec (CommRingCat.of R))), IsProper X.hom → IsSeparated Z.hom →
   ∀ (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1))))) (b : ∀ e, (Y e).left ⟶ X.left),

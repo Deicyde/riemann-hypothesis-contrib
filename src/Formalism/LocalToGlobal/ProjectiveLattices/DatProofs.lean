@@ -108,9 +108,9 @@ theorem hT_emb (τ : D.host.E →+* ℂ) (v w : (D.sp.W j).V) :
     τ ((D.sp.W j).hT v w) = star (fun i => τ ((D.sp.W j).frame.repr v i)) ⬝ᵥ
       (GW D j τ *ᵥ fun i => τ ((D.sp.W j).frame.repr w i)) := by
   rw [sesq_repr (D.sp.W j).hT (D.sp.W j).frame v w]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, emb_star, dotProduct, mulVec, GW, HSpace.gram, Matrix.map_apply,
-    Pi.star_apply, Complex.star_def, Finset.mul_sum]
+
+  simp only [map_sum, map_mul, emb_star, dotProduct, mulVec, GW, HSpace.gram, Matrix.map_apply,
+  Pi.star_apply, Complex.star_def, Finset.mul_sum]
   refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun k _ => by ring))
 
 theorem dot_smul_real {n : Type} [Fintype n] (G : Matrix n n ℂ) (a a' : ℝ) (u w : n → ℂ) :
@@ -274,7 +274,7 @@ theorem term_pos {n : Type} [Fintype n] (c : ℂ) (hc : 0 < c.im) (K G : Matrix 
     have : 0 < 2 * (ρ * c.im) := by positivity
     exact ⟨this.le, fun _ => this⟩
 
-set_option maxHeartbeats 1600000 in
+
 theorem domFor_pm (D : D7) (j : ℕ) (hj : 1 ≤ j ∧ j ≤ D.R.m) (hI : DatInt D j) :
     ∃ ε : ℤ, (ε = 1 ∨ ε = -1) ∧ DomFor D j (ε • intForm (efQ D j) hI) := by
   classical

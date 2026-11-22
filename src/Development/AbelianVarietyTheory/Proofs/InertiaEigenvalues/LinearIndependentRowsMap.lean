@@ -15,8 +15,8 @@ noncomputable section
 
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SeriesTie
 
@@ -31,8 +31,8 @@ theorem linearIndependent_rows_map {K L : Type*} [Field K] [Field L] (e : K →+
     simpa [Pi.single_apply, eq_comm] using this
   have hg' : ∀ (x : Fin m → K) j, g x j = ∑ k, x k * g (fun j' => if k = j' then 1 else 0) j := fun x j => by
     conv_lhs => rw [pi_eq_sum_univ x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_apply]
+
+    rw [map_sum, Finset.sum_apply]
     simp only [map_smul, Pi.smul_apply, smul_eq_mul]
   rw [Fintype.linearIndependent_iff]
   intro μ hμ j

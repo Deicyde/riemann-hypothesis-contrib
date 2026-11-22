@@ -71,9 +71,9 @@ private theorem xr_agree {O R X K : Type} [CommRing O] [CommRing R] [Algebra O R
   let p : MvPowerSeries W.σ O := ∑ m ∈ T, coeff m f • monomial m 1
   have hpc : ∀ m, coeff m p = if m ≤ n' then coeff m f else 0 := by
     intro m
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [p, map_sum, MvPowerSeries.coeff_smul, MvPowerSeries.coeff_monomial, mul_ite, mul_one,
-      mul_zero]
+
+    simp only [p, map_sum, MvPowerSeries.coeff_smul, MvPowerSeries.coeff_monomial, mul_ite, mul_one,
+    mul_zero]
     rw [Finset.sum_ite_eq]
     simp only [T, Finset.mem_Iic]
   have hf' : ∀ n, Finsupp.weight W.wt n ≠ j → coeff n f = 0 := hf
@@ -91,18 +91,18 @@ private theorem xr_agree {O R X K : Type} [CommRing O] [CommRing R] [Algebra O R
   have hG : ∀ (K' : Type) [CommRing K'] [Algebra O K'] (G : MvPowerSeries W.σ O →ₐ[O] K'),
       G p = ∑ m ∈ T, coeff m f • ∏ s, G (MvPowerSeries.X s) ^ m s := by
     intro K' _ _ G
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [p, map_sum, map_smul, mvPowerSeries_algHom_monomial_eq_prod_X_pow]
+
+    simp only [p, map_sum, map_smul, mvPowerSeries_algHom_monomial_eq_prod_X_pow]
   let y : W.A := ∑ m ∈ T, coeff m f • ∏ s, W.zA s ^ m s
   have hy : F p = η y := by
     rw [hG K F]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [y, map_sum, map_smul, map_prod, map_pow, hX]
+
+    simp only [y, map_sum, map_smul, map_prod, map_pow, hX]
   have hyR : (y : R) = W.π p := by
     rw [hG R W.π]
     show W.A.val y = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [y, map_sum, map_smul, map_prod, map_pow]
+
+    simp only [y, map_sum, map_smul, map_prod, map_pow]
     rfl
   let e : W.A := ∑ m ∈ μ, (⟨W.π (b m), W.part_le_A (j := 0) (Submodule.mem_map_of_mem (hb m))⟩ : W.A) *
     ∏ s, W.zA s ^ m s
@@ -112,15 +112,15 @@ private theorem xr_agree {O R X K : Type} [CommRing O] [CommRing R] [Algebra O R
     rw [map_sub]
     show (x : R) - (y : R) = _
     rw [hx, hyR, ← map_sub, hg]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [e, map_sum, map_mul, map_prod, map_pow, mvPowerSeries_algHom_monomial_eq_prod_X_pow]
+
+    simp only [e, map_sum, map_mul, map_prod, map_pow, mvPowerSeries_algHom_monomial_eq_prod_X_pow]
     rfl
   have hdiff : F f - η x = F (f - p) - η e := by
     rw [← he, map_sub, map_sub, hy]
     ring
   rw [hdiff, hg]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [e, map_sum, map_mul, mvPowerSeries_algHom_monomial_eq_prod_X_pow, hX, map_prod, map_pow]
+
+  simp only [e, map_sum, map_mul, mvPowerSeries_algHom_monomial_eq_prod_X_pow, hX, map_prod, map_pow]
   rw [← Finset.sum_sub_distrib]
   refine Ideal.sum_mem _ fun m hm => ?_
   rw [← sub_mul]

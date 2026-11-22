@@ -69,9 +69,9 @@ theorem pairing_sum {R G : Type} [Ring R] [AddCommGroup G] (N : AddSubgroup G) (
   have hWM : ∀ x : Orb × Fin 2, IE (W * M x.1 x.2) := fun x => hmul _ _ hW (hM _ _)
   rw [← QuotientAddGroup.eq_zero_iff]
   change q _ = 0
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, map_sum, Finset.mul_sum, s1 _ _ _ (fun x => hM x.1 x.2) (ies _ _ hWM), sub_eq_zero,
-    Fintype.sum_prod_type]
+
+  rw [map_sub, map_sum, Finset.mul_sum, s1 _ _ _ (fun x => hM x.1 x.2) (ies _ _ hWM), sub_eq_zero,
+  Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun o _ => ?_
   have one : ∀ g : Fin 2, q (H (M o g) (∑ x : Orb × Fin 2, W * M x.1 x.2)) = q (H (M o g) (W * M o (1 - g))) := by
     intro g
@@ -110,8 +110,8 @@ theorem subst_sum_smul {σ τ α : Type} [Finite σ] [Fintype α] {a : σ → Mv
     (ha : ∀ s, constantCoeff (a s) = 0) (c : α → C) (F : α → MvPowerSeries σ C) :
     subst a (∑ i, c i • F i) = ∑ i, c i • subst a (F i) := by
   have hs := hasSubst_of_constantCoeff_zero ha
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← coe_substAlgHom hs, map_sum]
+
+  rw [← coe_substAlgHom hs, map_sum]
   exact Finset.sum_congr rfl fun i _ => by rw [coe_substAlgHom hs, subst_smul hs]
 
 theorem subst_prod' {σ τ α : Type} [Finite σ] [Fintype α] {a : σ → MvPowerSeries τ C}
@@ -124,8 +124,8 @@ theorem subst_sum'' {σ τ α : Type} [Finite σ] [Fintype α] {a : σ → MvPow
     (ha : ∀ s, constantCoeff (a s) = 0) (F : α → MvPowerSeries σ C) :
     subst a (∑ i, F i) = ∑ i, subst a (F i) := by
   have hs := hasSubst_of_constantCoeff_zero ha
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← coe_substAlgHom hs, map_sum]
+
+  rw [← coe_substAlgHom hs, map_sum]
 
 theorem subst_subst {σ τ υ : Type} [Finite σ] [Finite τ] {a : σ → MvPowerSeries τ C} {b : τ → MvPowerSeries υ C}
     (ha : ∀ s, constantCoeff (a s) = 0) (hb : ∀ s, constantCoeff (b s) = 0) (F : MvPowerSeries σ C) :
@@ -142,8 +142,8 @@ theorem cc_lg (hX : RLaw X V) (i : κ) : constantCoeff (X.lg i) = 0 := by
 
 theorem cc_lin (A : Matrix κ κ C) {τ : Type} {Z : κ → MvPowerSeries τ C} (hZ : ∀ i, constantCoeff (Z i) = 0) (x : κ) :
     constantCoeff (∑ y, A x y • Z y) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, hZ]
+
+  simp [map_sum, hZ]
 
 theorem endP_X (A : Matrix κ κ C) (i : κ) :
     endP X A (MvPowerSeries.X : κ → MvPowerSeries κ C) i = subst (fun x => ∑ y, A x y • X.lg y) (X.ex i) := by
@@ -204,8 +204,8 @@ def genVec {τ : Type} (v : WVO I → τ) (j : Fin dd) : MvPowerSeries τ C :=
 
 omit [NeZero d] in
 theorem cc_genVec {τ : Type} (v : WVO I → τ) (j : Fin dd) : constantCoeff (genVec Y p v j) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [genVec, map_sum]
+
+  simp [genVec, map_sum]
 
 omit [NeZero d] in
 theorem lin_genVec {τ : Type} (v : WVO I → τ) (A : Matrix (Fin dd) (Fin dd) C) (x : Fin dd) :
@@ -240,7 +240,7 @@ theorem cc_hRow (o : Orb) : constantCoeff (Y.raw (p o)).hRow = 0 := by
   rw [ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.Nab.cc_h Y.gauge, smul_zero]
 
 
-set_option maxHeartbeats 400000 in
+
 theorem one_row (hs : PairsSep Y p) (gr : ∀ o, MvPowerSeries (WV (I o)) C)
     (hg : ∀ o, gr o ∈ ExpInt (Y.raw (p o)) V) :
     ∃ f : MvPowerSeries (Fin dd) C, IntS V f ∧ ∀ (τ : Type) (v : WVO I → τ),
@@ -410,8 +410,8 @@ theorem deriv_genVec {n : ℕ} (b : Fin n) (u : Fin dd → C) (co : WVO I → C)
       if x.1 = b' then MvPowerSeries.C ((p x.2.1).u x.2.2.1 x.2.2.2 j) else 0 := by
     rintro ⟨ρ, w⟩
     unfold genVec
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_single w]
+
+    rw [map_sum, Finset.sum_eq_single w]
     · rw [Derivation.map_smul]
       by_cases h : ρ = b'
       · subst h
@@ -424,8 +424,8 @@ theorem deriv_genVec {n : ℕ} (b : Fin n) (u : Fin dd → C) (co : WVO I → C)
   rw [Fintype.sum_prod_type, Finset.sum_eq_single b]
   · by_cases h : b' = b
     · subst h
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [hu, map_sum, smul_eq_C_mul]
+
+      simp [hu, map_sum, smul_eq_C_mul]
     · simp [h, Ne.symm h]
   · intro ρ _ hρ
     simp [hρ]
@@ -459,9 +459,9 @@ theorem all_rows (n : ℕ) (gr : ∀ o, Fin n → MvPowerSeries (WV (I o)) C) (f
     rfl
   have c2 : ∀ b : Fin n, constantCoeff (subst (fun i : Fin dd => (X (b, i) : PS C n dd))
       ((Y.k : C) • un1 (Y.B.hL C Y.h Y.w0))) = 0 := fun b => by rw [cc_subst (cX b), cL]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e1, FB.expS, ← mvExp_eq_subst (by rw [map_sum]; exact Finset.sum_eq_zero fun b _ => c2 b), mvExp_sum _ c2,
-    ← Finset.prod_mul_distrib, subst_prod' hE]
+
+  rw [e1, FB.expS, ← mvExp_eq_subst (by rw [map_sum]; exact Finset.sum_eq_zero fun b _ => c2 b), mvExp_sum _ c2,
+  ← Finset.prod_mul_distrib, subst_prod' hE]
   have cU : ∀ o (x : Fin n × WV (I o)),
       constantCoeff (X (x.1, (⟨o, x.2⟩ : WVO I)) : MvPowerSeries (Fin n × WVO I) C) = 0 :=
     fun _ _ => constantCoeff_X _

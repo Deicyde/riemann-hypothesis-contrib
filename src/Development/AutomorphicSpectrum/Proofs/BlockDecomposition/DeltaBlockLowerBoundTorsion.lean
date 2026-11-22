@@ -119,7 +119,7 @@ end GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.LocalBound
 
 open GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 
-set_option maxHeartbeats 1000000 in
+
 theorem GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.LocalBound.local_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (m : ℕ) (c : Matrix (Fin m) (Fin m) E), (∀ a b, σ (c b a) = c a b) → ∀ (u : Fin m → E) (t : 𝓞 E), t ∈ tor c u → t ≠ 0 → ∃ f : F, ∀ d : F, delta c * Ideal.absNorm (tor c u) ^ 2 * Ideal.absNorm (den F (f + ((RingOfIntegers.norm F t : 𝓞 F) : F) * d)) ^ 2 ≤ delta (blk σ c u (algebraMap F E d)) := by
   intro F E _ _ _ _ _ σ hCM m c hc u t ht ht0
   obtain ⟨hinv, hfix, hsO, hN⟩ := GlobalTheory.T.cm_conjugation_properties F E σ hCM
@@ -128,14 +128,14 @@ theorem GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.LocalBound.local_boun
       -∑ j, σ ((c *ᵥ fun j => algebraMap (𝓞 E) E (yo j)) j) * algebraMap (𝓞 E) E (yo j) := by
     have hs : ∑ j, σ ((c *ᵥ fun j => algebraMap (𝓞 E) E (yo j)) j) * algebraMap (𝓞 E) E (yo j) =
         ∑ j, (c *ᵥ fun j => algebraMap (𝓞 E) E (yo j)) j * σ (algebraMap (𝓞 E) E (yo j)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.sum_mul]
+
+      simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.sum_mul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
       rw [hc]
       ring
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_neg, map_sum]
+
+    rw [map_neg, map_sum]
     simp only [map_mul, hinv]
     rw [hs]
   obtain ⟨f, hf⟩ := hfix _ hf0
@@ -190,8 +190,8 @@ theorem GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.LocalBound.local_boun
       ring
     have hs2 : algebraMap (𝓞 E) E (∑ j, sO σ (lo j) * yo j) =
         ∑ j, σ (algebraMap (𝓞 E) E (lo j)) * algebraMap (𝓞 E) E (yo j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_mul]
       exact congrArg (· * _) (hsO (lo j))

@@ -101,8 +101,8 @@ theorem thetaLift_lie_derivative_eq_zero (hP : _root_.GlobalTheory.FunPr.ThetaLo
     unfold liftPure
     rw [dite_eq_left HL, HL.choose_spec _ _ (hf i).2.1 (hf i).2.2, hlie γ hγ (f i) (hf i).1 (f₁ i) (hA i),
       TensorProduct.zero_tmul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e1, map_sum]
+
+  rw [e1, map_sum]
   exact Finset.sum_eq_zero fun i _ => e2 i
 end GlobalTheory.TripleAssembly.LieInv
 open GlobalTheory.TripleAssembly.LieInv in
@@ -168,7 +168,7 @@ open scoped TensorProduct ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm
 open scoped GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.theta_triple_lift_lie_invariant : GlobalTheory.Published.HoweDualityReal → _root_.GlobalTheory.FunPr.ThetaLocalInputs →
     ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsStdChar D ψ (-1) → IsInfFam θ →
     ∀ (W W₁ X : HSp D) (A : Fr W) (A₁ : Fr W₁) (B : Fr X) (α β : (AE D)ˣ →* Circle), IsTriple W W₁ X α β →

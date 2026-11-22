@@ -4,8 +4,8 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleCohomolo
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
@@ -193,13 +193,13 @@ private theorem IsVal.van {n : ℕ} {C : M.V n →+ (Module.Dual K (HdR M.q n) �
   obtain ⟨m, hm⟩ := b.inj a hM n
   choose xs hxs using fun k => hN (v k)
   have h1 := hm (R.t ^ u • ∑ k, (c k • xs k)) (by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_smul, map_sum, hxs]
+
+    simp only [map_smul, map_sum, hxs]
     simp only [smul_comm (c _) (R.t ^ N), ← Finset.smul_sum]
     rw [smul_comm, h, smul_zero])
   have h2 := congrArg (fun y => p.κ a n y ψ) h1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [p.lin a hM, map_zero, AddMonoidHom.zero_apply, map_sum] at h2
+
+  simp only [p.lin a hM, map_zero, AddMonoidHom.zero_apply, map_sum] at h2
   have heval : (∑ k, p.κ a n (c k • xs k)) ψ = ∑ k, p.κ a n (c k • xs k) ψ := by
     exact map_sum ({ toFun := fun f => f ψ, map_zero' := rfl, map_add' := fun _ _ => rfl } : (Module.Dual K (HdR M.q n) →+ R.B) →+ R.B) _ _
   rw [heval] at h2
@@ -282,8 +282,8 @@ theorem injAbs : UpperTheory.Ru.crystallineComparison.InjAbs := by
     obtain ⟨a', _, ⟨m⟩⟩ := hL.refine (P s) M (uu s) (hu s) (hP s).1 hM a₀ a
     have := inj_conn hF hS hL e b p (hP s).1 (hP s).2 a' j (fun k => Model.pullT (uu s) (hu s) j (v k)) c u (by
       have h1 := congrArg (D.pullA m j) h
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_smul, map_sum, map_zero, ← e.nat m (hP s).1 hM] using h1) f'
+
+      simpa only [map_smul, map_sum, map_zero, ← e.nat m (hP s).1 hM] using h1) f'
     simpa only [toV_pullT] using this
   let L : M.V j →ₗ[ℚ_[l]] ∀ s, (P s).V j := LinearMap.pi fun s => Model.pullV (uu s) (hu s) j
   have hk : LinearMap.ker L = ⊥ := LinearMap.ker_eq_bot'.2 fun w hw => hinj j w fun s => congrFun hw s
@@ -292,11 +292,11 @@ theorem injAbs : UpperTheory.Ru.crystallineComparison.InjAbs := by
   have hf : ∀ w, f w = ∑ s, f' s (Model.pullV (uu s) (hu s) j w) := by
     intro w
     have h1 : g (L w) = w := LinearMap.congr_fun hg w
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [← h1, ← Finset.univ_sum_single (L w), map_sum, map_sum]
+
+    conv_lhs => rw [← h1, ← Finset.univ_sum_single (L w), map_sum, map_sum]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hf, map_sum, Finset.sum_mul]
+
+  simp only [hf, map_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   exact Finset.sum_eq_zero fun s _ => hs s (f' s)
 

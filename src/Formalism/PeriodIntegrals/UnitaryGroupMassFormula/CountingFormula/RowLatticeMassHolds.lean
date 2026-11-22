@@ -100,8 +100,8 @@ theorem Mof_unimod (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (Λ : Su
         apply (VS D).frame.ext
         intro i
         dsimp [μ]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, LinearMap.sum_apply]
+
+        rw [map_sum, LinearMap.sum_apply]
         have hs : ∀ j, (VS D).hT (star (φ ((VS D).frame j)) • bs j) ((VS D).frame i) =
             φ ((VS D).frame j) * (if i = j then 1 else 0) := by
           intro j

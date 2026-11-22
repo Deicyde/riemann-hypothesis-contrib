@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorsorsTrivi
 @[expose] public section
 
 open IsLocalRing Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_section_strictHenselisation_closedFibre_point : GlobalTheory.LocAcyc.KeyClosedPts →
     ∀ (T E : Type) [CommRing T] [IsDomain T] [IsLocalRing T] [CommRing E]
       [Algebra (Polynomial T) E] [Algebra T E] [IsScalarTower T (Polynomial T) E]

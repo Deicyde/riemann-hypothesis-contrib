@@ -23,8 +23,8 @@ theorem coeff_comb {B Q : Type} [CommRing B] [CommRing Q] [Algebra B Q] {σ ι :
     (b : ι → B) (e : ι → MvPowerSeries σ Q) (α : σ →₀ ℕ) :
     coeff α (comb b e) = ∑ l, algebraMap B Q (b l) * coeff α (e l) := by
   unfold comb
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [MvPowerSeries.coeff_smul]
 
@@ -53,8 +53,8 @@ theorem GlobalTheory.QLog.small_first_of_frob : ∀ (p : ℕ) [Fact p.Prime] (C 
   have key : ∀ m, algebraMap F.B F.Q (∑ l, U l m * cc l) =
       (p : F.Q) * ∑ l, algebraMap F.B F.Q (U l m) * coeff α (e l) := by
     intro m
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.mul_sum]
+
+    rw [map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [map_mul, ← hcc]; ring
   have hcol : ∀ m l, (U * blk d k (p : F.B) 1) l m = U l m * Sum.elim (fun _ => (p : F.B)) (fun _ => 1) m := by

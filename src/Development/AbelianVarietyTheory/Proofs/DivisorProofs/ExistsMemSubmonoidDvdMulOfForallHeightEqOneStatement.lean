@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.M
 @[expose] public section
 
 open IsLocalRing
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_mem_submonoid_dvd_mul_of_height_one : ∀ (B : Type) [CommRing B] [IsDomain B] [IsNoetherianRing B] [IsIntegrallyClosed B]
     (S : Submonoid B), (0 : B) ∉ S → ∀ x y : B, y ≠ 0 →
     (∀ Q : Ideal B, Q.IsPrime → Q.height = 1 → y ∈ Q → Disjoint (S : Set B) (Q : Set B) →

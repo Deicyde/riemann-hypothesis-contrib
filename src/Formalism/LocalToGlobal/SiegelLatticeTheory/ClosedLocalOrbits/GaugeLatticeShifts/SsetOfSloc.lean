@@ -42,9 +42,9 @@ theorem uw_fix {z : Fin (2 * r + k + 1) → ℂ} {h : Matrix (Fin (2 * r + k + 1
     ext j
     simp [Finset.sum_apply, Pi.single_apply]
   conv_lhs => rw [hw']
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show h *ᵥ (∑ i, w i • Pi.single i (1:ℂ)) = ∑ i, w i • (h *ᵥ Pi.single i (1:ℂ)) by
-      simp only [← Matrix.mulVecLin_apply, map_sum, map_smul]]
+
+  rw [show h *ᵥ (∑ i, w i • Pi.single i (1:ℂ)) = ∑ i, w i • (h *ᵥ Pi.single i (1:ℂ)) by
+    simp only [← Matrix.mulVecLin_apply, map_sum, map_smul]]
   rw [Finset.sum_congr rfl (fun i _ => key i), ← hw']
 
 private theorem mulVec_single_one_apply_gauge_lattice_shifts {n : ℕ} (m : Matrix (Fin n) (Fin n) ℂ) (j i : Fin n) :
@@ -137,8 +137,8 @@ theorem sum_low {n : ℕ} (Q : Matrix (Fin n) (Fin (2 * r + k + 1)) ℂ) (a : �
         simp [bvec, Pi.single_apply, hne]
       · simp
   conv_lhs => rw [hw']
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← Matrix.mulVecLin_apply, map_sum, map_smul]
+
+  simp only [← Matrix.mulVecLin_apply, map_sum, map_smul]
 
 end Model
 

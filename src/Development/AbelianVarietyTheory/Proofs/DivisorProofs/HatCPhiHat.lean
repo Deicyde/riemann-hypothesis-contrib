@@ -44,8 +44,8 @@ theorem hatC_phiHat {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Reci
   unfold hatC phiHat
   rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype, ← hz]
   show _ = c.F.val _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [map_mul, map_zpow₀]
   rfl

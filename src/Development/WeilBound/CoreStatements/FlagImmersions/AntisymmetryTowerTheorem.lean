@@ -133,7 +133,7 @@ private theorem inWall_and_dominant_of_eq_neighbors {Ψ : Type} [Fintype Ψ] [De
   · intro s a b hab
     exact hdom s ((b : ℕ) - (a : ℕ)) a b (by have := Fin.le_iff_val_le_val.1 hab; omega)
 
-set_option maxHeartbeats 800000 in
+
 open GroundTheory.Heights₂.Heights in
 theorem antisymmetry_tower_theorem : GroundTheory.Heights₂.Heights.AntisymPerturbation.Statement → ∀ II : IntersectionSystem, ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (hh : RP Ψ N →ₗ[ℝ] ℝ), T.Proportional → T.ThmW II → T.I8 II hh → I9 (Ψ := Ψ) (N := N) hh → T.ThmB II hh := by
   intro hS II Ψ _ _ N T hh hprop hW h8 h9

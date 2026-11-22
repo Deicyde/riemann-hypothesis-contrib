@@ -26,7 +26,7 @@ def Inv {dim : (E →+* ℂ) → ℕ} (L I : Submodule ℤ (Vsp dim)) (σ : E �
   (∀ s < k, χ s ∈ Zs L I (μ s) ∧ ∀ y ∈ Xg L I, prj σ y ∉ Wk σ χ s → μ s ≤ ‖y‖) ∧
   (∀ s < k, μ s ^ 2 ≤ Bu)
 
-set_option maxHeartbeats 1000000 in
+
 private lemma inv_step_lemma {dim : (E →+* ℂ) → ℕ} {L I : Submodule ℤ (Vsp dim)}
     (hsep : ∀ g ∈ Xg L I, g ≠ 0 → 1 ≤ ‖g‖) (σ : E →+* ℂ) (W : Submodule ℂ (Vsp dim)) (y0 : Vsp dim)
     (hy0 : y0 ∈ Xg L I) (hy0W : prj σ y0 ∉ W) :

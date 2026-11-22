@@ -104,8 +104,8 @@ theorem cxMat_mulVec_int (f : (Fin r → E) →+ (X.Ψ × Fin r → ℂ)) (m : F
   have hm : m = ∑ j, m j • Pi.single j (1 : ℤ) := by
     funext j; simp [Pi.single_apply]
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [hm, map_sum, AddSubmonoidClass.coe_finsetSum, map_sum]
+
+  conv_rhs => rw [hm, map_sum, AddSubmonoidClass.coe_finsetSum, map_sum]
   simp only [map_zsmul, AddSubgroupClass.coe_zsmul]
   simp [cxMat, mulVec, dotProduct, mul_comm]
 

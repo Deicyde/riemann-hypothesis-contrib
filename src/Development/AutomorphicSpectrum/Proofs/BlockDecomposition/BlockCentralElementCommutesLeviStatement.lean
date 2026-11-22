@@ -34,7 +34,7 @@ private theorem block_zj_eq_diagonal (k : Type) [Field k] [ValuativeRel k] [Topo
     rw [leviEmb_apply_ne k _ _ hab, Matrix.diagonal_apply_ne _ hne]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.block_central_element_commutes_levi : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], ∀ (h N : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N) (t : kˣ) (j : Fin h), ∀ y ∈ GroundTheory.Automorphic.Parabolic.levi k N (Zl.JC.blockIdx d hd), leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) * y = y * leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) := by
   intro k _ _ _ _ h N d hd t j y hy
   apply Units.ext

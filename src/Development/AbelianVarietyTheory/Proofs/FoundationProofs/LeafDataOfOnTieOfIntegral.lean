@@ -42,8 +42,8 @@ theorem mem_eig_iff {y : Z} : y ∈ eig ρ U ψ ↔ ∀ u : U, ρ (u : P) y = ((
 
 theorem trace_mem_eig (hψ : ∀ a ∈ U, ∀ b ∈ U, ψ (a * b) = ψ a * ψ b) (y : Z) : trace ρ U ψ y ∈ eig ρ U ψ := by
   refine mem_eig_iff.2 fun a => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [trace, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, Finset.smul_sum]
+
+  simp only [trace, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, Finset.smul_sum]
   refine (Fintype.sum_equiv (Equiv.mulRight a) _ _ fun u => ?_).symm
   have e : ρ (a : P) (ρ ((u : P) * a)⁻¹ y) = ρ (u : P)⁻¹ y := by
     rw [← Module.End.mul_apply, ← map_mul, mul_inv_rev, mul_inv_cancel_left]
@@ -165,8 +165,8 @@ theorem trace_gen_mem (hT : LawsFull T) (hj : InR D j) (hxi : TwistTrivialOnRati
     fun u => ⟨hx u, by simpa [hn] using ax u, (hf u).2.2⟩⟩, rfl⟩
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem trace_mem_thetaEig (hT : LawsFull T) (hj : InR D j) (hxi : TwistTrivialOnRational T j) (hn : w.n = D.R.nV)
     (hl : w.LastPos) (hρ : ∀ g F, ρ g (z.symm (1 ⊗ₜ F)) = z.symm (1 ⊗ₜ act g F)) (hact : IsLevAct T.toTop h j w ℓ act)
     (hdet : ∀ u ∈ U, DetOne (ℓ u)) {y : Fin n → K} (hy : y ∈ spanK z ((recPJ h j hj).shortTh w : Set _)) :

@@ -15,7 +15,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SchurAdmi
 @[expose] public section
 
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.isSubquotient_jacquetModule_refine_tensor : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
     (n s : ℕ) (d : Fin s → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin n) (V : Type) [AddCommGroup V] [Module ℂ V]
     (π : Representation ℂ (GL (Fin n) k) V), IsSmooth π →

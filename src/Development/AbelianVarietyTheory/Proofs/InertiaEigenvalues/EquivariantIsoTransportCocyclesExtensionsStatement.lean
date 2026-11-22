@@ -17,11 +17,11 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComp
 @[expose] public section
 
 open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
-set_option synthInstance.maxHeartbeats 400000
+
 open ReciprocityTheory.Def (Z1 B1 H1)
 open TensorProduct
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.equivariantIso_transport_cocycles_extensions : ∀ {O G : Type} [CommRing O] [Group G] [TopologicalSpace G] {M M' : Type} [AddCommGroup M]
     [Module O M] [AddCommGroup M'] [Module O M'] (W : Representation O G M) (W' : Representation O G M')
     (e : M ≃ₗ[O] M'), (∀ g x, e (W g x) = W' g (e x)) →

@@ -76,7 +76,7 @@ theorem factorial_mul_dpow_xi (n : ℕ) :
 theorem pk_toB_algebraMap (k : ℕ) (w : AInf ℂ_[l] l) :
     pk l k (toBDeRhamPlus (normInteger ℂ_[l]) l (algebraMap (AInf ℂ_[l] l) 𝔸 w)) = fk l k w := rfl
 
-set_option maxHeartbeats 400000 in
+
 theorem pk_toB_mem (k M : ℕ) {s : 𝔸} (hs : s ∈ ACris.ACrisZero ℂ_[l] l) :
     pk l k (toBDeRhamPlus (normInteger ℂ_[l]) l s) ∈ sub (fk l k) (xi0 l) l M :=
   map_adjoin_mem (W := AInf ℂ_[l] l) (A := 𝔸) (B := BdRp l) (C := Bk l k)
@@ -85,7 +85,7 @@ theorem pk_toB_mem (k M : ℕ) {s : 𝔸} (hs : s ∈ ACris.ACrisZero ℂ_[l] l)
     (factorial_mul_dpow_xi l) (mem_adjoin_dpow l hs)
 
 
-set_option maxHeartbeats 800000 in
+
 theorem cris_in (l : ℕ) [Fact l.Prime] (M k : ℕ) (c : Acris l) :
     Lat.pk l k (ACris.iota ℂ_[l] l c) ∈ Lat.sub (Lat.fk l k) (xi0 l) l M := by
   obtain ⟨s, hs, hst⟩ := (ACris.embedding₂ ℂ_[l] l k c).2

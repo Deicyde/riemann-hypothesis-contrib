@@ -98,7 +98,7 @@ end GlobalTheory.ChainTw.UpQProof
 
 
 open GlobalTheory.ChainTw.UpQProof in
-set_option maxHeartbeats 1000000 in
+
 theorem GlobalTheory.ChainTw.upQ_holds : GlobalTheory.Published.CuspRapidDecay → ∀ D : D7, UpQ D := by
   classical
   intro hP D hN c w hw k hk s s' hs hs' p hp u φ hu v₀ _

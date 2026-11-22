@@ -19,7 +19,7 @@ open GlobalTheory.MiTop
 
 noncomputable section
 
-set_option maxHeartbeats 800000
+
 
 open Formalism.BasicNotions.TH Formalism.IndefR.Lev
 

@@ -41,7 +41,7 @@ theorem prime_eq_of_idem {a : AE D} {P P' : Formalism.L2.DIV.Pl D.host.E} (h : F
   · rw [hx]; exact iff_of_true (zero_mem _) (zero_mem _)
   · exact (h.2 x hx).trans (h'.2 x hx).symm
 
-set_option maxHeartbeats 2000000 in
+
 theorem stepVecLocal : ∀ D : D7, StepVecLocal D := by
   classical
   intro D ψ θ S T sS sT ΛS ΛT βS βT LS χ Q ξ f₀ f μ 𝓕 t ht Hl cl hP hB hC _ _ hdisj hv

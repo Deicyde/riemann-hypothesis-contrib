@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LevRepZ
 @[expose] public section
 
 open ReciprocityTheory.Gal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.card_H0_level_rep_eq : ∀ {O : Type} [CommRing O] {G : Type} [Group G] [TopologicalSpace G] {M : Type} [AddCommGroup M]
     [Module O M] (ρ : Representation O G M) (c : O), Finite ρ.invariants →
     Nat.card (ReciprocityTheory.Gal.H0 (GlobalTheory.ShapeNeg.levRep ρ c)) =

@@ -33,7 +33,7 @@ abbrev G0 (D : D7) : D.what₂.Tau → Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) �
 
 instance instGroupUP0 (D : D7) : Group (unitaryGroupFiniteAdeles D) := Subgroup.toGroup _
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 structure TrFacts {D : D7} (X : HidaSetting D) {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u}
     (Tr : Transport X u F) : Prop where

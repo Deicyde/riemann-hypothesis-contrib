@@ -123,9 +123,9 @@ theorem mulVec_period_basis {g : ℕ} {La : Type} [AddCommGroup La] (P : La →+
     ext k; simp only [Finset.sum_apply, Pi.single_apply, Pi.smul_apply, smul_eq_mul, mul_ite, _root_.mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
   rw [h1 fun i => v (.inl i), h1 fun i => v (.inr i)]
   conv_lhs => rw [h2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, Fintype.sum_sum_type, map_add (f := _), (hh _).1, (hh _).2, Matrix.mulVec_sum,
-    Matrix.mulVec_smul, Matrix.mulVec_add]
+
+  simp only [map_sum, map_zsmul, Fintype.sum_sum_type, map_add (f := _), (hh _).1, (hh _).2, Matrix.mulVec_sum,
+  Matrix.mulVec_smul, Matrix.mulVec_add]
 
 theorem existsUnique_char_of_triple (hT : ThetaUnifAV) (hmul : Out.MulNSt) {E : Type} [Field E] [NumberField E]
     [IsCMField E] {H : Host E} {S : Scheme.{0}} (t : SAB H S) (hp : IsProper t.G.hom)

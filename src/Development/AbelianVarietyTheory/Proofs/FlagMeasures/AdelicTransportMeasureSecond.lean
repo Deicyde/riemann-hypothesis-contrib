@@ -196,7 +196,7 @@ open scoped TensorProduct InnerProductSpace ContDiff Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_adelic_rep {D : D7} {θ : InfFam D} {V : HSp D} (hθ : IsInfFam θ) {μ : Measure (GA D V)}
     (hμ : μ.IsHaarMeasure) (hμ' : μ.IsMulRightInvariant)
     {K : Type} [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K] {ι : K → GA D V → ℂ}
@@ -241,7 +241,7 @@ theorem exists_adelic_rep {D : D7} {θ : InfFam D} {V : HSp D} (hθ : IsInfFam �
     fun k hk => h2 k hk.1 hk.2, hb⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_mmap {D : D7} {θ : InfFam D} {V : HSp D} (hθ : IsInfFam θ) {S : D.what₂.Tau → SPar} (M : DSModel V S)
     {μ : Measure (GA D V)} (hμ : μ.IsHaarMeasure) (hμ' : μ.IsMulRightInvariant)
     {K : Type} [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K] {ι : K → GA D V → ℂ}

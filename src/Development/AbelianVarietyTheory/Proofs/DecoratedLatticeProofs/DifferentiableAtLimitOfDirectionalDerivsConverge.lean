@@ -41,9 +41,9 @@ theorem differentiableAt_of_tendstoLocallyUniformly_directional :
     funext j z
     refine ContinuousLinearMap.ext fun x => ?_
     conv_lhs => rw [← hvc x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, FunLike.coe_sum, Finset.sum_apply,
-      FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.smulRight_apply]
+
+    simp only [map_sum, map_smul, FunLike.coe_sum, Finset.sum_apply,
+    FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.smulRight_apply]
     refine Finset.sum_congr rfl fun a _ => ?_
     simp [Complex.real_smul, mul_comm]
   have hconv : TendstoLocallyUniformly (fun j z => fderiv ℝ (g j) z)

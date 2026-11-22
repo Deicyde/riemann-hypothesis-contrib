@@ -27,8 +27,8 @@ theorem cA_cA (h : IsCMExt F E σ) (a : AE F E) : cA σ (cA σ a) = a := by
 
 theorem hTens_inc (J : Matrix (Fin n) (Fin n) E) (J' : Matrix (Fin d) (Fin d) E) (x y : Matrix (Fin n) (Fin d) E) :
     hTens (cA σ) (incM F J) (incM F J') (incM F x) (incM F y) = inclR (F := F) (AF F) (hTens σ J J' x y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hTens, incM, Matrix.map_apply, map_sum, map_mul]
+
+  simp only [hTens, incM, Matrix.map_apply, map_sum, map_mul]
   rfl
 
 theorem hTens_smul (J : Matrix (Fin n) (Fin n) E) (J' : Matrix (Fin d) (Fin d) E) (x y : Matrix (Fin n) (Fin d) E) (a b : E) :
@@ -75,7 +75,7 @@ def Nice {κ : Type} [Fintype κ] (μ : Measure (AE F E)ˣ) (z : ℕ) (v : AE F 
     (∀ a, v a = ∑ i, pureA F (g i a) (φ i)) ∧
     ∀ q : Seminorm ℂ (SInf F κ), Continuous q → ∀ i, Integrable (fun l : (AE F E)ˣ => q (g i l) * (absE F E l : ℝ) ^ z) μ
 
-set_option maxHeartbeats 800000 in
+
 theorem nice (hS : Slice) (hT : TateAbs) {B : Base F E} {X : Spc F E n} {W : Spc F E d} {X₁ : Spc F E n₁} {W₁ : Spc F E d₁}
     {M : Model σ X W} {M₁ : Model σ X₁ W₁} (hB : B.IsGood σ) (hM : M.IsGood B.ψ) (hM₁ : M₁.IsGood B.ψ) {ι ι' I e}
     (he : IsEv B M M₁ ι ι' I e) {v₀ z₀ : Matrix (Fin n) (Fin d) E} (hI : ∀ a : AE F E, a • incM F z₀ ∈ I)
@@ -118,8 +118,8 @@ theorem nice (hS : Slice) (hT : TateAbs) {B : Base F E} {X : Spc F E n} {W : Spc
     have hy : Continuous y := IsModuleTopology.continuous_of_linearMap (Bt.equivFun.toLinearMap ∘ₗ τ.toLinearMap)
     have e1 : ∀ a, τ a = ∑ j, y a j • Bt j := fun a => (Bt.sum_equivFun _).symm
     have e2 : ∀ a, a = ∑ j, y a j • τ (Bt j) := fun a => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        conv_lhs => rw [← hτ a, e1 a, map_sum]
+
+      conv_lhs => rw [← hτ a, e1 a, map_sum]
       simp only [map_smul]
     refine ⟨Fin r, inferInstance, φ₁, fun i a => A i (y a) f, h1, fun i => (h3 i f).comp hy, fun a => ?_, fun q hq i => ?_⟩
     · beta_reduce
@@ -158,8 +158,8 @@ theorem nice (hS : Slice) (hT : TateAbs) {B : Base F E} {X : Spc F E n} {W : Spc
         have : ∑ w, ‖piInf (B.emb w) (l : AE F E)‖ ≤ s * K := by
           rw [hK, Finset.sum_comm, Finset.mul_sum]
           refine Finset.sum_le_sum fun w _ => ?_
-          set_option synthInstance.maxHeartbeats 100000 in
-            conv_lhs => rw [e2 l, map_sum]
+
+          conv_lhs => rw [e2 l, map_sum]
           rw [Finset.mul_sum]
           refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => ?_)
           rw [norm_piInf_smul hB.cm]

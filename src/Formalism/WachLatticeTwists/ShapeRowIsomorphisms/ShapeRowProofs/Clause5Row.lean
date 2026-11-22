@@ -15,7 +15,7 @@ noncomputable section
 
 namespace Formalism.RepresentationBoundsCohomology.LocallyConstantCohomology
 
-set_option maxHeartbeats 1000000 in
+
 theorem kRow_rel {O Γ VT VT' : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
     [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)]
@@ -43,7 +43,7 @@ theorem kRow_rel {O Γ VT VT' : Type} [CommRing O] [IsDomain O] [IsDiscreteValua
   have h3 : (b : Γ → M) g = u.symm (x.1 g) - (ρM g m - m) := by rw [h2]; abel
   rw [h3, map_sub, map_sub, LinearEquiv.apply_symm_apply, hu]
 
-set_option maxHeartbeats 1000000 in
+
 theorem clause5Gen {O Γ VT VT' : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
     [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)]

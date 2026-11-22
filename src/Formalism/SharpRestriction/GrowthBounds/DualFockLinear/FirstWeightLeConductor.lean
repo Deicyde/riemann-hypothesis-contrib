@@ -82,7 +82,7 @@ theorem first_weight_le_conductor {n' m : ℕ} (hm : 2 ≤ m) {TT : Finset (Fin 
   · show (-restW TT lam0 t (Fin.rev 0) - -restW TT lam0 t (Fin.rev (Fin.last m))).toNat ≤ c0
     rw [Fin.rev_last, Fin.rev_zero]; omega
 
-set_option maxHeartbeats 800000 in
+
 theorem opFAt_of_ten (hT : TenOp) {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
     [Field Qq] [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf] [CharZero Kf]
     {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O} (hS : HidaSetting p n' W Qq O Kf ι σ j w) {m : ℕ} (hm : 1 ≤ m)

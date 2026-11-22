@@ -11,7 +11,7 @@ open IsDedekindDomain NumberField Matrix MvPolynomial
 open scoped TensorProduct nonZeroDivisors
 open GlobalTheory.SignedHC GlobalTheory.ChiGrid Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.FunObj
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.idempotent_support_hermitian_decomposition : ∀ (D : D7) (V : HSp D) (fr : GL (Fin V.rank) D.host.E) (S : Finset ℕ), (∀ q ∈ S, q.Prime) →
     ∀ x : GA D V, x ∈ GfC V →
     ∃ (γ : GL (Fin V.rank) D.host.E) (h k : GA D V),

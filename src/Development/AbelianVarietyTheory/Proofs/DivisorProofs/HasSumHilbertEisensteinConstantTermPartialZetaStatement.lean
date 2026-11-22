@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.OmegaFact
 @[expose] public section
 
 open scoped nonZeroDivisors
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.hasSum_hilbertEisenstein_constantTerm_partialZeta : ∀ (F : Type) [Field F] [NumberField F] [NumberField.IsTotallyReal F] (𝔞 𝔟 : GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Frac F) (s : ℕ), 1 ≤ s →
   ∀ (D : (Ideal (NumberField.RingOfIntegers F))⁰), (D : Ideal (NumberField.RingOfIntegers F)) = differentIdeal ℤ (NumberField.RingOfIntegers F) →
   ∀ Z : ℂ → ℂ, GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.IsPartialZeta (ClassGroup.mk0 D * ClassGroup.mk F 𝔞) Z →

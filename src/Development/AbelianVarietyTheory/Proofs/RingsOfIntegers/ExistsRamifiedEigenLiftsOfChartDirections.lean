@@ -154,8 +154,8 @@ theorem isIntegral_mul_dual {E : Type} [Field E] [NumberField E] (δ : 𝓞 E) (
     exact RingOfIntegers.isIntegral_coe _
   · refine ⟨fun i => (RingOfIntegers.basis E).repr x i, ?_⟩
     have h1 := congrArg (algebraMap (𝓞 E) E) ((RingOfIntegers.basis E).sum_repr x)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h1
+
+    rw [map_sum] at h1
     show algebraMap (𝓞 E) E x = _
     rw [← h1]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -217,12 +217,12 @@ theorem GlobalTheory.PlaceInt.exists_ramified_eigenLifts : ∀ (E : Type) [Field
     intro x
     have h1 : ∑ t, embF c t x = ((Algebra.trace ℚ E x : ℚ) : c.F) := by
       apply (algebraMap c.F ℂ).injective
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_ratCast, ← sum_embeddings]
+
+      rw [map_sum, map_ratCast, ← sum_embeddings]
       rfl
     have h2 := congrArg io h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_ratCast] at h2
+
+    rw [map_sum, map_ratCast] at h2
     exact h2
   have hNmem : (((discr E).natAbs : ℕ) : 𝓞 E) ∈ differentIdeal ℤ (𝓞 E) := by
     have h1 := Ideal.absNorm_mem (differentIdeal ℤ (𝓞 E))

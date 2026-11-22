@@ -303,8 +303,8 @@ private theorem isWeightedHomogeneous_rowDiv {r n : ℕ} (a b : Fin r) (p : MvPo
   classical
   rw [MvPolynomial.as_sum p]
   unfold rowDiv
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Polynomial.finsetSum_coeff]
+
+  rw [map_sum, Polynomial.finsetSum_coeff]
   first
     | (apply MvPolynomial.IsWeightedHomogeneous.sum
        intro x hx

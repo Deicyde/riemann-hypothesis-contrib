@@ -22,8 +22,8 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.AxHLAM
 @[expose] public section
 
 set_option autoImplicit false
-set_option maxHeartbeats 4000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 noncomputable section
 

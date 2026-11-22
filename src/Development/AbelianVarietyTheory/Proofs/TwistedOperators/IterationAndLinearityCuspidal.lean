@@ -70,16 +70,16 @@ theorem per_indep {ρ : ℕ} (B : GlobalTheory.Unf.BesLev D ρ) {ψ : AddChar (A
 
 theorem hN_top {M : Vol G} {t : T} (hM : M.Is t) : NFlag (G.V (.grid D.R.m 0)) G.besTop.e = flagN (topLev G hM).d :=
   by
-  set_option maxHeartbeats 20000000 in
-   exact (nFlag_diag (GlobalTheory.RowUnf.rowBes G 0 (by have := D.R.two_le_m; omega) ((D.R.m - 2) / 2)
-    (by have := top_idx (D := D); omega)).e (lam _) (lam_ne _)).symm
+
+  exact (nFlag_diag (GlobalTheory.RowUnf.rowBes G 0 (by have := D.R.two_le_m; omega) ((D.R.m - 2) / 2)
+   (by have := top_idx (D := D); omega)).e (lam _) (lam_ne _)).symm
 
 def topVNRow {M₀ : Vol G} (h₀ : M₀.IsRow) : GlobalTheory.Unf.VolN (besDecAt G 0 ((D.R.m - 2) / 2) top_idx) :=
   by
-  set_option maxHeartbeats 20000000 in
-   exact volNOf (d := GlobalTheory.RowUnf.rowBes G 0 (by have := D.R.two_le_m; omega) ((D.R.m - 2) / 2) (by have := top_idx (D := D); omega))
-    (nFlag_diag _ (lam _) (lam_ne _)).symm
-    (GlobalTheory.RowUnf.topVolN G M₀ h₀ (by have := D.R.two_le_m; omega) (by have := top_idx (D := D); omega))
+
+  exact volNOf (d := GlobalTheory.RowUnf.rowBes G 0 (by have := D.R.two_le_m; omega) ((D.R.m - 2) / 2) (by have := top_idx (D := D); omega))
+   (nFlag_diag _ (lam _) (lam_ne _)).symm
+   (GlobalTheory.RowUnf.topVolN G M₀ h₀ (by have := D.R.two_le_m; omega) (by have := top_idx (D := D); omega))
 
 theorem bplus_eq_besPer (W : G.Weil) {M₀ : Vol G} (h₀ : M₀.IsRow) {M : Vol G} {t : T} (hM : M.Is t) (φ : Fn G (.top 0))
     (F : Fn G (.grid D.R.m 0)) : Bplus W M₀ φ F = besPer W.ψ 1 (topLev G hM).d (topLev G hM).o (topLev G hM).ζ (M₀.ν (.top 0))
@@ -159,11 +159,11 @@ theorem liftT_oppTens (W : G.Weil) (M : Vol G) (t : T) (τi : PolRow G × PolDow
   let l : TotT G (oppPath t D.R.m) →+ Fn G (.grid D.R.m 0) :=
     AddMonoidHom.mk' (fun τ => liftT W M (oppPath t D.R.m) τ F) fun τ τ' => liftT_add W M _ τ τ' F
   show l (oppTens W t τi τf) = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [oppTens, Finsupp.sum, map_sum, Finset.sum_product]
+
+  rw [oppTens, Finsupp.sum, map_sum, Finset.sum_product]
   refine Finset.sum_congr rfl fun P _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finsupp.sum, map_sum]
+
+  rw [Finsupp.sum, map_sum]
   exact Finset.sum_congr rfl fun d _ => liftT_single W M _ _ _ F
 
 theorem all_append {S : Arrow T → Type} {P : ∀ a, S a → Prop} {X Y : Node} {p : Path T X Y} {d : p.Fam S} (hd : Path.Fam.All P d) :

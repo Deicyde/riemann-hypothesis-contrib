@@ -150,8 +150,8 @@ theorem rank_eq {O k M : Type} [CommRing O] [Nontrivial O] [Field k] [Algebra O 
     intro c hc j
     choose a ha using fun j => hs (c j)
     have h1 : q (∑ j, a j • b j) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hc, map_sum]
+
+      rw [← hc, map_sum]
       exact Finset.sum_congr rfl fun j _ => by rw [map_smul, ← ha, algebraMap_smul]
     obtain ⟨y, hy⟩ := (hk _).1 h1
     have h2 := congrArg (fun z => b.repr z j) hy
@@ -181,8 +181,8 @@ theorem γD_smulA (T : LocLat G Qp LL O) (g : W.Gam) (a : LetA O n₀) (x : W.DD
 theorem γ₀_π₀ {δ : W.Gam} (hδ : δ ∈ W.DelF) : W.γ₀ δ W.π₀₁ = W.π₀₁ := by
   classical
   have hm : ∀ g, g ∈ W.DelF ↔ IsOfFinOrder g := fun g => by rw [W.DelF_def, isOfFinOrder_iff_pow_eq_one]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LocWach.π₀₁, map_add (f := _), map_sub, map_one, map_natCast, map_sum]
+
+  rw [LocWach.π₀₁, map_add (f := _), map_sub, map_one, map_natCast, map_sum]
   congr 1
   refine Finset.sum_bijective (δ * ·) (Group.mulLeft_bijective δ) (fun g => ?_) (fun g _ => ?_)
   · rw [hm, hm]
@@ -198,8 +198,8 @@ theorem coord_inv (T : LocLat G Qp LL O) {m : ℕ} (b : Fin m → W.DD T) (hb : 
     ∀ δ ∈ W.DelF, W.γA δ (a j) = a j := by
   intro δ hδ
   have h := hx δ hδ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum] at h
+
+  rw [map_sum] at h
   simp only [γD_smulA, hb _ δ hδ] at h
   have := Fintype.linearIndependent_iff.1 hli (fun j => W.γA δ (a j) - a j) (by
     simp only [sub_smul, Finset.sum_sub_distrib, h, sub_self]) j
@@ -258,8 +258,8 @@ theorem sen_gen [IsDomain O] (p : Pres W F ι τ γ) (hp : ((PD.p : ℕ) : k) = 
     have hai := coord_inv W T _ (fun j => (b j).2.2) hli a (by rw [ha]; exact x.2.2)
     have hx : x = ∑ j, (⟨a j • (b j : W.DD T), (W.N T).smul_mem _ (b j).2.1,
         smul_mem W T (hai j) (b j).2.2⟩ : ↥(W.NΔ T)) := Subtype.ext (by rw [← ha]; simp)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hx, map_sum]
+
+    rw [hx, map_sum]
     refine Submodule.sum_mem _ fun j _ => ?_
     obtain ⟨c, hc⟩ := hinv (a j (τ i)) fun δ hδ => congrFun (hai j δ hδ) (τ i)
     rw [hs (a j) c (b j) _ hc rfl]
@@ -312,8 +312,8 @@ theorem sen_gen [IsDomain O] (p : Pres W F ι τ γ) (hp : ((PD.p : ℕ) : k) = 
   have h2 : J ⟨_, hwi⟩ = (PowerSeries.X : k⟦X⟧) • J ⟨_, hzi⟩ :=
     hs (W.π₀ + (PD.p : LetA O n₀)) PowerSeries.X _ _ (by rw [hιX, ← hq]; rfl) hzz
   refine mem_sh_iff_exists.2 ⟨_, hJN ⟨_, hzi⟩, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← X_smul_eq, ← h2, h1, one_smul, hw, map_sub, map_sum, hnab]
+
+  rw [← X_smul_eq, ← h2, h1, one_smul, hw, map_sub, map_sum, hnab]
   simp only [hO', Matrix.map_apply]
 
 
@@ -337,7 +337,7 @@ theorem map_prod_c (c : ℤ → O) (hc : ∀ a : ℤ, algebraMap O k (c a) = -(a
 end Gen
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem sen_base : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (H : LocHW l P) (S : TopSit P) (k : Type) [Field k] [Algebra S.O k] [CharP k l], S.IsRes k → ∀ {R : RingPG k l} (ι : k⸨X⸩ →ₐ[k] k⸨X⸩) (F : DFun R S.n S.G) (τ : ZMod S.n → ZMod (Module.finrank ℚ_[l] ↥(K0 S.K))) (γ : (S.W H).Gam) (p : Pres (S.W H) F ι τ γ), GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.IsCyclotomic R ι → (∀ i, (S.W H).emb (τ i) = S.emb i) → ((S.W H).χΓ γ : S.O) = 1 + (l : S.O) → GlobalTheory.WachUse.QN (S.W H) → ∀ (T : LocLat S.G ℚ_[l] ↥S.LL.1 S.O) (A : Ob k S.G) q (U : ZMod S.n → Multiset ℤ), Onto T A q → KerIs S.Γ.lam q → CrysWith (P.PD S.K) S.emb T.ρ U → ∀ N : Lats k S.n A.m, (∀ i y, y ∈ N i ↔ ∃ x : ↥(DΔ (S.W H) T), (x : (S.W H).DD T) ∈ (S.W H).N T ∧ p.j T A q i x = y) → ∀ i x, sen ((F.D A).γ i) (N i) x = resCount (U i) 0 x := by
   intro l _ P H S k _ _ _ hk R ι F τ γ p hι hτ hγ hQ T A q U hO hK hU N hN i x
   obtain ⟨N', hN', hL⟩ := GlobalTheory.T.wachDeltaInvariants_reduction_isLattice H S k hk ι F τ γ p hι hτ hγ hQ T A q U hO hK hU

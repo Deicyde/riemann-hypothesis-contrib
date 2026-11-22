@@ -63,7 +63,7 @@ private theorem eig_of_wdRel {E Ω E' Ω' : Type} [Field E] [NumberField E] [Fie
   obtain ⟨n, b, b', rfl, rfl, -, H⟩ := H
   rw [WD.eig_mk, WD.eig_mk, H σ σ' hσ]
 
-set_option maxHeartbeats 1000000 in
+
 private theorem exists_transfer {F K Ω : Type} [Field F] [NumberField F] [Field K] [NumberField K] [Field Ω]
     [Algebra F Ω] [Algebra K Ω] [IsAlgClosure F Ω] [IsAlgClosure K Ω] {l : ℕ} [Fact l.Prime] {A : ValuationSubring Ω}
     {v : HeightOneSpectrum (𝓞 F)} {w : HeightOneSpectrum (𝓞 K)} (h : IsPlaceOver A v) (h' : IsPlaceOver A w)

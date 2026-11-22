@@ -117,9 +117,9 @@ theorem lieModel_coordinates_baseChange : ∀ (E : Type) [Field E] [NumberField 
   let eT : T ≃ₗ[R'] (Fin (Module.finrank R V) → R') := (hbc.basis b).equivFun
   have key : ∀ u : Fin (Module.finrank R V) → R, eT.symm (f ∘ u) = j (eV.symm u) := by
     intro u
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [eT, eV, Module.Basis.equivFun_symm_apply, map_sum, map_smul, IsBaseChange.basis_apply,
-      Function.comp_apply]
+
+    simp only [eT, eV, Module.Basis.equivFun_symm_apply, map_sum, map_smul, IsBaseChange.basis_apply,
+    Function.comp_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     exact algebraMap_smul R' (u i) (j (b i))
   have hpt : ∀ u : Fin (Module.finrank R V) → R, ((transport M' eT).pt (f ∘ u)).left =
