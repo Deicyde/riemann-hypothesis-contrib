@@ -17,14 +17,12 @@ theorem goal1 :
   intro E _ _ V _ _ _ _ A y hy
   induction hy using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by rw [one_smul]; exact Submodule.subset_span hx⟩
-  | zero => exact ⟨1, one_ne_zero, by rw [smul_zero]; exact Submodule.zero_mem _⟩
+  | zero => exact ⟨1, one_ne_zero, by simp⟩
   | add x z _ _ hx hz =>
     obtain ⟨d1, hd1, h1⟩ := hx
     obtain ⟨d2, hd2, h2⟩ := hz
     refine ⟨d1 * d2, mul_ne_zero hd1 hd2, ?_⟩
-    have e1 : (d1 * d2) • x = d2 • (d1 • x) := by rw [mul_comm, mul_smul]
-    have e2 : (d1 * d2) • z = d1 • (d2 • z) := by rw [mul_smul]
-    rw [smul_add, e1, e2]
+    rw [smul_add, mul_comm d1 d2, mul_smul, mul_smul, smul_comm d2 d1 z]
     exact Submodule.add_mem _ (Submodule.smul_mem _ _ h1) (Submodule.smul_mem _ _ h2)
   | smul c x _ hx =>
     obtain ⟨d, hd, h⟩ := hx

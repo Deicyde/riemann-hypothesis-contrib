@@ -174,8 +174,7 @@ theorem antisymmetrizedProduct_perm_invariant {A : Type} [Ring A] [Algebra ℂ A
     rw [h]
   | succ m =>
     have hπ : π ∈ Submonoid.closure (Set.range fun i : Fin m => Equiv.swap i.castSucc i.succ) := by
-      rw [Equiv.Perm.mclosure_swap_castSucc_succ]
-      trivial
+      simp [Equiv.Perm.mclosure_swap_castSucc_succ]
     revert arg
     induction hπ using Submonoid.closure_induction with
     | mem x hx =>
@@ -192,7 +191,6 @@ theorem antisymmetrizedProduct_perm_invariant {A : Type} [Ring A] [Algebra ℂ A
 
 theorem antisymmetrizedProduct_eq_factorial_smul_qdet {A : Type} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A) (hE : GlRel E) (u : ℂ) :
     doublyAntisymmetrizedProduct E (fun k => u - (k : ℂ)) = (n.factorial : ℂ) • qdet E u := by
-
   have hcol : ∀ (b : Fin n → Fin n) (τ : Equiv.Perm (Fin n)),
       qminor E id (b ∘ τ) u = ((Equiv.Perm.sign τ : ℤ) : A) * qminor E id b u := by
     cases n with
@@ -203,8 +201,7 @@ theorem antisymmetrizedProduct_eq_factorial_smul_qdet {A : Type} [Ring A] [Algeb
     | succ m =>
       intro b τ
       have hτ : τ ∈ Submonoid.closure (Set.range fun i : Fin m => Equiv.swap i.castSucc i.succ) := by
-        rw [Equiv.Perm.mclosure_swap_castSucc_succ]
-        trivial
+        simp [Equiv.Perm.mclosure_swap_castSucc_succ]
       revert b
       induction hτ using Submonoid.closure_induction with
       | mem x hx =>
@@ -228,8 +225,8 @@ theorem antisymmetrizedProduct_eq_factorial_smul_qdet {A : Type} [Ring A] [Algeb
   have hsq : ∀ τ : Equiv.Perm (Fin n), ((Equiv.Perm.sign τ : ℤ) : A) *
       (((Equiv.Perm.sign τ : ℤ) : A) * qminor E id id u) = qminor E id id u := by
     intro τ
-    rw [← mul_assoc, ← Int.cast_mul, ← Units.val_mul, Int.units_mul_self, Units.val_one, Int.cast_one,
-      one_mul]
+    rw [← mul_assoc, ← Int.cast_mul, ← Units.val_mul, Int.units_mul_self]
+    simp
   simp only [hin, hcol, hsq, Finset.sum_const, Finset.card_univ, Fintype.card_perm, Fintype.card_fin]
   rw [← Nat.cast_smul_eq_nsmul ℂ]
   rfl
@@ -241,8 +238,7 @@ theorem term_neg_transpose {A : Type} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fi
   · subst h
     rw [if_pos rfl, if_pos rfl, map_neg]
     abel
-  · rw [if_neg h, if_neg (Ne.symm h)]
-    simp
+  · simp [h, Ne.symm h]
 
 theorem orderedTermProduct_neg_transpose {A : Type} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A) (arg : Fin n → ℂ)
     (σ τ : Equiv.Perm (Fin n)) :
