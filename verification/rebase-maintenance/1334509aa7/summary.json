@@ -1,0 +1,243 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining",
+  "results": [
+    {
+      "number": 54,
+      "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+      "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+      "original_repo": "by-eureka/riemann-hypothesis",
+      "original_branch": "eureka/upstream-proof-refactors",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "automatic_resolution_count": 85,
+      "automatic_resolutions": [
+        {
+          "path": "src/Formalism/GammaFactorNonvanishing/RhOfRight.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/GammaFactorNonvanishing/CritLine.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/FourierUniquenessOfOpenSubgroup.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/WeilBound/CoreStatements/HodgeTatePoints/HtatLieB.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/WeilStabilizerVolume/TopoPolish.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/TopoPolish.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/DiscreteSubgroupCountableAndExistsStrictFundamen.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TorusHaarMeasure/ExistsStrictMeasurableFundamentalSetOfDiscrete.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/KerLeSpanImageKerOfSemilinear.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/QuadraticUnramifiedIffInertOrSplit.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ThetaDilations/Nuabs.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/ClaimStrip.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/RiemannHypothesisOfEveryCharacter.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/GL3MeanSquares/GenusMeanAsymptotics/JacobiCharacterSums/OneLeLogOfThreeLe.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/LBSubm.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/TorsionTwoGeneratorsGlobal.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/UnfoldAbsAlt.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerVolume/EventuallySmulSub.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/LocDensCntQ.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/DensVGen.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/FinTheta.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/HermitianGroupLattices/StarMapTraceOfPowEqOne.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerVolume/LocDensChLift.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/LocDensFFS.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsCompletionEmbedding.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerVolume/LocDensFFHS.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/DeterminantIdentity/SmulMemOfMemSpan.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/GroundTheory/AutomorphicForms/UnitaryRepresentations/ExistsEqAlgebraMapOfIsSelfAdjoint.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/SchwartzSeminormSmulLeftLinearPhaseLe.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/LocalToGlobal/GlobalTheory/GL1/CompactFixesLattice/AdeleIntA.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerVolume/DensGen.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/OrbRing.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/IsotypicFactorOfIsIrreduciblePiFiniteGroups.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/GroundTheory/HeightsAndTheta/Heights/ComplexAnalyticSets/PPrimeGermNullstellensatz.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/DensVCos.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/LocDensFFT.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ThetaDilations/IsOpenCoset.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ThetaDilations/SqPosOfNe.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HformSmulRight.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/DensInfCV.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/ShiftBound.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/LocDensVolT.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Development/WeilBound/CoreStatements/HodgeTatePoints/TwhopfSec.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/CompanionTheory/ThickeningEstimates/LieGroupReduction/HasDerivAtSchwartzToL2.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/ExStabU.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/UnfoldMain.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/DeterminantIdentity/NormOne.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerVolume/UnfoldAbs.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/IntegralSumCosets.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/OneAlg.lean",
+          "reason": "retain-main-pruning"
+        }
+      ],
+      "rebased_head": "bbd9b59472b3ace1b2b249a615483e6809a65119",
+      "diff_check": false,
+      "diff_check_output": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/CharpolyDvdPowOfAevalEqZero.lean:80: new blank line at EOF.\nsrc/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/FiniteQuotientOfCompleteNakayama.lean:57: new blank line at EOF.\nsrc/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DerInner.lean:96: new blank line at EOF.\nsrc/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/MonomialRepresentations/RelWeight.lean:88: new blank line at EOF.\nsrc/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/FiniteZpModuleTorsionFreeSplitting.lean:94: new blank line at EOF.\nsrc/Formalism/HermitianCurvature/HermitianCurvatureProofs/GaussianHessianIntegral.lean:466: new blank line at EOF.\nsrc/Formalism/HermitianCurvature/HermitianCurvatureProofs/SubmoduleMultiplication.lean:930: new blank line at EOF.\nsrc/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/PosNear.lean:133: new blank line at EOF.\nsrc/Formalism/SharpRestriction/GrowthBounds/HermitianTensor/GrowthOfBasic.lean:236: new blank line at EOF.\nsrc/ReciprocityTheory/GroupCohomology/PartialProdCoe.lean:249: new blank line at EOF.\n",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "135 files changed, 1438 insertions(+), 4775 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 1,
+        "missing": [
+          {
+            "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/ClaimStrip.lean",
+            "line": "4",
+            "module": "Formalism.GammaFactorNonvanishing.RhOfRight"
+          }
+        ],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-54-1334509aa7-45045049636-remaining",
+      "status": "rebased"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
