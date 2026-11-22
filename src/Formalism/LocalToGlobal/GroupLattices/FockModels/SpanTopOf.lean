@@ -146,8 +146,7 @@ theorem rowNu_self : rowNu (r := k) ν = ν := by
 
 theorem isHWV (hν : Antitone ν) : IsHWV (EV K k ν) (fun a => (ν a : ℤ)) (hwV K k ν hν) := by
   refine ⟨fun h => hwNe K k k le_rfl ν (congrArg Subtype.val h), ?_, fun a b hab => ?_⟩
-  · have := wt_mem (hwV K k ν hν) (rowNu (r := k) ν) (hwRowWeight K k k le_rfl ν hν)
-    rwa [rowNu_self] at this
+  · simpa [rowNu_self] using wt_mem (hwV K k ν hν) (rowNu (r := k) ν) (hwRowWeight K k k le_rfl ν hν)
   · apply Subtype.ext
     show Dop K a b (hw K le_rfl ν) = 0
     rw [sw_Dop_rowDiv]

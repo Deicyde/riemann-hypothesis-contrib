@@ -77,10 +77,9 @@ theorem mem_TSet_iff (j : ZMod J) (mm : Fin r) (s : Fin (Dt.nL j) ⊕ Fin r) :
     · rintro (⟨l, h⟩ | ⟨m', hm, h⟩)
       · cases h
       · cases h
-        have : mm.val < m.val := hm
         omega
     · intro h
-      exact Or.inr ⟨m, (by show mm.val < m.val; omega), rfl⟩
+      exact Or.inr ⟨m, by omega, rfl⟩
 
 theorem TSet_fst {j : ZMod J} {mm : Fin r} {t : TL J Dt.nL r} (h : t ∈ Dt.TSet j mm) : t.1 = j := by
   rcases h with ⟨l, rfl⟩ | ⟨m, _, rfl⟩ <;> rfl

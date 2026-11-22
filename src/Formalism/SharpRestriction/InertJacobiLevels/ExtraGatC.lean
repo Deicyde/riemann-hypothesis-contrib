@@ -14,15 +14,14 @@ namespace Formalism.MainNotions.Inhab
 open Formalism.BasicNotions Formalism.BasicNotions.Examples₂ Formalism.BasicNotions.Examples₂.LevelValuationRings Formalism.MainNotions.G Formalism.FrobeniusOrbits NumberField
 
 theorem two_ne_Kn (p : ℕ) [Fact p.Prime] (h5 : 5 ≤ p) (n : ℕ) : (2 : Kn p n) ≠ 0 := by
+
   intro h
   have h1 : ((algebraMap (On p n) (Kn p n)).comp (algebraMap (Wn p n) (On p n))) 2 =
       ((algebraMap (On p n) (Kn p n)).comp (algebraMap (Wn p n) (On p n))) 0 := by
     rw [map_ofNat, map_zero, h]
   have h2 : (2 : Wn p n) = 0 := inj_WK p n h1
   have h3 : ((2 : ℕ) : GaloisField p n) = 0 := by
-    have := congrArg (WittVector.constantCoeff (p := p) (R := GaloisField p n)) h2
-    rw [map_ofNat, map_zero] at this
-    exact_mod_cast this
+    simpa [map_ofNat, map_zero] using congrArg (WittVector.constantCoeff (p := p) (R := GaloisField p n)) h2
   have h4 := (CharP.cast_eq_zero_iff (GaloisField p n) p 2).1 h3
   have := Nat.le_of_dvd (by norm_num) h4
   omega

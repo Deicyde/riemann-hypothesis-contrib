@@ -41,12 +41,11 @@ theorem colSpan_mul_le (G : Matrix (Fin k) (Fin k) Qq) (M : Matrix (Fin k) (Fin 
 
 theorem colSpan_mul_unit (G : Matrix (Fin k) (Fin k) Qq) (M M' : Matrix (Fin k) (Fin k) W) (h : M * M' = 1) :
     colSpan W (G * M.map (algebraMap W Qq)) = colSpan W G := by
-  apply le_antisymm (colSpan_mul_le G M)
+  refine le_antisymm (colSpan_mul_le G M) ?_
   have h1 : G * M.map (algebraMap W Qq) * M'.map (algebraMap W Qq) = G := by
     rw [Matrix.mul_assoc, ← Matrix.map_mul, h]
     simp
-  calc colSpan W G = colSpan W (G * M.map (algebraMap W Qq) * M'.map (algebraMap W Qq)) := by rw [h1]
-    _ ≤ colSpan W (G * M.map (algebraMap W Qq)) := colSpan_mul_le _ M'
+  simpa [h1] using colSpan_mul_le (G * M.map (algebraMap W Qq)) M'
 
 def dD (Qq : Type) [Field Qq] (p r k : ℕ) : Matrix (Fin k) (Fin k) Qq :=
   Matrix.diagonal fun c => if c.val < r then ((p : Qq))⁻¹ else 1

@@ -87,12 +87,10 @@ lemma lseries_summable_of_vonMangoldt_bound {a : ℕ → ℝ} (ha : ∀ n, |a n|
 lemma neg_log_deriv_eq_lseries_mul_vonMangoldt {w : ℂ} (hw : 1 < w.re) : negLD χ w = LSeries (↗χ * ↗Λ) w := by
   unfold negLD
   rw [DirichletCharacter.LSeries_twist_vonMangoldt_eq χ hw, neg_div]
-  have hEq : ∀ s : ℂ, 1 < s.re → DirichletCharacter.LFunction χ s = L (fun n => χ n) s :=
-    fun s hs => DirichletCharacter.LFunction_eq_LSeries χ hs
   have hev : DirichletCharacter.LFunction χ =ᶠ[𝓝 w] L (fun n => χ n) := by
     filter_upwards [(isOpen_lt continuous_const Complex.continuous_re).mem_nhds hw] with s hs
-    exact hEq s hs
-  rw [hev.deriv_eq, hEq w hw]
+    exact DirichletCharacter.LFunction_eq_LSeries χ hs
+  rw [hev.deriv_eq, DirichletCharacter.LFunction_eq_LSeries χ hw]
 
 lemma neg_log_deriv_eq_lseries_re_im {w : ℂ} (hw : 1 < w.re) :
     negLD χ w = LSeries (fun n => (vonMangoldtCharRe χ n : ℂ)) w +
@@ -280,8 +278,7 @@ lemma perron_vertical_integrable {σ₀ : ℝ} (hσ : 1 < σ₀) :
     mellin (fun x : ℝ => Schi χ x) (((-σ₀ : ℝ) : ℂ) + t * I)
   have hw : ((-σ₀ : ℝ) : ℂ) + t * I = -((σ₀ : ℂ) + ((-t : ℝ) : ℂ) * I) := by push_cast; ring
   rw [hw, mellin_chebyshev_character χ (by simp [hσ])]
-  unfold Fchi
-  rw [ofReal_one, one_cpow, mul_one]
+  simp [Fchi, one_cpow]
 
 end
 
