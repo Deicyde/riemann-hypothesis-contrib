@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/LemmaEprimeFromSteps.lean",
+      "stages": {
+        "1": "f3945b84d66c4ac2626a00a1e48993a5d5244a8c",
+        "2": "70504d6761fdc99bd6328905bf8166897c06303a",
+        "3": "7dc673b69b727b5a3d743fa727c7d3fb4037a873"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "c2f5959c818f1ed4f8f933f7b7893033ee929abb",
+  "checkpoint_head": "cd81986244c91414eb37f5afccfd19a2e76b5dd9"
+}
