@@ -60,7 +60,7 @@ theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.annFin :
       exact Submodule.smul_mem _ _ hz
   let φ : T →ₗ[O] (Fin n → M ⧸ N') :=
     { toFun := fun t i => N'.mkQ (μ t (s i))
-      map_add (f := _)' := by
+      map_add' := by
         intro a b
         funext i
         simp [map_add (f := _)]
