@@ -1,0 +1,254 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45043720463-imports-9",
+  "results": [
+    {
+      "number": 9,
+      "title": "remove redundant imports and heartbeat overrides",
+      "original_head": "c2de7b111cf3d61b59454121ff418cba6a5a0763",
+      "original_repo": "deancureton/riemann-hypothesis",
+      "original_branch": "cleanup/redundant-imports",
+      "maintainer_can_modify": true,
+      "old_merge_base": "f1f6d65420dbbf36d6cfdac1af8d79511a855a5b",
+      "automatic_resolution_count": 20375,
+      "automatic_resolutions": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/ProductMoment.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/TypeHC.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WaveBallEstimateWeightedDualAlt.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/LocScalar.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/CuspidalMirabolic.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/ExhaustionOfThree.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/IrreducibleAdmissibleGL.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/IsLAddSegmentOfInjectiveOfNotPrecedes.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/JuxtDefs.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/LUnlinkedIrrOfSeg.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/GrothendieckRingPolynomial/ClassProductIrreducibleLeft.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/GrothendieckRingPolynomial/MultOne.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/GrothendieckRingPolynomial/PeelGood.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/BernsteinZelevinsky/TopAdm.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ThetaDilations/HfSubSmul.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/BesselOrbitConvolutions/JacquetFunctionalNormalization.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/DsExhaust.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/MatrixCoefficientDecay/InfinitesimalCharacterPaths/ExhaustionLabels.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/HilbertSpaceModels/HilbertSpaceRealisationHolds.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/FormalDegrees/ArchimedeanFormalDegrees/ExplicitFunctionSquareIntegrable.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/FormalDegrees/ArchimedeanFormalDegrees/NormIndOfSteps.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/BoundB.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/ComapTwKer.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/ConjDual.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/CuspPair.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/CuspPairIrr.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/DerFin.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/JacquetModuleThetaTwist.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/NontrivialOfIsIrreducible.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/SomeRed.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/ThetaContra.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/LocalDensityBlockOneProduct.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/TprodComplementSplitFinsetStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AntiInvolutionSwapsUpperLowerStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CapelliPolynomialPermutationMatchStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CenterActionCommutesLeviDifferenceStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CompactSubgroupFiniteOpenCosetsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CongruenceEndomorphismInverseExistsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FiniteTypeAlgebraCommonEigencharacterStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChangeStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FreeAlgebraActionOnSubquotientStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/HermitianAdjointExistsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        }
+      ],
+      "status": "conflict",
+      "conflict_count": 3,
+      "stage_types": {
+        "1,2,3": 3
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ChainFrameSignatureData.lean",
+          "stages": {
+            "1": "69c0cde5e786173cfb139f5ebe2d45410de460e4",
+            "2": "07a42bdf7a4d178a702fd6fe10720b22c960b5ac",
+            "3": "a3e47ae4636a776503913ca55c6bc90a76c3ea8a"
+          }
+        },
+        {
+          "path": "src/Development/WeilBound/CoreStatements/TorusUniformisation/ChowMahlerFamilies/MemOfFixedByAutomorphisms.lean",
+          "stages": {
+            "1": "9ffe106d739e57c8c151d51f3cfa8a08f152f8c8",
+            "2": "96f3b9bff060e403558431c6099612970c7ca9bf",
+            "3": "cdcaeca893678d1bd0587b1152980d871726f96b"
+          }
+        },
+        {
+          "path": "src/Formalism/LogFactorialBounds/LogFactorialProofs/PrimeSum.lean",
+          "stages": {
+            "1": "7088404e0bbc960487bf76f19264941245f88aac",
+            "2": "aeee038ec3a93a76519c02d552884a3e1b4fc7f4",
+            "3": "39c1aed8d625bed64e1c061c0b22e3820e331fde"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "7dc12f4789042f3cd498c4c25ea85fc90c091fe1",
+      "log_tail": "ormalism/WachLatticeTwists/RealDisplaySplitting/RealDisplayProofs/RealizationAllFormsHolds.lean left in tree.\nCONFLICT (modify/delete): src/Formalism/WachLatticeTwists/RealDisplaySplitting/RealDisplayProofs/SplitF.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/Formalism/WachLatticeTwists/RealDisplaySplitting/RealDisplayProofs/SplitF.lean left in tree.\nCONFLICT (modify/delete): src/Formalism/WachLatticeTwists/SplitClassesAll/SplitClassesProofs/SourceCaseBSpecialHolds.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/Formalism/WachLatticeTwists/SplitClassesAll/SplitClassesProofs/SourceCaseBSpecialHolds.lean left in tree.\nCONFLICT (modify/delete): src/Formalism/WachLatticeTwists/SplitClassesAll/SplitClassesProofs/TheoremNFiveAllForms.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/Formalism/WachLatticeTwists/SplitClassesAll/SplitClassesProofs/TheoremNFiveAllForms.lean left in tree.\nCONFLICT (modify/delete): src/Formalism/WachLatticeTwists/SplitClassesAll/SplitClassesProofs/TheoremNFiveSplitRankForm.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/Formalism/WachLatticeTwists/SplitClassesAll/SplitClassesProofs/TheoremNFiveSplitRankForm.lean left in tree.\nAuto-merging src/GroundTheory/ArithmeticGeometry/SchemeCohomology/ProperCohomology/FormalCechSmul.lean\nAuto-merging src/GroundTheory/ArithmeticGeometry/SchemeCohomology/ProperCohomology/FormalVanish.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/ArithmeticGeometry/SchemeCohomology/ProperCohomology/FormalVanish.lean\nAuto-merging src/GroundTheory/ArithmeticGeometry/SchemeCohomology/ProperCohomology/SheafHEquiv.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/ArithmeticGeometry/SchemeCohomology/ProperCohomology/SheafHEquiv.lean\nAuto-merging src/GroundTheory/AutomorphicForms/L2LocalComponents/NonEmpty.lean\nAuto-merging src/GroundTheory/AutomorphicForms/MultiplicityOne/FiniteFactor.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/AutomorphicForms/MultiplicityOne/FiniteFactor.lean\nAuto-merging src/GroundTheory/AutomorphicForms/TensorProductTheorem/GKMain.lean\nAuto-merging src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/FieldNumbersLocalIntegralClosureFinite.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/FieldNumbersLocalIntegralClosureFinite.lean\nAuto-merging src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/HilbertSamuelGrowthOffHypersurfacePolynomial.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/HilbertSamuelGrowthOffHypersurfacePolynomial.lean\nAuto-merging src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/InjectiveHolomorphicJacobianNeZeroHolds.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/InjectiveHolomorphicJacobianNeZeroHolds.lean\nAuto-merging src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/KeyFormulaVanishingCechMultInvariants.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/KeyFormulaVanishingCechMultInvariants.lean\nAuto-merging src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/NumbersDVRC3ResidualContractionComponent.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/NumbersDVRC3ResidualContractionComponent.lean\nAuto-merging src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/TargetsProjGenericRank.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/TargetsProjGenericRank.lean\nAuto-merging src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/TargetsProjRegularDens.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/TargetsProjRegularDens.lean\nAuto-merging src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/UniformIntegrabilityProportionalityHolds.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/HeightsAndTheta/Heights/LocalFiniteness/UniformIntegrabilityProportionalityHolds.lean\nAuto-merging src/GroundTheory/PAdicHodge/BCrisNewtonDom.lean\nAuto-merging src/GroundTheory/PAdicHodge/BCrisNewtonKey.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/PAdicHodge/BCrisNewtonKey.lean\nCONFLICT (modify/delete): src/GroundTheory/PAdicHodge/FundamentalSeq.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/GroundTheory/PAdicHodge/FundamentalSeq.lean left in tree.\nCONFLICT (modify/delete): src/GroundTheory/PAdicHodge/WAFracOrbit.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/GroundTheory/PAdicHodge/WAFracOrbit.lean left in tree.\nAuto-merging src/GroundTheory/ProfiniteCohomology/GlobalClassFormation/IdeleInvariants/BrauerInvZOfIsSepClosureIdelesLocalResIdelesResF.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/ProfiniteCohomology/GlobalClassFormation/IdeleInvariants/BrauerInvZOfIsSepClosureIdelesLocalResIdelesResF.lean\nAuto-merging src/GroundTheory/ProfiniteCohomology/GlobalClassFormation/IdeleInvariants/LocalInf.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/ProfiniteCohomology/GlobalClassFormation/IdeleInvariants/LocalInf.lean\nAuto-merging src/GroundTheory/ProfiniteCohomology/GlobalClassFormation/IdeleLimits/Assembly.lean\nAuto-merging src/GroundTheory/ProfiniteCohomology/GlobalEulerCharacteristic/KummerSha.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/ProfiniteCohomology/GlobalEulerCharacteristic/KummerSha.lean\nAuto-merging src/GroundTheory/ProfiniteCohomology/RestrictedRamification/ClassFieldGSLocal.lean\nCONFLICT (content): Merge conflict in src/GroundTheory/ProfiniteCohomology/RestrictedRamification/ClassFieldGSLocal.lean\nAuto-merging src/Lemmata/B1959r/Imports.lean\nCONFLICT (content): Merge conflict in src/Lemmata/B1959r/Imports.lean\nCONFLICT (modify/delete): src/PositivityTheory/AutomorphicForms/PublishedInputs/CuspidalContinuity/ArchimedeanCuspidal/AdelicGaussians/growthAd.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/PositivityTheory/AutomorphicForms/PublishedInputs/CuspidalContinuity/ArchimedeanCuspidal/AdelicGaussians/growthAd.lean left in tree.\nCONFLICT (modify/delete): src/PositivityTheory/AutomorphicForms/PublishedInputs/CuspidalContinuity/ArchimedeanCuspidal/KFiniteVectors/KFiniteAdelicGaussians/growthAd.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/PositivityTheory/AutomorphicForms/PublishedInputs/CuspidalContinuity/ArchimedeanCuspidal/KFiniteVectors/KFiniteAdelicGaussians/growthAd.lean left in tree.\nCONFLICT (modify/delete): src/PositivityTheory/AutomorphicForms/PublishedInputs/CuspidalContinuity/ArchimedeanCuspidal/RealLocalIntegrals/RealTemperedBounds/RotationScalingMulVecSnd.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/PositivityTheory/AutomorphicForms/PublishedInputs/CuspidalContinuity/ArchimedeanCuspidal/RealLocalIntegrals/RealTemperedBounds/RotationScalingMulVecSnd.lean left in tree.\nCONFLICT (modify/delete): src/PositivityTheory/AutomorphicForms/PublishedInputs/CuspidalContinuity/ArchimedeanCuspidal/RealLocalIntegrals/RealTemperedBounds/TrDefs.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/PositivityTheory/AutomorphicForms/PublishedInputs/CuspidalContinuity/ArchimedeanCuspidal/RealLocalIntegrals/RealTemperedBounds/TrDefs.lean left in tree.\nAuto-merging src/ReciprocityTheory/GeometryOfNumbers/AsymptoticSequences/ClosingHS.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/GeometryOfNumbers/AsymptoticSequences/ClosingHS.lean\nAuto-merging src/ReciprocityTheory/GeometryOfNumbers/LatticeCovolumes/CountUpSt.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/GeometryOfNumbers/LatticeCovolumes/CountUpSt.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/IsBergDensity.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/IsBergDensity.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovVolumes/UpperBounds/NormOrderPfA.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovVolumes/UpperBounds/NormOrderPfA.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/DiscreteValuationRings/MemFinsetInf.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/DiscreteValuationRings/MemFinsetInf.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/PullbackSections/HolomorphicFamilies/EigRamHelp.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/PullbackSections/HolomorphicFamilies/EigRamHelp.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/ExceptionalGroupG2/FormalDegreeG2/FdConsA.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/ExceptionalGroupG2/FormalDegreeG2/FdConsA.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/ExceptionalGroupG2/TensorProductsG2/OccDTensKStable.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/ExceptionalGroupG2/TensorProductsG2/OccDTensKStable.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/LaplaceOperators/KTypeLemma/PartialSumRootNonneg.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/LaplaceOperators/KTypeLemma/PartialSumRootNonneg.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/JTransMA.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/JTransMA.lean\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/CmAllOf.lean deleted in HEAD and modified in 7dc12f4789 (remove redundant imports and heartbeat overrides).  Version 7dc12f4789 (remove redundant imports and heartbeat overrides) of src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/CmAllOf.lean left in tree.\nAuto-merging src/ReciprocityTheory/SemistableReduction/AlgAll.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/AlgAll.lean\nRebasing (1/1)\nerror: could not apply 7dc12f4789... remove redundant imports and heartbeat overrides\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply 7dc12f4789... # remove redundant imports and heartbeat overrides\n",
+      "checkpoint_head": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
