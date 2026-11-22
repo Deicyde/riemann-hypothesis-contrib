@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.IsOp
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory TopologicalSpace
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_section_extending_of_dense_openImmersion : ∀ {T Z : Scheme.{0}} [IsReduced Z] (j : T ⟶ Z) [IsOpenImmersion j], Dense (Set.range j) →
     ∀ (U : Z.Opens) (s : Γ(T, j ⁻¹ᵁ U)), (∀ u ∈ U, ∃ (W : Z.Opens) (hWU : W ≤ U), u ∈ W ∧
       ∃ h : Γ(Z, W), j.app W h = T.presheaf.map (homOfLE (j.preimage_mono hWU)).op s) →

@@ -197,10 +197,10 @@ theorem norm_coords {E : Type} [Field E] [NumberField E] [StarRing E] (W : HSpac
       τ (W.hT x x) := by
   rw [star_mulVec, mulVec_mulVec, ← dotProduct_mulVec, mulVec_mulVec, ← Matrix.mul_assoc, hA]
   conv_rhs => rw [← W.frame.sum_repr x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, map_mul,
-    RingHom.id_apply, dotProduct, mulVec, Matrix.map_apply, HSpace.gram, Pi.star_apply, starRingEnd_apply, hτ,
-    Finset.mul_sum]
+
+  simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, map_mul,
+  RingHom.id_apply, dotProduct, mulVec, Matrix.map_apply, HSpace.gram, Pi.star_apply, starRingEnd_apply, hτ,
+  Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring

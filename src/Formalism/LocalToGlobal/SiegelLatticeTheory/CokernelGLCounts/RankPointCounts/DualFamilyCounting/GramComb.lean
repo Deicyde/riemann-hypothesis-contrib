@@ -24,10 +24,10 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicN
 theorem gram_comb' {ι : Type} [Fintype ι] (p : ι → S.V) (A : Matrix ι ι E) (b c : ι) :
     S.hT (∑ a, A a b • p a) (∑ a, A a c • p a) =
       (A.conjTranspose * Matrix.of (fun a a' => S.hT (p a) (p a')) * A) b c := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, map_smul, LinearMap.smul_apply, smul_eq_mul,
-    Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply, starRingEnd_apply, Finset.sum_mul,
-    Finset.mul_sum]
+
+  simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, map_smul, LinearMap.smul_apply, smul_eq_mul,
+  Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply, starRingEnd_apply, Finset.sum_mul,
+  Finset.mul_sum]
   first
     | (refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_; ring)
     | (rw [Finset.sum_comm]; refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_; ring)
@@ -129,14 +129,14 @@ theorem hf_pv (a a' : Fin (r + 1)) :
   obtain ⟨hwe, -, hwz⟩ := hw
   induction a using Fin.lastCases with
   | last =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [pv, Fin.snoc_last, map_add (f := _), map_sum, map_smul, smul_eq_mul, hsw0 S (h.ez _), mul_zero,
-      Finset.sum_const_zero, add_zero, hwz, hz_gv h hN]
+
+    simp only [pv, Fin.snoc_last, map_add (f := _), map_sum, map_smul, smul_eq_mul, hsw0 S (h.ez _), mul_zero,
+    Finset.sum_const_zero, add_zero, hwz, hz_gv h hN]
     simp [eq_comm]
   | cast a =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [pv, Fin.snoc_castSucc, map_add (f := _), map_sum, map_smul, smul_eq_mul, h.ee, mul_zero,
-      Finset.sum_const_zero, add_zero, hwe, he_gv h hN]
+
+    simp only [pv, Fin.snoc_castSucc, map_add (f := _), map_sum, map_smul, smul_eq_mul, h.ee, mul_zero,
+    Finset.sum_const_zero, add_zero, hwe, he_gv h hN]
     simp [eq_comm]
 
 theorem hpv_pv (ht : S.hT w0 w0 = tv N N' Z) (a a' : Fin (r + 1)) :
@@ -154,10 +154,10 @@ theorem hpv_pv (ht : S.hT w0 w0 = tv N N' Z) (a a' : Fin (r + 1)) :
       ∑ d, Psi N' Z d a' * S.hT (gv y z N a) (e d) +
       ∑ d, star (Psi N' Z d a) * S.hT (e d) (gv y z N a') +
       star (if a = Fin.last r then (1 : E) else 0) * (if a' = Fin.last r then (1 : E) else 0) * S.hT w0 w0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [pv, map_add (f := _), LinearMap.add_apply, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, map_smul,
-      LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, h.ee, mul_zero, Finset.sum_const_zero, hgw, hwg,
-      hwe, hwe', add_zero, zero_add]
+
+    simp only [pv, map_add (f := _), LinearMap.add_apply, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, map_smul,
+    LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, h.ee, mul_zero, Finset.sum_const_zero, hgw, hwg,
+    hwe, hwe', add_zero, zero_add]
     ring
   rw [key, hgv_gv h hN, ht]
   simp only [hgv_e h hN, he_gv h hN, mul_ite, mul_one, mul_zero]

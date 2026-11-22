@@ -167,11 +167,11 @@ theorem local_step [Finite B] (T : RingAut B) (ℓ : ℕ) (hℓ : 0 < ℓ) (hT :
       rw [← hρ, h1]
       rfl
     have := congrArg (Ideal.Quotient.mk m) h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hy, map_zero] at this
+
+    simp only [map_sum, map_mul, hy, map_zero] at this
     have h2 := congrArg (Ideal.Quotient.mk m) h1'
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, pow_zero, map_one] at h2
+
+    simp only [map_sum, map_mul, pow_zero, map_one] at h2
     have h3 : ∀ i, Ideal.Quotient.mk m (((1 : RingAut B)) (y i)) = Ideal.Quotient.mk m (y i) :=
       fun i => rfl
     simp only [h3] at h2
@@ -327,8 +327,8 @@ theorem fixed_tensor {κ κ' A : Type*} [Field κ] [CommRing κ'] [Algebra κ κ
       b.sum (fun i m => m ⊗ₜ[κ] C i)
     rw [Finsupp.sum_mapRange_index (by simp)]
     conv_rhs => rw [← hs]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Finsupp.sum, map_sum]
+
+    simp [Finsupp.sum, map_sum]
   have hb : ∀ i, τ (b i) = b i := fun i => by
     have := DFunLike.congr_fun hbb i
     simpa using this

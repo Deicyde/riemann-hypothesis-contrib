@@ -39,7 +39,7 @@ def IsEtaleFirstChernUntwisted (r : E.Roots l) {M : Model l K} (D : E.LineData M
 
 
 variable (l K) in
-set_option maxHeartbeats 1000000 in
+
 structure HTPre where
   h : ∀ (M : Model l K) (a n : ℕ), M.V n →+ (Module.Dual K (Hdg M.q a n) →+ ℂ_[l])
   lin : ∀ (M : Model l K) (a n : ℕ) (z : ℚ_[l]) (v : M.V n) (φ : Module.Dual K (Hdg M.q a n)), h M a n (z • v) φ = qC l z * h M a n v φ

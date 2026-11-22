@@ -58,7 +58,7 @@ theorem nb_neg {nb : hermA D n → G D n} (h : PositivityTheory.PfSWUS.IsNMap nb
   have h' : nb (-b) * nb b = 1 := by rw [← nb_add h, neg_add_cancel, nb_zero h]
   exact (eq_inv_of_mul_eq_one_left h').symm
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem nb_continuous {nb : hermA D n → G D n} (h : PositivityTheory.PfSWUS.IsNMap nb) : Continuous nb := by
   obtain ⟨i1, -⟩ := lattice_Mx D n n
   haveI : IsTopologicalAddGroup (Mx D n n) := i1

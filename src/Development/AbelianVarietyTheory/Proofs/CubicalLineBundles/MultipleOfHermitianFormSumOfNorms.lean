@@ -113,8 +113,8 @@ theorem exists_split {n : ℕ} (u w : Fin n → M) (fr : ∀ a, a = ∑ i, g (w 
   classical
   obtain ⟨N, Z, hN, hZ, hB⟩ := exists_kill g herm pos u Finset.univ
   have hZ0 : ∀ a, Z a = 0 := fun a => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [fr a, map_sum]
+
+    rw [fr a, map_sum]
     exact Finset.sum_eq_zero fun i hi => by rw [map_smul, hZ i hi, smul_zero]
   have hB' : IsSumOfNorms br (fun x y => (N : R) * g y x) := hB.congr fun x y => by simp [hZ0]
   have key : ∀ e : M, ∃ K : ℕ, IsSumOfNorms br (fun x y => (K : R) * g y x - g e x * br (g e y)) := by
@@ -171,8 +171,8 @@ theorem kForm_sum_sq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
       rw [Int.cast_natCast, SubringClass.coe_natCast]) u w fr
   refine ⟨N, m, l, r, hN, hr, fun x y => ?_⟩
   have := congrArg (OK H).val (hl x y)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_mul, map_sum, map_natCast, Subalgebra.coe_val] at this
+
+  simp only [map_mul, map_sum, map_natCast, Subalgebra.coe_val] at this
   simp only [← hbr]
   exact this
 

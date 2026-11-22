@@ -161,9 +161,9 @@ variable {D : D7}
 theorem embT_trace (τ : D.what₂.Tau) {m n : ℕ} (M : Matrix (Fin m) (Fin n) D.host.E) :
     embT D τ (Matrix.trace (Mᴴ * M)) =
       ((∑ i, ∑ j, Complex.normSq (embT D τ (M i j)) : ℝ) : ℂ) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply, map_sum, map_mul,
-    embT_star, Complex.ofReal_sum, Complex.normSq_eq_conj_mul_self]
+
+  simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply, map_sum, map_mul,
+  embT_star, Complex.ofReal_sum, Complex.normSq_eq_conj_mul_self]
   rw [Finset.sum_comm]
 
 theorem k_eq {m n : ℕ} (M : Matrix (Fin m) (Fin n) D.host.E) (k : ℤ)

@@ -98,7 +98,7 @@ theorem theta_neg (hP : Parity) (hp : IsPair B M χX χW om r s r' s') {Φ : Fn 
   rw [smul_right_injective _ hc0 e1, thetaSum_neg]
 
 
-set_option maxHeartbeats 800000 in
+
 open scoped Classical in
 theorem qb_piece (hP : Parity) (hS : CoefSum) (hE : CoefEq) (hB : CoefBd) (hp : IsPair B M χX χW om r s r' s') (N : ℕ)
     {φ : (Fin n × Fin d → Af F) → ℂ} (hφ : φ ∈ SB _)

@@ -35,7 +35,7 @@ theorem tau_derivative_rule_holds : TauRule := by
   rw [x00, x11, x01, x10]
   linear_combination (MvPowerSeries.X 0 - MvPowerSeries.X 1) * (MvPowerSeries.X 0 ^ 2 - MvPowerSeries.X 1 ^ 2) * (-e0 + e1 + U * p0 - U * p1)
 
-set_option maxHeartbeats 400000 in
+
 theorem core {R : Type} [CommRing R] (a b c Xa Ya Xb Yb Xc Yc h g3 : R)
     (Ca : Ya ^ 2 = 4 * Xa ^ 3 - 2 * h * a ^ 4 * Xa - g3 * a ^ 6)
     (Cb : Yb ^ 2 = 4 * Xb ^ 3 - 2 * h * b ^ 4 * Xb - g3 * b ^ 6)

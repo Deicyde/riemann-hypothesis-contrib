@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsGal
 open scoped MatrixGroups NNReal
 open Polynomial GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisensteinGalois
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.residue_linear_disjointness_coeff_lt_one :
     ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
       IsClo p Ω → ∀ (v : Valuation Ω ℝ≥0), (∀ x : Ω, v x ≤ 1 ↔ IsInt (p := p) x) →
@@ -116,15 +116,15 @@ theorem _root_.GlobalTheory.T.residue_linear_disjointness_coeff_lt_one :
     exact (hCz z).symm
   obtain ⟨f, hf, hfix⟩ := ResDisj.exists_pow_eq _ halg
   have hrel : ∑ t, ρ (E t) * φ (LauZ.red p (a t)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hφ, ← map_mul, ← map_sum]
+
+    simp only [hφ, ← map_mul, ← map_sum]
     rw [hρ]
     convert hsum using 2
     exact map_sum A.subtype _ _
   have hres :=
     ResDisj.coeff_rel_of_pow φ hf _ hfix Finset.univ _ (fun t ht => absurd (Finset.mem_univ t) ht) hrel r
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LauZ.red_coeff, ← hCz, ← map_mul, ← map_sum] at hres
+
+  simp only [LauZ.red_coeff, ← hCz, ← map_mul, ← map_sum] at hres
   rw [hρ] at hres
   convert hres using 2
   refine Eq.trans ?_ (map_sum A.subtype _ _).symm

@@ -126,9 +126,9 @@ theorem IsVB.isTorsionFree (h : IsVB F r) : IsTorsionFree F := by
   obtain ⟨a, ha⟩ := (he U le_rfl).2 (resM F hle s)
   have h0 : ∑ i, X.presheaf.germ U _ hU (a i) • he.stalkBasis _ hU i = 0 := by
     rw [← hs, ← germ_resM hle hU, ← ha]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Fintype.linearCombination_apply, map_sum, QCoh.germ_smul, resM_self,
-      IsFrame.stalkBasis_apply]
+
+    simp only [Fintype.linearCombination_apply, map_sum, QCoh.germ_smul, resM_self,
+    IsFrame.stalkBasis_apply]
   have h1 : a = 0 := funext fun i => germ_injective_of_isIntegral X _ hU
     ((Fintype.linearIndependent_iff.1 (he.stalkBasis _ hU).linearIndependent _ h0 i).trans
       (map_zero _).symm)

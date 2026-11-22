@@ -154,8 +154,8 @@ theorem phiinv_matrix {r : ℕ} {S : Submodule (LetA O n) (W.DD T)} (bS : Module
     rw [φspan, Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
     obtain ⟨c, rfl⟩ := coords bS hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [φD_smulA]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -199,8 +199,8 @@ theorem le_of_X_pow_smul_le
     refine matrix_eq_of_comb li fun j => ?_
     rw [comb_smul, comb_mul, comb_smul, comb_mul]
     have e1 : ∑ k, Bm.map (W.γA W.gam) k j • ∑ i, Gm i k • b i = W.γ T (W.X ^ a • b₁ j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hB j, map_sum]
+
+      rw [hB j, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [γ_smulA, ← hG k, Matrix.map_apply]
     have e2 : ∑ k, Gm₁ k j • ∑ i, Bm i k • b i = W.X ^ a • W.γ T (b₁ j) := by
@@ -221,8 +221,8 @@ theorem le_of_X_pow_smul_le
     refine matrix_eq_of_comb li fun j => ?_
     rw [Matrix.smul_mul, comb_smul, comb_mul, comb_smul, comb_mul]
     have e1 : ∑ k, Bm.map W.φA k j • ∑ i, F i k • b i = W.Q ^ hM • W.φD T (W.X ^ a • b₁ j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hB j, map_sum, Finset.smul_sum]
+
+      rw [hB j, map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [φD_smulA, ← hF k, Matrix.map_apply, smul_comm]
     have e2 : ∑ k, F₁ k j • ∑ i, Bm i k • b i = W.X ^ a • W.Q ^ h₁ • W.φD T (b₁ j) := by

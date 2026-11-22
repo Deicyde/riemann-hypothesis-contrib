@@ -41,9 +41,9 @@ theorem UpperTheory.Reformulated.B.CoboundaryCriterion.isCoboundary_of_coprime :
     calc S = ∑ q : f.range, (z (i u) + ρ (i u) (z (i (s q)))) := by
           rw [h1]; exact Finset.sum_congr rfl fun q _ => h2 q
       _ = n • z (i u) + ρ (i u) S := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [Finset.sum_add_distrib, Finset.sum_const, hS, map_sum, hn, Nat.card_eq_fintype_card,
-            Finset.card_univ]
+
+          rw [Finset.sum_add_distrib, Finset.sum_const, hS, map_sum, hn, Nat.card_eq_fintype_card,
+          Finset.card_univ]
   obtain ⟨a, c, hac⟩ : IsCoprime (n : ℤ) (l : ℤ) := Nat.isCoprime_iff_coprime.mpr hcop'
   refine ⟨-(a • S), fun u => ?_⟩
   have h3 : (n : ℤ) • z (i u) = S - ρ (i u) S := by

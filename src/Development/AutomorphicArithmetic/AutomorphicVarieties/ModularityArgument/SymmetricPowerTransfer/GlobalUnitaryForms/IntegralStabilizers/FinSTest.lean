@@ -102,7 +102,7 @@ private theorem fSv_apply_ne_zero_of_fs_ne_zero (D : Dat Δ) (t : Dat.Par F) (g 
   rw [if_neg hc.1]
   simp [one, hc.2]
 
-set_option maxHeartbeats 1000000 in
+
 theorem finS_test : ∀ (F : Type) [Field F] [NumberField F] (Δ : F) (D : Dat Δ), D.Ok → ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
     (ch : F → ℂ) (x : DA Δ) (B : Base (SU Δ) (SA Δ) V), D.IsBS ch x B → ∀ t, D.Cone t → (Base.Tw.one B).IsTest (D.FSx t x) := by
   intro F _ _ Δ D hD V _ _ ch x B hB t ht

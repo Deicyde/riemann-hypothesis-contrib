@@ -270,22 +270,22 @@ theorem AddBlockIsometric.proof : AddBlockIsometric.Statement := by
         · simp only [Pi.add_apply]
           have := hle i k
           omega
-        set_option synthInstance.maxHeartbeats 100000 in
-          · rw [map_sub, map_sum, aeval_chartMon, sub_eq_zero]
-            calc ∑ i, aeval y (U i * Gs i * chartMon c (fun k => Dt k - (ε i k + δs i k)))
-                = ∑ i, u i * (v i * ∏ k, y ⟨k, c k⟩ ^ (-((m : ℤ) * A.a k))) * ∏ k, y ⟨k, c k⟩ ^ Dt k := by
-                  refine Finset.sum_congr rfl fun i _ => ?_
-                  rw [map_mul, map_mul, hUv i, hGsv i, aeval_chartMon]
-                  calc (u i * ∏ k, y ⟨k, c k⟩ ^ ε i k) * (v i * ∏ k, y ⟨k, c k⟩ ^ Ns i k) *
-                        ∏ k, y ⟨k, c k⟩ ^ (Dt k - (ε i k + δs i k))
-                      = u i * v i * ((∏ k, y ⟨k, c k⟩ ^ ε i k) * (∏ k, y ⟨k, c k⟩ ^ Ns i k) *
-                        (∏ k, y ⟨k, c k⟩ ^ (Dt k - (ε i k + δs i k)))) := by ring
-                    _ = _ := by rw [key i]; ring
-              _ = ∏ k, y ⟨k, c k⟩ ^ Dt k := by rw [← Finset.sum_mul, hsum', one_mul]
+
+        · rw [map_sub, map_sum, aeval_chartMon, sub_eq_zero]
+          calc ∑ i, aeval y (U i * Gs i * chartMon c (fun k => Dt k - (ε i k + δs i k)))
+              = ∑ i, u i * (v i * ∏ k, y ⟨k, c k⟩ ^ (-((m : ℤ) * A.a k))) * ∏ k, y ⟨k, c k⟩ ^ Dt k := by
+                refine Finset.sum_congr rfl fun i _ => ?_
+                rw [map_mul, map_mul, hUv i, hGsv i, aeval_chartMon]
+                calc (u i * ∏ k, y ⟨k, c k⟩ ^ ε i k) * (v i * ∏ k, y ⟨k, c k⟩ ^ Ns i k) *
+                      ∏ k, y ⟨k, c k⟩ ^ (Dt k - (ε i k + δs i k))
+                    = u i * v i * ((∏ k, y ⟨k, c k⟩ ^ ε i k) * (∏ k, y ⟨k, c k⟩ ^ Ns i k) *
+                      (∏ k, y ⟨k, c k⟩ ^ (Dt k - (ε i k + δs i k)))) := by ring
+                  _ = _ := by rw [key i]; ring
+            _ = ∏ k, y ⟨k, c k⟩ ^ Dt k := by rw [← Finset.sum_mul, hsum', one_mul]
       have hΦW := hPW (rename_mem v hΦ)
       have hS : rename (oldV N) (∑ i, U i * Gs i * chartMon c (fun k => Dt k - (ε i k + δs i k))) ∈ W := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         exact W.sum_mem fun i _ => by
           rw [map_mul, map_mul]
           exact W.mul_mem_right _ (W.mul_mem_left _ (hall i))

@@ -493,8 +493,8 @@ theorem hK_symm (x y : D.host.E) : G0.hK D x y = G0.cK D (G0.hK D y x) := by
   apply D.host.φ₀.injective
   show D.host.φ₀ ((Algebra.trace D.host.K D.host.E (x * D.host.conj y) : D.host.K) : D.host.E)
     = D.host.φ₀ (D.host.conj ((Algebra.trace D.host.K D.host.E (y * D.host.conj x) : D.host.K) : D.host.E))
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [CU.emb_conj, ← FL.sum_tau_trace, ← FL.sum_tau_trace, map_sum]
+
+  rw [CU.emb_conj, ← FL.sum_tau_trace, ← FL.sum_tau_trace, map_sum]
   refine Finset.sum_congr rfl fun τ _ => ?_
   rw [map_mul, map_mul, map_mul, CU.emb_conj, CU.emb_conj, Complex.conj_conj, mul_comm]
 
@@ -514,8 +514,8 @@ private theorem hK_smul_right' (k : D.host.K) (x y : D.host.E) :
 theorem hK_sum_smul_right {ι : Type*} (s : Finset ι) (k : ι → D.host.K) (f : ι → D.host.E) (x : D.host.E) :
     G0.hK D x (∑ i ∈ s, k i • f i) = ∑ i ∈ s, G0.cK D (k i) * G0.hK D x (f i) := by
   rw [← Finset.sum_congr rfl fun i _ => hK_smul_right' D (k i) x (f i)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [G0.hK, map_sum, Finset.mul_sum]
+
+  simp only [G0.hK, map_sum, Finset.mul_sum]
 
 theorem hK_smul_right (k : D.host.K) (x y : D.host.E) : G0.hK D x (k • y) = G0.cK D k * G0.hK D x y :=
   hK_smul_right' D k x y

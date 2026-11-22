@@ -187,7 +187,7 @@ theorem isModels_tr (h : R.IsModels) : letI := alg b iK; (real b R).IsModels := 
   case BV => exact (by with_unfolding_all exact (h.BV :))
   case order => exact (by with_unfolding_all exact (h.order :))
 
-set_option maxHeartbeats 4000000 in
+
 
 theorem isChainW_tr (h : R.IsChainW) : letI := alg b iK; (real b R).IsChainW := by
   letI := alg b iK
@@ -230,7 +230,7 @@ theorem isChainW_tr (h : R.IsChainW) : letI := alg b iK; (real b R).IsChainW := 
       (fun m _ x => ∀ t, OrZero (pIoXW (@m) R t) (x t)) ((by with_unfolding_all exact (R.ioY :))) ((by with_unfolding_all exact (R.ioX :)))) ((by with_unfolding_all exact (h.ioX :))) :))
   case Th => exact (by with_unfolding_all exact (cast (congrArg (fun p : type_of% R.PTh => ∀ t, OrZero (p t) (R.Th t)) (pTh_eq b R)) h.Th :))
 
-set_option maxHeartbeats 4000000 in
+
 
 theorem isThPW_tr (h : R.IsThPW) : letI := alg b iK; (real b R).IsThPW := by
   letI := alg b iK
@@ -251,7 +251,7 @@ theorem isThPW_tr (h : R.IsThPW) : letI := alg b iK; (real b R).IsThPW := by
   case thF => exact (by with_unfolding_all exact (cast (congrArg (fun p : type_of% R.PThF => ∀ i t, OrZero (p i t) (R.thF i t)) (pThF_eq b R)) h.thF :))
   case thG => exact (by with_unfolding_all exact (h.thG :))
 
-set_option maxHeartbeats 4000000 in
+
 
 theorem exAt_tr (h : R.ExAt) : letI := alg b iK; (real b R).ExAt := by
   letI := alg b iK

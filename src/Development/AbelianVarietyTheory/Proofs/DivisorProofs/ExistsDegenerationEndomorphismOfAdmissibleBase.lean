@@ -21,7 +21,7 @@ attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.DVR
 open GlobalTheory.UT
 
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.UT
 

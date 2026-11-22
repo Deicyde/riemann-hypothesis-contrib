@@ -152,8 +152,8 @@ theorem glue_approx {Q : Finset (HeightOneSpectrum (𝓞 E))} (hQ : ∀ P ∈ Q,
   have h1 : G' * G = 1 := by
     ext i j
     refine PtExist.ad_ext fun w => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.mul_apply, map_sum]
+
+    rw [Matrix.mul_apply, map_sum]
     simp only [map_mul, hG, hG']
     split_ifs with h h'
     · set_option synthInstance.maxHeartbeats 100000 in

@@ -40,8 +40,8 @@ private theorem exists_eigen_idem {O OE κ : Type} [CommRing O] [CommRing OE] [F
     split_ifs with h
     · subst h; rw [(hε.idem i).eq]
     · rw [hε.ortho h, map_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [← map_sum, hε.complete, map_one]
+
+  · rw [← map_sum, hε.complete, map_one]
   · have h1 : Ψ (1 ⊗ₜ[ℤ] a) = ρ a := by
       refine (Algebra.TensorProduct.lift_tmul _ _ _ _ _).trans ?_
       rw [map_one, _root_.one_mul]

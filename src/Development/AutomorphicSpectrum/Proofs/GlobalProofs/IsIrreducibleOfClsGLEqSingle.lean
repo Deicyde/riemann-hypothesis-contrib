@@ -134,8 +134,8 @@ private theorem exists_hasSupport_of_symm_sum_ne_zero (hS : IsSegmentClass k Z) 
     (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
     (F : Finset (Segment k →₀ ℕ)) (c : (Segment k →₀ ℕ) → ℤ) (u : IrrGL (k := k))
     (h : (Ψ.symm (∑ n ∈ F, monomial n (c n))) u ≠ 0) : ∃ n ∈ F, HasSupport u.rep (msum n) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finsupp.finsetSum_apply] at h
+
+  rw [map_sum, Finsupp.finsetSum_apply] at h
   obtain ⟨n, hn, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero h
   refine ⟨n, hn, hasSupport_of_symm_monomial_ne_zero hS hΨ hX u n ?_⟩
   intro h0
@@ -309,7 +309,7 @@ theorem eq_pair (hx : x.IsCusp) (hy : y.IsCusp) (hl : ∀ j : ℤ, |j| ≤ 1 →
 end Monomials
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem prod₂_cls {A : Type 1} [CommRing A] {Ψ : GrothGL k ≃+ A} (hΨ : IsProductIso k Ψ) (x y : IrrGL (k := k)) :
     ∃ h : HasFiniteLength (prod₂ x.rep y.rep), Ψ (clsGL (prod₂ x.rep y.rep) h) = bas Ψ x * bas Ψ y := by
   have hx := hasFiniteLength_of_isIrreducible x.snd.rep.irr
@@ -436,7 +436,7 @@ theorem isIrreducible_of_cls_eq_mul (hG : GeometricLemma) (hBZ : BernsteinZelevi
 end Main
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem isIrreducible_prod₂_of_polynomialRing (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness)
     (hZ : ZelevinskyPolynomialRing) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
     [IsNonarchimedeanLocalField k] (x y : IrrGL (k := k)) (hx : x.IsCusp) (hy : y.IsCusp)

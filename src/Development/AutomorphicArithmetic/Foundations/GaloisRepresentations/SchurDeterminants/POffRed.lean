@@ -32,7 +32,7 @@ theorem UpperTheory.Gal.Schur.offClrRed_of :
     · simp [hC]
     · rw [map_mul, hC, hX]
   have := congrArg φ key'
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_prod, map_pow, map_sub, map_neg, map_one, sch, hφ, vdmAway, vdm,
-    hs, hC, hX] at this
+
+  simp only [map_sum, map_mul, map_prod, map_pow, map_sub, map_neg, map_one, sch, hφ, vdmAway, vdm,
+  hs, hC, hX] at this
   simpa [sch, vdmAway, vdm] using this

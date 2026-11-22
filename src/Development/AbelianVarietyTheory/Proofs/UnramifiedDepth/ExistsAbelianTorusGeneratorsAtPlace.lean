@@ -126,8 +126,8 @@ private theorem wfd (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C
 private theorem mulVec_comb {O I J K : Type} [CommRing O] [Fintype I] [Fintype J] (M : Matrix K J O)
     (c : I → O) (u : I → J → O) : M *ᵥ (∑ i, c i • u i) = ∑ i, c i • (M *ᵥ u i) := by
   show Matrix.mulVecLin M _ = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_congr rfl fun i _ => map_smul _ _ _
 
 private theorem sum_single' {O I : Type} [CommRing O] [Fintype I] [DecidableEq I] (c : I → O) :
@@ -312,14 +312,14 @@ theorem exists_generators : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [I
     omega
   · intro l j
     refine Fin.addCases (fun l => ?_) (fun l => ?_) l
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [Fin.append_left, hχ, map_sum]
-        exact Submodule.sum_mem _ fun i _ => by
-          rw [map_smul]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [Fin.append_right, map_sum]
-        exact Submodule.sum_mem _ fun i _ => by
-          rw [map_smul]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
+
+    · rw [Fin.append_left, hχ, map_sum]
+      exact Submodule.sum_mem _ fun i _ => by
+        rw [map_smul]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
+
+    · rw [Fin.append_right, map_sum]
+      exact Submodule.sum_mem _ fun i _ => by
+        rw [map_smul]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
   · have hTb : ∀ j k, tauExt ((t j : Emb (O := O) w.e) : OE →+* O) (b k : ℤ_[p] ⊗[ℤ] OE) =
         tauExt ((t j : Emb (O := O) w.e) : OE →+* O) α ^ (k : ℕ) := by
       intro j k

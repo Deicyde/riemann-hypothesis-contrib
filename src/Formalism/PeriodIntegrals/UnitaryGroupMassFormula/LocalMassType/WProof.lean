@@ -101,22 +101,22 @@ theorem SD.snd_proj_split_matrix_entry {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fi
 
 theorem SD.fst_proj_split_matrix_mulVec {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (x : Fin n → Fv F v ⊗[F] E)
     (i : Fin n) : D.π₁ ((D.kS k₁ k₂ *ᵥ x) i) = (k₁ *ᵥ fun j => D.π₁ (x j)) i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mulVec, dotProduct, map_sum, map_mul, SD.fst_proj_split_matrix_entry]
+
+  simp only [mulVec, dotProduct, map_sum, map_mul, SD.fst_proj_split_matrix_entry]
 
 theorem SD.snd_proj_split_matrix_mulVec {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (x : Fin n → Fv F v ⊗[F] E)
     (i : Fin n) : D.π₂ ((D.kS k₁ k₂ *ᵥ x) i) = (k₂ *ᵥ fun j => D.π₂ (x j)) i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mulVec, dotProduct, map_sum, map_mul, SD.snd_proj_split_matrix_entry]
+
+  simp only [mulVec, dotProduct, map_sum, map_mul, SD.snd_proj_split_matrix_entry]
 
 theorem SD.kS_mul {n : ℕ} (k₁ k₂ l₁ l₂ : Matrix (Fin n) (Fin n) (Fv F v)) :
     D.kS k₁ k₂ * D.kS l₁ l₂ = D.kS (k₁ * l₁) (k₂ * l₂) := by
   ext i j
   apply D.ext
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [Matrix.mul_apply, map_sum, map_mul, SD.fst_proj_split_matrix_entry]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [Matrix.mul_apply, map_sum, map_mul, SD.snd_proj_split_matrix_entry]
+
+  · simp only [Matrix.mul_apply, map_sum, map_mul, SD.fst_proj_split_matrix_entry]
+
+  · simp only [Matrix.mul_apply, map_sum, map_mul, SD.snd_proj_split_matrix_entry]
 
 theorem SD.kS_one {n : ℕ} : D.kS (1 : Matrix (Fin n) (Fin n) (Fv F v)) 1 = 1 := by
   ext i j
@@ -129,13 +129,13 @@ def stdH (σ : E →ₐ[F] E) {n : ℕ} (x y : Fin n → Fv F v ⊗[F] E) : Fv F
 
 theorem SD.fst_proj_standard_hermitian_form {n : ℕ} (x y : Fin n → Fv F v ⊗[F] E) :
     D.π₁ (stdH σ x y) = (fun i => D.π₂ (x i)) ⬝ᵥ (fun i => D.π₁ (y i)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [stdH, map_sum, map_mul, D.hσ1, dotProduct]
+
+  simp only [stdH, map_sum, map_mul, D.hσ1, dotProduct]
 
 theorem SD.snd_proj_standard_hermitian_form {n : ℕ} (x y : Fin n → Fv F v ⊗[F] E) :
     D.π₂ (stdH σ x y) = (fun i => D.π₁ (x i)) ⬝ᵥ (fun i => D.π₂ (y i)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [stdH, map_sum, map_mul, D.hσ2, dotProduct]
+
+  simp only [stdH, map_sum, map_mul, D.hσ2, dotProduct]
 
 theorem dot_mulVec_mulVec {K : Type} [CommRing K] {n : ℕ} (M N : Matrix (Fin n) (Fin n) K)
     (u w : Fin n → K) : (M *ᵥ u) ⬝ᵥ (N *ᵥ w) = u ⬝ᵥ ((Mᵀ * N) *ᵥ w) := by
@@ -186,9 +186,9 @@ theorem SD.sat₁ {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD 
   have hc := hprim (fun a => sc (E := E) v (t a) * D.e) (by
     intro i
     rw [D.hO]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, (D.hsc _).1,
-      (D.hsc _).2, D.he1, D.he2, mul_one, mul_zero, zero_mul, Finset.sum_const_zero]
+
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, (D.hsc _).1,
+    (D.hsc _).2, D.he1, D.he2, mul_one, mul_zero, zero_mul, Finset.sum_const_zero]
     refine ⟨?_, Subring.zero_mem _⟩
     have := ht i
     simp only [mulVec, dotProduct, Matrix.of_apply] at this
@@ -205,10 +205,10 @@ theorem SD.sat₂ {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD 
   have hc := hprim (fun a => sc (E := E) v (t a) * (1 - D.e)) (by
     intro i
     rw [D.hO]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, map_sub, map_one,
-      (D.hsc _).1, (D.hsc _).2, D.he1, D.he2, sub_self, sub_zero, mul_one, mul_zero, zero_mul,
-      Finset.sum_const_zero]
+
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, map_sub, map_one,
+    (D.hsc _).1, (D.hsc _).2, D.he1, D.he2, sub_self, sub_zero, mul_one, mul_zero, zero_mul,
+    Finset.sum_const_zero]
     refine ⟨Subring.zero_mem _, ?_⟩
     have := ht i
     simp only [mulVec, dotProduct, Matrix.of_apply] at this
@@ -269,8 +269,8 @@ theorem stepW_core {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
     rw [memΛ]
     have : Qi *ᵥ (∑ a, c a • W a) = ∑ a, c a • (Qi *ᵥ W a) := by
       show Matrix.mulVecLin Qi (∑ a, c a • W a) = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_smul, Matrix.mulVecLin_apply]
     rwa [this]
   set Z0 : Fin (r + 1) → Fin n → Fv F v ⊗[F] E := fun a => Qi *ᵥ Y0 a with hZ0def
@@ -350,8 +350,8 @@ theorem stepW_core {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
     · intro i
       rw [hkstd, SD.fst_proj_split_matrix_mulVec]
       have := congrArg (fun M => f (M i a)) hk1A
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mul_apply, map_sum, map_mul] at this
+
+      simp only [Matrix.mul_apply, map_sum, map_mul] at this
       simp only [mulVec, dotProduct, Matrix.map_apply]
       exact this
     · intro i
@@ -359,8 +359,8 @@ theorem stepW_core {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
         rw [← hk1B, ← Matrix.mul_assoc, e3, Matrix.one_mul]
       rw [hkstd, SD.snd_proj_split_matrix_mulVec]
       have := congrArg (fun M => f (M i a)) hB
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mul_apply, map_sum, map_mul] at this
+
+      simp only [Matrix.mul_apply, map_sum, map_mul] at this
       simp only [mulVec, dotProduct, Matrix.map_apply]
       exact this
 

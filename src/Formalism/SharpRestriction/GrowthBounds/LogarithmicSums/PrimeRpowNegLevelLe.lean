@@ -27,7 +27,7 @@ theorem fin_arith (m N q : ℝ) (hm : 2 ≤ m) (hN : 1 ≤ N) (hq : 500 ≤ q) :
   have h3 : 1000 ≤ m * (N * q) := by nlinarith
   linarith
 
-set_option maxHeartbeats 800000 in
+
 theorem sv_le (X : Inst D L) (K : Consts) (hK : K.Nonneg) (P : ParameterChoice' D L) {a b : HH D → ℤ} (h : InWin L a b) (p : ℕ)
     (hp : p.Prime) (hpX : (p : ℝ) < L.sc.X') (t0 : HH D) :
     Sv X K a b p t0 ≤ 2 * (D.R.m : ℝ) * (Nv X p t0 : ℝ) * L.sc.a / p := by

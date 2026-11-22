@@ -85,7 +85,7 @@ theorem isomFin_tr (i : Fin a.D.R.m) : @principalLevelFrame.IsIsomFin c.to.D (Yc
   case lat => exact (by with_unfolding_all exact ((Y.isomFin i).lat :))
 
 
-set_option maxHeartbeats 800000 in
+
 def read : @Read c.to.D G _ _ Pl0 I0 T (famInThreeCoefficientChange c.to A) Ks _ _ (alg c.to iK) ((by with_unfolding_all exact ((real c.to R) :))) ((by with_unfolding_all exact ((face c.to F) :))) (baseLevelRowSideTransport c X0) :=
   @Read.mk c.to.D G _ _ Pl0 I0 T (famInThreeCoefficientChange c.to A) Ks _ _ (alg c.to iK) ((by with_unfolding_all exact ((real c.to R) :))) ((by with_unfolding_all exact ((face c.to F) :))) (baseLevelRowSideTransport c X0)
     (tup := (by with_unfolding_all exact (Y.tup :)))

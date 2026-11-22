@@ -118,7 +118,7 @@ end PositivityTheory.Rg.Sw.Glob.LeviH
 namespace PositivityTheory.Rg.Sw.Glob
 
 open LeviH in
-set_option maxHeartbeats 800000 in
+
 theorem leviTau : LeviTau := by
   intro D n V ψ χ θ μ ω H l s ν τ ε fr ι hC y a ha hya
   have hθ := hC.hθ

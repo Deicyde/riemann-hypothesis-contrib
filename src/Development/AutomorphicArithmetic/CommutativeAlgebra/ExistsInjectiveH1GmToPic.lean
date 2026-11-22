@@ -101,7 +101,7 @@ private def PD : Data where
 
 end UpperTheory.PicD
 
-set_option maxHeartbeats 1000000 in
+
 open UpperTheory.PicD in
 theorem UpperTheory.exists_injective_h1_gm_to_pic :
     ∀ (A : Type) [CommRing A], ∃ φ : H ℤ (sp A) Gm 1 →+ Additive (CommRing.Pic A), Function.Injective φ := by

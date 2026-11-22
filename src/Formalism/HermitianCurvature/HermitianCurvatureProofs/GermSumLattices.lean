@@ -146,9 +146,9 @@ theorem double_germ (h h' : Point K) (t₁ t₂ κ : Kˣ) (cr : K ⧸ R.toAddSub
   apply Finset.sum_congr rfl
   intro z hz
   have hz' : z ^ (m + 1) = (-t₁) ^ m * cr x := by simpa using hz
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hherm (pt2 h' m t₂ (cr x)) (addBlock h (m + 1) z), hG2 x hx', germSum_eq R ψ m γ hroots,
-    map_mul, Complex.conj_ofReal, map_sum]
+
+  rw [hherm (pt2 h' m t₂ (cr x)) (addBlock h (m + 1) z), hG2 x hx', germSum_eq R ψ m γ hroots,
+  map_mul, Complex.conj_ofReal, map_sum]
   have hz₀ : (κ * z) ^ (m + 1) = (-t₂) ^ m * cr x := by
     rw [mul_pow, hκ, hz', ← mul_assoc, ← mul_pow]
     congr 2

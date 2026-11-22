@@ -28,8 +28,8 @@ theorem cosetSum_mem_fixed (ρ : Representation ℂ G V) {K N : Subgroup G} [Fin
     (hv : v ∈ GroundTheory.Automorphic.fixedVectors ρ N) :
     GroundTheory.Automorphic.cosetSum ρ K N v ∈ GroundTheory.Automorphic.fixedVectors ρ K := by
   intro k hk
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [GroundTheory.Automorphic.cosetSum_apply, map_sum]
+
+  rw [GroundTheory.Automorphic.cosetSum_apply, map_sum]
   refine Fintype.sum_equiv (MulAction.toPerm (⟨k, hk⟩ : K)) _ _ fun q => ?_
   rw [← Module.End.mul_apply, ← map_mul]
   have := GroundTheory.Automorphic.act_eq_of_mk_eq ρ hv (a := ⟨k, hk⟩ * Quotient.out q)
@@ -45,8 +45,8 @@ theorem opOf_eq (ρ : Representation ℂ G V) (f : G →₀ ℂ) (v : V) :
 theorem opOf_map {W : Type} [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G V)
     (τ : Representation ℂ G W) (F : V →ₗ[ℂ] W) (hF : ∀ g v, F (ρ g v) = τ g (F v)) (f : G →₀ ℂ) (v : V) :
     F (GlobalTheory.Cong.opOf ρ f v) = GlobalTheory.Cong.opOf τ f (F v) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [GlobalTheory.Cong.opOf, Finsupp.sum, map_sum, map_smul, hF]
+
+  simp only [GlobalTheory.Cong.opOf, Finsupp.sum, map_sum, map_smul, hF]
 
 end GlobalTheory.LocOpAct
 
@@ -100,8 +100,8 @@ theorem GlobalTheory.Cong.opOf_locU_eq_smul : ∀ (E : Type) [Field E] [NumberFi
         have hv : v ∈ GroundTheory.Automorphic.fixedVectors σ.ρ N' := fun n hn => hle hn
         have hu := GlobalTheory.LocOpAct.cosetSum_mem_fixed σ.ρ (K := Kw) hv
         have hcs : GroundTheory.Automorphic.cosetSum ρ' Kw N' (F.1 v) = F.1 (GroundTheory.Automorphic.cosetSum σ.ρ Kw N' v) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [GroundTheory.Automorphic.cosetSum_apply, GroundTheory.Automorphic.cosetSum_apply, map_sum]
+
+          rw [GroundTheory.Automorphic.cosetSum_apply, GroundTheory.Automorphic.cosetSum_apply, map_sum]
           simp only [hFint]
         have hfix : GroundTheory.Automorphic.cosetSum σ.ρ Kw N' v ∈ GlobalTheory.PRep.fixed σ.ρ Kw := fun k => by
           show σ.ρ k _ = ((1 : Kw →* ℂˣ) k : ℂ) • _

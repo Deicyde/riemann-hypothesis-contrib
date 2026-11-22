@@ -47,8 +47,8 @@ theorem coeff_zl {C : Type} [Field C] {dd : ℕ} (v : Fin dd → C) (F : PS C 2 
     MvPowerSeries.coeff ν (zl v F) = ∑ j, v j * MvPowerSeries.coeff
       (ν.mapDomain (fun q : Fin 1 × Fin dd => ((0 : Fin 2), q.2)) + Finsupp.single ((1 : Fin 2), j) 1) F := by
   unfold zl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [MvPowerSeries.coeff_C_mul]
   conv_lhs => rw [← snd_map ν]
@@ -241,8 +241,8 @@ theorem zl_hAB (Y : FBChart C V O dd) {A B : Pt C 1 dd} (hA : ∀ i, constantCoe
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => ?_
   unfold linAct
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_mul]
+
+  rw [map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul]
   ring

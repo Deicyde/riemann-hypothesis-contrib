@@ -138,7 +138,7 @@ theorem FinGradedSub.embedC_of_not {n : ℕ} (s : Cech.Cochain (fun I : Chart x 
   simp only [FinGradedSub.embedC, LinearMap.coe_mk, AddHom.coe_mk]
   rw [dite_eq_right h]
 
-set_option synthInstance.maxHeartbeats 100000 in
+
 theorem FinGradedSub.embedC_d (n : ℕ) (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n) :
     M.embedC c (n + 1) (Cech.d _ (M.tildeSys c).res n s) =
       Cech.d (fun _ : StdCell N => ConeLaurent S x) (supportRes S x) n (M.embedC c n s) := by

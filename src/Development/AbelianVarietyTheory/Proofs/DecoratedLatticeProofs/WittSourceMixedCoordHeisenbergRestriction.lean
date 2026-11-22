@@ -55,7 +55,7 @@ theorem isIsoSplit_hyp {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (hρ :
     rw [rat_mul, rat_mul, rat_conjTranspose, rat_zero, Matrix.mul_assoc]
     exact d.wittDecomp_gram_X_anisotropic
 
-set_option maxHeartbeats 1000000 in
+
 theorem mem_NI_hyp {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (g : GA D S) (h1 : mt S g ⬝ d.jX = d.jX)
     (h2 : d.pY ⬝ mt S g = d.pY) (B : Mx D ρ S₀.rank) (h3 : mt S g ⬝ d.j0 = d.j0 + d.jX ⬝ B) : g ∈ NI S d.e := by
   apply Subgroup.subset_closure

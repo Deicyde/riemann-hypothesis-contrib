@@ -13,7 +13,7 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNo
 
 namespace Formalism.L2.SG.Pf.Coef.SplitCoefficientComponents
 
-set_option maxHeartbeats 1600000
+
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

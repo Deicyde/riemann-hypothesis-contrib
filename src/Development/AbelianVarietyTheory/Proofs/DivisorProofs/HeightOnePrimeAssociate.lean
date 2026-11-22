@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.M
 @[expose] public section
 
 open IsLocalRing
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.height_one_prime_associate : ∀ (A' B' : Type) [CommRing A'] [CommRing B'] [IsDomain B'] [IsNoetherianRing B']
     [IsIntegrallyClosed B'] [Algebra A' B'] (𝔭 : Ideal A'), (𝔭.map (algebraMap A' B')).IsPrime →
     (𝔭.map (algebraMap A' B')).height = 1 → ∀ c : B', c ≠ 0 →

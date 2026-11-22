@@ -27,7 +27,7 @@ theorem sum_le_norm (x : mixedSpace F) : ∑ w : InfinitePlace F, normAtPlace w 
   rw [norm_eq_sup'_normAtPlace]
   exact Finset.le_sup' (fun w => normAtPlace w x) hw
 
-set_option maxHeartbeats 800000 in
+
 theorem slice_core {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (e : ((κ → AF F) → ℂ) →ₗ[ℂ] (κ₁ → AF F) → ℂ)
     (ei : SInf F κ →L[ℂ] SInf F κ₁) (ef : ((κ → Af F) → ℂ) → (κ₁ → Af F) → ℂ) (h0 : ei ≠ 0)
     (he : ∀ φ ∈ SB (κ → Af F), ef φ ∈ SB _ ∧ ∀ f : SInf F κ, e (pureA F f φ) = pureA F (ei f) (ef φ))
@@ -200,8 +200,8 @@ theorem slice_of : Slice := by
     (fun j => M.co.e (incM F (z j))) (fun j a Φ hΦ => by rw [← map_smul]; exact he.inv _ (hD.mem j a) Φ hΦ)
     (fun i j => by rw [← M.co.form]; convert hD.pair i j) hφ
   refine ⟨r, φ₁, C, A, h1, h2, h3, fun y f => ?_, h5⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← h4, Darboux.rho, lin, map_sum]
+
+  rw [← h4, Darboux.rho, lin, map_sum]
   simp only [map_smul]
 
 theorem evAdm_of : EvAdm := by

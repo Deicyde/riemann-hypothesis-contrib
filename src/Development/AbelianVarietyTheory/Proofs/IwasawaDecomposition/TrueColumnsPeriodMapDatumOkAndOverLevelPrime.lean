@@ -74,7 +74,7 @@ theorem stX_ok (a : I.ι) : (I.stX a).Ok := by
       (Subtype.ext ((toGLm B.fields.E (B.R.N B.R.m - 1)).injective (h₁.trans (map_one _).symm)))
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem perIn_ok (h : I.Ok) (u : B.Word) (a : I.ι) : (I.perIn u a).Ok := {
   step := stX_ok a
   til_smul _ g p := Subtype.ext (Prod.ext
@@ -109,7 +109,7 @@ theorem perIn_ok (h : I.Ok) (u : B.Word) (a : I.ι) : (I.perIn u a).Ok := {
   H_rat _ g := ⟨g, Subgroup.mem_top _, rfl⟩ }
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem perIn_over (h : I.Ok) (u : B.Word) (a : I.ι) : (I.perIn u a).Over (I.atIn u a) := {
   norm_tz := by
     show star (star (((B.primes X).piT u : 𝓞 B.fields.E) : B.fields.E)) *

@@ -17,7 +17,7 @@ open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic
 open GroundTheory.Automorphic.CuspidalProjection PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory.K
 open scoped InnerProductSpace
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.ConvolutionTheory.K.kern2 :
     Kern2 := by
   intro K _ _ n μ _ θ a g ha ha' hg hg'

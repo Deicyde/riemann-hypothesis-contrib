@@ -97,9 +97,9 @@ theorem mk_decomp (g : ℕ → ℂ) (m : ℕ) :
     PowerSeries.mk g = ∑ j ∈ range (m + 1), g j • (X : PowerSeries ℂ) ^ j
       + X ^ (m + 1) * PowerSeries.mk (fun i => g (i + (m + 1))) := by
   ext k
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, coeff_mk, coeff_X_pow_mul', LinearMap.map_smul, coeff_X_pow,
-    smul_eq_mul, mul_ite, mul_one, mul_zero]
+
+  simp only [map_add (f := _), map_sum, coeff_mk, coeff_X_pow_mul', LinearMap.map_smul, coeff_X_pow,
+  smul_eq_mul, mul_ite, mul_one, mul_zero]
   by_cases hk : m + 1 ≤ k
   · rw [if_pos hk, Nat.sub_add_cancel hk, sum_ite_eq]
     simp [mem_range]
@@ -119,8 +119,8 @@ theorem sum_of_subst (N : ℂ) (τ g : ℕ → ℂ) {w : PowerSeries ℂ} (hw : 
   have hG : θ (PowerSeries.mk g) = ∑ j ∈ range (m + 1), g j • (-(X * w)) ^ j
       + (-(X * w)) ^ (m + 1) * θ H := by
     conv_lhs => rw [mk_decomp g m]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_smul, map_mul, map_pow, hX, hH]
+
+    simp only [map_add (f := _), map_sum, map_smul, map_mul, map_pow, hX, hH]
   rw [hθ, map_sub, map_one, map_mul, hX, hG] at h
   have hterm : ∀ j, Q * (X * w) * (g j • (-(X * w)) ^ j)
       = (g j * (-1) ^ j) • (X * bser N τ j) := by
@@ -133,9 +133,9 @@ theorem sum_of_subst (N : ℂ) (τ g : ℕ → ℂ) {w : PowerSeries ℂ} (hw : 
     rw [← h, ← sum_congr rfl fun j _ => hterm j, ← mul_sum, neg_mul_eq_mul_neg X w, mul_pow]
     ring
   have hc := congrArg (coeff (m + 1)) hfin
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, LinearMap.map_smul, coeff_succ_X_mul, coeff_bser, coeff_X_pow_mul',
-    smul_eq_mul, hQ, map_sub, coeff_mk, coeff_one] at hc
+
+  simp only [map_add (f := _), map_sum, LinearMap.map_smul, coeff_succ_X_mul, coeff_bser, coeff_X_pow_mul',
+  smul_eq_mul, hQ, map_sub, coeff_mk, coeff_one] at hc
   simp at hc
   have e : ∑ j ∈ range (m + 1), bco N τ m j * ((-1) ^ j * g j)
       = ∑ x ∈ range (m + 1), g x * (-1) ^ x * bco N τ m x :=

@@ -55,8 +55,8 @@ theorem EL_add (F G : PowerSeries O) : EL Br a (F + G) = EL Br a F + EL Br a G :
 
 theorem EL_sum {I : Type} (s : Finset I) (F : I → PowerSeries O) :
     EL Br a (∑ i ∈ s, F i) = ∑ i ∈ s, EL Br a (F i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [EL, cst_sum' Br, Finset.mul_sum, map_sum]
+
+  simp only [EL, cst_sum' Br, Finset.mul_sum, map_sum]
 
 theorem EL_zero : EL Br a 0 = 0 := by
   have h : Br.cst 0 = 0 := by
@@ -141,15 +141,15 @@ theorem crisMap_coords (W : LocWach PD LL O v n) {T₁ T₂ : LocLat G Qp LL O} 
       ∑ k, algebraMap O LL (μ m k) • ((φVB PD (LL := LL) (V := T₂.V)) ^ e) (cmpD W T₂ (bb k)) := by
     intro m
     have hm := hμ m
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dvO, dv, map_sum, map_smul] at hm
+
+    simp only [dvO, dv, map_sum, map_smul] at hm
     simpa [Pi.single_apply] using hm
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dvO, dv, map_sum, map_smul, hX, Finset.smul_sum, smul_smul, map_mul, Finset.sum_smul]
+
+  simp only [dvO, dv, map_sum, map_smul, hX, Finset.smul_sum, smul_smul, map_mul, Finset.sum_smul]
   exact Finset.sum_comm
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem lift2a [NeZero n] [Fintype (K →ₐ[Qp] LL)] [IsDomain O] [IsDiscreteValuationRing O]
     [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : LocWach PD LL O v n)
     {T₁ T₂ : LocLat G Qp LL O} (F : LatHom T₁.L T₂.L) {b w S η m : ℕ} {up : ZMod n → Bool}
@@ -303,8 +303,8 @@ theorem lift2a [NeZero n] [Fintype (K →ₐ[Qp] LL)] [IsDomain O] [IsDiscreteVa
   set zb : W.DD T₁ := ∑ δ ∈ W.DelF, W.γD T₁ δ ((letE a : LetA O n) • z₀) with hzb
   obtain ⟨hzbΔ, hzblet⟩ := avg_props W a hzN hzlet
   have hmapzb : W.map F zb = (W.DelF.card : ℕ) • (W.π₀ ^ AA • y) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hzb, map_sum]
+
+    rw [hzb, map_sum]
     have : ∀ δ ∈ W.DelF, W.map F (W.γD T₁ δ ((letE a : LetA O n) • z₀)) = W.π₀ ^ AA • y := by
       intro δ hδ
       rw [W.map_γ, hzmap, γD_smulA, hy'.2 δ hδ,
@@ -433,8 +433,8 @@ theorem lift2a [NeZero n] [Fintype (K →ₐ[Qp] LL)] [IsDomain O] [IsDiscreteVa
   have hlC : ∀ m, ((PD.p : ℕ) : O) ^ κ * Cc m = ∑ i, coef i * c₀ i m := by
     intro m
     have := congrArg (PowerSeries.coeff J) (hstar m)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [PowerSeries.coeff_C_mul, map_sum] at this
+
+    rw [PowerSeries.coeff_C_mul, map_sum] at this
     show _ * PowerSeries.coeff J (Φ m) = _
     rw [this]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -532,8 +532,8 @@ theorem lift2a [NeZero n] [Fintype (K →ₐ[Qp] LL)] [IsDomain O] [IsDiscreteVa
         rw [e, hUu, ← mul_assoc, ← map_mul, EL_mulA Br a _ _ _ hc2, mul_assoc]
       exact hL.symm.trans (h1.trans hR)
     have hco := congrArg (PowerSeries.coeff J) hser
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [PowerSeries.coeff_C_mul, map_sub, map_sum, PowerSeries.coeff_X_pow_mul', if_neg (by omega)] at hco
+
+    rw [PowerSeries.coeff_C_mul, map_sub, map_sum, PowerSeries.coeff_X_pow_mul', if_neg (by omega)] at hco
     have hδc : PowerSeries.coeff J δk = if k = k₀ then ((W.DelF.card : ℕ) : O) * ((PD.p : ℕ) : O) ^ (2 * σ) else 0 := by
       by_cases hk : k = k₀
       · simp only [hδk, if_pos hk, hR₀def]

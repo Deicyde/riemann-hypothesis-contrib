@@ -292,7 +292,7 @@ section Lat
 
 variable {D : D7} {S T : HSp D}
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem eq_nsmul_of_parts {v l : WO S T} {n : ℕ} (hv0 : v.map (infPart D) = 0) (hl0 : l.map (infPart D) = 0)
     (h : (v - (1 : ℕ) • (n • l)).map (finPart D) = 0) : v = n • l := by
   rw [one_smul] at h
@@ -302,7 +302,7 @@ theorem eq_nsmul_of_parts {v l : WO S T} {n : ℕ} (hv0 : v.map (infPart D) = 0)
   rw [nsmul_eq_mul, RingHom.map_sub, RingHom.map_mul, show infPart D (v i j) = 0 from congrFun (congrFun hv0 i) j,
     show infPart D (l i j) = 0 from congrFun (congrFun hl0 i) j, mul_zero, sub_zero]
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem psi_nsmul_lat {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
     {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)} (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT)
     {l l₁ k : WO S T} (hl : l ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)

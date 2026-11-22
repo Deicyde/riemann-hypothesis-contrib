@@ -94,8 +94,8 @@ theorem exists_diagonal (h : IsCMExt F E σ) {a : GAd σ J} (ha : a ∈ infPts �
         ← InfinitePlace.Completion.ringEquivRealOfIsReal_apply (hR w), RingEquiv.apply_symm_apply]
     have hij := congrFun (congrFun (hs w τ) i) j
     rw [Matrix.mul_apply, Matrix.mul_diagonal] at hij
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, Matrix.map_apply, hZ, hc, ← harch]
+
+    simp only [map_sum, map_mul, Matrix.map_apply, hZ, hc, ← harch]
     simpa only [Matrix.map_apply] using hij
   · have hfin : ∀ k l, (Algebra.TensorProduct.map (sndA F) (AlgHom.id F E)).toRingHom ((matHom _ σ J a).1 k l) =
         (1 : Matrix (Fin n) (Fin n) (Af F ⊗[F] E)) k l := fun k l =>
@@ -105,9 +105,9 @@ theorem exists_diagonal (h : IsCMExt F E σ) {a : GAd σ J} (ha : a ∈ infPts �
         ((pairA F (c j) 1 : AF F) ⊗ₜ[F] (1 : E)) = 1 := by
       rw [AlgHom.toRingHom_eq_coe, RingHom.coe_coe, Algebra.TensorProduct.map_tmul]
       rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hfin, hδ, Matrix.one_apply, ite_mul, one_mul, zero_mul, mul_one,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true]
+
+    simp only [map_sum, map_mul, hfin, hδ, Matrix.one_apply, ite_mul, one_mul, zero_mul, mul_one,
+    Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
 theorem mem_parFlag (h : IsCMExt F E σ) {a : GAd σ J} (ha : a ∈ infPts σ J) (Z : Matrix (Fin n) (Fin r) E)
     (d : Fin r → ℕ) (s : Fin r → ℝ) (h0 : ∀ i, s i ≠ 0) (hs : ∀ (w : InfinitePlace F) (τ : EmbOver E w),

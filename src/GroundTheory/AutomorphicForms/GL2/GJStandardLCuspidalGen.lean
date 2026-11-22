@@ -29,7 +29,7 @@ namespace GroundTheory.Automorphic.GJStandardLCuspidal
 
 noncomputable section
 
-set_option maxHeartbeats 1000000
+
 set_option linter.unusedSectionVars false
 
 section Abstract

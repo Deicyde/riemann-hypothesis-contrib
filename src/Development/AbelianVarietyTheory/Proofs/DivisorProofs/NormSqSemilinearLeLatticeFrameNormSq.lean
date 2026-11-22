@@ -71,8 +71,8 @@ theorem GlobalTheory.frame_semilinear_sq_le : ∀ (K V : Type) [Field K] [Number
     simp only [hβ', map_mul, hlam, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun l _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [he, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
+
+    simp only [he, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun j _ => by ring
 
   have hxmem : (x : V) ∈ Submodule.span (𝓞 K) (Set.range fun k => (gw k : V)) := by
@@ -92,8 +92,8 @@ theorem GlobalTheory.frame_semilinear_sq_le : ∀ (K V : Type) [Field K] [Number
       rw [← hβ, Finset.sum_congr rfl fun k _ => hk k, Finset.sum_comm]
       simp_rw [← Finset.sum_smul]
       rw [Module.Basis.repr_sum_self]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hr, h2, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
+
+    simp only [hr, h2, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
 

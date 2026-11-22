@@ -270,8 +270,8 @@ theorem cinv_crd (y : (VS D).V) : cinv X (crd X y) = y := by
 
 theorem crd_cinv (x : Fin X.B.I.n → X.B.I.E) : crd X (cinv X x) = x := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [crd, crdOf, cinv, Finsupp.single_apply]
+
+  simp [crd, crdOf, cinv, Finsupp.single_apply]
 
 theorem cinv_add (x y : Fin X.B.I.n → X.B.I.E) : cinv X (x + y) = cinv X x + cinv X y := by
   simp only [cinv, Pi.add_apply, map_add (f := _), add_smul, Finset.sum_add_distrib]
@@ -403,8 +403,8 @@ variable {D : D7} (X : HidaSetting D)
 
 theorem cinv_sum {ι : Type} (s : Finset ι) (x : ι → Fin X.B.I.n → X.B.I.E) :
     cinv X (∑ j ∈ s, x j) = ∑ j ∈ s, cinv X (x j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [cinv, Finset.sum_apply, map_sum, Finset.sum_smul]
+
+  simp only [cinv, Finset.sum_apply, map_sum, Finset.sum_smul]
   exact Finset.sum_comm
 
 theorem fe (a b : Fin D.R.rS) : (VS D).hT (X.fY b) (X.eX a) = if a = b then 1 else 0 := by

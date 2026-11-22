@@ -120,9 +120,9 @@ private theorem kappa (b : Blo S r) {w : Pl E} (hw : w ∉ S) {ϖ : w.adicComple
     simpa only [inv_inv] using this
   have h3 := Finset.sum_congr (rfl : (Finset.univ : Finset (Fin n)) = _) fun i _ => h1 i
   rw [← integral_finsetSum _ fun i _ => h2 i] at h3
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← Finset.mul_sum, ← map_sum, hs', map_mul, mul_left_comm _ (starRingEnd ℂ μ), integral_const_mul,
-    Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul] at h3
+
+  simp only [← Finset.mul_sum, ← map_sum, hs', map_mul, mul_left_comm _ (starRingEnd ℂ μ), integral_const_mul,
+  Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul] at h3
   rw [mul_assoc, ← h3, inv_mul_cancel_left₀ hn']
 
 private theorem adj (b : Blo S r) {w : Pl E} (hw : w ∉ S) {ϖ : w.adicCompletion E} (hϖ : ϖ ∈ Ov E w) (hu : IsUnifV E w ϖ)

@@ -20,8 +20,8 @@ theorem thetaLogIsSubst : ThetaLogIsSubst := by
   have hz0 : ∀ x : Bool × EV ν r0 r1, MvPowerSeries.constantCoeff (zLin om oms x) = 0 := by
     intro x
     unfold zLin
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     apply Finset.sum_eq_zero
     intro s _
     split_ifs <;> simp

@@ -122,8 +122,8 @@ theorem isCell_pullA (hc : ∀ a, σ (bar a) = bar (σ a)) (hev : TwEval σ ψ) 
       obtain ⟨k, c, hk, hkc⟩ := h3 _ hβ0 (fun y => hp _) he
       refine ⟨k, c, hk, ?_⟩
       have := congrArg (pullA τ) hkc
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_nsmul, pullA_pullA_symm, map_sum] at this
+
+      rw [map_nsmul, pullA_pullA_symm, map_sum] at this
       simpa only [map_nsmul] using this
 
 end Cell

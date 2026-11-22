@@ -38,8 +38,8 @@ theorem deg_aeval_eq_prod_aroots :
     rw [hΦev m]
     change (deg (∑ i, m i • End.addEquiv (Polynomial.aeval f (u i))) : ℚ) =
       (deg (End.addEquiv (Polynomial.aeval f (∑ i, m i • u i))) : ℚ)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_zsmul]
+
+    simp only [map_sum, map_zsmul]
   · exact hm.map _
   · rw [Polynomial.natDegree_map_eq_of_injective (RingHom.injective_int _)]
     exact hd

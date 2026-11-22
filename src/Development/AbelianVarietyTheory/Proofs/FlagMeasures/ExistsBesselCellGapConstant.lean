@@ -23,7 +23,7 @@ open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.
 
 namespace GlobalTheory.GapConstant
 
-set_option maxHeartbeats 2000000 in
+
 theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k) :
     Formalism.FourierDecayAlt.ThreeDimData.GapOK k r (1000 * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
               (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)) ∧

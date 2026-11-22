@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KummerTow
 @[expose] public section
 
 open GlobalTheory.K5 GlobalTheory.KumDlog
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.kaehler_relation_derivationModIntegral : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], ∀ (n : ℕ) (ι : On p n →ₐ[O0 p] Ω) (S : Subalgebra (O0 p) Ω), (∀ x ∈ S, IsInt (p := p) x) → (∀ x, ι x ∈ S) →
   ∀ D : Ω → Ω, IsDer S D → ∀ a b c x y z : On p n,
   a • KaehlerDifferential.D (O0 p) (On p n) x = b • KaehlerDifferential.D (O0 p) (On p n) y + c • KaehlerDifferential.D (O0 p) (On p n) z →

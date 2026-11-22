@@ -182,8 +182,8 @@ theorem totalDegree_add_card_le_ringKrullDim (h1 : HilbEventuallyPoly.Statement.
       have hall : ∀ᶠ m in Filter.atTop, ∀ j, (hilbFn (Q j) (m - fun k => (c j k : ℤ)) : ℚ) =
           eval (fun k => (m k : ℚ)) (q j) := Filter.eventually_all.mpr hq
       filter_upwards [hall, hsum] with m hm hm'
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hm', map_sum]
+
+      rw [hm', map_sum]
       push_cast
       exact Finset.sum_congr rfl fun j _ => hm j
     have hpq := hU K _ p _ hp hsumP

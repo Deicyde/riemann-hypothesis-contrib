@@ -15,7 +15,7 @@ open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.Genus
 open scoped TensorProduct Matrix
 open scoped GlobalTheory.VacAny
 
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.LatVacBdd
 

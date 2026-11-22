@@ -143,7 +143,7 @@ theorem big {r j : ℕ} {x : Y.Fam M r j} (hx : CB.Comp x) (a : ℕ) (ha : r < a
   rw [H.gam_eq hM le_rfl hx hw]
   exact (isCo H.co (S r) hM j r.lt_succ_self).big a ha w
 
-set_option maxHeartbeats 1600000 in
+
 theorem sh {r r' j : ℕ} (k : ℕ) (h : r + k = r') {x : Y.Fam M r j} (hx : CB.Comp x) (hs : CB.Comp (CB.shS k h x)) (a : ℕ) :
     gam S (CB.shS k h x) a = gam S x a := by
   have hr : r ≤ r' := by omega

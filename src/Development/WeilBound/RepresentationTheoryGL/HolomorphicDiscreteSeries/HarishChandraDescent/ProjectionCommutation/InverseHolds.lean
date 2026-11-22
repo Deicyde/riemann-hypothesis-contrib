@@ -48,7 +48,7 @@ end InverseCommuting
 
 open InverseCommuting
 
-set_option maxHeartbeats 800000 in
+
 theorem inverse_holds : Inv := by
   intro H _ _ _ D B ι U hD hB hnorm hadj hU hcomm
   let f : ↥D →ₗ[ℂ] H := D.subtype ∘ₗ B

@@ -221,8 +221,8 @@ theorem mulVec_sub_mem_of_triple_product_fixing {n : ℕ} {R : Type} [CommRing R
   exact hk
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem vanish {Y V : HSp D} (d : HermitianOrthogonalExtensionData Y V 1 1) (Λ : Lat V) (𝔪 : Ideal (𝓞 D.host.E)) (hΛ : IsSelfDualC V Λ)
     (hz : zv d ∈ Λ) (x : GA D Y) (γ : GA D V) (z : Fin V.rank → D.host.E) (hzγ : mt V γ *ᵥ ratV (zv d) = ratV z)
     (h : GA D Y) (hk : Lev.finE V (stabilizerEmbedding d x⁻¹ * γ * stabilizerEmbedding d h) ∈ congLev D.sp.cm V.gram Λ 𝔪) :

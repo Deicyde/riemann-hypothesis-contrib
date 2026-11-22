@@ -199,7 +199,7 @@ theorem keeps_inv_gram (σ : E →ₐ[F] E) {nS : ℕ} (JS JB : Matrix (Fin nS) 
   exact hxi.smul_left_cancel.1 e1
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem memS_of_UG (σ : E →ₐ[F] E) {nS : ℕ} (JS JB : Matrix (Fin nS) (Fin nS) E) (hdet : JS.det ≠ 0) (ξ₀ : E)
     (hξ₀ : ξ₀ ≠ 0) (ξ : AF F ⊗[F] E) (hB : ξ • incM F JB = incM F (ξ₀ • JS⁻¹)) (b : UG (cA σ) (incM F JB)) :
     ∃ G : GL (Fin nS) (AF F ⊗[F] E), G.1 = (b⁻¹).1.1ᵀ ∧ G ∈ HR (AF F) σ JS := by
@@ -251,7 +251,7 @@ theorem isThetaFunOF_thetaTr : ∀ (F E : Type) [Field F] [NumberField F] [Field
       smooth := GlobalTheory.T.contDiff_thetaTransform_realLines_cmExtension F E σ B hB nS nT JS JT hS hT ξ₀ hξ₀ hξc hstd JA JB ξ hA hBξ κ co hco φ hφ }
 
 
-set_option maxHeartbeats 400000 in
+
 theorem pres_impl : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
     B.IsGood σ → ∀ (nS nT : ℕ) (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E),
       IsHermND σ JS → IsHermND σ JT → ∀ ξ₀ : E, ξ₀ ≠ 0 → σ ξ₀ = -ξ₀ →

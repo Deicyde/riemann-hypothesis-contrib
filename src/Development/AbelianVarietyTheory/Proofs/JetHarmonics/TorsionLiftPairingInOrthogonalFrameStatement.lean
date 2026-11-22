@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.Jets.CmLatticeCommuta
 
 open GlobalTheory.MomOne Formalism.L2.Ker.JMB
 open scoped ComplexConjugate BigOperators
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.torsion_lift_pairing_in_orthogonal_frame :
     ∀ (q : ℕ) [Fact q.Prime] (lam : Qbar →+* ℂ_[q]) (ι : ℂ ≃+* ℂ_[q])
       (g : ℕ) (S : Setup g) (x : Fin g → Fin g → ℂ) (a : Fin g → ℕ) (r : ℕ)

@@ -181,7 +181,7 @@ theorem sval_rel {k : ℕ} (x : D'.X) (s : LB.Sec (LB.LinComb D.P.L (DegPre.fam�
     (e.trans ?_)
   exact congrArg₂ (· * ·) (congrArg Units.val p) rfl
 
-set_option maxHeartbeats 1000000 in
+
 include hT hΘ₁ hΘ₂ in
 theorem phiVal_pull (hG : GlobalFnsSt) {k : ℕ} (p₀ : QkPt D F k) (p₀' : QkPt D' F k) (hy : p₀'.y = hD.xe.symm p₀.y)
     (hg : IsPullGtF φ hD F p₀.g p₀'.g)

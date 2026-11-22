@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.JetsTorsi
 open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
 open scoped BigOperators
 
-set_option maxHeartbeats 1000000 in
+
 open GlobalTheory.NormSum.KernelAt in
 theorem UpperTheory.WildA.cmbIop :
     ∀ (D : D7), Inp D → ∀ (cc : Ideal (𝓞 D.host.K)), cc = ⊤ → ∀ (δ t0 : ℂ), Crv D cc δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D cc δ) t0 →

@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.UnderT
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.UG Formalism.MainNotions Formalism.L2.Col Formalism.L2.Ker Formalism.L2.DIV Formalism.L2.PairingIndexBounds.F Formalism.MainNotions.G.KAat Formalism.L2.Forms Formalism.MainNotions.G GlobalTheory.TwU GlobalTheory.TwV
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.orthonormalChange_intertwines_rationalIsometries : UnderTie (fun {D L hT Gi Gl Kc Y cX ex t u μ St} A dtU a =>
     ∀ i (hi : i + 1 ≤ D.R.m) (γ : GL (Fin (D.R.N i)) D.host.E) (γ' : GL (Fin (D.R.N (i + 1))) D.host.E)
       (g : UF t.X.E (D.R.N i)) (g' : UF t.X.E (D.R.N (i + 1))),

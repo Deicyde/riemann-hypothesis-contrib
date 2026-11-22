@@ -40,7 +40,7 @@ private theorem realAd_one_smul {F : Type} [Field F] [NumberField F] {U : Type} 
   rw [sub_smul, one_smul, sub_eq_zero] at h
   exact h.symm
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.exists_polynomial_of_isFinF_thetaLift_pureTensor :
     ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (ε : Bool) (S X : HSp D) (d : ℕ) (e : Fin d ≃ Fin X.rank)
         (Bs : Base D.host.F D.host.E) (Vs : Spc D.host.F D.host.E S.rank) (Ws : Spc D.host.F D.host.E d)

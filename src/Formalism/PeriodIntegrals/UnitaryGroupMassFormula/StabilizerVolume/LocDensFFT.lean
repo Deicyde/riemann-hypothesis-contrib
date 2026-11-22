@@ -148,11 +148,11 @@ theorem card_transport {k K : Type} [Field k] [CommRing K] [Algebra k K] (σ : K
     funext i j
     show ∑ a', ∑ b, (e (X i a')).swap * e (J a' b) * e (X j b) =
       e (∑ a', ∑ b, σ (X i a') * J a' b * X j b)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun a' _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [map_mul, map_mul, he]
   rw [key]

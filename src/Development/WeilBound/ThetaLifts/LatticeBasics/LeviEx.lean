@@ -46,8 +46,8 @@ theorem leviEx : LeviEx := by
   let N : Matrix (Fin d) (Fin 2) E := (Matrix.of ![H.x, H.y])ᵀ
   let P := Matrix.fromCols H.ι N
   have hsk (x y : Fin d → E) : form σ W.J x y = -σ (form σ W.J y x) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [form, dotProduct, Matrix.mulVec, map_sum, map_mul, Finset.mul_sum, inv, hW.skew, ← Finset.sum_neg_distrib]
+
+    simp only [form, dotProduct, Matrix.mulVec, map_sum, map_mul, Finset.mul_sum, inv, hW.skew, ← Finset.sum_neg_distrib]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
   have hFull : W.L.IsFullLattice E := by
@@ -111,9 +111,9 @@ theorem leviEx : LeviEx := by
   have o2 : Nᵀ * W.J * H.ι.map σ = 0 := by
     ext j i
     have := congrArg σ (congrFun (congrFun o1 i) j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, inv, hW.skew, Matrix.zero_apply,
-      map_zero, Finset.sum_mul] at this ⊢
+
+    simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, inv, hW.skew, Matrix.zero_apply,
+    map_zero, Finset.sum_mul] at this ⊢
     rw [Finset.sum_comm, ← neg_eq_zero, ← this, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [← Finset.sum_neg_distrib]

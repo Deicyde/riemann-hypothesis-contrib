@@ -34,7 +34,7 @@ theorem addVal_prod {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) {ι 
   | empty => simp
   | insert i s hi ih => rw [Finset.prod_insert hi, Finset.sum_insert hi, v.map_mul, ih]
 
-set_option maxHeartbeats 1000000 in
+
 theorem herbrand_lengthIdentities_auxiliary_bound (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (S : Type)
     [Fintype S] [DecidableEq S] (a : S → Int0 v) (ha : Function.Injective a) (N : ℕ)
     (Fil : Submodule (RS a) (Fin N → RS a))

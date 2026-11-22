@@ -9,7 +9,7 @@ open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.GalOfCusp TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.Gal.crystallineComparison.detCoLift_of :
     CoFacts → WdLift → CoLift := by
   intro hco hwd l _ P ι K LL a ρ S _ _ π h1 h2

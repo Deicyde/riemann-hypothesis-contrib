@@ -91,9 +91,9 @@ private theorem sum_eq_zero_of_eigen_separated {ι V : Type*} [DecidableEq ι] [
         rw [hS u, sub_smul]
       have h2 : C u (∑ i ∈ insert j G, y i) - p j u • ∑ i ∈ insert j G, y i =
           ∑ i ∈ G, (p i u - p j u) • y i := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, Finset.smul_sum, ← Finset.sum_sub_distrib, Finset.sum_insert hj,
-          hy j (Finset.mem_insert_self j G) u, sub_self, zero_add]
+
+        rw [map_sum, Finset.smul_sum, ← Finset.sum_sub_distrib, Finset.sum_insert hj,
+        hy j (Finset.mem_insert_self j G) u, sub_self, zero_add]
         refine Finset.sum_congr rfl (fun i hi => ?_)
         rw [hy i (Finset.mem_insert_of_mem hi) u, sub_smul]
       rw [← h1, h2]
@@ -130,8 +130,8 @@ theorem io_eig_sep {ι V : Type*} [DecidableEq ι] [AddCommGroup V] [Module ℂ 
       have h3 : ∀ v, C v (∑ i ∈ F.filter (fun i => i = i0), y i) =
           p i0 v • ∑ i ∈ F.filter (fun i => i = i0), y i := by
         intro v
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, Finset.smul_sum]
+
+        rw [map_sum, Finset.smul_sum]
         refine Finset.sum_congr rfl (fun i hi => ?_)
         have hi' := Finset.mem_filter.mp hi
         rw [hy i hi'.1 v, hi'.2]
@@ -159,10 +159,10 @@ theorem io_sqAct_mul {k : ℕ} (mu : DomWeight k) (g g' : GL (Fin k) ℂ) (f : M
         (Formalism.GradedWeylDivisibility.rowAct ℂ (n := k) (g' : Matrix (Fin k) (Fin k) ℂ).transpose) := by
     apply MvPolynomial.algHom_ext
     intro v
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Formalism.GradedWeylDivisibility.rowAct, AlgHom.comp_apply, MvPolynomial.aeval_X, map_sum, map_mul,
-      MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq, Matrix.transpose_apply, Units.val_mul,
-      Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]
+
+    simp only [Formalism.GradedWeylDivisibility.rowAct, AlgHom.comp_apply, MvPolynomial.aeval_X, map_sum, map_mul,
+    MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq, Matrix.transpose_apply, Units.val_mul,
+    Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun b _ => Finset.sum_congr rfl (fun c _ => ?_))
     ring

@@ -144,15 +144,15 @@ theorem act_inR {a : N.X i → MatN N i} (ha : InR N i r a) :
       ∑ k, toK N i (f k π) • (mapM (toK N i) (rO N i r π) (g k)).mulVec u := by
     rw [Finset.sum_apply]
     change ((toK N i).mapMatrix (∑ k, f k π • rO N i r π (g k))).mulVec u = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Matrix.sum_mulVec]
+
+    rw [map_sum, Matrix.sum_mulVec]
     refine Finset.sum_congr rfl (fun k _ => ?_)
     rw [← Matrix.smul_mulVec]
     congr 1
     ext a b
     simp [mapM, Matrix.smul_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum]
+
+  rw [h, map_sum]
   refine Finset.sum_congr rfl (fun k _ => ?_)
   rw [map_smul, hL]
 

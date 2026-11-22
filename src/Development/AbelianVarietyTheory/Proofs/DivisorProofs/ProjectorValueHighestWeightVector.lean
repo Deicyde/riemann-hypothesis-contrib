@@ -129,9 +129,9 @@ theorem stepScalar : StepScalar := by
     Finset.prod_eq_zero (i := n) (Finset.mem_range.2 (by omega)) (sub_self _)
   have hS := partial_sum n j K
   simp only [hP, mul_zero, zero_div, add_zero] at hS
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [proj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, smul_eq_mul,
-    hterm]
+
+  simp only [proj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, smul_eq_mul,
+  hterm]
   have hc : ∀ k : ℕ, coef j k * ((k.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) * φ (T v)) =
       (-1 : ℚ) ^ k * (j.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) / ((k + j + 1).factorial : ℚ) *
         φ (T v) := by

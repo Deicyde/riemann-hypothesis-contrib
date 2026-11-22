@@ -124,7 +124,7 @@ theorem pairingRes_zmodMulPairing_comp_gsRootsLocalMor (v : S) :
   exact zmodMulPairing_tmul n (gsRoots S n) (nsmul_gsRoots S n) a d
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem gsLocalInvRoots_cupPairing (v : S) {r s : ℕ} (h : r + s = 2)
     (ξ : cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (zmodRep.{0} (galUnramifiedOutside K.1 ℚ̄ S) n)) r)
     (η : cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) s) :

@@ -234,9 +234,9 @@ theorem plancherel {R : ℕ} (hR : 0 < R) {φ ψ : Matrix κ ι ℚ → ℂ} (h 
         (V ^ 2)⁻¹ * (φ (rep R a) * conj (ψ (rep R b))) *
           ech (∑ k, (rep R a k - rep R b k) ⬝ᵥ rep R n k) := by
     intro n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ft_eq hR h (intM_rep hR n), ft_eq hR h' (intM_rep hR n), ← hV, map_mul, map_mul, map_inv₀,
-      hVc, map_sum]
+
+    rw [ft_eq hR h (intM_rep hR n), ft_eq hR h' (intM_rep hR n), ← hV, map_mul, map_mul, map_inv₀,
+    hVc, map_sum]
     have e : ∀ A B : ℂ, c * (V⁻¹ * A) * (conj c * (V⁻¹ * B)) = (V ^ 2)⁻¹ * (A * B) := by
       intro A B
       calc _ = (c * conj c) * ((V ^ 2)⁻¹ * (A * B)) := by rw [sq, mul_inv]; ring

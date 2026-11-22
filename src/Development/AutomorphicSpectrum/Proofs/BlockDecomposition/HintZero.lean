@@ -81,7 +81,7 @@ theorem hint_zero {H : Type} [Group H] (K : Subgroup H) : hint K (fun _ : H => (
   unfold hint
   rw [finsum_zero, mul_zero]
 
-set_option maxHeartbeats 1600000 in
+
 theorem ct_eq (E : Type) [Field E] [NumberField E] [IsCMField E] (n a b : ℕ) (h : a + b = n) (w : Pl E) (c : ℂˣ)
     (ϖ : w.adicCompletion E) (hw : IsSplitAt w) (hϖ : IsUnifV E w ϖ) (k : ℕ) (hk : k ≤ n) (m : GLw a w × GLw b w) :
     ctT h w (GlobalTheory.SmGL.unrChar (w.adicCompletion E) c) ϖ k m =

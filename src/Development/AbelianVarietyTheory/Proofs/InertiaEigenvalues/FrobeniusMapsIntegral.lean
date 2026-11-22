@@ -27,8 +27,8 @@ open GlobalTheory.ExportSeries (Base Twist Weight PairRep GLR detChar detFam foc
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.ConjHalfInt
 variable {D : D7}
@@ -68,8 +68,8 @@ theorem toEAf_cA_idem_mul_mem {Pg Q : Finset (Formalism.L2.DIV.Pl D.host.E)} (hP
     toEAf D (cA D (idem Pg) * incA D a) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
   obtain ⟨P, h1, -, hsp⟩ := hP.split
   have hS : GlobalTheory.ExportSeries.SplitSet Pg := hsp.mono h1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [GlobalTheory.ExportSeries.idem, map_sum, Finset.sum_mul, map_sum]
+
+  rw [GlobalTheory.ExportSeries.idem, map_sum, Finset.sum_mul, map_sum]
   refine sum_mem fun PP hPP => ?_
   have ht : GlobalTheory.IdemSupport.Comparison₂ PP (GlobalTheory.ExportSeries.idemAt PP) := (hS.isIdemAt hPP).2
   refine toEAf_mul_mem ht.conj ?_ ha
@@ -147,8 +147,8 @@ theorem adj_shape {m n : ℕ} (c : EAf D) (C : Matrix (Fin m) (Fin 1) (EAf D)) (
       GlobalTheory.AdelicLatMove.cF D c • ((R.map (GlobalTheory.AdelicLatMove.cF D))ᵀ * (C.map (GlobalTheory.AdelicLatMove.cF D))ᵀ) := by
   ext i j
   simp only [Matrix.transpose_apply, Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, Matrix.mul_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_mul, map_sum]
+
+  rw [map_mul, map_sum]
   congr 1
   exact Finset.sum_congr rfl fun z _ => by rw [map_mul, mul_comm]
 

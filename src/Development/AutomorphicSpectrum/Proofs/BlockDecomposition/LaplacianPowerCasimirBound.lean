@@ -51,8 +51,8 @@ theorem Lap_add {f f' : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) (hf' : 
 theorem Lap_post (A : V →L[ℂ] V) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) :
     Set.EqOn (Lap fun y => A (f y)) (fun y => A (Lap f y)) (GLs n) := by
   intro g hg
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Lap_eq, map_neg, map_sum]
+
+  simp only [Lap_eq, map_neg, map_sum]
   exact congrArg Neg.neg (Finset.sum_congr rfl fun p _ => Rw_post [p, p] A hf hg)
 
 theorem iter_congr (j : ℕ) {f f' : Mat n → V} (e : Set.EqOn f f' (GLs n)) :

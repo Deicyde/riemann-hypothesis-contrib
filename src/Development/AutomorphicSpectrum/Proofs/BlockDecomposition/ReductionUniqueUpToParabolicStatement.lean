@@ -7,7 +7,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JpUnif
 @[expose] public section
 
 open Matrix GlobalTheory.CompanionTheory.Jp
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.reduction_unique_up_to_parabolic : ∀ (O L : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field L] [Algebra O L] [IsFractionRing O L]
     (n : ℕ) (w : Lˣ) (κ : GL (Ix n) O) (h₁ h₂ : GL (Ix n) (IsLocalRing.ResidueField O)),
     IsRed (O := O) w κ h₁ → IsRed (O := O) w κ h₂ →

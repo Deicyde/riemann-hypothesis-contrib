@@ -44,8 +44,8 @@ theorem avg_fix (a : Γ →* Module.End F M) (P : Subgroup Γ) [Fintype P] (t : 
 
 theorem avg_type (a : Γ →* Module.End F M) (P : Subgroup Γ) [Fintype P] (t : P →* Fˣ) (v : P) (y : M) :
     a (v : Γ) (avg a P t y) = ((t v : Fˣ) : F) • avg a P t y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [avg, LinearMap.smul_apply, LinearMap.sum_apply, map_smul, map_sum]
+
+  simp only [avg, LinearMap.smul_apply, LinearMap.sum_apply, map_smul, map_sum]
   rw [smul_comm]
   congr 1
   rw [Finset.smul_sum]
@@ -203,12 +203,12 @@ theorem span_image_good (σ : LL →+* K'') (f : WL →ₛₗ[σ] K'' ⊗[O] Fm)
     have := congrArg (algebraMap K K'') h
     rwa [map_natCast, map_zero] at this))
   have hfE : ∀ x, f (grp aLh cL x) = ext O K'' (grp aF cF) (f x) := fun x => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [grp, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smulₛₗ, ext_sum, ext_smul]
+
+    simp only [grp, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smulₛₗ, ext_sum, ext_smul]
     exact Finset.sum_congr rfl fun g _ => by rw [hcf]; congr 1; exact hc g x
   have hfA : ∀ x, f (avg aLh P tL x) = ext O K'' (avg aF P tF) (f x) := fun x => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [avg, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smulₛₗ, ext_sum, ext_smul]
+
+    simp only [avg, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smulₛₗ, ext_sum, ext_smul]
     rw [map_inv₀, map_inv₀, map_natCast, map_natCast]
     congr 1
     refine Finset.sum_congr rfl fun u _ => ?_
@@ -354,8 +354,8 @@ theorem inj_span_of_carries {emb : LL →+* K''} (e : WL →ₛₗ[emb] K'' ⊗[
   set b := Basis.ofVectorSpace LL WL with hbdef
   have hsum : ∀ x, e x = ∑ i ∈ (b.repr x).support, emb (b.repr x i) • b'' i := fun x => by
     conv_lhs => rw [← b.linearCombination_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Finsupp.linearCombination_apply, Finsupp.sum, map_sum, map_smulₛₗ, hb]
+
+    simp [Finsupp.linearCombination_apply, Finsupp.sum, map_sum, map_smulₛₗ, hb]
   constructor
   · refine (injective_iff_map_eq_zero e).2 fun x hx => ?_
     rw [hsum] at hx
@@ -384,13 +384,13 @@ theorem ext_intertwine (hF : IsForm LL WK) {emb : LL →+* K''} (eF : Fm ≃ₗ[
   have e1 := he (Fin n) a f
   have e2 := he (Fin n) (fun k => cL * a k) (fun k => rK (f k))
   have e3 : cL • rL (∑ k, a k • b k) = ∑ k, (cL * a k) • ((rK (f k) : WK) : WL) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.smul_sum]
+
+    rw [map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, ← hr (f k), mul_smul]
   have e4 : ∑ k, a k • b k = ∑ k, a k • ((f k : WK) : WL) := rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e3, e2, e4, e1, map_sum]
+
+  rw [e3, e2, e4, e1, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [ext_tmul]
   have e5 : aF (eF.symm ((1 : K) ⊗ₜ[Ks] f k)) = cK • eF.symm ((1 : K) ⊗ₜ[Ks] rK (f k)) := by
@@ -447,8 +447,8 @@ theorem isKsForm_of_iso {A : FormsL LL Ks WL W G} {A' : FormsL LL Ks' WL' W' G'}
     obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun LL).1 hx
     have : x = ∑ k, a k • I.e.symm (b k) := by
       apply I.e.injective
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← ha, map_sum]
+
+      rw [← ha, map_sum]
       simp
     rw [this]
     exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -480,7 +480,7 @@ variable {D : D7} (c : NChoice D) (w : D.what₂.places.Pl)
 
 attribute [local instance] algKK
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 instance towKK : IsScalarTower (D.ntw.O (c.twI w)) (FractionRing (D.ntw.O (c.twI w))) (FractionRing (c.Oe w)) :=
   IsScalarTower.of_algebraMap_eq fun y => by
     rw [IsScalarTower.algebraMap_apply (D.ntw.O (c.twI w)) (c.Oe w) (FractionRing (c.Oe w)), RingHom.algebraMap_toAlgebra]
@@ -488,8 +488,8 @@ instance towKK : IsScalarTower (D.ntw.O (c.twI w)) (FractionRing (D.ntw.O (c.twI
 
 variable {c w}
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem stage1 (ht : NChTie D c) (j : ℕ) (S : RatDat D.ntw) (hks : (S.A j).IsKsForm)
     (rho : RhoStab S j) (chi : ChiInLL0 S j)
     (eF : D.nexp.Fm (c.twI w) j (c.sd w) ≃ₗ[FractionRing (D.ntw.O (c.twI w))] Fm S (c.twI w) j (c.sd w))
@@ -566,8 +566,8 @@ variable {D : D7} {c : NChoice D} {w : D.what₂.places.Pl}
 
 attribute [local instance] algKK
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 2000000 in
+
+
 theorem stage2 (ht : NChTie D c) {Gp : Type} [Group Gp] [Fintype Gp] (I : Gp ≃* G0g D.nd)
     (S : RatDat D.ntw) (j : ℕ)
     {Ks' WL' : Type} [Field Ks'] [NumberField Ks'] [Algebra Ks' D.what₂.LL] [AddCommGroup WL'] [Module D.what₂.LL WL']

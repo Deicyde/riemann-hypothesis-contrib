@@ -85,8 +85,8 @@ theorem exists_rankOne_idempotent (k B : Type) [Field k] [Finite k] [Ring B] [Al
     simp only [E, Matrix.single_mul_mul_single, one_mul, mul_one, Matrix.smul_single, ← hc]
     rw [Algebra.algebraMap_eq_smul_one]
   · apply e.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [E, map_sum, Matrix.single_mul_single_same, Matrix.sum_single_one]
+
+    simp [E, map_sum, Matrix.single_mul_single_same, Matrix.sum_single_one]
 
 end GlobalTheory.AzumayaResidue
 
@@ -136,7 +136,7 @@ theorem exists_residue_idempotent : ∀ (A : Type) [CommRing A] [IsLocalRing A] 
     refine ⟨c, hker _ ?_⟩
     rw [map_sub, map_mul, map_mul, hc, map_smul, ← ResidueField.algebraMap_eq,
       algebraMap_smul, sub_self]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [map_sub, map_sum, map_mul, map_one, ha, hb, hsum, sub_self]
+
+  · simp only [map_sub, map_sum, map_mul, map_one, ha, hb, hsum, sub_self]
 
 end GlobalTheory.AzumayaResidue

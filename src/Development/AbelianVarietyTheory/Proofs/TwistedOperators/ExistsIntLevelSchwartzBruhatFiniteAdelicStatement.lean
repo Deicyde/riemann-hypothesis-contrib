@@ -8,7 +8,7 @@ public import GroundTheory.GlobalFields.TateThesis.AdelicCharDual
 @[expose] public section
 
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_int_level_schwartzBruhat_finiteAdelic : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
     (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ), g ∈ GlobalTheory.WeilM.SB (κ → FiniteAdeleRing (𝓞 F) F) →
     ∃ d : 𝓞 F, d ≠ 0 ∧ ∀ x u : κ → FiniteAdeleRing (𝓞 F) F,

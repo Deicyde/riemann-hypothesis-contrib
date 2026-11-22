@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.PointShiftSt
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CM
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.scalar_eq_of_weilPairing_eq_principalCMTriple : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (K : Type) [Field K]
     [NumberField K] (ρ : 𝓞 K) (σ₁ : K →+* ℂ) (A : PAT H (Sp (𝓞 K))), ρ ^ 2 = -(H.d : 𝓞 K) →
     HasType H A.t.act ρ 1 0 → ∀ s s' : 𝓞 E,

@@ -50,8 +50,8 @@ theorem abstract_irreducible_of_highestWeight (V : Type) [AddCommGroup V] [Modul
       refine ⟨y.2, fun s hs => ?_⟩
       have h := congrArg (fun z : S => (z : V)) (b.sum_repr ⟨s, hs⟩)
       simp only [Submodule.coe_sum, Submodule.coe_smul] at h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← h, map_sum, LinearMap.sum_apply]
+
+      rw [← h, map_sum, LinearMap.sum_apply]
       refine Finset.sum_eq_zero fun i _ => ?_
       rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hy', smul_zero]
     rw [hPbot, Submodule.mem_bot] at hyP

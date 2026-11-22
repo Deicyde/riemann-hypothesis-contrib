@@ -89,8 +89,8 @@ theorem HWMod.centre {act : (ι → Mat R S) →ₗ[ℂ] Module.End ℂ M} {Λ :
   have : (act (Pi.single w 1)).eigenspace (∑ a, Λ w a) = ⊤ := by
     refine h.gen _ ?_ fun Z _ y hy => ?_
     · rw [Module.End.mem_eigenspace_iff, ← e]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, LinearMap.sum_apply, h.wt, Finset.sum_smul]
+
+      simp only [map_sum, LinearMap.sum_apply, h.wt, Finset.sum_smul]
     · have := shift_eig h.lie (H := Pi.single w 1) (Z := Z) (k := 0) (by
         funext i
         by_cases h : i = w
@@ -98,8 +98,8 @@ theorem HWMod.centre {act : (ι → Mat R S) →ₗ[ℂ] Module.End ℂ M} {Λ :
         · simp [Pi.single_eq_of_ne h]) hy
       rwa [add_zero] at this
   have hx : x ∈ (act (Pi.single w 1)).eigenspace (∑ a, Λ w a) := this ▸ Submodule.mem_top
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Module.End.mem_eigenspace_iff, ← e, map_sum, LinearMap.sum_apply] at hx
+
+  rw [Module.End.mem_eigenspace_iff, ← e, map_sum, LinearMap.sum_apply] at hx
   exact hx
 
 theorem par_zero {m : Emb R S R₁ S₁} {act : (ι → Mat R S) →ₗ[ℂ] Module.End ℂ M}
@@ -111,8 +111,8 @@ theorem par_zero {m : Emb R S R₁ S₁} {act : (ι → Mat R S) →ₗ[ℂ] Mod
   have hlow : low (act (dg ι m.h)) (∑ w, ∑ a, m.h a * Λ w a) ≤ LinearMap.ker D := by
     refine low_ker D fun x => ?_
     rw [dg_eq]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, Finset.sum_smul, hs]
+
+    simp only [map_sum, LinearMap.sum_apply, Finset.sum_smul, hs]
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [← hc, mul_smul, ← hD.cpt, m.sum, m.h_s (.inl rfl), m.h_s (.inr rfl)]
     simp [m.h_e]
@@ -189,8 +189,8 @@ theorem par_line {m : Emb R S R₁ S₁} {act : (ι → Mat R S) →ₗ[ℂ] Mod
     exact h0 (LinearMap.ext fun x => not_not.1 fun e => h ⟨x, e⟩)
   have hc : ∀ w, c w = Λ w (.inl m.i) + Λ w (.inr m.j) := fun w => by
     have e := congrArg D (hM.centre w x)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [m.sum, m.sum, map_add (f := _), ← LinearMap.add_apply, ← map_add act, hD.cpt, map_sum, map_smul] at e
+
+    rw [m.sum, m.sum, map_add (f := _), ← LinearMap.add_apply, ← map_add act, hD.cpt, map_sum, map_smul] at e
     simp only [hD.levi, hM₁.centre, hΛ] at e
     rw [← add_smul] at e
     exact add_right_cancel (smul_left_injective ℂ hx e)

@@ -49,8 +49,8 @@ private theorem finrank_span_blockData_gens {p : ℕ} [Fact (Nat.Prime p)] {O : 
         rw [bW.sum_repr]
       refine h1.symm.trans ?_
       simp only [Submodule.coe_sum, Submodule.coe_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hw', map_sum]
+
+    rw [hw', map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [hsmul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)

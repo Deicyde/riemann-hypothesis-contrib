@@ -174,7 +174,7 @@ theorem fwd_rat (hR : RatIso P e) {F : Bridge.Gf V → c.W} (hA : F ∈ Bridge.A
   rw [(hR γ).1, ← map_mul] at h1
   exact h1
 
-set_option maxHeartbeats 4000000 in
+
 theorem bwd_ad (hg : V.gram = 1) (hU : UnitFr P) (hR : RatIso P e)
     (red : (LE).Q →* G₀)
     (hred : ∀ q : (LE).Q, eG (red q) =
@@ -216,7 +216,7 @@ theorem bwd_ad (hg : V.gram = 1) (hU : UnitFr P) (hR : RatIso P e)
   rw [hk2, e.apply_symm_apply γ, hgh, hk'] at hmain
   exact hmain
 
-set_option maxHeartbeats 4000000 in
+
 theorem bwd_q (hg : V.gram = 1) (hU : UnitFr P)
     (red : (LE).Q →* G₀)
     (hred : ∀ q : (LE).Q, eG (red q) =
@@ -247,7 +247,7 @@ theorem bwd_q (hg : V.gram = 1) (hU : UnitFr P)
   rw [hgh, hk'] at hmain
   exact hmain
 
-set_option maxHeartbeats 4000000 in
+
 theorem fwd_law (hg : V.gram = 1) (hU : UnitFr P)
     (red : (LE).Q →* G₀)
     (hred : ∀ q : (LE).Q, eG (red q) =
@@ -265,7 +265,7 @@ theorem fwd_law (hg : V.gram = 1) (hU : UnitFr P)
 
 end Main
 
-set_option maxHeartbeats 4000000 in
+
 theorem cutSp_iff_typeSp : ∀ (D : D7) (V : HSp D) (hr : D.R.r ≤ V.rank) (Pg Q : Finset (Pl D.host.E)) (chi xi : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ) (c : CoefA V) (P : principalLevelFrame.RowPsi V V.rank) (e : ReciprocityTheory.Aut.GQ D.host.E V.rank ≃* Formalism.L2.Theta.GQ V), V.gram = 1 → UnitFr P → RatIso P e → ∀ (G₀ : Type) [Group G₀] (red : (levEnv V 1 (datV D V.rank hr Pg Q (LevelP.triv _ _ _) chi xi)).Q →* G₀) (eG : G₀ ≃* G0 Pg D.R.r) (P₀ : Subgroup G₀) (ψ₀ : P₀ →* D.what₂.LLˣ), (∀ q : (levEnv V 1 (datV D V.rank hr Pg Q (LevelP.triv _ _ _) chi xi)).Q, eG (red q) = rTup 1 (datV D V.rank hr Pg Q (LevelP.triv _ _ _) chi xi) (Formalism.UG.bc (swapAE D) ((q : Bridge.Gf V) : GL _ _))) → ∀ F : Bridge.Gf V → c.W, F ∈ cutSp (Bridge.ratF V) c.coef.ρ (levEnv V 1 (datV D V.rank hr Pg Q (LevelP.triv _ _ _) chi xi)).J (levEnv V 1 (datV D V.rank hr Pg Q (LevelP.triv _ _ _) chi xi)).χ (levEnv V 1 (datV D V.rank hr Pg Q (LevelP.triv _ _ _) chi xi)).Q (levEnv V 1 (datV D V.rank hr Pg Q (LevelP.triv _ _ _) chi xi)).ch red P₀ ((Units.map D.what₂.embLL.toMonoidHom).comp ψ₀⁻¹) ↔ (fun g => F (toGf P g)) ∈ NG.TypeSp (wtRep c e) (stdJ (datV D V.rank hr Pg Q (levPOf eG D.what₂.embLL P₀ ψ₀) chi xi)) (stdX (datV D V.rank hr Pg Q (levPOf eG D.what₂.embLL P₀ ψ₀) chi xi)) := by
   intro D V hr Pg Q chi xi c P e hg hU hR G₀ _ red eG P₀ ψ₀ hred F
   constructor

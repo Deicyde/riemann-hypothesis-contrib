@@ -46,8 +46,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.hilbert_ninety_frobenius_twisted_fini
     · rw [hpow, hd]; rfl
     · obtain ⟨s, x, y, h⟩ := hG.sep
       refine ⟨s, fun i => algebraMap F₁ A (x i), fun i => algebraMap F₁ A (y i), fun j hj => ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hpow, hpowF, ← map_mul, ← map_sum]
+
+      simp only [hpow, hpowF, ← map_mul, ← map_sum]
       rw [h j hj]
       split_ifs <;> simp
   have hu : IsUnit c := by

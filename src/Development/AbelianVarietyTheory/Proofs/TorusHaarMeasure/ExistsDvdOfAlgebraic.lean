@@ -187,8 +187,8 @@ theorem exists_maps (j0 : Fin (N + 1)) (v : Fin (N + 1) → Ω) (x : Fin N → �
       · rw [polyImg_same, if_pos rfl, hX]; rfl
       · have h1 := congrArg β₀ (sum_polyImg_succ j v x hv hx i)
         have h2 := hrel i
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, map_zero, Fin.sum_univ_succAbove _ j] at h1
+
+        rw [map_sum, map_zero, Fin.sum_univ_succAbove _ j] at h1
         rw [Fin.sum_univ_succAbove _ j] at h2
         simp only [map_mul, hC, polyImg_succAbove, hX] at h1
         have h3 : β₀ (polyImg j x (i.succ, j)) * ψ (v j) = a (t (i.succ, j)) * ψ (v j) :=
@@ -230,8 +230,8 @@ theorem exists_maps (j0 : Fin (N + 1)) (v : Fin (N + 1) → Ω) (x : Fin N → �
       (iR.comp (algebraMap Ω _)) (v j) =
       iR (algebraMap (MvPolynomial (SVar D N) Ω) _ (∑ j, polyImg j0 x (i, j) * C (v j))) := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum]
+
+    rw [map_sum, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [hTX, RingHom.comp_apply, hΩ, map_mul, map_mul]
   obtain ⟨α, hα1, hα2⟩ := huniv _ (algebraMap K' _) (iR.comp (algebraMap Ω _))
@@ -275,8 +275,8 @@ variable {K K' : Type} [Field K] [Field K'] [Algebra K K'] {D N : ℕ} {ι : Typ
   {Ω : ι → Type} [∀ Z, Field (Ω Z)] [∀ Z, Algebra K (Ω Z)]
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem basis_descends (j0 : ι → Fin (N + 1)) (v : ∀ Z, Fin (N + 1) → Ω Z) (x : ∀ Z, Fin N → Ω Z)
     (hv : ∀ Z, v Z (j0 Z) ≠ 0) (hx : ∀ Z k, x Z k = v Z ((j0 Z).succAbove k) / v Z (j0 Z))
     (hind : ∀ Z, AlgebraicIndependent K (sImg (D := D) (j0 Z) (x Z)))
@@ -335,8 +335,8 @@ theorem basis_descends (j0 : ι → Fin (N + 1)) (v : ∀ Z, Fin (N + 1) → Ω 
     intro g hg k
     have := hli (fun k => algebraMap _ K' (g k)) (fun Z => by
       have h1 := congrArg (β Z) (congrFun hg Z)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_apply, map_sum, Pi.zero_apply, map_zero] at h1
+
+      rw [Finset.sum_apply, map_sum, Pi.zero_apply, map_zero] at h1
       rw [← h1]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [Pi.smul_apply, Algebra.smul_def, map_mul, hβF, hβ2]) k
@@ -356,8 +356,8 @@ theorem basis_descends (j0 : ι → Fin (N + 1)) (v : ∀ Z, Fin (N + 1) → Ω 
       obtain ⟨c, hc⟩ := hsp y
       rw [Submodule.mem_span_range_iff_exists_fun]
       refine ⟨c, funext fun Z => ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hy, hc, map_sum, Finset.sum_apply]
+
+      rw [← hy, hc, map_sum, Finset.sum_apply]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [Pi.smul_apply, Algebra.smul_def, map_mul, hα1]
     have h1 := finrank_le_of_span_eq_top hs
@@ -400,8 +400,8 @@ theorem coords_of_equiv {K' M ι : Type} [Field K'] [AddCommGroup M] [Module K' 
   letI : ∀ Z, Module K' (Q Z) := fun Z => (a Z).toModule
   have key : ∀ (c : Fin n → K') Z, E (∑ k, c k • b k) Z = ∑ k, a Z (c k) * E (b k) Z := by
     intro c Z
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_apply]
+
+    rw [map_sum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul]
     rfl
@@ -417,8 +417,8 @@ variable {K Kl K' : Type} [Field K] [Field Kl] [Field K'] [Algebra K Kl] [Algebr
   [IsScalarTower K Kl K'] {ι : Type} [Fintype ι] {Ω : ι → Type} [∀ Z, Field (Ω Z)] [∀ Z, Algebra K (Ω Z)]
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem basis_descends_loc {D D' N m n : ℕ} (hD : D = D') (e : Fin m ≃ Fin (N + 1)) (j0 : ι → Fin (N + 1))
     (v : ∀ Z, Fin m → Ω Z) (x : ∀ Z, Fin N → Ω Z)
     (hv : ∀ Z, v Z (e.symm (j0 Z)) ≠ 0)
@@ -469,8 +469,8 @@ theorem basis_descends_loc {D D' N m n : ℕ} (hD : D = D') (e : Fin m ≃ Fin (
       (∀ y, f (algebraMap K' _ y) = a' y) → (∀ ω, f (incl K Kl K' ω) = ψ' ω) → ∀ i,
       f (s Z i) = ∑ j, a' ((t ∘ ε) (i, j)) * ψ' (v Z (e.symm j)) := by
     intro Z R _ f a' ψ' h1 h2 i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hs', map_sum]
+
+    rw [hs', map_sum]
     exact Finset.sum_congr rfl fun j _ => by rw [map_mul, h1, h2]
   refine basis_descends j0 (fun Z j => v Z (e.symm j)) x hv hx hind hfin (t ∘ ε)
     ((algebraicIndependent_equiv ε).2 ht) a ψ (fun Z c => ?_) (fun Z i => ?_) (fun Z R _ a' ψ' hc h0 h1 => ?_)

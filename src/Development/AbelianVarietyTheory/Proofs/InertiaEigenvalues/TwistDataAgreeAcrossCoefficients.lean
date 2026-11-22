@@ -81,7 +81,7 @@ structure SameForms {D D' : D7} {N : NData D.R D.host D.what₂} {N' : NData D'.
   hkF : HEq Y.hkF Y'.hkF
 
 
-set_option maxHeartbeats 4000000 in
+
 set_option maxRecDepth 100000 in
 theorem goodTw_transfer {D D' : D7} {N : NData D.R D.host D.what₂} {N' : NData D'.R D'.host D'.what₂}
     {X : NTw D.R D.host D.what₂ D.LL0 N} {X' : NTw D'.R D'.host D'.what₂ D'.LL0 N'}
@@ -126,7 +126,7 @@ theorem goodTw_transfer {D D' : D7} {N : NData D.R D.host D.what₂} {N' : NData
   exact h
 
 
-set_option maxHeartbeats 4000000 in
+
 set_option maxRecDepth 100000 in
 theorem fullRk_basisOf_transfer {D D' : D7} {N : NData D.R D.host D.what₂} {N' : NData D'.R D'.host D'.what₂}
     {X : NTw D.R D.host D.what₂ D.LL0 N} {X' : NTw D'.R D'.host D'.what₂ D'.LL0 N'}
@@ -162,7 +162,7 @@ theorem fullRk_basisOf_transfer {D D' : D7} {N : NData D.R D.host D.what₂} {N'
   exact h
 
 
-set_option maxHeartbeats 4000000 in
+
 set_option maxRecDepth 100000 in
 theorem same_basic {D D' : D7} {N : NData D.R D.host D.what₂} {N' : NData D'.R D'.host D'.what₂}
     {X : NTw D.R D.host D.what₂ D.LL0 N} {X' : NTw D'.R D'.host D'.what₂ D'.LL0 N'}

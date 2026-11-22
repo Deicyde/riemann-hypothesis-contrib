@@ -106,16 +106,16 @@ def logLin (cp : ι → Fin n) (u : ι → Fin d → K) (b : Fin n) : Fin d → 
 omit [CharZero K] in
 theorem cc_logLin (cp : ι → Fin n) (u : ι → Fin d → K) (b : Fin n) (e : Fin d) :
     constantCoeff (logLin cp u b e) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [logLin, map_sum, constantCoeff_smul, constantCoeff_X, smul_zero, Finset.sum_const_zero]
+
+  simp only [logLin, map_sum, constantCoeff_smul, constantCoeff_X, smul_zero, Finset.sum_const_zero]
 
 omit [CharZero K] in
 theorem pderiv_logLin (cp : ι → Fin n) (u : ι → Fin d → K) (b : Fin n) (e : Fin d) (l : ι) :
     pderiv l (logLin cp u b e) = if cp l = b then C (u l e) else 0 := by
   classical
   unfold logLin
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single l]
+
+  rw [map_sum, Finset.sum_eq_single l]
   · rw [Derivation.map_smul, pderiv_X_self, smul_eq_C_mul, mul_one]
     split_ifs <;> simp
   · intro l' _ hl
@@ -151,11 +151,11 @@ theorem pderiv_subst_expPt (F : FGLaw K d) (hF : ∀ a, MvIsInt v (subst (twoVar
   rw [ReciprocityTheory.ChartRestriction.G.TB.LogPf.pderiv_subst hT, Fintype.sum_prod_type, Finset.sum_eq_single (cp l)]
   · unfold DofN
     simp only [key, ite_true]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← coe_substAlgHom hTs, map_sum]
+
+    rw [← coe_substAlgHom hTs, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_mul, map_sum, mul_comm]
+
+    rw [map_mul, map_sum, mul_comm]
     congr 1
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, coe_substAlgHom hTs, subst_C]
@@ -186,8 +186,8 @@ theorem invDer : InvDerSt := by
     | nil => rfl
     | cons a L ih => rw [List.foldr_cons, List.foldr_cons, hit, ih]
   unfold DpolyN derivAt0
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [map_mul, constantCoeff_C, mul_assoc, ← constantCoeff_subst_self T hT]
   congr 1

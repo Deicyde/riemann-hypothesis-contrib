@@ -55,8 +55,8 @@ theorem cT_JR {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) : cT
 theorem hform_conj {K : Type} [CommRing K] {M : ℕ} {s : K →+* K} {J : Matrix (Fin M) (Fin M) K} (hs : ∀ x, s (s x) = x)
     (hJ : cT s J = J) (x y : Fin M → K) : s (hform s J x y) = hform s J y x := by
   have : ∀ i j, s (J j i) = J i j := fun i j => congrFun (congrFun hJ i) j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hform, map_sum, map_mul, hs, this]
+
+  simp only [hform, map_sum, map_mul, hs, this]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 

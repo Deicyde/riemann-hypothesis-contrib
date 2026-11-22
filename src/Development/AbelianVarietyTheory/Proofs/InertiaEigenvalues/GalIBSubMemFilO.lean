@@ -157,8 +157,8 @@ theorem gal_iB_sub_mem_filO : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a
   intro l _ a e _ _ O K _ _ _ _ _ _ _ _ _ _ t ϖ C m f hfA hN g hg
   have key : ∀ τ, galOB O (sQ l g) (ϖ.iSl O K (f τ)) - ϖ.iSl O K (f τ) ∈ filO O C m := fun τ =>
     gal_iSl_sub_mem ϖ C m ⟨sQ l g, hg⟩ (f τ) (hfA τ) (hN τ)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [PiSys.iB, glue_apply, map_sum, ← Finset.sum_sub_distrib]
+
+  rw [PiSys.iB, glue_apply, map_sum, ← Finset.sum_sub_distrib]
   refine Submodule.sum_mem _ fun τ _ => ?_
   have hid : galOB O (sQ l g) (idem (constB t) τ) = idem (constB t) τ :=
     (galOB_toOB _ (idem (constC t) τ)).trans (congrArg _ (galOCr_idem t ϖ ⟨sQ l g, hg⟩ τ))

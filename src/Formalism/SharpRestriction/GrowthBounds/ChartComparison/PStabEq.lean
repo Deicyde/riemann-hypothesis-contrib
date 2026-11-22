@@ -179,7 +179,7 @@ theorem conj_mem' (x y : GL (Fin n) (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) (γ�
   exact S.U.mul_mem (S.U.mul_mem (S.U.inv_mem κ₀.2) hd) κ₀.2
 
 
-set_option maxHeartbeats 2000000 in
+
 include H hW hH hbad in
 theorem cls_unique {cl : Type} (y : cl → UPts σ J (FiniteAdeleRing (𝓞 F) F))
     (hy : Function.Injective (fun c => (Quotient.mk'' (y c) : Cls S))) (i : G.comp) (L : G.P.Tup)
@@ -284,7 +284,7 @@ theorem gamI_inj_locJ (c : cmp) : Function.Injective ((locJ hi t B).gamI c) := b
   exact (reGL (rankN D (i + 1) hi) D.host.E).injective hab
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem gamOnto_locJ (hU : SameUlocJ hi S Uloc) (c : cmp) : GamOnto S (locJ hi t B) c := by
   intro δ hδ hoff
   have hδ0 : (reGL (rankN D (i + 1) hi) D.host.E).symm δ ∈ UJ (D.sp.cm.sig : D.host.E →+* D.host.E) (D.sp.X (i + 1)).gram :=
@@ -344,7 +344,7 @@ def HypTJC : Prop :=
         w'.adicCompletionIntegers D.host.F
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem locHypC_locJ (hU : SameUlocJ hi S Uloc) (hB : FrRatJ t B) (hTc : HypTJC t) : LocHypC S (locJ hi t B) := by
   refine locHypC_of (rankN D (i + 1) hi) (locJ hi t B) S B rfl Uloc hU ?_
   intro v x0 hx0

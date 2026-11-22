@@ -47,7 +47,7 @@ def pullSecF (e : ∀ k, H ≫ φ k = φ' k) (s : LB.Sec (LB.LinComb L φ ε)) (
     Γ(Y', (LB.LinComb L φ' ε).U j) :=
   (H.appLE ((LB.LinComb L φ ε).U j) ((LB.LinComb L φ' ε).U j) (wchart_pull_le' L φ φ' ε H e j)).hom (s.f j)
 
-set_option maxHeartbeats 1000000 in
+
 theorem pullSecF_compat (e : ∀ k, H ≫ φ k = φ' k) (s : LB.Sec (LB.LinComb L φ ε)) (i j : K → L.ι) :
     (Y'.presheaf.map (homOfLE (inf_le_left : (LB.LinComb L φ' ε).U i ⊓ (LB.LinComb L φ' ε).U j ≤
         (LB.LinComb L φ' ε).U i)).op).hom (pullSecF L φ φ' ε H e s i) =

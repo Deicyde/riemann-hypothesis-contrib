@@ -28,8 +28,8 @@ theorem eigenBC_relation {K K' : Type} [Field K] [NumberField K] [Field K'] [Num
     exact this
   have h1 : ∑ i, y i • s i = 0 := by
     apply RingOfIntegers.coe_injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero]
+
+    rw [map_sum, map_zero]
     have : ∀ i, algebraMap (𝓞 K') K' (y i • s i)
         = algebraMap K K' ((d : 𝓞 K) : K) * ((s i : K') * algebraMap K K' (x i)) := by
       intro i
@@ -43,11 +43,11 @@ theorem eigenBC_relation {K K' : Type} [Field K] [NumberField K] [Field K'] [Num
     rw [← Finset.mul_sum, h, mul_zero]
   have h2 : ∑ i, y i * φ (s i) = 0 := by
     have := congrArg φ h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum] using this
+
+    simpa [map_sum] using this
   have h3 := congrArg (algebraMap (𝓞 K) K) h2
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_zero] at h3
+
+  rw [map_sum, map_zero] at h3
   apply mul_left_cancel₀ hd0
   rw [mul_zero, Finset.mul_sum, ← h3]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -79,8 +79,8 @@ theorem eigenLattice_baseChange : ∀ (K K' O : Type) [Field K] [NumberField K] 
       = fun i => j ((r a).mulVec c i) := by
     intro a c
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mulVec, dotProduct, map_sum]
+
+    simp [Matrix.mulVec, dotProduct, map_sum]
   constructor
   · intro h
     refine ⟨Submodule.span_mono (Set.image_mono (show {c | c ∈ Λ ∧ ∀ a, (r a).mulVec c = τ a • c} ⊆ (Λ : Set (Fin n → K)) from fun c hc => hc.1)) h, fun a => ?_⟩
@@ -110,8 +110,8 @@ theorem eigenLattice_baseChange : ∀ (K K' O : Type) [Field K] [NumberField K] 
       have e : ∀ i, (s i : K') = ∑ k, j ((φ k (s i) : 𝓞 K) : K) * (b k : K') := by
         intro i
         have := congrArg (algebraMap (𝓞 K') K') (hb (s i))
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum] at this
+
+        rw [map_sum] at this
         refine this.trans (Finset.sum_congr rfl fun k _ => ?_)
         rw [Algebra.smul_def, map_mul, ← IsScalarTower.algebraMap_apply,
           IsScalarTower.algebraMap_apply (𝓞 K) K K']
@@ -119,8 +119,8 @@ theorem eigenLattice_baseChange : ∀ (K K' O : Type) [Field K] [NumberField K] 
       rw [Finset.sum_congr rfl fun i _ => by rw [e i, Finset.sum_mul], Finset.sum_comm]
       refine Finset.sum_congr rfl fun k _ => ?_
       show _ = (b k : K') * j ((∑ i, φ k (s i) • l i) t)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_apply, map_sum, Finset.mul_sum]
+
+      rw [Finset.sum_apply, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       show _ = (b k : K') * j (((φ k (s i) : 𝓞 K) : K) * l i t)
       rw [map_mul]; ring

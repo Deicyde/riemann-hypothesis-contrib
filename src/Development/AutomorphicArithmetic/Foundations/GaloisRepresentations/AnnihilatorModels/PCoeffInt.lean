@@ -17,8 +17,8 @@ theorem UpperTheory.Gal.crystallineComparison.coeffInt_of :
   have hform : ∀ i, form (c i) = (form (c' i)).map f := by
     intro i
     simp [form, f, Polynomial.map_sub, MvPolynomial.map_C, c']
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Polynomial.map_sum]
+
+    rw [Polynomial.map_sum]
     simp [Polynomial.map_mul, Polynomial.map_C, MvPolynomial.map_C, MvPolynomial.map_X]
   have hP : (∏ i, form (c i)) = (∏ i, form (c' i)).map f := by
     rw [Polynomial.map_prod]

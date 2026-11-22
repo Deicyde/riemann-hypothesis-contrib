@@ -32,7 +32,7 @@ theorem Lat.cube_mem {K : Type} [Field K] {V : Type} [AddCommGroup V] [Module (�
   rw [this]
   exact B.smul_mem _ h
 
-set_option maxHeartbeats 400000 in
+
 theorem all_parts_transfer_of_facts (hE : IdemE) (hP : IdemP) (hC : Core) (hD : DimSq) (hM : Metric) :
     AllPartsTransfer := by
   intro K _ _ _ _ G _ _ S _ T _ _ _ τ H₀ χ₀ H χ hτ hM1 V _ _ _ _ ι _ _ b X ρ hX hU A hA

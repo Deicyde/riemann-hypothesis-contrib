@@ -74,8 +74,8 @@ theorem exists_pull {K : Type} [Fintype K] {φ : K → (Y ⟶ X)} {ε : K → �
 def linSec {M : LB Y} {N : ℕ} (c : Fin N → Γ(Y, ⊤)) (t : Fin N → LB.Sec M) : LB.Sec M where
   f j := ∑ i, resTop _ (c i) * (t i).f j
   compat i j := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, Finset.mul_sum]
+
+    rw [map_sum, map_sum, Finset.mul_sum]
     exact Finset.sum_congr rfl fun k _ => (SecOps.secScale (c k) (t k)).compat i j
 
 variable {C : Type} [CommRing C] {n N : ℕ}

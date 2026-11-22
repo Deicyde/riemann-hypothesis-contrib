@@ -20,7 +20,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.LevelSeries
 
 noncomputable section
@@ -63,18 +63,18 @@ theorem rename_comp_fockSubst {D : D7} {H : Geo.Tor.Host D.host.E} (Dw : Datum H
   induction i using Fin.addCases with
   | left i =>
     have hi : ((Fin.castAdd Dw.q i : Fin (Dw.p + Dw.q)) : ℕ) < (fun _ => Dw.p) ρ := by simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [AlgHom.comp_apply, GlobalTheory.ExportSeries.fockSubst, MvPolynomial.aeval_X, if_pos hi, map_sum, map_mul,
-      MvPolynomial.rename_C, MvPolynomial.rename_X]
+
+    simp only [AlgHom.comp_apply, GlobalTheory.ExportSeries.fockSubst, MvPolynomial.aeval_X, if_pos hi, map_sum, map_mul,
+    MvPolynomial.rename_C, MvPolynomial.rename_X]
     simp only [GlobalTheory.FockLetters.fockVarEquiv, Equiv.prodCongr_apply, Prod.map, finCongr_refl, Equiv.refl_trans,
       Equiv.refl_apply, finSumFinEquiv_symm_apply_castAdd]
     erw [GlobalTheory.Harm.colSubst_X_xVar]
     simp [GlobalTheory.Harm.xForm_apply]
   | right j =>
     have hj : ¬ ((Fin.natAdd Dw.p j : Fin (Dw.p + Dw.q)) : ℕ) < (fun _ => Dw.p) ρ := by simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [AlgHom.comp_apply, GlobalTheory.ExportSeries.fockSubst, MvPolynomial.aeval_X, if_neg hj, map_sum, map_mul,
-      MvPolynomial.rename_C, MvPolynomial.rename_X]
+
+    simp only [AlgHom.comp_apply, GlobalTheory.ExportSeries.fockSubst, MvPolynomial.aeval_X, if_neg hj, map_sum, map_mul,
+    MvPolynomial.rename_C, MvPolynomial.rename_X]
     simp only [GlobalTheory.FockLetters.fockVarEquiv, Equiv.prodCongr_apply, Prod.map, finCongr_refl, Equiv.refl_trans,
       Equiv.refl_apply, finSumFinEquiv_symm_apply_natAdd]
     erw [GlobalTheory.Harm.colSubst_X_yVar]

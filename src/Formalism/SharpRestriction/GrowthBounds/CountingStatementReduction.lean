@@ -1928,8 +1928,8 @@ theorem wtProj_stable {n : ℕ} {E : GLOps n K V} (hE : IsGLRep E) (la : Fin n �
     · exact hall la h
     · rw [Finsupp.notMem_support_iff.1 h]; exact Submodule.zero_mem _
   have : wtProj hE la x = f la := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hsum, map_sum]
+
+    rw [← hsum, map_sum]
     by_cases h : la ∈ f.support
     · rw [Finset.sum_eq_single la]
       · exact wtProj_same hE la (hf la)

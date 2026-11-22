@@ -128,8 +128,8 @@ theorem φ_mem [NeZero n] (T : LocLat G Qp LL O) (M h : ZMod n → ℕ) (h5 : p5
     (hx : x ∈ W.N T) : W.Q ^ mx M • W.φD T x ∈ W.N T := by
   have hx' : x = ∑ j, (letE j : LetA O n) • x := by
     rw [← Finset.sum_smul, sum_letE_eq_one', one_smul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hx', map_sum, Finset.smul_sum]
+
+  rw [hx', map_sum, Finset.smul_sum]
   refine Submodule.sum_mem _ (fun j _ => ?_)
   have hj : (letE j : LetA O n) • x ∈ W.Nl T (j + 1 - 1) := by
     rw [add_sub_cancel_right]
@@ -202,7 +202,7 @@ theorem aN_sat (hsat : ∀ x : W.DD T₀, W.map ι x ∈ W.N T₁ → x ∈ W.N 
   have e := X_smul_inj W T₁ hmx
   exact (mem_aN W T₀ W.X _).2 ⟨y, hsat y (e ▸ hm), rfl⟩
 
-set_option maxHeartbeats 1000000 in
+
 private theorem lift_multiple_lemma (l M : ℕ) (c₁ : IsCrys PD T₁.ρ) (c₂ : IsCrys PD T₂.ρ)
     (hnat : W.ClNat) (h2 : p2 W T₁) (hφ : ∀ x ∈ W.N T₁, W.Q ^ M • W.φD T₁ x ∈ W.N T₁)
     (hc : p2c W T₂ M)
@@ -346,8 +346,8 @@ theorem jumpsLet_quot (M h : ZMod n → ℕ)
 end Generic
 
 
-set_option maxHeartbeats 1600000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem defect_torsion : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
     (Cm : CmpOf D.loc D.locA HW F), Pr2d D HW F := by
   intro D HW F Cm l _ K s LL h T₀ T₁ T₂ ι π M hh c₀ c₁ c₂ hJ hses

@@ -109,9 +109,9 @@ theorem integral_thetaSum_schr_diag : ∀ (F : Type) [Field F] [NumberField F] (
       · intro r hr y
         obtain ⟨ρ, rfl⟩ := (GlobalTheory.ThetaParseval.mem_ratVec_iff r).1 hr
         simp only [he, dotProduct_add, AddChar.map_add_eq_mul]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [show emb ζ ⬝ᵥ (fun i => algebraMap F (AF F) (ρ i)) = algebraMap F (AF F) (ζ ⬝ᵥ ρ) by
-          subst hemb; simp [dotProduct, map_sum, map_mul], htriv, one_mul]
+
+        rw [show emb ζ ⬝ᵥ (fun i => algebraMap F (AF F) (ρ i)) = algebraMap F (AF F) (ζ ⬝ᵥ ρ) by
+        subst hemb; simp [dotProduct, map_sum, map_mul], htriv, one_mul]
       · intro y
         simp only [he, dotProduct_add, AddChar.map_add_eq_mul]
         congr 2

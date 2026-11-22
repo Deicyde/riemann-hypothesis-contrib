@@ -208,7 +208,7 @@ private theorem UpperTheory.ConvolutionTheory.Ci.valC {K : Type} [Field K] [Numb
   ext c
   simp
 
-set_option maxHeartbeats 6400000 in
+
 theorem UpperTheory.ConvolutionTheory.Ci.ciOf :
     TrExp → EvVal → ValBc → KillEx → KfBc → TruncSpec → SepPoly → OneSide → EvEx → Kill → CI := by
   classical

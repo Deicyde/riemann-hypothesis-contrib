@@ -108,7 +108,7 @@ theorem inBox_of_orb (E : QExt G χ) {y : E.Ch (G.s + 1)} {z} (hz : z ∈ box _ 
   rwa [sub_add_cancel] at this
 
 
-set_option maxHeartbeats 4000000 in
+
 @[reducible] def restr (E : QExt G χ) : QExt G χ :=
   { E with
     Ch := fun j => {y : E.Ch j // InBox E j y}
@@ -154,7 +154,7 @@ def OrbAt (j : ℕ) (y : E.Ch j) (β : Ch₀ j) : Prop :=
 variable {A E} {P : BadPr I a} {hψ : Continuous G.ψk} {sg : ℂ}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem orb_iff (hI : I.Ok)
     (tw : GlobalTheory.TwBridge.AtTwist (R := B.R) (k := G.k) I.sel (I.tup a) (I.cst a) B.embLL P (G.q.pr.comp (incA (_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G))) G.s (E.tw hψ sg))
     (hM : E.M = (I.cst a).M) (b : Idx I.sel (I.tup a) (I.idx a) (G.s + 1)) (hQ : P.1 ∈ I.Q a) {e}
@@ -195,7 +195,7 @@ theorem orbAt_unique {j : ℕ} (hj : j + 1 = B.R.m) {y y' : E.Ch j} {β : Ch₀ 
   exact E.cos_inj _ _ (H.trans (h rfl e he) (H.symm (h' rfl e he)))
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_orbAt (hI : I.Ok) (hA : A.Is)
     (tw : GlobalTheory.TwBridge.AtTwist (R := B.R) (k := G.k) I.sel (I.tup a) (I.cst a) B.embLL P (G.q.pr.comp (incA (_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G))) G.s (E.tw hψ sg))
     (hM : E.M = (I.cst a).M) {j : ℕ} (hj : j + 1 = B.R.m) (β : Ch₀ j) (hk : A.kb j β = TC.kStd X u (B.R.N j)) :
@@ -217,7 +217,7 @@ theorem exists_orbAt (hI : I.Ok) (hA : A.Is)
   exact hy
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem lev_of_orbAt (hI : I.Ok) (hA : A.Is)
     (tw : GlobalTheory.TwBridge.AtTwist (R := B.R) (k := G.k) I.sel (I.tup a) (I.cst a) B.embLL P (G.q.pr.comp (incA (_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G))) G.s (E.tw hψ sg))
     (hM : E.M = (I.cst a).M) {j : ℕ} (hj : j + 1 = B.R.m) (b : Idx I.sel (I.tup a) (I.idx a) j) (hQ : P.1 ∈ I.Q a) {y : E.Ch j}
@@ -234,7 +234,7 @@ theorem lev_of_orbAt (hI : I.Ok) (hA : A.Is)
   exact h1
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_vec (hI : I.Ok) (hA : A.Is)
     (tw : GlobalTheory.TwBridge.AtTwist (R := B.R) (k := G.k) I.sel (I.tup a) (I.cst a) B.embLL P (G.q.pr.comp (incA (_root_.GlobalTheory.Mem.assemble _ _ Z.W Z.V Z.S Z.N Z.G))) G.s (E.tw hψ sg))
     (hM : E.M = (I.cst a).M) {j : ℕ} (hj : j + 1 = B.R.m) (b : Idx I.sel (I.tup a) (I.idx a) j) {y : E.Ch j} (hy : InBox E j y) :

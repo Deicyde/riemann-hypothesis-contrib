@@ -221,8 +221,8 @@ theorem isExtension_comp {k E : Type} [Field k] [Field E] [Algebra k E] {V W W' 
   · refine eq_top_iff.2 fun x _ => ?_
     obtain ⟨x, rfl⟩ := hθ.2 x
     obtain ⟨n, c, v, rfl⟩ := ha.exists_sum x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Submodule.sum_mem _ fun i _ => by
       rw [map_smul]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨v i, e _⟩)
   · intro ℓ
@@ -241,8 +241,8 @@ theorem linearIndependent_of_isExtension {k E : Type} [Field k] [Field E] [Algeb
   obtain ⟨Λ, hΛ⟩ := ha.coord ℓ
   refine hv S (fun i => ℓ (c i)) ?_ i hi
   have := congrArg Λ hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_zero] at this
+
+  rw [map_sum, map_zero] at this
   exact (Finset.sum_congr rfl fun i _ => (hΛ _ _).symm).trans this
 
 theorem isExtension_pullThrough {k E : Type} [Field k] [Field E] [Algebra k E] {π : Y ⟶ Spec (CommRingCat.of k)}

@@ -152,9 +152,9 @@ theorem cwl_coeffT_Phi (L : List (Fin r × Fin r × (Fin r × Fin n)))
       rw [List.nodup_append] at hL'
       intro h
       exact hL'.2.2 v h v (by simp) rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [cwl_Phi_append_single, cwl_tau_iota, Polynomial.eval₂_eq_sum, Polynomial.sum_def,
-      map_sum, cwl_coeffT_sum]
+
+    rw [cwl_Phi_append_single, cwl_tau_iota, Polynomial.eval₂_eq_sum, Polynomial.sum_def,
+    map_sum, cwl_coeffT_sum]
     have key : ∀ (j : ℕ) (c : MvPolynomial (Fin r × Fin n) R),
         cwl_coeffT d (cwl_Phi w (cwl_iota c * C (X (s, a, v).2.2) ^ j)) =
           if j ≤ d v then cwl_coeffT (d - Finsupp.single v j) (cwl_Phi w (cwl_iota c)) else 0 := by

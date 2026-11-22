@@ -240,7 +240,7 @@ end GlobalTheory.CrysInertDescent
 namespace GlobalTheory.CrysInertDescent
 variable {l : ℕ} [Fact l.Prime]
 
-set_option maxHeartbeats 1000000 in
+
 theorem descend (P : LocPrime l) {LL : FinExt l} (T : QLat LL) (K' F K'' : FinExt l) (hN : (GK K').Normal)
     (hK'' : K''.1 = K'.1 ⊔ F.1)
     (hfix : ∀ i : Gl l, i ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l) → (i : GQ l) ∈ GK F →
@@ -305,7 +305,7 @@ end GlobalTheory.CrysInertDescent
 
 namespace GlobalTheory.CrysInertDescent
 
-set_option maxHeartbeats 1000000 in
+
 theorem main : GlobalTheory.Published.FontaineBcris → ∀ (l : ℕ) [Fact l.Prime] (LL : FinExt l) (Pl : LocPrime l) (AI : LocAinf l Pl), IsStd Pl AI → ∀ (K' F : FinExt l), (GK K').Normal → ∀ T : QLat LL, IsCrys (Pl.PD K') (resF T K').ρ → ((∀ g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l), (g : GQ l) ∈ GK F → ∀ x ∈ Dcris (Pl.PD K') (resF T K').ρ, actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ g x = x) → IsCrys (Pl.PD F) (resF T F).ρ) ∧ ∀ g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l), ∀ p : Polynomial ↥LL.1, (∀ x ∈ Dcris (Pl.PD K') (resF T K').ρ, Polynomial.aeval (actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ g : Module.End ↥LL.1 (T.V ⊗[ℚ_[l]] Pl.R.B)) p x = 0) → ∀ x ∈ Dcris (Pl.PD F) (resF T F).ρ, Polynomial.aeval (actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ g : Module.End ↥LL.1 (T.V ⊗[ℚ_[l]] Pl.R.B)) p x = 0 := by
   intro _ l _ LL Pl AI hstd K' F hN T hc
   have hT : LocTied l Pl AI := hstd.some

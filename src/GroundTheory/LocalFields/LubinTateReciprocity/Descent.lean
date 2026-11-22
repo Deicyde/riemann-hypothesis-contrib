@@ -312,8 +312,8 @@ theorem exists_adjoinRoot_map_eq {S : Type*} [CommRing S] (ι : R →+* S) (p : 
     ∃ y : AdjoinRoot p, AdjoinRoot.map ι p q hq y = z := by
   refine ⟨∑ i, AdjoinRoot.of p (d i) * AdjoinRoot.root p ^ (i : ℕ), ?_⟩
   conv_rhs => rw [← (AdjoinRoot.powerBasis' hqm).basis.sum_repr z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, map_pow, AdjoinRoot.map_of, AdjoinRoot.map_root, hd, Algebra.smul_def,
     PowerBasis.coe_basis, AdjoinRoot.powerBasis'_gen, AdjoinRoot.algebraMap_eq]
@@ -325,7 +325,7 @@ variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchi
   {π : 𝒪[K]} (hπ : Irreducible π) (u : 𝒪[K]ˣ) (m : ℕ)
 
 
-set_option maxHeartbeats 1000000 in
+
 include hπ in
 theorem exists_fixed_root_ltEisenstein (σ : Ω ≃ₐ[K] Ω)
     (hσ : unramifiedDegree K Ω σ = Multiplicative.ofAdd 1) {l : Ω}

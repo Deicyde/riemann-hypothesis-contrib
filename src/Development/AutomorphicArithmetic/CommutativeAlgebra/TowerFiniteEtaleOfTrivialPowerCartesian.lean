@@ -10,7 +10,7 @@ set_option autoImplicit false
 open AlgebraicGeometry CategoryTheory Limits
 open UpperTheory.Gal.Int.Geo
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.tower_finiteEtale_of_trivial_powerCartesian :
     PiZero → PowCart → PiFet := by
   intro h0 hpc p _ D G L E _ _ gb w q _ r 𝔴 𝔫 S k T N c a hN C

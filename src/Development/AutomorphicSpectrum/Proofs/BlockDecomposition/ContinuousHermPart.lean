@@ -38,7 +38,7 @@ theorem hermPart_rat {x : Mx D r r} (hx : x ∈ ratMx D r r) : hermPart D r x �
   refine (mem_ratMx).2 ⟨(1 / 2 : D.host.E) • (γ + γᴴ), ?_⟩
   rw [rat_smul, rat_add, rat_conjTranspose]; rfl
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem continuous_hermPart : Continuous (hermPart D r) :=
   haveI : IsTopologicalAddGroup (Mx D r r) := (lattice_Mx D r r).1
   show Continuous fun x => half D • (x + adj x) from (continuous_id.add continuous_adj).const_smul (half D)

@@ -32,8 +32,8 @@ theorem finrank_orth_add_finrank (U : Submodule E S.V) : finrank E (orth S U) + 
     rw [Fintype.linearIndependent_iff]
     intro c hc a
     have h1 : S.hT (∑ a, star (c a) • (b a : S.V)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, ← hc]
+
+      rw [map_sum, ← hc]
       refine Finset.sum_congr rfl (fun a _ => ?_)
       rw [map_smulₛₗ, starRingEnd_apply, star_star]
     have h2 : ∑ a, star (c a) • (b a : S.V) = 0 := S.nondeg.1 _ (fun y => by rw [h1]; rfl)
