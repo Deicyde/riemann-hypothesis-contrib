@@ -68,6 +68,7 @@ def main():
             for field in ['conflicts','conflict_count','rebase_head','rebased_head','prepared_branch']:
                 row.pop(field,None)
         row['note']='Contributor incorporated the latest main during this maintenance pass; left their newer work in place.' if update['status']=='updated-by-contributor' else 'PR closed during the maintenance pass; no branch update is necessary.'
+        if int(key)==91 and update['status']=='closed':row['note']='Closed by another actor during this pass. Four unmerged cleanup commits remain available at the linked preserved head.'
     catalog[85]['note']='Historical formatter demonstration against formatter-pilot-base, explicitly not for merging. Left its before/after comparison intact.'
     rows=[catalog[n] for n in sorted(catalog)]
     counts=dict(collections.Counter(r['status'] for r in rows))
@@ -85,10 +86,11 @@ def main():
               'counts':counts,'results':compact}
     (HERE/'rebase-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     lines=['# Open PR rebase maintenance — 2026-11-22','',
-           'Main: [`'+BASE[:12]+'`]('+UPSTREAM+'/commit/'+BASE+'). The pass covers all 36 PRs open at the initial snapshot; newer PRs were left to their current workers. Previously requested #66 has merged.','',
+           'Reviewed proof base: [`'+BASE[:12]+'`]('+UPSTREAM+'/commit/'+BASE+'). The pass covers all 36 PRs open at the initial snapshot; newer PRs were left to their current workers. Previously requested #66 has merged.','',
+           'Main subsequently advanced through README-only edits. The publishing script follows these edits while checking that every other file and all retained author/message metadata remain identical. Any other main change stops publication.','',
            'Validation covers Git replay and structural checks; Lean builds remain required. Conflicted proof edits were adapted individually, retaining needed Lean 4.36 port fixes, toolchain and dependency pins. Edits to declarations already pruned from main were dropped. Retained original commits preserve their authors and full messages, including coauthor trailers. The final documentation-only restack additionally checks exact source/configuration identity and exact author/message metadata.','',
            'GitHub allowed publication to Jack’s fork but rejected updates to contributor/upstream branches with “Resource not accessible by integration”. Prepared heads below remain available on the fork. No pull request was merged or closed by this maintenance pass.','',
-           'Upstream merged #115 during this pass. Empty rebases confirm that #71, #74, #76, #80, #81, #82, #90 and #92 are now fully incorporated in main. Their branches were left intact. #91 retains four further cleanup commits.','',
+           'Upstream merged #115 during this pass. Empty rebases confirm that #71, #74, #76, #80, #81, #82, #90 and #92 are now fully incorporated in main. Their branches were left intact. #91 was subsequently closed by another actor; its four remaining cleanup commits and its pre-update heads are preserved in the preparation and backup branches.','',
            'Seven older transformations require regeneration against Lean 4.36: #4 (import minimization), #55/#58/#61/#67 (unused-declaration pruning), #44 (proof overhaul) and #63 (module consolidation). The last replay found 6,482, 4,029, 103,997 and 142,439 conflicts respectively; those reports precede #115. Retained proofs and imports overlap their deletion/transformation ranges.','',
            '| PR | Result | Prepared or published head | Detail |','|---|---|---|---|']
     for r in compact:
@@ -98,7 +100,7 @@ def main():
     lines += ['', '## Publishing prepared heads','',
               'Use an account that can update each original PR branch. Save this directory’s `push_prepared_rebases.py` and `rebase-manifest.json` together, then run:', '',
               '```sh','gh auth setup-git','python3 push_prepared_rebases.py          # read-only preview','python3 push_prepared_rebases.py --apply 9 10','```','',
-              '`--apply-all` publishes every ready entry. The script refuses changed main or PR heads, verifies the prepared ref, creates original-head backups and uses exact force-with-lease updates. It skips PRs that have closed. It never merges or closes a PR. Lean build validation remains necessary.','',
+              '`--apply-all` publishes every ready entry. The script stops if main changes outside README or a PR head changes. README-only main updates are replayed with exact file and author/message checks. It verifies prepared refs, creates original-head backups and uses exact force-with-lease updates. It skips PRs that have closed. It never merges or closes a PR. Lean build validation remains necessary.','',
               'Each manifest row links its immutable per-run report, with conflict stages, resolutions and checks. The preparation and checkpoint branches preserve reviewable Git histories. `final-verification.json` records the additional author, file-identity and concurrent-update audits.']
     (HERE/'README.md').write_text('\n'.join(lines)+'\n')
     print(json.dumps(counts));print('Ready to publish:',[r['number'] for r in compact if r['ready_to_publish']])

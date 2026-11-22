@@ -1,12 +1,14 @@
 # Open PR rebase maintenance — 2026-11-22
 
-Main: [`611ce0b63013`](https://github.com/leanprover-community/riemann-hypothesis/commit/611ce0b6301315e35f9642dfa1817e19d6dba2f1). The pass covers all 36 PRs open at the initial snapshot; newer PRs were left to their current workers. Previously requested #66 has merged.
+Reviewed proof base: [`611ce0b63013`](https://github.com/leanprover-community/riemann-hypothesis/commit/611ce0b6301315e35f9642dfa1817e19d6dba2f1). The pass covers all 36 PRs open at the initial snapshot; newer PRs were left to their current workers. Previously requested #66 has merged.
+
+Main subsequently advanced through README-only edits. The publishing script follows these edits while checking that every other file and all retained author/message metadata remain identical. Any other main change stops publication.
 
 Validation covers Git replay and structural checks; Lean builds remain required. Conflicted proof edits were adapted individually, retaining needed Lean 4.36 port fixes, toolchain and dependency pins. Edits to declarations already pruned from main were dropped. Retained original commits preserve their authors and full messages, including coauthor trailers. The final documentation-only restack additionally checks exact source/configuration identity and exact author/message metadata.
 
 GitHub allowed publication to Jack’s fork but rejected updates to contributor/upstream branches with “Resource not accessible by integration”. Prepared heads below remain available on the fork. No pull request was merged or closed by this maintenance pass.
 
-Upstream merged #115 during this pass. Empty rebases confirm that #71, #74, #76, #80, #81, #82, #90 and #92 are now fully incorporated in main. Their branches were left intact. #91 retains four further cleanup commits.
+Upstream merged #115 during this pass. Empty rebases confirm that #71, #74, #76, #80, #81, #82, #90 and #92 are now fully incorporated in main. Their branches were left intact. #91 was subsequently closed by another actor; its four remaining cleanup commits and its pre-update heads are preserved in the preparation and backup branches.
 
 Seven older transformations require regeneration against Lean 4.36: #4 (import minimization), #55/#58/#61/#67 (unused-declaration pruning), #44 (proof overhaul) and #63 (module consolidation). The last replay found 6,482, 4,029, 103,997 and 142,439 conflicts respectively; those reports precede #115. Retained proofs and imports overlap their deletion/transformation ranges.
 
@@ -41,7 +43,7 @@ Seven older transformations require regeneration against Lean 4.36: #4 (import m
 | [#87](https://github.com/leanprover-community/riemann-hypothesis/pull/87) | rebased | [`36ab4482cd`](https://github.com/Deicyde/riemann-hypothesis-contrib/commit/36ab4482cd80ba7bf99f3839af5f4c94eb86f9f2) | Prepared on Jack’s fork; original branch publication requires maintainer credentials. |
 | [#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88) | rebased | [`fdf6baa027`](https://github.com/Deicyde/riemann-hypothesis-contrib/commit/fdf6baa027671ba5a51c0776043573156dabbafa) | Challenge.lean is moved byte-for-byte to comparator/Challenge.lean, as intended by this PR. |
 | [#90](https://github.com/leanprover-community/riemann-hypothesis/pull/90) | already-in-main | — | An empty rebase confirms that #115 already incorporated all remaining changes. No branch rewrite is necessary. |
-| [#91](https://github.com/leanprover-community/riemann-hypothesis/pull/91) | applied | [`3dbbac15c3`](https://github.com/Deicyde/riemann-hypothesis-contrib/commit/3dbbac15c31dca8edfa0f00039979b59d3ce05ca) | Published to the original PR branch with a checked head and an original-head backup. Four unmerged cleanup commits remain after #115. |
+| [#91](https://github.com/leanprover-community/riemann-hypothesis/pull/91) | closed | [`3dbbac15c3`](https://github.com/Deicyde/riemann-hypothesis-contrib/commit/3dbbac15c31dca8edfa0f00039979b59d3ce05ca) | Closed by another actor during this pass. Four unmerged cleanup commits remain available at the linked preserved head. |
 | [#92](https://github.com/leanprover-community/riemann-hypothesis/pull/92) | already-in-main | — | An empty rebase confirms that #115 already incorporated all remaining changes. No branch rewrite is necessary. |
 | [#94](https://github.com/leanprover-community/riemann-hypothesis/pull/94) | rebased | [`8c0cb138b5`](https://github.com/Deicyde/riemann-hypothesis-contrib/commit/8c0cb138b5f8ea8fd8834369995e2d2d56d4db66) | Prepared on Jack’s fork; original branch publication requires maintainer credentials. |
 | [#95](https://github.com/leanprover-community/riemann-hypothesis/pull/95) | rebased | [`ee2509a61e`](https://github.com/Deicyde/riemann-hypothesis-contrib/commit/ee2509a61e7984414ea8a976e7bb5b64506a0533) | The entire proof source tree matches the contributor’s latest Lean 4.36 integration exactly; current main’s documentation and CI changes are included. |
@@ -59,6 +61,6 @@ python3 push_prepared_rebases.py          # read-only preview
 python3 push_prepared_rebases.py --apply 9 10
 ```
 
-`--apply-all` publishes every ready entry. The script refuses changed main or PR heads, verifies the prepared ref, creates original-head backups and uses exact force-with-lease updates. It skips PRs that have closed. It never merges or closes a PR. Lean build validation remains necessary.
+`--apply-all` publishes every ready entry. The script stops if main changes outside README or a PR head changes. README-only main updates are replayed with exact file and author/message checks. It verifies prepared refs, creates original-head backups and uses exact force-with-lease updates. It skips PRs that have closed. It never merges or closes a PR. Lean build validation remains necessary.
 
 Each manifest row links its immutable per-run report, with conflict stages, resolutions and checks. The preparation and checkpoint branches preserve reviewable Git histories. `final-verification.json` records the additional author, file-identity and concurrent-update audits.

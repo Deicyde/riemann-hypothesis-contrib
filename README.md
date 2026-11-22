@@ -2,7 +2,8 @@
 
 [![checks](https://github.com/leanprover-community/riemann-hypothesis/actions/workflows/checks.yml/badge.svg)](https://github.com/leanprover-community/riemann-hypothesis/actions/workflows/checks.yml)
 
-A Lean formalization of the Riemann Hypothesis, and of GRH for Dirichlet L-functions.
+A community-led effort to clean up and maintain a Lean formalization of the Riemann Hypothesis,
+and of GRH for Dirichlet L-functions.
 
 Levent Alpöge announced it on 2026-11-20 ([remark.pdf](https://alpo.ge/remark.pdf)), and the
 first commit, `40e56bab`, is the source as posted. Since then pull requests have deleted files

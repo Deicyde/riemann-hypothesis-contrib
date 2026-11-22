@@ -6,9 +6,9 @@
     "conflict": 7,
     "rebased": 17,
     "already-in-main": 8,
-    "closed": 1,
+    "closed": 2,
     "excluded-nonmerging-formatter-pilot": 1,
-    "applied": 2
+    "applied": 1
   },
   "results": [
     {
@@ -880,7 +880,7 @@
     {
       "number": 91,
       "title": "Combine reviewed proof cleanups on Lean 4.36",
-      "status": "applied",
+      "status": "closed",
       "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
       "original_head": "68fc637250dd1538cdda48bdb41dc99b46e939c7",
       "original_repo": "Deicyde/riemann-hypothesis-contrib",
@@ -892,6 +892,7 @@
       "prepared_branch": "maintenance/rebased-pr-91-611ce0b630-45055415926-tree-restack",
       "ready_to_publish": false,
       "published_head": "3dbbac15c31dca8edfa0f00039979b59d3ce05ca",
+      "head": "2a1994e748aece10924ecc0d933b9ee8fd34f88a",
       "changes": "79 files changed, 1390 insertions(+), 8336 deletions(-)",
       "imports": {
         "modules": 149397,
@@ -916,7 +917,7 @@
       "automatic_resolution_count": 0,
       "retained_commit_metadata_verified": true,
       "retained_commit_count": 4,
-      "note": "Published to the original PR branch with a checked head and an original-head backup. Four unmerged cleanup commits remain after #115.",
+      "note": "Closed by another actor during this pass. Four unmerged cleanup commits remain available at the linked preserved head.",
       "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-611ce0b630-45055415926-tree-restack/verification/rebase-maintenance/611ce0b630/summary.json"
     },
     {

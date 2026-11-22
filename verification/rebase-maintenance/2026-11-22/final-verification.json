@@ -51,5 +51,22 @@
       "isError": true
     }
   },
-  "lean_builds_run": false
+  "lean_builds_run": false,
+  "later_main": {
+    "head": "4b5ccecc2091a3ceb0d3cf36275fe5a00ef6c120",
+    "changes_since_reviewed_base": [
+      "README.md"
+    ]
+  },
+  "concurrent_pr91_closure": {
+    "closed_head": "2a1994e748aece10924ecc0d933b9ee8fd34f88a",
+    "preserved_linear_head": "3dbbac15c31dca8edfa0f00039979b59d3ce05ca",
+    "remaining_cleanup_commits": 4
+  },
+  "publisher_tests": [
+    "README-only restack preserves author, date, full message and coauthor trailer",
+    "Unicode author and missing final message newline preserved",
+    "Source changes on main rejected",
+    "Read-only preview performs no push"
+  ]
 }
