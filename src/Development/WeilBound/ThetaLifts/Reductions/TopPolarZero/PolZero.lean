@@ -1,29 +1,63 @@
 module
 
-public import Mathlib
-public import Development.WeilBound.ThetaLifts.LatticeBasics.BotAsm
-public import Development.WeilBound.ThetaLifts.LatticeBasics.NormZeta
-public import Development.WeilBound.ThetaLifts.LatticeBasics.CoefLine
-public import Development.WeilBound.ThetaLifts.LatticeBasics.HermCpt
-public import Development.WeilBound.ThetaLifts.LatticeBasics.EulerHalf
-public import Development.WeilBound.ThetaLifts.LatticeBasics.LocUnrInert
-public import Development.WeilBound.ThetaLifts.LatticeBasics.LocUnrSplit
-public import Development.WeilBound.ThetaLifts.LatticeBasics.FinLevel
-public import Development.WeilBound.ThetaLifts.LatticeBasics.CartanBound2
-public import Development.WeilBound.ThetaLifts.LatticeBasics.HgtIntOf
-public import Development.WeilBound.ThetaLifts.LatticeBasics.EisCont
-public import Development.WeilBound.ThetaLifts.LatticeBasics.FrameConj
-public import Development.WeilBound.ThetaLifts.LatticeBasics.BadFactor
-public import Development.WeilBound.ThetaLifts.LatticeBasics.NearUnits
-public import Development.WeilBound.ThetaLifts.LatticeBasics.PresDOf
-public import Development.WeilBound.ThetaLifts.LatticeBasics.PairsFin
-public import Development.WeilBound.ThetaLifts.LatticeBasics.ThConstFin
-public import Development.WeilBound.ThetaLifts.LatticeBasics.LocDist
-public import Development.WeilBound.ThetaLifts.LatticeBasics.OrthAn
-public import Development.WeilBound.ThetaLifts.LatticeBasics.OffOpen
-public import Development.WeilBound.ThetaLifts.LatticeBasics.HeightGLLe
-public import Development.WeilBound.ThetaLifts.LatticeBasics.SiegelWeilAnisoOf
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MatchingOfParts
+public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.HeckeLEntireAndNonzeroAtOne
+public import Development.WeilBound.ThetaLifts.CartanFactorisation.CartanConj
+public import Development.WeilBound.ThetaLifts.FrameEstimates.SquareIntegrableWeilRange
+public import Development.WeilBound.ThetaLifts.LatticeBasics.HypothesesS
 public import Development.WeilBound.CoreStatements.AbelianHeightsDuality.UnitaryDensity.EqTopOfLines
+public import Development.WeilBound.ThetaLifts.LatticeBasics.BoxSec
+public import Development.WeilBound.ThetaLifts.LatticeBasics.CartanBound2
+public import Development.WeilBound.ThetaLifts.LatticeBasics.CoefLine
+public import Development.WeilBound.ThetaLifts.LatticeBasics.EisCont
+public import Development.WeilBound.ThetaLifts.LatticeBasics.ExistsIsGauss
+public import Development.WeilBound.ThetaLifts.LatticeBasics.FinLevel
+public import Development.WeilBound.ThetaLifts.LatticeBasics.FrameConj
+public import Development.WeilBound.ThetaLifts.LatticeBasics.GoodNe
+public import Development.WeilBound.ThetaLifts.LatticeBasics.HermCpt
+public import Development.WeilBound.ThetaLifts.LatticeBasics.HgtIntOf
+public import Development.WeilBound.ThetaLifts.LatticeBasics.LocDist
+public import Development.WeilBound.ThetaLifts.LatticeBasics.PairsFin
+public import Development.WeilBound.ThetaLifts.LatticeBasics.PolZero
+public import Development.WeilBound.ThetaLifts.LatticeBasics.RatEquiv
+import Development.WeilBound.ThetaLifts.LatticeBasics.SWFull
+public import Development.WeilBound.ThetaLifts.LatticeBasics.SiegelWeilAnisoOf
+public import Development.WeilBound.ThetaLifts.LatticeBasics.ThConstFin
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

@@ -1,6 +1,12 @@
 module
 
-public import Mathlib.RingTheory.PowerSeries.WeierstrassPreparation
+public import Mathlib.RingTheory.AdicCompletion.Basic
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+public import Mathlib.RingTheory.PowerSeries.Trunc
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Tactic.ContinuousFunctionalCalculus
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 

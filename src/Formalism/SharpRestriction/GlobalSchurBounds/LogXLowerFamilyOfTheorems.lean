@@ -1,41 +1,46 @@
 module
 
-public import Formalism.SharpRestriction.SmoothDesignExistence.DesignExistsDes
-public import Formalism.SharpRestriction.SmoothDesignExistence.LinkGLOBALPk
 public import Formalism.SharpRestriction.GlobalSchurBounds.LinkMin
-public import Formalism.SharpRestriction.GlobalSchurBounds.MainSup
-public import Mathlib
-public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.UnitTraceSumBounds.LemmaTwoThreeOfSiegelBound
-public import Formalism.PeriodIntegrals.ExplicitFormulaCounts.ExplicitFormula
-public import Formalism.SharpRestriction.GlobalSchurBounds.ShortIntervalPrimes
-public import Formalism.LocalToGlobal.GlobalTheory.GL2.Statement
-public import Formalism.GL3MeanSquares.SecondEstimateOfIntervalHypothesis
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.JacobiCharacterSums.MSqMain
-public import Formalism.GL3MeanSquares.HookFormulaTorsion.WeightedVonMangoldtSumIdentity
-public import Formalism.GL3MeanSquares.HookFormulaTorsion.NumericalZeroDensityBound
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.JacobiCharacterSums.TailContour
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.JacobiCharacterSums.TailDiff
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.JacobiCharacterSums.TailMertens
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.JacobiCharacterSums.TailNum
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.JacobiCharacterSums.CountSt
-public import Formalism.GL3MeanSquares.HookFormulaTorsion.TwistIsPrimitiveCharacter
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.JacobiCharacterSums.CountZAll
-public import Formalism.LandauZeroFreeBounds.NoZeroComplex
-public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.UnitTraceSumBounds.Imports
-public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.FamilyPartFiveOfExplicitConstants
-public import Formalism.SharpRestriction.CuspSpanNormBounds.StandingHypothesesHoldFamily
-public import Formalism.SharpRestriction.CuspSpanNormBounds.PlaceDegreeData
+public import Formalism.SharpRestriction.GlobalSchurBounds.WeightVectorSmallSharesEight
+import Formalism.LocalToGlobal.GlobalTheory.LossRequirementsOfSmallShares
+import Formalism.LocalToGlobal.GlobalTheory.PlacesP
 public import Formalism.SharpRestriction.SmoothDesignExistence.DGamSmooth
-public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.CMFieldLemmas
-public import Formalism.SharpRestriction.GlobalSchurBounds.FirstClaimLemmaTwoFourOfLemmaTwoThree
-public import Formalism.SharpRestriction.GlobalSchurBounds.JointsL
-public import Formalism.LocalToGlobal.GlobalTheory.LossRequirementsOfSmallShares
-public import Formalism.SharpRestriction.GlobalSchurBounds.ProductFirstZerothParts
-public import Formalism.SharpRestriction.Divisibility.PrimeDegreeVariant
-public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LClosedeqLemmas
-public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LDlatLemmas
-public import Formalism.GradedWeylDivisibility.FinalC
-public import Formalism.LocalToGlobal.Divisibility.BrJoint
+public import Formalism.SharpRestriction.SmoothDesignExistence.LinkGLOBALPk
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

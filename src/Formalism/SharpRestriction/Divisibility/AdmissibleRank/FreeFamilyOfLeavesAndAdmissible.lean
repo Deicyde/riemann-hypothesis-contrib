@@ -1,36 +1,45 @@
 module
 
-public import Mathlib
-public import Formalism.DoubleCosetMeasures.StatementV
-public import Formalism.DoubleCosetMeasures.LowerUnipotentOrbits.LemmaU
-public import Formalism.DoubleCosetMeasures.LowerUnipotentOrbits.MeasureUniformizerMatrixSetMulCard
-public import Formalism.DoubleCosetMeasures.LowerUnipotentOrbits.RelIndexMulMeasure
-public import Formalism.SharpRestriction.Divisibility.AbsolutelyIrreducibleSpan
-public import Formalism.LandauZeroFreeBounds.SiegelWalfiszAPOfSiegelLower
-public import Formalism.LandauZeroFreeBounds.ExceptionalZeroBounds.LGrowth
-public import Formalism.LFunctionBounds.LFunctionBoundsProofs.LPartialSum
-public import Formalism.LandauZeroFreeBounds.ExceptionalZeroBounds.LDerivNearOne
-public import Formalism.LandauZeroFreeBounds.SiegelWalfiszAP
-public import Formalism.SharpRestriction.ElevenLe
-public import Formalism.SharpRestriction.ParConsts
-public import Formalism.SharpRestriction.Divisibility.ZetaProductPairs
-public import Formalism.SharpRestriction.Divisibility.InnerProductFormulaField
-public import Formalism.SharpRestriction.Divisibility.SchurIrreducible
-public import Formalism.SharpRestriction.Divisibility.KudlaSiegelWeil
-public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
-public import Formalism.LocalRingCardinality.DataDIV
-public import Formalism.SharpRestriction.Divisibility.PrinLevClass
-public import Formalism.SharpRestriction.Divisibility.PrimeDegreeVariant
-public import Formalism.SharpRestriction.Divisibility.LocalQuadraticParts
-public import Formalism.SharpRestriction.Divisibility.PlaceRankTwoOne
-public import Formalism.LocalRingCardinality.DataParams₂
-public import Formalism.LocalRingCardinality.DataDIVDefs
-public import Formalism.LocalRingCardinality.DataIdx
 public import Formalism.LocalRingCardinality.DataKap
-public import Formalism.LocalRingCardinality.DataAmbForm
-public import Formalism.LocalRingCardinality.DataRRMetric
-public import Formalism.HarderNarasimhan.ShiftInvariance
-public import Formalism.SharpRestriction.Divisibility.FamilyThetaDenominatorValues
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalRingCardinality.DataTheta
+public import Formalism.SharpRestriction.ParConsts
 
 @[expose] public section
 
