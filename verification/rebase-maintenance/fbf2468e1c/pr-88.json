@@ -1,0 +1,11 @@
+{
+  "number": 88,
+  "title": "Add a formal-conjectures Comparator setup and gather the setups in comparator/",
+  "original_head": "24e73b1ff2c9c965e39c68c32e50bdaf13a7db7a",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "comparator/formal-conjectures",
+  "maintainer_can_modify": false,
+  "old_merge_base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "status": "error",
+  "error": "git push: To https://github.com/Deicyde/riemann-hypothesis-contrib.git\n ! [remote rejected]       f3c6a3940d5e8fa2a56c9da47a34164929c67ae0 -> maintenance/checkpoint-pr-88-fbf2468e1c-45054686002-docs-pr-88-pending-1 (refusing to allow a GitHub App to create or update workflow `.github/workflows/checks.yml` without `workflows` permission)\nerror: failed to push some refs to 'https://github.com/Deicyde/riemann-hypothesis-contrib.git'\n"
+}
