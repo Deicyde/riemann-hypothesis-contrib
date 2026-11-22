@@ -37,8 +37,7 @@ theorem freeOf_J_matrix (a : S) : FreeOf2 a JJ := by
 theorem freeOf2_mul {a : S} {M N : M2 (SlopeTestRemainingChoices S A)} (hM : FreeOf2 a M) (hN : FreeOf2 a N) :
     FreeOf2 a (M * N) := by
   intro i j k l
-  simp only [Matrix.mul_apply]
-  exact Commute.sum_right _ _ _ fun m _ => (hM i m k l).mul_right (hN m j k l)
+  simpa only [Matrix.mul_apply] using Commute.sum_right _ _ _ fun m _ => (hM i m k l).mul_right (hN m j k l)
 
 theorem freeOf2_transpose {a : S} {M : M2 (SlopeTestRemainingChoices S A)} (hM : FreeOf2 a M) : FreeOf2 a Mᵀ := fun i j => hM j i
 
@@ -49,8 +48,7 @@ theorem freeOf_matrix_smul {a : S} {M : M2 (SlopeTestRemainingChoices S A)} (c :
 theorem freeOf_diagScalar {a : S} {b : SlopeTestRemainingChoices S A} (h : FreeOf a b) : FreeOf2 a (d0 b) := by
   intro i j
   by_cases hij : i = j
-  · subst hij
-    simpa [d0] using h
+  · simpa [d0, hij] using h
   · simpa [d0, hij] using free_zero (A := A) a
 
 theorem J_mul_J : JJ * JJ = -1 := by
@@ -103,10 +101,9 @@ theorem partial_flip_mul_J_insert (a : S) : Q0 a * d0 (ins a JJ) = d0 (ins a JJ)
 
 theorem Rh0_J (a : S) (D d : K) (h : d = 1 - D) (hD : D ≠ 0) (hD1 : D ≠ 1) :
     Rh0 a D * d0 (ins a JJ) = (D / (D - 1)) • (d0 (ins a JJ) * Rht0 a d) := by
-  have h1 : D - 1 ≠ 0 := sub_ne_zero.mpr hD1
   have hc : D / (D - 1) * (1 - D - 1)⁻¹ = -(D - 1)⁻¹ := by
     rw [show 1 - D - 1 = -D by ring, inv_neg]
-    field_simp
+    field_simp [hD, sub_ne_zero.mpr hD1]
   subst h
   unfold Rh0 Rht0
   rw [Matrix.smul_mul, Matrix.sub_mul, Matrix.smul_mul, Matrix.one_mul, flip_mul_J_insert, Matrix.mul_smul,
@@ -117,10 +114,9 @@ theorem Rh0_J (a : S) (D d : K) (h : d = 1 - D) (hD : D ≠ 0) (hD1 : D ≠ 1) :
 
 theorem Rht0_J (a : S) (d D : K) (h : D = 1 - d) (hd : d ≠ 0) (hd1 : d ≠ 1) :
     Rht0 a d * d0 (ins a JJ) = (d / (d - 1)) • (d0 (ins a JJ) * Rh0 a D) := by
-  have h1 : d - 1 ≠ 0 := sub_ne_zero.mpr hd1
   have hc : d / (d - 1) * (1 - d - 1)⁻¹ = -(d - 1)⁻¹ := by
     rw [show 1 - d - 1 = -d by ring, inv_neg]
-    field_simp
+    field_simp [hd, sub_ne_zero.mpr hd1]
   subst h
   unfold Rh0 Rht0
   rw [Matrix.smul_mul, Matrix.sub_mul, Matrix.smul_mul, Matrix.one_mul, partial_flip_mul_J_insert, Matrix.mul_smul,
@@ -153,12 +149,8 @@ theorem star_mul_ins {a : S} {RR : SlopeTestRemainingChoices S A} (hR : FreeOf a
 theorem herm_transpose {RR : SlopeTestRemainingChoices S A} {M : M2 (SlopeTestRemainingChoices S A)}
     (h : (d0 RR * M)ᴴ = d0 RR * M) : (d0 RR * Mᵀ)ᴴ = d0 RR * Mᵀ := by
   refine Matrix.ext fun i j => ?_
-  have h1 := congrFun (congrFun h j) i
-  rw [Matrix.conjTranspose_apply, d0, Matrix.diagonal_mul] at h1
-  rw [Matrix.conjTranspose_apply, d0, Matrix.diagonal_mul, Matrix.diagonal_mul,
-    Matrix.transpose_apply, Matrix.transpose_apply]
-  rw [Matrix.diagonal_mul] at h1
-  exact h1
+  simpa [d0, Matrix.diagonal_mul, Matrix.conjTranspose_apply, Matrix.transpose_apply] using
+    congrFun (congrFun h j) i
 
 theorem ins_J_comm {a : S} {b : SlopeTestRemainingChoices S A} (hb : FreeOf a b) : b * ins a JJ = ins a JJ * b :=
   (Wd1.ins_comm a JJ b hb (comm_J b)).eq

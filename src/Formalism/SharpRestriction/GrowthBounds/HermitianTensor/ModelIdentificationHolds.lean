@@ -31,9 +31,8 @@ theorem theorem_I_of_pairing_GL (D : Formalism.BasicNotions.D7) (hPh : QPh) : Se
   obtain ⟨T0, -, h0⟩ := hA 0 le_rfl
   obtain ⟨T1, -, h1⟩ := h0 T0 le_rfl
   obtain ⟨T2, -, h2⟩ := h1 T1 T1 T1 le_rfl le_rfl le_rfl
-  obtain ⟨CA, Ckap, Ct, Cs, -, -, -, -, hB⟩ := h2 T2 le_rfl
+  obtain ⟨_, _, _, _, _, _, _, _, hB⟩ := h2 T2 le_rfl
   have hT : AdmT D := hB.2.2.2.2
-  have h11 : GradedLatticeStable D := hT.2.2.2.2.2.2.1
-  exact theorem_I_of_contraction D (contraction_of_pairing_GL hPh h11.2) hA
+  exact theorem_I_of_contraction D (contraction_of_pairing_GL hPh (hT.2.2.2.2.2.2.1.2)) hA
 
 end Formalism.MainNotions.flipOneThree.Pf

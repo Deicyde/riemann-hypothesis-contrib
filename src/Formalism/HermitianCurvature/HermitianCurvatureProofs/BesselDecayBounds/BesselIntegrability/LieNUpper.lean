@@ -53,7 +53,6 @@ theorem lieNUpper : LieNUpper := by
       intro h; apply hl; ext; omega
     · simp
   have hz : X b p = 0 := hA1 ⟨p.val, by omega⟩ b (by simp only; omega)
-  rw [s1, s2, hz, star_zero, zero_add] at e
-  exact e
+  rwa [s1, s2, hz, star_zero, zero_add] at e
 
 end Formalism.MainNotions.GrowthW

@@ -19,8 +19,7 @@ theorem det_mem {h : V →ₗ⋆[K] V →ₗ[K] K} {n : ℕ} (x : Fin n → V) (
   have e : S.subtype.mapMatrix (Matrix.of fun i j => (⟨h (x i) (x j), hx i j⟩ : S)) = U0.gram h x := by
     ext i j
     rfl
-  rw [e] at key
-  rw [← key]
+  rw [← e, ← key]
   exact Subtype.mem _
 
 theorem smul_apply' (h : V →ₗ⋆[K] V →ₗ[K] K) (c : K) (x y : V) : (c • h) x y = c * h x y := by

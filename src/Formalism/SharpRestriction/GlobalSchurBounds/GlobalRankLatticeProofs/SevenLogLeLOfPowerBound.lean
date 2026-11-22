@@ -65,9 +65,7 @@ theorem lamCol_anti (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau) (i j : �
   induction d with
   | zero => exact le_rfl
   | succ d ih =>
-    have h1 := lamCol_step D u τ (i + d) (by omega)
-    have h2 := ih (by omega) (by omega)
-    exact h1.trans h2
+    exact (lamCol_step D u τ (i + d) (by omega)).trans (ih (by omega) (by omega))
 
 theorem lamCol_int (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau) (i : ℕ) (hi : i < D.R.k) :
     ∃ z : ℤ, lamCol D u τ i = z := by
@@ -239,13 +237,10 @@ theorem base_sizes2 {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (hX 
   obtain ⟨s1, s2, s3, s4, s5, s6, s7⟩ := base_sizes P
   have hx := L.sc.one_lt_alt
   have hm2 : (2 : ℝ) ≤ D.R.m := by exact_mod_cast D.R.two_le_m
-  have hn1 : (1 : ℝ) ≤ D.R.n := by
-    have : 1 ≤ D.R.n := D.R.ord_pos
-    exact_mod_cast this
+  have hn1 : (1 : ℝ) ≤ D.R.n := by exact_mod_cast D.R.ord_pos
   have hN0 : (0 : ℝ) ≤ D.R.N D.R.m := Nat.cast_nonneg _
-  have hNW : (D.R.N D.R.m : ℝ) ≤ L.sc.w'' D.R.n := by
-    refine le_trans ?_ s1
-    exact le_mul_of_one_le_right hN0 (one_le_pow₀ (by linarith))
+  have hNW : (D.R.N D.R.m : ℝ) ≤ L.sc.w'' D.R.n :=
+    le_trans (le_mul_of_one_le_right hN0 (one_le_pow₀ (by linarith))) s1
   have hW0 : 0 ≤ L.sc.w'' D.R.n := le_trans hN0 hNW
   have hb0 : 0 < L.sc.b := Real.exp_pos _
   refine ⟨hNW, ?_, ?_⟩
@@ -583,10 +578,8 @@ theorem nums_of_params {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (
 
 theorem rdE_le {R : Ranks} (H : Host R) : H.rdE ≤ 2 * (R.n : ℝ) ^ 2 * Real.sqrt ((H.q : ℝ) * H.d) := by
   refine le_trans (factRd R H).2.1 ?_
-  apply mul_le_mul_of_nonneg_right _ (Real.sqrt_nonneg _)
   have h1 : (H.QS : ℝ) ≤ (R.n : ℝ) ^ 2 := by exact_mod_cast H.QS_le
-  have h2 : (0 : ℝ) ≤ (R.n : ℝ) ^ 2 := by positivity
-  linarith
+  exact mul_le_mul_of_nonneg_right (by linarith) (Real.sqrt_nonneg _)
 
 theorem pow_le_exp_rpow_for_large_x (K : ℕ) (e : ℝ) (he : 0 < e) :
     ∃ x0 : ℝ, ∀ x, x0 ≤ x → x ^ K ≤ Real.exp (x ^ e) := by
@@ -670,8 +663,7 @@ theorem size_bounds_of_scale {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : 
     apply Real.rpow_le_rpow_of_exponent_le hx1
     linarith
   · unfold Scale.L
-    apply Real.rpow_le_rpow_of_exponent_le hx1
-    linarith
+    exact Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
   · refine le_trans ?_ hn1
     have h1 : L.sc.x ^ (2 : ℝ) ≤ L.sc.x ^ (2 + 8 * L.sc.eps - L.sc.eps / 100) := by
       apply Real.rpow_le_rpow_of_exponent_le hx1
@@ -687,17 +679,14 @@ theorem size_bounds_of_scale {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : 
     linarith
   · refine le_trans hq ?_
     unfold Scale.L
-    apply Real.rpow_le_rpow_of_exponent_le hx1
-    linarith
+    exact Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
   · refine le_trans hd ?_
     unfold Scale.L
-    apply Real.rpow_le_rpow_of_exponent_le hx1
-    linarith
+    exact Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
 
 theorem cyl_eq {eps : ℝ} (Fm : FamP eps) (x : ℝ) (hx : Fm.x1 < x) (i : Fm.Ix x) :
     (Fm.params x hx i).CYL = Fm.PK.getD 19 0 := by
-  have := congrArg (fun l => l.getD 19 0) (Fm.params_K x hx i)
-  simpa [parConsts] using this
+  simpa [parConsts] using congrArg (fun l => l.getD 19 0) (Fm.params_K x hx i)
 
 theorem nums_wts_of_fam {eps : ℝ} (Fm : FamP eps)
     (hT : ∃ Cc x0 : ℝ, ∀ x ≥ x0, ∀ (i : Fm.Ix x) u,
@@ -729,11 +718,8 @@ theorem nums_wts_of_fam {eps : ℝ} (Fm : FamP eps)
     have := le_trans (le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) (le_max_right _ _)) hx
     linarith
   have hsx : (Fm.L x i).sc.x = x := Fm.L_x x i hx1
-  have hse : (Fm.L x i).sc.eps = eps := Fm.L_eps x i
   have hX : (Fm.L x i).sc.x ^ 14 ≤ (Fm.L x i).sc.X' := by
-    unfold Scale.X'
-    rw [hsx, hse]
-    exact hA x hxA
+    simpa [Scale.X', hsx, Fm.L_eps x i] using hA x hxA
   have hx4' : 4 ≤ (Fm.L x i).sc.x := by rw [hsx]; exact hx4
   obtain ⟨c1, -⟩ := index_scalar_multiple_eq _ hX
   have c2 := seven_log_le_L_of_power_bound _ hX

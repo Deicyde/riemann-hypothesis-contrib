@@ -95,10 +95,9 @@ private theorem hpk_sq_lemma (k r : ℕ) : Hpk k r * Hpk k r = 1 := by
 
 private theorem isUnit_det_of_mem_UH' {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r)) :
     IsUnit g.det := by
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   have h : Hpk k r * gᴴ * Hpk k r * g = 1 := by
     calc Hpk k r * gᴴ * Hpk k r * g = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
-      _ = 1 := by rw [hg', hpk_sq_lemma k r]
+      _ = 1 := by rw [hg, hpk_sq_lemma k r]
   exact Matrix.isUnit_det_of_left_inverse h
 
 theorem stabAct_comp {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r))
