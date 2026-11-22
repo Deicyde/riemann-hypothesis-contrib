@@ -131,8 +131,8 @@ theorem semilinear_eq_sum_single {K : Type} [Field K] {σ : K →+* ℂ} {n : �
   have hx : x = ∑ i, x i • (Pi.single i 1 : Fin n → K) := by
     ext k; simp [Finset.sum_apply, Pi.single_apply]
   conv_lhs => rw [hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [map_smulₛₗ]
 
 theorem isCxBasis_coord : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (σ : K →+* ℂ) (n : ℕ) (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W] (j : (Fin n → K) →ₛₗ[σ] W), IsCxBasis σ j → (∀ x, j x = ∑ i, σ (x i) • j (Pi.single i 1)) ∧ Function.Injective j ∧ Module.finrank ℂ W = n := by
@@ -237,8 +237,8 @@ private theorem v0_int_lemma_5 {K : Type} [Field K] [NumberField K] [StarRing K]
     have hgen : ∀ v ∈ M.gen, ∃ y, j y = v := hM.1
     choose! pre hpre using hgen
     have hjy : j (∑ v ∈ M.gen, (c v : K) • pre v) = x := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, hc]
+
+      rw [map_sum, hc]
       refine Finset.sum_congr rfl fun v hv => ?_
       rw [map_smulₛₗ, hpre v hv]
     set y := ∑ v ∈ M.gen, (c v : K) • pre v with hy
@@ -292,8 +292,8 @@ private theorem jEE_injective' {D : D7} {EE : Type} [NormedAddCommGroup EE] [Inn
   set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro y hy
   have hsum : y = ∑ i, X.RR.b.repr y i • X.RR.b i := (X.RR.b.sum_repr y).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, map_sum] at hy
+
+  rw [hsum, map_sum] at hy
   simp only [map_smulₛₗ] at hy
   have h0 := Fintype.linearIndependent_iff.mp X.jEE_basis.1 _ hy
   rw [hsum]
@@ -350,8 +350,8 @@ private theorem le_span_lemma_9 (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T
   have key : eRR ((S.ι t).mulVec (((A.side P ψ Zs).Pq t).mulVec F)) =
       ∑ u ∈ s', (c u : D.what₂.LL) • z u := by
     apply jEE_injective' X
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hX.iota t F, hxs, map_sum, map_sum]
+
+    rw [← hX.iota t F, hxs, map_sum, map_sum]
     refine Finset.sum_congr rfl fun u hu => ?_
     rw [LinearMap.map_smul, map_smulₛₗ, hz u hu]
   have hsm : ∀ (a : 𝓞 D.what₂.LL) (v : X.RR.V), (a : D.what₂.LL) • v = a • v := fun a v => by

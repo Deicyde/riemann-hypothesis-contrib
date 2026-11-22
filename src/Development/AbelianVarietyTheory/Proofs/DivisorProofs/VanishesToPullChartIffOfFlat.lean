@@ -169,8 +169,8 @@ theorem LeadAt.map {R S R' S' : Type*} [CommRing R] [CommRing S] [CommRing R'] [
   refine ⟨fun α => θ (m α), fun α => by rw [e, hm], ?_⟩
   have := Ideal.mem_map_of_mem θ hf
   rw [Ideal.map_pow, Ideal.map_span, ← Set.range_comp] at this
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_sum, map_mul, map_monoVal] at this
+
+  simp only [map_sub, map_sum, map_mul, map_monoVal] at this
   exact this
 
 section Lead

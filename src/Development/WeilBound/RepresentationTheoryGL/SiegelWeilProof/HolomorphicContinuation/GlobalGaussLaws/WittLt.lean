@@ -19,7 +19,7 @@ namespace PositivityTheory.Rg.Sw.Glob
 
 open ReciprocityTheory.ChartRestriction.G
 
-set_option maxHeartbeats 1600000 in
+
 theorem wittLBlt : WittLBlt := by
   intro D V k hk hS
   letI : NumberField.IsCMField D.host.E := D.host.isCMField_hostE

@@ -31,10 +31,10 @@ open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotion
 variable {D : D7}
 
 
-set_option maxHeartbeats 1000000 in
+
 @[reducible] def nchCut (c : CutD D) (x : NChoice D) : NChoice (cut D c) := { x with }
 
-set_option maxHeartbeats 1000000 in
+
 theorem nct_cut (c : CutD D) {x : NChoice D} (h : NChTie D x) : NChTie (cut D c) (nchCut c x) :=
   { h with
     twOf_eq := fun a => h.twOf_eq a.1

@@ -12,7 +12,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 
 open GlobalTheory.BirigidPow (val_one_left val_one_right val_pow_right comp_pow_pt) in
 open GlobalTheory.CechPic (cls cls_pull cls_eq_iff cls_eq_zero_iff pull_comp) in
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.Cb.polarization_kernel_of_p_isogeny_quasi_inverse :
     ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ) (c : ℕ) (Y : Scheme.{0}) (s : Y ⟶ Sp R) (o o' : Obj b N s) (ψ : o.A ⟶ o'.A) (ψ' : o'.A ⟶ o.A), IsUnit ((p : ℕ) : R) → IsPIsog c o o' ψ → IsQuasiInv c ψ ψ' → PolKerAt o ψ' c (𝟙 Y) := by
   intro p _ D R _ b N c Y s o o' ψ ψ' hp hI hq T σ hσ x hx

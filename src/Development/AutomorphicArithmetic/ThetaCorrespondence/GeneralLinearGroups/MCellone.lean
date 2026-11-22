@@ -15,7 +15,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsE
 
 open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult UpperTheory.Lit.Cas
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 section
 
@@ -59,7 +59,7 @@ private theorem cellone_offdiag (hG : GeometricLemma) (hBZ : BernsteinZelevinsky
   refine jhMult_ne_zero_iff.2 hsub (key _ hd (funext fun i => ?_))
   fin_cases i <;> rfl
 
-set_option maxHeartbeats 1000000 in
+
 private theorem jacquet_multiplicity_single_cell (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness) (x : Fin 2 → IrrGL (k := k))
     (H : ∀ (q : Fin 2 → IrrGL (k := k)) (hq : ∑ a, (q a).1 = (x 1).1), 0 < (q 0).1 → jm q hq (x 1).rep ≠ 0 →
       ∀ (p : IrrGL (k := k)) (hc : ∑ a, (![p, q 0] a).1 = (x 0).1), jhMult (x 0).rep (prodIrr ![p, q 0] hc) = 0)

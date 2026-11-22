@@ -63,8 +63,8 @@ theorem rayLe : ∀ (K E L Ω : Type) [Field K] [NumberField K] [_root_.NumberFi
   haveI : NumberField M' := NumberField.of_module_finite E M'
   have hmem : ∀ y, j y ∈ M' := by
     intro y
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr y, map_sum]
+
+    rw [← b.sum_repr y, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_smul, Algebra.smul_def, IsScalarTower.algebraMap_apply K E Ω]
     exact mul_mem (M'.algebraMap_mem _) (IntermediateField.subset_adjoin E _ ⟨i, rfl⟩)

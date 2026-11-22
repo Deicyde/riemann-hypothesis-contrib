@@ -33,8 +33,8 @@ theorem qminor_exists_poly {A : Type} [Ring A] [Algebra ℂ A] {n t : ℕ} (E : 
     rw [RingHom.id_apply, ← map_pow, Algebra.smul_def, Algebra.commutes]
   have hX : φ Polynomial.X = algebraMap ℂ A u := Polynomial.eval₂_X _ _
   have hC : ∀ x, φ (Polynomial.C x) = x := fun x => Polynomial.eval₂_C _ _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← hφ, map_sum, qminor]
+
+  rw [← hφ, map_sum, qminor]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [map_mul, map_intCast, map_list_prod, List.map_ofFn]
   congr 3
@@ -94,9 +94,9 @@ theorem cof_eigen {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {m
     rw [Finset.sum_comm, Finset.smul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     simp only [Module.End.mul_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, ← map_sum, hT, map_smul, map_smul, Module.End.intCast_apply,
-      ← Int.cast_smul_eq_zsmul ℂ]
+
+    rw [← map_sum, ← map_sum, hT, map_smul, map_smul, Module.End.intCast_apply,
+    ← Int.cast_smul_eq_zsmul ℂ]
     push_cast
     rfl
   have hc1 : Continuous fun Y : ℂ => ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) •
@@ -115,8 +115,8 @@ namespace GlobalTheory
 
 theorem comatrix_picks_eigencomponent : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (m : ℕ) (E : Fin (m + 1) → Fin (m + 1) → Module.End ℂ M) (mu : Fin (m + 1) → ℝ) (y : Fin (m + 1) → Fin (m + 1) → M), Formalism.REAL.GlRel E → (∀ (Y : ℂ) (w : M), Formalism.REAL.qdet E (Y + (((m + 1 : ℕ) : ℂ) - 1) / 2) w = (∏ s, (Y + (mu s : ℂ))) • w) → (∀ t, splitCas E (y t) = ((-mu t + (1 - ((m + 1 : ℕ) : ℝ)) / 2 : ℝ) : ℂ) • y t) → ∀ s i, ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) • Formalism.REAL.qminor E (Fin.succAbove j) (Fin.succAbove i) (-(mu s : ℂ) + (m : ℂ) / 2) (∑ t, y t j) = (∏ t ∈ univ.erase s, ((mu t : ℂ) - mu s)) • y s i := by
   intro M _ _ m E mu y hE hq hy s i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, Finset.smul_sum]
+
+  simp only [map_sum, Finset.smul_sum]
   rw [Finset.sum_comm]
   simp only [fun t => ComatrixEigen.cof_eigen E mu (y t) hE hq t (hy t) i (-(mu s : ℂ))]
   rw [Finset.sum_eq_single s]

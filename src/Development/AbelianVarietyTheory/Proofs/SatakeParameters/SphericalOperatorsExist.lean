@@ -98,13 +98,13 @@ theorem exists_finsupp_heckeVec (S : Subring ℂ) {G : Type} [Group G] {K : Subg
   refine ⟨∑ c ∈ s, Finsupp.single c.out (h c.out), fun g => ?_, fun V _ _ ρ x => ?_⟩
   · rw [Finsupp.finsetSum_apply]
     exact Subring.sum_mem _ fun c _ => single_mem S _ (hS _) g
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [← opHom_apply ρ x, map_sum, heckeVec, finsum_eq_sum_of_support_subset (s := s)]
-      · refine Finset.sum_congr rfl fun c _ => ?_
-        rw [opHom_apply, opOf_single]
-      · intro c hc
-        simp only [s, Set.Finite.coe_toFinset, Set.mem_setOf_eq]
-        exact fun h0 => hc (by simp [h0])
+
+  · rw [← opHom_apply ρ x, map_sum, heckeVec, finsum_eq_sum_of_support_subset (s := s)]
+    · refine Finset.sum_congr rfl fun c _ => ?_
+      rw [opHom_apply, opOf_single]
+    · intro c hc
+      simp only [s, Set.Finite.coe_toFinset, Set.mem_setOf_eq]
+      exact fun h0 => hc (by simp [h0])
 
 end GlobalTheory.Cong.SphOpsProof
 

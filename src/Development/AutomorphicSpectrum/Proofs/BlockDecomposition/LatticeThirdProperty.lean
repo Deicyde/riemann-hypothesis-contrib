@@ -100,8 +100,8 @@ theorem exists_of_fixed [FiniteDimensional k E] [IsGalois k E] (σ : E ≃ₐ[k]
 
 theorem sum_pow_fixed (σ : E ≃ₐ[k] E) {ℓ : ℕ} (hℓ : σ ^ ℓ = 1) (z : E) :
     σ (∑ j ∈ Finset.range ℓ, (σ ^ j) z) = ∑ j ∈ Finset.range ℓ, (σ ^ j) z := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   have h : ∀ j, σ ((σ ^ j) z) = (σ ^ (j + 1)) z := fun j => by
     rw [pow_succ', AlgEquiv.mul_apply]
   simp_rw [h]
@@ -224,8 +224,8 @@ theorem descent_core {k E : Type} [Field k] [ValuativeRel k] [TopologicalSpace k
     have e1 : (Y.map (algebraMap k E)) p s =
         ∑ q : Fin ℓ × Fin n, algebraMap k E (c s q : k) * T q.1 p q.2 := by
       show algebraMap k E (b s p) = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hbp, map_sum]
+
+      rw [hbp, map_sum]
       refine Finset.sum_congr rfl fun q _ => ?_
       rw [map_mul, hS]
     rw [e1, Matrix.mul_apply]
@@ -241,8 +241,8 @@ theorem descent_core {k E : Type} [Field k] [ValuativeRel k] [TopologicalSpace k
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hS i p m, hwp i m p, map_sum, Finset.mul_sum]
+
+    rw [← hS i p m, hwp i m p, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun s _ => ?_
     rw [map_mul]
     ring

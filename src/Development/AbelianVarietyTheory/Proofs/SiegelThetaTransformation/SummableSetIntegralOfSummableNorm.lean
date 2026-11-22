@@ -87,8 +87,8 @@ theorem finiteRank_integral_mem_span : ∀ (A I Y : Type) [Countable I] [Measura
   have hx : (fun j => e j a) = ∑ j, e j a • (Pi.single j (1 : ℂ) : Fin m → ℂ) := by
     ext k
     simp [Pi.single_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hx, map_sum]
+
+  rw [hx, map_sum]
   simp [mul_comm]
 
 end GlobalTheory.SW

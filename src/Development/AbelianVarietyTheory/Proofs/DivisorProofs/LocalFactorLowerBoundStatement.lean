@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.ExistsMulMu
 @[expose] public section
 
 open NumberField IsDedekindDomain GlobalTheory.SUVol
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.local_factor_lower_bound : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
     (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))), 1 ≤ r →
     (v.asIdeal.map (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E))).IsPrime →

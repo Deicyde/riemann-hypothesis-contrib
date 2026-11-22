@@ -34,8 +34,8 @@ theorem map_fockS (s : K →+* ℂ) (f g : MvPolynomial σ K) (hf : ∀ m, s (st
   have hsf : f.support ⊆ f.support ∪ g.support := fun x hx => Finset.mem_union_left _ hx
   have hsg : (MvPolynomial.map s g).support ⊆ f.support ∪ g.support :=
     fun x hx => Finset.mem_union_right _ (MvPolynomial.support_map_subset _ _ hx)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [fockF_eq_sum _ _ _ hsg, map_sum, Finset.sum_subset hsf ?_]
+
+  rw [fockF_eq_sum _ _ _ hsg, map_sum, Finset.sum_subset hsf ?_]
   · refine Finset.sum_congr rfl fun m _ => ?_
     simp only [MvPolynomial.coeff_map, map_mul, hf m, map_natCast, mfact, Finsupp.prod]
     ring
@@ -199,13 +199,13 @@ theorem evFr_coord (G : ι → Matrix (Fin n) (Fin n) ℂ) (s : K →+* ℂ) (la
     have key : (blockAct K (n := n) A).comp (blockAct K (n := n) B) = blockAct K (n := n) (fun τ => B τ * A τ) := by
       apply MvPolynomial.algHom_ext
       rintro ⟨a, b, c⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [AlgHom.comp_apply, Formalism.GradedWeylDivisibility.blockAct, MvPolynomial.aeval_X, map_sum, map_mul,
-        MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq]
+
+      simp only [AlgHom.comp_apply, Formalism.GradedWeylDivisibility.blockAct, MvPolynomial.aeval_X, map_sum, map_mul,
+      MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq]
       simp only [Finset.mul_sum, ← mul_assoc, ← MvPolynomial.C_mul]
       rw [Finset.sum_comm]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← Finset.sum_mul, ← map_sum, Matrix.mul_apply]
+
+      simp only [← Finset.sum_mul, ← map_sum, Matrix.mul_apply]
     exact DFunLike.congr_fun key q
   have hid : ∀ q : MvPolynomial (ι × Fin n × Fin n) K,
       blockAct K (n := n) (fun _ => (1 : Matrix (Fin n) (Fin n) K)) q = q := by
@@ -501,9 +501,9 @@ theorem linearIndependent_map {σ κ : Type} (s : K →+* ℂ) (v : κ → MvPol
       rfl
     have h2 : ∑ j ∈ t, (AddMonoidAlgebra.coeff (v j) m) * B.repr (g j) b = 0 := by
       have h3 := congrArg (fun z => B.repr z b) hm'
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-        smul_eq_mul, map_zero, Finsupp.coe_zero, Pi.zero_apply] using h3
+
+      simpa only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+      smul_eq_mul, map_zero, Finsupp.coe_zero, Pi.zero_apply] using h3
     exact (Finset.sum_congr rfl fun j _ => mul_comm _ _).trans h2
   have h4 : B.repr (g i) = 0 := by
     ext b
@@ -603,13 +603,13 @@ theorem nfAll_blockAct (lam : ι → DomWeight n) (u : ι → Matrix (Fin n) (Fi
   have key : (blockAct ℂ (n := n) (fun τ => (u τ)ᴴ)).comp (blockAct ℂ (n := n) u) = AlgHom.id ℂ _ := by
     apply MvPolynomial.algHom_ext
     rintro ⟨a, b, c⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [AlgHom.comp_apply, AlgHom.id_apply, Formalism.GradedWeylDivisibility.blockAct, MvPolynomial.aeval_X, map_sum, map_mul,
-      MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq]
+
+    simp only [AlgHom.comp_apply, AlgHom.id_apply, Formalism.GradedWeylDivisibility.blockAct, MvPolynomial.aeval_X, map_sum, map_mul,
+    MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq]
     simp only [Finset.mul_sum, ← mul_assoc, ← MvPolynomial.C_mul]
     rw [Finset.sum_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← Finset.sum_mul, ← map_sum]
+
+    simp only [← Finset.sum_mul, ← map_sum]
     have hmul : ∀ d, ∑ x : Fin n, u a b x * (u a)ᴴ x d = (1 : Matrix (Fin n) (Fin n) ℂ) b d := by
       intro d
       rw [← hu a, Matrix.mul_apply]

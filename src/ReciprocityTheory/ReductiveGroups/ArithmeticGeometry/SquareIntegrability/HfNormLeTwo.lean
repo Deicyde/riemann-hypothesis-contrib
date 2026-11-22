@@ -38,7 +38,7 @@ theorem norm_sgnT {dim : (E →+* ℂ) → ℕ} {n nb : ℕ} (bs : Fin nb → Bl
   refine Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) fun r _ => ?_
   rcases Int.units_eq_one_or (Equiv.Perm.sign (T j r)) with h | h <;> simp [h]
 
-set_option maxHeartbeats 1000000 in
+
 open Classical in
 theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht : ColTorusStatement)
     (ha : ColAbelStatement) (he : ColEmptyStatement) [IsCMField E] (X : PT E) {n nb : ℕ}

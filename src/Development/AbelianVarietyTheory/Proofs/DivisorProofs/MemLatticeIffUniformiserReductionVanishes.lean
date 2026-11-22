@@ -14,8 +14,8 @@ open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie Glo
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Classical
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 namespace GlobalTheory.DilKer
 
 open GlobalTheory.StdFrames (cpt)
@@ -68,8 +68,8 @@ theorem mem_int_of_mul {D : D7} {Q : Finset (Pl D.host.E)} {e : AE D} (he : IsId
     rw [← WithZero.exp_zero, WithZero.exp_le_exp]
     omega
   · have h0 : cpt P (toEAf D (∑ PP ∈ Q, es PP)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum]
+
+      rw [map_sum, map_sum]
       exact Finset.sum_eq_zero fun PP hPP => (GlobalTheory.StdFrames.cpt_of_isIdemAt (hes PP hPP)).2 P fun h => hP (h ▸ hPP)
     have := congrArg (cpt P) hm
     rw [RingHom.map_mul, h0, zero_mul] at this

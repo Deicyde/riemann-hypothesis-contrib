@@ -92,9 +92,9 @@ theorem central_shift : ∀ {D : D7} (V : HSp D) (P : Pl D.host.E), conjPl P ≠
   by_cases hl : IsLab V P d
   · obtain ⟨z, hzR, S0, S1⟩ := shift hP (GlobalTheory.SphLabelOps.sphOp_rep hl)
     have fw := (GlobalTheory.SphLabelOps.label_operators V P).2.1 (Finsupp.single d 1) M π u hu
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← (c1 _ _ S0).2 M π _ fw, ← (c1 _ _ S1).2 M π u hu, Finset.sum_singleton, GlobalTheory.SphLabelOps.opOf_single,
-      map_sum, Finset.sum_image (mul_left_injective z).injOn]
+
+    rw [← (c1 _ _ S0).2 M π _ fw, ← (c1 _ _ S1).2 M π u hu, Finset.sum_singleton, GlobalTheory.SphLabelOps.opOf_single,
+    map_sum, Finset.sum_image (mul_left_injective z).injOn]
     refine Finset.sum_congr rfl fun γ hγ => ?_
     rw [hzR γ hγ, map_mul, Module.End.mul_apply]
   · have hl' : ¬ IsLab V P (d.map fun x => x - 1) := fun h => hl (isLab_of_shift hP h)

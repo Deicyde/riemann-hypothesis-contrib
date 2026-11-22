@@ -22,13 +22,13 @@ theorem trDR_projection : ∀ (k K L : Type) [Field k] [CharZero k] [Field K] [F
   obtain ⟨m, b, ω, rfl⟩ := (GlobalTheory.T.mapDR_span_and_linearIndependent_baseChange k K L).1 β
   have hT := (GlobalTheory.T.deRhamFormTrace_exists_unique k K L).1
   constructor
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [Finset.mul_sum, map_sum, map_sum, Finset.mul_sum]
-      refine Finset.sum_congr rfl fun j _ => ?_
-      rw [mul_smul_comm, ← map_mul, hT, hT, mul_smul_comm]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [Finset.sum_mul, map_sum, map_sum, Finset.sum_mul]
-      refine Finset.sum_congr rfl fun j _ => ?_
-      rw [smul_mul_assoc, ← map_mul, hT, hT, smul_mul_assoc]
+
+  · rw [Finset.mul_sum, map_sum, map_sum, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [mul_smul_comm, ← map_mul, hT, hT, mul_smul_comm]
+
+  · rw [Finset.sum_mul, map_sum, map_sum, Finset.sum_mul]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [smul_mul_assoc, ← map_mul, hT, hT, smul_mul_assoc]
 
 end GlobalTheory.W1

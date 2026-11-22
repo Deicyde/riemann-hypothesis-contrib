@@ -17,7 +17,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace PositivityTheory.Rg.Sw.Glob.LocLawH
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem exists_realPar_ne (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (hψ : IsCharAF D.host.F ψ) (θ : InfFam D)
     (hθ : IsInfFam θ) : ∃ l : D.what₂.Tau → ℝ, HasRealPar ψ θ l ∧ ∀ τ, l τ ≠ 0 := by
   obtain ⟨ψ₀, h₀, a, ha0, ha⟩ := GlobalTheory.ThetaAllChar.exists_std hψ

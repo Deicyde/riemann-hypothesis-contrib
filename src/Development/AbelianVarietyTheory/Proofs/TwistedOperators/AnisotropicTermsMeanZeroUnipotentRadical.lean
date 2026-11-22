@@ -144,8 +144,8 @@ theorem symplOH_rat (S T : HSp D) (x y : Matrix (Fin T.rank) (Fin S.rank) D.host
       (1 / 2 * Algebra.trace D.host.F D.host.E (D.host.xi0 * (S.gram⁻¹ * yᴴ * T.gram * x).trace)) := by
   have key : hO S T (x.map (incA D)) (y.map (incA D)) = incA D ((S.gram⁻¹ * yᴴ * T.gram * x).trace) := by
     rw [← sum_eq_trace]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hO, Matrix.map_apply, cA_incA_eq_incA_star, ← map_mul, ← map_sum]
+
+    simp only [hO, Matrix.map_apply, cA_incA_eq_incA_star, ← map_mul, ← map_sum]
   rw [symplOH, symplO, key, ← map_mul]
   rw [show incA D (D.host.xi0 * (S.gram⁻¹ * yᴴ * T.gram * x).trace) =
     (1 : AF D.host.F) ⊗ₜ[D.host.F] (D.host.xi0 * (S.gram⁻¹ * yᴴ * T.gram * x).trace) from rfl, trace_one_tmul, ← map_mul]
@@ -317,7 +317,7 @@ theorem cA_one (N : ℕ) (i j : Fin N) :
   · simp
   · rw [Matrix.one_apply_ne h, Matrix.one_apply_ne h.symm, map_zero]
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_central (V : HSp D) (X : Matrix (Fin V.rank) (Fin V.rank) D.host.E) (hXX : X * X = 0)
     (hsk : Xᴴ * V.gram + V.gram * X = 0) (a : AF D.host.F) :
     ∃ z : GA D V, Formalism.L2.Theta.mt V z = 1 + a • X.map (incA D) := by
@@ -464,8 +464,8 @@ theorem central_mem_NI {V : HSp D} {r : ℕ} {C : Matrix (Fin V.rank) (Fin r) D.
       ext i
       have := congrFun h0 i
       simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Pi.zero_apply] at this ⊢
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_zero (incA D), ← this, map_sum]
+
+      rw [← map_zero (incA D), ← this, map_sum]
       simp only [map_mul]
     show ((matHom V z).1 - 1).mulVec _ = _
     rw [hm, Matrix.smul_mulVec, key, smul_zero, Matrix.mulVec_zero]

@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 noncomputable section
@@ -55,7 +55,7 @@ private theorem sum_of_prod {n : ℕ} (u v : Fin n → ℂ) (h : ∏ j, (X - C (
     rwa [Multiset.map_map] at this
   exact congrArg Multiset.sum (((key u).symm.trans (congrArg roots h)).trans (key v))
 end UpperTheory.V.Z.J.D.TypeVAux
-set_option synthInstance.maxHeartbeats 200000 in
+
 open UpperTheory.V.Z.J.D UpperTheory.V.Z.J.D.TypeVAux in
 theorem UpperTheory.V.Z.J.D.type_v_statement :
     _root_.UpperTheory.V.Z.J.D.TypeVAlt := by

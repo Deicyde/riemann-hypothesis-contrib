@@ -97,14 +97,14 @@ private theorem ord_parts {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Al
     have hfi : ∀ s ∈ (⨅ i : f.support, U i).subgroupOf S, ∀ i ∈ f.support, ρ s (f i) = f i := fun s hs i hi =>
       hfix i _ (Subgroup.mem_iInf.1 (Subgroup.mem_subgroupOf.1 hs) ⟨i, hi⟩)
     have hχ1 : ∀ s ∈ (⨅ i : f.support, U i).subgroupOf S, χ s = 1 := fun s hs => hinj _ _ (by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hχ, one_smul, ← hsum, Finsupp.sum, map_sum]
+
+      rw [← hχ, one_smul, ← hsum, Finsupp.sum, map_sum]
       exact Finset.sum_congr rfl (hfi s hs))
     have hPF : P F = F := hP2 F fun s => by
       rw [hρ', hχ, smul_smul, inv_mul_cancel₀ (hne _ _ (hχ s)), one_smul]
     have : F = ∑ i ∈ f.support, P (f i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum, ← hPF, ← hsum]; rfl
+
+      rw [← map_sum, ← hPF, ← hsum]; rfl
     have key : ∀ i ∈ f.support, P (f i) ∈ ⨆ i, Y i ⊓ matchingEigenvectors ρ K F := fun i hi => by
       refine Submodule.mem_iSup_of_mem i ⟨hP3 _ (fun s y hy => ?_) _ (hf i), fun k hk a ha => ?_⟩
       · exact (Y i).smul_mem _ (hst i s s.2.1 y hy)

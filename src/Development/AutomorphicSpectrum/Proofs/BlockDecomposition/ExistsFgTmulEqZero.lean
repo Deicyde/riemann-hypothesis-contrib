@@ -61,14 +61,14 @@ theorem exists_system {A : Type} [CommRing A] (B : Type) [CommRing B] [Algebra A
   have hxsum : x = ∑ t, b t ⊗ₜ[A] kk t := by
     rw [hS, ← Finset.sum_coe_sort, ← Equiv.sum_comp e.symm]
   have hx' : ∑ t, b t ⊗ₜ[A] (kk t : Fin n → A) = (1 : B) ⊗ₜ[A] w := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hx, hxsum, map_sum]
+
+    rw [← hx, hxsum, map_sum]
     simp only [LinearMap.lTensor_tmul, Submodule.subtype_apply]
   refine ⟨n, S.card, fun s t => (kk t : Fin n → A) s, w, ⟨b, fun s => ?_⟩, ?_⟩
   · have hvec := congrFun (congrArg (TensorProduct.piScalarRight A B B (Fin n)) hx') s
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, TensorProduct.piScalarRight_apply, TensorProduct.piScalarRightHom_tmul,
-      Finset.sum_apply] at hvec
+
+    simp only [map_sum, TensorProduct.piScalarRight_apply, TensorProduct.piScalarRightHom_tmul,
+    Finset.sum_apply] at hvec
     rw [Algebra.algebraMap_eq_smul_one]
     exact hvec
   · intro B₁ _ _ hy
@@ -76,16 +76,16 @@ theorem exists_system {A : Type} [CommRing A] (B : Type) [CommRing B] [Algebra A
     have h2 : ∑ t, y t ⊗ₜ[A] (kk t : Fin n → A) = (1 : B₁) ⊗ₜ[A] w := by
       apply (TensorProduct.piScalarRight A B₁ B₁ (Fin n)).injective
       funext s
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, TensorProduct.piScalarRight_apply, TensorProduct.piScalarRightHom_tmul,
-        Finset.sum_apply]
+
+      simp only [map_sum, TensorProduct.piScalarRight_apply, TensorProduct.piScalarRightHom_tmul,
+      Finset.sum_apply]
       rw [← Algebra.algebraMap_eq_smul_one]
       exact hy s
     have h3 := congrArg (LinearMap.lTensor B₁ (Q'.subtype ∘ₗ π)) h2
     have hk : ∀ t, π (kk t : Fin n → A) = 0 := fun t => LinearMap.mem_ker.mp (kk t).2
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.lTensor_tmul, LinearMap.comp_apply, hk, hw, map_zero,
-      TensorProduct.tmul_zero, Finset.sum_const_zero, Submodule.subtype_apply] at h3
+
+    simp only [map_sum, LinearMap.lTensor_tmul, LinearMap.comp_apply, hk, hw, map_zero,
+    TensorProduct.tmul_zero, Finset.sum_const_zero, Submodule.subtype_apply] at h3
     exact h3.symm
 
 end GlobalTheory.CompanionTheory.EqCrit

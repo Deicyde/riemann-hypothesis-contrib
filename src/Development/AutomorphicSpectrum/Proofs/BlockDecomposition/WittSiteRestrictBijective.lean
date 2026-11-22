@@ -23,7 +23,7 @@ def resG (q : X ⟶ Spec (CommRingCat.of O)) (ρ : O →+* k) (m : ℕ)
   τ _ := LinearMap.id
   nat _ _ := rfl
 
-set_option maxHeartbeats 1600000 in
+
 theorem resG_bij (q : X ⟶ Spec (CommRingCat.of O)) (ρ : O →+* k) (m : ℕ) (𝒱 : Set X.Opens) (hU : sSup 𝒱 = ⊤)
     (P : ObjectProperty (Thick (Wc.L l (B.schFn q) ρ m))) (hP : P = stF q ρ m {⊤}) (h : stF q ρ m 𝒱 ≤ P) (j : ℕ) :
     Function.Bijective ((resG q ρ m P (stF q ρ m 𝒱) h).pull j) := by

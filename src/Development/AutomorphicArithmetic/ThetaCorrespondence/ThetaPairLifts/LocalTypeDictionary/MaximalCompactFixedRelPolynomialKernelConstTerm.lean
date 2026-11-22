@@ -49,8 +49,8 @@ theorem maximalCompact_fixed_rel_polynomialKernel_constTerm : _root_.GlobalTheor
     exact hv (Finset.mem_union_right _ (Finset.mem_biUnion.2 ⟨i, Finset.mem_univ _, by simpa [S] using h⟩))
   · have e : ∀ i, c i • (g i : (Fin a × Fin (a + a') → AF F) → ℂ) = pure (c i • f i) (φ i) := fun i => by
       rw [hg i, GlobalTheory.PolMatchLin.pure_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [e, map_sum, key, pure_sub, Finset.sum_sub_distrib]
+
+    simp only [e, map_sum, key, pure_sub, Finset.sum_sub_distrib]
   · simp only [hp, TensorProduct.zero_tmul, Finset.sum_const_zero]
 end GlobalTheory.PolKerCpt
 end
@@ -59,7 +59,7 @@ end
 section
 open NumberField IsDedekindDomain
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.maximalCompact_invariants_polynomialKernel : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
     (Bs : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base F E) (a a' : ℕ) (G : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Geo σ a a') (Xc : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chars F E)
     (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V G.W) (om' : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V' G.W) (R : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.RealMaps F a a')

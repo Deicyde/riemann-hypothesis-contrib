@@ -22,7 +22,7 @@ private theorem conj_vPoly (n : ℕ) (t : ℝ) :
   unfold vPoly
   simp [map_prod, map_div₀]
 
-set_option maxHeartbeats 400000 in
+
 theorem UpperTheory.Gal.Gen.gammaConj_pf :
     UpperTheory.Gal.Gen.RConj → UpperTheory.Gal.Gen.GammaConj := by
   intro hR F _ _ _ _ n _ _ μ _

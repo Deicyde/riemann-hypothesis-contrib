@@ -131,8 +131,8 @@ private theorem poly_cg (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (w n : ℕ) (
   have hu := h u
   have hv := h v
   rw [map_sub, sub_eq_zero] at hu hv
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hu, hv, hc, hc, map_sum, map_sum]
+
+  rw [hu, hv, hc, hc, map_sum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   obtain ⟨x, hx⟩ := Submodule.Quotient.mk_surjective _ (AdicCompletion.eval (idl l) (X.Kl l) n (c i))
   rw [map_smul, map_smul, ← hx, ← Submodule.Quotient.mk_smul, ← Submodule.Quotient.mk_smul, Submodule.Quotient.eq,
@@ -187,9 +187,9 @@ theorem UpperTheory.V.Z.Kato.Nb.sHeckeGal :
       simp [tr]
     have hsum := sum_perm p e hp.pos (he.coprime_dvd_right ((Dvd.intro_left _ rfl : p ∣ _).mul_left _))
       (fun k => AdicCompletion.eval (idl l) (X.Kl l) n (X.act l !![1, k; 0, (p : ℤ)] (X.galB l s a) u)) hper
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, sub_eq_zero, LinearMap.sum_apply, LinearMap.sum_apply, map_sum, Finset.sum_apply, Finset.sum_apply,
-      map_sum, map_sum, ← hsum]
+
+    rw [map_sub, sub_eq_zero, LinearMap.sum_apply, LinearMap.sum_apply, map_sum, Finset.sum_apply, Finset.sum_apply,
+    map_sum, map_sum, ← hsum]
     refine Finset.sum_congr rfl fun j hj => ?_
     refine (hR j _ ζ e hM ((Finset.dvd_prod_of_mem _ hj).mul_right _) hζ hs j).trans ?_
     refine eval_kmap X l n _ (eval_kmap X l n _ (poly_cg X l w n a t ht hat _ _ ?_ ?_))

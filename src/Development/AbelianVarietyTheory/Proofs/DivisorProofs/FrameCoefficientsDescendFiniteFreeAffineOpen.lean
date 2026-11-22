@@ -75,9 +75,9 @@ theorem aff_coeff (ρ₁ : R →+* R₁) {d : ℕ} (b : Fin d → R₁)
     have h0 : ∑ l, B l ⊗ₜ[R] a l = 0 := e.injective (ha.trans (map_zero e).symm)
     funext k
     have := congrArg (fun w => TensorProduct.equivFinsuppOfBasisLeft B w k) h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, TensorProduct.equivFinsuppOfBasisLeft_apply_tmul_apply, Module.Basis.repr_self,
-      Finsupp.single_apply] using this
+
+    simpa [map_sum, TensorProduct.equivFinsuppOfBasisLeft_apply_tmul_apply, Module.Basis.repr_self,
+    Finsupp.single_apply] using this
 
 end GlobalTheory.FrameCoeff
 

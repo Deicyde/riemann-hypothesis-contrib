@@ -48,7 +48,7 @@ theorem eig_bc (hBC : HodgeBC) {k k' : Type} [Field k] [Field k'] (φ : k →+* 
   have e2 := (hβ2 H.q H'.q bc.z bc.hz _ _ (bc.y g) hp (H.t g) (H.comm _) (H'.t (ι' g)) (H'.comm _) (bc.ht g) a b).1
   exact (e1 _).trans (congrArg _ (e2 v))
 
-set_option maxHeartbeats 1000000 in
+
 theorem locE_of : LocEOf := by
   classical
   intro hBC hTr hOpE l _ K ιC H H' ι' bc θ θ' a hθ hN hops hcov hocc d ρ hρ

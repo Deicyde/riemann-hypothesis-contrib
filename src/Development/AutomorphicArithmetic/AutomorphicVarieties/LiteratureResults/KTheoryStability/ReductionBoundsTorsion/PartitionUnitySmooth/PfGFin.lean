@@ -11,7 +11,7 @@ open scoped ComplexOrder
 
 namespace PositivityTheory.KB.SmoothPartitionUnityBasic
 
-set_option maxHeartbeats 800000 in
+
 theorem pf_GFin : GFin := by
   intro hSHt hSm hRS hRE hRL hRD hRLip hTh hPr hBu hNr hDB
   intro L _ _ hTC

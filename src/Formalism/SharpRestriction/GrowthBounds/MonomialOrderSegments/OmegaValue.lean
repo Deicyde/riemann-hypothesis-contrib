@@ -34,8 +34,8 @@ theorem omega_value (hD : DVRHyp v p) (h1 : 1 ≤ C0) (D : TwistData K) (hV : D.
   have hLsum : ∀ (s : Finset D.EM) (f : D.EM → MvPolynomial (D.ML × Fin D.r) K),
       D.abelian₂ p F (∑ i ∈ s, f i) = ∑ i ∈ s, D.abelian₂ p F (f i) := by
     intro s f
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [key, map_sum, fock_sum_right]
+
+    simp only [key, map_sum, fock_sum_right]
   have hLsmul : ∀ (c : K) (W : MvPolynomial (D.ML × Fin D.r) K), D.abelian₂ p F (c • W) = c * D.abelian₂ p F W := by
     intro c W
     simp only [key, map_smul, fock_smul_right]
@@ -52,8 +52,8 @@ theorem omega_value (hD : DVRHyp v p) (h1 : 1 ≤ C0) (D : TwistData K) (hV : D.
     unfold TwistData.kapD kap
     exact Finset.sum_nonneg fun i _ => mul_nonneg (Nat.cast_nonneg _) (lg_nonneg' hp2 hr1 _)
   have hDm : 0 ≤ D.Dm p C0 := TwistData.Dm_nonneg (D := D) hp2 hr1 h1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hZ, map_sum (dg gp), map_sum Pj, map_sum (dg gm), hLsum, hLsum, ← Finset.sum_sub_distrib]
+
+  rw [hZ, map_sum (dg gp), map_sum Pj, map_sum (dg gm), hLsum, hLsum, ← Finset.sum_sub_distrib]
   simp only [map_smul, hLsmul]
   apply vge_sum'
   intro ζ hζ

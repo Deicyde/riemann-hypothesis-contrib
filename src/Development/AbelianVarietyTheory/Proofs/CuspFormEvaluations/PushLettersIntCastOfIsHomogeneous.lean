@@ -46,10 +46,10 @@ theorem basisComponent_sum (b : Module.Basis ι R S) (J : Finset ι) (Q : ι →
     basisComponent b i (∑ j ∈ J, b j • MvPolynomial.map (algebraMap R S) (Q j)) = Q i := by
   classical
   ext m
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coeff_basisComponent, coeff_sum, coeff_smul, coeff_map, smul_eq_mul, mul_comm (b _),
-    ← Algebra.smul_def, map_sum, map_smul, Module.Basis.repr_self, Finsupp.coe_finsetSum,
-    Finset.sum_apply, Finsupp.smul_apply, Finsupp.single_apply]
+
+  simp only [coeff_basisComponent, coeff_sum, coeff_smul, coeff_map, smul_eq_mul, mul_comm (b _),
+  ← Algebra.smul_def, map_sum, map_smul, Module.Basis.repr_self, Finsupp.coe_finsetSum,
+  Finset.sum_apply, Finsupp.smul_apply, Finsupp.single_apply]
   rw [Finset.sum_eq_single i] <;> simp +contextual [hi]
 
 variable {T : Type*} {p q : ℕ} {κ : Type*} [Fintype κ] {c : T → Fin p → ℕ} {c' : T → Fin q → ℕ}
@@ -73,8 +73,8 @@ theorem basisComponent_mem_rowHighest (b : Module.Basis ι R S) (i : ι) {P : Po
   refine mem_rowHighest_iff_rowAdd.2 ⟨fun t a b' => ?_, fun t r m hm => h₂ t r fun e => hm ?_,
     fun t r r' hr s => ?_⟩
   · have := h₁ t a b'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hJ, map_sum] at this
+
+    rw [hJ, map_sum] at this
     simp only [map_smul, ← map_laplacian] at this
     rw [← basisComponent_sum b J (fun j => laplacian t a b' (basisComponent b j P)) hi, this]
     simp [basisComponent]

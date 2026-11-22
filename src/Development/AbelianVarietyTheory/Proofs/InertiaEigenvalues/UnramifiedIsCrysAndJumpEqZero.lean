@@ -153,8 +153,8 @@ theorem exists_witt_matrix
     (fun g i j => by
       rw [dvd_iff_constantCoeff]
       have := congrFun (congrFun (hW₁g g) i) j
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Matrix.sub_apply, map_sub, sub_eq_zero, Matrix.mul_apply, map_sum]
+
+      rw [Matrix.sub_apply, map_sub, sub_eq_zero, Matrix.mul_apply, map_sum]
       rw [Matrix.mul_apply] at this
       simp only [map_mul]
       exact this)
@@ -190,9 +190,9 @@ theorem exists_matrixHom {l : ℕ} [Fact l.Prime] {G : Type} [Group G] {L V : Ty
     rw [map_mul, Module.End.mul_apply]
     conv_lhs => rw [← e.sum_repr (ρ h (e j))]
     have : ∀ (a : ℚ_[l]) v, ρ g (a • v) = a • ρ g v := fun a v => (ρ g).map_smul_of_tower _ _
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, this, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-      smul_eq_mul, mul_comm]
+
+    simp only [map_sum, this, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+    smul_eq_mul, mul_comm]
 
 theorem map_mul_map_eq {A A' : Type} [CommRing A] [CommRing A'] (f : A →+* A') {n : ℕ}
     {M W : Matrix (Fin n) (Fin n) A} {M' : Matrix (Fin n) (Fin n) A'} {s : A → A} {s' : A' → A'}
@@ -200,8 +200,8 @@ theorem map_mul_map_eq {A A' : Type} [CommRing A] [CommRing A'] (f : A →+* A')
     M' * (W.map f).map s' = W.map f := by
   ext i j
   have := congrArg f (congrFun (congrFun h i) j)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.mul_apply, map_sum] at this
+
+  rw [Matrix.mul_apply, map_sum] at this
   simp only [map_mul, hM, Matrix.map_apply, hs] at this
   exact this
 

@@ -31,8 +31,8 @@ theorem frob_mv {σ : Type} {A B : MvPowerSeries σ C} (hA : IntS V A) (hB : Int
     rw [add_pow_prime_eq' V.l_prime A B]
     simp only [map_natCast]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, coeff_C_mul, map_sum, mul_comm]
+
+  rw [e, coeff_C_mul, map_sum, mul_comm]
   refine ValuationNonnegativity.mm_mul_int (VF.Ge.sum fun k _ => ?_) FrobP.mm_l
   rw [coeff_mul_C]
   exact VF.Ge.mul_int (intS_mul (intS_pow hA k) (intS_pow hB _) μ) (VF.ge_natCast _)
@@ -83,8 +83,8 @@ theorem frobPowMv {σ : Type} (F : MvPowerSeries σ C) (hF : IntS V F) (α : σ 
         rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 hx]
         exact le_self_add
       have hc : coeff x.1 (F - P) = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sub, sub_eq_zero, hPdef, map_sum]
+
+        rw [map_sub, sub_eq_zero, hPdef, map_sum]
         simp only [coeff_monomial]
         rw [Finset.sum_ite_eq, if_pos (Finset.mem_Iic.2 hx1)]
       rw [hc, zero_mul]
@@ -92,8 +92,8 @@ theorem frobPowMv {σ : Type} (F : MvPowerSeries σ C) (hF : IntS V F) (α : σ 
   have e2 := frob_sum (Finset.Iic α) (fun β => monomial β (coeff β F)) hmon α
   have e3 : coeff α (∑ β ∈ Finset.Iic α, (monomial β (coeff β F)) ^ V.l) =
       if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [monomial_pow', coeff_monomial]
     split_ifs with hdiv
     · have hβ : α = V.l • divL V.l α := by

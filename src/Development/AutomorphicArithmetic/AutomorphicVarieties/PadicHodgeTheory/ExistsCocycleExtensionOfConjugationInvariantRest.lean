@@ -66,9 +66,9 @@ theorem UpperTheory.exists_cocycle_extension_of_conjugation_invariant_restrictio
         Continuous.subtype_mk (h1.inv.mul (continuous_id.mul continuous_const)) _
       exact hρ.comp (h1.prodMk (hc.1.comp h2))
     · simp only [cor]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← zm_sum H g' (fun q => ρ (g • q).out (c (zm_h H g q))), map_sum,
-        ← Finset.sum_add_distrib]
+
+      rw [← zm_sum H g' (fun q => ρ (g • q).out (c (zm_h H g q))), map_sum,
+      ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun q _ => ?_
       rw [zm_h_mul, hc2, map_add (f := _), hmul, hmul, mul_smul, zm_out]
   let c' : G ⧸ H → H → V := fun q h => ρ q.out (c (zm_h H h q))

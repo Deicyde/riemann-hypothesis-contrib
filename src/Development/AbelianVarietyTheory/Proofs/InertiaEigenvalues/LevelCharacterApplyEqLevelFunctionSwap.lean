@@ -12,7 +12,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ExportSeries GlobalTheory.ConjTwist GlobalTheory.SeriesTie.Scale
 
 set_option autoImplicit false
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 
@@ -60,7 +60,7 @@ theorem mem_levJ_of {S T : HSp D} (B : Base S T) {ψ ψ' : Twist D Circle} (hQ :
   rw [hQ] at hk
   exact hk
 
-set_option maxHeartbeats 800000 in
+
 theorem levelCharacter_apply_eq_levelFunction_swap {S T : HSp D} (B : Base S T) (ψ : Twist D Circle) (k : B.levJ ψ) :
     B.levLam ψ k = levFn B.F.βS (B.levS ψ) (Formalism.UG.bc (Lev.swapAE D) k.1.1) := by
   unfold Base.levLam Lev.levCharAfE

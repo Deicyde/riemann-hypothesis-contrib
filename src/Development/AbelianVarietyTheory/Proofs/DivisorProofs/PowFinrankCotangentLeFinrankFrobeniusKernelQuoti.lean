@@ -105,8 +105,8 @@ theorem pow_le_finrank {n d : ℕ} {K A : Type*} [Field K] [CommRing A] [Algebra
     intro g hg a
     have hmem : (∑ a, g a • MvPolynomial.monomial (e a) (1 : K)) ∈
         RingHom.ker (MvPolynomial.aeval (R := K) x) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [RingHom.mem_ker, map_sum]
+
+      rw [RingHom.mem_ker, map_sum]
       simpa only [map_smul] using hg
     have hr : (Set.range fun i => (MvPolynomial.X i : MvPolynomial (Fin d) K) ^ n) =
         (fun s => MvPolynomial.monomial s (1 : K)) '' Set.range (fun i => Finsupp.single i n) := by
@@ -147,8 +147,8 @@ theorem pow_finrank_cot_le [Module.Finite k H] :
   have hsum : ∀ l : Fin (Module.finrank k (AugCot ε)) → k,
       AugCot.d ε (∑ i, l i • (x i : H ⧸ J)) = ∑ i, l i • b i := by
     intro l
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, hx]
+
+    simp [map_sum, hx]
   have hmem : ∀ l : Fin (Module.finrank k (AugCot ε)) → k,
       (∑ i, l i • (x i : H ⧸ J)) ∈ RingHom.ker ε := by
     intro l

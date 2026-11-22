@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemExpSolCon
 @[expose] public section
 
 open NumberField MeasureTheory GlobalTheory.CuspRep GlobalTheory.HCF Topology
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.harishChandraFiniteFormsGL_span_killed_scalarDerivative : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (L : Subgroup (GL (Fin a) (Af E)))
     (W : Submodule ℂ (Kinf E a → ℂ)) (X : Set (Module.End ℂ (Sm E a) → ℂ)), X.Finite → ∀ N : ℕ,
     ∃ Λ : List ℂ, ∀ φ ∈ Submodule.span ℂ (formsGL E a L W X N),

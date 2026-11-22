@@ -62,9 +62,9 @@ theorem sum_emb_embComp {K : Type} [Field K] [NumberField K] {i : ℕ} (z : Proj
       ∑ σ : K →+* ℂ, σ (integralBasis K m) * b.repr (Pi.single σ 1) m' := by
     intro m'
     have := congrArg (fun v => b.repr v m') hb
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Module.Basis.repr_self, map_sum, map_smul, Finsupp.coe_finsetSum,
-      Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul] at this
+
+    simp only [Module.Basis.repr_self, map_sum, map_smul, Finsupp.coe_finsetSum,
+    Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul] at this
     rw [← this, Finsupp.single_apply]
   have hs : ∀ m', ∑ σ : K →+* ℂ, σ (integralBasis K m) * (b.repr (Pi.single σ 1) m' * z (m', j)) =
       (if m = m' then (1 : ℂ) else 0) * z (m', j) := by

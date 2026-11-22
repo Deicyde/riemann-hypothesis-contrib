@@ -916,8 +916,8 @@ theorem compactProj : CompactProj := by
     have e4 : ∀ a, ee c a • ρ a x = ∑ l, t l • (ee c a • ρ a (b l : H)) := by
       intro a
       conv_lhs => rw [← h3]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.smul_sum]
+
+      rw [map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun l _ => by rw [map_smul, smul_comm]
     simp_rw [e4]
     have hI3 : ∀ l : Fin d, Integrable (fun a => t l • ee c a • ρ a (b l : H)) μ := fun l => (hIv _).smul (t l)

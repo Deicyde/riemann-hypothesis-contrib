@@ -21,7 +21,7 @@ namespace PositivityTheory.Lit1.GEN.W_killed_b
 
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
-set_option maxHeartbeats 1000000 in
+
 theorem ratio_shortExact_prime (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (hS : S.Finite) (hSℓ : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
     (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
@@ -125,7 +125,7 @@ theorem coind_stages {k G : Type} [CommRing k] [Group G] (U W : Subgroup G) (hUW
   ⟨Rep.mkIso (coindStagesEquiv U W hUW A)⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem isMultiplicativeOn_ratio_coind (ℓ : ℕ) [Fact ℓ.Prime]
     (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1))) (hS : S.Finite)
     (hSℓ : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)

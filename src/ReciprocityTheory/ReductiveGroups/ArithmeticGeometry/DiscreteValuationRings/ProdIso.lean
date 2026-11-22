@@ -283,7 +283,7 @@ lemma inf_le_iSup_inf_cover (hB : B.IsLB) (a a' : A.ι) : A.U a ⊓ A.U a' ≤ �
   calc A.U a ⊓ A.U a' = (A.U a ⊓ A.U a') ⊓ ⨆ b, B.U b := by rw [hB.cover, inf_top_eq]
     _ ≤ ⨆ b, (A.U a ⊓ A.U a') ⊓ B.U b := (inf_iSup_eq _ _).le
 
-set_option maxHeartbeats 1000000 in
+
 private lemma res_trans_eq_inv_mul_of_res_eq_one_left {T : Scheme.{0}} {O P Q R S' W : T.Opens}
     (hP : O ≤ P) (hQ : O ≤ Q) (hR : O ≤ R) (hS : O ≤ S') (hW : W ≤ O)
     (s : Γ(T, P)ˣ) (m : Γ(T, Q)ˣ) (l : Γ(T, R)ˣ) (s' : Γ(T, S')ˣ)
@@ -370,7 +370,7 @@ def boxSecF (σ : Fin j → LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) 
     Γ(X', LB.wchart (LB.LinComb L pr (fun _ => 1)) (fun _ : Fin 1 => 𝟙 X') jN) :=
   ∏ i, rs (box_le_pr L pr jN i) (((pr i).app _).hom ((σ i).f (fun _ => jN 0 i)))
 
-set_option maxHeartbeats 1000000 in
+
 private lemma res_pullU_res_pullU_id {T S : Scheme.{0}} (h : S ⟶ T) {O Q : T.Opens} {W : S.Opens}
     (e : O ≤ (𝟙 T) ⁻¹ᵁ Q) (hW : W ≤ h ⁻¹ᵁ O) (c : W ≤ h ⁻¹ᵁ Q) (z : Γ(T, Q)ˣ) :
     res hW (pullU h O (res e (pullU (𝟙 T) Q z))) = res c (pullU h Q z) := by
@@ -417,7 +417,7 @@ lemma box_g_res (jN jN' : Fin 1 → (Fin j → L.ι)) {V : X'.Opens}
   refine (congrArg (· ^ k) (res_linComb_g_eq_prod_tr_zpow L pr (fun _ => 1) (jN 0) (jN' 0) c0)).trans ?_
   simp only [zpow_one, Finset.prod_zpow]
 
-set_option maxHeartbeats 1000000 in
+
 lemma g_pull_one {Z : Scheme.{0}} (h : Z ⟶ X) (a b : Fin 1 → L.ι) {W : Z.Opens}
     (hW : W ≤ h ⁻¹ᵁ (LB.wchart L (fun _ : Fin 1 => 𝟙 X) a ⊓ LB.wchart L (fun _ : Fin 1 => 𝟙 X) b)) :
     res hW (pullU h _ ((LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => k)).g a b)) =
@@ -433,7 +433,7 @@ lemma g_pull_one {Z : Scheme.{0}} (h : Z ⟶ X) (a b : Fin 1 → L.ι) {W : Z.Op
   congr 1
   exact (res_pullU_res_pullU_id h _ hW c _).trans e3.symm
 
-set_option maxHeartbeats 1000000 in
+
 lemma boxSecF_compat (σ : Fin j → LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => k)))
     (jN jN' : Fin 1 → (Fin j → L.ι)) :
     rs (inf_le_left : LB.wchart (LB.LinComb L pr (fun _ => 1)) (fun _ : Fin 1 => 𝟙 X') jN ⊓

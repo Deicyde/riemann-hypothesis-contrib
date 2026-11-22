@@ -19,7 +19,7 @@ public import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.TiedRec
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.IntegralityCompare
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.chainStep_weight_arithmetic : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l))
     (u : B.Word) (μ : I.ι) (i : ℕ), i < B.R.m →
     ∃ k : (I.rec7 l Z).what₂.Tau → ℕ,

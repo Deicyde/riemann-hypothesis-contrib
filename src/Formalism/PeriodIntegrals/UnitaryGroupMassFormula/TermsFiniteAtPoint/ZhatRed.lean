@@ -134,9 +134,9 @@ theorem zhatReduce_of (hC : CellReduce) (hF : FrameOp) (hR : CarrierRow) (hI : Z
       exact n0.apply_symm_apply _
     set_option backward.isDefEq.respectTransparency false in
       rw [h1, hn0act a, hmact b]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-      Matrix.mul_apply, Matrix.map_apply, Finset.sum_mul]
+
+    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+    Matrix.mul_apply, Matrix.map_apply, Finset.sum_mul]
     refine Finset.sum_congr rfl fun d _ => ?_
     simp only [RingHom.id_apply, Finset.mul_sum]
     refine Finset.sum_congr rfl fun c _ => ?_

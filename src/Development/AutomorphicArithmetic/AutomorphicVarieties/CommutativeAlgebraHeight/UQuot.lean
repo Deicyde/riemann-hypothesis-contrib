@@ -168,8 +168,8 @@ theorem exists_comap_level [TopologicalSpace G] [IsTopologicalGroup G] [CompactS
       rw [← D.toDet.nat]
       change _ = D.D S (ofT A G S _)
       congr 1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [Det.gen, map_sum, ofT_tmul]
+
+      simp [Det.gen, map_sum, ofT_tmul]
     rw [heval, heval]
     congr 1
     ext α

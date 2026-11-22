@@ -14,7 +14,7 @@ open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG
 open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.SpectralAccumulation
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace PositivityTheory.Rg.BcB.F.BC
 
@@ -53,7 +53,7 @@ theorem gen_tr (gen : Γ → Prod' H d) (β : ∀ s, H s →L[ℂ] H s) (m : ℕ
 
 end Gen
 
-set_option maxHeartbeats 2000000 in
+
 theorem chiTr' : ChiTr := fun _ _ _ _ _ _ _ _ _ _ G Q h₀ h =>
   gen_tr (H := G.H) G.gen G.βop G.m G.v G.v_ne G.a₀ (fun x => G.c x G.i₀) (fun x => (G.vblk x).1) h₀ Q
     fun s χ h1 h2 h3 => h s χ ⟨h1, h2, h3⟩

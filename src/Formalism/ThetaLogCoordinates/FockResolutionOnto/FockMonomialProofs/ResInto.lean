@@ -74,8 +74,8 @@ theorem resL_glAct {N r : ℕ} (LL : Letters N) (j : ℕ) (c d : Fin r) (v : Fin
     (h : ∀ i : Fin N, (i : ℕ) < j → (i, c) ≠ v ∧ (i, d) ≠ v) (x : MvPolynomial (Fin N × Fin r) ℚ_[p]) :
     resL p v e (glAct p LL j c d x) = glAct p LL j c d (resL p v e x) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
+
+  rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   by_cases hij : (i : ℕ) < j
   · obtain ⟨hc, hd⟩ := h i hij
@@ -149,8 +149,8 @@ theorem pderiv_keep_wt [NeZero r] (LL : Letters (K + 1)) (hv : LL.vec (Fin.last 
         restrictSupport ℚ_[p] {m : Fin (K + 1) × Fin r →₀ ℕ | ((wt LL (K + 1) 0 m : ℤ) : WithTop ℤ) ≤ Mt} := by
   intro x hx
   rw [MvPolynomial.mem_restrictSupport_iff] at hx
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [x.as_sum, map_sum]
+
+  rw [x.as_sum, map_sum]
   refine Submodule.sum_mem _ fun m hm => ?_
   rw [MvPolynomial.pderiv_monomial, MvPolynomial.mem_restrictSupport_iff]
   refine (Finset.coe_subset.2 MvPolynomial.support_monomial_subset).trans ?_
@@ -176,8 +176,8 @@ private theorem pderiv_last_glAct_comm (LL : Letters (K + 1)) (a b c : Fin r)
     (x : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) :
     pderiv (Fin.last K, c) (glAct p LL K a b x) = glAct p LL K a b (pderiv (Fin.last K, c) x) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
+
+  rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   by_cases hij : (i : ℕ) < K
   · have hne : ∀ d : Fin r, ((i, d) : Fin (K + 1) × Fin r) ≠ (Fin.last K, c) :=
@@ -257,8 +257,8 @@ noncomputable def FreeLast (p : ℕ) [Fact p.Prime] (K r : ℕ) :
 theorem pderiv_freeLast (x : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) (hx : x ∈ FreeLast p K r) (d : Fin r) :
     pderiv (Fin.last K, d) x = 0 := by
   rw [FreeLast, MvPolynomial.mem_restrictSupport_iff] at hx
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [x.as_sum, map_sum]
+
+  rw [x.as_sum, map_sum]
   apply Finset.sum_eq_zero
   intro m hm
   have h0 : m (Fin.last K, d) = 0 := hx hm d
@@ -269,8 +269,8 @@ private theorem pderiv_mem_freeLast (v : Fin (K + 1) × Fin r) :
     ∀ y ∈ FreeLast p K r, pderiv v y ∈ FreeLast p K r := by
   intro y hy
   rw [FreeLast, MvPolynomial.mem_restrictSupport_iff] at hy
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [y.as_sum, map_sum]
+
+  rw [y.as_sum, map_sum]
   refine Submodule.sum_mem _ fun m hm => ?_
   rw [MvPolynomial.pderiv_monomial, FreeLast, MvPolynomial.mem_restrictSupport_iff]
   refine (Finset.coe_subset.2 MvPolynomial.support_monomial_subset).trans ?_
@@ -385,8 +385,8 @@ private theorem pderiv_last_eulL_eq (c : Fin r) (g : MvPolynomial (Fin (K + 1) �
       pderiv (Fin.last K, c) g +
         Formalism.GM.ProjS.eulL (fun d : Fin r => (Fin.last K, d)) (pderiv (Fin.last K, c) g) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Formalism.GM.ProjS.eulL_apply, Formalism.GM.ProjS.eulL_apply, map_sum]
+
+  rw [Formalism.GM.ProjS.eulL_apply, Formalism.GM.ProjS.eulL_apply, map_sum]
   simp only [Derivation.leibniz, MvPolynomial.pderiv_X, smul_eq_mul, Finset.sum_add_distrib]
   refine (add_comm _ _).trans ?_
   congr 1

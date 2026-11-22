@@ -73,7 +73,7 @@ variable {N : ℕ} [NeZero N] {L : Type*} [Field L] [NumberField L] [IsCyclotomi
 include hζ
 
 
-set_option maxHeartbeats 800000 in
+
 theorem adjoin_top : Algebra.adjoin E {ζ} = ⊤ := by
   have h1 : Algebra.adjoin ℚ ({ζ} : Set L) = ⊤ := IsCyclotomicExtension.adjoin_primitive_root_eq_top hζ
   refine eq_top_iff.2 fun x hxt => ?_

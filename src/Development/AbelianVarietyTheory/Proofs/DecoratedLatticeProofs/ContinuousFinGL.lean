@@ -19,8 +19,8 @@ noncomputable section
 namespace GlobalTheory.AdForm.RdLaw
 variable {D : D7}
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem continuous_comm : letI := tensTopL (F := D.host.F) (E := D.host.E) (Af D.host.F)
     Continuous (Algebra.TensorProduct.comm D.host.F (Af D.host.F) D.host.E) := by
   letI : Algebra (Af D.host.F) (D.host.E ⊗[D.host.F] Af D.host.F) := Algebra.TensorProduct.rightAlgebra

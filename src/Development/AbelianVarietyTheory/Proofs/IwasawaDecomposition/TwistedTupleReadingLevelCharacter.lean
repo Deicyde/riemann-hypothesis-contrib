@@ -91,8 +91,8 @@ theorem isPtOf_mul_rat [NeZero n] {hcm : CMData F E} {SG Q : Finset (HeightOneSp
     have e : ∀ x, adAt F P.1 ((g : Matrix (Fin n) (Fin n) (AfE F E)) i x * (z : Matrix (Fin n) (Fin n) (AfE F E)) x j) =
         algebraMap E (P.1.adicCompletion E) (p.fr P (Pi.single x 1) i * (c P).1 (Pi.single j 1) x) := fun x => by
       rw [map_mul, map_mul, hg.fr P, hcz P]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl fun x _ => e x, ← map_sum]
+
+    rw [Finset.sum_congr rfl fun x _ => e x, ← map_sum]
     refine congrArg (algebraMap E (P.1.adicCompletion E)) ?_
     show _ = (p.fr P) ((c P).1 (Pi.single j 1)) i
     exact (Finset.sum_congr rfl fun k _ => mul_comm _ _).trans (GlobalTheory.TopStep.apply_eq_sum (p.fr P).toLinearMap _ i).symm
@@ -164,7 +164,7 @@ theorem levQX_lam_inv (emb : X.K →+* ℂ) (hn : R.N R.m - 1 = R.r + R.m * R.t)
 
 end Chr
 
-set_option maxHeartbeats 2000000 in
+
 theorem rdLevOn_reads_tw : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l))
     (a : I.ι) {bad : Set (HeightOneSpectrum (𝓞 (I.rec7 l Z).host.F))}
     (S : StepLevel (I.rec7 l Z).host.F (I.rec7 l Z).host.E (sigD (I.rec7 l Z)) (gramP (I.rec7 l Z)) 1 (I.rec7 l Z).R.f bad)

@@ -40,7 +40,7 @@ theorem entry_memAt (V : HSp D) (P : Pl D → Prop) (g : GA D V) (hg : g ∈ grp
   rw [Matrix.sub_apply]; exact Ideal.Quotient.eq.mp h2
 
 
-set_option maxHeartbeats 800000 in
+
 open GlobalTheory.LocWeil.PlaceIdem in
 theorem prod_of_grpAt : ∀ (D : D7) (V : HSp D) (n : ℕ) (k : Fin n → Type) [∀ i, Field (k i)] [∀ i, ValuativeRel (k i)] [∀ i, TopologicalSpace (k i)] [∀ i, IsNonarchimedeanLocalField (k i)] (q : ∀ i, GlobalTheory.FinPl.SplitPt D (k i)), Function.Injective (fun i => (q i).v) → ∀ g ∈ GlobalTheory.FinPl.grpAt V (fun p => ∃ i, p = (q i).v), ∃ h : Fin n → GA D V, (∀ i, SuppAt (q i).e V (h i)) ∧ g = ((List.finRange n).map h).prod := by
   intro D V n k _ _ _ _ q hv g hg
@@ -70,8 +70,8 @@ theorem prod_of_grpAt : ∀ (D : D7) (V : HSp D) (n : ℕ) (k : Fin n → Type) 
     rw [Ideal.mem_iInf] at hoff
     have h1 := key (fun i => (q i).v) hv ((M - 1) a b) (fun u hu =>
       (RingHom.mem_ker).mp (hoff ⟨u, fun ⟨i, hi⟩ => hu ⟨i, hi.symm⟩⟩))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sub, map_one, map_sum] at h1
+
+    rw [map_sub, map_sub, map_one, map_sum] at h1
     have h2 := real_idem_mul ((M - 1) a b) ((RingHom.mem_ker).mp hinf)
     have h3 : (1 - ∑ i, E i) = (1 - algebraMap (AF D.host.F) (AE D) (pairA D.host.F 1 0) - ∑ i, E i) +
         algebraMap (AF D.host.F) (AE D) (pairA D.host.F 1 0) := by ring

@@ -34,8 +34,8 @@ theorem tprod_expand {ι κ : T → Type} [∀ τ, Fintype (ι τ)] [∀ τ, Fin
       ∑ g : (∀ τ, κ τ), (∏ τ, ⟪b' τ (g τ), b τ (f τ)⟫_ℂ) • PiTensorProduct.tprod ℂ fun τ => b' τ (g τ) := by
   have h : (fun τ => b τ (f τ)) = fun τ => ∑ j, ⟪b' τ j, b τ (f τ)⟫_ℂ • b' τ j :=
     funext fun τ => ((b' τ).sum_repr' _).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, MultilinearMap.map_sum]
+
+  rw [h, MultilinearMap.map_sum]
   refine Finset.sum_congr rfl fun g _ => ?_
   exact MultilinearMap.map_smul_univ _ _ _
 
@@ -49,8 +49,8 @@ theorem pSum_indep {ι κ : T → Type} [∀ τ, Fintype (ι τ)] [∀ τ, Finty
   have hχ : ∀ (χ : (⨂[ℂ] τ, E τ) →ₗ[ℂ] ℂ) (f : ∀ τ, ι τ),
       χ (PiTensorProduct.tprod ℂ fun τ => b τ (f τ)) = ∑ g, U f g * χ (t' g) := by
     intro χ f
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [tprod_expand b b' f, map_sum]
+
+    rw [tprod_expand b b' f, map_sum]
     simp only [map_smul, smul_eq_mul, U, t']
   have horth : ∀ g g' : (∀ τ, κ τ), ∑ f, starRingEnd ℂ (U f g) * U f g' = if g = g' then 1 else 0 := by
     intro g g'
@@ -78,8 +78,8 @@ theorem pSum_indep {ι κ : T → Type} [∀ τ, Fintype (ι τ)] [∀ τ, Finty
   simp_rw [hχ φ, hχ ψ]
   calc ∑ f, starRingEnd ℂ (∑ g, U f g * φ (t' g)) * ∑ g', U f g' * ψ (t' g')
       = ∑ g, ∑ g', starRingEnd ℂ (φ (t' g)) * ψ (t' g') * ∑ f, starRingEnd ℂ (U f g) * U f g' := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
+
+        simp only [map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
         conv_rhs => rw [Finset.sum_comm]
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun g _ => ?_
@@ -131,7 +131,7 @@ def smIso {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S) (τ : D.wha
 end Model
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_smul_prIso (D : D7) (θ : InfFam D) (MX : DSModel D.sp.X' (parB (Ptw D) D.R.m))
     (cX : CoefA D.sp.X') (prX : cX.W →ₗ[ℂ] SmT MX →ₗ[ℂ] ℂ) (hθ : IsInfFam θ) (hc : cX.Is)
     (hpr : IsDualPair θ MX cX prX) : ∃ c : ℂ, c ≠ 0 ∧ Seed.PrIso MX cX (c • prX) := by

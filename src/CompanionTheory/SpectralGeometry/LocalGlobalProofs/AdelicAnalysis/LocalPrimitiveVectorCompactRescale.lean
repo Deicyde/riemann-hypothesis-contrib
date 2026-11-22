@@ -85,14 +85,14 @@ theorem primitiveCompact_of_ringEquiv {A B : Type*} [CommRing A] [CommRing B] [T
   rintro y ⟨z, hz⟩
   have h1 : (fun i => e (z i)) ⬝ᵥ (fun i => e (y i)) = 1 := by
     have := congrArg e hz
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [dotProduct, map_sum, map_mul] using this
+
+    simpa [dotProduct, map_sum, map_mul] using this
   obtain ⟨a, w, m1, m2, m3⟩ := p _ ⟨_, h1⟩
   refine ⟨Units.map (e.symm : B →* A) a, fun i => e.symm (w i), ⟨_, m1, ?_⟩, ⟨w, m2, rfl⟩, ?_⟩
   · ext i; simp
   · apply e.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [dotProduct, map_sum, map_mul] using m3
+
+    simpa [dotProduct, map_sum, map_mul] using m3
 
 section Quad
 

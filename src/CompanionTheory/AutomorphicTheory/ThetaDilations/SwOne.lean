@@ -23,7 +23,7 @@ noncomputable section
 
 namespace CompanionTheory.PlacePermOperatorBicommutantSpan
 
-set_option maxHeartbeats 600000 in
+
 theorem sw_one : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → 3 ≤ M → ∀ (T : Matrix (Fin 1) (Fin 1) E) (hT : ∀ a b, σ (T b a) = T a b), T.det ≠ 0 → SWMeas σ J T hT := by
   intro F E _ _ _ _ _ σ hcm M J hJ hM T hT hd d b li lam hli hlam μ 𝓕 hμ h𝓕 mi m hmi hm
   obtain ⟨t1, t2⟩ := theta_inv F E σ hcm M J hJ μ 𝓕 hμ h𝓕 1 T

@@ -113,9 +113,9 @@ theorem LocFam.linearIndependent [Fintype ι] (D : LocFam F ℓ ι) (hD : D.Over
       ring
     have hιX : D.ιF i (X : F) =
         -((ℓ : D.K i) * ∑ k, algebraMap ℚ_[ℓ] (D.K i) (d k) * D.ιF i (b k)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hXF, map_sum, Finset.sum_congr rfl fun k _ => hterm k, Finset.sum_sub_distrib, hrel i,
-        Finset.mul_sum]
+
+      rw [hXF, map_sum, Finset.sum_congr rfl fun k _ => hterm k, Finset.sum_sub_distrib, hrel i,
+      Finset.mul_sum]
       ring
     have hsum : valuation (D.K i) (∑ k, algebraMap ℚ_[ℓ] (D.K i) (d k) * D.ιF i (b k)) ≤ 1 := by
       refine Valuation.map_sum_le _ fun k _ => ?_
@@ -156,8 +156,8 @@ theorem LocFam.injective_of_linearIndependent [Fintype ι] (D : LocFam F ℓ ι)
   have hb : ∀ k, bb k = 1 ⊗ₜ integralBasis F k := fun k => Algebra.TensorProduct.basis_apply _ _
   refine (injective_iff_map_eq_zero D.Φ).2 fun x hx => ?_
   rw [← bb.sum_repr x] at hx ⊢
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, hb] at hx
+
+  simp only [map_sum, map_smul, hb] at hx
   have h0 := (Fintype.linearIndependent_iff.1 hl) (fun k => bb.repr x k) hx
   simp [h0]
 

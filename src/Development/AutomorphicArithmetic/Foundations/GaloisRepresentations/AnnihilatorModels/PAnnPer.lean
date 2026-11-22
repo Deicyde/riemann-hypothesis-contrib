@@ -20,7 +20,7 @@ private theorem algebraTensorModule_map_map_id_left_comm_of_comm {F L V B B' : T
   | tmul v b => simp [h]
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Gal.crystallineComparison.annPer_of :
     AnnPer := by
   intro F G B B' _ _ _ _ _ _ σ ψ σ' ψ' c hc hσ hψ L _ _ e hB V _ _ _ _ _ ρ hA
@@ -72,8 +72,8 @@ theorem UpperTheory.Gal.crystallineComparison.annPer_of :
       m ((AlgebraTensorModule.map (T j) (ψ ^ (n - j))) y.1) :=
     fun j => algebraTensorModule_map_map_id_left_comm_of_comm c (T j) (ψ ^ (n - j)) (ψ' ^ (n - j)) (hpow (n - j)) y.1
   have h0 := congrArg m (hT y.1 y.2)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_zero, map_sum] at h0
+
+  rw [map_zero, map_sum] at h0
   rw [hxy, ← h0]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [key j]

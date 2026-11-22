@@ -31,7 +31,7 @@ noncomputable section
 
 open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.Cos CompanionTheory.Exh GlobalTheory.CompanionTheory.ExhGood
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace CompanionTheory.Groth.ClsOfF
 

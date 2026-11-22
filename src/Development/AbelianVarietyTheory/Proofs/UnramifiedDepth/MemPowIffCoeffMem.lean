@@ -111,8 +111,8 @@ theorem decomp [Fintype κ] [DecidableEq κ] (f : MvPowerSeries κ R) :
     f = C (coeff 0 f) + ∑ k, X k * cof f k := by
   classical
   ext d
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, coeff_C]
+
+  rw [map_add (f := _), map_sum, coeff_C]
   simp_rw [X, coeff_monomial_mul, one_mul, coeff_cof]
   by_cases hd : d = 0
   · subst hd

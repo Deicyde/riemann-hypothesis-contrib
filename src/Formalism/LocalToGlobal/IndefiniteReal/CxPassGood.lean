@@ -50,8 +50,8 @@ theorem mulVec_sum_smul {n : ℕ} (c : G → K) (M : G → Matrix (Fin n) (Fin n
 theorem cpt_sum_smul (σ : K →+* ℂ) {n : ℕ} (c : G → K) (y : G → Fin n → K) :
     cpt σ (∑ g, c g • y g) = ∑ g, σ (c g) • cpt σ (y g) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [cpt, Finset.sum_apply, map_sum]
+
+  simp [cpt, Finset.sum_apply, map_sum]
 
 theorem sum_eq_one_of {E : Type} [AddCommGroup E] [Module ℂ E] (σ : K →+* ℂ) {n : ℕ}
     (f : (Fin n → ℂ) →ₗ[ℂ] E) (hf : Function.Injective f) (ρ : G → Matrix (Fin n) (Fin n) K)
@@ -63,8 +63,8 @@ theorem sum_eq_one_of {E : Type} [AddCommGroup E] [Module ℂ E] (σ : K →+* �
   intro x
   rw [Matrix.toLin'_apply, Matrix.toLin'_one, LinearMap.id_apply]
   have h1 : f (cpt σ ((∑ g, c g • ρ g) *ᵥ x)) = f (cpt σ x) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mulVec_sum_smul, cpt_sum_smul, map_sum]
+
+    rw [mulVec_sum_smul, cpt_sum_smul, map_sum]
     simp only [map_smul, hρ]
     exact hfix x
   have h2 := hf h1

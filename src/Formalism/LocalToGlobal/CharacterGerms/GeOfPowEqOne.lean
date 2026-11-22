@@ -58,8 +58,8 @@ theorem InL.zero {l : ℕ} : InL l (0 : PowerSeries C) :=
 theorem InL.sum {l : ℕ} {ι : Type} (s : Finset ι) (f : ι → PowerSeries C) (hf : ∀ i ∈ s, InL l (f i)) :
     InL l (∑ i ∈ s, f i) :=
   fun m hm => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun i hi => hf i hi m hm
 
 private theorem coeff_tyS_pow_eq_of_two_le {l : ℕ} (hl : 2 ≤ l) (b : ℕ → C) (s : ℕ) :
@@ -256,15 +256,15 @@ theorem unV_mem (V : VF C) (g : Fin 2) (hlg0 : ∀ i, MvPowerSeries.constantCoef
   refine ⟨fun i => dnL V.l (γ i), fun q => dnL V.l (lam q), hδ, hlam', ?_, ?_⟩
   · intro i
     apply subst_X_pow_inj hl0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hal, h1 i, ← PowerSeries.coe_substAlgHom hS, map_sum]
+
+    rw [← hal, h1 i, ← PowerSeries.coe_substAlgHom hS, map_sum]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [map_smul, PowerSeries.coe_substAlgHom hS, hty]
   · intro q
     apply subst_X_pow_inj hl0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hty, h2 q, ← PowerSeries.coe_substAlgHom hS, map_add (f := _), map_sub, map_sum,
-      PowerSeries.coe_substAlgHom hS, ← hal, ← (hlamL q).eq_subst hl0]
+
+    rw [← hty, h2 q, ← PowerSeries.coe_substAlgHom hS, map_add (f := _), map_sub, map_sum,
+    PowerSeries.coe_substAlgHom hS, ← hal, ← (hlamL q).eq_subst hl0]
     congr 1
     refine Finset.sum_congr rfl fun c _ => ?_
     split_ifs

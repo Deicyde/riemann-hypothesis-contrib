@@ -275,8 +275,8 @@ theorem cls_linComb {L : LB X} (hL : L.IsLB) {K : Type} [Fintype K] (φ : K → 
     ext i
     simp [Finset.sum_apply, Pi.single_apply]
   show F ε = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, map_sum]
+
+  rw [e, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul, ← e]
   exact congrArg _ (cls_linComb_single hL φ k)

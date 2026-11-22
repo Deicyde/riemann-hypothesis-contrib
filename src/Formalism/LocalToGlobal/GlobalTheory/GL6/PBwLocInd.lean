@@ -27,9 +27,9 @@ theorem substitution_substitution {ι : Type} {n : ℕ} (o o' : ι → Matrix (F
   have h : (subP o).comp (subP o') = subP (fun τ => o' τ * o τ) := by
     apply MvPolynomial.algHom_ext
     intro x
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [AlgHom.comp_apply, subP, MvPolynomial.aeval_X, map_sum, map_mul, MvPolynomial.aeval_C,
-      MvPolynomial.algebraMap_eq, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
+
+    simp only [AlgHom.comp_apply, subP, MvPolynomial.aeval_X, map_sum, map_mul, MvPolynomial.aeval_C,
+    MvPolynomial.algebraMap_eq, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
     rw [Finset.sum_comm]
   show ((subP o).comp (subP o')) P = _
   rw [h]

@@ -55,8 +55,8 @@ theorem ip_sum_right {A : Type} (t : Finset A) (f : A → Fin g → ℂ) (x : Fi
 
 theorem ip_sum_left {A : Type} (t : Finset A) (f : A → Fin g → ℂ) (y : Fin g → ℂ) :
     R.ip (∑ i ∈ t, f i) y = ∑ i ∈ t, R.ip (f i) y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← ip_conj R y, ip_sum_right, map_sum]
+
+  rw [← ip_conj R y, ip_sum_right, map_sum]
   exact Finset.sum_congr rfl fun i _ => ip_conj R y (f i)
 
 

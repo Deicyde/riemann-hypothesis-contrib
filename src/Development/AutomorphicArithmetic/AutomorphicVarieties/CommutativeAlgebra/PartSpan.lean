@@ -37,9 +37,9 @@ theorem UpperTheory.V.Alg.part_span :
       rw [map_add (f := _), hm] at hkm
       simpa using hkm
     · ext n
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_congr rfl
-        (g := fun m => if c n = m then (if n ∈ S then coeff n f else 0) else 0), Finset.sum_ite_eq]
+
+      rw [map_sum, Finset.sum_congr rfl
+      (g := fun m => if c n = m then (if n ∈ S then coeff n f else 0) else 0), Finset.sum_ite_eq]
       · by_cases hn : n ∈ S
         · rw [if_pos ((Set.Finite.mem_toFinset hMfin).2 (hcM n hn)), if_pos hn]
         · rw [hf n hn]

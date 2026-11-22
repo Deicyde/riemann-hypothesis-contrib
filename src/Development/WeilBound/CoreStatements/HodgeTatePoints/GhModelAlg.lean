@@ -41,8 +41,8 @@ theorem exists_int_proj (E : Type) [Field E] [NumberField E] :
   have ha : ∀ k, ((∑ j, n (k, j) • RingOfIntegers.basis E j : 𝓞 E) : E) = ((m : ℤ) : E) * HT.dualInt E k := by
     intro k
     conv_rhs => rw [← (integralBasis E).sum_repr (HT.dualInt E k)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [RingOfIntegers.coe_eq_algebraMap, map_sum, Finset.mul_sum]
+
+    rw [RingOfIntegers.coe_eq_algebraMap, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     have h := hn (k, j)
     simp only [eq_intCast, zsmul_eq_mul] at h

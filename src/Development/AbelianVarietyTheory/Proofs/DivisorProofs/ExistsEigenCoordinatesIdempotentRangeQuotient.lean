@@ -72,8 +72,8 @@ theorem exists_eigen_coordinates_range_quot : ∀ {C : Type} [CommRing C] [IsLoc
   have hEu : ∀ x ∈ LinearMap.range π, ∀ u : Fin a → H ⧸ F, (∀ i c, σb c (u i) = χ i c • u i) →
       F.mkQ x = ∑ i, u i → ∀ i, e i (F.mkQ x) = u i := by
     intro x hx u hu hxu i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hxu, map_sum, Finset.sum_eq_single i]
+
+    rw [hxu, map_sum, Finset.sum_eq_single i]
     · exact he2 i (u i) (hu i)
     · intro j _ hji; exact he3 i j (u j) hji (hu j)
     · simp

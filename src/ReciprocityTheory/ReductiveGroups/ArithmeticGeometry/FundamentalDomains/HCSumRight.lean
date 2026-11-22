@@ -19,8 +19,8 @@ variable {r : ℕ} (X : Data E r)
 
 theorem hC_sum_right' (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) {ι : Type*} (s : Finset ι)
     (u : Fin r → ℂ) (f : ι → Fin r → ℂ) : hermC τ G u (∑ i ∈ s, f i) = ∑ i ∈ s, hermC τ G u (f i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hermC, Finset.sum_apply, map_sum, Finset.mul_sum]
+
+  simp only [hermC, Finset.sum_apply, map_sum, Finset.mul_sum]
   calc (∑ a, ∑ b, ∑ i ∈ s, u a * τ (G a b) * conj (f i b))
       = ∑ a, ∑ i ∈ s, ∑ b, u a * τ (G a b) * conj (f i b) :=
         Finset.sum_congr rfl fun a _ => Finset.sum_comm

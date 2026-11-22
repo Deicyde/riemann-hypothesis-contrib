@@ -15,8 +15,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open UpperTheory.GalN.V UpperTheory.V.Z.Win.Birth
@@ -294,8 +294,8 @@ private theorem mkSeed {n : ℕ} {l : ℕ} [Fact l.Prime] {L : Type} [Field L] [
   ⟨h1, h2, h3, h4, h5, h6, h7 h6⟩
 end Up
 end UpperTheory.V.Sd
-set_option maxHeartbeats 1600000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 open UpperTheory.V.Sd in
 theorem UpperTheory.V.Z.Bc.second_initial_of_prints :
     _root_.UpperTheory.V.Z.Bc.HypothesesZ' → AwChain → PropEGP → _root_.UpperTheory.V.Sd.Seed2Alt := by

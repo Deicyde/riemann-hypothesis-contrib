@@ -78,8 +78,8 @@ theorem lat_core (𝔐 : HodgeCpt Y S y) (ψ : Ω₀ →+* Ω) (j : Li₀ →+ �
     have hBspan : Submodule.span Ω (Set.range fun k => j (B k)) = ⊤ := by
       rw [eq_top_iff, ← htop, Submodule.span_le]
       rintro _ ⟨e, rfl⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← B.sum_repr e, map_sum]
+
+      rw [← B.sum_repr e, map_sum]
       refine Submodule.sum_mem _ fun k _ => ?_
       rw [hsemi]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -111,12 +111,12 @@ theorem lat_core (𝔐 : HodgeCpt Y S y) (ψ : Ω₀ →+* Ω) (j : Li₀ →+ �
       rw [← (hb s).2, Submodule.mem_span_range_iff_exists_fun] at he'
       obtain ⟨a, rfl⟩ := he'
       refine ⟨a, ⟨h, he⟩, ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, hsemi]
+
+      simp only [map_sum, hsemi]
     · rintro ⟨a, ⟨h, ha⟩, rfl⟩
       refine ⟨h, _, ha, ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, hsemi]
+
+      simp only [map_sum, hsemi]
 
 end
 

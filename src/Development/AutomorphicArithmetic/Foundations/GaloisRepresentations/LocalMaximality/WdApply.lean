@@ -106,14 +106,14 @@ theorem UpperTheory.Gal.productCup_of_system.htpy_of :
   · show wd (fun l => act (r l)) _ = _
     funext t
     rw [wd_apply']
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finset.smul_sum]
+
+    simp only [map_sum, Finset.smul_sum]
     rw [Finset.sum_comm]
     have : ∀ l, ∑ i ∈ t, GlobalTheory.cubeSign t i • act (r i) (act (a l) (ctrH l c (t.erase i))) =
         act (a l) (act (r l) (c t)) := by
       intro l
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hstep l t, wd_apply', map_sum]
+
+      rw [← hstep l t, wd_apply', map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_zsmul, hcomm]
     rw [Finset.sum_congr rfl fun l _ => this l, LinearMap.sum_apply]

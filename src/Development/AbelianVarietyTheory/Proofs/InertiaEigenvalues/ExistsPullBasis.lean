@@ -125,8 +125,8 @@ theorem map_sub_one (i m : Fin n) : (G.map ι - 1) i m ∈ Dp k 2 := by
 omit hψ h5 hG in
 theorem iota_op (x : Fin n → k⸨X⸩) (i : Fin n) : ι (∑ m, R.φ (G i m) * R.γ (x m) - x i) =
     ∑ m, phiPi k l (G.map ι i m) * gamPi k l (ι (x m)) - ι (x i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_sum, map_mul, hι.2.2.2.1, iota_gam hι, Matrix.map_apply]
+
+  simp only [map_sub, map_sum, map_mul, hι.2.2.2.1, iota_gam hι, Matrix.map_apply]
 
 theorem coord_maps {a : ℤ} (h1 : 2 - (l : ℤ) ≤ a) (h2 : a ≤ 0) (x : Fin n → k⸨X⸩) (hx : ∀ i, ψ (x i) = 0)
     (hs : ∀ i, x i ∈ Dp k a) (i : Fin n) : ∑ m, R.φ (G i m) * R.γ (x m) - x i ∈ Dp k (a + 1) := by
@@ -148,9 +148,9 @@ theorem coord_surj {a : ℤ} (h1 : 2 - (l : ℤ) ≤ a) (h2 : a ≤ 0) (z : Fin 
       (fun i => by rw [map_sub, psi_del, y1, map_zero, sub_zero]) (fun i => by
         have h3 := congrArg (delPi k t) (y3 i)
         have h4 := y3 i
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sub, map_sum, map_mul, del_phi, del_gam, Matrix.map_apply, hd, mul_sub,
-          Finset.sum_sub_distrib] at h3 h4 ⊢
+
+        simp only [map_sub, map_sum, map_mul, del_phi, del_gam, Matrix.map_apply, hd, mul_sub,
+        Finset.sum_sub_distrib] at h3 h4 ⊢
         linear_combination h3 - h4)
     exact sub_eq_zero.1 (congrFun this i)
   choose x hx using this
@@ -174,8 +174,8 @@ theorem exists_pull_basis {σ : k⸨X⸩ →ₐ[k] k⸨X⸩} {f : V →ₗ[k] V}
     rw [← ht]
     refine Submodule.span_le.2 ?_
     rintro _ ⟨x, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr x, map_sum]
+
+    rw [← b.sum_repr x, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [hf]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -195,8 +195,8 @@ theorem exists_Psi [FiniteDimensional k⸨X⸩ V] {σ : k⸨X⸩ →ₐ[k] k⸨X
     rw [← smul_one_smul k⸨X⸩ r x, map_smul, Finsupp.smul_apply, smul_assoc, one_smul, map_smul, smul_assoc]
   · change ∑ i, ψ (c.repr (a • f x) i) • b i = _
     have h1 : a • f x = ∑ i, (σ (b.repr x i) * a) • c i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        conv_lhs => rw [← b.sum_repr x, map_sum, Finset.smul_sum]
+
+      conv_lhs => rw [← b.sum_repr x, map_sum, Finset.smul_sum]
       exact Finset.sum_congr rfl fun i _ => by rw [hf, hc, smul_smul, mul_comm]
     conv_rhs => rw [← b.sum_repr x, Finset.smul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -258,8 +258,8 @@ theorem lemmaPsi : GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacter
     intro x
     obtain ⟨c, hc'⟩ := exists_pull_basis hf ht (Module.finBasis k⸨X⸩ V)
     rw [← c.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hc', hg, ← hc, hΨ, hΨ, hg₀, hR.2.2.1]
   refine ⟨Ψ, (psiMod_iff R ψ ((psiRing_iff R ψ).1 hR) f g₀ g Ψ).2 ⟨hΨ, hcomm, ?_⟩⟩
@@ -275,8 +275,8 @@ theorem lemmaPsi : GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacter
   have hker : ∀ x, Ψ x = 0 ↔ ∀ i, ψ (c.repr x i) = 0 := by
     intro x
     have : Ψ x = ∑ i, ψ (c.repr x i) • b i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        conv_lhs => rw [← c.sum_repr x, map_sum]
+
+      conv_lhs => rw [← c.sum_repr x, map_sum]
       simp only [hcb, hΨ]
     rw [this]
     exact ⟨Fintype.linearIndependent_iff.1 b.linearIndependent _, fun h => by simp [h]⟩
@@ -284,15 +284,15 @@ theorem lemmaPsi : GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacter
     intro x i
     have h3 : ∀ m, c.repr (g (c m)) i = R.φ (G i m) := by
       intro m
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hcb, ← hc, ← b.sum_repr (g₀ (b m)), map_sum]
+
+      rw [hcb, ← hc, ← b.sum_repr (g₀ (b m)), map_sum]
       simp only [hf _, ← hcb]
       rw [c.repr_sum_self]
       rfl
     rw [map_sub, Finsupp.sub_apply]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [← c.sum_repr x, map_sum, map_sum, Finsupp.finsetSum_apply]
+
+    conv_lhs => rw [← c.sum_repr x, map_sum, map_sum, Finsupp.finsetSum_apply]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [hg, map_smul, Finsupp.smul_apply, h3, smul_eq_mul, mul_comm]
   ext z

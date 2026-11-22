@@ -338,7 +338,7 @@ private theorem shaInj_gen {O Γ H W X : Type} [CommRing O] [IsDomain O] [IsLoca
       rw [hm _ (MonoidHom.mem_range.mpr ⟨h, rfl⟩), hαΨ, smul_smul, ← sub_smul, hφ, map_sub, map_mul, map_neg]
       ring
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.V.U3.sha_inj_gen {Ω : Type} [Field Ω] [Algebra ℚ Ω] {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O]
     [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] {H : Type} [Group H]
     [TopologicalSpace H] (e n : ℕ) (θ : G ℚ Ω →* Oˣ) (η : G ℚ Ω →* ℤˣ) (N : Set (G ℚ Ω)) (ι : H →* G ℚ Ω)

@@ -108,12 +108,12 @@ theorem sideEv_end (b : Bool) (T : Module.End K (V b)) (f : V b) (y : Σ b', Fin
   classical
   have h0 : T f = ∑ t, (e b).repr f t • T (e b t) := by
     conv_lhs => rw [← (e b).sum_repr f]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul]
+
+    simp only [map_sum, map_smul]
   have h1 : sideEv iC e b (T f) y =
       ∑ t, iC ((e b).repr f t) * sideEv iC e b (T (e b t)) y := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h0, map_sum, Finset.sum_apply]
+
+    rw [h0, map_sum, Finset.sum_apply]
     exact Finset.sum_congr rfl fun t _ => sideEv_smul iC e b _ _ y
   rw [h1, Fintype.sum_sigma, Finset.sum_eq_single b]
   · refine Finset.sum_congr rfl fun t _ => ?_

@@ -90,9 +90,9 @@ theorem conj_tau {n p q : ℕ} (Z : ReciprocityTheory.L2DbarEstimates.V n →ₗ
       intro ξ η
       rw [curv_tau Z 0 ξ η h0]
       simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hc, map_sum, map_smul, conjTranspose_sum, conjTranspose_smul, Matrix.sum_mul,
-      Matrix.mul_sum, Matrix.smul_mul, Matrix.mul_smul, smul_neg, Finset.sum_neg_distrib, neg_inj]
+
+    simp only [hc, map_sum, map_smul, conjTranspose_sum, conjTranspose_smul, Matrix.sum_mul,
+    Matrix.mul_sum, Matrix.smul_mul, Matrix.mul_smul, smul_neg, Finset.sum_neg_distrib, neg_inj]
     simp only [Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => by rw [mul_comm]; rfl
@@ -116,10 +116,10 @@ theorem conj_tauBar {n p q : ℕ} (Z : ReciprocityTheory.L2DbarEstimates.V n →
       intro ξ η
       rw [curv_tauBar Z 0 ξ η h0]
       simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hc, map_sum, map_smul, conjTranspose_sum, conjTranspose_smul,
-      Matrix.sum_mul, Matrix.mul_sum, Matrix.smul_mul, Matrix.mul_smul, smul_neg,
-      Finset.sum_neg_distrib, neg_inj, transpose_sum, transpose_smul]
+
+    simp only [hc, map_sum, map_smul, conjTranspose_sum, conjTranspose_smul,
+    Matrix.sum_mul, Matrix.mul_sum, Matrix.smul_mul, Matrix.mul_smul, smul_neg,
+    Finset.sum_neg_distrib, neg_inj, transpose_sum, transpose_smul]
     simp only [Finset.smul_sum, smul_smul]
     rfl
   rw [hsum, hJ, hJ, curv_tauBar Z w _ _ hw, ← hAA, ← hB, ← transpose_nonsing_inv, Matrix.mul_neg,

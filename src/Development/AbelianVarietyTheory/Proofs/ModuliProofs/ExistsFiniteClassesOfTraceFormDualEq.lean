@@ -39,8 +39,8 @@ theorem exists_finite_classes_of_forms {V : Type} [AddCommGroup V] [Module E V]
   have hsum : ∀ a (c : Fin n → E) j,
       h a (∑ i, c i • v a i) (v a j) = c j * h a (v a j) (v a j) := by
     intro a c j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply, Finset.sum_eq_single j]
+
+    rw [map_sum, LinearMap.sum_apply, Finset.sum_eq_single j]
     · simp
     · intro i _ hij; simp [hvo a i j hij]
     · simp
@@ -57,8 +57,8 @@ theorem exists_finite_classes_of_forms {V : Type} [AddCommGroup V] [Module E V]
     simp [φ, Basis.equivFun_symm_apply, hB]
   have hform : ∀ a c c', h a ((φ a).symm c) ((φ a).symm c') =
       ∑ j, star (c' j) * (c j * h a (v a j) (v a j)) := fun a c c' => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hφ, hφ, map_sum (h a _)]
+
+    rw [hφ, hφ, map_sum (h a _)]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smulₛₗ, hsum, starRingEnd_apply, smul_eq_mul]
   let L : α → Submodule ℤ (Fin n → E) := fun a => (Λ a).map ((φ a).toLinearMap.restrictScalars ℤ)

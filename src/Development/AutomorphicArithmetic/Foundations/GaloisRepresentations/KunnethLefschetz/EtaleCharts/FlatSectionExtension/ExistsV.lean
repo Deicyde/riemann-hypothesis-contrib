@@ -24,8 +24,8 @@ theorem UpperTheory.Gal.KunnethLefschetz.G.PX.existsV :
     have e2 := hs 1 (fun p => map_one _)
     have e1 : (∑ m, b m * v m) = s := by
       refine hs _ fun p => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_mul, hb, hv]
       simp [uSelf]
     rw [e1, e2]

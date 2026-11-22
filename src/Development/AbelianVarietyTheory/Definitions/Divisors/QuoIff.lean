@@ -5,7 +5,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CovolXOfCovo
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

@@ -24,7 +24,7 @@ structure Raw (D : D7) where
 
 variable {D : D7} (Λ : Raw D)
 
-set_option maxHeartbeats 1600000
+
 
 @[reducible] def ledTr (L : SizeData₂ D) : SizeData₂ Λ.rec' := { L with }
 

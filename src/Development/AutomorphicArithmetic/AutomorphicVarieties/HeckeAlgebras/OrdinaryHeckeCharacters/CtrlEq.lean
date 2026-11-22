@@ -39,9 +39,9 @@ theorem UpperTheory.V.Hi.ctrlEq :
   · haveI : Finite (X.I.N ⧸ (X.I.Nconj a).subgroupOf X.I.N) :=
       Nat.finite_of_card_ne_zero (X.I.fin_N a a.2)
     haveI := Fintype.ofFinite (X.I.N ⧸ (X.I.Nconj a).subgroupOf X.I.N)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Frame.UF, Frame.U, Iwa.uOp, finsum_eq_sum_of_fintype, LinearMap.smul_apply, LinearMap.sum_apply,
-      map_smul, map_sum, Finset.smul_sum]
+
+    simp only [Frame.UF, Frame.U, Iwa.uOp, finsum_eq_sum_of_fintype, LinearMap.smul_apply, LinearMap.sum_apply,
+    map_smul, map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun q _ => ?_
     ext g i
     have := UpperTheory.V.Hi.ctrlEq_row W g.2 (q.out : X.I.N) (X.I.N_le q.out.2) ⟨a, X.I.P_le a a.2⟩

@@ -211,8 +211,8 @@ theorem _root_.GlobalTheory.SW.Dict.quad_tauOf (Z : _root_.GlobalTheory.SW.CM Ψ
       2 * ∑ τ : Ψ, _root_.GlobalTheory.SW.Dict.vec τ.1 m ⬝ᵥ Z τ *ᵥ
         fun a => conj (_root_.GlobalTheory.SW.Dict.vec τ.1 m a) := by
   rw [two_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dotProduct, mulVec, _root_.GlobalTheory.SW.tauOf, _root_.GlobalTheory.SW.Dict.vec, Matrix.of_apply, map_sum, map_mul, hm, Fintype.sum_prod_type, Finset.mul_sum, Finset.sum_mul, mul_add, add_mul, Finset.sum_add_distrib]
+
+  simp only [dotProduct, mulVec, _root_.GlobalTheory.SW.tauOf, _root_.GlobalTheory.SW.Dict.vec, Matrix.of_apply, map_sum, map_mul, hm, Fintype.sum_prod_type, Finset.mul_sum, Finset.sum_mul, mul_add, add_mul, Finset.sum_add_distrib]
   congr 1
   ·
     conv_rhs => rw [Finset.sum_comm]
@@ -249,8 +249,8 @@ theorem _root_.GlobalTheory.SW.Dict.lin_zetaOf (z z' : _root_.GlobalTheory.SW.CM
     m ⬝ᵥ _root_.GlobalTheory.SW.zetaOf Ψ z z' k =
       ∑ τ : Ψ, (_root_.GlobalTheory.SW.Dict.vec τ.1 m ⬝ᵥ z τ k +
         z' τ k ⬝ᵥ fun a => conj (_root_.GlobalTheory.SW.Dict.vec τ.1 m a)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dotProduct, _root_.GlobalTheory.SW.zetaOf, _root_.GlobalTheory.SW.Dict.vec, map_sum, map_mul, hm, Fintype.sum_prod_type, Finset.mul_sum, Finset.sum_mul, mul_add, Finset.sum_add_distrib]
+
+  simp only [dotProduct, _root_.GlobalTheory.SW.zetaOf, _root_.GlobalTheory.SW.Dict.vec, map_sum, map_mul, hm, Fintype.sum_prod_type, Finset.mul_sum, Finset.sum_mul, mul_add, Finset.sum_add_distrib]
   rw [Finset.sum_comm (s := (Finset.univ : Finset Ψ))]
   simp only [Finset.sum_comm (s := (Finset.univ : Finset Ψ))]
   congr 1 <;> exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ =>
@@ -264,9 +264,9 @@ theorem _root_.GlobalTheory.SW.Dict.map_ofQ (σ : E →+* ℂ)
     (m : Matrix (Fin n) (_root_.GlobalTheory.SW.QI E N) ℚ) (k : Fin n) (a : Fin N) :
     σ (_root_.GlobalTheory.SW.ofQ m k a) =
       _root_.GlobalTheory.SW.Dict.vec σ (_root_.GlobalTheory.SW.qv (m k)) a := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [_root_.GlobalTheory.SW.ofQ, Matrix.of_apply, map_sum,
-    _root_.GlobalTheory.SW.Dict.vec, _root_.GlobalTheory.SW.qv]
+
+  simp only [_root_.GlobalTheory.SW.ofQ, Matrix.of_apply, map_sum,
+  _root_.GlobalTheory.SW.Dict.vec, _root_.GlobalTheory.SW.qv]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Rat.smul_def, map_mul, map_ratCast, mul_comm]
 
@@ -356,9 +356,9 @@ theorem _root_.GlobalTheory.SW.Dict.tauOf_mem (hΨ : _root_.GlobalTheory.SW.IsTy
       funext a; simp
     have hconjT : v τ ⬝ᵥ (Z τ)ᴴ *ᵥ (fun a => conj (v τ a)) =
         conj (v τ ⬝ᵥ Z τ *ᵥ fun a => conj (v τ a)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [dotProduct, mulVec, conjTranspose_apply, map_sum, map_mul, Complex.star_def,
-        Complex.conj_conj, Finset.mul_sum]
+
+      simp only [dotProduct, mulVec, conjTranspose_apply, map_sum, map_mul, Complex.star_def,
+      Complex.conj_conj, Finset.mul_sum]
       rw [Finset.sum_comm]
       exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
     rw [hstar]
@@ -398,8 +398,8 @@ theorem _root_.GlobalTheory.SW.Dict.tauOf_mem (hΨ : _root_.GlobalTheory.SW.IsTy
         simp only [hvdef, _root_.GlobalTheory.SW.Dict.vec,
           ComplexEmbedding.conjugate_coe_eq, Pi.zero_apply] at h1
         have h2 := congrArg conj h1
-        set_option synthInstance.maxHeartbeats 100000 in
-          simpa [map_sum, hm] using h2
+
+        simpa [map_sum, hm] using h2
     apply hx
     funext p
     obtain ⟨a, j0⟩ := p

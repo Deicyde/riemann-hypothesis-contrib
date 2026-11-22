@@ -97,8 +97,8 @@ lemma range_reesΦ :
     refine ⟨∑ n ∈ P.coeff.support, (reesIncFam I hF 𝔘 hU n).cechH p (y n), ?_⟩
     apply PolynomialModule.ext
     ext k
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [reesΦ_coeff, map_sum]
+
+    rw [reesΦ_coeff, map_sum]
     simp_rw [reesCoefFam_reesIncFam]
     rw [Finset.sum_ite_eq']
     split_ifs with hk

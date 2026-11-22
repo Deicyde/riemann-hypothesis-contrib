@@ -38,13 +38,13 @@ theorem coord_sig {R : Type} [CommRing R] [Algebra F R] {d : ℕ} (σ : E →ₐ
   have h : sigR R σ x =
       ∑ k, ((Algebra.TensorProduct.basis R b).repr x k) • ((1 : R) ⊗ₜ[F] σ (b k)) := by
     conv_lhs => rw [sum_coord (R := R) b x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [TensorProduct.smul_tmul', TensorProduct.smul_tmul']
     simp [sigR]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum, Finsupp.finsetSum_apply]
+
+  rw [h, map_sum, Finsupp.finsetSum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
 
@@ -54,8 +54,8 @@ theorem trace_coord {R : Type} [CommRing R] [Algebra F R] {d : ℕ} (b : Module.
     Algebra.trace R (R ⊗[F] E) x =
       ∑ k, (Algebra.TensorProduct.basis R b).repr x k * algebraMap F R (Algebra.trace F E (b k)) := by
   conv_lhs => rw [sum_coord (R := R) b x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, GlobalTheory.LatVac.trace_tmul, one_mul, smul_eq_mul]
 

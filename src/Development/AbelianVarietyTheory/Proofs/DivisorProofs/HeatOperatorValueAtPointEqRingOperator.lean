@@ -69,8 +69,8 @@ theorem value_acts : ∀ (R : Type) [CommRing R] (G : Over (Sp R)) [GrpObj G] [I
   · rw [ha i0]
     simp only [valR_eq_evalAt x _ hW]
     unfold GlobalTheory.Heat.op ringOp
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sub, map_mul, map_sum, map_pow, map_natCast, map_ofNat, hδ', hd', hc, rsT_same,
-      RingHom.mapMatrix_apply, Matrix.map_apply]
+
+    simp only [map_add (f := _), map_sub, map_mul, map_sum, map_pow, map_natCast, map_ofNat, hδ', hd', hc, rsT_same,
+    RingHom.mapMatrix_apply, Matrix.map_apply]
 
 end GlobalTheory.HeatPointValue

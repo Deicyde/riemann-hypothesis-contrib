@@ -51,7 +51,7 @@ lemma integral_of_finite_embedding {w : Af D.host.F ⊗[D.host.F] D.host.E} (hw 
   ⟨by rw [mul_fI_eq, finite_part_finite_embedding], by rw [finite_part_finite_embedding]; exact hw⟩
 
 
-set_option maxHeartbeats 800000 in
+
 lemma intAE_decomp (N : ℕ) (hN : 0 < N) {w : Af D.host.F ⊗[D.host.F] D.host.E} (hw : w ∈ intAE D) :
     ∃ x : 𝓞 D.host.E, ∃ w' ∈ intAE D, w = (1 : Af D.host.F) ⊗ₜ[D.host.F] (x : D.host.E) + N • w' := by
   induction hw using AddSubgroup.closure_induction with
@@ -91,7 +91,7 @@ lemma intAE_decomp (N : ℕ) (hN : 0 < N) {w : Af D.host.F ⊗[D.host.F] D.host.
     abel
 
 
-set_option maxHeartbeats 800000 in
+
 lemma intAE_residues (N : ℕ) (hN : 0 < N) :
     ∃ R : Finset (Af D.host.F ⊗[D.host.F] D.host.E), ∀ w ∈ intAE D, ∃ r ∈ R, ∃ w' ∈ intAE D, w = r + N • w' := by
   classical
@@ -111,7 +111,7 @@ lemma intAE_residues (N : ℕ) (hN : 0 < N) :
   abel
 
 
-set_option maxHeartbeats 800000 in
+
 lemma intF_residues (N : ℕ) (hN : 0 < N) :
     ∃ R : Finset (AE D), ∀ y : AE D, IntF y → ∃ r ∈ R, ∃ y' : AE D, IntF y' ∧ y = r + N • y' := by
   classical
@@ -123,7 +123,7 @@ lemma intF_residues (N : ℕ) (hN : 0 < N) :
   rw [hy', e, map_add (f := _), map_nsmul]
 
 
-set_option maxHeartbeats 800000 in
+
 lemma mat_residues (m n : ℕ) (N : ℕ) (hN : 0 < N) :
     ∃ R : Finset (Mx D m n), ∀ Z : Mx D m n, (∀ i j, IntF (Z i j)) →
       ∃ ρ ∈ R, ∃ Z' : Mx D m n, (∀ i j, IntF (Z' i j)) ∧ Z = ρ + N • Z' := by
@@ -138,7 +138,7 @@ lemma mat_residues (m n : ℕ) (N : ℕ) (hN : 0 < N) :
   rw [Matrix.add_apply, Matrix.smul_apply, Matrix.of_apply, Matrix.of_apply]
   exact hyeq i j
 
-set_option maxHeartbeats 800000 in
+
 lemma nsmul_cancel_AE {x y : AE D} {k : ℕ} (hk : 0 < k) (h : k • x = k • y) : x = y := by
   have hk' : ((k : D.host.F)) ≠ 0 := by exact_mod_cast hk.ne'
   have hu : algebraMap D.host.F (AE D) ((k : D.host.F))⁻¹ * algebraMap D.host.F (AE D) (k : D.host.F) = 1 := by
@@ -158,7 +158,7 @@ lemma nsmul_cancel_Mx {m n : ℕ} {X Y : Mx D m n} {k : ℕ} (hk : 0 < k) (h : k
   simpa using h1
 
 
-set_option maxHeartbeats 800000 in
+
 lemma exists_finset_half_decomp {S T : HSp D} {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
     {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)} (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT)
     {c' : ℕ} (hc' : 0 < c') (hup : ∀ t ∈ latAll S T ΛS ΛT, ∀ i j, IntF ((c' • t) i j))

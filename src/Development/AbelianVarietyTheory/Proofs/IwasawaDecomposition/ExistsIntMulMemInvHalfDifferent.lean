@@ -157,8 +157,8 @@ theorem exists_atP (p : ℕ) (hp : p.Prime) (hs : Th.SplitK H p) : ∃ γ : Th.I
   obtain ⟨𝔭, α, β, hp𝔭, hα, hβ, hαβ⟩ := GlobalTheory.T.exists_prime_over_split_not_mem_conj R H p hp hs
   have hiso : ∀ x y, ∑ w, γ.g x w * HostK.conjK H (γ.g y w) = ∑ a, Algebra.trace H.K H.E (x a * H.conj (y a)) := fun x y => by
     apply (algebraMap H.K H.E).injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← γ.isom, map_sum]
+
+    rw [← γ.isom, map_sum]
     exact Finset.sum_congr rfl fun w _ => map_mul _ _ _
   let L : Submodule (𝓞 H.K) (Fin 4 × Tau R → H.K) := (lat4 H).map (γ.g.toLinearMap.restrictScalars (𝓞 H.K))
   have hm : ∀ x, γ.g x ∈ L ↔ x ∈ lat4 H := fun x =>

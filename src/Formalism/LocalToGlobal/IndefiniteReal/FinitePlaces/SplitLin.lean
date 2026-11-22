@@ -5,8 +5,8 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.PlaceFinal
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 100000
-set_option maxHeartbeats 1600000
+
+
 
 noncomputable section
 

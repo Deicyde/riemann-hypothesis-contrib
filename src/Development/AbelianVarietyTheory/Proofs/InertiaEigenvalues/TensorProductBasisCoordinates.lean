@@ -19,8 +19,8 @@ theorem GlobalTheory.tensorBasisCoords : ∀ (F : Type) [Field F] (B : Type) [Co
   · intro y
     rw [LinearEquiv.symm_apply_eq]
     funext j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_apply]
+
+    rw [map_sum, Finset.sum_apply]
     simp only [h1, Basis.repr_self, Finsupp.single_apply]
     simp
   · intro r f y
@@ -36,8 +36,8 @@ theorem GlobalTheory.tensorBasisCoords : ∀ (F : Type) [Field F] (B : Type) [Co
       rw [← Finset.sum_smul]
       congr 1
       conv_lhs => rw [← b.sum_repr v]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum, Finsupp.finsetSum_apply]
+
+      rw [map_sum, map_sum, Finsupp.finsetSum_apply]
       simp only [map_smul, Finsupp.smul_apply, smul_eq_mul]
       exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
     | add y z hy hz =>

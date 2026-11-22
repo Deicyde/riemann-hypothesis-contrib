@@ -23,7 +23,7 @@ private theorem exists_eq_smul_id_of_irreducible {E : Type} [Field E] [Valuative
   exact ⟨c, LinearMap.ext fun x =>
     (congrArg (fun f : Representation.IntertwiningMap ρ ρ => f x) hc).symm⟩
 
-set_option maxHeartbeats 400000 in
+
 theorem UpperTheory.Gal.InertialTypesAlt.L.twScale :
     UpperTheory.Gal.InertialTypesAlt.L.TwScale := by
   intro k E _ _ _ _ _ _ _ _ _ _ _ _ _ σ hgen n V _ _ ρ hs hi I hI

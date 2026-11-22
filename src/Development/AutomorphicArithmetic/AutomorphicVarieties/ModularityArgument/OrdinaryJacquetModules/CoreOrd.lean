@@ -14,7 +14,7 @@ open UpperTheory.V.HV (Coef)
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open UpperTheory.V.Z UpperTheory.V.Z.Ord
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 theorem UpperTheory.V.Z.Ord.coreOrd :
     GlobalTheory.Mem.LiteralAutomorphy.LitN → CoreOrd := by

@@ -57,9 +57,9 @@ theorem parIndep : ∀ D : D7, ParIndep D := by
     simp only [Pi.smul_apply, smul_eq_mul, f, Pi.zero_apply]
     rw [Finset.sum_subtype_eq_sum_filter (f := fun i => conj (a i) * conj (PiLocalization₂.val (x i) v g)) (p := p)]
     rw [Finset.sum_filter_of_ne]
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [← map_zero (starRingEnd ℂ), ← hsum' g, map_sum]
-        exact Finset.sum_congr rfl (fun i _ => (map_mul (starRingEnd ℂ) _ _).symm)
+
+    · rw [← map_zero (starRingEnd ℂ), ← hsum' g, map_sum]
+      exact Finset.sum_congr rfl (fun i _ => (map_mul (starRingEnd ℂ) _ _).symm)
     · intro i _ hne h0
       apply hne
       simp [h0]

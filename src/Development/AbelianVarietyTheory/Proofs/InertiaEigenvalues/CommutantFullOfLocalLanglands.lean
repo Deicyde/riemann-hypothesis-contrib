@@ -29,8 +29,8 @@ open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.DIV Formalis
 open Formalism.MainNotions.IntegralHeckeForms (HkIdx)
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 section Raw
 

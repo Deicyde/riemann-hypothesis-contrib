@@ -54,8 +54,8 @@ theorem Sj_monomial (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l])
 theorem applyAt0_eq (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l])
     (P : MvPolynomial (XZ Lt N0 N1) ℤ) : applyAt0 N0 N1 l Th P = Lj Th P := by
   conv_rhs => rw [P.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   unfold applyAt0
   refine Finset.sum_congr rfl fun μ _ => ?_
   rw [Lj_monomial, atMon, smul_monomial, zsmul_eq_mul, mul_assoc]
@@ -163,8 +163,8 @@ end Span
 
 theorem stepSpan : StepSpan := by
   intro Lt _ _ l _ N0 N1 nu Th I
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [applyAt0_eq, Gxz_expand, map_sum]
+
+  rw [applyAt0_eq, Gxz_expand, map_sum]
   refine Submodule.sum_mem _ fun F _ => ?_
   rw [Lj_inl_inr]
   exact Submodule.smul_mem _ _ (prodD_mem nu F)

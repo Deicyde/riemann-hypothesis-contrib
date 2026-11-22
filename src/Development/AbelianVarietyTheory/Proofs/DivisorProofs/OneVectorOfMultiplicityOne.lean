@@ -34,8 +34,8 @@ omit [CharZero K] in
 theorem asAlg_eq_sum (r : Representation K G V) (a : MonoidAlgebra K G) (x : V) :
     r.asAlgebraHom a x = ∑ g : G, a.coeff g • r g x := by
   conv_lhs => rw [eq_sum_single a]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, LinearMap.sum_apply]
+
+  simp [map_sum, LinearMap.sum_apply]
 
 
 
@@ -85,8 +85,8 @@ theorem iC_cpt (t : Bs.Tup) (x : Fin ((lv (fc X.zs) b).dQ t) → K) :
     X.iC cr b t (cpt Bs.v0.embedding x) = X.Θ t (X.jR t (cr.toR X.zs b t x)) := by
   classical
   conv_rhs => rw [← Finset.univ_sum_single x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [CxData.iC, lin_apply, map_sum, map_sum, map_sum]
+
+  rw [CxData.iC, lin_apply, map_sum, map_sum, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   have : (Pi.single k (x k) : Fin _ → K) = x k • Pi.single k 1 := by
     funext i; by_cases hi : i = k <;> simp [hi]
@@ -137,8 +137,8 @@ theorem oneVector_of_whittaker (R : RealDat D A Ks) (F : Face D A) (hW : GlobalT
   rw [← hP] at h
   let e : (R.levR F false).H ≃ F.P0 := R.eG.symm.toEquiv.subtypeEquiv fun _ => Iff.rfl
   apply D.what₂.embLL.injective
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_natCast, ← Nat.card_congr e, ← h, typeSum, map_sum]
+
+  rw [map_natCast, ← Nat.card_congr e, ← h, typeSum, map_sum]
   unfold GlobalTheory.IndefiniteRowSideFullHecke.CuspidalInducedCharacter.lvlSum
   letI := GlobalTheory.IndefiniteRowSideFullHecke.CuspidalInducedCharacter.fintypeH (R.levR F false)
   refine (Fintype.sum_equiv e _ _ fun x => ?_).symm

@@ -13,7 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Restr
 
 open scoped Matrix GlobalTheory.VacAny ENNReal
 open NumberField IsDedekindDomain MeasureTheory Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RatWeilOp
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lintegral_adelicHaar_split_archimedean_finite : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [MeasurableSpace (κ → AF F)] [BorelSpace (κ → AF F)]
     [MeasurableSpace (κ → mixedEmbedding.mixedSpace F)] [BorelSpace (κ → mixedEmbedding.mixedSpace F)]
     [MeasurableSpace (κ → Af F)] [BorelSpace (κ → Af F)]

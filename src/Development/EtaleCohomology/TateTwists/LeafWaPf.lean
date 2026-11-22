@@ -30,21 +30,21 @@ lemma d_tau_single {N : ℕ} (z : Pr N) :
     cases r with
     | zero => simp [swap, Pr.d₁, Pr.d₂]
     | succ r =>
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [swap, Pr.d₁, Pr.d₂, map_add (f := _), map_smul, map_sum, tau_single, Finset.smul_sum,
-        Finsupp.smul_single, smul_eq_mul]
+
+      simp only [swap, Pr.d₁, Pr.d₂, map_add (f := _), map_smul, map_sum, tau_single, Finset.smul_sum,
+      Finsupp.smul_single, smul_eq_mul]
       simp
   | succ p =>
     cases r with
     | zero =>
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [swap, Pr.d₁, Pr.d₂, map_add (f := _), map_smul, map_sum, tau_single, Finset.smul_sum,
-        Finsupp.smul_single, smul_eq_mul]
+
+      simp only [swap, Pr.d₁, Pr.d₂, map_add (f := _), map_smul, map_sum, tau_single, Finset.smul_sum,
+      Finsupp.smul_single, smul_eq_mul]
       simp
     | succ r =>
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [swap, Pr.d₁, Pr.d₂, map_add (f := _), map_sum, tau_single, Finset.smul_sum,
-        Finsupp.smul_single, smul_eq_mul, smul_add]
+
+      simp only [swap, Pr.d₁, Pr.d₂, map_add (f := _), map_sum, tau_single, Finset.smul_sum,
+      Finsupp.smul_single, smul_eq_mul, smul_add]
       rw [add_comm]
       congr 1
       · refine Finset.sum_congr rfl fun i _ => ?_
@@ -72,13 +72,13 @@ lemma tau_push {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) 
 
 lemma tau_bd {N : ℕ} (c : Pr N →₀ ℤ) : tau (N + 1) (Pr.bd c) = Pr.bd (tau N c) := by
   unfold Pr.bd
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, tau_push]
+
+  simp only [map_sum, map_zsmul, tau_push]
 
 lemma wa_eq (N : ℕ) : Pr.wa N = tau N (Pr.aw N) := by
   unfold Pr.wa Pr.aw
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, tau_single, swap, one_mul]
+
+  simp only [map_sum, tau_single, swap, one_mul]
 
 end LateralTheory.EtaleFoundations.SteenPf.WaPf
 

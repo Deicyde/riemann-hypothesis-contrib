@@ -148,8 +148,8 @@ theorem eigBasis_of_loc {R O M : Type} [CommRing R] [AddCommGroup M] [Module R M
     obtain ⟨⟨q, hq⟩, hqi⟩ := IsLocalization.exist_integer_multiples p.primeCompl (Finset.univ : Finset (Fin m)) c
     choose b hb using fun i => hqi i (Finset.mem_univ _)
     obtain ⟨r, hr, e⟩ := h₂ (q • w - ∑ i, b i • u i) (by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, map_smulₛₗ, hc, map_sum, Finset.smul_sum, sub_eq_zero]
+
+      rw [map_sub, map_smulₛₗ, hc, map_sum, Finset.smul_sum, sub_eq_zero]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smulₛₗ, hb, smul_smul, Algebra.smul_def])
     refine ⟨r * q, p.primeCompl.mul_mem hr hq, ?_⟩
@@ -161,8 +161,8 @@ theorem eigBasis_of_loc {R O M : Type} [CommRing R] [AddCommGroup M] [Module R M
   obtain ⟨M', _, _, _, ρ, h₁, -, -, h₄⟩ := loc p
   have k : ∀ c : Fin m → R, w = ∑ i, c i • u i →
       ρ w = ∑ i, algebraMap R (Localization.AtPrime p) (c i) • ρ (u i) := fun c e => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e, map_sum]
+
+    rw [e, map_sum]
     exact Finset.sum_congr rfl fun i _ => map_smulₛₗ _ _ _
   exact congrFun ((h₄ (ρ w) fun x => by rw [← h₁, hw, map_smulₛₗ]).unique (k _ hc') (k _ hc.symm)) i
 

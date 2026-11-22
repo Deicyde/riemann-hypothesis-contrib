@@ -108,7 +108,7 @@ private lemma ev_log_sq (eps : ℝ) (he : 0 < eps) :
   rw [e, sq]
   exact mul_le_mul hx hx hl hp.le
 
-set_option maxHeartbeats 800000 in
+
 theorem normPrimesN :
     ShortNorm → ∀ eps : ℝ, 0 < eps → ∃ x₀ : ℝ, ∀ x ≥ x₀, ∀ N d : ℕ, ModAt x eps N d → ∀ Y : ℝ, 0 < Y → 8 * x ^ eps ≤ Real.log Y →
       Y ^ ((9 : ℝ) / 10) ≤ ((normPrimes d N Y (2 * Y)).card : ℝ) := by

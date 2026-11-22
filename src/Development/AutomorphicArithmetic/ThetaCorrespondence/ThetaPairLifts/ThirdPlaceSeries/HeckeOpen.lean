@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsRecTLocRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -68,7 +68,7 @@ structure CharFrameHostEmbedding (D : D7) (cf : CharFrame D) (jE : D.host.E →+
   chiT : ChiTOk D cf
 section Loc
 variable {D : D7}
-set_option synthInstance.maxHeartbeats 400000 in
+
 structure AutomorphicSpecialisation {cf : CharFrame D} {jE : D.host.E →+* Qb} (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (M : MtFam D)
     (tup : D.what₂.Tup → Fin D.R.m → HChar D.host.E) {X : LocNd (lay0 D)}
     (iq : ∀ i : X.nd.Loc, FractionRing (X.nd.O i) →+* Qbar (X.nd.l i)) (Y : LocAut X) (Cb : LocBC Y) where

@@ -75,8 +75,8 @@ theorem sum_normSq_tens_update_le :
   rw [Finset.sum_comm]
   refine Finset.sum_le_sum fun r _ => ?_
   have := hL (∑ l, C r l • u l v₀)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul] at this
+
+  simp only [map_sum, map_smul] at this
   refine this.trans_eq ?_
   rw [← Submodule.norm_coe]
   simp

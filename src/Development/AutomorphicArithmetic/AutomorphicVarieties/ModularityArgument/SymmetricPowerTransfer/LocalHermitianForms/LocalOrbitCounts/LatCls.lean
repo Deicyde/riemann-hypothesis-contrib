@@ -114,7 +114,7 @@ private theorem latCls_basis {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteV
     exact hliK.ne_zero (e 0) hz
   · rw [← hR, ← hMf]
 
-set_option maxHeartbeats 400000 in
+
 private theorem latCls_val {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
     [IsFractionRing O K] (a b c : K) (h : b ^ 2 - 4 * a * c ≠ 0) :
     (a ≠ 0 ∧ b / a ∈ (algebraMap O K).range ∧ c / a ∈ (algebraMap O K).range) ∨

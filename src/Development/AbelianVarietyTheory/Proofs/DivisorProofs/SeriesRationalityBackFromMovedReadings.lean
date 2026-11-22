@@ -17,8 +17,8 @@ noncomputable section
 
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.UnframeForms
 

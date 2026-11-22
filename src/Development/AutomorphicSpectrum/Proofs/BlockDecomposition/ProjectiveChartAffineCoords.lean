@@ -91,8 +91,8 @@ theorem glue {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] (F : C ⥤ Mo
     (e2 : c0 - ∑ j, (resU F (hP j)).pull m (ω j) = (resU F h).pull m x) :
     c = ∑ j, (resU F (hA j)).pull m (ω' j) + x := by
   apply hi
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, ← e0, ← e2]
+
+  rw [map_add (f := _), map_sum, ← e0, ← e2]
   have e5 : ∀ j, (resU F h).pull m ((resU F (hA j)).pull m (ω' j)) = (resU F (hP j)).pull m (ω j) := fun j => by
     rw [← hω j, pull_resU_comp, pull_resU_comp]
   rw [Finset.sum_congr rfl fun j _ => e5 j]
@@ -102,8 +102,8 @@ theorem glue_res {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] (F : C �
     {Q W : ObjectProperty C} (A : ι → ObjectProperty C) (h : W ≤ Q) (hA : ∀ j, Q ≤ A j) (hW : ∀ j, W ≤ A j) (m : ℕ)
     (c x : HU F Q m) (ω' : ∀ j, HU F (A j) m) (e : c = ∑ j, (resU F (hA j)).pull m (ω' j) + x) :
     (resU F h).pull m c = ∑ j, (resU F (hW j)).pull m (ω' j) + (resU F h).pull m x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, map_add (f := _), map_sum]
+
+  rw [e, map_add (f := _), map_sum]
   refine congrArg (· + _) (Finset.sum_congr rfl fun j _ => ?_)
   rw [pull_resU_comp]
 
@@ -143,7 +143,7 @@ theorem rep_zero_xdt (h1 : CrystallineSemistableComparison.Pb.KH.LocGr) (h2 : Cr
   rwa [e0] at hx
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem main : KH.LocGr → KH.PolyTf → KH.GrAff →
     ∀ {K : Type} [Field K] [CharZero K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) (n : ℕ)
     [SmoothOfRelativeDimension (n + 1) q] {N : ℕ} (i : X ⟶ PSpace K N) (y : Fin (n + 2) → MvPolynomial (Fin (N + 1)) K),

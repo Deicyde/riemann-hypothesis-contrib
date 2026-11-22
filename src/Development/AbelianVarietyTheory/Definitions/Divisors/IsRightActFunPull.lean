@@ -58,8 +58,8 @@ def ph (χ : G →* Kˣ) (u : R) : R →ₗ[K] (G → R) :=
 
 theorem IsRightAct.tr_mem_eigen {st : G → R →ₐ[K] R} (hs : IsRightAct st) (χ : G →* Kˣ) (F : R) :
     tr st χ F ∈ eigen st χ := fun g => by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [tr_apply, map_sum, Finset.smul_sum]
+
+  rw [tr_apply, map_sum, Finset.smul_sum]
   refine Fintype.sum_equiv (Equiv.mulRight g) _ _ fun h => ?_
   rw [map_smul, ← hs.2, smul_smul, Equiv.coe_mulRight, map_mul]
   congr 1

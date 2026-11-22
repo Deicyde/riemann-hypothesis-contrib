@@ -16,8 +16,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Stan
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.FinPl.GlobImage
 variable {D : D7}
@@ -87,7 +87,7 @@ theorem finE_mulVec (S : HSp D) (x : GA D S) (y : Fin S.rank → AE D) :
   ext i
   exact RingHom.map_mulVec ((Formalism.IndefR.Lev.swapAE D).comp (finPart D)) (mt S x) y i
 
-set_option maxHeartbeats 400000 in
+
 theorem image_moves (S : HSp D) (L : Lat S) (hL : IsSelfDualC S L) (g : GA D S) :
     ∃ M : Lat S, IsSelfDualC S M ∧ ∀ P : Pl D → Prop, Moves S g L M P := by
   obtain ⟨x, hx, hgx⟩ := finRep D S g
@@ -116,7 +116,7 @@ end Gen
 
 theorem colMul_eq {m n : ℕ} (x : Mx D m n) (i : Fin n) (a : AE D) : colMul x i a = fun k => a * x k i := rfl
 
-set_option maxHeartbeats 400000 in
+
 theorem supp_of {S : HSp D} {S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (M : Lat S) (M₀ : Lat S₀) (v : Pl D)
     (y : Fin S.rank → AE D)
     (hX : ∀ i, colMul d.jX i ((d.pX *ᵥ y) i) ∈ latV S M (· = v))
@@ -133,14 +133,14 @@ theorem supp_of {S : HSp D} {S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (M 
   · rw [mulVec_eq_sum, Finset.sum_apply]
     exact Ideal.sum_mem _ fun i _ => latV_supp D S M _ _ (hY i) k
 
-set_option maxHeartbeats 400000 in
+
 theorem col_iff {S : HSp D} (L M : Lat S) (g : GA D S) (v : Pl D) {n : ℕ} (x : Mx D S.rank n)
     (hg : HMul.hMul (mt S g) x = x) (h1 : Moves S g L M (· = v)) (i : Fin n) (a : AE D) (ha : a ∈ idAt D (· = v)) :
     colMul x i a ∈ latV S L (· = v) ↔ colMul x i a ∈ latV S M (· = v) := by
   have hs : ∀ k, colMul x i a k ∈ idAt D (· = v) := fun k => (idAt D _).mul_mem_right _ ha
   rw [h1 _ hs, colMul_eq, mulVec_col, hg]
 
-set_option maxHeartbeats 400000 in
+
 theorem wittEmbedding_carries_latticeCompletion (S : HSp D) (L : Lat S) (S₀ : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ) (L₀ M₀ : Lat S₀) (M : Lat S)
     (γ : GA D S₀) (v : Pl D) (hL : MonoAt d L L₀ v) (h0 : Moves S₀ γ L₀ M₀ (· = v))
     (h1 : Moves S (d.emb0 γ) L M (· = v)) : MonoAt d M M₀ v := by

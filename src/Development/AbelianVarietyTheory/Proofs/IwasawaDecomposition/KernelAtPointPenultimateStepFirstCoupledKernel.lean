@@ -64,9 +64,9 @@ theorem comp_appOf {K : Type} [Field K] [NumberField K] [StarRing K] {S₀ S S�
     (A.comp h S.outSec).appOf h₀ S₀.outSec φ d₁ =
       (cplKer2 A).appOf (cplGSD_ok Y h) (cplGSD S Y).outSec ((cplKer1 A).appOf h₀ S₀.outSec φ) d₁ := by
   unfold ClsKer.appOf
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [cpl_comp_k, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.comp_apply, map_sum, map_smul,
-    Finset.smul_sum]
+
+  simp only [cpl_comp_k, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.comp_apply, map_sum, map_smul,
+  Finset.smul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun q _ => Finset.sum_congr rfl fun c _ => ?_
   rw [smul_comm]
@@ -305,8 +305,8 @@ theorem colAt_top (hX : X.Ok) (hPr : Pr.Ok) (hsel : IsSel X sel) (H : TilOk Pr s
   · show (k2.op hC (midForm W Ch A hK hF hL φ)).1 (toRow sel mu d) =
       ((∑ a, ((((chKerC W Ch sel mu cst L A u m2 b hY P hK).cp a).comp (hF (m2 + 1) b) _).opOf (hF m2 a) _) ∘ₗ (LinearMap.proj a))
         ((chKerC W Ch sel mu cst L A u m2 b hY P hK).kk.colTo hF m2 (startC hL u φ))).1 (toRow sel mu d)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [midForm, map_sum, LinearMap.sum_apply, Submodule.coe_sum, Submodule.coe_sum, Finset.sum_apply, Finset.sum_apply]
+
+    rw [midForm, map_sum, LinearMap.sum_apply, Submodule.coe_sum, Submodule.coe_sum, Finset.sum_apply, Finset.sum_apply]
     exact Finset.sum_congr rfl fun a _ => (comp_appOf ((chKerC W Ch sel mu cst L A u m2 b hY P hK).cp a) (hF m2 a) (hF (m2 + 1) b)
       ((chKerC W Ch sel mu cst L A u m2 b hY P hK).kk.colTo hF m2 (startC hL u φ) a).1 (toRow sel mu d)).symm
 

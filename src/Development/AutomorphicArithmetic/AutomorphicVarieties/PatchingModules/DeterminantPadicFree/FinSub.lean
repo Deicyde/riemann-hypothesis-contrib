@@ -26,8 +26,8 @@ theorem UpperTheory.V.Pa.Det.finSub :
   let E : (↥s → A) →ₗ[A] A := Fintype.linearCombination A c
   have hE : ∀ i, f i (∑ a : ↥s, c a • a.1) = E (h i) := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [E, h, Fintype.linearCombination_apply, map_sum, mul_comm]
+
+    simp [E, h, Fintype.linearCombination_apply, map_sum, mul_comm]
   have hker : Submodule.span A (h '' (T : Set ι)) ≤ LinearMap.ker E := by
     rw [Submodule.span_le]
     rintro _ ⟨i, hi, rfl⟩

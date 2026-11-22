@@ -24,9 +24,9 @@ theorem idem_split_mul {R S : Type} [CommRing R] [Ring S] (e : R) (ι : S →+ R
     {l m n : Type} [Fintype m] (A : Matrix l m R) (B : Matrix m n R) (X : Matrix l m S) (Y : Matrix m n S) :
     ((1 - e) • A + X.map ι) * ((1 - e) • B + Y.map ι) = (1 - e) • (A * B) + (X * Y).map ι := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, map_sum,
-    Finset.mul_sum, ← Finset.sum_add_distrib]
+
+  simp only [Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, map_sum,
+  Finset.mul_sum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [hmul]
   linear_combination (A i k * B k j) * he + A i k * hι (Y k j) + B k j * hι (X i k)

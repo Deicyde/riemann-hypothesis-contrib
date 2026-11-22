@@ -390,7 +390,7 @@ variable (Ch sel mu cst L u) in
 abbrev St (j : ℕ) : GStep X.E X.K (R.N j) := stepAt sel mu cst L (topLev Ch sel mu cst (rPsymF (R := R) Ch)) u j
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem xiAt_law (hX : X.Ok) (hPr : Pr.Ok) (hsel : IsSel X sel) (hT : Pr.T u ∈ S) (hg : ∀ k, Pr.g k ∈ S)
     (hL : L.Ok Ch sel mu cst G m2) (hs : cst.sharp = true) {i : ℕ} (hi : i < R.m) (b : Idx sel mu L i) (b' : Idx sel mu L (i + 1))
     (g : (St Ch sel mu cst L u i).G b) (g' : (St Ch sel mu cst L u (i + 1)).G b') (p : (St Ch sel mu cst L u i).D b)
@@ -506,7 +506,7 @@ theorem half_cast (R : Ranks) (k : ℕ) : (((R.N k / 2 : ℕ) : ℤ) : ℚ) = (R
 
 
 include h in
-set_option maxHeartbeats 1000000 in
+
 theorem th_move (g : (I.stp u a i).G b) (g' : (I.stp u a (i + 1)).G b') (z : VCx B.fields.Tau (B.R.N i) (B.R.N (i + 1))) :
     I.rho u a i b ((I.stp u a i).act b g q) * I.rho' u a i b' ((I.stp u a (i + 1)).act b' g' q') *
         I.th u a i b b' ((I.stp u a i).act b g q) ((I.stp u a (i + 1)).act b' g' q') z =

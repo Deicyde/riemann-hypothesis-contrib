@@ -97,7 +97,7 @@ private theorem roots_prod_X_sub_C_fin_eq_map_univ {F : Type} [Field F] {n : ℕ
     rfl
   rw [h, Polynomial.roots_multiset_prod_X_sub_C]
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.AlgebraTools.monomialRed :
     ∀ (K k B G : Type) [Field K] [IsAlgClosed K] [Field k] [CommRing B] [Group G] (n : ℕ) (r : G →* Matrix (Fin n) (Fin n) K)
       (j : B →+* K) (φ : B →+* k) (χ : Fin n → G →* kˣ), Function.Injective j →

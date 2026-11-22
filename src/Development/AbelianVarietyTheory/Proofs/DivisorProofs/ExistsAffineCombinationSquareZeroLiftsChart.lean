@@ -76,8 +76,8 @@ def combHom {A S T : Type} [CommRing A] [CommRing S] [CommRing T] (q : S →+* T
     have hd : ∀ i z, q (ψ i z - φ z) = 0 := fun i z => by
       rw [map_sub, ← RingHom.comp_apply, hq i, RingHom.comp_apply, sub_self]
     have hD : ∀ z, q (∑ i, a i * (ψ i z - φ z)) = 0 := fun z => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, hd, mul_zero, Finset.sum_const_zero]
+
+      simp only [map_sum, map_mul, hd, mul_zero, Finset.sum_const_zero]
     have e1 : ∀ i, ψ i (x * y) - φ (x * y) = φ x * (ψ i y - φ y) + (ψ i x - φ x) * φ y := fun i => by
       have := mul_eq_zero_of_sq q hsq (hd i x) (hd i y)
       rw [map_mul, map_mul]; linear_combination this
@@ -102,9 +102,9 @@ theorem comp_combHom {A S T : Type} [CommRing A] [CommRing S] [CommRing T] (q : 
   ext x
   have hd : ∀ i, q (ψ i x - φ x) = 0 := fun i => by
     rw [map_sub, ← RingHom.comp_apply, hq i, RingHom.comp_apply, sub_self]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [RingHom.comp_apply, combHom_apply, map_add (f := _), map_sum, map_mul, hd, mul_zero,
-    Finset.sum_const_zero, add_zero]
+
+  simp only [RingHom.comp_apply, combHom_apply, map_add (f := _), map_sum, map_mul, hd, mul_zero,
+  Finset.sum_const_zero, add_zero]
 
 theorem combHom_comp_eq {R A S T : Type} [CommRing R] [CommRing A] [CommRing S] [CommRing T] (q : S →+* T)
     (hsq : RingHom.ker q ^ 2 = ⊥) {ι : Type} [Fintype ι] (φ : A →+* S) (ψ : ι → (A →+* S)) (a : ι → S)

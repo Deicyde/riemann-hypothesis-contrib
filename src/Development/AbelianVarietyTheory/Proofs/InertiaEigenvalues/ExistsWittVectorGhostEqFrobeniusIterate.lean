@@ -36,8 +36,8 @@ theorem ghost_eq {A : Type} [CommRing A] (l : ℕ) (φ : A →+* A)
   | zero => exact coeff_spec l φ a 0 (by simp)
   | succ n ih =>
     apply coeff_spec
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Function.iterate_succ_apply', ih, map_sum, ← sum_sub_distrib]
+
+    rw [Function.iterate_succ_apply', ih, map_sum, ← sum_sub_distrib]
     apply dvd_sum
     intro i hi
     have hin : i ≤ n := Nat.lt_succ_iff.mp (mem_range.mp hi)

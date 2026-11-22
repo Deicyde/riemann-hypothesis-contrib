@@ -20,7 +20,7 @@ open scoped Matrix TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section Abstract
 
@@ -98,8 +98,8 @@ private theorem ze_main (Y : J → Submodule ℂ M) (hY : iSupIndep Y) (Z : Subm
     obtain ⟨x, hx, rfl⟩ := ze_dec (fun i => Y i ⊓ Z) hF1
     refine Submodule.sum_mem _ fun i _ => Submodule.mem_iSup_of_mem i ⟨(hx i).1, (hx i).2, ?_⟩
     have h0 : ∑ i, P (x i) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum]
+
+      rw [← map_sum]
       exact hF.2
     exact ze_zero Y hY (fun i => P (x i)) (fun i => hP i _ (hx i).1) h0 i
   have hE' : iSupIndep fun i => Y i ⊓ (Z ⊓ LinearMap.ker P) := hY.mono fun _ => inf_le_left

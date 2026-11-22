@@ -57,7 +57,7 @@ theorem psJet_subst_psIn {ι' : Type} [Fintype ι'] [DecidableEq ι'] (m : ℕ) 
 
 end Help
 
-set_option maxHeartbeats 800000 in
+
 theorem adVal : AdValSt := by
   intro E _ _ _ H Dw l Xo c _ S _ _ _ y C φ hφ hx hact a' wL hrel m u0 u1 z J hJ
   have hφ0 : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0 := hφ.const

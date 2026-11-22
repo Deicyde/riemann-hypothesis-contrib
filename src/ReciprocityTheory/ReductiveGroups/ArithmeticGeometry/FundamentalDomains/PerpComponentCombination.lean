@@ -42,8 +42,8 @@ lemma uc_comb (hz : z0 ∈ X.dom) {n : ℕ} (a : Fin n → ℂ) (V : Fin n → F
   have hHf : ∀ u w, X.Hf z0 τ u w = hermC τ.1 X.Gm ((2 : ℂ) • L u - u) w := fun u w => rfl
   have hsum : X.Hf z0 τ (∑ k, a k • V k) (Data.emb τ.1 ξ) =
       ∑ k, a k * X.Hf z0 τ (V k) (Data.emb τ.1 ξ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hHf, map_sum]
+
+    rw [hHf, map_sum]
     simp only [map_smul]
     have e : (2 : ℂ) • ∑ k, a k • L (V k) - ∑ k, a k • V k =
         ∑ k, a k • ((2 : ℂ) • L (V k) - V k) := by
@@ -72,8 +72,8 @@ lemma uc_perp (hξξ : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0
     exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
   have hsym : hermC τ.1 X.Gm (Data.emb τ.1 ξ) v = 0 := by
     have hc : hermC τ.1 X.Gm (Data.emb τ.1 ξ) v = conj (hermC τ.1 X.Gm v (Data.emb τ.1 ξ)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hermC, map_sum, map_mul, Complex.conj_conj]
+
+      simp only [hermC, map_sum, map_mul, Complex.conj_conj]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
       rw [← ReciprocityTheory.ChartRestriction.G.FD.emb_cc, X.Gm_herm]

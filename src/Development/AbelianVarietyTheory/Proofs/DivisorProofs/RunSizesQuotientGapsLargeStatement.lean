@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
 open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
   GlobalTheory.CompHS GlobalTheory.HSApp
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.runSizes_quotientGaps_large : Closed FamHyp fun Fm _ => ∃ x0 : ℝ, ∀ (x : ℝ) (hx : Fm.x1 < x), x0 ≤ x → ∀ ι : Fm.Ix x,
     1 ≤ (Fm.D x ι).R.f * (Fm.D x ι).R.r.choose 2 ∧
     (Fm.D x ι).R.f * (Fm.D x ι).R.r.choose 2 + 1 ≤

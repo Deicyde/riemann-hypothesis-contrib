@@ -177,8 +177,8 @@ theorem fderiv_conj (F : (Fin g → ℂ) → ℂ) (x w : Fin g → ℂ) :
 theorem form_conj (Hm : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ) :
     a ⬝ᵥ (Hm.map (starRingEnd ℂ)).mulVec (star b) =
       starRingEnd ℂ (star a ⬝ᵥ Hm.mulVec (star (star b))) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [dotProduct, Matrix.mulVec, map_sum, map_mul]
+
+  simp [dotProduct, Matrix.mulVec, map_sum, map_mul]
 
 end Analysis
 

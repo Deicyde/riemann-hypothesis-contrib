@@ -49,8 +49,8 @@ theorem exists_dualFamily_of_isLattice {O K V : Type} [CommRing O] [IsDedekindDo
     have h1 : π (s ⟨y, hy⟩) = ⟨y, hy⟩ := LinearMap.congr_fun hs ⟨y, hy⟩
     have h2 : (π (s ⟨y, hy⟩) : V) = y := by rw [h1]
     rw [pi_eq_sum_univ' (s ⟨y, hy⟩)] at h2
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Submodule.coe_sum, Submodule.coe_smul] at h2
+
+    simp only [map_sum, map_smul, Submodule.coe_sum, Submodule.coe_smul] at h2
     simp only [LinearMap.sum_apply, LinearMap.smulRight_apply, LinearMap.id_apply]
     refine Eq.trans (Finset.sum_congr rfl fun i _ => ?_) h2
     rw [hf i ⟨y, hy⟩, algebraMap_smul]
@@ -188,9 +188,9 @@ theorem hform_eq_sum {A : Type} [CommRing A] (σ : A →+* A) (J : Matrix (Fin n
     hform σ J x y = ∑ j, σ ((Φ *ᵥ x) j) * (((S.map σ)ᵀ * J) *ᵥ y) j := by
   conv_lhs => rw [← Matrix.one_mulVec x, ← h1, ← Matrix.mulVec_mulVec]
   generalize Φ *ᵥ x = u
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hform, Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum,
-    map_mul, Finset.sum_mul, Finset.mul_sum]
+
+  simp only [hform, Matrix.mulVec, dotProduct, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum,
+  map_mul, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun b _ => ?_
@@ -381,8 +381,8 @@ private theorem frame_span_eq_top_of_unimodular {E : Type} [Field E] [NumberFiel
       apply S.frame.ext
       intro i
       dsimp only [μ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, LinearMap.sum_apply]
+
+      rw [map_sum, LinearMap.sum_apply]
       have hs : ∀ j, S.hT (star (φ (S.frame j)) • bs j) (S.frame i) =
           φ (S.frame j) * (if i = j then 1 else 0) := by
         intro j

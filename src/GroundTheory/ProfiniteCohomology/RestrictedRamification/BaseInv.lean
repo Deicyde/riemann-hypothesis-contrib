@@ -98,7 +98,7 @@ variable (ιs : ∀ v : S, ℚ̄ →ₐ[K.1] AlgebraicClosure ((v : HeightOneSpe
   [NeZero n] [Fintype S]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem surjective_gsCompactInv [Nonempty S] (hodd : Odd n ∨ IsTotallyComplex K.1)
     (h3 : Subsingleton (cohomology (gsRoots S n) 3))
     (ht : ∀ v, Function.Surjective (gsLocalInvRoots S ιs n v)) :
@@ -267,7 +267,7 @@ theorem exists_sUnits_of_mem_localPrimaryKernel (ℓ : ℕ) (hℓ : ℓ.Prime)
   exact ⟨y', hj, (congrArg (brauerLocal ι) (hy'.trans hyb)).trans hb⟩
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem injective_gsCompactInv (ℓ k : ℕ) (hℓ : ℓ.Prime) (hnk : n = ℓ ^ k)
     (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
     (hodd : Odd n ∨ IsTotallyComplex K.1) (h3 : Subsingleton (cohomology (gsRoots S n) 3))

@@ -91,8 +91,8 @@ theorem eigComp_eq (R : RiemLat E g Λ) (s : E →+* ℂ) (c : 𝓞 E →₀ ℂ
     intro a
     rw [R.act]
     conv_lhs => rw [← h4 (R.P u)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun s' _ => ?_
     exact (mem_eigSp_iff R).1 ((h3 _).1 _) a
   simp_rw [hy, Finset.smul_sum, smul_smul]

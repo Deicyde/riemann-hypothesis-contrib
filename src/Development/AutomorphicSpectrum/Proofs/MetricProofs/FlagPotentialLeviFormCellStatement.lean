@@ -12,7 +12,7 @@ public import GroundTheory.HeightsAndTheta.Heights.Antisymmetric.Statements
 
 open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.flag_potential_levi_form_cell :
     ∀ (N j : ℕ), j ≤ N → ∀ (i : Fin N) (w : Pairs N → ℂ),
     let r : Fin N → ℕ := fun a => if (a : ℕ) < N - j then j + a else a - (N - j)

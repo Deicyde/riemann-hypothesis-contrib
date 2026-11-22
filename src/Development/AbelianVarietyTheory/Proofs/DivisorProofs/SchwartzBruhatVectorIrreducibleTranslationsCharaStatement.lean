@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Exi
 @[expose] public section
 
 open ValuativeRel Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.schwartzBruhat_vector_irreducible_translations_characters : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
     {κ : Type} [Fintype κ] (ψ0 : AddChar k ℂ), Continuous ψ0 →
     (∀ x : k, (∀ y ∈ 𝒪[k], ψ0 (x * y) = 1) ↔ x ∈ 𝒪[k]) →

@@ -39,12 +39,12 @@ theorem coe_eq_sum (b : Basis κ K V) (y : spanO b) :
 theorem form_eq (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) {H : Matrix κ κ (𝓞 K)}
     (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j)) (y y' : spanO b) :
     h (y : V) (y' : V) = algebraMap (𝓞 K) K (star (crd b y) ⬝ᵥ (H *ᵥ crd b y')) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coe_eq_sum b y, map_sum, LinearMap.sum_apply, dotProduct, map_sum]
+
+  rw [coe_eq_sum b y, map_sum, LinearMap.sum_apply, dotProduct, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coe_eq_sum b y', map_smulₛₗ, LinearMap.smul_apply, map_sum, map_mul, mulVec, dotProduct, map_sum,
-    smul_eq_mul]
+
+  rw [coe_eq_sum b y', map_smulₛₗ, LinearMap.smul_apply, map_sum, map_mul, mulVec, dotProduct, map_sum,
+  smul_eq_mul]
   congr 1
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_smul, smul_eq_mul, map_mul, hH, mul_comm]

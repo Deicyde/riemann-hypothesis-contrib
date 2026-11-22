@@ -54,13 +54,13 @@ theorem exists_basis (F E : Type) [Field F] [NumberField F] [Field E] [NumberFie
       rw [hz, Algebra.smul_def]
     have hxe : algebraMap (𝓞 E) E y = ∑ j, ((NumberField.RingOfIntegers.basis E).repr y j) • β j := by
       conv_lhs => rw [← (NumberField.RingOfIntegers.basis E).sum_repr y]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp [β, map_zsmul]
     rw [hxe]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_zsmul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_smul,
-      Pi.smul_apply, Finset.mul_sum, mul_smul_comm]
+
+    simp only [map_sum, map_zsmul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_smul,
+    Pi.smul_apply, Finset.mul_sum, mul_smul_comm]
     exact Subring.sum_mem _ fun j _ => Subring.zsmul_mem _ (key j) _
 
 end Formalism.L2.GlobalTheoryTheory.FiltrationBoundaryCriterion.CompactFixesLatticeTheory
