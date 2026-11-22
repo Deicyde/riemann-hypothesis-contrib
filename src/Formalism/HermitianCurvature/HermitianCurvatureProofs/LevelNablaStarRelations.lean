@@ -72,16 +72,14 @@ theorem multiplierPair_mul (f fb g gb : Fn r) : fnP f fb * fnP g gb = fnP (f * g
   · show MulOpposite.op (mulOp gb * mulOp fb) = MulOpposite.op (mulOp (fb * gb))
     rw [mulOp_mul, mul_comm]
 theorem multiplierPair_add (f fb g gb : Fn r) : fnP f fb + fnP g gb = fnP (f + g) (fb + gb) := by
-  refine Prod.ext ?_ ?_
-  · exact mulOp_add f g
-  · show MulOpposite.op (mulOp fb + mulOp gb) = MulOpposite.op (mulOp (fb + gb))
-    rw [mulOp_add]
+  refine Prod.ext (mulOp_add f g) ?_
+  show MulOpposite.op (mulOp fb + mulOp gb) = MulOpposite.op (mulOp (fb + gb))
+  rw [mulOp_add]
 theorem multiplierPair_one : (fnP 1 1 : Pr r) = 1 := by
   have : mulOp (1 : Fn r) = 1 := by ext h : 1; simp [mulOp]
   refine Prod.ext ?_ ?_
   · exact this
-  · show MulOpposite.op (mulOp (1 : Fn r)) = 1
-    rw [this]; rfl
+  · exact congrArg MulOpposite.op this
 theorem multiplierPair_neg (f fb : Fn r) : -fnP f fb = fnP (-f) (-fb) := by
   rw [neg_eq_iff_add_eq_zero, multiplierPair_add]; simp
   refine Prod.ext ?_ ?_
@@ -142,8 +140,7 @@ theorem smul_fnP (a : ℝ) (f fb : Fn r) : (a : ℂ) • fnP f fb = fnP ((a : �
   · show algebraMap ℂ (Op r) a * mulOp f = mulOp ((a : ℂ) • f)
     ext h : 1; simp [mulOp]
   · show (algebraMap ℂ (Op r)ᵐᵒᵖ) (starRingEnd ℂ (a : ℂ)) * MulOpposite.op (mulOp fb) = MulOpposite.op (mulOp ((a : ℂ) • fb))
-    rw [Complex.conj_ofReal, ← Algebra.smul_def, ← MulOpposite.op_smul]
-    congr 1
+    rw [Complex.conj_ofReal, ← Algebra.smul_def, ← MulOpposite.op_smul, MulOpposite.op_inj]
     ext h : 1; simp [mulOp]
 
 noncomputable def nabE (a TT : ℝ) : Pr r := dzP + (a : ℂ) • (zbP * ggiP TT)
@@ -167,9 +164,7 @@ theorem nabla_zeta_comm (a TT : ℝ) : nabE a TT * (zP : Pr r) = zP * nabE a TT 
 theorem nab_zi (a TT : ℝ) : nabE a TT * (ziP : Pr r) = ziP * nabE a TT - ziP * ziP := by
   rw [ziP, nabE_fn, euler_inv _ _ (coord_ne r _), euler_inv _ _ (coord_ne r _), (eulerCoord r vz vz 0).1,
     (eulerCoord r vzb vzb 0).1, if_pos rfl, if_pos rfl, multiplierPair_mul, sub_eq_add_neg, multiplierPair_neg]
-  congr 2
-  · field_simp [coord_ne r vz]
-  · field_simp [coord_ne r vzb]
+  congr 2 <;> field_simp [coord_ne r vz, coord_ne r vzb]
 theorem nab_zb (a TT : ℝ) : nabE a TT * (zbP : Pr r) = zbP * nabE a TT := by
   rw [zbP, nabE_fn, (eulerCoord r vz vzb 0).1, (eulerCoord r vzb vz 0).1, if_neg vz_ne, if_neg vz_ne.symm]
   simp only [mul_zero]
@@ -181,29 +176,21 @@ theorem nab_zb (a TT : ℝ) : nabE a TT * (zbP : Pr r) = zbP * nabE a TT := by
   rw [this, add_zero]
 theorem nab_gg (a TT : ℝ) : nabE a TT * (ggP TT : Pr r) = ggP TT * nabE a TT + zbP := by
   rw [ggP, nabE_fn, euler_GG_z, euler_gg_zb, zbP]
-  congr 2
-  · field_simp [coord_ne r vz]
-  · field_simp [coord_ne r vzb]
+  congr 2 <;> field_simp [coord_ne r vz, coord_ne r vzb]
 theorem nab_ggi (a TT : ℝ) : nabE a TT * (ggiP TT : Pr r) = ggiP TT * nabE a TT - zbP * ggiP TT * ggiP TT := by
   rw [ggiP, nabE_fn, euler_inv _ _ (gg_ne TT), euler_inv _ _ (gg_ne TT), euler_GG_z, euler_gg_zb, zbP, multiplierPair_mul, multiplierPair_mul,
     sub_eq_add_neg, multiplierPair_neg]
-  congr 2
-  · field_simp [coord_ne r vz]
-  · field_simp [coord_ne r vzb]
+  congr 2 <;> field_simp [coord_ne r vz, coord_ne r vzb]
 theorem nabs_zb (a TT : ℝ) : nabsE a TT * (zbP : Pr r) = zbP * nabsE a TT - 1 := by
   rw [zbP, nabsE_fn, (eulerCoord r vz vz 0).1, (eulerCoord r vzb vzb 0).1, if_pos rfl, if_pos rfl,
     inv_mul_cancel₀ (coord_ne r _), inv_mul_cancel₀ (coord_ne r _), multiplierPair_one]
 theorem nabs_gg (a TT : ℝ) : nabsE a TT * (ggP TT : Pr r) = ggP TT * nabsE a TT - zP := by
   rw [ggP, nabsE_fn, euler_GG_z, euler_gg_zb, zP]
-  congr 2
-  · field_simp [coord_ne r vzb]
-  · field_simp [coord_ne r vz]
+  congr 2 <;> field_simp [coord_ne r vzb, coord_ne r vz]
 theorem nabs_ggi (a TT : ℝ) : nabsE a TT * (ggiP TT : Pr r) = ggiP TT * nabsE a TT + zP * ggiP TT * ggiP TT := by
   rw [ggiP, nabsE_fn, euler_inv _ _ (gg_ne TT), euler_inv _ _ (gg_ne TT), euler_GG_z, euler_gg_zb, zP, multiplierPair_mul, multiplierPair_mul,
     sub_eq_add_neg, multiplierPair_neg]
-  congr 2
-  · field_simp [coord_ne r vzb]
-  · field_simp [coord_ne r vz]
+  congr 2 <;> field_simp [coord_ne r vzb, coord_ne r vz]
 
 theorem partialDeriv_def (l : Fin r) : (pP l : Pr r) = mk (mulOp 1 * euler (vc l)) (-(mulOp 1 * euler (vcb l))) := by
   have : mulOp (1 : Fn r) = 1 := by ext h : 1; simp [mulOp]
@@ -213,9 +200,7 @@ theorem p_c (l : Fin r) : pP l * cP l = cP l * pP l + cP l := by
 theorem p_ci (l : Fin r) : pP l * ciP l = ciP l * pP l - ciP l := by
   rw [partialDeriv_def, ciP, der_fn, euler_inv _ _ (coord_ne r _), euler_inv _ _ (coord_ne r _), (eulerCoord r _ _ 0).1,
     (eulerCoord r _ _ 0).1, if_pos rfl, if_pos rfl, one_mul, one_mul, sub_eq_add_neg, multiplierPair_neg]
-  congr 2
-  · field_simp [coord_ne r (vc l)]
-  · field_simp [coord_ne r (vcb l)]
+  congr 2 <;> field_simp [coord_ne r (vc l), coord_ne r (vcb l)]
 
 theorem eulerComm : EulerComm := by
   intro r v w
@@ -303,43 +288,34 @@ theorem comm_eu (v w : Var r) (f : Fn r) (h : euler v f = 0) :
 
 theorem mk_comm (X Xs Y Ys : Op r) (h1 : X * Y = Y * X) (h2 : Xs * Ys = Ys * Xs) : mk X Xs * mk Y Ys = mk Y Ys * mk X Xs := by
   refine Prod.ext h1 ?_
-  show MulOpposite.op (Ys * Xs) = MulOpposite.op (Xs * Ys)
-  rw [h2]
+  exact congrArg MulOpposite.op h2.symm
 
 theorem partialDeriv_commute_nab (l : Fin r) (a TT : ℝ) : pP l * nabE a TT = nabE a TT * pP l := by
   unfold nabE
   rw [zbP, ggiP, multiplierPair_mul, smul_fnP, mul_add, add_mul, partialDeriv_mul_fn,
     ((zf_smul _ (zf_mul zf_zb (zf_ggi TT))) l).1, ((zf_smul _ (zf_mul zeta_free_of_variable (zf_ggi TT))) l).2, multiplierPair_zero, add_zero]
   congr 1
-  apply mk_comm
-  · exact comm_eu _ _ _ (zf_zi l).1
-  · rw [neg_mul_neg, neg_mul_neg]; exact comm_eu _ _ _ (zf_zbi l).2
+  exact mk_comm _ _ _ _ (comm_eu _ _ _ (zf_zi l).1) (by rw [neg_mul_neg, neg_mul_neg]; exact comm_eu _ _ _ (zf_zbi l).2)
 theorem partialDerivBar_commute_nab (l : Fin r) (a TT : ℝ) : pbP l * nabE a TT = nabE a TT * pbP l := by
   unfold nabE
   rw [zbP, ggiP, multiplierPair_mul, smul_fnP, mul_add, add_mul, partialDerivBar_mul_fn,
     ((zf_smul _ (zf_mul zf_zb (zf_ggi TT))) l).2, ((zf_smul _ (zf_mul zeta_free_of_variable (zf_ggi TT))) l).1, multiplierPair_zero, add_zero]
   congr 1
-  apply mk_comm
-  · exact comm_eu _ _ _ (zf_zi l).2
-  · rw [neg_mul_neg, neg_mul_neg]; exact comm_eu _ _ _ (zf_zbi l).1
+  exact mk_comm _ _ _ _ (comm_eu _ _ _ (zf_zi l).2) (by rw [neg_mul_neg, neg_mul_neg]; exact comm_eu _ _ _ (zf_zbi l).1)
 theorem partialDeriv_commute_nabs (l : Fin r) (a TT : ℝ) : pP l * nabsE a TT = nabsE a TT * pP l := by
   unfold nabsE
   rw [zP, ggiP, multiplierPair_mul, smul_fnP, mul_add, add_mul, partialDeriv_mul_fn,
     ((zf_smul _ (zf_mul zeta_free_of_variable (zf_ggi TT))) l).1, ((zf_smul _ (zf_mul zf_zb (zf_ggi TT))) l).2, multiplierPair_zero, add_zero,
     mul_neg, neg_mul]
   congr 2
-  apply mk_comm
-  · exact comm_eu _ _ _ (zf_zbi l).1
-  · rw [neg_mul_neg, neg_mul_neg]; exact comm_eu _ _ _ (zf_zi l).2
+  exact mk_comm _ _ _ _ (comm_eu _ _ _ (zf_zbi l).1) (by rw [neg_mul_neg, neg_mul_neg]; exact comm_eu _ _ _ (zf_zi l).2)
 theorem partialDerivBar_commute_nabs (l : Fin r) (a TT : ℝ) : pbP l * nabsE a TT = nabsE a TT * pbP l := by
   unfold nabsE
   rw [zP, ggiP, multiplierPair_mul, smul_fnP, mul_add, add_mul, partialDerivBar_mul_fn,
     ((zf_smul _ (zf_mul zeta_free_of_variable (zf_ggi TT))) l).2, ((zf_smul _ (zf_mul zf_zb (zf_ggi TT))) l).1, multiplierPair_zero, add_zero,
     mul_neg, neg_mul]
   congr 2
-  apply mk_comm
-  · exact comm_eu _ _ _ (zf_zbi l).2
-  · rw [neg_mul_neg, neg_mul_neg]; exact comm_eu _ _ _ (zf_zi l).1
+  exact mk_comm _ _ _ _ (comm_eu _ _ _ (zf_zbi l).2) (by rw [neg_mul_neg, neg_mul_neg]; exact comm_eu _ _ _ (zf_zi l).1)
 
 theorem nabs_zbi (a TT : ℝ) : nabsE a TT * (zbiP : Pr r) = zbiP * nabsE a TT + zbiP * zbiP := by
   rw [zbiP, nabsE_fn, eci, eci, if_pos rfl, if_pos rfl, multiplierPair_mul, sub_eq_add_neg, multiplierPair_neg]

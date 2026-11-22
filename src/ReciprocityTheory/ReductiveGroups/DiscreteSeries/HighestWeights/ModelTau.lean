@@ -182,8 +182,7 @@ theorem hasDeriv_dTau (ε : Fin n → Bool) (m : Fin n → ℤ) (X : Matrix (Fin
   have he : dTau ε m X = derOp ε (tauM ε m) X := by
     unfold dTau
     rw [cextL_apply, cext_of_inK _ (rLinOnK_derOp ε m) hX]
-  rw [he]
-  exact h
+  simpa [he] using h
 
 def w0 (ε : Fin n → Bool) (m : Fin n → ℤ) : MV ε m := MV.mk (f0K ε m) (highest_weight_fn_mem_space ε m)
 

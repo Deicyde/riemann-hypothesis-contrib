@@ -16,9 +16,8 @@ lemma sixteen_mul_le_two_pow (n : ℕ) (hn : 7 ≤ n) : n * 16 ≤ 2 ^ n := by
   induction n, hn using Nat.le_induction with
   | base => norm_num
   | succ k hk ih =>
-    have h16 : 16 ≤ 2 ^ k :=
-      calc 16 = 2 ^ 4 := by norm_num
-        _ ≤ 2 ^ k := Nat.pow_le_pow_right (by norm_num) (by omega)
+    have h16 : 16 ≤ 2 ^ k := by
+      simpa using (Nat.pow_le_pow_right (by norm_num) (by omega) : 2 ^ 4 ≤ 2 ^ k)
     rw [pow_succ]
     linarith
 
@@ -34,14 +33,10 @@ lemma small_f (f k : ℕ) (hfk : f ≤ k) (hk : 7 ≤ k) : (f : ℝ) * (8 / 2 ^ 
 lemma vand_pos (p : ℕ) (x : ℕ → ℝ) (h : ∀ s t, 1 ≤ s → s < t → t ≤ p → x t < x s) :
     0 < Vand p x := by
   unfold Vand
-  apply Finset.prod_pos
-  intro i hi
-  apply Finset.prod_pos
-  intro j hj
+  refine Finset.prod_pos fun i hi => Finset.prod_pos fun j hj => ?_
   rw [Finset.mem_Icc] at hi
   rw [Finset.mem_Ioc] at hj
-  have hx := h i j hi.1 hj.1 hj.2
-  linarith
+  linarith [h i j hi.1 hj.1 hj.2]
 
 lemma anti_of_step (p : ℕ) (x : ℕ → ℝ) (h : ∀ i, 1 ≤ i → i < p → x (i + 1) < x i) :
     ∀ s t, 1 ≤ s → s < t → t ≤ p → x t < x s := by
@@ -50,11 +45,7 @@ lemma anti_of_step (p : ℕ) (x : ℕ → ℝ) (h : ∀ i, 1 ≤ i → i < p →
   induction d with
   | zero => simpa using h s hs (by omega)
   | succ d ih =>
-    have h1 := ih (by omega) (by omega)
-    have h2 := h (s + 1 + d) (by omega) (by omega)
-    have e : s + 1 + (d + 1) = s + 1 + d + 1 := by omega
-    rw [e]
-    linarith
+    exact lt_trans (h (s + 1 + d) (by omega) (by omega)) (ih (by omega) (by omega))
 
 lemma vand_word_pos (hIL : Interlacing) (c : Cfg) (de : ℕ → ℝ) (hOk : c.Ok)
     (hde : IsWord c.k de) : 0 < Vand c.k (c.u de) := by
@@ -65,15 +56,12 @@ lemma vand_word_pos (hIL : Interlacing) (c : Cfg) (de : ℕ → ℝ) (hOk : c.Ok
   linarith [hx.1, hx.2]
 
 lemma sfac_pos (p : ℕ) : 0 < sfac p := by
-  unfold sfac
   exact Finset.prod_pos (fun i _ => Nat.factorial_pos i)
 
 lemma tcrit_nonneg (k m : ℕ) (ka rd g VV Vu : ℝ) (hka : 0 < ka) (hrd : 0 < rd) (hg : 0 < g)
     (hVV : 0 < VV) (hVu : 0 < Vu) : 0 ≤ Tcrit k m ka rd g VV Vu := by
   unfold Tcrit
-  apply Real.rpow_nonneg
-  unfold TcritPow
-  positivity
+  exact Real.rpow_nonneg (by unfold TcritPow; positivity) _
 
 lemma beta_bound (hBeta : BetaOnCut) (hAZ : AZeroBound) (c : Cfg) (r : ℕ) (bb : ℝ)
     (de de' : ℕ → ℝ) (ka rd g VV T T' : ℝ) (l : ℕ)
@@ -85,8 +73,7 @@ lemma beta_bound (hBeta : BetaOnCut) (hAZ : AZeroBound) (c : Cfg) (r : ℕ) (bb 
     0 ≤ g ^ c.m * c.be ka de de' T T' Y ∧
       g ^ c.m * c.be ka de de' T T' Y ≤
         160 * tv c de de' ka rd g VV T T' * Real.sqrt c.k * Real.sqrt (D / c.Del) := by
-  have hpi := Real.pi_pos
-  have hg0 : 0 < g := by linarith
+  have hg0 : 0 < g := by linarith [Real.pi_pos]
   have hka0 : 0 < ka := by rw [hka]; positivity
   have hDel : 0 < c.Del := by linarith [hOk.hDel]
   constructor
