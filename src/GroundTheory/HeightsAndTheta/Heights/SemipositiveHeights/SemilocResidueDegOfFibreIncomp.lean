@@ -1,57 +1,61 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MixedFieldContraction.ContractMixedFieldStatement
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterDivSupp
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.ArithVarZero
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PfAtZero
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPFStep
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPFSecRed
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPFVert
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPFIntZero
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPFHoriz
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPFFibreSum
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPFFibreBij
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.EqZeroOfEventuallyEval
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PRatioAlgDep
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.LeviOfRealSmulRight
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.MixedDiscEqZeroOfMulVec
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.IsMultiProjPrimeImageZ
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.TableDegreeThreeBase
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.IsMultiHomogRenameCoordPow
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PConsequences
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.IsHorizontalImageZIff
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.IsHorizontalImageZ
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.ImportsAlt
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.ImportsRest
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PChartRankAdjoin
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.QuotientMapImageZInjective
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PtsIntegralLogNormRat
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PullWMemFibre
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.ExistsSheetPullW
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.Assembly
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ProjDeg
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PFnDegRelDeg
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.StatementsFibreIncomp
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.StatementsSemilocResidueDeg
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.ExistsUniqueStatement
 public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.Assembly
-public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PDivPushForward
 public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PContractRelDimLe
-public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.NumericalSegre
-public import GroundTheory.HeightsAndTheta.Heights.LocalFiniteness.NumbersDVRC3ResidualContractionComponent
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ContractMixedField
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ImageArithClosed
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.GeoNum
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ExistsUnique
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ProjContract
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.Multilin
-public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.FibreDim
-public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.PtsIntegrable
+public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PDivPushForward
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.Assembly
+import GroundTheory.HeightsAndTheta.Heights.Intersections.PFibreDivSupp
+import GroundTheory.HeightsAndTheta.Heights.Intersections.PFibreOverFinite
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PSemilocMaxIdeals
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.PSemilocResidueAdjoin
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PSemilocResidueDeg
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PSemilocResidueFibreDim
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PSemilocResidueAdjoin
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PSemilocResidueFrac
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PFibreDivSupp
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PFibreOverFinite
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PFnDegRelDeg
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ProjDeg
+public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.NumericalSegre
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

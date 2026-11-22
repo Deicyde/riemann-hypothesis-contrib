@@ -1,23 +1,16 @@
 module
 
-public import Mathlib
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.AltCoeff
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.BlockValue
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.CoinvReduction
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Elementary
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Expand
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.FlagBasic
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsComb
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.InhabitantsElem
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Inhabitants
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.JacobiTrudi
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Lattice
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsCoinv
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsFlag
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsTop
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsElem
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsSchur
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.ImportsAlt
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.NumStandardTablePos
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCharacterAtIdentity
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCharacterBound
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCoinvAboveTopGeneral
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCoinvAboveTop
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsCoinv
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCoinvAtTop
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCoinvIdealComponent
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCoinvIdealRepresentation
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCoinvMonomialReduction
@@ -36,17 +29,15 @@ public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombCfUpdateZ
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombCfVandermondePsumOne
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombDetDescFactorial
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombExtendWord
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Statements
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombPcntAppend
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombSortLe
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombSortShiftDistinct
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombSortShift
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombSortShiftDistinct
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombStripSum
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombTableauOfWord
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombTableauRowCount
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombTableauRowLattice
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombTableauRowPrefix
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.ImportsAlt
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombWordOfTableau
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PCombYoungRowCard
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagAltCoeffInjective
@@ -60,7 +51,6 @@ public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagDividedDi
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagHomogeneousComponentMul
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagInjSumBound
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagIntegralAntisymmetrize
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsFlag
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagIntegralPermute
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagIntegralTopComponent
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagIntegralTopDegree
@@ -83,32 +73,29 @@ public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagVandermon
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFlagVandermondeHomogeneous
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFrobeniusCharacterFormula
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PFrobeniusDimensionFormula
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PHomogeneousComponentMul
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsTop
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PowerSums
+import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PHomogeneousComponentMul
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PHookSumBound
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PHookTableauCount
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PLemmaA
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PLemmaB
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PLemmaC
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSameFactorFormula
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.POtherFactorBound
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.POtherFactorFormula
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.NumStandardTablePos
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestBound
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestBoundOfPrimeBound
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestInnerTsumBound
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestKSumBound
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestPolynomialDecomposes
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestPolynomialHomogeneousDecomposition
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestPolynomialHomogeneous
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestPolynomialHomogeneousDecomposition
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestPrimeBound
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PRestPrimeBoundOfFactor
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSameFactorBound
+import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSameFactorFormula
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchAevalSignedRename
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchAltPartitionExpansion
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchAlternantHomogeneous
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchAlternantRenamePlace
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchAltPartitionExpansion
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchAntisymmetrizePlace
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchBlockVandermondeOne
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchCompleteAtRootsOfUnity
@@ -134,23 +121,48 @@ public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchSchurHomog
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchSchurRowsToK
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchSmallBlockProduct
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchStrictAntiSplit
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchWeightedPreimage
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchurPowerSumCoefficient
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchurSignCoefficient
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PSchWeightedPreimage
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PVandermondeOfHomogeneous
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsElem
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StatementsSchur
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PrimeWeightEqZeroOfLt
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.FlagIntegralRealEqMulDdConst
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.NumStandardTableEqCardMonotone
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.IsFlagIntegralOne
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.IsPowerSumDecompositionHomogeneousComponent
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.StaircaseIsHomogeneous
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.CoeffRenameProdCongrRight
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.RestAt
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.DegPolynomialIsHomogeneous
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.FlagIntegralRealTransferOfSyzygy
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.FlagIntegralRealRootRingToRealAlt
+import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.PVandermondeOfHomogeneous
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

@@ -1,37 +1,33 @@
 module
 
-public import Mathlib
+public import Development.EtaleCohomology.CohomologicalPurity.LeafIndExc
+public import Development.AutomorphicArithmetic.CommutativeAlgebra.ProductLevelwiseOfAlexanderWhitney
+public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.EtaleExcisionHocolimOfLocalProperties
+public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.HocolimAugmentationInjectiveOfPurityInputs
 public import Development.EtaleCohomology.CohomologicalPurity.FinLeafAW
 public import Development.EtaleCohomology.CohomologicalPurity.FinLeafBd
 public import Development.EtaleCohomology.CohomologicalPurity.FinLeafChart
 public import Development.EtaleCohomology.CohomologicalPurity.FinLeafCl
-public import Development.EtaleCohomology.CohomologicalPurity.FinLeafExc
+import Development.EtaleCohomology.CohomologicalPurity.FinLeafExc
 public import Development.EtaleCohomology.CohomologicalPurity.FinLeafHens
 public import Development.EtaleCohomology.CohomologicalPurity.FinLeafIndExc
 public import Development.EtaleCohomology.CohomologicalPurity.FinLeafSemi
-public import Development.EtaleCohomology.CohomologicalPurity.FinLeafThom
+import Development.EtaleCohomology.CohomologicalPurity.FinLeafThom
+public import Development.EtaleCohomology.CohomologicalPurity.Imports
 public import Development.EtaleCohomology.CohomologicalPurity.LeafAbvPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafActNatPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafAugInjPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafAugLocalPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafAugSurjPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafChPushPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafChainsSumPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafChiSqProof
 public import Development.EtaleCohomology.CohomologicalPurity.LeafEqvOfExcPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafExcAffPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafExcLevelPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafExcOfEqvPfSq
-public import Development.EtaleCohomology.CohomologicalPurity.LeafFstHocPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafGysinPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafHKSplitPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafHKSumPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafHensHPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafHomLocPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafHsSumPfR
 public import Development.EtaleCohomology.CohomologicalPurity.LeafLevelPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafLocBasePf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafLocCutAug
 public import Development.EtaleCohomology.CohomologicalPurity.LeafLocExcPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafLocFstPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafLocHenPf
@@ -43,24 +39,57 @@ public import Development.EtaleCohomology.CohomologicalPurity.LeafPrdAffPfQuot
 public import Development.EtaleCohomology.CohomologicalPurity.LeafPrdHocPfX
 public import Development.EtaleCohomology.CohomologicalPurity.LeafPrdRingPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafPurNatPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafPurPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafPurProjPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafPurRedPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafPushPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafQisLocalPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafQuotPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafRefinePf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafRelHocPfX
 public import Development.EtaleCohomology.CohomologicalPurity.LeafRelLevPfX
-public import Development.EtaleCohomology.CohomologicalPurity.LeafRelPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafSumPf
-public import Development.EtaleCohomology.CohomologicalPurity.LeafTubeCut
 public import Development.EtaleCohomology.CohomologicalPurity.LeafUnivSumPf
 public import Development.EtaleCohomology.CohomologicalPurity.LeafZPf
-public import Development.EtaleCohomology.CohomologicalPurity.Imports
-public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.EtaleExcisionHocolimOfLocalProperties
-public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.HocolimAugmentationInjectiveOfPurityInputs
-public import Development.AutomorphicArithmetic.CommutativeAlgebra.ProductLevelwiseOfAlexanderWhitney
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Development.EtaleCohomology.CohomologicalPurity.LeafFstHocPf
+public import Development.EtaleCohomology.CohomologicalPurity.LeafGysinPf
+public import Development.EtaleCohomology.CohomologicalPurity.LeafHsSumPfR
+public import Development.EtaleCohomology.CohomologicalPurity.LeafRelHocPfX
 
 @[expose] public section
 
