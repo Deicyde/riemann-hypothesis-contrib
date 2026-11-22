@@ -59,9 +59,9 @@ theorem normOp_comm (h : IsHeis σ w γ W) (lam : ℕ →* ℂ) {A B : Submodule
     normOp lam W A B (L e) = L (normOp lam W A B e) := by
   obtain ⟨n, f, hf, hu⟩ := ((sumOp_transversal h A B hB).2.1 hi).1
   have he' : Fixes W A (L e) := fun a ha => by rw [← hL, he a ha]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [normOp, normOp, ((sumOp_transversal h A B hB).1 _ he' _ f hf hu).1,
-    ((sumOp_transversal h A B hB).1 _ he _ f hf hu).1, map_smul, map_sum]
+
+  rw [normOp, normOp, ((sumOp_transversal h A B hB).1 _ he' _ f hf hu).1,
+  ((sumOp_transversal h A B hB).1 _ he _ f hf hu).1, map_smul, map_sum]
   simp only [hL]
 
 end Abstract

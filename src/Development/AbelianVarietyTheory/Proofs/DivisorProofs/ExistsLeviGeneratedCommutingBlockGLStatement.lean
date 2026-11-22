@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCu
 
 open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
 open Matrix in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_levi_generated_commuting_blockGL :
     ∀ (F : Type) [Field F] (r : ℕ) (b : Fin r → ℕ) (d : Set.range b → ℕ)
       (h : ∀ c : Set.range b, (block b c).card = d c),

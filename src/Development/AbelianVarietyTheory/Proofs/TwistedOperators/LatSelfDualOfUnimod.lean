@@ -604,7 +604,7 @@ theorem cpt_mem_of_mul {Q : Pl D.host.E} {δ z : Ef D} (e1 : cpt Q δ = 1) (h : 
   have := (mem_OA_iff _).1 h Q
   rwa [RingHom.map_mul, e1, one_mul] at this
 
-set_option maxHeartbeats 800000 in
+
 theorem leAt_of_spansAt {V : HSp D} {β₀ M : GL (Fin V.rank) (Ef D)} (h₀ : crdLat V V.L0 = lat β₀) {Q : Pl D.host.E}
     (h : SpansAt Q V M.val) : LeAt Q M β₀ ∧ LeAt Q β₀ M := by
   obtain ⟨e, he, h⟩ := h

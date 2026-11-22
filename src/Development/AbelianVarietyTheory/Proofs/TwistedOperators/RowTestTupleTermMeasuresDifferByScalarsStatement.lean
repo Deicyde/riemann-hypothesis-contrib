@@ -17,7 +17,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped NNReal
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.rowTest_tupleTerm_measures_differ_by_scalars : Big fun {D} _ _ _ _ _ _ _ _ _ _ _ ch => ∀ t Φ β (M M' : Vol ch.G), M.Is t → IsTermVol t ch.S.toGridChoice Φ β M' →
     ∃ x : Node → ℝ≥0, Scales M M' x ∧
       ∀ X : Node, DefNode D.R.m X → X ≠ .top D.R.m → (∀ j ∈ idx D, X ≠ .top j) → x X = 1 := by

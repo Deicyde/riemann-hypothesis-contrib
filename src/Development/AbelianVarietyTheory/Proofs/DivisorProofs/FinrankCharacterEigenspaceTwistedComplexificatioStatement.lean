@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Complexifica
 @[expose] public section
 
 open GlobalTheory.BadCount
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finrank_characterEigenspace_twistedComplexification : ∀ (K W G : Type) [Field K] [AddCommGroup W] [Module K W] [FiniteDimensional K W] [Group G] [Fintype G]
     (σ : K →+* ℂ) (ρ0 : G →* (W →ₗ[K] W)) (χ : G →* Kˣ) (J : Subgroup G) (μ : J →* Kˣ) (c : G → K),
     Module.finrank K (⨅ p : J, LinearMap.ker (ρ0 p - ((χ p * μ p : Kˣ) : K) • LinearMap.id) : Submodule K W) =

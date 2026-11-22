@@ -16,7 +16,7 @@ open GlobalTheory.AdForm
 
 namespace GlobalTheory.StabOff
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 theorem prV_comm_tmul {D : D7} (v : Pl D) (a : Af ↥D.host.F) (e : D.host.E) :
     Formalism.UG.prV (E := D.host.E) v ((Algebra.TensorProduct.comm (↥D.host.F) (Af ↥D.host.F) D.host.E) (a ⊗ₜ e)) =

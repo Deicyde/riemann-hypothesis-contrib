@@ -205,8 +205,8 @@ theorem one_sub_star (q : Ψ × Fin j × Fin j' ≃ Fin n) (t : Fin n → ℂ) (
       (1 - (ballMat q t τ)ᴴ * ballMat q t τ).map (starRingEnd ℂ) := by
   rw [ballMat_star]
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mul_apply, Matrix.one_apply, Matrix.sub_apply, Matrix.conjTranspose_apply, map_sum, apply_ite]
+
+  simp [Matrix.mul_apply, Matrix.one_apply, Matrix.sub_apply, Matrix.conjTranspose_apply, map_sum, apply_ite]
 
 theorem star_mem_ballDom {q : Ψ × Fin j × Fin j' ≃ Fin n} {t : Fin n → ℂ} (ht : t ∈ ballDom q) :
     star t ∈ ballDom q := by

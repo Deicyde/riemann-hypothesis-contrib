@@ -19,7 +19,7 @@ open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 open PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcN.F2
 
@@ -83,8 +83,8 @@ theorem gBound_words (gen : Γ → Prod' H d) (a₀ : Γ) (β : ∀ s, H s →L[
     filter_upwards [eventually_ge_atTop 1] with k hk
     rw [← ht k hk]
     unfold SG.trU
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hc.mul_pow, ← Prod.pow_snd, hpow, Prod.snd_sum, Finset.mul_sum, ContinuousLinearMap.coe_sum, map_sum]
+
+    rw [hc.mul_pow, ← Prod.pow_snd, hpow, Prod.snd_sum, Finset.mul_sum, ContinuousLinearMap.coe_sum, map_sum]
     refine Finset.sum_congr rfl fun f _ => ?_
     rw [Prod.smul_snd, mul_smul_comm, ContinuousLinearMap.coe_smul, map_smul, smul_eq_mul, wdVal_snd]
   · intro s

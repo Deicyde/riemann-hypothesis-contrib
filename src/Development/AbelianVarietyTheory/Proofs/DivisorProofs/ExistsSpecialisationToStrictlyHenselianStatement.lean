@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorsorsTrivi
 @[expose] public section
 
 open IsLocalRing Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_specialisation_to_strictlyHenselian : ∀ (R S O : Type) [CommRing R] [CommRing S] [IsLocalRing S] [CommRing O]
     [HenselianLocalRing O] [IsSepClosed (IsLocalRing.ResidueField O)] [Algebra R S] [Algebra R O]
     (Q y : Ideal R) [Q.IsPrime] [y.IsPrime], Q ≤ y →

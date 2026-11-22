@@ -21,7 +21,7 @@ open PositivityTheory.Rg.BcB.SpectralAccumulation (Tr pairSpace)
 open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.Bc.ArchbcB.B
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace PositivityTheory.Rg.BcB.F.PCandLh
 
@@ -47,7 +47,7 @@ theorem gap_restr {n m : ℕ} {x : Fin n → ℤ} (hx : x ∈ coneGL n 2) (S : F
     simp only [PositivityTheory.Rg.Bc.ArchbcB.B.restr]
     omega
 
-set_option maxHeartbeats 1600000 in
+
 open PCandSa in
 theorem inert_d (h1 : Tail.ReadT) (h2 : Tail.ExpRead) (h3 : RS.JoinSat) (hR : Rd.ReadLimit) (E : Type) [Field E] [NumberField E] [IsCMField E] (hE : GlobalTheory.BCT.Unr E) (n : ℕ)
     (π : Submodule ℂ (UA E n → ℂ)) (S T : Finset (Pl E)) (F₀ : Frame0 hR π S) (F : RunFrame F₀ T) (i : F₀.C.ι)
@@ -149,7 +149,7 @@ theorem mu_one {a b : ℕ} {μ : HChar E} {w : Pl E} (h : μ.UnrAt w) (m : GLw a
   rw [map_mul, map_pow, map_pow, h _ (GlobalTheory.SphGal.isUnitAt_det_of_mem h1), h _ (GlobalTheory.SphGal.isUnitAt_det_of_mem h2), one_pow,
     one_pow, one_mul]
 
-set_option maxHeartbeats 1600000 in
+
 theorem candLev_of (h0 : Tail.ReadLev) (h1 : Tail.ReadT) (h2 : Tail.ExpRead) (h3 : RS.JoinSat) : CandLev := by
   intro hR E _ _ _ hE n hn π hπ S T F₀ F hF i s₁ s₂ Pa Pb D A G hc hG hl hne w
   have ha : F₀.C.a i ≤ n := F₀.C.le i

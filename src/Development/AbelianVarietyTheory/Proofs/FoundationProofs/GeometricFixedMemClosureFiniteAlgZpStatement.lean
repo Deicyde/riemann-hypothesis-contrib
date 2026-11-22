@@ -39,7 +39,7 @@ private theorem mem_geoField_of_fixed_local {p : ℕ} [Fact p.Prime] {Ω : Type}
   obtain ⟨y, rfl⟩ := IntermediateField.mem_bot.1 hbot
   exact y.2
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.geometric_fixed_mem_closure_finite_algZp : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
   ∀ x : Ω, (∀ g ∈ Ggeo (p := p) Ω, g x = x) → ∃ S : Finset Ω, (∀ s ∈ S, IsAlgZp (p := p) s) ∧
     x ∈ Subfield.closure (Set.range (algebraMap (O0 p) Ω) ∪ (S : Set Ω)) := by

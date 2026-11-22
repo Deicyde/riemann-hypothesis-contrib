@@ -27,8 +27,8 @@ theorem h_sum_left {ι : Type*} (s : Finset ι) (x : ι → V) (y : V) :
 
 theorem h_sum_right {ι : Type*} (s : Finset ι) (x : V) (y : ι → V) :
     H.h x (∑ i ∈ s, y i) = ∑ i ∈ s, H.h x (y i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [H.h_herm, h_sum_left, map_sum]
+
+  rw [H.h_herm, h_sum_left, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [← H.h_herm]
 
@@ -185,7 +185,7 @@ open Formalism.L2.SG.Pf.BBTie
 variable {r : ℕ}
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem gen_change (t : Term V M r) (C Ci : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (hC0 : ∀ a b, b < a → C a b = 0)
     (hC1 : ∀ a, C a a = 1) (hCO : ∀ a b, C a b ∈ M.L.O) (hCiO : ∀ a b, Ci a b ∈ M.L.O) (hCCi : C * Ci = 1)
     (hCiC : Ci * C = 1) (hAdm : ∀ g, M.split = some g → H.Admissible g (chg t (comb C t.f')))

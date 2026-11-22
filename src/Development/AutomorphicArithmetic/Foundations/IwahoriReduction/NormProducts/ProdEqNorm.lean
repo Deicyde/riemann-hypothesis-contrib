@@ -12,8 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteDim
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.Kd.K4 Polynomial
 open scoped Matrix MatrixGroups
 
-set_option maxHeartbeats 200000
-set_option synthInstance.maxHeartbeats 40000
+
+
 
 private theorem val_one_iff {K : Type} [Field K] (A : ValuationSubring K) (x : K) :
     A.valuation x = 1 ↔ x ≠ 0 ∧ x ∈ A ∧ x⁻¹ ∈ A := by

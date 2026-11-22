@@ -167,8 +167,8 @@ theorem exists_matrix_split {E : Type} [Field E] [NumberField E] {n p q : ℕ} (
       have hc' : (c : E) ≠ 0 := by simpa using hc
       have e : (c : E) • φ a = ∑ i, (s i : E) • φ (v i) := by
         have := congrArg (fun z : L => φ z) hs
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Submodule.coe_smul, Submodule.coe_sum, map_smul, map_sum] at this
+
+        simp only [Submodule.coe_smul, Submodule.coe_sum, map_smul, map_sum] at this
         exact this
       rw [SetLike.mem_coe, ← Submodule.smul_mem_iff _ hc', e]
       exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -231,7 +231,7 @@ theorem gLat_eq_of_finCong {D : D7} (V : HSp D) (u : GA D V) (h : FinCong V 1 u)
   · rw [Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul, mul_inv_cancel, map_one, Units.val_one, Matrix.one_mulVec]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_of_matched {D : D7} (V : HSp D) (g g' δ : GA D V) (δ' : GL (Fin V.rank) D.host.E)
     (S : Matrix (Fin V.rank) (Fin V.rank) D.host.E) (M : ℕ) (hM : M ≠ 0) (I I' : Ideal (𝓞 D.host.E))
     (hI : I * I' = Ideal.span {(M : 𝓞 D.host.E)}) (hδ : IsRat V δ δ')
@@ -295,7 +295,7 @@ theorem exists_of_matched {D : D7} (V : HSp D) (g g' δ : GA D V) (δ' : GL (Fin
   ring
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem marking_of_conjugate : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (V : HSp D) (r : ℕ) (C : Ctx Xo c σ V r), C.OK → (Dw.p = 0 ∨ Dw.q = 0 ∨ 3 ≤ Dw.p + Dw.q) → ∀ τ : ℂ ≃+* ℂ, τ H.rt0 = H.rt0 → ∀ (Cv : Curve H) (io : Cv.P.A.left ⟶ Cv.P.A.left) (s : ℤ × ℤ) (π : Fin C.F.n → Fin C.F.n), Cv.ActsBy τ io l.M s → ConjugationPermutesPeriods C.F τ π → ∀ h γ k h' γ', C.Mark h k γ → C.Mark h' (π k) γ' → ∃ δ ∈ GQ V, ∃ u : GA D V, gLat V u = latHat V ∧ finHom V (γ' * h') * finHom V u = finHom V δ * finHom V (γ * h) ∧ ((Matrix.GeneralLinearGroup.det (finHom V (u)) : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ) : (Af D.host.F ⊗[D.host.F] D.host.E)) * ((1 : Af D.host.F) ⊗ₜ[D.host.F] ((wE H s ^ Dw.p * H.bar (wE H s) ^ Dw.q : 𝓞 D.host.E) : D.host.E)) - 1 ∈ GlobalTheory.AdLat.hat1 D.host.F ((algebraMap (𝓞 D.host.E) D.host.E) '' (l.Mb : Set (𝓞 D.host.E))) := by
   intro D H Dw l Xo c σ V r C hC hsig τ hτ Cv io s π hact hπ h γ k h' γ' hm hm'
   obtain rfl : V.rank = r := C.hr

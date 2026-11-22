@@ -67,8 +67,8 @@ def sc {α β : Type} (M : Matrix α β K) (p : α → ℤ) (q : β → ℤ) : M
 theorem sc_mul {α : Type} [Fintype α] (M N : Matrix α α K) (p q q' s : α → ℤ) (hq : ∀ a, q a + q' a = 0) :
     sc M p q * sc N q' s = sc (M * N) p s := by
   ext1 a b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [sc, Matrix.mul_apply, Matrix.of_apply, map_sum, Finset.sum_mul, map_mul]
+
+  simp only [sc, Matrix.mul_apply, Matrix.of_apply, map_sum, Finset.sum_mul, map_mul]
   refine Finset.sum_congr rfl fun c _ => ?_
   have : p a + s b = (p a + q c) + (q' c + s b) := by linear_combination -hq c
   rw [this, T_add (p a + q c)]
@@ -408,10 +408,10 @@ variable {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] (H : 
 
 theorem B_vec (e d : Fin j → V) (u v : Matrix (Fin j) (Fin j) K) (a b : Fin j) :
     H.B (vec e u a) (vec d v b) = (uᵀ * (Matrix.of fun a b => H.B (e a) (d b)) * v.map star) a b := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [vec, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, map_smulₛₗ, smul_eq_mul,
-    Matrix.mul_apply, Matrix.transpose_apply, Matrix.of_apply, Matrix.map_apply, Finset.sum_mul, Finset.mul_sum,
-    starRingEnd_apply]
+
+  simp only [vec, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, map_smulₛₗ, smul_eq_mul,
+  Matrix.mul_apply, Matrix.transpose_apply, Matrix.of_apply, Matrix.map_apply, Finset.sum_mul, Finset.mul_sum,
+  starRingEnd_apply]
   refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
 theorem B_symm0 {x y : V} (h : H.B x y = 0) : H.B y x = 0 := by rw [← H.herm, h, star_zero]
@@ -479,8 +479,8 @@ theorem exists_isom [FiniteDimensional K V] (e d : Fin j → V) (M M' : Matrix (
 omit [StarRing K] in
 theorem map_vec (s : V ≃ₗ[K] V) (e : Fin j → V) (S u : Matrix (Fin j) (Fin j) K)
     (hs : ∀ a, s (e a) = vec e S a) (a : Fin j) : s (vec e u a) = vec e (S * u) a := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [vec, map_sum, map_smul, hs, Matrix.mul_apply, Finset.sum_smul, Finset.smul_sum, smul_smul]
+
+  simp only [vec, map_sum, map_smul, hs, Matrix.mul_apply, Finset.sum_smul, Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by rw [mul_comm]
 
@@ -532,16 +532,16 @@ theorem transport [NumberField K] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K 
     have hx' : x = ∑ a, c a • vec (ej F hj) S' a := by
       apply s.injective
       change s • x = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hc, map_sum, map_smul, map_vec s _ S S' hs, hS']
+
+      simp only [hc, map_sum, map_smul, map_vec s _ S S' hs, hS']
       simp [vec, Matrix.one_apply]
     obtain ⟨c', hc', e⟩ := h2 x hx (hx' ▸ Submodule.sum_mem _ fun a _ =>
       Submodule.smul_mem _ _ (vec_mem F hj S' a le_rfl))
     refine ⟨c', hc', ?_⟩
     change s x = _
     rw [e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, map_vec s _ S u hs]
+
+    simp only [map_sum, map_smul, map_vec s _ S u hs]
 
 end Isom
 
@@ -625,7 +625,7 @@ theorem inN_of (F : FlagD H r) {j : ℕ} (hj : j ≤ r) (s : V ≃ₗ[K] V) (his
     rwa [← hs] at this
   · rw [LinearEquiv.coe_coe, hfix a (not_lt.1 ha), sub_self]; exact Submodule.zero_mem _
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_elt [FiniteDimensional K V] (u : Matrix (Fin N.j) (Fin N.j) K) (hu : IsUni u) :
     ∃ s ∈ N.Rs, (∀ y ∈ II N.F N.F' ⊔ Submodule.span K {N.F.z} ⊔ N.Ist, s y = y) ∧
       (∀ x y, H.B (s x) (s y) = H.B x y) ∧
@@ -787,9 +787,9 @@ theorem ref_facts :
         simp [this])
       (fun b hb => by simp [e_ej' N b hb]) (fun b hb => by simp [(ist_ej N b hb _).2]) y hy
     rw [hx] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, hd, smul_eq_mul, mul_ite, mul_one,
-      mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] using this
+
+    simpa only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, hd, smul_eq_mul, mul_ite, mul_one,
+    mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] using this
   · obtain ⟨x, -, hx⟩ := (mem_Xa N.F' N.j_le le_rfl y).1 hyX
     refine ⟨x, fun a => ?_, hx⟩
     have hd : ∀ b, H.B (ej N.F' N.j_le b) ((c (σ a))⁻¹ • ej N.F N.j_le (σ a)) = if b = a then 1 else 0 := by
@@ -806,9 +806,9 @@ theorem ref_facts :
         · simp)
       (fun b _ => by simp [e_ej]) (fun b hb => by simp [(ist_ej N b hb _).1]) y hy
     rw [hx] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, hd, smul_eq_mul, mul_ite, mul_one,
-      mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] using this
+
+    simpa only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, hd, smul_eq_mul, mul_ite, mul_one,
+    mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] using this
 
 theorem denom (𝔠 : Ideal (𝓞 K))
     (hD : ∀ (l : ℕ) (hl : l ≤ r + 1), l ≤ N.j → Dl N.F N.F' l hl ≠ 0 → ∀ x ∈ 𝔠,

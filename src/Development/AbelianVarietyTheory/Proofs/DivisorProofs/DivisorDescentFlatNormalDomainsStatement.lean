@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OriginIdeal
 @[expose] public section
 
 open IsLocalRing Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.divisor_descent_flat_normal_domains : ∀ (A' B' : Type) [CommRing A'] [IsDomain A'] [IsNoetherianRing A'] [IsIntegrallyClosed A']
     [CommRing B'] [IsDomain B'] [IsNoetherianRing B'] [IsIntegrallyClosed B'] [Algebra A' B']
     [Module.Flat A' B'] (s : A'), s ≠ 0 →

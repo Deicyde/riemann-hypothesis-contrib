@@ -283,8 +283,8 @@ theorem finrank_le_local {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] [I
   · obtain ⟨C, D', hCD, hC⟩ := matrix_level_local U hl hv hρ b n
     refine ⟨C.map f, D'.map f, by rw [← Matrix.map_mul, hCD]; simp, fun a k j => ?_⟩
     have := hpow _ _ (hC a k j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [Matrix.mul_apply, map_sum] using this
+
+    simpa [Matrix.mul_apply, map_sum] using this
 
 end Geometry
 
@@ -347,8 +347,8 @@ theorem betaPosDef (Y : Model Xo c β) {p : ℕ} (hp : 1 < p) : BetaPosDef Y p :
   have hne : ∑ i, z i • b i ≠ 0 := fun h => hz (funext (Fintype.linearIndependent_iff.1 b.linearIndependent z h))
   refine (hlow _ hne).trans_eq ?_
   rw [← A.beLin_apply (betaAdd Y p)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul, DatAt.beLin_apply]
+
+  simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul, DatAt.beLin_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.mul_sum]

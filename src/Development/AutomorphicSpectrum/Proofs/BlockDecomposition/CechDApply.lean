@@ -126,8 +126,8 @@ abbrev dcx : DCx.{w} R where
     funext t
     rw [cech_d_apply]
     change _ = (A.K (ent t)).d q ((A.term q).cech.d p x t)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [cech_d_apply, map_sum]
+
+    rw [cech_d_apply, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_zsmul]
     exact congrArg _ ((A.res _).comm q _).symm

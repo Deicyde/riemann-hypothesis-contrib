@@ -202,7 +202,7 @@ open GlobalTheory.ConstRatio (NegIdx Factor)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open MeasureTheory
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.vanishing_of_definite_small_irreducible : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching →
   ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsStdChar D ψ (-1) → IsInfFam θ →
   ∀ (W W₁ X : HSp D) (A : GlobalTheory.ChainFr.Fr W) (A₁ : GlobalTheory.ChainFr.Fr W₁) (B : GlobalTheory.ChainFr.Fr X) (α β : (AE D)ˣ →* Circle),

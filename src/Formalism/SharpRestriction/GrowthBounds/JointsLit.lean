@@ -257,7 +257,7 @@ theorem foldr_smul {R M ι : Type*} [Semiring R] [AddCommMonoid M] [Module R M] 
   | cons i l ih => simp only [List.map_cons, List.foldr_cons, Function.comp_apply, ih, iter_smul]
 
 
-set_option maxHeartbeats 1000000 in
+
 open Classical in
 theorem NPDesc_of (c : LatCmp D) {L : SizeData₂ D} (hT : GatTies D) (X : Inst D L) (Y : LatInst D) (K : Consts)
     (hv : c.VramDef Y) (hy : YvRat c) : c.NPDesc X Y K := by

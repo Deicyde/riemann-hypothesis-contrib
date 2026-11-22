@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LaurentMapIs
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial GlobalTheory.EtC GlobalTheory.EtC.GmStep
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finiteAlgebra_strictlyHenselian_induction : ∀ (A : Type) [CommRing A], SH A → ∀ (P : ∀ (T : Type) [CommRing T] [Algebra A T], Prop),
   (∀ (T T' : Type) [CommRing T] [CommRing T'] [Algebra A T] [Algebra A T'], (T ≃ₐ[A] T') → P T → P T') →
   (∀ (T : Type) [CommRing T] [Algebra A T], Subsingleton T → P T) →

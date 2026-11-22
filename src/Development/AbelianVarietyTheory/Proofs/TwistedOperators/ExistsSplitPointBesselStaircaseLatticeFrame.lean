@@ -94,8 +94,8 @@ theorem map_latV {A B : HSp D} {L : Lat A} {L' : Lat B} (M : Matrix (Fin B.rank)
 theorem sec_mulVec {m n : ℕ} (M : Matrix (Fin m) (Fin n) D.host.E) (u : Fin n → k) :
     (fun i => p.sec ((M.map (emb p) *ᵥ u) i)) = M.map (incA D) *ᵥ fun j => p.sec (u j) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mulVec, dotProduct, map_apply, map_sum]
+
+  simp only [mulVec, dotProduct, map_apply, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [mul_comm (incA D _), sec_mul_right, mul_comm, emb_apply]
 
@@ -143,7 +143,7 @@ theorem perp_left {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrthogon
   exact Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun j _ => by ring
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_frame {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B c ε) (hε : ε ≠ 0) {Λ : Lat A}
     (hΛ : IsSelfDualC A Λ) (𝔟 : Fin c → FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) (s : Fin c → k) (hs : ∀ q, s q ≠ 0)
     (h1 : ∀ q, ∀ u ∈ 𝔟 q, (s q)⁻¹ * emb p u ∈ 𝒪[k]) (h2 : ∀ q, ∃ u ∈ 𝔟 q, ∃ o ∈ 𝒪[k], s q = o * emb p u) :
@@ -200,8 +200,8 @@ theorem exists_frame {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrtho
         funext i
         rw [hbv, Pi.add_apply, map_add (f := _), Pi.add_apply, Finset.sum_apply]
         congr 1
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [mulVec, dotProduct, map_sum, a', map_apply]
+
+        simp only [mulVec, dotProduct, map_sum, a', map_apply]
         exact Finset.sum_congr rfl fun q _ => by rw [sec_mul_right, mul_comm, emb_apply]
       rw [e]
       refine add_mem ?_ (sum_mem fun q _ => ?_)
@@ -237,8 +237,8 @@ theorem exists_frame {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrtho
             mul_inv_cancel_left₀ (hs _)]
           rw [e1]
           funext i
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp only [Pi.add_apply, mulVec, dotProduct, map_add (f := _), map_sum, map_mul, F', a', map_apply]
+
+          simp only [Pi.add_apply, mulVec, dotProduct, map_add (f := _), map_sum, map_mul, F', a', map_apply]
         rw [e, mulVec_mulVec, β.b'b, one_mulVec]
         obtain ⟨t, rfl⟩ := σ.surjective j
         simp only [x', Function.comp_apply, Equiv.symm_apply_apply]

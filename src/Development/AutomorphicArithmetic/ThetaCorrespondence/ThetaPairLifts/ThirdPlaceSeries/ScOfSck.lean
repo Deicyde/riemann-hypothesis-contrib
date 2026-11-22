@@ -10,7 +10,7 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section

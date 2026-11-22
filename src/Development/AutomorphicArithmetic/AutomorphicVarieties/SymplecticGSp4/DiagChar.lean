@@ -54,8 +54,8 @@ private theorem match_chars {H K : Type} [Group H] [Field K] (a b : Fin 4 → H 
     rw [linearIndependent_iff_injective_finsuppLinearCombination] at li
     have h1 : (∑ i, Finsupp.single (a i) (1 : K)) = ∑ j, Finsupp.single (b j) (1 : K) := by
       apply li
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, Finsupp.linearCombination_single, one_smul]
+
+      simp only [map_sum, Finsupp.linearCombination_single, one_smul]
       funext g
       simpa using h g
     have h2 := congrArg (fun f => f (b j)) h1

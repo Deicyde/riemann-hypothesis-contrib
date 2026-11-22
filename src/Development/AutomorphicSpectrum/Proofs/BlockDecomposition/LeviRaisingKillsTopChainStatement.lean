@@ -12,7 +12,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TwLMulSe
 open Finset PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD GlobalTheory.CompanionTheory.LvChain
 open CompanionTheory.D.LK (Pos)
 open scoped InnerProductSpace
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.levi_raising_kills_top_chain : ∀ (n : ℕ) (lev : Fin n → ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (E1 E2 : Fin n → Fin n → Module.End ℂ V) (u : V),
     (∀ a b : Fin n, a < b → kA E1 E2 a b u = 0) → ∀ p q : Fin n, p < q → lev p = lev q →
       Lv lev E1 E2 p q (Pi.single (omU lev) u : Cq n V) = 0 := by

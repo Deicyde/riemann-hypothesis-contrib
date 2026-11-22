@@ -67,8 +67,8 @@ theorem map_cubicalTermLinearAlongTangent (ψ : R →+* S) (ph2 : PS R 3 d) (u :
   ext mu
   rw [MvPowerSeries.coeff_map]
   change ψ (∑ i : Fin d, _) = ∑ i : Fin d, _
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, MvPowerSeries.coeff_map]
+
+  simp only [map_sum, map_mul, MvPowerSeries.coeff_map]
 
 theorem map_map {T σ : Type} [CommRing T] (ψ : R →+* S) (χ : S →+* T) (f : MvPowerSeries σ R) :
     MvPowerSeries.map (χ.comp ψ) f = MvPowerSeries.map χ (MvPowerSeries.map ψ f) := by

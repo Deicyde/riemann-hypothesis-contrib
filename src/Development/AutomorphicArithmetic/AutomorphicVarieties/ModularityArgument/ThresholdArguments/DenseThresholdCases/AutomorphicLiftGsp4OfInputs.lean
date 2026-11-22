@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open UpperTheory.GalN.V UpperTheory.V.Z.Win.Birth
@@ -69,7 +69,7 @@ private theorem irr_tw_comp {Γ Γ' k : Type} [Group Γ] [Group Γ'] [Field k] {
   irr_tw (r.comp φ) (κ.comp φ) h
 private theorem tw_one {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k) (κ : Γ →* kˣ) (s : Γ) (h : r s = 1) (h' : κ s = 1) :
     tw r κ s = 1 := Units.ext (by rw [tw_val, h, h']; simp)
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Cu.rank_four_automorphy_of_tensor_of_base_change_of_induction (H : _root_.UpperTheory.V.Af.HypothesesH') (hQ : UpQuadI) (hS : UpSolI) (hI : Z.InvariantSubmoduleMonicPolynomial.E.IndAutCs) (hP : PolOf4) (hB : BadOfW) : RankFourAutomorphyOfTensor := by
   intro Ω _ _ _ l _ ι K' _ h2 hc ρ hρ ⟨π, hreg, hatt⟩ hio hrw g0 m c₁ κ hg0 ⟨τ₀, s₀, h₀⟩
   haveI : IsAlgClosure K' Ω := ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) _⟩

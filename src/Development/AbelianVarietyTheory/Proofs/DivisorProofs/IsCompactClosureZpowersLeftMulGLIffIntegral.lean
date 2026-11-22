@@ -141,9 +141,9 @@ theorem bounded_of_fg (he : ∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v
   have hsum : mulHom e b (∑ y ∈ S, f y • y) i j = ∑ y ∈ S, e (algebraMap K.O K.E (f y)) * mulHom e b y i j := by
     rw [mulHom_apply]
     simp only [mulHom_apply, Finset.sum_mul, smul_mul_assoc]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← algebraMap_smul K.E (f _), map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply,
-      Finsupp.smul_apply, smul_eq_mul, map_mul]
+
+    simp only [← algebraMap_smul K.E (f _), map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply,
+    Finsupp.smul_apply, smul_eq_mul, map_mul]
   rw [hsum]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun y _ => ?_)
   rw [norm_mul]

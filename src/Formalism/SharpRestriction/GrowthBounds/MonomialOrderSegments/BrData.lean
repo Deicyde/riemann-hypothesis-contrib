@@ -366,9 +366,9 @@ theorem gaAct_comm (H : MvPolynomial (PlaneGramData.TL J Dt.nL r × Fin r) (G.KK
         (∑ mo ∈ H.support, monomial mo (algebraMap O (G.KK O) (Dt.ga mo) * H.coeff mo)) := by
   classical
   unfold TwistData.gaAct
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [support_rename_of_injective (gO_inj Dt),
-    Finset.sum_image (fun a _ b _ h => Finsupp.mapDomain_injective (gO_inj Dt) h), map_sum]
+
+  rw [support_rename_of_injective (gO_inj Dt),
+  Finset.sum_image (fun a _ b _ h => Finsupp.mapDomain_injective (gO_inj Dt) h), map_sum]
   refine Finset.sum_congr rfl fun mo _ => ?_
   rw [rename_monomial, ga_md, coeff_rename_mapDomain _ (gO_inj Dt)]
 
@@ -461,10 +461,10 @@ theorem digit_comm (ρ : (toData Dt).Tau → Fin r → ℕ) (F : MvPolynomial (P
       rename (Prod.map (fM Dt) id) (Dt.Fdig (fun x => ρ ((zE J).symm x.1.1, x.1.2) x.2) F) := by
   classical
   unfold TwistData.digitPart PlaneGramData.SignedChainData.Fdig
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [support_rename_of_injective (gO_inj Dt),
-    Finset.sum_image (fun a _ b _ h => Finsupp.mapDomain_injective (gO_inj Dt) h), map_sum,
-    Finset.sum_filter]
+
+  rw [support_rename_of_injective (gO_inj Dt),
+  Finset.sum_image (fun a _ b _ h => Finsupp.mapDomain_injective (gO_inj Dt) h), map_sum,
+  Finset.sum_filter]
   refine Finset.sum_congr rfl fun mo _ => ?_
   rw [coeff_rename_mapDomain _ (gO_inj Dt)]
   by_cases hd : Dt.digOK (fun x => ρ ((zE J).symm x.1.1, x.1.2) x.2) mo

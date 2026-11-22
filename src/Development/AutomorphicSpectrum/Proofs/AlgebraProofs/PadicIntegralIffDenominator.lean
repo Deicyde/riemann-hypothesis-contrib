@@ -72,7 +72,7 @@ private theorem norm_esymm_le_one_of_forall_norm_le_one {K : Type*} [NormedField
   intro z hz
   exact h z (Multiset.mem_of_le (Multiset.mem_powersetCard.mp ht).1 hz)
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.CompanionTheory.Relay.padic_integral_iff_denominator : ∀ (E : Type) [Field E] [NumberField E] (p : Nat.Primes) (x : E), ((∀ j : E →+* ℂ_[p], ‖j x‖ ≤ 1) ↔ ∃ (n : ℕ) (a : 𝓞 E), ¬ (p : ℕ) ∣ n ∧ (n : E) * x = a) := by
   intro E _ _ p x
   constructor

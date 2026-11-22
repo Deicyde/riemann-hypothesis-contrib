@@ -10,7 +10,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.V.Pa.dualN :
     ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (n : ℕ) (x : NP G0.frame n) (k : Kap x), l ≠ 2 → PhiCond G0.Γ l → (∀ g : G0.G₀, (g : G0.Γ) ∈ PL l T.H.toSubgroup → x.ρ g = 1) → Detects k (Set.range T.sg) → ∃ C : ℕ, ∀ m, ∀ᶠ N in atTop, ∀ rep' : Representation x.A (T.GN N).Γ (k.EpsilonEtaTensorDual (x.Am m)), IsAd (T.GN N).frame (fun g => k.ρ1 (x.Am m) ((T.h N).p₀ g)) (fun g => epsD k (x.Am m) ((T.h N).p g)) (k.EpsilonEtaTensorDual (x.Am m)) rep' → Finite (Zl rep') → {y | y ∈ Zl rep' ∧ ∀ j, ∃ Y, y (T.ph N j) = rep' (T.ph N j) Y - Y ∧ y (T.ta N j) = rep' (T.ta N j) Y - Y}.ncard ≤ Nat.card (Bl rep') * Nat.card x.K ^ C := by
   intro l _ L G0 T n x k hl hphi hρ hdet

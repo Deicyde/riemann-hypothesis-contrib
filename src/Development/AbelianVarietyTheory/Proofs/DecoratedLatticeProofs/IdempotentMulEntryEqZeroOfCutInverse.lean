@@ -113,8 +113,8 @@ theorem c_mul {W : Type} [Fintype W] (v : W → Pl D) (hv : Function.Injective v
       rw [map_mul, map_zero, map_sub, map_sub, map_sum, map_one, hp2]
     simp only [hs, sub_zero]
     refine af_ext _ fun u => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_mul, map_zero, map_sub, map_one, map_sum]
+
+    rw [map_mul, map_zero, map_sub, map_one, map_sum]
     by_cases hu : u ∈ Set.range v
     · obtain ⟨w0, rfl⟩ := hu
       rw [Finset.sum_eq_single w0 (fun w _ hw => evalV_single_ne _ (fun e => hw (hv e).symm))
@@ -182,7 +182,7 @@ theorem mt_list_prod (V : HSp D) {W : Type} (h : W → GA D V) (E : W → AE D)
       horth w y (fun e => hl.1 (e ▸ hy)))
 
 
-set_option maxHeartbeats 800000 in
+
 open GlobalTheory.LocWeil.PlaceIdem in
 theorem prod_of_trivOff : ∀ (D : D7) (V : HSp D) (W : Type) [Fintype W] [DecidableEq W] (v : W → Pl D) (e : W → AE D),
     Function.Injective v → (∀ w, IsSplitIdem D (e w) ∧ ∃ ε, IsPlaceIdem D (v w) ε ∧

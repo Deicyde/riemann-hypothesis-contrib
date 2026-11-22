@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EigenIdempot
 @[expose] public section
 
 universe u
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_eigen_idempotents_of_comaximal : ∀ {C : Type} [CommRing C] {A : Type} [CommRing A] {W : Type u} [AddCommGroup W] [Module C W]
   (σ : A →+* Module.End C W) (a : ℕ) (χ : Fin a → A →+* C),
   (∀ i j, i ≠ j → Ideal.span (Set.range fun x => χ i x - χ j x) = ⊤) →

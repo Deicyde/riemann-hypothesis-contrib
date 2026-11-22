@@ -10,7 +10,7 @@ noncomputable section
 
 open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult GlobalTheory.ProdReorder
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace CompanionTheory.Groth
 

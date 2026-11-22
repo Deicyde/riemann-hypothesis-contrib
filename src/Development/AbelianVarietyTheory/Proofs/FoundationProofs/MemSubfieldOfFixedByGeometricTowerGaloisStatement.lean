@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AlgebraMa
 
 open scoped MatrixGroups
 open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisensteinGalois GlobalTheory.GeoFix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mem_subfield_of_fixed_by_geometric_tower_galois : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω → ∀ (T : Tower p Ω) (n : ℕ) (F : Subfield Ω), (∀ c : O0 p, algebraMap (O0 p) Ω c ∈ F) → (∀ x : Ω, IsAlgZp (p := p) x → x ∈ F) → T.qq n ∈ F → ∀ o : Ω, (∀ g ∈ Ggeo (p := p) Ω ⊓ Gn T n, g o = o) → o ∈ F := by
   intro p hp Ω _ _ hc T n F hO hA hq o ho
   have : CharZero Ω := GlobalTheory.K5.Basic.charZero_of_isClo hc

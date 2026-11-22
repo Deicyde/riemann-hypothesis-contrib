@@ -364,9 +364,9 @@ theorem good_gen (hS4 : S4) (hβ : ∀ y, (∀ x, β x y = 0) → y = 0)
         LinearMap.coe_toContinuousLinearMap', ContinuousLinearMap.comp_apply,
         ContinuousLinearMap.coe_restrictScalars', orb_eq]
       conv_lhs => rw [← b.sum_repr (conjL (τ x) (σ x) Z)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, ContinuousLinearMap.map_smul_of_tower, Finset.smul_sum, mul_smul,
-        Complex.coe_smul, Module.Basis.coord_apply]
+
+      simp only [map_sum, map_smul, ContinuousLinearMap.map_smul_of_tower, Finset.smul_sum, mul_smul,
+      Complex.coe_smul, Module.Basis.coord_apply]
     rw [hD']
     beta_reduce
     rw [Finset.sum_apply]

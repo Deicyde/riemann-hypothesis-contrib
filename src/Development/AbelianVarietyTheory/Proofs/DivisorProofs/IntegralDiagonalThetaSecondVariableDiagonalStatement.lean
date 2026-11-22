@@ -27,7 +27,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open MeasureTheory
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.integral_diagonalTheta_secondVariable_diagonal : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsCharAF F ψ → ∀ (κ : Type) [Fintype κ],
     letI : MeasurableSpace (κ → AF F) := borel _
     ∀ (μ : MeasureTheory.Measure (κ → AF F)), μ.IsAddHaarMeasure →

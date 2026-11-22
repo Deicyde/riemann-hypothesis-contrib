@@ -6,7 +6,7 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.KaehlerDiffe
 @[expose] public section
 
 open MvPolynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.kaehler_differentials_span_local : ∀ (S B : Type) [CommRing S] [Algebra ℚ S] [CommRing B] [IsLocalRing B]
     [IsNoetherianRing B] [Algebra ℂ B] (ψ : S →+* B) (φ : S →+* ℂ),
     (∀ s, ψ s - algebraMap ℂ B (φ s) ∈ IsLocalRing.maximalIdeal B) →

@@ -6,7 +6,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass
@@ -14,8 +14,8 @@ namespace GlobalTheory.StepGlobalPf
 variable {D : D7} (i : D.nd.Loc)
 variable (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)))
   (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i)
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem main_alt_alt : GlobalTheory.Published.GlobalArtinReciprocity → _root_.GlobalTheory.Pass.GlobalStatement := by
   intro hA D i r ρ π Xs eρ eχ hr _ _ hG4 hG5 hG5x hG6 hDec _ hS hZ hπ hl hsel hsha
   obtain ⟨S, hS⟩ := hS

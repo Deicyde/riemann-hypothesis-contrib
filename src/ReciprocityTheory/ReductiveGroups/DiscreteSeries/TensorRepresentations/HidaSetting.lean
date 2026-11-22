@@ -185,8 +185,8 @@ theorem tset_kV {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H �
       simp only [Submodule.coe_smul] <;> rfl
     funext s
     show ((eeV E f' s : D) : H) = ∑ d, k s d • σ k ((eeV E f d : D) : H)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [eeV_coord, hf', map_sum, map_smul, Submodule.coe_sum, Submodule.coe_smul, hsingle]
+
+    simp only [eeV_coord, hf', map_sum, map_smul, Submodule.coe_sum, Submodule.coe_smul, hsingle]
     rw [tset_comb k hu (fun a b r => ((E a b (g r) : D) : H)) s, Finset.sum_comm]
   · have hf' : ∀ r, f' r = ∑ d, star (k r d) • g d := by
       intro r
@@ -197,9 +197,9 @@ theorem tset_kV {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H �
       simp only [Submodule.coe_smul] <;> rfl
     funext r
     show ((eeVd E f' r : D) : H) = ∑ d, star (k r d) • σ k ((eeVd E f d : D) : H)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [eeVd_coord, hf', map_sum, map_smul, map_neg, Submodule.coe_sum, Submodule.coe_smul,
-      Submodule.coe_neg, hsingle, smul_neg, Finset.sum_neg_distrib]
+
+    simp only [eeVd_coord, hf', map_sum, map_smul, map_neg, Submodule.coe_sum, Submodule.coe_smul,
+    Submodule.coe_neg, hsingle, smul_neg, Finset.sum_neg_distrib]
     rw [tset_combd k hu (fun a b s => ((E a b (g s) : D) : H)) r, Finset.sum_comm]
 
 theorem tensSub_stable {E : Fin n → Fin n → Module.End ℂ D} {V : Submodule ℂ D} (dual : Bool) (a b : Fin n) :
@@ -268,9 +268,9 @@ theorem isGKEndo_eeF {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → 
         by_cases h : r = a
         · rw [if_pos h, if_pos h, h]
         · rw [if_neg h, if_neg h, map_zero]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [e1, Finset.sum_add_distrib, Finset.sum_sub_distrib, hirr, Finset.sum_ite_eq,
-        Finset.sum_ite_eq', Finset.mem_univ, reduceIte, map_sum]
+
+      simp only [e1, Finset.sum_add_distrib, Finset.sum_sub_distrib, hirr, Finset.sum_ite_eq,
+      Finset.sum_ite_eq', Finset.mem_univ, reduceIte, map_sum]
       abel
     · show eeVd E (tensVd E a b f) c = tensVd E a b (eeVd E f) c
       simp only [hEd, hTd]
@@ -282,9 +282,9 @@ theorem isGKEndo_eeF {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → 
         by_cases h : s = b
         · rw [if_pos h, if_pos h, h]
         · rw [if_neg h, if_neg h, map_zero]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [e2, Finset.sum_add_distrib, Finset.sum_sub_distrib, hirr, Finset.sum_ite_eq,
-        Finset.sum_ite_eq', Finset.mem_univ, reduceIte, map_sum, map_neg]
+
+      simp only [e2, Finset.sum_add_distrib, Finset.sum_sub_distrib, hirr, Finset.sum_ite_eq,
+      Finset.sum_ite_eq', Finset.mem_univ, reduceIte, map_sum, map_neg]
       by_cases hbc : b = c
       · rw [if_pos hbc, if_pos hbc.symm]; abel
       · rw [if_neg hbc, if_neg (Ne.symm hbc)]; abel

@@ -76,7 +76,7 @@ private theorem epsEq {l : ℕ} [Fact l.Prime] (F : GFrame l) (c₀ c : Coef l) 
   ext
   simp [GFrame.eps, pushCh]
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Th.Nm.mkPt :
     ∀ {l : ℕ} [Fact l.Prime] {n : ℕ} (F : GFrame l) (c₀ c : Coef l) (ρ : F.G₀ →* GL (Fin n) (Qbar l)) (P : GL (Fin n) (Qbar l)) (ψ : ∀ v, Fin n → F.Gv v →* (Qbar l)ˣ) (z : F.G₀ → Matrix (Fin n) (Fin n) (Qbar l)) (w : F.Vl → GL (Fin n) (Qbar l)) (Y : F.Vl → Matrix (Fin n) (Fin n) (Qbar l)), Continuous ρ → Submodule.span (Qbar l) (Set.range (mat ρ)) = ⊤ → F.IsForm c₀.O n ρ P → ((P : Matrix (Fin n) (Fin n) (Qbar l))ᵀ = P ∨ (P : Matrix (Fin n) (Fin n) (Qbar l))ᵀ = -P) → (∀ u, ∀ g ∈ F.Iu u, ρ g = 1) → (∀ v, ∃ g, Function.Injective fun i => ψ v i g) → (∀ v i j, i < j → ψ v i ≠ ψ v j * (F.eps c₀.O (Qbar l)).comp (F.φ v)) → IsOrdCoc F ρ P F.Iu ψ z → (∀ v, OrdAt F ρ v (ψ v) z (w v) (Y v)) → (∀ g, InO c (mat ρ g)) → InO c (P : Matrix (Fin n) (Fin n) (Qbar l)) → InO c ((P⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) → (∀ v, InO c (w v : Matrix (Fin n) (Fin n) (Qbar l)) ∧ InO c (((w v)⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) ∧ InO c (Y v)) → (∀ g, InO c (z g)) → ∃ (y : Pt F c.O n) (z₀ : F.G₀ → Matrix (Fin n) (Fin n) c.O), IsModel y ρ P ψ ∧ (∀ g, (z₀ g).map (algebraMap c.O (Qbar l)) = z g) ∧ OCoc y z₀ := by
   intro l _ n F c₀ c ρ P ψ z w Y hρc hspan hform hsgn hine hreg hN1 hz hord hρO hPO hPiO hwO hzO

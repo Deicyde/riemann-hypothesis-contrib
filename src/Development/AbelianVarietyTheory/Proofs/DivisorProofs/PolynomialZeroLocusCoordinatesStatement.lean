@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TC
 
 open GlobalTheory.LKTrip
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_polynomialLocus_similitudeCentralizerTorus : ∀ (D : Type) [Ring D] [Algebra ℚ D] [FiniteDimensional ℚ D] (σ : D →+* Dᵐᵒᵖ) (β y : D),
   ∃ (N : ℕ) (S : Set (MvPolynomial (Fin N × Fin N) ℚ)) (hS : HeckeCharacterZeroLocus.IsGroupLocus S)
     (φ : ∀ (R : Type) [CommRing R] [Algebra ℚ R], HeckeCharacterZeroLocus.locusSubgroup S hS R →* (R ⊗[ℚ] D)ˣ × Rˣ),

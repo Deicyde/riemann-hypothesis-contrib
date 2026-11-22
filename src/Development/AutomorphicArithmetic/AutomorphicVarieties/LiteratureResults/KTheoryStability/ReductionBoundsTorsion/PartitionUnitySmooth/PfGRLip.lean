@@ -361,7 +361,7 @@ private theorem pf_GRLip_lemma_7 (μ : HS L N → ℝ) (g : HS L N) (z : VR L N)
   refine Finset.sum_congr rfl (fun j _ => ?_)
   exact pf_GRLip_lemma_5 _ _ z
 
-set_option maxHeartbeats 1000000 in
+
 theorem pf_GRLip : GRLip := by
   intro hB hR hT
   unfold Basic at hB

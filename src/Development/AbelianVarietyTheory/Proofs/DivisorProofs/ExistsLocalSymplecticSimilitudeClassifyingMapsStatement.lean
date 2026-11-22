@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsGalois
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_local_symplecticSimilitude_classifyingMaps : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N h M : ℕ),
   3 ≤ N → N.Coprime p → 3 ≤ M → Odd M → M.Coprime p →
   ∀ (X : Scheme.{0}) (s : X ⟶ Sp R) (s₁ : X ⟶ Sp (cycAway M)) (u : Obj b N s)

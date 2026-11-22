@@ -39,8 +39,8 @@ theorem sig_sig (h : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
 
 theorem form_swap (hσ : ∀ x, σ (σ x) = x) {J : Matrix (Fin n) (Fin n) E} (ε : E) (h : ∀ i j, σ (J j i) = ε * J i j) (x y : Fin n → E) :
     σ (form σ J x y) = ε * form σ J y x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [form, dotProduct, mulVec, map_sum, map_mul, hσ, h, Finset.mul_sum]
+
+  simp only [form, dotProduct, mulVec, map_sum, map_mul, hσ, h, Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
@@ -54,9 +54,9 @@ theorem hTens_vec (a c : AE F E) (x p : Fin n → E) (y q : Fin d → E) :
     hTens (cA σ) (incM F X.J) (incM F W.J) (a • incM F (vecMulVec x y)) (c • incM F (vecMulVec p q)) =
       a * cA σ c * inclR (F := F) (AF F) (form σ X.J x p * form σ W.J y q) := by
   have hc : ∀ z : E, cA σ (inclR (F := F) (AF F) z) = inclR (F := F) (AF F) (σ z) := fun z => rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hTens, form, dotProduct, mulVec, incM, Matrix.smul_apply, map_apply, vecMulVec_apply, smul_eq_mul, map_mul, hc, map_sum,
-    Finset.mul_sum, Finset.sum_mul]
+
+  simp only [hTens, form, dotProduct, mulVec, incM, Matrix.smul_apply, map_apply, vecMulVec_apply, smul_eq_mul, map_mul, hc, map_sum,
+  Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Finset.sum_congr rfl fun i _ => Finset.sum_comm, Finset.sum_comm]
@@ -144,7 +144,7 @@ open Filter Topology NumberField IsDedekindDomain Matrix GlobalTheory.WeilM Glob
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField Classical.propDecidable
 
-set_option maxHeartbeats 400000 in
+
 theorem soEv_of (hL : LinEx) (hLow : Low) : SoEv := by
   intro F E _ _ _ _ _ σ B n d n₁ d₁ X W X₁ W₁ H H' j₀ j₁ i₀ i₁ r s r' s' M M₀ hH hH' hB hX hW hM hM₀ e he Ψ hΨ
   refine ⟨ev_zero hL hB hX hW hM _ e (x_ne hH) (fun z => he.inv _ (Or.inl ⟨z, rfl⟩)) Ψ hΨ, fun a => ?_⟩

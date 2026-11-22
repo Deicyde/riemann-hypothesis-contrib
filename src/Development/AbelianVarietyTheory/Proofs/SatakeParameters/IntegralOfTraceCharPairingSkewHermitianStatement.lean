@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Gam0
 @[expose] public section
 
 open Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.integral_of_traceCharPairing_skewHermitian : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ϖ : L) (σ : L →+* L) (q : ℕ) (δ : L) (ψ : AddChar L ℂ),
   Formalism.UG.IsUnramInv ϖ σ q → (Valued.v δ = 1 ∧ σ δ = -δ) →
   (∃ a ∈ Formalism.UG.intL L, σ a = a ∧ ψ (ϖ⁻¹ * a) ≠ 1) →

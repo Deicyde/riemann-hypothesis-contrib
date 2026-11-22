@@ -296,7 +296,7 @@ theorem inj_Tt : Function.Injective (Tt S γ w e) := by
   subst e2
   rfl
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 include hγ hd hZw hpos he in
 theorem emb_Tt : MeasurableEmbedding (Tt S γ w e) := set_option maxHeartbeats 800000 in by
   have hm : Measurable (Tt S γ w e) := by

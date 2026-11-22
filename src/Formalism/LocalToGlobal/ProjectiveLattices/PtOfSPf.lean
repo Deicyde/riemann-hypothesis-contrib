@@ -9,7 +9,7 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.PtOfSPfBC
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -143,12 +143,12 @@ theorem pos_sec_eval :
   have e : rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0) =
       ∑ k, (@algebraMap (Op X la N) (Kp X la N) _ _ _ (Tv X la N (0, k))) • rzMap X la N Ω gF (emb X la N (X.inc wL (w k))) := by
     unfold Formalism.MainNotions.Gaps.EtaleWeightGaps.sec
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul]
   refine (congrArg (fun v => χ (algebraMap (RZ X la N Ω) (RZs X la N Ω gF w) v)) e).trans ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum]
+
+  simp only [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Algebra.smul_def, map_mul, map_mul, ← IsScalarTower.algebraMap_apply, AlgHom.commutes,
     CurveLoc.alg_rzMap_emb]
@@ -204,7 +204,7 @@ def PtOfSBody (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.
             evR (T.Q.Xo j) T.Q.c ((G.w k' : T.R j)) y) ^ k
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem ptOfS_all [Finite (Comp (T.Q.Xo j) T.Q.c)] (hS : ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeAnySt)
     (hTw : ReciprocityTheory.ChartRestriction.G.Out.SecTwistSt) (hFT : GenFromTest (T.Q.Xo j) T.Q.c hG) (hV : GenValInjSt h j hG)
     {ka wL wF : WeightFamilies.Wt D j} (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (hB : BIRSt h j hj hG G)

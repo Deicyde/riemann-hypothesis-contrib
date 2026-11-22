@@ -15,8 +15,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open Formalism.IndefR.Links
 open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx)
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SpecFac
 
@@ -82,8 +82,8 @@ theorem series_sum {B : Base S T} (hB : B.Good) (ω : PairRep S T) {ι : Type} (
     (f : ι → WO S T → ℂ) (hf : ∀ a ∈ s, IsThetaFunO B.F.ψ S T (f a)) (h : GA D S) (P : PolF D T.rank S.rank) (g : GA D T) :
     series B.F ω (∑ a ∈ s, c a • f a) h P g = ∑ a ∈ s, c a * series B.F ω (f a) h P g := by
   simp only [series_apply, Frame.fock]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [pureTensorO_sum hB.frame.vac.1 hB.frame.vac.2.inf _ _ _ _ s c f hf P, map_sum, Finset.sum_apply]
+
+  rw [pureTensorO_sum hB.frame.vac.1 hB.frame.vac.2.inf _ _ _ _ s c f hf P, map_sum, Finset.sum_apply]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [map_smul, Pi.smul_apply, smul_eq_mul]
 
@@ -110,8 +110,8 @@ theorem coef_prod (ρ : Setup X) (Y : NExp D.R D.host D.what₂ D.LL0 N X) (i : 
       ∏ PP, ρ.eOk i b k (χ (Multiplicative.ofAdd (spread Y i Q M (ρ.ch i) (Pi.single PP (a PP)))) : X.Ok i k) := by
   have e : a = ∑ PP, Pi.single PP (a PP) := (Finset.univ_sum_single a).symm
   conv_lhs => rw [e]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ofAdd_sum, map_prod, Units.coe_prod, map_prod]
+
+  rw [map_sum, ofAdd_sum, map_prod, Units.coe_prod, map_prod]
 
 
 open Classical in
@@ -137,8 +137,8 @@ theorem vecAt_specLoc (ρ : Setup X) (Y : NExp D.R D.host D.what₂ D.LL0 N X) (
         (ρ.B i j b).vecFam (half (ρ.ch i) (admissibleConjugatePairPlaces X i Q M)) (Base.univFam (univOf Y i (admissibleConjugatePairPlaces X i Q M) M ρ.rc) (ρ.β j)) a := by
   rw [Base.vecAt, locFn_specLoc]
   change (ρ.B i j b).F.vecL (ρ.B i j b).G _ _ = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [map_smul]
   rfl

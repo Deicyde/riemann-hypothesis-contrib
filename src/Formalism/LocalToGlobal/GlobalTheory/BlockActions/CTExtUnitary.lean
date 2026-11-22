@@ -60,8 +60,8 @@ theorem latS_mulVec (R : Type) [CommRing R] [Algebra F R] (S : Subring (E ⊗[F]
     apply Submodule.subset_span
     refine ⟨M *ᵥ x0, hM x0 hx0, ?_⟩
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply]
+
+    simp only [mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply]
   | zero => rw [mulVec_zero]; exact zero_mem _
   | add x y _ _ hx hy => rw [mulVec_add]; exact add_mem hx hy
   | smul a x _ hx =>
@@ -124,7 +124,7 @@ theorem isExt_prV {z0 : Fin (D.R.N D.R.m) → D.host.E} (v : HeightOneSpectrum (
     exact (RingHom.map_mulVec _ _ _ _).symm.trans this
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem lev_lat (Tf : FormsTiedSym D u Ch chOf)
     (k : Matrix (Fin (D.R.N D.R.m - 1)) (Fin (D.R.N D.R.m - 1)) (D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F))
     (G : GL (Fin (D.R.N D.R.m)) (D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F))

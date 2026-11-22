@@ -26,8 +26,8 @@ private theorem tower_minimal_presentation (Λ : Type) [CommRing Λ] [IsLocalRin
   · intro x hx i
     have h1 : ∑ j, algebraMap Λ k (x j) • b j = 0 := by
       have h2 := congrArg (TensorProduct.mk Λ k A 1) hx
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Fintype.linearCombination_apply, map_sum, map_zero] at h2
+
+      rw [Fintype.linearCombination_apply, map_sum, map_zero] at h2
       rw [← h2]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_smul, hv, algebraMap_smul]

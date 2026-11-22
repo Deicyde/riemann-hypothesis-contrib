@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FullRk
 @[expose] public section
 
 open scoped Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.full_rank_coinvariant_induced_iso : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
     (n d : ℕ) (ν : kˣ →* ℂˣ), n ≤ d → GlobalTheory.SmGL.IsSmoothChar ν →
     ∃ Z : (Matrix (Fin n) (Fin d) k → ℂ) →ₗ[ℂ] (GL (Fin d) k → ℂ),

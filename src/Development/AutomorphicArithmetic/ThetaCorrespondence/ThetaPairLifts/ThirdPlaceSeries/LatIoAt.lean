@@ -9,7 +9,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option autoImplicit false
@@ -20,8 +20,8 @@ open Formalism.IndefR.FWT Formalism.IndefR.Datum GlobalTheory.BigTop GlobalTheor
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries GlobalTheory.ConjTwist GlobalTheory.FlatVecSum GlobalTheory.BigOn.Exp.SerBase
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.BigOn.Exp.SerBase
 section BaseChange

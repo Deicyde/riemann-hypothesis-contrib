@@ -12,8 +12,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne
@@ -22,7 +22,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 open UpperTheory.V.Z UpperTheory.V.Z.Ord UpperTheory.Gal.projectedFormsSystemPart UpperTheory.GalN.V
 namespace UpperTheory.Gal.projectedFormsSystemPart
 section

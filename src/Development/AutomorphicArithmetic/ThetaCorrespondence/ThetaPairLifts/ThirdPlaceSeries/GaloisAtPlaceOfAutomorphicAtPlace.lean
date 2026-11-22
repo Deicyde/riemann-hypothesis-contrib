@@ -27,7 +27,7 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section
@@ -136,7 +136,7 @@ open Formalism.CohomologicalDescent.LogSmallConstantBounds Formalism.Cohomologic
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
   {Y : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ} (p : PtAt ex Csz)
-set_option maxHeartbeats 1600000 in
+
 theorem galois_at_place_of_automorphic_at_place_alt (p1 : GlobalTheory.Published.ClozelCohomological)
     (p3 : GlobalTheory.Published.HeckeLAdicCharacter) (p4 : GlobalTheory.Published.ChebotarevDegreeOne)
     (p6 : _root_.UpperTheory.GalS.CuspUAlt) (p7 : _root_.GlobalTheory.Published.BaseChangeDefiniteUnitaryGroup)
@@ -184,7 +184,7 @@ end
 end
 section
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.ExpTie GlobalTheory.ExpFrame Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.LogSmallConstantBounds Formalism.CohomologicalDescent.ShortWeightBounds Formalism.CohomologicalDescent.LD Formalism.RankGapBounds.FormsTensorLocalization
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.galois_frame_compatibility_alt : GlobalTheory.Published.ClozelCohomological → GlobalTheory.Published.HeckeLAdicCharacter → GlobalTheory.Published.ChebotarevDegreeOne → _root_.UpperTheory.GalS.CuspUAlt → _root_.GlobalTheory.Published.BaseChangeDefiniteUnitaryGroup → GlobalTheory.Published.BhattScholzeCrystallineLattices → GlobalTheory.Published.HeckeLAdicCharacterAbove → _root_.UpperTheory.Zero.LLC.RecTExists → _root_.GlobalTheory.ExpTie.SmallnessCondition → _root_.GlobalTheory.ExpTie.GaloisStatement := by
   first | exact @_root_.GlobalTheory.FrameGal.galois_steinberg_local_alt | exact _root_.GlobalTheory.FrameGal.galois_steinberg_local_alt | (intros; apply _root_.GlobalTheory.FrameGal.galois_steinberg_local_alt <;> assumption)
 end

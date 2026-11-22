@@ -80,8 +80,8 @@ theorem homogeneousComponent_aeval_mul {K σ : Type} [Field K] {m e : ℕ} (he :
         hr (Nat.eq_of_mul_eq_mul_left he (Nat.add_right_cancel h'))
       rw [if_neg hne.symm, if_neg hr]
   conv_lhs => rw [← sum_homogeneousComponent C]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_mul, map_sum]
+
+  rw [map_sum, Finset.sum_mul, map_sum]
   simp_rw [key]
   rw [Finset.sum_ite_eq']
   split_ifs with hmem
@@ -103,8 +103,8 @@ theorem exists_hom_relation {K σ : Type} [Field K] {m : ℕ} (I : Ideal (MvPoly
   refine ⟨s, fun l => homogeneousComponent ((s - l) * w) (C l), hs,
     fun l => homogeneousComponent_isHomogeneous _ _, ?_⟩
   have hcomp := hI _ hmem (e * w * s)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum] at hcomp
+
+  rw [map_add (f := _), map_sum] at hcomp
   convert hcomp using 2
   · have h := ha.pow s
     rw [homogeneousComponent_of_mem ((mem_homogeneousSubmodule _ _).2 h)]

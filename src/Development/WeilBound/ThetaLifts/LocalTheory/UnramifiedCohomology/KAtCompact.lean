@@ -253,7 +253,7 @@ theorem part_comm {v : Pl F} {g : UA σ Y.J} (hg : g ∈ UAt σ Y (evFin F v)) (
     noncomm_ring)
   rw [← hc, mul_assoc, c4, hc]; group
 
-set_option maxHeartbeats 800000 in
+
 theorem kInv (hB : B.IsGood σ) (hY : Y.IsHerm σ B r s) (hH : H.IsAdapted σ B Y Y₁ i₀ i₁) {K : Subgroup (UA σ Y.J)}
     (hK : IsStab B K) (hI : Iwa H K) (v : Pl F) (μ : Measure (kAt K (evFin F v))) [μ.IsHaarMeasure] {f : UA σ Y.J → ℂ}
     (hf : ContinuousOn f (UAt σ Y (evFin F v)))
@@ -267,9 +267,9 @@ theorem kInv (hB : B.IsGood σ) (hY : Y.IsHerm σ B r s) (hH : H.IsAdapted σ B 
   have hd₁ : IsUnit Y₁.J.det := hfr.isUnit_det hd.isUnit
   have h₁ : ∀ i j, σ (Y₁.J j i) = (((1 : ℤˣ) : ℤ) : E) * Y₁.J i j := fun i j => by
     rw [← hH.gram]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, hY.herm,
-      PositivityTheory.ThKG.Tow.Levi.sig_sig hB.cm, Finset.sum_mul, Units.val_one, Int.cast_one, one_mul]
+
+    simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, hY.herm,
+    PositivityTheory.ThKG.Tow.Levi.sig_sig hB.cm, Finset.sum_mul, Units.val_one, Int.cast_one, one_mul]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   obtain ⟨-, ⟨ν, -, hν, -⟩, hνr⟩ := PositivityTheory.ThKF.unimodularity_holds F E σ hB.cm n Y.J 1 (fun i j => by simp [hY.herm]) hd

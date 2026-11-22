@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FamIdeal
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.normCoefficientIdealFamily_eq_top_of_disjoint : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) [IsFinite π] [IsIntegral Y]
     (hK : IsField (Z.presheaf.stalk (GlobalTheory.NormSheafDescent.genPt π)))
     (hfd : letI := GlobalTheory.NormSheafDescent.fieldK π hK; letI := GlobalTheory.NormSheafDescent.algKL π

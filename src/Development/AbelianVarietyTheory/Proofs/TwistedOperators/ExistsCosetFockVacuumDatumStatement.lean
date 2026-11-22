@@ -25,6 +25,6 @@ open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheor
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.SepRows GlobalTheory.CoreOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_cosetFockVacuumDatum : DatumEx := by
   first | exact @GlobalTheory.CoreOnto.datumEx | exact GlobalTheory.CoreOnto.datumEx | (intros; apply GlobalTheory.CoreOnto.datumEx <;> assumption)

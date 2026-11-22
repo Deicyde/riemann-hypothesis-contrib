@@ -8,7 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -17,7 +17,7 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 namespace GlobalTheory.TypeBlockConj
 end GlobalTheory.TypeBlockConj
 namespace GlobalTheory.TypeBlockConj
-set_option maxHeartbeats 1000000 in
+
 theorem main_alt_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (S : Reading P.T), _root_.GlobalTheory.NPin.IsFaithfulReading P S → ∀ (i : D.nd.Loc) (k : Fin 2) (v : D.nd.PlG k) (s : SplitPlace D.host.E) (hw : IsSplitPl D.host s.w), s.w = GlobalTheory.DimPartsCompare.cPl (D.naut.plGw k v) → IsTame (S i s.w hw).mu → ∀ c : s.v.adicCompletion (maximalRealSubfield D.host.E) ≃+* s.w.adicCompletion D.host.E, Continuous c → (∀ x : D.host.E, c (s.i x) = algebraMap D.host.E (s.w.adicCompletion D.host.E) x) → ∀ Q, ∃ f ∈ NG.isoTyp (P.M.loc i).wt.ρ (P.H.av.S i Q), f ≠ 0 ∧ ∀ x : GAf D.host.E D.R.nV, TrivOutside {s.v} x → Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV x) ∈ blockGrp (s.w.adicCompletion D.host.E) D.R.r D.R.t → NG.rt D.host.E D.R.nV x f = blockChar (S i s.w hw).mu (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV x)) • f := by
   intro hL D P S hS i k v s hw hs hμt c hc hcs Q
   obtain ⟨hj1, hj2⟩ := D.nd.j_range i

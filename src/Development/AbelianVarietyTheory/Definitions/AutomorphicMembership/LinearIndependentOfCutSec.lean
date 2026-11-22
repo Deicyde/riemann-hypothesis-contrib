@@ -123,8 +123,8 @@ omit [NumberField F] [NumberField E] in
 variable {w c y} in
 theorem smul_mem_cutSet (hy : y ∈ cutSet Y E w c) : σ • y ∈ cutSet Y E w c := fun k hk i => by
   have := congrArg σ (hy k (below_smul σ y ▸ hk) i)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa only [map_sum, map_mul, map_coef, map_zero, valAt_smul] using this
+
+  simpa only [map_sum, map_mul, map_coef, map_zero, valAt_smul] using this
 
 end Gal
 

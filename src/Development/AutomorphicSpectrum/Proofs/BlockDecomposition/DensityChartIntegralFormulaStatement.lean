@@ -14,7 +14,7 @@ open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ
 open ReciprocityTheory.ChartRestriction.G.Geo (mcPts IsMultiHomog SameOrbit segre fibre IsGoodProj IsSheet HermLine IsSmoothHerm sheetDensity maDensity ptsIntegral ptsIntegralAt pot)
 open ReciprocityTheory.ChartRestriction.G.AI.I2 (IsRatSectionOn logNormRat)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.density_chart_integral_formula : ∀ {Y ι : Type} {D : ℕ} [TopologicalSpace Y] [MeasurableSpace Y] [BorelSpace Y] [Countable ι]
     (μ : ℤˣ → Measure Y) (e : ι → OpenPartialHomeomorph Y (Fin D → ℂ)) (ρ : ι → (Fin D → ℂ) → ℝ),
     (∀ l, ContinuousOn (ρ l) (e l).target) →

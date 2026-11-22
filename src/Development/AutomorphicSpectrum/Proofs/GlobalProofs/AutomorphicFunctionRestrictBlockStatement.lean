@@ -13,7 +13,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Published GlobalTheory.Published.AutFin GlobalTheory.StdPar GlobalTheory.ThK.SmoothLev GlobalTheory.CompanionTheory.Hypotheses₂.ConstFin GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart
 open GlobalTheory.UAut GlobalTheory.AdelicU GlobalTheory.SiegelSet
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.gelfand_eigenvalue_casimir_scalar : ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (hθ : IsInfFam θ) (V : HSp D) (τ : D.what₂.Tau)
     (M : Fin V.rank → Fin V.rank → Matrix (Fin V.rank) (Fin V.rank) ℂ), Formalism.REAL.GlRel M →
     Submodule.span ℂ (Set.range fun p : Fin V.rank × Fin V.rank => M p.1 p.2) = ⊤ → ∀ (c : ℕ → ℂ) (v : ℂ), ∃ s : ℂ,

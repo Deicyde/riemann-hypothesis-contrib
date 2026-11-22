@@ -16,7 +16,7 @@ set_option maxSynthPendingDepth 1
 open NumberField GlobalTheory.CuspRep GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
 open scoped NumberField.AdeleRing
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.compact_span_finite_dim_stable : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (φ : Sm E a)
     (Z : (AutomorphicForm.isExpLieAlgebra E a).lieSubalgebra),
     Matrix.conjTranspose (AutomorphicForm.mat (Z : AutomorphicForm.ArchMatrix E a)) =

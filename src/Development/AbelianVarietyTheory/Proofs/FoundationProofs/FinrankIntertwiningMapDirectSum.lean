@@ -56,16 +56,16 @@ theorem equivs_of_biproduct (ρ : ∀ i, Representation k G (V i)) (τ : Represe
     exact hsum (f u)
   · funext i
     refine DFunLike.ext _ _ fun u => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [IntertwiningMap.comp_apply, IntertwiningMap.sum_apply, map_sum]
+
+    rw [IntertwiningMap.comp_apply, IntertwiningMap.sum_apply, map_sum]
     simp only [IntertwiningMap.comp_apply]
     rw [Finset.sum_eq_single i (fun i' _ h => hoff i i' h _) (by simp)]
     exact hdiag i _
   · refine DFunLike.ext _ _ fun w => ?_
     rw [IntertwiningMap.sum_apply]
     simp only [IntertwiningMap.comp_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, hsum]
+
+    rw [← map_sum, hsum]
   · funext i
     refine DFunLike.ext _ _ fun x => ?_
     rw [IntertwiningMap.comp_apply, IntertwiningMap.sum_apply]
@@ -94,8 +94,8 @@ theorem finrank_intertwiningMap_directSum :
     (fun i => (p₀ i).comp e.symm.toIntertwiningMap) (fun i => e.toIntertwiningMap.comp (j₀ i))
     (fun w => by
       simp only [IntertwiningMap.comp_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum]
+
+      rw [← map_sum]
       have : ∀ x : ⨁ i, V i, ∑ i, j₀ i (p₀ i x) = x := fun x => DirectSum.sum_univ_of x
       rw [this, hes])
     (fun i x => by

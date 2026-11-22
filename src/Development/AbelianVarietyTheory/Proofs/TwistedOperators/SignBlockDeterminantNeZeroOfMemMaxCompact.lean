@@ -80,8 +80,8 @@ theorem exists_coefFam [Group G] [Finite σ] (ρ : G → Module.End ℂ (MvPolyn
   beta_reduce
   rw [hm]
   conv_lhs => rw [he _ (hd k φ)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, MvPolynomial.coeff_sum, MvPolynomial.coeff_smul, smul_eq_mul]
+
+  simp only [map_sum, map_smul, MvPolynomial.coeff_sum, MvPolynomial.coeff_smul, smul_eq_mul]
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
 end General

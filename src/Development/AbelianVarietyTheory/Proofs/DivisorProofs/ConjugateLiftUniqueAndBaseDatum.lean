@@ -35,7 +35,7 @@ namespace GlobalTheory.GalLift.BaseDatum
 variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
   {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (i : Fin D.R.m)
 
-set_option maxHeartbeats 2000000 in
+
 theorem isConjForms_base_five {F : Face D A} (hC : GlobalTheory.Core5 R F) {gramR c0R c0L} (hT : Comparison₂ R gramR c0R c0L) :
     IsConjForms R i (sg0 D A) (c0L i) (R.cV i) (along (realisation_embedding_eq_baseEmbedding R) (c0L i)) (R.HV i A.μ0)
       (along (realisation_embedding_eq_baseEmbedding R) (R.jV i A.μ0)) := by
@@ -53,7 +53,7 @@ theorem isConjForms_base_five {F : Face D A} (hC : GlobalTheory.Core5 R F) {gram
       (RingHom.congr_fun (realisation_embedding_eq_baseEmbedding R) _)
   · exact (ext_val (R.B.L i A.μ0).pres (c0L i) e he hact hχ _ h).imp fun v hv =>
       ⟨(congrFun (hC.models.jV i A.μ0 x) h).trans hv, (congrFun (hC.models.jV i A.μ0 x) h).trans hv⟩
-set_option maxHeartbeats 2000000 in
+
 theorem isConjLift_base_five {F : Face D A} (hC : GlobalTheory.Core5 R F) :
     IsConjLift R i (sg0 D A) (R.mu0 ((i : ℕ) + 1)) R.eta (R.cV i) (R.HV i A.μ0) (R.thG i A.μ0) := by
   have h1 := hC.thP.thF i A.μ0
@@ -160,7 +160,7 @@ end GlobalTheory.GalLift.BaseId
 namespace GlobalTheory.ConjLiftUnique
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem lift_unique_five : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A), GlobalTheory.Core5 R F → ∀ (i : Fin D.R.m), ∀ gramR c0R c0L, Comparison₂ R gramR c0R c0L → ∀ (σ : D.what₂.LL →+* ℂ), OverK σ → ∀ (μ' η' : (AE D)ˣ →* Circle) (c : CoefA (Vc D i)) (c₁ : VsV D i D.what₂.LL →ₛₗ[σ] c.W) (H : HMod (Bridge.Gf (Vc D i) → c.W)) (j : A.fam.amb.FL i A.μ0 →ₛₗ[σ] H.H) (c' : CoefA (Vc D i)) (c₁' : VsV D i D.what₂.LL →ₛₗ[σ] c'.W) (H' : HMod (Bridge.Gf (Vc D i) → c'.W)) (j' : A.fam.amb.FL i A.μ0 →ₛₗ[σ] H'.H), IsConjForms R i σ (c0L i) c c₁ H j → IsConjForms R i σ (c0L i) c' c₁' H' j' → ∀ (ω : GA D (Vc D i) × GA D (Wc D i) →* Module.End ℂ (WO (Vc D i) (Wc D i) → ℂ)) (f₀ f : WO (Vc D i) (Wc D i) → ℂ) (B : D.what₂.Tau → Matrix (Fin (Wc D i).rank) (Fin (Wc D i).rank) ℂ) (io : LowT (R.MW i σ) →ₗ[ℂ] c.W →ₗ[ℂ] PolF D (Wc D i).rank (Vc D i).rank) (thP : LinearMap.range (c.ext ∘ₗ H.e) →ₗ[ℂ] (LowT (R.MW i σ) →ₗ[ℂ] (GA D (Wc D i) → ℂ))) (ω' : GA D (Vc D i) × GA D (Wc D i) →* Module.End ℂ (WO (Vc D i) (Wc D i) → ℂ)) (f₀' f' : WO (Vc D i) (Wc D i) → ℂ) (B' : D.what₂.Tau → Matrix (Fin (Wc D i).rank) (Fin (Wc D i).rank) ℂ) (io' : LowT (R.MW i σ) →ₗ[ℂ] c'.W →ₗ[ℂ] PolF D (Wc D i).rank (Vc D i).rank) (thP' : LinearMap.range (c'.ext ∘ₗ H'.e) →ₗ[ℂ] (LowT (R.MW i σ) →ₗ[ℂ] (GA D (Wc D i) → ℂ))), LiftData R i σ μ' η' c H ω f₀ f B io thP → LiftData R i σ μ' η' c' H' ω' f₀' f' B' io' thP' → ∃ κ : ℂ, ‖κ‖ = 1 ∧ ∀ x v, thP' ((c'.ext ∘ₗ H'.e).rangeRestrict (j' x)) v = κ • thP ((c.ext ∘ₗ H.e).rangeRestrict (j x)) v := by
   intro D G _ _ Pl0 T0 A Ks _ _ _ R F hC i gramR c0R c0L hT σ hσ μ' η' c c₁ H j c' c₁' H' j' hj hj' ω f₀ f B io thP ω' f₀' f'
     B' io' thP' hL hL'

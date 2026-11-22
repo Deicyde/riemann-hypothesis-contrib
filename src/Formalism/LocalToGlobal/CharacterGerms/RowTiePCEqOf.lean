@@ -53,8 +53,8 @@ theorem intS_upG {V : VF C} (g : Fin 2) {F : MvPowerSeries (I g) C} (hF : IntS V
 
 theorem lin_const {κ : Type} (X : RawChart C d I κ) (g : Fin 2) (j : κ) :
     MvPowerSeries.constantCoeff (∑ c : I g, X.u g c j • (MvPowerSeries.X c : MvPowerSeries (I g) C)) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_eq_zero fun c _ => ?_
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_smul,
     MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.constantCoeff_X, mul_zero]
@@ -66,8 +66,8 @@ theorem expPt_eq {κ : Type} [Fintype κ] (X : RawChart C d I κ) (g : Fin 2) (i
   unfold RawChart.expPt
   congr 1
   funext j
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [upG_eq, map_sum]
+
+  rw [upG_eq, map_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [map_smul, ← upG_eq, upG_X]
 

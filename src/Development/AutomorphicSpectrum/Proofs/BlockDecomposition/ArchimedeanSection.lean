@@ -266,8 +266,8 @@ theorem exists_section_matrix {B X : Type} [CommRing B] [TopologicalSpace B] [Is
     c ((Matrix.isUnit_iff_isUnit_det _).2 hc)
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 set_option synthInstance.maxSize 2000 in
 theorem secInf : PositivityTheory.PfSWUS.SchInf.SecInf := by
   intro F E _ _ _ _ _ σ hσ n c hc

@@ -20,8 +20,8 @@ open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 open GlobalTheory.NormSum (Pair Tup)
 open Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 800000
+
+
 noncomputable section
 namespace GlobalTheory.BotBigLevel
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter GlobalTheory.RowVacScalar Formalism.L2.DIV GlobalTheory.BotFinLevel
@@ -52,7 +52,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 open GlobalTheory.NormSum (Pair Tup)
 open Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.bottom_large_level_kernel : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching →
     (∀ D, GlobalTheory.NormSum.Inp D) → GlobalTheory.SqTop.BotSmall →
     GlobalTheory.SqTop.GBig fun {D} T _ _ G _ _ _ _ => ∀ (W : G.Weil), IsStdChar D W.ψ (-1) → ∀ (i j : Fin D.R.m) (A A' WW : HSp D)

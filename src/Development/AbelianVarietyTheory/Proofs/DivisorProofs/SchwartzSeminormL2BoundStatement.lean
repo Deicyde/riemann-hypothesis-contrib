@@ -5,7 +5,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchwartzSemi
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.schwartz_seminorm_l2_bound : ∀ {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
     (μ : MeasureTheory.Measure E) [μ.IsAddHaarMeasure] (k n : ℕ), ∃ (N : ℕ) (C : ℝ), 0 ≤ C ∧
       ∀ (f : SchwartzMap E ℂ) (x : E), ‖x‖ ^ k * ‖iteratedFDeriv ℝ n f x‖ ≤

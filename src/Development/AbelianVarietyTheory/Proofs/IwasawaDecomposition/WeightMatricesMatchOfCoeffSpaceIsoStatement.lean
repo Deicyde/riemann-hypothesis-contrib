@@ -14,14 +14,14 @@ open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 open GlobalTheory.LevCmp
 open GlobalTheory.TwistChoice (Reading ReadsAt)
 
 open Formalism.L2.DIV GlobalTheory.CoefModel
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.weightMatrices_match_of_coeffSpace_iso :
     ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
     {ι : Type} [Fintype ι] {K : Type} [Field K] (φ : K →+* ℂ) (emb : ι → L →+* K)

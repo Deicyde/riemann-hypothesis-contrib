@@ -19,7 +19,7 @@ private theorem fa (a : ℕ) (ρ : Representation ↥LL.1 ↥(GK K) (Fin a → �
   rw [GlobalTheory.Pst.LetterDim.finrank_wdSpace l P ι K LL _ ρ hr]
   simp
 
-set_option maxHeartbeats 1600000 in
+
 private theorem ringS' (hRing : RingS) (LL : FinExt l) :
     ∃ (S : Type) (_ : CommRing S) (_ : Algebra ℂ S) (π : ↥LL.1 ⊗[ℚ_[l]] Bst P →+* S), Nontrivial S ∧
       (∀ x : ↥LL.1, π (x ⊗ₜ[ℚ_[l]] (1 : Bst P)) = algebraMap ℂ S (ι (x : Om l))) ∧
@@ -35,7 +35,7 @@ private theorem ringS' (hRing : RingS) (LL : FinExt l) :
   exact hRing ℚ_[l] ↥LL.1 ↥(MaximalUnramifiedExtension l) (Bst P) ℂ
     (ι.toRingHom.comp (algebraMap ↥LL.1 (Om l))) (urC ι) hz
 
-set_option maxHeartbeats 1600000 in
+
 private theorem core (hCo : CoFacts) (hCore : DetCore) (a : ℕ)
     (ρ : Representation ↥LL.1 ↥(GK K) (Fin a → ↥LL.1)) (ρ' : Representation ↥LL.1 ↥(GK K) (Fin 1 → ↥LL.1))
     [FiniteDimensional ↥(MaximalUnramifiedExtension l) (DpstUr P ρ)] [FiniteDimensional ↥(MaximalUnramifiedExtension l) (DpstUr P ρ')]
@@ -82,7 +82,7 @@ private theorem core (hCo : CoFacts) (hCore : DetCore) (a : ℕ)
     simp [Matrix.mulVec, dotProduct, Fin.sum_univ_one]
 end
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.Gal.crystallineComparison.detOne_of :
     CoFacts → RingS → DetCore → DetMem → WeilCo → SpanS → CoLift → DetE := by
   intro hCo hRing hCore hMem hWeil hSpan hLift l _ P AI hAI ι E Ω _ _ _ _ _ A w h O _ _ _ Bw hj a LL r c

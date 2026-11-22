@@ -81,8 +81,8 @@ theorem blockVandermonde_ne_zero (f N : ℕ) : blockVandermonde f N ≠ 0 := by
 
 theorem blockPermute_antisymmetrize (f N : ℕ) (v : Fin f → Equiv.Perm (Fin N)) (H : RootRing f N) :
     blockPermute f N v (antisymmetrize f N H) = blockSign f N v • antisymmetrize f N H := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [antisymmetrize, map_sum, map_smul, blockPermute_blockPermute, Finset.smul_sum, smul_smul]
+
+  simp only [antisymmetrize, map_sum, map_smul, blockPermute_blockPermute, Finset.smul_sum, smul_smul]
   refine Fintype.sum_equiv (Equiv.mulLeft v) _ _ (fun w => ?_)
   simp only [Equiv.coe_mulLeft]
   congr 1

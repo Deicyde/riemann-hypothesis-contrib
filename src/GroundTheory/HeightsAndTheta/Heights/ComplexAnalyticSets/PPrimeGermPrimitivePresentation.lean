@@ -121,8 +121,8 @@ theorem toGerm_mem_iff {w : σ → ℂ} {k : ℕ} {p : Fin k → (σ → ℂ) �
     exact ⟨h, hh, Germ.coe_eq.1 e⟩
   · rintro ⟨h, hh, hev⟩
     have hsum : toGerm w u = ∑ i, toGerm w (mkA (h i) (hh i)) * toGerm w (mkA (p i) (hp i)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← map_mul, ← map_sum]
+
+      simp only [← map_mul, ← map_sum]
       apply Subtype.ext
       change ((u.1 : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) =
         (((∑ i, mkA (h i) (hh i) * mkA (p i) (hp i) : anFun w) : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ)
@@ -132,7 +132,7 @@ theorem toGerm_mem_iff {w : σ → ℂ} {k : ℕ} {p : Fin k → (σ → ℂ) �
     refine Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨i, rfl⟩)
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem proof (hFP : PrimeGermFiniteProjection.Statement) (hIC : HolGermsIntegrallyClosed.Statement)
     (hCE : CentredIntegralEquation.Statement) : PrimeGermPrimitivePresentation.Statement := by
   classical
@@ -197,8 +197,8 @@ theorem proof (hFP : PrimeGermFiniteProjection.Statement) (hIC : HolGermsIntegra
       refine Finset.sum_congr rfl fun m hm => ?_
       simp [a', hm, compA, mkA, crd]
     have h0 := (hcl0 _).2 (by rw [hU]; exact hc)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, sub_eq_zero, map_sum] at h0
+
+    rw [map_sub, sub_eq_zero, map_sum] at h0
     show cl u ∈ _
     rw [h0]
     refine Subalgebra.sum_mem _ fun m _ => ?_
@@ -218,8 +218,8 @@ theorem proof (hFP : PrimeGermFiniteProjection.Statement) (hIC : HolGermsIntegra
       funext z
       simp [compA, mkA, crd, Finset.sum_apply]
     have h0 := (hcl0 _).2 (by rw [hV]; exact hc)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_pow, map_sum] at h0
+
+    rw [map_add (f := _), map_pow, map_sum] at h0
     simp only [map_mul, map_pow, hcompA] at h0
     rw [eval₂_add, eval₂_X_pow, eval₂_finsetSum]
     simpa [eval₂_mul, eval₂_C, eval₂_X_pow] using h0
@@ -239,16 +239,16 @@ theorem proof (hFP : PrimeGermFiniteProjection.Statement) (hIC : HolGermsIntegra
       apply Subtype.ext
       funext z
       simp [lA, mkA, ℓ, compA, cst, crd, Finset.sum_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [this, map_sum]
+
+    rw [this, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, hcompA]
     rfl
   have haev : ∀ (q : R[X]) (K : ℕ), q.natDegree < K →
       aeval ℓB q = cl (∑ j : Fin K, compA A w (rep (q.coeff j)) * lA ^ (j : ℕ)) := by
     intro q K hq
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [aeval_eq_sum_range' hq, ← Fin.sum_univ_eq_sum_range (fun i => q.coeff i • ℓB ^ i) K, map_sum]
+
+    rw [aeval_eq_sum_range' hq, ← Fin.sum_univ_eq_sum_range (fun i => q.coeff i • ℓB ^ i) K, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, map_pow, hlA, hcomp, Algebra.smul_def]
   set N := m.natDegree with hN
@@ -266,9 +266,9 @@ theorem proof (hFP : PrimeGermFiniteProjection.Statement) (hIC : HolGermsIntegra
       simp [lA, mkA, compA, cf, Finset.sum_apply]
     have hcm : cl (lA ^ N + ∑ j : Fin N, compA A w (rep (m.coeff j)) * lA ^ (j : ℕ)) = aeval ℓB m := by
       conv_rhs => rw [hmon.as_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), map_pow, hlA, map_sum, map_add (f := _), map_pow, aeval_X, map_sum,
-        ← Fin.sum_univ_eq_sum_range (fun i => aeval ℓB (C (m.coeff i) * X ^ i)) N]
+
+      rw [map_add (f := _), map_pow, hlA, map_sum, map_add (f := _), map_pow, aeval_X, map_sum,
+      ← Fin.sum_univ_eq_sum_range (fun i => aeval ℓB (C (m.coeff i) * X ^ i)) N]
       congr 1
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_mul, map_pow, hlA, hcomp, map_mul, aeval_C, map_pow, aeval_X]
@@ -284,8 +284,8 @@ theorem proof (hFP : PrimeGermFiniteProjection.Statement) (hIC : HolGermsIntegra
         funext z
         simp [lA, mkA, compA, Finset.sum_apply]
       have h := (hcl0 _).2 (by rw [hU]; exact hc')
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← h, map_sum, map_sum]
+
+      rw [← h, map_sum, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_mul, map_pow, aeval_C, aeval_X, map_mul, map_pow, hlA, hcompA]
     have hq0 : q = 0 := by
@@ -320,9 +320,9 @@ theorem proof (hFP : PrimeGermFiniteProjection.Statement) (hIC : HolGermsIntegra
     let Fm : ((Fin d → ℂ) → ℂ)[X] := X ^ N + ∑ j : Fin N, C (cf j) * X ^ (j : ℕ)
     have hFm : Fm.map G = m.map ιR := by
       conv_rhs => rw [hmon.as_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Fm, Polynomial.map_add (f := _), Polynomial.map_pow, map_X, Polynomial.map_sum, Polynomial.map_mul,
-        map_C, cf, hGrep]
+
+      simp only [Fm, Polynomial.map_add (f := _), Polynomial.map_pow, map_X, Polynomial.map_sum, Polynomial.map_mul,
+      map_C, cf, hGrep]
       rw [← Fin.sum_univ_eq_sum_range (fun i => C (ιR (m.coeff i)) * X ^ i) N]
     let E : ((Fin d → ℂ) → ℂ)[X] := lift a * Fm + lift b * derivative Fm - C δ
     have hE : E.map G = 0 := by
@@ -345,8 +345,8 @@ theorem proof (hFP : PrimeGermFiniteProjection.Statement) (hIC : HolGermsIntegra
       · rw [hi, map_zero]
       · exact hy i (mem_support_iff.2 hi)
     have hFy : Fm.map ev = monicOfCoeffs fun j => cf j y := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [Fm, monicOfCoeffs, Polynomial.map_sum, ev]
+
+      simp [Fm, monicOfCoeffs, Polynomial.map_sum, ev]
     rw [separable_def, ← hFy]
     simp only [E, Polynomial.map_sub, Polynomial.map_add (f := _), Polynomial.map_mul, map_C, ← derivative_map,
       sub_eq_zero] at hE0

@@ -35,8 +35,8 @@ theorem exists_dual_sum_smul_eq {V ι : Type} [AddCommGroup V] [Module ℚ V] [F
     rw [hbot] at this
     simpa using this
   have h1 : ∑ J, φ (n J) * φ (n J) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [T, map_sum] using h0
+
+    simpa [T, map_sum] using h0
   have h2 := (Finset.sum_eq_zero_iff_of_nonneg (fun J _ => mul_self_nonneg (φ (n J)))).1 h1 J₀ (Finset.mem_univ _)
   exact hφ (mul_self_eq_zero.1 h2)
 
@@ -87,12 +87,12 @@ theorem exists_dual_DeX_eq_minY : ∀ (D : D7) (k : Type) [Field k] [CharZero k]
     congr 2
     exact RingHom.ext_int _ _
   refine ⟨ph, fun y => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [GL3Columns.wwCB_holds D k N nu y, finsum_eq_sum_of_fintype, map_sum]
+
+  rw [GL3Columns.wwCB_holds D k N nu y, finsum_eq_sum_of_fintype, map_sum]
   have h := congrArg (fun F => MvPolynomial.eval (fun v : (Bool × Formalism.MainNotions.G.HH D) × ℕ × Fin N => y v.1 v.2.2 v.2.1)
     (MvPolynomial.map (algebraMap ℚ k) F)) hψ
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum] at h
+
+  simp only [map_sum] at h
   rw [hm, eval_nablaX_eq_minY] at h
   rw [← h]
   refine Finset.sum_congr rfl fun J _ => ?_

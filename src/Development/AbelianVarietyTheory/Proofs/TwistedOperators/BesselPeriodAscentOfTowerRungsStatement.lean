@@ -12,6 +12,6 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Un
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Asc
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.besselPeriod_ascent_of_tower_rungs : TowerEx → Rung0 → RungB → RungJ → Ascent := by
   first | exact @GlobalTheory.Asc.ascent_of_rungs | exact GlobalTheory.Asc.ascent_of_rungs | (intros; apply GlobalTheory.Asc.ascent_of_rungs <;> assumption)

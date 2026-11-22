@@ -93,8 +93,8 @@ theorem exists_pr (f : Matrix κ ι ℚ →ₗ[ℤ] ℚ) : ∃ x, ∀ v, f v = p
   refine ⟨fun k i => g (Matrix.single k i 1), fun v => ?_⟩
   change g v = _
   conv_lhs => rw [Matrix.matrix_eq_sum_single v]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, pr, dotProduct]
+
+  simp only [map_sum, pr, dotProduct]
   refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun i _ => ?_
   have : Matrix.single k i (v k i) = v k i • Matrix.single k i (1 : ℚ) := by
     simp [Matrix.smul_single]

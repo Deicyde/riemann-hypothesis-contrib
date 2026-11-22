@@ -17,7 +17,7 @@ open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.
 open scoped Classical
 open GlobalTheory.CompanionTheory.FinActS
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finite_sum_fiber_decomposition : ∀ {Γ H : Type} [Group Γ] [Group H] (p : Γ →* H) (e : H →* Γ) (hpe : ∀ m, p (e m) = m)
     (L : Subgroup Γ) (V : Subgroup H) (hLV : ∀ u ∈ L, p u ∈ V) (φ : Γ → ℂ)
     (hφ : ∀ u ∈ L, ∀ x, φ (x * u) = φ x) (hfin : {q : Γ ⧸ L | φ q.out ≠ 0}.Finite),

@@ -30,8 +30,8 @@ theorem clAct_d {D : Type u} [Category.{v} D] (H : D ⥤ ModuleCat.{w} R) (ρ : 
   funext s
   change ∑ i : Fin (p + 2), (-1 : ℤ) ^ (i : ℕ) • (H.map (GlobalTheory.CatH.toLast i s)).hom (ρ _ a (f (GlobalTheory.CatH.face i s))) =
     ρ _ a (∑ i : Fin (p + 2), (-1 : ℤ) ^ (i : ℕ) • (H.map (GlobalTheory.CatH.toLast i s)).hom (f (GlobalTheory.CatH.face i s)))
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_zsmul, hρ]
 

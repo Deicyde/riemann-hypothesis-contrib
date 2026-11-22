@@ -125,8 +125,8 @@ theorem goal1 (τ : Representation K G T)
     have hx : ∑ j, b j • ε (τ (γ j) v) = 0 := by
       apply orbit_ker τ hirr φ hφ
       intro g
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, smul_eq_mul]
+
+      simp only [map_sum, map_smul, smul_eq_mul]
       have := key g
       simp only [w, smul_eq_mul] at this
       rw [← this]
@@ -160,8 +160,8 @@ theorem goal1 (τ : Representation K G T)
     have hcoef : ∀ i, φ (τ (δ i) (ε x)) = ∑ k, c i k * a k := by
       intro i
       rw [← ha]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [c, map_sum, map_smul, mul_comm]
+
+      simp [c, map_sum, map_smul, mul_comm]
     have hinv : ∀ j, ∑ i, c⁻¹ j i * ∑ k, c i k * a k = a j := by
       intro j
       have := congrFun (show Matrix.mulVec c⁻¹ (Matrix.mulVec c a) = a by

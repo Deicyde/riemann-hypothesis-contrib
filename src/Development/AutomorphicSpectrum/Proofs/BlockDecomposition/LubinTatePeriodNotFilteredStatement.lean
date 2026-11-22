@@ -11,7 +11,7 @@ open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual Recipro
 open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
 open scoped Classical
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lubin_tate_period_not_filtered : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (χ : ↥(GK K) →* (↥K.1)ˣ),
     (∀ (g : GQ l) (hg : g ∈ GK K), (∀ u ∈ GroundTheory.PAdicHodge.unramifiedClosure l, g u = u) →
       Algebra.norm ℚ_[l] ((χ ⟨g, hg⟩ : (↥K.1)ˣ) : ↥K.1) =

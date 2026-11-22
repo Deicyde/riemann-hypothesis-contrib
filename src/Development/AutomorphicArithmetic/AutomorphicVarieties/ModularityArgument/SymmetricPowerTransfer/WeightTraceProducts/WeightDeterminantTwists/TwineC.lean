@@ -20,8 +20,8 @@ private theorem tr_pi {ι : Type} [Fintype ι] [DecidableEq ι] {V : ι → Type
     · intro b _ hb
       simp [Pi.single_eq_of_ne hb.symm]
     · simp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, map_sum]
+
+  rw [e, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [LinearMap.trace_comp_comm']
   congr 1

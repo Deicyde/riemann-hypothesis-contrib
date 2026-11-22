@@ -7,7 +7,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -16,7 +16,7 @@ namespace GlobalTheory.CoefDuty.MemberO
 variable {D : D7}
 end GlobalTheory.CoefDuty.MemberO
 namespace GlobalTheory.CoefDuty.MemberO
-set_option maxHeartbeats 1000000 in
+
 theorem contains_fixZ_alt {D : D7} {cf : CharFrame D} {jE : D.host.E →+* Qb} {A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE} {M : MtFam D} {C : NChoice D}
     {tup : D.what₂.Tup → Fin D.R.m → HChar D.host.E} {big : D.what₂.places.Pl → Finset ℂ} {L : LocAll (lay0 D)}
     (hL : _root_.GlobalTheory.CoefDuty.BuiltAlt A M C tup big L) (i : L.X.nd.Loc) :
@@ -28,7 +28,7 @@ theorem contains_fixZ_alt {D : D7} {cf : CharFrame D} {jE : D.host.E →+* Qb} {
   change L.Y.naut.iotaQC i (L.Y.naut.iotaQ i x) = z
   rw [Au.iotaQ, Au.iotaQC]
   exact hx
-set_option maxHeartbeats 1000000 in
+
 theorem contains_big_of_built {D : D7} {cf : CharFrame D} {jE : D.host.E →+* Qb} {A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE} {M : MtFam D}
     {C : NChoice D} {tup : D.what₂.Tup → Fin D.R.m → HChar D.host.E} {big : D.what₂.places.Pl → Finset ℂ}
     {L : LocAll (lay0 D)} (hL : _root_.GlobalTheory.CoefDuty.BuiltAlt A M C tup big L) (i : L.X.nd.Loc) :

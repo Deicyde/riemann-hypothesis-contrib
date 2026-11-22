@@ -39,8 +39,8 @@ theorem aeval_eq_zero_of_point {F K : Type} [Field F] [Field K] [Algebra F K] [I
       simpa using this
     · rw [hmap, hyP a ha, map_zero]
     · have := congrArg φ (hs i)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum, map_mul] using this
+
+      simpa [map_sum, map_mul] using this
   rw [hmap (fun p : Fin (e + 1) × Fin N => s p.1 p.2)] at key
   simpa using key
 

@@ -51,9 +51,9 @@ theorem exists_weak_integral {X V : Type} [TopologicalSpace X] [T2Space X] [Meas
   have hint : ∀ s, s ⊆ Λ → ∀ g : X → ℂ, Continuous g → IntegrableOn g s ν := fun s hs g hg =>
     (hg.continuousOn.integrableOn_compact hc).mono_set hs
   conv_rhs => rw [hU]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [integral_biUnion_finset _ (fun v _ => hmeas v) hdisj
-    (fun v _ => hint _ Set.inter_subset_left _ (hcont l)), map_sum]
+
+  rw [integral_biUnion_finset _ (fun v _ => hmeas v) hdisj
+  (fun v _ => hint _ Set.inter_subset_left _ (hcont l)), map_sum]
   refine Finset.sum_congr rfl fun v _ => ?_
   rw [map_smul, smul_eq_mul, ← integral_mul_const]
   refine setIntegral_congr_fun (hmeas v) fun x hx => ?_

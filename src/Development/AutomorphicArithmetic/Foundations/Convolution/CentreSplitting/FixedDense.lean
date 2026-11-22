@@ -44,9 +44,9 @@ theorem UpperTheory.ConvolutionTheory.Dp.fixedDense :
     · rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one]; rfl
     · rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one]; rfl
   · have e : v - J ((S.card : ℂ)⁻¹ • ∑ y ∈ S, y) = (S.card : ℂ)⁻¹ • ∑ y ∈ S, (v - J y) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_smul, map_sum, Finset.sum_sub_distrib, smul_sub, Finset.sum_const, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
-        inv_mul_cancel₀ hc', one_smul]
+
+      rw [map_smul, map_sum, Finset.sum_sub_distrib, smul_sub, Finset.sum_const, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
+      inv_mul_cancel₀ hc', one_smul]
     have h1 : ∀ y ∈ S, ‖v - J y‖ = dist v (J x) := fun y hy => by
       obtain ⟨g, hg, rfl⟩ := (hm y).1 hy
       rw [hJ, dist_eq_norm, ← hρ g (v - J x), map_sub, hv g hg]

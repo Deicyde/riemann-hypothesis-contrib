@@ -23,7 +23,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.LevelSeries
 
 namespace GlobalTheory.DivPtFourier.Prod
@@ -40,7 +40,7 @@ theorem sum_orth {D : D7} {ι : Type} (s : Finset ι) (cs : ι → AE D) (i : ι
     (ho : ∀ j ∈ s, cs i * cs j = 0) : cs i * (∑ j ∈ s, cs j) = 0 := by
   rw [Finset.mul_sum]; exact Finset.sum_eq_zero ho
 
-set_option maxHeartbeats 800000 in
+
 theorem card_add {D : D7} {S T : HSp D} (Λ : AddSubgroup (WO S T))
     (hst : ∀ c : AE D, c * c = c → ∀ u ∈ Λ, c • u ∈ Λ) (c₁ c₂ : AE D) (h₁ : c₁ * c₁ = c₁) (h₂ : c₂ * c₂ = c₂)
     (h₁₂ : c₁ * c₂ = 0) (N : ℕ) :

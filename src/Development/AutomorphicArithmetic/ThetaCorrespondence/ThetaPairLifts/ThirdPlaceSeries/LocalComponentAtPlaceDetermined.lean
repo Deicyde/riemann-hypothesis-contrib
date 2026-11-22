@@ -33,7 +33,7 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section
@@ -43,8 +43,8 @@ open Formalism.L2.Host (embLL0)
 open Formalism.IndefR.RecTie (Used0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 open GlobalTheory.HeightCounting.Up (PrN)
 namespace GlobalTheory.PlaceRead
 variable {D : D7} {c : NChoice D} {w : D.what₂.places.Pl}
@@ -158,8 +158,8 @@ theorem exists_basisAt_latAt_thetaAt_of_atPlace (hCo : GlobalTheory.Published.Di
     have h1 := hth x hx n a f hf
     rw [hε.twVia_eq] at h1
     refine (rdF_thPe _ hε H.ok hrat _).trans ((congrArg _ (he x)).trans (h1.trans (congrArg (z₁ • ·) ?_)))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.smul_sum]
+
+    rw [map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [rdF_tmul, smul_comm]
     refine congrArg (ε (c.embW w (a k)) • ·) ?_
@@ -214,7 +214,7 @@ end
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.local_component_at_place_determined_alt : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.CasselmanWallach → GlobalTheory.Published.HarishChandraModules → _root_.GlobalTheory.HeightCounting.Up.PublishedInputsThirdLayerAlt → SerN → ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists, AllSt fun _ _ _ T w P x => ∀ (l : _root_.GlobalTheory.HeightCounting.Up.ThirdIntermediateLevel hL x) (ch : NChoice (Dof x)) (tp : TupTied (Dof x) (cfOf x) ch), tp.xi = w.I.xi → tp.psi = T.psi → ch.Q = QOf P → (∀ v, TwistedAt (Dof x) v → ch.k' v = T.k v) → ChoiceSide (Dof x) (cfOf x) l.mt.M l.b.Bs.exp ch tp → (∀ v, TwistedAt (Dof x) v → IntegralHeckeForms.TwOK (ch.twI v) (ch.k' v) (ch.Q v) ((ch.psi' v).comp ((Dof x).ntw.art (ch.twI v) (ch.Q v)))) → ∀ v, TwistedAt (Dof x) v → ∀ i : Fin (Dof x).R.m, ∃ (e : (Dof x).what₂.MtL ((Dof x).what₂.muTw v) (i.1 + 1) →ₛₗ[ch.embW v] GlobalTheory.ChoiceRead.Tgt ch v (i.1 + 1)) (u : (FractionRing (ch.Oe v))ˣ), GlobalTheory.ChoiceRead.BasisAt ch v (i.1 + 1) e ∧ GlobalTheory.ChoiceRead.LatAt ch v (i.1 + 1) e (u : FractionRing (ch.Oe v)) ∧ GlobalTheory.ChoiceRead.ThetaAt x.r.Y l.b.YS ch v i e (u : FractionRing (ch.Oe v)) := by
   first | exact @_root_.GlobalTheory.PlaceRead.exists_local_map_at_place_alt | exact _root_.GlobalTheory.PlaceRead.exists_local_map_at_place_alt | (intros; apply _root_.GlobalTheory.PlaceRead.exists_local_map_at_place_alt <;> assumption)
 end

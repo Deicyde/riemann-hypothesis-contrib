@@ -77,8 +77,8 @@ theorem GlobalTheory.PlaceDecomp.weil_decomposition_at_place : ∀ (D : D7) (θ 
     funext x
     have h1 := (moves_avg hθ (N.M.fr_unit τ) (N.M.fr_gram τ) hσ he f x _ _ _ _ (hW x) (hc x) (h x)).1.2.2.2.2 1
       (one_mem_UJ _)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [res_one hθ (N.M.fr_unit τ), sigma_one hσ.1, hQ, map_sum, map_smul, smul_eq_mul] at h1
+
+    simp only [res_one hθ (N.M.fr_unit τ), sigma_one hσ.1, hQ, map_sum, map_smul, smul_eq_mul] at h1
     have h2 := h1.unique (hasSum_sum fun j _ => (Expn.summable_term (h x) (c j) (hσ.2.2.1 _ (haK j))).hasSum)
     have h3 : avg θ N.V τ (N.M.ε τ) (N.M.fr τ) e f x = f x := by
       have := he1 _ (hTy x)
@@ -95,7 +95,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.Grow GlobalTheory.Size
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.weil_representation_place_decomposition : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (N : GlobalTheory.Grid.Node D) (U : Subgroup (GA D N.V)) (W : D.what₂.Tau → Type) [∀ τ, AddCommGroup (W τ)] [∀ τ, Module ℂ (W τ)] [∀ τ, FiniteDimensional ℂ (W τ)] (ρ : ∀ τ, Representation ℂ (Formalism.REAL.KG (N.M.ε τ)) (W τ)), (∀ τ, GlobalTheory.Published.AutFin.IsContRep (ρ τ)) → ∀ τ, GlobalTheory.KFinDecomp.DecompAt θ N (GlobalTheory.KFinDecomp.Cls θ N U) (fun τ f => GlobalTheory.Published.AutFin.HasTypeAt θ N.V τ (N.M.ε τ) (N.M.fr τ) (ρ τ) f) τ := by
   first | exact @_root_.GlobalTheory.PlaceDecomp.weil_decomposition_at_place | exact _root_.GlobalTheory.PlaceDecomp.weil_decomposition_at_place | (intros; apply _root_.GlobalTheory.PlaceDecomp.weil_decomposition_at_place <;> assumption)
 end

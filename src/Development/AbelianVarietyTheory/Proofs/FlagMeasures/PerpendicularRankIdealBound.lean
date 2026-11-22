@@ -131,12 +131,12 @@ theorem isCompl_perp (h : V →ₗ⋆[K] V →ₗ[K] K) (ha : ∀ x, h x x = 0 �
     have hx' : ∀ i, h (b i : V) x = 0 := fun i => congrFun (LinearMap.mem_ker.1 hx) i
     have e : p = ∑ i, b.repr ⟨p, hp⟩ i • (b i : V) := by
       have := congrArg A.subtype (b.sum_repr ⟨p, hp⟩)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at this
+
+      rw [map_sum] at this
       exact this.symm
     rw [e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, hx']
+
+    simp [map_sum, hx']
   have h1 := f.finrank_range_add_finrank_ker
   have h2 : finrank K (LinearMap.range f) ≤ finrank K A := by
     have := (LinearMap.range f).finrank_le
@@ -214,7 +214,7 @@ end General
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 4000000 in
+
 theorem base_full (D : D7) (u u' : D.what₂.Word) (F0 : Fb D u) (Λ : LatV D)
     (hStand : Stand D u u') (hB : IsBase D u F0) (hR : IsRowLat D F0 Λ) :
     Submodule.IsFullLattice D.host.E (L0X D Λ (lf D F0)) := by

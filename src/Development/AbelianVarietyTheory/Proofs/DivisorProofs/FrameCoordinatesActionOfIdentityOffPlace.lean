@@ -22,9 +22,9 @@ theorem frame_mul_map (ι : L →+ _root_.GlobalTheory.IndefiniteRowSideFullHeck
     ((1 - ι 1) • (1 : Matrix (Fin m) (Fin m) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) + A.map ι) * Y.map ι = (A * Y).map ι := by
   rw [Matrix.add_mul, Matrix.smul_mul, Matrix.one_mul]
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, sub_mul, one_mul, ← hmul, one_mul, sub_self,
-    zero_add, Matrix.mul_apply, Matrix.map_apply, Matrix.mul_apply, map_sum]
+
+  rw [Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, sub_mul, one_mul, ← hmul, one_mul, sub_self,
+  zero_add, Matrix.mul_apply, Matrix.map_apply, Matrix.mul_apply, map_sum]
   simp only [Matrix.map_apply, hmul]
 
 theorem map_mul_frame_transpose (ι : L →+ _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (hmul : ∀ x y, ι (x * y) = ι x * ι y) {m k : ℕ}
@@ -32,9 +32,9 @@ theorem map_mul_frame_transpose (ι : L →+ _root_.GlobalTheory.IndefiniteRowSi
     Y.map ι * ((1 - ι 1) • (1 : Matrix (Fin k) (Fin k) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) + C.map ι)ᵀ = (Y * Cᵀ).map ι := by
   rw [Matrix.transpose_add, Matrix.transpose_smul, Matrix.transpose_one, Matrix.mul_add, Matrix.mul_smul, Matrix.mul_one]
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, sub_mul, one_mul, ← hmul, one_mul, sub_self,
-    zero_add, Matrix.mul_apply, Matrix.map_apply, Matrix.mul_apply, map_sum]
+
+  rw [Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, sub_mul, one_mul, ← hmul, one_mul, sub_self,
+  zero_add, Matrix.mul_apply, Matrix.map_apply, Matrix.mul_apply, map_sum]
   simp only [Matrix.map_apply, Matrix.transpose_apply, hmul]
 
 theorem actAB_xm_frame (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]

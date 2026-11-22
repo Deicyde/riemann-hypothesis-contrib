@@ -141,8 +141,8 @@ theorem subst_lg_comp (Y : FBChart C V O dd) (φ : Pt C 1 dd) (hφ0 : ∀ i, MvP
         rw [OActLog.log_endo Y.B.G Y.lg Y.lg_lin Y.lg_add φ hφ0 hhom x]
     _ = ∑ j, OActLog.linM φ x j • MvPowerSeries.subst Q (Y.lg j) := by
         simp only [← MvPowerSeries.smul_eq_C_mul]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← MvPowerSeries.coe_substAlgHom hQS, map_sum]
+
+        rw [← MvPowerSeries.coe_substAlgHom hQS, map_sum]
         simp only [map_smul]
 
 end StartSelf
@@ -247,8 +247,8 @@ theorem allStartSelf_of (hLie : ProjLieSelfSt) : AllStartSelfSt := by
     rw [h1, StartSelf.subst_lg_comp Y (Φ col) (hΦ0 col) (hΦhom col) Q hQ0 x]
     simp only [h2]
     refine PowerSeries.ext fun n => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, smul_eq_mul, PowerSeries.coeff_mk]
+
+    simp only [map_sum, map_smul, smul_eq_mul, PowerSeries.coeff_mk]
     exact hkey n col x
   let RHS : I0 → PowerSeries C := fun q =>
     (0 : PowerSeries C) - alongCv Γ ((Y.rawSelf p).sg ((Y.rawSelf p).u (1 - g) q)) +

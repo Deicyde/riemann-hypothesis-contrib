@@ -86,21 +86,21 @@ theorem measure_isomorphism_at_infinity : IsoStep := by
       simp [c, hab, h1, h2, herm]
   refine ⟨f', ⟨?_, ?_, ?_⟩, ?_⟩
   · intro a b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [f', map_sum, F0.e_iso, hF.1]
+
+    simp [f', map_sum, F0.e_iso, hF.1]
   · intro b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [f', map_sum, F0.z_orth, hF.2.1]
+
+    simp [f', map_sum, F0.z_orth, hF.2.1]
   · intro b l hl
     have hexp : S.hT (f' b) l = S.hT (f b) l + ∑ k, star (c k b) * S.hT (F0.e k) l := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [f', map_sum, starRingEnd_apply]
+
+      simp [f', map_sum, starRingEnd_apply]
     rw [hexp]
     exact addm (hF.2.2 b l hl) (summ _ (fun k => hprod k b _ _ (hc_mem k b) (hE k l hl)))
   · intro a b
     have h := hsum a b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [f', map_sum, hfe, hF.1, F0.e_iso, Finset.sum_ite_eq', starRingEnd_apply]
+
+    simp [f', map_sum, hfe, hF.1, F0.e_iso, Finset.sum_ite_eq', starRingEnd_apply]
     linear_combination h
 
 end PI.SRW

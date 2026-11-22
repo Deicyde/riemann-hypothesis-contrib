@@ -19,7 +19,7 @@ open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.Basi
 variable {l : ℕ} [Fact l.Prime]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem bcAt_fin (hJ : Formalism.MainNotions.N.GlobalTheory.CoefJumpGen) (Th : LocTheory) (K LL LL' : FinExt l)
     (hLL : LL.1 ≤ LL'.1) :
     Formalism.MainNotions.WachCoordinates.BCAt ((Th l).PD K) (LL := ↥LL.1) (O := ↥(OL LL)) (O' := ↥(OL LL'))
@@ -67,8 +67,8 @@ theorem bcAt_fin (hJ : Formalism.MainNotions.N.GlobalTheory.CoefJumpGen) (Th : L
   have hli : LinearIndependent ↥LL.1 b := linInd_frac (O := ↥(OL LL)) b hliO
   have hy : ∀ a : ↥(OL LL'), algebraMap ↥(OL LL') ↥LL'.1 a ∈ Submodule.span ↥LL.1 (Set.range b) := by
     intro a
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← bO.sum_repr a, map_sum]
+
+    rw [← bO.sum_repr a, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     have e : algebraMap ↥(OL LL') ↥LL'.1 (bO.repr a i • bO i) =
         (algebraMap ↥(OL LL) ↥LL.1 (bO.repr a i)) • b i := by

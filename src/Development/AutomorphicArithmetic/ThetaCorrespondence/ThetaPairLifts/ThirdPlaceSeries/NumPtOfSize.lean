@@ -7,10 +7,10 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
-set_option synthInstance.maxHeartbeats 400000
+
 noncomputable section
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.BigTop GlobalTheory.CovTop GlobalTheory.RefSum

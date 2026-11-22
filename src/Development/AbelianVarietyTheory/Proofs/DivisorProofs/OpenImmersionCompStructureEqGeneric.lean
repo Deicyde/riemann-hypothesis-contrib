@@ -79,7 +79,7 @@ theorem comp_eq_of_lift {hle : c.F ≤ c'.F} (hr : r ≫ pullback.snd _ _ = pull
 
 
 open GlobalTheory.LocM.BaseMdl in
-set_option maxHeartbeats 1000000 in
+
 theorem exists_isCoord {R : Type} [CommRing R] {ξ : Sp R ⟶ Y.X} {g : ℕ} {e : Fin g → (Sp (DualNumber R) ⟶ Y.t.G.left)}
     (he : IsTanBasis Y.t ξ e) (σ : E →+* ℂ) {σR : 𝓞 E →+* R} {U : Matrix (Fin g) (Fin g) R}
     (hU : IsProjMat Y.t ξ σR e U) {k : Type} [CommRing k] [Algebra c.F k] {φ : R →+* k} {yy : Sp k ⟶ Xo'.XF c'}
@@ -192,7 +192,7 @@ theorem exists_lift_frPt {hle : c.F ≤ c'.F} (hr : r ≫ pullback.snd _ _ = pul
 
 
 include ν in
-set_option maxHeartbeats 1000000 in
+
 theorem exists_intFr_lift (T : CDVR) (io : c.F →+* T.Fr) (yt : Sp T.V ⟶ Y.X) (yy : Sp T.Fr ⟶ Xo'.XF c')
     (z : letI := io.toAlgebra; FrPt Xo c T.Fr) (hz : yy ≫ Y.j = spMap (algebraMap T.V T.Fr) ≫ yt)
     (hzr : letI := io.toAlgebra; yy ≫ r = GlobalTheory.AllWt.ptF z) :
@@ -224,7 +224,7 @@ theorem exists_intFr_lift (T : CDVR) (io : c.F →+* T.Fr) (yt : Sp T.V ⟶ Y.X)
 
 
 open GlobalTheory.LocM.BaseMdl in
-set_option maxHeartbeats 1000000 in
+
 theorem exists_change {R : Type} [CommRing R] {ξ : Sp R ⟶ Y.X} {g : ℕ}
     {e : Fin g → (Sp (DualNumber R) ⟶ Y.t.G.left)} (he : IsTanBasis Y.t ξ e) {σ : E →+* ℂ}
     {U : Matrix (Fin g) (Fin g) R} {L : Type} [CommRing L] [Algebra c.F L] {φ : R →+* L} {yy : Sp L ⟶ Xo'.XF c'}
@@ -330,7 +330,7 @@ theorem value_map {R : Type} [CommRing R] {ξ : Sp R ⟶ Y.X} {g : ℕ}
 
 
 open GlobalTheory.ModelFrameCompare MonObj in
-set_option maxHeartbeats 1000000 in
+
 theorem images_eigenBasis (σ : E →+* ℂ) (T : CDVR) (io : c.F →+* T.Fr) (y₀ : IntFr Xo c T io) (xV : Sp T.V ⟶ Y.X)
     (yy : Sp T.Fr ⟶ Xo'.XF c') (hxV : yy ≫ Y.j = spMap (algebraMap T.V T.Fr) ≫ xV)
     (hpt : letI := io.toAlgebra; GlobalTheory.AllWt.ptF y₀.1 = yy ≫ r) :
@@ -417,7 +417,7 @@ theorem images_eigenBasis (σ : E →+* ℂ) (T : CDVR) (io : c.F →+* T.Fr) (y
 
 
 open GlobalTheory.LocM.BaseMdl in
-set_option maxHeartbeats 1000000 in
+
 theorem coord_integral {R : Type} [CommRing R] {ξ : Sp R ⟶ Y.X} {g : ℕ}
     {e : Fin g → (Sp (DualNumber R) ⟶ Y.t.G.left)} (he : IsTanBasis Y.t ξ e) (σ : E →+* ℂ) {σR : 𝓞 E →+* R}
     {U : Matrix (Fin g) (Fin g) R} (hU : IsProjMat Y.t ξ σR e U) (T : CDVR) (io : c.F →+* T.Fr)
@@ -574,7 +574,7 @@ theorem exists_local {hle : c.F ≤ c'.F} (hr : r ≫ pullback.snd _ _ = pullbac
 
 
 include ν in
-set_option maxHeartbeats 1000000 in
+
 theorem chart_bound {hle : c.F ≤ c'.F} (hr : r ≫ pullback.snd _ _ = pullback.snd _ _ ≫
       spMap (IntermediateField.inclusion hle).toRingHom) (Z : Comp Xo c) {f : Rul Xo c} {σ₁ σ₂ : E →+* ℂ}
     (hL : DetLaw Z f σ₁ σ₂)
@@ -729,7 +729,7 @@ theorem chart_bound {hle : c.F ≤ c'.F} (hr : r ≫ pullback.snd _ _ = pullback
 
 
 omit Y r ν in
-set_option maxHeartbeats 1000000 in
+
 theorem exists_denom (hpq : 1 ≤ Dw.p + Dw.q) (hA : l.A = 1) (Z : Comp Xo c)
     {f : Rul Xo c} {σ₁ σ₂ : E →+* ℂ} (hL : DetLaw Z f σ₁ σ₂)
     (hbd : ∀ (T : CDVR) (io : c.F →+* T.Fr) (y₀ : IntFr Xo c T io), (∀ a, a ≠ 0 → vV T.V (io a) = 0) →

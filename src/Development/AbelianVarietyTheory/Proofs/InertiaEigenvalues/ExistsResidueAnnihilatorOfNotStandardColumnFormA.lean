@@ -109,8 +109,8 @@ theorem exists_residue_annihilator_of_not_standard_column_form (O K : Type) [Com
     have hf : ∀ v, f v = (fun i => f (Pi.single i 1)) ⬝ᵥ v := by
       intro v
       conv_lhs => rw [pi_eq_sum_univ v]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, smul_eq_mul, dotProduct]
+
+      simp only [map_sum, map_smul, smul_eq_mul, dotProduct]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [mul_comm]; congr 2; ext j; simp [Pi.single_apply, eq_comm]
     refine ⟨fun i => f (Pi.single i 1), ?_, ?_⟩

@@ -7,7 +7,7 @@ public import Formalism.LocalToGlobal.IndefiniteReal.GramCEqTranspose
 @[expose] public section
 
 open NumberField
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.twistedProjector_orthogonal_of_unitary_action : ∀ {LL Ks : Type} [Field LL] [NumberField LL] [Field Ks] [NumberField Ks] [Algebra Ks LL]
     {WL : Type} [AddCommGroup WL] [Module LL WL] [Module Ks WL] [IsScalarTower Ks LL WL]
     [Module (𝓞 LL) WL] [IsScalarTower (𝓞 LL) LL WL] [Module (𝓞 Ks) WL] [IsScalarTower (𝓞 Ks) Ks WL]

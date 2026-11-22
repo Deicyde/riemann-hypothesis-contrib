@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Moor
 
 open Formalism.Per GlobalTheory.PSer
 open scoped Formalism.Per
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.tiltedSeriesRow_sub_untilt_truncatedAdditiveRow : ∀ (l : ℕ) [Fact l.Prime] (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [CharP F l]
     [PerfectRing F l] (ι : Fl l →+* F) (tsh : F →*₀ ℂ_[l]),
     (∀ z, ‖tsh z‖ = ‖z‖) → (∀ x, tsh (ι x) = sh x) → (∀ z : F, ‖z‖ ≤ 1 → ∃ x, ι x = z) →

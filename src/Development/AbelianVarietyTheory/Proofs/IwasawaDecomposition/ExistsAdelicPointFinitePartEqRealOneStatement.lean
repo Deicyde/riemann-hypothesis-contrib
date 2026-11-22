@@ -12,7 +12,7 @@ open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
 open GlobalTheory.Mem.R3.LiftBrg
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_adelicPoint_finitePart_eq_realOne : ∀ {D : D7} (V : HSp D) (g : Bridge.Gf V), ∃ α ∈ GfC V, finHom V α = (g : GL (Fin V.rank) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)) := by
   intro D V g
   obtain ⟨β, hβ⟩ := g.2

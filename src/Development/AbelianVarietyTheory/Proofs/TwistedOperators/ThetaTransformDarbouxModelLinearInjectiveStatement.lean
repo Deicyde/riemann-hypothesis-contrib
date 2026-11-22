@@ -16,7 +16,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm
 open scoped GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.thetaTransform_darbouxModel_linear_injective : ∀ (D : D7) {m k d : ℕ} {Y : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc D.host.F D.host.E m} {Z : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc D.host.F D.host.E k}
     (Mo : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Model D.sp.cm.sig Y Z) (ψ : AddChar (AF D.host.F) ℂ) (G : Matrix (Fin m) (Fin m) D.host.E)
     (e : Fin k ≃ Fin d), Mo.IsGood ψ → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ → Y.J.det ≠ 0 → Z.J.det ≠ 0 → G.det ≠ 0 →

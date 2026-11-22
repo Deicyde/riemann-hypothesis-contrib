@@ -15,7 +15,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep GlobalTheory.FieldPair
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_divisor_nonKlt_points_numerically_multiple : GlobalTheory.Published.Principalisation → ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X]
     (p : X ⟶ Sp ℂ) (n : ℕ), IsProjOver p → topologicalKrullDim X = n → letI := algebraΓOfHom p;
     ∀ (Δ : X → ℚ) (m : ℕ) (G A : CartierDiv X) (D : X → ℚ) (P : Finset X) (z : X) (k : ℕ) (h : ℚ),

@@ -12,7 +12,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.symmetricPullbackGenerator_second_difference : ∀ (R : Type) [CommRing R] [IsDomain R] (D₀ : DegPre R) (f g : D₀.P.A ⟶ D₀.P.A) [IsMonHom f] [IsMonHom g],
     padd D₀.P.A f g = 𝟙 D₀.P.A →
     ∀ uw : LB.Gen (LB.LinComb D₀.P.L (GlobalTheory.UTau0.w0φ D₀ f) GlobalTheory.UTau0.w0ε), uw.IsGen →

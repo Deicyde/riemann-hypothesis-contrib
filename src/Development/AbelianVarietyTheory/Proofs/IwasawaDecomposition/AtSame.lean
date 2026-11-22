@@ -12,7 +12,7 @@ open GlobalTheory.HeightCounting GlobalTheory.Mem.R3.Tr
 
 noncomputable section
 namespace GlobalTheory.LayerMove
-set_option maxHeartbeats 4000000
+
 variable {D : D7} (m : Mv D) {hL : GlobalTheory.Published.LocalLanglandsGL}
 
 def Mv.all {C : NChoice D} (a : NAllC D C) : NAllC m.D (m.ch C) := @_root_.GlobalTheory.HeightCounting.NAllC.mk (_) (_)

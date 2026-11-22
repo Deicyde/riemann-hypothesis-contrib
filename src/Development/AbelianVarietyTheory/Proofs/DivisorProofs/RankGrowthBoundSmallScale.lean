@@ -91,7 +91,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelA
 open GlobalTheory.BadCount
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

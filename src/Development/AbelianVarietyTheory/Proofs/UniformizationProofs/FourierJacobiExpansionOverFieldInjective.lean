@@ -37,8 +37,8 @@ theorem split_iff {R F : Type} [CommRing R] [CommRing F] [Algebra R F] {X X₀ :
     (hτ l Z r z J hJ).trans (Finset.sum_congr rfl fun i _ => congrArg (· * _) (germOf_apply _ _ _).symm)
   constructor
   · intro h Z q r e z J hJ
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finset.sum_mul]
+
+    simp only [map_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_eq_zero fun l _ => ?_
     have h₁ := (hτ l Z r z J hJ).symm.trans ((congrArg (fun s => sval s r z J) (h l)).trans (h₀ Z r z J hJ))
@@ -69,7 +69,7 @@ theorem expT_unit_iff : AllPre fun {_} _ _ _ {_} {_} {_} _ _ U => ∀ k σ σ' f
   exact key _ (congrArg Over.mk (Spec.map_id _))
 
 
-set_option maxHeartbeats 400000 in
+
 theorem main : (AllPre fun {V} _ _ _ {_} {_} {_} _ _ U => ∀ (F : Type) [Field F] [Algebra (FractionRing V) F] (k : ℕ) t t' s s', U.ExpF F k t s → U.ExpF F k t' s' → (t = t' ↔ s = s')) := by
   intro V _ _ _ hV D A G _ _ U F _ _ k t t' s s' ⟨n, c, σ, f, hE, hG, hB⟩ ⟨n', c', σ', f', hE', hG', hB'⟩
   classical

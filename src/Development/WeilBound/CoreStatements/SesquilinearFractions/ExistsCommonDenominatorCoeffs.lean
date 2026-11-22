@@ -41,8 +41,8 @@ theorem exists_common_denominator_coeffs (D : Datum H) {p : ℕ} (x' : Fin p →
     choose w hw using hdv
     have he : projectionCoeffs D x' (∑ i, c i • t i) a = ∑ i, IsCMField.complexConj E (c i : E) * projectionCoeffs D x' (t i) a := by
       show projectionCoeffsAddHom D x' a (∑ i, c i • t i) = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       show projectionCoeffs D x' (c i • t i) a = _
       rw [projectionCoeffs_smul, Pi.smul_apply, smul_eq_mul]

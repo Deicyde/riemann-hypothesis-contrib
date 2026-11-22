@@ -226,8 +226,8 @@ theorem cc_pderiv (f : PS R n d) (v : Fin n × Fin d) :
 theorem coeff_lin_ev {φ : Pt R 1 d} (hφ : Z φ) (f : PS R 1 d) (j : Fin d) :
     coeff (Finsupp.single ((0 : Fin 1), j) 1) (ev ![φ] f) =
       ∑ c, coeff (Finsupp.single ((0 : Fin 1), c) 1) f * lin φ 1 c j := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← cc_pderiv, d1 hφ, map_sum]
+
+  rw [← cc_pderiv, d1 hφ, map_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [map_mul, ccev (ZZ_cons hφ ZZ_nil), cc_pderiv, cc_pderiv, lin]
 
@@ -254,8 +254,8 @@ theorem lin_add (G : FGLaw R d) {φ ψ : Pt R 1 d} (hφ : Z φ) (hψ : Z ψ) :
     rw [hc]
     split_ifs <;> simp
   change coeff _ (ev ![φ, ψ] (G.F i)) = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← cc_pderiv, d2 hφ hψ, map_add (f := _), map_sum, map_sum]
+
+  rw [← cc_pderiv, d2 hφ hψ, map_add (f := _), map_sum, map_sum]
   simp only [map_mul, ccev (ZZ_cons hφ (ZZ_cons hψ ZZ_nil)), h0, h1]
   simp [cc_pderiv, lin]
 

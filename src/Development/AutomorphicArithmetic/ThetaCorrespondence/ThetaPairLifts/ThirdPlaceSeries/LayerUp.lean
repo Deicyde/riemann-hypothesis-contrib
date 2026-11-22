@@ -20,7 +20,7 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl NumberField IsDedekindDomain
@@ -29,7 +29,7 @@ open GlobalTheory.HeightCounting.Up GlobalTheory.Mem.SRe GlobalTheory.Mem.R3.Rw
 open GlobalTheory.HeightCounting GlobalTheory.Mem.R3.Tr
 noncomputable section
 namespace GlobalTheory.LayerMove
-set_option maxHeartbeats 4000000
+
 section
 variable {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {Z : w.Lt} {Wt : Set B.places.Pl}
   (S' : SStage B w.C Z.W) (N : ∀ u, Submodule (𝓞 B.LL) (Z.V.div.Nu u).V) (h : B.Word → ℝ) {nch : NChoice (w.D Z)}

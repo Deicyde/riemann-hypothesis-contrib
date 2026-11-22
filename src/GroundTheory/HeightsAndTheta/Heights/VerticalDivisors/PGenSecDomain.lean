@@ -32,8 +32,8 @@ theorem eval₂_mul_of_isHomogeneous {k S : Type*} [CommSemiring k] [CommSemirin
 
 theorem map_linForm {R S : Type*} [CommRing R] [CommRing S] {n : ℕ} (f : R →+* S) (u : Fin n → R) :
     MvPolynomial.map f (linForm u) = linForm (fun j => f (u j)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [linForm, map_sum]
+
+  simp [linForm, map_sum]
 
 variable {k : Type} [Field k] {n : ℕ}
 
@@ -222,8 +222,8 @@ theorem secR_isDomain (h₁ : ChartDomain.Statement) (Q : Ideal (MvPolynomial (F
     have h : Ideal.Quotient.mk (secIdeal (Q.map (MvPolynomial.map (C : k →+* MvPolynomial (Par e n) k)))
         (X : Par e n → MvPolynomial (Par e n) k)) (chartForm X - 1) = 0 :=
       Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_one, sub_eq_zero, chartForm, linForm, map_sum] at h
+
+    rw [map_sub, map_one, sub_eq_zero, chartForm, linForm, map_sum] at h
     simpa [xc, secCoord] using h
   have hchart : ∀ j (a : SecR Q e), algebraMap _ (Localization.Away (xc Q e j)) a = 0 →
       ∃ N : ℕ, xc Q e j ^ N * a = 0 := by

@@ -246,7 +246,7 @@ lemma up_four_le (n t : ℕ) (ht : 1 ≤ t) : (4 : ℝ) ≤ ((n : ℝ) + 2) * ((
   have h2 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   nlinarith
 
-set_option maxHeartbeats 1000000 in
+
 private theorem mul_le_mul_of_one_le {a b c d : ℝ} (hab : a ≤ b) (hcd : c ≤ d) (ha : 1 ≤ a) (hc : 1 ≤ c) :
     a * c ≤ b * d :=
   mul_le_mul hab hcd (by linarith) (by linarith)
@@ -290,7 +290,7 @@ private theorem linear_log_bound_le_K_mul_M (K M L lC l4 lB lQ lK E1 E : ℝ) (h
   nlinarith
 
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperPlace_holds : UpperPlace := by
   unfold UpperPlace
   intro ε x hε hx k m Δ C₃ u v b w hm2 hmeven hk2 hmk hΔ hC₃ hI hu

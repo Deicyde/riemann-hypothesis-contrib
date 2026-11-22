@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTenso
 
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct Classical
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.schwartz_functional_archimedean_factor : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsStd ψ → ∀ (κ : Type) [Fintype κ]
     (L : ((κ → AF F) → ℂ) → ℂ),
     (∀ Φ ∈ schA F κ, ∀ Ψ ∈ schA F κ, L (Φ + Ψ) = L Φ + L Ψ) →

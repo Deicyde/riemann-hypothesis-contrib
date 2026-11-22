@@ -21,8 +21,8 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Lat
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.LineIdeal
 

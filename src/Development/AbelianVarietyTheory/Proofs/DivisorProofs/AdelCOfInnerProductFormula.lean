@@ -161,7 +161,7 @@ theorem exists_isLift_lowC (h1 : LiftIsCuspC R F) : ∃ th, IsLift R i σ ω (pt
 
 
 include hd hν hV in
-set_option maxHeartbeats 800000 in
+
 theorem form_key_lowC (hy : Bridge.IsReps (Bridge.ratF (Vc D i)) (grpOf (Vc D i) (R.βV i) (datV i R.Pg (R.Q t) P m)) y)
     (h2 : SourceLevelLawC R F) (h3 : InnerProductFormulaC R F)
     (th : HV.H →ₗ[ℂ] (R.HW i σ).H) (hth : IsLift R i σ ω (ptAt R i σ BW f) c io ν 𝓕 HV th) (v : ∀ ρ, lowT (R.MW i σ) ρ)

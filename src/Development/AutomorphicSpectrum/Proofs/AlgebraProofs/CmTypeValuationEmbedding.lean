@@ -107,8 +107,8 @@ theorem targetO : TargetO := by
 
   have projSum : ∀ (f : S → Fin (p + q) → C) (t : S), HT.eigProj ρH t.1 (∑ s, T s (f s)) = T t (f t) := by
     intro f t
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_single t]
+
+    rw [map_sum, Finset.sum_eq_single t]
     · exact HT.LatBasic.eigProj_of_mem (Tmem _ _)
     · intro s _ hs
       exact HT.LatBasic.eigProj_of_ne (fun e => hs (Subtype.ext e).symm) (Tmem _ _)
@@ -116,8 +116,8 @@ theorem targetO : TargetO := by
   have hind : ∀ f : S → Fin (p + q) → C, ∑ s, g s (f s) = 0 → ∀ s, g s (f s) = 0 := by
     intro f hf t
     have h2 := congrArg (HT.eigProj ρ t.1) hf
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero, Finset.sum_eq_single t] at h2
+
+    rw [map_sum, map_zero, Finset.sum_eq_single t] at h2
     · rwa [HT.LatBasic.eigProj_of_mem (gmem _ _)] at h2
     · intro s _ hs
       exact HT.LatBasic.eigProj_of_ne (fun e => hs (Subtype.ext e).symm) (gmem _ _)
@@ -274,8 +274,8 @@ theorem targetO : TargetO := by
   have hLBA : IsLatticeBasis ν (fun i => ∑ j, A i j • U j)
       (eigenQuot (W := fun _ => Fin (p + q) → C) (freeLattice a (p + q)) τ) := by
     have hTA : ∀ i, T τ (∑ j, A i j • U j) = ∑ j, A i j • u j := fun i => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, hU]
+
+      simp only [map_sum, map_smul, hU]
     refine ⟨?_, ?_⟩
     · apply LinearIndependent.of_comp (T τ)
       have : (T τ) ∘ (fun i => ∑ j, A i j • U j) = fun i => ∑ j, A i j • u j := funext hTA

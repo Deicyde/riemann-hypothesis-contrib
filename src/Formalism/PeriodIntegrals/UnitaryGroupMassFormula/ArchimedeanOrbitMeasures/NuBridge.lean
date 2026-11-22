@@ -81,7 +81,7 @@ theorem half_re (w : ℂ) : ((1 / 2 : ℂ) * (w + conj w)).re = w.re := by
 theorem half_emb {D : D7} (X : HidaSetting D) (v : InfinitePlace X.B.I.F) : v.embedding (1 / 2) = (1 / 2 : ℂ) := by
   rw [map_div₀, map_one, map_ofNat]
 
-set_option maxHeartbeats 1000000 in
+
 theorem nuBridge : NuBridge := by
   classical
   intro D X u' ψ hT μinf νinf fibInf hP
@@ -201,11 +201,11 @@ theorem nuBridge : NuBridge := by
     simp only [sumReI]
     refine Finset.sum_congr rfl fun v _ => ?_
     show (PI.AprimeInfU.evInf X v (pairHerm (Ainf X.B.I.F) X.B.I.cm.sig (D.R.rS + 1 + D.R.rS) S T)).re = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [pairHerm, map_mul, NuB.evInf_alg, NuB.evInf_trace, half_emb, half_re, map_sum, Complex.re_sum]
+
+    rw [pairHerm, map_mul, NuB.evInf_alg, NuB.evInf_trace, half_emb, half_re, map_sum, Complex.re_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Complex.re_sum]
+
+    rw [map_sum, Complex.re_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [map_mul, hTh v a b]
     simp only [thH, Matrix.map_apply, Complex.mul_re, Complex.conj_re, Complex.conj_im]

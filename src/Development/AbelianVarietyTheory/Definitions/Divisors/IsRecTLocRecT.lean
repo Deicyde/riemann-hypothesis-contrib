@@ -35,7 +35,7 @@ namespace GlobalTheory.CuspRep.ParLawsT
 
 open Formalism.BasicNotions
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 variable {R : Ranks} {H : Formalism.BasicNotions.Host R} {Ω : Type} [Field Ω] [Algebra H.E Ω] [IsAlgClosure H.E Ω]
 

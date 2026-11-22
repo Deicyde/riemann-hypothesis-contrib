@@ -14,7 +14,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_lambdaGenerator_zpow_with_periods : ∀ {R : Type} [CommRing R] [IsDomain R] (D : DegPre R), D.TauBimult → ∀ (n : ℤ),
     ∃ g : LB.Gen (LB.LinComb D.P.L (Sum.elim (GlobalTheory.PolDeg.lamPts (fst D.P.A D.P.A) (snd D.P.A D.P.A ^ n))
         (GlobalTheory.PolDeg.lamPts (fst D.P.A D.P.A) (snd D.P.A D.P.A))) (Sum.elim Oε (fun l => -n * Oε l))), g.IsGen ∧

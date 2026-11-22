@@ -5,7 +5,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleFaithfu
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.etale_faithfullyFlat_descent_geometric_points : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [IsReduced A] [IsJacobsonRing A],
     Module.FaithfullyFlat A B → Algebra.Etale A B → ∀ b : B,
     (∀ (k : Type) [Field k] [IsAlgClosed k] (φ ψ : B →+* k), φ.comp (algebraMap A B) = ψ.comp (algebraMap A B) →

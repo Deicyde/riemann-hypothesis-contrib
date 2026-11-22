@@ -55,7 +55,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.Local
 noncomputable section
 namespace GlobalTheory.BotMatch
 variable {D : D7}
-set_option maxHeartbeats 3200000 in
+
 theorem bottom_matching_of_triangle (hH : GlobalTheory.Published.HoweDualityReal) (hPr : _root_.GlobalTheory.FunPr.ThetaLocalInputs) (hLM : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching)
     {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hψ : IsStdChar D ψ (-1)) (hθ : IsInfFam θ) {T : Type} {A A' WW : HSp D}
     (X : GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle.Tri T A A' WW) {α β : T → ((AE D)ˣ →* Circle)} {νH : T → Formalism.L2.Host.HChar D.host.E}

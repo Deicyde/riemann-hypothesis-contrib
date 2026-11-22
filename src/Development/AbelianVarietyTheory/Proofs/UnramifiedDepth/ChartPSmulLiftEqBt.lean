@@ -111,8 +111,8 @@ theorem chart_p_smul_lift_eq_bt :
     (D.wd.ψ.1.toLinearMap.restrict hf)
     (TensorProduct.map LinearMap.id (ξmul (Tw.π 1) (Tw.ξ 1) (Tw.ξ_mem 1)) (w i))
   have hpt : p • ∑ i, n i • B.map D.wd.ψ (p • th i) = B.tg D.wd.πW hsq v := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [v, map_sum, map_nsmul (B.tg D.wd.πW hsq), Finset.smul_sum]
+
+    simp only [v, map_sum, map_nsmul (B.tg D.wd.πW hsq), Finset.smul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [B.tg_nat (Tw.π 1) D.wd.πW (Tw.sqZero 1) hsq, ← hpth, smul_comm p, ← map_nsmul,
       smul_smul, pow_two]
@@ -146,9 +146,9 @@ theorem chart_p_smul_lift_eq_bt :
     · have h := btTan_chi_tg D.ch (hF D.ch _) D.wd.ρW D.sm.nil D.wd.πW hsq D.wd.ρ1 D.wd.ρW_eq v k
       simp only [hpt]
       rw [h]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [v, map_sum, map_nsmul, AddSubmonoidClass.coe_finsetSum,
-        AddSubmonoidClass.coe_nsmul, Finset.mul_sum]
+
+      simp only [v, map_sum, map_nsmul, AddSubmonoidClass.coe_finsetSum,
+      AddSubmonoidClass.coe_nsmul, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [btTanCrd_nat, ← LinearMap.lTensor_def, btTanCrd_nat, ← D.wd.ξ_img, mul_smul_comm,
         ← map_mul]

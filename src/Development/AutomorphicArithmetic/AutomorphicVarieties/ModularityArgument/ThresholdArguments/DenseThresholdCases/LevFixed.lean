@@ -23,8 +23,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 theorem UpperTheory.V.Lev.fixedSs_of_prints (P : _root_.UpperTheory.V.Af.Hypotheses') : _root_.UpperTheory.V.Lev.FixedSsAlt :=

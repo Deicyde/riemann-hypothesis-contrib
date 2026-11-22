@@ -96,7 +96,7 @@ variable {K : FiniteSubfield} (S : Set (HeightOneSpectrum (𝓞 K.1))) [Fintype 
   (hK : Odd N ∨ IsTotallyComplex K.1)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 include hS in
 theorem bijective_gs_compactZmodDualityMap_of_duality {r s : ℕ} (h : r + s = 3) :
     Function.Bijective (compactZmodDualityMap (gsFinFamily S ιs) (gsRoots S N) (nsmul_gsRoots S N)
@@ -137,7 +137,7 @@ variable {K L : FiniteSubfield} [Fact (K ≤ L)] (S : Set (HeightOneSpectrum (�
   (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S) (n : ℕ) [NeZero n]
 
 
-set_option maxHeartbeats 3200000 in
+
 theorem bijective_compactZmodDualityMap_gsOpenSubgroup_of_surjective
     (τ : compactCohomologyRes (mackeyFamily (gsOpenSubgroup S hL) (gsFinFamily S ιs))
       (Rep.res (gsOpenSubgroup S hL : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype (gsRoots S n)) 3 →+ ZMod n)

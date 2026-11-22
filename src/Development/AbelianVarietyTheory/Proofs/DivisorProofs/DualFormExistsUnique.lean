@@ -66,8 +66,8 @@ theorem gram_det_ne_zero (ξ : E) (hξ : ξ ≠ 0) : (gram ξ).det ≠ 0 := by
     apply riemann_left_nondeg ξ hξ
     intro y
     rw [← riemannBil_apply, ← b.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul]
     apply Finset.sum_eq_zero
     intro j _
     have := congrFun hv0 j
@@ -113,8 +113,8 @@ theorem clBasis_repr (ξ : E) (hξ : ξ ≠ 0) (x : E) (i) :
   have h : riemannCl ξ x = (clBasis ξ hξ).equivFun.symm (fun i => (((Module.finBasis ℚ E).repr x i : ℚ) : ℂ)) := by
     rw [Module.Basis.equivFun_symm_apply]
     conv_lhs => rw [← riemannClL_apply, ← (Module.finBasis ℚ E).sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, clBasis_apply, riemannClL_apply]
+
+    simp only [map_sum, map_smul, clBasis_apply, riemannClL_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
     ext y
     simp [Rat.smul_def]

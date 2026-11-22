@@ -35,11 +35,11 @@ theorem sigR_inclR (x : E) : sigR R σ (inclR (F := F) R x) = inclR (F := F) R (
 theorem hR_ratV (x y : Fin M → E) :
     hR R σ J (ratV (F := F) R x) (ratV (F := F) R y) = inclR (F := F) R (hE σ J x y) := by
   unfold hR hE Formalism.UG.hform JR ratV
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [map_mul, map_mul, sigR_inclR, Matrix.map_apply]
   rfl

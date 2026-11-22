@@ -53,11 +53,11 @@ theorem bd_eC (m : ℕ) :
       map_add] at hx hy ⊢
     rw [hx, hy]
   | single g a =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe,
-      LinearMap.baseChange_tmul, eC_single, bdZ_single, tmul_add, tmul_sum, map_add, map_sum,
-      bd, Finsupp.linearCombination_single, smul_add, Finset.smul_sum, Finsupp.smul_single,
-      smul_eq_mul, mul_one]
+
+    simp only [LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe,
+    LinearMap.baseChange_tmul, eC_single, bdZ_single, tmul_add, tmul_sum, map_add, map_sum,
+    bd, Finsupp.linearCombination_single, smul_add, Finset.smul_sum, Finsupp.smul_single,
+    smul_eq_mul, mul_one]
     congr 1 <;> (try funext j) <;> congr 1 <;> push_cast <;> ring
 
 theorem cmap_eC {H : Type} [Group H] (f : G →* H) (n : ℕ) :

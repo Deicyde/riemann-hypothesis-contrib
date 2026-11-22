@@ -21,7 +21,7 @@ open GlobalTheory.StdLoc (glVol blockIdx)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.NormRatio
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.thetaLineReading_adelicNorm_eq_torusMeanSquare : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) {a d : ℕ} (hS : S.rank = a) (hT : T.rank = d)
   (δ : ℂ) (r : D.host.E), Setup ψ θ S T ⊤ δ r →
   ∀ LT : Lat T, IsSelfDualC T LT →

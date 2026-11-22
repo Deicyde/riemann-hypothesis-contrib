@@ -10,7 +10,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CPoly
 open Matrix Finset
 open scoped InnerProductSpace
 open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD GlobalTheory.CompanionTheory.RealCount GlobalTheory.CompanionTheory.RealCount.Tope
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.weight_polynomial_trace_identity : ∀ {n : ℕ} (lam : Fin n → ℤ) (E : KMod n) (T : E.V →L[ℂ] E.V), IsLefK lam E T →
     (⨆ μ, wtDual E μ) = ⊤ → iSupIndep (wtDual E) → ∀ s : Finset (Fin n → ℤ), (∀ μ, wtDual E μ ≠ ⊥ → μ ∈ s) →
       cPoly s (fun μ => trOn (wtDual E μ) (dualT E 1 : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ))) * altL (delZ n) ^ 2 =

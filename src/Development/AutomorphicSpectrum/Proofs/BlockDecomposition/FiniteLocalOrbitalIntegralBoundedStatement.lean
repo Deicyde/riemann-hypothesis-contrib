@@ -19,7 +19,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CompanionTheory.SiegelND.Integ GlobalTheory.CompanionTheory.SiegelND.Integ.Hua
 open NumberField
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finite_local_orbital_integral_bounded : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
     IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J →
     ∀ (n : ℕ) (ψ : AddChar (AF F) ℂ), IsCharAF F ψ →

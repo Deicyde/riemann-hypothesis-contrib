@@ -22,7 +22,7 @@ open CategoryTheory AlgebraicGeometry TensorProduct GroundTheory.PAdicHodge Glob
 
 namespace CrystallineSemistableComparison.Pb
 
-set_option maxHeartbeats 1000000
+
 
 variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (r : Res l K)
 

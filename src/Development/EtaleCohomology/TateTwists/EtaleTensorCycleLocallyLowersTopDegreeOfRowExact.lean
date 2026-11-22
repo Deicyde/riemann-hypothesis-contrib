@@ -96,8 +96,8 @@ theorem stD_low {R : Type} [CommRing R] (C J : Cx R) (U : Scheme.{0}) (w w' : �
     ∀ q : TensorDegreeIndex w', n + 1 < q.1.1 → stD C J U w w' h y q = 0 := by
   classical
   intro q hq
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← DirectSum.sum_support_of y, map_sum, DirectSum.sum_apply]
+
+  rw [← DirectSum.sum_support_of y, map_sum, DirectSum.sum_apply]
   refine Finset.sum_eq_zero fun p hp => ?_
   have hpn : p.1.1 ≤ n := by
     by_contra hc; exact (DFinsupp.mem_support_iff.1 hp) (hy p (by omega))
@@ -114,8 +114,8 @@ theorem stD_top {R : Type} [CommRing R] (C J : Cx R) (U : Scheme.{0}) (w w' : �
       TensorProduct.map ((C.d s (s + 1)).hom.app (op U)).hom LinearMap.id (y ⟨(s, w - s), h0⟩) := by
   classical
   conv_lhs => rw [← DirectSum.sum_support_of y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, DirectSum.sum_apply]
+
+  rw [map_sum, DirectSum.sum_apply]
   have hz : ∀ p ∈ DFinsupp.support y, p ≠ ⟨(s, w - s), h0⟩ →
       stD C J U w w' h (DirectSum.of (TensorDegreeSummand C J U w) p (y p)) ⟨(s + 1, w - s), h1⟩ = 0 := by
     intro p hp hne

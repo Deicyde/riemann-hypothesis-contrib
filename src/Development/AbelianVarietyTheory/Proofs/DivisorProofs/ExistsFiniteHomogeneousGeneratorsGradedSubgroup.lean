@@ -21,8 +21,8 @@ theorem twist_homog (x : Fin (D + 1) → K) (n : ℕ) (T : MvPolynomial (Fin (D 
     (hT : T.IsHomogeneous n) :
     twist x T = Polynomial.C (aeval x T) * Polynomial.X ^ n := by
   unfold twist
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coe_eval₂Hom, eval₂_eq', aeval_def, eval₂_eq', map_sum, Finset.sum_mul]
+
+  rw [coe_eval₂Hom, eval₂_eq', aeval_def, eval₂_eq', map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun d hd => ?_
   have hdeg : ∑ i, d i = n := by
     have := hT (mem_support_iff.mp hd)
@@ -93,8 +93,8 @@ theorem exists_finite_homogeneous_generators : ∀ (K : Type) [CommRing K] (D c 
     rintro _ ⟨⟨q, f⟩, hf, rfl⟩
     obtain ⟨T, hT, rfl⟩ := hw q f hf
     refine ⟨T, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ψ, v, Fintype.linearCombination_apply, hsmul, twist_homog x _ _ (hT _), map_sum, Finset.sum_mul]
+
+    simp only [ψ, v, Fintype.linearCombination_apply, hsmul, twist_homog x _ _ (hT _), map_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp only [map_mul]; ring
   have hfg : M.FG := by

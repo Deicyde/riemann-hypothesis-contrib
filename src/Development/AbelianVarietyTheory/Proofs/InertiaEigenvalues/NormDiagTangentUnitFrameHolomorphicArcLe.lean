@@ -119,8 +119,8 @@ theorem exists_im_tau : ∃ A N : Matrix (Fin g) (Fin g) ℝ, ∀ w : ℂ, (Θ.�
       have := (Θ.per 0 k).1
       rwa [Ha.Pw_eq, zero_smul, add_zero] at this
     rw [h1, ← hu, hs]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_zsmul, Matrix.mulVec_sum, Matrix.mulVec_smul, hp]
+
+    simp only [map_sum, map_zsmul, Matrix.mulVec_sum, Matrix.mulVec_smul, hp]
     simp [Pi.single_apply]
   refine ⟨Matrix.of fun j k => ((Θ.h *ᵥ Ha.P₀ (Θ.bas (Pi.single (.inr k) 1))) j).im,
     Matrix.of fun j k => ((Θ.h *ᵥ Ha.N (Θ.bas (Pi.single (.inr k) 1))) j).re, fun w => ?_⟩
@@ -183,7 +183,7 @@ end ThetaShiftProofs
 
 
 open GlobalTheory.FrameNormLie GlobalTheory.FrameNorm in
-set_option maxHeartbeats 1000000 in
+
 theorem point_bound {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
     {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ} {σ : c.F →+* ℂ}
     {U : Formalism.L2.PjFree.Unf Xo c σ r} (Uw : UnfWit U) (hσ : Formalism.L2.PjFree.GoodEmb c σ) (hU : Formalism.L2.PjFree.IsUnf U)

@@ -8,7 +8,7 @@ open NumberField NumberField.mixedEmbedding MeasureTheory Module
 
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 400000
+
 set_option synthInstance.maxSize 1024
 
 noncomputable section

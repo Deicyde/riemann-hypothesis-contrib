@@ -25,8 +25,8 @@ theorem span_range_eq_basis {n : ℕ} (b : Module.Basis (Fin n) K C) (j : C →�
     Submodule.span ℂ (Set.range j) = Submodule.span ℂ (Set.range fun k => j (b k)) := by
   refine le_antisymm (Submodule.span_le.2 ?_) (Submodule.span_mono ?_)
   · rintro _ ⟨f, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr f, map_sum]
+
+    rw [← b.sum_repr f, map_sum]
     refine Submodule.sum_mem _ fun k _ => ?_
     rw [map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -64,7 +64,7 @@ def evL (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ) (v : (R.MW i σ).Vec) : (R
   map_smul' c a := by simp [evAt]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem jUnif_of (hl : LawsJ T) (hJ : JEvExists T R κ v₀) (hB : JEvBar T R κ) (hI : EvInj T R v₀)
     (h1 : ∀ (i : Fin D.R.m) σ, GoodEmb T.Q.c σ → ∀ (hV : T.V ((i : ℕ) + 1) σ = Wc D i) (m : ℕ) (b : Fin m → Cu T κ i),
       LinearIndependent T.Q.c.F b → LinearIndependent ℂ fun k => phiC T hV (wtA (κ i)) (b k : T.R ((i : ℕ) + 1)))

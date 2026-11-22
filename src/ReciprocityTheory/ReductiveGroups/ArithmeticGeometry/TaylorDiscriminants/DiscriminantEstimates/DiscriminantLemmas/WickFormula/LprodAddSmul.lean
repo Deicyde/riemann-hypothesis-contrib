@@ -160,8 +160,8 @@ theorem b_mul_ordEval {k AA M : Type} [CommRing k] [Ring AA] [Algebra k AA] [Add
         ∑ j, κ i j • ((c * (m (Sum.inr j) : k)) •
           omon (a + b) (a' + b') (m - Finsupp.single (Sum.inr j) 1)) := by
       change E _ = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [E, AddMonoidHom.mk'_apply, ordEval_smul, ordEval_monomial]
     rw [hdl, hsum, ordEval_monomial]
     simp only [omon_lower]

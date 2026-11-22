@@ -22,8 +22,8 @@ namespace GlobalTheory.LiftChar
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
 open ReciprocityTheory.Aut Formalism.AUTREP
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
-set_option maxHeartbeats 1000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 theorem charAt (D : D7) (cf : CharFrame D) (C : CharSide D cf) (j : Fin D.R.m) :
     ∃ μ : D.naut.CG 1, (C.e1 μ).1 = cf.mu0 j ∧ D.naut.csd μ ∧

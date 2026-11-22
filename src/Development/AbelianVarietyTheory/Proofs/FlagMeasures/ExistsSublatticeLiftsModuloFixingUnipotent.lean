@@ -151,8 +151,8 @@ theorem expand {E : Type} [Field E] [NumberField E] [StarRing E] (S : HSpace E) 
     (hx : x ∈ Submodule.span E (Set.range e)) : x = ∑ a, S.hT (f a) x • e a := by
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 hx
   refine Finset.sum_congr rfl fun a _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, h]
+
+  simp [map_sum, h]
 
 theorem orth_span {E : Type} [Field E] [NumberField E] [StarRing E] (S : HSpace E) {s : Set S.V} {y : S.V}
     (h : ∀ x ∈ s, S.hT x y = 0) : y ∈ orth S (Submodule.span E s) := by
@@ -208,8 +208,8 @@ theorem mem_of_split {u : D.what₂.Word} {F0 : Fb D u} {Λ : LatV D} (hB : IsBa
     have h1 := orth_apply _ hw (Submodule.subset_span (Or.inl ⟨a, rfl⟩))
     have h2 : (hS D).hT (D.sp.hypE a) (x₁ + x) = 0 := by
       rw [expand (hS D) D.sp.hypE D.sp.hypF (hyp_fe D) hx2]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, D.sp.hyp_ee]
+
+      simp [map_sum, D.sp.hyp_ee]
     rw [map_add (f := _), h2, zero_add] at h1
     rw [h1, zero_smul]
   rw [hy0, add_zero] at hw e'

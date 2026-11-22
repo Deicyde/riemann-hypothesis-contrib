@@ -145,8 +145,8 @@ theorem start : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [P
   have hcoeff : ∀ α, coeff α f = (if α = 0 then -T (constantCoeff c) else 0) +
       ∑ i, if α = Finsupp.single i 1 then T (w i) else 0 := by
     intro α
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hf, map_add (f := _), map_sum]
+
+    rw [hf, map_add (f := _), map_sum]
     have e : ∀ (r : WittVector p k) (g : MvPowerSeries (Fin d) (Fr p k)),
         coeff α (r • g) = algebraMap (WittVector p k) (Fr p k) r * coeff α g := fun r g => by
       rw [← algebraMap_smul (Fr p k) r g, coeff_smul]
@@ -160,8 +160,8 @@ theorem start : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [P
     rw [hcoeff α]
     refine ⟨(if α = 0 then -WittVector.teichmuller p (constantCoeff c) else 0) +
       ∑ i, if α = Finsupp.single i 1 then WittVector.teichmuller p (w i) else 0, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [one_mul, map_add (f := _), map_sum]
+
+    rw [one_mul, map_add (f := _), map_sum]
     congr 1
     · split_ifs <;> simp [hT]
     · refine Finset.sum_congr rfl fun i _ => ?_

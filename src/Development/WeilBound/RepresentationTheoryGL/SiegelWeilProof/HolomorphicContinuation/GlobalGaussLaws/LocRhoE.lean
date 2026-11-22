@@ -17,8 +17,8 @@ namespace PositivityTheory.Rg.Sw.Glob.RhoH
 
 variable {D : D7} {n : ℕ}
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 2000000
+
+
 
 
 open Classical in
@@ -40,10 +40,10 @@ theorem evX_substP {m : ℕ} (τ : D.what₂.Tau) (fr : Matrix (Fin m) (Fin m) �
   · subst hτ
     rw [if_pos rfl, dirAt_self]
     cases b
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [Bool.false_eq_true, ↓reduceIte, map_sum, map_mul, eval_C, eval_X, Matrix.mul_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [↓reduceIte, map_sum, map_mul, eval_C, eval_X, Matrix.mul_apply, map_sum, Complex.star_def]
+
+    · simp only [Bool.false_eq_true, ↓reduceIte, map_sum, map_mul, eval_C, eval_X, Matrix.mul_apply]
+
+    · simp only [↓reduceIte, map_sum, map_mul, eval_C, eval_X, Matrix.mul_apply, map_sum, Complex.star_def]
   · rw [if_neg hτ, dirAt_ne hτ]
     cases b <;> simp
 

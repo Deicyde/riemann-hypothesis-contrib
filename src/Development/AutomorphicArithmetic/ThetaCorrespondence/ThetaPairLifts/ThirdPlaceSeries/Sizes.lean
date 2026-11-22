@@ -6,11 +6,11 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 noncomputable section
 open GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.FlatTw GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.RefSum
 namespace GlobalTheory.RefSum.SizeTZ

@@ -15,7 +15,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option autoImplicit false
@@ -24,8 +24,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons
 open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 namespace GlobalTheory.BigOn.Exp
 theorem expConj_alt : GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Published.GlobalArtinReciprocity → GlobalTheory.Published.RayClassFieldSt → GlobalTheory.SerStd.SeriesRatS → _root_.GlobalTheory.BigOn.Exp.TwistConditions fun Fm x hx i p w j => ∀ (ρ : Setup (Fm.D x i).ntw) (hρ : ρ.Good) (ν : ℂ),
   RealPin p.R p.cG ρ → ρ.LevelOf (Fm.D x i).nexp →
@@ -55,8 +55,8 @@ theorem expConj_alt : GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Pub
       ν • ρ.theta ((Fm.ex x hx i).nch.twI w) j ((Fm.ex x hx i).nch.sd w) h P := by
     rw [← hf]
     change _ = ν • ν⁻¹ • evK p.nexp p.v₀ hρ _ j _ (p.nexp.eF _ _ _ (Nat.le_add_left _ _) j.2 f)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [smul_inv_smul₀ hν, hfe, map_sum]
+
+    rw [smul_inv_smul₀ hν, hfe, map_sum]
     rfl
   have h0 := a2 τ hfix (n + n')
     (Fin.append (fun k => ρ.e ((Fm.ex x hx i).nch.twI w) ((Fm.ex x hx i).nch.sd w) (a k)) (fun k => -b k))

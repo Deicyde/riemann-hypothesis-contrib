@@ -159,8 +159,8 @@ theorem hG_f_proj {r : ℕ} {e f : Fin r → Fin I.n → I.E} (hf : ∀ a b, hG 
   have hsym : ∀ x y, hG I y x = starRingEnd I.E (hG I x y) := by
     intro x y
     unfold hG Formalism.UG.hform
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, starRingEnd_self_apply, hJ]
+
+    simp only [map_sum, map_mul, starRingEnd_self_apply, hJ]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
     ring

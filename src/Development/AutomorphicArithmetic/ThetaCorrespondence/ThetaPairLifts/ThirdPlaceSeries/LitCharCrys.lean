@@ -33,7 +33,7 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 theorem UpperTheory.Lit.heckeLAdicCharacterCrystalline_of_deRham (h1 : GlobalTheory.Published.HeckeLAdicCharacterDeRham) (h2 : GlobalTheory.Published.DeRhamPotSemistable)

@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 noncomputable section
@@ -18,7 +18,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 namespace UpperTheory.Gal.projectedFormsSystemPart
 open UpperTheory.V.Z.Ord UpperTheory.Zero.LLC
 def PartLinkAlt : Prop :=

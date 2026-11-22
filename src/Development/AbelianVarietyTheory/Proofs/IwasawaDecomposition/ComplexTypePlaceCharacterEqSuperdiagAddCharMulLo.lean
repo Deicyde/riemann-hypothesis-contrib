@@ -10,8 +10,8 @@ open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 open GlobalTheory.LevCmp
 open GlobalTheory.TwistChoice (Reading ReadsAt)
 
@@ -124,8 +124,8 @@ private theorem loc_read (s : SplitPlace L) {n r : ℕ} (h : r ≤ n) {q : ℕ} 
     · exact (hX _ _).symm
     · rfl
   · unfold NX.supSum
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
     split_ifs
     · exact (hr _ _).symm

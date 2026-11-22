@@ -118,7 +118,7 @@ def coefL (ψ : AddChar (AF D.host.F) ℂ) {ρ σ : ℕ} (B : BesLev D ρ) (B' :
   ψ (symplOH B.V₀ S (-(B.o.resS S).symm (0, l.κ S (B'.o.resT S u').2)) ((B.o.resS S).symm (0, (B.o.resS S u).2))) *
     cstL ψ B S M LS P ((B.o.resS S u).2 - l.κ S (B'.o.resT S u').2)
 
-set_option maxHeartbeats 2000000 in
+
 theorem contrOp : ∀ D : D7, ContrOp D := by
   intro D k _ _ _ _ ι p I P hP n' n'' _ _ _ _ ψ hψ ρ σ B B' l S vL α α₀ γ γ₀ M LS M' Λ Λ' hM hLS hM' hfr e₁ e₂ he₁ he₂
   classical

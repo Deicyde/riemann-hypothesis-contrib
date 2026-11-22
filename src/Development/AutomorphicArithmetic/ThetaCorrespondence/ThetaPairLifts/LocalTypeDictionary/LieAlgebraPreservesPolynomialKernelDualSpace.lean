@@ -86,8 +86,8 @@ theorem polynomialKernel_constTerm_lieDeriv_dualSpace : _root_.GlobalTheory.FunP
     intro x
     refine (HasDerivAt.sum (u := Finset.univ) (fun i _ => hpure i x)).congr_of_eventuallyEq
       (Filter.Eventually.of_forall fun t => ?_)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finset.sum_apply]
+
+    simp [map_sum, Finset.sum_apply]
   have hΦ₁ : Φ₁ = ∑ i, pure (D (f i)) (φ i) := by
     funext x
     rw [Finset.sum_apply]
@@ -104,7 +104,7 @@ end
 section
 open NumberField IsDedekindDomain
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lieAlgebra_preserves_polynomialKernel_dualSpace : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
     (Bs : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base F E) (a a' : ℕ) (G : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Geo σ a a') (Xc : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chars F E)
     (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V G.W) (om' : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V' G.W) (R : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.RealMaps F a a')

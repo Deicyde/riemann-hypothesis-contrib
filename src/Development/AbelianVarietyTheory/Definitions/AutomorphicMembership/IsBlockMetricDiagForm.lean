@@ -28,9 +28,9 @@ def gramOf (h : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ) (u : n → M) : Matrix n n �
 
 theorem form_sum (h : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ) (u : n → M) (v w : n → ℂ) :
     h (∑ a, v a • u a) (∑ a, w a • u a) = star w ⬝ᵥ gramOf h u *ᵥ v := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, RingHom.id_apply, smul_eq_mul,
-    dotProduct, mulVec, gramOf, of_apply, Pi.star_apply, Finset.mul_sum, RCLike.star_def]
+
+  simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, RingHom.id_apply, smul_eq_mul,
+  dotProduct, mulVec, gramOf, of_apply, Pi.star_apply, Finset.mul_sum, RCLike.star_def]
   exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
 
 def diagForm (b : Module.Basis n ℂ M) (a : n → ℝ) : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ :=

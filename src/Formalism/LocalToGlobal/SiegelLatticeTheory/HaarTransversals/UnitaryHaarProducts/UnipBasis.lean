@@ -62,10 +62,10 @@ theorem hE_crd (v w : (VS D).V) : hE X (X.crd v) (X.crd w) = X.ιE.symm ((VS D).
   apply X.ιE.injective
   rw [RingEquiv.apply_symm_apply]
   conv_rhs => rw [← X.bas.sum_repr v, ← X.bas.sum_repr w]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hE, Formalism.UG.P.hform_eq_dot, dotProduct, mulVec, Function.comp_apply, map_sum, map_mul,
-    LinearMap.sum_apply, LinearMap.map_smulₛₗ₂, LinearMap.map_smul, smul_eq_mul,
-    starRingEnd_apply, X.ιE_conj, X.J_eq, HidaSetting.crd, crdOf, RingEquiv.apply_symm_apply, Finset.mul_sum]
+
+  simp only [hE, Formalism.UG.P.hform_eq_dot, dotProduct, mulVec, Function.comp_apply, map_sum, map_mul,
+  LinearMap.sum_apply, LinearMap.map_smulₛₗ₂, LinearMap.map_smul, smul_eq_mul,
+  starRingEnd_apply, X.ιE_conj, X.J_eq, HidaSetting.crd, crdOf, RingEquiv.apply_symm_apply, Finset.mul_sum]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [star_host_apply]
@@ -244,8 +244,8 @@ theorem Bm'_mul_Bm : Bm' X * Bm X = 1 := by
   apply Matrix.toLin'.injective
   apply LinearMap.ext
   intro c
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.toLin'_apply, Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, Bm_mulVec, Bm'_mulVec, map_sum, Matrix.one_mulVec]
+
+  rw [Matrix.toLin'_apply, Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, Bm_mulVec, Bm'_mulVec, map_sum, Matrix.one_mulVec]
   funext k'
   simp [Finset.sum_apply, cE_bv]
 

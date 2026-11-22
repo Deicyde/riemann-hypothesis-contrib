@@ -334,7 +334,7 @@ def rep (hC : DefCase U ξ) (hL : ActLev (Xo := Xo) c lev) (hD : Dom a n) :
   map_one' := LinearMap.ext fun f => Subtype.ext (actL_one _ _ _ hL.total hL.func hL.one (mem_sec f.2).1)
   map_mul' g h := LinearMap.ext fun f => Subtype.ext (actL_mul _ _ _ hL.total hL.func hL.mul g h (mem_sec f.2).1)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem mem_eigSub (χ : G →* (c.F)ˣ) (f : Rul Xo c) :
     f ∈ eigSub lev χ ↔ ∀ g, actLev c lev g f = (χ g : c.F) • f := by
   rw [eigSub, Submodule.mem_iInf]

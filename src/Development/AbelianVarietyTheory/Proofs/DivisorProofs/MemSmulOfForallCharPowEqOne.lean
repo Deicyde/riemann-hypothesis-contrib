@@ -22,8 +22,8 @@ theorem mem_smul_of_forall_char_pow_eq_one
     apply b.repr.injective
     ext j
     rw [← natCast_zsmul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finsupp.single_apply, Int.mul_ediv_cancel' (h j)]
+
+    simp [map_sum, Finsupp.single_apply, Int.mul_ediv_cancel' (h j)]
   obtain ⟨i, hi⟩ := hex
   have hk0 : k ≠ 0 := by rintro rfl; exact hk (by simp)
   haveI : NeZero (k : F) := ⟨hk⟩

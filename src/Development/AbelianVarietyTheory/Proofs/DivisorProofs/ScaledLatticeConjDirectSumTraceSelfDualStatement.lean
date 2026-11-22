@@ -39,7 +39,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.Local
 open GlobalTheory.TripleSpaceW (conjSub)
 open GlobalTheory.SkewLat (scLat pairLat)
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.scaledLattice_conj_directSum_trace_selfDual : ∀ {D : D7} (A B : HSp D)
     {ΛA : Submodule (𝓞 D.host.E) (Fin A.rank → D.host.E)} {ΛB : Submodule (𝓞 D.host.E) (Fin B.rank → D.host.E)},
     IsSelfDualC A ΛA → IsSelfDualC B ΛB → ∀ {d : ℕ} (e : Fin A.rank ⊕ Fin B.rank ≃ Fin d) (y : Fin d → D.host.E),

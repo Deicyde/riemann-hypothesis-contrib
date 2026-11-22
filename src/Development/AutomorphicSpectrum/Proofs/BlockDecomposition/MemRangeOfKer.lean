@@ -33,8 +33,8 @@ theorem mem_range_of_ker {ι : Type} (f : ι → A →ₗ[ℂ] X) (x : A ⊗[ℂ
     refine Submodule.mem_iInf _ |>.2 fun j => ?_
     have e : (c.mapRange (f j) (map_zero _)).sum (fun i m => m ⊗ₜ[ℂ] B i) = 0 := by
       rw [Finsupp.sum_mapRange_index (by simp)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [Finsupp.sum, map_sum] using h j
+
+      simpa [Finsupp.sum, map_sum] using h j
     have := TensorProduct.sum_tmul_basis_right_eq_zero B _ e
     simpa using DFunLike.congr_fun this i
   refine Submodule.sum_mem _ fun i _ => ⟨(⟨c i, hc i⟩ : (⨅ j, LinearMap.ker (f j) : Submodule ℂ A)) ⊗ₜ[ℂ] B i, ?_⟩
@@ -240,8 +240,8 @@ theorem prodFn_prodInv {S₁ : Submodule ℂ (Sm E r)} {S₂ : Submodule ℂ (Sm
   have : (fun m : GA E r × GA E s => ∑ i, (ψ₁ i).1 m.1 * (ψ₂ i).1 m.2) =
       prodFn S₁ S₂ (∑ i, (⟨ψ₁ i, h₁ i⟩ : S₁) ⊗ₜ[ℂ] (⟨ψ₂ i, h₂ i⟩ : S₂)) := by
     funext m
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finset.sum_apply, prodFn_tmul]
+
+    simp [map_sum, Finset.sum_apply, prodFn_tmul]
   rw [this, prodInv_prodFn]
 
 def cc (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (r s : ℕ) : GA E r × GA E s →* ℂˣ :=

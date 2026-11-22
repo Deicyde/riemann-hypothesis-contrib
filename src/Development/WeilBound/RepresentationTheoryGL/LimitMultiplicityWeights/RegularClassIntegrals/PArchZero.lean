@@ -117,7 +117,7 @@ theorem update_mem {fa : ∀ w, GArch σ J w → ℂ} (hfa : ∀ w, fa w ∈ CcA
 end Gen
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem integral_class_eq_zero (hB : BumpOn) (hW : Weight) (hV : Vanish) (hFD : FDRight) (hG : ArchGroup)
     (hU : ArchUnimod) (hR : MainStatements.RegularCuspidalTrace.RegClassInt) (μ : Measure (GA D V)) [μ.IsHaarMeasure] [μ.IsMulRightInvariant]
     (fa : ∀ w, GArch D.sp.cm.sig V.gram w → ℂ) (ff : ∀ v, GLoc D.sp.cm.sig V.gram v → ℂ)
@@ -155,7 +155,7 @@ theorem integral_class_eq_zero (hB : BumpOn) (hW : Weight) (hV : Vanish) (hFD : 
 
 end MainStatements.WeightKernel.PArchZero
 
-set_option maxHeartbeats 1000000 in
+
 open MainStatements.WeightKernel.PArchZero in
 theorem MainStatements.WeightKernel.archZero : BumpOn → Weight → Vanish → FDRight → ArchGroup → ArchUnimod → MainStatements.RegularCuspidalTrace.RegClassInt →
     ArchZero := by

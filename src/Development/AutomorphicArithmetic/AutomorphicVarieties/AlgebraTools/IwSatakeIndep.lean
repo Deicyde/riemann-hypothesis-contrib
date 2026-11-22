@@ -42,8 +42,8 @@ private theorem satInd_trc {I K : Subgroup G} (h : I ≤ K) (hf : FinOrb K I 1) 
     congr 1
     show (((q : G ⧸ I).out * 1 : G) : G ⧸ I) = _
     rw [mul_one, QuotientGroup.out_eq']
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hv, map_sum, MonoidAlgebra.coeff_sum]
+
+  rw [hv, map_sum, MonoidAlgebra.coeff_sum]
   simp only [Representation.ofMulAction_single, MonoidAlgebra.coeff_single]
   change (Finsupp.applyAddHom (M := A) (y : G ⧸ I))
     (∑ q : MulAction.orbit K ((1 : G) : G ⧸ I), Finsupp.single (g • (q : G ⧸ I)) (1 : A)) = _

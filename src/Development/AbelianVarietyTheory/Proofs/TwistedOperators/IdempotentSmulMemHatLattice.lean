@@ -109,7 +109,7 @@ variable {D : D7} {S T : HSp D} {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank →
   {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem v_le_of_mem_latO_idLat (hS : IsSelfDualC S ΛS) {βS : GL (Fin S.rank) (EAf D)} {βT : GL (Fin T.rank) (EAf D)}
     (hβS : IsFrame βS ΛS) (hβT : IsFrame βT ΛT) (w : Pl D.host.E)
     (hw : ∀ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) ≤ 1)

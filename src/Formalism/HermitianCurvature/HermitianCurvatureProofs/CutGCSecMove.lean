@@ -213,9 +213,9 @@ theorem section_move_holds : SecMove := by
       rw [hrhs]
       conv_lhs => rw [hXX, hsp0]
       ext v
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [ContinuousLinearMap.comp_apply, FunLike.coe_sum, Finset.sum_apply,
-        FunLike.coe_smul, Pi.smul_apply, map_sum, map_smul]
+
+      simp only [ContinuousLinearMap.comp_apply, FunLike.coe_sum, Finset.sum_apply,
+      FunLike.coe_smul, Pi.smul_apply, map_sum, map_smul]
 
   have hfam0 : ∀ (Dc : (Fin P.r → ℂ) → Set (Q.Mx P.k P.r)) (Φ : Q.Fn P.k P.r (Wq →L[ℂ] Wp)),
       FamR P Bs Dc Φ → FamR P Bs0 Dc Φ := by

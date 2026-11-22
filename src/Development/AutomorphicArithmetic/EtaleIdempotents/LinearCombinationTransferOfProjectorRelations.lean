@@ -5,7 +5,7 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleCohomolo
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 set_option backward.isDefEq.respectTransparency false
 
 open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison TensorProduct UpperTheory.Gal.crystallineComparison UpperTheory.Ru.crystallineComparison
@@ -24,8 +24,8 @@ theorem UpperTheory.linear_combination_transfer_of_projector_relations :
     have e1 : ∀ a, ∑ k, (L * ρ i * cc i k) • P i a (Ev k) = R • P i a (Z i) := by
       intro a
       have := congrArg (P i a) (h2 i)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_smul, map_sum, Finset.smul_sum, smul_smul] at this
+
+      simp only [map_smul, map_sum, Finset.smul_sum, smul_smul] at this
       simpa only [mul_assoc] using this
     calc ∑ k, (L * ρ i * cc i k) • (β • G (Wc i k))
         = ∑ k, (L * ρ i * cc i k) • (γ • ∑ a, P i a (Ev k)) := by simp only [h1]
@@ -40,8 +40,8 @@ theorem UpperTheory.linear_combination_transfer_of_projector_relations :
   calc (L * β) • G (∑ q : J × ι, ((σ q.1 : A) * ρ q.1 * cc q.1 q.2) • Wc q.1 q.2)
       = ∑ i, (σ i : A) • ∑ k, (L * ρ i * cc i k) • (β • G (Wc i k)) := by
         rw [Fintype.sum_prod_type]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, map_smul, Finset.smul_sum, smul_smul]
+
+        simp only [map_sum, map_smul, Finset.smul_sum, smul_smul]
         refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
         congr 1
         ring

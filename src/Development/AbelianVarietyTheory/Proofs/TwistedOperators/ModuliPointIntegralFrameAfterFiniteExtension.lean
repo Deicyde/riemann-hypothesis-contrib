@@ -21,7 +21,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -212,7 +212,7 @@ theorem exists_obj_level (c : Coeff l) (c₂ : Coeff l₂) (hle : c.F ≤ c₂.F
   exact ⟨L, inferInstance, inferInstance, inferInstance, j, o₂, ho₂ ▸ ⟨m⟩⟩
 
 
-set_option maxHeartbeats 400000 in
+
 theorem exists_intFr {Xo : Moduli D l} {c : Coeff l} (T : CDVR) (io : c.F →+* T.Fr) (x : Sp T.Fr ⟶ Xo.X)
     (hx : letI := io.toAlgebra; x ≫ Xo.s = sOf c T.Fr) (G : SAB H (Sp T.V)) (t' : SAB H (Sp T.Fr))
     (m1 : SABMap t' Xo.univ.t x) (m2 : SABMap t' G (spMap (algebraMap T.V T.Fr))) (θ : LB.Sec G.PP.L)

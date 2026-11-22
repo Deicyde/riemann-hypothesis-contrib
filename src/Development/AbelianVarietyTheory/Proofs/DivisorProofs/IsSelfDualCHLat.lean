@@ -15,8 +15,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.MovedLat
 

@@ -110,9 +110,9 @@ theorem genericMultOne (hL : OneGenericVector) : GenericMultOne := by
     refine Finset.prod_congr rfl fun PP _ => ?_
     simp only [f, Units.val_inv_eq_inv_val]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_congr rfl fun h _ => hterm h, map_natCast, Nat.card_congr e, Nat.card_pi, Nat.cast_prod,
-    ← Finset.prod_congr rfl fun PP _ => hf PP, Fintype.prod_sum]
+
+  rw [map_sum, Finset.sum_congr rfl fun h _ => hterm h, map_natCast, Nat.card_congr e, Nat.card_pi, Nat.cast_prod,
+  ← Finset.prod_congr rfl fun PP _ => hf PP, Fintype.prod_sum]
   exact Fintype.sum_equiv e _ _ fun _ => rfl
 
 end GlobalTheory.GenericProduct

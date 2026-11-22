@@ -12,8 +12,8 @@ open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.ColSplit
 

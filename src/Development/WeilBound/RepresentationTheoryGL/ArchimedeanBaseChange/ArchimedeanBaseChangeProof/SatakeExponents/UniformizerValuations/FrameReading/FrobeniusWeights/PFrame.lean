@@ -11,13 +11,13 @@ open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions 
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.SpectralAccumulation PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Eig
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace PositivityTheory.Rg.BcB.F.FG
 
 attribute [local instance] borelG borelF borelA GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option maxHeartbeats 1000000 in
+
 theorem frGoodOf_holds : FRGoodOf := by
   intro h1 h2 hR E _ _ _ hE n π hπ S T F₀ F i s₁ s₂ Pa Pb D hc A G h0 hG hl he
   obtain ⟨e1, e2, e3, e4, -⟩ := F.same
@@ -29,7 +29,7 @@ theorem frGoodOf_holds : FRGoodOf := by
     (fun w hw => ⟨F.comp w hw, ((F.fam.comp F.i₀).2.2.2 w hw).2.1⟩) _ _ _ _ _ _ (F₀.A i) s₁ s₂ Pa Pb D hc l1 l2 A G h0 hG hl
     fun w hw hg k intersection_update_fsHerm_neg_one => he (⟨w, hw, hg⟩, k, intersection_update_fsHerm_neg_one)
 
-set_option maxHeartbeats 1000000 in
+
 theorem frWeightOf_holds : FRWeightOf := by
   intro h1 hR E _ _ _ hE n hn π hπ S F₀ d i s₁ s₂ Pa Pb D hc
   obtain ⟨G, hG, h0, -⟩ := hc.vec

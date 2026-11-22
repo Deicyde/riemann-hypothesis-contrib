@@ -25,8 +25,8 @@ theorem unit_transfer {A B m n : Type} [CommRing A] [CommRing B] [Fintype m] [Fi
   ext i j
   have := congrArg s (congrFun (congrFun hy (e i)) (e j))
   rw [hJ, ← this]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, hg, hJ, hs]
+
+  simp only [Matrix.mul_apply, Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul, hg, hJ, hs]
   rw [← e.sum_comp]
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [← e.sum_comp]
@@ -45,7 +45,7 @@ theorem hasMat_pt {h h' : GA D D.sp.X'} {y} (h1 : HasMat h y) (h2 : HasMat h' y)
     exact (h1.2 i j).trans (h2.2 i j).symm
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem hasMat_exists (y : Formalism.UG.UPts (sigD D) (gramP D) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)) :
     ∃ h : GA D D.sp.X', HasMat h y.1 := by
   let e := finCongr (rankP D)

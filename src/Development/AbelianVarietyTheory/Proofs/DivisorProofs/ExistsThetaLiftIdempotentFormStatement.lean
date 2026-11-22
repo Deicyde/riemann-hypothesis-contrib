@@ -18,7 +18,7 @@ open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTh
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_theta_lift_idempotent_form : ∀ {D : D7} (V : HSp D), V.gram = 1 → ∀ (e : AE D), e * e = e → e * cA D e = 0 →
     ∀ (P Q : Matrix (Fin V.rank) (Fin V.rank) (AE D)), e • (P * Q) = e • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) →
       e • (Q * P) = e • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) →

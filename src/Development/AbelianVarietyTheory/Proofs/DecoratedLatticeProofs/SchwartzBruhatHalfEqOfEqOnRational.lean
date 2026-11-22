@@ -18,8 +18,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 theorem GlobalTheory.RatHalfDense.tmul_split {F E A : Type} [Field F] [CommRing E] [Algebra F E] [CommRing A] [Algebra F A]
     (a : E) (α ι : A) (u : F) (N d : ℕ)

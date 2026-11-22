@@ -69,8 +69,8 @@ theorem eq_sum_epsPairing_smul {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) (
   classical
   apply (G.pairing_flip_bijective C).1
   refine tb.ext fun m => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LinearMap.flip_apply, LinearMap.flip_apply, map_sum]
+
+  rw [LinearMap.flip_apply, LinearMap.flip_apply, map_sum]
   have hlin : ∀ (t : G.Tate) (c : ℤ_[p]) (ψ : G.dual.Tate),
       epsPairing hε G t (c • ψ) = c * epsPairing hε G t ψ := by
     intro t c ψ
@@ -114,9 +114,9 @@ theorem hasDatum_of_matrices : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
       fun m' => algebraMap O C (D.bb z m') := by
     intro z
     funext m'
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.bC, GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.redC, Datum.bb, Matrix.toLin'_apply, Matrix.mulVec,
-      dotProduct, map_sum, map_mul]
+
+    simp [GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.bC, GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.redC, Datum.bb, Matrix.toLin'_apply, Matrix.mulVec,
+    dotProduct, map_sum, map_mul]
   have halC : ∀ (y : Fin G.height → C) a, GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.alC C D y (σ a) =
       ∑ m, algebraMap O C (WittVector.fontaineTheta O p (Fa a m)) * y m := by
     intro y a
@@ -219,8 +219,8 @@ theorem hasDatum_of_matrices : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
       ∑ m, lb j (hodgeTate G (tb m)) * padicToO p O (tb.repr t m) := by
     intro j t
     conv_lhs => rw [← tb.sum_repr t]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum (hodgeTate G), map_sum (lb j)]
+
+    rw [map_sum (hodgeTate G), map_sum (lb j)]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [hodgeTate_smul (padicToO p O), map_smul, smul_eq_mul, mul_comm]
   have hχexp : ∀ χ0 : G.dual.Tate, χ0 = ∑ m', epsPairing hε G (tb m') χ0 • χ m' :=
@@ -244,15 +244,15 @@ theorem hasDatum_of_matrices : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
     rw [hbq]
     have hbbx : ∀ m', D.bb m m' = lie (D.Fil.mkQ m) (dlog G (χ m')) := by
       intro m'
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hbb, hdlog, map_sum]
+
+      rw [hbb, hdlog, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smul, hlie, smul_eq_mul]
     rw [pairingO]
     simp only [hbbx, he]
     conv_rhs => rw [hχexp χ0]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum (dlog G), map_sum]
+
+    rw [map_sum (dlog G), map_sum]
     refine Finset.sum_congr rfl fun m' _ => ?_
     rw [dlog_smul (padicToO p O), map_smul, smul_eq_mul, mul_comm]
 

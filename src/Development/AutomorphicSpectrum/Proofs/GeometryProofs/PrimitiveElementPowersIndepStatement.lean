@@ -6,7 +6,7 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrimitiveEle
 @[expose] public section
 
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.primitive_element_powers_indep : ∀ (k : Type) [Field k] (p : ℕ) [Fact p.Prime] [CharP k p]
     (A : Type) [CommRing A] [HopfAlgebra k A] [Coalgebra.IsCocomm k A] [Module.Finite k A] (f : A),
     Coalgebra.comul (R := k) f = f ⊗ₜ[k] (1 : A) + (1 : A) ⊗ₜ[k] f → f ≠ 0 →

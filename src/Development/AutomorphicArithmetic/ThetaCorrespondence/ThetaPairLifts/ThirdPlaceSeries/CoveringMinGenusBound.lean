@@ -29,11 +29,11 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section
-set_option synthInstance.maxHeartbeats 400000
+
 open NumberField
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions
 open GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.AllWt GlobalTheory.LevDesc
@@ -84,7 +84,7 @@ open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pul
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
 open GlobalTheory.BadCount
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.covering_gmin_of_prints_gram_deep_size : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.DeepGoodness → _root_.GlobalTheory.CovTop.SizeCondition → _root_.GlobalTheory.CovTop.MinimalGenerator := by
   first | exact @_root_.GlobalTheory.CovGminTop.covering_gmin_of_gram_deep_size | exact _root_.GlobalTheory.CovGminTop.covering_gmin_of_gram_deep_size | (intros; apply _root_.GlobalTheory.CovGminTop.covering_gmin_of_gram_deep_size <;> assumption)
 end

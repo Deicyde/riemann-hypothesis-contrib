@@ -123,8 +123,8 @@ theorem diag_eq_halfTrace (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (v : Heigh
   have h2 : e + e = algebraMap (Fv F v) (Fv F v ⊗[F] E) (Algebra.trace (Fv F v) (Fv F v ⊗[F] E) e) := by
     conv_lhs => rw [show e + e = e + sigR (Fv F v) σ e by rw [he]]
     rw [eq_sum_tmul bs (Fv F v) e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     rw [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
     have hs : sigR (Fv F v) σ ((Algebra.TensorProduct.basis (Fv F v) bs).repr e k ⊗ₜ[F] bs k) =

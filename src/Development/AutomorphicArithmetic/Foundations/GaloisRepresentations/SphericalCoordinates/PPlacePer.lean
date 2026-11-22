@@ -59,8 +59,8 @@ private theorem period_of_basis {M : Type} [AddCommGroup M] [Module.Free ℤ M] 
   have hPx : ∀ x, P x = ∑ i, (b.repr x i) • v i := by
     intro x
     conv_lhs => rw [← b.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => map_zsmul _ _ _
   have hsp : ⊤ ≤ Submodule.span ℝ (Set.range v) := by
     rw [← hs]

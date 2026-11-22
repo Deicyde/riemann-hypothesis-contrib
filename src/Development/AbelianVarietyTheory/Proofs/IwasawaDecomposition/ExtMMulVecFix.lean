@@ -81,7 +81,7 @@ theorem eq_extM_of_laws (g : Matrix (Fin n) (Fin n) A) (G : Matrix (Fin N) (Fin 
     exact congrFun (h1 _) _
 
 end ExtL
-set_option maxHeartbeats 1600000 in
+
 theorem exists_ka_tw (u : B.Word) (a : I.ι) {Ch : Type} {chOf : (I.stp u a B.R.m).Cl → Ch}
     {Lb : Ch → Submodule (𝓞 B.host.E) (Fin (B.R.N B.R.m) → B.host.E)}
     {U : Ch → Subgroup (GA B (B.R.N B.R.m))} {chi : ∀ β, U β →* ℂˣ} {y : (I.stp u a B.R.m).Cl → GA B (B.R.N B.R.m)}
@@ -169,7 +169,7 @@ theorem til_lat_eq_tw (hI : I.Ok) (l : I.Laws) (Z : TC.Later B (I.cols l))
     (piT_dvd_of_mem (base_fields_primes_ok B X).1 hPr u) _ (iXc (I.rec7 l Z)) hiX (z0v B X u) (fun j => rfl)] at e2
   exact (mulLat_toGLm m.1.1 _).trans e2.symm
 
-set_option maxHeartbeats 1600000 in
+
 theorem til_fv_eq_tw (hI : I.Ok) (l : I.Laws) (Z : TC.Later B (I.cols l))
     (hg : gramN (I.rec7 l Z) B.R.m le_rfl = 1) (u : B.Word) (a : I.ι)
     {lat : (I.stp u a B.R.m).Cl → Submodule (𝓞 B.host.E) (Fin (B.R.N B.R.m) → B.host.E)}
@@ -254,7 +254,7 @@ theorem til_fv_eq_tw (hI : I.Ok) (l : I.Laws) (Z : TC.Later B (I.cols l))
   exact mul_left_cancel₀ (M₀ := Res v.1) hs0 h9
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem til_tw (hI : I.Ok) (hP : TC.Pins B X) (l : I.Laws) (Z : TC.Later B (I.cols l)) {l0 : I.Law0 l} {inQ : I.ι → HeightOneSpectrum (𝓞 (I.rec7 l Z).host.F) → Prop} {H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z)}
     {F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u)} {T : Formalism.L2.Herm.TwChTied (I.rec7 l Z) inQ} {J : Formalism.L2.Herm.TwChJointS T H}
     {W : TwFormsTiedS (I.rec7 l Z) (I.tw l l0 Z) T J F} {Lv : SymmetricTwistedLevelData W}

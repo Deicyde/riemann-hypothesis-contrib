@@ -57,7 +57,7 @@ theorem tmul_eq (α : Af D.host.F) (c y : D.host.E) :
   rw [Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, mul_one, mul_one, one_mul]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem int_of_mem_latO (hS : IsSelfDualC S ΛS) {βS : GL (Fin S.rank) (EAf D)} {βT : GL (Fin T.rank) (EAf D)}
     (hβS : IsFrame βS ΛS) (hβT : IsFrame βT ΛT) (w : Pl D.host.E)
     (hw : ∀ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) ≤ 1) {u : WO S T}
@@ -149,7 +149,7 @@ theorem smul_mem_latO_of_mem_hatMx (hS : IsSelfDualC S ΛS) {a : D.host.E} (ha :
   | neg x _ hx => rw [smul_neg]; exact neg_mem hx
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem mem_latO_of_mem_hatMx (hS : IsSelfDualC S ΛS) {e₁ : AE D} {P₁ : Finset (Pl D.host.E)} (he : IsIdemSum e₁ P₁)
     (hAA : ∀ w ∈ P₁, ∃ a ∈ D.host.AA, Valued.v (algebraMap D.host.E (Kw w) a) = 1) {u : WO S T} (hu : IsHalf e₁ u)
     (hm : u ∈ hatMx (homLat ΛS ΛT)) : u ∈ latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True := by

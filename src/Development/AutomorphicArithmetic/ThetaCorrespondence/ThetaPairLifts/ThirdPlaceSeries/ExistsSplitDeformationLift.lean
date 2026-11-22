@@ -33,7 +33,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section
@@ -61,8 +61,8 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelA
 open GlobalTheory.BadCount
 open scoped TensorProduct
 open Formalism.IndefR.FWT
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem exists_free_action_permuting_summands_thirdPlace : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.LiftsCondition fun Fm x _ ι p i _ _ => (i : ℕ) + 1 = (Fm.D x ι).R.m → ∀ (hp : _root_.GlobalTheory.CovTop.RowsTAlt p) (Hg : Type) [Group Hg] [Finite Hg] (φ : Hg →* p.P.Gp),
     GlobalTheory.DefPt.FreePt (p.T.Q.Xo ((i : ℕ) + 1)) p.T.Q.c (fun h => (p.O i).lev2 (φ h)) →
     ∃ (X : Type) (_ : Fintype X) (_ : DecidableEq X) (_ : MulAction Hg X) (A : X → Submodule ℂ (GlobalTheory.DefRead.VC (GlobalTheory.DefHalf.sigC p) (GlobalTheory.DefHalf.CF p i))),
@@ -111,7 +111,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelA
 open GlobalTheory.BadCount
 open scoped TensorProduct
 open Formalism.IndefR.FWT
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_isInternal_free_permuted_thirdPlace : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.LiftsCondition fun Fm x _ ι p i _ _ => (i : ℕ) + 1 = (Fm.D x ι).R.m → ∀ (hp : _root_.GlobalTheory.CovTop.RowsTAlt p) (Hg : Type) [Group Hg] [Finite Hg] (φ : Hg →* p.P.Gp),
     GlobalTheory.DefPt.FreePt (p.T.Q.Xo ((i : ℕ) + 1)) p.T.Q.c (fun h => (p.O i).lev2 (φ h)) →
     ∃ (X : Type) (_ : Fintype X) (_ : DecidableEq X) (_ : MulAction Hg X) (A : X → Submodule ℂ (GlobalTheory.DefRead.VC (GlobalTheory.DefHalf.sigC p) (GlobalTheory.DefHalf.CF p i))),

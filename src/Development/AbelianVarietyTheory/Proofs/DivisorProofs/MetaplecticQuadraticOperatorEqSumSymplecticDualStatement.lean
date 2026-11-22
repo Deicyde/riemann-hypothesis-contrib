@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 open scoped Matrix
 open MeasureTheory GlobalTheory.RealWeil
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.metaplecticQuadraticOperator_eq_sum_symplectic_dual : ∀ (l κ : Type) [Fintype l] [DecidableEq l] [Fintype κ] (X : Matrix (l ⊕ l) (l ⊕ l) ℝ) (u v : κ → (l ⊕ l → ℝ)),
     (∀ w, ∑ i, sympl (v i) w • u i = w) →
     quad X = (4 * Real.pi * Complex.I : ℂ)⁻¹ • ∑ i, (1 / 2 : ℂ) •

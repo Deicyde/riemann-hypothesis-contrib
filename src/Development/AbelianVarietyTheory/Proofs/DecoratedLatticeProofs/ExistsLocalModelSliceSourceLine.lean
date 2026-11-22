@@ -38,8 +38,8 @@ theorem prH_apply (a : D.host.E) : prH p a = p.pr a := rfl
 theorem map_ι_mul_rat {l m o : Type} [Fintype m] (M : Matrix l m k) (N : Matrix m o D.host.E) :
     M.map p.ι * N.map (incA D) = (M * N.map (prH p)).map p.ι := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, ι_mul_right]
+
+  simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, ι_mul_right]
   rfl
 
 section Frames

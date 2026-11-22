@@ -150,9 +150,9 @@ theorem coefFn_rhoVr {emb : D.what₂.Tau → (D.host.E →+* K)} (hemb : ∀ τ
       eval₂Hom σ (fun v => (((embGL (tauE D) γ)⁻¹ * x) v.1).val v.2.1 v.2.2) := by
     refine MvPolynomial.ringHom_ext (fun a => by simp [trAct, Formalism.GradedWeylDivisibility.blockAct]) fun v => ?_
     have : ∀ a b, σ (((embGL emb γ v.1)⁻¹).val a b) = ((embGL (tauE D) γ v.1)⁻¹).val a b := fun a b => he _ _
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [RingHom.comp_apply, RingHom.coe_coe, trAct, Formalism.GradedWeylDivisibility.blockAct, aeval_X, map_sum, map_mul, eval₂Hom_C,
-      eval₂Hom_X', Pi.mul_apply, Pi.inv_apply, Units.val_mul, Matrix.mul_apply]
+
+    simp only [RingHom.comp_apply, RingHom.coe_coe, trAct, Formalism.GradedWeylDivisibility.blockAct, aeval_X, map_sum, map_mul, eval₂Hom_C,
+    eval₂Hom_X', Pi.mul_apply, Pi.inv_apply, Units.val_mul, Matrix.mul_apply]
     exact Finset.sum_congr rfl fun b _ => congrArg (· * _) (this _ _)
   have e3 : σ (detTwK lam (invTrK (embGL emb γ))) =
       ((detFam (fun τ => (lam τ).detShift) (embGL (tauE D) γ)⁻¹ : ℂˣ) : ℂ) := by

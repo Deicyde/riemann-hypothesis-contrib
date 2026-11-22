@@ -22,8 +22,8 @@ theorem pderiv_mul_free (v : σ) (g f : MvPolynomial σ ℚ_[p]) (hg : pderiv v 
 theorem pderiv_pair_free (w e : Fin r → σ) (v : σ) (hw : ∀ c, w c ≠ v) (he : ∀ c, e c ≠ v) :
     pderiv v (∑ c, X (w c) * X (e c) : MvPolynomial σ ℚ_[p]) = 0 := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_eq_zero fun c _ => ?_
   rw [Derivation.leibniz, pderiv_X, pderiv_X, Pi.single_eq_of_ne (he c), Pi.single_eq_of_ne (hw c)]
   simp
@@ -50,7 +50,7 @@ theorem commute_E_E (w e w' e' : Fin r → σ) :
     (∑ c, X (w' c) * X (e' c)) * ((∑ c, X (w c) * X (e c)) * f)
   ring
 
-set_option maxHeartbeats 1000000 in
+
 theorem commute_F_F (w e w' e' : Fin r → σ) :
     Commute (Formalism.GM.tieF (k := ℚ_[p]) w e) (Formalism.GM.tieF (k := ℚ_[p]) w' e') := by
   unfold Formalism.GM.tieF

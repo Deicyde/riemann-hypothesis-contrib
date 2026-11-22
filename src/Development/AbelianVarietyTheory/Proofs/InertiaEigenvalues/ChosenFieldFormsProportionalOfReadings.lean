@@ -11,8 +11,8 @@ open Formalism.L2.Host (embLL0)
 open Formalism.IndefR.RecTie (Used0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 open GlobalTheory.PlaceRead
 open GlobalTheory.HeightCounting.Up (PrN)
 
@@ -52,15 +52,15 @@ private theorem tensor_scalar_relation {O L M N ι : Type*} [CommRing O] [Field 
   have hind := Fintype.linearIndependent_iff.1 hli
   constructor
   · rintro rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_zero, smul_zero, map_sum] at h
+
+    rw [map_zero, smul_zero, map_sum] at h
     simp only [hR] at h
     have h2 : ∀ a, α a = 0 := fun a => ε.injective ((hind _ h a).trans (map_zero _).symm)
     simp [h2]
   · obtain ⟨β, rfl⟩ := hsp B
     intro hB
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum] at h
+
+    rw [map_sum, map_sum] at h
     simp only [hR] at h
     have h1 : ∀ a, ε (α a) - z * ε (β a) = 0 := hind (fun a => ε (α a) - z * ε (β a)) (by
       simp only [sub_smul, mul_smul, Finset.sum_sub_distrib, ← Finset.smul_sum, h, sub_self])

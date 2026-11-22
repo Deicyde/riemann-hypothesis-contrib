@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MapCons
 @[expose] public section
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.NL.DenomStep
 
@@ -41,8 +41,8 @@ theorem mem_N_of_jD (E : EtTie W RA RW inclR φR gR πA) (T : LocLat G Qp LL O)
       obtain ⟨a, x, hxN, rfl⟩ := hz
       obtain ⟨α, hα, -⟩ := hbA x hxN
       refine ⟨fun j => a * E.io (α j), ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hα, map_sum, Finset.smul_sum]
+
+      rw [hα, map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [GlobalTheory.NL.FrobDenom.jD_smulA, smul_smul, map_mul]
     | zero => exact ⟨0, by simp⟩
@@ -75,8 +75,8 @@ theorem mem_N_of_jD (E : EtTie W RA RW inclR φR gR πA) (T : LocLat G Qp LL O)
   obtain ⟨β, hβ⟩ := hNA _ hx
   obtain ⟨μ, rfl⟩ := hDE x
   have hj : E.jD T (∑ j, μ j • b j) = ∑ j, E.ioE (μ j) • E.jD T (b j) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun j _ => E.jD_smul T _ _
   obtain ⟨c, -, hc⟩ := hbW (E.jD T (∑ j, μ j • b j))
   have e1 := hc (fun j => E.ioE (μ j)) hj
@@ -136,7 +136,7 @@ theorem of_tie (E : EtTie W RA RW inclR φR gR πA) (T : LocLat G Qp LL O) (hT :
 end Generic
 
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem main : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; ∀ T : Lt K LL, IsCrys ((D.loc l).PD K) T.ρ → ∀ (M : ℕ) (m : W.DD T), W.φD T m - m ∈ invN W T (W.Q ^ M) → ∃ a : ℕ, W.X ^ a • m ∈ W.N T := by
   intro D HW F l _ K s LL h W T hT M m hm
   exact of_tie ((F l).E K s LL h).tie T hT (GlobalTheory.NL.FrobDenom.main D HW F l K s LL h T hT)

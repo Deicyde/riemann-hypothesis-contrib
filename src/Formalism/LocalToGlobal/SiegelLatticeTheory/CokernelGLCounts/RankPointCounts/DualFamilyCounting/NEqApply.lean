@@ -38,9 +38,9 @@ theorem nL_isom (hinv : X0⁻¹ * X0 = 1) (hxs : ∀ b, InW X (xs b)) (hM : M + 
       (fun w' hw' => g_ww X X0 xs M hxs hw hw') y
   conv_lhs => rw [decomp X x]
   conv_rhs => rw [decomp X x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, map_smul, LinearMap.add_apply, LinearMap.sum_apply, LinearMap.map_smulₛₗ,
-    LinearMap.smul_apply, smul_eq_mul]
+
+  simp only [map_add (f := _), map_sum, map_smul, LinearMap.add_apply, LinearMap.sum_apply, LinearMap.map_smulₛₗ,
+  LinearMap.smul_apply, smul_eq_mul]
   simp only [he, hf, hw _ (inW_pW X x)]
 
 theorem nL_inj (hinv : X0⁻¹ * X0 = 1) (hxs : ∀ b, InW X (xs b)) (hM : M + Mᴴ = -Gp D X0 xs) :

@@ -104,8 +104,8 @@ theorem eval_momentPoly {Ω : Type*} [MeasurableSpace Ω] (μ : Measure Ω) (w :
     (Q : MvPolynomial (Fin 3) (Ω → ℝ)) (hQ : ∀ m, Integrable (fun p => w p * AddMonoidAlgebra.coeff Q m p) μ)
     (a : Fin 3 → ℝ) :
     eval a (momentPoly μ w Q) = ∫ p, w p * eval₂ (Pi.evalRingHom (fun _ : Ω => ℝ) p) a Q ∂μ := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [momentPoly, map_sum]
+
+  rw [momentPoly, map_sum]
   simp only [eval_monomial]
   simp_rw [← integral_mul_const]
   rw [← integral_finsetSum _ (fun m _ => (hQ m).mul_const _)]
@@ -123,8 +123,8 @@ theorem dotPoly_id_pow (N : ℕ) :
     (dotPoly (id : S2 → S2)) ^ N =
       MvPolynomial.map (ContinuousMap.coeFnRingHom : C(S2, ℝ) →+* (S2 → ℝ)) ((∑ i, X i * C (coordS i)) ^ N) := by
   rw [map_pow, dotPoly]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_X, map_C]
+
+  simp only [map_sum, map_mul, map_X, map_C]
   rfl
 
 theorem pushMomentPoly_eq (k : ℕ) (hk : 1 ≤ k) :
@@ -151,8 +151,8 @@ theorem pushMomentPoly_eq (k : ℕ) (hk : 1 ≤ k) :
     rw [real_inner_self_eq_norm_sq, EuclideanSpace.norm_sq_eq]
     simp [sq_abs]
   rw [haa]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_neg, map_pow, map_sum, eval_X]
+
+  simp only [map_neg, map_pow, map_sum, eval_X]
   have hc : ((k - 1 : ℕ) : ℝ) = (k : ℝ) - 1 := by rw [Nat.cast_sub hk, Nat.cast_one]
   rw [hc]
   have hk' : (2 * ((k : ℝ) - 1) + 1) ≠ 0 := by
@@ -191,8 +191,8 @@ theorem proof : FibreLocal.Statement := by
     field_simp
     ring
   · rw [pushMomentPoly_eq k hk]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_neg, map_pow, map_sum, aeval_X]
+
+    simp [map_neg, map_pow, map_sum, aeval_X]
   · rw [kappa_eq, FlagBundles.fibreConstant_eq]
     ring
 

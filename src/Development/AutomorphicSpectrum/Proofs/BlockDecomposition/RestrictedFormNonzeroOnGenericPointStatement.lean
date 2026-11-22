@@ -16,7 +16,7 @@ open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
 open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ
 open ReciprocityTheory.ChartRestriction.G.Geo (mcPts IsMultiHomog SameOrbit)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.restricted_form_nonzero_on_generic_point : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (X : Scheme.{0}) [IsIntegral X] (i : X ⟶ MP ℤ m n) [IsClosedImmersion i]
     (c : ∀ k, Bk n k) (h : genericPoint X ∈ i ⁻¹ᵁ mchart c) (f : Pol n) (a : Fin (m + 1) → ℕ), IsMultiHomog f a →
     f ∉ ptIdeal (i (genericPoint X)) → fnAt i c h f ≠ 0 := by

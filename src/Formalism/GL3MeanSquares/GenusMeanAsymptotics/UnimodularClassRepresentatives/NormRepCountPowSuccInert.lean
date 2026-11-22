@@ -49,8 +49,8 @@ theorem normRepCount_eq (J : Ideal (𝓞 K)) (hJ : ∀ a ∈ J, conjO K a ∈ J)
   have key : ∀ y : Fin M → 𝓞 K, (∀ i, Ideal.Quotient.mk J (y i) = x i) →
       Ideal.Quotient.mk J (∑ i, conjO K (y i) * y i) = ∑ i, conjQ J hJ (x i) * x i := by
     intro y hy
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, ← hy i, conjQ_mk]
   constructor

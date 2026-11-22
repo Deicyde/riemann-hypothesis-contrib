@@ -6,7 +6,7 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 noncomputable section
 
-set_option maxHeartbeats 1000000
+
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
 open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.BCT PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8

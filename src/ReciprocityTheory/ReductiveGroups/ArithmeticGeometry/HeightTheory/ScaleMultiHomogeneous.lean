@@ -81,8 +81,8 @@ theorem scale_multiHomogeneous (b : Fin (D + 1)) (u : Kˣ) (a : Fin (D + 1) → 
       exact absurd (Finset.mem_univ b) h
   conv_lhs => rw [F.as_sum]
   conv_rhs => rw [F.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.mul_sum]
+
+  rw [map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun s hs => ?_
   rw [scaleEquiv_monomial, hsum s, hF s hs b]
 

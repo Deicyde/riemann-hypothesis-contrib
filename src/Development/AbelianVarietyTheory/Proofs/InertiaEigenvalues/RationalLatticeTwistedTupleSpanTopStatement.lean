@@ -12,11 +12,11 @@ open Formalism.L2.Host (embLL0)
 open Formalism.IndefR.RecTie (Used0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 open GlobalTheory.PlaceRead
 open GlobalTheory.HeightCounting.Up (PrN)
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.rationalLatticeTwistedTuple_span_top : ∀ (D : D7) (w : D.what₂.places.Pl) (j : ℕ), Submodule.span D.what₂.LL (latS (D := D) w j) = ⊤ := by
   first | exact @GlobalTheory.PlaceRead.span_latS | exact GlobalTheory.PlaceRead.span_latS | (intros; apply GlobalTheory.PlaceRead.span_latS <;> assumption)

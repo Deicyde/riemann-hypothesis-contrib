@@ -139,8 +139,8 @@ theorem cong_on_adjoin : ∀ (W K : Type) [CommRing W] [IsDomain W] [IsDiscreteV
     apply (pow_left_injective (M := O.ValueGroup) (n := l) hl0 : Function.Injective (fun a : O.ValueGroup => a ^ l))
     show _ ^ l = t ^ l
     rw [← map_pow, ← map_pow, hx', g.commutes, htl]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ← Finset.sum_sub_distrib]
+
+  rw [map_sum, ← Finset.sum_sub_distrib]
   refine Valuation.map_sum_lt _ one_ne_zero fun i hi => ?_
   rcases Nat.eq_zero_or_pos i with rfl | hi0
   · simp
