@@ -1,1 +1,16 @@
-{"prs":{}}
+{
+  "prs": {
+    "78": [
+      {
+        "commit": "619411a02677658215662c6fe0efcd2a09f7cb08",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "ffbeeaaa86179e657b72bcb202a216ef535419c3",
+            "resolution": "resolutions/78-readme-current.md"
+          }
+        ]
+      }
+    ]
+  }
+}
