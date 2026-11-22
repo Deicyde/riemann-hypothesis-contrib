@@ -441,6 +441,16 @@
           }
         ],
         "note": "The orbit-volume test and its finite projection helper were already pruned from main. Retain the pruning and current imports/API repairs."
+      },
+      {
+        "commit": "036dfd8d9ea1498dea97165e771d23bdbc66a24d",
+        "files": [
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/FiniteQuotientOfCompleteNakayama.lean",
+            "ours": "df14be4f1333516b713855974b8193d9239d6263",
+            "resolution": "resolutions/54-complete-nakayama.lean"
+          }
+        ]
       }
     ]
   }
