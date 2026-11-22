@@ -481,6 +481,16 @@
             "resolution": "resolutions/54-relative-weight.lean"
           }
         ]
+      },
+      {
+        "commit": "da04f0d59940d0c63f2468530ad6678d28fae9e5",
+        "files": [
+          {
+            "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/FiniteZpModuleTorsionFreeSplitting.lean",
+            "ours": "6267566872f652068e7942ce3e94ccace966e05f",
+            "resolution": "resolutions/54-padic-splitting.lean"
+          }
+        ]
       }
     ]
   }
