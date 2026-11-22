@@ -1,0 +1,467 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45044493411-manual-imports",
+  "results": [
+    {
+      "number": 9,
+      "title": "remove redundant imports and heartbeat overrides",
+      "original_head": "c2de7b111cf3d61b59454121ff418cba6a5a0763",
+      "original_repo": "deancureton/riemann-hypothesis",
+      "original_branch": "cleanup/redundant-imports",
+      "maintainer_can_modify": true,
+      "old_merge_base": "f1f6d65420dbbf36d6cfdac1af8d79511a855a5b",
+      "automatic_resolution_count": 20378,
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ChainFrameSignatureData.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/WeilBound/CoreStatements/TorusUniformisation/ChowMahlerFamilies/MemOfFixedByAutomorphisms.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/LogFactorialBounds/LogFactorialProofs/PrimeSum.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/ProductMoment.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/TypeHC.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WaveBallEstimateWeightedDualAlt.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/LocScalar.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/CuspidalMirabolic.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/ExhaustionOfThree.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/IrreducibleAdmissibleGL.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/IsLAddSegmentOfInjectiveOfNotPrecedes.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/JuxtDefs.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/LUnlinkedIrrOfSeg.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/GrothendieckRingPolynomial/ClassProductIrreducibleLeft.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/GrothendieckRingPolynomial/MultOne.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/GrothendieckRingPolynomial/PeelGood.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/BernsteinZelevinsky/TopAdm.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ThetaDilations/HfSubSmul.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/BesselOrbitConvolutions/JacquetFunctionalNormalization.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/DsExhaust.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/MatrixCoefficientDecay/InfinitesimalCharacterPaths/ExhaustionLabels.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/HilbertSpaceModels/HilbertSpaceRealisationHolds.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/FormalDegrees/ArchimedeanFormalDegrees/ExplicitFunctionSquareIntegrable.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/FormalDegrees/ArchimedeanFormalDegrees/NormIndOfSteps.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/BoundB.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/ComapTwKer.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/ConjDual.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/CuspPair.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/CuspPairIrr.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/DerFin.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/JacquetModuleThetaTwist.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/NontrivialOfIsIrreducible.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/SomeRed.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/ThetaContra.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/LocalDensityBlockOneProduct.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/TprodComplementSplitFinsetStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AntiInvolutionSwapsUpperLowerStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CapelliPolynomialPermutationMatchStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CenterActionCommutesLeviDifferenceStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CompactSubgroupFiniteOpenCosetsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CongruenceEndomorphismInverseExistsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FiniteTypeAlgebraCommonEigencharacterStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        }
+      ],
+      "rebased_head": "1139b7bca226ea52b2ff781863cd1cd5e9fefe5f",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "14627 files changed, 17 insertions(+), 14781 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-9-1334509aa7-45044493411-manual-imports",
+      "status": "rebased"
+    },
+    {
+      "number": 10,
+      "title": "simplify generated proof fallbacks",
+      "original_head": "1ccff6869721e3608761372313714f64e59aba57",
+      "original_repo": "deancureton/riemann-hypothesis",
+      "original_branch": "cleanup/proof-fallbacks",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7da4577eb40dd74b09218d111114ca43bc2ad226",
+      "automatic_resolution_count": 10576,
+      "automatic_resolutions": [
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/HaarExistenceStatement.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/InverseGramEigenvaluesSumHsStatement.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DecoratedLatticeProofs/ExistsConjStabilizersSelfDualLatticesUnramifiedStatement.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/PointwiseCocycleLocalSectionsGlueBasicOpenCoverStatement.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/SumTwoPointFunctionMultiplesNaturalCharPStatement.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ConjugatedIntertwinerEquivariantRealPlaceStatement.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/ConjIntertwinerMapValuesIsCuspFunStatement.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/ThirdPlaceSeries/EigHkDatBackStatement.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilyFunctionalSpanDualStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/ThetaDilations/HfSubSmul.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/ExistsNormOneUnitShiftStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/HermitianFormDiagonalizesOverFieldStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/PoissonSummationGaussianStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/BalancedNonnegFormInPsdConeStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/PsdConeAddMemStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/PsdConeDescendsAlongSurjectionStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/PsdConeExistsMaximalSupportStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/PsdConeFinitelyManyOrbitsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeSpreadsOutStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/EigenvalueGapExistsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ExistsGradedMatrixEigenBoundStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FiniteNetOfGradedProjectionsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FubiniOfParabolicHaarMultipleStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FubiniParabolicMultipleStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/GeometricStatementStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/GrowthStatementStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/HilbertSchmidtProjectionBoundStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/IwasawaParabolicCompactFactorizationStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/LineFormulaOfFubiniAndParabolicStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/PolynomialNilpotentPathStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ToL2CongrOnUnitaryBisStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/UnitaryMaximalCompactIsCompactStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ExistsInfiniteAdeleTensorEquivMixedSpaceStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ExistsPlaceNotPowAdicCompletionStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ExistsPlacePowAndNotPowStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ExistsUnitMulSqQuadraticDefectStepStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/FirstInequalitySUnitsPrimeDegreeStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/HermitianLogTraceSqFirstVariationBoundStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/IsSemisimpleRepresentationTprodOfIsIrreducibleAlStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/MemPowsSUnitsChooseTStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/MulLogEqNegLogMulStatement.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/PowCountPlacesNotLocalPowerLeIndexStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/PowOfSUnitLocalPowerAtPlacesStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/RatComponentMemRatPolysVanishingOnMatrixSetStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/SUnitMemKummerNormsOfLocalNormsStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/SUnitsSupLocalKummerNormsNeTopStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ScaledFiniteMatrixMemLatticeStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ScaledMatrixMemRationalLatticeStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/UnitsLocalPowersAtPlacesIndexLeStatement.lean",
+          "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/FrameIsotropicOrthonormalStatement.lean",
+          "reason": "retain-main-pruning"
+        }
+      ],
+      "rebased_head": "3f21a3ec46974c5d37c9bfcb5b7ae0d0214e98ad",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "36203 files changed, 36280 insertions(+), 36265 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-10-1334509aa7-45044493411-manual-imports",
+      "status": "rebased"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
