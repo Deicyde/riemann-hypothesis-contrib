@@ -93,4 +93,3 @@ theorem UpperTheory.V.AlgebraTools.der_inner :
     LinearMap.mulLeft_apply, AlgHom.toLinearMap_apply] at hx
   rw [hx]
   noncomm_ring
-

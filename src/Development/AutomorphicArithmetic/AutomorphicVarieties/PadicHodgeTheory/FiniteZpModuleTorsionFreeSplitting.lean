@@ -91,4 +91,3 @@ theorem UpperTheory.finite_zp_module_torsion_free_splitting :
     · show (t _ : N) = y
       rw [htv, map_add (f := _), hs', hmk0, add_zero]
       abel
-

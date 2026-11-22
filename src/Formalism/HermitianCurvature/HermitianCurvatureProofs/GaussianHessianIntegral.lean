@@ -463,4 +463,3 @@ theorem Formalism.FourierDecayAlt.P.gaussian_multi_integral : Formalism.FourierD
   Formalism.FourierDecayAlt.P.G9.gaussMulti_of Formalism.FourierDecayAlt.P.takagi_factorization Formalism.FourierDecayAlt.P.G9.gaussOneDamped
 
 end SeveralVariables
-
