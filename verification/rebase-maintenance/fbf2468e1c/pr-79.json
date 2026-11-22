@@ -1,0 +1,68 @@
+{
+  "number": 79,
+  "title": "Remove heartbeat overrides",
+  "status": "rebased",
+  "base": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+  "original_head": "90d23d60feda4ba5c41c6c7f8835c1de67bee799",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-heartbeats",
+  "rebased_head": "45c3d43ef6dcc11f39baf52bce587667dca18f80",
+  "prepared_branch": "maintenance/rebased-pr-79-fbf2468e1c-45053969849-repair",
+  "ready_to_publish": true,
+  "changes": "57872 files changed, 103800 insertions(+), 103801 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 8,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "42d9f80017ca1caadfc824059087378ceed1c0fb",
+  "restack_commit_count": 1,
+  "automatic_resolutions": [
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    }
+  ],
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 1
+}
