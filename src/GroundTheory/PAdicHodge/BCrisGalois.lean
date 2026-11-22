@@ -86,13 +86,33 @@ def galB (σ : Gal(PadicAlgCl p/K)) : BCris hε →+* BCris hε :=
 
 theorem galB_algebraMap (σ : Gal(PadicAlgCl p/K)) (x : BCrisPlus ℂ_[p] p) :
     galB hε σ (algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) x) =
-      algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) (σ • x) :=
-  awaySMulHom_algebraMap (isUnit_gal_smul_periodT hε) σ x
+      algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) (σ • x) := by
+  -- Infer the localization arguments from the unfolded action.
+  delta galB
+  apply @awaySMulHom_algebraMap
 
 theorem phiB_galB (σ : Gal(PadicAlgCl p/K)) (x : BCris hε) :
-    phiB hε (galB hε σ x) = galB hε σ (phiB hε x) :=
-  awaySMulHom_comm (isUnit_gal_smul_periodT hε) (phiB hε) (phiPlus ℂ_[p] p)
-    (phiB_algebraMap hε) phiPlus_gal_smul σ x
+    phiB hε (galB hε σ x) = galB hε σ (phiB hε x) := by
+  let t := algebraMap (ACris ℂ_[p] p) (BCrisPlus ℂ_[p] p) (periodT (K := ℂ_[p]) (p := p) hε)
+  let φ := phiB (K := ℂ_[p]) (p := p) hε
+  let g := galB hε σ
+  have e : φ.comp g = g.comp φ := by
+    apply IsLocalization.ringHom_ext (Submonoid.powers t)
+    refine RingHom.ext fun y => ?_
+    change φ (g (algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) y)) =
+      g (φ (algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) y))
+    calc
+      _ = φ (algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) (σ • y)) :=
+        congrArg (fun z : BCris hε => φ z) (galB_algebraMap hε σ y)
+      _ = algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) (phiPlus ℂ_[p] p (σ • y)) :=
+        phiB_algebraMap (K := ℂ_[p]) (p := p) hε (σ • y)
+      _ = algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) (σ • phiPlus ℂ_[p] p y) :=
+        congrArg (algebraMap (BCrisPlus ℂ_[p] p) (BCris hε)) (phiPlus_gal_smul σ y)
+      _ = g (algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) (phiPlus ℂ_[p] p y)) :=
+        (galB_algebraMap hε σ (phiPlus ℂ_[p] p y)).symm
+      _ = _ := congrArg (fun z : BCris hε => g z)
+        (phiB_algebraMap (K := ℂ_[p]) (p := p) hε y).symm
+  exact congrArg (fun F : BCris hε →+* BCris hε => F x) e
 
 end ACris
 

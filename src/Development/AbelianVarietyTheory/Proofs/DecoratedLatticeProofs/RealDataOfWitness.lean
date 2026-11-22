@@ -42,6 +42,17 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Fam.LinkedPins
 
+private theorem seeAt_upd {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
+    {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type}
+    [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+    (R : RealDat3 D A3 Ks) (F : Face3 D A3) (lam : type_of% R.lam3) (err : type_of% R.err0)
+    (Dc : ∀ Zs : DefSub A3.fam3.amb3, DefCols (A3.side3 F.P1 F.ψ1 Zs))
+    (Sp : ∀ Zs, SPer (Dc Zs)) (Zsc : DefSub A3.fam3.amb3 → IndefScale A3.fam3.base3)
+    {X : Formalism.L2.SG.HidaSetting.HidaSetting D}
+    {h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D}
+    {s : Formalism.L2.Theta.GA D (D.sp.Y 0)} (hs : SeeAt R.toRealDat F.lv2 X h s) :
+    SeeAt ((R.updS R.kap lam).withErr err).toRealDat (reFace F Dc Sp Zsc).lv2 X h s :=
+  ⟨hs.fin, hs.conj, hs.mat⟩
 
 
 theorem seeAt_twArgs {K : Ctx} {B : GlobalTheory.Mem.Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {Z : w.Lt} {Wt : Set B.places.Pl}
@@ -50,13 +61,9 @@ theorem seeAt_twArgs {K : Ctx} {B : GlobalTheory.Mem.Base} {f : Fr B.toPre} {T :
     {t : RowsT K w Z Wt ex.p0} (a : TwArgs ex t) (X : Formalism.L2.SG.HidaSetting.HidaSetting (w.st Z).toD7)
     (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf (w.st Z).toD7) (s : Formalism.L2.Theta.GA (w.st Z).toD7 ((w.st Z).toD7.sp.Y 0))
     (hs : SeeAt (D := (w.st Z).toD7) t.r.z.R.toRealDat t.r.z.F.lv2 X h s) : SeeAt a.x.R.toRealDat a.x.F.lv2 X h s := by
-  obtain ⟨Dc, Sp, Zsc, lam, err, lam_eq, x, pack, _⟩ := a
-  obtain ⟨G, grp, fin, Pl0, I0, T0, A3, core, alg, R, F, cG, _⟩ := x
-  dsimp only at pack ⊢
-  cases pack
-  refine ⟨hs.fin, ?_, ?_⟩
-  · exact (hs.conj)
-  · exact (hs.mat)
+  have e := congrArg (fun p => match p with
+    | ⟨_, _, _, _, _, _, _, _, _, R, F, _⟩ => SeeAt R.toRealDat F.lv2 X h s) a.pack
+  exact e.mpr (seeAt_upd t.r.z.R t.r.z.F a.lam a.err a.Dc a.Sp a.Zsc hs)
 
 theorem setting_congr {D : D7} (M : ∀ X : Formalism.L2.SG.HidaSetting.HidaSetting D, X.B.I = Formalism.L2.SG.InstExistsPf.instOf D → Prop)
     {F0 F0' : ∀ u, Formalism.L2.Forms.Forms0 D u} (e : F0 = F0') {P : SPack D F0} {P' : SPack D F0'} (hP : HEq P P')

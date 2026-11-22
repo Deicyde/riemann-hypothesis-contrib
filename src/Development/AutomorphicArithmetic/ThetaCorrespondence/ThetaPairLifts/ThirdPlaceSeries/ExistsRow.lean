@@ -108,8 +108,10 @@ theorem exists_nonempty_nMore_upL (hL : _root_.UpperTheory.Zero.LLC.RecTExists) 
   have e10 : eW' = row_cast% t.r.Y.mj.eW := eq_of_heq (row_cast% hs.eW)
   subst e10
   obtain ⟨Sb, ev, hSb, hev, hE⟩ := eig
-  obtain ⟨i1, i2, i3⟩ := s7 ⟨labc, zeta, pht⟩
-  obtain ⟨l1, l2, l3, l4, l5, lv⟩ := grp.lvl
+  -- Bind the level witnesses before destructuring them to avoid generalizing over the dependent goal.
+  have inner' := s7 ⟨labc, zeta, pht⟩
+  have lvl := grp.lvl
+  obtain ⟨l1, l2, l3, l4, l5, lv⟩ := lvl
   refine Nonempty.elim (hser kKs hk nexp (row_cast% kKs) (row_cast% hk) (@_root_.Formalism.IndefR.NX.NExpRealS.mk (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_)
     (fi := row_cast% nexp.fi)
     (geq := row_cast% nexp.geq)
@@ -203,7 +205,7 @@ theorem exists_nonempty_nMore_upL (hL : _root_.UpperTheory.Zero.LLC.RecTExists) 
       (hk_none := row_cast% (@_root_.GlobalTheory.GeoTie.ThetaTie.side (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) geo (row_cast% x1) (row_cast% x2) (row_cast% x3)).hk_none))
     (isUnramified₂ := row_cast% geo.isUnramified₂)
     ⟩
-    (row_cast% ok) (row_cast% th) (row_cast% xda) (row_cast% ((mvOf w Z S' N h).large large)) (row_cast% i1) (row_cast% i2) (row_cast% i3)⟩⟩
+    (row_cast% ok) (row_cast% th) (row_cast% xda) (row_cast% ((mvOf w Z S' N h).large large)) (row_cast% inner'.1) (row_cast% inner'.2.1) (row_cast% inner'.2.2)⟩⟩
   row_exact ((mvOf w Z S' N h).tauTrue_alt (a := a.all) tau)
 end GlobalTheory.LayerMove
 end

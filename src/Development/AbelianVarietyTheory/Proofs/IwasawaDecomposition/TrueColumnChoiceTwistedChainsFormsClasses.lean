@@ -81,7 +81,7 @@ theorem twStep_out {H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z)} {F : ∀ u, F
      offU := fun h1 hm => absurd ⟨h1, hm⟩ hout
      offL := fun h1 hm => absurd ⟨h1, hm⟩ hout
      offK := fun h1 h2 => absurd ⟨h1, le_of_succ_m h2⟩ hout
-     uniq := fun e => absurd ⟨by have := B.R.two_le_m; omega, by omega⟩ hout
+     uniq := fun e => (hout ⟨(one_le_m B.R).trans e.ge, e.le⟩).elim
      chiFin := fun _ h1 hm => absurd ⟨h1, hm⟩ hout
      chiC := fun h1 h2 => absurd ⟨h1, le_of_succ_m h2⟩ hout }⟩
 
@@ -174,19 +174,16 @@ theorem twStep_mid (hok : I.Ok) (pins : TC.Pins B X) {H : Formalism.L2.Herm.Herm
       (fun e => by omega) (fun h => absurd rfl h) (fun _ _ β κ κ' e _ => ?_)⟩
     · exact (hC.carC u i h1 h2 β).Lb_eq
     · exact (hC.carC u i h1 h2 β).Uloc_eq v
-    · have : κ = κ' := Subtype.ext e
-      subst this
-      rfl
+    · exact congrArg ((F u).ch i h1 h2 β).lev.chi (Subtype.ext e)
   · obtain ⟨Ch, fin, chOf, K, g, hrQ, hp⟩ := GlobalTheory.Mem.Col2.TC.ChTw.charts_tuple_trivQ I hok pins l Z u a Q i hi (H.Ch u i) (H.chOf u i) ((F u).ch i h1 h2) h1 (by omega) hQ
       ((hF u).mid i h1 h2)
     have hr : I.ReadsK l Z u a i hi chOf K := hrQ.elim fun k hk => ⟨k, hk.1⟩
     have hoU : ∀ β v, v ∉ Q → (K β).lev.Uloc v = ((F u).ch i h1 h2 (g β)).lev.Uloc v := fun β v hv => (hp β).1 v hv
     refine ⟨twStep_mk hok pins u a i h1 hi hoff Ch fin chOf g K hr (fun _ => hrQ) (fun β => ?_) (fun β v hv => ?_) (fun _ _ β v hv => hoU β v hv)
       (fun e => by omega) (fun _ β => (hp β).2.1) (fun _ _ β κ κ' e hv => (hp β).2.2 κ κ' e hv)⟩
-    · rw [reads_lb_eq hr ((hF u).mid i h1 h2) β (g β)]
-      exact (hC.carC u i h1 h2 (g β)).Lb_eq
-    · rw [hoU β v hv]
-      exact (hC.carC u i h1 h2 (g β)).Uloc_eq v
+    · exact (reads_lb_eq (K := K) (K' := (F u).ch i h1 h2)
+        hr ((hF u).mid i h1 h2) β (g β)).trans (hC.carC u i h1 h2 (g β)).Lb_eq
+    · exact (hoU β v hv).trans ((hC.carC u i h1 h2 (g β)).Uloc_eq v)
 
 structure TopP {H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z)} {F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u)}
     {Q : Finset (HeightOneSpectrum (𝓞 (I.rec7 l Z).host.F))} {u : B.Word} {a : I.ι} (S : TwStep I l Z H F Q u a B.R.m) : Prop where
@@ -209,7 +206,7 @@ theorem twStep_top (hok : I.Ok) (pins : TC.Pins B X) {H : Formalism.L2.Herm.Herm
     fun v hv => GlobalTheory.T.twistPlaces_prime_to_levelAndTypePrimes I hok l u a v ((hQ v).1 hv)
   have h1m : 1 ≤ B.R.m := one_le_m B.R
   have hr0 := (hF u).ends B.R.m le_rfl (Or.inr rfl)
-  have hno : ∀ h2 : B.R.m + 1 ≤ B.R.m, False := fun h2 => by omega
+  have hno := Nat.not_succ_le_self B.R.m
   by_cases ha : a = I.mu0
   · subst ha
     let K : ∀ β : Unit, LevelChart (I.rec7 l Z) (B.T u) (badQ (I.rec7 l Z) Q) B.R.m le_rfl
@@ -217,37 +214,29 @@ theorem twStep_top (hok : I.Ok) (pins : TC.Pins B X) {H : Formalism.L2.Herm.Herm
         (fun c => latCrd (I.rec7 l Z) B.R.m le_rfl (I.latAt u I.mu0 B.R.m c.1)) :=
       chartAll (chartWiden Set.subset_union_left ((F u).cls B.R.m le_rfl (Or.inr rfl)).toChart)
     have hr : I.ReadsK l Z u I.mu0 B.R.m le_rfl (fun _ => ()) K := hr0
-    refine ⟨twStep_mk hok pins u I.mu0 B.R.m h1m le_rfl hoff Unit inferInstance (fun _ => ()) (fun _ => chM H u) K hr (fun h2 => (hno h2).elim) (fun β => ?_) (fun β v _ => ?_)
-      (fun _ h2 => (hno h2).elim) (fun _ => ⟨inferInstance⟩) (fun h => absurd rfl h) (fun _ h2 => (hno h2).elim), ?_, ?_, ?_⟩
-    · exact (hC.carM u).Lb_eq
-    · exact (hC.carM u).Uloc_eq v
-    · intro _ β κ κ' e _
-      have : κ = κ' := Subtype.ext e
-      subst this
-      rfl
-    · exact fun h => absurd rfl h
-    · exact fun h => absurd rfl h
-  · obtain ⟨K1, ⟨k1, hR1, hk1⟩, htop, hoU, hfin, hchi⟩ := GlobalTheory.T.chart_lastStep_twistBasePoint I hok pins l Z u a Q ((F u).cls B.R.m le_rfl (Or.inr rfl)) hQ hr0
-    have hr : I.ReadsK l Z u a B.R.m le_rfl (fun _ => ()) K1 := ⟨k1, hR1⟩
-    refine ⟨twStep_mk hok pins u a B.R.m h1m le_rfl hoff Unit inferInstance (fun _ => ()) (fun _ => chM H u) K1 hr (fun h2 => (hno h2).elim) (fun β => ?_) (fun β v hv => ?_)
-      (fun _ h2 => (hno h2).elim) (fun _ => ⟨inferInstance⟩) (fun _ β => hfin) (fun _ h2 => (hno h2).elim), ?_, ?_, ?_⟩
-    · have e0 : (K1 β).lev.Lb = ((F u).cls B.R.m le_rfl (Or.inr rfl)).lev.Lb := by
-        obtain ⟨k, R⟩ := hr
-        obtain ⟨k', R'⟩ := hr0
-        ext x
-        exact (R.lb β x).trans (R'.lb () x).symm
-      rw [e0]
-      exact (hC.carM u).Lb_eq
-    · have : β = () := rfl
-      subst this
-      rw [hoU v hv]
-      exact (hC.carM u).Uloc_eq v
-    · intro _ β κ κ' e hv
-      exact hchi κ κ' e hv
-    · intro _ _ β
-      exact htop
-    · intro _ _
-      exact ⟨k1, hR1, hk1⟩
+    let S := twStep_mk (F := F) hok pins u I.mu0 B.R.m h1m le_rfl hoff
+      Unit inferInstance (fun _ => ()) (fun _ => chM H u) K hr (fun h2 => (hno h2).elim)
+      (fun _ => (hC.carM u).Lb_eq) (fun _ v _ => (hC.carM u).Uloc_eq v)
+      (fun _ h2 => (hno h2).elim) (fun _ => ⟨inferInstance⟩)
+      (fun h => (h rfl).elim) (fun _ h2 => (hno h2).elim)
+    let χ := ((F u).cls B.R.m le_rfl (Or.inr rfl)).lev.chi
+    have hχ (κ κ' : ((F u).cls B.R.m le_rfl (Or.inr rfl)).lev.U)
+        (e : κ.1 = κ'.1) : χ κ = χ κ' := congrArg χ (Subtype.ext e)
+    exact ⟨S, ⟨fun _ _ κ κ' e _ => hχ κ κ' e, fun h => (h rfl).elim, fun h => (h rfl).elim⟩⟩
+  · obtain ⟨K1, hk, htop, hoU, hfin, hchi⟩ := GlobalTheory.T.chart_lastStep_twistBasePoint I hok pins l Z u a Q ((F u).cls B.R.m le_rfl (Or.inr rfl)) hQ hr0
+    have hr : I.ReadsK l Z u a B.R.m le_rfl (fun _ => ()) K1 :=
+      hk.elim fun k h => ⟨k, h.1⟩
+    have hLb (β : Unit) : (K1 β).lev.Lb = ((F u).cls B.R.m le_rfl (Or.inr rfl)).lev.Lb := by
+      obtain ⟨_, R⟩ := hr
+      obtain ⟨_, R'⟩ := hr0
+      exact Submodule.ext fun x => (R.lb β x).trans (R'.lb () x).symm
+    let S := twStep_mk (F := F) hok pins u a B.R.m h1m le_rfl hoff
+      Unit inferInstance (fun _ => ()) (fun _ => chM H u) K1 hr (fun h2 => (hno h2).elim)
+      (fun β => (hLb β).trans (hC.carM u).Lb_eq)
+      (fun _ v hv => (hoU v hv).trans ((hC.carM u).Uloc_eq v))
+      (fun _ h2 => (hno h2).elim) (fun _ => ⟨inferInstance⟩)
+      (fun _ _ => hfin) (fun _ h2 => (hno h2).elim)
+    exact ⟨S, ⟨fun _ _ => hchi, fun _ _ _ => htop, fun _ _ => hk⟩⟩
 
 
 
@@ -308,19 +297,9 @@ theorem twPack_ex (hok : I.Ok) (pins : TC.Pins B X) {H : Formalism.L2.Herm.HermC
   obtain ⟨J⟩ := GlobalTheory.T.exists_penultimateLevel_couplingCosets I hok pins l Z H.Ch H.chOf F u a Q h1 (St (B.R.m - 1)).Ch (St (B.R.m - 1)).fin (St (B.R.m - 1)).chOf
     (fun β => (St (B.R.m - 1)).K h1 (Nat.sub_le _ _) β) (St (B.R.m - 1)).gOf hQ hF hJ ((St (B.R.m - 1)).readsQ h1 (Nat.sub_le _ _) h2) hfin
     (fun β v hv => (St (B.R.m - 1)).offK h1 h2 β v hv) (fun β κ κ' e hv => (St (B.R.m - 1)).chiC h1 h2 β κ κ' e hv)
-  have hLb : (F u).levJ.Lb = reL (rankN (I.rec7 l Z) (B.R.m - 1) (Nat.sub_le _ _)) J.levJ.Lb := by
-    obtain ⟨c⟩ := twBefore_cl_nonempty hok u a
-    rw [← J.lb ((St (B.R.m - 1)).chOf c), ← (F u).levJ_Lb h1 ((St (B.R.m - 1)).gOf ((St (B.R.m - 1)).chOf c))]
-    exact (reads_lb_eq ((St (B.R.m - 1)).reads h1 (Nat.sub_le _ _)) ((hF u).mid (B.R.m - 1) h1 h2) _ _).symm
-  have hoffx := GlobalTheory.T.exists_levelJ_character_eq_member_off_places I hok pins l Z H.Ch H.chOf F u a Q h1 (St (B.R.m - 1)).Ch (St (B.R.m - 1)).fin (St (B.R.m - 1)).chOf
+  obtain ⟨χ, hχ, hχ'⟩ := GlobalTheory.T.exists_levelJ_character_eq_member_off_places I hok pins l Z H.Ch H.chOf F u a Q h1 (St (B.R.m - 1)).Ch (St (B.R.m - 1)).fin (St (B.R.m - 1)).chOf
     (fun β => (St (B.R.m - 1)).K h1 (Nat.sub_le _ _) β) (St (B.R.m - 1)).gOf hQ hF hJ ((St (B.R.m - 1)).reads h1 (Nat.sub_le _ _))
     (fun β v hv => (St (B.R.m - 1)).offK h1 h2 β v hv) (fun β κ κ' e hv => (St (B.R.m - 1)).chiC h1 h2 β κ κ' e hv) J
-  have fin : (∃ χ : J.levJ.U →* ℂˣ, (∀ β (κ : J.levJ.U) (κ' : ((St (B.R.m - 1)).K h1 (Nat.sub_le _ _) β).lev.U),
-      κ'.1 = reGL (rankN (I.rec7 l Z) (B.R.m - 1) (Nat.sub_le _ _)) _ κ.1 → ((St (B.R.m - 1)).K h1 (Nat.sub_le _ _) β).lev.chi κ' = χ κ) ∧
-      ∀ (κ : J.levJ.U) (κ' : (F u).levJ.U), κ'.1 = reGL (rankN (I.rec7 l Z) (B.R.m - 1) (Nat.sub_le _ _)) _ κ.1 →
-        (∀ v ∈ Q, bc (prV (E := (I.rec7 l Z).host.E) v) κ.1 = 1) → χ κ = (F u).levJ.chi κ') := by
-    first | exact hoffx hLb | exact hoffx
-  obtain ⟨χ, hχ, hχ'⟩ := fin
   exact ⟨⟨St, hSt ▸ hSm, { J with chiJ := χ, chiJ_eq := hχ }, hχ'⟩⟩
 
 theorem reL_inj {a b : ℕ} (h : a = b) {E : Type} [Field E] [NumberField E] {L L' : Submodule (𝓞 E) (Fin a → E)}

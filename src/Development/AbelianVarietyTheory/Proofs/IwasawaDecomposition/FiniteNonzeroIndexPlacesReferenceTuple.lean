@@ -75,10 +75,16 @@ theorem grpAt (w : ColW B f T) (Y : PreX B.toPre) (Z : w.Lt) (h : GrpAt (w.st Z)
 theorem fine (w : ColW B f T) (Y : PreX B.toPre) (Z : w.Lt) (hX : B.fields.Ok) (Wt : Set B.places.Pl)
     (z : R3.Dat (w.st Z) w.I hX T Wt) (h : Fine z) : Fine (w := colW w Y) (Z := Z) (dat w Y Z hX Wt z) := by
   refine ⟨?_, ?_, ?_, ?_⟩
-  · exact (by with_unfolding_all exact (h.1 :))
-  · exact (by with_unfolding_all exact (h.2.1 :))
-  · exact (by with_unfolding_all exact (h.2.2.1 :))
-  · exact (by with_unfolding_all exact (h.2.2.2 :))
+  · with_unfolding_all exact h.1
+  · with_unfolding_all exact h.2.1
+  · with_unfolding_all exact h.2.2.1
+  · have hStd := h.2.2.2
+    -- This conversion is much cheaper in the kernel than in elaborator unification.
+    run_tac
+      let proof ← Lean.Elab.Tactic.getFVarId (Lean.mkIdent `hStd)
+      let goal ← Lean.Elab.Tactic.getMainGoal
+      goal.assign (Lean.mkFVar proof)
+      Lean.Elab.Tactic.replaceMainGoal []
 
 
 
@@ -101,7 +107,8 @@ theorem seedW {K : Ctx} {P : Pre} {f : Top.Fr P} {F F₀ : IntermediateField ℚ
   refine ⟨B₀, f₀, T₀, colW w₀ Y, Z₀, hX₀, Wt₀, dat w₀ Y Z₀ hX₀ Wt₀ z₀, rfl, a2, a3, a4, heq_of_eq (preX_eq hG hT),
     pinned w₀ Y a6, a7, grpAt w₀ Y Z₀ a8, fine w₀ Y Z₀ hX₀ Wt₀ z₀ a9, holdsL w₀ Y Z₀ hX₀ Wt₀ z₀ a10, ?_, a12⟩
   intro v hv
-  exact a11 v ((nonzeroIndexPlaces_adelicDataResized_eq w₀ Y Z₀ hX₀ Wt₀ z₀).le hv)
+  have hW := nonzeroIndexPlaces_adelicDataResized_eq w₀ Y Z₀ hX₀ Wt₀ z₀
+  exact a11 v (Eq.mp (congrArg (fun s : Set B₀.places.Pl => v ∈ s) hW) hv)
 
 theorem finite_norm_eq {R : Ranks} (H : Formalism.BasicNotions.Host R) (n : ℕ) :
     {x : 𝓞 H.E | (x : H.E) * H.conj (x : H.E) = (n : H.E)}.Finite := by

@@ -40,7 +40,12 @@ theorem selected_lower_map_third_stage_alt : GlobalTheory.Published.DiscreteSeri
     cases x with
     | mk G Pl0 I0 T' A3 core R' F cG geo pins err' Y Z' C' sEE div JA amb0 JM mjH =>
     cases pack
-    exact amb_of_eq rfl (eq_of_heq htup) hjA q.x.obj.amb.1
+    let D := q.w.D q.Z
+    let t := q.x.what₂
+    exact amb_of_eq (D := D) (A := (famT t).A) (X := RowSide.sharp D)
+      (Fm := q.O.ex.amb) (Fm' := q.O.ex.amb) (P := t.r.z.F.P1) (ψ := t.r.z.F.ψ1)
+      (tup := Y.tup) (tup' := t.r.Y.tup) (jA := Y.jA) (jA' := t.r.Y.jA)
+      rfl (eq_of_heq htup) hjA q.x.obj.amb.1
   · cases a with
     | mk Dc Sp Zsc lam err lam_eq x pack intersectionNumber_baseChange hκ hv hfw htup htupT hjA hjA0 heMt hPY hPW heFT hIL heE heW hjW heRR =>
     cases x with

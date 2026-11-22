@@ -140,26 +140,26 @@ theorem length_bound_via_splitting :
         4 * (N + t) * ((cols.card : ℕ∞) + 1) * vδ +
         (t : ℕ∞) * (cols.card : ℕ∞) * H0 + (t : ℕ∞) * ∑ w ∈ qs, vζ w := by
   intro O _ _ _ X X' T T' Z p q b hb₁ hb₂ d _ _ R' _ hdet Tc _ _ _ _ G _ r χ E e₁ δ ι _ _ colIdx hinj
-    D j e' Kc k0 hEE he₁ hgen π' ρπ hρπ t ht bl hbl ρk hsurj hblk _ _ _ hvcc hcard sE tE δO ℓ cB
+    D j e' Kc k0 hEE he₁ hgen π' ρπ hρπ t ht bl hbl ρk hsurj hblk blockComm blockModule blockTower
+    hvcc hcard sE tE δO ℓ cB
     what₂ qs lenRow deg vζ s vhE H0 Sha hEsum hk0 NNc cols eO vδ N h0 hE0 hδ0 hτ0 hKO hlift
     hRho hHigh hOne
-  have hEE' : E * E = δ • E := by rw [Algebra.smul_def]; exact hEE
-  refine collectAlt t ht
-    (fun k => Module.length O (ColNNJ r χ E e₁ δ (fun l => D (colIdx l)) (fun l => j (colIdx l)) Kc k0
-      →ₗ[R'] blockRestrictedRepresentationType bl ρk k)) univ _ what₂ cols qs lenRow vζ h0 e' j deg Sha eO vδ s vhE N H0 cB hvcc
+  have hEE' : E * E = δ • E := hEE.trans (Algebra.smul_def δ E).symm
+  refine collectAlt t ht _ univ _ what₂ cols qs lenRow vζ h0 e' j deg Sha eO vδ s vhE N H0 cB hvcc
     ?_ ?_ ?_
   · obtain ⟨F, Q, hrows, hcols, hQ, hlen⟩ := hRho
     exact blockRhoLat O R' Tc G {a // bl a = 0} (ρk 0).toRingHom r χ E e₁ δ δO ι ℕ colIdx hinj D j e'
       Kc k0 ℓ sE tE hEsum hEE' hE0 hk0 hδ0 hτ0 hKO hlift what₂ F lenRow Q s hrows hcols hQ hlen
   · obtain ⟨hu, he₁0, hE1, hδ1, hk1, F, Q, hrows, hqs, hcols, hQ, hlen⟩ := hOne
-    have h1 : Fintype.card {a // bl a = (⟨1, by omega⟩ : Fin (t + 1))} = 1 :=
-      hcard _ (fun h => by simp [Fin.ext_iff] at h)
-    exact blockChiOneLat blockChiOneFull O R' Tc G _ (ρk ⟨1, by omega⟩).toRingHom r χ E e₁ δ δO ι ℕ
+    let c₁ : Fin (t + 1) := ⟨1, Nat.lt_succ_of_le ht⟩
+    have h1 := hcard c₁ (fun h => Nat.one_ne_zero (congrArg Fin.val h))
+    exact @blockChiOneLat blockChiOneFull O _ _ _ R' Tc G _ _ _ _ {a // bl a = c₁}
+      _ _ (ρk c₁).toRingHom (blockComm c₁) (blockModule c₁) (blockTower c₁) r χ E e₁ δ δO ι _ _ ℕ _
       colIdx hinj D j e' Kc k0 ℓ cB h1 hu he₁0 hE1 hδ1 hk1 what₂ qs F deg vζ Q vhE hrows hqs hcols hQ hlen
   · intro c hc
     obtain ⟨he₁0, hEc, hδc, hτc, hH0, F, Q, hrows, hqs, hcols, hQ, hlen⟩ := hHigh c hc
-    have hc1 : Fintype.card {a // bl a = c} = 1 :=
-      hcard c (by rintro rfl; simp at hc)
+    have hc1 := hcard c (fun h =>
+      Nat.not_succ_le_zero 1 (Eq.mp (congrArg (fun k : Fin (t + 1) => 2 ≤ (k : ℕ)) h) hc))
     exact blockChiCLat blockChiCFull O R' Tc G _ (ρk c).toRingHom r χ E e₁ δ δO ι ℕ colIdx hinj D j
       Kc k0 ℓ cB sE tE hc1 hEsum hEE' he₁0 hEc hk0 hδc hτc what₂ qs F deg vζ Q (Sha ((c : ℕ) - 1)) H0
       hH0 hrows hqs hcols hQ hlen

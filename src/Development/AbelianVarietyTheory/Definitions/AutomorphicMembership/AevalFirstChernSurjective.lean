@@ -46,7 +46,8 @@ def c1 (L : FinLB X) : PicSym X := Vert.c1 L.lb L.isLB
 
 theorem c1_eq (L : FinLB X) : L.c1 = firstChernPic L.cls := rfl
 
-@[simp] theorem firstChern_dual (L : FinLB X) : L.dual.c1 = -L.c1 := by simp [c1_eq]
+@[simp] theorem firstChern_dual (L : FinLB X) : L.dual.c1 = -L.c1 := by
+  simp only [c1_eq, cls_dual, map_neg]
 
 end FinLB
 
@@ -266,7 +267,8 @@ theorem resG_injective {V W : Z.X.Opens} (h : W ≤ V) (hW : Z.gen ⊓ V ≤ W) 
   have hy' : y ∈ Z.X.basicOpen a := hyx.mem_open (Z.X.basicOpen a).isOpen hx
   have : y ∈ Z.X.basicOpen (resG Z.X h a) :=
     (Z.X.basicOpen_res a (homOfLE h).op).ge ⟨hW ⟨hy, Z.X.basicOpen_le a hy'⟩, hy'⟩
-  simp [ha] at this
+  rw [ha, Scheme.basicOpen_zero] at this
+  exact this
 
 theorem exists_extension {V : Z.X.Opens} (a : Γ(Z.X, Z.gen ⊓ V))
     (h : ∀ x ∈ V, ∃ (W : Z.X.Opens) (hW : W ≤ V) (b : Γ(Z.X, W)), x ∈ W ∧
@@ -345,8 +347,8 @@ theorem IsSum.pull (H : IsSum P P' P'') : VertDiv.IsSum (P.pull hf) (P'.pull hf)
     eqn_pull _ hf j _ (inf_le_inf_left _ (inf_le_left.trans inf_le_right)) e', hu, map_mul, map_mul, LB.appLE_resG]
   exact congrArg (· * _) (LB.resG_appLE f e _ _).symm
 
-@[simp] theorem cls_pull_zero : ((zero Z).pull hf).cls = 0 := by
-  simpa using ((IsIsom.refl (zero Z)).isSum.pull hf).cls_eq
+@[simp] theorem cls_pull_zero : ((zero Z).pull hf).cls = 0 :=
+  add_eq_left.mp ((IsIsom.refl (zero Z)).isSum.pull hf).cls_eq.symm
 
 @[simp] theorem cls_pull_const (g : O) (hg : g ≠ 0) : ((const Z g hg).pull hf).cls = B.div g hg := by
   rw [← VertDiv.cls_const, ← add_zero (VertDiv.const B g hg).cls, ← VertDiv.cls_zero B]
@@ -418,7 +420,7 @@ def toProd : SmallPic Z.X × ∀ C, (Z.comp C).VDivZ :=
 theorem toProd_eq_iff : P.toProd = P'.toProd ↔ IsIsom P P' :=
   ⟨fun h => isIsom_of_comp (congrFun (congrArg Prod.snd h)), fun h => Prod.ext
     ((smallCls_eq_iff _ _).2 ⟨h.choose, h.choose_spec.1⟩) (funext fun C => by
-      simpa [toProd] using (h.isSum.pull (Z.compι_str C)).cls_eq.symm)⟩
+      simpa only [toProd, cls_pull_zero, add_zero] using (h.isSum.pull (Z.compι_str C)).cls_eq.symm)⟩
 
 
 variable (P P') in
@@ -488,10 +490,11 @@ variable {Z}
 
 @[simp] theorem vCls_cls (P : VPair Z) : Z.vCls P.cls = cls P.M P.isLB := smallPicEquiv_smallCls _ _
 
-theorem vRes_cls (P : VPair Z) (C : Z.Comp) : Z.vRes C P.cls = (P.pull (Z.compι_str C)).cls := rfl
+theorem vRes_cls (P : VPair Z) (C : Z.Comp) : Z.vRes C P.cls = (P.pull (Z.compι_str C)).cls :=
+  Eq.refl ((P.pull (Z.compι_str C)).cls)
 
 @[simp] theorem vRes_div (g : O) (hg : g ≠ 0) (C : Z.Comp) : Z.vRes C (Z.div g hg) = (Z.comp C).div g hg :=
-  (vRes_cls _ C).trans (VPair.cls_pull_const (Z.compι_str C) g hg)
+  VPair.cls_pull_const (Z.compι_str C) g hg
 
 @[simp] theorem vCls_div (g : O) (hg : g ≠ 0) : Z.vCls (Z.div g hg) = 0 := vCls_cls _
 
@@ -499,7 +502,8 @@ theorem picSymPull_mem_symDeg {X Y : Scheme.{0}} (f : Y ⟶ X) {n : ℕ} {x : Pi
     picSymPull f x ∈ symDeg (SmallPic Y) n := by
   refine (Submodule.span_le (p := (symDeg (SmallPic Y) n).comap (picSymPull f).toLinearMap)).2 ?_ hx
   rintro _ ⟨g, rfl⟩
-  exact Submodule.subset_span ⟨fun i => smallPull f (g i), by simp [picSymPull]⟩
+  exact Submodule.subset_span ⟨fun i => smallPull f (g i), by
+    simp only [AlgHom.toLinearMap_apply, picSymPull, map_prod, symMap_symOf]⟩
 
 
 variable (Z) in
@@ -507,10 +511,17 @@ def vDeg (d : ℕ) : Z.VDivZ →+ (PicSym Z.X →ₗ[ℚ] ℚ) :=
   ∑ C ∈ Finset.univ.filter fun C : Z.Comp => (Z.comp C).relDim = d,
     (LinearMap.lcomp ℚ ℚ (picSymPull (Z.compι C)).toLinearMap).toAddMonoidHom.comp ((Z.comp C).vDeg.comp (Z.vRes C))
 
+private theorem eval_sum_toFun {ι A M : Type*} [AddZeroClass A] [AddCommMonoid M] [Module ℚ M]
+    (s : Finset ι) (f : ι → A →+ (M →ₗ[ℚ] ℚ)) (a : A) (x : M) :
+    (∑ i ∈ s, f i).toFun a x = ∑ i ∈ s, (f i).toFun a x :=
+  map_sum ((LinearMap.evalAddMonoidHom x).comp (AddMonoidHom.eval a)) f s
+
 theorem vDeg_apply (d : ℕ) (D : Z.VDivZ) (x : PicSym Z.X) : Z.vDeg d D x =
     ∑ C ∈ Finset.univ.filter fun C : Z.Comp => (Z.comp C).relDim = d,
-      (Z.comp C).vDeg (Z.vRes C D) (picSymPull (Z.compι C) x) := by
-  simp [vDeg]
+      (Z.comp C).vDeg (Z.vRes C D) (picSymPull (Z.compι C) x) :=
+  eval_sum_toFun (Finset.univ.filter fun C => (Z.comp C).relDim = d)
+    (fun C => (LinearMap.lcomp ℚ ℚ (picSymPull (Z.compι C)).toLinearMap).toAddMonoidHom.comp
+      ((Z.comp C).vDeg.comp (Z.vRes C))) D x
 
 theorem vDeg_eq_zero {d n : ℕ} (D : Z.VDivZ) (hn : n ≠ d) {x : PicSym Z.X} (hx : x ∈ symDeg (SmallPic Z.X) n) :
     Z.vDeg d D x = 0 := by

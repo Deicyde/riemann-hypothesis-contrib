@@ -107,11 +107,18 @@ def capDeg_vp (p d : ℕ) : Z.VDivQ →ₗ[ℚ] PicSym Z.X →ₗ[ℚ] ℚ :=
 
 variable {Z}
 
-@[simp] theorem cDQ_toQ (D : Z.VDivZ) : Z.cDQ (toQ D) = firstChernPic (Z.vCls D) := by simp [cDQ, toQ]
+@[simp] theorem cDQ_toQ (D : Z.VDivZ) : Z.cDQ (toQ D) = firstChernPic (Z.vCls D) :=
+  LinearMap.liftBaseChange_one_tmul ℚ (firstChernPic.comp Z.vCls).toIntLinearMap D
+
+private theorem inv_smul_liftBaseChange_one_tmul {M N : Type} [AddCommGroup M] [AddCommGroup N]
+    [Module ℚ N] (f : M →+ (N →ₗ[ℚ] ℚ)) (r : ℚ) (D : M) (Q : N) :
+    (r⁻¹ • f.toIntLinearMap.liftBaseChange ℚ) (1 ⊗ₜ[ℤ] D) Q = f D Q / r := by
+  simp only [LinearMap.smul_apply, LinearMap.liftBaseChange_one_tmul, smul_eq_mul, div_eq_inv_mul]
+  rfl
 
 theorem capDeg_vp_toQ (p d : ℕ) (D : Z.VDivZ) (Q : PicSym Z.X) :
-    Z.capDeg_vp p d (toQ D) Q = Z.vDeg d D Q / ramIdx O p := by
-  simp [capDeg_vp, toQ, div_eq_inv_mul]
+    Z.capDeg_vp p d (toQ D) Q = Z.vDeg d D Q / ramIdx O p :=
+  inv_smul_liftBaseChange_one_tmul (Z.vDeg d) (ramIdx O p) D Q
 
 theorem capDeg_vp_eq_zero (p : ℕ) {d n : ℕ} (D : Z.VDivQ) (hn : n ≠ d) {x : PicSym Z.X}
     (hx : x ∈ symDeg (SmallPic Z.X) n) : Z.capDeg_vp p d D x = 0 := by
@@ -254,24 +261,60 @@ def twistingSheafOnCopies : FinLB (copies O n N).X :=
   FinLB.pull ⟨N + 1, (ProjSpace.O1 O N).U, (ProjSpace.O1 O N).g, ProjSpace.O1_isLB O N⟩
     (Sigma.desc fun _ : Fin n => 𝟙 (PSpace O N))
 
+private theorem picSymPull_c1_pow_of_comp_eq_id {X Y : Scheme.{0}} (L : FinLB X)
+    (f : Y ⟶ X) (g : X ⟶ Y) (h : g ≫ f = 𝟙 X) (k : ℕ) :
+    picSymPull g ((L.pull f).c1 ^ k) = L.c1 ^ k := by
+  rw [map_pow, FinLB.c1_eq (L.pull f), picSymPull_c1Pic, FinLB.cls_pull, ← pull_comp, h,
+    pull_id, FinLB.c1_eq L]
+
+private theorem capDeg_divP_of_constant_cover {d : ℕ} {B : Model O} {Z : NModel O}
+    (f : Fin n → (B.X ⟶ Z.X)) [∀ i, IsOpenImmersion (f i)]
+    (hf : ∀ i, f i ≫ Z.str = B.str) (hc : ∀ x, ∃ i, x ∈ Set.range (f i))
+    (hd : ∀ i j, (Set.range (f i) ∩ Set.range (f j)).Nonempty → i = j)
+    (hDim : B.relDim = d) (x : PicSym Z.X) (t : PicSym B.X)
+    (hPull : ∀ i, picSymPull (f i) x = t)
+    (hDeg : (B.toITh p).capDeg (B.toITh p).divP t = 1) :
+    (Z.toITh p d).capDeg (Z.toITh p d).divP x = n := by
+  change Z.capDeg_vp p d (toQ (Z.divP p)) x = n
+  have hRam : (ramIdx O p : ℚ) ≠ 0 := Nat.cast_ne_zero.2 (ramIdx_ne_zero O p)
+  have hComp : B.vDeg (B.divP p) t / ramIdx O p = 1 :=
+    (Model.capDeg_vp_toQ p (B.divP p) t).symm.trans hDeg
+  have hValue : B.vDeg (B.div (p : O) (natCast_ne_zero O p)) t = ramIdx O p :=
+    ((div_eq_iff hRam).1 hComp).trans (one_mul _)
+  have hCover := vDeg_div_of_cover (Z := Z) (B := fun _ => B) f hf hc hd d (natCast_ne_zero O p) x
+  have hSum :
+      (∑ i ∈ Finset.univ.filter (fun _ : Fin n => B.relDim = d),
+        B.vDeg (B.div (p : O) (natCast_ne_zero O p)) (picSymPull (f i) x)) =
+      (n : ℚ) * ramIdx O p := by
+    simp only [hDim, Finset.filter_true, hPull, hValue, Finset.sum_const, Finset.card_univ,
+      Fintype.card_fin, nsmul_eq_mul]
+  exact (capDeg_vp_toQ p d (Z.divP p) x).trans
+    ((congrArg (fun q : ℚ => q / ramIdx O p) (hCover.trans hSum)).trans
+      (mul_div_cancel_right₀ (n : ℚ) hRam))
+
 theorem capDeg_divP_copies : ((copies O n (N + 1)).toITh p (N + 1)).capDeg ((copies O n (N + 1)).toITh p (N + 1)).divP
     ((twistingSheafOnCopies O n (N + 1)).c1 ^ (N + 1)) = n := by
-  have h (i : Fin n) : picSymPull (Sigma.ι (fun _ : Fin n => (Model.projSpace O (N + 1)).X) i)
-      ((twistingSheafOnCopies O n (N + 1)).c1 ^ (N + 1)) = c1 (Model.formalTwistingSheaf O (N + 1)) (ProjSpace.O1_isLB O _) ^ (N + 1) := by
-    refine (map_pow _ _ _).trans (congrArg (· ^ (N + 1)) ((picSymPull_c1Pic _ _).trans (congrArg firstChernPic ?_)))
-    refine (congrArg _ (FinLB.cls_pull _ _)).trans ((pull_comp _ _ _).symm.trans ?_)
-    erw [Sigma.ι_desc, pull_id]
-    rfl
-  rw [capDeg_vp_toQ, divP, vDeg_div_of_cover (Z := copies O n (N + 1)) (B := fun _ : Fin n => Model.projSpace O (N + 1))
-    (fun i => Sigma.ι (fun _ : Fin n => (Model.projSpace O (N + 1)).X) i) (fun i => Sigma.ι_desc _ _)
-    (fun x => (sigmaOpenCover _).exists_eq x)
-    (fun i j ⟨x, hi, hj⟩ => by_contra fun hij => Set.disjoint_left.1
-      (Opens.coe_disjoint.2 (disjoint_opensRange_sigmaι _ i j hij)) hi hj)]
-  refine (congrArg (· / (ramIdx O p : ℚ)) (Finset.sum_congr rfl fun i _ =>
-    (congrArg _ (h i)).trans (Model.vDeg_div_projSpace N (natCast_ne_zero O p)))).trans ?_
-  simp only [Model.relDim_projSpace, Finset.filter_true, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
-    nsmul_eq_mul]
-  exact mul_div_cancel_right₀ (n : ℚ) (b := ramIdx O p) (Nat.cast_ne_zero.2 (ramIdx_ne_zero O p))
+  let B := Model.projSpace O (N + 1)
+  let Z := copies O n (N + 1)
+  let f (i : Fin n) : B.X ⟶ Z.X := Sigma.ι (fun _ : Fin n => B.X) i
+  let g : Z.X ⟶ B.X := Sigma.desc fun _ : Fin n => 𝟙 B.X
+  let L : FinLB B.X :=
+    ⟨(N + 1) + 1, (ProjSpace.O1 O (N + 1)).U, (ProjSpace.O1 O (N + 1)).g, ProjSpace.O1_isLB O (N + 1)⟩
+  let x : PicSym Z.X := (twistingSheafOnCopies O n (N + 1)).c1 ^ (N + 1)
+  let t := c1 (Model.formalTwistingSheaf O (N + 1)) (ProjSpace.O1_isLB O (N + 1)) ^ (N + 1)
+  have hPull (i : Fin n) : picSymPull (f i) x = t :=
+    picSymPull_c1_pow_of_comp_eq_id L g (f i) (Sigma.ι_comp_desc _ i) (N + 1)
+  -- Match the model and Chern class in the component degree theorem directly.
+  exact capDeg_divP_of_constant_cover O n p (d := N + 1)
+    (Z := copies O n (N + 1)) (B := Model.projSpace O (N + 1))
+    (fun i => Sigma.ι (fun _ : Fin n => (Model.projSpace O (N + 1)).X) i)
+    (fun i => Sigma.ι_comp_desc _ i) (fun y => (sigmaOpenCover _).exists_eq y)
+    (fun i j ⟨y, hi, hj⟩ => by_contra fun hij => Set.disjoint_left.1
+      (Opens.coe_disjoint.2 (disjoint_opensRange_sigmaι _ i j hij)) hi hj)
+    (Model.relDim_projSpace (O := O) (N + 1))
+    ((twistingSheafOnCopies O n (N + 1)).c1 ^ (N + 1))
+    (c1 (Model.formalTwistingSheaf O (N + 1)) (ProjSpace.O1_isLB O _) ^ (N + 1)) hPull
+    (Model.capDeg_divP_projSpace O N p)
 
 end Example
 

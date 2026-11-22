@@ -52,12 +52,17 @@ theorem nchT_up (n : NchT w Z Wt nch) : Nonempty (NchT w (upL Z S' N h) Wt (nchU
      chrPsi := by with_unfolding_all exact (n.chrPsi :) }⟩
 
 theorem kept_up (nch : NChoice (w.D Z)) : Kept nch (nchUp S' N h nch) := by
-  refine ⟨?_, ?_, ?_, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl⟩ <;> constructor <;> first | rfl | exact HEq.rfl
+  refine ⟨?_, ?_, ?_, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl⟩ <;> constructor <;> rfl
 
 theorem goodO_up (g : GoodO (w.D Z) nch xd) : GoodO (w.D (upL Z S' N h)) (nchUp S' N h nch) (xdUp S' N h xd) := by
-  obtain ⟨⟨E, N0, S⟩, h1, h2, h3⟩ := g.tw
-  cases h1
-  exact ⟨⟨⟨twEOf (xdUp S' N h xd), N0, S⟩, rfl, (by with_unfolding_all exact (h2 :)), (by with_unfolding_all exact (h3 :))⟩, g.sep⟩
+  dsimp only [nchUp, xdUp, upL]
+  -- Abstract the new division stage before comparing the twisting conditions.
+  generalize (Db.setDivZ Z N h).V = V'
+  obtain ⟨⟨E, N0, S⟩, hE, hAt, hCl⟩ := g.tw
+  cases hE
+  refine ⟨⟨⟨twEOf _, N0, S⟩, rfl, ?_, ?_⟩, g.sep⟩
+  · with_unfolding_all exact hAt
+  · with_unfolding_all exact hCl
 end
 
 end GlobalTheory.LayerMove

@@ -151,8 +151,15 @@ theorem localInvU_cohomologyMapAlong_gsUnitsLocalMor (v : S)
   refine congrArg (brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
     (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))) ?_
   refine (AddMonoidHom.comp_apply _ _ _).trans ?_
-  exact cohomologyMap_uliftInt_cohomologyMapAlong_of (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _)
+  have hres : cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom
+      (continuous_toMonoidHom _) (embUnitsMorZ S (ιs v)) 2 = gsLocalRes S (ιs v) 2 := by
+    unfold gsLocalRes gsFinFamily
+    rfl
+  have h := cohomologyMap_uliftInt_cohomologyMapAlong_of
+    (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _)
     (gsUnitsLocalMor S ιs v) (galUnitsToZ _ _) (embUnitsMorZ S (ιs v)) (fun _ => rfl) 2 x
+  refine h.trans ?_
+  exact congrArg (fun m => m.hom (cohomologyULiftIntAddEquiv _ 2 x)) hres
 
 theorem localInvU_cohomologyMapAlong_gsSUnitsLocalMor (v : S)
     (y : cohomology (galSUnitsMax K.1 ℚ̄ S) 2) :

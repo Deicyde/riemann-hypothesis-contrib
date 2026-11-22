@@ -19,7 +19,12 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 theorem toTerm_eTT_symm {D : D7} (Z : New D) {X : HidaSetting D} (Y : Full X) (u u' : D.what₂.Word)
     (s : TT (reY Z Y) (wd Z u) (wd Z u')) :
-    ((eTT Z Y u u').symm s).toTerm = (eRT Z Y u u').symm s.toTerm := (by with_unfolding_all exact (Eq.refl ((eRT Z Y u u').symm s.toTerm) :))
+    ((eTT Z Y u u').symm s).toTerm = (eRT Z Y u u').symm s.toTerm := by
+  have termRefl := Eq.refl ((eRT Z Y u u').symm s.toTerm)
+  run_tac
+    -- The kernel checks the conversion after the equivalences reduce.
+    Lean.Elab.Tactic.closeMainGoalUsing `toTerm_eTT_symm fun _ _ => do
+      return (← Lean.Meta.getLocalDeclFromUserName `termRefl).toExpr
 
 
 
@@ -34,8 +39,7 @@ def eFib {D : D7} (Z : New D) {X : HidaSetting D} (Y : Full X) (u u' : D.what₂
 
 theorem fibFin_re {D : D7} (Z : New D) {X : HidaSetting D} {Y : Full X} (h : FinX Y) (u u' : D.what₂.Word)
     (t : RT (reY Z Y) (wd Z u) (wd Z u')) : Finite (fib (reY Z Y) t) := by
-  have := h.fibFin u u' ((eRT Z Y u u').symm t)
-  exact Finite.of_equiv _ (eFib Z Y u u' t)
+  exact @Finite.of_equiv _ _ (h.fibFin u u' ((eRT Z Y u u').symm t)) (eFib Z Y u u' t)
 
 
 
@@ -48,27 +52,51 @@ theorem pairIndep_re {D : D7} (Z : New D) {X : HidaSetting D} {Y : Full X} (h : 
     rw [toTerm_eTT_symm, toTerm_eTT_symm, e₁]
   have e₂' : ((eTT Z Y u u').symm s₂).toTerm = ((eTT Z Y u u').symm s₂').toTerm := by
     rw [toTerm_eTT_symm, toTerm_eTT_symm, e₂]
-  have := h.pairIndep u u' ((eTT Z Y u u').symm s₁) ((eTT Z Y u u').symm s₂)
-    ((eTT Z Y u u').symm s₁') ((eTT Z Y u u').symm s₂') e₁' e₂' ((by with_unfolding_all exact (r₁ :))) ((by with_unfolding_all exact (r₂ :)))
-  with_unfolding_all exact this
+  let back := (eTT Z Y u u').symm
+  have pair := h.pairIndep u u' (back s₁) (back s₂) (back s₁') (back s₂') e₁' e₂'
+  run_tac
+    -- The row equalities and the conclusion convert by reduction in the kernel.
+    Lean.Elab.Tactic.closeMainGoalUsing `pairIndep_re fun _ _ => do
+      let localExpr := fun name => return (← Lean.Meta.getLocalDeclFromUserName name).toExpr
+      return Lean.mkApp2 (← localExpr `pair) (← localExpr `r₁) (← localExpr `r₂)
 
 
 set_option maxHeartbeats 16000000 in
 theorem finX_reY : ∀ (D : D7) (Z : New D) (X : HidaSetting D) (Y : Full X), FinX Y → FinX (reY Z Y) := by
   intro D Z X Y h
   refine
-  { shInj := (by with_unfolding_all exact (h.shInj :))
-    shSurj := (by with_unfolding_all exact (h.shSurj :))
-    inHH := by with_unfolding_all exact h.inHH
-    puLin := by with_unfolding_all exact h.puLin
-    finHH := (by with_unfolding_all exact (h.finHH :))
-    fibFin := (by with_unfolding_all exact (fibFin_re Z h :))
-    pairIndep := (by with_unfolding_all exact (pairIndep_re Z h :))
-    Greal := ?_
-    cdEx := (by with_unfolding_all exact (h.cdEx :))
-    volPos := (by with_unfolding_all exact (h.volPos :)) }
-  intro u u' t
-  with_unfolding_all exact h.Greal u u' ((eRT Z Y u u').symm t)
+    { shInj := ?_
+      shSurj := ?_
+      inHH := ?_
+      puLin := ?_
+      finHH := ?_
+      fibFin := ?_
+      pairIndep := ?_
+      Greal := fun u u' t => ?_
+      cdEx := ?_
+      volPos := ?_ }
+  run_tac
+    -- Elaborate the field proofs independently and let the kernel check their conversion.
+    let h := Lean.mkIdent `h
+    let Z := Lean.mkIdent `Z
+    let Y := Lean.mkIdent `Y
+    let u := Lean.mkIdent `u
+    let u' := Lean.mkIdent `u'
+    let t := Lean.mkIdent `t
+    let fields := [
+      ← `(FinX.shInj $h),
+      ← `(FinX.shSurj $h),
+      ← `(FinX.inHH $h),
+      ← `(FinX.puLin $h),
+      ← `(FinX.finHH $h),
+      ← `(fibFin_re $Z $h),
+      ← `(pairIndep_re $Z $h),
+      ← `(FinX.Greal $h $u $u' ((eRT $Z $Y $u $u').symm $t)),
+      ← `(FinX.cdEx $h),
+      ← `(FinX.volPos $h)]
+    for field in fields do
+      Lean.Elab.Tactic.closeMainGoalUsing `finX_reY fun _ _ =>
+        Lean.Elab.Term.elabTerm field none
 
 end GlobalTheory.Mem.SRe
 

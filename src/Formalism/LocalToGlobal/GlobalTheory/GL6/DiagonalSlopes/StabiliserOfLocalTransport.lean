@@ -31,13 +31,13 @@ theorem class_lattice_le_dual (K : ClsTied u i hi) (c : (D.mem u).C.cls i) : cls
   have hm : ∀ a ∈ K.lev.Lb, ∀ b ∈ K.lev.Lb,
       IsIntegral ℤ (((1 : ℤ) : D.host.E) * Formalism.UG.hform (sigD D : D.host.E →+* D.host.E) (gramN D i hi) a b) := by
     intro a ha b hb
-    obtain ⟨r, hr⟩ := K.lev.Lb_int b hb a ha
+    refine Exists.elim (K.lev.Lb_int b hb a ha) fun r hr => ?_
     rw [Int.cast_one, one_mul, ← hr]
     exact RingOfIntegers.isIntegral_coe r
   have h := Formalism.UG.P.csScale_glob (sigD D) (gramN D i hi) K.lev.Lb 1 hm (K.y c).1
     (K.y c).2 (hglob x' hx') (hglob x hx)
   rw [Int.cast_one, one_mul] at h
-  exact bwL_descent _ _ _ h
+  exact bwL_descent D.host.F D.host.E _ h
 
 
 
@@ -144,9 +144,13 @@ theorem local_dual_lattice_transport {A : AtTTied u} (K : ClsTied u i hi) (L : L
             (Formalism.L2.GlobalTheoryTheory.Comp.dl (sigD D) (gramN D i hi) K.lev.Lb)),
         K.lev.fT (A.eV v).1 (A.eV v).2 ⟨_, h1⟩ = K.lev.fT (A.eV v).1 (A.eV v).2 ⟨_, h2⟩ := by
   intro z hz
-  obtain ⟨a, ha, h, hfa⟩ := hF z hz
-  exact ⟨a, ha, h, fun h1 h2 => (fMe v).injective
-    ((hfv v c ⟨_, h⟩ h1).symm.trans (hfa.trans (hfv v c2 ⟨_, Submodule.smul_mem _ _ hz⟩ h2)))⟩
+  refine (hF z hz).elim fun a ha => ha.2.elim fun h hfa => ?_
+  refine ⟨a, ha.1, h, ?_⟩
+  intro h1 h2
+  have hz' := (Ld D u i hi c2).smul_mem (algebraMap (𝓞 D.host.F) (𝓞 D.host.E) a) hz
+  have hf₁ := hfv v c ⟨_, h⟩ h1
+  have hf₂ := hfv v c2 ⟨_, hz'⟩ h2
+  exact (fMe v).injective (hf₁.symm.trans (hfa.trans hf₂))
 
 
 set_option maxHeartbeats 2000000 in

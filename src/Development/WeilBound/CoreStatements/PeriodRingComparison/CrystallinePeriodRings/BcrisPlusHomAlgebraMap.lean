@@ -58,9 +58,20 @@ def bcrisInv : Formalism.Per6.Bcris l →+* Reformulated.AutPerF.Bcris l (OC l) 
       rw [RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom, cA_symm_tA]
       exact Reformulated.AutPerF.Bcris.isUnit_logTeich (epsilon_isPrimitive l))
 
+private theorem loc2_lift_comp_mk₀ {A E : Type} [CommRing A] [CommRing E] {a t : A}
+    (f : A →+* E) (ha : IsUnit (f a)) (ht : IsUnit (f t)) :
+    (Formalism.Per6.Loc2.lift f ha ht).comp (Formalism.Per6.Loc2.mk₀ a t) = f :=
+  RingHom.ext (Formalism.Per6.Loc2.lift_mk₀ f ha ht)
+
 theorem bcrisInv_cB (x : ACris.ACris ℂ_[l] l) :
-    bcrisInv l (Formalism.Per6.cB l x) = algebraMap _ (Reformulated.AutPerF.Bcris l (OC l)) ((cA l).symm x) :=
-  Formalism.Per6.Loc2.lift_mk₀ _ _ _ x
+    bcrisInv l (Formalism.Per6.cB l x) = algebraMap _ (Reformulated.AutPerF.Bcris l (OC l)) ((cA l).symm x) := by
+  -- Comparing the ring homomorphisms avoids unfolding the localization's function coercions.
+  have h : (bcrisInv l).comp (Formalism.Per6.cB l) =
+      (algebraMap (Reformulated.AutPerF.Acris l (OC l)) (Reformulated.AutPerF.Bcris l (OC l))).comp
+        (cA l).symm.toRingHom :=
+    loc2_lift_comp_mk₀ _ _ _
+  simpa only [RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom] using
+    RingHom.congr_fun h x
 
 theorem bcrisInv_bcrisHom (x : Reformulated.AutPerF.Bcris l (OC l)) : bcrisInv l (bcrisHom l x) = x := by
   have h : (bcrisInv l).comp (bcrisHom l) = RingHom.id _ := by

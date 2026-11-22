@@ -126,7 +126,7 @@ theorem tube : VolSt → StabSt → IdxSt → TubeSt := by
   let T : ι → Set (GA D V) := fun k => {y | (g' k)⁻¹ * y ∈ KM V M ∧ rp y ∈ B k}
   have hKMo : IsOpen (KM V M) := (hstab.1 D V).2 M (by omega)
   have hTm : ∀ k, MeasurableSet (T k) := fun k =>
-    ((hKMo.preimage (continuous_const.mul continuous_id)).measurableSet).inter (hrpc.measurable (hBm k))
+    (hKMo.preimage (continuous_const_mul (g' k)⁻¹)).measurableSet.inter (hrpc.measurable (hBm k))
   have hdisj := tube_disj D V θ A rp X₀.Ψ X₀.Gm σ π M ι X g' F hM hG hθ hrp hσ hπe hFfree
     (fun k k' h => hdist k k' (by rw [hg'f k, hg'f k']; exact h)) (fun k => (hX k).1)
     (fun k => by rw [← hg'f k]; exact (hX k).2.2.1) (fun k => (hX k).2.2.2.1)
