@@ -1,9 +1,8 @@
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandraFinitenessAutomorphicGLOfEigenStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandraFinitenessTotallyComplexGLProofStatement
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.TemperedLocalComponents.FormsFiniteGL
 
 namespace GlobalTheory
 
 theorem automorphicFormsFiniteGL : GlobalTheory.Published.AutomorphicFormsFiniteGL :=
-  GlobalTheory.T.harishChandra_finiteness_automorphic_GL_of_eigen GlobalTheory.T.harishChandraFinitenessTotallyComplexGL_proof
+  UpperTheory.V.Af.formsFiniteGL
 
 end GlobalTheory
