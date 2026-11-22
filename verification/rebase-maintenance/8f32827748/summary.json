@@ -1,0 +1,29 @@
+{
+  "base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "run": "45048636006-remaining-pending-94",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/GaussianHessianIntegral.lean",
+          "stages": {
+            "1": "15146c8973c152ade93270a1778b531d7da3d667",
+            "2": "731373c54d4d7299f859e5decf1bf044ee69547e",
+            "3": "9b4e56c5c6cb343033a2c68a14c33340a794f2e7"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "bc9b3241f4630c698427c8895460dd35601af9f9",
+      "checkpoint_head": "6b0a6cc7d7dfee132d158f2e3ac599bbb76e0a31",
+      "checkpoint_branch": "maintenance/checkpoint-pr-54-8f32827748-45048636006-remaining-pending-94"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
