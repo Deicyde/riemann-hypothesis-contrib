@@ -41,9 +41,9 @@ theorem lie_liftFil : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Dat
   refine ⟨w, fun i c => ?_, ?_⟩
   · rw [liftFil, Submodule.mem_comap, map_sub, map_smul, key, hw i]
     exact hw' i c
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [liftFil, Submodule.mem_comap, map_sub, map_sum]
-      simp only [hw]
-      exact hsum
+
+  · rw [liftFil, Submodule.mem_comap, map_sub, map_sum]
+    simp only [hw]
+    exact hsum
 
 end GlobalTheory.HTLiftLie

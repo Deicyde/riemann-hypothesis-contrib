@@ -69,8 +69,8 @@ private theorem finAm (K : Type) [Field K] [Finite K] (m : ℕ) :
   apply Ideal.Quotient.eq.mpr
   rw [Ideal.mem_span_singleton, PowerSeries.X_pow_dvd_iff]
   intro n hn
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, map_sum]
+
+  rw [map_sub, map_sum]
   simp only [PowerSeries.coeff_smul, PowerSeries.coeff_X_pow, smul_eq_mul, mul_ite, mul_one, mul_zero]
   rw [Finset.sum_eq_single ⟨n, hn⟩]
   · simp
@@ -90,7 +90,7 @@ private theorem smul_eq_zero_of_algebraMap_eq_zero_of_isOd {X : Type} [CommRing 
   apply Subtype.ext
   rw [Submodule.coe_smul, Submodule.coe_zero, ← algebraMap_smul X a, ha, zero_smul]
 
-set_option maxHeartbeats 1600000 in
+
 private theorem step {X X' X'' : Type} [CommRing X] [Algebra x.A X] [CommRing X'] [Algebra x.A X'] [CommRing X'']
     [Algebra x.A X''] {D D' D'' : Dat x.A (plOf G)} (o : IsOd h x X D) (o' : IsOd h x X' D') (o'' : IsOd h x X'' D'')
     {d : ℕ} {dv : L.Vl → ℕ} (hA : CohAx G d dv) (a : x.A) [Finite D''.H2LocalConditions] (hF : Finite D''.Ck2)
@@ -146,7 +146,7 @@ private theorem step {X X' X'' : Type} [CommRing X] [Algebra x.A X] [CommRing X'
 
 end
 
-set_option maxHeartbeats 800000 in
+
 theorem obstructionBound_of_duality : ObstructionBoundFromDuality := by
   intro l _ L G0 T n x k al d hl h0 hN hH hE
   obtain ⟨dv0, hA0⟩ := h0
@@ -212,8 +212,8 @@ theorem obstructionBound_of_duality : ObstructionBoundFromDuality := by
     simp only [← Submodule.Quotient.mk_smul] at hc
     have h1 : Submodule.Quotient.mk (p := Submodule.comap D.selmerSecondCocycles.subtype D.selmerSecondCoboundaries)
         (x.t ^ (C0 + Cn + Ch * Fintype.card L.Vl + 2 * Cd) • ∑ i, c i • ξ i) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Submodule.Quotient.mk_smul, ← Submodule.mkQ_apply, map_sum]
+
+      rw [Submodule.Quotient.mk_smul, ← Submodule.mkQ_apply, map_sum]
       exact hc
     exact Submodule.mem_comap.mp ((Submodule.Quotient.mk_eq_zero (Submodule.comap D.selmerSecondCocycles.subtype D.selmerSecondCoboundaries)).mp h1)
   obtain ⟨Ψ, hΨ, hΨe⟩ := hξ _ hmem

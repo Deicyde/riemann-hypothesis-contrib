@@ -38,9 +38,9 @@ theorem coboundary_of_finiteIndex {G M k : Type} [Group G] [Field k] [CharZero k
     intro g
     rw [← Equiv.sum_comp (MulAction.toPerm g) D]
     conv_rhs => rw [Equiv.sum_comp (MulAction.toPerm g) D]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [MulAction.toPerm_apply, hD, Finset.sum_add_distrib, map_sum, Finset.sum_const,
-      Finset.card_univ, Nat.cast_smul_eq_nsmul]
+
+    simp only [MulAction.toPerm_apply, hD, Finset.sum_add_distrib, map_sum, Finset.sum_const,
+    Finset.card_univ, Nat.cast_smul_eq_nsmul]
   refine ⟨b - (((Fintype.card (G ⧸ H) : ℕ) : k))⁻¹ • ∑ q, D q, fun g => ?_⟩
   have h1 : d g = (((Fintype.card (G ⧸ H) : ℕ) : k))⁻¹ • (∑ q, D q - a g (∑ q, D q)) := by
     rw [← eq_sub_iff_add_eq.2 (hsum g).symm, smul_smul, inv_mul_cancel₀ hn, one_smul]

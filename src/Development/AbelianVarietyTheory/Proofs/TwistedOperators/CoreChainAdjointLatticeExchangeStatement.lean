@@ -25,6 +25,6 @@ open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheor
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.SepRows GlobalTheory.CoreOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.coreChain_adjoint_latticeExchange : LatExch := by
   first | exact @GlobalTheory.LatExchPf.latExch | exact GlobalTheory.LatExchPf.latExch | (intros; apply GlobalTheory.LatExchPf.latExch <;> assumption)

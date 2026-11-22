@@ -42,8 +42,8 @@ theorem rec_li_semilin {K V M ι κ : Type} [Field K] [AddCommGroup V] [Module K
     intro x
     conv_lhs => rw [← b.linearCombination_repr x]
     conv_rhs => rw [← b.linearCombination_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finsupp.linearCombination_apply, Finsupp.sum, TensorProduct.tmul_sum, map_sum, map_sum]
+
+    rw [Finsupp.linearCombination_apply, Finsupp.sum, TensorProduct.tmul_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [LinearMap.map_smulₛₗ, TensorProduct.tmul_smul, ← algebraMap_smul ℂ (b.repr x i), map_smul, hLb]
     rfl
@@ -214,8 +214,8 @@ theorem span_basis {ι : Type} [Fintype ι] (b : Basis ι K S.EqFun) :
   · show Submodule.span ℂ (Set.range E.emb) ≤ _
     rw [Submodule.span_le]
     rintro _ ⟨φ, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr φ, map_sum]
+
+    rw [← b.sum_repr φ, map_sum]
     refine Submodule.sum_mem _ fun a _ => ?_
     rw [LinearMap.map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
@@ -229,9 +229,9 @@ theorem pairAt_mk (S : GSD K) (σ : K →+* ℂ) (hσ : ∀ x : K, σ (star x) =
       ∑ i, ∑ j, starRingEnd ℂ (σ (S.bV.repr x i)) * σ (S.gramV i j) * σ (S.bV.repr y j) := by
     intro x y
     conv_lhs => rw [← S.bV.sum_repr x, ← S.bV.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, map_mul,
-      Finset.mul_sum]
+
+    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, map_mul,
+    Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have h1 : σ ((starRingEnd K) (S.bV.repr x i)) = starRingEnd ℂ (σ (S.bV.repr x i)) := hσ _
@@ -245,8 +245,8 @@ theorem pairAt_mk (S : GSD K) (σ : K →+* ℂ) (hσ : ∀ x : K, σ (star x) =
   · right
     intro x y
     rw [key, pairAt, h]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, ComplexEmbedding.conjugate_coe_eq]
+
+    simp only [map_sum, map_mul, ComplexEmbedding.conjugate_coe_eq]
 
 theorem Ev.norm_eq {S : GSD K} {σ : K →+* ℂ} (E : S.Ev σ) (h : S.Ok) (R : S.Rat)
     (hσ : ∀ x : K, σ (star x) = starRingEnd ℂ (σ x)) (φ : S.EqFun) :
@@ -268,8 +268,8 @@ theorem Ev.norm_eq {S : GSD K} {σ : K →+* ℂ} (E : S.Ev σ) (h : S.Ok) (R : 
   · simp only [hp]
     rw [← Complex.conj_re]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, map_inv₀, map_natCast, Complex.conj_conj]
+
+    simp only [map_sum, map_mul, map_inv₀, map_natCast, Complex.conj_conj]
 
 end GSD
 

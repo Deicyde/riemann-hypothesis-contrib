@@ -70,14 +70,14 @@ theorem linearIndependent_sumElim_of_exact (hi : Function.Injective i) (hex : Fu
   simp only [Sum.elim_inl, Sum.elim_inr] at hg
   have h2 : ∑ j, g (Sum.inr j) • s'' j = 0 := by
     have := congrArg p hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_add (f := _), map_sum, map_smul, hex.apply_apply_eq_zero, hu] using this
+
+    simpa [map_add (f := _), map_sum, map_smul, hex.apply_apply_eq_zero, hu] using this
   have hr := hs'' _ h2
   have h1 : ∑ k, g (Sum.inl k) • s' k = 0 := by
     apply hi
     simp only [hr, zero_smul, Finset.sum_const_zero, add_zero] at hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero]
+
+    rw [map_sum, map_zero]
     simpa [map_smul] using hg
   have hl := hs' _ h1
   rintro (k | j)
@@ -109,13 +109,13 @@ theorem card_quotient_sumElim_of_exact (hi : Function.Injective i) (hp : Functio
         simp only [w, Sum.elim_inl, Sum.elim_inr] at hg
         have h2 : ∑ j, g (Sum.inr j) • s'' j = 0 := by
           have := congrArg p hg
-          set_option synthInstance.maxHeartbeats 100000 in
-            simpa [map_add (f := _), map_sum, map_smul, hex.apply_apply_eq_zero, hu] using this
+
+          simpa [map_add (f := _), map_sum, map_smul, hex.apply_apply_eq_zero, hu] using this
         have hr := (Fintype.linearIndependent_iff.mp hs'') _ h2
         simp only [hr, zero_smul, Finset.sum_const_zero, add_zero] at hg
         have : i (∑ k, g (Sum.inl k) • s' k) = i x := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [← hg, map_sum]
+
+          rw [← hg, map_sum]
           simp [map_smul]
         rw [← hi this]
         exact Submodule.sum_mem _ fun k _ ↦ Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -137,8 +137,8 @@ theorem card_quotient_sumElim_of_exact (hi : Function.Injective i) (hp : Functio
           Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at hx
         obtain ⟨b, hb⟩ := (Submodule.mem_span_range_iff_exists_fun (𝓞 K)).mp hx
         have hy : x - ∑ j, b j • u j ∈ LinearMap.range i := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [← hex.linearMap_ker_eq, LinearMap.mem_ker, map_sub, map_sum]
+
+          rw [← hex.linearMap_ker_eq, LinearMap.mem_ker, map_sub, map_sum]
           simp only [map_smul, hu, hb, sub_self]
         have hN : ∑ j, b j • u j ∈ N :=
           Submodule.sum_mem _ fun j _ ↦ Submodule.smul_mem _ _ (Submodule.subset_span ⟨Sum.inr j, rfl⟩)

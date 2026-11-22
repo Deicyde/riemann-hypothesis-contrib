@@ -44,8 +44,8 @@ theorem logCartier_rounding_family : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.
     (Submodule.mem_span_range_iff_exists_fun K).mp (hsp ▸ Submodule.mem_top)
   choose g hg using fun I => hπ (c I)
   have hQη : Q η = ∑ I, g I ^ p • logWedge x I := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hcη, map_sum]
+
+    rw [← hcη, map_sum]
     refine Finset.sum_congr rfl fun I _ => ?_
     rw [hQw, hg]
   refine ⟨∑ I, g I • logWedge x I, h η, ?_, ?_, ?_, ?_⟩

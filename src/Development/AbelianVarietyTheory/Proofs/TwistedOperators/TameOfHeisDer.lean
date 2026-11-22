@@ -118,8 +118,8 @@ private theorem dH_eq_sum_re_im_single {ι B : Type} [Fintype ι] [DecidableEq �
     exact (Complex.re_add_im (v x)).symm
   conv_lhs => rw [hv]
   unfold dH
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_add (f := _), map_smul, Complex.coe_smul]
+
+  simp only [map_sum, map_add (f := _), map_smul, Complex.coe_smul]
 
 private theorem single_eq_vecL_single (i : Fin W.rank) (j : Fin V.rank) (τ : D.what₂.Tau) (c : ℂ) :
     (Pi.single ((i, j), τ) c : Ix V W → ℂ) =

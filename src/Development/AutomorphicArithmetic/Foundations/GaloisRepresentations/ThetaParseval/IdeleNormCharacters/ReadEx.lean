@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Contin
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Host Formalism.ConjugateSelfDual Neutral.B1 ReciprocityTheory.Gal
 open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.Gal.TP.Chr
 
-set_option maxHeartbeats 400000 in
+
 theorem UpperTheory.Gal.TP.Chr.readEx :
     UpperTheory.Gal.TP.Chr.ReadEx := by
   intro E _ _ _ μ hU

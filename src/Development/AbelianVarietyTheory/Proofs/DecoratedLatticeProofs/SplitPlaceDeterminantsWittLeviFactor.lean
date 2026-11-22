@@ -95,7 +95,7 @@ theorem GlobalTheory.SplitLeviDet.emb0Part : ∀ (D : D7) (S S₀ : HSp D) (ρ :
   · rw [IsDetAt, locU_val, detU_val]
   · rw [IsDetAt, locU_val, detU_val, hdet]
 
-set_option maxHeartbeats 1000000 in
+
 theorem GlobalTheory.SplitLeviDet.leviPart : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ) (e : AE D), IsSplitIdem D e → ∀ (χ : (AE D)ˣ →* Circle) (n : ℕ), IsHeckeChar D χ → ResEta D χ n → ∀ a : GL (Fin ρ) (AE D), (∀ i j, (e + cA D e) * (a.1 - 1) i j = (a.1 - 1) i j) → SuppAt e S (d.levi a) ∧ ∃ x, IsDetAt e S (d.levi a) x ∧ χ x = χ (Matrix.GeneralLinearGroup.det a) := by
   intro D S S₀ ρ d e he
   obtain ⟨h1, h2, -⟩ := he

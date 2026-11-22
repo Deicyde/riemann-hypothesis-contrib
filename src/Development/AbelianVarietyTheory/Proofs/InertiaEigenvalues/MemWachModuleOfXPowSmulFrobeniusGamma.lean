@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MapCons
 @[expose] public section
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.NL.ExtLattice
 
@@ -91,8 +91,8 @@ theorem mem_N_of_div {r : ℕ} (b : Fin r → W.DD T) (hbN : ∀ j, b j ∈ W.N 
     rw [Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
     obtain ⟨u, rfl⟩ := hspan x hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [φ_smul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -114,8 +114,8 @@ theorem mem_N_of_div {r : ℕ} (b : Fin r → W.DD T) (hbN : ∀ j, b j ∈ W.N 
       W.γA W.gam W.X ^ a * (c i + letπ * W.X ^ a * ω i) := by
     have h1 : W.X ^ a • W.γD T W.gam (W.X ^ a • m) =
         ∑ i, (W.X ^ a * ∑ k, Γc k i * W.γA W.gam (c k)) • b i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hc, map_sum]
+
+      rw [hc, map_sum]
       simp_rw [γ_smul, hΓeq]
       rw [sum_smul_sum W T b _ (fun i k => Γc k i), Finset.smul_sum]
       simp_rw [smul_smul]
@@ -137,8 +137,8 @@ theorem mem_N_of_div {r : ℕ} (b : Fin r → W.DD T) (hbN : ∀ j, b j ∈ W.N 
       W.Q ^ K * W.Q ^ a * W.Q ^ M * c i + W.Q ^ K * W.X ^ a * W.Q ^ a * υ i := by
     have h1 : W.Q ^ M • W.Q ^ K • W.φD T (W.X ^ a • m) =
         ∑ i, (W.Q ^ M * ∑ k, Φc k i * W.φA (c k)) • b i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hc, map_sum, Finset.smul_sum]
+
+      rw [hc, map_sum, Finset.smul_sum]
       simp_rw [φ_smul, hcomm (W.Q ^ K), hΦc]
       rw [sum_smul_sum W T b _ (fun i k => Φc k i), Finset.smul_sum]
       simp_rw [smul_smul]
@@ -231,7 +231,7 @@ end Generic
 section Concrete
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem X_pow_dvd_entry_of_fintype (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (l : ℕ) [Fact l.Prime] (K : FinExt l)
     (s : ℕ) (LL : FinExt l) (h : Good K s LL) {ι : Type} [Fintype ι] [DecidableEq ι] (a m m' : ℕ)
     (B G G₁ Pm P₁ P₁' : Matrix ι ι (AA K LL))
@@ -263,7 +263,7 @@ theorem X_pow_dvd_entry_of_fintype (D : Formalism.BasicNotions.D7) (HW : HWOf D.
   · rw [hmap, ← map_mul, hφ, map_smul, map_mul]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem mem_N : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; ∀ T : Lt K LL, IsCrys ((D.loc l).PD K) T.ρ → ∀ (M a : ℕ) (m : W.DD T), W.φD T m - m ∈ invN W T (W.Q ^ M) → W.γ T m - m ∈ aN W T letπ → W.X ^ a • m ∈ W.N T → m ∈ W.N T := by
   intro D HW F l _ K s LL h W T hT M a m hφ hγ hX
   obtain ⟨bN⟩ := GlobalTheory.NL.N_basis D HW F l K s LL h T hT

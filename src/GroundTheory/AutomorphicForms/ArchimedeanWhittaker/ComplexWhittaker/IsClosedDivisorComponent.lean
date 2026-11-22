@@ -142,8 +142,8 @@ theorem map_Q (n : ℕ) (q : ℤ) (l : U2) (x : H) :
   simp_rw [← integral_smul]
   rw [← integral_finsetSum]
   · congr 1; funext k
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [psi_inv_mul, map_sum, Finset.sum_smul]
+
+    rw [psi_inv_mul, map_sum, Finset.sum_smul]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [smul_smul]
     congr 1

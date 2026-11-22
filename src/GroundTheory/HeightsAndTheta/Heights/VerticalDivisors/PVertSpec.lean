@@ -57,8 +57,8 @@ theorem linForm_mem_integralModel {I : Ideal (MvPolynomial (Fin n) K)} {u : Fin 
     (h : linForm u ∈ integralModel I) : linForm (fun j => (u j : K)) ∈ I := by
   simp only [integralModel, Ideal.mem_comap] at h
   convert h using 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [linForm, map_sum, map_mul, map_C, map_X]
+
+  simp [linForm, map_sum, map_mul, map_C, map_X]
 
 theorem VertSpec.proof : VertSpec.Statement := by
   intro K _ _ n e I f u v hI _ hu

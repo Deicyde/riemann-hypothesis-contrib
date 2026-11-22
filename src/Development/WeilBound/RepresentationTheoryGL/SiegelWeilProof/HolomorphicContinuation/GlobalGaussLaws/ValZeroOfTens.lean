@@ -59,7 +59,7 @@ theorem val_zero_of_tens {m : ℕ} {θ : InfFam D} (hθ : IsInfFam θ) {τ : D.w
   simp only [tens, e0, Matrix.mul_zero, e1] at this
   exact mul_right_cancel₀ hx₁ this
 
-set_option maxHeartbeats 2000000 in
+
 theorem gSplit_of (hI : GIwasawa) (hAw : AwayAct) (hLF : LocFact) (hIn : AwayIn) (hSch : SchFP) (hT : TensMem) (hZ : LNZ) :
     GSplit := by
   intro D n V ψ χ θ μ ω H l s ν τ ε fr ι hc L hL Ψ hΨ g

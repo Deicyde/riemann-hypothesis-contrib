@@ -180,7 +180,7 @@ end Formalism.FrobeniusOrbits.ThickExists
 
 namespace Formalism.FrobeniusOrbits
 
-set_option maxHeartbeats 1000000 in
+
 open ThickExists in
 theorem hostThickExists : HostThickExists := by
   unfold HostThickExists

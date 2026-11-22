@@ -413,8 +413,8 @@ theorem jet_range (hp : ι ≫ PSpace.str ℂ N = p) (d : ℕ) [SmoothOfRelative
         exact ((mem_vanS ι S).1 f.2).2 y hyS
       obtain ⟨b, hb⟩ := hgs _ hf0
       change (sqI p hy).mkQ _ ∈ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [(hq _ _).2 hb, map_sum]
+
+      rw [(hq _ _).2 hb, map_sum]
       exact Submodule.sum_mem _ fun j _ => by
         rw [map_smul]
         exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
@@ -426,8 +426,8 @@ theorem jet_range (hp : ι ≫ PSpace.str ℂ N = p) (d : ℕ) [SmoothOfRelative
     intro b hb
     refine congrFun (hgi b ?_)
     have : (sqI p hy).mkQ (∑ j, b j • g j) = (sqI p hy).mkQ 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simpa only [map_smul, map_zero] using hb
     have h2 := (hq _ _).1 this
     rw [sub_zero] at h2
@@ -629,8 +629,8 @@ theorem exists_jet_forms : ∀ (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp ℂ
       obtain ⟨b, hb⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 h1
       have h2 : u - ∑ j, b j • r j ∈ RingHom.ker (evS p hya) ^ 2 := by
         have e1 : (sqI p hya).mkQ (∑ j, b j • r j) = (sqI p hya).mkQ u := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [← hb, map_sum]
+
+          rw [← hb, map_sum]
           simp only [map_smul]
           rfl
         rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq] at e1

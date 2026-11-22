@@ -70,7 +70,7 @@ theorem isPullback_snd (T : Over (Spec (CommRingCat.of V))) :
   rw [Over.snd_left, Over.fst_left]
   exact (IsPullback.of_hasPullback T.hom D.P.A.hom).flip
 
-set_option maxHeartbeats 1600000 in
+
 private theorem exists_isBas_famVals_of_isPullback [IsLocalRing V] (hT : SecTwistSt) (hk : 1 ≤ k) {R : Type} [CommRing R] [IsLocalRing R]
     {t : Spec (CommRingCat.of R) ⟶ Spec (CommRingCat.of V)} {Y : Scheme.{0}} {π : Y ⟶ D.P.A.left}
     {f : Y ⟶ Spec (CommRingCat.of R)} (H : IsPullback π f D.P.A.hom t) :
@@ -206,7 +206,7 @@ theorem isBas_thick (hT : SecTwistSt) (hk : 1 ≤ k) {b : Fin (k ^ D.P.g) → Va
     obtain ⟨s0, hs0, rfl⟩ := exists_lift hT hk s hs
     exact ⟨s0, hs0, by rw [pull_pull]; exact congrArg (fun x => pull D.P.L x s0) (pullback.lift_fst _ _ _).symm⟩
 
-set_option maxHeartbeats 1000000 in
+
 private theorem existsUnique_sec_of_isBas_lemma {X B : Scheme.{0}} {L : LB X} (hL : L.IsLB) {K : Type} [Fintype K]
     {φ : K → (B ⟶ X)} {ε : K → ℤ} {R : Type} [CommRing R] (I : Ideal R) [IsAdicComplete I R]
     {p : B ⟶ Spec (CommRingCat.of R)} {Y : ℕ → Scheme.{0}} {π : ∀ e, Y e ⟶ B}

@@ -72,7 +72,7 @@ theorem rdU_eq {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Reciproci
   · exact absurd (by rw [e, dite_eq_right hx]) h
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_ratio {D : D7} (V : HSp D) {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H}
     {l : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H} {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ} (hr : V.rank = r)
     (U : Unf Xo c σ r) (dict : GA D V → Σ k, Frame (U.X k).Ψ r)

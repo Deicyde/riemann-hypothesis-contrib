@@ -682,7 +682,7 @@ theorem neg_one_pow_succ_mul_mul (r s : ℕ) :
   rw [Nat.succ_mul, pow_add, mul_assoc, ← mul_pow, neg_one_mul, neg_neg, one_pow, mul_one]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem revCone_compactCup_succ (μ : A ⊗ B ⟶ C) {r s m : ℕ} (h : r + 1 + s = m + 1)
     (h' : s + (r + 1) = m + 1) (x : (cochainsComplex A).X (r + 1))
     (y : (piComplex fun v => cochainsComplex (Rep.res (φ v).toMonoidHom A)).X r)
@@ -724,7 +724,7 @@ theorem revCone_compactCup_succ (μ : A ⊗ B ⟶ C) {r s m : ℕ} (h : r + 1 + 
   exact key
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem revCone_compactCup_zero (μ : A ⊗ B ⟶ C) {s : ℕ} (h : 0 + s = s) (h' : s + 0 = s)
     (x : (cochainsComplex A).X 0) (z : (cochainsComplex B).X s) :
     ((revCone φ C (fun v => Rep.res (φ v).toMonoidHom C) (fun _ => 𝟙 _)).f s).hom

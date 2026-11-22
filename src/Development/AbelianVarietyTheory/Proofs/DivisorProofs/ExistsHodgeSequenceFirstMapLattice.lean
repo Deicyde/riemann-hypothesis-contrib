@@ -191,18 +191,18 @@ theorem iota_exists : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgCl
       intro t
       have ht : t = ∑ i, e t i • e.symm (Pi.single i 1) := by
         apply e.injective
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         ext j
         simp [Finset.sum_apply, Pi.single_apply]
       have hlin : epsPairing hε G t χ =
           ∑ i, e t i * epsPairing hε G (e.symm (Pi.single i 1)) χ := by
         conv_lhs => rw [ht]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [epsPairing, map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
-          smul_eq_mul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hlin, map_sum]
+
+        simp only [epsPairing, map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
+        smul_eq_mul]
+
+      rw [hlin, map_sum]
       simp only [dotProduct, sχ, map_mul]
       exact Finset.sum_congr rfl fun i _ => mul_comm _ _
     have hyL : y = L (sχ ᵥ* D.G) := by

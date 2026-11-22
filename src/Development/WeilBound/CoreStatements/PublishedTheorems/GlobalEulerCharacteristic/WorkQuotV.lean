@@ -33,7 +33,7 @@ theorem nonempty_iso_of_addEquiv {k G : Type} [CommRing k] [Group G] (hk : Funct
         rw [Int.cast_smul_eq_zsmul, Int.cast_smul_eq_zsmul, map_zsmul] }
   exact ⟨Rep.mkIso (Representation.Equiv.mk f fun g => LinearMap.ext fun x => h g x)⟩
 
-set_option maxHeartbeats 800000 in
+
 theorem quotient_representation_open (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
     (L : FiniteSubfield) [Fact (K ≤ L)]

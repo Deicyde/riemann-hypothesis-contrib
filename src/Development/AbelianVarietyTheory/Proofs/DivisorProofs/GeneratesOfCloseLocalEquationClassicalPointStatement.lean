@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NonUnitAt
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH GlobalTheory.Poinc
 open GlobalTheory.SiegelTor
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.generates_of_close_localEquation_classicalPoint :
     ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω]
       (M₁ M : RatModel o Ω) (π : M.Z ⟶ M₁.Z),

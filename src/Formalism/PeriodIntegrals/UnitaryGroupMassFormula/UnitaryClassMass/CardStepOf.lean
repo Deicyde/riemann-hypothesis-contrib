@@ -90,10 +90,10 @@ theorem gram_linOf {F : Type} [Field F] [Algebra F E] (σ : E →ₐ[F] E) (hσ 
     h (linOf b U (b i)) (linOf b U (b j)) =
       (cT (σ : E →+* E) (U : Matrix (Fin M) (Fin M) E) * gramOf h b * (U : Matrix (Fin M) (Fin M) E)) i j := by
   rw [linOf_basis, linOf_basis]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-    Matrix.mul_apply, cT, Matrix.map_apply, Matrix.transpose_apply, gramOf, Finset.mul_sum,
-    Finset.sum_mul, AlgHom.coe_toRingHom, hσ, starRingEnd_apply]
+
+  simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+  Matrix.mul_apply, cT, Matrix.map_apply, Matrix.transpose_apply, gramOf, Finset.mul_sum,
+  Finset.sum_mul, AlgHom.coe_toRingHom, hσ, starRingEnd_apply]
   refine Finset.sum_congr rfl (fun k _ => Finset.sum_congr rfl (fun l _ => ?_))
   simp only [RingHom.id_apply]
   ring

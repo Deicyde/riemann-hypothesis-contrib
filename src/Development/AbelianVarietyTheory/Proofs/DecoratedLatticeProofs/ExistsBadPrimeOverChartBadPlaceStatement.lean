@@ -20,6 +20,6 @@ open GlobalTheory.SeeSaw GlobalTheory.Unf
 open GlobalTheory.Mem.Col2.AdT
 open Filter Topology
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_badPrime_over_chart_bad_place : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (a : I.ι) (v : HeightOneSpectrum (𝓞 (I.rec7 l Z).host.F)), v ∈ Formalism.L2.Forms.badG (I.rec7 l Z) ∨ I.UnderQ a v → ∃ P : SBof I a, Formalism.L2.Col.IsOver v (GlobalTheory.TwU.seamP (sm I l Z) P.1) := by
   exact @GlobalTheory.Mem.Col2.AdT.exists_SBof_over_sub

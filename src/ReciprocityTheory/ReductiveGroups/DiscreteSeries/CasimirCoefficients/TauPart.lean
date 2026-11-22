@@ -59,11 +59,11 @@ variable {ε : Fin n → Bool} {Λ : Fin n → ℝ}
 
 lemma dtau_upPart_w (T : KType ε Λ) {B : Matrix (Fin n) (Fin n) ℂ} (hB : IsBlock ε B) :
     T.dτ (upPart B) T.w = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.matrix_eq_sum_single (upPart B), map_sum, _root_.sum_apply]
+
+  rw [Matrix.matrix_eq_sum_single (upPart B), map_sum, _root_.sum_apply]
   refine Finset.sum_eq_zero (fun a _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, _root_.sum_apply]
+
+  rw [map_sum, _root_.sum_apply]
   refine Finset.sum_eq_zero (fun b _ => ?_)
   rw [single_eq_smul, map_smul, ContinuousLinearMap.smul_apply]
   simp only [upPart, Matrix.of_apply]
@@ -75,11 +75,11 @@ lemma dtau_upPart_w (T : KType ε Λ) {B : Matrix (Fin n) (Fin n) ℂ} (hB : IsB
 
 lemma dtau_diagPart_w (T : KType ε Λ) (B : Matrix (Fin n) (Fin n) ℂ) :
     T.dτ (diagPart B) T.w = (∑ a, ((Λ a : ℝ) : ℂ) * B a a) • T.w := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.matrix_eq_sum_single (diagPart B), map_sum, _root_.sum_apply, Finset.sum_smul]
+
+  rw [Matrix.matrix_eq_sum_single (diagPart B), map_sum, _root_.sum_apply, Finset.sum_smul]
   refine Finset.sum_congr rfl (fun a _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, _root_.sum_apply, Finset.sum_eq_single a]
+
+  rw [map_sum, _root_.sum_apply, Finset.sum_eq_single a]
   · rw [single_eq_smul, map_smul, ContinuousLinearMap.smul_apply, T.w_wt, smul_smul]
     simp only [diagPart, Matrix.diagonal_apply_eq]
     rw [mul_comm]
@@ -140,8 +140,8 @@ theorem tau_part {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) {B
     rw [Matrix.conjTranspose_apply] at h
     exact h
   have hc : (starRingEnd ℂ) (∑ a, ((Λ a : ℝ) : ℂ) * B a a) = ∑ a, ((Λ a : ℝ) : ℂ) * B a a := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, Complex.conj_ofReal, hBaa]
+
+    simp only [map_sum, map_mul, Complex.conj_ofReal, hBaa]
   have h1 : T.dτ (upPart B) * projW T = 0 := by
     ext v
     rw [ContinuousLinearMap.mul_apply, hP, map_smul, dtau_upPart_w T hB, smul_zero,

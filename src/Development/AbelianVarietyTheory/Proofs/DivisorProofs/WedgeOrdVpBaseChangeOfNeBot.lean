@@ -13,7 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsAbelianSche
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -102,7 +102,7 @@ theorem IsLieImage.baseChange (hF : PrimitiveSubmodule B = Submodule.span R' ((b
   exact mem_Fil.1 this f hf
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem IsKSValue.baseChange (P : AbelianDeRham) {A' : Over (Sp (DualNumber R))} [GrpObj A']
     {B' : Over (Sp (DualNumber R'))} [GrpObj B'] {g : ℕ} (hA : IsAbelianScheme A')
     (hg : SmoothOfRelativeDimension g A'.hom) {i : A.left ⟶ A'.left} {j : B.left ⟶ B'.left}

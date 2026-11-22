@@ -22,7 +22,7 @@ open GlobalTheory.AscFin
 
 namespace GlobalTheory.LineDepthZero
 
-set_option maxHeartbeats 1000000
+
 
 theorem smul_mem_hatMx_of_mem_latO {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) {S B : HSp D}
     (LS : Lat S) (Λ₀ : Lat B) (hS : IsSelfDualC S LS)

@@ -92,8 +92,8 @@ theorem rat_of_pairings {ι : Type*} [Fintype ι] (β : ι → MvPolynomial σ �
   have hrq : ∀ j, r j = ∑ i, fockQ (β j) (β i) * π (star (c i)) := by
     intro j
     have h1 := congrArg π (hrj j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hπq, map_sum] at h1
+
+    rw [hπq, map_sum] at h1
     rw [h1]
     refine Finset.sum_congr rfl fun i _ => ?_
     have : star (c i) * ((fockQ (β j) (β i) : ℚ) : ℂ) = (fockQ (β j) (β i)) • star (c i) := by
@@ -101,8 +101,8 @@ theorem rat_of_pairings {ι : Type*} [Fintype ι] (β : ι → MvPolynomial σ �
     rw [this, LinearMap.map_smul, smul_eq_mul]
   set G0 : MvPolynomial σ ℚ := ∑ i, π (star (c i)) • β i with hG0
   have hG0m : map (algebraMap ℚ ℂ) G0 = ∑ i, ((π (star (c i)) : ℚ) : ℂ) • g i := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hG0, map_sum]
+
+    rw [hG0, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_ratSmul]
   set D : MvPolynomial σ ℂ := ∑ i, (c i - ((π (star (c i)) : ℚ) : ℂ)) • g i with hD

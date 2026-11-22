@@ -76,7 +76,7 @@ theorem bij (n : ℤ) : Function.Bijective fun (x : CohomologyClass c.pt L n) (j
 
 end General
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem HKCoprod_of : LateralTheory.E.CoprodPf.HKCoprod := by
   intro R _ ι K c hc F n
   have h1 : HasColimitsOfSize.{1, 1} (Shv R) := IsGrothendieckAbelian.hasColimits.{1} (Shv R)

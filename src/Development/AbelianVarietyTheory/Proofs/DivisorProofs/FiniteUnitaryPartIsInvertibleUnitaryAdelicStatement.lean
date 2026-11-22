@@ -19,7 +19,7 @@ open IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes 
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finiteUnitaryPart_isInvertibleUnitaryAdelic : ∀ (D : D7) (V : Formalism.BasicNotions.TH.HSp D) (g : GA D V),
     GlobalTheory.UCls.IsUA (IsCMField.complexConj D.host.E) (-(V.gram)ᵀ)
       ((finHom V g).1 : Matrix (Fin V.rank) (Fin V.rank) (GlobalTheory.AdLat.RA (maximalRealSubfield D.host.E) D.host.E)) := by

@@ -27,7 +27,7 @@ open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.
 open UpperTheory.V.W (Plc Lp)
 open scoped Polynomial
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 open UpperTheory.GalN.V UpperTheory.V.Z.Win UpperTheory.Zero.LLC
 
 open UpperTheory.V.Z.Sym.AboveWeight

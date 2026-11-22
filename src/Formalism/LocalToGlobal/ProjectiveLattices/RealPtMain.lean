@@ -6,7 +6,7 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.ModelAt
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -23,7 +23,7 @@ theorem mul_ringHom_units_ratio {K : Type} [Field K] {W S R : K} (hW : W ≠ 0) 
   rw [mul_inv, mul_pow, div_eq_mul_inv, ← inv_pow]
   linear_combination (R * S⁻¹ ^ k) * h1
 
-set_option maxHeartbeats 4000000 in
+
 theorem realPt_of (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c) {ka wL wF : WeightFamilies.Wt D j}
     (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (la : HeightOneSpectrum (𝓞 (recB h.toLawsCore).KO))
     (hU : IsUnif (OsK (recPlus h j hj) la G.w) (unifO (recPlus h j hj) la G.N)) [∀ ζ : PtsG G la, IsDVRAt ζ]
@@ -77,8 +77,8 @@ theorem realPt_of (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j
       ∑ k, kap (@algebraMap (Op (recPlus h j hj) la G.N) (Kp (recPlus h j hj) la G.N) _ _ _ (Tv (recPlus h j hj) la G.N (0, k))) *
         evI y ((G.w k : (recB h.toLawsCore).Cusp j wL) : T.R j) := by
     unfold Formalism.MainNotions.Gaps.EtaleWeightGaps.sec
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Algebra.smul_def, map_mul, hev_k, hev_inc]
   have hs0' : (∑ k, kap (@algebraMap (Op (recPlus h j hj) la G.N) (Kp (recPlus h j hj) la G.N) _ _ _ (Tv (recPlus h j hj) la G.N (0, k))) *

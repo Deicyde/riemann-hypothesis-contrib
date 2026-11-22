@@ -30,8 +30,8 @@ theorem OrdGE.sub {n : ℕ} {f g : MvPowerSeries Z k} (hf : OrdGE n f) (hg : Ord
 theorem OrdGE.sum {ι : Type*} {n : ℕ} (s : Finset ι) {f : ι → MvPowerSeries Z k}
     (hf : ∀ i ∈ s, OrdGE n (f i)) : OrdGE n (∑ i ∈ s, f i) := by
   intro A hA
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_eq_zero fun i hi => hf i hi A hA
 
 theorem OrdGE.mul {a b : ℕ} {f g : MvPowerSeries Z k} (hf : OrdGE a f) (hg : OrdGE b g) :

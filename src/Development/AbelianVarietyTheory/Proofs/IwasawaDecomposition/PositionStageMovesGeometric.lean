@@ -29,7 +29,7 @@ noncomputable section
 
 namespace GlobalTheory.HeightCounting.Up
 
-set_option maxHeartbeats 4000000
+
 
 theorem kept_trans {D D' D'' : D7} {c : NChoice D} {c' : NChoice D'} {c'' : NChoice D''}
     (h : Kept c c') (h' : Kept c' c'') : Kept c c'' := by

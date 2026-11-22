@@ -88,7 +88,7 @@ variable {D : D7} (X : HidaSetting D) (Y : Formalism.L2.SG.Full.Full X) (u u' : 
   (κ : Term D u u' (X.Fu u) (Y.what₂ u) → ℕ)
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem finPhaseC_of (hNR : Formalism.L2.SG.PairVal.NormRepExists D u u' (X.Fu u) (Y.what₂ u))
     (h1 : Formalism.L2.SG.Pf.RowForm.LiftAtSomeC X Y u u' κ) : Formalism.L2.SG.Pf.FinitePhase.FinPhaseC X Y u u' κ := by
   intro R ρ s hrel L U hL hU hZ
@@ -129,8 +129,8 @@ theorem finPhaseC_of (hNR : Formalism.L2.SG.PairVal.NormRepExists D u u' (X.Fu u
     have h := humF b
     simp only [hframe] at h
     simp only [LinearEquiv.mul_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [show (X.Fu u').fvec b = frame (lf D (X.Fu u')) b from rfl, h, map_sum]
+
+    rw [show (X.Fu u').fvec b = frame (lf D (X.Fu u')) b from rfl, h, map_sum]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [map_smul, hig]
 

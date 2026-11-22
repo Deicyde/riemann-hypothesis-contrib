@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProdMinorsMe
 @[expose] public section
 
 open Classical MeasureTheory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.unitaryAverage_kills_fock_complement_relInvariants : ∀ {ι : Type} [Fintype ι] (a d : ℕ) (n : ι → ℕ) {K : Type} [Group K] [MeasurableSpace K] (ν : Measure K), IsProbabilityMeasure ν → ν.IsMulLeftInvariant →
   (∀ g0 : K, AEMeasurable (g0 * ·) ν) →
   ∀ (ρ : K →* (ι → Matrix.unitaryGroup (Fin a) ℂ)), (∀ τ i j, Measurable fun g => (ρ g τ : Matrix (Fin a) (Fin a) ℂ) i j) →

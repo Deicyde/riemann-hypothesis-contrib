@@ -133,7 +133,7 @@ private theorem cj_count {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K L : FinExt
   rw [← hs, ← Multiset.sum_count_eq_card (fun n hn => hsub (Multiset.mem_toFinset.2 hn)), Nat.cast_sum]
   exact Finset.sum_congr rfl fun n _ => hJ n
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.Prune.card_jumps :
     ∀ (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut) (Wd : WDSide D T) (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (a : ℕ)
         (r : G D.host.E D.nd.Om →* GL (Fin a) (Qbar l)) (τ : D.host.E →+* Qbar l) (w : PlE D.host)

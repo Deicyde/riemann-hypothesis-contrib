@@ -49,8 +49,8 @@ private theorem ns_dec {O σ : Type} [CommRing O] [IsLocalRing O] [Fintype σ] (
   refine ⟨h, fun s => ?_, e⟩
   rw [ns_mem_max]
   have hs := hg s
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, map_add (f := _), map_sum] at hs
+
+  rw [e, map_add (f := _), map_sum] at hs
   simp only [ns_coeff] at hs
   simpa [Algebra.algebraMap_eq_smul_one, MvPowerSeries.coeff_one] using hs
 
@@ -78,8 +78,8 @@ theorem UpperTheory.V.Fr.ep_nosec :
     obtain ⟨k, hk, hgk⟩ := ns_dec g (hmin.2 g hg)
     have e : π g = π g - s (p (π g)) := by rw [hpt, map_zero, sub_zero]
     rw [e, hgk]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_mul, AlgHom.commutes]
+
+    simp only [map_add (f := _), map_sum, map_mul, AlgHom.commutes]
     rw [add_sub_add_left_eq_sub, ← Finset.sum_sub_distrib]
     refine Submodule.sum_mem _ fun i _ => ?_
     have hk' : π (k i) ∈ maximalIdeal C := (ns_loc π (k i)).2 (hk i)

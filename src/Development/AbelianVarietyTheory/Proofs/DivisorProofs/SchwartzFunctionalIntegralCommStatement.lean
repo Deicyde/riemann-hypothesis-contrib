@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 open MeasureTheory GlobalTheory.RealWeil
 open scoped SchwartzMap
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.schwartz_functional_integral_comm : ∀ (W : Type) [NormedAddCommGroup W] [NormedSpace ℝ W] [FiniteDimensional ℝ W] [MeasurableSpace W]
     [BorelSpace W] (ν : Measure W) [SigmaFinite ν] (n : ℕ) (L : Sch (Fin n) →L[ℂ] ℂ) (G : W → Sch (Fin n))
     (c : W → ℂ) (g : Sch (Fin n)), Continuous G → Continuous c →

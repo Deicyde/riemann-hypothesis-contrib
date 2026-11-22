@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemMatLat
 @[expose] public section
 
 open Polynomial Matrix GlobalTheory.LatOrb
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_unitary_adjoin_lattice_image_eq : ∀ {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [Field K] [Algebra O K] [IsFractionRing O K]
     (n : ℕ) (P₀ : O[X]), IsCoprime P₀ (derivative P₀) →

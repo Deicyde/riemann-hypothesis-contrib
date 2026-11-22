@@ -20,7 +20,7 @@ private theorem mul_eq_one_of_card_eq_two_of_ne_one {H : Type*} [Group H] (hH : 
   have := Finset.card_le_univ ({1, x, x * y} : Finset H)
   omega
 
-set_option maxHeartbeats 400000 in
+
 theorem UpperTheory.V.Ws.P1.towerGal :
     ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c) (T : Tower D), (resLe T.F_le).range = T.GalL ∧ Function.Injective (resLe T.F_le) ∧ Continuous (resLe T.F_le) ∧
           (∀ a b : G T.F Ω, a ∉ T.GalL → b ∉ T.GalL → a * b ∈ T.GalL) ∧

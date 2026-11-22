@@ -36,8 +36,8 @@ theorem PhiS_act : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K L : FinExt l
     rw [GlobalTheory.DRFil.actVdR_tmul, P.PD_actdR, hR, PhiS_tmul, PhiS_tmul]
     funext i
     simp only [Matrix.mulVec, dotProduct, Matrix.map_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [IntermediateField.coe_sum, IntermediateField.coe_mul, map_sum, map_mul, Finset.sum_mul,
-      P.actQdR_Om, hg, mul_assoc]
+
+    simp only [IntermediateField.coe_sum, IntermediateField.coe_mul, map_sum, map_mul, Finset.sum_mul,
+    P.actQdR_Om, hg, mul_assoc]
 
 end GlobalTheory.HodgeAt

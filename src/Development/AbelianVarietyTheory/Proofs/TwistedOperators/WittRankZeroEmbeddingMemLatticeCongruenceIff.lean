@@ -100,8 +100,8 @@ theorem hatL_mulVec_rect {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
     apply Submodule.subset_span
     refine ⟨M *ᵥ z, h z hz, ?_⟩
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mulVec, dotProduct, map_sum]
+
+    simp [Matrix.mulVec, dotProduct, map_sum]
   | zero => simp
   | add y z _ _ hy hz =>
     rw [Matrix.mulVec_add]; exact Submodule.add_mem _ hy hz

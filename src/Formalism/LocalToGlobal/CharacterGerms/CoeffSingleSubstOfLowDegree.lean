@@ -228,8 +228,8 @@ theorem isT_sum {V : VF C} {d : ℕ} {I₁ J₁ : Type} [Fintype I₁] [Fintype 
       rw [Finset.coe_range, Set.mem_Iio]
       by_contra h
       exact hn (by rw [hlow n (by omega), smul_zero])
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [key]
   rw [Finset.sum_comm, MvPowerSeries.coeff_X]
   exact ht.2 x μ

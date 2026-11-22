@@ -26,8 +26,8 @@ theorem det_mul_eq_sum_mnr {R : Type} [CommRing R] {ι : Type} [Fintype ι] [Dec
       simp [Matrix.mul_apply, Finset.sum_apply]
     rw [this]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h1, MultilinearMap.map_sum]
+
+  rw [h1, MultilinearMap.map_sum]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [MultilinearMap.map_smul_univ]
   rfl

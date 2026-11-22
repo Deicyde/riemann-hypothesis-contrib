@@ -27,7 +27,7 @@ namespace PositivityTheory.Lit1.PTN
 
 attribute [local instance 2000] Rep.hV2
 
-set_option maxHeartbeats 8000000 in
+
 theorem nineAdd_core (Kf : FiniteSubfield)
     [IsAlgClosure Kf.1 (AlgebraicClosure ℚ)] {l r : ℕ} [Fact l.Prime] (hl : l ≠ 2 ∨ IsTotallyComplex Kf.1) (hr : 0 < r)
     (ζ : AlgebraicClosure ℚ) (hζ : IsPrimitiveRoot ζ (l ^ r))

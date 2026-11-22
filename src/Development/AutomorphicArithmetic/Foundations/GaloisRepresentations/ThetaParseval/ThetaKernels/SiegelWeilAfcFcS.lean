@@ -11,7 +11,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -128,8 +128,8 @@ theorem fc_deg_k {d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ} (L : _r
   have hrow : ∀ k, M0 L.i₀ k = 0 := fun k => by
     have e0 : ∀ l, ∑ p, σ (v p) * T0 p l = 0 := fun l => by
       have h1 := congrArg σ (congrFun hTv l)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Pi.zero_apply, map_zero] at h1
+
+      simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Pi.zero_apply, map_zero] at h1
       calc ∑ p, σ (v p) * T0 p l = ∑ p, σ (v p) * -(((ε : ℤ) : E) * σ (T0 l p)) :=
             Finset.sum_congr rfl fun p _ => by rw [nCond_rat T0 hC l p]
         _ = -(((ε : ℤ) : E) * ∑ p, σ (T0 l p) * σ (v p)) := by

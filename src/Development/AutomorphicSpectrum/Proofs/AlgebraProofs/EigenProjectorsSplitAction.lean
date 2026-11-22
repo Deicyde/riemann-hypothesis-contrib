@@ -74,14 +74,14 @@ theorem split_proj : ∀ (K : Type) [Field K] (C : ACurve K) (V : Type) [AddComm
   choose m c a hza using fun s : S => exists_sum_tmul (z s)
   have he : ∀ s, actMap (k := k) ρ (z s) = ∑ j, algebraMap k K (c s j) • ρ (a s j) := by
     intro s
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hza s, map_sum]
+
+    rw [hza s, map_sum]
     exact Finset.sum_congr rfl fun j _ => actMap_tmul ρ _ _
   have hcoef : ∀ s t, ∑ j, c s j * χ t (a s j) = if t = s then 1 else 0 := by
     intro s t
     have h := congrFun (hz s) t
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hza s, map_sum, Finset.sum_apply] at h
+
+    rw [hza s, map_sum, Finset.sum_apply] at h
     simp only [splitMap_tmul] at h
     rw [h, Pi.single_apply]
   have hmul : ∀ s b, ρ b * actMap (k := k) ρ (z s) =
@@ -101,13 +101,13 @@ theorem split_proj : ∀ (K : Type) [Field K] (C : ACurve K) (V : Type) [AddComm
   have hsum : ∑ s, actMap (k := k) ρ (z s) = 1 := by
     have h : ∑ s, z s = 1 := by
       apply hinj
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_one]
+
+      rw [map_sum, map_one]
       simp only [hz]
       funext t
       simp [Finset.sum_apply, Pi.single_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, h, map_one]
+
+    rw [← map_sum, h, map_one]
   refine ⟨fun s => actMap (k := k) ρ (z s), ?_, ?_, ?_, ?_, ?_⟩
   · intro s i x hx
     show actMap (k := k) ρ (z s) x ∈ L i
@@ -128,8 +128,8 @@ theorem split_proj : ∀ (K : Type) [Field K] (C : ACurve K) (V : Type) [AddComm
         algebraMap k K (c s j * χ s (a s j)) • x := fun j => by
       rw [LinearMap.smul_apply, hx', smul_smul, map_mul]
     simp only [this]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_smul, ← map_sum, hcoef s s]
+
+    rw [← Finset.sum_smul, ← map_sum, hcoef s s]
     simp
   · intro x
     have h := congrArg (fun f : Module.End K V => f x) hsum

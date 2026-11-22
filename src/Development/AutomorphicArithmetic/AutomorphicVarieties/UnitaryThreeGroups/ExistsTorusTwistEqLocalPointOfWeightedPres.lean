@@ -95,7 +95,7 @@ private theorem fg_lemma {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {K
   rw [he, Submodule.map_comp]
   exact h.map _
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.exists_torus_twist_eq_localPoint_of_weightedPres :
     ∀ {l : ℕ} [Fact l.Prime] {c : Coef l} {R S : Type} [CommRing R] [Algebra c.O R] [IsCO c.O R] [CommRing S] [Algebra c.O S] [IsCO c.O S]
           (W : WPres c.O ℤ R) (h : W.HasOrigin) (qh : R →ₐ[c.O] S), Function.Surjective qh → ∀ {κ : Type} (g : κ → W.A) (w : κ → ℤ), (∀ i, g i ∈ W.gr (w i)) →

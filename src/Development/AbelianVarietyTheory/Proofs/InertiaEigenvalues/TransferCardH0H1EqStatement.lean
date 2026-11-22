@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LevRepZ
 @[expose] public section
 
 open ReciprocityTheory.Gal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.transfer_card_H0_H1_eq : ∀ {O : Type} [CommRing O] {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G']
     (i : G ≃ₜ* G') {M : Type} [AddCommGroup M] [Module O M] (ρ : Representation O G M)
     (p r : ℕ) [NeZero (p ^ r)] (c : O) (h : ((p : O) ^ r) ∈ Ideal.span {c}),

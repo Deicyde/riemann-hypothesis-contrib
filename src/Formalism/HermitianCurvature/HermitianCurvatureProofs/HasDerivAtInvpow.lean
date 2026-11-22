@@ -32,8 +32,8 @@ private lemma exists_zhat_eq_eval_poly_deg_le_one (z z' : Fin (2 * r + k + 1) �
       MvPolynomial.totalDegree_finsetSum_le fun j _ => deg_CX _ _
   · intro g a b
     rw [Zhat_eq]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, eval_C, eval_X, PI.UnitaryGroupMassFormula.UsCompose.vars, Sum.elim_inl, Matrix.mul_apply, Finset.sum_mul]
+
+    simp only [map_sum, map_mul, eval_C, eval_X, PI.UnitaryGroupMassFormula.UsCompose.vars, Sum.elim_inl, Matrix.mul_apply, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
     exact Finset.sum_congr rfl fun x _ => by ring
@@ -49,9 +49,9 @@ private lemma exists_star_zhat_eq_eval_poly_deg_le_one (z z' : Fin (2 * r + k + 
       MvPolynomial.totalDegree_finsetSum_le fun j _ => deg_CX _ _
   · intro g a b
     rw [Zhat_eq]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, eval_C, eval_X, PI.UnitaryGroupMassFormula.UsCompose.vars, Sum.elim_inr, Matrix.mul_apply, Finset.sum_mul,
-      star_sum, star_mul']
+
+    simp only [map_sum, map_mul, eval_C, eval_X, PI.UnitaryGroupMassFormula.UsCompose.vars, Sum.elim_inr, Matrix.mul_apply, Finset.sum_mul,
+    star_sum, star_mul']
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
     exact Finset.sum_congr rfl fun x _ => by ring

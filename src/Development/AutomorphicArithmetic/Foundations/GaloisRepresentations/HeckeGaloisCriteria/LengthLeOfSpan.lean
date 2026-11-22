@@ -27,8 +27,8 @@ theorem length_le_of_span {O Q C : Type} [CommRing O] [AddCommGroup Q] [Module O
     have hq : q ∈ Submodule.span O (Set.range b) := hb ▸ Submodule.mem_top
     obtain ⟨r, hr⟩ := (Submodule.mem_span_range_iff_exists_fun O).mp hq
     refine ⟨fun i => Submodule.Quotient.mk (r i), ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [g, ← hr, map_sum, map_smul]
+
+    simp [g, ← hr, map_sum, map_smul]
     exact Finset.sum_congr rfl fun i _ => rfl
   calc Module.length O C ≤ Module.length O (Fin m → O ⧸ Ideal.span {A}) := Module.length_le_of_surjective g hg
     _ = m * Module.length O (O ⧸ Ideal.span {A}) := by simp
@@ -186,7 +186,7 @@ private theorem smul_eq_of_mem_iSup_heckeEig_of_forall_eigen (Y : Set X)
   have := hle hu
   rwa [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply, sub_eq_zero] at this
 
-set_option maxHeartbeats 1000000 in
+
 include hs in
 theorem length_le [IsPrincipalIdealRing O] [Module.Finite O M] (Z : Finset X) (Y' : Set S) (hY : ∀ x : S, x ∈ Y' ↔ x.1 ∈ Z)
     (α : Module.End O M) (A : O) (hA : A ≠ 0)

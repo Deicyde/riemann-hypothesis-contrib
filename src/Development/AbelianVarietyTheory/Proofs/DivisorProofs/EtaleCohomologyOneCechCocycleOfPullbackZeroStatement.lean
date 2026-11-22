@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
 
 open GlobalTheory.EtC.LerayOne in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.etaleCohomology_one_cechCocycle_of_pullback_zero :
     ∀ (R : Type) [CommRing R] (F : Shv R) (Y X : Scheme.{0}) (f : Y ⟶ X) (x : H R (sch.obj X) F 1),
       pull R (sch.map f) F 1 x = 0 →

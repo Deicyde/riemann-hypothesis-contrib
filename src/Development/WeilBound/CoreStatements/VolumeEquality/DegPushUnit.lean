@@ -275,7 +275,7 @@ private theorem zpow_mem_valuationSubring_of_unit {L : Type} [Field L] (V : Valu
     rw [zpow_negSucc, ← inv_pow]
     exact V.pow_mem h2 _
 
-set_option maxHeartbeats 400000 in
+
 open UnitZ in
 theorem unitZero : PtDim → UnitZero := by
   intro hpt k _ Ω _ _ K _ ι _ y n a b hy htop hval

@@ -153,8 +153,8 @@ lemma apply_eq_sum (f : Sp E n ≃ₗ[E] Sp E n) (v : Sp E n) (i : Fin n) :
     funext j
     simp [Loc.eN, Finset.sum_apply, Fin.val_inj]
   conv_lhs => rw [hv]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, Finset.sum_apply]
+
+  simp [map_sum, Finset.sum_apply]
 
 variable {kj N c : ℕ}
 

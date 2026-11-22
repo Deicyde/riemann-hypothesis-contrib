@@ -41,14 +41,14 @@ theorem matrixExtendByZero_zero : ext0 v (0 : Matrix (Fin n) (Fin n) (Fv F v ⊗
 theorem ext_zero_mul_right (M : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) (C : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) :
     ext0 v M * C = ext0 v (M * C.map (compFin F E v)) := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ext0, Matrix.mul_apply, Matrix.map_apply, map_sum, tensAt_mul_right]
+
+  simp only [ext0, Matrix.mul_apply, Matrix.map_apply, map_sum, tensAt_mul_right]
 
 theorem ext_zero_mul_left (M : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) (C : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) :
     C * ext0 v M = ext0 v (C.map (compFin F E v) * M) := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ext0, Matrix.mul_apply, Matrix.map_apply, map_sum]
+
+  simp only [ext0, Matrix.mul_apply, Matrix.map_apply, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [mul_comm, tensAt_mul_right, mul_comm]
 

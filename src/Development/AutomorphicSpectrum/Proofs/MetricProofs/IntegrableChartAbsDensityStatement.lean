@@ -22,7 +22,7 @@ open ReciprocityTheory.AnForm.R (conePts)
 open GlobalTheory.CompanionTheory.Ar.Pub.CxChart (chartSet chartComponents chartSection domCell absLogNorm)
 open GroundTheory.Heights₂.Heights (chartProjMatrix chartWeight chartPot chartDens chartAbsDens)
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.integrable_chartAbsDensity : ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (A : Matrix (Fin d) (Fin n) ℂ)
     (f : MvPolynomial (Fin n) ℂ) (φ : Fin d → (Fin n → ℂ) → ℝ) (R C : ℝ),
     J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d →

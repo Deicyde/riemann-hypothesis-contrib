@@ -33,8 +33,8 @@ theorem field_indep {k : Type} [Field k] (p : ℕ) [hp : Fact p.Prime] [CharP k 
   let c' : ℕ → K := fun j => if h : j < p ^ N then ⟨c j, hc j h⟩ else 0
   let P : K[X] := ∑ j ∈ Finset.range (p ^ N), monomial j (c' j)
   have hP : aeval t P = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hs, map_sum]
+
+    rw [← hs, map_sum]
     refine Finset.sum_congr rfl fun j hj => ?_
     rw [aeval_monomial]
     simp only [c', dif_pos (Finset.mem_range.1 hj)]

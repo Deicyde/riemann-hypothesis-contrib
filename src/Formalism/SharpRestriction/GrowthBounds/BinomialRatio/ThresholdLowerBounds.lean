@@ -95,7 +95,7 @@ theorem chordCoeffCubic_inversionDenom_inv {CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc)
     mul_le_mul_of_nonneg_right hP (by linarith)
   refine ⟨by nlinarith, by nlinarith, by nlinarith, by nlinarith⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 1 ≤ C0) (h1 : 1 ≤ CE1) (h2 : 1 ≤ CE2)
     (hH : 1 ≤ H) (t1 : T2 CE1 CE2 Cc H ≤ CYb) (t2 : T2 CE1 CE2 Cc H ≤ Cde) (t3 : T2 CE1 CE2 Cc H ≤ Ck)
     (t4 : T2 CE1 CE2 Cc H ≤ CD) (t5 : T2 CE1 CE2 Cc H ≤ Cb) {X : Loc} (hD : D1num X)

@@ -13,7 +13,7 @@ open GlobalTheory.CompanionTheory.Ar.TorusUnif
 open scoped CategoryTheory.Obj
 open scoped ComplexOrder
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lie_metric_torus_pullback : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (K : Type) (J : K → Type)
     (y : (Σ k, J k) → Ω) (ξ : Sp Ω ⟶ X) (G : Over X) [GrpObj G] [IsCommMonObj G]
     (Li : Type) [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li) (h : LieMetric M y)

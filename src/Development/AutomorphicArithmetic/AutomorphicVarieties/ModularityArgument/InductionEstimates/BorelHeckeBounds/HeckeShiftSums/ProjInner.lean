@@ -57,7 +57,7 @@ private theorem ker_cont {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Me
   change _ = ⟪UpperTheory.ConvolutionTheory.K.kv μ a ((γ : G1 K n) * x), Q (UpperTheory.ConvolutionTheory.K.kv μ b (θ.e ((γ : G1 K n) * x)))⟫_ℂ
   rw [map_mul, (ropAe K n μ a).2 _ γ.2, (ropAe K n μ b).2 _ ((θ.mem_gam _).2 γ.2)]
 
-set_option maxHeartbeats 1000000 in
+
 private theorem ker_bd {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
     (θ : Twist μ) (a b : CC K n) : ∃ (C : ℝ) (N : ℕ), 0 ≤ C ∧ ∀ (Q : L2 μ →L[ℂ] L2 μ) (x : G1 K n) (Z : ℝ), qht x ≤ Z →
       ‖⟪UpperTheory.ConvolutionTheory.K.kv μ a x, Q (UpperTheory.ConvolutionTheory.K.kv μ b (θ.e x))⟫_ℂ‖ ≤ C * Z ^ N * ‖Q‖ := by

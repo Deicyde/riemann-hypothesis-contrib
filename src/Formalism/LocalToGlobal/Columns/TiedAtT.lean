@@ -106,7 +106,7 @@ variable {d : ColDat} (a : ColArgs d)
 theorem att_star_eq (x : d.host.E) : star x = d.host.conj x := Formalism.BasicNotions.Examples₂.star_eq_conj d.host x
 
 
-set_option maxHeartbeats 1000000 in
+
 def atTTied (hH : HostHyp d) (u : d.what₂.Word) : CF.AtTTied (D := d.colRec a) u where
   eV := tieEV d.sp.cm d.hX d.hPr u
   piU := d.piT u

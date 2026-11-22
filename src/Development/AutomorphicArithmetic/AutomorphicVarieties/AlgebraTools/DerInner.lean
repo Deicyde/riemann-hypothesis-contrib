@@ -77,8 +77,8 @@ theorem UpperTheory.V.AlgebraTools.der_inner :
         exact absurd (Finset.mem_univ _) h
     have hS2 : ∑ s, ∑ k, j (u s k (i0 s)) * j (u s (i0 s) k) = 1 := by
       simp only [← map_mul, hsame, eq_self_iff_true, if_true]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← map_sum]
+
+      simp only [← map_sum]
       rw [hone, map_one]
     have e : a * j (u t p q) = ∑ s, ∑ k, (j (u s k (i0 s)) * D (u s (i0 s) k * u t p q)
         - j (u s k (i0 s)) * j (u s (i0 s) k) * D (u t p q)) := by

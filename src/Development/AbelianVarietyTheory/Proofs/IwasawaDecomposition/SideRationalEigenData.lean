@@ -39,7 +39,7 @@ noncomputable section
 
 namespace GlobalTheory.HeckeLocN
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 def feSup {l : ℕ} [Fact l.Prime] (K L : Loc.FinExt l) : Loc.FinExt l :=
   ⟨K.1 ⊔ L.1, haveI := K.2; haveI := L.2; IntermediateField.finiteDimensional_sup _ _⟩

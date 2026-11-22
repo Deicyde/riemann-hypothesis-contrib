@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsRealC
 @[expose] public section
 
 open NumberField Matrix Formalism.MainNotions.S GlobalTheory.CuspGeo
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_integralMatrix_relating_integralVectorZBases : ∀ (I : AutInst) {N : ℕ} (e e₀ : Fin N → Fin I.n → I.E), IsZBasis I e → IsZBasis I e₀ →
     (∀ (k : Module.Free.ChooseBasisIndex ℤ (𝓞 I.E)) (j : Fin N) (z : Fin N → ℤ),
       (integralBasis I.E k : I.E) • e j = ∑ i, z i • e i → (integralBasis I.E k : I.E) • e₀ j = ∑ i, z i • e₀ i) →

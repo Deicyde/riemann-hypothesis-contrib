@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsHei
 
 open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix
 open scoped Classical
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.heisenbergLineDerivative_eq_directional_add_phase : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
     {n d : ℕ} {X : Spc F E n} {W : Spc F E d} (M : Model σ X W) (ψ : AddChar (AF F) ℂ), IsStd ψ →
     ∀ (g h : SInf F (Fin n × Fin d)) (u : Matrix (Fin n) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))), At (evI F) u →

@@ -18,9 +18,9 @@ open GlobalTheory.ExportSeries (Base Twist Weight PairRep GLR detChar detFam foc
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
-set_option synthInstance.maxHeartbeats 400000
 
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.AdTh.MovedSum
 

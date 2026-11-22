@@ -10,6 +10,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Form
 open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx V0 Fm0 FullRk SgJ BasisOf)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.universalTwistedSeriesDistribution_of_compatibility : ∀ (D : D7) (ρ : Setup D.ntw) (hρ : ρ.Good) (rd : Rds D.nexp ρ), FullTie hρ rd → Laws hρ rd → ThURel D.nexp := by
   first | exact @GlobalTheory.DistRel.thURel_of_fullTie | exact GlobalTheory.DistRel.thURel_of_fullTie | (intros; apply GlobalTheory.DistRel.thURel_of_fullTie <;> assumption)

@@ -12,7 +12,7 @@ open CategoryTheory Limits AlgebraicGeometry TopologicalSpace
 
 namespace CrystallineSemistableComparison
 
-set_option maxHeartbeats 1000000 in
+
 theorem smooth_snd_of_isStrictlySemistable {O K : Type} [CommRing O] [CommRing K] [Algebra O K] (ϖ : O)
     [IsLocalization.Away ϖ K] {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of O))
     (hss : GlobalTheory.Et.IsStrictlySemistable ϖ p)

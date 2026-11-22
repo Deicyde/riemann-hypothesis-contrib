@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.cocycle_ev_d_eq_zero_and_mk_eq_zero_iff :
     ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (I : Cx R) (m n k : ℤ),
       m + 1 = n → n + 1 = k →
@@ -94,8 +94,8 @@ theorem _root_.GlobalTheory.T.cocycle_ev_d_eq_zero_and_mk_eq_zero_iff :
         ← Category.assoc _ (((chains R).obj (sch.obj X)).d _ _), CupSpec.chains_d, Category.assoc,
         Preadditive.sum_comp]
       refine (map_add (CupSpec.mapHom _ _ (freeGen R _ U x)) _ _).trans ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_zsmul, map_sum, Units.smul_def]
+
+      rw [map_zsmul, map_sum, Units.smul_def]
       refine congrArg₂ (· + ·) rfl (congrArg _ (Finset.sum_congr rfl fun i _ => ?_))
       rw [Preadditive.zsmul_comp, map_zsmul]
       congr 1

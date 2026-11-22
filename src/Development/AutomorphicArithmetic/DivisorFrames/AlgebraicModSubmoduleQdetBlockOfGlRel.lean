@@ -33,8 +33,8 @@ private theorem map_qdet {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra
     (φ : A →ₐ[ℂ] B) (E : Fin n → Fin n → A) (u : ℂ) :
     φ (qdet E u) = qdet (fun a b => φ (E a b)) u := by
   unfold qdet qminor
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun s _ => ?_
   rw [map_mul, map_intCast, map_list_prod, List.map_ofFn]
   congr 3
@@ -68,8 +68,8 @@ private theorem exists_poly {A : Type} [Ring A] [Algebra ℂ A] {R : Type} [Comm
   choose d hd using hc'
   refine ⟨X ^ n + ∑ k : Fin n, C (d k) * X ^ (k : ℕ), monic_X_pow_add (degree_sum_fin_lt _), fun u => ?_⟩
   rw [hq u, ← Fin.sum_univ_eq_sum_range (fun k => u ^ k • c k)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [eval_add, eval_pow, eval_X, eval_finsetSum, eval_mul, eval_C, map_add (f := _), map_sum]
+
+  simp only [eval_add, eval_pow, eval_X, eval_finsetSum, eval_mul, eval_C, map_add (f := _), map_sum]
   congr 1
   · rw [← map_pow, AlgHom.commutes]
   · refine Finset.sum_congr rfl fun k _ => ?_

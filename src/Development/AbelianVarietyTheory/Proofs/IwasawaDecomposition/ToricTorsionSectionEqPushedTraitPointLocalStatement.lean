@@ -18,7 +18,7 @@ public import Development.AbelianVarietyTheory.Definitions.Uniformization.Exists
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.toricTorsionSection_eq_pushed_trait_point_local : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
     (t : SAB H (Sp R)) (P : PELUnif (maximalIdeal R) t) (k : ℕ)
     (s : ∀ (A : Type) [CommRing A] (a : R →+* A) (τ : Multiplicative P.D.toPre.X →* Aˣ), τ ^ k = 1 → (Over.mk (spMap a) ⟶ t.G)),

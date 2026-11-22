@@ -100,8 +100,8 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit :
     have hsum : ∀ (g : Fin d → K.O) (v : Fin d → K'.O),
         algebraMap K'.O K'.E (∑ k, g k • v k) = ∑ k, algebraMap K.O K.E (g k) • algebraMap K'.O K'.E (v k) := by
       intro g v
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun k _ => hsm _ _
 
     choose bv hbv using hw1
@@ -135,9 +135,9 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit :
     have hTr : ∀ y, algebraMap K.O K.E (Algebra.trace K.O K'.O y) =
         Algebra.trace K.E K'.E (algebraMap K'.O K'.E y) := by
       intro y
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Algebra.trace_eq_matrix_trace b, Algebra.trace_eq_matrix_trace w, Matrix.trace, Matrix.trace,
-        map_sum]
+
+      rw [Algebra.trace_eq_matrix_trace b, Algebra.trace_eq_matrix_trace w, Matrix.trace, Matrix.trace,
+      map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       simp only [Matrix.diag_apply, Algebra.leftMulMatrix_apply, LinearMap.toMatrix_apply,
         Algebra.coe_lmul_eq_mul, LinearMap.mul_apply', hrep, map_mul, hb]
@@ -171,12 +171,12 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit :
       intro x n
       have hx : K'.c x = ∑ m, K.c (w.repr x m) • K'.c (w m) := by
         conv_lhs => rw [← w.sum_repr x]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         refine Finset.sum_congr rfl fun m _ => ?_
         rw [hsm, hsm, map_mul, ← hφ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hx, map_sum, Finsupp.finsetSum_apply]
+
+      rw [hx, map_sum, Finsupp.finsetSum_apply]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
       rfl
@@ -212,8 +212,8 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit :
     ext k l
     simp only [Matrix.mul_apply, Matrix.of_apply]
     conv_lhs => rw [← w.sum_repr (K'.c (w l))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.mul_sum, map_sum]
+
+    rw [Finset.mul_sum, map_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [mul_smul_comm, map_smul, smul_eq_mul, mul_comm]
   have hdet : (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l))).det = algebraMap K.O K.E (u * v) := by

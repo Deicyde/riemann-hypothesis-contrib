@@ -194,8 +194,8 @@ end GlobalTheory.LastVertexLoc
 
 namespace GlobalTheory.LastVertexLoc
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 open Matrix ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StdFrames GlobalTheory.RowVacScalar
 

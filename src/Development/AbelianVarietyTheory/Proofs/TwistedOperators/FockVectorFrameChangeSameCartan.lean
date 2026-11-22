@@ -182,8 +182,8 @@ theorem coef_comp (X X' : Fr V) (Y Y' : Fr W) (hX : ∀ τ, X'.cart τ = X.cart 
   · simp only [hterm, hs, if_true]
     exact hprod
   · simp only [hterm, hs, if_false]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, hprod]
+
+    rw [← map_sum, hprod]
     split_ifs <;> simp
 
 theorem sub_comp (X X' : Fr V) (Y Y' : Fr W) (hX : ∀ τ, X'.cart τ = X.cart τ) (hY : ∀ τ, Y'.cart τ = Y.cart τ) :
@@ -195,8 +195,8 @@ theorem sub_comp (X X' : Fr V) (Y Y' : Fr W) (hX : ∀ τ, X'.cart τ = X.cart �
       = ∑ p : Fin W.rank × Fin V.rank, coef X' X Y' Y (ρ, i, j) p •
           ∑ q : Fin W.rank × Fin V.rank, coef X X' Y Y' (ρ, p.1, p.2) q •
             (MvPolynomial.X (ρ, q.1, q.2) : PolF D W.rank V.rank) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [sub, MvPolynomial.aeval_X, map_sum, map_smul]
+
+        simp only [sub, MvPolynomial.aeval_X, map_sum, map_smul]
     _ = ∑ q : Fin W.rank × Fin V.rank, (∑ p : Fin W.rank × Fin V.rank,
           coef X' X Y' Y (ρ, i, j) p * coef X X' Y Y' (ρ, p.1, p.2) q) •
             (MvPolynomial.X (ρ, q.1, q.2) : PolF D W.rank V.rank) := by

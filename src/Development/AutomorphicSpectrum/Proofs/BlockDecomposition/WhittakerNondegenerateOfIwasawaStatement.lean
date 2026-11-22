@@ -19,6 +19,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.whittaker_nondegenerate_of_iwasawa : GlobalTheory.CompanionTheory.IwaAd.WhitKA → PositivityTheory.PfSWUS.WhitNDg := by
   first | exact @GlobalTheory.CompanionTheory.IwaAd.iwaRedA | exact GlobalTheory.CompanionTheory.IwaAd.iwaRedA | (intros; apply GlobalTheory.CompanionTheory.IwaAd.iwaRedA <;> assumption)

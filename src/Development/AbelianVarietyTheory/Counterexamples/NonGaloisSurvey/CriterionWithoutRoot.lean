@@ -45,8 +45,8 @@ theorem φpow_one_add (j : ℕ) : (W.φA ^ j) (1 + letπ) = (1 + (letπ : LetA O
   | succ j ih => rw [pow_succ', AlgHom.mul_apply, ih, map_pow, φ_one_add, ← pow_mul, pow_succ']
 
 theorem Q_eq : W.Q = ∑ k ∈ Finset.range PD.p, ((1 + (letπ : LetA O n)) ^ (PD.p ^ (W.s - 1))) ^ k := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LocWach.Q, q_eq, map_sum]
+
+  rw [LocWach.Q, q_eq, map_sum]
   simp only [map_pow, φpow_one_add]
 
 theorem value_Q (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPrimitiveRoot ζ (PD.p ^ j)) :
@@ -54,8 +54,8 @@ theorem value_Q (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPrimitiveRoot ζ (P
       ∑ k ∈ Finset.range PD.p, (ζ ^ (PD.p ^ (W.s - 1))) ^ k := by
   obtain ⟨E, hE, -, h⟩ := W.lev_π i ζ hζ
   rw [Q_eq]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_pow, map_add (f := _), map_one]
+
+  simp only [map_sum, map_pow, map_add (f := _), map_one]
   have : 1 + PowerSeries.constantCoeff (W.lev i ζ letπ) = ζ := by
     have := congrArg PowerSeries.constantCoeff h
     simpa [hE] using this

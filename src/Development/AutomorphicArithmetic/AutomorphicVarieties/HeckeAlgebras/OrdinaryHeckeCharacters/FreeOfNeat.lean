@@ -10,7 +10,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 noncomputable section
 
@@ -86,8 +86,8 @@ theorem teich_ext {O : Type} [CommRing O] [IsLocalRing O] [Finite (ResidueField 
   have e := (Commute.all (x : O) y).geom_sum₂_mul N
   rw [hx', hy', sub_self] at e
   have hu : IsUnit (∑ i ∈ Finset.range N, (x : O) ^ i * (y : O) ^ (N - 1 - i)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← residue_ne_zero_iff_isUnit, map_sum]
+
+    rw [← residue_ne_zero_iff_isUnit, map_sum]
     have : ∀ i ∈ Finset.range N, residue O ((x : O) ^ i * (y : O) ^ (N - 1 - i)) = residue O y ^ (N - 1) := fun i hi => by
       rw [map_mul, map_pow, map_pow, h, ← pow_add]
       congr 1

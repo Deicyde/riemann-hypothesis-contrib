@@ -72,8 +72,8 @@ theorem jetTab_comb {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGr
     simpa using this
   simp only [jetTab, kerFin, fockIn, GridData.Weil.ker, thetaKO]
   rw [← h1]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← h2, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+
+  simp only [← h2, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
 
 end GlobalTheory.DictFree
 

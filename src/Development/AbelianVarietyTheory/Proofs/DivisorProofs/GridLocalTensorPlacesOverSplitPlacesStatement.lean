@@ -20,7 +20,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Ha
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.gridLocalTensorPlaces_over_split_places : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T} (_hL : L.Is μ₀) (t : T)
     (w : HeightOneSpectrum (𝓞 D.host.E)), w ∈ locPl G t →
       Nonempty (D.host.E →ₐ[D.host.F] Fv D.host.F (w.under (𝓞 D.host.F))) := by

@@ -57,8 +57,8 @@ theorem isPerfect_hform (hc : ∀ a, c (c a) = a) (hM : IsUnit M.det) :
     simp only [hc]
     rw [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ hM, Matrix.vecMul_one]
     conv_rhs => rw [pi_eq_sum_univ y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul, smul_eq_mul, dotProduct]
     exact Finset.sum_congr rfl fun i _ => mul_comm _ _
 

@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.JetSpl
 
 open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.Mem GlobalTheory.Mem.Col2 NumberField
 
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.AtG
 

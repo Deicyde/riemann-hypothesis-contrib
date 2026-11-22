@@ -118,7 +118,7 @@ theorem genA (hA : ArchOp) (hE : EiDense) (hS : ArchSlice) {M : Model σ X W} {M
       hlf.ch (hlf.supp c) (x := bet (xi B H.x) (k, -η)) (y := c) fun w => by rw [map_mul, hlf.pi, pi_beta hlf hP.herm, mul_comm],
       pr_bet, inner_neg_left, neg_neg]
 
-set_option maxHeartbeats 400000 in
+
 theorem genB (hA : ArchOp) (hE : EiDense) (hS : ArchSlice) {M : Model σ X W} {M₁ : Model σ X₁ W₁} {χX χW om om₁ r s r' s' r₁ s₁ r₁' s₁'}
     (hP : IsPair B M χX χW om r s r' s') (hP₁ : IsPair B M₁ χX χW om₁ r₁ s₁ r₁' s₁') {H : Plane E n n₁} {H' : Plane E d d₁} {i j i' j'}
     (hH : H.IsAdapted σ B X X₁ i j) (hH' : H'.IsAdapted σ B W W₁ i' j') {e ei ev} (he : IsEv B M M₁ H.ι H'.ι (isoB H H') e)

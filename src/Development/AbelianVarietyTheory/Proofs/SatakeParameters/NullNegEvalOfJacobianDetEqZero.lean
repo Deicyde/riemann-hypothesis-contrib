@@ -47,9 +47,9 @@ theorem null_negEv_of_det_eq_zero : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) (d :
     funext j
     have hj := congrFun hv j
     simp only [Matrix.mulVec, dotProduct, Pi.zero_apply] at hj
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hM, ContinuousLinearMap.pi_apply, neg_apply,
-      ContinuousLinearMap.comp_apply, hTv, map_sum, map_smul, smul_eq_mul, Pi.zero_apply, neg_eq_zero]
+
+    simp only [hM, ContinuousLinearMap.pi_apply, neg_apply,
+    ContinuousLinearMap.comp_apply, hTv, map_sum, map_smul, smul_eq_mul, Pi.zero_apply, neg_eq_zero]
     rw [← hj]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [mul_comm]

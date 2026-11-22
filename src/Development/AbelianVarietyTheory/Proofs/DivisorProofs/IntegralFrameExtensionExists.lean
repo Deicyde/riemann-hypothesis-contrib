@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFla
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain IsLocalRing
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FactorDepth

@@ -116,7 +116,7 @@ theorem tauE_injective (D : D7) : Function.Injective (tauE D) := fun _ _ h =>
   D.eTau.injective (Subtype.ext ((factEmb D.R D.host).1.1 h))
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem exists_conj (D : D7) (Q : Par D) (χ₀ : (AE D)ˣ →* Circle) (hH : IsHeckeChar D χ₀) (hF : ∀ a, χ₀ (idF D a) = 1)
     (hy : ∀ x : (AE D)ˣ, infPart D (x : AE D) = 1 → ∃ y : Q.c.F, ((χ₀ x : Circle) : ℂ) = Q.c.F.val.toRingHom y)
     (c : D.what₂.Tau → ℚ) (hc : ∀ τ, HasInfExp D χ₀ τ (c τ)) (σ : Q.c.F →+* ℂ) :

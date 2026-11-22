@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RingHom
 @[expose] public section
 
 open TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.ringHom_isPushout_of_pi_components : ∀ {A P A' P' : Type} [CommRing A] [CommRing P] [CommRing A'] [CommRing P'] {n : ℕ}
     {Pi P'i : Fin n → Type} [∀ i, CommRing (Pi i)] [∀ i, CommRing (P'i i)]
     (f : A →+* P) (k : A →+* A') (k' : P →+* P') (h' : A' →+* P')

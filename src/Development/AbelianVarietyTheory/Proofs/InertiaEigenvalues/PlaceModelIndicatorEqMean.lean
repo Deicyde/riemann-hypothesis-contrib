@@ -19,8 +19,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
   Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.CoverRead GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.DivPtFourier
 

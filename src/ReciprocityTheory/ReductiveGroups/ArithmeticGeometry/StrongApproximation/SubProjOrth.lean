@@ -84,8 +84,8 @@ theorem OFam.sub_proj_orth {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x : �
     ring
   have hsym : ∀ x y, hf σ J y x = σ (hf σ J x y) := by
     intro x y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hf, map_sum, map_mul, hσ]
+
+    simp only [hf, map_sum, map_mul, hσ]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have hJij : J j i = σ (J i j) := congrFun (congrFun hJ i) j
@@ -186,8 +186,8 @@ theorem OFam.extend {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (hns : ¬ F.S
     ring
   have hsym : ∀ x y, hf σ J y x = σ (hf σ J x y) := by
     intro x y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hf, map_sum, map_mul, hσ]
+
+    simp only [hf, map_sum, map_mul, hσ]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have hJij : J j i = σ (J i j) := congrFun (congrFun hJ i) j
@@ -291,8 +291,8 @@ theorem OFam.card_le [Nontrivial K] {r : ℕ} (F : OFam (σ := σ) (J := J) e f 
     ring
   have hsym : ∀ x y, hf σ J y x = σ (hf σ J x y) := by
     intro x y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hf, map_sum, map_mul, hσ]
+
+    simp only [hf, map_sum, map_mul, hσ]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have hJij : J j i = σ (J i j) := congrFun (congrFun hJ i) j

@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LastColsVal
 open MeasureTheory GlobalTheory.SplitFlip ValuativeRel
 open scoped Matrix
 attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.smooth_character_orbital_integral_stable : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
     [MeasurableSpace k] [BorelSpace k] (n d : ℕ) (ν : kˣ →* ℂˣ), GlobalTheory.SmGL.IsSmoothChar ν →
     ∀ (S : Set (Matrix (Fin n) (Fin d) k)),

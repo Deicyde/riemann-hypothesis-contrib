@@ -99,7 +99,7 @@ end GlobalTheory.TypeSum.KSeries
 
 namespace GlobalTheory.TypeSum.KSeries
 
-set_option maxHeartbeats 1000000 in
+
 theorem hasTypeAll_of_kTypes : GlobalTheory.Published.HarishChandraModules → GlobalTheory.Published.CasselmanWallach →
     ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
     (σ : GlobalTheory.TypeSum.Mx n → (H →L[ℂ] H)), GlobalTheory.TypeSum.Std ε σ →

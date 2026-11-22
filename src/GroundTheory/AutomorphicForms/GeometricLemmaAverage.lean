@@ -141,8 +141,8 @@ theorem avgOver_comp_linearMap (hf : AvgFinite K f) {W' : Type*} [AddCommGroup W
       exact congrArg T (hk y)
   have : ((rightStab f).subgroupOf K).FiniteIndex := ⟨hf⟩
   let _ := Fintype.ofFinite (K ⧸ (rightStab f).subgroupOf K)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [avgOver_eq_avgSub hle hf, avgOver, avgSub_eq_sum, avgSub_eq_sum, map_smul, map_sum]
+
+  rw [avgOver_eq_avgSub hle hf, avgOver, avgSub_eq_sum, avgSub_eq_sum, map_smul, map_sum]
 
 theorem avgOver_comp_mul_left (h x : G) :
     avgOver K (fun y => f (h * y)) x = avgOver K f (h * x) := by

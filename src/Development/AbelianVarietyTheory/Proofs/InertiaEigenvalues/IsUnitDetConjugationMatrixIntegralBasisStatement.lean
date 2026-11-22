@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsLocal
 @[expose] public section
 
 open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Unr Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.isUnit_det_conjugationMatrix_integralBasis :
     ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), (∀ x, φ (K.c x) = K'.c (φ x)) →
       (letI : Algebra K.E K'.E := φ.toAlgebra
@@ -42,12 +42,12 @@ theorem _root_.GlobalTheory.T.isUnit_det_conjugationMatrix_integralBasis :
       intro x n
       have hx : K'.c x = ∑ m, K.c (w.repr x m) • K'.c (w m) := by
         conv_lhs => rw [← w.sum_repr x]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         refine Finset.sum_congr rfl fun m _ => ?_
         rw [hsm, hsm, map_mul, ← hφ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hx, map_sum, Finsupp.finsetSum_apply]
+
+      rw [hx, map_sum, Finsupp.finsetSum_apply]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
       rfl

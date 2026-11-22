@@ -22,9 +22,9 @@ theorem specPhi_coord {Z N C : Type} [CommRing Z] [AddCommGroup N] [Module Z N] 
     (fun i => φ (b.repr (u t) i)) = U.mulVec (fun i => φ (b.repr t i)) := by
   funext i
   conv_lhs => rw [← b.sum_repr t]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-    smul_eq_mul, map_mul, Matrix.mulVec, dotProduct, hU]
+
+  simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+  smul_eq_mul, map_mul, Matrix.mulVec, dotProduct, hU]
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
 theorem specPhi_coord_smul {Z O N C : Type} [CommRing Z] [CommRing O] [Algebra Z O] [AddCommGroup N]
@@ -171,15 +171,15 @@ theorem specPhi_abstract {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Ty
     have h2 : (fun i => σ g ((∑ k, κ r k • co (o k • t)) i)) =
         ∑ k, κ (u g r) k • co (o k • t) := by
       funext i
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, hσ, ← hκ]
+
+      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, hσ, ← hκ]
     rw [h2, Matrix.mulVec_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [h1, Matrix.mulVec_smul]
   · have h1 : L 1 = 1 := by rw [← map_one (algebraMap O R), hal, hone]
     rw [hΦt, h1, Matrix.one_mulVec]
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem specPhi_thR_alg (LL : FinExt l) (θ : Ainf l →ₐ[ℤ_[l]] OC l) (a : ↥(OL LL)) :
     thR LL θ (algebraMap ↥(OL LL) (RA LL) a) = (1 : OC l) ⊗ₜ[ℤ_[l]] a := by
   rw [Algebra.TensorProduct.algebraMap_apply, thR_tmul, map_one]

@@ -166,7 +166,7 @@ theorem rescale_pt (c ζ : ↥LL.1) : PowerSeries.rescale c (PowerSeries.C ζ * 
   simp only [PowerSeries.coeff_C_mul, PowerSeries.coeff_rescale]
   rw [mul_left_comm]
 
-set_option maxHeartbeats 1600000 in
+
 theorem subst_γ {R : WSer Γ} (h : LevExp R) (g : Γ.Gam) (i : ZMod (Module.finrank ℚ_[l] ↥(K0 K)))
     (ζ : ↥LL.1) (j a : ℕ) (hζ : IsPrimitiveRoot ζ ((P.PD K).p ^ j))
     (hv : (j : WithTop ℚ) ≤ P.v LL (algebraMap ↥(OL LL) ↥LL.1 (Γ.χΓ g : ↥(OL LL)) - (a : ↥LL.1)))
@@ -233,7 +233,7 @@ theorem l_pow_inv_ne (s : ℕ) : (((l : ℚ_[l]) ^ s)⁻¹) ≠ 0 :=
   inv_ne_zero (pow_ne_zero _ (by exact_mod_cast (Fact.out : l.Prime).ne_zero))
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_disc (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI)
     (K : FinExt l) (s : ℕ) (LL : FinExt l) (_ : Good K s LL) (Γ : GamS P K s LL) (R : WSer Γ) (I : IoS AI R)
     (_ : IoW I) (β : RA LL →+* ↥LL.1 ⊗[ℚ_[l]] P.R.B) (hβ : IsBeta AI β)

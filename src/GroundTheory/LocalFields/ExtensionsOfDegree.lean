@@ -9,8 +9,8 @@ public import GroundTheory.LocalFields.MaximalUnramified
 
 @[expose] public section
 
-set_option maxHeartbeats 4000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 noncomputable section
 

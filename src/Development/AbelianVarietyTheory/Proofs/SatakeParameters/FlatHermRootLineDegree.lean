@@ -140,11 +140,11 @@ theorem pullC_delta (τ : κ → ι) (φ : E →ₗ[k] E') (c : Finset ι → E)
   rw [pullC_apply]
   simp only [GlobalTheory.DI.delta]
   by_cases h : Set.InjOn τ t
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [if_pos h, Finset.sum_image (by intro x hx y hy hxy; exact h hx hy hxy), map_sum, Finset.smul_sum]
-      refine Finset.sum_congr rfl fun i hi => ?_
-      rw [pullC_apply, if_pos (h.mono (Finset.coe_subset.2 (Finset.erase_subset i t))), map_zsmul,
-        ← image_erase_of_injOn h hi, smul_smul, smul_smul, sign_inj h hi]
+
+  · rw [if_pos h, Finset.sum_image (by intro x hx y hy hxy; exact h hx hy hxy), map_sum, Finset.smul_sum]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [pullC_apply, if_pos (h.mono (Finset.coe_subset.2 (Finset.erase_subset i t))), map_zsmul,
+      ← image_erase_of_injOn h hi, smul_smul, smul_smul, sign_inj h hi]
   · rw [if_neg h]
     have h' : ∃ a ∈ t, ∃ b ∈ t, τ a = τ b ∧ a ≠ b := by
       by_contra hc

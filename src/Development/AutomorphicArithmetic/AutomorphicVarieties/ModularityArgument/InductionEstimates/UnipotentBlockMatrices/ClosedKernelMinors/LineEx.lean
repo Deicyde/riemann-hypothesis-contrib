@@ -70,8 +70,8 @@ private theorem frame_ex {V : Type} [AddCommGroup V] [Module ℂ V] (S : Submodu
   · intro v v'
     exact e.inner_map_map v v'
 
-set_option maxHeartbeats 800000 in
-set_option synthInstance.maxHeartbeats 100000 in
+
+
 theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.lineEx :
     LineExC := by
   intro K _ _ _ μ _ μ₂ _ τ₁ τ₂ hP D

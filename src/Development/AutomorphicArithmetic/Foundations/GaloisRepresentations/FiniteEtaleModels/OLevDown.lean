@@ -133,7 +133,7 @@ private theorem wSub_one {q : ℕ} [Fact q.Prime] (D : Datum q) (𝔟 : Ideal (�
   unfold wSub idealSub
   rw [pow_one]
 
-set_option maxHeartbeats 800000 in
+
 theorem levDown : LevDown := by
   unfold LevDown
   intro q _ D hm R _ b N S s o 𝔟₁ 𝔟₂ ε h𝔟 hmul l hl

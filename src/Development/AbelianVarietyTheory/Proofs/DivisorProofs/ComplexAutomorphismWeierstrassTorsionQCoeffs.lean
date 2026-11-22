@@ -32,8 +32,8 @@ private theorem ringEquiv_cSum_eq_cSum_vmul_dg (N : ℕ) (g : ℂ ≃+* ℂ) (a 
   obtain ⟨h0, h1⟩ := vmul_dg_apply_zero_and_one x a
   unfold _root_.GlobalTheory.WpFam.ZetaAct at hg
   unfold _root_.GlobalTheory.WpFam.cSum
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [h0, h1]
   simp only [map_mul, map_pow, map_natCast, map_add (f := _), apply_ite g, map_zero, hs, hg]

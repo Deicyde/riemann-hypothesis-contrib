@@ -16,8 +16,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.RankOnto
 

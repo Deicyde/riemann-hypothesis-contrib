@@ -93,8 +93,8 @@ theorem delAt_sum_smul {ι : Type} [Fintype ι] {v : V n} {u : ι → V n → �
       ∑ i, del (u i) v (coordVec c) • α i := by
     refine (bas n).ext_elem fun S => ?_
     rw [FormMul.repr_coefwise]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply, smul_eq_mul]
+
+    simp only [map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply, smul_eq_mul]
     rw [del_sum fun i _ => (hu i).mul_const _, ContinuousLinearMap.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [del_mul (hu i) (differentiableAt_const _), del_const]

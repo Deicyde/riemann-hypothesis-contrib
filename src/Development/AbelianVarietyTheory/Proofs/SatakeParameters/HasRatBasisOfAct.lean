@@ -30,8 +30,8 @@ theorem coordMap_sum (F : Subfield K) (b : Module.Basis ι K V) (φ : K →ₗ[F
   apply b.repr.injective
   ext i
   rw [repr_coordMap]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, Finset.sum_apply', Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul]
+
+  simp only [map_sum, map_smul, Finset.sum_apply', Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul]
   refine Finset.sum_congr rfl fun a _ => ?_
   have h := φ.map_smul (⟨b.repr (w a) i, hw a i⟩ : F) (x a)
   simp only [Subfield.smul_def, smul_eq_mul] at h
@@ -42,11 +42,11 @@ theorem map_coordMap (F : Subfield K) (b : Module.Basis ι K V) (φ : K →ₗ[F
     g (coordMap F b φ v) = coordMap F b φ (g v) := by
   have h1 : g v = ∑ j, b.repr v j • g (b j) := by
     conv_lhs => rw [← b.sum_repr v]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul]
+
+    simp only [map_sum, map_smul]
   rw [h1, coordMap_sum F b φ _ _ (fun a i => hg i a)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coordMap, map_sum, map_smul]
+
+  simp only [coordMap, map_sum, map_smul]
 
 theorem exists_retraction (F : Subfield K) :
     ∃ φ : K →ₗ[F] K, (∀ x, φ x ∈ F) ∧ ∀ x ∈ F, φ x = x := by
@@ -80,9 +80,9 @@ theorem hasRatBasis_of_act
       funext c
       apply S.bV.repr.injective
       ext i
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul,
-        Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul, g, repr_coordMap]
+
+      simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul,
+      Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul, g, repr_coordMap]
       conv_lhs => rw [← e.sum_repr (S.bV.repr ((f : S.Cl → S.V) c) i)]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [mul_comm]

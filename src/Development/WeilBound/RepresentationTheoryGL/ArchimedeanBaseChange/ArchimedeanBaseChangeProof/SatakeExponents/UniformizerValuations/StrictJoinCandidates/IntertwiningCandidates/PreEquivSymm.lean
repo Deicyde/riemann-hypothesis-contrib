@@ -10,8 +10,8 @@ open NumberField IsDedekindDomain Matrix
 open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.SpectralAccumulation
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -44,20 +44,20 @@ theorem ub_fin {α ι : Type} [Fintype ι] {κ : ι → Type} [∀ i, Fintype (�
     _ ≤ ∑ k', ∑ w' ∈ T, f i k' w' := Finset.single_le_sum (f := fun k' => ∑ w' ∈ T, f i k' w') (fun _ _ => Nat.zero_le _) (Finset.mem_univ k)
     _ ≤ ∑ i', ∑ k', ∑ w' ∈ T, f i' k' w' := Finset.single_le_sum (f := fun i' => ∑ k', ∑ w' ∈ T, f i' k' w') (fun _ _ => Nat.zero_le _) (Finset.mem_univ i)
 
-set_option maxHeartbeats 4000000 in
+
 def ClauseA {hR : Rd.ReadLimit} {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} {π : Submodule ℂ (UA E n → ℂ)}
     {S : Finset (Pl E)} (F₀ : Frame0 hR π S) (T' : Finset (Pl E)) (d : LocData E n) : Prop :=
   ∀ i w, ∃ Z : Set ((Fin (F₀.C.a i) → ℂˣ) × (Fin (n - F₀.C.a i) → ℂˣ)), Z.Finite ∧
     ∀ s₁ s₂ Pa Pb D, F₀.Cand d i s₁ s₂ Pa Pb D → w ∈ T' →
       ∀ ξa ξb, JEig Pa Pb w (F₀.d₀.ϖ w) ξa ξb → (ξa, ξb) ∈ Z
 
-set_option maxHeartbeats 4000000 in
+
 def ClauseC {hR : Rd.ReadLimit} {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} {π : Submodule ℂ (UA E n → ℂ)}
     {S : Finset (Pl E)} (F₀ : Frame0 hR π S) (T' : Finset (Pl E)) (d : LocData E n) : Prop :=
   ∃ m₀ : ℕ, ∀ i s₁ s₂ Pa Pb D, F₀.Cand d i s₁ s₂ Pa Pb D → ∀ w ∈ T',
     Module.finrank ℂ ↥(fixed (pairAt Pa Pb w) (I2 (F₀.C.a i) (n - F₀.C.a i) w)) ≤ m₀
 
-set_option maxHeartbeats 4000000 in
+
 theorem candFin_d (hJ : JEigFin) (hFS : FinStrict) (hEq : StrictEqv) (hSP : StrictPre) (hSPr : StrictProd)
     (hSJ : StrictJoin) (hCP : CandParts) (hII : IsoInv) (hAd : AdmProd)
     {hR : Rd.ReadLimit} {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} {π : Submodule ℂ (UA E n → ℂ)}
@@ -93,7 +93,7 @@ theorem candFin_d (hJ : JEigFin) (hFS : FinStrict) (hEq : StrictEqv) (hSP : Stri
     have h1 := ((hZ i w ja jb).2 Pa Pb (preEquiv_symm (hSP E _ _ _ ha)) (preEquiv_symm (hSP E _ _ _ hb))).1
     exact h1.trans (hub i (ja, jb) w hw)
 
-set_option maxHeartbeats 4000000 in
+
 theorem candFin_of : CandFinOf := by
   intro hJ hFS hEq hSP hSPr hSJ hCP hLO hII hAd
   intro hR E _ _ _ hU n hn π hπ S F₀ T' c e b hT'

@@ -31,7 +31,7 @@ noncomputable section
 namespace GlobalTheory.IdemResLift
 
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_int_lift : ∀ (D : D7) (Q : Finset (Pl D.host.E)) (es : Pl D.host.E → AE D), (∀ PP ∈ Q, Formalism.L2.NTheta.IsIdemAt (es PP) PP) → (∑ PP ∈ Q, es PP) * cA D (∑ PP ∈ Q, es PP) = 0 → ∀ Y : ∀ PP : Pl D.host.E, kP PP, ∃ N : EAf D, ∃ hN : N ∈ Formalism.L2.Herm.intAf D.host.F D.host.E, toEAf D (∑ PP ∈ Q, es PP) * N = N ∧ ∀ PP ∈ Q, resS D.host.F PP ⟨N, hN⟩ = Y PP := by
   intro D Q es hI hc Y
   have h1 : ∀ i ∈ Q, es i * es i = es i := fun i hi => (hI i hi).1.1
@@ -60,8 +60,8 @@ theorem exists_int_lift : ∀ (D : D7) (Q : Finset (Pl D.host.E)) (es : Pl D.hos
       rw [AddSubmonoidClass.coe_finsetSum]
       exact (Finset.sum_attach Q (fun P => toEAf D (es P) *
         ((oToS D.host.F D.host.E (a P) : Formalism.L2.Herm.intAf D.host.F D.host.E) : EAf D))).symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hN, map_sum, Finset.sum_eq_single ⟨P, hP⟩]
+
+    rw [hN, map_sum, Finset.sum_eq_single ⟨P, hP⟩]
     · obtain ⟨h, h1⟩ := GlobalTheory.IdemRes.resS_idem_eq_one D (es P) P (hI P hP)
       show resS D.host.F P (⟨toEAf D (es P), hint P hP⟩ * oToS D.host.F D.host.E (a P)) = Y P
       rw [map_mul, resS_oToS, ha, h1, one_mul]

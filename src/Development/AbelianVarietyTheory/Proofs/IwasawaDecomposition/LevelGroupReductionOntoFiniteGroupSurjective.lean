@@ -15,7 +15,7 @@ noncomputable section
 
 namespace GlobalTheory.Mem.R3.LiftBrg.ActQ
 
-set_option maxHeartbeats 1000000 in
+
 theorem redQ_surjective : ∀ (X : Stages) (px : PreX X.B.toPre) (I : Col2.ColIn X.B px) (U : Set I.ι) (L : Formalism.IndefR.Links.LevCh X.toD7 (TupU I U)) (eG : Gc X.B px ≃* G0 L.Pg X.toD7.R.r), I.Ok → ValsIn I → LevOf X I U L → IsPlacewiseIdentity X (px := px) eG → ∀ (i : Fin X.toD7.R.m) (t : TupU I U), Function.Surjective (LiftBrg.ActQ.redQ X I U L eG i t) := by
   intro X px I U L eG _ _ hL _ i t g
   obtain ⟨c, hc⟩ := hL.is.βV i

@@ -152,9 +152,9 @@ lemma map_sqMap_tg (B : BX R₀) {ι : Type} [Fintype ι] (w : ι → B.gg) (m :
     (u : M →ₗ[(O : Type)] M') :
     B.map (sqMap u) (B.tg (sqProj O M) (sqProj_sqZero O M) (∑ k, w k ⊗ₜ[R₀] sqKer (m k))) =
       B.tg (sqProj O M') (sqProj_sqZero O M') (∑ k, w k ⊗ₜ[R₀] sqKer (u (m k))) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← B.tg_nat (sqProj O M) (sqProj O M') (sqProj_sqZero O M) (sqProj_sqZero O M') (sqMap u)
-    (fun _ h => h), map_sum]
+
+  rw [← B.tg_nat (sqProj O M) (sqProj O M') (sqProj_sqZero O M) (sqProj_sqZero O M') (sqMap u)
+  (fun _ h => h), map_sum]
   rfl
 
 end Alg
@@ -196,16 +196,16 @@ lemma sum_lieBasis (l : Fin g → O) :
   have h : l = ∑ k, l k • (Pi.single k 1 : Fin g → O) := by
     ext j; simp [Finset.sum_apply, Pi.single_apply]
   conv_rhs => rw [h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Submodule.mkQ_apply, map_sum]
+
+  rw [← Submodule.mkQ_apply, map_sum]
   rfl
 
 lemma lie_ext {u u' : LieDualModP p O g →ₗ[O] M}
     (h : ∀ k, u (lieBasis O p g k) = u' (lieBasis O p g k)) : u = u' := by
   refine LinearMap.ext fun x => ?_
   obtain ⟨l, rfl⟩ := Submodule.Quotient.mk_surjective _ x
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← sum_lieBasis, map_sum, map_sum]
+
+  rw [← sum_lieBasis, map_sum, map_sum]
   simp only [map_smul, h]
 
 end Lie
@@ -279,16 +279,16 @@ lemma tg_act {E : Type} [CommRing E] (Ac : OAct B O p E) (a : E) (gb : Module.Ba
   have hx' : x = ∑ k, (⟨B.tg (sqProj O M) (sqProj_sqZero O M) (gb k ⊗ₜ[R₀] sqKer (m k)),
       tg_torP B p _ _ _ _ (hk k)⟩ : torP B p (sqAlg O M)) := by
     refine Subtype.ext ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hx, AddSubmonoidClass.coe_finsetSum, tgPt, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hx', map_sum, AddSubmonoidClass.coe_finsetSum]
+
+    rw [hx, AddSubmonoidClass.coe_finsetSum, tgPt, map_sum]
+
+  rw [hx', map_sum, AddSubmonoidClass.coe_finsetSum]
   simp only [Ac.act_tg a (sqIncl O M) (sqProj O M) (sqProj_sqZero O M) _ _ (hk _)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, tgPt]
+
+  rw [← map_sum, tgPt]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, TensorProduct.tmul_sum, ← smul_sqKer, ← TensorProduct.smul_tmul]
+
+  simp only [map_sum, TensorProduct.tmul_sum, ← smul_sqKer, ← TensorProduct.smul_tmul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [← TensorProduct.sum_tmul, gb.sum_repr]
@@ -394,8 +394,8 @@ theorem universal_derivation :
     have hρ : (D.H.ρL a)ᵀ *ᵥ l = ∑ k, l k • D.H.ρL a k := by
       ext j
       simp [Matrix.mulVec, dotProduct, Finset.sum_apply, mul_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hρ, ← Submodule.mkQ_apply, map_sum]
+
+    rw [hρ, ← Submodule.mkQ_apply, map_sum]
     rfl
 
 end GlobalTheory.CotUniv

@@ -212,8 +212,8 @@ theorem omega_coordI (u u' : Matrix (Fin n) (Fin d) (AE F E)) :
     omega (trP F (Fin n × Fin d)) (coordI M u) (coordI M u') =
       Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evH F (sympM (σ := σ) X W u u')) := by
   rw [show sympM (σ := σ) X W u u' = _ from M.co.form u u']
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [omega, trP, coordI, locV, dotProduct, map_sub, map_sum, map_mul, evI_eq]
+
+  simp only [omega, trP, coordI, locV, dotProduct, map_sub, map_sum, map_mul, evI_eq]
 
 theorem sympM_eq_zero {p q : Type} [Fintype p] [Fintype q] (P : Matrix (Fin d) p E) (Q : Matrix (Fin d) q E)
     (h : Pᵀ * W.J * Q.map σ = 0) (a : Matrix (Fin n) p (AE F E)) (b : Matrix (Fin n) q (AE F E)) :

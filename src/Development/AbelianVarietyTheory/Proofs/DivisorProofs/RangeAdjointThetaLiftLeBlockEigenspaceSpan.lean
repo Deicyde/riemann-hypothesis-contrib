@@ -236,8 +236,8 @@ theorem ops_splitC (i : Fin D.R.m) (hi : Function.Injective (R.HW i (sg0 D A)).e
     (hw : ∀ j, h P (Finsupp.single (splitLab n j) 1) w = a j • w) :
     h P (GlobalTheory.Hk3.splitC n z) w = (∑ j ∈ Finset.range (n + 1), z j * a j) • w := by
   apply hi
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hW _ hP, hk_splitC, postOn_sum, Finset.sum_smul, map_sum]
+
+  rw [hW _ hP, hk_splitC, postOn_sum, Finset.sum_smul, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [← hW _ hP, hw, mul_smul, map_smul, map_smul, map_smul]
 
@@ -257,7 +257,7 @@ theorem normal_of_normalFam {H : Type} [NormedAddCommGroup H] [InnerProductSpace
   exact hN.1 _ _ hP hP _ _
 
 
-set_option maxHeartbeats 800000 in
+
 theorem range_adjoint_le : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A) {s : ℕ}, GlobalTheory.Chain.LiftInteg D → A.fam.Ok s → Core R F → SchurAll R → ∀ i t, LinearMap.range (LinearMap.adjoint (R.thG i t)) ≤ Submodule.span ℂ (R.jV i t '' ((A.fam.L i t).ZH : Set (A.fam.L i t).S.Forms)) := by
   intro D G _ _ Pl0 T A Ks _ _ _ R F s _ hOk hC hS i t
   refine (exists_isSF R).elim fun SF hSF => ?_

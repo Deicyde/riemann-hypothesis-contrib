@@ -245,8 +245,8 @@ theorem UpperTheory.exists_unique_eigenline_of_rankOne_occurs :
       rw [map_smul, hav g hg, smul_comm]
     refine ⟨_, hy, fun f hf => ?_⟩
     refine prj_avg μ t ht _ _ ?_ ((mem_eigL μ).2 fun g hg => ?_)
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [map_smul, map_sum, hf]
+
+    · simp only [map_smul, map_sum, hf]
     · rw [← hf, hy g hg, map_smul]
   have hex : ∃ e, e ≠ 0 ∧ IsE e := by
     by_contra hno

@@ -39,8 +39,8 @@ theorem qf_block (a : α → α → ℂ) (w : α → β → ℂ) (b : β → β 
   have hconj : (∑ x ∈ Y₂, ∑ y ∈ Y₁, conj (c (.inr x)) * conj (w y x) * c (.inl y)) =
       conj (∑ p ∈ Y₁, ∑ q ∈ Y₂, conj (c (.inl p)) * w p q * c (.inr q)) := by
     rw [Finset.sum_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, Complex.conj_conj]
+
+    simp only [map_sum, map_mul, Complex.conj_conj]
     refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
     ring
   simp only [qf, Finset.sum_disjSum, blockK, Finset.sum_add_distrib]
@@ -87,8 +87,8 @@ theorem psd_iff_qf {γ : Type} (Y : Finset γ) (k : γ → γ → ℂ) :
       simp only [hc] at hre
       have him : (∑ i : Y, ∑ j : Y, conj (x i) * k i j * x j).im = 0 := by
         rw [← Complex.conj_eq_iff_im]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, map_mul, Complex.conj_conj]
+
+        simp only [map_sum, map_mul, Complex.conj_conj]
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
         rw [hh i i.2 j j.2, Complex.conj_conj]
@@ -165,8 +165,8 @@ theorem blockPSD_ones {α β : Type} (Y₁ : Finset α) (Y₂ : Finset β) :
   · have hq : qf (Y₁.disjSum Y₂) (blockK (fun _ _ => (1 : ℂ)) (fun _ _ => 1) (fun _ _ => 1)) c =
         conj (∑ x ∈ Y₁.disjSum Y₂, c x) * ∑ x ∈ Y₁.disjSum Y₂, c x := by
       unfold qf
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_mul_sum]
+
+      rw [map_sum, Finset.sum_mul_sum]
       refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
       cases x <;> cases y <;> simp [blockK]
     rw [hq, ← Complex.normSq_eq_conj_mul_self]

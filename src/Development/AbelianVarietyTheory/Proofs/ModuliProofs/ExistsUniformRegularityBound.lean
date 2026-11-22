@@ -489,8 +489,8 @@ theorem finrank_extSub (W : Submodule K (MvPolynomial σ K)) [Module.Finite K W]
     refine Fintype.linearIndependent_iff.1 hw (fun i => φ (c i)) ?_ i
     ext m
     have := congrArg (fun F => φ (AddMonoidAlgebra.coeff F m)) hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [coeff_sum, map_sum, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply, map_zero] at this ⊢
+
+    simp only [coeff_sum, map_sum, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply, map_zero] at this ⊢
     calc
       _ = ∑ j, φ (AddMonoidAlgebra.coeff (c j • v j) m) := by
         refine Finset.sum_congr rfl fun j _ => ?_
@@ -515,10 +515,10 @@ theorem finrank_extSub (W : Submodule K (MvPolynomial σ K)) [Module.Finite K W]
       rw [this]
       refine Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ ?_
       have h1 := congrArg W.subtype (w.sum_repr ⟨_, hF (b.coord j)⟩)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, Submodule.subtype_apply] at h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← h1, map_sum]
+
+      simp only [map_sum, map_smul, Submodule.subtype_apply] at h1
+
+      rw [← h1, map_sum]
       refine Submodule.sum_mem _ fun i _ => ?_
       rw [smul_eq_C_mul, map_mul, map_C, C_mul']
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)

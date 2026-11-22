@@ -23,7 +23,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelM
 open MonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Semi
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.eq_of_formallyUnramified_of_eq_at_closedPoint : ∀ {S T : Scheme.{0}} (f : T ⟶ S) [FormallyUnramified f]
     [LocallyOfFiniteType f] (R : CommRingCat.{0}) [IsLocalRing R] (u₁ u₂ : Spec R ⟶ T) (h : u₁ ≫ f = u₂ ≫ f)
     (K : Type) [Field K] (k : Sp K ⟶ Spec R) (hk : ∀ x, k x = IsLocalRing.closedPoint R)

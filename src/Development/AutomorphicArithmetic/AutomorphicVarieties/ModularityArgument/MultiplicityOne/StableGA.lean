@@ -36,7 +36,7 @@ open UpperTheory.V.Z.Tf.GlobalTraceComparison
 open UpperTheory.V.Af.Bc (cPl)
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.Zero.ConvolutionTheory.EB
 
@@ -77,7 +77,7 @@ open UpperTheory.Zero.ConvolutionTheory.EB
 
 attribute [local instance] borelG borelF borelA borelH
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Z.Mult.stableGA :
     PiFin → PiAdm → GrowthPiJ → CmbPiA → CuspReadI → UpperTheory.V.Z.Mult.StableBlockGA := by
   intro hFin hAdm hG hPi hR E _ _ _ hE n hn l₁ l₂

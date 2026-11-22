@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsIrred
 @[expose] public section
 
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.standard_module_properties : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k], GlobalTheory.Published.LanglandsMultisegments →
     ∀ (P : Segment k → Prop), (∀ 𝔫 : Multiset (Segment k), (∀ Δ ∈ 𝔫, P Δ) → ∃ y : IrrGL (k := k), IsL 𝔫 y.rep) →
     ∀ (h N : ℕ) (x : Fin h → IrrGL (k := k)) (hd : ∑ a, (x a).1 = N) (𝔪 : Fin h → Multiset (Segment k)),

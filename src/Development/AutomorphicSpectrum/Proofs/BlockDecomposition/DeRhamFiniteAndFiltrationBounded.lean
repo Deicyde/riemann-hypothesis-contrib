@@ -212,7 +212,7 @@ theorem gr_van (hVan : KH.GlobVanSt) (hAff : KH.GrAff) [Smooth q] (U : Cov q) (s
   (hVan (sq (thFil (smFun X q) r) (thFil (smFun X q) ((r : ℤ) + 1))) (TF 1 s) U.U r).1
     (fun S hS j' hj' => hAff q _ (U.inter S hS) s r j' hr (by omega)) j hj
 
-set_option maxHeartbeats 2000000 in
+
 theorem gr_fin (hSerre : KH.GlobSerreSt) (hAff : KH.GrAff) (hCech : KH.GrCechFin) [IsProper q] [Smooth q] (U : Cov q)
     (s : ℕ) (hs : 0 < s) (𝒮 : Serre.{1} K) (h𝒮 : ∀ (M : Type 1) [AddCommGroup M] [Module K M], 𝒮.P M ↔ Module.Finite K M)
     (r : ℕ) (hr : r < s) (n : ℕ) : 𝒮.P (HQ (KS q s (Set.range U.U)) r ((r : ℤ) + 1) n) := by

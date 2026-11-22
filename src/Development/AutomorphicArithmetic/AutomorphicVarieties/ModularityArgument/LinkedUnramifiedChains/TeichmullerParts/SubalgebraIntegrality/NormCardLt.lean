@@ -10,7 +10,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj)
 open UpperTheory.V.HV (Coef)
 open UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 open UpperTheory.V.Z.J.D
 
 namespace UpperTheory.V.Z.J.D

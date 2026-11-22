@@ -44,8 +44,8 @@ private theorem ec_right (T : Representation k H V) (v : V) (S : Subgroup H) [S.
 private theorem ec_left (T : Representation k H V) (v : V) (S : Subgroup H) [S.Normal] [Fintype (H ⧸ S)]
     (hS : S ≤ ecStab T v) (n : H) :
     T n (∑ q : H ⧸ S, T q.out v) = ∑ q : H ⧸ S, T q.out v := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Fintype.sum_equiv (Equiv.mulLeft (n : H ⧸ S)) _ _ fun q => ?_
   have : Equiv.mulLeft (n : H ⧸ S) q = ((n * q.out : H) : H ⧸ S) := by
     simp

@@ -76,8 +76,8 @@ theorem omega_integral_criterion : OmOKOf := by
           if_true] at h
         exact h
     have h2 := congrArg j key
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h2
+
+    rw [map_sum] at h2
     simp only [map_mul] at h2
     rw [h2]
     split_ifs <;> simp

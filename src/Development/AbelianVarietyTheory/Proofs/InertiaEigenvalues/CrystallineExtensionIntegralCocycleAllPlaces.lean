@@ -57,8 +57,8 @@ theorem Q_pow_φ_mem [NeZero n] (T : LocLat G Qp LL O) (M : ZMod n → ℕ)
     (x : W.DD T) (hx : x ∈ W.N T) : W.Q ^ (mx M) • W.φD T x ∈ W.N T := by
   have hx' : x = ∑ i : ZMod n, (letE i : LetA O n) • x := by
     rw [← Finset.sum_smul, sum_letE, one_smul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hx', map_sum, Finset.smul_sum]
+
+  rw [hx', map_sum, Finset.smul_sum]
   refine Submodule.sum_mem _ fun i _ => ?_
   have hle : M (i + 1) ≤ mx M := le_ciSup (Set.finite_range M).bddAbove (i + 1)
   have hmem : (letE i : LetA O n) • x ∈ W.Nl T (i + 1 - 1) := by
@@ -105,7 +105,7 @@ theorem core [NeZero n] (T Tp : LocLat G Qp LL O) (ι : LatHom T.L Tp.L) (π : L
 end Generic
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem crystalline_extension_integral_cocycle_all_places : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
     (Cm : CmpOf D.loc D.locA HW F), P8 D HW F := by
   intro D HW F Cm l _ K s LL h T M hh hT hjT Tp ι π hses hTp e heN hφe hγe x hx c hc

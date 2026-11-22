@@ -20,8 +20,8 @@ theorem gs_exists_rows_det_ne_zero {K : Type*} [Field K] {t r : ℕ} (M : Matrix
     have hfx : ∀ x : Fin r → K, f x = ∑ k, x k * f (Pi.single k 1) := by
       intro x
       conv_lhs => rw [← (Pi.basisFun K (Fin r)).sum_repr x]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, smul_eq_mul]
+
+      simp [map_sum, smul_eq_mul]
     have hc : M.mulVec (fun k => f (Pi.single k 1)) = 0 := by
       funext i
       have hi : M i ∈ LinearMap.ker f := hf (Submodule.subset_span ⟨i, rfl⟩)

@@ -34,7 +34,7 @@ attribute [local instance] Formalism.IndefR.principalLevelFrame.instCMHostI
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace GlobalTheory.LatMatch
 
@@ -43,7 +43,7 @@ theorem exists_nat_mul_intAf' {F : Type} [Field F] [NumberField F] (t : Formalis
   obtain ⟨m, hm, h⟩ := Formalism.L2.SG.Pf.Tau.TraceIntegralityAlt.exists_nat_mul_intAd t
   exact ⟨m, hm, fun v => h v⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_nat_smul_intAE {D : D7} (w : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) :
     ∃ k : ℕ, 0 < k ∧ k • w ∈ intAE D := by
   induction w using TensorProduct.induction_on with

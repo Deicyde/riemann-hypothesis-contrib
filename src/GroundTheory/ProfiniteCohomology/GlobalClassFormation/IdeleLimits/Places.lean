@@ -59,7 +59,7 @@ def transition : ∀ (v : Place K.1) {p q : GLevel K}, p ≤ q → P.localGroup 
     haveI := P.fin_liesOver v h
     (localTransition K p.1 q.1 (P.fin v p) (P.fin v q) n).hom.toAddMonoidHom
 
-set_option maxHeartbeats 4000000 in
+
 theorem shapiro_placeProj_inr (v : HeightOneSpectrum (𝓞 K.1)) (p : GLevel K)
     (y : cohomology (ideleRep K.1 p.1.1) n) :
     P.shapiro n (.inr v) p ((cohomologyMap (placeProj (.inr v)) n).hom y) =
@@ -69,7 +69,7 @@ theorem shapiro_placeProj_inr (v : HeightOneSpectrum (𝓞 K.1)) (p : GLevel K)
   rw [← placeProj_comp_finiteShapiroIso (P.fin v p) n]
   rfl
 
-set_option maxHeartbeats 4000000 in
+
 theorem shapiro_placeProj_inl (v : InfinitePlace K.1) (p : GLevel K)
     (y : cohomology (ideleRep K.1 p.1.1) n) :
     P.shapiro n (.inl v) p ((cohomologyMap (placeProj (.inl v)) n).hom y) =
@@ -80,7 +80,7 @@ theorem shapiro_placeProj_inl (v : InfinitePlace K.1) (p : GLevel K)
   rfl
 
 
-set_option maxHeartbeats 8000000 in
+
 def levelDecomposition : LevelDecomposition K n where
   L := P.localGroup n
   e := P.shapiro n

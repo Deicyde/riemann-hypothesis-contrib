@@ -355,9 +355,9 @@ theorem inter {v : Fin I.n → I.E} (hv : iv I v ∈ lamAf (F := I.F) (wLat0 I w
 theorem iv_lin (l : Fin I.n → I.E) {m : ℕ} (b : Fin m → Fin I.n → I.E) (c : Fin m → ℤ) :
     iv I (l - ∑ i, (c i : I.E) • b i) = iv I l - ∑ i, (c i : I.E ⊗[I.F] Af I.F) • iv I (b i) := by
   funext k
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [iv, Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sub, map_sum, map_mul,
-    map_intCast]
+
+  simp only [iv, Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sub, map_sum, map_mul,
+  map_intCast]
 
 theorem coords {p : ℕ} (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) {m : ℕ}
     {b : Fin m → (Fin I.n → I.E)} (hb : IsRedBasis0 I w b) {y : Fin I.n → I.E ⊗[I.F] Af I.F} (hy : y ∈ I.Lf) :

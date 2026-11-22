@@ -83,8 +83,8 @@ theorem isNoetherianRing_adicCompletion (R : Type*) [CommRing R] [IsNoetherianRi
     rw [AdicCompletion.evalₐ_mk, Ideal.quotientMap_mk]
     refine congrArg _ ?_
     change σ (Q n) = f.val n
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Q, map_add (f := _), map_sum, hσP]
+
+    simp only [Q, map_add (f := _), map_sum, hσP]
     rw [show σ (MvPolynomial.C (f.val 0)) = f.val 0 from MvPolynomial.eval_C _]
     rw [Finset.sum_range_sub (fun j ↦ f.val j) n]
     ring

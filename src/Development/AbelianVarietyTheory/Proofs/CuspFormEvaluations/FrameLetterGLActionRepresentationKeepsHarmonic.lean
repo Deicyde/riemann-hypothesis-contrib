@@ -37,8 +37,8 @@ theorem rename_letAct (h : IsEnum H pl) {K : Type} [Field K] (g : Ix → GL (Fin
   rcases half_cases (Ψ := InPsi H) (ComplexEmbedding.involutive_conjugate E)
     (not_mem_hostType_iff H) τ with hτ | ⟨τ, hτ, rfl⟩
   · have h1 : ∃ t, pl t = τ := (h.2 τ).1 hτ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [dite_eq_left h1, thetaLetterEquiv_of_mem Dw hτ, colSubst_X_xVar, xForm_apply, map_sum]
+
+    rw [dite_eq_left h1, thetaLetterEquiv_of_mem Dw hτ, colSubst_X_xVar, xForm_apply, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, rename_C, rename_X, thetaLetterEquiv_of_mem Dw hτ]
     rfl
@@ -49,9 +49,9 @@ theorem rename_letAct (h : IsEnum H pl) {K : Type} [Field K] (g : Ix → GL (Fin
     have h3 : h2.choose = h.idx ⟨τ, hτ⟩ := h.1 (by
       rw [h.pl_idx]
       exact (ComplexEmbedding.involutive_conjugate E).injective h2.choose_spec)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [dite_eq_right h1, dite_eq_left h2, thetaLetterEquiv_conjugate Dw hτ, colSubst_X_yVar, yForm_apply,
-      map_sum, h3]
+
+    rw [dite_eq_right h1, dite_eq_left h2, thetaLetterEquiv_conjugate Dw hτ, colSubst_X_yVar, yForm_apply,
+    map_sum, h3]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, rename_C, rename_X, thetaLetterEquiv_conjugate Dw hτ]
     rfl

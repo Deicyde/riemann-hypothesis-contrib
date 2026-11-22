@@ -38,8 +38,8 @@ theorem herm_smul_right (M : Matrix (Fin g) (Fin g) ℂ) (c : ℂ) (z w : Fin g 
 
 theorem herm_conj {M : Matrix (Fin g) (Fin g) ℂ} (hM : M.IsHermitian) (z w : Fin g → ℂ) :
     hermForm M z w = conj (hermForm M w z) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hermForm, dotProduct, mulVec, map_sum, map_mul, Finset.mul_sum, Pi.star_apply]
+
+  simp only [hermForm, dotProduct, mulVec, map_sum, map_mul, Finset.mul_sum, Pi.star_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [← hM.apply j i]
@@ -144,9 +144,9 @@ theorem relation {P₀ P : D.La →+ (Fin g → ℂ)} (hP₀ : IsPeriod D ty P�
   obtain ⟨M, -, hpos, h⟩ := hP.2.2.2.2
   refine eq_zero_of_imForm hpos (ext_period hP fun y => ?_)
   have := congrArg (fun u => imForm M₀ u (P₀ y)) hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finsupp.linearCombination_apply, Finsupp.sum, map_sum, map_smul, LinearMap.sum_apply,
-    LinearMap.smul_apply, imForm_apply, h, h₀, map_zero, LinearMap.zero_apply] at this ⊢
+
+  simp only [Finsupp.linearCombination_apply, Finsupp.sum, map_sum, map_smul, LinearMap.sum_apply,
+  LinearMap.smul_apply, imForm_apply, h, h₀, map_zero, LinearMap.zero_apply] at this ⊢
   exact this
 
 def colMat {L : Type} (α : Fin g → (L →₀ ℂ)) (f : L → Fin g → ℂ) : Matrix (Fin g) (Fin g) ℂ :=
@@ -173,12 +173,12 @@ theorem exists_colMat {P₀ : D.La →+ (Fin g → ℂ)} (hP₀ : IsPeriod D ty 
   refine ⟨fun j => (1 / 2 : ℂ) • k (r j) - (Complex.I / 2) • k (r' j),
     fun j => (1 / 2 : ℂ) • k (r j) + (Complex.I / 2) • k (r' j), fun P hP x => ?_⟩
   have := relation hP₀ hP (Finsupp.single x 1 - ∑ j, ((P₀ x j).re • r j + (P₀ x j).im • r' j)) (by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, map_add (f := _), map_smul, hr, hr', Finsupp.linearCombination_single, one_smul]
+
+    simp only [map_sub, map_sum, map_add (f := _), map_smul, hr, hr', Finsupp.linearCombination_single, one_smul]
     funext i
     simp [Finset.sum_apply, Pi.single_apply, Finset.sum_add_distrib])
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_sum, map_add (f := _), map_smul, Finsupp.linearCombination_single, one_smul, sub_eq_zero] at this
+
+  simp only [map_sub, map_sum, map_add (f := _), map_smul, Finsupp.linearCombination_single, one_smul, sub_eq_zero] at this
   rw [this]
   funext i
   simp only [realMap_apply, Pi.add_apply, mulVec, dotProduct, colMat_apply, map_sub, map_add (f := _), map_smul, hk,

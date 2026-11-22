@@ -117,8 +117,8 @@ private lemma pairing_mem_intV_of_mem_dualSet (σ : E →ₐ[F] E) (w : HeightOn
   | mem v hv =>
     obtain ⟨y, hy, rfl⟩ := hv
     have h := inclE_mem_intV_of_mem_intOE (F := F) w (hz' y hy)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hform_one_apply, map_sum] at h
+
+    rw [hform_one_apply, map_sum] at h
     convert h using 2 with j
     rw [map_mul]
     congr 1

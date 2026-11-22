@@ -37,8 +37,8 @@ private theorem rows_riesz (S : Formalism.BasicNotions.HSpace E) (φ : S.V →�
   have key : S.hT (∑ j, star (φ (S.frame j)) • bs j) = φ := by
     apply S.frame.ext
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply]
+
+    rw [map_sum, LinearMap.sum_apply]
     have hs : ∀ j, S.hT (star (φ (S.frame j)) • bs j) (S.frame i) =
         φ (S.frame j) * (if i = j then 1 else 0) := by
       intro j

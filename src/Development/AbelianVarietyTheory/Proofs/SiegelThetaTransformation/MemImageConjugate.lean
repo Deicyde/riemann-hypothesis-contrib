@@ -33,8 +33,8 @@ theorem _root_.GlobalTheory.Ker.ConjDatum.gram_conjugate (τ : E →+* ℂ) (G :
     _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (ComplexEmbedding.conjugate τ) G (P.map (starRingEnd ℂ)) =
       (_root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G P).map (starRingEnd ℂ) := by
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [_root_.ReciprocityTheory.ChartRestriction.G.FD.gram, _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC, _root_.ReciprocityTheory.ChartRestriction.G.FD.col, ComplexEmbedding.conjugate_coe_eq, map_sum]
+
+  simp [_root_.ReciprocityTheory.ChartRestriction.G.FD.gram, _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC, _root_.ReciprocityTheory.ChartRestriction.G.FD.col, ComplexEmbedding.conjugate_coe_eq, map_sum]
 
 open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
@@ -125,8 +125,8 @@ theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_rmul (Ψ : Finset (E →+* ℂ))
     _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b) =
       _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ b) := by
   funext τ a c
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [_root_.GlobalTheory.Ker.ConjDatum.cfr, _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul, _root_.ReciprocityTheory.ChartRestriction.G.FD.mat, Matrix.mul_apply, map_sum]
+
+  simp [_root_.GlobalTheory.Ker.ConjDatum.cfr, _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul, _root_.ReciprocityTheory.ChartRestriction.G.FD.mat, Matrix.mul_apply, map_sum]
 
 open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
@@ -137,9 +137,9 @@ theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_lact (Ψ : Finset (E →+* ℂ)) (
     _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x) =
       _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) := by
   funext τ a c
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [_root_.GlobalTheory.Ker.ConjDatum.cfr, _root_.ReciprocityTheory.ChartRestriction.G.FD.lact, _root_.ReciprocityTheory.ChartRestriction.G.FD.mat, Matrix.mul_apply, map_sum,
-    _root_.GlobalTheory.Ker.ConjDatum.cpl, ComplexEmbedding.conjugate_coe_eq]
+
+  simp [_root_.GlobalTheory.Ker.ConjDatum.cfr, _root_.ReciprocityTheory.ChartRestriction.G.FD.lact, _root_.ReciprocityTheory.ChartRestriction.G.FD.mat, Matrix.mul_apply, map_sum,
+  _root_.GlobalTheory.Ker.ConjDatum.cpl, ComplexEmbedding.conjugate_coe_eq]
 
 def conjData (X : Data E r) : Data E r where
   Ψ := X.Ψ.image ComplexEmbedding.conjugate

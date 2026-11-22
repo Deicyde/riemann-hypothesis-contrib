@@ -107,7 +107,7 @@ def liftForm (A : FamIn D.what₂.LL G Pl0 T D.R.m) (P : Subgroup G) (ψ : P →
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 4000000 in
+
 structure Read (R : RealDat D A3.A Ks) (F : Face D A3.A) (X0 : BaseLevelRowSide D) : Type 1 where
   tup : T → D.what₂.Tup
   tupT : D.what₂.Tup → T
@@ -191,7 +191,7 @@ structure Read (R : RealDat D A3.A Ks) (F : Face D A3.A) (X0 : BaseLevelRowSide 
 open Classical in
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 4000000 in
+
 structure ReadL (R : RealDat3 D A3 Ks) (F : Face3 D A3) (X0 : BaseLevelRowSide D) (Y : Read (A3 := A3) R.toRealDat F.lv2 X0) : Type where
   eRR : (Fin ((R.toCx3 F).data F.cr true).D → D.what₂.LL) ≃ₗ[D.what₂.LL] D.div.RR.V
   eRR0 : (Fin ((R.toCx3 F).data F.cr false).D → D.what₂.LL) ≃ₗ[D.what₂.LL] X0.s.RR.V

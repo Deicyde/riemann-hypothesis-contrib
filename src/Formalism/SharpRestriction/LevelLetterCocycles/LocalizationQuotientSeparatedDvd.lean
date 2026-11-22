@@ -672,8 +672,8 @@ theorem root_eq_one {l : ℕ} [Fact l.Prime] (t : ℚ_[l]) (ht : t ^ (l - 1) = 1
     rw [map_sub, map_one, sub_eq_zero] at hT1
     exact hT1
   have hS : PadicInt.toZMod (∑ i ∈ Finset.range (l - 1), T ^ i) ≠ 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_pow, hT, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
     rw [Ne, ZMod.natCast_eq_zero_iff]
     intro hd
@@ -715,7 +715,7 @@ end Trans
 section TransW
 
 
-set_option maxHeartbeats 800000 in
+
 theorem trans_prim {l : ℕ} [Fact l.Prime] (P : LocPrime l) {K LL : FinExt l}
     (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K)))
     (hcard : W.DelF.card = l - 1) (hζ₁ : IsPrimitiveRoot (P.ζQ 1) l)

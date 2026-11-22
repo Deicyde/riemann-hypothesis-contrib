@@ -264,7 +264,7 @@ def locCl (hU : Unr E) {P : E[X]} (r : {c : TwCl (MonoidHom.id (UE E n)) // c.re
     LocCl n P w :=
   ⟨cls (locPt w r.1.rep), (charpoly_cls _).trans ((charpoly_locPt hU w _).trans (by rw [r.2]))⟩
 
-set_option maxHeartbeats 800000 in
+
 theorem signs (hU : Unr E) (hn : 1 ≤ n) {S : Set (Pl E)} (hS : IsSection S) {P : E[X]} (hP : P ∈ Ell E n)
     (hgs : ∀ᶠ w in (cofinite : Filter (Pl E)), ∀ c : LocCl n P w, Good w c → ∀ Q : E[X], Q ∣ P →
       kapSign n w (atPl w Q) c.1.rep.1 = 1)
@@ -358,7 +358,7 @@ theorem signs (hU : Unr E) (hn : 1 ≤ n) {S : Set (Pl E)} (hS : IsSection S) {P
   · rw [if_pos h, if_pos (key.1 h)]
   · rw [if_neg h, if_neg (fun h' => h (key.2 h'))]
 
-set_option maxHeartbeats 800000 in
+
 theorem fixedP (hU : Unr E) (hn : 1 ≤ n) {S : Set (Pl E)} (hS : IsSection S) {P : E[X]} (hP : P ∈ Ell E n)
     {K' : ∀ w : Pl E, Subgroup (UL n w)} (hK' : IsLevelFam (fun w : Pl E => MonoidHom.id (UL n w)) (KL n) K')
     {f : ∀ w : Pl E, UL n w → ℂ} (hf : IsTest (KL n) K' f) :

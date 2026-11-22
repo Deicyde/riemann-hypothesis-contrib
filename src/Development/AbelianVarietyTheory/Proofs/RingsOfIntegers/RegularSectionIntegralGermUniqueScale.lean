@@ -27,8 +27,8 @@ theorem psJet_map {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') {κ 
   rw [Ideal.Quotient.lift_mk, RingHom.comp_apply]
   congr 1
   unfold psTrunc
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, MvPolynomial.map_monomial, MvPowerSeries.coeff_map]
+
+  simp [map_sum, MvPolynomial.map_monomial, MvPowerSeries.coeff_map]
 
 theorem psJet_smul {F κ : Type} [CommRing F] [Fintype κ] [DecidableEq κ] (m : ℕ) (c : F) (f : MvPowerSeries κ F) :
     psJet m (c • f) = algebraMap F (Jet F κ m) c * psJet m f := by
@@ -212,7 +212,7 @@ theorem germIs_smul (C : IntegralChartA3 Xo c T io y) (k : ℕ) (F F' : SecN Xo 
   exact (isGerm_iff y.1 _ _ _ _ _ _ _ _).2 q
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_germIs (hFT : ReciprocityTheory.ChartRestriction.G.PullbackSections.FrameTieSt Xo c) (C : IntegralChartA3 Xo c T io y)
     (hC : FrTrunc C.I.G (𝟙 (Sp T.V)) (chD C.ch) C.xT C.eT) (k : ℕ) (F : SecN Xo (xOf y) k) (hF : Regular C k F) :
     ∃ f, GermIs C k F f := by

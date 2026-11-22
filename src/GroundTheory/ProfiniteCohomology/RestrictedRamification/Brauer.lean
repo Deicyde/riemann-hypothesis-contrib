@@ -149,7 +149,7 @@ abbrev sUnitsH2Map : cohomology (sUnitsQuotSequence K.1 ℚ̄ S).X₁ 2 ⟶
 variable (ℓ : ℕ) (hℓ : ℓ.Prime)
   (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
 
-set_option maxHeartbeats 1000000 in
+
 include hℓ hS in
 theorem eq_zero_of_sUnitsH2Map_eq_zero_of_localEmbeddings (ιs : LocalEmbeddings K)
     (y : cohomology (sUnitsQuotSequence K.1 ℚ̄ S).X₁ 2) (k : ℕ)
@@ -347,7 +347,7 @@ theorem coe_sUnitsBrauerPrimary_apply (y : AddCommGroup.primaryComponent (cohomo
   rfl
 
 
-set_option maxHeartbeats 2000000 in
+
 include hℓ hS in
 theorem sUnitsBrauerPrimary_bijective : Function.Bijective (sUnitsBrauerPrimary K S ℓ ιs) := by
   refine ⟨fun a b hab => ?_, fun x => ?_⟩
@@ -412,7 +412,7 @@ theorem brauerLocalPrimary_bijective : Function.Bijective (brauerLocalPrimary K 
   refine ⟨⟨x, ⟨k, hxk⟩, fun v hv => (congrArg (fun s => s (.inr v)) hx).trans (ht v hv)⟩, Subtype.ext hx⟩
 
 
-set_option maxHeartbeats 2000000 in
+
 noncomputable def sUnitsH2PrimaryEquiv :
     AddCommGroup.primaryComponent (cohomology (galSUnitsMax K.1 ℚ̄ S) 2) ℓ ≃+ localPrimaryKernel K S ℓ :=
   (sUnitsBrauerPrimaryEquiv K S ℓ hℓ hS ιs).trans

@@ -30,7 +30,7 @@ private theorem roots_prod {W : Type} [AddCommGroup W] [Module ℂ W] [Module.Fi
   let b := Module.finBasis ℂ W
   rw [← LinearMap.charpoly_toMatrix M b, ← LinearMap.det_toMatrix b M, Matrix.det_eq_prod_roots_charpoly]
 
-set_option maxHeartbeats 1600000 in
+
 theorem detWD_of (hW : WdModel) (hC : CommonModel) (hE : DetE) : DetWD := by
   intro l _ P AI hT ι E Ω _ _ _ _ _ A w h O _ _ _ Bw hj a r c hdet hr hc g hg
   obtain ⟨LL, r', c', m₁, m₂, hs, p₁, p₂⟩ := hC l P AI hT E Ω _ O Bw a r c hr hc

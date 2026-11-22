@@ -70,7 +70,7 @@ theorem UpperTheory.V.Pa.Det.splitEx :
     infer_instance
   have hfinA : Finite (IsLocalRing.ResidueField (PowerSeries K)) :=
     Finite.of_equiv K (PowerSeries.residueFieldOfPowerSeries).symm.toEquiv
-  set_option synthInstance.maxHeartbeats 400000 in
+
   obtain ⟨hfin, _, _, hdvr, hcB, hloc, hres⟩ :=
     UpperTheory.V.AlgebraTools.integralClosure_complete_dvr (PowerSeries K) (FractionRing (PowerSeries K)) (Polynomial.SplittingField (∏ a, (P a).map (algebraMap (PowerSeries K) (FractionRing (PowerSeries K))))) ↥(integralClosure (PowerSeries K) (Polynomial.SplittingField (∏ a, (P a).map (algebraMap (PowerSeries K) (FractionRing (PowerSeries K))))))
   have hinjAE : Function.Injective (algebraMap (PowerSeries K) (Polynomial.SplittingField (∏ a, (P a).map (algebraMap (PowerSeries K) (FractionRing (PowerSeries K)))))) := by

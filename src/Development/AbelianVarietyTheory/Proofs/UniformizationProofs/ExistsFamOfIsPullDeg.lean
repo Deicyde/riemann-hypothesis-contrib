@@ -262,7 +262,7 @@ theorem cancel_units {S : Type} [CommRing S] {A B C E : Sˣ} {a b : S} (h : A.va
   rw [mul_right_comm, ← Units.val_mul, e, Units.val_mul, mul_right_comm, _root_.mul_assoc]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem fe_pull (hG : GlobalFnsSt) (hD : IsPullDeg φ D D') {k : ℕ} (F : Fam D (FractionRing R) k) (f : ∀ α, D.SecB k α)
     (f' : ∀ α, D'.SecB k α)
     (hs : ∀ α, GeneratorPullback.SecScal D.P.L (DegPre.famφ D (FractionRing R) α) (DegPre.famε k) (F.s α) (D.famφB α)

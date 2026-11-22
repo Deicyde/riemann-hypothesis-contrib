@@ -8,7 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -33,7 +33,7 @@ open Classical in
 def locOf_alt (π : NG.AutRep D.host.E D.R.nV) (w : PlE D.host) : D.naut.LP w :=
   if h : ∃ x, LocAt π w x then (T.e w).symm (_root_.GlobalTheory.CuspRep.ParLawsT.locRecT hL (D.nd.plOm.2 w) h.choose)
   else D.naut.lpZero w
-set_option synthInstance.maxHeartbeats 400000 in
+
 def boundaryConditionOfNoLocal (hE : IsEmpty D.nd.Loc) : NBC D.naut where
   AU := fun _ => AUq D.host.E D.R.nV
   multAU := fun _ X => X.rep.mult

@@ -206,13 +206,13 @@ theorem projZ : ProjZ := by
     simp only [π, LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype]
     rw [Submodule.projectionOnto_apply_left (hCm s) ⟨x, hx⟩]
   refine ⟨Tmap π, fun P => ?_, fun J => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [MvPolynomial.as_sum P, map_sum]
-      refine Submodule.sum_mem _ fun m _ => ?_
-      have : monomial m (AddMonoidAlgebra.coeff P m) = AddMonoidAlgebra.coeff P m • monomial m (1 : ℤ) := by
-        rw [smul_monomial, smul_eq_mul, mul_one]
-      rw [this, LinearMap.map_smul, Tmap_monomial]
-      exact Submodule.smul_mem _ _ (prod_mem_span nu _ fun s => hπmem s _)
+
+  · rw [MvPolynomial.as_sum P, map_sum]
+    refine Submodule.sum_mem _ fun m _ => ?_
+    have : monomial m (AddMonoidAlgebra.coeff P m) = AddMonoidAlgebra.coeff P m • monomial m (1 : ℤ) := by
+      rw [smul_monomial, smul_eq_mul, mul_one]
+    rw [this, LinearMap.map_smul, Tmap_monomial]
+    exact Submodule.smul_mem _ _ (prod_mem_span nu _ fun s => hπmem s _)
   · rw [nablaX_eq, Tmap_prod]
     refine Finset.prod_congr rfl fun s _ => ?_
     rw [hπfix]

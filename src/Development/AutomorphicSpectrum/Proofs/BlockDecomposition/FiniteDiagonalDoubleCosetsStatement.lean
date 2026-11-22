@@ -8,7 +8,7 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 open GlobalTheory.BCT PositivityTheory.Rg.BcB.G8.Fin
 open scoped Classical
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finite_diagonal_double_cosets : ∀ (H : Type) [Group H] (Z L C : Subgroup H) (F : H × H → ℂ),
   (∀ x : H, Z ⊓ L.map (MulAut.conj x).toMonoidHom ≤ C ∧ (Z ⊓ L.map (MulAut.conj x).toMonoidHom).relIndex C ≠ 0) →
   (∀ t ∈ Z, ∀ c ∈ C, t * c * t⁻¹ ∈ C) →

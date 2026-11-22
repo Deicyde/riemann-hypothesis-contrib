@@ -34,8 +34,8 @@ variable [CharZero K]
 theorem rename_esymm_mem {m : ℕ} (b : Fin f) (h1 : 1 ≤ m) (h2 : m ≤ n) :
     rename (fun i : Fin n => (b, i)) (esymm (Fin n) K m) ∈ psumIdeal K f n := by
   have hN := congrArg (rename (fun i : Fin n => (b, i))) (mul_esymm_eq_sum (Fin n) K m)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_mul, map_pow, map_neg, map_one, map_natCast, map_sum] at hN
+
+  simp only [map_mul, map_pow, map_neg, map_one, map_natCast, map_sum] at hN
   have hmem : ((m : ℕ) : MvPolynomial (Fin f × Fin n) K) *
       rename (fun i : Fin n => (b, i)) (esymm (Fin n) K m) ∈ psumIdeal K f n := by
     rw [hN]
@@ -58,9 +58,9 @@ theorem prod_X_add_eq_pow (b : Fin f) :
   set φ : MvPolynomial (Fin n) K →+* MvPolynomial (Fin f × Fin n) K ⧸ psumIdeal K f n :=
     (Ideal.Quotient.mk (psumIdeal K f n)).comp (rename (fun i : Fin n => (b, i))).toRingHom
   have hV := congrArg (Polynomial.map φ) (MvPolynomial.prod_C_add_X_eq_sum_esymm K (Fin n))
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Polynomial.map_prod, Polynomial.map_add (f := _), Polynomial.map_X, Polynomial.map_C,
-    Polynomial.map_sum, Polynomial.map_mul, Polynomial.map_pow, Fintype.card_fin] at hV
+
+  simp only [Polynomial.map_prod, Polynomial.map_add (f := _), Polynomial.map_X, Polynomial.map_C,
+  Polynomial.map_sum, Polynomial.map_mul, Polynomial.map_pow, Fintype.card_fin] at hV
   have hφX : ∀ i : Fin n, φ (X i) = Ideal.Quotient.mk (psumIdeal K f n) (X (b, i)) := by
     intro i; simp [φ]
   simp only [hφX] at hV

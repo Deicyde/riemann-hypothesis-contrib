@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 noncomputable section
@@ -20,7 +20,7 @@ open UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
 open UpperTheory.V.Z.Mult (Cp At IsDec CompOf Mult)
 open scoped Matrix TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 namespace UpperTheory.V.Z.J.D
 def TypePS2Alt : Prop :=
   _root_.GlobalTheory.Mem.LiteralAutomorphy.LiteratureRankNHypothesis → ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (n : ℕ), 1 ≤ n →

@@ -204,7 +204,7 @@ theorem gs_posKilled (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set 
   convert div_pos (mul_pos hEuler (pow_pos hCard (Fintype.card (InfinitePlace K.1)))) hReal
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_field_of_cyclic (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
     (L : FiniteSubfield) [Fact (K ≤ L)]

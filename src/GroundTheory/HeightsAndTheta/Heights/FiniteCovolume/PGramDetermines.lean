@@ -24,9 +24,9 @@ theorem sesq_linearCombination (h : HermitianForm F E W) {n : ℕ} {e e' : Fin n
     (hG : ∀ a b, h.toSesq (e a) (e b) = h.toSesq (e' a) (e' b)) (c d : Fin n → E) :
     h.toSesq (Fintype.linearCombination E e' c) (Fintype.linearCombination E e' d) =
       h.toSesq (Fintype.linearCombination E e c) (Fintype.linearCombination E e d) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Fintype.linearCombination_apply, map_sum, LinearMap.sum_apply, map_smulₛₗ,
-    LinearMap.smul_apply, hG]
+
+  simp only [Fintype.linearCombination_apply, map_sum, LinearMap.sum_apply, map_smulₛₗ,
+  LinearMap.smul_apply, hG]
 
 
 omit [NumberField E] [_root_.NumberField.IsTotallyComplex E] in

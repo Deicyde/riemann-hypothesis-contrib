@@ -145,7 +145,7 @@ end GlobalTheory.UseLoc.InstPoly
 namespace GlobalTheory.UseLoc.InstPoly
 open Polynomial
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem core {R O : Type} [CommRing R] [IsDomain R] [Infinite R] [CommRing O] [IsLocalRing O]
     (φ : O →+* R) (lam : R) (hφ : ∀ a ∈ IsLocalRing.maximalIdeal O, lam ∣ φ a) {n r : ℕ}
     (A : Matrix (Fin n) (Fin n) O) (B : Matrix (Fin r) (Fin r) O) (χ : ℕ → O) (t : ℕ)
@@ -203,7 +203,7 @@ theorem chiOC_val (C : TruncatedSeriesCountingIdentities.CoefExt D i w hw) (χ :
     ((chiOC C χ g : (↥(OL C.LL))ˣ) : ↥(OL C.LL)) =
       phiC C ((χ (decS D.nd w (Br.iota D.nbr i w hw g)) : (D.nd.O i)ˣ) : D.nd.O i) := rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem chiT_val (C : TruncatedSeriesCountingIdentities.CoefExt D i w hw) (θ : Br.G D.nbr i w hw →* (↥(OL C.LL))ˣ) (c : ℕ)
     (g : Br.G D.nbr i w hw) :
     ((chiT C θ c g : (↥(OL C.LL))ˣ) : ↥(OL C.LL)) =

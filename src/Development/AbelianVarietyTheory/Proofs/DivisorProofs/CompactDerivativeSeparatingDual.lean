@@ -21,8 +21,8 @@ theorem continuous_multilinear {ι : Type} [Fintype ι] {V G : Type} [NormedAddC
   have h : ∀ x : ι → V, f x = ∑ r : ι → Fin (Module.finrank ℝ V), (∏ i, b.coord (r i) (x i)) • f (fun i => b (r i)) := by
     intro x
     conv_lhs => rw [show x = fun i => ∑ j, b.coord j (x i) • b j from funext fun i => (b.sum_repr (x i)).symm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [MultilinearMap.map_sum]
+
+    rw [MultilinearMap.map_sum]
     refine Finset.sum_congr rfl fun r _ => ?_
     simpa only [RingHom.id_apply] using f.map_smul_univ (fun i => b.coord (r i) (x i)) (fun i => b (r i))
   rw [show (f : (ι → V) → G) = fun x => ∑ r : ι → Fin (Module.finrank ℝ V), (∏ i, b.coord (r i) (x i)) • f (fun i => b (r i))
@@ -86,8 +86,8 @@ theorem lie_apply_eq_sum : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (M
     funext i
     exact hermPart_toL (adHerm (c t) (Y i))
   rw [h2, ContinuousMultilinearMap.linearDeriv_apply] at h1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [(hκ l hl (ω Y)).unique h1, map_sum]
+
+  rw [(hκ l hl (ω Y)).unique h1, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hF]
   congr 2

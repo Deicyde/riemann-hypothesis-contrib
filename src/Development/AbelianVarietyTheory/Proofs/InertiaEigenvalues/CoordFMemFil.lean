@@ -97,15 +97,15 @@ theorem mulF_idem (K : FinExt l) [FiniteDimensional ℚ_[l] ↥K.1] (τ : ↥K.1
     (hτ : ∀ x : ↥K.1, ((τ x : ↥LL.1) : Om l) = (x : Om l)) :
     mulF P LL (GlobalTheory.DRFil.idem P.R.BdR τ) = 1 := by
   obtain ⟨n, a, c, h, h1⟩ := GlobalTheory.DRFil.idem_repr P.R.BdR τ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum]
+
+  rw [h, map_sum]
   have e : ∀ i, mulF P LL (a i ⊗ₜ[ℚ_[l]] algebraMap ↥K.1 P.R.BdR (c i)) =
       algebraMap (Om l) P.R.BdR (((a i * τ (c i) : ↥LL.1)) : Om l) := by
     intro i
     rw [mulF_tmul, embF_apply, IntermediateField.coe_mul, map_mul, hτ]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [e, ← map_sum]
+
+  simp only [e, ← map_sum]
   have h2 := congrArg (fun x : ↥LL.1 => (x : Om l)) h1
   simp only [IntermediateField.coe_sum, IntermediateField.coe_one] at h2
   simp only [IntermediateField.coe_mul] at h2 ⊢
@@ -129,9 +129,9 @@ theorem coordF_act (K : FinExt l) (r : ↥(GK K) →* Matrix.GeneralLinearGroup 
     have hfix : ∀ c : ↥LL.1, P.actQdR (g : GQ l) (embF P LL c) = embF P LL c := fun c => by
       rw [embF_apply, P.actQdR_Om, hg _ c.2]
     funext j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [actVdR, AlgebraTensorModule.map_tmul, coordF_tmul, repOf_apply, P.PD_actdR,
-      Matrix.mulVec, dotProduct, Matrix.map_apply, map_mul, hfix, map_sum]
+
+    simp only [actVdR, AlgebraTensorModule.map_tmul, coordF_tmul, repOf_apply, P.PD_actdR,
+    Matrix.mulVec, dotProduct, Matrix.map_apply, map_mul, hfix, map_sum]
     rw [Finset.sum_mul]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp only [AlgHom.toLinearMap_apply, LinearMap.coe_restrictScalars, AlgEquiv.coe_toAlgHom, AlgHom.coe_coe]

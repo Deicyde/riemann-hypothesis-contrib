@@ -21,8 +21,8 @@ noncomputable section
 namespace GlobalTheory.FockCoefSplit
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem actO_inf : ∀ (D : D7) (S T : HSp D) (a : GA D S) (b : GA D T), a ∈ GinfC S → b ∈ GinfC T →
     ∀ w : WO S T, w.map (infPart D) = 0 → actO S T a b w = w := by
   intro D S T a b ha hb w hw
@@ -46,8 +46,8 @@ theorem actO_inf : ∀ (D : D7) (S T : HSp D) (a : GA D S) (b : GA D T), a ∈ G
     · have h1 : ∀ k, finPart D (Formalism.L2.Theta.mt T b i k) = if i = k then 1 else 0 := fun k => by
         have := congrFun (congrFun hfb i) k
         simpa [Matrix.one_apply] using this
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Matrix.mul_apply, map_sum]
+
+      rw [Matrix.mul_apply, map_sum]
       simp [map_mul, h1]
   have e2 : w * Formalism.L2.Theta.mt S a⁻¹ = w := by
     ext i j
@@ -58,8 +58,8 @@ theorem actO_inf : ∀ (D : D7) (S T : HSp D) (a : GA D S) (b : GA D T), a ∈ G
     · have h1 : ∀ k, finPart D (Formalism.L2.Theta.mt S a⁻¹ k j) = if k = j then 1 else 0 := fun k => by
         have := congrFun (congrFun hfa k) j
         simpa [Matrix.one_apply] using this
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Matrix.mul_apply, map_sum]
+
+      rw [Matrix.mul_apply, map_sum]
       simp [map_mul, h1]
   unfold actO
   rw [e1, e2]

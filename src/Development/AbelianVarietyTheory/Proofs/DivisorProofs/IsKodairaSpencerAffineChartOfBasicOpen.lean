@@ -18,7 +18,7 @@ open GlobalTheory.Toroidal GlobalTheory.LogKS GlobalTheory.LogKSChart GlobalTheo
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 

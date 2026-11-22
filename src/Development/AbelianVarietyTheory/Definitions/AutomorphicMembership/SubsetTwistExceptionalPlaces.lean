@@ -19,7 +19,7 @@ open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 def TauTrue {D : D7} (X : NExpTied D) : Prop :=
   ∃ τ : ℕ → ∀ kv : (Σ k : Fin 2, D.nd.PlG k), (ZMod (D.host.g kv.1))ˣ →* (↥D.LL0)ˣ, ∀ i j b kv x, 1 ≤ j → j ≤ D.R.m →
@@ -106,7 +106,7 @@ variable {cG : G0 R.Pg D.R.r ≃* G0g D.nd} {S : RatDat D.ntw}
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 1000000 in
+
 structure SerAt (YS : NExpRealS R cG S) (v₀ : ∀ (j : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW j σ).Vec) (X : NExpTied D)
     (PV : ∀ i : Fin D.R.m, principalLevelFrame.RowPsi (Vc D i) D.R.nV) (cf : CharFrame D)
     (Pq : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)) → PlE D.host) : Type 1 where

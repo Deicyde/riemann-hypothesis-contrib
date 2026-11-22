@@ -67,8 +67,8 @@ theorem resOntoK_of_resSatL (LL : Letters (K + 1)) {q : ℕ} (J : Fin q → ℕ)
   have hbx : algebraMap ℤ_[p] ℚ_[p] (b : ℤ_[p]) • x ∈ IntPol p (Fin (K + 1) × Fin r) := by
     refine LinearMap.mem_range.2 ⟨∑ m ∈ x.support, monomial m (y m), ?_⟩
     change MvPolynomial.map (algebraMap ℤ_[p] ℚ_[p]) (∑ m ∈ x.support, monomial m (y m)) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     conv_rhs => rw [← MvPolynomial.support_sum_monomial_coeff x]
     rw [Finset.smul_sum]
     refine Finset.sum_congr rfl fun m _ => ?_

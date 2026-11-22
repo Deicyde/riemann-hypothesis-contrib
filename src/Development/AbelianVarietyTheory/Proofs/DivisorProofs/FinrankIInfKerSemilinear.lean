@@ -34,8 +34,8 @@ theorem finrank_iInf_ker_semilinear {L M W X ι κ : Type} [Field L] [Field M] [
     refine le_antisymm (Submodule.span_le.2 ?_) (Submodule.span_mono (by rintro _ ⟨k, rfl⟩; exact ⟨_, rfl⟩))
     rintro _ ⟨w, rfl⟩
     haveI := Fintype.ofFinite κ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr w, map_sum]
+
+    rw [← b.sum_repr w, map_sum]
     exact Submodule.sum_mem _ fun k _ => by
       rw [map_smulₛₗ]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
   let c : Basis κ M U := (Basis.span hb).map (LinearEquiv.ofEq _ _ hU.symm)
@@ -109,8 +109,8 @@ theorem finrank_eq {K L F M C W V G G' Γ : Type} [Field K] [Field L] [Field F] 
     exact Module.Flat.linearIndependent_one_tmul b₄
   have hRΦ : ∀ γ w, R γ (Φ w) = Φ ((((chi (θ γ))⁻¹ : Lˣ) : L) • ρ (θ γ) w) := fun γ w => by
     rw [← bW.sum_repr w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smulₛₗ, Finset.smul_sum, RingHom.id_apply]
+
+    simp only [map_sum, map_smulₛₗ, Finset.smul_sum, RingHom.id_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     obtain ⟨f', h1, h2⟩ := hρ γ (b k)
     rw [hΦb, Basis.mk_apply, h1, hΦ, hR, twistExt_tmul, h2, smul_comm]
@@ -160,9 +160,9 @@ theorem finrank_eq {K L F M C W V G G' Γ : Type} [Field K] [Field L] [Field F] 
       rintro (_ | γ) w
       · haveI := Fintype.ofEquiv G c.toEquiv
         simp only [Option.elim]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [Representation.asAlgebraHom_def, MonoidAlgebra.lift_apply, Finsupp.sum_fintype _ _ (fun _ => by simp),
-          LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
+
+        rw [Representation.asAlgebraHom_def, MonoidAlgebra.lift_apply, Finsupp.sum_fintype _ _ (fun _ => by simp),
+        LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
         refine (Fintype.sum_equiv c.toEquiv _ _ fun g => ?_).symm
         rw [LinearMap.smul_apply, LinearMap.smul_apply, mul_smul, map_smulₛₗ, he]
         exact congrArg _ (by rw [MonoidHom.comp_apply, hRΦ]; simp only [MulEquiv.toEquiv_eq_coe, EquivLike.coe_coe, hs])

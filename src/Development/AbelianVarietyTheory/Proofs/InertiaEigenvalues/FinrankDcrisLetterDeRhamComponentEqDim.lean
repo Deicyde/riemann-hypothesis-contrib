@@ -40,9 +40,9 @@ theorem card_le_of_idem {R : Type} [CommRing R] {e : R} (he : e * e = e) (he0 : 
     rw [← hr, Ideal.Quotient.eq_zero_iff_mem, hI, ← he, mul_assoc]
     refine h (fun i => e * r i) (fun j => ?_) i
     have := congrFun hg j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, ← hr, ← map_mul,
-      ← map_sum] at this
+
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, ← hr, ← map_mul,
+    ← map_sum] at this
     rw [Ideal.Quotient.eq_zero_iff_mem, hI, Finset.mul_sum] at this
     simpa only [mul_assoc] using this
   simpa using hli.fintype_card_le_finrank
@@ -74,8 +74,8 @@ theorem component_le [FiniteDimensional Qp K] [CharZero Qp] (hF : IsField F) (ρ
     (fun i j => ext Qp F (v.coord j) (b i : V ⊗[Qp] F)) (fun r hr => h r (by
       rw [eq_sum_basis v (∑ i, sm Qp F LL V (r i) (b i : V ⊗[Qp] F))]
       refine Finset.sum_eq_zero fun j _ => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [ext_sm, sm_self]
       rw [hr j, map_zero, LinearMap.zero_apply]))
   simpa using this

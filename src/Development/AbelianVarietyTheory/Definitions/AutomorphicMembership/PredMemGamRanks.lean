@@ -695,7 +695,7 @@ variable {E K : Type} [Field E] [NumberField E] [Field K] {n : ℕ} {S : GStep E
   {ST : Finset (HeightOneSpectrum (𝓞 E))} (A : TDat S ST)
 
 
-set_option maxHeartbeats 1600000 in
+
 structure Laws (T : ℕ) : Prop where
   lv_rank : ∀ P c, Module.finrank (Res P.1) (A.lv P c) = n
   lk_rank : ∀ P c, Module.finrank (Res P.1) (A.lk P c) = n
@@ -750,7 +750,7 @@ structure FmLaws (Pl : Rows.Places K) (hI : I.Ok) (hQ : Q.Ok) : Prop where
     (locW Pl w (BLat J emb hc i (fam i) P) : Set ((I.S i).hlat emb (lamT hc i) (fam i)).V) = ⊤
 
 
-set_option maxHeartbeats 1600000 in
+
 def forms {Pl : Rows.Places K} (Z : FmIn J Pl) (hI : I.Ok) (hJ : J.Ok) (hQ : Q.Ok) (l : J.Laws emb σ hc)
     (lf : FmLaws J Q emb σ hc Pl hI hQ) (_hT : Q.Over J) :
     MemberForms K σ Pl ι hc (I.chain emb σ hI hc) (J.atT emb σ hI hJ hc l) (Q.per emb σ hI hQ hc) where

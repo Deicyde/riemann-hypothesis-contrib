@@ -7,7 +7,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -38,7 +38,7 @@ theorem int_val (T : CDVR) (io : c.F →+* T.Fr) (τ : E →+* ℂ) (a : 𝓞 E)
   exact h3.symm
 
 
-set_option maxHeartbeats 800000 in
+
 theorem lieFree : LieFreeSt Xo c := by
   intro T io G t' x m1 m2 _ u₀ hu₀t hu₀e hu₀b
   let _ := io.toAlgebra

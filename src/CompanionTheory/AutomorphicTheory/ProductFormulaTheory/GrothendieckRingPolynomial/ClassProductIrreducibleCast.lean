@@ -20,7 +20,7 @@ noncomputable section
 
 open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.Cos
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace CompanionTheory.Groth.GrothendieckCommutativity
 
@@ -238,7 +238,7 @@ theorem class_eq_of_jordan_holder_mult {N : ℕ} {V W : Type} [AddCommGroup V] [
   rw [cls_apply, cls_apply, h c.rep]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem jhMult_pair_le (x y : IrrGL (k := k)) {N : ℕ} (h1 : ∑ a, (![x, y] a).1 = N) (h2 : ∑ a, (![y, x] a).1 = N)
     (σ : IrrRep (GL (Fin N) k)) : jhMult σ.ρ (prodIrr ![x, y] h1) ≤ jhMult σ.ρ (prodIrr ![y, x] h2) := by
   have hA := CompanionTheory.Tls2.BZGL.irreducibleAdmissibleGL_top
@@ -273,7 +273,7 @@ namespace CompanionTheory.Groth
 open CompanionTheory.Groth.GrothendieckCommutativity
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem comm (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : Comm k := by
   intro x y
   have hxy : ∑ a, (![x, y] a).1 = x.1 + y.1 := by simp [Fin.sum_univ_two]
