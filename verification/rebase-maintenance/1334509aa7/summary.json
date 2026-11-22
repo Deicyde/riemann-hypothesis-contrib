@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-9",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/WeilBound/CoreStatements/HodgeTatePoints/RaCarry.lean",
+          "stages": {
+            "1": "3d42d8607b6349eaf334258df69d370a074fe5bf",
+            "2": "3e8b35d3505f112cc74858328bd6a108e5062a98",
+            "3": "12f5e06964e48c5e6b3179e8c1d13ef03ab6033a"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "2f8feae4750fadfcc4144dd00c2d0737ed1252f1",
+      "checkpoint_head": "aaa5998a26cbd8573728abc2fe85760754c23f43"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
