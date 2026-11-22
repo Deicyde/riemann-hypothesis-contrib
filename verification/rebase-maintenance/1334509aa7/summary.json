@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-23",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/SubOneBijectiveQuotientOfTopNilpotent.lean",
+          "stages": {
+            "1": "0d365d0e1d792b0abd2a8c5f59591de4a6696a31",
+            "2": "411393422ecf880ef7ff0d362895a49fbc042155",
+            "3": "b77b8d18179e9545a40d4fac5e46dd5d566e45d5"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "9c5dcb31ead077b7663d8d20be0acab35b4221b1",
+      "checkpoint_head": "1f3a5f72b4af3d3422d46527420cd0d72005370a"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
