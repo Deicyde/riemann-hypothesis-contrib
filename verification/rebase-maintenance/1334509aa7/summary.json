@@ -1,0 +1,92 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-96",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 9,
+      "stage_types": {
+        "1,2,3": 9
+      },
+      "conflicts": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/SchurLimitBounds/SchurOrthogonality/URepBasic.lean",
+          "stages": {
+            "1": "acdda5021e093a968268f7e77c127576312cf126",
+            "2": "ca51460f3f5699275058e49606ba39b32c86efb1",
+            "3": "3cc4817d415b0f337ab6b725a2b1b077ac6217f5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/ThickeningEstimates/LieGroupReduction/HasDerivAtSchwartzToL2.lean",
+          "stages": {
+            "1": "cfcf6896a93cfcee44a384415d0bb395d3c1d67a",
+            "2": "05f6863ab2c7d4aede46e03f6c44298b82feebcb",
+            "3": "43fe7f2028815376bd66e4d7cc51781f6e14fa8e"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AlgebraMapQuotBijective.lean",
+          "stages": {
+            "1": "a676eca61fcf53427339d37d3ece229958cc3980",
+            "2": "a620197e983d3f4243d3b6e759f1a9084a4f3958",
+            "3": "d4f2c360ffa81985dd2403b08a9816f4c20b3363"
+          }
+        },
+        {
+          "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/GaussianHessianIntegral.lean",
+          "stages": {
+            "1": "9b4e56c5c6cb343033a2c68a14c33340a794f2e7",
+            "2": "3a22cb45b456cb7003ad971f35188863564bcf5f",
+            "3": "15146c8973c152ade93270a1778b531d7da3d667"
+          }
+        },
+        {
+          "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/LemmaEprimeFromSteps.lean",
+          "stages": {
+            "1": "7dc673b69b727b5a3d743fa727c7d3fb4037a873",
+            "2": "70504d6761fdc99bd6328905bf8166897c06303a",
+            "3": "5a6a363b530c5e705fcd3976ffefb33d6662ab92"
+          }
+        },
+        {
+          "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/WeightedL2BoundedMul.lean",
+          "stages": {
+            "1": "9a91453de04497a319478f95ecef66714f2102e5",
+            "2": "dd786ac2f893ab97745519ff00416f4a0f41b5c3",
+            "3": "4a120d024b0cca007554ed21ca245bc377ad8f7c"
+          }
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/PosNear.lean",
+          "stages": {
+            "1": "b0d2e9f4a2363e277edfeb5b04d525e591a446fd",
+            "2": "00f6a336d6a7c33446ed19d757c04e2dcd850621",
+            "3": "a9f1ce61e97f432339ec0efd5b315330333d0eeb"
+          }
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/Unimod.lean",
+          "stages": {
+            "1": "0ab23f0fb0ec88c582ba20a123ae712aa2299f3d",
+            "2": "71c15dda908b9163e2554952c0175acc73ff9483",
+            "3": "1dd3549a6f54379596c43c7a4ad064854e0fe346"
+          }
+        },
+        {
+          "path": "src/Formalism/SatakeDualWeyl/AdelicIwasawaHecke/Levelaf.lean",
+          "stages": {
+            "1": "812b74bae2590c02a7efd007f8de9a8263c1ac7a",
+            "2": "c177188a9efdc2f4e13d236cedbd2edb2af8a308",
+            "3": "37ed7d8bcbca5b58135550b1307136d53804ddba"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "c7cbfe9e07c75a1b3dd7bd1b5f29373f60deeb1f",
+      "checkpoint_head": "b0a272b20383ef6126cd2b7f40713ca269324210"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
