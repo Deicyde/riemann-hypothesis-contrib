@@ -63,9 +63,9 @@ lemma ldlat_linInd_field {F K : Type*} [Field F] [Field K] [Algebra F K] {σ ι 
     simp only [coeff_sum, coeff_smul, coeff_map, smul_eq_mul] at h1 ⊢
     change _ = 0 at h1 ⊢
     have h2 := congrArg (fun x => B.repr x j) h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_zero, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_zero,
-      Pi.zero_apply] at h2
+
+    simp only [map_sum, map_zero, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_zero,
+    Pi.zero_apply] at h2
     rw [← h2]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [mul_comm (c i), ← Algebra.smul_def, map_smul, Finsupp.smul_apply, smul_eq_mul, mul_comm]

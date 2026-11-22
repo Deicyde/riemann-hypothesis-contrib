@@ -69,8 +69,8 @@ private theorem exists_dual_basis_dlog_of_isCoord (hH : HbFacts) {W : Type*} [Ri
   have hexp : ∀ i, β (x⁻¹ * hb i * xᴴ⁻¹) = ∑ q, coords (x⁻¹ * hb i * xᴴ⁻¹) q • β (hb q) := by
     intro i
     conv_lhs => rw [← smul_add_smul_mul_mul_smul_add_smul_of_mul_eq_zero hH (hA' i)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [map_smul]
   have hcoef : ∀ i q, coords (x⁻¹ * hb i * xᴴ⁻¹) q = coords (xᴴ⁻¹ * hb q * x⁻¹) i := by
@@ -86,8 +86,8 @@ private theorem exists_dual_basis_dlog_of_isCoord (hH : HbFacts) {W : Type*} [Ri
     _ = ∑ q, ∑ i, coords (xᴴ⁻¹ * hb q * x⁻¹) i • (α (xᴴ * hb i * x) * β (hb q)) := Finset.sum_comm
     _ = ∑ q, α (∑ i, coords (xᴴ⁻¹ * hb q * x⁻¹) i • (xᴴ * hb i * x)) * β (hb q) := by
         refine Finset.sum_congr rfl fun q _ => ?_
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, Finset.sum_mul]
+
+        rw [map_sum, Finset.sum_mul]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [map_smul, smul_mul_assoc]
     _ = ∑ p, α (hb p) * β (hb p) := by
@@ -102,7 +102,7 @@ private theorem exists_dual_basis_dlog_of_isCoord (hH : HbFacts) {W : Type*} [Ri
         rw [Matrix.nonsing_inv_mul _ hu, Matrix.mul_one, ← Matrix.mul_assoc,
           Matrix.mul_nonsing_inv _ huH, Matrix.one_mul]
 
-set_option maxHeartbeats 800000 in
+
 theorem halfOne_of (hH : HbFacts) (hF : FrameDer) (hO : ∀ n, IsOpen (cone n)) (h1 : DerOne) : HalfOne := by
   intro n lam E Fr ε ι S Γ T hcx σ hσ hσh k hk hkeq d hd c v hv w hw
   obtain ⟨hxG, hdetv⟩ := KcInv.coneGL n σ hσh v hv

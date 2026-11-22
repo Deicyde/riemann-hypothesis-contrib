@@ -32,9 +32,9 @@ theorem mem_coordL (V : HSp D) (x : Fin V.rank → D.host.E) : x ∈ coordL V �
 theorem hform_coord (V : HSp D) (x y : Fin V.rank → D.host.E) :
     Formalism.UG.hform (D.sp.cm.sig : D.host.E →+* D.host.E) V.gram x y = V.hT (coordMap V x) (coordMap V y) := by
   rw [coordMap_apply, coordMap_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Formalism.UG.hform, HSpace.gram, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply,
-    smul_eq_mul, Finset.mul_sum]
+
+  simp only [Formalism.UG.hform, HSpace.gram, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply,
+  smul_eq_mul, Finset.mul_sum]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   show star (x i) * _ * y j = y j * (star (x i) * _)
@@ -67,7 +67,7 @@ theorem eToEAf_mem_intAf_of_isIntegral {a : D.host.E} (ha : IsIntegral ℤ a) :
   exact Subring.subset_closure (Or.inl ⟨⟨((b : 𝓞 D.host.E) : D.host.E), ⟨b, rfl⟩⟩, rfl⟩)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem isFrame_one_std (V : HSp D) (hV : FrmC.StdLat V) :
     Formalism.L2.DIV.IsFrame (1 : GL (Fin V.rank) (EAf D)) (coordL V) := by
   intro x

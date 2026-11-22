@@ -33,8 +33,8 @@ theorem exists_eq_sum_X {O σ : Type} [CommRing O] [Fintype σ] (p : MvPowerSeri
   refine ⟨g, ?_, fun i m => ?_⟩
   · ext n
     simp only [← hg]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sum, coeff_C]
+
+    rw [map_add (f := _), map_sum, coeff_C]
     simp only [hq]
     by_cases h : n ≠ 0
     · simp [dif_pos h, if_neg h]
@@ -297,8 +297,8 @@ theorem exists_gens_wt [Finite A] [Finite (ResidueField O)] {J : Ideal A} (hJ : 
     rw [← Ideal.Quotient.eq]
     have := congrArg Subtype.val hc
     simp only [AddSubmonoidClass.coe_finsetSum, Submodule.coe_smul_of_tower] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← this, ← Ideal.Quotient.mkₐ_eq_mk O, map_sum]
+
+    rw [← this, ← Ideal.Quotient.mkₐ_eq_mk O, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, Ideal.Quotient.mkₐ_eq_mk, hs']
   have h2 := decompose_mem_of_mem_Kj 𝒜 hJ j h1
@@ -328,8 +328,8 @@ theorem nonempty_gradedAlgebra_quot {B : Type} [CommRing B] [Algebra O B] (φ : 
   rw [eq_top_iff]
   intro y _
   obtain ⟨x, rfl⟩ := hφ y
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← DirectSum.sum_support_decompose 𝒜 x, map_sum]
+
+  rw [← DirectSum.sum_support_decompose 𝒜 x, map_sum]
   exact Submodule.sum_mem _ fun j _ => Submodule.mem_iSup_of_mem j ⟨_, SetLike.coe_mem _, rfl⟩
 
 end Fin

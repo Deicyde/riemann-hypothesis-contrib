@@ -90,7 +90,7 @@ end Pts
 variable {R : Type} [CommRing R] [IsLocalRing R] {W W' : Over (Spec (CommRingCat.of R))} [GrpObj W']
 
 
-set_option maxHeartbeats 400000 in
+
 theorem core {N : ℕ} (j : W ⟶ W') (hinj : ∀ (Y) (y y' : Y ⟶ W), y ≫ j = y' ≫ j → y = y')
     (hker : ∀ (Y) (z : Y ⟶ W'), z ^ N = 1 ↔ ∃ y, y ≫ j = z) (U : W.left.Opens) (U' : W'.left.Opens)
     (hF : IsFinite (U.ι ≫ W.hom)) (hF' : IsFinite (U'.ι ≫ W'.hom))

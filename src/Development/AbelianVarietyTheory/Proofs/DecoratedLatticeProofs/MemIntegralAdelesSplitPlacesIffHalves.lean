@@ -16,8 +16,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.FinPl.SplitHalves
 
@@ -33,8 +33,8 @@ theorem sum_idem {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsN
       rw [map_sub, map_sum]
     simp only [GlobalTheory.FinPlLoc.idem, GlobalTheory.FinPlLoc.infPart_pair, Finset.sum_const_zero, sub_zero]
   · intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum]
+
+    rw [map_sub, map_sum]
     simp only [GlobalTheory.FinPlLoc.compAt_idem]
     by_cases hw : P w
     · obtain ⟨j, rfl⟩ := (hP.mem w).1 hw
@@ -97,8 +97,8 @@ theorem mem_intAt_iff_halves : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k
         _ = (ε * (p i).e) * a + (ε * cA D (p i).e) * a := by
           rw [add_mul, mul_left_comm, ← mul_assoc, mul_left_comm (cA D (p i).e), ← mul_assoc]
         _ = a * (p i).e + a * cA D (p i).e := by rw [he, hce, mul_comm (p i).e, mul_comm (cA D (p i).e)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ha, map_sum]
+
+    rw [ha, map_sum]
     refine AddSubgroup.sum_mem _ fun i _ => ?_
     rw [map_add (f := _)]
     exact add_mem ((hs (p i) a 1).2 (by simpa using (hh i).1)).2

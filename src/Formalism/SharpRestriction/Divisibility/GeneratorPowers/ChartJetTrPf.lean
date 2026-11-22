@@ -18,7 +18,7 @@ attribute [local instance] Over.cartesianMonoidalCategory
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable (Xo : Moduli Dw l) (c : Coeff l)
 
-set_option maxHeartbeats 1000000 in
+
 theorem chartJetTr_of (hTan : ChartJetTanSt Xo c) (hBas : ChartJetBasisSt Xo c) : ChartJetTrSt Xo c := by
   intro T io y I d FT actT tgT uvecT xT hbas hch hdir
   letI := io.toAlgebra

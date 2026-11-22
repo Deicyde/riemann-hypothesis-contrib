@@ -94,8 +94,8 @@ theorem spansFlag_flagAt : ∀ (I I₀ : AutInst) (e : I₀.E ≃+* I.E) (xf : I
     have e1 : (fun l => I.φ v ((∑ i, T i *ᵥ u i) l)) =
         ∑ i, (T i).map (I.φ v) *ᵥ (fun l => I.φ v (u i l)) := by
       funext l
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, map_sum, RingHom.map_mulVec, Function.comp_def]
+
+      simp only [Finset.sum_apply, map_sum, RingHom.map_mulVec, Function.comp_def]
     rw [e1, Matrix.mulVec_sum]
     exact Finset.sum_congr rfl fun i _ => Matrix.mulVec_mulVec _ _ _
   constructor

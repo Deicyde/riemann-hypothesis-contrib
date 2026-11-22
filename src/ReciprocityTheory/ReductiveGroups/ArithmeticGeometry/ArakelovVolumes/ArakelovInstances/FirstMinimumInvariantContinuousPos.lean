@@ -29,8 +29,8 @@ theorem firstMinimumSq_rightBorel (X : Data E r) {x b : Frame X.Ψ r} (hx : x �
 theorem emb_mulVec (τ : E →+* ℂ) (M : Matrix (Fin r) (Fin r) E) (v : Fin r → E) :
     (M.map τ) *ᵥ Data.emb τ v = Data.emb τ (M *ᵥ v) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Data.emb, mulVec, dotProduct, map_sum]
+
+  simp [Data.emb, mulVec, dotProduct, map_sum]
 
 theorem maj_lact (X : Data E r) {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
     (τ : X.Ψ) (v : Fin r → E) :
@@ -152,7 +152,7 @@ theorem maj_near (X : Data E r) {x0 : Frame X.Ψ r} (hx0 : x0 ∈ X.dom) {κ : �
   filter_upwards [Filter.eventually_all.2 hτ] with w hw hwd τ v
   exact hw τ hwd v
 
-set_option maxHeartbeats 400000 in
+
 open Topology Filter in
 theorem firstMinimum_continuousOn (X : Data E r) : ContinuousOn X.la1 X.dom := by
   intro x0 hx0

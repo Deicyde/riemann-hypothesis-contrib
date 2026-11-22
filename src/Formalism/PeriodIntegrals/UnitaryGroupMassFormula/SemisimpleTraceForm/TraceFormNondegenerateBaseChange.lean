@@ -88,8 +88,8 @@ theorem traceFormNondegenerate_baseChange : AscendStep := by
     obtain ⟨y, hy, rfl⟩ := hcl hz
     obtain ⟨d, rfl⟩ := hspanA y hy
     show f (∑ i, d i • β i) ∈ _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [hfsmul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)

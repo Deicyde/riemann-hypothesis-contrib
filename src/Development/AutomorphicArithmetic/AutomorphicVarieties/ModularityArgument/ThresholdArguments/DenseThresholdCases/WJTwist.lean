@@ -241,7 +241,7 @@ private theorem pt_part (PH : _root_.UpperTheory.V.Af.HypothesesH') {l : ℕ} [F
   obtain ⟨ω, w1, w2⟩ := h5 v
   refine ⟨ω, w1, fun i => ?_⟩
   exact ord_congr (w2 i) fun g => hy _
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.V.Z.Desc.W.jTwist_of_alt : TypeGd → _root_.UpperTheory.V.Z.Desc.W.TwAwayAlt → _root_.UpperTheory.V.Z.Desc.W.SphUntwAlt → OrdTw → _root_.UpperTheory.V.Z.Desc.W.PsFullAlt →
     _root_.UpperTheory.V.Af.HypothesesH' → ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (n : ℕ), 1 ≤ n →
     ∀ (V : s.Lev) (Q : QData V) (c : Coef l), ∀ (r : Resid V.frame c.O n) (ι : Qbar l ≃+* ℂ), ∀ (B : UniversalOrdinaryDeterminantRing r) (Λ : LamObj r) (R : _root_.UpperTheory.V.Hi.CaseU.UnitaryHeckeData Q ι Λ) (K : (hset Q R.τ₀).Lev), V.S' = s.S → ∀ J : Ideal B.B, R.IsJ B K J → B.TwistOk J := by

@@ -16,8 +16,8 @@ theorem isHomogeneous_of_mul_isHomogeneous_right {σ : Type} (P Q : MvPolynomial
   have key : ∀ k, homogeneousComponent (k + b) (P * Q) = homogeneousComponent k P * Q := by
     intro k
     conv_lhs => rw [← sum_homogeneousComponent P]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_mul, map_sum]
+
+    rw [Finset.sum_mul, map_sum]
     have hterm : ∀ i, homogeneousComponent (k + b) (homogeneousComponent i P * Q)
         = if i = k then homogeneousComponent i P * Q else 0 := by
       intro i

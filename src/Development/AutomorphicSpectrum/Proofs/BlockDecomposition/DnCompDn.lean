@@ -91,9 +91,9 @@ theorem pulln_dn {F : C ⥤ CommAlgCat.{0} R} {G : D ⥤ CommAlgCat.{0} R}
     pulln m (n + 1) ∘ₗ dn F n = dn G n ∘ₗ pulln m n := by
   apply LinearMap.ext
   intro f
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.comp_apply, MainStatements.Hodge.dn, LinearMap.sum_apply,
-    LinearMap.smul_apply, map_sum, map_smul, map_zsmul, GlobalTheory.CompanionTheory.HodgeCx.pulln_cof]
+
+  simp only [LinearMap.comp_apply, MainStatements.Hodge.dn, LinearMap.sum_apply,
+  LinearMap.smul_apply, map_sum, map_smul, map_zsmul, GlobalTheory.CompanionTheory.HodgeCx.pulln_cof]
 
 theorem cxSt : CxSt := by
   intro R _ C _ F

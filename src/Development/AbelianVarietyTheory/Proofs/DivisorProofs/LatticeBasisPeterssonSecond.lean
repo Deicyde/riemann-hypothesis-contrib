@@ -66,7 +66,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelA
 open GlobalTheory.BadCount
 open scoped TensorProduct
 
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.HSShortRoad
 

@@ -193,8 +193,8 @@ theorem eig_of_comb (hv : ∀ i, IsTanAtG t x (v i)) {s : 𝓞 E →+* S} (he : 
     rw [← GlobalTheory.ShFam.Pad.Pull.eig_iff]
     exact he i b
   rw [GlobalTheory.ShFam.Pad.Pull.eig_iff]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, h1, Finset.smul_sum]
+
+  simp only [map_sum, map_smul, h1, Finset.smul_sum]
   exact Finset.sum_congr rfl fun i _ => smul_comm _ _ _
 
 theorem isEigG_push {X' : Scheme.{0}} {t' : SAB H X'} {f : X' ⟶ X} (ν : SABMap t' t f) {x' : Sp S ⟶ X'}
@@ -216,7 +216,7 @@ end Tan
 
 
 open GlobalTheory.LocM.BaseMdl in
-set_option maxHeartbeats 1000000 in
+
 theorem exists_change {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
     {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
     (Y : Model Xo c β) {R : Type} [CommRing R] {ξ : Sp R ⟶ Y.X} {g : ℕ}
@@ -315,7 +315,7 @@ theorem value_map : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : 
 
 
 open GlobalTheory.ModelFrameCompare MonObj in
-set_option maxHeartbeats 1000000 in
+
 theorem images_eigenBasis {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
     {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} (Y : Model Xo c (algebraMap (𝓞 c.F) c.F))
     (σ : E →+* ℂ) (T : CDVR) (io : c.F →+* T.Fr) (y₀ : IntFr Xo c T io) (xV : Sp T.V ⟶ Y.X)

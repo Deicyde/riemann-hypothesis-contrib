@@ -49,22 +49,22 @@ theorem FiniteModuloGeneralEquation.proof : FiniteModuloGeneralEquation.Statemen
     have := hψeq (analyticAtComp x L T) (∑ i, hs i * fs i + ∑ c', hs' c' * analyticAtComp x L (D c')) (by
       filter_upwards [hpow] with z hz
       simpa [analyticAtComp, T, D, hs, hs', fs] using hz)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [ψ', map_add (f := _), map_sum, map_mul, hψf] using this
+
+    simpa [ψ', map_add (f := _), map_sum, map_mul, hψf] using this
   have R2 : ∀ i c', ψ (hs' c') * ψ (es i) = ∑ j, ψ' (bs i c' j) * ψ (es j) := fun i c' => by
     have := hψeq (hs' c' * es i) (∑ j, analyticAtComp x L (bs i c' j) * es j +
       ∑ a, (⟨kk i c' a, hkk i c' a⟩ : analyticAtSubring x) * fs a) (by
       filter_upwards [hbk i c'] with z hz
       simpa [analyticAtComp, bs, es, hs', fs] using hz)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [ψ', map_add (f := _), map_sum, map_mul, hψf] using this
+
+    simpa [ψ', map_add (f := _), map_sum, map_mul, hψf] using this
   have R3 : ∑ m, ψ' (b1s m) * ψ (es m) = 1 := by
     have := hψeq 1 (∑ m, analyticAtComp x L (b1s m) * es m +
       ∑ a, (⟨k1 a, hk1 a⟩ : analyticAtSubring x) * fs a) (by
       filter_upwards [h1eq] with z hz
       simpa [analyticAtComp, b1s, es, fs] using hz)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [ψ', map_add (f := _), map_sum, map_mul, hψf] using this.symm
+
+    simpa [ψ', map_add (f := _), map_sum, map_mul, hψf] using this.symm
 
   have hMe : (ψ'.mapMatrix M) *ᵥ (fun j => ψ (es j)) = 0 := by
     funext i
@@ -74,9 +74,9 @@ theorem FiniteModuloGeneralEquation.proof : FiniteModuloGeneralEquation.Statemen
       intro c'
       rw [mul_right_comm, R2, Finset.sum_mul]
       exact Finset.sum_congr rfl fun j _ => by ring
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply, M, Matrix.of_apply, map_sub,
-      map_sum, map_mul, sub_mul, Finset.sum_sub_distrib, Pi.zero_apply, hdiag, R1, Finset.sum_mul]
+
+    simp only [Matrix.mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply, M, Matrix.of_apply, map_sub,
+    map_sum, map_mul, sub_mul, Finset.sum_sub_distrib, Pi.zero_apply, hdiag, R1, Finset.sum_mul]
     rw [Finset.sum_congr rfl fun c' _ => key c', Finset.sum_comm, sub_eq_zero]
   have hdet : ψ' M.det = 0 := by
     rw [RingHom.map_det]
@@ -88,8 +88,8 @@ theorem FiniteModuloGeneralEquation.proof : FiniteModuloGeneralEquation.Statemen
   refine ⟨fun i => q i, (M.det).2, fun i => (q i).2, ?_, ?_⟩
   · have hgerm : analyticAtGerm x (∑ i, q i * fs i) = analyticAtGerm x (analyticAtComp x L M.det) := by
       rw [← ha]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, map_mul, hq]
+
+      simp [map_sum, map_mul, hq]
     filter_upwards [(analyticAtGerm_eq_iff _ _).1 hgerm] with z hz
     simpa [analyticAtComp, fs] using hz.symm
 
@@ -98,9 +98,9 @@ theorem FiniteModuloGeneralEquation.proof : FiniteModuloGeneralEquation.Statemen
       rw [← analyticAtEval_apply, RingHom.map_det]
       have hdg : (analyticAtEval (L x) (L x + Pi.single c s)).mapMatrix M = Matrix.diagonal fun _ => s ^ r := by
         ext i j
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [RingHom.mapMatrix_apply, Matrix.map_apply, M, Matrix.of_apply, map_sub, map_sum, map_mul,
-          apply_ite (analyticAtEval (L x) (L x + Pi.single c s)), map_zero, analyticAtEval_apply, Matrix.diagonal_apply]
+
+        simp only [RingHom.mapMatrix_apply, Matrix.map_apply, M, Matrix.of_apply, map_sub, map_sum, map_mul,
+        apply_ite (analyticAtEval (L x) (L x + Pi.single c s)), map_zero, analyticAtEval_apply, Matrix.diagonal_apply]
         have hD : ∀ c', ((D c' : analyticAtSubring (L x)) : (τ → ℂ) → ℂ) (L x + Pi.single c s) = 0 := by
           intro c'
           simp only [D, zeroCoordinate_apply]

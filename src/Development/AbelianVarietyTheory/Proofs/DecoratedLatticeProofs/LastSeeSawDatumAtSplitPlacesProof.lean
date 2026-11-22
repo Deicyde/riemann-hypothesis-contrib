@@ -244,7 +244,7 @@ end GlobalTheory.LastTAllPf
 namespace GlobalTheory.LastTAllPf
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem main : ∀ D : D7, GlobalTheory.FinPl.LastTAll D := by
   intro D k _ _ _ _ ι p I P hP q ψ hψ χ hχ hchar n n' n'' _ _ _ _ _ _ V₀ A L S X T L'' o o'' ζ ζ₀ hζ hζ₀ τ lam hlam
     hunit hτ

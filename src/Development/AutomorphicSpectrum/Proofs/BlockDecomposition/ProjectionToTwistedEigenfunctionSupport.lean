@@ -75,9 +75,9 @@ theorem exists_finite_average {G V : Type} [Group G] [AddCommGroup V] [Module �
         rfl
       rw [Finset.sum_congr rfl fun q _ => h3 q]
       exact Equiv.sum_comp e (fun q => twOrbit ρ L θ x (Quotient.out q))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_smul, map_sum, Finset.sum_congr rfl fun q _ => h1 _, ← Finset.smul_sum, h2,
-      smul_comm]
+
+    rw [map_smul, map_sum, Finset.sum_congr rfl fun q _ => h1 _, ← Finset.smul_sum, h2,
+    smul_comm]
 
 def evalAt {G W : Type} [AddCommGroup W] [Module ℂ W] [Group G]
     [TopologicalSpace G] [IsTopologicalGroup G] (P : Subgroup G) (τ : Representation ℂ P W)
@@ -103,8 +103,8 @@ theorem exists_twisted_average_smInd {G : Type} {W : Type} [AddCommGroup W] [Mod
       have : evalAt P τ g (smInd P τ ((r i : L) : G) f) = 0 := hcon _ (r i).2
       simp only [twOrbit, map_smul, this, smul_zero]
     have : evalAt P τ g (c • ∑ i, twOrbit (smInd P τ) L θ f (r i)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_smul, map_sum, Finset.sum_eq_zero fun i _ => hz i, smul_zero]
+
+      rw [map_smul, map_sum, Finset.sum_eq_zero fun i _ => hz i, smul_zero]
     exact this
   · intro l g
     have h3 := congrArg (evalAt P τ g) (h2 l)

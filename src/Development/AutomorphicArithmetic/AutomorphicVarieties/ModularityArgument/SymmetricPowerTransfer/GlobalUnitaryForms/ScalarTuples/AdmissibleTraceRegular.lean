@@ -98,7 +98,7 @@ private theorem sum_GI (hD : D.Ok) (t : Dat.Par F) (ht : D.Cone t) (ch : F → �
   rw [finsum_congr kS, finsum_congr kK, ← const_sum, ← finsum_add_distrib (sup _) (sup' _)]
   exact finsum_congr (fun τ => by ring)
 
-set_option maxHeartbeats 800000 in
+
 private theorem term_eq (hD : D.Ok) {V : Type} [AddCommGroup V] [Module ℂ V] {ch : F → ℂ} {B : Base (U3 Δ) (GA Δ) V} {s : B.Tw}
     (hB : D.IsBG ch B s) {t : Dat.Par F} (ht : D.Cone t) {τ c : F} {d m : EL Δ τ} {δ i P} (hτ : D.Good t τ) (hd : IsDat c d m)
     (h : Models c d m δ i P) :
@@ -156,7 +156,7 @@ private theorem cls_eq {K : Type} [Field K] {τ : K} {x y : (Kˣ ⧸ (powMonoidH
   · rw [← QuotientGroup.out_eq' x2, ← QuotientGroup.out_eq' y2, QuotientGroup.eq, ← div_eq_inv_mul]
     exact h2
 
-set_option maxHeartbeats 1600000 in
+
 theorem sideG : SideG := by
   intro F _ _ Δ D hD
   obtain ⟨e, he⟩ := basePt F Δ D hD

@@ -20,8 +20,8 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Lat
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.GoodPos
 
@@ -120,8 +120,8 @@ theorem herm_smul (S : HSp D) (a b : AE D) (x y : Fin S.rank → AE D) :
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
 theorem herm_conj (S : HSp D) (x y : Fin S.rank → AE D) : cA D (hermAt S x y) = hermAt S y x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hermAt, map_sum, RingHom.map_mul, cA_cA]
+
+  simp only [hermAt, map_sum, RingHom.map_mul, cA_cA]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have : cA D (gA S j i) = gA S i j := congrFun (congrFun (adj_gA S) i) j
@@ -129,8 +129,8 @@ theorem herm_conj (S : HSp D) (x y : Fin S.rank → AE D) : cA D (hermAt S x y) 
 
 theorem herm_rat (S : HSp D) (z : Fin S.rank → D.host.E) :
     hermAt S (ratV z) (ratV z) = incA D (star z ⬝ᵥ S.gram *ᵥ z) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hermAt, dotProduct, mulVec, Finset.mul_sum, map_sum, RingHom.map_mul, mul_assoc]
+
+  simp only [hermAt, dotProduct, mulVec, Finset.mul_sum, map_sum, RingHom.map_mul, mul_assoc]
   rfl
 
 theorem rat_mulVec {m n : ℕ} (M : Matrix (Fin m) (Fin n) D.host.E) (z : Fin n → D.host.E) :

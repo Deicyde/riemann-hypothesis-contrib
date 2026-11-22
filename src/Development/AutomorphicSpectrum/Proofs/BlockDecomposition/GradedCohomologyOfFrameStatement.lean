@@ -8,7 +8,7 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 open CategoryTheory CrystallineSemistableComparison CrystallineSemistableComparison.Pb
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.graded_cohomology_of_frame : ∀ {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] {Φ : PDF R C} {Fil : ℤ → IdF Φ.A}
     (hF : IsFil Φ Fil) (E : CrystallineSemistableComparison.Pb.Frame Φ 0)
     (σ : ∀ T : C, E.D ⟶ T) (r : ℤ) (j : ℕ),

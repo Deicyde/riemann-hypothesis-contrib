@@ -4,7 +4,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 open IsLocalRing Filter Topology in
 theorem UpperTheory.V.Pr.linClosedOfAdic :
     UpperTheory.V.Pr.LinClosedOfAdic := by
@@ -82,8 +82,8 @@ theorem UpperTheory.V.Pr.linClosedOfAdic :
         mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     have hmem : K.mkQ (y g - y g0) ∈
         (maximalIdeal A ^ N • ⊤ : Submodule A ((Fin n × Fin n → A) ⧸ K)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hsum, map_sum]
+
+      rw [hsum, map_sum]
       refine Submodule.sum_mem _ fun p _ => ?_
       rw [LinearMap.map_smul]
       exact Submodule.smul_mem_smul (hd p) Submodule.mem_top

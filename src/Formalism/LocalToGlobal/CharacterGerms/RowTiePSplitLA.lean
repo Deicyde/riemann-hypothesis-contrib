@@ -128,9 +128,9 @@ theorem coeff_extract [CharZero K] {ι : Type} [Fintype ι] [DecidableEq ι] (B 
     have hroot : ∀ t : ℕ, q.eval (t : K) = 0 := by
       intro t
       have h1 := congrFun (h t) i
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hev t, eval_eq_sum_range' (n := R.natDegree + 2) (by omega), map_sum, Matrix.sum_mulVec,
-        Finset.sum_apply, Pi.zero_apply] at h1
+
+      rw [← hev t, eval_eq_sum_range' (n := R.natDegree + 2) (by omega), map_sum, Matrix.sum_mulVec,
+      Finset.sum_apply, Pi.zero_apply] at h1
       rw [hq, eval_finsetSum]
       refine Eq.trans (Finset.sum_congr rfl fun k _ => ?_) h1
       rw [eval_monomial, ← map_pow, map_mul, aeval_C, ← Algebra.commutes, alg_mulVec, Pi.smul_apply, smul_eq_mul,
@@ -175,9 +175,9 @@ theorem split_holds : SplitSt := by
     by_contra hne
     exact hx0 c c' hne h
   refine ⟨fun c => P *ᵥ (aeval (M x0) (Lagrange.basis Finset.univ (fun c => em c x0) c) *ᵥ v), ?_, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [← Matrix.mulVec_sum, ← Matrix.sum_mulVec, ← map_sum, Lagrange.sum_basis hinjl Finset.univ_nonempty, map_one,
-      Matrix.one_mulVec]
+
+  · rw [← Matrix.mulVec_sum, ← Matrix.sum_mulVec, ← map_sum, Lagrange.sum_basis hinjl Finset.univ_nonempty, map_one,
+    Matrix.one_mulVec]
   intro c x
   set u := aeval (M x0) (Lagrange.basis Finset.univ (fun c => em c x0) c) *ᵥ v with hu
   have hP0 : Commute P (M x0) := hPM x0

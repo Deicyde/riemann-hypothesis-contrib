@@ -277,8 +277,8 @@ theorem _root_.GlobalTheory.SmoothForms.SecondKind.sm_iff (H : _root_.GlobalTheo
       have hd := (hΨ.differentiableAt (by simp)).hasFDerivAt
       have heq : (e : (Fin (Fintype.card b) → ℝ) →L[ℝ] L) = fderiv ℝ Ψ 0 := by
         ext1 v
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← Finset.univ_sum_single v, map_sum, map_sum]
+
+        rw [← Finset.univ_sum_single v, map_sum, map_sum]
         simp only [ContinuousLinearEquiv.coe_coe, he, hsingle]
       rw [heq]
       exact hd

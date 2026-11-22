@@ -17,8 +17,8 @@ open MvPolynomial Finset
 
 theorem FlagPowerSumSymmetric.proof : FlagPowerSumSymmetric.Statement := by
   intro f N k τ w
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [blockPowerSum, map_sum, map_pow, Flag.blockPermute_X]
+
+  simp only [blockPowerSum, map_sum, map_pow, Flag.blockPermute_X]
   exact Equiv.sum_comp (w τ) (fun i => (X (τ, i) : RootRing f N) ^ k)
 
 end RestTerms

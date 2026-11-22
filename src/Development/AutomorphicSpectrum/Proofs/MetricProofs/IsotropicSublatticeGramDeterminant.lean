@@ -259,8 +259,8 @@ theorem det_gram_index (f : Λ →+ Λ →+ ℝ) {I : Submodule (𝓞 E) Λ} {ρ
         M.map (Int.cast : ℤ → ℝ) := by
     ext p q
     rw [Matrix.of_apply, hexp p, hexp q]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_zsmul, AddMonoidHom.finsetSum_apply, AddMonoidHom.coe_smul, Pi.smul_apply]
+
+    simp only [map_sum, map_zsmul, AddMonoidHom.finsetSum_apply, AddMonoidHom.coe_smul, Pi.smul_apply]
     simp only [zsmul_eq_mul, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply,
       Matrix.submatrix_apply, Matrix.of_apply, Finset.sum_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_

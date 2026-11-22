@@ -58,8 +58,8 @@ theorem cmb_eq_sum (b : Basis κ K V) (c : κ → 𝓞 K) : cmb b c = ∑ i, c i
   rw [crd_cmb]
   have : crd b (∑ i, c i • cmb b (Pi.single i 1)) = ∑ i, c i • crd b (cmb b (Pi.single i 1)) := by
     unfold crd
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => map_smul _ _ _
   rw [this]
   funext l
@@ -75,15 +75,15 @@ theorem end_apply_cmb {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] (b : Basis κ K V) 
     show crd b _ = crd b _
     have : crd b (∑ i, c i • cmb b fun l => Y l i) = ∑ i, c i • crd b (cmb b fun l => Y l i) := by
       unfold crd
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun i _ => map_smul _ _ _
     rw [this, crd_cmb]
     funext l
     simp [crd_cmb, mulVec, dotProduct, mul_comm]
   rw [h1, cmb_eq_sum b c]
   simp only [← Submodule.mkQ_apply] at hXY ⊢
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, hXY]
+
+  simp only [map_sum, map_smul, hXY]
 
 end Formalism.HermitianLattices.Ext.L3.HU

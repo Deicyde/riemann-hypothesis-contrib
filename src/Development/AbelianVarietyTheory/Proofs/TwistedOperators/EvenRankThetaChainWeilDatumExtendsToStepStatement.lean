@@ -26,6 +26,6 @@ open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.EvenOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.evenRankThetaChain_weilDatum_extends_to_step : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.HarishChandraModules → GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Published.CasselmanWallach → ∀ D : D7, StepEx D := by
   first | exact @GlobalTheory.EvenOnto.StepExists.stepEx | exact GlobalTheory.EvenOnto.StepExists.stepEx | (intros; apply GlobalTheory.EvenOnto.StepExists.stepEx <;> assumption)

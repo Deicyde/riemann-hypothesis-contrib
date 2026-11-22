@@ -81,8 +81,8 @@ theorem bt_pgsh : ∀ (R C : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [Fi
               = ((∑ j, b.repr ⟨g, hg⟩ j • b j : A) : Multiplicative N → R) := congrArg Subtype.val hg'
           rw [AddSubmonoidClass.coe_finsetSum] at h4
           exact h4
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hgs, map_sum]
+
+        rw [hgs, map_sum]
         refine Submodule.sum_mem _ fun j _ => ?_
         rw [map_smul]
         exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)

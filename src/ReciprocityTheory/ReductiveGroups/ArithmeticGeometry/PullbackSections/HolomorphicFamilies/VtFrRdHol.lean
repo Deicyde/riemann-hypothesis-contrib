@@ -61,7 +61,7 @@ variable {g : ℕ} {X Y : Scheme.{0}} (f : Y ⟶ X) (u : Sp ℂ ⟶ X) (e : (Fin
 def vtfLift (z : Fin g → ℂ) : Sp ℂ ⟶ pullback f u :=
   pullback.lift (e z) (𝟙 _) (by rw [he z, Category.id_comp])
 
-set_option maxHeartbeats 800000 in
+
 theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullback f u, V))
     (z0 : Fin g → ℂ) (hz0 : ⊤ ≤ vtfLift f u e he z0 ⁻¹ᵁ V) :
     ∃ N : Set (Fin g → ℂ), IsOpen N ∧ z0 ∈ N ∧ (∀ z ∈ N, ⊤ ≤ vtfLift f u e he z ⁻¹ᵁ V) ∧

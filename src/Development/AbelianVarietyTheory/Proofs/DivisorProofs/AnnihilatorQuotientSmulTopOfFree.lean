@@ -71,8 +71,8 @@ theorem free_of_free_quotient {B M : Type} [CommRing B] [IsLocalRing B] [IsNoeth
     intro c
     rw [hφ]
     change Submodule.mkQ P (∑ i, c i • v i) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_smul, hv i, ← Ideal.Quotient.algebraMap_eq, algebraMap_smul]
   have hsurj : LinearMap.range φ = ⊤ := by

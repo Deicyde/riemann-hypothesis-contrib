@@ -36,8 +36,8 @@ theorem mem_smul_of_sum_eigenvectors {O V ι α : Type*} [CommRing O] [AddCommGr
           · right
             refine ⟨e', fun j => ?_, hu'⟩
             rw [he' i, ← sub_smul, map_smul, he' j, smul_comm]
-        set_option synthInstance.maxHeartbeats 100000 in
-          · rw [hx, map_add (f := _), smul_add, he i, map_sum, Finset.smul_sum, Finset.sum_sub_distrib]; abel
+
+        · rw [hx, map_add (f := _), smul_add, he i, map_sum, Finset.smul_sum, Finset.sum_sub_distrib]; abel
         · have h2 : T j (T i x - e i • x) - ev j • (T i x - e i • x) =
               (ev i - e i) • (T j x - ev j • x) + (T j (T i x - ev i • x) - ev j • (T i x - ev i • x)) := by
             simp only [map_sub, map_smul]

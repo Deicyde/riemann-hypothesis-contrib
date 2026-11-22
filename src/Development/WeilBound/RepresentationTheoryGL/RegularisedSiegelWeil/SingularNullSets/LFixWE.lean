@@ -8,8 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SelfDualLatt
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 open scoped Matrix NNReal TensorProduct
 open IsDedekindDomain NumberField Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum GlobalTheory.AdelicU

@@ -229,8 +229,8 @@ theorem hat_mulVec {Y : Matrix ι ι K⟦X⟧} (hY : ∀ i j, Y i j ∈ RpiE O K
       ∑ j, hat O l e (Y i j) * algebraMap _ _ (toHat O K l e ⟨m j, hm j⟩) := by
   have : (Y *ᵥ m) i = ((∑ j, ⟨Y i j, hY i j⟩ * ⟨m j, le_away _ _ (hm j)⟩ : RpiE O K l e) : K⟦X⟧) := by
     simp [Matrix.mulVec, dotProduct]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, hat_coe, map_sum]
+
+  rw [this, hat_coe, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, hat_of_mem l e (hY i j),
     toHatE_eq l e (f := ⟨m j, le_away _ _ (hm j)⟩) (g := ⟨m j, hm j⟩) rfl]

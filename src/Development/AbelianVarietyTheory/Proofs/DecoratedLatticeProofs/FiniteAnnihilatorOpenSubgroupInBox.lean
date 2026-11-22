@@ -65,12 +65,12 @@ theorem symplO_extX_extY_single (S S₀ T : HSp D) {ρ : ℕ} (d : HypDec S S₀
   rw [h, pairS, ha, Matrix.trace_single_mul, smul_eq_mul]
   ring_nf
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem map_finPart_mul_map {n m : ℕ} (M : Mx D n n) (c : AE D) (z : Mx D n m)
     (hz : ∀ i j, finPart D (z i j) = 0) : (M ⬝ z.map (fun w => c * w)).map (finPart D) = 0 := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.map_apply, Matrix.mul_apply, map_sum (finPart D), Matrix.zero_apply]
+
+  rw [Matrix.map_apply, Matrix.mul_apply, map_sum (finPart D), Matrix.zero_apply]
   refine Finset.sum_eq_zero fun l _ => ?_
   rw [Matrix.map_apply, RingHom.map_mul, RingHom.map_mul, hz l j, mul_zero, mul_zero]
 

@@ -68,8 +68,8 @@ theorem galOCr_iC_taylor {l : ℕ} [Fact l.Prime] {a : ℕ} [NeZero a] {e : ℕ}
   refine ⟨Finset.univ.sup N, fun n hn => ?_⟩
   choose z hz using fun τ => hN τ n ((Finset.le_sup (Finset.mem_univ τ)).trans hn)
   refine ⟨∑ τ, idem (constC t) τ * z τ, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [PiSys.iC, glue_apply, map_sum, map_mul, galOCr_idem, Finset.mul_sum]
+
+  simp only [PiSys.iC, glue_apply, map_sum, map_mul, galOCr_idem, Finset.mul_sum]
   rw [Finset.sum_comm, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun τ _ => ?_
   rw [mul_left_comm, ← hz τ, mul_sub, Finset.mul_sum]
@@ -90,8 +90,8 @@ theorem coord_desc {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist 
       (P.mxInv τ *ᵥ (∑ x ∈ s, w x) τ) i = ∑ x ∈ s, (P.mxInv τ *ᵥ w x τ) i := fun s w => by
     rw [Finset.sum_apply, Matrix.mulVec_sum, Finset.sum_apply]
   conv_lhs => rw [desc_eq, P.eq_sum_phi_bas m]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hΦs, map_sum, hΦsum, Finset.mul_sum]
+
+  rw [hΦs, map_sum, hΦsum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [nabla_pow_smul, hΦsum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun p hp => ?_
@@ -131,8 +131,8 @@ theorem taylor_of_basis {l : ℕ} [Fact l.Prime] {a e : ℕ} [NeZero a] [NeZero 
       simp only [Finset.sum_apply, Pi.mul_apply, Pi.natCast_apply, AddSubmonoidClass.coe_finsetSum,
         MulMemClass.coe_mul, SubringClass.coe_natCast, hcj]
     rw [toCris_apply, h1]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, map_natCast]
+
+    simp only [map_sum, map_mul, map_natCast]
   have key : ∀ p : ι × ι, ∃ n₀, ∀ n ≥ n₀, (l : OCr l O) ^ r ∣
       galOCr O (g : GQ l) (ϖ.iC t K (c p.2)) * toOCr l O (Γ p.1 p.2) -
         ∑ k ∈ Finset.range n, ∑ q ∈ Finset.range (k + 1),

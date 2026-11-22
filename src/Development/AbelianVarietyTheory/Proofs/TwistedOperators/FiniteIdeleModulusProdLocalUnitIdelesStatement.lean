@@ -11,7 +11,7 @@ open IsDedekindDomain NumberField MeasureTheory Matrix ValuativeRel GlobalTheory
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.TopLevelInv
 open Formalism.IndefR.Fin.LevelGroupLemmas (resG detAt)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finiteIdeleModulus_prod_localUnitIdeles : ∀ {D : D7} (P : Finset (Pl D.host.E)) (y : ∀ w : P, (Kw w.1)ˣ),
     (∀ w, valuation (Kw w.1) (y w : Kw w.1) = 1) →
     GlobalTheory.IndefiniteRowSideFullHecke.SplitLinearModelNorm.absFin D (∏ w : P, GlobalTheory.LFun.locIdele D.host.F w.1 (y w)) = 1 := by

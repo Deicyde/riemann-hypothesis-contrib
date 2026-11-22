@@ -101,9 +101,9 @@ lemma theta₁_res_coeff
   | add z z' _ _ hz hz' =>
     simp only [map_add (f := _), PolynomialModule.coeff_add, Finsupp.add_apply, hz, hz']
   | smul s z _ hz =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Scheme.Modules.map_smul, theta₁_smul, theta₁_smul, reesRingHom_res hle hV hV',
-      PolynomialModule.smul_apply, PolynomialModule.smul_apply, map_sum]
+
+    rw [Scheme.Modules.map_smul, theta₁_smul, theta₁_smul, reesRingHom_res hle hV hV',
+    PolynomialModule.smul_apply, PolynomialModule.smul_apply, map_sum]
     refine Finset.sum_congr rfl fun x _ => ?_
     rw [Polynomial.coeff_map, hz, resF_smul]
 

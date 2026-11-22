@@ -76,8 +76,8 @@ def tensComp (C : Type) [AddCommGroup C] [Module Qp C] :
       simp only [LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.id_apply,
         LinearMap.proj_apply, LinearMap.pi_apply, AlgebraTensorModule.map_tmul,
         LinearMap.single_apply, LinearEquiv.coe_coe]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← sum_tmul, ← map_sum, Finset.univ_sum_single, E.symm_apply_apply])
+
+      rw [← sum_tmul, ← map_sum, Finset.univ_sum_single, E.symm_apply_apply])
 
 theorem tensComp_map {C D : Type} [AddCommGroup C] [Module Qp C] [AddCommGroup D] [Module Qp D]
     (φ' : V' →ₗ[LL] V') (φ : ∀ i, V i →ₗ[LL] V i) (h : ∀ x i, E (φ' x) i = φ i (E x i)) (ψ : C →ₗ[Qp] D)

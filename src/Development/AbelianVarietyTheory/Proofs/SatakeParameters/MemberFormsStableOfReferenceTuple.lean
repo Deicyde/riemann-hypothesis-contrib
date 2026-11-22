@@ -17,8 +17,8 @@ theorem fi_eq_range' {R : Ranks} {LL : Type} [Field LL] [NumberField LL] [StarRi
   · rw [← (M.emb_basis j).2]
     exact Submodule.span_mono (by rintro _ ⟨a, rfl⟩; exact ⟨_, rfl⟩)
   · rintro _ ⟨x, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← (M.emb_basis j).2, ← (M.lat j).b.sum_repr x, map_sum]
+
+    rw [← (M.emb_basis j).2, ← (M.lat j).b.sum_repr x, map_sum]
     refine Submodule.sum_mem _ fun a _ => ?_
     rw [LinearMap.map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)

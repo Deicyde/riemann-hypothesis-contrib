@@ -149,8 +149,8 @@ theorem frob_of (h1 : LiftMonomialDeterminantStatement) (h2 : FrobeniusBlockStat
         rw [dite_eq_right h]
         simp [c, h]
     show algebraMap R C ((y : Ix g → R) k) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hyk, map_sum]
+
+    rw [hyk, map_sum]
     simp only [linX, coefX, Matrix.mulVec_sum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [← algebraMap_smul C (w b), Matrix.mulVec_smul, Pi.smul_apply, smul_eq_mul, map_mul,

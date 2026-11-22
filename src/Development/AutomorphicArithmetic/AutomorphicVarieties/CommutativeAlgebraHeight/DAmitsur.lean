@@ -108,8 +108,8 @@ private theorem am_univ (k N : ℕ) :
       obtain ⟨c, w, hw', rfl⟩ := hu
       rw [map_zsmul, hw, hx w (by omega), smul_zero]
   have := congrArg (FreeAlgebra.lift ℤ x) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_add (f := _), h0, add_zero, map_one, map_sum, amP, map_list_prod, List.map_map] at this
+
+  rw [map_add (f := _), map_add (f := _), h0, add_zero, map_one, map_sum, amP, map_list_prod, List.map_map] at this
   simp only [FreeAlgebra.lift_ι_apply] at this
   rw [this, amP]
   congr 1
@@ -231,15 +231,15 @@ theorem UpperTheory.V.CA.d_amitsur :
       Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span ⟨amWt w, by simpa [amWt_degree] using hw, rfl⟩)
     rw [am_lift, this, zero_tmul]
   have h2 : π (D.D (MvPolynomial (Fin k) A) (1 + Det.gen x)) = π (MvPolynomial.map φ (L.map (amF n)).prod) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← D.nat, map_add (f := _), map_one, Det.gen, map_sum]
+
+    rw [← D.nat, map_add (f := _), map_one, Det.gen, map_sum]
     simp only [Algebra.TensorProduct.map_tmul, AlgHom.id_apply]
     rw [h1, amP, map_list_prod, map_list_prod, map_list_prod, List.map_map, List.map_map, List.map_map]
     congr 1
     refine List.map_congr_left fun p _ => ?_
     simp only [Function.comp]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [am_lift, smul_tmul', am_one, amF, map_add (f := _), map_add (f := _), map_one (MvPolynomial.map φ), map_one π, map_sum, map_sum]
+
+    rw [am_lift, smul_tmul', am_one, amF, map_add (f := _), map_add (f := _), map_one (MvPolynomial.map φ), map_one π, map_sum, map_sum]
     congr 1
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← map_zsmul, ← map_pow, ← π.commutes, ← map_mul]

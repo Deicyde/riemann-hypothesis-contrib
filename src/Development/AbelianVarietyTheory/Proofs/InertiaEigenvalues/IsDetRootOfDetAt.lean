@@ -21,8 +21,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.InvNatP
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix GlobalTheory.ExportSeries
 open Formalism.L2.NTheta (IsIdemAt IsHeckeElt)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 noncomputable section
 
 namespace GlobalTheory.DistRel
@@ -69,10 +69,10 @@ theorem unram_at_gen {A : Type} [CommGroup A] {χ : (AE D)ˣ →* A} {Q S' : Fin
     ring
   refine hχ y hinf (key _ h1 h2) (key _ h1' h3) ?_
   have h0 : idemAt P * (idem Q + cA D (idem Q)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mul_add, idem, map_sum, Finset.mul_sum, Finset.mul_sum,
-      Finset.sum_eq_zero fun j hj => hS.mul_eq_zero hP (hQ hj) fun e => hn (e ▸ hj),
-      Finset.sum_eq_zero fun j hj => hS.mul_conj hP (hQ hj), add_zero]
+
+    rw [mul_add, idem, map_sum, Finset.mul_sum, Finset.mul_sum,
+    Finset.sum_eq_zero fun j hj => hS.mul_eq_zero hP (hQ hj) fun e => hn (e ▸ hj),
+    Finset.sum_eq_zero fun j hj => hS.mul_conj hP (hQ hj), add_zero]
   linear_combination (idem Q + cA D (idem Q)) * h1 + ((y : AE D) - 1) * h0
 
 end GlobalTheory.DistRel
@@ -103,8 +103,8 @@ theorem fock_sum {F : Frame S T} (hF : F.Good) {ι : Type} (s : Finset ι) (f : 
 theorem series_sum {F : Frame S T} (hF : F.Good) (ω : PairRep S T) {ι : Type} (s : Finset ι) (f : ι → WO S T → ℂ)
     (hf : ∀ i, IsThetaFunO F.ψ S T (f i)) (h : GA D S) (Pol : PolF D T.rank S.rank) (g : GA D T) :
     series F ω (∑ i ∈ s, f i) h Pol g = ∑ i ∈ s, series F ω (f i) h Pol g := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [series_apply, (fock_sum hF s f hf Pol).2, map_sum, Finset.sum_apply]
+
+  simp only [series_apply, (fock_sum hF s f hf Pol).2, map_sum, Finset.sum_apply]
 
 theorem series_smul (F : Frame S T) (ω : PairRep S T) (c : ℂ) (f : WO S T → ℂ) (h : GA D S) (Pol : PolF D T.rank S.rank)
     (g : GA D T) : series F ω (c • f) h Pol g = c * series F ω f h Pol g := by
@@ -157,8 +157,8 @@ theorem vecAt_sum (B : Base S T) {Q : Finset (Pl D.host.E)} {P : Pl D.host.E} (h
       B.vecAt Q (fun PP y => if PP.1 = P then ∑ c, Φ PP.1 c y else Φ PP.1 (b PP) y) := by
   have e1 : ∀ φ : ∀ PP : ↥Q, Matrix (Fin T.rank) (Fin S.rank) (kP PP.1) → ℂ,
       B.vecAt Q φ = B.F.vecL B.G (B.de.Q ∪ Q) (B.locFn Q φ) := fun φ => rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [e1, ← map_sum]
+
+  simp only [e1, ← map_sum]
   congr 1
   funext y
   rw [Finset.sum_apply]

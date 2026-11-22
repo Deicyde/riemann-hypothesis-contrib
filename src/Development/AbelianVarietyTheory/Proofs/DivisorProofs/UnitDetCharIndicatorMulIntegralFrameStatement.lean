@@ -20,7 +20,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (InId IsUnitDet un
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.StdRead
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.unitDetCharIndicator_mul_integralFrame : ∀ {D : D7} (ν : (AE D)ˣ →* Circle) (e : AE D), e * e = e → toEAf D e ∈ Formalism.L2.Herm.intAf D.host.F D.host.E →
   ∀ {k : ℕ} (N : Matrix (Fin k) (Fin k) (EAf D)) (β : GL (Fin k) (EAf D)), IsIntM β.val → IsIntM (β⁻¹).val →
   unitChar ν e (HMul.hMul N β.val) = unitChar ν e N * unitChar ν e β.val := by

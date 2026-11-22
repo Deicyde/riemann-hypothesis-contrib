@@ -61,9 +61,9 @@ private theorem intS'_comp_continuousLinearMap {q : ℕ} (ω : V → V [⋀^Fin 
   unfold intS'
   apply setIntegral_congr_fun (isClosed_simplex_fin_sum_le_one q).measurableSet
   intro t _
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ContinuousAlternatingMap.compContinuousLinearMap_apply, map_add (f := _), map_sum, map_smul,
-    map_sub, Function.comp_def]
+
+  simp only [ContinuousAlternatingMap.compContinuousLinearMap_apply, map_add (f := _), map_sum, map_smul,
+  map_sub, Function.comp_def]
 
 private theorem kf_eta_congr_of_eq_on_initial_of_pDep (hD : PDep A φ) {k : ℕ} (c : (Fin (k + 2) → Γ) → ℝ) (j : ℕ)
     (σ σ' : ℕ → Γ) (h : ∀ m, m + j ≤ k → σ m = σ' m) :

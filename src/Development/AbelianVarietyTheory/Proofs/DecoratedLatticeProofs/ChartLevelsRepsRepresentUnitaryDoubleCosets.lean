@@ -50,7 +50,7 @@ theorem lift_mem (e : ↥(GfC V) ≃* ↥(UPts (sigD D) (V.gram.reindex (finCong
 
 
 include hU hh in
-set_option maxHeartbeats 1000000 in
+
 theorem reps_of_chart (hy : Function.Bijective (fun c => (Quotient.mk'' (y c) : Cls S))) : IsReps V U h := by
   letI := tensTopL (F := D.host.F) (E := D.host.E) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)
   obtain ⟨e, he⟩ := GlobalTheory.FinPartIso.exists_finIso D V n hn
@@ -137,7 +137,7 @@ variable {D : D7} (V : HSp D) {n : ℕ} (hn : V.rank = n) {T f : ℕ} {bad : Set
 
 
 include hU hh in
-set_option maxHeartbeats 1000000 in
+
 theorem stabOrd_of_chart {stab : cl → Type} [∀ c, Group (stab c)]
     (stabI : ∀ c, stab c →* UJ (sigD D : D.host.E →+* D.host.E) (V.gram.reindex (finCongr hn) (finCongr hn)))
     (hinj : ∀ c, Function.Injective (stabI c))
@@ -179,7 +179,7 @@ theorem stabOrd_of_chart {stab : cl → Type} [∀ c, Group (stab c)]
 end Gen2
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem twDat_reps : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)), ∀ (u : B.Word) (a : I.ι) (Ch : ℕ → Type) (A : TwDat I l Z u a Ch), A.Is → ∀ (i : ℕ) (hi : i ≤ B.R.m) β, IsReps ((I.rec7 l Z).sp.X i) (A.U i β) (A.h i β) ∧ (Continuous fun κ => ((A.chi i β κ : ℂˣ) : ℂ)) ∧ ∀ c, stabOrd (A.U i β) (A.h i β c) = Nat.card ((I.chain l u a).stab i c.1) := by
   intro B X I hOk hP l Z u a Ch A hA i hi β
   exact ⟨reps_of_chart _ (rankN (I.rec7 l Z) i hi) (A.K i hi β).lev (A.K i hi β).y (A.U i β) (hA.U i hi β) (A.h i β)

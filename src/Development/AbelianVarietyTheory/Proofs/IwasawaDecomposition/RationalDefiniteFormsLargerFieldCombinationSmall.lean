@@ -31,13 +31,13 @@ private theorem span_of_bc {K L : Type} [Field K] [NumberField K] [StarRing K] [
   obtain ⟨m, a, g, hg⟩ := Submodule.mem_span_set'.1 (b.mem_span_lift F φ')
   choose ψ hψ using fun k => (g k).2
   refine ⟨m, a, fun k => r (ψ k), heq_of_eq ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← hg, map_sum, map_sum]
+
+  rw [← hg, map_sum, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, LinearMap.map_smulₛₗ, ← hψ k, eq_of_heq (h (ψ k))]
 
 
-set_option maxHeartbeats 4000000 in
+
 private theorem exists_bc {B B' : Base} {f : Fr B.toPre} {f' : Fr B'.toPre} {T : TwDat B} {T' : TwDat B'} (w : ColW B f T)
     (w' : ColW B' f' T') (Wt : Set B.places.Pl) (Wt' : Set B'.places.Pl) (hE : Enl0 B B') (hf : HEq f' f) (hpx : HEq w'.px w.px)
     (k k' : ℕ) (hk : k' = k) (φ : B.LL →+* B'.LL) (hφ : ∀ x, B'.embLL (φ x) = B.embLL x) :
@@ -86,7 +86,7 @@ private theorem exists_bc {B B' : Base} {f : Fr B.toPre} {f' : Fr B'.toPre} {T :
     exact e1.trans e2.symm
 
 
-set_option maxHeartbeats 2000000 in
+
 private theorem gf_eq {B B' : Base} {f : Fr B.toPre} {f' : Fr B'.toPre} {T : TwDat B} {T' : TwDat B'} {w : ColW B f T}
     {w' : ColW B' f' T'} (Z : w.Lt) (Z' : w'.Lt) (h : B'.toPre = B.toPre) (i : Fin (w.st Z).toD7.R.m)
     (i' : Fin (w'.st Z').toD7.R.m) (hi : (i : ℕ) = i') :
@@ -101,7 +101,7 @@ private theorem gf_eq {B B' : Base} {f : Fr B.toPre} {f' : Fr B'.toPre} {T : TwD
 
 end GlobalTheory.Mem.R3.Rw.JSpanPf
 
-set_option maxHeartbeats 4000000 in
+
 theorem _root_.GlobalTheory.T.rationalDefiniteForms_largerField_combination_smallerField : ∀ {B B' : Base} {f : Fr B.toPre} {f' : Fr B'.toPre} {T : TwDat B} {T' : TwDat B'} {w : ColW B f T} {w' : ColW B' f' T'}
   {Z : w.Lt} {Z' : w'.Lt} {hX : B.fields.Ok} {hX' : B'.fields.Ok} {Wt : Set B.places.Pl}
   {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks (w'.st Z').toD7.what₂.LL] {Xg : Finset (Gc B' w'.px → B'.LL)} {tr : TrI B' w'.px}

@@ -104,8 +104,8 @@ theorem omega_eq (hB : B.IsGood σ) (u u' : Matrix (Fin n) (Fin d) (AE F E)) : o
     change InfinitePlace.Completion.extensionEmbedding w ((1 : AF F).1 w) * (B.emb w).1 x = _
     change InfinitePlace.Completion.extensionEmbedding w 1 * _ = _
     rw [map_one, one_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hTens, neg_one_mul, map_neg, map_sum, map_mul, hconj, incM, Matrix.map_apply, hincl, cj, Complex.star_def]
+
+  simp only [hTens, neg_one_mul, map_neg, map_sum, map_mul, hconj, incM, Matrix.map_apply, hincl, cj, Complex.star_def]
   rfl
 
 def Rel (B : Base F E) (X : Spc F E n) (W : Spc F E d) (e : InfinitePlace F → ℤˣ) (u u' : Matrix (Fin n) (Fin d) (AE F E)) : Prop :=

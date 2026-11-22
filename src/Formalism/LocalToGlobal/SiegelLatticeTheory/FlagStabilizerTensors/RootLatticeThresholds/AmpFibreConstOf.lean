@@ -149,7 +149,7 @@ theorem sinf_of_fix {x : X.B.I.GA} {c : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hx 
 theorem norm_chiN (κ : X.B.I.Gf) : ‖chiN X κ‖ = 1 := by
   exact Formalism.L2.SG.TermOp.KExpCut.psiUnit X _
 
-set_option maxHeartbeats 1000000 in
+
 private theorem exists_isSFund_ROinf_of_toTerm_eq (hR : RatPt) {s s' : TT Y u u'} (h : s.toTerm = s'.toTerm)
     (hs : ∃ Ω, IsSFund X.B.I (ROinf s) Ω) : ∃ Ω, IsSFund X.B.I (ROinf s') Ω := by
   obtain ⟨c, hcI, hcg, hcfix, n, hn, ν, hν, hlin⟩ := fib_c h

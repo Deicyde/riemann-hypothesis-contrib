@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AeEqOfDenseOf
 @[expose] public section
 
 open MeasureTheory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.ae_eq_of_dense_of_local_sq_bound_alt : ∀ {X : Type} [MeasurableSpace X] (μ : Measure X) (K : ℕ → Set X),
     (∀ n, MeasurableSet (K n)) → ⋃ n, K n = Set.univ →
     ∀ {H : Type} [NormedAddCommGroup H] [NormedSpace ℂ H] {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]

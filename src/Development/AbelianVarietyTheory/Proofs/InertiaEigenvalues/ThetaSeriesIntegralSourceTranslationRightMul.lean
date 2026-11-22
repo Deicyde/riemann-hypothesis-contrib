@@ -14,8 +14,8 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ExportSeries.DualType
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SourceTrans
 
@@ -31,8 +31,8 @@ theorem idem_mul_idemAt {Q : Finset (Pl D.host.E)} (hQ : SplitSet Q) {PP : Pl D.
     rw [idem, Finset.sum_mul]
     exact Finset.sum_eq_zero fun q hq => hQ.mul_conj hq hP
   have h3 : cA D (idem Q) * idemAt PP = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [idem, map_sum, Finset.sum_mul]
+
+    rw [idem, map_sum, Finset.sum_mul]
     exact Finset.sum_eq_zero fun q hq => by rw [mul_comm]; exact hQ.mul_conj hP hq
   have h4 : cA D (idem Q) * cA D (idemAt PP) = cA D (idemAt PP) := by rw [← map_mul, h1]
   rw [add_mul, mul_add, mul_add, h1, h2, h3, h4, add_zero, zero_add]
@@ -58,7 +58,7 @@ open Formalism.MainNotions.S Formalism.IndefR.Mult Formalism.IndefR.Lev GlobalTh
 variable {D : D7}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_local_lift' {V : HSp D} {β : GL (Fin V.rank) (Lev.EAf D)}
     {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} (hf : IsFrame β Λ) (hsd : HatSelfDual D.sp.cm.sig V.gram Λ)
     {P : Pl D.host.E} {e : Formalism.L2.Theta.AE D} (he : IsIdemAt e P) (k : GL (Fin V.rank) (kP P)) :

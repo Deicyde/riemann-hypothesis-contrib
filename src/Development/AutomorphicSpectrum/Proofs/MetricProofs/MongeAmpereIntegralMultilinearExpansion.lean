@@ -44,8 +44,8 @@ theorem mdisc_sum_smul {D : ℕ} {σ : Type*} [Fintype σ] (H : σ → Matrix (F
     intro A k c B
     simpa only [RingHom.id_apply, smul_eq_mul] using
       (_root_.ReciprocityTheory.AnForm.A.mdisc_update_smul A k c B))
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← hM, M.map_sum]
+
+  rw [← hM, M.map_sum]
   refine Finset.sum_congr rfl fun w _ => ?_
   simp only [M.map_smul_univ, RingHom.id_apply, smul_eq_mul]
 

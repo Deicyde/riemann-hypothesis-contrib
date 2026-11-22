@@ -54,8 +54,8 @@ theorem crisMap_φ {V V' : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [I
 
 theorem dv_succ (T : LocLat G Qp LL O) (e : ℕ) {d : ℕ} (b : Fin d → W.DD T) (c₀ : Fin d → LL) :
     dv W T (e + 1) b c₀ = φVB PD (LL := LL) (V := T.V) (dv W T e b c₀) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dv, map_sum, map_smul, pow_succ', Module.End.mul_apply]
+
+  simp only [dv, map_sum, map_smul, pow_succ', Module.End.mul_apply]
 
 theorem dvO_succ (T : LocLat G Qp LL O) (e : ℕ) {d : ℕ} (b : Fin d → W.DD T) (c₀ : Fin d → O) :
     dvO W T (e + 1) b c₀ = φVB PD (LL := LL) (V := T.V) (dvO W T e b c₀) :=
@@ -80,8 +80,8 @@ theorem dv_eq_sum (T : LocLat G Qp LL O) (e : ℕ) {d : ℕ} (b : Fin d → W.DD
 theorem dvO_lin (T : LocLat G Qp LL O) (e : ℕ) {d : ℕ} (b : Fin d → W.DD T) {I : Type} (s : Finset I)
     (a : I → O) (c₀ : I → Fin d → O) :
     dvO W T e b (fun m => ∑ i ∈ s, a i * c₀ i m) = ∑ i ∈ s, algebraMap O LL (a i) • dvO W T e b (c₀ i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dvO, dv, map_sum, map_mul, Finset.smul_sum, Finset.sum_smul, smul_smul]
+
+  simp only [dvO, dv, map_sum, map_mul, Finset.smul_sum, Finset.sum_smul, smul_smul]
   rw [Finset.sum_comm]
 
 theorem dvO_smul (T : LocLat G Qp LL O) (e : ℕ) {d : ℕ} (b : Fin d → W.DD T) (x : O) (c₀ : Fin d → O) :

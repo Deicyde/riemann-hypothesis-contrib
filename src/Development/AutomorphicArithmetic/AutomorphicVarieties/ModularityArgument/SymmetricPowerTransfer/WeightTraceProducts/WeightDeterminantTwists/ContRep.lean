@@ -68,8 +68,8 @@ theorem UpperTheory.V.Z.Sym.Wt.contRep :
   refine ⟨fun j x f => ?_, fun n e x f => ?_⟩
   · have hsplit : (fun g => f (repG I j g x)) = fun g => ∑ S, f (Pi.single S (repG I j g x S)) := by
       funext g
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum, Finset.univ_sum_single]
+
+      rw [← map_sum, Finset.univ_sum_single]
     rw [hsplit]
     refine continuous_finsetSum _ fun S _ => ?_
     have hent : ∀ (k : I × Bool) (i i' : Fin 3),

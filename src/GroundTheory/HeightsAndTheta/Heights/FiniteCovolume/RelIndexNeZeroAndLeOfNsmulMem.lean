@@ -97,9 +97,9 @@ theorem mulVec_coordEquiv (γ : h.unitaryGroup) (y : W) :
   rw [coordEquiv_apply, Algebra.TensorProduct.lid_tmul, one_smul,
     show v.repr ((γ : W ≃ₗ[E] W) y) = v.repr (((γ : W ≃ₗ[E] W) : W →ₗ[E] W) y) from rfl,
     ← LinearMap.toMatrix_mulVec_repr v v, ← hM]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply, coordEquiv_apply,
-    Algebra.TensorProduct.lid_tmul, one_smul]
+
+  simp only [mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply, coordEquiv_apply,
+  Algebra.TensorProduct.lid_tmul, one_smul]
 
 variable [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 

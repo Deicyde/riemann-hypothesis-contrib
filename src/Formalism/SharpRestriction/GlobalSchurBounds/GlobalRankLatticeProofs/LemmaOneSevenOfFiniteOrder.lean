@@ -168,7 +168,7 @@ def DefiniteUnitaryFiniteOrder (D : D7) : Prop :=
       U.map (MulAut.conj y).toMonoidHom →
     IsOfFinOrder γ
 
-set_option maxHeartbeats 1000000 in
+
 theorem finiteModel_of_heckeEstimate (D : D7) (hF : DefiniteUnitaryFiniteOrder D) : division_rows_rational_lattice D := by
   intro σ hσ J hJ hD g hg hlt v hv U hU hUc _hUo Uw hUw hUUw y hy
   rw [Subgroup.eq_bot_iff_forall]

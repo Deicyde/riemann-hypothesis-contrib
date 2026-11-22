@@ -64,8 +64,8 @@ theorem sum_eq_degree (s : ι →₀ ℕ) : (s.sum fun _ e => e) = s.degree := b
 theorem paPF_eq_sum (p : MvPolynomial ι ℂ) :
     paPF p = ∑ m ∈ p.support, p.coeff m • paMono m := by
   funext v
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [paPF, p.as_sum, map_sum]
+
+  conv_lhs => rw [paPF, p.as_sum, map_sum]
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, paMono, paPF, MvPolynomial.eval_monomial]
   refine Finset.sum_congr rfl fun m _ => by ring
 

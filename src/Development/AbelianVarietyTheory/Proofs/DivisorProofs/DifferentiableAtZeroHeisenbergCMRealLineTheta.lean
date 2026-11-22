@@ -70,8 +70,8 @@ theorem sndA_symplOHF (ξ₀ : E) (w y : WOF F E nS nT) (hy : y.map (finPartF F 
     rw [map_mul, map_mul, map_mul, finPartF_sigR, h0, map_zero, mul_zero, zero_mul, zero_mul]
   have hh : finPartF F E (hOF σ JS JT w y) = 0 := by
     unfold hOF
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, hk, Finset.sum_const_zero]
+
+    simp only [map_sum, hk, Finset.sum_const_zero]
   unfold symplOHF symplOF
   rw [map_mul, map_trace_tens]
   have e : (Algebra.TensorProduct.map (sndA F) (AlgHom.id F E)) (incAF F E ξ₀ * hOF σ JS JT w y) =

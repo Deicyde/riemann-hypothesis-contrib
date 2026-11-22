@@ -46,16 +46,16 @@ theorem UpperTheory.exists_nhds_displacement_le_half_of_derivOp_bound :
       conv_lhs => rw [← hST X]
       show S (h.toLie X) = _
       conv_lhs => rw [← b.sum_repr (h.toLie X)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun i _ => map_smul S _ _
     have hD : h.derivOp π X v =
         ∑ i, b.repr (h.toLie X) i • h.derivOp π (h.ofLie (b i)) v := by
       show fderiv ℝ (h.expOrbit π v) 0 X = ∑ i, b.repr (h.toLie X) i •
         fderiv ℝ (h.expOrbit π v) 0 (h.ofLie (b i))
       conv_lhs => rw [hsum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun i _ => map_smul _ _ _
     have hbound : ‖h.derivOp π X v‖ ≤ f X * ‖v‖ := by
       rw [hD]

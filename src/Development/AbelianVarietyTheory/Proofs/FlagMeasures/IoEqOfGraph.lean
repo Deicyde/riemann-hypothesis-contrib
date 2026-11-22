@@ -230,7 +230,7 @@ theorem alg1 {R V : Type} [CommRing R] [AddCommGroup V] [Module R V] (c : R) (x 
   subst this
   constructor <;> (rw [smul_sub]; abel)
 
-set_option maxHeartbeats 800000 in
+
 theorem place_A (g : Loc.SplitG (Zd.M p).L) (hs : (Zd.M p).split = some g) {T T' : D.host.E}
     (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T') (f f' : Fin (D.R.rS + 1) → Vp D p)
     (hA : f = fun a => frFac Zd.δ p a • baseChange₂ D p (frame F a)) (hB : f' = fun a => frFac Zd.δ p a • baseChange₂ D p (frame F' a))

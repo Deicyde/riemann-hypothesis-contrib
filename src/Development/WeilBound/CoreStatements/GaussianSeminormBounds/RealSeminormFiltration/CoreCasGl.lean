@@ -174,8 +174,8 @@ theorem cas_bound_gl {r s : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] (act
       act (Eab i.1.1 i.1.2) * units act k.1.1 k.1.2 = ∑ j, adC k j i • act (Eab j.1.1 j.1.2) := by
     intro k i
     simp only [units]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hL, ← pc_sum (pc_ad k.2 (pc_Eab i.2)), map_sum]
+
+    rw [hL, ← pc_sum (pc_ad k.2 (pc_Eab i.2)), map_sum]
     simp only [map_smul]
     rfl
   have h2' : ∀ (i j : PIx r s), act (Eab i.1.1 i.1.2) * act (Eab j.1.1 j.1.2) -
@@ -186,8 +186,8 @@ theorem cas_bound_gl {r s : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] (act
       intro a b hab
       rw [Matrix.sub_apply, kc_mul (pc_Eab i.2) (pc_Eab j.2) a b hab,
         kc_mul (pc_Eab j.2) (pc_Eab i.2) a b hab, sub_zero]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hL, ← kc_sum hK, map_sum]
+
+    rw [hL, ← kc_sum hK, map_sum]
     refine Submodule.sum_mem _ fun k _ => ?_
     rw [map_smul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -217,11 +217,11 @@ theorem cas_bound_gl {r s : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] (act
         by_cases hab : sameBlock a b
         · exact hk ⟨(a, b), hab⟩ x hx
         · exact hp ⟨(a, b), hab⟩ x hx
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Matrix.matrix_eq_sum_single W, map_sum, LinearMap.sum_apply]
+
+      rw [Matrix.matrix_eq_sum_single W, map_sum, LinearMap.sum_apply]
       refine Submodule.sum_mem _ fun a _ => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, LinearMap.sum_apply]
+
+      rw [map_sum, LinearMap.sum_apply]
       refine Submodule.sum_mem _ fun b _ => ?_
       have : (Matrix.single a b (W a b) : Mat r s) = W a b • Eab a b := by simp [Eab]
       rw [this, map_smul, LinearMap.smul_apply]

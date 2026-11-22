@@ -61,8 +61,8 @@ private theorem exists_sbar {R k M V : Type} [CommRing R] [Field k] [AddCommGrou
   have hx : x = ∑ j, x j • (Pi.single j 1 : Fin N → R) := by
     funext i
     simp [Finset.sum_apply, Pi.single_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [hx, map_sum, map_sum]
+
+  conv_rhs => rw [hx, map_sum, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_smul, h1]
   simp

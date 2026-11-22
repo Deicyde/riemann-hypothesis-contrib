@@ -240,9 +240,9 @@ theorem mul_sub_mem_lieZ {r : ℕ} (lam : Fin r → k) (c : Fin r → 𝓞 D.F) 
       · ring)
   convert H using 1
   rw [Fintype.sum_sum_type]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Sum.elim_inl, Sum.elim_inr, map_sum, map_smul, map_mul, Module.End.mul_apply, Finset.smul_sum,
-    smul_smul, sub_eq_add_neg, neg_mul, neg_smul, Finset.sum_neg_distrib]
+
+  simp only [Sum.elim_inl, Sum.elim_inr, map_sum, map_smul, map_mul, Module.End.mul_apply, Finset.smul_sum,
+  smul_smul, sub_eq_add_neg, neg_mul, neg_smul, Finset.sum_neg_distrib]
 
 theorem one_sub_mem_lieZ {r : Fin D.a → ℕ} (lam : ∀ i, Fin (r i) → k) (c : ∀ i, Fin (r i) → 𝓞 D.F)
     (hc : ∀ i j, ∑ l, lam i l * β (b.t j (c i l)) = if i = j then 1 else 0) {y : HdR o₀.A}
@@ -297,8 +297,8 @@ theorem lieZ_le_fil (hs : t = spMap β) : lieZ o₀ β ≤ Fil o₀.A := by
         ∑ i, ∑ l, lam l • (crysAct o₀ (algebraMap (𝓞 D.F) D.O (c l)) (w i) - β (b.t i (c l)) • w i) := by
     have h3 : ∀ i, ∑ l, lam l • β (b.t i (c l)) • w i = 0 := fun i => by
       simp only [smul_smul, ← Finset.sum_smul, hsum i, zero_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, smul_sub, Finset.smul_sum, Finset.sum_sub_distrib, h3, sub_zero]
+
+    simp only [map_sub, map_sum, smul_sub, Finset.smul_sum, Finset.sum_sub_distrib, h3, sub_zero]
     rw [Finset.sum_comm (f := fun i l => lam l • crysAct o₀ (algebraMap (𝓞 D.F) D.O (c l)) (w i))]
     abel
   rw [e]
@@ -360,8 +360,8 @@ theorem glueFil_lie : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Dat
   · refine mem_glueFil_of_crd_mem o₀.A f _ hZ hfZ _ fun π => ?_
     have H := mul_sub_mem_lieZ o₀ β (lam i) (c i) i (hc' i) (hrho π) c₀
     convert H using 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, hT, crd_smul]
+
+    simp only [map_sub, map_sum, hT, crd_smul]
   · have hk : algebraMap k (TrivSqZeroExt k (Fin d → k)) (β b.ρ - ((D.tr : k) - β b.ρ))⁻¹ *
         (algebraMap k (TrivSqZeroExt k (Fin d → k)) (β b.ρ) -
           algebraMap k (TrivSqZeroExt k (Fin d → k)) ((D.tr : k) - β b.ρ)) = 1 := by
@@ -370,7 +370,7 @@ theorem glueFil_lie : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Dat
     refine mem_glueFil_of_crd_mem o₀.A f _ hZ hfZ _ fun π => ?_
     have H := one_sub_mem_lieZ o₀ β lam c hc' (hrho π)
     convert H using 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, hT, crd_smul]
+
+    simp only [map_sub, map_sum, hT, crd_smul]
 
 end GlobalTheory.HTGlueLie

@@ -47,8 +47,8 @@ theorem exists_hom_of_ann {R V M : Type} [Ring R] [AddCommGroup V] [Module R V] 
       exact (one_smul R w).symm
     have e2 := LinearMap.congr_fun hP ⟨f 1, 1, rfl⟩
     simp only [LinearMap.comp_apply, LinearMap.coe_single]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, ← map_sum, e]
+
+    rw [← map_sum, ← map_sum, e]
     rw [LinearMap.comp_apply] at e2
     rw [e2, LinearMap.id_apply, hφ, one_smul]
   · obtain ⟨α, hα⟩ := (P (Pi.single a v)).2
@@ -84,8 +84,8 @@ theorem lift_words {L M : Type} [AddCommGroup M] [Module ℂ M] (τ : L → Modu
     induction l with
     | nil => simp
     | cons y l ih => rw [List.map_cons, List.prod_cons, map_mul, Module.End.mul_apply, ih]; simp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, LinearMap.sum_apply]
+
+  rw [map_sum, LinearMap.sum_apply]
   simp only [map_smul, LinearMap.smul_apply, this]
 
 theorem exists_intertwiner {L V M : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]

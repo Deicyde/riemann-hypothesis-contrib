@@ -31,8 +31,8 @@ theorem UniformiserGradientIndependent.proof (hjac : NormalCurveJacobian.Stateme
   have hpm : p ∈ RingHom.ker (eval w : MvPolynomial σ ℂ →+* ℂ) := by
     simp [hp, RingHom.mem_ker, htw, hfw]
   have hpg : GradientAtPoint.grad w p = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hp, map_sub, map_sum]
+
+    rw [hp, map_sub, map_sum]
     simp_rw [GradientAtPoint.grad_mul_of_eval_eq_zero w _ _ (hfw _), eval_C]
     have hg : ∀ q, GradientAtPoint.grad w q = fun i ↦ eval w (pderiv i q) :=
       fun q ↦ funext (GradientAtPoint.grad_apply w q)

@@ -209,7 +209,7 @@ private theorem mixedEmbedding_norm_eq_absNorm_span_singleton {K : Type} [Field 
 
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
-set_option maxHeartbeats 1000000 in
+
 private theorem tsum_principal_le_eq_tsum_mul_cutoff_span {K : Type} [Field K] [NumberField K]
     (B : Ideal (𝓞 K)) (G : Ideal (𝓞 K) → ℂ) (hG0 : G ⊥ = 0) (h : mixedSpace K → ℝ)
     (hsum : ∀ x : mixedSpace K, mixedEmbedding.norm x ≠ 0 →

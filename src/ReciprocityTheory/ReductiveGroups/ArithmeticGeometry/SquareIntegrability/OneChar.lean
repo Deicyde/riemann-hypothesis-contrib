@@ -11,7 +11,7 @@ variable {E : Type} [Field E] [NumberField E]
 
 namespace ChA
 
-set_option maxHeartbeats 1000000 in
+
 lemma one_char [IsCMField E] (hNP : Ext.NearestPlane) {dim : (E →+* ℂ) → ℕ}
     (L I : Submodule ℤ (Vsp dim))
     (hLs : ∀ (α : 𝓞 E) x, x ∈ L → act α x ∈ L) (hIs : ∀ (α : 𝓞 E) x, x ∈ I → act α x ∈ I)

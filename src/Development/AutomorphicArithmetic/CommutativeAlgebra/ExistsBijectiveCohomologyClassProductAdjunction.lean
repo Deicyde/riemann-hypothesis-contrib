@@ -319,8 +319,8 @@ private theorem up_δ {I : Cx R} {n m : ℤ} (hm : n + 1 = m) (α : Cochain ((ch
         Units.smul_def, Preadditive.comp_zsmul, ← Category.assoc _ (((chains R).obj A).d _ _),
         CupSpec.chains_d, Category.assoc, Preadditive.sum_comp]
       refine (map_add (CupSpec.mapHom _ _ (freeGen R _ T x)) _ _).trans ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_zsmul, map_sum, Units.smul_def]
+
+      rw [map_zsmul, map_sum, Units.smul_def]
       refine congrArg₂ (· + ·) rfl (congrArg _ (Finset.sum_congr rfl fun i _ => ?_))
       rw [Preadditive.zsmul_comp, map_zsmul]
       congr 1
@@ -330,8 +330,8 @@ private theorem up_δ {I : Cx R} {n m : ℤ} (hm : n + 1 = m) (α : Cochain ((ch
       rfl
     rw [hsucc, hsucc, map_add (f := _), ev_up, upL_d]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Units.smul_def, map_zsmul, map_sum, ev_up, fst_face, snd_face]
+
+    simp only [Units.smul_def, map_zsmul, map_sum, ev_up, fst_face, snd_face]
 
 end UpperTheory.Adj
 end

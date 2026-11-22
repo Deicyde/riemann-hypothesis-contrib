@@ -26,8 +26,8 @@ theorem sub_apply_bijective_of_iterate_eq_zero {M : Type} [AddCommGroup M] (L : 
   · intro c
     refine ⟨∑ k ∈ Finset.range K, (⇑L)^[k] c, ?_⟩
     show (∑ k ∈ Finset.range K, (⇑L)^[k] c) - L (∑ k ∈ Finset.range K, (⇑L)^[k] c) = c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     have hs : ∀ k, L ((⇑L)^[k] c) = (⇑L)^[k + 1] c := fun k =>
       (Function.iterate_succ_apply' (⇑L) k c).symm
     simp only [hs]
@@ -67,8 +67,8 @@ theorem perfLevelOp_frobenius (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [
   ext i
   simp only [perfLevelOp_apply, Pi.sub_apply, map_sub]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
+
+  simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
   congr 1
   ext j
   congr 1

@@ -13,7 +13,7 @@ open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions 
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcN.F2
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace PositivityTheory.Rg.BcB.F.Tail.PSc
 
@@ -181,8 +181,8 @@ theorem core {n a b : ℕ} (h : a + b = n) (w : Pl E) (μ : (w.adicCompletion E)
         c₀ * ∑ y : X, hint (K2 a b w) (fun g => phi3 h w e x y g * lw (ρ g (Λ j (F y)))) := by
     intro j F hF x lw
     show lw (Λ j (∑ y : X, actP w (phiMu h w μ e x y) (F y))) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, Finset.mul_sum]
+
+    rw [map_sum, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun y _ => ?_
     obtain ⟨U₁, hU₁o, hFU₁⟩ := (hF y).2
     have hFU : F y ∈ fixed (pairRt a b w) (U₁ ⊓ (Lv ⊓ χμ.ker)) :=
@@ -266,7 +266,7 @@ end PositivityTheory.Rg.BcB.F.Tail.PSc
 namespace PositivityTheory.Rg.BcB.F.Tail
 
 open PSc in
-set_option maxHeartbeats 1000000 in
+
 theorem rReadS_c : RReadS := by
   intro hRM hJM hLoc E _ _ _ n a b h μ s₁ s₂ Pa Pb D hC w K' X L e P m G hK'o hK'le hnorm hXK hX hLo hHk hkill hdim
     hG hne

@@ -31,8 +31,8 @@ theorem sum_char_conj_mul {K G : Type} [Field K] [CharZero K] [Group G] [Fintype
   set T : Module.End (AlgebraicClosure K) (Fin n → AlgebraicClosure K) := ∑ g : G, ρ (g * y * g⁻¹) with hTdef
   have hT : ∀ a v, T (ρ a v) = ρ a (T v) := by
     intro a v
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hTdef, LinearMap.sum_apply, map_sum]
+
+    simp only [hTdef, LinearMap.sum_apply, map_sum]
     rw [← Equiv.sum_comp (Equiv.mulLeft a)]
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul]
@@ -42,8 +42,8 @@ theorem sum_char_conj_mul {K G : Type} [Field K] [CharZero K] [Group G] [Fintype
     intro u
     have : LinearMap.trace _ _ (T * ρ u) = c * ρ.character u := by
       rw [hc]; simp [Representation.character, Module.End.mul_eq_comp]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← this, hTdef, Finset.sum_mul, map_sum]
+
+    rw [← this, hTdef, Finset.sum_mul, map_sum]
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [Representation.character, map_mul]
   have h2 : j ((Fintype.card G : K) * χ y) = c * j (χ 1) := by
@@ -54,8 +54,8 @@ theorem sum_char_conj_mul {K G : Type} [Field K] [CharZero K] [Group G] [Fintype
   have h3 : j (∑ g : G, χ (g * y * g⁻¹ * s)) = c * j (χ s) := by
     have := h1 s
     simp only [hρ] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, this]
+
+    rw [map_sum, this]
   apply hj
   rw [map_mul, h3, map_mul _ _ (χ s), h2]
   ring
@@ -73,16 +73,16 @@ theorem class_sum_apply {χ : G → K} (h : IsAbsIrrChar χ) (h1 : χ 1 ≠ 0) (
   have e1 : ∀ g : G, ρ (g * y * g⁻¹) (∑ r : G, σ ((chiIdem χ).coeff r) • ρ r u) =
       ∑ s : G, σ ((chiIdem χ).coeff ((g * y * g⁻¹)⁻¹ * s)) • ρ s u := by
     intro g
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← Equiv.sum_comp (Equiv.mulLeft (g * y * g⁻¹)⁻¹)]
+
+    rw [map_sum, ← Equiv.sum_comp (Equiv.mulLeft (g * y * g⁻¹)⁻¹)]
     refine Finset.sum_congr rfl fun s _ => ?_
     rw [map_smul, ← Module.End.mul_apply, ← map_mul]
     simp [mul_assoc]
   simp only [e1]
   rw [Finset.sum_comm, Finset.smul_sum]
   refine Finset.sum_congr rfl fun s _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Finset.sum_smul, ← map_sum, smul_smul, ← map_mul]
+
+  rw [← Finset.sum_smul, ← map_sum, smul_smul, ← map_mul]
   congr 2
   have e2 : ∀ g : G, (chiIdem χ).coeff ((g * y * g⁻¹)⁻¹ * s) =
       χ 1 / (Fintype.card G : K) * χ (g * y * g⁻¹ * s⁻¹) := by
@@ -141,8 +141,8 @@ theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G
     have e : (idemOf X).coeff g = ∑ φ ∈ X, (chiIdem φ).coeff g := by
       unfold idemOf
       simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_smul, ← map_sum, e]
+
+    rw [← Finset.sum_smul, ← map_sum, e]
   obtain ⟨χ, hχ, hw⟩ : ∃ χ ∈ X, ∑ g, σ ((chiIdem χ).coeff g) • ρ g u₀ ≠ 0 := by
     by_contra hcon
     push_neg at hcon
@@ -166,8 +166,8 @@ theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G
   have hLU : ∀ w ∈ U, L w ∈ U := fun w hw => Submodule.sum_mem _ fun h _ => Submodule.smul_mem _ _ (hmem _ _ hw)
   have hLe : ∀ (p : P) w, ρ p (L w) = σ (ψ p : K) • L w := by
     intro p w
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hL, map_sum, map_smul, Finset.smul_sum]
+
+    simp only [hL, map_sum, map_smul, Finset.smul_sum]
     refine (Equiv.sum_comp (Equiv.mulLeft p⁻¹) _).symm.trans (Finset.sum_congr rfl fun h _ => ?_)
     simp only [Equiv.coe_mulLeft]
     have e1 : lvlCoef P ψ (p⁻¹ * h) = (ψ p : K) * lvlCoef P ψ h := by
@@ -191,8 +191,8 @@ theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G
     have e : ∀ g : G, ρ g (L (ρ (t⁻¹ * g⁻¹) w₀)) =
         ∑ h : P, σ (lvlCoef P ψ h) • ρ (g * ((h : G) * t⁻¹) * g⁻¹) w₀ := by
       intro g
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hL, map_sum, map_smul]
+
+      simp only [hL, map_sum, map_smul]
       refine Finset.sum_congr rfl fun h _ => ?_
       rw [← Module.End.mul_apply (ρ (h : G)), ← map_mul, ← Module.End.mul_apply (ρ g), ← map_mul]
       simp [mul_assoc]
@@ -205,8 +205,8 @@ theorem exists_level_vector : ∀ {K G W : Type} [Field K] [CharZero K] [Group G
       congr 1
       exact class_sum_apply σ ρ (hX χ hχ) h1 _ u₀
     simp only [e2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_smul, ← map_sum, Finset.mul_sum]
+
+    rw [← Finset.sum_smul, ← map_sum, Finset.mul_sum]
     congr 2
     refine Finset.sum_congr rfl fun h _ => ?_
     ring

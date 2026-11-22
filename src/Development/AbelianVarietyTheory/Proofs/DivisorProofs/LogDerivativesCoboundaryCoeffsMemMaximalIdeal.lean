@@ -232,8 +232,8 @@ theorem mem_maximalIdeal_of_isCob : ∀ (A : Type) [CommRing A] [IsLocalRing A] 
       have r₂ : valHom (R := S) y.left _ hU (rsT (b j') _) = valHom (R := S) y.left _ hj' (b j') := by
         rw [rsT, dite_eq_left inf_le_right, ← valR_eq, ← valR_eq]
         exact valR_res _ _ hU _
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [dlg, pbT_id, map_sub, map_sum, map_mul, hc, r₁, r₂] at e₁
+
+      simp only [dlg, pbT_id, map_sub, map_sum, map_mul, hc, r₁, r₂] at e₁
       have e₂ : valHom (R := S) y.left _ hU (L.g j j').val * valHom (R := S) y.left _ hU (L.g j j')⁻¹.val = 1 := by
         rw [← map_mul, Units.mul_inv, map_one]
       have e₃ : ∀ i, φ DualNumber.eps * algebraMap A S (t i) = 0 := fun i => by

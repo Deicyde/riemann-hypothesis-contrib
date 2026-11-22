@@ -29,8 +29,8 @@ lemma _root_.GlobalTheory.DualFamily.herm_one_symm {n : ℕ} (x y : Fin n → E)
     _root_.ReciprocityTheory.ChartRestriction.G.FD.herm 1 x y = _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm 1 y x) := by
   rw [_root_.GlobalTheory.DualFamily.herm_one_eq, _root_.GlobalTheory.DualFamily.herm_one_eq]
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.cc
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [map_mul, IsCMField.complexConj_apply_apply, mul_comm]
 
@@ -121,16 +121,16 @@ private lemma exists_linearForm_extend_of_span_eq_univ {n : ℕ} (Λ : Submodule
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Submodule.coe_smul, ← algebraMap_smul E (a i), ha i, smul_assoc]
   have hg := congrArg (fun z => ((g z : 𝓞 E) : E)) hdy
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_smul, map_sum, smul_eq_mul, RingOfIntegers.coe_eq_algebraMap, map_mul] at hg
+
+  simp only [map_smul, map_sum, smul_eq_mul, RingOfIntegers.coe_eq_algebraMap, map_mul] at hg
   simp only [RingOfIntegers.coe_eq_algebraMap]
   have hd0 : algebraMap (𝓞 E) E d ≠ 0 :=
     IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors d.2
   apply mul_left_cancel₀ hd0
   rw [hg]
   conv_lhs => rw [← b.sum_repr (y : Fin n → E)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.mul_sum]
+
+  rw [map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, Module.Basis.constr_basis, ha i, smul_eq_mul, Algebra.smul_def]
   ring

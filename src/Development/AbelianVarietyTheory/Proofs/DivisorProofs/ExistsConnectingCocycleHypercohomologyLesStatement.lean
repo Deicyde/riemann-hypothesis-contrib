@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_connecting_cocycle_hypercohomology_les : ∀ (R : Type) [CommRing R] (S : ShortComplex (Shv R)), S.ShortExact →
   ∃ z : Cocycle (res R S.X₃) (res R S.X₁) 1,
     (∀ (K : Cx R) (n : ℤ),

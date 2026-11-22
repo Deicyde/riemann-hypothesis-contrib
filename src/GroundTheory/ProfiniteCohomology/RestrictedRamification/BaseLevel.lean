@@ -84,7 +84,7 @@ def GsLevelBijective (T : compactCohomologyRes (gsFinFamily S ιs) (gsRoots S n)
     (gsRoots S n) (nsmul_gsRoots S n) T h)
 
 
-set_option maxHeartbeats 3200000 in
+
 theorem bijective_zmodCompactDualityMap_gsOpenSubgroup
     (t : compactCohomologyRes (gsFinFamily S ιs) (gsRoots S n) 3 →+ ZMod n)
     (TL : compactCohomologyRes (gsFinFamily (placesOver S) (gsMackeyEmbeddings hL ιs))

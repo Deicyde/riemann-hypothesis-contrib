@@ -18,8 +18,8 @@ section Gen
 
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Rows Formalism.MainNotions NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.TwInputs.Move
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 2000000
+
+
 
 structure Cp (D : D7) {R : Ranks} {H : Host R} {r : Rows.Data R} [NumberField r.LL] [StarRing r.LL] {L : IntermediateField ℚ r.LL}
     {N : NData R H r} (e : ↥L ≃+* ↥D.LL0) (X : NTw R H r L N) (Y : NExp R H r L N X) : Prop where
@@ -310,8 +310,8 @@ open GlobalTheory.Mem.Top.TwChar (plUnder incl embLL_incl mem_plUnder plUnder_su
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 2000000
+
+
 
 theorem exists_fixedEquiv {B B' : Base} (h : Enl B B') :
     ∃ e : ↥B'.LL0 ≃+* ↥B.LL0, ∀ x : ↥B'.LL0, incl h (e x : B.LL) = (x : B'.LL) := by

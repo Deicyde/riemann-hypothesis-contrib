@@ -25,9 +25,9 @@ theorem map_star_subst2 {N n : ℕ} (A : Matrix (Fin N) (Fin N) ℂ) (B : Matrix
       (subst2 (A.map star) (B.map star)).toRingHom.comp (MvPolynomial.map (starRingEnd ℂ)) := by
     refine MvPolynomial.ringHom_ext (fun c => ?_) (fun p => ?_)
     · simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, map_X, subst2_X,
-        map_sum, map_mul, map_C, Matrix.map_apply, starRingEnd_apply]
+
+    · simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, map_X, subst2_X,
+      map_sum, map_mul, map_C, Matrix.map_apply, starRingEnd_apply]
   exact congrArg (fun f => f P) key
 
 theorem map_star_map_star_poly {N n : ℕ} (P : MvPolynomial (Fin N × Fin n) ℂ) :

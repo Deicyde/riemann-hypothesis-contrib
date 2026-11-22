@@ -5,7 +5,7 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.KaehlerRankT
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.kaehler_rank_transcendence_degree : ∀ (K L : Type) [Field K] [Field L] [Algebra K L] (I : Type) [Fintype I] (u : I → L),
     AlgebraicIndependent K u → IntermediateField.adjoin K (Set.range u) = ⊤ →
     Module.finrank L (KaehlerDifferential K L) = Fintype.card I := by

@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MvPolynomial
 
 open TensorProduct
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mvPolynomial_tensor_baseChange_ringEquiv' :
     ∀ (S B K τ : Type) [CommRing S] [CommRing B] [CommRing K] [Algebra S B] [Algebra S K]
       [Algebra (MvPolynomial τ S) K] [IsScalarTower S (MvPolynomial τ S) K],

@@ -242,9 +242,9 @@ theorem GlobalTheory.St.G.g_proj : ∀ (D : D7) (X : HidaSetting D) (u : D.what�
       have e : embA X wt ιA (Pi.single j 1) = qA X wt j := by
         simp [embA, Pi.single_apply]
       rwa [e] at h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_smul, Proj.pc_e, Proj.pc_f, Proj.orthogonalProjection_anisotropic_eq_zero, hqj, smul_zero,
-      Finset.sum_const_zero, add_zero]
+
+    simp only [map_add (f := _), map_sum, map_smul, Proj.pc_e, Proj.pc_f, Proj.orthogonalProjection_anisotropic_eq_zero, hqj, smul_zero,
+    Finset.sum_const_zero, add_zero]
     simp [embA]
   · intro y hy h1 h2
     exact Proj.T_pc_sub_mem X u hT hy h1 h2

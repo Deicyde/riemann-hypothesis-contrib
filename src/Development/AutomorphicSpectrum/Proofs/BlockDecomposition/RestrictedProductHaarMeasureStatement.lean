@@ -8,7 +8,7 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 open MeasureTheory Topology
 open scoped ENNReal NNReal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.restricted_product_haar_measure : ∀ {ι : Type} [Fintype ι]
   {G₀ : Type} [Group G₀] [TopologicalSpace G₀] [IsTopologicalGroup G₀] [T2Space G₀]
   [LocallyCompactSpace G₀] [SecondCountableTopology G₀]

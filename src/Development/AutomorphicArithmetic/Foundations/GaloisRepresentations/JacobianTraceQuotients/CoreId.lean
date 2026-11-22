@@ -25,7 +25,7 @@ private theorem jacA_refl {k V : Type} [Field k] {n : ℕ} [AddCommGroup V] [Mod
   obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective _ y
   rfl
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.Gal.Join.coreId (h1 : VarEx) (h2 : VarTrace) (h3 : ElemPairJ) : CoreId := by
   intro F E _ _ _ _ _ _ _ _ σ hσ hp n hn v w hns σw N hs hN π P hP hW τ τ' hτ hτ'
   obtain ⟨s, hs', hI⟩ := h1 F E σ hσ hp n hn P hP v w hns

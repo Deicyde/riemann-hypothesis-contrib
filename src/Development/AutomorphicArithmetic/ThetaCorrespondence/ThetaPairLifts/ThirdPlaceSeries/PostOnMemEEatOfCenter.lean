@@ -13,7 +13,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open scoped InnerProductSpace TensorProduct
@@ -24,7 +24,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.MiTop
 noncomputable section
-set_option maxHeartbeats 800000
+
 open Formalism.BasicNotions.TH Formalism.IndefR.Lev
 namespace GlobalTheory.MiTop.CentralShift
 section General

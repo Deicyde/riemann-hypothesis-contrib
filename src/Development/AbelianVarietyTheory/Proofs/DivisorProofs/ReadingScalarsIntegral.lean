@@ -15,8 +15,8 @@ open Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMas
 open Formalism.IndefR.FWT GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option autoImplicit false
@@ -65,8 +65,8 @@ theorem readExt_scalar_mem_range
   have hsum : ∀ x : L ⊗[O] M, ∀ (d : O) (c : _ → L), d • x = ∑ a, c a ⊗ₜ v a →
       ∑ a, eL (c a) • rd (v a) = eL (algebraMap O L d) • readExt rd eL hL x := fun x d c e => by
     have := congrArg (readExt rd eL hL) e
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← algebraMap_smul L d x, readExt_smul, map_sum] at this
+
+    rw [← algebraMap_smul L d x, readExt_smul, map_sum] at this
     rw [this]
     rfl
   obtain ⟨d₁, hd₁, c₁, e₁⟩ := exists_smul_eq_sum_tmul_finBasis x₁

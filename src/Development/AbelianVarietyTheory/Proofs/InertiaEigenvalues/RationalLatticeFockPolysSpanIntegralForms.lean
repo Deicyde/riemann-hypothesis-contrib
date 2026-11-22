@@ -14,8 +14,8 @@ open Formalism.L2.Host (embLL0)
 open Formalism.IndefR.RecTie (Used0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 open GlobalTheory.PlaceRead
 open GlobalTheory.HeightCounting.Up (PrN)
 
@@ -33,8 +33,8 @@ theorem _root_.GlobalTheory.T.rational_lattice_fock_polys_span_integral_forms : 
   · intro F hF
     obtain ⟨m, rfl⟩ := hrat F hF
     obtain ⟨a, ha⟩ := (key m).1 hF
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ha, map_sum, Finset.smul_sum]
+
+    rw [ha, map_sum, Finset.smul_sum]
     refine Submodule.sum_mem _ fun v hv => ?_
     rw [map_smul, smul_comm]
     refine Submodule.smul_mem _ (⟨D.what₂.embLL (a v : D.what₂.LL), a v, rfl⟩ : intLL D) (Submodule.subset_span ?_)

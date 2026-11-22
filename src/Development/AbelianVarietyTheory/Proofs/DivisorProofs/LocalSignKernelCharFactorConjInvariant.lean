@@ -58,9 +58,9 @@ theorem gram_basis {K : Type} [Field K] (σ : K →+* K) {n : ℕ} (V : Submodul
     rw [← this, Submodule.coe_sum, Finset.sum_apply]
     simp only [Submodule.coe_smul, Pi.smul_apply, smul_eq_mul]
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gram, Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, hc, map_sum, map_mul,
-    Finset.sum_mul, Finset.mul_sum]
+
+  simp only [gram, Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, hc, map_sum, map_mul,
+  Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [Finset.sum_comm]
@@ -77,8 +77,8 @@ theorem gram_unitary {K : Type} [Field K] (σ : K →+* K) {n : ℕ} (g : Matrix
     simpa [Matrix.mul_apply, Matrix.one_apply] using this
   have hm : ∀ (x : Fin n → K) k, (g *ᵥ x) k = ∑ a, g k a * x a := fun _ _ => rfl
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gram, Matrix.of_apply, hm, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
+
+  simp only [gram, Matrix.of_apply, hm, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [Finset.sum_comm]

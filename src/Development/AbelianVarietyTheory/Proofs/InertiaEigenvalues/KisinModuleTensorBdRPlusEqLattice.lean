@@ -68,7 +68,7 @@ namespace GlobalTheory.DeRhamIdent
 open GlobalTheory.DeRhamIdent
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O] [Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K] [TameDescentExponentData K l e a] (t : Wq l a →ₐ[ℤ_[l]] O) (ϖ : PiSys l e) (ι : Type) [Fintype ι] [DecidableEq ι] (P : PhiMod O K l e a ι) (T : LocLat (Gl l) ℚ_[l] K O) (I : Ident t ϖ P T), ∃ jD : (ι → OD l O) ≃ₗ[OD l O] TW (OD l O) T, ∀ (c : ι → OA l O) (z : TW (OA l O) T), I.j (inclV l O ι c) = TWincl (inclO l O) T z → jD (fun i => toOD l O (c i)) = TWincl (toOD l O) T z := by
   intro l _ a e _ _ O K _ _ _ _ _ _ _ _ _ _ t ϖ ι _ _ P T I
   obtain ⟨⟨ε, hε⟩, hεall⟩ := GlobalTheory.T.teichmullerSubOneAinf_properties_compatibleRoots l
@@ -110,13 +110,13 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O
     calc TWincl (inclO l O) T (ν ^ α • z') = inclO l O (ν ^ α) • I.j (inclV l O ι c) := by
           rw [TWincl_smul, h]
       _ = ∑ i, inclO l O (c i) • I.j (inclO l O (ν ^ α) • inclV l O ι (Pi.single i 1)) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [← I.j.map_smul, hsum c, Finset.smul_sum, map_sum]
+
+          rw [← I.j.map_smul, hsum c, Finset.smul_sum, map_sum]
           refine Finset.sum_congr rfl fun i _ => ?_
           rw [smul_comm, I.j.map_smul]
       _ = TWincl (inclO l O) T (∑ i, c i • z i) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
+
+          rw [map_sum]
           refine Finset.sum_congr rfl fun i _ => ?_
           rw [hz i, TWincl_smul]
   let w : ι → TW (OD l O) T := fun i => ((u⁻¹ : (OD l O)ˣ) : OD l O) ^ α • TWincl (toOD l O) T (z i)
@@ -128,8 +128,8 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O
     intro c z' h
     have h2 : toOD l O (ν ^ α) • TWincl (toOD l O) T z' =
         ∑ i, toOD l O (c i) • TWincl (toOD l O) T (z i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← TWincl_smul, hJ0 c z' h, map_sum]
+
+      rw [← TWincl_smul, hJ0 c z' h, map_sum]
       simp only [TWincl_smul]
     rw [hjD]
     calc ∑ i, toOD l O (c i) • w i

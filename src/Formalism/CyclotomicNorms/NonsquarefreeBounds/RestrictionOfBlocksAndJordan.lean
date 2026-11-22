@@ -20,8 +20,8 @@ theorem repr_diag_apply (ρ : Representation k G V) (e : Module.Basis (Fin N) k 
     e.repr (ρ y v) m = χ m y * e.repr v m := by
   have h : ρ y v = ∑ i, (e.repr v i * χ i y) • e i := by
     conv_lhs => rw [← e.sum_repr v]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, hy, smul_smul]
   rw [h, e.repr_sum_self]
@@ -197,8 +197,8 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
          rw [map_smul, Finsupp.smul_apply, hx j hj, smul_zero] }, fun x => Iff.rfl⟩
   have hYst : ∀ g' : G, ∀ x ∈ Y, ρ g' x ∈ Y := by
     intro g' x hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← e.sum_repr x, map_sum]
+
+    rw [← e.sum_repr x, map_sum]
     refine Y.sum_mem fun i _ => ?_
     rw [map_smul]
     by_cases hi : ∃ g, e i ∈ W.map (ρ g)

@@ -20,7 +20,7 @@ noncomputable section
 
 namespace GlobalTheory.SeeSaw
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 theorem idV_incA_mul {D : D7} (c : D.host.E) (𝔞 : FI D) (v : Pl D) {y : AE D} (hy : y ∈ idV 𝔞 v) :
     incA D c * y ∈ idV (FractionalIdeal.spanSingleton _ c * 𝔞) v := by

@@ -71,8 +71,8 @@ theorem eq_zero_of_sum {m : ℕ} (x : Fin m → K)
   rw [map_zero, Finsupp.zero_apply]
   refine hx (fun i => equivFinsuppOfBasisLeft b (d i) j) ?_ i
   have := congrArg (fun z => equivFinsuppOfBasisLeft b z j) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, Finsupp.finsetSum_apply, coord_mul_ι, map_zero, Finsupp.zero_apply] at this
+
+  simp only [map_sum, Finsupp.finsetSum_apply, coord_mul_ι, map_zero, Finsupp.zero_apply] at this
   exact this
 
 def cmpMap {m : ℕ} (x : Fin m → K) : (Fin m → ↥(Dcris PD ρ)) →ₗ[LL] ↥(DdR PD ρ) :=

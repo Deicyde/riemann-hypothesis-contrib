@@ -706,7 +706,7 @@ lemma EB_mulF {l n : Type*} {m : ℕ} {A : Matrix l (Fin m) ℂ} {B : Matrix (Fi
   have := EB_mul hA hB
   rwa [Fintype.card_fin] at this
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoordinateSizes := by
   intro k j ρ hj
   have hj0 : j ≠ 0 := by omega

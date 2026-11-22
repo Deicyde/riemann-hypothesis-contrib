@@ -12,8 +12,8 @@ noncomputable section
 
 namespace GlobalTheory.HeckeLocAct
 
-set_option maxHeartbeats 1000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} {B : LocBase0 H what₂}
 
@@ -115,8 +115,8 @@ theorem heckeGenerator_mapsTo_localisationLatticeSpan (hI : HeckeIntTw B) (i : L
   | mem z hz =>
     obtain ⟨x, hx, rfl⟩ := hz
     obtain ⟨F, c, hF, hc, he⟩ := hI (jOf B i) (wOf B i) i.2.2.2.1 i.2.2.2.2.1 i.2.2.2.2.2 v k hvk x hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [B.hK_def, he, map_sum]
+
+    rw [B.hK_def, he, map_sum]
     refine Submodule.sum_mem _ fun y hy => ?_
     rw [LinearMap.map_smulₛₗ]
     obtain ⟨o, ho⟩ := (B.ec_w (jOf B i) (wOf B i) (c y)).1 (hc y hy)

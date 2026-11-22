@@ -275,9 +275,9 @@ lemma wedge_tan {o cost : ℕ} {Kj : Finset (Fin (r + K)) → MvPolynomial σ R}
     weightedHomogeneousComponent wv (cost + o) (wedgeR y Kj J) =
       pl (Jp J) * wedgeR (fun b => y (Fin.natAdd r b)) tn (Jt J) := by
   unfold wedgeR
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [sum_split, map_add (f := _), map_sum, map_sum,
-    Finset.sum_eq_zero (fun a ha => cmp_of_Ord (hoff J a ha _) (Nat.lt_succ_self _)), zero_add, Finset.mul_sum]
+
+  rw [sum_split, map_add (f := _), map_sum, map_sum,
+  Finset.sum_eq_zero (fun a ha => cmp_of_Ord (hoff J a ha _) (Nat.lt_succ_self _)), zero_add, Finset.mul_sum]
   refine Finset.sum_congr rfl fun b hb => ?_
   rw [cmp_term o _ (hyt b), hD, Jp_erase_na, Jt_erase_na, card_filter_na]
   ring
@@ -292,10 +292,10 @@ lemma contr_tan {o cost : ℕ} {Kj : Finset (Fin (r + K)) → MvPolynomial σ R}
     weightedHomogeneousComponent wv (cost + o) (contrR y Kj J) =
       pl (Jp J) * contrR (fun b => y (Fin.natAdd r b)) tn (Jt J) := by
   unfold contrR
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [sum_split, Jp_compl, Jt_compl, map_add (f := _), map_sum, map_sum,
-    Finset.sum_eq_zero (fun a ha => cmp_of_Ord (hoff J a (by simpa using ha) _) (Nat.lt_succ_self _)), zero_add,
-    Finset.mul_sum]
+
+  rw [sum_split, Jp_compl, Jt_compl, map_add (f := _), map_sum, map_sum,
+  Finset.sum_eq_zero (fun a ha => cmp_of_Ord (hoff J a (by simpa using ha) _) (Nat.lt_succ_self _)), zero_add,
+  Finset.mul_sum]
   refine Finset.sum_congr rfl fun b hb => ?_
   rw [cmp_term o _ (hyt b), hD, Jp_insert_na, Jt_insert_na, card_filter_na]
   ring
@@ -311,10 +311,10 @@ lemma wedge_pl {o cost : ℕ} {Kj : Finset (Fin (r + K)) → MvPolynomial σ R} 
     weightedHomogeneousComponent wv (cost + o) (wedgeR y Kj J) =
       wedgeR (fun a => y (Fin.castAdd K a)) pl (Jp J) * tn (Jt J) := by
   unfold wedgeR
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [sum_split, map_add (f := _), map_sum, map_sum,
-    Finset.sum_eq_zero (s := Jt J) (fun a ha => cmp_of_Ord (hoff J a ha _) (Nat.lt_succ_self _)), add_zero,
-    Finset.sum_mul]
+
+  rw [sum_split, map_add (f := _), map_sum, map_sum,
+  Finset.sum_eq_zero (s := Jt J) (fun a ha => cmp_of_Ord (hoff J a ha _) (Nat.lt_succ_self _)), add_zero,
+  Finset.sum_mul]
   refine Finset.sum_congr rfl fun a ha => ?_
   rw [cmp_term o _ (hyp a), hD, Jp_erase_ca, Jt_erase_ca, card_filter_ca]
   by_cases hJ : Jt J = ∅
@@ -332,11 +332,11 @@ lemma contr_pl {o cost : ℕ} {Kj : Finset (Fin (r + K)) → MvPolynomial σ R} 
     weightedHomogeneousComponent wv (cost + o) (contrR y Kj J) =
       contrR (fun a => y (Fin.castAdd K a)) pl (Jp J) * tn (Jt J) := by
   unfold contrR
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [sum_split, Jp_compl, Jt_compl, map_add (f := _), map_sum, map_sum,
-    Finset.sum_eq_zero (s := univ \ Jt J)
-      (fun a ha => cmp_of_Ord (hoff J a (by simpa using ha) _) (Nat.lt_succ_self _)), add_zero,
-    Finset.sum_mul]
+
+  rw [sum_split, Jp_compl, Jt_compl, map_add (f := _), map_sum, map_sum,
+  Finset.sum_eq_zero (s := univ \ Jt J)
+    (fun a ha => cmp_of_Ord (hoff J a (by simpa using ha) _) (Nat.lt_succ_self _)), add_zero,
+  Finset.sum_mul]
   refine Finset.sum_congr rfl fun a ha => ?_
   rw [cmp_term o _ (hyp a), hD, Jp_insert_ca, Jt_insert_ca, card_filter_ca]
   by_cases hJ : Jt J = ∅

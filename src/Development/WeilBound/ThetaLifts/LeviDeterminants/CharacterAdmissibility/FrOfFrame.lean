@@ -122,7 +122,7 @@ theorem mul_col {R α β : Type} [CommRing R] (a : Matrix α Unit R) (x : β →
   simp [Matrix.mul_apply, Matrix.vecMulVec_apply, Matrix.replicateCol]
 
 
-set_option maxHeartbeats 800000 in
+
 theorem chartW {n d d₁ r s r' s' i₀ i₁ : ℕ} {X : Spc F E n} {W : Spc F E d} {W₁ : Spc F E d₁} {H : Plane E d d₁} (M : Model σ X W)
     (M₁ : Model σ X W₁) (hB : B.IsGood σ) (hX : X.IsHerm σ B r s) (hW : W.IsSkew σ B r' s') (hH : H.IsAdapted σ B W W₁ i₀ i₁) :
     ∃ (ε : Fin n × Fin d ≃ (Fin n × Fin 2) ⊕ Fin n × Fin d₁)
@@ -148,11 +148,11 @@ theorem chartW {n d d₁ r s r' s' i₀ i₁ : ℕ} {X : Spc F E n} {W : Spc F E
   let p : Matrix (Fin n) (Fin d) (AE F E) → Fin n × Fin 2 → AF F := fun z k => βA.repr (b z k.1) k.2
   let q : Matrix (Fin n) (Fin d) (AE F E) → Fin n × Fin 2 → AF F := fun z k => -Tr (βA k.2 * D z k.1)
   have hpq : ∀ z z', p z ⬝ᵥ q z' = -Tr (b z ⬝ᵥ D z') := fun z z' => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, Fintype.sum_prod_type, map_sum, ← Finset.sum_neg_distrib]
+
+    simp only [dotProduct, Fintype.sum_prod_type, map_sum, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [← βA.sum_repr (b z k), Finset.sum_mul, map_sum, ← Finset.sum_neg_distrib]
+
+    conv_rhs => rw [← βA.sum_repr (b z k), Finset.sum_mul, map_sum, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [smul_mul_assoc, map_smul, smul_eq_mul, ← mul_neg]
   have hTr : ∀ z, Tr (cA σ z) = Tr z := GlobalTheory.VacCocycle.trace_conj (cA σ) (cA_cA hB)

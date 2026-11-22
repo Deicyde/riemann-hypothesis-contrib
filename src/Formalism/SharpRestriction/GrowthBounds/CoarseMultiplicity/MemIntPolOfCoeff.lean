@@ -333,8 +333,8 @@ theorem blockFormAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cm Cc H : ℝ} (hCm : 17 ≤
         (u.coeff μ * u'.coeff μ * (expFact μ : KK O))) = algebraMap O (KK O) κ * algebraMap O (KK O) a := by
       rw [← Finset.mul_sum, ← Finset.mul_sum, ← ha]
       rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hf, ← map_sum, ← map_mul, ← map_add (f := _)]
+
+    rw [hf, ← map_sum, ← map_mul, ← map_add (f := _)]
     congr 1
     simp only [Finset.mul_sum, mul_add]
     congr 1

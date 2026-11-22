@@ -196,7 +196,7 @@ variable {D : D7} {Z : LocDat D} {T T' : D.host.E} {F0 : LFlag (D.sp.Y 0) D.R.rS
   {FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS} {G : GFrames (placesOf Z) D.R.rS D.R.k}
   (c : GCoord Z F0 F0' FP G)
 
-set_option maxHeartbeats 1000000 in
+
 theorem mem_rat_stab_iff (L : G.Lt) (hL : Submodule.IsFullLattice D.host.E L) (σ : G.GLV)
     (hx : ∀ p, ∃ g', (placesOf Z).Ext p σ g') :
     σ ∈ (placesOf Z).rat (fun p => MulAction.stabilizer (G.S p).GLV ((placesOf Z).lat p L)) ↔

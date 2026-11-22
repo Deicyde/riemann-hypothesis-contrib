@@ -7,7 +7,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp
@@ -18,8 +18,8 @@ namespace GlobalTheory.BigOn.Exp.ProjRd
 attribute [local instance] GroupAverageFixedPoints.GlobalTheory.CompanionTheory.LatSpan.algKK
 end GlobalTheory.BigOn.Exp.ProjRd
 open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 2000000 in
+
+
 theorem GlobalTheory.BigOn.Exp.canProj_alt : _root_.GlobalTheory.BigOn.Exp.CanonicalProjection₂ := by
   refine ⟨1, one_pos, fun _ _ _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm _ _ _ =>
     _root_.GlobalTheory.BigTop.EventuallyAtPoints.of_forall fun x hx i p _ _ w _ j rd hrd y => ?_⟩⟩

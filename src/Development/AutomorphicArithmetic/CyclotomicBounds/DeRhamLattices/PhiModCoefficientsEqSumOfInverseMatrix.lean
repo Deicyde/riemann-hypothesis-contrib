@@ -22,8 +22,8 @@ private theorem hat_mulVec' {O K : Type} [CommRing O] [NormedField K] [IsUltrame
     hat O l e ((Y *ᵥ m) i) = ∑ j, hat O l e (Y i j) * hat O l e (m j) := by
   have : (Y *ᵥ m) i = ((∑ j, ⟨Y i j, hY i j⟩ * ⟨m j, hm j⟩ : RpiE O K l e) : K⟦X⟧) := by
     simp [Matrix.mulVec, dotProduct]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, hat_coe, map_sum]
+
+  rw [this, hat_coe, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, hat_of_mem l e (hY i j), hat_of_mem l e (hm j)]
 

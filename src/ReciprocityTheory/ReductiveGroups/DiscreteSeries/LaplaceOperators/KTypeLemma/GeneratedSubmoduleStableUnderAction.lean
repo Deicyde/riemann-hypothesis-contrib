@@ -38,9 +38,9 @@ theorem euler_tensor_dual_commute_gl_action (hE : IsGlRep E) (a b : Fin n) :
     rw [sub_eq_iff_eq_add] at this
     rw [this]
     by_cases h1 : c = a <;> by_cases h2 : b = d <;> simp [h1, h2] <;> abel
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Module.End.mul_apply, euler_tensor_dual_apply, tensor_dual_action_apply_component, map_sub, map_neg, map_sum,
-    sum_sub_distrib, hc, sum_add_distrib]
+
+  simp only [Module.End.mul_apply, euler_tensor_dual_apply, tensor_dual_action_apply_component, map_sub, map_neg, map_sum,
+  sum_sub_distrib, hc, sum_add_distrib]
   by_cases hbd : b = d
   · subst hbd
     simp [apply_ite, Finset.sum_ite_eq']

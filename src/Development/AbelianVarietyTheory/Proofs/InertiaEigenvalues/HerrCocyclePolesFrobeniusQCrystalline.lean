@@ -62,9 +62,9 @@ theorem eq_zero_of_fixed {L ι : Type} [Field L] [Fintype ι] [DecidableEq ι] (
         rw [he j, map_mul, map_pow, hz]
         ring
       have h3 := congrArg constantCoeff h2
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, map_pow, hG, constantCoeff_algHom γ h0, ite_mul, one_mul, zero_mul,
-        Finset.sum_ite_eq, Finset.mem_univ, if_true] at h3
+
+      simp only [map_sum, map_mul, map_pow, hG, constantCoeff_algHom γ h0, ite_mul, one_mul, zero_mul,
+      Finset.sum_ite_eq, Finset.mem_univ, if_true] at h3
       have h4 : constantCoeff (e i) = 0 := by
         have : constantCoeff (e i) * (constantCoeff z ^ (k + 1) - 1) = 0 := by linear_combination h3
         exact (mul_eq_zero.mp this).resolve_right (sub_ne_zero.mpr (h1 ▸ hu (k + 1) k.succ_pos))
@@ -77,9 +77,9 @@ theorem semi_coord {A M ι : Type} [CommRing A] [AddCommGroup M] [Module A M] [F
     (hf : ∀ a x, f (a • x) = σ a • f x) (e : ι → M) (q : A) (H : Matrix ι ι A)
     (hH : ∀ j, q • f (e j) = ∑ i, H i j • e i) (c : ι → A) :
     q • f (Fintype.linearCombination A e c) = Fintype.linearCombination A e (H.mulVec fun j => σ (c j)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Fintype.linearCombination_apply, map_sum, hf, Finset.smul_sum, Matrix.mulVec, dotProduct,
-    Finset.sum_smul]
+
+  simp only [Fintype.linearCombination_apply, map_sum, hf, Finset.smul_sum, Matrix.mulVec, dotProduct,
+  Finset.sum_smul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [smul_comm, hH, Finset.smul_sum]
@@ -176,8 +176,8 @@ theorem coord_eq (hu : ∀ k : ℕ, 0 < k → algebraMap O LL (Γ.χΓ Γ.gam : 
       fun i => toL O LL n ((Gm g).mulVec (fun j => letγ (R.γ₀ g) (c j)) i) := by
     intro g c
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, toL_γ, Matrix.map_apply]
+
+    simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, toL_γ, Matrix.map_apply]
   have hf := fixed_diff (γL R Γ.gam).toRingHom (γL R g).toRingHom (γL_comm R _ _) ((Gm Γ.gam).map (toL O LL n))
     ((Gm g).map (toL O LL n)) (by rw [← hm, ← hm, mul_comm]) w (fun j => toL O LL n (z j))
     (fun j => toL O LL n (z' j)) hw (by
@@ -206,9 +206,9 @@ theorem coord_eq (hu : ∀ k : ℕ, 0 < k → algebraMap O LL (Γ.χΓ Γ.gam : 
   · have e1 : PowerSeries.constantCoeff (toL O LL n (z' i) k) = 0 := (hc (z' i k)).trans (by rw [hz0, map_zero])
     have e2 : ∀ j, PowerSeries.constantCoeff (γL R g (w j) k) = 0 := fun j =>
       (constantCoeff_algHom _ (hX g) _).trans (hw0 j k)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, Pi.sub_apply, Finset.sum_apply, Pi.mul_apply, map_sub, map_sum, map_mul,
-      e1, e2, hw0, mul_zero, Finset.sum_const_zero, sub_zero]
+
+    simp only [Matrix.mulVec, dotProduct, Pi.sub_apply, Finset.sum_apply, Pi.mul_apply, map_sub, map_sum, map_mul,
+    e1, e2, hw0, mul_zero, Finset.sum_const_zero, sub_zero]
   · have := congrFun (congrFun hf i) k
     rw [Matrix.mulVec, dotProduct, Finset.sum_apply] at this
     exact this
@@ -261,8 +261,8 @@ theorem exists_val (hinj : Function.Injective inclR) (gA : G → (RA →ₐ[O] R
   have hval : ∀ c : ι → LetA O n, Val β hβ inclR T (E.jD T (∑ i, c i • e i))
       (∑ i, actS T.V B (β (I.io (c i))) (x i)) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine val_sum _ _ _ fun i => ?_
     rw [jD_smulA]
     exact (hx i).smul _
@@ -300,8 +300,8 @@ theorem exists_val (hinj : Function.Injective inclR) (gA : G → (RA →ₐ[O] R
           AddMemClass.coe_add, a, h']
         ring
       have e2 := congrArg Dc.J e1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_mul, map_pow, map_sum, map_add (f := _), Dc.J_toL, Dc.J_γ] at e2
+
+      simp only [map_mul, map_pow, map_sum, map_add (f := _), Dc.J_toL, Dc.J_γ] at e2
       rw [map_pow]
       exact e2) w' hw'
   have key' : actVB PD T.ρ g w' - w' = ∑ i, actS T.V B (β (I.io (z' i))) (x i) := key
@@ -429,7 +429,7 @@ theorem isUnit_prod (hinj : Function.Injective inclR) (φA : O ⊗[Zl] Ai →ₐ
 
 
 include hI in
-set_option maxHeartbeats 1000000 in
+
 theorem mem_of_layers (ιA : Ai →+* B)
     (hβ₀ : ∀ (o : O) (w : Ai), β (o ⊗ₜ[Zl] w) = algebraMap O LL o ⊗ₜ[Qp] ιA w)
     (zl : PowerSeries Zl →+* LetA O n) (h1 : IsCrys PD W.one.ρ)
@@ -528,7 +528,7 @@ theorem exists_disc' (hT : LocTied l P AI) (h : Good K s LL) (Γ : GamS P K s LL
 end Concrete
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem solvable (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime]
     (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) (hL : Laws (HW l) (F l) h) (J : Multiset ℕ) (r : ℕ)
     (C : Set (LetA ↥LL.1 (Module.finrank ℚ_[l] ↥(K0 K)))) (t : LetA ↥LL.1 (Module.finrank ℚ_[l] ↥(K0 K)))
@@ -544,8 +544,8 @@ theorem solvable (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.
     (funext fun j => γL_apply (SerL (HW l) (F l) h hL) _ (w j))).trans k3
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem main : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW), P7 D HW F := by
   intro D HW F l _ K s LL h T hT J y z hy hz hyz
   refine Classical.byContradiction fun hcon => ?_

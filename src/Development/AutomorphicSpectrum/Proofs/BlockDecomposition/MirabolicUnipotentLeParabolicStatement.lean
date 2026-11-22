@@ -8,7 +8,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCI
 
 open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.LeibPhi Topology
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mirabolic_unipotent_le_parabolic :
     ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
       [IsNonarchimedeanLocalField k] (m j : ℕ),

@@ -10,7 +10,7 @@ public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.Dua
 
 open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.btOrder_comap_hom : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (T' : Type) [CommGroup T'] [Finite T'] (Γ' : QFGroup R T') (a : Γ.G ⟶ Γ'.G) (α : T →* T'), (∀ t, Γ.pt t ≫ a = Γ'.pt (α t)) → ∀ f ∈ Γ'.btOrder ⊤, (fun t => f (α t)) ∈ Γ.btOrder ⊤ := by
   intro R _ _ T _ _ Γ T' _ _ Γ' a α ha f hf
   let Φ : (T' → R) →ₐ[R] (T → R) :=

@@ -138,8 +138,8 @@ variable (y) in
 theorem aeval_div_mem (c : ∀ k, ι k) {g : MRingOver ℚ ι} {d : K → ℕ} (hg : IsMultiHomog g d) :
     aeval y g / ∏ k, y ⟨k, c k⟩ ^ d k ∈ chartRingQ y c := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [g.as_sum, map_sum, Finset.sum_div]
+
+  rw [g.as_sum, map_sum, Finset.sum_div]
   refine Subalgebra.sum_mem _ fun m hm => ?_
   rw [aeval_monomial, mul_div_assoc]
   refine Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _) ?_

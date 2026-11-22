@@ -9,7 +9,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -51,8 +51,8 @@ theorem IsPolForm.unique (P : AbelianDeRham.Free) {A : Over (Sp R)} [GrpObj A] {
   have ex : ∀ c : primDR A, x' c.1 = x c := fun c => congrArg x (o.symm_apply_apply c)
   have ey : ∀ c : primDR A, y' c.1 = y c := fun c => congrArg y (o.symm_apply_apply c)
   have := congrArg (exteriorPower.alternatingMapLinearEquiv (wedgeDual x' y')) hw
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa [map_sum, wedgeDual, ex, ey] using this
+
+  simpa [map_sum, wedgeDual, ex, ey] using this
 
 theorem isDPMorphism_red : IsDPMorphism (epsDP R) (dp0 R) (TrivSqZeroExt.fstHom R R R).toRingHom := by
   refine (isDPMorphism_iff _ _ _).2 ⟨Ideal.map_le_iff_le_comap.2 fun a ha => ?_, fun n hn a ha => ?_⟩
@@ -107,7 +107,7 @@ theorem constMor_surjective (P : AbelianDeRham) {A : Over (Sp R)} [GrpObj A] {g 
       ← GrpMor.pull_pull (bcMor hφ) (liftMor (epsDP R) hic) (constMor A) (fun _ => rfl) (by simpa using e1) c]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem IsKSValue.unique (P : AbelianDeRham) {A : Over (Sp R)} [GrpObj A] {A' : Over (Sp (DualNumber R))} [GrpObj A']
     {g : ℕ} (hA : IsAbelianScheme A') (hg : SmoothOfRelativeDimension g A'.hom) {i : A.left ⟶ A'.left}
     {h : IsGrpPullback A A' (epsRed R) i} {f : HdR A} {v v' : epsR R ⟶ A} (e : IsKSValue h f v)
@@ -275,8 +275,8 @@ theorem IsKS.unique (P : AbelianDeRham) {Φ : Finset (E →+* ℂ)} {y : FrPt Xo
     refine LinearMap.ext fun h => ?_
     obtain ⟨a, ha⟩ := exists_sub_mem_Fil hρ hL hvs (kb := kb) (fun k => hl₂ k.1 k.2) h
     have := iso f hf _ ha
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum] at this
+
+    rw [map_sub, map_sum] at this
     simpa [h0] using this
   have ed : ∀ k, th (hb k) - kb k ∈ Fil B := fun k => by
     rw [Fil, hF, Submodule.mem_dualAnnihilator]

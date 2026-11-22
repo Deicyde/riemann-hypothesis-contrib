@@ -30,7 +30,7 @@ theorem tan_coef {V K : Type} [CommRing V] [CommRing K] [Algebra V K] {d : ℕ} 
     rw [MvPolynomial.map_X, MvPolynomial.aeval_X, MvPolynomial.aeval_X]
     split_ifs <;> ext <;> simp [dualMap]
 
-set_option maxHeartbeats 1000000 in
+
 theorem chartJetTan_holds : ChartJetTanSt Xo c := by
   intro T io y I d FT actT tgT uvecT xT hb hc hu
   letI := io.toAlgebra
@@ -64,7 +64,7 @@ theorem chartJetTan_holds : ChartJetTanSt Xo c := by
   obtain ⟨u, a₁, a₂⟩ := (Chart.comb_push I.m1.cart _ _ _).1 (cb ℓ)
   exact ⟨u, fun i => (a₁ i).trans (congrArg (_ ≫ ·) (Category.assoc _ _ _)), a₂.trans (h₁ _ _)⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem chartJetBasis_holds (hF : FrTanBasisSt Xo c) : ChartJetBasisSt Xo c := by
   intro T io y I d FT actT tgT uvecT xT hb hc hu
   letI := io.toAlgebra

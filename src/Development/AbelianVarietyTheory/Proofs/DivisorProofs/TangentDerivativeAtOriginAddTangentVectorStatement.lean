@@ -16,6 +16,6 @@ open GlobalTheory.LogKS (IsField)
 open GlobalTheory.Heat GlobalTheory.FormalOrigin
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CoordsOrigin
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.tangentDerivativeAtOrigin_add_tangentVector : ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G] (u v : TanM (𝟙 (Sp R)) G) (f : G.left.presheaf.stalk (origin G)), tanDer G (u + v) f = tanDer G u f + tanDer G v f := by
   first | exact @GlobalTheory.CoordsOrigin.tanDer_add | exact GlobalTheory.CoordsOrigin.tanDer_add | (intros; apply GlobalTheory.CoordsOrigin.tanDer_add <;> assumption)

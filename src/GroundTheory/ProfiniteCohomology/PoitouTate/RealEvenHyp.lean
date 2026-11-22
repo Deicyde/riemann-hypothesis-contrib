@@ -36,7 +36,7 @@ theorem gsTauBijective_of_le (W₀ : OpenSubgroup (galUnramifiedOutside K.1 ℚ�
   exact gsTauBijective_gsOpenSubgroup S ιs hS hev hL W₀ hW₀ hU
 
 
-set_option maxHeartbeats 1000000 in
+
 include hS hev in
 theorem bijective_tateCompactDualityMap_coind_gs_of_even
     (t : tateCompactCohomologyRes (gsFinFamily S ιs) (gsRealFamily S ιr) (gsRoots S N) 3 →+ ZMod N)

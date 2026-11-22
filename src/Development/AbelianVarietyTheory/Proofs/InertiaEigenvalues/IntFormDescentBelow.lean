@@ -65,8 +65,8 @@ theorem exists_local_basis {F : Type} [Field F] [NumberField F] (p : HeightOneSp
       fun x hx i => by
         obtain ⟨o, ho, hxo⟩ := hgen (e x) (heC x) hx
         have hx' : x = ∑ k, o k • B.equivFun ⟨g k, hg k⟩ := heinj (by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [hxo, map_sum]
+
+          rw [hxo, map_sum]
           exact Finset.sum_congr rfl fun k _ => by rw [map_smul, he1])
         rw [hx', Finset.sum_apply, Finset.mul_sum]
         refine Valuation.map_sum_le _ fun k _ => ?_
@@ -88,14 +88,14 @@ theorem exists_local_basis {F : Type} [Field F] [NumberField F] (p : HeightOneSp
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun F).1 hxsp
     refine ⟨c, ?_⟩
     have := he1 ⟨f, hf⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hc, map_sum] at this
+
+    rw [← hc, map_sum] at this
     exact this.symm.trans (Finset.sum_congr rfl fun k _ => map_smul _ _ _)
   · have hy : (∑ k, c k • b k) ∈ S := by
       show Int (e _)
       convert hc using 1
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]; exact Finset.sum_congr rfl fun k _ => map_smul _ _ _
+
+      rw [map_sum]; exact Finset.sum_congr rfl fun k _ => map_smul _ _ _
     obtain ⟨a, ha, hya⟩ := hbsp _ hy
     have hz : ∑ k, (c k - a k) • b k = 0 := by
       simp only [sub_smul, Finset.sum_sub_distrib]; rw [← hya, sub_self]

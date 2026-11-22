@@ -20,8 +20,8 @@ theorem UpperTheory.Reformulated.B.FinrankIntEqFinrankRat.finrank_eq_of_place :
     intro u
     have hu : j u = ∑ i, (b.repr u i) • j (b i) := by
       conv_lhs => rw [← b.sum_repr u]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_zsmul]
+
+      simp only [map_sum, map_zsmul]
     rw [hu]
     refine Submodule.sum_mem _ fun i _ => ?_
     exact zsmul_mem (Submodule.subset_span (Set.mem_range_self i)) _

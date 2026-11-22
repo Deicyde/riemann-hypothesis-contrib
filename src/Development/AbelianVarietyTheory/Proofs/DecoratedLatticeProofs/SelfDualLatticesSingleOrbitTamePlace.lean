@@ -14,8 +14,8 @@ noncomputable section
 
 open scoped TensorProduct
 
-set_option maxHeartbeats 1000000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 namespace GlobalTheory.IwaOrbit
 

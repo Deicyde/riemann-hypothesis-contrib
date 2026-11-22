@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 noncomputable section
@@ -21,7 +21,7 @@ open UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
 open UpperTheory.V.Z.Mult (Cp At IsDec CompOf Mult)
 open scoped Matrix TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 namespace UpperTheory.V.Z.J.D
 private theorem ev_of_gen {M : Type} [AddCommGroup M] [Module ℂ M] (T : Module.End ℂ M) (μ a : ℂ) (F : M) (hF : F ≠ 0)
     (h : F ∈ T.maxGenEigenspace μ) (ha : T F = a • F) : a = μ := by

@@ -15,7 +15,7 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData
 
-set_option maxHeartbeats 800000 in
+
 theorem quadA_of (hSch : SchurH) (hNIs : NormIdSm) (hNI : NormInv) (hGG : GrowthG)
     (hDD : DecDD) (hBC : BeConv) (hIn : Inputs) {k r : ℕ} {Wp Wq : Type}
     [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp] [FiniteDimensional ℂ Wp]

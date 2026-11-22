@@ -24,7 +24,7 @@ open Formalism.L2.Th1.D (F1 F2 OwOK TrDual phFF)
 open Formalism.InvariantFactorPaths.G7 (UnrOK IsLawOfLog cob)
 open MvPowerSeries
 open Formalism.DworkPowerSeriesWeights (Integral mvExp entLog ZV)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.orbitPlaces_thetaSeries_subst_orbMap_eq : ∀ (D : D7) (p : ℕ) [Fact p.Prime] (hp : 5 ≤ p) (σ : MaximalUnramifiedExtension p →+* MaximalUnramifiedExtension p) (om oms : Fin (nP D p / 2) → MaximalUnramifiedExtension p)
     (R : Finset (OrbitPlaces.Pl D)) {M N N' r : ℕ} (eA : Fin M ≃ R × Fin N)
     (f f' : (R × Fin (nP D p / 2)) × Fin N × Fin N' → Fin r → MaximalUnramifiedExtension p) (Θ : MvPowerSeries (Fin r) ℂ_[p]), subst (fun y : ZV (nP D p) M N' =>

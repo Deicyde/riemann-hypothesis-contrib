@@ -191,8 +191,8 @@ private theorem locA (O A M V : Type) [CommRing O] [IsDomain O] [CommRing A] [Al
   · simp only [Module.End.mul_apply, je, jφ]
     exact LinearMap.congr_fun (hsym z hz) _
   · rw [jφ, ← hsum J a b hd]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, map_sum, Module.End.mul_apply, je, jφ]
+
+    simp only [LinearMap.sum_apply, map_sum, Module.End.mul_apply, je, jφ]
   · have h1 : e v = ((iwC k n ⊤).relIndex (KO k (Fin n))) • v := hι (by rw [he, map_nsmul, (dc_K ρ).2 _ hv])
     have h2 : e (φ y (e v)) = φ (Hk.dd (Hk.NN n (resCard k : O) * y)) (e v) := jinj (by
       simp only [je, jφ]

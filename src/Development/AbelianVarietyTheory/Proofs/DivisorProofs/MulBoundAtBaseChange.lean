@@ -67,8 +67,8 @@ theorem toExt_mulW (j : ℕ) (u : Fin G.N → F) (f : G.Sec j) :
     (Nat.cast_succ j).symm) (GlobalTheory.chartPullPull G.L (G.fst E)) (G.chartAdj E j) (G.chartAdj E (j + 1))
     (fun t => ⟨((t.1.1 PUnit.unit, t.1.2 PUnit.unit), t.2 PUnit.unit), rfl, rfl, rfl⟩) _ le_rfl _ f).trans ?_
   refine congrArg (fun s => ProdChart.mul _ s _) ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Fintype.linearCombination_apply, Fintype.linearCombination_apply, map_sum]
+
+  rw [Fintype.linearCombination_apply, Fintype.linearCombination_apply, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   exact (map_smulₛₗ _ _ _).trans (congrArg _ (pullChart_ofSec _ _ _ (G.b k)))
 

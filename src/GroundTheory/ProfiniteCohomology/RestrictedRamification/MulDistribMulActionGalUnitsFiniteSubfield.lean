@@ -423,7 +423,7 @@ variable {K : FiniteSubfield} {v : HeightOneSpectrum (𝓞 K.1)}
   (ι : ℚ̄ →ₐ[K.1] AlgebraicClosure (v.adicCompletion K.1))
   (F : FiniteSubfield) [Fact (K ≤ F)] [Normal K.1 F.1]
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 instance mulDistribMulAction_gal_units_finiteSubfield :
     MulDistribMulAction Gal(F.1/K.1) F.1ˣ :=
   AlgEquiv.instMulDistribMulActionUnits
@@ -432,7 +432,7 @@ def ordPlace (f : F.1ˣ) : ℤ :=
   -WithZero.log ((placeOfEmbedding ι F).1.valuation F.1 (f : F.1))
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem placeDecompHom_surjective : Function.Surjective (placeDecompHom ι F) := by
   intro d
   obtain ⟨τ, hτ⟩ : ∃ τ : compField ι F ≃ₐ[v.adicCompletion K.1] compField ι F, ∀ y,
@@ -522,7 +522,7 @@ def ordComp (y : Additive (compField ι F)ˣ) : ℤ :=
     (placeOfEmbedding ι F).1.adicCompletion F.1))
 
 omit [Normal K.1 F.1] in
-set_option maxHeartbeats 2000000 in
+
 theorem ordComp_add (y y' : Additive (compField ι F)ˣ) :
     ordComp ι F (y + y') = ordComp ι F y + ordComp ι F y' := by
   have h0 : ∀ z : Additive (compField ι F)ˣ, Valued.v (((compEquiv ι F).symm (z.toMul : compField ι F)) :
@@ -545,8 +545,8 @@ theorem ordComp_sub (y y' : Additive (compField ι F)ˣ) :
   rw [sub_eq_add_neg, ordComp_add, ordComp_neg, ← sub_eq_add_neg]
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 4000000 in
+
+
 theorem ordComp_smul (γ : Gal(compField ι F/v.adicCompletion K.1)) (y : (compField ι F)ˣ) :
     ordComp ι F (Additive.ofMul (Units.map (γ : compField ι F →* compField ι F) y)) =
       ordComp ι F (Additive.ofMul y) := by
@@ -579,7 +579,7 @@ abbrev compDecomp : Gal(compField ι F/v.adicCompletion K.1) →* Gal(F.1/K.1) :
   decompHom (v.adicCompletion K.1) (embedComp ι F)
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem compDecomp_restrictNormalHom
     (σ : Gal(AlgebraicClosure (v.adicCompletion K.1)/v.adicCompletion K.1)) :
     compDecomp ι F (AlgEquiv.restrictNormalHom (compField ι F) σ) =
@@ -673,8 +673,8 @@ theorem exists_compCocycle_coboundary
   exact hc'0
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 4000000 in
+
+
 theorem ordComp_coboundary_eq (c : Gal(F.1/K.1) × Gal(F.1/K.1) → F.1ˣ)
     (β' : Gal(compField ι F/v.adicCompletion K.1) → Additive (compField ι F)ˣ)
     (hβ' : (groupCohomology.d₁₂ (galUnits.{0} (v.adicCompletion K.1) (compField ι F))).hom β' =

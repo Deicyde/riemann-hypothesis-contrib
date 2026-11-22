@@ -19,8 +19,8 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.ConjHalfSplitInt
 
@@ -34,8 +34,8 @@ theorem frMapAdj_int_iff : ∀ (D : D7) (S T : HSp D) (βS : GL (Fin S.rank) (EA
       toEAf D e ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := fun e P h => by
     rw [← GlobalTheory.ExportSeries.idem_eq h]
     unfold GlobalTheory.ExportSeries.idem
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact sum_mem fun PP hPP => GlobalTheory.RedHalfDrop.int_idemAt ⟨e, h⟩ hPP
   constructor
   · intro h

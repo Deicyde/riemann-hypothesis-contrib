@@ -39,8 +39,8 @@ theorem aeval_mul_of_isMultiHomog {S : Type*} [CommRing S] [Algebra ℤ S] (r : 
   classical
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, Finset.sum_mul]
+
+  rw [map_sum, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun m hm => ?_
   have hdeg := hg m hm
   simp only [aeval_monomial]

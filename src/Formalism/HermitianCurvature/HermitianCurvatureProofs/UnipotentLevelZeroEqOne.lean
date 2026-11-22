@@ -194,17 +194,17 @@ theorem head_types_of_types_at : PBI.HeadTypesAt → PBI.HeadTypes := by
     rw [heq (y e)]
     ext v
     simp only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.comp_apply, hπ1]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum]
+
+    rw [← map_sum]
     congr 1
     have := congrArg (fun T : Wq →L[ℂ] Wp => T (Bs.π' h2 v)) (hex0 (y e))
     simpa only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.comp_apply] using this
   · intro h hh y e
     rw [heq (P5.act _ y e), hd0 h hh y e, heq (y e)]
     ext v
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.comp_apply, ContinuousLinearMap.smul_apply,
-      map_sum, map_smul, hπ1]
+
+    simp only [ContinuousLinearMap.sum_apply, ContinuousLinearMap.comp_apply, ContinuousLinearMap.smul_apply,
+    map_sum, map_smul, hπ1]
   · intro Ψ
     rw [heq Ψ]
     ext v

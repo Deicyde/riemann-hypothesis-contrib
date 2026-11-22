@@ -81,9 +81,9 @@ theorem UpperTheory.V.KT.gramdet :
     simp only [of_apply]
     rw [Equiv.sum_comp (equivReindex L).symm (fun φ => star (φ (RingOfIntegers.basis L s.2 : L)) *
       A φ s.1 t.1 * φ (RingOfIntegers.basis L t.2 : L)), UpperTheory.V.KT.sum_emb L]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hA1, hA2, RingHom.mapMatrix_apply, map_apply, Matrix.smul_apply, gram, of_apply,
-      smul_eq_mul, Finset.mul_sum, map_sum, Complex.ofRealHom_eq_coe]
+
+    simp only [hA1, hA2, RingHom.mapMatrix_apply, map_apply, Matrix.smul_apply, gram, of_apply,
+    smul_eq_mul, Finset.mul_sum, map_sum, Complex.ofRealHom_eq_coe]
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [← Complex.add_conj]
     have hh : mat h w t.1 s.1 = star (mat h w s.1 t.1) := ((mat_herm h w).apply t.1 s.1).symm

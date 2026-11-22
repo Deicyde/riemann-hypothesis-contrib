@@ -33,8 +33,8 @@ noncomputable section
 
 namespace PositivityTheory.Rg.Sw.Glob.RhoH
 
-set_option maxHeartbeats 2000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 theorem orbit_cont : ∀ (D : D7) (n : ℕ) (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ), IsCharAF D.host.F ψ →
     ∀ χ : (AE D)ˣ →* Circle, IsHeckeChar D χ → ResEta D χ V.rank → ∀ θ : InfFam D, IsInfFam θ →

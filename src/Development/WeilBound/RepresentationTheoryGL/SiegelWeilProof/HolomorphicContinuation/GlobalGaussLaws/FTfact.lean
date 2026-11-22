@@ -17,7 +17,7 @@ namespace PositivityTheory.Rg.Sw.Glob
 
 open Classical
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem fTfact : FTfact := by
   intro D n V ψ χ θ μ ω H l s ν τ ε fr ι ctx w hw
   have hθ := ctx.hθ

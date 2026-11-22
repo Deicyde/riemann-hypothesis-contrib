@@ -42,7 +42,7 @@ theorem mtTyQ_congr {X : Fields} (R : Ranks) {ξ ξ' : Chr X.F X.E X.K} (h : ξ 
   subst h
   rfl
 
-set_option maxHeartbeats 6000000 in
+
 theorem core (B0 : Base) (px0 : PreX B0.toPre) (I0 : Col2.ColIn B0 px0) (B : Base) (px : PreX B.toPre)
     (I : Col2.ColIn B px) (hX0 : B0.fields.Ok) (hI0 : I0.Ok) (hI : I.Ok) (hcfg : SameCfg B px I B0 px0 I0)
     (ι : B0.LL →+* B.LL) (hι : B.embLL.comp ι = B0.embLL) (a : I.ι) :
@@ -207,8 +207,8 @@ theorem transp : ∀ (B0 : Base) (px0 : PreX B0.toPre) (I0 : Col2.ColIn B0 px0),
       have hb : ∀ i, B0.embLL (bas i) ∈ B.LLC := fun i =>
         hs _ (Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
       have hx : B0.embLL x ∈ B.LLC := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← bas.sum_repr x, map_sum]
+
+        rw [← bas.sum_repr x, map_sum]
         refine sum_mem fun i _ => ?_
         rw [map_rat_smul]
         exact SMulMemClass.smul_mem _ (hb i)

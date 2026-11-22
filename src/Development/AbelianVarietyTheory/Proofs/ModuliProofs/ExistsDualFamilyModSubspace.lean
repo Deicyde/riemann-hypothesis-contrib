@@ -27,8 +27,8 @@ theorem exists_dual_family_mod_subspace (K V : Type) [Field K] [AddCommGroup V] 
     rw [Fintype.linearIndependent_iff]
     intro c hc
     have h0 : B.mkQ (∑ a, c a • φ a) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum, map_smul] using hc
+
+      simpa [map_sum, map_smul] using hc
     have hc0 := h c ((Submodule.Quotient.mk_eq_zero B).mp h0)
     intro i
     simp [hc0]
@@ -73,8 +73,8 @@ theorem exists_symm_matrix_mod_subspace :
       by simp [LinearMap.mem_ker, (Submodule.Quotient.mk_eq_zero B).mpr hx]
     have hk := key (f.comp B.mkQ) hα b
     simp only [LinearMap.comp_apply] at hk
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, map_smul, smul_eq_mul, hk]
+
+    simp only [map_sub, map_sum, map_smul, smul_eq_mul, hk]
     simp [mul_comm]
 
 end GlobalTheory.KS

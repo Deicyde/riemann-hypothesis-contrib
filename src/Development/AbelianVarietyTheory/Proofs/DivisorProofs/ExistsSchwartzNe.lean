@@ -290,8 +290,8 @@ theorem hTens_plane_right (J : Matrix α α S) (η : S) (J' : Matrix β β S) (z
 
 theorem conj_pair (hc : ∀ z, c (c z) = z) {J : Matrix α α S} {η : S} (hJ : ∀ i j, c (J j i) = η * J i j) (u w : α → S) :
     c (∑ i, ∑ k, u i * J i k * c (w k)) = η * ∑ i, ∑ k, w i * J i k * c (u k) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, hc, hJ, Finset.mul_sum]
+
+  simp only [map_sum, map_mul, hc, hJ, Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => by ring
 

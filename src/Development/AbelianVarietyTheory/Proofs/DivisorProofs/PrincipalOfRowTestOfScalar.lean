@@ -31,8 +31,8 @@ theorem model_of_pres {H Γ : Type} [Group H] [Group Γ] {ι : Γ →* H} {W : T
   · rw [injective_iff_map_eq_zero]
     intro x hx
     have h4 : P.extL x = 0 := by rw [← hj, hx, map_zero]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← S.basis.sum_repr x, map_sum] at h4
+
+    rw [← S.basis.sum_repr x, map_sum] at h4
     simp only [map_smulₛₗ] at h4
     have h5 := Fintype.linearIndependent_iff.1 h1 _ h4
     refine S.basis.repr.injective (Finsupp.ext fun i => ?_)

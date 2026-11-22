@@ -41,8 +41,8 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp.typeSat :
     funext k
     have h3 : L k F = ∑ j, b.repr F j • L k (b j) := by
       conv_lhs => rw [← b.sum_repr F]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul]
+
+      simp only [map_sum, map_smul]
     have h4 : ∀ i, b.repr (L k F) i = ∑ j, b.repr F j * c (i, j) k := by
       intro i
       rw [h3]

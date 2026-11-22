@@ -70,8 +70,8 @@ theorem isExp_piEnd {V : Type} [AddCommGroup V] [Module ℂ V] {L U : Module.End
   have hl : ∀ z : Fin m → V, l z = ∑ i, (l ∘ₗ LinearMap.single ℂ (fun _ : Fin m => V) i) (z i) := by
     intro z
     conv_lhs => rw [← Finset.univ_sum_single z]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum]
+
+    simp [map_sum]
   have key : (fun k : ℕ => ((k.factorial : ℂ))⁻¹ * l ((piEnd m L ^ k) y)) =
       fun k => ∑ i, ((k.factorial : ℂ))⁻¹ * (l ∘ₗ LinearMap.single ℂ (fun _ : Fin m => V) i) ((L ^ k) (y i)) := by
     funext k

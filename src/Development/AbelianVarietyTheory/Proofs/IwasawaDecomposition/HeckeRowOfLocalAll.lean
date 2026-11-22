@@ -13,8 +13,8 @@ namespace GlobalTheory.HeightCounting.Fin3
 
 open Formalism.L2.Theta Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 4000000
+
+
 
 section Gen
 

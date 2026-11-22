@@ -101,9 +101,9 @@ theorem mulVec_period {g : ℕ} {La : Type} [AddCommGroup La] (P : La →+ (Fin 
     ext k; simp [Finset.sum_apply, Pi.single_apply]
   rw [h1 (fun i => a (Sum.inl i)), h1 (fun i => a (Sum.inr i))]
   conv_lhs => rw [h2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, Fintype.sum_sum_type, map_add (f := _), Matrix.mulVec_add, Matrix.mulVec_sum,
-    Matrix.mulVec_smul, (hn _).1, (hn _).2]
+
+  simp only [map_sum, map_zsmul, Fintype.sum_sum_type, map_add (f := _), Matrix.mulVec_add, Matrix.mulVec_sum,
+  Matrix.mulVec_smul, (hn _).1, (hn _).2]
 
 theorem normalAt_of_coord (x : KeyIn ℂ) (u : HolUnif x.P.A x.P.L x.P.g) {La : Type} [AddCommGroup La]
     (P : La →+ (Fin x.P.g → ℂ)) (bas : (Fin x.P.g ⊕ Fin x.P.g → ℤ) ≃ₗ[ℤ] La)
