@@ -491,6 +491,16 @@
             "resolution": "resolutions/54-padic-splitting.lean"
           }
         ]
+      },
+      {
+        "commit": "091ff4a5ea67ae9e12e480634eecfb924618413a",
+        "files": [
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/CharpolyDvdPowOfAevalEqZero.lean",
+            "ours": "85e18f9ab800ea57f442214b25ed28ecd3d1d005",
+            "resolution": "resolutions/54-inertia-characteristic-polynomial.lean"
+          }
+        ]
       }
     ]
   }
