@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-22",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/IsIntegralConeRingOfForallValuationSubring.lean",
+          "stages": {
+            "1": "e7f4753d1d35b5b02b8b16859c2e336bdfbaabbe",
+            "2": "bd4d00b290a62ae1afbbb1f31a0e28b1486c35b6",
+            "3": "3440386d942ff46a6c4ccd5a0d0843341eaa5fa1"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "4f45f3a3e0679b0718c5ce0b91e6ea492309b23c",
+      "checkpoint_head": "68919dedf7e51134da99ca2dd6fc8aa138b9a782"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
