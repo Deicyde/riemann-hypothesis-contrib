@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/FiniteZpModuleTorsionFreeSplitting.lean",
+      "stages": {
+        "1": "fc3dc6323091c3d69427d19e24092e016bdf4502",
+        "2": "6267566872f652068e7942ce3e94ccace966e05f",
+        "3": "3607f3f1e7687a335817b0ca9709df90de3d0c45"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "da04f0d59940d0c63f2468530ad6678d28fae9e5",
+  "checkpoint_head": "7849d2fe77cd68624ad24916664308acaa4b76ed"
+}
