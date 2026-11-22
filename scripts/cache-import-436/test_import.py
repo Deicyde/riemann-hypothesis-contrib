@@ -29,6 +29,7 @@ def fixture(work):
         'Probe.Base': 'module\npublic theorem base : True := True.intro\n',
         'Probe.Runtime': 'module\nprivate def hidden (n : Nat) : Nat := n + 3\npublic def value : Nat := hidden 4\n',
         'Probe.Initializer': 'module\npublic initialize counter : IO.Ref Nat ← IO.mkRef 41\npublic def current : IO Nat := counter.get\n',
+        'Probe.RuntimeConsumer': 'module\nimport all Probe.Runtime\npublic def downstream : Nat := value + 1\n',
         'Probe.Proof': 'module\npublic import Probe.Base\npublic theorem proof : True := base\n',
         'Probe.LeanRuntime': 'module\npublic import Lean\npublic theorem leanProof : True := True.intro\n',
         'Probe.MetaOnly': 'module\nmeta import Lean\npublic theorem metaProof : True := True.intro\n',
@@ -79,7 +80,7 @@ def fixture(work):
     run([BIN / 'normalize-split', jobs_file, report], root, env)
     assert report.read_bytes() == classification_only.read_bytes()
     classifications = [json.loads(s) for s in report.read_text().splitlines()]
-    runtime = {'Probe.Runtime', 'Probe.Initializer'}
+    runtime = {'Probe.Runtime', 'Probe.Initializer', 'Probe.RuntimeConsumer'}
     assert {j['name'] for j in classifications if j['needsCompile']} == runtime
     for job in jobs:
         base = Path(job['olean']).with_suffix('')
@@ -107,8 +108,10 @@ def fixture(work):
     for request in requests:
         job = by_name[request['name']]
         fresh = Path(request['setup']).parent / 'fresh'
+        setup = fresh.parent / 'setup.json'
+        run(['zstd', '-q', '-d', '-f', request['setup'], '-o', setup], root, env)
         run(['lake', 'env', BIN / 'compile-runtime', job['name'], job['source'],
-             request['setup'], fresh.with_suffix('.olean'), fresh.with_suffix('.ilean'),
+             setup, fresh.with_suffix('.olean'), fresh.with_suffix('.ilean'),
              fresh.with_suffix('.c')], root, env)
         run([BIN / 'normalize-split', 'compare', job['name'],
              frozen / job['name'].replace('.', '/'), fresh, fresh.parent / 'compare'], root, env)
@@ -121,9 +124,9 @@ def fixture(work):
         old = frozen / job['name'].replace('.', '/')
         for suffix in suffixes:
             assert Path(str(base) + suffix).read_bytes() == Path(str(old) + suffix).read_bytes(), (job['name'], suffix)
-    (root / 'src/Use.lean').write_text('module\nimport Probe.Runtime\nimport Probe.Initializer\npublic def main : IO Unit := do\n  IO.println value\n  IO.println (← current)\n')
+    (root / 'src/Use.lean').write_text('module\nimport Probe.Runtime\nimport Probe.Initializer\nimport Probe.RuntimeConsumer\npublic def main : IO Unit := do\n  IO.println value\n  IO.println (← current)\n  IO.println downstream\n')
     run(['lake', 'build', 'probe-use'], root, env)
-    assert run([root / '.lake/build/bin/probe-use'], root, env).strip() == '7\n41'
+    assert run([root / '.lake/build/bin/probe-use'], root, env).strip() == '7\n41\n8'
     run(['lake', '--rehash', '--no-build', 'build'], root, env)
     cached = {**env, 'LAKE_ARTIFACT_CACHE': 'true', 'LAKE_RESTORE_ARTIFACTS': 'true'}
     mapping = work / 'outputs.jsonl'

@@ -173,14 +173,21 @@ private def setups (ws : Workspace) (jobs classifications work report : FilePath
   let cfg : ModuleFacetConfig Module.elabArtsFacet := mkFacetJobConfig fun mod => do
     unless mod.pkg.keyName == root do return ← Module.elabArtsFacetConfig.run mod
     unless selected.contains mod.name do error s!"unplanned root import {mod.name}"
-    Job.async do
+    let presetupJob ← mod.presetup.fetch
+    presetupJob.mapM fun presetup => do
+      setTrace presetup.trace
       -- Source/module metadata still comes exclusively from stock Lake.
       -- Only this planning workspace permits an absent C artifact.
       let arts ← mod.computeArtifacts true true
       return {arts with
         irSig? := some (← computeArtifact mod.irSigFile "ir.sig" (text := false))
         ir? := some (← computeArtifact mod.irFile "ir" (text := false))}
-  let ws := ws.addModuleFacetConfig cfg
+  let irCfg : ModuleFacetConfig Module.irArtsFacet := mkFacetJobConfig fun mod => do
+    if mod.pkg.keyName == root then
+      mod.elabArts.fetch
+    else
+      Module.irArtsFacetConfig.run mod
+  let ws := ws.addModuleFacetConfig cfg |>.addModuleFacetConfig irCfg
   let output ← IO.FS.Handle.mk report .write
   let action : FetchM Unit := do
     for line in (← IO.FS.lines jobs) do
@@ -194,8 +201,12 @@ private def setups (ws : Workspace) (jobs classifications work report : FilePath
       let dir := work / name.toString.replace "." "/"
       IO.FS.createDirAll dir
       let path := dir / "setup.json"
-      IO.FS.writeFile path (toJson {setup with name := archivedName}).pretty
-      output.putStrLn (Json.mkObj [("name", toJson name), ("setup", toJson path),
+      IO.FS.writeFile path (toJson {setup with name := archivedName}).compress
+      let compressed := path.addExtension "zst"
+      let result ← IO.Process.output {cmd := "zstd", args := #["-q", "-f", "--rm",
+        path.toString, "-o", compressed.toString]}
+      unless result.exitCode == 0 do error s!"setup compression failed: {result.stderr}"
+      output.putStrLn (Json.mkObj [("name", toJson name), ("setup", toJson compressed),
         ("input", toJson presetup.trace.hash.toString)]).compress
       output.flush
   ws.runFetchM action {verbosity := .quiet, noBuild := true, trustHash := false}
