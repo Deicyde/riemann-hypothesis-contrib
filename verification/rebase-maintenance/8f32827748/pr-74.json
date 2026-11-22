@@ -1,0 +1,38 @@
+{
+  "number": 74,
+  "title": "Give four duplicated theorems a single defining module",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "74efb4e7dbcc9fd9368c11e126661ff9bf273be8",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "fix/canonical-ahslim-theorems",
+  "initial_head": "06f38a132b762aafb0cc2b01aa0608128a346a64",
+  "rebased_head": "d487af9a50d476d16fd0d35effdd678d1e672b42",
+  "prepared_branch": "maintenance/rebased-pr-74-8f32827748-45049089055-restack",
+  "ready_to_publish": false,
+  "published_head": "74efb4e7dbcc9fd9368c11e126661ff9bf273be8",
+  "changes": "6 files changed, 36 insertions(+), 46 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 6,
+  "note": "Published to the original PR branch with a checked head and an original-head backup.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "applied_before_restack": true,
+  "previous_prepared_head": "74efb4e7dbcc9fd9368c11e126661ff9bf273be8"
+}

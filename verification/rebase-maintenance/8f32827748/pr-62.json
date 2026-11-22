@@ -1,0 +1,35 @@
+{
+  "number": 62,
+  "title": "Shorten machine-dumped terms and reuse repeated proofs in 76 modules",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "31a38861da6da8f71b16d18e935ac4f6794141d9",
+  "original_repo": "marwuint/riemann-hypothesis",
+  "original_branch": "refactor/shorten-explicit-terms-wave2",
+  "rebased_head": "bea553c5789ffcd02f535ab046704d392ef914d0",
+  "prepared_branch": "maintenance/rebased-pr-62-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "76 files changed, 1354 insertions(+), 6590 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "d637a716990574f2eefd9ef1fa1a6b24f646f40d"
+}

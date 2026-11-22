@@ -1,0 +1,35 @@
+{
+  "number": 83,
+  "title": "Zero-free region: replace the 34-file assembly with a self-contained 2,368-token proof (-89.1% normalized tokens)",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "92e1668af9185779557a28ce4983f28e5d12b41f",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/zero-free-region-single-file",
+  "rebased_head": "21c66206c6d05ee6bebd02e8aaef6bfaf8577b7c",
+  "prepared_branch": "maintenance/rebased-pr-83-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "2 files changed, 197 insertions(+), 3 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 1,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "a48e44cca837dd149092a1c0bba563200a40e28f"
+}

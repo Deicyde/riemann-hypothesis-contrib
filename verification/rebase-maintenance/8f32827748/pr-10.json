@@ -1,0 +1,37 @@
+{
+  "number": 10,
+  "title": "simplify generated proof fallbacks",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "1ccff6869721e3608761372313714f64e59aba57",
+  "original_repo": "deancureton/riemann-hypothesis",
+  "original_branch": "cleanup/proof-fallbacks",
+  "rebased_head": "f6807f95aa42e634ba140420aef114d7afe6c554",
+  "prepared_branch": "maintenance/rebased-pr-10-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "36203 files changed, 36280 insertions(+), 36265 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "automatic_resolution_count": 10576,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044493411-manual-imports/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "3f21a3ec46974c5d37c9bfcb5b7ae0d0214e98ad",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true
+}

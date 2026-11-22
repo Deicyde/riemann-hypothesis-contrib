@@ -1,0 +1,37 @@
+{
+  "number": 75,
+  "title": "Share analytic proofs across zeta and Dirichlet L-functions (630 fewer Lean lines)",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "4938a86c3e68095277b498f3b92e2bd4d2fda3ec",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/zero-free-region-normalized-log",
+  "rebased_head": "94e0e86f95a9e42791c0f8d9fd90b3492f8a3279",
+  "prepared_branch": "maintenance/rebased-pr-75-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "11 files changed, 487 insertions(+), 751 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "automatic_resolution_count": 12,
+  "note": "Retained DzDifferentiableOn and NormCpowSubLePoint because current main still imports them; import existence and cycle checks pass.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45043964658-remaining/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "d3ecd8eca4030408a832836bae657401ed86ce05",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true
+}

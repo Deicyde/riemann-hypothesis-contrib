@@ -1,0 +1,35 @@
+{
+  "number": 86,
+  "title": "Report vm.max_map_count at job start, fix the AWS template, clarify doctor output",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "a2ede518f2051022813ea7502f0d82a0680bbd25",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "ci/job-start-map-count-preflight",
+  "rebased_head": "53f2a3d8179b5dde87e6df2dc55ce598729a1d5f",
+  "prepared_branch": "maintenance/rebased-pr-86-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "5 files changed, 192 insertions(+), 8 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "40758c7d23084783aebf72d7f44d52cf824ef9c8"
+}

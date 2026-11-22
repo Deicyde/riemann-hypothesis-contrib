@@ -1,0 +1,35 @@
+{
+  "number": 92,
+  "title": "Reuse the existing CovNFormula proof",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "bb1ffc43837cba8e5fad630e6688d45dd818a3ea",
+  "original_repo": "graohene10-spec/riemann-hypothesis",
+  "original_branch": "covn-formula-share-proof",
+  "rebased_head": "ed7e6538a45e0f682983dfa2b2566c6b4602178f",
+  "prepared_branch": "maintenance/rebased-pr-92-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "1 file changed, 4 insertions(+), 32 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 1,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "4df9079596c68c31260c1482147e8c9b97f82510"
+}

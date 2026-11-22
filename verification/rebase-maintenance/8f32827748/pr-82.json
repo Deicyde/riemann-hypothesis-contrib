@@ -1,0 +1,35 @@
+{
+  "number": 82,
+  "title": "Share stabilizer filtration and Hensel counts (414 fewer Lean lines)",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "d4fa3841d45d222ce2c4a7f7c73d96a78cf04c55",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/share-stabilizer-counts",
+  "rebased_head": "02a0c5598732428cc2b2af674612a2e731b94383",
+  "prepared_branch": "maintenance/rebased-pr-82-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "2 files changed, 20 insertions(+), 434 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 4,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "80587aa885f931d17f297bc8cfa825422fc0df97"
+}

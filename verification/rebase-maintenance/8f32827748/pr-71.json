@@ -1,0 +1,35 @@
+{
+  "number": 71,
+  "title": "chore: remove 66 backward.* options across 4 kernel-used scheme files",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "ea66ac29ea75dea35b778299e34bc702798170ba",
+  "original_repo": "thekeunpie-hash/riemann-hypothesis",
+  "original_branch": "cleanup/remove-backward-options",
+  "rebased_head": "704081b30fb15e24ff7da16cd3b4fb37b8eee086",
+  "prepared_branch": "maintenance/rebased-pr-71-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "4 files changed, 434 insertions(+), 258 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 4,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "14bf9e628a20fa9f1adfd990c9e8b80fa898b960"
+}

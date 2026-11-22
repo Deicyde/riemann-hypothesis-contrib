@@ -1,0 +1,35 @@
+{
+  "number": 69,
+  "title": "cleanup/seed ancestor cache",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "53052797a29d749b004442a8fa8d77a04d67ffef",
+  "original_repo": "deancureton/riemann-hypothesis",
+  "original_branch": "cleanup/seed-ancestor-cache",
+  "rebased_head": "bb3ba3946c0dc3378ae5e41e9e9a69cf7f352d97",
+  "prepared_branch": "maintenance/rebased-pr-69-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "4 files changed, 165 insertions(+), 29 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "403722220d881dfcf630e2db30feeb57c0f8a532"
+}

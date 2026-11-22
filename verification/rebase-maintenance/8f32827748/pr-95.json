@@ -1,0 +1,35 @@
+{
+  "number": 95,
+  "title": "Simplify proofs in GammaFactorNonvanishing and ZeroFreeRegion (\u2212824 lines)",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "018e327c93d07383f5542b97741ca17548db2a7e",
+  "original_repo": "Osgood001/riemann-hypothesis",
+  "original_branch": "simplify-zero-free-region-and-gamma-reductions",
+  "rebased_head": "adba511564d02b8cb4cb2c4575011618abf30a35",
+  "prepared_branch": "maintenance/rebased-pr-95-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "26 files changed, 590 insertions(+), 1370 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 4,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "ecae7b331fb6c02cb5dc383fd8dee895c42e9c6f"
+}

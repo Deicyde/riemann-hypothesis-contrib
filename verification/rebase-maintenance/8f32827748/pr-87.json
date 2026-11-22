@@ -1,0 +1,35 @@
+{
+  "number": 87,
+  "title": "Shorten checked proofs across 816 Lean modules",
+  "status": "rebased",
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "original_head": "8e92b2be254a03fa837ad68a96e2be73b92ef8ef",
+  "original_repo": "graohene10-spec/riemann-hypothesis",
+  "original_branch": "proof-shortening/verified-disjoint-20261122",
+  "rebased_head": "264d8f165ec7d704590c5fb5f4bfca5c35137e83",
+  "prepared_branch": "maintenance/rebased-pr-87-8f32827748-45049089055-restack",
+  "ready_to_publish": true,
+  "changes": "816 files changed, 4509 insertions(+), 9560 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "5c1ddf85d2f237c400404eed7d227468891c8630"
+}
