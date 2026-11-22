@@ -37,6 +37,16 @@
             "resolution": "resolutions/88-current-readme-main611.md"
           }
         ]
+      },
+      {
+        "commit": "73374fdf92e9d8be07baf07e17d1213f7b40ddb9",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "ab7382d19407181da3fd452e6e0873060f0c3adf",
+            "resolution": "resolutions/88-comparator-layout-readme.md"
+          }
+        ]
       }
     ]
   }
