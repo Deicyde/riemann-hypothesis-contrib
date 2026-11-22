@@ -1,0 +1,90 @@
+{
+  "base": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+  "run": "45053965890-repair",
+  "results": [
+    {
+      "number": 54,
+      "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+      "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+      "original_repo": "by-eureka/riemann-hypothesis",
+      "original_branch": "eureka/upstream-proof-refactors",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "automatic_resolution_count": 1,
+      "rebased_head": "28dc0642588e031da797a6474efa94ced4b49e4e",
+      "diff_check": true,
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "133 files changed, 1416 insertions(+), 4738 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-54-fbf2468e1c-45053965890-repair",
+      "status": "rebased",
+      "base": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+      "note": "Retained main\u2019s local zeta reduction because RhOfRight was pruned; kept other proof shortenings.",
+      "repair_parent": "0d1cefd21d834298efd7b91c06ebfcc40674372b",
+      "previous_prepared_head": "d4c52842a47c82b9436bbf3f294caad818d48112",
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/ClaimStrip.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        }
+      ],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 149
+    },
+    {
+      "number": 95,
+      "title": "Simplify proofs in GammaFactorNonvanishing and ZeroFreeRegion (\u2212824 lines)",
+      "status": "needs-contributor-source-review",
+      "base": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+      "original_head": "b5c830f1cd3f529d94602391dc4b5c93829fdf16",
+      "original_repo": "Osgood001/riemann-hypothesis",
+      "original_branch": "simplify-zero-free-region-and-gamma-reductions",
+      "rebased_head": "9895731eb557dbd4b20661fc286c23a4ffcf7c1a",
+      "prepared_branch": "maintenance/rebased-pr-95-fbf2468e1c-45053965890-repair",
+      "ready_to_publish": true,
+      "changes": "26 files changed, 577 insertions(+), 1343 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 1,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "562d5d59e0cedb59b64b3b55db339830b358848a",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        }
+      ],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 1,
+      "contributor_latest_source_preserved": false,
+      "contributor_source_differences": [
+        "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZetaGrowth.lean"
+      ]
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
