@@ -1,0 +1,27 @@
+{
+  "number": 80,
+  "title": "Remove stub-check guards from the 4.36 port (stacked on #66)",
+  "original_head": "942cc4de41b2922bafbf871b184ff8edd2dd80b5",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "cleanup/port-4.36-stub-guards",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "214bf0f6663cacfee5c87b379b55b77b03a76346",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "20 files changed, 1 insertion(+), 514 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-80-e5ae821a00-45039889610-owned",
+  "status": "rebased"
+}

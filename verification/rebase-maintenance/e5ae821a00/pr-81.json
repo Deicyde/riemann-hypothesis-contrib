@@ -1,0 +1,27 @@
+{
+  "number": 81,
+  "title": "Remove debugging output from the 4.36 port (stacked on #66)",
+  "original_head": "0620a66560485fd220ed3e0fd8a15743fa5decaa",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "cleanup/port-4.36-debug-output",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "a48c2d2b5998762b400d6715b713b58d73c721e8",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "2 files changed, 4 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-81-e5ae821a00-45039889610-owned",
+  "status": "rebased"
+}

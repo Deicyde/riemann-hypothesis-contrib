@@ -1,0 +1,162 @@
+{
+  "base": "e5ae821a00834f8043e987947f8151cc769bafe2",
+  "run": "45039889610-owned",
+  "results": [
+    {
+      "number": 81,
+      "title": "Remove debugging output from the 4.36 port (stacked on #66)",
+      "original_head": "0620a66560485fd220ed3e0fd8a15743fa5decaa",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "cleanup/port-4.36-debug-output",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "a48c2d2b5998762b400d6715b713b58d73c721e8",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "2 files changed, 4 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-81-e5ae821a00-45039889610-owned",
+      "status": "rebased"
+    },
+    {
+      "number": 97,
+      "title": "Run the Lean auto-formatter over `src/` (stacked on #66)",
+      "original_head": "c44cd7f33a4ba6671fd3a43fcdc3c94ff93890af",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "format/port-4.36-lean-formatter",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2e43e1406f4398c615e1e527eeb3334600726cc4",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "f1f47149ae019fe2e36083a452467d1a8f105bbd",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "147418 files changed, 7893752 insertions(+), 4128307 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-97-e5ae821a00-45039889610-owned",
+      "status": "rebased"
+    },
+    {
+      "number": 74,
+      "title": "Give four duplicated theorems a single defining module",
+      "original_head": "06f38a132b762aafb0cc2b01aa0608128a346a64",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "fix/canonical-ahslim-theorems",
+      "maintainer_can_modify": true,
+      "old_merge_base": "09201d6a839516534e62aa598ff5ed82724105ac",
+      "automatic_resolution_count": 2,
+      "automatic_resolutions": [
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/ExistsPrimeFiltrationOfIsMultiHomogIdeal.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterDivSupp.lean",
+          "reason": "three-way-replay-through-module-header"
+        }
+      ],
+      "status": "conflict",
+      "conflict_count": 2,
+      "stage_types": {
+        "1,2,3": 2
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CapelliComplements/GeneralBFactAlt.lean",
+          "stages": {
+            "1": "462bcd8bc83c5bf2e1bb6c65ee504a5ac7196f6c",
+            "2": "ee17c1db0590f46a21498f12ff3c42d6a649ea7c",
+            "3": "f78415b71479e21607f77e2154395376e14a3eed"
+          }
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterPCProof.lean",
+          "stages": {
+            "1": "10f4a8192bfd0a93a8c3e49c877b4107430ab16a",
+            "2": "d4358ee2ae733305d4b246627d5fa20dfbb97017",
+            "3": "781f7f9eb760d8acced63a58f12945e09c62fe9c"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "06f38a132b762aafb0cc2b01aa0608128a346a64",
+      "log_tail": "Auto-merging src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CapelliComplements/GeneralBFactAlt.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CapelliComplements/GeneralBFactAlt.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/ExistsPrimeFiltrationOfIsMultiHomogIdeal.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/ExistsPrimeFiltrationOfIsMultiHomogIdeal.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/IsHomogeneousGrL.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterDivSupp.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterDivSupp.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterPCProof.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterPCProof.lean\nRebasing (1/1)\nerror: could not apply 06f38a132b... Give four duplicated theorems a single defining module\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply 06f38a132b... # Give four duplicated theorems a single defining module\n",
+      "checkpoint_head": "e5ae821a00834f8043e987947f8151cc769bafe2"
+    },
+    {
+      "number": 91,
+      "title": "Combine reviewed proof cleanups on Lean 4.36",
+      "original_head": "c07c1fd63cb6fe76bd361471fac5407a9eb081c9",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "cleanup/reviewed-on-4.36",
+      "maintainer_can_modify": true,
+      "old_merge_base": "14f383e5edeae10b9991d9b8aec26b58aabc57eb",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "462c51902aa763e93b8e7fe1d0517db42dd4419b",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "53 files changed, 1061 insertions(+), 3806 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-91-e5ae821a00-45039889610-owned",
+      "status": "rebased"
+    },
+    {
+      "number": 80,
+      "title": "Remove stub-check guards from the 4.36 port (stacked on #66)",
+      "original_head": "942cc4de41b2922bafbf871b184ff8edd2dd80b5",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "cleanup/port-4.36-stub-guards",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "214bf0f6663cacfee5c87b379b55b77b03a76346",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "20 files changed, 1 insertion(+), 514 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-80-e5ae821a00-45039889610-owned",
+      "status": "rebased"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}

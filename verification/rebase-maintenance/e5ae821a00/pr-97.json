@@ -1,0 +1,27 @@
+{
+  "number": 97,
+  "title": "Run the Lean auto-formatter over `src/` (stacked on #66)",
+  "original_head": "c44cd7f33a4ba6671fd3a43fcdc3c94ff93890af",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "format/port-4.36-lean-formatter",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2e43e1406f4398c615e1e527eeb3334600726cc4",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "f1f47149ae019fe2e36083a452467d1a8f105bbd",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "147418 files changed, 7893752 insertions(+), 4128307 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-97-e5ae821a00-45039889610-owned",
+  "status": "rebased"
+}
