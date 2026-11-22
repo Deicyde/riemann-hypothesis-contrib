@@ -1,0 +1,47 @@
+{
+  "number": 88,
+  "title": "Add a formal-conjectures Comparator setup and gather the setups in comparator/",
+  "original_head": "24e73b1ff2c9c965e39c68c32e50bdaf13a7db7a",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "comparator/formal-conjectures",
+  "maintainer_can_modify": false,
+  "old_merge_base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "automatic_resolution_count": 4,
+  "automatic_resolutions": [
+    {
+      "path": "README.md",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "README.md",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "README.md",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "README.md",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    }
+  ],
+  "rebased_head": "fdf6baa027671ba5a51c0776043573156dabbafa",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "challenge_relocated_unchanged": true,
+  "changes": "14 files changed, 993 insertions(+), 35 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-88-611ce0b630-45055427111-docs",
+  "status": "rebased"
+}
