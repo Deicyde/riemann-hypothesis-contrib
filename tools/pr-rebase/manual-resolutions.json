@@ -461,6 +461,16 @@
             "resolution": "resolutions/54-adic-neighbourhood.lean"
           }
         ]
+      },
+      {
+        "commit": "1d95a2d5d6ed8fa459a4406e0ce4afbc6785e4bd",
+        "files": [
+          {
+            "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DerInner.lean",
+            "ours": "59e02ea6e86dafab869dfb03da04f80130cb6aed",
+            "resolution": "resolutions/54-inner-derivations.lean"
+          }
+        ]
       }
     ]
   }
