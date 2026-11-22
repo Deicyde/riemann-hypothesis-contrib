@@ -93,8 +93,8 @@ theorem indep_phi_cmp (hdom : IsDomain O) (hFr : IsFractionRing O LL)
   have hsum : ∑ m, c m • W.cmp T ⟨e m, (he.1 m).1⟩ = 0 := by
     apply φVB_inj PD (LL := LL) (V := T.V)
     apply Formalism.MainNotions.UnusedSlot80.LevR.ιV_inj (PD := PD) (LL := LL) (V := T.V)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_zero, map_zero, map_sum, map_sum]
+
+    rw [map_zero, map_zero, map_sum, map_sum]
     simpa [map_smul] using hc
   obtain ⟨⟨dd, hdd⟩, hint⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors O)
     (Finset.univ : Finset (Fin r)) c
@@ -113,8 +113,8 @@ theorem indep_phi_cmp (hdom : IsDomain O) (hFr : IsFractionRing O LL)
   have hcz : W.cmp T ⟨z, hzN⟩ = 0 := by
     have e1 : (⟨z, hzN⟩ : ↥(W.N T)) = ∑ m, o m • (⟨e m, (he.1 m).1⟩ : ↥(W.N T)) :=
       Subtype.ext (by simp [hz, Submodule.coe_sum])
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, map_sum]
+
+    rw [e1, map_sum]
     simp only [W.cmp_smul]
     calc ∑ m, algebraMap O LL (o m) • W.cmp T ⟨e m, (he.1 m).1⟩
         = ∑ m, algebraMap O LL dd • (c m • W.cmp T ⟨e m, (he.1 m).1⟩) := by

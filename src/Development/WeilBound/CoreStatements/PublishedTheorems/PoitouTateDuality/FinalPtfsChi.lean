@@ -34,7 +34,7 @@ theorem valuation_le_one_of_pow_eq_one {Ω : Type} [Field Ω] (A : ValuationSubr
   have : A.valuation x ^ m = 1 := by rw [← Valuation.map_pow, hx, Valuation.map_one]
   exact (one_lt_pow₀ h hm).ne' this
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_chi' (Kf : FiniteSubfield) [NumberField Kf.1] [IsAlgClosure Kf.1 (AlgebraicClosure ℚ)]
     (v : HeightOneSpectrum (𝓞 Kf.1)) (A : ValuationSubring (AlgebraicClosure ℚ)) (hA : IsPlaceOver A v)
     (N : ℕ+)

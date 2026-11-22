@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 open MeasureTheory Matrix Topology
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.integrable_full_rank_fibre :
     ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
       [MeasurableSpace k] [BorelSpace k] (a b : ℕ) (ν : kˣ →* ℂˣ),

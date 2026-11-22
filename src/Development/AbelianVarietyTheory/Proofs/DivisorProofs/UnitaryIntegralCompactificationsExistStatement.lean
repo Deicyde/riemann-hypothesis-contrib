@@ -14,6 +14,6 @@ open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 open GlobalTheory
 open Classical
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.unitary_integral_compactifications_exist : UMinSt := by
   first | exact @GlobalTheory.UPoinc.uMinSt_holds | exact GlobalTheory.UPoinc.uMinSt_holds | (intros; apply GlobalTheory.UPoinc.uMinSt_holds <;> assumption)

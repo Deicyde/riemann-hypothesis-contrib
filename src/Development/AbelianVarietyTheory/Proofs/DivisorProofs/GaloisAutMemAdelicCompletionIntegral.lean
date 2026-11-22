@@ -60,8 +60,8 @@ theorem herm_smul_left (G : Matrix (Fin r) (Fin r) E) (t : E) (x y : Fin r → E
 theorem herm_symm (G : Matrix (Fin r) (Fin r) E) (hG : ∀ a b, cc (G a b) = G b a) (x y : Fin r → E) :
     IsCMField.complexConj E (herm G x y) = herm G y x := by
   simp only [cc] at hG
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [herm, cc, map_sum, map_mul, IsCMField.complexConj_apply_apply, hG]
+
+  simp only [herm, cc, map_sum, map_mul, IsCMField.complexConj_apply_apply, hG]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
 
@@ -348,8 +348,8 @@ theorem exists_idem_adele {T : Type} [Fintype T] [DecidableEq T] (N : T → 𝓞
     · rfl
     · exact map_zero _
   · have hsum' := congrArg incl hsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_mul, map_sum, map_one] at hsum'
+
+    rw [map_mul, map_sum, map_one] at hsum'
     simp only [map_mul, incl_algebraMap] at hsum'
     exact hsum'
 

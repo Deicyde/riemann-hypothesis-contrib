@@ -154,8 +154,8 @@ theorem pderiv_fockP_one (hS : IsPMat pS YS) (hT : IsPMat pT YT) (y : FVar D m n
     pderiv y (fockP τ pS pT YS YT 1) = if y.1 = τ then
       ∑ i, ∑ d, lin pS pT (act YS YT (single y.2.1 y.2.2 1)) i d • X (τ, i, d) else 0 := by
   obtain ⟨ρ, i₀, c₀⟩ := y
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [fockP, map_add (f := _), map_sum, apply_ite (pderiv _), map_zero, pderiv_quadOp_one]
+
+  simp only [fockP, map_add (f := _), map_sum, apply_ite (pderiv _), map_zero, pderiv_quadOp_one]
   split_ifs with h
   · subst h
     have := comb (RingHom.id ℂ) hS hT (fun i d => (X (ρ, i, d) : MvPolynomial (FVar D m n) ℂ)) i₀ c₀
@@ -226,12 +226,12 @@ theorem expand {d : Matrix (Fin m) (Fin n) ℂ →+ Module.End ℂ M} (hd : ∀ 
   have e : N = ∑ i, ∑ j, single i j (N i j) := Matrix.matrix_eq_sum_single N
   have e1 : d N = ∑ i, ∑ j, d (single i j (N i j)) := by
     conv_lhs => rw [e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
   have e2 : d (cplx pS pT N) = ∑ i, ∑ j, d (cplx pS pT (single i j (N i j))) := by
     conv_lhs => rw [e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [cplx, cplxO, Matrix.mul_sum, Matrix.sum_mul, Finset.smul_sum, map_sum]
+
+    simp only [cplx, cplxO, Matrix.mul_sum, Matrix.sum_mul, Finset.smul_sum, map_sum]
   have e3 : ∀ i j, single i j (N i j) = N i j • single i j (1 : ℂ) := fun i j => by simp
   unfold cre ann
   rw [e1, e2]
@@ -287,8 +287,8 @@ theorem quad_of_comm (hS : IsPMat (pS τ) YS) (hT : IsPMat (pT τ) YT)
       have := ga (single i j 1) (E 1)
       rw [hv, map_zero, eq_comm, add_eq_zero_iff_eq_neg] at this
       rw [this, (expand (hd ρ) _).1, neg_smul_neg]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, Finset.smul_sum]
+
+      simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, Finset.smul_sum]
       refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
       rw [← mul_one (X _), hX, smul_comm]
     · rw [← ga' ρ h, hv, map_zero, map_zero, smul_zero]
@@ -303,9 +303,9 @@ theorem quad_of_comm (hS : IsPMat (pS τ) YS) (hT : IsPMat (pT τ) YT)
       · subst h
         rw [gc, smul_add, sub_eq_add_neg, (expand (hd ρ) (act YS YT _)).2]
         congr 1
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, Finset.smul_sum, hb,
-          ← Finset.sum_neg_distrib]
+
+        simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, Finset.smul_sum, hb,
+        ← Finset.sum_neg_distrib]
         refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
         module
       · rw [gc' ρ h, map_zero, sub_zero]

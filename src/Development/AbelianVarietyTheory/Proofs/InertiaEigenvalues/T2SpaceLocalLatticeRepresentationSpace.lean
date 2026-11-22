@@ -88,11 +88,11 @@ theorem exists_pair (a : G → M →ₗ[O] M) (hmul : ∀ g h x, a (g * h) x = a
         rw [he, he]
         exact k1 _ _ (by rw [map_mul, hs δ hδ, hs _ (hΔm _ hg _ hδ)])
     simp only [hcoc, Finset.sum_add_distrib, Finset.sum_const] at h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hm, map_smul, map_smul, map_sum, map_sum, ← smul_sub,
-      show ∑ δ ∈ Δ, a g (j (e (s δ))) - ∑ δ ∈ Δ, j (e (s δ)) = -(Δ.card • j (e g)) by
-        rw [← h1]; abel,
-      smul_neg, ← Nat.cast_smul_eq_nsmul O, smul_smul, hu, one_smul]
+
+    rw [hm, map_smul, map_smul, map_sum, map_sum, ← smul_sub,
+    show ∑ δ ∈ Δ, a g (j (e (s δ))) - ∑ δ ∈ Δ, j (e (s δ)) = -(Δ.card • j (e g)) by
+      rw [← h1]; abel,
+    smul_neg, ← Nat.cast_smul_eq_nsmul O, smul_smul, hu, one_smul]
   have hz : ∀ g, r g ∈ Δ → c g + (a g (b₁ + j m) - (b₁ + j m)) = 0 := by
     intro g hg
     have h1 := hav g hg
@@ -723,7 +723,7 @@ theorem mem_herrCocycles_of_eq {O D : Type} [CommRing O] [AddCommGroup D] [Modul
   simp [herrCocycles, h]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem herr_a : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW), adm9 D HW F → ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let S := sit D.loc HW l (D.locA l) K s LL h; let E : S.Comparison₂ := ((F l).E K s LL h).tie; HerrAat S ∧ HerrAsat S := by
   intro D HW F h9 l _ K s LL h S E
   obtain ⟨hF, hD⟩ := h9 l K s LL h

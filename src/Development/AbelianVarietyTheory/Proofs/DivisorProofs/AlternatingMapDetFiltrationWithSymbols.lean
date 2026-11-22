@@ -38,8 +38,8 @@ theorem det_filtration_symbols : ∀ (E A' : Type) [Field E] [AddCommGroup A'] [
     refine (hsym a ⟨_, hy⟩).1 ?_
     have : (⟨_, hy⟩ : U a) = ⟨x, hx⟩ - ∑ i, sym a ⟨x, hx⟩ i • ⟨z (ix ⟨a, i⟩), hz ⟨a, i⟩⟩ := by
       ext; simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [this, map_sub, map_sum]
+
+    rw [this, map_sub, map_sum]
     simp only [map_smul, hzs']
     funext j
     simp [Finset.sum_apply, Pi.single_apply]

@@ -11,7 +11,7 @@ open scoped TensorProduct
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace GlobalTheory.SelfDualAt
 
@@ -47,7 +47,7 @@ theorem symplO_smul_swap (S T : HSp D) (c : AF D.host.F) (x y : WO S T) :
   rw [hO_smul_swap]
 
 
-set_option maxHeartbeats 800000 in
+
 theorem compFin_repr (w : Pl D) (y : Af D.host.F ⊗[D.host.F] D.host.E) (k : Fin (Module.finrank D.host.F D.host.E)) :
     (Algebra.TensorProduct.basis (Fv D.host.F w) (Module.finBasis D.host.F D.host.E)).repr
         (GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter.compFin D w y) k =
@@ -74,7 +74,7 @@ theorem eq_zero_of_compFin (y : Af D.host.F ⊗[D.host.F] D.host.E) (h : ∀ w, 
     exact hk w
   simpa using hr
 
-set_option maxHeartbeats 800000 in
+
 theorem compFin_alg_cP (P : Pl D → Prop) (w : Pl D) (hw : P w) :
     GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter.compFin D w (finPart D (algebraMap (AF D.host.F) (AE D) (cP P))) = 1 := by
   rw [Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply, GlobalTheory.LatVac.finPart_tmul]
@@ -87,7 +87,7 @@ theorem compFin_alg_cP (P : Pl D → Prop) (w : Pl D) (hw : P w) :
   exact Algebra.TensorProduct.one_def.symm
 
 
-set_option maxHeartbeats 800000 in
+
 theorem algebraMap_placeIdempotent_mul (P : Pl D → Prop) (z : AE D) (hz : z ∈ idAt D P) :
     algebraMap (AF D.host.F) (AE D) (cP P) * z = z := by
   rw [idAt, Ideal.mem_inf, Ideal.mem_iInf] at hz

@@ -36,8 +36,8 @@ private lemma key_sum {P : LocPrime l} {AI : LocAinf l P} (T : LocTied l P AI) {
   simp only [Finset.mul_sum, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, ← TensorProduct.tmul_sum]
+
+  simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, ← TensorProduct.tmul_sum]
   congr 1
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
@@ -61,13 +61,13 @@ private lemma coord_sum {P : LocPrime l} {L : FinExt l} {a d : ℕ}
     {ψ₀ : (Fin a → ↥L.1) ⊗[ℚ_[l]] Bst P →+ (Fin a → OB P)} (h : IsCoord P L ψ₀)
     (v : Fin d → Fin a → ↥L.1) (y : Fin d → Bst P) (i' : Fin a) :
     ψ₀ (∑ i, v i ⊗ₜ[ℚ_[l]] y i) i' = ∑ i, ((v i i' : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)] y i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_apply]
+
+  rw [map_sum, Finset.sum_apply]
   exact Finset.sum_congr rfl fun i _ => h _ _ _
 
 end UpperTheory.Gal.ClosedPhiFromClosedTrace
 
-set_option maxHeartbeats 4000000 in
+
 theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.tieRep_holds :
     TrLin → CoordEx → CoordWD → ColInv → WeilPhi2 → TestTr → TieRep2 := by
   intro hTr hCE hCW hCI hWP hTT l _ ι P AI T E Ω _ _ _ _ _ w A h O _ _ _ Bw hj g n₁ n₂ hα L a d R _

@@ -516,7 +516,7 @@ abbrev PolF (a b : ℕ) : Type := MvPolynomial (FVar D a b) ℂ
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 2000000 in
+
 structure RealDat (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] extends LevCh D T where
 
   hv0 : A.v0 = InfinitePlace.mk D.what₂.embLL

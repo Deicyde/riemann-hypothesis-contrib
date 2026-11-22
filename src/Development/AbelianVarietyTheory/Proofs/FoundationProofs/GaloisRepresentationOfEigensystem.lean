@@ -14,7 +14,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AdjoinSta
 
 @[expose] public section
 
-set_option maxHeartbeats 1600000
+
 
 noncomputable section
 open scoped MatrixGroups TensorProduct

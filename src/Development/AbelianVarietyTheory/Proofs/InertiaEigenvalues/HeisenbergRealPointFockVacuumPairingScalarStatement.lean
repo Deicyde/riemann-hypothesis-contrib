@@ -21,7 +21,7 @@ open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.heisenberg_realPoint_fockVacuum_pairing_scalar : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D), IsStdChar D ψ (-1) →
     IsInfFam θ → ∀ (sS : D.what₂.Tau → Matrix (Fin S.rank) (Fin S.rank) ℂ)
     (sT : D.what₂.Tau → Matrix (Fin T.rank) (Fin T.rank) ℂ),

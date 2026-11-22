@@ -322,8 +322,8 @@ theorem extend_family [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField 
           simp
       have := hyz _ hz'
       have hvy : ∀ i, h (v i) y = 0 := fun i => by rw [hc, (hφ y).1 hy i, map_zero]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hc, ← hB, map_sub, map_sum] at this
+
+      rw [hc, ← hB, map_sub, map_sum] at this
       simp only [hB, hm, hvy, mul_zero, Finset.sum_const_zero, sub_zero] at this
       rw [hc]
       exact this)

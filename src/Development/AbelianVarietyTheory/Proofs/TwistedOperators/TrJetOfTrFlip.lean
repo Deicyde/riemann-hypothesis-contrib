@@ -387,7 +387,7 @@ theorem finEmb_congr (hp : X'.B.toPre = X.B.toPre) {A B : HSp X.toD7} {A' B' : H
   exact HEq.rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem term_congr (hp : X'.B.toPre = X.B.toPre) {w : Pl X.toD7.host.E} {w' : Pl X'.toD7.host.E} (hw : HEq w' w)
     {Γ : Grid (Kw w)} {Γ' : Grid (Kw w')} (hs : 1 ≤ Γ.s) (hs' : 1 ≤ Γ'.s) {J J' ψ ψ' k k' e e' f f'} (h1 : HEq Γ' Γ) (h2 : HEq J' J)
     (h3 : HEq ψ' ψ) (h4 : k' = k) (h5 : e' = e) (h6 : HEq f' f) : Cosets hs' J' = Cosets hs J ∧ ∀ b b', HEq b' b →

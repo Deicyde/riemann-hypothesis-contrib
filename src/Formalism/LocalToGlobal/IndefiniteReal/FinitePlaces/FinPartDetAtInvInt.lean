@@ -16,7 +16,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open Formalism.IndefR.Datum
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace Formalism.IndefR.Fin.LevelGroupLemmas
 
@@ -146,8 +146,8 @@ theorem idemSum_conj_orth (hes : ∀ PP ∈ P, Formalism.L2.NTheta.IsIdemAt (es 
   have hsum : ∑ x ∈ P ×ˢ P, es x.1 * cA D (es x.2) = 0 := by
     rw [Finset.sum_product]
     show ∑ x ∈ P, ∑ y ∈ P, es x * cA D (es y) = 0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_mul_sum, ← map_sum, ← he, hc]
+
+    rw [← Finset.sum_mul_sum, ← map_sum, ← he, hc]
   refine idem_sum_zero (K := D.host.F) (P ×ˢ P) (fun x => es x.1 * cA D (es x.2)) ?_ hsum (PP, PP')
     (Finset.mem_product.2 ⟨hPP, hPP'⟩)
   rintro ⟨a, b⟩ hab
@@ -218,8 +218,8 @@ theorem idemSum_eps (h : IsIdemSum e P) :
     simpa [Algebra.TensorProduct.algebraMap_apply] using hab
   choose! v ε hpl hε using fun PP (hPP : PP ∈ P) => (hes PP hPP).1.2.2
   have hsum : algebraMap (AF D.host.F) (AE D) (∑ PP ∈ P, ε PP) = e + cA D e := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, he, map_sum, ← Finset.sum_add_distrib]
+
+    rw [map_sum, he, map_sum, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl (fun PP hPP => (hε PP hPP).symm)
   refine ⟨∑ PP ∈ P, ε PP, ?_, hsum⟩
   apply hinj
@@ -327,7 +327,7 @@ theorem resG_compl (hε : IsIdempotentElem ε) (g : GA D V) : resG V ε g * resG
   have h1 : ε + (1 - ε) = 1 := by ring
   rw [resG_orth V hε hε.one_sub h0 g, h1, resG_one_eps]
 
-set_option maxHeartbeats 1000000 in
+
 theorem resG_mem_GfC (hε : IsIdempotentElem ε) {g : GA D V} (hg : g ∈ GfC V) : resG V ε g ∈ GfC V := by
   unfold GfC at hg ⊢
   rw [MonoidHom.mem_ker] at hg ⊢
@@ -377,7 +377,7 @@ theorem frGL_val' {n : ℕ} (β : GL (Fin n) (Lev.EAf D)) (y : GL (Fin n) (Forma
         ((β⁻¹ : GL (Fin n) (Lev.EAf D)) : Matrix (Fin n) (Fin n) (Lev.EAf D)) := rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem finE_resG_mem_St (hε : IsIdempotentElem ε) {g : GA D V} {β : GL (Fin V.rank) (Lev.EAf D)}
     (hg : Lev.finE V g ∈ Formalism.L2.DIV.St β) : Lev.finE V (resG V ε g) ∈ Formalism.L2.DIV.St β := by
   obtain ⟨y, hy⟩ := hg
@@ -479,7 +479,7 @@ theorem comm_comm (z : Af D.host.F ⊗[D.host.F] D.host.E) :
 
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem toEAf_det {V : HSp D} {g : GA D V} {β : GL (Fin V.rank) (Lev.EAf D)}
     {y : GL (Fin V.rank) (Formalism.L2.Herm.intAf D.host.F D.host.E)} (hy : Formalism.L2.DIV.frGL β y = Lev.finE V g) :
     toEAf D (mt V g).det =
@@ -531,7 +531,7 @@ theorem infPart_idemAt {e : AE D} {PP : Formalism.L2.DIV.Pl D.host.E} (hPP : For
   linear_combination -hz + (infPart D e) * hy - hx
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem unrOff_detAt {e e₁ : AE D} {PP₁ : Formalism.L2.DIV.Pl D.host.E} (hPP₁ : Formalism.L2.NTheta.IsIdemAt e₁ PP₁)
     (horth : (e + cA D e) * e₁ = 0) (V : HSp D) {g : GA D V} {β : GL (Fin V.rank) (Lev.EAf D)}
     (hg : Lev.finE V g ∈ Formalism.L2.DIV.St β) {χ : (AE D)ˣ →* Circle} (hU : UnrOff e χ) : χ (detAt e₁ V g) = 1 := by
@@ -623,8 +623,8 @@ theorem isIdemSum_conj {e : AE D} {P : Finset (Formalism.L2.DIV.Pl D.host.E)} (h
   · rw [Finset.sum_image (fun a _ b _ (hab : Formalism.L2.DIV.conjPl a = Formalism.L2.DIV.conjPl b) => by
       rw [← Formalism.L2.DIV.conjPl_conjPl a, hab, Formalism.L2.DIV.conjPl_conjPl])]
     simp only [Formalism.L2.DIV.conjPl_conjPl]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [he, map_sum]
+
+    rw [he, map_sum]
   · rw [cA_cA, mul_comm]; exact hc
 
 

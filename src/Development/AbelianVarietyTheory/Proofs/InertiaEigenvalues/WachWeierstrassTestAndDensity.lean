@@ -96,8 +96,8 @@ theorem prod_prim [IsDomain O] {l : ℕ} (hp : l.Prime) {j : ℕ} {μ : O} (h : 
   have := congrArg (Polynomial.aeval (1 + PowerSeries.X : PowerSeries O))
     ((Polynomial.cyclotomic_prime_pow_eq_geom_sum (R := O) (n := j) hp).symm.trans
       (Polynomial.cyclotomic_eq_prod_X_sub_primitiveRoots h))
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa [map_prod, map_sum, PowerSeries.algebraMap_apply] using this
+
+  simpa [map_prod, map_sum, PowerSeries.algebraMap_apply] using this
 
 end Series
 
@@ -140,8 +140,8 @@ theorem Q_eq [IsDomain O] (i : ZMod n) :
     apply mul_left_cancel₀ (PowerSeries.X_ne_zero (R := O))
     rw [W.q₀_def, ← mul_geom_sum]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LocWach.Q, hq, map_sum]
+
+  rw [LocWach.Q, hq, map_sum]
   simp only [map_pow, phi_pow_one_add, Finset.sum_apply, Pi.add_apply, Pi.pow_apply, Pi.one_apply, letπ]
 
 noncomputable def ev (i : ZMod n) (ζ : LL) : PowerSeries O →ₐ[O] PowerSeries LL :=

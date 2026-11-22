@@ -86,8 +86,8 @@ theorem coeffIn_map {S : Type*} [CommRing S] (φ : R →+* S) (hφ : Function.In
     ReciprocityTheory.MultiplicativeHeights.coeffIn i k (MvPolynomial.map φ P) =
       MvPolynomial.map φ (ReciprocityTheory.MultiplicativeHeights.coeffIn i k P) := by
   unfold ReciprocityTheory.MultiplicativeHeights.coeffIn
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [MvPolynomial.support_map_of_injective _ hφ, map_sum]
+
+  rw [MvPolynomial.support_map_of_injective _ hφ, map_sum]
   refine Finset.sum_congr rfl fun s _ => ?_
   rw [MvPolynomial.map_monomial, MvPolynomial.coeff_map]
 

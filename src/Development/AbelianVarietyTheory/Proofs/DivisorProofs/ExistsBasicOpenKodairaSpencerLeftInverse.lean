@@ -81,9 +81,9 @@ theorem GlobalTheory.HorFrame.exists_basicOpen_det_ks : ∀ {E : Type} [Field E]
     ext b h
     have e := congrFun (hm b) h
     simp only [Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul] at e
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.map_apply, Matrix.mul_apply, Matrix.of_apply, map_sum, map_mul, Matrix.scalar_apply,
-      Matrix.diagonal_apply]
+
+    simp only [Matrix.map_apply, Matrix.mul_apply, Matrix.of_apply, map_sum, map_mul, Matrix.scalar_apply,
+    Matrix.diagonal_apply]
     simp only [← hat]
     calc ∑ x, m b x * ψ t * ψ (Mx x h) = ψ t * ∑ x, m b x * ψ (Mx x h) := by
           rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun x _ => by ring

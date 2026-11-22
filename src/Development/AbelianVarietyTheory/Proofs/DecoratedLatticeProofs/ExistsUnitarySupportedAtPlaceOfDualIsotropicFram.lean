@@ -82,7 +82,7 @@ theorem diag_const {ε : AE D} {n : ℕ} {α β : Fin n → AE D} (hαβ : ∀ i
   · subst h; simp
   · simp [h]
 
-set_option maxHeartbeats 1000000 in
+
 theorem imYX {ε : AE D} (hεε : ε * ε = ε) (hεc : cA D ε = ε) {α β : Fin ρ → AE D} (hαε : ∀ i, ε * α i = α i)
     (hαβ : ∀ i, α i * β i = ε) {b : Mx D ρ ρ} (hb : ε • b = b) {c' : Mx D S.rank ρ} (hc : ε • c' = c')
     (H1 : adj c' * (gA S * (d.jX * b)) = ε • (1 : Mx D ρ ρ)) :
@@ -116,7 +116,7 @@ theorem imXX {ε : AE D} {β : Fin ρ → AE D} {b : Mx D ρ ρ} :
       (gA S * (d.jX * (b * Matrix.diagonal β + (1 - ε) • (1 : Mx D ρ ρ)))) = 0 := by
   rw [adj_mul, Matrix.mul_assoc, gXX, Matrix.mul_zero]
 
-set_option maxHeartbeats 1000000 in
+
 theorem imYY {ε : AE D} (hεε : ε * ε = ε) (hεc : cA D ε = ε) {α : Fin ρ → AE D} (hαε : ∀ i, ε * α i = α i)
     {c' : Mx D S.rank ρ} (hc : ε • c' = c') (H2 : adj c' * (gA S * c') = 0) :
     adj (c' * Matrix.diagonal (fun i => cA D (α i)) + (1 - ε) • d.jY) *
@@ -129,18 +129,18 @@ theorem imYY {ε : AE D} (hεε : ε * ε = ε) (hεc : cA D ε = ε) {α : Fin 
   simp only [mul_tail₃ H2, Matrix.mul_zero, Matrix.smul_mul, Matrix.mul_smul, smul_smul, d.gram_YY, smul_zero,
     kill_mid₂ hεε hc, kill_left hεε (diag_absorb hαε), add_zero, Matrix.zero_mul]
 
-set_option maxHeartbeats 1000000 in
+
 theorem imOO {b : Mx D ρ ρ} {c' : Mx D S.rank ρ} :
     adj (d.j0 - (d.jX * b) * (adj c' * (gA S * d.j0))) * (gA S * (d.j0 - (d.jX * b) * (adj c' * (gA S * d.j0)))) = gA S₀ := by
   simp only [adj_sub, adj_mul, adj_gA, adj_adj, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_assoc, d.gram_00, d.wittDecomp_gram_X_anisotropic,
     gXX, g0X, Matrix.mul_zero, sub_zero]
 
-set_option maxHeartbeats 1000000 in
+
 theorem imOX {ε : AE D} {β : Fin ρ → AE D} {b : Mx D ρ ρ} {c' : Mx D S.rank ρ} :
     adj (d.j0 - (d.jX * b) * (adj c' * (gA S * d.j0))) * (gA S * (d.jX * (b * Matrix.diagonal β + (1 - ε) • (1 : Mx D ρ ρ)))) = 0 := by
   simp only [adj_sub, adj_mul, Matrix.sub_mul, Matrix.mul_assoc, gXX, g0X, Matrix.mul_zero, sub_zero]
 
-set_option maxHeartbeats 1000000 in
+
 theorem imOY {ε : AE D} (hεε : ε * ε = ε) (hεc : cA D ε = ε) {α : Fin ρ → AE D} {b : Mx D ρ ρ} (hb : ε • b = b)
     {c' : Mx D S.rank ρ} (hc : ε • c' = c')
     (H1 : adj c' * (gA S * (d.jX * b)) = ε • (1 : Mx D ρ ρ)) :
@@ -159,7 +159,7 @@ namespace GlobalTheory.IwaPlace.BuildQ
 variable {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem smul_sub_one {ε : AE D} (M : Mx D S.rank S.rank)
     (hX : ε • (M * d.jX - d.jX) = M * d.jX - d.jX) (h0 : ε • (M * d.j0 - d.j0) = M * d.j0 - d.j0)
     (hY : ε • (M * d.jY - d.jY) = M * d.jY - d.jY) : ε • (M - 1) = M - 1 := by
@@ -184,7 +184,7 @@ end GlobalTheory.IwaPlace.BuildQ
 
 
 open GlobalTheory.IwaPlace.BuildQ in
-set_option maxHeartbeats 1000000 in
+
 theorem GlobalTheory.IwaPlace.exists_grpAt_of_dual_frames : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ) (v : Pl D) (ε : AE D) (hεε : ε * ε = ε) (hεc : cA D ε = ε) (hεI : ε ∈ intAt D (· = v)) (hε : ∀ a, a ∈ idAt D (· = v) ↔ ε * a = a) (α β : Fin ρ → AE D) (b : Mx D ρ ρ) (c' : Mx D S.rank ρ), (∀ i, α i ∈ idAt D (· = v)) → (∀ i, β i ∈ idAt D (· = v)) → (∀ i, α i * β i = ε) → (∀ i j, b i j ∈ idAt D (· = v)) → (∀ i j, c' i j ∈ idAt D (· = v)) → adj c' * (gA S * (d.jX * b)) = ε • (1 : Mx D ρ ρ) → adj c' * (gA S * c') = 0 → ∃ q ∈ grpAt S (· = v), mt S q * d.jX = d.jX * (b * Matrix.diagonal β + (1 - ε) • (1 : Mx D ρ ρ)) ∧ (∀ i, mt S q *ᵥ colMul d.jX i (α i) = fun k => (d.jX * b) k i) ∧ (∀ i, mt S q *ᵥ colMul d.jY i (cA D (β i)) = fun k => c' k i) := by
   intro D S S₀ ρ d v ε hεε hεc _ hε α β b c' hα hβ hαβ hb hc' H1 H2
   have hb' : ε • b = b := smul_eq_of_mem hε hb

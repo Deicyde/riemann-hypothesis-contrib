@@ -269,8 +269,8 @@ theorem dict_span [FiniteDimensional ℂ W] (hρ : ρ.IsIrreducible) (S : Submod
       have hTinf : ∀ x ∈ infU L n, T (R x) ∈ W' := by
         intro x hx
         have := hst x⁻¹ ψ hψ
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hψe, map_sum] at this
+
+        rw [hψe, map_sum] at this
         convert this using 1
         rw [hT]
         refine Finset.sum_congr rfl fun i _ => ?_
@@ -299,8 +299,8 @@ theorem dict_span [FiniteDimensional ℂ W] (hρ : ρ.IsIrreducible) (S : Submod
           convert this using 1
           rw [hT]
           change phiL F R μ (∑ i, lp i v • fs i) = _
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
+
+          rw [map_sum]
           refine Finset.sum_congr rfl fun i _ => ?_
           rw [map_smul]
           have e : lp i ∘ₗ μ.smulRight v = lp i v • μ := LinearMap.ext fun w => by
@@ -318,14 +318,14 @@ theorem dict_span [FiniteDimensional ℂ W] (hρ : ρ.IsIrreducible) (S : Submod
           = ∑ i, ∑ k, b.repr (R y⁻¹ (fs i (fy F y))) k * lp i (b k) := by
             refine Finset.sum_congr rfl fun i _ => ?_
             conv_lhs => rw [← b.sum_repr (R y⁻¹ (fs i (fy F y)))]
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [map_sum]
+
+            rw [map_sum]
             simp only [map_smul, smul_eq_mul]
         _ = ∑ k, ∑ i, b.repr (R y⁻¹ (fs i (fy F y))) k * lp i (b k) := Finset.sum_comm
         _ = ∑ k, b.repr (R y⁻¹ ((∑ i, lp i (b k) • fs i) (fy F y))) k := by
             refine Finset.sum_congr rfl fun k _ => ?_
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp [Finset.sum_apply, map_sum, map_smul, mul_comm]
+
+            simp [Finset.sum_apply, map_sum, map_smul, mul_comm]
         _ = 0 := by simp only [hF, Pi.zero_apply, map_zero, Finsupp.zero_apply, Finset.sum_const_zero]
     · right
       refine le_antisymm hW' (Submodule.span_le.2 ?_)

@@ -547,9 +547,9 @@ theorem zhat_move {T T' : E} (F : LFlag S r T) (F' : LFlag S r T') {s : S.V ≃�
   have hiso : S.hT (s (frame F a)) (s (frame F' b)) = S.hT (frame F a) (frame F' b) := hs _ _
   have lhs : ZhatL F F' a b = S.hT (frame F a) (frame F' b) := rfl
   rw [lhs, ← hiso, h1, h2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ₂, map_smul, Matrix.mul_apply,
-    Matrix.conjTranspose_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul]
+
+  simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ₂, map_smul, Matrix.mul_apply,
+  Matrix.conjTranspose_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
   simp only [show ∀ x y, ZhatL F F' x y = S.hT (frame F x) (frame F' y) from fun _ _ => rfl, starRingEnd_apply,
     RingHom.id_apply]

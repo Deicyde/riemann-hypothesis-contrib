@@ -10,13 +10,13 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.DvrLatticeRank.U3up
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace Formalism.MainNotions.N.Ln34
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
 
-set_option maxHeartbeats 1000000 in
+
 theorem u1link_pf : FirstFrameOfModels := by
   intro D HW F Cm hA hdR hDi hML hMF
   intro l _ hl K LL hG π' E hp9 T₁ T₂ Fm S η m h' up b c α β hIF hHyp

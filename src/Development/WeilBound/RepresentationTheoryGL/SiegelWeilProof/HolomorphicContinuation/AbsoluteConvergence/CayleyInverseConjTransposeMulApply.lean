@@ -244,7 +244,7 @@ private theorem exists_unitary_coshSinh_decomposition (N : M2 n) (hN : Nᴴ * S0
       _ = U2 * sX * Wᴴ := by rw [hRs]
   · rw [Matrix.mul_assoc, ← hS', ← Matrix.mul_assoc, hU2', Matrix.one_mul]
 
-set_option maxHeartbeats 2000000 in
+
 theorem kAK : KAK := by
   intro n y
   have hY : InG (mR y) := y.2

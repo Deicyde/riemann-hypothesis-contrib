@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TensorEqT
 
 open scoped TensorProduct
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.tensor_eq_top_or_le_ker_finiteLength_modules : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] {M₀ P₀ : Type} [AddCommGroup M₀] [Module ℂ M₀] [AddCommGroup P₀] [Module ℂ P₀]
     {M P : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)] [∀ i, AddCommGroup (P i)] [∀ i, Module ℂ (P i)]
     (Op₀ : Set (Module.End ℂ M₀)) (Op : ∀ i, Set (Module.End ℂ (M i)))

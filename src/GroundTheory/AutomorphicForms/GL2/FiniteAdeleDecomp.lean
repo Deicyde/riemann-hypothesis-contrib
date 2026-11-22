@@ -45,10 +45,10 @@ theorem adeleSingleS_apply_of_mem (a : (v : S) → v.1.adicCompletion K) (w : S)
     adeleSingleS S a w.1 = a w := by
   classical
   change (∑ v : S, finiteAdeleSingleAdd v.1 (a v)) w.1 = a w
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show (∑ v : S, finiteAdeleSingleAdd v.1 (a v)) w.1 =
-      ∑ v : S, (finiteAdeleSingleAdd v.1 (a v)) w.1 from
-    map_sum (RestrictedProduct.evalAddMonoidHom _ w.1) _ _]
+
+  rw [show (∑ v : S, finiteAdeleSingleAdd v.1 (a v)) w.1 =
+    ∑ v : S, (finiteAdeleSingleAdd v.1 (a v)) w.1 from
+  map_sum (RestrictedProduct.evalAddMonoidHom _ w.1) _ _]
   rw [Finset.sum_eq_single w]
   · exact finiteAdeleSingleAdd_apply_self w.1 (a w)
   · intro u _ hu
@@ -59,10 +59,10 @@ theorem adeleSingleS_apply_of_mem (a : (v : S) → v.1.adicCompletion K) (w : S)
 theorem adeleSingleS_apply_of_notMem (a : (v : S) → v.1.adicCompletion K)
     {w : HeightOneSpectrum (𝓞 K)} (hw : w ∉ S) : adeleSingleS S a w = 0 := by
   change (∑ v : S, finiteAdeleSingleAdd v.1 (a v)) w = 0
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show (∑ v : S, finiteAdeleSingleAdd v.1 (a v)) w =
-      ∑ v : S, (finiteAdeleSingleAdd v.1 (a v)) w from
-    map_sum (RestrictedProduct.evalAddMonoidHom _ w) _ _]
+
+  rw [show (∑ v : S, finiteAdeleSingleAdd v.1 (a v)) w =
+    ∑ v : S, (finiteAdeleSingleAdd v.1 (a v)) w from
+  map_sum (RestrictedProduct.evalAddMonoidHom _ w) _ _]
   exact Finset.sum_eq_zero fun u _ ↦
     finiteAdeleSingleAdd_apply_of_ne (fun h ↦ hw (by rw [h]; exact u.2)) _
 

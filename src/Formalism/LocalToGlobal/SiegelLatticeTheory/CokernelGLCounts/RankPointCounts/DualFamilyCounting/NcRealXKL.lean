@@ -614,7 +614,7 @@ theorem meas_chAt (T : ℝ) (v : ι) : Measurable (fun x : (∀ q : CBlk r, CSpc
     · exact (measurable_pi_apply v).comp (measurable_pi_apply (Sum.inr (Sum.inl p) : CBlk r))
   · exact (measurable_pi_apply v).comp (measurable_pi_apply (Sum.inr (Sum.inr a) : CBlk r))
 
-set_option maxHeartbeats 800000 in
+
 theorem meas_Bk (T : ℝ) (p : CBlk r) :
     Measurable (fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) => Bk T p z.1 z.2) := by
   haveI : SecondCountableTopology ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) := inferInstance

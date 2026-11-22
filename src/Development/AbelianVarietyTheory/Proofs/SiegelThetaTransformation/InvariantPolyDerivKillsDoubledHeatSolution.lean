@@ -61,8 +61,8 @@ theorem polyDeriv_aeval_lin {F : (σ → ℂ) → ℂ} (hF : Differentiable ℂ 
   | mul_X P l hP =>
     rw [map_mul, aeval_X, lin, Finset.mul_sum, I2.jof_polyDeriv_sum,
       polyDeriv_mul_X (smooth hF)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [pi_eq_sum_univ' (d l), map_sum]
+
+    conv_rhs => rw [pi_eq_sum_univ' (d l), map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [mul_left_comm, C_mul', I2.polyDeriv_smul, polyDeriv_mul_X (smooth hF), funext hP]
     simp

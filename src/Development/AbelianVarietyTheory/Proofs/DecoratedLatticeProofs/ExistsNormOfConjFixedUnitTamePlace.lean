@@ -24,21 +24,21 @@ open scoped TensorProduct
 
 namespace GlobalTheory.FixedUnitNorm
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem compAt_cA (D : D7) (v : Pl D) (a : AE D) : compAt D v (cA D a) = sigV D v (compAt D v a) := by
   induction a using TensorProduct.induction_on with
   | zero => rw [RingHom.map_zero, RingHom.map_zero, map_zero]
   | add x y hx hy => rw [RingHom.map_add (f := _), RingHom.map_add (f := _), RingHom.map_add (f := _), map_add (f := _), hx, hy]
   | tmul a m => rfl
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem tmul_algebraMap (D : D7) (v : Pl D) (c : Fv D.host.F v) (f : D.host.F) :
     c ⊗ₜ[D.host.F] (algebraMap D.host.F D.host.E f) = (algebraMap D.host.F (Fv D.host.F v) f * c) ⊗ₜ[D.host.F] (1 : D.host.E) := by
   rw [Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul, TensorProduct.smul_tmul', Algebra.smul_def]
 
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem fixed_unit_norm : ∀ (D : D7) (v : Pl D) (ε : AE D), Tame D v → ε * ε = ε → cA D ε = ε → ε ∈ intAt D (· = v) →
     (∀ a, a ∈ idAt D (· = v) ↔ ε * a = a) → ∀ u ∈ intAt D (· = v), cA D u = u →
     (∃ y ∈ intAt D (· = v), u * y = ε) → ∃ x ∈ intAt D (· = v), x * cA D x = u := by

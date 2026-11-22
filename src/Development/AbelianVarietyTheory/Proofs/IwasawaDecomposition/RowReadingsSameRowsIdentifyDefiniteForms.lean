@@ -18,7 +18,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Fo
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.HeightCounting.Up GlobalTheory.Mem.SRe GlobalTheory.Mem.R3.Rw
 open GlobalTheory.Mem.R3.Tr
-set_option maxHeartbeats 2000000
+
 
 namespace GlobalTheory.Mem.R3.Rw.JmtUp
 

@@ -18,7 +18,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions For
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.heckeCharRestrictMaxReal_val_eq_prod_above : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (ν : Formalism.L2.Host.HChar E)
     (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))),
     (∀ w ∈ Formalism.L2.Host.aboveF (L := E) (maximalRealSubfield E) v,

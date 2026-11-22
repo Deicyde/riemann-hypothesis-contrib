@@ -79,8 +79,8 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchim
 private theorem theta_sum₂ {ι : Type*} (S : Finset ι) (c : ι → ℂ) (y : ι → LaurentRing n) :
     thP μ (∑ i ∈ S, c i • y i) = ∑ i ∈ S, c i • thP μ (y i) := by
   have h : ∀ r : LaurentRing n, thP μ r = Finsupp.linearCombination ℂ (th μ) r.coeff := fun r => rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [h, AddMonoidAlgebra.coeff_sum, AddMonoidAlgebra.coeff_smul, map_sum, map_smul]
+
+  simp only [h, AddMonoidAlgebra.coeff_sum, AddMonoidAlgebra.coeff_smul, map_sum, map_smul]
 
 variable [BorelSpace (GL (Fin n) F)] [μ.IsHaarMeasure]
 
@@ -126,8 +126,8 @@ theorem UpperTheory.ConvolutionTheory.H.core :
     eq_of_forall_evalAt fun z => by
       have := vandSum n z 1 1
       simp only [Equiv.Perm.coe_one, Function.comp_id, if_true] at this
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← this, map_sum]
+
+      rw [← this, map_sum]
       refine Finset.sum_congr rfl fun S _ => ?_
       rw [map_smul, evalAt_single, one_mul, monomialChar_add, smul_eq_mul]
   have hD1 : Dom (monomial (ν₁ + ν₂) * r * dPol n 1) := by

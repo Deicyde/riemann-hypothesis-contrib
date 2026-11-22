@@ -66,7 +66,7 @@ structure NHyp (what₂ : Rows.Data R) : Prop where
   hg : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 def ndToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NData R H what₂ where
   Om := AlgC
   plOm := ⟨fun v => placeOf AlgC v, fun v => isPlaceOver_placeOf AlgC v⟩
@@ -173,7 +173,7 @@ theorem isCMConjOm_conjAlgC : IsCMConjOm H.E AlgC conjAlgC := by
   rw [baseEmbedding_conj]
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 def ntwToy {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
     (LL0 : IntermediateField ℚ what₂.LL) (h : NHyp H what₂) :
     NTw R H what₂ LL0 (ndToy H what₂ h) where
@@ -390,7 +390,7 @@ theorem val_toU {z : ℂ} (h : z ≠ 0) : ((toU z : ℂˣ) : ℂ) = z := by
 
 
 open Polynomial in
-set_option synthInstance.maxHeartbeats 400000 in
+
 def nautToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NAut (ndToy H what₂ h) where
   iotaQ i := i.elim
   iotaQC i := i.elim
@@ -653,7 +653,7 @@ theorem g_split_of (hg : ∀ k, H.g k % H.condN = 1) :
   exact placesOver_ncard_of_split H (H.g k) (hg k)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 def nbcToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NBC (nautToy H what₂ h) where
   AU _ := Empty
   multAU _ π := π.elim
@@ -674,7 +674,7 @@ def nbcToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NBC (nautToy H what₂
   embAV_inf i := i.elim
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 def nexpToy {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
     (LL0 : IntermediateField ℚ what₂.LL) (h : NHyp H what₂) :
     NExp R H what₂ LL0 (ndToy H what₂ h) (ntwToy H LL0 h) where

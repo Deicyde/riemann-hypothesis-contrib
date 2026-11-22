@@ -48,8 +48,8 @@ theorem coordEmb_basis {K : Type} [Field K] (σ : K →+* ℂ) (n : ℕ) {ι : T
   have hs : ⊤ ≤ Submodule.span ℂ (Set.range (fun i => coordEmb σ n (b i))) := by
     rw [← (EuclideanSpace.basisFun (Fin n) ℂ).toBasis.span_eq, Submodule.span_le]
     rintro _ ⟨i, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [OrthonormalBasis.coe_toBasis, ← coordEmb_single σ, ← b.sum_repr (Pi.single i 1), map_sum]
+
+    rw [OrthonormalBasis.coe_toBasis, ← coordEmb_single σ, ← b.sum_repr (Pi.single i 1), map_sum]
     refine Submodule.sum_mem _ fun a _ => ?_
     rw [LinearMap.map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)

@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LevelHype
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer GlobalTheory.MixModel
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
@@ -40,7 +40,7 @@ theorem cut_tmul (P : Pl D → Prop) (a : Af D.host.F) (x : D.host.E) :
   rfl
 
 
-set_option maxHeartbeats 800000 in
+
 theorem cut_finPart (P : Pl D → Prop) (u : AE D) (hu : u ∈ idAt D P) : cut P (finPart D u) = u := by
   unfold idAt at hu
   rw [Ideal.mem_inf] at hu

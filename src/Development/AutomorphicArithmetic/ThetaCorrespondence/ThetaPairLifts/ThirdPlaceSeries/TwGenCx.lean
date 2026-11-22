@@ -14,7 +14,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp
@@ -24,8 +24,8 @@ open Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMas
 open Formalism.IndefR.FWT GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.BigOn.Exp.TwCx
 open GlobalTheory.ExportSeries Formalism.IndefR.Datum GlobalTheory.BigOn.Exp.TupLe GlobalTheory.BigOn.Exp.SerBase
@@ -136,9 +136,9 @@ theorem cx_at_alt (s1 : _root_.GlobalTheory.BigOn.Exp.TupLe.PlacesCondition) (s2
     rw [e3]
     simp only [GlobalTheory.ConjTwist.ser, singleSeries]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hgen, GlobalTheory.TwTraceCx.gen_eq_smul hB ht hadm (hρ.weil_base _ _ _) hω,
-    ← s3 _ _ _ _ _ _ _ _ _ _ p j hr hm ρ hρ hpin hlev _ _ _ _ ht hadm hω, ← hsum, map_sum, map_sum]
+
+  rw [hgen, GlobalTheory.TwTraceCx.gen_eq_smul hB ht hadm (hρ.weil_base _ _ _) hω,
+  ← s3 _ _ _ _ _ _ _ _ _ _ p j hr hm ρ hρ hpin hlev _ _ _ _ ht hadm hω, ← hsum, map_sum, map_sum]
   simp only [Subring.smul_def, map_smul, eS, eA, eE, Finset.smul_sum, smul_smul]
   refine Finset.sum_congr rfl fun k _ => ?_
   congr 1

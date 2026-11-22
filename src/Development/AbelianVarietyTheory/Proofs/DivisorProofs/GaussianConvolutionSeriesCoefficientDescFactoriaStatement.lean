@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowForm
 @[expose] public section
 
 open MeasureTheory Filter Topology
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.gaussianConvolutionSeriesCoefficient_descFactorial_estimate : ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
     [MeasurableSpace E] [BorelSpace E] (b c θ α : ℝ), 0 < c → 1 ≤ θ → 0 < α → c * θ ^ 2 ≤ α * (b + c) →
     ∀ (h : SchwartzMap E ℂ) (j i : ℕ) (y : E),

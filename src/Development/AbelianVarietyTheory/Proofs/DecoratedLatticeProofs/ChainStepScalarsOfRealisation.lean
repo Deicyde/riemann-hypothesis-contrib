@@ -208,7 +208,7 @@ namespace StepScal
 open GlobalTheory.ChainOnto
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem mid_scalar (R : RealDat D A Ks) (hN : GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.NodeGap D) (hSoft : SoftQ D) (hQ : QOfVal D)
     (hLP : LPos D) (hLF : LFull D) (hSL : StepLam D) (h : RangeX R) (hRC : RChain R h) (hRU : RUnif R h)
     (hRP : RowPar R) (hIP : IPDict R) (k : ℕ) (hk1 : k + 1 < D.R.m) :
@@ -325,7 +325,7 @@ namespace StepScal
 open GlobalTheory.ChainOnto
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem top_key (R : RealDat D A Ks) (hN : GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.NodeGap D) (hSoft : SoftQ D) (hQ : QOfVal D)
     (hLP : LPos D) (hLF : LFull D) (hSL : StepLam D) (h : RangeX R) (hRC : RChain R h)
     (hRU : RUnif R h) (hRP : RowPar R) (hIP : IPDict R) (δ : ℝ) (hδ : 0 < δ)
@@ -443,7 +443,7 @@ theorem top_key (R : RealDat D A Ks) (hN : GlobalTheory.IndefiniteRowSideFullHec
         linear_combination h1
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem top_scalar (R : RealDat D A Ks) (hN : GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.NodeGap D) (hSoft : SoftQ D) (hQ : QOfVal D)
     (hLP : LPos D) (hLF : LFull D) (hSL : StepLam D) (h : RangeX R) (hRC : RChain R h) (hNX : NormX R h)
     (hRU : RUnif R h) (hRP : RowPar R) (hIP : IPDict R) :

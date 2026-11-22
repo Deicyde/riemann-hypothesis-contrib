@@ -137,7 +137,7 @@ private theorem E_mul_apply_eq_dite_lt {R : Type*} [Semiring R] {a b c j : ℕ} 
     have hne : ¬ ((i : ℕ) = t ∧ (t : ℕ) < j) := fun e => h (by rw [e.1]; exact e.2)
     rw [if_neg hne, zero_mul]
 
-set_option maxHeartbeats 1000000 in
+
 theorem nf1 {k : Type*} [Field k] {n r j : ℕ} (x : Matrix (Fin n) (Fin r) k) (hx : x.rank = j) :
     ∃ (H : GL (Fin n) k) (G : GL (Fin r) k), x = H.val * E k n r j * G.val := by
   classical

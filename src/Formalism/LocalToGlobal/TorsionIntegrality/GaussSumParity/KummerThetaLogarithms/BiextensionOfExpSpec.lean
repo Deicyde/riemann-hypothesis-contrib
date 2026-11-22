@@ -22,8 +22,8 @@ theorem map_lgF' {K0 K : Type} [Field K0] [Field K] (l : ℕ) (j : K0 →+* K) :
   ext n
   rw [PowerSeries.coeff_map]
   unfold lgF
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [PowerSeries.coeff_mk, PowerSeries.coeff_mk, map_sum]
+
+  rw [PowerSeries.coeff_mk, PowerSeries.coeff_mk, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   split_ifs
   · rw [map_inv₀, map_pow, map_natCast]
@@ -44,8 +44,8 @@ theorem map_sumE {K0 K ι : Type} [Field K0] [Field K] [Fintype ι] {N0 N1 : ℕ
     (be : MvPowerSeries (Fin 2) K0) :
     map j (sumE (ι := ι) (N0 := N0) (N1 := N1) be) = sumE (map j be) := by
   unfold sumE
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun e _ => ?_
   rw [map_subst (hasSubst_of_constantCoeff_zero (by intro a; simp))]
   simp only [map_X]
@@ -61,8 +61,8 @@ theorem subst_map_linEL {K0 K : Type} [NormedField K0] [NormedField K] {d N0 N1 
     subst g (map j (linEL σ c (fun s : ZMod d => entLog (K := K0) l (s, a, b)))) =
       ∑ s : ZMod d, if s.val % 2 = 0 then C (j (σ^[s.val] c)) * X (s, a, b) else 0 := by
   unfold linEL
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, subst_sum hg]
+
+  rw [map_sum, subst_sum hg]
   refine Finset.sum_congr rfl fun s _ => ?_
   split_ifs
   · rw [map_mul, map_C, Formalism.DworkPowerSeriesWeights.Transfer.map_entLog, subst_mul hg, subst_C, hgE]
@@ -75,8 +75,8 @@ theorem subst_map_linOL {K0 K : Type} [NormedField K0] [NormedField K] {d N0 N1 
     subst g (map j (linOL σ c (fun s : ZMod d => entLog (K := K0) l (s, a, b)))) =
       ∑ s : ZMod d, if s.val % 2 = 0 then 0 else C (j (σ^[s.val] c)) * X (s, a, b) := by
   unfold linOL
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, subst_sum hg]
+
+  rw [map_sum, subst_sum hg]
   refine Finset.sum_congr rfl fun s _ => ?_
   split_ifs
   · rw [map_zero, subst_zero' hg]
@@ -113,8 +113,8 @@ theorem biextension_of_exp_spec (hE : ExpSpec) (hP : BiextensionPointsIntegral) 
       subst (fun s => entLog (K := K) l (s, ab.1, ab.2)) bm := ⟨_, rfl⟩
   have hmapB : map j (∑ ab : Fin N0 × Fin N1, subst
       (fun s => entLog (K := K0) l (s, ab.1, ab.2)) (beMean (d := d) l σ be0 om oms ζ)) = Bt := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, hBt]
+
+    rw [map_sum, hBt]
     refine Finset.sum_congr rfl fun ab _ => ?_
     rw [map_subst (hasSubst_of_constantCoeff_zero fun s => hE0 ab.1 ab.2 s), hbm]
     simp only [Formalism.DworkPowerSeriesWeights.Transfer.map_entLog]

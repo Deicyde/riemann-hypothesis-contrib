@@ -9,7 +9,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Compatib
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out MvPolynomial GlobalTheory.CompanionTheory.GE
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (PSpace)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.homogeneous_ideal_filtration_saturated : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R) (N : ℕ)
     (L : ℕ → Ideal (MvPolynomial (Fin (N + 1)) R)),
     (∀ e, HomogIdeal (L e)) →

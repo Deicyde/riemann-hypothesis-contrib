@@ -18,7 +18,7 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteD
   {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E} {r : ℕ}
 
 
-set_option maxHeartbeats 800000 in
+
 theorem continuous_uT (P : Frame E M r) (a b : Fin r) :
     Continuous fun g : HA (Af F) σ J => uT (Af F) σ J P g a b := by
   have h1 : Continuous fun g : HA (Af F) σ J => lin (Af F) σ J g (ratV (F := F) (Af F) (P.e b)) :=
@@ -40,8 +40,8 @@ theorem continuous_levL_mat (T : F) (P : Frame E M r) {X : Type} [TopologicalSpa
     {U W : X → Matrix (Fin r) (Fin r) (Af F ⊗[F] E)}
     (hU : ∀ a b, Continuous fun x => U x a b) (hW : ∀ a b, Continuous fun x => W x a b) :
     Continuous fun x => LinearMap.toMatrix' (levL (datR (Af F) σ J P T) (U x) (W x)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [levL, map_add (f := _), map_sum, map_smul]
+
+  simp only [levL, map_add (f := _), map_sum, map_smul]
   refine (continuous_const.add (continuous_finsetSum _ fun a _ => continuous_finsetSum _ fun b _ =>
     (hU a b).smul continuous_const)).add
     (continuous_finsetSum _ fun d _ => continuous_finsetSum _ fun b _ => (hW d b).smul continuous_const)

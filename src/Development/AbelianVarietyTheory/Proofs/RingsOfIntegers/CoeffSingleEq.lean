@@ -71,13 +71,13 @@ theorem coeff_hom [Fintype σ] (ψ : MvPowerSeries σ V →ₐ[V] MvPowerSeries 
   have h1 : ∀ j, coeff (Finsupp.single j 1) f = constantCoeff (k j) := by
     intro j
     conv_lhs => rw [hk]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), coeff_single_C, zero_add, map_sum]
+
+    rw [map_add (f := _), coeff_single_C, zero_add, map_sum]
     rw [Finset.sum_congr rfl fun i _ => coeff_single_mul j (X i) (k i) (by simp)]
     simp [coeff_single_X]
   conv_lhs => rw [hk]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), hC, map_add (f := _), coeff_single_C, zero_add, map_sum, map_sum]
+
+  rw [map_add (f := _), hC, map_add (f := _), coeff_single_C, zero_add, map_sum, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, coeff_single_mul _ _ _ (h j), const_hom ψ h, h1, _root_.mul_comm]
 

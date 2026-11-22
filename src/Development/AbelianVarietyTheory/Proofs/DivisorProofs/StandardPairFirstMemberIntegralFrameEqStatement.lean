@@ -20,7 +20,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (InId IsUnitDet un
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.StdRead
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.standardPairFirstMember_integralFrame_eq : ∀ {D : D7} (S T : HSp D) (ν : (AE D)ˣ →* Circle) (e : AE D) (𝔪 : Ideal (𝓞 D.host.E)) (β : GL (Fin S.rank) (EAf D)),
   IsIntM β.val → IsIntM (β⁻¹).val → ∀ t : WO S T, stdFst ν e 𝔪 S T β 1 t =
     if IsHalf e t ∧ (∀ i j, toEAf D (t i j) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E) ∧

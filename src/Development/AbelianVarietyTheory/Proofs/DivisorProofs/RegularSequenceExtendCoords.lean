@@ -88,8 +88,8 @@ theorem exists_frame_of_rsp : ∀ (k : Type) [Field k] [CharZero k] (Y : Scheme.
       funext j
       rw [Function.comp_apply, Fintype.linearCombination_apply, ← hz₀ j]
       have e1 := congrArg (KaehlerDifferential.map k k Γ(X, U) (X.presheaf.stalk y)) (ha j)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at e1
+
+      rw [map_sum] at e1
       change KaehlerDifferential.map k k Γ(X, U) (X.presheaf.stalk y)
         (KaehlerDifferential.D k Γ(X, U) (z₀ j)) = _ at e1
       rw [KaehlerDifferential.map_D] at e1

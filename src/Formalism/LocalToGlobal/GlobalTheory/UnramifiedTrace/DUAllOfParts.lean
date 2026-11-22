@@ -76,7 +76,7 @@ theorem upMvL_ex (T : Forms0 D u) (v : (D.mem u).A.vT) (c : (D.mem u).C.cls 0)
   obtain ⟨γ, η, κ, h⟩ := T.up_natural_level_zero v c z hz
   exact ⟨(γ, η, κ), h⟩
 
-set_option maxHeartbeats 4000000 in
+
 theorem dnMvL_dnMvs (T : Forms0 D u) {v : (D.mem u).A.vT} {c : (D.mem u).C.cls 0}
     {g : Module.Dual ((D.mem u).A.Fv v) ((D.fm u).lk 0 v c)}
     {γ : UJ (sigD D : D.host.E →+* D.host.E) (gramN D 0 (Nat.zero_le _))}
@@ -97,7 +97,7 @@ theorem dnMvL_dnMvs (T : Forms0 D u) {v : (D.mem u).A.vT} {c : (D.mem u).C.cls 0
   rw [← mul_assoc]
   simp only [atInf, ← Matrix.map_mul, Units.mul_inv, Matrix.map_one _ (map_zero _) (map_one _), one_mul]
 
-set_option maxHeartbeats 4000000 in
+
 theorem upMvL_isUp (T : Forms0 D u) {v : (D.mem u).A.vT} {c : (D.mem u).C.cls 0}
     {z : ↥(Ld D u 0 (Nat.zero_le _) c)}
     {γ : UJ (sigD D : D.host.E →+* D.host.E) (gramN D 0 (Nat.zero_le _))}
@@ -161,7 +161,7 @@ def ValDia (T : Forms0 D u) : Prop :=
       ∀ δ, IsDia T.cls0.lev (T.atT.eV v).1 (T.atT.eV v).2 k δ → G (T.cls0.y c * hcomp T η κ μ) = G (T.cls0.y c * δ)
 
 
-set_option maxHeartbeats 8000000 in
+
 theorem dUPt0F_of (T : Forms0 D u) (hE : PtEx T) (hW : PtWd T) (hI : PtInj T) (hS : PtSurj T)
     (vS : ValSame T) (vT : ValTe T) (vD : ValDia T) : DUPt0F T := by
   classical

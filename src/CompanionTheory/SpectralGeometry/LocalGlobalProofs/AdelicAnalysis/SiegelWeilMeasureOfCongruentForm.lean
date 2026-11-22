@@ -39,9 +39,9 @@ theorem hform_conj {A : Type} [CommRing A] {M : ℕ} (s : A →+* A) (J G : Matr
     simp only [hform, dotProduct, Matrix.mulVec, Function.comp, Finset.mul_sum, mul_assoc]
   have hs : s ∘ (G.mulVec x) = Matrix.vecMul (s ∘ x) (cT s G) := by
     ext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Function.comp, Matrix.mulVec, Matrix.vecMul, dotProduct, cT, map_sum, map_mul,
-      Matrix.transpose_apply, Matrix.map_apply]
+
+    simp only [Function.comp, Matrix.mulVec, Matrix.vecMul, dotProduct, cT, map_sum, map_mul,
+    Matrix.transpose_apply, Matrix.map_apply]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   rw [key, key, hs, ← Matrix.dotProduct_mulVec]
   simp only [Matrix.mulVec_mulVec, Matrix.mul_assoc]
@@ -72,9 +72,9 @@ theorem ratTup_ratAct (R : Type) [CommRing R] [Algebra F R] {M n : ℕ} (g : GL 
   ext a i
   have hG : ((bc (inclR R) g : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E)) =
       (g : Matrix (Fin M) (Fin M) E).map (inclR R) := rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ratTup, ratAct, actTup, hG, Matrix.mulVec, dotProduct, map_sum, map_mul,
-    Matrix.map_apply]
+
+  simp only [ratTup, ratAct, actTup, hG, Matrix.mulVec, dotProduct, map_sum, map_mul,
+  Matrix.map_apply]
 
 theorem actTup_mul (R : Type) [CommRing R] [Algebra F R] {M n : ℕ}
     (g h : GL (Fin M) (R ⊗[F] E)) (X : Fin n → Fin M → R ⊗[F] E) :
@@ -96,8 +96,8 @@ theorem map_actTup {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Algeb
   have hG : ∀ (S : Type) [CommRing S] [Algebra F S],
       ((bc (inclR S) g : GL (Fin M) (S ⊗[F] E)) : Matrix (Fin M) (Fin M) (S ⊗[F] E)) =
       (g : Matrix (Fin M) (Fin M) E).map (inclR S) := fun _ _ _ => rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [actTup, hG, Matrix.mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply]
+
+  simp only [actTup, hG, Matrix.mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply]
   refine Finset.sum_congr rfl fun j _ => ?_
   congr 1
   simp [inclR]
@@ -250,8 +250,8 @@ theorem theta_map (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) {M n : ℕ} (J : M
   unfold thetaMeas
   rw [Measure.map_smul, hmass] <;> try exact hmG.aemeasurable
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Measure.map_sum hmG.aemeasurable, ← sum_reindex (gramEquiv σ J g T)]
+
+  rw [Measure.map_sum hmG.aemeasurable, ← sum_reindex (gramEquiv σ J g T)]
   congr 1
   funext X
   rw [Measure.map_map hmG (hmf' _)]

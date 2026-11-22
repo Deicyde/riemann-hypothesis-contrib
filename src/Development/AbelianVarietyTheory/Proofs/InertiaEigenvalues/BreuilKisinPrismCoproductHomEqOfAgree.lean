@@ -26,7 +26,7 @@ theorem envExt_haus {C : Type} [CommRing C] (I : Ideal C) (h : IsHausdorff I C) 
     exact hz n
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem envExt_agree : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (B : Obj l ↥(OL K)) (d p : B.A) (En : Env bk B d p) (C : Type) [CommRing C] (φ : C →+* C) (F F' : En.Q.A →+* C), (∀ c : C, ((l : ℕ) : C) * c = 0 → c = 0) → (∀ a, F (En.Q.D.φ a) = φ (F a)) → (∀ a, F' (En.Q.D.φ a) = φ (F' a)) → (∀ b, F (En.inl.f b) = F' (En.inl.f b)) → F (BK.hf En.inr X) = F' (BK.hf En.inr X) → F (En.inl.f d) ∈ nonZeroDivisors C → IsHausdorff ((Ideal.span {((l : ℕ) : B.A)} ⊔ B.I).map (F.comp En.inl.f)) C → F = F' := by
   intro l _ K bk B d p En C _ φ F F' hl hF hF' hb hX hd hH
 
@@ -72,8 +72,8 @@ theorem envExt_agree : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (
       exact hi (hfin.mem_toFinset.2 h))
     have hsum : F (∑ i ∈ hfin.toFinset, En.inl.f (En.tb.c i x) * En.tb.b i) =
         F' (∑ i ∈ hfin.toFinset, En.inl.f (En.tb.c i x) * En.tb.b i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum]
+
+      rw [map_sum, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_mul, map_mul, hb, hbasis]
     exact envExt_sub_mem F F' En.inl.f _ _ _ hcomp hsum happ

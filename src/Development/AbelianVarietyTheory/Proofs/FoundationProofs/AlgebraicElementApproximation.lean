@@ -53,11 +53,11 @@ theorem exists_approx {p : ℕ} [Fact p.Prime] (P : ℤ_[p][X]) (N : ℕ) :
     ∑ i ∈ Finset.range (P.natDegree + 1), monomial i (r (P.coeff i)), ?_, ?_⟩
   · refine natDegree_sum_le_of_forall_le _ _ fun i hi => ?_
     exact (natDegree_monomial_le _).trans (Nat.lt_succ_iff.1 (Finset.mem_range.1 hi))
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [Polynomial.map_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
-      conv_lhs => rw [P.as_sum_range]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      rw [map_monomial, C_mul_monomial, ← map_add (f := _), eq_intCast, ← hmr]
+
+  · rw [Polynomial.map_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+    conv_lhs => rw [P.as_sum_range]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [map_monomial, C_mul_monomial, ← map_add (f := _), eq_intCast, ← hmr]
 
 theorem exists_cong : ∀ (p : ℕ) [Fact p.Prime] (Ωl : Type) [Field Ωl] [Algebra (O0 p) Ωl],
     IsClo p Ωl → ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (j : Ω →+* Ωl) (k : ℕ) (e : Ωl),

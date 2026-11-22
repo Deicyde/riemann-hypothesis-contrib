@@ -111,7 +111,7 @@ theorem realcont (ps : AddChar (AF F) ℂ) (hψ : IsStd ps) (κ : Type) [Fintype
 
 
 open GlobalTheory.WeilAdm in
-set_option maxHeartbeats 1000000 in
+
 theorem weilAdmissible_of_heisenberg_unitary (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ) (κ : Type) [Fintype κ]
     (B : ((κ → AF F) × (κ → AF F)) ≃ₗ[AF F] ((κ → AF F) × (κ → AF F)))
     (O : Module.End ℂ ((κ → AF F) → ℂ))
@@ -168,8 +168,8 @@ theorem weilAdmissible_of_heisenberg_unitary (ψ : AddChar (AF F) ℂ) (hψ : Is
   choose T hT using hT
   refine ⟨∑ r ∈ R.attach, (T r.1 r.2).comp ⟨A r.1, hcont r.1⟩, fun f => ?_⟩
   have hΦ := hdec (O (GlobalTheory.WeilM.pureA F f g)) (hfix _ (hfixed f)).1 (hfix _ (hfixed f)).2
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LinearMap.comp_apply, hΦ, map_sum, ContinuousLinearMap.sum_apply, ← Finset.sum_attach R]
+
+  rw [LinearMap.comp_apply, hΦ, map_sum, ContinuousLinearMap.sum_apply, ← Finset.sum_attach R]
   refine Finset.sum_congr rfl fun r _ => ?_
   rw [← hA, hT r.1 r.2]
   rfl

@@ -25,8 +25,8 @@ variable {S : Scheme.{0}} {G A T : Over S} [GrpObj G] [GrpObj A]
 
 theorem lam_sum {I : Type} (s : Finset I) (c : I → Pic A.left) (x y : T ⟶ A) :
     lam (∑ i ∈ s, c i) x y = ∑ i ∈ s, lam (c i) x y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [lam, map_sum, Finset.sum_add_distrib, Finset.sum_sub_distrib]
+
+  simp only [lam, map_sum, Finset.sum_add_distrib, Finset.sum_sub_distrib]
 
 variable [IsCommMonObj G] {L : LB G.left} (hL : L.IsLB) (hΘ : ∃ t : LB.Gen (Theta G L), t.IsGen)
 include hΘ

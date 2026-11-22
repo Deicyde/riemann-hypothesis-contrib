@@ -15,7 +15,7 @@ open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_linear_sectionValue_abelianPower : ∀ (K : Type) [Field K] (x : KeyIn K) (N : ℕ) (i : Fin 1 → x.P.L.ι) (B : Type) [CommRing B] [Algebra K B]
     (y : Sp B ⟶ (baseOver (Sp K) ⊗ x.P.A).left),
     y ≫ (fst (baseOver (Sp K)) x.P.A).left = spMap (algebraMap K B) →

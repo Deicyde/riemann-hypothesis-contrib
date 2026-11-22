@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 @[expose] public section
 
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.zlLattice_of_coefficientLattice : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL]
     (O : Type) [CommRing O] [Algebra O LL]
     (V : Type) [AddCommGroup V] [Module LL V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] LL V]

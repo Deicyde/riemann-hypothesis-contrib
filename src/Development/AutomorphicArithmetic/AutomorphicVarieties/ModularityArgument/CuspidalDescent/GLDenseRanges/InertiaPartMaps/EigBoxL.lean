@@ -15,7 +15,7 @@ open scoped Matrix TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 open UpperTheory.V.Z.J.D
 
@@ -108,8 +108,8 @@ private theorem eigBoxL_lemma {G Q Y X : Type} [Group G] [AddCommGroup Y] [Modul
   by_cases hQ : Finite Q
   · haveI := Fintype.ofFinite Q
     rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [LinearMap.sum_apply, map_sum, h]
+
+    simp [LinearMap.sum_apply, map_sum, h]
   · haveI : Infinite Q := not_finite_iff_infinite.mp hQ
     rw [finsum_of_infinite_support, finsum_of_infinite_support]
     · simp
@@ -177,14 +177,14 @@ private theorem eigBoxL_lemma_5 {G H Y X : Type} [Group G] [Group H] [AddCommGro
     (fun i => g (F i)) ∈ invT K₁ K₂ τ₀ σ₂ ⊓ Submodule.pi Set.univ fun _ => ePart (σ₂.comp (MonoidHom.inr G H)) a N := by
   have hE : ∀ y, g (opE (σ₁.comp (MonoidHom.inr G H)) a y) = opE (σ₂.comp (MonoidHom.inr G H)) a (g y) := by
     intro y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [opE, Finsupp.sum, map_sum, hg]
+
+    simp [opE, Finsupp.sum, map_sum, hg]
   rw [Submodule.mem_inf, mem_invT, Submodule.mem_pi] at hF ⊢
   obtain ⟨⟨h1, h2⟩, h3⟩ := hF
   refine ⟨⟨fun k i => ?_, fun k hk i => ?_⟩, fun i _ => ?_⟩
   · conv_rhs => rw [← h1 k i]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, hg]
+
+    simp [map_sum, hg]
   · rw [← hg, h2 k hk i]
   · have := h3 i (Set.mem_univ _)
     simp only [ePart, LinearMap.mem_ker, LinearMap.sub_apply, Module.End.natCast_apply] at this ⊢
@@ -199,14 +199,14 @@ private theorem eigBoxL_lemma_6 {G H Y X : Type} [Group G] [Group H] [AddCommGro
     F ∈ invT K₁ K₂ τ₀ σ₁ ⊓ Submodule.pi Set.univ fun _ => ePart (σ₁.comp (MonoidHom.inr G H)) a N := by
   have hE : ∀ y, g (opE (σ₁.comp (MonoidHom.inr G H)) a y) = opE (σ₂.comp (MonoidHom.inr G H)) a (g y) := by
     intro y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [opE, Finsupp.sum, map_sum, hg]
+
+    simp [opE, Finsupp.sum, map_sum, hg]
   rw [Submodule.mem_inf, mem_invT, Submodule.mem_pi] at hF ⊢
   obtain ⟨⟨h1, h2⟩, h3⟩ := hF
   refine ⟨⟨fun k i => hgi ?_, fun k hk i => hgi ?_⟩, fun i _ => ?_⟩
   · rw [← h1 k i]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, hg]
+
+    simp [map_sum, hg]
   · rw [hg, h2 k hk i]
   · have := h3 i (Set.mem_univ _)
     simp only [ePart, LinearMap.mem_ker, LinearMap.sub_apply, Module.End.natCast_apply] at this ⊢
@@ -366,8 +366,8 @@ theorem eigBoxL {L : Type} [Field L] [NumberField L] {n : ℕ} {V : Type} [Finty
           | tmul w F =>
             simp only [sl_tmul, LinearMap.lTensor_tmul, LinearMap.coe_comp, Function.comp_apply,
               LinearMap.coe_proj, Function.eval, LinearMap.coe_single]
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [← Finset.sum_smul, ← map_sum, Finset.univ_sum_single]
+
+            rw [← Finset.sum_smul, ← map_sum, Finset.univ_sum_single]
           | add x y hx hy => simp only [map_add (f := _), hx, hy, Finset.sum_add_distrib]
         rw [key]
         refine Submodule.sum_mem _ fun i _ => ?_

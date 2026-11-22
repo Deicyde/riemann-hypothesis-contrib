@@ -263,8 +263,8 @@ theorem exists_coords_and_series (h5 : 5 ≤ l) {σ : ℂ_[l] →+* ℂ_[l]} (h�
       fun r => ⟨hinj (by rw [map_iterate hτ]; exact (hD.fix r).1), hinj (by rw [map_iterate hτ]; exact (hD.fix r).2)⟩⟩
   have hTr : TrDual d τ o o' := by
     refine ⟨hD.card, fun r r' => hinj ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [sum_even d hd (fun n => τ^[n] (o r * o' r')), map_sum]
+
+    rw [sum_even d hd (fun n => τ^[n] (o r * o' r')), map_sum]
     simp only [map_iterate hτ, map_mul (MaximalUnramifiedExtension l).subtype]
     rw [hD.dual r r']
     split_ifs <;> simp
@@ -323,8 +323,8 @@ theorem exists_coords_and_series (h5 : 5 ≤ l) {σ : ℂ_[l] →+* ℂ_[l]} (h�
     convert h using 1
     · rfl
     unfold beXY
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [subst_sum hRs, map_sum]
+
+    rw [subst_sum hRs, map_sum]
     refine Finset.sum_congr rfl fun r _ => ?_
     rw [subst2_comp hRs (constantCoeff_X _) (constantCoeff_X _), subst_X hRs, subst_X hRs, subst_inPar hl b (hR0 _) (hR0 _),
       map_pair b (cc_ps (hR0 _) (cc_lgF hl)) (cc_ps (hR0 _) (cc_lgF hl)), ← map_lg, ← map_lg, hR]

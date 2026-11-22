@@ -41,7 +41,7 @@ open scoped TensorProduct
 open GlobalTheory.MovedDict Formalism.L2.Ker GlobalTheory.SignedHC
 noncomputable section
 namespace GlobalTheory.SplitMoveFrames
-set_option maxHeartbeats 1600000 in
+
 private theorem moves_generate_lattices {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} {S T : HSp D} (hθ : IsInfFam θ)
     (hSg : S.SigOK) (hTg : T.SigOK) (hcS : ∀ τ, IsCartanInv (gramAt D S τ) 1) (hcT : ∀ τ, IsCartanInv (gramAt D T τ) 1)
     {χS χT : (Formalism.L2.Theta.AE D)ˣ →* Circle} {om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)} (hW : IsWeilDatumO ψ S T χS χT om)
@@ -212,8 +212,8 @@ private theorem moves_generate_lattices {D : D7} {ψ : AddChar (AF D.host.F) ℂ
       ((splitFacO χS χT x₀ y₀ : ℂ) * ((Real.sqrt ((R.card : ℝ) * R'.card) : ℝ) : ℂ)⁻¹) •
       ∑ p ∈ R ×ˢ R', α (P (γ p)) •
         Formalism.L2.Th1.H.opU H (P (γ p)) (rd f) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hmain, map_smul, ← Finset.sum_product', map_sum]
+
+    rw [hmain, map_smul, ← Finset.sum_product', map_sum]
     congr 1
     refine Finset.sum_congr rfl fun p hp => ?_
     rw [hpf p hp, map_smul, hrd _ hf.2.theta,
@@ -397,7 +397,7 @@ private theorem jets_of_real_frames {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {�
     exact Finset.prod_pow_eq_pow_sum _ _ _
   rw [hprod, mul_pow]
   ring
-set_option maxHeartbeats 1600000 in
+
 private theorem jets_move_with_frames {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} {S T : HSp D}
     (hSg : S.SigOK) (hTg : T.SigOK)
     {sS : D.what₂.Tau → Matrix (Fin S.rank) (Fin S.rank) ℂ} {sT : D.what₂.Tau → Matrix (Fin T.rank) (Fin T.rank) ℂ}
@@ -583,7 +583,7 @@ private theorem jets_transfer_along_operator {D : D7} {N N' : ℕ} (T0 : Tor D) 
   ring
 end GlobalTheory.SplitMoveFrames
 open GlobalTheory.SplitMoveFrames in
-set_option maxHeartbeats 1600000 in
+
 theorem _root_.GlobalTheory.T.twist_splitMoveFrames_jets : _root_.GlobalTheory.FunPr.ThetaLocalInputs → (∀ D, GlobalTheory.NormSum.Inp D) → ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 T : Type}
     {A : FamIn D.what₂.LL Γ Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D A Ks}
     (ch : Choice R), ch.Is → ∀ (p : Pair T), DefPair D.R.m p → ∀ (x : FinPt ch.G p.small) (y : FinPt ch.G p.big) (e : Formalism.L2.Theta.AE D), IsSplitIdem D e → ∀ (s : FinPt ch.G p.small) (s' : FinPt ch.G p.big),

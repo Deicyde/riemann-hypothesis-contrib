@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 @[expose] public section
 
 open scoped Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.translated_standard_chain_stabilizer_radical : ∀ {K : Type} [Field K] {n m : ℕ} (Y : Fin (m + 1) → Submodule K (Fin n → K)) (d : Fin m → ℕ) (h : ∑ j, d j = n)
     (g : GL (Fin n) K), (∀ (j : Fin (m + 1)) (y : Fin n → K),
       y ∈ Y j ↔ ∀ i : Fin n, (j : ℕ) ≤ ((GlobalTheory.SmGL.blk (GlobalTheory.SmGL.stdBlocks d h) i : Fin m) : ℕ) →

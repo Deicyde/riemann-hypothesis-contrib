@@ -7,7 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open ReciprocityTheory.Gal UpperTheory.V.Base
 
-set_option maxHeartbeats 200000 in
+
 theorem UpperTheory.V.Base.lenEigSign :
     ∀ (O W Q N : Type) [CommRing O] [IsDomain O] [Group W] [CommGroup Q] [Finite Q] [HasEnoughRootsOfUnity O (Monoid.exponent Q)]
       [Fintype (Q →* Oˣ)] [AddCommGroup N] [Module O N] (π : Representation O W N) (p : W →* Q), Function.Surjective p →

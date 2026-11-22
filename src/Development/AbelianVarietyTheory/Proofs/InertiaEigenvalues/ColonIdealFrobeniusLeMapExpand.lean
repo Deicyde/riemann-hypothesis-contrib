@@ -17,8 +17,8 @@ theorem map_decomp_frob {O K : Type} [CommRing O] [NormedField K] [Algebra O K] 
     (h : f = ∑ j : Fin l, X ^ j.val * PowerSeries.expand l (Fact.out : l.Prime).ne_zero (g j)) :
     PowerSeries.map (algebraMap O K) f =
       ∑ j : Fin l, X ^ j.val * frob K l (PowerSeries.map (algebraMap O K) (g j)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum]
+
+  rw [h, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, map_pow, map_X, map_expand]
   rfl
@@ -60,8 +60,8 @@ theorem colon_map_frob_le : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUlt
         ∑ j : Fin l, X ^ j.val *
           frob K l ((G *ᵥ fun k => PowerSeries.map (algebraMap O K) (c k j)) i) := by
       rw [e1]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, hMk, Finset.mul_sum, map_sum, map_mul]
+
+      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, hMk, Finset.mul_sum, map_sum, map_mul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
       ring

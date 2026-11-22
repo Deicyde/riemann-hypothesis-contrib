@@ -93,8 +93,8 @@ theorem contractRight_trace {ι : Type*} [Fintype ι] [DecidableEq ι] (b : Modu
     | tmul x y => simp [TensorProduct.smul_tmul']
     | add x y hx hy => simp only [map_add (f := _), mul_add, smul_add, hx, hy]
   conv_rhs => rw [← sum_contractRight_coord_tmul b Θ]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [htr, map_sum, map_sum]
+
+  rw [htr, map_sum, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [contractRight_apply, lTensor_comp_mulLeft_of_balanced Θ hΘ, hr, ← contractRight_apply]
   simp [mul_comm]
@@ -185,8 +185,8 @@ theorem dvd_trace_of_balanced_tensor :
       have e : LinearMap.lTensor H (b.constr O v) Θ
           = ∑ j, contractRight Θ (b.coord j) ⊗ₜ[O] v j := by
         conv_lhs => rw [← sum_contractRight_coord_tmul b Θ]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp [map_sum]
+
+        simp [map_sum]
       rw [e]
       calc ∑ j, contractRight Θ (b.coord j) ⊗ₜ[O] v j
           = ∑ j, ∑ i, b i ⊗ₜ[O] (b.repr (contractRight Θ (b.coord j)) i • v j) := by

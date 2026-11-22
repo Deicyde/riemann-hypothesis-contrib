@@ -252,7 +252,7 @@ theorem βdR_mem_FilV (Ct : CmpTie W E ιdR p1 tS zS) (T : LocLat G Qp LL O) (hA
       exact tmul_mem_FilV T _ (hA w)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem core_gen (Ct : CmpTie W E ιdR p1 tS zS) (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) (i : ZMod n)
     (ζ : LL) (ι : LL →ₐ[Qp] BdR) (hιK : ∀ c : K₀, ι (W.emb i c) = algebraMap K₀ BdR c) (hζ : ι ζ = zS)
     (hι : ∀ c, ι c ∈ PD.Fil 0) (hA : ∀ w, ιdR w ∈ PD.Fil 0) (u : BdR) (hu0 : u ∈ PD.Fil 0)

@@ -18,10 +18,10 @@ open GlobalTheory.Mem.Top.TwChar (plUnder RootIso FrobPick)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
+
 set_option genInjectivity false
 set_option genSizeOfSpec false
-set_option maxHeartbeats 2000000
+
 
 def SatU {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} (P : Pre2 K w) : Prop :=
   T = TwDat.untw B T.pl → ∀ v v', OverOne (w.D P.Z₀) v v' → v ∈ P.Wt → v' ∈ P.Wt

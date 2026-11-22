@@ -22,7 +22,7 @@ namespace GlobalTheory.CompanionTheory.Hypotheses₂.TDSwap
 
 open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead GlobalTheory.OneBlockCell GlobalTheory.JHMult GlobalTheory.Published GlobalTheory.LocGL GlobalTheory.LocGL.SupportUnique
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 open scoped TensorProduct
 
@@ -273,7 +273,7 @@ theorem exists_jac_map_of_ne (hG : GeometricLemma) (n : Type) [Fintype n] [Decid
     ((h4 (b.symm G0) f₀ g₀).some.trans E₀)
 
 
-set_option maxHeartbeats 2000000 in
+
 variable (k) in
 theorem exists_jac_map_of_eq (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness) (n : Type) [Fintype n]
     [DecidableEq n] {D : ℕ} (hD : 0 < D) (σ : Fin 2 → Irr k D) (hc : ∀ i, IsCuspidal (σ i).π)

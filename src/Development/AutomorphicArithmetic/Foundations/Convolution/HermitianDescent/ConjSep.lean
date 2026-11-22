@@ -22,8 +22,8 @@ private noncomputable def pol (c : Fin n → R) : R[X] := ∑ j : Fin n, monomia
 
 private theorem kry_mulVec (g : Matrix (Fin n) (Fin n) R) (v c : Fin n → R) :
     kry g v *ᵥ c = aeval g (pol c) *ᵥ v := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [pol, map_sum, Matrix.sum_mulVec]
+
+  rw [pol, map_sum, Matrix.sum_mulVec]
   funext i
   rw [Finset.sum_apply]
   simp only [aeval_monomial, ← Algebra.smul_def, Matrix.smul_mulVec, Pi.smul_apply, smul_eq_mul]

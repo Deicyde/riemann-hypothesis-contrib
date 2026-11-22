@@ -73,7 +73,7 @@ theorem map_conj_local {D : D7} {c : Comm D} {v : VCom c} (G : GLoc v) {β : GL 
     _ = (B⁻¹).val * q.val * B.val := by simp only [ht1, Matrix.mul_one, F.γβ]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem psi_red_at {D : D7} {c : Comm D} {v : VCom c} (G : GLoc v) (PP : Pl D.host.E) (b : GA D (c.V 0))
     (β : GL (Fin (c.V 0).rank) (Lev.EAf D)) (hL : GlobalTheory.LevZero.LocAt G PP b β) (hr : D.R.r ≤ (c.V 0).rank) (n : GA D (c.V 0))
     (q : GL (XIx (Fin D.R.k) (Fin D.R.t) 0 ⊕ Fin (G.s + 1)) G.k) (p : ℕ) (hq : q ∈ GlobalTheory.RootEx.N G.k _ (G.s + 1) p)
@@ -110,11 +110,11 @@ theorem psi_red_at {D : D7} {c : Comm D} {v : VCom c} (G : GLoc v) (PP : Pl D.ho
   set w : Formalism.L2.Herm.intAf D.host.F D.host.E := ∑ i : Fin D.R.r, ∑ j : Fin D.R.r,
     if GlobalTheory.chainEdge D.R.k i j then y.val (Fin.castLE hr i) (Fin.castLE hr j) else 0 with hw
   have hres : resS D.host.F PP w = Ideal.Quotient.mk PP.asIdeal z := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hz, hw, map_sum]
+
+    rw [hz, hw, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     split_ifs
     · rfl
@@ -122,11 +122,11 @@ theorem psi_red_at {D : D7} {c : Comm D} {v : VCom c} (G : GLoc v) (PP : Pl D.ho
   have hker := (hred.ker (w - Formalism.L2.DIV.oToS D.host.F D.host.E z)).1 (by
     rw [map_sub, hres, Formalism.L2.DIV.resS_oToS, sub_self])
   have hpw : (π'.comp (Formalism.L2.Herm.intAf D.host.F D.host.E).subtype) w = (G.S.ϖ : G.k) * GlobalTheory.RootEx.simpleSum q := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hsum, hw, map_sum]
+
+    rw [← hsum, hw, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     split_ifs
     · have := congrFun (congrFun hmat (Fin.castLE hr i)) (Fin.castLE hr j)

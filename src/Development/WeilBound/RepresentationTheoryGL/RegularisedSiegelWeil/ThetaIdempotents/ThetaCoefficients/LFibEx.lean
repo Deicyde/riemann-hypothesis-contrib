@@ -23,7 +23,7 @@ namespace PositivityTheory.Rg.Rsw.L.LFibEx
 
 variable {D : D7} {r : ℕ}
 
-set_option maxHeartbeats 1000000 in
+
 open GlobalTheory.CompanionTheory.SiegelND in
 theorem _root_.PositivityTheory.Rg.Rsw.L.fibEx : FibEx := by
   intro D r V hr ψ hψ θ hθ μ hμ lam hlam b₀ hb₀

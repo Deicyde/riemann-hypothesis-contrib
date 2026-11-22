@@ -17,10 +17,10 @@ theorem pow_apply_smul_nsmul {O K : Type} [CommRing O] [NormedField K] [IsUltram
   induction k with
   | zero => simp
   | succ k ih =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_choose_succ_nsmul
-        (fun i j => (fun τ => (⇑(PowerSeries.derivative (R := K)))^[i] (f τ)) • (C.nabla ^ j) v) k,
-        pow_succ', mul_apply_eq_comp, ih, map_sum, ← Finset.sum_add_distrib]
+
+    rw [Finset.sum_choose_succ_nsmul
+      (fun i j => (fun τ => (⇑(PowerSeries.derivative (R := K)))^[i] (f τ)) • (C.nabla ^ j) v) k,
+      pow_succ', mul_apply_eq_comp, ih, map_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun p hp => ?_
     have hpk : p ≤ k := Nat.lt_succ_iff.1 (Finset.mem_range.1 hp)
     rw [map_nsmul, C.leibniz, smul_add, add_comm]

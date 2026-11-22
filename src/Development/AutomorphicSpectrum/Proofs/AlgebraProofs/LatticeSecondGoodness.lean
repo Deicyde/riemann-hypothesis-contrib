@@ -32,8 +32,8 @@ private theorem loc_free_base_change {o Ω C : Type} [CommRing o] [Field Ω] [Fi
     fun l => algebraMap Ω C (f l), fun l => algebraMap Ω C (c l), fun l => hRC _ (hf l),
     fun l => hRC _ (hc l), ?_, fun l => ?_⟩
   · have h := congrArg (algebraMap Ω C) hsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa only [map_sum, map_mul, map_one] using h
+
+    simpa only [map_sum, map_mul, map_one] using h
   obtain ⟨b, hli, hsp, hiff⟩ := hb l
   have hbc := isBaseChange_bcMap Ω C ι
   let B : Module.Basis (Fin r) Ω (ι → Ω) := Module.Basis.mk hli hsp.ge

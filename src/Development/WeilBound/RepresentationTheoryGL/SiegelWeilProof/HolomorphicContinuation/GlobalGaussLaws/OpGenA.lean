@@ -98,8 +98,8 @@ theorem hasTemperateGrowth_evX (P : PX m n) : (fun u : EE => evX P u).HasTempera
 
 theorem gramX_herm (ε : Fin m → Bool) (u : EE) : (gramX ε u)ᴴ = gramX ε u := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
+
+  simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
 
 theorem trace_real (ε : Fin m → Bool) (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) (u : EE) :
     (((b * gramX ε u).trace.re : ℝ) : ℂ) = (b * gramX ε u).trace := by
@@ -112,8 +112,8 @@ theorem hasTemperateGrowth_phase (ε : Fin m → Bool) (t : ℝ) (b : Matrix (Fi
   have hP : (fun u : EE => (b * gramX ε u).trace) =
       fun u => evX (∑ i, ∑ j, MvPolynomial.C (b i j) * Qp ε j i) u := by
     funext u
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [evX, gramX, Matrix.trace, Matrix.mul_apply, map_sum]
+
+    simp [evX, gramX, Matrix.trace, Matrix.mul_apply, map_sum]
   have hT : (fun u : EE => (b * gramX ε u).trace).HasTemperateGrowth := by
     rw [hP]
     exact hasTemperateGrowth_evX _

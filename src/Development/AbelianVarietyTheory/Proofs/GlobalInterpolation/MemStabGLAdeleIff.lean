@@ -118,8 +118,8 @@ theorem mem_latS_adele_iff [Module.Finite (𝓞 E) N] (u : n → E ⊗[F] Finite
   constructor
   · rintro ⟨a, ha, ea⟩ v
     refine ⟨fun j => a j v, fun j => ha j v, fun i => ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ea, map_sum]
+
+    simp only [ea, map_sum]
     rfl
   · intro h
     choose a ha ea using h
@@ -128,8 +128,8 @@ theorem mem_latS_adele_iff [Module.Finite (𝓞 E) N] (u : n → E ⊗[F] Finite
     refine ⟨A, fun j v => ha v j, fun i => ?_⟩
     rw [← sub_eq_zero]
     refine Formalism.UG.P.afsplit_inj _ fun v => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, sub_eq_zero, map_sum]
+
+    rw [map_sub, sub_eq_zero, map_sum]
     exact ea v i
 
 theorem prV_mulVec [Fintype n] (v : HeightOneSpectrum (𝓞 F))

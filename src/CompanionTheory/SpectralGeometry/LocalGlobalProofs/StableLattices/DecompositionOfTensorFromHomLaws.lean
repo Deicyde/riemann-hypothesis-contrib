@@ -34,8 +34,8 @@ theorem dec_comp {Hom : ∀ a b, (N a →ₗ[ℂ] N b) → Prop} (hc : IsLinCat 
       refine Finset.sum_congr rfl fun a _ => ?_
       ext x
       have := congrArg (fun f => j a (f (q a x))) (h2 a).sum
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum] using this
+
+      simpa [map_sum] using this
     pr_io p := by
       ext x
       have h1 := LinearMap.congr_fun (h.pr_io (e p).1) (io (e p).1 (e p).2 x)
@@ -84,8 +84,8 @@ theorem hom_cas (hL : HomLie) {X Y : Obj k r} {f : M X →ₗ[ℂ] M Y} (hX : X.
   refine LinearMap.ext fun x => ?_
   have h := fun Z y => LinearMap.congr_fun (hL k r X Y f hX hY hf Z) y
   simp only [LinearMap.comp_apply] at h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [cas, LinearMap.comp_apply, LinearMap.sum_apply, map_sum, mul_apply_eq_comp, h]
+
+  simp only [cas, LinearMap.comp_apply, LinearMap.sum_apply, map_sum, mul_apply_eq_comp, h]
 
 theorem dec1 (hC : HomCat) (hM : MatHom) (hT : TensHom) (F F' : FRep k r) (U : URep k r) {A : Type} [Fintype A]
     (T : A → URep k r) {io : ∀ a, M (one (T a)) →ₗ[ℂ] M (F, U)} {pr : ∀ a, M (F, U) →ₗ[ℂ] M (one (T a))}

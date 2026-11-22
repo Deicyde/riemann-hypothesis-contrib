@@ -38,8 +38,8 @@ theorem rep_conj_of_trace_eq : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (g : �
       · intro b _ hb
         simp [Pi.single_apply, Ne.symm hb]
       · simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [this, map_sum, Matrix.trace_sum]
+
+    rw [this, map_sum, Matrix.trace_sum]
     simp [map_smul, Matrix.trace_smul]
   let χ : (D.F →+* ℂ) → (𝓞 D.F →* ℂ) := fun τ => (τ.comp (algebraMap (𝓞 D.F) D.F)).toMonoidHom
   have hχ : Function.Injective χ := by

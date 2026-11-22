@@ -67,7 +67,7 @@ theorem phiDS_one {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel
   rw [inner_self_eq_norm_sq_to_K, hunit]
   simp
 
-set_option maxHeartbeats 400000 in
+
 theorem inner_apply_homDS {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} {M : DSModel V S} {H : Type}
     [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {π : GA D V →* (H →L[ℂ] H)}
     (hπ : IsUnitaryRep π) {K : Subgroup (GfC V)} {Φ : ContinuousMultilinearMap ℂ M.H H} (hΦ : Φ ∈ homDS M π ⊤)
@@ -83,7 +83,7 @@ theorem inner_apply_homDS {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} {M :
   rw [inner_eq_bePi (fun τ => isIrrUnitary_dsRep M τ) hπ hΦ hΦ]
   rfl
 
-set_option maxHeartbeats 400000 in
+
 theorem eq_zero_of_apply_unitVec {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} {M : DSModel V S} {H : Type}
     [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {π : GA D V →* (H →L[ℂ] H)}
     (hπ : IsUnitaryRep π) {Φ : ContinuousMultilinearMap ℂ M.H H} (hΦ : Φ ∈ homDS M π ⊤)
@@ -96,7 +96,7 @@ theorem eq_zero_of_apply_unitVec {D : D7} {V : HSp D} {S : D.what₂.Tau → SPa
   simp at hpos
 
 
-set_option maxHeartbeats 400000 in
+
 theorem finiteDimensional_of_bump {G E : Type} [Group G] [TopologicalSpace G] [MeasurableSpace G]
     [OpensMeasurableSpace G] [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
     {π : G →* (E →L[ℂ] E)} (hπ : IsUnitaryRep π) (μ : Measure G) [IsFiniteMeasureOnCompacts μ] [μ.IsOpenPosMeasure]
@@ -153,7 +153,7 @@ theorem finiteDimensional_of_bump {G E : Type} [Group G] [TopologicalSpace G] [M
       linarith
   exact finiteDimensional_of_compact_bdd _ hcpt X (norm_pos_iff.2 hJ0) hbound
 
-set_option maxHeartbeats 400000 in
+
 theorem admissible_representation_factorisation : AdmSt := by
   intro D V S M μ _ H _ _ _ π hπ hcpt hU
   classical

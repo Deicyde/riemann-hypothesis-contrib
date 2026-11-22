@@ -12,7 +12,7 @@ open CompanionTheory.D.LK (Pos Cn ann cre lift bd cpt allT wt ev)
 open CompanionTheory.RgExh CompanionTheory.RgExh.U
 open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
 open GlobalTheory.CompanionTheory.RgCOBlock
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.standard_blocks_level_sum : ∀ (n M : ℕ) (lev : Fin n → ℕ) (h : ∑ i, sz lev M i = n), Monotone lev → (∀ a, lev a < M) →
     (∀ (i : Fin M) (p : Fin (sz lev M i)), lev (stdBlocks (sz lev M) h ⟨i, p⟩) = (i : ℕ)) ∧
     ∀ (f : Fin n → ℂ) (i : Fin M), ∑ p : Fin (sz lev M i), f (stdBlocks (sz lev M) h ⟨i, p⟩) =

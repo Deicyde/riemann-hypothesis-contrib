@@ -215,8 +215,8 @@ theorem R1 (hef : e * f = f * e + h) (hhe : h * e = e * h + (2 : K) • e) (hhf 
       push_cast
       ring
   have ht := tele (fun j => (f ^ j) ((e ^ j) (e x))) s T (c + 1) (by simp [he])
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [P_apply, P_apply, map_sum, show (s : K) - c - 1 = (s : K) - (c + 1) by ring, ← ht]
+
+  rw [P_apply, P_apply, map_sum, show (s : K) - c - 1 = (s : K) - (c + 1) by ring, ← ht]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, hk]
 
@@ -240,8 +240,8 @@ theorem sl2_projector_apply_f_eq_smul_f_projector_succ (hef : e * f = f * e + h)
   have ht := tele (fun k => (f ^ (k + 1)) ((e ^ k) z)) s T (c - 1)
     (by show (f ^ (T + 1)) ((e ^ T) z) = 0; rw [he]; simp)
   beta_reduce at ht
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [P_apply, P_apply, map_sum]
+
+  rw [P_apply, P_apply, map_sum]
   simp only [key, map_smul, ← hpf']
   rw [ht]
   congr 1

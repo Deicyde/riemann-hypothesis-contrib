@@ -7,7 +7,7 @@ public import Development.WeilBound.RepresentationTheoryGL.EisensteinSeries.Sieg
 @[expose] public section
 
 open Filter Topology
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.holomorphic_series_uniform_tube : ∀ (ι X T : Type) [NormedAddCommGroup X] [NormedSpace ℂ X] [CompleteSpace X] [TopologicalSpace T]
     (t : ι → ℂ × ℂ → T → X) (Ω : Set (ℝ × ℝ)),
     (∀ r g (p v : ℂ × ℂ), Differentiable ℂ fun τ : ℂ => t r (p + τ • v) g) →

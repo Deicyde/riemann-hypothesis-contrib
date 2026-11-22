@@ -12,7 +12,7 @@ open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.MainNo
 open scoped Matrix TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 800000
+
 
 namespace GlobalTheory.LevelLatticeCong
 

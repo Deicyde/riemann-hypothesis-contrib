@@ -53,7 +53,7 @@ theorem infPart_smul (u : AF D.host.F) (a : AE D) :
   rw [Algebra.smul_def, map_mul]
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem realAd_smul_eq {θ : InfFam D} (hθ : IsInfFam θ) {S T : HSp D} {w : WO S T}
     (hw : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI D.host.F) w) (t : ℝ) :
     GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.realAd D.host.F t • w = ∑ τ, lineAt θ τ (compAt θ τ w) t := by
@@ -65,8 +65,8 @@ theorem realAd_smul_eq {θ : InfFam D} (hθ : IsInfFam θ) {S T : HSp D} {w : WO
   apply GlobalTheory.StdUnn.RealComp.eq_zero_of_parts
   · rw [← GlobalTheory.StdUnn.RealComp.theta_zero_iff hθ]
     intro ρ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [(infPart D).map_sub, (θ ρ).map_sub, sub_eq_zero, Matrix.sum_apply, map_sum (infPart D), map_sum (θ ρ)]
+
+    rw [(infPart D).map_sub, (θ ρ).map_sub, sub_eq_zero, Matrix.sum_apply, map_sum (infPart D), map_sum (θ ρ)]
     have e1 : ∀ τ, θ ρ (infPart D (lineAt θ τ (compAt θ τ w) t i j)) =
         if ρ = τ then (t : ℂ) * θ ρ (infPart D (w i j)) else 0 := by
       intro τ
@@ -93,7 +93,7 @@ namespace GlobalTheory.ArchLineSum
 open GlobalTheory.SplitScalar GlobalTheory.LatVac
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem hasDerivAt_realAd_smul : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsStdChar D ψ (-1) → IsInfFam θ →
     ∀ (S T : HSp D) (f : WO S T → ℂ), IsThetaFunO ψ S T f →
     ∀ w : WO S T, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI D.host.F) w → ∀ x : WO S T,
@@ -115,8 +115,8 @@ theorem hasDerivAt_realAd_smul : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (
     ext i j
     rw [hΛ]
     show finPart D ((∑ τ, lineAt θ τ (compAt θ τ w) (s τ) : WO S T) i j) = 0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.sum_apply, map_sum (finPart D)]
+
+    rw [Matrix.sum_apply, map_sum (finPart D)]
     exact Finset.sum_eq_zero fun τ _ => congrFun (congrFun ((hL τ).2.1 (s τ)) i) j
   let G : (D.what₂.Tau → ℝ) → ℂ := fun s => heisO ψ S T (Λ s) f x
   have hχ : ∀ τ, Differentiable ℝ fun t : ℝ => ψ (symplOH S T x (lineAt θ τ (compAt θ τ w) t)) := fun τ => by
@@ -175,8 +175,8 @@ theorem hasDerivAt_realAd_smul : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (
   rw [hfun]
   suffices key : fderiv ℝ G 0 (fun _ => 1) = ∑ τ, dRho (heisO ψ S T) θ τ (compAt θ τ w) f x by
     rw [← key]; exact hcomp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show (fun _ : D.what₂.Tau => (1 : ℝ)) = ∑ τ, Pi.single τ (1 : ℝ) from (Finset.univ_sum_single _).symm, map_sum]
+
+  rw [show (fun _ : D.what₂.Tau => (1 : ℝ)) = ∑ τ, Pi.single τ (1 : ℝ) from (Finset.univ_sum_single _).symm, map_sum]
   refine Finset.sum_congr rfl fun τ _ => ?_
   have hline : HasDerivAt (fun t : ℝ => t • (Pi.single τ (1 : ℝ) : D.what₂.Tau → ℝ))
       ((1 : ℝ) • (Pi.single τ (1 : ℝ) : D.what₂.Tau → ℝ)) 0 := (hasDerivAt_id 0).smul_const _

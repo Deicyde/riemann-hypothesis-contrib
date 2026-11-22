@@ -48,8 +48,8 @@ theorem intertwiner_fixes_of_local_vacuum {R X M : Type} [CommRing R] [AddCommGr
         have hsum : (1 - z) • ∑ i ∈ s, W (x i) (e i) = ∑ i ∈ s.erase j, W (x i) ((γ (P a) (x i) - z) • e i) := by
           rw [Finset.sum_erase s (by simp [hzdef]), sub_smul, one_smul]
           have h4 : ∑ i ∈ s, W (x i) (e i) = ∑ i ∈ s, γ (P a) (x i) • W (x i) (e i) := by
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [← hfix a ha, map_sum]
+
+            rw [← hfix a ha, map_sum]
             exact Finset.sum_congr rfl fun i _ => hact i
           calc _ = ∑ i ∈ s, γ (P a) (x i) • W (x i) (e i) - ∑ i ∈ s, z • W (x i) (e i) := by
                 rw [← h4, Finset.smul_sum]

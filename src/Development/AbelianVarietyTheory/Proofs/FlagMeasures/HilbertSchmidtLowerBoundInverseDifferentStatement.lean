@@ -8,7 +8,7 @@ public import Formalism.RealPlaceAnalysis.Complexify
 @[expose] public section
 
 open Formalism.HN Formalism.HermitianLatticesTheory Matrix NumberField Finset
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.hilbertSchmidt_lower_bound_inverseDifferent :
     ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] (a b : ℕ)
       (X : InfinitePlace K → Matrix (Fin a) (Fin a) ℂ)

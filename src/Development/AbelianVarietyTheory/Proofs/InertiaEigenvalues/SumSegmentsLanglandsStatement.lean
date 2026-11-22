@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Mono0
 @[expose] public section
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.sum_segments_langlands : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
     (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)),
     letI := GlobalTheory.LocalData.complRel w

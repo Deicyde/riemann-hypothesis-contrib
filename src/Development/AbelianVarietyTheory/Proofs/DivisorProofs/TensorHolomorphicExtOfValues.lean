@@ -35,9 +35,9 @@ theorem _root_.GlobalTheory.tensor_hol_ext_of_values :
     have hzero : (0 : _root_.GlobalTheory.AnPer.Hol W).fn p = 0 := by
       rw [← _root_.GlobalTheory.AnPer.Hol.ev_apply p hp, map_zero]
     have h0 := hzp p hp
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← e.symm_apply_apply z, TensorProduct.equivFinsuppOfBasisLeft_symm_apply, Finsupp.sum,
-      map_sum] at h0
+
+    rw [← e.symm_apply_apply z, TensorProduct.equivFinsuppOfBasisLeft_symm_apply, Finsupp.sum,
+    map_sum] at h0
     simp only [Algebra.TensorProduct.lift_tmul, AlgHom.id_apply, AlgHom.comp_apply,
       _root_.GlobalTheory.AnPer.Hol.ev_apply, Algebra.ofId_apply] at h0
     have h1 : ∑ j ∈ (e z).support, (e z j).fn p • b j = 0 := by

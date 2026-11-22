@@ -32,7 +32,7 @@ def iotaW : (T.Q.Dw ((i : ℕ) + 1)).La →ₗ[𝓞 D.host.E] (Fin (Wc D i).rank
 def IsLift (g : G) (κ : GA D (Wc D i)) : Prop :=
   Lev.IsLevelLift (Wc D i) (R.βW i) (R.datWp i R.triv) (R.eG g) κ
 
-set_option synthInstance.maxHeartbeats 100000
+
 
 def IsGeo (ρ : G →* Module.End T.Q.c.F (Cusp T i w)) : Prop :=
   ∃ lev : G → (T.Q.Dw ((i : ℕ) + 1)).La →ₗ[𝓞 D.host.E] (T.Q.Dw ((i : ℕ) + 1)).La,

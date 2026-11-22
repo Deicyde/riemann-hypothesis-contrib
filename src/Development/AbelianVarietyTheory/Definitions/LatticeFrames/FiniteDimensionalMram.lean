@@ -31,8 +31,8 @@ theorem rank_map_field {K L : Type} [Field K] [Field L] (f : K →+* L) {m n : T
       refine (Submodule.mem_span_range_iff_exists_fun L).2 ⟨fun i => f (c i), ?_⟩
       funext r
       have := congrArg f (congrFun hc r)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul] at this ⊢
+
+      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul] at this ⊢
       exact this
     · rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩

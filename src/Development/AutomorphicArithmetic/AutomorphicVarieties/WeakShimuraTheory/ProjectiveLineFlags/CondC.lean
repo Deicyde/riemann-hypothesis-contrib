@@ -10,7 +10,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Ws.P1.condC :
     ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c) (T : Tower D), T.Fit → T.Deep → ∀ (c' : Coef l) (h : c.O ≤ c'.O) (K : Link T c' h) (η : K.V.frame.G₀ →* (ResidueField c'.O)ˣ), η ^ 2 = 1 → (K.V.frame.eps c'.O (ResidueField c'.O)).ker ≤ η.ker →
           (∀ i, ∃ j, η * K.r.chib i = K.r.chib j) → η = 1 := by

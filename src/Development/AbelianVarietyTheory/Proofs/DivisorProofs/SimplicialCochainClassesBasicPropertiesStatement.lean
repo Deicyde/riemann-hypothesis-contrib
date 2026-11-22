@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.simplicialCochain_classes_basic_properties :
     ∀ (R : Type) [CommRing R] (F : Shv R) (E : Spc) (n : ℕ),
     (∀ s : (free R).obj (E.obj (op (SimplexCategory.mk n))) ⟶ F,

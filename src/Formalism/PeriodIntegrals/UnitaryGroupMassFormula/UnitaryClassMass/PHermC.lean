@@ -48,17 +48,17 @@ theorem gramOK : GramOK := by
       intro i
       have hi := congrFun hc i
       simp only [Matrix.mulVec, dotProduct, gramOf, Pi.zero_apply] at hi
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, smul_eq_mul]
+
+      simp only [map_sum, map_smul, smul_eq_mul]
       rw [← hi]
       exact Finset.sum_congr rfl fun j _ => mul_comm _ _
     have hw : ∀ x, h x (∑ j, c j • b j) = 0 := by
       intro x
       generalize hwd : (∑ j, c j • b j) = w at hbw ⊢
       rw [← b.sum_repr x]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, hbw, smul_zero,
-        Finset.sum_const_zero]
+
+      simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, hbw, smul_zero,
+      Finset.sum_const_zero]
     have hw0 := hnd.2 _ hw
     funext j
     exact Fintype.linearIndependent_iff.1 b.linearIndependent c hw0 j

@@ -39,7 +39,7 @@ private theorem isRoot_of_tri {W : Type} [AddCommGroup W] [Module ℂ W] [Finite
   exact Finset.prod_eq_zero (Finset.mem_univ i) (by simp [h1])
 
 
-set_option maxHeartbeats 800000 in
+
 theorem isRoot_charPol_wdAt :
     ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime]
     (ι : Qbar l ≃+* ℂ) (n M : ℕ), 1 ≤ M → ∀ (m : Fin n → ℤ) (r : G F Ω →* GL (Fin n) (Qbar l)), Continuous r →
@@ -113,7 +113,7 @@ open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.CuspRep GlobalTheory
 open scoped Matrix
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.weilDeligne_frobenius_eigenvalue_of_full_flag : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime]
     (ι : Qbar l ≃+* ℂ) (n M : ℕ), 1 ≤ M → ∀ (m : Fin n → ℤ) (r : G F Ω →* GL (Fin n) (Qbar l)), Continuous r →
     ∀ (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w)

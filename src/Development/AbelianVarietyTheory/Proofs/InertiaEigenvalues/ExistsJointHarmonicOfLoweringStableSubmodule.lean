@@ -32,8 +32,8 @@ open MvPolynomial
 theorem deg_pderiv_succ {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (k : ℕ) (h : f.totalDegree ≤ k + 1) :
     (pderiv i f).totalDegree ≤ k := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [f.as_sum, map_sum]
+
+  rw [f.as_sum, map_sum]
   refine totalDegree_finsetSum_le fun s hs => ?_
   rw [pderiv_monomial]
   by_cases h0 : s i = 0
@@ -90,8 +90,8 @@ theorem lower_to_harmonic : ∀ (D : D7) (n m : ℕ) (p : D.what₂.Tau → ℕ)
     obtain ⟨ψ, hψ, hψ0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
     let b := Module.finBasis ℂ W
     refine ⟨Finset.univ.sup fun j => (ψ (b j)).totalDegree, ψ, hψ, hψ0, fun w => ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr w, map_sum]
+
+    rw [← b.sum_repr w, map_sum]
     refine totalDegree_finsetSum_le fun j _ => ?_
     rw [map_smul]
     exact (totalDegree_smul_le _ _).trans

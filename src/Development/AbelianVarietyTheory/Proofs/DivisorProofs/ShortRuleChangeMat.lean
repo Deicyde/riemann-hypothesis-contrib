@@ -12,7 +12,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAl
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace GlobalTheory.OrbitAdapt
 

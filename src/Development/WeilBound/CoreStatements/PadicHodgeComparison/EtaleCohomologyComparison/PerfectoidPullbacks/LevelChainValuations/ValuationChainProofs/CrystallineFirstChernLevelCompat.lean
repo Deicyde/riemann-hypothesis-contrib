@@ -13,7 +13,7 @@ set_option linter.unusedVariables false
 
 noncomputable section
 
-set_option maxHeartbeats 1000000
+
 
 open CategoryTheory AlgebraicGeometry Limits GlobalTheory.LogCris DividedPowers
 
@@ -41,8 +41,8 @@ theorem crystalline_firstChern_level [FiniteDimensional ℚ_[l] K] (hM : M.Sm) (
     refine Eq.trans ?_ h1.symm
     show ∑ t, algebraMap K L.B (bs.coord t c) • muB L.γB M.q 1 s {⊤} 2 (bs t) = muB L.γB M.q 1 s {⊤} 2 c
     conv_rhs => rw [← bs.sum_repr c]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun t _ => (LinearMap.map_smulₛₗ _ _ _).symm
 
 end CrystallineSemistableComparison.Pb.Kap

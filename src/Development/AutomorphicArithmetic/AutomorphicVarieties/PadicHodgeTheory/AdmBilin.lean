@@ -145,18 +145,18 @@ private theorem span_eq_top_of_invariant [FiniteDimensional Q V] (ρ : G → V �
     ext j
     have := congrFun hc0 j
     simp only [Matrix.mulVec, dotProduct, A, Basis.toMatrix_apply, Pi.zero_apply] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-      smul_eq_mul, map_zero, Finsupp.zero_apply]
+
+    simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+    smul_eq_mul, map_zero, Finsupp.zero_apply]
     rw [← this]
     exact Finset.sum_congr rfl fun k _ => mul_comm _ _
   have hrep : ∀ g (w : B ⊗[Q] V) k, e.repr (sig a ρ g w) k =
       ∑ j, algebraMap Q B (v.repr (ρ g (v j)) k) * a g (e.repr w j) := by
     intro g w k
     conv_lhs => rw [← e.sum_repr w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, sig_smul, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-      smul_eq_mul]
+
+    simp only [map_sum, sig_smul, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+    smul_eq_mul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [mul_comm]
     congr 1

@@ -53,8 +53,8 @@ theorem γsum (T : LocLat G Qp LL O) (K : ℕ) (a : ℕ → ℕ) (c : ℕ → W.
     ∑ y ∈ Finset.range K, ((PD.p : ℕ) : O) ^ a y • (W.γ T (W.π₀ ^ y • c y) - W.π₀ ^ y • c y) =
       W.γ T (∑ y ∈ Finset.range K, W.π₀ ^ y • (((PD.p : ℕ) : O) ^ a y • c y)) -
         ∑ y ∈ Finset.range K, W.π₀ ^ y • (((PD.p : ℕ) : O) ^ a y • c y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ← Finset.sum_sub_distrib]
+
+  rw [map_sum, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun y _ => ?_
   rw [smul_comm (W.π₀ ^ y) (((PD.p : ℕ) : O) ^ a y) (c y), (W.γ T).map_smul, smul_sub]
 
@@ -146,8 +146,8 @@ theorem ser_unique [NeZero n] (hinj : Function.Injective (algebraMap O LL))
       rw [(W.γ T).map_smul, smul_sub (W.π₀ ^ y) (c y) (c' y), map_sub]
       simp only [smul_sub]
       abel
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hE, map_sum, ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib]
+
+    rw [hE, map_sum, ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib]
     exact Finset.sum_congr rfl fun y _ => hy y
   set E2 : W.DD T := ((PD.p : ℕ) : O) ^ (j1 + j2) • E
   have hlet : ∀ y, (letE i : LetA O n) • (W.π₀ ^ y • (c y - c' y)) = W.π₀ ^ y • (c y - c' y) := by
@@ -368,9 +368,9 @@ theorem red (hR : Formalism.MainNotions.LiftingTheory.lifta_Ring W) (T : LocLat 
       le_trans (eY_mono (PD := PD) (le_of_lt (Finset.mem_range.1 hy))) (Nat.le_add_right _ _)
     rw [LinearMap.map_smul_of_tower, φpow_smul, map_pow, lsmul_eq, lsmul_eq, lsmul_eq]
     exact term_id L _ _ _ _ _ hle (hrs y).2 (hg y) _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hz, smul_sub, Finset.smul_sum, Finset.sum_congr rfl e1, Finset.sum_sub_distrib, map_sub,
-    LinearMap.map_smul_of_tower, map_sum, smul_sub, Finset.smul_sum, smul_comm (((PD.p : ℕ) : O) ^ N)]
+
+  rw [hz, smul_sub, Finset.smul_sum, Finset.sum_congr rfl e1, Finset.sum_sub_distrib, map_sub,
+  LinearMap.map_smul_of_tower, map_sum, smul_sub, Finset.smul_sum, smul_comm (((PD.p : ℕ) : O) ^ N)]
   simp only [Finset.smul_sum]
   abel
 
@@ -429,8 +429,8 @@ theorem truncatedSeries_gamma_sub (T : LocLat G Qp LL O) (K : ℕ) (w : W.DD T) 
       ((PD.p : ℕ) : O) ^ Formalism.MainNotions.CrystallineLiftingInputs.eY PD.p K • (W.γ T w - w) -
         ∑ y ∈ Finset.range K, ((PD.p : ℕ) : O) ^ (Formalism.MainNotions.CrystallineLiftingInputs.eY PD.p K - Formalism.MainNotions.CrystallineLiftingInputs.eY PD.p y) •
           (W.γ T (W.π₀ ^ y • c y) - W.π₀ ^ y • c y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [E0, map_sub, (W.γ T).map_smul, map_sum]
+
+  rw [E0, map_sub, (W.γ T).map_smul, map_sum]
   simp only [(W.γ T).map_smul, smul_sub, Finset.sum_sub_distrib]
   abel
 
@@ -694,8 +694,8 @@ theorem ser_map {T T' : LocLat G Qp LL O} (F : LatHom T.L T'.L) (hT : IsCrys PD 
   obtain ⟨j, x, hx, hxΔ, e⟩ := hc.2.2 K
   refine ⟨j, W.map F x, W.map_N F hT hT' x hx, fun δ hδ => by rw [← W.map_γ, hxΔ δ hδ], ?_⟩
   have := congrArg (W.map F) e
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_sum, LinearMap.map_smul_of_tower, hγm] at this
+
+  simp only [map_sub, map_sum, LinearMap.map_smul_of_tower, hγm] at this
   exact this
 
 theorem hermFlagUnipotent_anisotropic_vector_sub_mem [NeZero n] [IsDomain O] (hinj : Function.Injective (algebraMap O LL))
@@ -712,8 +712,8 @@ theorem hermFlagUnipotent_anisotropic_vector_sub_mem [NeZero n] [IsDomain O] (hi
   obtain ⟨c, r, s, hc, hrs, hzd⟩ := hz
   have hzF : Formalism.MainNotions.CrystallineLiftingInputs.IsTrunc W T' i j M X σ (W.map F w₁) (W.map F z₁) := by
     refine ⟨fun y => W.map F (c y), r, s, ser_map W F hT hT' i hc, hrs, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hzd, map_sub, map_sum, LinearMap.map_smul_of_tower, map_φpow]
+
+    rw [hzd, map_sub, map_sum, LinearMap.map_smul_of_tower, map_φpow]
     simp only [mapA_smul, map_φpow]
   exact uniq_alt_alt W hinj hO2 h9 hH hR hsp hA h2 T' hT' i hj hzF hz'
 

@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.BorelPara
 @[expose] public section
 
 open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition GlobalTheory.SatakeBound
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.pairwise_disjoint_parahoricTorusDoubleCoset_antitone : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (ϖ : kˣ),
     valuation k (ϖ : k) = uniformizer k → ∀ (r l t : ℕ),
     Pairwise (Function.onFun Disjoint fun e : {e : Fin (l * t) → ℤ // Antitone e} =>

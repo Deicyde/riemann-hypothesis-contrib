@@ -90,8 +90,8 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 theorem map_conj_mulVec {r : ℕ} (M : Matrix (Fin r) (Fin r) ℂ) (u : Fin r → ℂ) :
     (M.map (starRingEnd ℂ)) *ᵥ u = star (M *ᵥ star u) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mulVec, dotProduct, map_sum]
+
+  simp [Matrix.mulVec, dotProduct, map_sum]
 
 theorem normSq_star {r : ℕ} (u : Fin r → ℂ) : ReciprocityTheory.MultiplicativeHeights.normSq (star u) = ReciprocityTheory.MultiplicativeHeights.normSq u := by
   simp [ReciprocityTheory.MultiplicativeHeights.normSq]

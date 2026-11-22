@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OriginIdeal
 
 open IsLocalRing Polynomial
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.zmodTorsor_field_eq_prod_galois : ∀ (K M : Type) [Field K] [CommRing M] [Algebra K M] (q : ℕ)
     (act : Multiplicative (ZMod q) →* (M ≃ₐ[K] M)), 0 < q →
     GlobalTheory.KeyOriginCut.IsZTorsor K M q act →

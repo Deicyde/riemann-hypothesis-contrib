@@ -61,8 +61,8 @@ private noncomputable def epsL {M : Type} [AddCommGroup M] [Module ℂ M] (n : �
 
 private theorem map_eps {M : Type} [AddCommGroup M] [Module ℂ M] {n : ℕ} (κ : Module.End ℂ M)
     (μ : (Fin n → Matrix (Fin n) (Fin n) ℂ) → M) : κ (eps μ) = eps fun x => κ (μ x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [eps, map_sum, map_zsmul]
+
+  simp only [eps, map_sum, map_zsmul]
 
 theorem UpperTheory.V.AlgRepEndIrreducible.alphaAbs :
     ∀ (M : Type) [AddCommGroup M] [Module ℂ M] (n : ℕ) (A B : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Module.End ℂ M) (arg : Fin n → ℂ),

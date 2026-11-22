@@ -135,7 +135,7 @@ variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
 def eS (B : Bridge L) : SA B.Δ ≃* ↥((SUA L).subgroupOf (finU (E := L) (n := 2))) := B.bS.trans eT
 
-set_option maxHeartbeats 2000000 in
+
 theorem left_eq (B : Bridge L) (hB : B.Ok) (p : UA L 2 →* finU (E := L) (n := 2))
     (hp1 : ∀ f : finU (E := L) (n := 2), ∀ k ∈ infU L 2, p ((f : UA L 2) * k) = f)
     (hp2 : ∀ x : UA L 2, ∃ k ∈ infU L 2, x = (p x : UA L 2) * k)
@@ -208,7 +208,7 @@ theorem val_inv_ge {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [I
 
 variable {B : Bridge L}
 
-set_option maxHeartbeats 4000000 in
+
 theorem place_el (hB : B.Ok) (T : Spl B) {S : Finset (Plc L)} {VL : ∀ w : Plc L, Lev (Kw w)} {A : SD B.Δ} (hA : A.Ok) (hF : Fit T S VL A)
     {a : ∀ w : Plc L, (Kw w)ˣ →* ℂˣ} {b : Chs (Lp L)} (hab : FitCh T S a b) {w : Plc L} (hw : w ∈ S) (h : IsSplitAt w) (t : (Kw w)ˣ)
     (ht : valuation (Kw w) (t : Kw w) < 1) :

@@ -33,8 +33,8 @@ theorem inParamK_eq {l : ℕ} [Fact l.Prime] {ι : Type} (f : MvPowerSeries ι �
   have hlog : PowerSeries.map (k0ToC l) (Formalism.MainNotions.FormalGroupSystem.logF l) = lgF ℂ_[l] l := by
     ext n
     rw [PowerSeries.coeff_map]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Formalism.MainNotions.FormalGroupSystem.logF, lgF, PowerSeries.coeff_mk, map_sum]
+
+    simp only [Formalism.MainNotions.FormalGroupSystem.logF, lgF, PowerSeries.coeff_mk, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [pow_mul]
     split_ifs <;> simp

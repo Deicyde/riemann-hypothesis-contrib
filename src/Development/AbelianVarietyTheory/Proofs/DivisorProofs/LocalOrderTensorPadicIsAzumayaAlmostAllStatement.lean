@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsScalarTowe
 open scoped TensorProduct
 open GlobalTheory.LKInvGood
 open GlobalTheory.LocAzumaya Module in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.localOrderTensorPadic_isAzumaya_almost_all : ∀ (F B : Type) [Field F] [NumberField F] [Ring B] [Algebra F B] [Algebra ℚ B]
     [IsScalarTower ℚ F B] [Algebra.IsCentral F B] [IsSimpleRing B] [FiniteDimensional F B]
     (Λ : Subring B) (hΛ : ∀ a : NumberField.RingOfIntegers F, algebraMap F B (a : F) ∈ Λ),
@@ -48,8 +48,8 @@ theorem _root_.GlobalTheory.T.localOrderTensorPadic_isAzumaya_almost_all : ∀ (
       intro c b h k
       obtain ⟨π, hπ1, hπ2⟩ := exists_coordProj ℓ F B e k
       have h' := congrArg π h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hsum, map_sum, hπ1] at h'
+
+      rw [hsum, map_sum, hπ1] at h'
       simp only [hπ2, Finset.sum_ite_eq', Finset.mem_univ, ite_true] at h'
       exact h'
     have hli : LinearIndependent (cenOrder ℓ F) v := by

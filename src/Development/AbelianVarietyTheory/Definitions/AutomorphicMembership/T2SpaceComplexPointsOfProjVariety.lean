@@ -379,8 +379,8 @@ theorem regC_cx_iff {g : Y.Fn} : RegC y (Y.cx σ g) ↔ RegAt (base y) g := by
       have hk := key i
       rw [← hu] at hk
       rw [map_mul, ← hk, ← mul_assoc, ← map_mul, Units.inv_mul, map_one, one_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hx, map_sum]
+
+    rw [hx, map_sum]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [map_smul]
     simp only [germEv, CxExt.lift_of]

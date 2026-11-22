@@ -202,9 +202,9 @@ theorem UpperTheory.finite_kummerSelmer_on_prime_stratum :
       rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_inv_cancel₀ hdK]
       rfl
     have hFab : F * inc L (B i) b = inc L (B i) a := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [F, a, b, inc, Finset.sum_mul, map_sum, Algebra.TensorProduct.map_tmul,
-        AlgHom.id_apply, Subalgebra.coe_val, Algebra.TensorProduct.tmul_mul_tmul, mul_one]
+
+      simp only [F, a, b, inc, Finset.sum_mul, map_sum, Algebra.TensorProduct.map_tmul,
+      AlgHom.id_apply, Subalgebra.coe_val, Algebra.TensorProduct.tmul_mul_tmul, mul_one]
       refine Finset.sum_congr rfl (fun j _ => ?_)
       congr 1
       have h := hp j

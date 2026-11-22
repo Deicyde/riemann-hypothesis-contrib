@@ -53,8 +53,8 @@ theorem adjoin_primitive_eq_top : ∀ (p : ℕ) [Fact p.Prime] (K H : Type) [Fie
   have hsum : ∀ l : Fin (Module.finrank K (AugCot ε)) → K,
       AugCot.d ε (∑ i, l i • y i) = ∑ i, l i • b i := by
     intro l
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [y, map_sum, hx]
+
+    simp [y, map_sum, hx]
   have hmem : ∀ l : Fin (Module.finrank K (AugCot ε)) → K, (∑ i, l i • y i) ∈ RingHom.ker ε := by
     intro l
     refine Ideal.sum_mem _ fun i _ => ?_

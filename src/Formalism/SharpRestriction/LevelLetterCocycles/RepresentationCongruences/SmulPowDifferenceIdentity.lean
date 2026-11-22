@@ -188,8 +188,8 @@ theorem arc_section_map (hinj : Function.Injective (algebraMap O LL))
     have h1 : Formalism.MainNotions.TruncatedSeriesCountingBounds.crisMap B F.f (W.cmp T₁ ⟨b₁ m, hb1N⟩) = W.cmp T₂ ⟨W.map F (b₁ m), hx⟩ :=
       (W.cmp_map F hW₁.1 hW₂.1 ⟨b₁ m, hb1N⟩ hx).symm
     have h2 : (⟨W.map F (b₁ m), hx⟩ : ↥(W.N T₂)) = ⟨∑ k, β m k • b k, hsumN⟩ := Subtype.ext (hβ m).2
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, h2, ArcF.cmp_sum_letter W T₂ c' b hbN hbl (β m) hsumN, map_sum]
+
+    rw [h1, h2, ArcF.cmp_sum_letter W T₂ c' b hbN hbl (β m) hsumN, map_sum]
     unfold dvO dv
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, ArcF.cmpD_of_mem W T₂ (hbN k)]
@@ -280,9 +280,9 @@ theorem arc_section_map (hinj : Function.Injective (algebraMap O LL))
       have hγF : W.γ T₂ (W.map F (Hh₁ m)) = W.map F (W.γ T₁ (Hh₁ m)) := (W.map_γ F W.gam _).symm
       have eγ₁ : W.γ T₁ (Hh₁ m) = Hh₁ m + W.π₀ ^ A.M PD.p • x₁ := by rw [← ex₁]; abel
       have eγ₂ : ∀ k, W.γ T₂ (Hh k) = Hh k + W.π₀ ^ A.M PD.p • x₂ k := fun k => by rw [← ex₂' k]; abel
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [E, smul_zero, sub_zero, map_sub, Relay2.γ_lsmul, map_sum, map_smul, hγF, eγ₁, eγ₂,
-        map_add, Relay2.mapA_smul, smul_add, Finset.sum_add_distrib, smul_sub, Finset.smul_sum]
+
+      simp only [E, smul_zero, sub_zero, map_sub, Relay2.γ_lsmul, map_sum, map_smul, hγF, eγ₁, eγ₂,
+      map_add, Relay2.mapA_smul, smul_add, Finset.sum_add_distrib, smul_sub, Finset.smul_sum]
       have hc1 : lA W ^ t • W.π₀ ^ A.M PD.p • W.map F x₁ = W.π₀ ^ A.M PD.p • lA W ^ t • W.map F x₁ :=
         smul_comm _ _ _
       have hc2 : ∀ k, μ m k • W.π₀ ^ A.M PD.p • x₂ k = W.π₀ ^ A.M PD.p • μ m k • x₂ k :=
@@ -302,8 +302,8 @@ theorem arc_section_map (hinj : Function.Injective (algebraMap O LL))
       ← pow_add, Nat.sub_add_cancel hje] at h1
     exact inFP_of_mul_unit W T₂ c' e _ u hu h1
   have hXF := Relay2.inMultiple_map W F hW₁.1 hW₂.1 c' e _ hX
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Relay2.mapA_smul, map_sub, map_sum, Relay2.map_φpow] at hXF
+
+  simp only [Relay2.mapA_smul, map_sub, map_sum, Relay2.map_φpow] at hXF
   have hA : ∑ m, a₁ m • ((W.φD T₂) ^ e) (E m) =
       lA W ^ t • ∑ m, a₁ m • ((W.φD T₂) ^ e) (W.map F (Hh₁ m)) -
         ∑ k, (∑ m, a₁ m * algebraMap O (LetA O n) (μ m k)) • ((W.φD T₂) ^ e) (Hh k) := by
@@ -311,8 +311,8 @@ theorem arc_section_map (hinj : Function.Injective (algebraMap O LL))
         lA W ^ t • (a₁ m • ((W.φD T₂) ^ e) (W.map F (Hh₁ m))) -
           ∑ k, (a₁ m * algebraMap O (LetA O n) (μ m k)) • ((W.φD T₂) ^ e) (Hh k) := by
       intro m
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [E, map_sub, Relay2.φpow_lsmul, map_sum, map_smul, smul_sub, Finset.smul_sum]
+
+      simp only [E, map_sub, Relay2.φpow_lsmul, map_sum, map_smul, smul_sub, Finset.smul_sum]
       congr 1
       · exact smul_comm _ _ _
       · refine Finset.sum_congr rfl fun k _ => ?_

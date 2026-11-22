@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HaarTrace
 @[expose] public section
 
 open MeasureTheory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.haar_trace_conj_eq_const_mul_kernel_image : ∀ {X Y : Type} [Group X] [TopologicalSpace X] [IsTopologicalGroup X] [MeasurableSpace X] [BorelSpace X]
     [Group Y] [TopologicalSpace Y] [IsTopologicalGroup Y] [MeasurableSpace Y] [BorelSpace Y]
     (R N K : Subgroup X) (π : R →* Y) (σ : Y →* R),

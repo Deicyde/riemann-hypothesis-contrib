@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsRecTLocRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -19,7 +19,7 @@ namespace GlobalTheory.NPin
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField
   IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 400000 in
+
 structure CharacterChoiceData (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) where
   cf : CharFrame D
   C : NChoice D

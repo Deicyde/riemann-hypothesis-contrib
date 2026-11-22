@@ -40,9 +40,9 @@ private theorem schur_form {H Γ : Type} [NormedAddCommGroup H] [InnerProductSpa
   have hT : ∀ x y, inner ℂ x (T y) = B x y := by
     intro x y
     conv_rhs => rw [← b.sum_repr' x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [T, LinearMap.sum_apply, LinearMap.smulRight_apply, inner_sum, inner_smul_right, map_sum, LinearMap.map_smulₛₗ,
-      LinearMap.smul_apply, smul_eq_mul, inner_conj_symm]
+
+    simp only [T, LinearMap.sum_apply, LinearMap.smulRight_apply, inner_sum, inner_smul_right, map_sum, LinearMap.map_smulₛₗ,
+    LinearMap.smul_apply, smul_eq_mul, inner_conj_symm]
     exact Finset.sum_congr rfl fun i _ => mul_comm _ _
   have hs : ∀ g, Function.Surjective (ρ g) := fun g => by
     refine LinearMap.injective_iff_surjective.1 ((injective_iff_map_eq_zero _).2 fun x hx => ?_)
@@ -228,18 +228,18 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K) (σ : K �
 private theorem pairAt_sesq {W : Type} [AddCommGroup W] [Module ℂ W] (j : S.V →ₛₗ[σ] W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ)
     (h : ∀ i k, B (j (S.bV i)) (j (S.bV k)) = σ (S.pair (S.bV i) (S.bV k))) (x y : S.V) : pairAt S σ x y = B (j x) (j y) := by
   conv_rhs => rw [← S.bV.sum_repr x, ← S.bV.sum_repr y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [pairAt, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, h,
-    CSD.gramV, Matrix.of_apply, RingHom.id_apply, Finset.mul_sum]
+
+  simp only [pairAt, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, h,
+  CSD.gramV, Matrix.of_apply, RingHom.id_apply, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
 private theorem csumAt_sum {I : Type} [Fintype I] (a : I → K) (f : I → S.Cl → S.V) :
     csumAt S σ (∑ i, a i • f i) (∑ i, a i • f i) = ∑ i, ∑ k, starRingEnd ℂ (σ (a i)) * csumAt S σ (f i) (f k) * σ (a k) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [csumAt, pairAt, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, smul_eq_mul,
-    map_mul, Finset.mul_sum, Finset.sum_mul]
+
+  simp only [csumAt, pairAt, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, smul_eq_mul,
+  map_mul, Finset.mul_sum, Finset.sum_mul]
   conv_rhs =>
     rw [Finset.sum_comm]
     enter [2, k]
@@ -322,8 +322,8 @@ private theorem pairK_mapVV_rat {K : Type} [Field K] [StarRing K] (σ : K →+* 
     obtain ⟨P, hP⟩ := bVVfun_int K lam j
     exact pairK_mapVV_int σ lam G _ y P ((bVV_coe _ lam j).trans hP)
   rw [← (bVV K lam).sum_repr x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, hb, map_mul]
+
+  simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, hb, map_mul]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [starRingEnd_apply (R := K), hx j σ]
 
@@ -487,7 +487,7 @@ private theorem idemOf_mem (h : R.grp_record) (g : Γ) : (idemOf A.X).coeff g �
     simp only [MonoidAlgebra.coeff_mul_single_apply, MonoidAlgebra.coeff_single_mul_apply, inv_inv, mul_one, one_mul] at this
     rw [he, he, map_mul eR, map_mul eR, this]
 
-set_option maxHeartbeats 1600000 in
+
 private theorem herm_eq (F : Face D A) (hc : GlobalTheory.Hk3.Core R F) (t : T) (σ : D.what₂.LL →+* ℂ)
     (x : Fin ((A.fam.R t).nV (A.fam.lvl F.P0 F.ψ0)) → D.what₂.LL) :
     (Nat.card (A.fam.lvl F.P0 F.ψ0).P : ℝ) *
@@ -513,7 +513,7 @@ private theorem herm_eq (F : Face D A) (hc : GlobalTheory.Hk3.Core R F) (t : T) 
   have hN : (Nat.card (A.fam.lvl F.P0 F.ψ0).P : ℂ) ≠ 0 := Nat.cast_ne_zero.2 Nat.card_pos.ne'
   rw [h3, ← Complex.re_ofReal_mul, Complex.ofReal_natCast, mul_inv_cancel_left₀ hN]
 
-set_option maxHeartbeats 1600000 in
+
 private theorem value_nonneg_and_norm_bound (ch : Choice R) (large₂ : SizeData₂ D) (F : Face D A) (hS : HidaSetting large₂ R F) (t : T) (σ : D.what₂.LL →+* ℂ)
     (f : (A.MtildeCSD t).Forms) :
     0 ≤ (csumAt (A.MtildeCSD t) σ f.1 f.1).re ∧ ∀ y, NrmLe _ σ (rowVal ch.S.toGridChoice (ch.S.formC t (R.jX t f) y))
@@ -566,7 +566,7 @@ end Main
 
 end GlobalTheory.FormNorm
 
-set_option maxHeartbeats 1600000 in
+
 open GlobalTheory.FormNorm in
 theorem _root_.GlobalTheory.T.baseTupleGoodForm_values_bounded_by_classSum : BigC fun {D} {_} _ _ {_} {_} {A} {_} _ _ _ {R} F ch _ _ => ∀ (σ : D.what₂.LL →+* ℂ) (x : Fin ((A.fam.R A.μ0).nV (A.fam.lvl F.P0 F.ψ0)) → D.what₂.LL),
   0 ≤ (star (fun i => σ (x i)) ⬝ᵥ (((A.fam.R A.μ0).HV (A.fam.lvl F.P0 F.ψ0)).map σ).mulVec fun i => σ (x i)).re ∧ ∀ y,

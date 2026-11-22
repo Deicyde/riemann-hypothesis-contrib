@@ -89,8 +89,8 @@ theorem exists_integral_coeffs_sum_norm_sq_le_of_rootOfUnity : ∀ {ι Q : Type}
       calc ∑ q, f q * (starRingEnd ℂ) (f q)
           = ∑ q, ∑ i, ∑ j, (a i * (starRingEnd ℂ) (a j)) * (ψ i q * (starRingEnd ℂ) (ψ j q)) := by
             refine Finset.sum_congr rfl fun q _ => ?_
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp only [f, map_sum, map_mul, Finset.sum_mul_sum]
+
+            simp only [f, map_sum, map_mul, Finset.sum_mul_sum]
             refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
             ring
         _ = ∑ i, ∑ j, (a i * (starRingEnd ℂ) (a j)) * ∑ q, (ψ i q * (starRingEnd ℂ) (ψ j q)) := by
@@ -108,9 +108,9 @@ theorem exists_integral_coeffs_sum_norm_sq_le_of_rootOfUnity : ∀ {ι Q : Type}
       simpa using this
     have hρr : ∀ q, ‖ρ (r q)‖ = ((N : ℝ) ^ k)⁻¹ * ‖f q‖ := by
       intro q
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [r, map_mul, map_inv₀, map_pow, map_natCast, map_sum, norm_mul, norm_inv,
-        norm_pow, Complex.norm_natCast, f, a, hψ]
+
+      simp only [r, map_mul, map_inv₀, map_pow, map_natCast, map_sum, norm_mul, norm_inv,
+      norm_pow, Complex.norm_natCast, f, a, hψ]
     simp_rw [hρr]
     rw [← Finset.mul_sum, mul_pow]
     have hNk : (0 : ℝ) < (N : ℝ) ^ k := by positivity

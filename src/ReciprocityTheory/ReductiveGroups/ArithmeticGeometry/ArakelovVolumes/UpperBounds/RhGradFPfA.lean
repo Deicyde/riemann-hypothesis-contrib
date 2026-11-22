@@ -52,8 +52,8 @@ theorem gc_toLp_apply (n d : ℕ) (J : V n →L[ℂ] V d) (ξ : Fin n → ℂ) (
   have h : WithLp.toLp 2 ξ = ∑ j, ξ j • bas n j := by
     ext k
     simp [bas, Pi.single_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum]
+
+  rw [h, map_sum]
   simp [map_smul]
 
 theorem gc_sum_wd_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →L[ℂ] V d) (v : V n)
@@ -122,8 +122,8 @@ theorem gc_leviV_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (U : Set (
     have := gc_wd_comp n d (wdb d a g) F (fderiv ℂ F v) v (hWg a) (hFd v hv) j
     rw [show (fun y => wdb d a g (F y)) = wdb d a g ∘ F from rfl, this, Finset.sum_mul]
   unfold leviV
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [step, gc_toLp_apply, Finset.sum_mul, map_sum, map_mul, Finset.mul_sum]
+
+  simp only [step, gc_toLp_apply, Finset.sum_mul, map_sum, map_mul, Finset.mul_sum]
   rw [sum_four_indices_comm]
   refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun a _ => ?_
   rw [Finset.sum_comm]

@@ -44,8 +44,8 @@ theorem laNum_eq (P : Ideal (MRing ι O)) (a : O) {r : ℕ} (x : Fin r → K →
     (divCycle_support_finite P (C a)) (psum (Fin r) ℤ (k - 1))
   have e : MvPolynomial.map (Int.castRingHom ℝ) (psum (Fin r) ℤ (k - 1)) =
       ∑ i : Fin r, (X i : MvPolynomial (Fin r) ℝ) ^ (k - 1) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [psum, map_sum]
+
+    simp [psum, map_sum]
   rw [e] at h
   rw [h, laNum]
   push_cast
@@ -57,16 +57,16 @@ theorem liePs_inl (j j' m : ℕ) (τ : Ψ) :
     (liePs (N := j + j') j m (Sum.inl τ) : MvPolynomial (Ψ × Fin (j + j')) ℝ) =
       rename (fun i : Fin j => (τ, Fin.castAdd j' i))
         (∑ i : Fin j, (X i : MvPolynomial (Fin j) ℝ) ^ m) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [liePs, map_sum, map_pow, rename_X, Finset.sum_filter, Fin.sum_univ_add]
+
+  simp only [liePs, map_sum, map_pow, rename_X, Finset.sum_filter, Fin.sum_univ_add]
   simp
 
 theorem liePs_inr (j j' m : ℕ) (τ : Ψ) :
     (liePs (N := j + j') j m (Sum.inr τ) : MvPolynomial (Ψ × Fin (j + j')) ℝ) =
       rename (fun i : Fin j' => (τ, Fin.natAdd j i))
         (∑ i : Fin j', (-(X i : MvPolynomial (Fin j') ℝ)) ^ m) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [liePs, map_sum, map_pow, map_neg, rename_X, Finset.sum_filter, Fin.sum_univ_add]
+
+  simp only [liePs, map_sum, map_pow, map_neg, rename_X, Finset.sum_filter, Fin.sum_univ_add]
   have h0 : ∀ x : Fin j, ¬ j ≤ (x : ℕ) := fun x => not_le.2 x.2
   simp [h0]
 
@@ -87,8 +87,8 @@ theorem cycNum_neg {ϖ : O} (hϖ : Irreducible ϖ) {P : Ideal (MRing ι O)} {d :
   have e2 : aeval (fun t : Fin r => ∑ i, (C (((if t = i then (-1 : ℤ) else 0 : ℤ)) : ℝ) * X i :
       MvPolynomial (Fin r) ℝ)) (∑ i : Fin r, (X i : MvPolynomial (Fin r) ℝ) ^ m) =
       ∑ i : Fin r, (-(X i : MvPolynomial (Fin r) ℝ)) ^ m := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, apply_ite]
+
+    simp [map_sum, apply_ite]
   rw [e1, e2] at h
   exact h
 

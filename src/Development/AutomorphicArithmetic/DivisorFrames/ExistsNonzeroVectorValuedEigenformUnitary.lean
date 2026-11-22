@@ -60,12 +60,12 @@ private theorem core {l : ℕ} [Fact l.Prime] {ι : Type} [Fintype ι] {n : ℕ}
     have h2 := hf3 i (e.symm g)
     rw [hc, map_one, one_smul, ← h1] at h2
     show ∑ a ∈ S, Φ _ = _ • Φ _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hΦs, ← LinearMap.map_smul, ← h2, map_sum, map_sum]
+
+    rw [← hΦs, ← LinearMap.map_smul, ← h2, map_sum, map_sum]
     refine Finset.sum_congr rfl fun a ha => ?_
     rw [map_mul, map_mul, hA a ha, mul_one]
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.exists_nonzero_vectorValued_eigenform_unitary :
     ∀ {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
         {Y : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ} (p : PtAt ex Csz) (j : Fin D.R.m) (t : p.P.T) {l : ℕ} [Fact l.Prime]

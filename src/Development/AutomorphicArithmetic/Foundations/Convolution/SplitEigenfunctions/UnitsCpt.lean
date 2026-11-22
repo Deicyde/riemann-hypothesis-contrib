@@ -159,7 +159,7 @@ private theorem arith {C H M τ s s₀ h : ℝ} {e N d r : ℕ} (hs₀ : 0 < s�
 
 end SlopeTestRemainingChoices
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.ConvolutionTheory.RankTwoDescent.decE :
     DecE := by
   intro F _ _ _ π f hf

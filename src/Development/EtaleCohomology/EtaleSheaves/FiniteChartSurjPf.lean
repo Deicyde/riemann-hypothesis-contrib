@@ -109,16 +109,16 @@ theorem ker_le_span_sub_sup_map {A A' : Type} [CommRing A] [CommRing A'] [Algebr
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun A).mp hxs
   have hsplit : x = ∑ i, algebraMap A S (c i) * (t i - algebraMap A S (a i)) +
       algebraMap A S (∑ i, c i * a i) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hc, map_sum, ← Finset.sum_add_distrib]
+
+    rw [← hc, map_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Algebra.smul_def, map_mul]; ring
   have hI : ∑ i, c i * a i ∈ I := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum]
+
+    rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum]
     have h0 : (φ.comp S.val) x = 0 := hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hc, map_sum] at h0
+
+    rw [← hc, map_sum] at h0
     rw [← h0]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, ha, map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq]

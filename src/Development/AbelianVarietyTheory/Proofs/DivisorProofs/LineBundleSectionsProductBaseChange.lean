@@ -100,8 +100,8 @@ theorem exists_isMat : ∀ (Rg : Type) [CommRing Rg] [IsNoetherianRing Rg] (A B 
     obtain ⟨c, hc⟩ := GlobalTheory.T.exists_coeff_pullback_baseChangeStableSectionBasis Rg A L k mA bA hbA R t A' φA' hpA.1 ψA hψA s
     refine ⟨c, fun p => ?_⟩
     have e1 := hs p
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hσ p.1, hc p.2, map_sum] at e1
+
+    rw [hσ p.1, hc p.2, map_sum] at e1
     erw [res_appLE] at e1
     simp only [map_mul] at e1
     erw [e1]

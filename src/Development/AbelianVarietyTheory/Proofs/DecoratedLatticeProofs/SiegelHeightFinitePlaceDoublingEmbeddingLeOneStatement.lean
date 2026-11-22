@@ -15,6 +15,6 @@ open GlobalTheory.Mem.Th (CptF)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.IP
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.siegelHeightFinitePlace_doublingEmbedding_le_one : ∀ (D : D7) (A : HSp D) (L : Lat A), IsSelfDualC A L → ∀ (v : FinPl D) (y : Gv A v), hgtFin D.sp.cm.sig (dblSp A).gram L v (ioAt A v y) ≤ 1 := by
   first | exact @GlobalTheory.Core.Rk.IP.hgtFin_ioAt_le_one | exact GlobalTheory.Core.Rk.IP.hgtFin_ioAt_le_one | (intros; apply GlobalTheory.Core.Rk.IP.hgtFin_ioAt_le_one <;> assumption)

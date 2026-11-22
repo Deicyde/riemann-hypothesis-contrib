@@ -36,7 +36,7 @@ private theorem ker_congr (A : AbF) {a b : ℕ} (h : a ≡ b [MOD A.m]) (hb : A.
   obtain ⟨u, hu, e⟩ := hb
   exact ⟨u, hu, e.trans ((ZMod.natCast_eq_natCast_iff _ _ _).2 h).symm⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.V.abelianField_hasMu_iff_exists_primitiveRoot :
     ∀ (A : AbF) (l : ℕ), l.Prime → l ≠ 2 → ∀ (L : Type) [Field L] [NumberField L], IsAbField A L →
       (A.HasMu l ↔ ∃ z : L, IsPrimitiveRoot z l) := by

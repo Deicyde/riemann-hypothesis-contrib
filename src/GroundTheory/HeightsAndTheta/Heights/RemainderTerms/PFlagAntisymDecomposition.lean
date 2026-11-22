@@ -15,8 +15,8 @@ open MvPolynomial Finset
 
 theorem antisymmetrize_finset_sum (f N : ℕ) {ι : Type*} (s : Finset ι) (g : ι → RootRing f N) :
     antisymmetrize f N (∑ i ∈ s, g i) = ∑ i ∈ s, antisymmetrize f N (g i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [antisymmetrize, map_sum, Finset.smul_sum]
+
+  simp only [antisymmetrize, map_sum, Finset.smul_sum]
   exact Finset.sum_comm
 
 theorem FlagAntisymDecomposition.proof (h1 : FlagSymmetricMulAntisym.Statement)

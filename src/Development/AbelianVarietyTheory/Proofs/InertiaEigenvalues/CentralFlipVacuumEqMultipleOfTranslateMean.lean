@@ -25,13 +25,13 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.LevelSeries
 
 namespace GlobalTheory.LevelSeries
 
 
-set_option maxHeartbeats 1600000 in
+
 open MeasureTheory GlobalTheory.VacUnique GlobalTheory.FockCompare in
 theorem eq_smul_vacuum {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hψ : IsStdChar D ψ (-1)) (hθ : IsInfFam θ)
     {S T : HSp D} {sS : D.what₂.Tau → Matrix (Fin S.rank) (Fin S.rank) ℂ}

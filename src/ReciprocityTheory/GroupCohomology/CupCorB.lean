@@ -59,15 +59,15 @@ theorem hd_hcup (β : V →ₗ[R] W →ₗ[R] Z) (p q : ℕ) (F : (Fin (p + 1) �
         β (F fun j => x ⟨(a.castSucc.succAbove j : ℕ), by omega⟩) (F' fun j => x ⟨p + 1 + j, by omega⟩)) =
         β (∑ a : Fin (p + 1), (-1 : ℤ) ^ (a : ℕ) • F fun j => x ⟨(a.castSucc.succAbove j : ℕ), by omega⟩)
           (F' fun j => x ⟨p + 1 + j, by omega⟩) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, LinearMap.sum_apply]
+
+      simp [map_sum, LinearMap.sum_apply]
     have e1 : (F' fun j => x ⟨p + ((0 : Fin (q + 2)).succAbove j : ℕ), by omega⟩) =
         F' fun j => x ⟨p + 1 + j, by omega⟩ := by
       congr 1; funext k; congr 1; ext; simp [val_succAbove]; omega
     rw [s1, hsum, e1]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Fin.val_zero, pow_zero, one_smul, map_add (f := _), map_sum, map_zsmul, smul_add, Finset.smul_sum,
-      smul_smul, Fin.val_succ, LinearMap.smul_apply]
+
+    simp only [Fin.val_zero, pow_zero, one_smul, map_add (f := _), map_sum, map_zsmul, smul_add, Finset.smul_sum,
+    smul_smul, Fin.val_succ, LinearMap.smul_apply]
     congr 1
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [← pow_add]; congr 2; omega
@@ -182,8 +182,8 @@ theorem cup_cor_eq (b : Pairing M N P) (p q : ℕ) (f : (Fin p → U) → M.V) (
       Fin.partialProd g ⟨p + (↑j + 1), by omega⟩ = g (Fin.natAdd p j) := fun j => pp_tail g j
   have h0 : Fin.partialProd g ⟨0, by omega⟩ = 1 := Fin.partialProd_zero g
   unfold cupFun corFun normF
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [finsum_eq_sum_of_fintype, map_sum, LinearMap.sum_apply]
+
+  simp only [finsum_eq_sum_of_fintype, map_sum, LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun c _ => ?_
   simp only [hcup, homz, Fin.coe_castSucc, Fin.val_succ, Fin.val_zero, add_zero]
   simp only [pp_trunc, Fin.coe_castSucc, Fin.val_succ]

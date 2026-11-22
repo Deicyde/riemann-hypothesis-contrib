@@ -40,8 +40,8 @@ theorem gl_smul_pi_one {k : Type} [Field k] [ValuativeRel k] {n : Type} [Fintype
     intro i _
     refine Submodule.mem_one.2 ⟨∑ j, h.1 i j * c j, ?_⟩
     show _ = ((Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) h).1 *ᵥ y) i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, ← hc]
+
+    simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, ← hc]
     rfl
   refine Submodule.ext fun x => (Submodule.mem_smul_pointwise_iff_exists x _ _).trans ⟨?_, ?_⟩
   · rintro ⟨y, hy, rfl⟩
@@ -51,7 +51,7 @@ theorem gl_smul_pi_one {k : Type} [Field k] [ValuativeRel k] {n : Type} [Fintype
     rw [map_inv, smul_inv_smul]
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem gl_mem_lev : All fun {D} _ _ {sc} {G} _ _ => ∀ (X : Node), IsSelfDualC (G.V X) (G.Λ X) → ∀ v ∈ G.pl.S0,
   ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (p : GlobalTheory.FinPl.SplitPt D k),
   p.v = v → Formalism.L2.NTheta.IsIdemAt p.e (G.pl.w v) → ∀ (n : Type) [Fintype n] [DecidableEq n] (β : GlobalTheory.FinPl.Frame p (G.V X) n),

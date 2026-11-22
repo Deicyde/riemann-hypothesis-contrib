@@ -106,7 +106,7 @@ theorem eq_zero_of_coprime_nsmul_zmod (hnk : n = ℓ ^ k) {m : ℕ} (hm : m.Copr
   exact (ZMod.unitOfCoprime m hmn).isUnit.mul_right_eq_zero.1 h
 
 
-set_option maxHeartbeats 1600000 in
+
 include hℓ hnk hS in
 theorem gsCompactInv_ker_left (x : cohomology (zmodRep.{0} (galUnramifiedOutside K.1 ℚ̄ S) n) 1)
     (hx : ∀ y : compactCohomologyRes (gsFinFamily S ιs) (gsRoots S n) 2,
@@ -154,7 +154,7 @@ theorem exists_nsmul_eq_of_forall_zmod {A : Type*} [AddCommGroup A] (a : A)
   exact hf (h (f.comp (QuotientAddGroup.mk' N)))
 
 
-set_option maxHeartbeats 4000000 in
+
 include hℓ hnk hS in
 theorem gsCompactInv_ker_right (y : compactCohomologyRes (gsFinFamily S ιs) (gsRoots S n) 2)
     (hy : ∀ x : cohomology (zmodRep.{0} (galUnramifiedOutside K.1 ℚ̄ S) n) 1,

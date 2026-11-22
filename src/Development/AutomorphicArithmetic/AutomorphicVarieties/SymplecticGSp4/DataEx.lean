@@ -202,7 +202,7 @@ private theorem dirG_pow {O : Type} [CommRing O] {N : ℕ} [NeZero N] (χ : Diri
 private theorem dirG_one {O : Type} [CommRing O] {N : ℕ} [NeZero N] (g : G ℚ Ω) :
     Chr.dirG ℚ Ω (1 : DirichletCharacter O N) g = 1 := Units.ext (MulChar.one_apply_coe _)
 
-set_option maxHeartbeats 800000 in
+
 private theorem core (hX : X.CorX) (h : Host) (e : ℕ) (hl2 : l ≠ 2) (he : 2 ≤ e) (ψ : DirichletCharacter c.O h.N)
     (hψ : h.IsChar ψ) (hev : PsiEven e ψ) (hchi : chiP l ψ ≠ 1) {p n : ℕ} [NeZero p] (hp : Odd p)
     (ξ₀ : DirichletCharacter c.O p) (ξ : DirichletCharacter c.O (2 ^ n)) (hξ : ξ.IsPrimitive) (hξo : ξ (-1) = -1)

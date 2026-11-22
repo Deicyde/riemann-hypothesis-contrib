@@ -11,7 +11,7 @@ open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published U
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.Gal.InertialTypesAlt.indMap :
     UpperTheory.Gal.TypesAndIwahori.IndSupp → UpperTheory.Gal.TypesAndIwahori.ParaFactor → IndMap := by
   intro hSupp hPara k _ _ _ _ N s d hd W Z _ _ _ _ ρ κ j hj hjκ

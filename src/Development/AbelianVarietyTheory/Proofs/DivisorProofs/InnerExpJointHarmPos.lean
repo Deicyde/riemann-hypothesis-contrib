@@ -148,9 +148,9 @@ theorem coeff_eigen (h0 : u 0 = ι) (han : ∀ P, AnalyticOnNhd ℝ (fun t => u 
     refine h1.congr_deriv ?_
     have e : inner ℂ (ι Q) (u t (A P)) = -(ψ t : ℂ) * inner ℂ (ι Q) (u t P) := by
       conv_lhs => rw [hA]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [ψ, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, inner_sum,
-        inner_smul_right, Complex.ofReal_sum, ← Finset.sum_neg_distrib, Finset.sum_mul]
+
+      simp only [ψ, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, inner_sum,
+      inner_smul_right, Complex.ofReal_sum, ← Finset.sum_neg_distrib, Finset.sum_mul]
       refine Finset.sum_congr rfl fun ν _ => ?_
       rw [odd_coeff h0 han hder (N ν) (S ν) (K ν) ν (hN ν) (hS ν) (hK ν) (aN ν) (aS ν) (aK ν) Q P
         (hQ ν) (hP ν) t, hm, map_smul, inner_smul_right]
@@ -314,8 +314,8 @@ theorem inner_exp_jointHarm_pos : ∀ (p q r s : ℕ) (T0 : GrpData (p * r + q *
         conv_lhs => rw [hsum]
         ext a b
         simp [Matrix.sum_apply, Finset.sum_mul, mul_assoc]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [e, map_sum]
+
+      rw [e, map_sum]
       simp only [map_smul]
     · rw [← sub_eq_zero, ← lie, ← mul_kronecker_mul, ← mul_kronecker_mul, (hNE ν).2.2.1,
         (hNE ν).2.2.2.1, sub_self, map_zero]

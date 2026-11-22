@@ -902,8 +902,8 @@ theorem Pg_Lc (q : Fin (2 * r + 1)) (x : Ix k r → ℝ) :
     Pg q.val (Lc x) = ∑ a, x ⟨q, a⟩ • bv (⟨q, a⟩ : Ix k r) := by
   rw [Lc_apply]
   have : Pg q.val (∑ i, x i • bv i) = PgL q.val (∑ i, x i • bv (k := k) (r := r) i) := rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, map_sum]
+
+  rw [this, map_sum]
   simp only [map_smul]
   have e : ∀ i : Ix k r, PgL q.val (bv i) = if i.1 = q then bv i else 0 := by
     intro i

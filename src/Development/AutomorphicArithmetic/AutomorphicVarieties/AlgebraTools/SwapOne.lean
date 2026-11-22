@@ -93,8 +93,8 @@ theorem UpperTheory.V.AlgebraTools.hkAct :
       refine ⟨y', ?_, ?_⟩
       · rw [b.T_mul a c h w hw, mul_assoc (b.T _), mul_assoc (b.T _), hy, ← mul_assoc, hy']
       ·
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hyK', ← hσ, hyK, map_sum, Finset.mul_sum, Finset.mul_sum]
+
+        rw [hyK', ← hσ, hyK, map_sum, Finset.mul_sum, Finset.mul_sum]
         simp only [add_mul, Finset.sum_add_distrib, mul_assoc]
         congr 1
         refine Fintype.sum_equiv (Equiv.mulLeft (swap a c)) _ _ fun u => ?_

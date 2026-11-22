@@ -81,8 +81,8 @@ theorem nl_le : NL W T Pt π' Eπ h' c ≤ LamLA W T π' Eπ h' c ⊤ := by
   refine Submodule.span_le.2 ?_
   rintro x ⟨m, a, y, ⟨hy, hx⟩, -⟩
   refine ⟨∑ j, a j ⊗ₜ ⟨mkL W T π' c (y j) (hy j), Submodule.mem_top⟩, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, hx]
+
+  rw [map_sum, hx]
   rfl
 
 theorem nl_smulA {b : LetA O n} (hb : b ∈ W.AΔ) {x : LA W T π' c} (hx : x ∈ NL W T Pt π' Eπ h' c) :
@@ -121,8 +121,8 @@ theorem nl_sat (hwd : WD W T Pt π' c) (hp : algebraMap O LL ((PD.p : ℕ) : O) 
         ((s j : ↥(⊤ : Submodule O _)) : LcQ W T π' c) := fun j => Submodule.Quotient.mk_surjective _ _
     choose z hz using hs
     refine ⟨m, a, fun j => z j, ⟨fun j => (z j).2, ?_⟩⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← ht, map_sum]
+
+    rw [← ht, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     change algebraMap (LetA O n) W.EE ((letE c : LetA O n) * a j) ⊗ₜ
       ((s j : ↥(⊤ : Submodule O _)) : LcQ W T π' c) = _

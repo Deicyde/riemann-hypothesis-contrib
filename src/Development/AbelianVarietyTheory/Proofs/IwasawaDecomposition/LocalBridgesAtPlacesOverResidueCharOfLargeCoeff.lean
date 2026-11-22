@@ -14,8 +14,8 @@ open Formalism.L2.Fam.NPC Formalism.L2.Fam.NPC.BaseC GlobalTheory.HeckeLocN
 
 namespace GlobalTheory.HeckeLocN.BridgeAll
 
-set_option maxHeartbeats 1000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 theorem exists_finExt_ge {l : ℕ} [Fact l.Prime] {ι : Type} (S : Set ι) (hS : S.Finite) (L : ι → Loc.FinExt l) :
     ∃ F : Loc.FinExt l, ∀ i ∈ S, (L i).1 ≤ F.1 := by

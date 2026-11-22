@@ -18,8 +18,8 @@ open GlobalTheory.Mem.R3.Tr
 
 namespace GlobalTheory.HeightCounting.Up.LiTw
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 2000000
+
+
 
 section Gen
 

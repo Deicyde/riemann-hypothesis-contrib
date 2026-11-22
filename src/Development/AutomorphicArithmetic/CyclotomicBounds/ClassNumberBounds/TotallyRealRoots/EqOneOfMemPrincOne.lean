@@ -56,8 +56,8 @@ private theorem eq_one_of_toZMod {o : ℕ} (ho : ¬ l ∣ o) {ζ : ℤ_[l]ˣ}
   · exact Units.ext (by simpa [sub_eq_zero] using h)
   · exfalso
     have := congrArg PadicInt.toZMod h
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at this
+
+    rw [map_sum, map_zero] at this
     simp only [map_pow, h1, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
       mul_one] at this
     exact ho ((ZMod.natCast_eq_zero_iff o l).1 this)

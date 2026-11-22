@@ -53,8 +53,8 @@ theorem exists_dualBasis (A M : Type) [CommRing A] [AddCommGroup M] [Module A M]
   have h1 : s m = ∑ i, (s m i) • (Pi.single i 1 : Fin n → A) := by
     ext j; simp [Finset.sum_apply, Pi.single_apply]
   have h2 : t (s m) = m := LinearMap.congr_fun hs m
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [← h2, h1, map_sum]
+
+  conv_rhs => rw [← h2, h1, map_sum]
   simp
 
 theorem isBaseChange_dual [Module.Finite A M] [Module.Projective A M] (hg : IsBaseChange B g) :
@@ -74,8 +74,8 @@ theorem isBaseChange_dual [Module.Finite A M] [Module.Projective A M] (hg : IsBa
       have hw : ∑ i, w (e i) • f i = w := by
         refine LinearMap.ext fun m => ?_
         have := congrArg w (hef m)
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, map_smul, smul_eq_mul] at this
+
+        simp only [map_sum, map_smul, smul_eq_mul] at this
         simp only [LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul]
         rw [← this]
         exact Finset.sum_congr rfl fun i _ => _root_.mul_comm _ _
@@ -92,10 +92,10 @@ theorem isBaseChange_dual [Module.Finite A M] [Module.Projective A M] (hg : IsBa
     show Φ (∑ i, y (g (e i)) • ((1 : B) ⊗ₜ[A] f i)) (g m) = _
     have h3 : y (g m) = ∑ i, algebraMap A B (f i m) * y (g (e i)) := by
       conv_lhs => rw [← hef m]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, Algebra.smul_def, ← IsScalarTower.algebraMap_smul B]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h3, map_sum, LinearMap.sum_apply]
+
+      simp [map_sum, Algebra.smul_def, ← IsScalarTower.algebraMap_smul B]
+
+    rw [h3, map_sum, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [Φ, _root_.mul_comm]
   exact IsBaseChange.of_equiv (LinearEquiv.ofBijective Φ

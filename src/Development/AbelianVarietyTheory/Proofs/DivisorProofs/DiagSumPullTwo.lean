@@ -23,8 +23,8 @@ theorem diagSum_pullTwo : ∀ (R : Type) [CommRing R] (D D' : Type) [CommRing D]
   induction c using TensorProduct.induction_on with
   | zero => simp
   | tmul a b =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [diagSum_tmul, pullbackTwo, TensorProduct.map_tmul, map_sum, map_mul]
+
+    simp only [diagSum_tmul, pullbackTwo, TensorProduct.map_tmul, map_sum, map_mul]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mulBy]
     rfl

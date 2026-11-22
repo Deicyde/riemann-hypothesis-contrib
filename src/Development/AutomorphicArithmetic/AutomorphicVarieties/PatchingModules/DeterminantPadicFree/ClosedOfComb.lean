@@ -37,8 +37,8 @@ private theorem closed_of_comb {A G ι : Type} [CommRing A] [IsDomain A] [IsLoca
     intro g
     have h1 : algebraMap A (FractionRing A) ((b : A) * ψ g) =
         algebraMap A (FractionRing A) (∑ a, c a * ρ a g) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_mul, h g, map_sum, Finset.mul_sum]
+
+      rw [map_mul, h g, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [map_mul, hc a, Algebra.smul_def, mul_assoc]
     have h2 := IsFractionRing.injective A (FractionRing A) h1
@@ -77,8 +77,8 @@ private theorem closed_of_comb {A G ι : Type} [CommRing A] [IsDomain A] [IsLoca
     Ideal.Quotient.mk (maximalIdeal A ^ N) (b : A))).isClopen_fiber 0
   convert hG.isClosed using 1
   ext g
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sub, map_sum, map_mul]
+
+  simp [map_sub, map_sum, map_mul]
 
 theorem UpperTheory.V.Pa.Det.psiMu :
     ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ} {r : Resid F O n} (x : Point r) (v : F.Vl) (i : Fin n) (g : F.Gv v), g ∈ F.mu v → x.ψ v i g = 1 := by

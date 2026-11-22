@@ -73,8 +73,8 @@ theorem aeval_chern_mem_reach {ι : Type} [Fintype ι] (m : ι → ℕ) (n : ℕ
         aeval (fun x : ι × ℕ => (Matrix.charpolyRev (-(A x.1))).coeff x.2) (monomial d (R.coeff d)) := by
     funext A
     conv_lhs => rw [R.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finset.sum_apply]
+
+    simp only [map_sum, Finset.sum_apply]
   rw [hsum]
   exact Submodule.sum_mem _ key
 

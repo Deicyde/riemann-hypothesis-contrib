@@ -391,7 +391,7 @@ end UpperTheory.V.Th.End3
 attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
 attribute [local instance 10000] IsDiscreteValuationRing.toIsLocalRing
 
-set_option maxHeartbeats 400000 in
+
 open UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Th.End3 in
 theorem UpperTheory.V.Th.rigEnd3 :
     Af.HypothesesH → AdL → RigEnd3 := by

@@ -189,8 +189,8 @@ theorem exists_rep_sandwich {W : G.Weil} (ρ : RealMatch W) {μ₀ : T} (hL : L.
     rw [hH x y z hx.1.1 hx.1.2 hx.2]
     have e1 : ∀ τ : TotT G ((A.comp r).comp B'), (τ.sum fun d c => c * famProd _ (φ d) ((x.append y).append z)) =
       Finsupp.linearCombination ℂ (fun d => famProd _ (φ d) ((x.append y).append z)) τ := fun τ => rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, map_sum]
+
+    rw [e1, map_sum]
     refine Finset.sum_congr rfl fun κ hκ => ?_
     rw [sandwich, map_finsuppSum, Finsupp.mul_sum]
     refine Finsupp.sum_congr fun d hd => ?_

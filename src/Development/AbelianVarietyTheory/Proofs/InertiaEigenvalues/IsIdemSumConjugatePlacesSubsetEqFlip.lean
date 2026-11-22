@@ -16,7 +16,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.LevelSeries
 
 namespace GlobalTheory.FlipIdemSum
@@ -56,8 +56,8 @@ theorem idemSum_flip_subset : ∀ (D : D7) (e eT e' : AE D) (P T : Finset (Forma
   have hA : ∑ Q ∈ P \ T, gs Q = ∑ Q ∈ P \ T, es Q := Finset.sum_congr rfl fun Q hQ =>
     GlobalTheory.Tow.idemAt_unique (hgs Q (Finset.mem_union_left _ hQ)) (hes Q (Finset.mem_sdiff.1 hQ).1)
   have hB : ∑ Q ∈ T.image Formalism.L2.DIV.conjPl, gs Q = cA D eT := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_image hinj, htsum, map_sum]
+
+    rw [Finset.sum_image hinj, htsum, map_sum]
     refine Finset.sum_congr rfl fun PP hPP => ?_
     rw [GlobalTheory.Tow.idemAt_unique (hts PP hPP) (hes PP (hTP hPP))]
     exact GlobalTheory.Tow.idemAt_unique (hgs _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ hPP))) (hconj PP (hTP hPP))

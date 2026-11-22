@@ -26,7 +26,7 @@ variable {l : ℕ} [Fact l.Prime] {F : FinExt l} {Qp K₀ K : Type} [Field Qp] [
     {I : WIo R RA RW inclR φR gR πA}
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem build_prism (BS : GlobalTheory.Published.BhattScholzeCrystallineLattices) (E : WEt I) [Algebra ℤ_[l] O]
     [Nontrivial O] [FiniteDimensional Qp LL] (hO : Function.Injective (algebraMap O LL)) (hp : PD.p = l)
     {PS PW : Obj l ↥(OL F)} (ev : Hom PS PW) (ioH : Hom PS (ainfObj F)) (gH : ↥(GK F) → Hom PS PS)
@@ -90,8 +90,8 @@ theorem build_prism (BS : GlobalTheory.Published.BhattScholzeCrystallineLattices
   have hνsum : ∀ T hT (t : Fin (q T hT) → PS.A),
       ν T hT (∑ i, t i • b T hT i) = ∑ i, c (ψ (t i)) • κ T (cb T hT i) := fun T hT t => by
     simp only [ν]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, map_sum]
+
+    rw [map_sum, map_sum, map_sum]
     exact Finset.sum_congr rfl fun i _ => by rw [hcb]; exact hνs T hT _ _
   have hν1 : ∀ T hT x, ∃ (k : ℕ) (m : (C T hT).M PS), c (ψ Q) ^ k • TWmap φR T (ν T hT x) = ν T hT m :=
     fun T hT x => by
@@ -102,8 +102,8 @@ theorem build_prism (BS : GlobalTheory.Published.BhattScholzeCrystallineLattices
     obtain ⟨k, t, h⟩ := h2 T hT x
     refine ⟨k, t, ?_⟩
     simp only [ν]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_pow, ← hκs, h, map_sum]
+
+    rw [← map_pow, ← hκs, h, map_sum]
     exact Finset.sum_congr rfl fun i _ => by rw [hκs, hκφ]
   have hν3 : ∀ T hT g x, TWact (gR g) T g (ν T hT x) = ν T hT ((C T hT).tr (gH g) x) := fun T hT g x => by
     simp only [ν]
@@ -157,8 +157,8 @@ theorem build_prism (BS : GlobalTheory.Published.BhattScholzeCrystallineLattices
   · intro y
     have key : ∀ t : Fin d → PS.A, κ Γ.one (∑ i, inclW l (ainfId F (ioH.f (t i))) ⊗ₜ[ℤ_[l]] bo i) =
         I.ioE (algebraMap _ R.EE (∑ i, o i • a (t i))) • ((1 : RW) ⊗ₜ[O] e₀) := fun t => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum, map_sum, Finset.sum_smul]
+
+      rw [map_sum, map_sum, map_sum, Finset.sum_smul]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hκ, hbo, Algebra.smul_def (o i) (a _), map_mul, ← IsScalarTower.algebraMap_apply, map_mul,
         AlgHom.commutes, hψ₀, TensorProduct.smul_tmul', smul_eq_mul, mul_one, ← Algebra.smul_def,
@@ -177,8 +177,8 @@ theorem build_prism (BS : GlobalTheory.Published.BhattScholzeCrystallineLattices
 end Generic
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem main : GlobalTheory.Published.BhattScholzeCrystallineLattices →
     ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI → WachEx AI := by
   intro BS l _ P AI tied K s LL hG Γ R I hW E

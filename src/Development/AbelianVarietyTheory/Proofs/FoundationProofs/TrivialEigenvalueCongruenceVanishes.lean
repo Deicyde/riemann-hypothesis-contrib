@@ -69,9 +69,9 @@ theorem poly_decomp {k : ℕ} (v : Fin k → E) (r : E → Fin k → ℤ_[l]) (P
   classical
   refine ⟨fun a => ∑ m ∈ P.support, MvPolynomial.monomial m (r (P.coeff m) a), ?_⟩
   ext n
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [MvPolynomial.coeff_sum, MvPolynomial.coeff_smul, MvPolynomial.coeff_map, MvPolynomial.coeff_monomial,
-    smul_eq_mul, map_sum]
+
+  simp only [MvPolynomial.coeff_sum, MvPolynomial.coeff_smul, MvPolynomial.coeff_map, MvPolynomial.coeff_monomial,
+  smul_eq_mul, map_sum]
   by_cases hn : n ∈ P.support
   · simp only [apply_ite (algebraMap ℤ_[l] E), map_zero, Finset.sum_ite_eq', if_pos hn]
     refine (hr n hn).trans ?_
@@ -90,8 +90,8 @@ theorem sum_reorg {n k : ℕ} (f : Fin n → E) (v : Fin k → E) (c : Fin n →
     (hf : ∀ i, f i = ∑ a, c i a • v a) (F : Fin n → MvPolynomial (Fin 2) ℤ_[l]) :
     ∑ a, v a • MvPolynomial.map (algebraMap ℤ_[l] E) (∑ i, c i a • F i) =
       ∑ i, f i • MvPolynomial.map (algebraMap ℤ_[l] E) (F i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_coef_smul, Finset.smul_sum, smul_smul]
+
+  simp only [map_sum, map_coef_smul, Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hf i, Finset.sum_smul]
@@ -104,8 +104,8 @@ theorem sum_slP {k : ℕ} (v : Fin k → E) (m : Matrix (Fin 2) (Fin 2) ℤ) (A 
     ∑ a, v a • MvPolynomial.map (algebraMap ℤ_[l] E) (slP m (A a) - B a) =
       slP m (∑ a, v a • MvPolynomial.map (algebraMap ℤ_[l] E) (A a)) -
         ∑ a, v a • MvPolynomial.map (algebraMap ℤ_[l] E) (B a) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ← Finset.sum_sub_distrib]
+
+  rw [map_sum, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [map_smul, RingHom.map_sub, map_slP, smul_sub]
 

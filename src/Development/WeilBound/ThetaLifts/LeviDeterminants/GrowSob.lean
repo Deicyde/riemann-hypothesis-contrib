@@ -81,8 +81,8 @@ theorem slice {D : ℕ} (b : Module.Basis (Fin D) ℝ (V F κ)) : ∃ μ, IsHaar
     have : ∑ i, lineA (b i) (t i) = J (t, 0) := by
       rw [hJ, Module.Basis.equivFun_symm_apply]
       change ∑ i, splitE F κ (t i • b i, 0) = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum]
+
+      rw [← map_sum]
       congr 1
       exact Prod.ext (by rw [Prod.fst_sum]) (by rw [Prod.snd_sum]; simp)
     rw [this, ← map_add (f := _), Prod.mk_add_mk, add_zero]

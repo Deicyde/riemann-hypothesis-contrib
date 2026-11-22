@@ -19,10 +19,10 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K)
 theorem csum_coords (u v : Fin S.dim → K) :
     S.csum (S.basis.equivFun.symm u : S.Cl → S.V) (S.basis.equivFun.symm v : S.Cl → S.V) =
       ∑ i, ∑ j, star (u i) * S.H i j * v j := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Basis.equivFun_symm_apply, Submodule.coe_sum, Submodule.coe_smul, CSD.csum, CSD.H,
-    Matrix.of_apply, Finset.sum_apply, Pi.smul_apply, map_sum, map_smulₛₗ, LinearMap.sum_apply,
-    LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul, RingHom.id_apply]
+
+  simp only [Basis.equivFun_symm_apply, Submodule.coe_sum, Submodule.coe_smul, CSD.csum, CSD.H,
+  Matrix.of_apply, Finset.sum_apply, Pi.smul_apply, map_sum, map_smulₛₗ, LinearMap.sum_apply,
+  LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul, RingHom.id_apply]
   conv_lhs => rw [Finset.sum_comm]; arg 2; ext j; rw [Finset.sum_comm]
   conv_lhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun c _ => ?_
@@ -67,8 +67,8 @@ theorem forms_of_semilinear (φ : K →+* K') (e : G ≃* G') (B : BlockDat K G 
     simp [hCdef, Matrix.mulVec, dotProduct, mul_comm]
   have hLsum : ∀ x : Fin B.S.dim → K, L (B.S.basis.equivFun.symm x) = ∑ k, φ (x k) • L (B.S.basis k) := by
     intro x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Basis.equivFun_symm_apply, map_sum]
+
+    rw [Basis.equivFun_symm_apply, map_sum]
     exact Finset.sum_congr rfl fun k _ => hsm _ _
   have hT : ∀ x : Fin B.S.dim → K, C *ᵥ (fun k => φ (x k)) = B'.S.basis.equivFun (L (B.S.basis.equivFun.symm x)) := by
     intro x

@@ -86,8 +86,8 @@ theorem exists_lattice (V : Set (AE F E)) (hV : V ∈ 𝓝 (0 : AE F E)) :
         simp only [smul_mul_smul_comm]
       change (RingHom.snd (Ainf F) (Af F) : AF F →+* Af F) (b.repr (z * z') k) = _
       rw [e1]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul]
+
+      simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul]
       simp only [map_mul, c]
       rfl
     rw [e1, e, e', Pi.smul_apply, Finset.smul_sum]

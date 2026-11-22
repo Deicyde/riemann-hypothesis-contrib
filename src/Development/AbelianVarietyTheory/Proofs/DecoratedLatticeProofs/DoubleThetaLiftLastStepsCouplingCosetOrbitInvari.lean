@@ -149,8 +149,8 @@ theorem om_comb {S T : HSp D} {χS χT : (AE D)ˣ →* Circle} {om : Om S T} (ho
     {g : GA D S} {h : GA D T} {c : WO S T →₀ ℂ} (hc : ∀ x ∈ c.support, actO S T g h x = x)
     {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) : om (g, h) (comb ψ S T c f) = comb ψ S T c (om (g, h) f) := by
   unfold comb
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun x hx => ?_
   rw [map_smul, hom.om_heis g h x f hf, hc x hx]
 
@@ -338,7 +338,7 @@ end Place
 
 
 open GlobalTheory.LastTwoSteps in
-set_option maxHeartbeats 1000000 in
+
 theorem lst_model {D : D7} {c : GlobalTheory.SeeSaw.Comm D} {v : GlobalTheory.SeeSaw.VCom c} {χ} (Q : GlobalTheory.QPl.QAt v χ) (hc : c.Is) (hv : v.Is) (h : Q.s + 2 * 0 + 2 = D.R.m)
     (hr : c.Lz.rank = 1)
     (hτ : (v.τ Q.s h)ᴴ * ((c.bes Q.s 0 h).L.gram * v.τ Q.s h) = (-(D.host.xi0 * star D.host.xi0)) • c.Lz.gram)
@@ -396,7 +396,7 @@ theorem lst_model {D : D7} {c : GlobalTheory.SeeSaw.Comm D} {v : GlobalTheory.Se
     exact funext hOK
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem orb : ∀ (D : D7) (c : GlobalTheory.SeeSaw.Comm D) (v : GlobalTheory.SeeSaw.VCom c) χ (Q : GlobalTheory.QPl.QAt v χ), c.Is → v.Is → ∀ (h : Q.s + 2 * 0 + 2 = D.R.m), c.Lz.rank = 1 → (v.τ Q.s h)ᴴ * ((c.bes Q.s 0 h).L.gram * v.τ Q.s h) = (-(D.host.xi0 * star D.host.xi0)) • c.Lz.gram → ∀ s₁ : GlobalTheory.Unf.StepBF c.ψ (c.B Q.s 0 h) (c.J Q.s 0 h), s₁.χW = χ Q.s → ∀ oma omb, IsWeilDatumO c.ψ _ _ (χ Q.s) (χ Q.s) oma → IsWeilDatumO c.ψ _ _ (χ (Q.s + 1)) (χ (Q.s + 1)) omb → ∀ c₁ c₂, (∀ u ∈ c₁.support, IsHalf (1 - (Q.q.e + cA D Q.q.e)) u) → (∀ u ∈ c₂.support, IsHalf (1 - (Q.q.e + cA D Q.q.e)) u) → ∀ Ψ₁ Ψ₂, GlobalTheory.FinPl.Vac c.ψ _ _ (v.N Q.s) (v.N (Q.s + 1)) (· = Q.q.v) Ψ₁ → GlobalTheory.FinPl.Vac c.ψ _ _ (v.N (Q.s + 1)) v.NT (· = Q.q.v) Ψ₂ → ∀ φ, IsContAut (c.X Q.s) φ → ∀ α u y yb, SameOrb (Q.T.lev (Q.s + 1) 0 rfl).J (box _ Q.c₂) (Q.cos y) yb → ∀ d₁ d₂, (ofSplit Q.q).IsCombAt c.ψ (Q.FX Q.s (Nat.le_succ _)) (Q.FX (Q.s + 1) le_rfl) d₁ (Q.T.xiPen (box _ Q.c₂) (Q.rep Q.s 0 rfl α) yb) → (ofSplit Q.q).IsCombAt c.ψ (Q.FX (Q.s + 1) le_rfl) Q.FM d₂ (Q.T.xiTop (box _ Q.c₂) Q.ψk Q.ν (-1) yb) → c.bl Q.s oma omb φ (biComb c.ψ _ _ _ (aconv [c₁, d₁]) (aconv [c₂, d₂]) (c.lst Q.s h (v.τ Q.s h) s₁ Ψ₁ Ψ₂)) = c.bl Q.s oma omb φ (biComb c.ψ _ _ _ (aconv [c₁, Q.dL Q.s α y]) (aconv [c₂, Q.dL (Q.s + 1) y u]) (c.lst Q.s h (v.τ Q.s h) s₁ Ψ₁ Ψ₂)) := by
   intro D c v χ Q hc hv h hr hτ s₁ _ oma omb ha hb c₁ c₂ hc₁ hc₂ Ψ₁ Ψ₂ h₁ h₂ φ _ α u y yb hy d₁ d₂ hd₁ hd₂
   obtain ⟨g, hg, y₀, hy₀, rfl⟩ := hy

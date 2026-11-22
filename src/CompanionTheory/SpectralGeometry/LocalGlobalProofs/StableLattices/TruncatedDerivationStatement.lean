@@ -10,6 +10,6 @@ public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.Admiss
 @[expose] public section
 
 open CompanionTheory.Bmu
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.TruncatedDerivation : CutDer := by
   first | exact @GlobalTheory.CompanionTheory.CutDeriv.cutDer | exact GlobalTheory.CompanionTheory.CutDeriv.cutDer | (intros; apply GlobalTheory.CompanionTheory.CutDeriv.cutDer <;> assumption)
